@@ -2,7 +2,7 @@ IMPORT iesp, doxie, liensv2_services, doxie_crs, fcra, suppress, FFD;
 
 EXPORT lienjudgment_records (
   dataset (doxie.layout_references) dids,
-  PersonReports.input.liens in_params = module (PersonReports.input.liens) end,
+  PersonReports.IParam.liens in_params = module (PersonReports.IParam.liens) end,
   boolean IsFCRA = false,
   dataset (fcra.Layout_override_flag) flagfile = fcra.compliance.blank_flagfile,
   dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim, 
@@ -156,7 +156,7 @@ EXPORT lienjudgment_records (
 	END;
 
   // same as in Compreport (Doxie/liens_v2_records)
-  rptRecs := LiensV2_Services.liens_raw.report_view.by_did (dids, in_params.ssn_mask, IsFCRA, in_params.liens_party_type,in_params.applicationType, ,slim_pc_recs, in_params.FFDOptionsMask,, rollup_by_case_link);
+  rptRecs := LiensV2_Services.liens_raw.report_view.by_did (dids, in_params.ssn_mask, IsFCRA, in_params.liens_party_type,in_params.application_type, ,slim_pc_recs, in_params.FFDOptionsMask,, rollup_by_case_link);
   rptRecs_fcra := LiensV2_Services.fn_applyFcraOverrides (rptRecs, flagfile, in_params.ssn_mask, false, slim_pc_recs, in_params.FFDOptionsMask);
 
   raw_recs := if (IsFCRA, rptRecs_fcra, rptRecs);

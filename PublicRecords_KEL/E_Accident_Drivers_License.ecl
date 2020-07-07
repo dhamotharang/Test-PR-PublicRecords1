@@ -1,7 +1,7 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0beta2
+//HPCC Systems KEL Compiler Version 1.1.0
 IMPORT KEL11 AS KEL;
 IMPORT PublicRecords_KEL;
-IMPORT CFG_Compile,E_Accident,E_Drivers_License FROM PublicRecords_KEL;
+IMPORT CFG_Compile,E_Accident,E_Drivers_License FROM $;
 IMPORT * FROM KEL11.Null;
 EXPORT E_Accident_Drivers_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
@@ -20,12 +20,14 @@ EXPORT E_Accident_Drivers_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCD
     RECORDOF(__in);
     KEL.typ.uid Acc_;
   END;
-  SHARED __d0_Acc__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__in,'AccidentNumber','__in'),E_Accident(__in,__cfg).Lookup,TRIM((STRING)LEFT.AccidentNumber) = RIGHT.KeyVal,TRANSFORM(__d0_Acc__Layout,SELF.Acc_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Missing_Acc__UIDComponents := KEL.Intake.ConstructMissingFieldList(__in,'AccidentNumber','__in');
+  SHARED __d0_Acc__Mapped := IF(__d0_Missing_Acc__UIDComponents = 'AccidentNumber',PROJECT(__in,TRANSFORM(__d0_Acc__Layout,SELF.Acc_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__in,__d0_Missing_Acc__UIDComponents),E_Accident(__in,__cfg).Lookup,TRIM((STRING)LEFT.AccidentNumber) = RIGHT.KeyVal,TRANSFORM(__d0_Acc__Layout,SELF.Acc_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH));
   SHARED __d0_License__Layout := RECORD
     RECORDOF(__d0_Acc__Mapped);
     KEL.typ.uid License_;
   END;
-  SHARED __d0_License__Mapped := JOIN(KEL.Intake.AppendNonExistUidComponents(__d0_Acc__Mapped,'DriversLicenseNumber,IssuingState','__in'),E_Drivers_License(__in,__cfg).Lookup,TRIM((STRING)LEFT.DriversLicenseNumber) + '|' + TRIM((STRING)LEFT.IssuingState) = RIGHT.KeyVal,TRANSFORM(__d0_License__Layout,SELF.License_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Missing_License__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d0_Acc__Mapped,'DriversLicenseNumber,IssuingState','__in');
+  SHARED __d0_License__Mapped := IF(__d0_Missing_License__UIDComponents = 'DriversLicenseNumber,IssuingState',PROJECT(__d0_Acc__Mapped,TRANSFORM(__d0_License__Layout,SELF.License_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d0_Acc__Mapped,__d0_Missing_License__UIDComponents),E_Drivers_License(__in,__cfg).Lookup,TRIM((STRING)LEFT.DriversLicenseNumber) + '|' + TRIM((STRING)LEFT.IssuingState) = RIGHT.KeyVal,TRANSFORM(__d0_License__Layout,SELF.License_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH));
   SHARED __d0_Prefiltered := __d0_License__Mapped;
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
   EXPORT InData := __d0;

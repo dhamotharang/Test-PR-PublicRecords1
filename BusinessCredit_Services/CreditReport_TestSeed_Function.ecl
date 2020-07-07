@@ -1,4 +1,4 @@
-﻿import iesp, Seed_Files, Address, risk_indicators, RiskWise;
+﻿import iesp, Seed_Files, Address, risk_indicators, RiskWise, STD;
 
 EXPORT CreditReport_TestSeed_Function(DATASET(BusinessCredit_Services.Layouts.in_key) inData,
 																STRING32 TestDataTableName_in) := FUNCTION
@@ -17,13 +17,13 @@ EXPORT CreditReport_TestSeed_Function(DATASET(BusinessCredit_Services.Layouts.in
 		self.dataset_name := TestDataTableName_in;
 
 		self.hashkey := Seed_Files.Hash_InstantID(
-		                    StringLib.StringToUpperCase(trim(le.authrep_first)),   // fname,
-		                    StringLib.StringToUpperCase(trim(le.authrep_last)),    // lname,
-		                    risk_indicators.nullstring,                            // ssn -- not used in business products,
-		                    StringLib.StringToUpperCase(trim(le.company_fein)),    // fein,
-		                    StringLib.StringToUpperCase(trim(le.company_zip)),     // zip,
-		                    StringLib.StringToUpperCase(trim(le.company_phone)),   // phone,
-		                    StringLib.StringToUpperCase(trim(le.company_name)));   // company_name
+		                    STD.Str.ToUpperCase(trim(le.authrep_first)),   // fname,
+		                    STD.Str.ToUpperCase(trim(le.authrep_last)),    // lname,
+		                    risk_indicators.nullstring,                    // ssn -- not used in business products,
+		                    STD.Str.ToUpperCase(trim(le.company_fein)),    // fein,
+		                    STD.Str.ToUpperCase(trim(le.company_zip)),     // zip,
+		                    STD.Str.ToUpperCase(trim(le.company_phone)),   // phone,
+		                    STD.Str.ToUpperCase(trim(le.company_name)));   // company_name
 	
 		self := [];
 	END;
@@ -2913,6 +2913,7 @@ EXPORT CreditReport_TestSeed_Function(DATASET(BusinessCredit_Services.Layouts.in
 								self.SourceDateLastSeen.Year          := rt.MV_Recs_Curr_Part_LSeen_Year            ;
 								self.SourceDateLastSeen.Month         := rt.MV_Recs_Curr_Part_LSeen_Month           ;
 								self.SourceDateLastSeen.Day           := rt.MV_Recs_Curr_Part_LSeen_Day             ;
+								self.ReportedName                     :=  '' ;
 						));
 				));
 				self.MotorVehicleRecords.CurrentSourceDocs :=
@@ -3070,6 +3071,7 @@ EXPORT CreditReport_TestSeed_Function(DATASET(BusinessCredit_Services.Layouts.in
 								self.SourceDateLastSeen.Year            := rt.MV_Recs_Prior_Part_LSeen_Year           ;
 								self.SourceDateLastSeen.Month           := rt.MV_Recs_Prior_Part_LSeen_Month          ;
 								self.SourceDateLastSeen.Day             := rt.MV_Recs_Prior_Part_LSeen_Day            ;
+              self.ReportedName                       := ''                                         ; 
 						));
 				));
 				self.MotorVehicleRecords.PriorSourceDocs :=

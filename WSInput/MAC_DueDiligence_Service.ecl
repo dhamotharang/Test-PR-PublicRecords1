@@ -12,6 +12,11 @@ EXPORT MAC_DueDiligence_Service(reqName) := MACRO
 										'GLBPurpose',
 										'HistoryDateYYYYMMDD',
 										'SSNMask',
+                                        /*---- CCPA ----*/
+                                        'LexIdSourceOptout',
+                                        '_TransactionId',
+                                        '_BatchUID',
+                                        '_GCID',
 										/*---- Debug ----*/
 										'DebugMode',
 										'IntermediateVariables'

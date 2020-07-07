@@ -1,5 +1,5 @@
-import Address, doxie, liensv2, CriminalRecords_Services, risk_indicators, doxie_files, sexoffender;
-import ingenix_natlprof, Prof_LicenseV2, models, ut, GSA, Business_Header, Business_Risk, Relationship, std;
+import liensv2, risk_indicators, doxie_files, sexoffender;
+import ingenix_natlprof, Prof_LicenseV2, models, GSA, Business_Risk, Relationship, std;
 
 EXPORT HealthCare_Shell(dataset(Risk_Indicators.Layout_Provider_Scoring.Clam_Plus) clam ) := FUNCTION
 	NULL := -999999999;
@@ -75,7 +75,7 @@ clamids_dedp := dedup(sort(clam(did<>0),did), did);
 justDids := PROJECT(clamids_dedp, 
 			TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
 //relatives not associates
-rellyids := Relationship.proc_GetRelationship(justDids, topNCount:=100,
+rellyids := Relationship.proc_GetRelationshipNeutral(justDids, topNCount:=100,
 							RelativeFlag:=TRUE,AssociateFlag:=TRUE,doAtMost:=TRUE, MaxCount:= 1000).result;   //All Relationships in new Format; limit set to 100 on key join
 withRelativesTemp := JOIN(clam, rellyids, LEFT.DID <> 0 AND LEFT.DID = RIGHT.did1 AND RIGHT.did2 <> 0, 
 											TRANSFORM({DATASET({UNSIGNED6 relativesDID}) relativesDID, 

@@ -1,6 +1,7 @@
-﻿import RiskWise, Gong, ut, business_header_ss, mdr, std;
+﻿import RiskWise, dx_gong, ut, business_header_ss, mdr, std, Doxie, Suppress, Business_Risk;
 
-export getBDIDTable_Hist(dataset(Business_Risk.Layout_Output) biid, unsigned1 glb) := FUNCTION
+export getBDIDTable_Hist(dataset(Business_Risk.Layout_Output) biid, unsigned1 glb,
+                                              doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 // instead of using the bdid_table, and bdid_risk_table, which aren't historical,
 // we need to search all sources on those tables by bdid, and filter the raw data by the history_date.
@@ -18,7 +19,7 @@ layout_out := record
 end;
 
 
-bqi_stat := business_risk.get_BH_BQI_Stats_hist(biid);
+bqi_stat := business_risk.get_BH_BQI_Stats_hist(biid, mod_access);
 
 layout_out append_bqi(biid le, bqi_stat rt) := transform
 	self.seq := le.seq,
@@ -26,14 +27,14 @@ layout_out append_bqi(biid le, bqi_stat rt) := transform
 	self.bdid := le.bdid,
 	// ofac_cnt set to 1 if biid got ofac hit instead of doing another search against the patriot file by bdid
 	self.ofac_cnt := if(le.watchlist_record_number[1..4] IN ['OFAC', 'OFC'], 1, 0);
-	
-	// these are the fields that couldn't be done in the bqi_stats_hist function, 
+
+	// these are the fields that couldn't be done in the bqi_stats_hist function,
 	// do them down at the bottom after all the header sources have been counted
 	// SELF.company_name_score := ut.CompanySimilar(le.company_name, rt.company_name);
 	// SELF.has_gong_yp := r.bdid != 0;
 	// self.current_corp_cnt we can get from biid
 	// SELF.combined_score := 0 +
-			// IF(l.b_phone_per_addr > l.r_phone_per_addr, 2, 
+			// IF(l.b_phone_per_addr > l.r_phone_per_addr, 2,
 			// IF(l.b_phone_per_addr > 0, 1, 0)) +
 			// IF(l.dnb_emps + l.irs5500_emps > l.ppl, 5, 0) +
 			// IF(l.domainss > 1, 2 ,0) +
@@ -43,19 +44,19 @@ layout_out append_bqi(biid le, bqi_stat rt) := transform
 			// IF(l.sources > 4, 1, 0) +
 			// IF(l.gong_yp_cnt > 0, 2, 0) +
 			// IF(l.current_corp_cnt > 0, 2, 0);
-	
-	self := rt;	
+
+	self := rt;
 end;
 
 
 
 // append the zip, prim_name and prim_range from the bh_best file
 bdid_tbl_init := join(biid, bqi_stat,
-						left.bdid!=0 and 
+						left.bdid!=0 and
 						  left.bdid=right.bdid,
 						  append_bqi(left, right), keep(1));
 
-kgh := gong.Key_History_BDID;
+kgh := dx_gong.Key_History_BDID();
 layout_gong_slim := record
 	kgh.bdid;
 	kgh.phone10;
@@ -68,16 +69,17 @@ layout_gong_slim := record
 	kgh.disc_cnt18;
 end;
 
-gh_slim := join(biid, kgh,
-				 left.bdid!=0 and 
-				  keyed(left.bdid=right.bdid) and 
+gh_slim_unsuppressed := join(biid, kgh,
+				 left.bdid!=0 and
+				  keyed(left.bdid=right.bdid) and
 				 (unsigned)right.dt_first_seen[1..6] < left.historydate,
-				 transform(layout_gong_slim, self.dt_first_seen := (unsigned4)right.dt_first_seen,
+				 transform({layout_gong_slim, UNSIGNED4 global_sid, UNSIGNED6 did}, self.dt_first_seen := (unsigned4)right.dt_first_seen,
 											 self.dt_last_seen := (unsigned4)right.dt_last_seen,
 											 self.deletion_date := (unsigned4)right.deletion_date,
 											 self := right),
 				 ATMOST(keyed(left.bdid=right.bdid), RiskWise.max_atmost), keep(1000));
 
+gh_slim := Suppress.Suppress_ReturnOldLayout(gh_slim_unsuppressed, mod_access, layout_gong_slim);
 
 layout_gong_history_stats := record
 	gh_slim.bdid;
@@ -115,10 +117,10 @@ bdid_tbl_gong := join(bdid_tbl_init,
 kbh := Business_Header_SS.Key_BH_BDID_pl;
 
 bh := join(biid, kbh,
-				 left.bdid!=0 and 
-				  keyed(left.bdid=right.bdid) and 
+				 left.bdid!=0 and
+				  keyed(left.bdid=right.bdid) and
 					ut.PermissionTools.glb.SrcOk(glb, right.source, right.dt_first_seen) and
-				 (unsigned)((STRING)right.dt_first_seen)[1..6] < left.historydate, 
+				 (unsigned)((STRING)right.dt_first_seen)[1..6] < left.historydate,
 				 transform(recordof(kbh), self := right),
 				 ATMOST(keyed(left.bdid=right.bdid), RiskWise.max_atmost), keep(1000));
 
@@ -214,7 +216,7 @@ layout_bh_stat := record
 	unsigned2 cnt_WC := count(group, mdr.sourcetools.SourceIsWorkmans_Comp(bh.source)); // State Workers Comp
 	unsigned2 cnt_WT := count(group, mdr.sourcetools.SourceIsWither_and_Die(bh.source)); // Wither and Die
 	unsigned2 cnt_Y  := count(group, mdr.sourcetools.SourceIsYellow_Pages(bh.source));  // Yellow Pages
-	
+
 end;
 
 bh_stat := table(bh, layout_bh_stat, bdid);
@@ -227,7 +229,7 @@ boolean CheckDateLast6Mos(unsigned4 date) := if(date <> 0,
                                              ut.DaysApart((string8)intformat(date, 8, 1), todays_date) <= 183,
 											 false);
 
-// Check for date in last year					
+// Check for date in last year
 boolean CheckDateLastYr(unsigned4 date) := if(date <> 0,
                                              ut.DaysApart((string8)intformat(date, 8, 1), todays_date) <= 365,
 											 false);
@@ -235,7 +237,7 @@ boolean CheckDateLastYr(unsigned4 date) := if(date <> 0,
 // Current Year with offset
 unsigned2 CurrentYearOffset(integer1 offset) := (integer)(todays_date[1..4]) + offset;
 
-// Current End of Year with offset											 
+// Current End of Year with offset
 unsigned4 CurrentYearEndOffset(integer1 offset) :=  (((integer)(todays_date[1..4]) + offset) * 10000) + 1231;
 
 layout_out_final := record
@@ -245,7 +247,7 @@ end;
 layout_out_final Append_Header_Stats(layout_out l, layout_bh_stat r) := transform
 	self.seq := l.seq;
 	self.bdid := l.bdid;
-	
+
 	SELF.domainss := r.cnt_W;
 	// self.source_ct := r.cnt_base;
 	self.dt_first_seen_Y := if(r.dt_first_seen_Y = 99999999, 0, r.dt_first_seen_Y);
@@ -262,12 +264,12 @@ layout_out_final Append_Header_Stats(layout_out l, layout_bh_stat r) := transfor
 	self.dt_first_seen_EB := if(r.dt_first_seen_EB = 99999999, 0, r.dt_first_seen_EB);
 	self.dt_first_seen_min := if(r.dt_first_seen_min = 99999999, 0, r.dt_first_seen_min);
 	self.dt_vendor_first_reported_min := if(r.dt_vendor_first_reported_min = 99999999, 0, r.dt_vendor_first_reported_min);
-	
+
 	// SELF.company_name_score := ut.CompanySimilar(le.company_name, rt.company_name);
 	// SELF.has_gong_yp := r.bdid != 0;
 	// self.current_corp_cnt we can get from biid
 	// SELF.combined_score := 0 +
-			// IF(l.b_phone_per_addr > l.r_phone_per_addr, 2, 
+			// IF(l.b_phone_per_addr > l.r_phone_per_addr, 2,
 			// IF(l.b_phone_per_addr > 0, 1, 0)) +
 			// IF(l.dnb_emps + l.irs5500_emps > l.ppl, 5, 0) +
 			// IF(l.domainss > 1, 2 ,0) +
@@ -277,33 +279,33 @@ layout_out_final Append_Header_Stats(layout_out l, layout_bh_stat r) := transfor
 			// IF(l.sources > 4, 1, 0) +
 			// IF(l.gong_yp_cnt > 0, 2, 0) +
 			// IF(l.current_corp_cnt > 0, 2, 0);
-	
-	
+
+
 	self.gong_yp_cnt := if(r.cnt_gb>0,1,0) + if(r.cnt_gg>0,1,0) + if(r.cnt_y>0,1,0);
-	
+
 	// this section of the transform is from BDID_risk_table InitBDIDRiskTable
 		self.PRScore_date := if(l.historydate=999999, (unsigned4)todays_date, (unsigned4)((string)l.historydate + '01') );
 		busregf := if(r.cnt_BR > 0, 1, 0);
 		self.busreg_flag := busregf;
-		
+
 		corpf := if(r.cnt_C > 0, 1, 0);
 		self.corp_flag := corpf;
-		
+
 		dnbf := if(r.cnt_D > 0, 1, 0);
 		self.dnb_flag := dnbf;
-		
+
 		irs5500f := if(r.cnt_I > 0, 1, 0);
 		self.irs5500_flag := irs5500f;
-		
+
 		stf := if(r.cnt_ST > 0, 1, 0);
 		self.st_flag := stf;
-		
+
 		uccf := if(r.cnt_U > 0, 1, 0);
 		self.ucc_flag := uccf;
-		
+
 		ypf := if(r.cnt_Y > 0, 1, 0);
 		self.yp_flag := ypf;
-		
+
 		tier1 :=  busregf +
 				  corpf +
 				  dnbf +
@@ -312,35 +314,35 @@ layout_out_final Append_Header_Stats(layout_out l, layout_bh_stat r) := transfor
 				  uccf +
 				  ypf;
 		self.tier1srcs := tier1;
-		
+
 		t1scr5 := if(tier1 > 5, 5, tier1);
 		self.t1scr5 := t1scr5;
-		
+
 		currphn := if(CheckDateLast6Mos(l.dt_last_seen_G), 1, 0);
 		self.currphn := currphn;
-		
+
 		currcorp := if(CheckDateLastYr(r.dt_last_seen_C), 1, 0);
 		self.currcorp := currcorp;
-		
+
 		currbr := if(CheckDateLastYr(r.dt_last_seen_BR), 1, 0);
 		self.currbr := currbr;
-		
+
 		currdnb := if(CheckDateLastYr(r.dt_last_seen_D), 1, 0);
 		self.currdnb := currdnb;
-		
+
 		currucc := if(CheckDateLastYr(r.dt_last_seen_UCC), 1, 0);
 		self.currucc := currucc;
-		
+
 		curry := if(CheckDateLastYr(r.dt_last_seen_Y), 1, 0);
 		self.curry := curry;
-		
+
 		ct1cnt := currcorp + currbr + currdnb + currucc  + curry;
 		self.currt1cnt := ct1cnt;
-		
-		ct1scrc4 := if(ct1cnt > 4, 4, ct1cnt);		
+
+		ct1scrc4 := if(ct1cnt > 4, 4, ct1cnt);
 		self.currt1src4 := ct1scrc4;
-		
-		
+
+
 		ylj := map(l.dt_last_seen_lj = 0 => 0,
 							l.dt_last_seen_lj < 18999999 => 1,
 							l.dt_last_seen_lj < CurrentYearEndOffset(-6) => CurrentYearOffset(-6),
@@ -352,23 +354,23 @@ layout_out_final Append_Header_Stats(layout_out l, layout_bh_stat r) := transfor
 							l.dt_last_seen_lj < CurrentYearEndOffset(-0) => CurrentYearOffset(0),
 							CurrentYearOffset(1));
 		self.year_lj := ylj;
-		
+
 		clj := map(l.cnt_LJ > 0 and ylj <= CurrentYearOffset(-5) => 3,
 					   l.cnt_LJ > 0 and ylj = CurrentYearOffset(-4) => 2,
 					   l.cnt_LJ > 0 and ylj <= CurrentYearOffset(-1) => 1,
 					   0);
-		self.lj := clj; 
-			
-		ustic := if((uccf + stf + irs5500f + corpf) > 0, 1, 0);	
+		self.lj := clj;
+
+		ustic := if((uccf + stf + irs5500f + corpf) > 0, 1, 0);
 		self.ustic := ustic;
-		
+
 		t1x := map(ct1scrc4 = 0 => 0,
 						ct1scrc4 = 1 => 1,
 						ct1scrc4 = 2 and t1scr5 < 5 => 2,
 						3);
 		self.t1x := t1x;
-						
-	
+
+
 	// this section was from the bdid_risk_table CalcScore transform
 		unsigned1 score := map(l.OFAC_cnt > 0 => 50,
                        r.cnt_B > 0 or (clj = 1 and t1x = 0) => 60,
@@ -382,15 +384,15 @@ layout_out_final Append_Header_Stats(layout_out l, layout_bh_stat r) := transfor
 					   t1x = 2 => 90,
 					   t1x = 3 => 95,
 					   50);
-					   
+
 		unsigned1 score1 := map(score in [60, 65, 90, 95] and currphn > 0 => score + 5,
 								score in [70, 80] and currphn > 0 => score + 10,
 								score);
-							
+
 		self.PRScore := map(score1 in [70, 80, 90] and ustic > 0 => score1 + 5,
 							score1 = 95 and ustic > 0 and currphn > 0 => score1 + 5,
 							score1);
-					
+
 	self := r;
 	self := l;
 end;
@@ -401,7 +403,7 @@ fscores := join(bdid_tbl_gong,
 					  Append_Header_Stats(left, right),
 					  left outer, lookup);
 
-	
+
 
 // output(bdid_tbl_init, named('bdid_tbl_init'));
 // output(bdid_tbl_gong, named('bdid_tbl_gong'));
@@ -409,5 +411,3 @@ fscores := join(bdid_tbl_gong,
 
 	return fscores;
 end;
-
-

@@ -36,7 +36,11 @@ EXPORT DueDiligence_Service := MACRO
       DueDiligence.CommonQuery.mac_GetBusinessOptionSettings(dppa, glba, drm, dpm, userIn.IndustryClass);
       
       //retrieve the data based on input to be used in searches (PII vs LexID vs Combo of PII and LexID)
-      dataToSearchBy := DueDiligence.fn_getProductInput(reqProduct, cleanData, busOptions, busLinkingOptions);
+      dataToSearchBy := DueDiligence.fn_getProductInput(reqProduct, cleanData, busOptions, busLinkingOptions,
+                                                                                                   LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                   TransactionID := TransactionID, 
+                                                                                                   BatchUID := BatchUID, 
+                                                                                                   GlobalCompanyID := GlobalCompanyID);
       
       
       
@@ -48,7 +52,11 @@ EXPORT DueDiligence_Service := MACRO
                        DATASET([], requestResponseLayout));
                             
       ddResults := IF(reqProduct IN DueDiligence.CitDDShared.DUEDILIGENCE_PRODUCTS, 
-                      DueDiligence.DueDiligenceServiceMain(dataToSearchBy, requestedVersion, DD_SSNMask, busOptions, busLinkingOptions, optionsIn.AdditionalInput, wseq, intermediates, debugIndicator), 
+                      DueDiligence.DueDiligenceServiceMain(dataToSearchBy, requestedVersion, DD_SSNMask, busOptions, busLinkingOptions, optionsIn.AdditionalInput, wseq, intermediates, debugIndicator,
+                                                                                              LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                              TransactionID := TransactionID, 
+                                                                                              BatchUID := BatchUID, 
+                                                                                              GlobalCompanyID := GlobalCompanyID), 
                       DATASET([], requestResponseLayout));
 
 

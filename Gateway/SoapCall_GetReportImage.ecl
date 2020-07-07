@@ -1,4 +1,4 @@
-IMPORT iesp;
+﻿IMPORT iesp;
 
 EXPORT DATASET(iesp.accident_image.t_AccidentImageResponseEx) SoapCall_GetReportImage(
 	Layouts.Config gatewayCfg, 
@@ -18,6 +18,11 @@ EXPORT DATASET(iesp.accident_image.t_AccidentImageResponseEx) SoapCall_GetReport
 		SELF := [];
 	END;
 
+	//Get the timeout from "User.MaxWaitSeconds" in the request. If it's set to zero or less, assume 180 seconds.
+	DefaultTimeout := 180;
+	RawTimeout := (INTEGER) Request[1].User.MaxWaitSeconds;
+	TrueTimeout := IF(RawTimeout <= 0, DefaultTimeout, RawTimeout);
+
 	Url := IF(EXISTS(Request), gatewayCfg.Url, '');
 	Out := SOAPCALL(
 		Request, 
@@ -29,7 +34,7 @@ EXPORT DATASET(iesp.accident_image.t_AccidentImageResponseEx) SoapCall_GetReport
 		XPATH('AccidentImageResponseEx'),
 		ONFAIL(FailCall(LEFT)), 
 		RETRY(0), 
-		TIMEOUT(60),
+		TIMEOUT(TrueTimeout),
 		TRIM,
 		LOG
 	);	

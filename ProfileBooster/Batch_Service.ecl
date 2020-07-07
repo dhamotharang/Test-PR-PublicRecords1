@@ -1,4 +1,4 @@
-﻿IMPORT iesp, Risk_indicators, Riskwise, address, AutoStandardI,std;
+﻿IMPORT Risk_indicators, address, AutoStandardI, std, ProfileBooster;
 
 EXPORT Batch_Service() := FUNCTION
 
@@ -11,6 +11,12 @@ EXPORT Batch_Service() := FUNCTION
 	string9   AttributesVersionRequest	:= ''  : stored('AttributesVersionRequest'); 
 	string50 	Custom_Model 						  := ''  : stored('Custom_Model');
 
+	//CCPA fields
+	unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+	string TransactionID := '' : STORED('_TransactionId');
+	string BatchUID := '' : STORED('_BatchUID');
+	unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
   BOOLEAN DEBUG := False;
 	
 	PB_wseq := project( batch_in, transform( ProfileBooster.Layouts.Layout_PB_In, 
@@ -19,11 +25,11 @@ EXPORT Batch_Service() := FUNCTION
 																	cleaned_name := address.CleanPerson73(left.Name_Full);
 																	boolean valid_cleaned := left.Name_Full <> '';
 																	
-																	self.Name_First  := stringlib.stringtouppercase(if(left.Name_First='' AND valid_cleaned, cleaned_name[6..25], left.Name_First));
-																	self.Name_Last 	 := stringlib.stringtouppercase(if(left.Name_Last='' AND valid_cleaned, cleaned_name[46..65], left.Name_Last));
-																	self.Name_Middle := stringlib.stringtouppercase(if(left.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], left.Name_Middle));
-																	self.Name_Suffix := stringlib.stringtouppercase(if(left.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], left.Name_Suffix));	
-																	self.Name_Title  := stringlib.stringtouppercase(if(valid_cleaned, cleaned_name[1..5],''));
+																	self.Name_First  := STD.Str.touppercase(if(left.Name_First='' AND valid_cleaned, cleaned_name[6..25], left.Name_First));
+																	self.Name_Last 	 := STD.Str.touppercase(if(left.Name_Last='' AND valid_cleaned, cleaned_name[46..65], left.Name_Last));
+																	self.Name_Middle := STD.Str.touppercase(if(left.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], left.Name_Middle));
+																	self.Name_Suffix := STD.Str.touppercase(if(left.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], left.Name_Suffix));	
+																	self.Name_Title  := STD.Str.touppercase(if(valid_cleaned, cleaned_name[1..5],''));
                               
 																	street_address := risk_indicators.MOD_AddressClean.street_address(left.street_addr, left.streetnumber, left.streetpredirection, left.streetname, left.streetsuffix, left.streetpostdirection, left.unitdesignation, left.unitnumber);
 																	self.street_addr := street_address;
@@ -35,7 +41,12 @@ EXPORT Batch_Service() := FUNCTION
   domodel := custommodel_in IN setvalidmodels;
   
   
-  attributes := ProfileBooster.Search_Function(PB_wseq, DataRestriction, DataPermission, AttributesVersionRequest,domodel,custommodel_in);  
+  attributes := ProfileBooster.Search_Function(PB_wseq, DataRestriction, DataPermission, AttributesVersionRequest,
+																				domodel,custommodel_in,
+																				LexIdSourceOptout := LexIdSourceOptout, 
+																				TransactionID := TransactionID, 
+																				BatchUID := BatchUID, 
+																				GlobalCompanyID := GlobalCompanyID);  
 
 #IF(DEBUG)
 

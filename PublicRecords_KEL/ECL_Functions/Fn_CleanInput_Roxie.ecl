@@ -16,12 +16,14 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		SELF.P_InpNameMid := le.P_InpNameMid;
 		SELF.P_InpNameLast := le.P_InpNameLast;			
 		SELF.P_InpAddrLine1 := le.P_InpAddrLine1;
+		SELF.P_InpAddrLine2 := le.P_InpAddrLine2;
 		SELF.P_InpAddrCity := le.P_InpAddrCity;
 		SELF.P_InpAddrState := le.P_InpAddrState; 
 		SELF.P_InpAddrZip := le.P_InpAddrZip;
 		SELF.P_InpPhoneHome := le.P_InpPhoneHome;
 		SELF.P_InpPhoneWork := le.P_InpPhoneWork;
-		SELF.P_InpEmail := le.P_InpEmail; 
+		SELF.P_InpEmail := le.P_InpEmail;
+		SELF.P_InpIPAddr := le.P_InpIPAddr; 
 		SELF.P_InpArchDt := le.P_InpArchDt;
 		SELF.P_InpSSN := le.P_InpSSN;
 		SELF.P_InpDOB := le.P_InpDOB;
@@ -29,7 +31,7 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		SELF.P_InpDLState := le.P_InpDLState;
 		// Clean input
 		cleaned_zip       := PublicRecords_KEL.ECL_Functions.Fn_Clean_Zip(le.P_InpAddrZip);
-		cleaned_Addr      := PublicRecords_KEL.ECL_Functions.Fn_Clean_Address_Roxie(le.P_InpAddrLine1, le.P_InpAddrCity, le.P_InpAddrState, cleaned_zip);
+		cleaned_Addr      := PublicRecords_KEL.ECL_Functions.Fn_Clean_Address_Roxie(le.P_InpAddrLine1 + ' ' + le.P_InpAddrLine2, le.P_InpAddrCity, le.P_InpAddrState, cleaned_zip);
 		cleaned_DL        := PublicRecords_KEL.ECL_Functions.Fn_Clean_DLNumber(le.P_InpDL);
 		cleaned_DLState   := PublicRecords_KEL.ECL_Functions.Fn_Clean_DLState(le.P_InpDLState);   //afa 2019026
 		cleaned_email     := PublicRecords_KEL.ECL_Functions.Fn_Clean_Email(le.P_InpEmail);
@@ -69,6 +71,7 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		SELF.P_InpClnAddrUnitDesig := cleaned_Addr.unit_desig;
 		SELF.P_InpClnAddrSecRng :=cleaned_Addr.sec_range;
 		SELF.P_InpClnAddrCity := cleaned_Addr.v_city_name;
+		SELF.P_InpClnAddrCityPost := cleaned_Addr.p_city_name;
 		SELF.P_InpClnAddrState := cleaned_Addr.st;
 		SELF.P_InpClnAddrZip5 := cleaned_Addr.zip;
 		SELF.P_InpClnAddrZip4 := cleaned_Addr.zip4;
@@ -76,6 +79,7 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		SELF.P_InpClnAddrLng :=	cleaned_Addr.geo_long;
 		SELF.P_InpClnAddrType := cleaned_Addr.rec_type;
 		SELF.P_InpClnAddrStatus :=	cleaned_Addr.err_stat;
+		SELF.P_InpClnAddrStateCode    := cleaned_Addr.county[1..2];
 		SELF.P_InpClnAddrCnty := cleaned_Addr.county[3..5];
 		SELF.P_InpClnAddrGeo := cleaned_Addr.geo_blk;
 		SELF.P_InpClnEmail :=cleaned_email;

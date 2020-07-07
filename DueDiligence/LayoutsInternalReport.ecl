@@ -100,15 +100,15 @@ EXPORT LayoutsInternalReport := MODULE
     DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
     UNSIGNED4	  historydate;
     STRING    CorpKey;
-		STRING150 BusinessName;                                 //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp legal name
-	  STRING20  FilingType;                                   //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp filing desc.   
+		STRING150 BusinessName;                                 //from Corp2.Key_LinkIDs.Corp.kfetch2 - corp legal name
+	  STRING20  FilingType;                                   //from Corp2.Key_LinkIDs.Corp.kfetch2 - corp filing desc.   
     BOOLEAN   isActive;
-	  STRING20  FilingStatus;                                 //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp status desc (example is ACTIVE)
-	  UNSIGNED4 FilingDate;                                   //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp filing date 
-	  UNSIGNED4 IncorporationDate;                            //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp inc date 
-		UNSIGNED4 LastSeenDate;                                 //***from Corp2.Key_LinkIDs.Corp.kfetch2 - 
-	  STRING30  FilingNumber;                                 //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp filing reference nbr
-	  STRING2   IncorporationState;                           //***from Corp2.Key_LinkIDs.Corp.kfetch2 - corp inc state
+	  STRING20  FilingStatus;                                 //from Corp2.Key_LinkIDs.Corp.kfetch2 - corp status desc (example is ACTIVE)
+	  UNSIGNED4 FilingDate;                                   //from Corp2.Key_LinkIDs.Corp.kfetch2 - corp filing date 
+	  UNSIGNED4 IncorporationDate;                            //from Corp2.Key_LinkIDs.Corp.kfetch2 - corp inc date 
+		UNSIGNED4 LastSeenDate;                                 //from Corp2.Key_LinkIDs.Corp.kfetch2 - 
+	  STRING30  FilingNumber;                                 //from Corp2.Key_LinkIDs.Corp.kfetch2 - corp filing reference nbr
+	  STRING2   IncorporationState;                           //from Corp2.Key_LinkIDs.Corp.kfetch2 - corp inc state
     STRING    OrgStructure;
 	END;
 	
@@ -119,17 +119,15 @@ EXPORT LayoutsInternalReport := MODULE
 	  DATASET(iesp.duediligencebusinessreport.t_DDRSOSFiling) BusSOSFilingsChild;   
  END;	
  
-  // ------                                                                      ------
-  // ------ define the ChildDataset  For Debtors                                 ------
-	// ------                                                                      ------
+
+  //define the ChildDataset  For Debtors 
  EXPORT	BusLiensDebtorsCreditorsChildDatasetLayout    := RECORD
 	  DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout; 
 	  DATASET(iesp.duediligenceshared.t_DDRCreditorDebtor) BusLiensDebtorCreditorChild;
 	END; 
  
-  // ------                                                                      ------
-  // ------ define the ChildDataset  For Business Liens                          ------
-	// ------                                                                      ------
+
+  //define the ChildDataset  For Business Liens 
  EXPORT	BusLiensChildDatasetLayout    := RECORD
 	  DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout; 
 	  DATASET(iesp.duediligenceshared.t_DDRLiensJudgmentsEvictions) BusLiensChild;
@@ -159,37 +157,12 @@ EXPORT LayoutsInternalReport := MODULE
     DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
     DATASET(iesp.duediligencebusinessreport.t_DDRBusinessExecutives) execs {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxBusinessExecs)};
   END;
-	
-  // ------                                                                      ------
-  // ------ define the Flat      Dataset  For Debtors                            ------
-	// ------                                                                      ------
- EXPORT	BusLiensDebtorsCreditorsFlatLayout    := RECORD
-	  DueDiligence.LayoutsInternal.layout_liens_judgments_categorized;
-		//unsigned6 did;
-    STRING50  rmsid;
-    STRING1   NameType;                   // D = Debtor   C = Creditor
-    STRING20  TaxID;
-    STRING8   party_date_first_seen;
-		STRING8   party_date_last_seen;
-	  iesp.duediligenceshared.t_DDRCreditorDebtor;  
-	END; 
-  
-  // ------                                                                     ------
-  // ------ define the internal Dataset for the Liens section  report           ------
-  // ------                                                                     ------
-	EXPORT ReportingofLiensDebtorChildDatasetLayout    := RECORD
-	 DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;      //*  This is the LINKID number of the parent 
-   // unsigned6 did;  
-   STRING50 tmsid;
-   UNSIGNED4	HistoryDate;
-   STRING1    NameType;                   // D = Debtor   C = Creditor
-	 iesp.duediligenceshared.t_DDRLiensJudgmentsEvictions;  
-	END; 
+
   
   EXPORT Associated_Businesses := RECORD
-    /* this will be the Link id's of the Inquired Business      */
+    //this will be the Link id's of the Inquired Business
 		DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout InquiredBus;
-    /* this will be the link id's of the Associated Businesses of the BEO  */   
+    //this will be the link id's of the Associated Businesses of the BEO
     DueDiligence.Layouts.Busn_Input Busn_Info;  
     unsigned4 HistoryDate;
     string50 AssociatedBusinessName;
@@ -199,7 +172,114 @@ EXPORT LayoutsInternalReport := MODULE
   EXPORT ReportingOfBEOAssociatedBus := RECORD
     DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
     DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout  AssociatedBusLINKID;
-    DATASET (iesp.duediligencebusinessreport.t_DDRBusinessNameWithLexID) RptAssocBusNames;
+    DATASET(iesp.duediligencebusinessreport.t_DDRBusinessNameWithLexID) RptAssocBusNames;
+  END;
+  
+  EXPORT ReportIdentity := RECORD
+    UNSIGNED6 seq;
+    UNSIGNED6 inquiredDID;
+    UNSIGNED estimatedAge;
+    iesp.duediligencepersonreport.t_DDRPersonSSNDetails inputSSNDetails;
+    iesp.duediligencepersonreport.t_DDRPersonSSNDetails bestSSNDetails; 
+    iesp.duediligencepersonreport.t_DDRPersonLexIDInformation identityDetails;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonLexIDSourcesReporting) allSourcesReporting;
+    UNSIGNED2 allSourcesCounts;
+  END;
+  
+  EXPORT PersonSSNDeviation := RECORD
+    UNSIGNED6 seq;
+    UNSIGNED6 inquiredDID; 
+    UNSIGNED didTiedToSSN; 
+    UNSIGNED4 historyDate; 
+    STRING9 inputSSN; 
+    STRING9 ssnOnFile; 
+    STRING9 bestSSN; 
+    STRING9 inquiredBestSSN;
+    DueDiligence.Layouts.Name bestName; 
+    DueDiligence.Layouts.Address bestAddress;
+    UNSIGNED bestDOB;
+    UNSIGNED2 relation;  
+    STRING relationText;
+    UNSIGNED differentSSNs;
+    UNSIGNED differentBestSSNs;
+    STRING9 maskedInputSSN; 
+    STRING9 maskedSSNOnFile; 
+    STRING9 maskedBestSSN; 
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonSSNDeviations) inputPersonDeviations;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonSSNDeviations) bestPersonDeviations;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonSSNLexID) reportedSSNs;
+  END;
+  
+  EXPORT IdentitySources := RECORD
+    UNSIGNED6 seq;
+    UNSIGNED6 inquiredDID; 
+    STRING source;
+    UNSIGNED4 sourceCount;
+    UNSIGNED4 sourceFirstSeen;
+    UNSIGNED4 sourceLastSeen;
+    UNSIGNED2 sourceID;
+    STRING sourceCategory;
+    UNSIGNED4 sourceCategoryCount;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonSources) espInputSourceDetails;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonSources) espBestSourceDetails;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonLexIDSourcesReporting) espSourceDetailsWithDates;
+  END;
+  
+  EXPORT IdentityNestedData := RECORD
+    UNSIGNED6 seq;
+    UNSIGNED6 inquiredDID;
+    DueDiligence.Layouts.Name aka;
+    DATASET(iesp.share.t_Name) espAKAs;
+    UNSIGNED4 dob;
+    DATASET(iesp.duediligencepersonreport.t_DDRPersonDOBAge) espDOBAge;
+  END;
+  
+  EXPORT SlimResidentTenant := RECORD
+    UNSIGNED6 residentDID;
+    DueDiligence.Layouts.Name;
+    BOOLEAN relative;
+    BOOLEAN busAssocs;
+    BOOLEAN highRiskProfServOfStudy;
+    BOOLEAN potentialCrimArrest;
+    BOOLEAN potentialSOs;
+  END;
+  
+  EXPORT CurrentResidentTenantInfo := RECORD
+    UNSIGNED6 inquiredSeq;
+    UNSIGNED6 inquiredDID;
+    UNSIGNED6 inquiredAddressSeq;
+    SlimResidentTenant;
+    DueDiligence.Layouts.AddressSlimDetail;
+    UNSIGNED4 residentLastSeenDate;
+    UNSIGNED4 residentFirstSeenDate;
+    UNSIGNED4 historyDate;
+  END;
+  
+  
+  EXPORT MobilityData := RECORD
+    UNSIGNED6 seq;
+    UNSIGNED6 inquiredDID;
+    UNSIGNED4 historyDate;
+    DueDiligence.Layouts.AddressDetails addrs;
+    STRING countyName;
+    STRING movingDistances;
+    STRING50 addressType;
+    STRING10 currentPreviousIndicator;
+    STRING residencyType;
+    STRING25 areaRisk;
+    UNSIGNED6 numberCurrentResidentTenants;
+    UNSIGNED6 numberOfRelatives;
+    UNSIGNED6 numberOfBusAssocs;
+    UNSIGNED6 numberHighRiskProfServOfStudy;
+    UNSIGNED6 numberPotentialCrimArrest;
+    UNSIGNED6 numberOfPotentialSOs;
+    DATASET(SlimResidentTenant) resTenInfo;
+  END;
+  
+  
+  EXPORT SharedCivilEvents := RECORD
+    DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
+    DueDiligence.Layouts.LiensJudgementsEvictionDetails;
   END;
   
 END;

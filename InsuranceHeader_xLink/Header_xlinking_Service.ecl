@@ -42,7 +42,7 @@
 </message>
 */
  
-EXPORT Header_xlinking_Service := MACRO
+EXPORT Header_xlinking_Service() := MACRO
   #WEBSERVICE(FIELDS(
 	'SNAME', 'FNAME', 'MNAME', 'LNAME', 'NAME', 'DERIVED_GENDER',
 	'ADDRESS1', 'ADDRESS2', 'PRIM_RANGE', 'PRIM_NAME', 'SEC_RANGE', 'CITY',
@@ -60,7 +60,7 @@ EXPORT Header_xlinking_Service := MACRO
 	'<li>RID<br/><li>SRC,SOURCE_RID,FNAME,DOB,CITY,DERIVED_GENDER,SNAME</li></ul>'),
 	DESCRIPTION('<p>SALT V3.7</p>' + 
 	'<p>By default all records of all clusters where the CLUSTER matches the field will be returned. To force a single record to match use MatchAllInOneRecord. To only return matching records use RecordsOnly.</p>'));/*FIELDS HACK*/	
-  IMPORT SALT37,InsuranceHeader_xLink;
+  IMPORT SALT37,InsuranceHeader_xLink,InsuranceHeader_PostProcess;
 	
 	STRING Input_NAME := '' : STORED('NAME');
 	clean_n := address.CleanPersonFML73(Input_NAME);
@@ -201,11 +201,8 @@ EXPORT Header_xlinking_Service := MACRO
 		self := left, 
 		self := right));
 		
-		//assign segmenation to the records
-		finalRes := JOIN(finalRes1, segKey, LEFT.s_did=RIGHT.did, TRANSFORM(finalLayout, 
-				SELF.segmentation := RIGHT.ind,
-				SELF := LEFT), LEFT OUTER, KEEP(10000), LIMIT(0));
-			
+	finalRes := InsuranceHeader_PostProcess.mod_segmentation.appendIndicator(finalRes1, s_did, segmentation);
+
   FieldNumber(SALT37.StrType fn) := CASE(fn,'NAME_SUFFIX' => 1,'FNAME' => 2,'MNAME' => 3,'LNAME' => 4, 
 			'PRIM_RANGE' => 5,'PRIM_NAME' => 6,'SEC_RANGE' => 7,'CITY_NAME' => 8,'ST' => 9,'ZIP' => 10,
 			'SSN' => 11,'DOB' => 12,'PHONE' => 13,'RID' => 14,'DT_FIRST_SEEN' => 15,'DT_LAST_SEEN' => 16,31);
@@ -237,5 +234,3 @@ EXPORT Header_xlinking_Service := MACRO
   // OUTPUT(pm.Data_0,NAMED('Attribute0'));
 
 ENDMACRO;
-
-

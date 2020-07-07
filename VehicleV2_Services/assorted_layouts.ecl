@@ -1,4 +1,4 @@
-import BIPV2; 
+﻿import BIPV2; 
 export assorted_layouts := MODULE
 
 	EXPORT lic_plate_key_payload_fields := RECORD
@@ -148,6 +148,7 @@ export assorted_layouts := MODULE
 		string11   geo_long := '';
 		string1 name_source_cd;
 		string30 name_source;
+   string30 reported_name;
 	END;
 	
 	export layout_lessee_or_lessor := RECORD

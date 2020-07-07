@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, EBR;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, EBR, Doxie;
 
 /*
 	Following Keys being used:
@@ -7,12 +7,13 @@
 
 EXPORT getBusSales(DATASET(DueDiligence.Layouts.Busn_Internal) busInfo,
 											Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-											BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+											BIPV2.mod_sources.iParams linkingOptions,
+                                            doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 	linkIDs := DueDiligence.CommonBusiness.GetLinkIDs(busInfo);
 		
 	// ---------------- EBR - Experian Business Records ------------------
-	ebr5600Raw := EBR.Key_5600_Demographic_Data_linkids.kFetch2(linkIDs, ,
+	ebr5600Raw := EBR.Key_5600_Demographic_Data_linkids.kFetch2(linkIDs, mod_access,
 																															 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																															 0, //ScoreThreshold --> 0 = Give me everything
 																															 linkingOptions,
@@ -25,7 +26,7 @@ EXPORT getBusSales(DATASET(DueDiligence.Layouts.Busn_Internal) busInfo,
 	ebrDateClean := DueDiligence.Common.CleanDatasetDateFields(ebr5600RawSeq, 'date_last_seen, date_first_seen');
 	
 	// Filter out records after our history date.
-	ebrFilt := DueDiligence.Common.FilterRecordsSingleDate(ebrDateClean, date_first_seen);
+	ebrFilt := DueDiligence.CommonDate.FilterRecordsSingleDate(ebrDateClean, date_first_seen);
 	
   // Sort the records by record_type (to get current first) and then by date_last_seen desc (to get last reported) and then by sales_actual desc (to get largest)
 	ebrSorted := SORT(ebrFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), record_type, -date_last_seen, -sales_actual);

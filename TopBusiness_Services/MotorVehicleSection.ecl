@@ -295,8 +295,9 @@ EXPORT MotorVehicleSection := MODULE;
 															                       right.Append_Clean_Address.st, 
 																										 right.Append_Clean_Address.fips_county),
 															 self.src_first_date 			:= right.src_first_date;											 
-															 self.src_last_date  			:= right.src_last_date;	
-													     self := right, // to keep the remaining party key fields we
+															 self.src_last_date  			:= right.src_last_date;
+															 self.ReportedName       := right.raw_name;    
+															 self := right, // to keep the remaining party key fields we
 	 		                                        // want (which have the same name on the temp 
 																							//       layout as on the party key)
 			                         self := left, // to preserve other linkids key fields being kept
@@ -437,7 +438,7 @@ EXPORT MotorVehicleSection := MODULE;
 		
 		self.SourceDateFirstSeen				:= iesp.ECL2ESP.toDate ((integer)l.SRC_FIRST_DATE);
 		self.SourceDateLastSeen					:= iesp.ECL2ESP.toDate ((integer)l.SRC_LAST_DATE);
-		
+		self.ReportedName              := l.ReportedName; 
 		self := []; // temp in case bug 150816 iesp changes are checked in before roxie chnages are ready???
 	end;
 

@@ -1,4 +1,4 @@
-IMPORT $, address, doxie, dx_gateway, gateway, iesp, targus;
+IMPORT $, address, doxie, gateway, iesp, targus;
 
 EXPORT Records(
   DATASET(iesp.gateway_targus.t_TargusSearchRequest) drecs_in, 
@@ -36,7 +36,7 @@ EXPORT Records(
 		SELF.SearchBy.Address.UnitNumber := clean_addr.sec_range;
 		SELF.SearchBy.Address.City := clean_addr.p_city_name;
 		SELF.SearchBy.Address.State := clean_addr.st;
-		SELF.SearchBy.Address.zip5 := clean_addr.st;
+		SELF.SearchBy.Address.zip5 := clean_addr.zip;
 		SELF.SearchBy.Address.zip4 := clean_addr.zip4;
     SELF := L;
   END;

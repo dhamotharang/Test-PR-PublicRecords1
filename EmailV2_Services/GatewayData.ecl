@@ -17,11 +17,12 @@ EXPORT GatewayData := MODULE
                                          // we populate status only if domain is invalid
                                          invalid_domain := $.Constants.isUndeliverableEmail(RIGHT.domain_status);
                                          accept_all_domain := RIGHT.accept_all;
-                                         SELF.email_status := MAP(invalid_domain => RIGHT.domain_status,
+                                         _email_status     := MAP(invalid_domain => RIGHT.domain_status,
                                                                   accept_all_domain => $.Constants.DomainAcceptAll,
-                                                                   ''),
+                                                                   '');
+                                         SELF.email_status := _email_status,
                                          SELF.email_status_reason := IF(invalid_domain,$.Constants.GatewayValues.get_error_desc($.Constants.GatewayValues.EMAIL_DOMAIN_INVALID), ''),
-                                         SELF.date_last_verified := RIGHT.date_last_verified,
+                                         SELF.date_last_verified := IF(_email_status<>'', RIGHT.date_last_verified,''),
                                          SELF:=LEFT),
                                LEFT OUTER, KEEP(1), LIMIT(0));
 
@@ -76,9 +77,11 @@ EXPORT GatewayData := MODULE
     isPremiumSearch := in_mod.CheckEmailDeliverable;
     oldest_date := IF(isPremiumSearch, prior_year_date, '');  // for premium we will be using BV gw, and we re-check statuses older than 1year
     prior_month_date := (STRING8) STD.Date.AdjustDate(today, 0,-1,0);
+    prior_3month_date := (STRING8) STD.Date.AdjustDate(today, 0,0,-90);
 
-    emails_for_hist := DEDUP(PROJECT(in_emails(cleaned.clean_email!='', email_status=''), TRANSFORM($.Layouts.Gateway_Data.batch_in_bv_rec,
-                                                        SELF.email := TRIM(LEFT.cleaned.clean_email,ALL))
+    emails_for_hist := DEDUP(PROJECT(in_emails(cleaned.clean_email!='' AND (email_status='' OR (date_last_verified < prior_3month_date AND $.Constants.isUnverifiableEmail(email_status)))),
+                                    TRANSFORM($.Layouts.Gateway_Data.batch_in_bv_rec,
+                                              SELF.email := TRIM(LEFT.cleaned.clean_email,ALL))
                                       ), ALL);
 
     all_events := $.Raw.GetEventHistory(emails_for_hist, $.Constants.GatewayValues.SourceBV, oldest_date); //we keep emails without history in results here
@@ -88,9 +91,14 @@ EXPORT GatewayData := MODULE
     top_events := TOPN(srtd_events, 1, -date_added);
 
     // separate latest from older which we attempt to recheck
-    latest_events := top_events(date_added >= prior_month_date OR (~$.Constants.isValid(email_status) AND ~$.Constants.isUnknown(email_status)));
-    // BV data older than 1 month need to be re-checked unless email address is invalid or domain accepts all incoming emails
-    recheck_events := UNGROUP(top_events(date_added < prior_month_date AND ($.Constants.isValid(email_status) OR $.Constants.isUnknown(email_status))));
+    // we are not re-validating invalid emails or emails with status=accept_all verified within past 90 days
+    //latest_events := top_events(date_added >= prior_month_date OR (~$.Constants.isValid(email_status) AND ~$.Constants.isUnknown(email_status)));
+    latest_events := top_events(date_added >= prior_month_date OR $.Constants.isUndeliverableEmail(email_status)
+                      OR (date_added >= prior_3month_date AND $.Constants.isUnverifiableEmail(email_status)));
+    // BV data older than 1 month need to be re-checked unless email address is invalid or status of domain accepts all incoming emails was checked more than 90 days back
+    recheck_events := UNGROUP(top_events(date_added < prior_month_date AND ($.Constants.isValid(email_status) OR $.Constants.isUnknown(email_status))
+                              OR (date_added < prior_3month_date AND $.Constants.isUnverifiableEmail(email_status))  // per req. EMAIL-234 we now re-check accept_all older than 90 days
+                              ));
 
     db_check_emails := PROJECT(recheck_events + all_events(email_status=''), // the email addresses are already deduped
                            TRANSFORM($.Layouts.Gateway_Data.batch_in_bv_rec,
@@ -152,7 +160,7 @@ EXPORT GatewayData := MODULE
                                             SELF:=[]),
                                  LEFT ONLY);
 
-    ds_email_in := ds_batch_in + input_only_emails;
+    ds_email_in := ds_batch_in + IF($.Constants.SearchType.isEIA(in_mod.SearchType), input_only_emails);  // for EIC if we didn't findPII based on email address, we cannot check identity
 
     // we need to check in domain lookup first to identify invalid domains and populate status for those:
     ds_email_with_domain := CheckDomainStatus(ds_email_in);
@@ -199,22 +207,26 @@ EXPORT GatewayData := MODULE
     is_BV_allowed := ~Doxie.Compliance.isBriteVerifyRestricted(in_mod.DataRestrictionMask);
     today := STD.Date.Today();
     prior_month_date := (STRING8) STD.Date.AdjustDate(today, 0,-1,0);
+    prior_3month_date := (STRING8) STD.Date.AdjustDate(today, 0,0,-90);
 
     // for Premium search  (checkEmailDelivery=True) we attempt to make BV GW call and need to pick data for that
     // we filter out emails with invalid status or domains accepting all incoming emails as these emails won't be sent for BV verification GW calls
     with_domain_fltrd := IF(in_mod.CheckEmailDeliverable, ds_email_in(~$.Constants.isUndeliverableEmail(email_status)
-                                       AND ~$.Constants.isUnverifiableEmail(email_status)));
+                                       AND (~$.Constants.isUnverifiableEmail(email_status) OR date_last_verified < prior_3month_date)
+                                       ));
 
     // we only need to send unique, cleaned, and properly formatted email addresses for delivery status validation
     ds_batch_clnd := IF($.Constants.SearchType.isEAA(in_mod.SearchType),
                         with_domain_fltrd(email_quality_mask & BNOT($.Constants.EmailQualityRulesForBVCall) = 0),
                         with_domain_fltrd);  // for email searches initiated by input email address cleaning/formatting is already checked
 
-    // if CheckEmailDelivery=True  - we can use BV GW to update status
+    // if CheckEmailDelivery=True  - we use BV GW to update status
     // BV data older than 1 month need to be re-checked
     // we keep emails for delivery check where we have no status from domain/events lookup
     ds_email_to_check := ds_batch_clnd(date_last_verified < prior_month_date OR email_status=''
-                                       OR ($.Constants.isUnknown(email_status) AND date_last_verified=''));
+                                       OR ($.Constants.isUnknown(email_status) AND date_last_verified='')
+                                       OR ($.Constants.isUnverifiableEmail(email_status) AND date_last_verified < prior_3month_date) // per req. EMAIL-234 we now re-check accept_all status older than 90 days
+                                       );
 
     // we need to sort results to pick the best for GW delivery check
     ds_email_srtd := $.Functions.SortResults(ds_email_to_check, in_mod);

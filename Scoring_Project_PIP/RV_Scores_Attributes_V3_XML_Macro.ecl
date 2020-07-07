@@ -453,8 +453,8 @@ self.time_ms := l.time_ms;
 																																		// self := left) );
 
 
-get_group(recordof(layout_rvattributesout) groups, string name_i) := FUNCTION
-			groupi := groups.attributegroup(name=name_i);
+get_group(recordof(Soap_output) groups, string name_i) := FUNCTION
+			groupi := groups.attributegroups.attributegroup(name=name_i);
 			RETURN groupi;
 		END;
 
@@ -487,10 +487,10 @@ get_group(recordof(layout_rvattributesout) groups, string name_i) := FUNCTION
 			self.IPAddrPop := r.ipaddress<>'';
 			self.HPhnPop := r.homephone<>'';			 
 
-		  just_groups := project(l, transform(layout_RVAttributesOut, self := l.attributegroups));
+		  // just_groups := project(l, transform(layout_RVAttributesOut, self := l.attributegroups));
 			
 			// version3 output
-			v2 := get_group(just_groups, 'Version3');
+			v2 := get_group(l, 'Version3');
 			v21 := get_attribute(v2, 1);
 			v22 := get_attribute(v2, 2);
 			v23 := get_attribute(v2, 3);

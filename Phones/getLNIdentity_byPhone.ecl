@@ -1,52 +1,61 @@
-﻿/*
+﻿﻿/*
 This function pulls inhouse phones data from gong, phonesplus, and bip.
 */
-IMPORT BIPV2,Gong,Header,MDR,Phones,phonesplus_batch,ut;
+IMPORT Doxie, BIPV2, dx_Gong, MDR, Phones, phonesplus_batch, Suppress, ut;
 EXPORT GetLNIdentity_byPhone(DATASET(Phones.Layouts.PhoneIdentity)  dsPhones,
-									UNSIGNED1 GLBPurpose = 0,
-									UNSIGNED1 DPPAPurpose = 0,
-									STRING DataRestrictionMask = '',
-									STRING Industryclass = '') := FUNCTION
+  doxie.IDataAccess mod_access) := FUNCTION
 
-	
-	dsUniquePhones := DEDUP(SORT(dsPhones,phone,acctno),phone);	
+	dsUniquePhones := DEDUP(SORT(dsPhones,phone,acctno),phone);
 	// Future development to exclude landlines from phonesPlus lookup and wireless from gong lookup
 	//constLandline := Phones.Constants.PhoneServiceType.Landline[1];
 	//dsLandlines := dsUniquePhones(append_phone_type IN ['',constLandline]);
 	//dsOtherPhones := dsUniquePhones(append_phone_type<>constLandline);
 	//landlines
-	dsGong := JOIN(dsUniquePhones,Gong.key_history_phone,
-					KEYED(LEFT.phone[4..10] = RIGHT.p7) AND 
-					KEYED(LEFT.phone[1..3] = RIGHT.p3) AND
-					RIGHT.current_flag,
-					TRANSFORM(Phones.Layouts.PhoneIdentity,
-								SELF.phone := LEFT.phone,
-								SELF.fname := RIGHT.name_first,
-								SELF.mname := RIGHT.name_middle,
-								SELF.lname := RIGHT.name_last,
-								SELF.src := RIGHT.src,
-								SELF.city_name := RIGHT.p_city_name,
-								SELF.Activeflag := 'A',
-								SELF.zip := RIGHT.z5,
-								SELF.listing_type_bus := IF(RIGHT.listing_type_bus=Phones.Constants.ListingType.Business OR RIGHT.business_flag,
-																																	Phones.Constants.ListingType.Business ,''),
-								SELF := RIGHT,
-								SELF := []),
-					LIMIT(Phones.Constants.MAX_RECORDS,SKIP));
-	dsGongPhones := DEDUP(SORT(dsGong,phone,did=0,did,-dt_last_seen,dt_first_seen),phone,did);
-															
-	
+
+  optout_layout := RECORD
+    Phones.Layouts.PhoneIdentity;
+    unsigned4 global_sid;
+    unsigned8 record_sid;
+  END;
+
+  pre_dsGong := JOIN(dsUniquePhones,dx_Gong.key_history_phone(),
+    KEYED(LEFT.phone[4..10] = RIGHT.p7) AND
+    KEYED(LEFT.phone[1..3] = RIGHT.p3) AND
+    RIGHT.current_flag,
+    TRANSFORM(optout_layout,
+      SELF.phone := LEFT.phone,
+      SELF.fname := RIGHT.name_first,
+      SELF.mname := RIGHT.name_middle,
+      SELF.lname := RIGHT.name_last,
+      SELF.src := RIGHT.src,
+      SELF.city_name := RIGHT.p_city_name,
+      SELF.Activeflag := 'A',
+      SELF.zip := RIGHT.z5,
+      SELF.listing_type_bus := IF(RIGHT.listing_type_bus=Phones.Constants.ListingType.Business OR RIGHT.business_flag,
+        Phones.Constants.ListingType.Business ,''),
+      SELF.global_sid := RIGHT.global_sid;
+      SELF.record_sid := RIGHT.record_sid;
+      SELF.did := RIGHT.did;
+      SELF := RIGHT,
+      SELF := []),
+    LIMIT(Phones.Constants.MAX_RECORDS,SKIP));
+
+  dsGong_optout := Suppress.MAC_SuppressSource(pre_dsGong, mod_access);
+  dsGong := PROJECT(dsGong_optout, Phones.Layouts.PhoneIdentity);
+  dsGongPhones := DEDUP(SORT(dsGong,phone,did=0,did,-dt_last_seen,dt_first_seen),phone,did);
+
 	// get the phonesplus records
 	dsPhonesPlusRequest := PROJECT(dsUniquePhones, TRANSFORM(phonesplus_batch.layout_phonesplus_reverse_batch_in,SELF.phoneno:=LEFT.phone,SELF:=LEFT,SELF:=[]));
-	PhonesPlus_Batch.Mac_Get_PPL_by_Phone(dsPhonesPlusRequest, dsPhonesPlusOut,GLBPurpose,DPPAPurpose,Industryclass,,DataRestrictionMask);
-	dsPhonesPlus := PROJECT(DEDUP(SORT(dsPhonesPlusOut,phone,did=0,did,-dt_last_seen,dt_first_seen),phone,did), 
+	PhonesPlus_Batch.Mac_Get_PPL_by_Phone(dsPhonesPlusRequest, dsPhonesPlusOut, mod_access.glb, mod_access.dppa,
+    mod_access.Industry_Class, , mod_access.DataRestrictionMask);
+	dsPhonesPlus := PROJECT(DEDUP(SORT(dsPhonesPlusOut,phone,did=0,did,-dt_last_seen,dt_first_seen),phone,did),
 											TRANSFORM(Phones.Layouts.PhoneIdentity,
 														SELF.src:=IF(LEFT.src='','PP',LEFT.src),
 														SELF.Activeflag := IF(LEFT.Activeflag='','A',LEFT.Activeflag),
 														SELF:=LEFT,SELF:=[]));
 
 	dsIndividualwPhones := 	dsGongPhones + dsPhonesPlus;
-	
+
 	// business lookup
 	businessRequest := DEDUP(SORT(dsIndividualwPhones + dsPhones,phone,-dt_last_seen,dt_first_seen),phone);
 	dsBusinesPhones := PROJECT(businessRequest,TRANSFORM(BIPV2.IDFunctions.rec_SearchInput,
@@ -61,8 +70,8 @@ EXPORT GetLNIdentity_byPhone(DATASET(Phones.Layouts.PhoneIdentity)  dsPhones,
 														SELF.Contact_did:=LEFT.did,
 														SELF.hsort:=TRUE, // bip requirement - always make true
 														SELF:=LEFT,SELF:=[]));
-	//get bip data		 - Gong.key_History_LinkIDs	may be added later - exploring the value.																		
-	dsBipData2 := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(dsBusinesPhones).data2_;	
+	//get bip data		 - Gong.key_History_LinkIDs	may be added later - exploring the value.
+	dsBipData2 := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(dsBusinesPhones).SearchKeyData(mod_access);
 	dsBips := DEDUP(dsBipData2(source<>MDR.SourceTools.src_Dunn_Bradstreet),all); //filter out Dunn's records, should only be used for linking
 
 	layout_rawRec:=RECORDOF(dsBips);
@@ -100,11 +109,11 @@ EXPORT GetLNIdentity_byPhone(DATASET(Phones.Layouts.PhoneIdentity)  dsPhones,
 		SELF.ActiveFlag 		:= r.company_status_derived;
 		SELF	:=	r;
 		SELF	:=	l;
-	END;	
-	dsBusinessInfo := JOIN(businessRequest,dsRolledRaw, 
+	END;
+	dsBusinessInfo := JOIN(businessRequest,dsRolledRaw,
 							LEFT.phone = RIGHT.Company_Phone,
 							formatBusinessInfo(LEFT,RIGHT),
-							LIMIT(Phones.Constants.MAX_RECORDS,SKIP));				
+							LIMIT(Phones.Constants.MAX_RECORDS,SKIP));
 
 	Phones.Layouts.PhoneIdentity PeopleToBusiness (Phones.Layouts.PhoneIdentity l, Phones.Layouts.PhoneIdentity r) := TRANSFORM
 		SELF.acctno := l.acctno;
@@ -131,15 +140,15 @@ EXPORT GetLNIdentity_byPhone(DATASET(Phones.Layouts.PhoneIdentity)  dsPhones,
 	#IF(Phones.Constants.Debug.LNData)
 		// OUTPUT(dsGong,NAMED('dsGong'));
 		OUTPUT(dsGongPhones,NAMED('dsGongPhones'));
-		// OUTPUT(dsPhonesPlusRequest,NAMED('dsPhonesPlusRequest'));	
-		OUTPUT(dsPhonesPlus,NAMED('dsPhonesPlus'));	
-		OUTPUT(businessRequest,NAMED('businessRequest'));	
-		// OUTPUT(dsBusinesPhones,NAMED('dsBusinesPhones'));			
-		// OUTPUT(dsBipData2,NAMED('dsBipData2'));	
-		OUTPUT(dsBips,NAMED('dsBips'));		
-		OUTPUT(dsRolledRaw,NAMED('dsRolledRaw'),all);	
-		OUTPUT(dsBusinessInfo,NAMED('dsBusinessInfo'));	
-		OUTPUT(dsPhonesIdentities,NAMED('dsPhonesIdentities'),all);	
+		// OUTPUT(dsPhonesPlusRequest,NAMED('dsPhonesPlusRequest'));
+		OUTPUT(dsPhonesPlus,NAMED('dsPhonesPlus'));
+		OUTPUT(businessRequest,NAMED('businessRequest'));
+		// OUTPUT(dsBusinesPhones,NAMED('dsBusinesPhones'));
+		// OUTPUT(dsBipData2,NAMED('dsBipData2'));
+		OUTPUT(dsBips,NAMED('dsBips'));
+		OUTPUT(dsRolledRaw,NAMED('dsRolledRaw'),all);
+		OUTPUT(dsBusinessInfo,NAMED('dsBusinessInfo'));
+		OUTPUT(dsPhonesIdentities,NAMED('dsPhonesIdentities'),all);
 	#END
 	RETURN dsPhonesIdentities;
 END;

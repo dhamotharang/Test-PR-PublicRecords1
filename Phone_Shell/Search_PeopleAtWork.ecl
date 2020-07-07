@@ -3,7 +3,7 @@
  * - LexID (DID):: Source: PAW																						*
  ************************************************************************ */
 
-IMPORT Phone_Shell, RiskWise, PAW, doxie, STD;
+IMPORT Phone_Shell, RiskWise, PAW, doxie, STD, Suppress;
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PeopleAtWork (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 PhoneRestrictionMask, 
          UNSIGNED2 PhoneShellVersion = 10, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
@@ -27,7 +27,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PeopleAtWor
 	  *************************************************************** */
  IncludeLexIDCounts := if(PhoneShellVersion >= 21,true,false);   // LexID counts/'all' attributes added in PhoneShell version 2.1     
     
-	layoutContactID getPhones(layoutContactID le, PAW.Key_ContactID ri) := TRANSFORM
+	{layoutContactID, unsigned4 global_sid} getPhones(layoutContactID le, PAW.Key_ContactID ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		
 		SELF.Gathered_Phone := TRIM(ri.Company_Phone);
 		
@@ -71,7 +72,10 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PeopleAtWor
 		
 		SELF := le;
 	END;
-	withPeopleAtWork := JOIN(withContactID, PAW.Key_ContactID, KEYED(LEFT.ContactID = RIGHT.Contact_ID) AND (INTEGER)RIGHT.Company_Phone <> 0, getPhones(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost));
+	
+	withPeopleAtWork_unsuppressed := JOIN(withContactID, PAW.Key_ContactID, KEYED(LEFT.ContactID = RIGHT.Contact_ID) AND (INTEGER)RIGHT.Company_Phone <> 0, getPhones(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost));
+	
+	withPeopleAtWork := Suppress.Suppress_ReturnOldLayout(withPeopleAtWork_unsuppressed, mod_access, layoutContactID);
 
 	layoutContactID get_Alls(layoutContactID le, layoutContactID ri) := TRANSFORM
    self.Sources.Source_List_All_Last_Seen := if(le.Sources.Source_Owner_DID = ri.Sources.Source_Owner_DID, 

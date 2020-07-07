@@ -1,5 +1,5 @@
-export mac_AddHRIPhone(infile, outfile) := macro
-import ut,gong,codes,risk_indicators;
+﻿export mac_AddHRIPhone(infile, outfile, mod_access) := macro
+import ut,dx_Gong,codes,risk_indicators, suppress;
 #uniquename(temp_rec)
 %temp_rec% := record
 	unsigned4	seq;
@@ -18,7 +18,7 @@ import ut,gong,codes,risk_indicators;
 	boolean missing := false;
 end;
 
-	
+
 #uniquename(into_temp)
 %temp_rec% %into_temp%(infile L, integer C) := transform
 	self.missing := L.phone = '' or length(trim(l.phone)) < 10;
@@ -28,20 +28,59 @@ end;
 
 #uniquename(tf)
 %tf% := group(project(infile,%into_temp%(LEFT, COUNTER)), seq);
-		
-#uniquename(addPhoneRisk1)
-%temp_rec% %addPhoneRisk1%(%temp_rec% L, Risk_Indicators.key_phone_table_v2 R) := transform
-	zpd := ut.zip_dist(L.zip,R.zip5);
-	self.disco := if (R.phone10 = '', L.disco, R.potDisconnect);
-	self.zipdist := if (R.phone10 = '', L.zipdist, zpd > 10);
-	self.cell := if (R.phone10 = '', L.cell, R.nxx_type in ['01','57','62','04','55','60']);
-	self.pager := if (R.phone10 = '', L.pager, R.nxx_type in ['02','52','56','61']);
-	self.sic := if (R.phone10 ='', L.sic, r.sic_Code != '');
-	self.notfound := if (r.phone10 ='', true, false);
-	self.nameaddr := if (r.phone10 = '', L.nameaddr, if (L.lname != R.lname or L.prim_range != R.prim_range
-												or L.prim_name != R.prim_name or L.zip != R.zip5, true, false));
-	self := L;
+
+#uniquename(key_phone_table)
+%key_phone_table% := dx_Gong.key_phone_table();
+
+#uniquename(phone_table_rec)
+%phone_table_rec% := record
+  boolean is_suppressed := false;
+  %key_phone_table%.did;
+  %key_phone_table%.phone10;
+  %key_phone_table%.zip5;
+  %key_phone_table%.potDisconnect;
+  %key_phone_table%.nxx_type;
+  %key_phone_table%.sic_Code;
+  %key_phone_table%.lname;
+  %key_phone_table%.prim_range;
+  %key_phone_table%.prim_name;
+  %key_phone_table%.global_sid;
+  %key_phone_table%.record_sid;
 end;
+
+#uniquename(temp_rec_with_phone_table)
+%temp_rec_with_phone_table% := record(%temp_rec%)
+  %phone_table_rec% phone_table;
+end;
+
+#uniquename(outf0)
+%outf0% := join(%tf%(~missing), dx_Gong.key_phone_table(), keyed(left.phone = right.phone10),
+  transform(%temp_rec_with_phone_table%,
+    self.phone_table := right;
+    self := left; 
+  ), left outer, KEEP(100), ATMOST(1000));
+
+#uniquename(outf0_flagged)
+%outf0_flagged% := suppress.MAC_FlagSuppressedSource(%outf0%,mod_access, phone_table.did, phone_table.global_sid);
+
+#uniquename(addPhoneRisk1)
+%temp_rec% %addPhoneRisk1%(%outf0_flagged% L) := transform
+  R := if(~L.phone_table.is_suppressed, L.phone_table, 
+    ROW([], %phone_table_rec%));
+  zpd := ut.zip_dist(L.zip,R.zip5);
+  self.disco := if (R.phone10 = '', L.disco, R.potDisconnect);
+  self.zipdist := if (R.phone10 = '', L.zipdist, zpd > 10);
+  self.cell := if (R.phone10 = '', L.cell, R.nxx_type in ['01','57','62','04','55','60']);
+  self.pager := if (R.phone10 = '', L.pager, R.nxx_type in ['02','52','56','61']);
+  self.sic := if (R.phone10 ='', L.sic, r.sic_Code != '');
+  self.notfound := if (r.phone10 ='', true, false);
+  self.nameaddr := if (r.phone10 = '', L.nameaddr, if (L.lname != R.lname or L.prim_range != R.prim_range
+    or L.prim_name != R.prim_name or L.zip != R.zip5, true, false));
+  self := L;
+end;
+
+#uniquename(outf0_suppressed)
+%outf0_suppressed% := project(%outf0_flagged%, %addPhoneRisk1%(LEFT));
 
 #uniquename(roll_risks)
 %temp_rec% %roll_risks%(%temp_rec% L, %temp_rec% R) := transform
@@ -61,8 +100,7 @@ end;
 end;
 
 #uniquename(outf1)
-%outf1% := rollup(join(%tf%(~missing), Risk_Indicators.key_phone_table_v2, keyed(left.phone = right.phone10),
-		%addPhoneRisk1%(LEFT,RIGHT), left outer, KEEP(100), ATMOST(1000)), %roll_risks%(LEFT, RIGHT), true);
+%outf1% := rollup(%outf0_suppressed%, %roll_risks%(LEFT, RIGHT), true);
 
 #uniquename(addrisk2)
 %temp_rec% %AddRisk2%(%temp_rec% L, Risk_indicators.Key_AreaCode_Change R) := transform
@@ -110,9 +148,9 @@ end;
 	self.diffnum := Rphone10=''; // this phone not found at that address
 	self := L;
 end;
-
+/* The below join does not need to be suppressed as no data is being taken out of the key */
 #uniquename(outf4)
-%outf4% := join(%outf3%,gong.key_address_current, keyed(left.prim_name = right.prim_name) and
+%outf4% := join(%outf3%,dx_Gong.key_address_current(), keyed(left.prim_name = right.prim_name) and
 								  keyed(left.st = right.st) and
 								  keyed(left.zip = right.z5) and
 								  keyed(left.prim_range = right.prim_range) and
@@ -120,20 +158,20 @@ end;
 								  keyed(left.predir = right.predir) AND
 									left.phone = right.phone10,
 							%addRisk4%(LEFT,RIGHT.phone10),left outer, keep(1), ATMOST (ut.limits. PHONE_PER_ADDRESS));
-							
+
 #uniquename(addRisk5)
 %temp_rec% %addRisk5%(%temp_rec% L, string5 rz5) := transform
 	self.diffnum := IF(Rz5='', false, L.diffnum);
 	self := L;
 end;
 
-//problem down here is that we are currently saying 
+//problem down here is that we are currently saying
 //is it missing from either?
 //should be saying
 //is it missing from both?
-
+/* The below join does not need to be suppressed as no data is being taken out of the key */
 #uniquename(outf5)
-%outf5% := join(%outf4%,gong.key_address_current, 
+%outf5% := join(%outf4%,dx_Gong.key_address_current(),
 									LEFT.diffnum AND
 									keyed(left.prim_name = right.prim_name) and
 								  keyed(left.st = right.st) and
@@ -144,19 +182,19 @@ end;
 									right.phone10 != '',
 							%addRisk5%(LEFT,RIGHT.z5),left outer, keep(1), ATMOST (ut.limits. PHONE_PER_ADDRESS));
 
-/*	
-code='0007' => 'The input phone number may be disconnected.',  
-code='0009' => 'The input phone number is a pager number.',  
-code='0010' => 'The input phone number is a mobile number.',  
-code='0015' => 'The input phone number matches a transient commercial or institutional address.',  
-code='0016' => 'The input phone number and input zip code combination is invalid.',  
-code='0044' => 'The input phone area code is changing.',  
-code='0049' => 'The input phone and address are geographically distant (greater than 10 miles).',  
-code='0064' => 'The input address returns a different phone number.',  
-code='0073' => 'The input Telephone Number is not found in the public record databases.',  
-code='0074' => 'The input phone number is associated with a different name and address.',  
-code='0075' => 'The input name and address are associated with an unlisted/non-published phone number.',  
-code='0080' => 'The input phone was missing or incomplete.',  
+/*
+code='0007' => 'The input phone number may be disconnected.',
+code='0009' => 'The input phone number is a pager number.',
+code='0010' => 'The input phone number is a mobile number.',
+code='0015' => 'The input phone number matches a transient commercial or institutional address.',
+code='0016' => 'The input phone number and input zip code combination is invalid.',
+code='0044' => 'The input phone area code is changing.',
+code='0049' => 'The input phone and address are geographically distant (greater than 10 miles).',
+code='0064' => 'The input address returns a different phone number.',
+code='0073' => 'The input Telephone Number is not found in the public record databases.',
+code='0074' => 'The input phone number is associated with a different name and address.',
+code='0075' => 'The input name and address are associated with an unlisted/non-published phone number.',
+code='0080' => 'The input phone was missing or incomplete.',
 */
 #uniquename(assign_codes)
 typeof(infile) %assign_codes%(%temp_rec% L) := transform

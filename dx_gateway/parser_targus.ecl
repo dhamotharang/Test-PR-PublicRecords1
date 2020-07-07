@@ -1,4 +1,4 @@
-IMPORT $, address, doxie, iesp, targus, suppress;
+IMPORT $, address, doxie, iesp, targus;
 
 EXPORT parser_targus := MODULE
 
@@ -58,10 +58,12 @@ EXPORT parser_targus := MODULE
       // **********************************************************
       enh_data := l.Response.VerifyExpressResult.EnhancedData;
       pde_data := l.Response.PhoneDataExpressSearchResult;
+      us_pde_data := l.Response.USPhoneDataExpressSearchResult;
       SELF.section_id := sec_id;
       t_name := CASE(sec_id, 
-        $.Constants.Targus.SECTION_ID_RESP.PDE_SEARCH_RESULT => iesp.ECL2ESP.SetName(pde_data.FirstName, '', pde_data.LastName, '', '', ''),
+        $.Constants.Targus.SECTION_ID_RESP.PDE_SEARCH_RESULT => iesp.ECL2ESP.SetName(pde_data.FirstName, pde_data.MiddleName, pde_data.LastName, '', '', ''),
         $.Constants.Targus.SECTION_ID_RESP.VE_ENHANCED_DATA => iesp.ECL2ESP.SetName('', '', '', '', '', enh_data.Name),
+        $.Constants.Targus.SECTION_ID_RESP.US_PDE_SEARCH_RESULT => iesp.ECL2ESP.SetName(us_pde_data.FirstName, us_pde_data.MiddleName, us_pde_data.LastName, '', '', ''),
         ROW([], iesp.share.t_Name)); 
       clean_name := Address.GetCleanNameAddress.fnCleanName(t_name);
       SELF.title := clean_name.title;
@@ -79,6 +81,10 @@ EXPORT parser_targus := MODULE
           iesp.ECL2ESP.SetAddress('', '', '', '', '', 
             '', '', enh_data.CityName, enh_data.State, enh_data.ZipCode, '', '', '', 
             enh_data.PrimaryAddress, '', ''),
+        $.Constants.Targus.SECTION_ID_RESP.US_PDE_SEARCH_RESULT => 
+          iesp.ECL2ESP.SetAddress(us_pde_data.StreetName, us_pde_data.PrimaryAddressNumber, '', '', '', 
+            '', '', us_pde_data.PostOfficeCityName, us_pde_data.State, us_pde_data.ZipCode, us_pde_data.ZipPlus4, '', '', 
+            '', '', ''),    
         ROW([], iesp.share.t_Address));
         
       clean_addr := Address.GetCleanNameAddress.fnCleanAddress(t_addr);
@@ -98,7 +104,7 @@ EXPORT parser_targus := MODULE
       SELF := l;
       SELF := []; // phone, ssn, dob, record_sid, transaction_id, batch_job_id, batch_process_id
     END;
-    ds_out := NORMALIZE(ds_in, 2, xtNorm(LEFT, counter));
+    ds_out := NORMALIZE(ds_in, $.Constants.Targus.SECTION_CNT_RESP, xtNorm(LEFT, counter));
 
     RETURN ds_out;
   END;
@@ -115,8 +121,7 @@ EXPORT parser_targus := MODULE
 
     d_req_clean := JOIN(d_req, d_req_optout_recs(~is_suppressed), 
       (UNSIGNED) LEFT.User.QueryId = RIGHT.seq,
-      TRANSFORM(targus.layout_targus_in, 
-      SELF := LEFT),
+      TRANSFORM(targus.layout_targus_in, SELF := LEFT),
       KEEP(1), LIMIT(0));
 
     // output(d_req, named('d_req'));  
@@ -150,19 +155,17 @@ EXPORT parser_targus := MODULE
 
         is_suppressed_enh_data := RIGHT.sections(section_id = $.Constants.Targus.SECTION_ID_RESP.VE_ENHANCED_DATA)[1].is_suppressed;
         is_suppressed_pde_data := RIGHT.sections(section_id = $.Constants.Targus.SECTION_ID_RESP.PDE_SEARCH_RESULT)[1].is_suppressed;
-
-        layout_enh_data := RECORDOF(LEFT.Response.VerifyExpressResult.EnhancedData);
-        layout_pde_data := RECORDOF(LEFT.Response.PhoneDataExpressSearchResult);
-
-        enh_data := if(is_suppressed_enh_data, row([], layout_enh_data),
-          LEFT.Response.VerifyExpressResult.EnhancedData);
-        pde_data := if(is_suppressed_pde_data, row([], layout_pde_data),
-          LEFT.Response.PhoneDataExpressSearchResult);
+        is_suppressed_us_pde_data := RIGHT.sections(section_id = $.Constants.Targus.SECTION_ID_RESP.US_PDE_SEARCH_RESULT)[1].is_suppressed;
         
-        SELF.Response.VerifyExpressResult.EnhancedData := enh_data;
-        SELF.Response.PhoneDataExpressSearchResult := pde_data;
+        SELF.Response.VerifyExpressResult.EnhancedData := if(~is_suppressed_enh_data, 
+          LEFT.Response.VerifyExpressResult.EnhancedData);
+        SELF.Response.PhoneDataExpressSearchResult := if(~is_suppressed_pde_data, 
+          LEFT.Response.PhoneDataExpressSearchResult);
+        SELF.Response.USPhoneDataExpressSearchResult := if(~is_suppressed_us_pde_data, 
+          LEFT.Response.USPhoneDataExpressSearchResult);
 
-        SELF := LEFT),
+        SELF := LEFT;
+      ),
       LEFT OUTER, KEEP(1), LIMIT(0));
 
     // output(d_resp, named('d_resp'));  
@@ -175,4 +178,3 @@ EXPORT parser_targus := MODULE
   END;
 
 END;
-

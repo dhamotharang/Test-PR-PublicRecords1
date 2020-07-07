@@ -32,16 +32,18 @@ export IdAppendThorLocal(
 		,primForcePost = false
 		,weightThreshold = 0
 		,disableSaltForce = false
+		,segmentation = true
+		,reAppend = true
 	) := functionmacro
 
-	import BIPV2_Company_Names, BizLinkFull,ut,_Control;
+	import BIPV2_Company_Names, BizLinkFull,ut,_Control,BIPV2_xlink_segmentation;
 
 	#uniquename(zipset)
 	#uniquename(infilec)
-	#uniquename(outfile1)
+	#uniquename(outfile0)
 	#uniquename(infilecnp)
 	%infilec% :=
-	project(infile,
+	project(infile(reAppend or (proxid = 0 and seleid = 0)),
 		transform(
 			{infile, unsigned6 cntr, DATASET(BizLinkFull.Process_Biz_layouts.layout_zip_cases) %zipset%},
 				self.cntr := counter,
@@ -121,18 +123,23 @@ export IdAppendThorLocal(
 		Input_mname := pContact_mname,
 		Input_lname := pContact_lname,
 		Input_contact_ssn := pContact_ssn,
-		Outfile := %OutFile1%,
+		Outfile := %OutFile0%,
 		AsIndex := %useKeyedJoins%,
 		In_bGetAllScores := bGetAllScores
 		,In_disableForce := disableSaltForce
 	);
 
+	#UNIQUENAME(OutSegResult)
+	%OutSegResult% := BIPV2_xlink_segmentation.mac_Segmentation(%OutFile0%,%useKeyedJoins%);
+	
+	#UNIQUENAME(OutFile1)
+	%OutFile1% := IF(segmentation, %OutSegResult%, %OutFile0%);
 
   #uniquename(outnorm)
   %outnorm% := normalize(
-	%OutFile1%((results[1].score >= (integer)score_threshold or results_ultid[1].score >= (integer)score_threshold)
-	           ,results[1].weight >= (integer)weightThreshold
-	           ,(results[1].proxid > 0 or results_ultid[1].ultid > 0)), //filter not necessary here, but might save some work
+	%OutFile1%((results[1].score >= (integer)score_threshold or results_seleid[1].score >= (integer)score_threshold or results_ultid[1].score >= (integer)score_threshold)
+	           ,(results[1].weight >= (integer)weightThreshold or results_seleid[1].weight >= weightThreshold)
+	           ,(results[1].proxid > 0 or results_seleid[1].seleid > 0 or results_ultid[1].ultid > 0)), //filter not necessary here, but might save some work
 	(integer)keep_count,
 	transform(
 		{%OutFile1%.reference, %OutFile1%.results.proxid, %OutFile1%.results.weight, %OutFile1%.results.score, %OutFile1%.results.seleid, %OutFile1%.results.orgid, %OutFile1%.results.ultid, %OutFile1%.results.powid
@@ -271,7 +278,7 @@ export IdAppendThorLocal(
 
 		self:= left.results[counter];    
 		)
-	)((score >= (integer)score_threshold or ultscore >= (integer)score_threshold), (proxid > 0 or ultid > 0));// proxid > 0 also because of case where threshold is zero (without this you get keep_count records even with no IDs on them)
+	)((score >= (integer)score_threshold or selescore >= (integer)score_threshold or ultscore >= (integer)score_threshold), (proxid > 0 or seleid > 0 or ultid > 0));// proxid > 0 also because of case where threshold is zero (without this you get keep_count records even with no IDs on them)
 
 
 	#uniquename(outfile20);
@@ -335,11 +342,21 @@ export IdAppendThorLocal(
 		left outer
   );
 
-	return %outfile20%;
+	passThru0 := project(infile(proxid != 0 or seleid != 0),
+		transform(BizLinkFull.Process_Biz_Layouts.id_stream_layout,
+			self.uniqueId := left.request_id,
+			self.proxid := left.proxid,
+			self.seleid := if(left.proxid != 0, 0, left.seleid);
+			self := left;
+			self := []));
+	passThru := if(reAppend, dataset([], recordof(passThru0)),
+	               BizLinkFull.Process_Biz_Layouts.id_stream_complete(passThru0));
 
-	// return parallel(
-		// output(infile_augmented, named('in_biz_batch'));
-		// output(%outfile1%, named('biz_batch'));
-	// );
+	postPassThru := project(passThru, transform(recordof(%outfile20%),
+		self.request_id := left.uniqueid,
+		self := left;
+		self := []));
+
+	return %outfile20% + postPassThru;
 
 endmacro;

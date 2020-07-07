@@ -1,15 +1,15 @@
-﻿IMPORT $, iesp, doxie, ut, Risk_Indicators, doxie_crs, Suppress, census_data, CriminalRecords_Services, PersonReports, std, MDR;
+IMPORT $, iesp, doxie, ut, Risk_Indicators, doxie_crs, Suppress, census_data, CriminalRecords_Services, PersonReports, std, MDR;
 
 /*
   boolean IncludeMotorVehicleV1 {xpath('IncludeMotorVehicleV1')};//hidden[internal]
   boolean IncludeRealTimeVehicles {xpath('IncludeRealTimeVehicles')};
   string RealTimePermissibleUse {xpath('RealTimePermissibleUse')}; //values['','Government','LawEnforcement','Parking','VerifyFraudOrDebt','Litigation','InsuranceClaims','InsuranceUnderwriting','TowedAndImpounded','PrivateToll','']
   string DateRange {xpath('DateRange')}; //values['0','1','12','24','36','48','']//hidden[internal]
-  */  
+  */
 
 EXPORT functions := MODULE
   // saves options from ESDL input into global storage for subsequent old-style reading;
-  // for existing input parameters legacy names must be used here 
+  // for existing input parameters legacy names must be used here
   // TODO: worth creating constant literals for SOAP names?
   // TODO: this code must be executed only in ESDL mode! So far I can't accomplish this
   // NB: careful: some ESDL-standard options (glb, dppa, etc.) are stored through iesp@ECL2EP
@@ -25,18 +25,18 @@ EXPORT functions := MODULE
     #stored ('IncludeAKAs', m_esdl.include_AKAs);
     #stored ('IncludeAssociates', m_esdl.include_associates);
     #stored ('IncludeBankruptcies', m_esdl.include_bankruptcy);
-        #stored ('BankruptcyVersion', m_esdl.bankruptcy_version);
+    #stored ('BankruptcyVersion', m_esdl.bankruptcy_version);
     #stored ('IncludeBestInfo', m_esdl.include_best);
     #stored ('IncludeCensusData', m_esdl.include_CensusData);
     #stored ('IncludeCivilCourts', m_esdl.include_civilcourts);
     #stored ('IncludeCorporateAffiliations', m_esdl.include_corpaffiliations);
     #stored ('IncludeCriminalRecords', m_esdl.include_crimrecords);
-        #stored ('CriminalRecordVersion', m_esdl.crimrecords_version);
+    #stored ('CriminalRecordVersion', m_esdl.crimrecords_version);
     #stored ('IncludeDEARecords', m_esdl.include_controlledsubstances);
-        #stored ('DeaVersion', m_esdl.dea_version);
+    #stored ('DeaVersion', m_esdl.dea_version);
     #stored ('IncludeDriversAtAddress', m_esdl.include_driversataddress);
     #stored ('IncludeDriversLicenses', m_esdl.include_DriversLicenses);
-        #stored ('DlVersion', m_esdl.dl_version);
+    #stored ('DlVersion', m_esdl.dl_version);
     #stored ('IncludeEmailAddresses', m_esdl.include_email);
     #stored ('IncludeFAACertificates', m_esdl.include_FAACertificates);
     #stored ('IncludeFAAAircrafts', m_esdl.include_faaaircrafts);
@@ -44,29 +44,29 @@ EXPORT functions := MODULE
     #stored ('IncludeFirearmsAndExplosives', m_esdl.include_atf);
     #stored ('IncludeForeclosures', m_esdl.include_Foreclosures);
     #stored ('IncludeHealthCareProviders', m_esdl.include_providers);
-        #stored ('IncludeGroupAffiliations', m_esdl.include_groupaffiliations); //see Doxie@Prov_records
-        #stored ('IncludeHospitalAffiliations', m_esdl.include_hospitalaffiliations);
-        #stored ('IncludeEducation', m_esdl.include_education);
-        #stored ('IncludeBusinessAddress', m_esdl.include_businessaddress);
+    #stored ('IncludeGroupAffiliations', m_esdl.include_groupaffiliations); //see Doxie@Prov_records
+    #stored ('IncludeHospitalAffiliations', m_esdl.include_hospitalaffiliations);
+    #stored ('IncludeEducation', m_esdl.include_education);
+    #stored ('IncludeBusinessAddress', m_esdl.include_businessaddress);
     #stored ('IncludeHealthCareSanctions', m_esdl.include_sanctions);
     #stored ('IncludeHRI', m_esdl.include_hri);
     #stored ('IncludeHuntingFishingLicenses', m_esdl.include_huntingfishing);
     #stored ('IncludeImposters', m_esdl.include_imposters);
     #stored ('IncludeInternetDomains', m_esdl.include_domains);
     #stored ('IncludeLiensJudgments', m_esdl.include_LiensJudgments);
-        #stored ('JudgmentLienVersion', m_esdl.liensjudgments_version);
+    #stored ('JudgmentLienVersion', m_esdl.liensjudgments_version);
     #stored ('IncludeMatrixCriminalHistory', m_esdl.include_crimhistory);
     #stored ('IncludeMerchantVessels', m_esdl.include_merchantvessels);
     #stored ('IncludeMotorVehicles', m_esdl.include_MotorVehicles);
-        #stored ('VehicleVersion', m_esdl.vehicles_version);
+    #stored ('VehicleVersion', m_esdl.vehicles_version);
     #stored ('IncludeNeighbors', m_esdl.include_neighbors);
-        #stored ('NeighborhoodCount', m_esdl.neighborhoods);
-				#stored ('MaxNeighborhoods', m_esdl.neighborhoods); //Used leagacy MaxNeighborhoods to fetch the right input from interface.Refer to -> doxie_crs.nbr_records
-        #stored ('NeighborsPerAddress', m_esdl.neighbors_per_address);
-        #stored ('AddressesPerNeighbor', m_esdl.addresses_per_neighbor);
-        #stored ('IncludeHistoricalNeighbors', m_esdl.include_historicalneighbors);
-        #stored ('NeighborsPerNA', m_esdl.neighbors_per_na);
-        #stored ('NeighborRecency', m_esdl.neighbors_recency);
+    #stored ('NeighborhoodCount', m_esdl.neighborhoods);
+    #stored ('MaxNeighborhoods', m_esdl.neighborhoods); //Used leagacy MaxNeighborhoods to fetch the right input from interface.Refer to -> doxie_crs.nbr_records
+    #stored ('NeighborsPerAddress', m_esdl.neighbors_per_address);
+    #stored ('AddressesPerNeighbor', m_esdl.addresses_per_neighbor);
+    #stored ('IncludeHistoricalNeighbors', m_esdl.include_historicalneighbors);
+    #stored ('NeighborsPerNA', m_esdl.neighbors_per_na);
+    #stored ('NeighborRecency', m_esdl.neighbors_recency);
     #stored ('IncludeNoticeOfDefaults', m_esdl.include_nod);
     #stored ('IncludeOldPhones', m_esdl.include_oldphones);
     #stored ('IncludePatriot', m_esdl.include_patriot);
@@ -74,22 +74,22 @@ EXPORT functions := MODULE
     #stored ('IncludePhoneSummary', m_esdl.include_phonesummary);
     #stored ('IncludeProfessionalLicenses', m_esdl.include_proflicenses);
     #stored ('IncludeProperties', m_esdl.include_properties);
-        #stored ('PropertyVersion', m_esdl.property_version);
-        #stored ('IncludeCurrentProperties', m_esdl.use_currentlyownedproperty);
-        #stored ('IncludePriorProperties', m_esdl.use_nonsubjectproperty);
+    #stored ('PropertyVersion', m_esdl.property_version);
+    #stored ('IncludeCurrentProperties', m_esdl.use_currentlyownedproperty);
+    #stored ('IncludePriorProperties', m_esdl.use_nonsubjectproperty);
     #stored ('IncludePhonesPlus', m_esdl.include_PhonesPlus);
     #stored ('IncludePhonesFeedback', m_esdl.include_phonesfeedback);
     #stored ('IncludeRelatives', m_esdl.include_relatives);
-        #stored ('RelativeDepth', m_esdl.relative_depth);
-        #stored ('MaxRelatives', m_esdl.max_relatives);
-        #stored ('IncludeRelativeAddresses', m_esdl.include_relativeaddresses);
-        #stored ('MaxRelativeAddresses', m_esdl.max_relatives_addresses);
+    #stored ('RelativeDepth', m_esdl.relative_depth);
+    #stored ('MaxRelatives', m_esdl.max_relatives);
+    #stored ('IncludeRelativeAddresses', m_esdl.include_relativeaddresses);
+    #stored ('MaxRelativeAddresses', m_esdl.max_relatives_addresses);
     #stored ('IncludeSexualOffenses', m_esdl.include_sexualoffences);
     #stored ('IncludeUCCFilings', m_esdl.include_UCCFilings);
-        #stored ('UccVersion', m_esdl.ucc_version);
+    #stored ('UccVersion', m_esdl.ucc_version);
     #stored ('IncludeVerification', m_esdl.include_verification);
     #stored ('IncludeVoterRegistrations', m_esdl.include_voters);
-        #stored ('VoterVersion', m_esdl.voters_version);
+    #stored ('VoterVersion', m_esdl.voters_version);
     #stored ('IncludeWaterCrafts', m_esdl.include_WaterCrafts);
     #stored ('IncludeWeaponPermits', m_esdl.include_WeaponPermits);
   // boolean DoPhoneReport {xpath('DoPhoneReport')};
@@ -100,13 +100,18 @@ EXPORT functions := MODULE
     #stored ('ExcludeSources', ~m_esdl.include_sources);
     #stored ('IncludeCriminalIndicators', m_esdl.include_criminalindicators);
     #stored ('IncludeStudentInformation', m_esdl.include_students);
-		#stored ('IncludeAMLProperty', m_esdl.include_aml_property);
-		#stored ('IncludeKeyRiskIndicators', m_esdl.include_kris);
-		#stored('IncludeAddressSourceInfo', m_esdl.include_addressSourceInfo);
+    #stored ('IncludeAMLProperty', m_esdl.include_aml_property);
+    #stored ('IncludeKeyRiskIndicators', m_esdl.include_kris);
+    #stored('IncludeAddressSourceInfo', m_esdl.include_addressSourceInfo);
+
+    #stored('MaxEmailResults', m_esdl.MaxEmailResults);
+    #stored('EmailSearchTier', m_esdl.EmailSearchTier);
+    #stored('EmailVersion', m_esdl.email_version);
+
     return output (dataset ([],{integer x}), named('__internal__'), extend);
   end;
 
-  
+
 
   // reads options from ESDL-input;
   // returns a module encapsulating them (will allow us to by-pass reading from "stored" later, if we'd want to).
@@ -114,6 +119,7 @@ EXPORT functions := MODULE
   EXPORT GetInputOptions (iesp.smartlinxreport.t_SmartLinxReportOption tag) := FUNCTION
     customer_ver := 0.0; //TODO: read from input XML
     options := module
+
 
       // Choose defaults, when defined (syntax Self := options_def would be nice to have
       export boolean include_akas               := tag.IncludeAKAs;
@@ -146,11 +152,11 @@ EXPORT functions := MODULE
       //export boolean include_merchantvessels    := tag.IncludeMerchantVessels; // not used in CRS
       export boolean include_motorvehicles      := tag.IncludeMotorVehicles;
       export boolean include_neighbors          := tag.Neighbors.IncludeNeighbors;
-          export boolean include_historicalneighbors := tag.Neighbors.IncludeHistoricalNeighbors;
-          export unsigned1 neighborhoods             := min (max (tag.Neighbors.NeighborhoodCount, 0), iesp.Constants.BR.MaxNeighborhood);
-          export unsigned1 historical_neighborhoods  := min (max (tag.Neighbors.HistoricalNeighborhoodCount, 0), iesp.Constants.BR.MaxHistoricalNeighborhood);
-          // TODO: mapping: ESP also defines NeighborCount, HistoricalNeighborCount
-           export unsigned1 neighbors_per_address     := tag.Neighbors.NeighborCount;
+      export boolean include_historicalneighbors := tag.Neighbors.IncludeHistoricalNeighbors;
+      export unsigned1 neighborhoods             := min (max (tag.Neighbors.NeighborhoodCount, 0), iesp.Constants.BR.MaxNeighborhood);
+      export unsigned1 historical_neighborhoods  := min (max (tag.Neighbors.HistoricalNeighborhoodCount, 0), iesp.Constants.BR.MaxHistoricalNeighborhood);
+      // TODO: mapping: ESP also defines NeighborCount, HistoricalNeighborCount
+      export unsigned1 neighbors_per_address     := tag.Neighbors.NeighborCount;
           // export unsigned1 addresses_per_neighbor    := 10;
           // export unsigned1 neighbors_per_na          := 10;
           // export unsigned1 neighbors_recency    := tag.Neighbors.
@@ -163,7 +169,7 @@ EXPORT functions := MODULE
       export boolean use_nonsubjectproperty     := tag.IncludePriorProperties;
       export boolean use_currentlyownedproperty := tag.IncludeCurrentProperties;
       // shared hcp := tag.HealthCareProviders;
-       export boolean include_providers          := tag.IncludeHealthCareProviders ;//or hcp.IncludeHealthCareProviders;
+      export boolean include_providers          := tag.IncludeHealthCareProviders ;//or hcp.IncludeHealthCareProviders;
           // export boolean include_groupaffiliations    := hcp.IncludeGroupAffiliations;
           // export boolean include_hospitalaffiliations := hcp.IncludeHospitalAffiliations;
           // export boolean include_education            := hcp.IncludeEducation;
@@ -173,10 +179,10 @@ EXPORT functions := MODULE
       export boolean include_phonesplus         := tag.IncludePhonesPlus;
       //export boolean include_a := tag.DoPhoneReport;
       export boolean include_relatives          := tag.Relatives.IncludeRelatives; // RELATIVES SECTION
-          export unsigned1 relative_depth           := min (max (tag.Relatives.RelativeDepth, 1), 3);
-          export unsigned1 max_relatives            := min (tag.Relatives.MaxRelatives, iesp.Constants.SMART.MaxRelatives);
-          export boolean include_relativeaddresses  := tag.Relatives.IncludeRelativeAddresses;
-          export unsigned1 max_relatives_addresses  := min (tag.Relatives.MaxRelativeAddresses, iesp.Constants.BR.MaxRelatives_Address);
+      export unsigned1 relative_depth           := min (max (tag.Relatives.RelativeDepth, 1), 3);
+      export unsigned1 max_relatives            := min (tag.Relatives.MaxRelatives, iesp.Constants.SMART.MaxRelatives);
+      export boolean include_relativeaddresses  := tag.Relatives.IncludeRelativeAddresses;
+      export unsigned1 max_relatives_addresses  := min (tag.Relatives.MaxRelativeAddresses, iesp.Constants.BR.MaxRelatives_Address);
       export boolean include_sexualoffences     := tag.IncludeSexualOffenses;
       export boolean include_sources            := tag.IncludeSourceDocs;
       export boolean include_uccfilings         := tag.IncludeUCCFilings;
@@ -185,11 +191,13 @@ EXPORT functions := MODULE
       export boolean include_watercrafts        := tag.IncludeWaterCrafts;
       export boolean include_weaponpermits      := tag.IncludeWeaponPermits;
       export boolean include_criminalindicators := tag.IncludeCriminalIndicators;
-			export boolean include_students           := tag.IncludeStudentInformation;
-			export boolean include_aml_property      	:= tag.IncludeAMLProperty;
-			export boolean include_kris           		:= tag.IncludeKeyRiskIndicators;
-			export boolean Include_AddressSourceInfo  := tag.IncludeAddressSourceInfo;
-      // export boolean include_a := tag.LawEnforcement;
+      export boolean include_students           := tag.IncludeStudentInformation;
+      export boolean include_aml_property      	:= tag.IncludeAMLProperty;
+      export boolean include_kris           		:= tag.IncludeKeyRiskIndicators;
+      export boolean Include_AddressSourceInfo  := tag.IncludeAddressSourceInfo;
+      export unsigned MaxEmailResults           := tag.EmailOption.MaxEmailResults;
+      export string   EmailSearchTier           := tag.EmailOption.EmailSearchTier;
+    // export boolean include_a := tag.LawEnforcement;
       // export boolean include_a  := tag.PruneAgedSSNs;
       //export boolean include_a := tag.MaxAddresses;
       // export boolean include_a := tag.LegacyVerified;
@@ -200,12 +208,13 @@ EXPORT functions := MODULE
       export unsigned1 crimrecords_version    := min (max (ver.CriminalRecord , 0), 4);
       export unsigned1 dea_version            := min (max (ver.DEA            , 0), 4);
       export unsigned1 dl_version             := min (max (ver.Dl             , 0), 4);
+      export unsigned1 email_version          := min (max (tag.EmailVersion, 1), 2);
       export unsigned1 liensjudgments_version := min (max (ver.JudgmentLien   , 0), 4);
       export unsigned1 property_version       := min (max (ver.Property       , 0), 4);
       export unsigned1 ucc_version            := min (max (ver.UCC            , 0), 4);
       export unsigned1 vehicles_version       := min (max (ver.Vehicles       , 0), 4);
       export unsigned1 voters_version         := min (max (ver.Voters         , 0), 4);
- 
+
       // those are not real versioning: they are used to suppress sections and/or counts
       export unsigned1 en_version             := min (max (ver.En             , 0), 1);
       export unsigned1 phonesplus_version     := min (max (ver.PhonesPlus     , 0), 1);
@@ -213,17 +222,17 @@ EXPORT functions := MODULE
       export unsigned1 statedeath_version     := min (max (ver.StateDeath     , 0), 1);
       export unsigned1 targus                 := min (max (ver.Targus         , 0), 1);
 
-			// relationship
-			export boolean   relationship_highConfidenceRelatives  := tag.relationshipOption.HighConfidenceRelatives;
-			export boolean   relationship_highConfidenceAssociates := tag.relationshipOption.HighConfidenceAssociates;
-			export unsigned2 relationship_relLookbackMonths        := tag.relationshipOption.RelativeLookBackMonths;
-			export string24  relationship_transAssocMask           := tag.relationshipOption.TransactionalAssociatesMask;
-			
+      // relationship
+      export boolean   relationship_highConfidenceRelatives  := tag.relationshipOption.HighConfidenceRelatives;
+      export boolean   relationship_highConfidenceAssociates := tag.relationshipOption.HighConfidenceAssociates;
+      export unsigned2 relationship_relLookbackMonths        := tag.relationshipOption.RelativeLookBackMonths;
+      export string24  relationship_transAssocMask           := tag.relationshipOption.TransactionalAssociatesMask;
+
     end;
 
     // unfortunately, I can't take immutable -- for CRS -- defaults in a manner like this:
     // res := module (project (options, PersonReports.input.default_options_crs, opt)) end;
-    //SetInputSearchOptions (res);  // can't make this call by some reasons 
+    //SetInputSearchOptions (res);  // can't make this call by some reasons
     return options;
   END;
 
@@ -265,6 +274,10 @@ EXPORT functions := MODULE
     {'    use_bestaka_ra', options.use_bestaka_ra},
     {'IMPOSTERS', ''},
     {'    return_AllImposterRecords', options.return_AllImposterRecords},
+    {'EMAILS', ''},
+    {'    EmailSearchTier', options.EmailSearchTier},
+    {'    MaxEmailResults', options.MaxEmailResults},
+    {'INCLUDES', ''},
 
     {'include_akas', options.include_akas},
     {'include_alsofound', options.include_alsofound}, //was not defined in "standard" doxie-selection.
@@ -321,6 +334,7 @@ EXPORT functions := MODULE
     {'crimrecords_version ', options.crimrecords_version},
     {'dea_version ', options.dea_version},
     {'dl_version ', options.dl_version},
+    {'email_version ', options.email_version},
     {'liensjudgments_version ', options.liensjudgments_version},
     {'property_version ', options.property_version},
     {'ucc_version ', options.ucc_version},
@@ -338,19 +352,19 @@ EXPORT functions := MODULE
   export Address ($.IParam.personal in_params) := MODULE
 
     export string GetLocationID (iesp.share.t_AddressEx addr) := function
-      string str_addr := trim (addr.City) + ';' + trim (addr.State) + ';' + trim (addr.StreetName) + ';' + 
-                         trim (addr.StreetNumber) + ';' + trim (addr.StreetPostDirection) + ';' + 
-                         trim (addr.StreetSuffix) + ';' + trim (addr.UnitDesignation) + ';' + 
-                         trim (addr.StreetPreDirection) + ';' + trim (addr.UnitNumber) + ';' + trim (addr.Zip5) + ';' + 
+      string str_addr := trim (addr.City) + ';' + trim (addr.State) + ';' + trim (addr.StreetName) + ';' +
+                         trim (addr.StreetNumber) + ';' + trim (addr.StreetPostDirection) + ';' +
+                         trim (addr.StreetSuffix) + ';' + trim (addr.UnitDesignation) + ';' +
+                         trim (addr.StreetPreDirection) + ';' + trim (addr.UnitNumber) + ';' + trim (addr.Zip5) + ';' +
                          trim (addr.Zip4);
       // ESP in addition encodes it, but cleaned input address shouldn't contain XML-invalid characters.
       return str_addr;
-    end; 
+    end;
 
     // To assisst phones-linking, add residents to the list of addresses: some residents are missing
     // from the list of addresses.
     // returns: dataset (doxie.layout_comp_addresses)
-    export ExpandWithResidents (dataset (doxie.layout_comp_addresses) addr, 
+    export ExpandWithResidents (dataset (doxie.layout_comp_addresses) addr,
                                 dataset (PersonReports.layouts.comp_names) residents) := function
 
       doxie.layout_comp_addresses CreateAddress (doxie.layout_comp_addresses L, PersonReports.layouts.comp_names R) := transform
@@ -362,18 +376,18 @@ EXPORT functions := MODULE
 
       // I'm deliberately avoiding full outer join here, explicit sum looks more clear
       residents_plus := join (addr, dedup (sort (residents, address_seq_no, lname), address_seq_no, lname),
-                              Left.address_seq_no = Right.address_seq_no and 
+                              Left.address_seq_no = Right.address_seq_no and
                              (Left.lname != Right.lname) and
         // minor improvement, accounts for name variations: for instance, for did=001813614478
         // [residents] and [comp_addresses] produce name varitions for person with did=836898021
-                             (Left.did = 0 or Right.did = 0 or (Left.did != Right.did)), 
-                             CreateAddress (Left, Right), 
+                             (Left.did = 0 or Right.did = 0 or (Left.did != Right.did)),
+                             CreateAddress (Left, Right),
                              limit (iesp.Constants.BR.MaxAddress_Residents, skip));
 
       // extra residents may introduce duplicates, since input may have same address mentioned more than once.
       res_ddp := dedup (residents_plus, lname, zip, prim_name, prim_range, sec_range, all);
       return addr + res_ddp;
-      // Note: generally, result still may contain redundant records with a fake sequence, 
+      // Note: generally, result still may contain redundant records with a fake sequence,
       //       but the benefit of having new last names is essential.
     end;
 
@@ -397,7 +411,7 @@ EXPORT functions := MODULE
         Self.name_matched := IsNameMatched;
 
         // check for unpublished phones (they will be filtered later)
-        Self.phone := if (R.publish_code = 'N' or R.omit_phone = 'Y', 'UNPUB', R.phone); 
+        Self.phone := if (R.publish_code = 'N' or R.omit_phone = 'Y', 'UNPUB', R.phone);
         boolean isVerified := IsNameMatched and date_matched;
         Self.sequence_verified := if (isVerified, L.address_seq_no, 0);
         Self.is_subject_verified := isVerified and L.isSubject;
@@ -411,7 +425,7 @@ EXPORT functions := MODULE
 
       // take (prefetched) phones -- probable candidates, including unlisted.
      addr_w_phones := join (addr, phor,
-                             Left.prim_range=Right.prim_range and 
+                             Left.prim_range=Right.prim_range and
                              Left.prim_name=Right.prim_name and
                              Left.zip = Right.zip and
                              ((in_params.exact_sec_range_match and (Left.sec_range = Right.sec_range)) or // exact match
@@ -435,14 +449,14 @@ EXPORT functions := MODULE
         // take whatever is there already, don't spent any efforts for parsing: ESP will take listing anyway.
         Self.Name := iesp.ECL2ESP.SetName (L.name_first, '', L.name_last, '', '');
         Self.Phone10 := L.phone;
-        Self.TimeZone := L.timezone; 
+        Self.TimeZone := L.timezone;
         Self.PubNonpub := l.publish_code; //TODO: what about omit_phone = 'Y'?
         Self.ListingName := L.listing_name;
         Self.CompanyName := if (L.business_flag, L.listing_name, '');
         Self.HighRiskIndicators := project (L.hri_Phone, iesp.ECL2ESP.FormatRiskIndicators (Left));
         // note: phones feedback is defined as dataset, not row
         fb := L.feedback [1];
-        fback := ROW ({fb.feedback_count, fb.Last_Feedback_Result, (string8) fb.Last_Feedback_Result_Provided}, 
+        fback := ROW ({fb.feedback_count, fb.Last_Feedback_Result, (string8) fb.Last_Feedback_Result_Provided},
                       iesp.phonesfeedback.t_PhonesFeedback);
         Self.phonefeedback := if (in_params.Include_PhonesFeedback, fback);
       END;
@@ -490,10 +504,10 @@ HISTORICAL addresses (so far subject's only, no last name)
         boolean IsHistorical := L.IsSubject and ~is_verified;
 
         phones_child := IF (L.sec_range != '',
-                            IF (exists (phs_by_range), phs_by_range, IF (~IsHistorical, 
-                                                                         phs_by_name, 
+                            IF (exists (phs_by_range), phs_by_range, IF (~IsHistorical,
+                                                                         phs_by_name,
                                                                          if (in_params.include_nonresidents_phones, phs))),
-                            IF (IsHistorical, 
+                            IF (IsHistorical,
                                 if (in_params.include_nonresidents_phones, phs_by_range),
                                 phs_by_range (name_matched)));
 
@@ -505,7 +519,7 @@ HISTORICAL addresses (so far subject's only, no last name)
         Self.Phones := project (phones_child, SetPhonesChild (Left));
         Self := L; //address_seq_no, address components: prim_range, prim_name, zip, sec_range, predir
       end;
- 
+
        phones_ready := ROLLUP (addr_grp, GROUP, RollPhones (Left, ROWS (Left)));
 
       // now we have unique set of addresses with all relevant phones filled in; join back to original addresses
@@ -520,10 +534,10 @@ HISTORICAL addresses (so far subject's only, no last name)
         Self.address_seq_no := L.address_seq_no;
         Self.county := L.county;
         Self.geo_blk := L.geo_blk;
-       
+
         ri := project (L.hri_address, SetAddressRiskIndicators (Left));
         Self.Address := iesp.ECL2ESP.SetAddressEx (
-          L.prim_name, L.prim_range, L.predir, L.postdir, L.suffix, L.unit_desig, L.sec_range, 
+          L.prim_name, L.prim_range, L.predir, L.postdir, L.suffix, L.unit_desig, L.sec_range,
           L.city_name, L.st, L.zip, L.zip4, L.county_name, HRIs := ri);
         Self.LocationId := GetLocationID (Self.Address);
         Self.DateLastSeen  := iesp.ECL2ESP.toDate ((unsigned4) (L.dt_last_seen + '00'));
@@ -534,7 +548,7 @@ HISTORICAL addresses (so far subject's only, no last name)
         // "different" address -- same address with different sequence. This is the case of associates
         // (including spouses having different last names), relatives (who used to live at this address at some point).
         // To avoid verification of non-current addresses, "recency" must be used.
-        phones_verificators := R.phones(sequence_verified = L.address_seq_no or 
+        phones_verificators := R.phones(sequence_verified = L.address_seq_no or
                                 (is_subject_verified and (ut.DaysApart ((STRING)Std.Date.Today(), L.dt_last_seen + '00') < in_params.address_recency_days)));
         Self.Verified := R.IsVerified and exists (phones_verificators);
 
@@ -546,15 +560,15 @@ HISTORICAL addresses (so far subject's only, no last name)
 
       addr_phones_ready := join (addr, phones_ready,
                                     // Left.address_seq_no=Right.address_seq_no,
-                                    Left.prim_range=Right.prim_range and 
+                                    Left.prim_range=Right.prim_range and
                                     Left.prim_name=Right.prim_name and
                                     Left.zip = Right.zip and
                                     Left.sec_range = Right.sec_range,
                                     AttachPhones (Left, Right), left outer); //at most 1:1
       // ---------- Now have addresses with phones ----------
-			    // output(addr_w_phones);
-			    // output(phones_ready);
-			    // output(addr_phones_ready);
+          // output(addr_w_phones);
+          // output(phones_ready);
+          // output(addr_phones_ready);
       return addr_phones_ready;
     end;
 
@@ -562,8 +576,8 @@ HISTORICAL addresses (so far subject's only, no last name)
     export dataset (PersonReports.layouts.address_bps) AddCensus (dataset (PersonReports.layouts.address_bps) addr) := function
       addr_census := JOIN (addr, census_data.Key_Smart_Jury,
                            keyed (left.AddressEx.State=right.stusab and
-                           left.county = right.county and 
-                           left.geo_blk[1..6] = right.tract and 
+                           left.county = right.county and
+                           left.geo_blk[1..6] = right.tract and
                            left.geo_blk[7]=right.blkgrp),
                            transform (PersonReports.layouts.address_bps, Self.CensusData := iesp.ECL2ESP.ProjectCensus (Right),
                                                            Self := Left),
@@ -573,12 +587,12 @@ HISTORICAL addresses (so far subject's only, no last name)
 
     // add residents to the base addresses; produces complete address layout
     export dataset (PersonReports.layouts.address_bps) AddResidents (dataset (PersonReports.layouts.slim_addr_rec) addr,
-																																		dataset (PersonReports.layouts.identity_bps_rolled) residents) := function
+                                                                    dataset (PersonReports.layouts.identity_bps_rolled) residents) := function
 
       PersonReports.layouts.address_bps AddResidents (PersonReports.layouts.slim_addr_rec L, PersonReports.layouts.identity_bps_rolled R) := transform
         Self.residents := R.akas; //'choosen' was already done
         Self.AddressEx := L.Address,
-        Self.Address := [], // TODO: slim down Left.Address 
+        Self.Address := [], // TODO: slim down Left.Address
         Self.LocationId := GetLocationID (L.Address);
 
         Self := L; //did, seq_no, Address, DateLastSeen, DateFirstSeen, _Shared, Verified, Phones, countyn, geo_blk
@@ -593,7 +607,7 @@ HISTORICAL addresses (so far subject's only, no last name)
 
     // add residents to the base addresses; produces slim address layout
     export dataset (PersonReports.layouts.address_slim) AddResidentsSlim (dataset (PersonReports.layouts.slim_addr_rec) addr,
-																																				dataset (PersonReports.layouts.identity_slim_rolled) residents) := function
+                                                                        dataset (PersonReports.layouts.identity_slim_rolled) residents) := function
 
       PersonReports.layouts.address_slim AddResidents (PersonReports.layouts.slim_addr_rec L, PersonReports.layouts.identity_slim_rolled R) := transform
         Self.residents := R.akas; //'choosen' was already done
@@ -614,9 +628,8 @@ HISTORICAL addresses (so far subject's only, no last name)
 
   export unsigned1 GetAge (integer4 dob) := IF (dob<>0, ut.Age(dob),0);
 
-//  export layouts.identity_slim GetDeadInfo (layouts.identity_slim L, doxie.key_death_masterV2_DID R):= transform
   export PersonReports.layouts.identity_slim GetDeadInfo (PersonReports.layouts.identity_slim L, doxie_crs.layout_deathfile_records R):= transform
-        // there can be different DOB in key_death_masterV2_DID and source dataset (for example: DID=002644313020),
+        // there can be different DOB in death_master index and source dataset (for example: DID=002644313020),
         // thus it is safer to take DOB from the left side
         left_dob := (string4) L.DOB.year + intformat (L.DOB.month, 2, 1) + intformat (L.DOB.day, 2, 1);
         u_doB := (unsigned) if (L.DOB.year != 0 and L.DOB.month != 0, left_dob, r.dob8);
@@ -632,10 +645,10 @@ HISTORICAL addresses (so far subject's only, no last name)
         Self.SSNInfo := project (L.SSNInfoEx, transform (iesp.share.t_SSNInfo, Self := Left,Self:=[];));
         Self := L;
       END;
-			
+
 shared layout_names_HRI := record
-	        PersonReports.layouts.comp_names;
-					personReports.layouts.ssn_hri_rec and not [did, ssn];
+          PersonReports.layouts.comp_names;
+          personReports.layouts.ssn_hri_rec and not [did, ssn];
         end;
 
   export  PersonReports.layouts.identity_slim AddIssuance (layout_names_HRI L, doxie_crs.layout_SSN_Lookups R):=transform
@@ -647,8 +660,8 @@ shared layout_names_HRI := record
         IssuedStart := iesp.ECL2ESP.toDate (R.ssn_issue_early);
         IssuedEnd   := iesp.ECL2ESP.toDate (R.ssn_issue_last);
         Self.SSNInfo := []; //will be copied from SSNInfoEx later;
-				HighRiskIndicators := project(l.hri_ssn,transform(iesp.share.t_RiskIndicator, self.riskcode := left.hri, self.Description := left.desc));
-        Self.SSNInfoEx := iesp.ECL2ESP.SetSSNInfoEx (L.ssn, if (R.valid, 'yes', 'no'), R.ssn_issue_place, 
+        HighRiskIndicators := project(l.hri_ssn,transform(iesp.share.t_RiskIndicator, self.riskcode := left.hri, self.Description := left.desc));
+        Self.SSNInfoEx := iesp.ECL2ESP.SetSSNInfoEx (L.ssn, if (R.valid, 'yes', 'no'), R.ssn_issue_place,
                                                    IssuedStart, IssuedEnd, HighRiskIndicators);
         Self.DOB := iesp.ECL2ESP.toDate (L.dob);
         Self.Age := GetAge (L.dob);
@@ -657,36 +670,36 @@ shared layout_names_HRI := record
       END;
 
 
-  export GetPersonBase (dataset (PersonReports.layouts.comp_names) persons, 
+  export GetPersonBase (dataset (PersonReports.layouts.comp_names) persons,
                         dataset (doxie_crs.layout_SSN_Lookups) ssn_lookups,
                         dataset (doxie_crs.layout_deathfile_records) deathfile_records,
                         doxie.IDataAccess mod_access,
                         PersonReports.IParam.personal in_params) := function
 
-			//moved HRI for SSNs here to improve performance.
-			maxHriPer_Value := in_params.max_hri;
-			persons_noHRI := project(persons, transform(layout_names_HRI, self := left, 
-			                                             self.valid_SSN := '',
-																									 self.cnt := 0,
-																									 self.ssn_issue_early := 0,
-																									 self.ssn_issue_last := 0,
-																									 self.ssn_issue_place := '' ,
-																									 self.hri_ssn := dataset([],risk_indicators.layout_desc)));
-  		doxie.mac_AddHRISSN(persons_noHRI,persons_HRI,FALSE);
-			personsHRI := if (in_params.include_hri, persons_HRI, persons_noHRI);
-      //====================================================================			
-			
+      //moved HRI for SSNs here to improve performance.
+      maxHriPer_Value := in_params.max_hri;
+      persons_noHRI := project(persons, transform(layout_names_HRI, self := left,
+                                                   self.valid_SSN := '',
+                                                   self.cnt := 0,
+                                                   self.ssn_issue_early := 0,
+                                                   self.ssn_issue_last := 0,
+                                                   self.ssn_issue_place := '' ,
+                                                   self.hri_ssn := dataset([],risk_indicators.layout_desc)));
+      doxie.mac_AddHRISSN(persons_noHRI,persons_HRI,FALSE);
+      personsHRI := if (in_params.include_hri, persons_HRI, persons_noHRI);
+      //====================================================================
+
       // append SSN info
       // bug 92311 -- lookups need to be done at the ssn9 level, not ssn5
       issuance := JOIN (personsHRI, ssn_lookups,
                         Left.ssn = Right.ssn_unmasked,
                         AddIssuance (Left, Right), keep(1), left outer);
-      
-			ssn_mask_value := mod_access.ssn_mask;
+
+      ssn_mask_value := mod_access.ssn_mask;
       Suppress.MAC_Mask (issuance, issuance_msk, SSNInfoEx.ssn, null, true, false);
 
       // get deceased info
-      pers_deceased := JOIN (issuance_msk, deathfile_records, 
+      pers_deceased := JOIN (issuance_msk, deathfile_records,
                         Left.did = (unsigned6) Right.did,
                         GetDeadInfo (Left, Right),
                         left outer, limit (0), keep (1));
@@ -699,9 +712,9 @@ shared layout_names_HRI := record
   export GetSSNRecordsBase (dataset (doxie_crs.layout_ssn_records) ssn_main,
                             dataset (doxie_crs.layout_deathfile_records) deathfile_records,
                             PersonReports.IParam.personal in_params,
-												boolean IsFCRA = false) := function
+                        boolean IsFCRA = false) := function
 
-    all_names := dedup (sort (ssn_main, fname,lname,mname,-dob,-ssn), 
+    all_names := dedup (sort (ssn_main, fname,lname,mname,-dob,-ssn),
                               left.fname=right.fname and left.lname=right.lname and
                               left.mname=right.mname and left.ssn=right.ssn or right.ssn='' and
                               (left.dob=right.dob or right.dob=0 or
@@ -730,42 +743,42 @@ shared layout_names_HRI := record
       Self.SubjectSSNIndicator := stringlib.StringToLowerCase (L.subject_ssn_indicator);
       Self.IsCurrentName := (L.current_name = 'YES');
       Self.IsCorrectDOB := (L.correct_dob = 'YES');
-			Self.Statementids  :=  L.Statementids;
-			Self.isDisputed := L.isDisputed;
+      Self.Statementids  :=  L.Statementids;
+      Self.isDisputed := L.isDisputed;
       Self := [];
     END;
 
     all_names_noHRI := project (all_names, AddIssuanceImposters (Left));
-    //====================================================================															
-			//moved HRI for SSNs here to improve performance.
-			maxHriPer_Value := personReports.layouts.max_hri;
-			ssnDidRecs := project(all_names_noHRI, transform(personReports.layouts.ssn_hri_rec, self.ssn := left.SSNInfoEx.ssn, self.did := left.did, self := left, self := [])); 
-			doxie.mac_AddHRISSN(ssnDidRecs,ssnDidRecsHRI,FALSE);
-			all_names_noHRI fillHRI(all_names_noHRI l, ssnDidRecsHRI r) := transform
-			  self.SSNInfoEx.HighRiskIndicators := project(r.hri_ssn,transform(iesp.share.t_RiskIndicator, self.riskcode := left.hri, self.Description := left.desc));
-				self := l;
-			end;
+    //====================================================================
+        //moved HRI for SSNs here to improve performance.
+        maxHriPer_Value := personReports.layouts.max_hri;
+        ssnDidRecs := project(all_names_noHRI, transform(personReports.layouts.ssn_hri_rec, self.ssn := left.SSNInfoEx.ssn, self.did := left.did, self := left, self := []));
+        doxie.mac_AddHRISSN(ssnDidRecs,ssnDidRecsHRI,FALSE);
+        all_names_noHRI fillHRI(all_names_noHRI l, ssnDidRecsHRI r) := transform
+        self.SSNInfoEx.HighRiskIndicators := project(r.hri_ssn,transform(iesp.share.t_RiskIndicator, self.riskcode := left.hri, self.Description := left.desc));
+        self := l;
+      end;
 
     all_names_noHRI fillHRI_FCRA(all_names_noHRI l, ssnDidRecs r) := transform
 
-		self.SSNInfoEx.HighRiskIndicators := project(r.hri_ssn,transform(iesp.share.t_RiskIndicator, self.riskcode := left.hri, self.Description := left.desc));
-		self := l;
-	end;
-	
-	all_namesHRI := if(~IsFCRA, join(all_names_noHRI, ssnDidRecsHRI ,left.SSNInfoEx.ssn = right.ssn and left.did = right.did, fillHRI(left, right), keep(1), left outer));
-	all_names_ready := IF (IsFcra or ~in_params.include_hri, all_names_noHRI, all_namesHRI);
-	      //====================================================================			
+    self.SSNInfoEx.HighRiskIndicators := project(r.hri_ssn,transform(iesp.share.t_RiskIndicator, self.riskcode := left.hri, self.Description := left.desc));
+    self := l;
+  end;
+
+  all_namesHRI := if(~IsFCRA, join(all_names_noHRI, ssnDidRecsHRI ,left.SSNInfoEx.ssn = right.ssn and left.did = right.did, fillHRI(left, right), keep(1), left outer));
+  all_names_ready := IF (IsFcra or ~in_params.include_hri, all_names_noHRI, all_namesHRI);
+        //====================================================================
     // get "dead" info here, since we will need it anyway in both imposters and AKA
-    all_persons_deceased := JOIN (all_names_ready, deathfile_records, 
+    all_persons_deceased := JOIN (all_names_ready, deathfile_records,
                          left.did = (unsigned6) right.did,
                          GetDeadInfo (left, right),
                          left outer, limit (0), keep (1));
     // add crim indicators
     CriminalRecords_Services.MAC_Indicators(all_persons_deceased,all_persons);
-		
+
     return map(~IsFCRA and in_params.include_criminalindicators  => all_persons,
-							 ~IsFCRA and ~in_params.include_criminalindicators => all_persons_deceased,	
-		                                                                all_names_ready);
+               ~IsFCRA and ~in_params.include_criminalindicators => all_persons_deceased,
+                                                                    all_names_ready);
   end;
 
 
@@ -776,7 +789,7 @@ shared layout_names_HRI := record
                        PersonReports.IParam.personal in_params) := function
 
     // TODO: replace join with a filter
-    imposters_by_ssn := join (all_persons, bestrecs, 
+    imposters_by_ssn := join (all_persons, bestrecs,
                               left.SSNInfo.SSN=right.ssn_unmasked,
                               transform (PersonReports.layouts.identity_slim, Self := Left), keep (1))
     (did != bestrecs[1].did);
@@ -790,13 +803,13 @@ shared layout_names_HRI := record
     // (Moxie currently returns all, which may produce kind of "duplicate" output)
     names_imposters := if (in_params.return_AllImposterRecords, all_imposters, imposters_by_ssn);
 
-    imposters_d := dedup (sort (names_imposters, did, record,if (DeathVerificationCode<>'',0,1)), 
+    imposters_d := dedup (sort (names_imposters, did, record,if (DeathVerificationCode<>'',0,1)),
                                         did, record, except DOD.year, DOD.month, DOD.day, DeathVerificationCode);
 
     imposters_grp := group (sort (imposters_d, did), did);
 
     iesp.bps_share.t_BpsReportImposter RollImposters (PersonReports.layouts.identity_slim l, dataset (PersonReports.layouts.identity_slim) r):=transform
-      self.AKAs := choosen (project (R, transform (iesp.bps_share.t_BpsReportIdentity, Self := Left; Self := [])), 
+      self.AKAs := choosen (project (R, transform (iesp.bps_share.t_BpsReportIdentity, Self := Left; Self := [])),
                             min(in_params.max_imposter_akas,iesp.constants.BR.MaxImposters_AKA));
     END;
 
@@ -811,8 +824,8 @@ shared layout_names_HRI := record
   export GetSubjectBestAKA (dataset (doxie_crs.layout_best_information) bestrecs,
                             dataset (doxie_crs.layout_deathfile_records) deathfile_records,
                             PersonReports.IParam.personal in_params,
-														boolean IsFCRA = false
-														) := function
+                            boolean IsFCRA = false
+                            ) := function
 
     //--------------------------------------------------------------------------------------------------------------
     //--------------------------------------------------------------------------------------------------------------
@@ -842,16 +855,16 @@ shared layout_names_HRI := record
       Self.IssuedLocation    := Suppress.dateCorrect.state(L.ssn, R.state);
       Self.HighRiskIndicators := if(~IsFCRA and in_params.include_hri,get_SSN_HRI(l.ssn,l.did, in_params.max_hri));
     END;
-    
-		key_ssnmap := if(IsFCRA,doxie.Key_SSN_FCRA_Map,doxie.Key_SSN_Map);
-		
+
+    key_ssnmap := if(IsFCRA,doxie.Key_SSN_FCRA_Map,doxie.Key_SSN_Map);
+
     layouts.identity_slim AddIssuanceAKAs (doxie_crs.layout_best_information L, key_ssnmap R) := TRANSFORM
       Self.did := L.did;
       Self.UniqueID := intformat (L.did, 12, 1);
       Self.Name := iesp.ECL2ESP.SetName (l.fname, l.mname, l.lname, L.name_suffix, L.title);
       Self.Gender := iesp.ECL2ESP.GetGender (L.title);
       //ds_ssn_info := limit (doxie.Key_SSN_Map (keyed (
-			ssnInfoHRI := project (L, FormatSSN_2 (Left, R));
+      ssnInfoHRI := project (L, FormatSSN_2 (Left, R));
       Self.SSNInfo   := project (ssnInfoHRI, transform(iesp.share.t_SSNInfo, self := left));
       Self.SSNInfoEx := ssnInfoHRI;
 
@@ -861,17 +874,17 @@ shared layout_names_HRI := record
       Self.SubjectSSNIndicator := '';//stringlib.StringToLowerCase (L.subject_ssn_indicator);
       Self.IsCurrentName := true;
       Self.IsCorrectDOB := L.dob != 0;
-			Self.StatementIDs := L.StatementIds;
-			Self.isDisputed := L.isDisputed;
+      Self.StatementIDs := L.StatementIds;
+      Self.isDisputed := L.isDisputed;
       // TODO: Self.DeathVerificationCode := r.death_code; // -- need another join?
       // dod := (unsigned) L.dod;  //twb not needed
       // dob := (unsigned) L.dob;//twb not needed
       // Self.AgeAtDeath := if (dod = 0 or dob = 0, 0, ut.GetAgeI_asOf (dob, dod)); //R.dod is "unsigned"//twb not needed
       Self := [];
     END;
-	
-		
-    // the above dod assignments appear to not be needed because the aka_best below is only 
+
+
+    // the above dod assignments appear to not be needed because the aka_best below is only
     // used once and that is for aka_best_dead directly below. It calls GetDead and it will
     // assign those same columns from the right ( meaning the death index )
     aka_best := join (bestrecs, key_ssnmap,
@@ -879,17 +892,17 @@ shared layout_names_HRI := record
                       keyed (left.ssn[ 6..9] between Right.start_serial AND Right.end_serial),
                       AddIssuanceAKAs (Left, Right),
                       left outer, limit (0), keep (1)); //1 : 1 relation
-									
+
     // append deceased info
-    aka_best_dead := JOIN (aka_best, deathfile_records, 
+    aka_best_dead := JOIN (aka_best, deathfile_records,
                            Left.did = (unsigned6) Right.did,
                            GetDeadInfo (Left, Right),
                            left outer, limit (0), keep (1));
     // add crim indicators
     CriminalRecords_Services.MAC_Indicators(aka_best_dead,aka_best_recs);
-		return map(~IsFCRA and in_params.include_criminalindicators  => aka_best_recs,
-				~IsFCRA and ~in_params.include_criminalindicators => aka_best_dead,	
-		                                                         aka_best);
+    return map(~IsFCRA and in_params.include_criminalindicators  => aka_best_recs,
+        ~IsFCRA and ~in_params.include_criminalindicators => aka_best_dead,
+                                                             aka_best);
   end;
 
   shared PersonReports.layouts.identity_bps_rolled RollIdentity (PersonReports.layouts.identity_bps l, dataset(PersonReports.layouts.identity_bps) r):=transform
@@ -900,14 +913,14 @@ shared layout_names_HRI := record
 
   // ------------------------- expanded relatives/associates -------------------------
   export CreateRelativesBps (dataset (recordof (doxie.relative_summary)) rel_assoc,
-                             dataset (PersonReports.layouts.identity_slim) relassoc_base, 
-                             dataset (PersonReports.layouts.address_bps) addr, 
+                             dataset (PersonReports.layouts.identity_slim) relassoc_base,
+                             dataset (PersonReports.layouts.address_bps) addr,
                              PersonReports.IParam.personal in_params) := function
 
     akas_xpanded := project (relassoc_base, ExpandIdentity (Left));
     // Note: additional linking by DID (concealed weapon, sex offense indicators, etc.)
     //       can be done here or after grouping.
-    akas_grouped := group (sort (akas_xpanded, did), did); 
+    akas_grouped := group (sort (akas_xpanded, did), did);
     akas_rolled := rollup (akas_grouped, GROUP, RollIdentity (Left, rows (Left)));
 
     wide_rec := iesp.bpsreport.t_BpsReportRelative;
@@ -926,8 +939,8 @@ shared layout_names_HRI := record
       Self :=[]; // addresses, indicators, etc.
     END;
 
-    akas := join (rel_assoc, akas_rolled, 
-                  (unsigned6) Left.person2 = Right.did,  
+    akas := join (rel_assoc, akas_rolled,
+                  (unsigned6) Left.person2 = Right.did,
                   GetRelativesInfo (Left, Right), limit (0), keep (1));
 
     // rel/assoc addresses will be linked with AKAs by DID (vs. sequence)
@@ -944,9 +957,9 @@ shared layout_names_HRI := record
       rel_addrs := R.addresses (~in_params.rels_with_phones OR exists (Phones));
       self.addresses := sort (choosen (rel_addrs, iesp.Constants.BR.MaxRelatives_Address), -DateLastSeen);
       self := l;
-    END; 
+    END;
 
-    all_recs := JOIN (akas, addr_rolled, 
+    all_recs := JOIN (akas, addr_rolled,
                       (integer) left.uniqueid = right.did,
                       GetFullRelatives (left,right),left outer);
     return all_recs;
@@ -960,11 +973,11 @@ shared PersonReports.layouts.identity_slim_rolled RollIdentitySlim (PersonReport
 END;
 
   export CreateRelativesSlim (dataset (recordof (doxie.relative_summary)) rel_assoc,
-                              dataset (PersonReports.layouts.identity_slim) relassoc_base, 
-                              dataset (PersonReports.layouts.address_slim) addr, 
+                              dataset (PersonReports.layouts.identity_slim) relassoc_base,
+                              dataset (PersonReports.layouts.address_slim) addr,
                               PersonReports.IParam.personal in_params) := function
 
-    akas_grouped := group (sort (relassoc_base, did), did); 
+    akas_grouped := group (sort (relassoc_base, did), did);
     akas_rolled := rollup (akas_grouped, GROUP, RollIdentitySlim (Left, rows (Left)));
 
     slim_rec := iesp.bpsreport.t_BpsReportRelativeSlim;
@@ -982,8 +995,8 @@ END;
       Self :=[]; // addresses, indicators, etc.
     END;
 
-    akas := join (rel_assoc, akas_rolled, 
-                  (unsigned6) Left.person2 = Right.did,  
+    akas := join (rel_assoc, akas_rolled,
+                  (unsigned6) Left.person2 = Right.did,
                   GetRelativesInfo (Left, Right), limit (0), keep (1));
 
     record_addr_did := record
@@ -1005,44 +1018,44 @@ END;
       rel_addrs := R.addresses (~in_params.rels_with_phones OR exists (Phones));
       self.addresses := sort (choosen (rel_addrs, iesp.Constants.BR.MaxRelatives_Address), -DateLastSeen);
       self := l;
-    END; 
+    END;
 
-    all_recs := JOIN (akas, roll_addrs, 
+    all_recs := JOIN (akas, roll_addrs,
                       (integer) left.uniqueid = right.did,
                       GetFullRelatives (left,right),left outer);
     return all_recs;
   end;
-	
-	  SHARED address_did_rec :=   record 
-	iesp.share.t_Address Address;
-	integer2 SourceCount;
-	dataset(iesp.smartlinxreport.t_SLRSources) Sources {MAXCOUNT(iesp.Constants.SLR.MaxSourceTypes)};
-	unsigned6 did;
+
+    SHARED address_did_rec :=   record
+  iesp.share.t_Address Address;
+  integer2 SourceCount;
+  dataset(iesp.smartlinxreport.t_SLRSources) Sources {MAXCOUNT(iesp.Constants.SLR.MaxSourceTypes)};
+  unsigned6 did;
   end;
-	
+
  SHARED	Source_rec := iesp.smartlinxreport.t_SLRSources;
 
  SHARED	source_rec GetSources (dataset ( PersonReports.layouts.header_recPlusSource) header_recDS) := function
-	
+
     _src := dedup (group (sort (header_recDS, _type, src), _type), src);
     src_categories:=rollup (_src, group, transform (Source_rec, Self._Type := Left._Type, Self.Count := count (rows (left))));
     // when sorting sources bring Credit Bureaus records on top, then alphabetically
     src_srt := sort (src_categories, _Type[1..25] != 'CONSUMER REPORTING AGENCY', _Type);
     return src_srt;
   end;
-	
+
  export  GetAddressIndicators (
   dataset(PersonReports.layouts.header_recPlusSource) Tmpheader_ext,
   PersonReports.IParam._smartlinxreport Mod_smartLinx
-	) := FUNCTION
-	
-	ValDID :=  tmpHeader_ext[1].did;
-	// START of getting header recs ********************************************
-	input_dids := dataset([{ValDid}], doxie.layout_references);
+  ) := FUNCTION
 
-	mod_access := PROJECT(Mod_smartLinx, doxie.IDataAccess);
+  ValDID :=  tmpHeader_ext[1].did;
+  // START of getting header recs ********************************************
+  input_dids := dataset([{ValDid}], doxie.layout_references);
 
-	header_obj := doxie.mod_header_records (
+  mod_access := PROJECT(Mod_smartLinx, doxie.IDataAccess);
+
+  header_obj := doxie.mod_header_records (
                      false, true, false, //DoSearch, include dailies, allow_wildcard
                      true,               // include_gong
                      false,              // suppress_gong_noncurrent
@@ -1050,14 +1063,14 @@ END;
                      mod_access
                 );
 
-	header_all_subj := header_obj.Results (project (input_dids, doxie.layout_references_hh));
-	header_all :=  header_all_subj(src != mdr.sourceTools.src_ZUtilities);
+  header_all_subj := header_obj.Results (project (input_dids, doxie.layout_references_hh));
+  header_all :=  header_all_subj(src != mdr.sourceTools.src_ZUtilities);
 
-	// attach source category -- Assets, Bureau, etc. -- to each record and initialize counts
-	data_categories := limit (Codes.Key_Codes_V3 (keyed (file_name = 'DATA_FAMILIES')), 1000, fail ('too many sources'));
-	PersonReports.layouts.header_recPlusSource AssignCategory (recordof (header_all) L, data_categories R) := transform
-     // in case if there are some sources not included into codes v3   
-     local_category := if (L.src = 'PH', 'PHONE', '');													 
+  // attach source category -- Assets, Bureau, etc. -- to each record and initialize counts
+  data_categories := limit (Codes.Key_Codes_V3 (keyed (file_name = 'DATA_FAMILIES')), 1000, fail ('too many sources'));
+  PersonReports.layouts.header_recPlusSource AssignCategory (recordof (header_all) L, data_categories R) := transform
+     // in case if there are some sources not included into codes v3
+     local_category := if (L.src = 'PH', 'PHONE', '');
      descript := trim (R.long_desc);
      Self._Type := if (descript != '', descript, local_category);
      Self.Count := 1;
@@ -1068,37 +1081,37 @@ END;
      // in case of Gong records use first/last as vendor's first/last
      Self.dt_vendor_first_reported := if (L.src = 'PH', L.dt_first_seen, L.dt_vendor_first_reported);
      Self.dt_vendor_last_reported := if (L.src = 'PH', L.dt_last_seen, L.dt_vendor_last_reported);
-     Self := L;     
+     Self := L;
    end;
-	
-	// header_all is the set of recs that has a src code in it.
-	//
-	header_ext := JOIN (header_all, data_categories,
+
+  // header_all is the set of recs that has a src code in it.
+  //
+  header_ext := JOIN (header_all, data_categories,
                            Left.src = Right.code,
                            AssignCategory (Left, Right),
-                           left outer, LOOKUP);										 
-	// END of getting header recs info **************************************
+                           left outer, LOOKUP);
+  // END of getting header recs info **************************************
 
-	src_rec := record
-		PersonReports.layouts.header_recPlusSource.src;
-		PersonReports.layouts.header_recPlusSource._type; 
-	end;
-	addr_slim_rec := record
-		PersonReports.layouts.header_recPlusSource and not [rid, src, phone, fname, mname, lname, name_suffix, 
-                        county, valid_ssn, hhid, count];    
-		dataset (src_rec) sources {maxcount ( iesp.Constants.SLR.MaxSourceTypes)}; 		
-	end;
+  src_rec := record
+    PersonReports.layouts.header_recPlusSource.src;
+    PersonReports.layouts.header_recPlusSource._type;
+  end;
+  addr_slim_rec := record
+    PersonReports.layouts.header_recPlusSource and not [rid, src, phone, fname, mname, lname, name_suffix,
+                        county, valid_ssn, hhid, count];
+    dataset (src_rec) sources {maxcount ( iesp.Constants.SLR.MaxSourceTypes)};
+  end;
 
   // Latest revision: same address = same address_line_1 AND (same city&state OR same zip)
   // This can be easily changed later; the main point is that indicators are fetched AFTER roll up,
   // which indeed affects content
 
   // save source as a dataset
-	addr_slim_rec SetSourceAsDataset (PersonReports.layouts.header_recPlusSource L) := transform
-		Self.sources := dataset ([{L.src, L._type}], src_rec);
-			Self := L;
+  addr_slim_rec SetSourceAsDataset (PersonReports.layouts.header_recPlusSource L) := transform
+    Self.sources := dataset ([{L.src, L._type}], src_rec);
+      Self := L;
      end;
-	header_addr := project (header_ext (zip != '' or (city_name != '' and st != '')), SetSourceAsDataset (Left));
+  header_addr := project (header_ext (zip != '' or (city_name != '' and st != '')), SetSourceAsDataset (Left));
      did_grouped := group (sort (header_addr, did), did);
 
   // ----------------------------------------------------------------------
@@ -1106,11 +1119,11 @@ END;
   // ----------------------------------------------------------------------
   // equality of address line 1 (is copy from doxie/mac_address_rollup)
   MAC_LineOneIsTheSame := MACRO
-    (left.prim_range=right.prim_range) and 
+    (left.prim_range=right.prim_range) and
     (left.prim_name=right.prim_name or
-      (left.zip4<>'' and right.zip4='') and  //only rollup a mismatched prim_name when one is better than the other 
+      (left.zip4<>'' and right.zip4='') and  //only rollup a mismatched prim_name when one is better than the other
       (ut.StringSimilar(left.prim_name,right.prim_name)<3 or length(trim(left.prim_range))>2)
-    ) and 
+    ) and
     ut.nneq(left.predir, right.predir) and
     ut.Sec_Range_Eq(left.sec_range, right.sec_range)<10
   ENDMACRO;
@@ -1120,51 +1133,48 @@ END;
     // ... and the rest is about the same as in doxie/tra_address_rollup
     Self.dt_first_seen := if (R.dt_first_seen = 0 or (L.dt_first_seen < R.dt_first_seen  and L.dt_first_seen>0), L.dt_first_seen, R.dt_first_seen);
     self.dt_last_seen := if (L.dt_last_seen > R.dt_last_seen, L.dt_last_seen, R.dt_last_seen);
-    self.sec_range := if (length(trim(L.sec_range)) > length(trim(R.sec_range)), L.sec_range, R.sec_range);  
+    self.sec_range := if (length(trim(L.sec_range)) > length(trim(R.sec_range)), L.sec_range, R.sec_range);
     Self := L;
   end;
 
   // by ZIP
-  sort_by_zip := sort (did_grouped, zip, 
+  sort_by_zip := sort (did_grouped, zip,
                                     prim_range,prim_name, -sec_range, -predir, suffix='', zip4='', -dt_last_seen);
-  rolled_by_zip := rollup (sort_by_zip, 
-                           (Left.zip = Right.zip) and 
+  rolled_by_zip := rollup (sort_by_zip,
+                           (Left.zip = Right.zip) and
                            MAC_LineOneIsTheSame(), RollSameAddreses (Left, Right));
 
   // By CITY+STATE
-	sort_by_city := sort (rolled_by_zip, st, city_name, 
+  sort_by_city := sort (rolled_by_zip, st, city_name,
                                        prim_range,prim_name, -sec_range, -predir, suffix='', zip4='', -dt_last_seen);
-	rolled_by_city := rollup (sort_by_city, 
-                            (Left.st = Right.st) and (Left.city_name = Right.city_name) and 
+  rolled_by_city := rollup (sort_by_city,
+                            (Left.st = Right.st) and (Left.city_name = Right.city_name) and
                             MAC_LineOneIsTheSame(), RollSameAddreses (Left, Right));
 
-	addr_slim_rec ToAddressxform (addr_slim_rec L) := transform
-			Self.sources :=  dedup (L.sources, src, all); 
-			Self := L;
-	end;
+  addr_slim_rec ToAddressxform (addr_slim_rec L) := transform
+      Self.sources :=  dedup (L.sources, src, all);
+      Self := L;
+  end;
      header_addresses := project (rolled_by_city, ToAddressXform (Left));
-	
-	address_did_rec SetAssociatedAddresses ( addr_slim_rec L) := transform
+
+  address_did_rec SetAssociatedAddresses ( addr_slim_rec L) := transform
                 Self.did := L.did;
-			Self.Address := iesp.ECL2ESP.SetAddress (L.prim_name, L.prim_range, L.predir, L.postdir,
+      Self.Address := iesp.ECL2ESP.SetAddress (L.prim_name, L.prim_range, L.predir, L.postdir,
                      L.suffix, L.unit_desig, L.sec_range, L.city_name,
                      L.st, L.zip, L.zip4, L.county_name);
-  
+
                 // get source categories' counts:
         R := project (L.sources, transform (PersonReports.layouts.header_recPlusSource, Self := Left, Self := []));
-		    Self.Sources := choosen ( GetSources (R), iesp.Constants.SLR.MaxSourceTypes);
+        Self.Sources := choosen ( GetSources (R), iesp.Constants.SLR.MaxSourceTypes);
                 // overall count:
-			Self.SourceCount :=  count (dedup (R, src, all));
-		end;
- 
+      Self.SourceCount :=  count (dedup (R, src, all));
+    end;
+
    addresses  := project( header_addresses, setAssociatedAddresses(left));
- 
-	 // output(header_all, named('header_all'));
-	// output(did_grouped, named('did_grouped'));	
-	return addresses;
+
+   // output(header_all, named('header_all'));
+  // output(did_grouped, named('did_grouped'));
+  return addresses;
 
      END;
 END;
-
-
-

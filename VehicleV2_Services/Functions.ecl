@@ -1,4 +1,4 @@
-import $, doxie, ut, codes, iesp, std;
+﻿import $, doxie, ut, codes, iesp, std;
 import AutoStandardI, VehicleV2_Services, Autokey_batch, CriminalRecords_Services;
 import VehicleV2, VehicleCodes, suppress, Census_Data, doxie_raw, MDR, Driversv2;
 
@@ -365,6 +365,7 @@ export 	lic_plate_filter_New(dataset(VehicleV2_Services.Layouts.lic_plate_key_pa
     SELF.County_Name := '';
     SELF.HasCriminalConviction := FALSE;
     SELF.IsSexualOffender := FALSE;
+    SELF.reported_name := r.raw_name;
 		self := r; //business ids /global_sid/record_sid 
 		self := [];
   END;
@@ -460,6 +461,7 @@ export 	lic_plate_filter_New(dataset(VehicleV2_Services.Layouts.lic_plate_key_pa
       SELF.Orig_Name_Type := r.Orig_Name_Type;
       SELF := IF(ofage, r);
       SELF.County_Name := '';
+      SELF.reported_name := r.raw_name;
       SELF.HasCriminalConviction := FALSE;
       SELF.IsSexualOffender := FALSE;
 			self := [];
@@ -736,7 +738,7 @@ export 	lic_plate_filter_New(dataset(VehicleV2_Services.Layouts.lic_plate_key_pa
                            GROUPED dataset(Layout_Vehicle_Key) in_veh_keys) := FUNCTION
 										 
 		boolean isCNSMR := aInputData.isConsumer();
-		boolean include_non_regulated_data := aInputData.IncludeNonRegulatedSources and doxie.compliance.isInfutorMVRestricted(aInputData.DataRestrictionMask);
+		boolean include_non_regulated_data := aInputData.IncludeNonRegulatedSources and ~doxie.compliance.isInfutorMVRestricted(aInputData.DataRestrictionMask);
 		
 	  pre_veh_recs0_info := join(in_veh_keys, VehicleV2.Key_Vehicle_Main_Key,
                           keyed(left.Vehicle_Key = right.Vehicle_Key) and

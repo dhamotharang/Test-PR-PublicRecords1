@@ -466,7 +466,7 @@ with_NLR_flags := join(with_pii_on_file, rolled_NLR, left.did=right.did,
 		iids_dedp := dedup(sort(ungroup(multiple_use_ssns_with_wildcard_did)(did<>0),did), did);
 		justDids := PROJECT(iids_dedp, 
 			TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
-	  rellyids := Relationship.proc_GetRelationship(justDids, TopnCount:=1,
+	  rellyids := Relationship.proc_GetRelationshipNeutral(justDids, TopnCount:=1,
 	  RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost,
 		HighConfidenceRelatives := HighConfidenceRelatives_Value,
 		HighConfidenceAssociates := HighConfidenceAssociates_Value,

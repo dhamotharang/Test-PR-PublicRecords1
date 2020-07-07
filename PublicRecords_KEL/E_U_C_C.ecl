@@ -1,8 +1,8 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0beta2
-IMPORT KEL11 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
+IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
-IMPORT * FROM KEL11.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT E_U_C_C(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
@@ -22,21 +22,22 @@ EXPORT E_U_C_C(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile
     KEL.typ.nstr Contract_Type_;
     KEL.typ.nkdate Vendor_Entry_Date_;
     KEL.typ.nkdate Vendor_Update_Date_;
-    KEL.typ.nkdate Date_Vendor_Last_Reported_;
-    KEL.typ.nkdate Date_Vendor_First_Reported_;
     KEL.typ.nstr Statements_Filed_;
     KEL.typ.nstr Foreign_Flag_;
     KEL.typ.nkdate Process_Date_;
     KEL.typ.nstr Collateral_Desc_;
     KEL.typ.nstr Collateral_Machine_;
     KEL.typ.nstr Source_;
+    KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
+    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     UNSIGNED8 __Permits;
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'UID(DEFAULT:UID),tmsid(DEFAULT:T_M_S_I_D_:\'\'),rmsid(DEFAULT:R_M_S_I_D_:\'\'),filingjurisdiction(DEFAULT:Filing_Jurisdiction_:\'\'),filingnumber(DEFAULT:Filing_Number_:\'\'),filingtype(DEFAULT:Filing_Type_:\'\'),filingdate(DEFAULT:Filing_Date_:DATE),originalfilingdate(DEFAULT:Original_Filing_Date_:DATE),filingstatus(DEFAULT:Filing_Status_:\'\'),filingtime(DEFAULT:Filing_Time_:\'\'),statustype(DEFAULT:Status_Type_:\'\'),filingagency(DEFAULT:Filing_Agency_:\'\'),expirationdate(DEFAULT:Expiration_Date_:DATE),contracttype(DEFAULT:Contract_Type_:\'\'),vendorentrydate(DEFAULT:Vendor_Entry_Date_:DATE),vendorupdatedate(DEFAULT:Vendor_Update_Date_:DATE),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:DATE),datevendorfirstreported(DEFAULT:Date_Vendor_First_Reported_:DATE),statementsfiled(DEFAULT:Statements_Filed_:\'\'),foreignflag(DEFAULT:Foreign_Flag_:\'\'),processdate(DEFAULT:Process_Date_:DATE),collateraldesc(DEFAULT:Collateral_Desc_:\'\'),collateralmachine(DEFAULT:Collateral_Machine_:\'\'),source(DEFAULT:Source_:\'\'),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping := 'UID(DEFAULT:UID),tmsid(DEFAULT:T_M_S_I_D_:\'\'),rmsid(DEFAULT:R_M_S_I_D_:\'\'),filingjurisdiction(DEFAULT:Filing_Jurisdiction_:\'\'),filingnumber(DEFAULT:Filing_Number_:\'\'),filingtype(DEFAULT:Filing_Type_:\'\'),filingdate(DEFAULT:Filing_Date_:DATE),originalfilingdate(DEFAULT:Original_Filing_Date_:DATE),filingstatus(DEFAULT:Filing_Status_:\'\'),filingtime(DEFAULT:Filing_Time_:\'\'),statustype(DEFAULT:Status_Type_:\'\'),filingagency(DEFAULT:Filing_Agency_:\'\'),expirationdate(DEFAULT:Expiration_Date_:DATE),contracttype(DEFAULT:Contract_Type_:\'\'),vendorentrydate(DEFAULT:Vendor_Entry_Date_:DATE),vendorupdatedate(DEFAULT:Vendor_Update_Date_:DATE),statementsfiled(DEFAULT:Statements_Filed_:\'\'),foreignflag(DEFAULT:Foreign_Flag_:\'\'),processdate(DEFAULT:Process_Date_:DATE),collateraldesc(DEFAULT:Collateral_Desc_:\'\'),collateralmachine(DEFAULT:Collateral_Machine_:\'\'),source(DEFAULT:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),datevendorfirstreported(DEFAULT:Date_Vendor_First_Reported_:EPOCH),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:EPOCH)';
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
@@ -54,18 +55,18 @@ EXPORT E_U_C_C(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile
   SHARED __SortedTable := SORT(__Table,KeyVal);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
   EXPORT Lookup := NullLookupRec + PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
-  SHARED Date_Vendor_Last_Reported_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
-  SHARED Date_Vendor_First_Reported_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
   SHARED Process_Date_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
   SHARED Date_First_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
   SHARED Date_Last_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
-  SHARED __Mapping0 := 'UID(DEFAULT:UID),tmsid(OVERRIDE:T_M_S_I_D_:\'\'),rmsid(OVERRIDE:R_M_S_I_D_:\'\'),filingjurisdiction(DEFAULT:Filing_Jurisdiction_:\'\'),filingnumber(DEFAULT:Filing_Number_:\'\'),filingtype(DEFAULT:Filing_Type_:\'\'),filingdate(DEFAULT:Filing_Date_:DATE),originalfilingdate(DEFAULT:Original_Filing_Date_:DATE),filingstatus(DEFAULT:Filing_Status_:\'\'),filingtime(DEFAULT:Filing_Time_:\'\'),statustype(DEFAULT:Status_Type_:\'\'),filingagency(DEFAULT:Filing_Agency_:\'\'),expirationdate(DEFAULT:Expiration_Date_:DATE),contracttype(DEFAULT:Contract_Type_:\'\'),vendorentrydate(DEFAULT:Vendor_Entry_Date_:DATE),vendorupdatedate(DEFAULT:Vendor_Update_Date_:DATE),dt_vendor_last_reported(OVERRIDE:Date_Vendor_Last_Reported_:DATE:Date_Vendor_Last_Reported_0Rule),dt_vendor_first_reported(OVERRIDE:Date_Vendor_First_Reported_:DATE:Date_Vendor_First_Reported_0Rule),statementsfiled(DEFAULT:Statements_Filed_:\'\'),foreign_indc(OVERRIDE:Foreign_Flag_:\'\'),process_date(OVERRIDE:Process_Date_:DATE:Process_Date_0Rule),collateraldesc(DEFAULT:Collateral_Desc_:\'\'),collateralmachine(DEFAULT:Collateral_Machine_:\'\'),src(OVERRIDE:Source_:\'\'),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH:Date_First_Seen_0Rule),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_0Rule),DPMBitmap(DEFAULT:__Permits:PERMITS)';
+  SHARED Date_Vendor_First_Reported_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
+  SHARED Date_Vendor_Last_Reported_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
+  SHARED __Mapping0 := 'UID(DEFAULT:UID),tmsid(OVERRIDE:T_M_S_I_D_:\'\'),rmsid(OVERRIDE:R_M_S_I_D_:\'\'),filingjurisdiction(DEFAULT:Filing_Jurisdiction_:\'\'),filingnumber(DEFAULT:Filing_Number_:\'\'),filingtype(DEFAULT:Filing_Type_:\'\'),filingdate(DEFAULT:Filing_Date_:DATE),originalfilingdate(DEFAULT:Original_Filing_Date_:DATE),filingstatus(DEFAULT:Filing_Status_:\'\'),filingtime(DEFAULT:Filing_Time_:\'\'),statustype(DEFAULT:Status_Type_:\'\'),filingagency(DEFAULT:Filing_Agency_:\'\'),expirationdate(DEFAULT:Expiration_Date_:DATE),contracttype(DEFAULT:Contract_Type_:\'\'),vendorentrydate(DEFAULT:Vendor_Entry_Date_:DATE),vendorupdatedate(DEFAULT:Vendor_Update_Date_:DATE),statementsfiled(DEFAULT:Statements_Filed_:\'\'),foreign_indc(OVERRIDE:Foreign_Flag_:\'\'),process_date(OVERRIDE:Process_Date_:DATE:Process_Date_0Rule),collateraldesc(DEFAULT:Collateral_Desc_:\'\'),collateralmachine(DEFAULT:Collateral_Machine_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH:Date_First_Seen_0Rule),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_0Rule),dt_vendor_first_reported(OVERRIDE:Date_Vendor_First_Reported_:EPOCH:Date_Vendor_First_Reported_0Rule),dt_vendor_last_reported(OVERRIDE:Date_Vendor_Last_Reported_:EPOCH:Date_Vendor_Last_Reported_0Rule),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_UCC__Key_LinkIds_key,TRANSFORM(RECORDOF(__in.Dataset_UCC__Key_LinkIds_key),SELF:=RIGHT));
   SHARED __d0_Out := RECORD
     RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_UCC__Key_LinkIds_key);
     KEL.typ.uid UID := 0;
   END;
-  SHARED __d0_UID_Mapped := JOIN(__d0_Norm,Lookup,TRIM((STRING)LEFT.tmsid) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),HASH);
+  SHARED __d0_UID_Mapped := JOIN(__d0_Norm,Lookup,TRIM((STRING)LEFT.tmsid) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
   EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UCC__Key_LinkIds_key_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
@@ -74,28 +75,28 @@ EXPORT E_U_C_C(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile
   SHARED Expiration_Date_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
   SHARED Vendor_Entry_Date_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
   SHARED Vendor_Update_Date_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
-  SHARED __Mapping1 := 'UID(DEFAULT:UID),tmsid(OVERRIDE:T_M_S_I_D_:\'\'),rmsid(OVERRIDE:R_M_S_I_D_:\'\'),filing_jurisdiction(OVERRIDE:Filing_Jurisdiction_:\'\'),filing_number(OVERRIDE:Filing_Number_:\'\'),filing_type(OVERRIDE:Filing_Type_:\'\'),filing_date(OVERRIDE:Filing_Date_:DATE:Filing_Date_1Rule),orig_filing_date(OVERRIDE:Original_Filing_Date_:DATE:Original_Filing_Date_1Rule),filing_status(OVERRIDE:Filing_Status_:\'\'),filing_time(OVERRIDE:Filing_Time_:\'\'),status_type(OVERRIDE:Status_Type_:\'\'),filing_agency(OVERRIDE:Filing_Agency_:\'\'),expiration_date(OVERRIDE:Expiration_Date_:DATE:Expiration_Date_1Rule),contract_type(OVERRIDE:Contract_Type_:\'\'),vendor_entry_date(OVERRIDE:Vendor_Entry_Date_:DATE:Vendor_Entry_Date_1Rule),vendor_upd_date(OVERRIDE:Vendor_Update_Date_:DATE:Vendor_Update_Date_1Rule),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:DATE),datevendorfirstreported(DEFAULT:Date_Vendor_First_Reported_:DATE),statements_filed(OVERRIDE:Statements_Filed_:\'\'),foreignflag(DEFAULT:Foreign_Flag_:\'\'),process_date(OVERRIDE:Process_Date_:DATE),collateral_desc(OVERRIDE:Collateral_Desc_:\'\'),prim_machine(OVERRIDE:Collateral_Machine_:\'\'),src(OVERRIDE:Source_:\'\'),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),DPMBitmap(DEFAULT:__Permits:PERMITS)';
+  SHARED __Mapping1 := 'UID(DEFAULT:UID),tmsid(OVERRIDE:T_M_S_I_D_:\'\'),rmsid(OVERRIDE:R_M_S_I_D_:\'\'),filing_jurisdiction(OVERRIDE:Filing_Jurisdiction_:\'\'),filing_number(OVERRIDE:Filing_Number_:\'\'),filing_type(OVERRIDE:Filing_Type_:\'\'),filing_date(OVERRIDE:Filing_Date_:DATE:Filing_Date_1Rule),orig_filing_date(OVERRIDE:Original_Filing_Date_:DATE:Original_Filing_Date_1Rule),filing_status(OVERRIDE:Filing_Status_:\'\'),filing_time(OVERRIDE:Filing_Time_:\'\'),status_type(OVERRIDE:Status_Type_:\'\'),filing_agency(OVERRIDE:Filing_Agency_:\'\'),expiration_date(OVERRIDE:Expiration_Date_:DATE:Expiration_Date_1Rule),contract_type(OVERRIDE:Contract_Type_:\'\'),vendor_entry_date(OVERRIDE:Vendor_Entry_Date_:DATE:Vendor_Entry_Date_1Rule),vendor_upd_date(OVERRIDE:Vendor_Update_Date_:DATE:Vendor_Update_Date_1Rule),statements_filed(OVERRIDE:Statements_Filed_:\'\'),foreignflag(DEFAULT:Foreign_Flag_:\'\'),process_date(OVERRIDE:Process_Date_:DATE),collateral_desc(OVERRIDE:Collateral_Desc_:\'\'),prim_machine(OVERRIDE:Collateral_Machine_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),datevendorfirstreported(DEFAULT:Date_Vendor_First_Reported_:EPOCH),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_UCC__Key_RMSID_Main,TRANSFORM(RECORDOF(__in.Dataset_UCC__Key_RMSID_Main),SELF:=RIGHT));
   SHARED __d1_Out := RECORD
     RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_UCC__Key_RMSID_Main);
     KEL.typ.uid UID := 0;
   END;
-  SHARED __d1_UID_Mapped := JOIN(__d1_Norm,Lookup,TRIM((STRING)LEFT.tmsid) = RIGHT.KeyVal,TRANSFORM(__d1_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),HASH);
+  SHARED __d1_UID_Mapped := JOIN(__d1_Norm,Lookup,TRIM((STRING)LEFT.tmsid) = RIGHT.KeyVal,TRANSFORM(__d1_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
   EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UCC__Key_RMSID_Main_Invalid := __d1_UID_Mapped(UID = 0);
   SHARED __d1_Prefiltered := __d1_UID_Mapped(UID <> 0);
   SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
-  SHARED Date_Vendor_Last_Reported_2Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
-  SHARED Date_Vendor_First_Reported_2Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
   SHARED Process_Date_2Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
   SHARED Date_First_Seen_2Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
   SHARED Date_Last_Seen_2Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
-  SHARED __Mapping2 := 'UID(DEFAULT:UID),tmsid(OVERRIDE:T_M_S_I_D_:\'\'),rmsid(OVERRIDE:R_M_S_I_D_:\'\'),filingjurisdiction(DEFAULT:Filing_Jurisdiction_:\'\'),filingnumber(DEFAULT:Filing_Number_:\'\'),filingtype(DEFAULT:Filing_Type_:\'\'),filingdate(DEFAULT:Filing_Date_:DATE),originalfilingdate(DEFAULT:Original_Filing_Date_:DATE),filingstatus(DEFAULT:Filing_Status_:\'\'),filingtime(DEFAULT:Filing_Time_:\'\'),statustype(DEFAULT:Status_Type_:\'\'),filingagency(DEFAULT:Filing_Agency_:\'\'),expirationdate(DEFAULT:Expiration_Date_:DATE),contracttype(DEFAULT:Contract_Type_:\'\'),vendorentrydate(DEFAULT:Vendor_Entry_Date_:DATE),vendorupdatedate(DEFAULT:Vendor_Update_Date_:DATE),dt_vendor_last_reported(OVERRIDE:Date_Vendor_Last_Reported_:DATE:Date_Vendor_Last_Reported_2Rule),dt_vendor_first_reported(OVERRIDE:Date_Vendor_First_Reported_:DATE:Date_Vendor_First_Reported_2Rule),statementsfiled(DEFAULT:Statements_Filed_:\'\'),foreign_indc(OVERRIDE:Foreign_Flag_:\'\'),process_date(OVERRIDE:Process_Date_:DATE:Process_Date_2Rule),collateraldesc(DEFAULT:Collateral_Desc_:\'\'),collateralmachine(DEFAULT:Collateral_Machine_:\'\'),src(OVERRIDE:Source_:\'\'),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH:Date_First_Seen_2Rule),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_2Rule),DPMBitmap(DEFAULT:__Permits:PERMITS)';
+  SHARED Date_Vendor_First_Reported_2Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
+  SHARED Date_Vendor_Last_Reported_2Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
+  SHARED __Mapping2 := 'UID(DEFAULT:UID),tmsid(OVERRIDE:T_M_S_I_D_:\'\'),rmsid(OVERRIDE:R_M_S_I_D_:\'\'),filingjurisdiction(DEFAULT:Filing_Jurisdiction_:\'\'),filingnumber(DEFAULT:Filing_Number_:\'\'),filingtype(DEFAULT:Filing_Type_:\'\'),filingdate(DEFAULT:Filing_Date_:DATE),originalfilingdate(DEFAULT:Original_Filing_Date_:DATE),filingstatus(DEFAULT:Filing_Status_:\'\'),filingtime(DEFAULT:Filing_Time_:\'\'),statustype(DEFAULT:Status_Type_:\'\'),filingagency(DEFAULT:Filing_Agency_:\'\'),expirationdate(DEFAULT:Expiration_Date_:DATE),contracttype(DEFAULT:Contract_Type_:\'\'),vendorentrydate(DEFAULT:Vendor_Entry_Date_:DATE),vendorupdatedate(DEFAULT:Vendor_Update_Date_:DATE),statementsfiled(DEFAULT:Statements_Filed_:\'\'),foreign_indc(OVERRIDE:Foreign_Flag_:\'\'),process_date(OVERRIDE:Process_Date_:DATE:Process_Date_2Rule),collateraldesc(DEFAULT:Collateral_Desc_:\'\'),collateralmachine(DEFAULT:Collateral_Machine_:\'\'),src(OVERRIDE:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH:Date_First_Seen_2Rule),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_2Rule),dt_vendor_first_reported(OVERRIDE:Date_Vendor_First_Reported_:EPOCH:Date_Vendor_First_Reported_2Rule),dt_vendor_last_reported(OVERRIDE:Date_Vendor_Last_Reported_:EPOCH:Date_Vendor_Last_Reported_2Rule),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d2_Norm := NORMALIZE(__in,LEFT.Dataset_UCC__Key_RMSID_Party,TRANSFORM(RECORDOF(__in.Dataset_UCC__Key_RMSID_Party),SELF:=RIGHT));
   SHARED __d2_Out := RECORD
     RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_UCC__Key_RMSID_Party);
     KEL.typ.uid UID := 0;
   END;
-  SHARED __d2_UID_Mapped := JOIN(__d2_Norm,Lookup,TRIM((STRING)LEFT.tmsid) = RIGHT.KeyVal,TRANSFORM(__d2_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),HASH);
+  SHARED __d2_UID_Mapped := JOIN(__d2_Norm,Lookup,TRIM((STRING)LEFT.tmsid) = RIGHT.KeyVal,TRANSFORM(__d2_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
   EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UCC__Key_RMSID_Party_Invalid := __d2_UID_Mapped(UID = 0);
   SHARED __d2_Prefiltered := __d2_UID_Mapped(UID <> 0);
   SHARED __d2 := __SourceFilter(KEL.FromFlat.Convert(__d2_Prefiltered,InLayout,__Mapping2,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
@@ -118,25 +119,30 @@ EXPORT E_U_C_C(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile
     KEL.typ.nstr Statements_Filed_;
     KEL.typ.nstr Foreign_Flag_;
     KEL.typ.nkdate Process_Date_;
-    KEL.typ.nkdate Date_Vendor_Last_Reported_;
-    KEL.typ.nkdate Date_Vendor_First_Reported_;
+    KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
+    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
   EXPORT Collateral_Layout := RECORD
     KEL.typ.nstr Collateral_Desc_;
     KEL.typ.nstr Collateral_Machine_;
-    KEL.typ.nkdate Date_Vendor_Last_Reported_;
-    KEL.typ.nkdate Date_Vendor_First_Reported_;
+    KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
+    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nstr Source_;
+    KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
+    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
   EXPORT Layout := RECORD
@@ -145,36 +151,48 @@ EXPORT E_U_C_C(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile
     KEL.typ.ndataset(Sub_Filing_Layout) Sub_Filing_;
     KEL.typ.ndataset(Collateral_Layout) Collateral_;
     KEL.typ.ndataset(Data_Sources_Layout) Data_Sources_;
+    KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
+    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
   EXPORT __PostFilter := __GroupedFilter(GROUP(DISTRIBUTE(InData,HASH(UID)),UID,LOCAL,ALL));
   U_C_C_Group := __PostFilter;
   Layout U_C_C__Rollup(InLayout __r, DATASET(InLayout) __recs) := TRANSFORM
     SELF.T_M_S_I_D_ := KEL.Intake.SingleValue(__recs,T_M_S_I_D_);
-    SELF.Sub_Filing_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),R_M_S_I_D_,Filing_Jurisdiction_,Filing_Number_,Filing_Type_,Filing_Date_,Original_Filing_Date_,Filing_Status_,Filing_Time_,Status_Type_,Filing_Agency_,Expiration_Date_,Contract_Type_,Vendor_Entry_Date_,Vendor_Update_Date_,Statements_Filed_,Foreign_Flag_,Process_Date_,Date_Vendor_Last_Reported_,Date_Vendor_First_Reported_},R_M_S_I_D_,Filing_Jurisdiction_,Filing_Number_,Filing_Type_,Filing_Date_,Original_Filing_Date_,Filing_Status_,Filing_Time_,Status_Type_,Filing_Agency_,Expiration_Date_,Contract_Type_,Vendor_Entry_Date_,Vendor_Update_Date_,Statements_Filed_,Foreign_Flag_,Process_Date_,Date_Vendor_Last_Reported_,Date_Vendor_First_Reported_),Sub_Filing_Layout)(__NN(R_M_S_I_D_) OR __NN(Filing_Jurisdiction_) OR __NN(Filing_Number_) OR __NN(Filing_Type_) OR __NN(Filing_Date_) OR __NN(Original_Filing_Date_) OR __NN(Filing_Status_) OR __NN(Filing_Time_) OR __NN(Status_Type_) OR __NN(Filing_Agency_) OR __NN(Expiration_Date_) OR __NN(Contract_Type_) OR __NN(Vendor_Entry_Date_) OR __NN(Vendor_Update_Date_) OR __NN(Statements_Filed_) OR __NN(Foreign_Flag_) OR __NN(Process_Date_) OR __NN(Date_Vendor_Last_Reported_) OR __NN(Date_Vendor_First_Reported_)));
-    SELF.Collateral_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Collateral_Desc_,Collateral_Machine_,Date_Vendor_Last_Reported_,Date_Vendor_First_Reported_},Collateral_Desc_,Collateral_Machine_,Date_Vendor_Last_Reported_,Date_Vendor_First_Reported_),Collateral_Layout)(__NN(Collateral_Desc_) OR __NN(Collateral_Machine_) OR __NN(Date_Vendor_Last_Reported_) OR __NN(Date_Vendor_First_Reported_)));
-    SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
+    SELF.Sub_Filing_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_First_Reported_,MIN,FALSE),KEL.typ.epoch Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_Last_Reported_,MAX,FALSE),R_M_S_I_D_,Filing_Jurisdiction_,Filing_Number_,Filing_Type_,Filing_Date_,Original_Filing_Date_,Filing_Status_,Filing_Time_,Status_Type_,Filing_Agency_,Expiration_Date_,Contract_Type_,Vendor_Entry_Date_,Vendor_Update_Date_,Statements_Filed_,Foreign_Flag_,Process_Date_},R_M_S_I_D_,Filing_Jurisdiction_,Filing_Number_,Filing_Type_,Filing_Date_,Original_Filing_Date_,Filing_Status_,Filing_Time_,Status_Type_,Filing_Agency_,Expiration_Date_,Contract_Type_,Vendor_Entry_Date_,Vendor_Update_Date_,Statements_Filed_,Foreign_Flag_,Process_Date_),Sub_Filing_Layout)(__NN(R_M_S_I_D_) OR __NN(Filing_Jurisdiction_) OR __NN(Filing_Number_) OR __NN(Filing_Type_) OR __NN(Filing_Date_) OR __NN(Original_Filing_Date_) OR __NN(Filing_Status_) OR __NN(Filing_Time_) OR __NN(Status_Type_) OR __NN(Filing_Agency_) OR __NN(Expiration_Date_) OR __NN(Contract_Type_) OR __NN(Vendor_Entry_Date_) OR __NN(Vendor_Update_Date_) OR __NN(Statements_Filed_) OR __NN(Foreign_Flag_) OR __NN(Process_Date_)));
+    SELF.Collateral_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_First_Reported_,MIN,FALSE),KEL.typ.epoch Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_Last_Reported_,MAX,FALSE),Collateral_Desc_,Collateral_Machine_},Collateral_Desc_,Collateral_Machine_),Collateral_Layout)(__NN(Collateral_Desc_) OR __NN(Collateral_Machine_)));
+    SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_First_Reported_,MIN,FALSE),KEL.typ.epoch Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_Last_Reported_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
     SELF.__RecordCount := COUNT(__recs);
+    SELF.Archive___Date_ := KEL.era.SimpleRoll(__recs,Archive___Date_,MIN,FALSE);
     SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,FALSE);
     SELF.Date_Last_Seen_ := KEL.era.SimpleRoll(__recs,Date_Last_Seen_,MAX,FALSE);
+    SELF.Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(__recs,Date_Vendor_First_Reported_,MIN,FALSE);
+    SELF.Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(__recs,Date_Vendor_Last_Reported_,MAX,FALSE);
     SELF := __r;
   END;
   Layout U_C_C__Single_Rollup(InLayout __r) := TRANSFORM
-    SELF.Sub_Filing_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Sub_Filing_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(R_M_S_I_D_) OR __NN(Filing_Jurisdiction_) OR __NN(Filing_Number_) OR __NN(Filing_Type_) OR __NN(Filing_Date_) OR __NN(Original_Filing_Date_) OR __NN(Filing_Status_) OR __NN(Filing_Time_) OR __NN(Status_Type_) OR __NN(Filing_Agency_) OR __NN(Expiration_Date_) OR __NN(Contract_Type_) OR __NN(Vendor_Entry_Date_) OR __NN(Vendor_Update_Date_) OR __NN(Statements_Filed_) OR __NN(Foreign_Flag_) OR __NN(Process_Date_) OR __NN(Date_Vendor_Last_Reported_) OR __NN(Date_Vendor_First_Reported_)));
-    SELF.Collateral_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Collateral_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Collateral_Desc_) OR __NN(Collateral_Machine_) OR __NN(Date_Vendor_Last_Reported_) OR __NN(Date_Vendor_First_Reported_)));
-    SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Source_)));
+    SELF.Sub_Filing_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Sub_Filing_Layout,SELF.__RecordCount:=1;,SELF.Archive___Date_:=KEL.era.SimpleRollSingleRow(LEFT,Archive___Date_,FALSE),SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF.Date_Vendor_First_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_First_Reported_,FALSE),SELF.Date_Vendor_Last_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_Last_Reported_,FALSE),SELF:=LEFT))(__NN(R_M_S_I_D_) OR __NN(Filing_Jurisdiction_) OR __NN(Filing_Number_) OR __NN(Filing_Type_) OR __NN(Filing_Date_) OR __NN(Original_Filing_Date_) OR __NN(Filing_Status_) OR __NN(Filing_Time_) OR __NN(Status_Type_) OR __NN(Filing_Agency_) OR __NN(Expiration_Date_) OR __NN(Contract_Type_) OR __NN(Vendor_Entry_Date_) OR __NN(Vendor_Update_Date_) OR __NN(Statements_Filed_) OR __NN(Foreign_Flag_) OR __NN(Process_Date_)));
+    SELF.Collateral_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Collateral_Layout,SELF.__RecordCount:=1;,SELF.Archive___Date_:=KEL.era.SimpleRollSingleRow(LEFT,Archive___Date_,FALSE),SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF.Date_Vendor_First_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_First_Reported_,FALSE),SELF.Date_Vendor_Last_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_Last_Reported_,FALSE),SELF:=LEFT))(__NN(Collateral_Desc_) OR __NN(Collateral_Machine_)));
+    SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF.Archive___Date_:=KEL.era.SimpleRollSingleRow(LEFT,Archive___Date_,FALSE),SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF.Date_Vendor_First_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_First_Reported_,FALSE),SELF.Date_Vendor_Last_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_Last_Reported_,FALSE),SELF:=LEFT))(__NN(Source_)));
     SELF.__RecordCount := 1;
+    SELF.Archive___Date_ := KEL.era.SimpleRollSingleRow(__r,Archive___Date_,FALSE);
     SELF.Date_First_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_First_Seen_,FALSE);
     SELF.Date_Last_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_Last_Seen_,FALSE);
+    SELF.Date_Vendor_First_Reported_ := KEL.era.SimpleRollSingleRow(__r,Date_Vendor_First_Reported_,FALSE);
+    SELF.Date_Vendor_Last_Reported_ := KEL.era.SimpleRollSingleRow(__r,Date_Vendor_Last_Reported_,FALSE);
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(U_C_C_Group,COUNT(ROWS(LEFT))=1),GROUP,U_C_C__Single_Rollup(LEFT)) + ROLLUP(HAVING(U_C_C_Group,COUNT(ROWS(LEFT))>1),GROUP,U_C_C__Rollup(LEFT, ROWS(LEFT)));
   EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
-  EXPORT T_M_S_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,T_M_S_I_D_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UCC__Key_LinkIds_key_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UCC__Key_RMSID_Main_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UCC__Key_RMSID_Party_Invalid),COUNT(T_M_S_I_D__SingleValue_Invalid)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UCC__Key_LinkIds_key_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UCC__Key_RMSID_Main_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UCC__Key_RMSID_Party_Invalid,KEL.typ.int T_M_S_I_D__SingleValue_Invalid});
+  EXPORT UIDSourceCounts := Lookup;
+  EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
+  EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
+  EXPORT T_M_S_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,T_M_S_I_D_);
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UCC__Key_LinkIds_key_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UCC__Key_RMSID_Main_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UCC__Key_RMSID_Party_Invalid),COUNT(T_M_S_I_D__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UCC__Key_LinkIds_key_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UCC__Key_RMSID_Main_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UCC__Key_RMSID_Party_Invalid,KEL.typ.int T_M_S_I_D__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UCC__Key_LinkIds_key_Invalid),COUNT(__d0)},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','tmsid',COUNT(__d0(__NL(T_M_S_I_D_))),COUNT(__d0(__NN(T_M_S_I_D_)))},
@@ -192,16 +210,17 @@ EXPORT E_U_C_C(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ContractType',COUNT(__d0(__NL(Contract_Type_))),COUNT(__d0(__NN(Contract_Type_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VendorEntryDate',COUNT(__d0(__NL(Vendor_Entry_Date_))),COUNT(__d0(__NN(Vendor_Entry_Date_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VendorUpdateDate',COUNT(__d0(__NL(Vendor_Update_Date_))),COUNT(__d0(__NN(Vendor_Update_Date_)))},
-    {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dt_vendor_last_reported',COUNT(__d0(__NL(Date_Vendor_Last_Reported_))),COUNT(__d0(__NN(Date_Vendor_Last_Reported_)))},
-    {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dt_vendor_first_reported',COUNT(__d0(__NL(Date_Vendor_First_Reported_))),COUNT(__d0(__NN(Date_Vendor_First_Reported_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','StatementsFiled',COUNT(__d0(__NL(Statements_Filed_))),COUNT(__d0(__NN(Statements_Filed_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','foreign_indc',COUNT(__d0(__NL(Foreign_Flag_))),COUNT(__d0(__NN(Foreign_Flag_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','process_date',COUNT(__d0(__NL(Process_Date_))),COUNT(__d0(__NN(Process_Date_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CollateralDesc',COUNT(__d0(__NL(Collateral_Desc_))),COUNT(__d0(__NN(Collateral_Desc_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CollateralMachine',COUNT(__d0(__NL(Collateral_Machine_))),COUNT(__d0(__NN(Collateral_Machine_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorFirstReported',COUNT(__d0(Date_Vendor_First_Reported_=0)),COUNT(__d0(Date_Vendor_First_Reported_!=0))},
+    {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorLastReported',COUNT(__d0(Date_Vendor_Last_Reported_=0)),COUNT(__d0(Date_Vendor_Last_Reported_!=0))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UCC__Key_RMSID_Main_Invalid),COUNT(__d1)},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','tmsid',COUNT(__d1(__NL(T_M_S_I_D_))),COUNT(__d1(__NN(T_M_S_I_D_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','rmsid',COUNT(__d1(__NL(R_M_S_I_D_))),COUNT(__d1(__NN(R_M_S_I_D_)))},
@@ -218,16 +237,17 @@ EXPORT E_U_C_C(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','contract_type',COUNT(__d1(__NL(Contract_Type_))),COUNT(__d1(__NN(Contract_Type_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','vendor_entry_date',COUNT(__d1(__NL(Vendor_Entry_Date_))),COUNT(__d1(__NN(Vendor_Entry_Date_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','vendor_upd_date',COUNT(__d1(__NL(Vendor_Update_Date_))),COUNT(__d1(__NN(Vendor_Update_Date_)))},
-    {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorLastReported',COUNT(__d1(__NL(Date_Vendor_Last_Reported_))),COUNT(__d1(__NN(Date_Vendor_Last_Reported_)))},
-    {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorFirstReported',COUNT(__d1(__NL(Date_Vendor_First_Reported_))),COUNT(__d1(__NN(Date_Vendor_First_Reported_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','statements_filed',COUNT(__d1(__NL(Statements_Filed_))),COUNT(__d1(__NN(Statements_Filed_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ForeignFlag',COUNT(__d1(__NL(Foreign_Flag_))),COUNT(__d1(__NN(Foreign_Flag_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','process_date',COUNT(__d1(__NL(Process_Date_))),COUNT(__d1(__NN(Process_Date_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','collateral_desc',COUNT(__d1(__NL(Collateral_Desc_))),COUNT(__d1(__NN(Collateral_Desc_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','prim_machine',COUNT(__d1(__NL(Collateral_Machine_))),COUNT(__d1(__NN(Collateral_Machine_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
+    {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
+    {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorFirstReported',COUNT(__d1(Date_Vendor_First_Reported_=0)),COUNT(__d1(Date_Vendor_First_Reported_!=0))},
+    {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorLastReported',COUNT(__d1(Date_Vendor_Last_Reported_=0)),COUNT(__d1(Date_Vendor_Last_Reported_!=0))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_UCC__Key_RMSID_Party_Invalid),COUNT(__d2)},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','tmsid',COUNT(__d2(__NL(T_M_S_I_D_))),COUNT(__d2(__NN(T_M_S_I_D_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','rmsid',COUNT(__d2(__NL(R_M_S_I_D_))),COUNT(__d2(__NN(R_M_S_I_D_)))},
@@ -244,15 +264,16 @@ EXPORT E_U_C_C(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ContractType',COUNT(__d2(__NL(Contract_Type_))),COUNT(__d2(__NN(Contract_Type_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VendorEntryDate',COUNT(__d2(__NL(Vendor_Entry_Date_))),COUNT(__d2(__NN(Vendor_Entry_Date_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VendorUpdateDate',COUNT(__d2(__NL(Vendor_Update_Date_))),COUNT(__d2(__NN(Vendor_Update_Date_)))},
-    {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dt_vendor_last_reported',COUNT(__d2(__NL(Date_Vendor_Last_Reported_))),COUNT(__d2(__NN(Date_Vendor_Last_Reported_)))},
-    {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dt_vendor_first_reported',COUNT(__d2(__NL(Date_Vendor_First_Reported_))),COUNT(__d2(__NN(Date_Vendor_First_Reported_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','StatementsFiled',COUNT(__d2(__NL(Statements_Filed_))),COUNT(__d2(__NN(Statements_Filed_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','foreign_indc',COUNT(__d2(__NL(Foreign_Flag_))),COUNT(__d2(__NN(Foreign_Flag_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','process_date',COUNT(__d2(__NL(Process_Date_))),COUNT(__d2(__NN(Process_Date_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CollateralDesc',COUNT(__d2(__NL(Collateral_Desc_))),COUNT(__d2(__NN(Collateral_Desc_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CollateralMachine',COUNT(__d2(__NL(Collateral_Machine_))),COUNT(__d2(__NN(Collateral_Machine_)))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d2(__NL(Source_))),COUNT(__d2(__NN(Source_)))},
+    {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d2(Archive___Date_=0)),COUNT(__d2(Archive___Date_!=0))},
     {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d2(Date_First_Seen_=0)),COUNT(__d2(Date_First_Seen_!=0))},
-    {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d2(Date_Last_Seen_=0)),COUNT(__d2(Date_Last_Seen_!=0))}]
+    {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d2(Date_Last_Seen_=0)),COUNT(__d2(Date_Last_Seen_!=0))},
+    {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorFirstReported',COUNT(__d2(Date_Vendor_First_Reported_=0)),COUNT(__d2(Date_Vendor_First_Reported_!=0))},
+    {'UCC','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorLastReported',COUNT(__d2(Date_Vendor_Last_Reported_=0)),COUNT(__d2(Date_Vendor_Last_Reported_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

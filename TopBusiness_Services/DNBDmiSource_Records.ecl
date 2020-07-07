@@ -1,4 +1,4 @@
-// ================================================================================
+﻿// ================================================================================
 // ====== RETURNS D&B DMI Source Count Info, currently no raw source docs are returned.
 // ================================================================================
 // uses V1 layouts (both in ECL and ESP)
@@ -8,6 +8,7 @@ IMPORT iesp, doxie, DNB, DNB_DMI, BIPV2, ut;
 EXPORT DNBDmiSource_Records ( 
   dataset(Layouts.rec_input_ids_wSrc) in_docids,
 	SourceService_Layouts.OptionsLayout inoptions,
+	doxie.IDataAccess mod_access,
   boolean IsFCRA = false
 ) := MODULE
 	
@@ -23,7 +24,7 @@ EXPORT DNBDmiSource_Records (
 																																		SELF := []));
 	
 	// *** Key fetch to get dunsnumber keys
-  SHARED ds_dmikeys := PROJECT(DNB_DMI.Key_LinkIds.kFetch(in_docs_linkonly,inoptions.fetch_level),
+  SHARED ds_dmikeys := PROJECT(DNB_DMI.Key_LinkIds.kFetch(in_docs_linkonly, mod_access, inoptions.fetch_level),
 																TRANSFORM(Layouts.rec_input_ids_wSrc,
 																					SELF.IdValue := LEFT.rawfields.duns_number,
 																					SELF := LEFT,
@@ -35,7 +36,7 @@ EXPORT DNBDmiSource_Records (
 	
   // fetch main records via Duns number key file.
 	SHARED dmi_sourceview := JOIN(dmi_keys,DNB_DMI.Keys().Duns.qa,
-													KEYED(LEFT.duns_number = RIGHT.duns),
+													KEYED(LEFT.duns_number = RIGHT.duns) and mod_access.use_DNB(),
 													TRANSFORM(Layout_DNB_Base_Linkids, SELF := RIGHT),
 													LIMIT(ut.limits.default,SKIP));
 

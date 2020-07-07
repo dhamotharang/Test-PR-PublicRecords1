@@ -24,7 +24,7 @@ EXPORT fn_checkRelativesRecs(dataset(Layouts.batch_working) ds_batch_in,
 		// Use relationship proc to retrieve relative dids.
 		ds_did := project(ds_batch_in_filt(lex_id != ''),transform(Relationship.Layout_GetRelationship.DIDs_layout,SELF.did := (integer)LEFT.Lex_id,SELF := []));
 				
-		ds_relative_recs := Relationship.proc_GetRelationship(ds_did,
+		ds_relative_recs := Relationship.proc_GetRelationshipNeutral(ds_did,
 			RelativeFlag:=TRUE,
 			AssociateFlag:=TRUE,
 			MaxCount:=ut.limits.RELATIVES_PER_PERSON,

@@ -1,4 +1,4 @@
-import targus, address, riskwise, ut, gateway, doxie, didville, gong,Phones, MDR;
+import targus, address, riskwise, ut, gateway, doxie, didville, Phones, MDR, STD;
 
 export MAC_Get_GLB_DPPA_Targus(boolean  phone_only_search,
 															string10 phone,
@@ -20,8 +20,7 @@ export MAC_Get_GLB_DPPA_Targus(boolean  phone_only_search,
 															unsigned1 scr_thr_val,
 															gateway.Layouts.Config gateway_cfg,
 															string120 company_name='\'\'',
-															boolean isPFR = false,
-                              boolean applyOptOut = false) := function
+															boolean isPFR = false) := function
 
 targus_gateway_url := gateway_cfg.url;
 
@@ -80,6 +79,7 @@ targus_reverse_in := project(targus_init, prep_for_reverse(left));
 
 targus_in := if(phone_only_search, targus_reverse_in, targus_basic_in);
 
+applyOptOut := TRUE; // temporary, until we can remove applyOptout parameter from SOAPCALL_Targus() below.
 vMakeGWCall := targus_gateway_url!='' and exists(targus_in);
 gateway_result := if(vMakeGWCall, 
                      gateway.SoapCall_Targus(targus_in, gateway_cfg, 6, 0, vMakeGWCall, mod_access, applyOptOut), dataset([],targus.layout_targus_out));
@@ -133,7 +133,7 @@ targus_out_rec tran_reverse(gateway_result l) := transform
 	self.fname := if(hit, gatewayRes.FirstName, '');
 	self.mname := if(hit, gatewayRes.MiddleName, '');
 	self.lname := if(hit, gatewayRes.LastName, '');
-	self.listed_name := stringlib.StringToUpperCase(
+	self.listed_name := STD.STR.ToUpperCase(
 	                      map(~hit => '',
 	                          self.lname<>''and self.fname<>'' => trim(self.fname) + ' ' + trim(self.lname), 
 					      self.lname<>'' => self.lname,
@@ -181,7 +181,7 @@ targus_wireless_in := if(targus_gateway_url!='' and exists(dirs_reverse) and ~ex
                          project(targus_init, prep_for_wireless(left)), dataset([],targus.layout_targus_in));
 
 wireless_result := IF(doxie.DataPermission.use_confirm,
-											gateway.SoapCall_Targus(targus_wireless_in, gateway_cfg, 3,,, mod_access)); // <- not passing makegatewaycall?
+											gateway.SoapCall_Targus(targus_wireless_in, gateway_cfg, 3,,, mod_access, applyOptOut)); // <- not passing makegatewaycall?
 		
 targus_out_rec tran_wireless(dirs_reverse l, wireless_result r) := transform
 	self.fname := r.response.WirelessConnectionSearchResult.ConsumerName.Frst;

@@ -57,6 +57,7 @@ MODULE
 	export src_BBB_Member                := 'BM';  // Better Business Bureau members
 	export src_BBB_Non_Member            := 'BN';  // Better Business Bureau non-members
 	export src_Best_Business             := 'BB';
+	export src_Best_Person               := 'BP';  // Best Person
 	export src_Business_Credit					 := 'BC';  // SBFE Business Credit
 	export src_Business_Registration     := 'BR';
 	export src_Calbus										 := 'C#';  // California business locator/CA sales & use tax permit holders
@@ -199,6 +200,7 @@ MODULE
 	export src_Daily_Utilities           := 'DU';    
 	export src_Dunn_Bradstreet           := 'D ';  // aka D&B DMI
 	export src_Dunn_Bradstreet_Fein      := 'DN';
+	export src_Dunndata_Consumer		     := 'A3';  //DF-23679 Dunndata Consumer Masterfile
 	export src_EBR                       := 'ER';  // Experian Business Reports	
 	export src_Edgar                     := 'E ';  // US Securities and Exchange Commission, "Edgar" system data
 	export src_Emdeon                    := '7U';  // Emdeon Healthcare Claims
@@ -308,6 +310,8 @@ MODULE
 	export src_Lobbyists                 := 'LB';
 	export src_Mari_Prof_Lic		 				 :=	'MP'; // Mortgage Assest Research Institute Professional Licenses
 	export src_Mari_Public_Sanc					 :=	'MQ'; // Mortgage Assest Research Institute Public sanctions
+	export src_Marketing_Relatives_Data  := 'AZ';
+	export src_Relatives_Data 					 := 'RL';
 	export src_Marriage					 				 :=	'MR';
 	export src_MartinDale_Hubbell        := 'MH';
 	export src_MediaOne									 := 'M1';
@@ -1087,7 +1091,9 @@ MODULE
 		,src_ZOOM                      ,src_TUCS_Ptrack
 	]; 
 
-// Marketing approved sources as of 6/2019.
+// Marketing approved sources as of 11/2019.
+// Note, doxie.compliance.isMarketingAllowed should be used to determine if a source is marketing approved.
+// Any new sources should be added codes_v3 key. Jira DF-26837 is an example on how to update codes_v3 key for new sources.
 export set_Marketing_Sources           := [
 		 src_AMS											 ,src_AK_Busreg                 ,src_AK_Perm_Fund						   ,src_Accurint_Trade_Show			 
 		,src_Aircrafts								 ,src_Accurint_Arrest_Log				,src_AlloyMedia_consumer       ,src_Airmen    						 		 
@@ -1101,7 +1107,7 @@ export set_Marketing_Sources           := [
 		,src_IRS_Non_Profit    				 ,src_InfutorNarc								,src_InfutorTRK  							 ,src_InfutorCID    						
 		,src_Infutor_Motorcycle_Veh 	 ,src_InfutorNare 							,src_Ingenix_Sanctions				 ,src_LaborActions_EBSA					
 		,src_LaborActions_WHD				   /*,src_Liens										  ,src_Liens_v2  */  					 ,src_LnPropV2_Fares_Asrs			 
-		,src_LnPropV2_Lexis_Deeds_Mtgs ,src_Lobbyists								  ,src_MO_DL   
+		,src_LnPropV2_Lexis_Deeds_Mtgs ,src_Lobbyists								  ,src_MO_DL                     ,src_Dunndata_Consumer 
 		,src_Marriage 								 ,src_MediaOne								  ,src_NaturalDisaster_Readiness ,src_NJ_Gaming_Licenses			 
 		,src_OR_Worker_Comp						 ,src_OSHAIR										,src_PBSA											 ,src_Professional_License			 
 		,src_sexoffender							 ,src_TXBUS										  /*,src_UCCV2*/  							 ,src_US_Coastguard
@@ -1131,7 +1137,7 @@ export set_Marketing_Sources           := [
     // additional items
     ,src_Edgar                     ,src_Bankruptcy_Trustee        ,src_Infutor_Veh               ,src_MS_Worker_Comp
     ,src_Liens_v2_Chicago_Law      ,src_Liens_v2_ILFDLN           ,src_Liens_v2_Hogan            ,src_Liens_v2_MA
-    ,src_Liens_v2_NYC              ,src_Liens_v2_NYFDLN
+    ,src_Liens_v2_NYC              ,src_Liens_v2_NYFDLN           ,src_LnPropV2_Lexis_Asrs       ,src_LnPropV2_Fares_Deeds
 	]; 
 	
 export set_Marketing_Restricted := [

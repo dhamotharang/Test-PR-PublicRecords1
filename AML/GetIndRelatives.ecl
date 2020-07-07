@@ -1,4 +1,4 @@
-import risk_indicators, doxie_raw, progressive_phone, ut,  header, riskwise, relationship;
+import header, riskwise, relationship;
 
 EXPORT GetIndRelatives (  DATASET(Layouts.LayoutAMLShellV2) IdsIn    
 
@@ -22,10 +22,10 @@ IndividDIDS := project(IdsIn, transform(Layouts.RelatLayoutV2, self.seq := left.
 iids_dedp := dedup(sort(IndividDIDS(subjectdid<>0),subjectdid), subjectdid);
 justDids := PROJECT(iids_dedp, 
 			TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.subjectdid));									 
-rellyids := Relationship.proc_GetRelationship(justDids,TopNCount:=100,
+rellyids := Relationship.proc_GetRelationshipNeutral(justDids,TopNCount:=100,
 			RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result;
 
-Layouts.RelatLayoutV2 GetRelatInfo(IndividDIDS le, recordof(rellyids) ri, integer degree) := TRANSFORM
+Layouts.RelatLayoutV2 GetRelatInfo(IndividDIDS le, Relationship.layout_GetRelationship.interfaceOutputNeutral ri, integer degree) := TRANSFORM
 	
 		self.seq := le.seq;
 		self.origdid := le.origdid;
@@ -46,7 +46,7 @@ FirstLevelRelat :=  join(IndividDIDS, rellyids,
 FirstLevelRelat_dedp := dedup(sort(FirstLevelRelat,subjectdid), relatDID);
 FirstLevelRelatDids := PROJECT(FirstLevelRelat_dedp, 
 			TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.relatDID));	
-rellyids2 :=Relationship.proc_GetRelationship(FirstLevelRelatDids,TopNCount:=10,
+rellyids2 :=Relationship.proc_GetRelationshipNeutral(FirstLevelRelatDids,TopNCount:=10,
 			RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result;   
 
 RelatParents := join(FirstLevelRelat, rellyids2, 

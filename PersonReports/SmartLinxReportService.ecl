@@ -3,19 +3,19 @@
   <part name="DID" type="xsd:string" required="1" />
   <part name="SSN" type="xsd:string"/>
   <part name="DPPAPurpose" type="xsd:byte" default="1"/>
-  <part name="GLBPurpose" type="xsd:byte" default="1"/> 
+  <part name="GLBPurpose" type="xsd:byte" default="1"/>
   <part name="LnBranded" type="xsd:boolean"/>
   <part name="DataRestrictionMask" type="xsd:string" default="00000000000"/>
   <part name="DataPermissionMask" type="xsd:string" default="00000000000"/>
   <part name="LegacyVerified" type="xsd:boolean" disabled="true" description=" not implemented"/>
   <part name="IncludeBlankDOD" type="xsd:boolean" default="false" description=" allowes to return death records with no DOD"/>
-	<part name="ExcludeDMVPII" type="xsd:boolean"/>
+  <part name="ExcludeDMVPII" type="xsd:boolean"/>
   <separator />
   <part name="IncludeBestInfo" type="xsd:boolean" default="true" description=" ...new selector"/>
   <part name="IncludeBpsAddress" type="xsd:boolean" default="true" description=" ...new selector"/>
         <part name="IncludeCensusData" type="xsd:boolean" indent="true" />
         <part name="IncludePhonesFeedback" type="xsd:boolean" indent="true" />
-        <part name="ExactSecondRangeMatch" type="xsd:boolean" indent="true" 
+        <part name="ExactSecondRangeMatch" type="xsd:boolean" indent="true"
                     description=" not in doxie CRS: address-phone linking"/>
   <part name="IncludeAKAs" type="xsd:boolean" default="true"/>
   <part name="IncludeImposters" type="xsd:boolean" default="true"/>
@@ -23,7 +23,7 @@
   <part name="IncludeAssociates" type="xsd:boolean" />
   <part name="IncludeRelatives"  type="xsd:boolean" />
         <part name="MaxRelatives" type="xsd:unsignedInt" indent="true" default="100"/>
-        <part name="RelativeDepth" type="xsd:byte" indent="true" default="3"/> 
+        <part name="RelativeDepth" type="xsd:byte" indent="true" default="3"/>
         <part name="IncludeRelativeAddresses" type="xsd:boolean" indent="true" />
         <part name="MaxRelativeAddresses" type="xsd:unsignedInt" indent="true" />
   <separator />
@@ -75,7 +75,7 @@
   <part name="ExcludeSources" type="xsd:boolean" />
   <part name="IncludeHRI" type="xsd:boolean"/>
   <part name="MaxHriPer" type="xsd:unsignedInt"/>
-  <part name="MaxAddresses" type="xsd:unsignedInt" default="1000" 
+  <part name="MaxAddresses" type="xsd:unsignedInt" default="1000"
         description=" limits number of Comp_addresses; should it be exposed?"/>
   <part name="MaxAssociates" type="xsd:unsignedInt" default="10" description=" number of associates to return"/>
 <!--
@@ -88,13 +88,13 @@
   <part name="PhonesPerAddress" type="xsd:byte"/>
   <part name="LawEnforcement" type="xsd:boolean"/>
   <part name="IncludeTimeline" type="xsd:boolean"/>
-  <part name="ExcludeResidentsForAssociatesAddresses" type="xsd:boolean"/>         
+  <part name="ExcludeResidentsForAssociatesAddresses" type="xsd:boolean"/>
   <part name="ProbationOverride" type="xsd:boolean"/>
   <part name="NoSmartRollup" type="xsd:boolean"/>
   <part name="IncludeKeyRiskIndicators" type="xsd:boolean"/>
-	<part name="IncludeAMLProperty" type="xsd:boolean"/>
+  <part name="IncludeAMLProperty" type="xsd:boolean"/>
 <part name="includeAddressSourceInfo" type="xsd:boolean"/>
-	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>
+  <part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>
 -->
 
 <!--
@@ -121,10 +121,10 @@
 
 </message>
 */
-/*--INFO-- 
+/*--INFO--
 <b>Note on options:</b> "SOAP" options will always override ESDL options
 (this is an unfortuante consequence of not being able to choose modules conditionally, but it seems
-to be relatively harmless anyway). <br /> 
+to be relatively harmless anyway). <br />
 */
 
 IMPORT iesp, doxie, AutoStandardI, Royalty;
@@ -132,87 +132,87 @@ IMPORT iesp, doxie, AutoStandardI, Royalty;
 EXPORT SmartLinxReportService () := MACRO
   #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
   #onwarning(4207, ignore);
-	//The following macro defines the field sequence on WsECL page of query. 
-	WSInput.MAC_PersonReports_SmartLinxReportService();
+  //The following macro defines the field sequence on WsECL page of query.
+  WSInput.MAC_PersonReports_SmartLinxReportService();
 
   #CONSTANT('TwoPartySearch', FALSE);
-	#constant('SelectIndividually', true); // we will setup all components explicitly
+  #constant('SelectIndividually', true); // we will setup all components explicitly
 
-	// those are defined in current CRS:
-	#option ('maxCompileThreads', 4); //
-	#stored('IncludeAllDIDRecords','1'); //
-	#stored('ReportReq',true); //
-	#stored('CriminalRecordVersion',2);
-	#stored('deaversion',2);
-	#stored('propertyversion',2);
-	#stored('dlversion',2);
-	#stored('voterversion',2);
-	#stored('vehicleversion',2);
-	#stored('judgmentlienversion',2);
-	#stored('uccversion',2);
-	#stored('bankruptcyversion',2);
-	#stored('IncludeSanctions',true);  //temporary fix until FUNCTIONS #stores..
-	#stored('IncludeProviders',true);
+  // those are defined in current CRS:
+  #option ('maxCompileThreads', 4); //
+  #stored('IncludeAllDIDRecords','1'); //
+  #stored('ReportReq',true); //
+  #stored('CriminalRecordVersion',2);
+  #stored('deaversion',2);
+  #stored('propertyversion',2);
+  #stored('dlversion',2);
+  #stored('voterversion',2);
+  #stored('vehicleversion',2);
+  #stored('judgmentlienversion',2);
+  #stored('uccversion',2);
+  #stored('bankruptcyversion',2);
+  #stored('IncludeSanctions',true);  //temporary fix until FUNCTIONS #stores..
+  #stored('IncludeProviders',true);
 
-	#constant('useOnlyBestDID',true); //
-	#stored('DataRestrictionMask','0000000000'); // //intentionally has diff default behavior than doxie_ln version
-	#CONSTANT('GONG_SEARCHTYPE','PERSON'); //
-	#constant('IncludeNonDMVSources', true); //
-	#CONSTANT('IncludeNonRegulatedVehicleSources', true);
-	#CONSTANT('IncludeNonRegulatedWatercraftSources', true);
+  #constant('useOnlyBestDID',true); //
+  #stored('DataRestrictionMask','0000000000'); // //intentionally has diff default behavior than doxie_ln version
+  #CONSTANT('GONG_SEARCHTYPE','PERSON'); //
+  #constant('IncludeNonDMVSources', true); //
+  #CONSTANT('IncludeNonRegulatedVehicleSources', true);
+  #CONSTANT('IncludeNonRegulatedWatercraftSources', true);
 
-	#CONSTANT('AML_XG5_GATEWAY','TRUE'); 
+  #CONSTANT('AML_XG5_GATEWAY','TRUE');
 
-	#constant('IsCRS',true);
-	#constant ('CurrentOnly', false); //TODO: check (property?)
-	noSmartRollup := false : stored('NoSmartRollup');
-	
-	// these are set for UCC report; not exposed in doxie CRS; in UCC report they are set to true
-	//#constant('IncludeMultipleSecured', false);
-	//#constant('ReturnRolledDebtors', false);
+  #constant('IsCRS',true);
+  #constant ('CurrentOnly', false); //TODO: check (property?)
+  noSmartRollup := false : stored('NoSmartRollup');
+
+  // these are set for UCC report; not exposed in doxie CRS; in UCC report they are set to true
+  //#constant('IncludeMultipleSecured', false);
+  //#constant('ReturnRolledDebtors', false);
 
   // *** Input parameters handling ***
   // General idea is that we may want to support reading from "stored" for a quite long time.
-  // Thus, even when reading from ESDL-input, parameters are #stored anyway, and then 
+  // Thus, even when reading from ESDL-input, parameters are #stored anyway, and then
   // being read again -- this time from 'stored', creating a module containing required parameters.
-  // I will create the same module directly from ESDL input anyway, so later 
+  // I will create the same module directly from ESDL input anyway, so later
   // we could bypass generally redundant in ESDL mode "save - read" processing.
 
   // parse ESDL input
   ds_in := DATASET ([], iesp.smartlinxreport.t_SmartlinxReportRequest) : STORED ('SmartLinxReportRequest', FEW);
   first_row := ds_in[1] : INDEPENDENT;
-	
-	s_gateway := dataset([],risk_indicators.Layout_Gateways_In) 	: stored('gateways');
-	
+
+  s_gateway := dataset([],risk_indicators.Layout_Gateways_In)   : stored('gateways');
+
   // this will #store some standard input parameters (generally, for search purpose)
   iesp.ECL2ESP.SetInputBaseRequest (first_row);
   iesp.ECL2ESP.SetInputReportBy (first_row.ReportBy);
 
-  // create module incorporating XML input options 
+  // create module incorporating XML input options
   options_in := PersonReports.functions.GetInputOptions (global (first_row.Options));
-	
-	// todo move prunedAgedSSNs to appropriate location
+
+  // todo move prunedAgedSSNs to appropriate location
   #stored ('UsingKeepSSNs', first_row.options.PruneAgedSSNs);
   #stored ('KeepOldSsns', ~first_row.options.PruneAgedSSNs);
-	  // set up defaults: comp report options are the most detailed, so they can be used here
+    // set up defaults: comp report options are the most detailed, so they can be used here
   options_esdl := module (project (options_in, PersonReports.IParam._compoptions, OPT))
     export boolean include_bpsaddress := TRUE;
-    export unsigned1 max_relatives := 11;
+    export unsigned1 max_relatives := 20; // changing this constant for max # of relatives to be returned
   end;
 
   // store XML options for subsequent legacy-style reading
   PersonReports.functions.SetInputSearchOptions (options_esdl);
 
-  // Read from stored. 
+  // Read from stored.
   SR := PersonReports.StoredReader;
-  options_stored := module (SR.relatives_options, SR.neighbors_options, SR.imposters_options,
+  options_stored := module (SR.relatives_options, SR.neighbors_options, SR.imposters_options, SR.email_options,
                             SR.global_options, SR.phones_options, SR.providers_options, SR.versions)
   end;
 
   // TODO: cannot choose module conditionally: if (exists (first_raw), options_esdl, options_stored);
   // to bypass global storage use "options_esdl"
-  options := options_stored; 
-  // options := options_esdl;  
+  options := options_stored;
+  // options := options_esdl;
 
 
   // get search parameters from global #stored variables;
@@ -229,20 +229,20 @@ EXPORT SmartLinxReportService () := MACRO
     export boolean include_hri := globals.IncludeHRI;
     export boolean legacy_verified := false : stored('LegacyVerified');
     export boolean include_BlankDOD := false : stored ('IncludeBlankDOD');
-		export boolean include_deceased := true ; //need to fix PersonReports.SourceCounts_records doesn't work without it.
-    export string9 _ssn := AutoStandardI.InterfaceTranslator.ssn_value.val(project(search_mod,AutoStandardI.InterfaceTranslator.ssn_value.params)); 
+    export boolean include_deceased := true ; //need to fix PersonReports.SourceCounts_records doesn't work without it.
+    export string9 _ssn := AutoStandardI.InterfaceTranslator.ssn_value.val(project(search_mod,AutoStandardI.InterfaceTranslator.ssn_value.params));
     export boolean smart_rollup := if (noSmartRollup, false, true);
-		export boolean include_sources := true;
-		export unsigned1 max_relatives := 100;
+    export boolean include_sources := true;
+    export unsigned1 max_relatives := 100;
     export boolean use_bestaka_ra := false;
-		export boolean use_bestaka_nb := false;
+    export boolean use_bestaka_nb := false;
     export unsigned1 bankruptcy_version := 2;
-		export STRING1 bk_party_type := iesp.Constants.SMART.DEBTOR;
+    export STRING1 bk_party_type := iesp.Constants.SMART.DEBTOR;
     export unsigned1 crimrecords_version := 2;
     export unsigned1 dea_version := 2;
     export unsigned1 dl_version := 2;
     export unsigned1 liensjudgments_version := 2;
-		export STRING1 liens_party_type := iesp.Constants.SMART.DEBTOR;
+    export STRING1 liens_party_type := iesp.Constants.SMART.DEBTOR;
     export unsigned1 phonesplus_version := 2;
     export unsigned1 proflicense_version := 2;
     export unsigned1 property_version := 2;
@@ -251,17 +251,17 @@ EXPORT SmartLinxReportService () := MACRO
     export unsigned1 voters_version := 2;
     export boolean include_nonresidents_phones := false;
     export unsigned1 neighbors_per_na := 2;
-		export boolean sort_deeds_by_ownership := true; //sets property ownership flag that is needed for determining Current/Prior
-		//criminal defaults
-		export boolean AllowGraphicDescription := false;
+    export boolean sort_deeds_by_ownership := true; //sets property ownership flag that is needed for determining Current/Prior
+    //criminal defaults
+    export boolean AllowGraphicDescription := false;
     export boolean Include_BestAddress := false;
-		export boolean IncludeAllCriminalRecords := false;
+    export boolean IncludeAllCriminalRecords := false;
     export boolean IncludeSexualOffenses := false;
-		export boolean return_AllImposterRecords := true;
-		export unsigned1 max_imposter_akas := 50;
-		export boolean include_proflicenses := true;  //force proflic, providers and sanctions for now
-		export boolean include_providers := true;  
-		export boolean include_sanctions := true;
+    export boolean return_AllImposterRecords := true;
+    export unsigned1 max_imposter_akas := 50;
+    export boolean include_proflicenses := true;  //force proflic, providers and sanctions for now
+    export boolean include_providers := true;
+    export boolean include_sanctions := true;
     export boolean include_criminalindicators := false : stored ('IncludeCriminalIndicators');
     export boolean Include_NonRegulated_WatercraftSources := false : stored ('IncludeNonRegulatedWatercraftSources');
     export boolean include_AddressSourceInfo := false : stored('IncludeAddressSourceInfo');
@@ -273,25 +273,25 @@ EXPORT SmartLinxReportService () := MACRO
   did_value := AutoStandardI.InterfaceTranslator.did_value.val(project(search_mod,AutoStandardI.InterfaceTranslator.did_value.params));
   dids := dataset ([(unsigned6) did_value], doxie.layout_references);
 
-	// main records
+  // main records
 
-	Relationship.IParams.storeParams(first_row.Options.RelationshipOption);
-	smartMod := Relationship.IParams.getParams(report_mod,PersonReports.IParam._smartlinxreport);
+  Relationship.IParams.storeParams(first_row.Options.RelationshipOption);
+  smartMod := Relationship.IParams.getParams(report_mod,PersonReports.IParam._smartlinxreport);
   recs := PersonReports.SmartLinxReport (dids, smartMod, FALSE);
 
   // wrap it into output structure
   iesp.smartlinxreport.t_SmartLinxReportResponse SetResponse (recs L) := transform
     Self._Header := iesp.ECL2ESP.GetHeaderRow ();
-    Self.Messages := L.messages; 
+    Self.Messages := L.messages;
     Self.Individual := L;
   end;
   results := PROJECT (recs, SetResponse (Left));
 
-	// ROYALTIES
-	Royalty.RoyaltyFares.MAC_SetD(recs.Foreclosures, royalties_fares);
-	Royalty.MAC_RoyaltyEmail(recs.Emailaddresses, royalties_email, source);	
- 	royalties := if (not ut.IndustryClass.is_knowx, royalties_fares) + royalties_email;
-
+  // ROYALTIES
+  Royalty.RoyaltyFares.MAC_SetD(recs.Foreclosures, royalties_fares);
+  Royalty.MAC_RoyaltyEmail(recs.Emailaddresses, royalties_email, source);
+  royalties := if (not mod_access.isConsumer(), royalties_fares) +
+               if(report_mod.email_version=2,recs.EmailV2Royalties, royalties_email);
   output (results, named ('Results'));
   output (royalties, named ('RoyaltySet'));
 

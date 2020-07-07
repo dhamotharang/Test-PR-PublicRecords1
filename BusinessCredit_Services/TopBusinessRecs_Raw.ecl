@@ -17,9 +17,12 @@ EXPORT TopBusinessRecs_Raw(BusinessCredit_Services.Iparam.reportrecords inmod ,
 		SELF 													:= [];
 	END;
 	
-	in_options 					:= ROW(xform_topbusiness_options());
-	in_topbusiness_mod	:= MODULE(PROJECT(inmod, AutoStandardI.DataRestrictionI.params, OPT)) END;	
-	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+  in_options 					:= ROW(xform_topbusiness_options());
+  in_topbusiness_mod	:= MODULE(PROJECT(inmod, AutoStandardI.DataRestrictionI.params, OPT))
+    EXPORT boolean ignoreFares := FALSE;
+    EXPORT boolean ignoreFidelity := FALSE;
+  END;	
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
      
 	add_best := TopBusiness_Services.BestSection.fn_fullView(	in_topbusiness_ds, 
 																														PROJECT(DATASET(in_options),TRANSFORM(TopBusiness_Services.BestSection_Layouts.rec_OptionsLayout, self := left, self := []))[1],
@@ -193,22 +196,8 @@ EXPORT TopBusinessRecs_Raw(BusinessCredit_Services.Iparam.reportrecords inmod ,
 	add_ConnectedBusinesses := TopBusiness_Services.ConnectedBusinessSection.fn_fullView(	PROJECT(in_topbusiness_ds, TopBusiness_Services.ConnectedBusinessSection_Layouts.rec_Input),
 																																												PROJECT(DATASET(in_options),TopBusiness_Services.ConnectedBusinessSection_Layouts.rec_OptionsLayout)[1],
 																																												in_topbusiness_mod );
-	iesp.businesscreditreport.t_BusinessCreditConnectedBusinessSection xfm_createConnBiz() := TRANSFORM
-		SELF.ConnectedBusinessRecords := 
-      CHOOSEN(PROJECT(add_ConnectedBusinesses[1].ConnectedBusinessRecords, 
-               TRANSFORM(iesp.businesscreditreport.t_BusinessCreditConnectedBusiness,
-                         SELF := LEFT,
-                         SELF.BusinessCreditIndicator := BusinessCredit_Services.Functions.fn_BuzCreditIndicator2(LEFT.BusinessIds.UltId, 
-                                                                                                                 LEFT.BusinessIds.OrgID,
-                                                                                                                 LEFT.BusinessIds.SeleID,
-                                                                                                                 mod_access,
-                                                                                                                 buzCreditAccess)
-                     )), iesp.constants.TOPBUSINESS.MAX_COUNT_CONNECTED_BUSINESSES),
-    SELF.CountConnectedBusinesses := add_ConnectedBusinesses[1].CountConnectedBusinesses,
-    SELF.TotalCountConnectedBusinesses := add_ConnectedBusinesses[1].TotalCountConnectedBusinesses
-	END;
-  
-	add_ConnectedBusinesses_final := DATASET([xfm_createConnBiz()]);
+
+     add_connectedBusinesses_final := BusinessCredit_Services.Functions.AddSBFEIndicatorFunction(Add_connectedBusinesses,mod_access,BuzCreditAccess);             	
    
 	add_contact := TopBusiness_Services.ContactSection.fn_fullView( PROJECT(in_topbusiness_ds, TopBusiness_Services.ContactSection_Layouts.rec_Input),
 																																	PROJECT(DATASET(in_options),TopBusiness_Services.ContactSection_Layouts.rec_OptionsLayout)[1],
@@ -253,6 +242,8 @@ EXPORT TopBusinessRecs_Raw(BusinessCredit_Services.Iparam.reportrecords inmod ,
 	final_recsDefault := DATASET([transform_TopBusinessRecs()]);
 	final_recsLNOnlyCreditReport := DATASET([transform_TopBusinessRecsLNOnlyCreditReport()]);
 	
+	// use the restricted topbusiness records only for the LNOnlyBusinessCreditReport option.
+	// the other LNOnly... options will use the larger set of records
 	final_recs := if (inmod.BusinessCreditReportType = BusinessCredit_Services.Constants.LNOnlyBusinessCreditReport, 
 	                                  final_recsLNOnlyCreditReport, final_recsDefault );
 

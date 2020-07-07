@@ -1,6 +1,6 @@
-﻿import risk_indicators, ut, daybatchPCNSR, Models, easi, gateway, Suppress, Doxie, STD;
+﻿import risk_indicators, ut, daybatchPCNSR, Models, easi, gateway, Suppress, Doxie, STD, RiskWise;
 
-export IT1O_Function(DATASET(Layout_IT1I) inf, dataset(Gateway.Layouts.Config) gateways, unsigned dppa_purpose, unsigned1 glb_purpose, 
+export IT1O_Function(DATASET(RiskWise.Layout_IT1I) inf, dataset(Gateway.Layouts.Config) gateways, unsigned dppa_purpose, unsigned1 glb_purpose, 
 						boolean isUtility=false, boolean ln_branded=false, 
 						string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction, string32 appType,
 						string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
@@ -10,6 +10,8 @@ export IT1O_Function(DATASET(Layout_IT1I) inf, dataset(Gateway.Layouts.Config) g
                         unsigned6 GlobalCompanyId = 0) := function
                         
    mod_access := MODULE(Doxie.IDataAccess)
+      EXPORT dppa := dppa_purpose;
+      EXPORT glb := glb_purpose;
       EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
       EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
       EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
@@ -329,20 +331,24 @@ wIID  := join(inf, iid_results, (LEFT.seq*2) = RIGHT.seq, map_iid_results(left, 
 		self := le;
 	end;
 
-	hous_recs := join(wIID, DayBatchPCNSR.Key_PCNSR_DID, 
+	hous_recs_unsuppressed := join(wIID, DayBatchPCNSR.Key_PCNSR_DID, 
 					left.iid.did!=0 and keyed(right.did=left.iid.did), 
 					get_household(left, right), left outer, ATMOST(keyed(right.did=left.iid.did), RiskWise.max_atmost), keep(50));
 	
-    hous_recs_suppressed := Suppress.MAC_SuppressSource(hous_recs, mod_access);	
-    
-    hous_recs_formatted := PROJECT(hous_recs_suppressed, TRANSFORM(xlayout,
-                                                  SELF := LEFT));
+    hous_recs_flagged := Suppress.MAC_FlagSuppressedSource(hous_recs_unsuppressed, mod_access);
+
+	hous_recs := PROJECT(hous_recs_flagged, TRANSFORM(xlayout, 
+		self.hownstatusflag := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.hownstatusflag);
+		self.estincome := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.estincome);
+		self.refresh_date := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.refresh_date);
+		SELF := LEFT;
+	)); 
                                                   
 	xlayout roll_hous(xlayout le, xlayout rt) := transform
 		self := if(le.refresh_date > rt.refresh_date, le, rt); 
 	end;
 	
-	groupedHouse   := group(sort(ungroup(hous_recs_formatted),seq),seq);
+	groupedHouse   := group(sort(ungroup(hous_recs),seq),seq);
 	wHouseHold   := rollup(groupedHouse, true, roll_hous(left, right));
 // end demographic
 

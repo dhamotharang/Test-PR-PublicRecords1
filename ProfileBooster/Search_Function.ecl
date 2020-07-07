@@ -1,20 +1,31 @@
 ﻿import 	_Control, address, Address_Attributes, avm_v2, dma, doxie, Gateway, LN_PropertyV2_Services, mdr, ProfileBooster, 
-				Riskwise, Risk_Indicators, Relationship, aid, std, dx_header;
+				Riskwise, Risk_Indicators, Relationship, aid, std, dx_header, Suppress;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Search_Function(DATASET(ProfileBooster.Layouts.Layout_PB_In) PB_In, 
-																						string50 DataRestrictionMask,
-																						string50 DataPermissionMask,
-																						string8 AttributesVersion, 
-                                            boolean domodel=false,
-                                            string modelname = ''
-                                            ) := FUNCTION
+												string50 DataRestrictionMask,
+												string50 DataPermissionMask,
+												string8 AttributesVersion, 
+												boolean domodel=false,
+												string modelname = '',
+												unsigned1 LexIdSourceOptout = 1,
+												string TransactionID = '',
+												string BatchUID = '',
+												unsigned6 GlobalCompanyId = 0,
+												unsigned1 GLBA = 0,
+												unsigned1 DPPA = 0
+												) := FUNCTION
+
+mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT glb := GLBA;
+	EXPORT dppa := ^.DPPA;
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
 
 BOOLEAN DEBUG := FALSE;
-
 	isFCRA 			:= false;
-	GLBA 				:= 0;
-	DPPA 				:= 0;
 	BSOptions := Risk_Indicators.iid_constants.BSOptions.RetainInputDID;
 	bsversion := 50;
 	append_best := 0;	
@@ -40,10 +51,10 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		mname  			:= l.Name_Middle;
 		lname  			:= l.Name_Last ;
 		suffix 			:= l.Name_Suffix ;
-		self.fname  := stringlib.stringtouppercase(fname);
-		self.mname  := stringlib.stringtouppercase(mname);
-		self.lname  := stringlib.stringtouppercase(lname);
-		self.suffix := stringlib.stringtouppercase(suffix);
+		self.fname  := Std.Str.touppercase(fname);
+		self.mname  := Std.Str.touppercase(mname);
+		self.lname  := Std.Str.touppercase(lname);
+		self.suffix := Std.Str.touppercase(suffix);
 		
 		addr_value 	:= trim(l.street_addr);
 		clean_a2 		:= Risk_Indicators.MOD_AddressClean.clean_addr(addr_value, l.City_name, l.st, l.z5);
@@ -69,7 +80,7 @@ Risk_Indicators.Layout_Input into(PB_In l) := TRANSFORM
 		county          		 := Address.CleanFields(clean_a2).county;
 		self.county          := county[3..5]; //bytes 1-2 are state code, 3-5 are county number
 		self.geo_blk         := Address.CleanFields(clean_a2).geo_blk;
-		self.Phone10				 := StringLib.StringFilter(l.Phone10, '0123456789');
+		self.Phone10				 := Std.Str.Filter(l.Phone10, '0123456789');
 		self := [];
 	END;
 
@@ -92,8 +103,8 @@ end;
 
 r_layout_input_PlusRaw	prep_for_AID(PB_In le)	:=
 transform
-	self.Line1		:=	trim(stringlib.stringtouppercase(le.street_addr));
-	self.LineLast	:=	address.addr2fromcomponents(stringlib.stringtouppercase(le.City_name), stringlib.stringtouppercase(le.St),  le.Z5);  // );, uppercase and trim city and state, zip5 only
+	self.Line1		:=	trim(Std.Str.touppercase(le.street_addr));
+	self.LineLast	:=	address.addr2fromcomponents(Std.Str.touppercase(le.City_name), Std.Str.touppercase(le.St),  le.Z5);  // );, uppercase and trim city and state, zip5 only
 	self.rawAID			:=	0;
 	self	:=	le;
 end;
@@ -126,11 +137,11 @@ Risk_Indicators.Layout_Input prep_for_thor(my_dataset_with_address_cache l) := T
 		mname  			:= l.Name_Middle;
 		lname  			:= l.Name_Last ;
 		suffix 			:= l.Name_Suffix ;
-		self.fname  := stringlib.stringtouppercase(fname);
-		self.mname  := stringlib.stringtouppercase(mname);
-		self.lname  := stringlib.stringtouppercase(lname);
-		self.suffix := stringlib.stringtouppercase(suffix);
-		self.Phone10				 := StringLib.StringFilter(l.Phone10, '0123456789');		
+		self.fname  := Std.Str.touppercase(fname);
+		self.mname  := Std.Str.touppercase(mname);
+		self.lname  := Std.Str.touppercase(lname);
+		self.suffix := Std.Str.touppercase(suffix);
+		self.Phone10				 := Std.Str.Filter(l.Phone10, '0123456789');		
 		
 		addr_value 	:= trim(l.street_addr);
 		self.in_streetAddress:= addr_value;
@@ -166,13 +177,16 @@ Risk_Indicators.Layout_Input prep_for_thor(my_dataset_with_address_cache l) := T
   did_prepped_output := ungroup(Risk_Indicators.iid_getDID_prepOutput_THOR(iid_prep, DPPA, GLBA, isFCRA, bsversion, DataRestrictionMask, append_best, gateways, BSOptions));
 #ELSE
 	iid_prep :=iid_prep_roxie;
-  did_prepped_output := ungroup(risk_indicators.iid_getDID_prepOutput(iid_prep, DPPA, GLBA, isFCRA, bsversion, DataRestrictionMask, append_best, gateways, BSOptions));
+  did_prepped_output := ungroup(risk_indicators.iid_getDID_prepOutput(iid_prep, DPPA, GLBA, isFCRA, bsversion, DataRestrictionMask, append_best, gateways, BSOptions, mod_access));
 #END
 
 // ********************************************************************
 // Get the DID and Append the Input Account Number
 // ********************************************************************
-	with_DID := JOIN(distribute(PB_In, seq), distribute(did_prepped_output, seq), 
+	with_DID := JOIN(distribute(PB_In, seq), distribute(did_prepped_output(DID<>0), seq), 
+									LEFT.seq = RIGHT.seq, TRANSFORM(Risk_Indicators.Layout_Output, SELF.Account := LEFT.AcctNo; SELF := RIGHT), local);
+									
+	without_DID := JOIN(distribute(PB_In, seq), distribute(did_prepped_output(DID=0), seq), 
 									LEFT.seq = RIGHT.seq, TRANSFORM(Risk_Indicators.Layout_Output, SELF.Account := LEFT.AcctNo; SELF := RIGHT), local);
 
 
@@ -220,28 +234,44 @@ donotmail_key := dma.key_DNM_Name_Address;
 		withDoNotMail := withDoNotMail_roxie;
 	#END
 	
-  withVerification := ProfileBooster.getVerification(withDoNotMail);
+  withVerification := ProfileBooster.getVerification(withDoNotMail, mod_access);
 
 //Search Death Master by DID. Set 2 dates (1 with SSA permission and 1 not) and choose appropriately 
-	ProfileBooster.Layouts.Layout_PB_Shell getDeceasedDID(withVerification le, Doxie.key_Death_masterV2_DID ri) := transform
+	{ProfileBooster.Layouts.Layout_PB_Shell, UNSIGNED4 global_sid} getDeceasedDID(withVerification le, Doxie.key_Death_masterV2_ssa_DID ri) := transform
+	    SELF.global_sid := ri.global_sid;
 		SELF.dod 		:= if(ri.src <> MDR.sourceTools.src_Death_Restricted, (UNSIGNED)ri.dod8, 0);  //excludes SSA 
 		SELF.dodSSA := (UNSIGNED)ri.dod8;  //unrestricted so includes SSA
 		self 	:= le;
 	end;
 
-	withDeceasedDID_roxie := join(withVerification, Doxie.key_Death_masterV2_ssa_DID,
+	withDeceasedDID_roxie_unsuppressed := join(withVerification, Doxie.key_Death_masterV2_ssa_DID,
 									left.DID <> 0 and
 									(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND									
 									keyed(left.DID = right.l_did),
 									getDeceasedDID(left, right), left outer, keep(200), ATMOST(RiskWise.max_atmost));
+	
+	withDeceasedDID_roxie_flagged := Suppress.MAC_FlagSuppressedSource(withDeceasedDID_roxie_unsuppressed, mod_access);
 
-	withDeceasedDID_thor := join(distribute(withVerification, did), 
+	withDeceasedDID_roxie := PROJECT(withDeceasedDID_roxie_flagged, TRANSFORM(ProfileBooster.Layouts.Layout_PB_Shell, 
+		SELF.dod 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dod);
+		SELF.dodSSA := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dodSSA);
+    SELF := LEFT;
+)); 
+
+	withDeceasedDID_thor_unsuppressed := join(distribute(withVerification, did), 
 														 distribute(pull(Doxie.key_Death_masterV2_ssa_DID), l_did),
 									left.DID <> 0 and
 									(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND									
 									left.DID = right.l_did,
 									getDeceasedDID(left, right), left outer, keep(200), local);
 
+	withDeceasedDID_thor_flagged := Suppress.MAC_FlagSuppressedSource(withDeceasedDID_thor_unsuppressed, mod_access);
+
+	withDeceasedDID_thor := PROJECT(withDeceasedDID_thor_flagged, TRANSFORM(ProfileBooster.Layouts.Layout_PB_Shell, 
+		SELF.dod 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dod);
+		SELF.dodSSA := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.dodSSA);
+    SELF := LEFT;
+)); 
 	#IF(onThor)
 		withDeceasedDID := withDeceasedDID_thor;
 	#ELSE
@@ -260,7 +290,8 @@ donotmail_key := dma.key_DNM_Name_Address;
   rolledDeceased := rollup(sortedDeceased, rollDeceased(left,right), seq);
 
 //join to the Infutor key to get marital status and gender
-	ProfileBooster.Layouts.Layout_PB_Shell getInfutor(rolledDeceased le, ProfileBooster.Key_Infutor_DID ri ) := TRANSFORM
+	{ProfileBooster.Layouts.Layout_PB_Shell, UNSIGNED4 global_sid} getInfutor(rolledDeceased le, ProfileBooster.Key_Infutor_DID ri ) := TRANSFORM
+		self.global_sid := ri.global_sid;
 		self.marital_status	:= ri.marital_status;
 		self.gender					:= ri.gender;
 		self.DOB						:= if(le.DOB = '', ri.DOB, le.DOB);
@@ -269,18 +300,36 @@ donotmail_key := dma.key_DNM_Name_Address;
 		self 								:= le;
 	END;
 	
-	withInfutor_roxie := join(rolledDeceased, ProfileBooster.Key_Infutor_DID,
+	withInfutor_roxie_unsuppressed := join(rolledDeceased, ProfileBooster.Key_Infutor_DID,
 		keyed(left.DID = right.DID), 
 		getInfutor(left,right), left outer, keep(1)
 	);
 	
-	withInfutor_thor := join(distribute(rolledDeceased, did), 
+	withInfutor_roxie_flagged := Suppress.MAC_FlagSuppressedSource(withInfutor_roxie_unsuppressed, mod_access);
+
+	withInfutor_roxie := PROJECT(withInfutor_roxie_flagged, TRANSFORM(ProfileBooster.Layouts.Layout_PB_Shell, 
+		self.marital_status	:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.marital_status);
+		self.gender				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.gender);
+		self.DOB				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.DOB);
+		self.ProspectAge	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.ProspectAge);
+    SELF := LEFT;)); 
+
+	withInfutor_thor_unsuppressed := join(distribute(rolledDeceased, did), 
 													 distribute(pull(ProfileBooster.Key_Infutor_DID), did),
 		left.DID = right.DID, 
 		getInfutor(left,right), left outer, keep(1), local)
 	// ;	
 	: PERSIST('~PROFILEBOOSTER::with_infutor_thor_full'); // remove persists because low on disk space and it's rebuilding persist file each time anyway
 	
+	withInfutor_thor_flagged := Suppress.MAC_FlagSuppressedSource(withInfutor_thor_unsuppressed, mod_access);
+
+	withInfutor_thor := PROJECT(withInfutor_thor_flagged, TRANSFORM(ProfileBooster.Layouts.Layout_PB_Shell, 
+		self.marital_status	:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.marital_status);
+		self.gender				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.gender);
+		self.DOB				:= IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.DOB);
+		self.ProspectAge	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.ProspectAge);
+    SELF := LEFT;)); 
+
 	#IF(onThor)
 		withInfutor := withInfutor_thor;
 	#ELSE
@@ -405,7 +454,7 @@ end;
 	RelativeMax := 300;
 	withCurrBus_dids := PROJECT(withCurrBus_dedp, 
 		TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
-	rellyids := Relationship.proc_GetRelationship(withCurrBus_dids,TopNCount:=RelativeMax,
+	rellyids := Relationship.proc_GetRelationshipNeutral(withCurrBus_dids,TopNCount:=RelativeMax,
 		RelativeFlag:=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RelativeMax, doThor := onThor).result; 
 	
 	relativeDIDs_roxie := join(withCurrBus, rellyids,
@@ -451,7 +500,7 @@ end;
 
 //--------- Get age of household members and relatives -------------//
 
-	ageRecs 		:= ProfileBooster.getAge(slimShell(DID <> DID2)); //we already have age of prospect so exclude them here
+	ageRecs 		:= ProfileBooster.getAge(slimShell(DID <> DID2), mod_access); //we already have age of prospect so exclude them here
 		
 	dedupHH 	 	:= dedup(sort(ageRecs(rec_type=ProfileBooster.Constants.recType.Relative), seq, HHID), seq, HHID); 
 
@@ -481,7 +530,7 @@ end;
 	dk := choosen(dx_header.key_max_dt_last_seen(), 1);
 	hdrBuildDate01 := dk[1].max_date_last_seen[1..6]+'01';
 
-	studentRecs := ProfileBooster.getStudent(slimShell);
+	studentRecs := ProfileBooster.getStudent(slimShell, mod_access);
 	
 	withStudent := join(withAge, studentRecs,
 												left.seq = right.seq and
@@ -519,7 +568,7 @@ end;
 																	
 //--------- Watercraft-------------//
 
-	watercraftRecs := ProfileBooster.getWatercraft(slimShell);
+	watercraftRecs := ProfileBooster.getWatercraft(slimShell, mod_access);
 	
 	withWatercraft := join(withStudent, watercraftRecs,
 												left.seq = right.seq and
@@ -566,7 +615,7 @@ end;
 
 //--------- Vehicles -------------//
 
-	vehicleRecs := ProfileBooster.getVehicles(slimShell);
+	vehicleRecs := ProfileBooster.getVehicles(slimShell, mod_access);
 	
 	withVehicles := join(withAircraft, vehicleRecs,
 												left.seq = right.seq and
@@ -609,7 +658,7 @@ end;
 																	self.historydate 	:= left.historydate;
 																	self 							:= [])), seq);
 	
-	derogRecs := ProfileBooster.getDerogs_Hist(preDerogs);
+	derogRecs := ProfileBooster.getDerogs_Hist(preDerogs, mod_access);
 
 	withDerogs := join(withVehicles, derogRecs,
 												left.seq = right.seq and
@@ -709,7 +758,7 @@ end;
 
 //--------- Professional License -------------//
 
-	profLicRecs := ProfileBooster.getProfLic(slimShell);
+	profLicRecs := ProfileBooster.getProfLic(slimShell, mod_access);
 	
 	withProfLic := join(withDerogs, profLicRecs,
 												left.seq = right.seq and
@@ -723,7 +772,7 @@ end;
 
 //--------- People at Work -------------//
 
-	busnAssocRecs := ProfileBooster.getBusnAssoc(slimShell);
+	busnAssocRecs := ProfileBooster.getBusnAssoc(slimShell, mod_access);
 	
 	withBusnAssoc := join(withProfLic, busnAssocRecs,
 												left.seq = right.seq and
@@ -1404,7 +1453,7 @@ prop_common_distr := distribute(prop_common, did);
 // *******************************************************************************************************************
 // Now that we have all necessary data in the PBShell, pass it to the attributes function to produce the attributes
 // *******************************************************************************************************************
-  attributes := if(StringLib.StringToUpperCase(AttributesVersion) in ProfileBooster.Constants.setValidAttributeVersions OR domodel, //if valid attributes version requested, go get attributes
+  attributes := if(Std.Str.ToUpperCase(AttributesVersion) in ProfileBooster.Constants.setValidAttributeVersions OR domodel, //if valid attributes version requested, go get attributes
 									 ProfileBooster.getAttributes(withAVMMed, DataPermissionMask),
 									 emptyAttr);  
 									 
@@ -1438,10 +1487,204 @@ ProfileBooster.Layouts.Layout_PB_BatchOut Blank_minors(ProfileBooster.Layouts.La
   self := le;
 END;
 
+FinalWithDID := PROJECT(with_mover_model, Blank_minors(left));
 
+ProfileBooster.Layouts.Layout_PB_BatchOut xfm_NoDIDs(Risk_Indicators.Layout_Output le) := TRANSFORM
+  self.seq                                                := le.seq;
+  self.AcctNo                                             := le.Account;
+  self.LexID                                              := le.did;
+  self.attributes.version1.DoNotMail                      := '-1';
+  self.attributes.version1.VerifiedProspectFound          := '-1';
+  self.attributes.version1.VerifiedName                   := '-1';
+  self.attributes.version1.VerifiedSSN                    := '-1';
+  self.attributes.version1.VerifiedPhone                  := '-1';
+  self.attributes.version1.VerifiedCurrResMatchIndex      := '-1';
+  self.attributes.version1.ProspectTimeOnRecord           := '-1';
+  self.attributes.version1.ProspectTimeLastUpdate         := '-1';
+  self.attributes.version1.ProspectLastUpdate12Mo         := '-1';
+  self.attributes.version1.ProspectAge                    := '-1';
+  self.attributes.version1.ProspectGender                 := '-1';
+  self.attributes.version1.ProspectMaritalStatus          := '-1';
+  self.attributes.version1.ProspectEstimatedIncomeRange   := '-1';
+  self.attributes.version1.ProspectDeceased               := '-1';
+  self.attributes.version1.ProspectCollegeAttending       := '-1';
+  self.attributes.version1.ProspectCollegeAttended        := '-1';
+  self.attributes.version1.ProspectCollegeProgramType     := '-1';
+  self.attributes.version1.ProspectCollegePrivate         := '-1';
+  self.attributes.version1.ProspectCollegeTier            := '-1';
+  self.attributes.version1.ProspectBankingExperience      := '-1';
+  self.attributes.version1.AssetCurrOwner                 := '-1';
+  self.attributes.version1.PropCurrOwner                  := '-1';
+  self.attributes.version1.PropCurrOwnedCnt               := '-1';
+  self.attributes.version1.PropCurrOwnedAssessedTtl       := '-1';
+  self.attributes.version1.PropCurrOwnedAVMTtl            := '-1';
+  self.attributes.version1.PropTimeLastSale               := '-1';
+  self.attributes.version1.PropEverOwnedCnt               := '-1';
+  self.attributes.version1.PropEverSoldCnt                := '-1';
+  self.attributes.version1.PropSoldCnt12Mo                := '-1';
+  self.attributes.version1.PropSoldRatio                  := '-1';
+  self.attributes.version1.PropPurchaseCnt12Mo            := '-1';
+  self.attributes.version1.PPCurrOwner                    := '-1';
+  self.attributes.version1.PPCurrOwnedCnt                 := '-1';
+  self.attributes.version1.PPCurrOwnedAutoCnt             := '-1';
+  self.attributes.version1.PPCurrOwnedMtrcycleCnt         := '-1';
+  self.attributes.version1.PPCurrOwnedAircrftCnt          := '-1';
+  self.attributes.version1.PPCurrOwnedWtrcrftCnt          := '-1';
+  self.attributes.version1.LifeEvTimeLastMove             := '-1';
+  self.attributes.version1.LifeEvNameChange               := '-1';
+  self.attributes.version1.LifeEvNameChangeCnt12Mo        := '-1';
+  self.attributes.version1.LifeEvTimeFirstAssetPurchase   := '-1';
+  self.attributes.version1.LifeEvTimeLastAssetPurchase    := '-1';
+  self.attributes.version1.LifeEvEverResidedCnt           := '-1';
+  self.attributes.version1.LifeEvLastMoveTaxRatioDiff     := '-1';
+  self.attributes.version1.LifeEvEconTrajectory           := '-1';
+  self.attributes.version1.LifeEvEconTrajectoryIndex      := '-1';
+  self.attributes.version1.ResCurrOwnershipIndex          := '-1';
+  self.attributes.version1.ResCurrAVMValue                := '-1';
+  self.attributes.version1.ResCurrAVMValue12Mo            := '-1';
+  self.attributes.version1.ResCurrAVMRatioDiff12Mo        := '-1';
+  self.attributes.version1.ResCurrAVMValue60Mo            := '-1';
+  self.attributes.version1.ResCurrAVMRatioDiff60Mo        := '-1';
+  self.attributes.version1.ResCurrAVMCntyRatio            := '-1';
+  self.attributes.version1.ResCurrAVMTractRatio           := '-1';
+  self.attributes.version1.ResCurrAVMBlockRatio           := '-1';
+  self.attributes.version1.ResCurrDwellType               := '-1';
+  self.attributes.version1.ResCurrDwellTypeIndex          := '-1';
+  self.attributes.version1.ResCurrMortgageType            := '-1';
+  self.attributes.version1.ResCurrMortgageAmount          := '-1';
+  self.attributes.version1.ResCurrBusinessCnt             := '-1';
+  self.attributes.version1.ResInputOwnershipIndex         := '-1';
+  self.attributes.version1.ResInputAVMValue               := '-1';
+  self.attributes.version1.ResInputAVMValue12Mo           := '-1';
+  self.attributes.version1.ResInputAVMRatioDiff12Mo       := '-1';
+  self.attributes.version1.ResInputAVMValue60Mo           := '-1';
+  self.attributes.version1.ResInputAVMRatioDiff60Mo       := '-1';
+  self.attributes.version1.ResInputAVMCntyRatio           := '-1';
+  self.attributes.version1.ResInputAVMTractRatio          := '-1';
+  self.attributes.version1.ResInputAVMBlockRatio          := '-1';
+  self.attributes.version1.ResInputDwellType              := '-1';
+  self.attributes.version1.ResInputDwellTypeIndex         := '-1';
+  self.attributes.version1.ResInputMortgageType           := '-1';
+  self.attributes.version1.ResInputMortgageAmount         := '-1';
+  self.attributes.version1.ResInputBusinessCnt            := '-1';  
+  self.attributes.version1.CrtRecCnt                      := '-1';
+  self.attributes.version1.CrtRecCnt12Mo                  := '-1';
+  self.attributes.version1.CrtRecTimeNewest               := '-1';
+  self.attributes.version1.CrtRecFelonyCnt                := '-1';
+  self.attributes.version1.CrtRecFelonyCnt12Mo            := '-1';
+  self.attributes.version1.CrtRecFelonyTimeNewest         := '-1';
+  self.attributes.version1.CrtRecMsdmeanCnt               := '-1';
+  self.attributes.version1.CrtRecMsdmeanCnt12Mo           := '-1';
+  self.attributes.version1.CrtRecMsdmeanTimeNewest        := '-1';
+  self.attributes.version1.CrtRecEvictionCnt              := '-1';
+  self.attributes.version1.CrtRecEvictionCnt12Mo          := '-1';
+  self.attributes.version1.CrtRecEvictionTimeNewest       := '-1';
+  self.attributes.version1.CrtRecLienJudgCnt              := '-1';
+  self.attributes.version1.CrtRecLienJudgCnt12Mo          := '-1';
+  self.attributes.version1.CrtRecLienJudgTimeNewest       := '-1';
+  self.attributes.version1.CrtRecLienJudgAmtTtl           := '-1';
+  self.attributes.version1.CrtRecBkrptCnt                 := '-1';
+  self.attributes.version1.CrtRecBkrptCnt12Mo             := '-1';
+  self.attributes.version1.CrtRecBkrptTimeNewest          := '-1';
+  self.attributes.version1.CrtRecSeverityIndex            := '-1';
+  self.attributes.version1.OccProfLicense                 := '-1';
+  self.attributes.version1.OccProfLicenseCategory         := '-1';
+  self.attributes.version1.OccBusinessAssociation         := '-1';
+  self.attributes.version1.OccBusinessAssociationTime     := '-1';
+  self.attributes.version1.OccBusinessTitleLeadership     := '-1';
+  self.attributes.version1.InterestSportPerson            := '-1';  
+  self.attributes.version1.HHTeenagerMmbrCnt              := '-1';
+  self.attributes.version1.HHYoungAdultMmbrCnt            := '-1';
+  self.attributes.version1.HHMiddleAgemmbrCnt             := '-1';
+  self.attributes.version1.HHSeniorMmbrCnt                := '-1';
+  self.attributes.version1.HHElderlyMmbrCnt               := '-1';
+  self.attributes.version1.HHCnt                          := '-1';
+  self.attributes.version1.HHEstimatedIncomeRange         := '-1';
+  self.attributes.version1.HHCollegeAttendedMmbrCnt       := '-1';
+  self.attributes.version1.HHCollege2yrAttendedMmbrCnt    := '-1';
+  self.attributes.version1.HHCollege4yrAttendedMmbrCnt    := '-1';
+  self.attributes.version1.HHCollegeGradAttendedMmbrCnt   := '-1';
+  self.attributes.version1.HHCollegePrivateMmbrCnt        := '-1';
+  self.attributes.version1.HHCollegeTierMmbrHighest       := '-1';
+  self.attributes.version1.HHPropCurrOwnerMmbrCnt         := '-1';
+  self.attributes.version1.HHPropCurrOwnedCnt             := '-1';
+  self.attributes.version1.HHPropCurrAVMHighest           := '-1';
+  self.attributes.version1.HHPPCurrOwnedCnt               := '-1';
+  self.attributes.version1.HHPPCurrOwnedAutoCnt           := '-1';
+  self.attributes.version1.HHPPCurrOwnedMtrcycleCnt       := '-1';
+  self.attributes.version1.HHPPCurrOwnedAircrftCnt        := '-1';
+  self.attributes.version1.HHPPCurrOwnedWtrcrftCnt        := '-1';
+  self.attributes.version1.HHCrtRecMmbrCnt                := '-1';
+  self.attributes.version1.HHCrtRecMmbrCnt12Mo            := '-1';
+  self.attributes.version1.HHCrtRecFelonyMmbrCnt          := '-1';
+  self.attributes.version1.HHCrtRecFelonyMmbrCnt12Mo      := '-1';
+  self.attributes.version1.HHCrtRecMsdmeanMmbrCnt         := '-1';
+  self.attributes.version1.HHCrtRecMsdmeanMmbrCnt12Mo     := '-1';
+  self.attributes.version1.HHCrtRecEvictionMmbrCnt        := '-1';
+  self.attributes.version1.HHCrtRecEvictionMmbrCnt12Mo    := '-1';
+  self.attributes.version1.HHCrtRecLienJudgMmbrCnt        := '-1';
+  self.attributes.version1.HHCrtRecLienJudgMmbrCnt12Mo    := '-1';
+  self.attributes.version1.HHCrtRecLienJudgAmtTtl         := '-1';
+  self.attributes.version1.HHCrtRecBkrptMmbrCnt           := '-1';
+  self.attributes.version1.HHCrtRecBkrptMmbrCnt12Mo       := '-1';
+  self.attributes.version1.HHCrtRecBkrptMmbrCnt24Mo       := '-1';
+  self.attributes.version1.HHOccProfLicMmbrCnt            := '-1';
+  self.attributes.version1.HHOccBusinessAssocMmbrCnt      := '-1';
+  self.attributes.version1.HHInterestSportPersonMmbrCnt   := '-1';  
+  self.attributes.version1.RaATeenageMmbrCnt              := '-1';
+  self.attributes.version1.RaAYoungAdultMmbrCnt           := '-1';
+  self.attributes.version1.RaAMiddleAgeMmbrCnt            := '-1';
+  self.attributes.version1.RaASeniorMmbrCnt               := '-1';
+  self.attributes.version1.RaAElderlyMmbrCnt              := '-1';
+  self.attributes.version1.RaAHHCnt                       := '-1';
+  self.attributes.version1.RaAMmbrCnt                     := '-1';
+  self.attributes.version1.RaAMedIncomeRange              := '-1';
+  self.attributes.version1.RaACollegeAttendedMmbrCnt      := '-1';
+  self.attributes.version1.RaACollege2yrAttendedMmbrCnt   := '-1';
+  self.attributes.version1.RaACollege4yrAttendedMmbrCnt   := '-1';
+  self.attributes.version1.RaACollegeGradAttendedMmbrCnt  := '-1';
+  self.attributes.version1.RaACollegePrivateMmbrCnt       := '-1';
+  self.attributes.version1.RaACollegeTopTierMmbrCnt       := '-1';
+  self.attributes.version1.RaACollegeMidTierMmbrCnt       := '-1';
+  self.attributes.version1.RaACollegeLowTierMmbrCnt       := '-1';
+  self.attributes.version1.RaAPropCurrOwnerMmbrCnt        := '-1';
+  self.attributes.version1.RaAPropOwnerAVMHighest         := '-1';
+  self.attributes.version1.RaAPropOwnerAVMMed             := '-1';
+  self.attributes.version1.RaAPPCurrOwnerMmbrCnt          := '-1';
+  self.attributes.version1.RaAPPCurrOwnerAutoMmbrCnt      := '-1';
+  self.attributes.version1.RaAPPCurrOwnerMtrcycleMmbrCnt  := '-1';
+  self.attributes.version1.RaAPPCurrOwnerAircrftMmbrCnt   := '-1';
+  self.attributes.version1.RaAPPCurrOwnerWtrcrftMmbrCnt   := '-1';
+  self.attributes.version1.RaACrtRecMmbrCnt               := '-1';
+  self.attributes.version1.RaACrtRecMmbrCnt12Mo           := '-1';
+  self.attributes.version1.RaACrtRecFelonyMmbrCnt         := '-1';
+  self.attributes.version1.RaACrtRecFelonyMmbrCnt12Mo     := '-1';
+  self.attributes.version1.RaACrtRecMsdmeanMmbrCnt        := '-1';
+  self.attributes.version1.RaACrtRecMsdmeanMmbrCnt12Mo    := '-1';
+  self.attributes.version1.RaACrtRecEvictionMmbrCnt       := '-1';
+  self.attributes.version1.RaACrtRecEvictionMmbrCnt12Mo   := '-1';
+  self.attributes.version1.RaACrtRecLienJudgMmbrCnt       := '-1';
+  self.attributes.version1.RaACrtRecLienJudgMmbrCnt12Mo   := '-1';
+  self.attributes.version1.RaACrtRecLienJudgAmtMax        := '-1';
+  self.attributes.version1.RaACrtRecBkrptMmbrCnt36Mo      := '-1';
+  self.attributes.version1.RaAOccProfLicMmbrCnt           := '-1';
+  self.attributes.version1.RaAOccBusinessAssocMmbrCnt     := '-1';
+  self.attributes.version1.RaAInterestSportPersonMmbrCnt  := '-1';
+  // new attributes added for bug RQ-13721
+  self.attributes.version1.PPCurrOwnedAutoVIN             := '-1';
+  self.attributes.version1.PPCurrOwnedAutoYear            := '-1';
+  self.attributes.version1.PPCurrOwnedAutoMake            := '-1';
+  self.attributes.version1.PPCurrOwnedAutoModel           := '-1';
+  self.attributes.version1.PPCurrOwnedAutoSeries          := '-1';
+  self.attributes.version1.PPCurrOwnedAutoType            := '-1';
+  self                                                    := [];
+END;
 
-Final := PROJECT(with_mover_model, Blank_minors(left));                   
-     
+FinalWithoutDID := PROJECT(without_DID, xfm_NoDIDs(left));
+
+Final := SORT(FinalWithDID + FinalWithoutDID, seq);                   
+// output( FinalWithDID, named('FinalWithDID'));    
+// output( FinalWithoutDID, named('FinalWithoutDID'));    
 // output(p_address,,'~dvstemp::out::property_thor_testing_inputs::p_address_' + thorlib.wuid());
 // output(ids_only,,'~dvstemp::out::property_thor_testing_inputs::ids_only_' + thorlib.wuid());
 		
@@ -1454,6 +1697,7 @@ Final := PROJECT(with_mover_model, Blank_minors(left));
 	  //output(with_mover_model, named('with_mover_model'));
 	 // output(iid_prep, named('iid_prep'));
    // output(with_DID, named('with_DID'));
+   // output(without_DID, named('without_DID'));
   // output(withDoNotMail, named('withDoNotMail'));
   // output(withVerification, named('withVerification'));
   // output(withDeceasedDID, named('withDeceasedDID'));

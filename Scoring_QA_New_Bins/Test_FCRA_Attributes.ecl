@@ -390,7 +390,7 @@ rpt24:=Scoring_QA_New_Bins.test_rvv3_experian_batch_attr_report(ip,a1,b1);
    // jn;
 	 dedup_jn:=dedup(jn,all);
 	 
-	 	out_file := output(choosen(dedup_jn,all), ,'~RiskView_Attributes_Reports::out::AttributeDistribution' + a1, CSV(heading(single), quote('"')), overwrite,EXPIRE(10));
+	 	out_file := output(choosen(dedup_jn,all), ,'~RiskView_Attributes_Reports::out::AttributeDistribution' + a1, CSV(heading(single), quote('"')), overwrite);
 			
 			
 				string out_file_layout := '';
@@ -428,7 +428,7 @@ rpt24:=Scoring_QA_New_Bins.test_rvv3_experian_batch_attr_report(ip,a1,b1);
 							
 						filtered_dedup_jn:=dedup_jn(file_version in ['ITA_V3_Capone' , 'RISKVIEW_v3_capone_prescreen' , 'RISKVIEW_v2_capone_prescreen', 'RISKVIEW_v5_capone_prescreen']);
 							
-			out_file1 := output(choosen(filtered_dedup_jn,all), ,'~RiskView_Attributes_Reports::out::AttributeDistribution1' + a1, CSV(heading(single), quote('"')), overwrite,EXPIRE(10));
+			out_file1 := output(choosen(filtered_dedup_jn,all), ,'~RiskView_Attributes_Reports::out::AttributeDistribution1' + a1, CSV(heading(single), quote('"')), overwrite);
 			
 			
 				string out_file_layout1 := '';

@@ -9,6 +9,7 @@
 		isIncludeEmail 					:= BParams.IncludeEmail;
 		isIncludeDeceased				:= BParams.IncludeDeceased;
 		isIncludeGender 				:= BParams.IncludeGender;
+		isIncludeDOB 						:= BParams.IncludeDOB;
 		isIncludeSSN 						:= BParams.IncludeSSN;
 		//Alternate to PhoneFinder
 		// isPhoneInfoAlternative	:= MemberPoint.IParam.IsPhoneFinderOperation;
@@ -129,7 +130,7 @@
 			paddedSSN:= INTFORMAT((UNSIGNED)currentSSN,9,1);
 			SELF.ssn:= IF(isIncludeSSN AND (paddedSSN <> '000000000'), paddedSSN, '');
 			currDOB := if(rowBest.best_dob <> '' AND rowBest.best_dob <> '0',rowBest.best_dob ,rowBest.dob );
-			SELF.dob := if((UNSIGNED)currDOB > 0 ,currDOB ,'');
+			SELF.dob := if(isIncludeDOB AND (UNSIGNED)currDOB > 0 ,currDOB ,'');
 			// Computed Address 
 			SELF.address := rowAddress.address;
 			SELF.city := rowAddress.city;
@@ -169,7 +170,7 @@
 			isPartial:= (LENGTH(TRIM(adultsOrGuardians.SSN)) < 5);
 			SELF.name_score:= IF(isDerived, '', (STRING)rowBest.verify_best_name);
 			SELF.ssn_score:= IF(~isPartial AND isIncludeSSN AND ~isDerived, (STRING)rowBest.verify_best_ssn, '');
-			SELF.dob_score:= IF(isDerived, '', (STRING)rowBest.verify_best_dob);
+			SELF.dob_score:= IF(~isDerived AND isIncludeDOB, (STRING)rowBest.verify_best_dob, '');
 			// Death
 			SELF.Date_of_death := rowDeceased.DOD8;
 			SELF.dcd_match_code := rowDeceased.matchcode; // this will be death match code + 1 string for 'D' or DOB matches

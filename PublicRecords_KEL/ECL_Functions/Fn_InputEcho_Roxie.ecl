@@ -11,13 +11,15 @@ EXPORT Fn_InputEcho_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout_
 		SELF.P_InpNameFirst:= le.FirstName;
 		SELF.P_InpNameMid:= le.MiddleName;
 		SELF.P_InpNameLast:= le.LastName;			
-		SELF.P_InpAddrLine1 := le.StreetAddress;
+		SELF.P_InpAddrLine1 := le.StreetAddressLine1;
+		SELF.P_InpAddrLine2 := le.StreetAddressLine2;
 		SELF.P_InpAddrCity := le.City;
 		SELF.P_InpAddrState := le.State; 
 		SELF.P_InpAddrZip := le.Zip;
 		SELF.P_InpPhoneHome := le.HomePhone;
 		SELF.P_InpPhoneWork := le.WorkPhone;
 		SELF.P_InpEmail := le.Email; 
+		SELF.P_InpIPAddr := le.IPAddress; 
 		SELF.P_InpArchDt := le.historydate;
 		SELF.P_InpSSN := le.SSN;
 		SELF.P_InpDOB := le.DateOfBirth;

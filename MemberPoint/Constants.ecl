@@ -8,6 +8,13 @@
 			EXPORT STRING1 WaterfallPhones:= 'W';
 		END;
 		
+		EXPORT EmailTransactionType:= MODULE
+			EXPORT STRING1 Basic:= '1';
+			EXPORT BOOLEAN Basic_UseDMEmailSourcesOnly:= TRUE;
+			EXPORT STRING1 Premium:= '2';
+			EXPORT BOOLEAN Premium_UseDMEmailSourcesOnly:= FALSE;
+		END;
+		
 		EXPORT PhoneFilterType:= MODULE, VIRTUAL
 			EXPORT STRING1 CellPhones:= 'C';
 			EXPORT STRING1 Landlines:= 'L';
@@ -40,12 +47,22 @@
 			export boolean IncludePhone := true;
 			export boolean IncludeAddress := true;
 			export boolean IncludeDeceased := true;
+			export boolean IncludeDOB := true;
 			export boolean IncludeSSN := true;
 			export boolean IncludeGender := true;
 			export string25 Phones_Score_Model := 'PHONESCORE_V2';
 			export string1	AddressConfidenceThreshold := 'M';
 			export string1	PhonesReturnCutoff := 'M';
 			
+			//Reportservice defaults
+			export boolean rpt_IncludeAddress := false;
+			export boolean rpt_IncludeDeceased := false;
+			export boolean rpt_IncludeDOB := false;
+			export boolean rpt_IncludeGender := false;
+			export boolean rpt_IncludeSSN := false;
+			export boolean rpt_IncludeEmail := false;
+			export boolean rpt_IncludePhone := false;
+
 			//MP Enhancements
 
 			EXPORT STRING5 IndustryClass := '';
@@ -109,6 +126,7 @@
 			EXPORT BOOLEAN NoDIDAppend:= FALSE;
 			EXPORT BOOLEAN PartialNameMatchCodes:= TRUE;
 			//Email: All common
+			EXPORT BOOLEAN UseDMEmailSourcesOnly := FALSE;
 			//PhoneFinder
 			EXPORT UNSIGNED PenaltyThreshold:= 10;
 			EXPORT STRING1 PhoneFilter:= PhoneFilterType.None;
@@ -157,7 +175,7 @@
 				{'SAD',14},{'SA',13},{'SZD',12},{'SZ',11},{'SCD',10},{'SC',9},{'ANZD',8},{'ANZ',7},{'ANCD',6},
 				{'ANC',5},{'SD',4},{'S',3},{'AND',2},{'AN',1}],MemberPoint.Layouts.sortRec);
 																				
-		export PhoneScore         := ENUM(UNSIGNED, LowMin = 187,LowMax = 310 ,MidMin = 311,MidMax = 579 ,HighMin = 580);
+		export PhoneScore         := ENUM(UNSIGNED, LowMin = 350,LowMax = 419 ,MidMin = 420,MidMax = 539 ,HighMin = 540);
 		export AdlBestAddressScore := ENUM(LowMin = 1,LowMax = 59 ,MidMin = 60,MidMax = 79 ,HighMin = 80, HighMax = 100 ,MidAverage = 65);
 		export BestAddressScore 	 := ENUM(LowMin = 1,LowMax = 39 ,MidMin = 40,MidMax = 79 ,HighMin = 80, HighMax = 100 );
 

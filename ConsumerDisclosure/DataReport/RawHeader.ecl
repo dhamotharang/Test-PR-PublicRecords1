@@ -229,6 +229,7 @@ header_combined_data := project(wUnitCount, transform(Riskwise.layouts_vru.Layou
 Layout_working combineHeaderCorrections(Riskwise.layouts_vru.Layout_Header_Data le, header_corr ri) := transform
   
   // correct fields where a correction was done or suppressed
+  self.title := if(ri.head.title<>'' or ri.blankout[risk_indicators.iid_constants.suppress.title]='1', ri.head.title, le.title);
   self.fname := if(ri.head.fname<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Fname]='1', ri.head.fname, le.fname);
   self.mname := if(ri.head.mname<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Mname]='1', ri.head.mname, le.mname);
   self.lname := if(ri.head.lname<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Lname]='1', ri.head.lname, le.lname);
@@ -246,8 +247,13 @@ Layout_working combineHeaderCorrections(Riskwise.layouts_vru.Layout_Header_Data 
   self.zip4 := if(ri.head.zip4<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Zip4]='1', ri.head.zip4, le.zip4);
   self.ssn := if(ri.head.ssn<>'' or ri.blankout[risk_indicators.iid_constants.suppress.SSN]='1', ri.head.ssn, le.ssn);
   self.dob := if(ri.head.dob<>0 or ri.blankout[risk_indicators.iid_constants.suppress.DOB]='1', ri.head.dob, le.dob);
+  self.dod := if(ri.head.dod<>0 or ri.blankout[risk_indicators.iid_constants.suppress.DOD]='1', ri.head.dod, le.dod);
   
   // check to see what was changed to what and if changed, then populate the fields for the next project
+  titleCorrected := ri.head.title<>'' or ri.blankout[risk_indicators.iid_constants.suppress.title]='1';	// correction field will only be populated if a correction was done
+  self.oldTitle := if(titleCorrected, le.title, '');			// only populate the old if there is a new
+  self.newTitle := if(titleCorrected, ri.head.title, '');	// only populate the new if there is a new
+
   fnameCorrected := ri.head.fname<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Fname]='1';	// correction field will only be populated if a correction was done
   self.oldFname := if(fnameCorrected, le.fname, '');			// only populate the old if there is a new
   self.newFname := if(fnameCorrected, ri.head.fname, '');	// only populate the new if there is a new
@@ -339,6 +345,10 @@ Layout_working combineHeaderCorrections(Riskwise.layouts_vru.Layout_Header_Data 
   dobCorrected := ri.head.dob<>0 or ri.blankout[risk_indicators.iid_constants.suppress.DOB]='1';	// correction field will only be populated if a correction was done
   self.oldDOB := if(dobCorrected, (string)le.dob, '');			// only populate the old if there is a new
   self.newDOB := if(dobCorrected, (string)ri.head.dob, '');	// only populate the new if there is a new
+
+  dodCorrected := ri.head.dod<>0 or ri.blankout[risk_indicators.iid_constants.suppress.DOD]='1';	// correction field will only be populated if a correction was done
+  self.oldDOD := if(dodCorrected, (string)le.dod, '');			// only populate the old if there is a new
+  self.newDOD := if(dodCorrected, (string)ri.head.dod, '');	// only populate the new if there is a new
 
   // set the flags
   self.addr_flags.dwelltype := if(ri.addr_flags.dwelltype<>'' or ri.blankout[risk_indicators.iid_constants.suppress.DwellType]='1', ri.addr_flags.dwelltype, le.addr_flags.dwelltype);
@@ -452,6 +462,7 @@ before_CorrOnly := join(header_combined_data, header_corr,
                       limit(0));
 
 Layout_working correctFutureData(unCorrOnly le, corrOnly ri) := transform
+  self.title := if((trim(ri.oldTitle)<>'' or trim(ri.newTitle)<>'') and ri.oldTitle=le.title, ri.newTitle, le.title);
   self.fname := if((trim(ri.oldFname)<>'' or trim(ri.newFname)<>'') and ri.oldFname=le.fname, ri.newFname, le.fname);
   self.mname := if((trim(ri.oldMname)<>'' or trim(ri.newMname)<>'') and ri.oldMname=le.mname, ri.newMname, le.mname);
   self.lname := if((trim(ri.oldLname)<>'' or trim(ri.newLname)<>'') and ri.oldLname=le.lname, ri.newLname, le.lname);
@@ -476,6 +487,7 @@ Layout_working correctFutureData(unCorrOnly le, corrOnly ri) := transform
   
   self.ssn := if((trim(ri.oldSSN)<>'' or trim(ri.newSSN)<>'') and ri.oldSSN=le.ssn, ri.newSSN, le.ssn);
   self.dob := if((trim(ri.oldDOB)<>'' or trim(ri.newDOB)<>'') and ri.oldDOB=(string)le.dob, (unsigned)ri.newDOB, le.dob);
+  self.dod := if((trim(ri.oldDOD)<>'' or trim(ri.newDOD)<>'') and ri.oldDOD=(string)le.dod, (unsigned)ri.newDOD, le.dod);
   
   self.addr_flags.dwellType := if((trim(ri.oldDwellType)<>'' or trim(ri.newDwellType)<>'') and sameAddr, ri.newDwellType, le.addr_flags.dwellType);
   self.addr_flags.valid := if((trim(ri.oldValid)<>'' or trim(ri.newValid)<>'') and sameAddr, ri.newValid, le.addr_flags.Valid);
@@ -490,6 +502,8 @@ Layout_working correctFutureData(unCorrOnly le, corrOnly ri) := transform
   self.addr_flags.mail_usage := if((trim(ri.oldmail_usage)<>'' or trim(ri.newmail_usage)<>'') and sameAddr, ri.newmail_usage, le.addr_flags.mail_usage);
   
   // keep the old/new fields for below rollup
+  self.oldTitle := if(sameAddr and (trim(ri.oldTitle)<>'' or trim(ri.newTitle)<>''), ri.oldTitle, '');
+  self.newTitle := if(sameAddr and (trim(ri.oldTitle)<>'' or trim(ri.newTitle)<>''), ri.newTitle, '');
   self.oldFname := if(sameAddr and (trim(ri.oldFname)<>'' or trim(ri.newFname)<>''), ri.oldFname, '');
   self.newFname := if(sameAddr and (trim(ri.oldFname)<>'' or trim(ri.newFname)<>''), ri.newFname, '');
   self.oldMname := if(sameAddr and (trim(ri.oldMname)<>'' or trim(ri.newMname)<>''), ri.oldMname, '');
@@ -524,6 +538,8 @@ Layout_working correctFutureData(unCorrOnly le, corrOnly ri) := transform
   self.newSSN := if(sameAddr and (trim(ri.oldSSN)<>'' or trim(ri.newSSN)<>''), ri.newSSN, '');
   self.oldDOB := if(sameAddr and (trim(ri.oldDOB)<>'' or trim(ri.newDOB)<>''), ri.oldDOB, '');
   self.newDOB := if(sameAddr and (trim(ri.oldDOB)<>'' or trim(ri.newDOB)<>''), ri.newDOB, '');
+  self.oldDOD := if(sameAddr and (trim(ri.oldDOD)<>'' or trim(ri.newDOD)<>''), ri.oldDOD, '');
+  self.newDOD := if(sameAddr and (trim(ri.oldDOD)<>'' or trim(ri.newDOD)<>''), ri.newDOD, '');
   self.oldDwellType := if(sameAddr and (trim(ri.oldDwellType)<>'' or trim(ri.newDwellType)<>''), ri.oldDwellType, '');
   self.newDwellType := if(sameAddr and (trim(ri.oldDwellType)<>'' or trim(ri.newDwellType)<>''), ri.newDwellType, '');
   self.oldValid := if(sameAddr and (trim(ri.oldValid)<>'' or trim(ri.newValid)<>''), ri.oldValid, '');
@@ -554,12 +570,15 @@ Layout_working correctFutureData(unCorrOnly le, corrOnly ri) := transform
 end;
 finalCorr := join(unCorrOnly, corrOnly, 
                   left.did=right.did and 
-                  ((trim(right.oldFname)<>'' or trim(right.newFname)<>'') and right.oldFname=left.fname OR	
+                  // should we take title and DOD into account here?
+                  ((trim(right.oldTitle)<>'' or trim(right.newTitle)<>'') and right.oldTitle=left.title OR	
+                  (trim(right.oldFname)<>'' or trim(right.newFname)<>'') and right.oldFname=left.fname OR	
                   (trim(right.oldMname)<>'' or trim(right.newMname)<>'') and right.oldMname=left.mname  OR
                   (trim(right.oldLname)<>'' or trim(right.newLname)<>'') and right.oldLname=left.lname OR
                   (trim(right.oldNameSuffix)<>'' or trim(right.newNameSuffix)<>'') and right.oldNameSuffix=left.name_suffix  OR
                   (trim(right.oldSSN)<>'' or trim(right.newSSN)<>'') and right.oldSSN=left.ssn OR
                   (trim(right.oldDOB)<>'' or trim(right.newDOB)<>'') and right.oldDOB=(string)left.dob OR
+                  (trim(right.oldDOD)<>'' or trim(right.newDOD)<>'') and right.oldDOD=(string)left.dod OR
                   // same address and an address field is different
                   address.Addr1FromComponents(right.oldPrimRange,right.oldPredir,right.oldPrimName,right.oldSuffix,right.oldPostDir,right.oldUnitDesig,right.oldSecRange) = 
                   address.Addr1FromComponents(left.Prim_Range,left.PreDir,left.Prim_Name,left.Suffix,left.PostDir,left.Unit_Desig,left.Sec_Range) OR
@@ -581,6 +600,11 @@ finalCorr := join(unCorrOnly, corrOnly,
                   
 // doing the above join results in too many records per rid (potentially), we need to rollup by rid and figure out which field to keep from the multiple choices
 layout_working getCorrectCorrections(finalCorr le, finalCorr ri) := transform
+  self.title := map(trim(le.title)=trim(ri.title) => le.title,	// same on both, keep left
+                    (trim(le.oldTitle)<>'' or trim(le.newTitle)<>'') and trim(le.newTitle)=trim(le.title) => le.title,	// correction on this rid and left matches new, so keep left
+                    (trim(le.oldTitle)<>'' or trim(le.newTitle)<>'') => ri.title, // correction on this rid and left doesnt match new, so keep right
+                    (trim(ri.oldTitle)<>'' or trim(ri.newTitle)<>'') => ri.title,	// correction on this rid and right had the correction, so keep right?
+                    le.title);	// default to keep left
   self.fname := map(trim(le.fname)=trim(ri.fname) => le.fname,	// same on both, keep left
                     (trim(le.oldFname)<>'' or trim(le.newFname)<>'') and trim(le.newFname)=trim(le.fname) => le.fname,	// correction on this rid and left matches new, so keep left
                     (trim(le.oldFname)<>'' or trim(le.newFname)<>'') => ri.fname, // correction on this rid and left doesnt match new, so keep right
@@ -668,7 +692,12 @@ layout_working getCorrectCorrections(finalCorr le, finalCorr ri) := transform
                   (trim(le.olddob)<>'' or trim(le.newdob)<>'') => ri.dob, // correction on this rid and left doesnt match new, so keep right
                   (trim(ri.oldDOB)<>'' or trim(ri.newDOB)<>'') => ri.dob,	// correction on this rid and right had the correction, so keep right?
                   le.dob);	// default to keep left
-                  
+  self.dod := map((le.dod)=(ri.dod) => le.dod,	// same on both, keep left
+                  (trim(le.oldDOD)<>'' or trim(le.newDOD)<>'') and trim(le.newdod)=(string)le.dod => le.dod,	// correction on this rid and left matches new, so keep left
+                  (trim(le.oldDOD)<>'' or trim(le.newDOD)<>'') => ri.dod, // correction on this rid and left doesnt match new, so keep right
+                  (trim(ri.oldDOD)<>'' or trim(ri.newDOD)<>'') => ri.dod,	// correction on this rid and right had the correction, so keep right?
+                  le.dod);	// default to keep left
+
   self.addr_flags.dwellType := map(	(le.addr_flags.dwellType)=(ri.addr_flags.dwellType) => le.addr_flags.dwellType,	// same on both, keep left
                                     (trim(le.oldDwellType)<>'' or trim(le.newDwellType)<>'') and trim(le.newDwellType)=(string)le.addr_flags.dwellType => le.addr_flags.dwellType,	// correction on this rid and left matches new, so keep left
                                     (trim(le.oldDwellType)<>'' or trim(le.newDwellType)<>'') => ri.addr_flags.dwellType, // correction on this rid and left doesnt match new, so keep right
@@ -729,7 +758,7 @@ layout_working getCorrectCorrections(finalCorr le, finalCorr ri) := transform
   
   self := le;	// keep the remaining left fields
 end;
-s := sort(finalCorr, persistent_record_id, -Fname,-Mname,-Lname,-Name_Suffix,-Prim_Range,-Predir,-Prim_Name,-Suffix,-Postdir,-Unit_Desig,-Sec_Range,-City_Name,-St,-Zip,-Zip4,-SSN,-DOB,
+s := sort(finalCorr, persistent_record_id, -Title, -Fname,-Mname,-Lname,-Name_Suffix,-Prim_Range,-Predir,-Prim_Name,-Suffix,-Postdir,-Unit_Desig,-Sec_Range,-City_Name,-St,-Zip,-Zip4,-SSN,-DOB,-DOD,
                                       -addr_flags.DwellType,-addr_flags.Valid,-addr_flags.PrisonAddr,-addr_flags.HighRisk,-addr_flags.CorpMil,-addr_flags.DoNotDeliver,
                                       -addr_flags.DeliveryStatus,-addr_flags.AddressType,-addr_flags.DropIndicator,-addr_flags.unit_count, -addr_flags.mail_usage);
 finalCorr2 := rollup (s, left.persistent_record_id=right.persistent_record_id, getCorrectCorrections(left,right));									
@@ -737,14 +766,15 @@ finalCorr2 := rollup (s, left.persistent_record_id=right.persistent_record_id, g
 // now we need to identify among finalCorr2 what additional records were corrected vs uncorrected recs
 layout_header_internal xfaddcorrflag(layout_working le, layout_working ri) := transform
 
-  is_corrected := le.Fname<>ri.Fname 
+  is_corrected := le.Title<>ri.Title
+          or le.Fname<>ri.Fname 
           or le.Mname<>ri.Mname or le.Lname<>ri.Lname
           or le.Name_Suffix<>ri.Name_Suffix or le.Prim_Range<>ri.Prim_Range
           or le.Predir<>ri.Predir or le.Prim_Name<>ri.Prim_Name
           or le.Suffix<>ri.Suffix or le.Postdir<>ri.Postdir
           or le.Unit_Desig<>ri.Unit_Desig or le.Sec_Range<>ri.Sec_Range
           or le.City_Name<>ri.City_Name or le.St<>ri.St or le.Zip<>ri.Zip
-          or le.Zip4<>ri.Zip4 or le.SSN<>ri.SSN or le.DOB<>ri.DOB 
+          or le.Zip4<>ri.Zip4 or le.SSN<>ri.SSN or le.DOB<>ri.DOB or le.DOD<>ri.DOD
           or le.addr_flags.DwellType<>ri.addr_flags.DwellType
           or le.addr_flags.Valid<>ri.addr_flags.Valid
           or le.addr_flags.PrisonAddr<>ri.addr_flags.PrisonAddr
@@ -801,7 +831,7 @@ header_recs_with_correction := no_correction_recs + future_corr_recs + before_fu
                                     self := []));
 
 // in case of no overrides available we need to do rollup by persistent_record_id 
-header_combined_ddp := dedup(sort(header_combined_data, persistent_record_id, -Fname,-Mname,-Lname,-Name_Suffix,-Prim_Range,-Predir,-Prim_Name,-Suffix,-Postdir,-Unit_Desig,-Sec_Range,-City_Name,-St,-Zip,-Zip4,-SSN,-DOB,
+header_combined_ddp := dedup(sort(header_combined_data, persistent_record_id, -Title, -Fname,-Mname,-Lname,-Name_Suffix,-Prim_Range,-Predir,-Prim_Name,-Suffix,-Postdir,-Unit_Desig,-Sec_Range,-City_Name,-St,-Zip,-Zip4,-SSN,-DOB,-DOD,
                                       -addr_flags.DwellType,-addr_flags.Valid,-addr_flags.PrisonAddr,-addr_flags.HighRisk,-addr_flags.CorpMil,-addr_flags.DoNotDeliver,
                                       -addr_flags.DeliveryStatus,-addr_flags.AddressType,-addr_flags.DropIndicator,-addr_flags.unit_count, -addr_flags.mail_usage, did),
                               persistent_record_id);
@@ -817,6 +847,8 @@ header_recs_temp := IF(EXISTS(header_corr), header_recs_with_correction, no_corr
 
 layout_header_internal xfmarksuppressed (layout_header_internal le, dx_header.layout_key_header ri) := transform
   is_suppressed_by_propagation	:= ~le.compliance_flags.isOverwritten and le.head.did=ri.did and
+            // do we need to take title and DOD into account here?
+            le.head.title=ri.title and
             le.head.fname=ri.fname and
             le.head.mname=ri.mname and
             le.head.lname=ri.lname and
@@ -829,7 +861,8 @@ layout_header_internal xfmarksuppressed (layout_header_internal le, dx_header.la
             le.head.unit_desig=ri.unit_desig and
             le.head.sec_range=ri.sec_range and
             (le.head.ssn=ri.ssn OR (le.head.ssn='' and le.head.valid_ssn='M') OR (ri.ssn='' and ri.valid_ssn='M')) and
-            (le.head.dob=ri.dob  OR (le.head.dob=0 and le.head.valid_dob='M') OR (ri.dob=0 and ri.valid_dob='M'));
+            (le.head.dob=ri.dob  OR (le.head.dob=0 and le.head.valid_dob='M') OR (ri.dob=0 and ri.valid_dob='M')) and 
+            le.head.dod=ri.dod;
   self.compliance_flags.isSuppressed := is_suppressed_by_propagation or le.compliance_flags.isSuppressed;
   self.isPropagatedCorrection := is_suppressed_by_propagation or le.isPropagatedCorrection;
   self := le;
@@ -837,11 +870,13 @@ layout_header_internal xfmarksuppressed (layout_header_internal le, dx_header.la
 end;
 
 // identify any future header records with PII information that has been suppressed in a previous RID
-header_suppressions_ddp := dedup(sort(header_suppressions,did,fname,mname,lname,name_suffix,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,ssn,dob,-valid_ssn,-valid_dob),
-                                did,fname,mname,lname,name_suffix,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,ssn,dob);
+header_suppressions_ddp := dedup(sort(header_suppressions,did,title,fname,mname,lname,name_suffix,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,ssn,dob,dod,-valid_ssn,-valid_dob),
+                                did,title,fname,mname,lname,name_suffix,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,ssn,dob,dod);
                                 
 header_recs_with_future_suppression := join(header_recs_temp, header_suppressions_ddp,
             left.head.did=right.did and 
+            // do we need to take title and DOD into account here?
+            left.head.title=right.title and
             left.head.fname=right.fname and
             left.head.mname=right.mname and
             left.head.lname=right.lname and
@@ -854,7 +889,8 @@ header_recs_with_future_suppression := join(header_recs_temp, header_suppression
             left.head.unit_desig=right.unit_desig and
             left.head.sec_range=right.sec_range and
             (left.head.ssn=right.ssn OR (left.head.ssn='' and left.head.valid_ssn='M') OR (right.ssn='' and right.valid_ssn='M') ) and
-            (left.head.dob=right.dob OR (left.head.dob=0 and left.head.valid_dob='M') OR (right.dob=0 and right.valid_dob='M') ), 
+            (left.head.dob=right.dob OR (left.head.dob=0 and left.head.valid_dob='M') OR (right.dob=0 and right.valid_dob='M') ) and
+            left.head.dod=right.dod,
             xfmarksuppressed(left, right), 
             left outer, limit(0), keep(1));  
 
@@ -939,15 +975,15 @@ header_recs := project(header_recs_final_srt,
   return header_recs;
 end;
 
+// Caller of this function is responsible for filtering suppressed/overwritten records, if required. 
+// Keep in mind though that this function, as well as everything else in this module, is not supposed to be used for anything other 
+// than consumer disclosure.
 export GetAddressList(DATASET(layout_header_out) in_header_recs) := 
   FUNCTION
-  filtered_recs := in_header_recs(~MetaData.ComplianceFlags.isSuppressed,
-                              // ~MetaData.ComplianceFlags.isDisputed,
-                              ~MetaData.ComplianceFlags.isOverwritten);
-  all_addresses := PROJECT(filtered_recs, 
-                            TRANSFORM($.Layouts.address_rec, 
-                              SELF.subject_did:=(UNSIGNED)LEFT.Metadata.Lexid,
-                              SELF:=LEFT.RawData.head));
+  all_addresses := PROJECT(in_header_recs, TRANSFORM($.Layouts.address_rec, 
+    SELF.subject_did := (UNSIGNED) LEFT.Metadata.Lexid;
+    SELF:=LEFT.RawData.head;
+    ));
 
   unique_address_list := DEDUP(SORT(all_addresses, subject_did,zip,prim_name,prim_range,predir,postdir,suffix,sec_range,-geo_blk), 
                             subject_did,zip,prim_name,prim_range,predir,postdir,suffix,sec_range);

@@ -1,4 +1,4 @@
-IMPORT Gateway, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, UT, MDR, Royalty;
+﻿IMPORT Gateway, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, UT, Royalty, STD;
 
 EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_IPAddress_Risk (DATASET(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus) Input,
 																																						DATASET(Suspicious_Fraud_LN.layouts.Layout_IPAddress_Inquiries) Inquiries,
@@ -26,7 +26,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_IPAddress_Risk (DATA
 	TempNetAcuity getNetAcuityResults(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus le, RiskWise.Layout_IP2O ri) := TRANSFORM
 		SELF.Seq := le.Seq;
 		SELF.IPAddress := ri.IPAddr;
-		SELF.DateFirstSeen := IF(le.Clean_Input.ArchiveDate <> 999999, le.Clean_Input.ArchiveDate + '01', UT.GetDate);
+		SELF.DateFirstSeen := IF(le.Clean_Input.ArchiveDate <> 999999, le.Clean_Input.ArchiveDate + '01', (STRING8)Std.Date.Today());
 		SELF.IPAddressNotInUSA := ri.ipresponse <> 'Gateway Error' AND ri.CountryCode NOT IN ['US', '']; // If the Gateway didn't error and the CountryCode is outside the US set to TRUE.
 		SELF.Royalty_NAG := Royalty.RoyaltyNetAcuity.GetCount(ri.ipaddr, ri.iptype);
 	END;

@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, LN_PropertyV2;
+﻿IMPORT BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR;
 
 EXPORT getPropertyByInputs(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -12,6 +12,7 @@ EXPORT getPropertyByInputs(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	proprec := RECORD
 	  Business_Risk_BIP.Layouts.INPUT ;
 		string12 fares_id;
+		string2 state_code;
 		unsigned4 InputAddrLotSize; 
 		unsigned4 InputAddrAssessedTotal; 
 		unsigned4 InputAddrSqFootage;
@@ -48,6 +49,7 @@ EXPORT getPropertyByInputs(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 						 
 						 
 	proprec get_Assessements(property_by_address le, KASF ri) :=		TRANSFORM			 
+					SELF.state_code := ri.state_code;
 					SELF.InputAddrLotSize	:= (INTEGER)StringLib.StringFilter(ri.land_square_footage, '0123456789');					 
           SELF.InputAddrSqFootage := (INTEGER)StringLib.StringFilter(ri.Building_Area, '0123456789');	
 				  SELF.InputAddrAssessedTotal := (INTEGER)max((INTEGER)ri.assessed_total_value, (INTEGER)ri.market_total_value);	
@@ -55,18 +57,34 @@ EXPORT getPropertyByInputs(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 					SELF := [];
 	END;
 	
-	PropertyAssessments := JOIN(DEDUP(SORT(property_by_address, Seq, Fares_ID), Seq, Fares_ID), KASF, 
+	PropertyAssessments_pre := JOIN(DEDUP(SORT(property_by_address, Seq, Fares_ID), Seq, Fares_ID), KASF, 
 															KEYED(LEFT.Fares_ID = RIGHT.LN_Fares_ID) 
 															AND (unsigned3)((STRING)right.proc_date)[1..6] <= left.historydate
 															AND (unsigned3)right.recording_date[1..6] <= left.historydate,
 															get_Assessements(LEFT,RIGHT),
 															ATMOST(keyed(LEFT.fares_id=RIGHT.ln_fares_id),Business_Risk_BIP.Constants.Limit_Assessments));
-															
-		PropertyBusnAssessRolled := ROLLUP(SORT(PropertyAssessments, Seq), LEFT.Seq = RIGHT.Seq, TRANSFORM(RECORDOF(LEFT),
-																					SELF.InputAddrLotSize := MAX(LEFT.InputAddrLotSize, RIGHT.InputAddrLotSize);
-																					SELF.InputAddrSqFootage := MAX(LEFT.InputAddrSqFootage, RIGHT.InputAddrSqFootage);
-																					SELF.InputAddrAssessedTotal := MAX(LEFT.InputAddrAssessedTotal, RIGHT.InputAddrAssessedTotal);
-																					SELF := LEFT));        
+
+	// Under the most recent definition for source codes that are allowed for Marketing purposes, all Property
+	// are ALLOWED with the exception of the following states ['ID','IL','KS','NM','SC','WA', ''] when they are
+	// in records whose src type is src_LnPropV2_Lexis_Asrs or src_LnPropV2_Lexis_Deeds_Mtgs (i.e. 'LA','LP').
+	PropertyAssessments_src := 
+		PROJECT(
+			PropertyAssessments_pre,
+			TRANSFORM( { RECORDOF(PropertyAssessments_pre), STRING src },
+				SELF.src := MDR.SourceTools.fProperty(LEFT.fares_id),
+				SELF := LEFT
+			)
+		);
+	
+	PropertyAssessments := IF( Options.MarketingMode = 1,
+			PropertyAssessments_src(src IN AllowedSourcesSet AND Business_Risk_BIP.Common.isMarketingAllowedProperty(src, state_code)),
+			PropertyAssessments_src);
+			
+	PropertyBusnAssessRolled := ROLLUP(SORT(PropertyAssessments, Seq), LEFT.Seq = RIGHT.Seq, TRANSFORM(RECORDOF(LEFT),
+																				SELF.InputAddrLotSize := MAX(LEFT.InputAddrLotSize, RIGHT.InputAddrLotSize);
+																				SELF.InputAddrSqFootage := MAX(LEFT.InputAddrSqFootage, RIGHT.InputAddrSqFootage);
+																				SELF.InputAddrAssessedTotal := MAX(LEFT.InputAddrAssessedTotal, RIGHT.InputAddrAssessedTotal);
+																				SELF := LEFT));        
                                           
  	withPropertyAssess := JOIN(Shell, PropertyBusnAssessRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
@@ -77,7 +95,7 @@ EXPORT getPropertyByInputs(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							SELF.Input_Characteristics.InputAddrSqFootage := IF(AddrNotInput_v30, '-1', (STRING)Business_Risk_BIP.Common.capNum(RIGHT.InputAddrSqFootage, -1, 999999999));
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);    
-                                  
+
   // OUTPUT(CHOOSEN(PropertyAssessments, 100), NAMED('Sample_PropertyAssessments'));
 	// OUTPUT(CHOOSEN(PropertyBusnAssessRolled, 100), NAMED('Sample_PropertyBusnAssessRolled'));
 	// OUTPUT(CHOOSEN(withPropertyAssess, 100), NAMED('Sample_withPropertyAssess'));

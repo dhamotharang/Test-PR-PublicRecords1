@@ -6,8 +6,8 @@ threads := 1;
 roxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie; 
 // roxieIP := RiskWise.Shortcuts.staging_neutral_roxieIP;
 
-InputFile := '~temp::kel::consumer_nonfcra_100k.csv';
-// InputFile := '~temp::kel::consumer_nonfcra_1mm.csv'; //1 million
+InputFile := '~mas::uatsamples::consumer_nonfcra_100k_07102019.csv ';
+//InputFile := '~mas::uatsamples::consumer_nonfcra_1m_07092019.csv';
 
 /*
 Data Setting 		NonFCRA
@@ -60,7 +60,8 @@ prii_layout := RECORD
     STRING FirstName           ;
     STRING MiddleName          ;
     STRING LastName            ;
-    STRING StreetAddress       ;
+    STRING StreetAddressLine1  ;
+    STRING StreetAddressLine2  ;
     STRING City                ;
     STRING State               ;
     STRING Zip                 ;

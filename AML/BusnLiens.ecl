@@ -1,6 +1,7 @@
-import Business_Risk, liensv2, RiskWise, risk_indicators, ut;
+﻿import Business_Risk, liensv2, RiskWise, risk_indicators, ut, Doxie, Suppress, AML;
 
-EXPORT BusnLiens(DATASET(Layouts.BusnLayoutV2) BusnIn
+EXPORT BusnLiens(DATASET(Layouts.BusnLayoutV2) BusnIn,
+									doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
 															// , 
 															// string50 DataRestriction,
 															// unsigned1 dppa,
@@ -51,7 +52,9 @@ rmsids := join(BusnIn, liensv2.key_liens_bdid,
 			get_lien_rmsid(LEFT,RIGHT), keep(100));
 
 // with liensV2, all fields we're interested in come from the liens_party_id file except the lien amount and filing description which come from the liens_main file
-lienrec get_liens(rmsids le, liensv2.key_liens_party_ID ri) := transform
+{lienrec, unsigned4 global_sid, unsigned6 did} get_liens(rmsids le, liensv2.key_liens_party_ID ri) := transform
+	self.global_sid := ri.global_sid;
+	self.did := (unsigned6)ri.did;
 	self.seq := le.seq;
 	self.historydate := le.historydate;
 	self.bdid := Le.bdid;
@@ -65,7 +68,7 @@ lienrec get_liens(rmsids le, liensv2.key_liens_party_ID ri) := transform
 	self := [];
 end;
 
-liensrecs := join(rmsids,  liensv2.key_liens_party_ID,
+liensrecs_unsuppressed := join(rmsids,  liensv2.key_liens_party_ID,
 				keyed(left.rmsid = right.rmsid) and
 				keyed(left.tmsid = right.tmsid) and
 				left.bdid = (unsigned)right.bdid and  // for cases with multiple debtors, make sure to only include the party records that match on bdid
@@ -74,6 +77,7 @@ liensrecs := join(rmsids,  liensv2.key_liens_party_ID,
 			   get_liens(LEFT,RIGHT), 
 			   atmost( (keyed(left.rmsid=right.rmsid) and keyed(left.tmsid=right.tmsid)), riskwise.max_atmost), keep(100));
 
+liensrecs := Suppress.Suppress_ReturnOldLayout(liensrecs_unsuppressed, mod_access, lienrec);
 
 lienrec roll_and_count(liensrecs L, liensrecs R) := transform
   sameLien := l.tmsid=r.tmsid and l.rmsid=r.rmsid;

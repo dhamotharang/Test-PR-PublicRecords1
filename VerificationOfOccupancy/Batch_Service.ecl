@@ -1,4 +1,4 @@
-IMPORT iesp, Risk_indicators, Riskwise, address, AutoStandardI, Doxie, STD;
+﻿IMPORT  Risk_indicators,  address, VerificationOfOccupancy, Doxie, STD;
 
 EXPORT Batch_Service() := FUNCTION
 
@@ -16,12 +16,19 @@ EXPORT Batch_Service() := FUNCTION
 	string50 	DataPermission 						:= risk_indicators.iid_constants.default_DataPermission  : stored('DataPermissionMask');
 	string9   AttributesVersionRequest	:= ''  : stored('AttributesVersionRequest'); 
 	boolean   IncludeModel     					:= false  : stored('IncludeModel');
+  unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+	string TransactionID := '' : STORED('_TransactionId');
+	string BatchUID := '' : STORED('_BatchUID');
+	unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 	
 	isUtility := Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(IndustryClassVal)); 
 
 	VOO_wseq := project( batch_in, transform( VerificationOfOccupancy.Layouts.Layout_VOOIn, self.seq := counter, self := left, self := [] ) );
 
-  attributes := VerificationOfOccupancy.Search_Function(VOO_wseq, DataRestriction, glba, dppa, isUtility, AttributesVersionRequest, IncludeModel, DataPermission).VOOReport;  
+  attributes := VerificationOfOccupancy.Search_Function(VOO_wseq, DataRestriction, glba, dppa, isUtility, AttributesVersionRequest, IncludeModel, DataPermission,LexIdSourceOptout := LexIdSourceOptout, 
+	TransactionID := TransactionID, 
+	BatchUID := BatchUID, 
+	GlobalCompanyID := GlobalCompanyID).VOOReport;  
 
 	VerificationOfOccupancy.Layouts.Layout_VOOBatchOutFlat addAcct(attributes le, VOO_wSeq ri) := transform
 		self.AcctNo 																	:= ri.AcctNo;

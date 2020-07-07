@@ -73,13 +73,11 @@ FUNCTION
     BOOLEAN   NoContractCarrier := MAX(GROUP, (integer) sortedPorts.high_risk_indicator) >0;
     BOOLEAN   Prepaid 					:= MAX(GROUP, (integer) sortedPorts.prepaid) > 0;
     UNSIGNED4 dt_last_reported	:= MAX(GROUP, sortedPorts.dt_last_reported);
-    BOOLEAN 	is_deact 					:= MAX(GROUP, sortedPorts.is_deact)='Y';
-    BOOLEAN 	is_react 					:= MAX(GROUP, sortedPorts.is_react)='Y';
-    UNSIGNED1 serviceType				:= MAX(GROUP, (integer) sortedPorts.serv);
   END;
 
-	dPorts := UNGROUP(TABLE(sortedPorts(source NOT IN [MDR.sourceTools.src_Phones_Disconnect, MDR.sourceTools.src_Phones_Gong_History_Disconnect]), portedRec));
-	dDisconnects := UNGROUP(TABLE(sortedPorts(source IN [MDR.sourceTools.src_Phones_Disconnect, MDR.sourceTools.src_Phones_Gong_History_Disconnect]), portedRec));
+  disconnects_src := [MDR.sourceTools.src_Phones_Disconnect, MDR.sourceTools.src_Phones_Gong_History_Disconnect];
+  dPorts := UNGROUP(TABLE(sortedPorts(source NOT IN [disconnects_src, MDR.sourceTools.src_Phones_Lerg6, MDR.sourceTools.src_PhoneFraud_OTP, MDR.sourceTools.src_Phones_LIDB]), portedRec));
+  dDisconnects := UNGROUP(TABLE(sortedPorts(source IN disconnects_src), portedRec));
   dPortedInfo := dPorts + dDisconnects;
 
   Porting_layout := RECORD
@@ -96,23 +94,21 @@ FUNCTION
                                                                                   SELF.PortEndDate 			:= LEFT.PortEndDate,
                                                                                   SELF.ServiceProvider 	:= TRIM(LEFT.operator_fullname, LEFT, RIGHT)))),
                                       SELF := LEFT,
-                                      SELF := []));
+                                      SELF := []));                            
 
 	// The carrier often sends updates which are identified by repeated spids based on the sequencing of FirstPortedDate
 	Porting_layout rollports(transformPort l, transformPort r) := TRANSFORM
     // Use to identify most current phone values - distinguishing btw PB (using dt_last_reported) and actual port records received (using port dates).
     mostCurrent := MAX(l.LastPortedDate, l.dt_last_reported) > MAX(r.LastPortedDate, r.dt_last_reported);
 
-    SELF.PortingCount 		 := IF(l.spid <> r.spid AND r.source <> MDR.sourceTools.src_Phones_Disconnect,
+    SELF.PortingCount 		 := IF(l.spid <> r.spid AND r.source NOT IN disconnects_src,
                                   l.PortingCount + r.PortingCount, l.PortingCount);
-    SELF.PortingHistory 	 := IF(r.source NOT IN [MDR.sourceTools.src_Phones_Disconnect, MDR.sourceTools.src_Phones_LIDB],
-                                                  l.PortingHistory + r.PortingHistory, l.PortingHistory);
+    PortingHistory         := l.PortingHistory + r.PortingHistory;                              
+    SELF.PortingHistory 	 := IF(r.source NOT IN disconnects_src,
+                                                  PortingHistory(PortStartDate <> 0 AND PortEndDate <> 0), l.PortingHistory);
     SELF.LastPortedDate 	 := MAX(l.LastPortedDate, r.LastPortedDate);
     SELF.ActivationDate 	 := MAX(l.ActivationDate, r.ActivationDate);
     SELF.DisconnectDate 	 := MAX(l.DisconnectDate, r.DisconnectDate);
-    SELF.is_deact		 			 := MAX(l.is_deact, r.is_deact);
-    SELF.is_react		 			 := MAX(l.is_react, r.is_react);
-    SELF.serviceType		 	 := IF(mostCurrent, l.serviceType, r.serviceType);
     SELF.Prepaid				 	 := IF(mostCurrent, l.Prepaid, r.Prepaid);
     SELF.NoContractCarrier := IF(mostCurrent, l.NoContractCarrier, r.NoContractCarrier);
     SELF.spid				 			 := IF(mostCurrent, l.spid, r.spid);
@@ -120,15 +116,15 @@ FUNCTION
 	END;
 
   // Should be rolled up on acctno, phone NOT acctno, did, phone
-	dPortedRolled		:= ROLLUP(SORT(transformPort, acctno, phone, FirstPortedDate=0, FirstPortedDate),
+	dPortedDisconnectRolled		:= ROLLUP(SORT(transformPort, acctno, phone, FirstPortedDate=0, FirstPortedDate),
 															LEFT.acctno = RIGHT.acctno AND
 															LEFT.phone 	= RIGHT.phone,
 															rollports(LEFT, RIGHT));
 
 		//Final results joined with original dataset
-	PhoneFinder_Services.Layouts.PhoneFinder.Final UpdatePhoneInfo(dSearchRecs0 l, dPortedRolled r) := TRANSFORM
+	PhoneFinder_Services.Layouts.PhoneFinder.Final UpdatePhoneInfo(dSearchRecs0 l, dPortedDisconnectRolled r) := TRANSFORM
     hasPort := r.PortingCount > 0;
-    hasMetadata := l.phone=r.phone;
+    // hasMetadata := l.phone=r.phone;
     SELF.PortingCode    := MAP(hasPort => 'Ported',
                                 (NOT inMod.SubjectMetadataOnly OR l.isprimaryphone)=> 'Not Ported',
                                 '');
@@ -137,16 +133,16 @@ FUNCTION
     SELF.FirstPortedDate := IF(inMod.ReturnPortingInfo, r.FirstPortedDate, l.FirstPortedDate);
     SELF.LastPortedDate  := IF(inMod.ReturnPortingInfo, r.LastPortedDate, l.LastPortedDate);
     SELF.NoContractCarrier  := IF(inMod.ReturnPortingInfo, r.NoContractCarrier, l.NoContractCarrier);
-    SELF.Prepaid				 := IF(inMod.ReturnPortingInfo, r.Prepaid, l.Prepaid);
-    deact_thresholdcheck := Std.Date.IsValidDate(r.DisconnectDate) AND (ut.DaysApart((STRING)r.DisconnectDate, currentDate) <= PhoneFinder_Services.Constants.PortingStatus.DisconnectedPhoneThreshold);
-
+    SELF.Prepaid				 := IF(inMod.ReturnPortingInfo AND l.isprimaryphone, r.Prepaid, l.Prepaid); //Right has no information about other phones, also, prepaid info should only be shown for ReturnPortingInfo
+    // deact_thresholdcheck := Std.Date.IsValidDate(r.DisconnectDate) AND (ut.DaysApart((STRING)r.DisconnectDate, currentDate) <= PhoneFinder_Services.Constants.PortingStatus.DisconnectedPhoneThreshold);
     SELF.PhoneStatus     :=  l.PhoneStatus;
     SELF.ActivationDate  := IF(l.PhoneStatus = PhoneFinder_Services.Constants.PhoneStatus.Active, r.ActivationDate, 0);
     SELF.DisconnectDate  := IF(l.PhoneStatus = PhoneFinder_Services.Constants.PhoneStatus.INACTIVE, r.DisconnectDate, 0);
     // Override TU data to use LIBD and Port data when available
-    SELF.serviceType  	 := r.serviceType;
-    SELF.RealTimePhone_Ext.ServiceClass := IF(hasMetadata, (STRING)r.serviceType, l.RealTimePhone_Ext.ServiceClass);
-    SELF.COC_description := IF(hasMetadata, PhoneFinder_Services.Functions.ServiceClassDesc((STRING)r.serviceType), l.COC_description);
+    //Commenting out for now since we get this information in getPhonedetails
+    // SELF.serviceType  	 := r.serviceType;
+    // SELF.RealTimePhone_Ext.ServiceClass := IF(hasMetadata, (STRING)r.serviceType, l.RealTimePhone_Ext.ServiceClass);
+    // SELF.COC_description := l.COC_description;
     SELF.PortingStatus   := '';
 		/*
     // Temporarily remove until better disconnect data is obtained
@@ -163,7 +159,7 @@ FUNCTION
     SELF := [];
 	END;
 
-	dPhoneMetadataWPorting := JOIN(dSearchRecs0, dPortedRolled,
+	dPhoneMetadataWPorting := JOIN(dSearchRecs0, dPortedDisconnectRolled,
                                   LEFT.acctno	= RIGHT.acctno AND
                                   LEFT.phone 	= RIGHT.phone,
                                   UpdatePhoneInfo(LEFT, RIGHT),
@@ -176,7 +172,7 @@ FUNCTION
 	    OUTPUT(dPortedInfo, NAMED('dPortedInfo'));
 	    OUTPUT(dPortedPhones, NAMED('dPortedPhones_getportedmetadata'));
 		   OUTPUT(transformPort, NAMED('transformPort'));
-		   OUTPUT(dPortedRolled, NAMED('dPortedRolled'));
+		   OUTPUT(dPortedDisconnectRolled, NAMED('dPortedDisconnectRolled'));
 	    OUTPUT(dphonemetadataWPorting, NAMED('dphonemetadataWPorting'));
 	#END;
 

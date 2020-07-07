@@ -9,19 +9,22 @@ Risk_Indicators.Scoring_Parameters parameters,
 ) := FUNCTION
 
 mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
-  EXPORT unsigned1 glb := parameters.glb;
-  EXPORT unsigned1 dppa := parameters.dppa;	
-  EXPORT string DataPermissionMask := parameters.datapermission;
-  EXPORT string DataRestrictionMask := parameters.datarestriction;
-  EXPORT boolean ln_branded := parameters.ln_branded;
-  EXPORT boolean probation_override := FALSE; // was set up as a constant below
-  EXPORT unsigned3 date_threshold := 0;              // was set up as a constant below
+	EXPORT unsigned1 glb := parameters.glb;
+	EXPORT unsigned1 dppa := parameters.dppa;	
+	EXPORT string DataPermissionMask := parameters.datapermission;
+	EXPORT string DataRestrictionMask := parameters.datarestriction;
+	EXPORT boolean ln_branded := parameters.ln_branded;
+	EXPORT boolean probation_override := FALSE; // was set up as a constant below
+	EXPORT unsigned3 date_threshold := 0;              // was set up as a constant below
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
 END;
 
 // get the DID for the input applicant, setting bsversion_temp := 2 so we don't ask for multiple DIDs
 bsversion_temp := 2;
 applicant_input_with_did := ungroup(risk_indicators.iid_getDID_prepOutput(progressive_prep, parameters.DPPA, parameters.GLB, parameters.isFCRA, bsversion_temp, parameters.DataRestriction,
-																																					parameters.appendBest, parameters.gateways));
+																																					parameters.appendBest, parameters.gateways, mod_access := mod_access));
 // output(applicant_input_with_did, named('applicant_input_with_did'));
 
 f_in_raw := project(applicant_input_with_did, 
@@ -209,7 +212,7 @@ addr_share_rec := record
 	string4 LengthSharedAddress;
 end;
 
-system_yearmonth := (integer)((STRING8)Std.Date.Today()[1..6]);
+system_yearmonth := (integer)((STRING8)Std.Date.Today())[1..6];
 		
 // identify all shared addresses so we can calcuate months since shared address variable
 shared_addresses := join(applicant_addr_history, address_history, 

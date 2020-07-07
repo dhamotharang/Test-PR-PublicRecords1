@@ -4335,6 +4335,112 @@ EXPORT InputEcho := RECORD
         string5 zip;
 	END;
 	
+	// Cortera B2B tradeline
+  EXPORT CorteraB2B := record	
+			in_key;
+			// Trade Summary 
+			unsigned2 TradeSumm_OpenAccountsCount;
+			string8 TradeSumm_AccountOpenDate; 
+			string12 TradeSumm_TotalOverdue; 
+			string30 TradeSumm_MostSevereStatus; 
+			string12 TradeSumm_HighestCredit;
+			string12 TradeSumm_TotalCurrentExposure; 
+			string12 TradeSumm_MedianBalance;
+			string12 TradeSumm_AvgOpenBalance;
+			unsigned2 TradeSumm_ChargeOffRecorded; 
+			unsigned2 TradeSumm_AccountsWithGuarantor;
+			//Current Payment Summary
+			string12 CurrPaySumm_TotalCurrentExposure; 
+			string3 CurrPaySumm_WithinTermsPercent; 
+			string3 CurrPaySumm_PastDueAgingAmount01to30Percent;
+			string3 CurrPaySumm_PastDueAgingAmount31to60Percent;
+			string3 CurrPaySumm_PastDueAgingAmount61to90Percent; 
+			string3 CurrPaySumm_PastDueAgingAmount91PlusPercent;
+			//Payment Summary
+			string12 PaySumm_TotalCurrentExposure; 
+			string3 PaySumm_WithinTermsPercent;
+			string3 PaySumm_PastDueAgingAmount01to30Percent;
+			string3 PaySumm_PastDueAgingAmount31to60Percent;
+			string3 PaySumm_PastDueAgingAmount61to90Percent;
+			string3 PaySumm_PastDueAgingAmount91PlusPercent;
+			string8 PaySumm_DateReported; 
+			unsigned2 PaySumm_ProviderCount; 
+			string12 PaySumm_WithinTermsTotal; 
+			string12 PaySumm_PastDueAgingAmount01to30Total; 
+			string12 PaySumm_PastDueAgingAmount31to60Total;
+			string12 PaySumm_PastDueAgingAmount61to90Total;
+			string12 PaySumm_PastDueAgingAmount91PlusTotal;
+			// 24 Month Payment History
+			string12 Pay24Mth_TotalCurrentExposure;
+			string3 Pay24Mth_WithinTermsPercent;
+			string3 Pay24Mth_PastDueAgingAmount01to30Percent;
+			string3 Pay24Mth_PastDueAgingAmount31to60Percent;
+			string3 Pay24Mth_PastDueAgingAmount61to90Percent;
+			string3 Pay24Mth_PastDueAgingAmount91PlusPercent;
+			string8 Pay24Mth_DateReported; 
+			// Industry Segments
+			string25 IndustrySeg1_IndustrySegment; 
+			unsigned2 IndustrySeg1_ProviderCount;
+			string12 IndustrySeg1_AverageBalance;
+			string12 IndustrySeg1_AverageDBT;
+			string12 IndustrySeg1_HighestBalance; 
+			string3 IndustrySeg1_PastDueAgingAmount31to60Percent; 
+			string3 IndustrySeg1_PastDueAgingAmount61to90Percent; 
+			string3 IndustrySeg1_PastDueAgingAmount91PlusPercent;
+			string25 IndustrySeg2_IndustrySegment; 
+			unsigned2 IndustrySeg2_ProviderCount;
+			string12 IndustrySeg2_AverageBalance;
+			string12 IndustrySeg2_AverageDBT;
+			string12 IndustrySeg2_HighestBalance; 
+			string3 IndustrySeg2_PastDueAgingAmount31to60Percent; 
+			string3 IndustrySeg2_PastDueAgingAmount61to90Percent; 
+			string3 IndustrySeg2_PastDueAgingAmount91PlusPercent;
+			// Account Details
+			string20 AcctDet1_AccountNo; 
+			string10 AcctDet1_Status;
+			string25 AcctDet1_IndustrySegment;
+			string8 AcctDet1_AccountDateReported; 
+			string12 AcctDet1_AmountOutstanding; 
+      // Account Detail, AcctDet1, 24 Month Payment History - two accounts
+			string12 AcctDet1_1_TotalCurrentExposure;
+			string3  AcctDet1_1_WithinTermsTotal;
+			string3  AcctDet1_1_PastDueAgingAmount01to30Percent;
+			string3  AcctDet1_1_PastDueAgingAmount31to60Percent;
+			string3  AcctDet1_1_PastDueAgingAmount61to90Percent;
+			string3  AcctDet1_1_PastDueAgingAmount91PlusPercent;
+			string8  AcctDet1_1_DateReported;
+			string12 AcctDet1_2_TotalCurrentExposure;
+			string3  AcctDet1_2_WithinTermsTotal;
+			string3  AcctDet1_2_PastDueAgingAmount01to30Percent;
+			string3  AcctDet1_2_PastDueAgingAmount31to60Percent;
+			string3  AcctDet1_2_PastDueAgingAmount61to90Percent;
+			string3  AcctDet1_2_PastDueAgingAmount91PlusPercent;
+			string8  AcctDet1_2_DateReported;
+      // Account Detail, AcctDet2
+			string20 AcctDet2_AccountNo; 
+			string10 AcctDet2_Status; 
+			string25 AcctDet2_IndustrySegment;
+			string8 AcctDet2_AccountDateReported; 
+			string12 AcctDet2_AmountOutstanding;
+      // Account Detail, AcctDet2, 24 Month Payment History - two accounts
+			string12 AcctDet2_1_TotalCurrentExposure;
+			string3  AcctDet2_1_WithinTermsTotal;
+			string3  AcctDet2_1_PastDueAgingAmount01to30Percent;
+			string3  AcctDet2_1_PastDueAgingAmount31to60Percent;
+			string3  AcctDet2_1_PastDueAgingAmount61to90Percent;
+			string3  AcctDet2_1_PastDueAgingAmount91PlusPercent;
+			string8  AcctDet2_1_DateReported;
+			string12 AcctDet2_2_TotalCurrentExposure;
+			string3  AcctDet2_2_WithinTermsTotal;
+			string3  AcctDet2_2_PastDueAgingAmount01to30Percent;
+			string3  AcctDet2_2_PastDueAgingAmount31to60Percent;
+			string3  AcctDet2_2_PastDueAgingAmount61to90Percent;
+			string3  AcctDet2_2_PastDueAgingAmount91PlusPercent;
+			string8  AcctDet2_2_DateReported;			
+			string5 StatusCode;
+			string40 StatusDescription;
+	END;
+	
 	EXPORT Flat_BusinessCreditReport := record
 	  InputEcho;                //Section 1
 	  BestInformation;          //Section 2
@@ -4355,7 +4461,8 @@ EXPORT InputEcho := RECORD
 	  TopBusConnected;          //Section 17
 	  TopBusContacts;           //Section 18 
     OtherBusInfo;             //Section 19
-	MatchInfo;                  //Section 20  
+	MatchInfo;                  //Section 20
+	  CorteraB2B;								//Section 21
 
 END;
 
@@ -4364,6 +4471,9 @@ END;
       Business_Credit.key_tradeline();
       BOOLEAN isRemain_Bal_Changed := FALSE; 
       BOOLEAN isRecent_Pmt_Not_Zero := FALSE;
+      BOOLEAN Disaster_Impact := FALSE;
+      UNSIGNED most_recent_suspend_dt := 0;
+      UNSIGNED most_recent_status_dt := 0;
     END;
 
 	

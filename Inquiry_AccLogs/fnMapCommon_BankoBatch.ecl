@@ -1,18 +1,18 @@
-import ut, address, aid, lib_stringlib, address, did_add, Business_Header_SS, standard, header_slimsort, didville, business_header,watchdog, mdr, header;
+import ut, lib_stringlib;
 
 export fnMapCommon_BankoBatch := module
 
 export clean := function
 
 n := inquiry_acclogs.test_count; /* n - to test a sample set, 0 to run all */
-										
+
 NullSet := inquiry_acclogs.fncleanfunctions.nullset;
 
 inputfile := distribute(choosen(inquiry_acclogs.File_BankoBatch_Logs.input
-																		,IF(n > 0, n, choosen:ALL)), random()); 			
+																		,IF(n > 0, n, choosen:ALL)), random());
 
 inquiry_acclogs.fncleanfunctions.cleanfields(inputfile, cleaned_fields);
-Inquiry_AccLogs.File_MBSApp(cleaned_fields,'BANKO', '', outfile); 
+Inquiry_AccLogs.File_MBSApp(cleaned_fields,'BANKO', '', outfile);
 
 /////////////////NAME AND BUSINESS CLEAN NEW FILE - REMOVE NULL IDENTIFIERS - ASSIGN UNIQUE ID FIELDS/////////////////////////////////////////////////////////
 
@@ -28,7 +28,7 @@ reconname := project(outfile, transform(inquiry_acclogs.layout_in_common,
 														self.ORIG_MNAME := left.orig_middle_name;
 														self.ORIG_LNAME := left.orig_last_name;
 														self.ORIG_NAMESUFFIX := '';
-																												
+
 														self.ORIG_ADDR1 := left.orig_addr1_street;
 														self.ORIG_LASTLINE1 := stringlib.stringcleanspaces(left.orig_addr1_CITY + ' ' + left.orig_addr1_state + ' ' + left.orig_addr1_zip);
 														self.ORIG_CITY1 := left.orig_addr1_CITY;
@@ -42,22 +42,22 @@ reconname := project(outfile, transform(inquiry_acclogs.layout_in_common,
 														self.PERSONAL_PHONE := Inquiry_AccLogs.fncleanfunctions.clean_phone(left.orig_phone);
 														self.COMPANY_PHONE := Inquiry_AccLogs.fncleanfunctions.clean_phone(left.orig_company_phone);
 														self.DOB := Inquiry_AccLogs.fncleanfunctions.clean_dob(left.orig_dob);
-														
+
 														fixDate := Inquiry_AccLogs.fncleanfunctions.tDateAdded(stringlib.stringfilterout(left.orig_datetime_stamp, '/'));
 														fixTime := Inquiry_AccLogs.fncleanfunctions.tTimeAdded(fixDate);
-														self.DateTime := fixTime;														
+														self.DateTime := fixTime;
 
 														self.GLOBAL_COMPANY_ID := left.orig_global_company_id;
 														self.COMPANY_ID := left.orig_company_id;
 
 														self.method := 'BATCH';
-														
+
 														self.INDUSTRY_1_CODE := left.industry_code_1;
-														self.INDUSTRY_2_CODE := left.industry_code_2;								
+														self.INDUSTRY_2_CODE := left.industry_code_2;
 														self.FCRA_purpose := left.orig_fcra_purpose;
 														self.GLB_purpose := left.orig_glb_purpose;
 														self.DPPA_purpose := left.orig_dppa_purpose;
-								
+
 														self.Login_History_ID := left.orig_login_history_id;
 														self.job_id := left.orig_job_id;
 														self.sequence_number := left.orig_sequence_nbr;
@@ -76,7 +76,7 @@ reconname := project(outfile, transform(inquiry_acclogs.layout_in_common,
 														self.charter_number := left.orig_charter_number;
 														self.ucc_number := left.orig_ucc_original_filing_number;
 														self.linkid := left.orig_link_id;
-													
+
 														self.source_file := 'BANKOBATCH';
 
 														self := left,
@@ -92,11 +92,11 @@ end;
 
 export ready_File(dataset(inquiry_acclogs.layout_in_common) SSNFile, string select_source = 'BANKOBATCH') := function
 
-							
+
 PersonData := project(SSNFile(source_file = select_source and domain_name + clean_cname1 + ucc_number + ein + charter_number = ''), transform(inquiry_acclogs.Layout.Common,
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
-			
+
 			self.allow_flags.Allowflags := left.Allowflags;
 
 			self.bus_intel.Sub_market := left.sub_market;
@@ -106,11 +106,11 @@ PersonData := project(SSNFile(source_file = select_source and domain_name + clea
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
-			
+
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
 			self.Permissions.FCRA_purpose := left.fcra_purpose;
-			
+
 			self.search_info.DateTime := left.datetime;
 			self.search_info.Login_History_ID := left.login_history_id;
 			self.search_info.Transaction_ID := left.transaction_id;
@@ -173,14 +173,14 @@ PersonData := project(SSNFile(source_file = select_source and domain_name + clea
 			self.person_q.Appended_ADL := left.appendadl;
 
 			self.search_info.Start_Monitor := left.datetime[1..8];
-						
+
 			self := left;
 			self := []));
 
 BusinessData := project(SSNFile(source_file = select_source and domain_name + clean_cname1 + ucc_number + ein + charter_number <> ''), transform(inquiry_acclogs.Layout.Common,
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
-			
+
 			self.allow_flags.Allowflags := left.Allowflags;
 
 			self.bus_intel.Sub_market := left.sub_market;
@@ -190,11 +190,11 @@ BusinessData := project(SSNFile(source_file = select_source and domain_name + cl
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
-			
+
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
 			self.Permissions.FCRA_purpose := left.fcra_purpose;
-			
+
 			self.search_info.DateTime := left.datetime;
 			self.search_info.Login_History_ID := left.login_history_id;
 			self.search_info.Transaction_ID := left.transaction_id;
@@ -239,7 +239,7 @@ BusinessData := project(SSNFile(source_file = select_source and domain_name + cl
 			self.bus_q.appended_ein := left.appendtaxid;
 
 			self.search_info.Start_Monitor := left.datetime[1..8];
-						
+
 			self := left;
 			self := []));
 
@@ -249,17 +249,17 @@ AppendForward := businessdata + persondata + previous_data;
 
 mapped_file := dedup(sort(distribute(AppendForward, hash(search_info.Sequence_Number)), record, local), record, local);
 
-joinBB := distribute(join(mapped_file, 
-													table(mapped_file, {search_info.sequence_number, search_info.datetime, search_info.start_monitor}), 
+joinBB := distribute(join(mapped_file,
+													table(mapped_file, {search_info.sequence_number, search_info.datetime, search_info.start_monitor}),
 														left.search_info.sequence_number = right.sequence_number and
 														left.search_info.datetime <> right.datetime,
 										transform(inquiry_acclogs.Layout.common,
 											pstop_monitor := map((unsigned6)left.search_info.start_monitor > (unsigned6)right.start_monitor => left.search_info.start_monitor,
 																					 (unsigned6)right.start_monitor > (unsigned6)left.search_info.start_monitor => right.start_monitor, '');
-											
+
 											self.search_info.stop_monitor := if((unsigned6)pstop_monitor = (unsigned6)left.search_info.start_monitor, '', pstop_monitor),
 											self := left), left outer, local), hash(search_info.sequence_number));
-											
+
 srtBB := dedup(sort(joinBB, search_info.sequence_number, -search_info.stop_monitor, local), search_info.sequence_number, local);
 
 return srtBB; // no new files. only run when necessary.

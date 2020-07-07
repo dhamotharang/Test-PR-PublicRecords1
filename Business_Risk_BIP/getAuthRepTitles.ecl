@@ -1,10 +1,11 @@
-﻿IMPORT _Validate, BIPV2, BIPV2_Build, Business_Risk_BIP, doxie_cbrs, Risk_Indicators, STD;
+﻿IMPORT _Validate, BIPV2, BIPV2_Build, Business_Risk_BIP, doxie_cbrs, Risk_Indicators, STD, doxie;
 
 // The following function finds the title for each Auth Rep at the time of the HistoryDate.
 EXPORT getAuthRepTitles( DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 													Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 													BIPV2.mod_sources.iParams linkingOptions,
-													SET OF STRING2 AllowedSourcesSet) := 
+													SET OF STRING2 AllowedSourcesSet,
+													doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := 
 	FUNCTION
 	
 		commonTitleChars := '- ,';
@@ -17,8 +18,8 @@ EXPORT getAuthRepTitles( DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																						 0, // ScoreThreshold --> 0 = Give me everything
 																						 linkingOptions,
 																						 Business_Risk_BIP.Constants.Limit_Default,
-																						 Options.KeepLargeBusinesses
-																		 );
+																						 Options.KeepLargeBusinesses,
+																						 mod_access := mod_access);
 		// 1. Add back our Seq numbers.
 		ds_contactLinkids_seq_pre := 
 			JOIN(
@@ -53,7 +54,7 @@ EXPORT getAuthRepTitles( DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 					( // If running in realtime mode, still filter out any future dates, but
 						// include everything up to today's date (thus the <= comparison).
 						HistoryDate = (INTEGER)Business_Risk_BIP.Constants.NinesDate AND 
-						(INTEGER)(((STRING)dt_first_seen)[1..6]) <= (INTEGER)(StringLib.getDateYYYYMMDD()[1..6])
+						(INTEGER)(((STRING)dt_first_seen)[1..6]) <= (integer)((STRING8)Std.Date.Today())[1..6]
 					) 
 					OR 
 					Business_Risk_BIP.Common.fn_filter_on_archive_date( (INTEGER)(((STRING)dt_first_seen_contact)[1..6]), (INTEGER)((STRING)HistoryDate)[1..6], 6 )

@@ -1,9 +1,10 @@
-﻿IMPORT AutoStandardI, BIPV2, BusinessInstantID20_Services, Codes, Doxie, iesp, MDR, STD, TopBusiness_Services, VehicleV2;
+﻿IMPORT AutoStandardI, BIPV2, Doxie, MDR, STD, TopBusiness_Services, VehicleV2, Doxie;
 
 EXPORT getMotorVehicles(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+											 SET OF STRING2 AllowedSourcesSet,
+											 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
  
   // Look at GLBA and DPPA values in Options, and define an attribute that determines
   // whether the GLBA/DPPA values indicate absolutely no permissions to view Vehicles
@@ -14,7 +15,7 @@ EXPORT getMotorVehicles(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
   vehicles_are_turned_off := NOT(dppa_ok AND glba_ok);
   
   // --------------- Vehicles Data - Using Business IDs ----------------
-  VehiclesRaw := VehicleV2.Key_Vehicle_Linkids.kFetch(Business_Risk_BIP.Common.GetLinkIDs(Shell),,
+  VehiclesRaw := VehicleV2.Key_Vehicle_Linkids.kFetch(Business_Risk_BIP.Common.GetLinkIDs(Shell), mod_access,
                              Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
                              0, /*ScoreThreshold --> 0 = Give me everything*/
                              linkingOptions,

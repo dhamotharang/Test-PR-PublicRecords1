@@ -31,10 +31,11 @@ export Report_Service() := macro
 	iesp.ECL2ESP.SetInputBaseRequest (first_row);
 	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 	
- glb_ok  := mod_access.isValidGlb();
+ is_consumer := mod_access.isConsumer();
+ glb_ok  := mod_access.isValidGlb() or is_consumer;
 			
 	// coded per requirement 3.30 #3 Relationship identifier Project.
-	PermissionsFlagGLB  := mod_access.glb = 0;
+	PermissionsFlagGLB := mod_access.glb = 0 and ~is_consumer;
 	
 	// END OF requirement 3.30 #3
 	

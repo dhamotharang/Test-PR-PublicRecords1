@@ -1,4 +1,4 @@
-﻿IMPORT DueDiligence, STD, ut;
+﻿IMPORT DueDiligence, Risk_Indicators, STD, ut;
 
 EXPORT getInd(DATASET(DueDiligence.LayoutsInternal.SharedInput) sharedInput) := FUNCTION
 
@@ -45,7 +45,7 @@ EXPORT getInd(DATASET(DueDiligence.LayoutsInternal.SharedInput) sharedInput) := 
                                                   SELF.bestAddress := LEFT.dataToUse.bestAddress;
                                                   
                                                   
-                                                  validDOB := DueDiligence.Common.IsValidDOB((UNSIGNED4)LEFT.dataToUse.dob);
+                                                  validDOB := DueDiligence.CommonDate.IsValidDate((UNSIGNED4)LEFT.dataToUse.dob);
                                                   validHistDate := STD.Date.IsValidDate(historyDate);
                                                   
                                                   SELF.estimatedAge := IF(validDOB AND validHistDate, ut.Age((UNSIGNED4)LEFT.dataToUse.dob, historyDate), 0);
@@ -60,8 +60,24 @@ EXPORT getInd(DATASET(DueDiligence.LayoutsInternal.SharedInput) sharedInput) := 
                                                   SELF.bs_bestSSN := LEFT.bs.best_flags.ssn;
                                                   SELF.bs_iidSocsValFlag := LEFT.bs.iid.socsvalflag;
                                                   SELF.bs_iidPwSocsValFlag := LEFT.bs.iid.pwsocsvalflag;
-                                                  SELF.bs_inputSocsCharFlag := LEFT.bs.ssn_verification.validation.inputsocscharflag;   
+                                                  SELF.bs_inputSocsCharFlag := LEFT.bs.ssn_verification.validation.inputsocscharflag;  
                                                   
+                                                  
+                                                  //fields for the Identity Report
+                                                  SELF.inputSSNDetails.ssn := LEFT.inputEcho.individual.ssn;
+                                                  SELF.inputSSNDetails.issuedLowDate := LEFT.bs.SSN_Verification.Validation.low_issue_date;
+                                                  SELF.inputSSNDetails.issuedHighDate := LEFT.bs.SSN_Verification.Validation.high_issue_date;
+                                                  SELF.inputSSNDetails.issuedState := LEFT.bs.SSN_Verification.Validation.issue_state;
+                                                  SELF.inputSSNDetails.randomized := Risk_Indicators.rcSet.isCodeRS(LEFT.inputEcho.individual.ssn, LEFT.bs.iid.socsvalflag, LEFT.bs.iid.socllowissue, LEFT.bs.iid.socsrcisflag);
+                                                  
+                                                  ssnOnFile := DueDiligence.Common.GetStringListAsDataset(LEFT.bs.header_summary.ssns_on_file);
+                                                  SELF.ssnOnFile := PROJECT(ssnOnFile(info <> DueDiligence.Constants.EMPTY), TRANSFORM({STRING9 ssn}, SELF.ssn := LEFT.info;));
+                                                  
+                                                  SELF.bestSSNDetails.ssn := LEFT.dataToUse.ssn;
+                                                  
+                                                  dobOnFile := DueDiligence.Common.GetStringListAsDataset(LEFT.bs.header_summary.dobs_on_file);
+                                                  SELF.dobOnFile := PROJECT(dobOnFile(info <> DueDiligence.Constants.EMPTY), TRANSFORM({STRING8 dob}, SELF.dob := LEFT.info;));
+                                                                                                 
                                                
                                                   
                                                   //pull any necessary fields needed for processing from the Citizenship risk indicators

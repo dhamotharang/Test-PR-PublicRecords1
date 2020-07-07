@@ -9,6 +9,7 @@ IMPORT BatchShare,doxie,FraudShared,FraudShared_Services, iesp, WSInput;
 EXPORT ReportService() := MACRO
   #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	#CONSTANT ('FraudPlatform', 'FraudGov');
+	#CONSTANT('useonlybestdid',true);	
 
 	//The following macro defines the field sequence on WsECL page of query.
 	WSInput.MAC_FraudGovPlatform_Services_ReportService();
@@ -189,37 +190,23 @@ EXPORT ReportService() := MACRO
 	// **************************************************************************************
 	// Append DID for Input PII
 	// **************************************************************************************	  
+	get_input_in := PROJECT(report_in, TRANSFORM(Autokey_batch.Layouts.rec_inBatchMaster, 
+																				SELF.did 		:= 0; //Purposefully sending DID = 0, so we can resolve the adl best did for Input PII.
+																				SELF.homephone := LEFT.phoneno,
+																				SELF := LEFT,
+																				SELF := []));
 
-	//prepare the layout for ADL_BEST DID call
-	ds_in_didville_layout := PROJECT(report_in, TRANSFORM(DidVille.Layout_Did_OutBatch,
-                                                  SELF.seq		:= (UNSIGNED)LEFT.acctno;
-                                                  SELF.fname	:= LEFT.name_first;
-                                                  SELF.mname	:= LEFT.name_middle;
-                                                  SELF.lname	:= LEFT.name_last;
-                                                  SELF.suffix	:= LEFT.name_suffix;
-                                                  SELF.ssn 		:= stringlib.stringfilter(LEFT.ssn,'0123456789');
-                                                  SELF.did 		:= 0; //Purposefully sending DID = 0, so we can resolve the adl best did for Input PII. 
-                                                  SELF.phone10:= LEFT.phoneno;
-                                                  SELF				:= LEFT;
-                                                  SELF				:= []));
-	
-	ds_in_w_adl_did_appended := DidVille.did_service_common_function(ds_in_didville_layout,
-                                                                   glb_flag := report_mod.isValidGLB(),
-                                                                   glb_purpose_value := report_mod.glb,
-                                                                   appType := report_mod.application_type,
-                                                                   include_minors := TRUE,
-                                                                   IndustryClass_val := report_mod.industry_class,
-                                                                   DRM_val := report_mod.DataRestrictionMask);
-																																			 
-	ds_in_w_adl_did_appended_ungrup := UNGROUP(ds_in_w_adl_did_appended);
-	
-	ds_in_with_did := JOIN(report_in, ds_in_w_adl_did_appended_ungrup, 
-											LEFT.acctno = (string)RIGHT.seq,
+	ds_in_w_adl_did_appended := BatchServices.Functions.fn_find_dids_and_append_to_acctno(get_input_in);																										
+
+	ds_in_with_did := JOIN(report_in, ds_in_w_adl_did_appended, 
+											LEFT.acctno = RIGHT.acctno,
 											TRANSFORM(FraudShared_Services.Layouts.BatchIn_rec, 
+												SELF.Seq := (UNSIGNED)LEFT.acctno,
 												SELF.did := MAP(~DidFoundInPR => RIGHT.DID, 
 																				DidFoundInPR OR IsInputDidRINID => LEFT.DID,
 																				0); 
-												SELF := LEFT));
+												SELF := LEFT),
+												LEFT OUTER);
 												
 	report_in_final := PROJECT(report_in, FraudShared_Services.Layouts.BatchIn_rec);
 	

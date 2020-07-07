@@ -14,7 +14,7 @@ EXPORT mac_segmentation(trimRes, resOut, weight_score, distance) := MACRO;
 IMPORT InsuranceHeader_PostProcess;
  
 	#UNIQUENAME(normrec)
-	%normrec% := record  
+	%normrec% := record
 		RECORDOF(trimRes.results) res;
 		unsigned6 id;
 	end;
@@ -29,15 +29,15 @@ IMPORT InsuranceHeader_PostProcess;
 	%trimReswSeg% := JOIN(%trimResNorm%,%seg%,
                       KEYED(left.res.did = right.did),
                        transform(RECORDOF(LEFT),
-														 string tempInd := TRIM(right.ind);                             
+														 string tempInd := TRIM(right.ind);
 														 self.res.cluster_cnt := right.cnt;
-														 self.res.ind := IF(tempInd = IDLExternalLinking.Constants.DEAD_IND and right.cnt=1, 'DEAD_SINGLETON', tempInd); // dead singleton is not good in the context.														 
+														 self.res.ind := IF(tempInd = IDLExternalLinking.Constants.DEAD_IND and right.cnt=1, 'DEAD_SINGLETON', tempInd); // dead singleton is not good in the context.
 														 self.res.best_ssn5 := InsuranceHeader_xLink.mod_SSNParse(right.ssn).ssn5,
-														 self.res.best_ssn4 := InsuranceHeader_xLink.mod_SSNParse(right.ssn).ssn4,														
-														 self.res.match_best_ssn := (left.res.ssn5<>'' and left.res.ssn5=self.res.best_ssn5 or left.res.ssn5weight=0) and 
-																	(left.res.ssn4 <> '' and left.res.ssn4=self.res.best_ssn4) and left.res.ssn4weight>0 ;																	
+														 self.res.best_ssn4 := InsuranceHeader_xLink.mod_SSNParse(right.ssn).ssn4,
+														 self.res.match_best_ssn := (left.res.ssn5<>'' and left.res.ssn5=self.res.best_ssn5 or left.res.ssn5weight=0) and
+																	(left.res.ssn4 <> '' and left.res.ssn4=self.res.best_ssn4) and left.res.ssn4weight>0 ;
 														 self.res.best_dob := right.dob,
-                             self.res := left.res,                             
+                             self.res := left.res,
                              self := left), left outer, keep(1));
 
 	#UNIQUENAME(trimResParentOnly)
@@ -46,7 +46,7 @@ IMPORT InsuranceHeader_PostProcess;
 	%trimResDeNorm% := DENORMALIZE(DISTRIBUTE(%trimResParentOnly%, reference),DISTRIBUTE(%trimReswSeg%, ID),
 											LEFT.reference = RIGHT.id, 
 													TRANSFORM(RECORDOF(LEFT),
-															self.results := LEFT.results + RIGHT.res,															
+															self.results := LEFT.results + RIGHT.res,
 															self := left), LOCAL);
  
 	// for the requests that were NOT assigned a DID using distance, try segmentation

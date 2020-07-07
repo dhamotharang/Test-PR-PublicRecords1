@@ -1,9 +1,8 @@
-﻿IMPORT BIPV2, BIPV2_Best, BIPV2_Contacts, BIPV2_Company_Names, BusinessBatch_BIP,
-  Corp2,DCAV2,Gong,LiensV2,LN_PropertyV2,
-      Suppress,TopBusiness_Services,UCCV2,FAA,Watercraft,VehicleV2,ut,
-      SAM,Business_Risk,Business_Risk_BIP,Codes,bankruptcyV3, STD,
-      UCCV2_Services, AutoStandardI, MDR, diversity_certification,OSHAIR,LaborActions_WHD,
-      Risk_Indicators, Doxie;
+﻿IMPORT Address, AutoStandardI, bankruptcyV3, BIPV2, BIPV2_Best, BIPV2_Company_Names, BIPV2_Contacts,
+       Business_Risk, Business_Risk_BIP, BusinessBatch_BIP, Codes, Corp2, DCAV2,
+       diversity_certification, Doxie, FAA, dx_Gong, LaborActions_WHD, LiensV2, LN_PropertyV2,
+       MDR, TopBusiness_Services, OSHAIR, Risk_Indicators, SAM, STD, Suppress,
+       UCCV2, UCCV2_Services, ut, VehicleV2, Watercraft;
 
 // These are general functions which for the most part go against the *linkids* kfetch routines
 // which return unique Id's for particular datasets.  These unique ID's can then be used to return
@@ -39,7 +38,7 @@ EXPORT getLINkidsAtProxidLevel( dataset(BIPV2.IDfunctions.rec_SearchInput) ds_Fo
     EXPORT boolean includeMinors := FALSE;
   END;
 
-  ds_bestInfoProxIdNonRestricted := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_Format2SearchInput).data2_;
+  ds_bestInfoProxIdNonRestricted := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_Format2SearchInput).SearchKeyData(mod_access);
 
   TopBusiness_Services.functions.MAC_IsRestricted(ds_bestInfoProxIdNonRestricted,
                               ds_bestInfoBatchProxIdRestricted,
@@ -74,102 +73,154 @@ EXPORT getLINkidsAtProxidLevel( dataset(BIPV2.IDfunctions.rec_SearchInput) ds_Fo
 END;
 
 // NOTE - this function will ultimately be replaced by BIPV2.IdAppendRoxie.WithBest when it supports the needed functionality
-EXPORT AppendBest(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend,
-                  string fetchLevel,
-                  BIPV2.mod_sources.iParams loc_mod = PROJECT(AutoStandardI.GlobalModule(), BIPV2.mod_sources.iParams, opt),
-                  boolean isMarketing = FALSE) := FUNCTION
-  isSeleBest := fetchLevel = BIPV2.IdConstants.fetch_level_seleid;
+EXPORT AppendBestSeleProx(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend,
+                          BIPV2.mod_sources.iParams loc_mod = PROJECT(AutoStandardI.GlobalModule(), BIPV2.mod_sources.iParams, opt),
+                          boolean isMarketing = FALSE) := FUNCTION
+
   preBest :=
-    project(withAppend,
-      transform(BIPV2.IdLayouts.l_xlink_ids2,
-        self.uniqueid := left.request_id,
-        self := left));
+  PROJECT(withAppend,
+    TRANSFORM(BIPV2.IdLayouts.l_xlink_ids2,
+      SELF.uniqueid := LEFT.request_id,
+      SELF := LEFT));
 
-  withBest0 := if(isMarketing, BIPV2_Best.Key_linkIds.kfetch2Marketing(preBest, fetchlevel, in_mod := loc_mod),
-                  BIPV2_Best.Key_LinkIds.kfetch2(preBest, fetchLevel, in_mod := loc_mod));
-  withBest := dedup(withBest0, ultid, orgid, seleid, proxid, uniqueid, all);
+  // note: the BIPV2_Best.Key_LinkIds.kfetch2 call returns not only the SeleID Best record for the
+  //       input linkids, but also the best ProxId records for all associated ProxIds
+  withBestSele0 := IF(isMarketing,
+                      BIPV2_Best.Key_linkIds.kfetch2Marketing(preBest, bipv2.IDconstants.Fetch_Level_SELEID, in_mod := loc_mod),
+                      BIPV2_Best.Key_LinkIds.kfetch2(preBest, bipv2.IDconstants.Fetch_Level_SELEID, in_mod := loc_mod));
+  withBestSele := DEDUP(withBestSele0, ultid, orgid, seleid, proxid, uniqueid, all);
 
-  BestLayout := RECORD
-    BIPV2.IDAppendLayouts.svcAppendOut;
-    withBest.company_name.dt_first_seen;
-    withBest.company_name.dt_last_seen;
-    dataset({withBest.company_name.sources}) company_name_sources;
-    string county_name;
-  END;
+  BusinessBatch_BIP.Layouts.BestSeleProxLayoutExp xfm_getSeleBest(BIPV2.IdAppendLayouts.IdsOnly l,
+                                                               BIPV2_Best.Key_LinkIds.kFetch2_layout r) :=
+    TRANSFORM
+      SELF.proxid := l.proxid;
+      SELF.proxscore := l.proxscore;
+      SELF.proxweight := l.proxweight;
+      SELF.seleScore := l.seleScore;
+      SELF.company_name := r.company_name[1].company_name;
+      SELF.dt_first_seen := r.company_name[1].dt_first_seen;
+      SELF.dt_last_seen := r.company_name[1].dt_last_seen;
+      SELF.prim_range := r.company_address[1].company_prim_range;
+      SELF.predir := r.company_address[1].company_predir;
+      SELF.prim_name := r.company_address[1].company_prim_name;
+      SELF.addr_suffix := r.company_address[1].company_addr_suffix;
+      SELF.postdir := r.company_address[1].company_postdir;
+      SELF.unit_desig := r.company_address[1].company_unit_desig;
+      SELF.sec_range := r.company_address[1].company_sec_range;
+      SELF.p_city_name := r.company_address[1].company_p_city_name;
+      SELF.v_city_name := r.company_address[1].address_v_city_name;
+      SELF.st := r.company_address[1].company_st;
+      SELF.zip := r.company_address[1].company_zip5;
+      SELF.zip4 := r.company_address[1].company_zip4;
+      SELF.county_name := r.company_address[1].county_name;
+      SELF.company_phone := r.company_phone[1].company_phone;
+      SELF.company_fein := r.company_fein[1].company_fein;
+      SELF.company_url := r.company_url[1].company_url;
+      SELF.company_incorporation_date := r.company_incorporation_date[1].company_incorporation_date;
+      SELF.duns_number := r.duns_number[1].duns_number;
+      SELF.company_sic_code1 := r.sic_code[1].company_sic_code1;
+      SELF.company_naics_code1 := r.naics_code[1].company_naics_code1;
+      SELF.company_name_sources := r.company_name[1].sources;
+      SELF.dba_name := r.dba_name[1].dba_name;
+      SELF.company_btype := '';
+      SELF.contact_fname := '';
+      SELF.contact_mname := '';
+      SELF.contact_lname := '';
+      SELF.contact_job_title := '';
+      SELF.contact_did := 0;
+      SELF.proxId_comp_name := '';
+      SELF.proxId_comp_address := '';
+      SELF.proxId_p_city_name := '';
+      SELF.proxId_v_city_name := '';
+      SELF.proxId_st := '';
+      SELF.proxId_zip := '';
+      SELF.proxId_zip4 := '';
+      SELF.proxId_company_phone := '';
+      SELF.proxId_dt_first_seen := 0;
+      SELF.proxId_dt_last_seen := 0;
+      SELF.proxId_county_name := '';
+      SELF.proxId_company_fein := '';
+      SELF.proxId_company_url := '';
+      SELF.proxId_incorporation_date := 0;
+      SELF.proxId_duns_number := '';
+      SELF.proxId_sic_code := '';
+      SELF.proxId_naics_code := '';
+      SELF.proxId_dba_name := '';
+      SELF._btype_id := 0;
+      SELF := l;
+      SELF := r;
+    END;
 
-  postBest :=
-    join(withAppend, withBest((isSeleBest and proxid = 0) or (not isSeleBest and proxid != 0)),
-      left.request_id = right.uniqueid
-        and (right.proxid = 0 or left.proxid = right.proxid),
-      transform(BestLayout,
-        hasMatch := right.proxid != 0 or right.seleid != 0;
-        sameProx := left.proxid = right.proxid or isSeleBest;
-        self.proxid := if(sameProx or not hasMatch, left.proxid, right.proxid),
-        self.proxscore := if(sameProx, left.proxscore, 0);
-        self.proxweight := if(sameProx, left.proxweight, 0);
-        self.company_name := right.company_name[1].company_name,
-        self.dt_first_seen := right.company_name[1].dt_first_seen,
-        self.dt_last_seen := right.company_name[1].dt_last_seen,
-        self.prim_range := right.company_address[1].company_prim_range,
-        self.predir := right.company_address[1].company_predir,
-        self.prim_name := right.company_address[1].company_prim_name,
-        self.addr_suffix := right.company_address[1].company_addr_suffix,
-        self.postdir := right.company_address[1].company_postdir,
-        self.unit_desig := right.company_address[1].company_unit_desig,
-        self.sec_range := right.company_address[1].company_sec_range,
-        self.p_city_name := right.company_address[1].company_p_city_name,
-        self.v_city_name := right.company_address[1].address_v_city_name,
-        self.st := right.company_address[1].company_st,
-        self.zip := right.company_address[1].company_zip5,
-        self.zip4 := right.company_address[1].company_zip4,
-        self.county_name := right.company_address[1].county_name,
-        self.company_phone := right.company_phone[1].company_phone,
-        self.company_fein := right.company_fein[1].company_fein,
-        self.company_url := right.company_url[1].company_url,
-        self.company_incorporation_date := right.company_incorporation_date[1].company_incorporation_date,
-        self.duns_number := right.duns_number[1].duns_number,
-        self.company_sic_code1 := right.sic_code[1].company_sic_code1,
-        self.company_naics_code1 := right.naics_code[1].company_naics_code1,
-        self.company_name_sources := right.company_name[1].sources;
-// get new best fields for dba_name, contact_fname, contact_mname, contact_lname, contact_job_title, contact_did
-        self.dba_name := right.dba_name[1].dba_name,
-        self.company_btype := '',
-        self.contact_fname := '',
-        self.contact_mname := '',
-        self.contact_lname := '',
-        self.contact_job_title := '',
-        self.contact_did := 0,
-        self := left,
-        self := right),
-      left outer);
+    BusinessBatch_BIP.Layouts.BestSeleProxLayoutExp xfm_addProxBest(BusinessBatch_BIP.Layouts.BestSeleProxLayoutExp l, BIPV2_Best.Key_LinkIds.kFetch2_layout r, INTEGER c) :=
+    TRANSFORM
+      SELF.proxId_comp_name := r.company_name[1].company_name;
+      SELF.proxId_dt_first_seen := r.company_name[1].dt_first_seen;
+      SELF.proxId_dt_last_seen := r.company_name[1].dt_last_seen;
+      SELF.proxId_comp_address := Address.Addr1FromComponents(r.company_address[1].company_prim_range,
+                                                              r.company_address[1].company_predir,
+                                                              r.company_address[1].company_prim_name,
+                                                              r.company_address[1].company_addr_suffix,
+                                                              r.company_address[1].company_postdir,
+                                                              r.company_address[1].company_unit_desig,
+                                                              r.company_address[1].company_sec_range);
+      SELF.proxId_p_city_name := r.company_address[1].company_p_city_name;
+      SELF.proxId_v_city_name := r.company_address[1].address_v_city_name;
+      SELF.proxId_st := r.company_address[1].company_st;
+      SELF.proxId_zip := r.company_address[1].company_zip5;
+      SELF.proxId_zip4 := r.company_address[1].company_zip4;
+      SELF.proxId_county_name := r.company_address[1].county_name;
+      SELF.proxId_company_phone := r.company_phone[1].company_phone;
+      SELF.proxId_company_fein := r.company_fein[1].company_fein;
+      SELF.proxId_company_url := r.company_url[1].company_url;
+      SELF.proxId_incorporation_date := r.company_incorporation_date[1].company_incorporation_date;
+      SELF.proxId_duns_number := r.duns_number[1].duns_number;
+      SELF.proxId_sic_code := r.sic_code[1].company_sic_code1;
+      SELF.proxId_naics_code := r.naics_code[1].company_naics_code1;
+      SELF.proxId_dba_name := r.dba_name[1].dba_name;
+      SELF._btype_id := c;
+      SELF := l;
+    END;
 
-  postBestWithId := project(postBest, transform({recordof(left), unsigned _btype_id}, self._btype_id := counter, self := left));
+    postBestSele :=
+    JOIN(withAppend, withBestSele,
+        LEFT.request_id = RIGHT.uniqueid AND
+        LEFT.seleid = RIGHT.seleid AND
+        RIGHT.proxid = 0,
+      xfm_getSeleBest(LEFT,RIGHT),
+      KEEP (1),
+      LEFT OUTER);
 
-  BIPV2_Company_Names.functions.mac_go(postBestWithId, outBtype, _btype_id, company_name);
-  withBType :=
-    join(postBestWithId, outBtype,
-      left._btype_id = right._btype_id,
-      transform(recordof(outBtype),
-        self.company_btype := right.cnp_btype,
-        self := left,
-        self := right,
-        self := []),
-      keep(1), left outer);
+  postBestWithProxAndId :=
+    JOIN(postBestSele, withBestSele,
+         LEFT.uniqueid = RIGHT.uniqueid AND
+         LEFT.seleid = RIGHT.seleid AND
+         LEFT.proxid = RIGHT.proxid,
+      xfm_addProxBest(LEFT,RIGHT,COUNTER),
+      KEEP (1),
+      LEFT OUTER);
 
-  //output(withBest0, named('AppendBest__withBest0'));
-  //output(withBest, named('AppendBest__withBest'));
-  //output(postBest, named('AppendBest__postBest'));
+  BIPV2_Company_Names.functions.mac_go(postBestWithProxAndId, outBtype, _btype_id, company_name);
+  withBTypeSeleProx :=
+    JOIN(postBestWithProxAndId, outBtype,
+      LEFT._btype_id = RIGHT._btype_id,
+      TRANSFORM(BusinessBatch_BIP.Layouts.BestSeleProxLayoutExp,
+        SELF.company_btype := RIGHT.cnp_btype,
+        SELF := LEFT,
+        SELF := RIGHT,
+        SELF := []),
+      KEEP(1), LEFT OUTER);
 
-  RETURN withBType;
+  RETURN withBTypeSeleProx;
 
 END;
+
 
   // Phones
 
   EXPORT GetPhones( DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWithAcctNo,
                     DATASET(BIPV2.IDlayouts.l_xlink_ids)                 dLinkIds) :=
   FUNCTION
-    dGongPhonesRaw := Gong.key_History_LinkIDs.kFetch(dLinkIds, ,
+    dGongPhonesRaw := dx_Gong.key_history_LinkIDs.kFetch(dLinkIds, mod_access,
         BIPV2.IDconstants.Fetch_Level_SELEID)(phone10 != '');
     RawRecordType := RECORDOF(dGongPhonesRaw);
 
@@ -840,9 +891,9 @@ EXPORT GetCorps(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWit
 
     // append property source to record so we can filter out marketing-restricted sources
     {RawRecordType, string _prop_src, boolean _use_st} AddPropertySource(RawRecordType le) := TRANSFORM
-      // Lexis Asrs property sources need to have the state appended to them (as some states are restricted)
+      // Lexis property sources need to have the state appended to them (as some states are restricted)
       rawSrc := MDR.sourceTools.fProperty(le.ln_fares_id);
-      addState := rawSrc = MDR.sourceTools.src_LnPropV2_Lexis_Asrs;
+      addState := rawSrc IN [MDR.sourceTools.src_LnPropV2_Lexis_Asrs, MDR.sourceTools.src_LnPropV2_Lexis_Deeds_Mtgs];
       fullSrc := IF (addState, rawSrc + le.st, rawSrc);
 
       SELF._prop_src := fullSrc;
@@ -1324,7 +1375,7 @@ EXPORT GetCorps(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWit
   EXPORT GetDCAInfo(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWithAcctNo,
                     DATASET(BIPV2.IDlayouts.l_xlink_ids)                 dLinkIds) :=
   FUNCTION
-    dDCAInfoRaw := DCAV2.Key_LinkIds.kFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID);
+    dDCAInfoRaw := DCAV2.Key_LinkIds.kFetch(dLinkIds, mod_access, BIPV2.IDconstants.Fetch_Level_SELEID);
     RawRecordType := RECORDOF(dDCAInfoRaw);
 
     // currently, all DCA records are marketing-allowed for the BRM rollup service

@@ -1,4 +1,4 @@
-﻿import Doxie, Doxie_Raw, doxie_ln, utilfile, header_quick, autokeyb, ut, moxie_phonesplus_server,
+import Doxie, Doxie_Raw, doxie_ln, utilfile, header_quick, autokeyb, ut, moxie_phonesplus_server,
   LN_PropertyV2_Services, mdr, iesp, AutoStandardI, CriminalRecords_Services, American_Student_Services, Suppress;
 
 doxie.MAC_Header_Field_Declare();
@@ -16,7 +16,8 @@ export ViewSourceDid(
     VoterVersion = 0,
     DeaVersion =0,
     CriminalRecordVersion =0,
-    string1 in_party_type = ''
+    string1 in_party_type = '',
+    EmailVersion = 0
 ) := FUNCTION
 
 global_mod := AutoStandardI.GlobalModule();
@@ -43,7 +44,8 @@ boolean viewStateDeath(string20 sect) := viewAll(sect) OR sect = 'statedeath';
 boolean viewProfLic(string20 sect)    := IF (IsCRS, Include_ProfessionalLicenses_val, viewAll(sect) OR sect = 'proflic');
 boolean viewSanc(string20 sect)				:= IF (IsCRS, Include_Sanctions_val, viewAll(sect) OR sect = 'sanc');
 boolean viewProv(string20 sect)				:= IF (IsCRS, Include_Providers_val, viewAll(sect) OR sect = 'prov');
-boolean viewEmail(string20 sect)			:= IF (isCRS, Include_Email_addresses_val, viewAll(sect) or sect = 'email');
+boolean viewEmail(string20 sect)			:= EmailVersion in [0,1] and IF (isCRS, Include_Email_addresses_val, viewAll(sect) or sect = 'email');
+boolean viewEmailV2(string20 sect)		:= EmailVersion = 2 and IF (isCRS, Include_Email_addresses_val, viewAll(sect) or sect = 'email_v2');
 boolean viewVeh(string20 sect)        := VehicleVersion in [0,1] and IF (IsCRS, Include_MotorVehicles_val, viewAll(sect) OR sect = 'veh');
 boolean viewVehV2(string20 sect)      := VehicleVersion in [0,2] and IF (IsCRS, Include_MotorVehicles_val, viewAll(sect) OR sect = 'veh_v2');
 boolean viewDea(string20 sect)        := DeaVersion in [0,1] and IF (IsCRS, Include_DEA_Val, viewAll(sect) OR sect = 'dea');
@@ -114,6 +116,7 @@ Doxie_Raw.layout_crs_raw getDidChildren(Doxie_Raw.Layout_input fileL) := transfo
     SELF.did := did;
     dids := dataset([{did}],Doxie.layout_references);
     ds_email_child := if(viewEmail(fileL.section), Doxie.email_records(dids,mod_access.ssn_mask,mod_access.application_type));
+    ds_email_v2_child := if(viewEmailV2(fileL.section), Doxie_Raw.emailv2_raw(dids,mod_access));
     ds_death_child := if(viewDeath(fileL.section),Doxie_Raw.death_raw(dids, , mod_access.date_threshold, mod_access.dppa, mod_access.glb,mod_access.ssn_mask)(IncludeBlankDOD or (integer)DOD8 > 0 ));
     ds_state_death_child := if(viewStateDeath(fileL.section),Doxie_Raw.state_death_raw(dids, mod_access.date_threshold, mod_access.dppa, mod_access.glb,mod_access.ssn_mask));
     ds_atf_child := if(viewAtf(fileL.section), Doxie_Raw.atf_raw(dids, mod_access.date_threshold, mod_access.dppa, mod_access.glb,mod_access.ssn_mask));
@@ -183,6 +186,7 @@ Doxie_Raw.layout_crs_raw getDidChildren(Doxie_Raw.Layout_input fileL) := transfo
     ds_doc_events_child := if(viewDOC(fileL.section),Doxie_Raw.DOC_Events_Raw(doc_persons,true,true,true,true,true,,,,mod_access.date_threshold,mod_access.dppa,mod_access.glb));
     // same as in doxie@Comprehensive_Report_Service
     tempmod := module(project(global_mod,CriminalRecords_Services.IParam.report,opt))
+      doxie.compliance.MAC_CopyModAccessValues(mod_access);    
       export string14 did := input[1].id;
       export string25   doc_number   := '' ;
       export string60   offender_key := '' ;
@@ -264,6 +268,7 @@ Doxie_Raw.layout_crs_raw getDidChildren(Doxie_Raw.Layout_input fileL) := transfo
     self.targ_child := CHOOSEN (ds_targ_child, ut.limits.CRS_SOURCE_COUNT.default);
     self.phonesPlus_child := CHOOSEN(ds_pp_child, ut.limits.CRS_SOURCE_COUNT.default);
     self.email_child := CHOOSEN(ds_email_child,ut.limits.CRS_SOURCE_COUNT.default); //this should always be 1 record
+    self.email_v2_child := CHOOSEN(ds_email_v2_child,ut.limits.CRS_SOURCE_COUNT.default);
     self.FBNv2_child := CHOOSEN (ds_fbn_v2_child, ut.limits.CRS_SOURCE_COUNT.default);
     self.student_child := CHOOSEN(ds_student, ut.limits.CRS_SOURCE_COUNT.default);
     self.busHdr_child := [];
@@ -325,7 +330,7 @@ QuickHeader_in := input(is_QuickHeader(id));
 header_quick_temp:= record
     header_quick.layout_records;
     unsigned4 global_sid;
-	unsigned8 record_sid;
+  unsigned8 record_sid;
 end;
 
 Doxie_Raw.Layout_crs_raw QuickHeader(QuickHeader_in L) := transform

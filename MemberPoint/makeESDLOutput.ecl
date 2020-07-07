@@ -1,12 +1,12 @@
 import iesp, Suppress;
 
-EXPORT iesp.memberpointreport.t_MemberPointReportResponse makeESDLOutput(dataset(MemberPoint.Layouts.BatchOut) BatchOut,
-																																							iesp.memberpointreport.t_MemberPointReportBy report_by, 
+EXPORT iesp.keepcontactreport.t_KeepContactReportResponse makeESDLOutput(dataset(MemberPoint.Layouts.BatchOut) BatchOut,
+																																							iesp.keepcontactreport.t_KeepContactReportBy report_by, 
 																																							string input_ssn_mask_value,
 																																							unsigned1 input_dob_mask_value) := function
 
 
-			iesp.memberpointreport.t_MemberPointPhoneInfo normXformPhones(MemberPoint.Layouts.BatchOut L,integer c) := transform
+			iesp.keepcontactreport.t_KeepContactPhoneInfo normXformPhones(MemberPoint.Layouts.BatchOut L,integer c) := transform
 			
 				self.MatchCode := map(
 																	c = 1 => l.Phone1_Match_Codes,
@@ -49,11 +49,12 @@ EXPORT iesp.memberpointreport.t_MemberPointReportResponse makeESDLOutput(dataset
 																	c = 2 => 	l.Phone2_Line_Type,
 																						l.Phone3_Line_Type
 																	) ;
-				self.Confidence := map(
+				// Removed the below field as it was deprecated per latest iesp interface/layout
+/* 				self.Confidence := map(
 																	c = 1 => l.Phone1_Score_confidence,
 																	c = 2 => l.Phone2_Score_confidence,
 																					 l.Phone3_Score_confidence
-																	) ;
+																	) ; */
 				
 /* 				self.Score :=  map(
    																	c = 1 => l.Phone1_Score,
@@ -87,7 +88,7 @@ EXPORT iesp.memberpointreport.t_MemberPointReportResponse makeESDLOutput(dataset
 			EmailChild := normalize(BatchOut,10,normXformEmails(left,counter));
 			header_row 	 :=  iesp.ECL2ESP.GetHeaderRow();
 
-			 iesp.memberpointreport.t_MemberPointReportResponse xformESDL(BatchOut l) := transform
+			 iesp.keepcontactreport.t_KeepContactReportResponse xformESDL(BatchOut l) := transform
 			 
 			 self._Header :=  project(header_row, transform(iesp.share.t_ResponseHeader,
 													self.status :=  left.status,
@@ -126,7 +127,8 @@ EXPORT iesp.memberpointreport.t_MemberPointReportResponse makeESDLOutput(dataset
 				self.Member.BestInfo.AddressOlderThan90Days :=  l.addr_older_than_90_days;
 				self.Member.BestInfo.DateFirstSeen :=  iesp.ECL2ESP.toDatestring8(L.addr_dt_first_seen);
 				self.Member.BestInfo.DateLastSeen :=  iesp.ECL2ESP.toDatestring8(L.addr_dt_last_seen);
-				self.Member.BestInfo.AddressConfidence :=  l.addr_confidence;
+				// Removed the below field as it was deprecated per latest iesp interface/layout
+				// self.Member.BestInfo.AddressConfidence :=  l.addr_confidence;
 				self.Member.BestInfo.NameScore := l.name_score;
 				self.Member.BestInfo.SSNScore := l.ssn_score;
 				self.Member.BestInfo.DOBScore := l.dob_score;
@@ -150,7 +152,8 @@ EXPORT iesp.memberpointreport.t_MemberPointReportResponse makeESDLOutput(dataset
 				self.Member.PossibleNewAddress.Address.Latitude := l.Latitude_new ;
 				self.Member.PossibleNewAddress.Address.Longitude := l.Longitude_new ;				
 				self.Member.PossibleNewAddress.AddressMatchCodes :=  l.address_new_match_codes  ;
-				self.Member.PossibleNewAddress.AddressConfidence :=  l.addr_confidence_new ;
+				// Removed the below field as it was deprecated per latest iesp interface/layout
+				// self.Member.PossibleNewAddress.AddressConfidence :=  l.addr_confidence_new ;
 				self.Member.PossibleNewAddress.DateFirstSeen := iesp.ECL2ESP.toDatestring8(L.addr_dt_first_seen_new);
 				self.Member.PossibleNewAddress.DateLastSeen  := iesp.ECL2ESP.toDatestring8(L.addr_dt_last_seen_new);
 				self.Member.Phones :=  PhonesChild;

@@ -11,22 +11,26 @@ Import ut;
 // export RV_Attributes_V3_XML_Experian_infile := '~scoring_project::in::riskview_v3_xml_experian_attributes_20141204' ;
 // export RV_Attributes_V3_XML_Experian_infile := '~scoring_project::in::riskview_v3_xml_experian_attributes_20160419' ;
 // export RV_Attributes_V3_XML_Experian_infile := '~scoring_project::in::riskview_v3_xml_experian_attributes_20161017' ;
-export RV_Attributes_V3_XML_Experian_infile := '~scoring_project::in::riskview_v3_xml_experian_attributes_20180507' ;
+// export RV_Attributes_V3_XML_Experian_infile := '~scoring_project::in::riskview_v3_xml_experian_attributes_20180507' ;
+export RV_Attributes_V3_XML_Experian_infile := '~scoring_project::in::riskview_v3_xml_experian_attributes_20191029' ;
 
 // export RV_Attributes_V3_BATCH_Experian_infile := '~scoring_project::in::riskview_v3_batch_experian_attributes_20141120' ; 
 // export RV_Attributes_V3_BATCH_Experian_infile :=  '~scoring_project::in::riskview_v3_xml_experian_attributes_20160419' ;
 // export RV_Attributes_V3_BATCH_Experian_infile := '~scoring_project::in::riskview_v3_xml_experian_attributes_20161017'; 
-export RV_Attributes_V3_BATCH_Experian_infile := '~scoring_project::in::riskview_v3_xml_experian_attributes_20180507'; 
+// export RV_Attributes_V3_BATCH_Experian_infile := '~scoring_project::in::riskview_v3_xml_experian_attributes_20180507'; 
+export RV_Attributes_V3_BATCH_Experian_infile := '~scoring_project::in::riskview_v3_xml_experian_attributes_20191029'; 
 
 // export RV_V4_Generic_infile :=  '~scoring_project::in::riskview_xml_generic_version4_20141212';
 // export RV_V4_Generic_infile :=  '~scoring_project::in::riskview_xml_generic_v3_v4_v5_20160419';
 // export RV_V4_Generic_infile :=  '~scoring_project::in::riskview_xml_generic_v3_v4_v5_20161110';
-export RV_V4_Generic_infile :=  '~scoring_project::in::riskview_xml_generic_v3_v4_v5_20180507';
+// export RV_V4_Generic_infile :=  '~scoring_project::in::riskview_xml_generic_v3_v4_v5_20180507';
+export RV_V4_Generic_infile :=  '~scoring_project::in::riskview_xml_generic_v3_v4_v5_20191029';
 
 // export RV_V3_Generic_infile :=  '~scoring_project::in::riskview_xml_generic_version3_20141205';
 // export RV_V3_Generic_infile :=  '~scoring_project::in::riskview_xml_generic_v3_v4_v5_20160419';
 // export RV_V3_Generic_infile :=  '~scoring_project::in::riskview_xml_generic_v3_v4_v5_20161110';
-export RV_V3_Generic_infile :=  '~scoring_project::in::riskview_xml_generic_v3_v4_v5_20180507';
+// export RV_V3_Generic_infile :=  '~scoring_project::in::riskview_xml_generic_v3_v4_v5_20180507';
+export RV_V3_Generic_infile :=  '~scoring_project::in::riskview_xml_generic_v3_v4_v5_20191029';
 
 export IV_Attributes_infile := '~scoring_project::in::riskview_xml_generic_v3_v4_v5_20160419';
 
@@ -34,73 +38,88 @@ export IV_Attributes_infile := '~scoring_project::in::riskview_xml_generic_v3_v4
 EXPORT SOCIO_Monitoring_v5_infile       := '~scoringqa::in::socio_v5';        
 //EXPORT SocioEconomic_V5_infile          := '~scoringqa::out::socioeconomic_v5_batch_20190621_1';
 // Export Profile_booster_Capone_infile := '~scoring_project::in::Profile_Booster_Capone_20160912';
-Export Profile_booster_Capone_infile    := '~scoring_project::in::Profile_Booster_Capone_20180226';
+// Export Profile_booster_Capone_infile    := '~scoring_project::in::Profile_Booster_Capone_20180226';
+Export Profile_booster_Capone_infile    := '~scoring_project::in::Profile_Booster_Capone_20191029';
 
 // export BC10_Scores_Chase_BNK4_infile := '~Scoring_Project::in::BC1O_XML_Chase_bnk4_20141110';
 // export BC10_Scores_Chase_BNK4_infile := '~scoring_project::in::bc1o_xml_chase_bnk4_20160525';
 // export BC10_Scores_Chase_BNK4_infile := '~scoring_project::in::bc1o_xml_chase_bnk4_20161117';
-export BC10_Scores_Chase_BNK4_infile := '~scoring_project::in::bc1o_xml_chase_bnk4_20180507';
+// export BC10_Scores_Chase_BNK4_infile := '~scoring_project::in::bc1o_xml_chase_bnk4_20180507';
+export BC10_Scores_Chase_BNK4_infile := '~scoring_project::in::bc1o_xml_chase_bnk4_20191029';
 
 // export PRIO_Scores_Chase_PIO2_infile := '~Scoring_Project::in::PRIO_XML_Chase_pi02_20141031';
 // export PRIO_Scores_Chase_PIO2_infile := '~scoring_project::in::prio_xml_chase_pi02_20160520';
 // export PRIO_Scores_Chase_PIO2_infile := '~scoring_project::in::prio_xml_chase_pi02_20161206';
-export PRIO_Scores_Chase_PIO2_infile := '~	scoring_project::in::prio_xml_chase_pi02_20180507';
+// export PRIO_Scores_Chase_PIO2_infile := '~	scoring_project::in::prio_xml_chase_pi02_20180507';
+export PRIO_Scores_Chase_PIO2_infile := '~scoring_project::in::prio_xml_chase_pi02_20191029';
 
 // export CBBL_Scores_XML_Chase_infile :='~scoring_project::in::cbbl_xml_chase_20141216';
 // export CBBL_Scores_XML_Chase_infile :='~scoring_project::in::cbbl_xml_chase_20160525';//
 // export CBBL_Scores_XML_Chase_infile :='~scoring_project::in::cbbl_xml_chase_20170210';
-export CBBL_Scores_XML_Chase_infile :='~scoring_project::in::cbbl_xml_chase_20180507';
+// export CBBL_Scores_XML_Chase_infile :='~scoring_project::in::cbbl_xml_chase_20180507';
+export CBBL_Scores_XML_Chase_infile :='~scoring_project::in::cbbl_xml_chase_20191029';
 
 // export ITA_Attributes_V3_BATCH_CapOne_infile := '~Scoring_Project::in::ITA_v3_Batch_CapitalOne_Attributes_20141001';
 // export ITA_Attributes_V3_BATCH_CapOne_infile := '~scoring_project::in::ita_v3_batch_capitalone_attributes_20160613';
 // export ITA_Attributes_V3_BATCH_CapOne_infile := '~scoring_project::in::ita_v3_batch_capitalone_attributes_20161208';
-export ITA_Attributes_V3_BATCH_CapOne_infile := '~scoring_project::in::ita_v3_batch_capitalone_attributes_20180521';
+// export ITA_Attributes_V3_BATCH_CapOne_infile := '~scoring_project::in::ita_v3_batch_capitalone_attributes_20180521';
+export ITA_Attributes_V3_BATCH_CapOne_infile := '~scoring_project::in::ita_v3_batch_capitalone_attributes_20191029';
 
 // export LI_Generic_msn1210_1_infile := '~scoring_project::in::leadintegrity_xml_generic_msn1210_1_20141028'; 
 // export LI_Generic_msn1210_1_infile := '~scoring_project::in::leadintegrity_xml_generic_msn1210_1_20160519'; 
 // export LI_Generic_msn1210_1_infile := '~scoring_project::in::leadintegrity_xml_generic_msn1210_1_20161206'; 
-export LI_Generic_msn1210_1_infile := '~scoring_project::in::leadintegrity_xml_generic_msn1210_1_20180507'; 
+// export LI_Generic_msn1210_1_infile := '~scoring_project::in::leadintegrity_xml_generic_msn1210_1_20180507'; 
+export LI_Generic_msn1210_1_infile := '~scoring_project::in::leadintegrity_xml_generic_msn1210_1_20191029'; 
 
 export IT61_Scores_BATCH_Paro_msn605_rsn804_infile := '~scoring_project::in::it61_batch_paro_msn605_rsn804_20141105';
 
 // export BIID_Scores_Batch_Chase_infile := '~scoring_project::in::biid_batch_chase_generic_20150306';  
 // export BIID_Scores_Batch_Chase_infile := '~scoring_project::in::biid_batch_chase_generic_20160824'; 
 // export BIID_Scores_Batch_Chase_infile := '~scoring_project::in::biid_batch_chase_generic_20170330';
-export BIID_Scores_Batch_Chase_infile := '~scoring_project::in::biid_batch_chase_generic_20180508';
+// export BIID_Scores_Batch_Chase_infile := '~scoring_project::in::biid_batch_chase_generic_20180508';
+export BIID_Scores_Batch_Chase_infile := '~scoring_project::in::biid_batch_chase_generic_20191029';
 
 // export BIID_Scores_XML_Generic_infile := '~scoring_project::in::biid_xml_general_generic_20150223 ';
 // export BIID_Scores_XML_Generic_infile := '~scoring_project::in::biid_xml_general_generic_20160602';//
 // export BIID_Scores_XML_Generic_infile := '~scoring_project::in::biid_xml_general_generic_20161213';
-export BIID_Scores_XML_Generic_infile := '~scoring_project::in::biid_xml_general_generic_20180507';
+// export BIID_Scores_XML_Generic_infile := '~scoring_project::in::biid_xml_general_generic_20180507';
+export BIID_Scores_XML_Generic_infile := '~scoring_project::in::biid_xml_general_generic_20191029';
 
 // export BIID_Scores_BATCH_Generic_infile := '~Scoring_Project::in::BIID_Batch_General_Generic_20141219';
 // export BIID_Scores_BATCH_Generic_infile := '~scoring_project::in::biid_xml_general_generic_20160602';//
 // export BIID_Scores_BATCH_Generic_infile := '~scoring_project::in::biid_xml_general_generic_20161213';
-export BIID_Scores_BATCH_Generic_infile := '~scoring_project::in::biid_xml_general_generic_20180507';
+// export BIID_Scores_BATCH_Generic_infile := '~scoring_project::in::biid_xml_general_generic_20180507';
+export BIID_Scores_BATCH_Generic_infile := '~scoring_project::in::biid_xml_general_generic_20191029';
+
 export BIIDv2_Scores_XML_Generic_infile := '~scoring_project::in::biid2_xml_20180507_csv';
 
 // export IID_Scores_V0_XML_Generic_infile := '~Scoring_Project::in::InstantID_XML_Generic_Version0_20141001';
 // export IID_Scores_V0_XML_Generic_infile := '~scoring_project::in::instantid_xml_generic_version0_20160602';
 // export IID_Scores_V0_XML_Generic_infile := '~scoring_project::in::instantid_xml_generic_version0_20161215';
-export IID_Scores_V0_XML_Generic_infile := '~scoring_project::in::instantid_xml_generic_version0_20180507';
+// export IID_Scores_V0_XML_Generic_infile := '~scoring_project::in::instantid_xml_generic_version0_20180507';
+export IID_Scores_V0_XML_Generic_infile := '~scoring_project::in::instantid_xml_generic_version0_20191029';
 
 // export IID_Scores_V0_BATCH_Generic_infile := '~scoring_project::in::instantid_batch_generic_version0_20141013';
 // export IID_Scores_V0_BATCH_Generic_infile := '~scoring_project::in::instantid_batch_generic_version0_20160527';
 // export IID_Scores_V0_BATCH_Generic_infile := '~scoring_project::in::instantid_batch_generic_version0_20170131';
-export IID_Scores_V0_BATCH_Generic_infile := '~scoring_project::in::instantid_xml_generic_version0_20180507';  //made shared sample wiht XML like ALL other samples, saves on time scraping logs
+// export IID_Scores_V0_BATCH_Generic_infile := '~scoring_project::in::instantid_xml_generic_version0_20180507';  //made shared sample wiht XML like ALL other samples, saves on time scraping logs
+export IID_Scores_V0_BATCH_Generic_infile := '~scoring_project::in::instantid_xml_generic_version0_20191029';  
 
 // export FP_V2_American_Express_FP1109_0_infile    := '~scoring_project::in:fraudpoint_xml_American_Express_fp1109_0_20160729'; 
 // export FP_V2_American_Express_FP1109_0_infile    := '~scoring_project::in:fraudpoint_xml_American_Express_fp1109_0_20161206';
-export FP_V2_American_Express_FP1109_0_infile    := '~scoring_project::in:fraudpoint_xml_american_express_fp1109_0_20180507';
+// export FP_V2_American_Express_FP1109_0_infile    := '~scoring_project::in:fraudpoint_xml_american_express_fp1109_0_20180507';
+export FP_V2_American_Express_FP1109_0_infile    := '~scoring_project::in::fraudpoint_xml_american_express_fp1109_0_20191029';
 
 // export FP_V3_Generic_FP31505_0_infile    := '~Scoring_Project::in::FraudPoint_XML_FP31505_0_20160419';
 // export FP_V3_Generic_FP31505_0_infile    := '~Scoring_Project::in::FraudPoint_XML_FP31505_0_20161220'; 
-export FP_V3_Generic_FP31505_0_infile    := '~scoring_project::in::fraudpoint_xml_fp31505_0_20180507'; 
+// export FP_V3_Generic_FP31505_0_infile    := '~scoring_project::in::fraudpoint_xml_fp31505_0_20180507'; 
+export FP_V3_Generic_FP31505_0_infile    := '~scoring_project::in::fraudpoint_xml_fp31505_0_20191029'; 
 
 // export bocashell_infile_name := '~scoring_project::in::bocashell_v3_v4_v5_input_20140528';
 // export bocashell_infile_name := '~scoring_project::in::bocashell_v3_v4_v5_input_20160419';
 // export bocashell_infile_name := '~scoring_project::in::riskview_xml_generic_v3_v4_v5_20161110';
-export bocashell_infile_name := '~scoring_project::in::riskview_xml_generic_v3_v4_v5_20180507';
+// export bocashell_infile_name := '~scoring_project::in::riskview_xml_generic_v3_v4_v5_20180507';
+export bocashell_infile_name := '~scoring_project::in::riskview_xml_generic_v3_v4_v5_20191029';
 
 
 export bocashell_infile_name_prod_copy := '~scoring_project::in::riskview_xml_generic_v3_v4_v5_20180507_Prod_Copy';
@@ -114,6 +133,9 @@ export AddressShell_Attributes_V1_BATCH_Generic_infile := '~scoring_project::in:
 // export BusinessShell_Attributes_V2_XML_Generic_infile := '~scoring_project::in::businessshell_xml_20151204'; // this PII file created by karthik using Bridgett sample, email 
 // export BusinessShell_Attributes_V2_XML_Generic_infile := '~scoring_project::in::businessshell_xml_20160825';
 export BusinessShell_Attributes_V2_XML_Generic_infile := '~scoring_project::in::businessshell_xml_20180507';
+
+export PhoneShell_Attributes_XML_Generic_infile := '~scoring_project::in::phoneshell_inquirytest_collectionsinternal_w20190501-121441';
+
 
 /* ********** CORE TESTING SAMPLES **************** */
 export ITA_CapitalOne_batch_infile_jan_full_file :=  '~Scoring_Project::in::ITA_v3_Batch_CapitalOne_Attributes_jan_full_file_20150206';

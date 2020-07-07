@@ -1,14 +1,22 @@
-import netacuity, riskwise, ut, gateway;
+﻿import netacuity, riskwise, ut, gateway, dx_gateway, STD;
 
 //Feature4 option is for Netacuity version 4, defaulting to false until the permanent move to version 4
-export getNetAcuity(dataset(riskwise.Layout_IPAI) indata, dataset(Gateway.Layouts.Config) gateways, unsigned1 dppa, unsigned1 glb, boolean Feature4=True) := function
+export getNetAcuity(dataset(riskwise.Layout_IPAI) indata, dataset(Gateway.Layouts.Config) gateways, unsigned1 dppa, unsigned1 glb, boolean Feature4=True, boolean applyOptOut = False) := function
 
 gateway_cfg	:= gateways(Gateway.Configuration.IsNetAcuity(servicename))[1];
 
+sort_indata := SORT(indata, did, ipaddr, seq);
+
+deduped_indata := DEDUP(sort_indata, did, ipaddr, seq);
+
+gw_mod_access := Gateway.IParam.GetGatewayModAccess(glb, dppa);
+
+pre_netacuity_in := IF(applyOptOut = TRUE, dx_gateway.parser_netacuity.NetAcuityOptOuts(deduped_indata, gw_mod_access), deduped_indata);
+
 // added a skip to remove records that don't have an input IP present so that it doesn't call netacuity unless it's there
-netacuity.Layout_NA_In prep(indata le) := transform
+netacuity.Layout_NA_In prep(pre_netacuity_in le) := transform
 	ip := trim(le.ipaddr);
-	self.NetAddress := if(Stringlib.StringFilterOut(ip[1],'0123456789')<>'' or ip='', SKIP, ip);
+	self.NetAddress := if(STD.Str.FilterOut(ip[1],'0123456789')<>'' or ip='', SKIP, ip);
 	self.user.GLBPurpose := (String)glb;
 	self.user.DLPurpose := (String)dppa;
 	self.user.QueryID := (String)le.seq;
@@ -16,11 +24,12 @@ netacuity.Layout_NA_In prep(indata le) := transform
 	self := [];
 end;
 
-netacuity_in := project(indata, prep(left));
+netacuity_in := project(pre_netacuity_in, prep(left));
 
 // Redundant makeGatewayCall passed to SOAP call as a safety mechanism in case Roxie 
 // ever decides to execute both sides of the IF statement.
 makeGatewayCall := gateway_cfg.url!='' and count(netacuity_in)>0;
+
 na_results := if(makeGatewayCall, Gateway.SoapCall_NetAcuity(netacuity_in, gateway_cfg, makeGatewayCall, Feature4), dataset([], netacuity.layout_NA_Out_v4));
 
 riskwise.Layout_IP2O format_netacuity(na_results le) := transform
@@ -66,19 +75,19 @@ riskwise.Layout_IP2O format_netacuity(na_results le) := transform
 												'');					
 	
 	//self.continentcf := if(hit, le.response. , '');
-	self.countrycode := if(hit, ut.Country_ISO3_To_ISO2(trim(StringLib.StringToUpperCase(Country_temp))), '');
+	self.countrycode := if(hit, ut.Country_ISO3_To_ISO2(trim(STD.Str.ToUpperCase(Country_temp))), '');
 	self.countrycodecf := if(hit, (string)CountryConfid_temp , '');
 	self.state := if(hit, Region_temp, '');
 	self.statecf := if(hit, (string)RegionConfid_temp, '');
 	self.zip := if(hit, ZipCode_temp, '');
 	self.domain := if(hit, le.response.domain, '');
-	dot := Stringlib.StringFind(le.response.domain, '.', 1);
+	dot := STD.Str.Find(le.response.domain, '.', 1);
 	domainlen := length(trim(le.response.domain));
 	self.topleveldomain := if(hit, le.response.domain[dot+1..domainlen], '');
 	self.secondleveldomain := if(hit, le.response.domain[1..dot-1] , '');
 	
-     proxy_type := if(hit,  stringlib.stringtolowercase(le.response.proxy) , '');
-	connection_type := if(hit, stringlib.stringtolowercase(connectionspeed_temp), '');
+     proxy_type := if(hit,  STD.Str.tolowercase(le.response.proxy) , '');
+	connection_type := if(hit, STD.Str.tolowercase(connectionspeed_temp), '');
 	self.iproutingmethod := map(Proxy_Type in ['anonymous', 'transparent', 'hosting'] => '02',
 						   Proxy_Type in ['aol'] => '03',
 						   Connection_Type = 'satellite' => '06',
@@ -121,12 +130,14 @@ riskwise.Layout_IP2O add_na(indata le, ret rt) := transform
 	self.seq := le.seq;
 	self.ipaddr := rt.ipaddr;
 	ip := trim(le.ipaddr);
-	ip_valid := if(Stringlib.StringFilterOut(ip[1],'0123456789')<>'' or ip='',false,true);
+	ip_valid := if(STD.Str.FilterOut(ip[1],'0123456789')<>'' or ip='',false,true);
 	self.ipresponse := if(le.seq!=rt.seq and ip_valid, 'Gateway Error', rt.ipresponse);
 	self := rt;
 end;
 
 final := join(indata, ret, left.seq=right.seq, add_na(left,right), left outer);
+
+// OUTPUT(na_results, NAMED('na_results'), OVERWRITE);
 
 return final;
 

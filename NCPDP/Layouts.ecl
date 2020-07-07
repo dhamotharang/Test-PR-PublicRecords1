@@ -1,4 +1,4 @@
-import AID, BIPV2;
+﻿import AID, BIPV2;
 
 EXPORT Layouts := MODULE
 
@@ -1051,6 +1051,8 @@ EXPORT Layouts := MODULE
 			STRING7		 				change_ownership_old_NCPDP_provider_id;
 			UNSIGNED6	 				change_ownership_clean_old_store_close_date;
 			UNSIGNED6	 				change_ownership_clean_change_owner_effect_date;
+			unsigned4 				global_sid					:= 23921; // Source ID for NCPDP - CCPA project 20191106 
+			unsigned8 				record_sid; 		
 		END;
 				
 	END;
@@ -1204,7 +1206,9 @@ EXPORT Layouts := MODULE
         STRING4            Mail_msa;
         STRING7            Mail_geo_blk;
         STRING1            Mail_geo_match;
-        STRING4            Mail_err_stat;    
+        STRING4            Mail_err_stat; 
+				unsigned4					 global_sid					:= 23921; // Source ID for NCPDP - CCPA project 20191106 
+				unsigned8 				 record_sid; 		
     END;
 
 	////////////////////////////////////////////////////////////////////////
@@ -1243,14 +1247,18 @@ EXPORT Layouts := MODULE
 		STRING5   business_zip;
 		STRING8   business_sec_range;
     UNSIGNED6 BDID;
+		unsigned4					 global_sid					:= 23921; // Source ID for NCPDP - CCPA project 20191106 
+		unsigned8 				 record_sid; 			
   END;
 
   EXPORT Slim_Autokey_All := RECORD
-	  Slim_Autokey_Business;
+	  Slim_Autokey_Business - [global_sid, record_sid];
 		STRING25 first_name;
 		STRING1  middle_initial;
 		STRING25 last_name;
 		STRING10 phone;
+		unsigned4					 global_sid					:= 23921; // Source ID for NCPDP - CCPA project 20191106 
+		unsigned8 				 record_sid; 		
 	END;
 
 END;

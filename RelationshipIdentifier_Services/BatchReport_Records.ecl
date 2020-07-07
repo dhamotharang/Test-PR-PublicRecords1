@@ -94,7 +94,7 @@ EXPORT BatchReport_Records(
 	AssociateFlag := TRUE;
 	AllFlag := TRUE; // getting all relationship types
 									 
-	DS_relationships := Relationship.proc_GetRelationship(ds_Batchinput_didsForRelationshipKey,
+	DS_relationships_Neutral := Relationship.proc_GetRelationshipNeutral(ds_Batchinput_didsForRelationshipKey,
                                   RelativeFlag,
 																	AssociateFlag,
 																	AllFlag,
@@ -116,7 +116,8 @@ EXPORT BatchReport_Records(
 																	,
 																	//Relationship.Layout_GetRelationship.TransactionalFlags_layout txflag = notx
 																	).Result;
-	 															
+	DS_relationships:= Relationship.functions_getRelationship.convertNeutralToFlat_new(DS_relationships_Neutral);
+
 // KEEP This documentation notes
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 // DS_relationships DOCS: DID1 is original did input and DID2 is the result did if a relationship exists. /
@@ -131,7 +132,7 @@ dsrelativesDids := 	PROJECT(DS_relationships(TYPE = RelationshipIdentifier_Servi
 													));
 // 2nd pass only get relatives
 
-ds_2ndDegreeRelatives := Relationship.proc_GetRelationship(dsrelativesDiDs,
+ds_2ndDegreeRelatives := Relationship.proc_GetRelationshipNeutral(dsrelativesDiDs,
                                   TRUE, // relative Flag
 																	TRUE, // associate flag
 																	FALSE, // all flag

@@ -1,4 +1,4 @@
-﻿import doxie, riskwise, risk_indicators;
+﻿import doxie, riskwise, risk_indicators, Suppress;
 
 export Boca_Shell_Fraud := module
 
@@ -19,7 +19,8 @@ end;
 
 // accepts a dataset of ADLs, dedupes them, searches the header and SSN table to find "suspicious" identities (as defined in fraudpoint 2.0 project) 
 // suspicious = ADLs_per_SSN seen in the last 18 months > 3 or SSN invalid or SSN issued prior to DOB or identity is credit bureau only or header first seen within the last year
-export suspicious_identities_function_hist(dataset(layout_identities_input) input_adls) := function
+export suspicious_identities_function_hist(dataset(layout_identities_input) input_adls,
+																		doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
 
 slim_rec := record
 	unsigned6 did;
@@ -38,15 +39,18 @@ deduped_input_adls := dedup(sort(input_adls,did), did);
 
 
 // if history mode, do the full searching of header and ssn_table...
-with_header := join(deduped_input_adls, doxie.key_header, 
+with_header_unsuppressed := join(deduped_input_adls, doxie.key_header, 
 								keyed(left.did=right.s_did) and 
 									right.s_did != 0 and 
 									right.dt_last_seen <> 0 and
 									right.dt_first_seen < left.historydate,
-									transform(slim_rec, 
+									transform({slim_rec, UNSIGNED4 global_sid}, 
+										self.global_sid := right.global_sid;
 										self.historydate := (unsigned3)(risk_indicators.iid_constants.myGetDate(left.historydate)[1..6]);
 										self := right), 
 								atmost(riskwise.max_atmost), keep(500));
+
+with_header := Suppress.Suppress_ReturnOldLayout(with_header_unsuppressed, mod_access, slim_rec);
 
 did_stats := table(with_header, {did,
 											historydate,
@@ -74,7 +78,7 @@ slim2 := record
 end;
 
 // use the SSNs to search the ssn_table to find out if it's valid SSN or has multiple Identities or ssn issued prior to DOB
-suspicious_ssns := join(did_ssn_dob, risk_indicators.Key_SSN_Table_v4_2, 
+suspicious_ssns_unsuppressed := join(did_ssn_dob, risk_indicators.Key_SSN_Table_v4_2, 
 	keyed(left.ssn=right.ssn)	and
 	(	// only keep records that are suspicious
 		right.combo.recentcount >= 3 or 
@@ -82,8 +86,9 @@ suspicious_ssns := join(did_ssn_dob, risk_indicators.Key_SSN_Table_v4_2,
 		( (unsigned)((string8)left.dob)[1..4] >  (unsigned)((string8)right.official_last_seen)[1..4] and right.official_last_seen<>0)
 	),
 	// transform(slim2,	self.ssntable := right, self := left), atmost(riskwise.max_atmost), keep(1));  // use this line if debugging to find out why it was suspicious
-	transform(recordof(did_ssn_dob),	self := left), atmost(riskwise.max_atmost));
+	transform({recordof(did_ssn_dob), UNSIGNED4 global_sid},	self.global_sid := right.global_sid; self := left), atmost(riskwise.max_atmost));
 
+suspicious_ssns := Suppress.Suppress_ReturnOldLayout(suspicious_ssns_unsuppressed, mod_access, recordof(did_ssn_dob));
 
 dids_with_suspicious_ssns := dedup(sort(suspicious_ssns, did, ssn), did);
 

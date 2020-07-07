@@ -1,4 +1,4 @@
-import Codes, LN_PropertyV2;
+﻿import Codes, LN_PropertyV2, _Control, LN_PropertyV2_Services;
 
 k_codes			:= LN_PropertyV2_Services.keys_2.codes;
 
@@ -65,7 +65,9 @@ export dataset(l_rolled) fn_get_deeds_2(
 	end;
 	
 	ds_value := project(ds_raw, addOnlyALittleValue(left));
+
 	
+#IF(_Control.Environment.OnThor) 
 	ds_value_distributed := distribute(ds_value, hash64(ln_fares_id));
 	
 	// sort & dedup
@@ -77,6 +79,19 @@ export dataset(l_rolled) fn_get_deeds_2(
 			), // this sort is costly--consider using a dedup(all, hash)
 		ln_fares_id, search_did, sortby_date, fid_type, vendor_source_flag, buyer1_id_code, borrower1_id_code, fares_transaction_type_desc, local
 	);
+#ELSE
+	// sort & dedup
+	ds_sort := 
+		DEDUP(
+			SORT(
+				ds_value, 
+				ln_fares_id, search_did, -sortby_date, fid_type, vendor_source_flag, buyer1_id_code, borrower1_id_code, fares_transaction_type_desc 
+			), // this sort is costly--consider using a dedup(all, hash)
+		ln_fares_id, search_did, sortby_date, fid_type, vendor_source_flag, buyer1_id_code, borrower1_id_code, fares_transaction_type_desc
+	);
+#END
+  
+  
 	
 	// rollup
 	l_rolled xf_roll_deeds(l_tmp L, dataset(l_tmp) R) := transform

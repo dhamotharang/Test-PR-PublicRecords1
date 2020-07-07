@@ -1,4 +1,4 @@
-﻿IMPORT AutoStandardI, BIPV2, Business_Credit, Business_Credit_KEL, Business_Risk_BIP, doxie;
+﻿IMPORT AutoStandardI, BIPV2, Business_Credit, Business_Credit_KEL, Business_Risk_BIP, doxie, suppress;
 
 	// The following function reads Business Header Records, which'll be used in at least two other 
 	// functions a bit later. Slims 'em down too, for a lighter footprint.
@@ -123,7 +123,7 @@
 			END;
 
 			// Hit Key_BusinessInformation to get BII (company name, address, etc., etc.).
-			BusinessInformation_recs := 
+			BusinessInformation_recs_org := 
 				JOIN(
 					ds_SBFE_filt, Business_Credit.Key_BusinessInformation(),
 					KEYED(RIGHT.contract_account_number = LEFT.contract_account_number) AND 
@@ -132,8 +132,9 @@
 					xfm_BusinessInformation_recs(LEFT,RIGHT,COUNTER), 
 					ATMOST(Business_Risk_BIP.Constants.Limit_SBFE)
 				);
+			BusinessInformation_recs := Suppress.MAC_SuppressSource(BusinessInformation_recs_org, _mod_access, did);
 			
-			// Join back to BIPIDs to filter out non-matching Businesses.
+      // Join back to BIPIDs to filter out non-matching Businesses.
 			BusinessInformation_filt :=
 				JOIN(
 					BusinessInformation_recs(record_type = 'AB'), ds_BIPIDs,

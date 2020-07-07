@@ -12,6 +12,7 @@ export IdAppendRoxie(
 		,unsigned soapTimeout = 30
 		,unsigned soapTimeLimit = 0
 		,unsigned soapRetries = 3
+		,boolean segmentation = true
 	) := module
 
 	#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
@@ -21,7 +22,8 @@ export IdAppendRoxie(
 			,scoreThreshold := scoreThreshold
 			,weightThreshold := weightThreshold
 			,disableSaltForce := not primForce
-			,reAppend := reAppend);
+			,reAppend := reAppend
+			,segmentation := segmentation);
 	#END
 
 	shared remoteAppend := BIPV2.IdAppendRoxieRemote(
@@ -34,6 +36,7 @@ export IdAppendRoxie(
 			,soapTimeout := soapTimeout
 			,soapTimeLimit := soapTimeLimit
 			,soapRetries := soapRetries
+			,segmentation := segmentation
 			);
 
 	export IdsOnly() := function
@@ -52,6 +55,7 @@ export IdAppendRoxie(
 	export WithBest(string fetchLevel = BIPV2.IdConstants.fetch_level_proxid, boolean allBest = false
 	                ,boolean isMarketing = false
 					,Doxie.IDataAccess mod_access = defaultDataAccess) := function
+                  
 		#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
 			res0 := BIPV2.IdAppendLocal.AppendBest(localAppend, fetchLevel := fetchLevel, allBest := allBest
 			                                       ,isMarketing := isMarketing

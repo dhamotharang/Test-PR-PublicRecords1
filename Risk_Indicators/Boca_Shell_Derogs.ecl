@@ -236,8 +236,40 @@ liens_full_unsuppressed := JOIN (liens_added, klr_nonFCRA,
 										LEFT OUTER, KEEP(100),
 				ATMOST(keyed(left.tmsid=right.tmsid) and keyed(left.rmsid=right.rmsid), Riskwise.max_atmost));
 
-liens_full := Suppress.Suppress_ReturnOldLayout(liens_full_unsuppressed, mod_access, layout_extended);
-    
+liens_full_flagged := Suppress.CheckSuppression(liens_full_unsuppressed, mod_access);
+
+liens_full := PROJECT(liens_full_flagged, TRANSFORM(layout_extended, 
+	SELF.BJL.last_liens_unreleased_date := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.BJL.last_liens_unreleased_date);
+	SELF.BJL.liens_last_unrel_date84 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.BJL.liens_last_unrel_date84);	
+	SELF.BJL.liens_recent_unreleased_count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_recent_unreleased_count);
+	SELF.BJL.liens_historical_unreleased_count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_historical_unreleased_count);												
+	SELF.BJL.liens_unreleased_count30 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_unreleased_count30);
+	SELF.BJL.liens_unreleased_count90 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_unreleased_count90);
+	SELF.BJL.liens_unreleased_count180 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_unreleased_count180);
+	SELF.BJL.liens_unreleased_count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_unreleased_count12);
+	SELF.BJL.liens_unreleased_count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_unreleased_count24);
+	SELF.BJL.liens_unreleased_count36 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_unreleased_count36);
+	SELF.BJL.liens_unreleased_count60 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_unreleased_count60);																	
+	SELF.BJL.liens_unreleased_count84 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_unreleased_count84);													
+	SELF.BJL.last_liens_released_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.last_liens_released_date);
+	SELF.BJL.liens_last_rel_date84	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_last_rel_date84);
+	SELF.BJL.liens_recent_released_count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_recent_released_count);
+	SELF.BJL.liens_historical_released_count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_historical_released_count);			
+	SELF.BJL.liens_released_count30 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_released_count30);
+	SELF.BJL.liens_released_count90 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_released_count90);
+	SELF.BJL.liens_released_count180 :=IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_released_count180);
+	SELF.BJL.liens_released_count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_released_count12);
+	SELF.BJL.liens_released_count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_released_count24);
+	SELF.BJL.liens_released_count36 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_released_count36);		
+	SELF.BJL.liens_released_count60 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_released_count60);
+	SELF.BJL.liens_released_count84 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_released_count84);																																										
+	SELF.date_first_seen := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.date_first_seen);
+	SELF.date_last_seen := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.date_last_seen);
+	self.tmsid := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.tmsid);	// set these to blank so that we miss on the evictions search below
+	self.rmsid := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.rmsid);
+    SELF := LEFT;
+)); 
+
 layout_extended_CCPA get_evictions(liens_full le, liensV2.key_liens_main_ID ri) := transform
     self.global_sid := ri.global_sid;
 	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
@@ -423,8 +455,127 @@ liens_main_unsuppressed := JOIN(liens_full, liensV2.key_liens_main_ID,
 											get_evictions(LEFT,RIGHT), left outer, 
 											ATMOST(keyed(LEFT.tmsid=RIGHT.tmsid) and keyed(left.rmsid=right.rmsid), riskwise.max_atmost));
                                                   
-liens_main := Suppress.Suppress_ReturnOldLayout(liens_main_unsuppressed, mod_access, layout_extended);
-                                                  
+liens_main_flagged := Suppress.CheckSuppression(liens_main_unsuppressed, mod_access);
+
+liens_main := PROJECT(liens_main_flagged, TRANSFORM(layout_extended, 
+    self.evictionRec  := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.evictionRec);
+	SELF.BJL.eviction_recent_unreleased_count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.eviction_recent_unreleased_count);
+	SELF.BJL.eviction_historical_unreleased_count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.eviction_historical_unreleased_count);
+	SELF.BJL.eviction_recent_released_count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.eviction_recent_released_count);
+	SELF.BJL.eviction_historical_released_count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.eviction_historical_released_count);
+	SELF.BJL.eviction_count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.eviction_count);
+	SELF.BJL.eviction_count30 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.eviction_count30);
+	SELF.BJL.eviction_count90 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.eviction_count90);
+	SELF.BJL.eviction_count180 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.eviction_count180);
+	SELF.BJL.eviction_count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.eviction_count12);
+	SELF.BJL.eviction_count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.eviction_count24);
+	SELF.BJL.eviction_count36 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.eviction_count36);
+	SELF.BJL.eviction_count60 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.eviction_count60);
+	SELF.BJL.eviction_count84 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.eviction_count84 );
+	SELF.BJL.last_eviction_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.last_eviction_date);
+	self.liens.liens_unrel_total_amount84 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unrel_total_amount84);
+	self.liens.liens_rel_total_amount84 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unrel_total_amount84);
+	self.liens.liens_unrel_total_amount 	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unrel_total_amount);
+	self.liens.liens_rel_total_amount 		:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_rel_total_amount);
+	self.liens.liens_unreleased_civil_judgment.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_civil_judgment.count);
+	self.liens.liens_unreleased_civil_judgment.earliest_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_civil_judgment.earliest_filing_date);
+	self.liens.liens_unreleased_civil_judgment.most_recent_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_civil_judgment.most_recent_filing_date);
+	self.liens.liens_unreleased_civil_judgment.total_amount := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_civil_judgment.total_amount);
+	self.liens.liens_released_civil_judgment.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_civil_judgment.count);
+	self.liens.liens_released_civil_judgment.earliest_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_civil_judgment.earliest_filing_date);
+	self.liens.liens_released_civil_judgment.most_recent_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_civil_judgment.most_recent_filing_date);
+	self.liens.liens_released_civil_judgment.total_amount := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_civil_judgment.total_amount);
+	self.liens.liens_unreleased_federal_tax.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_federal_tax.count);
+	self.liens.liens_unreleased_federal_tax.earliest_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_federal_tax.earliest_filing_date);
+	self.liens.liens_unreleased_federal_tax.most_recent_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_federal_tax.most_recent_filing_date);
+	self.liens.liens_unreleased_federal_tax.total_amount := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_federal_tax.total_amount);
+	self.liens.liens_released_federal_tax.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_federal_tax.count);
+	self.liens.liens_released_federal_tax.earliest_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_federal_tax.earliest_filing_date);
+	self.liens.liens_released_federal_tax.most_recent_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_federal_tax.most_recent_filing_date);
+	self.liens.liens_released_federal_tax.total_amount := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_federal_tax.total_amount);
+	self.liens.liens_unreleased_foreclosure.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_foreclosure.count);
+	self.liens.liens_unreleased_foreclosure.earliest_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_foreclosure.earliest_filing_date);
+	self.liens.liens_unreleased_foreclosure.most_recent_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_foreclosure.most_recent_filing_date);
+	self.liens.liens_unreleased_foreclosure.total_amount := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_foreclosure.total_amount);
+	self.liens.liens_released_foreclosure.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_foreclosure.count);
+	self.liens.liens_released_foreclosure.earliest_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_foreclosure.earliest_filing_date);
+	self.liens.liens_released_foreclosure.most_recent_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_foreclosure.most_recent_filing_date);
+	self.liens.liens_released_foreclosure.total_amount := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_foreclosure.total_amount);
+	self.liens.liens_unreleased_landlord_tenant.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_landlord_tenant.count);
+	self.liens.liens_unreleased_landlord_tenant.earliest_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_landlord_tenant.earliest_filing_date);
+	self.liens.liens_unreleased_landlord_tenant.most_recent_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_landlord_tenant.most_recent_filing_date);
+	self.liens.liens_unreleased_landlord_tenant.total_amount := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_landlord_tenant.total_amount);
+	self.liens.liens_released_landlord_tenant.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_landlord_tenant.count);
+	self.liens.liens_released_landlord_tenant.earliest_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_landlord_tenant.earliest_filing_date);
+	self.liens.liens_released_landlord_tenant.most_recent_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_landlord_tenant.most_recent_filing_date);
+	self.liens.liens_released_landlord_tenant.total_amount := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_landlord_tenant.total_amount);
+	self.liens.liens_unreleased_lispendens.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_lispendens.count);
+	self.liens.liens_unreleased_lispendens.earliest_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_lispendens.earliest_filing_date);
+	self.liens.liens_unreleased_lispendens.most_recent_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_lispendens.most_recent_filing_date);
+	self.liens.liens_unreleased_lispendens.total_amount := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_lispendens.total_amount);
+	self.liens.liens_released_lispendens.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_lispendens.count);
+	self.liens.liens_released_lispendens.earliest_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_lispendens.earliest_filing_date);
+	self.liens.liens_released_lispendens.most_recent_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_lispendens.most_recent_filing_date);
+	self.liens.liens_released_lispendens.total_amount := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_lispendens.total_amount);
+	self.liens.liens_unreleased_other_lj.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_other_lj.count);
+	self.liens.liens_unreleased_other_lj.earliest_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_other_lj.earliest_filing_date);
+	self.liens.liens_unreleased_other_lj.most_recent_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_other_lj.most_recent_filing_date);
+	self.liens.liens_unreleased_other_lj.total_amount := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_other_lj.total_amount);
+	self.liens.liens_released_other_lj.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_other_lj.count);
+	self.liens.liens_released_other_lj.earliest_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_other_lj.earliest_filing_date);
+	self.liens.liens_released_other_lj.most_recent_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_other_lj.most_recent_filing_date);
+	self.liens.liens_released_other_lj.total_amount := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_other_lj.total_amount);
+	self.liens.liens_unreleased_other_tax.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_other_tax.count);
+	self.liens.liens_unreleased_other_tax.earliest_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_other_tax.earliest_filing_date);
+	self.liens.liens_unreleased_other_tax.most_recent_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_other_tax.most_recent_filing_date);
+	self.liens.liens_unreleased_other_tax.total_amount := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_other_tax.total_amount);
+	self.liens.liens_released_other_tax.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_other_tax.count);
+	self.liens.liens_released_other_tax.earliest_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_other_tax.earliest_filing_date);
+	self.liens.liens_released_other_tax.most_recent_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_other_tax.most_recent_filing_date);
+	self.liens.liens_released_other_tax.total_amount := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_other_tax.total_amount);
+	self.liens.liens_unreleased_small_claims.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_small_claims.count);
+	self.liens.liens_unreleased_small_claims.earliest_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_small_claims.earliest_filing_date);
+	self.liens.liens_unreleased_small_claims.most_recent_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_small_claims.most_recent_filing_date);
+	self.liens.liens_unreleased_small_claims.total_amount := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_small_claims.total_amount);
+	self.liens.liens_released_small_claims.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_small_claims.count);
+	self.liens.liens_released_small_claims.earliest_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_small_claims.earliest_filing_date);
+	self.liens.liens_released_small_claims.most_recent_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_small_claims.most_recent_filing_date);
+	self.liens.liens_released_small_claims.total_amount := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_small_claims.total_amount);
+	self.liens.liens_unreleased_suits.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_suits.count);
+	self.liens.liens_unreleased_suits.earliest_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_suits.earliest_filing_date);
+	self.liens.liens_unreleased_suits.most_recent_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_suits.most_recent_filing_date);
+	self.liens.liens_unreleased_suits.total_amount := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_unreleased_suits.total_amount);
+	self.liens.liens_released_suits.count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_suits.count);
+	self.liens.liens_released_suits.earliest_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_suits.earliest_filing_date);
+	self.liens.liens_released_suits.most_recent_filing_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_suits.most_recent_filing_date);
+	self.liens.liens_released_suits.total_amount := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liens.liens_released_suits.total_amount);
+	SELF.BJL.last_liens_unreleased_date := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.BJL.last_liens_unreleased_date);	
+	SELF.BJL.liens_last_unrel_date84 := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.BJL.liens_last_unrel_date84);	
+	SELF.BJL.liens_recent_unreleased_count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_recent_unreleased_count);
+	SELF.BJL.liens_historical_unreleased_count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_historical_unreleased_count);																			
+	SELF.BJL.liens_unreleased_count30 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_unreleased_count30);
+	SELF.BJL.liens_unreleased_count90 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_unreleased_count90);
+	SELF.BJL.liens_unreleased_count180 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_unreleased_count180);
+	SELF.BJL.liens_unreleased_count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_unreleased_count12);
+	SELF.BJL.liens_unreleased_count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_unreleased_count24);
+	SELF.BJL.liens_unreleased_count36 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_unreleased_count36);
+	SELF.BJL.liens_unreleased_count60 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_unreleased_count60);																		
+	SELF.BJL.liens_unreleased_count84 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_unreleased_count84);																		
+	SELF.BJL.last_liens_released_date := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.last_liens_released_date);
+	SELF.BJL.liens_last_rel_date84	:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_last_rel_date84);
+	SELF.BJL.liens_recent_released_count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_recent_released_count);
+	SELF.BJL.liens_historical_released_count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_historical_released_count);																			
+	SELF.BJL.liens_released_count30 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_released_count30);								
+	SELF.BJL.liens_released_count90 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_released_count90);								
+	SELF.BJL.liens_released_count180 :=IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_released_count180);								
+	SELF.BJL.liens_released_count12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_released_count12);								
+	SELF.BJL.liens_released_count24 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_released_count24);								
+	SELF.BJL.liens_released_count36 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_released_count36);							
+	SELF.BJL.liens_released_count60 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_released_count60);
+	SELF.BJL.liens_released_count84 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.BJL.liens_released_count84);																	
+    SELF := LEFT;
+)); 
+                                   
 layout_extended roll_liens(layout_extended le, layout_extended ri) := TRANSFORM
 	sameLien := le.tmsid=ri.tmsid and le.rmsid=ri.rmsid;
 
@@ -605,7 +756,13 @@ all_foreclosures_unsuppressed := join(wFID, property.key_foreclosures_fid,
 								self := left),
 						left outer, atmost(keyed(left.fid=right.fid), riskwise.max_atmost), keep(50));
                                                   
-all_foreclosures := Suppress.Suppress_ReturnOldLayout(all_foreclosures_unsuppressed, mod_access, layout_derog_process);
+all_foreclosures_flagged := Suppress.CheckSuppression(all_foreclosures_unsuppressed, mod_access);
+
+all_foreclosures := PROJECT(all_foreclosures_flagged, TRANSFORM(layout_derog_process, 
+	self.BJL.last_foreclosure_date := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.BJL.last_foreclosure_date);
+	self.BJL.foreclosure_flag := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.BJL.foreclosure_flag);
+   SELF := LEFT;
+)); 
 
 wForeclosures := dedup(sort(all_foreclosures, seq, did, -BJL.last_foreclosure_date), seq, did);
 

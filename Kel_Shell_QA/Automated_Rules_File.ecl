@@ -156,7 +156,7 @@ Rules_ds:=project(p_ds,transform(Rules_lay,
 									                           (integer)STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2]> 999 and (integer)STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2] <= 99999 => '100',
 									                           (integer)STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2]>= 99 and (integer)STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2] <= 999 => '10',
 									                           (integer)STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2]>= 11 and (integer)STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2] <= 98 => '5',
-																						 (integer)STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2]>= 0 and (integer)STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2] <= 9 => '1',
+																						 (integer)STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2]>= 0 and (integer)STD.STr.SplitWords(REGEXREPLACE(' - ', left.Output_Values, '-'),'-')[2] <= 10 => '1',
 																						 'No BinSize'
 									                           );
 									// self.Average:=left.field16;
@@ -195,6 +195,26 @@ EXPORT Automated_Rules_File :=  Rules_Generation('Person','Best PII') +
 																Rules_Generation('Person','Derogs -Bankruptcy History') +
 																Rules_Generation('Person','Derogs -Criminal History') +
 																Rules_Generation('Business','Business B2B Trade') +
-																Rules_Generation('Business','Business LexID') +
+																// Rules_Generation('Business','Business LexID') +
 																Rules_Generation('Business','Business Input Validation') +
-																Rules_Generation('Person','Validation') ;
+																Rules_Generation('Person','Validation') +
+																Rules_Generation('Business','Business Derog - Bankruptcy History') +
+																
+																Rules_Generation('Business','Secretary of State') +
+																Rules_Generation('Business','Best BII') +
+																Rules_Generation('Business','Business Uniform Commercial Code') +
+																Rules_Generation('Business','Business Assets')+
+																Rules_Generation('Business','Business Best')+
+																Rules_Generation('Person', 'Address History')+
+																Rules_Generation('Business','Business Judgments')+
+																Rules_Generation('Business','Business Derogs - Landlord Tenant Disputes')+
+																Rules_Generation('Business','Business Derogs - Overall History')+
+																Rules_Generation('Business','Business Derogs - Lien and Judgment History')+
+																Rules_Generation('Business','Business Input - Business Header Velocity')+
+																Rules_Generation('Business','Business Firmographics')+
+																Rules_Generation('Business','Business Best - Best Sources')+
+																Rules_Generation('Business','Business Best - Best Characteristics')+
+																Rules_Generation('Business','Business Associate')+
+																Rules_Generation('Business','Business Source Verification')+ 
+																Rules_Generation('Person','Education')+
+																Rules_Generation('Suit','Derogs - Lien and Judgment History');

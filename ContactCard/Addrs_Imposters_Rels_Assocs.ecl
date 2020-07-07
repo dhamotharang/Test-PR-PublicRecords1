@@ -1,15 +1,15 @@
-﻿﻿// This code is left as it is, since it is used by ContactCard service. For future development use PersonReports.Person_records
+﻿// This code is left as it is, since it is used by ContactCard service. For future development use PersonReports.Person_records
 // Attribute Information: Fetches Imposters, AKAs, and Subject_Information for ContactCard ReportService.
 
-import AutoStandardI, codes, ContactCard, DeathV2_Services, doxie, driversv2_services,
+import codes, ContactCard, DeathV2_Services, doxie, driversv2_services,
        dx_death_master, header, MDR, PersonReports, risk_indicators, suppress, ut, watchdog;
 
 t_yesNo	:= PersonReports.layouts.t_yesNo; // string3
 yesNo		:= PersonReports.layouts.yesNo;
 
-mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
-
-export Addrs_imposters_rels_assocs(dataset(doxie.layout_references) dids, boolean checkrna = header.constants.checkRNA) := MODULE
+export Addrs_imposters_rels_assocs(dataset(doxie.layout_references) dids,
+                                           doxie.IDataAccess mod_access,
+                                           boolean checkrna = header.constants.checkRNA) := MODULE
 
 shared layout_comp_names_w_title := record
 	PersonReports.layouts.comp_names;
@@ -104,7 +104,7 @@ shared with_ssn_info := record
 	personReports.Layouts.identity.ssn_valid;
 	personReports.Layouts.identity.ssn_issued_location;
 	personReports.Layouts.date.ymd ssn_issued_start_date; 	// single
-	personReports.Layouts.date.ymd ssn_issued_end_date;	
+	personReports.Layouts.date.ymd ssn_issued_end_date;
 	dataset(personReports.Layouts.dl) drivers_licenses {maxcount(10)};
 END;
 
@@ -125,13 +125,13 @@ shared with_ssn_info_w_title add_issuance_w_title(layout_comp_names_w_title l,ss
 	self.ssn_issued_end_date.day := (unsigned1)((STRING) r.ssn_issue_last)[7..8];
 	self := l;
 	self := [];
-END;	
+END;
 
 shared get_hri_ssn(STRING9 ssn, UNSIGNED6 did) := FUNCTION
 	maxHriPer_Value := personReports.layouts.max_hri;
 	ssn_hri_rec := RECORD
 		STRING9   ssn;
-		UNSIGNED6 did;	
+		UNSIGNED6 did;
 		STRING1   valid_ssn;
 		UNSIGNED  cnt;
 		UNSIGNED4 ssn_issue_early;
@@ -169,7 +169,7 @@ shared get_id() := macro
   self := [];
 endmacro;
 
-shared contactcard.layouts.subject_rec identity_flat_w_title(with_ssn_info_w_title l):=transform  
+shared contactcard.layouts.subject_rec identity_flat_w_title(with_ssn_info_w_title l):=transform
  self.name.title := l.title;
  get_id()
 END;
@@ -180,11 +180,11 @@ ssn_info :=doxie.fn_SSN_Records (bestrecs,checkrna);
 with_ssn_info add_issuance_imposters(ssn_info l):=transform
 	self.ssn_valid := yesNo(l.valid);
 	self.ssn_issued_location := l.ssn_issue_place;
-	self.ssn_issued_start_date := project(l,transform(personReports.Layouts.date.ymd, 
+	self.ssn_issued_start_date := project(l,transform(personReports.Layouts.date.ymd,
 																				self.year		:=(integer)((STRING)left.ssn_issue_early)[1..4],
 																				self.month	:=(integer)((STRING)left.ssn_issue_early)[5..6],
 																				self.day		:=(integer)((STRING)left.ssn_issue_early)[7..8]));
-	self.ssn_issued_end_date := project(l,transform(personReports.Layouts.date.ymd, 
+	self.ssn_issued_end_date := project(l,transform(personReports.Layouts.date.ymd,
 																				self.year 	:=(integer)((STRING)left.ssn_issue_last)[1..4],
 																				self.month	:=(integer)((STRING)left.ssn_issue_last)[5..6],
 																				self.day 		:=(integer)((STRING)left.ssn_issue_last)[7..8]));
@@ -205,7 +205,7 @@ imposters_w_d_info_append := dx_death_master.Append.byDid(with_issuance_info_imp
 with_ssn_info get_dead(recordof(imposters_w_d_info_append) l):=transform
 	self.dod := (unsigned4)l.death.dod8;
 	self.death_verification_code := l.death.VorP_code; //r.death_code;
-	self.deceased := if(l.death.is_deceased,'Y',''); 
+	self.deceased := if(l.death.is_deceased,'Y','');
 	self.IsLimitedAccessDMF := (l.death.src = MDR.sourceTools.src_Death_Restricted);
 	self := l;
 	self := [];
@@ -215,7 +215,7 @@ imposters_w_d_info_all := project(imposters_w_d_info_append, get_dead(left));
 
 imposters_w_d_info := dedup(sort(imposters_w_d_info_all,
                                  did,record,if(death_verification_code<>'',0,1)),
-                            did,record,except dod, death_verification_code);     
+                            did,record,except dod, death_verification_code);
 with_did := record
 	dataset(personReports.Layouts.identity) akas {maxcount(20)};
 	unsigned6 did;
@@ -232,7 +232,7 @@ with_did do_identity(with_ssn_info l):=transform
 	self.did := l.did;
 	self.address_seq_no := l.address_seq_no;
 END;
-											
+
 proj_imposters := group(sort(project(imposters_w_d_info,do_identity(left)),did),did);
 
 with_did roll_identity(with_did l,dataset(with_did) r):=transform
@@ -267,7 +267,7 @@ with_ssn_info_w_title add_dls(with_ssn_info_w_title l, roll_dlsr r):=transform
 END;
 
 subj_w_dl_info := join(with_issuance_info_subj,roll_dlsr,
-											left.did=right.did and 
+											left.did=right.did and
 											left.fname=right.fname and left.mname=right.mname and left.lname=right.lname,
 											add_dls(left,right),left outer,keep(1));
 

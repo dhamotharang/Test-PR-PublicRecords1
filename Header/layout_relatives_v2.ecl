@@ -16,7 +16,11 @@ export shared_addresses := { string110 recent_address , unsigned3 recent_addr_la
 export shared_company :=  { unsigned6  bdid} ; 
 export temp := record
 
-  doxie.layout_relative_dids;
+  doxie.layout_relative_dids.person1;
+  doxie.layout_relative_dids.person2;
+  doxie.layout_relative_dids.recent_cohabit;
+  doxie.layout_relative_dids.same_lname;
+  doxie.layout_relative_dids.number_cohabits;
   integer3  zip;
   integer2  prim_range;
   string  relative_matches:='';
@@ -41,7 +45,11 @@ export temp := record
  
  export main := record
 
-  doxie.layout_relative_dids;
+  doxie.layout_relative_dids.person1;
+  doxie.layout_relative_dids.person2;
+  doxie.layout_relative_dids.recent_cohabit;
+  doxie.layout_relative_dids.same_lname;
+  doxie.layout_relative_dids.number_cohabits;
   integer3  zip;
   integer2  prim_range;
   string100  relative_matches:= '';
@@ -61,7 +69,11 @@ export temp := record
  end;
  
  export slim := record
-	doxie.layout_relative_dids;
+  doxie.layout_relative_dids.person1;
+  doxie.layout_relative_dids.person2;
+  doxie.layout_relative_dids.recent_cohabit;
+  doxie.layout_relative_dids.same_lname;
+  doxie.layout_relative_dids.number_cohabits;
   integer3 zip;
   integer2 prim_range;
   end;

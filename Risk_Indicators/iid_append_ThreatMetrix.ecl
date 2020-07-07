@@ -1,4 +1,4 @@
-﻿Import risk_indicators, PublicRecords_KEL, gateway, STD;
+﻿Import risk_indicators, PublicRecords_KEL, gateway, STD, Models;
 
 // this function needs the original input (indata)
 // and appends the TMX gateway results to the end of Layout_Output
@@ -7,8 +7,8 @@
 EXPORT iid_append_ThreatMetrix( DATASET(risk_indicators.layout_input) indata, 
                                 grouped DATASET(risk_indicators.Layout_Output) InstantID_function_results,
                                 dataset(Gateway.Layouts.Config) gateways,
-                                string20 companyID = ''
-                                // ,		doxie.IDataAccess mod_access   //contains IntendedUse, company name and global company ID, and Transaction ID
+                                string20 companyID = '',
+																string DataRestriction = ''
                                 ) := function
 
   in_slim := project(indata, transform(PublicRecords_KEL.ECL_Functions.Input_Layout_Slim, 
@@ -20,7 +20,7 @@ EXPORT iid_append_ThreatMetrix( DATASET(risk_indicators.layout_input) indata,
                                       self.LastName:= left.lname;
                                       self.email:= left.email_address;
                                       self.homephone:= left.phone10;
-                                      self.StreetAddress:= left.in_streetAddress;
+                                      self.StreetAddressLine1:= left.in_streetAddress;
                                       self.City := left.in_city;
                                       self.State:= left.in_state;
                                       self.Zip := left.in_zipcode;
@@ -77,6 +77,11 @@ EXPORT iid_append_ThreatMetrix( DATASET(risk_indicators.layout_input) indata,
       self.ThreatMetrix := right;
       self := left), left outer);
 
-	return group(with_TMX_results, seq);
+DRM_threatmetrix:= DataRestriction[Risk_indicators.iid_constants.IncludeDigitalIdentity]=Risk_indicators.iid_constants.sFalse;
+
+//  For ThreatMetrix reasoncodes
+with_TMX_model := if(DRM_threatmetrix, Models.IID1906_0_0(with_TMX_results), with_TMX_results);
+ 
+	return group(with_TMX_model, seq);
 	
 end;

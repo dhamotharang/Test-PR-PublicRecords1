@@ -10,12 +10,13 @@ temp_layout := record
 end;
 
 temp_layout_CCPA := record
-	integer8 did; // CCPA changes
-    unsigned4 global_sid; // CCPA changes
+	unsigned6 did; // CCPA changes
+  unsigned4 global_sid; // CCPA changes
+  boolean skip_opt_out := false; // CCPA changes
 	temp_layout;
 end;
 
-bureau_phonesearch_tmp := join(ids_wide, PhoneMart.key_phonemart_did,
+bureau_phonesearch_tmp_unsuppressed := join(ids_wide, PhoneMart.key_phonemart_did,
 	left.did<>0 and 
 	keyed(right.l_did=left.did) and
 	((unsigned)RIGHT.dt_first_seen < (unsigned)risk_indicators.iid_constants.full_history_date(left.historydate)),					// check date
@@ -29,18 +30,22 @@ bureau_phonesearch_tmp := join(ids_wide, PhoneMart.key_phonemart_did,
 	self := left;
 		), left outer, atmost(riskwise.max_atmost), keep(100));
 		
+bureau_phonesearch_tmp_flagged := Suppress.CheckSuppression(bureau_phonesearch_tmp_unsuppressed, mod_access);
+
+bureau_phonesearch_tmp := PROJECT(bureau_phonesearch_tmp_flagged, TRANSFORM(temp_layout, 
+	self.phone_ver_bureau := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.phone_ver_bureau);
+    SELF := LEFT;
+)); 
+
 bureau_phonesearch := sort(bureau_phonesearch_tmp, seq, (integer) phone_ver_bureau);
-bureau_phonesearch_rolled := rollup(bureau_phonesearch, left.seq=right.seq, transform(temp_layout_CCPA,
+bureau_phonesearch_rolled := rollup(bureau_phonesearch, left.seq=right.seq, transform(temp_layout,
 	self.phone_ver_bureau := if((integer)right.phone_ver_bureau > (integer)left.phone_ver_bureau,
 																					right.phone_ver_bureau,
 																					left.phone_ver_bureau),
 	self := left));
 //We don't need to check DRM 24 for this because we are not exposing the phone, just verifying it.
-bureau_suppress := Suppress.MAC_SuppressSource(bureau_phonesearch_rolled, mod_access);
-bureau_phonesearch_formatted := PROJECT(bureau_suppress, TRANSFORM(temp_layout,
-                                                  SELF := LEFT));
 																									
-return bureau_phonesearch_formatted;
+return bureau_phonesearch_rolled;
 
 
 end;

@@ -13,6 +13,7 @@ module
 	shared lprefix	        := _Constants(pUseOtherEnvironment).prefix			;
 
 	export Space_Usage            := tools.mod_FilenamesBuild(lfileprefix + 'SpaceUsage'	     ,pversion);
+	export HighRiskCodes          := tools.mod_FilenamesBuild(lfileprefix + 'HighRiskCodes'    ,pversion);
 	export Dashboard              := tools.mod_FilenamesBuild(lfileprefix + 'Dashboard'	       ,pversion);
 	export Best_Flat              := tools.mod_FilenamesBuild(lfileprefix + 'Best_Flat'	       ,pversion);
 	export BIP_Owners             := tools.mod_FilenamesBuild(lfileprefix + 'BIP_Owners'	     ,pversion);

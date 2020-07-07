@@ -192,6 +192,7 @@ layout_soap := RECORD
 	STRING50 AllowedSources;
 	REAL Global_Watchlist_Threshold;
 	boolean OutcomeTrackingOptOut;
+	STRING DataPermissionMask;    
 END;
 
 layout_soap transform_input_request(f_with_seq le) := TRANSFORM
@@ -336,7 +337,8 @@ layout_soap transform_input_request(f_with_seq le) := TRANSFORM
 	SELF.Seq := (STRING)le.seq;
 	SELF.AccountNumber := le.accountnumber;
 	SELF.OutcomeTrackingOptOut := TRUE;  // Turn off SCOUT logging
-	
+	SELF.DataPermissionMask := dataPermissionMask_val;
+
 	SELF := [];
 END;
 

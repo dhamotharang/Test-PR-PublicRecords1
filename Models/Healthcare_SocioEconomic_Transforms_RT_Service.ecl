@@ -555,7 +555,7 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 		SELF := [];
 	END;
 
-	Export PopulateScoresDS(CoreResults, Config, isReadmissionRequested, isMedicationAdherenceRequested, isMotivationRequested) := FUNCTIONMACRO
+	Export PopulateScoresDS(CoreResults, Config, isReadmissionRequested, isMedicationAdherenceRequested, isMotivationRequested, isTotalCostRiskScoreRequested) := FUNCTIONMACRO
 		
 		iesp.healthcare_socio_indicators.t_SocioScore formatRS() := TRANSFORM
 			SELF.Name := IF(isReadmissionRequested, 'ReadmissionProbability', _blank);
@@ -627,7 +627,7 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 			SeTC_Score_Str := trim(CoreResults[1].Score, left, right);
 			DECIMAL5_4 Socio_Index_Value := (DECIMAL5_4)(SeTC_Score/Config[1].TotalCostRiskScore_Index_Denominator);
 			SELF.Index := IF(isTotalCostRiskScoreRequested, MAP(SeTC_Score_Str = 'N/A' => 'N/A', SeTC_Score_Str = _blank => _blank,(string)Socio_Index_Value), 'N/A');
-			SELF.Rank := (string) MAP(
+			val_Socio_Rank := (string) MAP(
 								SeTC_Score_Str = 'N/A' => 'N/A',
 								SeTC_Score_Str = _blank => _blank,
 								SeTC_Score < Config[1].TotalCostRiskScore_Rank_1_Max  => '1',
@@ -731,13 +731,14 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 								SeTC_Score < Config[1].TotalCostRiskScore_Rank_99_Max => '99',
 								SeTC_Score >= Config[1].TotalCostRiskScore_Rank_99_Max => '100',
 								'N/A');
-			SELF.Category := MAP(SeTC_Score_Str = 'N/A' => 'N/A',
-								SeTC_Score_Str = _blank => _blank,
-   								SeTC_Score  < Config[1].TotalCostRiskScore_Category_2_Low => '1',
-   								SeTC_Score  < Config[1].TotalCostRiskScore_Category_3_Low => '2',
-   								SeTC_Score  < Config[1].TotalCostRiskScore_Category_4_Low => '3',
-   								SeTC_Score  < Config[1].TotalCostRiskScore_Category_5_Low => '4',
-   								SeTC_Score >= Config[1].TotalCostRiskScore_Category_5_Low => '5',
+			SELF.Rank := val_Socio_Rank;
+			SELF.Category := MAP(val_Socio_Rank = 'N/A' => 'N/A',
+								val_Socio_Rank = _blank => _blank,
+   								(UNSIGNED1)val_Socio_Rank  < (UNSIGNED1)Config[1].TotalCostRiskScore_Category_2_Low => '1',
+   								(UNSIGNED1)val_Socio_Rank  < (UNSIGNED1)Config[1].TotalCostRiskScore_Category_3_Low => '2',
+   								(UNSIGNED1)val_Socio_Rank  < (UNSIGNED1)Config[1].TotalCostRiskScore_Category_4_Low => '3',
+   								(UNSIGNED1)val_Socio_Rank  < (UNSIGNED1)Config[1].TotalCostRiskScore_Category_5_Low => '4',
+   								(UNSIGNED1)val_Socio_Rank >= (UNSIGNED1)Config[1].TotalCostRiskScore_Category_5_Low => '5',
 								'N/A');
 			SELF.CareDrivers.High1 := CoreResults[1].TC_Driver_Hi1;
 			SELF.CareDrivers.High2 := CoreResults[1].TC_Driver_Hi2;

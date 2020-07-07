@@ -45,6 +45,7 @@ FUNCTION
                                         PhoneFinder_Services.Constants.PhoneType.Other);
     SELF.ListingType             := IF(le.ListingType != '', le.ListingType, ri.ListingType);
     SELF.PhoneStatus             := IF(le.PhoneStatus = $.Constants.PhoneStatus.NotAvailable, ri.PhoneStatus, le.PhoneStatus);
+    SELF.Prepaid                 := IF(le.Prepaid , le.Prepaid, ri.Prepaid);
     SELF.PhoneOwnershipIndicator := le.PhoneOwnershipIndicator OR ri.PhoneOwnershipIndicator; // only valid for other phones
     SELF.CallForwardingIndicator := IF(ri.CallForwardingIndicator = '' OR le.CallForwardingIndicator = $.Functions.CallForwardingDesc(1),
                                         le.CallForwardingIndicator,
@@ -67,6 +68,7 @@ FUNCTION
     SELF.sim_Tenure_MaxDays      := IF(le.sim_Tenure_MaxDays = 0, ri.sim_Tenure_MaxDays, le.sim_Tenure_MaxDays);
     SELF.imei_Tenure_MinDays     := IF(le.imei_Tenure_MinDays = 0, ri.imei_Tenure_MinDays, le.imei_Tenure_MinDays);
     SELF.imei_Tenure_MaxDays     := IF(le.imei_Tenure_MaxDays = 0, ri.imei_Tenure_MaxDays, le.imei_Tenure_MaxDays);
+    SELF.phn_src_all             := le.phn_src_all + ri.phn_src_all;
     SELF                         := le;
   END;
 
@@ -89,9 +91,7 @@ FUNCTION
     SELF.Phonestatus		         := IF(ri.phone != '', ri.Phonestatus, le.Phonestatus);
     SELF.PortingCode             := IF(ri.phone != '', ri.PortingCode, le.PortingCode);
     SELF.ListingType             := IF(ri.ListingType != '', ri.ListingType, le.ListingType);
-    SELF.coc_description         := IF(ri.ServiceClass != '',
-                                        $.Functions.ServiceClassDesc(ri.ServiceClass),
-                                        le.coc_description);
+    SELF.coc_description         := IF(ri.coc_description != '', ri.coc_description, le.coc_description);
     SELF.carrier_name            := MAP(ri.operatingcompany.name != ''=> ri.operatingcompany.name,
                                         ri.carrier_name != ''=> ri.carrier_name,
                                         le.carrier_name);
@@ -106,8 +106,8 @@ FUNCTION
     SELF.PortingStatus           := le.PortingStatus;
     SELF.FirstPortedDate         := le.FirstPortedDate;
     SELF.LastPortedDate          := le.LastPortedDate;
-    SELF.ActivationDate          := le.ActivationDate;
-    SELF.DisconnectDate          := le.DisconnectDate;
+    SELF.ActivationDate          := IF(ri.phone != '', ri.ActivationDate, le.ActivationDate);
+    SELF.DisconnectDate          := IF(ri.phone != '', ri.DisconnectDate, le.DisconnectDate);
     SELF.Prepaid                 := le.Prepaid;
     SELF.NoContractCarrier       := le.NoContractCarrier;
     SELF.Spoof                   := le.Spoof;
@@ -145,6 +145,7 @@ FUNCTION
     SELF.sim_Tenure_MaxDays      := IF(le.sim_Tenure_MaxDays = 0, ri.sim_Tenure_MaxDays, le.sim_Tenure_MaxDays);
     SELF.imei_Tenure_MinDays     := IF(le.imei_Tenure_MinDays = 0, ri.imei_Tenure_MinDays, le.imei_Tenure_MinDays);
     SELF.imei_Tenure_MaxDays     := IF(le.imei_Tenure_MaxDays = 0, ri.imei_Tenure_MaxDays, le.imei_Tenure_MaxDays);
+    SELF.phn_src_all             := le.phn_src_all + ri.phn_src_all;
     SELF                         := ri;
   END;
 
@@ -162,7 +163,6 @@ FUNCTION
                         LEFT.acctno = RIGHT.acctno AND
                         LEFT.phone  = RIGHT.phone,
                         TRANSFORM($.Layouts.PhoneFinder.PhoneSlim,
-                                  SELF.coc_description := IF(LEFT.ServiceClass != '', $.Functions.ServiceClassDesc(LEFT.ServiceClass), LEFT.coc_description),
                                   SELF                 := LEFT),
                         LEFT ONLY);
 
@@ -171,14 +171,14 @@ FUNCTION
                           UNGROUP(TOPN(GROUP(dPhoneState, acctno), PhoneFinder_Services.Constants.WFConstants.MaxSectionLimit, acctno, -phone_score)));
 
   #IF(PhoneFinder_Services.Constants.Debug.Main)
-      OUTPUT(dPhoneSlim, NAMED('dPhoneSlim'), EXTEND);
-      OUTPUT(dPhoneState, NAMED('dPhoneState'), EXTEND);
-      OUTPUT(dPhoneSort, NAMED('dPhoneSort'), EXTEND);
-      OUTPUT(dPhoneRollup, NAMED('dPhoneRollup'), EXTEND);
-      OUTPUT(dPrimaryPhoneDetail, NAMED('dPrimaryPhoneDetail'), EXTEND);
-      OUTPUT(dPhoneDetail, NAMED('dPhoneDetail'), EXTEND);
-      OUTPUT(dTUPhonesOnly, NAMED('dTUPhonesOnly'), EXTEND);
-      OUTPUT(dAllPhonesDetail, NAMED('dAllPhonesDetail'), EXTEND);
+      OUTPUT(dPhoneSlim, NAMED('dPhoneSlim_Final'), EXTEND);
+      OUTPUT(dPhoneState, NAMED('dPhoneState_Final'), EXTEND);
+      OUTPUT(dPhoneSort, NAMED('dPhoneSort_Final'), EXTEND);
+      OUTPUT(dPhoneRollup, NAMED('dPhoneRollup_Final'), EXTEND);
+      OUTPUT(dPrimaryPhoneDetail, NAMED('dPrimaryPhoneDetail_Final'), EXTEND);
+      OUTPUT(dPhoneDetail, NAMED('dPhoneDetail_Final'), EXTEND);
+      OUTPUT(dTUPhonesOnly, NAMED('dTUPhonesOnly_Final'), EXTEND);
+      OUTPUT(dAllPhonesDetail, NAMED('dAllPhonesDetail_Final'), EXTEND);
     #END
 
   RETURN dAllPhonesDetail;

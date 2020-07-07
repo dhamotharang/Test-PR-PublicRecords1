@@ -2,7 +2,7 @@
 // to ESP output layouts as well (some sections' implementation can be found
 // in the history of PersonReports.Addrs_Imposters_Rels_Assocs)
 
-IMPORT $, CriminalRecords_Services, DeathV2_Services, doxie, doxie_crs, DriversV2_Services, dx_death_master, 
+IMPORT $, CriminalRecords_Services, DeathV2_Services, doxie, doxie_crs, DriversV2_Services, dx_death_master,
        FCRA, FFD, header, iesp, MDR, suppress, ut;
 
 EXPORT Person_records (
@@ -16,34 +16,28 @@ EXPORT Person_records (
 
 shared input_dids_set := SET (dids, did);
 
-shared fcra_csa_wrap :=FCRA.comp_subject (dids, 
-																					mod_access.dppa,
-																					mod_access.glb,
-																					false, // exclude Gong so far
-																					mod_access.industry_class,
-																					//in_params.dialcontactprecision
-																					, 
-																					/*Addresses_PerSubject*/,
+shared fcra_csa_wrap :=FCRA.comp_subject (dids,
+																					mod_access,
 																					ds_flags,
 																					slim_pc_recs,
 																					in_params.FFDOptionsMask);
 
 bestrecs_reg := doxie.best_records (dids, IsFCRA, , , true, includeDOD:=true, modAccess := mod_access); // use non-blank key, see #39788
-																		
-shared bestrecs_ffd := if(IsFCRA, fcra_csa_wrap.best_record, 
+
+shared bestrecs_ffd := if(IsFCRA, fcra_csa_wrap.best_record,
 	project(bestrecs_reg, transform(doxie_crs.layout_best_information, self := left, self := [])));
-																			
+
 // TODO: rename to src_bestrecords
 export bestrecs := project(bestrecs_ffd, doxie.layout_best);
 
-ssnr_pre_reg := doxie.fn_ssn_records (bestrecs); 
-//doxie_crs.layout_ssn_records 
+ssnr_pre_reg := doxie.fn_ssn_records (bestrecs);
+//doxie_crs.layout_ssn_records
 
 ssnr_pre_fcra := fcra_csa_wrap.ssn_recs;
 shared src_ssn_main := if (IsFCRA,ssnr_pre_fcra,ssnr_pre_reg);
 
 src_residents_reg := if (in_params.include_residents,
-                            project (doxie.Resident_Records, transform ($.layouts.comp_names, self :=left))); 
+                            project (doxie.Resident_Records, transform ($.layouts.comp_names, self :=left)));
 src_residents_fcra := dataset([],$.layouts.comp_names);
 shared src_residents := if(IsFCRA , src_residents_fcra , src_residents_reg);
 
@@ -57,17 +51,17 @@ glb_ok := mod_access.isValidGLB ();
 rna_glb_ok := mod_access.isValidGLB (header.constants.checkRNA);
 death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
 
-//NB: FCRA does not have permission to use/return RNA  
+//NB: FCRA does not have permission to use/return RNA
 
 // Get all DIDs that will be used in the report; set "is subject" indicator for a subject
 rec_did_owner := record (doxie.layout_references)
   boolean is_subject := false;
 end;
 all_dids_pre_reg := project (dids, transform (rec_did_owner, Self.did := Left.did, Self.is_subject := true;)) +
-                dedup (project (src_ssn_main (did not in input_dids_set), rec_did_owner), did, all) + 
-                dedup (project (src_residents, rec_did_owner), did, all) + 
+                dedup (project (src_ssn_main (did not in input_dids_set), rec_did_owner), did, all) +
+                dedup (project (src_residents, rec_did_owner), did, all) +
                 project (doxie.Get_RNA_DIDs, rec_did_owner);
-                                                                                                                                
+
 all_dids_pre_fcra := project (dids, transform (rec_did_owner, Self.did := Left.did, Self.is_subject := true;));
 
 all_dids_pre :=  if(IsFCRA ,all_dids_pre_fcra ,all_dids_pre_reg );
@@ -86,22 +80,22 @@ dear_recs := PROJECT(dear_glb_ok, TRANSFORM(doxie_crs.layout_deathfile_records,
   SELF.did := (string)((integer)(Left.death.did));
   SELF := left.death));
 dear := if(~IsFCRA, dear_recs);
-               
+
 Death_source_sort := SORT(dear, did, dod8);
 
 Death_source_grp:= Sort(group(Death_source_sort,did,dod8), did, dod8, if(IsLimitedAccessDMF, 1,0));
-Death_source_info := UNGROUP(iterate(Death_source_grp, TRANSFORM(doxie_crs.layout_deathfile_records, 
+Death_source_info := UNGROUP(iterate(Death_source_grp, TRANSFORM(doxie_crs.layout_deathfile_records,
 									SELF.IsLimitedAccessDMF :=if(COUNTER = 1 , ((INTEGER)RIGHT.dod8 != 0 AND RIGHT.IsLimitedAccessDMF),
 	                                LEFT.IsLimitedAccessDMF ) ,
-									SELF :=right))); 
-//============================  
+									SELF :=right)));
+//============================
 
 // for the purpose of deceased indicator we need only one record per person, preferrably with a county
 
-shared src_deceased := dedup (sort (Death_source_info, did, -dod8, trim (county_name) = ''), did, dod8);	  
+shared src_deceased := dedup (sort (Death_source_info, did, -dod8, trim (county_name) = ''), did, dod8);
 
 
-besr_choice := IF(EXISTS(bestrecs), bestrecs, project (dids, transform (doxie.layout_best , 
+besr_choice := IF(EXISTS(bestrecs), bestrecs, project (dids, transform (doxie.layout_best ,
                                                                             Self.did := Left.did, Self := [])));
 
   iesp.bpsreport.t_BpsReportBestInfo transform_best (doxie.layout_best L) := transform
@@ -153,7 +147,7 @@ address_expanded := $.Functions.Address (in_params).ExpandWithResidents (address
 shared src_address := if (in_params.expand_address, address_expanded, address_orig);
 
 
-// This is performance fix for the cases when no other data than address itself 
+// This is performance fix for the cases when no other data than address itself
 // is required (like in eAuth); can be extended with risk indicators, etc. if needed.
 $.layouts.t_AddressTimeLine GetSubjectShortAddress (doxie.Layout_Comp_Addresses L) := transform
   	Self.StreetName          := L.prim_name;
@@ -190,12 +184,12 @@ end;
 // TODO: append HRIs conditionally
 phones_wide_hri := project (phones_wide, transform (phones_rec, Self := Left; Self.hri_phone := []));
 maxHriPer_value := 10; //TODO: include into input (unsigned1 maxHriPer_value := 10 : stored('MaxHriPer'));
-doxie.mac_AddHRIPhone(phones_wide_hri, phor_pre);
+doxie.mac_AddHRIPhone(phones_wide_hri, phor_pre, mod_access);
 phor := project (phor_pre, transform (phones_rec, Self.lname := Left.name_last, Self := Left));
 
 // FinderReport style: verifies phones by last residents' names, among other things
 // Address-phone match is done at that point, so "extra" addresses appended (if any) from residents list can be removed.
-export addr_base := $.Functions.Address (in_params).AttachPhones (src_address, phor) 
+export addr_base := $.Functions.Address (in_params).AttachPhones (src_address, phor)
   (address_seq_no != $.Constants.APPENDED_BY_RESIDENTS);
 // ---------- Now have addresses with phones ----------
 
@@ -208,7 +202,7 @@ shared ssn_lookups := doxie.SSN_Lookups; // doxie_crs/layout_SSN_Lookups
 
 // flat table of residents with SSN, death, etc. info;
 // contains DID and address sequence, which can be used for linking.
-// Residents are effectively CURRENT RESIDENTS (i.e. those who reside recently). 
+// Residents are effectively CURRENT RESIDENTS (i.e. those who reside recently).
 shared residents_base := $.Functions.GetPersonBase (src_residents, ssn_lookups, src_deceased, mod_access, in_params);
 
 // ------------------------- expanded residents -------------------------
@@ -244,13 +238,13 @@ export residents_slim := if (~IsFCRA, rollup (res_slim_grouped, group, RollIdent
 // =======================================================================
 // ==============  Address: add Residents, Properties, etc. ==============
 // =======================================================================
-// Residents are effectively CURRENT RESIDENTS (i.e. those who reside recently). 
+// Residents are effectively CURRENT RESIDENTS (i.e. those who reside recently).
 // Thus, some of the addresses from address sequence table will not have residents yet (say, historical neighbors)
 
 // ------------------------- wide addresses -------------------------
 shared addr_wide := $.Functions.Address (in_params).AddResidents (addr_base, residents_wide);
 // NOTE: these addresses don't contain properties, census, etc. data;
-//       Since they are used in relatives and neighbors sections so far, it is not required. 
+//       Since they are used in relatives and neighbors sections so far, it is not required.
 //       But, if either is needed, it should be done here.
 
 
@@ -282,7 +276,7 @@ EXPORT SubjectAddressesSlim := if (~IsFCRA, project (x_SubjectAddressesSlim, ies
 // represented by a slim Identity in the output
 
 // flat table of ssn records, containing imposters and subject's AKAs
-// contains DID, which can be used for linking 
+// contains DID, which can be used for linking
 shared all_persons := $.Functions.GetSSNRecordsBase (src_ssn_main, src_deceased, in_params, IsFCRA);
 
 EXPORT Imposters := if(~IsFCRA,$.Functions.GetImposters (all_persons (did NOT IN input_dids_set), bestrecs, in_params));
@@ -322,9 +316,9 @@ aka_best_dl := project (aka_best, AppendDL (Left));
 
 // add together AKA from "best" file and all other AKAs
 // TODO: use filter instead of join
-other_akas := project (join (all_persons, dids, left.did=right.did, keep (1)), 
+other_akas := project (join (all_persons, dids, left.did=right.did, keep (1)),
                                     transform ($.layouts.CommonPreLitigationReportIdentity,
-			Self.SubjectSSNIndicator := IF(Left.SSNInfo.SSN!='' and 
+			Self.SubjectSSNIndicator := IF(Left.SSNInfo.SSN!='' and
 			Left.SSNInfo.SSN=bestrecs[1].SSN,'yes','no'),
 			Self := Left, Self := []));
 
@@ -347,7 +341,7 @@ src_relatives := doxie.relative_summary; //did, name, depth, etc.
 // AKAs will be taken from 'names_src', so we don't need to keep dupes in relatives.
 // Dedup by DID, choose the closest relatives
 //max_relassoc := iesp.Constants.BR.MaxRelatives + iesp.Constants.BR.MaxAssociates;
-max_relassoc := iesp.Constants.SMART.MaxRelatives + iesp.Constants.SMART.MaxAssociates;  
+max_relassoc := iesp.Constants.SMART.MaxRelatives + iesp.Constants.SMART.MaxAssociates;
 shared rel_assoc := choosen (dedup (sort (src_relatives, person2, depth, ~relative), person2), max_relassoc);
 
 src_names := doxie.Comp_Names; //did, name, ssn
@@ -408,7 +402,7 @@ shared iesp.share.t_PhoneInfoEx BpsPhone2Phone (iesp.bpsreport.t_BpsReportPhone 
 end;
 
 iesp.bpsreport.t_BpsReportAssociate Relative2Associate (iesp.bpsreport.t_BpsReportRelative L) := transform
-  Self.Addresses := project (L.addresses, transform (iesp.bpsreport.t_BpsReportAssociateAddress, 
+  Self.Addresses := project (L.addresses, transform (iesp.bpsreport.t_BpsReportAssociateAddress,
                                                      phones := project (Left.Phones, BpsPhone2Phone (Left));
                                                      Self.Phones := project (phones, iesp.share.t_PhoneInfo);
                                                      Self.PhonesEx := phones;
@@ -520,7 +514,7 @@ iesp.bpsreport.t_Neighbor SetSubjectAddress (layout_nbr_ext L, $.layouts.address
   Self.SubjectAddress.AddressEx := project (R.Address, transform (iesp.share.t_AddressEx, self.HighRiskIndicators := []; self := Left));
   // Self.SubjectAddress.Residents := project (R.residents, UnfoldResidents (Left));
   Self.SubjectAddress.Residents := project (R.residents, iesp.bps_share.t_BpsReportIdentity);
-  Self.SubjectAddress := R; //DateFirstSeen, DateLastSeen, Verified, _Shared 
+  Self.SubjectAddress := R; //DateFirstSeen, DateLastSeen, Verified, _Shared
   Self.NeighborAddresses := L.NeighborAddresses; //choosen was used before
 end;
 
@@ -586,7 +580,7 @@ ds_neighborhoods_slim := rollup (nb_addr_grp_slim, group, SetNeighborhoodsSlim (
 // Finally, set subject's address
 iesp.bpsreport.t_NeighborSlim SetSubjectAddressSlim (layout_nbr_ext_slim L, $.layouts.address_slim R) := transform
   phones := choosen (project (R.phones, BpsPhone2Phone (Left)), iesp.Constants.BR.Neigbors_Phones);
-  Self.SubjectAddress := project (R, transform (iesp.bpsreport.t_NeighborAddressSlim, 
+  Self.SubjectAddress := project (R, transform (iesp.bpsreport.t_NeighborAddressSlim,
                                                 Self.Phones := phones; Self := Left));
   Self.NeighborAddresses := L.NeighborAddresses; //choosen was used before
 end;

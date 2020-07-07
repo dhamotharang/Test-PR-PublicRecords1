@@ -265,7 +265,7 @@ odds := 0.10 / (1 - 0.10);
 
 point := -40;
 
-pb1708_1_0 := map((INTEGER)VerifiedProspectFound = -1 => '',(INTEGER)ProspectAge= 0 => '', (string)min(if(max(round(point * (c_lnoddsscore - ln(odds)) / ln(2) + base), 501) = NULL, -NULL, max(round(point * (c_lnoddsscore - ln(odds)) / ln(2) + base), 501)), 900));
+pb1708_1_0 := map((INTEGER)VerifiedProspectFound = -1 => '',(INTEGER)ProspectAge= 0 => '-1', (string)min(if(max(round(point * (c_lnoddsscore - ln(odds)) / ln(2) + base), 501) = NULL, -NULL, max(round(point * (c_lnoddsscore - ln(odds)) / ln(2) + base), 501)), 900));
 //if((INTEGER)VerifiedProspectFound = -1, '', (string)min(if(max(round(point * (c_lnoddsscore - ln(odds)) / ln(2) + base), 501) = NULL, -NULL, max(round(point * (c_lnoddsscore - ln(odds)) / ln(2) + base), 501)), 900));
 
 																																	 

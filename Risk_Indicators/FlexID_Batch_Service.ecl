@@ -131,7 +131,7 @@
 </pre>
 */
 
-import STD, address, iesp, patriot, riskwise, ut, intliid, models, autostandardi, risk_indicators, ADVO, gateway, OFAC_XG5;
+import STD, address, iesp, patriot, riskwise, ut, intliid, models, autostandardi, risk_indicators, ADVO, gateway, OFAC_XG5, Royalty;
 
 export FlexID_Batch_Service := MACRO
 
@@ -198,6 +198,7 @@ ds_in := dataset([], batch_in_format) : stored('batch_in',few);
 unsigned1 DPPAPurpose := 0 								: stored('DPPAPurpose');
 unsigned1 GLBPurpose := 8 									: stored('GLBPurpose');
 string5 	 IndustryClassVal := '' 						: stored('IndustryClass');
+industryClassValue := STD.Str.ToUpperCase(IndustryClassVal);
 unsigned3 HistoryDate := 999999 							: stored('HistoryDateYYYYMM');
 boolean   IsPOBoxCompliant := false 					: stored('PoBoxCompliance');
 boolean   UseDobFilter := false 							: stored('UseDobFilter');
@@ -527,12 +528,18 @@ with_advo := join(prep, Advo.Key_Addr1,
 											atmost(riskwise.max_atmost), keep(1));	
 
 ret := risk_indicators.InstantID_Function(prep, gateways, DPPAPurpose, GLBPurpose, isUtility, LNBrandedValue, 
-														OFACOnly, suppressNearDups, require2ele, fromBiid, isFCRA, ExcludeWatchLists,
-														fromIT1O, OFACVersion, IncludeOFAC, IncludeAdditionalWatchlists, GlobalWatchListThreshold, DobRadiusUse,
-														BSVersion, runSSNCodes, runBestAddrCheck, runChronoPhoneLookup, runAreaCodeSplitSearch, allowCellPhones,
-														ExactMatchLevel, DataRestriction, CustomDataFilter, IncludeDLverification, watchlists_request, DOBMatchOptions,
-														EverOccupant_PastMonths, EverOccupant_StartDate, AppendBest, BSoptions, LastSeenThreshold, CompanyID, DataPermission,
-                                                        LexIdSourceOptout := LexIdSourceOptout, TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID);
+                                          OFACOnly, suppressNearDups, require2ele, fromBiid, isFCRA, ExcludeWatchLists,
+                                          fromIT1O, OFACVersion, IncludeOFAC, IncludeAdditionalWatchlists, 
+                                          GlobalWatchListThreshold, DobRadiusUse, BSVersion, runSSNCodes, runBestAddrCheck, 
+                                          runChronoPhoneLookup, runAreaCodeSplitSearch, allowCellPhones, ExactMatchLevel, 
+                                          DataRestriction, CustomDataFilter, IncludeDLverification, watchlists_request, DOBMatchOptions,
+                                          EverOccupant_PastMonths, EverOccupant_StartDate, AppendBest, BSoptions, LastSeenThreshold, 
+                                          CompanyID, DataPermission,
+                                          LexIdSourceOptout := LexIdSourceOptout, 
+                                          TransactionID := TransactionID, 
+                                          BatchUID := BatchUID, 
+                                          GlobalCompanyID := GlobalCompanyID,
+                                          in_industryClass := industryClassValue);
 
 if(exists(ret(watchlist_table = 'ERR')), FAIL('Bridger Gateway Error'));
 
@@ -542,16 +549,8 @@ LayoutFlexIDBatchOutExt := RECORD
 	boolean insurance_dl_used;
 END;
 
-//  For ThreatMetrix reasoncodes
-TMX_model:=Models.IID1906_0_0(ret);
-DRM_threatmetrix:= DataRestriction[Risk_indicators.iid_constants.IncludeDigitalIdentity]=Risk_indicators.iid_constants.sFalse;
- retplus_tmx:= if(DRM_threatmetrix,join(ret,TMX_model,left.seq=right.seq,
- transform(risk_indicators.layout_output,
- self.iid_tmx.phonehighriskind:=RIGHT.phonehighriskind,
- self.iid_tmx.emailhighriskind:=Right.emailhighriskind,
- self:=LEFT),left outer),ungroup(ret));
  
-LayoutFlexIDBatchOutExt format_out(retplus_tmx le, fs ri) := TRANSFORM
+LayoutFlexIDBatchOutExt format_out(ret le, fs ri) := TRANSFORM
 	SELF.seq := (string)ri.seq;
 	SELF.acctNo := ri.acctno;
 	
@@ -567,17 +566,19 @@ LayoutFlexIDBatchOutExt format_out(retplus_tmx le, fs ri) := TRANSFORM
 	verlast := IF(le.combo_lastcount>0, le.combo_last, '');
 	veraddr := IF(le.combo_addrcount>0, Risk_Indicators.MOD_AddressClean.street_address('', le.combo_prim_range, le.combo_predir, le.combo_prim_name, le.combo_suffix,
 																													le.combo_postdir,le.combo_unit_desig,le.combo_sec_range), '');
-	cvi_temp := if(actualIIDVersion=0, risk_indicators.cviScore(le.phoneverlevel, le.socsverlevel, le, le.correctssn, le.correctaddr, le.correcthphone, '', veraddr, verlast,
-																															OFAC),
-																			risk_indicators.cviScoreV1(le.phoneverlevel, le.socsverlevel, le, le.correctssn, le.correctaddr, le.correcthphone, '', veraddr, verlast,
-																																	OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,'',IncludeITIN,IncludeComplianceCap));
-	isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) and actualIIDVersion=1;
-	SELF.ComprehensiveVerificationIndex := MAP(	IncludeMSoverride and risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) and (integer)cvi_temp > 10 => '10',
-							IsPOBoxCompliant AND risk_indicators.rcSet.isCodePO(le.addr_type) and (integer)cvi_temp > 10 => '10',
-							IncludeCLoverride and risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) and (integer)cvi_temp > 10 => '10', 
-							IncludeMIoverride AND risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) and (INTEGER)cvi_temp > 10 => '10',
-							isCodeDI AND (INTEGER)cvi_temp > 10 => '10',
-							cvi_temp);
+	
+            OverrideOptions := MODULE(Risk_Indicators.iid_constants.IOverrideOptions) 
+            EXPORT isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) AND actualIIDVersion=1;
+            EXPORT isCodePO := risk_indicators.rcSet.isCodePO(le.addr_type) AND IsPOBoxCompliant;
+            EXPORT isCodeCL := risk_indicators.rcSet.isCodeCL(le.ssn, le.bestSSN, le.socsverlevel, le.combo_ssn) AND IncludeCLoverride;
+            EXPORT isCodeMI := risk_indicators.rcSet.isCodeMI(le.adls_per_ssn_seen_18months) AND IncludeMIoverride;
+            EXPORT isCodeMS := risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) AND IncludeMSoverride;
+            END;
+            
+			SELF.ComprehensiveVerificationIndex :=  if(actualIIDVersion=0, risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,'',veraddr,verlast,
+																														OFAC,OverrideOptions),	
+																					risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,'',veraddr,verlast,
+																														OFAC, IncludeDOBinCVI, IncludeDriverLicenseInCVI,,,OverrideOptions));
 																																									
 	
 	// allow up to 20 reason codes (seemed like a high enough amount to show all reason codes returned)
@@ -686,7 +687,7 @@ LayoutFlexIDBatchOutExt format_out(retplus_tmx le, fs ri) := TRANSFORM
  SELF.PhoneLineDescription:=le.PhoneLineDescription;
  SELF := [];
 END;
-formedbeforeAdvo := join(retplus_tmx, fs, left.seq = right.seq, format_out(LEFT, RIGHT));
+formedbeforeAdvo := join(ret, fs, left.seq = right.seq, format_out(LEFT, RIGHT));
 formedWithAdvo := join(formedbeforeAdvo, with_advo, (integer)left.seq = right.seq, 
 									TRANSFORM(LayoutFlexIDBatchOutExt,
 										self.ValidElementSummaryAddressCMRA := IF(LEFT.ValidElementSummaryAddressCMRA = '1' OR RIGHT.ADVODropIndicator = 'C', '1', '0');
@@ -727,10 +728,8 @@ clam :=  risk_indicators.Boca_Shell_Function(	ret,
                                                             BatchUID := BatchUID, 
                                                             GlobalCompanyID := GlobalCompanyID);
 															
-															
-
-ip_prep := project( fs, transform( riskwise.Layout_IPAI, self.ipaddr := left.ip_addr, self.seq := left.seq ) );
-ip_out  := risk_indicators.getNetAcuity( ip_prep, gateways, DPPAPurpose, GLBPurpose);
+ip_prep := JOIN(ret, fs, left.seq = right.seq, transform( riskwise.Layout_IPAI, self.ipaddr := right.ip_addr, self.seq := right.seq, self.did := left.did ) );
+ip_out  := risk_indicators.getNetAcuity( ip_prep, gateways, DPPAPurpose, GLBPurpose, applyOptOut := TRUE);
 
 bs_with_ip := record
 	risk_indicators.Layout_Boca_Shell bs;

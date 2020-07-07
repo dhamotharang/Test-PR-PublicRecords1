@@ -106,7 +106,12 @@ EXPORT CommonQuery := MODULE
         outerBandHistoryDate           := DueDiligence.Constants.NUMERIC_ZERO      : STORED('HistoryDateYYYYMMDD');
         STRING6 outerBandSSNMASK       := Business_Risk_BIP.Constants.Default_SSNMask : STORED('SSNMask');  
 
-
+        //CCPA fields
+        unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+        string TransactionID := '' : STORED('_TransactionId');
+        string BatchUID := '' : STORED('_BatchUID');
+        unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+        
         //The general rule for picking these options is to look in the inner band (ie the User section) first
         //If the inner band fields are not populated look in the outer band or the Default from the Global Module 
         drm	    := IF(TRIM(userIn.DataRestrictionMask) <> DueDiligence.Constants.EMPTY, userIn.DataRestrictionMask, AutoStandardI.GlobalModule().DataRestrictionMask);

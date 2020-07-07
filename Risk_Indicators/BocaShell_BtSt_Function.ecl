@@ -1,8 +1,8 @@
-﻿import riskwise, gateway, Risk_Indicators, doxie;
+﻿﻿import riskwise, gateway, Risk_Indicators, doxie;
 //Old legacy RISKWISE services will not be shouldn't be sending in new score input fields...as otherwise
 //they should be updated to use our newer services.
 export BocaShell_BtSt_Function(grouped dataset(risk_indicators.layout_ciid_btst_Output) iid_btst, dataset(Gateway.Layouts.Config) gateways,
-													unsigned1 dppa, unsigned1 glb, boolean isUtility=false, boolean isLN=false, 
+													unsigned1 dppa_val, unsigned1 glb_val, boolean isUtility=false, boolean isLN=false, 
 													// optimization options
 													boolean includeRelativeInfo=true, boolean includeDLInfo=true, boolean includeVehInfo=true,
 													boolean includeDerogInfo = true, unsigned1 BSversion=1, boolean doScore=false, boolean nugen=false,
@@ -17,6 +17,10 @@ export BocaShell_BtSt_Function(grouped dataset(risk_indicators.layout_ciid_btst_
                                                     unsigned6 GlobalCompanyId = 0) := FUNCTION 
                                                     
    mod_access := MODULE(Doxie.IDataAccess)
+      EXPORT glb := glb_val;
+      EXPORT dppa := dppa_val;
+      EXPORT DataPermissionMask := DataPermission;
+      EXPORT DataRestrictionMask := DataRestriction;
       EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
       EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
       EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
@@ -30,7 +34,7 @@ end;
 iid_results := normalize(iid_btst, 2, norm(LEFT,COUNTER));
 	
 
-outf := risk_indicators.Boca_Shell_Function(iid_results, gateways, dppa, glb, isUtility, isLN, 
+outf := risk_indicators.Boca_Shell_Function(iid_results, gateways, dppa_val, glb_val, isUtility, isLN, 
 									includeRelativeInfo, includeDLInfo, includeVehInfo, includeDerogInfo, 
 									BSversion, doScore, nugen := nugen, DataRestriction:=DataRestriction,
 									BSOptions:=inBSOptions, DataPermission:=DataPermission,
@@ -59,7 +63,7 @@ end;
 
 outf3 := join(outf2, outf, left.seq = right.seq - 1, into_out2(LEFT,RIGHT), left outer);
 
-sc := risk_indicators.Score_And_Distance_Function(iid_btst, dppa, glb);
+sc := risk_indicators.Score_And_Distance_Function(iid_btst, dppa_val, glb_val);
 
 risk_indicators.layout_bocashell_btst_out add_scores(outf3 le, sc rt) := transform
 	self.eddo := rt;
@@ -71,11 +75,12 @@ wScores := join(outf3, sc, left.bill_to_out.seq=right.seq, add_scores(left, righ
 riskwise.Layout_IPAI prep_ips(iid_btst le) := transform
 	self.seq := le.bill_to_output.seq;
 	self.ipaddr := le.Bill_to_output.ip_address;
+	self.did := le.Bill_to_output.did;
 end;
 
 preNetAcuity := ungroup(project(iid_btst, prep_ips(left)));
 
-ips := if(ipid_only, dataset([], riskwise.Layout_IP2O),risk_indicators.getNetAcuity(preNetAcuity, gateways, dppa, glb, NetAcuity_v4));
+ips := if(ipid_only, dataset([], riskwise.Layout_IP2O),risk_indicators.getNetAcuity(preNetAcuity, gateways, dppa_val, glb_val, NetAcuity_v4, applyOptOut := TRUE));
 
 risk_indicators.layout_bocashell_btst_out add_ips(wScores le, ips rt) := transform
 	self.ip2o := rt;
@@ -135,7 +140,7 @@ transform(risk_indicators.layout_bocashell_btst_out,
 		self := [];
 				));
 
-btst_wBusHdr := risk_indicators.Boca_Shell_BtSt_Bus_Header(iid_btst, glb, dppa, DataRestriction, DataPermission);
+btst_wBusHdr := risk_indicators.Boca_Shell_BtSt_Bus_Header(iid_btst, glb_val, dppa_val, DataRestriction, DataPermission, mod_access);
 //verify if did is populated that this works
 btst_wDidSum_original := JOIN(btst_wBusHdr, btst_wBusHdr,
 	left.bill_to_out.seq = right.ship_to_out.seq - 1,
@@ -286,7 +291,7 @@ btst_wemail := join(btst_wstudent, btst_email,
 	self := left), atmost(riskwise.max_atmost),
 	left outer, parallel);
 
-btst_phones := Risk_Indicators.Boca_Shell_BtSt_Phones(iid_btst_filtered, dppa, glb, DataRestriction, mod_access);
+btst_phones := Risk_Indicators.Boca_Shell_BtSt_Phones(iid_btst_filtered, dppa_val, glb_val, DataRestriction, mod_access);
 btst_wphones := join(btst_wemail, btst_phones,
 	left.bill_to_out.seq = right.seq,
 	transform(risk_indicators.layout_bocashell_btst_out,
@@ -296,7 +301,7 @@ btst_wphones := join(btst_wemail, btst_phones,
 	self := left), atmost(riskwise.max_atmost),
 	left outer, parallel);
 	
-btst_Deeds_Addrs := Risk_Indicators.Boca_Shell_BtSt_Address(iid_btst_filtered, dppa, glb, DataRestriction, BSversion);
+btst_Deeds_Addrs := Risk_Indicators.Boca_Shell_BtSt_Address(iid_btst_filtered, dppa_val, glb_val, DataRestriction, BSversion);
 btst_wDeeds_Addrs := join(btst_wphones, btst_Deeds_Addrs,
 	left.bill_to_out.seq = right.seq,
 	transform(risk_indicators.layout_bocashell_btst_out,

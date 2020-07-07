@@ -1,4 +1,4 @@
-﻿IMPORT Address, DidVille, FraudGovPlatform_Services, FraudShared, FraudShared_Services, IDLExternalLinking, iesp, std;
+﻿IMPORT Address, Autokey_batch, BatchServices,  DidVille, FraudGovPlatform_Services, FraudShared, FraudShared_Services, IDLExternalLinking, iesp, std;
 
 EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_in,
                      FraudGovPlatform_Services.IParam.BatchParams batch_params,
@@ -30,36 +30,23 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// **************************************************************************************	  
 
 	//prepare the layout for ADL_BEST DID call
-	SHARED ds_in_didville_layout := PROJECT(ds_in, TRANSFORM(DidVille.Layout_Did_OutBatch,
-                                                  SELF.seq		:= (UNSIGNED)LEFT.acctno;
-                                                  SELF.fname	:= LEFT.name_first;
-                                                  SELF.mname	:= LEFT.name_middle;
-                                                  SELF.lname	:= LEFT.name_last;
-                                                  SELF.suffix	:= LEFT.name_suffix;
-                                                  SELF.ssn 		:= stringlib.stringfilter(LEFT.ssn,'0123456789');
-                                                  SELF.did 		:= 0; //Purposefully sending DID = 0, so we can resolve the adl best did for Input PII. 
-                                                  SELF.phone10:= LEFT.phoneno;
-                                                  SELF				:= LEFT;
-                                                  SELF				:= []));
+	SHARED get_input_in := PROJECT(ds_in, TRANSFORM(Autokey_batch.Layouts.rec_inBatchMaster, 
+																					SELF.did := 0; //Purposefully sending DID = 0, so we can resolve the adl best did for Input PII.
+																					SELF.homephone := LEFT.phoneno,
+																					SELF := LEFT,
+																					SELF := []));
+
+	EXPORT ds_in_w_adl_did_appended := BatchServices.Functions.fn_find_dids_and_append_to_acctno(get_input_in);																										
 	
-	EXPORT ds_in_w_adl_did_appended := DidVille.did_service_common_function( ds_in_didville_layout,
-                                                                           glb_flag := batch_params.isValidGLB(),
-                                                                           glb_purpose_value := batch_params.glb,
-                                                                           appType := batch_params.application_type,
-                                                                           include_minors := TRUE,
-                                                                           IndustryClass_val := batch_params.industry_class,
-                                                                           DRM_val := batch_params.DataRestrictionMask);
-																																			 
-	SHARED ds_in_w_adl_did_appended_ungrup := UNGROUP(ds_in_w_adl_did_appended);
-	
-	EXPORT ds_adl := JOIN(ds_in, ds_in_w_adl_did_appended_ungrup,
-												LEFT.acctno = (string)RIGHT.seq,
+	EXPORT ds_adl := JOIN(ds_in, ds_in_w_adl_did_appended,
+												LEFT.acctno = RIGHT.acctno,
 												TRANSFORM(DidVille.Layout_Did_OutBatch,
-													SELF.Seq := COUNTER,
+													SELF.Seq := (UNSIGNED)LEFT.acctno,
 													SELF.did := MAP(DidFoundInPR OR IsInputDidRINID => LEFT.DID,
 																					~DidFoundInPR => RIGHT.DID,
 																					0); 													
-													SELF	:= []));
+													SELF	:= []),
+													LEFT OUTER);
 													
 	BOOLEAN lexid_resolved := EXISTS(ds_adl(did>0));
 	
@@ -156,7 +143,9 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 											SELF.ElementValue := MAP(LEFT.entity_name = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT 
 																									=> FraudGovPlatform_Services.Functions.GetCleanAddressFragmentValue(LEFT.entity_value),
 																							LEFT.entity_name = Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT
-																									=> FraudGovPlatform_Services.Functions.GetCleanBankAccountFragmentValue(LEFT.entity_value),
+																									=> FraudGovPlatform_Services.Functions.GetCleanFragmentValue(LEFT.entity_value, 2),
+																							LEFT.entity_name = Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT
+																									=> FraudGovPlatform_Services.Functions.GetCleanFragmentValue(LEFT.entity_value, 1),
 																							LEFT.entity_value);
 											SELF.score := LEFT.cluster_score_,
 											SELF.ClusterName := LEFT.label_,
@@ -220,7 +209,9 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 		SELF.ElementValue := MAP(L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT 
 																=> FraudGovPlatform_Services.Functions.GetCleanAddressFragmentValue(L.fragment_value),
 														L.fragment = Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT
-																=> FraudGovPlatform_Services.Functions.GetCleanBankAccountFragmentValue(L.fragment_value),
+																=> FraudGovPlatform_Services.Functions.GetCleanFragmentValue(L.fragment_value, 2),
+                            L.fragment = Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT
+                                => FraudGovPlatform_Services.Functions.GetCleanFragmentValue(L.fragment_value, 1),
 														L.fragment_value);
 
 		SELF.ElementInformation := ds_elementsInformation(fragment_value = L.fragment_value)[1];
@@ -244,7 +235,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 				 L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => 
 															ds_recentTransactions_w_timeline(
 					  												STD.Str.ToUpperCase(
-																		  STD.Str.CleanSpaces(PhysicalAddress.StreetAddress1) +'@@@' + 
+																		  STD.Str.CleanSpaces(PhysicalAddress.StreetAddress1) + _Constant.FRAGMENT_SEPARATOR + 
 															  					Address.Addr2FromComponents(STD.Str.CleanSPaces(PhysicalAddress.City), 
 																											STD.Str.CleanSPaces(PhysicalAddress.State), 
 																											STD.Str.CleanSPaces(PhysicalAddress.Zip5))
@@ -255,13 +246,13 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 				 L.fragment = Fragment_Types_const.IP_ADDRESS_FRAGMENT => ds_recentTransactions_w_timeline(IpAddress = L.fragment_value),
 				 L.fragment = Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT => 
 															ds_recentTransactions_w_timeline(BankInformation1.BankAccountNumber = 
-																			FraudGovPlatform_Services.Functions.GetCleanBankAccountFragmentValue(L.fragment_value)),
+																			FraudGovPlatform_Services.Functions.GetCleanFragmentValue(L.fragment_value, 2)),
 				 L.fragment = Fragment_Types_const.EMAIL_FRAGMENT => ds_recentTransactions_w_timeline(
 																																		STD.Str.ToUpperCase(STD.Str.CleanSPaces(EmailAddress)) = 
 																																		STD.Str.ToUpperCase(STD.Str.CleanSPaces(L.fragment_value))),																			
 				 L.fragment = Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT => 
-															ds_recentTransactions_w_timeline(DriversLicense.DriversLicenseNumber = L.fragment_value AND 
-																													DriversLicense.DriversLicenseState = ds_in[1].dl_state),
+															ds_recentTransactions_w_timeline(DriversLicense.DriversLicenseNumber = 
+                              FraudGovPlatform_Services.Functions.GetCleanFragmentValue(L.fragment_value, 1)),
 				 DATASET([], iesp.fraudgovreport.t_FraudGovTimelineDetails));
 
 		ds_recentTransactions_sorted := SORT(ds_recentTransactions,-eventDate.year, -eventDate.Month, -eventDate.day);

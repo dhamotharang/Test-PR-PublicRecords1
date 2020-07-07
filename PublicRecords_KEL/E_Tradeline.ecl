@@ -1,8 +1,8 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0beta2
-IMPORT KEL11 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
+IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
-IMPORT * FROM KEL11.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT E_Tradeline(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
@@ -27,13 +27,16 @@ EXPORT E_Tradeline(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.nkdate First_Sale_Date_;
     KEL.typ.nkdate Last_Sale_Date_;
     KEL.typ.nstr Source_;
+    KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
+    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     UNSIGNED8 __Permits;
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'UID(DEFAULT:UID),ultid(DEFAULT:Ult_I_D_:0),orgid(DEFAULT:Org_I_D_:0),seleid(DEFAULT:Sele_I_D_:0),accountkey(DEFAULT:Account_Key_:\'\'),ardate(DEFAULT:A_R_Date_:DATE),status(DEFAULT:Status_),totalar(DEFAULT:Total_A_R_:\'\'),currentar(DEFAULT:Current_A_R_:\'\'),aging1to30(DEFAULT:Aging1_To30_:\'\'),aging31to60(DEFAULT:Aging31_To60_:\'\'),aging61to90(DEFAULT:Aging61_To90_:\'\'),aging91plus(DEFAULT:Aging91_Plus_:\'\'),creditlimit(DEFAULT:Credit_Limit_:\'\'),segmentid(DEFAULT:Segment_I_D_:\'\'),dtvendorfirstreported(DEFAULT:Dt_Vendor_First_Reported_:DATE),dtvendorlastreported(DEFAULT:Dt_Vendor_Last_Reported_:DATE),filedate(DEFAULT:File_Date_:DATE),firstsaledate(DEFAULT:First_Sale_Date_:DATE),lastsaledate(DEFAULT:Last_Sale_Date_:DATE),source(DEFAULT:Source_:\'\'),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping := 'UID(DEFAULT:UID),ultid(DEFAULT:Ult_I_D_:0),orgid(DEFAULT:Org_I_D_:0),seleid(DEFAULT:Sele_I_D_:0),accountkey(DEFAULT:Account_Key_:\'\'),ardate(DEFAULT:A_R_Date_:DATE),status(DEFAULT:Status_),totalar(DEFAULT:Total_A_R_:\'\'),currentar(DEFAULT:Current_A_R_:\'\'),aging1to30(DEFAULT:Aging1_To30_:\'\'),aging31to60(DEFAULT:Aging31_To60_:\'\'),aging61to90(DEFAULT:Aging61_To90_:\'\'),aging91plus(DEFAULT:Aging91_Plus_:\'\'),creditlimit(DEFAULT:Credit_Limit_:\'\'),segmentid(DEFAULT:Segment_I_D_:\'\'),dtvendorfirstreported(DEFAULT:Dt_Vendor_First_Reported_:DATE),dtvendorlastreported(DEFAULT:Dt_Vendor_Last_Reported_:DATE),filedate(DEFAULT:File_Date_:DATE),firstsaledate(DEFAULT:First_Sale_Date_:DATE),lastsaledate(DEFAULT:Last_Sale_Date_:DATE),source(DEFAULT:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),datevendorfirstreported(DEFAULT:Date_Vendor_First_Reported_:EPOCH),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:EPOCH)';
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
@@ -50,13 +53,13 @@ EXPORT E_Tradeline(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
   SHARED __SortedTable := SORT(__Table,KeyVal);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
   EXPORT Lookup := NullLookupRec + PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
-  SHARED __Mapping0 := 'UID(DEFAULT:UID),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),seleid(OVERRIDE:Sele_I_D_:0),account_key(OVERRIDE:Account_Key_:\'\'),ar_date(OVERRIDE:A_R_Date_:DATE),status(OVERRIDE:Status_),total_ar(OVERRIDE:Total_A_R_:\'\'),current_ar(OVERRIDE:Current_A_R_:\'\'),aging_1to30(OVERRIDE:Aging1_To30_:\'\'),aging_31to60(OVERRIDE:Aging31_To60_:\'\'),aging_61to90(OVERRIDE:Aging61_To90_:\'\'),aging_91plus(OVERRIDE:Aging91_Plus_:\'\'),credit_limit(OVERRIDE:Credit_Limit_:\'\'),segment_id(OVERRIDE:Segment_I_D_:\'\'),dt_vendor_first_reported(OVERRIDE:Dt_Vendor_First_Reported_:DATE),dt_vendor_last_reported(OVERRIDE:Dt_Vendor_Last_Reported_:DATE),filedate(OVERRIDE:File_Date_:DATE),first_sale_date(OVERRIDE:First_Sale_Date_:DATE),last_sale_date(OVERRIDE:Last_Sale_Date_:DATE),source(OVERRIDE:Source_:\'\'),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),DPMBitmap(DEFAULT:__Permits:PERMITS)';
+  SHARED __Mapping0 := 'UID(DEFAULT:UID),ultid(OVERRIDE:Ult_I_D_:0),orgid(OVERRIDE:Org_I_D_:0),seleid(OVERRIDE:Sele_I_D_:0),account_key(OVERRIDE:Account_Key_:\'\'),ar_date(OVERRIDE:A_R_Date_:DATE),status(OVERRIDE:Status_),total_ar(OVERRIDE:Total_A_R_:\'\'),current_ar(OVERRIDE:Current_A_R_:\'\'),aging_1to30(OVERRIDE:Aging1_To30_:\'\'),aging_31to60(OVERRIDE:Aging31_To60_:\'\'),aging_61to90(OVERRIDE:Aging61_To90_:\'\'),aging_91plus(OVERRIDE:Aging91_Plus_:\'\'),credit_limit(OVERRIDE:Credit_Limit_:\'\'),segment_id(OVERRIDE:Segment_I_D_:\'\'),dtvendorfirstreported(DEFAULT:Dt_Vendor_First_Reported_:DATE),dtvendorlastreported(DEFAULT:Dt_Vendor_Last_Reported_:DATE),filedate(OVERRIDE:File_Date_:DATE),first_sale_date(OVERRIDE:First_Sale_Date_:DATE),last_sale_date(OVERRIDE:Last_Sale_Date_:DATE),source(OVERRIDE:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),dt_vendor_first_reported(OVERRIDE:Date_Vendor_First_Reported_:EPOCH),dt_vendor_last_reported(OVERRIDE:Date_Vendor_Last_Reported_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_Cortera_Tradeline__Key_LinkIds,TRANSFORM(RECORDOF(__in.Dataset_Cortera_Tradeline__Key_LinkIds),SELF:=RIGHT));
   SHARED __d0_Out := RECORD
     RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_Cortera_Tradeline__Key_LinkIds);
     KEL.typ.uid UID := 0;
   END;
-  SHARED __d0_UID_Mapped := JOIN(__d0_KELfiltered,Lookup,TRIM((STRING)LEFT.ultid) + '|' + TRIM((STRING)LEFT.orgid) + '|' + TRIM((STRING)LEFT.seleid) + '|' + TRIM((STRING)LEFT.account_key) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),HASH);
+  SHARED __d0_UID_Mapped := JOIN(__d0_KELfiltered,Lookup,TRIM((STRING)LEFT.ultid) + '|' + TRIM((STRING)LEFT.orgid) + '|' + TRIM((STRING)LEFT.seleid) + '|' + TRIM((STRING)LEFT.account_key) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
   EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Cortera_Tradeline__Key_LinkIds_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
@@ -75,21 +78,30 @@ EXPORT E_Tradeline(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.nstr Status_;
     KEL.typ.nkdate First_Sale_Date_;
     KEL.typ.nkdate Last_Sale_Date_;
+    KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
+    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
   EXPORT Vendor_Dates_Layout := RECORD
     KEL.typ.nkdate Dt_Vendor_First_Reported_;
     KEL.typ.nkdate Dt_Vendor_Last_Reported_;
+    KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
+    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nstr Source_;
+    KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
+    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
   EXPORT Layout := RECORD
@@ -101,8 +113,11 @@ EXPORT E_Tradeline(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.ndataset(Records_Layout) Records_;
     KEL.typ.ndataset(Vendor_Dates_Layout) Vendor_Dates_;
     KEL.typ.ndataset(Data_Sources_Layout) Data_Sources_;
+    KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
+    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
   EXPORT __PostFilter := __GroupedFilter(GROUP(DISTRIBUTE(InData,HASH(UID)),UID,LOCAL,ALL));
@@ -112,31 +127,40 @@ EXPORT E_Tradeline(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     SELF.Org_I_D_ := KEL.Intake.SingleValue(__recs,Org_I_D_);
     SELF.Sele_I_D_ := KEL.Intake.SingleValue(__recs,Sele_I_D_);
     SELF.Account_Key_ := KEL.Intake.SingleValue(__recs,Account_Key_);
-    SELF.Records_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),A_R_Date_,Total_A_R_,Current_A_R_,Aging1_To30_,Aging31_To60_,Aging61_To90_,Aging91_Plus_,Credit_Limit_,Segment_I_D_,File_Date_,Status_,First_Sale_Date_,Last_Sale_Date_},A_R_Date_,Total_A_R_,Current_A_R_,Aging1_To30_,Aging31_To60_,Aging61_To90_,Aging91_Plus_,Credit_Limit_,Segment_I_D_,File_Date_,Status_,First_Sale_Date_,Last_Sale_Date_),Records_Layout)(__NN(A_R_Date_) OR __NN(Total_A_R_) OR __NN(Current_A_R_) OR __NN(Aging1_To30_) OR __NN(Aging31_To60_) OR __NN(Aging61_To90_) OR __NN(Aging91_Plus_) OR __NN(Credit_Limit_) OR __NN(Segment_I_D_) OR __NN(File_Date_) OR __NN(Status_) OR __NN(First_Sale_Date_) OR __NN(Last_Sale_Date_)));
-    SELF.Vendor_Dates_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Dt_Vendor_First_Reported_,Dt_Vendor_Last_Reported_},Dt_Vendor_First_Reported_,Dt_Vendor_Last_Reported_),Vendor_Dates_Layout)(__NN(Dt_Vendor_First_Reported_) OR __NN(Dt_Vendor_Last_Reported_)));
-    SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
+    SELF.Records_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_First_Reported_,MIN,FALSE),KEL.typ.epoch Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_Last_Reported_,MAX,FALSE),A_R_Date_,Total_A_R_,Current_A_R_,Aging1_To30_,Aging31_To60_,Aging61_To90_,Aging91_Plus_,Credit_Limit_,Segment_I_D_,File_Date_,Status_,First_Sale_Date_,Last_Sale_Date_},A_R_Date_,Total_A_R_,Current_A_R_,Aging1_To30_,Aging31_To60_,Aging61_To90_,Aging91_Plus_,Credit_Limit_,Segment_I_D_,File_Date_,Status_,First_Sale_Date_,Last_Sale_Date_),Records_Layout)(__NN(A_R_Date_) OR __NN(Total_A_R_) OR __NN(Current_A_R_) OR __NN(Aging1_To30_) OR __NN(Aging31_To60_) OR __NN(Aging61_To90_) OR __NN(Aging91_Plus_) OR __NN(Credit_Limit_) OR __NN(Segment_I_D_) OR __NN(File_Date_) OR __NN(Status_) OR __NN(First_Sale_Date_) OR __NN(Last_Sale_Date_)));
+    SELF.Vendor_Dates_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_First_Reported_,MIN,FALSE),KEL.typ.epoch Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_Last_Reported_,MAX,FALSE),Dt_Vendor_First_Reported_,Dt_Vendor_Last_Reported_},Dt_Vendor_First_Reported_,Dt_Vendor_Last_Reported_),Vendor_Dates_Layout)(__NN(Dt_Vendor_First_Reported_) OR __NN(Dt_Vendor_Last_Reported_)));
+    SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_First_Reported_,MIN,FALSE),KEL.typ.epoch Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_Last_Reported_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
     SELF.__RecordCount := COUNT(__recs);
+    SELF.Archive___Date_ := KEL.era.SimpleRoll(__recs,Archive___Date_,MIN,FALSE);
     SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,FALSE);
     SELF.Date_Last_Seen_ := KEL.era.SimpleRoll(__recs,Date_Last_Seen_,MAX,FALSE);
+    SELF.Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(__recs,Date_Vendor_First_Reported_,MIN,FALSE);
+    SELF.Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(__recs,Date_Vendor_Last_Reported_,MAX,FALSE);
     SELF := __r;
   END;
   Layout Tradeline__Single_Rollup(InLayout __r) := TRANSFORM
-    SELF.Records_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Records_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(A_R_Date_) OR __NN(Total_A_R_) OR __NN(Current_A_R_) OR __NN(Aging1_To30_) OR __NN(Aging31_To60_) OR __NN(Aging61_To90_) OR __NN(Aging91_Plus_) OR __NN(Credit_Limit_) OR __NN(Segment_I_D_) OR __NN(File_Date_) OR __NN(Status_) OR __NN(First_Sale_Date_) OR __NN(Last_Sale_Date_)));
-    SELF.Vendor_Dates_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Vendor_Dates_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Dt_Vendor_First_Reported_) OR __NN(Dt_Vendor_Last_Reported_)));
-    SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Source_)));
+    SELF.Records_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Records_Layout,SELF.__RecordCount:=1;,SELF.Archive___Date_:=KEL.era.SimpleRollSingleRow(LEFT,Archive___Date_,FALSE),SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF.Date_Vendor_First_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_First_Reported_,FALSE),SELF.Date_Vendor_Last_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_Last_Reported_,FALSE),SELF:=LEFT))(__NN(A_R_Date_) OR __NN(Total_A_R_) OR __NN(Current_A_R_) OR __NN(Aging1_To30_) OR __NN(Aging31_To60_) OR __NN(Aging61_To90_) OR __NN(Aging91_Plus_) OR __NN(Credit_Limit_) OR __NN(Segment_I_D_) OR __NN(File_Date_) OR __NN(Status_) OR __NN(First_Sale_Date_) OR __NN(Last_Sale_Date_)));
+    SELF.Vendor_Dates_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Vendor_Dates_Layout,SELF.__RecordCount:=1;,SELF.Archive___Date_:=KEL.era.SimpleRollSingleRow(LEFT,Archive___Date_,FALSE),SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF.Date_Vendor_First_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_First_Reported_,FALSE),SELF.Date_Vendor_Last_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_Last_Reported_,FALSE),SELF:=LEFT))(__NN(Dt_Vendor_First_Reported_) OR __NN(Dt_Vendor_Last_Reported_)));
+    SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF.Archive___Date_:=KEL.era.SimpleRollSingleRow(LEFT,Archive___Date_,FALSE),SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF.Date_Vendor_First_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_First_Reported_,FALSE),SELF.Date_Vendor_Last_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_Last_Reported_,FALSE),SELF:=LEFT))(__NN(Source_)));
     SELF.__RecordCount := 1;
+    SELF.Archive___Date_ := KEL.era.SimpleRollSingleRow(__r,Archive___Date_,FALSE);
     SELF.Date_First_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_First_Seen_,FALSE);
     SELF.Date_Last_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_Last_Seen_,FALSE);
+    SELF.Date_Vendor_First_Reported_ := KEL.era.SimpleRollSingleRow(__r,Date_Vendor_First_Reported_,FALSE);
+    SELF.Date_Vendor_Last_Reported_ := KEL.era.SimpleRollSingleRow(__r,Date_Vendor_Last_Reported_,FALSE);
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Tradeline_Group,COUNT(ROWS(LEFT))=1),GROUP,Tradeline__Single_Rollup(LEFT)) + ROLLUP(HAVING(Tradeline_Group,COUNT(ROWS(LEFT))>1),GROUP,Tradeline__Rollup(LEFT, ROWS(LEFT)));
   EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
-  EXPORT Ult_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Ult_I_D_);
-  EXPORT Org_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Org_I_D_);
-  EXPORT Sele_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Sele_I_D_);
-  EXPORT Account_Key__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Account_Key_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Cortera_Tradeline__Key_LinkIds_Invalid),COUNT(Ult_I_D__SingleValue_Invalid),COUNT(Org_I_D__SingleValue_Invalid),COUNT(Sele_I_D__SingleValue_Invalid),COUNT(Account_Key__SingleValue_Invalid)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Cortera_Tradeline__Key_LinkIds_Invalid,KEL.typ.int Ult_I_D__SingleValue_Invalid,KEL.typ.int Org_I_D__SingleValue_Invalid,KEL.typ.int Sele_I_D__SingleValue_Invalid,KEL.typ.int Account_Key__SingleValue_Invalid});
+  EXPORT UIDSourceCounts := Lookup;
+  EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
+  EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
+  EXPORT Ult_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Ult_I_D_);
+  EXPORT Org_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Org_I_D_);
+  EXPORT Sele_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Sele_I_D_);
+  EXPORT Account_Key__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Account_Key_);
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Cortera_Tradeline__Key_LinkIds_Invalid),COUNT(Ult_I_D__SingleValue_Invalid),COUNT(Org_I_D__SingleValue_Invalid),COUNT(Sele_I_D__SingleValue_Invalid),COUNT(Account_Key__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Cortera_Tradeline__Key_LinkIds_Invalid,KEL.typ.int Ult_I_D__SingleValue_Invalid,KEL.typ.int Org_I_D__SingleValue_Invalid,KEL.typ.int Sele_I_D__SingleValue_Invalid,KEL.typ.int Account_Key__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Cortera_Tradeline__Key_LinkIds_Invalid),COUNT(__d0)},
     {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ultid',COUNT(__d0(__NL(Ult_I_D_))),COUNT(__d0(__NN(Ult_I_D_)))},
@@ -153,13 +177,16 @@ EXPORT E_Tradeline(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','aging_91plus',COUNT(__d0(__NL(Aging91_Plus_))),COUNT(__d0(__NN(Aging91_Plus_)))},
     {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','credit_limit',COUNT(__d0(__NL(Credit_Limit_))),COUNT(__d0(__NN(Credit_Limit_)))},
     {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','segment_id',COUNT(__d0(__NL(Segment_I_D_))),COUNT(__d0(__NN(Segment_I_D_)))},
-    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dt_vendor_first_reported',COUNT(__d0(__NL(Dt_Vendor_First_Reported_))),COUNT(__d0(__NN(Dt_Vendor_First_Reported_)))},
-    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','dt_vendor_last_reported',COUNT(__d0(__NL(Dt_Vendor_Last_Reported_))),COUNT(__d0(__NN(Dt_Vendor_Last_Reported_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DtVendorFirstReported',COUNT(__d0(__NL(Dt_Vendor_First_Reported_))),COUNT(__d0(__NN(Dt_Vendor_First_Reported_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DtVendorLastReported',COUNT(__d0(__NL(Dt_Vendor_Last_Reported_))),COUNT(__d0(__NN(Dt_Vendor_Last_Reported_)))},
     {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','filedate',COUNT(__d0(__NL(File_Date_))),COUNT(__d0(__NN(File_Date_)))},
     {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','first_sale_date',COUNT(__d0(__NL(First_Sale_Date_))),COUNT(__d0(__NN(First_Sale_Date_)))},
     {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','last_sale_date',COUNT(__d0(__NL(Last_Sale_Date_))),COUNT(__d0(__NN(Last_Sale_Date_)))},
     {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
     {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorFirstReported',COUNT(__d0(Date_Vendor_First_Reported_=0)),COUNT(__d0(Date_Vendor_First_Reported_!=0))},
+    {'Tradeline','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorLastReported',COUNT(__d0(Date_Vendor_Last_Reported_=0)),COUNT(__d0(Date_Vendor_Last_Reported_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

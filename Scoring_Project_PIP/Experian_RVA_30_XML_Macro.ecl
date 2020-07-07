@@ -134,8 +134,8 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 		// ***************************************************************************************************
 				
 
-    get_group(recordof(layout_rvattributesout) groups, string name_i) := FUNCTION
-			groupi := groups.attributegroup(name=name_i);
+    get_group(recordof(Soap_output) groups, string name_i) := FUNCTION
+			groupi := groups.attributegroups.attributegroup(name=name_i);
 			RETURN groupi;
 		END;
 
@@ -167,8 +167,10 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 			self.EmailPop := r.email<>'';
 			self.HPhnPop := r.homephone<>'';
 					
-			just_groups := project(l, TRANSFORM(layout_RVAttributesOut, self := l.attributegroups));
-			v2 := get_group(just_groups, 'Version3');
+	
+		// just_groups := project(l, TRANSFORM(layout_RVAttributesOut, self := l.attributegroups));
+			// v2 := get_group(just_groups, 'Version3');
+			v2 := get_group(l, 'Version3');
 			v21 := get_attribute(v2, 1);
 			v22 := get_attribute(v2, 2);
 			v23 := get_attribute(v2, 3);

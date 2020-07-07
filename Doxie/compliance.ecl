@@ -1,4 +1,4 @@
-﻿IMPORT AutoStandardI, codes, data_services, mdr;
+﻿IMPORT AutoStandardI, codes, data_services, mdr, STD;
 
 EXPORT compliance := MODULE
 
@@ -82,7 +82,7 @@ EXPORT compliance := MODULE
 
   //Temporary: a macro copying new-style compliance parameters to the old one;
   //can be convenient for creating a module of AutoStandardI.PermissionI_Tools.params type from mod_access
-  EXPORT MAC_CopyComplianceValuesToLegacy (mod) := MACRO 
+  EXPORT MAC_CopyComplianceValuesToLegacy (mod) := MACRO
     EXPORT boolean AllowAll  := mod.unrestricted = doxie.compliance.ALLOW.ALL;
     EXPORT boolean AllowGLB  := mod.unrestricted & doxie.compliance.ALLOW.GLB > 0;
     EXPORT boolean AllowDPPA := mod.unrestricted & doxie.compliance.ALLOW.DPPA > 0;
@@ -128,7 +128,7 @@ EXPORT compliance := MODULE
       EXPORT unsigned1 intended_use := mod.intended_use;
       EXPORT string transaction_id := mod.transaction_id;
       EXPORT unsigned6 global_company_id :=mod.global_company_id;
-  ENDMACRO;    
+  ENDMACRO;
 
   shared restrictedSet := ['0',''];
   // ==============================================================================================
@@ -167,7 +167,7 @@ EXPORT compliance := MODULE
   EXPORT boolean isFdnInquiry           (string drm) := drm[25] not in restrictedSet;
   EXPORT boolean isJuliRestricted       (string drm) := drm[41] NOT IN restrictedSet;
   EXPORT boolean isAccuDataRestricted   (string drm) := drm[44] not in restrictedSet;
-  EXPORT BOOLEAN isBriteVerifyRestricted(string drm) := drm[46] NOT IN restrictedSet; // BriteVerify gateway for Email verification 
+  EXPORT BOOLEAN isBriteVerifyRestricted(string drm) := drm[46] NOT IN restrictedSet; // BriteVerify gateway for Email verification
   // ----------------------------------------------------------------------------------------------
 
   // TODO: functions for checking access; they should be defined in a separate attribute
@@ -269,13 +269,15 @@ EXPORT compliance := MODULE
   // ==============================================================================================
   EXPORT boolean use_qsent(string dpm)               := dpm [1] NOT IN restrictedSet; // use in-house(not gateway) qsent data
   EXPORT boolean use_targus(string dpm)              := dpm [2] NOT IN restrictedSet; // use targus gateway
-  EXPORT boolean use_LastResort(string dpm)          := dpm [6] NOT IN restrictedSet; 	
+  EXPORT boolean use_confirm(string dpm)             := dpm [3] NOT IN restrictedSet; // confirm if phone is active (typically, thorugh gateway call)
+  EXPORT boolean use_LastResort(string dpm)          := dpm [6] NOT IN restrictedSet;
   EXPORT boolean use_Polk(string dpm)                := dpm [7] NOT IN restrictedSet;
   EXPORT boolean use_DM_SSA_updates(string dpm)      := dpm[10] NOT IN restrictedSet;
   EXPORT boolean use_FdnContributoryData(string dpm) := dpm[11] NOT IN restrictedSet;	//Contributory Fraud and Test Fraud
   EXPORT boolean use_InsuranceDLData(string dpm)     := dpm[13] NOT IN restrictedSet;
   EXPORT boolean use_ZumigoIdentity(string dpm)      := dpm[21] NOT IN restrictedSet;
   EXPORT boolean use_AccuityBankData(string dpm)     := dpm[24] NOT IN restrictedSet;
+  EXPORT boolean use_DnB(string dpm)                 := dpm[28] NOT IN restrictedSet;
 
   // ----------------------------------------------------------------------------------------------
 
@@ -294,5 +296,19 @@ EXPORT compliance := MODULE
   EXPORT logSoldToTransaction(mod_access, env_flag = data_services.data_env.iNonFCRA) := FUNCTIONMACRO
     RETURN doxie.log.logSoldToTransaction(mod_access, env_flag);
   ENDMACRO;
+
+  // Marketing Restrictions
+  EXPORT isMarketingAllowed(string src, string st = '') := FUNCTION
+    Boolean  isAllowed := NOT (src = MDR.sourceTools.src_LnPropV2_Lexis_Asrs       AND st IN ['ID','IL','KS','NM','SC','WA', '']) AND
+                          NOT (src = MDR.sourceTools.src_LnPropV2_Lexis_Deeds_Mtgs AND st IN ['ID','IL','KS','NM','SC','WA', '']) AND
+                          EXISTS(Codes.Key_Codes_V3(KEYED(file_name = 'VENDOR_SOURCES') AND
+                                                  KEYED(field_name= 'DIRECTMARKETING') AND
+                                                  KEYED(field_name2 = 'SCODE') AND
+                                                  KEYED(code = src)));
+    RETURN isAllowed;
+
+    END;
+
+  EXPORT Boolean isDirectMarketing(String _industry_class) := STD.Str.ToUpperCase(_industry_class) = 'DRMKT';
 
 END;

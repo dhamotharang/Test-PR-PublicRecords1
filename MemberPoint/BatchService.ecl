@@ -12,6 +12,7 @@
 	<part name="IncludePhone" 				type="xsd:boolean"/> 
 	<part name="IncludeAddress" 			type="xsd:boolean"/> 
 	<part name="IncludeDeceased" 			type="xsd:boolean"/> 
+	<part name="IncludeDOB" 					type="xsd:boolean"/> 
 	<part name="IncludeSSN" 					type="xsd:boolean"/> 
 	<part name="IncludeGender" 				type="xsd:boolean"/> 
 	<part name="Phones_Score_Model"    type="xsd:string"/>

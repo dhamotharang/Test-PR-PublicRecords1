@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SNA Business Report">
 	<part name="SNABusinessReportRequest" type="tns:XmlDataSet" cols="80" rows="50"/>
  </message>
@@ -64,46 +64,61 @@
 </pre>
 */
 
-IMPORT sna, Business_Header, iesp, watchdog;
+IMPORT sna, Business_Header, iesp, Doxie, Suppress, UT, STD;
 
 
 EXPORT BusinessReport_Service := MACRO
 
 	ds_in    := dataset([], iesp.SNABusinessReport.t_SNABusinessReportRequest)  	: stored('SNABusinessReportRequest', few);
 
+    //CCPA fields
+    unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+    string TransactionID := '' : STORED('_TransactionId');
+    string BatchUID := '' : STORED('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+    
+    mod_access := MODULE(Doxie.IDataAccess)
+    EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+    EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+    EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+    END;
+
 	source_did := [(integer)ds_in[1].SearchBy.LexID];
 	contact_score_cutoff := (integer)ds_in[1].Options.ContactScoreCutoff; // defaults to 0
-	activeBusinessFilter := StringLib.StringToUpperCase(ds_in[1].Options.BusinessFilters.ActiveFilter);
-	medicalBusinessFilter := StringLib.StringToUpperCase(ds_in[1].Options.BusinessFilters.MedicalFilter);
+	activeBusinessFilter := STD.Str.ToUpperCase(ds_in[1].Options.BusinessFilters.ActiveFilter);
+	medicalBusinessFilter := STD.Str.ToUpperCase(ds_in[1].Options.BusinessFilters.MedicalFilter);
 	includeSIC := ds_in[1].Options.IncludeSIC;
 	
 	degreeCutoff := if(trim(ds_in[1].Options.DegreeCutoff)='', 2.0, (real)ds_in[1].Options.DegreeCutoff);
 	
-	SNA.BusinessRecord_Layout prep1_tx(sna.Key_Person_Cluster le, Business_Header.Key_Business_Contacts_DID ri) := TRANSFORM
+	{SNA.BusinessRecord_Layout, unsigned4 global_sid} prep1_tx(sna.Key_Person_Cluster le, Business_Header.Key_Business_Contacts_DID ri) := TRANSFORM
 		self := le;
 		self := ri;
 		self := [];
 	END;
 	
-	SNA.BusinessRecord_Layout prep2_tx(SNA.BusinessRecord_Layout le, Business_Header.Key_Business_Contacts_FP ri) := TRANSFORM
-		self := ri;
+	{SNA.BusinessRecord_Layout, unsigned4 global_sid} prep2_tx(SNA.BusinessRecord_Layout le, Business_Header.Key_Business_Contacts_FP ri) := TRANSFORM
+        self.global_sid := ri.global_sid;
+        self := ri;
 		self := le;
 		self := [];
 	END;
 	
 	Associates := choosen(sna.Key_Person_Cluster((cluster_id in source_did) and (degree <= degreeCutoff)), 1000);	
 	
-	BusinessesPrep1 := JOIN(sort(Associates(associated_did > 0), associated_did), 
+	BusinessesPrep1_unsuppressed := JOIN(sort(Associates(associated_did > 0), associated_did), 
 														Business_Header.Key_Business_Contacts_DID,
 		                        keyed(LEFT.associated_did = RIGHT.did),
 														prep1_tx(LEFT,RIGHT), 
 														LIMIT(iesp.Constants.SNA.MaxBusinessReturn));
+    BusinessesPrep1 := Suppress.Suppress_ReturnOldLayout(BusinessesPrep1_unsuppressed, mod_access, SNA.BusinessRecord_Layout);
 														
-	BusinessesPrep2 := JOIN(BusinessesPrep1, Business_Header.Key_Business_Contacts_FP,
+	BusinessesPrep2_unsuppressed := JOIN(BusinessesPrep1, Business_Header.Key_Business_Contacts_FP,
 		                        keyed(LEFT.fp = RIGHT.fp) and (contact_score_cutoff <= right.contact_score) and (RIGHT.bdid>0),
 														prep2_tx(LEFT,RIGHT), 
 														LIMIT(iesp.Constants.SNA.MaxBusinessReturn));
-					
+    BusinessesPrep2 := Suppress.Suppress_ReturnOldLayout(BusinessesPrep2_unsuppressed, mod_access, SNA.BusinessRecord_Layout);
+				
 					
 	glb := (INTEGER)ds_in[1].User.GLBPurpose;
   dppa := (INTEGER)ds_in[1].User.DLPurpose;

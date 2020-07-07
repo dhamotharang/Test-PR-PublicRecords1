@@ -1,4 +1,4 @@
-﻿IMPORT AutoKeyI, BIPV2, BusinessBatch_BIP, Business_Risk_BIP, MDR, ut, AutoStandardI;
+﻿IMPORT AutoKeyI, BIPV2, BIPV2_Best, Business_Risk_BIP, BusinessBatch_BIP, MDR, ut;
 
 EXPORT Records( DATASET(BusinessBatch_BIP.Layouts.Input_Processed) ds_BatchIn,
                 BusinessBatch_BIP.iParam.BatchParams               inMod
@@ -8,7 +8,7 @@ FUNCTION
   // Identify marketing and append mode
   marketing_mode := inMod.ExcludeMarketing;
   append_mode := (inMod.Use_Append OR marketing_mode);      // marketing mode will always use bip append
-
+  
   // Passthrough records are those that supply BIP ids directly and don't require a search
   is_valid_passthrough := ds_BatchIn.seleid <> 0;
 
@@ -81,20 +81,23 @@ END;
   // begin new code *********		to emulate	top biz ranking		
   tmpTopResultsScoredGrouped := BusinessBatch_BIP.Functions(inMod).getLINkidsAtProxidLevel(ds_Format2SearchInputAll);
 
-  // get linking info through idAppend
+  // get linking info through idAppend 
   ds_AppIds := PROJECT(BIPV2.IdAppendRoxie(ds_Format2AppInput, inMod.Score_Threshold, reAppend := false).IdsOnly(), BIPV2.IdAppendLayouts.IdsOnly);
 
   // Get the seleid best information for the search criteria
-  ds_BestInfoTmp_all := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_Format2SearchInput).SeleBest(company_name <> ''); 
-
+  ds_BestInfoTmp := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_Format2SearchInput).SeleBest(company_name <> ''); 
+  ds_BestInfoTmp_all := PROJECT(ds_BestInfoTmp, BusinessBatch_BIP.Layouts.ExpandedBestTmp);
+  
   // append version
   // note - if marketing flag is set, the output should contain no marketing data
-  ds_BestInfoApp_pre := BusinessBatch_BIP.Functions(inMod).AppendBest(ds_AppIds, 
-    BIPV2.IdConstants.Fetch_Level_SELEID, isMarketing := marketing_mode);
+  ds_BestInfoApp_pre := 
+    BusinessBatch_BIP.Functions(inMod).AppendBestSeleProx(ds_AppIds, 
+                                                          isMarketing := marketing_mode);
+
   ds_BestInfoApp_post := ds_BestInfoApp_pre(trim(company_name) <> '');
   ds_BestInfoApp_all := PROJECT(ds_BestInfoApp_post, 
-    TRANSFORM(recordof(ds_BestInfoTmp_all), 
-      SELF.acctno := (string)LEFT.request_id, 
+    TRANSFORM(BusinessBatch_BIP.Layouts.ExpandedBestTmp, 
+      SELF.acctno := (STRING)LEFT.request_id, 
       SELF := LEFT, 
       SELF := []));
 
@@ -116,7 +119,7 @@ END;
                             LEFT.ultid = RIGHT.ultid AND
                             LEFT.orgid = RIGHT.orgid AND
                             LEFT.seleid = RIGHT.seleid,
-                            TRANSFORM(RECORDOF(LEFT),
+                            TRANSFORM(BusinessBatch_BIP.Layouts.ExpandedBestTmp,
                                 SElF.weight:= right.proxweight;
                                 SELF := LEFT));	
 
@@ -126,7 +129,7 @@ END;
     LEFT.orgid = RIGHT.orgid AND
     LEFT.seleid = RIGHT.seleid AND
     (LEFT.proxid = 0 OR LEFT.proxid = RIGHT.proxid), 
-    TRANSFORM(RECORDOF(LEFT),
+    TRANSFORM(BusinessBatch_BIP.Layouts.ExpandedBestTmp,
         SELF.weight := RIGHT.proxweight,
         SELF.record_score := RIGHT.record_score, 
         // get the parent info from the header data
@@ -962,6 +965,7 @@ END;
       SELF := []));
 
   ds_DCAInfo2FinalSorted := SORT(ds_DCAInfo2FinalWithErr, acctno, -weight, -record_score, RECORD);
+  
   //output(tmpTopResultsScoredGrouped, named('tmpTopResultsScoredGrouped'));
   //output(ds_bestInfo, named('ds_bestInfo'));
   
@@ -1024,7 +1028,11 @@ END;
   //output(ds_OSHAFinal, named('ds_OSHAFinal'));
   
   //output(ds_RegisteredAgents, named('ds_RegisteredAgents'));
-  
-  RETURN PROJECT(IF(inmod.BestOnly,ds_HeaderInfoAll,ds_DCAInfo2FinalSorted),
-                                BusinessBatch_BIP.Layouts.Final);
+  // OUTPUT(ds_BestInfoApp_pre, named('ds_BestInfoApp_pre'));
+    
+  RETURN PROJECT(IF(inmod.BestOnly,
+                    ds_HeaderInfoAll,
+                    ds_DCAInfo2FinalSorted),
+                 BusinessBatch_BIP.Layouts.Final);
+
 END;

@@ -1,8 +1,9 @@
-﻿IMPORT Business_Risk_BIP, Gateway, Risk_Indicators;
+﻿IMPORT Business_Risk_BIP, Gateway, Risk_Indicators, doxie;
 
 	// The following function appends the LexID to each of the Authorized Reps. 
 	EXPORT getAuthRepLexIDs( DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
-	                        Business_Risk_BIP.LIB_Business_Shell_LIBIN Options ) := 
+	                        Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
+							doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := 
 		FUNCTION
 			
 			Risk_Indicators.Layout_Input prepForDIDAppend(Business_Risk_BIP.Layouts.Shell le, INTEGER whichAuthRep) := TRANSFORM
@@ -56,8 +57,8 @@
 																												Options.DataRestrictionMask,
 																												0,     // Append_Best
 																												DATASET([], Gateway.Layouts.Config), // Gateways
-																												0      // BSOptions
-			                         );
+																												0,      // BSOptions
+																											mod_access := mod_access);
                                
    // OUTPUT( DIDAppend, NAMED('_DIDAppend') );
 																												

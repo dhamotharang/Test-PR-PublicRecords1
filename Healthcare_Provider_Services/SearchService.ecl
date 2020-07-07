@@ -93,15 +93,19 @@ export SearchService := MACRO
 		EXPORT boolean 		IsUnknownSearchBoth := first_row.options.IsUnknownSearchBoth;
 	END;
 	string _DRM := '':Stored('DataRestrictionMask'); 
+	string _DPM := '':Stored('DataPermissionMask'); 
 	Healthcare_Header_Services.Layouts.common_runtime_config buildConfig():=transform
 		self.CustomerID := CustID;	
 		self.OneStepRule := first_row.searchby.VerificationConfiguration;
 		self.penalty_threshold := UserThreshold;
 		self.MaxResults := first_row.options.MaxResults;
 		self.DRM := _DRM; // '':Stored('DataRestrictionMask'); 
+		self.DPM := _DPM; // '':Stored('DataPermissionMask'); 
 		self.hasFullNCPDP := hasFullNCPDP;
 		self.glb_ok := ut.glb_ok ((integer)first_row.user.GLBPurpose);
 		self.dppa_ok := ut.dppa_ok((integer)first_row.user.DLPurpose);
+		self.glb :=   (integer)first_row.user.GLBPurpose;
+		self.dppa :=  (integer)first_row.user.DLPurpose;
 		self.doDeepDive := if((integer)ProviderID_Raw>0 and ProvidSRC_Raw in ['H',''],false,first_row.options.IncludeAlsoFound);
 		self.excludeSourceAMS := first_row.options.ExcludeSourceAMS;
 		self.excludeSourceNPPES := first_row.options.ExcludeSourceNPPES;
@@ -127,7 +131,7 @@ export SearchService := MACRO
 	
 	convertedInput := Healthcare_Header_Services.Records.convertInputtoDataset(tmpMod);
 	rawRec := Healthcare_Header_Services.Records.getSearchServiceRecords(convertedInput, cfgData);
-	returnThresholdExceeded:=rawRec[1].ProcessingMessage = 203;
+	returnThresholdExceeded:=rawRec[1].ProcessingMessage = 203 and rawRec[1].lnpid=0;
 	hasoptout:=exists(rawRec(hasoptout = true));
 	recsFmt:= project(rawRec,Healthcare_Header_Services.Transforms.formatSearchServiceProviderOutput(left,convertedInput,cfgData));
   		//marshall the output...
@@ -140,13 +144,10 @@ export SearchService := MACRO
 				string q_id := '' : stored ('_QueryId');
 				string t_id := '' : stored ('_TransactionId');
 				string msg	:= 'Too many subjects found.';
-				string optoutmsg	:= 'THIS SUBJECT CURRENTLY HAS A STATE OPT OUT ON FILE PREVENTING THE RETURN OF SOME OR ALL OF THE INFORMATION YOU REQUESTED. IF THE CONSUMER HAS ANY QUESTIONS ABOUT THIS, PLEASE INSTRUCT THEM TO CALL LEXISNEXIS RISK SOLUTIONS INC. AT 800-456-1244.';
-				optoutMessage := if(hasoptout,DATASET([{'700',optoutmsg}], iesp.share.t_ResultDisclaimer),DATASET([], iesp.share.t_ResultDisclaimer));
-				//optoutMessage := row({700,optoutmsg,q_id, t_id,[], []},iesp.share.t_ResponseHeader);
+				optoutMessage := if(hasoptout,DATASET([{'700',Healthcare_Provider_Services.Constants.optoutmsg}], iesp.share.t_ResultDisclaimer),DATASET([], iesp.share.t_ResultDisclaimer));
 				badheader := ROW ({203, msg, q_id, t_id, [],[]}, iesp.share.t_ResponseHeader);
 				goodheader := ROW ({0, '', q_id, t_id, [],optoutMessage}, iesp.share.t_ResponseHeader);
-				self._Header         := map(returnThresholdExceeded =>badheader,
-																		goodheader);
+				self._Header         := if(returnThresholdExceeded ,badheader,goodheader);
 				self.SearchBy				 := first_row.searchby;
 				self.Options				 := first_row.options;
 				self.RecordCount 		 := count(recsFmt);

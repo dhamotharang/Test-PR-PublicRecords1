@@ -76,6 +76,15 @@ EXPORT MAX_PROPERTIES := 500;
 EXPORT MAX_WATERCRAFT := 500;
 EXPORT MAX_VEHICLE := 500;
 EXPORT MAX_AIRCRAFT := 500;
+EXPORT MAX_RESIDENCES := 500;
+EXPORT MAX_LIENS_JUDGEMENTS_EVICTIONS := 300;
+
+
+
+EXPORT RELATIONSHIP_ROOM_MATE := 93;
+EXPORT RELATIONSHIP_BUSINESS := 94;
+EXPORT RELATIONSHIP_REAL_ESTATE := 95;
+EXPORT RELATIONSHIP_OTHER_PROPERTY := 96;
 
 
 EXPORT EMPTY := '';
@@ -86,6 +95,8 @@ EXPORT YES := 'Y';
 EXPORT NO := 'N'; 
 EXPORT UNKNOWN := 'U';  
 
+EXPORT AML_PARENT_DEFINITION := [10];
+
 EXPORT FELONY := 'F';
 EXPORT MISDEMEANOR := 'M';
 EXPORT INFRACTION := 'I';
@@ -93,10 +104,10 @@ EXPORT TRAFFIC := 'T';
 EXPORT UNKNOWN_OFFENSES := [UNKNOWN, EMPTY];   
 
 
-EXPORT INCARCERATION_TEXT := 'Incarceration';
-EXPORT PAROLE_TEXT := 'Parole';
-EXPORT PROBATION_TEXT := 'Probation';
-EXPORT PREVIOUSLY_INCARCERATED_TEXT := 'Previous Incarceration';
+EXPORT INCARCERATION_TEXT := 'INCARCERATION';
+EXPORT PAROLE_TEXT := 'PAROLE';
+EXPORT PROBATION_TEXT := 'PROBATION';
+EXPORT PREVIOUSLY_INCARCERATED_TEXT := 'PREVIOUS INCARCERATION';
 
 
 EXPORT SET_INMATE_STATUS_INCARCERATION := ['ACTIVE, HOUSE ARREST', 'ACTIVE, INMATE', 'ACTIVELIFE SENTENCE',
@@ -191,48 +202,6 @@ EXPORT SET_INMATE_STATUS_UNKNOWN := ['ACTIVE', 'ACTIVECOMMITTED YOUTHFUL O', 'AC
 
 
 
-// ---- 
-// ---- constants used in the Liens processing
-// ----
-EXPORT INVALID_LIEN    := 'IN';
-EXPORT SUITS           := 'SU';
-EXPORT SMALL_CLAIMS    := 'SC'; 
-EXPORT FEDERAL_TAX     := 'FX';
-EXPORT FORECLOSURE     := 'FC';
-EXPORT LANDLORD_TENANT := 'LT';
-EXPORT LISPENDENS      := 'LP';  //Lis Pendens is a notice filed in the public record that a lawsuit has been filed against the property. 
-EXPORT MECHANICS_LIEN  := 'ML';
-EXPORT CIVIL_JUDGMENT  := 'CJ';
-EXPORT OTHER_TAX       := 'OX';
-EXPORT DEFAULT_LIEN_CATAGORY := 'OT';
-
-// ---- 
-// ---- constants used in the Judgments processing 
-// ----
-EXPORT INVALID_JUDGMENT := 'Invalid';
-EXPORT JUDGMENT         := 'Judgment';
-EXPORT LIEN             := 'Lien';  
-
-// ---- 
-// ---- constants used in the Filing Status
-// ----
-EXPORT SATISFIED        := 'Satis';
-EXPORT DISMISS          := 'Dismiss';
-EXPORT UNLAPSED_LOWER   := 'Unlapsed';
-EXPORT OTHER_LOWER      := 'Other';  
-EXPORT UNLAPSED_UPPER   := 'UNLAPSED';  
-EXPORT LAPSED_LOWER   := 'lapsed';
-EXPORT LAPSED_UPPER   := 'LAPSED';  
-
-EXPORT CIVIL_RANGE_A :=  [5, 6, 7, 8, 9];
-EXPORT CIVIL_RANGE_B :=  [3, 4];
-EXPORT CIVIL_RANGE_C :=  [1, 2];
-
-EXPORT SET OF STRING filing_status_satisfied := ['SATISFIED', 'SETTLED', 'RELEASED', 'CLOSED', 'DISCHARGED'];
-
-EXPORT SET OF STRING filing_status_dismissed := ['DISPOSED - HEARING', 'DISMISSED', 'DELETED FROM VENDOR SYSTEM', 'VACATED', 'REMOVED',
-																									'DISCONTINUED', 'DELETED', 'WITHDRAWN', 'VOID', 'STRIKE', 'FILED IN ERROR', 'DISPOSED',
-																									'DISPOSED - PENDING', 'EXPUNGED', 'JUDGMENT VACATED'];
  
 
 //****SECTION FOR MACROS *****
@@ -259,40 +228,7 @@ EXPORT mac_JOINLinkids_Results := MACRO
 					'LEFT.seleID = RIGHT.seleID' 
 ENDMACRO;
 
-EXPORT mac_TRANSFORMLinkids := MACRO
-				'SELF.seq                    := LEFT.seq; '    +           //*** This is the sequence number of the Inquired Business (or the Parent)
-				'SELF.ultid                  := LEFT.ultid; '  +
-				'SELF.orgid                  := LEFT.orgid; '  +
-				'SELF.seleid                 := LEFT.seleid; ' +
-				'SELF.proxid                 := LEFT.proxid; ' +
-				'SELF.powid                  := LEFT.powid; '  +  
-				'SELF.did                    := LEFT.did; '    
-ENDMACRO;
 
-
-EXPORT mac_calculate_evictions := MACRO
-     'SUM(GROUP, (integer)(eviction = DueDiligence.Constants.YES))'
-ENDMACRO; 
-
-EXPORT mac_calculate_evictions_OVNYR := MACRO
-     'SUM(GROUP, (integer)(eviction = DueDiligence.Constants.YES  AND  NumOfDaysAgo > ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK)))'
-ENDMACRO;  
-
-EXPORT mac_calculate_evictionsNYR := MACRO
-     'SUM(GROUP, (integer)(eviction = DueDiligence.Constants.YES  AND  NumOfDaysAgo <= ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK)))'
-ENDMACRO;  
-
-EXPORT mac_calculate_liens := MACRO
-     'SUM(GROUP, (integer)(eviction != DueDiligence.Constants.YES))'
-ENDMACRO; 
-
-EXPORT mac_calculate_liens_OVNYR := MACRO
-     'SUM(GROUP, (integer)(eviction != DueDiligence.Constants.YES 	AND   NumOfDaysAgo > ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK)))'
-ENDMACRO; 
-
-EXPORT mac_calculate_liensNYR := MACRO
-     'SUM(GROUP, (integer)(eviction != DueDiligence.Constants.YES   AND  NumOfDaysAgo <= ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK)))'
-ENDMACRO; 
 
 
 EXPORT mac_TRANSFORMFetch2Linkids  := MACRO
@@ -326,6 +262,7 @@ EXPORT MIN_ADDRESS_SCORE := 70;
 EXPORT MAX_ADDRESS_SCORE := 100;
 
 EXPORT HighCrimeValue := 140;                 //  High = 140 or more,   Avg = 60 - 139,  Low = 1 - 59
+EXPORT LowCrimeValue := 59;                 //  High = 140 or more,   Avg = 60 - 139,  Low = 1 - 59
 
 EXPORT Owned_Property_code := 'OP'; 
 EXPORT Sold_Property_code  := 'SP';
@@ -341,6 +278,10 @@ EXPORT RELATED_BUSINESS_DEGREE := 'RB';
 EXPORT INQUIRED_INDIVIDUAL := 'II';
 EXPORT INQUIRED_INDIVIDUAL_SPOUSE := 'IS';
 EXPORT INQUIRED_INDIVIDUAL_PARENT := 'IP';
+EXPORT INQUIRED_INDIVIDUAL_FIRST_DEGREE := 'R1';
+EXPORT INQUIRED_INDIVIDUAL_SECOND_DEGREE := 'R2';
+EXPORT INQUIRED_INDIVIDUAL_OTHER_RELATION := 'RO';
+EXPORT INQUIRED_INDIVIDUAL_BUSINESS_ASSOCIATE := 'RP';
 
 EXPORT STATE_CRIMINAL_DATA := 'S';
 EXPORT FEDERAL_CRIMINAL_DATA := 'F';
@@ -680,6 +621,9 @@ EXPORT SOURCE_BUSINESS   := MDR.SourceTools.src_Gong_Business;
 EXPORT SOURCE_GOVERNMENT := MDR.SourceTools.src_Gong_Government;   
 EXPORT SOURCE_EBR := MDR.SourceTools.src_EBR;
 EXPORT SOURCE_BOTH_SOS_BUSINESS_REGISTRATION := 'BOTH';
+
+EXPORT SOURCE_IDENTITY_SOURCES_UTILITY := MDR.SourceTools.set_Utility_sources + [MDR.SourceTools.src_Experian_Phones, MDR.SourceTools.src_Targus_White_pages];
+
 
 
 //Industry (SIC/NAICS)

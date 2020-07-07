@@ -44,7 +44,8 @@ out_best :=
 		temp_bdids_suppress,
 		bh_key,
 		keyed(left.bdid = right.bdid) AND
-		((NOT (mdr.sourcetools.SourceIsEBR(RIGHT.source))) OR not doxie.DataRestriction.EBR),
+		((NOT (mdr.sourcetools.SourceIsEBR(RIGHT.source))) OR not doxie.DataRestriction.EBR) AND 
+    (right.source <> MDR.sourceTools.src_Dunn_Bradstreet OR Doxie.DataPermission.use_DNB),
 		transform(
 			business_header.layout_biz_search.result,
 			self.bdid := left.bdid,
@@ -165,7 +166,8 @@ blist_BH  := sort(join(blist, Business_Header_SS.Key_BH_BDID_pl,
 										 left.prim_name = right.prim_name AND
 										 left.prim_range = right.prim_range AND
 										 left.zip = right.zip AND
-                     ut.PermissionTools.glb.SrcOk(glb_purpose,right.source),
+                     ut.PermissionTools.glb.SrcOk(glb_purpose,right.source) AND 
+                     (right.source <> MDR.sourceTools.src_Dunn_Bradstreet OR Doxie.DataPermission.use_DNB),
                   transform(business_header.layout_biz_search.result_dateRange,
 									     // copy dates into separate fields in preparation for rollup
 											 // ensure dates come from business header file. (right side).									     		

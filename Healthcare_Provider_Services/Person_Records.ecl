@@ -1,4 +1,4 @@
-import doxie,PersonReports,AutoStandardI,iesp,ut,DeathV2_Services,doxie_crs,suppress, DriversV2_Services, header,Healthcare_Header_Services;
+﻿import doxie,dx_death_master,PersonReports,AutoStandardI,iesp,ut,DeathV2_Services,doxie_crs,suppress, DriversV2_Services, header,Healthcare_Header_Services;
 
 export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData, 
                        doxie.IDataAccess mod_access, dataset(doxie.layout_references) dsDids) := MODULE
@@ -50,15 +50,8 @@ export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData
 		self.did := (string)((integer)(R.did));
 		self := R;
 	end;
-	dear  := JOIN (dids_owners, doxie.key_death_masterV2_DID, 
-								 keyed (Left.did = Right.l_did) 
-								 and not DeathV2_Services.Functions.Restricted (right.src, right.glb_flag, if (Left.is_subject, glb_ok, rna_glb_ok), death_params),
-								 GetDeadRecords (Left, Right),
-								 left outer, limit (ut.limits.HEADER_PER_DID), keep (ut.limits.DEATH_PER_DID)); //
-	//============================
-
-	// dear := doxie.deathfile_records (in_params.include_BlankDOD or (unsigned)dod8 != 0);
-	// for the purpose of deceased indicator we need only one record per person, preferrably with a county
+dear:=project(dx_death_master.Get.byDid(dids_owners,did,death_params),transform(doxie_crs.layout_deathfile_records,self.did:=(string)left.did;self:=left;self:=[];))	;
+		// for the purpose of deceased indicator we need only one record per person, preferrably with a county
 	export src_deceased := dedup (sort (dear, did, -dod8, trim (county_name) = ''), did, dod8);
 
 		besr_choice := IF(EXISTS(bestrecs), bestrecs, project (dsDids, transform (doxie.layout_best, 
@@ -153,7 +146,7 @@ export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData
 	// TODO: append HRIs conditionally
 	phones_wide_hri := project (phones_wide, transform (phones_rec, Self := Left; Self.hri_phone := []));
 	maxHriPer_value := 10; //TODO: include into input (unsigned1 maxHriPer_value := 10 : stored('MaxHriPer'));
-	doxie.mac_AddHRIPhone(phones_wide_hri, phor_pre);
+	doxie.mac_AddHRIPhone(phones_wide_hri, phor_pre, mod_access);
 	export phor := project (phor_pre, transform (phones_rec, Self.lname := Left.name_last, Self := Left));
 
 	// FinderReport style: verifies phones by last residents' names, among other things
@@ -556,14 +549,12 @@ export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData
 	shared nbrRelsFinal := if(nbrRels=0,iesp.Constants.HPR.MAX_Relatives,min(nbrRels,iesp.Constants.BR.MaxRelatives));
 	export dsRelatives := if(count(dsDids(did>0))>0,choosen(relativesSlim,nbrRelsFinal));
 	export dsNeighbors := if(count(dsDids(did>0))>0,choosen(neighborsslim,iesp.Constants.HPR.MAX_Relatives));
-	export dsAssociates := if(count(dsDids(did>0))>0,choosen(associates, iesp.constants.BR.MaxAssociates));
-	export dsHistoricalNeighbors := if(count(dsDids(did>0))>0,choosen(neighbors_historical, iesp.constants.BR.MaxHistoricalNeighborhood));
-	export dsDOD := if(count(dsDids(did>0))>0,project(bestrecs(length(trim(dod,all))>1),transform(iesp.share.t_Date, self := iesp.ECL2ESP.toDatestring8(Left.dod))));
-	shared dsDODBlank := JOIN (dsDids, doxie.key_death_masterV2_DID, 
-											keyed (Left.did = Right.l_did),
-											keep(1),limit(0));
-	shared dsDodBlankVerified := dsDODBlank(dod8='');
-	shared blankDODExists := count(dsDodBlankVerified)>=1 and inputData.IncludeBlankDOD;
-	export DeceasedFlag := if(count(dsDOD)>0 or blankDODExists,true,false);
+	export dsAssociates := if(exists(dsDids(did>0)),choosen(associates, iesp.constants.BR.MaxAssociates));
+	export dsHistoricalNeighbors := if(exists(dsDids(did>0)),choosen(neighbors_historical, iesp.constants.BR.MaxHistoricalNeighborhood));
+	export dsDOD := if(exists(dsDids),project(bestrecs(length(trim(dod,all))>1),transform(iesp.share.t_Date, self := iesp.ECL2ESP.toDatestring8(Left.dod))));
+	 dsDODBlank := dx_death_master.Get.byDid(dsDids,did,death_params);
+	 dsDodBlankVerified := dsDODBlank(death.dod8='');
+	 blankDODExists := exists(dsDodBlankVerified) and inputData.IncludeBlankDOD;
+	export DeceasedFlag := exists (dsDOD )or blankDODExists;
 	export echo := dsDids; 
 end;

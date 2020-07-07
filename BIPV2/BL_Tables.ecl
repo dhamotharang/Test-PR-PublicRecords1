@@ -1,4 +1,4 @@
-/*2013-12-16T23:38:46Z (Charles Morton)
+﻿/*2013-12-16T23:38:46Z (Charles Morton)
 bug 141874 (Re-sandbox by HS for sprint30)
 */
 export BL_Tables := module
@@ -466,6 +466,7 @@ export BL_Tables := module
 											inCode = 'ACTIVE/NONCOMPLIANCE'															=> c.strActive,
 											inCode = 'ACTIVE/OWES CURRENT YEAR'													=> c.strActive,
 											inCode = 'ACTIVE-GOOD STANDING'															=> c.strActive,
+											inCode = 'ACTIVE GOOD STANDING'	              => c.strActive,
 											inCode = 'CORPORATION IS ACTIVE AND IN GOOD STANDING'				=> c.strActive,
 											inCode = 'CURRENT'																					=> c.strActive,
 											inCode = 'CURRENT-ACTIVE'																		=> c.strActive,

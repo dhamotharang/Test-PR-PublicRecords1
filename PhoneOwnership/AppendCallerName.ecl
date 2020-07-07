@@ -23,7 +23,7 @@ EXPORT AppendCallerName(DATASET(Phones.Layouts.AccuDataCNAM) dsCallerIDs,
 		// The name fields are populated only when there is a valid name.
 		// We have no way of knowing if CallerID Name is a person or company prior to this line.
 		SELF.AppendedCompanyName := IF(l.fname<>'' OR l.lname<>'',Phones.Functions.GetCleanCompanyName(l.listingname),'');
-		SELF.validatedRecord := validCNAMResponse; // availabilityindicator and presentationindicator (privateflag) removed from gateway response
+		SELF.validatedRecord := l.fname<>'' OR l.lname<>''; // availabilityindicator and presentationindicator (privateflag) removed from gateway response
 		SELF.source_category := IF(validCNAMResponse, r.source_category+Constants.CNAM, r.source_category);
 		//report error results and mark any reported bad numbers.
 		SELF.error_desc := IF(l.listingname='ERROR', r.error_desc+'CNAM: '+ l.error_desc + IF(l.error_desc<>'',PhoneOwnership.Constants.DELIMITER,''),r.error_desc);

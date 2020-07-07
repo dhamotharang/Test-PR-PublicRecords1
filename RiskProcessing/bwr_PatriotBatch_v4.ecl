@@ -1,6 +1,6 @@
 ﻿import Gateway, iesp, Patriot, Riskwise;
 plugin_version := 4;
-eyeball := 0;
+eyeball := 100;
 
 prii_layout := record
 	STRING AccountNumber;
@@ -29,7 +29,7 @@ END;
 
 
 // sdn := dataset('~dvstemp::in::ofac::20160325::sdn.csv', r, csv(quote('"')) )(sdn_number in ['15771', '12904', '10795', '12193','12437','11525']);
-r := dataset('~mmarshik::in::bridgertestsamplenames::bridgertestsamplenames.csv', prii_layout, csv(quote('"'),heading(1)) );
+r := choosen(dataset('~mmarshik::in::bridgertestsamplenames::bridgertestsamplenames.csv', prii_layout, csv(quote('"'),heading(1))),100 );
 output(r);
 
 // I-Individual, N-NonIndividual, B-Both
@@ -62,7 +62,7 @@ layout_soap := RECORD
 	// STRING50 MiddleName;
 	// STRING50 LastName;
 	// STRING150 UnParsedName;
-	STRING20 SearchType;
+	STRING20 search_type;
 	// string20 country;
 	// STRING8  DateOfBirth := '';
 		DATASET(Gateway.Layouts.Config) gateways;
@@ -76,10 +76,7 @@ batch_in SDNbatch_in(r le, integer c) := transform
 	self.name_middle := le.MiddleName; // if your file layout is not using this and using the name_unparsed set to '';
 	self.name_last  := le.LastName; // if your file layout is not using this and using the name_unparsed set to '';
 	self.name_unparsed  := ''; // if you're using this set as le.(name of the unparsed field coming from the prii_layout); Look at the examples above for first, middle, and last
-	self.search_type  := 'B'; // use this if no searchtype is given from the file
-	// self.search_type  := MAP(le.PersonalBusiness  in ['Business']  => 'N', 
-												  // le.PersonalBusiness  in [ 'Personal'] => 'I',
-																			// 'B'); //use this if a searchtype is given and modify based on what searchtype is called in the file
+	// self.search_type  := 'B'; // the searchtype in batch_in isn't looked at so set this in search_type on line 116
 	self.Country  := '';
 	self.dob := '';
 
@@ -115,8 +112,8 @@ Watchlist - this allows to input a watchlist or watchlist(s) that you specifical
 									  // dataset([{'BES'}],iesp.share.t_StringArrayItem); // use this if you need more than one watchlist, follow the same formatting to add one more if needing more than two 
 	self.UseDobFilter := FALSE;
 	self.dobradius := -1;
-	self.SearchType  := 'B'; // use this if no searchtype is given from the file
-	// self.SearchType  := MAP(le.PersonalBusiness  in ['Business']  => 'N', 
+	self.search_type  := 'B'; // use this if no searchtype is given from the file
+	// self.search_type  := MAP(le.PersonalBusiness  in ['Business']  => 'N', 
 												  // le.PersonalBusiness  in [ 'Personal'] => 'I',
 																			// 'B'); //use this if a searchtype is given and modify based on what searchtype is called in the file
 	// self.gateways := dataset([{'bridgerxg5', 'http://bridger_dev:NoMoreBugs!@10.173.132.10:7001/WsSearchCore?ver_=1'}], Gateway.Layouts.Config); 

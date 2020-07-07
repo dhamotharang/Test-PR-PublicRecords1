@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, BIPV2_Build, Business_Risk_BIP, DueDiligence, STD, UT;
+﻿IMPORT BIPV2, BIPV2_Build, Business_Risk_BIP, DueDiligence, STD, UT, Doxie;
 
 /*
 	Following Keys being used:
@@ -6,7 +6,8 @@
 */
 EXPORT getSharedBEOs(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 										Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-										BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+										BIPV2.mod_sources.iParams linkingOptions,
+                                        doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 
 
@@ -15,7 +16,7 @@ EXPORT getSharedBEOs(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																										 0, // ScoreThreshold --> 0 = Give me everything
 																										 linkingOptions,
 																										 Business_Risk_BIP.Constants.Limit_Default,
-																										 Options.KeepLargeBusinesses)(source NOT IN DueDiligence.Constants.EXCLUDE_SOURCES);
+																										 Options.KeepLargeBusinesses, mod_access)(source NOT IN DueDiligence.Constants.EXCLUDE_SOURCES);
 																										 
 																										 
     //Add back our Seq numbers.
@@ -25,7 +26,7 @@ EXPORT getSharedBEOs(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
     execCleanDates := DueDiligence.Common.CleanDatasetDateFields(execsRawSeq, 'dt_first_seen, dt_vendor_first_reported, dt_last_seen, dt_vendor_last_reported');
     
     // Filter out records after our history date.
-    execFilt := DueDiligence.Common.FilterRecords(execCleanDates, dt_first_seen, dt_vendor_first_reported);
+    execFilt := DueDiligence.CommonDate.FilterRecords(execCleanDates, dt_first_seen, dt_vendor_first_reported);
     
     //pull out the contact info and needed info
     pulledExecs :=  PROJECT(execFilt, TRANSFORM(DueDiligence.LayoutsInternal.BEOLayout,
@@ -51,7 +52,7 @@ EXPORT getSharedBEOs(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                                                 derived := STD.Str.ToUpperCase(TRIM(LEFT.contact_job_title_derived, LEFT, RIGHT));
                                                 execTitle := IF(derived IN DueDiligence.Constants.EXECUTIVE_TITLES, derived, DueDiligence.Constants.EMPTY);
                                                 
-                                                lastSeenDays := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)lastSeen, (STRING)LEFT.historyDate);
+                                                lastSeenDays := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)lastSeen, (STRING)LEFT.historyDate);
                                                 past3Years := ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK);
                                                 seenLast3Years := lastSeenDays <= past3Years;
                                                 
@@ -94,6 +95,7 @@ EXPORT getSharedBEOs(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
     // OUTPUT(execsRawSeq, NAMED('execsRawSeq'));
     // OUTPUT(filterExecs, NAMED('filterExecs'));
+    // OUTPUT(pulledExecs, NAMED('pulledExecs'));
     // OUTPUT(withDIDs, NAMED('withDIDs'));
     // OUTPUT(addExecs, NAMED('addExecs'));
     // OUTPUT(withoutDIDs, NAMED('withoutDIDs'));

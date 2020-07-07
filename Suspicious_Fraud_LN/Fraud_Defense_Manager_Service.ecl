@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Fraud_Defense_Manager_Service" wuTimeout="300000">
 	<part name="FraudDefenseManagerRequest" type="tns:XmlDataSet" cols="100" rows="100"/>
 	<part name="Gateways" type="tns:XmlDataSet" cols="100" rows="8"/>
@@ -67,7 +67,7 @@
 */
 
 
-IMPORT Address, Gateway, iesp, Models, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, UT;
+IMPORT Address, Gateway, iesp, Risk_Indicators, Suspicious_Fraud_LN, Doxie, STD;
 
 EXPORT Fraud_Defense_Manager_Service := MACRO
 	/* ************************************************************************
@@ -82,6 +82,12 @@ EXPORT Fraud_Defense_Manager_Service := MACRO
 	
 	requestIn := DATASET([], iesp.FraudDefenseManager.t_FraudDefenseManagerRequest)  	: STORED('FraudDefenseManagerRequest', FEW);
 	
+	//CCPA fields
+	unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+	string TransactionID := '' : STORED('_TransactionId');
+	string BatchUID := '' : STORED('_BatchUID');
+	unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
   firstRow := requestIn[1] : INDEPENDENT; // Since this is realtime and not batch, should only have one row on input.
 	request := GLOBAL(firstRow.SearchBy);
 	option := GLOBAL(firstRow.Options);
@@ -90,10 +96,19 @@ EXPORT Fraud_Defense_Manager_Service := MACRO
 	// Get GLB and DPPA and make sure they are at least set to 0
 	UNSIGNED1 GLBPurpose					:= MAX((INTEGER)users.GLBPurpose, 0);
 	UNSIGNED1 DPPAPurpose					:= MAX((INTEGER)users.DLPurpose, 0);
+	
+	mod_access := MODULE(Doxie.IDataAccess)
+		EXPORT glb := GLBPurpose;
+		EXPORT dppa := DPPAPurpose;
+		EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+		EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+		EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+	END;
+	
 	// Make sure DataRestrictionMask is populated - if not set it to the default Data Restriction Mask
 	STRING50 DataRestrictionMask	:= IF(TRIM(users.DataRestrictionMask) <> '', TRIM(users.DataRestrictionMask), Risk_Indicators.iid_constants.default_DataRestriction);
 	BOOLEAN TestDataEnabled				:= (INTEGER)users.TestDataEnabled = 1;
-	STRING32 TestDataTableName		:= StringLib.StringToUpperCase(TRIM(users.TestDataTableName));
+	STRING32 TestDataTableName		:= STD.Str.ToUpperCase(TRIM(users.TestDataTableName));
 
 	/* ************************************************************************
 	 *  Convert the ESDL input into the batch layout so that we can use the   *
@@ -101,22 +116,21 @@ EXPORT Fraud_Defense_Manager_Service := MACRO
    *  and unparsed name, unlike the batch service - which is why some of    *
    *  the parsing logic is here and not in the Search_Function.             *
 	 ************************************************************************ */
-	emptyRecord := ut.ds_oneRecord;
-	Suspicious_Fraud_LN.layouts.Layout_Batch_In batchifyRealtime(emptyRecord le) := TRANSFORM
+	Batch_In := DATASET([TRANSFORM(Suspicious_Fraud_LN.layouts.Layout_Batch_In, 
 		SELF.ReferenceCode				:= users.ReferenceCode;
 		SELF.QueryID							:= users.QueryID;
 		SELF.LexID								:= (INTEGER)request.UniqueID;
 		SELF.AcctNo								:= users.AccountNumber;
 		
 		// Use the Name Cleaner to get the Parsed version of the UnParsedFullName if populated.
-		inUnparsedName						:= StringLib.StringToUpperCase(TRIM(request.Name.Full, LEFT, RIGHT));
-		inNameFirst 							:= StringLib.StringToUpperCase(TRIM(request.Name.First, LEFT, RIGHT));
-		inNameMiddle							:= StringLib.StringToUpperCase(TRIM(request.Name.Middle, LEFT, RIGHT));
-		inNameLast								:= StringLib.StringToUpperCase(TRIM(request.Name.Last, LEFT, RIGHT));
+		inUnparsedName						:= STD.Str.ToUpperCase(TRIM(request.Name.Full, LEFT, RIGHT));
+		inNameFirst 							:= STD.Str.ToUpperCase(TRIM(request.Name.First, LEFT, RIGHT));
+		inNameMiddle							:= STD.Str.ToUpperCase(TRIM(request.Name.Middle, LEFT, RIGHT));
+		inNameLast								:= STD.Str.ToUpperCase(TRIM(request.Name.Last, LEFT, RIGHT));
 		cleanedName								:= Address.CleanPerson73(inUnparsedName);
-		cleanedFirst							:= IF(inUnparsedName <> '', StringLib.StringToUpperCase(cleanedName[6..25]), '');
-		cleanedMiddle							:= IF(inUnparsedName <> '', StringLib.StringToUpperCase(cleanedName[26..45]), '');
-		cleanedLast								:= IF(inUnparsedName <> '', StringLib.StringToUpperCase(cleanedName[46..65]), '');
+		cleanedFirst							:= IF(inUnparsedName <> '', STD.Str.ToUpperCase(cleanedName[6..25]), '');
+		cleanedMiddle							:= IF(inUnparsedName <> '', STD.Str.ToUpperCase(cleanedName[26..45]), '');
+		cleanedLast								:= IF(inUnparsedName <> '', STD.Str.ToUpperCase(cleanedName[46..65]), '');
 
 		SELF.FirstName						:= IF(inNameFirst = '', cleanedFirst, inNameFirst);
 		SELF.MiddleName						:= IF(inNameMiddle = '', cleanedMiddle, inNameMiddle);
@@ -126,11 +140,11 @@ EXPORT Fraud_Defense_Manager_Service := MACRO
 																															TRIM(request.Address.StreetName, LEFT, RIGHT), TRIM(request.Address.StreetSuffix, LEFT, RIGHT), 
 																															TRIM(request.Address.StreetPostDirection, LEFT, RIGHT), TRIM(request.Address.UnitDesignation, LEFT, RIGHT), 
 																															TRIM(request.Address.UnitNumber, LEFT, RIGHT));
-		inStreetAddress1					:= StringLib.StringToUpperCase(TRIM(request.Address.StreetAddress1, LEFT, RIGHT));
+		inStreetAddress1					:= STD.Str.ToUpperCase(TRIM(request.Address.StreetAddress1, LEFT, RIGHT));
 		SELF.StreetAddress1				:= IF(inStreetAddress1 = '', tempStreetAddr, inStreetAddress1);
-		SELF.StreetAddress2				:= StringLib.StringToUpperCase(TRIM(request.Address.StreetAddress2, LEFT, RIGHT));
-		SELF.City									:= StringLib.StringToUpperCase(TRIM(request.Address.City, LEFT, RIGHT));
-		SELF.State								:= StringLib.StringToUpperCase(TRIM(request.Address.State, LEFT, RIGHT));
+		SELF.StreetAddress2				:= STD.Str.ToUpperCase(TRIM(request.Address.StreetAddress2, LEFT, RIGHT));
+		SELF.City									:= STD.Str.ToUpperCase(TRIM(request.Address.City, LEFT, RIGHT));
+		SELF.State								:= STD.Str.ToUpperCase(TRIM(request.Address.State, LEFT, RIGHT));
 		SELF.Zip5									:= request.Address.Zip5;
 		DOBMonth									:= INTFORMAT(request.DOB.Month, 2, 1);
 		DOBDay										:= INTFORMAT(request.DOB.Day, 2, 1);
@@ -140,18 +154,16 @@ EXPORT Fraud_Defense_Manager_Service := MACRO
 		SELF.SSN									:= request.SSN;
 		SELF.Phone10							:= request.Phone;
 		SELF.IPAddress						:= request.IPAddress;
-		SELF.Email								:= StringLib.StringToUpperCase(TRIM(request.Email, LEFT, RIGHT));
+		SELF.Email								:= STD.Str.ToUpperCase(TRIM(request.Email, LEFT, RIGHT));
 		SELF.DriverLicenseNumber	:= request.DriverLicenseNumber;
 		SELF.DriverLicenseState		:= request.DriverLicenseState;
 		SELF.DeviceID							:= request.DeviceID;
-		SELF.ArchiveDate					:= HistoryDateYYYYMM;
-	END;
-	Batch_In := PROJECT(emptyRecord, batchifyRealtime(LEFT));
+		SELF.ArchiveDate					:= HistoryDateYYYYMM;)]);
 	
 	/* ************************************************************************
 	 * Get the Suspicious Fraud Results - Search TestSeeds is TestDataEnabled *
 	 ************************************************************************ */
-	results := IF(TestDataEnabled = FALSE, Suspicious_Fraud_LN.Fraud_Defense_Manager_Search_Function(Batch_In, GLBPurpose, DPPAPurpose, DataRestrictionMask, Gateways),
+	results := IF(TestDataEnabled = FALSE, Suspicious_Fraud_LN.Fraud_Defense_Manager_Search_Function(Batch_In, GLBPurpose, DPPAPurpose, DataRestrictionMask, Gateways, mod_access),
 																				 Suspicious_Fraud_LN.Fraud_Defense_Manager_TestSeed_Function(Batch_In, TestDataTableName));
 	
 	/* ************************************************************************

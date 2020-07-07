@@ -26,7 +26,7 @@
 
 */
 IMPORT Gong_Services;
-IMPORT gong, doxie, Census_Data, ut, Risk_Indicators, LIB_Word, NID, BIPV2, Address, Suppress, STD;
+IMPORT dx_Gong, doxie, Census_Data, ut, Risk_Indicators, LIB_Word, NID, BIPV2, Address, Suppress, STD;
 
 dummydidDS := Dataset([{0}],doxie.layout_references);
 EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
@@ -87,10 +87,11 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
 
   MaxResults_value := if(MaxResults_val > MaxResultsDefault, MaxResultsDefault, MaxResults_val);
 
-  typeof(gong.Key_History_phone.p7) local_phone7 := if(phone_value[8..10]='',
+  Key_History_phone := dx_Gong.key_history_phone();
+  typeof(Key_History_phone.p7) local_phone7 := if(phone_value[8..10]='',
                                                     phone_value[1..7],
                                                     phone_value[4..10]);
-  typeof(gong.Key_History_phone.p3) local_area_code := if(phone_value[8..10]='',
+  typeof(Key_History_phone.p3) local_area_code := if(phone_value[8..10]='',
                                                           '',
                                                           phone_value[1..3]);
 
@@ -108,7 +109,8 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
     unsigned4 record_sid;
   END;
 
-  joinedRecord_w_compliance doZipNameProject (gong.key_history_zip_name l) := TRANSFORM,
+  znm := dx_Gong.key_history_zip_name();
+  joinedRecord_w_compliance doZipNameProject (znm l) := TRANSFORM,
       SKIP(Gong_Services.MAC_Gong_History_Penalty(l, false)>score_threshold_value)
     SELF.businessIds := nullRow;
     SELF.record_sid := l.record_sid;
@@ -116,7 +118,9 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
     SELF.did := l.did;
     SELF := l;
   END;
-  joinedRecord_w_compliance doNameProject (gong.key_history_name l) := TRANSFORM,
+
+  nm := dx_Gong.key_history_name();
+  joinedRecord_w_compliance doNameProject (nm l) := TRANSFORM,
       SKIP(Gong_Services.MAC_Gong_History_Penalty(l,false)>score_threshold_value)
     SELF.businessIds := nullRow;
     SELF.record_sid := l.record_sid;
@@ -124,7 +128,9 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
     SELF.did := l.did;
     SELF := l;
   END;
-  joinedRecord_w_compliance doWildNameProject (gong.key_history_wild_name_zip l) := TRANSFORM,
+
+  nm_wild := dx_Gong.key_history_wild_name_zip();
+  joinedRecord_w_compliance doWildNameProject (nm_wild l) := TRANSFORM,
       SKIP(Gong_Services.MAC_Gong_History_Penalty(l,false)>score_threshold_value)
     SELF.businessIds := nullRow;
     SELF.record_sid := l.record_sid;
@@ -132,38 +138,49 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
     SELF.did := l.did;
     SELF := l;
   END;
-  joinedRecord doAddrProject (gong.Key_History_Address l) := TRANSFORM
+
+  Key_History_Address := dx_Gong.key_history_address();
+  joinedRecord doAddrProject (Key_History_Address l) := TRANSFORM
     SELF.businessIds := nullRow;
     SELF := l;
   END;
-  joinedRecord_w_compliance doPhoneProject (gong.Key_History_phone l) := TRANSFORM
-    SELF.businessIds := nullRow;
-    SELF.record_sid := l.record_sid;
-    SELF.global_sid := l.global_sid;
-    SELF.did := l.did;
-    SELF := l;
-  END;
-  joinedRecord doDidProject (gong.Key_History_did l) := TRANSFORM
-    SELF.businessIds := nullRow;
-    SELF := l;
-  END;
-  joinedRecord_w_compliance doCompanyNameProject (gong.key_history_companyname l) := TRANSFORM
+  joinedRecord_w_compliance doPhoneProject (Key_History_phone l) := TRANSFORM
     SELF.businessIds := nullRow;
     SELF.record_sid := l.record_sid;
     SELF.global_sid := l.global_sid;
     SELF.did := l.did;
     SELF := l;
   END;
-  joinedRecord_w_compliance doCityStNameProject (gong.key_history_city_st_name l) := TRANSFORM
+
+  Key_History_did := dx_Gong.key_history_did();
+  joinedRecord doDidProject (Key_History_did l) := TRANSFORM
     SELF.businessIds := nullRow;
     SELF := l;
   END;
-   joinedRecord doDidJoin (gong.Key_History_did r) := TRANSFORM
+
+  key_history_companyname := dx_Gong.key_history_companyname();
+  joinedRecord_w_compliance doCompanyNameProject (key_history_companyname l) := TRANSFORM
+    SELF.businessIds := nullRow;
+    SELF.record_sid := l.record_sid;
+    SELF.global_sid := l.global_sid;
+    SELF.did := l.did;
+    SELF := l;
+  END;
+
+  csnm := dx_Gong.key_history_city_st_name();
+  joinedRecord_w_compliance doCityStNameProject (csnm l) := TRANSFORM
+    SELF.businessIds := nullRow;
+    SELF := l;
+  END;
+
+  joinedRecord doDidJoin (Key_History_did r) := TRANSFORM
     SELF.businessIds := nullRow;
     SELF.did := r.l_did;
     SELF := r;
   END;
-  joinedRecord doHHIDJoin (gong.Key_History_HHID r) := TRANSFORM
+
+  Key_History_HHID := dx_gong.key_history_hhid();
+  joinedRecord doHHIDJoin (Key_History_HHID r) := TRANSFORM
     SELF.businessIds := nullRow;
     SELF.hhid := r.s_hhid;
     SELF := r;
@@ -207,11 +224,6 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
   st_fil(i) := MACRO
     state_value='' OR i.st=state_value
   ENDMACRO;
-
-  nm := gong.key_history_name;
-  nm_wild := gong.key_history_wild_name_zip;
-  znm := gong.key_history_zip_name;
-  csnm := gong.key_history_city_st_name;
 
      nm_postfil :=
         (prange_value = ''
@@ -407,8 +419,8 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
 
   // get the records based on address parameters
   // the order of the index is prim_name,st,z5, prim_range, sec_range
-  castFname := trim(ut.cast2keyfield(gong.Key_History_Address.name_first,fname_value));
-  addr_key_read_history := gong.Key_History_Address(pname_value != '' and (company_name='' or lname_value_better<>'' or fname_value<>''), zip_value <> [] or state_value <> ''
+  castFname := trim(ut.cast2keyfield(Key_History_Address.name_first,fname_value));
+  addr_key_read_history := Key_History_Address(pname_value != '' and (company_name='' or lname_value_better<>'' or fname_value<>''), zip_value <> [] or state_value <> ''
     ,keyed(prim_range = prange_value
           or prange_value = '' or addr_range or addr_wild or dir_prange_range or dir_prange_wild)
     ,keyed(prim_name = pname_value or prim_name = pname_val or prim_name = dir_pname_value)
@@ -441,7 +453,7 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
   addr_key_recs := project(addr_key_pick,doAddrProject(LEFT));
 
   //get records by phone
-  pre_phone_key_recs := project(choosen(gong.Key_History_phone(local_phone7 != ''
+  pre_phone_key_recs := project(choosen(Key_History_phone(local_phone7 != ''
     , keyed(p7 = local_phone7)
     , keyed(local_area_code = '' OR p3 = local_area_code)
     , (state_value = '') OR (st = state_value)
@@ -453,7 +465,7 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
   phone_key_recs_optout := Suppress.MAC_SuppressSource(pre_phone_key_recs, mod_access);
   phone_key_recs := PROJECT(phone_key_recs_optout, joinedRecord);
 
-  regional_phone_key_recs := project(LIMIT (LIMIT(gong.Key_History_phone(local_phone7 != ''
+  regional_phone_key_recs := project(LIMIT (LIMIT(key_history_phone(local_phone7 != ''
     , best_state[1].st != '' or state_value != ''
     , keyed(p7 = local_phone7)
     , st = best_state[1].st or st = state_value
@@ -489,13 +501,14 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
   name_addr_phone_key_recs_for_hhid := DEDUP(SORT(name_addr_phone_key_recs,hhid),hhid);
 
   //Join the name_addr recs to did and hhid recs if source_doc_view
-  key_history_did := gong.Key_History_did;
-  key_history_hhid := gong.Key_History_HHID;
 
   MatchingNameAddrPhoneDidRawRecs := join(name_addr_phone_key_recs_for_did, key_history_did,
      keyed(left.did = right.l_did), TRANSFORM(right), LIMIT (ut.limits .GONG_HISTORY_MAX, SKIP));
 
-  MatchingNameAddrPhoneDidRecs := project(MatchingNameAddrPhoneDidRawRecs, doDidJoin(LEFT));
+  MatchingNameAddrPhoneDidRawRecs_OptOut := Suppress.MAC_SuppressSource(
+    MatchingNameAddrPhoneDidRawRecs, mod_access);
+
+  MatchingNameAddrPhoneDidRecs := project(MatchingNameAddrPhoneDidRawRecs_OptOut, doDidJoin(LEFT));
 
   MatchingNameAddrPhoneHHIDRawRecs := join(name_addr_phone_key_recs_for_hhid, key_history_hhid,
     keyed(left.hhid = right.s_hhid), TRANSFORM(right), LIMIT (ut.limits .GONG_HISTORY_MAX, SKIP));
@@ -509,7 +522,7 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
 
   MatchingNameAddrPhone_in := dedup(sort(name_addr_phone_key_recs,phone10,name_last),phone10,name_last);
 
-  pre_MatchingNameAddrPhoneToPhoneRecs := JOIN(MatchingNameAddrPhone_in ,gong.Key_History_phone,
+  pre_MatchingNameAddrPhoneToPhoneRecs := JOIN(MatchingNameAddrPhone_in, Key_History_phone,
                                            LEFT.phone10 <> ''
                                            and LEFT.phone10[4..10]  = RIGHT.p7
                                            and LEFT.phone10[1..3]  = RIGHT.p3
@@ -522,7 +535,12 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
   hhid_dids := PROJECT(doxie.Get_Household_DIDs(indids(did<>0)),doxie.layout_references);
   use_dids := IF(include_HHID_DIDs, hhid_dids, indids(did<>0));
   // get the records based on did parameters
-  gong.Mac_History_Daily_Did(use_dids, did, did_key_raw_recs);
+
+  gong_did_history := join(use_dids, Key_History_did, keyed(left.did = right.l_did),
+    TRANSFORM(right), LIMIT(ut.limits.GONG_HISTORY_MAX, SKIP));
+
+  did_key_raw_recs := Suppress.MAC_SuppressSource(gong_did_history, mod_access);
+
 
   did_key_recs :=  project(did_key_raw_recs,doDidProject(LEFT));
 
@@ -545,7 +563,7 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
 
   is_wild_company_name := STD.Str.Find(company_name, '*', 1) <> 0 OR STD.Str.Find(company_name, '?', 1) <> 0;
 
-  MatchingCompanyNameRecs_regular_Fetch := gong.key_history_companyname((listed_name_new = trim(company_name_better) or
+  MatchingCompanyNameRecs_regular_Fetch := key_history_companyname((listed_name_new = trim(company_name_better) or
     listed_name_new[1..length(trim(company_name_clean))+1] = trim(company_name_clean) or
     listed_name_new[1..length(trim(company_name_better))+1]= trim(company_name_better) + ' ') and
       company_name<>'',
@@ -574,7 +592,7 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
   MatchingCompanyNameRecs_regular_optout := Suppress.MAC_SuppressSource(pre_MatchingCompanyNameRecs_regular, mod_access);
   MatchingCompanyNameRecs_regular := PROJECT(MatchingCompanyNameRecs_regular_optout, joinedRecord);
 
-  MatchingCompanyNameRecs_wild_keydata := gong.key_history_companyname(
+  MatchingCompanyNameRecs_wild_keydata := key_history_companyname(
     listed_name_new[1..length(trim(company_name))] = trim(company_name) and company_name<>'',
     prim_range = prange_value or prange_value = '' or addr_range or addr_wild or dir_prange_range or dir_prange_wild,
     prim_name = pname_value or prim_name = pname_val or prim_name = dir_pname_value or pname_value = '',
@@ -594,7 +612,7 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
   MatchingCompanyNameRecs_wild_OptOut := Suppress.MAC_SuppressSource(pre_MatchingCompanyNameRecs_wild, mod_access);
   MatchingCompanyNameRecs_wild := PROJECT(pre_MatchingCompanyNameRecs_wild, joinedRecord);
 
-  cn_key_1_recs := limit(gong.key_cn(keyed(dph_cn[1..if(phonetics,6,length(trim(metaphonelib.DMetaPhone1(lib_word.word(company_name,1)))))]=
+  cn_key_1_recs := limit(dx_Gong.key_cn()(keyed(dph_cn[1..if(phonetics,6,length(trim(metaphonelib.DMetaPhone1(lib_word.word(company_name,1)))))]=
         metaphonelib.DMetaPhone1(lib_word.word(company_name,1)) and length(trim(company_name))>0),
     keyed(cn[1..length(trim(lib_word.word(company_name,1)))]=lib_word.word(company_name,1) and length(trim(company_name))>0 or phonetics),
     keyed(st = state_value or state_value = ''),
@@ -620,7 +638,7 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
   ph_word_set := [ph_first_word_value, ph_any_word1_value, ph_any_word2_value];
   has_3_words := first_word_value<>'' or any_word1_value<>'' or any_word2_value<>'';
 
-  cn_key_3_recs := limit(gong.key_cn(keyed(dph_cn in ph_word_set and has_3_words),
+  cn_key_3_recs := limit(dx_Gong.key_cn()(keyed(dph_cn in ph_word_set and has_3_words),
     keyed(cn[1..9] in word_set and has_3_words or phonetics),
     keyed(st = state_value or state_value=''),
     city_value = '' or (city_value = p_city_name or city_value = v_city_name) or z5<>'' and (integer4)z5 in zips_within_city_value or
@@ -633,13 +651,14 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
 
   cn_key_recs := if(has_3_words, cn_key_3_recs, cn_key_1_recs);
 
-  joinedRecord_w_compliance get_gong_by_cn(gong.key_cn_to_company r) := TRANSFORM
+  key_cn_to_company := dx_Gong.key_cn_to_company();
+  joinedRecord_w_compliance get_gong_by_cn(key_cn_to_company r) := TRANSFORM
     SELF.businessIds := nullRow;
     SELF := r;
   END;
 
   MatchingCompanyNameRecs_cn_pre_suppress := join(dedup(sort(cn_key_recs, record), record),
-    gong.key_cn_to_company,
+    key_cn_to_company,
     keyed(left.listed_name = right.listed_name) and
     keyed(left.st = right.st) and
     keyed(left.p_city_name = right.p_city_name) and
@@ -851,7 +870,7 @@ EXPORT Fetch_Gong_History (Dataset(doxie.layout_references) indids = dummydidDS,
   ds_inData := dataset([{company_name, prange_value, pname_value, zip_val, '',
                         city_value, state_value, phone_value,'','','','','',''}], BIPV2.IDFunctions.rec_SearchInput);
 
-  ds_businessIdsInfoOut := Gong_Services.Fetch_Gong_History_By_BusinessIds(ds_inData);
+  ds_businessIdsInfoOut := Gong_Services.Fetch_Gong_History_By_BusinessIds(ds_inData, mod_access);
 
   ds_businessIdsInfoOutDeduped := dedup(ds_businessIdsInfoOut, all);
 

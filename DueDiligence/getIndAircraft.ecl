@@ -8,7 +8,7 @@
 EXPORT getIndAircraft(DATASET(DueDiligence.Layouts.Indv_Internal) inData) := FUNCTION
 
 
-    getSpouseAsInquired := DueDiligence.CommonIndividual.getRelationship(inData, spouses, DueDiligence.Constants.INQUIRED_INDIVIDUAL_SPOUSE);
+    getSpouseAsInquired := DueDiligence.CommonIndividual.GetRelationshipAsInquired(inData, spouses, DueDiligence.Constants.INQUIRED_INDIVIDUAL_SPOUSE);
   
     spouseAndInquired := getSpouseAsInquired + inData;
     

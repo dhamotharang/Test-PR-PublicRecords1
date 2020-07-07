@@ -1,4 +1,4 @@
-// shared for a lot of different keys:
+﻿// shared for a lot of different keys:
 prepped := $.layout_prep_for_keys;
 head := $.layout_header;
 
@@ -603,6 +603,11 @@ end;
     unsigned4 voter_src_cnt;
     string5   addressstatus;
     string3   addresstype;
+  END;
+
+  EXPORT i_first_ingest := RECORD
+    unsigned6 rid;
+    unsigned4 first_ingest_date;
   END;
 
 END;

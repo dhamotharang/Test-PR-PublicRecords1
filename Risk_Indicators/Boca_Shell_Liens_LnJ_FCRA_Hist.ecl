@@ -1,12 +1,18 @@
-﻿import _Control, FCRA, ut, liensv2, riskwise, Risk_Indicators, STD;
+﻿import _Control, FCRA, ut, liensv2, riskwise, Risk_Indicators, STD, iesp;
  onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0, 
 		GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus) w_corrections,
-    boolean IncludeLnJ = false,
-    integer2 ReportingPeriod = 84
+		boolean IncludeLnJ = false,
+		integer2 ReportingPeriod = 84,
+		unsigned6 MinimumAmount = 0,
+		dataset(iesp.share.t_StringArrayItem) ExcludeStates = dataset([], iesp.share.t_StringArrayItem),
+		dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem)
    ) := function
  
+ 	NonExemptReportingSources := SET(ExcludeReportingSources, value);
+	NonExemptStates := SET(ExcludeStates, value);
+	
 	todaysdate := (string) risk_indicators.iid_constants.todaydate;
 	// if the bsOption is turned on to remove liens, use the w_bankruptcy data prior to the liens joins
 	FilterLiens := (BSOptions & risk_indicators.iid_constants.BSOptions.FilterLiens) > 0;
@@ -20,6 +26,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 	FilterEvictions := (BSOptions & risk_indicators.iid_constants.BSOptions.Eviction) > 0;
 	FilterSSNs := (BSOptions & risk_indicators.iid_constants.BSOptions.SSNLienFtlr) > 0;
 	FilterBcb := (BSOptions & risk_indicators.iid_constants.BSOptions.BCBLienFtlr) > 0;
+	FilterReleasedCases := (BSOptions & risk_indicators.iid_constants.BSOptions.ReleasedCaseFltr) > 0;
 
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_LnJ add_liens(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus le, liensv2.key_liens_did_FCRA ri) :=
 	TRANSFORM
@@ -75,8 +82,9 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 							keyed(LEFT.rmsid=RIGHT.rmsid) AND keyed(left.tmsid=right.tmsid) and 
 							left.did=(unsigned)right.did and
 							(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 and	// date first seen was blank on some records
-	      right.name_type='D' and							
-							if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL
+							right.name_type='D' 
+							and right.orig_state not in NonExemptStates
+							and	if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL
 							get_liensparty_raw(LEFT,RIGHT), LEFT OUTER,
 							ATMOST(keyed(LEFT.rmsid=RIGHT.rmsid) AND keyed(left.tmsid=right.tmsid), 
 							riskwise.max_atmost));
@@ -85,9 +93,9 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 							distribute(pull(liensv2.key_liens_party_id_FCRA(name_type='D')), hash64(rmsid)), 
 							(LEFT.rmsid=RIGHT.rmsid) AND (left.tmsid=right.tmsid) and 
 							left.did=(unsigned)right.did and
-							(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 and	// date first seen was blank on some records
-
-							if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL
+							(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 // date first seen was blank on some records
+							and right.orig_state not in NonExemptStates
+							and if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL
 							get_liensparty_raw(LEFT,RIGHT), LEFT OUTER,
 							ATMOST(LEFT.rmsid=RIGHT.rmsid AND left.tmsid=right.tmsid, 
 							riskwise.max_atmost), LOCAL);
@@ -337,19 +345,23 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 
 	MAC_liensMain_transform(get_liens_main_raw, liensv2.key_liens_main_id_FCRA);
 
-	liens_main_raw_roxie := JOIN(liens_party_raw, liensV2.key_liens_main_ID_FCRA,
+	liens_main_raw_roxie_unfiltered := JOIN(liens_party_raw, liensV2.key_liens_main_ID_FCRA,
 					left.rmsid<>'' and left.tmsid<>'' and 
 					keyed(left.tmsid=right.tmsid) and keyed(left.rmsid=right.rmsid) and
 					(unsigned) left.date_first_seen = (unsigned) right.orig_filing_date and 
 					(unsigned) left.date_last_seen = (unsigned) right.release_date and //ensure we get the correct record for the defendant
 					right.filing_type_desc not in Risk_Indicators.iid_constants.setMechanicsLiens and
-					right.filing_type_desc not in Risk_Indicators.iid_constants.set_Invalid_Liens_50 and
-					if(FilterBCB, RIGHT.BCBFlag = TRUE, TRUE),					
+					right.filing_type_desc not in Risk_Indicators.iid_constants.set_Invalid_Liens_50
+					and (INTEGER)right.Amount >= MinimumAmount
+					and right.AgencyID not in NonExemptReportingSources
+					and if(FilterBCB, RIGHT.BCBFlag = TRUE, TRUE),					
 					get_liens_main_raw(LEFT,RIGHT), left outer, 
 					ATMOST(keyed(LEFT.tmsid=RIGHT.tmsid) and keyed(left.rmsid=right.rmsid), 
 					riskwise.max_atmost));
 	
-	liens_main_raw_thor_pre := JOIN(distribute(liens_party_raw(rmsid<>'' and tmsid<>''), hash64(tmsid, rmsid)), 
+	liens_main_raw_roxie := IF(FilterReleasedCases, liens_main_raw_roxie_unfiltered((INTEGER)ReleaseDate <= historydate),  liens_main_raw_roxie_unfiltered);
+
+	liens_main_raw_thor_pre_unfiltered := JOIN(distribute(liens_party_raw(rmsid<>'' and tmsid<>''), hash64(tmsid, rmsid)), 
 					distribute(pull(liensV2.key_liens_main_ID_FCRA(
 					filing_type_desc not in Risk_Indicators.iid_constants.setMechanicsLiens and 
 					filing_type_desc not in Risk_Indicators.iid_constants.set_Invalid_Liens_50)), hash64(tmsid, rmsid)),
@@ -357,12 +369,16 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 					(unsigned) left.date_first_seen = (unsigned) right.orig_filing_date and 
 					(unsigned) left.date_last_seen = (unsigned) right.release_date and //ensure we get the correct record for the defendant
 					right.filing_type_desc not in Risk_Indicators.iid_constants.setMechanicsLiens and
-					right.filing_type_desc not in Risk_Indicators.iid_constants.set_Invalid_Liens_50 and
-					if(FilterBCB, RIGHT.BCBFlag = TRUE, TRUE),					
+					right.filing_type_desc not in Risk_Indicators.iid_constants.set_Invalid_Liens_50
+					and (INTEGER)right.Amount >= MinimumAmount
+					and right.AgencyID not in NonExemptReportingSources
+					and if(FilterBCB, RIGHT.BCBFlag = TRUE, TRUE),					
 					get_liens_main_raw(LEFT,RIGHT), left outer, 
 					ATMOST((LEFT.tmsid=RIGHT.tmsid) and (left.rmsid=right.rmsid), 
 					riskwise.max_atmost), LOCAL);
 					
+	liens_main_raw_thor_pre := IF(FilterReleasedCases, liens_main_raw_thor_pre_unfiltered((INTEGER)ReleaseDate <= historydate),  liens_main_raw_thor_pre_unfiltered);
+
 	liens_main_raw_thor := group(sort(liens_main_raw_thor_pre + liens_party_raw(rmsid='' or tmsid=''), seq, local), seq, local);
 								
 	#IF(onThor)

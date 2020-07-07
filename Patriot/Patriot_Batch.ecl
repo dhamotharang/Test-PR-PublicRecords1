@@ -16,7 +16,7 @@
  </message>
 */
 
-import OFAC_XG5;
+import OFAC_XG5, STD, iesp, Patriot, ut;
 
 export Patriot_Batch := MACRO
 
@@ -41,6 +41,12 @@ boolean exclude_weakaka := FALSE: stored('ExcludeWeakAKA');
 boolean use_dob_Filter := FALSE :stored('UseDobFilter');
 integer2 dob_radius := -1 :stored('DobRadius');
 
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
 dob_radius_use := if(use_dob_Filter,dob_radius,-1);
 
 temp := record
@@ -55,18 +61,25 @@ IF( OFAC_version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, 
 
 in_format capitalize(in_format le) :=
 TRANSFORM
-	SELF.name_first := Stringlib.StringToUpperCase(le.name_first);
-	SELF.name_middle := Stringlib.StringToUpperCase(le.name_middle);
-	SELF.name_last := Stringlib.StringToUpperCase(le.name_last);
-	SELF.name_unparsed := Stringlib.StringToUpperCase(le.name_unparsed);
-	SELF.country := Stringlib.StringToUpperCase(le.country);
-	SELF.search_type := Stringlib.StringToUpperCase(search_type);
+
+cl := LENGTH(TRIM(le.country));
+	country_decoded := IF(cl=2 AND ut.Country_ISO2_To_Name(le.country)<>'',ut.Country_ISO2_To_Name(le.country),
+												IF(cl=3 AND ut.Country_ISO3_To_Name(le.country)<>'',ut.Country_ISO3_To_Name(le.country), le.country));
+
+	SELF.name_first := STD.Str.ToUpperCase(le.name_first);
+	SELF.name_middle := STD.Str.ToUpperCase(le.name_middle);
+	SELF.name_last := STD.Str.ToUpperCase(le.name_last);
+	SELF.name_unparsed := if( OFAC_version = 4 and le.name_first = '' and le.name_middle = '' and le.name_last = '' and le.name_unparsed = '' and le.country <> '', 
+														STD.Str.ToUpperCase(country_decoded), STD.Str.ToUpperCase(le.name_unparsed));
+	SELF.country := STD.Str.ToUpperCase(country_decoded);
+	SELF.search_type := STD.Str.ToUpperCase(search_type); 
 	SELF.dob := le.dob;	
 	SELF := le;
 END;
 
 
 output(Patriot.Search_Batch_Function(GROUP(PROJECT(f,capitalize(LEFT)),acctno), ofac_only_value,threshold_value,
-				ofac_version,include_ofac,include_additional_watchlists,dob_radius_use,watchlists_request,exclude_aka,exclude_weakaka),NAMED('Results'));
+				ofac_version,include_ofac,include_additional_watchlists,dob_radius_use,watchlists_request,exclude_aka,exclude_weakaka,
+				LexIdSourceOptout, TransactionID, BatchUID, GlobalCompanyID),NAMED('Results'));
 
 ENDMACRO;

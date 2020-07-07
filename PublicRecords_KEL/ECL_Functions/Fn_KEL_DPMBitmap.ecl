@@ -1,14 +1,20 @@
-﻿IMPORT $.^.^.BIPV2, $.^.^.MDR, $.^.^.PublicRecords_KEL, $.^.^.Risk_Indicators, $.^.^.RiskVIew, $.^.^.UT, STD;
+﻿IMPORT $.^.^.BIPV2, $.^.^.MDR, $.^.^.PublicRecords_KEL, $.^.^.Risk_Indicators, $.^.^.RiskVIew, $.^.^.dx_BestRecords, $.^.^.UT, STD;
 
 EXPORT Fn_KEL_DPMBitmap := MODULE
 
+	EXPORT Watchdog_NonEN := 'Watchdog NonEN';
+	EXPORT Watchdog_NonEQ := 'Watchdog NonEQ'; 
+
 	/* Sets the DPMBitmapValue for a record of data */
-	EXPORT SetValue(STRING Source = '', BOOLEAN FCRA_Restricted = FALSE, BOOLEAN GLBA_Restricted = FALSE, BOOLEAN Pre_GLB_Restricted = FALSE, BOOLEAN DPPA_Restricted = FALSE, STRING DPPA_State = '', BOOLEAN Generic_Restriction = FALSE, BOOLEAN Not_Restricted = FALSE, BOOLEAN Insurance_Product_Restricted = FALSE, PublicRecords_KEL.CFG_Compile KELPermissions = PublicRecords_KEL.CFG_Compile, UNSIGNED BIPBitMask = 0) := FUNCTION
+	// Marketing: Sources that are NOT marketing allowed have their marketing permission bit set to 1, so that in marketing mode, they are NOT allowed.
+	// Sources that ARE marketing allowed have marketing permission bit set to 0, since they do not need to be turned off when marketing mode is set.
+	// The watchdog person data permissions have a marketing bit that is ignored. After talking to the engineer in Boca who worked on those bits, we may change the code here.
+	EXPORT SetValue(STRING Source = '', BOOLEAN FCRA_Restricted = FALSE, BOOLEAN GLBA_Restricted = FALSE, BOOLEAN Pre_GLB_Restricted = FALSE, BOOLEAN DPPA_Restricted = FALSE, STRING DPPA_State = '', BOOLEAN Generic_Restriction = FALSE, BOOLEAN Is_Business_Header = FALSE, STRING Marketing_State = '', BOOLEAN Not_Restricted = FALSE, BOOLEAN Insurance_Product_Restricted = FALSE, UNSIGNED watchdogPermissionsColumn = 0, PublicRecords_KEL.CFG_Compile KELPermissions = PublicRecords_KEL.CFG_Compile, UNSIGNED BIPBitMask = 0) := FUNCTION
 		Permissions := 
 			IF(FCRA_Restricted, IF(NOT Not_Restricted, KELPermissions.Permit_FCRA, 0), IF(NOT Not_Restricted, KELPermissions.Permit_NonFCRA, 0)) | // IF FCRA_Restricted is TRUE this record/file is FCRA Restricted, if FALSE it is assumed to be a NonFCRA record/file.  Not_Restricted is utilized for files that allowed for usage in both FCRA and NonFCRA
 			IF(GLBA_Restricted, KELPermissions.Permit_GLBA, 0) | // This record/file is GLBA Restricted, you must have proper GLBA Permissions to use the data
 			IF(DPPA_Restricted, KELPermissions.Permit_DPPA, 0) | // This record/file is DPPA Restricted, you must have proper DPPA Permissions to use the data
-			IF(Source IN PublicRecords_KEL.ECL_Functions.Constants.ALLOWED_MARKETING_SOURCES OR (Source = '' AND BIPBitMask > 0), 0, KELPermissions.Permit_Marketing) | // This record/file is Marketing Approved, when running a Marketing Product you can use the data. Skip this check for BIP Best data (BIPBitMask > 0) since source codes are not populated, and marketing restriction has already been applied in BIPBitMask.
+			IF(Source IN PublicRecords_KEL.ECL_Functions.Constants.ALLOWED_MARKETING_SOURCES OR PublicRecords_KEL.ECL_Functions.Common_Functions.IsMarketingAllowedKey(Source, Marketing_State) OR (Source = '' AND BIPBitMask > 0), 0, KELPermissions.Permit_Marketing) | // This record/file is Marketing Approved, when running a Marketing Product you can use the data. Skip this check for BIP Best data (BIPBitMask > 0) since source codes are not populated, and marketing restriction has already been applied in BIPBitMask.
 			IF(Insurance_Product_Restricted, KELPermissions.Permit_InsuranceProduct, 0) | // This record/file is only permitted for use within an Insurance Product.  Business Services is NOT allowed to utilize these records
 			
 			/* ******** Data Restriction Mask controlled sources ******** */
@@ -88,7 +94,20 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 			
 			IF(Source IN [MDR.sourceTools.src_Mixed_DPPA, MDR.sourceTools.src_Mixed_Non_DPPA], KELPermissions.Permit_Restricted, 0) | // These sources are permanently restricted, there is no way to enable permissions for them in the Generate(...) function below, we just don't ever want to use this data
 			IF(Source = MDR.sourceTools.src_Mari_Prof_Lic AND Generic_Restriction, KELPermissions.Permit_Restricted, 0) | // MARI records where std_source_upd IN ['S0822','S0843','S0900','S0868'] are never allowed since we can't use New Mexico and Pennsylvania real estate
-			IF(Source = MDR.sourceTools.src_UCCV2 AND ~Generic_Restriction, KELPermissions.Permit_Marketing, 0) | //UCC Marking restricted 
+			IF(Source = MDR.sourceTools.src_UCCV2 AND ~Generic_Restriction, KELPermissions.Permit_Marketing, 0) | //UCC Marking restricted IF UCC and in List then allowed								
+			IF(Source = MDR.sourceTools.src_Marketing_Relatives_Data, KELPermissions.Permit_MarketingRelatives, 0) | //Relatives marketing 
+			IF(Source = MDR.sourceTools.src_Relatives_Data, KELPermissions.Permit_NonMarketingRelatives, 0) | //Relatives non marketing		
+			
+			IF(Source = Watchdog_NonEN, KELPermissions.Permit_Equifax, 0) |
+			IF(Source = Watchdog_NonEQ, KELPermissions.Permit_NonEquifax, 0) |
+			MAP(watchdogPermissionsColumn & dx_BestRecords.Functions.get_perm_type(glb_flag:=false, pre_glb_flag:=false, filter_exp_flag:=false) > 0 => KELPermissions.Permit_WatchdogNonRestricted, // This watchdog best record isn't restricted for usage
+			    watchdogPermissionsColumn & dx_BestRecords.Functions.get_perm_type(glb_flag:=true, pre_glb_flag:=false, filter_exp_flag:=false) > 0 => KELPermissions.Permit_GLBA, // This watchdog best record only requires GLBA Permissions to use
+			    watchdogPermissionsColumn & dx_BestRecords.Functions.get_perm_type(glb_flag:=true, pre_glb_flag:=false, filter_exp_flag:=true) > 0 => KELPermissions.Permit_GLBA | KELPermissions.Permit_WatchdogExperianRestricted, // This watchdog best record requires GLBA Permission and Experian must be restricted
+			    watchdogPermissionsColumn & dx_BestRecords.Functions.get_perm_type(glb_flag:=false, pre_glb_flag:=true, filter_exp_flag:=false) > 0 => KELPermissions.Permit_WatchdogPreGLBA, // This watchdog best record requires that we NOT be filtering PreGLB data
+			    watchdogPermissionsColumn > 0 => KELPermissions.Permit_Restricted, // Any other watchdog best records that didn't fit into the above conditions should be blocked from usage
+			                     0) | // Default to allowing the record - should only trigger when watchdogPermissionsColumn == 0, which would be true for any files that aren't the Watchdog Key
+
+			IF(PublicRecords_KEL.ECL_Functions.Common_Functions.SourceGroup(Source) NOT IN PublicRecords_KEL.ECL_Functions.Constants.Allowed_Business_Header_SRC AND Is_Business_Header, KELPermissions.Permit_Restricted, 0) |		//analytics only wants specific sources returned from BH
 			
 			KELPermissions.Permit_NoRestriction; // Every Record will be tagged as having NoRestriction - any records which have additional restrictions are handled above
 			/* TODO: KS-1968 - Define the set of ALLOWED_SOURCES.  At the time that ticket is worked on, replace the previous line of code with the following commented-out lines:
@@ -104,6 +123,9 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 			IF(Risk_Indicators.iid_constants.glb_ok(GLBA, isFCRA), KELPermissions.Permit_GLBA, 0) | // Check to see if we have appropriate GLBA permissions before allowing use of GLBA Restricted data in KEL
 			IF(Risk_Indicators.iid_constants.dppa_ok(DPPA, isFCRA), KELPermissions.Permit_DPPA, 0) | // Check to see if we have appropriate DPPA permissions before allowing use of DPPA Restricted data in KEL
 			IF(isMarketing, 0, KELPermissions.Permit_Marketing) | // Running a Marketing product, only allow Marketing approved sources in KEL
+			
+			IF(isMarketing,  KELPermissions.Permit_MarketingRelatives, KELPermissions.Permit_NonMarketingRelatives) | // if marketing use marketing relatives, else use 'normal' relatves
+			
 			IF(AllowDNBDMI, KELPermissions.Permit_DNBDMI, 0) | // If AllowDNBDMI is TRUE allow use of DNBDMI data in KEL
 			IF(IsInsuranceProduct, KELPermissions.Permit_InsuranceProduct, 0) | // If IsInsuranceProduct is TRUE allow use of Insurance only data in KEL
 			IF(PermissiblePurpose = RiskView.Constants.directToConsumer, 0 , KELPermissions.Permit_DirectToConsumer) | // If running with a Direct To Consumer Permissible Purpose, certain Direct to Consumer sources are not allowed
@@ -115,7 +137,7 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 			IF(DataRestrictionMask[Risk_Indicators.iid_constants.posFidelityRestriction] != '1', KELPermissions.Permit_Fidelity, 0) | // If Fidelity is NOT restricted in the DataRestrictionMask, allow its usage in KEL
 			IF(DataRestrictionMask[Risk_Indicators.iid_constants.posExperianRestriction] != '1', KELPermissions.Permit_Experian, 0) | // If Experian Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL
 			IF(DataRestrictionMask[Risk_Indicators.iid_constants.posCertegyRestriction] != '1', KELPermissions.Permit_Certegy, 0) | // If Certegy Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL
-			IF(DataRestrictionMask[Risk_Indicators.iid_constants.posEquifaxRestriction] != '1', KELPermissions.Permit_Equifax, 0) | // If Equifax Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL
+			IF(DataRestrictionMask[Risk_Indicators.iid_constants.posEquifaxRestriction] != '1', KELPermissions.Permit_Equifax, KELPermissions.Permit_NonEquifax) | // If Equifax Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL
 			IF(DataRestrictionMask[Risk_Indicators.iid_constants.posTransUnionRestriction] != '1', KELPermissions.Permit_TransUnion, 0) | // If TransUnion Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL
 			IF(DataRestrictionMask[Risk_Indicators.iid_constants.posADVORestriction] != '1', KELPermissions.Permit_Advo, 0) | // If ADVO Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL
 			IF(DataRestrictionMask[Risk_Indicators.iid_constants.posExperianFCRARestriction] != '1', KELPermissions.Permit_ExperianFCRA, 0) | // If ExperianFCRA Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL
@@ -142,7 +164,11 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 				5 => PublicRecords_KEL.ECL_Functions.DPPA_Permits.CheckDPPAPermits(RestrictDPPA5, isFCRA),
 				6 => PublicRecords_KEL.ECL_Functions.DPPA_Permits.CheckDPPAPermits(RestrictDPPA6, isFCRA),
 				7 => PublicRecords_KEL.ECL_Functions.DPPA_Permits.CheckDPPAPermits(RestrictDPPA7, isFCRA),
-						 0) | 
+						 0) |			 
+			MAP(DataRestrictionMask[Risk_Indicators.iid_constants.posExperianRestriction] = '1' => KELPermissions.Permit_WatchdogExperianRestricted, // Allow Watchdog Best experian restricted records (Note: this is the inverse of the check for Permit_Experian)
+					DataRestrictionMask[Risk_Indicators.iid_constants.posRestrictPreGLB] != '1' OR Risk_Indicators.iid_constants.glb_ok(GLBA, isFCRA) => KELPermissions.Permit_WatchdogPreGLBA, // Allow Watchdog Best PreGLBA restricted records if the Data Restriction Mask isn't restricting, or if GLBA data is allowed
+			    Risk_Indicators.iid_constants.glb_ok(GLBA, isFCRA) => KELPermissions.Permit_GLBA, // Allow Watchdog Best GLBA restricted records
+			    KELPermissions.Permit_WatchdogNonRestricted) | // Default to the version of Watchdog Best which isn't restricted
 
 			// Every Transaction should have the NoRestriction permission - this will allow viewing of data that has no restrictions at all
 			KELPermissions.Permit_NoRestriction;
@@ -256,12 +282,12 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 			{'Permit_DirectToConsumer', (BOOLEAN)(convertedString[56] = '1')},
 			{'Permit_Utility', (BOOLEAN)(convertedString[57] = '1')},
 			{'Permit_Fidelity', (BOOLEAN)(convertedString[58] = '1')},
-			{'Permit_Unassigned6', (BOOLEAN)(convertedString[59] = '1')},
-			{'Permit_Unassigned5', (BOOLEAN)(convertedString[60] = '1')},
-			{'Permit_Unassigned4', (BOOLEAN)(convertedString[61] = '1')},
-			{'Permit_Unassigned3', (BOOLEAN)(convertedString[62] = '1')},
-			{'Permit_Unassigned2', (BOOLEAN)(convertedString[63] = '1')},
-			{'Permit_Unassigned1', (BOOLEAN)(convertedString[64] = '1')}
+			{'Permit_NonEquifax', (BOOLEAN)(convertedString[59] = '1')},
+			{'Permit_WatchdogExperianRestricted', (BOOLEAN)(convertedString[60] = '1')},
+			{'Permit_WatchdogNonRestricted', (BOOLEAN)(convertedString[61] = '1')},
+			{'Permit_WatchdogPreGLBA', (BOOLEAN)(convertedString[62] = '1')},
+			{'Permit_MarketingRelatives', (BOOLEAN)(convertedString[63] = '1')},
+			{'Permit_NonMarketingRelatives', (BOOLEAN)(convertedString[64] = '1')}
 			], {STRING40 Permits_Name, BOOLEAN Permits_Set}) (Permits_Name[1..17] != 'Permit_Unassigned');
 	
 		RETURN result;

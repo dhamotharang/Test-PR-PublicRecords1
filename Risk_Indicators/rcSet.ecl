@@ -349,7 +349,7 @@ export isCodeFM( string1 DoNotMail ) := DoNotMail='1';
 export isCodeFV( string1 advo_address_vacancy ) := advo_address_vacancy='Y';
 
 export isCodeRS(STRING inSSN, STRING socsvalflag, STRING socslowissuedate, STRING socsRCISflag) := checkRS(inSSN, socsvalflag, socslowissuedate) AND socsRCISflag <> '1';
-export isCodeIS(STRING inSSN, STRING socsvalflag, STRING socslowissuedate, STRING socsRCISflag) := checkRS(inSSN, socsvalflag, socslowissuedate) AND ~isCode85(inSSN, socsRCISflag) AND socsRCISflag = '1';
+export isCodeIS(STRING inSSN, STRING socsvalflag, STRING socslowissuedate, STRING socsRCISflag) := checkRS(inSSN, socsvalflag, socslowissuedate) AND ~isCode85(inSSN, socslowissuedate) AND socsRCISflag = '1';
 export isCodeBO(string ver_sources) :=  function
 	identity_sources := models.common.zip2(ver_sources, ver_sources);  // put the sources into a dataset
 	credit_bureau_sourced := count(identity_sources(str1 in Risk_Indicators.iid_constants.bureau_sources)) > 0;

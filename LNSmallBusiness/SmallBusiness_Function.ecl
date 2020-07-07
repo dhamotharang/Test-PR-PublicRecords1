@@ -1,13 +1,17 @@
-﻿import Models, Risk_Indicators, Business_Risk, RiskWise, Risk_Reporting, address, ut, iesp, Gateway;
+﻿import Models, Risk_Indicators, Business_Risk, RiskWise, Risk_Reporting, address, ut, iesp, Gateway, STD;
 
 
 EXPORT SmallBusiness_Function(
-	dataset(Layouts.RequestEx) indata,
-	dataset(Gateway.Layouts.Config) gateways,
-	boolean  Testseeds            = false,
-	string20 Test_Data_Table_Name = '',
-	string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
-	string50 DataPermission=risk_indicators.iid_constants.default_DataPermission
+    dataset(Layouts.RequestEx) indata,
+    dataset(Gateway.Layouts.Config) gateways,
+    boolean  Testseeds            = false,
+    string20 Test_Data_Table_Name = '',
+    string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
+    string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
+    unsigned1 LexIdSourceOptout = 1,
+    string TransactionID = '',
+    string BatchUID = '',
+    unsigned6 GlobalCompanyId = 0
 ) := FUNCTION
 
 	//Experian Sources ER and Q3 cannot be used for services that deal with commercial credit origination
@@ -20,7 +24,7 @@ EXPORT SmallBusiness_Function(
 
 	model_name := case( in_model_name,
 		'' => 'rvs811_0', // blank model name gets rewritten to the default model
-		Stringlib.StringtoLowerCase(in_model_name)
+		STD.Str.toLowerCase(in_model_name)
 	);
 
 	DPPA_Purpose := (integer)indata[1].user.dlpurpose;
@@ -96,8 +100,8 @@ EXPORT SmallBusiness_Function(
 		self.addr_type        := clean_addr[139];
 		self.geo_blk          := clean_addr[171..177];
 		self.addr_status      := clean_addr[179..182];
-		// self.orig_city        := stringlib.stringtouppercase(le.city);
-		// self.orig_st          := stringlib.stringtouppercase(le.state);
+		// self.orig_city        := STD.Str.touppercase(le.city);
+		// self.orig_st          := STD.Str.touppercase(le.state);
 		// self.orig_z5          := le.zip[1..5];
 
 		self.ssn              := RiskWise.CleanSSN( le.searchby.owneragent.ssn );
@@ -106,8 +110,8 @@ EXPORT SmallBusiness_Function(
 		                         + intformat( (integer)le.searchby.owneragent.dob.day, 2, 1 );
 		// self.age              := if((integer)dob_val != 0, (STRING3)(ut.GetAgeI((integer)dob_val)), '');
 		// self.age              := le.searchby.owneragent.age;                
-		self.dl_number        := stringlib.stringtouppercase(le.searchby.owneragent.driverlicensenumber);
-		self.dl_state         := stringlib.stringtouppercase(le.searchby.owneragent.driverlicensestate);
+		self.dl_number        := STD.Str.touppercase(le.searchby.owneragent.driverlicensenumber);
+		self.dl_state         := STD.Str.touppercase(le.searchby.owneragent.driverlicensestate);
 		// self.email_address    := ;        
 
 
@@ -127,9 +131,17 @@ EXPORT SmallBusiness_Function(
 	vehicles  := false;
 	dl        := false;
 
-	iid := risk_indicators.InstantID_Function(iid_prep, gateways, DPPA_Purpose, GLB_Purpose, in_ln_branded:=false, in_bsVersion:=BSversion, in_DataRestriction := DataRestriction, in_DataPermission := DataPermission  );
+	iid := risk_indicators.InstantID_Function(iid_prep, gateways, DPPA_Purpose, GLB_Purpose, in_ln_branded:=false, in_bsVersion:=BSversion, in_DataRestriction := DataRestriction, in_DataPermission := DataPermission,
+                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                        TransactionID := TransactionID, 
+                                                                        BatchUID := BatchUID, 
+                                                                        GlobalCompanyID := GlobalCompanyID);
 	clam := ungroup(risk_indicators.Boca_Shell_Function(iid, gateways, DPPA_Purpose, GLB_Purpose, 
-									includeRelativeInfo := true, includeDLInfo := dl, includeVehInfo := vehicles, includeDerogInfo := derogs, BSversion:=BSversion, DataRestriction:=DataRestriction, DataPermission := DataPermission));
+								includeRelativeInfo := true, includeDLInfo := dl, includeVehInfo := vehicles, includeDerogInfo := derogs, BSversion:=BSversion, DataRestriction:=DataRestriction, DataPermission := DataPermission,
+                                LexIdSourceOptout := LexIdSourceOptout, 
+                                TransactionID := TransactionID, 
+                                BatchUID := BatchUID, 
+                                GlobalCompanyID := GlobalCompanyID));
 
 	business_risk.Layout_Input build_biid_prep(indata le) := transform
 		fullBusAddr := risk_indicators.MOD_AddressClean.street_address(
@@ -171,8 +183,8 @@ EXPORT SmallBusiness_Function(
 		self.Account          := le.user.AccountNumber;;
 		// self.bdid             := (integer)BDID_value;
 		self.score            := 0;
-		self.company_name     := stringlib.stringtouppercase(le.searchby.business.name);
-		self.alt_company_name := stringlib.stringtouppercase(le.searchby.business.alternatename);
+		self.company_name     := STD.Str.touppercase(le.searchby.business.name);
+		self.alt_company_name := STD.Str.touppercase(le.searchby.business.alternatename);
 		self.prim_range       := clean_bus_addr[1..10];
 		self.predir           := clean_bus_addr[11..12];
 		self.prim_name        := clean_bus_addr[13..40];
@@ -197,7 +209,7 @@ EXPORT SmallBusiness_Function(
 		// self.ip_addr          := bus_ip;
 		
 		
-		cleanName := address.CleanPerson73( stringlib.stringtouppercase(le.searchby.owneragent.name.full) );
+		cleanName := address.CleanPerson73( STD.Str.touppercase(le.searchby.owneragent.name.full) );
 		title := trim(cleanName[1..5]);
 		fname := trim(cleanName[6..25]);
 		mname := trim(cleanName[26..45]);
@@ -207,11 +219,11 @@ EXPORT SmallBusiness_Function(
 		string pickName( string cleaned, string input ) := if( input='', cleaned, input );
 		
 		
-		self.rep_fname        := pickName( fname, stringlib.stringtouppercase(le.searchby.owneragent.name.first));
-		self.rep_mname        := pickName( mname, stringlib.stringtouppercase(le.searchby.owneragent.name.middle));
-		self.rep_lname        := pickName( lname, stringlib.stringtouppercase(le.searchby.owneragent.name.last));
-		self.rep_name_suffix  := pickName( suffix, stringlib.stringtouppercase(le.searchby.owneragent.name.suffix));
-		// self.rep_alt_Lname    := stringlib.stringtouppercase(rep_alt_lname);
+		self.rep_fname        := pickName( fname, STD.Str.touppercase(le.searchby.owneragent.name.first));
+		self.rep_mname        := pickName( mname, STD.Str.touppercase(le.searchby.owneragent.name.middle));
+		self.rep_lname        := pickName( lname, STD.Str.touppercase(le.searchby.owneragent.name.last));
+		self.rep_name_suffix  := pickName( suffix, STD.Str.touppercase(le.searchby.owneragent.name.suffix));
+		// self.rep_alt_Lname    := STD.Str.touppercase(rep_alt_lname);
 		self.rep_prim_range   := clean_rep_addr[1..10];
 		self.rep_predir       := clean_rep_addr[11..12];
 		self.rep_prim_name    := clean_rep_addr[13..40];
@@ -222,8 +234,8 @@ EXPORT SmallBusiness_Function(
 		self.rep_p_city_name  := clean_rep_addr[65..89];
 		self.rep_st           := clean_rep_addr[115..116];
 		self.rep_z5           := clean_rep_addr[117..121];
-		self.rep_orig_city    := stringlib.stringtouppercase(le.searchby.owneragent.address.city);
-		self.rep_orig_st      := stringlib.stringtouppercase(le.searchby.owneragent.address.state);
+		self.rep_orig_city    := STD.Str.touppercase(le.searchby.owneragent.address.city);
+		self.rep_orig_st      := STD.Str.touppercase(le.searchby.owneragent.address.state);
 		self.rep_orig_z5      := le.searchby.owneragent.address.zip5;
 		self.rep_zip4         := clean_rep_addr[122..125];
 		self.rep_lat          := clean_rep_addr[146..155];
@@ -237,14 +249,25 @@ EXPORT SmallBusiness_Function(
 		self.rep_phone        := RiskWise.cleanphone( le.searchby.owneragent.phone10 );
 		// self.rep_age          := (string)rep_age; // need to calculate this?
 		self.rep_dl_num       := le.searchby.owneragent.driverlicensenumber;
-		self.rep_dl_state     := stringlib.stringtouppercase(le.searchby.owneragent.driverlicensestate);
-		// self.rep_email        := stringlib.stringtouppercase(rep_email);
+		self.rep_dl_state     := STD.Str.touppercase(le.searchby.owneragent.driverlicensestate);
+		// self.rep_email        := STD.Str.touppercase(rep_email);
 		self.historydate := le.historydate;
 	end;
 	biid_prep := project(indata, build_biid_prep(LEFT));
 	biid := business_risk.InstantID_Function(biid_prep, gateways, false /*hasbdids*/, dppa_purpose, glb_purpose,
-																					 DataPermission:=DataPermission, RestrictExperianData:=RESTRICT_EXPERIAN);
-	bshell := Business_Risk.Business_Shell_Function( biid, GLB_Purpose );
+                                                                          DataPermission:=DataPermission, 
+                                                                          RestrictExperianData:=RESTRICT_EXPERIAN,
+                                                                          LexIdSourceOptout := LexIdSourceOptout, 
+                                                                          TransactionID := TransactionID, 
+                                                                          BatchUID := BatchUID, 
+                                                                          GlobalCompanyID := GlobalCompanyID);
+                                                                          
+	bshell := Business_Risk.Business_Shell_Function(biid, GLB_Purpose,
+                                                                                           LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                           TransactionID := TransactionID, 
+                                                                                           BatchUID := BatchUID, 
+                                                                                           GlobalCompanyID := GlobalCompanyID,
+                                                                                           DataPermission := DataPermission);
 
 	model := case( model_name,
 		'rvs811_0' => Models.RVS811_0_0( clam, bshell ),

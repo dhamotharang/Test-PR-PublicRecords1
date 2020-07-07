@@ -8,7 +8,7 @@
  </message>
 */
 
-IMPORT Address, AutoStandardI, iesp, Risk_indicators, Riskwise, ut, STD, Inquiry_AccLogs, Risk_Reporting;
+IMPORT Address, AutoStandardI,VerificationOfOccupancy, iesp, Risk_indicators,AutoheaderV2,Doxie, ut, STD, Inquiry_AccLogs, Risk_Reporting;
 
 EXPORT PAR_Search_Service() := MACRO
  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -45,6 +45,10 @@ EXPORT PAR_Search_Service() := MACRO
 /* ************* End Scout Fields **************/
 	
 	string6  outOfBandHistoryDate := '' : STORED('HistoryDateYYYYMM');
+      unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+	string TransactionID := '' : STORED('_TransactionId');
+	string BatchUID := '' : STORED('_BatchUID');
+	unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 	string8  OOBHistoryDate := if(outOfBandHistoryDate <> '', outOfBandHistoryDate + '01', '');
 	
 	asOf 				:= search.AsOf.year
@@ -68,7 +72,7 @@ EXPORT PAR_Search_Service() := MACRO
 
 	TestDataEnabled 			:= userIn.TestDataEnabled;
 	TestDataTableName 		:= Trim(userIn.TestDataTableName);
-	attributesVersion 		:= StringLib.StringToUpperCase(optionsIn.AttributesVersionRequest);
+	attributesVersion 		:= STD.Str.ToUpperCase(optionsIn.AttributesVersionRequest);
 	IncludeModel 					:= optionsIn.IncludeModel;
 	IncludeReport 				:= optionsIn.IncludeReport;
 	
@@ -147,8 +151,8 @@ EXPORT PAR_Search_Service() := MACRO
 
 	Risk_Indicators.Layout_Input intoLayoutInput(ut.ds_oneRecord le, INTEGER c) := TRANSFORM
 		SELF.seq 				:= c;
-		SELF.fname 			:= trim(stringlib.stringtouppercase(fname));
-		SELF.lname 			:= trim(stringlib.stringtouppercase(lname));
+		SELF.fname 			:= trim(STD.Str.touppercase(fname));
+		SELF.lname 			:= trim(STD.Str.touppercase(lname));
 		SELF.ssn 				:= trim(search.SSN);
 		SELF.in_zipCode := trim(search.address.zip5);
 		SELF.phone10 		:= trim(search.Phone);
@@ -159,7 +163,10 @@ EXPORT PAR_Search_Service() := MACRO
 
 	searchResults := IF(TestDataEnabled, 
 		PROJECT(VerificationOfOccupancy.TestSeed_Function(packagedTestseedInput, TestDataTableName,IncludeModel,IncludeReport), TRANSFORM(VerificationOfOccupancy.Layouts.Layout_PARBatchOutReport, SELF := LEFT; SELF := [])),	// TestSeed Values
-		VerificationOfOccupancy.Search_Function(PAR_Input, DataRestriction, glba, dppa, isUtility, AttributesVersion, IncludeModel, DataPermission, IncludeReport, PAR_request := true).PARReport // Realtime Values
+		VerificationOfOccupancy.Search_Function(PAR_Input, DataRestriction, glba, dppa, isUtility, AttributesVersion, IncludeModel, DataPermission, IncludeReport, PAR_request := true,LexIdSourceOptout := LexIdSourceOptout, 
+	TransactionID := TransactionID, 
+	BatchUID := BatchUID, 
+	GlobalCompanyID := GlobalCompanyID ).PARReport // Realtime Values
 	);
 
 	iesp.share.t_NameValuePair createrec(searchResults le, integer C) := TRANSFORM

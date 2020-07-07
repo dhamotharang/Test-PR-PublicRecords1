@@ -1050,12 +1050,12 @@ Layout_FD_Scores := RECORD
 	string3 reason6FP_V3_fdn;	
 	
   string3 digital_insight_score;
-	string3 digital_insight_reason1;
-	string3 digital_insight_reason2;
-  string3 digital_insight_reason3;
-  string3 digital_insight_reason4;
-  string3 digital_insight_reason5;
-  string3 digital_insight_reason6;
+	string4 digital_insight_reason1;
+	string4 digital_insight_reason2;
+  string4 digital_insight_reason3;
+  string4 digital_insight_reason4;
+  string4 digital_insight_reason5;
+  string4 digital_insight_reason6;
 END;
 
 Layout_Liens_Info := RECORD

@@ -14,7 +14,7 @@ export Layout_RelativeRawOutput := record
 	unsigned2 number_cohabits;
 	integer2  rel_prim_range;
 	unsigned1 TitleNo := 0;
-	Relationship.layout_GetRelationship.InterfaceOuput -title;
+	Relationship.layout_GetRelationship.InterfaceOutput_new -title;
 end;
 
 

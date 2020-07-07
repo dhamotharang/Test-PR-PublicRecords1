@@ -261,7 +261,7 @@ EXPORT SourceSection_OtherDirs := MODULE
 	      SELF.category_doccount := TopBusiness_Services.InfoUSA_DeadcoSource_Records(
 			     // create dataset with 1 rec in the layout input to all ***Source_Records
            DATASET([l],TopBusiness_Services.Layouts.rec_input_ids_wSrc),
-					 rs_options,false).SourceView_RecCount;
+					 rs_options, mod_access, false).SourceView_RecCount;
 				SELF.Section           := ''; //section name N/A
 				SELF.Source            := MDR.sourceTools.src_INFOUSA_DEAD_COMPANIES;
 				SELF                   := l; // to assign all linkids

@@ -1,8 +1,8 @@
-/*2017-02-08T20:33:27Z (Andrea Koenen)
+﻿/*2017-02-08T20:33:27Z (Andrea Koenen)
 RR-10931: checking in since QA testing-  for FCRA to use score >= 80
 */
 
-import didville, risk_indicators, doxie, suppress, gateway, riskwise, autokey, header_quick, dx_header;
+import didville, risk_indicators, doxie, gateway, riskwise, autokey, header_quick, dx_header, Suppress, data_services;
 
 // this function will take the input data, append the DID and do all default values in layout output
 export iid_getDID_prepOutput(DATASET(risk_indicators.layout_input) indata, unsigned1 dppa, unsigned1 glb, 
@@ -10,9 +10,10 @@ export iid_getDID_prepOutput(DATASET(risk_indicators.layout_input) indata, unsig
 							unsigned1 BSversion, string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 							unsigned1 append_best=0/*0-don't append best, 1-save best ssn, 2-append best ssn to input if missing*/,
 							dataset(Gateway.Layouts.Config) gateways,
-							unsigned8 BSOptions=0	// this is initially being passed for the cap one riskview batch service so we dont call neutral roxie
-							) := function
+							unsigned8 BSOptions=0,	// this is initially being passed for the cap one riskview batch service so we dont call neutral roxie
+							doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
 	
+	data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
 	// used for Capital One's custom RiskView batch service so it doesn't call the neutral roxie.  DID is passed in as input
 	// FCRAConsumerAtributes_service uses the same capone mechanism to skip the neutral roxie / using the passed in did
 	CapOneBatch := isFCRA and ( ((BSOptions & iid_constants.BSOptions.IsCapOneBatch) > 0) or ((BSOptions & iid_constants.BSOptions.DIDRIDSearchOnly) > 0) );
@@ -67,12 +68,20 @@ export iid_getDID_prepOutput(DATASET(risk_indicators.layout_input) indata, unsig
 		risk_indicators.layout_input;
 	end;
  
-	with_public_records_flag := join(indata, risk_indicators.Key_ADL_Risk_Table_v4, 
+	with_public_records_flag_unsuppressed := join(indata, risk_indicators.Key_ADL_Risk_Table_v4, 
 		left.did<>0 and keyed(left.did=right.did),
-		transform(didResolveRec, 
+		transform({didResolveRec, unsigned4 global_sid}, 
+			self.global_sid := right.global_sid;
 			self.public_records_hit := right.did<>0;
 			self.new_did_from_rid := 0; // to be set later if public_records didn't get a hit
 			self := left), atmost(riskwise.max_atmost), keep(1), left outer);
+			
+	with_public_records_flag_flagged := Suppress.MAC_FlagSuppressedSource(with_public_records_flag_unsuppressed, mod_access, data_env := data_environment);
+
+	with_public_records_flag := PROJECT(with_public_records_flag_flagged, TRANSFORM(didResolveRec, 
+		self.public_records_hit := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.public_records_hit);
+		SELF := LEFT;
+	)); 
 
 	with_new_did := join(with_public_records_flag, dx_header.key_did_rid(),
 		left.did<>0 and ~left.public_records_hit and
@@ -337,7 +346,7 @@ export iid_getDID_prepOutput(DATASET(risk_indicators.layout_input) indata, unsig
 	// search2_by_did := true;
 	Suppress.MAC_Suppress(got_DIDbySSN_t1_pulled,got_DIDbySSN_t2,appType,Suppress.Constants.LinkTypes.DID,did);
 
-	layout_output CheckDIDorSSN(layout_output le, layout_output ri) := TRANSFORM
+	Risk_Indicators.layout_output CheckDIDorSSN(Risk_Indicators.layout_output le, Risk_Indicators.layout_output ri) := TRANSFORM
 		SELF.did := ri.did;
 		SELF.pullidflag := if(ri.did = 0 and le.did != 0, '1', '');
 		SELF := le;
@@ -357,11 +366,22 @@ export iid_getDID_prepOutput(DATASET(risk_indicators.layout_input) indata, unsig
 		(UseInputDidORRid = false and RetainInputDID=false and CapOneBatch = false), 
 		Group(Sort(FCRAData + FCRAMin, seq, did), seq, did), got_DIDbySSN);
 
+
+with_optout_flag := join(got_DIDbySSN2, suppress.key_OptOutSrc(data_environment), 
+													KEYED(LEFT.did = RIGHT.lexid),
+														transform(Risk_Indicators.layout_output,
+														self.skip_opt_out := RIGHT.lexid=0; // if the LexID isn't found at all, then we know we don't have to check on each record on every source in scope for CCPA
+														self := left;
+														self := [];
+													),	
+													LEFT OUTER, atmost(riskwise.max_atmost), keep(1));
+													
 	// output(resuTemp, named('resuTemp'));
 	// output(all_dids, named('all_dids'));
 	// output(BSversion, named('BSversion'));
 	// output(FCRAMin, named('FCRAMin'));
 	// output(FCRAData, named('FCRAData'));	
 	// output(got_DIDbySSN, named('got_DIDbySSN'));
-	return got_DIDbySSN2;
+	// return got_DIDbySSN2;
+	return with_optout_flag;
 end;

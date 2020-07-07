@@ -11,16 +11,16 @@
   <part name="GLBData" type="xsd:boolean"/>
   <part name="PatriotProcess" type="xsd:boolean"/>
   <part name="DataRestrictionMask" type="xsd:string"/>
-	<part name="GLBPurpose" type="xsd:byte"/> 
+	<part name="GLBPurpose" type="xsd:byte"/>
 	<part name="IncludeMinors" type="xsd:boolean"/>
 	<part name="ApplicationType" type="xsd:string"/>
-	<part name="xADLVersion" type="xsd:integer"/>	
+	<part name="xADLVersion" type="xsd:integer"/>
   <part name="usePreLab" type="xsd:boolean"/>
 </message>
 */
 /*--INFO-- This service returns dids based upon a set of personal data.*/
 
-import AutoStandardI, ut;
+import DidVille;
 
 // moving this code from DidVille.DID_Batch_Service due to layout change limitation (service is called through roxie pipe)
 export DID_Batch_Service_v2 := macro

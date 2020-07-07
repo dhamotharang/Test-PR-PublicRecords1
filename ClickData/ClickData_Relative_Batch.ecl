@@ -6,7 +6,7 @@
 */
 /*--INFO-- Take DIDs and record IDs, get relatives' DID*/
 
-import doxie, Relationship, Clickdata;
+import Relationship, Clickdata;
 
 export ClickData_Relative_Batch := macro
 
@@ -17,13 +17,13 @@ full_rec := record
 	string14 rid;
 	unsigned2	number_cohabits;
 	integer3	recent_cohabit;
-	Relationship.layout_GetRelationship.InterfaceOuput;
+	Relationship.layout_GetRelationship.interfaceOutputNeutral;
 end;
 
 rdid_ds := project(in_f,transform(Relationship.Layout_GetRelationship.DIDs_layout,self.did:=(integer)left.did,self := []));
-rel_recs := Relationship.proc_GetRelationship(rdid_ds,TRUE,TRUE,FALSE,FALSE,ut.limits.RELATIVES_PER_PERSON,,TRUE).result;
+rel_recs := Relationship.proc_GetRelationshipNeutral(rdid_ds,TRUE,TRUE,FALSE,FALSE,ut.limits.RELATIVES_PER_PERSON,,TRUE).result;
 
-full_rec get_rel(in_f l, Relationship.layout_GetRelationship.InterfaceOuput r) := transform
+full_rec get_rel(in_f l, Relationship.layout_GetRelationship.interfaceOutputNeutral r) := transform
 	self.recent_cohabit := r.rel_dt_last_seen / 100;
 	self.number_cohabits := MAX(r.total_score / 5,6);  // Conversion rule to match v2 key value
 	self := r;

@@ -43,5 +43,7 @@ export Layout_InstID_SoapCall := RECORD
 	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
 	boolean ADL_Based_Shell := false;
 	boolean PreScreen := false;
-	unsigned3 LastSeenThreshold := 0; 
+	unsigned3 LastSeenThreshold := 0;
+	boolean UseIngestDate := false;
+  boolean TurnOffTumblings := false;
 END;

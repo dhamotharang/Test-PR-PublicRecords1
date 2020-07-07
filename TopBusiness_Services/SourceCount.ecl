@@ -11,6 +11,7 @@ EXPORT SourceCount(
       EXPORT application_type := in_options.app_type;
       EXPORT ssn_mask := in_options.ssn_mask;
       EXPORT DataRestrictionMask := in_mod.DataRestrictionMask;
+      EXPORT DataPermissionMask := '' : STORED('DataPermissionMask');
       EXPORT dppa := in_mod.DPPAPurpose;
       EXPORT glb := in_mod.GLBPurpose;
       EXPORT show_minors := in_mod.IncludeMinors;
@@ -35,7 +36,7 @@ EXPORT SourceCount(
 		aircraft_recs := $.AircraftSource_Records(sourcelinkids,sourceOptions,false).SourceDetailInfo(in_options.IncludeAircrafts);
 		ebr_recs := $.EBRSource_Records(sourcelinkids,sourceOptions,false).SourceDetailInfo(in_options.IncludeExperianBusinessReports);
 		irs5500_recs := $.IRS5500Source_Records(sourcelinkids,sourceOptions,false).SourceDetailInfo(in_options.IncludeIRS5500);
-		dnb_recs := $.DNBDmiSource_Records(sourcelinkids,sourceOptions,false).SourceDetailInfo(in_options.IncludeDunBradStreet);
+		dnb_recs := $.DNBDmiSource_Records(sourcelinkids,sourceOptions, mod_access, false).SourceDetailInfo(in_options.IncludeDunBradStreet);
 		msworks_recs := $.MSWorkSource_Records(sourcelinkids,sourceOptions,false).SourceDetailInfo(in_options.IncludeWorkersComp);
 		orworks_recs := $.ORWorkSource_Records(sourcelinkids,sourceOptions,false).SourceDetailInfo(in_options.IncludeWorkersComp);
 		bbb_recs := $.BBBSource_Records(sourcelinkids,sourceOptions,false).SourceDetailInfo(in_options.IncludeBetterBusinessBureau);

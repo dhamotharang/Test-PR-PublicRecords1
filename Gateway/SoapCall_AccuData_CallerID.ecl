@@ -25,6 +25,8 @@ iesp.accudata_accuname.t_AccudataCnamRequest populateRequest(Phones.Layouts.Phon
 END;
 // OUTPUT(populateRequest(inPhones[1]));
 iesp.accudata_accuname.t_AccudataCnamResponseEx tErrX(Phones.Layouts.PhoneAcctno l) := TRANSFORM
+	//RQ-16410: Continue passing on phone to filter down to in house data during gateway failures
+	SELF.response.AccuDataReport.Phone := l.phone;
 	SELF.response._header.Status := FAILCODE;
 	SELF.response._header.Message := FAILMESSAGE;
 	SELF := [];

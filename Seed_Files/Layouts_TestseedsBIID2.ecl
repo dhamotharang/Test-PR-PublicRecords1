@@ -73,8 +73,8 @@ EXPORT ConsumerIIDrep1Layout	:= RECORD
 		STRING2 rep1_phone_st;
 		STRING5 rep1_phone_zip;
 		STRING10 rep1_name_addr_phone;
-		STRING6 rep1_ssa_date_first;
-		STRING6 rep1_ssa_date_last;
+		STRING8 rep1_ssa_date_first;
+		STRING8 rep1_ssa_date_last;
 		STRING2 rep1_ssa_state;
 		STRING20 rep1_ssa_state_name;
 		STRING20 rep1_current_fname;
@@ -323,8 +323,8 @@ EXPORT ConsumerIIDrep1Layout	:= RECORD
 		STRING2 rep2_phone_st;
 		STRING5 rep2_phone_zip;
 		STRING10 rep2_name_addr_phone;
-		STRING6 rep2_ssa_date_first;
-		STRING6 rep2_ssa_date_last;
+		STRING8 rep2_ssa_date_first;
+		STRING8 rep2_ssa_date_last;
 		STRING2 rep2_ssa_state;
 		STRING20 rep2_ssa_state_name;
 		STRING20 rep2_current_fname;
@@ -574,8 +574,8 @@ EXPORT ConsumerIIDrep1Layout	:= RECORD
 		STRING2 rep3_phone_st;
 		STRING5 rep3_phone_zip;
 		STRING10 rep3_name_addr_phone;
-		STRING6 rep3_ssa_date_first;
-		STRING6 rep3_ssa_date_last;
+		STRING8 rep3_ssa_date_first;
+		STRING8 rep3_ssa_date_last;
 		STRING2 rep3_ssa_state;
 		STRING20 rep3_ssa_state_name;
 		STRING20 rep3_current_fname;
@@ -824,8 +824,8 @@ EXPORT ConsumerIIDrep1Layout	:= RECORD
 		STRING2 rep4_phone_st;
 		STRING5 rep4_phone_zip;
 		STRING10 rep4_name_addr_phone;
-		STRING6 rep4_ssa_date_first;
-		STRING6 rep4_ssa_date_last;
+		STRING8 rep4_ssa_date_first;
+		STRING8 rep4_ssa_date_last;
 		STRING2 rep4_ssa_state;
 		STRING20 rep4_ssa_state_name;
 		STRING20 rep4_current_fname;
@@ -1074,8 +1074,8 @@ EXPORT ConsumerIIDrep1Layout	:= RECORD
 		STRING2 rep5_phone_st;
 		STRING5 rep5_phone_zip;
 		STRING10 rep5_name_addr_phone;
-		STRING6 rep5_ssa_date_first;
-		STRING6 rep5_ssa_date_last;
+		STRING8 rep5_ssa_date_first;
+		STRING8 rep5_ssa_date_last;
 		STRING2 rep5_ssa_state;
 		STRING20 rep5_ssa_state_name;
 		STRING20 rep5_current_fname;

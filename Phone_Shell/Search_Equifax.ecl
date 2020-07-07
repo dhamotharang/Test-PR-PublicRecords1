@@ -5,7 +5,7 @@
  * :: Source: EQP																													   *
  ************************************************************************ */
 
-IMPORT Phone_Shell, PhoneMart, RiskWise, doxie;
+IMPORT Phone_Shell, PhoneMart, RiskWise, doxie, Suppress;
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Equifax (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, 
 					DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) foundPhones, 
@@ -18,7 +18,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Equifax (DA
 	EquifaxAllowed :=	UsePremiumSource_A = true and Phone_Shell.Constants.EquiaxDRMCheck(DataRestrictionMask);
  IncludeLexIDCounts := if(PhoneShellVersion >= 21,true,false);   // LexID counts/'all' attributes added in PhoneShell version 2.1
 
-	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus getEquiFax(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, PhoneMart.key_phonemart_did ri) := TRANSFORM
+	{Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus, unsigned4 global_sid} getEquiFax(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, PhoneMart.key_phonemart_did ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		SELF.Gathered_Phone := ri.phone;
 		
 		// Equifax doesn't return names/dob, we can attempt to match the c and DID 
@@ -53,9 +54,10 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Equifax (DA
 
 	END;
 	//get Equifax data
-	WithPhoneMart := JOIN(Input, PhoneMart.key_phonemart_did, 
+	WithPhoneMart_unsuppressed := JOIN(Input, PhoneMart.key_phonemart_did, 
 			LEFT.DID <> 0 AND KEYED(RIGHT.l_DID = LEFT.DID) and RIGHT.phone != '',
 			getEquiFax(LEFT, RIGHT), KEEP(500), ATMOST(RiskWise.max_atmost));
+	WithPhoneMart := Suppress.Suppress_ReturnOldLayout(WithPhoneMart_unsuppressed, mod_access, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus);
 	//only look for Equifax if we didn't find at LN
 	NonLNbutEquifax := JOIN(WithPhoneMart(TRIM(Sources.Source_List) <> ''), foundPhones, 
 			LEFT.Clean_Input.Seq = RIGHT.Clean_Input.Seq AND 

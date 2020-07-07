@@ -1,4 +1,4 @@
-﻿import _Control, email_data, riskwise, ut, fcra, mdr, risk_indicators, doxie, Suppress;
+﻿import _Control, email_data, riskwise, ut, fcra, mdr, risk_indicators, doxie, Suppress, data_services;
 onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Email(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) clam_pre_email_in, 
@@ -9,7 +9,7 @@ export Boca_Shell_Email(GROUPED DATASET(risk_indicators.layout_bocashell_neutral
     doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
   ) := FUNCTION
 
-
+data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
 
 // clean the email address before doing anything else
 clam_pre_email := project(clam_pre_email_in, transform(risk_indicators.layout_bocashell_neutral, 
@@ -178,7 +178,7 @@ email_recs_nonfcra_minus_behavior_thor := join(distribute(clam_pre_email, hash64
 	email_recs_nonfcra_minus_behavior_unsuppressed := ungroup(email_recs_nonfcra_minus_behavior_roxie);
 #END
                                                   
-email_recs_nonfcra_minus_behavior := Suppress.Suppress_ReturnOldLayout(email_recs_nonfcra_minus_behavior_unsuppressed, mod_access, emailrec);
+email_recs_nonfcra_minus_behavior := Suppress.Suppress_ReturnOldLayout(email_recs_nonfcra_minus_behavior_unsuppressed, mod_access, emailrec, data_environment);
                                                   
 email_recs_nonfcra_roxie := join(clam_pre_email, email_data.key_did,
 						left.did<>0 and 
@@ -205,7 +205,7 @@ email_recs_nonfcra_thor := join(distribute(clam_pre_email, hash64(did)),
 	email_recs_non_fcra_unsuppressed  := ungroup(email_recs_nonfcra_roxie);
 #END
                                                   
-email_recs_non_fcra := Suppress.Suppress_ReturnOldLayout(email_recs_non_fcra_unsuppressed, mod_access, emailrec);
+email_recs_non_fcra := Suppress.Suppress_ReturnOldLayout(email_recs_non_fcra_unsuppressed, mod_access, emailrec, data_environment);
                                                   
 emailfile_raw_fcra_roxie := join(clam_pre_email, email_data.Key_Did_FCRA,
 						left.did<>0 and 
@@ -460,7 +460,7 @@ with_reverse_email_lookup_thor := join(distribute(clam_pre_email, hash64(shell_i
 	with_reverse_email_lookup_unsuppressed := with_reverse_email_lookup_roxie;
 #END
                                                   
-with_reverse_email_lookup := Suppress.Suppress_ReturnOldLayout(with_reverse_email_lookup_unsuppressed, mod_access, emailrec);
+with_reverse_email_lookup := Suppress.Suppress_ReturnOldLayout(with_reverse_email_lookup_unsuppressed, mod_access, emailrec, data_environment);
                                                   
 reverse_source_stats := table(with_reverse_email_lookup, {seq, email_src,
 											ver_level_per_source := max(group, (integer)Reverse_Email.Verification_level),

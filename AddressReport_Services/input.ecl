@@ -1,14 +1,15 @@
-IMPORT AutoHeaderI,AutoStandardI, iesp, Relationship;
+IMPORT AutoHeaderI, AutoStandardI, iesp, Relationship, doxie;
+
 export input := MODULE
-	
-	EXPORT params := interface(AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full,
-						AutoStandardI.LIBIN.PenaltyI_Addr.base,
-						AutoStandardI.InterfaceTranslator.no_scrub.params,
-						AutoStandardI.DataRestrictionI.params)
-		end;
+  
+  EXPORT params := interface(AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full,
+                             AutoStandardI.LIBIN.PenaltyI_Addr.base,
+                             doxie.IDataAccess)
+    EXPORT string DataPermissionMask := ''; //INTERFACES: different definitions in base modules
+  end;
 
   // adds "includes" specific for this service
-  export include := INTERFACE 
+  shared include := INTERFACE
     export boolean include_bankruptcy := false;
     export boolean include_driverslicenses := false;
     export boolean include_liensjudgments := false;
@@ -19,7 +20,6 @@ export input := MODULE
     export boolean include_CensusData := false;
     export boolean Include_ResidentialPhones := false;
     export boolean Include_BusinessPhones := false;
-    export boolean no_scrub :=false;
     export boolean include_CriminalRecords := false;
     export boolean include_SexualOffenses := false;
     export boolean include_HuntingFishingLicenses := false;
@@ -28,31 +28,20 @@ export input := MODULE
   end;
 
   export _addressreport := INTERFACE (params, include, Relationship.IParams.relationshipParams)
-    export boolean glb_ok; 
-    export boolean dppa_ok; 
-    export string6 ssn_mask := 'NONE';
-    export unsigned3 dateval := 0; // unsigned3 of 'YYYYMM';
-    export boolean ln_branded := false; 
-    export boolean probationoverride := false;
-    // export boolean probation_override_value := false;
-    export string5 industryclass := '';
-		export boolean useNewBusinessHeader := false;
-		export string1 BusinessReportFetchLevel := 'S';
-		//v--- added for Location Rpt 06/14/2016 chgs so can use hunting_fishing_services.Search_Records.params
-		export string    bdid;
+    export boolean useNewBusinessHeader := false;
+    export string1 BusinessReportFetchLevel := 'S';
+    //v--- added for Location Rpt 06/14/2016 chgs so can use hunting_fishing_services.Search_Records.params
+    export string bdid;
     export unsigned2 penalty_threshold;
-    export boolean   SearchAroundAddress;
-    export boolean   setrepaddr;
+    export boolean SearchAroundAddress;
+    export boolean setrepaddr;
     export unsigned1 setrepaddrbit;
-    export string6   ssnmask; // NOTE: slightly different than ssn_mask above.  This name is 
-		                          // what is "STORED" in AutoStandardI.GlobalModule and is needed by 
-															// hunting_fishing_services.Search_Records which uses ssnmask via 
-		                          // AutoStandardI.InterfaceTranslator.ssn_mask_value.params  
   end;
+
    //***************************************************
   // iesp.ECL2ESP.SetInputAddress (ReportBy.Address);
   // Unfortunately I cannot use the standard ECL2ESP setIputAddress
-  // because the input can be a single line or components and 
+  // because the input can be a single line or components and
   // I am using the clean address passing the single line address.
   //****************************************************
  EXPORT SetInputAddress (iesp.share.t_Address xml_in) := FUNCTION
@@ -72,21 +61,22 @@ export input := MODULE
     string60 in_streetAddress2 := global(xml_in).StreetAddress2;
     string addr_in := trim (in_streetAddress1) + ' ' + trim (in_streetAddress2);
     string addr := if(trim(addr_in)<>'',addr_in,
-					(trim(streetNumber,left,right) + ' ' + 
-					 trim(streetPreDirection,left,right) + ' ' +
-			           trim(streetName,left,right) + ' ' + 
-					 trim(streetSuffix) + ' ' +
-					 trim(streetPostDirection,left,right) + ' ' + 
-					 trim(UnitNumber,left,right)));
+          (trim(streetNumber,left,right) + ' ' +
+           trim(streetPreDirection,left,right) + ' ' +
+                 trim(streetName,left,right) + ' ' +
+           trim(streetSuffix) + ' ' +
+           trim(streetPostDirection,left,right) + ' ' +
+           trim(UnitNumber,left,right)));
     #stored('Addr',addr);
     string2 State := global(xml_in).State;
     #stored ('State', State);
     string25 City := global(xml_in).City;
     #stored ('City', City);
-    string5 zip5 := global(xml_in).Zip5; 
+    string5 zip5 := global(xml_in).Zip5;
     #stored('zip',zip5);
-    string50 StateCityZip := global(xml_in).StateCityZip; 
+    string50 StateCityZip := global(xml_in).StateCityZip;
     #stored('StateCityZip',StateCityZip);
     return output (dataset ([],{integer x}), named('__internal__'), extend);
   END;
+
 END;

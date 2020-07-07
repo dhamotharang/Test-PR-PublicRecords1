@@ -1,4 +1,4 @@
-import Healthcare_Header_Services, doxie, ut, AutoStandardI;
+﻿import Healthcare_Header_Services, doxie, ut, AutoStandardI;
 
 export ING_provider_report_recordsbyDid(dataset(doxie.layout_references) dids, boolean Include_Sanc=false) := FUNCTION
 
@@ -10,6 +10,8 @@ export ING_provider_report_recordsbyDid(dataset(doxie.layout_references) dids, b
 		self.DRM := gm.DataRestrictionMask;
 		self.glb_ok :=  ut.glb_ok (gm.GLBPurpose);
 		self.dppa_ok := ut.dppa_ok(gm.DPPAPurpose);
+		self.glb:= gm.GLBPurpose;
+                self.dppa:= gm.DPPAPurpose; 
 		// self:=[];Do not uncomment otherwise the default values will not get set.
 	end;
 	cfg:=dataset([buildConfig()]);

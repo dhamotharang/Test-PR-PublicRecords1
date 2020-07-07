@@ -1,20 +1,26 @@
-/* This function searches our Inquiries Keys and Inquiries Deltabase for Address Inquiries */
+﻿/* This function searches our Inquiries Keys and Inquiries Deltabase for Address Inquiries */
 
-IMPORT Gateway, Inquiry_AccLogs, Inquiry_Deltabase, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, UT;
+IMPORT Gateway, Inquiry_AccLogs, Inquiry_Deltabase, RiskWise, Suspicious_Fraud_LN, UT, Doxie, Suppress;
 
 EXPORT Suspicious_Fraud_LN.layouts.Layout_Address_Inquiries Search_Inquiries_Address (DATASET(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus) Input,
 																																											UNSIGNED1 DPPAPurpose,
 																																											UNSIGNED1 GLBPurpose,
 																																											STRING50 DataRestrictionMask,
-																																											DATASET(Gateway.Layouts.Config) DeltabaseGateway = Gateway.Constants.void_gateway) := FUNCTION
+																																											DATASET(Gateway.Layouts.Config) DeltabaseGateway = Gateway.Constants.void_gateway,
+																																											doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	InquiriesKey := Inquiry_AccLogs.Key_Inquiry_Address;
 	InquiriesUpdateKey := Inquiry_AccLogs.Key_Inquiry_Address_Update;
 
-	Suspicious_Fraud_LN.InquiryTransformMac (getInquiriesKey, Suspicious_Fraud_LN.layouts.Layout_Address_Inquiries, InquiriesKey);
-	Suspicious_Fraud_LN.InquiryTransformMac (getInquiriesUpdateKey, Suspicious_Fraud_LN.layouts.Layout_Address_Inquiries, InquiriesUpdateKey);
+	Layout_Address_Inquiries_CCPA := RECORD
+		Suspicious_Fraud_LN.layouts.Layout_Address_Inquiries;
+		UNSIGNED6 did;
+	END;
+	
+	Suspicious_Fraud_LN.InquiryTransformMac (getInquiriesKey, Layout_Address_Inquiries_CCPA, InquiriesKey, TRUE);
+	Suspicious_Fraud_LN.InquiryTransformMac (getInquiriesUpdateKey, Layout_Address_Inquiries_CCPA, InquiriesUpdateKey, TRUE);
 	Suspicious_Fraud_LN.InquiryTransformMac (getInquiriesDeltabase, Suspicious_Fraud_LN.layouts.Layout_Address_Inquiries, Inquiry_Deltabase.Layouts.Inquiry_Address);
 	
-	rawInquiriesKey := JOIN(Input, InquiriesKey, TRIM(LEFT.Clean_Input.Prim_Range) <> '' AND TRIM(LEFT.Clean_Input.Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Zip5) <> '' AND
+	rawInquiriesKey_unsuppressed := JOIN(Input, InquiriesKey, TRIM(LEFT.Clean_Input.Prim_Range) <> '' AND TRIM(LEFT.Clean_Input.Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Zip5) <> '' AND
 																							 KEYED(LEFT.Clean_Input.Zip5 = RIGHT.Zip) AND
 																							 KEYED(LEFT.Clean_Input.Prim_Name = RIGHT.Prim_Name) AND
 																							 KEYED(LEFT.Clean_Input.Prim_Range = RIGHT.Prim_Range) AND
@@ -24,7 +30,9 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Address_Inquiries Search_Inquiries_Add
 																							 (UNSIGNED)RIGHT.search_info.datetime[1..6] <= LEFT.Clean_Input.ArchiveDate,
 																							 getInquiriesKey(LEFT, RIGHT), KEEP(5000), ATMOST(5000));
 																							 
-	rawInquiriesUpdateKey := JOIN(Input, InquiriesUpdateKey, TRIM(LEFT.Clean_Input.Prim_Range) <> '' AND TRIM(LEFT.Clean_Input.Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Zip5) <> '' AND
+	rawInquiriesKey := Suppress.Suppress_ReturnOldLayout(rawInquiriesKey_unsuppressed, mod_access, Suspicious_Fraud_LN.layouts.Layout_Address_Inquiries, gsidfield := ccpa.global_sid);
+	
+	rawInquiriesUpdateKey_unsuppressed := JOIN(Input, InquiriesUpdateKey, TRIM(LEFT.Clean_Input.Prim_Range) <> '' AND TRIM(LEFT.Clean_Input.Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Zip5) <> '' AND
 																							 KEYED(LEFT.Clean_Input.Zip5 = RIGHT.Zip) AND
 																							 KEYED(LEFT.Clean_Input.Prim_Name = RIGHT.Prim_Name) AND
 																							 KEYED(LEFT.Clean_Input.Prim_Range = RIGHT.Prim_Range) AND
@@ -34,6 +42,8 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Address_Inquiries Search_Inquiries_Add
 																							 (UNSIGNED)RIGHT.search_info.datetime[1..6] <= LEFT.Clean_Input.ArchiveDate,
 																							 getInquiriesUpdateKey(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(RiskWise.max_atmost));
 	
+	rawInquiriesUpdateKey := Suppress.Suppress_ReturnOldLayout(rawInquiriesUpdateKey_unsuppressed, mod_access, Suspicious_Fraud_LN.layouts.Layout_Address_Inquiries, gsidfield := ccpa.global_sid);
+		
 	// We will only call the Deltabase for Realtime queries, not Archive Runs, since the Deltabase will have at most a week of transactions in it.
 	deltabaseInput := PROJECT(Input (Clean_Input.ArchiveDate = 999999), TRANSFORM(Inquiry_Deltabase.Layouts.Input_Deltabase_Address, SELF.Seq := LEFT.Seq;
 																																														SELF.Prim_Range := LEFT.Clean_Input.Prim_Range;

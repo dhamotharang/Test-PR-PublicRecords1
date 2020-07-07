@@ -25,26 +25,7 @@ FUNCTION
                                     dSearchResultsWCnt,
                                     dSearchResultsWCnt(isPrimaryPhone AND phone_source in [$.Constants.PhoneSource.Waterfall, $.Constants.PhoneSource.QSentGateway]));
 
-  dPrimaryPhoneInfo_pre := $.GetPhonesFinal(dSearchResultsPrimaryPhone, inMod, TRUE);
-
-  // ThreatMetrix
-  dDupThreatMetrixIn := PROJECT(DEDUP(SORT(dPrimaryPhoneInfo_pre, phone), phone), Phones.Layouts.PhoneAcctno);
-
-  dPrimaryThreatMetrixRecs := Phones.GetThreatMetrixRecords(dDupThreatMetrixIn, inMod.UseThreatMetrixRules, dGateways);
-
-  $.Layouts.PhoneFinder.PhoneSlim getThreatMetrix($.Layouts.PhoneFinder.PhoneSlim l, ThreatMetrix.gateway_trustdefender.t_TrustDefenderResponseEX r) := TRANSFORM
-    SELF.ReasonCodes  := r.response.Summary.ReasonCodes;
-    SELF.TmxVariables := r.response._data.TmxVariables;
-    SELF              := l;
-  END;
-
-  dPrepPrimaryThreatMetrix := JOIN(dPrimaryPhoneInfo_pre,
-                                    dPrimaryThreatMetrixRecs,
-                                    LEFT.phone = RIGHT.response._Data.AccountTelephone.Content_,
-                                    getThreatMetrix(LEFT, RIGHT),
-                                    LEFT OUTER, LIMIT(0), KEEP(1));
-
-  dPrimaryPhoneInfo := IF(inMod.UseThreatMetrixRules, dPrepPrimaryThreatMetrix, dPrimaryPhoneInfo_pre);
+  dPrimaryPhoneInfo := $.GetPhonesFinal(dSearchResultsPrimaryPhone, inMod, TRUE);
 
   // Other phones
   dSearchResultsOtherPhones := IF(inMod.isPrimarySearchPII, dSearchResultsWCnt(~isPrimaryPhone));
@@ -75,34 +56,36 @@ FUNCTION
                               dPrimaryPhoneInfo,
                               LEFT.acctno = RIGHT.acctno,
                               TRANSFORM($.Layouts.PhoneFinder.Final,
-                                        SELF.phone             := RIGHT.phone,
-                                        SELF.isPrimaryIdentity := TRUE,
-                                        SELF.isPrimaryPhone    := TRUE,
+                                        SELF.phone                   := RIGHT.phone,
+                                        SELF.isPrimaryIdentity       := TRUE,
+                                        SELF.isPrimaryPhone          := TRUE,
                                         // Need this mapping as SELF := RIGHT happens first before SELF := LEFT mapping
-                                        SELF.dt_first_seen     := IF(LEFT.dt_first_seen != '', LEFT.dt_first_seen, (STRING)RIGHT.dt_first_seen),
-                                        SELF.dt_last_seen      := IF(LEFT.dt_last_seen != '', LEFT.dt_last_seen, (STRING)RIGHT.dt_last_seen),
-                                        SELF.fname             := LEFT.fname,
-                                        SELF.lname             := LEFT.lname,
-                                        SELF.prim_range        := LEFT.prim_range,
-                                        SELF.predir            := LEFT.predir,
-                                        SELF.prim_name         := LEFT.prim_name,
-                                        SELF.suffix            := LEFT.suffix,
-                                        SELF.postdir           := LEFT.postdir,
-                                        SELF.unit_desig        := LEFT.unit_desig,
-                                        SELF.sec_range         := LEFT.sec_range,
-                                        SELF.city_name         := LEFT.city_name,
-                                        SELF.st                := LEFT.st,
-                                        SELF.zip               := LEFT.zip,
-                                        SELF.zip4              := LEFT.zip4,
-                                        SELF.county_code       := LEFT.county_code,
-                                        SELF.county_name       := LEFT.county_name,
-                                        SELF.listed_name       := IF(RIGHT.ListingName != '', RIGHT.ListingName, LEFT.listed_name),
-                                        SELF.phoneState        := RIGHT.phone_state,
-                                        SELF.listing_type_res  := IF(STD.Str.Find(RIGHT.ListingType, 'RESIDENTIAL') > 0, 'R', ''),
-                                        SELF.listing_type_bus  := IF(STD.Str.Find(RIGHT.ListingType, 'BUSINESS') > 0, 'B', ''),
-                                        SELF.listing_type_gov  := IF(STD.Str.Find(RIGHT.ListingType, 'GOVERNMENT') > 0, 'G', ''),
-                                        SELF.RealTimePhone_Ext := RIGHT,
-                                        SELF.isLNameMatch      := STD.Str.findword(TRIM(IF(RIGHT.ListingName != '', RIGHT.ListingName, LEFT.listed_name)),TRIM(LEFT.lname), TRUE),
+                                        SELF.dt_first_seen           := IF(LEFT.dt_first_seen != '', LEFT.dt_first_seen, (STRING)RIGHT.dt_first_seen),
+                                        SELF.dt_last_seen            := IF(LEFT.dt_last_seen != '', LEFT.dt_last_seen, (STRING)RIGHT.dt_last_seen),
+                                        SELF.fname                   := LEFT.fname,
+                                        SELF.lname                   := LEFT.lname,
+                                        SELF.prim_range              := LEFT.prim_range,
+                                        SELF.predir                  := LEFT.predir,
+                                        SELF.prim_name               := LEFT.prim_name,
+                                        SELF.suffix                  := LEFT.suffix,
+                                        SELF.postdir                 := LEFT.postdir,
+                                        SELF.unit_desig              := LEFT.unit_desig,
+                                        SELF.sec_range               := LEFT.sec_range,
+                                        SELF.city_name               := LEFT.city_name,
+                                        SELF.st                      := LEFT.st,
+                                        SELF.zip                     := LEFT.zip,
+                                        SELF.zip4                    := LEFT.zip4,
+                                        SELF.county_code             := LEFT.county_code,
+                                        SELF.county_name             := LEFT.county_name,
+                                        SELF.PhoneOwnershipIndicator := LEFT.PhoneOwnershipIndicator,
+                                        SELF.listed_name             := IF(RIGHT.ListingName != '', RIGHT.ListingName, LEFT.listed_name),
+                                        SELF.phoneState              := RIGHT.phone_state,
+                                        SELF.listing_type_res        := IF(STD.Str.Find(RIGHT.ListingType, 'RESIDENTIAL') > 0, 'R', ''),
+                                        SELF.listing_type_bus        := IF(STD.Str.Find(RIGHT.ListingType, 'BUSINESS') > 0, 'B', ''),
+                                        SELF.listing_type_gov        := IF(STD.Str.Find(RIGHT.ListingType, 'GOVERNMENT') > 0, 'G', ''),
+                                        SELF.RealTimePhone_Ext       := RIGHT,
+                                        SELF.isLNameMatch            := STD.Str.findword(TRIM(IF(RIGHT.ListingName != '', RIGHT.ListingName, LEFT.listed_name)),TRIM(LEFT.lname), TRUE),
+                                        SELF.phn_src_all             := LEFT.phn_src_all;
                                         SELF := RIGHT, SELF := LEFT),
                               FULL OUTER,
                               LIMIT(1, SKIP));
@@ -158,12 +141,30 @@ FUNCTION
                                 SELF.lname             := IF(isResExists, RIGHT.lname, LEFT.name_last),
                                 SELF.isPrimaryPhone    := IF(isResExists, RIGHT.isPrimaryPhone, TRUE), // This will process the RiskIndicators for "no identity and no phone"
                                 SELF.isPrimaryIdentity := IF(isResExists, RIGHT.isPrimaryIdentity, TRUE), // This will process the RiskIndicators for "no identity and no phone"
+                                SELF.phonestatus       := IF(RIGHT.PhoneOwnershipIndicator, $.Constants.PhoneStatus.Active, RIGHT.phonestatus); // PHPR- 483 If Phone verified by zumigo then update phonestatus to be ACTIVE;
                                 SELF                   := RIGHT,
                                 SELF                   := []),
                       LEFT OUTER,
                       LIMIT(100, SKIP));
 
-  dRIs := IF(inMod.IncludeRiskIndicators, $.CalculatePRIs(dPrepForRIs, inMod));
+ // ThreatMetrix
+  dDupThreatMetrixIn := PROJECT(DEDUP(SORT(dPrepForRIs, phone), phone), Phones.Layouts.PhoneAcctno);
+
+  dThreatMetrixRecs := Phones.GetThreatMetrixRecords(dDupThreatMetrixIn, inMod.UseThreatMetrixRules, dGateways);
+
+  $.Layouts.PhoneFinder.Final getThreatMetrix($.Layouts.PhoneFinder.Final l, ThreatMetrix.gateway_trustdefender.t_TrustDefenderResponseEX r) := TRANSFORM
+   SELF.ReasonCodes := r.response.Summary.ReasonCodes;
+   SELF.TmxVariables := r.response._data.TmxVariables;
+   SELF := l;
+  END;
+
+  dPrepThreatMetrix	:= JOIN(dPrepForRIs, dThreatMetrixRecs,
+                            LEFT.phone = RIGHT.response._Data.AccountTelephone.Content_,
+                            getThreatMetrix(LEFT, RIGHT), LEFT OUTER, LIMIT(0), KEEP(1));
+
+  dPrepAllRIs := IF(inMod.UseThreatMetrixRules, dPrepThreatMetrix, dPrepForRIs);
+
+  dRIs := $.CalculatePRIs(dPrepAllRIs, inMod);
 
   dFinal := MAP(inMod.IncludeRiskIndicators AND inMod.IncludeOtherPhoneRiskIndicators => dRIs + dOtherIdentities,
                 inMod.IncludeRiskIndicators                                           => dRIs + dPrepOtherPhonesForRIs + dOtherIdentities,

@@ -479,7 +479,6 @@ EXPORT SetInputSearchBy (iesp.motorvehicle.t_MotorVehicleSearch2By searchBy) := 
 		export string120 fuzzy_l             := '';
 		export boolean   dedup_results_l     := true;
 		export string3   thresh_val          := '';
-		export boolean   GLB_data            := false;
 		export unsigned1 glb                 := 8;
 		export boolean   patriotproc         := false;
 		export boolean   show_minors         := false;

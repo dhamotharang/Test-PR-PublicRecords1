@@ -1,17 +1,17 @@
-﻿IMPORT $, doxie, dx_Email, DidVille, Royalty;
+﻿IMPORT $, doxie, dx_Email, DidVille, Royalty, iesp;
 EXPORT Layouts := MODULE
 
   EXPORT batch_email_input := RECORD
     STRING email;
-    doxie.layout_inBatchMaster - [dl,dlstate,vin,Plate,PlateState,MatchCode,searchType,score,max_results];                
+    doxie.layout_inBatchMaster - [dl,dlstate,vin,Plate,PlateState,MatchCode,searchType,score,max_results];
   END;
 
   EXPORT batch_in_rec := RECORD
     STRING20    acctno := '';
     UNSIGNED    seq := 0; //to be used for internal search on multiple inputs for same acctno
     UNSIGNED    DID := 0;
-    UNSIGNED    subject_lexid := 0;  // for Lexid resolved from input PII or DID provided from input  
-   
+    UNSIGNED    subject_lexid := 0;  // for Lexid resolved from input PII or DID provided from input
+
     STRING20    name_first := '';
     STRING20    name_middle := '';
     STRING20    name_last := '';
@@ -34,30 +34,30 @@ EXPORT Layouts := MODULE
     STRING2     st := '';
     STRING5     z5 := '';
     STRING4     zip4 := '';
-    BOOLEAN     isdeepdive := FALSE; 
-    BOOLEAN     has_full_address := FALSE; 
-    BOOLEAN     has_full_name := FALSE; 
-    BOOLEAN     has_full_ssn := FALSE; 
+    BOOLEAN     isdeepdive := FALSE;
+    BOOLEAN     has_full_address := FALSE;
+    BOOLEAN     has_full_name := FALSE;
+    BOOLEAN     has_full_ssn := FALSE;
   END;
-  
+
   EXPORT batch_in_ext_rec := RECORD(batch_in_rec)
     UNSIGNED2  record_err_code := 0;
     STRING     record_err_msg  := '';
     BOOLEAN    is_rejected_rec := FALSE;
   END;
-  
+
   EXPORT batch_in_didvile_rec := RECORD(DidVille.Layout_did_inbatch)
     UNSIGNED    DID := 0;
   END;
-  
+
  EXPORT email_ids_rec := RECORD
     STRING20  acctno := '';
-    UNSIGNED  seq := 0; 
+    UNSIGNED  seq := 0;
     UNSIGNED  email_rec_key := 0;
-    BOOLEAN   isdeepdive := FALSE; 
-    UNSIGNED  subject_lexid := 0;  // keeping Lexid resolved from input PII or DID provided from input  
+    BOOLEAN   isdeepdive := FALSE;
+    UNSIGNED  subject_lexid := 0;  // keeping Lexid resolved from input PII or DID provided from input
   END;
-  
+
   EXPORT orig_email_rec := RECORD
     STRING first_name;
     STRING last_name;
@@ -76,7 +76,7 @@ EXPORT Layouts := MODULE
     STRING ssn;
     STRING dob;
   END;
-    
+
   EXPORT clean_email_rec := RECORD
     STRING200 clean_email;
     dx_Email.Layouts.Layout_Clean_Name Name;
@@ -97,16 +97,18 @@ EXPORT Layouts := MODULE
     UNSIGNED8 did_score := 0;
     STRING8   date_first_seen;
     STRING8   date_last_seen;
+    UNSIGNED4 ln_date_first := 0;    // LN calculated date based on vendor's date_first_seen
+    UNSIGNED4 ln_date_last := 0;    // LN calculated date based on vendor's date_last_seen
     STRING8   date_vendor_first_reported;
     STRING8   date_vendor_last_reported;
     STRING8   process_date;
     STRING1   activecode;
-    BOOLEAN   is_current; 
+    BOOLEAN   is_current;
     UNSIGNED  rules;
     orig_email_rec original;
     clean_email_rec cleaned;
-    BOOLEAN   isdeepdive := FALSE; 
-    UNSIGNED  subject_lexid := 0;  // keeping Lexid resolved from input PII or DID provided from input  
+    BOOLEAN   isdeepdive := FALSE;
+    UNSIGNED  subject_lexid := 0;  // keeping Lexid resolved from input PII or DID provided from input
     STRING    orig_CompanyName;
     STRING    cln_CompanyName;
     STRING    CompanyTitle;
@@ -117,9 +119,9 @@ EXPORT Layouts := MODULE
     UNSIGNED6 SELEID;
     UNSIGNED6 OrgID;
     UNSIGNED6 UltID;
-    UNSIGNED4 global_sid := 0;  //  GlobalSourceId  
-    UNSIGNED8 record_sid := 0;  //  SourceSpecificRecordId  
-   // UNSIGNED8 gdp_rules_mask := 0;  //  global data protection mask - to indicate which rules apply  
+    UNSIGNED4 global_sid := 0;  //  GlobalSourceId
+    UNSIGNED8 record_sid := 0;  //  SourceSpecificRecordId
+   // UNSIGNED8 gdp_rules_mask := 0;  //  global data protection mask - to indicate which rules apply
   END;
 
   EXPORT email_internal_rec := RECORD
@@ -129,13 +131,13 @@ EXPORT Layouts := MODULE
     UNSIGNED penalt_addr := 0;
     UNSIGNED penalt_name := 0;
     UNSIGNED penalt_didssndob := 0;
-    BOOLEAN  isRoyaltySource := FALSE; 
+    BOOLEAN  isRoyaltySource := FALSE;
     UNSIGNED num_sources := 0;
     STRING8  latest_orig_login_date := '';
     UNSIGNED num_email_per_did := 0;
     UNSIGNED num_did_per_email := 0;
   END;
-  
+
   EXPORT best_rec := RECORD
     QSTRING5 title := '';
     QSTRING20 fname := '';
@@ -157,7 +159,7 @@ EXPORT Layouts := MODULE
     QSTRING9 ssn := '';
     INTEGER4 dob := 0;
   END;
-  
+
   EXPORT tmx_insights_rec := RECORD
     STRING  account_email_first_seen := '';
     STRING  account_email_last_event := '';
@@ -172,7 +174,7 @@ EXPORT Layouts := MODULE
     STRING  digital_id_last_event := '';
     STRING  digital_id_last_update := '';
     STRING  digital_id_result := '';
-      
+
     STRING policy_score := '';
     STRING request_result := '';
     STRING review_status := '';
@@ -196,7 +198,12 @@ EXPORT Layouts := MODULE
     DATASET(email_final_rec) Records;
     DATASET(Royalty.Layouts.RoyaltyForBatch) Royalties;
   END;
-  
+
+  EXPORT email_royalty_combined_rec := RECORD
+    DATASET(email_final_rec) Records;
+    DATASET(Royalty.Layouts.Royalty) Royalties;
+  END;
+
   EXPORT event_history_rec := RECORD
     STRING200 email := '';
     STRING10  email_status := '';
@@ -204,9 +211,9 @@ EXPORT Layouts := MODULE
     STRING40  error_code := '';
     BOOLEAN   is_disposable_address := FALSE;
     BOOLEAN   is_role_address := FALSE;
-    STRING100 email_username := '';  
-    STRING100 email_domain := ''; 
-    STRING8   date_added;   
+    STRING100 email_username := '';
+    STRING100 email_domain := '';
+    STRING8   date_added;
   END;
 
   EXPORT domain_rec := RECORD
@@ -295,29 +302,57 @@ EXPORT Layouts := MODULE
     STRING    src;
     STRING50  record_err_msg  := '';
     UNSIGNED2 record_err_code := 0;
+    STRING8   ln_date_first := '';    // LN calculated date based on vendor's date_first_seen
+    STRING8   ln_date_last := '';    // LN calculated date based on vendor's date_last_seen
   END;
 
   EXPORT batch_combined_rec := RECORD
     DATASET(batch_final_rec) Records;
     DATASET(Royalty.Layouts.RoyaltyForBatch) Royalties;
   END;
-  
+
+  crs_raw_cleaned := RECORD(iesp.emailsearchv2.t_EmailSearchV2CleanData)
+    STRING10  Phone;
+    STRING9   ssn;
+    UNSIGNED4 dob;
+  END;
+  EXPORT crs_email_raw_rec := RECORD                         // to be used with source_counts reporting
+    crs_raw_cleaned Cleaned;
+    iesp.emailsearchv2.t_EmailSearchV2OriginalData - [FirstName,LastName,StreetAddress,City,State,Zip,Zip4] Original;
+    unsigned8 LexId {xpath('LexId')};
+    STRING8 DateFirstSeen {xpath('DateFirstSeen')};
+    STRING8 DateLastSeen {xpath('DateLastSeen')};
+    STRING8 DateVendorFirstReported {xpath('DateVendorFirstReported')};
+    STRING8 DateVendorLastReported {xpath('DateVendorLastReported')};
+    STRING8 ProcessDate {xpath('ProcessDate')};
+    STRING2 Source {xpath('Source')};
+    UNSIGNED EmailId {xpath('EmailId')};
+  END;
+
+  EXPORT crs_email_rec := RECORD(iesp.bpsreport.t_BpsReportEmailSearchRecord)
+  END;
+
+  EXPORT crs_email_combined_rec := RECORD
+    DATASET(crs_email_rec) EmailV2Records  {xpath('Emails/Email'), MAXCOUNT(iesp.Constants.Email.MAX_RECS)};
+    DATASET(Royalty.Layouts.Royalty) EmailV2Royalties;
+  END;
+
   EXPORT Gateway_Data := MODULE
     EXPORT batch_in_bv_rec := RECORD
       STRING   email := '';
       INTEGER  rec_no := 0;
       INTEGER  group_no := 0;
     END;
-    
+
     EXPORT bv_history_rec := RECORD
       STRING   email := '';
       STRING   email_status := '';
       STRING   email_status_reason := '';
       STRING   additional_status_info := '';
-      STRING   email_username := '';  
-      STRING   email_domain := '';    
+      STRING   email_username := '';
+      STRING   email_domain := '';
     END;
-    
+
     EXPORT bv_history_deltabase_rec := RECORD
       STRING   date_added := '';
       STRING   email_address := '';
@@ -328,16 +363,16 @@ EXPORT Layouts := MODULE
       STRING   error_code := '';
       STRING   error := '';
       STRING   account := '';  // email user name
-      STRING   domain := '';    
+      STRING   domain := '';
     END;
-    
+
      EXPORT bv_history_response_rec := RECORD
        DATASET (bv_history_deltabase_rec) Records  {XPATH('Records/Rec'), MAXCOUNT($.Constants.GatewayValues.SQLSelectLimit)};
        STRING  RecsReturned {XPATH('RecsReturned')};
        STRING  Latency {XPATH('Latency')};
        STRING  ExceptionMessage {XPATH('Exceptions/Exception/Message')};
     END;
-    
+
   END;
 
 END;

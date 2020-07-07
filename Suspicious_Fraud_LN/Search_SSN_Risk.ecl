@@ -1,11 +1,14 @@
-IMPORT AutoKey, Death_Master, Doxie, dx_header, Drivers, Header, Header_Quick, /*Inquiry_AccLogs,*/ MDR, Risk_Indicators, RiskWise, 
-Suspicious_Fraud_LN, UT,AutoStandardI,DeathV2_Services, Relationship, STD;
+﻿IMPORT AutoKey, Death_Master, Doxie, dx_header, Drivers, Header, Header_Quick, MDR, Risk_Indicators, RiskWise, 
+Suspicious_Fraud_LN, UT,AutoStandardI,DeathV2_Services, Relationship, STD, Suppress;
 
 EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus) Input,
 																																			DATASET(Suspicious_Fraud_LN.layouts.Layout_SSN_Inquiries) Inquiries,
 																																			UNSIGNED1 DPPAPurpose,
 																																			UNSIGNED1 GLBPurpose,
-																																			STRING50 DataRestrictionMask) := FUNCTION
+																																			STRING50 DataRestrictionMask,
+																																			unsigned1 LexIdSourceOptout = 1,
+																																			string TransactionID = '',
+																																			unsigned6 GlobalCompanyId = 0) := FUNCTION
   unsigned4 todays_date := STD.Date.Today ();
 
 	// SSN Indexed Keys Used
@@ -28,6 +31,9 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
     EXPORT unsigned1 glb := GLBPurpose;
     EXPORT unsigned1 dppa := DPPAPurpose;	
     EXPORT string DataRestrictionMask := ^.DataRestrictionMask;
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
   END;
   glb_ok := mod_access.isValidGLB();
   dppa_ok := mod_access.isValidDPPA();
@@ -126,7 +132,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
 	translateSrc (STRING3 src) := IF(src IN [MDR.SourceTools.src_Equifax_Quick, MDR.SourceTools.src_Equifax_Weekly], MDR.SourceTools.src_Equifax, src);
 	
 
-	headerRecs := JOIN(uniqueHeaderSSN, FullHeaderKey, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.s_DID) AND (LEFT.SSN = RIGHT.SSN OR (UNSIGNED)RIGHT.SSN = 0) AND
+	headerRecs_unsuppressed := JOIN(uniqueHeaderSSN, FullHeaderKey, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.s_DID) AND (LEFT.SSN = RIGHT.SSN OR (UNSIGNED)RIGHT.SSN = 0) AND
 																												translateSrc(RIGHT.src) NOT IN Risk_Indicators.iid_constants.masked_header_sources(DataRestrictionMask, isFCRA := FALSE) AND
 																												(Header.isPreGLB(RIGHT) OR Risk_Indicators.iid_constants.glb_ok(mod_access.glb, isFCRA := FALSE)) AND
 																												(~MDR.Source_is_DPPA(translateSrc(RIGHT.src)) OR (Risk_Indicators.iid_constants.dppa_ok(mod_access.dppa, isFCRA := FALSE) AND Drivers.state_dppa_ok(Header.TranslateSource(translateSrc(RIGHT.src)), mod_access.dppa, translateSrc(RIGHT.src)))) AND
@@ -134,12 +140,14 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
 																												((RIGHT.dt_first_seen < LEFT.ArchiveDate AND RIGHT.dt_first_seen <> 0) 
 																														OR
 																												(RIGHT.dt_vendor_first_reported < LEFT.ArchiveDate AND RIGHT.dt_first_seen = 0)),
-																												transform(right), ATMOST(ut.Limits.Header_Per_DID));																								
+																												transform(right), ATMOST(ut.Limits.Header_Per_DID));
+	headerRecs := Suppress.MAC_SuppressSource(headerRecs_unsuppressed, mod_access);
 	Header.MAC_GlbClean_Header(headerRecs, headerRecsCleaned, , , mod_access);
 	
 	// Get the header records for those DID's which match on SSN
 	HeaderDIDMac (TransformName, KeyName) := MACRO
-	TempHeader TransformName(TempHeader le, KeyName ri, BOOLEAN fastHeader) := TRANSFORM
+	{TempHeader, unsigned4 global_sid} TransformName(TempHeader le, KeyName ri, BOOLEAN fastHeader) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		SELF.Seq := le.Seq;
 		SELF.InputDID := le.InputDID;
 		SELF.DID := le.DID;
@@ -200,14 +208,14 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
 	HeaderDIDMac (GetFastHeaderDID, FastHeaderKey);
 	
 	// Make sure the SSN matches what's on the header, or that the header record doesn't have SSN populated.
-	fullHeaderDID := JOIN(uniqueHeaderSSN, headerRecsCleaned, LEFT.DID <> 0 AND LEFT.DID = RIGHT.s_DID AND (LEFT.SSN = RIGHT.SSN OR (UNSIGNED)RIGHT.SSN = 0) AND
+	fullHeaderDID_unsuppressed := JOIN(uniqueHeaderSSN, headerRecsCleaned, LEFT.DID <> 0 AND LEFT.DID = RIGHT.s_DID AND (LEFT.SSN = RIGHT.SSN OR (UNSIGNED)RIGHT.SSN = 0) AND
 																												/*Source conditions satisfied by headerRecsCleaned*/
 																												((RIGHT.dt_first_seen < LEFT.ArchiveDate AND RIGHT.dt_first_seen <> 0) 
 																														OR
 																												(RIGHT.dt_vendor_first_reported < LEFT.ArchiveDate AND RIGHT.dt_first_seen = 0)),
 																		GetHeaderDID(LEFT, RIGHT, FALSE), LIMIT(ut.Limits.Header_Per_DID, SKIP));
-																		
-	fastHeaderDID := JOIN(uniqueHeaderSSN, FastHeaderKey, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.DID) AND (LEFT.SSN = RIGHT.SSN OR (UNSIGNED)RIGHT.SSN = 0) AND
+	fullHeaderDID := Suppress.Suppress_ReturnOldLayout(fullHeaderDID_unsuppressed, mod_access, TempHeader);																	
+	fastHeaderDID_unsuppressed := JOIN(uniqueHeaderSSN, FastHeaderKey, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.DID) AND (LEFT.SSN = RIGHT.SSN OR (UNSIGNED)RIGHT.SSN = 0) AND
 																												translateSrc(RIGHT.src) NOT IN Risk_Indicators.iid_constants.masked_header_sources(DataRestrictionMask, isFCRA := FALSE) AND
 																												(Header.isPreGLB(RIGHT) OR Risk_Indicators.iid_constants.glb_ok(mod_access.glb, isFCRA := FALSE)) AND
 																												(~MDR.Source_is_DPPA(translateSrc(RIGHT.src)) OR (Risk_Indicators.iid_constants.dppa_ok(mod_access.dppa, isFCRA := FALSE) AND Drivers.state_dppa_ok(Header.TranslateSource(translateSrc(RIGHT.src)), mod_access.dppa, translateSrc(RIGHT.src)))) AND
@@ -216,7 +224,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
 																														OR
 																												(RIGHT.dt_vendor_first_reported < LEFT.ArchiveDate AND RIGHT.dt_first_seen = 0)),
 																		GetFastHeaderDID(LEFT, RIGHT, TRUE), ATMOST(ut.Limits.Header_Per_DID));
-																		
+	fastHeaderDID := Suppress.Suppress_ReturnOldLayout(fastHeaderDID_unsuppressed, mod_access, TempHeader);																																		
 	headerDID := SORT(fullHeaderDID + fastHeaderDID, Seq, SSN, DID, -Date_Last_Seen, -Date_First_Seen, Prim_Range, Prim_Name, Zip5, Source, ArchiveDate);
 	
 	// Calculate the Dates First and Last Seen as well as the DateOfBirth for the DID/SSN Combo (Identity)
@@ -268,7 +276,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
 	uRelatDids := PROJECT(uniqueDIDs, 
 		TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
 
-	rellyids := Relationship.proc_GetRelationship(uRelatDids,TopNCount:=500,
+	rellyids := Relationship.proc_GetRelationshipNeutral(uRelatDids,TopNCount:=500,
 			RelativeFlag :=TRUE,AssociateFlag:=TRUE,
 			doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result; 
 	
@@ -416,7 +424,9 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
 		STRING8 DateFirstSeen := '';
 	END;
 	
-	TempRandSSN getRiskTable(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus le, RiskTableKey ri) := TRANSFORM
+	{TempRandSSN, unsigned4 global_sid, unsigned6 did} getRiskTable(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus le, RiskTableKey ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
+		SELF.did := le.clean_input.did;
 		SELF.Seq := le.Seq;
 		SELF.SSN := le.Clean_Input.SSN;
 		
@@ -453,9 +463,9 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
 		SELF.DateFirstSeen := IF(invalid, '-1', firstSeen); // If seen before our archive date, blank this record
 	END;
 	// Need to specifically use LEFT OUTER here to catch the randomized SSN's that aren't on our issuance key
-	randomizedSSN := JOIN(Input, RiskTableKey, LEFT.Clean_Input.SSN NOT IN ['0', ''] AND KEYED(LEFT.Clean_Input.SSN = RIGHT.SSN), 
+	randomizedSSN_unsuppressed := JOIN(Input, RiskTableKey, LEFT.Clean_Input.SSN NOT IN ['0', ''] AND KEYED(LEFT.Clean_Input.SSN = RIGHT.SSN), 
 																			getRiskTable(LEFT, RIGHT), LEFT OUTER, KEEP(1), ATMOST(KEYED(LEFT.Clean_Input.SSN = RIGHT.SSN), 500));
-	
+	randomizedSSN := Suppress.Suppress_ReturnOldLayout(randomizedSSN_unsuppressed, mod_access, TempRandSSN);
 	// Get all of the information necessary to determine if we have a deceased SSN
 	TempDeadSSN := RECORD
 		UNSIGNED8 Seq := 0;
@@ -464,7 +474,9 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
 		STRING8 FileDate := ''; // Date person filed as dead
 	END;
 	
-	TempDeadSSN getDeadPeople(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus le, DeathMasterKey ri) := TRANSFORM
+	{TempDeadSSN, unsigned4 global_sid, unsigned6 did} getDeadPeople(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus le, DeathMasterKey ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
+		SELF.did := (unsigned6)ri.did;
 		SELF.Seq := le.Seq;
 		SELF.SSN := le.Clean_Input.SSN;
 		todaysDate := IF(le.Clean_Input.ArchiveDate = 999999, todays_date, (INTEGER)(le.Clean_Input.ArchiveDate + '01'));
@@ -472,9 +484,10 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
 		SELF.FileDate := ri.filedate;
 	END;
 	
-	deadSSNsTemp := JOIN(Input, DeathMasterKey, LEFT.Clean_Input.SSN NOT IN ['0', ''] AND KEYED(LEFT.Clean_Input.SSN = RIGHT.SSN)
+	deadSSNsTemp_unsuppressed := JOIN(Input, DeathMasterKey, LEFT.Clean_Input.SSN NOT IN ['0', ''] AND KEYED(LEFT.Clean_Input.SSN = RIGHT.SSN)
 																			and not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, Risk_Indicators.iid_constants.glb_ok(mod_access.glb, isFCRA := FALSE), deathparams),
 																			getDeadPeople(LEFT, RIGHT), KEEP(500), ATMOST(RiskWise.max_atmost));
+	deadSSNsTemp := Suppress.Suppress_ReturnOldLayout(deadSSNsTemp_unsuppressed, mod_access, TempDeadSSN);
 	// Keep the earliest dead SSN date
 	deadSSNs := ROLLUP(SORT(deadSSNsTemp, Seq, SSN, FileDate), LEFT.Seq = RIGHT.Seq AND LEFT.SSN = RIGHT.SSN, TRANSFORM(TempDeadSSN, SELF.FileDate := MAP((UNSIGNED)LEFT.FileDate = 0	=> RIGHT.FileDate,
 																																																																												(UNSIGNED)RIGHT.FileDate = 0	=> LEFT.FileDate,

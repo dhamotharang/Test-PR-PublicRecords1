@@ -71,8 +71,8 @@ layout := RECORD // project out required fields
   h.rcid; // For the case where an external linkage did not happen
   h.prim_name;
   h.st;
-  h.city;
 // Extra credit fields
+  h.city;
   h.company_sic_code1;
   h.cnp_number;
   h.cnp_btype;
@@ -130,7 +130,7 @@ SHARED DataForKeyL_CNPNAME_ZIP := DataForKey2;
 EXPORT KeyL_CNPNAME_ZIP := INDEX(DataForKeyL_CNPNAME_ZIP,{DataForKeyL_CNPNAME_ZIP},{},KeyL_CNPNAME_ZIPName);
 KeyRec := RECORDOF(KeyL_CNPNAME_ZIP);
  
-EXPORT RawFetchL_CNPNAME_ZIP(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'') := 
+EXPORT RawFetchL_CNPNAME_ZIP(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'') := 
   FUNCTION
  //Generate service attributes for GSS join
     wds := SALT311.fn_string_to_wordstream(param_cnp_name);
@@ -140,8 +140,7 @@ EXPORT RawFetchL_CNPNAME_ZIP(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_n
     doIndexRead(UNSIGNED4 search,UNSIGNED2 spc) := STEPPED(KEYL_CNPNAME_ZIP( KEYED(GSS_hash = search) AND (GSS_bloom & BloomF) = BloomF
       AND KEYED((zip IN SET(param_zip,zip)))
       AND ((param_prim_name = (TYPEOF(prim_name))'' OR prim_name = (TYPEOF(prim_name))'') OR (prim_name = param_prim_name) OR ((Config_BIP.WithinEditN(prim_name,prim_name_len,param_prim_name,param_prim_name_len,1, 0)) ))
-      AND ((param_st = (TYPEOF(st))'' OR st = (TYPEOF(st))'') OR (st = param_st))
-      AND ((param_city = (TYPEOF(city))'' OR city = (TYPEOF(city))'') OR (city = param_city) OR ( (metaphonelib.DMetaPhone1(city)=metaphonelib.DMetaPhone1(param_city))  OR (Config_BIP.WithinEditN(city,city_len,param_city,param_city_len,2, 0)) ))),ultid,orgid,seleid,proxid,PRIORITY(40-spc)); // Filter for each row of index fetch
+      AND ((param_st = (TYPEOF(st))'' OR st = (TYPEOF(st))'') OR (st = param_st))),ultid,orgid,seleid,proxid,PRIORITY(40-spc)); // Filter for each row of index fetch
     SALT311.MAC_collate_wordbag_matches4(wds,slimrec,doIndexRead,ultid,orgid,seleid,proxid,steppedmatches) // Perform N-way join
     res := JOIN( steppedmatches, KeyL_CNPNAME_ZIP, KEYED(RIGHT.GSS_Hash = wds[1].hsh)
       AND KEYED((RIGHT.zip IN SET(param_zip,zip))) AND KEYED(RIGHT.fallback_value >= param_fallback_value) AND KEYED(LEFT.proxid = RIGHT.proxid AND LEFT.seleid = RIGHT.seleid AND LEFT.orgid = RIGHT.orgid AND LEFT.ultid = RIGHT.ultid),TRANSFORM(indexOutputRecord,SELF.gss_word_weight := LEFT.gss_word_weight,SELF := RIGHT));
@@ -149,7 +148,7 @@ EXPORT RawFetchL_CNPNAME_ZIP(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_n
   END;
  
 EXPORT ScoredproxidFetchL_CNPNAME_ZIP(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.company_sic_code1) param_company_sic_code1 = (TYPEOF(h.company_sic_code1))'',TYPEOF(h.cnp_number) param_cnp_number = (TYPEOF(h.cnp_number))'',TYPEOF(h.cnp_btype) param_cnp_btype = (TYPEOF(h.cnp_btype))'',TYPEOF(h.cnp_lowv) param_cnp_lowv = (TYPEOF(h.cnp_lowv))'',TYPEOF(h.prim_range) param_prim_range = (TYPEOF(h.prim_range))'',TYPEOF(h.prim_range_len) param_prim_range_len = (TYPEOF(h.prim_range_len))'',TYPEOF(h.sec_range) param_sec_range = (TYPEOF(h.sec_range))'',TYPEOF(h.sec_range_len) param_sec_range_len = (TYPEOF(h.sec_range_len))'',TYPEOF(h.parent_proxid) param_parent_proxid = (TYPEOF(h.parent_proxid))'',TYPEOF(h.sele_proxid) param_sele_proxid = (TYPEOF(h.sele_proxid))'',TYPEOF(h.org_proxid) param_org_proxid = (TYPEOF(h.org_proxid))'',TYPEOF(h.ultimate_proxid) param_ultimate_proxid = (TYPEOF(h.ultimate_proxid))'',TYPEOF(h.sele_flag) param_sele_flag = (TYPEOF(h.sele_flag))'',TYPEOF(h.org_flag) param_org_flag = (TYPEOF(h.org_flag))'',TYPEOF(h.ult_flag) param_ult_flag = (TYPEOF(h.ult_flag))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',BOOLEAN param_disableForce = FALSE) := FUNCTION
-  RawData := RawFetchL_CNPNAME_ZIP(param_cnp_name,param_zip,param_prim_name,param_prim_name_len,param_st,param_city,param_city_len,param_fallback_value);
+  RawData := RawFetchL_CNPNAME_ZIP(param_cnp_name,param_zip,param_prim_name,param_prim_name_len,param_st,param_fallback_value);
  
   Process_Biz_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
     SELF.keys_used := 1 << 1+Config_BIP.KeysBitmapOffset; // Set bitmap for keys used
@@ -307,8 +306,8 @@ layout := RECORD // project out required fields
   h.rcid; // For the case where an external linkage did not happen
   h.prim_name;
   h.zip;
-  h.city;
 // Extra credit fields
+  h.city;
   h.company_sic_code1;
   h.cnp_number;
   h.cnp_btype;
@@ -366,7 +365,7 @@ SHARED DataForKeyL_CNPNAME_ST := DataForKey2;
 EXPORT KeyL_CNPNAME_ST := INDEX(DataForKeyL_CNPNAME_ST,{DataForKeyL_CNPNAME_ST},{},KeyL_CNPNAME_STName);
 KeyRec := RECORDOF(KeyL_CNPNAME_ST);
  
-EXPORT RawFetchL_CNPNAME_ST(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'') := 
+EXPORT RawFetchL_CNPNAME_ST(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'') := 
   FUNCTION
  //Generate service attributes for GSS join
     wds := SALT311.fn_string_to_wordstream(param_cnp_name);
@@ -376,8 +375,7 @@ EXPORT RawFetchL_CNPNAME_ST(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_na
     doIndexRead(UNSIGNED4 search,UNSIGNED2 spc) := STEPPED(KEYL_CNPNAME_ST( KEYED(GSS_hash = search) AND (GSS_bloom & BloomF) = BloomF
       AND KEYED((st = param_st))
       AND ((param_prim_name = (TYPEOF(prim_name))'' OR prim_name = (TYPEOF(prim_name))'') OR (prim_name = param_prim_name) OR ((Config_BIP.WithinEditN(prim_name,prim_name_len,param_prim_name,param_prim_name_len,1, 0)) ))
-      AND ((~EXISTS(param_zip) OR zip = (TYPEOF(zip))'') OR (zip IN SET(param_zip,zip)))
-      AND ((param_city = (TYPEOF(city))'' OR city = (TYPEOF(city))'') OR (city = param_city) OR ( (metaphonelib.DMetaPhone1(city)=metaphonelib.DMetaPhone1(param_city))  OR (Config_BIP.WithinEditN(city,city_len,param_city,param_city_len,2, 0)) ))),ultid,orgid,seleid,proxid,PRIORITY(40-spc)); // Filter for each row of index fetch
+      AND ((~EXISTS(param_zip) OR zip = (TYPEOF(zip))'') OR (zip IN SET(param_zip,zip)))),ultid,orgid,seleid,proxid,PRIORITY(40-spc)); // Filter for each row of index fetch
     SALT311.MAC_collate_wordbag_matches4(wds,slimrec,doIndexRead,ultid,orgid,seleid,proxid,steppedmatches) // Perform N-way join
     res := JOIN( steppedmatches, KeyL_CNPNAME_ST, KEYED(RIGHT.GSS_Hash = wds[1].hsh)
       AND KEYED((RIGHT.st = param_st)) AND KEYED(RIGHT.fallback_value >= param_fallback_value) AND KEYED(LEFT.proxid = RIGHT.proxid AND LEFT.seleid = RIGHT.seleid AND LEFT.orgid = RIGHT.orgid AND LEFT.ultid = RIGHT.ultid),TRANSFORM(indexOutputRecord,SELF.gss_word_weight := LEFT.gss_word_weight,SELF := RIGHT));
@@ -385,7 +383,7 @@ EXPORT RawFetchL_CNPNAME_ST(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_na
   END;
  
 EXPORT ScoredproxidFetchL_CNPNAME_ST(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.company_sic_code1) param_company_sic_code1 = (TYPEOF(h.company_sic_code1))'',TYPEOF(h.cnp_number) param_cnp_number = (TYPEOF(h.cnp_number))'',TYPEOF(h.cnp_btype) param_cnp_btype = (TYPEOF(h.cnp_btype))'',TYPEOF(h.cnp_lowv) param_cnp_lowv = (TYPEOF(h.cnp_lowv))'',TYPEOF(h.prim_range) param_prim_range = (TYPEOF(h.prim_range))'',TYPEOF(h.prim_range_len) param_prim_range_len = (TYPEOF(h.prim_range_len))'',TYPEOF(h.sec_range) param_sec_range = (TYPEOF(h.sec_range))'',TYPEOF(h.sec_range_len) param_sec_range_len = (TYPEOF(h.sec_range_len))'',TYPEOF(h.parent_proxid) param_parent_proxid = (TYPEOF(h.parent_proxid))'',TYPEOF(h.sele_proxid) param_sele_proxid = (TYPEOF(h.sele_proxid))'',TYPEOF(h.org_proxid) param_org_proxid = (TYPEOF(h.org_proxid))'',TYPEOF(h.ultimate_proxid) param_ultimate_proxid = (TYPEOF(h.ultimate_proxid))'',TYPEOF(h.sele_flag) param_sele_flag = (TYPEOF(h.sele_flag))'',TYPEOF(h.org_flag) param_org_flag = (TYPEOF(h.org_flag))'',TYPEOF(h.ult_flag) param_ult_flag = (TYPEOF(h.ult_flag))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',BOOLEAN param_disableForce = FALSE) := FUNCTION
-  RawData := RawFetchL_CNPNAME_ST(param_cnp_name,param_st,param_prim_name,param_prim_name_len,param_zip,param_city,param_city_len,param_fallback_value);
+  RawData := RawFetchL_CNPNAME_ST(param_cnp_name,param_st,param_prim_name,param_prim_name_len,param_zip,param_fallback_value);
  
   Process_Biz_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
     SELF.keys_used := 1 << 2+Config_BIP.KeysBitmapOffset; // Set bitmap for keys used
@@ -541,9 +539,9 @@ layout := RECORD // project out required fields
   h.proxid; // The ID field
   h.rcid; // For the case where an external linkage did not happen
   h.prim_name;
-  h.st;
   h.city;
 // Extra credit fields
+  h.st;
   h.company_sic_code1;
   h.cnp_number;
   h.cnp_btype;
@@ -570,11 +568,11 @@ layout := RECORD // project out required fields
 //Scores for various field components
   h.prim_name_weight100 ; // Contains 100x the specificity
   h.prim_name_e1_Weight100;
-  h.st_weight100 ; // Contains 100x the specificity
   h.city_weight100 ; // Contains 100x the specificity
   INTEGER2 city_p_Weight100 := SALT311.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_p_cnt)/log(2)); // Precompute phonetic specificity
   INTEGER2 city_e2_Weight100 := SALT311.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_e2_cnt)/log(2)); // Precompute edit-distance specificity
   INTEGER2 city_e2p_Weight100 := SALT311.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_e2p_cnt)/log(2)); // Precompute phonetic & edit_distance specificity
+  h.st_weight100 ; // Contains 100x the specificity
   h.company_sic_code1_weight100 ; // Contains 100x the specificity
   h.cnp_number_weight100 ; // Contains 100x the specificity
   h.cnp_btype_weight100 ; // Contains 100x the specificity
@@ -593,7 +591,7 @@ layout := RECORD // project out required fields
   h.zip_weight100 ; // Contains 100x the specificity
 END;
  
-DataForKey0 := DEDUP(SORT(TABLE(h((cnp_name NOT IN SET(s.nulls_cnp_name,cnp_name) AND cnp_name <> (TYPEOF(cnp_name))''),(zip NOT IN SET(s.nulls_zip,zip) AND zip <> (TYPEOF(zip))'')),layout),GSS_hash,proxid,seleid,orgid,ultid,rcid,prim_name,st,city,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag,zip,powid,cnp_name,gss_bloom,prim_name_len,city_len,prim_range_len,sec_range_len,prim_name_weight100,prim_name_e1_Weight100,st_weight100,city_weight100,city_p_Weight100,city_e2_Weight100,city_e2p_Weight100,company_sic_code1_weight100,cnp_number_weight100,cnp_btype_weight100,cnp_lowv_weight100,prim_range_weight100,prim_range_e1_Weight100,sec_range_weight100,sec_range_e1_Weight100,parent_proxid_weight100,sele_proxid_weight100,org_proxid_weight100,ultimate_proxid_weight100,sele_flag_weight100,org_flag_weight100,ult_flag_weight100,zip_weight100,-fallback_value,LOCAL),WHOLE RECORD,EXCEPT fallback_value,LOCAL);
+DataForKey0 := DEDUP(SORT(TABLE(h((cnp_name NOT IN SET(s.nulls_cnp_name,cnp_name) AND cnp_name <> (TYPEOF(cnp_name))''),(zip NOT IN SET(s.nulls_zip,zip) AND zip <> (TYPEOF(zip))'')),layout),GSS_hash,proxid,seleid,orgid,ultid,rcid,prim_name,city,st,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag,zip,powid,cnp_name,gss_bloom,prim_name_len,city_len,prim_range_len,sec_range_len,prim_name_weight100,prim_name_e1_Weight100,city_weight100,city_p_Weight100,city_e2_Weight100,city_e2p_Weight100,st_weight100,company_sic_code1_weight100,cnp_number_weight100,cnp_btype_weight100,cnp_lowv_weight100,prim_range_weight100,prim_range_e1_Weight100,sec_range_weight100,sec_range_e1_Weight100,parent_proxid_weight100,sele_proxid_weight100,org_proxid_weight100,ultimate_proxid_weight100,sele_flag_weight100,org_flag_weight100,ult_flag_weight100,zip_weight100,-fallback_value,LOCAL),WHOLE RECORD,EXCEPT fallback_value,LOCAL);
 // Now need to 'blow out' the fixed word-bag fields to create the pseudo-inversion
 SALT311.mac_expand_wordbag_key(DataForKey0,GSS_hash,cnp_name,DataForKey1,GSS_word_weight)
 DataForKey2 := DEDUP(SORT(DataForKey1,WHOLE RECORD,LOCAL),WHOLE RECORD,LOCAL); // Can remove wordbag fields now
@@ -602,7 +600,7 @@ SHARED DataForKeyL_CNPNAME := DataForKey2;
 EXPORT KeyL_CNPNAME := INDEX(DataForKeyL_CNPNAME,{DataForKeyL_CNPNAME},{},KeyL_CNPNAMEName);
 KeyRec := RECORDOF(KeyL_CNPNAME);
  
-EXPORT RawFetchL_CNPNAME(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'') := 
+EXPORT RawFetchL_CNPNAME(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'') := 
   FUNCTION
  //Generate service attributes for GSS join
     wds := SALT311.fn_string_to_wordstream(param_cnp_name);
@@ -611,15 +609,14 @@ EXPORT RawFetchL_CNPNAME(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name)
     BloomF := SALT311.Fn_Wordbag_To_Bloom(param_cnp_name); // Use for extra index filtering
     doIndexRead(UNSIGNED4 search,UNSIGNED2 spc) := STEPPED(KEYL_CNPNAME( KEYED(GSS_hash = search) AND (GSS_bloom & BloomF) = BloomF
       AND ((param_prim_name = (TYPEOF(prim_name))'' OR prim_name = (TYPEOF(prim_name))'') OR (prim_name = param_prim_name) OR ((Config_BIP.WithinEditN(prim_name,prim_name_len,param_prim_name,param_prim_name_len,1, 0)) ))
-      AND ((param_st = (TYPEOF(st))'' OR st = (TYPEOF(st))'') OR (st = param_st))
       AND ((param_city = (TYPEOF(city))'' OR city = (TYPEOF(city))'') OR (city = param_city) OR ( (metaphonelib.DMetaPhone1(city)=metaphonelib.DMetaPhone1(param_city))  OR (Config_BIP.WithinEditN(city,city_len,param_city,param_city_len,2, 0)) ))),ultid,orgid,seleid,proxid,PRIORITY(40-spc)); // Filter for each row of index fetch
     SALT311.MAC_collate_wordbag_matches4(wds,slimrec,doIndexRead,ultid,orgid,seleid,proxid,steppedmatches) // Perform N-way join
     res := JOIN( steppedmatches, KeyL_CNPNAME, KEYED(RIGHT.GSS_Hash = wds[1].hsh) AND KEYED(RIGHT.fallback_value >= param_fallback_value) AND KEYED(LEFT.proxid = RIGHT.proxid AND LEFT.seleid = RIGHT.seleid AND LEFT.orgid = RIGHT.orgid AND LEFT.ultid = RIGHT.ultid),TRANSFORM(indexOutputRecord,SELF.gss_word_weight := LEFT.gss_word_weight,SELF := RIGHT));
     RETURN IF(SUM(wds,spec) > 19,res,IF(SUM(wds,spec) = 0,DATASET([],indexOutputRecord) ,DATASET(ROW([],indexOutputRecord)))); // Ensure at least spc of specificity in gss portion
   END;
  
-EXPORT ScoredproxidFetchL_CNPNAME(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.company_sic_code1) param_company_sic_code1 = (TYPEOF(h.company_sic_code1))'',TYPEOF(h.cnp_number) param_cnp_number = (TYPEOF(h.cnp_number))'',TYPEOF(h.cnp_btype) param_cnp_btype = (TYPEOF(h.cnp_btype))'',TYPEOF(h.cnp_lowv) param_cnp_lowv = (TYPEOF(h.cnp_lowv))'',TYPEOF(h.prim_range) param_prim_range = (TYPEOF(h.prim_range))'',TYPEOF(h.prim_range_len) param_prim_range_len = (TYPEOF(h.prim_range_len))'',TYPEOF(h.sec_range) param_sec_range = (TYPEOF(h.sec_range))'',TYPEOF(h.sec_range_len) param_sec_range_len = (TYPEOF(h.sec_range_len))'',TYPEOF(h.parent_proxid) param_parent_proxid = (TYPEOF(h.parent_proxid))'',TYPEOF(h.sele_proxid) param_sele_proxid = (TYPEOF(h.sele_proxid))'',TYPEOF(h.org_proxid) param_org_proxid = (TYPEOF(h.org_proxid))'',TYPEOF(h.ultimate_proxid) param_ultimate_proxid = (TYPEOF(h.ultimate_proxid))'',TYPEOF(h.sele_flag) param_sele_flag = (TYPEOF(h.sele_flag))'',TYPEOF(h.org_flag) param_org_flag = (TYPEOF(h.org_flag))'',TYPEOF(h.ult_flag) param_ult_flag = (TYPEOF(h.ult_flag))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',BOOLEAN param_disableForce = FALSE) := FUNCTION
-  RawData := RawFetchL_CNPNAME(param_cnp_name,param_prim_name,param_prim_name_len,param_st,param_city,param_city_len,param_fallback_value);
+EXPORT ScoredproxidFetchL_CNPNAME(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.company_sic_code1) param_company_sic_code1 = (TYPEOF(h.company_sic_code1))'',TYPEOF(h.cnp_number) param_cnp_number = (TYPEOF(h.cnp_number))'',TYPEOF(h.cnp_btype) param_cnp_btype = (TYPEOF(h.cnp_btype))'',TYPEOF(h.cnp_lowv) param_cnp_lowv = (TYPEOF(h.cnp_lowv))'',TYPEOF(h.prim_range) param_prim_range = (TYPEOF(h.prim_range))'',TYPEOF(h.prim_range_len) param_prim_range_len = (TYPEOF(h.prim_range_len))'',TYPEOF(h.sec_range) param_sec_range = (TYPEOF(h.sec_range))'',TYPEOF(h.sec_range_len) param_sec_range_len = (TYPEOF(h.sec_range_len))'',TYPEOF(h.parent_proxid) param_parent_proxid = (TYPEOF(h.parent_proxid))'',TYPEOF(h.sele_proxid) param_sele_proxid = (TYPEOF(h.sele_proxid))'',TYPEOF(h.org_proxid) param_org_proxid = (TYPEOF(h.org_proxid))'',TYPEOF(h.ultimate_proxid) param_ultimate_proxid = (TYPEOF(h.ultimate_proxid))'',TYPEOF(h.sele_flag) param_sele_flag = (TYPEOF(h.sele_flag))'',TYPEOF(h.org_flag) param_org_flag = (TYPEOF(h.org_flag))'',TYPEOF(h.ult_flag) param_ult_flag = (TYPEOF(h.ult_flag))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',BOOLEAN param_disableForce = FALSE) := FUNCTION
+  RawData := RawFetchL_CNPNAME(param_cnp_name,param_prim_name,param_prim_name_len,param_city,param_city_len,param_fallback_value);
  
   Process_Biz_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
     SELF.keys_used := 1 << 3+Config_BIP.KeysBitmapOffset; // Set bitmap for keys used
@@ -636,13 +633,6 @@ EXPORT ScoredproxidFetchL_CNPNAME(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.
            SELF.prim_name_match_code = SALT311.MatchCode.ExactMatch =>le.prim_name_weight100,
            SELF.prim_name_match_code = SALT311.MatchCode.EditDistanceMatch =>le.prim_name_e1_weight100,
            -1.000*le.prim_name_weight100))/100; 
-    SELF.st_match_code := MAP(
-           le.st = (TYPEOF(le.st))'' OR param_st = (TYPEOF(param_st))'' => SALT311.MatchCode.OneSideNull,
-           match_methods(File_BizHead).match_st(le.st,param_st,FALSE));
-    SELF.stWeight := (50+MAP (
-           SELF.st_match_code = SALT311.MatchCode.OneSideNull => 0,
-           SELF.st_match_code = SALT311.MatchCode.ExactMatch =>le.st_weight100,
-           -1.000*le.st_weight100))/100; 
     SELF.city_match_code := MAP(
            le.city = (TYPEOF(le.city))'' OR param_city = (TYPEOF(param_city))'' => SALT311.MatchCode.OneSideNull,
            le.st = (TYPEOF(le.st))'' OR param_st = (TYPEOF(param_st))'' OR le.st <> param_st  => SALT311.MatchCode.ContextNoMatch, // Only valid if the context variable is equal
@@ -654,6 +644,13 @@ EXPORT ScoredproxidFetchL_CNPNAME(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.
            SELF.city_match_code = SALT311.MatchCode.EditDistanceMatch =>IF( metaphonelib.DMetaPhone1(le.city)=metaphonelib.DMetaPhone1(param_city),le.city_e2p_weight100,le.city_e2_weight100),
            SELF.city_match_code = SALT311.MatchCode.PhoneticMatch =>le.city_p_weight100,
            -0.947*le.city_weight100))/100; 
+    SELF.st_match_code := MAP(
+           le.st = (TYPEOF(le.st))'' OR param_st = (TYPEOF(param_st))'' => SALT311.MatchCode.OneSideNull,
+           match_methods(File_BizHead).match_st(le.st,param_st,FALSE));
+    SELF.stWeight := (50+MAP (
+           SELF.st_match_code = SALT311.MatchCode.OneSideNull => 0,
+           SELF.st_match_code = SALT311.MatchCode.ExactMatch =>le.st_weight100,
+           -1.000*le.st_weight100))/100; 
     SELF.company_sic_code1_match_code := MAP(
            le.company_sic_code1 = (TYPEOF(le.company_sic_code1))'' OR param_company_sic_code1 = (TYPEOF(param_company_sic_code1))'' => SALT311.MatchCode.OneSideNull,
            match_methods(File_BizHead).match_company_sic_code1(le.company_sic_code1,param_company_sic_code1,FALSE));
@@ -755,7 +752,7 @@ EXPORT ScoredproxidFetchL_CNPNAME(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.
            SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100* param_zip(zip=le.zip)[1].weight/100.0,
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
-    SELF.Weight := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0 AND le.rcid = 0, 1, MAX(0, SELF.cnp_nameWeight) + MAX(0, SELF.prim_nameWeight) + MAX(0, SELF.stWeight) + MAX(0, SELF.cityWeight) + MAX(0, SELF.company_sic_code1Weight) + MAX(0, SELF.cnp_numberWeight) + MAX(0, SELF.cnp_btypeWeight) + MAX(0, SELF.cnp_lowvWeight) + MAX(0, SELF.prim_rangeWeight) + MAX(0, SELF.sec_rangeWeight) + MAX(0, SELF.parent_proxidWeight) + MAX(0, SELF.sele_proxidWeight) + MAX(0, SELF.org_proxidWeight) + MAX(0, SELF.ultimate_proxidWeight) + MAX(0, SELF.sele_flagWeight) + MAX(0, SELF.org_flagWeight) + MAX(0, SELF.ult_flagWeight) + MAX(0, SELF.zipWeight));
+    SELF.Weight := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0 AND le.rcid = 0, 1, MAX(0, SELF.cnp_nameWeight) + MAX(0, SELF.prim_nameWeight) + MAX(0, SELF.cityWeight) + MAX(0, SELF.stWeight) + MAX(0, SELF.company_sic_code1Weight) + MAX(0, SELF.cnp_numberWeight) + MAX(0, SELF.cnp_btypeWeight) + MAX(0, SELF.cnp_lowvWeight) + MAX(0, SELF.prim_rangeWeight) + MAX(0, SELF.sec_rangeWeight) + MAX(0, SELF.parent_proxidWeight) + MAX(0, SELF.sele_proxidWeight) + MAX(0, SELF.org_proxidWeight) + MAX(0, SELF.ultimate_proxidWeight) + MAX(0, SELF.sele_flagWeight) + MAX(0, SELF.org_flagWeight) + MAX(0, SELF.ult_flagWeight) + MAX(0, SELF.zipWeight));
     SELF := le;
   END;
   result0 := PROJECT(NOFOLD(RawData),Score(LEFT));
@@ -771,8 +768,8 @@ layout := RECORD // project out required fields
 // Compulsory fields
   h.company_name_prefix;
 // Optional fields
-  h.zip;
   h.st;
+  h.zip;
   h.fallback_value; // Populate the fallback field
   h.ultid; // Parent #3
   h.orgid; // Parent #2
@@ -780,8 +777,8 @@ layout := RECORD // project out required fields
   h.proxid; // The ID field
   h.rcid; // For the case where an external linkage did not happen
   h.cnp_name;
-  h.city;
 // Extra credit fields
+  h.city;
   h.company_sic_code1;
   h.cnp_number;
   h.cnp_btype;
@@ -803,12 +800,12 @@ layout := RECORD // project out required fields
   h.company_name_prefix_weight100 ; // Contains 100x the specificity
   h.cnp_name_weight100 ; // Contains 100x the specificity
   h.cnp_name_initial_char_weight100 ; // Contains 100x the specificity
+  h.st_weight100 ; // Contains 100x the specificity
   h.zip_weight100 ; // Contains 100x the specificity
   h.city_weight100 ; // Contains 100x the specificity
   INTEGER2 city_p_Weight100 := SALT311.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_p_cnt)/log(2)); // Precompute phonetic specificity
   INTEGER2 city_e2_Weight100 := SALT311.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_e2_cnt)/log(2)); // Precompute edit-distance specificity
   INTEGER2 city_e2p_Weight100 := SALT311.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_e2p_cnt)/log(2)); // Precompute phonetic & edit_distance specificity
-  h.st_weight100 ; // Contains 100x the specificity
   h.company_sic_code1_weight100 ; // Contains 100x the specificity
   h.cnp_number_weight100 ; // Contains 100x the specificity
   h.cnp_btype_weight100 ; // Contains 100x the specificity
@@ -826,24 +823,23 @@ layout := RECORD // project out required fields
   h.ult_flag_weight100 ; // Contains 100x the specificity
 END;
  
-DataForKey0 := DEDUP(SORT(TABLE(h((company_name_prefix NOT IN SET(s.nulls_company_name_prefix,company_name_prefix) AND company_name_prefix <> (TYPEOF(company_name_prefix))''),(cnp_name NOT IN SET(s.nulls_cnp_name,cnp_name) AND cnp_name <> (TYPEOF(cnp_name))''),(zip NOT IN SET(s.nulls_zip,zip) AND zip <> (TYPEOF(zip))'')),layout),company_name_prefix,zip,st,proxid,seleid,orgid,ultid,rcid,cnp_name,city,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag,powid,city_len,prim_range_len,sec_range_len,company_name_prefix_weight100,cnp_name_weight100,cnp_name_initial_char_weight100,zip_weight100,city_weight100,city_p_Weight100,city_e2_Weight100,city_e2p_Weight100,st_weight100,company_sic_code1_weight100,cnp_number_weight100,cnp_btype_weight100,cnp_lowv_weight100,prim_range_weight100,prim_range_e1_Weight100,sec_range_weight100,sec_range_e1_Weight100,parent_proxid_weight100,sele_proxid_weight100,org_proxid_weight100,ultimate_proxid_weight100,sele_flag_weight100,org_flag_weight100,ult_flag_weight100,-fallback_value,LOCAL),WHOLE RECORD,EXCEPT fallback_value,LOCAL);
+DataForKey0 := DEDUP(SORT(TABLE(h((company_name_prefix NOT IN SET(s.nulls_company_name_prefix,company_name_prefix) AND company_name_prefix <> (TYPEOF(company_name_prefix))''),(cnp_name NOT IN SET(s.nulls_cnp_name,cnp_name) AND cnp_name <> (TYPEOF(cnp_name))''),(zip NOT IN SET(s.nulls_zip,zip) AND zip <> (TYPEOF(zip))'')),layout),company_name_prefix,st,zip,proxid,seleid,orgid,ultid,rcid,cnp_name,city,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag,powid,city_len,prim_range_len,sec_range_len,company_name_prefix_weight100,cnp_name_weight100,cnp_name_initial_char_weight100,st_weight100,zip_weight100,city_weight100,city_p_Weight100,city_e2_Weight100,city_e2p_Weight100,company_sic_code1_weight100,cnp_number_weight100,cnp_btype_weight100,cnp_lowv_weight100,prim_range_weight100,prim_range_e1_Weight100,sec_range_weight100,sec_range_e1_Weight100,parent_proxid_weight100,sele_proxid_weight100,org_proxid_weight100,ultimate_proxid_weight100,sele_flag_weight100,org_flag_weight100,ult_flag_weight100,-fallback_value,LOCAL),WHOLE RECORD,EXCEPT fallback_value,LOCAL);
 SHARED DataForKeyL_CNPNAME_FUZZY := DataForKey0;
  
 EXPORT KeyL_CNPNAME_FUZZY := INDEX(DataForKeyL_CNPNAME_FUZZY,{DataForKeyL_CNPNAME_FUZZY},{},KeyL_CNPNAME_FUZZYName);
 KeyRec := RECORDOF(KeyL_CNPNAME_FUZZY);
  
-EXPORT RawFetchL_CNPNAME_FUZZY(TYPEOF(h.company_name_prefix) param_company_name_prefix = (TYPEOF(h.company_name_prefix))'',TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'') := 
+EXPORT RawFetchL_CNPNAME_FUZZY(TYPEOF(h.company_name_prefix) param_company_name_prefix = (TYPEOF(h.company_name_prefix))'',TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'') := 
     STEPPED( LIMIT( KeyL_CNPNAME_FUZZY(
           KEYED((company_name_prefix = param_company_name_prefix))
       AND ((param_cnp_name = (TYPEOF(cnp_name))'' OR cnp_name = (TYPEOF(cnp_name))'') OR (SALT311.MatchBagOfWords(cnp_name,param_cnp_name,3177747,1) > Config_BIP.cnp_name_Force * 100))
-      AND KEYED((~EXISTS(param_zip) OR zip = (TYPEOF(zip))'') OR (zip IN SET(param_zip,zip)))
-      AND ((param_city = (TYPEOF(city))'' OR city = (TYPEOF(city))'') OR (city = param_city) OR ( (metaphonelib.DMetaPhone1(city)=metaphonelib.DMetaPhone1(param_city))  OR (Config_BIP.WithinEditN(city,city_len,param_city,param_city_len,2, 0)) ))
       AND KEYED((param_st = (TYPEOF(st))'' OR st = (TYPEOF(st))'') OR (st = param_st))
+      AND KEYED((~EXISTS(param_zip) OR zip = (TYPEOF(zip))'') OR (zip IN SET(param_zip,zip)))
       AND KEYED(fallback_value >= param_fallback_value)),Config_BIP.L_CNPNAME_FUZZY_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),ultid,orgid,seleid,proxid);
  
  
-EXPORT ScoredproxidFetchL_CNPNAME_FUZZY(TYPEOF(h.company_name_prefix) param_company_name_prefix = (TYPEOF(h.company_name_prefix))'',TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.company_sic_code1) param_company_sic_code1 = (TYPEOF(h.company_sic_code1))'',TYPEOF(h.cnp_number) param_cnp_number = (TYPEOF(h.cnp_number))'',TYPEOF(h.cnp_btype) param_cnp_btype = (TYPEOF(h.cnp_btype))'',TYPEOF(h.cnp_lowv) param_cnp_lowv = (TYPEOF(h.cnp_lowv))'',TYPEOF(h.prim_range) param_prim_range = (TYPEOF(h.prim_range))'',TYPEOF(h.prim_range_len) param_prim_range_len = (TYPEOF(h.prim_range_len))'',TYPEOF(h.sec_range) param_sec_range = (TYPEOF(h.sec_range))'',TYPEOF(h.sec_range_len) param_sec_range_len = (TYPEOF(h.sec_range_len))'',TYPEOF(h.parent_proxid) param_parent_proxid = (TYPEOF(h.parent_proxid))'',TYPEOF(h.sele_proxid) param_sele_proxid = (TYPEOF(h.sele_proxid))'',TYPEOF(h.org_proxid) param_org_proxid = (TYPEOF(h.org_proxid))'',TYPEOF(h.ultimate_proxid) param_ultimate_proxid = (TYPEOF(h.ultimate_proxid))'',TYPEOF(h.sele_flag) param_sele_flag = (TYPEOF(h.sele_flag))'',TYPEOF(h.org_flag) param_org_flag = (TYPEOF(h.org_flag))'',TYPEOF(h.ult_flag) param_ult_flag = (TYPEOF(h.ult_flag))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',BOOLEAN param_disableForce = FALSE) := FUNCTION
-  RawData := RawFetchL_CNPNAME_FUZZY(param_company_name_prefix,param_cnp_name,param_zip,param_city,param_city_len,param_st,param_fallback_value);
+EXPORT ScoredproxidFetchL_CNPNAME_FUZZY(TYPEOF(h.company_name_prefix) param_company_name_prefix = (TYPEOF(h.company_name_prefix))'',TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.company_sic_code1) param_company_sic_code1 = (TYPEOF(h.company_sic_code1))'',TYPEOF(h.cnp_number) param_cnp_number = (TYPEOF(h.cnp_number))'',TYPEOF(h.cnp_btype) param_cnp_btype = (TYPEOF(h.cnp_btype))'',TYPEOF(h.cnp_lowv) param_cnp_lowv = (TYPEOF(h.cnp_lowv))'',TYPEOF(h.prim_range) param_prim_range = (TYPEOF(h.prim_range))'',TYPEOF(h.prim_range_len) param_prim_range_len = (TYPEOF(h.prim_range_len))'',TYPEOF(h.sec_range) param_sec_range = (TYPEOF(h.sec_range))'',TYPEOF(h.sec_range_len) param_sec_range_len = (TYPEOF(h.sec_range_len))'',TYPEOF(h.parent_proxid) param_parent_proxid = (TYPEOF(h.parent_proxid))'',TYPEOF(h.sele_proxid) param_sele_proxid = (TYPEOF(h.sele_proxid))'',TYPEOF(h.org_proxid) param_org_proxid = (TYPEOF(h.org_proxid))'',TYPEOF(h.ultimate_proxid) param_ultimate_proxid = (TYPEOF(h.ultimate_proxid))'',TYPEOF(h.sele_flag) param_sele_flag = (TYPEOF(h.sele_flag))'',TYPEOF(h.org_flag) param_org_flag = (TYPEOF(h.org_flag))'',TYPEOF(h.ult_flag) param_ult_flag = (TYPEOF(h.ult_flag))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',BOOLEAN param_disableForce = FALSE) := FUNCTION
+  RawData := RawFetchL_CNPNAME_FUZZY(param_company_name_prefix,param_cnp_name,param_st,param_zip,param_fallback_value);
  
   Process_Biz_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
     SELF.keys_used := 1 << 4+Config_BIP.KeysBitmapOffset; // Set bitmap for keys used
@@ -859,6 +855,13 @@ EXPORT ScoredproxidFetchL_CNPNAME_FUZZY(TYPEOF(h.company_name_prefix) param_comp
            SELF.cnp_name_match_code = SALT311.MatchCode.OneSideNull => 0,
            SELF.cnp_name_match_code = SALT311.MatchCode.ExactMatch =>le.cnp_name_weight100,
            SALT311.MatchBagOfWords(le.cnp_name,param_cnp_name,3177747,1)))/100; 
+    SELF.st_match_code := MAP(
+           le.st = (TYPEOF(le.st))'' OR param_st = (TYPEOF(param_st))'' => SALT311.MatchCode.OneSideNull,
+           match_methods(File_BizHead).match_st(le.st,param_st,FALSE));
+    SELF.stWeight := (50+MAP (
+           SELF.st_match_code = SALT311.MatchCode.OneSideNull => 0,
+           SELF.st_match_code = SALT311.MatchCode.ExactMatch =>le.st_weight100,
+           -1.000*le.st_weight100))/100; 
     SELF.zip_match_code := MAP(
            le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(param_zip) => SALT311.MatchCode.OneSideNull,
            match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),FALSE));
@@ -878,13 +881,6 @@ EXPORT ScoredproxidFetchL_CNPNAME_FUZZY(TYPEOF(h.company_name_prefix) param_comp
            SELF.city_match_code = SALT311.MatchCode.EditDistanceMatch =>IF( metaphonelib.DMetaPhone1(le.city)=metaphonelib.DMetaPhone1(param_city),le.city_e2p_weight100,le.city_e2_weight100),
            SELF.city_match_code = SALT311.MatchCode.PhoneticMatch =>le.city_p_weight100,
            -0.947*le.city_weight100))/100; 
-    SELF.st_match_code := MAP(
-           le.st = (TYPEOF(le.st))'' OR param_st = (TYPEOF(param_st))'' => SALT311.MatchCode.OneSideNull,
-           match_methods(File_BizHead).match_st(le.st,param_st,FALSE));
-    SELF.stWeight := (50+MAP (
-           SELF.st_match_code = SALT311.MatchCode.OneSideNull => 0,
-           SELF.st_match_code = SALT311.MatchCode.ExactMatch =>le.st_weight100,
-           -1.000*le.st_weight100))/100; 
     SELF.company_sic_code1_match_code := MAP(
            le.company_sic_code1 = (TYPEOF(le.company_sic_code1))'' OR param_company_sic_code1 = (TYPEOF(param_company_sic_code1))'' => SALT311.MatchCode.OneSideNull,
            match_methods(File_BizHead).match_company_sic_code1(le.company_sic_code1,param_company_sic_code1,FALSE));
@@ -978,7 +974,7 @@ EXPORT ScoredproxidFetchL_CNPNAME_FUZZY(TYPEOF(h.company_name_prefix) param_comp
            SELF.ult_flag_match_code = SALT311.MatchCode.OneSideNull => 0,
            SELF.ult_flag_match_code = SALT311.MatchCode.ExactMatch =>le.ult_flag_weight100,
            -1.000*le.ult_flag_weight100))/100*0.00; 
-    SELF.Weight := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0 AND le.rcid = 0, 1, MAX(0, SELF.company_name_prefixWeight) + MAX(0, SELF.cnp_nameWeight) + MAX(0, SELF.zipWeight) + MAX(0, SELF.cityWeight) + MAX(0, SELF.stWeight) + MAX(0, SELF.company_sic_code1Weight) + MAX(0, SELF.cnp_numberWeight) + MAX(0, SELF.cnp_btypeWeight) + MAX(0, SELF.cnp_lowvWeight) + MAX(0, SELF.prim_rangeWeight) + MAX(0, SELF.sec_rangeWeight) + MAX(0, SELF.parent_proxidWeight) + MAX(0, SELF.sele_proxidWeight) + MAX(0, SELF.org_proxidWeight) + MAX(0, SELF.ultimate_proxidWeight) + MAX(0, SELF.sele_flagWeight) + MAX(0, SELF.org_flagWeight) + MAX(0, SELF.ult_flagWeight));
+    SELF.Weight := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0 AND le.rcid = 0, 1, MAX(0, SELF.company_name_prefixWeight) + MAX(0, SELF.cnp_nameWeight) + MAX(0, SELF.stWeight) + MAX(0, SELF.zipWeight) + MAX(0, SELF.cityWeight) + MAX(0, SELF.company_sic_code1Weight) + MAX(0, SELF.cnp_numberWeight) + MAX(0, SELF.cnp_btypeWeight) + MAX(0, SELF.cnp_lowvWeight) + MAX(0, SELF.prim_rangeWeight) + MAX(0, SELF.sec_rangeWeight) + MAX(0, SELF.parent_proxidWeight) + MAX(0, SELF.sele_proxidWeight) + MAX(0, SELF.org_proxidWeight) + MAX(0, SELF.ultimate_proxidWeight) + MAX(0, SELF.sele_flagWeight) + MAX(0, SELF.org_flagWeight) + MAX(0, SELF.ult_flagWeight));
     SELF := le;
   END;
   result0 := PROJECT(NOFOLD(RawData),Score(LEFT));
@@ -3557,8 +3553,8 @@ Process_Biz_Layouts.OutputLayout GetResults(Process_Biz_Layouts.InputLayout le) 
     MERGE(
     SORTED(IF(BizLinkFull.Key_BizHead_L_CNPNAME_ZIP.CanSearch(le),ScoredproxidFetchL_CNPNAME_ZIP(param_cnp_name := cnp_name_spec,param_zip := le.zip_cases,param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_st := le.st,param_city := le.city,param_city_len := city_len,param_company_sic_code1 := le.company_sic_code1,param_cnp_number := le.cnp_number,param_cnp_btype := le.cnp_btype,param_cnp_lowv := le.cnp_lowv,param_prim_range := le.prim_range,param_prim_range_len := prim_range_len,param_sec_range := le.sec_range,param_sec_range_len := sec_range_len,param_parent_proxid := le.parent_proxid,param_sele_proxid := le.sele_proxid,param_org_proxid := le.org_proxid,param_ultimate_proxid := le.ultimate_proxid,param_sele_flag := le.sele_flag,param_org_flag := le.org_flag,param_ult_flag := le.ult_flag,param_fallback_value := le.fallback_value,param_disableForce := In_disableForce)),ultid,orgid,seleid,proxid,rcid)
     ,SORTED(IF((~BizLinkFull.Key_BizHead_L_CNPNAME_ZIP.CanSearch(le)),IF(BizLinkFull.Key_BizHead_L_CNPNAME_ST.CanSearch(le),ScoredproxidFetchL_CNPNAME_ST(param_cnp_name := cnp_name_spec,param_st := le.st,param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_zip := le.zip_cases,param_city := le.city,param_city_len := city_len,param_company_sic_code1 := le.company_sic_code1,param_cnp_number := le.cnp_number,param_cnp_btype := le.cnp_btype,param_cnp_lowv := le.cnp_lowv,param_prim_range := le.prim_range,param_prim_range_len := prim_range_len,param_sec_range := le.sec_range,param_sec_range_len := sec_range_len,param_parent_proxid := le.parent_proxid,param_sele_proxid := le.sele_proxid,param_org_proxid := le.org_proxid,param_ultimate_proxid := le.ultimate_proxid,param_sele_flag := le.sele_flag,param_org_flag := le.org_flag,param_ult_flag := le.ult_flag,param_fallback_value := le.fallback_value,param_disableForce := In_disableForce))),ultid,orgid,seleid,proxid,rcid)
-    ,SORTED(IF((~BizLinkFull.Key_BizHead_L_CNPNAME_ST.CanSearch(le) AND ~BizLinkFull.Key_BizHead_L_CNPNAME_ZIP.CanSearch(le)),IF(BizLinkFull.Key_BizHead_L_CNPNAME.CanSearch(le),ScoredproxidFetchL_CNPNAME(param_cnp_name := cnp_name_spec,param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_st := le.st,param_city := le.city,param_city_len := city_len,param_company_sic_code1 := le.company_sic_code1,param_cnp_number := le.cnp_number,param_cnp_btype := le.cnp_btype,param_cnp_lowv := le.cnp_lowv,param_prim_range := le.prim_range,param_prim_range_len := prim_range_len,param_sec_range := le.sec_range,param_sec_range_len := sec_range_len,param_parent_proxid := le.parent_proxid,param_sele_proxid := le.sele_proxid,param_org_proxid := le.org_proxid,param_ultimate_proxid := le.ultimate_proxid,param_sele_flag := le.sele_flag,param_org_flag := le.org_flag,param_ult_flag := le.ult_flag,param_zip := le.zip_cases,param_fallback_value := le.fallback_value,param_disableForce := In_disableForce))),ultid,orgid,seleid,proxid,rcid)
-    ,SORTED(IF(BizLinkFull.Key_BizHead_L_CNPNAME_FUZZY.CanSearch(le),ScoredproxidFetchL_CNPNAME_FUZZY(param_company_name_prefix := le.company_name_prefix,param_cnp_name := cnp_name_spec,param_zip := le.zip_cases,param_city := le.city,param_city_len := city_len,param_st := le.st,param_company_sic_code1 := le.company_sic_code1,param_cnp_number := le.cnp_number,param_cnp_btype := le.cnp_btype,param_cnp_lowv := le.cnp_lowv,param_prim_range := le.prim_range,param_prim_range_len := prim_range_len,param_sec_range := le.sec_range,param_sec_range_len := sec_range_len,param_parent_proxid := le.parent_proxid,param_sele_proxid := le.sele_proxid,param_org_proxid := le.org_proxid,param_ultimate_proxid := le.ultimate_proxid,param_sele_flag := le.sele_flag,param_org_flag := le.org_flag,param_ult_flag := le.ult_flag,param_fallback_value := le.fallback_value,param_disableForce := In_disableForce)),ultid,orgid,seleid,proxid,rcid)
+    ,SORTED(IF((~BizLinkFull.Key_BizHead_L_CNPNAME_ST.CanSearch(le) AND ~BizLinkFull.Key_BizHead_L_CNPNAME_ZIP.CanSearch(le)),IF(BizLinkFull.Key_BizHead_L_CNPNAME.CanSearch(le),ScoredproxidFetchL_CNPNAME(param_cnp_name := cnp_name_spec,param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_city := le.city,param_city_len := city_len,param_st := le.st,param_company_sic_code1 := le.company_sic_code1,param_cnp_number := le.cnp_number,param_cnp_btype := le.cnp_btype,param_cnp_lowv := le.cnp_lowv,param_prim_range := le.prim_range,param_prim_range_len := prim_range_len,param_sec_range := le.sec_range,param_sec_range_len := sec_range_len,param_parent_proxid := le.parent_proxid,param_sele_proxid := le.sele_proxid,param_org_proxid := le.org_proxid,param_ultimate_proxid := le.ultimate_proxid,param_sele_flag := le.sele_flag,param_org_flag := le.org_flag,param_ult_flag := le.ult_flag,param_zip := le.zip_cases,param_fallback_value := le.fallback_value,param_disableForce := In_disableForce))),ultid,orgid,seleid,proxid,rcid)
+    ,SORTED(IF(BizLinkFull.Key_BizHead_L_CNPNAME_FUZZY.CanSearch(le),ScoredproxidFetchL_CNPNAME_FUZZY(param_company_name_prefix := le.company_name_prefix,param_cnp_name := cnp_name_spec,param_st := le.st,param_zip := le.zip_cases,param_city := le.city,param_city_len := city_len,param_company_sic_code1 := le.company_sic_code1,param_cnp_number := le.cnp_number,param_cnp_btype := le.cnp_btype,param_cnp_lowv := le.cnp_lowv,param_prim_range := le.prim_range,param_prim_range_len := prim_range_len,param_sec_range := le.sec_range,param_sec_range_len := sec_range_len,param_parent_proxid := le.parent_proxid,param_sele_proxid := le.sele_proxid,param_org_proxid := le.org_proxid,param_ultimate_proxid := le.ultimate_proxid,param_sele_flag := le.sele_flag,param_org_flag := le.org_flag,param_ult_flag := le.ult_flag,param_fallback_value := le.fallback_value,param_disableForce := In_disableForce)),ultid,orgid,seleid,proxid,rcid)
     ,SORTED(IF(BizLinkFull.Key_BizHead_L_ADDRESS1.CanSearch(le),ScoredproxidFetchL_ADDRESS1(param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_city := le.city,param_city_len := city_len,param_st := le.st,param_prim_range := le.prim_range,param_prim_range_len := prim_range_len,param_cnp_name := cnp_name_spec,param_zip := le.zip_cases,param_company_sic_code1 := le.company_sic_code1,param_cnp_number := le.cnp_number,param_cnp_btype := le.cnp_btype,param_cnp_lowv := le.cnp_lowv,param_sec_range := le.sec_range,param_sec_range_len := sec_range_len,param_parent_proxid := le.parent_proxid,param_sele_proxid := le.sele_proxid,param_org_proxid := le.org_proxid,param_ultimate_proxid := le.ultimate_proxid,param_sele_flag := le.sele_flag,param_org_flag := le.org_flag,param_ult_flag := le.ult_flag,param_fallback_value := le.fallback_value,param_disableForce := In_disableForce)),ultid,orgid,seleid,proxid,rcid)
     ,SORTED(IF(BizLinkFull.Key_BizHead_L_ADDRESS2.CanSearch(le),ScoredproxidFetchL_ADDRESS2(param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_zip := le.zip_cases,param_prim_range := le.prim_range,param_prim_range_len := prim_range_len,param_cnp_name := cnp_name_spec,param_st := le.st,param_city := le.city,param_city_len := city_len,param_company_sic_code1 := le.company_sic_code1,param_cnp_number := le.cnp_number,param_cnp_btype := le.cnp_btype,param_cnp_lowv := le.cnp_lowv,param_sec_range := le.sec_range,param_sec_range_len := sec_range_len,param_parent_proxid := le.parent_proxid,param_sele_proxid := le.sele_proxid,param_org_proxid := le.org_proxid,param_ultimate_proxid := le.ultimate_proxid,param_sele_flag := le.sele_flag,param_org_flag := le.org_flag,param_ult_flag := le.ult_flag,param_fallback_value := le.fallback_value,param_disableForce := In_disableForce)),ultid,orgid,seleid,proxid,rcid)
     ,SORTED(IF(BizLinkFull.Key_BizHead_L_ADDRESS3.CanSearch(le),ScoredproxidFetchL_ADDRESS3(param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_prim_range := le.prim_range,param_prim_range_len := prim_range_len,param_zip := le.zip_cases,param_cnp_name := cnp_name_spec,param_st := le.st,param_city := le.city,param_city_len := city_len,param_company_sic_code1 := le.company_sic_code1,param_cnp_number := le.cnp_number,param_cnp_btype := le.cnp_btype,param_cnp_lowv := le.cnp_lowv,param_sec_range := le.sec_range,param_sec_range_len := sec_range_len,param_parent_proxid := le.parent_proxid,param_sele_proxid := le.sele_proxid,param_org_proxid := le.org_proxid,param_ultimate_proxid := le.ultimate_proxid,param_sele_flag := le.sele_flag,param_org_flag := le.org_flag,param_ult_flag := le.ult_flag,param_fallback_value := le.fallback_value,param_disableForce := In_disableForce)),ultid,orgid,seleid,proxid,rcid)

@@ -2,11 +2,12 @@
 // ====== RETURNS SHEILA GRECO DATA FOR A MAINCOMPANYID IN ESP-COMPLIANT WAY. =====
 // ================================================================================
 //
-import Sheila_Greco, iesp, BIPV2, ut, codes, std;
+import Sheila_Greco, iesp, BIPV2, ut, codes, std, doxie;
 
 export SheilaGrecoSource_Records(
   dataset(Layouts.rec_input_ids_wSrc) in_docids,
-  SourceService_Layouts.OptionsLayout inoptions, 
+  SourceService_Layouts.OptionsLayout inoptions,
+	doxie.IDataAccess mod_access, 
 	boolean IsFCRA = false) 
  := MODULE
 
@@ -17,7 +18,7 @@ export SheilaGrecoSource_Records(
 																																		SELF := []));
 																																		
 	// *** Key fetch to get sgreco data
-  SHARED sgreco_recs := Sheila_Greco.Key_LinkIds.KFetch(in_docs_linkonly,
+  SHARED sgreco_recs := Sheila_Greco.Key_LinkIds.KFetch(in_docs_linkonly, mod_access,
 	                                                      inoptions.fetch_level,,
 																												TopBusiness_Services.Constants.DefaultJoinLimit);
 	

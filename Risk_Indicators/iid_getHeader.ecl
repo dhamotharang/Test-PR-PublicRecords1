@@ -1,4 +1,4 @@
-﻿import _Control, risk_indicators, header, mdr, did_add, ut, drivers, FCRA, header_quick, riskwise, NID, address,data_services,dx_header,STD;
+﻿import _Control, risk_indicators, header, mdr, did_add,Doxie, ut, drivers,suppress, FCRA, header_quick, riskwise, NID, address,data_services,dx_header,STD;
 onThor := _Control.Environment.OnThor;
 
 export iid_getHeader(grouped DATASET(risk_indicators.Layout_output) inrec, unsigned1 dppa, unsigned1 glb, 
@@ -10,11 +10,21 @@ export iid_getHeader(grouped DATASET(risk_indicators.Layout_output) inrec, unsig
 							unsigned2 EverOccupant_PastMonths=0,
 							unsigned4 EverOccupant_StartDate = risk_indicators.iid_constants.default_history_date,
 							unsigned3 LastSeenThreshold = risk_indicators.iid_constants.oneyear,
-							unsigned8 BSOptions=0
-	) := function
+							unsigned8 BSOptions=0,
+							unsigned1 LexIdSourceOptout = 1,
+							string TransactionID = '',
+							string BatchUID = '',
+							unsigned6 GlobalCompanyId = 0) := function
+							
+mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT glb := ^.glb;
+	EXPORT dppa := ^.dppa;
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
 
 unsigned1 iType := IF (isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
-
 
 ExactFirstNameRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactFirstNameMatch]=risk_indicators.iid_constants.sTrue;
 ExactLastNameRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactLastNameMatch]=risk_indicators.iid_constants.sTrue;
@@ -36,6 +46,7 @@ dppa_ok := Risk_Indicators.iid_constants.dppa_ok(dppa, isFCRA);
 EnableEmergingID := (BSOptions & risk_indicators.iid_constants.BSOptions.EnableEmergingID) > 0;
 FilterLiens := (BSOptions & risk_indicators.iid_constants.BSOptions.FilterLiens) > 0;
 FilterVoter := (BSOptions & risk_indicators.iid_constants.BSOptions.FilterVoter) > 0;
+UseIngestDate := (BSOptions & risk_indicators.iid_constants.BSOptions.UseIngestDate) > 0;
 
 // only use this variable in realtime mode to simulate the header build date rather than todays date
 dk := choosen(dx_header.key_max_dt_last_seen(iType), 1);
@@ -43,16 +54,24 @@ max_last_seen := (string) dk[1].max_date_last_seen;
 hdrBuildDate01 := max_last_seen[1..6]+'01';
 header_build_date := (unsigned)(max_last_seen[1..6]);
 
-
 Layout_Header_Data := RECORD
-	Risk_Indicators.iid_constants.layout_outx;
+	// Risk_Indicators.iid_constants.layout_outx; -- this can be reverted back if title and dod ever need to be exposed by iid_getHeader.
+  risk_indicators.layout_output;
+  dx_header.layout_key_header h;
 	string1 valid_dob := '';	// on the header key but not in layout_outx, so we need to keep it
 	Risk_Indicators.Layouts.Layout_Addr_Flags Addr_Flags;
 	boolean came_from_fastheader;
 END;
 
+layout_header_data_plus := record
+	unsigned4 first_ingest_date;
+	layout_header_data;
+end;
+
 Layout_working := RECORD
 	Layout_Header_Data;
+	string5 oldTitle;
+	string5 newTitle;
 	string20 oldFname;
 	string20 newFname;
 	string20 oldMname;
@@ -87,6 +106,8 @@ Layout_working := RECORD
 	string9 newSSN;
 	string8 oldDOB;
 	string8 newDOB;
+	string8 oldDOD;
+	string8 newDOD;
 	string1 oldDwellType;	
 	string1 newDwellType;
 	string1 oldValid;
@@ -156,9 +177,13 @@ header_corr_thor := if(isFCRA,group( JOIN(distribute(g_inrec(did<>0), hash64(did
 																		
 // get full header
 header_key := dx_header.key_header(iType);
-
-Layout_Header_Data get_j_pre(g_inrec le, header_key ri) := TRANSFORM
-	self.seq := le.seq; 
+risk_indicators_iid_getHeader_ccpa := Record
+Layout_Header_Data;
+Unsigned4 Global_sid; 
+end;
+risk_indicators_iid_getHeader_ccpa get_j_pre(g_inrec le, header_key ri) := TRANSFORM
+	SELF.Global_Sid := ri.Global_Sid;
+  self.seq := le.seq; 
 	self.h := ri; 
 	self.valid_dob := ri.valid_dob, 
 	self.hhid_summary.hhid := if(isFCRA, 0, ri.hhid);
@@ -166,16 +191,13 @@ Layout_Header_Data get_j_pre(g_inrec le, header_key ri) := TRANSFORM
 	self := []
 END;
 
-j_pre_roxie := join (g_inrec, header_key, 
+j_pre_roxie_unsuppressed := join (g_inrec, header_key, 
 													 LEFT.did<>0 AND keyed(LEFT.did = RIGHT.s_did) AND
 														// if the customdata filter=PM or EB, make sure the source is on their allowed sources list
 														(right.src in risk_indicators.iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.PhillipMorrisFilter) and
 														(right.src in risk_indicators.iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.ExperianFCRA_Batch) and
                             ((right.src=MDR.sourcetools.src_Voters_v2 and filterVoter=false) or right.src<>MDR.sourcetools.src_Voters_v2) and 
 													 right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
-													 // dt_first_seen must be less than history date, and vendor date must also be less than history date (with the exception of EN FCRA source.  EN FCRA always has a recent vendor date)
-													 RIGHT.dt_first_seen < left.historydate and // check dt_first_seen 
-                           (right.dt_vendor_first_reported < left.historydate or (isFCRA and right.src=mdr.sourcetools.src_Experian_Credit_Header)) and // check vendor date (EN vendor dates are always recent because of full refresh, so that source is exception to this rule
 													 (
 													 (bsversion>=50 or ~mdr.Source_is_Utility(RIGHT.src)) AND // rm Utility from NAS.  for shell 5.0, allow utility records into join for everything but NAS fields
 													 (header.IsPreGLB_LIB(right.dt_nonglb_last_seen, 
@@ -198,7 +220,16 @@ j_pre_roxie := join (g_inrec, header_key,
 													 get_j_pre(LEFT, RIGHT), 
 													 LEFT OUTER, atmost(ut.limits.HEADER_PER_DID));
 
-j_pre_thor := join (distribute(g_inrec(did<>0), hash64(did)), 
+j_pre_roxie_flagged := Suppress.CheckSuppression(j_pre_roxie_unsuppressed, mod_access, data_env := iType);
+
+j_pre_roxie := PROJECT(j_pre_roxie_flagged, TRANSFORM(Layout_Header_Data, 
+	self.h := IF(~left.is_suppressed, left.h); 
+	self.valid_dob :=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.valid_dob);
+	self.hhid_summary.hhid := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hhid_summary.hhid);
+    SELF := LEFT;
+)); 
+
+j_pre_thor_unsuppressed := join (distribute(g_inrec(did<>0), hash64(did)), 
 										distribute(pull(header_key(s_did<>0)), hash64(s_did)), 
 													 (LEFT.did = RIGHT.s_did) AND
 														// if the customdata filter=PM or EB, make sure the source is on their allowed sources list
@@ -206,10 +237,7 @@ j_pre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 														(right.src in risk_indicators.iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.ExperianFCRA_Batch) and
                             ((right.src=MDR.sourcetools.src_Voters_v2 and filterVoter=false) or right.src<>MDR.sourcetools.src_Voters_v2) and
 													 right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
-													 // dt_first_seen must be less than history date, and vendor date must also be less than history date (with the exception of EN FCRA source.  EN FCRA always has a recent vendor date)
-													 RIGHT.dt_first_seen < left.historydate and // check dt_first_seen 
-                           (right.dt_vendor_first_reported < left.historydate or (isFCRA and right.src=mdr.sourcetools.src_Experian_Credit_Header)) and // check vendor date (EN vendor dates are always recent because of full refresh, so that source is exception to this rule
-
+													
 													 (
 													 (bsversion>=50 or ~mdr.Source_is_Utility(RIGHT.src)) AND // rm Utility from NAS.  for shell 5.0, allow utility records into join for everything but NAS fields
 													 (header.IsPreGLB_LIB(right.dt_nonglb_last_seen, 
@@ -232,6 +260,15 @@ j_pre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 													 get_j_pre(LEFT, RIGHT), 
 													 LEFT OUTER, atmost(left.did=right.s_did, ut.limits.HEADER_PER_DID), LOCAL);
 
+j_pre_thor_flagged := Suppress.CheckSuppression(j_pre_thor_unsuppressed, mod_access, data_env := iType);
+
+j_pre_thor := PROJECT(j_pre_thor_flagged, TRANSFORM(Layout_Header_Data, 
+	self.h := IF(~left.is_suppressed, left.h); 
+	self.valid_dob :=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.valid_dob);
+	self.hhid_summary.hhid := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.hhid_summary.hhid);
+    SELF := LEFT;
+)); 
+
 j_pre_thor_nodid := project(g_inrec(did=0), transform(Layout_Header_Data, self := left, self := []));
 
 #IF(onThor)
@@ -243,7 +280,8 @@ j_pre_thor_nodid := project(g_inrec(did=0), transform(Layout_Header_Data, self :
 // get quick header
 header_quick_key := if(isFCRA, header_quick.key_did_fcra, header_quick.key_DID);
 
-Layout_Header_Data get_j_quickpre(g_inrec le, header_quick_key ri) := TRANSFORM
+risk_indicators_iid_getHeader_ccpa get_j_quickpre(g_inrec le, header_quick_key ri) := TRANSFORM
+	SELF.Global_Sid := ri.Global_Sid;
 	self.seq := le.seq, 
 	self.came_from_fastheader := true, 
 	self.h := ri, 
@@ -251,17 +289,14 @@ Layout_Header_Data get_j_quickpre(g_inrec le, header_quick_key ri) := TRANSFORM
 	self := [] 
 END;
 
-j_quickpre_roxie := join (g_inrec, header_quick_key,
+j_quickpre_roxie_unsuppressed := join (g_inrec, header_quick_key,
 																LEFT.did<>0 AND keyed(LEFT.did = RIGHT.did) AND
 														// if the customdata filter=PM or EB, make sure the source is on their allowed sources list
 														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in risk_indicators.iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.PhillipMorrisFilter) and
 														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in risk_indicators.iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.ExperianFCRA_Batch) and
 													 IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
                            ((right.src=MDR.sourcetools.src_Voters_v2 and filterVoter=false) or right.src<>MDR.sourcetools.src_Voters_v2) and
-													  // dt_first_seen must be less than history date, and vendor date must also be less than history date (with the exception of EN FCRA source.  EN FCRA always has a recent vendor date)
-													 RIGHT.dt_first_seen < left.historydate and // check dt_first_seen 
-                           (right.dt_vendor_first_reported < left.historydate or (isFCRA and right.src=mdr.sourcetools.src_Experian_Credit_Header)) and // check vendor date (EN vendor dates are always recent because of full refresh, so that source is exception to this rule
-													 (
+													 	 (
 													 (bsversion>=50 or ~mdr.Source_is_Utility(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src))) AND // rm Utility from NAS.  for shell 5.0, allow utility records into join for everything but NAS fields
 													 (header.IsPreGLB_LIB(right.dt_nonglb_last_seen, 
 																								right.dt_first_seen, 
@@ -282,8 +317,9 @@ j_quickpre_roxie := join (g_inrec, header_quick_key,
 														and trim( (string)right.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id	
 													 get_j_quickpre(LEFT,RIGHT), 
 													 atmost(ut.limits.HEADER_PER_DID));
+		  	 j_quickpre_roxie := Suppress.Suppress_ReturnOldLayout(j_quickpre_roxie_unsuppressed, mod_access,Layout_Header_Data, iType);
 
-j_quickpre_thor := join (distribute(g_inrec(did<>0), hash64(did)), 
+j_quickpre_thor_unsuppressed := join (distribute(g_inrec(did<>0), hash64(did)), 
 												 distribute(pull(header_quick_key(did<>0)), hash64(did)),
 														(LEFT.did = RIGHT.did) AND
 														// if the customdata filter=PM or EB, make sure the source is on their allowed sources list
@@ -291,10 +327,7 @@ j_quickpre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in risk_indicators.iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.ExperianFCRA_Batch) and
 													 IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
                            ((right.src=MDR.sourcetools.src_Voters_v2 and filterVoter=false) or right.src<>MDR.sourcetools.src_Voters_v2) and
-													 // dt_first_seen must be less than history date, and vendor date must also be less than history date (with the exception of EN FCRA source.  EN FCRA always has a recent vendor date)
-													 RIGHT.dt_first_seen < left.historydate and // check dt_first_seen 
-                           (right.dt_vendor_first_reported < left.historydate or (isFCRA and right.src=mdr.sourcetools.src_Experian_Credit_Header)) and // check vendor date (EN vendor dates are always recent because of full refresh, so that source is exception to this rule
-
+													
 													 (
 													 (bsversion>=50 or ~mdr.Source_is_Utility(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src))) AND // rm Utility from NAS.  for shell 5.0, allow utility records into join for everything but NAS fields
 													 (header.IsPreGLB_LIB(right.dt_nonglb_last_seen, 
@@ -316,7 +349,8 @@ j_quickpre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 														and trim( (string)right.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id	
 													 get_j_quickpre(LEFT,RIGHT), 
 													 atmost(LEFT.did = RIGHT.did, ut.limits.HEADER_PER_DID), LOCAL);
-													 
+				  	 j_quickpre_thor := Suppress.Suppress_ReturnOldLayout(j_quickpre_thor_unsuppressed, mod_access,Layout_Header_Data, iType);
+											 
 #IF(onThor)
 	j_quickpre := j_quickpre_thor;
 #ELSE
@@ -328,14 +362,50 @@ real_header_all_roxie := group( sort( ungroup(header_recs_combined), seq ,did), 
 real_header_all_thor := group( sort( distribute( ungroup(header_recs_combined), hash64(seq)), seq ,did, LOCAL), seq, did, LOCAL);
 real_header_all := if(onThor, real_header_all_thor, real_header_all_roxie);
 
-real_header := if(DataRestriction[risk_indicators.iid_constants.posEquifaxRestriction]=risk_indicators.iid_constants.sTrue, real_header_all (h.src NOT IN [MDR.sourceTools.src_Equifax, MDR.sourcetools.src_Equifax_Quick, MDR.sourcetools.src_Equifax_Weekly]), real_header_all);
+real_header_nodate_filtering := if(DataRestriction[risk_indicators.iid_constants.posEquifaxRestriction]=risk_indicators.iid_constants.sTrue, real_header_all (h.src NOT IN [MDR.sourceTools.src_Equifax, MDR.sourcetools.src_Equifax_Quick, MDR.sourcetools.src_Equifax_Weekly]), real_header_all);
 
+real_header_with_ingestdate_appended := join(real_header_nodate_filtering, dx_Header.key_first_ingest(iType), 
+	left.h.rid<>0 and keyed(left.h.rid=right.rid),
+transform(Layout_Header_Data_plus,
+self.first_ingest_date := right.first_ingest_date;
+self := left;
+), left outer, atmost(1000), keep(1));
+
+// original filtering	
+// ======================================================
+real_header1 := join(g_inrec, real_header_nodate_filtering, 
+	left.seq=right.seq and 
+ RIGHT.h.dt_first_seen < left.historydate and // check dt_first_seen 
+(right.h.dt_vendor_first_reported < left.historydate or (isFCRA and right.src=mdr.sourcetools.src_Experian_Credit_Header)), // check vendor date (EN vendor dates are always recent because of full refresh, so that source is exception to this rule
+transform(Layout_Header_Data,
+self := right,
+self := left),
+left outer );
+
+// new filter by ingest date
+// ======================================================
+real_header2 := join(g_inrec, real_header_with_ingestdate_appended, 
+	left.seq=right.seq and 
+(
+(right.first_ingest_date<>0 and right.first_ingest_date < (unsigned)((string)left.historydate + '01') ) or
+(right.first_ingest_date=0 and right.h.dt_first_seen < left.historydate and right.h.dt_vendor_first_reported < left.historydate) // use old logic if ingest_date=0
+),
+transform(Layout_Header_Data,
+self := right,
+self := left),
+left outer );
+
+real_header_toggle := if(UseIngestDate and ~isFCRA, real_header2, real_header1);
+
+real_header := group(real_header_toggle, seq, did);		// put the grouping back in after the joins											 
+													 
 
 
 // now that we have header and quick header together, join them to corrections and see which fields changed so that we can correct all records
 Layout_working combineHeaderCorrections(real_header le, header_corr ri) := transform
 	ssnToUse := IF(le.h.valid_ssn<>'M', le.h.ssn, '');	// if manufactured, then blank out
 	
+  self.h.title := if(trim(ri.head.title)<>''  or ri.blankout[Risk_Indicators.iid_constants.suppress.Title]='1', ri.head.title, le.h.title);
 	self.h.fname := if(trim(ri.head.fname)<>''  or ri.blankout[Risk_Indicators.iid_constants.suppress.Fname]='1', ri.head.fname, le.h.fname);
 	self.h.mname := if(trim(ri.head.mname)<>''  or ri.blankout[Risk_Indicators.iid_constants.suppress.Mname]='1', ri.head.mname, le.h.mname);
 	self.h.lname := if(trim(ri.head.lname)<>''  or ri.blankout[Risk_Indicators.iid_constants.suppress.Lname]='1', ri.head.lname, le.h.lname);
@@ -353,9 +423,14 @@ Layout_working combineHeaderCorrections(real_header le, header_corr ri) := trans
 	self.h.zip4 := if(trim(ri.head.zip4)<>''  or ri.blankout[Risk_Indicators.iid_constants.suppress.Zip4]='1', ri.head.zip4, le.h.zip4);
 	self.h.ssn := if(trim(ri.head.ssn)<>''  or ri.blankout[Risk_Indicators.iid_constants.suppress.SSN]='1', ri.head.ssn, ssnToUse);
 	self.h.dob := if(ri.head.dob<>0  or ri.blankout[Risk_Indicators.iid_constants.suppress.DOB]='1', ri.head.dob, le.h.dob);
+	self.h.dod := if(ri.head.dod<>0  or ri.blankout[Risk_Indicators.iid_constants.suppress.DOD]='1', ri.head.dod, le.h.dod);
 
 	
 	// check to see what was changed to what and if changed, then populate the fields for the next project
+  titleCorrected := trim(ri.head.title)<>''  or ri.blankout[Risk_Indicators.iid_constants.suppress.Title]='1';	// correction field will only be populated if a correction was done
+	self.oldTitle := if(titleCorrected, le.h.title, '');			// only populate the old if there is a new
+	self.newTitle := if(titleCorrected, ri.head.title, '');	// only populate the old if there is a new
+
 	fnameCorrected := trim(ri.head.fname)<>''  or ri.blankout[Risk_Indicators.iid_constants.suppress.Fname]='1';	// correction field will only be populated if a correction was done
 	self.oldFname := if(fnameCorrected, le.h.fname, '');			// only populate the old if there is a new
 	self.newFname := if(fnameCorrected, ri.head.fname, '');	// only populate the old if there is a new
@@ -454,6 +529,10 @@ Layout_working combineHeaderCorrections(real_header le, header_corr ri) := trans
 	self.oldDOB := if(dobCorrected, (string)le.h.dob, '');			// only populate the old if there is a new
 	self.newDOB := if(dobCorrected, (string)ri.head.dob, '');	// only populate the old if there is a new
 
+  dodCorrected := ri.head.dod<>0  or ri.blankout[Risk_Indicators.iid_constants.suppress.DOD]='1';	// correction field will only be populated if a correction was done
+	self.oldDOD := if(dodCorrected, (string)le.h.dod, '');			// only populate the old if there is a new
+	self.newDOD := if(dodCorrected, (string)ri.head.dod, '');	// only populate the old if there is a new
+
 	// set the flags - only if there is a correction, so that if it is populated, we know that it should be overwritten later
 	self.addr_flags.dwelltype := if(trim(ri.addr_flags.dwelltype)<>'' or ri.blankout[Risk_Indicators.iid_constants.suppress.DwellType]='1', ri.addr_flags.dwelltype, '');
 	self.addr_flags.valid := if(trim(ri.addr_flags.valid)<>'' or ri.blankout[Risk_Indicators.iid_constants.suppress.Valid]='1', ri.addr_flags.valid, '');
@@ -526,6 +605,7 @@ unCorrOnly := corrPlusHeader(~isCorrected);
 
 
 Layout_working correctFutureData(unCorrOnly le, corrOnly ri) := transform
+	self.h.title := if((trim(ri.oldTitle)<>'' or trim(ri.newTitle)<>'') and ri.oldTitle=le.h.title, ri.newTitle, le.h.title);
 	self.h.fname := if((trim(ri.oldFname)<>'' or trim(ri.newFname)<>'') and ri.oldFname=le.h.fname, ri.newFname, le.h.fname);
 	self.h.mname := if((trim(ri.oldMname)<>'' or trim(ri.newMname)<>'') and ri.oldMname=le.h.mname, ri.newMname, le.h.mname);
 	self.h.lname := if((trim(ri.oldLname)<>'' or trim(ri.newLname)<>'') and ri.oldLname=le.h.lname, ri.newLname, le.h.lname);
@@ -550,6 +630,7 @@ Layout_working correctFutureData(unCorrOnly le, corrOnly ri) := transform
 		
 	self.h.ssn := if((trim(ri.oldSSN)<>'' or trim(ri.newDOB)<>'') and ri.oldSSN=le.ssn, ri.newSSN, le.h.ssn);
 	self.h.dob := if((trim(ri.oldDOB)<>'' or trim(ri.newDOB)<>'') and ri.oldDOB=(string)le.h.dob, (unsigned)ri.newDOB, le.h.dob);
+	self.h.dod := if((trim(ri.oldDOD)<>'' or trim(ri.newDOD)<>'') and ri.oldDOD=(string)le.h.dod, (unsigned)ri.newDOD, le.h.dod);
 	
 	self.addr_flags.dwellType := if((trim(ri.oldDwellType)<>'' or trim(ri.newDwellType)<>'') and sameAddr, ri.newDwellType, le.addr_flags.dwellType);
 	self.addr_flags.valid := if((trim(ri.oldValid)<>'' or trim(ri.newValid)<>'') and sameAddr, ri.newValid, le.addr_flags.Valid);
@@ -621,12 +702,14 @@ Layout_working correctFutureData(unCorrOnly le, corrOnly ri) := transform
 end;
 finalCorr := join(unCorrOnly, CorrOnly, 
 									left.seq=right.seq and left.h.did=right.h.did and 
-									((trim(right.oldFname)<>'' or trim(right.newFname)<>'') and right.oldFname=left.h.fname OR	
+									((trim(right.oldTitle)<>'' or trim(right.newTitle)<>'') and right.oldTitle=left.h.title OR	
+									(trim(right.oldFname)<>'' or trim(right.newFname)<>'') and right.oldFname=left.h.fname  OR
 									(trim(right.oldMname)<>'' or trim(right.newMname)<>'') and right.oldMname=left.h.mname  OR
 									(trim(right.oldLname)<>'' or trim(right.newLname)<>'') and right.oldLname=left.h.lname OR
 									(trim(right.oldNameSuffix)<>'' or trim(right.newNameSuffix)<>'') and right.oldNameSuffix=left.h.name_suffix  OR
 									(trim(right.oldSSN)<>'' or trim(right.newSSN)<>'') and right.oldSSN=left.h.ssn OR
 									(trim(right.oldDOB)<>'' or trim(right.newDOB)<>'') and right.oldDOB=(string)left.h.dob OR
+									(trim(right.oldDOD)<>'' or trim(right.newDOD)<>'') and right.oldDOD=(string)left.h.dod OR
 									// same address and an address field is different
 									address.Addr1FromComponents(right.oldPrimRange,right.oldPredir,right.oldPrimName,right.oldSuffix,right.oldPostDir,right.oldUnitDesig,right.oldSecRange) = 
 									address.Addr1FromComponents(left.h.Prim_Range,left.h.PreDir,left.h.Prim_Name,left.h.Suffix,left.h.PostDir,left.h.Unit_Desig,left.h.Sec_Range) OR
@@ -650,6 +733,11 @@ finalCorr := join(unCorrOnly, CorrOnly,
 // doing the above join results in too many records per rid (potentially), we need to rollup by rid and figure out which field to keep from the multiple choices
 layout_working getCorrectCorrections(finalCorr le, finalCorr ri) := transform
 	
+	self.h.title := map(trim(le.h.title)=trim(ri.h.title) => le.h.title,	// same on both, keep left
+										(trim(le.oldTitle)<>'' or trim(le.newTitle)<>'') and trim(le.newTitle)=trim(le.h.title) => le.h.title,	// correction on this rid and left matches new, so keep left
+										(trim(le.oldTitle)<>'' or trim(le.newTitle)<>'') => ri.h.title, // correction on this rid and left doesnt match new, so keep right
+										(trim(ri.oldTitle)<>'' or trim(ri.newTitle)<>'') => ri.h.title,	// correction on this rid and right had the correction, so keep right?
+										le.h.title);	// default to keep left
 	self.h.fname := map(trim(le.h.fname)=trim(ri.h.fname) => le.h.fname,	// same on both, keep left
 										(trim(le.oldFname)<>'' or trim(le.newFname)<>'') and trim(le.newFname)=trim(le.h.fname) => le.h.fname,	// correction on this rid and left matches new, so keep left
 										(trim(le.oldFname)<>'' or trim(le.newFname)<>'') => ri.h.fname, // correction on this rid and left doesnt match new, so keep right
@@ -738,7 +826,12 @@ layout_working getCorrectCorrections(finalCorr le, finalCorr ri) := transform
 									(trim(le.olddob)<>'' or trim(le.newdob)<>'') => ri.h.dob, // correction on this rid and left doesnt match new, so keep right
 									(trim(ri.oldDOB)<>'' or trim(ri.newDOB)<>'') => ri.h.dob,	// correction on this rid and right had the correction, so keep right?
 									le.h.dob);	// default to keep left
-									
+	self.h.dod := map((le.h.dod)=(ri.h.dod) => le.h.dod,	// same on both, keep left
+									(trim(le.oldDOD)<>'' or trim(le.newDOD)<>'') and trim(le.newDOD)=(string)le.h.dod => le.h.dod,	// correction on this rid and left matches new, so keep left
+									(trim(le.oldDOD)<>'' or trim(le.newDOD)<>'') => ri.h.dod, // correction on this rid and left doesnt match new, so keep right
+									(trim(ri.oldDOD)<>'' or trim(ri.newDOD)<>'') => ri.h.dod,	// correction on this rid and right had the correction, so keep right?
+									le.h.dod);	// default to keep left
+
 	self.addr_flags.dwellType := map(	(le.addr_flags.dwellType)=(ri.addr_flags.dwellType) => le.addr_flags.dwellType,	// same on both, keep left
 																		(trim(le.oldDwellType)<>'' or trim(le.newDwellType)<>'') and trim(le.newDwellType)=(string)le.addr_flags.dwellType => le.addr_flags.dwellType,	// correction on this rid and left matches new, so keep left
 																		(trim(le.oldDwellType)<>'' or trim(le.newDwellType)<>'') => ri.addr_flags.dwellType, // correction on this rid and left doesnt match new, so keep right
@@ -788,8 +881,8 @@ layout_working getCorrectCorrections(finalCorr le, finalCorr ri) := transform
 	self := le;	// keep the remaining left fields
 end;
  
-finalCorr2 := rollup (sort(finalCorr(isCorrected),	seq, h.persistent_record_id,-h.Fname,-h.Mname,-h.Lname,-h.Name_Suffix,-h.Prim_Range,-h.Predir,-h.Prim_Name,-h.Suffix,-h.Postdir,-h.Unit_Desig,-h.Sec_Range,-h.City_Name,
-																			-h.St,-h.Zip,-h.Zip4,-h.SSN,-h.DOB,
+finalCorr2 := rollup (sort(finalCorr(isCorrected),	seq, h.persistent_record_id,-h.Title,-h.Fname,-h.Mname,-h.Lname,-h.Name_Suffix,-h.Prim_Range,-h.Predir,-h.Prim_Name,-h.Suffix,-h.Postdir,-h.Unit_Desig,-h.Sec_Range,-h.City_Name,
+																			-h.St,-h.Zip,-h.Zip4,-h.SSN,-h.DOB,-h.DOD,
 																			-addr_flags.DwellType,-addr_flags.Valid,-addr_flags.PrisonAddr,-addr_flags.HighRisk,-addr_flags.CorpMil,-addr_flags.DoNotDeliver,
 																			-addr_flags.DeliveryStatus,-addr_flags.AddressType,-addr_flags.DropIndicator,came_from_fastheader, h.RID), left.h.persistent_record_id=right.h.persistent_record_id and left.seq=right.seq, getCorrectCorrections(left,right));
 
@@ -950,7 +1043,6 @@ risk_indicators.iid_constants.layout_outx getHeader(Layout_working le) := TRANSF
 	
 	dobmatch := risk_indicators.iid_constants.g(dobmatch_score) and if(ExactDOBRequired, le.dob[1..8]=le_head_dob[1..8], true);
 	
-	
 	trueDID_original := le.h.did<>0;
 	    
   // if the consumer has a statement on file, security alert, legal hold, we need to set the noScore trigger so all attributes and scores get suppressed.
@@ -961,7 +1053,8 @@ risk_indicators.iid_constants.layout_outx getHeader(Layout_working le) := TRANSF
   le.ConsumerFlags.legal_hold_alert or  
   (le.ConsumerFlags.id_theft_flag and bsversion < 50) ,
     false, trueDID_original);
-    
+  
+  self.FIS_trueDID := trueDID_original;
     
 	// FYI, if we add any new sources to this list or modify this mapping, let Jesse Shaw know about it so that he can update KEL attribute IdentityReport.graph
 	converted_src := map(
@@ -1033,7 +1126,9 @@ risk_indicators.iid_constants.layout_outx getHeader(Layout_working le) := TRANSF
 	self.addrs_last_5years := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.addrs_last_5years, if(trim(self.addr_from_did) != '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.fiveyears, le.historydate), 1, 0));
 	self.addrs_last_10years := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.addrs_last_10years, if(trim(self.addr_from_did) != '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.tenyears, le.historydate), 1, 0));
 	self.addrs_last_15years := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.addrs_last_15years, if(trim(self.addr_from_did) != '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.fifteenyears, le.historydate), 1, 0));
-					 
+  self.FIS_addrs_last12 := if(le.historydate=risk_indicators.iid_constants.default_history_date, le.FIS_addrs_last12, if(trim(self.addr_from_did) != '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.oneyear, le.historydate), 1, 0));
+  self.FIS_addrs_last60 := if(le.historydate=risk_indicators.iid_constants.default_history_date, le.FIS_addrs_last60, if(trim(self.addr_from_did) != '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.fiveyears, le.historydate), 1, 0));
+  
 	self.firstcount := IF(firstmatch,1,0);
  self.middlecount := IF(middlematch,1,0);
 	self.lastcount := IF(lastmatch,1,0);
@@ -1267,6 +1362,8 @@ risk_indicators.iid_constants.layout_outx getHeader(Layout_working le) := TRANSF
 	nonderog_source_50 := non_derog_category > 0;
 	nonderog_source := if(bsversion>=50, nonderog_source_50, nonderog_source_41);	
 	self.num_nonderogs := if(nonderog_source, 1, 0);	
+
+  self.FIS_num_nonderogs := IF(nonderog_source_41, 1, 0);
 	
 	realtimeMode := le.historydate=risk_indicators.iid_constants.default_history_date or le.historydate = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..6]);
 	
@@ -1345,6 +1442,7 @@ tranHeader := project(header_recs, getHeader(LEFT));
 
 // search ADL record history for match to prison address for bs 3.0
 prison_key := if(isFCRA, risk_indicators.key_HRI_Address_To_SIC_filtered_FCRA, risk_indicators.key_HRI_Address_To_SIC);
+
 
 Risk_Indicators.iid_constants.layout_outx getPrison(tranHeader le, prison_key ri) := transform
 	self.isPrison := if(trim(le.chrono_addr_flags.prisonAddr)<>'', (boolean)le.chrono_addr_flags.prisonAddr, ri.sic_code='2225');

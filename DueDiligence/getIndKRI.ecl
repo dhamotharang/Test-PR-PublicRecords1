@@ -2,15 +2,7 @@
 
 
 EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
-	//individual not found
-	STRING10 INVALID_INDIVIDUAL_FLAGS := 'FFFFFFFFFF';
-	STRING2 INVALID_INDIVIDUAL_SCORE := '-1';
-
-	//we have individuals with and without LEXID/DIDs
-	withDIDs := indivs(individual.did <> DueDiligence.Constants.NUMERIC_ZERO);
-	noDIDs := indivs(individual.did = DueDiligence.Constants.NUMERIC_ZERO);
-  
-
+	
  
 	DueDiligence.Layouts.Indv_Internal IndvKRIs(DueDiligence.Layouts.Indv_Internal le) := TRANSFORM
 		
@@ -192,7 +184,7 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
     
     
 
-    //INDIVIDUAL GEOGRAPHIC RISK
+    //PERSON GEOGRAPHIC RISK
     perGeoRisk_Flag9 := IF(le.CountyHasHighCrimeIndex AND le.CountyBordersForgeinJur AND (le.HIDTA OR le.HIFCA), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);										
     perGeoRisk_Flag8 := IF(le.CityBorderStation OR le.CityFerryCrossing OR le.CityRailStation, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                     												
     perGeoRisk_Flag7 := IF(le.CountyBordersForgeinJur, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);       		
@@ -220,7 +212,7 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
 			
 
     
-		//INDIVIDUAL PROFESSIONAL LICENSE
+		//PERSON PROFESSIONAL LICENSE
 		highRiskFound := le.atleastOneActiveLawAcct OR le.atleastOneActiveFinRealEstate OR le.atleastOneActiveMedical OR 
                      le.atleastOneActiveBlastPilot OR le.atleastOneInactiveLawAcct OR le.atleastOneInactiveFinRealEstate OR 
                      le.atleastOneInactiveMedical OR le.atleastOneInactiveBlastPilot;
@@ -249,18 +241,18 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
 		SELF.PerProfLicense := (STRING)(10-STD.Str.Find(professionalLicRiskConcat_Final, DueDiligence.Constants.T_INDICATOR, 1));
 		
 
-    //ASSETS OWNED VEHICLE
-		PerAssetOwnVehicle_Flag9 := IF(le.VehicleCount > 0 AND le.VehicleBaseValue >= 200000, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
-		PerAssetOwnVehicle_Flag8 := IF(le.VehicleCount > 0 AND le.VehicleBaseValue BETWEEN 150000 AND 199999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
-		PerAssetOwnVehicle_Flag7 := IF(le.VehicleCount > 0 AND le.VehicleBaseValue BETWEEN 100000 AND 149999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);  
-		PerAssetOwnVehicle_Flag6 := IF(le.VehicleCount >= 15, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                                  
-		PerAssetOwnVehicle_Flag5 := IF(le.VehicleCount BETWEEN 8 AND 14, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                    
-		PerAssetOwnVehicle_Flag4 := IF(le.VehicleCount BETWEEN 5 AND 7, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                     
-		PerAssetOwnVehicle_Flag3 := IF(le.VehicleCount BETWEEN 3 AND 4, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                        
-		PerAssetOwnVehicle_Flag2 := IF(le.VehicleCount BETWEEN 1 AND 2, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                        
-		PerAssetOwnVehicle_Flag1 := IF(le.VehicleCount = 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                                  
-	
-		PerAssetOwnVehicle_Flag_Final := DueDiligence.Common.calcFinalFlagField(PerAssetOwnVehicle_Flag9,
+    //PERSON ASSET OWNED VEHICLE
+    PerAssetOwnVehicle_Flag9 := IF(le.VehicleCount > 0 AND le.VehicleBaseValue >= 200000, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    PerAssetOwnVehicle_Flag8 := IF(le.VehicleCount > 0 AND le.VehicleBaseValue BETWEEN 150000 AND 199999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    PerAssetOwnVehicle_Flag7 := IF(le.VehicleCount > 0 AND le.VehicleBaseValue BETWEEN 100000 AND 149999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);  
+    PerAssetOwnVehicle_Flag6 := IF(le.VehicleCount >= 15, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                                  
+    PerAssetOwnVehicle_Flag5 := IF(le.VehicleCount BETWEEN 8 AND 14, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                    
+    PerAssetOwnVehicle_Flag4 := IF(le.VehicleCount BETWEEN 5 AND 7, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                     
+    PerAssetOwnVehicle_Flag3 := IF(le.VehicleCount BETWEEN 3 AND 4, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                        
+    PerAssetOwnVehicle_Flag2 := IF(le.VehicleCount BETWEEN 1 AND 2, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                        
+    PerAssetOwnVehicle_Flag1 := IF(le.VehicleCount = 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                                  
+
+    PerAssetOwnVehicle_Flag_Final := DueDiligence.Common.calcFinalFlagField(PerAssetOwnVehicle_Flag9,
                                                                             PerAssetOwnVehicle_Flag8,
                                                                             PerAssetOwnVehicle_Flag7,
                                                                             PerAssetOwnVehicle_Flag6,
@@ -271,12 +263,12 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
                                                                             PerAssetOwnVehicle_Flag1);
 
     SELF.PerAssetOwnVehicle_Flag := PerAssetOwnVehicle_Flag_Final;                                             
-		SELF.PerAssetOwnVehicle := (STRING)(10-STD.Str.Find(PerAssetOwnVehicle_Flag_Final, DueDiligence.Constants.T_INDICATOR, 1));  
+    SELF.PerAssetOwnVehicle := (STRING)(10-STD.Str.Find(PerAssetOwnVehicle_Flag_Final, DueDiligence.Constants.T_INDICATOR, 1));  
     
     
-    //INDIVIDUAL IDENTITY RISK
-    idFirstReported := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.firstReportedDate, (STRING)le.historyDate);
-    idRiskLastSeenDays := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.lastSeenBySource, (STRING)le.historyDate);
+    //PERSON IDENTITY RISK
+    idFirstReported := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)le.firstReportedDate, (STRING)le.historyDate);
+    idRiskLastSeenDays := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)le.lastSeenBySource, (STRING)le.historyDate);
     
     ssnRedFlags := le.redFlagSSNInvalid OR le.redFlagSSNIssuedPriorDOB OR le.redFlagSSNRandomIssuedInvalid OR
                    le.redFlagLexIDContainsMultiSSNs OR le.redFlagInputSSNAssocAtleast3LexIDs OR le.redFlagInputSSNIsITIN;
@@ -302,7 +294,122 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
                                                              perIDRiskFlag1);
 
     SELF.PerIdentityRisk_Flag := perIDRiskFinal;                                             
-		SELF.PerIdentityRisk := (STRING)(10-STD.Str.Find(perIDRiskFinal, DueDiligence.Constants.T_INDICATOR, 1));
+    SELF.PerIdentityRisk := (STRING)(10-STD.Str.Find(perIDRiskFinal, DueDiligence.Constants.T_INDICATOR, 1));
+    
+    
+    //PERSON MOBILITY
+    daysHeaderAddrFirstSeen := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)le.earliestHeaderAddressReported, (STRING)le.Historydate);
+    daysAtCurrentAddr := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)le.currentAddressFirstSeen, (STRING)le.Historydate);
+    daysBetweenCurrPrevAddr := DueDiligence.CommonDate.DaysApartWithZeroEmptyDate((STRING)le.currentAddressFirstSeen, (STRING)le.previousAddressFirstSeen);
+
+    movedLessThan1YearAgo := le.currentAddressFirstSeen <> 0 AND daysAtCurrentAddr < ut.DaysInNYears(1);
+    movedTwice := le.move1Distance <> DueDiligence.Constants.EMPTY AND le.move2Distance <> DueDiligence.Constants.EMPTY;
+    movedThreeTimes := movedTwice AND le.move3Distance <> DueDiligence.Constants.EMPTY;
+
+
+    perMobility_Flag9 := IF(le.hasAddressHistory = FALSE, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    perMobility_Flag8 := IF(le.earliestHeaderAddressReported <> 0 AND daysHeaderAddrFirstSeen < ut.DaysInNYears(1), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    perMobility_Flag7 := IF(le.earliestHeaderAddressReported <> 0 AND daysHeaderAddrFirstSeen >= ut.DaysInNYears(1) AND
+                            le.hasAddressHistory AND le.hasPreviousAddressHistory = FALSE, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+                            
+    perMobility_Flag6 := IF(movedLessThan1YearAgo AND
+                            ((movedTwice AND (UNSIGNED)le.move1Distance <= 50 AND (UNSIGNED)le.move2Distance <= 50) OR
+                             (movedThreeTimes AND (UNSIGNED)le.move1Distance <= 50 AND (UNSIGNED)le.move2Distance <= 50 AND (UNSIGNED)le.move3Distance <= 50)), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+
+    perMobility_Flag5 := IF(movedLessThan1YearAgo AND le.previousAddressFirstSeen <> 0 AND daysBetweenCurrPrevAddr < ut.DaysInNYears(3), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perMobility_Flag4 := IF(movedLessThan1YearAgo AND le.previousAddressFirstSeen <> 0 AND daysBetweenCurrPrevAddr >= ut.DaysInNYears(3), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+
+    perMobility_Flag3 := IF(le.currentAddressFirstSeen <> 0 AND daysAtCurrentAddr >= ut.DaysInNYears(1) AND daysAtCurrentAddr < ut.DaysInNYears(3), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perMobility_Flag2 := IF(le.currentAddressFirstSeen <> 0 AND daysAtCurrentAddr >= ut.DaysInNYears(3) AND daysAtCurrentAddr < ut.DaysInNYears(5), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perMobility_Flag1 := IF(le.currentAddressFirstSeen <> 0 AND daysAtCurrentAddr >= ut.DaysInNYears(5), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+
+    perMobility_Flag_Final := DueDiligence.Common.calcFinalFlagField(perMobility_Flag9,
+                                                                      perMobility_Flag8,
+                                                                      perMobility_Flag7,
+                                                                      perMobility_Flag6,
+                                                                      perMobility_Flag5,
+                                                                      perMobility_Flag4,
+                                                                      perMobility_Flag3,
+                                                                      perMobility_Flag2,
+                                                                      perMobility_Flag1);
+
+    SELF.PerMobility_Flag := perMobility_Flag_Final;                                             
+    SELF.PerMobility := (STRING)(10-STD.Str.Find(perMobility_Flag_Final, DueDiligence.Constants.T_INDICATOR, 1)); 
+    
+    
+    //PERSON ASSOCIATIONS
+    perAssoc_Flag9 := IF(le.relationCurrentlyIncarcerated, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    perAssoc_Flag8 := IF(le.relationPotentialSexOffender, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    perAssoc_Flag7 := IF(le.relationCurrentlyParoleOrProbation, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    perAssoc_Flag6 := IF(le.relationFelonyPast3Years, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    perAssoc_Flag5 := IF(le.relationEverIncarcerated, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    
+    perAssoc_Flag4 := IF(le.relationHeaderLess1YearWithSSNRiskCount > 1, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    perAssoc_Flag3 := IF(le.relationHeaderLess1YearWithSSNRiskCount = 1, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    perAssoc_Flag2 := IF(le.relationHeaderGreater1YearWithSSNRiskCount >= 1, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    
+    perAssoc_Flag1 := IF(le.relationCurrentlyIncarcerated = FALSE AND
+                         le.relationPotentialSexOffender = FALSE AND
+                         le.relationCurrentlyParoleOrProbation = FALSE AND
+                         le.relationFelonyPast3Years = FALSE AND
+                         le.relationEverIncarcerated = FALSE AND
+                         le.relationHeaderLess1YearWithSSNRiskCount = 0 AND
+                         le.relationHeaderGreater1YearWithSSNRiskCount = 0 AND
+                         COUNT(le.parents + le.spouses + le.associates) > 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+                         
+    
+    perAssoc_Flag_Final := DueDiligence.Common.calcFinalFlagField(perAssoc_Flag9,
+                                                                  perAssoc_Flag8,
+                                                                  perAssoc_Flag7,
+                                                                  perAssoc_Flag6,
+                                                                  perAssoc_Flag5,
+                                                                  perAssoc_Flag4,
+                                                                  perAssoc_Flag3,
+                                                                  perAssoc_Flag2,
+                                                                  perAssoc_Flag1);
+                                                                  
+    
+    SELF.PerAssociates_Flag := perAssoc_Flag_Final;
+    SELF.PerAssociates := (STRING)(10-STD.Str.Find(perAssoc_Flag_Final, DueDiligence.Constants.T_INDICATOR, 1));
+    
+    
+    //PERSON CIVIL EVENTS(LIENS, JUDGEMENTS and EVICTIONS)
+    totalCivilCount := le.liensUnreleasedCntInThePastNYR + le.evictionsCntInThePastNYR;
+    totalCivilCountOlder := le.liensUnreleasedCntOVNYR + le.evictionsCntOVNYR; 
+     
+    perCivilEvent_Flag9 := IF(totalCivilCount >= 10, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);    
+    perCivilEvent_Flag8 := IF(totalCivilCount BETWEEN 5 AND 9, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);   											
+    perCivilEvent_Flag7 := IF(totalCivilCount BETWEEN 3 AND 4, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);    										
+    perCivilEvent_Flag6 := IF(totalCivilCount BETWEEN 1 AND 2, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    perCivilEvent_Flag5 := IF(totalCivilCountOlder >= 10, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perCivilEvent_Flag4 := IF(totalCivilCountOlder BETWEEN 5 AND 9, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 						
+    perCivilEvent_Flag3 := IF(totalCivilCountOlder BETWEEN 3 AND 4, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 										
+    perCivilEvent_Flag2 := IF(totalCivilCountOlder BETWEEN 1 AND 2, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    perCivilEvent_Flag1 := IF(perCivilEvent_Flag9 = DueDiligence.Constants.F_INDICATOR AND 
+                              perCivilEvent_Flag8 = DueDiligence.Constants.F_INDICATOR AND 
+                              perCivilEvent_Flag7 = DueDiligence.Constants.F_INDICATOR AND
+                              perCivilEvent_Flag6 = DueDiligence.Constants.F_INDICATOR AND 
+                              perCivilEvent_Flag5 = DueDiligence.Constants.F_INDICATOR AND 
+                              perCivilEvent_Flag4 = DueDiligence.Constants.F_INDICATOR AND 
+                              perCivilEvent_Flag3 = DueDiligence.Constants.F_INDICATOR AND 
+                              perCivilEvent_Flag2 = DueDiligence.Constants.F_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+     
+    perCivilEvent_Flag_final := DueDiligence.Common.calcFinalFlagField(perCivilEvent_Flag9,
+                                                                        perCivilEvent_Flag8,
+                                                                        perCivilEvent_Flag7,
+                                                                        perCivilEvent_Flag6,
+                                                                        perCivilEvent_Flag5,
+                                                                        perCivilEvent_Flag4,
+                                                                        perCivilEvent_Flag3,
+                                                                        perCivilEvent_Flag2,
+                                                                        perCivilEvent_Flag1); 
+
+     SELF.PerCivilLegalEvent_Flag :=  perCivilEvent_Flag_final;
+     SELF.PerCivilLegalEvent := (STRING)(10 - STD.Str.Find(perCivilEvent_Flag_final, DueDiligence.Constants.T_INDICATOR, 1)); 																																																	 
+     
+    
+    
+    
     
 
     
@@ -335,55 +442,8 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
 	END;
 
 
-	kriIndv := PROJECT(SORT(withDIDs, seq), IndvKRIs(LEFT));
-  //all of the person with no information(DID) will get the value of -1
-	kriUnknownIndv := PROJECT(noDIDs, TRANSFORM(DueDiligence.Layouts.Indv_Internal,
-                                              SELF.PerAssetOwnProperty := INVALID_INDIVIDUAL_SCORE;
-                                              SELF.PerAssetOwnProperty_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              SELF.PerAssetOwnAircraft := INVALID_INDIVIDUAL_SCORE;
-                                              SELF.PerAssetOwnAircraft_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              SELF.PerAssetOwnWatercraft := INVALID_INDIVIDUAL_SCORE;
-                                              SELF.PerAssetOwnWatercraft_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              SELF.PerAssetOwnVehicle := INVALID_INDIVIDUAL_SCORE;
-                                              SELF.PerAssetOwnVehicle_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              SELF.PerAccessToFundsProperty := INVALID_INDIVIDUAL_SCORE;
-                                              SELF.PerAccessToFundsProperty_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              SELF.PerAccessToFundsIncome := INVALID_INDIVIDUAL_SCORE;
-                                              SELF.PerAccessToFundsIncome_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              SELF.PerGeographic := INVALID_INDIVIDUAL_SCORE;
-                                              SELF.PerGeographic_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              // SELF.PerMobility := INVALID_INDIVIDUAL_SCORE;
-                                              // SELF.PerMobility_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              SELF.PerStateLegalEvent := INVALID_INDIVIDUAL_SCORE;
-                                              SELF.PerStateLegalEvent_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              // SELF.PerFederalLegalEvent := INVALID_INDIVIDUAL_SCORE;
-                                              // SELF.PerFederalLegalEvent_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              // SELF.PerFederalLegalMatchLevel := INVALID_INDIVIDUAL_SCORE;
-                                              // SELF.PerFederalLegalMatchLevel_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              // SELF.PerCivilLegalEvent := INVALID_INDIVIDUAL_SCORE;
-                                              // SELF.PerCivilLegalEvent_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              SELF.PerOffenseType := INVALID_INDIVIDUAL_SCORE;
-                                              SELF.PerOffenseType_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              SELF.PerAgeRange := INVALID_INDIVIDUAL_SCORE;
-                                              SELF.PerAgeRange_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              SELF.PerIdentityRisk := INVALID_INDIVIDUAL_SCORE;
-                                              SELF.PerIdentityRisk_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              SELF.PerUSResidency := INVALID_INDIVIDUAL_SCORE;
-                                              SELF.PerUSResidency_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              SELF.PerMatchLevel := INVALID_INDIVIDUAL_SCORE;
-                                              SELF.PerMatchLevel_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              // SELF.PerAssociates := INVALID_INDIVIDUAL_SCORE;
-                                              // SELF.PerAssociates_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              SELF.PerProfLicense := INVALID_INDIVIDUAL_SCORE;
-                                              SELF.PerProfLicense_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              SELF.PerBusAssociations := INVALID_INDIVIDUAL_SCORE;
-                                              SELF.PerBusAssociations_Flag := INVALID_INDIVIDUAL_FLAGS;
-                                              // SELF.PerEmploymentIndustry := INVALID_INDIVIDUAL_SCORE;
-                                              // SELF.PerEmploymentIndustry_Flags := INVALID_INDIVIDUAL_FLAGS
-                                              SELF := LEFT;));
 
 
-
-	RETURN kriIndv + kriUnknownIndv;
+	RETURN PROJECT(indivs, IndvKRIs(LEFT));
 				 
 END;

@@ -1,4 +1,4 @@
-IMPORT autokey, autokeyI, doxie, AutoStandardI, Address, OIG, Healthcare_Header_Services,ut;
+﻿IMPORT autokey, autokeyI, doxie, AutoStandardI, Address, OIG, Healthcare_Header_Services,ut;
 
 EXPORT ING_Sanctions_Search_Records ( STRING11 taxid_value, BOOLEAN include_OIG ) := 
    FUNCTION
@@ -39,7 +39,9 @@ EXPORT ING_Sanctions_Search_Records ( STRING11 taxid_value, BOOLEAN include_OIG 
 			 self.glb_ok := ut.glb_ok (gm.GLBPurpose);
 			 self.dppa_ok := ut.dppa_ok(gm.DPPAPurpose);
 			 self.DRM := gm.DataRestrictionMask;
-			 self.includeSanctions := true;
+	 		self.glb:= gm.GLBPurpose;
+                        self.dppa:= gm.DPPAPurpose; 
+		 self.includeSanctions := true;
 			// self:=[];Do not uncomment otherwise the default values will not get set.
 		end;
 		cfg:=dataset([buildConfig()]);

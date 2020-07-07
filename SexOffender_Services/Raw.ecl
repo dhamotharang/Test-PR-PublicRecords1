@@ -151,12 +151,13 @@ export Raw := module
 		iesp.share.t_GeoLocationMatch bestlocation;
 	end;
 	
-	export GetBestAddressRec(dataset(SexOffender_Services.Layouts.raw_rec) in_raw, unsigned dppa_purpose = 0, unsigned glb_purpose = 0) := function 
+	export GetBestAddressRec(dataset(SexOffender_Services.Layouts.raw_rec) in_raw, doxie.IDataAccess mod_access) := function 
 		
-			GLB := ut.PermissionTools.glb.ok(glb_purpose);
-			DPPA := ut.PermissionTools.dppa.ok(dppa_purpose);
+			glb_ok := mod_access.isValidGlb();
+			dppa_ok := mod_access.isValidDppa();
+
 			in_dids := dedup(sort(project(in_raw, doxie.layout_references), did), did);
-			doxie.mac_best_records(in_raw, did, best_recs, DPPA, GLB, false, doxie.DataRestriction.fixed_DRM,,,doxie.layout_best_ext);	
+			doxie.mac_best_records(in_raw, did, best_recs, dppa_ok, glb_ok, false, mod_access.DataRestrictionMask,,,doxie.layout_best_ext);	
 			
 			bestAddressInfo xform1(SexOffender_Services.Layouts.raw_rec l, doxie.layout_best_ext r):=transform
 				self.bestaddress.AddressType := SexOffender_Services.Constants.address_type;
@@ -221,7 +222,7 @@ export Raw := module
 				p3 := PARSE(ds, line, NounPhraseComponent3, ps3, BEST, MANY);
 
 				noQuotes := PROJECT (p3 , TRANSFORM(RECORDOF(P3), 
-					SELF.OUT1 := stringlib.stringfilter(stringlib.stringtouppercase(left.out1), ' -0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+					SELF.OUT1 := STD.Str.Filter(STD.Str.ToUpperCase(left.out1), ' -0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 				));
 
 				distinct := dedup(noQuotes, out1, All);	
@@ -233,10 +234,10 @@ export Raw := module
 									SexOffender_Services.IParam.search in_mod,
 									boolean isFCRA = false,
 									dataset(fcra.Layout_override_flag) flagfile = fcra.compliance.blank_flagfile,
-									dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-									integer8 inFFDOptionsMask = 0) := function
+									dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim
+									) := function
 					
-			ds_raw_offenders := GetRawOffenders(in_spks, in_mod.ApplicationType, isFCRA, flagfile, slim_pc_recs, inFFDOptionsMask);
+			ds_raw_offenders := GetRawOffenders(in_spks, in_mod.application_type, isFCRA, flagfile, slim_pc_recs, in_mod.FFDOptionsMask);
 			
 			//this affects penalty calculation. when the address is just the center of a circle instead of a target, you dont want to penalize on street, etc.
 		  boolean SearchAroundAddress_value := AutoStandardI.InterfaceTranslator.SearchAroundAddress_value.val(project(in_mod,AutoStandardI.InterfaceTranslator.SearchAroundAddress_value.params))
@@ -284,25 +285,22 @@ export Raw := module
 				result := project(parsedSmt, TRANSFORM({string200 word, string200 field, boolean match}, 
 					SELF.word := left.out1;
 					SELF.field := smtField;
-					SELF.match := StringLib.StringFind(TRIM(SMTfield), TRIM(left.out1), 1) > 0;));								
+					SELF.match := STD.Str.Find(TRIM(SMTfield), TRIM(left.out1), 1) > 0;));								
 				// Scars marks and tattos penalty is the number of words search minus the 
 				// number of words found in the record.
 				self.penalt_osmt := smtSearchCount - COUNT(result(match)) ;				
 		    self := left));
 
 		  // ***** DID & SSN pulling and suppression ****
-			Suppress.MAC_Suppress(recs_plus_pen,dids_pulled,in_mod.applicationtype,Suppress.Constants.LinkTypes.DID,did);
+			Suppress.MAC_Suppress(recs_plus_pen,dids_pulled,in_mod.application_type,Suppress.Constants.LinkTypes.DID,did);
 			// pull, prune & suppress ssns twice, once for ssn_appended & once for ssn
-			Suppress.MAC_Suppress(dids_pulled,ssns_pulled1,in_mod.applicationtype,Suppress.Constants.LinkTypes.SSN,ssn_appended);
-			Suppress.MAC_Suppress(ssns_pulled1,ssns_pulled2,in_mod.applicationtype,Suppress.Constants.LinkTypes.SSN,ssn);
+			Suppress.MAC_Suppress(dids_pulled,ssns_pulled1,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,ssn_appended);
+			Suppress.MAC_Suppress(ssns_pulled1,ssns_pulled2,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
 	    doxie.MAC_PruneOldSSNs(ssns_pulled2, ssns_pruned1, ssn_appended, did, isFCRA);
 			doxie.MAC_PruneOldSSNs(ssns_pruned1, ssns_pruned2, ssn, did, isFCRA);
 
-		  // set the ssn_mask_value that is used in Suppress.MAC_Mask
-		  string6 ssn_mask_value := AutoStandardI.InterfaceTranslator.ssn_mask_val.val(project(in_mod, AutoStandardI.InterfaceTranslator.ssn_mask_val.params)); 
-
-		  suppress.MAC_Mask(ssns_pruned2, ssns_suppressed1, ssn_appended, blank, true, false);
-		  suppress.MAC_Mask(ssns_suppressed1, ssns_suppressed2, ssn, blank, true, false);
+		  suppress.MAC_Mask(ssns_pruned2, ssns_suppressed1, ssn_appended, blank, true, false, maskVal := in_mod.ssn_mask);
+		  suppress.MAC_Mask(ssns_suppressed1, ssns_suppressed2, ssn, blank, true, false, maskVal := in_mod.ssn_mask);
       return ssns_suppressed2;
 		end;
 
@@ -318,12 +316,12 @@ export Raw := module
 											 SexOffender_Services.IParam.report in_mod,
 											 boolean isFCRA = false,
 											 dataset(fcra.Layout_override_flag) flagfile = fcra.compliance.blank_flagfile,
-											 dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-											 integer8 inFFDOptionsMask = 0) := function
+											 dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim
+											 ) := function
 
 	    // Used to replace spaces in date strings with zeroes so cast to integer works Ok,
 	    // since some dates only contain a yyyy or a yyyymm.
-      fixed_date(string8 dtin) := StringLib.StringFindReplace(dtin, ' ', '0');
+      fixed_date(string8 dtin) := STD.Str.FindReplace(dtin, ' ', '0');
 			// Restrict explicit offense descriptions
 			od(string primKey, string od1, string od2) := function
 				isRestricted := (primKey[3..4] in SexOffender.Constants.explicitOffenseStates);
@@ -474,7 +472,7 @@ export Raw := module
 
 				// Sort Convictions by Conviction-Date reverse chron (descending)
 				ds_spk := dataset([{l.seisint_primary_key, l.isDeepDive}], SexOffender_Services.Layouts.search);
-				self.Convictions := sort(project(GetRawOffenses(ds_spk, isFCRA, flagfile, slim_pc_recs, inFFDOptionsMask),
+				self.Convictions := sort(project(GetRawOffenses(ds_spk, isFCRA, flagfile, slim_pc_recs, in_mod.FFDOptionsMask),
 			 				                           offenses_file_xform(left)),
 																 -ConvictionDate),
 				// (name_type=0 is the main name, not an AKA).
@@ -493,7 +491,7 @@ export Raw := module
 			recs_pre_best  := project(recs(name_type ='0'), spk_file_xform(left));			
 			
 			// adding best information if requested.
-			recs_best 		 := GetBestAddressRec(recs, in_mod.DPPAPurpose, in_mod.GLBPurpose);				
+			recs_best 		 := GetBestAddressRec(recs, in_mod);				
 			recs_with_best := join(recs_pre_best, recs_best,
 														 (unsigned6) left.UniqueId = right.did,
 														 transform(iesp.sexualoffender_fcra.t_FcraSexOffReportRecord,
@@ -504,20 +502,16 @@ export Raw := module
 			recs_out := if(in_mod.include_bestaddress and ~isFCRA, recs_with_best, recs_pre_best);
 															 			
 		  // ***** DID & SSN pulling and suppression ****
-			Suppress.MAC_Suppress(recs_out,dids_pulled,in_mod.applicationtype,Suppress.Constants.LinkTypes.DID,UniqueId);
+			Suppress.MAC_Suppress(recs_out,dids_pulled,in_mod.application_type,Suppress.Constants.LinkTypes.DID,UniqueId);
 
 			// pull, prune & suppress ssns twice, once for ssn_appended & once for ssn
-			Suppress.MAC_Suppress(dids_pulled,ssns_pulled1,in_mod.applicationtype,Suppress.Constants.LinkTypes.SSN,ssn);
-			Suppress.MAC_Suppress(ssns_pulled1,ssns_pulled2,in_mod.applicationtype,Suppress.Constants.LinkTypes.SSN,OrigSSN);
+			Suppress.MAC_Suppress(dids_pulled,ssns_pulled1,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
+			Suppress.MAC_Suppress(ssns_pulled1,ssns_pulled2,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,OrigSSN);
 	    doxie.MAC_PruneOldSSNs(ssns_pulled2, ssns_pruned1, SSN, UniqueId, isFCRA);
 			doxie.MAC_PruneOldSSNs(ssns_pruned1, ssns_pruned2, OrigSSN, UniqueId, isFCRA);
 
-		  // set the ssn_mask_value that is used in Suppress.MAC_Mask
-		  string6 ssn_mask_value := AutoStandardI.InterfaceTranslator.ssn_mask_value.val(project(in_mod,
-                                AutoStandardI.InterfaceTranslator.ssn_mask_value.params)); 
-
-		  suppress.MAC_Mask(ssns_pruned2, ssns_suppressed1, SSN, blank, true, false);
-		  suppress.MAC_Mask(ssns_suppressed1, ssns_suppressed2, OrigSSN, blank, true, false);
+		  suppress.MAC_Mask(ssns_pruned2, ssns_suppressed1, SSN, blank, true, false, maskVal := in_mod.ssn_mask);
+		  suppress.MAC_Mask(ssns_suppressed1, ssns_suppressed2, OrigSSN, blank, true, false, maskVal := in_mod.ssn_mask);
 
       return ssns_suppressed2;		
 		end;
@@ -526,13 +520,13 @@ export Raw := module
 									 SexOffender_Services.IParam.report in_mod,
 									 boolean isFCRA = false,
 									 dataset(fcra.Layout_override_flag) flagfile = fcra.compliance.blank_flagfile,
-									 dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-									 integer8 inFFDOptionsMask = 0) := function
+									 dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim
+									 ) := function
 
 			fmt_dids := project(in_dids,SexOffender_Services.layouts.search_did);
 			rec_ids  := byDIDs(fmt_dids, isFCRA);
-			rawrecs  := GetRawOffenders(rec_ids, in_mod.ApplicationType, isFCRA, flagfile, slim_pc_recs, inFFDOptionsMask);
-			rpt_recs := format_rpt(rawrecs, in_mod, isFCRA, flagfile, slim_pc_recs, inFFDOptionsMask);
+			rawrecs  := GetRawOffenders(rec_ids, in_mod.application_type, isFCRA, flagfile, slim_pc_recs, in_mod.FFDOptionsMask);
+			rpt_recs := format_rpt(rawrecs, in_mod, isFCRA, flagfile, slim_pc_recs);
 			
 		  return rpt_recs;
 		end;
@@ -545,7 +539,7 @@ export Raw := module
 			rec_dids:= getDIDsbySPK(in_spks, isFCRA);
 			rec_ids  := byDIDs(rec_dids, isFCRA)+in_spks;
 			dedup_rec_ids  := dedup(sort(rec_ids,seisint_primary_key),seisint_primary_key);
-			rawrecs  := GetRawOffenders(dedup_rec_ids, in_mod.ApplicationType, isFCRA, flagfile);
+			rawrecs  := GetRawOffenders(dedup_rec_ids, in_mod.application_type, isFCRA, flagfile);
 			rpt_recs := format_rpt(rawrecs, in_mod, isFCRA, flagfile);
 			
 			return rpt_recs;

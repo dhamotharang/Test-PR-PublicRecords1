@@ -98,6 +98,7 @@ layout_soap := record
 	boolean ExactLastNameMatch;
 	boolean ExactPhoneMatch;
 	boolean ExactSSNMatch;
+	boolean ExactDriverLicenseMatch;
 
 	boolean IncludeAllRiskIndicators;
 
@@ -117,6 +118,14 @@ layout_soap := record
 	boolean EnableEmergingID;  //for AmEx - do additional searches to assign a DID - set this option in the transform below 
 	string  NameInputOrder;    //if customer wants to specify the order of the input full name field - see options below 
 
+
+boolean disablenongovernmentdldata := false;
+boolean	IncludeEmailVerification := false;
+boolean IncludeITIN := false;
+boolean	ExcludeMinors := false;
+boolean	IncludeComplianceCap := false;
+boolean	IncludeDigitalIdentity := false;
+	
 end;
 
 l := RECORD
@@ -246,6 +255,7 @@ ESP version >= 1.49 which applies to IID/BIID and Patriot -  OFACversion, Watchl
 	self.ExactLastNameMatch := false;
 	self.ExactPhoneMatch := false;
 	self.ExactSSNMatch := false;
+	self.ExactDriverLicenseMatch := false;
 
 	self.IncludeAllRiskIndicators := true;
 	
@@ -268,6 +278,14 @@ ESP version >= 1.49 which applies to IID/BIID and Patriot -  OFACversion, Watchl
 	self.EnableEmergingID := false;  //set to true to do additional DID searching (primarily for AmEx)
 	self.NameInputOrder := '';  // if customer wants to specify the order of input name
 															//   options are 'fml' or 'lfm' - anything else defaults to standard
+															
+self.disablenongovernmentdldata := false;
+self.IncludeEmailVerification := false;
+self.IncludeITIN := false;
+self.ExcludeMinors := false;
+self.IncludeComplianceCap := false;
+self.IncludeDigitalIdentity := false;
+
 	SELF := le;
 	self := [];
 end;

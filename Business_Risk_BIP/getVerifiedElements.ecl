@@ -1,11 +1,12 @@
-﻿IMPORT Address, BIPV2, Business_Credit, Business_Credit_KEL, Business_Risk, Business_Risk_BIP, BusinessInstantID20_Services, Census_data, DID_Add, Risk_Indicators, STD, ut;
+﻿IMPORT Address, BIPV2, Business_Risk, Business_Risk_BIP, DID_Add, Risk_Indicators, STD, ut, Doxie;
 
 	// The following function determines whether Business data passed in from the customer were actually found
 	// in various sources.
 	EXPORT getVerifiedElements(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 SET OF STRING2 AllowedSourcesSet) := 
+											 SET OF STRING2 AllowedSourcesSet,
+											 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := 
 		FUNCTION
 				UCase := STD.Str.ToUpperCase;
     ds_BIPIDs := Business_Risk_BIP.Common.GetLinkIDs(Shell);
@@ -28,7 +29,8 @@
                        JoinLimit                := Business_Risk_BIP.Constants.Limit_BusHeader,
                        dnbFullRemove            := FALSE,
                        bypassContactSuppression := TRUE,
-                       JoinType                 := BIPV2.IDconstants.JoinTypes.LimitTransformJoin );// Options.KeepLargeBusinesses  Business_Risk_BIP.Constants.DefaultJoinType );
+                       JoinType                 := BIPV2.IDconstants.JoinTypes.LimitTransformJoin,
+						mod_access := mod_access);// Options.KeepLargeBusinesses  Business_Risk_BIP.Constants.DefaultJoinType );
 	
 		// clean up the business header before doing anything else
 		Business_Risk_BIP.Common.mac_slim_header(ds_BusinessHeaderRaw1, ds_BusinessHeaderRaw);	
@@ -241,14 +243,14 @@
 					);
 
 				// Gain some extra lift from Business Shell verification indicators.
-				Business_Risk_BIP.Layouts.Shell xfm_AddVerificationElements( Business_Risk_BIP.Layouts.Shell ri, layout_temp le ) := 
+				Business_Risk_BIP.Layouts.Shell xfm_AddVerificationElements( Business_Risk_BIP.Layouts.Shell le, layout_temp ri ) := 
 					TRANSFORM
-						ver_name_src_count   := (INTEGER)ri.Verification.NameMatchSourceCount;
-						ver_altnm_src_count  := (INTEGER)ri.Verification.AltNameMatchSourceCount;
-						ver_addr_src_count   := (INTEGER)ri.Verification.AddrVerificationSourceCount; 
-						ver_phn_src_count    := (INTEGER)ri.Verification.PhoneMatchSourceCount;
-						ver_phn_src_id_count := (INTEGER)ri.Verification.PhoneMatchSourceCountID;
-						ver_fein_src_count   := (INTEGER)ri.Verification.FEINMatchSourceCount;
+						ver_name_src_count   := (INTEGER)le.Verification.NameMatchSourceCount;
+						ver_altnm_src_count  := (INTEGER)le.Verification.AltNameMatchSourceCount;
+						ver_addr_src_count   := (INTEGER)le.Verification.AddrVerificationSourceCount; 
+						ver_phn_src_count    := (INTEGER)le.Verification.PhoneMatchSourceCount;
+						ver_phn_src_id_count := (INTEGER)le.Verification.PhoneMatchSourceCountID;
+						ver_fein_src_count   := (INTEGER)le.Verification.FEINMatchSourceCount;
 
 						BOOLEAN ver_nam   := ver_name_src_count  > 0;
 						BOOLEAN ver_altnm := ver_altnm_src_count > 0;
@@ -259,22 +261,22 @@
 						// Since the Business Shell doesn't provide CompanyNames, Addresses, or other data, fill in 
 						// these data from the original input if this product couldn't find the Business in the 
 						// Business Header, but the Business Shell found it in other sources.
-						_CompanyName    := Business_Risk_BIP.Common.fn_CleanString( TRIM( IF( ver_nam   AND TRIM(le.CompanyName)    = '', le.origCompanyName   , le.CompanyName ) ) );
-						_AltCompanyName := Business_Risk_BIP.Common.fn_CleanString( TRIM( IF( ver_altnm AND TRIM(le.AltCompanyName) = '', le.origAltCompanyName, le.AltCompanyName ) ) );
+						_CompanyName    := Business_Risk_BIP.Common.fn_CleanString( TRIM( IF( ver_nam   AND TRIM(ri.CompanyName)    = '', ri.origCompanyName   , ri.CompanyName ) ) );
+						_AltCompanyName := Business_Risk_BIP.Common.fn_CleanString( TRIM( IF( ver_altnm AND TRIM(ri.AltCompanyName) = '', ri.origAltCompanyName, ri.AltCompanyName ) ) );
 						
 						SELF.Verification.VerifiedCompanyName       := _CompanyName;
 						SELF.Verification.VerifiedAltCompanyName    := _AltCompanyName;
-						SELF.Verification.VerifiedCompanyAddress1   := IF( ver_add AND TRIM(le.StreetAddress) = '', le.origStreetAddress , le.StreetAddress );
-						SELF.Verification.VerifiedCompanyCity       := IF( ver_add AND TRIM(le.City) = ''         , le.origCity          , le.City );
-						SELF.Verification.VerifiedCompanyState      := IF( ver_add AND TRIM(le.State) = ''        , le.origState         , le.State );
-						SELF.Verification.VerifiedCompanyZip        := IF( ver_add AND TRIM(le.Zip5) = ''         , le.origZip5          , le.Zip5 );
-						SELF.Verification.VerifiedCompanyFEIN       := IF( ver_tin AND TRIM(le.FEIN) = ''         , le.origFEIN          , le.FEIN );
-						SELF.Verification.VerifiedCompanyPhone      := IF( ver_phn AND TRIM(le.Phone10) = ''      , le.origPhone10       , le.Phone10 );		
-      SELF.Verification.VerifiedCompanyNameInd    := (STRING)((INTEGER)(ver_nam OR ver_altnm));
-      SELF.Verification.VerifiedCompanyAddressInd := (STRING)((INTEGER)ver_add);
-      SELF.Verification.VerifiedCompanyFEINInd    := (STRING)((INTEGER)ver_tin);
-      SELF.Verification.VerifiedCompanyPhoneInd   := (STRING)((INTEGER)ver_phn);
-						SELF := ri;
+						SELF.Verification.VerifiedCompanyAddress1   := IF( ver_add AND TRIM(ri.StreetAddress) = '', ri.origStreetAddress , ri.StreetAddress );
+						SELF.Verification.VerifiedCompanyCity       := IF( ver_add AND TRIM(ri.City) = ''         , ri.origCity          , ri.City );
+						SELF.Verification.VerifiedCompanyState      := IF( ver_add AND TRIM(ri.State) = ''        , ri.origState         , ri.State );
+						SELF.Verification.VerifiedCompanyZip        := IF( ver_add AND TRIM(ri.Zip5) = ''         , ri.origZip5          , ri.Zip5 );
+						SELF.Verification.VerifiedCompanyFEIN       := IF( ver_tin AND TRIM(ri.FEIN) = ''         , ri.origFEIN          , ri.FEIN );
+						SELF.Verification.VerifiedCompanyPhone      := IF( ver_phn AND TRIM(ri.Phone10) = ''      , ri.origPhone10       , ri.Phone10 );		
+						SELF.Verification.VerifiedCompanyNameInd    := (STRING)((INTEGER)(ver_nam OR ver_altnm));
+						SELF.Verification.VerifiedCompanyAddressInd := (STRING)((INTEGER)ver_add);
+						SELF.Verification.VerifiedCompanyFEINInd    := (STRING)((INTEGER)ver_tin);
+						SELF.Verification.VerifiedCompanyPhoneInd   := (STRING)((INTEGER)ver_phn);
+						SELF := le;
 						SELF := [];
 					END;
 				
@@ -288,11 +290,12 @@
 					);
 
 				// DEBUGs...:
-				// OUTPUT( ds_OriginalInput, NAMED('__OriginalInput') );
+				// OUTPUT( ds_BIPIDs, NAMED('BIPIDs') );
+				// OUTPUT( ds_BusinessHeaderRaw1, NAMED('BusinessHeaderRaw1') );
+				// OUTPUT( ds_BusinessHeaderSeq, NAMED('BusinessHeaderSeq') );
 				// OUTPUT( ds_BusinessHeaderSlimDeduped, NAMED('BusinessHeaderSlimDeduped') );
 				// OUTPUT( ds_Matching, NAMED('Matching') );
 				// OUTPUT( ds_MatchingRolled, NAMED('MatchingRolled') );
-				// OUTPUT( ds_MatchingWithShellData, NAMED('MatchingWithShellData') );
-				
+        
 				RETURN ds_withVerifiedElements;
 		END;

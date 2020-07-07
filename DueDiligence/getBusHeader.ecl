@@ -1,11 +1,12 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, BusinessInstantID20_Services, DueDiligence;
+﻿IMPORT BIPV2, Business_Risk_BIP, BusinessInstantID20_Services, DueDiligence, doxie;
 
 
 EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
                     Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
                     BIPV2.mod_sources.iParams linkingOptions,
                     BOOLEAN includeAllBusinessData,
-                    BOOLEAN includeReportData) := FUNCTION
+                    BOOLEAN includeReportData,
+                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	
   
   
@@ -14,7 +15,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
     
     allBusinesses := inData + linkedBus;	
 
-    busHeaderFilt := DueDiligence.getBusHeaderImpl.getFilteredData(inData, options, linkingOptions);
+    busHeaderFilt := DueDiligence.getBusHeaderImpl.getFilteredData(inData, options, linkingOptions, mod_access);
     
     //if we are processing from a business perspective, we want all data
     //if we are processing from a person perspective, we only need certain information about the business

@@ -233,13 +233,13 @@ IMPORT Models, Std;
         export string10 TotalCostRiskScore_Rank_99_Max   := V5_Defaults.TotalCostRiskScore_Rank_99_Max : STORED('TotalCostRiskScore_Rank_99_Max') ;
         export string10 TotalCostRiskScore_Rank_100_Min  := V5_Defaults.TotalCostRiskScore_Rank_100_Min : STORED('TotalCostRiskScore_Rank_100_Min');
 
-        export string10 TotalCostRiskScore_Category_5_Low  := V5_Defaults.TotalCostRiskScore_Category_5_Low  : STORED('TotalCostRiskScore_Category_5_Low');
-        export string10 TotalCostRiskScore_Category_4_High := V5_Defaults.TotalCostRiskScore_Category_4_High : STORED('TotalCostRiskScore_Category_4_High');
-        export string10 TotalCostRiskScore_Category_4_Low  := V5_Defaults.TotalCostRiskScore_Category_4_Low  : STORED('TotalCostRiskScore_Category_4_Low');
-        export string10 TotalCostRiskScore_Category_3_High := V5_Defaults.TotalCostRiskScore_Category_3_High : STORED('TotalCostRiskScore_Category_3_High');
-        export string10 TotalCostRiskScore_Category_3_Low  := V5_Defaults.TotalCostRiskScore_Category_3_Low  : STORED('TotalCostRiskScore_Category_3_Low');
-        export string10 TotalCostRiskScore_Category_2_High := V5_Defaults.TotalCostRiskScore_Category_2_High : STORED('TotalCostRiskScore_Category_2_High');
-        export string10 TotalCostRiskScore_Category_2_Low  := V5_Defaults.TotalCostRiskScore_Category_2_Low  : STORED('TotalCostRiskScore_Category_2_Low');
-        export string10 TotalCostRiskScore_Category_1_High := V5_Defaults.TotalCostRiskScore_Category_1_High : STORED('TotalCostRiskScore_Category_1_High');
+        export string3 TotalCostRiskScore_Category_5_Low  := V5_Defaults.TotalCostRiskScore_Category_5_Low  : STORED('TotalCostRiskScore_Category_5_Low');
+        export string3 TotalCostRiskScore_Category_4_High := V5_Defaults.TotalCostRiskScore_Category_4_High : STORED('TotalCostRiskScore_Category_4_High');
+        export string3 TotalCostRiskScore_Category_4_Low  := V5_Defaults.TotalCostRiskScore_Category_4_Low  : STORED('TotalCostRiskScore_Category_4_Low');
+        export string3 TotalCostRiskScore_Category_3_High := V5_Defaults.TotalCostRiskScore_Category_3_High : STORED('TotalCostRiskScore_Category_3_High');
+        export string3 TotalCostRiskScore_Category_3_Low  := V5_Defaults.TotalCostRiskScore_Category_3_Low  : STORED('TotalCostRiskScore_Category_3_Low');
+        export string3 TotalCostRiskScore_Category_2_High := V5_Defaults.TotalCostRiskScore_Category_2_High : STORED('TotalCostRiskScore_Category_2_High');
+        export string3 TotalCostRiskScore_Category_2_Low  := V5_Defaults.TotalCostRiskScore_Category_2_Low  : STORED('TotalCostRiskScore_Category_2_Low');
+        export string3 TotalCostRiskScore_Category_1_High := V5_Defaults.TotalCostRiskScore_Category_1_High : STORED('TotalCostRiskScore_Category_1_High');
 
 	END;

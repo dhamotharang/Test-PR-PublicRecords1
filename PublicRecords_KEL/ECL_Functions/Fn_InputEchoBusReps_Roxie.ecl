@@ -14,7 +14,8 @@ EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_
 				SELF.P_InpNameFirst := le.Rep1firstname;
 				SELF.P_InpNameMid := le.Rep1MiddleName;
 				SELF.P_InpNameLast := le.Rep1lastname;
-				SELF.P_InpAddrLine1 := le.Rep1Addr;
+				SELF.P_InpAddrLine1 := le.Rep1StreetAddressLine1;
+				SELF.P_InpAddrLine2 := le.Rep1StreetAddressLine2;
 				SELF.P_InpAddrCity := le.Rep1City;
 				SELF.P_InpAddrState := le.Rep1State; 
 				SELF.P_InpAddrZip := le.Rep1Zip;
@@ -41,7 +42,8 @@ EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_
 				SELF.P_InpNameFirst := le.Rep2firstname;
 				SELF.P_InpNameMid := le.Rep2MiddleName;
 				SELF.P_InpNameLast := le.Rep2lastname;
-				SELF.P_InpAddrLine1 := le.Rep2Addr;
+				SELF.P_InpAddrLine1 := le.Rep2StreetAddressLine1;
+				SELF.P_InpAddrLine2 := le.Rep2StreetAddressLine2;
 				SELF.P_InpAddrCity := le.Rep2City;
 				SELF.P_InpAddrState := le.Rep2State; 
 				SELF.P_InpAddrZip := le.Rep2Zip;
@@ -68,7 +70,8 @@ EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_
 				SELF.P_InpNameFirst := le.Rep3firstname;
 				SELF.P_InpNameMid := le.Rep3MiddleName;
 				SELF.P_InpNameLast := le.Rep3lastname;
-				SELF.P_InpAddrLine1 := le.Rep3Addr;
+				SELF.P_InpAddrLine1 := le.Rep3StreetAddressLine1;
+				SELF.P_InpAddrLine2 := le.Rep3StreetAddressLine2;
 				SELF.P_InpAddrCity := le.Rep3City;
 				SELF.P_InpAddrState := le.Rep3State; 
 				SELF.P_InpAddrZip := le.Rep3Zip;
@@ -95,7 +98,8 @@ EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_
 				SELF.P_InpNameFirst := le.Rep4firstname;
 				SELF.P_InpNameMid := le.Rep4MiddleName;
 				SELF.P_InpNameLast := le.Rep4lastname;
-				SELF.P_InpAddrLine1 := le.Rep4Addr;
+				SELF.P_InpAddrLine1 := le.Rep4StreetAddressLine1;
+				SELF.P_InpAddrLine2 := le.Rep4StreetAddressLine2;
 				SELF.P_InpAddrCity := le.Rep4City;
 				SELF.P_InpAddrState := le.Rep4State; 
 				SELF.P_InpAddrZip := le.Rep4Zip;
@@ -122,7 +126,8 @@ EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_
 				SELF.P_InpNameFirst := le.Rep5firstname;
 				SELF.P_InpNameMid := le.Rep5MiddleName;
 				SELF.P_InpNameLast := le.Rep5lastname;
-				SELF.P_InpAddrLine1 := le.Rep5Addr;
+				SELF.P_InpAddrLine1 := le.Rep5StreetAddressLine1;
+				SELF.P_InpAddrLine2 := le.Rep5StreetAddressLine2;
 				SELF.P_InpAddrCity := le.Rep5City;
 				SELF.P_InpAddrState := le.Rep5State; 
 				SELF.P_InpAddrZip := le.Rep5Zip;

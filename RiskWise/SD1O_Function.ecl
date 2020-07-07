@@ -191,8 +191,7 @@ working_layout fill_output(iid_results le, indata ri) := TRANSFORM
 								    le.bill_to_output.combo_postdir,le.bill_to_output.combo_unit_desig,le.bill_to_output.combo_sec_range);
 	
 	
-	self.score := if(tribCode = 'ex70', Risk_Indicators.cviScore(le.bill_to_output.phoneverlevel,le.bill_to_output.socsverlevel,le.bill_to_output,le.bill_to_output.correctssn,
-													 le.bill_to_output.correctaddr,le.bill_to_output.correcthphone,'',veraddr,le.bill_to_output.combo_last,true), '');
+	self.score := if(tribCode = 'ex70', Risk_Indicators.cviScore(le.bill_to_output.phoneverlevel,le.bill_to_output.socsverlevel,le.bill_to_output,'',veraddr,le.bill_to_output.combo_last,true), '');
 	
 	numByte := if(tribCode = 'sd01', 1, 2);	// sd01 formats the count to 1 byte, the others are 2 bytes
 	self.firstcount := if(ri.first <> '' and tribCode in ['sd01','ex02','ex03','ex22','ex70','cb61','cb62'], RiskWise.flattenCount(le.bill_to_output.combo_firstcount,2,numByte), '');

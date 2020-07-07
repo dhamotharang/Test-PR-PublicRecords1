@@ -7,7 +7,8 @@ EXPORT Fn_InputEchoBus_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_UID_
 				SELF.G_ProcBusUID := le.G_ProcBusUID;
 				SELF.B_InpName := le.CompanyName;           
 				SELF.B_InpAltName := le.AlternateCompanyName; 
-				SELF.B_InpAddrLine1 := le.Addr1;         
+				SELF.B_InpAddrLine1 := le.StreetAddressLine1;         
+				SELF.B_InpAddrLine2 := le.StreetAddressLine2;    
 				SELF.B_InpAddrCity := le.City1;          
 				SELF.B_InpAddrState := le.State1;          
 				SELF.B_InpAddrZip := le.Zip1;            

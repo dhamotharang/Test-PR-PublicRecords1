@@ -1,4 +1,4 @@
-// This module contains code involved in counting the number of times the source
+﻿// This module contains code involved in counting the number of times the source
 // report results reference various data types: Name, SSN, DOB, FEIN, Address, Phone
 
 import doxie_cbrs, ut, iesp, MDR, dx_header;
@@ -15,16 +15,16 @@ export Occurrence := module
 	shared set_prop_a		:= [ MDR.sourceTools.src_LnPropV2_Fares_Asrs, MDR.sourceTools.src_LnPropV2_Lexis_Asrs ];
 	shared set_prop_d		:= [ MDR.sourceTools.src_LnPropV2_Fares_Deeds, MDR.sourceTools.src_LnPropV2_Lexis_Deeds_Mtgs, MDR.sourceTools.src_Fares_Deeds_from_Asrs ];
 	export l_src				:= { string13 code; set of string2 ridSrc; string50 desc; };
-	export max_sources	:= 64; // 50 people/combined sources + 14 Business only sources
+	export max_sources	:= 65; // 51 people/combined sources + 14 Business only sources
   // src_code contents information:
-	// 1. The "code" values below (i.e. first entry in each "row") are an abbreviated 
-	//    version of the child dataset names in the layout of the dataset coming out of: 
+	// 1. The "code" values below (i.e. first entry in each "row") are an abbreviated
+	//    version of the child dataset names in the layout of the dataset coming out of:
 	//    a. Doxie.HeaderSource_Service (i.e. Doxie_Raw.Layout_crs_raw) for people and
 	//       combined people/business sources.
-	//    OR   
+	//    OR
 	//    b. doxie_cbrs.Business_Report_Source_Service (i.e. doxie_cbrs.layout_source)
 	//       for business only sources.
-	// 2. The "ridSrc" values below (i.e. second entry in each "row") are the appropriate 
+	// 2. The "ridSrc" values below (i.e. second entry in each "row") are the appropriate
 	//    two character source code(s) or set of source codes.
 	// 3. The "description" values below (i.e. third entry in each "row") were derived from
 	//    emails sent by various ESP staff members showing source descriptions used within ESP.
@@ -41,6 +41,7 @@ export Occurrence := module
 		export sanc					:= row({'SANC',						MDR.sourceTools.set_Ingenix_Sanctions,			'Sanctions'},																l_src);
 		export prov					:= row({'PROV',						[],																					'Medical Providers'},												l_src);
 		export email				:= row({'EMAIL',					[],																					'Email Addresses'}, 												l_src);
+		export emailv2			:= row({'EMAIL_V2',				[],																					'Email Addresses'}, 												l_src);
 		export veh					:= row({'VEH',						MDR.sourceTools.set_Vehicles,								'Motor Vehicle Registrations'},							l_src);
 		export vehv2				:= row({'VEH_V2',					MDR.sourceTools.set_Vehicles,								'Motor Vehicle Registrations'},							l_src);
 		export eq						:= row({'EQ',							MDR.sourceTools.set_Equifax,								'Person Locator 1'}, 												l_src);
@@ -68,7 +69,7 @@ export Occurrence := module
 		export DOC					:= row({'DOC',						MDR.sourceTools.set_Accurint_DOC,						'Criminal'}, 																l_src);
 		export SO						:= row({'SEXOFFENDER',		MDR.sourceTools.set_Accurint_Sex_offender,	'Sexual Offenses'}, 												l_src);
 		export finder				:= row({'FINDER',					['FI'],																			'Historical Person Locator'}, 							l_src);
-		export ak						:= row({'AK',							MDR.sourceTools.set_AK_Perm_Fund,						'Alaskan Permanent Fund'}, 									l_src);
+		export ak						:= row({'AK',							MDR.sourceTools.set_AK_Perm_Fund,						'Alaska Permanent Fund'}, 									l_src);
 		export nod					:= row({'NOD',						MDR.sourceTools.set_Foreclosures_Delinquent,'Notice Of Defaults'},				 							l_src);
 		export for					:= row({'FOR',						MDR.sourceTools.set_Foreclosures,						'Foreclosure Records'}, 										l_src);
 		export util					:= row({'UTIL',						MDR.sourceTools.set_Utility_sources,				'Utility Data'},														l_src);
@@ -82,7 +83,7 @@ export Occurrence := module
 		export FBNv2				:= row({'FBN',						MDR.sourceTools.set_Fbnv2,									'Fictitious Business Names Records'}, 			l_src);
 		//Business only sources ---------v
 		export bbbm   			:= row({'BBBM',  					MDR.sourceTools.set_BBB_Member,							'Better Business Bureau Member'}, 					l_src);
-		export bbbnm  			:= row({'BBBNM',  				MDR.sourceTools.set_BBB_Non_Member,					'Better Business Bureau Non-Member'},				l_src);			
+		export bbbnm  			:= row({'BBBNM',  				MDR.sourceTools.set_BBB_Non_Member,					'Better Business Bureau Non-Member'},				l_src);
     export bfinder			:= row({'BFINDER',	 		  MDR.sourceTools.set_Business_header,				'Business Finder'}, 												l_src);
 		export castax  			:= row({'CASALESTAX', 		MDR.sourceTools.set_CA_Sales_Tax,						'California Sales Tax'}, 										l_src);
 		export cont   			:= row({'CONTACTS',   		MDR.sourceTools.set_Business_contacts,			'Business Contacts'}, 											l_src);
@@ -97,7 +98,7 @@ export Occurrence := module
 		export orwork				:= row({'ORWORK',					MDR.sourceTools.set_OR_Worker_Comp,					'Oregon Worker\'s Compensation'},						l_src);
 	end;
   // NOTE: a similar list of codes appears in doxie.Comprehensive_Report_Service and
-	//       doxie_cbrs/all_base_records_prs and ESP also maintains a list of codes, 
+	//       doxie_cbrs/all_base_records_prs and ESP also maintains a list of codes,
 	//       descriptions, and a couple other values that differ in some fairly small ways.
   //       In a perfect world, we'd find a way to consolidate these four lists.
 
@@ -110,9 +111,10 @@ export Occurrence := module
 		src_code.voter.code,			src_code.voterv2.code,
 		src_code.assessment.code,	src_code.assessment2.code,
 		src_code.deed.code,				src_code.deed2.code,
-		src_code.corp.code,				src_code.corpv2.code
+		src_code.corp.code,				src_code.corpv2.code,
+		src_code.email.code,			src_code.emailv2.code
 	];
-	
+
 	// valid datum codes
 	export datum_code := module
 		export name		:= 'NAME';
@@ -123,23 +125,23 @@ export Occurrence := module
 		export phone	:= 'PHONE';
 	end;
 	export max_datum := 6;
-	
+
 	// =-=-=-=-=-=-=-=-=-=-=-= Handshake =-=-=-=-=-=-=-=-=-=-=-=
-	
+
 	// INPUT: each record in each child dataset of the source report must be transformed to...
 	export l_in := record
 		string13	src;
 		string50	src_desc;
-		boolean		hasName  := false; 
+		boolean		hasName  := false;
 		boolean		hasSSN   := false;
 		boolean		hasDOB   := false;
-		boolean		hasFEIN  := false;		
+		boolean		hasFEIN  := false;
 		boolean		hasAddr  := false;
 		boolean		hasPhone := false;
 		unsigned	dt_first_seen;
 		unsigned	dt_last_seen;
 	end;
-	
+
 	// OUTPUT: which we'll roll up into...
 	export l_ref := record
 		string50 src; // NOTE: for ESP purposes, this will actually contain the description
@@ -147,15 +149,15 @@ export Occurrence := module
 		l_in.dt_first_seen;
 		l_in.dt_last_seen;
 	end;
-	
+
 	export l_out := record
 		string5					datum;
 		unsigned1				num_sources;
 		dataset(l_ref)	sources { maxcount(max_sources) };
 	end;
-	
+
 	// =-=-=-=-=-=-=-=-=-=-=-= Code =-=-=-=-=-=-=-=-=-=-=-=
-	
+
 	// ---- convert ridSrc strings to their descriptions
 	export ridSrc_to_desc(string2 ridSrc) := map(
 		ridSrc in src_code.atf.ridSrc					=> src_code.atf.desc,
@@ -203,20 +205,20 @@ export Occurrence := module
 		''
 	);
 
-  // Business sources ------------------v 
+  // Business sources ------------------v
 	// Convert Business Header 2 char source codes to their descriptions.
 	// A separate BHSrc_to_desc map was created since some business descriptions
-	// are different than the people descriptions for the same source codes 
-	// (i.e. 'Corporate Filings' vs "Corpate Affliations') and 
+	// are different than the people descriptions for the same source codes
+	// (i.e. 'Corporate Filings' vs "Corpate Affliations') and
 	// certain business codes are in multiple MDR.sourceTools.set_*** attributes
-	// (i.e. code=BR=src_Business_Registration is in set_Business_Contacts and 
+	// (i.e. code=BR=src_Business_Registration is in set_Business_Contacts and
 	// set_Business_Header).
 	//NOTE: The order of the map entries below matches the order of the child datasets
 	//  in the results of doxie_cbrs.Business_Report_Source_Service, except
 	//  the "finder" child dataset is output first in order, but is
 	//  checked for after all the other individual sources since some sources
 	//  are in their own set_*** and in the set_business_header.
-	//  Also the "contacts" chlid dataset has no correpsonding "map" entry due to 
+	//  Also the "contacts" chlid dataset has no correpsonding "map" entry due to
 	//  those sources codes also being mapped to "bfinder" description.
 	export BHSrc_to_desc(string2 BHSrc) := map(
     BHSrc in src_code.dnb.ridSrc			    => src_code.dnb.desc,
@@ -224,7 +226,7 @@ export Occurrence := module
 	  BHSrc in src_code.bk.ridSrc						=> src_code.bk.desc,
 		BHSrc in src_code.ucc.ridSrc				  => src_code.ucc.desc,
     BHSrc in src_code.lien.ridSrc					=> src_code.lien.desc,
-		// Skipped Business Contacts section on purpose because those related 
+		// Skipped Business Contacts section on purpose because those related
 		// source codes are also in the Business Finder section/set_business_header.
 		//BHSrc in src_code.cont.ridSrc		  		=> src_code.cont.desc,
 		BHSrc in src_code.assessment.ridSrc		=> src_code.assessment.desc,
@@ -247,15 +249,15 @@ export Occurrence := module
  		BHSrc in src_code.mswork.ridSrc				=> src_code.mswork.desc,
 		BHSrc in src_code.orwork.ridSrc			  => src_code.orwork.desc,
     BHSrc in src_code.bfinder.ridSrc			=> src_code.bfinder.desc,
-    // Default = If input code does not match to any of the ones above, 
-		// just output the 2 char source code that was input to this map for 
+    // Default = If input code does not match to any of the ones above,
+		// just output the 2 char source code that was input to this map for
 		// debugging purposes.
 		BHSrc
 	);
-	
+
 	// ---- the main rollup logic ----
 	shared dataset(l_out) roll(dataset(l_in) ds_in) := function
-	
+
 		// produce separate records for each data type
 		l_tmp := record(l_ref)
 			l_in.src_desc;
@@ -284,8 +286,8 @@ export Occurrence := module
 			self := L;
 		end;
 		cnt := rollup(sort(tmp, datum, src), toCnt(left,right), datum, src);
-		
-		// merge occurrences by datum/src_desc one of two ways... 
+
+		// merge occurrences by datum/src_desc one of two ways...
 		// - for versioned records we need to avoid duplicated counts
 		// - otherwise just accomodate cases where src:src_desc is many:1 (e.g. Phones & Phones Plus)
 		l_tmp toMerged(l_tmp L, l_tmp R) := transform
@@ -306,20 +308,20 @@ export Occurrence := module
 		end;
 		grp := group(sort(merged, datum, src, record), datum);
 		results := rollup(grp, group, toOut(left, rows(left)));
-		
+
 		// output(ds_in,		named('ds_in'));		// DEBUG
 		// output(tmp,			named('tmp'));			// DEBUG
 		// output(cnt,			named('cnt'));			// DEBUG
 		// output(merged, 	named('merged'));		// DEBUG
-		
+
 		return results;
-	
+
 	end; // roll()
 
 	// --- Common date macros
 	// Convert iesp date format to YYYYMMDD
 	shared normDate_iesp(iesp.share.t_Date d) := (unsigned)(d.Year*10000 + d.Month*100 + d.Day);
-		
+
 	// macros to extract dt_first_seen/dt_last_seen from a child dataset
 	shared mac_dt_first(ds, field) := macro
 		ut.NormDate(min(ds(field<>0), field))
@@ -333,19 +335,19 @@ export Occurrence := module
 	shared mac_dt_last_str(ds, field) := macro
 		ut.NormDate(max(ds, (unsigned)field))
 	endmacro;
-	
+
   // define whether DATUM is present; we don't need real validity check, just most basic.
-  shared boolean is_valid_dob (string8 dob) := (integer) dob[1..4] > 0; 
+  shared boolean is_valid_dob (string8 dob) := (integer) dob[1..4] > 0;
 
 	// --- generate results from doxie.HeaderSource_Service results ----
 	export dataset(l_out) fromHSS(dataset(Doxie_Raw.Layout_crs_raw) ds_in) := function
-	
+
 		// HSS returns a single row every time
 		base := ds_in[1];
 
 		// One section at a time, work our way through the HSS output,
 		// transforming each piece into the common input layout we need
-		
+
 		ds_atf := project(base.atf_child, transform(l_in,
 			self.src 						:= src_code.atf.code;
 			self.src_desc				:= src_code.atf.desc;
@@ -357,7 +359,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.date_first_seen);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.date_last_seen);
 		));
-		
+
 		ds_bk := project(base.bk_child, transform(l_in,
 			self.src 						:= src_code.bk.code;
 			self.src_desc				:= src_code.bk.desc;
@@ -369,7 +371,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.orig_filing_date);
 			self.dt_last_seen		:= Max( ut.NormDate((unsigned)left.disposed_date), ut.NormDate((unsigned)left.reopen_date) );
 		));
-		
+
 		ds_bkv2 := project(base.bk_V2_child, transform(l_in,
 			self.src 						:= src_code.bkv2.code;
 			self.src_desc				:= src_code.bkv2.desc;
@@ -381,7 +383,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.orig_filing_date);
 			self.dt_last_seen		:= Max( ut.NormDate((unsigned)left.disposed_date), ut.NormDate((unsigned)left.reopen_date) );
 		));
-		
+
 		ds_lien := project(base.lien_child, transform(l_in,
 			self.src 						:= src_code.lien.code;
 			self.src_desc				:= src_code.lien.desc;
@@ -394,7 +396,7 @@ export Occurrence := module
 			self.dt_first_seen	:= dt_filing;
 			self.dt_last_seen		:= Max(dt_filing, ut.NormDate((unsigned)left.release_date));
 		));
-		
+
 		ds_lienv2 := project(base.lien_V2_child, transform(l_in,
 			self.src 						:= src_code.lienv2.code;
 			self.src_desc				:= src_code.lienv2.desc;
@@ -410,7 +412,7 @@ export Occurrence := module
 			self.dt_first_seen	:= dt_filing;
 			self.dt_last_seen		:= max(dt_filing, dt_rel, dt_judsat, dt_judvac);
 		));
-		
+
 		ds_dl := project(base.dl_child, transform(l_in,
 			self.src 						:= src_code.dl.code;
 			self.src_desc				:= src_code.dl.desc;
@@ -436,7 +438,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate(left.dt_first_seen);
 			self.dt_last_seen		:= ut.NormDate(left.dt_last_seen);
 		));
-		
+
 		ds_death := project(base.death_child, transform(l_in,
 			self.src 						:= src_code.death.code;
 			self.src_desc				:= src_code.death.desc;
@@ -448,7 +450,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.dob8);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.dod8);
 		));
-		
+
 		ds_proflic := project(base.proflic_child, transform(l_in,
 			self.src 						:= src_code.proflic.code;
 			self.src_desc				:= src_code.proflic.desc;
@@ -460,7 +462,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.date_first_seen);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.date_last_seen);
 		));
-		
+
 		ds_sanc := project(base.sanc_child, transform(l_in,
 			self.src 						:= src_code.sanc.code;
 			self.src_desc				:= src_code.sanc.desc;
@@ -472,7 +474,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.date_first_seen);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.date_last_seen);
 		));
-		
+
 		ds_prov := project(base.prov_child, transform(l_in,
 			self.src 						:= src_code.prov.code;
 			self.src_desc				:= src_code.prov.desc;
@@ -484,7 +486,7 @@ export Occurrence := module
 			self.dt_first_seen	:= mac_dt_first_str(left.license, Effective_Date);
 			self.dt_last_seen		:= mac_dt_last_str(left.license, Termination_Date);
 		));
-		
+
 		ds_email := project(base.email_child, transform(l_in,
 			self.src 						:= src_code.email.code;
 			self.src_desc				:= src_code.email.desc;
@@ -496,30 +498,42 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate(left.best_dob);
 			self.dt_last_seen		:= ut.NormDate(left.latest_orig_login_date);
 		));
-		
+
+		ds_emailv2 := project(base.email_v2_child, transform(l_in,
+			self.src 						:= src_code.emailv2.code;
+			self.src_desc				:= src_code.emailv2.desc;
+			self.hasName				:= left.Cleaned.Name.last<>'';
+			self.hasSSN					:= left.Cleaned.ssn<>'';
+			self.hasDOB					:= left.Cleaned.dob>0;
+			self.hasAddr				:= left.Cleaned.Address.state<>'' or left.Cleaned.Address.zip5<>'';
+			self.hasPhone				:= left.Cleaned.phone<>'';
+			self.dt_first_seen	:= ut.NormDate((unsigned)left.DateFirstSeen);
+			self.dt_last_seen		:= ut.NormDate((unsigned)left.DateLastSeen);
+		));
+
 		ds_veh := project(base.veh_child, transform(l_in,
 			self.src 						:= src_code.veh.code;
 			self.src_desc				:= src_code.veh.desc;
-			self.hasName				:= (left.own_1_customer_name<>'' or left.own_2_customer_name<>'' or 
-															left.reg_1_customer_name<>'' or left.reg_2_customer_name<>'' or 
+			self.hasName				:= (left.own_1_customer_name<>'' or left.own_2_customer_name<>'' or
+															left.reg_1_customer_name<>'' or left.reg_2_customer_name<>'' or
 															left.lh_1_customer_name<>'' or left.lh_2_customer_name<>'' or left.lh_3_customer_name<>'');
-			self.hasSSN					:= (left.own_1_feid_ssn<>'' or left.own_2_feid_ssn<>'' or 
-															left.reg_1_feid_ssn<>'' or left.reg_2_feid_ssn<>'' or 
+			self.hasSSN					:= (left.own_1_feid_ssn<>'' or left.own_2_feid_ssn<>'' or
+															left.reg_1_feid_ssn<>'' or left.reg_2_feid_ssn<>'' or
 															left.lh_1_feid_ssn<>'' or left.lh_2_feid_ssn<>'' or left.lh_3_feid_ssn<>'');
-			self.hasDOB					:= (left.own_1_dob<>'' or left.own_2_dob<>'' or 
-															left.reg_1_dob<>'' or left.reg_2_dob<>'' or 
+			self.hasDOB					:= (left.own_1_dob<>'' or left.own_2_dob<>'' or
+															left.reg_1_dob<>'' or left.reg_2_dob<>'' or
 															left.lh_1_dob<>'' or left.lh_2_dob<>'' or left.lh_3_dob<>'');
-			self.hasAddr				:= (left.own_1_state<>'' or left.own_2_state<>'' or 
-															left.reg_1_state<>'' or left.reg_2_state<>'' or 
+			self.hasAddr				:= (left.own_1_state<>'' or left.own_2_state<>'' or
+															left.reg_1_state<>'' or left.reg_2_state<>'' or
 															left.lh_1_state<>'' or left.lh_2_state<>'' or left.lh_3_state<>'' or
-															left.own_1_zip5_zip4_foreign_postal<>'' or left.own_2_zip5_zip4_foreign_postal<>'' or 
-															left.reg_1_zip5_zip4_foreign_postal<>'' or left.reg_2_zip5_zip4_foreign_postal<>'' or 
+															left.own_1_zip5_zip4_foreign_postal<>'' or left.own_2_zip5_zip4_foreign_postal<>'' or
+															left.reg_1_zip5_zip4_foreign_postal<>'' or left.reg_2_zip5_zip4_foreign_postal<>'' or
 															left.lh_1_zip5_zip4_foreign_postal<>'' or left.lh_2_zip5_zip4_foreign_postal<>'' or left.lh_3_zip5_zip4_foreign_postal<>'');
 			self.hasPhone				:= false;
 			self.dt_first_seen	:= ut.NormDate(left.dt_first_seen);
 			self.dt_last_seen		:= ut.NormDate(left.dt_last_seen);
 		));
-		
+
 		ds_vehv2 := project(base.veh_v2_child, transform(l_in,
 			self.src 						:= src_code.vehv2.code;
 			self.src_desc				:= src_code.vehv2.desc;
@@ -531,7 +545,7 @@ export Occurrence := module
 			self.dt_first_seen	:= mac_dt_first_str(left.registrants, Reg_Earliest_Effective_Date);
 			self.dt_last_seen		:= mac_dt_last_str(left.registrants, Reg_Latest_Effective_Date);
 		));
-		
+
 		ds_eq := project(base.eq_child, transform(l_in,
 			self.src 						:= src_code.eq.code;
 			self.src_desc				:= src_code.eq.desc;
@@ -543,17 +557,17 @@ export Occurrence := module
 			//#138824 : Changing dt_first_seen and dt_last_seen based on date_first_seen & date_last_seen that has become newly available for QH & WH rids.
 			self.dt_first_seen	:= if(left.date_first_seen = '' ,
 																ut.NormDate((unsigned)left.current_address_date_reported) ,
-																ut.NormDate((unsigned)left.date_first_seen));						
-			
+																ut.NormDate((unsigned)left.date_first_seen));
+
 			// Bug #100330: The eq data here is guaranteed to be current by the header build. Changing the last seen date to reflect that.
-			self.dt_last_seen   := if(left.date_last_seen = '' , 
-																ut.NormDate(CHOOSEN (dx_header.key_max_dt_last_seen(), 1)[1].max_date_last_seen), 
-																ut.NormDate((unsigned)left.date_last_seen));			
-																
+			self.dt_last_seen   := if(left.date_last_seen = '' ,
+																ut.NormDate(CHOOSEN (dx_header.key_max_dt_last_seen(), 1)[1].max_date_last_seen),
+																ut.NormDate((unsigned)left.date_last_seen));
+
 			 // NOTE: The eq data contains two other dates that are about old addresses not shown in the person
-			 //       search cite lists, so for consistency here we need to reference the current date only.			 
+			 //       search cite lists, so for consistency here we need to reference the current date only.
 		));
-		
+
 		ds_en := project(base.en_child, transform(l_in,
 			self.src 						:= src_code.en.code;
 			self.src_desc				:= src_code.en.desc;
@@ -565,7 +579,7 @@ export Occurrence := module
 			self.dt_first_seen	:= Left.date_first_seen;
 			self.dt_last_seen		:= Left.date_last_seen;
 		));
-		
+
 		ds_dea := project(base.dea_child, transform(l_in,
 			self.src 						:= src_code.dea.code;
 			self.src_desc				:= src_code.dea.desc;
@@ -577,7 +591,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.date_first_reported);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.date_last_reported);
 		));
-		
+
 		ds_deav2 := project(base.dea_v2_child, transform(l_in,
 			self.src 						:= src_code.deav2.code;
 			self.src_desc				:= src_code.deav2.desc;
@@ -589,7 +603,7 @@ export Occurrence := module
 			self.dt_first_seen	:= mac_dt_first_str(left.Children, Expiration_Date);
 			self.dt_last_seen		:= mac_dt_last_str(left.Children, Expiration_Date);
 		));
-		
+
 		ds_airc := project(base.airc_child, transform(l_in,
 			self.src 						:= src_code.airc.code;
 			self.src_desc				:= src_code.airc.desc;
@@ -601,7 +615,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.date_first_seen);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.date_last_seen);
 		));
-		
+
 		ds_pilot := project(base.pilot_child, transform(l_in,
 			self.src 						:= src_code.pilot.code;
 			self.src_desc				:= src_code.pilot.desc;
@@ -613,7 +627,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.date_first_seen);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.date_last_seen);
 		));
-		
+
 		ds_pilotcert := project(base.pilotcert_child, transform(l_in,
 			// There's nothing in this layout that's useful to us!  I'm
 			// just keeping this code here to show it wasn't forgotten.
@@ -627,7 +641,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.date_first_seen);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.date_last_seen);
 		));
-		
+
 		ds_watercraft := project(base.watercraft_child, transform(l_in,
 			self.src 						:= src_code.watercraft.code;
 			self.src_desc				:= src_code.watercraft.desc;
@@ -639,7 +653,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.date_last_seen); // no first_seen
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.date_last_seen);
 		));
-		
+
 		ds_ucc := project(base.ucc_child, transform(l_in,
 			self.src 						:= src_code.ucc.code;
 			self.src_desc				:= src_code.ucc.desc;
@@ -651,7 +665,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.orig_filing_date);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.orig_filing_date);
 		));
-		
+
 		ds_uccv2 := project(base.ucc_v2_child, transform(l_in,
 			self.src 						:= src_code.uccv2.code;
 			self.src_desc				:= src_code.uccv2.desc;
@@ -663,7 +677,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.orig_filing_date);
 			self.dt_last_seen		:= Max( ut.NormDate((unsigned)left.orig_filing_date), ut.NormDate((unsigned)left.cmnt_effective_date) );
 		));
-		
+
 		ds_corpAffil := project(base.corpaffil_child, transform(l_in,
 			self.src 						:= src_code.corpAffil.code;
 			self.src_desc				:= src_code.corpAffil.desc;
@@ -675,7 +689,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.filing_date);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.filing_date);
 		));
-		
+
 		l_in x_emerge(Doxie_Raw.Layout_emerge_raw L, string13 code, string50 desc) := transform
 			self.src 						:= code;
 			self.src_desc				:= desc;
@@ -690,7 +704,7 @@ export Occurrence := module
 		ds_ccw		:= project(base.emerge_child(file_id='CCW'),	x_emerge(left, src_code.ccw.code, src_code.ccw.desc));
 		ds_hunt		:= project(base.emerge_child(file_id='HUNT'),	x_emerge(left, src_code.hunt.code, src_code.hunt.desc));
 		ds_voter	:= project(base.emerge_child(file_id='VOTE'),	x_emerge(left, src_code.voter.code, src_code.voter.desc));
-		
+
 		ds_voterv2 := project(base.voters_v2_child, transform(l_in,
 			self.src 						:= src_code.voterv2.code;
 			self.src_desc				:= src_code.voterv2.desc;
@@ -704,7 +718,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.Min2(d1,d2);
 			self.dt_last_seen		:= Max(d1,d2);
 		));
-		
+
 		ds_whois := project(base.whois_child, transform(l_in,
 			self.src 						:= src_code.whois.code;
 			self.src_desc				:= src_code.whois.desc;
@@ -716,7 +730,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.date_first_seen);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.date_last_seen);
 		));
-		
+
 		ds_phone := project(base.phone_child, transform(l_in,
 			self.src 						:= src_code.phone.code;
 			self.src_desc				:= src_code.phone.desc;
@@ -728,12 +742,12 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.dt_first_seen);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.dt_last_seen);
 		));
-		
+
 		ds_assessment := project(base.assessor_child, transform(l_in,
 			self.src 						:= src_code.assessment.code;
 			self.src_desc				:= src_code.assessment.desc;
-			self.hasName				:= (left.assessee_name<>'' or left.second_assessee_name<>'' or 
-															left.fares_non_parsed_assessee_name<>'' or left.fares_non_parsed_second_assessee_name<>'' or 
+			self.hasName				:= (left.assessee_name<>'' or left.second_assessee_name<>'' or
+															left.fares_non_parsed_assessee_name<>'' or left.fares_non_parsed_second_assessee_name<>'' or
 															left.fares_seller_name<>'');
 			self.hasSSN					:= false;
 			self.hasDOB					:= false;
@@ -742,12 +756,12 @@ export Occurrence := module
       rc_dt         	    := ut.NormDate((unsigned)left.recording_date);
 			av_dt               := ut.NormDate((unsigned)left.assessed_value_year);
 			mv_dt               := ut.NormDate((unsigned)left.market_value_year);
-			// Then use the recording_date if not zero or assessed_value_year if not zero, 
+			// Then use the recording_date if not zero or assessed_value_year if not zero,
 			// otherwise use the market_value_year
-		  self.dt_first_seen  := if(rc_dt<>0,rc_dt, 
+		  self.dt_first_seen  := if(rc_dt<>0,rc_dt,
 			                          if(av_dt<>0,av_dt, mv_dt));
 		  // don't use rc_dt for last seen unless other 2 are empty
-			self.dt_last_seen	  := if(av_dt<>0, av_dt,  
+			self.dt_last_seen	  := if(av_dt<>0, av_dt,
 			                          if(mv_dt<>0, mv_dt, rc_dt));
 		));
 
@@ -766,15 +780,15 @@ export Occurrence := module
 			av_dt_last          := mac_dt_last_str(left.assessments, assessed_value_year);
 			mv_dt_first         := mac_dt_first_str(left.assessments, market_value_year);
 			mv_dt_last          := mac_dt_last_str(left.assessments, market_value_year);
-			// Then use the recording_date if not zero or assessed_value_year if not zero, 
+			// Then use the recording_date if not zero or assessed_value_year if not zero,
 			// otherwise use the market_value_year
-		  self.dt_first_seen  := if(rc_dt_first<>0,rc_dt_first, 
+		  self.dt_first_seen  := if(rc_dt_first<>0,rc_dt_first,
 			                          if(av_dt_first<>0,av_dt_first, mv_dt_first));
 		  // don't use rc_dt for last seen unless other 2 are empty
-			self.dt_last_seen	  := if(av_dt_last<>0, av_dt_last,  
+			self.dt_last_seen	  := if(av_dt_last<>0, av_dt_last,
 			                          if(mv_dt_last<>0, mv_dt_last, rc_dt_last));
 		));
-		
+
 		ds_deed := project(base.deed_child, transform(l_in,
 			self.src 						:= src_code.deed.code;
 			self.src_desc				:= src_code.deed.desc;
@@ -786,7 +800,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.process_date);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.process_date);
 		));
-		
+
 		ds_deed2 := project(base.deed2_child, transform(l_in,
 			self.src 						:= src_code.deed2.code;
 			self.src_desc				:= src_code.deed2.desc;
@@ -798,7 +812,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)(left.deeds[1].recording_date));
 			self.dt_last_seen		:= ut.NormDate((unsigned)(left.deeds[1].recording_date));
 		));
-		
+
 		ds_flcrash := project(base.flcrash_child, transform(l_in,
 			self.src 						:= src_code.flcrash.code;
 			self.src_desc				:= src_code.flcrash.desc;
@@ -810,7 +824,7 @@ export Occurrence := module
 			self.dt_first_seen	:= mac_dt_first_str(left.flcrash_time_location, accident_date);
 			self.dt_last_seen		:= mac_dt_last_str(left.flcrash_time_location, accident_date);
 		));
-		
+
 		ds_DOC := project(base.DOC_people_child, transform(l_in,
 			self.src 						:= src_code.doc.code;
 			self.src_desc				:= src_code.doc.desc;
@@ -822,7 +836,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.file_date);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.case_date);
 		));
-		
+
 		ds_SO := project(base.SexOffender_people_child, transform(l_in,
 			self.src 						:= src_code.so.code;
 			self.src_desc				:= src_code.so.desc;
@@ -834,7 +848,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.dt_first_reported);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.dt_last_reported);
 		));
-		
+
 		ds_finder := project(base.finder_child, transform(l_in,
 			self.src 						:= src_code.finder.code;
 			self.src_desc				:= src_code.finder.desc;
@@ -846,7 +860,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.dt_first_seen);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.dt_last_seen);
 		));
-		
+
 		ds_ak := project(base.ak_child, transform(l_in,
 			self.src 						:= src_code.ak.code;
 			self.src_desc				:= src_code.ak.desc;
@@ -858,7 +872,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.process_date);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.process_date);
 		));
-		
+
 		ds_nod := project(base.nod_child, transform(l_in,
 			self.src 						:= src_code.nod.code;
 			self.src_desc				:= src_code.nod.desc;
@@ -870,7 +884,7 @@ export Occurrence := module
 			self.dt_first_seen	:= normDate_iesp(left.FilingDate);
 			self.dt_last_seen		:= normDate_iesp(left.FilingDate);
 		));
-		
+
 		ds_for := project(base.for_child, transform(l_in,
 			self.src 						:= src_code.for.code;
 			self.src_desc				:= src_code.for.desc;
@@ -882,7 +896,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.recording_date);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.recording_date);
 		));
-		
+
 		ds_util := project(base.util_child, transform(l_in,
 			self.src 						:= src_code.util.code;
 			self.src_desc				:= src_code.util.desc;
@@ -894,7 +908,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.date_first_seen);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.date_first_seen); // no date_last_seen
 		));
-		
+
 		ds_mswork := project(base.mswork_child, transform(l_in,
 			self.src 						:= src_code.mswork.code;
 			self.src_desc				:= src_code.mswork.desc;
@@ -906,7 +920,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.date_first_seen);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.date_last_seen);
 		));
-		
+
 		ds_boater := project(base.boater_child, transform(l_in,
 			self.src 						:= src_code.boater.code;
 			self.src_desc				:= src_code.boater.desc;
@@ -918,7 +932,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.date_first_seen);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.date_last_seen);
 		));
-		
+
 		ds_tu := project(base.tu_child, transform(l_in,
 			self.src 						:= src_code.tu.code;
 			self.src_desc				:= src_code.tu.desc;
@@ -944,7 +958,7 @@ export Occurrence := module
 			self.hasPhone				:= (left.clean_phone<>'');
 			self.dt_first_seen	:= left.dt_first_seen;
 			self.dt_last_seen		:= left.dt_last_seen;
-		));		
+		));
 		ds_quickheader := project(base.quickheader_child, transform(l_in,
 			self.src 						:= src_code.quickheader.code;
 			self.src_desc				:= src_code.quickheader.desc;
@@ -956,7 +970,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.dt_first_seen);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.dt_last_seen);
 		));
-		
+
 		ds_targ := project(base.targ_child, transform(l_in,
 			self.src 						:= src_code.targ.code;
 			self.src_desc				:= src_code.targ.desc;
@@ -968,7 +982,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.dt_first_seen);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.dt_last_seen);
 		));
-		
+
 		ds_phonesPlus := project(base.phonesPlus_child, transform(l_in,
 			self.src 						:= src_code.phonesPlus.code;
 			self.src_desc				:= src_code.phonesPlus.desc;
@@ -980,7 +994,7 @@ export Occurrence := module
 			self.dt_first_seen	:= 0;
 			self.dt_last_seen		:= 0;
 		));
-		
+
 		ds_FBNv2 := project(base.fbnv2_child, transform(l_in,
 			self.src 						:= src_code.FBNv2.code;
 			self.src_desc				:= src_code.FBNv2.desc;
@@ -994,19 +1008,19 @@ export Occurrence := module
 			dt_last2						:= normDate_iesp(left.FilingCancellationDate);
 			self.dt_last_seen		:= if(dt_last1<>0, dt_last1, dt_last2);
 		));
-		
+
 		// concatenate and process all the inputs
 		ds_all := ds_atf + ds_bk + ds_bkv2 + ds_lien + ds_lienv2 + ds_dl + ds_dl2 + ds_death + ds_proflic +
-							ds_sanc + ds_prov + ds_email + ds_veh + ds_vehv2 + ds_eq + ds_en + ds_dea + ds_deav2 + ds_airc + 
+							ds_sanc + ds_prov + ds_email + ds_emailv2 + ds_veh + ds_vehv2 + ds_eq + ds_en + ds_dea + ds_deav2 + ds_airc +
 							ds_pilot + ds_pilotcert + ds_watercraft + ds_ucc + ds_uccv2 +
-							ds_corpAffil + ds_ccw + ds_voter + ds_voterv2 + ds_hunt + ds_whois + ds_phone + 
+							ds_corpAffil + ds_ccw + ds_voter + ds_voterv2 + ds_hunt + ds_whois + ds_phone +
 							ds_assessment + ds_assessment2 + ds_deed + ds_deed2 +
-							ds_flcrash + ds_DOC + ds_SO + ds_finder + ds_ak + ds_nod + ds_for + 
+							ds_flcrash + ds_DOC + ds_SO + ds_finder + ds_ak + ds_nod + ds_for +
 							ds_util + ds_mswork + ds_boater + ds_tn + ds_tu + ds_quickheader + ds_targ + ds_phonesPlus + ds_FBNv2;
-		results := roll(ds_all);	
-		
+		results := roll(ds_all);
+
 		return results;
-	
+
 	end; // fromHSS()
 
 
@@ -1016,8 +1030,8 @@ export Occurrence := module
 
 		// BRSR returns a single row every time
 		base := ds_in[1];
-	
-		// *** Work our way through the BRSR output one section at a time, 
+
+		// *** Work our way through the BRSR output one section at a time,
 		// transforming each piece into the common output layout we need.
 
 		ds_bfinder := project(base.finder, transform(l_in,
@@ -1036,7 +1050,7 @@ export Occurrence := module
 			self.src_desc				:= src_code.dnb.desc;
 			self.hasName				:= left.business_name<>'';
 			self.hasFEIN				:= false;
-			self.hasAddr				:= (left.st<>''      or left.zip<>'' or 
+			self.hasAddr				:= (left.st<>''      or left.zip<>'' or
 			                        left.mail_st<>'' or left.mail_zip<>'');
 			self.hasPhone				:= left.telephone_number<>'';
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.date_first_seen);
@@ -1053,7 +1067,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.dt_first_seen);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.dt_last_seen);
 		));
-	
+
 		ds_corpv2 := project(base.corporate_filings_v2, transform(l_in,
 			self.src 						:= src_code.corpv2.code;
 			self.src_desc				:= src_code.corpv2.desc;
@@ -1075,7 +1089,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.orig_filing_date);
 			self.dt_last_seen		:= Max( ut.NormDate((unsigned)left.disposed_date), ut.NormDate((unsigned)left.reopen_date) );
 		));
-		
+
 		ds_bkv2 := project(base.bankruptcy_v2, transform(l_in,
 			self.src 						:= src_code.bkv2.code;
 			self.src_desc				:= src_code.bkv2.desc;
@@ -1097,7 +1111,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.orig_filing_date);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.orig_filing_date);
 		));
-		
+
 		ds_uccv2 := project(base.uccs_v2, transform(l_in,
 			self.src 						:= src_code.uccv2.code;
 			self.src_desc				:= src_code.uccv2.desc;
@@ -1108,7 +1122,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.orig_filing_date);
 			self.dt_last_seen		:= Max( ut.NormDate((unsigned)left.orig_filing_date), ut.NormDate((unsigned)left.cmnt_effective_date) );
 		));
-		
+
 		ds_lien := project(base.liens_judgments, transform(l_in,
 			self.src 						:= src_code.lien.code;
 			self.src_desc				:= src_code.lien.desc;
@@ -1135,9 +1149,9 @@ export Occurrence := module
 			self.dt_first_seen	:= dt_filing;
 			self.dt_last_seen		:= max(dt_filing, dt_rel, dt_judsat, dt_judvac);
 		));
-		
-		/* removed out per email discussion with George Wenz on 04/14/10, 
-		   but left the coding comented out here in case it is needed 
+
+		/* removed out per email discussion with George Wenz on 04/14/10,
+		   but left the coding comented out here in case it is needed
 			 to be re-activated in the future.
 		ds_cont := project(base.contacts, transform(l_in,
 			self.src 						:= src_code.cont.code;
@@ -1156,15 +1170,15 @@ export Occurrence := module
 			self.src_desc				:= src_code.assessment.desc;
 			self.hasName				:= (left.name_owner_1<>'' or left.name_owner_2<>'');
 			self.hasFEIN				:= false;
-			self.hasAddr				:= (left.property_address_citystatezip<>'' or 
-			                        left.buyer_mailing_address_citystatezip<>'' or 
+			self.hasAddr				:= (left.property_address_citystatezip<>'' or
+			                        left.buyer_mailing_address_citystatezip<>'' or
 															left.owners_address_ace_state<>'' or
 															left.owners_address_ace_zip<>'');
 			self.hasPhone				:= false;
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.tax_year);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.tax_year);
 		));
-		
+
 		ds_assessment2 := project(base.property_v2_assess, transform(l_in,
 			self.src 						:= src_code.assessment2.code;
 			self.src_desc				:= src_code.assessment2.desc;
@@ -1179,12 +1193,12 @@ export Occurrence := module
 			av_dt_last          := mac_dt_last_str(left.assessments, assessed_value_year);
 			mv_dt_first         := mac_dt_first_str(left.assessments, market_value_year);
 			mv_dt_last          := mac_dt_last_str(left.assessments, market_value_year);
-			// Then use the recording_date if not zero or assessed_value_year if not zero, 
+			// Then use the recording_date if not zero or assessed_value_year if not zero,
 			// otherwise use the market_value_year
-		  self.dt_first_seen  := if(rc_dt_first<>0,rc_dt_first, 
+		  self.dt_first_seen  := if(rc_dt_first<>0,rc_dt_first,
 			                          if(av_dt_first<>0,av_dt_first, mv_dt_first));
 		  // don't use rc_dt for last seen unless other 2 are empty
-			self.dt_last_seen	  := if(av_dt_last<>0, av_dt_last,  
+			self.dt_last_seen	  := if(av_dt_last<>0, av_dt_last,
 			                          if(mv_dt_last<>0, mv_dt_last, rc_dt_last));
 		));
 
@@ -1198,7 +1212,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)(left.deeds[1].recording_date));
 			self.dt_last_seen		:= ut.NormDate((unsigned)(left.deeds[1].recording_date));
 		));
-		
+
 		ds_nod := project(base.Notice_Of_Defaults, transform(l_in,
 			self.src 						:= src_code.nod.code;
 			self.src_desc				:= src_code.nod.desc;
@@ -1209,7 +1223,7 @@ export Occurrence := module
 			self.dt_first_seen	:= normDate_iesp(left.FilingDate);
 			self.dt_last_seen		:= normDate_iesp(left.FilingDate);
 		));
-		
+
 		ds_for := project(base.Foreclosures, transform(l_in,
 			self.src 						:= src_code.for.code;
 			self.src_desc				:= src_code.for.desc;
@@ -1220,7 +1234,7 @@ export Occurrence := module
 			self.dt_first_seen	:= normDate_iesp(left.RecordingDate);
 			self.dt_last_seen		:= normDate_iesp(left.RecordingDate);
 		));
-		
+
 		// internet = whois
 		ds_internet := project(base.internet, transform(l_in,
 			self.src 						:= src_code.whois.code;
@@ -1232,7 +1246,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.date_first_seen);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.date_last_seen);
 		));
-		
+
 		ds_proflic := project(base.professional_licenses, transform(l_in,
 			self.src 						:= src_code.proflic.code;
 			self.src_desc				:= src_code.proflic.desc;
@@ -1243,27 +1257,27 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.date_first_seen);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.date_last_seen);
 		));
-		
+
 		ds_veh := project(base.motor_vehicles, transform(l_in,
 			self.src 						:= src_code.veh.code;
 			self.src_desc				:= src_code.veh.desc;
-			self.hasName				:= (left.own_1_customer_name<>'' or left.own_2_customer_name<>'' or 
-															left.reg_1_customer_name<>'' or left.reg_2_customer_name<>'' or 
+			self.hasName				:= (left.own_1_customer_name<>'' or left.own_2_customer_name<>'' or
+															left.reg_1_customer_name<>'' or left.reg_2_customer_name<>'' or
 															left.lh_1_customer_name<>''  or left.lh_2_customer_name<>'' or left.lh_3_customer_name<>'');
-			self.hasFEIN				:= (left.own_1_feid_ssn<>'' or left.own_2_feid_ssn<>'' or 
-															left.reg_1_feid_ssn<>'' or left.reg_2_feid_ssn<>'' or 
+			self.hasFEIN				:= (left.own_1_feid_ssn<>'' or left.own_2_feid_ssn<>'' or
+															left.reg_1_feid_ssn<>'' or left.reg_2_feid_ssn<>'' or
 															left.lh_1_feid_ssn<>''  or left.lh_2_feid_ssn<>'' or left.lh_3_feid_ssn<>'');
-			self.hasAddr				:= (left.own_1_state<>'' or left.own_2_state<>'' or 
-															left.reg_1_state<>'' or left.reg_2_state<>'' or 
+			self.hasAddr				:= (left.own_1_state<>'' or left.own_2_state<>'' or
+															left.reg_1_state<>'' or left.reg_2_state<>'' or
 															left.lh_1_state<>''  or left.lh_2_state<>'' or left.lh_3_state<>'' or
-															left.own_1_zip5_zip4_foreign_postal<>'' or left.own_2_zip5_zip4_foreign_postal<>'' or 
-															left.reg_1_zip5_zip4_foreign_postal<>'' or left.reg_2_zip5_zip4_foreign_postal<>'' or 
+															left.own_1_zip5_zip4_foreign_postal<>'' or left.own_2_zip5_zip4_foreign_postal<>'' or
+															left.reg_1_zip5_zip4_foreign_postal<>'' or left.reg_2_zip5_zip4_foreign_postal<>'' or
 															left.lh_1_zip5_zip4_foreign_postal<>''  or left.lh_2_zip5_zip4_foreign_postal<>'' or left.lh_3_zip5_zip4_foreign_postal<>'');
 			self.hasPhone				:= false;
 			self.dt_first_seen	:= ut.NormDate(left.dt_first_seen);
 			self.dt_last_seen		:= ut.NormDate(left.dt_last_seen);
 		));
-		
+
 		ds_vehv2 := project(base.motor_vehicles_v2, transform(l_in,
 			self.src 						:= src_code.vehv2.code;
 			self.src_desc				:= src_code.vehv2.desc;
@@ -1274,11 +1288,11 @@ export Occurrence := module
 			self.dt_first_seen	:= mac_dt_first_str(left.registrants, Reg_Earliest_Effective_Date);
 			self.dt_last_seen		:= mac_dt_last_str(left.registrants, Reg_Latest_Effective_Date);
 		));
-		
+
 		ds_watercraft := project(base.watercrafts, transform(l_in,
 			self.src 						:= src_code.watercraft.code;
 			self.src_desc				:= src_code.watercraft.desc;
-			self.hasName				:= exists(left.owners(company_name<>'')) or 
+			self.hasName				:= exists(left.owners(company_name<>'')) or
 			                       exists(left.lienholders(lien_name<>''));
 			self.hasFEIN				:= exists(left.owners(orig_fein<>''));
 			self.hasAddr				:= exists(left.owners(st<>'' or zip5<>'')) or
@@ -1287,7 +1301,7 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.date_last_seen); // no first_seen
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.date_last_seen);
 		));
-		
+
 		ds_airc := project(base.aircrafts, transform(l_in,
 			self.src 						:= src_code.airc.code;
 			self.src_desc				:= src_code.airc.desc;
@@ -1298,19 +1312,19 @@ export Occurrence := module
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.date_first_seen);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.date_last_seen);
 		));
-		
+
 		ds_ebr := project(base.experian_business_reports, transform(l_in,
 			self.src 						:= src_code.ebr.code;
 			self.src_desc				:= src_code.ebr.desc;
 			self.hasName				:= left.header_recs.company_name<>'';
 			self.hasFEIN				:= false; // ???
-			self.hasAddr				:= left.header_recs.state_code<>'' or 
+			self.hasAddr				:= left.header_recs.state_code<>'' or
 			                       left.header_recs.orig_zip<>'';
 			self.hasPhone				:= left.header_recs.phone_number<>'';
 			self.dt_first_seen	:= ut.NormDate((unsigned)left.header_recs.date_first_seen);
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.header_recs.date_last_seen);
 		));
-		
+
 		ds_irs5500 := project(base.irs_5500, transform(l_in,
 			self.src 						:= src_code.irs5500.code;
 			self.src_desc				:= src_code.irs5500.desc;
@@ -1321,8 +1335,8 @@ export Occurrence := module
 			self.hasFEIN				:= (left.ein<>'' or left.admin_ein<>'' or left.preparer_ein<>'' );
 			self.hasAddr				:= (left.spons_dfe_state<>'' or left.spons_dfe_zip_code<>'' or
 			                        left.admin_state<>''     or left.admin_zip_code<>''     or
-															left.preparer_state<>''  or left.preparer_zip_code<>''); 
-			self.hasPhone				:= (left.spon_dfe_phone_num<>'' or left.admin_phone_num<>'' or 
+															left.preparer_state<>''  or left.preparer_zip_code<>'');
+			self.hasPhone				:= (left.spon_dfe_phone_num<>'' or left.admin_phone_num<>'' or
 			                        left.preparer_phone_num<>'');
       pe_dt	              := ut.NormDate((unsigned)left.plan_eff_date);
 			as_dt 		          := ut.NormDate((unsigned)left.admin_signed_date);
@@ -1333,8 +1347,8 @@ export Occurrence := module
 		ds_irsnp := project(base.irs_non_profit, transform(l_in,
 			self.src 						:= src_code.irsnp.code;
 			self.src_desc				:= src_code.irsnp.desc;
-			self.hasName				:= (left.primary_name_of_organization<>'' or 
-			                        left.cname<>''); 
+			self.hasName				:= (left.primary_name_of_organization<>'' or
+			                        left.cname<>'');
 			self.hasFEIN				:= (left.employer_id_number<>'');
 			self.hasAddr				:= (left.state<>'' or left.zip_code<>'' or
 															left.st<>''    or left.zip<>'');
@@ -1346,12 +1360,12 @@ export Occurrence := module
 		ds_fdic := project(base.fdic, transform(l_in,
 			self.src 						:= src_code.fdic.code;
 			self.src_desc				:= src_code.fdic.desc;
-			self.hasName				:= (left.chrtagnt<>'' or 
+			self.hasName				:= (left.chrtagnt<>'' or
 			                        left.insagnt1<>'' or left.insagnt2<>''  or
 															left.name<>''     or
-															left.regagnt<>''); 
+															left.regagnt<>'');
 			self.hasFEIN				:= false;
-			self.hasAddr				:= (left.address<>'' or 
+			self.hasAddr				:= (left.address<>'' or
 			                        left.stcnty<>'' or left.zip<>'' or
 															left.st<>''     or left.zip5<>'');
 			self.hasPhone				:= false;
@@ -1396,7 +1410,7 @@ export Occurrence := module
 		ds_iastax := project(base.iasalestax, transform(l_in,
 			self.src 						:= src_code.iastax.code;
 			self.src_desc				:= src_code.iastax.desc;
-			self.hasName				:= (left.company_name_1<>'' or left.company_name_2<>''); 
+			self.hasName				:= (left.company_name_1<>'' or left.company_name_2<>'');
 			self.hasFEIN				:= false;
 			self.hasAddr				:= (left.location_state<>'' or left.location_zip_code<>'' or
 			                        left.mailing_state<>''  or left.mailing_zip_code<>'');
@@ -1430,22 +1444,22 @@ export Occurrence := module
 			self.dt_last_seen		:= ut.NormDate((unsigned)left.date_last_seen);
 		));
 
-		
+
 		// Concatenate all the inputs
-		ds_all_bus := ds_bfinder + ds_dnb + ds_corp + ds_corpv2 
+		ds_all_bus := ds_bfinder + ds_dnb + ds_corp + ds_corpv2
 		              + ds_bk + ds_bkv2 + ds_ucc + ds_uccv2 + ds_lien + ds_lienv2
 							    // + ds_cont  // removed 04/14/10, see comment above
-							    + ds_assessment + ds_assessment2 + ds_deed2 + ds_nod + ds_for 
-							    + ds_internet + ds_proflic 
+							    + ds_assessment + ds_assessment2 + ds_deed2 + ds_nod + ds_for
+							    + ds_internet + ds_proflic
 							    + ds_veh + ds_vehv2 + ds_watercraft + ds_airc
                   + ds_ebr + ds_irs5500 + ds_irsnp
 							    + ds_fdic + ds_bbbm + ds_bbbnm
 							    + ds_castax + ds_iastax + ds_mswork + ds_orwork;
-		
+
 		results := roll(ds_all_bus);
-		
+
 		return results;
-	
+
 	end; // fromBRSR()
 
 end;  // module

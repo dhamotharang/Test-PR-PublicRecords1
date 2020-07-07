@@ -1,11 +1,21 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, Doxie;
 
 EXPORT fn_getProductInput(UNSIGNED1 productRequested,
                           DATASET(DueDiligence.Layouts.CleanedData) cleanData,
                           Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-                          BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+                          BIPV2.mod_sources.iParams linkingOptions,
+                          unsigned1 LexIdSourceOptout = 1,
+                          string TransactionID = '',
+                          string BatchUID = '',
+                          unsigned6 GlobalCompanyId = 0) := FUNCTION
 
-
+    mod_access := MODULE(Doxie.IDataAccess)
+      EXPORT glb := options.GLBA_Purpose;
+      EXPORT dppa := options.DPPA_Purpose;
+      EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+      EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+      EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+    END;
 
     processInd := cleanData(cleanedInput.containsPersonReq);
     processBus := cleanData(cleanedInput.containsPersonReq = FALSE);
@@ -37,7 +47,7 @@ EXPORT fn_getProductInput(UNSIGNED1 productRequested,
     //====================================
     //        process individuals
     //====================================
-    personInformation := DueDiligence.getIndInformation(options);
+    personInformation := DueDiligence.getIndInformation(options, mod_access);
     
     //LexID input (DueDiligence.LayoutsInternal.BestData)
     processIndLexID := processInd(cleanedInput.lexIDPopulated);
@@ -70,7 +80,11 @@ EXPORT fn_getProductInput(UNSIGNED1 productRequested,
                       ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
                 
                 
-    bsAndRI := DueDiligence.fn_getIndBSAndRI(processInd, options);
+    bsAndRI := DueDiligence.fn_getIndBSAndRI(processInd, options,
+                                                                                  LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                  TransactionID := TransactionID, 
+                                                                                  BatchUID := BatchUID, 
+                                                                                  GlobalCompanyID := GlobalCompanyID);
     
     piiLexIDAndBSAndRI := JOIN(piiLexID, bsAndRI,
                                LEFT.dataToUse.seq = RIGHT.bs.seq,

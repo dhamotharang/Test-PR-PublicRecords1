@@ -1,7 +1,8 @@
-﻿IMPORT _Control, Watercraft, RiskWise, ut, std, risk_indicators;
+﻿IMPORT _Control, Watercraft, RiskWise, ut, risk_indicators, Doxie, Suppress, ProfileBooster;
 onThor := _Control.Environment.OnThor;
 
-EXPORT getWatercraft(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim) := FUNCTION
+EXPORT getWatercraft(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim,
+										doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 WCidKey := Watercraft.key_watercraft_did(false); 
  
@@ -39,7 +40,8 @@ WatercraftKeys_thor :=  join(distribute(PBslim, did2),
 
 WCDetailskey := watercraft.key_watercraft_sid(false);
 											
-ProfileBooster.Layouts.Layout_PB_Slim_watercraft  getWCDetails(WatercraftKeys le, WCDetailskey ri) := TRANSFORM
+{ProfileBooster.Layouts.Layout_PB_Slim_watercraft, UNSIGNED4 global_sid}  getWCDetails(WatercraftKeys le, WCDetailskey ri) := TRANSFORM
+	self.global_sid	:= ri.global_sid;
 	self.watercraft_key := le.watercraft_key;
 	self.sequence_key := le.sequence_key;
 	self.history_flag :=  map(ri.history_flag =	'' => 'Current',				
@@ -55,18 +57,22 @@ ProfileBooster.Layouts.Layout_PB_Slim_watercraft  getWCDetails(WatercraftKeys le
 	self := le;
 END;
 
-WatercraftDetails_roxie :=  join(WatercraftKeys, WCDetailskey,
+WatercraftDetails_roxie_unsuppressed :=  join(WatercraftKeys, WCDetailskey,
 												 keyed(right.watercraft_key = left.watercraft_key and
 												       right.state_origin = left.state_origin),
 												 getWCDetails(left,right), 
 												 atmost(right.watercraft_key = left.watercraft_key and right.state_origin = left.state_origin, riskwise.max_atmost));
 
-WatercraftDetails_thor :=  join(WatercraftKeys, WCDetailskey,
+WatercraftDetails_roxie := Suppress.Suppress_ReturnOldLayout(WatercraftDetails_roxie_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Slim_watercraft);
+
+WatercraftDetails_thor_unsuppressed :=  join(WatercraftKeys, WCDetailskey,
 												 keyed(right.watercraft_key = left.watercraft_key and
 												       right.state_origin = left.state_origin),
 												 getWCDetails(left,right), 
 												 atmost(right.watercraft_key = left.watercraft_key and right.state_origin = left.state_origin, riskwise.max_atmost));
-												 
+			
+WatercraftDetails_thor := Suppress.Suppress_ReturnOldLayout(WatercraftDetails_thor_unsuppressed, mod_access, ProfileBooster.Layouts.Layout_PB_Slim_watercraft);
+
 #IF(onThor)
 	WatercraftDetails := WatercraftDetails_thor;
 #ELSE

@@ -21,10 +21,73 @@ EXPORT getLiens(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	
 	// Figure out if the kFetch was successful
 	kFetchErrorCodes := Business_Risk_BIP.Common.GrabFetchErrorCode(LiensJudgmentsTMSIDSeq);
-	
-	// Filter out records after our history date
-	LiensJudgmentsTMSID := Business_Risk_BIP.Common.FilterRecords(LiensJudgmentsTMSIDSeq, date_first_seen, date_vendor_first_reported, MDR.SourceTools.src_Liens_v2, AllowedSourcesSet);
 
+	// Under the most recent definition for source codes that are allowed for Marketing purposes, all Liens
+	// are restricted with the exception of the following sources: 
+	set_MarketingAllowedLienSources := ['MA','HG','CL','IL','NY','CJ'];
+	
+	// Filter out records after our history date; set sourceCode to null string for FilterRecords so all UCC 
+	// records return whether Marketing restriction is indicated or not.
+	LiensJudgmentsTMSID_pre := Business_Risk_BIP.Common.FilterRecords(LiensJudgmentsTMSIDSeq, date_first_seen, date_vendor_first_reported, '', AllowedSourcesSet);
+
+	LiensJudgmentsTMSID := IF( Options.MarketingMode = 1,
+			LiensJudgmentsTMSID_pre(tmsid[1..2] IN set_MarketingAllowedLienSources),
+			LiensJudgmentsTMSID_pre);
+
+	// Add stats for first seen, last seen, record count, etc.
+
+	// Figure out the first seen and last seen date per source for each Seq, by LinkID level
+	LienStats := TABLE(LiensJudgmentsTMSID,
+			{Seq,
+			 TMSID,
+			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+			 Source := MDR.SourceTools.src_Liens_v2,
+			 STRING6 DateFirstSeen       := Business_Risk_BIP.Common.groupMinDate6(date_first_seen, HistoryDate),
+			 STRING6 DateVendorFirstSeen := Business_Risk_BIP.Common.groupMinDate6(date_vendor_first_reported, HistoryDate),
+			 STRING6 DateLastSeen        := Business_Risk_BIP.Common.groupMaxDate6(date_last_seen, HistoryDate),
+			 STRING6 DateVendorLastSeen  := Business_Risk_BIP.Common.groupMaxDate6(date_vendor_last_reported, HistoryDate),
+			 UNSIGNED4 RecordCount := COUNT(GROUP)
+			 },
+			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID)
+			 );
+
+	// Rollup the dates first/last seen into child datasets by Seq, and add Sources to Shell layout.
+	tempLayout := RECORD
+		UNSIGNED4 Seq;
+		STRING TMSID;
+		DATASET(Business_Risk_BIP.Layouts.LayoutSources) Sources;
+	END;
+  
+	LienStatsTemp := PROJECT(LienStats, 
+			TRANSFORM(tempLayout,
+				SELF.Seq := LEFT.Seq;
+				SELF.TMSID := LEFT.TMSID;
+				SELF.Sources := 
+						DATASET([{LEFT.Source, 
+							IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
+							IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+							LEFT.DateLastSeen,
+							LEFT.DateVendorLastSeen,
+							LEFT.RecordCount}], Business_Risk_BIP.Layouts.LayoutSources)));
+
+	LienStatsRolled := 
+		ROLLUP(
+			LienStatsTemp, 
+			LEFT.Seq = RIGHT.Seq, 
+			TRANSFORM( tempLayout, 
+				SELF.Seq := LEFT.Seq; 
+				SELF.TMSID := LEFT.TMSID; 
+				SELF.Sources := LEFT.Sources + RIGHT.Sources
+			));
+	
+	withLienStats := JOIN(Shell, LienStatsRolled, 
+			LEFT.Seq = RIGHT.Seq,
+			TRANSFORM(Business_Risk_BIP.Layouts.Shell,
+				SELF.Sources := RIGHT.Sources;
+				SELF := RIGHT,
+				SELF := LEFT),
+				LEFT OUTER, KEEP(1), ATMOST(100), FEW);	
+	
 	// Define categories of filing statuses.
 	
 	SET OF STRING filing_status_satisfied :=
@@ -310,7 +373,7 @@ EXPORT getLiens(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// Finally, add Liens and Judgments to the Shell. First Liens...:
 	withLienData := 
 		JOIN(
-			Shell, liens_rolled, 
+			withLienStats, liens_rolled, 
 			LEFT.Seq = RIGHT.Seq,
 			TRANSFORM( Business_Risk_BIP.Layouts.Shell,
 				sortedLiens := SORT(RIGHT.Liens, -FilingDate, -ReleaseDate) (FilingDate <> '');
@@ -563,7 +626,12 @@ EXPORT getLiens(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// *********************
 	//   DEBUGGING OUTPUTS
 	// *********************
+	// OUTPUT( LiensJudgmentsTMSIDRaw, NAMED('LiensJudgmentsTMSIDRaw') );
 	// OUTPUT( LiensJudgmentsTMSID, NAMED('LiensJudgmentsTMSID') );
+	// OUTPUT( LienStats, NAMED('LienStats') );
+	// OUTPUT( LienStatsTemp, NAMED('LienStatsTemp') );
+	// OUTPUT( LienStatsRolled, NAMED('LienStatsRolled') );
+	// OUTPUT( withLienStats, NAMED('withLienStats') );
 	// OUTPUT( liens_judgments_main, NAMED('liens_judgments_main') );
 	// OUTPUT( liens_judgments_sorted, NAMED('liens_judgments_sorted') );
 	// OUTPUT( liens_judgments_rolled, NAMED('liens_judgments_rolled') );

@@ -2096,6 +2096,7 @@ end;
 export t_FcraDataServiceRawLiensPartyTmsid := record
 	string tmsid {xpath('tmsid')};
 	string rmsid {xpath('rmsid')};
+	string orig_rmsid {xpath('orig_rmsid')};
 	string orig_full_debtorname {xpath('orig_full_debtorname')};
 	string orig_name {xpath('orig_name')};
 	string orig_lname {xpath('orig_lname')};
@@ -2185,11 +2186,13 @@ export t_FcraDataServiceRawLiensMainTmsid := record
 	string date_vendor_removed {xpath('date_vendor_removed')};
 	string filing_jurisdiction {xpath('filing_jurisdiction')};
 	string filing_state {xpath('filing_state')};
+	string orig_rmsid {xpath('orig_rmsid')};
 	string orig_filing_number {xpath('orig_filing_number')};
 	string orig_filing_type {xpath('orig_filing_type')};
 	string orig_filing_date {xpath('orig_filing_date')};
 	string orig_filing_time {xpath('orig_filing_time')};
 	string case_number {xpath('case_number')};
+	string filing_type_id {xpath('filing_type_id')};
 	string filing_number {xpath('filing_number')};
 	string filing_type_desc {xpath('filing_type_desc')};
 	string filing_date {xpath('filing_date')};

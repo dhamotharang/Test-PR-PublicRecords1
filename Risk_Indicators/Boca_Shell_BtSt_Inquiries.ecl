@@ -152,6 +152,7 @@ export Boca_Shell_BtSt_Inquiries(
 
     inq_tmp_CCPA := RECORD
         unsigned4 global_sid;
+				boolean skip_opt_out := false;
         inq_tmp;
     END;
     
@@ -271,8 +272,35 @@ getBtStInquiryRaw(btStField, InquiryRawCount, KeyName, getDelta) := FUNCTIONMACR
 						add_inquiry_raw(left, right, InquiryRawCount),
 						left outer, atmost(5000));	
     #END             
-    inq := Suppress.Suppress_ReturnOldLayout(inq_unsuppressed, mod_access, inq_tmp);
-    
+    inq_flagged := Suppress.CheckSuppression(inq_unsuppressed, mod_access);
+
+inq := PROJECT(inq_flagged, TRANSFORM(inq_tmp, 
+		self.CBD_Hit := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.CBD_Hit);
+		self.Hit := IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('STRING'), left.Hit);
+		self.first_log_date := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.first_log_date);	
+		self.Transaction_ID := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Transaction_ID);
+		self.Sequence_Number := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Sequence_Number);
+		self.addr := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.addr);
+		self.prim_range := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.prim_range);
+		self.prim_name := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.prim_name);
+		self.sec_range := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.sec_range);
+		self.phone := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.phone);
+		self.ssn := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.ssn);
+		self.Collection := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Collection);
+		self.Auto :=  IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Auto);
+		self.Banking :=  IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Banking);
+		self.Mortgage :=  IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Mortgage);
+		self.HighRiskCredit :=  IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.HighRiskCredit);
+		self.Retail :=  IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Retail);
+		self.Communications :=  IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Communications);
+		self.PrepaidCards :=  IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.PrepaidCards);
+		self.RetailPayments := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.RetailPayments);	
+		self.Utilities :=  IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Utilities);
+		self.QuizProvider :=  IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.QuizProvider);
+		self.StudentLoans :=  IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.StudentLoans);
+		self.Other := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.Other);
+    SELF := LEFT;
+)); 
     RETURN inq;
     
     ENDMACRO;

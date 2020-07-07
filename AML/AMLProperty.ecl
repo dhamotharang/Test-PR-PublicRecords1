@@ -1,10 +1,9 @@
-﻿import ut, census_data, ln_propertyv2, riskwise, risk_indicators, doxie;
+﻿import ut, ln_propertyv2, riskwise, risk_indicators;
 
 export AMLProperty (GROUPED DATASET(risk_indicators.layout_PropertyRecord) p_address,
                             GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids, 
                             boolean includeRelatives = true, 
-									          boolean filter_out_fares=false,
-                            doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
+									          boolean filter_out_fares=false) := function
 
 
 layout_PropertyRecordPlus := RECORD

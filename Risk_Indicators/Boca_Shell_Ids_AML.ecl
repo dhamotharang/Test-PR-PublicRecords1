@@ -1,4 +1,4 @@
-﻿import doxie,watchdog,doxie_raw,ut,std,Header, Relationship, riskwise, risk_indicators;
+﻿import Header, Relationship, riskwise, risk_indicators;
 
 export Boca_Shell_Ids_AML(GROUPED DATASET(Risk_Indicators.Layout_Output) iid_res,
                        boolean includeRelativeInfo=true,
@@ -25,7 +25,7 @@ iids_dedp := dedup(sort(ungroup(iid_res),did), did);
 justDids := PROJECT(iids_dedp, 
 		TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
 
-rellyids := Relationship.proc_GetRelationship(justDids,TopNCount:=100,
+rellyids := Relationship.proc_GetRelationshipNeutral(justDids,TopNCount:=100,
 				RelativeFlag :=TRUE,AssociateFlag:=TRUE,
 				doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result;   
 

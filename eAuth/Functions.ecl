@@ -15,19 +15,31 @@ export MAC_RANDOM (ds_in, max_return, ds_out) := MACRO
   ds_out := project (choosen (sort (%ds_seq%, seq), max_return), %rec_in%);
 ENDMACRO;
 
-// returns a random integer from the interval [0..high), or RAND_MAX (?) for high=0 
+// chooses a number of random records out of given dataset
+export MAC_PICK_RANDOM_RECS (ds_in, max_return) := FUNCTIONMACRO
+  LOCAL rec_in := recordof (ds_in);
+  LOCAL rec_seq := record (rec_in)
+    integer seq;
+  end;
+  LOCAL ds_seq := project (ds_in, transform (rec_seq, Self.seq := random (), Self := Left;));
+  LOCAL ds_out := project (choosen (sort (ds_seq, seq), max_return), rec_in);
+
+  RETURN ds_out;
+ENDMACRO;
+
+// returns a random integer from the interval [0..high), or RAND_MAX (?) for high=0
 export integer GetRandom (integer high = 0) := IF (high = 0, random(), (random() % high));
 
 // primitive data validation
-export boolean IsValidDate (iesp.share.t_Date date, boolean ignore_day = false) 
+export boolean IsValidDate (iesp.share.t_Date date, boolean ignore_day = false)
   := (date.Year != 0) and (date.Month != 0) and (ignore_day or (date.Day != 0));
 
 // returns nicely formatted address line 1
 export string FormatAddressLine1 (iesp.share.t_Address r) := function
-  return trim (r.StreetNumber) + 
-         if (trim (r.StreetPreDirection)  != '', ' ' + trim (r.StreetPreDirection),  '') + 
-         if (trim (r.StreetName)          != '', ' ' + trim (r.StreetName),          '') + 
-         if (trim (r.StreetPostDirection) != '', ' ' + trim (r.StreetPostDirection), '') + 
+  return trim (r.StreetNumber) +
+         if (trim (r.StreetPreDirection)  != '', ' ' + trim (r.StreetPreDirection),  '') +
+         if (trim (r.StreetName)          != '', ' ' + trim (r.StreetName),          '') +
+         if (trim (r.StreetPostDirection) != '', ' ' + trim (r.StreetPostDirection), '') +
          if (trim (r.StreetSuffix)        != '', ' ' + trim (r.StreetSuffix),        '');
 end;
 

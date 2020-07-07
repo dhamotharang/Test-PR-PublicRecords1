@@ -1,12 +1,14 @@
 ﻿﻿/* PublicRecords_KEL.BWR_nonFCRA_MAS_Roxie */
+#workunit('name','MAS NonFCRA Consumer dev156 1 Thread-Testfile');
 IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD;
 
 threads := 1;
 
 RoxieIP := RiskWise.shortcuts.Dev156;
 
-InputFile := '~temp::kel::consumer_nonfcra_100k.csv';
-// InputFile := '~temp::kel::consumer_nonfcra_1mm.csv'; //1 million
+InputFile := '~mas::uatsamples::consumer_nonfcra_100k_07102019.csv ';
+//InputFile := '~mas::uatsamples::consumer_nonfcra_1m_07092019.csv';
+// InputFile := '~mas::uatsamples::consumer_nonfcra_iptest_04232020.csv';
 
 /*
 Data Setting 		NonFCRA
@@ -33,35 +35,34 @@ BatchUID := '';
 GCID := 0;
 
 // Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
-// histDate := '0';
+histDate := '0';
 // histDate := '20190116';
-histDate := (STRING)STD.Date.Today(); // Run with today's date
+// histDate := (STRING)STD.Date.Today(); // Run with today's date
 
 Score_threshold := 80;
 // Score_threshold := 90;
 
 // Output additional file in Master Layout
 // Master results are for R&D/QA purposes ONLY. This should only be set to TRUE for internal use.
-Output_Master_Results := FALSE;
-// Output_Master_Results := TRUE; 
+// Output_Master_Results := FALSE;
+Output_Master_Results := TRUE; 
 
 // Toggle to include/exclude SALT profile of results file
-Output_SALT_Profile := FALSE;
-// Output_SALT_Profile := TRUE;
+// Output_SALT_Profile := FALSE;
+Output_SALT_Profile := TRUE;
 
 RecordsToRun := 0;
 eyeball := 120;
 
-OutputFile := '~calbrecht::BundleTest_100K_RoxieDev_current_09172019_NonFCRA'+ ThorLib.wuid() ;
-// OutputFile := '~calbrecht::BundleTest_100K_RoxieDev_archive_09172019_NonFCRA'+ ThorLib.wuid() ;
-
+OutputFile := '~bbraaten::out::PersonNonFCRA_Roxie_100k_Archive_KS-5842_test_marketing_'+ ThorLib.wuid();
 
 prii_layout := RECORD
     STRING Account             ;
     STRING FirstName           ;
     STRING MiddleName          ;
     STRING LastName            ;
-    STRING StreetAddress       ;
+    STRING StreetAddressLine1  ;
+    STRING StreetAddressLine2  ;
     STRING City                ;
     STRING State               ;
     STRING Zip                 ;
@@ -84,7 +85,7 @@ prii_layout := RECORD
     STRING Proj;
 END;
 
-p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));
+p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"'), HEADING(SINGLE)));
 p := IF (RecordsToRun = 0, p_in, CHOOSEN (p_in, RecordsToRun));
 PP := PROJECT(P(Account != 'Account'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout, 
 SELF.historydate := if(histDate = '0', LEFT.historydate, histDate); 
@@ -134,6 +135,7 @@ END;
   // OUTPUT( ResultSet, NAMED('Results') );
 
 layout_MAS_Test_Service_output := RECORD
+    unsigned8 time_ms{xpath('_call_latency_ms')} := 0;  // picks up timing
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster MasterResults {XPATH('Results/Result/Dataset[@name=\'MasterResults\']/Row')};
 	PublicRecords_KEL.ECL_Functions.Layout_Person_NonFCRA Results {XPATH('Results/Result/Dataset[@name=\'Results\']/Row')};
 	STRING G_ProcErrorCode := '';
@@ -187,6 +189,7 @@ OUTPUT( CHOOSEN(Failed,eyeball), NAMED('bwr_results_Failed') );
 OUTPUT( COUNT(Failed), NAMED('Failed_Cnt') );
 
 LayoutMaster_With_Extras := RECORD
+    unsigned8 time_ms;
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster;
 	STRING G_ProcErrorCode;
 	STRING ln_project_id;
@@ -200,6 +203,7 @@ LayoutMaster_With_Extras := RECORD
 END;
 
 Layout_Person := RECORD
+    unsigned8 time_ms;
 	PublicRecords_KEL.ECL_Functions.Layout_Person_NonFCRA;
 	STRING G_ProcErrorCode;
 END;
@@ -208,6 +212,7 @@ Passed_with_Extras :=
 	JOIN(p, Passed, LEFT.Account = RIGHT.MasterResults.P_InpAcct, 
 		TRANSFORM(LayoutMaster_With_Extras,
 			SELF := RIGHT.MasterResults, //fields from passed
+            SELF.time_ms := RIGHT.time_ms,
 			SELF := LEFT, //input performance fields
 			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),
@@ -217,6 +222,7 @@ Passed_Person :=
 	JOIN(p, Passed, LEFT.Account = RIGHT.Results.P_InpAcct, 
 		TRANSFORM(Layout_Person,
 			SELF := RIGHT.Results, //fields from passed
+            SELF.time_ms := RIGHT.time_ms,
 			SELF := LEFT, //input performance fields
 			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),

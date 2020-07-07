@@ -1,4 +1,4 @@
-﻿IMPORT BIPv2, prof_licenseV2, risk_indicators, Prof_License_Mari, STD;
+﻿IMPORT BIPv2, prof_licenseV2, risk_indicators, Prof_License_Mari, STD, Doxie, Suppress;
 
 /*
   This module is used by both Business and Person products.
@@ -8,19 +8,22 @@
 			Prof_License_Mari.key_did
 */
 
-EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv) := FUNCTION
+EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv,
+                                          doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 
-	licenseRaw := JOIN(indiv, prof_licenseV2.Key_Proflic_Did(),
+	licenseRaw_unsuppressed := JOIN(indiv, prof_licenseV2.Key_Proflic_Did(),
 											TRIM(RIGHT.prolic_key)!= DueDiligence.Constants.EMPTY AND
 											KEYED(RIGHT.did = LEFT.party.did),
 											TRANSFORM({UNSIGNED4 uniqueID, DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout -did, UNSIGNED4 historyDate, RECORDOF(RIGHT)},
-																	SELF.did := LEFT.party.did;
-                                  SELF := LEFT;
-																	SELF := RIGHT;
-																	SELF := [];),
+                                            SELF.did := LEFT.party.did;
+                                            SELF := LEFT;
+                                            SELF := RIGHT;
+                                            SELF := [];),
 											ATMOST(RIGHT.did = LEFT.party.did, DueDiligence.Constants.MAX_ATMOST_1000));
-											
+                      
+	licenseRaw := Suppress.MAC_SuppressSource(licenseRaw_unsuppressed, mod_access);
+  
 	projectLicense := PROJECT(licenseRaw, TRANSFORM(DueDiligence.LayoutsInternal.PartyLicenses,
 																										
 																										professionCat := TRIM(LEFT.profession_or_board, LEFT, RIGHT);
@@ -66,11 +69,11 @@ EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv) :
 
 
 
-	mariLicenseRaw := JOIN(indiv, Prof_License_Mari.key_did(),
+	mariLicenseRaw_unsuppressed := JOIN(indiv, Prof_License_Mari.key_did(),
 													KEYED(LEFT.party.did = RIGHT.s_did) AND
 													RIGHT.std_source_upd NOT IN risk_indicators.iid_constants.restricted_Mari_vendor_set,
 													TRANSFORM({UNSIGNED4 seq, UNSIGNED6 parentUltID, UNSIGNED6 parentOrgID, UNSIGNED6 parentSeleID, UNSIGNED4 historyDate, RECORDOF(RIGHT)},
-																			SELF.parentUltID := LEFT.ultID;
+                                                                            SELF.parentUltID := LEFT.ultID;
 																			SELF.parentOrgID := LEFT.orgID;
 																			SELF.parentSeleID := LEFT.seleID;
 																			SELF := LEFT;
@@ -78,6 +81,8 @@ EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv) :
 																			SELF := [];),
 													ATMOST(LEFT.party.did = RIGHT.s_did, DueDiligence.Constants.MAX_ATMOST_1000));
 	
+    mariLicenseRaw := Suppress.MAC_SuppressSource(mariLicenseRaw_unsuppressed, mod_access);
+        
 	projectMariLicense := PROJECT(mariLicenseRaw, TRANSFORM(DueDiligence.LayoutsInternal.PartyLicenses,
 																														
 																														professionCat := TRIM(LEFT.std_prof_desc, LEFT, RIGHT);
@@ -134,7 +139,7 @@ EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv) :
 	allLicenseDateClean:= DueDiligence.Common.CleanDatasetDateFields(allLicenses, 'license.dateFirstSeen');
 	
 	// Filter out records after our history date.
-	allLicenseFilt := DueDiligence.Common.FilterRecordsSingleDate(allLicenseDateClean, license.dateFirstSeen);
+	allLicenseFilt := DueDiligence.CommonDate.FilterRecordsSingleDate(allLicenseDateClean, license.dateFirstSeen);
 	
 	sortLicenses := SORT(allLicenseFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, license.licenseNumber, license.dateFirstSeen);
 	rollupLicenses := ROLLUP(sortLicenses,

@@ -1,4 +1,4 @@
-﻿import doxie, FCRA, FFD, iesp, Gateway;
+﻿import doxie, FCRA, FFD, iesp, Gateway, STD;
 
 export ReportRecords := module
   shared shared_val(SexOffender_Services.IParam.report in_mod, 
@@ -21,7 +21,7 @@ export ReportRecords := module
     
     //By Primary Key
     prim_key_recs := SexOffender_Services.Raw.REPORT_VIEW.by_primary_key(
-                              DATASET ([{Stringlib.StringToUpperCase(in_mod.Primary_Key)}], 
+                              DATASET ([{STD.Str.ToUpperCase(in_mod.Primary_Key)}], 
                                        SexOffender_Services.layouts.search), 
                                in_mod);
     
@@ -30,8 +30,7 @@ export ReportRecords := module
                                                             in_mod,
                                                             isFCRA, 
                                                             ds_flags,
-                                                            slim_pc_recs,
-                                                            in_mod.FFDOptionsMask);
+                                                            slim_pc_recs);
                               
     recs1 := MAP (in_mod.Primary_Key != '' => prim_key_recs,
                   (unsigned) in_mod.did != 0 => did_recs
@@ -51,8 +50,7 @@ export ReportRecords := module
    return final_results;
   end;
   
- export val(SexOffender_Services.IParam.report in_mod) := PROJECT(shared_val(in_mod, FALSE).Records, iesp.sexualoffender.t_SexOffReportRecord);                             
- export fcra_val(SexOffender_Services.IParam.report in_mod) := shared_val(in_mod, TRUE);
-
+  export val(SexOffender_Services.IParam.report in_mod) := PROJECT(shared_val(in_mod, FALSE).Records, iesp.sexualoffender.t_SexOffReportRecord);                             
+  export fcra_val(SexOffender_Services.IParam.report in_mod) := shared_val(in_mod, TRUE);
   
 end;

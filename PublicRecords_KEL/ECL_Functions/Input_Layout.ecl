@@ -5,7 +5,8 @@ EXPORT Input_Layout := record
 	STRING FirstName;
 	STRING MiddleName;
 	STRING LastName;
-	STRING StreetAddress;
+	STRING StreetAddressLine1;
+	STRING StreetAddressLine2;
 	STRING City;
 	STRING State;
 	STRING Zip;
@@ -20,6 +21,7 @@ EXPORT Input_Layout := record
 	STRING CHARGEOFFD; 
 	STRING FormerName;
 	STRING EMAIL; 
+	STRING IPAddress;
 	STRING employername;
 	STRING historydate; //(adding historydate timestamp) 
 	STRING LexID;

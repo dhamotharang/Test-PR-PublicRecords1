@@ -79,9 +79,9 @@
 	<part name="MarketingMode" type="xsd:integer"/>
 	<part name="AllowedSources" type="xsd:string"/>
 	<part name="BIPBestAppend" type="xsd:integer"/>
-  <part name="OFAC_Version" type="xsd:integer"/>
-  <part name="Global_Watchlist_Threshold" type="xsd:real"/>
-  <part name="Watchlists_Requested" type="tns:XmlDataSet" cols="90" rows="10"/>
+	<part name="OFAC_Version" type="xsd:integer"/>
+	<part name="Global_Watchlist_Threshold" type="xsd:real"/>
+	<part name="Watchlists_Requested" type="tns:XmlDataSet" cols="90" rows="10"/>
 	<!-- Output Options -->
 	<part name="OutputRecordCount" type="xsd:integer"/>
 	<part name="IncludeAll" type="xsd:boolean"/>
@@ -98,6 +98,9 @@
 	<part name="IncludeOSHA" type="xsd:boolean"/>
 	<part name="IncludeBBB" type="xsd:boolean"/>
 	<part name="IncludeFBN" type="xsd:boolean"/>
+	<part name="IncludeHighRiskPhone" type="xsd:boolean"/>
+	<part name="IncludeHighRiskAddress" type="xsd:boolean"/>
+	<part name="IncludeHighRiskIndustries" type="xsd:boolean"/>
 	<part name="IncludeIRS990NonProfit" type="xsd:boolean"/>
 	<part name="IncludeUtility" type="xsd:boolean"/>
 	<part name="IncludePropertyAssessments" type="xsd:boolean"/>
@@ -107,11 +110,12 @@
 	<part name="IncludeCorpFilings" type="xsd:boolean"/>
 	<part name="IncludeBankruptcy" type="xsd:boolean"/>
 	<part name="IncludeCortera" type="xsd:boolean"/>
- <part name="IncludeWatchlistSearch" type="xsd:boolean"/>
- <part name="IncludeProfessionalLicense" type="xsd:boolean"/>
+	<part name="IncludeEmailV2" type="xsd:boolean"/>
+	<part name="IncludeWatchlistSearch" type="xsd:boolean"/>
+	<part name="IncludeProfessionalLicense" type="xsd:boolean"/>
 	<part name="IncludeSBFE" type="xsd:boolean"/>
 	<part name="IncludeDataBridge" type="xsd:boolean"/>
- <part name="KeepLargeBusinesses" type="xsd:integer"/>
+	<part name="KeepLargeBusinesses" type="xsd:integer"/>
 	<part name="OverrideExperianRestriction" type="xsd:boolean"/>
 	<part name="Gateways" type="tns:XmlDataSet" cols="100" rows="8"/>
 </message>
@@ -119,8 +123,8 @@
 /*--INFO-- Prod Data Service - This is the XML Service utilizing BIP linking*/
 
 #option('expandSelectCreateRow', true);
-IMPORT Address, AutoStandardI, BIPV2, BizLinkFull, Business_Risk_BIP, Corp2, Doxie, EBR, EBR_Services, Gateway,
- iesp, LiensV2, LN_PropertyV2, MDR, NID, Risk_Indicators, RiskWise, UT;
+IMPORT Address, AutoStandardI, BIPV2, BizLinkFull, Business_Risk_BIP, Corp2, Doxie, dx_Email, EBR, EBR_Services, Gateway,
+ iesp, LiensV2, LN_PropertyV2, MDR, NID, Risk_Indicators, RiskWise, UT, BIPV2_Build;
 
 EXPORT ProdData() := FUNCTION
 	/* ************************************************************************
@@ -180,12 +184,17 @@ EXPORT ProdData() := FUNCTION
 	'IncludeBusinessHeader',
 	'IncludeBusReg',
 	'IncludeCorpFilings',
-  'IncludeCortera',
+	'IncludeCortera',
+	'IncludeDataBridge',
 	'IncludeDCA',
 	'IncludeDEADCO',
 	'IncludeDNBDMI',
 	'IncludeEBR',
+	'IncludeEmailV2',
 	'IncludeFBN',
+	'IncludeHighRiskPhone',
+	'IncludeHighRiskAddress',
+	'IncludeHighRiskIndustries',
 	'IncludeInquiriesBus',
 	'IncludeIRS990NonProfit',
 	'IncludeLiensJudgments',
@@ -198,8 +207,7 @@ EXPORT ProdData() := FUNCTION
 	'IncludeUCC',
 	'IncludeUtility',
 	'IncludeWatchlistSearch',
- 'IncludeProfessionalLicense',
- 'IncludeDataBridge',
+	'IncludeProfessionalLicense',
 	'KeepLargeBusinesses',
 	'OverrideExperianRestriction',
   'gateways'
@@ -327,6 +335,10 @@ layout_watchlists_temp := record
 	BOOLEAN IncludeSBFE_In := FALSE : STORED('IncludeSBFE');
 	BOOLEAN IncludeCortera_In := FALSE : STORED('IncludeCortera');
 	BOOLEAN IncludeDataBridge_In := FALSE : STORED('IncludeDataBridge');
+	BOOLEAN IncludeEmailV2_In := FALSE : STORED('IncludeEmailV2');
+	BOOLEAN IncludeHighRiskPhone_In := FALSE : STORED('IncludeHighRiskPhone');
+	BOOLEAN IncludeHighRiskAddress_In := FALSE : STORED('IncludeHighRiskAddress');
+	BOOLEAN IncludeHighRiskIndustries_In := FALSE : STORED('IncludeHighRiskIndustries');
 	UNSIGNED1 KeepLargeBusinesses_In  := Business_Risk_BIP.Constants.DefaultJoinType : STORED('KeepLargeBusinesses');
 	BOOLEAN OverrideExperianRestriction_In := FALSE : STORED('OverrideExperianRestriction');
 
@@ -479,6 +491,10 @@ layout_watchlists_temp := record
 		EXPORT BOOLEAN		IncludeWatchlist		:= FALSE;
 		EXPORT BOOLEAN		IncludeSBFE		      := FALSE;
 		EXPORT BOOLEAN		IncludeDataBridge    := FALSE;
+		EXPORT BOOLEAN		IncludeEmailV2			:= FALSE;
+		EXPORT BOOLEAN		IncludeHighRiskPhone	:= FALSE;
+		EXPORT BOOLEAN		IncludeHighRiskAddress	:= FALSE;
+		EXPORT BOOLEAN		IncludeHighRiskIndustries	:= FALSE;
 	END;
 	// Grab the output options
 	outputs := MODULE(OutputInterface)
@@ -511,6 +527,10 @@ layout_watchlists_temp := record
 		EXPORT BOOLEAN IncludeProfLic := IncludeProfLic_In;
 		EXPORT BOOLEAN IncludeSBFE := IncludeSBFE_In;
 		EXPORT BOOLEAN IncludeDataBridge := IncludeDataBridge_In;
+		EXPORT BOOLEAN IncludeEmailV2 := IncludeEmailV2_In;
+		EXPORT BOOLEAN IncludeHighRiskPhone := IncludeHighRiskPhone_In;
+		EXPORT BOOLEAN IncludeHighRiskAddress := IncludeHighRiskAddress_In;
+		EXPORT BOOLEAN IncludeHighRiskIndustries := IncludeHighRiskIndustries_In;
 	END;
 
 	// Generate the linking parameters to be used in BIP's kFetch (Key Fetch) - These parameters should be global so figure them out here and pass around appropriately
@@ -785,8 +805,8 @@ layout_watchlists_temp := record
 
 	cleanedInputSet := PROJECT(LinkIDsFound, TRANSFORM(Business_Risk_BIP.Layouts.Input, SELF := LEFT.Clean_Input));
 
-	optionsDataset := DATASET([{outputs.OutputRecordCount, outputs.IncludeAll, outputs.IncludeABIUS, outputs.IncludeBankruptcy, outputs.IncludeBBB, outputs.IncludeBusinessHeader, outputs.IncludeBusReg, outputs.IncludeCorpFilings, outputs.IncludeCortera, outputs.IncludeDCA, outputs.IncludeDEADCO, outputs.IncludeDNBDMI, outputs.IncludeEBR, outputs.IncludeFBN, outputs.IncludeInquiriesBus, outputs.IncludeIRS990, outputs.IncludeLiensJudgments, outputs.IncludeLinkingResults, outputs.IncludeOSHA, outputs.IncludePropertyAssessments, outputs.IncludePropertyDeeds, outputs.IncludeSBFE, outputs.IncludeTradelines, outputs.IncludeUCC, outputs.IncludeUtility, outputs.IncludeDataBridge, outputs.OFAC_Version, outputs.IncludeWatchlist, linkingOptions.DataRestrictionMask, linkingOptions.ignoreFares, linkingOptions.ignoreFidelity, linkingOptions.AllowAll, linkingOptions.AllowGLB, linkingOptions.AllowDPPA, linkingOptions.DPPAPurpose, linkingOptions.GLBPurpose, linkingOptions.IncludeMinors, linkingOptions.LNBranded}],
-													 {UNSIGNED4 OutputRecordCount, BOOLEAN IncludeAll, BOOLEAN IncludeABIUS, BOOLEAN IncludeBankruptcy, BOOLEAN IncludeBBB, BOOLEAN IncludeBusinessHeader, BOOLEAN IncludeBusReg, BOOLEAN IncludeCorpFilings, BOOLEAN IncludeCortera, BOOLEAN IncludeDCA, BOOLEAN IncludeDEADCO, BOOLEAN IncludeDNBDMI, BOOLEAN IncludeEBR, BOOLEAN IncludeFBN, BOOLEAN IncludeInquiriesBus, BOOLEAN IncludeIRS990, BOOLEAN IncludeLiensJudgments, BOOLEAN IncludeLinkingResults, BOOLEAN IncludeOSHA, BOOLEAN IncludePropertyAssessments, BOOLEAN IncludePropertyDeeds, BOOLEAN IncludeSBFE, BOOLEAN IncludeTradelines, BOOLEAN IncludeUCC, BOOLEAN IncludeUtility, BOOLEAN IncludeDataBridge, Unsigned1 OFAC_Version, BOOLEAN IncludeWatchlist, STRING DataRestrictionMask, BOOLEAN ignoreFares, BOOLEAN ignoreFidelity, BOOLEAN AllowAll, BOOLEAN AllowGLB, BOOLEAN AllowDPPA, UNSIGNED1 DPPAPurpose, UNSIGNED1 GLBPurpose, BOOLEAN IncludeMinors, BOOLEAN LNBranded});
+	optionsDataset := DATASET([{outputs.OutputRecordCount, outputs.IncludeAll, outputs.IncludeABIUS, outputs.IncludeBankruptcy, outputs.IncludeBBB, outputs.IncludeBusinessHeader, outputs.IncludeBusReg, outputs.IncludeCorpFilings, outputs.IncludeCortera, outputs.IncludeDCA, outputs.IncludeDEADCO, outputs.IncludeDNBDMI, outputs.IncludeEBR, outputs.IncludeFBN, outputs.IncludeInquiriesBus, outputs.IncludeIRS990, outputs.IncludeLiensJudgments, outputs.IncludeLinkingResults, outputs.IncludeOSHA, outputs.IncludePropertyAssessments, outputs.IncludePropertyDeeds, outputs.IncludeSBFE, outputs.IncludeTradelines, outputs.IncludeUCC, outputs.IncludeUtility, outputs.IncludeDataBridge, outputs.IncludeHighRiskPhone, outputs.IncludeHighRiskAddress, outputs.IncludeHighRiskIndustries, outputs.OFAC_Version, outputs.IncludeWatchlist, linkingOptions.DataRestrictionMask, linkingOptions.ignoreFares, linkingOptions.ignoreFidelity, linkingOptions.AllowAll, linkingOptions.AllowGLB, linkingOptions.AllowDPPA, linkingOptions.DPPAPurpose, linkingOptions.GLBPurpose, linkingOptions.IncludeMinors, linkingOptions.LNBranded}],
+													 {UNSIGNED4 OutputRecordCount, BOOLEAN IncludeAll, BOOLEAN IncludeABIUS, BOOLEAN IncludeBankruptcy, BOOLEAN IncludeBBB, BOOLEAN IncludeBusinessHeader, BOOLEAN IncludeBusReg, BOOLEAN IncludeCorpFilings, BOOLEAN IncludeCortera, BOOLEAN IncludeDCA, BOOLEAN IncludeDEADCO, BOOLEAN IncludeDNBDMI, BOOLEAN IncludeEBR, BOOLEAN IncludeFBN, BOOLEAN IncludeInquiriesBus, BOOLEAN IncludeIRS990, BOOLEAN IncludeLiensJudgments, BOOLEAN IncludeLinkingResults, BOOLEAN IncludeOSHA, BOOLEAN IncludePropertyAssessments, BOOLEAN IncludePropertyDeeds, BOOLEAN IncludeSBFE, BOOLEAN IncludeTradelines, BOOLEAN IncludeUCC, BOOLEAN IncludeUtility, BOOLEAN IncludeDataBridge,  BOOLEAN IncludeHighRiskPhone,  BOOLEAN IncludeHighRiskAddress,  BOOLEAN IncludeHighRiskIndustries, Unsigned1 OFAC_Version, BOOLEAN IncludeWatchlist, STRING DataRestrictionMask, BOOLEAN ignoreFares, BOOLEAN ignoreFidelity, BOOLEAN AllowAll, BOOLEAN AllowGLB, BOOLEAN AllowDPPA, UNSIGNED1 DPPAPurpose, UNSIGNED1 GLBPurpose, BOOLEAN IncludeMinors, BOOLEAN LNBranded});
 
 	kFetchLinkIDs := Business_Risk_BIP.Common.GetLinkIDs(LinkIDsFound);
 	kFetchLinkSearchLevel := Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel);
@@ -952,14 +972,25 @@ layout_watchlists_temp := record
 	// --------------- SBFE data ----------------
 	SBFE := Business_Risk_BIP.PD_SBFE(LinkIDsFound, options, linkingOptions, AllowedSourcesSet).SBFE_data_raw;
 
-  // --------------- Cortera data ----------------
-  Cortera := Business_Risk_BIP.PD_Cortera(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
-  CorteraRecs := Cortera.CorteraRecs;
-  Cortera_Attribute_recs := Cortera.Cortera_Attribute_recs;
-  Cortera_Tradelines := Business_Risk_BIP.PD_Cortera_Tradelines(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
+	// --------------- Cortera data ----------------
+	Cortera := Business_Risk_BIP.PD_Cortera(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
+	CorteraRecs := Cortera.CorteraRecs;
+	Cortera_Attribute_recs := Cortera.Cortera_Attribute_recs;
+	Cortera_Tradelines := Business_Risk_BIP.PD_Cortera_Tradelines(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
 	
-  DataBridge := Business_Risk_BIP.PD_DataBridge(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, AllowedSourcesSet);
+	DataBridge := Business_Risk_BIP.PD_DataBridge(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, AllowedSourcesSet);
+  
+	EmailV2 := dx_Email.Key_LinkIds.kFetch(kFetchLinkIDs,
+																							kFetchLinkSearchLevel,
+																							0 // ScoreThreshold --> 0 = Give me everything
+																					 );
+
+	// --------------- High risk codes ----------------
+	High_Risk_phones := Business_Risk_BIP.PD_High_Risk_Industries.Phone(cleanedInput);
 	
+	High_Risk_Address := Business_Risk_BIP.PD_High_Risk_Industries.Address(cleanedInput);
+	
+	High_Risk_Industries := Business_Risk_BIP.PD_High_Risk_Industries.Industries(kFetchLinkIDs);
 	
 	// Keep all of the outputs at the end so that we can keep them sorted more easily, and so that the function compiles
 	// Inputs/Options - By outputting these two here we are forcing OSS to display the fields on the form in an order that makes sense and that we control
@@ -1010,6 +1041,11 @@ layout_watchlists_temp := record
 	IF(outputs.IncludeProfLic OR outputs.IncludeAll, OUTPUT(CHOOSEN((ProfLic), outputs.OutputRecordCount), NAMED('ProfessionalLicense')));
 	IF((outputs.IncludeSBFE OR outputs.IncludeAll), OUTPUT(CHOOSEN((SBFE), outputs.OutputRecordCount), NAMED('SBFE')));
 	IF((outputs.IncludeDataBridge OR outputs.IncludeAll), OUTPUT(CHOOSEN((DataBridge), outputs.OutputRecordCount), NAMED('DataBridge')));
+	IF((outputs.IncludeEmailV2 OR outputs.IncludeAll), OUTPUT(CHOOSEN((EmailV2), outputs.OutputRecordCount), NAMED('EmailV2')));
+	IF((outputs.IncludeHighRiskPhone OR outputs.IncludeAll), OUTPUT(CHOOSEN((High_Risk_phones), outputs.OutputRecordCount), NAMED('HighRiskPhone')));
+	IF((outputs.IncludeHighRiskAddress OR outputs.IncludeAll), OUTPUT(CHOOSEN((High_Risk_Address), outputs.OutputRecordCount), NAMED('HighRiskAddress')));
+	IF((outputs.IncludeHighRiskIndustries OR outputs.IncludeAll), OUTPUT(CHOOSEN((High_Risk_Industries), outputs.OutputRecordCount), NAMED('HighRiskIndustries')));
+
 
 	RETURN(TRUE);
 END;

@@ -1,5 +1,5 @@
-﻿IMPORT  AutoStandardI, doxie, AddressFeedback, AddressFeedback_Services, BusinessCredit_Services, DriversV2,  
-       PhonesFeedback, PhonesFeedback_Services, Suppress, ut, iesp, doxie;
+﻿IMPORT $, AddressFeedback, AddressFeedback_Services, AutoStandardI, BusinessCredit_Services, doxie, DriversV2, iesp,  
+       PhonesFeedback, PhonesFeedback_Services, Suppress, ut;
 
 EXPORT HeaderFileRollupService_Records := 
   MODULE
@@ -117,7 +117,7 @@ EXPORT HeaderFileRollupService_Records :=
         ta2_preBusinessCredit := IF(ta2_iparam_mod.Smart_Rollup, ta1Smart, ta1);
         
         // Business Credit / SBFE - request is to resort SBFE records to the top of the results list
-        ds_ta2_BusinessCredit_atTop := BusinessCredit_Services.Functions.fn_BusinessCreditSorting ( ta2_preBusinessCredit, ta2_iparam_mod.SeleId, ta2_iparam_mod.OrgId, ta2_iparam_mod.UltId ); 
+        ds_ta2_BusinessCredit_atTop := BusinessCredit_Services.Functions.fn_BusinessCreditSorting ( ta2_preBusinessCredit, mod_access, ta2_iparam_mod.SeleId, ta2_iparam_mod.OrgId, ta2_iparam_mod.UltId ); 
          
 				ta2 := IF( useBusinessCreditSorting, ds_ta2_BusinessCredit_atTop, ta2_preBusinessCredit );
       				

@@ -1,4 +1,4 @@
-import iesp, ut, Census_Data,AutoStandardI,Codes,MDR,  LN_propertyv2, topBusiness_services, bipv2,
+﻿import iesp, ut, Census_Data,AutoStandardI,Codes,MDR,  LN_propertyv2, topBusiness_services, bipv2,
    LN_PropertyV2_Services;
 
 export PropertySection := module
@@ -172,7 +172,7 @@ export fn_fullView(
 																	 unsigned6 dotid;
 																	 string12 in_ln_fares_id;
 																	 string45 apn;
-																	 TopBusiness_Services.PropertySection_layouts.rec_party;																	 
+																	 TopBusiness_Services.PropertySection_layouts.rec_party;
 																	 },													
 																	 CountyName := choosen(project(Census_Data.Key_Fips2County(
 							                          keyed(state_code = right.st) and 
@@ -198,22 +198,22 @@ export fn_fullView(
 																	self.empid        := left.empid,
 																	self.dotid        := left.dotid,
 																	self.company_name := right.cname;
-																  self.name_last    := right.lname,
+                                                                                           self.name_last    := right.lname,
 																	self.name_first   := right.fname,
 																	self.name_middle  := right.mname,
 																	self.name_suffix  := right.name_suffix,
 																	self.name_title   := right.title,
 																	self.party_type   := right.source_code[1]; // owner, buyer,seller(source_code[1] ='O' or source_code[1] = 'B' or source_code[1] = 'S'),
 																	self.party_type_address := right.source_code[2];
-																	self.vendor       := right.vendor_source_flag; 
-																	self.source       := right.source_code[1]; 															
-																	self.ln_fares_id  := right.ln_fares_id;		
+																	self.vendor       := right.vendor_source_flag;
+																	self.source       := right.source_code[1];
+																	self.ln_fares_id  := right.ln_fares_id;
 																	self.in_ln_fares_id := left.ln_fares_id;
 																	self.owner_date   := left.owner_date;
 																	// lot of fields set by this self := right
 																	self := right;
-																	self := []), limit(0), 
-																	keep(TopBusiness_Services.Constants.SearchFidKeyConstant)); 
+																	self := []), limit(0),
+																	keep(TopBusiness_Services.Constants.SearchFidKeyConstant));
 	                                 // separated out since there were dups in the seller rows 
 																	 // and this way I get all the sellers
   
@@ -223,14 +223,13 @@ export fn_fullView(
 																			transform(recordof(left),
 																			   // set current record here from accessor key
 																			   self.Current_record := right.current_record;
-																				 
 																				 self := left),
 																				 left outer,limit(TopBusiness_Services.Constants.PropertySectionKeepLimit,skip)
 																				 ),all);																	 
 		
   property_partySellers     := property_partyPayload(party_type = 'S' and (party_type_address = 'S' OR
 	                                                                         party_type_address = 'P') and owner_date <> 0);
-  property_partySellersSlim := dedup(property_partySellers, except owner_date);		
+  property_partySellersSlim := dedup(property_partySellers, except owner_date);
 	
 	// now take this set and join against property_partyPayload using ln_fares_id	
 	Property_partyPayloadSellersSlim := property_partyPayload(party_type='S' and (party_type_address='P' OR party_type_address='S') and owner_date <> 0);
@@ -305,8 +304,8 @@ export fn_fullView(
 															                     left.party_type_address  ='S',
 															                        left.ownerSeller_address); 																																										                       
                                self.partyType := left.party_type;
-															 self.party_type_address := left.party_type_address;																													
-															 ));				
+															 self.party_type_address := left.party_type_address;
+															 ));
 	
 	   foreclosureNODSection :=  TopBusiness_Services.ForeclosureNODSection.fn_fullView(
 	                      ds_in_data,
@@ -339,9 +338,8 @@ export fn_fullView(
 												 self := [];
     										)), all,HASH);
     							 																
-					tmpOwners1 := project(property_transactionO,															
+                            tmpOwners1 := project(property_transactionO,
 													transform(TopBusiness_Services.PropertySection_layouts.transactionInfo,
-                                    																														
 														self.partyType := left.partytype;
 														self.companyName := left.CompanyName;
                             self.address :=	if (left.party_type_address <> 'P', left.address);
@@ -370,7 +368,7 @@ export fn_fullView(
 																									
     property_party1Owner := dedup(property_party1OwnerLarge,all,HASH);
 	
-	 tmpSellers := project(property_transactionS, 	 
+    tmpSellers := project(property_transactionS,
 	         transform(TopBusiness_Services.PropertySection_layouts.transactionInfo,
 							 self := left;
 							 self := [];
@@ -626,11 +624,19 @@ export fn_fullView(
   
   // get all recs from the initial linkids join
 	// whose party information is needed for population of return dataset later.
-  denorm1stParam := project(property_partyPayLoadDeduped, 
+	
+	// added this logic to ensure that property listing in ln_fares_id rows in search.fid key that don't have
+	// a party type of 'P' just 'O' ....i.e.  so no property address info just owner address ....i.e. so that that prop rec don't get excluded in report output.
+
+denorm1stParamLarge := project(property_partyPayLoadDeduped, 
 	                    transform(TopBusiness_Services.PropertySection_layouts.denorm_layout,
-	                            self.property_address := if (left.party_type_address = 'P', left.property_address);
-															                           													                             
-                             self := left))(party_type_address <> 'O' OR ln_fares_id[2]='D');														
+	                     self.property_address := if (left.party_type_address = 'P', left.property_address);															                           													                            
+					self := left));	
+  denorm1stParamSlim := denorm1stParamLarge(party_type_address <> 'O' OR ln_fares_id[2]='D');														
+ 
+ denorm1stParam := if (count(denorm1stParamSlim) = 0  and exists(Denorm1stParamLarge),
+                                               Denorm1stParamLarge, denorm1stParamSlim);  
+
  denorm1stParam_all := dedup(denorm1stParam, all,HASH);	    	
 	// FILL IN THE DEED INFORMATION
   recs_parent_child := denormalize(denorm1stParam_all,											
@@ -643,22 +649,21 @@ export fn_fullView(
 
   recs_parent_child_slim := dedup(recs_parent_child, all,HASH);
 	   	 																								 
-    TopBusiness_Services.PropertySection_layouts.rec_PropertyIntermediateLayout 
-		 assessment_info(TopBusiness_Services.propertySection_Layouts.rec_propertyParent l, 		                  																														
+    TopBusiness_Services.PropertySection_layouts.rec_PropertyIntermediateLayout
+		 assessment_info(TopBusiness_Services.propertySection_Layouts.rec_propertyParent l,
 											recordof(LN_PropertyV2.key_assessor_fid()) r
-											) := transform                  
-				
-      self.county_land_use_description := r.county_land_use_description;											
+											) := transform
+      self.county_land_use_description := r.county_land_use_description;
 			self.PropertyUniqueID     := l.ln_fares_id;
 			
-			self.AssessmentDate      := r.assessed_value_year + '0000'; 			
+			self.AssessmentDate      := r.assessed_value_year + '0000';
 			self.recording_date       := r.recording_date;
 			
 			self.assessedTotalValue := iesp.ECL2ESP.FormatDollarAmount(r.assessed_total_value);
 			self.marketLandValue    := iesp.ECL2ESP.FormatDollarAmount(r.market_land_value);
 			self.marketTotalValue   := iesp.ECL2ESP.FormatDollarAmount(r.market_total_value);
 							
-			self.Property_Address := l.property_Address; 																						      										        							
+			self.Property_Address := l.property_Address;			      										        							
        
 				self.CountForeclosed := count(l.parties.Foreclosures);
 				
@@ -993,7 +998,9 @@ export fn_fullView(
 														 self.cname := left.companyName;))[1].cname, left, right);                       											 
         sellerPartyCname2 := trim(project(parties.sellers,
 				                    transform({string120 cname;},
-														 self.cname := left.companyName;))[2].cname, left, right);      		
+														 self.cname := left.companyName;))[2].cname, left, right);
+     
+		
                           
 				ownerMatch := (  
 				                  (ut.StringSimilar(stringlib.stringToUppercase(ownerPartyCname), 													
@@ -1027,7 +1034,7 @@ export fn_fullView(
 																															 '');
 																															         
 				self.purchasePrice := if (salePriceColumn = 'PURCHASE', salesPrice, '');
-				self.salesPrice := if (salePriceColumn  = 'SALE', salesPrice, '');																	  
+				self.salesPrice := if (salePriceColumn  = 'SALE', salesPrice, '');
 				
 				// start of all the NON bip related accurint desired fields																 
 					self.deeds.state := r.state;
@@ -1574,182 +1581,89 @@ export fn_fullView(
 																				  in_propertyTotalRecsMaxCount);
 			 self.PropertyRecords := left;
 		   self := left));			
-         
+// output(CnameReport, named('CnameReport'));
+//output(property_recs_raw, named('property_recs_raw'));
+//output(TmpMort_info_forLNFARESIDNoExplosCodes, named('TmpMort_info_forLNFARESIDNoExplosCodes'));
+//output(property_recs_projected, named('property_recs_projected'));
+//output(property_partyPayload_raw, named('property_partyPayload_raw'));
+//output(property_partyPayload, named('property_partyPayload'));
+//output(property_partySellers, named('property_partySellers'));
+//output(property_partySellersSlim, named('property_partySellersSlim'));
+//output(Property_partyPayloadSellersSlim, named('Property_partyPayloadSellersSlim'));
+//output(property_partySellersAll, named('property_partySellersAll'));
+//output(property_partyPayloadSlim, named('property_partyPayloadSlim'));
+//output(property_partyPayloadDeduped1, named('property_partyPayloadDeduped1'));
+//output(property_partyPayloadDeduped2, named('property_partyPayloadDeduped2'));
+//output(Seller_ln_fares_ids, named('Seller_ln_fares_ids'));
+//output(property_partyPayloadDeduped4, named('property_partyPayloadDeduped4'));
+//output(Seller_ln_fares_idPayload, named('Seller_ln_fares_idPayload'));
+//output(Seller_ln_fares_idPayloadSlim, named('Seller_ln_fares_idPayloadSlim'));
+//output(Property_partyPayloadDeduped, named('Property_partyPayloadDeduped'));
+//output(property_transaction, named('Property_transaction'));
+//output(foreclosureNODSection, named('foreclosureNODSection'));
+ //output(property_TransactionSlim, named('property_TransactionSlim'));
+//output(property_transactionO, named('property_transactionO'));
+//output(property_transactionS, named('property_transactionS')); 
+//output(property_transactionB, named('property_transactionB'));
+
+//output(property_party1, named('property_party1'));
+//output(tmpOwners2, named('tmpOwners2'));
+//output(tmpOwners2Large, named('tmpOwners2Large'));
+//output(property_party1OwnerLarge, named('property_party1OwnerLarge'));
+//output(property_party1Owner, named('property_party1Owner'));
+//output(tmpSellers, named('tmpSellers'));
+//output(tmpSellersLarge, named('tmpSellersLarge'));
+//ouptut(tmpSellers2, named('tmpSellers2'));
+
+//output(property_party1Seller, named('property_party1Seller'));
+//output(tmpBorrowers, named('tmpBorrowers'));
+//output(tmpBorrowers2, named('tmpBorrowers2'));
+//output(property_party, named('property_party'));
+//output(tmpNods, named('tmpNods'));
+//output(tmpNods2_Situs1, named('tmpNods2_Situs1'));
+//output(tmpNods2, named('tmpNods2'));
+//output(property_party_WNOD, named('property_party_WNOD'));
+//output(tmpFores, named('tmpFores'));
+//output(tmpFores2, named('tmpFores2'));
+//output(property_party_WFORE_NODS, named('property_party_WFORE_NODS'));
+//output(property_party_dedup, named('property_party_dedup'));
+ 
+//output(denorm1stParamLarge, named('denorm1stParamLarge'));
+//output(denorm1stParamSlim, named('denorm1stParamSlim'));
+//output(denorm1stParam, named('denorm1stParam'));
+//output(denorm1stParam_all, named('denorm1stParam_all'));
+//output(recs_parent_child, named('recs_parent_child'));
+//output(recs_parent_child_slim, named('recs_parent_child_slim'));
+//output(Assessment_info_ds, named('Assessment_info_ds'));
+//output(tmp_deed_info_plus_assessmentWITHOUTDEED_EXPLOSIONCODES, named('tmp_deed_info_plus_assessmentWITHOUTDEED_EXPLOSIONCODES'));
+//output(tmp_deed_info_plus_assessmentLARGE, named('tmp_deed_info_plus_assessmentLARGE'));
+//output(tmp_deed_info_plus_assessment_Slimmer, named('tmp_deed_info_plus_assessment_Slimmer'));
+//output(tmp_deed_info_plus_assessment, named('tmp_deed_info_plus_assessment'));
+//output(fares_deed_info, named('fares_deed_info'));
+//output(fares_transaction_deed_infoNoExplosionCode, named('fares_transaction_deed_infoNoExplosionCode'));
+//output(AccessorRecsWithSellers, named('AccessorRecsWithSellers'));
+//output(tmp, named('tmp'));
+//output(tmp_deed_info_plus_assessment_extra, named('tmp_deed_info_plus_assessment_extra'));
+//output(tmp_deed_info_plus_assessment_extra_slim, named('tmp_deed_info_plus_assessment_extra_slim'));
+//output(tmp_deed_info_plus_assessment_extra_slimWMortgageAPN, named('tmp_deed_info_plus_assessment_extra_slimWMortgageAPN'));
+//output(tmp_deed_info_plus_assessment_extra_slim2, named('tmp_deed_info_plus_assessment_extra_slim2'));
+//output(deed_info_plus_assessmentLarge, named('deed_info_plus_assessmentLarge'));
+//output(allRecs_accessor, named('allRecs_accessor'));
+//output(allRecs_accessor_slim, named('allRecs_accessor_slim'));
+//output(tmp_recs_sorted_Acc, named('tmp_recs_sorted_Acc'));
+//output(tmp_recs_Sorted_MortDeed, named('tmp_recs_Sorted_MortDeed'));
+//output(tmp_recsRolledA, named('tmp_recsRolledA'));
+//output(tmp_recsRolledMortDeed, named('tmp_recsRolledMortDeed'));
+//output(tmpSet, named('tmpSet'));
+//output(tmpSetRolled, named('tmpSetRolled'));
+//output(deed_info_plus_assessment, named('deed_info_plus_assessment'));
+//output(prop_list, named('prop_list'));
+// output(all_grouped, named('all_grouped'));         
+// output(all_rptdetail_rolled, named('all_rptdetail_rolled'));
+// output(raw_data_wAcctno, named('raw_data_wAcctno'));
+// output(final_results, named('final_results'));
 															  
-   // debug
-	   // output(ds_in_data, named('ds_in_data'));
-		 //output(choosen(property_recs_raw,3500), named('property_recs_raw'));
-			
-			//output(CnameReport, named('CnameReport'));
-		//output(property_recs_dedup, named('property_recs_dedup'));
-		 // output(ds_assessor, named('ds_assessor'));		
-		 
-		 // output(choosen(property_party1,250), named('property_party1'));
-				//output(property_party1, named('property_party1'));		
-				
-				// DEBUG HERE
-			   // output(tmpSellers, named('tmpSellers'));			
-				 // output(tmpSellers2, named('tmpSellers2'));	
-				 // END DEBUG
-					
-				 // output(choosen(property_partyPayload,500), named('property_partyPayload'));
-				 // output(count(property_partyPayload), named('count_property_partyPayload'));				 				
-		
-		  // output(property_recs_normalized, named('property_recs_normalized'));	    			
-		// output(count(property_partyPayloadDeduped), named('count_property_partyPayloadDeduped'));
-		
-
-		 //output(property_partyPayLoadSlim, named('property_partyPayLoadSlim'));
-		// output(count(property_partyPayload), named('property_partyPayload_count'));
-		// output(property_partySellers, named('property_partySellers'));
-		// output(property_partySellersSlim, named('property_partySellersSlim'));
-		//output(count(right_side), named('right_side'));
-		// output(count(Property_partyPayloadSellersSlim), named('Property_partyPayloadSellersSlim'));
-		 
-		// output(property_partySellersAll, named('poperty_partySellersAll'));
-    ////output(foreclosureNODSection, named('foreclosureNODSection'));
-		
-   // CURRENT DEBUG		
-		 // output(property_partyPayloadDeduped1, named('property_partyPayloadDeduped1'));
-	
-		 // output(property_partyPayloadDeduped4, named('property_partyPayloadDeduped4'));
-		 // output(Seller_ln_fares_idPayloadSlim, named('Seller_ln_fares_idPayloadSlim'));
-		 
-		  //output(property_partyPayloadDeduped, named('property_partyPayloadDeduped'));
-			 
-				// output(property_party_WFORE_NODS, named('property_party_WFORE_NODS'));
-				// output(property_party_dedup, named('property_party_dedup'));
-				////output(denorm1stParam, named('denorm1stParam'));
-				// output(denorm1stParam_all, named('count_denorm1stParam_all'));				
-				
-				////output(recs_parent_child, named('recs_parent_child'));
-				 ////output(recs_parent_child_slim, named('recs_parent_child_slim'));
-			 // CURRENT DEBUG		 
-				 
-		// output(Mort_info_forLNFARESID_M, named('Mort_info_forLNFARESID_M'));
-		
-		// output(Mort_info_forLNFARESID_D, named('Mort_info_forLNFARESID_D'));
-		// output(TmpMort_info_forLNFARESID, named('TmpMort_info_forLNFARESID'));
-		// output(Mort_info_forLNFARESID, named('Mort_info_forLNFARESID'));
-    // output(fares_transaction_deed_info, named('fares_transaction_deed_info'));    						
-		// output(property_partyPayloadOwnersOnly, named('property_partyPayloadOwnersOnly'));
-		
-		 // output(count(property_Transaction), named('property_Transaction'));
-		// output(count(property_TransactionSlim), named('property_TransactionSlim'));
-		// output(curAssessorsRecs, named('curAssessorsRecs'));
-		// output(foreclosureNODSection, named('foreclosureNODSection'));
-		
-		// output(nod, named('nod'));
-		// output(tmpnods, named('tmpnods'));
-	 // output(tmpNods2_Situs1, named('tmpNods2_Situs1'));
-	// output(tmpfores, named('tmpfores'));
-		// output(foreclos, named('foreclos'));
-		// // output(property_party, named('property_party'));
-	
-		// DEBUG
-		////output(tmpNods2, named('tmpNods2'));
-		
-
-
-		// output(property_party_WNOD1,named('property_party_WNOD1'));
-		// output(property_party_WNOD2,named('property_party_WNOD2'));
-		////output(property_party_WNOD,named('property_party_WNOD'));
-		
-		
-
-		// output(tmpFores, named('tmpFores'));
-		// output(tmpFores2 , named('tmpFores2'));
-		// output(final_results_tmp, named('final_results_tmp'));
-		// output(final_results_final, named('final_result_final'));
-		//
-		   // output(count(property_recs_normalized), named('Count_property_recs_normalized'));
-			//// output(property_partyPayload, named('property_partyPayload'));
-			// output(count(Assessment_info_Ds_AddedLandUse), named('count_Assessment_info_Ds_AddedLandUse'));
-		 // output(choosen(Assessment_info_Ds_AddedLandUse,500), named('Assessment_info_Ds_AddedLandUse'));
-	//// output(choosen(property_partyPayload_raw,200), named('property_partyPayload_raw'));
-		  //output(property_party_dedup, named('property_party_dedup'));
-			 // DEBUG HERE
-			// output(property_party1, named('property_party1'));	
-			  // output(count(tmpOwners1), named('count_tmpOwners1'));
-				 // output(choosen(tmpOwners1,1000), named('tmpOwners1_1000'));
-				 
-	// output(count(Property_partyPayloadDeduped), named('Count_Property_partyPayloadDeduped'));			 
-		// output(choosen(Property_partyPayloadDeduped,1000), named('Property_partyPayloadDeduped_1000'));	
-		   // output(count(tmpowners2), named('count_tmpOwners2'));
-	     // output(choosen(tmpOwners2,1000), named('tmpOwners2_1000'));
-	 		 // output(choosen(property_party1Owner,1000), named('property_party1Owner_1000'));
-			 // output(count(property_party1Owner), named('count_property_party1Owner'));
-			 // output(choosen(property_party1Seller,1000), named('property_party1Seller_1000'));
-			 // output(count(property_party1Seller), named('property_party1Seller_count'));
-			 
-			 
-     // END DEBUG
-			  // output(choosen(property_party1,2500), named('property_party1'));
-				
-		   // output(choosen(recs_parent_child_slim, 2000), named('recs_parent_child_slim'));
-			 // output(count(recs_parent_child_slim), named('count_recs_parent_child_slim'));
-		 //// output(Assessment_info_ds_OWNER_RELATIONSHIP_RIGHTS_CODE , named('Assessment_info_ds_OWNER_RELATIONSHIP_RIGHTS_CODE'));
-		 //// output(tmp, named('tmp'));
-		 
-		//2nd level debug sometimes over 10K recs kills hthor jobs.
-		 ////output(AccessorRecsWithSellers, named('AccessorRecsWithSellers'));
-		  //output(cnameReport, named('cnameReport'));
-		
-		  //output(choosen(tmp_deed_info_plus_assessmentLARGE (apn <> ''),500), named('tmp_deed_info_plus_assessmentLARGE'));
-// Coutput(tmp_deed_info_plus_assessment, named('tmp_deed_info_plus_assessment'));
- //output(count(tmp_deed_info_plus_assessment), named('count_tmp_deed_info_plus_assessment'));
-			////output(tmp_deed_info_plus_assessmentLARGE, named('tmp_deed_info_plus_assessmentLARGE'));
-			//// output(fares_transaction_deed_info, named('fares_transaction_deed_info'));
-		
-			
-		 	//// output(tmp_deed_info_plus_assessment_slimmer, named('tmp_deed_info_plus_assessment_slimmer'));
-	
-		//// output(tmp_deed_info_plus_assessment_extra, named('tmp_deed_info_plus_assessment_extra'));
-		//// output(tmp_deed_info_plus_assessment_extra_slim, named('tmp_deed_info_plus_assessment_extra_slim'));
-		///// output(tmp_deed_info_plus_assessment_extra_slim2, named('tmp_deed_info_plus_assessment_extra_slim2'));
-		
-		//// output(tmp_deed_info_plus_assessment_extra_slimWMortgageAPN, named('tmp_deed_info_plus_assessment_extra_slimWMortgageAPN'));
-		   
-		     // output(deed_info_plus_assessment, named('deed_info_plus_assessment'));
-			// output(allRecs_accessor, named('allRecs_accessor'));
-			// output(allRecs_accessor_slim, named('allRecs_accessor_slim'));
-			// output(allRecs_deed, named('allRecs_deed'));
-			// output(allRecs_deed_slim, named('allREcs_deed_slim'));
-			// output(allRecs_mort, named('allREcs_mort'));
-			// output(allRecs_mort_slim, named('allRecs_mort_slim'));
-			 // output(tmp_recs_sorted_Acc, named('tmp_recs_sorted_Acc'));
-			// output(tmp_recsRolledA, named('tmp_recsRolledA'));
-			
-			//output(ReportCompanyName, named('ReportCompanyName'));
-		
-			// output(tmp_recs_sorted_MortDeed,named('tmp_recs_sorted_mortDeed'));
-		// output(tmp_recsRolledMortDeed, named('tmp_recsRolledMortDeed'));
-			// output(tmp_recs_sorted, named('tmp_recs_sorted'));
-			// output(tmp_recs2, named('tmp_recs2'));
-		//// output(tmpSet, named('tmpSet'));
-			//// output(tmpsetRolled, named('tmpSetRolled'));
-    // output(fares_deed_info, named('fares_deed_info'));
-		 //output(count(fares_deed_info), named('count_fares_deed_info'));
-		 
-		
-		
-		// output(linkids_states_tabled_current, named('linkids_states_tabled_current'));
-		// output(linkids_states_tabled_prior, named('linkids_states_tabled_prior'));
-		// output(choosen(Mort_info_forLNFARESID_NoExplosionCodes,1000), 
-		// named('Mort_info_forLNFARESID_NoExplosionCodes'));
-		// output(tmp_deed_info_plus_assessment_extra_slimWMortgageAPN, 
-		// named('tmp_deed_info_plus_assessment_extra_slimWMortgageAPN'));
-		// output(propertyParty_recs_plus_stcnt_current, named('propertyParty_recs_plus_stcnt_current'));
-		
-		// output(propertyParty_recs_plus_stcnt_prior, named('propertyParty_recs_plus_stcnt_prior'));
-		//output(prop_list, named('prop_list'));
-		  // output(all_grouped, named('all_grouped'));
-		// output(count(all_grouped), named('count_all_grouped'));
-		 // output(count(all_grouped_slim), named('count_all_grouped_slim'));
-		
-		//output(all_rptdetail_rolled, named('all_rptdetail_rolled'));
-		// output(raw_data_wAcctno, named('raw_data_wAcctno'));		
-	//	output(Final_results, named('final_results'));	
+  
 	return(final_results);
 	
 end; // function

@@ -224,7 +224,7 @@ def dCnpNameOptimizations():
                                                                       AND Keyed(fallback_value >= param_fallback_value)
                                                                       
                                                                   ),
-                                                                  250000,
+                                                                  Config_BIP.L_CNPNAME_FUZZY_MAXBLOCKLIMIT,
                                                                   ONFAIL(TRANSFORM(SlimKeyRec, 
                                                                                    SELF := ROW([],SlimKeyRec))),
                                                                   keyed),
@@ -244,9 +244,6 @@ def dCnpNameOptimizations():
                   OR RIGHT.prim_name = (TYPEOF(RIGHT.prim_name))'') 
                   OR (RIGHT.prim_name = param_prim_name) 
                   OR ((Config_BIP.WithinEditN(RIGHT.prim_name,RIGHT.prim_name_len,param_prim_name,param_prim_name_len,1, 0))))
-                AND ((param_st = (TYPEOF(RIGHT.st))'' 
-                  OR RIGHT.st = (TYPEOF(RIGHT.st))'') 
-                  OR (RIGHT.st = param_st))
                 AND ((param_city = (TYPEOF(RIGHT.city))'' 
                   OR RIGHT.city = (TYPEOF(RIGHT.city))'') 
                   OR (RIGHT.city = param_city) 
@@ -267,9 +264,41 @@ def dCnpNameFuzzyFallbackValueChanges():
 	return [
 		('Key_BizHead_L_CNPNAME_FUZZY', 'h.fallback_value; // Populate the fallback field', 'HACK26a', '// Moved fallback_value up in layout to decrease number of seeks against index /*HACK26a*/', 'Remove field from previous position'),
 		('Key_BizHead_L_CNPNAME_FUZZY', '(h.company_name_prefix;)', 'HACK26b', '\g<1>\n  h.fallback_value; // Populate the fallback field /*HACK26b*/', 'Add field to new position'),
-		('Key_BizHead_L_CNPNAME_FUZZY', '\n(.*?)AND KEYED\(fallback_value >= param_fallback_value\)', 'HACK26c', '\g<1>', 'Remove old placement of fallback value in index lookup'),
+		('Key_BizHead_L_CNPNAME_FUZZY', '\n(.*?)AND KEYED\(fallback_value >= param_fallback_value\)\n', 'HACK26c', '\g<1>', 'Remove old placement of fallback value in index lookup'),
 		('Key_BizHead_L_CNPNAME_FUZZY', '(KEYED\(\(company_name_prefix = param_company_name_prefix\)\))', 'HACK26d', '\g<1>\n      AND KEYED(fallback_value >= param_fallback_value) /*HACK26d*/', 'Add new placement of fallback value in index lookup')
 	]
+
+##---------------------------------------------------------------------------
+##HACK27
+##Change limits and block sizes for CNPNAME_ZIP, CNPNAME_ST, CNPNAME_FUZZY
+##in BizLinkFull.Config
+##---------------------------------------------------------------------------		
+def dChangeConfigLimits():
+    return[
+        ('Config', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKSIZE:=10000;', 'HACK27a', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKSIZE:=250000; // Increased limit to 100K from 10K /*HACK27a*/', 'Increased limit to 100K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKLIMIT:=10000;', 'HACK27b', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKLIMIT:=250000; // Increased limit to 100K from 10K /*HACK27b*/', 'Increased limit to 100K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_ST_MAXBLOCKSIZE:=10000;', 'HACK27c', 'EXPORT L_CNPNAME_ST_MAXBLOCKSIZE:=250000; // Increased limit to 100K from 10K /*HACK27c*/', 'Increased limit to 100K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_ST_MAXBLOCKLIMIT:=10000;', 'HACK27d', 'EXPORT L_CNPNAME_ST_MAXBLOCKLIMIT:=250000; // Increased limit to 100K from 10K /*HACK27d*/', 'Increased limit to 100K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKSIZE:=10000;', 'HACK27e', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKSIZE:=250000; // Increased limit to 100K from 10K /*HACK27e*/', 'Increased limit to 100K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKLIMIT:=10000;', 'HACK27f', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKLIMIT:=250000; // Increased limit to 100K from 10K /*HACK27f*/', 'Increased limit to 100K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_MAXBLOCKSIZE:=10000;', 'HACK27g', 'EXPORT L_CNPNAME_MAXBLOCKSIZE:=250000; // Increased limit to 250K from 10K /*HACK27g*/', 'Increased limit to 250K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_MAXBLOCKLIMIT:=10000;', 'HACK27h', 'EXPORT L_CNPNAME_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27h*/', 'Increased limit to 250K from 10K')
+    ]
+
+##---------------------------------------------------------------------------
+##HACK28
+##Add limits to L_CNPNAME_ST and L_CNPNAME_ZIP for Roxie. Don't exists since
+##company name is using BOW
+##---------------------------------------------------------------------------		
+def dAddLimitsForBOW():
+    return[
+        ('Key_BizHead_L_CNPNAME_ST', '(doIndexRead.*? := STEPPED\()(KEY.*?$)', 'HACK28a', '\g<1>LIMIT(\g<2>', 'Add Limit to keyed lookup so as to not blow out the result set'),
+        ('Key_BizHead_L_CNPNAME_ST', '(AND .*?)(,ultid,orgid,seleid,proxid,PRIORITY.*?$)', 'HACK28b', '\g<1>,Config_BIP.L_CNPNAME_ST_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED)\g<2>', 'Add Limit to keyed lookup so as to not blow out the result set'),
+        ('Key_BizHead_L_CNPNAME_ST', '(Returnable\(DATASET\(RECORDOF\(RawData0\)\) d\).*?)<>(.*?$)', 'HACK28c', '\g<1>>\g<2>', 'Fix fallback logic to actually work and fallback'),
+        ('Key_BizHead_L_CNPNAME_ZIP', '(doIndexRead.*? := STEPPED\()(KEY.*?$)', 'HACK28a', '\g<1>LIMIT(\g<2>', 'Add Limit to keyed lookup so as to not blow out the result set'),
+        ('Key_BizHead_L_CNPNAME_ZIP', '(AND .*?)(,ultid,orgid,seleid,proxid,PRIORITY.*?$)', 'HACK28b', '\g<1>,Config_BIP.L_CNPNAME_ZIP_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED)\g<2>', 'Add Limit to keyed lookup so as to not blow out the result set'),
+        ('Key_BizHead_L_CNPNAME_ZIP', '(Returnable\(DATASET\(RECORDOF\(RawData0\)\) d\).*?)<>(.*?$)', 'HACK28c', '\g<1>>\g<2>', 'Fix fallback logic to actually work and fallback')
+    ]    
 
 getHacks = 	dAppendForce() + \
 			dUpdateKeynames() + \
@@ -283,6 +312,8 @@ getHacks = 	dAppendForce() + \
 			dExtFileDisableForceOn() + \
 			dRemoveRcidJoinCondition() + \
 			dCnpNameOptimizations() + \
-			dCnpNameFuzzyFallbackValueChanges()
+			dCnpNameFuzzyFallbackValueChanges() + \
+            dChangeConfigLimits() + \
+            dAddLimitsForBOW()
 			
 

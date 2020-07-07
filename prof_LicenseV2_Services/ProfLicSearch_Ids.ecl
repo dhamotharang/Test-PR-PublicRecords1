@@ -1,4 +1,4 @@
-import doxie_cbrs, doxie,
+﻿import doxie_cbrs, doxie,
   autostandardI, prof_licensev2_services, Healthcare_Header_Services, address, ut;
 
 export ProfLicSearch_Ids := module
@@ -81,13 +81,7 @@ export val_prolic(params in_params) := function
 
   prolic_Ids := dedup(sort(Prolic_Seq_Nums, prolic_seq_id, if(isDeepDive, 1, 0)), prolic_seq_id);
 
-  // output(get_auto, named('get_auto'));
-  // output(pre_Prolic_Seq_Nums, named('pre_Prolic_Seq_Nums'));
-  // output(in_params.is_search, named('is_search'));
-  // OUTPUT( byak_prolic, NAMED('byak_prolic') );
-  // output(byak_prolic, named('byak_prolic'));
-  // output(did_value, named('did_value'));
-  // output(bydid_prolic, named('bydid_prolic'));
+  
 
 
   return prolic_Ids;
@@ -183,6 +177,9 @@ export val_sanc(params in_params) := function
     Healthcare_Header_Services.Layouts.common_runtime_config buildConfig():=transform
       self.glb_ok :=  ut.glb_ok (gm.GLBPurpose);
       self.dppa_ok := ut.dppa_ok(gm.DPPAPurpose);
+      self.glb :=  gm.GLBPurpose;
+      self.dppa := gm.DPPAPurpose;
+
       self.DRM := gm.DataRestrictionMask;
       self.IncludeSanctions := true;
       dataRestrictEnclarity := gm.DataRestrictionMask[19] not in ['0',''];//if there is a value other than blank or Zero Restrict
@@ -292,6 +289,8 @@ export val_prov(params in_params) := function
     Healthcare_Header_Services.Layouts.common_runtime_config buildConfig():=transform
       self.glb_ok :=  ut.glb_ok (gm.GLBPurpose);
       self.dppa_ok := ut.dppa_ok(gm.DPPAPurpose);
+			self.glb := gm.GLBPurpose;
+		  self.dppa := gm.DPPAPurpose;
       self.DRM := gm.DataRestrictionMask;
       self.IncludeSanctions := true;
       dataRestrictEnclarity := gm.DataRestrictionMask[19] not in ['0',''];//if there is a value other than blank or Zero Restrict

@@ -1,7 +1,6 @@
-﻿
-import Inquiry_AccLogs, risk_indicators, doxie, riskwise;
+﻿IMPORT risk_indicators;
 
-EXPORT Boca_Shell_College_Attendance( grouped dataset(risk_indicators.layout_boca_shell) input_clam, boolean isFCRA, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
+EXPORT Boca_Shell_College_Attendance( grouped dataset(risk_indicators.layout_boca_shell) input_clam, boolean isFCRA) := function
 
 with_college_attendance := project(input_clam,
 	transform(risk_indicators.layout_boca_shell,
@@ -12,14 +11,7 @@ with_college_attendance := project(input_clam,
 																		 left.address_verification.address_history_2.Standardized_land_use_code in college_land_use_codes;
 																		 							 
 		self.address_history_summary.address_history_college_evidence := addr_history_college_evidence;
-		
-		inquiry_hit := exists(choosen(Inquiry_AccLogs.Key_Inquiry_DID(keyed(left.did=s_did) and
-						(unsigned)search_info.datetime[1..6] < left.historydate 
-						and bus_intel.industry='STUDENT LOANS'), 1));
-		
-		student_loan_inquiry := if(isFCRA, false, inquiry_hit);  // only ping inquiries for non-fcra
-	
-	
+			
 		self.attended_college := 
 													map(
 													left.did=0 => false,
@@ -30,7 +22,7 @@ with_college_attendance := project(input_clam,
 													left.student.file_type='' and (left.student.college_code<>'' or left.student.college_tier<>'' or left.student.college_major<>'' or
 																												 left.student.class<>'' or left.student.income_level_code<>'') => true,										 
 													addr_history_college_evidence => true,		
-													student_loan_inquiry => true,
+													left.attended_college => true,  // if we already have inquiries that said the person had student_loan, attended_college will already be set before getting in here
 													false);
 		self := left));	
 

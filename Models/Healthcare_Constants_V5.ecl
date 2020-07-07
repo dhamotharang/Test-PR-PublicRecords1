@@ -229,14 +229,14 @@ EXPORT Healthcare_Constants_V5 := MODULE
         export string10 TotalCostRiskScore_Rank_99_Max   := '1384.471';
         export string10 TotalCostRiskScore_Rank_100_Min  := '1384.471';
 
-        export string10 TotalCostRiskScore_Category_5_Low  := '1100';
-        export string10 TotalCostRiskScore_Category_4_High := '1100';
-        export string10 TotalCostRiskScore_Category_4_Low  := '850';
-        export string10 TotalCostRiskScore_Category_3_High := '850';
-        export string10 TotalCostRiskScore_Category_3_Low  := '650';
-        export string10 TotalCostRiskScore_Category_2_High := '650';
-        export string10 TotalCostRiskScore_Category_2_Low  := '450';
-        export string10 TotalCostRiskScore_Category_1_High := '450';
+        export string3 TotalCostRiskScore_Category_5_Low  := '96';
+        export string3 TotalCostRiskScore_Category_4_High := '95';
+        export string3 TotalCostRiskScore_Category_4_Low  := '86';
+        export string3 TotalCostRiskScore_Category_3_High := '85';
+        export string3 TotalCostRiskScore_Category_3_Low  := '71';
+        export string3 TotalCostRiskScore_Category_2_High := '70';
+        export string3 TotalCostRiskScore_Category_2_Low  := '51';
+        export string3 TotalCostRiskScore_Category_1_High := '50';
 
     end;
 END;

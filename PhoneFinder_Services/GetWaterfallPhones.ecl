@@ -155,9 +155,7 @@
   dPrimaryPhones := dWFQSentPrimaryPhone + dWaterfallPrimaryPhone;
 
   dWFQSentPrimaryPhoneDetail := IF(EXISTS(dPrimaryPhones) AND inMod.UseTransUnionPVS,
-                                    PhoneFinder_Services.GetQSentPhones.GetQSentPVSData(dPrimaryPhones,
-                                                                                        inMod, phone, acctno,
-                                                                                        TRUE, qSentGateway));
+    PhoneFinder_Services.GetQSentPhones.GetQSentPVSData(dPrimaryPhones, inMod, qSentGateway));
   // dPrimaryPhones + dPrimaryPhoneDetail - Primary phones including Qsent if no Waterfall phones found
   // dWFQSentOtherPhones - If no phones found in waterfall, Qsent other phones
   // dWFQSentMatches - If phones found in waterfall, all Qsent phones other than Primary
@@ -176,14 +174,15 @@
     SELF.carrier_name      := ri.carrier_name;
     SELF.phone_region_city := ri.phone_region_city;
     SELF.phone_region_st   := ri.phone_region_st;
-    SELF.coc_description   := ri.coc_description;
+    // for other phones keep metadata from transunion if we have it and we didn't find any in-house
+    SELF.coc_description   := IF(~isPrimaryPhone AND ri.coc_description = '', le.coc_description, ri.coc_description);
     SELF.phonestatus       := ri.phonestatus;
     SELF.servicetype       := ri.servicetype;
     SELF.prepaid           := ri.prepaid;
     SELF.RealTimePhone_Ext := ri.RealTimePhone_Ext;
     SELF.typeflag          := IF(isPrimaryPhone, ri.typeflag, le.typeflag);
     SELF.phone_source      := ri.phone_source;
-    SELF.dt_last_seen      := ri.dt_last_seen;
+    SELF.dt_last_seen      := IF(isPrimaryPhone, ri.dt_last_seen, le.dt_last_seen);
     SELF.isPrimaryPhone    := isPrimaryPhone;
     SELF                   := le;
   END;

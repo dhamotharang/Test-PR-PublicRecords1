@@ -55,7 +55,7 @@
 /*--INFO-- Business Shell Batch Service - This is the Batch Service utilizing BIP linking. */
 
 #option('expandSelectCreateRow', true);
-IMPORT Business_Risk_BIP, Gateway, iesp, UT, Cortera, Risk_Indicators, patriot, OFAC_XG5;
+IMPORT Business_Risk_BIP, Gateway, iesp, UT, Cortera, Risk_Indicators, patriot, OFAC_XG5, STD;
 
 EXPORT Business_Shell_Batch_Service() := FUNCTION
 	/* ************************************************************************
@@ -110,7 +110,11 @@ EXPORT Business_Shell_Batch_Service() := FUNCTION
 	'Include_MASI_Watchlist',
 	'Include_OFFC_Watchlist',
 	'Include_PMLC_Watchlist',
-	'Include_PMLJ_Watchlist'
+	'Include_PMLJ_Watchlist',
+	'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'
 	));
 	
 	/* ************************************************************************
@@ -127,8 +131,9 @@ EXPORT Business_Shell_Batch_Service() := FUNCTION
 	UNSIGNED1	GLBA_Purpose         := Business_Risk_BIP.Constants.Default_GLBA : STORED('GLBA_Purpose');
 	STRING50	DataRestrictionMask  := Business_Risk_BIP.Constants.Default_DataRestrictionMask : STORED('Data_Restriction_Mask');
 	STRING50	DataPermissionMask   := Business_Risk_BIP.Constants.Default_DataPermissionMask : STORED('Data_Permission_Mask');
+	#STORED('DataPermissionMask', DataPermissionMask); // Ensure our DataPermissionMask gets mapped in as AutostandardI DPM
 	STRING5	IndustryClass_In		   := Business_Risk_BIP.Constants.Default_IndustryClass : STORED('IndustryClass');
-	IndustryClass := StringLib.StringToUpperCase(TRIM(IndustryClass_In, LEFT, RIGHT));
+	IndustryClass := STD.Str.ToUpperCase(TRIM(IndustryClass_In, LEFT, RIGHT));
 	UNSIGNED1	LinkSearchLevel      := Business_Risk_BIP.Constants.LinkSearch.Default : STORED('LinkSearchLevel');
 	UNSIGNED1	MarketingMode        := Business_Risk_BIP.Constants.Default_MarketingMode : STORED('MarketingMode');
 	UNSIGNED1	BusShellVersion      := Business_Risk_BIP.Constants.Default_BusShellVersion : STORED('BusShellVersion');
@@ -175,6 +180,12 @@ EXPORT Business_Shell_Batch_Service() := FUNCTION
   boolean Include_OFFC_Watchlist:= false : stored('Include_OFFC_Watchlist');
   boolean Include_PMLC_Watchlist:= false : stored('Include_PMLC_Watchlist');
   boolean Include_PMLJ_Watchlist:= false : stored('Include_PMLJ_Watchlist');
+
+  //CCPA fields
+  unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+  string TransactionID := '' : STORED('_TransactionId');
+  string BatchUID := '' : STORED('_BatchUID');
+  unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 
   dWL := dataset([], iesp.share.t_StringArrayItem) +
   if(Include_ALL_Watchlist, dataset([{patriot.constants.wlALL}], iesp.share.t_StringArrayItem)) +
@@ -237,7 +248,11 @@ EXPORT Business_Shell_Batch_Service() := FUNCTION
 																																 Gateways,
 																																 RunTargusGateway, /* for testing purposes only */
 																																 OverrideExperianRestriction,
-																																 IncludeAuthRepInBIPAppend);
+																																 IncludeAuthRepInBIPAppend,
+																																 LexIdSourceOptout := LexIdSourceOptout, 
+																																 TransactionID := TransactionID, 
+																																 BatchUID := BatchUID, 
+																																 GlobalCompanyID := GlobalCompanyID);
 	
 	Final_Results := PROJECT(Shell_Results, TRANSFORM(Business_Risk_BIP.Layouts.OutputLayout, SELF := LEFT));
 	

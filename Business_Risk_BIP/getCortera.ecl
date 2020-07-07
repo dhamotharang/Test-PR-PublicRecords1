@@ -1,10 +1,11 @@
-﻿IMPORT BIPV2, Cortera, MDR, Risk_Indicators, STD, UT;
+﻿IMPORT BIPV2, Cortera, doxie, MDR, Risk_Indicators, STD, UT;
 
 EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
-												 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
-												 BIPV2.mod_sources.iParams linkingOptions,
-												 SET OF STRING2 AllowedSourcesSet,
-												 DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw)) := FUNCTION
+                          doxie.IDataAccess mod_access,
+                          Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
+                          BIPV2.mod_sources.iParams linkingOptions,
+                          SET OF STRING2 AllowedSourcesSet,
+                          DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw)) := FUNCTION
 	
 	Allow_Cortera := Options.DataRestrictionMask[42] IN ['0', ''];
 	
@@ -74,11 +75,13 @@ EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	CorteraBuildDate := Risk_Indicators.get_Build_date('cortera_build_version');
 	
 	CorteraRaw := Cortera.Key_LinkIDs.kfetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
-	                                         Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
-	                                         0, // ScoreThreshold --> 0 = Give me everything
-																					 Business_Risk_BIP.Constants.Limit_Default,
-																					 Options.KeepLargeBusinesses
-													);
+                                            Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+                                            0, // ScoreThreshold --> 0 = Give me everything
+                                            Business_Risk_BIP.Constants.Limit_Default,
+                                            Options.KeepLargeBusinesses,
+                                            mod_access,
+                                            /* append_contact */ TRUE
+                                           );
 	
 	// Add back our Seq numbers.
 	Business_Risk_BIP.Common.AppendSeq2(CorteraRaw, Shell, CorteraSeq);
@@ -88,7 +91,7 @@ EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
   
   // First, filter off records after our historydate. We will use this data to determine how long a business has been on Cortera header
   AllCorteraRecords := Business_Risk_BIP.Common.FilterRecords(CorteraSeq, dt_vendor_first_reported, 0, MDR.SourceTools.src_Cortera, AllowedSourcesSet);
-  
+    
   CorteraHeaderFirstSeen := TABLE(AllCorteraRecords,
 			{Seq,
 			 STRING6 DateVendorFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_vendor_first_reported, HistoryDate),		 
@@ -445,7 +448,7 @@ EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			LEFT OUTER, KEEP(1), ATMOST(100), FEW
 		);
 
-	CorteraStats := TABLE(CorteraRecs, 
+	CorteraStats_pre_pre := TABLE(CorteraRecs, 
 				{Seq,
 			 HistoryDate,
 			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
@@ -464,10 +467,55 @@ EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID)
 			 );
 	
+  // If running Business Shell version 31 or higher, we'll need a dataset consisting of records that exist in the past 24 months
+  // to calculate FirmEmployeeCount and FirmReportedSales.
+  CorteraRecs_past24Months := CorteraRecs( dt_vendor_last_reported >= STD.Date.AdjustDate( HistoryDate, year_delta := -2 ) );
+
+  // Sum of all most recent, populated employee count values among all unique data source company identifiers.
+  tbl_FirmEmployeeCount := TABLE(
+    DEDUP(SORT(CorteraRecs_past24Months(total_employees != ''), Seq, ultimate_linkid, -dt_last_seen, -(INTEGER)total_employees), Seq, ultimate_linkid),
+    {seq, FirmEmployeeCount := SUM( GROUP, (INTEGER)total_employees )},
+    Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) );  
+
+  CorteraStats_pre := 
+    JOIN(
+      CorteraStats_pre_pre, tbl_FirmEmployeeCount, 
+      LEFT.seq = RIGHT.seq, 
+      TRANSFORM( RECORDOF(CorteraStats_pre_pre),
+        SELF.FirmEmployeeCount := 
+						IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+								IF( COUNT(tbl_FirmEmployeeCount(seq = LEFT.seq)) > 0, RIGHT.FirmEmployeeCount, -1 ),
+								LEFT.FirmEmployeeCount ),
+        SELF := LEFT,
+        SELF := []
+      ),
+			LEFT OUTER, FEW
+    );
+
+  // Sum of all most recent, populated reported sales values among all unique data source company identifiers. 
+  tbl_FirmReportedSales := TABLE(
+      DEDUP(SORT(CorteraRecs_past24Months(total_sales != ''), Seq, ultimate_linkid, -dt_last_seen, -(INTEGER)total_sales), Seq, ultimate_linkid),
+      {seq, FirmReportedSales := SUM( GROUP, (INTEGER)total_sales )},
+      Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID) );  
+
+  CorteraStats :=
+    JOIN(
+      CorteraStats_pre, tbl_FirmReportedSales, 
+      LEFT.Seq = RIGHT.Seq, 
+      TRANSFORM( RECORDOF(CorteraStats_pre_pre),
+        SELF.FirmReportedSales := 
+						IF( Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+								IF( COUNT(tbl_FirmReportedSales(seq = LEFT.seq)) > 0, RIGHT.FirmReportedSales, -1 ),
+								LEFT.FirmReportedSales ),
+        SELF := LEFT,
+        SELF := []
+      ),
+      LEFT OUTER, FEW
+    );
+
 	tempLayout := RECORD
 		UNSIGNED4 Seq;
 		UNSIGNED3 HistoryDate;
-		INTEGER FirmReportedSales;
 		INTEGER YearStart;
 		INTEGER BusinessClosedDate;
 		STRING2 OwnershipType;
@@ -475,6 +523,7 @@ EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		DATASET(Business_Risk_BIP.Layouts.LayoutSources) Sources;
 		DATASET(Business_Risk_BIP.Layouts.LayoutSources) EmployeeSources;
 		DATASET(Business_Risk_BIP.Layouts.LayoutSICNAIC) SICNAICSources;
+		DATASET(Business_Risk_BIP.Layouts.LayoutSalesSources) SalesSources;
 	END;
 	
 	CorteraStatsTemp := PROJECT(CorteraStats, TRANSFORM(tempLayout,
@@ -493,7 +542,12 @@ EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																																	LEFT.DateVendorLastSeen,
 																																	LEFT.FirmEmployeeCount}], Business_Risk_BIP.Layouts.LayoutSources),
 																																	DATASET([],  Business_Risk_BIP.Layouts.LayoutSources));
-																				SELF.FirmReportedSales := LEFT.FirmReportedSales;
+																				SELF.SalesSources := DATASET([{LEFT.Source, 
+																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
+																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+																																	LEFT.DateLastSeen,
+																																	LEFT.DateVendorLastSeen,
+																																	LEFT.FirmReportedSales}], Business_Risk_BIP.Layouts.LayoutSalesSources);
 																				SELF.YearStart				 := LEFT.YearStart;
 																				SELF.OwnershipType		 := LEFT.OwnershipType;
 																				SELF.BusinessClosedDate := LEFT.BusinessClosedDate;
@@ -505,7 +559,7 @@ EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																																		SELF.HistoryDate := LEFT.HistoryDate;
 																																		SELF.Sources := LEFT.Sources + RIGHT.Sources; 
 																																		SELF.EmployeeSources := LEFT.EmployeeSources + RIGHT.EmployeeSources; 
-																																		SELF.FirmReportedSales := MAX(LEFT.FirmReportedSales, RIGHT.FirmReportedSales);
+																																		SELF.SalesSources := LEFT.SalesSources + RIGHT.SalesSources;
 																																		SELF.YearStart := MAX(LEFT.YearStart, RIGHT.YearStart);
 																																		SELF.OwnershipType := MAX(LEFT.OwnershipType, RIGHT.OwnershipType);
 																																		SELF.BusinessClosedDate := MAX(LEFT.BusinessClosedDate, RIGHT.BusinessClosedDate);
@@ -519,10 +573,10 @@ EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				SELF.Firmographic.OwnershipType := MAP(TRIM(RIGHT.OwnershipType)='P' => '1',
 																							 TRIM(RIGHT.OwnershipType)='V' => '2',
 																																							 '0');
-				SELF.Firmographic.FirmReportedSales := (STRING)Business_Risk_BIP.Common.capNum(IF(CorteraExists, RIGHT.FirmReportedSales, -1), -1, 99999999999);
 				SELF.B2B.BusinessClosedDate := IF(RIGHT.BusinessClosedDate > 0, (STRING)RIGHT.BusinessClosedDate, '-1');
 				SELF.Sources := LEFT.Sources + RIGHT.Sources;
 				SELF.EmployeeSources := LEFT.EmployeeSources + RIGHT.EmployeeSources;
+				SELF.SalesSources := LEFT.SalesSources + RIGHT.SalesSources;
         SELF.B2B.HeaderTimeOldest := IF(CorteraExists, LEFT.B2B.HeaderTimeOldest, '-1'); // If we haven't seen the business on the most recent Cortera update, overwrite this to -1.
 				SELF := LEFT
 			),
@@ -611,10 +665,13 @@ EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// OUTPUT(CHOOSEN(Shell, 100), NAMED('Sample_Shell'));
 	// OUTPUT(CHOOSEN(CorteraRetrotestRecs, 100), NAMED('Sample_CorteraRetrotestRecs'));
 	// OUTPUT(CHOOSEN(CorteraRaw, 100), NAMED('Sample_CorteraRaw'));
+  // OUTPUT(CHOOSEN(CorteraSeq, 100), NAMED('Sample_CorteraSeq'));
+  // OUTPUT(CHOOSEN(kFetchErrorCodes, 100), NAMED('Sample_kFetchErrorCodes'));
 	// OUTPUT(CHOOSEN(AllCorteraRecords, 100), NAMED('Sample_AllCorteraRecords'));
 	// OUTPUT(CHOOSEN(CorteraHeaderFirstSeen, 100), NAMED('Sample_CorteraHeaderFirstSeen'));
   // OUTPUT(CHOOSEN(withCorteraHeaderFirstSeen, 100), NAMED('Sample_withCorteraHeaderFirstSeen'));
 	// OUTPUT(CHOOSEN(CorteraRecs, 100), NAMED('Sample_CorteraRecs'));
+  // OUTPUT(CHOOSEN(CorteraRecs_DD, 100), NAMED('Sample_CorteraRecs_DD'));
 	// OUTPUT(CHOOSEN(CorteraAttributes_InHouse_All, 100), NAMED('Sample_CorteraAttributes_InHouse_All'));
 	// OUTPUT(CHOOSEN(CorteraAttributesFirstSeen, 100), NAMED('Sample_CorteraAttributesFirstSeen'));
 	// OUTPUT(CHOOSEN(withCorteraAttributesFirstSeen, 100), NAMED('Sample_withCorteraAttributesFirstSeen'));
@@ -624,6 +681,11 @@ EXPORT getCortera(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// OUTPUT(CHOOSEN(CorteraAttributesUltimateID, 100), NAMED('Sample_CorteraAttributesUltimateID'));
 	// OUTPUT(CHOOSEN(rollCorteraAttributes, 100), NAMED('Sample_rollCorteraAttributes'));
 	// OUTPUT(CHOOSEN(withCorteraAttributes, 100), NAMED('Sample_withCorteraAttributes'));
+	// OUTPUT(CHOOSEN(CorteraStats_pre_pre, 100), NAMED('Sample_CorteraStats_pre_pre'));
+  // OUTPUT(CHOOSEN(CorteraRecs_past24Months, 100), NAMED('Sample_CorteraRecs_past24Mos'));
+  // OUTPUT(CHOOSEN(tbl_FirmEmployeeCount, 100), NAMED('Sample_tbl_FirmEmployeeCount'));
+	// OUTPUT(CHOOSEN(CorteraStats_pre, 100), NAMED('Sample_CorteraStats_pre'));
+  // OUTPUT(CHOOSEN(tbl_FirmReportedSales, 100), NAMED('Sample_tbl_FirmReportedSales'));
 	// OUTPUT(CHOOSEN(CorteraStats, 100), NAMED('Sample_CorteraStats'));
 	// OUTPUT(CHOOSEN(CorteraStatsTemp, 100), NAMED('Sample_CorteraStatsTemp'));
 	// OUTPUT(CHOOSEN(CorteraStatsRolled, 100), NAMED('Sample_CorteraStatsRolled'));

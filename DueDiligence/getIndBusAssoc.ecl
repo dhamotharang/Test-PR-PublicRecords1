@@ -1,4 +1,4 @@
-﻿IMPORT BIPv2, Business_Risk_BIP, DueDiligence, PAW, STD;
+﻿IMPORT BIPv2, Business_Risk_BIP, Doxie, DueDiligence, Header, PAW, STD, Suppress;
 
 /*
 	Following Keys being used:
@@ -7,7 +7,8 @@
 */
 EXPORT getIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) individuals,
                       Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-                      BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+                      BIPV2.mod_sources.iParams linkingOptions,
+                      doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
     withPAW := JOIN(individuals, PAW.Key_Did,
                     KEYED(LEFT.inquiredDID = RIGHT.did), 
@@ -21,29 +22,35 @@ EXPORT getIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) individuals,
 
 
 
-    pawBusiness := JOIN(withPAW, PAW.Key_contactid,
-                        KEYED(LEFT.contactID = RIGHT.contact_id),
-                        TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, UNSIGNED4 historyDate, STRING8 dateFirstSeen, STRING8 dateLastSeen},
-                                  SELF.seq := LEFT.seq;
-                                  SELF.ultID := RIGHT.ultID;
-                                  SELF.orgID := RIGHT.orgID;
-                                  SELF.seleID := RIGHT.seleID;
-                                  SELF.did := LEFT.inquiredDID;
-                                  SELF.historyDate := LEFT.historyDate;
-                                  SELF.dateFirstSeen := RIGHT.dt_first_seen;
-                                  SELF.dateLastSeen := RIGHT.dt_last_seen;
-                                  SELF := [];),
-                        ATMOST(DueDiligence.Constants.MAX_ATMOST_1000));
+    pawBusiness_unsuppressed := JOIN(withPAW, PAW.Key_contactid,
+                                      KEYED(LEFT.contactID = RIGHT.contact_id),
+                                      TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, UNSIGNED6 assocID, UNSIGNED4 historyDate, STRING8 dateFirstSeen, STRING8 dateLastSeen, UNSIGNED4 global_sid},
+                                                SELF.global_sid := RIGHT.global_sid;
+                                                SELF.seq := LEFT.seq;
+                                                SELF.ultID := RIGHT.ultID;
+                                                SELF.orgID := RIGHT.orgID;
+                                                SELF.seleID := RIGHT.seleID;
+                                                SELF.did := LEFT.inquiredDID;
+                                                SELF.assocID := RIGHT.did;
+                                                SELF.historyDate := LEFT.historyDate;
+                                                SELF.dateFirstSeen := RIGHT.dt_first_seen;
+                                                SELF.dateLastSeen := RIGHT.dt_last_seen;
+                                                SELF := [];),
+                                      ATMOST(DueDiligence.Constants.MAX_ATMOST_1000));
                         
+    pawBusiness := Suppress.MAC_SuppressSource(pawBusiness_unsuppressed, mod_access);
                         
     //clean the dates
-    pawCleanDates := DueDiligence.Common.CleanDatasetDateFields(pawBusiness(seleID > 0), 'dateFirstSeen, dateLastSeen');
+    pawCleanDates := DueDiligence.Common.CleanDatasetDateFields(pawBusiness, 'dateFirstSeen, dateLastSeen');
     
     //filter out records after our history date
-		filterPAW := DueDiligence.Common.FilterRecordsSingleDate(pawCleanDates, dateFirstSeen);
+    filterPAW := DueDiligence.CommonDate.FilterRecordsSingleDate(pawCleanDates, dateFirstSeen);
+    
+    filterBusinessOnly := filterPAW(seleID > 0);
+    filterBusAssocOnly := filterPAW(assocID > 0);
     
     //remove duplicate businesses
-    uniquePAWBusinesses := DEDUP(SORT(filterPAW, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), dateFirstSeen, -dateLastSeen), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
+    uniquePAWBusinesses := DEDUP(SORT(filterBusinessOnly, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), dateFirstSeen, -dateLastSeen), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
     
     uniqueBusinessID := PROJECT(uniquePAWBusinesses, TRANSFORM({UNSIGNED6 uniqueBusIdentifier, RECORDOF(LEFT)}, SELF.uniqueBusIdentifier := COUNTER; SELF := LEFT;));
     
@@ -58,7 +65,7 @@ EXPORT getIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) individuals,
                                                               
                                                               
     //get all associated business details, returns DS of DueDiligence.LayoutsInternal.IndBusAssociations                                                          
-    allBusiness := DueDiligence.getIndBusAssocBus(convertToBusiness, options, linkingOptions);     
+    allBusiness := DueDiligence.getIndBusAssocBus(convertToBusiness, options, linkingOptions, mod_access);     
 
                                     
     //add the inquired's did back in
@@ -139,8 +146,97 @@ EXPORT getIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) individuals,
                                       SELF.individual.busAssociationScore := RIGHT.busAssocScore;
                                       SELF.individual.busAssociationFlags := RIGHT.busAssocFlags;
                                       SELF := LEFT;));
+                                      
+      
+ 
+ 
+    //get the BEOs
+    beos := NORMALIZE(allBusiness, LEFT.busAssociation.beos, TRANSFORM(DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout,
+                                                                          SELF.seq := LEFT.inputseq;
+                                                                          SELF.did := RIGHT.did;
+                                                                          SELF := [];)); 
+    
+    populatedBEODIDs := DEDUP(SORT(beos(did <> 0), seq, did), seq, did);
     
     
+    //get the business associates that are not the inquired
+    busAssociates := filterBusAssocOnly(did <> assocID);
+    
+    //remove duplicate business associates
+    uniqueAssociates := DEDUP(SORT(busAssociates, did, assocID), did, assocID);
+    
+    //only care about associates that are NOT BEOs
+    assocNotBEO := JOIN(uniqueAssociates, populatedBEODIDs,
+                        LEFT.seq = RIGHT.seq AND
+                        LEFT.assocID = RIGHT.did,
+                        TRANSFORM(RECORDOF(LEFT),
+                                  SELF := LEFT;),
+                        LEFT ONLY);
+    
+                                      
+    //add business associates to relationships of the inquired
+    convertAssocToInquired := JOIN(individuals, assocNotBEO,
+                                    LEFT.seq = RIGHT.seq AND
+                                    LEFT.inquiredDID = RIGHT.did,
+                                    TRANSFORM(DueDiligence.Layouts.Indv_Internal,
+                                              SELF.seq := LEFT.seq;
+                                              SELF.historyDate := LEFT.historyDate;
+                                              SELF.inquiredDID := LEFT.inquiredDID;
+                                              SELF.individual.did := RIGHT.assocID;
+                                              SELF.indvType := DueDiligence.Constants.INQUIRED_INDIVIDUAL_BUSINESS_ASSOCIATE;  
+                                              SELF := [];));
+                             
+    
+    //pull unique individuals for best data - only need to do it once per person
+    uniqueAssociateDIDs := DEDUP(SORT(convertAssocToInquired, individual.did), individual.did);
+
+    bestAssocData := DueDiligence.getIndInformation(options, mod_access).GetIndividualBestDataWithLexID(uniqueAssociateDIDs);
+    
+    
+    addToInquired := JOIN(convertAssocToInquired, bestAssocData,
+                          LEFT.individual.did = RIGHT.individual.did,
+                          TRANSFORM(DueDiligence.Layouts.Indv_Internal,
+                                    SELF.seq := LEFT.seq;
+                                    SELF.inquiredDID := LEFT.inquiredDID;
+                                    SELF := RIGHT;),
+                          LEFT OUTER,
+                          ATMOST(1));
+    
+    reformatAssociates := PROJECT(bestAssocData, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DATASET(DueDiligence.Layouts.SlimRelation) relations},
+                                                        SELF.seq := LEFT.seq;
+                                                        SELF.did := LEFT.inquiredDID;
+                                                        SELF.relations := DATASET([TRANSFORM(DueDiligence.Layouts.SlimRelation, 
+                                                                                              SELF.relationToInquired := LEFT.indvType;
+                                                                                              SELF.relationship := Header.relative_titles.num_associate;
+                                                                                              SELF.rawRelationshipType := DueDiligence.Constants.INQUIRED_INDIVIDUAL_BUSINESS_ASSOCIATE;
+                                                                                              SELF := LEFT.individual; 
+                                                                                              SELF := [];)]);
+                                                        SELF := [];));
+                                                            
+    sortReformatted := SORT(reformatAssociates, seq, did);
+    rollReformatted := ROLLUP(sortReformatted,
+                              LEFT.seq = RIGHT.seq AND
+                              LEFT.did = RIGHT.did,
+                              TRANSFORM(RECORDOF(LEFT),
+                                        SELF.relations := LEFT.relations + RIGHT.relations;
+                                        SELF := LEFT;));
+    
+
+    addAssociates := JOIN(addAssociations, rollReformatted,
+                          LEFT.seq = RIGHT.seq AND
+                          LEFT.inquiredDID = RIGHT.did,
+                          TRANSFORM(DueDiligence.Layouts.Indv_Internal,
+                                    SELF.associates := LEFT.associates + RIGHT.relations;
+                                    SELF := LEFT;),
+                          LEFT OUTER,
+                          ATMOST(1));
+
+
+
+
+
+
+
 
 
 
@@ -149,6 +245,8 @@ EXPORT getIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) individuals,
     // OUTPUT(pawBusiness, NAMED('pawBusiness'));
     // OUTPUT(pawCleanDates, NAMED('pawCleanDates'));
     // OUTPUT(filterPAW, NAMED('filterPAW'));
+    // OUTPUT(filterBusinessOnly, NAMED('filterBusinessOnly'));
+    // OUTPUT(filterBusAssocOnly, NAMED('filterBusAssocOnly'));
     // OUTPUT(uniquePAWBusinesses, NAMED('uniquePAWBusinesses'));
     // OUTPUT(uniqueBusinessID, NAMED('uniqueBusinessID'));
     // OUTPUT(convertToBusiness, NAMED('convertToBusiness'));
@@ -164,8 +262,22 @@ EXPORT getIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) individuals,
     // OUTPUT(convertForDS, NAMED('convertForDS'));
     // OUTPUT(rollConverted, NAMED('rollConverted'));
     // OUTPUT(addAssociations, NAMED('addAssociations'));
+
+    // OUTPUT(beos, NAMED('beos'));
+    // OUTPUT(populatedBEODIDs, NAMED('populatedBEODIDs'));
+    // OUTPUT(busAssociates, NAMED('busAssociates'));
+    // OUTPUT(uniqueAssociates, NAMED('uniqueAssociates'));
+    // OUTPUT(assocNotBEO, NAMED('assocNotBEO'));
+    // OUTPUT(convertAssocToInquired, NAMED('convertAssocToInquired'));
+    // OUTPUT(uniqueAssociateDIDs, NAMED('uniqueAssociateDIDs'));
+    // OUTPUT(bestAssocData, NAMED('bestAssocData'));
+    // OUTPUT(addToInquired, NAMED('addToInquired'));
+    // OUTPUT(reformatAssociates, NAMED('reformatAssociates'));
+    // OUTPUT(sortReformatted, NAMED('sortReformatted'));
+    // OUTPUT(rollReformatted, NAMED('rollReformatted'));
+    // OUTPUT(addAssociates, NAMED('addAssociates'));
    
             
             
-    RETURN addAssociations;
+    RETURN addAssociates;
 END;

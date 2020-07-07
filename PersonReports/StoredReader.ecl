@@ -125,6 +125,7 @@ export StoredReader := MODULE
     export unsigned1 crimrecords_version    := min (max (CriminalRecordVersion, 0), 4);
     export unsigned1 dea_version            := min (max (deaversion,            0), 4);
     export unsigned1 dl_version             := min (max (dlversion,             0), 4);
+    export unsigned1 email_version          := min (max (emailversion,          0), 4);
     export unsigned1 liensjudgments_version := min (max (judgmentlienversion,   0), 4);
     export unsigned1 property_version       := min (max (propertyversion,       0), 4);
     export unsigned1 ucc_version            := min (max (uccversion,            0), 4);
@@ -134,6 +135,12 @@ export StoredReader := MODULE
     // those were not used in doxie version
 
   end;
+
+  export email_options := MODULE //(PersonReports.IParam.emails)
+      export unsigned MaxEmailResults := 5 : STORED('MaxEmailResults');;
+      export string   EmailSearchTier := '' : STORED('EmailSearchTier');
+  end;
+
 
 END;
 /*

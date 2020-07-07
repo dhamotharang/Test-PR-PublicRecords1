@@ -1,4 +1,4 @@
-﻿import _Control, risk_indicators, suppress,Risk_Indicators, doxie, address, riskwise, NID, FCRA, Death_Master, MDR, Relationship, dx_header,STD,data_services;
+﻿import _Control, risk_indicators, suppress, doxie, address, riskwise, NID, FCRA, Death_Master, MDR, Relationship, dx_header,STD,data_services;
 onThor := _Control.Environment.OnThor;
 
 export iid_getSSNFlags(grouped DATASET(risk_indicators.Layout_output) inrec, unsigned1 dppa, unsigned1 glb, 
@@ -7,7 +7,8 @@ export iid_getSSNFlags(grouped DATASET(risk_indicators.Layout_output) inrec, uns
 							string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 							UNSIGNED1 BSversion = 3, 
 							unsigned8 BSOptions=0,
-							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) := function
+							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
+							doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
 
 unsigned1 iType := IF (isFCRA, data_services.data_env.iFCRA, 0);
 
@@ -387,8 +388,8 @@ got_SSNTableDL_fcra_thor := group(sort(distribute(got_SSNTableDL_fcra_thor_pre +
 	
 deathSSNKey := Death_Master.key_ssn_ssa(isFCRA);
 
-layout_output_DE_src getDeathSSN (layout_output_DE_src le, deathSSNKey ri) := transform
-
+{layout_output_DE_src, UNSIGNED4 global_sid} getDeathSSN (layout_output_DE_src le, deathSSNKey ri) := transform
+	self.global_sid := ri.global_sid;
 	ssnDeathHit := trim(ri.ssn)<>'';
 	full_history_date := Risk_Indicators.iid_constants.full_history_date(le.historydate);
 	pre_history := (string)ri.dod8 < full_history_date;
@@ -414,7 +415,7 @@ layout_output_DE_src getDeathSSN (layout_output_DE_src le, deathSSNKey ri) := tr
 	self := [];
 END;
 
-got_death_fcra_roxie := join (got_SSNTableDL_fcra, deathSSNKey,
+got_death_fcra_roxie_unformatted := join (got_SSNTableDL_fcra, deathSSNKey,
                    left.ssn!='' and keyed(left.ssn=right.ssn) and
 									 (((integer)right.DOD8 <> 0 and (string)right.DOD8[1..6] <= (string)left.historydate) or
 									  ((integer)right.filedate <> 0 and (string)right.filedate[1..6] <= (string)left.historydate)) and
@@ -422,8 +423,10 @@ got_death_fcra_roxie := join (got_SSNTableDL_fcra, deathSSNKey,
 									 right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) and
 									 (right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
                    getDeathSSN(left,right),left outer, KEEP(10), ATMOST(keyed(left.ssn=right.ssn),500));
- 
-got_death_fcra_thor_pre := join (distribute(got_SSNTableDL_fcra(ssn <> ''), hash64(ssn)), 
+
+got_death_fcra_roxie := PROJECT(got_death_fcra_roxie_unformatted, TRANSFORM(layout_output_DE_src, SELF := LEFT));
+
+got_death_fcra_thor_pre_unformatted := join (distribute(got_SSNTableDL_fcra(ssn <> ''), hash64(ssn)), 
 									 distribute(pull(deathSSNKey), hash64(ssn)),
                    (left.ssn=right.ssn) and
 									 (((integer)right.DOD8 <> 0 and (string)right.DOD8[1..6] <= (string)left.historydate) or
@@ -432,6 +435,8 @@ got_death_fcra_thor_pre := join (distribute(got_SSNTableDL_fcra(ssn <> ''), hash
 									 right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) and
 									 (right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
                    getDeathSSN(left,right),left outer, KEEP(10), ATMOST(left.ssn=right.ssn,500), LOCAL);
+
+got_death_fcra_thor_pre := PROJECT(got_death_fcra_thor_pre_unformatted, TRANSFORM(layout_output_DE_src, SELF := LEFT));
 
 got_death_fcra_thor := got_death_fcra_thor_pre + got_SSNTableDL_fcra(ssn='');
 									 
@@ -487,7 +492,7 @@ got_SSNTableDL_nonfcra_thor := got_SSNTableDL_nonfcra_thor_pre +
 																				self.dlsocsdobflag := '2',
 																				self := left));
 
-got_death_nonfcra_roxie := join (got_SSNTableDL_nonfcra_roxie, deathSSNKey,
+got_death_nonfcra_roxie_unsuppressed := join (got_SSNTableDL_nonfcra_roxie, deathSSNKey,
                    left.ssn!='' and keyed(left.ssn=right.ssn) and
 									 (((integer)right.DOD8 <> 0 and (string)right.DOD8[1..6] <= (string)left.historydate) or
 									  ((integer)right.filedate <> 0 and (string)right.filedate[1..6] <= (string)left.historydate)) and									 
@@ -495,8 +500,19 @@ got_death_nonfcra_roxie := join (got_SSNTableDL_nonfcra_roxie, deathSSNKey,
 									 right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
 									 (right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
                    getDeathSSN(left,right),left outer, KEEP(10), ATMOST(keyed(left.ssn=right.ssn),500));
-									 
-got_death_nonfcra_thor := join (distribute(got_SSNTableDL_nonfcra_thor, hash64(ssn)), 
+									
+got_death_nonfcra_roxie_flagged := Suppress.CheckSuppression(got_death_nonfcra_roxie_unsuppressed, mod_access, data_env := iType);
+
+got_death_nonfcra_roxie := PROJECT(got_death_nonfcra_roxie_flagged, TRANSFORM(layout_output_DE_src, 
+	self.deceasedDate := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.deceasedDate);	
+	self.deceasedDOB := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.deceasedDOB);
+	self.deceasedfirst := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.deceasedfirst);
+	self.deceasedlast := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.deceasedlast);
+	self.deathsource := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.deathsource);
+    SELF := LEFT;
+)); 
+
+got_death_nonfcra_thor_unsuppressed := join (distribute(got_SSNTableDL_nonfcra_thor, hash64(ssn)), 
 									 distribute(pull(deathSSNKey), hash64(ssn)),
                    left.ssn!='' and (left.ssn=right.ssn) and
 									 (((integer)right.DOD8 <> 0 and (string)right.DOD8[1..6] <= (string)left.historydate) or
@@ -505,7 +521,18 @@ got_death_nonfcra_thor := join (distribute(got_SSNTableDL_nonfcra_thor, hash64(s
 									 right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
 									 (right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
                    getDeathSSN(left,right),left outer, KEEP(10), ATMOST(left.ssn=right.ssn,500), LOCAL);
-									 
+	
+got_death_nonfcra_thor_flagged := Suppress.CheckSuppression(got_death_nonfcra_thor_unsuppressed, mod_access, data_env := iType);
+
+got_death_nonfcra_thor := PROJECT(got_death_nonfcra_thor_flagged, TRANSFORM(layout_output_DE_src, 
+	self.deceasedDate := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.deceasedDate);	
+	self.deceasedDOB := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.deceasedDOB);
+	self.deceasedfirst := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.deceasedfirst);
+	self.deceasedlast := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.deceasedlast);
+	self.deathsource := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.deathsource);
+    SELF := LEFT;
+)); 
+
 #IF(onThor)
 	got_death_nonfcra := group(sort(got_death_nonfcra_thor, seq),seq);
 #ELSE
@@ -577,7 +604,7 @@ ssn_table_results1 := if(isFCRA, got_SSNTable_corr_proj, got_death_nonfcra_proj	
 		iids_dedp := dedup(sort(ungroup(multiple_use_ssns_with_wildcard_did)(did<>0),did), did);
 		justDids := PROJECT(iids_dedp, 
 			TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
-		rellyids := Relationship.proc_GetRelationship(justDids, topnCount:=500,
+		rellyids := Relationship.proc_GetRelationshipNeutral(justDids, topnCount:=500,
 			RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result;
 
 		multiple_use_ssn_with_relative_flag := join(multiple_use_ssns_with_wildcard_did, rellyids, 

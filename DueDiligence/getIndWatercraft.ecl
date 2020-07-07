@@ -1,13 +1,14 @@
-﻿IMPORT DueDiligence, STD, Watercraft;
+﻿IMPORT DueDiligence, STD, Watercraft, Doxie, Suppress;
 
 /*
 	Following Keys being used:
 			Watercraft.key_watercraft_did
       Watercraft.key_watercraft_sid
 */
-EXPORT getIndWatercraft(DATASET(DueDiligence.Layouts.Indv_Internal) inData) := FUNCTION
+EXPORT getIndWatercraft(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
+                                              doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
               
-    getSpouseAsInquired := DueDiligence.CommonIndividual.getRelationship(inData, spouses, DueDiligence.Constants.INQUIRED_INDIVIDUAL_SPOUSE);
+    getSpouseAsInquired := DueDiligence.CommonIndividual.GetRelationshipAsInquired(inData, spouses, DueDiligence.Constants.INQUIRED_INDIVIDUAL_SPOUSE);
   
     spouseAndInquired := getSpouseAsInquired + inData;
  
@@ -38,21 +39,24 @@ EXPORT getIndWatercraft(DATASET(DueDiligence.Layouts.Indv_Internal) inData) := F
                            ATMOST(LEFT.individual.did = RIGHT.l_did, DueDiligence.Constants.MAX_ATMOST_1000));
                         
 
-    watercraftDateDetails := JOIN(watercraftKeys, Watercraft.key_watercraft_sid(),
+    watercraftDateDetails_unsuppressed := JOIN(watercraftKeys, Watercraft.key_watercraft_sid(),
                                    KEYED(LEFT.stateOrigin = RIGHT.state_origin AND
                                          LEFT.watercraftKey = RIGHT.watercraft_key AND
                                          LEFT.sequenceKey = RIGHT.sequence_key),
-                                   TRANSFORM({RECORDOF(LEFT), STRING8 dateFirstSeen, STRING8 dateLastSeen},
+                                   TRANSFORM({RECORDOF(LEFT), STRING8 dateFirstSeen, STRING8 dateLastSeen, UNSIGNED4 global_sid},
+                                              SELF.global_sid := right.global_sid;
                                               SELF := LEFT;
                                               SELF.dateFirstSeen := IF(RIGHT.date_first_seen = DueDiligence.Constants.EMPTY, RIGHT.date_vendor_first_reported, RIGHT.date_first_seen);
                                               SELF.dateLastSeen := IF(RIGHT.date_last_seen = DueDiligence.Constants.EMPTY, RIGHT.date_vendor_last_reported, RIGHT.date_last_seen);), 
                                    ATMOST(DueDiligence.Constants.MAX_ATMOST_1000));
                                    
+    watercraftDateDetails := Suppress.MAC_SuppressSource(watercraftDateDetails_unsuppressed, mod_access);          
+    
     //Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
     watercraftCleanDates := DueDiligence.Common.CleanDatasetDateFields(watercraftDateDetails, 'dateFirstSeen');
     
     //Filter records based on when we first seen the data
-    filteredWatercraftRecords := DueDiligence.Common.FilterRecordsSingleDate(watercraftCleanDates, dateFirstSeen);  
+    filteredWatercraftRecords := DueDiligence.CommonDate.FilterRecordsSingleDate(watercraftCleanDates, dateFirstSeen);  
     
     slimWatercraft := PROJECT(filteredWatercraftRecords, TRANSFORM(DueDiligence.LayoutsInternal.WatercraftSlimLayout, SELF := LEFT;));
     
@@ -73,7 +77,7 @@ EXPORT getIndWatercraft(DATASET(DueDiligence.Layouts.Indv_Internal) inData) := F
     
     
     //Get the details about the watercraft
-    watercraftDetails := DueDiligence.getSharedWatercraft(rollSlimWatercracts); 
+    watercraftDetails := DueDiligence.getSharedWatercraft(rollSlimWatercracts, mod_access); 
     
     addWaterCraft := JOIN(inData, watercraftDetails,
                           LEFT.seq = RIGHT.seq AND

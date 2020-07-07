@@ -25,7 +25,9 @@ export TestSeed_Function(DATASET(Risk_Indicators.Layout_Input) inData,
 	
 	isPreScreenPurpose := STD.Str.ToUpperCase(Intended_Purpose) = 'PRESCREENING';
 	isCollectionsPurpose := STD.Str.ToUpperCase(Intended_Purpose) = 'COLLECTIONS';
-	
+  
+  CheckingIndicatorsRequest := STD.Str.ToLowerCase(AttributesVersionRequest) = RiskView.Constants.checking_indicators_attribute_request;
+
 // Get TestSeed Results
 RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_Input le, SeedKey ri) := TRANSFORM
 		SELF.Seq := le.Seq;
@@ -356,8 +358,28 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		self.PhoneInputSubjectCount	:= if(valid_attributes_requested, ri.PhoneInputSubjectCount	, '');
 		self.PhoneInputMobile 	:= if(valid_attributes_requested, ri.PhoneInputMobile 	, '');
 		self.AlertRegulatoryCondition	:= if(valid_attributes_requested, ri.AlertRegulatoryCondition	, '');
-	
-	
+    
+    //checking indicators section
+    self.CheckProfileIndex := if(CheckingIndicatorsRequest, ri.CheckProfileIndex	, '');
+    self.CheckTimeOldest := if(CheckingIndicatorsRequest, ri.CheckTimeOldest	, '');
+    self.CheckTimeNewest := if(CheckingIndicatorsRequest, ri.CheckTimeNewest	, '');
+    self.CheckNegTimeOldest := if(CheckingIndicatorsRequest, ri.CheckNegTimeOldest	, '');
+    self.CheckNegRiskDecTimeNewest := if(CheckingIndicatorsRequest, ri.CheckNegRiskDecTimeNewest	, '');
+    self.CheckNegPaidTimeNewest := if(CheckingIndicatorsRequest, ri.CheckNegPaidTimeNewest	, '');
+    self.CheckCountTotal := if(CheckingIndicatorsRequest, ri.CheckCountTotal	, '');
+    self.CheckAmountTotal := if(CheckingIndicatorsRequest, ri.CheckAmountTotal	, '');
+    self.CheckAmountTotalSinceNegPaid := if(CheckingIndicatorsRequest, ri.CheckAmountTotalSinceNegPaid	, '');
+    self.CheckAmountTotal03Month := if(CheckingIndicatorsRequest, ri.CheckAmountTotal03Month	, '');		
+		
+		// FIS attributes section
+		self.rv3ConfirmationSubjectFound	:= if(valid_attributes_requested, ri.rv3ConfirmationSubjectFound	, '');
+		self.rv3AddrChangeCount60Month	:= if(valid_attributes_requested, ri.rv3AddrChangeCount60Month	, '');
+		self.rv3AddrChangeCount12Month	:= if(valid_attributes_requested, ri.rv3AddrChangeCount12Month	, '');
+		self.rv3AddrInputTimeOldest	:= if(valid_attributes_requested, ri.rv3AddrInputTimeOldest	, '');
+		self.rv3SourceNonDerogCount	:= if(valid_attributes_requested, ri.rv3SourceNonDerogCount	, '');
+		self.rv3AssetPropCurrentCount	:= if(valid_attributes_requested, ri.rv3AssetPropCurrentCount	, '');
+		self.rv3SSNDeceased	:= if(valid_attributes_requested, ri.rv3SSNDeceased	, '');
+		self.rv3AssetIndex	:= if(valid_attributes_requested, ri.rv3AssetIndex	, '');
 		
 		//lien-judment section
 		self.LnJEvictionTotalCount           := if(lnjattributes_requested, ri.LnJEvictionTotalCount	, '');         
@@ -387,7 +409,6 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		self.LnjJudgmentCount                := if(lnjattributes_requested, ri.LnjJudgmentCount	, '');           
 		self.LnjJudgmentTimeNewest           := if(lnjattributes_requested, ri.LnjJudgmentTimeNewest	, '');           
 		self.LnjJudgmentDollarTotal          := if(lnjattributes_requested, ri.LnjJudgmentDollarTotal	, ''); 
-		
 		
 		// liens 1&2
 	
@@ -603,10 +624,9 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		iesp.riskview2.t_RiskView2Report;
 	END;
 	
-	report_results := if(run_report, Report_TestSeed_Function(Indata, TestDataTableName_in), dataset([], returnLayout));
-	
-	
-	FinalSeed := Join(seedResults, report_results, left.seq=right.seq, transform(RiskView.Layouts.Layout_RiskView5_Search_Results, self.report:=right, self:=left), LEFT OUTER, KEEP(1), ATMOST(100));
+	report_results := if(run_report OR lnjattributes_requested, Report_TestSeed_Function(Indata, TestDataTableName_in), dataset([], returnLayout));
+	              
+    FinalSeed := Join(seedResults, report_results, left.seq=right.seq, transform(RiskView.Layouts.Layout_RiskView5_Search_Results, self.report:=right, self:=left), LEFT OUTER, KEEP(1), ATMOST(100));
 	
 
 	// ------------------ DEBUGGING SECTION --------------------
@@ -623,6 +643,7 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 	// OUTPUT(Custom_Model_Name, NAMED('TS_Custom_Model_Name'));
 	// OUTPUT(seedResults, NAMED('seedResults'));
 	// OUTPUT(report_results, NAMED('report_results'));
+	// OUTPUT(finalseed, NAMED('finalseed'));
 	// ---------------------------------------------------------
 	
 	RETURN FinalSeed;

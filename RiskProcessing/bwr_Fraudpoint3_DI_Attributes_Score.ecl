@@ -1,7 +1,7 @@
 ﻿//This for requesting the Fraudpoint 202 + Digital Insights attribute group
 //Returns attributes counts of up to 538 (v202 + DI)
 
-import ut, risk_indicators, models, riskwise, iesp;
+import data_services, risk_indicators, models, riskwise, iesp;
 #workunit('name','Fraudpoint 3 Score and Attributes 202 + Digital Insights');
 
 //----------------
@@ -16,8 +16,8 @@ unsigned Threads        := 30;  //number of threads to use in the soapcall
 unsigned retrys         := 5 ;  //number of retrys in the soapcall
 
 //---------------- FILE NAMES -----------------
-filename := ut.foreign_prod + 'nmontpetit::out::chase_1139_apr_dev_sample_pii';
-outputfile := '~tfuerstenberg::out::TMX_examples_' + thorlib.wuid();
+filename := data_services.foreign_prod + 'nmontpetit::out::chase_1139_apr_dev_sample_pii';
+outputfile := '~tfuerstenberg::out::TMX_examples_' + '_' + thorlib.wuid();
 qa_outputfile := outputfile+'_QA';
 
 
@@ -39,7 +39,7 @@ historydate_to_use := 0;   //999999 will run in current mode
 GLB  := 1;
 DPPA := 3;
 DataRestriction_Mask := '0000000000000000000000000';  // byte 6, if 1, restricts experian || byte 8, if 1, restricts equifax || byte 10 restricts Transunion
-DataPermission_Mask  := '0000000000100';    // to allow population of FDN Virtual Fraud, Test Fraud and Contributory Fraud, set position 11 to '1'
+DataPermission_Mask  := '0000000000101';    // to allow population of FDN Virtual Fraud, Test Fraud and Contributory Fraud, set position 11 to '1'
                                             // to allow access to Insurance DL data, set position 13 to '1'
 _IncludeRiskIndices := FALSE; // Set to true to return riskIndicies if the requested model is able
 _OfacOnly           := FALSE;
@@ -82,6 +82,7 @@ f := if(record_limit = 0, //depending on the record_limit, either process the en
 				choosen(dataset(filename,prii_layout, csv(quote('"'))), record_limit));
 
 output(choosen(f,eyeball), named('original_input'));
+output(count(f), named('original_input_count'));
 
 Layout_Attributes_In := RECORD
 	string name;
@@ -204,7 +205,7 @@ layout_old_acct into_fdInput(f le, INTEGER c) := TRANSFORM
                         IF(Model2 != '', modelrequest2) +
                         IF(Model3 != '', modelrequest3); //Fraudpoint now accepts up to 3 models. To pass in more then 1 model use the request structures above
   
- 	self.gateways := dataset([{'threatmetrix_test', 'http://rw_score_dev:Password01@gatewaycertesp.sc.seisint.com:7426/WsGatewayEx/?ver_=2.28'}], Risk_Indicators.Layout_Gateways_In)
+ 	self.gateways := riskwise.shortcuts.gw_threatmetrix;
                    /* + riskwise.shortcuts.gw_netacuityv4 */
                    /* + riskwise.shortcuts.gw_targus */;     //Can uncomment targus gateway and/or watchlists if needed
                    
@@ -275,7 +276,7 @@ resu := soapcall(dist_dataset, roxieIP,
 				retry(retrys),
 				onFail(myFail(LEFT)));
 				
-output(choosen(resu, eyeball), named('roxie_result'));
+// output(choosen(resu, eyeball), named('roxie_result'));
 	
 fd_attributes_norm := RECORD
 	string30 AccountNumber;
@@ -1447,9 +1448,14 @@ qa_results := GROUP(SORT(JOIN(resu(Shell.Account<>''), fdInput, LEFT.Shell.Accou
                       TRANSFORM({Models.Layout_Fraudpoint_Debug.Shell, STRING errorcode}, 
                       SELF.Account := RIGHT.old_account_number, SELF := LEFT.Shell, SELF := LEFT)), Account), Account);
 
-output(choosen(normed, eyeball), named('sample'));
-output(choosen(normed(errorcode<>''), eyeball), named('errors'));
-output(count(normed(errorcode<>'')), named('err_count'));
+DI_input_errors := normed(errorcode = '0ReceivedRoxieException: (Invalid request for Digital Insights, must supply a phone number and email.)');
+
+Other_errors := normed(errorcode not in ['','0ReceivedRoxieException: (Invalid request for Digital Insights, must supply a phone number and email.)']);
+
+// output(choosen(normed, eyeball), named('sample'));
+output(choosen(DI_input_errors, eyeball), named('DI_input_errors'));
+output(choosen(Other_errors, eyeball), named('Other_errors'));
+output(count(Other_errors), named('Other_error_count'));
 
 attr_plus_scores := group(sort(normed, accountnumber), accountnumber);
 
@@ -1517,7 +1523,7 @@ end;
 
 rolled_scores := rollup(scores_denormed, true, combine_scores(left,right));
 
-to_1_record := join(rolled_scores, attrs_only,
+to_1_record_temp := join(rolled_scores, attrs_only,
                     left.accountnumber = right.accountnumber,
                     Transform(fd_attributes_norm,
                               self.fp_score1 :=left.fp_score1;
@@ -1550,13 +1556,19 @@ to_1_record := join(rolled_scores, attrs_only,
                               self := right
                               ));
 
-output(choosen(to_1_record, eyeball), named('to_1_record'));
+// output(choosen(to_1_record_temp, eyeball), named('to_1_record'));
 
 fd_attributes_norm_minus_compromised_dl := record
 	fd_attributes_norm - IdentityDriversLicenseComp;
 end;
 
+//Add any errors back to the results so that we have all the input records
+to_1_record := to_1_record_temp + DI_input_errors;
+
 without_compromised_dl := project(to_1_record, transform(fd_attributes_norm_minus_compromised_dl, self := left));
+
+output(choosen(to_1_record, eyeball), named('to_1_record'));
+output(choosen(without_compromised_dl, eyeball), named('without_compromised_dl'));
 
 // if the option is turned on to suppress compromised DLs, then output the file that has the attribute included
 // otherwise, output the file without that field in the layout
@@ -1564,6 +1576,8 @@ if(_SuppressCompromisedDLs,
 output(to_1_record,,outputfile,CSV(heading(single), quote('"')), overwrite),
 output(without_compromised_dl,,outputfile,CSV(heading(single), quote('"')), overwrite)
 );
+
+output(Other_errors,,outputfile + '_errors',CSV(heading(single), quote('"')), overwrite);
 
 IF(_include_internal_extras, OUTPUT(CHOOSEN(qa_results, eyeball), NAMED('Sample_QA_Results')));
 IF(_include_internal_extras, OUTPUT(qa_results,,qa_outputfile, CSV(heading(single), quote('"')), overwrite));

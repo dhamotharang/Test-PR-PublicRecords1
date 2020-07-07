@@ -1,7 +1,4 @@
-﻿/*2016-11-12T02:51:18Z (Michele Walklin)
-Adding XG5 logic
-*/
-import GlobalWatchLists, GlobalWatchLists_Services, iesp, ut, OFAC_XG5, Gateway;
+﻿IMPORT GlobalWatchLists, iesp, ut, OFAC_XG5, Gateway, Doxie, Suppress, Patriot;
 
 export Search_Batch_Function(GROUPED DATASET(patriot.Layout_batch_in) in_data, 
 														boolean ofaconly_value,
@@ -12,8 +9,18 @@ export Search_Batch_Function(GROUPED DATASET(patriot.Layout_batch_in) in_data,
 														integer2 dob_radius = -1,
 														dataset(iesp.share.t_StringArrayItem) watchlists_requested=dataset([], iesp.share.t_StringArrayItem),
 														boolean exclude_aka = false,
-														boolean exclude_weakaka = false) :=
+														boolean exclude_weakaka = false,
+														unsigned1 LexIdSourceOptout = 1,
+														string TransactionID = '',
+														string BatchUID = '',
+														unsigned6 GlobalCompanyId = 0) :=
 FUNCTION
+
+mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
 
 r_threshold_score := map(threshold_value = 0.00 and ofac_version < 4 => OFAC_XG5.Constants.DEF_THRESHOLD_REAL, 
 												threshold_value = 0.00 and ofac_version  >= 4 => OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL, 
@@ -29,7 +36,7 @@ gwl_key := GlobalWatchLists.Key_GlobalWatchLists_Key;
 
 layout_batch_ex :=
 RECORD
-	layout_batch_out;
+	Patriot.layout_batch_out;
 	gwl_key.first_name;
 	gwl_key.last_name;
 	gwl_key.cname;
@@ -51,7 +58,9 @@ TRANSFORM
 END;
 normed := NORMALIZE(base,LEFT.pty_keys,norm(LEFT,RIGHT));
 
-normed dobrange(normed l, globalwatchlists.Key_GlobalWatchLists_Key r):=transform
+{normed, UNSIGNED4 global_sid, UNSIGNED6 did} dobrange(normed l, globalwatchlists.Key_GlobalWatchLists_Key r):=transform
+	self.global_sid := r.global_sid;
+	self.did := r.did;
 	return_match := find_dob_match(l.dob,,r.dob_1,r.dob_2,r.dob_3,r.dob_4,r.dob_5,r.dob_6,r.dob_7,r.dob_8,
 																r.dob_9,r.dob_10,dob_radius);
 	
@@ -59,9 +68,11 @@ normed dobrange(normed l, globalwatchlists.Key_GlobalWatchLists_Key r):=transfor
 	self := l;
 END;
 	
-pre_dobs_in_range := join(normed,gwl_key,keyed(left.pty_key=right.pty_key),
+pre_dobs_in_range_unsuppressed := join(normed,gwl_key,keyed(left.pty_key=right.pty_key),
 											dobrange(left,right), keep(100));
 											
+pre_dobs_in_range := Suppress.Suppress_ReturnOldLayout(pre_dobs_in_range_unsuppressed, mod_access, RECORDOF(normed));
+
 dobs_in_range := pre_dobs_in_range(pty_key<>'');
 											
 duped_dobs_in_range :=dedup(sort(dobs_in_range,acctno,pty_key),acctno, pty_key);	
@@ -70,7 +81,7 @@ dob_normed := group(sort(join(normed,duped_dobs_in_range,left.acctno=right.acctn
 
 normed_Use := if(dob_radius=-1, normed,dob_normed);
 
-layout_batch_out pull_full(normed le, gwl_key ri) :=
+{layout_batch_out, UNSIGNED4 global_sid, UNSIGNED6 did} pull_full(normed le, gwl_key ri) :=
 TRANSFORM, SKIP((exclude_AKA AND ri.name_type IN ['AKA','STRONG AKA', 'WEAK AKA']) OR (exclude_WeakAKA AND ri.name_type IN ['WEAK AKA']))
 	SELF.country := le.country;
 	SELF := ri;
@@ -83,7 +94,7 @@ END;
 	is exceeded. It keeps only the input data & places the Error message (a constant defined
 	above) in the first Remarks field. Doing this allows the remainder of the file to process.
 */
-layout_batch_out return_input_with_error_msg (normed le ) :=
+{layout_batch_out, UNSIGNED4 global_sid, UNSIGNED6 did} return_input_with_error_msg (normed le ) :=
    TRANSFORM
       SELF.acctno         := le.acctno;
 	   SELF.seq            := le.seq;
@@ -94,12 +105,12 @@ layout_batch_out return_input_with_error_msg (normed le ) :=
 	   SELF.search_type    := le.search_type;
 	   SELF.country        := le.country;
 	   SELF.dob            := le.dob;
-	   SELF.remarks_1      := Constants.LIMIT_ERROR_MESSAGE;
+	   SELF.remarks_1      := Patriot.Constants.LIMIT_ERROR_MESSAGE;
 	   SELF                := [];
    END;
 
 	
-j_org := JOIN(normed_use, gwl_key,
+j_org_unsuppressed := JOIN(normed_use, gwl_key,
 			   keyed(LEFT.pty_key=RIGHT.pty_key) AND (
 			   (LEFT.first_name=RIGHT.first_name AND ut.NBEQ(LEFT.last_name,RIGHT.last_name)) OR 
 			   ut.NBEQ(LEFT.cname,RIGHT.cname) OR 
@@ -109,7 +120,9 @@ j_org := JOIN(normed_use, gwl_key,
 			   // When an input record exceeds the limit, return only the input data & message.
 			   ONFAIL( return_input_with_error_msg (LEFT)),
 			   LEFT OUTER);
-				
+
+j_org := Suppress.Suppress_ReturnOldLayout(j_org_unsuppressed, mod_access, layout_batch_out);
+			
 /*  Per product (Dawn Hill), when an input record has a multiple hits where at least one of 
     those hits has too many records (exceeds the limit),she wants only one record returned
 	 and that record to contain only the input data and the error message. And example:  The 
@@ -142,13 +155,13 @@ j_org := JOIN(normed_use, gwl_key,
 
 j := ROLLUP( SORT( j_org, acctno, Remarks_1 != Constants.LIMIT_ERROR_MESSAGE),
              LEFT.acctno = RIGHT.acctno AND
-				 LEFT.Remarks_1 = Constants.LIMIT_ERROR_MESSAGE,
+				 LEFT.Remarks_1 = Patriot.Constants.LIMIT_ERROR_MESSAGE,
 				 TRANSFORM (LEFT)
 				);				
 
 s := SORT(j,-score, pty_key);
 
-Patriot.layout_batch_out iter(layout_batch_out le, layout_batch_out ri) :=
+Patriot.layout_batch_out iter(Patriot.layout_batch_out le, Patriot.layout_batch_out ri) :=
 TRANSFORM
 	HitNumAsNum := (INTEGER)le.HitNum;
 

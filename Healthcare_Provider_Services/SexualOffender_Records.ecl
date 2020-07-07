@@ -1,8 +1,12 @@
 import doxie,PersonReports,iesp,Healthcare_Header_Services;
-export SexualOffender_Records (Healthcare_Header_Services.IParams.ReportParams inputData,dataset(doxie.layout_references) dsDids) := module
-		emptyMod := module(project (inputData, PersonReports.input.sexoffenses, opt))
-			export string6 ssn_mask := inputData.ssnmask;
-		end;
+
+export SexualOffender_Records (Healthcare_Header_Services.IParams.ReportParams inputData,
+																doxie.IDataAccess mod_access,
+																dataset(doxie.layout_references) dsDids) := module
+
+		// sex-offenses in person reports depend on compliance values only
+		emptyMod := project (mod_access, PersonReports.IParam.sexoffenses);
+
 		export sexOffenderOffenses:=PersonReports.sexoffenses_records(dsDids,emptyMod)(inputData.IncludeSexOffenders);
 		getID(iesp.sexualoffender.t_SexOffRecordIdNumbers recID) := FUNCTION
 				ID := MAP(TRIM(recID.OffenderId)!='' => recID.OffenderId,

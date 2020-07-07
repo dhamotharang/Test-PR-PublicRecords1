@@ -1,4 +1,4 @@
-﻿import autoheaderi, autostandardi, BIPV2, doxie, iesp, address, UPS_Services, ut, dx_header;
+﻿import autoheaderi, autostandardi, BIPV2, doxie, iesp, address, Header, UPS_Services, ut, dx_header;
 
 
 export mod_Searches := MODULE
@@ -383,11 +383,23 @@ export mod_Searches := MODULE
 			daily_recs := GongAndDailyLookup(emptyDIDs).records;    // parallel with mod_PartialMatch
 			// gong_recs := GongAndDailyLookup(dids).records;        // executed sequentially (after mod_PM)
 
-			//WFPV8_recs := UPS_Services.fn_WaterfallPhonesLookup(dids,in_mod);
 			ind := hdr_recs + daily_recs; // + WFPV8_recs;
-					
+     
+			rec_header_plus := record(doxie.layout_presentation) 
+			 string2   addr_ind := '';
+			end;
+    
+			ind_plus := PROJECT(ind,rec_header_plus);
+      // The macro Header.MAC_Append_Addr_Ind sorts the result, so we don't have to.
+			ind_ranked := Header.MAC_Append_Addr_Ind(ind_plus, addr_ind, /*src*/, did, prim_range , 
+                                               prim_name, sec_range, city_name, st, zip, 
+                                               /*predir*/, /*postdir*/, /*addr_suffix */, 
+                                               /*dt_first_seen*/, /*dt_last_seen*/, /*dt_vendor_first_reported*/, 
+                                               /*dt_vendor_last_reported*/ , /*isTrusted*/ , 
+                                               /*isFCRA*/, /*hitQH*/, /*debug*/);                     
+                            
 			// convert records to output layout
-			UPS_Services.layout_Common indToLayoutTransform(ind L) := TRANSFORM
+			UPS_Services.layout_Common indToLayoutTransform(ind_ranked L) := TRANSFORM
 				SELF.rollup_key := if (L.did <> 0, L.did, L.rid);
 				SELF.rollup_key_type := if (L.did <> 0, UPS_Services.Constants.TAG_ROLLUP_KEY_DID, UPS_Services.Constants.TAG_ROLLUP_KEY_RID);
 
@@ -424,8 +436,9 @@ export mod_Searches := MODULE
 				SELF.history_flag := ''; // Used only for canadian data
 			END;
 
-			resp := CHOOSEN(PROJECT(SORT(ind,did,rid,phone<>''), indToLayoutTransform(LEFT)), //now deterministic
+			resp := CHOOSEN(PROJECT(ind_ranked, indToLayoutTransform(LEFT)), //now deterministic
 											Constant.MAX_SEARCH_RECORDS);
+                    
 			#if(UPS_Services.Debug.debug_flag)
 			output(resp, NAMED('ind_hdr'));
 			#end

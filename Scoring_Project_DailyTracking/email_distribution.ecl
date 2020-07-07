@@ -36,19 +36,31 @@ EXPORT email_distribution := MODULE
 										// 'Haley.Vicchio' + at +
 										// 'lea.smith' + at +
 										'';	
-	
+	//2/24/2020 edited PR_QA
 	SHARED PR_QA := 
 										'isabel.ma' + at +
-										'Amy.Southard' + at +
 										'Benjamin.Karnatz' + at +
 										'Matthew.Ludewig' + at +
 										'Apaar.Sinha' + at +
 										'Daniel.Harkins' + at +
+										'Sheryl.Ramos' + at +
+										'Noah.Lahr' + at +
+										'Karen.Acuna' + at +
+										'Lucky.Mores' + at +
+										'Vishesh.Dosaj' + at +
+                    'alexander.garcia' + at +
 										'';
 	
 	// SHARED INS_QA := 
 // ;
 	
+//2/1/2020 added Scoring_QA for boca_54
+//2/24/20  edited Scoring_QA
+	  SHARED Scoring_QA	:= 
+		                 //'isabel.ma' + at +
+										 //'Matthew.Ludewig' + at +
+ 		                //'alexander.garcia' + at + 
+	                   '';
 	SHARED Other_QA := 
 										// 'Nathan.Koubsky' + at +
 										'';
@@ -78,10 +90,15 @@ EXPORT busshell_list_all := PR_QA + Other_QA +  Modeling + ECL_Developers_Slim +
 
 EXPORT DDT_general_list := PR_QA + Other_QA + Modeling + Product + ECL_Developers_Slim + Engineering_QA + INS_Engineering;
 
-export addr_reports := '  Matthew.Ludewig@lexisnexisrisk.com; Isabel.Ma@lexisnexisrisk.com ;Benjamin.Karnatz@lexisnexisrisk.com; Todd.Steil@lexisnexisrisk.com;Michele.Walklin@lexisnexisrisk.com;David.Schlangen@lexisnexisrisk.com;andi.koenen@lexisnexisrisk.com;christopher.albee@lexisnexisrisk.com'	;					
-export business_reports := '  Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;  Benjamin.Karnatz@lexisnexisrisk.com; lea.smith@lexisnexisrisk.com; Haley.Vicchio@lexisnexisrisk.com;Tara.DeWit@lexisnexisrisk.com;Lewis.Hughes@lexisnexisrisk.com;Todd.Steil@lexisnexisrisk.com;Michele.Walklin@lexisnexisrisk.com;David.Schlangen@lexisnexisrisk.com;andi.koenen@lexisnexisrisk.com;christopher.albee@lexisnexisrisk.com;Zachary.Fredenberg@lexisnexisrisk.com';					
-export business_reports_detailed := 'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;Lewis.Hughes@lexisnexisrisk.com;benjamin.karnatz@lexisnexisrisk.com;apaar.sinha@lexisnexisrisk.com;Haley.Vicchio@lexisnexisrisk.com; Tara.DeWit@lexisnexisrisk.com;lea.smith@lexisnexisrisk.com;Zachary.Fredenberg@lexisnexisrisk.com';					
-export prod_reports := ' Apaar.Sinha@lexisnexisrisk.com; Isabel.Ma@lexisnexisrisk.com;Benjamin.Karnatz@lexisnexisrisk.com; Matthew.Ludewig@lexisnexisrisk.com; Amy.Southard@lexisnexisrisk.com; Daniel.Harkins@lexisnexisrisk.com';					
+//2/11/2020 added email distribution for boca_54
+EXPORT  boca_54_list	:= Scoring_QA;
+
+export addr_reports := '  Matthew.Ludewig@lexisnexisrisk.com; Isabel.Ma@lexisnexisrisk.com ;Benjamin.Karnatz@lexisnexisrisk.com; Todd.Steil@lexisnexisrisk.com;Michele.Walklin@lexisnexisrisk.com;David.Schlangen@lexisnexisrisk.com;andi.koenen@lexisnexisrisk.com;'	;					
+export business_reports := '  Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;  Benjamin.Karnatz@lexisnexisrisk.com; lea.smith@lexisnexisrisk.com; Haley.Vicchio@lexisnexisrisk.com;Lewis.Hughes@lexisnexisrisk.com;Todd.Steil@lexisnexisrisk.com;Michele.Walklin@lexisnexisrisk.com;David.Schlangen@lexisnexisrisk.com;andi.koenen@lexisnexisrisk.com;christopher.albee@lexisnexisrisk.com;Zachary.Fredenberg@lexisnexisrisk.com;Noah.Lahr@lexisnexisrisk.com';					
+export business_reports_detailed := 'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;Lewis.Hughes@lexisnexisrisk.com;benjamin.karnatz@lexisnexisrisk.com;apaar.sinha@lexisnexisrisk.com;Haley.Vicchio@lexisnexisrisk.com;lea.smith@lexisnexisrisk.com;Zachary.Fredenberg@lexisnexisrisk.com;Noah.Lahr@lexisnexisrisk.com';					
+export prod_reports := ' Apaar.Sinha@lexisnexisrisk.com; Isabel.Ma@lexisnexisrisk.com;Benjamin.Karnatz@lexisnexisrisk.com; Matthew.Ludewig@lexisnexisrisk.com; Sheryl.Ramos@lexisnexisrisk.com;Daniel.Harkins@lexisnexisrisk.com; Noah.Lahr@lexisnexisrisk.com;Karen.Acuna@lexisnexisrisk.com;Lucky.Mores@lexisnexisrisk.com;Vishesh.Dosaj@lexisnexisrisk.com';					
+
+
 // EXPORT Bocashell_collections_success_list := PR_QA + Other_QA + INS_QA + ECL_Developers_Slim;
 
 // EXPORT Bocashell_collections_fail_list := PR_QA + Other_QA + INS_QA;
@@ -105,21 +122,25 @@ export prod_reports := ' Apaar.Sinha@lexisnexisrisk.com; Isabel.Ma@lexisnexisris
 
 // EXPORT busshell_list_all := 'nathan.koubsky@lexisnexis.com;Nicholas.Montpetit@lexisnexis.com;darrin.udean@lexisnexis.com;Brent.Sorenson@lexisnexis.com;mike.woodberry@lexisnexis.com;jeffrey.feinstein@lexisnexis.com;Todd.Steil@lexisnexis.com;David.Schlangen@lexisnexis.com;Kenneth.Hill@lexisnexis.com;Brenton.Pahl@lexisnexis.com;Michele.Walklin@lexisnexis.com;heather.mccarl@lexisnexis.com;Robert.Perez@lexisnexis.com;Randy.Niemeyer@lexisnexis.com;Kevin.Huls@lexisnexis.com;InsurView.IV-QA@risk.lexisnexis.com;LNDataQA@risk.lexisnexis.com;rob.mcgee@lexisnexis.com;Nathan.Koubsky@lexisnexis.com;Benjamin.Weiner@lexisnexis.com;Benjamin.Karnatz@lexisnexis.com;Frank.Allen@lexisnexis.com;Apaar.Sinha@lexisnexis.com;Bridgett.Braaten@lexisnexis.com;lea.smith@lexisnexis.com;Jonathan.Deurlein@Lexisnexis.com';
 					
+//EXPORT fail_list :=
+	//				'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;apaar.sinha@lexisnexisrisk.com; Sheryl.Ramos@lexisnexisrisk.com;Daniel.Harkins@lexisnexisrisk.com; Noah.Lahr@lexisnexisrisk.com;Karen.Acuna@lexisnexisrisk.com;Lucky.Mores@lexisnexisrisk.com;Vishesh.Dosaj@lexisnexisrisk.com';
+
 EXPORT fail_list :=
-					'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;benjamin.karnatz@lexisnexisrisk.com;apaar.sinha@lexisnexisrisk.com; Amy.Southard@lexisnexisrisk.com' ;
+					'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;apaar.sinha@lexisnexisrisk.com;Sheryl.Ramos@lexisnexisrisk.com;Daniel.Harkins@lexisnexisrisk.com;Noah.Lahr@lexisnexisrisk.com;Karen.Acuna@lexisnexisrisk.com;Lucky.Mores@lexisnexisrisk.com;Vishesh.Dosaj@lexisnexisrisk.com';
+
 
 // EXPORT DDT_general_list := 
 					// 'nathan.koubsky@lexisnexis.com';
 // 'nathan.koubsky@lexisnexis.com; karthik.reddy@lexisnexis.com; benjamin.karnatz@lexisnexis.com; frank.allen@lexisnexis.com; suman.burjukindi@lexisnexis.com; Brandon.Walker@lexisnexis.com; Vikram.Pareddy@lexisnexis.com; mike.woodberry@lexisnexis.com; Nicholas.Montpetit@lexisnexis.com; Benjamin.Weiner@lexisnexis.com; Apaar.Sinha@lexisnexis.com; Bridgett.Braaten@lexisnexis.com; Todd.Steil@lexisnexis.com; Martin.Clary@lexisnexis.com;Jonathan.Deurlein@Lexisnexis.com';
 					
 EXPORT DDT_fail_list :=
-					'benjamin.karnatz@lexisnexisrisk.com;apaar.sinha@lexisnexisrisk.com; Matthew.Ludewig@lexisnexisrisk.com;isabel.ma@lexisnexisrisk.com; Amy.Southard@lexisnexisrisk.com';
+					'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;apaar.sinha@lexisnexisrisk.com; Sheryl.Ramos@lexisnexisrisk.com;Daniel.Harkins@lexisnexisrisk.com; Noah.Lahr@lexisnexisrisk.com;Karen.Acuna@lexisnexisrisk.com;Lucky.Mores@lexisnexisrisk.com;Vishesh.Dosaj@lexisnexisrisk.com';
 					
 EXPORT Bocashell_collections_success_list :=
-           'Apaar.Sinha@lexisnexisrisk.com;Benjamin.Karnatz@lexisnexisrisk.com; Matthew.Ludewig@lexisnexisrisk.com;isabel.ma@lexisnexisrisk.com; Amy.Southard@lexisnexisrisk.com; Daniel.Harkins@lexisnexisrisk.com';					 
+					'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;benjamin.karnatz@lexisnexisrisk.com;apaar.sinha@lexisnexisrisk.com; Sheryl.Ramos@lexisnexisrisk.com;Daniel.Harkins@lexisnexisrisk.com; Noah.Lahr@lexisnexisrisk.com;Karen.Acuna@lexisnexisrisk.com;Lucky.Mores@lexisnexisrisk.com;Vishesh.Dosaj@lexisnexisrisk.com';
 					
 EXPORT Bocashell_collections_fail_list :=
-					'benjamin.karnatz@lexisnexisrisk.com;Apaar.Sinha@lexisnexisrisk.com;Matthew.Ludewig@lexisnexisrisk.com;isabel.ma@lexisnexisrisk.com;Amy.Southard@lexisnexisrisk.com';
+					'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;apaar.sinha@lexisnexisrisk.com; Sheryl.Ramos@lexisnexisrisk.com;Daniel.Harkins@lexisnexisrisk.com; Noah.Lahr@lexisnexisrisk.com;Karen.Acuna@lexisnexisrisk.com;Lucky.Mores@lexisnexisrisk.com;Vishesh.Dosaj@lexisnexisrisk.com;alexander.garcia@lexisnexisrisk.com';
 
 EXPORT test_list :=
 					'isabel.ma@lexisnexisrisk.com';
@@ -134,16 +155,16 @@ Export Runway_test_list :=
 						'benjamin.karnatz@lexisnexis.com; apaar.sinha@lexisnexisrisk.com';
 						
 EXPORT Daily_Data_collections_fail_list :=
-           'Apaar.Sinha@lexisnexisrisk.com,Benjamin.Karnatz@lexisnexisrisk.com, Matthew.Ludewig@lexisnexisrisk.com,isabel.ma@lexisnexisrisk.com, Amy.Southard@lexisnexisrisk.com';
+					'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;apaar.sinha@lexisnexisrisk.com; Sheryl.Ramos@lexisnexisrisk.com;Daniel.Harkins@lexisnexisrisk.com; Noah.Lahr@lexisnexisrisk.com;Karen.Acuna@lexisnexisrisk.com;Lucky.Mores@lexisnexisrisk.com;Vishesh.Dosaj@lexisnexisrisk.com';
 
 EXPORT KS_Success_list:=					 
-           'Apaar.Sinha@lexisnexisrisk.com,Benjamin.Karnatz@lexisnexisrisk.com,   Matthew.Ludewig@lexisnexisrisk.com,isabel.ma@lexisnexisrisk.com, Vishesh.Dosaj@lexisnexisrisk.com, Amy.Southard@lexisnexisrisk.com, Daniel.Harkins@lexisnexisrisk.com';					 
+					'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;benjamin.karnatz@lexisnexisrisk.com;apaar.sinha@lexisnexisrisk.com;Vishesh.Dosaj@lexisnexisrisk.com; Sheryl.Ramos@lexisnexisrisk.com;Daniel.Harkins@lexisnexisrisk.com; Noah.Lahr@lexisnexisrisk.com;Karen.Acuna@lexisnexisrisk.com;Lucky.Mores@lexisnexisrisk.com';				 
 					 
 EXPORT BSS_Success_list:=						 
-           'Apaar.Sinha@lexisnexisrisk.com,Benjamin.Karnatz@lexisnexisrisk.com,   Matthew.Ludewig@lexisnexisrisk.com, isabel.ma@lexisnexisrisk.com, Vishesh.Dosaj@lexisnexisrisk.com, Amy.Southard@lexisnexisrisk.com, Daniel.Harkins@lexisnexisrisk.com';					 
+					'Matthew.Ludewig@lexisnexisrisk.com;Isabel.Ma@lexisnexisrisk.com;benjamin.karnatz@lexisnexisrisk.com;apaar.sinha@lexisnexisrisk.com;Vishesh.Dosaj@lexisnexisrisk.com; Sheryl.Ramos@lexisnexisrisk.com;Daniel.Harkins@lexisnexisrisk.com; Noah.Lahr@lexisnexisrisk.com;Karen.Acuna@lexisnexisrisk.com;Lucky.Mores@lexisnexisrisk.com';				 
 
 EXPORT BSS_Capone_Specific_Success_list:=					 
-					 'Apaar.Sinha@lexisnexisrisk.com,Benjamin.Karnatz@lexisnexisrisk.com, Matthew.Ludewig@lexisnexisrisk.com,isabel.ma@lexisnexisrisk.com, Amy.Southard@lexisnexisrisk.com, Daniel.Harkins@lexisnexisrisk.com';
+					 'Apaar.Sinha@lexisnexisrisk.com,Benjamin.Karnatz@lexisnexisrisk.com, Matthew.Ludewig@lexisnexisrisk.com,isabel.ma@lexisnexisrisk.com';
 					 
 // EXPORT ISS_Email_list:=					 
 					 // 'Bridgett.Braaten@lexisnexis.com';
@@ -158,5 +179,7 @@ EXPORT BocaHeader_Alert_List :=
 					 'Jonathan.Deurlein@lexisnexis.com,narasimha.peruka@lexisnexis.com,ursula.rothe@lexisnexis.com,Adnan.Siddique@lexisnexis.com,Gabriel.Marcan@lexisnexis.com,Apaar.Sinha@lexisnexis.com';
 					
 EXPORT SOCIO_Daily_Monitoring_Success_List :=
-				   'Daniel.Harkins@lexisnexisrisk.com;Matthew.Ludewig@lexisnexisrisk.com';
+				   'Daniel.Harkins@lexisnexisrisk.com,Matthew.Ludewig@lexisnexisrisk.com,Isabel.Ma@lexisnexisrisk.com,Sheryl.Ramos@lexisnexisrisk.com,Crayton.Hudspeth@lexisnexisrisk.com,Noah.Lahr@lexisnexisrisk.com';
+
+
 END;

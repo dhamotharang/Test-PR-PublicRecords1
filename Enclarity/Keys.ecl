@@ -1,17 +1,93 @@
-import doxie, tools;
-
+﻿import doxie, tools, ut;
+//this attribute strips out base file fields for the keys
 export Keys(string		pversion							= '',boolean pUseProd = false) := module
+
+	EXPORT Modified_License_Base	:= FUNCTION
+		orig_lic_base		:= Enclarity.Files(pversion,pUseProd).license_base.built(record_type <> 'D');
+		mo_only					:= orig_lic_base(lic_state = 'MO');
+		no_mo_lic				:= orig_lic_base(lic_state <> 'MO');
+		npi_base				:= Enclarity.Files(pversion,pUseProd).npi_base.built;
+		
+		lic_base_w_tax	:= record
+			Enclarity.Layouts.license_base;
+			Enclarity.Layouts.npi_base.npi_num;
+			Enclarity.Layouts.npi_base.taxonomy;
+		end;
+		
+		joined_npi	:= join(sort(distribute(mo_only, hash(group_key)), group_key, local),
+												sort(distribute(npi_base, hash(group_key)), group_key, local),
+													left.group_key = right.group_key,
+													transform({lic_base_w_tax},
+														self.npi_num	:= right.npi_num,
+														self.taxonomy	:= trim(right.taxonomy,all),
+														self					:= left),
+													left outer, local);
+	
+		mo_apn			:= joined_npi(taxonomy[1..4] = '363L' or taxonomy[1..4] = '364S' or taxonomy[1..3] = '367')
+										:persist('~thor_data400::base::enclarity::modified_license_w_taxonomy');
+		
+		non_mo_apn	:= joined_npi(taxonomy[1..4] <> '363L' and taxonomy[1..4] <> '364S' and taxonomy[1..3] <> '367')
+										:persist('~thor_data400::base::enclarity::modified_license_w_taxonomy_non_apn');;
+		
+		clear_exp_stat	:= project(mo_apn, 
+																transform(enclarity.Layouts.license_base,
+																	old_rec									:= if(left.dt_vendor_last_reported < (unsigned4)pversion, true, false);
+																	self.lic_end_date				:= if(old_rec,'00000000',left.lic_end_date),
+																	self.lic_status					:= if(old_rec,'',left.lic_status),
+																	self.clean_lic_end_date	:= if(old_rec,'00000000',left.clean_lic_end_date),
+																	self										:= left));
+																	
+		sort_clear_exp_stat	:= sort(distribute(clear_exp_stat, hash(group_key, lic_state, lic_num, lic_begin_date)),
+															group_key, lic_state, lic_num, lic_begin_date, local);
+
+		Enclarity.Layouts.license_base t_rollup(sort_clear_exp_stat L, sort_clear_exp_stat R) := TRANSFORM
+			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
+			SELF.dt_vendor_last_reported  := max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			SELF						 							:= IF(L.lic_end_date = '00000000', L, R);
+		END;
+
+		roll_mo_lic := ROLLUP(sort_clear_exp_stat,					
+										LEFT.group_key 			= RIGHT.group_key 			AND 
+										LEFT.lic_state 			= RIGHT.lic_state				AND				
+										LEFT.lic_num				= RIGHT.lic_num					AND						
+										// LEFT.lic_end_date		= RIGHT.lic_end_date	 	AND	 // don't match end date
+										// LEFT.lic_status			= RIGHT.lic_status		  AND
+										LEFT.lic_begin_date = RIGHT.lic_begin_date	AND
+										LEFT.record_type		= RIGHT.record_type,
+										t_rollup(LEFT,RIGHT),LOCAL);
+									
+		recombined_provs	:= no_mo_lic + project(non_mo_apn, enclarity.Layouts.license_base) + roll_mo_lic;
+		
+		dedup_recombined_provs	:= dedup(sort(distribute(recombined_provs, hash(group_key, lic_state, lic_num, lic_end_date, lic_status)),
+																	group_key, lic_state, lic_num, lic_end_date, lic_status, local), record, local):
+										persist('~thor_data400::base::enclarity::modified_license_persist_for_keys::' + pversion);
+										
+		RETURN dedup_recombined_provs;
+	END;
 
 	shared facility_Base						:= Files(pversion,pUseProd).facility_Base.Built;
 	shared fac_Base_gk							:= facility_Base(group_key <> '');
 	shared fac_Base_ak							:= facility_Base(addr_key <> '');
 
-	shared individual_Base					:= Files(pversion,pUseProd).individual_Base.Built;
+	shared revised_ind_layout	:= record
+		Enclarity.Layouts.individual_base - 
+				[xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, xadl2_matches, xadl2_matches_desc];
+	end;
+	
+	shared individual_Base					:= project(Files(pversion,pUseProd).individual_Base.Built, revised_ind_layout);
 	shared ind_Base_gk							:= individual_Base(group_key <> '');
 	shared ind_Base_lnpid						:= individual_Base(lnpid > 0);
 
-	shared associate_Base						:= Files(pversion,pUseProd).associate_Base.Built;
-	shared assoc_Base_gk						:= associate_Base(group_key <> '');
+	shared revised_assoc_layout	:= record
+		Enclarity.Layouts.associate_base - 
+				[xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, xadl2_matches, xadl2_matches_desc];
+	end;
+
+	shared associate_Base0					:= project(Files(pversion,pUseProd).associate_Base.Built, revised_assoc_layout):persist('~thor_data400::persist::enclarity::associate_mod_layout');												
+	shared associate_base						:= dedup(associate_base0, all):persist('~thor_data400::persist::enclarity::associte_base_for_keys');
+
+	shared assoc_Base_gk						:= associate_base(group_key <> '');
+																					
 	shared assoc_Base_ak						:= associate_Base(addr_key <> '');
 	shared assoc_Base_bill_tin			:= dedup(associate_Base((unsigned)bill_tin > 0),bill_tin,group_key,sloc_group_key,billing_group_key,all);
 	shared associate_base_bk				:= associate_Base(billing_group_key <> '');
@@ -24,7 +100,20 @@ export Keys(string		pversion							= '',boolean pUseProd = false) := module
 	shared dea_Base_gk							:= dea_Base(group_key <> '');
 	shared dea_Base_dea							:= dea_Base(dea_num <> '');
 
-	shared license_Base							:= Files(pversion,pUseProd).license_Base.Built;
+	// shared license_Base							:= Files(pversion,pUseProd).license_Base.Built;
+	// Modification 20180703 - Sometime this year, the MO nurse practitioner licensing boards stopped providing updated records when a
+	// provider surrendered their license, or it was revoked, or any other reason it became expired prematurely.  Expired licenses no
+	// longer appear in the list provided by the board, so the absence of a previously issued license from this list implies it is 
+	// expired.  For the purposes of this build, since the license record was previously received with a future expiration date 
+	// that could now be erroneous, the license_base build was changed to create an additional "persist" file to wipe out what is
+	// assumed to be bad expiration dates, and then the key created from that base.  It is important to know that the original license
+	// base still contains the expiration dates, so this means that the key and the base file will not match for the qualifying records.
+	// The modified code for this additional persist file can be found in Enclarity.Update_base.Modified_License_base.
+	
+	// make_lic_base	:= 									Update_Base(pversion,pUseProd).Modified_License_Base; 
+	make_lic_base	:= 									Modified_License_Base; 
+	
+	shared license_base							:= make_lic_base;  
 	shared lic_Base_gk							:= license_Base(group_key <> '');
 	shared lic_Base_lic							:= license_Base(lic_num_in <> '');
 
@@ -80,8 +169,9 @@ export Keys(string		pversion							= '',boolean pUseProd = false) := module
 	tools.mac_FilesIndex('individual_base(lnpid>0)		,{lnpid			}	  ,{ind_Base_lnpid	}'	,keynames(pversion,pUseProd).individual_lnpid		,individual_lnpid	 );
 
 	// associate keys - group_key, addr_key
-	tools.mac_FilesIndex('associate_base		,{group_key	}	  ,{assoc_Base_gk	}'	,keynames(pversion,pUseProd).associate_group_key		,associate_group_key	 );
-	tools.mac_FilesIndex('associate_base		,{addr_key	}	  ,{assoc_Base_ak	}'	,keynames(pversion,pUseProd).associate_addr_key		,associate_addr_key	 );
+	// tools.mac_FilesIndex('associate_base		,{group_key	}	  ,{assoc_Base_gk	}'	,keynames(pversion,pUseProd).associate_group_key		,associate_group_key	 );
+	tools.mac_FilesIndex('assoc_base_gk		,{group_key	}	  ,{assoc_Base_gk	}'	,keynames(pversion,pUseProd).associate_group_key		,associate_group_key	 );
+	tools.mac_FilesIndex('assoc_base_ak		,{addr_key	}	  ,{assoc_Base_ak	}'	,keynames(pversion,pUseProd).associate_addr_key		,associate_addr_key	 );
 	tools.mac_FilesIndex('assoc_Base_bill_tin,{bill_tin},{group_key,sloc_group_key,billing_group_key}'	,keynames(pversion,pUseProd).associate_bill_tin		,associate_bill_tin	 );
 	tools.mac_FilesIndex('associate_base_bk ,{billing_group_key},{associate_base_bk}'	,keynames(pversion,pUseProd).associate_bgk		,associate_bgk	 );
 		
@@ -131,4 +221,5 @@ export Keys(string		pversion							= '',boolean pUseProd = false) := module
 	tools.mac_FilesIndex('specialty_base		,{group_key,spec_code	}	  ,{specialty_Base_gk	}'	,keynames(pversion,pUseProd).specialty_group_key_spec_code		,specialty_group_key_spec_code	 );
 	tools.mac_FilesIndex('specialty_base		,{spec_desc,group_key	}	  ,{specialty_Base_gk	}'	,keynames(pversion,pUseProd).specialty_spec_desc_group_key		,specialty_spec_desc_group_key	 );
 			
+	
 end;

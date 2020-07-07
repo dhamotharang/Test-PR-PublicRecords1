@@ -20,7 +20,7 @@ FUNCTION
     EXPORT BOOLEAN UseTransUnionIQ411      := FALSE;
     EXPORT BOOLEAN UseTransUnionPVS        := FALSE;
     EXPORT BOOLEAN UseLastResort := FALSE;
-    EXPORT BOOLEAN UseInHousePhoneMetadata := FALSE;
+    EXPORT BOOLEAN UseInHousePhoneMetadataOnly := FALSE;
   END;
 
   dInDIDPopulated       := dIn(orig_did != 0 or did != 0);

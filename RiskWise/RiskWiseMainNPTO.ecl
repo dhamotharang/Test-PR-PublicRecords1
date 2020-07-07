@@ -34,7 +34,7 @@
 */
 /*--INFO-- 'npt1' */
 
-IMPORT Risk_Indicators, seed_files, gateway, Riskwise, STD;
+IMPORT Risk_Indicators, seed_files, gateway, Riskwise, STD, Inquiry_AccLogs, Risk_Reporting, Royalty;
 
 export RiskWiseMainNPTO := MACRO
 
@@ -320,7 +320,7 @@ RiskWise.Layout_NPTO format_out(Risk_Indicators.Layout_Output le) := TRANSFORM
 												le.combo_suffix,le.combo_postdir,le.combo_unit_desig,
 												le.combo_sec_range),'');
 												
-	self.score := Risk_Indicators.cviScore(le.phoneverlevel, le.socsverlevel, le, self.correctsocs, '', self.correcthphone, '', veraddr, verlast, true);
+	self.score := Risk_Indicators.cviScore(le.phoneverlevel, le.socsverlevel, le, '', veraddr, verlast, true);
 	self.ri := RiskWise.patriotReasonCodes(le, 6, true);
 	self.reason1 := self.ri[1].hri;
 	self.reason2 := self.ri[2].hri;

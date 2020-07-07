@@ -18,7 +18,7 @@ EXPORT ABMS_Layouts := MODULE
 	export autokeyInput := record
 			batchInterface;
 			unsigned8 	global_sid :=0;
-			unsigned4 record_sid:=0;
+			unsigned8 record_sid:=0;
 			boolean hasOptout := false;
 			boolean includeCareer := false;
 			boolean includeEducation := false;
@@ -29,7 +29,7 @@ EXPORT ABMS_Layouts := MODULE
 	export searchKeyResults := record
 		string20	acctno := '';
 		unsigned4 	global_sid :=0;
-		unsigned4 record_sid:=0;
+		unsigned8 record_sid:=0;
 		unsigned6   DID := 0;
 		STRING8   biog_number := '';
 		boolean 	isAutokeysResult := false;
@@ -173,6 +173,9 @@ EXPORT ABMS_Layouts := MODULE
 	Export LayoutOutput := Record
 			iesp.abms.t_ABMSResults;
 			boolean hasoptout:=false;
+			unsigned6   DID := 0;
+			unsigned4 global_sid;
+			unsigned8 record_sid;
 			boolean isAutoKeyResults := false;	
 			string Board_Name := '';	
 			string MOC_Cert_Name := '';	

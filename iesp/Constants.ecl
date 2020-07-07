@@ -4,11 +4,11 @@
 //
 // Due to multiple different developers style, some attributes are within the general
 // "Constants" module and others are within their own product sub-module.
-// 
+//
 // !!! ------> IF YOU ADD NEW ATTRIBUTES OR MODULES, AS A CURTIOUSY TO OTHERS,
 // PLEASE ADD THEM IN THE APPROPRIATE PRODUCT ALPHABETIC ORDER.
 
-// NOTE2: If you add a new module do not make it the same name as any existing 
+// NOTE2: If you add a new module do not make it the same name as any existing
 // iesp.* attribute name.  For some reason doing so causes a syntax error.
 
 // NOTE3: It also seems that adding a attribute name ABC inside MODULE_FOO
@@ -25,13 +25,13 @@ EXPORT Constants := MODULE
 		export UNSIGNED2 MaxVehicles := 10;
 		export UNSIGNED2 MaxPolicies := 10;
 	end;
-	
+
 	//Claims
 	export Claims := module
 		export UNSIGNED2 MaxClaims := 10;
 		export UNSIGNED2 MaxParticipants := 99;
 	end;
-  // Limits on record numbers for child datasets 
+  // Limits on record numbers for child datasets
 
   // Miscellaneous
 	export unsigned2 MaxCountMetronetPhones := 50;
@@ -41,20 +41,20 @@ EXPORT Constants := MODULE
 	export unsigned2 MaxCountASL := 1;
 	export unsigned2 MaxCountASLSearch := 1000;
 	export unsigned2 MaxPhoneListingTypes := 4; //so far: mobile, business, government, residential
-	export unsigned2 MaxCountIncomeRiskHRI := 25; // ~18 from biid + 5 new ones from includes both : 
-	                                              // business risk HRI codes and 
+	export unsigned2 MaxCountIncomeRiskHRI := 25; // ~18 from biid + 5 new ones from includes both :
+	                                              // business risk HRI codes and
 	                                              // 5 new ones in income risk
   export unsigned1 MaxResponseExceptions := 20;
 	export unsigned2 MaxCountHealthCareConsolidatedSearch := 1000;
-  
+
 	export unsigned2 MAX_REPORT_SOURCES := 1;
 	export unsigned2 MAX_CONSUMER_STATEMENTS := 100;
-  
+
 	// Full File Disclosure
 	export unsigned2 MaxConsumerAlerts := 100;
-	export unsigned2 MaxConsumerStatementIds := 20 * 5; 
+	export unsigned2 MaxConsumerStatementIds := 20 * 5;
 	export unsigned2 MaxConsumerStatements := 200;
-	
+
   // Accidents - Florida and National
 	export unsigned2 ACCIDENTS_MAX_COUNT_SEARCH_RESPONSE_RECORDS := 2000;
  	export unsigned2 ACCIDENTS_MAX_COUNT_CHARGED_OFFENSES := 8;
@@ -69,25 +69,25 @@ EXPORT Constants := MODULE
 	export unsigned2 ACCIDENT_STATE_RESTRICTIONS_MAX_RECORDS := 100;
 	export unsigned2 ACCIDENT_STATE_RESTRICTIONS_MAX_REQUIRED_ITEMS := 100;
 	export unsigned2 ACCIDENT_STATE_RESTRICTIONS_MAX_RESTRICTED_ITEMS := 100;
-	
+
 	// used by progressive phone and bps search
-	EXPORT SET OF STRING	TNT_CURRENT_SET := ['B', 'V','C']; 
-	
+	EXPORT SET OF STRING	TNT_CURRENT_SET := ['B', 'V','C'];
+
 	// Address Search
 	export Address := MODULE
 		export unsigned2 MAX_COUNT_SEARCH_RESPONSE_RECORDS := 2000;
 	END;
-	
+
 	// Address risk
 	export AddrRisk := MODULE
 	   export unsigned2 MAX_COUNT_SEARCH_RESPONSE_RECORDS := 500;
 	END;
-	
+
 	// AddressShell (address attributes ESDL)
 	EXPORT AddressShell := MODULE
-		EXPORT UNSIGNED2 MaxCountAttributes := 300; 
+		EXPORT UNSIGNED2 MaxCountAttributes := 300;
 	END;
-	
+
 	// AddressSummary
 	export AddressSummaryConstants := MODULE
 		export MaxPreviousAddressRecords := 3;
@@ -104,14 +104,14 @@ EXPORT Constants := MODULE
 	export AMLRAttributesConst := MODULE
 		export unsigned2 MaxAttributes := 17;
 	end;
-	
+
   // Bankruptcy
 	export BANKRPT := MODULE  // "bankruptcy" cannot be used
     export unsigned2 MaxCountSearch := 1000;
     export unsigned2 MaxCountReport := 10;
     export unsigned2 MaxPersonNames     := 20;
     export unsigned2 MaxPersonAddresses := 5;
-    export unsigned2 MaxPersonPhones    := 5; 
+    export unsigned2 MaxPersonPhones    := 5;
 		export unsigned2 MaxPersonEmails		:= 5;
     export unsigned2 MaxStatusHistory := 20;
     export unsigned2 MaxComments      := 20;
@@ -150,7 +150,7 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 MAX_COUNT_BANKRUPTCIES := 3;
 		EXPORT UNSIGNED2 MAX_COUNT_LIENS_JUDGEMENTS := 3;
 	END;
-		
+
 	// Business Credit, AKA Experian Business Reports (EBR)
 	EXPORT BIZ_CREDIT := MODULE
 		EXPORT UNSIGNED2 MAX_BIZCREDITS      := 100;
@@ -195,7 +195,7 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 MAXVERIFICATIONSUMMARIES := 5;
 		EXPORT UNSIGNED2 MAXBUS2EXECINDEXES := 7;
 	END;
-	
+
  // Basic Person Search
 	export BPS := MODULE
 		// Bps search
@@ -225,20 +225,20 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxCodes 				:= 100;
 		export unsigned2 MaxVariation 		:= 1000;
     export unsigned2 MaxTradelines    := 50;
-    
+
     //  business credit reduces Top Business constants
-    export unsigned2 MAX_COUNT_BIZRPT_INCORP_RECORDS      := 100; 
-    export unsigned2 MAX_COUNT_BIZRPT_PROPERTY_RECORDS    := 50; 
+    export unsigned2 MAX_COUNT_BIZRPT_INCORP_RECORDS      := 100;
+    export unsigned2 MAX_COUNT_BIZRPT_PROPERTY_RECORDS    := 50;
     export unsigned2 MAX_COUNT_BIZRPT_PROPERTY_TOTAL_RECS := 100;
-    export unsigned2 MAX_COUNT_BIZRPT_SRCDOC_RECORDS      := 50; 
+    export unsigned2 MAX_COUNT_BIZRPT_SRCDOC_RECORDS      := 50;
 	END;
-	
+
 	// Business Registration
 	export BUSREG := MODULE
 		export unsigned2 MAX_OFFICERS := 6;
 	END;
-	
-	// Caltaxpermitholder AKA Calbus 
+
+	// Caltaxpermitholder AKA Calbus
 	export CALTAX := module
 		export unsigned2	MAX_COUNT_SEARCH_RECORDS := 1;
   end;
@@ -250,12 +250,12 @@ EXPORT Constants := MODULE
 	export CheckPerson := MODULE
    	export MaxCountResponseRecords := 200;
 	END;
-	
+
 		// Child Identity Fraud Report
 	export ChildIdentityFraud := module
 		export MaxPersonRecords := 3;
 	end;
-  
+
   //Citizenship
   export Citizenship := MODULE
     export MaxAttributes := 28;
@@ -270,14 +270,14 @@ EXPORT Constants := MODULE
 		export unsigned1 MaxCountAddressRecords := 200;
 		export unsigned1 MaxCountSources := 100;
 	end;
-	
+
 	// Civil Court
   export unsigned2 MAX_COUNT_CIVIL_COURT_SEARCH_RESPONSE_RECORDS := 2000; // need this to be lower since a higher number will
 	                                                                        // overflow and cause memory error.
 	export unsigned2 MAX_COUNT_CIVIL_COURT_REPORT_RESPONSE_RECORDS := 2000;
 	export unsigned2 MAX_COUNT_CIVIL_COURT_ENTITES := 8;
 	export unsigned2 MAX_COUNT_CIVIL_COURT_AUTOKEY_LIMIT := 1750;
-	
+
 	// Code Lookup
 	export unsigned2 MaxCountCodeRecords := 3000;
 
@@ -286,21 +286,21 @@ EXPORT Constants := MODULE
 
 	// ConsumerAttributesReport (BocaShell attributes etc...ESDL)
 	EXPORT ConsumerAttributesShell := MODULE
-		EXPORT UNSIGNED2 MaxCountAttributes := 1040; 
+		EXPORT UNSIGNED2 MaxCountAttributes := 1040;
 	END;
-	
+
 	//ConsumerProfileReport
 	export ConsumerProfile := MODULE
 		export unsigned2 MAX_COUNT_AKAS := 50;
 		export unsigned2 MAX_COUNT_ADDR_HIST := 30;
 		export unsigned2 MAX_COUNT_ALERTS := 5;
 	END;
-	
-	// Corporate/Corporations, AKA Incorporations 
+
+	// Corporate/Corporations, AKA Incorporations
 	export CORP := module
 		export unsigned2	MAX_COUNT_REPORT_RECORDS := 1;
 		export unsigned2  MAX_HISTORIES := 300;
-		export unsigned2  MAX_CONTACTS := 150; 
+		export unsigned2  MAX_CONTACTS := 150;
 		export unsigned2  MAX_EVENTS := 150;
 		export unsigned2  MAX_STOCKS := 100;
 		export unsigned2  MAX_ANNUAL_RPTS := 100;
@@ -308,12 +308,12 @@ EXPORT Constants := MODULE
 		export unsigned2  MAX_TRADENAMES := 100;
 		export unsigned2  MAX_CONTACT_NAMES := 10;
 		export unsigned2  MAX_CONTACT_ADDR := 10;
-		export unsigned2  MAX_CONTACT_TYPES := 10; 
+		export unsigned2  MAX_CONTACT_TYPES := 10;
 		export unsigned2  MAX_RAW_ADDR := 10;
   end;
 
 	// Court Search Adviser
-	export CtSearchAdviser := MODULE 
+	export CtSearchAdviser := MODULE
 		export unsigned2 MaxCounties := 40;
 		export unsigned2 MaxStates := 100;
 		export unsigned2 MaxDistricts := 40;
@@ -343,12 +343,12 @@ EXPORT Constants := MODULE
     EXPORT UNSIGNED2 BANKRUPTCIES_MAX_JOIN_RECS := 10000;
     EXPORT UNSIGNED2 LIENS_MAX_JOIN_RECS        := 10000;
   END;
-  
+
   // Directory Assistance Wireless
 	EXPORT DAW := MODULE
 		EXPORT UNSIGNED2 MAX_RECORDS       := 1;
 		EXPORT UNSIGNED2 MAX_DESCRIPTIONS  := 3;
-		EXPORT UNSIGNED2 MAX_LISTING_TYPES := 3;		
+		EXPORT UNSIGNED2 MAX_LISTING_TYPES := 3;
 	END;
 
   // Directory of Corporate Affiliations AKA DCA AKA LNCA
@@ -359,7 +359,7 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 MAX_COMPETITORS          := 10;
 		EXPORT UNSIGNED2 MAX_CONTACTS             := 100;
 		EXPORT UNSIGNED2 MAX_EXECUTIVES           := 100;
-		EXPORT UNSIGNED2 MAX_EXCHANGES            := 19;		
+		EXPORT UNSIGNED2 MAX_EXCHANGES            := 19;
 	END;
 
   // Dead Company (InfoUSA)
@@ -368,15 +368,15 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 MAX_SECONDARY_SICS       := 4;
 		EXPORT UNSIGNED2 MAX_FRANCHISES           := 1; //???
 	END;
-	
-  // Deconfliction	
+
+  // Deconfliction
 	EXPORT DECONFLICTION := MODULE
 		EXPORT UNSIGNED2 MAX_COUNT_RECORDS := 2000;
 		EXPORT UNSIGNED2 MAX_COMPANY_IDS := 10;
 		EXPORT UNSIGNED2 MAX_EXCL_UIDS := 200;
 	END;
 
-	// Diversity Cert 
+	// Diversity Cert
 	EXPORT DIVERSITYCERT := MODULE
 		EXPORT UNSIGNED2 MaxDiversityCert := 25;
 		EXPORT UNSIGNED2 MaxExports := 2;
@@ -398,7 +398,7 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 MaxNaicsCodes := 8;
 	END;
 
-  // for Doxie.HeaderFileRollupSearch call from BusinessAuthRepSearch 
+  // for Doxie.HeaderFileRollupSearch call from BusinessAuthRepSearch
   // Counts from: doxie.rollup_limits
   EXPORT DoxieHFRS := MODULE
     EXPORT UNSIGNED1 PHONES       := 10;
@@ -410,7 +410,7 @@ EXPORT Constants := MODULE
     EXPORT UNSIGNED1 DOBS         := 15;
     EXPORT UNSIGNED1 DODS         := 15;
 	  EXPORT UNSIGNED1 MAX_COUNT_SEARCH_RESPONSE_RECORDS := 20000;  // taken from doxie.header_records_byDID return limit
-  END;  
+  END;
 
   // Driver Licenses (DL)
   export DL := MODULE
@@ -423,19 +423,19 @@ EXPORT Constants := MODULE
 	// Drug Enforcement Administration (DEA)
   export unsigned2 MAX_COUNT_DEA_REGISTRATION := ut.limits.DEA_MAX; //actual count=16 (reg number= MM0726503: W20081013-145222, prod)
   export unsigned2 MAX_COUNT_DEA_SEARCH := 100;
-		
+
 	//Due Diligence
 	export DDRAttributesConst := MODULE
-    export unsigned2 MaxAttributes      				:= 24;		
-    export unsigned2 MaxReportedAKAs      			:= 500;		
-    export unsigned2 MaxReportedDOBs      			:= 500;		
-    export unsigned2 MaxSSNDeviations      			:= 500;		
+    export unsigned2 MaxAttributes      				:= 24;
+    export unsigned2 MaxReportedAKAs      			:= 500;
+    export unsigned2 MaxReportedDOBs      			:= 500;
+    export unsigned2 MaxSSNDeviations      			:= 500;
     export unsigned2 MaxProperties         			:= 500;
     export unsigned2 MaxPropertyOwners   				:= 500;
     export unsigned2 MaxAircraft         				:= 500;
     export unsigned2 MaxWatercraft         			:= 500;
     export unsigned2 MaxVehicles         				:= 500;
-    export unsigned2 MaxOperatingLocations 			:= 500;   
+    export unsigned2 MaxOperatingLocations 			:= 500;
     export unsigned2 MaxReportingBureaus 				:= 500;
     export unsigned2 MaxReportingSources 				:= 500;
     export unsigned2 MaxSOSFilingStatuses 			:= 500;
@@ -456,13 +456,15 @@ EXPORT Constants := MODULE
     export unsigned2 MaxRegisteredAgents   			:= 500;
     export unsigned2 MaxIndvAssociations   			:= 500;
     export unsigned2 MaxBusAssociations   			:= 500;
+    export unsigned2 MaxResidence               := 500;
+    export unsigned2 MaxPersonAssociations      := 500;
 	end;
-	
+
 	//Digital Mortgage Application Prefill (DMAP)
 	EXPORT UNSIGNED2 DMAP_MAX_COUNT_OWNED_PROPERTIES	:= 50;
-	
+
   //Dun and Bradstreet (DNB)
- 	export unsigned2 DNB_MAX_COUNT_SEARCH_RECORDS := 500;	
+ 	export unsigned2 DNB_MAX_COUNT_SEARCH_RECORDS := 500;
 
   // Electronic Authorization (eAuth)
   export EAUTHORIZE := MODULE // "eauth" cannot be used
@@ -472,15 +474,16 @@ EXPORT Constants := MODULE
     export unsigned1 MaxInvalidAnswers := 20;
     export unsigned1 MaxAddress := 40; // number of person address to use for questions generating
   end;
-	
-  // eCrash 
+
+  // eCrash
   EXPORT eCrashMod := MODULE
 	   export unsigned2 MaxRecords := 2000;
 	   export unsigned2 Max_Involved_Parties := 50;
 		 export unsigned2 MaxAnalyticRecords := 200;
 		 export unsigned2 Max_Documents :=200;
+		 export unsigned1 Max_HPD_Results :=1;
 	END;
-	
+
 	// EC (European Commission) Ruling
 	export EC_RULING := MODULE
 			export unsigned2 MaxRelatedCase := 100;
@@ -489,17 +492,17 @@ EXPORT Constants := MODULE
 			export unsigned2 MaxPublicationJournals := 100;
 			export unsigned2 MaxSearchRecords := 200;
 	end;
-	
+
 	// Email
 	EXPORT Email := MODULE
 		EXPORT UNSIGNED2 MAX_RECS := 200;
 		EXPORT UNSIGNED2 MAX_RECS_PER_DID := 100;
-    EXPORT UNSIGNED2 MAX_MSGS_PER_DID := 10; 
+    EXPORT UNSIGNED2 MAX_MSGS_PER_DID := 10;
 		EXPORT UNSIGNED2 MAX_NAMES_PER_PERSON := 20;
 		EXPORT UNSIGNED2 MAX_ADDRS_PER_PERSON := 20;
 		EXPORT UNSIGNED2 MAX_EMAILS_PER_PERSON := 20;
 	END;
-	
+
   // Experian Business Reports (EBR)
 	EXPORT EBR := MODULE
 		EXPORT UNSIGNED2 MAX_COUNT_REPORT_RECORDS  := 1;
@@ -516,10 +519,10 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 MAX_COLLATERAL_ACCOUNTS   := 100; //EBR_Servicesconstants.maxcounts.Collateral_Accounts value, but may be too big here???; //???
 		EXPORT UNSIGNED2 MAX_COLLACCTS_COLLATERALS := 12;
 		EXPORT UNSIGNED2 MAX_UCC_FILINGS           := 100; //EBR_Servicesconstants.maxcounts.public_records value, but may be too big here???
-		EXPORT UNSIGNED2 MAX_UCC_COLLATERALS       := 6; 
+		EXPORT UNSIGNED2 MAX_UCC_COLLATERALS       := 6;
 		EXPORT UNSIGNED2 MAX_BANKING_DETAILS       := 100; //EBR_Servicesconstants.maxcounts.Bank_Details value, but may be too big here???
 		EXPORT UNSIGNED2 MAX_DEMOGRAPHICS_5600     := 10;  //EBR_Servicesconstants.maxcounts.Demographic_Data value, but may be too big here???
-		EXPORT UNSIGNED2 MAX_DEMO5600_SICS         := 4; 
+		EXPORT UNSIGNED2 MAX_DEMO5600_SICS         := 4;
 		EXPORT UNSIGNED2 MAX_DEMOGRAPHICS_5610     := 10;  //EBR_Servicesconstants.maxcounts.Demographic_Data value, but may be too big here???
 		EXPORT UNSIGNED2 MAX_GOVERNMENT_TRADES     := 100; //EBR_Servicesconstants.maxcounts.Government_Trade value, but may be too big here???
 		EXPORT UNSIGNED2 MAX_GOV_DEBARRED_CONTRACTORS := 100; //EBR_Servicesconstants.maxcounts.Government_Debarred_Contractor value, but may be too big here???
@@ -534,7 +537,7 @@ EXPORT Constants := MODULE
 	export MAX_COUNT_PILOT_RECORD_INFO := 20;
 	export MAX_COUNT_FAAPILOTS := 20;
 
-	// Fein, AKA DNB (Dun and Bradstreet) Fein 
+	// Fein, AKA DNB (Dun and Bradstreet) Fein
 	export DNBFEIN := module
 		export unsigned2 MAX_COUNT_SEARCH_RECORDS := 1;
 		export unsigned2 MAX_ADDRESSES            := 5;
@@ -543,7 +546,7 @@ EXPORT Constants := MODULE
   end;
 
 	// Fictitious Business Names (FBN)
-  export FBN := MODULE 
+  export FBN := MODULE
     export unsigned1 MaxCountOwners := 25;
 		export unsigned2 MAX_COUNT_SEARCH_RECORDS := 1;
   end;
@@ -563,28 +566,28 @@ EXPORT Constants := MODULE
   export FI := MODULE
 		export unsigned1 MaxCVIRiskIndicators	:= 75;
   end;
-	
+
   //Foreclosures
 	EXPORT unsigned2 MAX_COUNT_Foreclosure_SEARCH := 2000;
 	EXPORT unsigned2 MAX_COUNT_Foreclosure_REPORT := 100;
 	export unsigned2 MAX_COUNT_PLAINTIFF   := 100;
 	export unsigned2 MAX_COUNT_DEFENDANT   := 100;
-	
+
 	// Franchise
   export FRANDX := MODULE
 		export unsigned1 MAX_EXECUTIVES	:= 25;
   end;
-	
+
   // Fraud Defense Network
 	export FDN := MODULE
     // Counts used in the iesp.frauddefensenetwork attribute related to the "Susupicious Activity Report"
 		export unsigned2 MAX_COUNT_EXCLUDE_IND_TYPES := 10; //estimated, actual still TBD
 		export unsigned2 MAX_COUNT_FILE_TYPES        := 20; //estimated, actual still TBD
-  export unsigned2 MAX_COUNT_MATCH_DETAILS     := 50; //estimated, actual still TBD  
+  export unsigned2 MAX_COUNT_MATCH_DETAILS     := 50; //estimated, actual still TBD
   export unsigned2 MAX_COUNT_RESPONSE_RECORDS  := 10; //estimated, actual still TBD
   export unsigned2 ROLLUP_MAX_COUNT_HITS       := 10; //estimated, actual still TBD
   end;
-	
+
 	export FraudGov := MODULE
 		export unsigned2 MAX_COUNT_SEARCH_RECORDS := 2000;
 		export unsigned2 MAX_COUNT_PAYLOAD := 1000;
@@ -611,8 +614,14 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_COUNT_NVP := 1000;
 		export unsigned2 MAX_TIMELINE_PHONES := 20;
 	end;
-	
-	export Fraud_Point := MODULE
+
+  export RIN := MODULE
+    export unsigned2 MAX_COUNT_NVP := 1000;
+    export unsigned2 MAX_COUNT_SEARCH_RECORDS := 2000;
+    export unsigned2 MAX_COUNT_INDICATOR_ATTRIBUTE := 1000;
+  end;
+
+  export Fraud_Point := MODULE
 		export unsigned2 MaxAttributes := 256; // update after reviewing attribute return counts.
 	end;
 
@@ -621,19 +630,19 @@ EXPORT Constants := MODULE
 		export unsigned MaxList := 50;
 		export unsigned MaxItem := 1024;
 	end;
-	
+
 	// Government Services Administration (GSA) Verification
 	export unsigned  MAX_GSA_VERIFICATION_REQUEST_RECORDS := 25;  //actual averages 5 with at most 19
 	export unsigned  MAX_GSA_VERIFICATION_RESPONSE_RECORDS := 50;  //actual 28
-	export unsigned  MAX_GSA_VERIFICATION_RESPONSE_ADDRS := 50; 
-	export unsigned  MAX_GSA_VERIFICATION_RESPONSE_ACTIONS := 50; 
-	export unsigned  MAX_GSA_VERIFICATION_RESPONSE_REFERENCES := 50; 
+	export unsigned  MAX_GSA_VERIFICATION_RESPONSE_ADDRS := 50;
+	export unsigned  MAX_GSA_VERIFICATION_RESPONSE_ACTIONS := 50;
+	export unsigned  MAX_GSA_VERIFICATION_RESPONSE_REFERENCES := 50;
 
-	// HealthCareAttributes 
+	// HealthCareAttributes
 	EXPORT HealthCareAttributeConstants := MODULE
-		EXPORT UNSIGNED2 MaxCountAttributes := 12; 
+		EXPORT UNSIGNED2 MaxCountAttributes := 12;
 	END;
-	
+
  	// NOTE: For Healthcare Provider report
   export HPR := MODULE
 		export unsigned2 Max_Small_Cnt						:= 10;
@@ -715,7 +724,7 @@ EXPORT Constants := MODULE
 		export unsigned2 Max_Taxonomies						:= 1000;
 	  export unsigned2 Max_MDMSearchFields      := 30;
   end;
-	
+
   export HC_MDM := MODULE
 		export unsigned2 MAX_CUSTOM_INPUT					:= 5;
 		export unsigned2 MAX_CUSTOM_FIELDS				:= 1000;
@@ -724,7 +733,7 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_IDS									:= 10;
 		export unsigned2 MAX_CUSTOMER_RECORDS			:= 50;
   end;
-	
+
   export HC_PROVIDERPOINT := MODULE
 		export unsigned2 Max_Small_Cnt						:= 10;
 		export unsigned2 Max_Large_Cnt						:= 50;
@@ -774,7 +783,7 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 Max_OFFICEATTRIBUTES			:= Max_Small_Cnt;
 		EXPORT UNSIGNED2 Max_Gateways							:= Max_Small_Cnt;
   end;
-  
+
   export HC_ClaimsCleanse := MODULE
 		export unsigned2 Max_Small_Cnt						:= 10;
 		export unsigned2 Max_Large_Cnt						:= 50;
@@ -835,7 +844,7 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 Max_Service_Cnt          := Max_Small_Cnt;
 		EXPORT UNSIGNED2 Max_OtherPayer_Cnt       := Max_Small_Cnt;
   end;
-  
+
  	// NOTE: For Healthcare Facility report
   export HC_FACILITY_REPORT := MODULE
 		export unsigned2 Max_Small_Cnt						:= 10;
@@ -884,7 +893,7 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 MAX_CONTACT_RECORDS			:= Max_Large_Cnt;
 		EXPORT UNSIGNED2 MAX_DNBSIC_RECORDS				:= Max_Medium_Cnt;
 	END;
-	
+
 	export HCAffiliationSearch := MODULE
 		export unsigned2 MaxResults := 2000;
 		export unsigned2 MaxSpecialties := 2;
@@ -897,39 +906,47 @@ EXPORT Constants := MODULE
 	export HCOrganizationReport := MODULE
 		export unsigned2 MaxResults := 200;
 	end;
-	
+
 	export HCProviderSearch := MODULE
 		export unsigned2 MaxResults := 200;
 	end;
-	
+
 	export HCProviderReport := MODULE
 		export unsigned2 MaxResults := 200;
 	end;
-	
+
 	export HC_Subrogation := MODULE
 		export unsigned2 MaxRecords := 100;
 		export unsigned2 MaxPassengers := 20;
 		export unsigned2 MaxOtherParties := 20;
 	end;
-	
+
+  // Homestead Exemption
+	export hmstdExmptn := MODULE
+		export unsigned2 MAX_EXMPTN  := 4;
+		export unsigned2 MAX_OWNERS  := 4;
+		export unsigned2 MAX_PERSONS := 5;
+		export unsigned2 MAX_PROPERTIES := 15;
+	end;
+
   // Hunting & Fishing Licenses
 	export unsigned2 HF_MAX_COUNT_SEARCH_RESPONSE_RECORDS := 2000;
 
-	// Identity Management system (IDM); FKA BLS 
+	// Identity Management system (IDM); FKA BLS
 	export IDM := MODULE
 		export unsigned1 MaxAddress := 20;
     export unsigned1 MaxHistoricalPhones := 10; //old phones (for a given person)
 		export unsigned1 MaxRNA := 40; //includes associates and relatives
 		export unsigned1 MaxRNA_Address := 10;
-		export unsigned1 MaxRelatives := 20; 
-		export unsigned1 MaxAssociates := 20; 
+		export unsigned1 MaxRelatives := 20;
+		export unsigned1 MaxAssociates := 20;
     export unsigned1 MaxProperties := 10;
 		export unsigned1 MaxPropertyParties := 20;
 		export unsigned1 MaxPropertyEntities := 25; //to match iesp.Constants.Prop.MaxEntities
 		export unsigned1 MaxPropertyRecords := 20; //max number of records for a property
     export unsigned1 MaxVehicles := 10;
     export unsigned1 MaxVehicleDetails := 10; //max number of different records per vehicles -> max number of different registration addresses
-    export unsigned1 MaxStudentColleges := 10; 
+    export unsigned1 MaxStudentColleges := 10;
     export unsigned1 MaxWatercrafts := 10;
 		export unsigned1 MaxAircrafts := 10;
 		export unsigned1 MaxAircraftRegistrations := 40; // max number of registrations per aircraft
@@ -942,7 +959,7 @@ EXPORT Constants := MODULE
 		export unsigned1 MaxAkas := 10;
 		export unsigned1 MaxInternetDomains := 10;
 	end;
-	
+
 	// Identity Fraud Network Constants
 	export IDFraudNetwork := module
 		export MaxRiskIndicators := 1000;
@@ -972,7 +989,7 @@ EXPORT Constants := MODULE
 	export unsigned2 MaxCountVerificationResults := 35;
 	export unsigned2 MaxCountDataSourceResults := 35;
 	export unsigned2 MaxCountCountrySettings := 200;
-	
+
 	// InstantID/Identifier2 (IID)
   export Identifier2c := MODULE
 	  export MaxRiskIndicators := 50;
@@ -999,9 +1016,9 @@ EXPORT Constants := MODULE
 		export MaxReportDebtors := 3;
 		export MaxReports := 10;
 	END;
-  
+
   //InstantId Reporting and Archiving
-	EXPORT IIDReporting := MODULE	
+	EXPORT IIDReporting := MODULE
 		//Search
 		export unsigned2 MaxSearchRecords := 100;
 		//Report
@@ -1013,11 +1030,11 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxRiskIndexScore := 100;
 		export unsigned2 MaxFraudRiskIndex := 425;
 		export unsigned2 MaxFraudPointSummary := 100;
-		//RedFlags	
+		//RedFlags
 		export unsigned2 MaxRedFlags := 500;
 		export unsigned2 MaxRiskIndicators := 700;
 		export unsigned2 MaxRedFlagsSummary := 1000;
-	  //iidi	
+	  //iidi
 		export unsigned2 MaxMatchingSources := 100;
 		export unsigned2 MaxIVIRiskIndicators := 500;
 		export unsigned2 MaxFieldVerification := 100;
@@ -1039,32 +1056,32 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxPolicies := 25;
 		export unsigned2 MaxPhones := 10;
 	END;
-	
+
 	// Insurance
 	EXPORT Insurance := MODULE
 		export MaxRiskIndicators := 4;
 		export MaxScores := 3;
 		export MaxScoreOptions := 3;
 	END;
-	
+
 	// International (Mexican) dockets
 	export unsigned2 INTERNATIONALDOCKET_MAX_COUNT_STATECODES	:= 35;
 	export unsigned2 INTERNATIONALDOCKET_MAX_COUNT_AKAS := 50;
 	export unsigned2 INTERNATIONALDOCKET_MAX_COUNT_DOCKETS := 50;
 	export unsigned2 INTERNATIONALDOCKET_MAX_COUNT_SEARCH_RESPONSE_RECORDS := 2000;
-	
+
 	// International (Mexican) Professional Licenses/Certifications
 	export unsigned2 INTERNATIONALPROFLICENSE_MAX_COUNT_AKAS := 50;
 	export unsigned2 INTERNATIONALPROFLICENSE_MAX_COUNT_LICENSES := 50;
-	export unsigned2 INTERNATIONALPROFLICENSE_MAX_COUNT_SEARCH_RESPONSE_RECORDS := 2000;	
+	export unsigned2 INTERNATIONALPROFLICENSE_MAX_COUNT_SEARCH_RESPONSE_RECORDS := 2000;
 	export unsigned2 INTERNATIONALPROFCERT_MAX_COUNT_AKAS := 50;
 	export unsigned2 INTERNATIONALPROFCERT_MAX_COUNT_CERTIFICATIONS := 50;
 	export unsigned2 INTERNATIONALPROFCERT_MAX_COUNT_SEARCH_RESPONSE_RECORDS := 2000;
-		
+
 	// Internet domain search
 	export unsigned2 INTERNETDOMAIN_MAX_COUNT_SEARCH_RESPONSE_RECORDS := 2000;
 	export unsigned2 INTERNETDOMAIN_MAX_COUNT_ADDRESSES := 8;
-  
+
 	// inview report (gateway)
   EXPORT INVIEW_EQUIFAX := MODULE
 		export unsigned2 INV_INTERNET_TRAITS_MAX_COUNT := 10;
@@ -1094,7 +1111,7 @@ EXPORT Constants := MODULE
 		export unsigned2 INV_IDTRAITS_MAX_COUNT := 10;
 		export unsigned2 INV_EFX_DATAPOINTS_MAX_COUNT := 10;
 	END;
-	
+
 	// Jail Booking
 	EXPORT JB := MODULE
 		EXPORT UNSIGNED2 MAX_SEARCH_RECORDS := 2000;
@@ -1102,12 +1119,12 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 MAX_REPORT_RECORDS := 2000;
 		EXPORT UNSIGNED2 MAX_CHARGES_RECORDS := 100;
 	END;
-	
+
 	// Labor Action EBSA (Employee Benefit Security Admin)
 	EXPORT LABOR_ACTION_EBSA := MODULE
 			EXPORT UNSIGNED2 MaxSearchRecords := 200;
 	END;
-	
+
 	// Labor Action MSHA (Mine Safety and Health Admin)
 	EXPORT LABOR_ACTION_MSHA := MODULE
 			EXPORT UNSIGNED2 MaxAccidents := 100;
@@ -1117,14 +1134,14 @@ EXPORT Constants := MODULE
 			EXPORT UNSIGNED2 MaxContractors := 100;
 			EXPORT UNSIGNED2 MaxSearchRecords := 200;
 	END;
-	
+
 	// Labor Action WHD
 	EXPORT LABORACTIONWHD := MODULE
 			EXPORT UNSIGNED2 MaxCaseIDs := 50;
 			EXPORT UNSIGNED2 MaxLaborActionWHDRecords := 10;
 			EXPORT UNSIGNED2 MaxCountSuppRiskRecords := 25;
 	END;
-	
+
 	// Lead Integrity (ITA Attributes via ESDL)
 	EXPORT LI := MODULE
 		EXPORT UNSIGNED2 MaxAttributes := 400; // This will need to be changed in the future if we return more than 400 ITA attributes
@@ -1135,7 +1152,7 @@ EXPORT Constants := MODULE
 
 	// Liens & Judgements
 	EXPORT Liens := MODULE
-    EXPORT UNSIGNED2 MAX_LIENS_JUDGEMENTS := 50; 
+    EXPORT UNSIGNED2 MAX_LIENS_JUDGEMENTS := 50;
 		EXPORT UNSIGNED2 MAX_PARTIES := 25;
 		EXPORT UNSIGNED2 MAX_ADDRESSES := 10;
 		EXPORT UNSIGNED2 MAX_DEBTORS := 25;
@@ -1145,10 +1162,10 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 MAX_FILINGS := 15;
 		EXPORT UNSIGNED2 MAX_PHONES := 50;
 	END;
-	
+
 	//LNCA (aka DCA) Firmographics
 	EXPORT LNCA := MODULE
-    EXPORT UNSIGNED2 MaxSICCodes := 100; 
+    EXPORT UNSIGNED2 MaxSICCodes := 100;
 		EXPORT UNSIGNED2 MaxExecutives := 100;
 		EXPORT UNSIGNED2 MaxExchanges := 20;
 		EXPORT UNSIGNED2 MaxNAICSCodes := 100;
@@ -1156,7 +1173,7 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED3 MaxLNCARecLen := 250000;
 		EXPORT UNSIGNED2 MaxCountSuppRiskRecords := 25;
 	END;
-	
+
 	//lookups
 	export lookups := MODULE
 		EXPORT UNSIGNED2 SEARCH_MAX_ZIPCODE_RESPONSE_RECORDS := 2000;
@@ -1165,7 +1182,7 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 SEARCH_MAX_COMPANYSEARCH_RESPONSE_RECORDS := 2000;
 	end;
 
-	export MemberPoint := MODULE
+	export KeepContact := MODULE
 		export unsigned2 MAX_PHONES := 3;
 		export unsigned2 MAX_EMAILS := 10;
 	end;
@@ -1173,17 +1190,17 @@ EXPORT Constants := MODULE
 	// Mortgage Industry Data Exchange(MIDEX) from Mortgage Asset Research Institute(MARI)
 	export MIDEX := MODULE
 		export unsigned2 MAX_COUNT_REPORT_RESPONSE_RECORDS    := 100;  // ??
-		export unsigned2 MAX_COUNT_REPORT_RESPONSE_PHONES     := 10;   // Final# TBD???	
-		export unsigned2 MAX_COUNT_REPORT_RESPONSE_EMAILS     := 10;   // Final# TBD???	
-		export unsigned2 MAX_COUNT_REPORT_RESPONSE_NAMEVARS   := 20;   // Final# TBD???	
+		export unsigned2 MAX_COUNT_REPORT_RESPONSE_PHONES     := 10;   // Final# TBD???
+		export unsigned2 MAX_COUNT_REPORT_RESPONSE_EMAILS     := 10;   // Final# TBD???
+		export unsigned2 MAX_COUNT_REPORT_RESPONSE_NAMEVARS   := 20;   // Final# TBD???
 		export unsigned2 MAX_COUNT_REPORT_RESPONSE_SSNS       := 10;   // Final# TBD???
-		export unsigned2 MAX_COUNT_REPORT_RESPONSE_NPRECS     := 50;   // Final# TBD???	
-		export unsigned2 MAX_COUNT_REPORT_RESPONSE_PUBRECS    := 50;   // Final# TBD???	
-		export unsigned2 MAX_COUNT_REPORT_RESPONSE_LICENSES   := 100;   // Final# TBD???	
+		export unsigned2 MAX_COUNT_REPORT_RESPONSE_NPRECS     := 50;   // Final# TBD???
+		export unsigned2 MAX_COUNT_REPORT_RESPONSE_PUBRECS    := 50;   // Final# TBD???
+		export unsigned2 MAX_COUNT_REPORT_RESPONSE_LICENSES   := 100;   // Final# TBD???
     export unsigned2 MAX_COUNT_REPORT_RESPONSE_FMRECS     := 50;
-		export unsigned2 MAX_COUNT_REPORT_LICENSES					  := 200;  
-		export unsigned2 MAX_COUNT_REPORT_NMLS					      := 3;  
-		export unsigned2 MAX_COUNT_REPORT_RESPONSE_OTHERLICS  := 10;   // Final# TBD???	
+		export unsigned2 MAX_COUNT_REPORT_LICENSES					  := 200;
+		export unsigned2 MAX_COUNT_REPORT_NMLS					      := 3;
+		export unsigned2 MAX_COUNT_REPORT_RESPONSE_OTHERLICS  := 10;   // Final# TBD???
 		export unsigned2 MAX_COUNT_REPORT_RESPONSE_NUMREPORTS := 50;
     export unsigned2 MAX_COUNT_REPORT_REBUTTALS           := 50;
 	  export unsigned2 MAX_COUNT_REPORT_REPORTBY            := 250;
@@ -1200,14 +1217,14 @@ EXPORT Constants := MODULE
     export unsigned2 MAX_COUNT_REPORT_TEXT                := 500;
     export unsigned2 MAX_COUNT_REPORT_PUBLICACTION        := 50;
     export unsigned2 MAX_COUNT_REPORT_AKA_DBA             := 100;  // Bug: 161341 (CR16) -- Per Rodney, since the AKAs/DBAs are no longer a string500 field we should increase the max to 20
-                                                                  // because he is limiting the data to have no more than 20 AKA + DBA. 
+                                                                  // because he is limiting the data to have no more than 20 AKA + DBA.
                                                                   // JIRA: 10581 - there are 59 DBAs, increasing limit to 100
     export unsigned2 MAX_COUNT_SEARCH_RESPONSE_REPORTNUMBERS := 250;
 		export unsigned2 MAX_COUNT_SEARCH_RESPONSE_RECORDS    := 2000; // Final# TBD???
 		export unsigned2 MAX_COUNT_SEARCH_RESPONSE_ADDRESSES  := 20;   // Final# TBD???
-		export unsigned2 MAX_COUNT_SEARCH_RESPONSE_NAMES      := 20;   // Final# TBD???		
+		export unsigned2 MAX_COUNT_SEARCH_RESPONSE_NAMES      := 20;   // Final# TBD???
 		export unsigned2 MAX_COUNT_SEARCH_RESPONSE_AKAS       := 5;
-		export unsigned2 MAX_COUNT_SEARCH_LICENSES					  := 200;  
+		export unsigned2 MAX_COUNT_SEARCH_LICENSES					  := 200;
 		export unsigned2 MAX_COUNT_REGISTRATIONS       				:= 250;
 		export unsigned2 MAX_COUNT_OFFICE_LOCATIONS       		:= 100;
 		export unsigned2 MAX_COUNT_REPRESENT       						:= 150;
@@ -1215,8 +1232,8 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_COUNT_DISC_ACTIONS       				:= 150;
 		export unsigned2 MAX_COUNT_REG_ACTIONS       					:= 150;
     export unsigned2 MAX_COUNT_SEARCH_NMLS                := 20;
-    
-    // Smartlinx Business 
+
+    // Smartlinx Business
 		export unsigned2 MAX_COUNT_SMARTLINX_BIZ_PROPERTIES          := 150;
 		export unsigned2 MAX_COUNT_SMARTLINX_BIZ_LIENS_JUDGMENTS     := 10;
 		export unsigned2 MAX_COUNT_SMARTLINX_BIZ_BUSINESS_ASSOCIATES := 150;
@@ -1226,9 +1243,9 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_COUNT_SMARTLINX_BIZ_ADDRESS_VARIATIONS  := 100;
 		export unsigned2 MAX_COUNT_SMARTLINX_BIZ_ASSOCIATED_PEOPLE   := 500;
 	end;
-	
+
 	// Motor Vehicle Registrations (MVR)
-  export MV := MODULE 
+  export MV := MODULE
     // ideally, those should refer to VehicleV2_Services.Constant values...
     export unsigned1 MaxCountGateways := 2;
     export unsigned1 MaxCountOwners := 10;
@@ -1244,16 +1261,16 @@ EXPORT Constants := MODULE
 		export MAX_COUNT_SEARCH_RESPONSE_RECORDS := 2000;
 		export MAX_COUNT_REPORT_RESPONSE_RECORDS := 2000;
   end;
-	
+
 	// Natural Disaster Readiness
 	export NATURAL_DISASTER := MODULE
 		export unsigned2 MaxISOCommittees	:= 50;
 		export unsigned2 MaxNaturalDisaster := 50;
 		EXPORT UNSIGNED2 MaxCountSuppRiskRecords := 25;
 	END;
-	
+
 	// Neighborhood Safety Report
-  export NeighborSafety := MODULE 
+  export NeighborSafety := MODULE
     export unsigned1 MaxSexOffender := 10;
     export unsigned1 MaxPublicSafety := 4;
     export unsigned1 MaxCorrecFacility := 3;
@@ -1263,6 +1280,19 @@ EXPORT Constants := MODULE
 		export MAX_COUNT_SEARCH_RESPONSE_RECORDS := 2000;
 		export MAX_COUNT_REPORT_RESPONSE_RECORDS := 2000;
   end;
+
+	// NetWise Data (Social Media Email) gateway for the Virtual Identity Report V2 Accurint product
+  EXPORT NETWISE := MODULE
+    export unsigned2 MAX_COUNT_ADDRESS_RECORDS   := 10;
+    export unsigned2 MAX_COUNT_EDUCATION_RECORDS := 10;
+    export unsigned2 MAX_COUNT_EMAIL_RECORDS     := 15;
+    export unsigned2 MAX_COUNT_IMAGE_RECORDS     := 10;
+    export unsigned2 MAX_COUNT_NAME_RECORDS      := 10;
+    export unsigned2 MAX_COUNT_PLACE_RECORDS     := 10;
+    export unsigned2 MAX_COUNT_PHONE_RECORDS     := 10;
+    export unsigned2 MAX_COUNT_RESULTS_RECORDS   := 5;
+    export unsigned2 MAX_COUNT_WORK_RECORDS      := 10;
+  END;
 
   // Official Records - from certain counties
 	export unsigned2 OFFRECS_MAX_COUNT_REPORT_RESPONSE_RECORDS := 2;
@@ -1279,7 +1309,7 @@ EXPORT Constants := MODULE
 	EXPORT ORWORK := MODULE
 		EXPORT UNSIGNED2 MAX_NAMES := 5;
 	END;
-	 
+
 	// Occupational Safety & Health Administration
 	EXPORT OSHAIR := MODULE
 		EXPORT UNSIGNED2 MaxCountSuppRiskRecords := 25;
@@ -1310,7 +1340,7 @@ EXPORT Constants := MODULE
 
   // phones feedback (PHONESFEEDBACK name can't be used)
   export PHFEEDBACK := MODULE
-    export unsigned2 MaxAdditionalPhones := 10;  
+    export unsigned2 MaxAdditionalPhones := 10;
     export unsigned2 MaxOtherInfo        := 10;
     export unsigned2 MaxFeedbacks        := 10;
   end;
@@ -1331,19 +1361,20 @@ EXPORT Constants := MODULE
 		export unsigned1 MaxSpoofs := 100;
 		export unsigned1 MaxOTPs := 100;
 		export unsigned1 MaxInquiries := 100;
-		export unsigned1 MaxPRIRules := 20;
-		export unsigned1 MaxAlerts := 20;
-		export unsigned1 MaxAlertMessages := 20;
+		export unsigned1 MaxPRIRules := 100;
+		export unsigned1 MaxAlerts := 100;
+		export unsigned1 MaxAlertMessages := 100;
+		export unsigned1 MaxSources := 20;
 	end;
   // Phone History Report
 	export unsigned2 PhoneHistoryMaxRecords :=500;
   export unsigned2 PhoneInfoMessages := 1;
-	
+
 	// phone picklist
 	export Phone_PickList := MODULE
 		export MaxRecords := 100;
 	END;
-	
+
 	// Premise Association
 	export PAR := MODULE
 		export unsigned2 MaxAttributes := 24;
@@ -1370,7 +1401,7 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 MAX_TAXONOMY := UNKNOWN;
 		EXPORT UNSIGNED2 MAX_LICENSEINFOS := LARGE;
 		EXPORT UNSIGNED2 MAX_DEGREES := UNKNOWN;
-		EXPORT UNSIGNED2 MAX_SPECIALTIES := XLARGE;  
+		EXPORT UNSIGNED2 MAX_SPECIALTIES := XLARGE;
 		EXPORT UNSIGNED2 MAX_BUSADDRANDPHONES := LARGE;
 		EXPORT UNSIGNED2 MAX_GROUPAFFILIATIONS := LARGE;
 		EXPORT UNSIGNED2 MAX_HOSPITALAFFILIATIONS := LARGE;
@@ -1394,7 +1425,7 @@ EXPORT Constants := MODULE
 	export ProgPhones := Module
 		export unsigned2 MaxDedupePhones := 150;
 		export unsigned2 MaxCountPhoneRecords := 150;
-	end;	
+	end;
 
   // Property Records - Assessments, Deeds, Mortgages
   export PROP := MODULE // "property" cannot be used
@@ -1427,7 +1458,7 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED1 MaxCountResidents        := 20;
 		EXPORT UNSIGNED1 MaxCountHistoricalValues := 250;
 	END;
-	
+
 	// Public Profile
 	EXPORT PublicProfile := MODULE
 		EXPORT UNSIGNED2 MAX_SSN_RECORDS := 15;
@@ -1437,16 +1468,16 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 MAX_ADDRESS_RECORDS := 15;
 		EXPORT UNSIGNED2 MAX_SOURCE_RECORDS := ut.limits.header_per_did;
 		EXPORT UNSIGNED2 MAX_SUBJECT_RECORDS := 10;
-		EXPORT UNSIGNED2 MAX_FORECLOSURES := 10; 
+		EXPORT UNSIGNED2 MAX_FORECLOSURES := 10;
 		EXPORT UNSIGNED2 MAX_NOTICE_OF_DEFAULTS := 50;
-		EXPORT UNSIGNED2 MAX_CRIMINAL_RECORDS := 50; 
-		EXPORT UNSIGNED2 MAX_AIRCRAFTS := 50; 
+		EXPORT UNSIGNED2 MAX_CRIMINAL_RECORDS := 50;
+		EXPORT UNSIGNED2 MAX_AIRCRAFTS := 50;
 	END;
 
 	//Qsent gateway
 	export unsigned MAX_EXCLUDED_PHONES := 15;
 	export unsigned REALTIME_PHONE_LIMIT := 10;
-	
+
   // Rate Evasion for Insurance
 	export unsigned2 RATEEVA_MAX_COUNT_ADDL_DRIVERS := 10;
 	export unsigned2 RATEEVA_MAX_COUNT_ADDR_DOC_SRCES := 10;
@@ -1476,39 +1507,39 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_SEARCH_RECORDS := 10000;
 		// max number of responses returned by UPS_Services.RightAddressService.
 		// Each record in the response may contain up to MAX_CHILD_RECORDS names
-		// and MAX_CHILD_RECORDS addresses (which may, in turn, contain up to 
+		// and MAX_CHILD_RECORDS addresses (which may, in turn, contain up to
 		// MAX_CHILD_RECORDS phone listings).
 		export unsigned2 MAX_RESPONSE_RECORDS := 100;
 		// max number of rolled up names/addresses/phones included in a response.
-		export unsigned2 MAX_CHILD_RECORDS := 25;				
+		export unsigned2 MAX_CHILD_RECORDS := 25;
 	end;
-	
+
 	// Relationship Identifier
-	
+
 	EXPORT RelationshipIdentifier := MODULE
 		EXPORT  UNSIGNED2 MAX_COUNT_SEARCH_MATCH_RECORDS := 8;
 		EXPORT  UNSIGNED2 MAX_COUNT_MATCH_RECORDS := 5;
-		EXPORT  UNSIGNED2 MAX_COUNT_ALL_MATCH_RECORDS := 40;		
+		EXPORT  UNSIGNED2 MAX_COUNT_ALL_MATCH_RECORDS := 40;
 		EXPORT  UNSIGNED2 MAX_COUNT_RELATIONSHIP_TYPES := 25;
 		EXPORT  UNSIGNED2 MAX_COUNT_RELATIONSHIP_MIDEX_LICENSES := 10;
 	END;
-	
+
 	// RetrieveImage
 	export Retrieve_Image := module
 		export MaxImageSize := 100000000;
 	end;
-	
+
 		// RetrieveImage
 	export Retrieve_Document := module
 		export MaxDocumentSize := 100000000;
 	end;
-	
+
   // RiskView
 	export RiskView_Report := MODULE
 			export MaxRecords := 512;
 			export MaxModels := 3;
 	end;
-	
+
 	export RiskView_2 := MODULE
 			export MaxHRICount := 12;
 			export MaxModelCount := 9;
@@ -1516,8 +1547,10 @@ EXPORT Constants := MODULE
 			export MaxAttributes := 1000;
 			export MaxAlertCount := 12;
 			export MaxPublicReportCount := 99;
+			export MaxStateExclusions := 50;
+			export MaxReportingSourceExclusions := 12292;
 	end;
-		
+
   // Risk Metrics
 	export RISK_METRIC := MODULE
 			export unsigned2 MaxSubsidiaries := 100;
@@ -1526,19 +1559,19 @@ EXPORT Constants := MODULE
 			export unsigned2 MaxSelfInsurance := 100;
 			export unsigned2 MaxCountSuppRiskRecords := 25;
 	end;
-	
-  // SearchPoint 
+
+  // SearchPoint
 	export unsigned2 SP_MAX_COUNT_RESPONSE_RECORDS := 3000;
-  
+
   // Sex Offender
 	// For AKAs, the actual dedup max count=71 (sspk=C2MO2069522; W20090218-091022 & W20090218-100428 on dev)
 	export unsigned2 SEXOFF_MAX_COUNT_AKAS := 75;
 	// For alternate addresses, the actual deduped max count=1169 (sspk=C2TX1867828; W20090416-135902 & W20090416-155016 on dev)
-	// However any value over 4?? (exact number would take a long time to determine) causes a 
+	// However any value over 4?? (exact number would take a long time to determine) causes a
 	// "System error 1451: Memory pool exhausted" runtime error.
-	// Therefore a max count of 400 was picked which will work for all but 3 offenders 
+	// Therefore a max count of 400 was picked which will work for all but 3 offenders
 	// that have more than 400 alternate addresses.
-	export unsigned2 SEXOFF_MAX_COUNT_ALT_ADDRESSES := 400; 
+	export unsigned2 SEXOFF_MAX_COUNT_ALT_ADDRESSES := 400;
   // For convictions, the actual max count=5 (sspk=CC2CA2004119 et al; W20090225-144435 on dev)
   export unsigned2 SEXOFF_MAX_COUNT_CONVICTIONS := 10;
 	export unsigned2 SEXOFF_MAX_COUNT_INPUT_HASHVALS := 3000;
@@ -1558,13 +1591,13 @@ EXPORT Constants := MODULE
 	export SITE_SECURITY := MODULE
 			export unsigned2 MaxSearchRecords := 200;
 	end;
-	
+
   // Skip Trace (The only Clarity gateway product we are using as of 10/11/2010.)
-	// The Skiptrace module name was choosen by the ESP group when they created the 
+	// The Skiptrace module name was choosen by the ESP group when they created the
 	// iesp.gateway_skiptrace attribute.
-	// NOTE: the Clarity skiptrace gateway is used by WorkPlace_Services Search & 
+	// NOTE: the Clarity skiptrace gateway is used by WorkPlace_Services Search &
 	// Report Services and constants related to those are found below under WP_MAX_*.
-	export Skiptrace := MODULE 
+	export Skiptrace := MODULE
 		export unsigned2 MaxAddresses   := 3;
 	  export unsigned2 MaxBanks       := 3;
 	  export unsigned2 MaxEmployments := 3;
@@ -1576,13 +1609,13 @@ EXPORT Constants := MODULE
 	export SLR := module    // Keep values in sync with GWBRIDGER to avoid data loss
 		export MaxList		:= 50;
 		export MaxItem 		:= 1024;
-		export MaxSourceTypes := 100;
+    export MaxSourceTypes := 100;
 	end;
-	
-  // Small Business 
+
+  // Small Business
 	export INTEGER1 MaxCountSmallBusinessHRI    := 4;
 	export INTEGER1 MaxCountSmallBusinessModels := 2;
-	
+
 	//Smartlinx report
 	export SMART := MODULE
 	  export unsigned2 MaxUnRolledRecords    := 1000;//all sections should use this as a limit on records prior to rollup logic
@@ -1605,7 +1638,7 @@ EXPORT Constants := MODULE
 		export unsigned1 MaxNOD           := 50;
 		export unsigned2 MaxVehicles 			:= 25;
 		export unsigned1 MaxWatercrafts 	:= 25;
-		export unsigned1 MaxAircrafts   	:= 25; 
+		export unsigned1 MaxAircrafts   	:= 25;
 		export unsigned2 MaxBankruptcies	:= 100;
 		export unsigned2 MaxLiens 		    := 100;
 		export unsigned1 MaxUCCs      	  := 100;
@@ -1622,7 +1655,7 @@ EXPORT Constants := MODULE
 		export unsigned1 MaxSexualOffenses := 50;
 		export unsigned1 MaxCrimRecords   := 100;
 		export unsigned1 MaxSources       := 100; //unlimited
-		
+
 		export string1 CURRENT      := 'C';
     export string1 PRIOR        := 'P';
 	  export string1 ACTIVE       := 'A';
@@ -1635,7 +1668,7 @@ EXPORT Constants := MODULE
 		//criminal record types
 		export string25 DOC         := 'DEPARTMENT OF CORRECTIONS';
     export string25 ARRESTLOG      := 'ARREST LOG';
-    export string25 CRIMINALCOURT    := 'CRIMINAL COURT'; 
+    export string25 CRIMINALCOURT    := 'CRIMINAL COURT';
 	end;
 
 	// SNA Constants
@@ -1649,7 +1682,7 @@ EXPORT Constants := MODULE
 		export Max_Scores := 10;
 		export Max_Invalids := 10;
 	end;
-	
+
 	// Taxpayer info, AKA Txbus?
 	export TAXPAYER := module
 		export unsigned2	MAX_COUNT_SEARCH_RECORDS := 1;
@@ -1673,9 +1706,9 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 MaxCountDOBs := 100;
 		EXPORT UNSIGNED2 MaxCountDODs := 100;
 		EXPORT UNSIGNED2 MaxCountRelatives := 5;
-		EXPORT UNSIGNED2 MaxCountResponseRecords := 100;		
+		EXPORT UNSIGNED2 MaxCountResponseRecords := 100;
 	END;
-	
+
 	// Thin RollupPersonSearch Extended
 	EXPORT ThinRpsExt := MODULE
 		EXPORT UNSIGNED2 MaxNames := ThinRps.MaxCountNames;
@@ -1684,8 +1717,8 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 MaxDODs := ThinRps.MaxCountDODs;
 		EXPORT UNSIGNED2 MaxRelatives := ThinRps.MaxCountRelatives;
 		EXPORT UNSIGNED2 MaxPhones := 1;
-		EXPORT UNSIGNED2 MaxRespRecords := ThinRps.MaxCountResponseRecords;				
-		EXPORT UNSIGNED2 MaxEmailAddresses := 5;		
+		EXPORT UNSIGNED2 MaxRespRecords := ThinRps.MaxCountResponseRecords;
+		EXPORT UNSIGNED2 MaxEmailAddresses := 5;
 		EXPORT UNSIGNED2 MaxCountCollegeAddresses := 5;
 		EXPORT UNSIGNED2 MaxCountPersonCounts := 25;
 	END;
@@ -1693,17 +1726,17 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 MaxAddresses := 5;
 		EXPORT UNSIGNED2 MaxCurrentResidents := 1;
 		EXPORT UNSIGNED2 MaxPreviousResidents := 5;
-		EXPORT UNSIGNED2 MaxRespRecords := 5; 
+		EXPORT UNSIGNED2 MaxRespRecords := 5;
 		EXPORT UNSIGNED2 MaxRelatives := 10;
 	END;
-	
+
 	EXPORT TISTA := MODULE
 		export unsigned2 MAX_WARNINGS := 20;
 		export unsigned2 MAX_ADDRESSES := 5;
 		export unsigned2	MAX_NAMEVALUES := 10;
 	end;
 
-	// TopBusiness, AKA BIP/Business Integration Project 
+	// TopBusiness, AKA BIP/Business Integration Project
 	EXPORT TOPBUSINESS := module
 
     // Report, Search & Source Services limits:
@@ -1713,17 +1746,17 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_COUNT_SOURCE_SEARCHBY_RECORDS   := 50;
 		export unsigned2 MAX_COUNT_SEARCH_MATCH_PRE_ROLLUP_RECORDS := 50;
 		export unsigned2 MAX_COUNT_SEARCH_MATCH_ROLLUP_RECORDS := 5;
-		
+
 		// associate/relationship/relative limits:
 		export unsigned2 MAX_COUNT_BIZRPT_RELATIONSHIP_RECORDS := 20;
 		export unsigned2 MAX_COUNT_BIZRPT_ASSOCIATE_RECORDS    := 100; //req BIZ2.0-1280 & 1410
     export unsigned2 MAX_COUNT_BIZRPT_PARENT_RECORDS       := 5;
-		
-		// best section 		
+
+		// best section
 		export unsigned	 MAX_COUNT_BIZRPT_OTHER_COMPANIES := 100;
 		export unsigned	 MAX_COUNT_BIZRPT_FEINS           := 100;
-		
-		// Profile section limits		
+
+		// Profile section limits
 		export unsigned2 MAX_COUNT_BIZRPT_FINANCE_RECORDS     :=  1;  //req BIZ2.0-0430
 		export unsigned2 MAX_COUNT_BIZRPT_PARCOMP_RECORDS     :=  5;  //req BIZ2.0-0440
 		export unsigned2 MAX_COUNT_BIZRPT_INDUSTRY_RECORDS    := 50;  //req BIZ2.0-0450???
@@ -1747,7 +1780,7 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_COUNT_BIZRPT_BANKRUPTCY_ATTORNEYS := 20;
 		export unsigned2 MAX_COUNT_BIZRPT_BANKRUPTCY_TRUSTEES  := 20;
 		export unsigned2 MAX_COUNT_BIZRPT_BANKRUPTCIES         := 100; //or 100? req BIZ2.0-0670
-    
+
 		// ConnectedBusinesses section limits
     export unsigned2 MAX_COUNT_CONNECTED_BUSINESSES        := 100;
 
@@ -1768,16 +1801,25 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_COUNT_BIZRPT_TERMINATED_UCCS := 100; //req BIZ2.0-0770
 		export unsigned2 MAX_COUNT_BIZRPT_UCC_ASDEBTORS   := 100; //req BIZ2.0-0770
 		export unsigned2 MAX_COUNT_BIZRPT_UCC_ASSECUREDS  := 100; //req BIZ2.0-0770
-		
+
 		// tradelines section
 		export unsigned  MAX_COUNT_BIZRPT_TRADELINES := 50;
 		export unsigned  MAX_COUNT_BIZRPT_TRADELINE_SUMMARIES  := 50;
 
-		// Real Property section limits	
-		// ensure that this is 1/2 of MAX_COUNT_BIZRPT_PROPERTY_TOTAL_RECS 
-		export unsigned2 MAX_COUNT_BIZRPT_PROPERTY_RECORDS        := 100; 
-		export unsigned2 MAX_COUNT_BIZRPT_PROPERTY_PARTY_RECORDS  := 50; 
-		export unsigned2 MAX_COUNT_BIZRPT_PROPERTY_DEED_RECORDS   := 10; 
+		// cortera tradelines
+		// NOTE: this is currently not used in top business report - at present it is only used for combined bip service
+		export unsigned MAX_COUNT_BIZRPT_CTL_SEGMENTS := 50;
+		export unsigned MAX_COUNT_BIZRPT_CTL_ACCTS := 100;
+
+           // BUSINESS INSIGHT SECTION CONSTANTS
+           export unsigned MAX_COUNT_BUSINESS_RISK_RISKCODE := 20;
+           export unsigned MAX_COUNT_BUSINESS_EVIDENCE_RISKCODE := 20;
+
+		// Real Property section limits
+		// ensure that this is 1/2 of MAX_COUNT_BIZRPT_PROPERTY_TOTAL_RECS
+		export unsigned2 MAX_COUNT_BIZRPT_PROPERTY_RECORDS        := 100;
+		export unsigned2 MAX_COUNT_BIZRPT_PROPERTY_PARTY_RECORDS  := 50;
+		export unsigned2 MAX_COUNT_BIZRPT_PROPERTY_DEED_RECORDS   := 10;
 		export unsigned2 MAX_COUNT_BIZRPT_PROPERTY_TOTAL_RECS     := 200;
 
 		// foreclosure NOD section limits
@@ -1803,20 +1845,20 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_COUNT_BIZRPT_BUSREG_RECORDS    := 50;
 		export unsigned2 MAX_COUNT_BIZRPT_DNBSIC_RECORDS    := 30; // for all SIC code fields in DNB.Layout_DNB_Base
 		export unsigned2 MAX_COUNT_BIZRPT_EBR_RECORDS       := 10; // May need adjusted? Not really sure how many EBR file_numbers could be associated with a seleid
-		// NOTE: The BIP2 "Accurint only" EBR section will use the iesp.bizcredit layouts 
+		// NOTE: The BIP2 "Accurint only" EBR section will use the iesp.bizcredit layouts
 		// which use max count values from this attribute named BIZ_CREDIT.MAX_* above.
 		export unsigned2 MAX_COUNT_BIZRPT_IRS5500_RECORDS   := 50;
 	  export unsigned2 MAX_COUNT_BIZRPT_SANCTION_RECORDS   := 50;
 		// SourceService limits
 		export unsigned2 MAX_COUNT_SOURCE_CONTACT_RECORD := 20;// max may need adjusted???
 	  export unsigned2 MAX_COUNT_ACF_RECORD       := 100; // max may need adjusted???
-		export unsigned2 MAX_COUNT_AMSLIC_RECORD    := 100; 
+		export unsigned2 MAX_COUNT_AMSLIC_RECORD    := 100;
     export unsigned2 MAX_COUNT_BBB_RECORD       := 100; // max may need adjusted???
     export unsigned2 MAX_COUNT_BK_RECORD        := 100; // max may need adjusted???
 		export unsigned2 MAX_COUNT_BUSREG_RECORD    := 100;
-		export unsigned2 MAX_COUNT_CATAX_RECORD    	:= 100; 
-    export unsigned2 MAX_COUNT_CALBUS_RECORD    := 100; // max may need adjusted??? 
-		export unsigned2 MAX_COUNT_CNLD_RECORD    	:= 100;  
+		export unsigned2 MAX_COUNT_CATAX_RECORD    	:= 100;
+    export unsigned2 MAX_COUNT_CALBUS_RECORD    := 100; // max may need adjusted???
+		export unsigned2 MAX_COUNT_CNLD_RECORD    	:= 100;
     export unsigned2 MAX_COUNT_CORP_RECORD      := 100; // max may need adjusted???
 		export unsigned2 MAX_COUNT_CORTERA_RECORD   := 100;
 		export unsigned2 MAX_COUNT_CRASH_RECORD			:= 100;
@@ -1827,28 +1869,28 @@ EXPORT Constants := MODULE
     export unsigned2 MAX_COUNT_DEADCO_RECORD    := 100;
 	  export unsigned2 MAX_COUNT_DIRECTORY_RECORD := 100; // MAY NOT BE NEEDED ???
 		export unsigned2 MAX_COUNT_DIVCERT_RECORD   := 100;
-    export unsigned2 MAX_COUNT_DNB_RECORD       := 100; 
-    export unsigned2 MAX_COUNT_EBR_RECORD       := 100; 
+    export unsigned2 MAX_COUNT_DNB_RECORD       := 100;
+    export unsigned2 MAX_COUNT_EBR_RECORD       := 100;
 	export unsigned2 MAX_COUNT_EQUIFAXBUSDATA_RECORD := 100;
-    export unsigned2 MAX_COUNT_EDA_RECORD       := 100; 
-	  export unsigned2 MAX_COUNT_FAA_RECORD       := 100; 
-    export unsigned2 MAX_COUNT_FBN_RECORD       := 100; 
-	  export unsigned2 MAX_COUNT_FCC_RECORD       := 100; 
-    export unsigned2 MAX_COUNT_FDIC_RECORD      := 100; 
-    export unsigned2 MAX_COUNT_FDICSOD_RECORD   := 100; 
-    export unsigned2 MAX_COUNT_FEIN_RECORD      := 100; 
-		export unsigned2 MAX_COUNT_EXPFEIN_RECORD   := 100; 
+    export unsigned2 MAX_COUNT_EDA_RECORD       := 100;
+	  export unsigned2 MAX_COUNT_FAA_RECORD       := 100;
+    export unsigned2 MAX_COUNT_FBN_RECORD       := 100;
+	  export unsigned2 MAX_COUNT_FCC_RECORD       := 100;
+    export unsigned2 MAX_COUNT_FDIC_RECORD      := 100;
+    export unsigned2 MAX_COUNT_FDICSOD_RECORD   := 100;
+    export unsigned2 MAX_COUNT_FEIN_RECORD      := 100;
+		export unsigned2 MAX_COUNT_EXPFEIN_RECORD   := 100;
 		export unsigned2 MAX_COUNT_EXPCRDB_RECORD		:= 100;
-    export unsigned2 MAX_COUNT_FIREARM_RECORD   := 100; 
-    export unsigned2 MAX_COUNT_FOREC_RECORD     := 100; 
-		export unsigned2 MAX_COUNT_FRANDX_RECORD    := 100; 
-    export unsigned2 MAX_COUNT_GAMING_RECORD    := 100; 
-		export unsigned2 MAX_COUNT_GONG_RECORD    	:= 100; 
-		export unsigned2 MAX_COUNT_GSA_RECORD    		:= 100; 
-		export unsigned2 MAX_COUNT_IATAX_RECORD    	:= 100; 
-    export unsigned2 MAX_COUNT_IDEXEC_RECORD    := 100; 
+    export unsigned2 MAX_COUNT_FIREARM_RECORD   := 100;
+    export unsigned2 MAX_COUNT_FOREC_RECORD     := 100;
+		export unsigned2 MAX_COUNT_FRANDX_RECORD    := 100;
+    export unsigned2 MAX_COUNT_GAMING_RECORD    := 100;
+		export unsigned2 MAX_COUNT_GONG_RECORD    	:= 100;
+		export unsigned2 MAX_COUNT_GSA_RECORD    		:= 100;
+		export unsigned2 MAX_COUNT_IATAX_RECORD    	:= 100;
+    export unsigned2 MAX_COUNT_IDEXEC_RECORD    := 100;
 		export unsigned2 MAX_COUNT_INFUTOR_NARB_RECORD := 100;
-		export unsigned2 MAX_COUNT_INSCERT_RECORD 	:= 100; 
+		export unsigned2 MAX_COUNT_INSCERT_RECORD 	:= 100;
     export unsigned2 MAX_COUNT_IRS5500_RECORD   := 100; // max may need adjusted???
     export unsigned2 MAX_COUNT_IRS990_RECORD    := 100; // max may need adjusted???
     export unsigned2 MAX_COUNT_JS_RECORD        := 100; // max may need adjusted???
@@ -1863,7 +1905,7 @@ EXPORT Constants := MODULE
     export unsigned2 MAX_COUNT_ORWORK_RECORD    := 100; // max may need adjusted???
 		export unsigned2 MAX_COUNT_OTHER_RECORD    	:= 750; // max may need adjusted???
 		export unsigned2 MAX_COUNT_OTHER_GROUP    	:= 250; // max may need adjusted???
-		export unsigned2 MAX_COUNT_OSHAIR_RECORD   	:= 100; 
+		export unsigned2 MAX_COUNT_OSHAIR_RECORD   	:= 100;
     export unsigned2 MAX_COUNT_PROFLIC_RECORD   := 100; // max may need adjusted???
     export unsigned2 MAX_COUNT_PROP_RECORD      := 100; // max may need adjusted???
     export unsigned2 MAX_COUNT_SDA_RECORD       := 100; // max may need adjusted???
@@ -1880,10 +1922,10 @@ EXPORT Constants := MODULE
     export unsigned2 MAX_COUNT_UTILITY_RECORD   := 100; // max may need adjusted???
     export unsigned2 MAX_COUNT_VICKERS_RECORD   := 100; // max may need adjusted???
     export unsigned2 MAX_COUNT_WC_RECORD        := 100; // max may need adjusted???
-		export unsigned2 MAX_COUNT_WORKERSCOMP_RECORD := 100; // max may need adjusted???					
+		export unsigned2 MAX_COUNT_WORKERSCOMP_RECORD := 100; // max may need adjusted???
     export unsigned2 MAX_COUNT_YP_RECORD        := 100; // max may need adjusted???
     export unsigned2 MAX_COUNT_ZOOM_RECORD      := 100; // max may need adjusted???
-		
+
 		// Default or Other source doc defaults
 		export unsigned2 OTHER_MAX_SICCODES					:= 75;
 		export unsigned2 OTHER_MAX_NAICSCODES				:= 75;
@@ -1892,7 +1934,7 @@ EXPORT Constants := MODULE
 	END; // of TopBusiness module
 
   // UCC Filings (cannot use same name: "F" -- for "filing")
-  // TODO: following constants must be redefined appropriately, they're hardcoded in 
+  // TODO: following constants must be redefined appropriately, they're hardcoded in
   // uccv2_services.layout_ucc_rollup
   export UCCF := MODULE
     export unsigned2 MaxCountSearch := 1000;
@@ -1918,7 +1960,7 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 MAX_SECONDARY_SICS       := 4;
 		EXPORT UNSIGNED2 MAX_SICS									:= 5;
 	END;
-	
+
 	//Velocity Check - Search Alert
 	export VC := MODULE
 		 export unsigned2 MAX_SRCHDATE_RECS := 100;
@@ -1957,7 +1999,7 @@ EXPORT Constants := MODULE
   // *** Modules that refer to other modules above.
  	// NOTE: Various Max* attributes in the BR module refer to other modules (i.e. BANKRPT,
 	// Crim, etc.), so this BR module must be after all of the modules it refers to.
-	// 
+	//
   // Bps (Business/Person) Report and all other compound reports
   export BR := MODULE
     export unsigned1 UNKNOWN := 10; // default
@@ -1973,7 +2015,7 @@ EXPORT Constants := MODULE
     export unsigned1 MaxAddress := 20;
     export unsigned1 MaxAddress_Residents := 10; // residents per each addresses
     export unsigned1 MaxAddress_Phones := 5; // phones per each addresses
-    export unsigned1 MaxAddress_Property := UNKNOWN; // 
+    export unsigned1 MaxAddress_Property := UNKNOWN; //
     export unsigned1 MaxAssociates := 25; // Associates per each addresses
     export unsigned1 MaxNeighborhood := 5; // number neighborhoods to return
     export unsigned1 MaxHistoricalNeighborhood := 5;
@@ -1987,7 +2029,7 @@ EXPORT Constants := MODULE
 
     // single sources
     export unsigned1 MaxAccidents := UNKNOWN; //no limit defined for datatype
-    export unsigned1 MaxAircrafts := 10; 
+    export unsigned1 MaxAircrafts := 10;
     export unsigned1 MaxAssessments := PROP.MaxCountReportAssessments;
     export unsigned1 MaxBankruptcies := BANKRPT.MaxCountReport;
     export unsigned1 MaxCivilCourtRecords := UNKNOWN;
@@ -2016,7 +2058,7 @@ EXPORT Constants := MODULE
     export unsigned1 MaxRTVehicles := UNKNOWN;
     export unsigned2 MaxSanctions := UNKNOWN;
     export unsigned1 MaxSexualOffenses := 50;
-    export unsigned1 MaxStudentColleges := 10; 
+    export unsigned1 MaxStudentColleges := 10;
     export unsigned1 MaxSuperiorLiens := UNKNOWN; //TODO: what is that? should it rather be "LiensSUperior"
     export unsigned1 MaxUCCFilings := UCCF.MaxCountReport;
     export unsigned1 MaxVehicles := 10;
@@ -2032,7 +2074,7 @@ EXPORT Constants := MODULE
     export unsigned1 MaxUtilAddresses := 2;
   end;
 
- 	// NOTE: Various Max*** attributes in the AR module refer to the BR & DL modules, 
+ 	// NOTE: Various Max*** attributes in the AR module refer to the BR & DL modules,
 	// so this AR module must be after the BR & DL modules.
   // Address report
   export AR := MODULE
@@ -2056,8 +2098,8 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxHuntingandFishing := 50;
 		export unsigned2 MaxConcealedWeapons := 50;
 		export unsigned1 MaxNeighborhood 	:= 1;
-		export unsigned1 MaxRelatives := 50;		
-		export unsigned1 MaxAssociates := 50;		
+		export unsigned1 MaxRelatives := 50;
+		export unsigned1 MaxAssociates := 50;
 		export unsigned1 MaxOwners := 5;
 		export unsigned1 MaxPossibleOccupants := 4;
   end;
@@ -2067,9 +2109,9 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxDefault         := 100;
 		export unsigned2 MaxAircrafts       := 1000;
 		export unsigned2 MaxATF             := 200;
-		export unsigned2 MaxAVM             := 1000;
-		export unsigned2 MaxBankruptcies    := 1000;  
-		export unsigned2 MaxCrimOffenders		:= 2000;  
+		export unsigned2 MaxAVM             := 2000;
+		export unsigned2 MaxBankruptcies    := 1000;
+		export unsigned2 MaxCrimOffenders		:= 2000;
 		export unsigned2 MaxCrimOffenses		:= 750;
 		export unsigned2 MaxCrimCourtOffenses	:= 900;
 		export unsigned2 MaxCrimPunishment	:= 150;
@@ -2101,7 +2143,7 @@ EXPORT Constants := MODULE
     export unsigned2 MaxResults := 1000;
     export unsigned2 MaxCountSearch := 1000;
   END;
-	
+
 	// PRCT/Demo Search Tool
   export DEMO_SEARCH_TOOL := MODULE
     export unsigned2 MAX_COUNT_SEARCH_RESPONSE_RECORDS := 100;
@@ -2110,7 +2152,7 @@ EXPORT Constants := MODULE
 	 export PhoneMetadata := module
 		export UNSIGNED2 MaxPhoneMetadataRecords := 1000;
 	end;
-    
+
   export PfResSnapshot := module
 		export UNSIGNED2 MaxRIs := 50;
 		export UNSIGNED2 MaxIdentities := 50;
@@ -2118,7 +2160,7 @@ EXPORT Constants := MODULE
 		export UNSIGNED2 MaxSearchRecords := 2000;
 		export UNSIGNED2 MaxCompanyIds := 100;
 	end;
-	
+
 	//Person Slim alerting query
   export PersonSlim := module
 	//decision made to return only the latest rec per Virtual ID (entity)
@@ -2154,10 +2196,15 @@ EXPORT Constants := MODULE
     export UNSIGNED2 MaxImposters    := 50;
     export UNSIGNED2 MaxUtilities    := 100;
   end;
-  
+
   export CollectionReport := module
     export unsigned2 MaxCollections := 100;
     export unsigned2 MaxCollectionRecords := 2000;
   end;
-	
+
+  export ConsumerOptoutReport := module
+    export unsigned2 MaxGlobalSIDs := 1000;
+  end;
+
 END;
+

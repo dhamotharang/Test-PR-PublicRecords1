@@ -1,8 +1,11 @@
-import doxie, Doxie_Raw;
+﻿import AutoStandardI, doxie, Doxie_Raw;
 
 doxie.MAC_Header_Field_Declare() // only to take dateVal
 
 export corp_affiliations_records(dataset(doxie.layout_references) in_dids) := function
+
+global_mod := AutoStandardI.GlobalModule();
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (global_mod);
 
 j1 := Doxie_Raw.CorpAffil_Raw(in_dids, dateVal);
 
@@ -26,7 +29,7 @@ forphone := project(r, transform(doxie.layout_AppendGongByAddr_input,
 																 self := left,
 																 self := []));
 
-gphones := Doxie.fn_AppendGongByAddr(forphone);
+gphones := Doxie.fn_AppendGongByAddr(forphone,mod_access);
 
 
 //***** DEDUP THE PHONES

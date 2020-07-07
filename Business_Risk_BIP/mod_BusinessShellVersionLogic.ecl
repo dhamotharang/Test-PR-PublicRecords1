@@ -1,4 +1,4 @@
-﻿IMPORT ut;
+﻿IMPORT MDR, STD, ut;
 
 EXPORT mod_BusinessShellVersionLogic(Business_Risk_BIP.LIB_Business_Shell_LIBIN Options) := MODULE
 
@@ -131,8 +131,30 @@ EXPORT mod_BusinessShellVersionLogic(Business_Risk_BIP.LIB_Business_Shell_LIBIN 
 		RETURN result;
 	END;
 	
-	EXPORT _FirmReportedSales(STRING FirmReportedSales) := 
-	IF(BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, (STRING)MIN((INTEGER)FirmReportedSales, 999999999), FirmReportedSales);
+	EXPORT _FirmReportedSales(DATASET(Business_Risk_BIP.Layouts.LayoutSalesSources) SalesSources, STRING VerInputIDTruebiz) := FUNCTION
+		maxSalesValue := MAX(SalesSources, Amount);
+		salesValueBySort := SORT( SalesSources, -(Source = 'DF'), -(Source = 'Z1'), -(Source = 'Z2'), -(Source = 'RR'), -(Source = 'Q3'), -(Source = 'ER'), -DateLastSeen, -DateFirstSeen, -Amount)[1].Amount;
+
+		firmReportedSales :=  MAP(
+      BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31 AND VerInputIDTruebiz = '0' => '-1',
+			BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30 => (STRING)MIN(maxSalesValue, 999999999),
+			Options.BusShellVersion =  Business_Risk_BIP.Constants.BusShellVersion_v30 => (STRING)MIN(maxSalesValue, 99999999999),
+			Options.BusShellVersion =  Business_Risk_BIP.Constants.BusShellVersion_v31 => (STRING)MIN(salesValueBySort, 99999999999),
+			'');
+			
+		RETURN (STRING)Business_Risk_BIP.Common.capNum( (INTEGER)checkBlank(firmReportedSales, '-1'), -1, 99999999999 );
+	END;
+			
+	EXPORT _FirmReportedSalesRange(DATASET(Business_Risk_BIP.Layouts.LayoutSalesSources) SalesSources, STRING VerInputIDTruebiz) := FUNCTION
+		firmReportedSales :=  _FirmReportedSales(SalesSources, VerInputIDTruebiz);
+		
+		RETURN MAP(
+      busShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31 AND VerInputIDTruebiz = '0' => '-1',
+			Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND firmReportedSales = '-1' => firmReportedSales,
+			Options.BusShellVersion =  Business_Risk_BIP.Constants.BusShellVersion_v30 => (STRING)Business_Risk_BIP.Common.getSalesRangeIndex((INTEGER)firmReportedSales),
+			Options.BusShellVersion =  Business_Risk_BIP.Constants.BusShellVersion_v31 => (STRING)Business_Risk_BIP.Common.getSalesRangeIndexV31((INTEGER)firmReportedSales),
+			'');
+	END;
 
 	EXPORT _InputAddrVacancyNoID(STRING InputAddrVacancy) := 
   FUNCTION   
@@ -295,4 +317,79 @@ EXPORT mod_BusinessShellVersionLogic(Business_Risk_BIP.LIB_Business_Shell_LIBIN 
     InputPhoneEntityCount_2 := IF(TRIM(Phone10) <> '', (STRING)MAX((INTEGER)InputPhoneEntityCount, 0), '-1');
     RETURN  IF(busShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, InputPhoneEntityCount_1, InputPhoneEntityCount_2);
   END;  
+
+  EXPORT _GroupedSICNAICSources( DATASET(Business_Risk_BIP.Layouts.LayoutSICNAIC) SICNAICSources ) := FUNCTION
+    LayoutSICNAIC_temp := {Business_Risk_BIP.Layouts.LayoutSICNAIC, STRING2 OrigSource};
+    SICNAICSources_temp := PROJECT( SICNAICSources, TRANSFORM( LayoutSICNAIC_temp, SELF.OrigSource := LEFT.Source, SELF := LEFT, SELF := [] ) );
+    GroupedSICNAICSources_pre := Business_Risk_BIP.Common.groupSources(LayoutSICNAIC_temp, SICNAICSources_temp);
+    
+    GroupedSICNAICSources := PROJECT( GroupedSICNAICSources_pre, Business_Risk_BIP.Layouts.LayoutSICNAIC );
+    
+    GroupedSICNAICSources_31 := PROJECT(
+        GroupedSICNAICSources_pre,
+        TRANSFORM( Business_Risk_BIP.Layouts.LayoutSICNAIC,
+          SELF.Source := IF( LEFT.OrigSource IN MDR.sourceTools.set_CorpV2, LEFT.OrigSource, LEFT.Source ),
+          SELF := LEFT, // must be able to look at CorpsV2 source codes in "Source" field, specifically: 'CP','C?','CI'
+          SELF := [] )); 
+    
+    RETURN IF( busShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, GroupedSICNAICSources_31, GroupedSICNAICSources);
+  END;
+  
+  SHARED apply24MonthFilterSICNAIC( DATASET(Business_Risk_BIP.Layouts.LayoutSICNAIC) SICNAICSources, INTEGER HistoryDate ) := FUNCTION
+    histDate := IF( HistoryDate = 999999, (INTEGER)(((STRING)STD.Date.Today( ))[1..6]+'01'), (INTEGER)((((STRING)HistoryDate) + '01')[1..8]) );
+    RETURN IF( 
+      busShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, 
+      SICNAICSources( ((INTEGER)(DateLastSeen + '01') >= STD.Date.AdjustDate( histDate, year_delta := -2 )) ),
+      SICNAICSources );
+  END;
+
+  // To choose the best SIC/NAIC we are going with a waterfall source selection - the first source in this list is the SIC/NAIC we choose.  
+  // Adding dates/record counts to ensure we don't have some sort of magical indeterminate code. 
+  EXPORT _BestSIC( DATASET(Business_Risk_BIP.Layouts.LayoutSICNAIC) SICSources, INTEGER HistoryDate, STRING VerInputIDTruebiz ) := 
+    FUNCTION
+        // Sorting logic for SIC/NAIC codes in older Business Shell versions:
+        SICSources_sorted := SORT((SICSources(IsPrimary = TRUE)), -(Source = 'DF'), -(Source = 'ER'), -(TRIM(Source) = 'Y') , -(Source = 'OS'), -(Source = 'BR'), -(Source = 'FH'), -(Source = 'C#'), -(Source = 'DN'), -DateLastSeen, -DateFirstSeen, -RecordCount)[1];
+        // Sorting logic for v31 and higher:
+        SICSources_v31_past24Months := apply24MonthFilterSICNAIC( SICSources, HistoryDate );
+        SICSources_v31_sorted := SORT( SICSources_v31_past24Months, -(IsPrimary = TRUE), -(Source = 'DF'), -(Source = 'Z1'), -(TRIM(Source) = 'D'), -(Source = 'RQ'), -(Source = 'Z2'), -(Source = 'RR'), -(Source = 'DN'), -(Source = 'ER'), -(Source = 'Q3'), -(Source = 'L0'), -(TRIM(Source) = 'Y'), -DateLastSeen, -DateFirstSeen, -RecordCount )[1];
+        SICSources_v31_sorted_trueBiz := IF( VerInputIDTruebiz = '1', SICSources_v31_sorted ); 
+        RETURN IF( busShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, SICSources_v31_sorted_trueBiz, SICSources_sorted );        
+    END;
+
+  // To choose the best SIC/NAIC we are going with a waterfall source selection - the first source in this list is the SIC/NAIC we choose.  
+  // Adding dates/record counts to ensure we don't have some sort of magical indeterminate code. 
+  EXPORT _BestNAIC( DATASET(Business_Risk_BIP.Layouts.LayoutSICNAIC) NAICSources, INTEGER HistoryDate, STRING VerInputIDTruebiz ) := 
+    FUNCTION
+        // Sorting logic for SIC/NAIC codes in older Business Shell versions:
+        NAICSources_sorted := SORT((NAICSources(IsPrimary = TRUE)), -(Source = 'DF'), -(Source = 'ER'), -(TRIM(Source) = 'Y') , -(Source = 'OS'), -(Source = 'BR'), -(Source = 'FH'), -(Source = 'C#'), -(Source = 'DN'), -DateLastSeen, -DateFirstSeen, -RecordCount)[1];
+        // Sorting logic for v31 and higher:
+        NAICSources_v31_past24Months := apply24MonthFilterSICNAIC( NAICSources, HistoryDate );
+        NAICSources_v31_sorted := SORT( NAICSources_v31_past24Months, -(IsPrimary = TRUE), -(Source = 'DF'), -(Source = 'Z1'), -(Source = 'RR'), -(Source = 'C#'), -(Source = 'TX'), -(Source = 'CP'), -(Source = 'C?'), -(Source = 'CI'), -(Source = 'Q3'), -(TRIM(Source) = 'Y'), -DateLastSeen, -DateFirstSeen, -RecordCount )[1];
+        NAICSources_v31_sorted_trueBiz := IF( VerInputIDTruebiz = '1', NAICSources_v31_sorted ); 
+
+        RETURN IF( busShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, NAICSources_v31_sorted_trueBiz, NAICSources_sorted );        
+    END;
+	
+  EXPORT _FirmEmployeeCount( DATASET(Business_Risk_BIP.Layouts.LayoutSources) SeqEmployeeSources, STRING VerInputIDTruebiz ) := FUNCTION
+		FirmEmployeeCount_v22 := IF(EXISTS(SeqEmployeeSources), (STRING)Business_Risk_BIP.Common.capNum(SORT(SeqEmployeeSources (RecordCount > 0), -(Source = 'DF'), -(Source = 'BR'), -(Source = 'IA'), -(Source = 'IC'), -DateLastSeen, -DateFirstSeen, -RecordCount)[1].RecordCount, -1, 999999), '-1');
+		FirmEmployeeCount_v30 := IF(EXISTS(SeqEmployeeSources), (STRING)Business_Risk_BIP.Common.capNum(SORT(SeqEmployeeSources (RecordCount > -1), -(Source = 'DF'), -(Source = 'RR'), -(Source = 'BR'), -(Source = 'IA'), -(Source = 'IC'), -DateLastSeen, -DateFirstSeen, -RecordCount)[1].RecordCount, -1, 999999), '-1');
+		FirmEmployeeCount_v31 := IF(EXISTS(SeqEmployeeSources), (STRING)Business_Risk_BIP.Common.capNum(SORT(SeqEmployeeSources (RecordCount > -1), -(Source = 'DF'), -(Source = 'Z1'), -(Source = 'RR'), -(Source = 'Q3'), -(Source = 'Z2'), -(Source = 'ER'), -DateLastSeen, -DateFirstSeen, -RecordCount)[1].RecordCount, -1, 999999), '-1');
+		RETURN MAP(
+        busShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31 AND VerInputIDTruebiz = '0' => '-1',
+        busShellVersion =  Business_Risk_BIP.Constants.BusShellVersion_v22 => FirmEmployeeCount_v22,
+        busShellVersion =  Business_Risk_BIP.Constants.BusShellVersion_v30 => FirmEmployeeCount_v30, 
+        busShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31 => FirmEmployeeCount_v31,
+        '');  
+  END;
+  
+  EXPORT _FirmEmployeeRangeCount( DATASET(Business_Risk_BIP.Layouts.LayoutSources) SeqEmployeeSources, STRING VerInputIDTruebiz ) := FUNCTION
+		FirmEmployeeCount_v30 := IF(EXISTS(SeqEmployeeSources), (STRING)Business_Risk_BIP.Common.capNum(SORT(SeqEmployeeSources (RecordCount > -1), -(Source = 'DF'), -(Source = 'RR'), -(Source = 'BR'), -(Source = 'IA'), -(Source = 'IC'), -DateLastSeen, -DateFirstSeen, -RecordCount)[1].RecordCount, -1, 999999), '-1');
+		FirmEmployeeCount_v31 := IF(EXISTS(SeqEmployeeSources), (STRING)Business_Risk_BIP.Common.capNum(SORT(SeqEmployeeSources (RecordCount > -1), -(Source = 'DF'), -(Source = 'Z1'), -(Source = 'RR'), -(Source = 'Q3'), -(Source = 'Z2'), -(Source = 'ER'), -DateLastSeen, -DateFirstSeen, -RecordCount)[1].RecordCount, -1, 999999), '-1');
+		RETURN MAP(
+        busShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31 AND VerInputIDTruebiz = '0' => '-1',
+        busShellVersion =  Business_Risk_BIP.Constants.BusShellVersion_v30 => (STRING)Business_Risk_BIP.Common.getEmployeeRangeIndex((INTEGER)FirmEmployeeCount_v30),
+        busShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31 => (STRING)Business_Risk_BIP.Common.getEmployeeRangeIndexV31((INTEGER)FirmEmployeeCount_v31),
+        '');
+  END;
+  
 END;

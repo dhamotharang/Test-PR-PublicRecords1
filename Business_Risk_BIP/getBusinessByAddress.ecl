@@ -1,9 +1,10 @@
-﻿IMPORT BIPV2, BizLinkFull, Risk_Indicators, SALT28, UT;
+﻿IMPORT BIPV2, BizLinkFull, Risk_Indicators, SALT28, UT, Doxie, STD;
 
 EXPORT getBusinessByAddress(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 												 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 												 BIPV2.mod_sources.iParams linkingOptions,
-												 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+												 SET OF STRING2 AllowedSourcesSet,
+												 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 	tempVerificationLayout := RECORD
 		UNSIGNED4 Seq,
@@ -58,7 +59,8 @@ EXPORT getBusinessByAddress(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							Business_Risk_BIP.Constants.Limit_BusHeader,
 																							FALSE, /* dnbFullRemove */
 																							TRUE, /* bypassContactSuppression */
-																							Options.KeepLargeBusinesses);
+																							Options.KeepLargeBusinesses,
+																							mod_access := mod_access);
 																							
 	// clean up the business header before doing anything else
   Business_Risk_BIP.Common.mac_slim_header(BusinessHeaderRawAddress1, BusinessHeaderRawAddress);																							
@@ -87,7 +89,7 @@ EXPORT getBusinessByAddress(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		AddressPopulated		:= TRIM(le.Clean_Input.Prim_Name) <> '' AND TRIM(le.Clean_Input.Zip5) <> '' AND TRIM(ri.prim_name) <> '' AND TRIM(ri.Zip) <> '';
 		NoScoreValue				:= 255; // This is what the various score functions return if blank is passed in
 		ZIPScore						:= IF(le.Clean_Input.Zip5 <> '' AND ri.Zip <> '' AND le.Clean_Input.Zip5[1] = ri.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(le.Clean_Input.Zip5, ri.Zip), NoScoreValue);
-		StateMatched				:= StringLib.StringToUpperCase(le.Clean_Input.State) = StringLib.StringToUpperCase(ri.st);
+		StateMatched				:= STD.Str.ToUpperCase(le.Clean_Input.State) = STD.Str.ToUpperCase(ri.st);
 		CityStateScore			:= IF(le.Clean_Input.City <> '' AND le.Clean_Input.State <> '' AND ri.p_city_name <> '' AND ri.st <> '' AND StateMatched, 
 															Risk_Indicators.AddrScore.CityState_Score(le.Clean_Input.City, le.Clean_Input.State, ri.p_city_name, ri.st, ''), NoScoreValue);
 		CityStateZipMatched	:= AddressPopulated AND Risk_Indicators.iid_constants.ga(ZIPScore) AND Risk_Indicators.iid_constants.ga(CityStateScore);

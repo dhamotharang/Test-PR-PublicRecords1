@@ -60,7 +60,7 @@ export constants:= module;
 	export unsigned4 SearchFidKeyConstant := 10;	
 	export unsigned4 PropertyKeepConstant := 5;
 	export unsigned4 PropertyKeepDeedConstant := 50;
-	export unsigned4 PropertyKfetchMaxLimit := 10000;
+	export unsigned4 PropertyKfetchMaxLimit := 5000;
 	export unsigned4 ForeclosureNODKfetchMaxLimit := 500;
 	export unsigned4 OtherCompanyNamesVariationsMax := 199;
 	export unsigned4 BusHeaderKfetchMaxLimitLarger := 17000;
@@ -319,5 +319,10 @@ export constants:= module;
 		EXPORT Foreign    := 'Foreign';
 		EXPORT Domestic  	:= 'Domestic';
 	END;
+     
+     EXPORT BusinessInsight := MODULE
+         	export unsigned4 UCCBusinessInsightKfetchMaxLimit := 5000;	
+          EXPORT unsigned2 MaxIndicatorCodesReturned := 5;
+      END;
 	
 end;

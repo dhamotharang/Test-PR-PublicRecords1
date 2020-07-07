@@ -1,4 +1,4 @@
-﻿import ut, riskwise, risk_indicators, AutoStandardI, doxie, PublicRecords_KEL, Gateway;
+﻿import ut, riskwise, risk_indicators, AutoStandardI, doxie, Gateway;
 
 export Boca_Shell := MACRO
 
@@ -48,7 +48,9 @@ export Boca_Shell := MACRO
     'LexIdSourceOptout',
     '_TransactionId',
     '_BatchUID',
-    '_GCID'));
+    '_GCID',
+		'TurnOffTumblings',
+		'UseIngestDate'));
 
 string30 account_value := '' 		: stored('AccountNumber');
 string30 fname_val := ''     		: stored('FirstName');
@@ -103,12 +105,14 @@ real watchlist_threshold := 0.84 			: stored('GlobalWatchlistThreshold');
 unsigned1 ofac_version      := 1        : stored('OFACVersion');
 boolean   include_ofac       := false    : stored('IncludeOfac');
 boolean   include_additional_watchlists  := false    : stored('IncludeAdditionalWatchLists');
+boolean   TurnOffTumblings  := false    : stored('TurnOffTumblings');
+boolean UseIngestDate             := FALSE : stored('UseIngestDate'); 
 
 //CCPA fields
-unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
-string TransactionID := '' : stored ('_TransactionId');
-string BatchUID := '' : stored('_BatchUID');
-unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 
 rec := record
   unsigned4 seq;
@@ -135,7 +139,7 @@ risk_indicators.layout_input into(rec l) := transform
 	self.ssn := ssn_value;
 	self.dob := dob_value;
 				temp_age :=  if (age_value = 0 and (integer)dob_value != 0, 
-														(STRING)ut.GetAgeI_asOf((unsigned)dob_value, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
+														(STRING)ut.Age((unsigned)dob_value, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
 														(STRING)age_value);
 	self.age := if((integer)temp_age > 99, '99',temp_age);
 	
@@ -186,7 +190,7 @@ gateways_in := Gateway.Configuration.Get();
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
 	self.url := map(
-  bsversion >= 55 and stringlib.StringToLowerCase(trim(le.servicename)) = Gateway.Constants.ServiceName.ThreatMetrix => le.url, // TMX allowed for shell 5.5 and higher
+	bsversion >= 55 and stringlib.StringToLowerCase(trim(le.servicename)) in [Gateway.Constants.ServiceName.ThreatMetrix,Gateway.Constants.ServiceName.ThreatMetrix_test]  => le.url, // TMX allowed for shell 5.5 and higher
   bsversion >= 50 and stringlib.StringToLowerCase(trim(le.servicename))in[Gateway.Constants.ServiceName.InsurancePhoneHeader, Gateway.Constants.ServiceName.DeltaInquiry] => le.url, // insurance phones gateway allowed if shell version 50 or higher
                  le.servicename = 'bridgerwlc' => le.url, // included bridger gateway to be able to hit OFAC v4
                   '');
@@ -227,7 +231,9 @@ unsigned8 BSOptions :=
 											0) +
 	if(RetainInputDID, Risk_Indicators.iid_constants.BSOptions.RetainInputDID, 0 ) +
 	if(bsVersion >= 50, risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary, 0) +
-	if(bsVersion >= 55, risk_indicators.iid_constants.BSOptions.RunThreatMetrix, 0) ;
+	if(bsVersion >= 55, risk_indicators.iid_constants.BSOptions.RunThreatMetrix, 0) + 
+	if(TurnOffTumblings, risk_indicators.iid_constants.BSOptions.TurnOffTumblings, 0) +
+	if(UseIngestDate, risk_indicators.iid_constants.BSOptions.UseIngestDate, 0);
 
 
 
@@ -356,6 +362,8 @@ ENDMACRO;
 	<part name="IncludeAdditionalWatchLists" type="xsd:boolean"/>
 	<part name="RemoveQuickHeader" type="xsd:boolean"/> 
 	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>
+	<part name="TurnOffTumblings" type="xsd:boolean"/> 
+
  </message>
 */
 

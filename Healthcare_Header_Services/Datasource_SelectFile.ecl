@@ -1,6 +1,6 @@
 ﻿Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sanctions,Suppress;
 /*Changes for RR11959*/
-EXPORT Datasource_SelectFile := MODULE
+ EXPORT Datasource_SelectFile := MODULE
 	Export get_providers_base (dataset(Healthcare_Header_Services.Layouts.searchKeyResults_plus_input) input,dataset(Healthcare_Header_Services.layouts.common_runtime_config) cfg):= function
 			// rawdataIndividual:= join(dedup(sort(input(lnpid>0),record),record), Enclarity.Keys(,true).individual_lnpid.qa,
 											// keyed(left.lnpid = right.lnpid),
@@ -20,9 +20,9 @@ EXPORT Datasource_SelectFile := MODULE
 																		// self:=right),
 											// keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0)); 
 			// noHits := join(input,rawdataIndividual,left.acctno=right.acctno,transform(Layouts.searchKeyResults_plus_input, self:=left),left only);
-			noHits := dedup(sort(input(vendorid<>''),acctno,vendorid),acctno,vendorid);
-			rawdataIndividualbyVendorid:= join(noHits, Enclarity.Keys(,true).individual_group_key.qa,
-											keyed(left.vendorid = right.group_key) and left.src = Healthcare_Header_Services.Constants.SRC_SELECTFILE and right.record_type = 'C',
+			   noHits := dedup(sort(input(vendorid<>''),acctno,vendorid),acctno,vendorid);
+			   rawdataIndividualbyVendorid:= join(noHits, Enclarity.Keys(,true).individual_group_key.qa,
+											keyed(left.vendorid = right.group_key) and left.src = Healthcare_Header_Services.Constants.SRC_SELECTFILE and right.record_type = Healthcare_Header_Services.Constants.Record_type,
 											transform(Healthcare_Header_Services.Layouts.selectfile_providers_base_with_input,
 																		self.lnpid := left.lnpid;
 																		SELF.clean_prim_range:=right.prim_range;
@@ -47,8 +47,8 @@ EXPORT Datasource_SelectFile := MODULE
 																		self:=left),
 											keep(Healthcare_Header_Services.Constants.IDS_PER_DID), limit(0));
 			//Detect no hit, filter input dataset for no hits. join noHits,rawdataIndividualbyVendorid /acctno left only
-			nohitcheckHistory:= join(noHits,rawdataIndividualbyVendorid, left.acctno = right.acctno,transform(left),left only);
-			rawdataIndividualbyVendorid2:= dedup(sort(join(nohitcheckHistory, Enclarity.Keys(,true).individual_group_key.qa,
+			  nohitcheckHistory:= join(noHits,rawdataIndividualbyVendorid, left.acctno = right.acctno,transform(left),left only);
+			  rawdataIndividualbyVendorid2:= dedup(sort(join(nohitcheckHistory, Enclarity.Keys(,true).individual_group_key.qa,
 											keyed(left.vendorid = right.group_key) and left.src = Healthcare_Header_Services.Constants.SRC_SELECTFILE,
 											transform(Healthcare_Header_Services.Layouts.selectfile_providers_base_with_input,
 																		self.lnpid := left.lnpid;
@@ -73,19 +73,17 @@ EXPORT Datasource_SelectFile := MODULE
 																		self:=right,
 																		self:=left),
 											keep(Healthcare_Header_Services.Constants.IDS_PER_DID), limit(0)),acctno,LNPID,-dt_vendor_last_reported),acctno,LNPID);
-			rawdataIndividualwithAddrScores := join(rawdataIndividualbyVendorid+rawdataIndividualbyVendorid2, Enclarity.Keys(,true).associate_group_key.qa,
+			  rawdataIndividualwithAddrScores := join(rawdataIndividualbyVendorid+rawdataIndividualbyVendorid2, Enclarity.Keys(,true).associate_group_key.qa,
 											keyed(left.vendorid = right.group_key) and right.normed_name_rec_type ='1' and
 											right.record_type='C' and left.addr_key = right.addr_key,
 											transform(Healthcare_Header_Services.Layouts.selectfile_providers_base_with_input,
 																		self.addr_conf_score := (integer)right.prac_addr_confidence_score;
+																		self.hasOptOut := (integer)left.dotid = 1;//If the dotid is set to 1 by the data team.  The optout flag from MN impacted the results
 																		self:=left), left outer,
 											keep(Healthcare_Header_Services.Constants.IDS_PER_DID), limit(0)); 
-			   Supmacselectfile:=Suppress.MAC_FlagSuppressedSource(rawdataIndividualwithAddrScores, CFG[1]); 
-         setOptOutselectfile := project(Supmacselectfile, transform(Healthcare_Header_Services.Layouts.selectfile_providers_base_with_input,self.hasOptOut:= left.is_suppressed;self:=left;self:=[];))   ;                                                                                 
-				rawdataDeduped:=dedup(sort(setOptOutselectfile,acctno,lnpid,addr_conf_score,addr_rectype,bdid,best_dob,best_ssn,bill_addr_ind,bill1_fax_ind,bill1_phone_ind,birth_year,addr_suffix,clean_company_name,clean_last_verify_date,p_city_name,postdir,predir,prim_name,prim_range,sec_range,st,unit_desig,zip,date_of_death,dea_bus_act_ind,dea_num,dea_num_exp,did,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,fax1,fips_county,fips_st,first_name,gender,geo_lat,geo_long,group_key,last_name,lic_begin_date,lic_end_date,lic_num,lic_state,lic_status,lic_type,lnpid,middle_name,normed_addr_rec_type,npi_num,oig_flag,opm_flag,orig_fullname,phone1,prac_addr_ind,prac1_fax_ind,prac1_phone_ind,primary_location,provider_status,state_restrict_flag,suffix_name,suffix_other,title,upin,v_city_name,zip4),
-														acctno,lnpid,addr_conf_score,addr_rectype,bdid,best_dob,best_ssn,bill_addr_ind,bill1_fax_ind,bill1_phone_ind,birth_year,addr_suffix,clean_company_name,clean_last_verify_date,p_city_name,postdir,predir,prim_name,prim_range,sec_range,st,unit_desig,zip,date_of_death,dea_bus_act_ind,dea_num,dea_num_exp,did,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,fax1,fips_county,fips_st,first_name,gender,geo_lat,geo_long,group_key,last_name,lic_begin_date,lic_end_date,lic_num,lic_state,lic_status,lic_type,lnpid,middle_name,normed_addr_rec_type,npi_num,oig_flag,opm_flag,orig_fullname,phone1,prac_addr_ind,prac1_fax_ind,prac1_phone_ind,primary_location,provider_status,state_restrict_flag,suffix_name,suffix_other,title,upin,v_city_name,zip4);
-			baseRecs := project(sort(rawdataDeduped,acctno,-addr_conf_score,-clean_last_verify_date),Healthcare_Header_Services.Transforms.build_selectfile_Provider_base(left));
-		  
+				rawdataDeduped:=dedup(sort(rawdataIndividualwithAddrScores,acctno,lnpid,addr_conf_score,addr_rectype,bdid,best_dob,best_ssn,bill_addr_ind,bill1_fax_ind,bill1_phone_ind,birth_year,addr_suffix,clean_company_name,clean_last_verify_date,p_city_name,postdir,predir,prim_name,prim_range,sec_range,st,unit_desig,zip,date_of_death,dea_bus_act_ind,dea_num,dea_num_exp,did,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,fax1,fips_county,fips_st,first_name,gender,geo_lat,geo_long,group_key,last_name,lic_begin_date,lic_end_date,lic_num,lic_state,lic_status,lic_type,lnpid,middle_name,normed_addr_rec_type,npi_num,oig_flag,opm_flag,orig_fullname,phone1,prac_addr_ind,prac1_fax_ind,prac1_phone_ind,primary_location,provider_status,state_restrict_flag,suffix_name,suffix_other,title,upin,v_city_name,zip4,dotid),
+														acctno,lnpid,addr_conf_score,addr_rectype,bdid,best_dob,best_ssn,bill_addr_ind,bill1_fax_ind,bill1_phone_ind,birth_year,addr_suffix,clean_company_name,clean_last_verify_date,p_city_name,postdir,predir,prim_name,prim_range,sec_range,st,unit_desig,zip,date_of_death,dea_bus_act_ind,dea_num,dea_num_exp,did,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,fax1,fips_county,fips_st,first_name,gender,geo_lat,geo_long,group_key,last_name,lic_begin_date,lic_end_date,lic_num,lic_state,lic_status,lic_type,lnpid,middle_name,normed_addr_rec_type,npi_num,oig_flag,opm_flag,orig_fullname,phone1,prac_addr_ind,prac1_fax_ind,prac1_phone_ind,primary_location,provider_status,state_restrict_flag,suffix_name,suffix_other,title,upin,v_city_name,zip4,dotid);
+				baseRecs := project(sort(rawdataDeduped,acctno,-addr_conf_score,-clean_last_verify_date),Healthcare_Header_Services.Transforms.build_selectfile_Provider_base(left));
 	return baseRecs;
 	end;
 
@@ -106,7 +104,7 @@ EXPORT Datasource_SelectFile := MODULE
 																		SELF.Termination_Date:=if((integer)right.lic_end_date>0,right.lic_end_date,'');
 																		self:=[]),
 											keep(Healthcare_Header_Services.Constants.MAX_SEARCH_RECS), limit(0)); 
-			Layouts.layout_child_licenseinfo doRollup(Healthcare_Header_Services.Layouts.layout_licenseinfo l, dataset(Healthcare_Header_Services.Layouts.layout_licenseinfo) r) := TRANSFORM
+			Healthcare_Header_Services.Layouts.layout_child_licenseinfo doRollup(Healthcare_Header_Services.Layouts.layout_licenseinfo l, dataset(Healthcare_Header_Services.Layouts.layout_licenseinfo) r) := TRANSFORM
 				SELF.acctno := l.licenseAcctno;
 				self.group_key := l.group_key;
 				self.ProviderID := l.ProviderID;
@@ -116,7 +114,7 @@ EXPORT Datasource_SelectFile := MODULE
 			results := join(input,licenseinfo_rollup, left.acctno=right.acctno and left.srcid = right.ProviderID and left.vendorid=right.group_key,
 																			transform(Healthcare_Header_Services.Layouts.CombinedHeaderResults,
 																								self.StateLicenses := right.childinfo;
-																								self := left),left outer);
+																								self := left),left outer,keep(Healthcare_Header_Services.Constants.MAX_SEARCH_RECS),limit(0));
 			return results;
 	end;
 	Export appendSpecialty(dataset(Healthcare_Header_Services.Layouts.CombinedHeaderResults) input, dataset(Healthcare_Header_Services.Layouts.GroupKey) searchby):= function
@@ -130,7 +128,7 @@ EXPORT Datasource_SelectFile := MODULE
 																		SELF.SpecialtyName:=right.spec_desc;
 																		self:=[]),
 											keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0)); 
-			Layouts.layout_child_specialty doRollup(Healthcare_Header_Services.Layouts.layout_specialty l, dataset(Healthcare_Header_Services.Layouts.layout_specialty) r) := TRANSFORM
+			Healthcare_Header_Services.Layouts.layout_child_specialty doRollup(Healthcare_Header_Services.Layouts.layout_specialty l, dataset(Healthcare_Header_Services.Layouts.layout_specialty) r) := TRANSFORM
 				SELF.acctno := l.acctno;
 				self.group_key := l.group_key;
 				self.ProviderID := l.ProviderID;
@@ -154,7 +152,7 @@ EXPORT Datasource_SelectFile := MODULE
 																		SELF.GraduationYear:=right.medschool_year;
 																		self:=[]),
 											keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0))(MedSchoolName<>''); 
-			Layouts.layout_child_medschool doRollup(Healthcare_Header_Services.Layouts.layout_medschool l, dataset(Healthcare_Header_Services.Layouts.layout_medschool) r) := TRANSFORM
+		Healthcare_Header_Services.Layouts.layout_child_medschool doRollup(Healthcare_Header_Services.Layouts.layout_medschool l, dataset(Healthcare_Header_Services.Layouts.layout_medschool) r) := TRANSFORM
 				SELF.acctno := l.acctno;
 				self.group_key := l.group_key;
 				self.ProviderID := l.ProviderID;
@@ -197,7 +195,7 @@ EXPORT Datasource_SelectFile := MODULE
 																		self.worksfor := right.pgk_works_for='Y';
 																		self:=[]),
 											keep(Healthcare_Header_Services.Constants.MAX_SEARCH_RECS), limit(0)); 
-			Layouts.layout_Child_affiliateHospital doRollup(Healthcare_Header_Services.Layouts.layout_affiliateHospital l, dataset(Healthcare_Header_Services.Layouts.layout_affiliateHospital) r) := TRANSFORM
+			Healthcare_Header_Services.Layouts.layout_Child_affiliateHospital doRollup(Healthcare_Header_Services.Layouts.layout_affiliateHospital l, dataset(Healthcare_Header_Services.Layouts.layout_affiliateHospital) r) := TRANSFORM
 				SELF.acctno := l.acctno;
 				self.group_key := l.group_key;
 				self.ProviderID := l.ProviderID;
@@ -318,8 +316,9 @@ EXPORT Datasource_SelectFile := MODULE
 																		self.SancCategory := right.Cat;
 																		self.SancLegacyType := map(left.LicenseStatus='T' and left.sanc1_code = '112DS' => right.LegacyType,
 																															 left.sanc1_code = '112DS' => 'HISTORICAL CONDITIONS',
+																															 left.SancLegacyType<>''=>left.SancLegacyType,
 																															 right.LegacyType);
-																		self.FullDesc := if(trim(left.sanc1_desc,right)<>'',left.sanc1_desc,right.desc);//Support new granular field data
+																		self.FullDesc := if(trim(left.sanc1_desc,right)<>'',left.sanc1_desc,right.desc);
 																		self.SancLevel := if(RIGHT.level='STATE','',RIGHT.level);
 																		self.StateOrFederal := if(left.level='STATE','STATE','FEDERAL');
 																		self.SancLossOfLic := if((integer)left.ln_derived_rein_date>0,'FALSE',right.LossOfLicense);
@@ -333,7 +332,6 @@ EXPORT Datasource_SelectFile := MODULE
 																		self:=left;
 																		self:=[]),
 											keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0), left outer);
-
 			return rawdatalookup4;
 	end;
 
@@ -482,7 +480,9 @@ EXPORT Datasource_SelectFile := MODULE
 			facilities_final_sorted := sort(filterRec, acctno, SrcId, Src,vendorid);
 			facilities_final_grouped := group(facilities_final_sorted, acctno, SrcId, Src,vendorid);
 			facilities_rolled := rollup(facilities_final_grouped, group, Transforms.doSelectFileFacilitiesBaseRecordSrcIdRollup(left,rows(left)));			
-       return facilities_rolled;
+  		return facilities_rolled;
+			      
+			
 			
 	end;
 

@@ -97,7 +97,6 @@ layout_soap := record
 	string TimeofApplication;
 	unsigned did := 0;
   boolean IncludeQAOutputs;
-  boolean RemoveQuickHeader;
 end;
 
 
@@ -162,8 +161,6 @@ self.model := 'fp1109_0';  //
     
   SELF.IncludeQAOutputs := include_internal_extras;   
 	
-  self.RemoveQuickHeader := false;
-  // self.RemoveQuickHeader := true;
 	SELF := le;
 	self := [];
 end;

@@ -35,6 +35,7 @@ MODULE
 		EXPORT BOOLEAN   VerifyPhoneName      	:= FALSE;
 		EXPORT BOOLEAN	 VerifyPhoneNameAddress	:= FALSE;
 		EXPORT BOOLEAN	 VerifyPhoneIsActive		:= FALSE;
+    EXPORT BOOLEAN   VerifyPhoneLastName    := FALSE;
     EXPORT INTEGER   DateFirstSeenThreshold := 180;
     EXPORT INTEGER   DateLastSeenThreshold  := 30;
     EXPORT INTEGER   LengthOfTimeThreshold  := 90;
@@ -86,6 +87,7 @@ MODULE
 		EXPORT BOOLEAN UseTransUnionPVS       := FALSE;
 		EXPORT BOOLEAN IncludeInhousePhones   := FALSE;
 		EXPORT BOOLEAN UseInhousePhones       := FALSE;
+    EXPORT BOOLEAN IncludePortingDetails      := FALSE;
 
     //zumigo options
     EXPORT BOOLEAN NameAddressValidation        := FALSE;
@@ -111,6 +113,7 @@ MODULE
     EXPORT BOOLEAN hasActivePhoneTransactionCountRule := FALSE;
     EXPORT BOOLEAN IsGovSearch := FALSE;
     EXPORT BOOLEAN UseInHousePhoneMetadataOnly := FALSE;
+    EXPORT BOOLEAN SuppressRiskIndicatorWarnStatus := FALSE;
   END;
 
   EXPORT PhoneVerificationParams :=
@@ -119,6 +122,7 @@ MODULE
     EXPORT BOOLEAN VerifyPhoneName;
     EXPORT BOOLEAN VerifyPhoneNameAddress;
     EXPORT BOOLEAN VerifyPhoneIsActive;
+    EXPORT BOOLEAN VerifyPhoneLastName;
     EXPORT INTEGER DateFirstSeenThreshold;
     EXPORT INTEGER DateLastSeenThreshold;
     EXPORT INTEGER LengthOfTimeThreshold;
@@ -150,7 +154,7 @@ MODULE
       EXPORT STRING6   PrimarySearch        := PrimarySearchCriteria;
       EXPORT BOOLEAN   IsPrimarySearchPII   := PrimarySearch = $.Constants.PrimarySearchCriteria;
       EXPORT BOOLEAN   StrictMatch          := AutoStandardI.InterfaceTranslator.StrictMatch_value.val(searchMod);
-      EXPORT BOOLEAN   PhoneticMatch        := AutoStandardI.InterfaceTranslator.phonetics.val(searchMod);
+
       EXPORT UNSIGNED  ScoreThreshold       := AutoStandardI.InterfaceTranslator.score_threshold_value.val(searchMod);
       EXPORT UNSIGNED  PenaltyThreshold     := AutoStandardI.InterfaceTranslator.penalt_threshold_value.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.penalt_threshold_value.params));
       EXPORT BOOLEAN   useWaterfallv6	      := FALSE : STORED('useWaterfallv6');	// internal
@@ -163,6 +167,8 @@ MODULE
       EXPORT BOOLEAN   VerifyPhoneName				:= pfOptions.VerificationOptions.VerifyPhoneName;
       EXPORT BOOLEAN   VerifyPhoneNameAddress := pfOptions.VerificationOptions.VerifyPhoneNameAddress;
       EXPORT BOOLEAN   VerifyPhoneIsActive    := pfOptions.VerificationOptions.VerifyPhoneIsActive;
+      EXPORT BOOLEAN   VerifyPhoneLastName    := pfOptions.VerificationOptions.VerifyPhoneLastName;
+      EXPORT BOOLEAN   PhoneticMatch          := VerifyPhoneName OR VerifyPhoneNameAddress OR VerifyPhoneLastName OR AutoStandardI.InterfaceTranslator.phonetics.val(searchMod);
       EXPORT INTEGER   DateFirstSeenThreshold := pfOptions.VerificationOptions.DateFirstSeenThreshold;
       EXPORT INTEGER   DateLastSeenThreshold  := pfOptions.VerificationOptions.DateLastSeenThreshold;
       EXPORT INTEGER   LengthOfTimeThreshold  := pfOptions.VerificationOptions.LengthOfTimeThreshold;
@@ -204,18 +210,20 @@ MODULE
       EXPORT BOOLEAN   IncludeRiskIndicators           := ((IncludePhoneMetadata AND displayAll) OR IncludeRiskIndicators_internal);
       EXPORT BOOLEAN   IncludeOtherPhoneRiskIndicators := IncludeRiskIndicators_internal OR pfOptions.IncludeOtherPhoneRiskIndicators;
 
-      UserRules	:= pfOptions.RiskIndicators;
-      AllRules  := IF(IncludeRiskIndicators AND EXISTS(UserRules), $.Constants.DefaultRiskIndicatorRules  + UserRules);
+      UserRules	:= DEDUP(SORT(pfOptions.RiskIndicators, riskid), riskid);
+      AllRules  := DEDUP(SORT(IF(IncludeRiskIndicators AND EXISTS(UserRules), $.Constants.DefaultRiskIndicatorRules  + UserRules), riskid), riskid);
 
       EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators := IF(TransactionType = $.Constants.TransType.PHONERISKASSESSMENT, UserRules, AllRules);
       EXPORT BOOLEAN IsGetPortedData         := ReturnPortingInfo OR IncludePhoneMetadata;
       EXPORT BOOLEAN IsGetMetaData           := IsGetPortedData OR ReturnSpoofingInfo OR ReturnOTPInfo OR IncludeRiskIndicators;
-              BOOLEAN RealTimedata 			 		 := pfOptions.UseDeltabase;
+      BOOLEAN IncludeDeltabaseForRI          := IncludeRiskIndicators AND EXISTS(RiskIndicators(RiskId IN [6, 7, 8, 9, 15, 26, 27, 30]));
+      BOOLEAN RealTimedata 			 		 := pfOptions.UseDeltabase OR IncludeDeltabaseForRI; // To get same day OTPs and Inquiries
       EXPORT BOOLEAN UseDeltabase 					 := IF(IsGetMetaData, RealTimedata, FALSE);
 
       EXPORT BOOLEAN IncludeAccudataOCN      := pfOptions.IncludeAccudataOCN;
-      EXPORT BOOLEAN UseAccuData_OCN         := ((IncludePhoneMetadata AND displayAll) OR IncludeAccudataOCN) AND ~doxie.compliance.isAccuDataRestricted(drm);
-
+      //EXPORT BOOLEAN UseAccuData_OCN         := ((IncludePhoneMetadata AND displayAll) OR IncludeAccudataOCN) AND ~doxie.compliance.isAccuDataRestricted(drm);
+      //The gateway is down for past 2 months,not calling this gateway until further update from Product
+      EXPORT BOOLEAN UseAccuData_OCN         := FALSE;
       EXPORT BOOLEAN IncludeTargus           := pfOptions.IncludeTargus;
       EXPORT BOOLEAN UseTargus          		 := (TransactionType = $.Constants.TransType.Ultimate OR IncludeTargus) AND ~doxie.compliance.isPhoneFinderTargusRestricted(drm);
 
@@ -282,6 +290,8 @@ MODULE
       EXPORT BOOLEAN hasActiveIdentityCountRules        := IncludeRiskIndicators AND EXISTS(RiskIndicators((RiskId = $.Constants.RiskRules.IdentityCount AND Active)));
       EXPORT BOOLEAN hasActivePhoneTransactionCountRule := IncludeRiskIndicators AND EXISTS(RiskIndicators(RiskId = $.Constants.RiskRules.PhoneTransactionCount AND ACTIVE));
       EXPORT BOOLEAN IsGovsearch := application_type in AutoStandardI.Constants.GOV_TYPES;
+      EXPORT BOOLEAN SuppressRiskIndicatorWarnStatus            :=  pfOptions.SuppressRiskIndicatorWarnStatus : STORED('SuppressRiskIndicatorWarnStatus'); // Need to read from stored for options defined in MBS for API transactions as they would come under the root tag;
+      EXPORT BOOLEAN IncludePortingDetails            := pfOptions.IncludePortingDetails : STORED('IncludePortingDetails');
     END;
 
     RETURN in_params;
@@ -319,12 +329,13 @@ MODULE
       EXPORT BOOLEAN   useWaterfallv6			 := FALSE : STORED('useWaterfallv6');//internal
       EXPORT BOOLEAN   IncludePhoneMetadata:= FALSE : STORED('IncludePhoneMetadata');
 
-      EXPORT BOOLEAN   UseAccudata_ocn     := IncludePhoneMetadata AND
-                                              ~doxie.compliance.isAccuDataRestricted(drm) AND
-                                              TransactionType IN [$.Constants.TransType.Premium,
-                                                                  $.Constants.TransType.Ultimate,
-                                                                  $.Constants.TransType.PHONERISKASSESSMENT]; // accudata_ocn gateway call
-
+      // EXPORT BOOLEAN   UseAccudata_ocn     := IncludePhoneMetadata AND
+      //                                         ~doxie.compliance.isAccuDataRestricted(drm) AND
+      //                                          TransactionType IN [$.Constants.TransType.Premium,
+      //                                                             $.Constants.TransType.Ultimate,
+      //                                                              $.Constants.TransType.PHONERISKASSESSMENT]; // accudata_ocn gateway call
+      //The gateway is down for past 2 months,not calling this gateway until further update from Product
+      EXPORT BOOLEAN   UseAccudata_ocn     := FALSE;
              BOOLEAN   SubjectMetadata 		 := FALSE : STORED('SubjectMetadataOnly');
       EXPORT BOOLEAN   SubjectMetadataOnly := IF(IncludePhoneMetadata,SubjectMetadata,FALSE);
       EXPORT BOOLEAN   SuppressNonRelevantRecs := FALSE : STORED('SuppressNonRelevantRecs');
@@ -339,7 +350,7 @@ MODULE
       EXPORT INTEGER   MaxOtherPhones		              := iesp.Constants.Phone_Finder.MaxOtherPhones;// TO LIMIT OTHER PHONES
 
       EXPORT BOOLEAN   UseInHousePhoneMetadata	:= FALSE : STORED('UseInHousePhoneMetadata');
-      EXPORT BOOLEAN UseInHousePhoneMetadataOnly := UseInHousePhoneMetadata OR ~UseTransUnionPVS;;
+      EXPORT BOOLEAN   UseInHousePhoneMetadataOnly := UseInHousePhoneMetadata OR ~UseTransUnionPVS;
       EXPORT BOOLEAN   UseAccuData_CNAM         := UseInHousePhoneMetadata AND ~doxie.compliance.isAccuDataRestricted(drm) AND TransactionType != $.Constants.TransType.PhoneRiskAssessment;
 
 
@@ -364,12 +375,14 @@ MODULE
 
       UserRules := DATASET([],iesp.phonefinder.t_PhoneFinderRiskIndicator) : STORED('RiskIndicators');
       AllRules  := IF(IncludeRiskIndicators AND EXISTS(UserRules), $.Constants.defaultRiskIndicatorRules + UserRules);
-      EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators := IF(TransactionType = $.Constants.TransType.PHONERISKASSESSMENT, UserRules, AllRules);
+      EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators := DEDUP(SORT(IF(TransactionType = $.Constants.TransType.PHONERISKASSESSMENT, UserRules, AllRules), riskid), riskid);
 
-		  EXPORT BOOLEAN   IsGetPortedData                    := ReturnPortingInfo OR IncludePhoneMetadata;
-		  EXPORT BOOLEAN   IsGetMetaData                      := IsGetPortedData OR ReturnSpoofingInfo OR ReturnOTPInfo OR IncludeRiskIndicators;
-			       BOOLEAN   RealtimeData 			                := FALSE : STORED('UseDeltabase');
-			EXPORT BOOLEAN   UseDeltabase 					            := IF(IsGetMetaData,RealTimedata,FALSE);
+	  EXPORT BOOLEAN   IsGetPortedData                    := ReturnPortingInfo OR IncludePhoneMetadata;
+	  EXPORT BOOLEAN   IsGetMetaData                      := IsGetPortedData OR ReturnSpoofingInfo OR ReturnOTPInfo OR IncludeRiskIndicators;
+      BOOLEAN   UseDeltabase_internal                     := FALSE : STORED('UseDeltabase');
+      BOOLEAN IncludeDeltabaseForRI          := IncludeRiskIndicators AND EXISTS(RiskIndicators(RiskId IN [6, 7, 8, 9, 15, 26, 27, 30]));
+      BOOLEAN   RealtimeData 		                      := UseDeltabase_internal OR IncludeDeltabaseForRI; // To get same day OTPs and Inquiries
+	  EXPORT BOOLEAN   UseDeltabase 		              := IF(IsGetMetaData,RealTimedata,FALSE);
       EXPORT BOOLEAN   UseTransUnionIQ411                 :=   UseQSent;
       EXPORT BOOLEAN   UseTransUnionPVS                   :=   UseQSent;
       EXPORT BOOLEAN   UseInhousePhones                   :=   displayAll OR TransactionType = $.Constants.TransType.BASIC;
@@ -394,6 +407,8 @@ MODULE
                                                       IncludeDeviceInfo OR IncludeDeviceChangeInfo;
       EXPORT BOOLEAN UseZumigoIdentity	          := IncludeZumigoOptions AND BillingId <>'' AND doxie.compliance.use_ZumigoIdentity(dpm);
       EXPORT BOOLEAN IsGovsearch := mod_access.application_type in AutoStandardI.Constants.GOV_TYPES;
+      EXPORT BOOLEAN SuppressRiskIndicatorWarnStatus :=  FALSE : STORED('SuppressRiskIndicatorWarnStatus');
+      EXPORT BOOLEAN IncludePortingDetails               := FALSE : STORED('IncludePortingDetails');
     END;
 
     RETURN input_Mod;

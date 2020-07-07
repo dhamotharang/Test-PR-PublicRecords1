@@ -20,8 +20,8 @@ IMPORT iesp;
 	//Get Account Config Entries
 	cfg_CompanyID := acct_configRaw.Common.GlobalCompanyId;
 	cfg_TransactionId := acct_configRaw.Common.TransactionId;
-	// TODO: Change GLOBAL.CONFIG to Socio Config
-	cfg_Config := acct_configRaw.Configs(STD.STR.ToUpperCase(Name)='GLOBAL.CONFIG')[1];//Need to filter as there may be multiple for different products
+	// Changed GLOBAL.CONFIG to SOCIOECONOMIC Config
+	cfg_Config := acct_configRaw.Configs(STD.STR.ToUpperCase(Name)='SOCIOECONOMIC.CONFIG')[1];//Need to filter as there may be multiple for different products
 	cfg_Name := cfg_Config.Name;
 	cfg_Type := cfg_Config._Type;
 	cfg_ProductKey := cfg_Config.ProductKey;
@@ -620,14 +620,14 @@ IMPORT iesp;
 			self.TotalCostRiskScore_Rank_99_Max  := IF( val_TotalCostRiskScore_Rank_99_Max <>0, val_TotalCostRiskScore_Rank_99_Max, Models.Healthcare_Constants_RT_Service.val_TotalCostRiskScore_Rank_99_Max);
 			self.TotalCostRiskScore_Rank_100_Min := IF( val_TotalCostRiskScore_Rank_100_Min <>0, val_TotalCostRiskScore_Rank_100_Min, Models.Healthcare_Constants_RT_Service.val_TotalCostRiskScore_Rank_100_Min);
 
-			val_TotalCostRiskScore_Category_5_Low  := (DECIMAL8_4) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_TotalCostRiskScore_Category_5_Low );
-			val_TotalCostRiskScore_Category_4_High := (DECIMAL8_4) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_TotalCostRiskScore_Category_4_High);
-			val_TotalCostRiskScore_Category_4_Low  := (DECIMAL8_4) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_TotalCostRiskScore_Category_4_Low );
-			val_TotalCostRiskScore_Category_3_High := (DECIMAL8_4) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_TotalCostRiskScore_Category_3_High);
-			val_TotalCostRiskScore_Category_3_Low  := (DECIMAL8_4) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_TotalCostRiskScore_Category_3_Low );
-			val_TotalCostRiskScore_Category_2_High := (DECIMAL8_4) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_TotalCostRiskScore_Category_2_High);
-			val_TotalCostRiskScore_Category_2_Low  := (DECIMAL8_4) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_TotalCostRiskScore_Category_2_Low );
-			val_TotalCostRiskScore_Category_1_High := (DECIMAL8_4) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_TotalCostRiskScore_Category_1_High);
+			val_TotalCostRiskScore_Category_5_Low  := (UNSIGNED1) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_TotalCostRiskScore_Category_5_Low );
+			val_TotalCostRiskScore_Category_4_High := (UNSIGNED1) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_TotalCostRiskScore_Category_4_High);
+			val_TotalCostRiskScore_Category_4_Low  := (UNSIGNED1) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_TotalCostRiskScore_Category_4_Low );
+			val_TotalCostRiskScore_Category_3_High := (UNSIGNED1) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_TotalCostRiskScore_Category_3_High);
+			val_TotalCostRiskScore_Category_3_Low  := (UNSIGNED1) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_TotalCostRiskScore_Category_3_Low );
+			val_TotalCostRiskScore_Category_2_High := (UNSIGNED1) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_TotalCostRiskScore_Category_2_High);
+			val_TotalCostRiskScore_Category_2_Low  := (UNSIGNED1) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_TotalCostRiskScore_Category_2_Low );
+			val_TotalCostRiskScore_Category_1_High := (UNSIGNED1) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_TotalCostRiskScore_Category_1_High);
 
 			self.TotalCostRiskScore_Category_5_Low  := IF(val_TotalCostRiskScore_Category_5_Low  <>0, val_TotalCostRiskScore_Category_5_Low , Models.Healthcare_Constants_RT_Service.val_TotalCostRiskScore_Category_5_Low );
 			self.TotalCostRiskScore_Category_4_High := IF(val_TotalCostRiskScore_Category_4_High <>0, val_TotalCostRiskScore_Category_4_High, Models.Healthcare_Constants_RT_Service.val_TotalCostRiskScore_Category_4_High);
@@ -837,7 +837,7 @@ IMPORT iesp;
 	PreCoreException_DS := SubscriptionFail_DS + Condition_1_2_Minor_Reject_DS + GLB_DPPA_Exceptions_DS;
 	ExceptionsInInputRequest := IF(COUNT(PreCoreException_DS(code<>0)) > 0, TRUE, FALSE);
 
-	Boolean NothingIsRequested := IF(isAttributesRequested = FALSE AND isReadmissionRequested = FALSE AND isMedicationAdherenceRequested = FALSE AND isMotivationRequested = FALSE, TRUE, FALSE);
+	Boolean NothingIsRequested := IF(isAttributesRequested = FALSE AND isReadmissionRequested = FALSE AND isMedicationAdherenceRequested = FALSE AND isMotivationRequested = FALSE AND isTotalCostRiskScoreRequested = FALSE, TRUE, FALSE);
 	isCoreRequestValid := IF(NothingIsRequested = FALSE AND ExceptionsInInputRequest = FALSE, TRUE, FALSE);
 
 	DataRestrictionMask_in := (string) TRIM(first_row.user.DataRestrictionMask, LEFT, RIGHT);
@@ -871,7 +871,7 @@ IMPORT iesp;
 
 	FinalException_DS := PreCoreException_DS + ADLScoreFail_DS;
 
-	SocioScoresDS := Models.Healthcare_SocioEconomic_Transforms_RT_Service.PopulateScoresDS(coreResults, dsCfg, isReadmissionRequested, isMedicationAdherenceRequested, isMotivationRequested);
+	SocioScoresDS := Models.Healthcare_SocioEconomic_Transforms_RT_Service.PopulateScoresDS(coreResults, dsCfg, isReadmissionRequested, isMedicationAdherenceRequested, isMotivationRequested, isTotalCostRiskScoreRequested);
 	SocioScoresChildDS := choosen(SocioScoresDS,iesp.Constants.Socio.Max_Scores);
 	// OUTPUT(SocioScoresChildDS, NAMED('SocioScoresChildDS'));
 

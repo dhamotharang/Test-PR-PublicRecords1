@@ -311,8 +311,7 @@ nugen_rec format_out(risk_indicators.Layout_Output le) := TRANSFORM
 	
 	SELF.fua 		:= risk_indicators.getActionCodes(le,4, SELF.NAS_summary, SELF.NAP_summary, ac_settings := actioncode_settings);
 	
-	cvi_temp := risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,le.correctssn,
-																						le.correctaddr,le.correcthphone,'',veraddr,verlast);																			
+	cvi_temp := risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,'',veraddr,verlast);																			
 	SELF.CVI := map(IncludeMSoverride and risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) and (integer)cvi_temp > 10 => '10',
 									IsPOBoxCompliant AND risk_indicators.rcSet.isCodePO(le.addr_type) and (integer)cvi_temp > 10 => '10',
 									cvi_temp);

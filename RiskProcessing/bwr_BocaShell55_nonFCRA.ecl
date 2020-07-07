@@ -132,9 +132,12 @@ l assignAccount (ds_input le, INTEGER c) := TRANSFORM
 	self.bsversion := 55;	
 
   // tmx_gw := dataset( [{'threatmetrix','https://rw_score_dev:Password01@gatewaycertesp.sc.seisint.com:8726/WsGatewayEx/?ver_=2.28'}], risk_indicators.layout_gateways_in );  // 8726 is online traffic
-  tmx_gw := dataset( [{'threatmetrix','http://rw_score_dev:Password01@gatewaycertesp.sc.seisint.com:7426/WsGatewayEx/?ver_=2.28'}], risk_indicators.layout_gateways_in );   // 7426 is for batch traffic
+  // tmx_gw := dataset( [{'threatmetrix','http://rw_score_dev:Password01@gatewaycertesp.sc.seisint.com:7426/WsGatewayEx/?ver_=2.28'}], risk_indicators.layout_gateways_in );   // 7426 is for batch traffic
+	tmx_gw := riskwise.shortcuts.gw_threatmetrix;
   self.gateways := project(tmx_gw, transform(Gateway.Layouts.Config, self := left, self := []) );   //dev TMX gateway
   
+	self.UseIngestDate := false;  // set this to true if they want to use ingest date for filtering instead of date first seen
+	
 	// if you are running realtime mode with today's date and you need realtime inquiries turn on deltabase searching	
   // self.gateways := project(riskwise.shortcuts.gw_delta_dev, transform(Gateway.Layouts.Config, self := left, self := []) );   //dev deltabase
 	// self.gateways := project(riskwise.shortcuts.gw_delta_prod, transform(Gateway.Layouts.Config, self := left, self := []) );   // production deltabase

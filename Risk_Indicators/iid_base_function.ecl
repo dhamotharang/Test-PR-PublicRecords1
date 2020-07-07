@@ -1,4 +1,4 @@
-﻿import _Control, iesp, fcra, gateway, risk_indicators;
+﻿import _Control, iesp, fcra, gateway, risk_indicators, Doxie;
 onThor := _Control.Environment.OnThor;
 
 export iid_base_function(DATASET(risk_indicators.layout_input) indata, dataset(Gateway.Layouts.Config) gateways,
@@ -29,14 +29,27 @@ export iid_base_function(DATASET(risk_indicators.layout_input) indata, dataset(G
 													string20 companyID='',
 													string50 DataPermission=Risk_Indicators.iid_constants.default_DataPermission,
 													boolean IncludeNAPData = false,
-                          string100 IntendedPurpose = ''
+													string100 IntendedPurpose = '',
+													unsigned1 LexIdSourceOptout = 1,
+													string TransactionID = '',
+													string BatchUID = '',
+													unsigned6 GlobalCompanyId = 0,
+                          string5 IndustryClass = ''
 													) := FUNCTION
+
+mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT glb := ^.glb;
+	EXPORT dppa := ^.dppa;
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
 
 // step 1.  Get the DID and prep the layout_output dataset
 #IF(onThor)
 	with_DID := risk_indicators.iid_getDID_prepOutput_THOR(indata, dppa, glb, isFCRA, BSversion, DataRestriction, append_best, gateways, BSOptions);
 #ELSE
-	with_DID := risk_indicators.iid_getDID_prepOutput(indata, dppa, glb, isFCRA, BSversion, DataRestriction, append_best, gateways, BSOptions);
+	with_DID := risk_indicators.iid_getDID_prepOutput(indata, dppa, glb, isFCRA, BSversion, DataRestriction, append_best, gateways, BSOptions, mod_access);
 #END
 
 // do corrections here
@@ -123,7 +136,12 @@ commonstart := risk_indicators.iid_common_function(with_PersonContext, dppa, glb
 															suppressNearDups, isFCRA, bsversion,
 															runSSNCodes, runBestAddrCheck, ExactMatchLevel, DataRestriction, CustomDataFilter,
 															DOBMatchOptions, EverOccupant_PastMonths, EverOccupant_StartDate, BSOptions, 
-															LastSeenThreshold, DataPermission);
+															LastSeenThreshold, DataPermission,
+															LexIdSourceOptout := LexIdSourceOptout, 
+															TransactionID := TransactionID, 
+															BatchUID := BatchUID, 
+															GlobalCompanyID := GlobalCompanyID,
+                              IndustryClass := IndustryClass);
                               
 common_transformed := risk_indicators.iid_transform_common(commonstart, BSOptions);
 
@@ -138,26 +156,27 @@ gotWatch := map(isFCRA or // don't search watchlist files for FCRA products anym
 								// ofac_version=4 => call the new Watchlist ESP service
 								risk_indicators.getWatchLists2(eqfsphones,ofac_only, from_BIID,ofac_version,include_ofac,include_additional_watchlists,global_watchlist_threshold,dob_radius, watchlists_requested, gateways));
 
-with_flags := group(sort(risk_indicators.iid_getPhoneAddrFlags(with_overrides, isFCRA, runAreaCodeSplitSearch, BSversion),seq),seq);
+with_flags := group(sort(risk_indicators.iid_getPhoneAddrFlags(with_overrides, isFCRA, runAreaCodeSplitSearch, BSversion, mod_access),seq),seq);
 with_addrs := risk_indicators.iid_getAddressInfo(with_flags, glb, isFCRA, require2ele, BSversion, isUtility, ExactMatchLevel, LastSeenThreshold, BSOptions);					
 with_nap := risk_indicators.iid_getPhoneInfo(with_addrs, gateways, dppa, glb, isFCRA, require2ele, BSversion, allowCellphones, 
 		ExactMatchLevel, LastSeenThreshold, BSOptions, companyID, EverOccupant_PastMonths, EverOccupant_StartDate, 
-		IncludeNAPData);
+		IncludeNAPData, mod_access);
 
 combined_verification := risk_indicators.iid_combine_verification(gotWatch, with_nap, from_IT1O, ExactMatchLevel, isFCRA, 
-		BSOptions, bsversion, DataPermission, DataRestriction);
+		BSOptions, bsversion, DataPermission, DataRestriction, mod_access);
 
-dlverify := risk_indicators.iid_DL_verification(combined_verification, dppa, isfcra, ExactMatchLevel, BSOptions, DataPermission, bsversion);
+dlverify := risk_indicators.iid_DL_verification(combined_verification, dppa, isfcra, ExactMatchLevel, BSOptions, DataPermission, bsversion, mod_access);
 with_DL_verification := if(runDLverification, dlverify, combined_verification);
 
 runThreatMetrix := (BSOptions & risk_indicators.iid_constants.BSOptions.runThreatMetrix) > 0;
 
 with_ThreatMetrix := if(runThreatMetrix, 
-	risk_indicators.iid_append_threatMetrix(indata, with_dl_verification, gateways, companyID), 
+	risk_indicators.iid_append_threatMetrix(indata, with_dl_verification, gateways, companyID, DataRestriction), 
 	with_dl_verification);
 
 // output(with_addrs, named('with_addrs'));
 // output(with_nap, named('with_nap'));
+// output(IndustryClass, named('industryClass_iidBaseFunction'));
 
 return with_ThreatMetrix;
 

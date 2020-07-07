@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Discpl_Batch_Service">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
   <part name="DPPAPurpose" type="xsd:byte"/>
@@ -35,6 +35,8 @@ export Discpl_Batch_Service := MACRO
 		 self.penalty_threshold := pt;
 		 self.glb_ok :=  ut.glb_ok (gm.GLBPurpose);
 		 self.dppa_ok := ut.dppa_ok(gm.DPPAPurpose);
+		 self.glb := gm.GLBPurpose;
+		 self.dppa := gm.DPPAPurpose;
 		 self.drm := gm.DataRestrictionMask;	
 		 self.includeSanctions:=true;
 		// self:=[];Do not uncomment otherwise the default values will not get set.

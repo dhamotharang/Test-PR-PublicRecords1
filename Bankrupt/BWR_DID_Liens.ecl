@@ -1,4 +1,4 @@
-import did_add,fair_isaac,didville,ut,header_slimsort,watchdog, Business_Header, Business_Header_SS;
+import did_add, ut, Business_Header, Business_Header_SS;
 
 /*---------------[ IMPORTANT ]---------------*/
 /*                                           */
@@ -37,7 +37,7 @@ did_add.MAC_Match_Flex(df2,myset,orig_ssn,foo,def_fname,def_mname,def_lname,
 	def_name_suffix,prim_range, prim_name, sec_range, zip, state, foo,
 	did_temp,temprec,true,did_score_temp,70,outf)
 
-did_add.MAC_Add_SSN_By_DID(outf,did_temp,ssn_appended_temp,out2,true)	
+did_add.MAC_Add_SSN_By_DID(outf,did_temp,ssn_appended_temp,out2,true)
 
 to_bdid := out2 : persist('TEMP:liens_did');
 to_bdid_company := to_bdid((indivbusun='B' or aka_yn = 'B') and company_name <> '');
@@ -54,7 +54,7 @@ Business_Header.MAC_Source_Match(to_bdid_company, bdid_init,
                         FALSE, phone_field,
                         FALSE, fein_field,
 				    TRUE, vendor_id)
- 
+
 bdid_match := bdid_init(bdid_new <> 0);
 
 bdid_nomatch := bdid_init(bdid_new = 0);
@@ -62,17 +62,17 @@ bdid_nomatch := bdid_init(bdid_new = 0);
 
 Business_Header_SS.MAC_Add_BDID_FLEX(
 	bdid_nomatch, business_matchset,
-	company_name, 
-	prim_range, prim_name, zip, 
+	company_name,
+	prim_range, prim_name, zip,
 	sec_range, state,
 	phone_field, fein_field,
-	bdid_new,	
+	bdid_new,
 	temprec,
 	false, BDID_Score_field,  //these should default to zero in definition
 	bdid_rematch)
-	
+
 out3 := to_bdid_no_company + bdid_match + bdid_rematch;
-				
+
 typeof(df) into(out3 L) := transform
 	boolean ssn_flag := If ((length(trim(L.orig_ssn)) = 4 AND length(trim(L.ssn_appended_temp)) = 9 AND l.orig_ssn[1..4] <> L.ssn_appended_temp[6..9]) OR
 					 (length(trim(L.orig_ssn)) = 9 AND length(trim(L.ssn_appended_temp)) = 9 AND L.orig_ssn <> L.ssn_appended_temp) OR

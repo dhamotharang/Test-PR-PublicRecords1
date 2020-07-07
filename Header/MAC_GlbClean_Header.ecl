@@ -44,8 +44,8 @@ END;
 // Check both DL and GLB permissions
 #uniquename(into)
 %oformat% %into% (%dl_rec% le, codes.Key_Codes_V3 R) := TRANSFORM
-  _dppa_ok := #if (batch) le. #end dppa_ok;
-  _dppa    := #if (batch) le.dppa_purpose #else modAccess.dppa #end;
+  _dppa_ok := dppa_ok;
+  _dppa    := modAccess.dppa;
   //? TODO: interestingly enough, also skip for batch
   SELF.dppa := IF (le.dl_src = 0, FALSE, IF (_dppa_ok AND (R.file_name = ''), TRUE, SKIP));
 
@@ -66,12 +66,12 @@ END;
                   (LEFT.dl_src != 0) AND // zero means do not need to check DL permission
                   KEYED (RIGHT.file_name='GENERAL') AND
                   KEYED (RIGHT.field_name = IF (LEFT.dl_src = 1, 'DL-PURPOSE', 'EXPERIAN-DL-PURPOSE')) AND
-                  // header/translateSource returns a full source name, but all DL sources' names 
+                  // header/translateSource returns a full source name, but all DL sources' names
                   // start from have 2-char state abbreviation
                   KEYED (RIGHT.field_name2 = (string2) header.translateSource (LEFT.src)) AND
-                  KEYED (RIGHT.code = (string1) (#if(batch) LEFT.dppa_purpose #else modAccess.dppa #end)),
+                  KEYED (RIGHT.code = (string1) modAccess.dppa),
                   %into% (LEFT, RIGHT),
-                  LEFT OUTER, 
+                  LEFT OUTER,
                   LIMIT (0), KEEP (1)); // limit(0) since we checking just exists condition
 
 
@@ -79,16 +79,12 @@ END;
 #uniquename(CheckProbation);
 %oformat% %CheckProbation% (%oformat% L, codes.Key_Codes_V3 R) := TRANSFORM
   // if we have a match, then this record is on probabtion; check if probation is overriden.
-  boolean toDrop := (R.long_desc != '') AND 
+  boolean toDrop := (R.long_desc != '') AND
                      ~(
-                       #if (batch)
-                         L.probation_override_value
-                       #else
-                         modAccess.probation_override 
-                       #end
+                         modAccess.probation_override
                        and l.src IN mdr.Probation_Smartlinx_Override);
   // in case of batch blank the record, otherwise skip.
-  // TODO: this is contradict the usage above and below, where filters are applied freely.
+  // TODO: this contradicts the usage above and below, where filters are applied freely.
   #if (batch)
     SELF.seq := L.seq;
     SELF := IF (not toDrop, L);
@@ -115,8 +111,8 @@ END;
 #uniquename(Fetch3a)
 #uniquename(Fetch3b)
 
-Suppress.MAC_Suppress(%Fetch3%,%Fetch3a%,%appType%,Suppress.Constants.LinkTypes.SSN,ssn,,,batch);
-Suppress.MAC_Suppress(%Fetch3a%,%Fetch3b%,%appType%,Suppress.Constants.LinkTypes.DID,did,,,batch);
+Suppress.MAC_Suppress(%Fetch3%, %Fetch3a%, %appType%, Suppress.Constants.LinkTypes.SSN, ssn, , , batch);
+Suppress.MAC_Suppress(%Fetch3a%, %Fetch3b%, %appType%, Suppress.Constants.LinkTypes.DID, did, , , batch);
 
 #uniquename(Fetch3c)
 #uniquename(Fetch3c_minors_cleaned)

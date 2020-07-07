@@ -1,4 +1,4 @@
-IMPORT data_services, doxie, STD;
+﻿IMPORT data_services, doxie, STD;
 
 // common for all indices name prefix
 //string prefix := data_services.data_location.person_header + 'thor_data400::key::' + $.Constants.DataSetName + '::';
@@ -115,8 +115,6 @@ EXPORT names (string file_version = doxie.Version_SuperKey):= MODULE
 
   EXPORT i_DMV_restricted := prefix + 'header::DMV_restricted' + postfix;
 
-  EXPORT i_ParentLnames := prefix + 'header.parentlnames' + postfix;
-
   EXPORT i_address_research := prefix + 'address_research' + postfix;
 
   EXPORT i_ssn_address := prefix + 'header_ssn_address' + postfix;
@@ -128,6 +126,10 @@ EXPORT names (string file_version = doxie.Version_SuperKey):= MODULE
   EXPORT i_addr_unique_expanded      := prefix          + sf_addr_unique_expanded_p2;
   EXPORT i_addr_unique_expanded_fcra := prefix + 'fcra::' + sf_addr_unique_expanded_p2;
  
+  EXPORT sf_first_ingest    := 'header::@version@::first_ingest_date'; 
+  EXPORT sf_first_ingest_p2 := IF (file_version = '', sf_first_ingest, ChangeFileVersion (sf_first_ingest, file_version));
+  EXPORT i_first_ingest := prefix + sf_first_ingest_p2;
+
   // do not want to define a name for index which is located in a different folder
   //  EXPORT i_geolink := prefix + 'addrrisk_geolink' + postfix;
 END;

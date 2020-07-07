@@ -1,6 +1,6 @@
 ﻿// This MODULE EXPORTs all of our model calls.  By doing this, each library can request a specific module and thus only those models are compiled.
 
-IMPORT Models, Risk_Indicators, RiskView;
+IMPORT Models, Risk_Indicators, RiskView, STD;
 
 // Including these blank defaults for retrieving the sets of Valid Models without having to pass in Boca Shell or Arguments
 // This way when creating a new model we only need to update one section of the code to plug the model in (Models.LIB_RiskView_Models)
@@ -13,22 +13,22 @@ EXPORT LIB_RiskView_Models (
 											Models.RV_LIBIN arguments = blankArguments
 																							) := INLINE MODULE
 
-	SHARED modelName				:= StringLib.StringToUpperCase(arguments.modelName);
-	SHARED intendedPurpose	:= StringLib.StringToUpperCase(arguments.IntendedPurpose);
+	SHARED modelName				:= STD.Str.ToUpperCase(arguments.modelName);
+	SHARED intendedPurpose	:= STD.Str.ToUpperCase(arguments.IntendedPurpose);
 	SHARED lexIDOnlyOnInput := arguments.LexIDOnlyOnInput;
 	SHARED isCalifornia			:= arguments.isCalifornia;
 	SHARED preScreenOptOut	:= arguments.preScreenOptOut;
 	SHARED returnCode				:= arguments.returnCode;
 	SHARED payFrequency			:= arguments.payFrequency;
 	SHARED customInputs			:= arguments.Custom_Inputs;
-	shared isPreScreenPurpose := StringLib.StringToUpperCase(intendedPurpose) = 'PRESCREENING';
+	shared isPreScreenPurpose := STD.Str.ToUpperCase(intendedPurpose) = 'PRESCREENING';
 	
 	/* Model Validation -- Use this when trying to validate a new model through the RiskView.Search_Service */
  EXPORT TurnOnValidation := FALSE; // When TRUE allows for Layout_Debug to be OUTPUT in the Search_Service
 	 // EXPORT TurnOnValidation := TRUE; // When TRUE allows for Layout_Debug to be OUTPUT in the RiskView.Search_Service
 	
 	
-	EXPORT ValidatingModel := Models.RVA1904_1_0(BocaShell,FALSE); // Change this to the model you are tring to validate
+	EXPORT ValidatingModel := Models.RVA1908_1_0(BocaShell); // Change this to the model you are tring to validate
 	
 	
 	// Version 4.0
@@ -158,7 +158,8 @@ that is sent INTO calcindex for ECL.
 																			{'RVG1808_2', MType_G+'RVG1808_2', calcIndex( 74), '0-999', 0}, //Telechek
 																			{'RVA1809_1', MType_A+'RVA1809_1', calcIndex( 76), '0-999', 0}, //CactusJack
                                                                             {'RVA1904_1', MType_A+'RVA1904_1', calcIndex( 78), '0-999', 0}, //Westlake Financial
-																			
+                                                                            {'RVG1809_1', MType_G+'RVG1809_1', calcIndex( 79), '0-999', 0}, //Tranzaction
+																			{'RVA1908_1', MType_A+'RVA1908_1', calcIndex( 80), '0-999', 0}, //SCUSA
 																			
 																		// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 																			{'RVA9999_9', MType_A+'RVA9999_9', 0, '0-999', 0},
@@ -212,7 +213,9 @@ that is sent INTO calcindex for ECL.
 											'RVG1808_1' => UNGROUP(Models.RVG1808_1_0(BocaShell, isPreScreenPurpose)),	
 											'RVG1808_2' => UNGROUP(Models.RVG1808_2_0(BocaShell, isPreScreenPurpose)),	
 											'RVA1809_1' => UNGROUP(Models.RVA1809_1_0(BocaShell, isPreScreenPurpose)),	
-                                            'RVA1904_1' => UNGROUP(Models.RVA1904_1_0(BocaShell, isPreScreenPurpose)),	
+                                            'RVA1904_1' => UNGROUP(Models.RVA1904_1_0(BocaShell, isPreScreenPurpose)),
+                                            'RVA1908_1' => UNGROUP(Models.RVA1908_1_0(BocaShell)),	
+                                            'RVG1809_1' => UNGROUP(Models.RVG1809_1_0(BocaShell)),	
 											// ----------------------------------------------------------------------------------
 											// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 											'RVA9999_9' => UNGROUP(Models.FAKE_0_0(BocaShell, 'RV50')),

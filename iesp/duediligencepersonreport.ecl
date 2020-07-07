@@ -111,8 +111,15 @@ export t_DDRBusinessAssocationDetails := record
 	dataset(iesp.duediligenceshared.t_DDRPersonNameWithLexID) RegisteredAgents {xpath('RegisteredAgents/RegisteredAgent'), MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxRegisteredAgents)};
 end;
 		
+export t_DDRBusinessAssociationDetails := record (t_DDRBusinessAssocationDetails)
+end;
+		
 export t_DDRBusinessAssocations := record
 	dataset(t_DDRBusinessAssocationDetails) Associations {xpath('Associations/Association'), MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxBusAssociations)};
+end;
+		
+export t_DDRBusinessAssociations := record
+	dataset(t_DDRBusinessAssociationDetails) Associations {xpath('Associations/Association'), MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxBusAssociations)};
 end;
 		
 export t_DDRPersonInformation := record
@@ -196,6 +203,54 @@ end;
 		
 export t_DDRPersonLegalAttributeDetails := record
 	dataset(t_DDRPersonCriminalEvents) PossibleLegalEvents {xpath('PossibleLegalEvents/PossibleLegalEvent'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxLegalEvents)};
+	dataset(iesp.duediligenceshared.t_DDRLiensJudgmentsEvictions) PossibleLiensJudgmentsEvictions {xpath('PossibleLiensJudgmentsEvictions/PossibleLiensJudgmentsEviction'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxLienJudgementsEvictions)};
+end;
+		
+export t_DDRPersonGeographicResidentTenantRisk := record
+	integer NumberCurrentResidentTenant {xpath('NumberCurrentResidentTenant')};
+	integer NumberRelatives {xpath('NumberRelatives')};
+	integer NumberBusinessAssociates {xpath('NumberBusinessAssociates')};
+	integer NumberHighRiskProfServiceProvidersOrFieldOfStudy {xpath('NumberHighRiskProfServiceProvidersOrFieldOfStudy')};
+	integer NumberPotentialCriminalRecordsArrests {xpath('NumberPotentialCriminalRecordsArrests')};
+	integer NumberPotentialSexOffenders {xpath('NumberPotentialSexOffenders')};
+end;
+		
+export t_DDRPersonGeographicAreaInformation := record
+	string AreaRisk {xpath('AreaRisk')};
+	string ResidencyStatus {xpath('ResidencyStatus')};
+	string ResidencyType {xpath('ResidencyType')};
+end;
+		
+export t_DDRPersonAddressDetails := record
+	iesp.share.t_Address Address {xpath('Address')};
+	iesp.share.t_Date AddressFirstSeenDate {xpath('AddressFirstSeenDate')};
+	iesp.share.t_Date AddressLastSeenDate {xpath('AddressLastSeenDate')};
+	string AddressType {xpath('AddressType')};
+	integer MilesFromPreviousResidence {xpath('MilesFromPreviousResidence')};
+	t_DDRPersonGeographicAreaInformation AreaInformation {xpath('AreaInformation')};
+	t_DDRPersonGeographicResidentTenantRisk ResidentTenantRisk {xpath('ResidentTenantRisk')};
+end;
+		
+export t_DDRPersonGeographicAttributeDetails := record
+	integer NumberCurrentResidence {xpath('NumberCurrentResidence')};
+	integer NumberPriorResidence {xpath('NumberPriorResidence')};
+	dataset(t_DDRPersonAddressDetails) ResidenceDetails {xpath('ResidenceDetails/ResidenceDetail'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxResidence)};
+end;
+		
+export t_DDRPersonAssociationRelationshipDetails := record
+	iesp.share.t_Name Name {xpath('Name')};
+	string PossibleRelationship {xpath('PossibleRelationship')};
+	t_DDRPersonSSNLexID SSNLexID {xpath('SSNLexID')};
+	iesp.share.t_Date DOB {xpath('DOB')};
+	iesp.share.t_Address Address {xpath('Address')};
+	boolean TrafficRelated {xpath('TrafficRelated')};
+	boolean AllOtherCriminalRecords {xpath('AllOtherCriminalRecords')};
+end;
+		
+export t_DDRPersonAssociations := record
+	integer NumberRelatives {xpath('NumberRelatives')};
+	integer NumberOtherAssociates {xpath('NumberOtherAssociates')};
+	dataset(t_DDRPersonAssociationRelationshipDetails) RelationDetails {xpath('RelationDetails/RelationDetail'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxPersonAssociations)};
 end;
 		
 export t_DDRPersonAttributeDetails := record
@@ -204,6 +259,8 @@ export t_DDRPersonAttributeDetails := record
 	t_DDRPersonProfessionalNetworkDetails ProfessionalNetwork {xpath('ProfessionalNetwork')};
 	t_DDRIdentityAttributeDetails Identitiy {xpath('Identitiy')};
 	t_DDRBusinessAssocations BusinessAssocation {xpath('BusinessAssocation')};
+	t_DDRPersonGeographicAttributeDetails Geographic {xpath('Geographic')};
+	t_DDRPersonAssociations PersonAssociation {xpath('PersonAssociation')};
 end;
 		
 export t_DDRPersonReport := record

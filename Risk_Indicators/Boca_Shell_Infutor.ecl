@@ -10,8 +10,9 @@ END;
 
 Layout_Infutor_CCPA := RECORD
 	integer8 did; // CCPA changes
-    unsigned4 global_sid; // CCPA changes
-    Layout_Infutor;
+  unsigned4 global_sid; // CCPA changes
+  boolean skip_opt_out := false; // CCPA changes
+	Layout_Infutor;
 END;
 
 Layout_Infutor_CCPA getInfutor(ids_wide le, InfutorCID.Key_Infutor_DID ri) := transform	
@@ -35,13 +36,22 @@ Layout_Infutor_CCPA getInfutor(ids_wide le, InfutorCID.Key_Infutor_DID ri) := tr
     self.global_sid := ri.global_sid;
 	self := le;
 end;
-wInfutor := join(ids_wide, InfutorCID.Key_Infutor_DID,	
+wInfutor_unsuppressed := join(ids_wide, InfutorCID.Key_Infutor_DID,	
 									left.did<>0 and
 									keyed(left.did=right.did) and
 									right.dt_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate),
 									getInfutor(left,right), left outer, atmost(riskwise.max_atmost), KEEP(100));
 									
-Layout_Infutor_CCPA rollInfutor(Layout_Infutor_CCPA le, Layout_Infutor_CCPA ri) := transform
+wInfutor_flagged := Suppress.CheckSuppression(wInfutor_unsuppressed, mod_access);
+
+wInfutor := PROJECT(wInfutor_flagged, TRANSFORM(Layout_Infutor,
+	self.infutor_date_first_seen := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.infutor_date_first_seen);
+	self.infutor_date_last_seen := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.infutor_date_last_seen);			
+	self.infutor_nap := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.infutor_nap);
+    SELF := LEFT;
+)); 
+									
+Layout_Infutor rollInfutor(Layout_Infutor le, Layout_Infutor ri) := transform
 	self.infutor_date_first_seen := ut.min2(le.infutor_date_first_seen, ri.infutor_date_first_seen);
 	self.infutor_date_last_seen := max(le.infutor_date_last_seen, ri.infutor_date_last_seen);	
 	self.infutor_nap := max(le.infutor_nap, ri.infutor_nap);
@@ -49,10 +59,7 @@ Layout_Infutor_CCPA rollInfutor(Layout_Infutor_CCPA le, Layout_Infutor_CCPA ri) 
 	self := le;
 end;
 
-Suppressed_Infutor := Suppress.MAC_SuppressSource(rollup(wInfutor, true, rollInfutor(left,right)), mod_access);
-
-rolledInfutor := PROJECT(Suppressed_Infutor, TRANSFORM(Layout_Infutor,
-                                                  SELF := LEFT));
+rolledInfutor := rollup(wInfutor, true, rollInfutor(left,right));
 
 return rolledInfutor;
 

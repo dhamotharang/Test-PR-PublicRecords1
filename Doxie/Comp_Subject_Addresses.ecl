@@ -20,7 +20,7 @@ head_all := doxie.mod_header_records(
 
 head_for_append := head_all(doxie.needAppends(src, listed_name));
 head_skip 			:= head_all(~doxie.needAppends(src, listed_name));
-head_gd1 := doxie.Append_Gong(head_for_append, DATASET([], doxie.layout_relative_dids_v3),
+head_gd1 := doxie.Append_Gong(head_for_append, DATASET([], doxie.layout_relative_dids),
   mod_access, dial_contactprecision_value);
 
 head_gd :=

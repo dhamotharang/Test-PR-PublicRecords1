@@ -1,4 +1,4 @@
-IMPORT VehicleV2_Services;
+﻿IMPORT VehicleV2_Services;
 
 MAC_SetPerson () := MACRO
   Self.PersonInfo.Name := ECL2ESP.SetName (L.fname, L.mname, L.lname, L.name_suffix, '');
@@ -22,6 +22,7 @@ iesp.motorvehicle.t_MVReportOwner SetOwners (VehicleV2_Services.assorted_layouts
   MAC_SetPerson ();
 	Self.SourceDateFirstSeen := iesp.ECL2ESP.toDatestring8(L.SRC_FIRST_DATE);
 	Self.SourceDateLastSeen := iesp.ECL2ESP.toDatestring8(L.SRC_LAST_DATE);
+  Self.ReportedName := L.reported_name;
 END;
 
 iesp.motorvehicle.t_MVReportBrand SetBrands (VehicleV2_Services.assorted_layouts.layout_brand L) := TRANSFORM
@@ -33,6 +34,7 @@ END;
 
 iesp.motorvehicle.t_MVReportRegistrant SetRegistrants (VehicleV2_Services.assorted_layouts.Layout_registrant L) := TRANSFORM
   Self.RegistrantType := '';
+  Self.ReportedName := L.reported_name;
   MAC_SetPerson ();
 END;
 
@@ -42,6 +44,7 @@ iesp.motorvehicle.t_MVReportLienHolder SetLienHolders (VehicleV2_Services.assort
   Self.FEID_SSN := '';
   Self.LienDate := iesp.ECL2ESP.toDate ((integer4) L.Orig_Lien_Date);
   Self.BusinessName := L.Append_Clean_CName; //or L.orig_name
+  Self.ReportedName := L.reported_name;
 END;
 
 iesp.motorvehicle.t_MVReportRecord toOut (VehicleV2_Services.Layout_Report L) := TRANSFORM

@@ -1,4 +1,4 @@
-﻿IMPORT risk_indicators, RiskView;
+﻿IMPORT risk_indicators, RiskView, iesp;
 
 EXPORT Transforms := module
 
@@ -1601,7 +1601,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts1_FilingNumber := ri.LnJJudgments[1].FilingNumber;
 		self.Jgmts1_FilingBook   := ri.LnJJudgments[1].FilingBook;
 		self.Jgmts1_FilingPage   := ri.LnJJudgments[1].FilingPage;
-		self.Jgmts1_Eviction     := ri.LnJJudgments[1].Eviction;		
+		self.Jgmts1_Eviction     := ri.LnJJudgments[1].Eviction;
 		self.Jgmts1_Agency       := ri.LnJJudgments[1].Agency ;
 		self.Jgmts1_AgencyCounty := ri.LnJJudgments[1].AgencyCounty;
 		self.Jgmts1_AgencyState	:= ri.LnJJudgments[1].AgencyState;
@@ -3469,9 +3469,910 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts99_AgencyState  := ri.LnJJudgments[99].AgencyState     ;
 		self.Jgmts99_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[99].ConsumerStatementId);
     self.Jgmts99_orig_rmsid       := ri.LnJJudgments[99].orig_rmsid;
-		
+				self.Liens1_AgencyID      := ri.LnJliens[1].AgencyID;
+		self.Liens2_AgencyID      := ri.LnJliens[2].AgencyID;
+		self.Liens3_AgencyID      := ri.LnJliens[3].AgencyID;
+		self.Liens4_AgencyID      := ri.LnJliens[4].AgencyID;
+		self.Liens5_AgencyID      := ri.LnJliens[5].AgencyID;
+		self.Liens6_AgencyID      := ri.LnJliens[6].AgencyID;
+		self.Liens7_AgencyID      := ri.LnJliens[7].AgencyID;
+		self.Liens8_AgencyID      := ri.LnJliens[8].AgencyID;
+		self.Liens9_AgencyID      := ri.LnJliens[9].AgencyID;
+		self.Liens10_AgencyID     := ri.LnJliens[10].AgencyID;
+		self.Liens11_AgencyID     := ri.LnJliens[11].AgencyID;
+		self.Liens12_AgencyID     := ri.LnJliens[12].AgencyID;
+		self.Liens13_AgencyID     := ri.LnJliens[13].AgencyID;
+		self.Liens14_AgencyID     := ri.LnJliens[14].AgencyID;
+		self.Liens15_AgencyID     := ri.LnJliens[15].AgencyID;
+		self.Liens16_AgencyID     := ri.LnJliens[16].AgencyID;
+		self.Liens17_AgencyID     := ri.LnJliens[17].AgencyID;
+		self.Liens18_AgencyID     := ri.LnJliens[18].AgencyID;
+		self.Liens19_AgencyID     := ri.LnJliens[19].AgencyID;
+		self.Liens20_AgencyID     := ri.LnJliens[20].AgencyID;
+		self.Liens21_AgencyID     := ri.LnJliens[21].AgencyID;
+		self.Liens22_AgencyID     := ri.LnJliens[22].AgencyID;
+		self.Liens23_AgencyID     := ri.LnJliens[23].AgencyID;
+		self.Liens24_AgencyID     := ri.LnJliens[24].AgencyID;
+		self.Liens25_AgencyID     := ri.LnJliens[25].AgencyID;
+		self.Liens26_AgencyID     := ri.LnJliens[26].AgencyID;
+		self.Liens27_AgencyID     := ri.LnJliens[27].AgencyID;
+		self.Liens28_AgencyID     := ri.LnJliens[28].AgencyID;
+		self.Liens29_AgencyID     := ri.LnJliens[29].AgencyID;
+		self.Liens30_AgencyID     := ri.LnJliens[30].AgencyID;
+		self.Liens31_AgencyID     := ri.LnJliens[31].AgencyID;
+		self.Liens32_AgencyID     := ri.LnJliens[32].AgencyID;
+		self.Liens33_AgencyID     := ri.LnJliens[33].AgencyID;
+		self.Liens34_AgencyID     := ri.LnJliens[34].AgencyID;
+		self.Liens35_AgencyID     := ri.LnJliens[35].AgencyID;
+		self.Liens36_AgencyID     := ri.LnJliens[36].AgencyID;
+		self.Liens37_AgencyID     := ri.LnJliens[37].AgencyID;
+		self.Liens38_AgencyID     := ri.LnJliens[38].AgencyID;
+		self.Liens39_AgencyID     := ri.LnJliens[39].AgencyID;
+		self.Liens40_AgencyID     := ri.LnJliens[40].AgencyID;
+		self.Liens41_AgencyID     := ri.LnJliens[41].AgencyID;
+		self.Liens42_AgencyID     := ri.LnJliens[42].AgencyID;
+		self.Liens43_AgencyID     := ri.LnJliens[43].AgencyID;
+		self.Liens44_AgencyID     := ri.LnJliens[44].AgencyID;
+		self.Liens45_AgencyID     := ri.LnJliens[45].AgencyID;
+		self.Liens46_AgencyID     := ri.LnJliens[46].AgencyID;
+		self.Liens47_AgencyID     := ri.LnJliens[47].AgencyID;
+		self.Liens48_AgencyID     := ri.LnJliens[48].AgencyID;
+		self.Liens49_AgencyID     := ri.LnJliens[49].AgencyID;
+		self.Liens50_AgencyID     := ri.LnJliens[50].AgencyID;
+		self.Liens51_AgencyID     := ri.LnJliens[51].AgencyID;
+		self.Liens52_AgencyID     := ri.LnJliens[52].AgencyID;
+		self.Liens53_AgencyID     := ri.LnJliens[53].AgencyID;
+		self.Liens54_AgencyID     := ri.LnJliens[54].AgencyID;
+		self.Liens55_AgencyID     := ri.LnJliens[55].AgencyID;
+		self.Liens56_AgencyID     := ri.LnJliens[56].AgencyID;
+		self.Liens57_AgencyID     := ri.LnJliens[57].AgencyID;
+		self.Liens58_AgencyID     := ri.LnJliens[58].AgencyID;
+		self.Liens59_AgencyID     := ri.LnJliens[59].AgencyID;
+		self.Liens60_AgencyID     := ri.LnJliens[60].AgencyID;
+		self.Liens61_AgencyID     := ri.LnJliens[61].AgencyID;
+		self.Liens62_AgencyID     := ri.LnJliens[62].AgencyID;
+		self.Liens63_AgencyID     := ri.LnJliens[63].AgencyID;
+		self.Liens64_AgencyID     := ri.LnJliens[64].AgencyID;
+		self.Liens65_AgencyID     := ri.LnJliens[65].AgencyID;
+		self.Liens66_AgencyID     := ri.LnJliens[66].AgencyID;
+		self.Liens67_AgencyID     := ri.LnJliens[67].AgencyID;
+		self.Liens68_AgencyID     := ri.LnJliens[68].AgencyID;
+		self.Liens69_AgencyID     := ri.LnJliens[69].AgencyID;
+		self.Liens70_AgencyID     := ri.LnJliens[70].AgencyID;
+		self.Liens71_AgencyID     := ri.LnJliens[71].AgencyID;
+		self.Liens72_AgencyID     := ri.LnJliens[72].AgencyID;
+		self.Liens73_AgencyID     := ri.LnJliens[73].AgencyID;
+		self.Liens74_AgencyID     := ri.LnJliens[74].AgencyID;
+		self.Liens75_AgencyID     := ri.LnJliens[75].AgencyID;
+		self.Liens76_AgencyID     := ri.LnJliens[76].AgencyID;
+		self.Liens77_AgencyID     := ri.LnJliens[77].AgencyID;
+		self.Liens78_AgencyID     := ri.LnJliens[78].AgencyID;
+		self.Liens79_AgencyID     := ri.LnJliens[79].AgencyID;
+		self.Liens80_AgencyID     := ri.LnJliens[80].AgencyID;
+		self.Liens81_AgencyID     := ri.LnJliens[81].AgencyID;
+		self.Liens82_AgencyID     := ri.LnJliens[82].AgencyID;
+		self.Liens83_AgencyID     := ri.LnJliens[83].AgencyID;
+		self.Liens84_AgencyID     := ri.LnJliens[84].AgencyID;
+		self.Liens85_AgencyID     := ri.LnJliens[85].AgencyID;
+		self.Liens86_AgencyID     := ri.LnJliens[86].AgencyID;
+		self.Liens87_AgencyID     := ri.LnJliens[87].AgencyID;
+		self.Liens88_AgencyID     := ri.LnJliens[88].AgencyID;
+		self.Liens89_AgencyID     := ri.LnJliens[89].AgencyID;
+		self.Liens90_AgencyID     := ri.LnJliens[90].AgencyID;
+		self.Liens91_AgencyID     := ri.LnJliens[91].AgencyID;
+		self.Liens92_AgencyID     := ri.LnJliens[92].AgencyID;
+		self.Liens93_AgencyID     := ri.LnJliens[93].AgencyID;
+		self.Liens94_AgencyID     := ri.LnJliens[94].AgencyID;
+		self.Liens95_AgencyID     := ri.LnJliens[95].AgencyID;
+		self.Liens96_AgencyID     := ri.LnJliens[96].AgencyID;
+		self.Liens97_AgencyID     := ri.LnJliens[97].AgencyID;
+		self.Liens98_AgencyID     := ri.LnJliens[98].AgencyID;
+		self.Liens99_AgencyID     := ri.LnJliens[99].AgencyID;
+		self.Jgmts1_AgencyID      := ri.LnJJudgments[1].AgencyID;
+		self.Jgmts2_AgencyID      := ri.LnJJudgments[2].AgencyID;
+		self.Jgmts3_AgencyID      := ri.LnJJudgments[3].AgencyID;
+		self.Jgmts4_AgencyID      := ri.LnJJudgments[4].AgencyID;
+		self.Jgmts5_AgencyID      := ri.LnJJudgments[5].AgencyID;
+		self.Jgmts6_AgencyID      := ri.LnJJudgments[6].AgencyID;
+		self.Jgmts7_AgencyID      := ri.LnJJudgments[7].AgencyID;
+		self.Jgmts8_AgencyID      := ri.LnJJudgments[8].AgencyID;
+		self.Jgmts9_AgencyID      := ri.LnJJudgments[9].AgencyID;
+		self.Jgmts10_AgencyID     := ri.LnJJudgments[10].AgencyID;
+		self.Jgmts11_AgencyID     := ri.LnJJudgments[11].AgencyID;
+		self.Jgmts12_AgencyID     := ri.LnJJudgments[12].AgencyID;
+		self.Jgmts13_AgencyID     := ri.LnJJudgments[13].AgencyID;
+		self.Jgmts14_AgencyID     := ri.LnJJudgments[14].AgencyID;
+		self.Jgmts15_AgencyID     := ri.LnJJudgments[15].AgencyID;
+		self.Jgmts16_AgencyID     := ri.LnJJudgments[16].AgencyID;
+		self.Jgmts17_AgencyID     := ri.LnJJudgments[17].AgencyID;
+		self.Jgmts18_AgencyID     := ri.LnJJudgments[18].AgencyID;
+		self.Jgmts19_AgencyID     := ri.LnJJudgments[19].AgencyID;
+		self.Jgmts20_AgencyID     := ri.LnJJudgments[20].AgencyID;
+		self.Jgmts21_AgencyID     := ri.LnJJudgments[21].AgencyID;
+		self.Jgmts22_AgencyID     := ri.LnJJudgments[22].AgencyID;
+		self.Jgmts23_AgencyID     := ri.LnJJudgments[23].AgencyID;
+		self.Jgmts24_AgencyID     := ri.LnJJudgments[24].AgencyID;
+		self.Jgmts25_AgencyID     := ri.LnJJudgments[25].AgencyID;
+		self.Jgmts26_AgencyID     := ri.LnJJudgments[26].AgencyID;
+		self.Jgmts27_AgencyID     := ri.LnJJudgments[27].AgencyID;
+		self.Jgmts28_AgencyID     := ri.LnJJudgments[28].AgencyID;
+		self.Jgmts29_AgencyID     := ri.LnJJudgments[29].AgencyID;
+		self.Jgmts30_AgencyID     := ri.LnJJudgments[30].AgencyID;
+		self.Jgmts31_AgencyID     := ri.LnJJudgments[31].AgencyID;
+		self.Jgmts32_AgencyID     := ri.LnJJudgments[32].AgencyID;
+		self.Jgmts33_AgencyID     := ri.LnJJudgments[33].AgencyID;
+		self.Jgmts34_AgencyID     := ri.LnJJudgments[34].AgencyID;
+		self.Jgmts35_AgencyID     := ri.LnJJudgments[35].AgencyID;
+		self.Jgmts36_AgencyID     := ri.LnJJudgments[36].AgencyID;
+		self.Jgmts37_AgencyID     := ri.LnJJudgments[37].AgencyID;
+		self.Jgmts38_AgencyID     := ri.LnJJudgments[38].AgencyID;
+		self.Jgmts39_AgencyID     := ri.LnJJudgments[39].AgencyID;
+		self.Jgmts40_AgencyID     := ri.LnJJudgments[40].AgencyID;
+		self.Jgmts41_AgencyID     := ri.LnJJudgments[41].AgencyID;
+		self.Jgmts42_AgencyID     := ri.LnJJudgments[42].AgencyID;
+		self.Jgmts43_AgencyID     := ri.LnJJudgments[43].AgencyID;
+		self.Jgmts44_AgencyID     := ri.LnJJudgments[44].AgencyID;
+		self.Jgmts45_AgencyID     := ri.LnJJudgments[45].AgencyID;
+		self.Jgmts46_AgencyID     := ri.LnJJudgments[46].AgencyID;
+		self.Jgmts47_AgencyID     := ri.LnJJudgments[47].AgencyID;
+		self.Jgmts48_AgencyID     := ri.LnJJudgments[48].AgencyID;
+		self.Jgmts49_AgencyID     := ri.LnJJudgments[49].AgencyID;
+		self.Jgmts50_AgencyID     := ri.LnJJudgments[50].AgencyID;
+		self.Jgmts51_AgencyID     := ri.LnJJudgments[51].AgencyID;
+		self.Jgmts52_AgencyID     := ri.LnJJudgments[52].AgencyID;
+		self.Jgmts53_AgencyID     := ri.LnJJudgments[53].AgencyID;
+		self.Jgmts54_AgencyID     := ri.LnJJudgments[54].AgencyID;
+		self.Jgmts55_AgencyID     := ri.LnJJudgments[55].AgencyID;
+		self.Jgmts56_AgencyID     := ri.LnJJudgments[56].AgencyID;
+		self.Jgmts57_AgencyID     := ri.LnJJudgments[57].AgencyID;
+		self.Jgmts58_AgencyID     := ri.LnJJudgments[58].AgencyID;
+		self.Jgmts59_AgencyID     := ri.LnJJudgments[59].AgencyID;
+		self.Jgmts60_AgencyID     := ri.LnJJudgments[60].AgencyID;
+		self.Jgmts61_AgencyID     := ri.LnJJudgments[61].AgencyID;
+		self.Jgmts62_AgencyID     := ri.LnJJudgments[62].AgencyID;
+		self.Jgmts63_AgencyID     := ri.LnJJudgments[63].AgencyID;
+		self.Jgmts64_AgencyID     := ri.LnJJudgments[64].AgencyID;
+		self.Jgmts65_AgencyID     := ri.LnJJudgments[65].AgencyID;
+		self.Jgmts66_AgencyID     := ri.LnJJudgments[66].AgencyID;
+		self.Jgmts67_AgencyID     := ri.LnJJudgments[67].AgencyID;
+		self.Jgmts68_AgencyID     := ri.LnJJudgments[68].AgencyID;
+		self.Jgmts69_AgencyID     := ri.LnJJudgments[69].AgencyID;
+		self.Jgmts70_AgencyID     := ri.LnJJudgments[70].AgencyID;
+		self.Jgmts71_AgencyID     := ri.LnJJudgments[71].AgencyID;
+		self.Jgmts72_AgencyID     := ri.LnJJudgments[72].AgencyID;
+		self.Jgmts73_AgencyID     := ri.LnJJudgments[73].AgencyID;
+		self.Jgmts74_AgencyID     := ri.LnJJudgments[74].AgencyID;
+		self.Jgmts75_AgencyID     := ri.LnJJudgments[75].AgencyID;
+		self.Jgmts76_AgencyID     := ri.LnJJudgments[76].AgencyID;
+		self.Jgmts77_AgencyID     := ri.LnJJudgments[77].AgencyID;
+		self.Jgmts78_AgencyID     := ri.LnJJudgments[78].AgencyID;
+		self.Jgmts79_AgencyID     := ri.LnJJudgments[79].AgencyID;
+		self.Jgmts80_AgencyID     := ri.LnJJudgments[80].AgencyID;
+		self.Jgmts81_AgencyID     := ri.LnJJudgments[81].AgencyID;
+		self.Jgmts82_AgencyID     := ri.LnJJudgments[82].AgencyID;
+		self.Jgmts83_AgencyID     := ri.LnJJudgments[83].AgencyID;
+		self.Jgmts84_AgencyID     := ri.LnJJudgments[84].AgencyID;
+		self.Jgmts85_AgencyID     := ri.LnJJudgments[85].AgencyID;
+		self.Jgmts86_AgencyID     := ri.LnJJudgments[86].AgencyID;
+		self.Jgmts87_AgencyID     := ri.LnJJudgments[87].AgencyID;
+		self.Jgmts88_AgencyID     := ri.LnJJudgments[88].AgencyID;
+		self.Jgmts89_AgencyID     := ri.LnJJudgments[89].AgencyID;
+		self.Jgmts90_AgencyID     := ri.LnJJudgments[90].AgencyID;
+		self.Jgmts91_AgencyID     := ri.LnJJudgments[91].AgencyID;
+		self.Jgmts92_AgencyID     := ri.LnJJudgments[92].AgencyID;
+		self.Jgmts93_AgencyID     := ri.LnJJudgments[93].AgencyID;
+		self.Jgmts94_AgencyID     := ri.LnJJudgments[94].AgencyID;
+		self.Jgmts95_AgencyID     := ri.LnJJudgments[95].AgencyID;
+		self.Jgmts96_AgencyID     := ri.LnJJudgments[96].AgencyID;
+		self.Jgmts97_AgencyID     := ri.LnJJudgments[97].AgencyID;
+		self.Jgmts98_AgencyID     := ri.LnJJudgments[98].AgencyID;
+		self.Jgmts99_AgencyID     := ri.LnJJudgments[99].AgencyID;
+		self.Full := ri.report.summary.name.full;
+		self.First := ri.report.summary.name.first;
+		self.Middle := ri.report.summary.name.middle;
+		self.Last := ri.report.summary.name.last;
+		self.Suffix := ri.report.summary.name.suffix;
+		self.Prefix := ri.report.summary.name.prefix;
+		self.StreetNumber := ri.report.summary.address.streetnumber;
+		self.StreetPreDirection := ri.report.summary.address.StreetPreDirection;
+		self.StreetName := ri.report.summary.address.StreetName;
+		self.StreetSuffix := ri.report.summary.address.StreetSuffix;
+		self.StreetPostDirection := ri.report.summary.address.StreetPostDirection;
+		self.UnitDesignation := ri.report.summary.address.UnitDesignation;
+		self.UnitNumber := ri.report.summary.address.UnitNumber;
+		self.StreetAddress1 := ri.report.summary.address.StreetAddress1;
+		self.StreetAddress2 := ri.report.summary.address.StreetAddress2;
+		self.City := ri.report.summary.address.City;
+		self.State := ri.report.summary.address.State;
+		self.Zip5 := ri.report.summary.address.Zip5;
+		self.Zip4 := ri.report.summary.address.Zip4;
+		self.County := ri.report.summary.address.County;
+		self.PostalCode := ri.report.summary.address.PostalCode;
+		self.StateCityZip := ri.report.summary.address.StateCityZip;
+		self.SSN := ri.report.summary.SSN;
+		self.Phone := ri.report.summary.Phone;
+		self.Year := ri.report.summary.DOB.Year;
+		self.Month := ri.report.summary.DOB.Month;
+		self.Day := ri.report.summary.DOB.Day;
+		self.UniqueId := ri.report.summary.UniqueId;
+		self.AddressStability := ri.report.summary.AddressStability;
+		self.InquiriesRestricted := ri.report.summary.InquiriesRestricted;
+		self.SSNMismatch := ri.report.summary.SSNMismatch;
+		self.DOBMismatch := ri.report.summary.DOBMismatch;
+		self.AddressMismatch := ri.report.summary.AddressMismatch;
+		self.PhoneMismatch := ri.report.summary.PhoneMismatch;
+		self.UniqueIDMismatch := ri.report.summary.UniqueIDMismatch;
 		self := ri;
 		self := []; 
 end;
+
+// rv5 attribute transform
+EXPORT iesp.share.t_NameValuePair intoVersion5(riskview.layouts.layout_riskview5_search_results le, INTEGER c) := TRANSFORM
+  SELF.name := MAP(
+              c=1	=> 'InputProvidedFirstName',
+              c=2	=> 'InputProvidedLastName',
+              c=3	=> 'InputProvidedStreetAddress',
+              c=4	=> 'InputProvidedCity',
+              c=5	=> 'InputProvidedState',
+              c=6	=> 'InputProvidedZipCode',
+              c=7	=> 'InputProvidedSSN',
+              c=8	=> 'InputProvidedDateofBirth',
+              c=9	=> 'InputProvidedPhone',
+              c=10	=> 'InputProvidedLexID',
+              c=11	=> 'SubjectRecordTimeOldest',
+              c=12	=> 'SubjectRecordTimeNewest',
+              c=13	=> 'SubjectNewestRecord12Month',
+              c=14	=> 'SubjectActivityIndex03Month',
+              c=15	=> 'SubjectActivityIndex06Month',
+              c=16	=> 'SubjectActivityIndex12Month',
+              c=17	=> 'SubjectAge',
+              c=18	=> 'SubjectDeceased',
+              c=19	=> 'SubjectSSNCount',
+              c=20	=> 'SubjectStabilityIndex',
+              c=21	=> 'SubjectStabilityPrimaryFactor',
+              c=22	=> 'SubjectAbilityIndex',
+              c=23	=> 'SubjectAbilityPrimaryFactor',
+              c=24	=> 'SubjectWillingnessIndex',
+              c=25	=> 'SubjectWillingnessPrimaryFactor',
+              c=26	=> 'ConfirmationSubjectFound',
+              c=27	=> 'ConfirmationInputName',
+              c=28	=> 'ConfirmationInputDOB',
+              c=29	=> 'ConfirmationInputSSN',
+              c=30	=> 'ConfirmationInputAddress',
+              c=31	=> 'SourceNonDerogProfileIndex',
+              c=32	=> 'SourceNonDerogCount',
+              c=33	=> 'SourceNonDerogCount03Month',
+              c=34	=> 'SourceNonDerogCount06Month',
+              c=35	=> 'SourceNonDerogCount12Month',
+              c=36	=> 'SourceCredHeaderTimeOldest',
+              c=37	=> 'SourceCredHeaderTimeNewest',
+              // c=38	=> 'SourceDirectory',   -- removing from layout for change control request #2
+              // c=39	=> 'SourceDirectoryCount',   -- removing from layout for change control request #2
+              c=40	=> 'SourceVoterRegistration',
+              // c=41	=> 'EstimatedAnnualIncome',   -- removing from layout for change control request #2
+              c=42	=> 'EducationAttendance',
+              c=43	=> 'EducationEvidence',
+              c=44	=> 'EducationProgramAttended',
+              c=45	=> 'EducationInstitutionPrivate',
+              c=46	=> 'EducationInstitutionRating',
+              c=47	=> 'ProfLicCount',
+              c=48	=> 'ProfLicTypeCategory',
+              c=49	=> 'BusinessAssociation',
+              c=50	=> 'BusinessAssociationIndex',
+              c=51	=> 'BusinessAssociationTimeOldest',
+              c=52	=> 'BusinessTitleLeadership',
+              c=53	=> 'AssetIndex',
+              c=54	=> 'AssetIndexPrimaryFactor',
+              c=55	=> 'AssetOwnership',
+              c=56	=> 'AssetProp',
+              c=57	=> 'AssetPropIndex',
+              c=58	=> 'AssetPropEverCount',
+              c=59	=> 'AssetPropCurrentCount',
+              c=60	=> 'AssetPropCurrentTaxTotal',
+              c=61	=> 'AssetPropPurchaseCount12Month',
+              c=62	=> 'AssetPropPurchaseTimeOldest',
+              c=63	=> 'AssetPropPurchaseTimeNewest',
+              c=64	=> 'AssetPropNewestMortgageType',
+              c=65	=> 'AssetPropEverSoldCount',
+              c=66	=> 'AssetPropSoldCount12Month',
+              c=67	=> 'AssetPropSaleTimeOldest',
+              c=68	=> 'AssetPropSaleTimeNewest',
+              c=69	=> 'AssetPropNewestSalePrice',
+              c=70	=> 'AssetPropSalePurchaseRatio',
+              c=71	=> 'AssetPersonal',
+              c=72	=> 'AssetPersonalCount',
+              c=73	=> 'PurchaseActivityIndex',
+              c=74	=> 'PurchaseActivityCount',
+              c=75	=> 'PurchaseActivityDollarTotal',
+              c=76	=> 'DerogSeverityIndex',
+              c=77	=> 'DerogCount',
+              c=78	=> 'DerogCount12Month',
+              c=79	=> 'DerogTimeNewest',
+              c=80	=> 'CriminalFelonyCount',
+              c=81	=> 'CriminalFelonyCount12Month',
+              c=82	=> 'CriminalFelonyTimeNewest',
+              c=83	=> 'CriminalNonFelonyCount',
+              c=84	=> 'CriminalNonFelonyCount12Month',
+              c=85	=> 'CriminalNonFelonyTimeNewest',
+              c=86	=> 'EvictionCount',
+              c=87	=> 'EvictionCount12Month',
+              c=88	=> 'EvictionTimeNewest',
+              c=89	=> 'LienJudgmentSeverityIndex',
+              c=90	=> 'LienJudgmentCount',
+              c=91	=> 'LienJudgmentCount12Month',
+              c=92	=> 'LienJudgmentSmallClaimsCount',
+              c=93	=> 'LienJudgmentCourtCount',
+              c=94	=> 'LienJudgmentTaxCount',
+              c=95	=> 'LienJudgmentForeclosureCount',
+              c=96	=> 'LienJudgmentOtherCount',
+              c=97	=> 'LienJudgmentTimeNewest',
+              c=98	=> 'LienJudgmentDollarTotal',
+              c=99	=> 'BankruptcyCount',
+              c=100	=> 'BankruptcyCount24Month',
+              c=101	=> 'BankruptcyTimeNewest',
+              c=102	=> 'BankruptcyChapter',
+              c=103	=> 'BankruptcyStatus',
+              c=104	=> 'BankruptcyDismissed24Month',
+              c=105	=> 'ShortTermLoanRequest',
+              c=106	=> 'ShortTermLoanRequest12Month',
+              c=107	=> 'ShortTermLoanRequest24Month',
+              c=108	=> 'InquiryAuto12Month',
+              c=109	=> 'InquiryBanking12Month',
+              c=110	=> 'InquiryTelcom12Month',
+              c=111	=> 'InquiryNonShortTerm12Month',
+              c=112	=> 'InquiryShortTerm12Month',
+              c=113	=> 'InquiryCollections12Month',
+              c=114	=> 'SSNSubjectCount',
+              c=115	=> 'SSNDeceased',
+              c=116	=> 'SSNDateLowIssued',
+              c=117	=> 'SSNProblems',
+              c=118	=> 'AddrOnFileCount',
+              c=119	=> 'AddrOnFileCorrectional',
+              c=120	=> 'AddrOnFileCollege',
+              c=121	=> 'AddrOnFileHighRisk',
+              c=122	=> 'AddrInputTimeOldest',
+              c=123	=> 'AddrInputTimeNewest',
+              c=124	=> 'AddrInputLengthOfRes',
+              c=125	=> 'AddrInputSubjectCount',
+              c=126	=> 'AddrInputMatchIndex',
+              c=127	=> 'AddrInputSubjectOwned',
+              c=128	=> 'AddrInputDeedMailing',
+              c=129	=> 'AddrInputOwnershipIndex',
+              c=130	=> 'AddrInputPhoneService',
+              c=131	=> 'AddrInputPhoneCount',
+              c=132	=> 'AddrInputDwellType',
+              c=133	=> 'AddrInputDwellTypeIndex',
+              c=134	=> 'AddrInputDelivery',
+              c=135	=> 'AddrInputTimeLastSale',
+              c=136	=> 'AddrInputLastSalePrice',
+              c=137	=> 'AddrInputTaxValue',
+              c=138	=> 'AddrInputTaxYr',
+              c=139	=> 'AddrInputTaxMarketValue',
+              c=140	=> 'AddrInputAVMValue',
+              c=141	=> 'AddrInputAVMValue12Month',
+              c=142	=> 'AddrInputAVMRatio12MonthPrior',
+              c=143	=> 'AddrInputAVMValue60Month',
+              c=144	=> 'AddrInputAVMRatio60MonthPrior',
+              c=145	=> 'AddrInputCountyRatio',
+              c=146	=> 'AddrInputTractRatio',
+              c=147	=> 'AddrInputBlockRatio',
+              c=148	=> 'AddrInputProblems',
+              c=149	=> 'AddrCurrentTimeOldest',
+              c=150	=> 'AddrCurrentTimeNewest',
+              c=151	=> 'AddrCurrentLengthOfRes',
+              c=152	=> 'AddrCurrentSubjectOwned',
+              c=153	=> 'AddrCurrentDeedMailing',
+              c=154	=> 'AddrCurrentOwnershipIndex',
+              c=155	=> 'AddrCurrentPhoneService',
+              c=156	=> 'AddrCurrentDwellType',
+              c=157	=> 'AddrCurrentDwellTypeIndex',
+              c=158	=> 'AddrCurrentTimeLastSale',
+              c=159	=> 'AddrCurrentLastSalesPrice',
+              c=160	=> 'AddrCurrentTaxValue',
+              c=161	=> 'AddrCurrentTaxYr',
+              c=162	=> 'AddrCurrentTaxMarketValue',
+              c=163	=> 'AddrCurrentAVMValue',
+              c=164	=> 'AddrCurrentAVMValue12Month',
+              c=165	=> 'AddrCurrentAVMRatio12MonthPrior',
+              c=166	=> 'AddrCurrentAVMValue60Month',
+              c=167	=> 'AddrCurrentAVMRatio60MonthPrior',
+              c=168	=> 'AddrCurrentCountyRatio',
+              c=169	=> 'AddrCurrentTractRatio',
+              c=170	=> 'AddrCurrentBlockRatio',
+              c=171	=> 'AddrCurrentCorrectional',
+              c=172	=> 'AddrPreviousTimeOldest',
+              c=173	=> 'AddrPreviousTimeNewest',
+              c=174	=> 'AddrPreviousLengthOfRes',
+              c=175	=> 'AddrPreviousSubjectOwned',
+              c=176	=> 'AddrPreviousOwnershipIndex',
+              c=177	=> 'AddrPreviousDwellType',
+              c=178	=> 'AddrPreviousDwellTypeIndex',
+              c=179	=> 'AddrPreviousCorrectional',
+              c=180	=> 'AddrStabilityIndex',
+              c=181	=> 'AddrChangeCount03Month',
+              c=182	=> 'AddrChangeCount06Month',
+              c=183	=> 'AddrChangeCount12Month',
+              c=184	=> 'AddrChangeCount24Month',
+              c=185	=> 'AddrChangeCount60Month',
+              c=186	=> 'AddrLastMoveTaxRatioDiff',
+              c=187	=> 'AddrLastMoveEconTrajectory',
+              c=188	=> 'AddrLastMoveEconTrajectoryIndex',
+              c=189	=> 'PhoneInputProblems',
+              c=190	=> 'PhoneInputSubjectCount',
+              c=191	=> 'PhoneInputMobile',
+              c=192	=> 'AlertRegulatoryCondition',
+              c=193	=> 'CheckProfileIndex',
+              c=194	=> 'CheckTimeOldest',
+              c=195	=> 'CheckTimeNewest',
+              c=196	=> 'CheckNegTimeOldest',
+              c=197	=> 'CheckNegRiskDecTimeNewest',
+              c=198	=> 'CheckNegPaidTimeNewest',
+              c=199	=> 'CheckCountTotal',
+              c=200	=> 'CheckAmountTotal',
+              c=201	=> 'CheckAmountTotalSinceNegPaid',
+              c=202	=> 'CheckAmountTotal03Month',
+                       ''
+              );
+
+  SELF.value := MAP(
+              c=1	=>  le.InputProvidedFirstName	,
+              c=2	=>  le.InputProvidedLastName	,
+              c=3	=>  le.InputProvidedStreetAddress	,
+              c=4	=>  le.InputProvidedCity	,
+              c=5	=>  le.InputProvidedState	,
+              c=6	=>  le.InputProvidedZipCode	,
+              c=7	=>  le.InputProvidedSSN	,
+              c=8	=>  le.InputProvidedDateofBirth	,
+              c=9	=>  le.InputProvidedPhone	,
+              c=10	=>  le.InputProvidedLexID	,
+              c=11	=>  le.SubjectRecordTimeOldest	,
+              c=12	=>  le.SubjectRecordTimeNewest	,
+              c=13	=>  le.SubjectNewestRecord12Month	,
+              c=14	=>  le.SubjectActivityIndex03Month	,
+              c=15	=>  le.SubjectActivityIndex06Month	,
+              c=16	=>  le.SubjectActivityIndex12Month	,
+              c=17	=>  le.SubjectAge	,
+              c=18	=>  le.SubjectDeceased	,
+              c=19	=>  le.SubjectSSNCount	,
+              c=20	=>  le.SubjectStabilityIndex	,
+              c=21	=>  le.SubjectStabilityPrimaryFactor	,
+              c=22	=>  le.SubjectAbilityIndex	,
+              c=23	=>  le.SubjectAbilityPrimaryFactor	,
+              c=24	=>  le.SubjectWillingnessIndex	,
+              c=25	=>  le.SubjectWillingnessPrimaryFactor	,
+              c=26	=>  le.ConfirmationSubjectFound	,
+              c=27	=>  le.ConfirmationInputName	,
+              c=28	=>  le.ConfirmationInputDOB	,
+              c=29	=>  le.ConfirmationInputSSN	,
+              c=30	=>  le.ConfirmationInputAddress	,
+              c=31	=>  le.SourceNonDerogProfileIndex	,
+              c=32	=>  le.SourceNonDerogCount	,
+              c=33	=>  le.SourceNonDerogCount03Month	,
+              c=34	=>  le.SourceNonDerogCount06Month	,
+              c=35	=>  le.SourceNonDerogCount12Month	,
+              c=36	=>  le.SourceCredHeaderTimeOldest	,
+              c=37	=>  le.SourceCredHeaderTimeNewest	,
+              // c=38	=>  le.SourceDirectory	,
+              // c=39	=>  le.SourceDirectoryCount	,
+              c=40	=>  le.SourceVoterRegistration	,
+              // c=41	=>  le.EstimatedAnnualIncome	,
+              c=42	=>  le.EducationAttendance	,
+              c=43	=>  le.EducationEvidence	,
+              c=44	=>  le.EducationProgramAttended	,
+              c=45	=>  le.EducationInstitutionPrivate	,
+              c=46	=>  le.EducationInstitutionRating	,
+              c=47	=>  le.ProfLicCount	,
+              c=48	=>  le.ProfLicTypeCategory	,
+              c=49	=>  le.BusinessAssociation	,
+              c=50	=>  le.BusinessAssociationIndex	,
+              c=51	=>  le.BusinessAssociationTimeOldest	,
+              c=52	=>  le.BusinessTitleLeadership	,
+              c=53	=>  le.AssetIndex	,
+              c=54	=>  le.AssetIndexPrimaryFactor	,
+              c=55	=>  le.AssetOwnership	,
+              c=56	=>  le.AssetProp	,
+              c=57	=>  le.AssetPropIndex	,
+              c=58	=>  le.AssetPropEverCount	,
+              c=59	=>  le.AssetPropCurrentCount	,
+              c=60	=>  le.AssetPropCurrentTaxTotal	,
+              c=61	=>  le.AssetPropPurchaseCount12Month	,
+              c=62	=>  le.AssetPropPurchaseTimeOldest	,
+              c=63	=>  le.AssetPropPurchaseTimeNewest	,
+              c=64	=>  le.AssetPropNewestMortgageType	,
+              c=65	=>  le.AssetPropEverSoldCount	,
+              c=66	=>  le.AssetPropSoldCount12Month	,
+              c=67	=>  le.AssetPropSaleTimeOldest	,
+              c=68	=>  le.AssetPropSaleTimeNewest	,
+              c=69	=>  le.AssetPropNewestSalePrice	,
+              c=70	=>  le.AssetPropSalePurchaseRatio	,
+              c=71	=>  le.AssetPersonal	,
+              c=72	=>  le.AssetPersonalCount	,
+              c=73	=>  le.PurchaseActivityIndex	,
+              c=74	=>  le.PurchaseActivityCount	,
+              c=75	=>  le.PurchaseActivityDollarTotal	,
+              c=76	=>  le.DerogSeverityIndex	,
+              c=77	=>  le.DerogCount	,
+              c=78	=>  le.DerogCount12Month	,
+              c=79	=>  le.DerogTimeNewest	,
+              c=80	=>  le.CriminalFelonyCount	,
+              c=81	=>  le.CriminalFelonyCount12Month	,
+              c=82	=>  le.CriminalFelonyTimeNewest	,
+              c=83	=>  le.CriminalNonFelonyCount	,
+              c=84	=>  le.CriminalNonFelonyCount12Month	,
+              c=85	=>  le.CriminalNonFelonyTimeNewest	,
+              c=86	=>  le.EvictionCount	,
+              c=87	=>  le.EvictionCount12Month	,
+              c=88	=>  le.EvictionTimeNewest	,
+              c=89	=>  le.LienJudgmentSeverityIndex	,
+              c=90	=>  le.LienJudgmentCount	,
+              c=91	=>  le.LienJudgmentCount12Month	,
+              c=92	=>  le.LienJudgmentSmallClaimsCount	,
+              c=93	=>  le.LienJudgmentCourtCount	,
+              c=94	=>  le.LienJudgmentTaxCount	,
+              c=95	=>  le.LienJudgmentForeclosureCount	,
+              c=96	=>  le.LienJudgmentOtherCount	,
+              c=97	=>  le.LienJudgmentTimeNewest	,
+              c=98	=>  le.LienJudgmentDollarTotal	,
+              c=99	=>  le.BankruptcyCount 	,
+              c=100	=>  le.BankruptcyCount24Month	,
+              c=101	=>  le.BankruptcyTimeNewest	,
+              c=102	=>  le.BankruptcyChapter	,
+              c=103	=>  le.BankruptcyStatus	,
+              c=104	=>  le.BankruptcyDismissed24Month	,
+              c=105	=>  le.ShortTermLoanRequest	,
+              c=106	=>  le.ShortTermLoanRequest12Month	,
+              c=107	=>  le.ShortTermLoanRequest24Month	,
+              c=108	=>  le.InquiryAuto12Month	,
+              c=109	=>  le.InquiryBanking12Month	,
+              c=110	=>  le.InquiryTelcom12Month	,
+              c=111	=>  le.InquiryNonShortTerm12Month	,
+              c=112	=>  le.InquiryShortTerm12Month	,
+              c=113	=>  le.InquiryCollections12Month	,
+              c=114	=>  le.SSNSubjectCount	,
+              c=115	=>  le.SSNDeceased	,
+              c=116	=>  le.SSNDateLowIssued	,
+              c=117	=>  le.SSNProblems	,
+              c=118	=>  le.AddrOnFileCount	,
+              c=119	=>  le.AddrOnFileCorrectional	,
+              c=120	=>  le.AddrOnFileCollege	,
+              c=121	=>  le.AddrOnFileHighRisk	,
+              c=122	=>  le.AddrInputTimeOldest	,
+              c=123	=>  le.AddrInputTimeNewest	,
+              c=124	=>  le.AddrInputLengthOfRes	,
+              c=125	=>  le.AddrInputSubjectCount	,
+              c=126	=>  le.AddrInputMatchIndex	,
+              c=127	=>  le.AddrInputSubjectOwned	,
+              c=128	=>  le.AddrInputDeedMailing	,
+              c=129	=>  le.AddrInputOwnershipIndex	,
+              c=130	=>  le.AddrInputPhoneService	,
+              c=131	=>  le.AddrInputPhoneCount	,
+              c=132	=>  le.AddrInputDwellType	,
+              c=133	=>  le.AddrInputDwellTypeIndex	,
+              c=134	=>  le.AddrInputDelivery	,
+              c=135	=>  le.AddrInputTimeLastSale	,
+              c=136	=>  le.AddrInputLastSalePrice	,
+              c=137	=>  le.AddrInputTaxValue	,
+              c=138	=>  le.AddrInputTaxYr	,
+              c=139	=>  le.AddrInputTaxMarketValue	,
+              c=140	=>  le.AddrInputAVMValue	,
+              c=141	=>  le.AddrInputAVMValue12Month	,
+              c=142	=>  le.AddrInputAVMRatio12MonthPrior	,
+              c=143	=>  le.AddrInputAVMValue60Month	,
+              c=144	=>  le.AddrInputAVMRatio60MonthPrior	,
+              c=145	=>  le.AddrInputCountyRatio	,
+              c=146	=>  le.AddrInputTractRatio	,
+              c=147	=>  le.AddrInputBlockRatio	,
+              c=148	=>  le.AddrInputProblems	,
+              c=149	=>  le.AddrCurrentTimeOldest	,
+              c=150	=>  le.AddrCurrentTimeNewest	,
+              c=151	=>  le.AddrCurrentLengthOfRes 	,
+              c=152	=>  le.AddrCurrentSubjectOwned 	,
+              c=153	=>  le.AddrCurrentDeedMailing	,
+              c=154	=>  le.AddrCurrentOwnershipIndex	,
+              c=155	=>  le.AddrCurrentPhoneService	,
+              c=156	=>  le.AddrCurrentDwellType 	,
+              c=157	=>  le.AddrCurrentDwellTypeIndex	,
+              c=158	=>  le.AddrCurrentTimeLastSale	,
+              c=159	=>  le.AddrCurrentLastSalesPrice	,
+              c=160	=>  le.AddrCurrentTaxValue	,
+              c=161	=>  le.AddrCurrentTaxYr	,
+              c=162	=>  le.AddrCurrentTaxMarketValue	,
+              c=163	=>  le.AddrCurrentAVMValue	,
+              c=164	=>  le.AddrCurrentAVMValue12Month	,
+              c=165	=>  le.AddrCurrentAVMRatio12MonthPrior	,
+              c=166	=>  le.AddrCurrentAVMValue60Month	,
+              c=167	=>  le.AddrCurrentAVMRatio60MonthPrior	,
+              c=168	=>  le.AddrCurrentCountyRatio	,
+              c=169	=>  le.AddrCurrentTractRatio	,
+              c=170	=>  le.AddrCurrentBlockRatio	,
+              c=171	=>  le.AddrCurrentCorrectional	,
+              c=172	=>  le.AddrPreviousTimeOldest	,
+              c=173	=>  le.AddrPreviousTimeNewest	,
+              c=174	=>  le.AddrPreviousLengthOfRes 	,
+              c=175	=>  le.AddrPreviousSubjectOwned 	,
+              c=176	=>  le.AddrPreviousOwnershipIndex	,
+              c=177	=>  le.AddrPreviousDwellType 	,
+              c=178	=>  le.AddrPreviousDwellTypeIndex	,
+              c=179	=>  le.AddrPreviousCorrectional	,
+              c=180	=>  le.AddrStabilityIndex	,
+              c=181	=>  le.AddrChangeCount03Month	,
+              c=182	=>  le.AddrChangeCount06Month	,
+              c=183	=>  le.AddrChangeCount12Month	,
+              c=184	=>  le.AddrChangeCount24Month	,
+              c=185	=>  le.AddrChangeCount60Month	,
+              c=186	=>  le.AddrLastMoveTaxRatioDiff	,
+              c=187	=>  le.AddrLastMoveEconTrajectory	,
+              c=188	=>  le.AddrLastMoveEconTrajectoryIndex	,
+              c=189	=>  le.PhoneInputProblems	,
+              c=190	=>  le.PhoneInputSubjectCount	,
+              c=191	=>  le.PhoneInputMobile 	,
+              c=192	=>  le.AlertRegulatoryCondition	,
+              c=193	=>  le.CheckProfileIndex,
+              c=194	=>  le.CheckTimeOldest,
+              c=195	=>  le.CheckTimeNewest,
+              c=196	=>  le.CheckNegTimeOldest,
+              c=197	=>  le.CheckNegRiskDecTimeNewest,
+              c=198	=>  le.CheckNegPaidTimeNewest,
+              c=199	=>  le.CheckCountTotal,
+              c=200	=>  le.CheckAmountTotal,
+              c=201	=>  le.CheckAmountTotalSinceNegPaid,
+              c=202	=>  le.CheckAmountTotal03Month,
+                        ''
+              );
+END;
+
+
+EXPORT iesp.riskview2.t_RiskView2ModelHRI intoModel(riskview.layouts.layout_riskview5_search_results le, integer c) := TRANSFORM
+		
+		score_name := MAP(
+			c=1	=> le.Auto_Score_Name,
+			c=2	=> le.BankCard_Score_Name,
+			c=3	=> le.Short_term_lending_Score_Name,
+			c=4	=> le.Telecommunications_Score_Name,
+			c=5	=> le.Crossindustry_Score_Name,
+			c=6	=> le.Custom_Score_Name,
+			c=7	=> le.Custom2_Score_Name,
+			c=8	=> le.Custom3_Score_Name,
+			c=9	=> le.Custom4_Score_Name,
+			c=10	=> le.Custom5_Score_Name,
+			''
+		);
+		
+		score_type := MAP(
+			c=1 => le.Auto_Type,
+			c=2 => le.BankCard_Type,
+			c=3 => le.Short_term_lending_Type,
+			c=4 => le.Telecommunications_Type,
+			c=5 => le.Crossindustry_Type,
+			c=6 => le.Custom_Type,
+			c=7 => le.Custom2_Type,
+			c=8 => le.Custom3_Type,
+			c=9 => le.Custom4_Type,
+			c=10 => le.Custom5_Type,			
+			''
+		);
+
+		score_value := MAP(
+			c=1	=> le.auto_score,
+			c=2	=> le.Bankcard_score,
+			c=3	=> le.Short_term_lending_score,
+			c=4	=> le.Telecommunications_score,
+			c=5	=> le.Crossindustry_score,
+			c=6	=> le.Custom_score,
+			c=7 => le.Custom2_score,
+			c=8 => le.Custom3_score,
+			c=9 => le.Custom4_score,
+			c=10 => le.Custom5_score,
+			''
+		);
+		
+		reason1 := MAP(
+			c=1	=> le.auto_reason1,
+			c=2	=> le.Bankcard_reason1,
+			c=3	=> le.Short_term_lending_reason1,
+			c=4	=> le.Telecommunications_reason1,
+			c=5	=> le.Crossindustry_reason1,
+			c=6	=> le.Custom_reason1,
+			c=7	=> le.Custom2_reason1,
+			c=8	=> le.Custom3_reason1,
+			c=9	=> le.Custom4_reason1,
+			c=10	=> le.Custom5_reason1,
+			''
+		);
+		
+		reason2 := MAP(
+			c=1	=> le.auto_reason2,
+			c=2	=> le.Bankcard_reason2,
+			c=3	=> le.Short_term_lending_reason2,
+			c=4	=> le.Telecommunications_reason2,
+			c=5	=> le.Crossindustry_reason2,
+			c=6	=> le.Custom_reason2,
+			c=7	=> le.Custom2_reason2,
+			c=8	=> le.Custom3_reason2,
+			c=9	=> le.Custom4_reason2,
+			c=10	=> le.Custom5_reason2,
+			''
+		);
+		
+		reason3 := MAP(
+			c=1	=> le.auto_reason3,
+			c=2	=> le.Bankcard_reason3,
+			c=3	=> le.Short_term_lending_reason3,
+			c=4	=> le.Telecommunications_reason3,
+			c=5	=> le.Crossindustry_reason3,
+			c=6	=> le.Custom_reason3,
+			c=7	=> le.Custom2_reason3,
+			c=8	=> le.Custom3_reason3,
+			c=9	=> le.Custom4_reason3,
+			c=10	=> le.Custom5_reason3,
+			''
+		);
+		
+		reason4 := MAP(
+			c=1	=> le.auto_reason4,
+			c=2	=> le.Bankcard_reason4,
+			c=3	=> le.Short_term_lending_reason4,
+			c=4	=> le.Telecommunications_reason4,
+			c=5	=> le.Crossindustry_reason4,
+			c=6	=> le.Custom_reason4,
+			c=7	=> le.Custom2_reason4,
+			c=8	=> le.Custom3_reason4,
+			c=9	=> le.Custom4_reason4,
+			c=10	=> le.Custom5_reason4,
+			''
+		);
+		
+		reason5 := MAP(
+			c=1	=> le.auto_reason5,
+			c=2	=> le.Bankcard_reason5,
+			c=3	=> le.Short_term_lending_reason5,
+			c=4	=> le.Telecommunications_reason5,
+			c=5	=> le.Crossindustry_reason5,
+			c=6	=> le.Custom_reason5,
+			c=7	=> le.Custom2_reason5,
+			c=8	=> le.Custom3_reason5,
+			c=9	=> le.Custom4_reason5,
+			c=10	=> le.Custom5_reason5,
+			''
+		);
+		
+		ds_reasons := DATASET([
+			{1, reason1, Risk_Indicators.getHRIDesc(reason1)},
+			{2, reason2, Risk_Indicators.getHRIDesc(reason2)},
+			{3, reason3, Risk_Indicators.getHRIDesc(reason3)},
+			{4, reason4, Risk_Indicators.getHRIDesc(reason4)},
+			{5, reason5, Risk_Indicators.getHRIDesc(reason5)}
+			], iesp.riskview2.t_RiskView2RiskIndicator)(ReasonCode NOT IN ['','00']); // Only keep the valid reason codes
+		
+		self.name := score_name;
+		
+		SELF.Scores := DATASET([transform(iesp.riskview2.t_RiskView2ScoreHRI,
+			self.value := (unsigned)score_value;
+			self._type := score_type;
+			self.ScoreReasons := ds_reasons;
+			)]);
+	END;
+
+
+EXPORT iesp.riskview2.t_RiskView2Alert norm_alerts(riskview.layouts.layout_riskview5_search_results le, INTEGER c) := TRANSFORM
+		
+		SELF.code := MAP(
+			c=1	=> le.alert1,
+			c=2	=> le.alert2,
+			c=3	=> le.alert3,
+			c=4	=> le.alert4,
+			c=5	=> le.alert5,
+			c=6	=> le.alert6,
+			c=7	=> le.alert7,
+			c=8	=> le.alert8,
+			c=9	=> le.alert9,
+			c=10	=> le.alert10,
+			''
+		);
+
+		SELF.description := MAP(
+			c=1	=>  if(le.alert1<>'', risk_indicators.getHRIDesc(le.alert1), ''),
+			c=2	=>  if(le.alert2<>'', risk_indicators.getHRIDesc(le.alert2), ''),
+			c=3	=>  if(le.alert3<>'', risk_indicators.getHRIDesc(le.alert3), ''),
+			c=4	=>  if(le.alert4<>'', risk_indicators.getHRIDesc(le.alert4), ''),
+			c=5	=>  if(le.alert5<>'', risk_indicators.getHRIDesc(le.alert5), ''),
+			c=6	=>  if(le.alert6<>'', risk_indicators.getHRIDesc(le.alert6), ''),
+			c=7	=>  if(le.alert7<>'', risk_indicators.getHRIDesc(le.alert7), ''),
+			c=8	=>  if(le.alert8<>'', risk_indicators.getHRIDesc(le.alert8), ''),
+			c=9	=>  if(le.alert9<>'', risk_indicators.getHRIDesc(le.alert9), ''),
+			c=10	=>  if(le.alert10<>'', risk_indicators.getHRIDesc(le.alert10), ''),
+			''
+		);
+	END;
+  
+EXPORT iesp.share.t_NameValuePair norm_LnJ(riskview.layouts.layout_riskview5_search_results le, INTEGER c) := TRANSFORM
+		
+		SELF.name := MAP(
+		 c=1 => 'LnJEvictionTotalCount'        ,
+		 c=2 => 'LnJEvictionTotalCount12Month',
+		 c=3 => 'LnJEvictionTimeNewest'        ,
+		 c=4 => 'LnJJudgmentSmallClaimsCount'  ,
+		 c=5 => 'LnJJudgmentCourtCount'        ,
+		 c=6 => 'LnJJudgmentForeclosureCount'  ,
+		 c=7 => 'LnJLienJudgmentSeverityIndex' ,
+		 c=8 => 'LnJLienJudgmentCount'         ,
+		 c=9 => 'LnJLienJudgmentCount12Month'  ,
+		 c=10=> 'LnJLienTaxCount'              ,
+		 c=11 => 'LnJLienJudgmentOtherCount'    ,
+		 c=12 => 'LnjLienJudgmentTimeNewest'    ,
+		 c=13 => 'LnJLienJudgmentDollarTotal'   ,
+		 c=14 => 'LnJLienCount'                 ,
+		 c=15 => 'LnJLienTimeNewest'           ,
+		 c=16 => 'LnJLienDollarTotal'           ,
+		 c=17 => 'LnJLienTaxTimeNewest'         ,
+		 c=18 => 'LnJLienTaxDollarTotal'        ,
+		 c=19 => 'LnJLienTaxStateCount'         ,
+		 c=20 => 'LnJLienTaxStateTimeNewest'    ,
+		 c=21 => 'LnJLienTaxStateDollarTotal'   ,
+		 c=22 => 'LnJLienTaxFederalCount'       ,
+		 c=23 => 'LnJLienTaxFederalTimeNewest'  ,
+		 c=24 => 'LnJLienTaxFederalDollarTotal' ,
+		 c=25 => 'LnJJudgmentCount'             ,
+		 c=26 => 'LnJJudgmentTimeNewest'        ,
+		 c=27 => 'LnJJudgmentDollarTotal' ,
+		 ''	);
+
+		SELF.value := MAP(
+			c=1 => le.LnJEvictionTotalCount        ,
+			c=2 => le.LnJEvictionTotalCount12Month,
+			c=3 => le.LnJEvictionTimeNewest        ,
+			c=4 => le.LnJJudgmentSmallClaimsCount  ,
+			c=5 => le.LnJJudgmentCourtCount        ,
+			c=6 => le.LnJJudgmentForeclosureCount  ,																
+			c=7 => le.LnJLienJudgmentSeverityIndex ,
+			c=8 => le.LnJLienJudgmentCount         ,
+			c=9 => le.LnJLienJudgmentCount12Month  ,
+			c=10 => le.LnJLienTaxCount              ,
+			c=11 => le.LnJLienJudgmentOtherCount    ,
+			c=12 => le.LnjLienJudgmentTimeNewest    ,
+			c=13 => le.LnJLienJudgmentDollarTotal   ,
+
+			c=14 => le.LnJLienCount                 ,
+			c=15 => le.LnJLienTimeNewest           ,
+			c=16 => le.LnJLienDollarTotal           ,
+			c=17 => le.LnJLienTaxTimeNewest         ,
+			c=18 => le.LnJLienTaxDollarTotal       ,
+			c=19 => le.LnJLienTaxStateCount         ,
+			c=20 => le.LnJLienTaxStateTimeNewest    ,
+			c=21 => le.LnJLienTaxStateDollarTotal   ,
+			c=22 => le.LnJLienTaxFederalCount      ,
+			c=23 => le.LnJLienTaxFederalTimeNewest  ,
+			c=24 => le.LnJLienTaxFederalDollarTotal ,
+			c=25 => le.LnJJudgmentCount             ,
+			c=26 => le.LnJJudgmentTimeNewest        ,
+			c=27 => le.LnJJudgmentDollarTotal,
+			''
+		);
+	END;
+
+EXPORT iesp.share.t_NameValuePair intoFISattrs(riskview.layouts.layout_riskview5_search_results le, INTEGER c) := TRANSFORM
+		
+  SELF.name := MAP(
+    c=1 => 'RV3SSNDeceased',
+    c=2 => 'RV3ConfirmationSubjectFound',
+    c=3 => 'RV3SourceNonDerogCount',
+    c=4 => 'RV3AddrChangeCount12Month',
+    c=5 => 'RV3AddrChangeCount60Month',
+    c=6 => 'RV3AddrInputTimeOldest',
+    c=7 => 'RV3AssetPropCurrentCount',
+    c=8 => 'RV3AssetIndex',
+		       '' );
+
+  SELF.value := MAP(
+    c=1 => le.rv3SSNDeceased,
+    c=2 => le.rv3ConfirmationSubjectFound,
+    c=3 => le.rv3SourceNonDerogCount,
+    c=4 => le.rv3AddrChangeCount12Month,
+    c=5 => le.rv3AddrChangeCount60Month,
+    c=6 => le.rv3AddrInputTimeOldest,
+    c=7 => le.rv3AssetPropCurrentCount,																
+    c=8 => le.rv3AssetIndex,
+           '' );
+	END;
 
 END;

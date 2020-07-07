@@ -12,6 +12,11 @@ IMPORT Risk_Reporting, iesp, gateway, risk_indicators, std, ut, ffd, Inquiry_Acc
 
 export FcraInsurView2_Service := MACRO
 
+  // Can't have duplicate definitions of Stored with different default values, 
+	// so add the default to #stored to eliminate the assignment of a default value.
+	#stored('DataRestrictionMask',risk_indicators.iid_constants.default_DataRestriction);
+	#stored('DataPermissionMask',risk_indicators.iid_constants.default_DataPermission);
+	
 	#WEBSERVICE(FIELDS(
 		'FCRAInsurView2AttributesRequest',
 		'HistoryDateYYYYMM',
@@ -335,7 +340,7 @@ input_ok := if(((
     SELF.AddressCharacteristics.AddrInputOwnershipIndex := VA.AddrInputOwnershipIndex;
     SELF.AddressCharacteristics.AddrInputPhoneService := VA.AddrInputPhoneService;
     SELF.AddressCharacteristics.AddrInputPhoneCount := VA.AddrInputPhoneCount;
-    SELF.AddressCharacteristics.AddrInputDwellType := VA.AddrInputDwellTypeIndex;
+    SELF.AddressCharacteristics.AddrInputDwellType := VA.AddrInputDwellType;
     SELF.AddressCharacteristics.AddrInputDwellTypeIndex := VA.AddrInputDwellTypeIndex;
     SELF.AddressCharacteristics.AddrInputDelivery := VA.AddrInputDelivery;
     SELF.AddressCharacteristics.AddrInputTimeLastSale := VA.AddrInputTimeLastSale;

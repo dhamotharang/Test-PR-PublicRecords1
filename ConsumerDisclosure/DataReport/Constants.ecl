@@ -9,7 +9,7 @@ MODULE
     EXPORT UNSIGNED2 MaxAircraftsPerDID  := 1000; // ut.limits.AIRCRAFTS_PER_DID   -- as of 11/10/2017 maxcnt=975
     EXPORT UNSIGNED2 MaxAirmenPerDID 		 := 200; // ut.limits.AIRMAN_PER_DID       -- as of 11/10/2017 maxcnt=66
     EXPORT UNSIGNED2 MaxAirmanCertificates := 100; // ut.limits.AIRMAN_CERTIFICATES_MAX  -- as of 11/10/2017 maxcnt=32
-    EXPORT UNSIGNED2 MaxAdvoPerAddress   := 1000; // -- as of 11/9/2017 maxcnt=1919, drops below 1K except 109 rec
+    EXPORT UNSIGNED2 MaxAdvoPerAddress   := 2000; // -- as of 01/07/2019 maxcnt=3007, drops below 2k except 4 recs
     EXPORT UNSIGNED2 MaxAVMPerAddress    := 100; // -- as of 11/9/2017 maxcnt=9
     EXPORT UNSIGNED2 MaxBKParties        := 200;  // -- as of 11/9/2017 maxcnt=411 (single rec), followed by cnt=192
     EXPORT UNSIGNED1 MaxBankruptcyPerDID := 10000; // -- maxcnt=60334 as of 11/9/2017,  drops below 10K after 282 recs

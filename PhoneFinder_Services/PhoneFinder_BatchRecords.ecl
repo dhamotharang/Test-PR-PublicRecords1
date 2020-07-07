@@ -68,7 +68,7 @@ IMPORT Autokey_Batch, BatchShare, Gateway, MDR, Phones, PhoneFinder_Services, Ro
   // Append best info
   SHARED dInNoPhoneBestInfo := PhoneFinder_Services.Functions.GetBestInfo(dInNoPhone, PROJECT(inMod, doxie.IDataAccess));
 
-  Suppress.MAC_Suppress(dInNoPhoneBestInfo,SHARED dinBestInfo,inMod.application_type,Suppress.Constants.LinkTypes.DID,did,'','',FALSE,'',TRUE);
+  Suppress.MAC_Suppress(dInNoPhoneBestInfo,SHARED dInBestInfo,inMod.application_type,Suppress.Constants.LinkTypes.DID,did,'','',FALSE,'',TRUE);
 
   // Search inhouse phone sources and gateways when phone number is provided
   SHARED phoneMod := MODULE(PROJECT(inMod, $.iParam.SearchParams))
@@ -106,14 +106,14 @@ IMPORT Autokey_Batch, BatchShare, Gateway, MDR, Phones, PhoneFinder_Services, Ro
     SELF.acctno               := L.acctno;
     SELF.seq                  := L.seq;
     SELF.phone                := L.phone;
-    SELF.phonestatus          := PhoneFinder_Services.Constants.PhoneStatus.NotAvailable;
-    BOOLEAN UseInternal_pvs   := L.typeflag = 'P';
-    SELF.coc_description      := IF(UseInternal_pvs, L.coc_description, '');
-    SELF.carrier_name         := IF(UseInternal_pvs, L.carrier_name, '');
-    SELF.phone_region_city    := IF(UseInternal_pvs, L.phone_region_city, '');
-    SELF.phone_region_st      := IF(UseInternal_pvs, L.phone_region_st, '');
-    SELF.RealTimePhone_Ext    := IF(UseInternal_pvs, L.RealTimePhone_Ext);
-    SELF.typeflag             := IF(UseInternal_pvs, L.typeflag, '');
+    SELF.phonestatus          := L.phonestatus;
+    BOOLEAN UsePVS            := L.typeflag = Phones.Constants.TypeFlag.DataSource_PV;
+    SELF.coc_description      := L.coc_description;
+    SELF.carrier_name         := L.carrier_name;
+    SELF.phone_region_city    := L.phone_region_city;
+    SELF.phone_region_st      := L.phone_region_st;
+    SELF.RealTimePhone_Ext    := L.RealTimePhone_Ext;
+    SELF.typeflag             := IF(UsePVS, L.typeflag, '');
     SELF                      := [];
   END;
 
@@ -135,14 +135,14 @@ IMPORT Autokey_Batch, BatchShare, Gateway, MDR, Phones, PhoneFinder_Services, Ro
                                 PhoneFinder_Services.GetPhonesPortedMetadata(dSearchRecs,inMod,dGateways,dSubjectInfo,accu_inport(port_end_dt <> 0)),
                                 dSearchRecs);
 
-  SHARED dZum_gw_recs := PhoneFinder_Services.GetZumigoIdentity_Records(dPorted_phones, dinBestInfo, inMod, dGateways);
+  SHARED dZum_gw_recs := PhoneFinder_Services.GetZumigoIdentity_Records(dPorted_phones, dInBestInfo, inMod, dGateways);
   SHARED dZumigo_recs:= dZum_gw_recs.Zumigo_GLI;
 
   SHARED dZum_final := if(inMod.UseZumigoIdentity, dZumigo_recs, dPorted_phones);
 
-  dSearchResultsUnfiltered := IF(inMod.IsGetMetaData
-                                  ,PhoneFinder_Services.GetPhonesMetadata(dZum_final, inMod, dGateways, dinBestInfo, dSubjectInfo)
-                                  ,dZum_final);
+  dSearchResultsUnfiltered := IF(inMod.IsGetMetaData,
+                                  PhoneFinder_Services.GetPhonesMetadata(dZum_final, inMod, dGateways, dInBestInfo, dSubjectInfo),
+                                  dZum_final);
 
   // restriction added here if plugin from batch is set to true ....
   // if not then don't do any restrictions.
@@ -156,16 +156,18 @@ IMPORT Autokey_Batch, BatchShare, Gateway, MDR, Phones, PhoneFinder_Services, Ro
   SHARED dInBestDID := if(doVerify, dAppendDIDsFormat); // for lexid verification
 
   // Phone verfication, calculate PRIs
-  SHARED dPhoneFinalResults := IF(EXISTS(dInPhone) OR doVerify, PhoneFinder_Services.GetPRIs(PhoneSearchResults, dInBestDID, phoneMod, dGateways, dFormat2BatchCommonInput));
-  SHARED dDIDFinalResults   := IF(EXISTS(dInNoPhone), PhoneFinder_Services.GetPRIs(DidSearchResults, dInBestInfo, piiMod, dGateways, dFormat2BatchCommonInput));
+  SHARED dPhoneFinalResults := IF(EXISTS(dInPhone) OR doVerify, PhoneFinder_Services.GetPRIs(PhoneSearchResults, dInBestDID, phoneMod, dGateways, dInPhone));
+  SHARED dDIDFinalResults   := IF(EXISTS(dInNoPhone), PhoneFinder_Services.GetPRIs(DidSearchResults, dInBestInfo, piiMod, dGateways, dInNoPhone));
 
+  // OUTPUT(PhoneSearchResults, NAMED('PhoneSearchResults'));
   // OUTPUT(dPhoneFinalResults, NAMED('dPhoneFinalResults'));
+  // OUTPUT(DidSearchResults, NAMED('DidSearchResults'));
   // OUTPUT(dDIDFinalResults, NAMED('dDIDFinalResults'));
 
   // Format to batch out layout
   SHARED dFormat2Batch := IF(EXISTS(dInPhone) OR doVerify,
-                              PhoneFinder_Services.Functions.FormatResults2Batch(dPhoneFinalResults,dAppendDIDs, phoneMod, TRUE)) +
-                              IF(EXISTS(dInNoPhone), PhoneFinder_Services.Functions.FormatResults2Batch(dDIDFinalResults, dAppendDIDs, piiMod, FALSE));
+                              PhoneFinder_Services.Functions.FormatResults2Batch(dPhoneFinalResults, dInPhone, phoneMod, TRUE)) +
+                              IF(EXISTS(dInNoPhone), PhoneFinder_Services.Functions.FormatResults2Batch(dDIDFinalResults, dInNoPhone, piiMod, FALSE));
 
   // OUTPUT(dFormat2Batch, NAMED('dFormat2Batch'));
 

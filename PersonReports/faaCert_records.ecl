@@ -10,13 +10,13 @@ IMPORT iesp, doxie, FaaV2_PilotServices, fcra, FFD, PersonReports;
 
 EXPORT faacert_records (
   dataset (doxie.layout_references) dids,
-  PersonReports.input.faacerts in_params = module (PersonReports.input.faacerts) end,
+  PersonReports.IParam.faacerts in_params = module (PersonReports.IParam.faacerts) end,
   boolean IsFCRA = false,
-	dataset (fcra.Layout_override_flag) flagfile = fcra.compliance.blank_flagfile,
-	dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim
+  dataset (fcra.Layout_override_flag) flagfile = fcra.compliance.blank_flagfile,
+  dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim
 ) := MODULE
 
-  shared bps_pilots := FaaV2_PilotServices.Raw.getBpsReportByDID (dids, in_params.ApplicationType,isFCRA,flagfile,slim_pc_recs,in_params.FFDOptionsMask);
+  shared bps_pilots := FaaV2_PilotServices.Raw.getBpsReportByDID (dids, in_params.application_type, isFCRA, flagfile, slim_pc_recs, in_params.FFDOptionsMask);
   EXPORT bps_view := sort(bps_pilots, -DateCertifiedMedical.year, -DateCertifiedMedical.month);
 
   iesp.bpsreport_fcra.t_FcraFAACertificate GetCertificate (iesp.bpsreport_fcra.t_FcraFAACertificate L) := transform
@@ -34,4 +34,3 @@ EXPORT faacert_records (
   EXPORT assetreport_view  := sort(recs, -DateCertifiedMedical.year, -DateCertifiedMedical.month);
 
 END;
-

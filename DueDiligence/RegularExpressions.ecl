@@ -6,8 +6,22 @@ EXPORT RegularExpressions := MODULE
     SHARED STARTS_WITH := '^';
     SHARED ENDS_WITH := '.*$';
     
+    
+    
+    EXPORT NOT_PO_ADDRESS_EXPRESSION := '^((?!((P[\\s\\.]*O[\\.\\s]*)|(POST[\\s]*OFFICE[\\s]*))+BOX).)*$';  //finds reference to anything other than po box or post office box
 
-    //These are common shared between expressions or could be in future releases
+    EXPORT FELONY_NOT_REDUCED := '^(?=.*(\\b|\\B)(FELONY))(?!.*(\\b|\\B)(REDUCED))(?!.*(\\b|\\B)(NON-FELONY)).*$';
+    EXPORT SPECIFIC_KEYWORD_TRAFFIC := '^(?=.*\\b(TRAFFIC)\\b).*$';
+    EXPORT SPECIFIC_KEYWORD_INFRACTION := '^(?=.*\\b(INFRACTION)\\b).*$';
+    EXPORT SPECIFIC_KEYWORD_MISDEMEANOR:= '^(?=.*\\b(MISDEMEANOR)\\b).*$';
+    
+
+    /*
+      As of 01/14/2020 these will no longer be
+      used as part of the Due Diligence suite.
+      This is now being replaced with a
+      ML (Machine Learning) model.
+    */
     SHARED COMMON_INFRACTION_ORDINANCES_LIST := '((?=.*(\\b|\\B)(ORDINANCE|NOISE|MUSIC|LOUD|CODE|LITTER|TRASH|FIREWORK|CURFEW|CITATION|PEDDL|JAYWALK))|((?=.*(\\b|\\B)(PAN))(?=.*(\\b|\\B)(HANDL)))|((?=.*(\\b|\\B)(PUB))(?=.*(\\b|\\B)(NUIS|DIST)))|((?=.*(\\b|\\B)(CITY))(?=.*(\\b|\\B)(ORDIN)))|((?=.*(\\b|\\B)(CIVIL))(?=.*(\\b|\\B)(ASSESS))))';
     SHARED COMMON_LIVESTOCK_ANIMAL_LIST := '(((?=.*(\\b|\\B)(ANIMAL|AMNL|ANIML|ANMLS|DOG|RABIES|VACC|SPAY|NEUTER|LIVESTOCK|LVSTOK|LIVESTK|LVSTCK|L\\/STOCK|SWINE|HOG|COW|CATTLE|SHEEP|GOAT|MULE|HORSE|HRSE))|(?=.*(CAT|PET)\\b)|((?=.*(\\b|\\B)(EXOTIC))(?=.*(\\b|\\B)(SPEC))))(?!.*((\\b|\\B)(VERIFICAT|IDENTIFICAT|DEFACAT|INTOXICAT|REVOCAT|EQUIP|CERTIFICAT)|' + COMMON_INFRACTION_ORDINANCES_LIST + ')))';
     SHARED COMMON_FISH_GAME_ANIMAL_LIST := '(((?=.*(\\b|\\B)(DNR|WILDLIFE|WLDLIF|BOBCAT|PHEASANT|TURKEY|DUCK|WATERFOWL|PINTAIL|GEESE|GOOSE|PELICAN|DOVE|FOWL|BEAR|DEER|ELK|MOOSE|SQUIRREL|RABBIT|MINK|FOX|FISH|WALLEYE|CRAPPIE|BLUEGILL|SAUGER|SALMON|SNAPPER|TROUT|FLOUNDER|ROCKF|WELK|PERCH|TUNA|CRAB|CONCH|SHRIMP|LOBSTER|OYSTER|ANIMAL|BIRD|MIGRATORY|SWAN|BUCK|DOE(\\b)|RAC(C)?OON|GOPHER|STEELHEAD|GATOR|STURGEON|TORTOISE|F\\&W))|((?=.*(\\b|\\B)(GAM))(?=.*(\\b|\\B)(BIG|MAMMAL)))|((?=.*(\\b|\\B)(BG))(?=.*(\\b|\\B)(GAM)))|((?=.*(\\b|\\B)(NORTH))(?=.*(\\b|\\B)(PIKE)))|((?=.*(\\b|\\B)(BASS))(?=.*(\\b|\\B)(SEA|STRIP|MOUTH|BLACK|UNDERS)))|((?=.*(\\b|\\B)(BIRD))(?=.*(\\b|\\B)(GAM|WILD|MIG)))|((?=.*(\\b|\\B)(RED))(?=.*(\\b|\\B)(DRUM)))|((?=.*(\\b|\\B)(LARGE))(?=.*(\\b|\\B)(MOUTH))))(?!.*(\\b|\\B)(BEARING|BIGAMY|((?=.*(\\b|\\B)(CITY))(?=.*(\\b|\\B)(KILLDEER))))))';
@@ -402,16 +416,5 @@ EXPORT RegularExpressions := MODULE
     EXPORT DRUGS := STARTS_WITH + OFFENSE_DRUGS + ENDS_WITH;
     EXPORT IMMIGRATION_ALIEN := STARTS_WITH + OFFENSE_ALIEN_IMMIGRATION + ENDS_WITH;
     EXPORT MANUFACTURE_DISTRIBUTE_DRUGS_WEAPONS := STARTS_WITH + OFFENSE_MANU_DIST_DRUGS_AND_WEAPONS + ENDS_WITH;
-    
-    
-    
- 
-    
-    EXPORT NOT_PO_ADDRESS_EXPRESSION := '^((?!((P[\\s\\.]*O[\\.\\s]*)|(POST[\\s]*OFFICE[\\s]*))+BOX).)*$';  //finds reference to anything other than po box or post office box
-
-    EXPORT FELONY_NOT_REDUCED := '^(?=.*(\\b|\\B)(FELONY))(?!.*(\\b|\\B)(REDUCED))(?!.*(\\b|\\B)(NON-FELONY)).*$';
-    EXPORT SPECIFIC_KEYWORD_TRAFFIC := '^(?=.*\\b(TRAFFIC)\\b).*$';
-    EXPORT SPECIFIC_KEYWORD_INFRACTION := '^(?=.*\\b(INFRACTION)\\b).*$';
-    EXPORT SPECIFIC_KEYWORD_MISDEMEANOR:= '^(?=.*\\b(MISDEMEANOR)\\b).*$';
 		
 END;

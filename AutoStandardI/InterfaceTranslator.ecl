@@ -1,6 +1,6 @@
-﻿import AutoStandardI;
+import AutoStandardI;
 import address, doxie, dx_header, ut, corp2_services, vehiclev2_services, business_header_ss, business_header,
-       header, suppress, STD;
+       suppress, STD;
 
 export InterfaceTranslator := module
 	// provided only for backward compatibility
@@ -9,26 +9,26 @@ export InterfaceTranslator := module
 			export boolean OnlyExactMatches := false;
 			export boolean StrictMatch := false;
 		end;
-		// set strict match if either OnlyExactMatches or StrictMatch set (OnlyExactMatches to be retired) 
+		// set strict match if either OnlyExactMatches or StrictMatch set (OnlyExactMatches to be retired)
 		export boolean val(params in_mod) := in_mod.OnlyExactMatches or in_mod.StrictMatch;
 	end;
 	export FuzzySecRange_value := module
     export params := interface
       export integer FuzzySecRange;
     end;
-    export integer val(params in_mod) := case (in_mod.FuzzySecRange, 
+    export integer val(params in_mod) := case (in_mod.FuzzySecRange,
                                                1 => AutoStandardI.Constants.SECRANGE.EXACT_OR_BLANK,
                                                2 => AutoStandardI.Constants.SECRANGE.INCLUDES_ATOM,
                                                AutoStandardI.Constants.SECRANGE.EXACT);
 	end;
-	
+
 	// Display Matched Party for Search Service
 	export DisplayMatchedParty_value := module
 		export params := interface
 			export boolean DisplayMatchedParty := false;
 		end;
 		export boolean val(params in_mod) := in_mod.DisplayMatchedParty;
-	end;	
+	end;
 
 	shared mx_nameasis_val := module
 		export params := interface
@@ -42,7 +42,7 @@ export InterfaceTranslator := module
 		end;
 		export string120 val(params in_mod) := in_mod.asisname;
 	end;
-	
+
 	export party_type := module
 		export params := interface
 			export string1 partytype;
@@ -69,7 +69,7 @@ export InterfaceTranslator := module
 			export boolean BpsLeadingNameMatch;
 		end;
 		export boolean val(params in_mod) := in_mod.BpsLeadingNameMatch;
-	end;	
+	end;
 	export nodeepdive := module
 		export params := interface(StrictMatch_value.params)
 			export boolean nodeepdive;
@@ -131,6 +131,12 @@ export InterfaceTranslator := module
 		end;
 		export unsigned1 val(params in_mod) := in_mod.CriminalRecordVersion;
 	end;
+	export EmailVersion := module
+		export params := interface
+			export unsigned1 EmailVersion;
+		end;
+		export unsigned1 val(params in_mod) := in_mod.EmailVersion;
+	end;
 	export unparsed_fullname_value := module
 		export params := interface
 			export string120 unparsedfullname;
@@ -148,9 +154,9 @@ export InterfaceTranslator := module
 			in_mod.lfmname <>'' => Address.CleanPersonLFM73(in_mod.lfmname),
 			// new name cleaner was introduced and caused a regression - former version
 			// parsed single word inputs as last names always; new version parses them as first names
-			// always.   
+			// always.
 			// in order to mimic the behavior of the prior name cleaner when only a single word
-			// is input as an unparsed full name, skip cleaning altogether and fabricate a result 
+			// is input as an unparsed full name, skip cleaning altogether and fabricate a result
 			// in the cleanPerson73 format with only last name populated (for both unknown and FML versions)
       STD.Str.CountWords (unparsed_fullname_value.val(in_mod), ' ')<= 1 => forceAsLname(unparsed_fullname_value.val(in_mod)),
 			// ut.NoWords(unparsed_fullname_value.val(in_mod)) <= 1 => forceAsLname(unparsed_fullname_value.val(in_mod)),
@@ -279,7 +285,7 @@ export InterfaceTranslator := module
 			export string6 zip;
 		end;
 		// discard all zero zips
-		hasAlpha(string6 s) := STD.Str.FilterOut(s, '0123456789') <> ''; //iow, looks canadian 
+		hasAlpha(string6 s) := STD.Str.FilterOut(s, '0123456789') <> ''; //iow, looks canadian
 		export string6 val(params in_mod) := if((integer)in_mod.zip <> 0 or hasAlpha(in_mod.zip), in_mod.zip, '');
 	end;
 	export PostalCode := module
@@ -293,7 +299,7 @@ export InterfaceTranslator := module
 			export unsigned2 zipradius;
 			export unsigned2 mileradius;
 		end;
-		export unsigned2 val(params in_mod) := 
+		export unsigned2 val(params in_mod) :=
 			map(
 				StrictMatch_value.val(in_mod) => 0,
 				in_mod.zipradius != 0 => in_mod.zipradius,
@@ -361,7 +367,7 @@ export InterfaceTranslator := module
 			export boolean checknamevariants;
 		end;
 		export boolean val(params in_mod) := ~StrictMatch_value.val(in_mod) AND in_mod.checknamevariants;
-	end;	
+	end;
 	export raw_records := module
 		export params := interface
 			export boolean raw;
@@ -398,7 +404,7 @@ export InterfaceTranslator := module
 			export boolean allowFuzzyDOBMatch;
 		end;
 		export boolean val(params in_mod) := in_mod.allowFuzzyDOBMatch;
-	end;	
+	end;
 	export maxresults_val := module
 		export params := interface
 			export unsigned8 maxresults;
@@ -457,7 +463,7 @@ export InterfaceTranslator := module
 		export params := interface(StrictMatch_value.params)
 			export unsigned1 scorethreshold;
 		end;
-		export unsigned1 val(params in_mod) := 
+		export unsigned1 val(params in_mod) :=
 			if(
 				StrictMatch_value.val(in_mod),
 				1, // for some reason, header_records (at least) uses < rather than <=
@@ -468,7 +474,7 @@ export InterfaceTranslator := module
 		export params := interface(StrictMatch_value.params)
 			export unsigned2 penalty_threshold;
 		end;
-		export unsigned1 val(params in_mod) := 
+		export unsigned1 val(params in_mod) :=
 			if(
 				StrictMatch_value.val(in_mod),
 				0, // here we use <=
@@ -676,10 +682,10 @@ export InterfaceTranslator := module
 		export params := interface(zip_val0.params,PostalCode.params)
 			export string5 z5;
 		end;
-		export string6 val(params in_mod) := 
+		export string6 val(params in_mod) :=
 			STD.Str.ToUpperCase(
 				map(
-					in_mod.z5 <> '' => in_mod.z5, 
+					in_mod.z5 <> '' => in_mod.z5,
 					zip_val0.val(in_mod) <> ''  => zip_val0.val(in_mod),
 					PostalCode.val(in_mod)
 				)
@@ -697,7 +703,7 @@ export InterfaceTranslator := module
 		end;
 			// note that suppression depends not only on input application type,
 			// but also on DPM, which may set LE-permissions, and which must have higher priority
-		export string32 val(params in_mod) := 
+		export string32 val(params in_mod) :=
 						map (AutoStandardI.DataPermissionI.val(project(in_mod,AutoStandardI.DataPermissionI.params,opt)).use_LE => Suppress.Constants.ApplicationTypes.LE,
 								 in_mod.industryclass = 'CNSMR' => Suppress.Constants.ApplicationTypes.Consumer,
 								 in_mod.ApplicationType  <> '' => in_mod.ApplicationType,
@@ -716,7 +722,7 @@ export InterfaceTranslator := module
 		export params := interface
 			export string11 ssn;
 		end;
-		// need to eliminate leading 5 and trailing 4 zeroes from the input SSN in order for the appropriate 
+		// need to eliminate leading 5 and trailing 4 zeroes from the input SSN in order for the appropriate
 		// fetching and penalty handling to occur
 		// if less than 9 chars, use as-is; if all zero, discard it
 		export string val(params in_mod) := cleanSSN(in_mod.ssn);
@@ -735,9 +741,9 @@ export InterfaceTranslator := module
 				keyed (Linking_ID=ssn_filt));
 
       ssn_cleaned := IF (ssn_filt !='' and count(CHOOSEN(supp_key, 1)) > 0, '', ssn_filt);
-      
+
       RETURN IF (in_mod.isFCRAval, ssn_filt, ssn_cleaned);
-    END;   
+    END;
 	end;
 	export phone_value := module
 		export params := phone_val.params;
@@ -771,7 +777,7 @@ export InterfaceTranslator := module
 		export string val(params in_mod) := STD.Str.ToUpperCase(industry_class_val.val(in_mod));
 	end;
 	// no longer using doNotFillBlanks for determining no_scrub
-	// no_scrub is now equivalent to raw_records 
+	// no_scrub is now equivalent to raw_records
 	export no_scrub := module
 		export params := interface(raw_records.params)
 		end;
@@ -803,20 +809,20 @@ export InterfaceTranslator := module
 	export find_year_low := module
 		export params := interface(dob_val.params,agehigh_val.params)
 		end;
-		export unsigned val(params in_mod) := doxie.DOBTools(dob_val.val(in_mod)).find_year_low(agehigh_val.val(in_mod));   
+		export unsigned val(params in_mod) := doxie.DOBTools(dob_val.val(in_mod)).find_year_low(agehigh_val.val(in_mod));
 	end;
 	export find_year_high := module
 		export params := interface(dob_val.params,agelow_val.params)
 		end;
-		export unsigned val(params in_mod) := doxie.DOBTools(dob_val.val(in_mod)).find_year_high(agelow_val.val(in_mod));   
+		export unsigned val(params in_mod) := doxie.DOBTools(dob_val.val(in_mod)).find_year_high(agelow_val.val(in_mod));
 	end;
 	export find_month := module
 		export params := dob_val.params;
-		export unsigned val(params in_mod) := doxie.DOBTools(dob_val.val(in_mod)).find_month;   
+		export unsigned val(params in_mod) := doxie.DOBTools(dob_val.val(in_mod)).find_month;
 	end;
 	export find_day := module
 		export params := dob_val.params;
-		export unsigned val(params in_mod) := doxie.DOBTools(dob_val.val(in_mod)).find_day;   
+		export unsigned val(params in_mod) := doxie.DOBTools(dob_val.val(in_mod)).find_day;
 	end;
 	export dl_value := module
 		export params := interface
@@ -846,7 +852,7 @@ export InterfaceTranslator := module
 			export boolean checkNameVariants;
 		end;
 		export boolean val(params in_mod) := in_mod.checkNameVariants;
-	end;	
+	end;
 	export fname_set_value := module
 		export params := interface(fname_value.params,checkNameVariants.params)
 			export boolean isFCRAval;
@@ -887,7 +893,7 @@ export InterfaceTranslator := module
 		export params := interface(lname_value.params,cleaned_input_lname.params,checkNameVariants.params)
 			export boolean isFCRAval;
 		end;
-		
+
 		export set of string val(params in_mod) :=  map(lname_value.val(in_mod) = '' => [],
 			checkNameVariants.val(in_mod) => ut.NameVariants(cleaned_input_lname.val(in_mod),10,in_mod.isFCRAval,checkNameVariants.val(in_mod)).lnames,
 			lname_value.val(in_mod) != cleaned_input_lname.val(in_mod) => [lname_value.val(in_mod), cleaned_input_lname.val(in_mod)],
@@ -909,7 +915,7 @@ export InterfaceTranslator := module
 		end;
 		export set of string val(params in_mod) := FUNCTION
       ph_lname := metaphonelib.DMetaPhone1 (lname_value.val(in_mod))[1..6];
-      ds_dist := header.key_phonetic_lname (
+      ds_dist := dx_header.key_phonetic_lname() (
                    keyed (dph_lname = ph_lname),
                    STD.Str.EditDistance (lname_value.val(in_mod), lname) < in_mod.distancethreshold);
       orig_set := SET (IF(UsePhoneticDistance.val(in_mod), CHOOSEN (ds_dist, 500)), lname);
@@ -994,7 +1000,7 @@ export InterfaceTranslator := module
 	end;
 	export lname_wild := module
 		export params := lname_value.params;
-		export boolean val(params in_mod) := STD.Str.Find(lname_value.val(in_mod), '*', 1) <> 0 or 
+		export boolean val(params in_mod) := STD.Str.Find(lname_value.val(in_mod), '*', 1) <> 0 or
               STD.Str.Find(lname_value.val(in_mod), '?', 1) <> 0;
 	end;
 	export lname_wild_val := module
@@ -1003,7 +1009,7 @@ export InterfaceTranslator := module
 	end;
 	export fname_wild := module
 		export params := fname_value.params;
-		export boolean val(params in_mod) := STD.Str.Find(fname_value.val(in_mod), '*', 1) <> 0 or 
+		export boolean val(params in_mod) := STD.Str.Find(fname_value.val(in_mod), '*', 1) <> 0 or
               STD.Str.Find(fname_value.val(in_mod), '?', 1) <> 0;
 	end;
 	export fname_wild_val := module
@@ -1013,21 +1019,21 @@ export InterfaceTranslator := module
 	export addr_wild := module
 		export params := addr_value.params;
 		export boolean val(params in_mod) :=
-			STD.Str.Find(addr_value.val(in_mod), '*', 1) <> 0 and 
-			STD.Str.Find(addr_value.val(in_mod), '*', 1) < STD.Str.Find(addr_value.val(in_mod), ' ', 1) or 
-			STD.Str.Find(addr_value.val(in_mod), '?', 1) <> 0 and 
+			STD.Str.Find(addr_value.val(in_mod), '*', 1) <> 0 and
+			STD.Str.Find(addr_value.val(in_mod), '*', 1) < STD.Str.Find(addr_value.val(in_mod), ' ', 1) or
+			STD.Str.Find(addr_value.val(in_mod), '?', 1) <> 0 and
 			STD.Str.Find(addr_value.val(in_mod), '?', 1) < STD.Str.Find(addr_value.val(in_mod), ' ', 1);
 	end;
 	shared addr_comma := module
 		export params := addr_value.params;
 		export boolean val(params in_mod) :=
-			STD.Str.Find(addr_value.val(in_mod), ',', 1) <> 0 AND 
+			STD.Str.Find(addr_value.val(in_mod), ',', 1) <> 0 AND
 			STD.Str.Find(addr_value.val(in_mod), ',', 1) < STD.Str.Find(addr_value.val(in_mod), ' ', 1);
 	end;
 	shared addr_colon := module
 		export params := addr_value.params;
 		export boolean val(params in_mod) :=
-			STD.Str.Find(addr_value.val(in_mod), ':', 1) <> 0 AND 
+			STD.Str.Find(addr_value.val(in_mod), ':', 1) <> 0 AND
 			STD.Str.Find(addr_value.val(in_mod), ':', 1) < STD.Str.Find(addr_value.val(in_mod), ' ', 1);
 	end;
 	export addr_range := module
@@ -1061,18 +1067,18 @@ export InterfaceTranslator := module
 				STD.Str.Find(addr_value.val(in_mod), ':', 1)+1)..
 			STD.Str.Find(addr_value.val(in_mod), ' ', 1)-1], '');
 	end;
-	
+
 	// added prange_end_value to addr_line_first when
 	// addr_range exists so that Addr line can be cleaned appropriately
 	export addr_line_first := module
 		export params := interface(addr_range.params,addr_value.params)
 		end;
-		export string val(params in_mod) := IF (addr_range.val(in_mod), 
+		export string val(params in_mod) := IF (addr_range.val(in_mod),
 		if(addr_comma.val(in_mod),
 		addr_value.val(in_mod)[STD.Str.Find(addr_value.val(in_mod), ',', 1)..]
 		,addr_value.val(in_mod)[STD.Str.Find(addr_value.val(in_mod), ':', 1)..])
 		, addr_value.val(in_mod));
-	end;	
+	end;
 	export addr_origin_country := module
 		export params := interface
 			export unsigned1 addr_origin_country := 0;
@@ -1082,14 +1088,14 @@ export InterfaceTranslator := module
 	export addr_line_second := module
 		export params := interface(city_val.params,state_val.params,zip_val.params,statecityzip_val.params,addr_origin_country.params)
 		end;
-		shared string fake_city(params in_mod) := MAP (addr_origin_country.val(in_mod) = address.Components.Country.CA => 'Nocityname BC','Nocityname NY');		
-		export string val(params in_mod) := 
+		shared string fake_city(params in_mod) := MAP (addr_origin_country.val(in_mod) = address.Components.Country.CA => 'Nocityname BC','Nocityname NY');
+		export string val(params in_mod) :=
 			IF (
 				(city_val.val(in_mod) <> '' AND state_val.val(in_mod)<>'') OR zip_val.val(in_mod) <> '',
 				TRIM(city_val.val(in_mod)) + ' ' + TRIM(state_val.val(in_mod)) + ' ' + TRIM(zip_val.val(in_mod)),
 				if(
-					StateCityZip_val.val(in_mod) <> '', 
-					StateCityZip_val.val(in_mod), 
+					StateCityZip_val.val(in_mod) <> '',
+					StateCityZip_val.val(in_mod),
 					fake_city(in_mod)
 				)
 			);
@@ -1104,7 +1110,7 @@ export InterfaceTranslator := module
 		shared ca(params in_mod) := address.GetCleanAddress(addr1(in_mod), addr2(in_mod), addr_origin_country.val(in_mod), useGlobal := in_mod.useGlobalScope);
 		export val(params in_mod) := ca(in_mod).str_addr;
 		export val_mod(params in_mod) := ca(in_mod).results;
-										 
+
 	end;
 	shared isValidCityStateClean := module
 		export params := interface(city_val.params,state_val.params,statecityzip_val.params)
@@ -1118,9 +1124,9 @@ export InterfaceTranslator := module
 		end;
 		shared isCanadian(params in_mod) := addr_origin_country.val(in_mod) = address.Components.Country.CA;//ziplib.ZipToState2 does not work for canada, so i have to divert to the clean address
 		export string val(params in_mod) := STD.Str.ToUpperCase(map(
-			city_val.val(in_mod)='' and state_val.val(in_mod)='' and in_mod.st='' and zip_val.val(in_mod)<>'' and not isCanadian(in_mod) 
+			city_val.val(in_mod)='' and state_val.val(in_mod)='' and in_mod.st='' and zip_val.val(in_mod)<>'' and not isCanadian(in_mod)
 																														=> ziplib.ZipToState2(zip_val.val(in_mod)),
-			in_mod.st<>''												  		=> in_mod.st, 
+			in_mod.st<>''												  		=> in_mod.st,
 			in_mod.st_orig <> ''                  		=> in_mod.st_orig,
 			state_val.val(in_mod)<>''												  		=> state_val.val(in_mod),
 			isValidCityStateClean.val(in_mod)											=> clean_address.val_mod(in_mod).state,
@@ -1140,7 +1146,7 @@ export InterfaceTranslator := module
 		export params := interface(state_value.params,city_value.params)
 		end;
 		export string5 val(params in_mod) := ziplib.CityToZip5(state_value.val(in_mod), city_value.val(in_mod));
-	end;	
+	end;
 	export city_zip_set_value := module
 		export params := interface(state_value.params,city_value.params)
 		end;
@@ -1175,7 +1181,7 @@ export InterfaceTranslator := module
 	export any_addr_error_value := module
 		export params := err_stat.params;
 		export boolean val(params in_mod) := err_stat.val(in_mod)[1]='E';
-	end;	
+	end;
 	export zip_value := module
 		export params := interface(city_zip_value.params,city_value.params,state_value.params,zip_val.params,county_value.params,zipradius_value.params,clean_address.params,any_addr_error_value.params)
 		end;
@@ -1192,15 +1198,15 @@ export InterfaceTranslator := module
 	export city_codes_set := module
 		export params := interface(city_value.params,zip_val.params)
 		end;
-		export set of unsigned val(params in_mod) := if(city_value.val(in_mod)<>'',doxie.Make_CityCodes(city_value.val(in_mod)).rox,[])  
-		                                            + ut.ZipToCities(zip_val.val(in_mod)).set_codes; 
+		export set of unsigned val(params in_mod) := if(city_value.val(in_mod)<>'',doxie.Make_CityCodes(city_value.val(in_mod)).rox,[])
+		                                            + ut.ZipToCities(zip_val.val(in_mod)).set_codes;
 	end;
 	shared skipTheCleanAddr := module
 		export params := interface
 			export boolean isPRP;
 			export string200 addr;
 		end;
-		export boolean val(params in_mod) := in_mod.isPRP and 
+		export boolean val(params in_mod) := in_mod.isPRP and
                                          // input address line-1 is one word
                                          (length(trim(in_mod.addr, all)) = length(trim(in_mod.addr, left, right)));
 	end;
@@ -1247,11 +1253,11 @@ export InterfaceTranslator := module
 	export is_inv_wildcard := module //derived; TODO: hide, probably isn't used.
 		export params := interface(lname_value.params,fname_value.params,pname_val.params)
 		end;
-		export boolean val(params in_mod) := (STD.Str.Find(lname_value.val(in_mod), '*', 1) in [1,2,3]) or 
-                           (STD.Str.Find(lname_value.val(in_mod), '?', 1) in [1,2,3]) or   
-		                 (STD.Str.Find(fname_value.val(in_mod), '*', 1) in [1,2,3]) or 
-                           (STD.Str.Find(fname_value.val(in_mod), '?', 1) in [1,2,3]) or   
-					  (STD.Str.Find(pname_val.val(in_mod), '*', 1) in [1,2,3]) or    
+		export boolean val(params in_mod) := (STD.Str.Find(lname_value.val(in_mod), '*', 1) in [1,2,3]) or
+                           (STD.Str.Find(lname_value.val(in_mod), '?', 1) in [1,2,3]) or
+		                 (STD.Str.Find(fname_value.val(in_mod), '*', 1) in [1,2,3]) or
+                           (STD.Str.Find(fname_value.val(in_mod), '?', 1) in [1,2,3]) or
+					  (STD.Str.Find(pname_val.val(in_mod), '*', 1) in [1,2,3]) or
 					  (STD.Str.Find(pname_val.val(in_mod), '?', 1) in [1,2,3]);
 	end;
 	export is_wildcard_search := module
@@ -1350,7 +1356,7 @@ export InterfaceTranslator := module
 	shared cnvf_forwords := module
 		export params := interface(comp_name_value.params,state_value.params)
 		end;
-		export val(params in_mod) := FUNCTION 
+		export val(params in_mod) := FUNCTION
       ds_cnames :=  IF (comp_name_value.val(in_mod) <> '',
                         DATASET ([transform (business_header_ss.layout_MakeCNameWords,
                                              self.company_name := comp_name_value.val(in_mod),
@@ -1383,7 +1389,7 @@ export InterfaceTranslator := module
 			export string bdid;
 		end;
 		export string val(params in_mod) := in_mod.bdid;
-	end;	
+	end;
 	export exact_only := module //TODO: only in Business_Header.BH_SearchService
 		export params := interface(StrictMatch_value.params)
 			export boolean exactonly;
@@ -1395,7 +1401,7 @@ export InterfaceTranslator := module
 			export unsigned2 mileradius;
 			export unsigned2 zipradius;
 		end;
-		export unsigned2 val(params in_mod) := 
+		export unsigned2 val(params in_mod) :=
 			map(
 				StrictMatch_value.val(in_mod) => 0,
 				in_mod.mileradius != 0 => in_mod.mileradius,
@@ -1513,7 +1519,7 @@ export InterfaceTranslator := module
                                                  KEYED (left.bdl = right.bdl),
                                                  TRANSFORM ({unsigned6 bdid}, self.bdid := right.bdid),
                                                  //there're a few BDLs with more than 10K matches
-                                                 LIMIT (10000)), 
+                                                 LIMIT (10000)),
                         multiBDID.val(in_mod)      => PROJECT (PARSE (DATASET([{_bdid}],{string bdidlist}),
                                                                       bdidlist, bdidpatt, {unsigned6 bdid := (unsigned6)matchtext(bdidlistval)},scan),
                                                               {unsigned6 bdid}),
@@ -1532,16 +1538,16 @@ export InterfaceTranslator := module
 		end;
 		export unsigned2 val(params in_mod) := map(
 			zip_val.val(in_mod) = '' and (state_value.val(in_mod) = '' OR city_value.val(in_mod) = '')=> 0,
-		  mile_radius.val(in_mod) < 50 => mile_radius.val(in_mod), 
+		  mile_radius.val(in_mod) < 50 => mile_radius.val(in_mod),
 			50);
 	end;
-  
+
 	export bh_zip_value := module
 		export params := interface(zip_value_cleaned.params,mile_radius_value.params,state_value.params,city_value.params,city_zip_value.params)
 		end;
-		export set of integer4 val(params in_mod) := 
+		export set of integer4 val(params in_mod) :=
 			if(zip_value_cleaned.val(in_mod) <> '' and mile_radius_value.val(in_mod) = 0, [(integer)zip_value_cleaned.val(in_mod)],
-				 if(zip_value_cleaned.val(in_mod) <> '', ziplib.ZipsWithinRadius(zip_value_cleaned.val(in_mod), mile_radius_value.val(in_mod)), 
+				 if(zip_value_cleaned.val(in_mod) <> '', ziplib.ZipsWithinRadius(zip_value_cleaned.val(in_mod), mile_radius_value.val(in_mod)),
 						if(state_value.val(in_mod) <> '' AND city_value.val(in_mod) <> '',
 							 if(mile_radius_value.val(in_mod) > 0, ziplib.ZipsWithinRadius(city_zip_value.val(in_mod), mile_radius_value.val(in_mod)),
 									ut.ZipsWithinCity(state_value.val(in_mod),city_value.val(in_mod))),
@@ -1638,7 +1644,7 @@ export InterfaceTranslator := module
 			export boolean SearchAroundAddress;
 		end;
 		export boolean val(params in_mod) := in_mod.SearchAroundAddress and zipradius_value.val(in_mod) > 0;
-	end;	
+	end;
 
 	// get prim range interval based on neighbors records;
 	export prim_range_set_value := module
@@ -1647,16 +1653,16 @@ export InterfaceTranslator := module
 		end;
 		shared set of string5 city_zip_set(params in_mod) := set(dedup(zip_value_ds.val(in_mod)+city_zip_value_ds.val(in_mod), zip, all),zip);
 
-		shared neighbors_range(params in_mod) := 
+		shared neighbors_range(params in_mod) :=
 			limit(limit(
-				project(dx_header.key_nbr_headers()(keyed((exists(zip_value_ds.val(in_mod)) or exists(city_zip_value_ds.val(in_mod))) 
-																				and zip IN city_zip_set(in_mod)), 
-																			keyed(pname_value.val(in_mod) <> '' and prim_name[1..length(pname_value.val(in_mod))] = pname_value.val(in_mod)), 
+				project(dx_header.key_nbr_headers()(keyed((exists(zip_value_ds.val(in_mod)) or exists(city_zip_value_ds.val(in_mod)))
+																				and zip IN city_zip_set(in_mod)),
+																			keyed(pname_value.val(in_mod) <> '' and prim_name[1..length(pname_value.val(in_mod))] = pname_value.val(in_mod)),
 																			((prange_beg_value.val(in_mod) <> 0 or prange_end_value.val(in_mod) <> 0) and (integer)prim_range >= prange_beg_value.val(in_mod) and (integer)prim_range <= prange_end_value.val(in_mod))),
 								{dx_header.key_nbr_headers().prim_range}),
 			ut.limits.FETCH_KEYED, skip, keyed),ut.limits.FETCH_UNKEYED, skip);
 		// NB: neighbors' index cannot be used on FCRA side, so address range search is effectivly disabled on FCRA side.
-		export set of string10 val(params in_mod) := 
+		export set of string10 val(params in_mod) :=
 			if (in_mod.isFCRAval,
 					[],
 					set(dedup(sort(neighbors_range (in_mod), prim_range),prim_range),prim_range));
@@ -1673,7 +1679,7 @@ export InterfaceTranslator := module
 		end;
 		export string val(params in_mod) := in_mod.SIC;
 	end;
-	export demo_customer_name_value := module 
+	export demo_customer_name_value := module
 		export params := interface
 			export string20 DemoCustomerName;
 		end;

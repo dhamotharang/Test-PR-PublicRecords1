@@ -19,29 +19,32 @@ end;
 export t_EmailSearchV2Option := record (iesp.share.t_BaseSearchOptionEx)
 	integer ReturnCount {xpath('ReturnCount')};
 	integer StartingRecord {xpath('StartingRecord')};
+	string SearchTier {xpath('SearchTier')}; //values['Basic','Premium','']
 	string SearchType {xpath('SearchType')}; //values['EAA','EIA','EIC','']
-	string EmailQualityRulesMask {xpath('EmailQualityRulesMask')};
+	string EmailQualityRulesMask {xpath('EmailQualityRulesMask')};//hidden[internal]
 	boolean IncludeNoLexIdMatch {xpath('IncludeNoLexIdMatch')};
-	boolean IncludeHistoricData {xpath('IncludeHistoricData')};
-	boolean CheckEmailDeliverable {xpath('CheckEmailDeliverable')};
-	boolean KeepUndeliverableEmail {xpath('KeepUndeliverableEmail')};
-	unsigned2 MaxEmailsForDeliveryCheck {xpath('MaxEmailsForDeliveryCheck')};
+	boolean IncludeHistoricData {xpath('IncludeHistoricData')};//hidden[internal]
+	boolean CheckEmailDeliverable {xpath('CheckEmailDeliverable')};//hidden[internal]
+	boolean KeepUndeliverableEmail {xpath('KeepUndeliverableEmail')};//hidden[internal]
+	unsigned2 MaxEmailsForDeliveryCheck {xpath('MaxEmailsForDeliveryCheck')};//hidden[internal]
 	string BVAPIkey {xpath('BVAPIkey')};//hidden[ecl_only]
-	boolean SkipTMX {xpath('SkipTMX')};
-	unsigned2 MaxEmailsForTMX {xpath('MaxEmailsForTMX')};
+	boolean SkipTMX {xpath('SkipTMX')};//hidden[internal]
+	unsigned2 MaxEmailsForTMX {xpath('MaxEmailsForTMX')};//hidden[internal]
+	boolean IsMarketingUse {xpath('IsMarketingUse')};
+	string RestrictedUseCase {xpath('RestrictedUseCase')};//hidden[internal]
 end;
 		
 export t_EmailSearchV2OriginalData := record
 	string EmailAddress {xpath('EmailAddress')};
-	string FirstName {xpath('FirstName')};
-	string LastName {xpath('LastName')};
-	string StreetAddress {xpath('StreetAddress')};
-	string City {xpath('City')};
-	string State {xpath('State')};
-	string Zip {xpath('Zip')};
-	string Zip4 {xpath('Zip4')};
-	string LoginDate {xpath('LoginDate')};
-	string IPAddress {xpath('IPAddress')};
+	string FirstName {xpath('FirstName')};//hidden[internal]
+	string LastName {xpath('LastName')};//hidden[internal]
+	string StreetAddress {xpath('StreetAddress')};//hidden[internal]
+	string City {xpath('City')};//hidden[internal]
+	string State {xpath('State')};//hidden[internal]
+	string Zip {xpath('Zip')};//hidden[internal]
+	string Zip4 {xpath('Zip4')};//hidden[internal]
+	string LoginDate {xpath('LoginDate')};//hidden[internal]
+	string IPAddress {xpath('IPAddress')};//hidden[internal]
 	string Website {xpath('Website')};
 	string CompanyName {xpath('CompanyName')};
 	string CompanyTitle {xpath('CompanyTitle')};
@@ -66,25 +69,27 @@ export t_EmailSearchV2Record := record
 	t_EmailSearchV2CleanData Cleaned {xpath('Cleaned')};
 	t_EmailSearchV2BestInfo BestInfo {xpath('BestInfo')};
 	unsigned8 LexId {xpath('LexId')}; // Xsd type: string
-	iesp.share.t_Date ProcessDate {xpath('ProcessDate')};
-	iesp.share.t_Date DateFirstSeen {xpath('DateFirstSeen')};
-	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
+	iesp.share.t_Date ProcessDate {xpath('ProcessDate')};//hidden[internal]
+	iesp.share.t_Date DateFirstSeen {xpath('DateFirstSeen')};//hidden[internal]
+	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};//hidden[internal]
 	iesp.share.t_Date DateVendorFirstReported {xpath('DateVendorFirstReported')};
 	iesp.share.t_Date DateVendorLastReported {xpath('DateVendorLastReported')};
 	string8 LatestOrigLoginDate {xpath('LatestOrigLoginDate')};
-	string2 Source {xpath('Source')};
+	string2 Source {xpath('Source')};//hidden[internal]
 	unsigned NumEmailPerLexid {xpath('NumEmailPerLexid')};
 	unsigned NumLexIdPerEmail {xpath('NumLexIdPerEmail')};
-	boolean IsDeepDive {xpath('IsDeepDive')};
-	unsigned Penalt {xpath('Penalt')};
-	unsigned PenaltyAddress {xpath('PenaltyAddress')};
-	unsigned PenaltyName {xpath('PenaltyName')};
-	unsigned PenaltyDidSsnDob {xpath('PenaltyDidSsnDob')};
+	boolean IsDeepDive {xpath('IsDeepDive')};//hidden[internal]
+	unsigned Penalt {xpath('Penalt')};//hidden[internal]
+	unsigned PenaltyAddress {xpath('PenaltyAddress')};//hidden[internal]
+	unsigned PenaltyName {xpath('PenaltyName')};//hidden[internal]
+	unsigned PenaltyDidSsnDob {xpath('PenaltyDidSsnDob')};//hidden[internal]
 	string EmailStatus {xpath('EmailStatus')};
 	string EmailStatusReason {xpath('EmailStatusReason')};
 	string AdditionalStatusInfo {xpath('AdditionalStatusInfo')};
 	string Relationship {xpath('Relationship')};
 	unsigned EmailId {xpath('EmailId')};//hidden[internal]
+	iesp.share.t_Date LNDateFirst {xpath('LNDateFirst')};
+	iesp.share.t_Date LNDateLast {xpath('LNDateLast')};
 end;
 		
 export t_EmailSearchV2InputSubject := record
@@ -94,8 +99,9 @@ end;
 		
 export t_EmailSearchV2Response := record
 	iesp.share.t_ResponseHeader _Header {xpath('Header')};
+	integer RecordCount {xpath('RecordCount')};
 	dataset(t_EmailSearchV2Record) Records {xpath('Records/Record'), MAXCOUNT(iesp.Constants.Email.MAX_RECS)};
-	t_EmailSearchV2InputSubject InputSubject {xpath('InputSubject')};
+	t_EmailSearchV2InputSubject InputSubject {xpath('InputSubject')};//hidden[internal]
 end;
 		
 export t_EmailSearchV2Request := record (iesp.share.t_BaseRequest)

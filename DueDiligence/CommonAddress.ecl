@@ -1,4 +1,4 @@
-﻿IMPORT Address, Advo, DueDiligence, Risk_Indicators, STD;
+﻿IMPORT Address, Advo, Census_Data, Codes, DueDiligence, Easi, Risk_Indicators, STD;
 
 
 /*
@@ -7,6 +7,12 @@
 */
 EXPORT CommonAddress := MODULE
 
+
+    EXPORT getAddressScore(STRING prim_range1, STRING prim_name1, STRING sec_range1, STRING prim_range2, STRING prim_name2, STRING sec_range2) := FUNCTION
+        score := Risk_Indicators.AddrScore.AddressScore(prim_range1, prim_name1, sec_range1, prim_range2, prim_name2, sec_range2);
+
+        RETURN score;
+    END;
 
     EXPORT GetCleanAddress(DueDiligence.Layouts.Address addressToClean) := FUNCTION
         
@@ -62,6 +68,8 @@ EXPORT CommonAddress := MODULE
     
     
     EXPORT GetKeyAddr1HistoryResidentialOrBusiness(leftDS, fieldName) := FUNCTIONMACRO
+        IMPORT Advo;
+        
         addKeyAddr1History := JOIN(leftDS, Advo.Key_Addr1_history,  
                                     LEFT.#EXPAND(fieldName).zip5 != '' AND 
                                     LEFT.#EXPAND(fieldName).prim_range != '' AND
@@ -81,5 +89,109 @@ EXPORT CommonAddress := MODULE
                                     KEEP(DueDiligence.Constants.MAX_ATMOST_1));
         RETURN addKeyAddr1History;
     ENDMACRO;
+    
+    
+    EXPORT GetKeyAddr1HistoryAddressType(leftDS, fieldName) := FUNCTIONMACRO
+        IMPORT Advo;
+    
+        addKeyAddr1History := JOIN(leftDS, Advo.Key_Addr1_history,  
+                                    LEFT.#EXPAND(fieldName).zip5 != '' AND 
+                                    LEFT.#EXPAND(fieldName).prim_range != '' AND
+                                    KEYED(LEFT.#EXPAND(fieldName).zip5 = RIGHT.zip) AND
+                                    KEYED(LEFT.#EXPAND(fieldName).prim_range = RIGHT.prim_range) AND
+                                    KEYED(LEFT.#EXPAND(fieldName).prim_name = RIGHT.prim_name) AND
+                                    KEYED(LEFT.#EXPAND(fieldName).addr_suffix = RIGHT.addr_suffix) AND
+                                    KEYED(LEFT.#EXPAND(fieldName).predir = RIGHT.predir) AND
+                                    KEYED(LEFT.#EXPAND(fieldName).postdir = RIGHT.postdir) AND
+                                    KEYED(LEFT.#EXPAND(fieldName).sec_range = RIGHT.sec_range), 
+                                    TRANSFORM({RECORDOF(LEFT), STRING1 addr_type},
+                                                SELF.addr_type := RIGHT.address_type;
+                                                SELF := LEFT,
+                                                SELF := []), LEFT OUTER, 
+                                    KEEP(DueDiligence.Constants.MAX_ATMOST_1));
+        RETURN addKeyAddr1History;
+    ENDMACRO;
+    
+    //assumes inDS has a field named state and county
+    EXPORT GetAddressCounty(inDS) := FUNCTIONMACRO
+        IMPORT Census_Data, codes, STD;
+         
+        tempFIPS := PROJECT(inDS, TRANSFORM({RECORDOF(inDS), STRING5 tempFIPSCode, STRING countyNameText},
+                                            SELF.tempFIPSCode := codes.st2FipsCode(STD.Str.ToUpperCase(LEFT.state)) + LEFT.county;
+                                            SELF.countyNameText := '';
+                                            SELF := LEFT;));
+          
+                                                                                                                                                                                         
+        Census_Data.MAC_Fips2County_Keyed(tempFIPS, state, tempFIPSCode, countyNameText, addrWithCounty);
+        
+        RETURN addrWithCounty;
+    ENDMACRO;
+    
+    
+    EXPORT getAddressRisk(DATASET(DueDiligence.layoutsInternal.GeographicLayout) addressList, BOOLEAN theseAddressesNeedToBeCleaned = FALSE) := FUNCTION
+
+      cleanedAddress := PROJECT(addressList, TRANSFORM(DueDiligence.LayoutsInternal.GeographicLayout,
+                                                        tempAddr := PROJECT(LEFT, TRANSFORM(DueDiligence.Layouts.Address, SELF := LEFT;));
+                                                        
+                                                        cleanAddress := GetCleanAddress(tempAddr);
+                                                        
+                                                        SELF := cleanAddress;
+                                                        SELF := LEFT;));
+
+      PickUpGeoRiskForThisList := IF(theseAddressesNeedToBeCleaned, cleanedAddress, addressList);  
+    
+
+      //Pick up the EasiTotCrime for this state and county and geo blk                         
+      //    from the Census Keys.  This FUNCTION is expecting the 3 digits county to build          
+      //    the geolink Build the 5 digit FIPS code using the state code + county                       
+      //    Use the 5 digit FIPS code to determine if the county area matches the lists       
+      //    created in the duediligence.constants                                                                                                                  
+      //Note:  The Easi - if we cannot find any Census data for this geographic location  
+      //       per our requirements the "not found" condition will produce the same result  
+      //       a low to average crime index 
+      withGeographicRisk := JOIN(PickUpGeoRiskForThisList, Easi.Key_Easi_Census,
+                                  KEYED(RIGHT.geolink = LEFT.state + LEFT.county + LEFT.geo_blk),
+                                  TRANSFORM(DueDiligence.layoutsInternal.GeographicLayout, 
+                                            //Set all of the County/State area risk indicators
+                                            INTEGER tempCrimeValue := (INTEGER)RIGHT.totcrime;  
+                                            
+                                            SELF.CountyHasHighCrimeIndex := tempCrimeValue >= DueDiligence.Constants.HighCrimeValue;
+                                            SELF.EasiTotCrime := RIGHT.totcrime;
+                                            SELF.buildgeolink := LEFT.state + LEFT.county + LEFT.geo_blk;
+                                             
+                                            
+                                            STRING5 tempFIPS := Codes.st2FipsCode(STD.Str.ToUpperCase(LEFT.state)) + LEFT.county;
+                                            
+                                            SELF.FipsCode := tempFIPS; 
+                                            SELF.validFIPSCode := LENGTH(TRIM(tempFIPS, ALL)) = 5;
+                                            SELF.HIFCA := tempFIPS IN DueDiligence.Constants.setHIFCA;
+                                            SELF.HIDTA := tempFIPS IN DueDiligence.Constants.setHIDTA;
+                                            SELF.CountyBordersForgeinJur := tempFIPS IN DueDiligence.Constants.CountyForeignJurisdic;   
+                                            SELF.CountyBorderOceanForgJur := tempFIPS IN DueDiligence.Constants.CountyBordersOceanForgJur;
+                                            
+                                            //Set all of the City/State area risk indicators
+                                            tempCityState := TRIM(LEFT.city, LEFT, RIGHT) + ','+ LEFT.state;
+                                            
+                                            SELF.CityState := tempCityState; 
+                                            SELF.CityBorderStation := tempCityState in DueDiligence.Constants.CityBorderStation;
+                                            SELF.CityFerryCrossing := tempCityState in DueDiligence.Constants.CityFerryCrossing; 
+                                            SELF.CityRailStation := tempCityState in DueDiligence.Constants.CityRailStation; 
+                                            
+                                            SELF.censusRecordExists := RIGHT.geolink <> DueDiligence.Constants.EMPTY;
+
+                                            SELF := LEFT;),  
+                                  LEFT OUTER,  
+                                  ATMOST (KEYED(RIGHT.geolink = LEFT.state + LEFT.county + LEFT.geo_blk), DueDiligence.Constants.MAX_ATMOST), 
+                                  KEEP(DueDiligence.Constants.MAX_ATMOST_1));
+
+                                                                                                            
+      //Use the Census Macro to fill in the county_name - pass the result set as input,                              
+      //the field name that contains the state,                                                                       
+      //the field name that contains the 3 digit fips(county) and the field name of the county name.                 
+      //the name of the output result set                                                                                                                                                                                          
+      Census_Data.MAC_Fips2County_Keyed(withGeographicRisk, state, FipsCode, countyName, WithGeoRiskCounty);
+
+      RETURN WithGeoRiskCounty;
+    END;
 
 END;

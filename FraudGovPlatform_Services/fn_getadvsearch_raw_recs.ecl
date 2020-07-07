@@ -55,7 +55,7 @@ EXPORT fn_getadvsearch_raw_recs (
 	ds_auto_phone 	:= FraudGovPlatform_Services.fn_postautokey_joins(ds_batch_in_norm5slim(phoneno !=''), fraud_platform);	
 
 	//Hitting the Fraud shared keys.. which are based on BatchIn_rec record structure. 
-	ds_valid_in 	:= FraudShared_Services.ValidateInput.BuildValidityRecs(ds_batch_in_orig);
+	ds_valid_in 	:= FraudShared_Services.ValidateInput.BuildValidityRecs(ds_batch_in_orig,fraud_platform);
 	EntitiesIds_ 	:= FraudShared_Services.EntitiesIds(ds_valid_in, fraud_platform, filterBy_entity_type,FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT);
 	
 	ds_did                  := EntitiesIds_.GetLexID();
@@ -67,7 +67,6 @@ EXPORT fn_getadvsearch_raw_recs (
 	ds_provider_npi         := EntitiesIds_.GetNPI();
 	ds_provider_lnpid       := EntitiesIds_.GetLNPID();
 	ds_bankaccountnumber		:= EntitiesIds_.GetBankAccountNumber();
-	ds_DriverLicensesIds		:= EntitiesIds_.GetDriverLicenses();
 
 	//Hitting the Advance Search spcific only keys.. which are based on BatchInExtended_rec record structure.
 	Search_EntitiesIDs_ := FraudGovPlatform_Services.Search_EntitiesIDs(ds_batch_in, fraud_platform, filterBy_entity_type, IsOnline);
@@ -83,6 +82,7 @@ EXPORT fn_getadvsearch_raw_recs (
 	ds_CityStateIds			:= Search_EntitiesIDs_.GetCityStateIds();
 	ds_CountyIds				:= Search_EntitiesIDs_.GetCountyIds();
 	ds_ZipIds						:= Search_EntitiesIDs_.GetZipIds();
+	ds_DriverLicensesIds:= Search_EntitiesIDs_.GetDriverLicenses();
 	
 	//Find which email key to hit.
 	email_user_name :=  STD.Str.CleanSpaces(regexfind('(.*)@(.*)$',in_rec.email_address,1));
@@ -191,8 +191,8 @@ EXPORT fn_getadvsearch_raw_recs (
 																			if(userNameOnly, STD.Str.CleanSpaces(regexfind('(.*)@(.*)$',email_address,1)) = email_user_name, true) AND
 																			if(domainNameOnly, STD.Str.CleanSpaces(regexfind('(.*)@(.*)$',email_address,2)) = email_user_domain, true) AND
 																			if(fullemail, email_address = STD.Str.CleanSpaces(in_rec.email_address), true) AND
-																			if(in_rec.dl_number <> '' AND in_rec.dl_state <> '',
-																					drivers_license = in_rec.dl_number AND drivers_license_state = in_rec.dl_state, true) AND
+																			if(in_rec.dl_number <> '', drivers_license = in_rec.dl_number, true) AND
+																			if(in_rec.dl_state <> '', drivers_license_state = in_rec.dl_state, true) AND
 																			if(in_rec.ProgramCode <> '', classification_permissible_use_access.ind_type_description	= in_rec.ProgramCode, true)
 																		 );
 																		 
@@ -245,9 +245,10 @@ EXPORT fn_getadvsearch_raw_recs (
 	// output(ds_auto_name, named('ds_auto_name'));
 	// output(ds_auto_address, named('ds_auto_address'));
 	// output(ds_auto_ssn, named('ds_auto_ssn'));
-	// output(ds_auto_phone, named('ds_auto_phone'));
-	// output(ds_recs, named('ds_recs'));
-	// output(ds_recs_filtered, named('ds_recs_filtered'));
+	// output(ds_valid_in, named('ds_valid_in'),EXTEND);
+	// output(ds_recs, named('ds_recs'),EXTEND);
+	// output(ds_ids, named('ds_ids'),EXTEND);
+	// output(ds_payload_recs, named('ds_payload_recs'),EXTEND);
 	// output(ds_recs_filtered_name, named('ds_recs_filtered_name'));
 	// output(ds_recs_filtered_address, named('ds_recs_filtered_address'));
 	// output(ds_recs_filtered_phone, named('ds_recs_filtered_phone'));

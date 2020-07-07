@@ -86,15 +86,16 @@ FUNCTION
     SELF.ProfLicenseMari := PROJECT(proflic_mari_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceProfLicenseMariData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
     SELF.PropertyAssessment := PROJECT(SORT(property_by_owner_recs(EXISTS(Assessment)),-assessed_value_year), $.Transforms.xformPropertyAssessmentData(LEFT));
     SELF.PropertyDeed := PROJECT(SORT(property_by_owner_recs(EXISTS(Deed)),-contract_date), $.Transforms.xformPropertyDeedData(LEFT));
-    SELF.AssessmentByResidence := PROJECT(SORT(property_by_residence_recs(EXISTS(Assessment)),-assessed_value_year), $.Transforms.xformPropertyAssessmentData(LEFT));
-    SELF.DeedByResidence := PROJECT(SORT(property_by_residence_recs(EXISTS(Deed)),-contract_date), $.Transforms.xformPropertyDeedData(LEFT));
+    // deprecated as of feb.2020
+    // SELF.AssessmentByResidence := PROJECT(SORT(property_by_residence_recs(EXISTS(Assessment)),-assessed_value_year), $.Transforms.xformPropertyAssessmentData(LEFT));
+    // SELF.DeedByResidence := PROJECT(SORT(property_by_residence_recs(EXISTS(Deed)),-contract_date), $.Transforms.xformPropertyDeedData(LEFT));
     SELF.SexOffenders := PROJECT(so_recs, $.Transforms.xformSexOffenderData(LEFT));
     SELF.SSN := PROJECT(ssn_recs(isHeaderSource), TRANSFORM(iesp.fcradataservice.t_FcraDataServiceSSNData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData, SELF.SourceData.death_sources := LEFT.death_sources));
     SELF.SSNFromInquiries := PROJECT(ssn_recs(isInquirySource), TRANSFORM(iesp.fcradataservice.t_FcraDataServiceSSNData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData, SELF.SourceData.death_sources := LEFT.death_sources));
     SELF.Thrive := PROJECT(thrive_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceThriveData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
     SELF.Watercraft := PROJECT(watercraft_recs, $.Transforms.xformWatercraftData(LEFT));
     SELF.PersonContext := PROJECT(pc_recs, iesp.fcradataservice.t_FcraDataServicePersonContextRecord); // --> maybe this should be the raw records as returned from person context instead?
-    SELF:=[];
+    SELF:=[]; 
   END;
   
   res := ROW(xformResult());

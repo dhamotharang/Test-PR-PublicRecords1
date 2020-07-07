@@ -86,156 +86,61 @@ export string is_valid(string8 d1, string8 d2) := function
       'N' );
 			
 end;			
-export ctg_Arson                           := 'ARSON';   
-export ctg_Assault_aggr  	                 := 'ASSAULT_AGGRAVATED';  	                   
-export ctg_Assault_other  	               := 'ASSAULT_OTHER';
-export ctg_Bribery                         := 'BRIBERY';                       
-export ctg_Burglary_BreakAndEnter_res      := 'BURGLARY_BREAK_AND_ENTER_RESIDENTIAL';
-export ctg_Burglary_BreakAndEnter_comm     := 'BURGLARY_BREAK_AND_ENTER_COMMERCIAL';   
-export ctg_Burglary_BreakAndEnter_veh      := 'BURGLARY_BREAK_AND_ENTER_MOTOR_VEHICLE'; 
-export ctg_Counterfeiting_Forgery          := 'COUNTERFEITING_FORGERY';       
-export ctg_Destruction_Damage_Vandalism    := 'DESTRUCTION_DAMAGE_VANDALISM';  
-export ctg_Drug_Narcotic                   := 'DRUG_NARCOTIC';                 
-export ctg_Fraud                           := 'FRAUD';                         
-export ctg_Gambling                        := 'GAMBLING';                     
-export ctg_Homicide                        := 'HOMICIDE';                      
-export ctg_Kidnapping_Abduction            := 'KIDNAPPING_ABDUCTION';          
-export ctg_Theft                           := 'THEFT';                       
-export ctg_Shoplifting                     := 'SHOPLIFTING'; 
-export ctg_Motor_Vehicle_Theft             := 'MOTOR_VEHICLE_THEFT';           
-export ctg_Pornography                     := 'PORNOGRAPHY_OBSCENE_MATERIAL';  
-export ctg_Prostitution                    := 'PROSTITUTION';                  
-export ctg_Robbery_res                     := 'ROBBERY_RESIDENTIAL';                       
-export ctg_Robbery_comm                    := 'ROBBERY_COMMERCIAL';
-export ctg_SexOffensesForcible             := 'SEXOFFENSES_FORCIBLE';           
-export ctg_SexOffensesNon_forcible         := 'SEXOFFENSES_NON_FORCIBLE';       
-export ctg_Stolen_Property_Offenses_Fence  := 'STOLEN_PROPERTY_OFFENSES_FENCE';
-export ctg_Weapon_Law_Violations           := 'WEAPON_LAW_VIOLATIONS';         
-export ctg_Identity_Theft                  := 'IDENTITY_THEFT';                
-export ctg_Computer_Crimes                 := 'COMPUTER_CRIMES';               
-export ctg_Human_Trafficking               := 'HUMAN_TRAFFICKING';             
-export ctg_Terrorist_Threats               := 'TERRORIST_THREATS';             
-export ctg_Restraining_Order_Violations    := 'RESTRAINING_ORDER_VIOLATIONS';  
-export ctg_Traffic                         := 'TRAFFIC';                       
-export ctg_BadChecks                       := 'BADCHECKS';                     
-export ctg_CurfewLoiteringVagrancyVio      := 'CURFEW_LOITERING_VAGRANCY';    
-export ctg_DisorderlyConduct               := 'DISORDERLY_CONDUCT';             
-export ctg_DrivingUndertheInfluence        := 'DRIVING_UNDER_THE_INFLUENCE';      
-export ctg_Drunkenness                     := 'DRUNKENNESS';                   
-export ctg_FamilyOffenses                  := 'FAMILY_OFFENSES';      
-export ctg_LiquorLawViolations             := 'LIQUOR_LAW_VIOLATIONS';           
-export ctg_TrespassofRealProperty          := 'TRESPASS_OF_REALPROPERTY'; 
-export ctg_PeepingTom                      := 'PEEPING_TOM'; 
-export ctg_Other                           := 'OTHER'; 
-export ctg_Unclassified                    := 'CANNOT_CLASSIFY'; 
-export ctg_Warrant_Fugitive                := 'WARRANT_FUGITIVE';
-export ctg_Obstruct_Resist                 := 'OBSTRUCT_RESIST';
-// export ctg_Embezzlement                 := 'EMBEZZLEMENT';        //Currently Not used
-// export ctg_Extortion_Blackmail          := 'EXTORTION_BLACKMAIL'; //Currently Not used 
 
-//convert the category to bitmap											
-export category_to_bitmap  (string category = '')  := map(
-													//Sources other than header
-													
-													category = ctg_Arson                          	=> ut.bit_set(0,0),
-													category = ctg_Assault_aggr  	                	=> ut.bit_set(0,1),
-													category = ctg_Assault_other  	              	=> ut.bit_set(0,2),
-													category = ctg_Bribery                    	    => ut.bit_set(0,3),
-													category = ctg_Burglary_BreakAndEnter_res       => ut.bit_set(0,4),
-													category = ctg_Burglary_BreakAndEnter_comm      => ut.bit_set(0,5),
-													category = ctg_Burglary_BreakAndEnter_veh   	  => ut.bit_set(0,6),
-													category = ctg_Counterfeiting_Forgery         	=> ut.bit_set(0,7),
-													category = ctg_Destruction_Damage_Vandalism   	=> ut.bit_set(0,8),
-													category = ctg_Drug_Narcotic                  	=> ut.bit_set(0,9),
-													category = ctg_Fraud                            => ut.bit_set(0,10),
-													category = ctg_Gambling                         => ut.bit_set(0,11),
-													category = ctg_Homicide                       	=> ut.bit_set(0,12),
-													category = ctg_Kidnapping_Abduction           	=> ut.bit_set(0,13),
-													category = ctg_Theft                            => ut.bit_set(0,14),
-													category = ctg_Shoplifting                    	=> ut.bit_set(0,15),
-													category = ctg_Motor_Vehicle_Theft            	=> ut.bit_set(0,16),
-													category = ctg_Pornography                    	=> ut.bit_set(0,17),
-													category = ctg_Prostitution                   	=> ut.bit_set(0,18),
-													category = ctg_Robbery_res                    	=> ut.bit_set(0,19),
-													category = ctg_Robbery_comm                   	=> ut.bit_set(0,20),
-													category = ctg_SexOffensesForcible            	=> ut.bit_set(0,21),
-													category = ctg_SexOffensesNon_forcible        	=> ut.bit_set(0,22),
-													category = ctg_Stolen_Property_Offenses_Fence 	=> ut.bit_set(0,23),
-													category = ctg_Weapon_Law_Violations            => ut.bit_set(0,24),
-													category = ctg_Identity_Theft                 	=> ut.bit_set(0,25),
-													category = ctg_Computer_Crimes                	=> ut.bit_set(0,26),
-													category = ctg_Human_Trafficking              	=> ut.bit_set(0,27),
-													category = ctg_Terrorist_Threats              	=> ut.bit_set(0,28),
-													category = ctg_Restraining_Order_Violations     => ut.bit_set(0,29),
-													category = ctg_Traffic                          => ut.bit_set(0,30),
-													category = ctg_BadChecks                      	=> ut.bit_set(0,31),
-													category = ctg_CurfewLoiteringVagrancyVio     	=> ut.bit_set(0,32),
-													category = ctg_DisorderlyConduct              	=> ut.bit_set(0,33),
-													category = ctg_DrivingUndertheInfluence       	=> ut.bit_set(0,34),
-													category = ctg_Drunkenness                    	=> ut.bit_set(0,35),
-													category = ctg_FamilyOffenses                   => ut.bit_set(0,36),
-													category = ctg_LiquorLawViolations              => ut.bit_set(0,37),
-													category = ctg_TrespassofRealProperty         	=> ut.bit_set(0,38),      
-													category = ctg_PeepingTom                     	=> ut.bit_set(0,39),      
-													category = ctg_Other                            => ut.bit_set(0,40),      
-													category = ctg_Unclassified                     => ut.bit_set(0,41),      
-													category = ctg_Warrant_Fugitive                 => ut.bit_set(0,42),
-													category = ctg_Obstruct_Resist                  => ut.bit_set(0,43),
-													0); //Max 64 sources
- 
+// convert a bitmap to space separated string of category descriptions
+EXPORT STRING get_category_from_bitmap(UNSIGNED bitmap) := FUNCTION
 
-//-----Convert the bitmap to desc									
-export	string	Get_category_from_bitmap(unsigned bitmap_category) := function
-		boolean		fis_match(unsigned p_in_bitmap_category, unsigned bitmap_category)	:=	p_in_bitmap_category & bitmap_category = bitmap_category;
-		string		translate_bitmap		:=	if(bitmap_category = 0,'',											   							     
-																					 if(fis_match(bitmap_category, category_to_bitmap(ctg_Arson                         	)),' ' + ctg_Arson                         	,'')
-                                          +if(fis_match(bitmap_category, category_to_bitmap(ctg_Assault_aggr  	               	)),' ' + ctg_Assault_aggr  	               	,'')																					
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Assault_other  	             	  )),' ' + ctg_Assault_other  	             	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Bribery                       	)),' ' + ctg_Bribery                       	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Burglary_BreakAndEnter_res      )),' ' + ctg_Burglary_BreakAndEnter_res    	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Burglary_BreakAndEnter_comm     )),' ' + ctg_Burglary_BreakAndEnter_comm   	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Burglary_BreakAndEnter_veh      )),' ' + ctg_Burglary_BreakAndEnter_veh	    ,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Counterfeiting_Forgery        	)),' ' + ctg_Counterfeiting_Forgery        	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Destruction_Damage_Vandalism  	)),' ' + ctg_Destruction_Damage_Vandalism  	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Drug_Narcotic                 	)),' ' + ctg_Drug_Narcotic                 	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Fraud                         	)),' ' + ctg_Fraud                         	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Gambling                      	)),' ' + ctg_Gambling                      	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Homicide                      	)),' ' + ctg_Homicide                      	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Kidnapping_Abduction          	)),' ' + ctg_Kidnapping_Abduction          	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Theft                         	)),' ' + ctg_Theft                         	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Shoplifting                   	)),' ' + ctg_Shoplifting                   	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Motor_Vehicle_Theft           	)),' ' + ctg_Motor_Vehicle_Theft           	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Pornography                   	)),' ' + ctg_Pornography                   	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Prostitution                  	)),' ' + ctg_Prostitution                  	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Robbery_res                   	)),' ' + ctg_Robbery_res                   	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Robbery_comm                  	)),' ' + ctg_Robbery_comm                  	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_SexOffensesForcible           	)),' ' + ctg_SexOffensesForcible           	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_SexOffensesNon_forcible       	)),' ' + ctg_SexOffensesNon_forcible       	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Stolen_Property_Offenses_Fence	)),' ' + ctg_Stolen_Property_Offenses_Fence	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Weapon_Law_Violations         	)),' ' + ctg_Weapon_Law_Violations         	,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Identity_Theft                	)),' ' + ctg_Identity_Theft                	,'')	
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Computer_Crimes               	)),' ' + ctg_Computer_Crimes               	,'')			
-                                          +if(fis_match(bitmap_category, category_to_bitmap(ctg_Human_Trafficking               )),' ' + ctg_Human_Trafficking             	,'')
-                                          +if(fis_match(bitmap_category, category_to_bitmap(ctg_Terrorist_Threats               )),' ' + ctg_Terrorist_Threats             	,'')
-                                          +if(fis_match(bitmap_category, category_to_bitmap(ctg_Restraining_Order_Violations    )),' ' + ctg_Restraining_Order_Violations  	,'')
-                                          +if(fis_match(bitmap_category, category_to_bitmap(ctg_Traffic                         )),' ' + ctg_Traffic                       	,'')
-                                          +if(fis_match(bitmap_category, category_to_bitmap(ctg_BadChecks                       )),' ' + ctg_BadChecks                     	,'')
-                                          +if(fis_match(bitmap_category, category_to_bitmap(ctg_CurfewLoiteringVagrancyVio      )),' ' + ctg_CurfewLoiteringVagrancyVio    	,'')
-                                          +if(fis_match(bitmap_category, category_to_bitmap(ctg_DisorderlyConduct               )),' ' + ctg_DisorderlyConduct             	,'')
-                                          +if(fis_match(bitmap_category, category_to_bitmap(ctg_DrivingUndertheInfluence        )),' ' + ctg_DrivingUndertheInfluence      	,'')
-                                          +if(fis_match(bitmap_category, category_to_bitmap(ctg_Drunkenness                     )),' ' + ctg_Drunkenness                   	,'')											   
-                                          +if(fis_match(bitmap_category, category_to_bitmap(ctg_FamilyOffenses                  )),' ' + ctg_FamilyOffenses                	,'')											   
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_LiquorLawViolations             )),' ' + ctg_LiquorLawViolations           	,'')	
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_TrespassofRealProperty          )),' ' + ctg_TrespassofRealProperty         ,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_PeepingTom                      )),' ' + ctg_PeepingTom                     ,'')	
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Other                           )),' ' + ctg_Other                          ,'')	
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Unclassified                    )),' ' + ctg_Unclassified                   ,'')	
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Warrant_Fugitive                )),' ' + ctg_Warrant_Fugitive               ,'')
-																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Obstruct_Resist                 )),' ' + ctg_Obstruct_Resist                ,'')
-												 );                                                                                                      	
-		
-		return		stringlib.stringfindreplace(trim(stringlib.stringcleanspaces(translate_bitmap),left,right),'  ',' ');
-end;	
+  BOOLEAN categoryMatch(UNSIGNED chkBitmap,UNSIGNED catBitmap) := chkBitmap & catBitmap = catBitmap;
+
+  STRING descriptions := IF(bitmap=0,'',
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.ARSON                         ),hygenics_crim.Constants.CTG_ARSON                         +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.ASSAULT_AGGRAVATED            ),hygenics_crim.Constants.CTG_ASSAULT_AGGR                  +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.ASSAULT_OTHER                 ),hygenics_crim.Constants.CTG_ASSAULT_OTHER                 +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.BRIBERY                       ),hygenics_crim.Constants.CTG_BRIBERY                       +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.BURGLARY_RESIDENTIAL          ),hygenics_crim.Constants.CTG_BURGLARY_BREAKANDENTER_RES    +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.BURGLARY_COMMERCIAL           ),hygenics_crim.Constants.CTG_BURGLARY_BREAKANDENTER_COMM   +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.BURGLARY_MOTOR_VEHICLE        ),hygenics_crim.Constants.CTG_BURGLARY_BREAKANDENTER_VEH    +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.COUNTERFEITING_FORGERY        ),hygenics_crim.Constants.CTG_COUNTERFEITING_FORGERY        +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.DESTRUCTION_DAMAGE_VANDALISM  ),hygenics_crim.Constants.CTG_DESTRUCTION_DAMAGE_VANDALISM  +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.DRUG_NARCOTIC                 ),hygenics_crim.Constants.CTG_DRUG_NARCOTIC                 +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.FRAUD                         ),hygenics_crim.Constants.CTG_FRAUD                         +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.GAMBLING                      ),hygenics_crim.Constants.CTG_GAMBLING                      +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.HOMICIDE                      ),hygenics_crim.Constants.CTG_HOMICIDE                      +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.KIDNAPPING_ABDUCTION          ),hygenics_crim.Constants.CTG_KIDNAPPING_ABDUCTION          +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.THEFT                         ),hygenics_crim.Constants.CTG_THEFT                         +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.SHOPLIFTING                   ),hygenics_crim.Constants.CTG_SHOPLIFTING                   +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.MOTOR_VEHICLE_THEFT           ),hygenics_crim.Constants.CTG_MOTOR_VEHICLE_THEFT           +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.PORNOGRAPHY_OBSCENE_MATERIAL  ),hygenics_crim.Constants.CTG_PORNOGRAPHY                   +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.PROSTITUTION                  ),hygenics_crim.Constants.CTG_PROSTITUTION                  +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.ROBBERY_RESIDENTIAL           ),hygenics_crim.Constants.CTG_ROBBERY_RES                   +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.ROBBERY_COMMERCIAL            ),hygenics_crim.Constants.CTG_ROBBERY_COMM                  +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.SEXOFFENSES_FORCIBLE          ),hygenics_crim.Constants.CTG_SEXOFFENSESFORCIBLE           +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.SEXOFFENSES_NON_FORCIBLE      ),hygenics_crim.Constants.CTG_SEXOFFENSESNON_FORCIBLE       +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.STOLEN_PROPERTY_OFFENSES_FENCE),hygenics_crim.Constants.CTG_STOLEN_PROPERTY_OFFENSES_FENCE+' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.WEAPON_LAW_VIOLATIONS         ),hygenics_crim.Constants.CTG_WEAPON_LAW_VIOLATIONS         +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.IDENTITY_THEFT                ),hygenics_crim.Constants.CTG_IDENTITY_THEFT                +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.COMPUTER_CRIMES               ),hygenics_crim.Constants.CTG_COMPUTER_CRIMES               +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.HUMAN_TRAFFICKING             ),hygenics_crim.Constants.CTG_HUMAN_TRAFFICKING             +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.TERRORIST_THREATS             ),hygenics_crim.Constants.CTG_TERRORIST_THREATS             +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.RESTRAINING_ORDER_VIOLATIONS  ),hygenics_crim.Constants.CTG_RESTRAINING_ORDER_VIOLATIONS  +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.TRAFFIC                       ),hygenics_crim.Constants.CTG_TRAFFIC                       +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.BADCHECKS                     ),hygenics_crim.Constants.CTG_BADCHECKS                     +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.CURFEW_LOITERING_VAGRANCY     ),hygenics_crim.Constants.CTG_CURFEWLOITERINGVAGRANCYVIO    +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.DISORDERLY_CONDUCT            ),hygenics_crim.Constants.CTG_DISORDERLYCONDUCT             +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.DRIVING_UNDER_THE_INFLUENCE   ),hygenics_crim.Constants.CTG_DRIVINGUNDERTHEINFLUENCE      +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.DRUNKENNESS                   ),hygenics_crim.Constants.CTG_DRUNKENNESS                   +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.FAMILY_OFFENSES               ),hygenics_crim.Constants.CTG_FAMILYOFFENSES                +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.LIQUOR_LAW_VIOLATIONS         ),hygenics_crim.Constants.CTG_LIQUORLAWVIOLATIONS           +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.TRESPASS_OF_REALPROPERTY      ),hygenics_crim.Constants.CTG_TRESPASSOFREALPROPERTY        +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.PEEPING_TOM                   ),hygenics_crim.Constants.CTG_PEEPINGTOM                    +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.OTHER                         ),hygenics_crim.Constants.CTG_OTHER                         +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.CANNOT_CLASSIFY               ),hygenics_crim.Constants.CTG_UNCLASSIFIED                  +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.WARRANT_FUGITIVE              ),hygenics_crim.Constants.CTG_WARRANT_FUGITIVE              +' ','')+
+    IF(categoryMatch(bitmap,hygenics_crim.Constants.OBSTRUCT_RESIST               ),hygenics_crim.Constants.CTG_OBSTRUCT_RESIST               +' ','')
+    );
+
+  RETURN TRIM(descriptions);
+END;
 
 
 export is_company(string temp_name) := function 

@@ -74,7 +74,7 @@ SmallBusinessRiskRequest XML:
 </pre>
 */
 
-import iesp, Risk_Indicators;
+import Risk_Indicators;
 
 export SmallBusiness_Batch_Service := MACRO
  #onwarning(4207, ignore);
@@ -92,12 +92,24 @@ export SmallBusiness_Batch_Service := MACRO
 	string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 	string50 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 	
+    //CCPA fields
+    unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+    string TransactionID := '' : STORED('_TransactionId');
+    string BatchUID := '' : STORED('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
 	// add sequence here
 	batch_seq := project( batch_in, transform( LNSmallBusiness.Layouts.Batch_In, self.seq:=counter, 
 																		self.HistoryDateYYYYMM := IF(LEFT.HistoryDateYYYYMM=0, HISTORY_DATE, LEFT.HISTORYDATEYYYYMM);  
 																		self:=left ) );
 	indata := LNSmallBusiness.Helpers.BatchIn2Hierarchical( batch_seq, modelname, glb, dppa );
-	lnsb   := PROJECT(LNSmallBusiness.SmallBusiness_Function( indata, gateways, false, '', DataRestriction, DataPermission ), TRANSFORM(LNSmallBusiness.Layouts.ResponseEx, SELF := LEFT));
+	lnsb   := PROJECT(LNSmallBusiness.SmallBusiness_Function( indata, gateways, false, '', DataRestriction, DataPermission, 
+                                                                                                                  LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                                  TransactionID := TransactionID, 
+                                                                                                                  BatchUID := BatchUID, 
+                                                                                                                  GlobalCompanyID := GlobalCompanyID), 
+                  TRANSFORM(LNSmallBusiness.Layouts.ResponseEx, SELF := LEFT));
+                  
 	batch_out := LNSmallBusiness.Helpers.HierarchicalOut2Testseed( lnsb );
 
 

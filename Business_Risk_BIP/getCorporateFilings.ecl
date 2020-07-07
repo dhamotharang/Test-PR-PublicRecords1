@@ -1,9 +1,10 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, Corp2, EBR, MDR, Risk_Indicators, UT, riskwise;
+﻿IMPORT BIPV2, Business_Risk_BIP, Corp2, EBR, MDR, Risk_Indicators, UT, riskwise, Doxie, STD;
 
 EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
+											 SET OF STRING2 AllowedSourcesSet,
+											 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 	STRING1 CURRENT := 'C';
 	STRING1 HISTORY := 'H';
@@ -15,7 +16,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	
 	// NOTE: owner_type_code--One of the following descriptions will be listed: 0 = Unknown; 1 = Public; 2 = Private; 3 = Foreign; 4 = Non-Profit
 
-	EBRRaw := EBR.Key_5600_Demographic_Data_linkids.kFetch2(LinkIDs, ,
+	EBRRaw := EBR.Key_5600_Demographic_Data_linkids.kFetch2(LinkIDs, mod_access,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, // ScoreThreshold --> 0 = Give me everything
 																							linkingOptions,
@@ -27,12 +28,23 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	
 	// Filter out records after our history date.
 	EBR_recs := Business_Risk_BIP.Common.FilterRecords(EBRSeq, date_first_seen, (UNSIGNED)Business_Risk_BIP.Constants.MissingDate, MDR.SourceTools.src_EBR, AllowedSourcesSet);
-	
+
+  EBR_recs_temp := 
+    PROJECT( 
+      EBR_recs, 
+      TRANSFORM( {RECORDOF(EBR_recs), STRING EverPublic}, 
+        SELF.EverPublic := LEFT.owner_type_code, 
+        SELF := LEFT, 
+        SELF := [] 
+      ) 
+    );
+  
 	EBR_recs_rollup :=
 		ROLLUP(
-			SORT(	EBR_recs, seq, UltID, OrgID, SeleID, ProxID, -(record_type = CURRENT), -process_date ),
-			TRANSFORM( RECORDOF(EBR_recs),
+			SORT(	EBR_recs_temp, seq, UltID, OrgID, SeleID, ProxID, -(record_type = CURRENT), -process_date ),
+			TRANSFORM( {RECORDOF(EBR_recs), STRING EverPublic},
 				SELF.owner_type_code := IF( LEFT.owner_type_code != '', LEFT.owner_type_code, RIGHT.owner_type_code ),
+        SELF.EverPublic := IF( LEFT.EverPublic = '1', LEFT.EverPublic, RIGHT.EverPublic ),
 				SELF := LEFT
 			),
 			seq, UltID, OrgID, SeleID, ProxID
@@ -83,6 +95,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		BOOLEAN everDefunct       := FALSE;
 		BOOLEAN CurrDefunct       := FALSE;
 		BOOLEAN PrivateOwnership  := FALSE;
+    BOOLEAN EverNonProfit     := FALSE;
 		DATASET({STRING TypeDesc}) OrigBus;
 		DATASET({STRING Term}) TermExist;
 		DATASET({STRING Standing}) SOSStandingBest;    
@@ -102,8 +115,8 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	fn_getSOSStanding(STRING record_type, STRING corp_status_cd, STRING corp_status_desc) := 
     MAP(
       Business_Risk_BIP.Common.is_ActiveCorp(record_type, corp_status_cd, corp_status_desc)    => '3',
-      StringLib.StringFind(StringLib.StringToUpperCase(corp_status_desc), 'INACTIVE', 1) <> 0  => '2',
-      StringLib.StringFind(StringLib.StringToUpperCase(corp_status_desc), 'DISSOLVED', 1) <> 0 => '1',
+      STD.Str.Find(STD.Str.ToUpperCase(corp_status_desc), 'INACTIVE', 1) <> 0  => '2',
+      STD.Str.Find(STD.Str.ToUpperCase(corp_status_desc), 'DISSOLVED', 1) <> 0 => '1',
       '0');
 
 	CorpFilingsCleaned := PROJECT(CorpFilings_Recs_Filt, TRANSFORM(layout_corpfilings_inflated,
@@ -111,22 +124,23 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			SELF.temp_corp_inc_date := IF( LEFT.corp_inc_date = '', '99999999', LEFT.corp_inc_date ),
 			SELF.temp_corp_forgn_date := IF( LEFT.corp_forgn_date = '', '99999999', LEFT.corp_forgn_date ),
 			SELF.SOSStanding := SOSStanding,			
-			SELF.CurrDefunct := IF(StringLib.StringToUpperCase(LEFT.corp_status_desc) IN ['FORFEITED','TERMINATED','DISSOLVED'] and left.record_type = CURRENT, true, false);
-			SELF.everDefunct := IF(StringLib.StringToUpperCase(LEFT.corp_status_desc) IN ['FORFEITED','TERMINATED','DISSOLVED'], true, false);
+			SELF.CurrDefunct := IF(STD.Str.ToUpperCase(LEFT.corp_status_desc) IN ['FORFEITED','TERMINATED','DISSOLVED'] and left.record_type = CURRENT, true, false);
+			SELF.everDefunct := IF(STD.Str.ToUpperCase(LEFT.corp_status_desc) IN ['FORFEITED','TERMINATED','DISSOLVED'], true, false);
 			SELF.PrivateOwnership := IF(TRIM(LEFT.corp_for_profit_ind) = 'Y', TRUE, FALSE);
-			SELF.OrigBus := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(StringLib.StringToUpperCase(IF(TRIM(LEFT.corp_orig_bus_type_desc, LEFT, RIGHT) = '', LEFT.corp_entity_desc[1..20], LEFT.corp_orig_bus_type_desc[1..20])))}], {STRING TypeDesc});
-			SELF.TermExist := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(StringLib.StringToUpperCase(TRIM(LEFT.corp_term_exist_cd, LEFT, RIGHT)))}], {STRING Term});
+      SELF.EverNonProfit := TRIM(LEFT.corp_for_profit_ind) = 'N',
+			SELF.OrigBus := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(IF(TRIM(LEFT.corp_orig_bus_type_desc, LEFT, RIGHT) = '', LEFT.corp_entity_desc[1..20], LEFT.corp_orig_bus_type_desc[1..20])))}], {STRING TypeDesc});
+			SELF.TermExist := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(TRIM(LEFT.corp_term_exist_cd, LEFT, RIGHT)))}], {STRING Term});
 			SELF.SOSStandingBest := DATASET([{SOSStanding}], {STRING Standing}),
 			SELF.SOSStandingWorst := DATASET([{SOSStanding}], {STRING Standing}),
 			SELF.Filings := DATASET([{Business_Risk_BIP.Common.checkInvalidDate(LEFT.corp_filing_date, Business_Risk_BIP.Constants.MissingDate, LEFT.HistoryDate),
-																Business_Risk_BIP.Common.filterOutSpecialChars(StringLib.StringToUpperCase(TRIM(LEFT.corp_filing_cd, LEFT, RIGHT))),
+																Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(TRIM(LEFT.corp_filing_cd, LEFT, RIGHT))),
 																LEFT.corp_foreign_domestic_ind}], {STRING FilingDate, STRING FilingCD, STRING ForgnDomstcInd});
 			SELF.FilingStatus := DATASET(
       [
         {
           Business_Risk_BIP.Common.checkInvalidDate(LEFT.corp_status_date, Business_Risk_BIP.Constants.MissingDate, LEFT.HistoryDate),
           LEFT.corp_status_cd,
-          Business_Risk_BIP.Common.filterOutSpecialChars( StringLib.StringToUpperCase(TRIM(LEFT.corp_status_desc, LEFT, RIGHT)) ),
+          Business_Risk_BIP.Common.filterOutSpecialChars( STD.Str.ToUpperCase(TRIM(LEFT.corp_status_desc, LEFT, RIGHT)) ),
           LEFT.record_type
         }
       ], 
@@ -137,25 +151,25 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 			SELF.Incorporation := 
       DATASET(
-        [ { incDate, Business_Risk_BIP.Common.filterOutSpecialChars(StringLib.StringToUpperCase(TRIM(LEFT.corp_inc_state, LEFT, RIGHT)))} ], 
+        [ { incDate, Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(TRIM(LEFT.corp_inc_state, LEFT, RIGHT)))} ], 
         {STRING IncDate, STRING IncState} );
 
 			ForgnIncDate := Business_Risk_BIP.Common.checkInvalidDate(LEFT.corp_forgn_date, Business_Risk_BIP.Constants.MissingDate, LEFT.HistoryDate);
 
 			SELF.ForgnIncorporation := 
       DATASET(
-        [ { ForgnIncDate, Business_Risk_BIP.Common.filterOutSpecialChars(StringLib.StringToUpperCase(TRIM(LEFT.corp_forgn_state_cd, LEFT, RIGHT)))} ], 
+        [ { ForgnIncDate, Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(TRIM(LEFT.corp_forgn_state_cd, LEFT, RIGHT)))} ], 
         {STRING IncDate, STRING IncState} );
 
 			registeredAgentChanged := (INTEGER)LEFT.corp_ra_effective_date > 0 OR // We have a registered agent effective date or a registered agent name
 																TRIM(LEFT.Corp_RA_Name) <> '';
-			SELF.RegAgentChanges := IF(registeredAgentChanged, DATASET([{StringLib.StringToUpperCase(TRIM(LEFT.Corp_RA_Name, LEFT, RIGHT)), Business_Risk_BIP.Common.checkInvalidDate(LEFT.corp_ra_effective_date, Business_Risk_BIP.Constants.MissingDate, LEFT.HistoryDate), '1'}], {STRING AgentName, STRING AgentChangeDate, STRING AgentChanged}),
+			SELF.RegAgentChanges := IF(registeredAgentChanged, DATASET([{STD.Str.ToUpperCase(TRIM(LEFT.Corp_RA_Name, LEFT, RIGHT)), Business_Risk_BIP.Common.checkInvalidDate(LEFT.corp_ra_effective_date, Business_Risk_BIP.Constants.MissingDate, LEFT.HistoryDate), '1'}], {STRING AgentName, STRING AgentChangeDate, STRING AgentChanged}),
 																												 DATASET([{'', Business_Risk_BIP.Constants.MissingDate, '0'}], {STRING AgentName, STRING AgentChangeDate, STRING AgentChanged}));
 			SELF.Amendments := DATASET([{(INTEGER)LEFT.corp_amendments_filed}], {INTEGER Amendment});
-			SELF.OrigSOS := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(StringLib.StringToUpperCase(TRIM(LEFT.corp_orig_sos_charter_nbr, LEFT, RIGHT)))}], {STRING CharterNBR});
-			SELF.OrigOrg := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(StringLib.StringToUpperCase(StringLib.StringFilterOut(TRIM(LEFT.corp_orig_org_structure_desc, LEFT, RIGHT), '\n')))}], {STRING StructureDesc});
-			SELF.ForeignState := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(StringLib.StringToUpperCase(TRIM(LEFT.corp_forgn_state_cd, LEFT, RIGHT)))}], {STRING StateCD});
-			SELF.Address1 := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(StringLib.StringToUpperCase(TRIM(LEFT.corp_address1_type_desc, LEFT, RIGHT)))}], {STRING TypeDesc});
+			SELF.OrigSOS := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(TRIM(LEFT.corp_orig_sos_charter_nbr, LEFT, RIGHT)))}], {STRING CharterNBR});
+			SELF.OrigOrg := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(STD.Str.FilterOut(TRIM(LEFT.corp_orig_org_structure_desc, LEFT, RIGHT), '\n')))}], {STRING StructureDesc});
+			SELF.ForeignState := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(TRIM(LEFT.corp_forgn_state_cd, LEFT, RIGHT)))}], {STRING StateCD});
+			SELF.Address1 := DATASET([{Business_Risk_BIP.Common.filterOutSpecialChars(STD.Str.ToUpperCase(TRIM(LEFT.corp_address1_type_desc, LEFT, RIGHT)))}], {STRING TypeDesc});
 			SELF := LEFT));
 	
 	// Sort to the top the most recent, Current, Legal record for each corp_key. Among these, 
@@ -187,6 +201,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			SELF.everDefunct := LEFT.everDefunct OR RIGHT.everDefunct;
 			SELF.CurrDefunct := LEFT.CurrDefunct OR RIGHT.CurrDefunct;
 			SELF.PrivateOwnership := LEFT.PrivateOwnership OR RIGHT.PrivateOwnership;
+      SELF.EverNonProfit := LEFT.EverNonProfit OR RIGHT.EverNonProfit;
 			SELF.OrigBus := LEFT.OrigBus + RIGHT.OrigBus;
 			SELF.TermExist := LEFT.TermExist + RIGHT.TermExist;
 			SELF.Filings := LEFT.Filings + RIGHT.Filings;
@@ -228,6 +243,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			SELF.everDefunct := LEFT.everDefunct OR RIGHT.everDefunct;
 			SELF.CurrDefunct := LEFT.CurrDefunct OR RIGHT.CurrDefunct;
 			SELF.PrivateOwnership := LEFT.PrivateOwnership OR RIGHT.PrivateOwnership;
+      SELF.EverNonProfit := LEFT.EverNonProfit OR RIGHT.EverNonProfit;
 			SELF.OrigBus := LEFT.OrigBus + RIGHT.OrigBus;
 			SELF.TermExist := LEFT.TermExist + RIGHT.TermExist;
 			SELF.SOSStandingBest := LEFT.SOSStandingBest + RIGHT.SOSStandingBest; // (STRING)MAX((INTEGER)LEFT.SOSStandingBest, (INTEGER)RIGHT.SOSStandingBest);
@@ -247,6 +263,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// Add ownership_type to the Shell
 	withOwnership := JOIN(Shell, EBR_recs_rollup, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 				SELF.SOS.SOSOwnershipTypeList := IF(RIGHT.owner_type_code = '', UNKNOWN, RIGHT.owner_type_code);
+        SELF.Firmographic.FirmPublicFlag := IF(RIGHT.EverPublic = '1', '1', '0');
 				SELF := LEFT
 			),
 			LEFT OUTER, KEEP(1), ATMOST(100), FEW);
@@ -315,6 +332,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				SELF.SOS.SOSRegisterAgentChangeCount06Month := IF(SOSRecExists, (STRING)Business_Risk_BIP.Common.CapNum(COUNT(regAgent06Month), -1, 999), '-1');
 				SELF.SOS.SOSRegisterAgentChangeCount03Month := IF(SOSRecExists, (STRING)Business_Risk_BIP.Common.CapNum(COUNT(regAgent03Month), -1, 999), '-1');
 				SELF.Firmographic.OwnershipType := IF(RIGHT.PrivateOwnership, '2', '0');
+        SELF.Firmographic.FirmNonProfitFlag := IF(RIGHT.EverNonProfit, '1', '0');
 				SELF := LEFT;
     SELF := [];
 			),
@@ -354,7 +372,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
                 SELF.recordtype := RIGHT.recordtype;
                 SELF.incdate := LEFT.incdate;
                 SELF.incstate := LEFT.incstate;
-                ), ATMOST(riskwise.max_atmost));
+                ), LEFT OUTER, ATMOST(riskwise.max_atmost));
                 
 				newestIncorporation := PROJECT(TOPN(Joined_Incorp_FilingStatus_Domestic, 1, StatusCD, -IncDate), TRANSFORM(RECORDOF(ds_Incorporation_Seq), SELF := LEFT));
 				oldestIncorporation := PROJECT(TOPN(Joined_Incorp_FilingStatus_Domestic, 1, StatusCD, IncDate), TRANSFORM(RECORDOF(ds_Incorporation_Seq), SELF := LEFT));
@@ -419,6 +437,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				SELF.SOS.SOSRegisterAgentChangeCount06Month := IF(SOSRecExists, (STRING)Business_Risk_BIP.Common.CapNum(COUNT(regAgent06Month), -1, 999), '-1');
 				SELF.SOS.SOSRegisterAgentChangeCount03Month := IF(SOSRecExists, (STRING)Business_Risk_BIP.Common.CapNum(COUNT(regAgent03Month), -1, 999), '-1');
 				SELF.Firmographic.OwnershipType := IF(RIGHT.PrivateOwnership, '2', '0');
+        SELF.Firmographic.FirmNonProfitFlag := IF(RIGHT.EverNonProfit, '1', '0');
 				SELF := LEFT;
     SELF := [];
 			),
@@ -538,6 +557,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				SELF.SOS.SOSRegisterAgentChangeCount06Month  := IF(SOSRecExists, (STRING)Business_Risk_BIP.Common.CapNum(COUNT(regAgent06Month), -1, 999), '-1');
 				SELF.SOS.SOSRegisterAgentChangeCount03Month  := IF(SOSRecExists, (STRING)Business_Risk_BIP.Common.CapNum(COUNT(regAgent03Month), -1, 999), '-1');
 				SELF.Firmographic.OwnershipType              := IF(RIGHT.PrivateOwnership, '2', '0');
+        SELF.Firmographic.FirmNonProfitFlag := IF(RIGHT.EverNonProfit, '1', '0');
 				SELF := LEFT;
 				SELF := [];
 			),
@@ -547,35 +567,87 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
  withCorpFilingsData_NonBIID20 := IF( Options.BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, withCorpFilingsData_Old, withCorpFilingsData_New );
  withCorpFilingsData := IF( Options.BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30 AND Options.IsBIID20 = TRUE, withCorpFilingsData_BIID20, withCorpFilingsData_NonBIID20);
  
- 
-	withErrorCodes := JOIN(withCorpFilingsData, kFetchErrorCodes, LEFT.Seq = RIGHT.Seq,
+  // Get all unique NAIC Codes along with dates. For this data source, we only need the primary code.
+	tempLayout := RECORD
+		UNSIGNED4 Seq;
+		DATASET(Business_Risk_BIP.Layouts.LayoutSICNAIC) SICNAICSources;
+	END;
+  
+  CorpFilingsNAIC := TABLE(CorpFilings_withSrcCode,
+    {
+      Seq,
+      LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
+      STRING2 Source := corp_src_type, // obtained from call to MDR.sourceTools function, above
+      STRING6 DateFirstSeen := Business_Risk_BIP.Common.groupMinDate6(dt_first_seen, HistoryDate),
+      STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate),
+      UNSIGNED4 RecordCount := COUNT(GROUP),
+      STRING10 NAICCode := (STD.Str.Filter((STRING)corp_naic_code, '0123456789'))[1..6],
+      BOOLEAN IsPrimary := TRUE
+    },
+    Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID), ((STRING)corp_naic_code)[1..6]
+  );
+
+  CorpFilingsNAICTemp := 
+    PROJECT(
+      CorpFilingsNAIC, 
+      TRANSFORM(tempLayout,
+        SELF.Seq := LEFT.Seq;
+        SELF.SICNAICSources := DATASET([{LEFT.Source, IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), LEFT.DateLastSeen, LEFT.RecordCount, '' /*SICCode*/, '' /*SICIndustry*/, LEFT.NAICCode, Business_Risk_BIP.Common.industryGroup(LEFT.NAICCode, Business_Risk_BIP.Constants.NAIC), LEFT.IsPrimary}], Business_Risk_BIP.Layouts.LayoutSICNAIC);
+        SELF := []
+      )
+    );
+
+  CorpFilingsNAICRolled := 
+    ROLLUP(
+      CorpFilingsNAICTemp, 
+      LEFT.Seq = RIGHT.Seq, 
+      TRANSFORM( tempLayout, 
+        SELF.Seq := LEFT.Seq; 
+        SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources; 
+        SELF := LEFT
+      )
+    );
+
+  withCorpFilingsNAIC := 
+    JOIN(withCorpFilingsData, CorpFilingsNAICRolled, 
+      LEFT.Seq = RIGHT.Seq,
+      TRANSFORM( Business_Risk_BIP.Layouts.Shell,
+        SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
+        SELF := LEFT
+      ),
+      LEFT OUTER, KEEP(1), ATMOST(100), FEW
+    );
+    
+	withErrorCodes := JOIN(withCorpFilingsNAIC, kFetchErrorCodes, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Data_Fetch_Indicators.FetchCodeCorporateFilings := (STRING)RIGHT.Fetch_Error_Code;
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
 
-	// *********************
-	//   DEBUGGING OUTPUTS
-	// *********************
-	// OUTPUT( Shell, NAMED('Shell') );
-	// OUTPUT( LinkIDs, NAMED('LinkIDs') );
-	// OUTPUT( EBR_recs, NAMED('EBR_recs') );
-	// OUTPUT( EBR_recs_rollup, NAMED('EBR_recs_rollup') );
-	// OUTPUT( CorpFilings_raw, NAMED('CorpFilings_raw') );
-	// OUTPUT( CorpFilings_seq, NAMED('CorpFilings_seq') );
-    // OUTPUT( CorpFilings_withSrcCode, NAMED('CorpFilings_withSrcCode') );
-	// OUTPUT( CorpFilings_recs, NAMED('CorpFilings_recs') );
-	// OUTPUT( CorpFilings_recs_filt, NAMED('CorpFilings_recs_filt'), ALL );
-	// OUTPUT( CorpFilingsCleaned, NAMED('CorpFilingsCleaned') );
-	// OUTPUT( CorpFilings_recs_srtd, NAMED('CorpFilings_recs_srtd'), ALL );
-	// OUTPUT( CorpFilingsRolled1, NAMED('CorpFilingsRolled1'));
-	// OUTPUT( CorpFilingsRolledClean, NAMED('CorpFilingsRolledClean') );
-	// OUTPUT( CorpFilingsRolled, NAMED('CorpFilingsRolled') );
-    // OUTPUT(Options.BusShellVersion, named('Options_BusShellVersion'));
-    // OUTPUT(Business_Risk_BIP.Constants.BusShellVersion_v30, named('Business_Risk_BIP_Constants_BusShellVersion'));
-	// OUTPUT( withCorpFilingsData_Old, NAMED('withCorpFilingsData_Old') );
-	// OUTPUT( withCorpFilingsData_New, NAMED('withCorpFilingsData_New') );
-	// OUTPUT( withCorpFilingsData, NAMED('withCorpFilingsData') );
+  // *********************
+  //   DEBUGGING OUTPUTS
+  // *********************
+  // OUTPUT( Shell, NAMED('Shell') );
+  // OUTPUT( LinkIDs, NAMED('LinkIDs') );
+  // OUTPUT( EBR_recs, NAMED('EBR_recs') );
+  // OUTPUT( EBR_recs_rollup, NAMED('EBR_recs_rollup') );
+  // OUTPUT( CorpFilings_raw, NAMED('CorpFilings_raw') );
+  // OUTPUT( CorpFilings_seq, NAMED('CorpFilings_seq') );
+  // OUTPUT( CorpFilings_withSrcCode, NAMED('CorpFilings_withSrcCode') );
+  // OUTPUT( CorpFilings_recs, NAMED('CorpFilings_recs') );
+  // OUTPUT( CorpFilings_recs_filt, NAMED('CorpFilings_recs_filt'), ALL );
+  // OUTPUT( CorpFilingsCleaned, NAMED('CorpFilingsCleaned') );
+  // OUTPUT( CorpFilings_recs_srtd, NAMED('CorpFilings_recs_srtd'), ALL );
+  // OUTPUT( CorpFilingsRolled1, NAMED('CorpFilingsRolled1'));
+  // OUTPUT( CorpFilingsRolledClean, NAMED('CorpFilingsRolledClean') );
+  // OUTPUT( CorpFilingsRolled, NAMED('CorpFilingsRolled') );
+  // OUTPUT(Options.BusShellVersion, named('Options_BusShellVersion'));
+  // OUTPUT(Business_Risk_BIP.Constants.BusShellVersion_v30, named('Business_Risk_BIP_Constants_BusShellVersion'));
+  // OUTPUT( withOwnership, NAMED('withOwnership') );
+  // OUTPUT( withCorpFilingsData_Old, NAMED('withCorpFilingsData_Old') );
+  // OUTPUT( withCorpFilingsData_New, NAMED('withCorpFilingsData_New') );
+  // OUTPUT( withCorpFilingsData_BIID20, NAMED('withCorpFilingsData_BIID20') );
+  // OUTPUT( withCorpFilingsData, NAMED('withCorpFilingsData') );
 
 	RETURN withErrorCodes;
 END;

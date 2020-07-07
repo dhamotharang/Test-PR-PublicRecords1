@@ -1,10 +1,17 @@
-﻿IMPORT BIPV2, Business_Credit_Scoring, BusinessCredit_Services, iesp, LNSmallBusiness, Risk_Indicators, std;
+﻿IMPORT $, AutoKeyI, BIPV2, Business_Credit_Scoring, BusinessCredit_Services, iesp, LNSmallBusiness, Risk_Indicators, std;
 
 EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IParams SmallBizCombined_inmod ) := 
   FUNCTION
     set_modelsRequested := SET(SmallBizCombined_inmod.ModelsRequested, ModelName); 
     
  		 isBIPIDSearch := SmallBizCombined_inmod.ds_SBA_Input[1].UltID != 0 OR SmallBizCombined_inmod.ds_SBA_Input[1].OrgID != 0 OR SmallBizCombined_inmod.ds_SBA_Input[1].SeleID != 0;
+     
+     // we disable the use of SBFE data if the request type is one of the LN-only variants
+     disallowSBFE := SmallBizCombined_inmod.BusinessCreditReportType IN LNSmallBusiness.Constants.LNOnlyCreditSet;
+
+     // check to see if we are fetching Cortera trade results
+     use_b2b_results := SmallBizCombined_inmod.BusinessCreditReportType = LNSmallBusiness.Constants.LNOnlyB2BCombinedCreditReport;
+
    /* ************************************************************************
 	  *         Get the Small Business Attributes and Scores Results           *
 	  ************************************************************************ */
@@ -51,6 +58,7 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
 
     I believe we can simplify the MAP( ) statement somewhat based on these rules; for the near term though, I’ll focus on getting the MAP( ) statement to play nice with the new models Alek has been working on.
 */
+
     
     ds_CombinedModelsRequested := 
       MAP( 
@@ -186,8 +194,12 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
                                                  SmallBizCombined_inmod.DisableIntermediateShellLogging,
                                                  SmallBizCombined_inmod.IncludeTargusGateway,
                                                  SmallBizCombined_inmod.RunTargusGateway, /* for testing purposes only */
-                                                 BusinessCredit_Services.Constants.BIPID_WEIGHT_THRESHOLD
-																								 );
+                                                 BusinessCredit_Services.Constants.BIPID_WEIGHT_THRESHOLD, 
+                                                 DisableSBFE := disallowSBFE,
+												 LexIdSourceOptout := SmallBizCombined_inmod.in_LexIdSourceOptout, 
+                                                 TransactionID := SmallBizCombined_inmod.in_TransactionID, 
+                                                 BatchUID := SmallBizCombined_inmod.in_BatchUID, 
+                                                 GlobalCompanyID := SmallBizCombined_inmod.in_GlobalCompanyID);
 
 
 	  SBA_Results_Temp := 
@@ -195,7 +207,7 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
               LNSmallBusiness.BIP_Layouts.IntermediateLayout );
               
 	  SBA_Results := 
-      IF(SmallBizCombined_inmod.TestDataEnabled = FALSE, 
+      IF(~SmallBizCombined_inmod.TestDataEnabled, 
          SBA_Results_Temp,
          LNSmallBusiness.SmallBusiness_BIP_Testseed_Function(SmallBizCombined_inmod.ds_SBA_Input,
                                                              (STRING32)SmallBizCombined_inmod.TestDataTableName,
@@ -222,8 +234,8 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
       LNSmallBusiness.SmallBusiness_intoIESP_layouts.fn_SmallBiz_intoESDL(SBA_Results,
                                                                           SmallBizCombined_inmod.AttributesRequested,
                                                                           LNSmallBizModelsType,
-																																																																										ds_NewModels
-																																					);
+                                                                          ds_NewModels
+                                                                          );
     
 		isGoodHit := SBA_Results[1].MatchWeight >= BusinessCredit_Services.Constants.BIPID_WEIGHT_THRESHOLD;
 		
@@ -251,11 +263,11 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
 				// in order to keep boolean true and have backward compability this SmallBizCombined_inmod.BusinessCreditReportType needs to be set
 				// to the option of '1'  by default in the top level service ( LNSmallBusiness.SmallBusiness_BIP_Combined_Service)
 				// which is the value of BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport if nothing or '1'  is passed in.
-				// in the future when a '2' is passed for BusinessCreditReportType meaning LnOnly Credit then this will ensure that Include_businessCredit
+				// in the future when a '2' or '3' is passed for BusinessCreditReportType meaning LnOnly Credit then this will ensure that Include_businessCredit
 				// is false meaning no SBFE data in that particular version of the report.
 	   EXPORT BOOLEAN   Include_BusinessCredit :=   SmallBizCombined_inmod.BusinessCreditReportType = 
 		                                                                                         BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport; 
-																																																														 		                                                                                        		                                                                                                  		                                                                                     
+
 	 EXPORT BOOLEAN  LimitPaymentHistory24Months  :=  SmallBizCombined_inmod. LimitPaymentHistory24Months; // small bus Credit Report w SBFE addition
 	  EXPORT STRING     SBFEContributorIds  := SmallBizCombined_inmod.SBFEContributorIds; // small bus Credit Report w SBFE addition
 	  EXPORT STRING1 BusinessCreditReportType :=  SmallBizCombined_inmod.BusinessCreditReportType;  // use input iparam for requirement 1.3.3 
@@ -289,16 +301,41 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
 				EXPORT BOOLEAN   UseInputDataAsIs       := SmallBizCombined_inmod.UseInputDataAsIs;
       END;
 
-    ds_BizCredRecord_results	:= IF(SmallBizCombined_inmod.IncludeCreditReport, 
-                                    BusinessCredit_Services.CreditReport_Records(CreditReportInput_mod),
-                                    DATASET([], iesp.businesscreditreport.t_BusinessCreditReportRecord));
+    iesp.businesscreditreport.t_BusinessCreditReportRecord bizCred_null_trans() := TRANSFORM
+      SELF := [];
+    END;
+
+    ds_BizCredRecord_raw	:= IF(SmallBizCombined_inmod.IncludeCreditReport, 
+                                BusinessCredit_Services.CreditReport_Records(CreditReportInput_mod),
+                                DATASET([bizCred_null_trans()]));
+
+    ds_BizCredRecord_results := PROJECT(ds_BizCredRecord_raw, 
+      TRANSFORM(iesp.smallbusinessbipcombinedreport.t_CombinedSmallBusinessCreditReportRecord, 
+        SELF := LEFT, 
+        SELF := []));
+
+    // -----------------------------------------------------------------------------------------
+    // ----------------------------- LN-Only (Cortera) B2B Trade Data --------------------------
+    // -----------------------------------------------------------------------------------------
+    ds_b2bTrade_LNResults := LNSmallBusiness.LN_Tradeline_Functions(ds_BizLinkIds).compose_b2b_trade_data();
+   ds_b2bTrade_TestSeedResults := LNSmallBusiness.getCorteraTestSeedData(SmallBizCombined_inmod.ds_SBA_Input,
+                                                                         (STRING20)SmallBizCombined_inmod.TestDataTableName);
+    ds_b2bTrade_results_nohit := 
+      LNSmallBusiness.LN_Tradeline_Functions(ds_BizLinkIds).compose_b2b_trade_data_nohit(
+        (string)AutoKeyI.errorcodes._codes.INSUFFICIENT_INPUT, 
+        AutoKeyI.errorcodes._msgs(AutoKeyI.errorcodes._codes.INSUFFICIENT_INPUT)
+      );
+   
+    ds_b2bTrade_results := IF(SmallBizCombined_inmod.TestDataEnabled,
+                              ds_b2bTrade_TestSeedResults, 
+                              ds_b2bTrade_LNResults);
 
    /* ****************************************************************************
     *        Business Credit Report: get historical scores using index           *
     ******************************************************************************/ 	
 
-     set_ScoreTypeFilter := BusinessCredit_Services.Functions.fn_set_ScoreTypeFilter( CreditReportModelsType ) +
-ds_newModels;
+    set_ScoreTypeFilter := BusinessCredit_Services.Functions.fn_set_ScoreTypeFilter( CreditReportModelsType ) +
+      ds_newModels;
 
 	  ds_HistoricalCreditScoringRecs := 
       Business_Credit_Scoring.Key_ScoringIndex().kFetch2(ds_BizLinkIds,
@@ -306,7 +343,7 @@ ds_newModels;
                                                          SmallBizCombined_inmod.DataPermissionMask, 
                                                          BusinessCredit_Services.Constants.JOIN_LIMIT);
                                                          
-    ds_hist_scores		:= 
+    ds_hist_scores_tmp		:= 
       CHOOSEN(PROJECT(ds_HistoricalCreditScoringRecs, 
                       TRANSFORM(iesp.businesscreditreport.t_BusinessCreditScoring,
                         SELF.DateScored 									:= iesp.ECL2ESP.toDatestring8(LEFT.version),
@@ -331,10 +368,16 @@ ds_newModels;
                                                                       )), iesp.constants.BusinessCredit.MaxScores);
                     )), BusinessCredit_Services.Constants.Max_Historical_Scores);
 
+    // do not return historical scores for SBFE-restricted queries
+    ds_hist_scores := IF(disallowSBFE, 
+      DATASET([], iesp.businesscreditreport.t_BusinessCreditScoring),
+      ds_hist_scores_tmp
+    );
+
    /* *****************************************************************************************
     * Business Credit Report: get Current scores for Credit Report from LNSmallBizAna results *
     *******************************************************************************************/ 	
-
+ 
     ds_model_results	          := NORMALIZE(SBA_Results, LEFT.ModelResults, TRANSFORM(RIGHT));
 	   ds_modelScores_res_filtered := ds_model_results( Name IN set_ScoreTypeFilter );
 
@@ -347,7 +390,7 @@ ds_newModels;
                                      BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED, 
                                      BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED, 
                                      BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL => BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT, 
- ''
+                                     ''
                                     );
         SELF.MinScoreRange 	:=	(UNSIGNED2)BusinessCredit_Services.Constants.MIN_SCORE_RANGE;
         SELF.MaxScoreRange 	:=	(UNSIGNED2)BusinessCredit_Services.Constants.MAX_SCORE_RANGE;
@@ -380,7 +423,7 @@ ds_newModels;
                                      BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,  
                                      BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,  
                                      BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL => BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT,  
-	''
+                                     ''
                                     );
         SELF.MinScoreRange 	:=	(UNSIGNED2)BusinessCredit_Services.Constants.MIN_SCORE_RANGE;
         SELF.MaxScoreRange 	:=	(UNSIGNED2)BusinessCredit_Services.Constants.MAX_SCORE_RANGE;
@@ -399,7 +442,10 @@ ds_newModels;
     _curr_Scores_good_hit	:= PROJECT(ds_modelScores_res_filtered , xfm_current_scores(LEFT));
 		_curr_Scores_no_hit   := PROJECT(ds_modelScores_res_filtered , xfm_current_scores_no_hit(LEFT));
 		
-		_curr_Scores := IF( isGoodHit OR SmallBizCombined_inmod.TestDataEnabled, _curr_Scores_good_hit, _curr_Scores_no_hit );
+		_curr_Scores := IF( isGoodHit OR SmallBizCombined_inmod.TestDataEnabled, 
+      _curr_Scores_good_hit, 
+      _curr_Scores_no_hit
+    );
 		
     iesp.businesscreditreport.t_BusinessCreditScoring xfm_CurrScores_toIESP_Layout() := 
       TRANSFORM
@@ -415,7 +461,7 @@ ds_newModels;
     *  Business Credit Report: get historical scores using index       *
     ******************************************************************************/ 	
 	
-    ds_CreditReportCurAndHistScores := SORT( ds_curr_Scores +  ds_hist_scores, -(CurrentPriorFlag = LNSmallBusiness.Constants.CURRENT_FLAG), -DateScored);
+    ds_CreditReportCurAndHistScores := SORT(ds_curr_Scores + ds_hist_scores, -(CurrentPriorFlag = LNSmallBusiness.Constants.CURRENT_FLAG), -DateScored);
   
   	ds_Phone_Sources := NORMALIZE(SBA_Results_Temp_with_PhoneSources, LEFT.PhoneSources, TRANSFORM(RIGHT));
 	  ds_CreditReportPhoneSources := 
@@ -428,16 +474,19 @@ ds_newModels;
     // Add LN Small Biz Scores  and LN Small Biz phone sources to Credit Report Records 
     ds_Final_CreditReportRecords := 
       PROJECT(ds_bizCredRecord_results,
-              TRANSFORM(iesp.businesscreditreport.t_BusinessCreditReportRecord,
-                        SELF.Scorings     := choosen(ds_CreditReportCurAndHistScores, iesp.constants.BusinessCredit.MaxSection); //IF(CreditReportInput_mod.TestDataEnabled, LEFT.Scorings, ds_CreditReportCurAndHistScores),   
-                        SELF.PhoneSources	:= choosen(ds_CreditReportPhoneSources, iesp.constants.BusinessCredit.MaxSection);
-                        SELF              := LEFT
-              ));
+        TRANSFORM(iesp.smallbusinessbipcombinedreport.t_CombinedSmallBusinessCreditReportRecord,
+          SELF.Scorings := CHOOSEN(ds_CreditReportCurAndHistScores, iesp.constants.BusinessCredit.MaxSection),
+          SELF.PhoneSources	:= CHOOSEN(ds_CreditReportPhoneSources, iesp.constants.BusinessCredit.MaxSection),
+          SELF.B2BTradeData := IF(use_b2b_results, ds_b2bTrade_results[1]),
+          SELF := LEFT,
+          SELF := []
+      ));
 
     ds_Final_CreditReportRecords_NoHit := 
       PROJECT(ds_bizCredRecord_results,
-              TRANSFORM(iesp.businesscreditreport.t_BusinessCreditReportRecord,
+              TRANSFORM(iesp.smallbusinessbipcombinedreport.t_CombinedSmallBusinessCreditReportRecord,
                         SELF.Scorings := ds_curr_Scores, // Omit historical Scores; current Scores indicate a no-hit.
+                        SELF.B2BTradeData := if(use_b2b_results, ds_b2bTrade_results_nohit[1]), 
                         SELF := []
               ));
 

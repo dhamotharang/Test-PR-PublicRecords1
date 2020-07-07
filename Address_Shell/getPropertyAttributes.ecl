@@ -1,13 +1,13 @@
-/* 
+﻿/* 
  * getPropertyAttributes: This function takes in the input and returns the
  * public records attributes relating to the input property and surrounding
  * neighborhoods.  It then places this information into a flat layout for return.
  * This function should be batch friendly.
  */
 
-IMPORT iesp, InsuranceContext_iesp, ut;
+IMPORT iesp, InsuranceContext_iesp,doxie, ut;
 
-EXPORT Address_Shell.layoutPropertyCharacteristics getPropertyAttributes (DATASET(Address_Shell.layoutInput) input, UNSIGNED1 attributesVersion = 1) := FUNCTION
+EXPORT Address_Shell.layoutPropertyCharacteristics getPropertyAttributes (DATASET(Address_Shell.layoutInput) input, UNSIGNED1 attributesVersion = 1,doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 /* ************************************************************
 	 * All searching will be done by GeoLink or ZIP/PrimRange/  *
    * PrimName/Suffix/PreDir for the time being, but           *
@@ -54,7 +54,7 @@ EXPORT Address_Shell.layoutPropertyCharacteristics getPropertyAttributes (DATASE
 /* ************************************************************
 	 *              Get foreclosure information:                *
 	 ************************************************************ */
-	foreclosures := Address_Shell.searchForeclosures(firefighters, attributesVersion);
+	foreclosures := Address_Shell.searchForeclosures(firefighters, attributesVersion,mod_access);
 	
 /* ************************************************************
 	 *               Get assessment information:                *

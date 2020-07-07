@@ -5,7 +5,7 @@ EXPORT SoapCall_BriteVerify(DATASET(iesp.briteverify_email.t_BriteVerifyEmailReq
                             BOOLEAN makeGatewayCall=FALSE,
                             INTEGER waittime=10,
                             INTEGER retries=Gateway.Constants.Defaults.RETRIES,
-                            INTEGER num_threads=1) := FUNCTION
+                            INTEGER num_threads=2) := FUNCTION
 
   //Get the URL for the BV email gateway
   bv_gw := gateways(Gateway.Configuration.IsBriteVerifyEmail(servicename))[1];
@@ -67,9 +67,7 @@ EXPORT SoapCall_BriteVerify(DATASET(iesp.briteverify_email.t_BriteVerifyEmailReq
                           ONFAIL(FailX()),
                           RETRY(retries),
                           TIMEOUT(waittime),
-                          #IF((INTEGER)#TEXT(num_threads) > 1)
-                            PARALLEL(num_threads),
-                          #END
+                          PARALLEL(num_threads),
                           TRIM,LOG),
                  DATASET([setSoapError()]));
 

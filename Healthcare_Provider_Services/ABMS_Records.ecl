@@ -7,19 +7,19 @@ export ABMS_Records(unsigned1 glb=8, unsigned1 dppa=0, unsigned1 PenaltThreshold
 	Export ids_by_did (dataset(myLayouts.autokeyInput) input):= function
 			return choosen(dedup(sort(join(input(did>0), ABMS.Keys().Main.DID.qa,
 																				 left.did=right.did, 
-																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=left;),
+																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=right;self:=left;),
 																				 keep(myConst.MAX_RECS_ON_JOIN),limit(0)),record),record),myConst.MAX_RECS_ON_JOIN);
 	end;
 	Export ids_by_bdid (dataset(myLayouts.autokeyInput) input):= function
 			return choosen(dedup(sort(join(input(bdid>0), ABMS.Keys().Main.BDID.qa,
 																				 left.bdid=right.bdid, 
-																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=left;),
+																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=right;self:=left),
 																				 keep(myConst.MAX_RECS_ON_JOIN),limit(0)),record),record),myConst.MAX_RECS_ON_JOIN);
 	end;
 	Export ids_by_npi (dataset(myLayouts.autokeyInput) input):= function
 			return choosen(dedup(sort(join(input(npi<>''), ABMS.Keys().Main.NPI.qa,
 																				 left.npi=right.npi, 
-																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=left;),
+																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=right;self:=left),
 																				 keep(myConst.MAX_RECS_ON_JOIN),limit(0)),record),record),myConst.MAX_RECS_ON_JOIN);
 	end;
 	Export ids_by_NameAndSpecialty (dataset(myLayouts.autokeyInput) input):= function
@@ -27,27 +27,27 @@ export ABMS_Records(unsigned1 glb=8, unsigned1 dppa=0, unsigned1 PenaltThreshold
 			specialty1 := choosen(dedup(sort(join(input(Specialty<>''), ABMS.Keys().Main.LNameCertFName.qa,
 																				 stringlib.StringToUpperCase(left.name_last)=right.last_name and
 																				 stringlib.StringToUpperCase(left.Specialty)=right.cert_name, 
-																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=left;),
+																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=right;self:=left),
 																				 keep(myConst.MAX_RECS_ON_JOIN),limit(0)),record),record),myConst.MAX_RECS_ON_JOIN);
 			specialty2 := choosen(dedup(sort(join(input(Specialty2<>''), ABMS.Keys().Main.LNameCertFName.qa,
 																				 stringlib.StringToUpperCase(left.name_last)=right.last_name and
 																				 stringlib.StringToUpperCase(left.Specialty)=right.cert_name, 
-																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=left;),
+																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=right;self:=left),
 																				 keep(myConst.MAX_RECS_ON_JOIN),limit(0)),record),record),myConst.MAX_RECS_ON_JOIN);
 			specialty3 := choosen(dedup(sort(join(input(Specialty3<>''), ABMS.Keys().Main.LNameCertFName.qa,
 																				 stringlib.StringToUpperCase(left.name_last)=right.last_name and
 																				 stringlib.StringToUpperCase(left.Specialty)=right.cert_name, 
-																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=left;),
+																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=right;self:=left),
 																				 keep(myConst.MAX_RECS_ON_JOIN),limit(0)),record),record),myConst.MAX_RECS_ON_JOIN);
 			specialty4 := choosen(dedup(sort(join(input(Specialty4<>''), ABMS.Keys().Main.LNameCertFName.qa,
 																				 stringlib.StringToUpperCase(left.name_last)=right.last_name and
 																				 stringlib.StringToUpperCase(left.Specialty)=right.cert_name, 
-																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=left;),
+																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=right;self:=left),
 																				 keep(myConst.MAX_RECS_ON_JOIN),limit(0)),record),record),myConst.MAX_RECS_ON_JOIN);
 			specialty5 := choosen(dedup(sort(join(input(Specialty5<>''), ABMS.Keys().Main.LNameCertFName.qa,
 																				 stringlib.StringToUpperCase(left.name_last)=right.last_name and
 																				 stringlib.StringToUpperCase(left.Specialty)=right.cert_name, 
-																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=left;),
+																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=right;self:=left),
 																				 keep(myConst.MAX_RECS_ON_JOIN),limit(0)),record),record),myConst.MAX_RECS_ON_JOIN);
 			combinedSpecialty := choosen(dedup(sort(specialty1+specialty2+specialty3+specialty4+specialty5,record),record),myConst.MAX_RECS_ON_JOIN);
 			return combinedSpecialty;
@@ -57,29 +57,30 @@ export ABMS_Records(unsigned1 glb=8, unsigned1 dppa=0, unsigned1 PenaltThreshold
 			subspecialty1 := choosen(dedup(sort(join(input(SubSpecialty<>''), ABMS.Keys().Main.LNameCertFName.qa,
 																				 stringlib.StringToUpperCase(left.name_last)=right.last_name and
 																				 stringlib.StringToUpperCase(left.Specialty)=right.cert_name, 
-																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=left;),
+																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=right;self:=left),
 																				 keep(myConst.MAX_RECS_ON_JOIN),limit(0)),record),record),myConst.MAX_RECS_ON_JOIN);
 			subspecialty2 := choosen(dedup(sort(join(input(SubSpecialty2<>''), ABMS.Keys().Main.LNameCertFName.qa,
 																				 stringlib.StringToUpperCase(left.name_last)=right.last_name and
 																				 stringlib.StringToUpperCase(left.Specialty)=right.cert_name, 
-																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=left;),
+																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=right;self:=left),
 																				 keep(myConst.MAX_RECS_ON_JOIN),limit(0)),record),record),myConst.MAX_RECS_ON_JOIN);
 			subspecialty3 := choosen(dedup(sort(join(input(SubSpecialty3<>''), ABMS.Keys().Main.LNameCertFName.qa,
 																				 stringlib.StringToUpperCase(left.name_last)=right.last_name and
 																				 stringlib.StringToUpperCase(left.Specialty)=right.cert_name, 
-																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=left;),
+																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=right;self:=left),
 																				 keep(myConst.MAX_RECS_ON_JOIN),limit(0)),record),record),myConst.MAX_RECS_ON_JOIN);
 			subspecialty4 := choosen(dedup(sort(join(input(SubSpecialty4<>''), ABMS.Keys().Main.LNameCertFName.qa,
 																				 stringlib.StringToUpperCase(left.name_last)=right.last_name and
 																				 stringlib.StringToUpperCase(left.Specialty)=right.cert_name, 
-																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=left;),
+																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=right;self:=left),
 																				 keep(myConst.MAX_RECS_ON_JOIN),limit(0)),record),record),myConst.MAX_RECS_ON_JOIN);
 			subspecialty5 := choosen(dedup(sort(join(input(SubSpecialty5<>''), ABMS.Keys().Main.LNameCertFName.qa,
 																				 stringlib.StringToUpperCase(left.name_last)=right.last_name and
 																				 stringlib.StringToUpperCase(left.Specialty)=right.cert_name, 
-																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=left;),
+																				 transform(myLayouts.searchKeyResults,self.acctno:=left.acctno; self.biog_number:=right.biog_number;self.isAutokeysResult:=false;self:=right;self:=left),
 																				 keep(myConst.MAX_RECS_ON_JOIN),limit(0)),record),record),myConst.MAX_RECS_ON_JOIN);
 			combinedSubSpecialty := choosen(dedup(sort(subspecialty1+subspecialty2+subspecialty3+subspecialty4+subspecialty5,record),record),myConst.MAX_RECS_ON_JOIN);
+     
 			return combinedSubSpecialty;
 	end;
 	Export myLayouts.searchKeyResults xformLimit(myLayouts.searchKeyResults l, integer cnt) := transform
@@ -142,10 +143,7 @@ export ABMS_Records(unsigned1 glb=8, unsigned1 dppa=0, unsigned1 PenaltThreshold
 		mod_access:=Healthcare_Header_Services.ConvertcfgtoIdataaccess(cfg);
     suppress_macAbms:=Suppress.MAC_FlagSuppressedSource(ids_by_keys+byAK, mod_access); 	
 		optoutrecsabms := project(suppress_macAbms, transform(ABMS_Layouts.searchKeyResults,self.hasOptOut:= left.is_suppressed;self:=left;self:=[];))   ; 
-   // final_recs:=optoutrecs(hasOptOut=false);
-		// output(getNoHits,named('getNoHits'));
-		// output(test_mac,named('test_mac'),extend);
-		// output(setOptOut,named('setOptOut'),extend);
+   
 		return optoutrecsabms;
 	end;
 
@@ -157,8 +155,18 @@ export ABMS_Records(unsigned1 glb=8, unsigned1 dppa=0, unsigned1 PenaltThreshold
 		baseRecs := join(ids,ABMS.Keys().Main.BIOGNumber.qa,left.biog_number=right.biog_number,
 													ABMS_Transforms.buildBase(left,right,PenaltThreshold),
 													keep(myConst.MAX_RECS_ON_JOIN),limit(0));
+		modaccess:=Healthcare_Header_Services.ConvertcfgtoIdataaccess(cfg);
+    suppressmacAbmsbiognumber:=Suppress.MAC_FlagSuppressedSource(	baseRecs,	modaccess);	
+		optoutrecsabmsberbiognumber := project(suppressmacAbmsbiognumber, transform(ABMS_Layouts.LayoutOutput,
+																						self.hasOptOut:= left.is_suppressed;
+																						self.AccountNumber:=left.AccountNumber;
+																						self._Penalty:=left._Penalty;
+																						self:=if(not left.is_suppressed,left);
+																						self:=[];));    
+
+		
 		//Rollup and dedup by biog_number
-		grp_baseRecs := group(sort(baseRecs,AccountNumber,ABMSBiogID),AccountNumber,ABMSBiogID);
+		grp_baseRecs := group(sort(optoutrecsabmsberbiognumber,AccountNumber,ABMSBiogID),AccountNumber,ABMSBiogID);
 		roll_baseRecs := rollup(grp_baseRecs,group,Healthcare_Provider_Services.ABMS_Transforms.doABMSBiogIDRollup(left,rows(left)));
 		//Join to get Type of Practice Information
 		appendBaseWithType := myFn.appendTypeOfPractice(roll_baseRecs);
@@ -166,12 +174,7 @@ export ABMS_Records(unsigned1 glb=8, unsigned1 dppa=0, unsigned1 PenaltThreshold
 		appendBaseWithCertificates := myFn.appendCertificates(appendBaseWithType);
 		//Get optional data
 		appendOptionalData := myFn.appendOptionalData(appendBaseWithCertificates,inputData);
-		// output(inputData,named('inputData'));
-		// output(ids,named('CollectedIDs'));
-		// output(baseRecs,named('baseRecs'));
-		// output(roll_baseRecs,named('roll_baseRecs'));
-		// output(appendBaseWithType,named('appendBaseWithType'));
-		// output(appendBaseWithCertificates,named('appendBaseWithCertificates'));
+	
 		return sort(appendOptionalData,_Penalty);
 	end;
 	Export getRecordsBatch(dataset(ABMS_Layouts.autokeyInput) inputData,dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg) := function

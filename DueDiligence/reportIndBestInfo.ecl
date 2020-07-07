@@ -44,16 +44,16 @@ EXPORT reportIndBestInfo(DATASET(DueDiligence.layouts.Indv_Internal) inData,
                                                     SELF.personalInfo.inputAddressType := Advo.Lookup_Descriptions.fn_resbus(LEFT.Residential_OR_Business_Clean);
                                                     SELF.personalInfo.bestAddressType := Advo.Lookup_Descriptions.fn_resbus(LEFT.Residential_OR_Business_Best);
                                                     
-                                                    SELF.personalInfo.InputSSN := LEFT.inputSSN;
+                                                    SELF.personalInfo.InputSSN := LEFT.indvRawInput.ssn;
                                                     SELF.personalInfo.BestSSN := LEFT.bestSSN;
                                                     SELF.personalInfo.InputDOB := iesp.ECL2ESP.toDatestring8(LEFT.indvRawInput.dob);
-                                                    SELF.personalInfo.BestDOB := iesp.ECL2ESP.toDate(LEFT.bestDOB);;
+                                                    SELF.personalInfo.BestDOB := iesp.ECL2ESP.toDate(LEFT.bestDOB);
                                                     SELF.personalInfo.InputPhone := LEFT.indvRawInput.phone;
                                                     SELF.personalInfo.BestPhone := LEFT.bestPhone;
                                                     
                                                     inputDOB := (UNSIGNED4)LEFT.indvRawInput.dob;
                                                     
-                                                    validInputDOB := DueDiligence.Common.IsValidDOB(inputDOB);
+                                                    validInputDOB := DueDiligence.CommonDate.IsValidDate(inputDOB);
                                                     validHistDate := STD.Date.IsValidDate(LEFT.historyDate);
                                                     
                                                     SELF.personalInfo.InputAge := IF(validInputDOB AND validHistDate, ut.Age(inputDOB, LEFT.historyDate), 0);

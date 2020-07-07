@@ -1,9 +1,12 @@
-﻿import _Control, riskwise, ut, doxie;
+﻿import _Control, riskwise, ut, doxie, data_services, Suppress;
 onThor := _Control.Environment.OnThor;
 
 export getVelocityHist(GROUPED DATASET(iid_constants.layout_outx) iid2, boolean isFCRA, unsigned1 dppa,
-												string50 DataRestriction, unsigned1 BSversion) := FUNCTION
+												string50 DataRestriction, unsigned1 BSversion,
+												doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
+data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+	
 iid_roxie := group(sort(iid2,seq,did),seq,did);
 
 iid_thor := group(sort(distribute(iid2, hash64(seq,did)),seq,did, LOCAL),seq,did, LOCAL);
@@ -19,7 +22,7 @@ dppa_ok := iid_constants.dppa_ok(dppa, isFCRA);
 age_hist := Risk_Indicators.getAgeHist(iid);
 
 
-counts_per_ssn := table(iid, {seq, historydate, did, ssn_from_did,
+counts_per_ssn := table(UNGROUP(iid), {seq, historydate, did, ssn_from_did,
 															_ssns_per_adl := count(group, ssns_per_adl>0),
 															_ssns_per_adl_created_6months := count(group, ssns_per_adl_created_6months>0),
 															_ssns_per_adl_created_outside_6months := count(group, ssns_per_adl>0 and ssns_per_adl_created_6months=0),
@@ -348,7 +351,8 @@ rolled_ssn_addr_lname_thor := join(distribute(jInvalids2, hash64(seq, did)),
 	rolled_ssn_addr_lname := rolled_ssn_addr_lname_roxie;
 #END
 
-iid_constants.layout_outx addADL(rolled_ssn_addr le, key_ADL_Risk_Table_v4 ri) := transform
+{iid_constants.layout_outx, UNSIGNED4 global_sid} addADL(rolled_ssn_addr le, key_ADL_Risk_Table_v4 ri) := transform
+	self.global_sid := ri.global_sid;
 	// determine which section of the table is permitted for use based on the data restriction mask
 	header_version := map(DataRestriction[iid_constants.posEquifaxRestriction]=iid_constants.sFalse and
 												DataRestriction[iid_constants.posTransUnionRestriction]=iid_constants.sFalse and
@@ -372,14 +376,18 @@ iid_constants.layout_outx addADL(rolled_ssn_addr le, key_ADL_Risk_Table_v4 ri) :
 	self.address_history_summary.address_history_advo_college_hit := ri.college_address_in_history;
 	self := le;
 END;
-ADLinfo_nonfcra_orig_roxie := join(rolled_ssn_addr_lname, risk_indicators.key_ADL_Risk_Table_v4, left.did != 0 and keyed(left.did=right.did), 
+ADLinfo_nonfcra_orig_roxie_unsuppressed := join(rolled_ssn_addr_lname, risk_indicators.key_ADL_Risk_Table_v4, left.did != 0 and keyed(left.did=right.did), 
 							addADL(LEFT,RIGHT), left outer, atmost(Riskwise.max_atmost), keep(1));	
 
-ADLinfo_nonfcra_orig_thor := join(distribute(rolled_ssn_addr_lname, hash64(did)), 
+ADLinfo_nonfcra_orig_roxie := Suppress.Suppress_ReturnOldLayout(ADLinfo_nonfcra_orig_roxie_unsuppressed, mod_access, iid_constants.layout_outx, data_environment);
+
+ADLinfo_nonfcra_orig_thor_unsuppressed := join(distribute(rolled_ssn_addr_lname, hash64(did)), 
 							distribute(pull(risk_indicators.key_ADL_Risk_Table_v4(did<>0)), hash64(did)), 
 							left.did != 0 and(left.did=right.did), 
 							addADL(LEFT,RIGHT), left outer, atmost(Riskwise.max_atmost), keep(1), LOCAL);	
 							
+ADLinfo_nonfcra_orig_thor := Suppress.Suppress_ReturnOldLayout(ADLinfo_nonfcra_orig_thor_unsuppressed, mod_access, iid_constants.layout_outx, data_environment);
+
 #IF(onThor)
 	ADLinfo_nonfcra_orig := ADLinfo_nonfcra_orig_thor;
 #ELSE

@@ -181,7 +181,9 @@ EXPORT fn_SmallBusiness_getScores( DATASET(Business_Risk_BIP.Layouts.Input) Shel
 			IF( BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_SBFEATTR IN set_model_names, // blended model
 					setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_SBFEATTR, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_SBFEATTR, Boca_Shell_Grouped)) ) +     
       IF( BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP IN set_model_names, // blended model
-					setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, Boca_Shell_Grouped)) ) +     
+					setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, Boca_Shell_Grouped)) ) + 
+      IF( BusinessCredit_Services.Constants.BBFM1906_1_0 IN set_model_names, // blended model
+					setModelName(BusinessCredit_Services.Constants.BBFM1906_1_0, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BBFM1906_1_0, Boca_Shell_Grouped)) ) +  
       IF( BusinessCredit_Services.Constants.CREDIT_SCORE_BOFM IN set_model_names, // non blended 
 					setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_BOFM, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_BOFM)) ) + 
       IF( BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL IN set_model_names, // blended only
@@ -197,6 +199,7 @@ EXPORT fn_SmallBusiness_getScores( DATASET(Business_Risk_BIP.Layouts.Input) Shel
 						BusinessCredit_Services.Constants.CREDIT_SCORE_BOFM IN set_model_names OR
 						BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_SBFEATTR IN set_model_names OR
 						BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP IN set_model_names OR
+						BusinessCredit_Services.Constants.BBFM1906_1_0 IN set_model_names OR
 						BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO IN set_model_names or
 						BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL IN set_model_names OR
 						BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL IN set_model_names),

@@ -1,8 +1,9 @@
-﻿IMPORT BIPv2, Business_Risk_BIP, DueDiligence, iesp;
+﻿IMPORT BIPv2, Business_Risk_BIP, DueDiligence, iesp, Doxie;
 
 EXPORT reportBusRegisteredAgents(DATASET(DueDiligence.layouts.Busn_Internal) inData,
                                   Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-                                  BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+                                  BIPV2.mod_sources.iParams linkingOptions,
+                                  doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
     
     
     
@@ -62,7 +63,7 @@ EXPORT reportBusRegisteredAgents(DATASET(DueDiligence.layouts.Busn_Internal) inD
     
     //get LexIDs
     busLexIDs := DueDiligence.getBusInformation(options, linkingOptions).GetBusinessBestDataWithPII(cleanBusAgent.clean);
-    indLexIDs := DueDiligence.getIndInformation(options).GetIndividualBestDataWithPII(cleanIndAgent.clean);
+    indLexIDs := DueDiligence.getIndInformation(options, mod_access).GetIndividualBestDataWithPII(cleanIndAgent.clean);
    
 
                                                   

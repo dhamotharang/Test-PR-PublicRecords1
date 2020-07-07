@@ -6,7 +6,7 @@
 IMPORT Phone_Shell, RiskWise, UT, Utilfile, STD, Doxie;
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Utility (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 GLBPurpose, UNSIGNED1 PhoneRestrictionMask, STRING30 IndustryClass, 
-         UNSIGNED2 PhoneShellVersion = 10, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+         UNSIGNED2 PhoneShellVersion = 10) := FUNCTION
          
  IncludeLexIDCounts := if(PhoneShellVersion >= 21,true,false);   // LexID counts/'all' attributes added in PhoneShell version 2.1
          

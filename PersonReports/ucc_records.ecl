@@ -1,12 +1,12 @@
-import iesp, doxie, AutoStandardI, UCCv2_Services;
+import $, iesp, doxie, UCCv2_Services;
 
 EXPORT ucc_records (
   dataset (doxie.layout_references) dids,
-  input.ucc in_params = module (input.ucc) end,
+  $.IParam.ucc in_params = module ($.IParam.ucc) end,
   boolean IsFCRA = false
 ) := MODULE
 
-  export uccr2 := UCCv2_Services.UCCRaw.source_view.by_did (dids, in_params.ssn_mask, in_params.ucc_party_type, in_params.applicationType);
+  export uccr2 := UCCv2_Services.UCCRaw.source_view.by_did (dids, in_params.ssn_mask, in_params.ucc_party_type, in_params.application_type);
   //returns: uccv2_services.layout_ucc_rollup_src:
 
   iesp.ucc.t_UCCParsedParty FormatParties (uccv2_services.layout_ucc_party_parsed L, string120 Orig_name) := TRANSFORM

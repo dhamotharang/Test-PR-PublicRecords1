@@ -1,12 +1,13 @@
-IMPORT iesp, InsuranceContext_iesp, ut, Gateway;
+﻿IMPORT iesp, InsuranceContext_iesp, ut,std, Gateway;
 
-EXPORT propertyCharacteristicsSoapCallFunction (DATASET(Address_Shell.layoutInput) input, UNSIGNED1 propertyInformationAttributesVersion, UNSIGNED1 ercAttributesVersion, DATASET(Gateway.Layouts.Config) gateway_cfg) := FUNCTION
+EXPORT propertyCharacteristicsSoapCallFunction (DATASET(Address_Shell.layoutInput) input, UNSIGNED1 propertyInformationAttributesVersion, UNSIGNED1 ercAttributesVersion,
+ DATASET(Gateway.Layouts.Config) gateway_cfg) := FUNCTION
 /* ************************************************************
 	 *       Convert input into ReportService() input:          *
 	 ************************************************************ */
 
-	propertyInformationGatewayURL := gateway_cfg(StringLib.StringToLowerCase(servicename) = 'reportservice')[1].url;
-	ercGatewayURL := gateway_cfg(StringLib.StringToLowerCase(servicename) = 'erc')[1].url;
+	propertyInformationGatewayURL := gateway_cfg(STD.Str.ToLowerCase(servicename) = 'reportservice')[1].url;
+	ercGatewayURL := gateway_cfg(STD.Str.ToLowerCase(servicename) = 'erc')[1].url;
 	 
 	iesp.property_info.t_PropertyInformationRequest intoPropertyInformationRequest(Address_Shell.layoutInput le) := TRANSFORM
 		SELF.User.GLBPurpose := le.GLBPurpose;
@@ -49,7 +50,7 @@ EXPORT propertyCharacteristicsSoapCallFunction (DATASET(Address_Shell.layoutInpu
 		SELF.Products.PROPINFO.CustomerName := '';
 		SELF.Products.PROPINFO.CustomerNumber := '';
 		SELF.Products.PROPINFO.Status := 'A';
-		SELF.Products.PROPINFO.IsReseller := FALSE;
+		//SELF.Products.PROPINFO.IsReseller := FALSE;
 		SELF.Products.PROPINFO.IncludeConfidenceFactors := TRUE;
 		SELF := [];
 	END;

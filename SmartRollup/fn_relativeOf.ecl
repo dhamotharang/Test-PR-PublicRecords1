@@ -11,7 +11,7 @@ export fn_relativeOf(dataset(iesp.smartlinxreport.t_SLRRelative) inRels, integer
   level2 := inRels(relativedepth=2);
   level3 := inRels(relativedepth=3);
   
-	relrec fillparent(Relationship.layout_GetRelationship.InterfaceOuput r) := transform
+	relrec fillparent(Relationship.layout_GetRelationship.interfaceOutputNeutral r) := transform
     self.parentdid :=  r.did1;
 	  self.childdid := r.did2;
 		self.titleNo := r.title;
@@ -24,17 +24,17 @@ export fn_relativeOf(dataset(iesp.smartlinxreport.t_SLRRelative) inRels, integer
 		self := [];
 	end;
 	did_rec := DATASET ([prep_did()]);
-	parents0 := project(Relationship.proc_GetRelationship(did_rec,TRUE,TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result,fillparent(left));
+	parents0 := project(Relationship.proc_GetRelationshipNeutral(did_rec,TRUE,TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result,fillparent(left));
 		
 	//do we need to sort these so they are in the same order everytime they get generated 
 	//code below gets first parent found wouldn't want it to be different 
 	parent1dids := project(level1,transform(Relationship.Layout_GetRelationship.DIDs_layout,SELF.did := (integer)LEFT.uniqueid,SELF := []));	
-	parents1 := project(Relationship.proc_GetRelationship(parent1dids,TRUE,TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result,fillparent(left));
+	parents1 := project(Relationship.proc_GetRelationshipNeutral(parent1dids,TRUE,TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result,fillparent(left));
 	
 	//do we need to sort these so they are in the same order everytime they get generated 
 	//code below gets first parent found wouldn't want it to be different
 	parent2dids := project(level2,transform(Relationship.Layout_GetRelationship.DIDs_layout,SELF.did := (integer)LEFT.uniqueid,SELF := []));	
-	parents2 := project(Relationship.proc_GetRelationship(parent2dids,TRUE,TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result,fillparent(left));
+	parents2 := project(Relationship.proc_GetRelationshipNeutral(parent2dids,TRUE,TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result,fillparent(left));
   
 	// for relatives of depth=1 we asign titles, the default 'relative' is replaced with blank to preserve the current functionality
   outrec fill1(inRels l, relrec r) := transform

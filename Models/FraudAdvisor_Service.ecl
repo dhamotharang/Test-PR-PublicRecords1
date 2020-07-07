@@ -77,6 +77,7 @@
   <part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
   <part name="SuppressCompromisedDLs" type="xsd:boolean"/>
   <part name="IncludeQAOutputs" type="xsd:boolean"/>
+  <part name="UseIngestDate" type="xsd:boolean"/>
  </message>
 */
 /*--INFO-- Contains Fraud Advisor 3, 5, 9, Version1 and Fraud Attributes */
@@ -171,7 +172,8 @@ export FraudAdvisor_Service := MACRO
         'LexIdSourceOptout',
         '_TransactionId',
         '_BatchUID',
-        '_GCID'
+        '_GCID',
+				'UseIngestDate'
 	));
 
 Risk_indicators.MAC_unparsedfullname(title_val,first_value,middle_value,last_value,suffix_value,'FirstName','MiddleName','LastName','NameSuffix')
@@ -283,6 +285,7 @@ boolean   IncludeRiskIndices := false : stored('IncludeRiskIndices');  // to inc
 boolean SuppressCompromisedDLs := false : stored('SuppressCompromisedDLs');
 // Set to TRUE when running RiskProcessing scripts to include some intermediate boca shell outputs for modelers
 boolean IncludeQAOutputs             := FALSE : stored('IncludeQAOutputs'); 
+boolean UseIngestDate             := FALSE : stored('UseIngestDate'); 
 
 Boolean TrackInsuranceRoyalties := Risk_Indicators.iid_constants.InsuranceDL_ok(DataPermission);
 
@@ -318,6 +321,14 @@ single_model := Dataset([Transform(Models.Layouts.Layout_Model_Request_In,
 //identity fields are available as regular input fields, but if the new model is requested via InstantID or FlexID, the fields will be
 //available only through this custom model request.  
 
+mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT glb := GLB_Purpose;
+	EXPORT dppa := DPPA_Purpose;
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
+
 //If this model request limit changes, update the model_check and custom_field_replacement functions as well
 Model_requests := choosen(ModelOptions_In, 3);
 
@@ -326,8 +337,8 @@ Models_to_use := IF(Model != '', single_model, Model_requests);
 Valid_requested_models := project(Models_to_use, Transform(Models.Layouts.Layout_Model_Request_In,
                                        self := Models.FP_models.Valid_request(left, attributesIn, ip_value, includeriskindices, RedFlag_version, glb_ok)));
 
-//Check minimum input for Digital Insights score and attributes
-IF((Models.FP_models.Model_Check(Valid_requested_models, ['di31906_0']) or EXISTS(attributesIn(STD.STR.ToLowerCase(name) in [Models.FraudAdvisor_Constants.attrvTMX])))
+//Check minimum input for Digital Insights model
+IF((Models.FP_models.Model_Check(Valid_requested_models, ['di31906_0']))
     and (email_value = '' or hphone_value = ''),
     FAIL('Invalid request for Digital Insights, must supply a phone number and email.'));
 
@@ -354,6 +365,7 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
                                                                                                                                          le.url); 
   self := le;																																								
 end;
+
 gateways := project(gateways_in, gw_switch(left));
 
 if(OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, Risk_Indicators.iid_constants.FAXML_WatchlistModels) and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway)); 
@@ -502,7 +514,9 @@ doAttributesVersion1 := Models.FP_Models.Check_Valid_Attributes(attributesIn, [M
 doIDAttributes := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.IDattr]);                          // Output IDAttributes if requested
 doAttributesVersion2 := Models.FP_Models.Check_Valid_Attributes(attributesIn, attributesV2set) and input_ok;	                            // output version2 if requested and minimum input entered
 doAttributesVersion201 := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrV201]) and input_ok;	  // output version201 if requested and minimum input entered
-doAttributesVersion202 := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrV202]) and input_ok;	  // output version202 if requested and minimum input entered
+doAttributesVersion202 := (Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrV202]) 
+                          or Models.FP_models.Model_Check(Valid_requested_models, ['fp1908_1'])) // run attributes by this model name in case model called by FlexID
+                          and input_ok;	  // output version202 if requested and minimum input entered
 doParoAttributes := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrvparo]) and input_ok;	      // output Paro attrs if requested and minimum input entered
 doTMXAttributes := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrvTMX]) and input_ok;	      // output TMX attrs if requested and minimum input entered
 
@@ -546,8 +560,8 @@ IncludeDLverification := if(doAttributesVersion2, true, false);
 //=== BS Version        ===
 //=========================
 bsVersion := map(
-  Models.FP_models.Model_Check(Valid_requested_models, ['di31906_0']) => 55,
-  Models.FP_models.Model_Check(Valid_requested_models, ['fp1902_1']) => 54,
+  Models.FP_models.Model_Check(Valid_requested_models, ['di31906_0']) or doTMXAttributes => 55,
+  Models.FP_models.Model_Check(Valid_requested_models, ['fp1902_1', 'fp1908_1', 'fp1909_1', 'fp1909_2']) => 54,  
   Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.BS_Version53_List) or doParoAttributes or doAttributesVersion202 => 53,
 	Models.FP_models.Model_Check(Valid_requested_models, ['fp1706_1','fp1705_1','fp1704_1']) => 52,
 	Models.FP_models.Model_Check(Valid_requested_models, ['fp1506_1', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9','fp1509_1', 
@@ -565,7 +579,7 @@ bsVersion := map(
 //=========================
 //=== BS options        ===
 //=========================
-BSOptions := Models.FP_Models.Set_BSOptions(Valid_requested_models, attributesIn, input_ok, doInquiries);
+BSOptions := Models.FP_Models.Set_BSOptions(Valid_requested_models, attributesIn, input_ok, doInquiries, UseIngestDate);
 
 iid := //Group(Dataset([],risk_indicators.layout_output), seq);
        risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, isUtility, isLn, 
@@ -579,6 +593,13 @@ iid := //Group(Dataset([],risk_indicators.layout_output), seq);
                                                                                     TransactionID := TransactionID, 
                                                                                     BatchUID := BatchUID, 
                                                                                     GlobalCompanyID := GlobalCompanyID);
+
+//Check for ThreatMetrix Gateway error
+IF(EXISTS(gateways(servicename IN ['threatmetrix', 'threatmetrix_test'])),
+          IF(iid[1].threatmetrix.digital_id_result[1..14] = 'gateway-error:', 
+             FAIL('An error occured within the ThreatMetrix Gateway (Error Code ' + iid[1].threatmetrix.digital_id_result[15..] + ')')));
+
+                                                                                    
 
 clam := //Group(Dataset([], risk_indicators.Layout_Boca_Shell), seq);
         risk_indicators.Boca_Shell_Function(iid, gateways, DPPA_Purpose, GLB_Purpose, isUtility, isLn,  
@@ -603,7 +624,7 @@ clam_BtSt := //Group(Dataset([], risk_indicators.layout_bocashell_btst_out), bil
                                                                                     BatchUID := BatchUID, 
                                                                                     GlobalCompanyID := GlobalCompanyID)
 	);
-	
+  
   //Added for Paro 9-2018
   skiptrace_Prep := project(ungroup(iid), transform(risk_indicators.Layout_input, self := left));
   skiptrace_call := riskwise.skip_trace(skiptrace_Prep, DPPA_Purpose, GLB_Purpose, DataRestriction, '', DataPermission);
@@ -642,10 +663,9 @@ clam_BtSt := //Group(Dataset([], risk_indicators.layout_bocashell_btst_out), bil
   easi_census := IF(Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.Paro_models), easi_census1, Dataset([], easi.layout_census));
   //End for Paro
   
-ip_prep := project( ungroup(iid), transform( riskwise.Layout_IPAI, self.seq := left.seq, self.ipaddr := ip_value ) );
-ipdata := risk_indicators.getNetAcuity( ip_prep, gateways, DPPA_Purpose, GLB_Purpose); 
-  
- 
+ip_prep := project( ungroup(iid), transform( riskwise.Layout_IPAI, self.seq := left.seq, self.ipaddr := ip_value, self.did := left.did) );
+ipdata := risk_indicators.getNetAcuity( ip_prep, gateways, DPPA_Purpose, GLB_Purpose, applyOptOut := TRUE); 
+
 clam_ip := join( clam, ipdata, left.seq=right.seq,
 	transform( models.layouts.bs_with_ip,
 		self.bs := left,
@@ -654,14 +674,9 @@ clam_ip := join( clam, ipdata, left.seq=right.seq,
 	left outer
 );
 
-#if(Models.FraudAdvisor_Constants.VALIDATION_MODE)
 	
-    // This is for ROUND 2 Validation ONLY //
- 	  ModelValidationResults := Models.DI31906_0_0(iid);
- 	  OUTPUT(ModelValidationResults, named('Results'));
+#if( NOT Models.FraudAdvisor_Constants.VALIDATION_MODE)
     
-#ELSE
-
 //* *************************************
 //*   Boca Shell Logging Functionality  *
 //***************************************
@@ -670,7 +685,7 @@ clam_ip := join( clam, ipdata, left.seq=right.seq,
      intermediate_Log := Risk_Reporting.To_LOG_Boca_Shell(clam, productID, bsVersion);
 // ************ End Logging ************
 
-
+#END
 risk_indicators.layout_input into_test_prep(r1 l) := transform
 	self.seq := l.seq;	
 	self.ssn := socs_value;
@@ -687,12 +702,17 @@ test_prep := PROJECT(d,into_test_prep(LEFT));
 model_indicator := IF(doParoAttributes, Models.FraudAdvisor_Constants.attrvparo, ''); //model names will now be passed in through the model request structure in getFDAttributes
 
 // Get the attributes
-attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_indicator, suppressCompromisedDLs, ModelRequests := Valid_requested_models);
+attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_indicator, suppressCompromisedDLs, ModelRequests := Valid_requested_models, mod_access := mod_access);
 //For Paro update
 // attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_indicator, suppressCompromisedDLs,
                                      // DPPA_Purpose, GLB_Purpose, DataRestriction, DataPermission, '', Valid_requested_models);
+#if(Models.FraudAdvisor_Constants.VALIDATION_MODE)
 
-// search for test seeds																					
+    // This is for ROUND 2 Validation ONLY //
+ 	  ModelValidationResults := Models.FP1909_2_0(clam, 6, attributes);
+ 	  OUTPUT(ModelValidationResults, named('Results'));
+    
+#ELSE// search for test seeds																					
 attr_test_seed := Risk_Indicators.FDAttributes_TestSeed_Function(test_prep, account_value, Test_Data_Table_Name);	
 																																									
 // choose either test seed or real
@@ -839,6 +859,7 @@ All_models := Project(Valid_requested_models, transform(Models.layouts.Enhanced_
                                                 EXPORT Dataset(Models.Layouts.Layout_Model_Options) modeloptions  := left.modeloptions;
                                                 EXPORT Dataset(riskwise.Layout_SkipTrace) _skiptrace := skiptrace;
                                                 EXPORT Dataset(easi.layout_census) _easicensus := easi_census;
+                                                EXPORT Dataset(Models.Layout_FraudAttributes) _FDatributes := attributes;
                                               END;
                                               
                                               custom_temp  := left.ModelOptions(STD.STR.ToLowerCase(TRIM(OptionName)) = 'custom');
@@ -847,14 +868,12 @@ All_models := Project(Valid_requested_models, transform(Models.layouts.Enhanced_
                                               self.model_name := custom_name, // piping model name through to keep track of what's what
                                               self := Models.FP_models.Execute_model(Model_params)));
 
-temp_fp_test_seed := Project(Valid_requested_models, Transform(Models.layouts.Enhanced_layout_fp1109,
+fp_test_seed := Project(Valid_requested_models, Transform(Models.layouts.Enhanced_layout_fp1109,
                                                 seed_custom_temp  := left.ModelOptions(STD.STR.ToLowerCase(TRIM(OptionName)) = 'custom');
                                                 seed_custom_name  := STD.STR.ToLowerCase(TRIM(seed_custom_temp[1].OptionValue));
                                                 
                                                 self := Risk_Indicators.FraudPoint_TestSeed_Function(test_prep, Test_Data_Table_Name, seed_custom_name)));
 
-//Filter out testseeds that don't have a score or reason codes as we didn't get a proper hit.
-fp_test_seed := temp_fp_test_seed(score != '' and ri[1].hri != '');
 
 models.Layout_Reason_Codes form_modelout_rc(Models.Layout_ModelOut le, unsigned1 cnt) :=
 TRANSFORM

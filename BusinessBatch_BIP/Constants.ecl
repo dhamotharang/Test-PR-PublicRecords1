@@ -14,6 +14,18 @@ MODULE
 		EXPORT UNSIGNED4 MaxBHLinkidsBest := 7500;
 		EXPORT REAL OFAC_ONLY_GlobalWatchListThreshold := 0.89;
 	END;
+
+  EXPORT SingleView :=
+  MODULE
+    EXPORT UNSIGNED4 MaxLinkedPerRequest := 2000;
+    EXPORT UNSIGNED2 MaxResultsPerAcctno := 5;
+    EXPORT UNSIGNED2 MaxLinkedPerAcctno := 25;
+
+    // Record Types
+    EXPORT STRING1 LinkingRecordType := 'L';
+    EXPORT STRING1 BusinessRecordType := 'B';
+    EXPORT STRING1 ContactRecordType := 'C';
+  END;
 	
 	EXPORT Limits :=
   MODULE

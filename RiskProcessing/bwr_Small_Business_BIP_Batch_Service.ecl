@@ -88,11 +88,11 @@ bus_in := record
      string50  RepresentativeEmailAddress := '';
 	 string20  RepresentativeFormerLastName := '';
 	 integer   historydate;
-	unsigned SeleID;
-	unsigned ProxID;
 	unsigned PowID;
-	unsigned UltID;
+	unsigned ProxID;
+	unsigned SeleID;
 	unsigned OrgID;
+	unsigned UltID;
 end;
 
 f := 

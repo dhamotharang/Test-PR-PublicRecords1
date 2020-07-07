@@ -2,7 +2,7 @@
  * This function gathers the Phonesplus_Characteristics attributes.				*
  ************************************************************************ */
 
-IMPORT AutoKey, Data_Services, Phone_Shell, Phones, Phonesplus_v2, RiskWise, UT, STD, doxie;
+IMPORT AutoKey, Data_Services, Phone_Shell, Phones, Phonesplus_v2, RiskWise, UT, STD, doxie, Suppress;
 
 DEBUG_IGNORE_ALLOW_LIST := FALSE; // Set to TRUE if you do NOT want to filter by allow list
 
@@ -34,7 +34,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Pho
 	getPhoneFDID := JOIN(Input, PhoneAutoKey, TRIM(LEFT.Gathered_Phone) NOT IN ['', '0'] AND KEYED(RIGHT.p7 = LEFT.Gathered_Phone[4..10]) AND KEYED(RIGHT.p3 = LEFT.Gathered_Phone[1..3]),
 																		getFDID(LEFT, RIGHT), KEEP(500), ATMOST(RiskWise.max_atmost));
 																		
-	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus getPhonesPlusAttributes(layoutPPTemp le, Phonesplus_v2.key_phonesplus_fdid ri) := TRANSFORM
+	{Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus, unsigned4 global_sid} getPhonesPlusAttributes(layoutPPTemp le, Phonesplus_v2.key_phonesplus_fdid ri) := TRANSFORM
+		SELF.global_sid := ri.global_sid;
 		PhonesPlusSources := ['PPFA', 'PPLA', 'PPFLA', 'PPLFA', 'PPCA', 'PPDID', 'PPTH'];
 		SELF.PhonesPlus_Characteristics.PhonesPlus_Type := MAP(TRIM(le.PhonesPlus_Characteristics.PhonesPlus_Type) <> ''	=> le.PhonesPlus_Characteristics.PhonesPlus_Type,
 																													 TRIM(le.Sources.Source_List) IN PhonesPlusSources					=> 'U',
@@ -230,7 +231,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Pho
 		SELF := le;
 	END;
 	
-	withPhonesPlusTemp := JOIN(getPhoneFDID, Phonesplus_v2.key_phonesplus_fdid, LEFT.FDID <> 0 AND KEYED(LEFT.FDID = RIGHT.FDID) AND
+	withPhonesPlusTemp_unsuppressed := JOIN(getPhoneFDID, Phonesplus_v2.key_phonesplus_fdid, LEFT.FDID <> 0 AND KEYED(LEFT.FDID = RIGHT.FDID) AND
 																													Phones.Functions.IsPhoneRestricted(RIGHT.origstate, 
 																																														 GLBPurpose, 
 																																														 DPPAPurpose, 
@@ -247,7 +248,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Pho
                              #end
                                                , 
 																										getPhonesPlusAttributes(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost));
-	
+	withPhonesPlusTemp := Suppress.Suppress_ReturnOldLayout(withPhonesPlusTemp_unsuppressed, mod_access, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus);
 	// Keep the most confident/recent phones plus data possible
 	withPhonesPlus := SORT(withPhonesPlusTemp, Unique_Record_Sequence, Clean_Input.Seq, Gathered_Phone, -PhonesPlus_Characteristics.PhonesPlus_Confidence, -PhonesPlus_Characteristics.PhonesPlus_DateLastSeen, -PhonesPlus_Characteristics.PhonesPlus_DateVendorLastSeen, -PhonesPlus_Characteristics.PhonesPlus_DateFirstSeen, -PhonesPlus_Characteristics.PhonesPlus_DateVendorFirstSeen, -PhonesPlus_Characteristics.PhonesPlus_Orig_LastSeen, -PhonesPlus_Characteristics.PhonesPlus_DID, -PhonesPlus_Characteristics.PhonesPlus_BDID, -PhonesPlus_Characteristics.PhonesPlus_EDA_Match, PhonesPlus_Characteristics.PhonesPlus_HHID, PhonesPlus_Characteristics.PhonesPlus_CleanAID, -PhonesPlus_Characteristics.PhonesPlus_Current_Rec, -PhonesPlus_Characteristics.PhonesPlus_Last_Build_Date, -PhonesPlus_Characteristics.PhonesPlus_First_Build_Date);
 	

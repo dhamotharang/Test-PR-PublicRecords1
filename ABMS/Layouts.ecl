@@ -1,4 +1,7 @@
-IMPORT Address;
+﻿/*2019-10-28T19:26:59Z (Hennigar, Jennifer (RIS-BCT))
+CCPA-773
+*/
+IMPORT Address,BIPV2;
 
 EXPORT Layouts := MODULE
 
@@ -245,6 +248,9 @@ EXPORT Layouts := MODULE
 			Address.Layout_Clean_Name    clean_name;
 			Miscellaneous.Cleaned_Phone  clean_phone;
 			STRING    address_type_desc;
+			BIPV2.IDlayouts.l_xlink_ids ;
+			unsigned4 								global_sid					:= 23941; // Source ID for ABMS - CCPA project 20190910  
+			unsigned8 								record_sid; 
 		END;
 
     EXPORT Career := RECORD
@@ -298,7 +304,7 @@ EXPORT Layouts := MODULE
 	EXPORT KeyBuild := MODULE
 
 	  EXPORT Main := RECORD
-		  Base.Main - [source_rec_id];
+		  Base.Main - source_rec_id -BIPV2.IDlayouts.l_xlink_ids;
 		END;
 
 		EXPORT Main_Specialty := RECORD
@@ -311,7 +317,11 @@ EXPORT Layouts := MODULE
 		  Input.Cert.cert_name;
 		  Input.Cert.cert_type_ind;
 		END;
-
+    
+		EXPORT Main_Lnpid := record
+      unsigned8 lnpid;		  
+			STRING8   biog_number;
+		end;
 	END;
 
 END;

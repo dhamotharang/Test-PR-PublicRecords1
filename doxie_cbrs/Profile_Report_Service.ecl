@@ -78,6 +78,7 @@ EXPORT Profile_Report_Service := MACRO
     global_watchlist_threshold := if(ofac_version in [1, 2, 3], 0.8, 0.85);
     
     gateways_in := Gateway.Configuration.Get();
+    mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := if(ofac_version = 4 and le.servicename = 'bridgerwlc',le.servicename, '');
@@ -90,7 +91,7 @@ if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail
     
 		appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
 
-		all_recs_prs :=doxie_cbrs.all_records_prs(doxie_cbrs.ds_subject_BDIDs, ofac_version, include_ofac, global_watchlist_threshold);
+		all_recs_prs :=doxie_cbrs.all_records_prs(doxie_cbrs.ds_subject_BDIDs, ofac_version, include_ofac, global_watchlist_threshold, mod_access);
 
 		doxie_crs.layout_property_ln property_child(doxie_cbrs.layout_profile_property l):= transform
 		self := l;

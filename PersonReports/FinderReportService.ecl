@@ -1,10 +1,10 @@
-﻿/*--SOAP--
+/*--SOAP--
 <message name="FinderReportService">
   <part name="FirstName" type="xsd:string"/>
   <part name="MiddleName" type="xsd:string"/>
   <part name="LastName" type="xsd:string"/>
   <part name="allowNicknames" type="xsd:boolean"/>
-  <part name="UnparsedFullName" type="xsd:string"/>  
+  <part name="UnparsedFullName" type="xsd:string"/>
   <part name="PhoneticMatch" type="xsd:boolean"/>
   <separator />
   <part name="Addr" type="xsd:string"/>
@@ -17,14 +17,16 @@
   <part name="SSN" type="xsd:string"/>
   <part name="SSNMask" type="xsd:string"/>	<!-- [NONE, ALL, LAST4, FIRST5] -->
   <part name="DOB" type="xsd:unsignedInt"/>
+  <part name="ResellerType" type="xsd:unsignedInt"/>
+  <part name="IndustryClass" type="xsd:string"/>
   <part name="DPPAPurpose" type="xsd:byte" default="1"/>
-  <part name="GLBPurpose" type="xsd:byte" default="1"/> 
+  <part name="GLBPurpose" type="xsd:byte" default="1"/>
   <part name="LnBranded" type="xsd:boolean"/>
   <part name="DataRestrictionMask" type="xsd:string" default="00000000000"/>
   <part name="DataPermissionMask" type="xsd:string" default="00000000000"/>
-	<part name="ExcludeDMVPII" type="xsd:boolean"/>
+  <part name="ExcludeDMVPII" type="xsd:boolean"/>
   <separator />
-	<part name="ReturnAlsoFound" type="xsd:boolean" />
+  <part name="ReturnAlsoFound" type="xsd:boolean" />
   <part name="IncludeProfessionalLicenses" type="xsd:boolean"/>
   <part name="IncludeMotorVehicles" type="xsd:boolean"/>
   <part name="IncludePeopleAtWork" type="xsd:boolean"/>
@@ -32,7 +34,10 @@
   <part name="IncludePhonesPlus" type="xsd:boolean"/>
   <part name="IncludePhonesFeedback" type="xsd:boolean"/>
   <part name="IncludeCriminalIndicators" type="xsd:boolean"/>
+  <part name="IncludeEmailAddresses" type="xsd:boolean"/>
   <separator />
+  <part name="MaxEmailResults" type="xsd:unsignedInt"  default="5"/>
+  <part name="EmailSearchTier" type="xsd:string"  default="Basic"/>
   <part name="UnverifiedAddresses" type="xsd:boolean" default="false" description=" return unverified addresses as well"/>
   <part name="AddressesWithoutPhones" type="xsd:boolean" default="false" description=" includes addresses without phones as well"/>
   <part name="_n_phones" type="xsd:byte" default="20" description=" phones numbers to keep per address W/O secondary range"/>
@@ -41,10 +46,11 @@
   <part name="ReturnAllImposters" type="xsd:boolean" description=" returns all imposter records, even having different SSN (demo only)"/>
   <separator />
   <part name="PeopleReportRequest" type="tns:XmlDataSet" cols="80" rows="10" />
+  <part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>
 </message>
 */
 /*--INFO-- Provides indicators and more (Address, AKAs, Imposters).<p/><p/>
-  Only persons with "verified" address(es) are returned. Address is verified when it has a current phone 
+  Only persons with "verified" address(es) are returned. Address is verified when it has a current phone
   (either by exact secondary range or by person's last name as a listed name). Associates' addresses can be
   verified by subject's one, if the same and recent enough.
 */
@@ -55,7 +61,7 @@ EXPORT FinderReportService () := MACRO
 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #onwarning(4207, ignore);
 
-//The following macro defines the field sequence on WsECL page of query. 
+//The following macro defines the field sequence on WsECL page of query.
 WSInput.MAC_PersonReports_FinderReportService();
 
 #CONSTANT('TwoPartySearch', FALSE);
@@ -91,6 +97,9 @@ unsigned1 n_phones := 40 : stored('_n_phones');
       export boolean include_driverslicenses      := tag.IncludeDriversLicenses;
       export boolean include_phonesfeedback       := tag.IncludePhonesFeedback;
       export boolean include_criminalindicators   := tag.IncludeCriminalIndicators;
+      export boolean include_email                := tag.IncludeEmailAddresses;        // default- False
+      export unsigned MaxEmailResults             := tag.EmailOption.MaxEmailResults;  // default- 5
+      export string   EmailSearchTier             := tag.EmailOption.EmailSearchTier;  // default- 'Basic'
     end;
     return options;
   end;
@@ -109,7 +118,7 @@ unsigned1 n_phones := 40 : stored('_n_phones');
   iesp.ECL2ESP.SetInputBaseRequest (first_row);
   iesp.ECL2ESP.SetInputReportBy (first_row.ReportBy);
 
-  // create module incorporating ESDL input options 
+  // create module incorporating ESDL input options
   options_in := GetInputOptions (global (first_row.Options));
 
   // set up default options -- those, which must be always chosen in ESDL mode
@@ -120,10 +129,10 @@ unsigned1 n_phones := 40 : stored('_n_phones');
   PersonReports.functions.SetInputSearchOptions (module (project (options_esdl, PersonReports.IParam._compoptions, opt)) end);
   SetInputLocalOptions (options_esdl);
 
-  // Read from stored and set parameters from SOAP (rather debug purpose). 
+  // Read from stored and set parameters from SOAP (rather debug purpose).
   SR := PersonReports.StoredReader;
-  options_stored := module (SR.relatives_options, SR.neighbors_options, SR.imposters_options, 
-                            SR.global_options, SR.phones_options)
+  options_stored := module (SR.relatives_options, SR.neighbors_options, SR.imposters_options,
+                            SR.global_options, SR.phones_options, SR.email_options)
     // debug options, can be removed (not exposed in ESP)
     shared boolean use_unverified_addr := false : stored ('UnverifiedAddresses');
     export boolean use_verified_address_ra := ~use_unverified_addr;
@@ -139,10 +148,10 @@ unsigned1 n_phones := 40 : stored('_n_phones');
 
   // TODO: cannot choose module conditionally: if (exists (first_raw), options_esdl, options_stored);
   // to bypass global storage use "options_esdl"
-  options := options_stored; 
-  //options := options_esdl;  
+  options := options_stored;
+  //options := options_esdl;
 
-	gm := AutoStandardI.GlobalModule();
+  gm := AutoStandardI.GlobalModule();
 
   // define search parameters; in "pure" ESDL mode this must be replaced with a module created from XML input
   search_mod := module (project (gm, PersonReports.IParam._didsearch, opt))
@@ -153,7 +162,7 @@ unsigned1 n_phones := 40 : stored('_n_phones');
   report_mod := module (options, mod_access)
     // Do all required translations here
     export unsigned1 score_threshold := AutoStandardI.InterfaceTranslator.score_threshold_value.val (search_mod);
-		EXPORT UNSIGNED1 neighborhoods := 10;
+    EXPORT UNSIGNED1 neighborhoods := 10;
     // these are not used in Finder, will be removed when all components are switched to IDataAccess.
     // EXPORT boolean ignoreFares := FALSE;
     // EXPORT boolean ignoreFidelity := FALSE;
@@ -163,8 +172,8 @@ unsigned1 n_phones := 40 : stored('_n_phones');
   dids := AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do (search_mod);
 
   // main records
-	Relationship.IParams.storeParams(first_row.Options.RelationshipOption);
-	finder_mod := Relationship.IParams.getParams(report_mod,PersonReports.IParam._finderreport);
+  Relationship.IParams.storeParams(first_row.Options.RelationshipOption);
+  finder_mod := Relationship.IParams.getParams(report_mod,PersonReports.IParam._finderreport);
   recs := PersonReports.FinderReport (dids, finder_mod, FALSE);
 //  output (recs);
 
@@ -175,9 +184,14 @@ unsigned1 n_phones := 40 : stored('_n_phones');
   end;
   results := PROJECT (recs, SetResponse (Left));
 
+  // ROYALTIES
+   royalties := IF (finder_mod.include_email, recs.EmailV2Royalties);
+
   IF (count (dids) > 1,
       fail (203, doxie.ErrorCodes (203)), // or ('ambiguous criteria')
-      output (results, named ('Results')));
+      parallel(output (results, named ('Results')),
+               output (royalties, named ('RoyaltySet')))
+      );
 /*
   // debug
   print_mod := module (project (finder_mod, PersonReports.input._compoptions, opt))

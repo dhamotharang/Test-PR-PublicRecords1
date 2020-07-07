@@ -2,7 +2,11 @@
 
 
 EXPORT fn_getIndBSAndRI(DATASET(DueDiligence.Layouts.CleanedData) cleanData,
-                        Business_Risk_BIP.LIB_Business_Shell_LIBIN options) := FUNCTION
+                        Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
+                        unsigned1 LexIdSourceOptout = 1,
+                        string TransactionID = '',
+                        string BatchUID = '',
+                        unsigned6 GlobalCompanyId = 0) := FUNCTION
     
     //for only person requests of Due Diligence and Citizenship call the BS and Indicators - use cleaned input vs the new pii/lexID just calc'd
     //convert cleaned data into a usable layout for IID
@@ -59,11 +63,20 @@ EXPORT fn_getIndBSAndRI(DATASET(DueDiligence.Layouts.CleanedData) cleanData,
     
     //call instantID
     iid := Risk_Indicators.InstantID_Function(iid_ready, defaultGateway, options.DPPA_Purpose, options.GLBA_Purpose, in_ln_branded := defaultLNBranded, in_BSversion := defaultBSVersion, 
-                                              in_BSOptions := defaultBSOptions, in_DataRestriction := options.DataRestrictionMask, in_DataPermission := options.DataPermissionMask);
+                                              in_BSOptions := defaultBSOptions, in_DataRestriction := options.DataRestrictionMask, in_DataPermission := options.DataPermissionMask,
+                                              LexIdSourceOptout := LexIdSourceOptout, 
+                                              TransactionID := TransactionID, 
+                                              BatchUID := BatchUID, 
+                                              GlobalCompanyID := GlobalCompanyID);
                     
     //call Boca Shell
     bocaShell := Risk_Indicators.Boca_Shell_Function(iid, defaultGateway, options.DPPA_Purpose, options.GLBA_Purpose, BSversion := defaultBSVersion, BSOptions := defaultBSOptions,
-                                                      DataRestriction := options.DataRestrictionMask, DataPermission := options.DataPermissionMask);
+                                                      DataRestriction := options.DataRestrictionMask, DataPermission := options.DataPermissionMask,
+																											includeVehInfo := false,
+                                                      LexIdSourceOptout := LexIdSourceOptout, 
+                                                      TransactionID := TransactionID, 
+                                                      BatchUID := BatchUID, 
+                                                      GlobalCompanyID := GlobalCompanyID);
                                                       
     ungroupBS := UNGROUP(bocaShell);
 

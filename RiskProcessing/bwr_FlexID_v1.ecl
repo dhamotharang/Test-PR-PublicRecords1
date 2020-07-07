@@ -1,7 +1,4 @@
-﻿/*2016-05-26T20:32:11Z (Kevin Huls_prod)
-Update for Emerging Identities
-*/
-#workunit('name','FlexID Process v1');
+﻿#workunit('name','FlexID Process v1');
 // #option ('hthorMemoryLimit', 1000)
 
 import Models, risk_indicators, riskwise, iesp, ut;
@@ -30,11 +27,12 @@ prii_layout := RECORD
 	string historydate;
 END;
 
-INFILE := '~bweiner::in::aetna_4630_10k_sample';
-OUTFILE := '~bweiner::out::flexidv1_out';
 
-f := DATASET(INFILE,prii_layout,csv(quote('"')));
-// f := choosen(DATASET(INFILE,prii_layout,csv(quote('"'))),10);
+INFILE := '~tfuerstenberg::in::rent_8885_puerto_rico_in.csv';
+OUTFILE := '~tfuerstenberg::out::rent_8885_puerto_rico_flexidv1' + thorlib.wuid();
+
+// f := DATASET(INFILE,prii_layout,csv(quote('"')));
+f := choosen(DATASET(INFILE,prii_layout,csv(quote('"'))),10);
 output(f);
 
 // verSSN on/off: On for Google only
@@ -79,22 +77,51 @@ layout_soap := record
 end;
 
 
+include_DigitalInsights := false;  // new setting in CIID enhancements Fall 2019.  Default to false
+UseTargusGateway := false;
+
 
 layout_soap t_f(f le, INTEGER c) := TRANSFORM
 	self.originalAccount := le.accountnumber;
 	
 	// self.gateways := dataset([], risk_indicators.Layout_Gateways_In);
+
+	self.gateways := riskwise.shortcuts.gw_insurancephoneheader + 
+									if(include_DigitalInsights, riskwise.shortcuts.gw_threatmetrix) + 
+									if(UseTargusGateway, riskwise.shortcuts.gw_targus_sco);
+	
+//__________________________________________________________________________________________________________________________________________________________________________ 
+/* **** Use if Targus and InsurancePhoneHeader are needed  **** */
+
+//__________________________________________________________________________________________________________________________________________________________________________            
 	// self.gateways := dataset([{'targus','http://rw_data_prod:Password01@gatewayprodesp.sc.seisint.com:7726/wsGateway/?ver_=1.70'}], risk_indicators.Layout_Gateways_In);
 
 	// for production runs, use the production gateway
 	// self.gateways := dataset([{'insurancephoneheader','http://rw_score_dev:Password01@gatewaycertesp.sc.seisint.com:7526/WsPrism/?ver_=1.82'}], risk_indicators.Layout_Gateways_In);
-	self.gateways := dataset([{'insurancephoneheader','HTTP://api_prod_gw_roxie:g0h3%40t2x@gatewayprodesp.sc.seisint.com:7726/WsGatewayEx/?ver_=1.87'}], risk_indicators.Layout_Gateways_In);
+// self.gateways := dataset([{'bridgerwlc', 'http://bridger_batch_cert:Br1dg3rBAtchC3rt@172.16.70.19:7003/WsSearchCore?ver_=1'}], Gateway.Layouts.Config);  // CERT use this one to run OFAC/Watchlist Version 4 searching  
 	
 //__________________________________________________________________________________________________________________________________________________________________________ 
 /* **** Use if Targus and InsurancePhoneHeader are needed  **** */
 // self.gateways := dataset([{'targus','http://rw_data_prod:Password01@gatewayprodesp.sc.seisint.com:7726/wsGateway/?ver_=1.70'}
            // ,{'insurancephoneheader','http://rw_score_dev:Password01@gatewaycertesp.sc.seisint.com:7526/WsPrism/?ver_=1.82'}], risk_indicators.Layout_Gateways_In);
 //__________________________________________________________________________________________________________________________________________________________________________            
+/* **** Use if Targus and Watchlists are needed  **** */
+
+// self.gateways := dataset([{'targus','http://rw_data_prod:Password01@gatewayprodesp.sc.seisint.com:7726/wsGateway/?ver_=1.70'}
+           // ,{'bridgerwlc', 'http://bridger_batch_cert:Br1dg3rBAtchC3rt@172.16.70.19:7003/WsSearchCore?ver_=1'}], risk_indicators.Layout_Gateways_In);
+//__________________________________________________________________________________________________________________________________________________________________________ 
+/* **** Use if Watchlists and InsurancePhoneHeader are needed  **** */
+
+// self.gateways := dataset([{'bridgerwlc', 'http://bridger_batch_cert:Br1dg3rBAtchC3rt@172.16.70.19:7003/WsSearchCore?ver_=1'}
+           // ,{'insurancephoneheader','http://rw_score_dev:Password01@gatewaycertesp.sc.seisint.com:7526/WsPrism/?ver_=1.82'}], risk_indicators.Layout_Gateways_In);
+//__________________________________________________________________________________________________________________________________________________________________________           
+ /* **** Use if Targus, InsurancePhoneHeader, and Watchlists are needed are needed  **** */
+ 
+// self.gateways := dataset([{'targus','http://rw_data_prod:Password01@gatewayprodesp.sc.seisint.com:7726/wsGateway/?ver_=1.70'}
+// ,{'insurancephoneheader','http://rw_score_dev:Password01@gatewaycertesp.sc.seisint.com:7526/WsPrism/?ver_=1.82'}
+// ,{'bridgerwlc', 'http://bridger_batch_cert:Br1dg3rBAtchC3rt@172.16.70.19:7003/WsSearchCore?ver_=1'}], risk_indicators.Layout_Gateways_In);
+//__________________________________________________________________________________________________________________________________________________________________________ 
+
 /*	
 ESP WITH WATCHLISTS INSTRUCTIONS AND USAGE
 
@@ -125,6 +152,7 @@ ESP version >= 1.039 and < 1.49 which only applies to IID/BIID - OFACversion, In
 
 ESP version >= 1.49 which applies to IID/BIID and Patriot -  OFACversion, Watchlist
 */
+
 	self.OfacOnly := false;
   self.ExcludeWatchLists := false;
 	self.OFACversion := 2;
@@ -138,7 +166,7 @@ ESP version >= 1.49 which applies to IID/BIID and Patriot -  OFACversion, Watchl
   // self.watchlist := dataset([{'OFAC'}],iesp.share.t_StringArrayItem) +
 									  // dataset([{'BES'}],iesp.share.t_StringArrayItem); // use this if you need more than one watchlist, but not all of them
   self._espclientinterfaceversion := 2.16;
-
+ 
 
 	self.FlexIDRequest := project(ut.ds_oneRecord,
 					transform(iesp.flexid.t_FlexIDRequest, 
@@ -187,6 +215,12 @@ ESP version >= 1.49 which applies to IID/BIID and Patriot -  OFACversion, Watchl
 								self.options.EnableEmergingId := false;	// if true, does additional DID searching (for AmEx primarily)
 								self.options.NameInputOrder := '';	// if customer wants to specify the order of input name
 																										//   options are 'fml' or 'lfm' - anything else defaults to standard
+
+																										
+								self.options.IncludeEmailVerification := false;
+								self.options.DisableNonGovernmentDLData := false;
+								self.options.IncludeDigitalIdentity := include_DigitalInsights;  
+								
 								self.searchby.Seq := (string)C;
 								self.searchby.Name.Full := ''; 
 								self.searchby.Name.First := le.FirstName; 
@@ -225,7 +259,9 @@ ESP version >= 1.49 which applies to IID/BIID and Patriot -  OFACversion, Watchl
 								self.searchby.Passport.MachineReadableLine2 := '';
 								self.searchby.Gender := '';
 
-								self := []));
+								self := []
+								));
+
 							
 	self.scores := score; // this is where you ask for the scores, it is being set above
 	
@@ -302,6 +338,7 @@ LayoutFlexIDOut normit(resu le, p_f ri) := transform
 	self.NameAddressPhoneStatus := le.Result.NameAddressPhone.Status;
 	
 	self.VerifiedElementSummaryFirstName := le.Result.VerifiedElementSummary.FirstName;
+	self.VerifiedElementSummaryMiddleName := if(le.Result.VerifiedElementSummary.MiddleName, '1', '0');
 	self.VerifiedElementSummaryLastName := le.Result.VerifiedElementSummary.LastName;
 	self.VerifiedElementSummaryStreetAddress := le.Result.VerifiedElementSummary.StreetAddress;
 	self.VerifiedElementSummaryCity := le.Result.VerifiedElementSummary.City;
@@ -312,6 +349,7 @@ LayoutFlexIDOut normit(resu le, p_f ri) := transform
 	self.VerifiedElementSummaryDOBMatchLevel := (string)le.Result.VerifiedElementSummary.DOBMatchLevel;//dobmatchlevel
 	self.VerifiedElementSummarySSN := le.Result.VerifiedElementSummary.SSN;
 	self.VerifiedElementSummaryDL := le.Result.VerifiedElementSummary.DL;
+	self.VerifiedElementSummaryEmail := if(le.Result.VerifiedElementSummary.Email, '1', '0');
 	
 	self.ValidElementSummarySSN := (string)le.Result.ValidElementSummary.SSNValid;
 	self.ValidElementSummarySSNDeceased := (string)le.Result.ValidElementSummary.SSNDeceased;
@@ -393,6 +431,12 @@ LayoutFlexIDOut normit(resu le, p_f ri) := transform
 	self.EmergingID := le.Result.EmergingID;
 	self.AddressSecondaryRangeMismatch := le.Result.AddressSecondaryRangeMismatch;
 	
+  self.BureauDeleted :=le.result.BureauDeleted;
+  self.ITINExpired :=le.result.ITINExpired;
+  self.IsPhoneCurrent :=le.result.IsPhoneCurrent;
+  self.PhoneLineType :=le.result.PhoneLineType;
+  self.PhoneLineDescription :=le.result.PhoneLineDescription;	
+		
   self.errorcode := le.errorcode;
 	self.seq := ri.FlexIDRequest[1].Searchby.Seq;
 
@@ -422,6 +466,11 @@ Layout_no_verssn := RECORD
 	string1 InstantIDVersion;	// output the version that was run
 	boolean EmergingID;
 	string1 AddressSecondaryRangeMismatch;	// New for EmergingIdentities	
+  boolean BureauDeleted;
+  boolean ITINExpired;
+  boolean IsPhoneCurrent;
+  string2 PhoneLineType;
+  string2 PhoneLineDescription; 
 	string errorcode;
 END;
 
@@ -432,11 +481,12 @@ output(no_verssn_j_f, named('Without_verSSN'));
 /* if statements control whether verSSN or no-verSSN dataset is written to file */
 if(
 	(boolean) include_verssn,
-	output(j_f,,OUTFILE,CSV(heading(single), quote('"')), overwrite),
-	output(no_verssn_j_f,,OUTFILE,CSV(heading(single), quote('"')), overwrite)
+	output(j_f,,OUTFILE,CSV(heading(single), quote('"'))),
+	output(no_verssn_j_f,,OUTFILE,CSV(heading(single), quote('"')))
 	);
 if(
   (boolean) include_verssn,
-	output(j_f(errorcode<>''),,OUTFILE+'_error',CSV(QUOTE('"')), overwrite),
-	output(no_verssn_j_f(errorcode<>''),,OUTFILE+'_error',CSV(QUOTE('"')), overwrite)
+	output(j_f(errorcode<>''),,OUTFILE+'_error',CSV(QUOTE('"'))),
+	output(no_verssn_j_f(errorcode<>''),,OUTFILE+'_error',CSV(QUOTE('"')))
+
 	);

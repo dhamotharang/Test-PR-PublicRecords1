@@ -17,6 +17,9 @@
 IMPORT Std, PublicRecords_KEL, Gateway;
 
 EXPORT MAS_FCRA_Service() := MACRO
+
+#OPTION('expandSelectCreateRow', TRUE);
+
   #WEBSERVICE(FIELDS(
 		'input',
 		'ScoreThreshold',
@@ -43,12 +46,21 @@ EXPORT MAS_FCRA_Service() := MACRO
 	STRING Industry_Class := '' : STORED('IndustryClass');
 	STRING Permissible_Purpose := '' : STORED('PermissiblePurpose'); // Can be set to 'PRESCREENING' for FCRA Pre-Screen applications
 	
+	gateways_in := Gateway.Configuration.Get();
+	Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
+		SELF.servicename := le.servicename;
+		SELF.url := le.url; 
+		SELF := le;
+	END;
+
+	DATASET(Gateway.Layouts.Config) GatewaysClean := PROJECT(gateways_in, gw_switch(LEFT));
+	
 	Options := MODULE(PublicRecords_KEL.Interface_Options)
 		EXPORT INTEGER ScoreThreshold := Score_threshold;
 		EXPORT BOOLEAN isFCRA := TRUE;
 		EXPORT BOOLEAN OutputMasterResults := Output_Master_Results;
-		EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
-		EXPORT STRING Data_Permission_Mask := DataPermissionMask;
+		EXPORT STRING100 Data_Restriction_Mask := DataRestrictionMask;
+		EXPORT STRING100 Data_Permission_Mask := DataPermissionMask;
 		EXPORT UNSIGNED GLBAPurpose := GLBA;
 		EXPORT UNSIGNED DPPAPurpose := DPPA;
 		EXPORT BOOLEAN isMarketing := Is_Marketing; // When TRUE enables Marketing Restrictions
@@ -64,7 +76,9 @@ EXPORT MAS_FCRA_Service() := MACRO
 			Permissible_Purpose,
 			Industry_Class,
 			PublicRecords_KEL.CFG_Compile);
-
+		
+		EXPORT DATASET(Gateway.Layouts.Config) Gateways := GatewaysClean;
+		
 		// Override Include* Entity/Association options here if certain entities can be turned off to speed up processing.
 		// This will bypass uneccesary key JOINS in PublicRecords_KEL.Fn_MAS_FDC if the keys don't contribute to any 
 		// ENTITIES/ASSOCIATIONS being used by the query.	

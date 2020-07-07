@@ -114,11 +114,15 @@ ISSServiceRequest XML:
 
 export ISS_Service := MACRO
 
-	import risk_indicators, ut, iesp, address, seed_files, models, dma, doxie, riskwise, gateway, OFAC_XG5;
+	import risk_indicators, ut, iesp,std, address, models, dma, doxie, riskwise, gateway, OFAC_XG5;
 
 	// Get XML input 
 	ds_in    	:= dataset([], iesp.issservice.t_InsuranceScoringServiceRequest)  	: stored('InsuranceScoringServiceRequest', few);
   unsigned1 ofac_version_      := 1        : stored('OFACVersion');
+  unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+	string TransactionID := '' : STORED('_TransactionId');
+	string BatchUID := '' : STORED('_BatchUID');
+	unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 	gateways_in := Gateway.Configuration.Get();
 
 	optionsIn := ds_in[1].options;
@@ -150,8 +154,8 @@ export ISS_Service := MACRO
 	layout_settings := {boolean LIver1:=false, boolean LIver3:=false, boolean Fraudver1:=false};
 	
 	layout_settings get_settings( ds_in le ) := TRANSFORM
-		liIn := attributesIn(StringLib.StringToLowerCase(TRIM(Name)) = 'leadintegrity');
-		fraudIn := attributesIn(StringLib.StringToLowerCase(TRIM(Name)) = 'fraud');
+		liIn := attributesIn(STD.Str.ToLowerCase(TRIM(Name)) = 'leadintegrity');
+		fraudIn := attributesIn(STD.Str.ToLowerCase(TRIM(Name)) = 'fraud');
 		
 		self.LIver1 := if(liIn[1].Version = '1', true, false);
 		self.LIver3 := if(liIn[1].Version = '3', true, false);
@@ -220,7 +224,7 @@ export ISS_Service := MACRO
 		    + intformat((integer1)l.searchby.dob.day,   2, 1);
 		self.dob := if((unsigned)dob=0, '', dob);
 		self.age := if (l.searchby.age = 0 and (integer)dob != 0, 
-														(STRING3)ut.GetAgeI_asOf((unsigned8)dob, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
+														(STRING3)ut.Age((unsigned8)dob, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
 														if(l.searchby.age=0, '', (STRING3)l.searchby.age));	
 		fullname := trim(l.searchby.name.full);
 		cleanname := address.CleanPerson73( fullname );
@@ -230,11 +234,11 @@ export ISS_Service := MACRO
 		lname  := if(l.searchby.name.last  ='' and fullname!='', trim((cleanname[46..65])), l.searchby.name.last  );
 		suffix := if(l.searchby.name.suffix='' and fullname!='', trim((cleanname[66..70])), l.searchby.name.suffix);
 		
-		self.title  := stringlib.stringtouppercase(title);
-		self.fname  := stringlib.stringtouppercase(fname);
-		self.mname  := stringlib.stringtouppercase(mname);
-		self.lname  := stringlib.stringtouppercase(lname);
-		self.suffix := stringlib.stringtouppercase(suffix);
+		self.title  := STD.Str.touppercase(title);
+		self.fname  := STD.Str.touppercase(fname);
+		self.mname  := STD.Str.touppercase(mname);
+		self.lname  := STD.Str.touppercase(lname);
+		self.suffix := STD.Str.touppercase(suffix);
 		
 		addr_value := if(trim(l.searchby.address.streetaddress1)!='', l.searchby.address.streetaddress1,
 				Address.Addr1FromComponents(l.searchby.address.streetnumber, l.searchby.address.streetpredirection, l.searchby.address.streetname,
@@ -264,8 +268,8 @@ export ISS_Service := MACRO
 		self.county          := clean_a2[143..145];
 		self.geo_blk         := clean_a2[171..177];
 		dl_num_clean := riskwise.cleanDL_num(l.searchby.DriverLicenseNumber);
-		self.dl_number       := stringlib.stringtouppercase(dl_num_clean);
-		self.dl_state        := stringlib.stringtouppercase(l.searchby.DriverLicenseState);
+		self.dl_number       := STD.Str.touppercase(dl_num_clean);
+		self.dl_state        := STD.Str.touppercase(l.searchby.DriverLicenseState);
 		self.phone10 			:= l.searchby.homephone;
 		self.wphone10			:= l.searchby.workphone;
 		self.email_address	:= l.searchby.email;
@@ -286,8 +290,8 @@ export ISS_Service := MACRO
 		cleanname := address.CleanPerson73( fullname );
 		fname  := if(l.searchby.name.first ='' and fullname!='', trim((cleanname[6..25])) , l.searchby.name.first );
 		lname  := if(l.searchby.name.last  ='' and fullname!='', trim((cleanname[46..65])), l.searchby.name.last  );
-		self.fname := stringlib.stringtouppercase(fname);
-		self.lname := stringlib.stringtouppercase(lname);
+		self.fname := STD.Str.touppercase(fname);
+		self.lname := STD.Str.touppercase(lname);
 		SELF.in_zipCode := l.searchby.address.zip5;
 		self := [];
 	end;
@@ -366,7 +370,11 @@ IF( OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, v
 															EverOccupant_PastMonths, 
 															EverOccupant_StartDate, 
 															AppendBest,
-															in_DataPermission:=DataPermission);
+															in_DataPermission:=DataPermission,
+                              LexIdSourceOptout := LexIdSourceOptout, 
+                              TransactionID := TransactionID, 
+                              BatchUID := BatchUID, 
+                              GlobalCompanyID := GlobalCompanyID);
 														
 																							
 																										
@@ -385,7 +393,10 @@ IF( OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, v
 																nugen, 
 																RemoveFares, 
 																DataRestriction,
-																DataPermission:=DataPermission);
+																DataPermission:=DataPermission,LexIdSourceOptout := LexIdSourceOptout, 
+                                          TransactionID := TransactionID, 
+                                          BatchUID := BatchUID, 
+                                          GlobalCompanyID := GlobalCompanyID);
 																
 	adlBasedClam := risk_indicators.ADL_Based_Modeling_Function(iid_prep,
 																					gateways, 
@@ -413,7 +424,10 @@ IF( OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, v
 																					doScore, 
 																					nugen,
 																					DataRestriction:=DataRestriction,
-																					DataPermission:=DataPermission);
+																					DataPermission:=DataPermission,LexIdSourceOptout := LexIdSourceOptout, 
+                                          TransactionID := TransactionID, 
+                                          BatchUID := BatchUID, 
+                                          GlobalCompanyID := GlobalCompanyID);
 																		
 
 	finalClam := if(ADLBasedShell, adlBasedClam, clam);
@@ -421,7 +435,8 @@ IF( OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, v
   if( OFACVersion = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 	// get boca shell test seeds
-	clamTestSeeds := Risk_Indicators.Boca_Shell_Test_Function(test_prep, ds_in[1].searchby.accountNumber, TestDataTableName, IsFCRA);
+	clamTestSeeds := Risk_Indicators.Boca_Shell_Test_Function(test_prep, ds_in[1].searchby.accountNumber, TestDataTableName, IsFCRA
+  );
 														
 	// map the bocashell	into esdl names													
 	mappedBocaShell := iss.getBocaShell(finalClam, datarestriction, TestDataEnabled, TestDataTableName, bsversion);
@@ -462,8 +477,8 @@ IF( OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, v
 
 
 	// get the IP data from netacuity outside the getFDattributes()
-	ip_prepped := project( iid_prep, transform( riskwise.Layout_IPAI, self.seq := left.seq, self.ipaddr := left.ip_address ) );
-	ip_gateway_response := risk_indicators.getNetAcuity( ip_prepped, gateways, DPPA, GLBA );
+	ip_prepped := JOIN( iid_prep, iid, left.seq = right.seq, transform( riskwise.Layout_IPAI, self.seq := left.seq, self.ipaddr := left.ip_address, self.did := right.did) );
+	ip_gateway_response := risk_indicators.getNetAcuity( ip_prepped, gateways, DPPA, GLBA, applyOptOut := true);
 	
 	// Get Fraud Attributes
 	fraudAttr := Models.getFDAttributes(finalClam, iid, '', ip_gateway_response);
@@ -471,7 +486,6 @@ IF( OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, v
 	fraudAttrTestSeed := Risk_Indicators.FDAttributes_TestSeed_Function(test_prep, '', TestDataTableName);																						
 	// choose either test seed or real
 	fraudAttrFinal := if(doFraudver1, if(TestDataEnabled, fraudAttrTestSeed, ungroup(fraudAttr)), dataset([], Models.Layout_FraudAttributes));
-
 
 
 

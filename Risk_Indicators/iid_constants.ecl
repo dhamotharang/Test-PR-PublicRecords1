@@ -323,7 +323,8 @@ export EvictionFltrs := ['FORCIBLE ENTRY/DETAINER', 'FORCIBLE ENTRY/DETAINER REL
 									'FORECLOSURE SATISFIED','DISMISSED FORECLOSURE','FORECLOSURE',
 									'FORCIBLE ENTRY/DETAINER RELEAS','FORECLOSURE PAID'];
 
-export LnJDefault := '11111111';		
+
+export LnJDefault := '11111111111';		
 
 export CreateFullName(string title, string fname, string mname, string lname, string name_suffix) := function
  return (if(trim(title) != '', trim(title) + ' ','') +
@@ -334,7 +335,7 @@ export CreateFullName(string title, string fname, string mname, string lname, st
 end;
 
 export override_addr_type(string street_addr, string addr_type, string carr_rte) := function
-	s := stringlib.stringtouppercase(street_addr);
+	s := STD.Str.touppercase(street_addr);
 	checked_rare_PO := if(
 		REGEXFIND( '^(P[\\s\\.]*[O0BM]?[\\.\\s]*)?((B([O0]X)?)|X)[\\s\\d\\.#]*', s )  // po boxes (abbreviated)
 		OR REGEXFIND( '^POST[\\s\\.]*OFFICE[\\.\\s]*BOX[\\s\\d\\.#]*', s ) // po boxes (spelled out)
@@ -344,7 +345,7 @@ export override_addr_type(string street_addr, string addr_type, string carr_rte)
 end;
 //iid logic with chase pio2 logic
 export override_addr_type_chase(string street_addr_chase, string addr_type_chase) := function
-	s_chase := stringlib.stringtouppercase(street_addr_chase);
+	s_chase := STD.Str.touppercase(street_addr_chase);
 	checked_rare_PO_chase := if(
 		REGEXFIND( '^(P[\\s\\.]*[O0BM]?[\\.\\s]*)?((B([O0]X)?)|X)[\\s\\d\\.#]*', s_chase )  // po boxes (abbreviated)
 		OR REGEXFIND( '^POST[\\s\\.]*OFFICE[\\.\\s]*BOX[\\s\\d\\.#]*', s_chase ) // po boxes (spelled out)
@@ -503,24 +504,32 @@ export bureau_sources := ['EQ', 'EN', 'TN'];
 		InsuranceFCRAMode = 1 << 17,		//ISS FCRA query to use this to filter of data
 		IncludeHHIDSummary = 1 << 18,
 		FilterLiens = 1 << 19,   // option to be able to filter out liens from derogs data and from header searching
-		CityTaxLien = 1 								<< 20,
-		CountyTaxLien = 1 						  << 21,
-		StateTaxWarrant = 1							<< 22,
-		StateTaxLien  =1		 	          << 23,
-		FederalTaxLien = 1 				      << 24,	
-		OtherLien = 1										<< 25,
-		Judgment = 1 										<< 26,
-		Eviction = 1										<< 27,
-		SSNLienFtlr = 1									<< 28,
-		BCBLienFtlr = 1									<< 29,
+		CityTaxLien = 1      << 20,
+		CountyTaxLien = 1    << 21,
+		StateTaxWarrant = 1  << 22,
+		StateTaxLien  = 1    << 23,
+		FederalTaxLien = 1   << 24,	
+		OtherLien = 1        << 25,
+		Judgment = 1         << 26,
+		Eviction = 1         << 27,
+		SSNLienFtlr = 1      << 28,
+		BCBLienFtlr = 1      << 29,
 		InsuranceFCRABankruptcyException = 1 << 30,
 		InsuranceFCRABankruptcyAllow10Yr = 1 << 31,
-		FilterVoter = 1									<< 32,
-   InsuranceFCRASODataFilter    = 1 << 33,
-   RunThreatMetrix= 1          << 34,
-   disablenongovernmentdldata =1 << 35,
-   enableEquifaxPhoneMart   =1 << 36
-		);
+    FilterVoter = 1                << 32,
+    InsuranceFCRASODataFilter = 1  << 33,
+    RunThreatMetrix = 1            << 34,
+    disablenongovernmentdldata = 1 << 35,
+    enableEquifaxPhoneMart = 1     << 36,
+    TurnOffTumblings = 1           << 37, // option to speed up bocashell 5.3 and higher if it's not needed
+    UseIngestDate = 1              << 38, // archive filtering by IngestDate instead of dt_first_seen and vendor date first reported
+
+    ReleasedCaseFltr = 1           << 39,
+    TurnOffRelativeProperty=1      << 40,
+    AttributesOnly = 1             << 41,
+    ExcludeStatusRefresh = 1       << 42,
+    IsFISattributes = 1            << 43  //indicates that FIS custom attributes are being requested
+  );
 
 export CheckifFlagged(string inString, integer Position) :=  if(inString[Position] = '0', true, false);
 
@@ -535,6 +544,9 @@ export FlagLiensOptions(string FilterLienTypes) := function
 	OtherLiens := CheckifFlagged(LiensInput, 6);
 	Judgments := CheckifFlagged(LiensInput, 7);
 	Evictions := CheckifFlagged(LiensInput, 8);
+	ReleasedCases := CheckifFlagged(LiensInput, 9);
+	AttributesOnly := CheckifFlagged(LiensInput, 10);
+    ExcludeStatusRefresh := CheckifFlagged(LiensInput, 11);
 	return (if(CityTaxLiens, BSOptions.CityTaxLien, 0) +
 		if(CountyTaxLiens, BSOptions.CountyTaxLien, 0) +
 		if(StateTaxWarrants, BSOptions.StateTaxWarrant, 0) +
@@ -542,7 +554,11 @@ export FlagLiensOptions(string FilterLienTypes) := function
 		if(FederalTaxLiens, BSOptions.FederalTaxLien, 0) +
 		if(OtherLiens, BSOptions.OtherLien, 0) +
 		if(Judgments, BSOptions.Judgment, 0) +
-		if(Evictions, BSOptions.Eviction, 0)) ;
+		if(Evictions, BSOptions.Eviction, 0) +
+
+		if(ReleasedCases, BSOptions.ReleasedCaseFltr, 0) +
+		if(AttributesOnly, BSOptions.AttributesOnly, 0) +
+        if(ExcludeStatusRefresh, BSOptions.ExcludeStatusRefresh, 0));
 end;
 
 export GoodSSNLength(string9 inSSN) :=  inSSN != '' and 
@@ -599,7 +615,9 @@ export GoodSSNLength(string9 inSSN) :=  inSSN != '' and
 													AddressType, 		// 25
 													DropIndicator,	// 26
 													Unit_count,			// 27
-													Mail_usage);		// 28
+													Mail_usage,		// 28
+													title, // 29
+													dod); // 30
 	
 	export unsigned1 capVelocity(unsigned vcounter) := min(255, vcounter);
 											
@@ -736,7 +754,7 @@ export EI_set_valid_ssn_codes := ['G','Z','R','O','U'];
 
 export boolean isFakeDID (UNSIGNED8 DID) := DID > EmailFakeIds;
 
-export ds_Record := dataset([{1}], {unsigned a});
+export ds_Record := dataset([{1}], {unsigned a}) : DEPRECATED('Replace with: ds := DATASET ([my_transform()])');
 
 
 export stripLeadingZeros(string ZeroedNumber) := function
@@ -1066,7 +1084,7 @@ export Get_chase_NAS_NAP( string chase_f, string chase_l, string chase_addr,  in
 	return Chase_nas_nap;
 end;
 
-export IntendedPurposeCodes(string IntendedPurpose) := case( stringlib.stringtouppercase(IntendedPurpose),
+export IntendedPurposeCodes(string IntendedPurpose) := case( STD.Str.touppercase(IntendedPurpose),
 'APPLICATION' => ['110'],
 'CREDIT TRANSACTION' => ['110'],
 'CREDIT MORTGAGE' => ['110'],
@@ -1192,5 +1210,17 @@ inputssnflag := map(
 
 return inputssnflag;
 end;
+
+Export minor_reasoncode := 'AM';
+
+EXPORT IOverrideOptions := INTERFACE
+    EXPORT BOOLEAN isCodeDI := FALSE;
+    EXPORT BOOLEAN isCodePO := FALSE;
+    EXPORT BOOLEAN isCodeCL := FALSE;
+    EXPORT BOOLEAN isCodeMI := FALSE;
+    EXPORT BOOLEAN isCodeMS := FALSE;
+    EXPORT BOOLEAN isCode12 := FALSE;
+    EXPORT BOOLEAN isCode72 := FALSE;
+END;
 
 end;

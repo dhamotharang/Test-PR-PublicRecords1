@@ -1,5 +1,5 @@
 ﻿
-Import healthcare_shared,MMCP,BatchServices,Autokey_batch,AutokeyB2,AutoStandardI,Codes;
+ Import healthcare_shared,MMCP,BatchServices,Autokey_batch,AutokeyB2,AutoStandardI,Codes;
 
 EXPORT Customer_License_Search_Records := module
 	Shared myLayouts := Healthcare_Services.Customer_License_Search_Layouts;
@@ -153,25 +153,25 @@ EXPORT Customer_License_Search_Records := module
 			self.full_name := trim(FullName+' '+BusName,right);
 			self.hasoptout:=l.hasoptout;
 			self.license_number:=if(l.hasoptout=false,l.license_number,'');
-	  self.bull_license_type:=if(l.hasoptout=false,l.license_number,'');
-		self.sec_license_status:=if(l.hasoptout=false,l.license_number,'');;
-		self.license_status:=if(l.hasoptout=false,l.license_number,'');     
-		self.license_status_date:=if(l.hasoptout=false,l.license_number,'');
-		self.expiration_date:=if(l.hasoptout=false,l.license_number,'');
-		self.audit_number:=if(l.hasoptout=false,l.license_number,'');
-	  self.bull_specialty:=if(l.hasoptout=false,l.license_number,'');
-		self.license_mask:=if(l.hasoptout=false,l.license_number,'');
-		self.issue_date:=if(l.hasoptout=false,l.license_number,'');
-		self.dea_number:=if(l.hasoptout=false,l.license_number,'');
-		self.discipline_ind:=if(l.hasoptout=false,l.license_number,'');     
-		self.last_update_date:=if(l.hasoptout=false,l.license_number,'');   
+	  self.bull_license_type:=if(l.hasoptout=false,l.bull_license_type,'');
+		self.sec_license_status:=if(l.hasoptout=false,l.sec_license_status,'');;
+		self.license_status:=if(l.hasoptout=false,l.license_status,'');     
+		self.license_status_date:=if(l.hasoptout=false,l.license_status_date,'');
+		self.expiration_date:=if(l.hasoptout=false,l.expiration_date,'');
+		self.audit_number:=if(l.hasoptout=false,l.audit_number,'');
+	  self.bull_specialty:=if(l.hasoptout=false,l.bull_specialty,'');
+		self.license_mask:=if(l.hasoptout=false,l.license_mask,'');
+		self.issue_date:=if(l.hasoptout=false,l.issue_date,'');
+		self.dea_number:=if(l.hasoptout=false,l.dea_number,'');
+		self.discipline_ind:=if(l.hasoptout=false,l.discipline_ind,'');     
+		self.last_update_date:=if(l.hasoptout=false,l.last_update_date,'');   
 		//self.status_change_date; // added
-		self.name_prefix:=if(l.hasoptout=false,l.license_number,'');
+		self.name_prefix:=if(l.hasoptout=false,l.name_prefix,'');
 		  // adjusted for IL use
-		self.name_first:=if(l.hasoptout=false,l.license_number,'');
-		self.name_middle:=if(l.hasoptout=false,l.license_number,'');
-		self.name_last:=if(l.hasoptout=false,l.license_number,'');
-		self.name_suffix:=if(l.hasoptout=false,l.license_number,'');
+		self.name_first:=if(l.hasoptout=false,l.name_first,'');
+		self.name_middle:=if(l.hasoptout=false,l.name_middle,'');
+		self.name_last:=if(l.hasoptout=false,l.name_last,'');
+		self.name_suffix:=if(l.hasoptout=false,l.name_suffix,'');
 		self.dob:=if(l.hasoptout=false,l.dob,'');
 		self.ssn:=if(l.hasoptout=false,l.ssn,'');
 		self.company_name:=if(l.hasoptout=false,l.company_name,'');       
@@ -186,9 +186,6 @@ EXPORT Customer_License_Search_Records := module
 		self.clean_company_address.predir:=if(l.hasoptout=false,l.clean_company_address.predir,'');
 		self.clean_company_address.prim_name:=if(l.hasoptout=false,l.clean_company_address.prim_name,'');
 		self.clean_company_address.addr_suffix:=if(l.hasoptout=false,l.clean_company_address.addr_suffix,'');
-		// self.clean_company_address.prim_range:=if(l.hasoptout=false,l.clean_company_address.prim_range,'');
-		// self.clean_company_address.prim_range:=if(l.hasoptout=false,l.clean_company_address.prim_range,'');
-   // self.clean_name:=if(l.hasoptout=false,l.clean_name,'');
 		self.license_board_code_desc:=if(l.hasoptout=false,l.license_board_code_desc,'');
 		self.bull_lic_type_desc:=if(l.hasoptout=false,l.bull_lic_type_desc,'');
 	  self.license_status_desc:=if(l.hasoptout=false,l.license_status_desc,'');

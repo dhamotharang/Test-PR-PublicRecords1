@@ -22,6 +22,16 @@ export layouts := module
 		FFD.Layouts.CommonRawRecordElements;
 	end;
 
+	export offense_rec := record
+		unsigned bitmap;
+		string description;
+	end;
+
+	export raw_with_offenses := record
+		l_raw;
+		dataset(offense_rec) offenses;
+	end;
+
 	export t_CrimSearchRecordWithPenalty := record
 		iesp.criminal_fcra.t_FcraCrimSearchRecord;
 	end;

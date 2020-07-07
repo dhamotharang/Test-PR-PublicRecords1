@@ -1,4 +1,4 @@
-﻿IMPORT Address, AutoStandardI, BIPV2, Business_Credit_Scoring, BusinessCredit_Services, Business_Risk_BIP, Doxie, iesp, LNSmallBusiness, ut, std;
+﻿IMPORT Address, AutoStandardI, Business_Credit_Scoring, BusinessCredit_Services, Business_Risk_BIP, Doxie, iesp, LNSmallBusiness, std;
 
 EXPORT fn_getBusiness_CreditScore (BusinessCredit_Services.Iparam.reportrecords inmod,                                                                                              
 																	     DATASET(BusinessCredit_Services.Layouts.TopBusiness_BestSection) bestRecs,
@@ -144,6 +144,7 @@ EXPORT fn_getBusiness_CreditScore (BusinessCredit_Services.Iparam.reportrecords 
 																 BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,
 																 BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_SBFEATTR => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,
 																 BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,
+																 BusinessCredit_Services.Constants.BBFM1906_1_0 => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,
 																 BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB  => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,
 																 BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL  => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,
 																 BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL  => BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT,

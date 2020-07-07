@@ -1,4 +1,4 @@
-﻿// Note to ECL Developers:
+// Note to ECL Developers:
 // 
 // On 07/09/2019 for the 2019 Criminal Records Report Enhancement (add offense town) Project; 
 // when 1 new OffenseTown field was to be added to the t_CrimReportOffense record of the ESDL 
@@ -25,12 +25,63 @@ export criminal := MODULE
 export t_CrimSearchOption := record (iesp.share.t_BaseSearchOptionEx)
 	integer ReturnCount {xpath('ReturnCount')};
 	integer StartingRecord {xpath('StartingRecord')};
+	boolean GroupSelectCrimesAgainstPersons {xpath('GroupSelectCrimesAgainstPersons')};
+	boolean GroupSelectCrimesAgainstProperty {xpath('GroupSelectCrimesAgainstProperty')};
+	boolean GroupSelectDrugAlcoholOffenses {xpath('GroupSelectDrugAlcoholOffenses')};
+	boolean GroupSelectFraudOffenses {xpath('GroupSelectFraudOffenses')};
+	boolean GroupSelectDomesticPersonalOffenses {xpath('GroupSelectDomesticPersonalOffenses')};
+	boolean GroupSelectSexualOffenses {xpath('GroupSelectSexualOffenses')};
+	boolean IncludeArson {xpath('IncludeArson')};
+	boolean IncludeAssaultAggravated {xpath('IncludeAssaultAggravated')};
+	boolean IncludeAssaultOther {xpath('IncludeAssaultOther')};
+	boolean IncludeBribery {xpath('IncludeBribery')};
+	boolean IncludeBurglaryResidential {xpath('IncludeBurglaryResidential')};
+	boolean IncludeBurglaryCommercial {xpath('IncludeBurglaryCommercial')};
+	boolean IncludeBurglaryMotorVehicle {xpath('IncludeBurglaryMotorVehicle')};
+	boolean IncludeCounterfeitingForgery {xpath('IncludeCounterfeitingForgery')};
+	boolean IncludeDestructionDamageVandalism {xpath('IncludeDestructionDamageVandalism')};
+	boolean IncludeDrugNarcotic {xpath('IncludeDrugNarcotic')};
+	boolean IncludeFraud {xpath('IncludeFraud')};
+	boolean IncludeGambling {xpath('IncludeGambling')};
+	boolean IncludeHomicide {xpath('IncludeHomicide')};
+	boolean IncludeKidnappingAbduction {xpath('IncludeKidnappingAbduction')};
+	boolean IncludeTheft {xpath('IncludeTheft')};
+	boolean IncludeShoplifting {xpath('IncludeShoplifting')};
+	boolean IncludeMotorVehicleTheft {xpath('IncludeMotorVehicleTheft')};
+	boolean IncludePornographyObsceneMaterial {xpath('IncludePornographyObsceneMaterial')};
+	boolean IncludeProstitution {xpath('IncludeProstitution')};
+	boolean IncludeRobberyResidential {xpath('IncludeRobberyResidential')};
+	boolean IncludeRobberyCommercial {xpath('IncludeRobberyCommercial')};
+	boolean IncludeSexOffensesForcible {xpath('IncludeSexOffensesForcible')};
+	boolean IncludeSexOffensesNonForcible {xpath('IncludeSexOffensesNonForcible')};
+	boolean IncludeStolenPropertyOffensesFence {xpath('IncludeStolenPropertyOffensesFence')};
+	boolean IncludeWeaponLawViolations {xpath('IncludeWeaponLawViolations')};
+	boolean IncludeIdentityTheft {xpath('IncludeIdentityTheft')};
+	boolean IncludeComputerCrimes {xpath('IncludeComputerCrimes')};
+	boolean IncludeHumanTrafficking {xpath('IncludeHumanTrafficking')};
+	boolean IncludeTerroristThreats {xpath('IncludeTerroristThreats')};
+	boolean IncludeRestrainingOrderViolations {xpath('IncludeRestrainingOrderViolations')};
+	boolean IncludeTraffic {xpath('IncludeTraffic')};
+	boolean IncludeBadchecks {xpath('IncludeBadchecks')};
+	boolean IncludeCurfewLoiteringVagrancy {xpath('IncludeCurfewLoiteringVagrancy')};
+	boolean IncludeDisorderlyConduct {xpath('IncludeDisorderlyConduct')};
+	boolean IncludeDrivingUnderTheInfluence {xpath('IncludeDrivingUnderTheInfluence')};
+	boolean IncludeDrunkenness {xpath('IncludeDrunkenness')};
+	boolean IncludeFamilyOffenses {xpath('IncludeFamilyOffenses')};
+	boolean IncludeLiquorLawViolations {xpath('IncludeLiquorLawViolations')};
+	boolean IncludeTrespassOfRealProperty {xpath('IncludeTrespassOfRealProperty')};
+	boolean IncludePeepingTom {xpath('IncludePeepingTom')};
+	boolean IncludeOther {xpath('IncludeOther')};
+	boolean IncludeCannotClassify {xpath('IncludeCannotClassify')};
+	boolean IncludeWarrantFugitive {xpath('IncludeWarrantFugitive')};
+	boolean IncludeObstructResist {xpath('IncludeObstructResist')};
+	string OffenseType {xpath('OffenseType')}; //values['','all','felonies','']
+	boolean ConvictionsOnly {xpath('ConvictionsOnly')};
 end;
 		
 export t_CrimSearchBy := record
 	string11 SSN {xpath('SSN')};
 	string12 UniqueId {xpath('UniqueId')};
-	//string10 Phone10 {xpath('Phone10')};//hidden[ecldev]  //For Distrix use only???
 	string10 DOCNumber {xpath('DOCNumber')};
 	iesp.share.t_Name Name {xpath('Name')};
 	iesp.share.t_Address Address {xpath('Address')};
@@ -41,6 +92,11 @@ export t_CrimSearchBy := record
 	iesp.share.t_DateRange CaseFilingDateRange {xpath('CaseFilingDateRange')};
 end;
 		
+export t_OffenseClassifications := record
+	dataset(iesp.share.t_StringArrayItem) Groups {xpath('Groups/Group'), MAXCOUNT(iesp.constants.CRIM.MaxOffenses)};
+	dataset(iesp.share.t_StringArrayItem) Categories {xpath('Categories/Category'), MAXCOUNT(iesp.constants.CRIM.MaxOffenses)};
+end;
+
 export t_CrimSearchRecord := record
 	integer _Penalty {xpath('Penalty')};//hidden[ecldev]
 	boolean AlsoFound {xpath('AlsoFound')};
@@ -57,8 +113,8 @@ export t_CrimSearchRecord := record
 	string35 CaseNumber {xpath('CaseNumber')};
 	string10 DOCNumber {xpath('DOCNumber')};
 	iesp.share.t_Date CaseFilingDate {xpath('CaseFilingDate')};
-	//boolean IsAccurintData {xpath('IsAccurintData')};//hidden[internal]  //For Distrix use only?
 	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
+	t_OffenseClassifications OffenseClassifications {xpath('OffenseClassifications')};
 end;
 		
 export t_CrimSearchResponse := record

@@ -1,14 +1,15 @@
-﻿IMPORT DueDiligence, VehicleV2;
+﻿IMPORT DueDiligence, VehicleV2, Doxie, Suppress;
 
 /*
 	Following Keys being used:
         VehicleV2.key_vehicle_did
         VehicleV2.Key_Vehicle_Party_Key	 
 */
-EXPORT getIndVehicle(DATASET(DueDiligence.Layouts.Indv_Internal) inData, UNSIGNED1 dppa) := FUNCTION
+EXPORT getIndVehicle(DATASET(DueDiligence.Layouts.Indv_Internal) inData, UNSIGNED1 dppa,
+                                          doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 
-  getSpouseAsInquired := DueDiligence.CommonIndividual.getRelationship(inData, spouses, DueDiligence.Constants.INQUIRED_INDIVIDUAL_SPOUSE);
+  getSpouseAsInquired := DueDiligence.CommonIndividual.GetRelationshipAsInquired(inData, spouses, DueDiligence.Constants.INQUIRED_INDIVIDUAL_SPOUSE);
   
   spouseAndInquired := getSpouseAsInquired + inData;
   
@@ -64,11 +65,12 @@ EXPORT getIndVehicle(DATASET(DueDiligence.Layouts.Indv_Internal) inData, UNSIGNE
   //           VehicleV2.Key_Vehicle_Party_Key                       
   // and select only records where history field is empty           
   // to get just the currently owned vehicles                       
-  vehicleSlimParty := JOIN(rollVehicles, VehicleV2.Key_Vehicle_Party_Key,                                 
+  vehicleSlimParty_unsuppressed := JOIN(rollVehicles, VehicleV2.Key_Vehicle_Party_Key,                                 
                             KEYED(LEFT.Vehicle_Key = RIGHT.vehicle_key)   AND
                             KEYED(LEFT.Iteration_Key = RIGHT.iteration_key) AND 
                             KEYED(LEFT.Sequence_Key  = RIGHT.sequence_key),
-                            TRANSFORM(DueDiligence.LayoutsInternal.VehicleSlimLayout,  
+                            TRANSFORM({UNSIGNED4 global_sid, DueDiligence.LayoutsInternal.VehicleSlimLayout},  
+                                                                            SELF.global_sid := RIGHT.global_sid;
 																			SELF.licensePlateType := RIGHT.reg_license_plate_type_desc;                   
 																			SELF.registeredState := RIGHT.reg_license_state;
 																			SELF.registeredDate := RIGHT.reg_latest_effective_date;
@@ -80,9 +82,10 @@ EXPORT getIndVehicle(DATASET(DueDiligence.Layouts.Indv_Internal) inData, UNSIGNE
 																			SELF := LEFT;),
                             //keep only the records that match on both sides
                             ATMOST(DueDiligence.Constants.MAX_ATMOST));
-
+                            
+  vehicleSlimParty := Suppress.Suppress_ReturnOldLayout(vehicleSlimParty_unsuppressed, mod_access, DueDiligence.LayoutsInternal.VehicleSlimLayout);
               
-  vehicleSummary := DueDiligence.getSharedVehicle(vehicleSlimParty, dppa);
+  vehicleSummary := DueDiligence.getSharedVehicle(vehicleSlimParty, dppa, mod_access);
    
    
   addIndVehicleData := JOIN(inData, vehicleSummary,

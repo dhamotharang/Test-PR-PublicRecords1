@@ -13,7 +13,7 @@
   FraudDefenseNetwork_Services.SearchService and BatchServices.trisv31_get_fdn 
  */ 
 
-IMPORT doxie, FraudGovPlatform_Services, FraudShared_Services, iesp;
+IMPORT AutoStandardI, doxie, FraudGovPlatform_Services, FraudShared_Services, iesp;
 
 EXPORT Search_Records(
 	DATASET(FraudDefenseNetwork_Services.Layouts.batch_search_rec) ds_in,
@@ -33,7 +33,10 @@ EXPORT Search_Records(
 	// could be removed.
   
 ) := FUNCTION
-
+  
+  global_mod := AutoStandardI.GlobalModule();
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (global_mod);
+  
   ds_in_seq := FraudDefenseNetwork_Services.Functions.SetSequences(ds_in);
 
   ds_filterBys := PROJECT(ds_in_seq, FraudDefenseNetwork_Services.Layouts.FilterBy_With_Seq_rec);
@@ -42,7 +45,7 @@ EXPORT Search_Records(
 
 	ds_ids := FraudDefenseNetwork_Services.Search_IDs(ds_batch_in, fraud_platform, filterBy_entity_type);
 	
-	ds_Raw := FraudShared_Services.GetPayloadRecords(ds_ids, fraud_platform);
+	ds_Raw := FraudShared_Services.GetPayloadRecords(ds_ids, fraud_platform, mod_access);
   
   ds_Raw_With_Filter := JOIN(
     ds_Raw, ds_filterBys,

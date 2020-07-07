@@ -38,13 +38,14 @@
 */
 /*--INFO-- Contains RiskView Scores and attributes version 5.0 and higher */
 
-import iesp, gateway, risk_indicators, UT, FFD;
+import iesp, gateway, risk_indicators, FFD, STD, Riskview, Models, Royalty;
 
 export Batch_Service := MACRO
 
 // Can't have duplicate definitions of Stored with different default values, 
 // so add the default to #stored to eliminate the assignment of a default value.
 #stored('DataRestrictionMask',risk_indicators.iid_constants.default_DataRestriction);
+#stored('DataPermissionMask',risk_indicators.iid_constants.default_DataPermission);
 
 batchin := dataset([],riskview.layouts.Layout_Riskview_Batch_In) 	: stored('batch_in',few);
 string    AttributesVersionRequest := '' 				: stored('AttributesVersionRequest');
@@ -64,7 +65,7 @@ gateways_in := Gateway.Configuration.Get();
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
 	SELF.servicename := le.servicename;
-	SELF.url := IF(le.servicename IN ['targus'], '', le.url); // Don't allow Targus Gateway
+	SELF.url := IF(le.servicename IN ['targus', 'first_data'], '', le.url); // Don't allow Targus Gateway or First Data/Fiserv Gateway
 	SELF := le;
 END;
 gateways := PROJECT(gateways_in, gw_switch(LEFT));
@@ -75,7 +76,7 @@ string CustomerNumber := ''						: stored('CustomerNumber');
 string SecurityCode := ''							: stored('SecurityCode');
 
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
-string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+STRING DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 
 STRING  strFFDOptionsMask_in	 :=  '0' : STORED('FFDOptionsMask');
 boolean OutputConsumerStatements := strFFDOptionsMask_in[1] = '1';
@@ -93,7 +94,20 @@ boolean ExcludeFederalTaxLiens := false : stored('ExcludeFederalTaxLiens');
 boolean ExcludeOtherLiens := false : stored('ExcludeOtherLiens');
 boolean ExcludeJudgments := false : stored('ExcludeJudgments');
 boolean ExcludeEvictions := false : stored('ExcludeEvictions');
-
+boolean ExcludeReleasedCases := false : stored('ExcludeReleasedCases');
+unsigned6 MinAmount := 0 : stored('MinimumAmount');
+MinimumAmount := MIN(MinAmount, 999999999);
+string ExcludeStates := '' : stored('ExcludeStates');
+ExcludeStatesArray := STD.STr.SplitWords(TRIM(ExcludeStates,ALL),',');
+ExcludedStates := DATASET(ExcludeStatesArray,iesp.share.t_StringArrayItem);
+string ExcludeReportingSources := '' : stored('ExcludeReportingSources');
+ExcludeReportingSourcesArray := STD.STr.SplitWords(TRIM(ExcludeReportingSources,ALL),',');
+ExcludedReportingSources := DATASET(ExcludeReportingSourcesArray,iesp.share.t_StringArrayItem);
+boolean IncludeStatusRefreshChecks := false : stored('IncludeStatusRefreshChecks');
+boolean AttributesOnly := false : stored('AttributesOnly');
+boolean ExcludeStatusRefresh := false : stored('ExcludeStatusRefresh');
+string5 StatusRefreshWaitPeriod := '' : stored('StatusRefreshWaitPeriod');
+		
 //Default to being ON, which is 1. If Excluded, we change to 0.
 string tmpFilterLienTypes := Risk_Indicators.iid_constants.LnJDefault;
 
@@ -105,6 +119,9 @@ tmpFedFltr := if(ExcludeFederalTaxLiens, '0', tmpFilterLienTypes[5..5]);
 tmpLiensFltr := if(ExcludeOtherLiens,'0', tmpFilterLienTypes[6..6]);
 tmpJdgmtsFltr := if(ExcludeJudgments, '0', tmpFilterLienTypes[7..7]);
 tmpEvictionsFltr := if(ExcludeEvictions, '0', tmpFilterLienTypes[8..8]);
+tmpReleasedCasesFltr := if(ExcludeReleasedCases, '0', tmpFilterLienTypes[9..9]);
+tmpAttributesOnlyFltr := if(AttributesOnly, '0', tmpFilterLienTypes[10..10]);
+tmpExcludeStatusRefresh := if(ExcludeStatusRefresh, '0', tmpFilterLienTypes[11..11]);
 	//We now have boolean options for each of these filters. We built the code to use a bit (string)
 	//saying which ones they want and which ones they want to filter. I take the boolean flags and 
 	//turn them into the string the code is expecting. FlagLiensOptions in constants will convert to 
@@ -116,7 +133,10 @@ FilterLienTypes := tmpCityFltr +
 		tmpFedFltr +
 		tmpLiensFltr +
 		tmpJdgmtsFltr +
-		tmpEvictionsFltr;
+		tmpEvictionsFltr +
+		tmpReleasedCasesFltr +
+		tmpAttributesOnlyFltr +
+        tmpExcludeStatusRefresh;
 
 boolean RetainInputDID := false				: stored('RetainInputDID');  // to be used by modelers in R&D mode
 
@@ -187,17 +207,17 @@ RiskView.Layouts.layout_riskview_input getInput(riskview.layouts.Layout_Riskview
 	SELF.seq := c; /*Production*/
 	// SELF.seq := (Unsigned)le.AcctNo; /*Validation*/
 
-	SELF.Custom_Inputs := NORMALIZE(ut.ds_oneRecord, 25, getCustomInputs(le, COUNTER));
+	SELF.Custom_Inputs := NORMALIZE(DATASET([TRANSFORM(iesp.RiskView_Share.t_ModelOptionRV, SELF := [])]), 25, getCustomInputs(le, COUNTER));
 
 	SELF := le;
 END;
 batchin_with_seq := project(batchin, getInput(LEFT, COUNTER));
 
-MLA_alone				:= StringLib.StringToLowerCase(custom_model_name) = 'mla1608_0' AND 
-									 StringLib.StringToLowerCase(custom2_model_name) = '' AND
-									 StringLib.StringToLowerCase(custom3_model_name) = '' AND
-									 StringLib.StringToLowerCase(custom4_model_name) = '' AND
-									 StringLib.StringToLowerCase(custom5_model_name) = '' AND
+MLA_alone				:= STD.Str.ToLowerCase(custom_model_name) = 'mla1608_0' AND 
+									 STD.Str.ToLowerCase(custom2_model_name) = '' AND
+									 STD.Str.ToLowerCase(custom3_model_name) = '' AND
+									 STD.Str.ToLowerCase(custom4_model_name) = '' AND
+									 STD.Str.ToLowerCase(custom5_model_name) = '' AND
 									 auto_model_name = '' AND bankcard_model_name = '' AND 
 									 Short_term_lending_model_name = '' AND Telecommunications_model_name = '' AND Crossindustry_model_name =''  AND AttributesVersionRequest = '';
 								 
@@ -243,10 +263,15 @@ search_Results := riskview.Search_Function(valid_inputs,
 	CustomerNumber,
 	SecurityCode,
 	IncludeRecordsWithSSN,
- IncludeBureauRecs, 
+	IncludeBureauRecs, 
 	ReportingPeriod, 
 	IncludeLnJ,
-	RetainInputDID
+	RetainInputDID,
+	MinimumAmount := MinimumAmount,
+	ExcludeStates := ExcludedStates,
+	ExcludeReportingSources := ExcludedReportingSources,
+	IncludeStatusRefreshChecks := IncludeStatusRefreshChecks,
+	StatusRefreshWaitPeriod := StatusRefreshWaitPeriod
 	);
 
 
@@ -260,11 +285,11 @@ Results := join(batchin_with_seq, search_results, left.seq=right.seq,
 // OUTPUT(batchin_with_seq, NAMED('batchin_with_seq'));
 // OUTPUT(search_results, NAMED('search_results'));
 
-MLA_royalties := if((StringLib.StringToLowerCase(custom_model_name)  = 'mla1608_0' OR
-										 StringLib.StringToLowerCase(custom2_model_name) = 'mla1608_0' OR
-										 StringLib.StringToLowerCase(custom3_model_name) = 'mla1608_0' OR
-										 StringLib.StringToLowerCase(custom4_model_name) = 'mla1608_0' OR 
-										 StringLib.StringToLowerCase(custom5_model_name) = 'mla1608_0'), 
+MLA_royalties := if((STD.Str.ToLowerCase(custom_model_name)  = 'mla1608_0' OR
+										 STD.Str.ToLowerCase(custom2_model_name) = 'mla1608_0' OR
+										 STD.Str.ToLowerCase(custom3_model_name) = 'mla1608_0' OR
+										 STD.Str.ToLowerCase(custom4_model_name) = 'mla1608_0' OR 
+										 STD.Str.ToLowerCase(custom5_model_name) = 'mla1608_0'), 
 										 Royalty.RoyaltyMLA.GetBatchRoyaltiesBySeq(batchin_with_seq, search_Results),
 										 Royalty.RoyaltyMLA.GetNoBatchRoyalties());
 

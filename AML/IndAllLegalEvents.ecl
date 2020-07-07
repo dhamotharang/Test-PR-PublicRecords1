@@ -1,4 +1,4 @@
-﻿Import SexOffender, Risk_indicators, doxie_files, SexOffender_Services, RiskWise, ut, VerificationOfOccupancy, liensv2, std, doxie;
+﻿Import SexOffender, Risk_indicators, doxie_files, SexOffender_Services, RiskWise, ut, VerificationOfOccupancy, liensv2, std, doxie, data_services, Suppress, AML;
 
 
 
@@ -6,6 +6,8 @@ export IndAllLegalEvents(DATASET(Layouts.AMLDerogsLayoutV2) idsIN ,
 													 boolean isFCRA = false,
                                                      doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
   													) := FUNCTION
+
+data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
 
 //version 2
 //  history date can't be 999999   needs a 6 digit date         TODO
@@ -380,7 +382,8 @@ END;
 liens_added := JOIN(idsDedup, kld, keyed(LEFT.did=RIGHT.did), add_liens(LEFT,RIGHT), LEFT OUTER, KEEP(500),
 					ATMOST(keyed(left.did=right.did), Riskwise.max_atmost));
 					
-LiensLayout get_liens_nonFCRA(liens_added le, klr_nonFCRA ri) := TRANSFORM
+{LiensLayout, unsigned4 global_sid} get_liens_nonFCRA(liens_added le, klr_nonFCRA ri) := TRANSFORM
+	self.global_sid := ri.global_sid;
 	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);	
   self.date_first_seen := (INTEGER)ri.date_first_seen;
 	self.date_last_seen  := (INTEGER)ri.date_last_seen ;
@@ -401,7 +404,7 @@ LiensLayout get_liens_nonFCRA(liens_added le, klr_nonFCRA ri) := TRANSFORM
   SELF := le;
 END;
 
-liens_full := JOIN (liens_added, klr_nonFCRA, 
+liens_full_unsuppressed := JOIN (liens_added, klr_nonFCRA, 
                     LEFT.rmsid<>'' AND
                     keyed(left.tmsid=right.tmsid) and keyed(LEFT.rmsid=RIGHT.rmsid) AND 
 										right.name_type='D' and 
@@ -410,7 +413,18 @@ liens_full := JOIN (liens_added, klr_nonFCRA,
 										LEFT OUTER, KEEP(1000),
 				ATMOST(keyed(left.tmsid=right.tmsid) and keyed(left.rmsid=right.rmsid), Riskwise.max_atmost));
 				
-				
+liens_full_flagged := Suppress.MAC_FlagSuppressedSource(liens_full_unsuppressed, mod_access, data_env := data_environment);
+
+liens_full := PROJECT(liens_full_flagged, TRANSFORM(LiensLayout, 
+	SELF.date_first_seen := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.date_first_seen);
+	SELF.date_last_seen  := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.date_last_seen);
+	SELF.liensUnreleasedCnt := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liensUnreleasedCnt);
+	SELF.liensReleasedCnt := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liensReleasedCnt);
+	SELF.liensUnreleasedCnt12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liensUnreleasedCnt12);
+	SELF.liensReleasedCnt12 := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.liensReleasedCnt12);
+    SELF := LEFT;
+)); 
+			
 LiensLayout roll_liens(liens_full le, liens_full ri) := TRANSFORM
 	sameLien := le.tmsid=ri.tmsid and le.rmsid=ri.rmsid;
 	SELF.liensUnreleasedCnt := le.liensUnreleasedCnt + IF(sameLien ,0,ri.liensUnreleasedCnt);

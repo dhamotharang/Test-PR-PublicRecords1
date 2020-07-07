@@ -1,4 +1,4 @@
-﻿import inquiry_acclogs, ut, did_add, riskwise, risk_indicators, NID, STD;
+﻿import inquiry_acclogs, ut, did_add, riskwise, risk_indicators, NID, STD, doxie, data_services, suppress;
 
 // change notes
 // 1.  add fcra purpose of 164 - collections
@@ -11,8 +11,11 @@
 todays_date := (string) risk_indicators.iid_constants.todaydate;
 
 export iid_getInquiryNAP(GROUPED DATASET(risk_indicators.layout_output) iid_pre_Inquiries, boolean isFCRA, 
-													string10 ExactMatchLevel=iid_constants.default_ExactMatchLevel, unsigned3 LastSeenThreshold, unsigned BSVersion=41) := FUNCTION
+													string10 ExactMatchLevel=iid_constants.default_ExactMatchLevel, unsigned3 LastSeenThreshold, unsigned BSVersion=41,
+													doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
+data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+	
 key_ssn := Inquiry_AccLogs.Key_Inquiry_SSN;
 key_address := Inquiry_AccLogs.Key_Inquiry_Address;
 key_phone := Inquiry_AccLogs.Key_Inquiry_Phone;
@@ -142,6 +145,7 @@ layout_temp := record
 	integer fp_score := 0;
 	integer InquiryCnt := 0;
 	string MaxDate := '';
+	boolean skip_opt_out := false;
 end;
 
 
@@ -151,14 +155,14 @@ layout_temp trans_name(risk_indicators.layout_output le, key_did rt) := transfor
 	self.seq := le.seq;
 	self.did := le.did;
 	
-	industry := trim(StringLib.StringToUpperCase(rt.bus_intel.industry));
-	vertical := trim(StringLib.StringToUpperCase(rt.bus_intel.vertical));
-	sub_market := trim(StringLib.StringToUpperCase(rt.bus_intel.sub_market));
-	func := trim(StringLib.StringToUpperCase(rt.search_info.function_description));
+	industry := trim(STD.Str.ToUpperCase(rt.bus_intel.industry));
+	vertical := trim(STD.Str.ToUpperCase(rt.bus_intel.vertical));
+	sub_market := trim(STD.Str.ToUpperCase(rt.bus_intel.sub_market));
+	func := trim(STD.Str.ToUpperCase(rt.search_info.function_description));
 	product_code := trim(rt.search_info.product_code);
 	logdate := rt.search_info.datetime[1..8];
 	
-	is_banko_inquiry := func in Inquiry_AccLogs.shell_constants.banko_functions or (stringlib.stringfind(func, 'MONITORING', 1) > 0 AND product_code='5'); // monitoring transactions with product code=5 are also banko_batch
+	is_banko_inquiry := func in Inquiry_AccLogs.shell_constants.banko_functions or (STD.Str.find(func, 'MONITORING', 1) > 0 AND product_code='5'); // monitoring transactions with product code=5 are also banko_batch
 
 	function_is_ok := if(isfcra, func in Inquiry_AccLogs.shell_constants.set_valid_fcra_functions(bsversion), func in Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions(BSversion));
 	
@@ -223,7 +227,7 @@ layout_temp trans_name(risk_indicators.layout_output le, key_did rt) := transfor
 	boolean isCollection := inquiry_hit and 
 			(~isFCRA or trim(rt.permissions.fcra_purpose) = '164') and
 			(vertical in collections_bucket or industry IN Inquiry_AccLogs.shell_constants.collection_industry or
-				StringLib.StringFind(StringLib.StringToUpperCase(sub_market),'FIRST PARTY', 1) > 0);	
+				STD.Str.Find(STD.Str.ToUpperCase(sub_market),'FIRST PARTY', 1) > 0);	
 				
 	noAddr := le.in_streetaddress='' or rt.person_q.address='' or ~inquiry_hit or isCollection;
 	noFirst := le.fname='' or rt.person_q.fname='' or ~inquiry_hit or isCollection;
@@ -328,7 +332,7 @@ j_raw_nonfcra := dedup(sort(j_raw_nonfcra1, seq, transaction_id, Sequence_Number
 //--online method filtering
 j_raw_online_nonfcra_tmp := sort(j_raw_nonfcra(inquiryPerADL > 0 and fp_score >0 and did <> 0 
 	and method = 'ONLINE'), seq, did, (integer) first_log_date);
-tbl_inq_online_cnts := table(j_raw_online_nonfcra_tmp, {seq, did, inq_cnt:=count(group)}, seq); 
+tbl_inq_online_cnts := table(j_raw_online_nonfcra_tmp, {seq, did, inq_cnt:=count(group)}, seq, did); 
 //get the max dates for each seq
 maxed_online_date := dedup(j_raw_online_nonfcra_tmp, seq, did);
 //join back with the data for online
@@ -345,7 +349,7 @@ j_OnlineMethodFiltered := join(j_raw_nonFcraWithOnlineMaxDates, tbl_inq_online_c
 //--xml and batch method filtering
 j_raw_xml_nonfcra_tmp := sort(j_raw_nonfcra(inquiryPerADL > 0 and fp_score >0 and did <> 0 
 	and method IN ['XML', 'BATCH']), seq, did, (integer) first_log_date);
-tbl_inq_xml_cnts := table(j_raw_xml_nonfcra_tmp, {seq, did, inq_cnt:=count(group)}, seq); 
+tbl_inq_xml_cnts := table(j_raw_xml_nonfcra_tmp, {seq, did, inq_cnt:=count(group)}, seq, did); 
 maxed_xml_date := dedup(j_raw_xml_nonfcra_tmp, seq, did);
 //join back with the data for xml/batch
 j_raw_nonFcraWithXMLMaxDates := join(j_raw_xml_nonfcra_tmp, maxed_xml_date,
@@ -564,7 +568,8 @@ with_DOBs_per_adl := join(with_phones_per_adl, rolled_DOBs_per_adl, left.seq=rig
 // start of the SSN velocity counter section
 // -----------------------------------------------------
 
-layout_temp add_ssn_raw(layout_temp le, key_ssn rt) := transform
+{layout_temp, UNSIGNED4 global_sid} add_ssn_raw(layout_temp le, key_ssn rt) := transform
+	self.global_sid := rt.ccpa.global_sid;
 	good_inquiry := Inquiry_AccLogs.shell_constants.Valid_Velocity_Inquiry(rt.bus_intel.vertical, 
 															rt.bus_intel.industry, 
 															rt.search_info.function_description, 
@@ -594,20 +599,53 @@ layout_temp add_ssn_raw(layout_temp le, key_ssn rt) := transform
 	self := le;
 end;
 
-ssn_raw_base := join(with_DOBs_per_adl, key_ssn,
+ssn_raw_base_unsuppressed := join(with_DOBs_per_adl, key_ssn,
 								left.shell_input.ssn<>'' and 
 								keyed(left.shell_input.ssn=right.ssn) and
 								(~isFCRA) and  // if it is FCRA, need to check the purpose				
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, BSVersion),
 								add_ssn_raw(left, right), left outer, atmost(riskwise.max_atmost));
+								
+ssn_raw_base_flagged := Suppress.CheckSuppression(ssn_raw_base_unsuppressed, mod_access, data_env := data_environment);
+
+ssn_raw_base := PROJECT(ssn_raw_base_flagged, TRANSFORM(layout_temp, 												
+	self.inquiryPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryPerSSN);														
+	self.inquiryADLsPerSSN:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryADLsPerSSN);
+	self.inquiryADLsFromSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryADLsFromSSN);
+	self.inquiryLNamesPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryLNamesPerSSN);
+	self.inquiryLNamesFromSSN := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryLNamesFromSSN);
+	self.inquiryAddrsPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryAddrsPerSSN);
+	self.inquiryAddrsFromSSN := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryAddrsFromSSN);
+	self.inquiryDOBsPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryDOBsPerSSN);
+	self.inquiryDOBsFromSSN := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryDOBsFromSSN);
+	self.Transaction_ID := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Transaction_ID);
+	self.Sequence_Number := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Sequence_Number);
+    SELF := LEFT;
+)); 
 
 // update keys are only built for non-fcra
-ssn_raw_updates := join(with_DOBs_per_adl, Inquiry_AccLogs.Key_Inquiry_SSN_update,
+ssn_raw_updates_unsuppressed := join(with_DOBs_per_adl, Inquiry_AccLogs.Key_Inquiry_SSN_update,
 								left.shell_input.ssn<>'' and 
 								keyed(left.shell_input.ssn=right.ssn) and	
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, BSVersion),
 								add_ssn_raw(left, right), atmost(riskwise.max_atmost));
 
+ssn_raw_updates_flagged := Suppress.CheckSuppression(ssn_raw_updates_unsuppressed, mod_access, data_env := data_environment);
+
+ssn_raw_updates := PROJECT(ssn_raw_updates_flagged, TRANSFORM(layout_temp, 												
+	self.inquiryPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryPerSSN);														
+	self.inquiryADLsPerSSN:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryADLsPerSSN);
+	self.inquiryADLsFromSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryADLsFromSSN);
+	self.inquiryLNamesPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryLNamesPerSSN);
+	self.inquiryLNamesFromSSN := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryLNamesFromSSN);
+	self.inquiryAddrsPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryAddrsPerSSN);
+	self.inquiryAddrsFromSSN := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryAddrsFromSSN);
+	self.inquiryDOBsPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryDOBsPerSSN);
+	self.inquiryDOBsFromSSN := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryDOBsFromSSN);
+	self.Transaction_ID := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Transaction_ID);
+	self.Sequence_Number := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Sequence_Number);
+    SELF := LEFT;
+)); 
 
 ssn_raw_nonfcra := dedup(sort(ungroup(ssn_raw_base + ssn_raw_updates), seq, transaction_id, Sequence_Number), seq, transaction_id, sequence_number) ;
 
@@ -681,7 +719,8 @@ with_ssn_velocity := join(with_Addrs_per_SSN, rolled_DOBs_per_ssn, left.seq=righ
 // start of the Address velocity counter section
 // -----------------------------------------------------
 
-layout_temp add_addr_raw(layout_temp le, key_address rt) := transform
+{layout_temp, UNSIGNED4 global_sid} add_addr_raw(layout_temp le, key_address rt) := transform
+	self.global_sid := rt.ccpa.global_sid;
 	good_inquiry := Inquiry_AccLogs.shell_constants.Valid_Velocity_Inquiry(rt.bus_intel.vertical, 
 															rt.bus_intel.industry, 
 															rt.search_info.function_description, 
@@ -709,7 +748,7 @@ layout_temp add_addr_raw(layout_temp le, key_address rt) := transform
 	self := le;
 end;
 
-Addr_raw_base := join(with_ssn_velocity, key_address,
+Addr_raw_base_unsuppressed := join(with_ssn_velocity, key_address,
 								left.shell_input.prim_name<>'' and 
 								left.shell_input.z5<>'' and
 								keyed(left.shell_input.z5=right.zip) and 
@@ -723,9 +762,26 @@ Addr_raw_base := join(with_ssn_velocity, key_address,
 								//(unsigned)right.search_info.datetime[1..6] < left.historydate,
 								add_Addr_raw(left, right), left outer, atmost(riskwise.max_atmost));
 
+Addr_raw_base_flagged := Suppress.CheckSuppression(Addr_raw_base_unsuppressed, mod_access, data_env := data_environment);
+
+Addr_raw_base := PROJECT(Addr_raw_base_flagged, TRANSFORM(layout_temp, 
+	self.inquiryPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryPerSSN);														
+	self.inquiryADLsPerSSN:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryADLsPerSSN);
+	self.inquiryADLsFromSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryADLsFromSSN);
+	self.inquiryLNamesPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryLNamesPerSSN);
+	self.inquiryLNamesFromSSN := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryLNamesFromSSN);
+	self.inquiryAddrsPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryAddrsPerSSN);
+	self.inquiryAddrsFromSSN := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryAddrsFromSSN);
+	self.inquiryDOBsPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryDOBsPerSSN);
+	self.inquiryDOBsFromSSN := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryDOBsFromSSN);
+	self.Transaction_ID := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Transaction_ID);
+	self.Sequence_Number := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Sequence_Number);
+    SELF := LEFT;
+)); 
+
 // update keys are only built for non-fcra
 
-Addr_raw_updates := join(with_ssn_velocity, Inquiry_AccLogs.Key_Inquiry_Address_update,
+Addr_raw_updates_unsuppressed := join(with_ssn_velocity, Inquiry_AccLogs.Key_Inquiry_Address_update,
 								left.shell_input.prim_name<>'' and 
 								left.shell_input.z5<>'' and
 								keyed(left.shell_input.z5=right.zip) and 
@@ -736,6 +792,23 @@ Addr_raw_updates := join(with_ssn_velocity, Inquiry_AccLogs.Key_Inquiry_Address_
 								left.shell_input.addr_suffix=right.person_q.addr_suffix and
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, BSVersion),
 								add_Addr_raw(left, right), atmost(riskwise.max_atmost));
+								
+Addr_raw_updates_flagged := Suppress.CheckSuppression(Addr_raw_updates_unsuppressed, mod_access, data_env := data_environment);
+
+Addr_raw_updates := PROJECT(Addr_raw_updates_flagged, TRANSFORM(layout_temp, 
+	self.inquiryPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryPerSSN);														
+	self.inquiryADLsPerSSN:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryADLsPerSSN);
+	self.inquiryADLsFromSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryADLsFromSSN);
+	self.inquiryLNamesPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryLNamesPerSSN);
+	self.inquiryLNamesFromSSN := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryLNamesFromSSN);
+	self.inquiryAddrsPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryAddrsPerSSN);
+	self.inquiryAddrsFromSSN := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryAddrsFromSSN);
+	self.inquiryDOBsPerSSN := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryDOBsPerSSN);
+	self.inquiryDOBsFromSSN := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.inquiryDOBsFromSSN);
+	self.Transaction_ID := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Transaction_ID);
+	self.Sequence_Number := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Sequence_Number);
+    SELF := LEFT;
+)); 
 
 addr_raw_nonfcra := dedup(sort(ungroup(addr_raw_base + addr_raw_updates), seq, transaction_id, Sequence_Number), seq, transaction_id, sequence_number) ;
 	
@@ -794,7 +867,8 @@ with_address_velocities := join(with_Lnames_per_Addr, rolled_SSNs_per_Addr, left
 // start of the Phone velocity counter section
 // -----------------------------------------------------
 
-layout_temp add_Phone_raw(layout_temp le, Key_Phone rt) := transform
+{layout_temp, UNSIGNED4 global_sid} add_Phone_raw(layout_temp le, Key_Phone rt) := transform
+	self.global_sid := rt.ccpa.global_sid;
 	good_inquiry := Inquiry_AccLogs.shell_constants.Valid_Velocity_Inquiry(rt.bus_intel.vertical, 
 															rt.bus_intel.industry, 
 															rt.search_info.function_description, 
@@ -819,19 +893,41 @@ layout_temp add_Phone_raw(layout_temp le, Key_Phone rt) := transform
 end;
 
 
-Phone_raw_base := join(with_address_velocities, key_phone,
+Phone_raw_base_unsuppressed := join(with_address_velocities, key_phone,
 								left.shell_input.phone10<>'' and 
 								keyed(left.shell_input.phone10=right.phone10) and
 								(~isFCRA) and  // if it is FCRA, need to check the purpose
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, BSVersion),
 								add_Phone_raw(left, right), left outer, atmost(riskwise.max_atmost));
 
+Phone_raw_base_flagged := Suppress.CheckSuppression(Phone_raw_base_unsuppressed, mod_access, data_env := data_environment);
+
+Phone_raw_base := PROJECT(Phone_raw_base_flagged, TRANSFORM(layout_temp, 													
+	self.inquiryPerPhone := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryPerPhone);											
+	self.inquiryADLsPerPhone:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryADLsPerPhone);
+	self.inquiryADLsFromPhone := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryADLsFromPhone);
+	self.Transaction_ID := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Transaction_ID);
+	self.Sequence_Number := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Sequence_Number);
+    SELF := LEFT;
+)); 
+
 // update keys are only built for non-fcra
-Phone_raw_updates := join(with_address_velocities, Inquiry_AccLogs.Key_Inquiry_Phone_update,
+Phone_raw_updates_unsuppressed := join(with_address_velocities, Inquiry_AccLogs.Key_Inquiry_Phone_update,
 								left.shell_input.phone10<>'' and 
 								keyed(left.shell_input.phone10=right.phone10) and
 								Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate, BSVersion),
 								add_Phone_raw(left, right), atmost(riskwise.max_atmost));								
+
+Phone_raw_updates_flagged := Suppress.CheckSuppression(Phone_raw_updates_unsuppressed, mod_access, data_env := data_environment);
+
+Phone_raw_updates := PROJECT(Phone_raw_updates_flagged, TRANSFORM(layout_temp, 													
+	self.inquiryPerPhone := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryPerPhone);											
+	self.inquiryADLsPerPhone:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryADLsPerPhone);
+	self.inquiryADLsFromPhone := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.inquiryADLsFromPhone);
+	self.Transaction_ID := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Transaction_ID);
+	self.Sequence_Number := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.Sequence_Number);
+    SELF := LEFT;
+)); 
 
 phone_raw_nonfcra := dedup(sort(ungroup(phone_raw_base + phone_raw_updates), seq, transaction_id, Sequence_Number), seq, transaction_id, sequence_number) ;
 								

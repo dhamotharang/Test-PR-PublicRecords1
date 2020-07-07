@@ -1,8 +1,9 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, Doxie;
 
 EXPORT getIndBusAssocBus(DATASET(DueDiligence.Layouts.Busn_Internal) businesses,
                           Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-                          BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+                          BIPV2.mod_sources.iParams linkingOptions,
+                          doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
      
      
     BOOLEAN includeAllBusinessData := FALSE;
@@ -13,15 +14,15 @@ EXPORT getIndBusAssocBus(DATASET(DueDiligence.Layouts.Busn_Internal) businesses,
   
     busReg := DueDiligence.getBusRegistration(linkedBus, options, includeAllBusinessData);
     
-    busHeader := DueDiligence.getBusHeader(busReg, options, linkingOptions, includeAllBusinessData, includeReportData);
+    busHeader := DueDiligence.getBusHeader(busReg, options, linkingOptions, includeAllBusinessData, includeReportData, mod_access);
     
     busSOS := DueDiligence.getBusSOSDetail(busHeader, options, includeAllBusinessData, includeReportData);
     
     addrRisk := DueDiligence.getBusAddrData(busSOS, options, includeReportData);  //must be called after getBusSOSDetail & getBusRegistration
     
-    getBusSICNAICS := DueDiligence.getBusSicNaic(addrRisk, options, linkingOptions, includeReportData);
+    getBusSICNAICS := DueDiligence.getBusSicNaic(addrRisk, options, linkingOptions, includeReportData, mod_access);
     
-    getBEOs := DueDiligence.getSharedBEOs(getBusSICNAICS, options, linkingOptions); 
+    getBEOs := DueDiligence.getSharedBEOs(getBusSICNAICS, options, linkingOptions, mod_access); 
     
     //populate the structure for the business
     associatedBusinesses := PROJECT(getBEOs, TRANSFORM(DueDiligence.LayoutsInternal.IndBusAssociations,

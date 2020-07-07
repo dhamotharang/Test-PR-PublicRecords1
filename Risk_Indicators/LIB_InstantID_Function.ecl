@@ -1,10 +1,10 @@
-﻿import doxie, ut, DID_Add, address, UtilFile, riskwise, iesp, patriot, gateway;
+﻿import doxie, iesp, gateway, RIsk_Indicators;
 
 export LIB_InstantID_Function(DATASET(risk_indicators.layout_input) indata, 
 			dataset(Gateway.Layouts.Config) gateways, 
-			LIBIN args, 
+			Risk_Indicators.LIBIN args, 
 			dataset(iesp.share.t_StringArrayItem) watchlists_requested,
-			dataset(layouts.Layout_DOB_Match_Options) DOBMatchOptions) := 
+			dataset(Risk_Indicators.layouts.Layout_DOB_Match_Options) DOBMatchOptions) := 
 
 MODULE
 
@@ -44,16 +44,35 @@ LastSeenThreshold := args.LastSeenThreshold;
 companyID := args.companyID;
 DataPermission := args.DataPermission;
 IncludeNAPData := args.IncludeNAPData;
+LexIdSourceOptout := args.iid_LexIdSourceOptout;
+TransactionID := args.iid_TransactionID; 
+BatchUID := args.iid_BatchUID; 
+GlobalCompanyID := args.iid_GlobalCompanyID;
+IndustryClass := args.IndustryClass; 
+
+mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT glb := ^.glb;
+	EXPORT dppa := ^.dppa;
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
 
 // step 1.  Get the DID and prep the layout_output dataset
 with_DID := risk_indicators.iid_getDID_prepOutput(indata, dppa, glb, isFCRA, BSversion, DataRestriction, 
-				append_best, gateways, BSOptions);
+				append_best, gateways, BSOptions, mod_access);
 
 commonstart := risk_indicators.iid_common_function(with_did, dppa, glb, isUtility, ln_branded,
 															suppressNearDups, isFCRA, bsversion,
 															runSSNCodes, runBestAddrCheck, ExactMatchLevel, DataRestriction, CustomDataFilter,
 															DOBMatchOptions, EverOccupant_PastMonths, EverOccupant_StartDate, BSOptions, LastSeenThreshold, 
-															DataPermission);
+															DataPermission,
+															LexIdSourceOptout := LexIdSourceOptout, 
+															TransactionID := TransactionID, 
+															BatchUID := BatchUID, 
+															GlobalCompanyID := GlobalCompanyID,
+                              IndustryClass := IndustryClass
+                              );
 															
 common_transformed := risk_indicators.iid_transform_common(commonstart, BSOptions);
 
@@ -70,25 +89,26 @@ gotWatch := map(isFCRA or // don't search watchlist files for FCRA products anym
 								include_additional_watchlists,global_watchlist_threshold,dob_radius, watchlists_requested, gateways));
 
 
-with_flags := risk_indicators.iid_getPhoneAddrFlags(with_did, isFCRA, runAreaCodeSplitSearch, BSversion);							
+with_flags := risk_indicators.iid_getPhoneAddrFlags(with_did, isFCRA, runAreaCodeSplitSearch, BSversion, mod_access);							
 with_addrs := risk_indicators.iid_getAddressInfo(with_flags, glb, isFCRA, require2ele, BSversion, isUtility, 
 		ExactMatchLevel, LastSeenThreshold, BSOptions);					
 
 with_nap := risk_indicators.iid_getPhoneInfo(with_addrs, gateways, dppa, glb, isFCRA, require2ele, BSversion, 
 allowCellphones, ExactMatchLevel, LastSeenThreshold, BSOptions,
-		companyID,EverOccupant_PastMonths, EverOccupant_StartDate, IncludeNAPData);
+		companyID,EverOccupant_PastMonths, EverOccupant_StartDate, IncludeNAPData, mod_access);
 
 combined_verification := risk_indicators.iid_combine_verification(gotWatch, with_nap, from_IT1O, 
-		ExactMatchLevel, isFCRA, BSOptions, bsversion, DataPermission, DataRestriction);
+		ExactMatchLevel, isFCRA, BSOptions, bsversion, DataPermission, DataRestriction, mod_access);
 
-dlverify := risk_indicators.iid_DL_verification(combined_verification, dppa, isfcra, ExactMatchLevel, BSOptions, DataPermission, bsversion);
+dlverify := risk_indicators.iid_DL_verification(combined_verification, dppa, isfcra, ExactMatchLevel, BSOptions, DataPermission, bsversion, mod_access);
 with_DL_verification := if(runDLverification, dlverify, combined_verification);
 
 runThreatMetrix := (BSOptions & risk_indicators.iid_constants.BSOptions.runThreatMetrix) > 0;
 
 with_ThreatMetrix := if(runThreatMetrix, 
-	risk_indicators.iid_append_threatMetrix(indata, with_dl_verification, gateways, companyID), 
+	risk_indicators.iid_append_threatMetrix(indata, with_dl_verification, gateways, companyID, DataRestriction), 
 	with_dl_verification);
+		
 	
 export results := with_ThreatMetrix;
 

@@ -1,4 +1,4 @@
-IMPORT Relationship,Header,PAW,STD,ut,dx_BestRecords;
+﻿IMPORT Relationship,Header,PAW,STD,dx_BestRecords,Doxie,suppress;
 
 EXPORT fn_getRelAssocRecs(DATASET(Layouts.batch_working) ds_work_recs,
 													IParams.BatchParams in_mod) := FUNCTION
@@ -21,7 +21,11 @@ EXPORT fn_getRelAssocRecs(DATASET(Layouts.batch_working) ds_work_recs,
 		acctDidRec;
 		UNSIGNED6 seleid;
 		BOOLEAN is_business_affiliate:=TRUE;
+		UNSIGNED4 global_sid;
+		UNSIGNED8 record_sid;
 	END;
+	
+	mod_access := PROJECT(in_mod, Doxie.IDataAccess);
 
 	#IF(CONSTANTS.DEBUG_RELATIONSHIPS)
 	getRelativeName(UNSIGNED6 did) := FUNCTION
@@ -46,7 +50,7 @@ EXPORT fn_getRelAssocRecs(DATASET(Layouts.batch_working) ds_work_recs,
 	// REFERENCE: Header.relative_titles
 	txMask := Relationship.Functions.getTransAssocFlgs(in_mod.relationship_transassocmask);
 	dids := PROJECT(ds_work_recs,TRANSFORM(Relationship.layout_GetRelationship.DIDs_layout,SELF:=LEFT));
-	RelationshipRecs := Relationship.proc_GetRelationship(dids,txflag:=txMask).result;
+	RelationshipRecs := Relationship.proc_GetRelationshipNeutral(dids,txflag:=txMask).result;
 	ds_relationship1_recs := JOIN(ds_work_recs,RelationshipRecs,
 		LEFT.did=RIGHT.did1,TRANSFORM(tmpRelRec,SELF.acctno:=LEFT.acctno,SELF:=RIGHT));
 
@@ -67,8 +71,10 @@ EXPORT fn_getRelAssocRecs(DATASET(Layouts.batch_working) ds_work_recs,
 		KEYED(LEFT.contact_id=RIGHT.contact_id) AND RIGHT.seleid!=0,
 		TRANSFORM(acctDidSeleidRec,SELF:=LEFT,SELF:=RIGHT),
 		LIMIT(0),KEEP(1)),RECORD),RECORD);
+		
+	suppressed_pawDidSeleidRecs := suppress.MAC_SuppressSource(pawDidSeleidRecs,mod_access);
 
-	pawCommonSeleidRecs:=JOIN(pawDidSeleidRecs(is_subject),pawDidSeleidRecs(~is_subject),
+	pawCommonSeleidRecs:=JOIN(suppressed_pawDidSeleidRecs(is_subject),suppressed_pawDidSeleidRecs(~is_subject),
 		LEFT.acctno=RIGHT.acctno AND LEFT.seleid=RIGHT.seleid,
 		TRANSFORM(acctDidSeleidRec,SELF:=RIGHT),
 		LIMIT(100,SKIP));
@@ -80,6 +86,10 @@ EXPORT fn_getRelAssocRecs(DATASET(Layouts.batch_working) ds_work_recs,
 
 	ds_working_recs := DENORMALIZE(ds_work_recs,ds_relationship2_recs,
 		LEFT.acctno=RIGHT.acctno,GROUP,addRelationships(LEFT,ROWS(RIGHT)));
-
+		
+    // Intermediate outputs for CCPA testing
+	// OUTPUT(pawDidSeleidRecs,NAMED('pawDidSeleidRecs'));
+    // OUTPUT(suppressed_pawDidSeleidRecs,NAMED('suppressed_pawDidSeleidRecs'));
+	
 	RETURN ds_working_recs;
 END;

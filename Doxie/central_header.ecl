@@ -2,54 +2,93 @@
 IMPORT doxie, doxie_crs, suppress, fcra, header, AID_Build, Relationship, Advo, FFD;
 
 EXPORT central_header (DATASET (doxie.layout_references) dids,
-                       boolean IsFCRA = false, 
-											 boolean VerifyUniqueID = false,
-											 boolean in_getSSNBest = false,
-											 dataset(FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = dataset([], FFD.Layouts.PersonContextBatchSlim), 											 
-											 integer8 inFFDOptionsMask = 0,
-											 dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
-											 ) := FUNCTION
+                       doxie.IDataAccess mod_access,
+                       boolean IsFCRA = false,
+                       boolean VerifyUniqueID = false,
+                       boolean in_getSSNBest = false,
+                       dataset(FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = dataset([], FFD.Layouts.PersonContextBatchSlim),
+                       integer8 inFFDOptionsMask = 0,
+                       dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
+                       ) := FUNCTION
 
 boolean includeGeoLocation := false : stored('IncludeGeoLocation');
 boolean IncludePhoneMetadata := false : stored('IncludePhoneMetadata'); //For Accurint CompReport
 
 doxie.MAC_Header_Field_Declare(IsFCRA); //ssn_value, fname_value, lname_value, dial_contactprecision_value
-mod_access := doxie.compliance.GetGlobalDataAccessModule ();
-
 doxie.MAC_Selection_Declare();
 
 // non-FCRA header data
 idid := max(dids(did > 0, did < header.constants.QH_start_rid), did);//dids has no more than 1 record here.  this is just a technique for turning it into an integer value.  see #stored('useOnlyBestDID',true) in doxie.Comprehensive_Report_Service
 boolean IncludeBlankDOD := false : stored('IncludeBlankDOD');
 
-dear0 := doxie.Deathfile_Records(IncludeBlankDOD or (unsigned)dod8 != 0); 
+deathfile_with_src := doxie.Deathfile_Records(IncludeBlankDOD or (unsigned)dod8 != 0);
+
+dear0 := project(deathfile_with_src, doxie_crs.layout_deathfile_records);
 death_filtered := dear0((unsigned)did = idid);//creating a common filter
 best_full := doxie.best_records (dids, FALSE, useNonBlankKey := true, getSSNBest := in_getSSNBest, modAccess := mod_access);
 
 ssnr_pre := doxie.fn_ssn_records(best_full);
 
-besr_pre := project(best_full, 
+besr_pre := project(best_full,
     transform (doxie_crs.layout_best_information,
       max_dod := max(death_filtered, dod8);
-      self.phones := doxie_crs.verifiedPhones(Legacy_Verified_Value).records, 
+      self.phones := doxie_crs.verifiedPhones(Legacy_Verified_Value).records,
       self.dod := max_dod,
       self.deceased := if(exists(death_filtered),'Y','N'),
       self.IsLimitedAccessDMF := max_dod != '' and not exists(death_filtered(dod8 = max_dod and ~IsLimitedAccessDMF)),
       self.ssn := if (left.ssn <> '',
-                      left.ssn, 
+                      left.ssn,
                       if(exists(ssnr_pre(did = idid and ssn = ssn_value)), ssn_value, ''));
       self := left)
 );
+
+//code to add best supplemental info
+
+rec_best_supplemental := record
+  unsigned6 did;
+  string9 ssn;
+  doxie_crs.layout_best_supplemental_info;
+  string3 death_rec_src;
+end;
+
+//Getting best supplemental info for did in best information section.
+//join best information section with death children section to get age at death, death county, death state
+death_recs_sorted := sort(deathfile_with_src, if(death_rec_src = 'SSA', 0, 1), -county_name, -state);
+
+death_info := join(best_full,death_recs_sorted,
+                   left.did = (unsigned6) right.did,
+                   transform(rec_best_supplemental,
+                     self.age_at_death  := right.age_at_death,
+                     self.death_county  := right.county_name,
+                     self.death_state   := right.state,
+                     self.death_rec_src := right.death_rec_src,
+                     self               := left,
+                     self               := []
+                   ), left outer, keep(1), limit(0));
+
+//join best information and death information with ssn children dataset
+//to get required ssn information for the did in best infromation section
+best_supplemental := join(death_info, ssnr_pre,
+                          left.did = right.did and
+                          left.ssn = right.ssn,
+                          transform(doxie_crs.layout_best_supplemental_info,
+                            self.is_valid_ssn         := right.valid,
+                            self.ssn_issued_location  := right.ssn_issue_place,
+                            self.ssn_issued_startdate := right.ssn_issue_early,
+                            self.ssn_issued_enddate   := right.ssn_issue_last,
+                            self                      := left
+                          ), left outer, keep(1), limit(0));
+
+best_supplemental_info := if(~IsFCRA, best_supplemental);
+//best supplemental info code ends here
 
 // TODO: It looks like there's no reliable way to fetch flag records by SSN in the FCRA context:
 //   consider just taking it from the input, if any.
 
 // FCRA header data -- based on the DIDs fetched from the neutral site.
 // All FCRA-relevant corrections are applied inside
-fcra_csa_wrap := FCRA.comp_subject (dids, mod_access.dppa, mod_access.glb, false, // exclude Gong so far
-                                    mod_access.industry_class,
-                                    dial_contactprecision_value, // *, Addresses_PerSubject * //
-																		, ds_flags, slim_pc_recs(datagroup in FFD.Constants.DataGroupSet.HDR), inFFDOptionsMask);
+fcra_csa_wrap := FCRA.comp_subject (dids, mod_access,
+                                    ds_flags, slim_pc_recs(datagroup in FFD.Constants.DataGroupSet.HDR), inFFDOptionsMask);
 
 // Additional validation of DID, if requested
 did_verify_input := module (doxie.IVerifyLexID)
@@ -77,47 +116,47 @@ shrr0 := doxie.HRI_SSN_records;
 
 _addr_verified := doxie_Crs.Comp_Addresses_Verified(Legacy_Verified_Value);
 
-_addr_geo := join(_addr_verified, AID_Build.Key_AID_Base, 
-                  left.rawaid = right.rawaid, 
-                  transform(recordof(_addr_verified), self.geo_lat := right.geo_lat, self.geo_long := right.geo_long, self := left), 
-									left outer, keep(1), limit(0));
+_addr_geo := join(_addr_verified, AID_Build.Key_AID_Base,
+                  left.rawaid = right.rawaid,
+                  transform(recordof(_addr_verified), self.geo_lat := right.geo_lat, self.geo_long := right.geo_long, self := left),
+                  left outer, keep(1), limit(0));
 
 _addr_temp := if(includeGeoLocation, _addr_geo, _addr_verified);
 _addr := IF (IsFCRA, csa_addresses, _addr_temp);
 
-doxie.MAC_Add_UtilityConnection(_addr, doxie.Layout_Comp_Addr_Utility_Recs, //addr, 
+doxie.MAC_Add_UtilityConnection(_addr, doxie.Layout_Comp_Addr_Utility_Recs, //addr,
                                 addr_util, TRUE, IsFCRA, mod_access.isValidGLB()); // Appends Utility recs to subject address.
-																
+
 
 //adding address type for residence/business indicator comp report redesign
- 
+
 //Look up data by address (using zip)
 ds_zip_key := join(addr_util,Advo.Key_Addr1,
-		keyed(left.zip != '' and left.zip = right.zip) and
-		keyed(left.prim_range = right.prim_range) and
-		keyed(left.prim_name = right.prim_name) and
-		keyed(left.suffix = right.addr_suffix) and
-		keyed(left.predir = right.predir) and
-		keyed(left.postdir = right.postdir) and
-		keyed(left.sec_range = right.sec_range),
-		transform(doxie.Layout_Comp_Addr_Utility_Recs,
-			self.Address_type := Advo.Lookup_Descriptions.fn_resbus_mixed(right.Residential_Or_Business_Ind),
-			self := left),left outer,
-		LIMIT(0),keep(1));
-		
+    keyed(left.zip != '' and left.zip = right.zip) and
+    keyed(left.prim_range = right.prim_range) and
+    keyed(left.prim_name = right.prim_name) and
+    keyed(left.suffix = right.addr_suffix) and
+    keyed(left.predir = right.predir) and
+    keyed(left.postdir = right.postdir) and
+    keyed(left.sec_range = right.sec_range),
+    transform(doxie.Layout_Comp_Addr_Utility_Recs,
+      self.Address_type := Advo.Lookup_Descriptions.fn_resbus_mixed(right.Residential_Or_Business_Ind),
+      self := left),left outer,
+    LIMIT(0),keep(1));
+
 //  Look up data by address (using City/State)
 addr_nonfcra := join(ds_zip_key,Advo.Key_Addr2,
-												keyed(left.Address_type = '' and left.st != '' and left.city_name != '' and left.st = right.st) and
-												keyed(left.city_name = right.v_city_name) and
-								        keyed(left.prim_range = right.prim_range) and
-												keyed(left.prim_name = right.prim_name) and
-												keyed(left.sec_range = right.sec_range),
-												transform(doxie.Layout_Comp_Addr_Utility_Recs,
-																	self.Address_type := If(left.Address_type='',Advo.Lookup_Descriptions.fn_resbus_mixed(right.Residential_Or_Business_Ind),left.Address_type),
-																	self := left),left outer,
-												LIMIT(0),keep(1));
-												
-addr0 := if(IsFCRA,	addr_util , addr_nonfcra); 																			
+                        keyed(left.Address_type = '' and left.st != '' and left.city_name != '' and left.st = right.st) and
+                        keyed(left.city_name = right.v_city_name) and
+                        keyed(left.prim_range = right.prim_range) and
+                        keyed(left.prim_name = right.prim_name) and
+                        keyed(left.sec_range = right.sec_range),
+                        transform(doxie.Layout_Comp_Addr_Utility_Recs,
+                                  self.Address_type := If(left.Address_type='',Advo.Lookup_Descriptions.fn_resbus_mixed(right.Residential_Or_Business_Ind),left.Address_type),
+                                  self := left),left outer,
+                        LIMIT(0),keep(1));
+
+addr0 := if(IsFCRA,  addr_util , addr_nonfcra);
 resr := if (IsFCRA, fcra_csa_wrap.residents, doxie.Resident_Links);
 
 namr_unmasked := if (IsFCRA, fcra_csa_wrap.comp_names, doxie.comp_names);
@@ -133,10 +172,10 @@ nbhr := doxie.Comp_NBrHds;
 
 phrecs := doxie.comp_phones (include_hri_val, maxHriPer_value, IncludePhoneMetadata);
 phrecs_nogeo := phrecs.current;
-phrecs_geo := join(phrecs_nogeo, AID_Build.Key_AID_Base, 
-                  left.rawaid = right.rawaid, 
-                  transform(recordof(phrecs_nogeo), self.geo_lat := right.geo_lat, self.geo_long := right.geo_long, self := left), 
-								  left outer, keep(1), limit(0));
+phrecs_geo := join(phrecs_nogeo, AID_Build.Key_AID_Base,
+                  left.rawaid = right.rawaid,
+                  transform(recordof(phrecs_nogeo), self.geo_lat := right.geo_lat, self.geo_long := right.geo_long, self := left),
+                  left outer, keep(1), limit(0));
 phrecs_temp := if (includeGeoLocation, phrecs_geo, phrecs_nogeo);
 phor0       := if (IsFCRA, fcra_csa_wrap.phones, phrecs_temp);
 
@@ -154,15 +193,15 @@ boolean FDNInqDataPermitted  := ~doxie.DataRestriction.FDNInquiry;
 boolean FDN_Any        := IncludeFDNSubjectOnly or IncludeFDNAllAssociations;
 boolean FDN_Associates := IncludeFDNAllAssociations;
 
-mod_append_fdn_inds := doxie.Append_FDN_Inds(besr0, ssnr0, shrr0, dear0, addr0, namr0, phor0, 
+mod_append_fdn_inds := doxie.Append_FDN_Inds(besr0, ssnr0, shrr0, dear0, addr0, namr0, phor0,
                                              phold0, sslr0, relr0, assr0, nbrr20,
-																						 IncludeFDNSubjectOnly,  IncludeFDNAllAssociations,
+                                             IncludeFDNSubjectOnly,  IncludeFDNAllAssociations,
                                              in_FDN_gcid, in_FDN_indtype, in_FDN_prodcode,
                                              FDNContDataPermitted, FDNInqDataPermitted);
 
 besr := if(NOT IsFCRA and FDN_Any ,mod_append_fdn_inds.ds_besr_fdn_checked, besr0);
 
-// NOTE: FDN_Any used above because even though assocaites are not in the besr dataset, 
+// NOTE: FDN_Any used above because even though assocaites are not in the besr dataset,
 //       the fdn waf ind is in there and fdn waf applies to both subject and associates
 
 ssnr  := if(NOT IsFCRA and FDN_Any, mod_append_fdn_inds.ds_ssnr_fdn_checked, ssnr0);
@@ -178,31 +217,32 @@ assr  := if(NOT IsFCRA and FDN_Associates, mod_append_fdn_inds.ds_assr_fdn_check
 nbrr2 := if(NOT IsFCRA and FDN_Associates, mod_append_fdn_inds.ds_nbrr2_fdn_checked, nbrr20);
 
 // Added for the FDN Project to create the new FDN child dataset/section of the report
-fdnrecs := if(NOT IsFCRA and FDN_Any, 
+fdnrecs := if(NOT IsFCRA and FDN_Any,
               doxie.FDN_Records(mod_append_fdn_inds.ds_fdnidkey_recs_matched));
 // end of the coding section added for FDN changes
 
 doxie.layout_central_header Format () := transform
-         self.best_information_children    := global(besr);
-         self.hri_ssn_children             := IF (~IsFCRA, global(shrr));
-         self.deathfile_children           := IF (~IsFCRA, global(dear));
-         self.ssn_children                 := global(ssnr);
-         self.addresses_children           := global(addr);
-         self.resident_links_children      := global(resr);
-         self.phones_children              := global(phor);
-         self.phones_old_children          := if (Include_OldPhones_Val, global(phOld));
-         self.ssn_lookups_children         := global(sslr);
-         self.names_children               := namr;
-         self.relative_summary_children    := IF (~IsFCRA, global(relr(relative = true)) );
-         self.associate_summary_children   := IF (~IsFCRA, global(assr) );
-         self.nbrs_summary_children        := IF (~IsFCRA, global(nbrr) );
-         self.nbrs_summary2_children       := IF (~IsFCRA, global(nbrr2) );
-         self.nbrhoods_children            := IF (~IsFCRA, global(nbhr) );
-         self.fdn_children                 := IF(~IsFCRA, global(fdnrecs) );
+         self.best_information_children             := global(besr);
+         self.best_supplemental_info_children       := global(best_supplemental_info);
+         self.hri_ssn_children                      := IF (~IsFCRA, global(shrr));
+         self.deathfile_children                    := IF (~IsFCRA, global(dear));
+         self.ssn_children                          := global(ssnr);
+         self.addresses_children                    := global(addr);
+         self.resident_links_children               := global(resr);
+         self.phones_children                       := global(phor);
+         self.phones_old_children                   := if (Include_OldPhones_Val, global(phOld));
+         self.ssn_lookups_children                  := global(sslr);
+         self.names_children                        := namr;
+         self.relative_summary_children             := IF (~IsFCRA, global(relr(relative = true)) );
+         self.associate_summary_children            := IF (~IsFCRA, global(assr) );
+         self.nbrs_summary_children                 := IF (~IsFCRA, global(nbrr) );
+         self.nbrs_summary2_children                := IF (~IsFCRA, global(nbrr2) );
+         self.nbrhoods_children                     := IF (~IsFCRA, global(nbhr) );
+         self.fdn_children                          := IF(~IsFCRA, global(fdnrecs) );
          // these two datasets were not returned from neutral or central_record services before,
          // but were calculated in central records for use in certain single-sources
-         self.subject_names                := global(csa_names);
-         self.subject_addresses            := global(csa_addresses);
+         self.subject_names                         := global(csa_names);
+         self.subject_addresses                     := global(csa_addresses);
          self.errors := []; // this can be eventually removed from the layout
 end;
 
@@ -214,5 +254,5 @@ Suppress.MAC_Suppress(preSuppress,postSuppress,mod_access.application_type,suppr
 // this should be a temporary measure on FCRA side:
 
 return postSuppress;//IF (IsFCRA,preSuppress,postSuppress);
-  
+
 END;

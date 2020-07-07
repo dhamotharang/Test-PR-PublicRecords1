@@ -1,4 +1,4 @@
-  IMPORT Address, Autokey_batch, Doxie, iesp, MDR, Phones, PhoneFinder_Services, std, ut, SSNBest_Services;
+﻿  IMPORT $, Address, Autokey_batch, Doxie, iesp, MDR, Phones, PhoneFinder_Services, std, ut;
 
   pfLayouts     := PhoneFinder_Services.Layouts;
   lBatchInAcctno:= pfLayouts.BatchInAppendAcctno;
@@ -352,6 +352,17 @@
     RETURN dAppendDIDs;
   END;
 
+   EXPORT getSourceTypeByCode (DATASET($.Layouts.PhoneFinder.src_rec) dIn) := FUNCTION
+
+      $.Layouts.PhoneFinder._type type_it($.Layouts.PhoneFinder.src_rec l) := TRANSFORM
+        SELF._Type := $.Constants.MapSourceTypeDCT(l.Src);
+      end;
+
+      dsType := PROJECT(dIn, type_it(LEFT));
+
+    return DEDUP(SORT(dsType, _Type), _Type);
+  END;
+
   // Format search results to IESP layout
   EXPORT FormatResults2IESP(DATASET(lFinal) dIn, PhoneFinder_Services.iParam.SearchParams inMod) :=
   FUNCTION
@@ -396,6 +407,10 @@
                                                     (STRING)STD.Date.MonthsBetween(dt_last_seen, today),
                                                     '');
       SELF.PhoneOwnershipIndicator           := pInput.PhoneOwnershipIndicator;
+      // Source details will be populated in Identities  only in a Phone Search.
+      SELF.SourceDetails                     := IF(~inMod.isPrimarySearchPII, PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT)));
+      SELF.TotalSourceCount                  := IF(~inMod.isPrimarySearchPII, pInput.TotalSourceCount, 0);
+      SELF.SelfReportedSourcesOnly           := IF(~inMod.isPrimarySearchPII, pInput.SelfReportedSourcesOnly, FALSE);
       SELF                                   := pInput;
     END;
 
@@ -409,9 +424,9 @@
                                     tFormat2IespIdentity(LEFT));
 
     // Primary phone section
-    iesp.phonefinder.t_PhoneFinderDetailedInfo tFormat2IespPrimaryPhone(lFinal pInput) :=
+    $.Layouts.log_primary tFormat2IespPrimaryPhone(lFinal pInput) :=
     TRANSFORM
-      doVerify := inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress OR inMod.VerifyPhoneIsActive;
+      doVerify := inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress OR inMod.VerifyPhoneIsActive OR inMod.VerifyPhoneLastName;
 
       vVerificationDesc := IF(doVerify AND ~pInput.is_verified AND pInput.verification_desc = '', $.Constants.VerifyMessage.PhoneCannotBeVerified, pInput.verification_desc);
 
@@ -421,17 +436,20 @@
       SELF.CarrierCity                      := pInput.phone_region_city;
       SELF.CarrierState                     := pInput.phone_region_st;
       SELF.ListingName                      := pInput.listed_name;
-      SELF.FirstPortedDate                  := iesp.ECL2ESP.toDate(ValidateDate(pInput.FirstPortedDate));
-      SELF.LastPortedDate                   := iesp.ECL2ESP.toDate(ValidateDate(pInput.LastPortedDate));
+      SELF.FirstPortedDate                  := IF(inMod.IncludePortingDetails, iesp.ECL2ESP.toDate(ValidateDate(pInput.FirstPortedDate)));
+      SELF.LastPortedDate                   := IF(inMod.IncludePortingDetails, iesp.ECL2ESP.toDate(ValidateDate(pInput.LastPortedDate)));
       Phone_Status                          := pInput.PhoneStatus;
       SELF.ActivationDate                   := IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.Active, iesp.ECL2ESP.toDate(pInput.ActivationDate));
       SELF.DisconnectDate                   := IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.INACTIVE, iesp.ECL2ESP.toDate(pInput.DisconnectDate));
-      SELF.PortingHistory                   := CHOOSEN(PROJECT(pInput.PortingHistory,
+      SELF.PortingHistory                   := IF(inMod.IncludePortingDetails,CHOOSEN(PROJECT(pInput.PortingHistory,
                                                                 TRANSFORM(iesp.phonefinder.t_PortingHistory,
                                                                           SELF.PortStartDate := iesp.ECL2ESP.toDate(ValidateDate(LEFT.PortStartDate)),
                                                                           SELF.PortEndDate   := iesp.ECL2ESP.toDate(ValidateDate(LEFT.PortEndDate)),
                                                                           SELF               := LEFT)),
-                                                        iesp.Constants.Phone_Finder.MaxPorts);
+                                                        iesp.Constants.Phone_Finder.MaxPorts));
+      SELF.PortingCount                     := IF(inMod.IncludePortingDetails, pInput.PortingCount, 0);
+      SELF.PortingCode                      := IF(inMod.IncludePortingDetails, pInput.PortingCode, '');
+      SELF.PortingStatus                    := IF(inMod.IncludePortingDetails, pInput.PortingStatus, '');
       SELF.SpoofingData.Spoof               := PROJECT(pInput.Spoof,
                                                         TRANSFORM(iesp.phonefinder.t_SpoofCommon,
                                                                   SELF.FirstSpoofedDate := iesp.ECL2ESP.toDate(ValidateDate(LEFT.FirstSpoofedDate)),
@@ -502,6 +520,11 @@
                                                     inmod.IsPrimarySearchPII => PhoneFinder_Services.Constants.SOURCES.Internal,
                                                     '');
       SELF                                  := pInput.RealTimePhone_Ext;
+      // Source details will be populated in Primary Phone Details  in a PII Search.
+      SELF.SourceDetails                    := IF(inMod.isPrimarySearchPII, PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT)));
+      SELF.TotalSourceCount                 := IF(inMod.isPrimarySearchPII, pInput.TotalSourceCount, 0);
+      SELF.SelfReportedSourcesOnly          := IF(inMod.isPrimarySearchPII, pInput.SelfReportedSourcesOnly, FALSE);
+      SELF.Identity_count                   := pInput.Identity_count;
       SELF                                  := pInput;
 
       // Below two fields are not being used currently
@@ -512,7 +535,7 @@
     dPrimaryPhoneIesp := PROJECT(dIn(isPrimaryPhone AND isPrimaryIdentity), tFormat2IespPrimaryPhone(LEFT));
 
     // Other phones
-    iesp.phonefinder.t_PhoneFinderInfo tFormat2IespOtherPhones(lFinal pInput) :=
+    $.Layouts.log_other tFormat2IespOtherPhones(lFinal pInput) :=
     TRANSFORM
       dt_first_seen := ValidateDate((INTEGER)pInput.dt_first_seen);
       dt_last_seen  := ValidateDate((INTEGER)pInput.dt_last_seen);
@@ -523,11 +546,12 @@
       SELF.CarrierCity             := pInput.phone_region_city;
       SELF.CarrierState            := pInput.phone_region_st;
       SELF.ListingName             := pInput.listed_name;
-      SELF.PortingCode             := pInput.PortingCode;
-      SELF.LastPortedDate          := iesp.ECL2ESP.toDate(ValidateDate(pInput.LastPortedDate));
+      SELF.PortingCode             := IF(inMod.IncludePortingDetails, pInput.PortingCode, '');
+      SELF.LastPortedDate          := IF(inMod.IncludePortingDetails,iesp.ECL2ESP.toDate(ValidateDate(pInput.LastPortedDate)));
       SELF.PhoneRiskIndicator      := pInput.PhoneRiskIndicator;
       SELF.OTPRIFailed             := pInput.OTPRIFailed;
       SELF.PhoneStatus             := pInput.PhoneStatus,
+      SELF.Prepaid                 := pInput.Prepaid, 
       SELF.Address                 := iesp.ECL2ESP.SetAddress(pInput.prim_name, pInput.prim_range,
                                                               pInput.predir, pInput.postdir, pInput.suffix,
                                                               pInput.unit_desig, pInput.sec_range,
@@ -546,6 +570,9 @@
       SELF.source                  := MAP(inmod.IsPrimarySearchPII and pinput.phone_source IN PhoneFinder_Services.Constants.GatewaySources => PhoneFinder_Services.Constants.SOURCES.Gateway,
                                           inmod.IsPrimarySearchPII => PhoneFinder_Services.Constants.SOURCES.Internal,
                                           '');
+      // Source details will be populated in OtherPhones in a PII Search.
+      SELF.SourceDetails           := PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT));
+      SELF.identity_count          := pInput.identity_count;
       SELF                         := pInput;
       SELF.PhoneAddressState       := '';
 
@@ -557,7 +584,7 @@
     dOtherPhonesIesp := PROJECT(SORT(dIn(~isPrimaryPhone AND ~isPrimaryIdentity AND phone != ''), acctno, -phone_score, -dt_last_seen, dt_first_seen), tFormat2IespOtherPhones(LEFT));
 
     // Format to final iesp layout
-    iesp.phonefinder.t_PhoneFinderSearchRecord tFormat2PhoneFinderSearch() :=
+    $.Layouts.log_PhoneFinderSearchRecord tFormat2PhoneFinderSearch() :=
     TRANSFORM
       // Check if the IF statement is needed
       SELF.Identities          := CHOOSEN(dIdentitiesIesp, iesp.Constants.Phone_Finder.MaxIdentities);
@@ -596,10 +623,12 @@
 
     lFinal := pf.PhoneFinder.Final;
 
-    pf.PhoneFinder.TempOut tFormat2Denorm(pf.BatchInAppendAcctno pInput) :=
+    pf.PhoneFinder.TempOut tFormat2Denorm(pf.BatchInAppendDID pInput) :=
     TRANSFORM
-      SELF := pInput;
-      SELF := [];
+      SELF.phone := pInput.homephone;
+      SELF.z4    := pInput.zip4;
+      SELF       := pInput;
+      SELF       := [];
     END;
 
     dFormat2Denorm := PROJECT(dSearchIn, tFormat2Denorm(LEFT));
@@ -642,6 +671,7 @@
                                                     (STRING)STD.Date.MonthsBetween(dt_last_seen, today),
                                                     '');
       SELF.PhoneOwnershipIndicator           := pInput.PhoneOwnershipIndicator;
+      SELF.SourceDetails                     := [];
       SELF                                   := pInput;
     END;
 
@@ -690,7 +720,7 @@
                                     ri.RecentAddress.County, ri.RecentAddress.PostalCode, ri.RecentAddress.StateCityZip},
                                   {ri.FirstSeenWithPrimaryPhone.Year, ri.FirstSeenWithPrimaryPhone.Month, ri.FirstSeenWithPrimaryPhone.Day},
                                   {ri.LastSeenWithPrimaryPhone.Year, ri.LastSeenWithPrimaryPhone.Month, ri.LastSeenWithPrimaryPhone.Day},
-                                  ri.TimeWithPrimaryPhone, ri.TimeSinceLastSeenWithPrimaryPhone, ri.PrimaryAddressType, ri.RecordType, ri.phoneownershipindicator, ri.SSN},
+                                  ri.TimeWithPrimaryPhone, ri.TimeSinceLastSeenWithPrimaryPhone, ri.PrimaryAddressType, ri.RecordType, ri.phoneownershipindicator, ri.SSN, ri.SourceDetails, ri.selfreportedsourcesonly, ri.totalsourcecount},
                                 iesp.phonefinder.t_PhoneIdentityInfo);
       SELF               := le;
       SELF               := [];
@@ -713,8 +743,8 @@
       SELF.CarrierCity             := pInput.phone_region_city;
       SELF.CarrierState            := pInput.phone_region_st;
       SELF.ListingName             := pInput.listed_name;
-      SELF.PortingCode             := pInput.PortingCode;
-      SELF.LastPortedDate          := iesp.ECL2ESP.toDate($.Functions.ValidateDate(pInput.LastPortedDate));
+      SELF.PortingCode             := IF(inMod.IncludePortingDetails, pInput.PortingCode, '');
+      SELF.LastPortedDate          := IF(inMod.IncludePortingDetails, iesp.ECL2ESP.toDate($.Functions.ValidateDate(pInput.LastPortedDate)));
       SELF.PhoneRiskIndicator      := pInput.PhoneRiskIndicator;
       SELF.OTPRIFailed	           := pInput.OTPRIFailed;
       SELF.PhoneStatus             := pInput.PhoneStatus,
@@ -742,6 +772,7 @@
       // Below two fieldss are not being used currently
       SELF.InquiryDetails          := [];
       SELF.ZumigoDeviceDetails     := [];
+      SELF.SourceDetails           := [];
     END;
 
     dOtherPhoneInfo := PROJECT(SORT(dIn(~isPrimaryPhone AND ~isPrimaryIdentity AND phone != ''), acctno, -phone_score), tFormat2IespOtherPhones(LEFT));
@@ -774,17 +805,19 @@
       SELF.CarrierCity                      := pInput.phone_region_city;
       SELF.CarrierState                     := pInput.phone_region_st;
       SELF.ListingName                      := pInput.listed_name;
-      SELF.FirstPortedDate                  := iesp.ECL2ESP.toDate($.Functions.ValidateDate(pInput.FirstPortedDate));
-      SELF.LastPortedDate                   := iesp.ECL2ESP.toDate($.Functions.ValidateDate(pInput.LastPortedDate));
+      SELF.FirstPortedDate                  := IF(inMod.IncludePortingDetails, iesp.ECL2ESP.toDate($.Functions.ValidateDate(pInput.FirstPortedDate)));
+      SELF.LastPortedDate                   := IF(inMod.IncludePortingDetails,iesp.ECL2ESP.toDate($.Functions.ValidateDate(pInput.LastPortedDate)));
+      SELF.PortingCount                     := IF(inMod.IncludePortingDetails, pInput.PortingCount, 0);
+      SELF.PortingCode                      := IF(inMod.IncludePortingDetails, pInput.PortingCode, '');
       Phone_Status                          := pInput.PhoneStatus;
       SELF.ActivationDate                   := IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.Active, iesp.ECL2ESP.toDate(pInput.ActivationDate));
       SELF.DisconnectDate                   := IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.INACTIVE, iesp.ECL2ESP.toDate(pInput.DisconnectDate));
-      SELF.PortingHistory                   := CHOOSEN(PROJECT(pInput.PortingHistory,
+      SELF.PortingHistory                   := IF(inMod.IncludePortingDetails, CHOOSEN(PROJECT(pInput.PortingHistory,
                                                                 TRANSFORM(iesp.phonefinder.t_PortingHistory,
                                                                           SELF.PortStartDate := iesp.ECL2ESP.toDate($.Functions.ValidateDate(LEFT.PortStartDate)),
                                                                           SELF.PortEndDate   := iesp.ECL2ESP.toDate($.Functions.ValidateDate(LEFT.PortEndDate)),
                                                                           SELF               := LEFT)),
-                                                        iesp.Constants.Phone_Finder.MaxPorts);
+                                                        iesp.Constants.Phone_Finder.MaxPorts));
       SELF.SpoofingData.Spoof               := PROJECT(pInput.Spoof,
                                                         TRANSFORM(iesp.phonefinder.t_SpoofCommon,
                                                                   SELF.FirstSpoofedDate := iesp.ECL2ESP.toDate($.Functions.ValidateDate(LEFT.FirstSpoofedDate)),
@@ -860,7 +893,8 @@
       // Below two fields are not being used currently
       SELF.InquiryDetails                   := [];
       SELF.ZumigoDeviceDetails              := [];
-    END;
+      SELF.SourceDetails                     := [];
+     END;
 
     dPrimaryPhoneInfo := PROJECT(dIn(isPrimaryPhone AND isPrimaryIdentity), tFormat2IespPrimaryPhone(LEFT));
 

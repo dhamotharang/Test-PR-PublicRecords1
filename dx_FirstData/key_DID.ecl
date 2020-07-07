@@ -8,8 +8,8 @@ payload := RECORD
   $.layouts.i_did.DL_STATE;
 	$.layouts.i_did.DL_ID;
 	$.layouts.i_did.PROCESS_DATE;
-	$.layouts.i_did.FIRST_SEEN_DATE_TRUE;
-	$.layouts.i_did.LAST_SEEN_DATE;
+	$.layouts.i_did.DATE_FIRST_SEEN;
+	$.layouts.i_did.DATE_LAST_SEEN;
 END;
 
 EXPORT key_DID() := 

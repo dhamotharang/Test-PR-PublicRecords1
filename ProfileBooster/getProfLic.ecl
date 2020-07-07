@@ -1,7 +1,8 @@
-﻿import _Control, prof_licenseV2, riskwise, ut, ProfileBooster, Risk_Indicators;
+﻿import _Control, prof_licenseV2, riskwise, ut, ProfileBooster, Risk_Indicators, Doxie, Suppress, STD;
 onThor := _Control.Environment.OnThor;
 
-export getProfLic(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim) := FUNCTION
+export getProfLic(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim,
+							  doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 string8 proflic_build_date := Risk_Indicators.get_Build_date('proflic_build_version');
 
@@ -9,7 +10,8 @@ checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days
 
 key_did := prof_licenseV2.key_proflic_did(false);
 
-ProfileBooster.Layouts.Layout_PB_Slim_profLic addProfLic(PBslim le, key_did rt) := transform
+{ProfileBooster.Layouts.Layout_PB_Slim_profLic, UNSIGNED4 global_sid} addProfLic(PBslim le, key_did rt) := transform
+	self.global_sid := rt.global_sid;
 	hit := trim(rt.prolic_key)!='';	// make sure we have a good record
 	myGetDate := Risk_Indicators.iid_constants.myGetDate(le.historydate);
 	self.prolic_key := if(hit, rt.prolic_key, '');
@@ -23,19 +25,43 @@ ProfileBooster.Layouts.Layout_PB_Slim_profLic addProfLic(PBslim le, key_did rt) 
 	self.PLcategory := '';	
 	self := le;
 end;
-license_recs_original_roxie := join(PBslim, key_did,
+
+license_recs_original_roxie_unsuppressed := join(PBslim, key_did,
 											left.did2!=0 and keyed(right.did = left.did2) and
-										  (stringlib.stringtouppercase(right.source_st) not in ProfileBooster.Constants.setProfLicStatesRes) and 
+										  (STD.Str.touppercase(right.source_st) not in ProfileBooster.Constants.setProfLicStatesRes) and 
 											(unsigned)(right.date_last_seen[1..6]) < left.historydate,
 											addProfLic(left,right), left outer, atmost(right.did = left.did2, riskwise.max_atmost));
 
-license_recs_original_thor := join(
+license_recs_original_roxie_flagged := Suppress.MAC_FlagSuppressedSource(license_recs_original_roxie_unsuppressed, mod_access);
+
+license_recs_original_roxie := PROJECT(license_recs_original_roxie_flagged, TRANSFORM(ProfileBooster.Layouts.Layout_PB_Slim_profLic, 
+	self.prolic_key :=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.prolic_key);
+	self.date_first_seen :=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.date_first_seen);
+	self.professional_license_flag :=  IF(left.is_suppressed, false, left.professional_license_flag);
+	self.license_type :=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.license_type);
+	self.proflic_count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.proflic_count);
+    SELF := LEFT;
+)); 
+
+license_recs_original_thor_unsuppressed := join(
 distribute(PBslim(did2<>0), did2), 
-distribute(pull(key_did(stringlib.stringtouppercase(source_st) not in ProfileBooster.Constants.setProfLicStatesRes)), did),
+distribute(pull(key_did(STD.Str.touppercase(source_st) not in ProfileBooster.Constants.setProfLicStatesRes)), did),
 											left.did2=right.did and
 											(unsigned)(right.date_last_seen[1..6]) < left.historydate,
 											addProfLic(left,right), left outer, atmost(left.did2=right.did,riskwise.max_atmost),
 		local);
+		
+license_recs_original_thor_flagged := Suppress.MAC_FlagSuppressedSource(license_recs_original_thor_unsuppressed, mod_access);
+
+license_recs_original_thor := PROJECT(license_recs_original_thor_flagged, TRANSFORM(ProfileBooster.Layouts.Layout_PB_Slim_profLic, 
+	self.prolic_key :=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.prolic_key);
+	self.date_first_seen :=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.date_first_seen);
+	self.professional_license_flag :=  IF(left.is_suppressed, false, left.professional_license_flag);
+	self.license_type :=  IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.license_type);
+	self.proflic_count := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.proflic_count);
+    SELF := LEFT;
+)); 
+
 
 #IF(onThor)
 	license_recs_original := license_recs_original_thor;
@@ -53,7 +79,7 @@ preMari := group(project(PBslim,
 isFCRA 			:= false;
 isPreScreen := false;
 
-mari_data := risk_indicators.Boca_Shell_Mari(preMari, isFCRA, isPreScreen);
+mari_data := risk_indicators.Boca_Shell_Mari(preMari, isFCRA, isPreScreen, mod_access);
 
 // initially not so sure we trust the dates on the MARI file to be accurate.  
 // ie, date_first_seen is newer than the expire date

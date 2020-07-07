@@ -2,8 +2,8 @@
 
 doxie_cbrs.mac_Selection_Declare()
 
-EXPORT all_base_records_prs(DATASET(doxie_cbrs.layout_references) bdids = DATASET([],doxie_cbrs.layout_references), STRING6 SSNMask = 'NONE') 
-			:= FUNCTION
+EXPORT all_base_records_prs(DATASET(doxie_cbrs.layout_references) bdids = DATASET([],doxie_cbrs.layout_references), STRING6 SSNMask = 'NONE',
+                            doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 //
 // SL based limits for a Report, where possible
@@ -123,11 +123,11 @@ salr := doxie_cbrs.sales_records_trimmed(bdids); // dca data
 indr := doxie_cbrs.industry_information_records_trimmed(bdids);  // dca data
 
 basr := doxie_cbrs.business_associates_records_trimmed(bdids); 
-dnbr := doxie_cbrs.dnb_records(bdids)(Include_DunBradstreetRecords_val);
+dnbr := doxie_cbrs.dnb_records(bdids, mod_access)(Include_DunBradstreetRecords_val);
 ebrr := doxie_cbrs.experian_business_reports_trimmed(bdids); 
 irsr := doxie_cbrs.IRS5500_records_trimmed(bdids);
 sancr := doxie.Ingenix_Business_records(bdids).records;
-srcr := doxie_cbrs.count_records_prs_dayton(bdids,SSNMask);
+srcr := doxie_cbrs.count_records_prs_dayton(bdids,SSNMask, mod_access);
 divcert := doxie_cbrs.diversity_cert_records(bdids);
 riskMet := doxie_cbrs.risk_metrics_records(bdids);
 laborAct := doxie_cbrs.laborActions_WHD_records(bdids);

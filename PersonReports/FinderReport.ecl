@@ -1,6 +1,8 @@
-﻿IMPORT $, doxie, iesp;
+IMPORT $, doxie, iesp, Royalty;
 
-out_rec := iesp.peoplereport.t_PeopleReportIndividual;
+out_rec := record(iesp.peoplereport.t_PeopleReportIndividual)
+    dataset(Royalty.Layouts.Royalty) EmailV2Royalties;
+end;
 
 // accepts atmost one DID, actually
 EXPORT out_rec FinderReport (
@@ -8,17 +10,11 @@ EXPORT out_rec FinderReport (
   $.IParam._finderreport mod_finder,
   boolean IsFCRA = false) := FUNCTION
 
-  //Convert to the old _report style module: $.input._finderreport
-  param := MODULE (PROJECT (mod_finder, $.IParam.old_finderreport))
-    $.input.mac_copy_report_fields(mod_finder);
-  END;
-
   mod_access := PROJECT (mod_finder, doxie.IDataAccess);
 
   // DID should be atmost one (do we keep layout_references for legacyt reasons?)
   did := dids[1].did;
-  isCNSMR := mod_access.isConsumer();
-  // person records 
+  // person records
   pers := $.person_records (dids, mod_access, PROJECT (mod_finder, $.IParam.personal), IsFCRA);
 
   p_addresses  := choosen (pers.SubjectAddressesSlim,  iesp.Constants.BR.MaxAddress);
@@ -35,7 +31,7 @@ EXPORT out_rec FinderReport (
   p_hist_2     := choosen (old_phones.oldphones_2, iesp.constants.BR.MaxPhonesHistorical);
 
   // "single source" person's data
-  vehs := if(~isCNSMR, vehicle_records (dids, module (project (param, input.vehicles)) end, IsFCRA).vehicles);
+  vehs := $.vehicle_records (dids, PROJECT (mod_finder, $.IParam.vehicles), IsFCRA).vehicles;
   p_vehicles   := choosen (vehs, iesp.Constants.BR.MaxVehicles);
   proflic := $.proflic_records (dids, PROJECT (mod_finder, $.IParam.proflic), IsFCRA);
 
@@ -47,10 +43,11 @@ EXPORT out_rec FinderReport (
 
   p_dlsr := choosen (pers.dlsr, 1);
   p_drivers    := choosen (pers.driver_licenses, iesp.Constants.BR.MaxDLs);
-
+  emailsV2     := $.emailV2_records(dids, PROJECT (mod_finder, $.IParam.emails));
+  p_emailsV2    := choosen (emailsV2.EmailV2Records, iesp.Constants.SMART.MaxEmails);
   // -----------------------------------------------------------------------
   // COUNTS (cannot use doxie.key_did_lookups_v2 -- not always in sync);
-  // something similar to doxie.MAC_Add_WeAlsoFound can be used here, 
+  // something similar to doxie.MAC_Add_WeAlsoFound can be used here,
   // but some particular data (Bankruptcy, for instance) are missing in doxie.MAC_Add_WeAlsoFound
   // TODO: All "counts" logic must be eventually moved to corresponding data attribute(s),
   // this service must not know anything about underlying data.
@@ -66,7 +63,7 @@ EXPORT out_rec FinderReport (
     Self.HasCorporateAffiliation := exists (p_corp_aff);
 
     // also found
-    Self.AlsoFound := IF (mod_finder.include_alsofound, 
+    Self.AlsoFound := IF (mod_finder.include_alsofound,
       ROW ({exists (p_at_work), exists (p_vehicles), exists (p_phonesplus_v2), exists (p_proflic), exists (p_dlsr)}, iesp.peoplereport.t_PeopleReportAlsoFound));
 
     Self.BpsReportAddresses2 := IF (mod_finder.include_bpsaddress, GLOBAL (p_addresses));
@@ -86,10 +83,12 @@ EXPORT out_rec FinderReport (
     Self.PeopleAtWorks      := IF (mod_finder.include_peopleatwork, GLOBAL (p_at_work));
     Self.DriverLicenses     := IF (mod_finder.include_driverslicenses, GLOBAL (p_drivers));
     Self.CorporateAffiliations := IF (mod_finder.include_corpaffiliations, GLOBAL (p_corp_aff));
-  END;
+    Self.Emails             := IF (mod_finder.include_email, GLOBAL (p_emailsV2));
+    self.EmailV2Royalties   := IF (mod_finder.include_email, GLOBAL (emailsv2.EmailV2Royalties));
+    END;
 
   // is supposed to produce one row only (usebestdid = true)
   individual := dataset ([Format ()]);
-  
+
   return individual;
 end;

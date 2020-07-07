@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ProfessionalLicenseReportRequest">
   <part name="UniqueId" type="xsd:string"/>
   <part name="LicenseNumber" type="xsd:string"/>
@@ -65,6 +65,8 @@ export Prof_LicenseReportService := MACRO
 	Healthcare_Header_Services.Layouts.common_runtime_config buildConfig():=transform
 		 self.glb_ok :=  ut.glb_ok (input_params.GLBPurpose);
 		 self.dppa_ok := ut.dppa_ok(input_params.DPPAPurpose);
+		 self.glb :=  input_params.GLBPurpose;
+		 self.dppa := input_params.DPPAPurpose;
 		 self.drm := input_params.DataRestrictionMask;	
 		 self.includeSanctions:=true;
 		// self:=[];Do not uncomment otherwise the default values will not get set.
@@ -74,6 +76,10 @@ export Prof_LicenseReportService := MACRO
 	Provider_raw := doxie.ING_provider_report_records(ids_prov,true,,cfg);//Always get this as it is needed for Sanctions.
 	//So what if the initial search was a boolean search which is using the backfill keys????  
 	//We need to hit the new backfill to vendor id xref key to get the vendor id then hit the HC Individual header vendorid key to get the header lnpid
+ 
+ //At least one name is always expected to be populated if data exists
+ provider_data_exists := exists(Provider_raw[1].name);
+ 
 	tmp_rec := record
 			Health_Provider_Services.Key_HealthProvider_VEN.InputLayout_Batch;
 	end;
@@ -87,7 +93,7 @@ export Prof_LicenseReportService := MACRO
 	searchBy := project(getProviderIDBackfill, transform(newlayout,self.acctno:='1';self.providersrc := Healthcare_Header_Services.Constants.SRC_HEADER;self.ProviderId := left.lnpid;self:=[]));
 	rawData := Healthcare_Header_Services.Records.getRecordsRawDoxieIndividual(searchBy,cfg);
 	fmtData := Healthcare_Header_Services.Records.fmtRecordsLegacyReport(rawData,cfg);
-	Provider_data := if(exists(Provider_raw),Provider_raw,fmtData);
+	Provider_data := if(provider_data_exists,Provider_raw,fmtData);
 	Provider_r := Provider_data(tempmod.include_prov);
 	
 	out_rec := doxie.ingenix_sanctions_module.layout_ingenix_sanctions_report;

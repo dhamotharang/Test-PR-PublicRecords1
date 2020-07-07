@@ -1,4 +1,4 @@
-IMPORT AutoStandardI,doxie_raw,Header,ut,Relationship;
+IMPORT doxie_raw,Header,ut,Relationship;
 	
 EXPORT Get_DID_Associations(DATASET(Doxie_Raw.Layouts.RelDetailsIn) dSubjDIDs,
 														Doxie_Raw.iParam.RelDetails             inMod,
@@ -6,7 +6,7 @@ EXPORT Get_DID_Associations(DATASET(Doxie_Raw.Layouts.RelDetailsIn) dSubjDIDs,
 														DATASET(Doxie_Raw.Layouts.RelDetailsIn) dDIDsOfInterest          = DATASET([],Doxie_Raw.Layouts.RelDetailsIn)) :=
 FUNCTION
 	// Relatives layout
-	relativeLayout := Relationship.layout_GetRelationship.InterfaceOuput;
+	relativeLayout := Relationship.layout_GetRelationship.interfaceOutputNeutral;
 	
 	// Common transforms
 	// First degree relatives and associates
@@ -63,7 +63,7 @@ FUNCTION
 	// First degree relatives
 	fdeg_dids := PROJECT(dSubjDIDsFilter,TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout,SELF:=LEFT,SELF := []));
 
-	fdeg_recs := Relationship.proc_GetRelationship(fdeg_dids,TRUE,TRUE,FALSE,FALSE,ut.limits.RELATIVES_PER_PERSON,,TRUE).result;
+	fdeg_recs := Relationship.proc_GetRelationshipNeutral(fdeg_dids,TRUE,TRUE,FALSE,FALSE,ut.limits.RELATIVES_PER_PERSON,,TRUE).result;
 	dRelsFirstDeg := JOIN(dSubjDIDsFilter,fdeg_recs,
 												LEFT.did = RIGHT.did1 and RIGHT.isRelative,
 												tRelsAssocFirstDeg(LEFT,RIGHT,1));
@@ -107,7 +107,7 @@ FUNCTION
 	// Second degree relatives
 	sdeg_dids := PROJECT(dRelsFirstDegLookForMore,TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout,SELF:=LEFT,SELF := []));
 	
-	sdeg_recs := Relationship.proc_GetRelationship(sdeg_dids,TRUE,TRUE,FALSE,FALSE,ut.limits.RELATIVES_PER_PERSON,,TRUE).result;
+	sdeg_recs := Relationship.proc_GetRelationshipNeutral(sdeg_dids,TRUE,TRUE,FALSE,FALSE,ut.limits.RELATIVES_PER_PERSON,,TRUE).result;
 	dRelsSecondDeg := JOIN(dRelsFirstDegLookForMore,sdeg_recs,
 												LEFT.person2 = RIGHT.did1 and RIGHT.isRelative,
 												tRels(LEFT,RIGHT,2));
@@ -167,7 +167,7 @@ FUNCTION
 	// Third degree relatives
 	tdeg_dids := PROJECT(dRelsSecondDegLookForMore,TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout,SELF:=LEFT,SELF := []));
 	// Proc params set to only return relatives and not associates.
-  tdeg_recs := Relationship.proc_GetRelationship(tdeg_dids,TRUE,TRUE,FALSE,FALSE,ut.limits.RELATIVES_PER_PERSON,,TRUE).result;
+  tdeg_recs := Relationship.proc_GetRelationshipNeutral(tdeg_dids,TRUE,TRUE,FALSE,FALSE,ut.limits.RELATIVES_PER_PERSON,,TRUE).result;
 	dRelsThirdDeg := JOIN(dRelsSecondDegLookForMore,tdeg_recs,
 												LEFT.person2 = RIGHT.did1 and RIGHT.isRelative,
 												tRels(LEFT,RIGHT,3));	

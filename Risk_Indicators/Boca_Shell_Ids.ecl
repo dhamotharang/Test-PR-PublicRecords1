@@ -1,4 +1,4 @@
-﻿import doxie,watchdog,doxie_raw,progressive_phone,ut, Relationship, riskwise, risk_indicators;
+﻿import Relationship, riskwise, risk_indicators;
 
 export Boca_Shell_Ids(GROUPED DATASET(Risk_Indicators.Layout_Output) iid_res,
                        boolean includeRelativeInfo=true,
@@ -18,7 +18,7 @@ TRANSFORM
                 SELF.isrelat := relat;
                 SELF.fname := f_name;
                 SELF.lname := l_name;
-
+								self.skip_opt_out := if(relat, true, le.skip_opt_out); // only do opt out on the consumer on input, don't need it on relatives
                 self := [];
 END;
 
@@ -27,7 +27,7 @@ iids_dedp := dedup(sort(ungroup(iid_res),did), did);
 justDids := PROJECT(iids_dedp, 
 		TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
 
-rellyids := Relationship.proc_GetRelationship(justDids,TopNCount:=100,
+rellyids := Relationship.proc_GetRelationshipNeutral(justDids,TopNCount:=100,
 				RelativeFlag :=TRUE,AssociateFlag:=TRUE,
 				doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result;   
 

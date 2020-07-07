@@ -136,7 +136,7 @@ export PhonesPlus_Layouts := MODULE
 		 t_QSentCISOCContactInfo_out  Contact ;
 	END;
 	
-	export t_RealTimePhone_Ext := RECORD
+	export t_RealTimePhone_Ext_Base := RECORD
 		string CallerId := '' ;
 		string StatusCode  := '';
 		string StatusCode_Desc  := '';
@@ -163,7 +163,7 @@ export PhonesPlus_Layouts := MODULE
 		t_QSentCISOperatingCompany_out OperatingCompany;
 	END;
 	
-	export t_RealTimePhone_Ext1 := RECORD(t_RealTimePhone_Ext)
+	export t_RealTimePhone_Ext := RECORD(t_RealTimePhone_Ext_Base)
 		string ServiceClass {xpath('ServiceClass')};
 		string GenericName {xpath('GenericName')};
 		string DeliveryPointCode {xpath('DeliveryPointCode')};
@@ -173,12 +173,12 @@ export PhonesPlus_Layouts := MODULE
 	
 	export t_PhoneplusSearchResponse := RECORD
 	  preFinalLayout;
-		t_RealTimePhone_Ext  RealTimePhone_Ext;
+		t_RealTimePhone_Ext_Base RealTimePhone_Ext;
 	END;
 	
 	export PhonePlusSearchResponse_Ext := RECORD
 		preFinalLayout;
-		t_RealTimePhone_Ext1 RealTimePhone_Ext;
+		t_RealTimePhone_Ext RealTimePhone_Ext;
 	END;
 
 END;

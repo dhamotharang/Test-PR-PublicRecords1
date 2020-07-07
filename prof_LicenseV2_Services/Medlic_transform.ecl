@@ -1,4 +1,4 @@
-import Healthcare_Header_Services,doxie,autostandardi,ut;
+﻿import Healthcare_Header_Services,doxie,autostandardi,ut;
 EXPORT Medlic_transform := module
 		
 		shared gm:=autostandardi.GlobalModule();
@@ -426,6 +426,8 @@ EXPORT Medlic_transform := module
 				 self.penalty_threshold := pt;
 				 self.glb_ok :=  ut.glb_ok (gm.GLBPurpose);
 				 self.dppa_ok := ut.dppa_ok(gm.DPPAPurpose);
+				 self.glb := gm.GLBPurpose;
+		                 self.dppa := gm.DPPAPurpose;
 				 self.drm := gm.DataRestrictionMask;	
 				 self.includeSanctions:=true;
 				// self:=[];Do not uncomment otherwise the default values will not get set.

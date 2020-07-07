@@ -8,12 +8,12 @@ EXPORT GetAccuData_CallerName(DATASET(Phones.Layouts.PhoneAcctno) inPhones,
 
 	Phones.Layouts.AccuDataCNAM resolveCallerID(iesp.accudata_accuname.t_AccudataCnamResponseEx l) := TRANSFORM
     // availabilityIndicator and presentationIndicator flags removed from gateway response
-		isAvailable := l.response.AccudataReport.TransactionType<>'' AND
-									 l.response.AccudataReport.ErrorMessage='';
-
 		callerName	:= STD.Str.ToUpperCase(l.response.AccudataReport.Reply.CallingName);
-		SELF.fname := IF(isAvailable, STD.Str.GetNthWord(callerName,2),'');
-		SELF.lname := IF(isAvailable, STD.Str.GetNthWord(callerName,1),'');
+		isAvailable := l.response.AccudataReport.ErrorMessage='' AND callerName<>'';
+		//RQ-16410: Added IsValidIdentity to distinguish 'City, State' names in Accudata ListingName
+		isValidCallerName := IF(isAvailable, Phones.Functions.IsValidIdentity(callerName), FALSE);
+		SELF.fname := IF(isValidCallerName, STD.Str.GetNthWord(callerName,1),'');
+		SELF.lname := IF(isValidCallerName, STD.Str.GetNthWord(callerName,2),'');
 		SELF.listingName := callerName;
 		SELF.phone := l.response.AccudataReport.Phone;
 		SELF.did   := 0;

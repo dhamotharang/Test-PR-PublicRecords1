@@ -1,14 +1,26 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, Doxie;
 
 	
 EXPORT getBusAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData,
                         STRING6 ssnMask,
                         BOOLEAN includeReport,
-												Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-												BIPV2.mod_sources.iParams linkingOptions,
-                        BOOLEAN debugMode = FALSE) := FUNCTION
+                        Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
+                        BIPV2.mod_sources.iParams linkingOptions,
+                        BOOLEAN debugMode = FALSE,
+                        unsigned1 LexIdSourceOptout = 1,
+                        string TransactionID = '',
+                        string BatchUID = '',
+                        unsigned6 GlobalCompanyId = 0) := FUNCTION
 
-  
+     mod_access := MODULE(Doxie.IDataAccess)
+      EXPORT glb := options.GLBA_Purpose;
+      EXPORT dppa := options.DPPA_Purpose;
+      EXPORT DataPermissionMask := options.DataPermissionMask;
+      EXPORT DataRestrictionMask := options.DataRestrictionMask;
+      EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+      EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+      EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+    END;
 	
     BOOLEAN includeAllBusinessData := TRUE;
 
@@ -62,32 +74,37 @@ EXPORT getBusAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     linkedBus := DueDiligence.getBusLinkedBus(inquiredBusWithBIP, options, linkingOptions, ssnMask);
 
     //get executives from inquired businesses
-    busExecs := DueDiligence.getBusExec(linkedBus, options, linkingOptions);
+    busExecs := DueDiligence.getBusExec(linkedBus, options, linkingOptions, mod_access);
 
 
     //get attribute data for individuals related to the inquired business
-    busProfLicense := DueDiligence.getBusProfLic(busExecs, includeReport);
+    busProfLicense := DueDiligence.getBusProfLic(busExecs, includeReport, mod_access);
 
-    busLegalEvents := DueDiligence.getBusLegalEvents(busProfLicense, options, linkingOptions, includeReport); 
+    busLegalEvents := DueDiligence.getBusLegalEvents(busProfLicense, mod_access); 
+    
 
 
     //get attribute data for the inquired business
     busProperty    := DueDiligence.getBusProperty(busLegalEvents, options, linkingOptions);
 
-    busWatercraft  := DueDiligence.getBusWatercraft(busProperty, options, linkingOptions);
+    busWatercraft  := DueDiligence.getBusWatercraft(busProperty, options, linkingOptions, mod_access);
 
     busAircraft := DueDiligence.getBusAircraft(busWatercraft, options);
 
-    busVehicle := DueDiligence.getBusVehicle(busAircraft, options, linkingOptions);
+    busVehicle := DueDiligence.getBusVehicle(busAircraft, options, linkingOptions, mod_access);
 
     busReg := DueDiligence.getBusRegistration(busVehicle, options, includeAllBusinessData);
 
     busGeoRisk := DueDiligence.getBusGeographicRisk(busReg);   
 
-    busSales := DueDiligence.getBusSales(busGeoRisk, options, linkingOptions);
+    busSales := DueDiligence.getBusSales(busGeoRisk, options, linkingOptions, mod_access);
+    
+    busCivilEvents := DueDiligence.getBusCivilEvent(busSales, options, mod_access);
+    
+    
 
     //attributes taking in inquired and linked businesses
-    busHeader := DueDiligence.getBusHeader(busSales, options, linkingOptions, includeAllBusinessData, includeReport);
+    busHeader := DueDiligence.getBusHeader(busCivilEvents, options, linkingOptions, includeAllBusinessData, includeReport, mod_access);
 
     busSOS := DueDiligence.getBusSOSDetail(busHeader, options, includeAllBusinessData, includeReport);
 
@@ -95,9 +112,9 @@ EXPORT getBusAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     //attributes that must be called after other attributes
     addrRisk := DueDiligence.getBusAddrData(busSOS, options, includeReport);  //must be called after getBusSOSDetail & getBusRegistration
 
-    busAsInd := DueDiligence.getBusAsInd(addrRisk, options);  //must be called after getBusSOSDetail & getBusHeader
+    busAsInd := DueDiligence.getBusAsInd(addrRisk, options, mod_access);  //must be called after getBusSOSDetail & getBusHeader
 
-    busSicNaic := DueDiligence.getBusSicNaic(busAsInd, options, linkingOptions, includeReport);  //must be called after getBusRegistration & getBusHeader & getBusSOSDetail
+    busSicNaic := DueDiligence.getBusSicNaic(busAsInd, options, linkingOptions, includeReport, mod_access);  //must be called after getBusRegistration & getBusHeader & getBusSOSDetail
 
 
     addCounts := PROJECT(busSicNaic, TRANSFORM(DueDiligence.Layouts.Busn_Internal,
@@ -108,7 +125,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
 
 
     //if a report is requested, populate the data needed for report	
-    addBusinessDataForReport := IF(includeReport, DueDiligence.getBusReport(addCounts, options, linkingOptions, ssnMask), addCounts);
+    addBusinessDataForReport := IF(includeReport, DueDiligence.getBusReport(addCounts, options, linkingOptions, ssnMask, mod_access), addCounts);
 
     //populate the index for the customer
     busKRI := DueDiligence.getBusKRI(addBusinessDataForReport + inquiredBusNoBIP);
@@ -134,6 +151,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     IF(debugMode, OUTPUT(busReg, NAMED('busReg')));	
     IF(debugMode, OUTPUT(busGeoRisk, NAMED('busGeoRisk')));	
     IF(debugMode, OUTPUT(busSales, NAMED('busSales')));
+    IF(debugMode, OUTPUT(busCivilEvents, NAMED('busCivilEvents')));
 
     IF(debugMode, OUTPUT(busHeader, NAMED('busHeader')));
     IF(debugMode, OUTPUT(busSOS, NAMED('busSOS')));

@@ -215,6 +215,7 @@ export t_RiskView2Models := record
 end;
 		
 export t_RiskView2LiensJudgmentsReportOptions := record
+    string32 DeferredTransactionID {xpath('DeferredTransactionID')};
 	boolean IncludeRecordsWithSSN {xpath('IncludeRecordsWithSSN')};
 	boolean ExcludeCityTaxLiens {xpath('ExcludeCityTaxLiens')};
 	boolean ExcludeCountyTaxLiens {xpath('ExcludeCountyTaxLiens')};
@@ -224,9 +225,16 @@ export t_RiskView2LiensJudgmentsReportOptions := record
 	boolean ExcludeOtherLiens {xpath('ExcludeOtherLiens')};
 	boolean ExcludeJudgments {xpath('ExcludeJudgments')};
 	boolean ExcludeEvictions {xpath('ExcludeEvictions')};
+	boolean ExcludeReleasedCases {xpath('ExcludeReleasedCases')};
 	boolean IncludeBureauRecs {xpath('IncludeBureauRecs')};
 	boolean GeneratePDF {xpath('GeneratePDF')};
 	integer ReportingPeriod {xpath('ReportingPeriod')};
+	unsigned6 MinimumAmount {xpath('MinimumAmount')}; // Xsd type: int64
+	dataset(iesp.share.t_StringArrayItem) ExcludeStates {xpath('ExcludeStates/ExcludeState'), MAXCOUNT(iesp.constants.RiskView_2.MaxStateExclusions)};
+	dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources {xpath('ExcludeReportingSources/ExcludeReportingSource'), MAXCOUNT(iesp.constants.RiskView_2.MaxReportingSourceExclusions)};
+	boolean AttributesOnly {xpath('AttributesOnly')};
+    boolean ExcludeStatusRefresh {xpath('ExcludeStatusRefresh')};
+    string5 StatusRefreshWaitPeriod {xpath('StatusRefreshWaitPeriod')};
 end;
 		
 export t_RiskView2Options := record (iesp.share.t_BaseOption)
@@ -238,6 +246,8 @@ export t_RiskView2Options := record (iesp.share.t_BaseOption)
 	string DaytonRiskViewSubscriptionNumber {xpath('DaytonRiskViewSubscriptionNumber')};//hidden[internal]
 	boolean IncludeLiensJudgmentsReport {xpath('IncludeLiensJudgmentsReport')};
 	t_RiskView2LiensJudgmentsReportOptions LiensJudgmentsReportOptions {xpath('LiensJudgmentsReportOptions')};
+	integer RVCheckingSubscriberId {xpath('RVCheckingSubscriberId')};//hidden[internal]
+	boolean IncludeStatusRefreshChecks {xpath('IncludeStatusRefreshChecks')};
 end;
 		
 export t_RiskView2SearchBy := record
@@ -286,18 +296,19 @@ end;
 		
 export t_RiskView2LiensJudgmentsReportForLien := record
 	string30 Seq {xpath('Seq')};
+	string17 RecordID {xpath('RecordID')};
 	iesp.share.t_Date DateFiled {xpath('DateFiled')};
+	string2 LienTypeID {xpath('LienTypeID')};
 	string50 LienType {xpath('LienType')};
 	string15 Amount {xpath('Amount')};
 	iesp.share.t_Date ReleaseDate {xpath('ReleaseDate')};
 	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
 	string120 Defendant {xpath('Defendant')};
 	iesp.share.t_Address DefendantAddress {xpath('DefendantAddress')};
-	string2 LienTypeID {xpath('LienTypeID')};
 	string20 FilingNumber {xpath('FilingNumber')};
 	string10 FilingBook {xpath('FilingBook')};
 	string10 FilingPage {xpath('FilingPage')};
-	string7 AgencyID {xpath('AgencyID')};
+	string7 AgencyID {xpath('AgencyId')};
 	string60 Agency {xpath('Agency')};
 	string35 AgencyCounty {xpath('AgencyCounty')};
 	string2 AgencyState {xpath('AgencyState')};
@@ -306,11 +317,12 @@ end;
 		
 export t_RiskView2LiensJudgmentsReportForJudgement := record
 	string30 Seq {xpath('Seq')};
+	string17 RecordID {xpath('RecordID')};
 	iesp.share.t_Date DateFiled {xpath('DateFiled')};
+	string2 JudgmentTypeID {xpath('JudgmentTypeID')};
 	string50 JudgmentType {xpath('JudgmentType')};
 	string15 Amount {xpath('Amount')};
 	iesp.share.t_Date ReleaseDate {xpath('ReleaseDate')};
-	string2 JudgmentTypeID {xpath('JudgmentTypeID')};
 	string16 FilingDescription {xpath('FilingDescription')};
 	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
 	string120 Defendant {xpath('Defendant')};
@@ -320,7 +332,7 @@ export t_RiskView2LiensJudgmentsReportForJudgement := record
 	string10 FilingBook {xpath('FilingBook')};
 	string10 FilingPage {xpath('FilingPage')};
 	string1 Eviction {xpath('Eviction')};
-	string7 AgencyID {xpath('AgencyID')};
+	string7 AgencyID {xpath('AgencyId')};
 	string60 Agency {xpath('Agency')};
 	string35 AgencyCounty {xpath('AgencyCounty')};
 	string2 AgencyState {xpath('AgencyState')};
@@ -328,6 +340,7 @@ export t_RiskView2LiensJudgmentsReportForJudgement := record
 end;
 		
 export t_RiskView2LiensJudgmentsReport := record
+	t_Rv2ReportSummaryRecord Summary {xpath('Summary')};
 	dataset(t_RiskView2LiensJudgmentsReportForLien) Liens {xpath('Liens/Lien'), MAXCOUNT(iesp.constants.RiskView_2.MaxPublicReportCount)};
 	dataset(t_RiskView2LiensJudgmentsReportForJudgement) Judgments {xpath('Judgments/Judgment'), MAXCOUNT(iesp.constants.RiskView_2.MaxPublicReportCount)};
 	dataset(iesp.share.t_NameValuePair) LnJAttributes {xpath('LnJAttributes/LnJAttribute'), MAXCOUNT(iesp.constants.RiskView_2.MaxAttributes)};
@@ -343,6 +356,7 @@ export t_RiskView2Result := record
 	dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
 	t_RiskView2LiensJudgmentsReport LiensJudgmentsReports {xpath('LiensJudgmentsReports')};
 	iesp.share_fcra.t_FcraConsumer Consumer {xpath('Consumer')};//hidden[__inq_hist_logging__]
+	boolean FDCheckingIndicator {xpath('FDCheckingIndicator')};//hidden[internal]
 end;
 		
 export t_RiskView2Response := record

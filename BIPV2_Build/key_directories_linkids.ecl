@@ -65,13 +65,14 @@ module
   function
 
     BIPV2.IDmacros.mac_IndexFetch(inputs, Key, out, Level, JoinLimit);
-    isperm := BIPV2.mod_sources.isPermitted(in_mod);
+    isperm_industry := BIPV2.mod_sources.isPermitted(in_mod, true); // ALlow DnB (source 'D ' records regardless of user permission to make use of SIC/NAICS codes)
+    isperm_contacts := BIPV2.mod_sources.isPermitted(in_mod, mod_access.use_DnB()); // Restrict DnB (source 'D ' based on user permission)
 
-    ds_restricted := out(isperm.bySource(industry_fields.source, contacts_fields.vl_id)
-    and isperm.bySource(contacts_fields.source, contacts_fields.vl_id)
+    ds_restricted := out(isperm_industry.bySource(industry_fields.source, contacts_fields.vl_id)
+    and isperm_contacts.bySource(contacts_fields.source, contacts_fields.vl_id)
     );
     
-    BIPV2_build.mac_check_access(ds_restricted, ds_restricted_out, mod_access, false);
+    BIPV2_build.mac_check_access(ds_restricted, ds_restricted_out, mod_access, false, contacts_fields.contact_did);
     
     return ds_restricted_out;
 									

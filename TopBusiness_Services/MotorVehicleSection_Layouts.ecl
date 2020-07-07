@@ -1,4 +1,4 @@
-import BIPV2, Census_Data, iesp, Standard, VehicleV2;
+﻿import BIPV2, Census_Data, iesp, Standard, VehicleV2;
 
 export MotorVehicleSection_Layouts := module;
 
@@ -77,6 +77,8 @@ export MotorVehicleSection_Layouts := module;
 		//source date added for infutor data	
 		VehicleV2.Layout_Base_Party.SRC_FIRST_DATE;
 		VehicleV2.Layout_Base_Party.SRC_LAST_DATE;
+
+    string30 ReportedName;  // VehicleV2.Layout_Base_Party.raw_name 		
 	end;
 
   export rec_parent_mvrdetail := record

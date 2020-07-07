@@ -9,16 +9,20 @@ FUNCTION
   matchDid ($.Layouts.PhoneFinder.IdentitySlim L, $.Layouts.BatchIn R) :=
   (R.did > 0 AND L.did = R.did);
 
+  //match last name
+  matchLastName ($.Layouts.PhoneFinder.IdentitySlim L, $.Layouts.BatchIn R) :=
+  (
+      R.name_last != '' AND (L.lname = STD.STR.ToUpperCase(R.name_last))
+      OR
+      (vmod.phoneticMatch AND metaphonelib.DMetaPhone1(L.lname) = metaphonelib.DMetaPhone1(STD.STR.ToUpperCase(R.name_last)))
+  );
+
   // Match on name, DID
   matchName ($.Layouts.PhoneFinder.IdentitySlim L, $.Layouts.BatchIn R) :=
   (matchDid(L, R) OR
   (
-    R.name_first != '' AND NID.mod_PFirstTools.PFLeqPFR(L.fname, STD.STR.ToUpperCase(R.name_first)) AND
-    (
-      R.name_last != '' AND (L.lname = STD.STR.ToUpperCase(R.name_last))
-      OR
-      (vmod.phoneticMatch AND metaphonelib.DMetaPhone1(L.lname) = metaphonelib.DMetaPhone1(STD.STR.ToUpperCase(R.name_last)))
-    )
+    R.name_first != '' AND NID.mod_PFirstTools.PFLeqPFR(L.fname, STD.STR.ToUpperCase(R.name_first))
+    AND matchLastName(L, R)
   ));
 
   // Match name or DID and address
@@ -26,17 +30,17 @@ FUNCTION
     (matchDid(L, R) OR
     ((matchName(L, R) AND
     (
-      (L.vendor_id = MDR.sourceTools.src_Targus_Gateway AND L.prim_range = '' AND L.prim_name = '')
-      OR
-      (
-        (R.prim_range != '' AND L.prim_range = R.prim_range AND R.prim_name != '' AND L.prim_name = STD.STR.ToUpperCase(R.prim_name)) AND
-        (
-          (R.p_city_name != '' AND L.city_name = STD.STR.ToUpperCase(R.p_city_name) AND R.st != '' AND L.st = STD.STR.ToUpperCase(R.st))
-          OR
-          (R.z5 != '' AND L.zip = R.z5)
-        )
-      )
-    ))));
+    (
+      (L.vendor_id = MDR.sourceTools.src_Targus_Gateway AND L.prim_range = '' AND L.prim_name = '' ) OR
+      (R.prim_range != '' AND L.prim_range = R.prim_range AND R.prim_name != '' AND L.prim_name = STD.STR.ToUpperCase(R.prim_name))
+    ) AND
+   (
+     (R.p_city_name != '' AND L.city_name = STD.STR.ToUpperCase(R.p_city_name) AND R.st != '' AND L.st = STD.STR.ToUpperCase(R.st))
+     OR
+     (R.z5 != '' AND L.zip = R.z5)
+  )
+  )
+  )));
 
   // Phone active
   matchPhoneActive($.Layouts.PhoneFinder.IdentitySlim L) :=
@@ -56,15 +60,17 @@ FUNCTION
     RETURN isPhoneActive;
   END;
 
+
   // Verify identity
   dVerifyIdentity := JOIN(dIn, dInWithBestDIDs,
                           LEFT.acctno = RIGHT.acctno,
                           TRANSFORM($.Layouts.PhoneFinder.IdentitySlim,
                                     BOOLEAN isNameAddrVerified := vmod.VerifyPhoneNameAddress AND matchNameAddress(LEFT, RIGHT);
                                     BOOLEAN isNameVerified     := vmod.VerifyPhoneName AND matchName(LEFT, RIGHT);
-
-                                    SELF.acctno               := IF(isNameAddrVerified OR isNameVerified OR (~vmod.VerifyPhoneNameAddress AND ~vmod.VerifyPhoneName), LEFT.acctno, SKIP),
-                                    SELF.is_identity_verified := isNameAddrVerified OR isNameVerified,
+                                    BOOLEAN isLastNameVerified := vmod.VerifyPhoneLastName AND matchLastName(LEFT, RIGHT);
+                                    BOOLEAN isIdentityMatch    := isNameAddrVerified OR isNameVerified OR isLastNameVerified;
+                                    SELF.acctno               := IF(isIdentityMatch OR (~vmod.VerifyPhoneNameAddress AND ~vmod.VerifyPhoneName AND ~vmod.VerifyPhoneLastName), LEFT.acctno, SKIP),
+                                    SELF.is_identity_verified := isIdentityMatch,
                                     SELF                      := LEFT),
                           LIMIT(0), KEEP(1));
 
@@ -86,6 +92,7 @@ FUNCTION
                                     SELF                   := LEFT));
 
   // Populate identity and phone verification flags
+  //Only one verification check is allowed at a time, also, currently only Report service has these checks
   dVerify := JOIN(dIdentitiesAll,
                   dPhoneVerify,
                   LEFT.acctno = RIGHT.acctno,
@@ -93,9 +100,11 @@ FUNCTION
                             SELF.verification_desc := MAP(RIGHT.phone = ''   => PhoneFinder_Services.Constants.VerifyMessage.PhoneNotEntered,
                                                           vMod.VerifyPhoneNameAddress AND LEFT.is_identity_verified => PhoneFinder_Services.Constants.VerifyMessage.PhoneMatchesNameAddress,
                                                           vMod.VerifyPhoneName AND LEFT.is_identity_verified     => PhoneFinder_Services.Constants.VerifyMessage.PhoneMatchesName,
-                                                          (vmod.VerifyPhoneNameAddress OR vmod.VerifyPhoneName) AND ~LEFT.is_identity_verified => PhoneFinder_Services.Constants.VerifyMessage.PhoneCannotBeVerified,
+                                                          vmod.VerifyPhoneLastName AND LEFT.is_identity_verified => PhoneFinder_Services.Constants.VerifyMessage.PhoneMatchesLastName,
+                                                          (vmod.VerifyPhoneNameAddress OR vmod.VerifyPhoneName OR vmod.VerifyPhoneLastName) AND ~LEFT.is_identity_verified => PhoneFinder_Services.Constants.VerifyMessage.PhoneCannotBeVerified,
                                                           vmod.VerifyPhoneIsActive AND RIGHT.is_phone_verified => PhoneFinder_Services.Constants.VerifyMessage.PhoneIsActive,
                                                           vmod.VerifyPhoneIsActive AND ~RIGHT.is_phone_verified => PhoneFinder_Services.Constants.VerifyMessage.PhoneNotActive,
+
                                                           ''),
                             SELF.is_phone_verified := RIGHT.is_phone_verified, SELF := LEFT),
                   LIMIT(0), KEEP(1));

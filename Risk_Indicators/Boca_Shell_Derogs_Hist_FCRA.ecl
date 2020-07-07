@@ -1,9 +1,12 @@
-﻿import Risk_Indicators, Riskview;
+﻿import Risk_Indicators, Riskview, iesp;
 
 export Boca_Shell_Derogs_Hist_FCRA (GROUPED DATASET(risk_indicators.layouts.layout_derogs_input) ids, 
 				integer bsVersion, unsigned8 BSOptions=0,
 				boolean IncludeLnJ = false,
-				integer2 ReportingPeriod = 84
+				integer2 ReportingPeriod = 84,
+				unsigned6 MinimumAmount = 0,
+				dataset(iesp.share.t_StringArrayItem) ExcludeStates = dataset([], iesp.share.t_StringArrayItem),
+				dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem)
         ) := FUNCTION
  
 	Bankruptcy := Risk_Indicators.Boca_Shell_Bankrucpty_FCRAHist(bsVersion, BSOptions, ids);
@@ -18,7 +21,7 @@ export Boca_Shell_Derogs_Hist_FCRA (GROUPED DATASET(risk_indicators.layouts.layo
 			SELF := LEFT;
 			SELF := [];));
 
-	BankLiensCrimSO_LNJ :=	Risk_Indicators.Boca_Shell_Liens_LnJ_FCRA_Hist(bsVersion, BSOptions, ids_formatted, IncludeLnJ, ReportingPeriod);									
+	BankLiensCrimSO_LNJ :=	Risk_Indicators.Boca_Shell_Liens_LnJ_FCRA_Hist(bsVersion, BSOptions, ids_formatted, IncludeLnJ, ReportingPeriod, MinimumAmount, ExcludeStates, ExcludeReportingSources);									
   DerogsLNJ := JOIN(BankLiensCrimSO, BankLiensCrimSO_LNJ,
 					LEFT.Did = Right.Did,
 					RiskView.Transforms.GetLnJInfo(LEFT, RIGHT),

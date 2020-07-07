@@ -1,7 +1,4 @@
-﻿/*2016-08-16T13:02:56Z (mwalklin)
-C:\Users\walkmi01\AppData\Roaming\HPCC Systems\eclide\mwalklin\DatalandStaging\Patriot\Search_Function\2016-08-16T13_02_56Z.ecl
-*/
-import GlobalWatchLists, GlobalWatchLists_Services, iesp, ut, OFAC_XG5, Gateway;
+﻿IMPORT GlobalWatchLists, iesp, ut, OFAC_XG5, Gateway, Doxie, Suppress, Patriot;
 
 export Search_Function(GROUPED DATASET(patriot.Layout_batch_in) in_data, 
 														boolean ofaconly_value,
@@ -10,8 +7,18 @@ export Search_Function(GROUPED DATASET(patriot.Layout_batch_in) in_data,
 														boolean include_ofac = false,
 														boolean include_additional_watchlists =false,
 														integer2 dob_radius = -1,
-														dataset(iesp.share.t_StringArrayItem) watchlists_requested=dataset([], iesp.share.t_StringArrayItem) ) :=
+														dataset(iesp.share.t_StringArrayItem) watchlists_requested=dataset([], iesp.share.t_StringArrayItem),
+														unsigned1 LexIdSourceOptout = 1,
+														string TransactionID = '',
+														string BatchUID = '',
+														unsigned6 GlobalCompanyId = 0) :=
 FUNCTION
+
+mod_access := MODULE(Doxie.IDataAccess)
+	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+END;
 
 r_threshold_score := map(threshold_value = 0.00 and ofac_version < 4 => OFAC_XG5.Constants.DEF_THRESHOLD_REAL, 
 												threshold_value = 0.00 and ofac_version  >= 4 => OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL, 
@@ -77,16 +84,20 @@ normed := NORMALIZE(base,LEFT.pty_keys,norm(LEFT,RIGHT));
 
 
 
-normed dobrange(normed l, globalwatchlists.Key_GlobalWatchLists_Key r):=transform
+{normed, UNSIGNED4 global_sid, UNSIGNED6 did} dobrange(normed l, globalwatchlists.Key_GlobalWatchLists_Key r):=transform
+	self.global_sid := r.global_sid;
+	self.did := r.did;
 	return_match := find_dob_match(l.dob,,r.dob_1,r.dob_2,r.dob_3,r.dob_4,r.dob_5,r.dob_6,r.dob_7,r.dob_8,
 																r.dob_9,r.dob_10,dob_radius);
 	self.pty_key := if(return_match, l.pty_key,'');															
 	self := l;
 END;
 	
-pre_dobs_in_range := join(normed(record_type='I'),globalwatchlists.Key_GlobalWatchLists_Key,keyed(left.pty_key=right.pty_key),
+pre_dobs_in_range_unsuppressed := join(normed(record_type='I'),globalwatchlists.Key_GlobalWatchLists_Key,keyed(left.pty_key=right.pty_key),
 											dobrange(left,right), keep(100), atmost(10000));
 											
+pre_dobs_in_range := Suppress.Suppress_ReturnOldLayout(pre_dobs_in_range_unsuppressed, mod_access, RECORDOF(normed));
+						
 dobs_in_range := pre_dobs_in_range(pty_key<>'');
 
 duped_dobs_in_range :=dedup(sort(dobs_in_range,acctno, pty_key),acctno, pty_key);	
@@ -127,7 +138,7 @@ patriot.layout_search_out.aka aka_tran(r le) := TRANSFORM
 	SELF := le;
 END;
 
-layout_search_out.remark remark_tran(r le, INTEGER i) := TRANSFORM
+Patriot.layout_search_out.remark remark_tran(r le, INTEGER i) := TRANSFORM
 	remark_prelim := CHOOSE(i,le.remarks_1,le.remarks_2,le.remarks_3,le.remarks_4,le.remarks_5,
 														le.remarks_6,le.remarks_7,le.remarks_8,le.remarks_9,le.remarks_10,
 														le.remarks_11,le.remarks_12,le.remarks_13,le.remarks_14,le.remarks_15,
@@ -141,12 +152,15 @@ patriot.layout_search_out.parent format(base le) := TRANSFORM
 	// highest number of AKAs in the key for any given pty_key is 3,840.  the next highest entity has 600 records
 	// changing the keep(n) to be 4000 to cover that max number we're at for OFAC10923   
 	// also adding atmost(10000) to remove the compiler warning:  Neither LIMIT() nor CHOOSEN() supplied for index read
-	pat_recs := JOIN(le.pty_keys, GlobalWatchLists.Key_GlobalWatchLists_Key, keyed(LEFT.pty_key=RIGHT.pty_key), 
+	pat_recs_unsuppressed := JOIN(le.pty_keys, GlobalWatchLists.Key_GlobalWatchLists_Key, keyed(LEFT.pty_key=RIGHT.pty_key), 
 											get_pat(LEFT,RIGHT), KEEP(4000), atmost(10000));
+											
+	pat_recs := Suppress.MAC_SuppressSource(pat_recs_unsuppressed, mod_access);
+	
 	// self.seq := le.seq;
 	aka_dedup1 := DEDUP(SORT(PROJECT(pat_recs, aka_tran(LEFT)), orig_pty_name, -(real)score), orig_pty_name);
 	SELF.akas := CHOOSEN(SORT(aka_dedup1, -(real)score, orig_pty_name),10);
-	SELF.addresses := CHOOSEN(DEDUP(PROJECT(pat_recs, layout_search_out.address),all),10);
+	SELF.addresses := CHOOSEN(DEDUP(PROJECT(pat_recs, Patriot.layout_search_out.address),all),10);
 	SELF.remarks := NORMALIZE(choosen(pat_recs,1), 30, remark_tran(LEFT, COUNTER));
 	SELF.pty_key := le.pty_keys[1].pty_key;
 	SELF.source := pat_recs[1].source;

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchService_Batch">
 	<part name="DPPAPurpose"          type="xsd:byte"/>
 	<part name="GLBPurpose"           type="xsd:byte"/> 		
@@ -44,9 +44,12 @@ EXPORT SearchService_Batch := MACRO
 		self.penalty_threshold := PenaltThreshold;
 		self.MaxResults := MaxResults;
 		self.DRM := gm.DataRestrictionMask;
+		self.DPM := gm.DataPermissionMask;
 		self.hasFullNCPDP := hasFullNCPDP;
 		self.glb_ok := ut.glb_ok (gm.GLBPurpose);
 		self.dppa_ok := ut.dppa_ok(gm.DPPAPurpose);
+		self.glb     := gm.GLBPurpose;
+		self.dppa    := gm.DPPAPurpose;
 		self.isBatchService := True;
 		self.doDeepDive := req_DeepDive;
 		self.IncludeAlsoFound := req_DeepDive;

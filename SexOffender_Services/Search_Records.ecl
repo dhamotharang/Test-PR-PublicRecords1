@@ -1,14 +1,14 @@
-﻿import AutoStandardI,iesp, doxie, FCRA, FFD, Alerts, Gateway, SexOffender_Services;
+﻿import AutoStandardI, iesp, doxie, FCRA, FFD, Alerts, Gateway, SexOffender_Services;
 
 export Search_Records := module
   export getRecordsAndApplyRules(dataset (SexOffender_Services.layouts.search) spks,
                                 SexOffender_Services.IParam.search in_mod,
                                 boolean isFCRA = false,
                                 dataset(fcra.Layout_override_flag) flagfile = fcra.compliance.blank_flagfile,
-                                dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-                                integer8 inFFDOptionsMask = 0) := function
+                                dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim
+                                ) := function
                                                 
-    recs_from_raw := SexOffender_Services.Raw.Search_View.bySPK(spks, in_mod, isFCRA, flagfile, slim_pc_recs, inFFDOptionsMask);
+    recs_from_raw := SexOffender_Services.Raw.Search_View.bySPK(spks, in_mod, isFCRA, flagfile, slim_pc_recs);
     
     // Filter first using the penalty threshold
     mod_penalty := project (in_mod, AutoStandardI.InterfaceTranslator.penalt_threshold_value.params);
@@ -19,12 +19,12 @@ export Search_Records := module
     recs_filtered := recs_pen(name_type='0');
 
     // Format recs for searchservice XML output
-     added_functions_in_mod := project(in_mod, SexOffender_Services.IParam.functions_params);
+    added_functions_in_mod := project(in_mod, SexOffender_Services.IParam.functions_params);
     recs_fmtd := SexOffender_Services.search_functions.fnSearchVal(recs_filtered,
                                                                    added_functions_in_mod,
                                                                    isFCRA,,
                                                                    slim_pc_recs,
-                                                                   inFFDOptionsMask); 
+                                                                   in_mod.FFDOptionsMask); 
     // Sort into final order for returning. 
     recs_sort := sort(recs_fmtd,if(AlsoFound,1,0),
                                 _penalty,
@@ -97,7 +97,7 @@ export Search_Records := module
                                           
     ds_flags := if (IsFCRA, FFD.GetFlagFile(did_best, pc_recs), FCRA.compliance.blank_flagfile);
     
-    results := getRecordsAndApplyRules(spks, in_mod, isFCRA, ds_flags, slim_pc_recs, in_mod.FFDOptionsMask);
+    results := getRecordsAndApplyRules(spks, in_mod, isFCRA, ds_flags, slim_pc_recs);
     filterResults := IF(in_mod.filterRecsByAltAddr,filterRecsByAltAddresses(in_mod,results),results);
     
        // set the maxresults_val that is used in Alerts.mac_ProcessAlerts

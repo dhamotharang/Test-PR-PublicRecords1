@@ -1,26 +1,28 @@
-﻿IMPORT BIPv2, DueDiligence, STD, UT, VehicleV2;
+﻿IMPORT BIPv2, DueDiligence, STD, UT, VehicleV2, Doxie, Suppress;
 
 /*
 	Following Keys being used:
         VehicleV2.Key_Vehicle_Main_Key		 
 */
-EXPORT getSharedVehicle(DATASET(DueDiligence.LayoutsInternal.VehicleSlimLayout) inVehicleData, UNSIGNED1 dppa) := FUNCTION
+EXPORT getSharedVehicle(DATASET(DueDiligence.LayoutsInternal.VehicleSlimLayout) inVehicleData, UNSIGNED1 dppa,
+                                                  doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
   
   
   //Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
 	vehicleSlimCleanDate := DueDiligence.Common.CleanDatasetDateFields(inVehicleData, 'dateFirstSeen');
 	
 	//Filter out records after our history date.
-	vehicleFilt := DueDiligence.Common.FilterRecordsSingleDate(vehicleSlimCleanDate, dateFirstSeen);      
+	vehicleFilt := DueDiligence.CommonDate.FilterRecordsSingleDate(vehicleSlimCleanDate, dateFirstSeen);      
 
   //retrieve the vehichle data for all the vehicle data within our history range
   //this allows us to get as much info about a vehicle
-  vehicleDetails := JOIN(vehicleFilt, VehicleV2.Key_Vehicle_Main_Key,
+  vehicleDetails_unsuppressed := JOIN(vehicleFilt, VehicleV2.Key_Vehicle_Main_Key,
 															KEYED(LEFT.vehicle_key = RIGHT.vehicle_key) AND
                               KEYED(LEFT.iteration_Key = RIGHT.iteration_Key),
-															TRANSFORM(DueDiligence.LayoutsInternal.VehicleSlimLayout,  
-																				SELF.seq := LEFT.seq,
-																				SELF.ultid := LEFT.ultid;
+															TRANSFORM({unsigned4 global_sid, DueDiligence.LayoutsInternal.VehicleSlimLayout},  
+                                        SELF.global_sid := RIGHT.global_sid;
+                                        SELF.seq := LEFT.seq,
+                                        SELF.ultid := LEFT.ultid;
                                         SELF.orgid := LEFT.orgid;
                                         SELF.seleid := LEFT.seleid;
                                         SELF.did := LEFT.did;
@@ -43,7 +45,7 @@ EXPORT getSharedVehicle(DATASET(DueDiligence.LayoutsInternal.VehicleSlimLayout) 
 																				SELF := LEFT;
 																				SELF := [];),  
 														 ATMOST(DueDiligence.Constants.MAX_ATMOST));
-                             
+  vehicleDetails := Suppress.Suppress_ReturnOldLayout(vehicleDetails_unsuppressed, mod_access, DueDiligence.LayoutsInternal.VehicleSlimLayout);                           
   permissibleVehicles := vehicleDetails(UT.PermissionTools.dppa.state_ok(stateOrigin, dppa,, sourceCode));   
   
  

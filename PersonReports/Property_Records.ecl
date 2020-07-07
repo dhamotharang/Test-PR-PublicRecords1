@@ -171,14 +171,14 @@ EXPORT property_records (
     Self.LoanAmount := iesp.ECL2ESP.FormatDollarAmount (assess.mortgage_loan_amount);
     Self.MortgageLoanType := assess.mortgage_loan_type_desc;
     Self.MortgageLenderName := assess.mortgage_lender_name;
-	
+
 		Self.GarageDescription:= assess.garage_type_desc;
 		Self.RoofDescription:= assess.roof_type_desc;
 		Self.ACDescription:= assess.air_conditioning_desc;
-		
+
     Self.ExteriorWalls := assess.exterior_walls_desc;
     Self.Heating := assess.heating_desc;
-    Self.RecordType := 'assessor'; 
+    Self.RecordType := 'assessor';
     Self.ParcelNumber := assess.apna_or_pin_number; // same as below, don't ahve formatted value here...
     Self.ParcelId := assess.apna_or_pin_number;
     Self.FipsCode := assess.fips_code;
@@ -235,7 +235,7 @@ EXPORT property_records (
 			                                               , if (assess.sale_date != '', assess.sale_date, assess.recording_date)
 			                               );
 		Self.StatementIDs := assess.StatementIDs;
-		Self.isDisputed := assess.isDisputed;														 
+		Self.isDisputed := assess.isDisputed;
   ENDMACRO;
 
 
@@ -249,24 +249,23 @@ EXPORT property_records (
   csa_raw := doxie.Comp_Subject_Addresses (dids, , , , mod_access);
 
   // similar to doxie/central_header
-  csa_raw_fcra := FCRA.comp_subject (dids, mod_access.dppa, mod_access.glb, 
-                                     false, // exclude Gong so far
-                                     ,,, flagfile,slim_pc_recs,in_params.FFDOptionsMask);
+  csa_raw_fcra := FCRA.comp_subject (dids, mod_access,
+                                     flagfile, slim_pc_recs, in_params.FFDOptionsMask);
 
   csa_addresses := if (IsFCRA, csa_raw_fcra.addresses, csa_raw.addresses);
   csa_names := if (IsFCRA, csa_raw_fcra.names, csa_raw.names);
 
-  crs_prop := LN_PropertyV2_Services.CRS_records (csa_addresses, csa_names, mod_access.application_type, 
+  crs_prop := LN_PropertyV2_Services.CRS_records (csa_addresses, csa_names, mod_access.application_type,
 																									 in_params.non_subject_suppression, isFCRA,
 																									 slim_pc_recs, in_params.FFDOptionsMask, flagfile);
   shared base_property := crs_prop (in_params.use_nonsubjectproperty or owned,
                                         ~in_params.use_currentlyownedproperty or current_record='Y');
-    
+
   shared string FormatName (LN_PropertyV2_Services.layouts.parties.entity L) := function
     return
       if (trim (L.title) != '', trim (L.title), '') +
       if (trim (L.fname) != '', ' ' + trim (L.fname), '') +
-      if (trim (L.mname) != '', ' ' + trim (L.mname), '') + 
+      if (trim (L.mname) != '', ' ' + trim (L.mname), '') +
       if (trim (L.lname) != '', ' ' + trim (L.lname), '') +
       if (trim (L.name_suffix) != '', ' ' + trim (L.name_suffix), '');
   end;
@@ -274,20 +273,16 @@ EXPORT property_records (
   deed_ext format_deed (LN_PropertyV2_Services.layouts.out_crs l) := TRANSFORM
     MAC_SetDeeds ();
   END;
-  shared formatted_deed := project (base_property (fid_type = 'D'), format_deed(left));
+  formatted_deed := project (base_property (fid_type = 'D'), format_deed(left));
+
+  export prop_deeds := project (sort (formatted_deed, -srt_date, ParcelId), iesp.propdeed.t_DeedReportRecord);
 
   assess_ext format_assess (LN_PropertyV2_Services.layouts.out_crs l) := TRANSFORM
     MAC_SetAssessments (false);
     Self.Foundation := ''; // the only required field which is absent in the input
   END;
+  formatted_assess := project (base_property (fid_type = 'A'), format_assess (Left));
 
-  export formatted_assess := project (base_property (fid_type = 'A'), format_assess (Left));
-
-  // MAC_SetMinDate (formatted_deed, shared deeds_ready);
-  // MAC_SetMinDate (formatted_assess, shared assess_ready);
-  // export prop_deeds := project (sort (deeds_ready, -srt_date, ParcelId), iesp.propdeed.t_DeedReportRecord);
-  // export prop_assessments := project (sort(assess_ready, -IsSubjectOwned, -srt_date, -TaxYear, ParcelId), iesp.propassess.t_AssessReportRecord);
-  export prop_deeds := project (sort (formatted_deed, -srt_date, ParcelId), iesp.propdeed.t_DeedReportRecord);
   export prop_assessments := project (sort(formatted_assess, -IsSubjectOwned, -srt_date, -TaxYear, ParcelId), iesp.propassess_fcra.t_FcraAssessReportRecord);
 
 
@@ -311,19 +306,12 @@ EXPORT property_records (
   deed_ext format_deed_all (LN_PropertyV2_Services.layouts.combined.widest l) := TRANSFORM
     MAC_SetDeeds ();
   END;
-//  shared formatted_deed_all := project (all_records (fid_type = 'D'), format_deed_all(left))
   formatted_deed_all := project (all_records (fid_type = 'D'), format_deed_all(left));
                 // (exists (owners (trim (value) != '')) or
                  // exists (sellers (trim (value) != '')));
-            
-
-  // MAC_SetMinDate (formatted_deed_all, shared deeds_ready_all);
-  // MAC_SetMinDate (formatted_assess_all, shared assess_ready_all);
-  // export prop_deeds_all := project (sort (deeds_ready_all, -srt_date, ParcelId), iesp.propdeed.t_DeedReportRecord);
-  // export prop_assessments_all := project (sort(assess_ready_all, -IsSubjectOwned, -srt_date, -TaxYear, ParcelId), iesp.propassess.t_AssessReportRecord);
 
   export prop_deeds_all := project (sort (formatted_deed_all, -srt_date, ParcelId), iesp.propdeed_fcra.t_FcraDeedReportRecord);
-  export prop_assessments_all := project (sort(formatted_assess_all, -IsSubjectOwned, -srt_date, -TaxYear, ParcelId), iesp.propassess.t_AssessReportRecord);
+  // export prop_assessments_all := project (sort(formatted_assess_all, -IsSubjectOwned, -srt_date, -TaxYear, ParcelId), iesp.propassess.t_AssessReportRecord);
 
 
 
@@ -332,47 +320,47 @@ EXPORT property_records (
   // ================================================================================================
 
   export property := dataset ([], iesp.bpsreport.t_BpsReportProperty);
-	
-	 
+
+
 	iesp.share.t_StringArrayItem xform_orig_names(LN_PropertyV2_Services.layouts.parties.orig L) := transform
 		Self.value := L.orig_name;
 	end;
-	 
+
 	iesp.property.t_Property2Entity xform_entities(LN_PropertyV2_Services.layouts.parties.pparty L) := transform
 		Self.Address := SetPartyAddress (L);
 		Self.Phone := ROW({L.phone_number,'','','','',''}, iesp.share.t_PhoneInfo);
 		Self.EntityTypeCode := L.party_type;
 		Self.EntityType := L.party_type_name;
-		
+
 		CLN_ORIG := address.GetCleanAddress(L.orig_addr,L.orig_csz,0).results; // region is 0 for US.
-		
+
 		Self.OriginalAddress := iesp.ECL2ESP.SetAddress (
       CLN_ORIG.prim_name, CLN_ORIG.prim_range, CLN_ORIG.predir, CLN_ORIG.postdir, CLN_ORIG.suffix, CLN_ORIG.unit_desig, CLN_ORIG.sec_range,
       CLN_ORIG.v_city, CLN_ORIG.state, CLN_ORIG.zip, CLN_ORIG.zip4, CLN_ORIG.county);
 		Self.Lot := L.lot;
 		Self.LotOrder := L.lot_order;
-		
+
 		ds_names := project(L.entity, xform_names(left));
-		Self.Names := ds_names; 
-		
+		Self.Names := ds_names;
+
 		ds_orig_names := project(L.orig_names, xform_orig_names(left));
 		Self.OriginalNames := choosen(ds_orig_names,iesp.constants.prop.MaxOriginalNames);
-		
+
 		ds_orig_names2 := project(L.orig_names, xform_orig_names2(left));
 		Self.OriginalNames2 := choosen(ds_orig_names2,iesp.constants.prop.MaxOriginalNames2);
-		
-		
+
+
 	end;
 
   iesp.property.t_PropertyReport2Record FormatReport2Records (all_records L) := TRANSFORM
-		assess := L.assessments[1];	
+		assess := L.assessments[1];
 		deed := L.deeds[1];
-		
+
 		Self.DataSource := L.vendor_source_flag;
 		Self.FaresId := L.ln_fares_id;
 		Self.SourcePropertyRecordId := L.ln_fares_id;
-		Self.RecordType := L.fid_type; 
-		Self.RecordTypeDesc := L.fid_type_desc; 
+		Self.RecordType := L.fid_type;
+		Self.RecordTypeDesc := L.fid_type_desc;
 		Self.OutputSeqNo := '';
 		Self.ParcelNumber := map(L.fid_type='A' => assess.apna_or_pin_number,
 															L.fid_type='D' => deed.apnt_or_pin_number ,
@@ -382,7 +370,7 @@ EXPORT property_records (
 		Self.Assessment.ParcelId  := assess.apna_or_pin_number;
 		Self.Assessment.FipsCode  := assess.fips_code;
 		Self.Assessment.DuplicateApnMultipleAddressId  := assess.duplicate_apn_multiple_address_id;
-		Self.Assessment.TapeCutDate.year :=(unsigned2) assess.tape_cut_date[1..4]; 
+		Self.Assessment.TapeCutDate.year :=(unsigned2) assess.tape_cut_date[1..4];
 		Self.Assessment.TapeCutDate.month :=(unsigned1) assess.tape_cut_date[5..6];
 		Self.Assessment.TapeCutDate.day :=0 ; // TapCutDate format from vendor is YYYYMM only.
 		Self.Assessment.EditionNumber  := assess.edition_number;
@@ -529,35 +517,35 @@ EXPORT property_records (
 		Self.Assessment.SourcePropertyRecord.ConditionDesc := assess.fares_condition_desc;
 		ds :=  dataset([{assess.school_tax_district1},{assess.school_tax_district2},{assess.school_tax_district3}], {string15 school_tax_district});
 		Self.Assessment.SchoolTaxDistricts :=  project(ds,transform(iesp.share.t_StringArrayItem,self.value:= left.school_tax_district));
-		
+
 		ds1 := dataset([{assess.tax_exemption1_desc},
 						{ assess.tax_exemption2_desc},
 						{ assess.tax_exemption3_desc},
 						{ assess.tax_exemption4_desc}], {string21 description});
-		Self.Assessment.TaxExemptions := project(ds1,transform(iesp.share.t_StringArrayItem,self.value:= left.description));								
-		
+		Self.Assessment.TaxExemptions := project(ds1,transform(iesp.share.t_StringArrayItem,self.value:= left.description));
+
 
 		ds2 := dataset([{assess.other_buildings1_desc},
 					{ assess.other_buildings2_desc},
 					{ assess.other_buildings3_desc},
 					{ assess.other_buildings4_desc},
 					{assess.other_buildings5_desc}], {string28 description});
-		Self.Assessment.OtherBuildings := project(ds2,transform(iesp.share.t_StringArrayItem,self.value:= left.description));								
-		
+		Self.Assessment.OtherBuildings := project(ds2,transform(iesp.share.t_StringArrayItem,self.value:= left.description));
+
 		ds3 := dataset([{assess.site_influence1_desc},
 					{ assess.site_influence2_desc},
 					{ assess.site_influence3_desc},
 					{ assess.site_influence4_desc},
 					{ assess.site_influence5_desc}], {string29 description});
-		Self.Assessment.SiteInfluences := project(ds3,transform(iesp.share.t_StringArrayItem,self.value:= left.description));								
-		
+		Self.Assessment.SiteInfluences := project(ds3,transform(iesp.share.t_StringArrayItem,self.value:= left.description));
+
 		ds4 := dataset([{assess.amenities1_desc},
 						{ assess.amenities2_desc},
 						{ assess.amenities3_desc},
 						{ assess.amenities4_desc},
 						{assess.amenities5_desc}], {string17 description});
-		Self.Assessment.Amenities := project(ds4,transform(iesp.share.t_StringArrayItem,self.value:= left.description));								
-		
+		Self.Assessment.Amenities := project(ds4,transform(iesp.share.t_StringArrayItem,self.value:= left.description));
+
 		ds5 :=  dataset([{assess.building_area, assess.building_area_indicator,assess.building_area_desc},
 						{assess.building_area1, assess.building_area1_indicator, assess.building_area1_desc},
 						{assess.building_area2, assess.building_area2_indicator, assess.building_area2_desc},
@@ -566,10 +554,10 @@ EXPORT property_records (
 						{assess.building_area5, assess.building_area5_indicator, assess.building_area5_desc},
 						{assess.building_area6, assess.building_area6_indicator, assess.building_area6_desc},
 						{assess.building_area7, assess.building_area7_indicator, assess.building_area7_desc}], {string9 area, string2 indicator, string30 description});
-		Self.Assessment.BuildingAreas := project(ds5,transform(iesp.share.t_StringArrayItem,self.value:= left.description));								
+		Self.Assessment.BuildingAreas := project(ds5,transform(iesp.share.t_StringArrayItem,self.value:= left.description));
 		Self.Assessment.BuildingAreas2 := project(ds5, transform(iesp.property.t_BuildingAreaInfo, self:=left));
-		
-		Self.Deed.County := deed.county_name;	
+
+		Self.Deed.County := deed.county_name;
 		Self.Deed.ParcelId  := deed.apnt_or_pin_number;
 		Self.Deed.FipsCode  := deed.fips_code;
 		Self.Deed.DeedType  := deed.record_type;
@@ -586,7 +574,7 @@ EXPORT property_records (
 		Self.Deed.Buyer1IdDesc := deed.buyer1_id_desc ;
 		Self.Deed.Buyer2IdDesc := deed.buyer2_id_desc ;
 		Self.Deed.BuyerVestingDesc  := deed.buyer_vesting_desc;
-		
+
 		Self.Deed.BuyersInfo.Id1Code := deed.buyer1_id_code ;
 		Self.Deed.BuyersInfo.Id1Description := deed.buyer1_id_desc ;
 		Self.Deed.BuyersInfo.Id2Code := deed.buyer2_id_code;
@@ -594,14 +582,14 @@ EXPORT property_records (
 		Self.Deed.BuyersInfo.VestingCode := deed.buyer_vesting_code;
 		Self.Deed.BuyersInfo.VestingDescription := deed.buyer_vesting_desc;
 		Self.Deed.BuyersInfo.AddendumFlag := deed.buyer_addendum_flag;
-		
+
 		Self.Deed.Borrower1IdCode := deed.borrower1_id_code;
 		Self.Deed.Borrower2IdCode := deed.borrower2_id_code;
 		Self.Deed.BorrowerVestingCode  := deed.borrower_vesting_code;
 		Self.Deed.Borrower1IdDesc := deed.borrower1_id_desc;
 		Self.Deed.Borrower2IdDesc := deed.borrower2_id_desc;
 		Self.Deed.BorrowerVestingDesc  := deed.borrower_vesting_desc;
-		
+
 		Self.Deed.BorrowersInfo.Id1Code := deed.borrower1_id_code ;
 		Self.Deed.BorrowersInfo.Id1Description := deed.borrower1_id_desc ;
 		Self.Deed.BorrowersInfo.Id2Code := deed.borrower2_id_code;
@@ -609,13 +597,13 @@ EXPORT property_records (
 		Self.Deed.BorrowersInfo.VestingCode := deed.borrower_vesting_code;
 		Self.Deed.BorrowersInfo.VestingDescription := deed.borrower_vesting_desc;
 		Self.Deed.BorrowersInfo.AddendumFlag := ''; //Borrower addendumflag doesn't exist.
-		
+
 		Self.Deed.Seller1IdCode := deed.seller1_id_code;
 		Self.Deed.Seller2IdCode := deed.seller2_id_code;
 		Self.Deed.SellerAddendumFlag  := deed.seller_addendum_flag;
 		Self.Deed.Seller1IdDesc := deed.seller1_id_desc ;
 		Self.Deed.Seller2IdDesc := deed.seller2_id_desc;
-		
+
 		Self.Deed.SellersInfo.Id1Code := deed.Seller1_id_code ;
 		Self.Deed.SellersInfo.Id1Description := deed.Seller1_id_desc ;
 		Self.Deed.SellersInfo.Id2Code := deed.Seller2_id_code;
@@ -623,21 +611,21 @@ EXPORT property_records (
 		Self.Deed.SellersInfo.VestingCode := '';//field doesn't exist.
 		Self.Deed.SellersInfo.VestingDescription := '';//field doesn't exist.
 		Self.Deed.SellersInfo.AddendumFlag := deed.Seller_addendum_flag;
-		
+
 		Self.Deed.Lender  := deed.lender_name;
 		Self.Deed.LenderNameId  := deed.lender_name_id;
 		Self.Deed.LenderDbaAka  := deed.lender_dba_aka_name;
 		Self.Deed.LenderFullStreetAddress  := deed.lender_full_street_address;
 		Self.Deed.LenderAddressUnitNumber  := deed.lender_address_unit_number;
 		Self.Deed.LenderAddressCitystatezip  := deed.lender_address_citystatezip;
-		
+
 		Self.Deed.LenderInfo.Name := deed.lender_name ;
 		Self.Deed.LenderInfo.NameId := deed.lender_name_id ;
 		Self.Deed.LenderInfo.DbaAka :=  deed.lender_dba_aka_name;
 		Self.Deed.LenderInfo.FullStreetAddress :=  deed.lender_full_street_address;
 		Self.Deed.LenderInfo.AddressUnitNumber := deed.lender_address_unit_number;
 		Self.Deed.LenderInfo.AddressCitystatezip := deed.lender_address_citystatezip;
-		
+
 		Self.Deed.ContractDate  := iesp.ECL2ESP.toDate ((unsigned6) deed.contract_date);
 		Self.Deed.RecordingDate  := iesp.ECL2ESP.toDate ((unsigned6) deed.recording_date);
 		Self.Deed.DocumentTypeCode  := deed.document_type_code;
@@ -662,7 +650,7 @@ EXPORT property_records (
 		Self.Deed.LegalTractNumber  := deed.legal_tract_number;
 		Self.Deed.LegalSecTwnRngMer  := deed.legal_sec_twn_rng_mer;
 		Self.Deed.RecorderMapReference  := deed.recorder_map_reference;
-		
+
 		Self.Deed.LegalInfo.BriefDescription := deed.legal_brief_description;
 		Self.Deed.LegalInfo.LotCode  := deed.legal_lot_code;
 		Self.Deed.LegalInfo.LotDesc  := deed.legal_lot_desc ;
@@ -678,8 +666,8 @@ EXPORT property_records (
 		Self.Deed.LegalInfo.TractNumber  := deed.legal_tract_number ;
 		Self.Deed.LegalInfo.SecTwnRngMer  := deed.legal_sec_twn_rng_mer ;
 		Self.Deed.LegalInfo.AssessorMapRef  := deed.recorder_map_reference ;
-		
-		
+
+
 		Self.Deed.CompleteLegalDescriptionCode  := deed.complete_legal_description_code;
 		Self.Deed.LoanNumber  := deed.loan_number;
 		Self.Deed.ConcurrentMortgageBookPageDocumentNumber  := deed.concurrent_mortgage_book_page_document_number;
@@ -750,7 +738,7 @@ EXPORT property_records (
 		Self.Deed.FaresMortgageTerm  := deed.fares_mortgage_term;
 		Self.Deed.FaresIrisApn  := deed.fares_iris_apn;
 		Self.Deed.FaresLenderAddress  := deed.fares_lender_address;
-		
+
 		Self.Deed.DeedSourcePropertyRecord.TransactionType  := deed.fares_transaction_type;
 		Self.Deed.DeedSourcePropertyRecord.TransactionTypeDesc  := deed.fares_transaction_type ;
 		Self.Deed.DeedSourcePropertyRecord.MortgageDeedType  := deed.fares_mortgage_deed_type;
@@ -773,7 +761,7 @@ EXPORT property_records (
 		Self.Entities := ds_entities;
 		Self := [];
   END;
-	
+
 	export property_v2 := project(all_records ,FormatReport2Records(left));
-	
+
 END;

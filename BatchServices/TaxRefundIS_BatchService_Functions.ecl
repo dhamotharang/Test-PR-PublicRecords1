@@ -511,8 +511,7 @@ export TaxRefundIS_BatchService_Functions := MODULE
         self.hri_6 := if (count(RI) >= 6 and RI[6].hri in Instant_ID_Codes, RI[6].hri, '');
         self.hri_desc_6 := if (count(RI) >= 6 and RI[6].hri in Instant_ID_Codes, RI[6].desc, '');
         self.nas_summary := (string)L.socsverlevel;
-        cvi_temp := risk_indicators.cviScore(L.phoneverlevel,L.socsverlevel,L,L.correctssn,
-                                              L.correctaddr,L.correcthphone,'',veraddr,verlast);	
+        cvi_temp := risk_indicators.cviScore(L.phoneverlevel,L.socsverlevel,L,'',veraddr,verlast);	
         self.CVI := map(	IncludeMSoverride and risk_indicators.rcSet.isCodeMS(L.ssns_per_adl_seen_18months) and (integer)cvi_temp > 10 => '10',
                 IsPOBoxCompliant AND risk_indicators.rcSet.isCodePO(L.addr_type) and (integer)cvi_temp > 10 => '10',
                 IncludeCLoverride and risk_indicators.rcSet.isCodeCL(L.ssn, L.bestSSN, L.socsverlevel, L.combo_ssn) and (integer)cvi_temp > 10 => '10',

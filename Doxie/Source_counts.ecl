@@ -10,7 +10,7 @@ mod_access := Doxie.compliance.GetGlobalDataAccessModule();
 boolean is_knowx1 := mod_access.isConsumer();
 
 Out_layout := record
- unsigned2 atf_cnt; 
+ unsigned2 atf_cnt;
  unsigned2 bk_cnt;
  unsigned2 bkv2_cnt;
  unsigned2 lien_cnt;
@@ -18,7 +18,7 @@ Out_layout := record
  unsigned2 dl_cnt;
  unsigned2 dl2_cnt;
  unsigned2 death_cnt;
- unsigned2 statedeath_cnt; 
+ unsigned2 statedeath_cnt;
  unsigned2 proflic_cnt;
  unsigned2 sanc_cnt;
  unsigned2 prov_cnt;
@@ -34,8 +34,8 @@ Out_layout := record
  unsigned2 pilot_cnt;
  unsigned2 pilotCert_cnt;
  unsigned2 watercraft_cnt;
- unsigned2 ucc_cnt; 
- unsigned2 uccv2_cnt; 
+ unsigned2 ucc_cnt;
+ unsigned2 uccv2_cnt;
  unsigned2 corpAffil_cnt;
  unsigned2 voter_cnt;
  unsigned2 voterv2_cnt;
@@ -53,7 +53,7 @@ Out_layout := record
  unsigned2 nod_cnt;
  unsigned2 boater_cnt;
  unsigned2 finder_cnt;
- unsigned2 tu_cnt; 
+ unsigned2 tu_cnt;
  unsigned2 tn_cnt;
  unsigned2 deed_cnt;
  unsigned2 assessment_cnt;
@@ -65,6 +65,7 @@ Out_layout := record
  unsigned2 phonesPlus_cnt;
  unsigned2 FBNv2_cnt;
  unsigned2 student_cnt;
+ unsigned2 emailv2_cnt;
 end;
 
 doxie_raw.Layout_input intoInput(doxie.layout_references L) := transform
@@ -78,7 +79,7 @@ inputi := project(dids,intoInput(left));
 
 outDid := Doxie_Raw.ViewSourceDid(inputi, mod_access, IsCRS,
 		BankruptcyVersion,JudgmentLienVersion,UccVersion,DlVersion,VehicleVersion,VoterVersion,DeaVersion,CriminalRecordVersion,
-		doxie_crs.str_typeDebtor); //limit counts for CRS
+		doxie_crs.str_typeDebtor, EmailVersion); //limit counts for CRS
 
 //=========================================================
 
@@ -100,6 +101,7 @@ outRec combineChildResults(outRec L, outRec R) := transform
 	self.sanc_child := (L.sanc_child + R.sanc_child);
 	self.prov_child := (L.prov_child + R.prov_child);
 	self.email_child := (L.email_child + R.email_child);
+	self.email_v2_child := (L.email_v2_child + R.email_v2_child);
 	self.veh_child := IF(not is_knowx1,(L.veh_child + R.veh_child));
 	self.veh_v2_child := IF(not is_knowx1,(L.veh_v2_child + R.veh_v2_child));
 	self.dea_child := (L.dea_child + R.dea_child);
@@ -165,11 +167,13 @@ TRANSFORM
 
 	self.voterv2_cnt := if (Include_VoterRegistrations_val,count(dedup(SORT(L.voters_v2_child, RECORD), record)),0);
 	self.death_cnt := count(dedup(SORT(L.death_child, RECORD), record));
-	self.statedeath_cnt := count(dedup(SORT(L.state_death_child,RECORD),record));	
+	self.statedeath_cnt := count(dedup(SORT(L.state_death_child,RECORD),record));
 	self.proflic_cnt := if (Include_ProfessionalLicenses_val,count(dedup(SORT(L.proflic_child, RECORD), record)),0);
 	self.sanc_cnt := if (Include_Sanctions_val,count(dedup(SORT(L.sanc_child, RECORD), record)),0);
 	self.prov_cnt := if (Include_Providers_val,count(dedup(SORT(L.prov_child, RECORD), record)),0);
 	self.email_cnt := if(Include_Email_addresses_val,count(dedup(sort(L.email_child,RECORD),record)),0);
+	self.emailv2_cnt := if(Include_Email_addresses_val,count(dedup(sort(L.email_v2_child,RECORD),record)),0);
+
 	self.veh_cnt := if (Include_MotorVehicles_val,count(dedup(SORT(L.veh_child, RECORD), record)),0);
 	self.vehv2_cnt := if (Include_MotorVehicles_val,count(dedup(SORT(L.veh_v2_child, RECORD), record)),0);
 	self.dea_cnt := if (Include_DEA_Val,count(dedup(SORT(L.dea_child, RECORD), record)),0);
@@ -203,19 +207,19 @@ TRANSFORM
 																addr_suffix,predir,prim_range,postdir,unit_desig,sec_range,
 																util_type,date_first_seen,connect_date,
 																date_added_to_exchange));
-																
+
 	self.quickheader_cnt := count(dedup(SORT(L.quickheader_child, RECORD), record));
-	Header.Layout_EQ_src_dates t(Header.Layout_EQ_src_dates a , 
+	Header.Layout_EQ_src_dates t(Header.Layout_EQ_src_dates a ,
    		                             Header.Layout_EQ_src_dates b):= transform
    			IsABig := a.date_last_seen > b.date_last_seen ;
    			self 	 := if(IsABig ,a ,b);
    		 end;
-   		 
+
    	self.eq_cnt := count(rollup(sort(L.eq_child, -current_address_date_reported[3..6],
-   															 -current_address_date_reported[1..2],RECORD), 
+   															 -current_address_date_reported[1..2],RECORD),
    													t(left,right),
-   							            RECORD,EXCEPT date_last_seen,date_first_seen,cid));		
-														
+   							            RECORD,EXCEPT date_last_seen,date_first_seen,cid));
+
 	self.en_cnt := count(dedup(SORT(L.en_child, RECORD), record));
 	self.for_cnt := if(Include_Foreclosures_val and (not doxie.DataRestriction.Fares),count(dedup(SORT(L.for_child, RECORD), record)),0);
 	self.nod_cnt := if(Include_NoticeOfDefaults_val and (not doxie.DataRestriction.Fares),count(dedup(SORT(L.nod_child, RECORD), record)),0);

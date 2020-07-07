@@ -1,12 +1,15 @@
 ﻿/* PublicRecords_KEL.BWR_FCRA_MAS_Roxie */
+#workunit('name','MAS FCRA Consumer dev156 1 thread');
 IMPORT PublicRecords_KEL, RiskWise, STD, Gateway, UT, SALT38, SALTRoutines;
 threads := 1;
 
 RoxieIP := RiskWise.shortcuts.Dev156;
 NeutralRoxieIP:= RiskWise.Shortcuts.Dev156;
 
-//InputFile := '~temp::kel::consumer_fcra_1mm.csv'; //1 million
-InputFile := '~temp::kel::consumer_fcra_100k.csv';
+InputFile := '~mas::uatsamples::consumer_fcra_100k_07102019.csv';
+//InputFile := '~mas::uatsamples::consumer_fcra_1m_07092019.csv';
+// InputFile := '~mas::uatsamples::consumer_nonfcra_iptest_04232020.csv'; //Samesample as NonFCRA only testing IP validation
+
 
 /* Data Setting 	FCRA 	
 DRMFares = 1 //FARES - bit 1
@@ -39,26 +42,25 @@ Score_threshold := 80;
 
 // Output additional file in Master Layout
 // Master results are for R&D/QA purposes ONLY. This should only be set to TRUE for internal use.
-Output_Master_Results := FALSE;
-// Output_Master_Results := TRUE; 
+// Output_Master_Results := FALSE;
+Output_Master_Results := TRUE; 
 
 // Toggle to include/exclude SALT profile of results file
-Output_SALT_Profile := FALSE;
-// Output_SALT_Profile := TRUE;
+// Output_SALT_Profile := FALSE;
+Output_SALT_Profile := TRUE;
 
 RecordsToRun := 0;
 eyeball := 100;
 
-OutputFile := '~calbrecht::BundleTest_100K_RoxieDev_current_09172019_FCRA'+ ThorLib.wuid() ;
-// OutputFile := '~calbrecht::BundleTest_100K_RoxieDev_archive_09172019_FCRA'+ ThorLib.wuid() ;
-
+OutputFile := '~lweiner::out::PersonFCRA_Roxie_100k_Archive_KS-4216_'+ ThorLib.wuid();
 
 prii_layout := RECORD
     STRING Account             ;
     STRING FirstName           ;
     STRING MiddleName          ;
     STRING LastName            ;
-    STRING StreetAddress       ;
+    STRING StreetAddressLine1  ;
+    STRING StreetAddressLine2  ;
     STRING City                ;
     STRING State               ;
     STRING Zip                 ;
@@ -80,7 +82,7 @@ prii_layout := RECORD
     STRING Perf;
     STRING Proj;
 END;
-p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));
+p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"'), HEADING(SINGLE)));
 // P_IN1 := p_in( ACCOUNT IN ['AAAA7833-122054', 'TMOBJUN7088-84991']);
 p := IF (RecordsToRun = 0, P_IN, CHOOSEN (P_IN, RecordsToRun));
 //p2 := p_in;
@@ -149,6 +151,7 @@ OUTPUT(CHOOSEN(soap_in, eyeball), NAMED('Sample_SOAPInput'));
 	
 
 layout_MAS_Test_Service_output := RECORD
+    unsigned8 time_ms{xpath('_call_latency_ms')} := 0;  // picks up timing
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster MasterResults {XPATH('Results/Result/Dataset[@name=\'MasterResults\']/Row')};
 	PublicRecords_KEL.ECL_Functions.Layout_Person_FCRA Results {XPATH('Results/Result/Dataset[@name=\'Results\']/Row')};
 	STRING G_ProcErrorCode := '';
@@ -179,6 +182,7 @@ OUTPUT( CHOOSEN(Failed,eyeball), NAMED('bwr_results_Failed') );
 OUTPUT( COUNT(Failed), NAMED('Failed_Cnt') );
 
 LayoutMaster_With_Extras := RECORD
+    unsigned8 time_ms;
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster;
 	STRING G_ProcErrorCode;
 	STRING ln_project_id;
@@ -192,6 +196,7 @@ LayoutMaster_With_Extras := RECORD
 END;
 
 Layout_Person := RECORD
+    unsigned8 time_ms;
 	PublicRecords_KEL.ECL_Functions.Layout_Person_FCRA;
 	STRING G_ProcErrorCode;
 END;
@@ -200,6 +205,7 @@ Passed_with_Extras :=
 	JOIN(p, Passed, LEFT.Account = RIGHT.MasterResults.P_InpAcct, 
 		TRANSFORM(LayoutMaster_With_Extras,
 			SELF := RIGHT.MasterResults, //fields from passed
+            SELF.time_ms := RIGHT.time_ms,
 			SELF := LEFT, //input performance fields
 			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),
@@ -209,6 +215,7 @@ Passed_Person :=
 	JOIN(p, Passed, LEFT.Account = RIGHT.Results.P_InpAcct, 
 		TRANSFORM(Layout_Person,
 			SELF := RIGHT.Results, //fields from passed
+            SELF.time_ms := RIGHT.time_ms,
 			SELF := LEFT, //input performance fields
 			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),

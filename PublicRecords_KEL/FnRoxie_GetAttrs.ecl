@@ -10,23 +10,21 @@ EXPORT FnRoxie_GetAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) In
         SELF.G_ProcUID := COUNTER,
         SELF := LEFT ));														
 								
-	// Echo input
-	InputEcho := PublicRecords_KEL.ECL_Functions.Fn_InputEcho_Roxie( ds_input_slim );	
+	Prep_inputPII := PublicRecords_KEL.ECL_Functions.FnRoxie_Prep_InputPII(InputData, Options);
 
-  // Clean input
-  cleanInput := PublicRecords_KEL.ECL_Functions.Fn_CleanInput_Roxie( InputEcho );
-  
-  // Append LexID
-  withLexID := IF(Options.isFCRA, 
-		PublicRecords_KEL.ECL_Functions.Neutral_Lexid_Soapcall(cleanInput, Options), //FCRA uses soapcall
-		PublicRecords_KEL.ECL_Functions.Fn_AppendLexid_Roxie( cleanInput, Options ));
-		
-	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( withLexID, Options );
+	// 'mini' fdc fetching is to gather address hist data from rank key then pass this to the rest of the FDC after creating prev/curr/emerging address related attributes 
+	OptionsMini := PublicRecords_KEL.Interface_Mini_Options(Options);
+
+	FDCDatasetMini := PublicRecords_KEL.Fn_MAS_FDC( Prep_inputPII, OptionsMini);		
+
+	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(Prep_inputPII, FDCDatasetMini, OptionsMini); 
+
+	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( MiniAttributes, Options , DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII) ,FDCDatasetMini);
 
   // Get Attributes - cleans the attributes after KEL is done 
-  InputPIIAttributes := KEL.Clean(PublicRecords_KEL.Q_Input_Attributes_V1(withLexID, (STRING) withLexID[1].P_InpClnArchDt[1..8], Options.KEL_Permissions_Mask).res0, TRUE, TRUE, TRUE);
+  InputPIIAttributes :=PublicRecords_KEL.FnRoxie_GetInputPIIAttributes(Prep_inputPII, Options);
 	
-	PersonAttributes := PublicRecords_KEL.FnRoxie_GetPersonAttributes(withLexID, FDCDataset, Options); 
+	PersonAttributes := PublicRecords_KEL.FnRoxie_GetPersonAttributes(MiniAttributes, FDCDataset, Options); 
 
 	withPersonAttributes := JOIN(InputPIIAttributes, PersonAttributes, LEFT.G_ProcUID = RIGHT.G_ProcUID,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,

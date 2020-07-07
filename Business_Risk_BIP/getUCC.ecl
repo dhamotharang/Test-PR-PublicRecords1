@@ -21,8 +21,18 @@ EXPORT getUCC(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// Figure out if the kFetch was successful
 	kFetchErrorCodes := Business_Risk_BIP.Common.GrabFetchErrorCode(UCCTMSIDSeq);
 	
-	// Filter out records after our history date
-	UCCTMSID := Business_Risk_BIP.Common.FilterRecords(UCCTMSIDSeq, dt_first_seen, dt_vendor_first_reported, MDR.SourceTools.src_UCCV2, AllowedSourcesSet);
+	// Under the most recent definition for source codes that are allowed for Marketing purposes, all UCCs are
+	// restricted with the exception of the following jurisdictions: ['TXD','TXH','CA','IL','NYC','MA','TX'].
+	set_MarketingAllowedUCCSources2Chars := ['CA', 'IL', 'MA', 'TX'];
+	set_MarketingAllowedUCCSources3Chars := ['TXD', 'TXH', 'NYC'];
+	
+	// Filter out records after our history date; set sourceCode to null string for FilterRecords so all UCC 
+	// records return whether Marketing restriction is indicated or not.
+	UCCTMSID_pre := Business_Risk_BIP.Common.FilterRecords(UCCTMSIDSeq, dt_first_seen, dt_vendor_first_reported, '', AllowedSourcesSet);
+	
+	UCCTMSID := IF( Options.MarketingMode = 1,
+			UCCTMSID_pre(tmsid[1..3] IN set_MarketingAllowedUCCSources3Chars OR tmsid[1..2] IN set_MarketingAllowedUCCSources2Chars),
+			UCCTMSID_pre);
 	
 	// ---- Get the raw data based on the unique TMSID codes - this is simlar to code adopted from TopBusiness_Services.UCCSource_Records ----
 	UCCKeys := PROJECT(UCCTMSID (TRIM(TMSID) != ''), TRANSFORM(UCCv2_Services.layout_tmsid, SELF.TMSID := LEFT.TMSID, SELF := LEFT));
@@ -66,14 +76,14 @@ EXPORT getUCC(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	END;
   
 	UCCStatsTemp := PROJECT(UCCStats, TRANSFORM(tempLayout,
-																				SELF.Seq := LEFT.Seq;
-																				SELF.TMSID := LEFT.TMSID;
-																				SELF.Sources := DATASET([{LEFT.Source, 
-																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
-																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
-																																	LEFT.DateLastSeen,
-																																	LEFT.DateVendorLastSeen,
-																																	LEFT.RecordCount}], Business_Risk_BIP.Layouts.LayoutSources)));
+													SELF.Seq := LEFT.Seq;
+													SELF.TMSID := LEFT.TMSID;
+													SELF.Sources := DATASET([{LEFT.Source, 
+																		IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
+																		IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
+																		LEFT.DateLastSeen,
+																		LEFT.DateVendorLastSeen,
+																		LEFT.RecordCount}], Business_Risk_BIP.Layouts.LayoutSources)));
 
 	UCCStatsRolled := 
   ROLLUP(

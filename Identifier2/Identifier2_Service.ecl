@@ -177,7 +177,7 @@ end;
 
 
 
-import ut, address, models, iesp, OFAC_XG5, Risk_Indicators;
+import iesp, OFAC_XG5, Risk_Indicators, Inquiry_AccLogs, AutoheaderV2, Risk_Reporting, Identifier2, STD;
 
 export Identifier2_Service := MACRO
  
@@ -189,6 +189,28 @@ export Identifier2_Service := MACRO
   boolean  Test_Data_Enabled    := FALSE  : stored('TestDataEnabled');
   string20 Test_Data_Table_Name := ''     : stored('TestDataTableName');
 
+/* **********************************************
+   *  Fields needed for improved Scout Logging  *
+   **********************************************/
+	string32 _LoginID           := ''	: STORED('_LoginID');
+	string20 CompanyID          := '' : STORED('_CompanyID');
+	string20 FunctionName       := '' : STORED('_LogFunctionName');
+	string50 ESPMethod          := '' : STORED('_ESPMethodName');
+    string10 InterfaceVersion   := '';
+    #stored('_ESPClientInterfaceVersion', InterfaceVersion);
+	string6 ssnmask             := 'NONE' : STORED('SSNMask');
+	string6 dobmask	            := ''	: STORED('DOBMask');
+	unsigned1 dlmask              := 0	: STORED('DLMask');
+	string5 DeliveryMethod      := '' : STORED('_DeliveryMethod');
+	string5 DeathMasterPurpose  := '' : STORED('__deathmasterpurpose');
+	boolean ExcludeDMVPII       := FALSE : STORED('ExcludeDMVPII');
+	BOOLEAN DisableOutcomeTracking := FALSE : STORED('OutcomeTrackingOptOut');
+	string1 ArchiveOptIn        := '' : STORED('instantidarchivingoptin');
+
+	//Look up the industry by the company ID.
+  
+	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Identifier2__Identifier2_Service);
+/* ************* End Scout Fields **************/
 
   //set options
   iesp.ECL2ESP.SetInputBaseRequest (first_row);
@@ -199,23 +221,22 @@ export Identifier2_Service := MACRO
   options := global(first_row.Options);
 	parsed_addr := identifier2.fn_make_address(search_by.address)[1].address;
 	
-	#stored( 'in_city', search_by.address.city )
+	#stored( 'in_city', search_by.address.city);
 	
 	// perform zip/state matching prior to address cleaning. zip state match is true if and only if zip and state are input and zip is in the state
 	doesZipMatchState :=
 		options.VerifyInput.ZipMatchesState
 		and trim(search_by.address.State) != ''
 		and trim(search_by.address.zip5) != ''
-		and ziplib.ZipToState2(trim(search_by.address.zip5)) = StringLib.StringToUpperCase( trim(search_by.address.State) )
-	;
-	#stored( 'ZipStateMatch', doesZipMatchState )
+		and ziplib.ZipToState2(trim(search_by.address.zip5)) = STD.Str.ToUpperCase( trim(search_by.address.State) );
+	#stored( 'ZipStateMatch', doesZipMatchState);
 	
 	// Check for DOBMatch options and store if entered
 	
 	dobTemp := record
 		risk_indicators.layouts.Layout_DOB_Match_Options;
 	end;
-	dob_temp := project( ut.ds_oneRecord, transform( dobTemp, self.DOBMatch := options.DOBMatch.MatchType, self.DOBMatchYearRadius := options.DOBMatch.MatchYearRadius ));
+    dob_temp := DATASET ([transform(dobTemp, self.DOBMatch := options.DOBMatch.MatchType, self.DOBMatchYearRadius := options.DOBMatch.MatchYearRadius)]);
 	#stored ('DOBMatchOptions', dob_temp);	
 	
 	
@@ -249,10 +270,8 @@ export Identifier2_Service := MACRO
     #stored ('City', City);
     string5 zip5 := search_address.Zip5; 
     #stored('zip',zip5);
-    // string4 Zip4 {xpath('Zip4')};
     string18 County :=search_address.County;
 		#stored('County',County);
-    // string6 PostalCode {xpath('PostalCode')};
     string50 StateCityZip := search_address.StateCityZip; 
     #stored('StateCityZip',StateCityZip);
   												
@@ -260,39 +279,24 @@ export Identifier2_Service := MACRO
 	
 	boolean useFML := true;
 	#stored ('cleanNameFML', useFML);
- //iesp.ECL2ESP.SetInputAddress (search_address);
- // iesp.ECL2ESP.SetInputSearchOptions (first_row.options);
   iesp.ECL2ESP.SetInputDate (search_by.DOB , 'DOB'); 
-  // unsigned8 dob_value := 0 : stored('DOB');
-  unsigned8 dob_value_temp := 0 : stored('DOB');  	//***KWH - CIV (allow just MMDD input for DOB, but pad with leading zeroes if so)
-	string    dob_value := if(dob_value_temp between 0101 and 1231, intformat(dob_value_temp,8,1), (string)dob_value_temp); 	//***KWH - CIV
-	//string200 addr := '' : stored('Addr');
+  unsigned8 dob_value_temp := 0 : stored('DOB');
+	string    dob_value := if(dob_value_temp between 0101 and 1231, intformat(dob_value_temp,8,1), (string)dob_value_temp);
 	#stored ('UnitDesignation', search_address.UnitDesignation);
-	//string200 addr := identifier2.input.addr1 ;
 	#stored ('StreetAddress',addr);  //instantid uses this value as input
 	//process input specific for this service:
-  //#stored ('AccountNumber',search_by.UniqueId);
 	#stored ('SSN',search_by.SSN);
-	// #stored ('DateOfBirth',(string)dob_value);   //workaround needs improvement  ***KWH - CIV (comment this line out)
-	#stored ('DateOfBirth',dob_value);   //workaround needs improvement	***KWH - CIV (no need to format to string since it is already) 
+	#stored ('DateOfBirth',dob_value);
 	#stored ('Age',search_by.Age);
 	#stored ('DLNumber',search_by.DriverLicenseNumber);
 	#stored ('DLState',search_by.DriverLicenseState);
 	boolean IncludeDLverification := (trim(search_by.DriverLicenseNumber)<>'' and trim(search_by.DriverLicenseState)<>'');	// do DL verification if both DL num and DL state are input
 	#stored ('IncludeDLverification', IncludeDLverification);
-	//#stored ('Email',search_by.Email);
 	#stored ('IPAddress',search_by.IPAddress);
 	#stored ('HomePhone',search_by.HomePhone);
 	#stored ('WorkPhone',search_by.WorkPhone);
-	//#stored ('EmployerName',search_by.EmployerName);
-	//#stored ('FormerName',search_by.FormerName);
-	//#stored ('IndustryClass',search_by.IndustryClass);
-	//#stored ('HistoryDateYYYYMM',search_by.HistoryDateYYYYMM);
-	//#stored ('PoBoxCompliance',search_by.PoBoxCompliance);
 	#stored ('IncludeOfacOnly',options.IncludeOfacOnly);
 	#stored ('ExcludeWatchLists',options.ExcludeWatchLists);
-	//Adding OFACVersion as an input option until the hard cutover to XG5.  After the cutover, old version/s are no longer allowed
-	//so force version to 4 (XG5).  
 	unsigned1 tempOFACVersion := max(options.OFACVersion, 2); //default to version 2, unless a higher version is passed in
 	#stored ('OFACVersion',tempOFACVersion); 
 	#stored ('IncludeOfac',options.IncludeOfac);
@@ -311,7 +315,7 @@ export Identifier2_Service := MACRO
 	temp := record
 		dataset(iesp.share.t_StringArrayItem) WatchList {xpath('WatchList/Name'), MAXCOUNT(iesp.Constants.MaxCountWatchLists)};
 	end;
-	watchlist_temp := project( ut.ds_oneRecord, transform( temp, self.Watchlist := options.Watchlists ));
+    watchlist_temp := DATASET ([transform(temp, self.Watchlist := options.Watchlists)]);
 	#stored( 'Watchlist', watchlist_temp );
 	
 	
@@ -320,21 +324,16 @@ export Identifier2_Service := MACRO
 	
 	integer dobRadius := if( options.DOBRadius > 0, options.DOBRadius, search_by.DOBRadius );
 	#stored ('DOBRadius',DOBRadius);
-	// #stored ('TestDataEnabled',options.TestDataEnabled);
-	// #stored ('TestDataTableName',options.TestDataTableName);
-//	#stored ('FromIIDModel',options.FromIIDModel);
 	STRING10 RedFlags_version := '' : STORED('RedFlags_version');
 	redFlagsVersion := MAP(
-													TRIM(options.RedFlagsReport) <> '' AND StringLib.StringContains(options.RedFlagsReport, 'version', TRUE) 	=> (INTEGER)(options.RedFlagsReport[8..]), // Check in-band first
-													TRIM(RedFlags_version) <> '' AND StringLib.StringContains(RedFlags_version, 'version', TRUE) 							=> (INTEGER)(RedFlags_version[8..]), // Then check out-of-band
+													TRIM(options.RedFlagsReport) <> '' AND STD.Str.Contains(options.RedFlagsReport, 'version', TRUE) 	=> (INTEGER)(options.RedFlagsReport[8..]), // Check in-band first
+													TRIM(RedFlags_version) <> '' AND STD.Str.Contains(RedFlags_version, 'version', TRUE) 							=> (INTEGER)(RedFlags_version[8..]), // Then check out-of-band
 																																																																				0 // No Red Flags Requested
 												);
 	#stored ('RedFlag_version', redFlagsVersion);
 	boolean disallowTargusE3220 := options.DisallowTargusEID3220;
 	#stored ('IncludeTargusE3220',~disallowTargusE3220);
 
-//	#stored ('scores',???????????????);
-//	#stored ('gateways',options.gateways);
 	#stored ('ExactFirstNameMatch',options.RequireExactMatch.FirstName);
 	#stored ('ExactLastNameMatch',options.RequireExactMatch.LastName);
 	#stored ('ExactAddrMatch',options.RequireExactMatch.Address);
@@ -389,9 +388,9 @@ export Identifier2_Service := MACRO
       FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 	// With Emerging Identities changes, bump from BS version 3 to 51
-	#stored( 'BSVersion', 51 )
+	#stored( 'BSVersion', 51 );
   
-  recs2 := Identifier2.Identifier2records;
+  recs2 := Identifier2.Identifier2records : INDEPENDENT;
 	 recs := iesp.transform_identifier2(recs2);
 	 
 	 dRoyalties := Project(recs2, transform(Royalty.Layouts.Royalty,
@@ -410,7 +409,66 @@ export Identifier2_Service := MACRO
 		Self.Result := L;
 	end;
 	results := PROJECT (recs, SetResponse (Left));
-	output (results, named ('Results'));
+  
+  
+	Deltabase_Logging_prep := project(recs2, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
+                                  self.company_id := (Integer)CompanyID,
+                                  self.login_id := _LoginID,
+                                  self.product_id := Risk_Reporting.ProductID.Identifier2__Identifier2_Service,
+                                  self.function_name := FunctionName,
+                                  self.esp_method := ESPMethod,
+                                  self.interface_version := InterfaceVersion,
+                                  self.delivery_method := DeliveryMethod,
+                                  self.date_added := (STRING8)Std.Date.Today(),
+                                  self.death_master_purpose := DeathMasterPurpose,
+                                  self.ssn_mask := ssnmask,
+                                  self.dob_mask := dobmask,
+                                  self.dl_mask := (STRING)dlmask,
+                                  self.exclude_dmv_pii := IF(ExcludeDMVPII, '1', '0'),
+                                  self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
+                                  self.archive_opt_in := ArchiveOptIn,
+                                  self.glb := (UNSIGNED1)first_row.User.GLBPurpose,
+                                  self.dppa := (UNSIGNED1)first_row.User.DLPurpose,
+                                  self.data_restriction_mask := first_row.User.DataRestrictionMask,
+                                  self.data_permission_mask := first_row.User.DataPermissionMask,
+                                  self.industry := Industry_Search[1].Industry,
+                                  self.i_ssn := first_row.SearchBy.SSN,
+                                  self.i_dob := INTFORMAT(first_row.SearchBy.DOB.Year, 4, 1) + INTFORMAT(first_row.SearchBy.DOB.Month, 2, 1) + INTFORMAT(first_row.SearchBy.DOB.Day, 2, 1),
+                                  self.i_name_full := first_row.SearchBy.Name.Full,
+                                  self.i_name_first := first_row.SearchBy.Name.First,
+                                  self.i_name_last := first_row.SearchBy.Name.Last,
+                                  self.i_address := first_row.SearchBy.Address.StreetAddress1,
+                                  self.i_city := first_row.SearchBy.Address.City,
+                                  self.i_state := first_row.SearchBy.Address.State,
+                                  self.i_zip := first_row.SearchBy.Address.Zip5 + first_row.SearchBy.Address.Zip4,
+                                  self.i_dl := first_row.SearchBy.DriverLicenseNumber,
+                                  self.i_dl_state := first_row.SearchBy.DriverLicenseState,
+                                  self.i_home_phone := first_row.SearchBy.HomePhone,
+                                  self.i_model_name_1 := 'CVI';
+                                  self.i_model_name_2 := first_row.Options.IncludeModels.ModelRequests[1].ModelName,
+                                  self.o_score_1    := (STRING)left.ComprehensiveVerificationIndex;
+                                  self.o_reason_1_1 := left.RiskIndicators[1].riskcode,
+                                  self.o_reason_1_2 := left.RiskIndicators[2].riskcode,
+                                  self.o_reason_1_3 := left.RiskIndicators[3].riskcode,
+                                  self.o_reason_1_4 := left.RiskIndicators[4].riskcode,
+                                  self.o_reason_1_5 := left.RiskIndicators[5].riskcode,
+                                  self.o_reason_1_6 := left.RiskIndicators[6].riskcode,
+                                  self.o_score_2 := IF(self.i_model_name_2 != '', left.Models[1].Scores[1].i, ''),
+                                  self.o_reason_2_1 := IF(self.i_model_name_2 != '', left.Models[1].Scores[1].Reason_Codes[1].Reason_Code, ''),
+                                  self.o_reason_2_2 := IF(self.i_model_name_2 != '', left.Models[1].Scores[1].Reason_Codes[2].Reason_Code, ''),
+                                  self.o_reason_2_3 := IF(self.i_model_name_2 != '', left.Models[1].Scores[1].Reason_Codes[3].Reason_Code, ''),
+                                  self.o_reason_2_4 := IF(self.i_model_name_2 != '', left.Models[1].Scores[1].Reason_Codes[4].Reason_Code, ''),
+                                  self.o_reason_2_5 := IF(self.i_model_name_2 != '', left.Models[1].Scores[1].Reason_Codes[5].Reason_Code, ''),
+                                  self.o_reason_2_6 := IF(self.i_model_name_2 != '', left.Models[1].Scores[1].Reason_Codes[6].Reason_Code, ''),
+                                  self.o_lexid := (INTEGER)left.UniqueId,
+                                  self := left,
+                                  self := [] ));
+																	
+	Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
+  
+  IF(~DisableOutcomeTracking and ~Test_Data_Enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+
+output (results, named ('Results'));
 
 output(dRoyalties, named('RoyaltySet'));
 ENDMACRO;

@@ -28,9 +28,17 @@ EXPORT DueDiligence_PersonRptService := MACRO
     DueDiligence.CommonQuery.mac_GetBusinessOptionSettings(dppa, glba, drm, dpm, userIn.IndustryClass);
     
     //retrieve the data based on input to be used in searches (PII vs LexID vs Combo of PII and LexID)
-    dataToSearchBy := DueDiligence.fn_getProductInput(productsRequested, cleanData, busOptions, busLinkingOptions);
+    dataToSearchBy := DueDiligence.fn_getProductInput(productsRequested, cleanData, busOptions, busLinkingOptions,
+                                                                                                 LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                 TransactionID := TransactionID, 
+                                                                                                 BatchUID := BatchUID, 
+                                                                                                 GlobalCompanyID := GlobalCompanyID);
 
-    consumerResults := DueDiligence.getIndAttributes(dataToSearchBy, DD_SSNMask, TRUE, busOptions, busLinkingOptions, debugIndicator);
+    consumerResults := DueDiligence.getIndAttributes(dataToSearchBy, DD_SSNMask, TRUE, busOptions, busLinkingOptions, debugIndicator,
+                                                                                            LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                            TransactionID := TransactionID, 
+                                                                                            BatchUID := BatchUID, 
+                                                                                            GlobalCompanyID := GlobalCompanyID);
 
     indIndex := DueDiligence.CommonQuery.GetIndividualAttributes(consumerResults);
     indIndexHits := DueDiligence.CommonQuery.GetIndividualAttributeFlags(consumerResults);

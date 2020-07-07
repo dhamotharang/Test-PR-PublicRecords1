@@ -2,7 +2,11 @@
 
 EXPORT DueDiligenceBatchMain(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData,
                              Business_Risk_BIP.LIB_Business_Shell_LIBIN busOptions, 
-                             BIPV2.mod_sources.iParams busLinkingOptions) := FUNCTION
+                             BIPV2.mod_sources.iParams busLinkingOptions,
+                             unsigned1 LexIdSourceOptout = 1,
+                             string TransactionID = '',
+                             string BatchUID = '',
+                             unsigned6 GlobalCompanyId = 0) := FUNCTION
 
   
   //Keep track of individual vs business requests
@@ -11,7 +15,11 @@ EXPORT DueDiligenceBatchMain(DATASET(DueDiligence.LayoutsInternal.SharedInput) i
   
 
   //********************************************************PERSON ATTRIBUTES STARTS HERE**********************************************************
-  consumerResults := DueDiligence.getIndAttributes(indRecs, DueDiligence.Constants.EMPTY, FALSE, busOptions, busLinkingOptions);
+  consumerResults := DueDiligence.getIndAttributes(indRecs, DueDiligence.Constants.EMPTY, FALSE, busOptions, busLinkingOptions,
+                                                                                          LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                          TransactionID := TransactionID, 
+                                                                                          BatchUID := BatchUID, 
+                                                                                          GlobalCompanyID := GlobalCompanyID);
                                          
   indIndex := JOIN(indRecs, consumerResults, 
                     LEFT.cleanedInput.seq = RIGHT.seq, 
@@ -70,7 +78,11 @@ EXPORT DueDiligenceBatchMain(DATASET(DueDiligence.LayoutsInternal.SharedInput) i
 
 
   //********************************************************BUSINESS ATTRIBUTES STARTS HERE********************************************************
-  businessResults := DueDiligence.getBusAttributes(busRecs, DueDiligence.Constants.EMPTY, FALSE, busOptions, busLinkingOptions);
+  businessResults := DueDiligence.getBusAttributes(busRecs, DueDiligence.Constants.EMPTY, FALSE, busOptions, busLinkingOptions,
+                                                                                          LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                          TransactionID := TransactionID, 
+                                                                                          BatchUID := BatchUID, 
+                                                                                          GlobalCompanyID := GlobalCompanyID);
                              
   busIndex := JOIN(busRecs, businessResults,
                     LEFT.cleanedInput.seq = RIGHT.seq, 

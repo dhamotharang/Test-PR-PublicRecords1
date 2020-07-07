@@ -1,4 +1,4 @@
-﻿import iesp,_Control,Gateway,Risk_Indicators;
+﻿import iesp, _Control, Gateway, Risk_Indicators;
 
 USE_LIBRARY := not _Control.LibraryUse.ForceOff_Risk_Indicators__LIB_InstantID_Function;
 
@@ -32,7 +32,8 @@ export InstantID_Function(DATASET(risk_indicators.layout_input) indata1, dataset
                           unsigned1 LexIdSourceOptout = 1,
                           string TransactionID = '',
                           string BatchUID = '',
-                          unsigned6 GlobalCompanyId = 0
+                          unsigned6 GlobalCompanyId = 0,
+                          string5 in_industryClass = ''
 													) :=
 FUNCTION
 
@@ -110,6 +111,11 @@ seq_map := join( indata1, indata,
 			export string50 DataPermission := in_DataPermission;
 			export boolean IncludeNAPData := in_IncludeNAPData;
 			export string100 IntendedPurpose := in_IntendedPurpose;
+			export unsigned1 iid_LexIdSourceOptout := LexIdSourceOptout;
+			export string16 iid_TransactionID := (string16)TransactionID;
+			export string16 iid_BatchUID := (string16)BatchUID;
+			export unsigned6 iid_GlobalCompanyId := GlobalCompanyId;
+      export string5 IndustryClass := in_industryClass;
 		END;
 
 	// Call Library
@@ -122,7 +128,13 @@ seq_map := join( indata1, indata,
 								in_runSSNCodes, in_runBestAddrCheck, in_runChronoPhoneLookup, in_runAreaCodeSplitSearch, // optimization options	
 								in_allowCellphones, in_ExactMatchLevel, in_DataRestriction, in_CustomDataFilter, in_runDLverification,
 								watchlists_requested, DOBMatchOptions, in_EverOccupant_PastMonths, in_EverOccupant_StartDate, in_append_best,
-								in_BSOptions_override, in_LastSeenThreshold, in_CompanyID, in_DataPermission, in_IncludeNAPData, in_IntendedPurpose);
+								in_BSOptions_override, in_LastSeenThreshold, in_CompanyID, in_DataPermission, in_IncludeNAPData, in_IntendedPurpose,
+								LexIdSourceOptout := LexIdSourceOptout, 
+								TransactionID := TransactionID, 
+								BatchUID := BatchUID, 
+								GlobalCompanyID := GlobalCompanyID,
+                IndustryClass := in_industryClass
+                );
 
 	iid_results := base;
 	
@@ -170,6 +182,7 @@ seq_map := join( indata1, indata,
 // output(	in_LastSeenThreshold	, named('in_LastSeenThreshold')	);
 // output(	in_CompanyID	, named('in_CompanyID')	);
 // output(	in_DataPermission	, named('in_DataPermission')	);//35
+// output(in_industryClass, named('industryClass_iidFunction'));
 
 	return group(valid_full_response, seq);
 END;

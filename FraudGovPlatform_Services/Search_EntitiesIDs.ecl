@@ -304,4 +304,22 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 												
 		RETURN ds_IPRangeIds;
 	END;
+
+	EXPORT GetDriverLicenses() := FUNCTION
+
+		ds_DriverLicenses := IF(validInput(in_rec.dl_number),
+														JOIN(ds_batch_in, FraudShared.Key_DriversLicense(fraud_platform),
+																	KEYED(LEFT.dl_number = RIGHT.drivers_license),
+																	TRANSFORM(FraudShared_Services.Layouts.Recid_rec,
+																		SELF.acctno := IF(filterBy_entity_type AND RIGHT.Entity_type_id <> FraudShared_Services.Constants.EntityTypes_Enum.PERSON, 
+																			SKIP, 
+																			LEFT.acctno),
+																		SELF := RIGHT,
+																		SELF := LEFT,
+																		SELF := []),
+																	LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP)),
+														dataset([], FraudShared_Services.Layouts.Recid_rec));
+		RETURN ds_DriverLicenses;
+	END;	
+
 END;

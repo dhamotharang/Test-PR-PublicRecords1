@@ -1,22 +1,23 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, Doxie;
 
 EXPORT getBusExecResidency(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
-                            Business_Risk_BIP.LIB_Business_Shell_LIBIN options) := FUNCTION
+                            Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
+                            doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 		
 		
 		
-		INTEGER bsVersion := DueDiligence.CitDDShared.DEFAULT_BS_VERSION;
-		UNSIGNED8 bsOptions := DueDiligence.CitDDShared.DEFAULT_BS_OPTIONS;
-		BOOLEAN isFCRA := DueDiligence.Constants.DEFAULT_IS_FCRA;
-		
-		UNSIGNED1 dppa := options.DPPA_Purpose;
-		UNSIGNED1 glba := options.GLBA_Purpose;
-		STRING dataRestrictionMask := options.DataRestrictionMask;
-		
-		
-		pullExecs := DueDiligence.CommonBusiness.getExecs(indata);
-		
-			
+    INTEGER bsVersion := DueDiligence.CitDDShared.DEFAULT_BS_VERSION;
+    UNSIGNED8 bsOptions := DueDiligence.CitDDShared.DEFAULT_BS_OPTIONS;
+    BOOLEAN isFCRA := DueDiligence.Constants.DEFAULT_IS_FCRA;
+
+    UNSIGNED1 dppa := options.DPPA_Purpose;
+    UNSIGNED1 glba := options.GLBA_Purpose;
+    STRING dataRestrictionMask := options.DataRestrictionMask;
+
+
+    pullExecs := DueDiligence.CommonBusiness.getExecs(indata);
+
+      
     indLayout := PROJECT(pullExecs, TRANSFORM(DueDiligence.Layouts.Indv_Internal,
                                               SELF.seq := LEFT.seq;
                                               SELF.historyDate := DueDiligence.Common.GetMyDate(LEFT.historyDate);
@@ -24,21 +25,21 @@ EXPORT getBusExecResidency(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                                               SELF.indvType := DueDiligence.Constants.INQUIRED_INDIVIDUAL;
                                               SELF.individual := LEFT.party;
                                               SELF := [];));
-		
-		
-		//get the best data for the individual if do not have it
-		execBestData := DueDiligence.getIndInformation(options).GetIndividualBestDataWithLexID(indLayout);						
-		
-		//get relatives of the inquired individual
-		inquiredRelatives := DueDiligence.getIndRelatives(execBestData, options);
-		
-		//get header information
-		indHeader := DueDiligence.getIndHeader(inquiredRelatives, dataRestrictionMask, dppa, glba, isFCRA, FALSE);
-		
-		//get information pertaining to SSN
-		indSSNData := DueDiligence.getIndSSNData(indHeader, dataRestrictionMask, dppa, glba, bsVersion, bsOptions);
-		
-		//add the best data to the execs with the residency score for the given exec
+
+
+    //get the best data for the individual if do not have it
+    execBestData := DueDiligence.getIndInformation(options, mod_access).GetIndividualBestDataWithLexID(indLayout);						
+
+    //get relatives of the inquired individual
+    inquiredRelatives := DueDiligence.getIndRelationships(execBestData, options, mod_access);
+
+    //get header information
+    indHeader := DueDiligence.getIndHeader(inquiredRelatives, dataRestrictionMask, dppa, glba, isFCRA, bsVersion, FALSE, mod_access);
+
+    //get information pertaining to SSN
+    indSSNData := DueDiligence.getIndSSNData(indHeader, dataRestrictionMask, dppa, glba, isFCRA, bsVersion, bsOptions, mod_access);
+
+    //add the best data to the execs with the residency score for the given exec
     combineExecs := JOIN(pullExecs, indSSNData,
                           LEFT.seq = RIGHT.seq AND
                           LEFT.party.did = RIGHT.inquiredDID,
@@ -68,12 +69,12 @@ EXPORT getBusExecResidency(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
                                     SELF := LEFT;
                                     SELF := [];));
-		
-	
-		//replace the updated exec data
-		updatedExecOnInquired := DueDiligence.CommonBusiness.ReplaceExecs(indata, combineExecs);
-		
-		//translate the flags to rollup to the business
+
+
+    //replace the updated exec data
+    updatedExecOnInquired := DueDiligence.CommonBusiness.ReplaceExecs(indata, combineExecs);
+
+    //translate the flags to rollup to the business
     updtHitLevels := PROJECT(combineExecs, TRANSFORM({BOOLEAN hitLevel9, BOOLEAN hitLevel8, BOOLEAN hitLevel7, BOOLEAN hitLevel6, BOOLEAN hitLevel5,
                                                                          BOOLEAN hitLevel4, BOOLEAN hitLevel3, BOOLEAN hitLevel2, BOOLEAN hitLevel1, RECORDOF(LEFT)},
 
@@ -89,10 +90,10 @@ EXPORT getBusExecResidency(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                                                       SELF.hitLevel2 := flags[8] = 'T';
                                                       SELF.hitLevel1 := flags[9] = 'T';
                                                       SELF := LEFT;));
-		
-		//roll the combined execs to determine if atleast one exec hits overall
-		sortCombined := SORT(updtHitLevels, seq, #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()));
-		
+
+    //roll the combined execs to determine if atleast one exec hits overall
+    sortCombined := SORT(updtHitLevels, seq, #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()));
+
     rollCombined := ROLLUP(sortCombined,
                             LEFT.seq = RIGHT.seq AND
                             LEFT.ultID = RIGHT.ultID AND
@@ -127,22 +128,22 @@ EXPORT getBusExecResidency(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                                     SELF.atleastOneBEOOrParentRegisteredVoter := RIGHT.hitLevel1;
                                     SELF := LEFT;),
                           LEFT OUTER);
-		
-		
-		
-		// OUTPUT(indata, NAMED('indata_execResidency'));
-		// OUTPUT(pullExecs, NAMED('pullExecs'));
-		// OUTPUT(indLayout, NAMED('indLayout'));
-		// OUTPUT(execBestData, NAMED('execBestData'));
-		// OUTPUT(inquiredRelatives, NAMED('inquiredRelatives'));
-		// OUTPUT(indHeader, NAMED('indHeader'));
-		// OUTPUT(indSSNData, NAMED('indSSNData'));
-		// OUTPUT(combineExecs, NAMED('combineExecs'));
-		// OUTPUT(updatedExecOnInquired, NAMED('updatedExecOnInquired'));
-		// OUTPUT(updtHitLevels, NAMED('updtHitLevels'));
-		// OUTPUT(rollCombined, NAMED('rollCombined'));
-		// OUTPUT(addResidency, NAMED('addResidency'));
-									
-										
-			RETURN addResidency;							
+
+
+
+    // OUTPUT(indata, NAMED('indata_execResidency'));
+    // OUTPUT(pullExecs, NAMED('pullExecs'));
+    // OUTPUT(indLayout, NAMED('indLayout'));
+    // OUTPUT(execBestData, NAMED('execBestData'));
+    // OUTPUT(inquiredRelatives, NAMED('inquiredRelatives'));
+    // OUTPUT(indHeader, NAMED('indHeader'));
+    // OUTPUT(indSSNData, NAMED('indSSNData'));
+    // OUTPUT(combineExecs, NAMED('combineExecs'));
+    // OUTPUT(updatedExecOnInquired, NAMED('updatedExecOnInquired'));
+    // OUTPUT(updtHitLevels, NAMED('updtHitLevels'));
+    // OUTPUT(rollCombined, NAMED('rollCombined'));
+    // OUTPUT(addResidency, NAMED('addResidency'));
+                  
+                    
+    RETURN addResidency;							
 END;										

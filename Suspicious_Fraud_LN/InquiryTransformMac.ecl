@@ -1,9 +1,12 @@
-/* This MACRO performs the common inquiry calculations and returns the raw inquiries */
+﻿/* This MACRO performs the common inquiry calculations and returns the raw inquiries */
 
-IMPORT Inquiry_AccLogs, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, UT;
+IMPORT Inquiry_AccLogs, Suspicious_Fraud_LN, UT;
 
-EXPORT InquiryTransformMac (TransformName, OutputLayout, KeyName) := MACRO
+EXPORT InquiryTransformMac (TransformName, OutputLayout, KeyName, getDID = FALSE) := MACRO
 	OutputLayout TransformName(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus le, KeyName ri) := TRANSFORM
+		#IF(getDID)
+		SELF.did := le.Clean_Input.did;
+		#END
 		SELF.Seq := le.Seq;
 		
 		SELF.Transaction_ID := StringLib.StringToUpperCase(TRIM(ri.Search_Info.Transaction_ID));

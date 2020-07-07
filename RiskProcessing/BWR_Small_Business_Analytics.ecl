@@ -1,4 +1,4 @@
-#workunit('name','Small Business Analytics');
+﻿#workunit('name','Small Business Analytics');
 #option ('hthorMemoryLimit', 1000);
 
 IMPORT Business_Risk_BIP, LNSmallBusiness, Models, iESP, Risk_Indicators, RiskWise, UT;
@@ -15,8 +15,8 @@ eyeball := 50;
 
 threads := 25;
 
-RoxieIP := RiskWise.shortcuts.prod_batch_neutral; // Production
-// RoxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; // Staging/Cert
+RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;      // Production
+//RoxieIP := RiskWise.shortcuts.prod_batch_neutral;      // Production// RoxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; // Staging/Cert
 // RoxieIP := RiskWise.shortcuts.Dev192; // Development Roxie 192
 
 inputFile := ut.foreign_prod + 'jpyon::in::compass_1190_bus_shell_in_in';
@@ -35,12 +35,13 @@ AttributesRequested :=
 		// DATASET([{'SBFEAttrV1'}], iesp.share.t_StringArrayItem) + 
 		DATASET([], iesp.share.t_StringArrayItem);
 		
-
 // Uncomment the models below that you wish to have returned
 ModelsRequested :=
 		// DATASET([{'SBA9999_9'}], iesp.share.t_StringArrayItem) +
 		// DATASET([{'SBFE9999_9'}], iesp.share.t_StringArrayItem) +
 		DATASET([], iesp.share.t_StringArrayItem);
+
+dataPermissionMask_val := '0000000000000000000000000';
 
 /* **************************************
  *         MAIN SCRIPT CODE             *
@@ -97,6 +98,7 @@ layout_soap := RECORD
 	STRING50 AllowedSources;
 	REAL Global_Watchlist_Threshold;
 	BOOLEAN OutcomeTrackingOptOut;
+	STRING DataPermissionMask;    
 END;
 
 layout_soap transform_input_request(f le, UNSIGNED8 ctr) := TRANSFORM
@@ -105,7 +107,7 @@ layout_soap transform_input_request(f le, UNSIGNED8 ctr) := TRANSFORM
 			SELF.DLPurpose := '1'; 
 			SELF.GLBPurpose := '1'; 
 			SELF.DataRestrictionMask := '00000000000000000000'; 
-			SELF.DataPermissionMask := '0000000000'; 
+			SELF.DataPermissionMask := dataPermissionMask_val; 
 			SELF := []));
 	o := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessanalytics.t_SBAOptions, 
 			SELF.AttributesVersionRequest := AttributesRequested; 
@@ -233,6 +235,7 @@ layout_soap transform_input_request(f le, UNSIGNED8 ctr) := TRANSFORM
 	SELF.AllowedSources := '';
 	SELF.Global_Watchlist_Threshold := 0.84;
 	SELF.OutcomeTrackingOptOut := TRUE; // Turn off SCOUT logging
+	SELF.DataPermissionMask := dataPermissionMask_val;
 
 	SELF.Seq := (STRING)ctr;
 	SELF.AccountNumber := le.accountnumber;

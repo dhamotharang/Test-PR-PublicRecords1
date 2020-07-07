@@ -1,5 +1,5 @@
 ﻿import _Control, doxie, ut, mdr, header, drivers, census_data, riskwise, VotersV2, 
-	models, AID_Build, risk_indicators, dx_header, data_services;
+       models, AID_Build, risk_indicators, dx_header, data_services, STD;
 onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_FCRA_Neutral_Function(grouped DATASET(risk_indicators.Layout_output) iid,
@@ -51,7 +51,7 @@ TRANSFORM
 	verlast := IF(le.socsverlevel in [2,5,7,8,9,11,12] OR le.phoneverlevel in [2,5,7,8,9,11,12], le.combo_last, '');
 	veraddr := IF(le.socsverlevel in [3,5,6,8,10,11,12] OR le.phoneverlevel in [3,5,6,8,10,11,12], Risk_Indicators.MOD_AddressClean.street_address('',le.combo_prim_range,
 										le.combo_predir,le.combo_prim_name,le.combo_suffix,le.combo_postdir,le.combo_unit_desig,le.combo_sec_range),'');			
-	SELF.iid.CVI := (INTEGER)risk_indicators.cviScore(SELF.iid.NAP_Summary,SELF.iid.NAS_summary,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast);
+	SELF.iid.CVI := (INTEGER)risk_indicators.cviScore(SELF.iid.NAP_Summary,SELF.iid.NAS_summary,le,'',veraddr,verlast);
 	ri := Risk_indicators.reasonCodes(le, 6, reasoncode_settings); 	
 	self.iid.reason1 := ri[1].hri;
   self.iid.reason2 := ri[2].hri;
@@ -64,8 +64,9 @@ TRANSFORM
 	self.iid.watchlisthit := le.watchlist_table<>'';
 	self.iid.iid_flags := le.iid_flags;
 	self.iid.swappedNames := map(le.fname = '' or le.lname = ''	=> -1,
-															 le.swappedNames 								=> 1,
-																																 0);
+                               le.swappedNames                => 1,
+                                                                 0);
+
 	self.iid := le;
 
 	SELF.Available_Sources.DL := Risk_Indicators.Source_Available.DL(IF(le.dl_state<>'',le.dl_state,le.st)); 
@@ -316,14 +317,14 @@ TRANSFORM
 	latest_date := le.address_history_summary.input_addr_last_seen;  // this field is only populated on version 4.0 and higher
 	
 	SELF.Address_Verification.Input_Address_Information.credit_sourced := if(whatsinput=0 and bsversion>=50,
-		stringlib.stringfind(le.address_sources_summary.input_addr_sources, MDR.sourceTools.src_Equifax, 1) > 0,
+		STD.STR.Find(le.address_sources_summary.input_addr_sources, MDR.sourceTools.src_Equifax, 1) > 0,
 		inputbpicker(le.chrono_eqfsaddrcount, le.chrono_eqfsaddrcount2,le.chrono_eqfsaddrcount3));
 	SELF.Address_Verification.Input_Address_Information.dl_sourced := if(whatsinput=0 and bsversion>=50,
 		models.common.findw_cpp(le.address_sources_summary.input_addr_sources, 'D' , ' ,', 'ie') > 0,
 		inputbpicker(le.chrono_dladdrcount, le.chrono_dladdrcount2,le.chrono_dladdrcount3));
 	SELF.Address_Verification.Input_Address_Information.voter_sourced := if(whatsinput=0 and bsversion>=50,
-		stringlib.stringfind(le.address_sources_summary.input_addr_sources, 'EM', 1) > 0 or
-		stringlib.stringfind(le.address_sources_summary.input_addr_sources, 'VO', 1) > 0,
+		STD.STR.Find(le.address_sources_summary.input_addr_sources, 'EM', 1) > 0 or
+		STD.STR.Find(le.address_sources_summary.input_addr_sources, 'VO', 1) > 0,
 		inputbpicker(le.chrono_emaddrcount,le.chrono_emaddrcount2,le.chrono_emaddrcount3));
 	SELF.Address_Verification.Input_Address_Information.source_count := if(bsversion>=50, 
 		count(input_address_sources),
@@ -485,6 +486,11 @@ TRANSFORM
 	SELF.reported_dob := le.reported_dob;
 	SELF.inferred_age := le.inferred_age;
 	
+  //FIS fields for FIS custom attributes
+  self.FIS.trueDID := le.FIS_trueDID;
+  self.FIS.num_nonderogs := le.FIS_num_nonderogs;
+  self.FIS.addrs_last12 := le.FIS_addrs_last12;
+  self.FIS.addrs_last60 := le.FIS_addrs_last60;
 	
 	SELF.dobmatchlevel := le.dobmatchlevel;	// now calculated in iid portion for use in iid
 														
@@ -519,8 +525,8 @@ TRANSFORM
 								MIN((INTEGER) ut.zip_Dist(SELF.Address_Verification.Address_History_1.zip5,
 													SELF.Address_Verification.Address_History_2.zip5), 9998));
 	
-  SELF.ConsumerFlags.corrected_flag := (StringLib.StringFind (le.src, 'CO', 1) != 0) OR
-                                       (StringLib.StringFind (le.sources, 'CO', 1) != 0);																		 
+  SELF.ConsumerFlags.corrected_flag := (STD.STR.Find(le.src, 'CO', 1) != 0) OR
+                                       (STD.STR.Find(le.sources, 'CO', 1) != 0);																		 
 																			 		
 // adding self := le; so we don't need to manually map fields from layout output into the shell anymore if they're named the same	
 	// self.header_summary := le.header_summary;

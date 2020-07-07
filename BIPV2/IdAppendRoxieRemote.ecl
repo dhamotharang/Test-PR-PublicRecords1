@@ -15,6 +15,7 @@ export IdAppendRoxieRemote(
         ,unsigned soapTimeout = 30
         ,unsigned soapTimeLimit = 0
         ,unsigned soapRetries = 3
+				,boolean segmentation = true
 	) := module
 
 	shared disableSaltForce := not primForce;
@@ -56,6 +57,7 @@ export IdAppendRoxieRemote(
 				self.data_access_glb := mod_access.glb,
 				self.data_access_dppa := mod_access.dppa,
 				self.data_access_lexid_source_optout := mod_access.lexid_source_optout,
+				self.do_segmentation := segmentation,
 				self := defaultPermissions,
 			))
 		);

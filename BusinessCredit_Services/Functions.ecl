@@ -36,6 +36,37 @@ EXPORT Functions := MODULE
                                                                             ,FETCHLEVEL);
 	END;
 
+  // RQ-20112 - indicate if status is impacted by natural disaster
+  EXPORT fn_appendDisasterStatus(string status, boolean disaster_impact,
+    boolean disaster_suspend) := FUNCTION
+    stat := BusinessCredit_Services.Constants.ACCT_STATUS;
+    status_app := CASE(status, 
+      stat.Current => stat.Disaster.Current, 
+      stat.Overdue => stat.Disaster.Overdue, 
+      stat.Closed => stat.Disaster.Closed, 
+      stat.WithinTerms => stat.Disaster.WithinTerms, 
+      stat.Overdue30 => stat.Disaster.Overdue30, 
+      stat.Overdue60 => stat.Disaster.Overdue60, 
+      stat.Overdue90 => stat.Disaster.Overdue90, 
+      stat.Overdue90Plus => stat.Disaster.Overdue90Plus, 
+      stat.Bankruptcy => stat.Disaster.Bankruptcy, 
+      stat.ChargeOff => stat.Disaster.ChargeOff, 
+      stat.Foreclosure => stat.Disaster.Foreclosure, 
+      stat.NonAccrual => stat.Disaster.NonAccrual, 
+      stat.Collection => stat.Disaster.Collection, 
+      stat.Disaster.None
+    );
+
+    acct_stat :=  MAP(
+      disaster_suspend => stat.Disaster.Suspended, 
+      disaster_impact => status_app, 
+      status
+    );
+
+    return acct_stat;
+    
+  END;
+
 	EXPORT fn_useBusinessCredit (STRING in_dataPermissionMask, BOOLEAN IncludeBusinessCredit ) := FUNCTION
 
 		dataPermissionTempMod := MODULE( AutoStandardI.DataPermissionI.params )
@@ -47,23 +78,36 @@ EXPORT Functions := MODULE
 	END;
 
   // Add Business Credit / SBFE Sorting
-	EXPORT fn_BusinessCreditSorting ( DATASET(doxie.Layout_Rollup.KeyRec_feedback) ds_in, UNSIGNED6 inSeleId, UNSIGNED6 inOrgId, UNSIGNED6 inUltId) := FUNCTION
+	EXPORT fn_BusinessCreditSorting ( DATASET(doxie.Layout_Rollup.KeyRec_feedback) ds_in, 
+                                    Doxie.IDataAccess mod_access,
+                                    UNSIGNED6 inSeleId, 
+                                    UNSIGNED6 inOrgId, 
+                                    UNSIGNED6 inUltId) := FUNCTION
+                                    
 		// Hit the SBFE keys to see if the did has matches for any of the SELEid/OrgId/UltId input combinations
 		// We only need to keep one match to set the indicator for the next join.
-		ds_BusinessCredit_hits := JOIN( ds_in, Business_Credit.Key_IndividualOwnerInformation(),
-																			KEYED( (UNSIGNED6)LEFT.did = RIGHT.did ) AND
-																			inUltId  = RIGHT.UltId AND
-																			inOrgId  = RIGHT.OrgId AND
-																			inSeleId = RIGHT.SELEId AND
-																			RIGHT.SELEid != 0,
-																			TRANSFORM( doxie.Layout_Rollup.KeyRec_feedback,
-																								 SELF.BusinessCreditMatch := (UNSIGNED6)LEFT.did = RIGHT.did,
-																								 SELF                     := LEFT,
-																							 ),
-																			LEFT OUTER,
-																			KEEP (1),
-																			LIMIT(0)
-																	);
+		ds_BusinessCredit_hits_org := JOIN( ds_in, Business_Credit.Key_IndividualOwnerInformation(),
+                                        KEYED( (UNSIGNED6)LEFT.did = RIGHT.did ) AND
+                                        inUltId  = RIGHT.UltId AND
+                                        inOrgId  = RIGHT.OrgId AND
+                                        inSeleId = RIGHT.SELEId AND
+                                        RIGHT.SELEid != 0,
+                                        TRANSFORM( doxie.Layout_Rollup.KeyRec_feedback_sids,
+                                                   SELF.BusinessCreditMatch := (UNSIGNED6)LEFT.did = RIGHT.did,
+                                                   SELF.global_sid          := RIGHT.global_sid,
+                                                   SELF.record_sid          := RIGHT.record_sid,
+                                                   SELF                     := LEFT,
+                                                 ),
+                                        LEFT OUTER,
+                                        KEEP (1),
+                                        LIMIT(0)
+                                    );
+    ds_BusinessCredit_hits_flagSupp := Suppress.MAC_FlagSuppressedSource(ds_BusinessCredit_hits_org, mod_access, did);
+    ds_BusinessCredit_hits := 
+      PROJECT( ds_BusinessCredit_hits_flagSupp,
+        TRANSFORM( doxie.Layout_Rollup.KeyRec_feedback,
+          SELF.BusinessCreditMatch := ~LEFT.is_suppressed AND LEFT.BusinessCreditMatch,
+          SELF                     := LEFT));
 
 		// sort so sbfe records bubble to the top, keeping the same penalty order for true/false records
 		ds_BusinessCredit_atTop := SORT( ds_BusinessCredit_hits, ~BusinessCreditMatch );
@@ -171,28 +215,6 @@ EXPORT Functions := MODULE
 		RETURN BuzCreditIndicator;
 	END;	// END of function fn_BuzCreditIndicator
 
-	EXPORT fn_BuzCreditIndicator2 (UNSIGNED6 UltID, UNSIGNED6 OrgID, UNSIGNED6 SeleID , doxie.IDataAccess mod_access, BOOLEAN buzCreditAccess = FALSE) := FUNCTION
-
-		BIPV2.IDlayouts.l_xlink_ids2 initialize() := TRANSFORM
-			SELF.SeleID := SeleID;
-			SELF.OrgID  := OrgID;
-			SELF.UltID  := UltID;
-			SELF				:= [];
-		END;
-
-		BusinessIds := DATASET([initialize()]);
-
-		BOOLEAN exists_BipHeader 			:= true; // always going to be in bip v2 header since results are from this key:  BIPV2.Key_BH_Relationship_SELEID.kFetch
-		BOOLEAN exists_BuzCreditHeader:= IF(buzCreditAccess, EXISTS(Business_Credit.Key_LinkIds().Kfetch2(BusinessIds,mod_access,,,BusinessCredit_Services.Constants.JOIN_LIMIT)(record_type = Business_Credit.Constants().AccountBase)), FALSE);
-
-		integer BuzCreditIndicator := MAP(exists_BipHeader and ~exists_BuzCreditHeader => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.HEADER_FILE_ONLY,
-													//~exists_BipHeader and exists_BuzCreditHeader => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.BUSINESS_CREDIT_ONLY, // will never exist at this point
-														exists_BipHeader and exists_BuzCreditHeader	 => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.BOTH,
-																			0);
-
-		RETURN BuzCreditIndicator;
-	END;	// END of function fn_BuzCreditIndicator
-
 	EXPORT fn_BuzStructureDescription (STRING BuzStructureCode) := FUNCTION
 		buzStructureDesc := CASE(BuzStructureCode,
 															'001' => 'Individual Sole Proprietorship',
@@ -235,14 +257,21 @@ EXPORT Functions := MODULE
 		RETURN AccountTypeDescription;
 	END; // END of function AccountTypeDescription
 
-	EXPORT fn_CurrentAccountStatus (STRING DateAccountClosed , STRING PaymentStatusCategory) := FUNCTION
-		AccountStatus := MAP (
-													DateAccountClosed = 	'' AND  (integer) PaymentStatusCategory = 0 => 'CURRENT',
-													DateAccountClosed = 	'' AND  (integer) PaymentStatusCategory > 0 => 'OVERDUE',
-													DateAccountClosed <> 	'' 																					=> 'CLOSED',
-													''
-													);
-		RETURN AccountStatus;
+	EXPORT fn_CurrentAccountStatus (STRING DateAccountClosed , 
+    STRING PaymentStatusCategory, 
+    BOOLEAN Disaster_Impact, 
+    BOOLEAN Disaster_Suspend) := FUNCTION
+    
+		stat := BusinessCredit_Services.Constants.ACCT_STATUS;
+    AccountStatus := MAP (
+      DateAccountClosed = '' AND (integer) PaymentStatusCategory = 0 => stat.Current,
+      DateAccountClosed = '' AND (integer) PaymentStatusCategory > 0 => stat.Overdue,
+      DateAccountClosed <> '' => stat.Closed,
+      stat.None
+    );
+
+		// RQ-20112 - indicate if status is impacted by natural disaster
+		RETURN fn_appendDisasterStatus(AccountStatus, Disaster_Impact, Disaster_Suspend);
 	END; // END of function CurrentAccountStatus
 
   EXPORT fn_CurrentBizAccountStatus (STRING   DateAccountClosed,
@@ -253,7 +282,11 @@ EXPORT Functions := MODULE
                                      BOOLEAN  isRecent_Pmt_Not_Zero,
                                      UNSIGNED dateOneYearAgo,
                                      STRING   Account_Status_1,
-                                     STRING   Account_Status_2) := FUNCTION
+                                     STRING   Account_Status_2, 
+                                     BOOLEAN  Disaster_Impact, 
+                                     BOOLEAN  Disaster_Suspend) := FUNCTION
+
+    stat := BusinessCredit_Services.Constants.ACCT_STATUS;
 
     RequiredValidations := DateAccountClosed = '' AND
                            AccountClosureReason = '' AND
@@ -264,15 +297,17 @@ EXPORT Functions := MODULE
 
 
     AccountStatus := MAP (
-													RequiredValidations AND (INTEGER) PaymentStatusCategory = 0
-                            => 'CURRENT',
-													RequiredValidations AND (INTEGER) PaymentStatusCategory > 0
-                            => 'OVERDUE',
-													~RequiredValidations
-                            => 'CLOSED',
-													''
-													);
-		RETURN AccountStatus;
+      RequiredValidations AND (INTEGER) PaymentStatusCategory = 0
+        => stat.Current,
+      RequiredValidations AND (INTEGER) PaymentStatusCategory > 0
+        => stat.Overdue,
+      ~RequiredValidations
+        => stat.Closed,
+      stat.None
+    );
+
+    // RQ-20112 - indicate if status is impacted by natural disaster
+		RETURN fn_appendDisasterStatus(AccountStatus, Disaster_Impact, Disaster_Suspend);
 	END; // END of function CurrentBizAccountStatus
 
 	EXPORT fn_OwnerGuarnIndicator (STRING OwnerGuarnIndicatorCode) := FUNCTION
@@ -297,14 +332,20 @@ EXPORT Functions := MODULE
 	END; // END of function AccountClosureReason
 
 	EXPORT fn_PaymentStatusCategory (STRING PaymentStatusCategoryCode) := FUNCTION
+    stat := BusinessCredit_Services.Constants.ACCT_STATUS;
 		PaymentStatusCategoryDesc:= MAP (
-																			PaymentStatusCategoryCode = '007' OR PaymentStatusCategoryCode = '006' OR PaymentStatusCategoryCode = '005' OR PaymentStatusCategoryCode = '004' => 'Overdue 90+',
-																			PaymentStatusCategoryCode = '003' => 'Overdue 90',
-																			PaymentStatusCategoryCode = '002' => 'Overdue 60',
-																			PaymentStatusCategoryCode = '001' => 'Overdue 30',
-																			PaymentStatusCategoryCode = '000' => 'Within Terms',
-																			''
-																		);
+      PaymentStatusCategoryCode = '007' OR PaymentStatusCategoryCode = '006' OR PaymentStatusCategoryCode = '005' OR PaymentStatusCategoryCode = '004' 
+        => stat.Overdue90Plus,
+      PaymentStatusCategoryCode = '003' 
+        => stat.Overdue90,
+      PaymentStatusCategoryCode = '002' 
+        => stat.Overdue60,
+      PaymentStatusCategoryCode = '001' 
+        => stat.Overdue30,
+      PaymentStatusCategoryCode = '000' 
+        => stat.WithinTerms,
+      stat.None
+    );
 		RETURN PaymentStatusCategoryDesc;
 	END; // END of function PaymentStatusCategory
 
@@ -385,50 +426,70 @@ EXPORT Functions := MODULE
                               Account_Closed_Reason <> '' OR
                               Account_Status_1 IN BusinessCredit_Services.Constants.Closed_Account_Status_Codes OR
                               Account_Status_2 IN BusinessCredit_Services.Constants.Closed_Account_Status_Codes;
-		status_whenAccClosed := MAP(isAccountClosed AND  Account_Status_1 = '008' => 'Bankruptcy',
-																isAccountClosed AND  (Account_Status_1 = '009' OR Account_Status_1 = '011') => 'Charge off',
-																isAccountClosed AND  (Account_Status_1 = '006' OR Account_Status_1 = '015' OR Account_Status_1 = '018') => 'Foreclosure/Repossession',
-																isAccountClosed AND  Account_Status_1 = '010' => 'Non-Accrual account',
-																isAccountClosed AND  Account_Status_1 = '017' => 'Collection',
-																'');
+		stat := BusinessCredit_Services.Constants.ACCT_STATUS;
+    status_whenAccClosed := MAP(
+      isAccountClosed AND  Account_Status_1 = '008' 
+        => stat.Bankruptcy,
+      isAccountClosed AND  (Account_Status_1 = '009' OR Account_Status_1 = '011') 
+        => stat.ChargeOff,
+      isAccountClosed AND  (Account_Status_1 = '006' OR Account_Status_1 = '015' OR Account_Status_1 = '018') 
+        => stat.Foreclosure,
+      isAccountClosed AND  Account_Status_1 = '010' 
+        => stat.NonAccrual,
+      isAccountClosed AND  Account_Status_1 = '017' 
+        => stat.Collection,
+      stat.None
+    );
 
-		paymentStatus	:= IF(status_whenAccClosed = '', fn_PaymentStatusCategory(Payment_Status_Category), status_whenAccClosed);
-		RETURN paymentStatus;
+		paymentStatus	:= IF(status_whenAccClosed = stat.None, fn_PaymentStatusCategory(Payment_Status_Category), status_whenAccClosed);
+		
+    RETURN paymentStatus;
 	END; // END of function WorstStatus
 
 	EXPORT fn_WorstStatus_sort_order(STRING status) := FUNCTION
+    stat := BusinessCredit_Services.Constants.ACCT_STATUS;
 		worst_status_sort_order := 	CASE(status,
-																		'Bankruptcy' 							  => 1,
-																		'Charge off' 							  => 2,
-																		'Foreclosure/Repossession'  => 3,
-																		'Non-Accrual account' 		  => 4,
-																		'Collection' 							  => 5,
-																		'Overdue 90+' 		  				=> 6,
-																		'Overdue 90' 		  					=> 7,
-																		'Overdue 60' 		 						=> 8,
-																		'Overdue 30' 		  					=> 9,
-																		'Within Terms' 							=> 10,
-																		999);
+      stat.Bankruptcy => 1,
+      stat.ChargeOff => 2,
+      stat.Foreclosure => 3,
+      stat.NonAccrual => 4,
+      stat.Collection => 5,
+      stat.Overdue90Plus => 6,
+      stat.Overdue90 => 7,
+      stat.Overdue60 => 8,
+      stat.Overdue30 => 9,
+      stat.WithinTerms => 10,
+      999);
 		RETURN worst_status_sort_order;
 	END;
 
 	EXPORT fn_AccountStatus_sort_orderCreditTrades(STRING status) := FUNCTION
 
-           res := 	CASE(status,
-																				'OVERDUE'	=> 1,
-																				'CURRENT'	=> 2,
-																				'CLOSED'  => 3,
-																				999);
+    stat := BusinessCredit_Services.Constants.ACCT_STATUS;
+    res := CASE(status,
+      stat.Disaster.Overdue => 1,
+      stat.Overdue => 2,
+      stat.Disaster.Current => 3,
+      stat.Current => 4,
+      stat.Disaster.Closed => 5,
+      stat.Closed => 6,
+      999
+    );
 
 		RETURN res;
 	END;
 	EXPORT fn_AccountStatus_sort_order(STRING status) := FUNCTION
 
-           fn_AccountStatus_sort_order := 	CASE(status,
-																				'CURRENT'	=> 1,
-																				'OVERDUE'	=> 2,
-																				'CLOSED'  => 3,
-																				999);
+    stat := BusinessCredit_Services.Constants.ACCT_STATUS;
+    fn_AccountStatus_sort_order := CASE(status,
+      stat.Disaster.Current => 1,
+      stat.Current => 2,
+      stat.Disaster.Overdue => 3,
+      stat.Overdue => 4,
+      stat.Disaster.Closed => 5,
+      stat.Closed => 6,
+      999
+    );
 
 		RETURN fn_AccountStatus_sort_order;
 	END;
@@ -673,5 +734,61 @@ EXPORT Functions := MODULE
 
 				RETURN ds_MatchingRolled;
 		END;
+    
+    EXPORT AddSBFEIndicatorFunction( DATASET (TopBusiness_Services.ConnectedBusinessSection_Layouts.rec_Final) InConnectedBusinesses,
+                                            doxie.IDataAccess mod_access, 
+                                            BOOLEAN buzCreditAccess = FALSE)   := FUNCTION
+             // function purpose is to set the BusinessCreditIndicator into values of 1 or 3 or 0 to signify if particular row in connectedBusinessSection
+             // has ult/org/seleid combo that is also in businessCredit (SBFE) header as well as BIP header.
+               InRecs := PROJECT( InConnectedBusinesses[1].ConnectedBusinessRecords,
+                    TRANSFORM({iesp.businesscreditreport.t_BusinessCreditConnectedBusiness; UNSIGNED4 UniqueId;},
+                       SELF.UniqueID := COUNTER;
+                       SELF.BusinessCreditIndicator := 0;
+                       SELF := LEFT; // all the other data copied over.
+               ));
+               InRecsWithoutcounter :=  PROJECT(InConnectedBusinesses[1].ConnectedBusinessRecords,
+                    TRANSFORM(iesp.businesscreditreport.t_BusinessCreditConnectedBusiness,                                         
+                       SELF.BusinessCreditIndicator := 0;
+                       SELF := LEFT; // all the other data copied over.
+               ));                                         
+                // sequence the recs before they are passed into the kfetch2 function so that we can join this set back to Inrecs afterwards
+                // using UniqueID value.
+                tmpLinkids := PROJECT( InConnectedBusinesses[1].ConnectedBusinessRecords, TRANSFORM(bipv2.idlayouts.l_xlink_ids2,                                                          
+                     SELF.UniqueID := COUNTER;
+                     SELF.ultid := LEFT.BusinessIds.UltId;
+                     SELF.orgid := LEFT.BusinessIds.orgid;
+                     SELF.seleid := LEFT.BusinessIds.seleid;                                                    
+                     SELF := []));
+                tmpBusCreditRecs := Business_Credit.Key_LinkIds().Kfetch2(tmplinkids
+                                                                                                    ,mod_access
+                                                                                                    ,BIPV2.IDconstants.Fetch_Level_SeleID
+                                                                                                    ,
+                                                                                                    ,BusinessCredit_Services.Constants.JOIN_LIMIT)(record_type = Business_Credit.Constants().AccountBase);
+                temp  := DEDUP(SORT(tmpBusCreditRecs, uniqueID), uniqueID);
+                                                                                                           
+                tempfinal := JOIN( InRecs, temp, 
+                                             LEFT.uniqueId = RIGHT.uniqueId,
+                                             TRANSFORM(iesp.businesscreditreport.t_BusinessCreditConnectedBusiness,                                               
+                                                SELF.BusinessCreditIndicator := IF (RIGHT.ultid > 0  AND BuzCreditAccess, BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.BOTH,
+                                                                                                            BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.HEADER_FILE_ONLY);                    
+                                                                                                            // if there is info on right side then we know this particular
+                                                                                                            // ult/org/seleid exists in bus credit header (SBFE) and by default we know the ult/org/seleid are in bip header
+                                                                                                            // so thus mark it as being both BIP header and SBFE bus Credit header aka (Constants.BUSINESS_CREDIT_INDICATOR.BOTH)
+                                                                                                            // otherwise just mark as being bip header only
+                                                SELF := LEFT;                                              
+                                                ), LEFT OUTER);
+                                 
+                iesp.businesscreditreport.t_BusinessCreditConnectedBusinessSection xfm_createConnBiz() := TRANSFORM                             
+                                  SELF.CountConnectedBusinesses :=  InConnectedBusinesses[1].CountConnectedBusinesses;
+                                  SELF.TotalCountConnectedBusinesses :=  InConnectedBusinesses[1].TotalCountConnectedBusinesses;
+                                  SELF. ConnectedBusinessRecords :=   IF ( buzCreditAccess, CHOOSEN(tempFinal,iesp.constants.TOPBUSINESS.MAX_COUNT_CONNECTED_BUSINESSES),
+                                                                                                         CHOOSEN(InRecsWithoutcounter,iesp.constants.TOPBUSINESS.MAX_COUNT_CONNECTED_BUSINESSES));
+                                  END;
+                                  
+                FinalResults := DATASET([xfm_createConnBiz()]);
+                // output(tmpBusCreditRecs, named('tmpBusCreditRecs'));
+            // output(tempfinal, named('tempfinal'));
+       RETURN (FinalResults);
+    END;
 
 END; // end of Functions module

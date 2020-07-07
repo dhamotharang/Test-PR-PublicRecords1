@@ -1,4 +1,4 @@
-﻿import iesp, codes, AutoStandardI, corrections, fcra, doxie_files, FFD, STD, CriminalRecords_Services;
+﻿import iesp, codes, AutoStandardI, corrections, fcra, doxie_files, FFD, STD, CriminalRecords_Services, hygenics_crim;
 
 MAX_OVERRIDE_LIMIT := FCRA.compliance.MAX_OVERRIDE_LIMIT;
 
@@ -14,12 +14,110 @@ export Functions := module
 		export string2	st;
 	end;
 	
+  EXPORT fnAppendOffenses(DATASET(CriminalRecords_Services.layouts.l_raw) in_recs,
+    CriminalRecords_Services.IParam.Search in_mod,BOOLEAN isFCRA=FALSE) := FUNCTION
+
+    offenseRec:=RECORD
+      corrections.layout_Offender.offender_key;
+      CriminalRecords_Services.layouts.offense_rec;
+      BOOLEAN isFelony;
+      BOOLEAN wasConvicted;
+    END;
+
+    workRec:=RECORD
+      CriminalRecords_Services.layouts.raw_with_offenses;
+      boolean hasFelony;
+      boolean hasConviction;
+      boolean hasFelonyConviction;
+    END;
+
+    offenses:=JOIN(in_recs,doxie_files.Key_Offenses(isFCRA),
+      KEYED(LEFT.offender_key=RIGHT.ok),TRANSFORM(offenseRec,
+      SELF.offender_key:=LEFT.offender_key,
+      SELF.bitmap:=RIGHT.offense_category,
+      SELF.description:=hygenics_crim._functions.get_category_from_bitmap(RIGHT.offense_category),
+      SELF.isFelony:=RIGHT.off_typ=CriminalRecords_Services.Constants.FELONY[1],
+      SELF.wasConvicted:=RIGHT.fcra_conviction_flag='D'), // D = DOC assumed conviction
+      LIMIT(iesp.constants.CRIM.MaxOffenses,SKIP));
+
+    court_offenses:=JOIN(in_recs,doxie_files.Key_Court_Offenses(isFCRA),
+      KEYED(LEFT.offender_key=RIGHT.ofk),TRANSFORM(offenseRec,
+      SELF.offender_key:=LEFT.offender_key,
+      SELF.bitmap:=RIGHT.offense_category,
+      SELF.description:=hygenics_crim._functions.get_category_from_bitmap(RIGHT.offense_category),
+      SELF.isFelony:=Std.Str.Contains(RIGHT.court_off_lev_mapped,CriminalRecords_Services.Constants.FELONY,TRUE),
+      SELF.wasConvicted:=RIGHT.fcra_conviction_flag='Y'),
+      LIMIT(iesp.constants.CRIM.MaxCourtOffenses,SKIP));
+
+    uniq_offenses:=DEDUP(SORT(offenses+court_offenses,offender_key,bitmap),offender_key,bitmap);
+    slct_offenses:=IF(in_mod.OffenseCategories > 0,uniq_offenses(in_mod.OffenseCategories & bitmap > 0),uniq_offenses);
+
+    workRec appendOffenses1(CriminalRecords_Services.layouts.l_raw L,DATASET(offenseRec) R) := TRANSFORM
+      SELF.offenses:=PROJECT(R,CriminalRecords_Services.layouts.offense_rec);
+      SELF.hasFelony:=EXISTS(R(isFelony));
+      SELF.hasConviction:=EXISTS(R(wasConvicted));
+      SELF.hasFelonyConviction:=EXISTS(R(isFelony AND wasConvicted));
+      SELF:=L;
+    END;
+
+    // add selected offense categories and set booleans in records
+    denormRecs:=DENORMALIZE(in_recs,slct_offenses,LEFT.offender_key=RIGHT.offender_key,GROUP,appendOffenses1(LEFT,ROWS(RIGHT)));
+
+    // filter records by felony and conviction flags
+    filterByFelony:=Std.Str.ToUpperCase(in_mod.OffenseType)[1..5]=CriminalRecords_Services.Constants.FELONY[1..5];
+    tempRecs:=MAP(
+      filterByFelony AND in_mod.ConvictionsOnly => denormRecs(hasFelonyConviction),
+      filterByFelony => denormRecs(hasFelony),
+      in_mod.ConvictionsOnly => denormRecs(hasConviction),
+      denormRecs);
+
+    // filter input records by selected offense categories
+    fltrdRecs:=IF(in_mod.OffenseCategories > 0,tempRecs(EXISTS(offenses)),tempRecs);
+
+    CriminalRecords_Services.layouts.raw_with_offenses appendOffenses2(workRec L,DATASET(offenseRec) R) := TRANSFORM
+      SELF.offenses:=PROJECT(R,CriminalRecords_Services.layouts.offense_rec);
+      SELF:=L;
+    END;
+
+    // return all offense categories for selected records
+    crimRecs:=DENORMALIZE(fltrdRecs,uniq_offenses,LEFT.offender_key=RIGHT.offender_key,GROUP,appendOffenses2(LEFT,ROWS(RIGHT)));
+
+    // OUTPUT(slct_offenses,NAMED('offenses'));
+    // OUTPUT(tempRecs,NAMED('tempRecs'));
+    // OUTPUT(fltrdRecs,NAMED('fltrdRecs'));
+    // OUTPUT(crimRecs,NAMED('crimRecs'));
+
+    RETURN crimRecs;
+  END;
+
+  // categories bitmap to dataset of group descriptions
+  SHARED getGrpDescriptions(UNSIGNED bitmap) := FUNCTION
+
+    BOOLEAN inGroup(UNSIGNED catBitmap, UNSIGNED grpBitmap):=catBitmap & grpBitmap > 0;
+
+    STRING descriptions:=IF(bitmap=0,'',
+      IF(inGroup(bitmap,hygenics_crim.Constants.CRIMES_AGAINST_PERSONS),
+        hygenics_crim.Constants.GRP_CRIMES_AGAINST_PERSONS,'')+' '+
+      IF(inGroup(bitmap,hygenics_crim.Constants.CRIMES_AGAINST_PROPERTY),
+        hygenics_crim.Constants.GRP_CRIMES_AGAINST_PROPERTY,'')+' '+
+      IF(inGroup(bitmap,hygenics_crim.Constants.DOMESTIC_PERSONAL_OFFENSES),
+        hygenics_crim.Constants.GRP_DOMESTIC_PERSONAL_OFFENSES,'')+' '+
+      IF(inGroup(bitmap,hygenics_crim.Constants.DRUG_ALCOHOL_OFFENSES),
+        hygenics_crim.Constants.GRP_DRUG_ALCOHOL_OFFENSES,'')+' '+
+      IF(inGroup(bitmap,hygenics_crim.Constants.FRAUD_OFFENSES),
+        hygenics_crim.Constants.GRP_FRAUD_OFFENSES,'')+' '+
+      IF(inGroup(bitmap,hygenics_crim.Constants.SEXUAL_OFFENSES),
+        hygenics_crim.Constants.GRP_SEXUAL_OFFENSES,''));
+
+    RETURN DATASET(Std.Str.SplitWords(descriptions,' '),iesp.share.t_StringArrayItem);
+  END;
+
 	// ------------------------
 	//	Generate search output
 	// ------------------------
-	export fnCrimSearchVal(dataset(CriminalRecords_Services.layouts.l_raw) in_recs, params in_mod) := function
+	export fnCrimSearchVal(dataset(CriminalRecords_Services.layouts.raw_with_offenses) in_recs) := function
 	
-		CriminalRecords_Services.layouts.t_CrimSearchRecordWithPenalty toSearch(CriminalRecords_Services.layouts.l_raw L) := transform
+		CriminalRecords_Services.layouts.t_CrimSearchRecordWithPenalty toSearch(CriminalRecords_Services.layouts.raw_with_offenses L) := transform
 			self._Penalty			:= L.penalt;
 			self.AlsoFound		:= L.isDeepdive;
 			self.datasource		:= L.datasource;
@@ -43,6 +141,28 @@ export Functions := module
 			self.DateLastSeen := iesp.ECL2ESP.toDatestring8(L.process_date);
 			self.isDisputed := L.isDisputed;
 			self.StatementIDs := L.StatementIDs;
+
+			// consolidate all offense bitmaps into one bitmap for getGrpDescriptions()
+			bitmap:=MAX(ITERATE(L.offenses,
+				TRANSFORM(CriminalRecords_Services.layouts.offense_rec,
+					SELF.bitmap:=LEFT.bitmap | RIGHT.bitmap,
+					SELF.description:='')
+				),bitmap);
+
+			self.OffenseClassifications.Groups:=CHOOSEN(PROJECT(getGrpDescriptions(bitmap),
+				TRANSFORM(iesp.share.t_StringArrayItem,SELF:=LEFT)),
+					iesp.constants.CRIM.MaxOffenses);
+
+			ds_parent:=PROJECT(L.offenses,
+				TRANSFORM({DATASET(iesp.share.t_StringArrayItem) categories},
+					SELF.categories:=DATASET(Std.Str.SplitWords(LEFT.description,' '),iesp.share.t_StringArrayItem)));
+
+			ds_children:=DEDUP(SORT(NORMALIZE(ds_parent,LEFT.categories,
+				TRANSFORM(iesp.share.t_StringArrayItem,SELF:=RIGHT)),RECORD),RECORD);
+
+			self.OffenseClassifications.Categories:=CHOOSEN(PROJECT(ds_children,
+				TRANSFORM(iesp.share.t_StringArrayItem,SELF:=LEFT)),
+					iesp.constants.CRIM.MaxOffenses);
 		end;
 		temp_formatted := project(in_recs, toSearch(left));
 		
@@ -339,7 +459,7 @@ export Functions := module
 			self.NumberCounts							:= L.num_of_counts;
 			self.OffenseDate							:= iesp.ECL2ESP.toDatestring8(L.off_date);
 			self.OffenseType							:= L.off_typ;
-			self.Sentence									:= stringLib.stringcleanspaces(l.stc_desc_1 + ' ' + l.stc_desc_2 + ' ' + l.stc_desc_3 + ' ' + l.stc_desc_4);//'';
+			self.Sentence									:= STD.Str.CleanSpaces(l.stc_desc_1 + ' ' + l.stc_desc_2 + ' ' + l.stc_desc_3 + ' ' + l.stc_desc_4);//'';
 			self.SentenceLengthDescription:= L.stc_lgth_desc;
 			// self.SentenceDescription1     := L.stc_desc_1;
 			self.SentenceDate							:= iesp.ECL2ESP.toDatestring8(L.stc_dt);

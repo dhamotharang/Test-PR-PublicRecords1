@@ -1,4 +1,4 @@
-import mdr, drivers, dx_header, riskwise, Relationship;
+﻿import doxie, mdr, drivers, dx_header, suppress, riskwise, Relationship, VerificationOfOccupancy;
 
 EXPORT getScore(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOBatchOut) VOO_attr,
 								DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) VOO_shell, 
@@ -6,8 +6,9 @@ EXPORT getScore(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOBatchOut) VOO_
 																		boolean glb_ok,
 																		integer dppa,
 																		boolean isUtility,
-																		boolean dppa_ok) := FUNCTION
-
+																		boolean dppa_ok,
+                                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+    	
 VerificationOfOccupancy.Layouts.Layout_VOOBatchOut appendScore(VOO_attr le) := transform
 
 	nonowner := 0 <= (integer)le.attributes.version1.AddressOwnershipHistoryIndex AND (integer)le.attributes.version1.AddressOwnershipHistoryIndex <= 2;
@@ -195,7 +196,7 @@ RelativeMax := 500;
 voshell_dids := PROJECT(voshell_dedp, 
 		TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.DID));
 
-rellyids := Relationship.proc_GetRelationship(voshell_dids,TopNCount:=RelativeMax,
+rellyids := Relationship.proc_GetRelationshipNeutral(voshell_dids,TopNCount:=RelativeMax,
 		RelativeFlag:=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RelativeMax).result; 
 		
 //use the new relatives key to get all DIDs that are related to our input subject
@@ -213,14 +214,18 @@ hdrBuildDate01 := ((string)dk[1].max_date_last_seen)[1..6];
 
 //get all DIDs associated with our target input address
 Key_Header_Address := dx_header.key_header_address();
-
-VerificationOfOccupancy.Layouts.Layout_VOOShell getDIDs(VOO_shell le, Key_Header_Address ri) := TRANSFORM
-	SELF.infer_own_targetDID 			:= ri.DID;
+   VerificationOfOccupancy_CCPA := RECORD
+   VerificationOfOccupancy.Layouts.Layout_VOOShell;
+	 Unsigned4 Global_sid;
+   end;
+VerificationOfOccupancy_CCPA getDIDs(VOO_shell le, Key_Header_Address ri) := TRANSFORM
+	SELF.global_sid := ri.global_sid;
+  SELF.infer_own_targetDID 			:= ri.DID;
 	SELF.infer_own_current 				:= trim((string)ri.dt_last_seen) >= hdrBuildDate01 OR ri.dt_last_seen >= le.historydate; // Need to make sure our "current" calculation still works in history mode
 	SELF 													:= le;
 END;
 
-targetDIDs := join(VOO_shell, Key_Header_Address,
+targetDIDs_unsuppressed := join(VOO_shell, Key_Header_Address,
 												keyed(left.prim_name = right.prim_name) and
 												keyed(left.z5 = right.zip) and
 												keyed(left.prim_range = right.prim_range) and
@@ -233,7 +238,14 @@ targetDIDs := join(VOO_shell, Key_Header_Address,
 												(~mdr.Source_is_DPPA(RIGHT.src) OR 
 													(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),DPPA,RIGHT.src))),
 								getDIDs(LEFT,RIGHT), left outer, ATMOST(riskwise.max_atmost));
+                
+    targetDIDs_flagged := Suppress.MAC_FlagSuppressedSource(targetDIDs_unsuppressed, mod_access);
 
+	targetDIDs := PROJECT(targetDIDs_flagged, TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOShell, 
+    SELF.infer_own_targetDID 			:= IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.infer_own_targetDID);
+    SELF.infer_own_current 				:= IF(left.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), left.infer_own_current);
+	SELF := LEFT;
+	)); 
 //keep only those DIDs that are currently updating for the target address
 dedupTargetDIDs := dedup(sort(targetDIDs(infer_own_current), seq, infer_own_targetDID), seq, infer_own_targetDID);
 

@@ -23,19 +23,20 @@ export OrderScore_Service := MACRO
 	#stored('DataPermissionMask', Risk_Indicators.iid_constants.default_DataPermission);
 
 	#WEBSERVICE(FIELDS(
-			'OrderScoreRequest',
-			'HistoryDateYYYYMM',
-			'HistoryDateTimeStamp',
-			'ipid_only',
-			'gateways',
-            'LexIdSourceOptout',
-            '_TransactionId',
-            '_BatchUID',
-            '_GCID'));
+              'OrderScoreRequest',
+              'HistoryDateYYYYMM',
+              'HistoryDateTimeStamp',
+              'ipid_only',
+              'gateways',
+              'LexIdSourceOptout',
+              '_TransactionId',
+              '_BatchUID',
+              '_GCID',
+              'Debug'
+              ));
 
+  BOOLEAN DEBUG := false : stored('Debug');  //Set to TRUE for Round 1 and Round 2 validation and to FALSE when creating testseeds or Production mode
 
-	BOOLEAN DEBUG := False;                                    //Set to TRUE for Round 1 and Round 2 validation and to FALSE when you are creating TEST SEEDS
-	
 	BOOLEAN   ipid_only  := FALSE  : stored('ipid_only');
 
   rec_in     := iesp.orderscore.t_OrderScoreRequest;
@@ -68,15 +69,16 @@ export OrderScore_Service := MACRO
 	BOOLEAN DisableOutcomeTracking  := False : STORED('OutcomeTrackingOptOut');
 	BOOLEAN ArchiveOptIn            := False : STORED('instantidarchivingoptin');
 
+	//Look up the industry by the company ID.
+	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Models__OrderScore_Service);
+/* ************* End Scout Fields **************/
+
 //CCPA fields
 unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
 string TransactionID := '' : stored ('_TransactionId');
 string BatchUID := '' : stored('_BatchUID');
 unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 
-	//Look up the industry by the company ID.
-	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Models__OrderScore_Service);
-/* ************* End Scout Fields **************/
 
 
 /* ***************************************
@@ -200,15 +202,8 @@ unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 	stringified_attributesIn := Business_Risk_BIP.Common.convertDelimited(attributesIn, name, '|');
 
 	genericModelName := trim(STD.Str.ToLowerCase(option.IncludeModels.OrderScore));
-	//reserved for future use of the model options - similar to code below...I think
-	// cmGrade           := STD.Str.ToLowerCase(TRIM(option.IncludeModels.ModelOptions[1].OptionName)) = 'grade';
-	// cmGradeValue      := STD.Str.ToUpperCase(TRIM(option.IncludeModels.ModelOptions[1].OptionValue));
-  // cmDeliverable           := STD.Str.ToLowerCase(TRIM(option.IncludeModels.ModelOptions[1].OptionName)) = 'delivery';
-  // cmDeliverableValue      := STD.Str.ToUpperCase(TRIM(option.IncludeModels.ModelOptions[1].OptionValue));
-  // cmTotal           := STD.Str.ToLowerCase(TRIM(option.IncludeModels.ModelOptions[1].OptionName)) = 'total_amount';
-  // cmTotalValue      := STD.Str.ToUpperCase(TRIM(option.IncludeModels.ModelOptions[1].OptionValue));
   
-  
+	//model options
   cmDeliverableOption           := option.IncludeModels.ModelOptions(STD.Str.ToLowerCase(TRIM(OptionName)) = 'delivery');
   cmDeliverableValue      := STD.Str.ToUpperCase(TRIM(cmDeliverableOption[1].OptionValue));
   cmTotalAmountOption           := option.IncludeModels.ModelOptions(STD.Str.ToLowerCase(TRIM(OptionName)) = 'total_amount' );
@@ -311,12 +306,8 @@ unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 	d := dataset([{0}],{integer seq});
 	
 	Models.layouts_OrderScore.Layout_OS_In addseq(d l, INTEGER C) := TRANSFORM
-	#If(DEBUG)
-		self.seq := (Integer)account_value;
-	#Else
-		self.seq := C;
-		//self.seq := (Integer)account_value;	
-	#End
+  
+		self.seq := IF(DEBUG, (Integer)account_value, C);
 		self.account := account_value;
 	//bill to
 	cleaned_name := address.CleanPerson73(fullname_value);
@@ -378,12 +369,12 @@ unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 	BSOptions := if(bsversion >= 50, risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary, 0);
 	
 	iid_results := Models.ChargebackDefender_Function(indata, gateways_in, GLBPurpose, DPPAPurpose, ipid_only, 
-																										dataRestriction, ofac_only,
-																										suppressneardups, require2Ele, bsVersion, dataPermission, BSOptions,
-                                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
-                                                                                                        TransactionID := TransactionID, 
-                                                                                                        BatchUID := BatchUID, 
-                                                                                                        GlobalCompanyID := GlobalCompanyID);
+                                                    dataRestriction, ofac_only,
+                                                    suppressneardups, require2Ele, bsVersion, dataPermission, BSOptions,
+                                                    LexIdSourceOptout := LexIdSourceOptout, 
+                                                    TransactionID := TransactionID, 
+                                                    BatchUID := BatchUID, 
+                                                    GlobalCompanyID := GlobalCompanyID);
 
 	Risk_Indicators.Layout_BocaShell_BtSt.layout_OSMain_wAcct fill_output(iid_results le, indata ri) := TRANSFORM
 			self.AccountNumber := ri.account;
@@ -518,30 +509,30 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 	cd2i_in := project(indata, transform(riskwise.layout_cd2i, self := left));
 
 	clam := Risk_Indicators.BocaShell_BtSt_Function(
-		iid_results,
-		gateways_in,
-		DPPAPurpose,
-		GLBPurpose,
-		isUtility,
-		false, // not needed -- isLN  
-		includeRelatives,
-		includeDLInfo,
-		includeVehicles,
-		includeDerogs,
-		bsversion,
-		doscore, // do score
-		true, // nugen
-		DataRestriction,
-		BSOptions,
-		DataPermission, 
-		ScoresInput,
-		NetAcuity_v4, //true for CBD5.1 models
-		ipid_only,
-		skip_businessHeader,
-        LexIdSourceOptout := LexIdSourceOptout, 
-        TransactionID := TransactionID, 
-        BatchUID := BatchUID, 
-        GlobalCompanyID := GlobalCompanyID
+    iid_results,
+    gateways_in,
+    DPPAPurpose,
+    GLBPurpose,
+    isUtility,
+    false, // not needed -- isLN  
+    includeRelatives,
+    includeDLInfo,
+    includeVehicles,
+    includeDerogs,
+    bsversion,
+    doscore, // do score
+    true, // nugen
+    DataRestriction,
+    BSOptions,
+    DataPermission, 
+    ScoresInput,
+    NetAcuity_v4, //true for CBD5.1 models
+    ipid_only,
+    skip_businessHeader,
+    LexIdSourceOptout := LexIdSourceOptout, 
+    TransactionID := TransactionID, 
+    BatchUID := BatchUID, 
+    GlobalCompanyID := GlobalCompanyID
 	);
 
 	
@@ -572,9 +563,8 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
   // so far no clients wanting custom inputs for Order Score. If someone does want it look into the 
 	//transform 'getCustomInputs' until the code 'customModelInputs' is set in CBD
 
-/*  Models will be validated and called in this OrderScore_GetScore */   
-	#If(DEBUG)
-	    //getScore :=  Models.OrderScore_GetScore (clam, ungroup(cd2i_in), ipid_only, genericModelName);
+  //Models will be validated and called in this OrderScore_GetScore    
+
 	    getScore :=  Models.OrderScore_GetScore (clam, ungroup(cd2i_in), ipid_only, genericModelName, cmDeliverableValue , (Integer) cmTotalValue);
 			getScoreWAcct := record
 		    recordof(getScore);
@@ -584,11 +574,8 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 	    out1 := join(getScore, ungroup(cd2i_in),
 		             left.seq = right.seq * 2,                                           //this needs to be the seq # of the bill to
 		             transform(getScoreWAcct, self.Account2 := right.Account, self := left));
-	#ELSE
-	    //getScore :=  Models.OrderScore_GetScore (clam, ungroup(cd2i_in), ipid_only, genericModelName );  
-	    getScore :=  Models.OrderScore_GetScore (clam, ungroup(cd2i_in), ipid_only, genericModelName, cmDeliverableValue , (Integer) cmTotalValue );  
-	
-	
+
+
 // ****Add the Models to the output 
 	iesp.share.t_SequencedRiskIndicator form_rc(getScore le, integer i) := TRANSFORM
 		self.sequence := i;
@@ -679,8 +666,15 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 	os_model := if( Test_Data_Enabled, seed_final, ret );
 	
 	// ****get attributes
-	shell2Use := clam;  
-
+	temp_shell := clam;  
+  
+  FirstData := models.getFirstData(temp_shell, genericModelName );
+  
+  //Send it through the check to see if we need to call FirstData for Khols
+  shell2Use := FirstData.FD_lookup;
+  
+  Khols_BillingIndicator := FirstData.BillingStateIndicator;
+  
 	attributes := Models.getCBDAttributes(shell2Use, account_value, indata, attrversion);	
 
 	 attr_test_seed := Models.OSAttributes_TestSeed_FN(testPrep, account_value, Test_Data_Table_Name);
@@ -722,8 +716,9 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 	final1 := if( ipid_only, project(ret,blankOS(left)), retAttr );
 
 	Risk_Indicators.Layout_BocaShell_BtSt.layout_OSOut_wAcct addEcho(final1 le) := TRANSFORM
-		self.Result.InputEcho.BillTo := searchBT,
+		self.Result.InputEcho.BillTo := searchBT;
 		self.Result.InputEcho.ShipTo := searchST;
+    self.Result.BillingStateIndicator := Khols_BillingIndicator;
 		self.AccountNumber := le.AccountNumber;
 		self.Result := le.Result;
 		self._Header.QueryId := QueryId;
@@ -809,16 +804,15 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 	Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
 	// #stored('Deltabase_Log', Deltabase_Logging);
 
-#End
 
-#If(DEBUG)
-	  OUTPUT(out1,             named('Results'));
-	  // OUTPUT(getScore,         named('GetScore'));
-		// OUTPUT(ungroup(cd2i_in), named('cd2i_in'));
-		// OUTPUT(clam,             named('clam'));  
-#Else	
-	OUTPUT(final3,named('Results'));
-	OUTPUT(royalties,NAMED('RoyaltySet'));
+  //DEBUGGING STATEMENTS
+  IF(DEBUG, OUTPUT(out1, named('Results_DEBUG')));
+  // OUTPUT(getScore,         named('GetScore'));
+  // OUTPUT(ungroup(cd2i_in), named('cd2i_in'));
+  // OUTPUT(clam,             named('clam'));  
+
+	IF(~DEBUG, OUTPUT(final3,named('Results')));
+	IF(~DEBUG, OUTPUT(royalties,NAMED('RoyaltySet')));
 	
 /* **************  REMOVING INTERMEDIATE LOGGING FOR NOW TO SPEED UP QUERY *******************
 	// Note: All intermediate logs must have the following name schema:
@@ -829,7 +823,6 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 *******************************************************************************************/	
 	 
 	 //Improved Scout Logging
-	IF(~DisableOutcomeTracking and ~Test_Data_Enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
-#End
+	IF(~DEBUG and ~DisableOutcomeTracking and ~Test_Data_Enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 
 ENDMACRO;

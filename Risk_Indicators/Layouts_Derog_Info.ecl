@@ -76,6 +76,7 @@ EXPORT Layouts_Derog_Info := MODULE
 		string CaseNumberL;
 		string sort2Date;
 		string ProcessDate;
+		boolean HighRiskCheck;
 	END;		
 
 	export plaintiff_rec := record
@@ -196,8 +197,8 @@ EXPORT Layouts_Derog_Info := MODULE
 		Liens_Working;
 		string PersistId;
 		unsigned ConsumerStatementId;
-  string2 Filing_Type_Id;
-  string Party_PersistId;
+		string2 Filing_Type_Id;
+		string Party_PersistId;
 	END;	
 	
 	EXPORT layout_derog_process_plus_workingDF := RECORD
@@ -244,7 +245,12 @@ EXPORT Layouts_Derog_Info := MODULE
 		string35 AgencyCounty       ;    
 		string2 AgencyState         ;  
 		unsigned ConsumerStatementId;
-    string10 orig_rmsid         ;
+		string10 orig_rmsid         ;
+        /* The below parameters are internal only */
+		boolean HighRiskCheck;
+		string RMSID;
+		string TMSID;
+        boolean SuppressRecord := FALSE;
 	END;
 	
 	EXPORT Liens_seq := RECORD
@@ -290,7 +296,12 @@ EXPORT Layouts_Derog_Info := MODULE
 		string35 AgencyCounty ;                
 		string2 AgencyState    ;
 		unsigned ConsumerStatementId;
-    string10 orig_rmsid   ;
+		string10 orig_rmsid   ;
+        /* The below parameters are internal only */
+		boolean HighRiskCheck;
+		string RMSID;
+		string TMSID;
+        boolean SuppressRecord := FALSE;
 	END;	
 	
 	EXPORT Judgments_seq := RECORD

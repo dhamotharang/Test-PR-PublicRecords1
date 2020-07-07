@@ -1,22 +1,32 @@
-import doxie,gong,Census_Data,ut,suppress;
-export ReversePhoneHistory_Records(dataset(BatchServices.Layouts.ReversePhoneHistory.batch_in_cleaned) batch_in, BatchServices.Interfaces.reversephonehistory_config in_mod ) := FUNCTION
+import doxie,dx_Gong,Census_Data,ut,suppress;
+export ReversePhoneHistory_Records(
+  dataset(BatchServices.Layouts.ReversePhoneHistory.batch_in_cleaned) batch_in,
+  BatchServices.Interfaces.reversephonehistory_config in_mod,
+  Doxie.IDataAccess mod_access
+) := FUNCTION
 	Batchin			:= BatchServices.Layouts.ReversePhoneHistory.batch_in_cleaned;
 	Batchout		:= BatchServices.Layouts.ReversePhoneHistory.batch_out;
-	GongRecs		:= gong.Key_History_phone;
-	GongDIDRecs	:= gong.Key_History_did;
-	GongBDIDRecs:= gong.Key_History_BDID;
+	GongRecs		:= dx_Gong.key_history_phone();
+	GongDIDRecs	:= dx_Gong.key_history_did();
+	GongBDIDRecs:= dx_Gong.key_history_bdid();
 	Census			:= Census_Data.Key_Fips2County;
 
+  batchout_optout := RECORD
+    batchout;
+    unsigned4 global_sid;
+    unsigned8 record_sid;
+  END;
 
 	doCommonProject() := macro
 			self.acctno:=l.acctno;
 			self.seq:=0;
 			self.errormsg:='';
+			self.timezone:= '';
+
 			self.iscurrent:=r.current_record_flag;
 			self.did:=r.did;
 			self.bdid:=r.bdid;
 			self.phone:=r.phone10;
-			self.timezone:= '';
 			self.listed_name:=r.listed_name;
 			self.title:=r.name_prefix;
 			self.name_first:=r.name_first;
@@ -42,24 +52,26 @@ export ReversePhoneHistory_Records(dataset(BatchServices.Layouts.ReversePhoneHis
 			self.omit_address:=r.omit_address;
 			self.omit_phone:=r.omit_phone;
 			self.omit_locality:=r.omit_locality;
+			self.record_sid:=r.record_sid;
+			self.global_sid:=r.global_sid;
 	endmacro;
 
-	Batchout doPhoneProject10 (Batchin l, GongRecs r) := TRANSFORM
+	batchout_optout doPhoneProject10 (Batchin l, GongRecs r) := TRANSFORM
 		doCommonProject();
 		self.search_type:='T';
 	END;
 
-	Batchout doPhoneProject7 (Batchin l, GongRecs r) := TRANSFORM
+	batchout_optout doPhoneProject7 (Batchin l, GongRecs r) := TRANSFORM
 		doCommonProject();
 		self.search_type:='S';
 	END;
 
-	Batchout doPhoneProjectDID (Batchin l, GongDIDRecs r) := TRANSFORM
+	batchout_optout doPhoneProjectDID (Batchin l, GongDIDRecs r) := TRANSFORM
 		doCommonProject();
 		self.search_type:='D';
 	END;
 
-	Batchout doPhoneProjectBDID (Batchin l, GongBDIDRecs r) := TRANSFORM
+	batchout_optout doPhoneProjectBDID (Batchin l, GongBDIDRecs r) := TRANSFORM
 		doCommonProject();
 		self.search_type:='B';
 	END;
@@ -79,7 +91,7 @@ export ReversePhoneHistory_Records(dataset(BatchServices.Layouts.ReversePhoneHis
 													doPhoneProject10(LEFT,right),
 												  limit(count(fullPhones) * BatchServices.Constants.ReversePhoneHistory.MAX_SEARCH_RESULTS_PER_ACCT),
 													left outer);
-	
+
 	//get records by 7 digit phone and state
 	phones_by_7digit := join(partialPhones,GongRecs,
 													keyed(left.phone7 = right.p7) and
@@ -87,7 +99,7 @@ export ReversePhoneHistory_Records(dataset(BatchServices.Layouts.ReversePhoneHis
 													doPhoneProject7(LEFT,right),
 												  limit(count(partialPhones)*BatchServices.Constants.ReversePhoneHistory.MAX_SEARCH_RESULTS_PER_ACCT),
 													left outer);
-	
+
 	//get records by DID
 	phones_by_did := join(didPhones,GongDIDRecs,
 													keyed(left.did = right.l_did),
@@ -101,11 +113,24 @@ export ReversePhoneHistory_Records(dataset(BatchServices.Layouts.ReversePhoneHis
 												  limit(count(bdidPhones)*BatchServices.Constants.ReversePhoneHistory.MAX_SEARCH_RESULTS_PER_ACCT),
 													left outer);
 
+  //Combine all records for a single Opt Out suppression call.
+  combined_raw := phones_by_10digit + phones_by_7digit + phones_by_did + phones_by_bdid;
+  combined_optout_flagged := Suppress.MAC_FlagSuppressedSource(combined_raw, mod_access);
+
+  combined := PROJECT(combined_optout_flagged,
+    TRANSFORM(batchout,
+      self.acctno:= LEFT.acctno,
+      self.seq:= LEFT.seq,
+      self.errormsg:= LEFT.errormsg,
+      self.timezone:= LEFT.timezone,
+      self.search_type:= LEFT.search_type,
+      self := if(not LEFT.is_suppressed, LEFT)));
+
+  combined_final := group(sort(combined, acctno, phone, did, bdid, -date_last_seen, -iscurrent),
+    acctno, phone, did, bdid);
 
 	//Format bad criteria records
 	badCriteriaRecords:=project(errorCriteria, transform(Batchout,self.acctno:=left.acctno,self.errormsg:='Bad Criteria',self:=[]));
-	//Rejoin group and sort the records
-	combined := group(sort(phones_by_10digit+phones_by_7digit+phones_by_did+phones_by_bdid,acctno,phone,did,bdid,-date_last_seen,-iscurrent),acctno,phone,did,bdid);
 	//Rollup Transform
 	Batchout doRollup(Batchout l, DATASET(Batchout) allRows) := TRANSFORM
 		self.acctno:=l.acctno;
@@ -141,9 +166,9 @@ export ReversePhoneHistory_Records(dataset(BatchServices.Layouts.ReversePhoneHis
 		self.omit_phone:=l.omit_phone;
 		self.omit_locality:=l.omit_locality;
 		self.search_type:=l.search_type;
-	END;	
+	END;
 	//Rollup the records and sequence them
-	resultsRolled := ROLLUP(combined(phone <> ''), GROUP, doRollup(LEFT, ROWS(LEFT)));
+	resultsRolled := ROLLUP(combined_final(phone <> ''), GROUP, doRollup(LEFT, ROWS(LEFT)));
 	// pull any DIDed records as necessary
   Suppress.MAC_Suppress(resultsRolled,resultsCleanDID,in_mod.applicationType,Suppress.Constants.LinkTypes.DID,did);
 	// pull any BDIDed records as necessary
@@ -169,7 +194,7 @@ export ReversePhoneHistory_Records(dataset(BatchServices.Layouts.ReversePhoneHis
 	end;
 
 	resultsSeqLimit := Project(group(resultsSorted,acctno,phone),doSeqLimit(left,counter));
-	
+
 	Batchout -search_type doFinalSeq(Batchout l, integer c):=transform
 		self.seq:=c;
 		self := l;

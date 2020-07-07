@@ -2571,7 +2571,7 @@ end;
       																				 ,
       																				 'Scoring_QA@risk.lexisnexis.com');
       																				 
-      					out_file1 := output(NON_FCRA_result , ,'~ScoringQA::out::ks1::NON_FCRA_result' + curr_date, CSV(heading(single), quote('"')), overwrite, EXPIRE(30) );
+      					out_file1 := output(NON_FCRA_result , ,'~ScoringQA::out::ks1::NON_FCRA_result' + curr_date, CSV(heading(single), quote('"')), overwrite);
       			
       			
       			// string out_file_layout := '';
@@ -2624,8 +2624,8 @@ end;
       																				 ,
       																				 'Scoring_QA@risk.lexisnexis.com');	
 																							 
-					   // send_file2 :=FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.Daily_Data_collections_fail_list, 'KS Report Exceptions ' , alert_msg_file[COUNT(alert_msg_file)].line);																		 
-					   send_file2 :=FileServices.SendEmail('Weiyu.Ma@lexisnexisrisk.com, Matthew.Ludewig@lexisnexisrisk.com', 'KS Report Exceptions ' , alert_msg_file[COUNT(alert_msg_file)].line);																		 
+					   send_file2 :=FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.Daily_Data_collections_fail_list, 'KS Report Exceptions ' , alert_msg_file[COUNT(alert_msg_file)].line);																		 
+					   // send_file2 :=FileServices.SendEmail('isabel.Ma@lexisnexisrisk.com, Matthew.Ludewig@lexisnexisrisk.com', 'KS Report Exceptions ' , alert_msg_file[COUNT(alert_msg_file)].line);																		 
       																				 
       																				 
            sequential ( out_file, send_file ,out_file1,send_file1,IF(count(alert_file_list)>0,send_file2));																				 

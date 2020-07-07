@@ -173,6 +173,13 @@ export SmallBusiness_Service := macro
 	string20 Test_Data_Table_Name := ''     : stored('TestDataTableName');
 	string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 	string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+  
+    //CCPA fields
+    unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+    string TransactionID := '' : STORED('_TransactionId');
+    string BatchUID := '' : STORED('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
 	#stored('DisableBocaShellLogging', DisableOutcomeTracking);
 				
 	// add a sequence value
@@ -185,7 +192,12 @@ export SmallBusiness_Service := macro
 	
 	prep := project( ds_in, addSeq(left,counter) );
 
-	lnsbResults := LNSmallBusiness.SmallBusiness_Function( prep, gateways, Test_Data_Enabled, Test_Data_Table_Name, DataRestriction, DataPermission );
+	lnsbResults := LNSmallBusiness.SmallBusiness_Function( prep, gateways, Test_Data_Enabled, Test_Data_Table_Name, 
+                                                                                                        DataRestriction, DataPermission,
+                                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                        TransactionID := TransactionID, 
+                                                                                                        BatchUID := BatchUID, 
+                                                                                                        GlobalCompanyID := GlobalCompanyID);
 	
 	// realtime gets only one record, so sequence is irrelevant. per 2008-01-13 discussions with Terrence, we believe
 	// accountnumber for realtime transactions are handled automagically via the ESP, so we can omit them as well

@@ -1,3 +1,4 @@
+﻿import workman;
 EXPORT Layouts :=
 module
 
@@ -18,6 +19,28 @@ module
 //    ,string watcherwuid
 //    ,string notify_event
   };
+
+	export wks_slim_filename := Workman.layouts.wks_slim_filename;
+	export wks_slim_filename_old :=
+		record
+			string               name                                                                        {xpath('name')};
+			string               wuid                                                                        {xpath('wuid')};
+			string               ESP                                                                         {xpath('esp')};    
+			string               ENV                                                                         {xpath('env')};    
+			string               state                                                                       {xpath('state')};
+			string               iteration                                                                   {xpath('iteration')};
+			string               version                                                                     {xpath('version')};
+			string               total_thor_time                                                             {xpath('total_thor_time')};
+			real8                total_time_secs                                                             {xpath('total_time_secs')};
+			string               run_total_thor_time                                                         {xpath('run_total_thor_time')} := '';
+			real8                run_total_time_secs                                                         {xpath('run_total_time_secs')} := 0.0;
+			string               subotal_thor_time                                                           {xpath('subotal_thor_time')}   := '';
+			real8                subtotal_time_secs                                                          {xpath('subtotal_time_secs')}  := 0.0;
+			string               time_finished                                                               {xpath('time_finished')}       := '' ;
+			string               Errors                                                                      {xpath('errors')}              := '' ;
+			string               __filename                                                                  { virtual(logicalfilename)};
+		end;
+
 
 	export WuidItems :=
 	record

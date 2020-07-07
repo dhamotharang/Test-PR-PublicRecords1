@@ -1,4 +1,4 @@
-﻿import risk_indicators, ut, mdr, easi, riskwise, aml, riskview; 
+﻿import aml, easi, mdr, risk_indicators, riskwise, riskview, STD, ut; 
 
 blankEasi := row( [], EASI.Layout_Easi_Census );
 blankBTST := row( [], Risk_Indicators.Layout_BocaShell_BtSt_Out );
@@ -62,6 +62,21 @@ shared unsigned3 fixYYYY00( unsigned YYYYMM ) := if( YYYYMM > 0 and YYYYMM % 100
 // for a few attributes (notably: AddrMostRecentTaxDiff, AddrMostRecentIncomeDiff, AddrMostRecentValueDiff, AddrMostRecentCrimeDiff),
 // a -1 value is legitimate (not null), so we'll change legitimate -1 values to -2 in order to preserve the exceptionality of -1
 shared preserveNull( integer val ) := if( val=-1, -2, val );
+
+
+// Functions brought over from Models.getRVAttributes to replicate RV3 logic for FIS custom attributes
+shared fulldate := (unsigned4)risk_indicators.iid_constants.myGetDate(clam.historydate);	// full history date
+
+shared sysdateV3 := if(clam.historydate <> 999999, (integer)(((string)clam.historydate)[1..6]), (integer)clam.header_summary.header_build_date);
+
+// to account for the loss of TS source from fcra, double count EQ if the consumer was on file with EQ for more than 9 years
+shared onFileEQ9years := if((unsigned)clam.source_verification.adl_eqfs_first_seen=0, false,
+                           if(risk_indicators.iid_constants.checkdays((string)fulldate,clam.source_verification.adl_eqfs_first_seen+'01',
+                             risk_indicators.iid_constants.nineyears, clam.historydate), false, true));
+                                                                            
+shared add1U(UNSIGNED field) := FUNCTION
+  RETURN(IF(onFileEQ9years, field+1, field));
+END;
 
 // shared intermediate variables
 // ===================================================================================================================
@@ -190,7 +205,7 @@ shared	statusAddr3 := map(clam.address_verification.address_history_2.applicant_
 														clam.address_verification.addr_type3 not in ['','S'] => 'R',// rent,
 										 'U');// unknown;
 
-								
+shared ssnNotInput := clam.shell_input.SSN = '';
 
 /* **********************************************************************************************
 			BEGINNING OF ATTRIBUTES LOGIC
@@ -817,15 +832,19 @@ export	string3	AddrChangeCount03	:= capS((string)addr_change_count03, capZero, c
 
 export	string3	AddrChangeCount06	:= capS((string)clam.velocity_counters.addrs_per_adl_created_6months, capZero, cap255);
 
-export	string3	AddrChangeCount12	:= capS((string)clam.other_address_info.addrs_last12, capZero, cap255);
+export	string3	AddrChangeCount12 := capS((string)clam.other_address_info.addrs_last12, capZero, cap255);
+export	string3	rv3AddrChangeCount12 := capS((string)clam.FIS.addrs_last12, capZero, cap255); //FIS custom attribute
 
 export	string3	AddrChangeCount24 	:= capS((string)clam.other_address_info.addrs_last24, capZero, cap255);
 
 export	string3	AddrChangeCount60 	:= capS((string)clam.other_address_info.addrs_last_5years, capZero, cap255);
+export	string3	rv3AddrChangeCount60 := capS((string)clam.FIS.addrs_last60, capZero, cap255); //FIS custom attribute
 
 export	string10	EstimatedAnnualIncome	:= capS((string)clam.estimated_income, capZero, capMax) ;
 	
 export	string1	PropertyOwner	:= checkboolean(clam.address_verification.owned.property_total>0);
+
+export string3 rv3AssetPropCurrentCount := capS((string)clam.FIS.owned_property_total, capZero, cap255); //FIS custom attribute
 
 export string3 PropOwnedCount := capS((string)clam.address_verification.owned.property_total, capZero, cap255);
 export string3 PropRealSourceCount := PropOwnedCount; // as of CBD4, use the same logic as PropOwnedCount but a different name
@@ -903,6 +922,8 @@ export	string3	AircraftCount24	:= capS((string)clam.aircraft.aircraft_count24, c
 export	string3	AircraftCount60 := capS((string)clam.aircraft.aircraft_count60, capZero, cap255);
 	
 export	string2	WealthIndex 	:= if(clam.wealth_indicator in ['0', ''], '-1', capS(clam.wealth_indicator, capZero, '6'));
+
+export	string2	rv3AssetIndex 	:= Trim(capS(clam.wealth_indicator, capZero, '6')); //FIS custom attribute
 
 export	string2	BusinessActiveAssociation	:= map(clam.did=0 => '-1', 
 																									(clam.employment.business_ct-clam.employment.dead_business_ct) > 0 => '1', 
@@ -1099,6 +1120,8 @@ shared date_last_derog := if( date_last_derog_1 > agedate, 0, date_last_derog_1 
 export	string3	DerogAge	:= if(date_last_derog=0, '-1', 
 	capS((string)round((ut.DaysApart((string)date_last_derog, (string)sysdate)) / 30), capZero, map( not isFCRA => cap960, Bankruptcy_Age > 84 => '120', cap84 )));
 
+export	string3	rv3NonDerogCount	:= capS((string)add1U(clam.fis.num_nonderogs), capZero, cap255);	//FIS custom attribute
+	
 export	string3	NonDerogCount	:= capS((string)clam.source_verification.num_nonderogs, capZero, cap255);		
 export	string3	NonDerogCount01	:= capS((string)clam.source_verification.num_nonderogs30, capZero, cap255);
 	shared nonderog_count03 := clam.source_verification.num_nonderogs90;
@@ -1124,7 +1147,7 @@ export	string2	RecentActivityIndex	:= map(DerogCount='0' and (integer)NonDerogCo
 																						'4');
 
 	
-export	string1	VoterRegistrationRecord	:= checkboolean(StringLib.StringFind(clam.header_summary.ver_sources,mdr.sourcetools.src_Voters_v2, 1) > 0);
+export	string1	VoterRegistrationRecord	:= checkboolean(STD.STR.Find(clam.header_summary.ver_sources,mdr.sourcetools.src_Voters_v2, 1) > 0);
 export	string3	ProfLicCount	:= capS((string)clam.professional_license.proflic_count, capZero, cap255);
 	shared pl_date_most_recent := if(clam.professional_license.date_most_recent>ageDate, 0, clam.professional_license.date_most_recent);	
 export	string3	ProfLicAge	:= if(pl_date_most_recent=0, '-1', 
@@ -1410,7 +1433,7 @@ export string3 PRSearchPhoneIdentities             := (string)min( 255, clam.acc
 // (-1) - Identity not found
 export string2 IdentityRiskLevel := map(
 			clam.iid.decsflag='1' or // ssn deceased
-			stringlib.stringfind(clam.header_summary.ver_sources, 'DE', 1) > 0 // ADL had death record on header
+			STD.STR.Find(clam.header_summary.ver_sources, 'DE', 1) > 0 // ADL had death record on header
 			=> '9',
 			clam.iid.socsdobflag='1' or   	// issued prior to DOB
 			not clam.SSN_Verification.Validation.valid   // invalid ssn	
@@ -1734,8 +1757,8 @@ export string3 AssocHighRiskTopologyCount := (string)min( 255, clam.relatives.re
 	shared assocrisklevel_temp := (integer)AssocHighRiskTopologyCount + (integer)AssocSuspicousIdentitiesCount;
 export string2 AssocRiskLevel := if(clam.did=0, '-1',  (string)min( 9, if(assocrisklevel_temp=0, 1, assocrisklevel_temp) ) );  // 0's are now collapsed into 1's bucket
 
-export string2 IPCountry := if(trim(ip2o.ipaddr)='', '-1',trim(StringLib.StringToUpperCase(ip2o.countrycode[1..2])));
-export string2 IPState := if(trim(ip2o.ipaddr)='', '-1',if(ipcountry = 'US', StringLib.StringToUpperCase(ip2o.state), ''));
+export string2 IPCountry := if(trim(ip2o.ipaddr)='', '-1',trim(STD.STR.ToUpperCase(ip2o.countrycode[1..2])));
+export string2 IPState := if(trim(ip2o.ipaddr)='', '-1',if(ipcountry = 'US', STD.STR.ToUpperCase(ip2o.state), ''));
 export string2 IPContinent := if(trim(ip2o.ipaddr)='', '-1', ip2o.continent);
 	
 	shared invalid_ssn_value := if(not clam.SSN_Verification.Validation.valid, 4, 0);
@@ -2233,7 +2256,7 @@ export string2 SourceDirectory	:= map(not clam.truedid => '-1',
 		
 export string3 SourceDirectoryCount := if(not clam.truedid, '-1', capS((string)source_directory_count, capZero, cap255) );
 export string2 SourceVoterRegistration := map(not clam.truedid => '-1', 
-		StringLib.StringFind(clam.header_summary.ver_sources,mdr.sourcetools.src_Voters_v2, 1) > 0 => '1',
+		STD.STR.Find(clam.header_summary.ver_sources,mdr.sourcetools.src_Voters_v2, 1) > 0 => '1',
 		'0');
 
 export string2 EducationAttendance := map(not clam.truedid => '-1',
@@ -2572,8 +2595,8 @@ export string2 BankruptcyChapter := map(not clam.truedid => '-1',
 			
 export string2 BankruptcyStatus_v5 := map(not clam.truedid => '-1',
 	not clam.bjl.bankrupt => '0',
-	stringlib.stringfind(stringlib.stringtouppercase(clam.bjl.disposition), 'DISCHARGED', 1) > 0 => '1',
-	stringlib.stringfind(stringlib.stringtouppercase(clam.bjl.disposition), 'DISMISSED', 1) > 0 => '2',
+	STD.STR.Find(STD.STR.ToUpperCase(clam.bjl.disposition), 'DISCHARGED', 1) > 0 => '1',
+	STD.STR.Find(STD.STR.ToUpperCase(clam.bjl.disposition), 'DISMISSED', 1) > 0 => '2',
 	'-1');
 		
 export string2 BankruptcyDismissed24Month := map(not clam.truedid => '-1',
@@ -2602,7 +2625,8 @@ export string2 InquiryShortTerm12Month	:= if(not clam.truedid, '-1', checkboolea
 export string2 InquiryCollections12Month	:= if(not clam.truedid, '-1', checkboolean(clam.acc_logs.collection.count12>0) );
 
 export string3 SSNSubjectCount := if(not clam.truedid or InputProvidedSSN='0', '-1', capS( (string)clam.velocity_counters.adls_per_ssn_seen_18months, capZero, cap255) );
-export string2	SSNDeceased	:= Risk_Indicators.iid_constants.SSNDeceased_Lookup(clam.truedid, InputProvidedSSN, clam.iid.decsflag);
+export string2 SSNDeceased	:= Risk_Indicators.iid_constants.SSNDeceased_Lookup(clam.truedid, InputProvidedSSN, clam.iid.decsflag);
+export string2 rv3SSNDeceased	:= if(ssnNotInput, '', checkBoolean(clam.iid.decsflag='1')); //FIS custom attribute
 
 export string8 SSNDateLowIssued := if(not clam.truedid 
                                         or InputProvidedSSN='0' 
@@ -2632,6 +2656,10 @@ export string2 AddrOnFileHighRisk := map(not clam.truedid => '-1',
  
 export	string3	AddrInputTimeOldest	:= if(not clam.truedid or noaddrInput or InputAddrDateFirstSeen_v5=0, '-1', 
 																				capS((string)Risk_Indicators.iid_constants.monthsApart_YYYYMMDD_legacy((string)InputAddrDateFirstSeen_v5  + '01',	(string)header_sysDate_version5, true), capOfOne, cap960) );
+
+export	string3	rv3AddrInputTimeOldest	:= if(IAdateFirstSeen=0, '', 
+                                                  capS((string)round((ut.DaysApart((string)checkHdrBldDate(IAdateFirstSeen,clam.header_summary.header_build_date) ,(string)sysdateV3)) / 30), 
+                                                  capOfOne, cap960)); //FIS custom attribute
 																				
 export	string3	AddrInputTimeNewest	:= if(not clam.truedid or noaddrInput or InputAddrDateLastSeen_v5=0, '-1', 
 																				capS((string)Risk_Indicators.iid_constants.monthsApart_YYYYMMDD_legacy((string)checkDate6(InputAddrDateLastSeen_v5) + '31',	(string)header_sysDate_version5, true), capOfOne, cap960) );
@@ -2859,6 +2887,12 @@ export string1 ConfirmationSubjectFound :=
   if(riskview.constants.noscore(clam.iid.nas_summary,clam.iid.nap_summary, clam.address_verification.input_address_information.naprop, clam.truedid), 
   '0',  // subject not found
   '1');  // subject found
+
+//FIS custom attribute, uses old logic for truedid
+export string1 rv3ConfirmationSubjectFound := IF(riskview.constants.noscore(clam.iid.nas_summary,clam.iid.nap_summary, clam.address_verification.input_address_information.naprop, clam.FIS.truedid),
+                                                 '1',
+                                                 '0'); 
+
 
 export	string7	AssetPropCurrentTaxTotal	:= if(not clam.truedid or clam.address_verification.owned.property_total < 1, '-1', 
 	capS((string)clam.address_verification.owned.property_owned_assessed_total, capZero, cap7Byte) );

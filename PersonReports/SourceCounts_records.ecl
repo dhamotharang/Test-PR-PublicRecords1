@@ -4,11 +4,11 @@
 
 // TODO: should be kept in sync with  IPTree* BpsDenormalizer::buildSourceCountsSection()
 // TODO: who decides the versioning -- still ESP?
-// TODO: eventually should replace doxie.Source_counts 
+// TODO: eventually should replace doxie.Source_counts
 // TODO: check input parameters structure; check whether FCRA is required
 
-// NB: ESP often implements versioning as "if, then, else". 
-// I'm more conservative here, explicitely checking version instead of "else": 
+// NB: ESP often implements versioning as "if, then, else".
+// I'm more conservative here, explicitely checking version instead of "else":
 // i.e. if (ver=1, then), if (ver=2, then), etc.
 
 out_rec := iesp.share.t_SourceSection;
@@ -17,13 +17,13 @@ out_rec := iesp.share.t_SourceSection;
 //TODO: rewrite doxie, making it ESDL-compliant
 EXPORT out_rec SourceCounts_records (dataset (doxie.layout_references) dids,
   doxie.IDataAccess mod_access,
-  PersonReports.IParam._sources param, 
+  PersonReports.IParam._sources param,
   boolean IsFCRA = false
   ) := FUNCTION
 
   did := dids[1].did;
   did_ref_prefix := 'P' + (string) did + '$';
-  
+
   src_row := Doxie.Source_counts (dids)[1]; // returns flat view of the counts
 
   // if subject's "pure" header (vs. single source) information is requested; true by assumption
@@ -35,7 +35,7 @@ EXPORT out_rec SourceCounts_records (dataset (doxie.layout_references) dids,
 //  Sections ADDRESS, SSN, DOB are taken from raw header.
 //  Section NAME is hardcoded
 
-  sources := 
+  sources :=
          dataset ([{'NAME', 0, did_ref_prefix, 'Section'}], iesp.share.t_SourceSection) +
 
          if (param.include_atf and (src_row.atf_cnt > 0), dataset ([
@@ -90,9 +90,12 @@ EXPORT out_rec SourceCounts_records (dataset (doxie.layout_references) dids,
          if (param.include_faaaircrafts and (src_row.airc_cnt >0), dataset ([
              {'FAA Aircraft Registrations', src_row.airc_cnt, did_ref_prefix + 'AIRC', 'Retrievable'},
              {'AIRCRAFT',                   0,                did_ref_prefix + 'AIRC', 'Section'}], iesp.share.t_SourceSection)) +
-         if (param.include_email and (src_row.email_cnt >0), dataset ([
+         if (param.include_email and (src_row.email_cnt >0) and (param.email_version = 1), dataset ([
              {'Email Addresses', src_row.email_cnt, did_ref_prefix + 'EMAIL', 'Retrievable'},
              {'EMAILADDRESS',    0,                 did_ref_prefix + 'EMAIL', 'Section'}], iesp.share.t_SourceSection)) +
+         if (param.include_email and (src_row.emailv2_cnt >0) and (param.email_version = 2), dataset ([
+             {'Email Addresses', src_row.emailv2_cnt, did_ref_prefix + 'EMAIL_V2', 'Retrievable'},
+             {'EMAILADDRESS',    0,                 did_ref_prefix + 'EMAIL_V2', 'Section'}], iesp.share.t_SourceSection)) +
          if (param.include_faacertificates and (src_row.pilot_cnt > 0), dataset ([
              {'FAA Pilot Licenses', src_row.pilot_cnt, did_ref_prefix + 'PILOT', 'Retrievable'},
              {'PILOT',              0,                 did_ref_prefix + 'PILOT', 'Section'}], iesp.share.t_SourceSection)) +
@@ -135,9 +138,9 @@ EXPORT out_rec SourceCounts_records (dataset (doxie.layout_references) dids,
              {'SO',            0,              did_ref_prefix + 'SEXOFFENDER', 'Section'}], iesp.share.t_SourceSection)) +
 									if (param.include_students and (src_row.student_cnt > 0),  dataset ([
              {'Student Locator', src_row.student_cnt, did_ref_prefix + 'STUDENT', 'Retrievable'},
-             {'STUDENT',            0,         did_ref_prefix + 'STUDENT', 'Section'}], iesp.share.t_SourceSection)) +		 
+             {'STUDENT',            0,         did_ref_prefix + 'STUDENT', 'Section'}], iesp.share.t_SourceSection)) +
          if (header_include and (src_row.ak_cnt > 0),             dataset ([
-             {'Alaskan Permenant Fund', src_row.ak_cnt, did_ref_prefix + 'AK', 'Retrievable'},
+             {'Alaska Permenant Fund', src_row.ak_cnt, did_ref_prefix + 'AK', 'Retrievable'},
              {'AK',                     0,              did_ref_prefix + 'AK', 'Section'}], iesp.share.t_SourceSection)) +
          if (header_include and (src_row.mswork_cnt > 0), dataset ([
              {'Mississippi Worker\'s Compensation', src_row.mswork_cnt, did_ref_prefix + 'MSWORK', 'Retrievable'},
@@ -175,14 +178,14 @@ EXPORT out_rec SourceCounts_records (dataset (doxie.layout_references) dids,
              {'Criminal', src_row.doc_cnt, did_ref_prefix + 'DOC', 'Retrievable'},
              {'DOC',      0,               did_ref_prefix + 'DOC', 'Section'}], iesp.share.t_SourceSection)) +
          if (param.include_properties and (src_row.assessment_cnt > 0) and (param.property_version = 1), dataset ([
-             {'Tax Assessor Records', src_row.assessment_cnt, did_ref_prefix + 'ASSESSMENT', 'Retrievable'}, 
+             {'Tax Assessor Records', src_row.assessment_cnt, did_ref_prefix + 'ASSESSMENT', 'Retrievable'},
              {'ASSESSMENT',           0,                      did_ref_prefix + 'ASSESSMENT', 'Retrievable'}], iesp.share.t_SourceSection)) +
          if (param.include_properties and (src_row.assessment2_cnt > 0) and (param.property_version = 2), dataset ([
              {'Tax Assessor Records', src_row.assessment2_cnt, did_ref_prefix + 'ASSESSMENT_V2','Retrievable'},
              {'ASSESSMENT_V2',        0,                       did_ref_prefix + 'ASSESSMENT_V2','Section'}], iesp.share.t_SourceSection)) +
 									if (param.include_properties and (src_row.assessment2_cnt > 0) and (param.property_version = 2), dataset ([
              {'Property Records', src_row.assessment2_cnt + src_row.deed2_cnt, did_ref_prefix + 'PROPERTY_V2','Retrievable'},
-             {'PROPERTY_V2',        0,                       did_ref_prefix + 'PROPERTY_V2','Section'}], iesp.share.t_SourceSection)) +		 
+             {'PROPERTY_V2',        0,                       did_ref_prefix + 'PROPERTY_V2','Section'}], iesp.share.t_SourceSection)) +
          if (header_include and (src_row.util_cnt > 0), dataset ([
              {'Utility Locator', src_row.util_cnt, did_ref_prefix + 'UTIL', 'Retrievable'},
              {'UTIL',            0,                did_ref_prefix + 'UTIL', 'Section'}], iesp.share.t_SourceSection)) +
@@ -193,28 +196,28 @@ EXPORT out_rec SourceCounts_records (dataset (doxie.layout_references) dids,
              {'Person Locator 4', src_row.targ_cnt, did_ref_prefix + 'TARG', 'Retrievable'},
              {'Person Locator 4', 0,                did_ref_prefix + 'TARG', 'Section'}], iesp.share.t_SourceSection)) +
 									if (header_include and (src_row.tn_cnt > 0), dataset ([
-             {'Person Locator 6', src_row.tn_cnt, did_ref_prefix + 'PL6', 'Retrievable'}], iesp.share.t_SourceSection)) +		
+             {'Person Locator 6', src_row.tn_cnt, did_ref_prefix + 'PL6', 'Retrievable'}], iesp.share.t_SourceSection)) +
 									if (header_include and (src_row.en_cnt > 0) /*and (param.en_version = 1)*/, dataset ([
              {'Person Locator 5', src_row.en_cnt, did_ref_prefix + 'PL5', 'Retrievable'}], iesp.share.t_SourceSection)) +
-       
+
 									if (header_include and (src_row.en_cnt > 0) /*and (param.en_version = 1)*/, dataset ([
              {'Person Locator 1', src_row.eq_cnt, did_ref_prefix + 'PL1', 'Retrievable'}], iesp.share.t_SourceSection));
 
 //  self.quickheader_cnt := count(dedup(SORT(L.quickheader_child, RECORD), record));
 
-  // Take sections from header file (this is almost exact copy of the code from doxie.CRS)  
+  // Take sections from header file (this is almost exact copy of the code from doxie.CRS)
   header_recs := Doxie_Raw.Header_Raw (dids, mod_access);
 
-  header_sections := 
+  header_sections :=
     if (exists (header_recs),             dataset ([{'ADDRESSES', 0, did_ref_prefix + 'ADDRESSES', 'Section'}], iesp.share.t_SourceSection)) +
     if (exists (header_recs (ssn != '')), dataset ([{'SSN',       0, did_ref_prefix + 'SSN',       'Section'}], iesp.share.t_SourceSection)) +
     if (exists (header_recs (dob != 0)),  dataset ([{'DOB',       0, did_ref_prefix + 'DOB',       'Section'}], iesp.share.t_SourceSection));
 
   return sources + header_sections;
-END;  
+END;
     // those are actually included unconditionally...
   // self.death_cnt := count(dedup(SORT(L.death_child, RECORD), record));
-  // self.statedeath_cnt := count(dedup(SORT(L.state_death_child,RECORD),record));  
+  // self.statedeath_cnt := count(dedup(SORT(L.state_death_child,RECORD),record));
   // self.ak_cnt := count(dedup(SORT(L.ak_child, RECORD), record));
   // self.mswork_cnt := count(dedup(SORT(L.mswork_child, RECORD), record));
   // self.util_cnt := count(dedup(SORT(L.util_child, RECORD), record));

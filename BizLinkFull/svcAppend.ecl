@@ -17,6 +17,7 @@
 	boolean includeRecords := false : stored('include_records');
 	boolean isMarketing := false : stored('is_marketing');
 	boolean dnbFullRemove := false : stored('dnb_full_remove');
+	boolean do_segmentation := true : stored('do_segmentation');
 
 	defaultDataAccess := MODULE(doxie.IDataAccess) END;
 	typeof(Doxie.IDataAccess.glb) dataAccessGlb := defaultDataAccess.glb : stored('data_access_glb');
@@ -40,6 +41,7 @@
 		,useFuzzy := use_fuzzy
 		,doZipExpansion := do_zip_expansion
 		,reAppend := re_append
+		,segmentation := do_segmentation
 	);
 
 	// matchset has to be defined outside of macro call so that code will syntax check.
@@ -72,6 +74,8 @@
 		,useFuzzy := use_fuzzy
 		,weightThreshold := weight_threshold
 		,disableSaltForce := disable_salt_force
+		,segmentation := do_segmentation
+		,reAppend := re_append
 	);
 
 	withAppend := if(from_thor, withAppendThor, withAppendRoxie);

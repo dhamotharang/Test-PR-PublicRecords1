@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2;
+﻿IMPORT $, BIPV2, doxie;
 
 EXPORT Key_LinkIds := MODULE
 
@@ -32,11 +32,14 @@ EXPORT Key_LinkIds := MODULE
               string1 Level = BIPV2.IDconstants.Fetch_Level_DotID,
               unsigned2 ScoreThreshold = 0,
               joinLimit = 25000,
-              unsigned1 JoinType = BIPV2.IDconstants.JoinTypes.KeepJoin
+              unsigned1 JoinType = BIPV2.IDconstants.JoinTypes.KeepJoin,
+              doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END,
+              boolean append_contact = FALSE
               ) :=
        FUNCTION
 
-              BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, out, Level, joinLimit, JoinType);
+              BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, fetched, Level, joinLimit, JoinType);
+							$.mac_append_contact(fetched, out, mod_access, append_contact);
               return out;
 			END;
 END;

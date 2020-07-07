@@ -1,20 +1,20 @@
 ﻿/* TO BE DONE:
-   1. Future enhancement to further assist when new sources are added: 
-      a. Contact Vern about about adding all the source specific fields currently used 
+   1. Future enhancement to further assist when new sources are added:
+      a. Contact Vern about about adding all the source specific fields currently used
          to the POE base data file, so they are then included on the did key file.
-      b. Then revise steps 5 & 12 (and others?) to get the source specific fields from 
+      b. Then revise steps 5 & 12 (and others?) to get the source specific fields from
          the POE did key file.
 */
 
 // NOTE: POE is short for PlaceOfEmployment which is the former name of this product/project.
-// However the production POE keys were already built when it was decided to rename this 
+// However the production POE keys were already built when it was decided to rename this
 // product to WorkPlace, so the keys were left named as POE.
 
 IMPORT BatchShare, doxie, doxie_cbrs, MDR, POE, Suppress, ut, WorkPlace_Services, STD;
 
 string todays_date := (string) STD.Date.Today ();
 
-EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = FALSE) := FUNCTION 
+EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = FALSE) := FUNCTION
 
   // *** Stored soap input and temporary/internal constants
 	boolean IncludeSpouseAlways := false : STORED('IncludeSpouseAlways');
@@ -22,7 +22,7 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 	boolean IncludeCorp         := false : STORED('IncludeCorpInfo');
 	boolean IncludeSelfRepCompanyName := false : STORED('IncludeSelfRepCompanyName');
 
- 	string in_excluded_sources  := '' : stored('ExcludedSources'); 
+ 	string in_excluded_sources  := '' : stored('ExcludedSources');
 
   // ***************************************************************************
   // *** Main processing
@@ -36,18 +36,18 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
   layout_source := record
 	  string2 source;
 	end;
-	
-  ds_excluded_sources := 
+
+  ds_excluded_sources :=
 	   if(in_excluded_sources_edited = '',
 	      dataset([], layout_source),
 			  dataset(Std.Str.SplitWords(in_excluded_sources_edited, ','), layout_source));
 
 
-	// 1. Grab the input XML and throw into a dataset.	
-	ds_batch_in := IF(NOT useCannedRecs, 
-	                  BatchServices.file_inBatchMaster(), 
+	// 1. Grab the input XML and throw into a dataset.
+	ds_batch_in := IF(NOT useCannedRecs,
+	                  BatchServices.file_inBatchMaster(),
 	                  BatchServices._Sample_inBatchMaster('WP'));
- 
+
   // 2. Do a project with transform to convert any lower case input to upper case.
   BatchShare.MAC_CapitalizeInput(ds_batch_in, ds_batch_in_caps);
   // 3. Get the DID(s) associated with each input record.
@@ -65,11 +65,11 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 		ds_acctnos_dids_appended.acctno;
     did_count := COUNT(GROUP);
   END;
-	
+
 	ds_acctnos_dids_table := table(ds_acctnos_dids_appended,layout_dids_count,acctno,few);
   ds_acctnos_w1did      := ds_acctnos_dids_table(did_count<=WorkPlace_Constants.Limits.DID_LIMIT);
 
-  // 3.2.2 Join all acctnos with dids appended to those with just 1 did per acctno to 
+  // 3.2.2 Join all acctnos with dids appended to those with just 1 did per acctno to
 	//       remove any acctnos with more than 1 did or with no did.
 	ds_acctnos_dids_good := join(ds_acctnos_w1did,ds_acctnos_dids_appended,
 	                               left.acctno = right.acctno,
@@ -77,16 +77,16 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 													     left outer, // keep all the recs from the left ds
 													     atmost(WorkPlace_Constants.Limits.JOIN_LIMIT));
 
-  // 3.3 Sort/dedup on did in case same person input more than once and 
+  // 3.3 Sort/dedup on did in case same person input more than once and
 	//    to reduce number of lookups against the POE did key file later.
   //    We will re-attach all acctnos back to the dids later.
   ds_dids_deduped := dedup(sort(ds_acctnos_dids_good,did),did);
 
-	// 3.4 Project the resulting deduped subject dids with a transform to put into a 
+	// 3.4 Project the resulting deduped subject dids with a transform to put into a
 	//     common poe did key lookup layout and set the correct spouse_indicator.
-	// NOTE: the spouse_indicator only indicates if the record is a spouse record, 
+	// NOTE: the spouse_indicator only indicates if the record is a spouse record,
 	// not if a spouse was found for the subject/did.
-  ds_subject_dids := project(ds_dids_deduped, 
+  ds_subject_dids := project(ds_dids_deduped,
 	                           transform(WorkPlace_Layouts.POE_lookup,
 															 self.acctno           := left.acctno,
 															 self.lookupDid        := left.did,
@@ -102,16 +102,16 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
   ds_dids_spousein := if(IncludeSpouseAlways or IncludeSpouseOnly,
                          project(ds_dids_deduped,WorkPlace_Layouts.subjectSpouse));
 	ds_spouse_acctnos_dids := WorkPlace_Functions.getSpouseDidBatch(ds_dids_spousein);
-  
-  // 4.2 Sort/dedup all the spouse dids by did to reduce number of lookups against 
+
+  // 4.2 Sort/dedup all the spouse dids by did to reduce number of lookups against
 	//     the POE did key file later.
   //     We will re-attach all acctnos back to the spouse dids later.
-	ds_spouse_dids_deduped := dedup(sort(ds_spouse_acctnos_dids(spousedid<>0), spousedid), 
+	ds_spouse_dids_deduped := dedup(sort(ds_spouse_acctnos_dids(spousedid<>0), spousedid),
 	                                spousedid);
 
-  // 4.3 Project the resulting deduped spouse dids with a transform to put into a 
+  // 4.3 Project the resulting deduped spouse dids with a transform to put into a
 	//     common poe key did lookup layout and set the correct spouse_indicator.
-	ds_spouse_dids := project(ds_spouse_dids_deduped, 
+	ds_spouse_dids := project(ds_spouse_dids_deduped,
 	                          transform(WorkPlace_Layouts.POE_lookup,
 														  self.acctno           := left.acctno,
 															self.lookupDid        := left.spouseDid,
@@ -119,52 +119,52 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 															self.spouseDid        := left.spouseDid,
                               self.spouse_indicator := 'Y'));
 
-  // 5. Look up dids in the POE key did file to get all the fields needed for 
+  // 5. Look up dids in the POE key did file to get all the fields needed for
 	//    choosing a candidate record later.
 	//
-  // 5.1 Combine the unique subject dids and unique spouse dids into 1 dataset and 
-	//     then sort and dedup by lookup did in case 1 subject did is another 
+  // 5.1 Combine the unique subject dids and unique spouse dids into 1 dataset and
+	//     then sort and dedup by lookup did in case 1 subject did is another
 	//     subject's spouse did.
 	ds_combined_dids_sorted := dedup(sort(ds_subject_dids + ds_spouse_dids,lookupdid),lookupdid);
 
   // 5.2 Join the ds of unique combined dids with POE key did file, transforming the
-	//     full did key layout into a slimmmed format of just the fields needed for 
+	//     full did key layout into a slimmmed format of just the fields needed for
 	//     choosing a candidate record below.
-	
+
 	ds_poe_recs := WorkPlace_Services.Functions.getPoeRecs(ds_combined_dids_sorted, mod_access);
-	
-	// Bring back to the slimmed POE layout													 
-	ds_poe_recs_slimmed:= PROJECT(ds_poe_recs, WorkPlace_Layouts.poe_didkey_slimmed);													 
-	
+
+	// Bring back to the slimmed POE layout
+	ds_poe_recs_slimmed:= PROJECT(ds_poe_recs, WorkPlace_Layouts.poe_didkey_slimmed);
+
 	//     Join the ds of unique combined dids with PSS key did file, transforming the
-	//     full did key layout into a slimmmed format of just the fields needed for 
+	//     full did key layout into a slimmmed format of just the fields needed for
 	//     choosing a candidate record below.
 	ds_PSS_Results	:=	WorkPlace_Services.Functions.getPSSRecs(ds_combined_dids_sorted);
-		
+
 	// Bring back to the slimmed PSS layout
 	ds_PSS_Results_Slim	:=	PROJECT(ds_PSS_Results,BatchServices.WorkPlace_Layouts.POE_DIDKey_Slimmed);
-	
+
 	//		 If POE data exists get PAW data else SKIP.
 	//     Join the ds of unique combined dids with PAW key did file, transforming the
-	//     full did key layout into a slimmmed format of just the fields needed for 
+	//     full did key layout into a slimmmed format of just the fields needed for
 	//     choosing a candidate record below.
-	
+
 	//     Get PAW data only for the dids with POE data.
 	ds_paw_recs	:=	WorkPlace_Services.Functions.getPawRecs(ds_poe_recs,mod_access);
-	
+
 	// Bring back to the slimmed PAW layout
 	ds_paw_recs_slimmed:= PROJECT(ds_paw_recs,BatchServices.WorkPlace_Layouts.POE_DIDKey_Slimmed);
-	
-  // 7.1 Combine POE, PSS & PAW slimmed recs into 1 dataset here and 
+
+  // 7.1 Combine POE, PSS & PAW slimmed recs into 1 dataset here and
 	//     join to POE source_hierarchy key file to assign the source_order.
 	ds_combine_sources	:=	ds_poe_recs_slimmed	+	ds_PSS_Results_Slim + ds_paw_recs_slimmed;
-	
+
 	ds_all_recs_slimmed := join(ds_combine_sources,
 	                            POE.Keys().source_hierarchy.qa,
 															keyed(left.source = right.source),
 	                            transform(WorkPlace_Layouts.poe_didkey_slimmed,
 															  // get source_order from the right key file
-																self.source_order := RIGHT.source_order, 
+																self.source_order := RIGHT.source_order,
 																// keep the rest of fields from left
                                 self              := left),
 												      LEFT OUTER); // keep left record in case no match to right key file
@@ -196,7 +196,7 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 	//
   // 9.0.1 Project ds onto the layout expected by the clean/add functions.
   ds_all_recs_pulled_projtd := project(ds_all_recs_pulled,
-	                                     WorkPlace_Services.Layouts.poe_didkey_plus);	
+	                                     WorkPlace_Services.Layouts.poe_didkey_plus);
 
 	// 9.0.2 Try to add any missing company info using the business-header best file.
   ds_all_recs_bhbest_added := WorkPlace_Functions.AddBestInfo(ds_all_recs_pulled_projtd);
@@ -207,43 +207,43 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 	// 9.0.4 Remove company_names with only invalid terms.
 	ds_all_recs_cname_cleaned := WorkPlace_Functions.CleanCompName(ds_all_recs_phones_cleaned, IncludeSelfRepCompanyName);
 
-	ds_all_recs_gongcomp := 
-     	 WorkPlace_Services.Functions.getCompInfoFromGong(ds_all_recs_cname_cleaned);	
-	
-	// 10.1 Sort/dedup on non-zero bdids to reduce the number of lookups against the gong key.
-	 ds_all_recs_gongphone := 
-     	 WorkPlace_Services.Functions.getPhoneFromGong(ds_all_recs_gongcomp);	
+	ds_all_recs_gongcomp :=
+     	 WorkPlace_Services.Functions.getCompInfoFromGong(ds_all_recs_cname_cleaned, mod_access);
 
-  // 10.4 If no gong phone found, try getting phone# from the yellow pages. 
+	// 10.1 Sort/dedup on non-zero bdids to reduce the number of lookups against the gong key.
+	 ds_all_recs_gongphone :=
+     	 WorkPlace_Services.Functions.getPhoneFromGong(ds_all_recs_gongcomp, mod_access);
+
+  // 10.4 If no gong phone found, try getting phone# from the yellow pages.
 	//      Sort/dedup on non-zero bdids and empty phone2 to reduce the number
 	//      of lookups against the yellow pages key bdid file.
-	ds_all_recs_ypphone :=	 
+	ds_all_recs_ypphone :=
 	     WorkPlace_Services.Functions.getPhoneFromYP(ds_all_recs_gongphone);
-	
+
 	// 10.7 Show only phone numbers which do not exist in PSS or that match the criteria of phone status = A and is in the 30 day window
 	// Check company phone1 to see if it fits the criteria for valid phone
-		
+
 			dSuppressBadPhones	:=	Workplace_Services.Functions.SuppressPhones(ds_all_recs_ypphone);
-	
-	
-  // 11. Identify the 1 most complete/best candidate record to use for each did and 
+
+
+  // 11. Identify the 1 most complete/best candidate record to use for each did and
 	//     optionally keep up to 4 additional/history recs.
   //
 	// 11.1 First filter to only use "complete" info recs, which according to the product
-	//      specs are those records with a non-blank company_name and at least 1 non-blank 
+	//      specs are those records with a non-blank company_name and at least 1 non-blank
 	//      company phone.
 	//      Also use "corp" source recs if that option was selected and use all
 	//      other non-corp sources regardless of the IncludeCorp option.
 	ds_all_recs_cleaned_projtd := PROJECT(dSuppressBadPhones,
-   	                                      BatchServices.WorkPlace_Layouts.poe_didkey_slimmed);	
-	
+   	                                      BatchServices.WorkPlace_Layouts.poe_didkey_slimmed);
+
   ds_most_complete_all	:=	ds_all_recs_cleaned_projtd(	company_name	<>	''	and	// need a comp name
 																												company_phone1<>	''	and	// need a phone
 																												(IncludeCorp	OR	~MDR.sourceTools.SourceIsCorpV2(source))	// include corp
 																											);  // if not include corp, include all other sources
 
 	// 11.2 Sort all complete records by:
-	//      did, descending dt_last_seen & source_code order to 
+	//      did, descending dt_last_seen & source_code order to
 	//      identify the "most current" record in source order for each did.
 	ds_most_complete_srtd := sort(ds_most_complete_all,
 	                              did, -dt_last_seen, source_order,record);
@@ -251,11 +251,11 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
   // 11.3 Then dedup by did to only keep the 1 most current record for each did.
   ds_most_current1 := dedup(ds_most_complete_srtd(~from_PAW), did);
 
-  // 11.4.1 Match all complete recs for a did to the most current one for a did to keep 
-	//        any recs for a did that have the same bdid/company name & phone1 as the 
+  // 11.4.1 Match all complete recs for a did to the most current one for a did to keep
+	//        any recs for a did that have the same bdid/company name & phone1 as the
 	//        most current one and are within 14 days of the most current dt_last_seen.
   ds_best_recs_for_did := join(ds_most_complete_srtd(~from_PAW),ds_most_current1,
-	                             left.did = right.did                            and 
+	                             left.did = right.did                            and
 	                             // check for bdids the same in case company names are slightly different
 	                             ((left.bdid !=0 and left.bdid = right.bdid) or
 													      left.company_name = right.company_name)        and
@@ -269,7 +269,7 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 													     inner, // only keep recs from left that match right on join conditions
 												       limit(WorkPlace_Constants.Limits.JOIN_LIMIT));
 
-  // 11.4.2 Sort the best recs for a did in ascending source_order and then 
+  // 11.4.2 Sort the best recs for a did in ascending source_order and then
 	//        dedup to only keep the 1 best candidate (lowest source_order) for the did.
 	ds_best1_for_did := dedup(sort(ds_best_recs_for_did,
 	                               did, source_order, -dt_last_seen, record), did);
@@ -278,17 +278,17 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 	//
 	// 11.5.1 If IncludeCorpInfo option was set on:
 	//        1. sort/dedup on non-zero bdids (to reduce the number of lookups),
-	//        2. then project onto appropriate layout and 
+	//        2. then project onto appropriate layout and
 	//        3. call a function to get the status.
   ds_best1_for_did_bdids_cs := if(IncludeCorp,
 	                                  WorkPlace_Functions.getCorpStatus(
-																	    dedup(sort(project(ds_best1_for_did(bdid!=0), 
-																			                   doxie_cbrs.layout_references), 
+																	    dedup(sort(project(ds_best1_for_did(bdid!=0),
+																			                   doxie_cbrs.layout_references),
 																								 bdid), bdid)),
-																		//else output an empty ds 
+																		//else output an empty ds
 																    dataset([], WorkPlace_Layouts.bdids_corpstat));
-  
-  // 11.5.2 Join the bdids with a corp status back to the ds of 1 bestfor did records 
+
+  // 11.5.2 Join the bdids with a corp status back to the ds of 1 bestfor did records
 	//        to attach the corp status to them.
 	ds_best1_for_did_wcs := join(ds_best1_for_did, ds_best1_for_did_bdids_cs,
 				                         left.bdid=right.bdid,
@@ -298,7 +298,7 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
                                  // Rest of the fields, keep the ones from the left ds
                                  self             := left),
 											         left outer,  // keep all the recs from the left ds
-												       atmost(WorkPlace_Constants.Limits.JOIN_LIMIT)); 
+												       atmost(WorkPlace_Constants.Limits.JOIN_LIMIT));
 
   // 11.6 Get optional additional/history info
 	//
@@ -306,25 +306,25 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 	//        1. recs for any royalty sources because they are not to be included.
 	ds_most_complete_fltrd := ds_most_complete_srtd(source not in WorkPlace_Constants.WP_ROYALTY_SOURCE_SET);
 
-  // 11.6.2 Next sort/dedup the filtered recs to only keep the recs with a  
+  // 11.6.2 Next sort/dedup the filtered recs to only keep the recs with a
 	//        unique company_name for each did
   ds_most_complete_unique := dedup(sort(ds_most_complete_fltrd,
 		                                    did, company_name, from_PAW, -dt_last_seen, source_order, record),
 	                                 did, company_name);
 
-  // 11.6.3 Next do a left only join to remove the best rec for each did  
+  // 11.6.3 Next do a left only join to remove the best rec for each did
 	//        from the ds with all the potential additional/history recs.
   ds_most_complete_addl := join(ds_most_complete_unique,ds_best1_for_did,
-	                                  left.did              = right.did and 
-															      left.dt_last_seen     = right.dt_last_seen and 
-															      left.source_order     = right.source_order,  
+	                                  left.did              = right.did and
+															      left.dt_last_seen     = right.dt_last_seen and
+															      left.source_order     = right.source_order,
 															    transform(WorkPlace_Layouts.poe_didkey_slimmed,
 															      self := left),
 															    left only, // keep left recs with no match in right ds
 															    atmost(WorkPlace_Constants.Limits.JOIN_LIMIT)
 												         );
 
-  // 11.6.4 Next sort/dedup the remaining recs to keep the 4 next most current recs 
+  // 11.6.4 Next sort/dedup the remaining recs to keep the 4 next most current recs
 	//        for each did.
   ds_addl_4recs := dedup(sort(ds_most_complete_addl,
 		                          did, -dt_last_seen, source_order, from_PAW, record),
@@ -336,17 +336,17 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 	//
 	// 11.7.1 If IncludeCorpInfo option was set on:
 	//        1. sort/dedup on non-zero bdids (to reduce the number of lookups),
-	//        2. then project onto appropriate layout and 
+	//        2. then project onto appropriate layout and
 	//        3. call a function to get the status.
   ds_addl_4recs_bdids_corpstat := if(IncludeCorp,
 	                                  WorkPlace_Functions.getCorpStatus(
-																	    dedup(sort(project(ds_addl_4recs(bdid!=0), 
-																			                   doxie_cbrs.layout_references), 
+																	    dedup(sort(project(ds_addl_4recs(bdid!=0),
+																			                   doxie_cbrs.layout_references),
 																								 bdid), bdid)),
-																		//else output an empty ds 
+																		//else output an empty ds
 																    dataset([], WorkPlace_Layouts.bdids_corpstat));
 
-  // 11.7.2 Join the bdids with a corp status back to the ds of addl/hist records 
+  // 11.7.2 Join the bdids with a corp status back to the ds of addl/hist records
 	//        to attach the corp status to them.
 	ds_addl_4recs_wcorpstat := join(ds_addl_4recs, ds_addl_4recs_bdids_corpstat,
 				                            left.bdid=right.bdid,
@@ -361,80 +361,80 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 
  	// 11.7.3 Combine up to 4 addl/hist recs for each did into a single layout to assist
 	//        in joining later.
-	BatchServices.WorkPlace_Layouts.addl_info_slimmed 
+	BatchServices.WorkPlace_Layouts.addl_info_slimmed
 	        xform_roll_addl(WorkPlace_Layouts.poe_didkey_slimmed L,
 					                dataset(WorkPlace_Layouts.poe_didkey_slimmed) RL) := transform
 		self.did                       := L.did;
-	  self.addl_wpl_bdid_1           := IF(L.bdid != 0,(string) L.bdid,'') ; 
+	  self.addl_wpl_bdid_1           := IF(L.bdid != 0,(string) L.bdid,'') ;
     self.addl_wpl_comp_name_1      := L.company_name;
 		self.addl_wpl_comp_address1_1  := L.company_address;
     self.addl_wpl_comp_city_1      := L.company_city;
     self.addl_wpl_comp_state_1     := L.company_state;
     self.addl_wpl_comp_zip_1       := L.company_zip;
-    self.addl_wpl_phone1_1         := L.company_phone1; 
-    self.addl_wpl_phone2_1         := L.company_phone2; 
-		self.addl_wpl_status_1         := L.company_status; 
+    self.addl_wpl_phone1_1         := L.company_phone1;
+    self.addl_wpl_phone2_1         := L.company_phone2;
+		self.addl_wpl_status_1         := L.company_status;
     self.addl_wpl_last_seen_date_1 := (string) L.dt_last_seen;
-	  self.addl_wpl_bdid_2           := IF(RL[2].bdid != 0,(string) RL[2].bdid,''); 
+	  self.addl_wpl_bdid_2           := IF(RL[2].bdid != 0,(string) RL[2].bdid,'');
     self.addl_wpl_comp_name_2      := RL[2].company_name;
 		self.addl_wpl_comp_address1_2  := RL[2].company_address;
     self.addl_wpl_comp_city_2      := RL[2].company_city;
     self.addl_wpl_comp_state_2     := RL[2].company_state;
     self.addl_wpl_comp_zip_2       := RL[2].company_zip;
-    self.addl_wpl_phone1_2         := RL[2].company_phone1; 
+    self.addl_wpl_phone1_2         := RL[2].company_phone1;
     self.addl_wpl_phone2_2         := RL[2].company_phone2;
     self.addl_wpl_status_2         := RL[2].company_status;
     self.addl_wpl_last_seen_date_2 := (string) RL[2].dt_last_seen;
-		self.addl_wpl_bdid_3           := IF(RL[3].bdid != 0,(string) RL[3].bdid,''); 
+		self.addl_wpl_bdid_3           := IF(RL[3].bdid != 0,(string) RL[3].bdid,'');
 		self.addl_wpl_comp_name_3      := RL[3].company_name;
 		self.addl_wpl_comp_address1_3  := RL[3].company_address;
 		self.addl_wpl_comp_city_3      := RL[3].company_city;
 		self.addl_wpl_comp_state_3     := RL[3].company_state;
 		self.addl_wpl_comp_zip_3       := RL[3].company_zip;
-		self.addl_wpl_phone1_3         := RL[3].company_phone1; 
+		self.addl_wpl_phone1_3         := RL[3].company_phone1;
 		self.addl_wpl_phone2_3         := RL[3].company_phone2;
 		self.addl_wpl_status_3         := RL[3].company_status;
 		self.addl_wpl_last_seen_date_3 := (string) RL[3].dt_last_seen;
-		self.addl_wpl_bdid_4           := IF(RL[4].bdid != 0,(string) RL[4].bdid,''); 
+		self.addl_wpl_bdid_4           := IF(RL[4].bdid != 0,(string) RL[4].bdid,'');
 		self.addl_wpl_comp_name_4      := RL[4].company_name;
 		self.addl_wpl_comp_address1_4  := RL[4].company_address;
 		self.addl_wpl_comp_city_4      := RL[4].company_city;
 		self.addl_wpl_comp_state_4     := RL[4].company_state;
 		self.addl_wpl_comp_zip_4       := RL[4].company_zip;
-		self.addl_wpl_phone1_4         := RL[4].company_phone1; 
+		self.addl_wpl_phone1_4         := RL[4].company_phone1;
 		self.addl_wpl_phone2_4         := RL[4].company_phone2;
 		self.addl_wpl_status_4         := RL[4].company_status;
 		self.addl_wpl_last_seen_date_4 := (string) RL[4].dt_last_seen;
 	end;
-	
+
   ds_addl_combined := rollup(group(sort(ds_addl_4recs_wcorpstat,
 	                                      did, from_PAW, -dt_last_seen, source_order, record),
 																	 did),
 														 group,
 														 xform_roll_addl(left,rows(left)));
 
-  // 12. Get the detailed POE indivdual source data for each 1 best for did record.	
-	// Get the detailed data from all the sources and email addresses.	
+  // 12. Get the detailed POE indivdual source data for each 1 best for did record.
+	// Get the detailed data from all the sources and email addresses.
 	ds_detail_w_email:= WorkPlace_Services.Functions.getDetailedWithEmail(ds_best1_for_did_wcs, mod_access);
-	
+
 
   // 13. Get parent company info.
-	ds_detail_wpar_corpstat:= WorkPlace_Services.Functions.getParentCompany(ds_detail_w_email, IncludeCorp);		
+	ds_detail_wpar_corpstat:= WorkPlace_Services.Functions.getParentCompany(ds_detail_w_email, IncludeCorp);
 
 
   // 15 Get any Professional License data.
 	temp_detail_wprolic:= WorkPlace_Services.Functions.getProfLicInfo(ds_detail_wpar_corpstat, mod_access);
-	
+
 	ds_detail_wprolic:= PROJECT(temp_detail_wprolic,
 																TRANSFORM(WorkPlace_Layouts.final,
 																					self.did            := (string) left.did,
 																					self.company_bdid   := (string) left.bdid,
-																					self.date_last_seen := (string) left.dt_last_seen,														
+																					self.date_last_seen := (string) left.dt_last_seen,
 																					self                := left));
 
   // 17. Split detail records with extra info into separate subject and spouse datasets.
 	//
-	// 17.1 Join all the detail recs with parent co info, prof lic & email info added to 
+	// 17.1 Join all the detail recs with parent co info, prof lic & email info added to
 	//      the subject dids to create subject only records.
 	ds_detail_subject := join(ds_subject_dids,ds_detail_wprolic,
 	                            left.lookupdid = (unsigned6) right.did,
@@ -451,49 +451,49 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 																	transform(WorkPlace_Layouts.final,
 																		// assign hist fields from right
 																		self.did := left.did,
-																		self.addl_wpl_bdid_1           := RIGHT.addl_wpl_bdid_1, 
+																		self.addl_wpl_bdid_1           := RIGHT.addl_wpl_bdid_1,
 																		self.addl_wpl_comp_name_1      := RIGHT.addl_wpl_comp_name_1,
 																		self.addl_wpl_comp_address1_1  := RIGHT.addl_wpl_comp_address1_1,
 																		self.addl_wpl_comp_city_1      := RIGHT.addl_wpl_comp_city_1,
 																		self.addl_wpl_comp_state_1     := RIGHT.addl_wpl_comp_state_1,
 																		self.addl_wpl_comp_zip_1       := RIGHT.addl_wpl_comp_zip_1,
-																		self.addl_wpl_phone1_1         := RIGHT.addl_wpl_phone1_1, 
-																		self.addl_wpl_phone2_1         := RIGHT.addl_wpl_phone2_1, 
-																		self.addl_wpl_status_1         := RIGHT.addl_wpl_status_1, 
-																		self.addl_wpl_bdid_2           := RIGHT.addl_wpl_bdid_2, 
+																		self.addl_wpl_phone1_1         := RIGHT.addl_wpl_phone1_1,
+																		self.addl_wpl_phone2_1         := RIGHT.addl_wpl_phone2_1,
+																		self.addl_wpl_status_1         := RIGHT.addl_wpl_status_1,
+																		self.addl_wpl_bdid_2           := RIGHT.addl_wpl_bdid_2,
 																		self.addl_wpl_comp_name_2      := RIGHT.addl_wpl_comp_name_2,
 																		self.addl_wpl_comp_address1_2  := RIGHT.addl_wpl_comp_address1_2,
 																		self.addl_wpl_comp_city_2      := RIGHT.addl_wpl_comp_city_2,
 																		self.addl_wpl_comp_state_2     := RIGHT.addl_wpl_comp_state_2,
 																		self.addl_wpl_comp_zip_2       := RIGHT.addl_wpl_comp_zip_2,
-																		self.addl_wpl_phone1_2         := RIGHT.addl_wpl_phone1_2, 
+																		self.addl_wpl_phone1_2         := RIGHT.addl_wpl_phone1_2,
 																		self.addl_wpl_phone2_2         := RIGHT.addl_wpl_phone2_2,
 																		self.addl_wpl_status_2         := RIGHT.addl_wpl_status_2,
-																		self.addl_wpl_bdid_3           := RIGHT.addl_wpl_bdid_3, 
+																		self.addl_wpl_bdid_3           := RIGHT.addl_wpl_bdid_3,
 																		self.addl_wpl_comp_name_3      := RIGHT.addl_wpl_comp_name_3,
 																		self.addl_wpl_comp_address1_3  := RIGHT.addl_wpl_comp_address1_3,
 																		self.addl_wpl_comp_city_3      := RIGHT.addl_wpl_comp_city_3,
 																		self.addl_wpl_comp_state_3     := RIGHT.addl_wpl_comp_state_3,
 																		self.addl_wpl_comp_zip_3       := RIGHT.addl_wpl_comp_zip_3,
-																		self.addl_wpl_phone1_3         := RIGHT.addl_wpl_phone1_3, 
+																		self.addl_wpl_phone1_3         := RIGHT.addl_wpl_phone1_3,
 																		self.addl_wpl_phone2_3         := RIGHT.addl_wpl_phone2_3,
 																		self.addl_wpl_status_3         := RIGHT.addl_wpl_status_3,
-																		self.addl_wpl_bdid_4           := RIGHT.addl_wpl_bdid_4, 
+																		self.addl_wpl_bdid_4           := RIGHT.addl_wpl_bdid_4,
 																		self.addl_wpl_comp_name_4      := RIGHT.addl_wpl_comp_name_4,
 																		self.addl_wpl_comp_address1_4  := RIGHT.addl_wpl_comp_address1_4,
 																		self.addl_wpl_comp_city_4      := RIGHT.addl_wpl_comp_city_4,
 																		self.addl_wpl_comp_state_4     := RIGHT.addl_wpl_comp_state_4,
 																		self.addl_wpl_comp_zip_4       := RIGHT.addl_wpl_comp_zip_4,
-																		self.addl_wpl_phone1_4         := RIGHT.addl_wpl_phone1_4, 
+																		self.addl_wpl_phone1_4         := RIGHT.addl_wpl_phone1_4,
 																		self.addl_wpl_phone2_4         := RIGHT.addl_wpl_phone2_4,
 																		self.addl_wpl_status_4         := RIGHT.addl_wpl_status_4,
 																		// assign rest of fields from left
 																		self := left),
 																	left outer, // keep all recs from left whether they have hist or not
 																	limit(WorkPlace_Constants.Limits.JOIN_LIMIT)
-																	); 
+																	);
 
- 	// 17.3 Join all the detail recs with parent co info, prof lic & email info added to 
+ 	// 17.3 Join all the detail recs with parent co info, prof lic & email info added to
 	//      the spouse dids to create spouse only records.
 	ds_detail_spouse := join(ds_spouse_dids,ds_detail_wprolic,
 	                            left.lookupdid = (unsigned6) right.did,
@@ -530,58 +530,58 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
                               self.spouse_email3                 := right.email3,
 															self.spouse_email_src1             := right.email_src1,
                               self.spouse_email_src2             := right.email_src2,
-                              self.spouse_email_src3             := right.email_src3,															
+                              self.spouse_email_src3             := right.email_src3,
 															SELF:= []),
                             inner, // keep only recs that exist on both left & right
 											      limit(WorkPlace_Constants.Limits.JOIN_LIMIT));
- 
+
 	ds_detail_spouse_waddl := join(ds_detail_spouse,ds_addl_combined,
 														        left.spouse_did = (string) right.did,
 																	transform(WorkPlace_Layouts.final,
 																		// assign hist fields from right
 																		self.did 															:= LEFT.did,
 																		self.spouse_did            					  := LEFT.spouse_did,
-																		self.spouse_addl_wpl_bdid_1           := RIGHT.addl_wpl_bdid_1, 
+																		self.spouse_addl_wpl_bdid_1           := RIGHT.addl_wpl_bdid_1,
 																		self.spouse_addl_wpl_comp_name_1      := RIGHT.addl_wpl_comp_name_1,
 																		self.spouse_addl_wpl_comp_address1_1  := RIGHT.addl_wpl_comp_address1_1,
 																		self.spouse_addl_wpl_comp_city_1      := RIGHT.addl_wpl_comp_city_1,
 																		self.spouse_addl_wpl_comp_state_1     := RIGHT.addl_wpl_comp_state_1,
 																		self.spouse_addl_wpl_comp_zip_1       := RIGHT.addl_wpl_comp_zip_1,
-																		self.spouse_addl_wpl_phone1_1         := RIGHT.addl_wpl_phone1_1, 
-																		self.spouse_addl_wpl_phone2_1         := RIGHT.addl_wpl_phone2_1, 
-																		self.spouse_addl_wpl_status_1         := RIGHT.addl_wpl_status_1, 
-																		self.spouse_addl_wpl_bdid_2           := RIGHT.addl_wpl_bdid_2, 
+																		self.spouse_addl_wpl_phone1_1         := RIGHT.addl_wpl_phone1_1,
+																		self.spouse_addl_wpl_phone2_1         := RIGHT.addl_wpl_phone2_1,
+																		self.spouse_addl_wpl_status_1         := RIGHT.addl_wpl_status_1,
+																		self.spouse_addl_wpl_bdid_2           := RIGHT.addl_wpl_bdid_2,
 																		self.spouse_addl_wpl_comp_name_2      := RIGHT.addl_wpl_comp_name_2,
 																		self.spouse_addl_wpl_comp_address1_2  := RIGHT.addl_wpl_comp_address1_2,
 																		self.spouse_addl_wpl_comp_city_2      := RIGHT.addl_wpl_comp_city_2,
 																		self.spouse_addl_wpl_comp_state_2     := RIGHT.addl_wpl_comp_state_2,
 																		self.spouse_addl_wpl_comp_zip_2       := RIGHT.addl_wpl_comp_zip_2,
-																		self.spouse_addl_wpl_phone1_2         := RIGHT.addl_wpl_phone1_2, 
+																		self.spouse_addl_wpl_phone1_2         := RIGHT.addl_wpl_phone1_2,
 																		self.spouse_addl_wpl_phone2_2         := RIGHT.addl_wpl_phone2_2,
 																		self.spouse_addl_wpl_status_2         := RIGHT.addl_wpl_status_2,
-																		self.spouse_addl_wpl_bdid_3           := RIGHT.addl_wpl_bdid_3, 
+																		self.spouse_addl_wpl_bdid_3           := RIGHT.addl_wpl_bdid_3,
 																		self.spouse_addl_wpl_comp_name_3      := RIGHT.addl_wpl_comp_name_3,
 																		self.spouse_addl_wpl_comp_address1_3  := RIGHT.addl_wpl_comp_address1_3,
 																		self.spouse_addl_wpl_comp_city_3      := RIGHT.addl_wpl_comp_city_3,
 																		self.spouse_addl_wpl_comp_state_3     := RIGHT.addl_wpl_comp_state_3,
 																		self.spouse_addl_wpl_comp_zip_3       := RIGHT.addl_wpl_comp_zip_3,
-																		self.spouse_addl_wpl_phone1_3         := RIGHT.addl_wpl_phone1_3, 
+																		self.spouse_addl_wpl_phone1_3         := RIGHT.addl_wpl_phone1_3,
 																		self.spouse_addl_wpl_phone2_3         := RIGHT.addl_wpl_phone2_3,
 																		self.spouse_addl_wpl_status_3         := RIGHT.addl_wpl_status_3,
-																		self.spouse_addl_wpl_bdid_4           := RIGHT.addl_wpl_bdid_4, 
+																		self.spouse_addl_wpl_bdid_4           := RIGHT.addl_wpl_bdid_4,
 																		self.spouse_addl_wpl_comp_name_4      := RIGHT.addl_wpl_comp_name_4,
 																		self.spouse_addl_wpl_comp_address1_4  := RIGHT.addl_wpl_comp_address1_4,
 																		self.spouse_addl_wpl_comp_city_4      := RIGHT.addl_wpl_comp_city_4,
 																		self.spouse_addl_wpl_comp_state_4     := RIGHT.addl_wpl_comp_state_4,
 																		self.spouse_addl_wpl_comp_zip_4       := RIGHT.addl_wpl_comp_zip_4,
-																		self.spouse_addl_wpl_phone1_4         := RIGHT.addl_wpl_phone1_4, 
+																		self.spouse_addl_wpl_phone1_4         := RIGHT.addl_wpl_phone1_4,
 																		self.spouse_addl_wpl_phone2_4         := RIGHT.addl_wpl_phone2_4,
 																		self.spouse_addl_wpl_status_4         := RIGHT.addl_wpl_status_4,
 																	 	// assign rest of fields from left
 																		self := left),
 																	left outer, // keep all recs from left whether they have hist or not
-																	limit(WorkPlace_Constants.Limits.JOIN_LIMIT)); 
-																
+																	limit(WorkPlace_Constants.Limits.JOIN_LIMIT));
+
   // 18.1 Now join the detail subject recs back to the ds of all acctnos with one did to
 	//      re-attach the acctnos to the dids and so that the same output results are returned
 	//      if the same input criteria was entered more than once with different acctnos.
@@ -607,29 +607,29 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 																	 self := left),
 												         left outer,  // keep all form left
 												         limit(WorkPlace_Constants.Limits.JOIN_LIMIT,skip));
- 
+
   // 19.1 Sort detail subject with acctno in acctno order for joining below.
 	//      Also dedup in case some prior join created more than 1 record for an  acctno.
 	ds_detail_subj_wacctno_srtd := dedup(sort(ds_detail_subj_wacctno,acctno),acctno);
-	
+
   // 19.2 Sort detail spouse with acctno in acctno order for joining below.
 	//      Also dedup in case some prior join created more than 1 record for an acctno.
 	ds_detail_spos_wacctno_srtd := dedup(sort(ds_detail_spos_wacctno,acctno),acctno);
 
-  // 20. Next join the subject & spouse sorted datasets on acctno to combine  
+  // 20. Next join the subject & spouse sorted datasets on acctno to combine
 	//     subject and optional spouse data for each acctno onto the same record.
 	ds_detail_combined := join(ds_detail_subj_wacctno_srtd, ds_detail_spos_wacctno_srtd,
 													     left.acctno = right.acctno,
 	                           transform(WorkPlace_Layouts.final,
-														     // Assign subject & spouse fields depending on the 
+														     // Assign subject & spouse fields depending on the
 																 // input inlcude spouse options and existence of left
 																 // (subject) or right (spouse) record for the acctno.
 																 // Assign spouse fields first if the appropriate
 																 // condition exists.
-																 // NOTE: only assigning fields currently being used, 
+																 // NOTE: only assigning fields currently being used,
 																 // not any fields marked as "reserved for future use"
-				                         boolean output_spouse := if(IncludeSpouseAlways or 
-																                             (IncludeSpouseOnly and 
+				                         boolean output_spouse := if(IncludeSpouseAlways or
+																                             (IncludeSpouseOnly and
 																														  left.did <> right.did),
 																										         true,false);
 			                           self.spouse_source          := if(output_spouse, right.spouse_source,''),
@@ -669,7 +669,7 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 																 self.spouse_addl_wpl_comp_city_1      := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_city_1, ''),
 																 self.spouse_addl_wpl_comp_state_1     := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_state_1, ''),
 																 self.spouse_addl_wpl_comp_zip_1       := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_zip_1, ''),
-																 self.spouse_addl_wpl_phone1_1         := IF(output_spouse, RIGHT.spouse_addl_wpl_phone1_1, ''), 
+																 self.spouse_addl_wpl_phone1_1         := IF(output_spouse, RIGHT.spouse_addl_wpl_phone1_1, ''),
 																 self.spouse_addl_wpl_phone2_1         := IF(output_spouse, RIGHT.spouse_addl_wpl_phone2_1, ''),
 																 self.spouse_addl_wpl_status_1         := IF(output_spouse, RIGHT.spouse_addl_wpl_status_1, ''),
 																 self.spouse_addl_wpl_bdid_2           := IF(output_spouse, RIGHT.spouse_addl_wpl_bdid_2, ''),
@@ -678,39 +678,39 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 																 self.spouse_addl_wpl_comp_city_2      := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_city_2, ''),
 																 self.spouse_addl_wpl_comp_state_2     := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_state_2, ''),
 																 self.spouse_addl_wpl_comp_zip_2       := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_zip_2, ''),
-																 self.spouse_addl_wpl_phone1_2         := IF(output_spouse, RIGHT.spouse_addl_wpl_phone1_2, ''), 
+																 self.spouse_addl_wpl_phone1_2         := IF(output_spouse, RIGHT.spouse_addl_wpl_phone1_2, ''),
 																 self.spouse_addl_wpl_phone2_2         := IF(output_spouse, RIGHT.spouse_addl_wpl_phone2_2, ''),
 																 self.spouse_addl_wpl_status_2         := IF(output_spouse, RIGHT.spouse_addl_wpl_status_2, ''),
-																 self.spouse_addl_wpl_bdid_3           := IF(output_spouse, RIGHT.spouse_addl_wpl_bdid_3, ''), 
+																 self.spouse_addl_wpl_bdid_3           := IF(output_spouse, RIGHT.spouse_addl_wpl_bdid_3, ''),
 																 self.spouse_addl_wpl_comp_name_3      := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_name_3, ''),
 																 self.spouse_addl_wpl_comp_address1_3  := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_address1_3, ''),
 																 self.spouse_addl_wpl_comp_city_3      := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_city_3, ''),
 																 self.spouse_addl_wpl_comp_state_3     := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_state_3, ''),
 																 self.spouse_addl_wpl_comp_zip_3       := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_zip_3, ''),
-																 self.spouse_addl_wpl_phone1_3         := IF(output_spouse, RIGHT.spouse_addl_wpl_phone1_3, ''), 
+																 self.spouse_addl_wpl_phone1_3         := IF(output_spouse, RIGHT.spouse_addl_wpl_phone1_3, ''),
 																 self.spouse_addl_wpl_phone2_3         := IF(output_spouse, RIGHT.spouse_addl_wpl_phone2_3, ''),
 																 self.spouse_addl_wpl_status_3         := IF(output_spouse, RIGHT.spouse_addl_wpl_status_3, ''),
-																 self.spouse_addl_wpl_bdid_4           := IF(output_spouse, RIGHT.spouse_addl_wpl_bdid_4, ''), 
+																 self.spouse_addl_wpl_bdid_4           := IF(output_spouse, RIGHT.spouse_addl_wpl_bdid_4, ''),
 																 self.spouse_addl_wpl_comp_name_4      := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_name_4, ''),
 																 self.spouse_addl_wpl_comp_address1_4  := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_address1_4, ''),
 																 self.spouse_addl_wpl_comp_city_4      := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_city_4, ''),
 																 self.spouse_addl_wpl_comp_state_4     := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_state_4, ''),
 																 self.spouse_addl_wpl_comp_zip_4       := IF(output_spouse, RIGHT.spouse_addl_wpl_comp_zip_4, ''),
-																 self.spouse_addl_wpl_phone1_4         := IF(output_spouse, RIGHT.spouse_addl_wpl_phone1_4, ''), 
+																 self.spouse_addl_wpl_phone1_4         := IF(output_spouse, RIGHT.spouse_addl_wpl_phone1_4, ''),
 																 self.spouse_addl_wpl_phone2_4         := IF(output_spouse, RIGHT.spouse_addl_wpl_phone2_4, ''),
 																 self.spouse_addl_wpl_status_4         := IF(output_spouse, RIGHT.spouse_addl_wpl_status_4, ''),
-																 
-                                 // handle the case where there is only spouse (right) 
+
+                                 // handle the case where there is only spouse (right)
 																 // and no subject (left) data.
 			                           self.acctno := if(left.acctno<>'',left.acctno,right.acctno),
 			                           self.did    := if(left.did<>'',left.did,right.did),
 																 // assign subject fields from left
 																 self        := left
-													     ), 
+													     ),
 												       full outer, // keep all the recs from the left & right ds
 													     limit(WorkPlace_Constants.Limits.JOIN_LIMIT));
 
-  // 21. Finally, join the input ds to the sorted combined recs with all the output 
+  // 21. Finally, join the input ds to the sorted combined recs with all the output
 	//     data to put the input fields in the final output.
 	ds_final_results       := join(ds_batch_in_caps, ds_detail_combined,
 		                               left.acctno = right.acctno,
@@ -757,7 +757,7 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 	//OUTPUT(IncludeCorp,              NAMED('ds_batch_IC'));
  	//OUTPUT(in_excluded_sources,      NAMED('in_excluded_sources'));
  	//OUTPUT(in_excluded_sources_edited, NAMED('in_excluded_sources_edited'));
-  //OUTPUT(ds_excluded_sources,      NAMED('ds_excluded_sources'));	
+  //OUTPUT(ds_excluded_sources,      NAMED('ds_excluded_sources'));
 	//OUTPUT(ds_batch_in,              NAMED('ds_batch_in'));
 	//OUTPUT(ds_batch_in_caps,         NAMED('ds_batch_in_caps'));
 	//OUTPUT(ds_acctnos_dids_appended, NAMED('ds_acctnos_dids_appended'));
@@ -769,12 +769,12 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
   //OUTPUT(ds_dids_spousein,         NAMED('ds_dids_spousein'));
 	//OUTPUT(ds_spouse_acctnos_dids,   NAMED('ds_spouse_acctnos_dids'));
 	//OUTPUT(ds_spouse_dids_deduped,   NAMED('ds_spouse_dids_deduped'));
-	//OUTPUT(ds_spouse_dids,           NAMED('ds_spouse_dids')); 
+	//OUTPUT(ds_spouse_dids,           NAMED('ds_spouse_dids'));
 	//OUTPUT(ds_combined_dids_sorted,  NAMED('ds_combined_dids_sorted'));
   //OUTPUT(ds_poe_recs_slimmed,      NAMED('ds_poe_recs_slimmed'));
 	//OUTPUT(dPSSResults,						 NAMED('dPSSResults'));
 	//OUTPUT(dPSSResultsDedup,				 NAMED('dPSSResultsDedup'));
-	
+
 	//OUTPUT(ds_dids_for_best_in,      NAMED('ds_dids_for_best_in'));
 	//OUTPUT(ds_best_outfile,          NAMED('ds_best_out'));
   //OUTPUT(ds_dids_ssns,             NAMED('ds_dids_ssns'));
@@ -803,7 +803,7 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 	//OUTPUT(dSuppressBadPhone1,			 NAMED('dSuppressBadPhone1'));
 	//OUTPUT(dSuppressBadPhone2,			 NAMED('dSuppressBadPhone2'));
 	//OUTPUT(dSuppressBadPhones,			 NAMED('dSuppressBadPhones'));
-	
+
   //OUTPUT(ds_most_complete_all,     NAMED('ds_most_complete_all'));
 	//OUTPUT(ds_most_complete_srtd,    NAMED('ds_most_complete_srtd'));
 	//OUTPUT(ds_most_current1,         NAMED('ds_most_current1'));
@@ -818,7 +818,7 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
   //OUTPUT(ds_addl_4recs_bdids_corpstat, NAMED('ds_addl_4recs_bdids_corpstat'));
 	//OUTPUT(ds_addl_4recs_wcorpstat,  NAMED('ds_addl_4recs_wcorpstat'));
 	//OUTPUT(ds_addl_combined,         NAMED('ds_addl_combined'));
- 
+
   //OUTPUT(ds_recs_spoke,            NAMED('ds_recs_spoke'));
   //OUTPUT(ds_recs_zoom,             NAMED('ds_recs_zoom'));
   //OUTPUT(ds_recs_corp,             NAMED('ds_recs_corp'));
@@ -868,7 +868,7 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
   //return ds_most_current;
 	//return ds_detail_all;
 	//return ds_detail_wparent;
-	
+
   RETURN ds_final_results;
 
 END;

@@ -1,4 +1,4 @@
-﻿import _Control, AID, gateway, risk_indicators, address, riskwise, ut, Risk_Reporting, Models, iesp, personcontext;
+﻿import _Control, AID, gateway, risk_indicators, address, riskwise, ut, Models, iesp, personcontext, STD, RiskView, Risk_Reporting;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Search_Function(
@@ -36,13 +36,19 @@ EXPORT Search_Function(
 	boolean RetainInputDID,
 	boolean exception_score_reason = FALSE,
   boolean InsuranceMode = FALSE, //BF _ This value is set to true for insurance only.
-	boolean InsuranceBankruptcyAllow10Yr = FALSE //Value is true for insurance only.
+	boolean InsuranceBankruptcyAllow10Yr = FALSE, //Value is true for insurance only.
+	unsigned6 MinimumAmount = 0,
+	dataset(iesp.share.t_StringArrayItem) ExcludeStates = dataset([], iesp.share.t_StringArrayItem),
+	dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem),
+	boolean IncludeStatusRefreshChecks = FALSE,
+	string32 DeferredTransactionID = '',
+    string5 StatusRefreshWaitPeriod = '',
+    string10 ESPInterfaceVersion = ''
   ) := function
 
-
-boolean   isPreScreenPurpose := StringLib.StringToUpperCase(intended_purpose) = 'PRESCREENING';
-boolean   isCollectionsPurpose := StringLib.StringToUpperCase(intended_purpose) = 'COLLECTIONS';
-boolean   isDirectToConsumerPurpose := StringLib.StringToUpperCase(intended_purpose) = Constants.directToConsumer;
+boolean   isPreScreenPurpose := STD.Str.ToUpperCase(intended_purpose) = 'PRESCREENING';
+boolean   isCollectionsPurpose := STD.Str.ToUpperCase(intended_purpose) = 'COLLECTIONS';
+boolean   isDirectToConsumerPurpose := STD.Str.ToUpperCase(intended_purpose) = Constants.directToConsumer;
 boolean   FilterLiens := if(DataRestriction[risk_indicators.iid_constants.posLiensJudgRestriction]='1', true, false ); //DRM says don't run lnj or include is false so don't run lnj
 
 // cleaning for batch and XML done the same for both
@@ -52,13 +58,13 @@ Risk_Indicators.Layout_Input cleanup(riskview_input le) := TRANSFORM
 	self.score := if(self.did<>0, 100, 0);
 	
 	// clean up input
-	invalidPrescreenSSN := LENGTH(TRIM(StringLib.StringFilter(le.ssn, '0123456789'))) < 4 OR
-								StringLib.StringFilter(le.ssn, '0123456789') IN ['000000000', '111111111', '222222222', '333333333', '444444444', '555555555', '666666666', '777777777', '888888888', '999999999'] OR
+	invalidPrescreenSSN := LENGTH(TRIM(STD.Str.Filter(le.ssn, '0123456789'))) < 4 OR
+								STD.Str.Filter(le.ssn, '0123456789') IN ['000000000', '111111111', '222222222', '333333333', '444444444', '555555555', '666666666', '777777777', '888888888', '999999999'] OR
 								TRIM(le.SSN) = '';
-	ssn_val := IF((invalidPrescreenSSN AND isPreScreenPurpose) OR StringLib.StringFilter(le.ssn, '0123456789') = '000000000', '', StringLib.StringFilter(le.ssn, '0123456789'));	// Consider a social as "not provided on input" if it is all repeating digits, less than 4 bytes, or blank on input for prescreen mode, otherwise only blank out all 0's.
+	ssn_val := IF((invalidPrescreenSSN AND isPreScreenPurpose) OR STD.Str.Filter(le.ssn, '0123456789') = '000000000', '', STD.Str.Filter(le.ssn, '0123456789'));	// Consider a social as "not provided on input" if it is all repeating digits, less than 4 bytes, or blank on input for prescreen mode, otherwise only blank out all 0's.
 	hphone_val := riskwise.cleanPhone(le.home_phone);
 	wphone_val := riskwise.cleanphone(le.work_phone);
-	email_val := stringlib.stringtouppercase(le.email);
+	email_val := STD.Str.touppercase(le.email);
 	dob_val := riskwise.cleandob(le.dob);
 	dl_num_clean := riskwise.cleanDL_num(le.dl_number);
 
@@ -73,11 +79,11 @@ Risk_Indicators.Layout_Input cleanup(riskview_input le) := TRANSFORM
 	cleaned_name := address.CleanPerson73(le.UnParsedFullName);
 	boolean valid_cleaned := le.UnParsedFullName <> '';
 		
-	self.fname := stringlib.stringtouppercase(if(le.Name_First='' AND valid_cleaned, address.cleanNameFields(cleaned_name).fname, le.Name_First));
-	self.lname := stringlib.stringtouppercase(if(le.Name_Last='' AND valid_cleaned, address.cleanNameFields(cleaned_name).lname, le.Name_Last));
-	self.mname := stringlib.stringtouppercase(if(le.Name_Middle='' AND valid_cleaned, address.cleanNameFields(cleaned_name).mname, le.Name_Middle));
-	self.suffix := stringlib.stringtouppercase(if(le.Name_Suffix ='' AND valid_cleaned, address.cleanNameFields(cleaned_name).name_suffix, le.Name_Suffix));	
-	self.title := stringlib.stringtouppercase(if(valid_cleaned, address.cleanNameFields(cleaned_name).title,''));
+	self.fname := STD.Str.touppercase(if(le.Name_First='' AND valid_cleaned, address.cleanNameFields(cleaned_name).fname, le.Name_First));
+	self.lname := STD.Str.touppercase(if(le.Name_Last='' AND valid_cleaned, address.cleanNameFields(cleaned_name).lname, le.Name_Last));
+	self.mname := STD.Str.touppercase(if(le.Name_Middle='' AND valid_cleaned, address.cleanNameFields(cleaned_name).mname, le.Name_Middle));
+	self.suffix := STD.Str.touppercase(if(le.Name_Suffix ='' AND valid_cleaned, address.cleanNameFields(cleaned_name).name_suffix, le.Name_Suffix));	
+	self.title := STD.Str.touppercase(if(valid_cleaned, address.cleanNameFields(cleaned_name).title,''));
 
 	street_address := risk_indicators.MOD_AddressClean.street_address(le.street_addr, le.prim_range, le.predir, le.prim_name, le.suffix, le.postdir, le.unit_desig, le.sec_range);
 	clean_addr := risk_indicators.MOD_AddressClean.clean_addr( street_address, le.p_City_name, le.St, le.Z5 ) ;											
@@ -128,8 +134,8 @@ Risk_Indicators.Layout_Input cleanup(riskview_input le) := TRANSFORM
     self.country 			:= '';
   // #END
 	
-	self.dl_number 		:= stringlib.stringtouppercase(dl_num_clean);
-	self.dl_state 		:= stringlib.stringtouppercase(le.dl_state);
+	self.dl_number 		:= STD.Str.touppercase(dl_num_clean);
+	self.dl_state 		:= STD.Str.touppercase(le.dl_state);
 	history_date := if(le.historydateTimeStamp='', risk_indicators.iid_constants.default_history_date, (unsigned)le.historydateTimeStamp[1..6]);
 	self.historydate := history_date;
 	self.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp(le.historydateTimeStamp, history_date);
@@ -148,8 +154,8 @@ r_layout_input_PlusRaw	:= RECORD
 end;
 
 r_layout_input_PlusRaw	prep_for_AID(bsprep_roxie le)	:= transform
-	SELF.Line1		:=	TRIM(stringlib.stringtouppercase(le.in_streetAddress));
-	SELF.LineLast	:=	address.addr2fromcomponents(stringlib.stringtouppercase(le.in_city), stringlib.stringtouppercase(le.in_state),  le.in_zipCode);
+	SELF.Line1		:=	TRIM(STD.Str.touppercase(le.in_streetAddress));
+	SELF.LineLast	:=	address.addr2fromcomponents(STD.Str.touppercase(le.in_city), STD.Str.touppercase(le.in_state),  le.in_zipCode);
 	SELF.rawAID			:=	0;
 	SELF	:=	le;
 end;
@@ -216,15 +222,26 @@ LexIDOnlyOnInput := IF(onThor, FALSE,
 											bsprep[1].DID > 0 AND bsprep[1].SSN = '' AND bsprep[1].dob = '' AND bsprep[1].phone10 = '' AND bsprep[1].wphone10 = '' AND 
 											bsprep[1].fname = '' AND bsprep[1].lname = '' AND bsprep[1].in_streetAddress = '' AND bsprep[1].z5 = '' AND bsprep[1].dl_number = '');
 										
-Crossindustry_model := StringLib.StringToUpperCase(Crossindustry_model_name);									
+Crossindustry_model := STD.Str.ToUpperCase(Crossindustry_model_name);
+
+CheckingIndicatorsRequest := STD.Str.ToLowerCase(AttributesVersionRequest) = RiskView.Constants.checking_indicators_attribute_request;
+NoCheckingIndicatorsRequest := STD.Str.ToLowerCase(AttributesVersionRequest) <> RiskView.Constants.checking_indicators_attribute_request;															
+
+
+//good chance these come through with varied case, so we will build out the set and capitalize them all
+//start change to upper case
+
+custom_models := DATASET([Custom_model_name,Custom2_model_name,Custom3_model_name,Custom4_model_name,Custom5_model_name],{string model});
+ucase_custom_models := PROJECT(custom_models, TRANSFORM(recordof(custom_models),SELF.model := STD.Str.ToUpperCase(LEFT.model)));
+Custom_model_name_array := SET(ucase_custom_models, model);
+
+
+ 
+// end change to upper case
 
 // BF _ Custom models are set to blank for insurance, therefore version 50 is selected.
-bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or 
-                Custom_model_name in  ['RVP1702_1'] or 
-                Custom2_model_name in ['RVP1702_1'] or 
-                Custom3_model_name in ['RVP1702_1'] or
-                Custom4_model_name in ['RVP1702_1'] or 
-                Custom5_model_name in ['RVP1702_1'],52,50);  // hard code this for now
+ bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or 'RVP1702_1' in Custom_model_name_array or  CheckingIndicatorsRequest,52,50); 
+
 
 	// set variables for passing to bocashell function fcra
 	BOOLEAN isUtility := FALSE;
@@ -259,9 +276,11 @@ bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or
    //BF _ Followings are added only for insurnace
     if(InsuranceMode, Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode +
                       Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyException, 0) +
-		if(InsuranceMode and InsuranceBankruptcyAllow10Yr, Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyAllow10Yr, 0);
+		if(InsuranceMode and InsuranceBankruptcyAllow10Yr, Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyAllow10Yr, 0) +
+    IF(STD.Str.ToLowerCase(AttributesVersionRequest) = 'riskviewattrv5fis', Risk_Indicators.iid_constants.BSOptions.IsFISattributes, 0);
 
-		
+	AttributesOnly := (BSOptions & risk_indicators.iid_constants.BSOptions.AttributesOnly) > 0;
+    ExcludeStatusRefresh := (BSOptions & risk_indicators.iid_constants.BSOptions.ExcludeStatusRefresh) > 0;
 	// In prescreen mode or if Lex ID is the only input run the ADL Based shell to append inputs
 	ADL_Based_Shell := isPreScreenPurpose OR LexIDOnlyOnInput;
 	
@@ -274,7 +293,10 @@ bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or
 		datapermission:=datapermission, IN_isDirectToConsumer:=isDirectToConsumerPurpose,
 		IncludeLnJ :=IncludeLnJ,
     ReportingPeriod := ReportingPeriod,
-    IntendedPurpose := Intended_Purpose
+    IntendedPurpose := Intended_Purpose,
+		in_MinimumAmount := MinimumAmount,
+		in_ExcludeStates := ExcludeStates,
+		in_ExcludeReportingSources := ExcludeReportingSources
 	);
 	
 #if(Models.LIB_RiskView_Models().TurnOnValidation = FALSE)
@@ -285,7 +307,7 @@ bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or
 		string1 ConfirmationSubjectFound;
 	END;	
 
-Report_output := if(RiskviewReportRequest, RiskView.Search_RptFunction(bsprep, 
+Report_output := if(RiskviewReportRequest OR IncludeLnJ, RiskView.Search_RptFunction(bsprep, 
 				LexIDOnlyOnInput, 
 				ungroup(clam), bsversion, 
 				DataRestriction, intended_purpose, SSNMask, DOBMask, DLMask, isDirectToConsumerPurpose),
@@ -305,7 +327,7 @@ model_info := Models.LIB_RiskView_Models().ValidV50Models; // Grab the valid mod
 valid_model_names := SET(model_info, Model_Name);
 valid_attributes := RiskView.Constants.valid_attributes;
 
-valid_attributes_requested := stringlib.stringtolowercase(AttributesVersionRequest) in valid_attributes;
+valid_attributes_requested := STD.Str.tolowercase(AttributesVersionRequest) in valid_attributes;
 
 isLnJRunningAlone := if(IncludeLnJ and  
 	(valid_attributes_requested  = false and // noattributes
@@ -344,7 +366,7 @@ attrv5 := if(valid_attributes_requested,
 							self := left, self := []))
 						);
 						
-clam_noScore :=	join(	attributes_clam, attrv5,
+clam_noScore :=	join(	attributes_clam, attrv5, // uses attrv5
 					left.seq = right.seq,
 					transform(RiskView.Layouts.shell_NoScore, 
 						self.no_score := if(valid_attributes_requested, right.no_score, false);
@@ -352,12 +374,13 @@ clam_noScore :=	join(	attributes_clam, attrv5,
 						left outer);
 
 					
-attrLnJ :=  if( IncludeLnJ /*and FilterLnJ = false*/,
+attrLnJ :=  if( IncludeLnJ /*and FilterLnJ = false*/, // uses clam_noScore
 							riskview.get_attributes_LnJ(group(clam_noScore, seq), isPreScreenPurpose),
 							project(clam_noScore, transform(riskview.layouts.attributes_internal_layout, 
 							self := left, self := []))
 						);
 
+emptyGateways := dataset([],Gateway.Layouts.Config); 
 
 riskview5_attr_search_results_attrv5 := join(clam, attrv5, left.seq=right.seq,
 transform(riskview.layouts.layout_riskview5_search_results, 
@@ -366,7 +389,7 @@ transform(riskview.layouts.layout_riskview5_search_results,
 		iesp.share_fcra.t_ConsumerStatement, self.dataGroup := '', self := left));
 	self := right,
 	self := left,
-	self := []), LEFT OUTER, KEEP(1), ATMOST(100));
+	self := []), LEFT OUTER, KEEP(1), ATMOST(100));  
 
 riskview5_attr_search_results := join(riskview5_attr_search_results_attrv5, attrLnJ, left.seq=right.seq,
 transform(riskview.layouts.layout_riskview5_search_results, 
@@ -409,22 +432,22 @@ transform(riskview.layouts.layout_riskview5_search_results,
 // Get all of our model scores
 noModelResults := DATASET([], Models.Layout_ModelOut);
 	
-auto_model := StringLib.StringToUpperCase(auto_model_name);
+auto_model := STD.Str.ToUpperCase(auto_model_name);
 valid_auto := auto_model <> '' AND auto_model IN valid_model_names;
 auto_model_result := MAP(valid_auto => Models.LIB_RiskView_V50_Function(clam, auto_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
 																			 noModelResults);
 
-bankcard_model := StringLib.StringToUpperCase(bankcard_model_name);
+bankcard_model := STD.Str.ToUpperCase(bankcard_model_name);
 valid_bankcard := bankcard_model <> '' AND bankcard_model IN valid_model_names;
 bankcard_model_result := MAP(valid_bankcard	=> Models.LIB_RiskView_V50_Function(clam, bankcard_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
 																							 noModelResults);
 
-short_term_lending_model := StringLib.StringToUpperCase(short_term_lending_model_name);
+short_term_lending_model := STD.Str.ToUpperCase(short_term_lending_model_name);
 valid_short_term_lending := short_term_lending_model <> '' AND short_term_lending_model IN valid_model_names;
 short_term_lending_model_result := MAP(valid_short_term_lending	=> Models.LIB_RiskView_V50_Function(clam, short_term_lending_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
 																																	 noModelResults);
 
-telecommunications_model := StringLib.StringToUpperCase(Telecommunications_model_name);
+telecommunications_model := STD.Str.ToUpperCase(Telecommunications_model_name);
 valid_telecommunications := telecommunications_model <> '' AND telecommunications_model IN valid_model_names;
 telecommunications_model_result := MAP(valid_telecommunications	=> Models.LIB_RiskView_V50_Function(clam, telecommunications_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
 																																	 noModelResults);
@@ -434,31 +457,31 @@ valid_Crossindustry := Crossindustry_model <> '' AND Crossindustry_model IN vali
 Crossindustry_model_result := MAP(valid_Crossindustry	=> Models.LIB_RiskView_V50_Function(clam, Crossindustry_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
 																															 noModelResults);
 	
-custom_model := StringLib.StringToUpperCase(Custom_model_name);
+custom_model := STD.Str.ToUpperCase(Custom_model_name);
 //MLA1608_0 is not a real model so bypass the call to the models library here
 valid_custom := custom_model not in ['','MLA1608_0'] AND custom_model IN valid_model_names;
 custom_model_result := MAP(valid_custom	=> Models.LIB_RiskView_V50_Function(clam, custom_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
 																					 noModelResults);
 
-custom2_model := StringLib.StringToUpperCase(Custom2_model_name);
+custom2_model := STD.Str.ToUpperCase(Custom2_model_name);
 //MLA1608_0 is not a real model so bypass the call to the models library here
 valid_custom2 := custom2_model not in ['','MLA1608_0'] AND custom2_model IN valid_model_names;
 custom2_model_result := MAP(valid_custom2	=> Models.LIB_RiskView_V50_Function(clam, custom2_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
 																						 noModelResults);
 
-custom3_model := StringLib.StringToUpperCase(Custom3_model_name);
+custom3_model := STD.Str.ToUpperCase(Custom3_model_name);
 //MLA1608_0 is not a real model so bypass the call to the models library here
 valid_custom3 := custom3_model not in ['','MLA1608_0'] AND custom3_model IN valid_model_names;
 custom3_model_result := MAP(valid_custom3	=> Models.LIB_RiskView_V50_Function(clam, custom3_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
 																					   noModelResults);
 
-custom4_model := StringLib.StringToUpperCase(Custom4_model_name);
+custom4_model := STD.Str.ToUpperCase(Custom4_model_name);
 //MLA1608_0 is not a real model so bypass the call to the models library here
 valid_custom4 := custom4_model not in ['','MLA1608_0'] AND custom4_model IN valid_model_names;
 custom4_model_result := MAP(valid_custom4	=> Models.LIB_RiskView_V50_Function(clam, custom4_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
 																					   noModelResults);
 
-custom5_model := StringLib.StringToUpperCase(Custom5_model_name);
+custom5_model := STD.Str.ToUpperCase(Custom5_model_name);
 //MLA1608_0 is not a real model so bypass the call to the models library here
 valid_custom5 := custom5_model not in ['','MLA1608_0'] AND custom5_model IN valid_model_names;
 custom5_model_result := MAP(valid_custom5	=> Models.LIB_RiskView_V50_Function(clam, custom5_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
@@ -623,7 +646,7 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 
 	//California or Rhodes Island state exceptions, return alert code 100D
 	boolean isCaliforniaException := isCalifornia_in_person and 
-																	StringLib.StringToUpperCase(intended_purpose) = 'APPLICATION' and
+																	STD.Str.ToUpperCase(intended_purpose) = 'APPLICATION' and
 																	((integer)(boolean)rt.iid.combo_firstcount+(integer)(boolean)rt.iid.combo_lastcount
 																	+(integer)(boolean)rt.iid.combo_addrcount+(integer)(boolean)rt.iid.combo_hphonecount
 																	+(integer)(boolean)rt.iid.combo_ssncount+(integer)(boolean)rt.iid.combo_dobcount) < 3;
@@ -706,7 +729,6 @@ boolean Alerts200 := (le.SubjectDeceased='1' or attr.SubjectDeceased = '1') or (
 	// If the score is being overridden to a 100, don't return a 200 or 222 score alert code.
 	ds_alerts := IF(score_override_alert_returned, ds_alerts_temp (alert_code NOT IN ['200A', '222A']), ds_alerts_temp);
 	ReportSuppressAlerts := (UT.Exists2(ds_alerts (alert_code = '222A')) or UT.Exists2(ds_alerts (alert_code = '200A')));
-
 	
 	self.alert1 := ds_alerts[1].alert_code;
 	self.alert2 := ds_alerts[2].alert_code;
@@ -1166,8 +1188,21 @@ boolean Alerts200 := (le.SubjectDeceased='1' or attr.SubjectDeceased = '1') or (
 	self.PhoneInputProblems	 := if(suppress_condition, '', le.PhoneInputProblems	);
 	self.PhoneInputSubjectCount	 := if(suppress_condition, '', le.PhoneInputSubjectCount	);
 	self.PhoneInputMobile 	 := if(suppress_condition, '', le.PhoneInputMobile 	);
-//don't display data if suppressed or no report option selected
-	self.report := if(~RiskviewReportRequest or suppress_condition 
+  
+  //Checking Indicators
+  self.CheckProfileIndex := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckTimeOldest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckTimeNewest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckNegTimeOldest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckNegRiskDecTimeNewest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckNegPaidTimeNewest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckCountTotal := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckAmountTotal := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckAmountTotalSinceNegPaid := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckAmountTotal03Month := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+
+//don't display data if suppressed or no report option selected	
+		self.report := if((~IncludeLnJ AND ~RiskviewReportRequest) or suppress_condition 
 		or AlertRegulatoryCondition = '3' or ReportSuppressAlerts, row([], iesp.riskview2.t_RiskView2Report), le.report);	
 	//LnJ new attributes
 	self.LnJEvictionTotalCount     := if(suppress_condition, '',     le.LnJEvictionTotalCount     );     
@@ -1241,8 +1276,6 @@ riskview5_pre_MLA := join(riskview5_search_results(Alert1 not in ['100D','100E',
 														self.results	:= left),
 													inner);
 
-emptyGateways := dataset([],Gateway.Layouts.Config); 
-
 //determine if MLA model was requested and if so, which slot in the output layout the results need to go into
 MLA_request_pos := map(custom_model  = 'MLA1608_0' 	=> 1,
 											 custom2_model = 'MLA1608_0' 	=> 2,
@@ -1256,8 +1289,46 @@ MLA_results := RiskView.getMLAAlert(riskview5_pre_MLA, if(MLA_request_pos <> 0, 
 //add records back in that didn't get passed to the gateway function
 riskview5_wMLA_results := riskview5_search_results(Alert1 in ['100D','100E','100F','222A'] or (Alert1 = '100A' and ~isCollectionsPurpose)) + MLA_results;
 															 
-riskview5_final_results := if(MLA_request_pos <> 0, riskview5_wMLA_results, riskview5_search_results);
+riskview5_pre_final_results := if(MLA_request_pos <> 0, riskview5_wMLA_results, riskview5_search_results);
 
+layout_preCI := record
+	Risk_Indicators.Layout_Input input;
+	riskview.layouts.layout_riskview5_search_results results;
+  string9 bestssn;
+end;
+
+Valid_FD_Input := riskview5_pre_final_results(AlertRegulatoryCondition <> '3' and Alert1 <> '222A' and CheckingIndicatorsRequest);
+
+Invalid_FD_Input := riskview5_pre_final_results(AlertRegulatoryCondition = '3' or Alert1 = '222A' or NoCheckingIndicatorsRequest);
+
+Slimmed_Invalid_FD_Input := project(Invalid_FD_Input, transform(Riskview.Layouts.Checking_Indicators_Layout,
+                                self.FDGatewayCalled := false;
+                                self := left;
+                                ));
+
+riskview5_pre_FirstData := join(Valid_FD_Input, clam, 
+													left.seq=right.seq, 
+													transform(layout_preCI,
+														self.input		:= right.shell_input;
+														self.results	:= left;
+                            self.bestssn := right.best_flags.ssn),
+													inner);
+
+FirstData_results :=  RiskView.getFirstData(riskview5_pre_FirstData,gateways);
+
+riskview5_wFD_results := FirstData_results + Slimmed_Invalid_FD_Input;
+
+riskview5_attr_search_results_FirstData := join(riskview5_pre_final_results, riskview5_wFD_results, left.seq=right.seq,
+transform(riskview.layouts.layout_riskview5_search_results, 
+	self := right,
+	self := left), LEFT OUTER, KEEP(1), ATMOST(100));
+  
+riskview5_final_results := if(CheckingIndicatorsRequest, riskview5_attr_search_results_FirstData, riskview5_pre_final_results);
+
+riskview5_with_status_refresh := MAP(IncludeStatusRefreshChecks = TRUE AND DeferredTransactionID = '' AND ~AttributesOnly => Riskview.Functions.JuLiProcessStatusRefresh(clam, gateways, riskview5_final_results, ExcludeStatusRefresh, StatusRefreshWaitPeriod, ESPInterfaceVersion),
+                                                                   IncludeStatusRefreshChecks = TRUE AND DeferredTransactionID <> '' => Riskview.Functions.JuLiProcessDTE(DeferredTransactionID, clam, gateways, riskview5_final_results),
+                                                                   riskview5_final_results);
+                                                                   
  /* *************************************
   *   Boca Shell Logging Functionality  *
   ***************************************/
@@ -1285,6 +1356,9 @@ riskview5_final_results := if(MLA_request_pos <> 0, riskview5_wMLA_results, risk
 // OUTPUT(telecommunications_model_result, NAMED('telecommunications_model_result'));
 // OUTPUT(Crossindustry_model_result, NAMED('Crossindustry_model_result'));
 // OUTPUT(custom_model_result, NAMED('custom_model_result'));
+// output(FirstData_results, named('FirstData_results'));
+// output(riskview5_attr_search_results_FirstData, named('riskview5_attr_search_results_FirstData'));
+// output(riskview5_attr_search_results, named('riskview5_attr_search_results'));
 // OUTPUT(riskview5_score_auto_results, NAMED('riskview5_score_auto_results'));
 // OUTPUT(riskview5_score_bankcard_results, NAMED('riskview5_score_bankcard_results'));
 // OUTPUT(riskview5_score_short_term_lending_results, NAMED('riskview5_score_short_term_lending_results'));
@@ -1315,8 +1389,8 @@ riskview5_final_results := if(MLA_request_pos <> 0, riskview5_wMLA_results, risk
 	// output(isLnJRunningAlone, named('isLnJRunningAlone'));		
 // output(riskview5_search_results, named('riskview5_search_results'));
 // output(riskview5_search_results_tmp, named('riskview5_search_results_tmp'));
-
-return riskview5_final_results;
+	
+return riskview5_with_status_refresh;
 #else // Else, output the model results directly
 
 return Models.LIB_RiskView_Models(clam, lib_in).ValidatingModel;

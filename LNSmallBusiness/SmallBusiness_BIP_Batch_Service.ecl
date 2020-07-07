@@ -119,7 +119,7 @@
 */
 
 #option('expandSelectCreateRow', true);
-IMPORT Business_Risk_BIP, Gateway, IESP, MDR, OFAC_XG5, Phones, Royalty, Royalty, Std;
+IMPORT Business_Risk_BIP, Gateway, IESP, MDR, OFAC_XG5, Phones, Royalty, Std;
 
 EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 	/* ************************************************************************
@@ -148,7 +148,11 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 		'ModelName4',
 		'ModelName5',
 		'IncludeTargusGateway',
-		'RunTargusGatewayAnywayForTesting'
+		'RunTargusGatewayAnywayForTesting',
+        'LexIdSourceOptout',
+        '_TransactionId',
+        '_BatchUID',
+        '_GCID'
 	));
 
 	// Can't have duplicate definitions of Stored with different default values, 
@@ -195,6 +199,12 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 	BOOLEAN IncludeTargusGateway := FALSE : STORED('IncludeTargusGateway');
 	BOOLEAN RunTargusGateway     := FALSE : STORED('RunTargusGatewayAnywayForTesting');
 	
+    //CCPA fields
+    unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+    string TransactionID := '' : STORED('_TransactionId');
+    string BatchUID := '' : STORED('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+    
 	AttrsRequested  := DATASET([ {Std.Str.ToUpperCase(AttrsVer1_in)},{Std.Str.ToUpperCase(AttrsVer2_in)} ], LNSmallBusiness.Layouts.AttributeGroupRec);
 	ModelsRequested := DATASET([ {Std.Str.ToUpperCase(ModelName1_in)},{Std.Str.ToUpperCase(ModelName2_in)},
 															 {Std.Str.ToUpperCase(ModelName3_in)},{Std.Str.ToUpperCase(ModelName4_in)},
@@ -224,8 +234,11 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 																														IncludeTargusGateway := IncludeTargusGateway,
 																														RunTargusGateway := RunTargusGateway, /* for testing purposes only */
 																														BIPIDWeightThreshold := LNSmallBusiness.Constants.BIPID_WEIGHT_THRESHOLD.FOR_SmallBusiness_BIP_Batch_Service,
-																														AppendBestsFromLexIDs := TRUE   /* DCB - Added 8/7/2019 This should get the Small Buisness Attributes & Credits 
-																																															scores using the SELEID as requested in RQ-16313 */
+																														AppendBestsFromLexIDs := TRUE,
+                                                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                                        TransactionID := TransactionID, 
+                                                                                                                        BatchUID := BatchUID, 
+                                                                                                                        GlobalCompanyID := GlobalCompanyID
 																														);
 
 	SBA_Results := PROJECT( SBA_Results_with_PhoneSources, LNSmallBusiness.BIP_Layouts.IntermediateLayout );

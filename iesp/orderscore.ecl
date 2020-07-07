@@ -86,6 +86,7 @@ export t_OrderScoreResult := record
 	iesp.instantid.t_IPIDResult IPAddressID {xpath('IPAddressID')};
 	dataset(iesp.instantid.t_ModelSequencedRISets) Models {xpath('Models/Model'), MAXCOUNT(1)};
 	dataset(t_OrderScoreAttributeGroup) AttributeGroups {xpath('AttributeGroups/AttributeGroup'), MAXCOUNT(iesp.constants.Order__Score.MaxAttributeVersionCount)};
+	boolean BillingStateIndicator {xpath('BillingStateIndicator')};//hidden[ecl_only]
 end;
 		
 export t_OrderScoreResponse := record

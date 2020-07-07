@@ -87,7 +87,7 @@ layout_soap := record
 	string model;
 	dataset(Risk_Indicators.Layout_Gateways_In) gateways;
 	dataset(Layout_Attributes_In) RequestedAttributeGroups;
-		boolean ExcludeIbehavior;  // temporary field until end of July 2017
+	boolean UseIngestDate := false;  
 
 end;
 
@@ -99,7 +99,7 @@ layout_old_acct := RECORD
 END;
 
 layout_old_acct into_fdInput(f le, INTEGER c) := TRANSFORM
-self.ExcludeIbehavior := true;  // set this back to false if they would like to include this data for their test
+	self.UseIngestDate := false;  //  change this to true if they want to use Ingest date for retro test instead of dt_first_seen filtering
 
 	SELF.old_account_number := le.account;
 	SELF.Accountnumber := (STRING)c;	

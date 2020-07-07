@@ -1,89 +1,101 @@
-﻿export cviScoreV1(INTEGER1 p, INTEGER1 s, Layout_Output l, STRING9 corrected_ssn, STRING50 corrected_address, STRING10 corrected_phone, STRING5 inTweak, STRING50 veraddr, STRING20 verlast, 
-								BOOLEAN OFAC=TRUE, BOOLEAN IncludeDOBinCVI=FALSE,BOOLEAN IncludeDLinCVI=FALSE, STRING128 CustomCVIModelName='',BOOLEAN IncludeITIN=FALSE, boolean includecompliancecap=false) := 
+﻿IMPORT Risk_Indicators, STD;
+
+export cviScoreV1(INTEGER1 NAP_Summary, 
+                                INTEGER1 NAS_Summary, 
+                                Risk_Indicators.Layout_Output l, 
+                                STRING5 inTweak, 
+                                STRING50 veraddr, 
+                                STRING20 verlast, 
+								BOOLEAN OFAC=TRUE, 
+                                BOOLEAN IncludeDOBinCVI=FALSE,
+                                BOOLEAN IncludeDLinCVI=FALSE, 
+                                BOOLEAN IncludeITIN=FALSE, 
+                                boolean includecompliancecap=false,
+                                Risk_Indicators.iid_constants.IOverrideOptions OverrideOptions = MODULE(Risk_Indicators.iid_constants.IOverrideOptions)END) := 
 FUNCTION
 
 BOOLEAN isPOTS := l.isPOTS;
 tweak := trim(inTweak);
 
-cvi := __COMMON__(CASE(p,
-		0 => MAP(s IN [0,1] => '00',
-			    s IN [2,3,4] => '10',
-			    s IN [5,6,7,8,9,10] => '20',
-			    '40'),																// s of 12 will now be 40
-		1 => MAP(s IN [10] => '20',	// new for this version
-					s IN [0,1] => '00',
-			    s IN [2,3,4,5,6,7,8,9] => '10',
+cvi := __COMMON__(CASE(NAP_Summary,
+		0 => MAP(NAS_Summary IN [0,1] => '00',
+			    NAS_Summary IN [2,3,4] => '10',
+			    NAS_Summary IN [5,6,7,8,9,10] => '20',
+			    '40'),																// NAS_Summary of 12 will now be 40
+		1 => MAP(NAS_Summary IN [10] => '20',	// new for this version
+					NAS_Summary IN [0,1] => '00',
+			    NAS_Summary IN [2,3,4,5,6,7,8,9] => '10',
 			    '30'),
-		2 => MAP(s IN [7,9] => '20',	// new for this version
-					s IN [0,1,2,3,4] => '10',
-			    s IN [5,6,8,10] => '20',
-			    s IN [12] AND ~isPOTS => '50',
+		2 => MAP(NAS_Summary IN [7,9] => '20',	// new for this version
+					NAS_Summary IN [0,1,2,3,4] => '10',
+			    NAS_Summary IN [5,6,8,10] => '20',
+			    NAS_Summary IN [12] AND ~isPOTS => '50',
 			    '40'),
-		3 => MAP(s IN [9] => '20',	// new for this version
-					s IN [0,1,2,3,4] => '10',
-			    s IN [5,6,7,8,10] => '20',
-			    s IN [12] AND ~isPOTS => '50',
+		3 => MAP(NAS_Summary IN [9] => '20',	// new for this version
+					NAS_Summary IN [0,1,2,3,4] => '10',
+			    NAS_Summary IN [5,6,7,8,10] => '20',
+			    NAS_Summary IN [12] AND ~isPOTS => '50',
 			    '40'),
-		4 => MAP(s IN [0,1,2,3,4] => '10',
-			    s IN [5,6,7,8,9,10] => '20',					// 5, 6, 7 and 9 will now be 20
-			    s In [12] AND ~isPOTS => '50',
+		4 => MAP(NAS_Summary IN [0,1,2,3,4] => '10',
+			    NAS_Summary IN [5,6,7,8,9,10] => '20',					// 5, 6, 7 and 9 will now be 20
+			    NAS_Summary In [12] AND ~isPOTS => '50',
 			    '40'),
-		5 => MAP(s IN [1] => '10',
-			    s IN [0,2,3,4,5,6] => '20',
-			    s IN [7,8,10] => '30',
-			    s IN [9,12] AND ~isPOTS => '50',
+		5 => MAP(NAS_Summary IN [1] => '10',
+			    NAS_Summary IN [0,2,3,4,5,6] => '20',
+			    NAS_Summary IN [7,8,10] => '30',
+			    NAS_Summary IN [9,12] AND ~isPOTS => '50',
 			    '40'),																// 11 will now be 40
-		6 => MAP(s IN [3] => '20',	// new for this version
-					s IN [10] => '30', // new for this version
-					s IN [0,1,2,4] => '10',
-			    s IN [6,7,9] => '20',
-			    s IN [5,8] => '30',
-			    s IN [11] => '40',
+		6 => MAP(NAS_Summary IN [3] => '20',	// new for this version
+					NAS_Summary IN [10] => '30', // new for this version
+					NAS_Summary IN [0,1,2,4] => '10',
+			    NAS_Summary IN [6,7,9] => '20',
+			    NAS_Summary IN [5,8] => '30',
+			    NAS_Summary IN [11] => '40',
 			    '50'),
-		7 => MAP(s IN [2,3] => '20',	// new for this version
-					s IN [10] => '30',	// new for this version
-					s IN [1] => '10',
-			    s IN [0,4,6] => '20',
-			    s IN [5,7,8,9] => '30',
-					s IN [12] => '50',										// 12 will now be 50
+		7 => MAP(NAS_Summary IN [2,3] => '20',	// new for this version
+					NAS_Summary IN [10] => '30',	// new for this version
+					NAS_Summary IN [1] => '10',
+			    NAS_Summary IN [0,4,6] => '20',
+			    NAS_Summary IN [5,7,8,9] => '30',
+					NAS_Summary IN [12] => '50',										// 12 will now be 50
 			    '40'),
-		8 => MAP(s IN [2,3] => '20',	// new for this version
-					s IN [1] => '10',
-			    s IN [0,4,6] => '20',
-			    s IN [5,7,10] => '30',
-			    s IN [9,11,12] AND ~isPOTS => '50',
+		8 => MAP(NAS_Summary IN [2,3] => '20',	// new for this version
+					NAS_Summary IN [1] => '10',
+			    NAS_Summary IN [0,4,6] => '20',
+			    NAS_Summary IN [5,7,10] => '30',
+			    NAS_Summary IN [9,11,12] AND ~isPOTS => '50',
 			    '40'),
-		9 => MAP(s IN [2,3] => '20',	// ne for this version
-					s IN [10] => '30',	// new for this version
-					s IN [12] => '50',	// new for this version
-					s IN [1] => '10',
-			    s IN [0,4,6] => '20',
-			    s IN [5,7,8,9] => '30',
+		9 => MAP(NAS_Summary IN [2,3] => '20',	// ne for this version
+					NAS_Summary IN [10] => '30',	// new for this version
+					NAS_Summary IN [12] => '50',	// new for this version
+					NAS_Summary IN [1] => '10',
+			    NAS_Summary IN [0,4,6] => '20',
+			    NAS_Summary IN [5,7,8,9] => '30',
 			    '40'),
-		10 => MAP(s In [0,2,3] => '20',	// new for this version
-				s IN [1] => '10',
-				s IN [4,6] => '20',
-				s IN [5,7,8,9,10] => '30',
-				s IN [11] => '40',
+		10 => MAP(NAS_Summary In [0,2,3] => '20',	// new for this version
+				NAS_Summary IN [1] => '10',
+				NAS_Summary IN [4,6] => '20',
+				NAS_Summary IN [5,7,8,9,10] => '30',
+				NAS_Summary IN [11] => '40',
 				'50'),
-		11 => MAP(s IN [1] => '20',
-				s IN [0,2,3,4,5,6] => '30',
-				s IN [7,8,10,11] => '40',
+		11 => MAP(NAS_Summary IN [1] => '20',
+				NAS_Summary IN [0,2,3,4,5,6] => '30',
+				NAS_Summary IN [7,8,10,11] => '40',
 				'50'),																	// 9 will now be 50
-		12 => MAP(s IN [1] => '20',
-				s IN [0,2,3,4,5,6] => '30',
-				s IN [7,8,10,11] => '40',  							// 11 will now be a 40
+		12 => MAP(NAS_Summary IN [1] => '20',
+				NAS_Summary IN [0,2,3,4,5,6] => '30',
+				NAS_Summary IN [7,8,10,11] => '40',  							// 11 will now be a 40
 				'50'),																	// 9 will now be 50
 				'00'));
 				
 	
 	// determine if we need to override to 10
-	override1 := __COMMON__(((	rcSet.isCode02(l.decsflag) OR 
-									rcSet.isCodeDI(l.DIDdeceased) OR
-									rcSet.isCode03(l.socsdobflag) OR 
-									(((rcSet.isCode06(l.socsvalflag, l.ssn)and (~rcSet.isCodeIT(l.ssn) or ~IncludeITIN)) OR rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~rcSet.isCode29(l.socsmiskeyflag)) OR 
-									(rcSet.isCode08(l.phonetype,l.phone10) AND rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) AND ~rcSet.isCode30(l.addrmiskeyflag) AND ~rcSet.isCode31(l.hphonemiskeyflag)))) OR
-								(OFAC and rcSet.isCode32(l.watchlist_table, l.watchlist_record_number )));
+	override1 := __COMMON__(((	Risk_Indicators.rcSet.isCode02(l.decsflag) OR 
+									Risk_Indicators.rcSet.isCodeDI(l.DIDdeceased) OR
+									Risk_Indicators.rcSet.isCode03(l.socsdobflag) OR 
+									(((Risk_Indicators.rcSet.isCode06(l.socsvalflag, l.ssn)and (~Risk_Indicators.rcSet.isCodeIT(l.ssn) or ~IncludeITIN)) OR Risk_Indicators.rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~Risk_Indicators.rcSet.isCode29(l.socsmiskeyflag)) OR 
+									(Risk_Indicators.rcSet.isCode08(l.phonetype,l.phone10) AND Risk_Indicators.rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) AND ~Risk_Indicators.rcSet.isCode30(l.addrmiskeyflag) AND ~Risk_Indicators.rcSet.isCode31(l.hphonemiskeyflag)))) OR
+								(OFAC and Risk_Indicators.rcSet.isCode32(l.watchlist_table, l.watchlist_record_number )));
   
 				
 	cviAdj2 := __COMMON__(IF(override1 and cvi>'10','10',cvi));
@@ -92,8 +104,8 @@ cvi := __COMMON__(CASE(p,
 	cviAdj3 := __COMMON__(MAP(tweak = 'ecvi' =>
 					MAP(cviAdj2 <= '20' => 
 							MAP(l.socsverlevel IN [4,7,9] and l.dobcount>0 and l.hriskphoneflag<>'5' and (l.addrvalflag<>'N' OR veraddr<>'') => '30',
-							    l.socsverlevel IN [4,7,9] and ga(l.combo_addrscore) and l.combo_prim_range=l.prim_range and (l.addrvalflag<>'N' OR veraddr<>'') => '30',
-							    verlast<>'' and ga(l.combo_addrscore) and (l.addrvalflag<>'N' OR veraddr<>'') => '30',
+							    l.socsverlevel IN [4,7,9] and Risk_Indicators.ga(l.combo_addrscore) and l.combo_prim_range=l.prim_range and (l.addrvalflag<>'N' OR veraddr<>'') => '30',
+							    verlast<>'' and Risk_Indicators.ga(l.combo_addrscore) and (l.addrvalflag<>'N' OR veraddr<>'') => '30',
 							    cviAdj2),
 					    cviAdj2 = '30' => IF(l.decsflag = '1' or l.socsdobflag = '1' or l.socsvalflag = '1', '20',cviAdj2),
 				         cviAdj2),
@@ -104,11 +116,11 @@ cvi := __COMMON__(CASE(p,
 					    cviAdj2 = '30' and l.socsverlevel = 9 and l.phoneverlevel in [6,7,8,9,10,11,12] => '40',
 					    cviAdj2),
 			     tweak = 'svi' => 
-					MAP(cviAdj2 = '10' and ((rcSet.isCode02(l.decsflag) OR rcSet.isCode03(l.socsdobflag) OR 
-										((rcSet.isCode06(l.socsvalflag, l.ssn) OR rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~rcSet.isCode29(l.socsmiskeyflag)) OR 
-										(rcSet.isCode08(l.phonetype,l.phone10) AND rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) AND 
-												~rcSet.isCode30(l.addrmiskeyflag) AND ~rcSet.isCode31(l.hphonemiskeyflag))) OR 
-									    (OFAC and rcSet.isCode32(l.watchlist_table, l.watchlist_record_number))) => '10',
+					MAP(cviAdj2 = '10' and ((Risk_Indicators.rcSet.isCode02(l.decsflag) OR Risk_Indicators.rcSet.isCode03(l.socsdobflag) OR 
+										((Risk_Indicators.rcSet.isCode06(l.socsvalflag, l.ssn) OR Risk_Indicators.rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~Risk_Indicators.rcSet.isCode29(l.socsmiskeyflag)) OR 
+										(Risk_Indicators.rcSet.isCode08(l.phonetype,l.phone10) AND Risk_Indicators.rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) AND 
+												~Risk_Indicators.rcSet.isCode30(l.addrmiskeyflag) AND ~Risk_Indicators.rcSet.isCode31(l.hphonemiskeyflag))) OR 
+									    (OFAC and Risk_Indicators.rcSet.isCode32(l.watchlist_table, l.watchlist_record_number))) => '10',
 					    cviAdj2 <= '20' =>
 							MAP(l.socsverlevel IN [4,7,9] and l.dobcount>0 and l.hriskphoneflag<>'5' and (l.addrvalflag<>'N' OR veraddr<>'') => '30',
 							    l.socsverlevel IN [4,7,9] and ga(l.combo_addrscore) and l.combo_prim_range=l.prim_range and (l.addrvalflag<>'N' OR veraddr<>'') => '30',
@@ -118,20 +130,20 @@ cvi := __COMMON__(CASE(p,
 					    cviAdj2),
 			     cviAdj2));
 				
-	cviAdj4 := __COMMON__(IF(tweak='svi',IF((rcSet.isCode02(l.decsflag) OR rcSet.isCode03(l.socsdobflag) OR ((rcSet.isCode06(l.socsvalflag, l.ssn) OR rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~rcSet.isCode29(l.socsmiskeyflag)) OR 
-	              (rcSet.isCode08(l.phonetype,l.phone10) AND rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) AND ~rcSet.isCode30(l.addrmiskeyflag) AND ~rcSet.isCode31(l.hphonemiskeyflag)) AND
+	cviAdj4 := __COMMON__(IF(tweak='svi',IF((Risk_Indicators.rcSet.isCode02(l.decsflag) OR Risk_Indicators.rcSet.isCode03(l.socsdobflag) OR ((Risk_Indicators.rcSet.isCode06(l.socsvalflag, l.ssn) OR Risk_Indicators.rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~Risk_Indicators.rcSet.isCode29(l.socsmiskeyflag)) OR 
+	              (Risk_Indicators.rcSet.isCode08(l.phonetype,l.phone10) AND Risk_Indicators.rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) AND ~Risk_Indicators.rcSet.isCode30(l.addrmiskeyflag) AND ~Risk_Indicators.rcSet.isCode31(l.hphonemiskeyflag)) AND
 			     cvi>'10'),'10',cviAdj3),cviAdj3));
 					 
-	override2 := __COMMON__(l.ssnexists and l.socscount = 0 and ~l.lastssnmatch2 and LENGTH(Stringlib.StringFilter(l.ssn,'0123456789'))=9);	// ssn does not belong to this last and it belongs to someone else
-	override3 := __COMMON__(l.socsvalflag != '1' and ~l.ssnexists and l.socscount = 0 and l.versocs <> '' and LENGTH(Stringlib.StringFilter(l.ssn,'0123456789'))=9);	// ssn does not belong to anybody, but there is a social for this person				 
+	override2 := __COMMON__(l.ssnexists and l.socscount = 0 and ~l.lastssnmatch2 and LENGTH(STD.Str.Filter(l.ssn,'0123456789'))=9);	// ssn does not belong to this last and it belongs to someone else
+	override3 := __COMMON__(l.socsvalflag != '1' and ~l.ssnexists and l.socscount = 0 and l.versocs <> '' and LENGTH(STD.Str.Filter(l.ssn,'0123456789'))=9);	// ssn does not belong to anybody, but there is a social for this person				 
 
 	cviAdj5 := __COMMON__(IF(override2 AND cviAdj4 > '20' , '20', cviAdj4));	
 	cviAdj6 := __COMMON__(IF(override3 AND cviAdj4 > '20' , '20', cviAdj5));	
 	
 	// for american express add custom cvi override logic
 	cviAdj7 := __COMMON__(IF(tweak='amxvi' and cviAdj6 > '30',
-															MAP(rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) and rcSet.isCode30(l.addrmiskeyflag) => '25',
-																	rcSet.isCodeCL(l.ssn, l.bestssn, l.socsverlevel, l.combo_ssn) and ~rcSet.isCode29(l.socsmiskeyflag) => '15',
+															MAP(Risk_Indicators.rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) and Risk_Indicators.rcSet.isCode30(l.addrmiskeyflag) => '25',
+																	Risk_Indicators.rcSet.isCodeCL(l.ssn, l.bestssn, l.socsverlevel, l.combo_ssn) and ~Risk_Indicators.rcSet.isCode29(l.socsmiskeyflag) => '15',
 																	cviAdj6),
 															cviAdj6));
 															
@@ -150,12 +162,16 @@ cvi := __COMMON__(CASE(p,
 									includecompliancecap and IncludeDLinCVI AND DLverified AND cviAdj7<'40' AND ~override1 AND ~override2 AND ~override3 => '20',	
 									cviAdj8));
                   
-  cviAdj10:= if(includecompliancecap and ( (p=8 and s=8) or (p=8 and s=11) or (p=8 and s=12) ),'30',cviAdj9);	
-	//Adjustment for Targets fp1403_2 model
-	target_Adj := __COMMON__(if(CustomCVIModelName = 'CCVI1501_1', if((s=7 and p=7) OR (s=9 and p=9), '20', cviAdj10), cviAdj10));
-
-//CustomCVIModelName = 'CCVI1810_1' special logic for chase.  Depends on if verfirst,last and addr is blanked out in iid records transform, also chaning nas and nap. applied to normal and custom cvi.
-
-RETURN (target_Adj);
+  cviAdj10:= if(includecompliancecap and ( (NAP_Summary=8 and NAS_Summary=8) or (NAP_Summary=8 and NAS_Summary=11) or (NAP_Summary=8 and NAS_Summary=12) ) AND ~override1 AND ~override2 AND ~override3, '30', cviAdj9);	
+  
+    //CustomCVIModelName = 'CCVI1810_1' special logic for chase.  Depends on if verfirst,last and addr is blanked out in iid records transform, also chaning nas and nap. applied to normal and custom cvi.
+ FinalCVI :=     MAP(OverrideOptions.isCodeMS and (INTEGER)cviAdj10 > 10 => '10',
+							OverrideOptions.isCodePO and (INTEGER)cviAdj10 > 10 => '10',
+							OverrideOptions.isCodeCL and (INTEGER)cviAdj10 > 10 => '10',
+							OverrideOptions.isCodeMI and (INTEGER)cviAdj10 > 10=> '10',
+							OverrideOptions.isCodeDI AND (INTEGER)cviAdj10 > 10 => '10',
+                            cviAdj10);
+              
+RETURN FinalCVI;
 
 END;
