@@ -1,4 +1,4 @@
-IMPORT AID, Address, Census_Data, Cortera, Cortera_Tradeline, data_services, did_add, doxie, nid, Tools, ut;
+﻿IMPORT AID, Address, Census_Data, Cortera, Cortera_Tradeline, data_services, did_add, doxie, nid, Tools, ut;
 
 EXPORT proc_createExecLinkID (DATASET(Cortera.Layout_Header_Out) dCortera) := FUNCTION
 
@@ -18,19 +18,15 @@ EXPORT proc_createExecLinkID (DATASET(Cortera.Layout_Header_Out) dCortera) := FU
     RETURN bIsBlank;
   ENDMACRO;
   
-  LayoutFullCortera := RECORD
-    Cortera.Layout_Header_Out;
-    Cortera.Layout_ExecLinkID;
-  END;
-
-  LayoutFullCortera xExecutives(RECORDOF(dCortera) l, UNSIGNED c) := TRANSFORM, 
+  Cortera.Layout_Executives xExecutives(RECORDOF(dCortera) l, UNSIGNED c) := TRANSFORM, 
     SKIP(fNameIsBlank(l, c) = TRUE)
-    SELF.Executive_Name := CHOOSE(c, l.EXECUTIVE_NAME1, l.EXECUTIVE_NAME2, l.EXECUTIVE_NAME3, l.EXECUTIVE_NAME4, l.EXECUTIVE_NAME5,
-      l.EXECUTIVE_NAME6, l.EXECUTIVE_NAME7, l.EXECUTIVE_NAME8, l.EXECUTIVE_NAME9, l.EXECUTIVE_NAME10);
-    SELF.Executive_Title := CHOOSE(c, l.TITLE1, l.TITLE2, l.TITLE3, l.TITLE4, l.TITLE5,l.TITLE6, l.TITLE7, l.TITLE8, l.TITLE9, l.TITLE10);
-    SELF.Name_Sequence := c;
-    SELF := l;
-    SELF := [];
+		
+    SELF.Executive_Name		:= CHOOSE(c, l.EXECUTIVE_NAME1, l.EXECUTIVE_NAME2, l.EXECUTIVE_NAME3, l.EXECUTIVE_NAME4, l.EXECUTIVE_NAME5,
+																			 l.EXECUTIVE_NAME6, l.EXECUTIVE_NAME7, l.EXECUTIVE_NAME8, l.EXECUTIVE_NAME9, l.EXECUTIVE_NAME10);
+    SELF.Executive_Title	:= CHOOSE(c, l.TITLE1, l.TITLE2, l.TITLE3, l.TITLE4, l.TITLE5,l.TITLE6, l.TITLE7, l.TITLE8, l.TITLE9, l.TITLE10);
+    SELF.Name_Sequence 		:= c;
+    SELF 									:= l;
+    SELF 									:= [];
   END;
 
   dExecutives := NORMALIZE(dCortera, 10, xExecutives(LEFT, COUNTER));
@@ -43,12 +39,34 @@ EXPORT proc_createExecLinkID (DATASET(Cortera.Layout_Header_Out) dCortera) := FU
       ),RECORD, EXCEPT Name_Sequence, ALL, LOCAL
     );
 
+	// Name cleaning using NID name cleaner
   nid.mac_cleanfullnames(dExecutivesDedup, dExecutiveCleanName, EXECUTIVE_NAME, nid, ln_entity_type, title, fname, mname, lname, name_suffix,,,,,,,,,,TRUE, cname, TRUE);
-
-  matchset := ['A', 'Z'];
-
-  did_add.MAC_Match_Flex(dExecutiveCleanName, matchset, '', '', fname, mname, lname, name_suffix, 
-    prim_range, prim_name, sec_range, zip, st, '' , did, LayoutFullCortera, TRUE, DID_Score,75, dExecutiveCleanNameWDID);
+	
+	// Match to Headers by Contact Name and Address and phone
+  matchset := ['A','P','Z'];
+	
+	// Appending lexids.
+  did_add.MAC_Match_Flex(dExecutiveCleanName, 			// Input Dataset
+												 matchset, 									// Matchset - what fields to match on
+												 '',												// ssn
+												 '',												// dob
+												 fname,											// fname
+												 mname,											// mname
+												 lname,											// lname
+												 name_suffix, 							// name_suffix
+												 prim_range,								// prim_range
+												 prim_name,									// prim_name
+												 sec_range,									// sec_range
+												 zip,												// zip5
+												 st, 												// st
+												 clean_phone,								// phone10
+												 did,												// Did
+												 cortera.Layout_Executives,	// output layout
+												 TRUE,											// Does output record have the score
+												 DID_Score,									// did score field
+												 75,												// Default - score threshold
+												 dExecutiveCleanNameWDID		// output dataset
+												);
 
   addGlobalSID := mdr.macGetGlobalSID(dExecutiveCleanNameWDID,'Cortera','','global_sid');
 
