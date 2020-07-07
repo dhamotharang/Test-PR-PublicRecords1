@@ -1,4 +1,4 @@
-export Layout_Vehicle_Title_Number := record
-  	string20		Ttl_Number;
-		string2 state_origin :='';
-end;
+EXPORT Layout_Vehicle_Title_Number := RECORD
+    STRING20 Ttl_Number;
+    STRING2 state_origin :='';
+END;
