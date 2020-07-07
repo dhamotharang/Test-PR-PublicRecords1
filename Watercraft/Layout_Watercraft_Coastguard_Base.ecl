@@ -1,4 +1,4 @@
-﻿﻿export Layout_Watercraft_Coastguard_Base
+﻿export Layout_Watercraft_Coastguard_Base
  :=
   record
   string30 watercraft_key;
