@@ -66,6 +66,7 @@ MODULE
     EXPORT Pager    := 'PAGER';
     EXPORT VoIP     := 'POSSIBLE VOIP';
     EXPORT Other    := 'OTHER/UNKNOWN';
+    EXPORT Cable    := 'CABLE';
   END;
 
   EXPORT serviceType   := ENUM(LandLine = 0,Wireless = 1,VOIP = 2,Unknown = 3);
