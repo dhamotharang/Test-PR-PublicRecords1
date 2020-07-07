@@ -1,7 +1,7 @@
 ﻿IMPORT SALT311;
 EXPORT RDP_Fields := MODULE
  
-EXPORT NumFields := 19;
+EXPORT NumFields := 20;
  
 // Processing for each FieldType
 EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_alpha','invalid_alphanumeric','invalid_email','invalid_date','invalid_numeric','invalid_zip','invalid_state','invalid_ssn','invalid_phone','invalid_ip','invalid_name');
@@ -99,11 +99,11 @@ END;
 EXPORT InValidFT_invalid_name(SALT311.StrType s) := WHICH(s[1]=' ' AND LENGTH(TRIM(s))>0,LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz <>{}[]-^=\'`!+&,./#()_'))));
 EXPORT InValidMessageFT_invalid_name(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotLeft,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz <>{}[]-^=\'`!+&,./#()_'),SALT311.HygieneErrors.Good);
  
-EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'Transaction_ID','TransactionDate','FirstName','LastName','MiddleName','Suffix','BirthDate','SSN','Lexid_Input','Street1','Street2','Suite','City','State','Zip5','Phone','Lexid_Discovered','RemoteIPAddress','ConsumerIPAddress');
-EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'Transaction_ID','TransactionDate','FirstName','LastName','MiddleName','Suffix','BirthDate','SSN','Lexid_Input','Street1','Street2','Suite','City','State','Zip5','Phone','Lexid_Discovered','RemoteIPAddress','ConsumerIPAddress');
-EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'Transaction_ID' => 0,'TransactionDate' => 1,'FirstName' => 2,'LastName' => 3,'MiddleName' => 4,'Suffix' => 5,'BirthDate' => 6,'SSN' => 7,'Lexid_Input' => 8,'Street1' => 9,'Street2' => 10,'Suite' => 11,'City' => 12,'State' => 13,'Zip5' => 14,'Phone' => 15,'Lexid_Discovered' => 16,'RemoteIPAddress' => 17,'ConsumerIPAddress' => 18,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['LEFTTRIM','ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['LEFTTRIM','ALLOW'],['LEFTTRIM','ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['LEFTTRIM','ALLOW','LENGTHS'],['LEFTTRIM','ALLOW','LENGTHS'],['LEFTTRIM','ALLOW','LENGTHS'],['ALLOW'],['LEFTTRIM','ALLOW'],['LEFTTRIM','ALLOW'],[]);
-EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
+EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'Transaction_ID','TransactionDate','FirstName','LastName','MiddleName','Suffix','BirthDate','SSN','Lexid_Input','Street1','Street2','Suite','City','State','Zip5','Phone','Lexid_Discovered','RemoteIPAddress','ConsumerIPAddress','Email_Address');
+EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'Transaction_ID','TransactionDate','FirstName','LastName','MiddleName','Suffix','BirthDate','SSN','Lexid_Input','Street1','Street2','Suite','City','State','Zip5','Phone','Lexid_Discovered','RemoteIPAddress','ConsumerIPAddress','Email_Address');
+EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'Transaction_ID' => 0,'TransactionDate' => 1,'FirstName' => 2,'LastName' => 3,'MiddleName' => 4,'Suffix' => 5,'BirthDate' => 6,'SSN' => 7,'Lexid_Input' => 8,'Street1' => 9,'Street2' => 10,'Suite' => 11,'City' => 12,'State' => 13,'Zip5' => 14,'Phone' => 15,'Lexid_Discovered' => 16,'RemoteIPAddress' => 17,'ConsumerIPAddress' => 18,'Email_Address' => 19,0);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['LEFTTRIM','ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['LEFTTRIM','ALLOW'],['LEFTTRIM','ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['LEFTTRIM','ALLOW','LENGTHS'],['LEFTTRIM','ALLOW','LENGTHS'],['LEFTTRIM','ALLOW','LENGTHS'],['ALLOW'],['LEFTTRIM','ALLOW'],['LEFTTRIM','ALLOW'],['ALLOW'],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
  
@@ -183,6 +183,10 @@ EXPORT Make_ConsumerIPAddress(SALT311.StrType s0) := MakeFT_invalid_ip(s0);
 EXPORT InValid_ConsumerIPAddress(SALT311.StrType s) := InValidFT_invalid_ip(s);
 EXPORT InValidMessage_ConsumerIPAddress(UNSIGNED1 wh) := InValidMessageFT_invalid_ip(wh);
  
+EXPORT Make_Email_Address(SALT311.StrType s0) := MakeFT_invalid_email(s0);
+EXPORT InValid_Email_Address(SALT311.StrType s) := InValidFT_invalid_email(s);
+EXPORT InValidMessage_Email_Address(UNSIGNED1 wh) := InValidMessageFT_invalid_email(wh);
+ 
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
   IMPORT SALT311,Scrubs_FraudGov;
@@ -223,6 +227,7 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_Lexid_Discovered;
     BOOLEAN Diff_RemoteIPAddress;
     BOOLEAN Diff_ConsumerIPAddress;
+    BOOLEAN Diff_Email_Address;
     UNSIGNED Num_Diffs;
     SALT311.StrType Val {MAXLENGTH(1024)};
   END;
@@ -247,8 +252,9 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_Lexid_Discovered := le.Lexid_Discovered <> ri.Lexid_Discovered;
     SELF.Diff_RemoteIPAddress := le.RemoteIPAddress <> ri.RemoteIPAddress;
     SELF.Diff_ConsumerIPAddress := le.ConsumerIPAddress <> ri.ConsumerIPAddress;
+    SELF.Diff_Email_Address := le.Email_Address <> ri.Email_Address;
     SELF.Val := (SALT311.StrType)evaluate(le,pivot_exp);
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_Transaction_ID,1,0)+ IF( SELF.Diff_TransactionDate,1,0)+ IF( SELF.Diff_FirstName,1,0)+ IF( SELF.Diff_LastName,1,0)+ IF( SELF.Diff_MiddleName,1,0)+ IF( SELF.Diff_Suffix,1,0)+ IF( SELF.Diff_BirthDate,1,0)+ IF( SELF.Diff_SSN,1,0)+ IF( SELF.Diff_Lexid_Input,1,0)+ IF( SELF.Diff_Street1,1,0)+ IF( SELF.Diff_Street2,1,0)+ IF( SELF.Diff_Suite,1,0)+ IF( SELF.Diff_City,1,0)+ IF( SELF.Diff_State,1,0)+ IF( SELF.Diff_Zip5,1,0)+ IF( SELF.Diff_Phone,1,0)+ IF( SELF.Diff_Lexid_Discovered,1,0)+ IF( SELF.Diff_RemoteIPAddress,1,0)+ IF( SELF.Diff_ConsumerIPAddress,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_Transaction_ID,1,0)+ IF( SELF.Diff_TransactionDate,1,0)+ IF( SELF.Diff_FirstName,1,0)+ IF( SELF.Diff_LastName,1,0)+ IF( SELF.Diff_MiddleName,1,0)+ IF( SELF.Diff_Suffix,1,0)+ IF( SELF.Diff_BirthDate,1,0)+ IF( SELF.Diff_SSN,1,0)+ IF( SELF.Diff_Lexid_Input,1,0)+ IF( SELF.Diff_Street1,1,0)+ IF( SELF.Diff_Street2,1,0)+ IF( SELF.Diff_Suite,1,0)+ IF( SELF.Diff_City,1,0)+ IF( SELF.Diff_State,1,0)+ IF( SELF.Diff_Zip5,1,0)+ IF( SELF.Diff_Phone,1,0)+ IF( SELF.Diff_Lexid_Discovered,1,0)+ IF( SELF.Diff_RemoteIPAddress,1,0)+ IF( SELF.Diff_ConsumerIPAddress,1,0)+ IF( SELF.Diff_Email_Address,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -280,6 +286,7 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_Lexid_Discovered := COUNT(GROUP,%Closest%.Diff_Lexid_Discovered);
     Count_Diff_RemoteIPAddress := COUNT(GROUP,%Closest%.Diff_RemoteIPAddress);
     Count_Diff_ConsumerIPAddress := COUNT(GROUP,%Closest%.Diff_ConsumerIPAddress);
+    Count_Diff_Email_Address := COUNT(GROUP,%Closest%.Diff_Email_Address);
   END;
   out_counts := table(%Closest%,%AggRec%,true);
 ENDMACRO;

@@ -43,6 +43,9 @@ module
 		self.FileTime := fn[7];
 		self.ind_type := functions.ind_type_fn(fn[4]);
 		self.file_type := 3 ;
+		//https://confluence.rsi.lexisnexis.com/display/GTG/Data+Source+Identification: 
+		self.RIN_Source := map(	l.RIN_Source = 0 => 1, //identity
+								l.RIN_Source); // NAC or RDP							
 		self:=l;
 		self:=[];
 	end;
@@ -118,8 +121,7 @@ module
 		LOOKUP);
 
 	dappendName := Standardize_Entity.Clean_Name(Valid_Recs);
-	dAppendPhone := Standardize_Entity.Clean_Phone (dappendName);
-	dCleanInputFields := Standardize_Entity.Clean_InputFields (dAppendPhone);
+	dCleanInputFields := Standardize_Entity.Clean_InputFields (dappendName);
 	
 	input_file_1 := fn_dedup(IdentityData_Sprayed  + project(dCleanInputFields,Layouts.Input.IdentityData)); 
 

@@ -22,6 +22,10 @@ EXPORT Functions := MODULE
 
   //****************************************************************************
   //fn_numeric_optional: 	returns true if only populated with numbers or empty
+	//                      If the string contains all numbers the size provided must 
+	//                      equal the length of the string.  Use ALLOW in spc file 
+	//                      if your optional numeric string has varying lengths.
+	//                      EXAMPLE: FIELDTYPE:Numeric_Optional:ALLOW(0123456789)
   //****************************************************************************
   EXPORT fn_numeric_optional(STRING nmbr, UNSIGNED1 size = 0) := FUNCTION
     RETURN IF(LENGTH(TRIM(nmbr, ALL)) IN [0,size] AND Stringlib.StringFilterOut(nmbr, '0123456789') = '',1,0);

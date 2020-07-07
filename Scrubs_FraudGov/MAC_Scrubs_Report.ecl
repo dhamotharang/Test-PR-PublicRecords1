@@ -1,5 +1,5 @@
 ﻿EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,inputFile,MemailList)	:=	FUNCTIONMACRO
-	import FraudShared,FraudGovPlatform;
+	import FraudShared,FraudGovPlatform,Salt35,Scrubs,tools,STD;
 	folder := #EXPAND(myFolder);
 	inFile := inputFile;
 	datasetName	:=	'FraudGov';

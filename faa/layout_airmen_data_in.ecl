@@ -17,6 +17,8 @@ export layout_airmen_data_in := record
    string1 med_class;
    string6 med_date;
    string6 med_exp_date;
+   string8 basic_med_course_date;
+   string8 basic_med_cmec_date;      
    string10 prim_range;
    string2 predir;
    string28 prim_name;

@@ -4,18 +4,20 @@
     address
     fips_state   
     fips_county  
+    county_name
     business_phone
     seleid_status
 
 
 */
-import ut,BIPV2;
+import ut,BIPV2,Address;
 EXPORT Best_From_BIP_Best_Seleid(
 
-  dataset(recordof(Marketing_List.Source_Files().bip_best)) pDataset_Best = Marketing_List.Source_Files().bip_best
- ,dataset(recordof(Marketing_List.Source_Files().bip_base)) pDataset_Base = Marketing_List.Source_Files().bip_base
+  dataset(recordof(Marketing_List.Source_Files().bip_best)) pDataset_Best   = Marketing_List.Source_Files().bip_best
+ ,dataset(recordof(Marketing_List.Source_Files().bip_base)) pDataset_Base   = Marketing_List.Source_Files().bip_base
  ,boolean                                                   pDebug          = false
  ,set of unsigned6                                          pSampleProxids  = []
+ ,dataset(recordof(Address.County_Names                  )) pCounty_Names   = Address.County_Names
 
 ) :=
 function
@@ -47,7 +49,7 @@ function
     // -- get best address and company name that are marketing approved.  
     best_company_name := topn(left.company_name   ((company_name_data_permits    & mktg_bmap) != 0) ,1,-dt_last_seen          )[1];
     best_address      := topn(left.company_address((company_address_data_permits & mktg_bmap) != 0) ,1, company_address_method)[1];
-    best_phone        := topn(left.company_phone  ((company_phone_data_permits   & mktg_bmap) != 0) ,1, company_phone_method  )[1];
+    best_phone        := topn(left.company_phone  ((company_phone_data_permits   & mktg_bmap) != 0,Marketing_List.Validate_phone(company_phone) != '') ,1, company_phone_method  )[1];
   
   
     self.seleid              := left.seleid                             ;
@@ -70,22 +72,26 @@ function
     self.err_stat            := ''                                      ;//need to get this from the base file
     self.fips_state          := best_address.state_fips                 ;
     self.fips_county         := best_address.county_fips                ;
+    self.county_name         := ''                                      ;//get this below
     self.age_of_company      := ''                                      ;
-    self.business_phone      := best_phone.company_phone                ;
+    self.business_phone      := Marketing_List.Validate_phone(best_phone.company_phone)                ;
     self.business_email      := ''                                      ;//need to get this from the base file
     self.annual_revenue      := 0                                       ;
     self.src_revenue         := ''                                      ;
     self.number_of_employees := 0                                       ;
+    self.src_employees       := ''                                      ;
     self.SIC_Primary         := ''                                      ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.SIC2                := ''                                      ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.SIC3                := ''                                      ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.SIC4                := ''                                      ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.SIC5                := ''                                      ; //need to get these from the base file so we can rank them and use dt_last_seen
+    self.src_sics            := ''                                      ;
     self.NAICS_Primary       := ''                                      ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.NAICS2              := ''                                      ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.NAICS3              := ''                                      ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.NAICS4              := ''                                      ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.NAICS5              := ''                                      ; //need to get these from the base file so we can rank them and use dt_last_seen
+    self.src_naics           := ''                                      ;
     self.dt_first_seen       := 0                                       ; //need to get from the base file
     self.dt_last_seen        := 0                                       ; //need to get from the base file
   ));
@@ -93,6 +99,12 @@ function
   // -- filter final dataset to make sure we didn't lose any records because of the marketing filter on company_name and address
   ds_best_seleid := ds_best_prep(trim(business_name) != '',trim(prim_name) != '',trim(v_city_name) != '',trim(st) != '',trim(zip) != '');
   
+  ds_result := join(ds_best_seleid  ,pCounty_Names  ,left.fips_state = right.state_code and left.fips_county = right.county_code ,transform(
+    recordof(left)
+    ,self.county_name := right.county_name  ;
+    ,self             := left               ;
+  ) ,left outer  ,hash  ,keep(1));
+
   output_debug := parallel(
    
     output('---------------------Marketing_List.Best_From_BIP_Best_Seleid---------------------'                      ,named('Marketing_List_Best_From_BIP_Best_Seleid' ),all)
@@ -103,9 +115,10 @@ function
    ,output(choosen(ds_best_get_active_seleids       (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Best_Seleid_ds_best_get_active_seleids'               ),all)
    ,output(choosen(ds_best_prep                     (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Best_Seleid_ds_best_prep'                             ),all)
    ,output(choosen(ds_best_seleid                   (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Best_Seleid_ds_best_seleid'                           ),all)
+   ,output(choosen(ds_result                        (count(pSampleProxids) = 0 or seleid in set_debug_seleids),300)  ,named('Best_From_BIP_Best_Seleid_ds_result'                                ),all)
   
   );
 
-  return when(ds_best_seleid  ,if(pDebug = true ,output_debug));
+  return when(ds_result  ,if(pDebug = true ,output_debug));
   
 end;

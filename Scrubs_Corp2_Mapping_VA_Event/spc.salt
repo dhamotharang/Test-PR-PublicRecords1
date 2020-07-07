@@ -1,4 +1,4 @@
-OPTIONS:-gh 
+﻿OPTIONS:-gh 
 MODULE:Scrubs_Corp2_Mapping_VA_Event
 FILENAME:In_VA
 //Uncomment up to NINES for internal or external adl
@@ -39,7 +39,7 @@ FIELD:event_amendment_nbr:TYPE(STRING3):0,0
 FIELD:event_filing_date:TYPE(STRING8):LIKE(invalid_date):0,0
 FIELD:event_date_type_cd:TYPE(STRING3):0,0
 FIELD:event_date_type_desc:TYPE(STRING30):0,0
-FIELD:event_filing_cd:TYPE(STRING8):LIKE(invalid_filing_type_cd):0,0
+FIELD:event_filing_cd:TYPE(STRING8):0,0
 FIELD:event_filing_desc:TYPE(STRING60):0,0
 FIELD:event_corp_nbr:TYPE(STRING32):0,0
 FIELD:event_corp_nbr_cd:TYPE(STRING1):0,0
@@ -52,9 +52,9 @@ FIELD:event_microfilm_nbr:TYPE(STRING10):0,0
 FIELD:event_desc:TYPE(STRING500):0,0
 FIELD:event_revocation_comment1:TYPE(STRING250):0,0
 FIELD:event_revocation_comment2:TYPE(STRING250):0,0
-FIELD:event_book_number:TYPE(STRING9):0,0
-FIELD:event_page_number:TYPE(STRING9):0,0
-FIELD:event_certification_number:TYPE(STRING9):0,0
+FIELD:event_book_nbr:TYPE(STRING9):0,0
+FIELD:event_page_nbr:TYPE(STRING9):0,0
+FIELD:event_certification_nbr:TYPE(STRING9):0,0
 //CONCEPT statements should be used to group together interellated fields; such as address
 //RELATIONSHIP is used to find non-obvious relationships between the clusters
 //SOURCEFIELD is used if a field of the file denotes a source of the records in that file

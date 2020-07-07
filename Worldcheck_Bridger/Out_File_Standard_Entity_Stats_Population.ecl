@@ -1,4 +1,4 @@
-#option('skipFileFormatCrcCheck', 1);
+﻿#option('skipFileFormatCrcCheck', 1);
 #option('maxLength', 131072);
 
 import ut, strata;
@@ -256,7 +256,7 @@ dsMain := dataset('~thor_200::persist::worldcheck::standard_worldcheck_bridger.m
 //LINK TOS//////////////////////////////////////////////////////////////////////
 	
 		dsNormLinkTosLayout := RECORD
-	//,maxLength(100000)
+	,maxLength(100000)
 	  string uid;
 	  string last_name;
 	  string first_name;

@@ -67,7 +67,7 @@ EXPORT ProcessFile(DATASET(Layouts.rEntity) infile, boolean useLexId = false) :=
 	// add akas
 	withaka := JOIN(basis, dedup(distribute(AllAkas, id),AKA,local), LEFT.id=Right.id,
 					TRANSFORM(Layout_XG.routp,
-						self.aka_list.AKA := RIGHT.AKA;
+						self.aka_list.AKA := CHOOSEN(RIGHT.AKA,254); 
 						self := LEFT;
 					), LEFT OUTER, LOCAL);
 					

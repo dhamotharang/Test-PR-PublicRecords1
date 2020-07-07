@@ -1,4 +1,4 @@
-EXPORT Constants := module
+﻿EXPORT Constants := module
 
 EXPORT dca_keyname := 	'~prte::key::dca::'; 
 
@@ -13,5 +13,7 @@ EXPORT ak_typestr := 'AK';
 EXPORT in_dca := '~PRTE::IN::dca';
 
 EXPORT base_dca := '~PRTE::BASE::dca'; 
+
+EXPORT dataset_name := 'DCAKEYS';
 
 END;

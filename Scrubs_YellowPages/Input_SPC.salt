@@ -1,0 +1,142 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_YellowPages
+FILENAME:YellowPages
+NAMESCOPE:Input
+// Uncomment up to NINES for internal or external adl
+// IDFIELD:EXISTS:<NameOfIDField>
+// RIDFIELD:<NameOfRidField>
+// RECORDS:<NumberOfRecordsInDataFile>
+// POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+// NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+// Uncomment Process if doing external adl
+// PROCESS:<ProcessName>
+// FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+// BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+// FUZZY can be used to create new types of FUZZY linking
+// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.
+// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running
+// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
+
+//FIELDTYPE DEFINITIONS
+FIELDTYPE:invalid_numeric:CUSTOM(Scrubs_YellowPages.Functions.fn_numeric>0)
+FIELDTYPE:invalid_mandatory:CUSTOM(Scrubs_YellowPages.Functions.fn_populated_strings>0)
+FIELDTYPE:invalid_date:CUSTOM(Scrubs_YellowPages.Functions.fn_valid_date>0)
+
+FIELDTYPE:invalid_orig_city:CUSTOM(Scrubs_YellowPages.Functions.fn_populated_strings>0,orig_state,orig_zip)
+FIELDTYPE:invalid_orig_state:CUSTOM(Scrubs_YellowPages.Functions.fn_verify_state>0)
+FIELDTYPE:invalid_orig_zip:CUSTOM(Scrubs_YellowPages.Functions.fn_verify_zip59>0)
+FIELDTYPE:invalid_sic_code:CUSTOM(Scrubs_YellowPages.Functions.fn_valid_SicCode>0)
+FIELDTYPE:invalid_sic2:CUSTOM(Scrubs_YellowPages.Functions.fn_valid_SicCode>0)
+FIELDTYPE:invalid_sic3:CUSTOM(Scrubs_YellowPages.Functions.fn_valid_SicCode>0)
+FIELDTYPE:invalid_sic4:CUSTOM(Scrubs_YellowPages.Functions.fn_valid_SicCode>0)
+FIELDTYPE:invalid_naics_code:CUSTOM(Scrubs_YellowPages.Functions.fn_validate_NAICSCode>0)
+FIELDTYPE:invalid_orig_phone10:CUSTOM(Scrubs_YellowPages.Functions.fn_numeric>0,10)
+
+//FIELD DEFINITIONS
+FIELD:primary_key:TYPE(STRING12):LIKE(invalid_numeric):0,0
+FIELD:chainid:TYPE(STRING4):0,0
+FIELD:filler1:TYPE(STRING14):0,0
+FIELD:pub_date:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:busshortname:TYPE(STRING30):0,0
+FIELD:business_name:TYPE(STRING100):LIKE(invalid_mandatory):0,0
+FIELD:busdeptname:TYPE(STRING100):0,0
+FIELD:house:TYPE(STRING10):0,0
+FIELD:predir:TYPE(STRING2):0,0
+FIELD:street:TYPE(STRING28):0,0
+FIELD:streettype:TYPE(STRING4):0,0
+FIELD:postdir:TYPE(STRING2):0,0
+FIELD:apttype:TYPE(STRING4):0,0
+FIELD:aptnbr:TYPE(STRING8):0,0
+FIELD:boxnbr:TYPE(STRING10):0,0
+FIELD:exppubcity:TYPE(STRING28):0,0
+FIELD:orig_city:TYPE(STRING28):LIKE(invalid_orig_city):0,0
+FIELD:orig_state:TYPE(STRING2):LIKE(invalid_orig_state):0,0
+FIELD:orig_zip:TYPE(STRING9):LIKE(invalid_orig_zip):0,0
+FIELD:dpc:TYPE(STRING3):0,0
+FIELD:carrierroute:TYPE(STRING4):0,0
+FIELD:fips:TYPE(STRING2):0,0
+FIELD:countycode:TYPE(STRING3):0,0
+FIELD:z4type:TYPE(STRING1):0,0
+FIELD:ctract:TYPE(STRING6):0,0
+FIELD:cblockgroup:TYPE(STRING1):0,0
+FIELD:cblockid:TYPE(STRING3):0,0
+FIELD:msa:TYPE(STRING4):0,0
+FIELD:cbsa:TYPE(STRING5):0,0
+FIELD:mcdcode:TYPE(STRING5):0,0
+FIELD:filler2:TYPE(STRING8):0,0
+FIELD:addrsensitivity:TYPE(STRING1):0,0
+FIELD:maildeliverabilitycode:TYPE(STRING1):0,0
+FIELD:sic1_4:TYPE(STRING4):0,0
+FIELD:sic_code:TYPE(STRING8):LIKE(invalid_sic_code):0,0
+FIELD:sic2:TYPE(STRING8):LIKE(invalid_sic2):0,0
+FIELD:sic3:TYPE(STRING8):LIKE(invalid_sic3):0,0
+FIELD:sic4:TYPE(STRING8):LIKE(invalid_sic4):0,0
+FIELD:indstryclass:TYPE(STRING1):0,0
+FIELD:naics_code:TYPE(STRING6):LIKE(invalid_naics_code):0,0
+FIELD:mlsc:TYPE(STRING1):0,0
+FIELD:filler3:TYPE(STRING8):0,0
+FIELD:orig_phone10:TYPE(STRING10):LIKE(invalid_orig_phone10):0,0
+FIELD:nosolicitcode:TYPE(STRING1):0,0
+FIELD:dso:TYPE(STRING1):0,0
+FIELD:timezone:TYPE(STRING1):0,0
+FIELD:validationflag:TYPE(STRING1):0,0
+FIELD:validationdate:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:secvalidationcode:TYPE(STRING1):0,0
+FIELD:singleaddrflag:TYPE(STRING2):0,0
+FIELD:filler4:TYPE(STRING2):0,0
+FIELD:gender:TYPE(STRING2):0,0
+FIELD:execname:TYPE(STRING40):0,0
+FIELD:exectitlecode:TYPE(STRING4):0,0
+FIELD:exectitle:TYPE(STRING40):0,0
+FIELD:condtitlecode:TYPE(STRING4):0,0
+FIELD:condtitle:TYPE(STRING40):0,0
+FIELD:contfunctioncode:TYPE(STRING4):0,0
+FIELD:contfunction:TYPE(STRING40):0,0
+FIELD:profession:TYPE(STRING40):0,0
+FIELD:emplsizecode:TYPE(STRING1):0,0
+FIELD:annualsalescode:TYPE(STRING1):0,0
+FIELD:yrsinbus:TYPE(STRING1):0,0
+FIELD:ethniccode:TYPE(STRING8):0,0
+FIELD:filler5:TYPE(STRING6):0,0
+FIELD:latlongmatchlevel:TYPE(STRING1):0,0
+FIELD:orig_latitude:TYPE(STRING11):0,0
+FIELD:orig_longitude:TYPE(STRING11):0,0
+FIELD:filler6:TYPE(STRING17):0,0
+FIELD:heading_string:TYPE(STRING100):0,0
+FIELD:ypheading2:TYPE(STRING100):0,0
+FIELD:ypheading3:TYPE(STRING100):0,0
+FIELD:ypheading4:TYPE(STRING100):0,0
+FIELD:ypheading5:TYPE(STRING100):0,0
+FIELD:ypheading6:TYPE(STRING100):0,0
+FIELD:maxypadsize:TYPE(STRING1):0,0
+FIELD:filler7:TYPE(STRING4):0,0
+FIELD:faxac:TYPE(STRING3):0,0
+FIELD:faxexchge:TYPE(STRING3):0,0
+FIELD:faxphone:TYPE(STRING4):0,0
+FIELD:altac:TYPE(STRING3):0,0
+FIELD:altexchge:TYPE(STRING3):0,0
+FIELD:altphone:TYPE(STRING4):0,0
+FIELD:mobileac:TYPE(STRING3):0,0
+FIELD:mobileexchge:TYPE(STRING3):0,0
+FIELD:mobilephone:TYPE(STRING4):0,0
+FIELD:tollfreeac:TYPE(STRING3):0,0
+FIELD:tollfreeexchge:TYPE(STRING3):0,0
+FIELD:tollfreephone:TYPE(STRING4):0,0
+FIELD:creditcards:TYPE(STRING3):0,0
+FIELD:brands:TYPE(STRING200):0,0
+FIELD:stdhrs:TYPE(STRING88):0,0
+FIELD:hrsopen:TYPE(STRING100):0,0
+FIELD:web_address:TYPE(STRING60):0,0
+FIELD:filler8:TYPE(STRING60):0,0
+FIELD:email_address:TYPE(STRING30):0,0
+FIELD:services:TYPE(STRING200):0,0
+FIELD:condheading:TYPE(STRING100):0,0
+FIELD:tagline:TYPE(STRING100):0,0
+FIELD:filler9:TYPE(STRING244):0,0
+FIELD:totaladspend:TYPE(STRING10):0,0
+FIELD:filler10:TYPE(STRING160):0,0
+FIELD:crlf:TYPE(STRING2):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

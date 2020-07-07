@@ -2,10 +2,10 @@
 EXPORT RDP_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 31;
-  EXPORT NumRulesFromFieldType := 31;
+  EXPORT NumRules := 32;
+  EXPORT NumRulesFromFieldType := 32;
   EXPORT NumRulesFromRecordType := 0;
-  EXPORT NumFieldsWithRules := 19;
+  EXPORT NumFieldsWithRules := 20;
   EXPORT NumFieldsWithPossibleEdits := 8;
   EXPORT NumRulesWithPossibleEdits := 20;
   EXPORT Expanded_Layout := RECORD(RDP_Layout_RDP)
@@ -36,11 +36,75 @@ EXPORT RDP_Scrubs := MODULE
     BOOLEAN RemoteIPAddress_wouldClean;
     UNSIGNED1 ConsumerIPAddress_Invalid;
     BOOLEAN ConsumerIPAddress_wouldClean;
+    UNSIGNED1 Email_Address_Invalid;
   END;
   EXPORT  Bitmap_Layout := RECORD(RDP_Layout_RDP)
     UNSIGNED8 ScrubsBits1;
     UNSIGNED8 ScrubsCleanBits1;
   END;
+  EXPORT Rule_Layout := RECORD(RDP_Layout_RDP)
+    STRING Rules {MAXLENGTH(1000)};
+  END;
+  SHARED toRuleDesc(UNSIGNED c) := CHOOSE(c
+          ,'Transaction_ID:invalid_numeric:ALLOW'
+          ,'TransactionDate:invalid_date:LEFTTRIM','TransactionDate:invalid_date:ALLOW'
+          ,'FirstName:invalid_alphanumeric:ALLOW'
+          ,'LastName:invalid_alphanumeric:ALLOW'
+          ,'MiddleName:invalid_alphanumeric:ALLOW'
+          ,'Suffix:invalid_alphanumeric:ALLOW'
+          ,'BirthDate:invalid_date:LEFTTRIM','BirthDate:invalid_date:ALLOW'
+          ,'SSN:invalid_ssn:LEFTTRIM','SSN:invalid_ssn:ALLOW','SSN:invalid_ssn:LENGTHS'
+          ,'Lexid_Input:invalid_numeric:ALLOW'
+          ,'Street1:invalid_alphanumeric:ALLOW'
+          ,'Street2:invalid_alphanumeric:ALLOW'
+          ,'Suite:invalid_alphanumeric:ALLOW'
+          ,'City:invalid_alphanumeric:ALLOW'
+          ,'State:invalid_state:LEFTTRIM','State:invalid_state:ALLOW','State:invalid_state:LENGTHS'
+          ,'Zip5:invalid_zip:LEFTTRIM','Zip5:invalid_zip:ALLOW','Zip5:invalid_zip:LENGTHS'
+          ,'Phone:invalid_phone:LEFTTRIM','Phone:invalid_phone:ALLOW','Phone:invalid_phone:LENGTHS'
+          ,'Lexid_Discovered:invalid_numeric:ALLOW'
+          ,'RemoteIPAddress:invalid_ip:LEFTTRIM','RemoteIPAddress:invalid_ip:ALLOW'
+          ,'ConsumerIPAddress:invalid_ip:LEFTTRIM','ConsumerIPAddress:invalid_ip:ALLOW'
+          ,'Email_Address:invalid_email:ALLOW'
+          ,'field:Number_Errored_Fields:SUMMARY'
+          ,'field:Number_Perfect_Fields:SUMMARY'
+          ,'rule:Number_Errored_Rules:SUMMARY'
+          ,'rule:Number_Perfect_Rules:SUMMARY'
+          ,'rule:Number_OnFail_Rules:SUMMARY'
+          ,'record:Number_Errored_Records:SUMMARY'
+          ,'record:Number_Perfect_Records:SUMMARY'
+          ,'record:Number_Edited_Records:SUMMARY'
+          ,'rule:Number_Edited_Rules:SUMMARY','UNKNOWN');
+  SHARED toErrorMessage(UNSIGNED c) := CHOOSE(c
+          ,RDP_Fields.InvalidMessage_Transaction_ID(1)
+          ,RDP_Fields.InvalidMessage_TransactionDate(1),RDP_Fields.InvalidMessage_TransactionDate(2)
+          ,RDP_Fields.InvalidMessage_FirstName(1)
+          ,RDP_Fields.InvalidMessage_LastName(1)
+          ,RDP_Fields.InvalidMessage_MiddleName(1)
+          ,RDP_Fields.InvalidMessage_Suffix(1)
+          ,RDP_Fields.InvalidMessage_BirthDate(1),RDP_Fields.InvalidMessage_BirthDate(2)
+          ,RDP_Fields.InvalidMessage_SSN(1),RDP_Fields.InvalidMessage_SSN(2),RDP_Fields.InvalidMessage_SSN(3)
+          ,RDP_Fields.InvalidMessage_Lexid_Input(1)
+          ,RDP_Fields.InvalidMessage_Street1(1)
+          ,RDP_Fields.InvalidMessage_Street2(1)
+          ,RDP_Fields.InvalidMessage_Suite(1)
+          ,RDP_Fields.InvalidMessage_City(1)
+          ,RDP_Fields.InvalidMessage_State(1),RDP_Fields.InvalidMessage_State(2),RDP_Fields.InvalidMessage_State(3)
+          ,RDP_Fields.InvalidMessage_Zip5(1),RDP_Fields.InvalidMessage_Zip5(2),RDP_Fields.InvalidMessage_Zip5(3)
+          ,RDP_Fields.InvalidMessage_Phone(1),RDP_Fields.InvalidMessage_Phone(2),RDP_Fields.InvalidMessage_Phone(3)
+          ,RDP_Fields.InvalidMessage_Lexid_Discovered(1)
+          ,RDP_Fields.InvalidMessage_RemoteIPAddress(1),RDP_Fields.InvalidMessage_RemoteIPAddress(2)
+          ,RDP_Fields.InvalidMessage_ConsumerIPAddress(1),RDP_Fields.InvalidMessage_ConsumerIPAddress(2)
+          ,RDP_Fields.InvalidMessage_Email_Address(1)
+          ,'Fields with errors'
+          ,'Fields without errors'
+          ,'Rules with errors'
+          ,'Rules without errors'
+          ,'Rules with possible edits'
+          ,'Records with at least one error'
+          ,'Records without errors'
+          ,'Edited records'
+          ,'Rules leading to edits','UNKNOWN');
 EXPORT FromNone(DATASET(RDP_Layout_RDP) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
     SELF.Transaction_ID_Invalid := RDP_Fields.InValid_Transaction_ID((SALT311.StrType)le.Transaction_ID);
@@ -78,16 +142,30 @@ EXPORT FromNone(DATASET(RDP_Layout_RDP) h) := MODULE
     SELF.ConsumerIPAddress_Invalid := RDP_Fields.InValid_ConsumerIPAddress((SALT311.StrType)le.ConsumerIPAddress);
     SELF.ConsumerIPAddress := IF(SELF.ConsumerIPAddress_Invalid=0 OR NOT withOnfail, le.ConsumerIPAddress, (TYPEOF(le.ConsumerIPAddress))''); // ONFAIL(BLANK)
     SELF.ConsumerIPAddress_wouldClean :=  SELF.ConsumerIPAddress_Invalid > 0;
+    SELF.Email_Address_Invalid := RDP_Fields.InValid_Email_Address((SALT311.StrType)le.Email_Address);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),RDP_Layout_RDP);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.Transaction_ID_Invalid << 0 ) + ( le.TransactionDate_Invalid << 1 ) + ( le.FirstName_Invalid << 3 ) + ( le.LastName_Invalid << 4 ) + ( le.MiddleName_Invalid << 5 ) + ( le.Suffix_Invalid << 6 ) + ( le.BirthDate_Invalid << 7 ) + ( le.SSN_Invalid << 9 ) + ( le.Lexid_Input_Invalid << 11 ) + ( le.Street1_Invalid << 12 ) + ( le.Street2_Invalid << 13 ) + ( le.Suite_Invalid << 14 ) + ( le.City_Invalid << 15 ) + ( le.State_Invalid << 16 ) + ( le.Zip5_Invalid << 18 ) + ( le.Phone_Invalid << 20 ) + ( le.Lexid_Discovered_Invalid << 22 ) + ( le.RemoteIPAddress_Invalid << 23 ) + ( le.ConsumerIPAddress_Invalid << 25 );
+    SELF.ScrubsBits1 := ( le.Transaction_ID_Invalid << 0 ) + ( le.TransactionDate_Invalid << 1 ) + ( le.FirstName_Invalid << 3 ) + ( le.LastName_Invalid << 4 ) + ( le.MiddleName_Invalid << 5 ) + ( le.Suffix_Invalid << 6 ) + ( le.BirthDate_Invalid << 7 ) + ( le.SSN_Invalid << 9 ) + ( le.Lexid_Input_Invalid << 11 ) + ( le.Street1_Invalid << 12 ) + ( le.Street2_Invalid << 13 ) + ( le.Suite_Invalid << 14 ) + ( le.City_Invalid << 15 ) + ( le.State_Invalid << 16 ) + ( le.Zip5_Invalid << 18 ) + ( le.Phone_Invalid << 20 ) + ( le.Lexid_Discovered_Invalid << 22 ) + ( le.RemoteIPAddress_Invalid << 23 ) + ( le.ConsumerIPAddress_Invalid << 25 ) + ( le.Email_Address_Invalid << 27 );
     SELF.ScrubsCleanBits1 := ( IF(le.TransactionDate_wouldClean, 1, 0) << 0 ) + ( IF(le.BirthDate_wouldClean, 1, 0) << 1 ) + ( IF(le.SSN_wouldClean, 1, 0) << 2 ) + ( IF(le.State_wouldClean, 1, 0) << 3 ) + ( IF(le.Zip5_wouldClean, 1, 0) << 4 ) + ( IF(le.Phone_wouldClean, 1, 0) << 5 ) + ( IF(le.RemoteIPAddress_wouldClean, 1, 0) << 6 ) + ( IF(le.ConsumerIPAddress_wouldClean, 1, 0) << 7 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
+  STRING escQuotes(STRING s) := STD.Str.FindReplace(s,'\'','\\\'');
+  Rule_Layout IntoRule(BitmapInfile le, UNSIGNED c) := TRANSFORM
+    mask := 1<<(c-1);
+    hasError := (mask&le.ScrubsBits1)>0;
+    SELF.Rules := IF(hasError,TRIM(toRuleDesc(c))+':\''+escQuotes(TRIM(toErrorMessage(c)))+'\'',IF(le.ScrubsBits1=0 AND c=1,'',SKIP));
+    SELF := le;
+  END;
+  unrolled := NORMALIZE(BitmapInfile,NumRules,IntoRule(LEFT,COUNTER));
+  Rule_Layout toRoll(Rule_Layout le,Rule_Layout ri) := TRANSFORM
+    SELF.Rules := TRIM(le.Rules) + IF(LENGTH(TRIM(le.Rules))>0 AND LENGTH(TRIM(ri.Rules))>0,',','') + TRIM(ri.Rules);
+    SELF := le;
+  END;
+  EXPORT RulesInfile := ROLLUP(unrolled,toRoll(LEFT,RIGHT),EXCEPT Rules);
 END;
 // Module to use if you already have a scrubs bitmap you wish to expand or compare
 EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
@@ -112,6 +190,7 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.Lexid_Discovered_Invalid := (le.ScrubsBits1 >> 22) & 1;
     SELF.RemoteIPAddress_Invalid := (le.ScrubsBits1 >> 23) & 3;
     SELF.ConsumerIPAddress_Invalid := (le.ScrubsBits1 >> 25) & 3;
+    SELF.Email_Address_Invalid := (le.ScrubsBits1 >> 27) & 1;
     SELF.TransactionDate_wouldClean := le.ScrubsCleanBits1 >> 0;
     SELF.BirthDate_wouldClean := le.ScrubsCleanBits1 >> 1;
     SELF.SSN_wouldClean := le.ScrubsCleanBits1 >> 2;
@@ -187,7 +266,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     ConsumerIPAddress_ALLOW_ErrorCount := COUNT(GROUP,h.ConsumerIPAddress_Invalid=2);
     ConsumerIPAddress_ALLOW_WouldModifyCount := COUNT(GROUP,h.ConsumerIPAddress_Invalid=2 AND h.ConsumerIPAddress_wouldClean);
     ConsumerIPAddress_Total_ErrorCount := COUNT(GROUP,h.ConsumerIPAddress_Invalid>0);
-    AnyRule_WithErrorsCount := COUNT(GROUP, h.Transaction_ID_Invalid > 0 OR h.TransactionDate_Invalid > 0 OR h.FirstName_Invalid > 0 OR h.LastName_Invalid > 0 OR h.MiddleName_Invalid > 0 OR h.Suffix_Invalid > 0 OR h.BirthDate_Invalid > 0 OR h.SSN_Invalid > 0 OR h.Lexid_Input_Invalid > 0 OR h.Street1_Invalid > 0 OR h.Street2_Invalid > 0 OR h.Suite_Invalid > 0 OR h.City_Invalid > 0 OR h.State_Invalid > 0 OR h.Zip5_Invalid > 0 OR h.Phone_Invalid > 0 OR h.Lexid_Discovered_Invalid > 0 OR h.RemoteIPAddress_Invalid > 0 OR h.ConsumerIPAddress_Invalid > 0);
+    Email_Address_ALLOW_ErrorCount := COUNT(GROUP,h.Email_Address_Invalid=1);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.Transaction_ID_Invalid > 0 OR h.TransactionDate_Invalid > 0 OR h.FirstName_Invalid > 0 OR h.LastName_Invalid > 0 OR h.MiddleName_Invalid > 0 OR h.Suffix_Invalid > 0 OR h.BirthDate_Invalid > 0 OR h.SSN_Invalid > 0 OR h.Lexid_Input_Invalid > 0 OR h.Street1_Invalid > 0 OR h.Street2_Invalid > 0 OR h.Suite_Invalid > 0 OR h.City_Invalid > 0 OR h.State_Invalid > 0 OR h.Zip5_Invalid > 0 OR h.Phone_Invalid > 0 OR h.Lexid_Discovered_Invalid > 0 OR h.RemoteIPAddress_Invalid > 0 OR h.ConsumerIPAddress_Invalid > 0 OR h.Email_Address_Invalid > 0);
     AnyRule_WithEditsCount := COUNT(GROUP, h.TransactionDate_wouldClean OR h.BirthDate_wouldClean OR h.SSN_wouldClean OR h.State_wouldClean OR h.Zip5_wouldClean OR h.Phone_wouldClean OR h.RemoteIPAddress_wouldClean OR h.ConsumerIPAddress_wouldClean);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
@@ -197,9 +277,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.Transaction_ID_ALLOW_ErrorCount > 0, 1, 0) + IF(le.TransactionDate_Total_ErrorCount > 0, 1, 0) + IF(le.FirstName_ALLOW_ErrorCount > 0, 1, 0) + IF(le.LastName_ALLOW_ErrorCount > 0, 1, 0) + IF(le.MiddleName_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.BirthDate_Total_ErrorCount > 0, 1, 0) + IF(le.SSN_Total_ErrorCount > 0, 1, 0) + IF(le.Lexid_Input_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Street1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Street2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Suite_ALLOW_ErrorCount > 0, 1, 0) + IF(le.City_ALLOW_ErrorCount > 0, 1, 0) + IF(le.State_Total_ErrorCount > 0, 1, 0) + IF(le.Zip5_Total_ErrorCount > 0, 1, 0) + IF(le.Phone_Total_ErrorCount > 0, 1, 0) + IF(le.Lexid_Discovered_ALLOW_ErrorCount > 0, 1, 0) + IF(le.RemoteIPAddress_Total_ErrorCount > 0, 1, 0) + IF(le.ConsumerIPAddress_Total_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.Transaction_ID_ALLOW_ErrorCount > 0, 1, 0) + IF(le.TransactionDate_Total_ErrorCount > 0, 1, 0) + IF(le.FirstName_ALLOW_ErrorCount > 0, 1, 0) + IF(le.LastName_ALLOW_ErrorCount > 0, 1, 0) + IF(le.MiddleName_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.BirthDate_Total_ErrorCount > 0, 1, 0) + IF(le.SSN_Total_ErrorCount > 0, 1, 0) + IF(le.Lexid_Input_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Street1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Street2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Suite_ALLOW_ErrorCount > 0, 1, 0) + IF(le.City_ALLOW_ErrorCount > 0, 1, 0) + IF(le.State_Total_ErrorCount > 0, 1, 0) + IF(le.Zip5_Total_ErrorCount > 0, 1, 0) + IF(le.Phone_Total_ErrorCount > 0, 1, 0) + IF(le.Lexid_Discovered_ALLOW_ErrorCount > 0, 1, 0) + IF(le.RemoteIPAddress_Total_ErrorCount > 0, 1, 0) + IF(le.ConsumerIPAddress_Total_ErrorCount > 0, 1, 0) + IF(le.Email_Address_ALLOW_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.Transaction_ID_ALLOW_ErrorCount > 0, 1, 0) + IF(le.TransactionDate_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.TransactionDate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.FirstName_ALLOW_ErrorCount > 0, 1, 0) + IF(le.LastName_ALLOW_ErrorCount > 0, 1, 0) + IF(le.MiddleName_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.BirthDate_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.BirthDate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SSN_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.SSN_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SSN_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.Lexid_Input_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Street1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Street2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Suite_ALLOW_ErrorCount > 0, 1, 0) + IF(le.City_ALLOW_ErrorCount > 0, 1, 0) + IF(le.State_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.State_ALLOW_ErrorCount > 0, 1, 0) + IF(le.State_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.Zip5_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.Zip5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Zip5_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.Phone_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.Phone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Phone_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.Lexid_Discovered_ALLOW_ErrorCount > 0, 1, 0) + IF(le.RemoteIPAddress_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.RemoteIPAddress_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ConsumerIPAddress_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.ConsumerIPAddress_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.Transaction_ID_ALLOW_ErrorCount > 0, 1, 0) + IF(le.TransactionDate_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.TransactionDate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.FirstName_ALLOW_ErrorCount > 0, 1, 0) + IF(le.LastName_ALLOW_ErrorCount > 0, 1, 0) + IF(le.MiddleName_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.BirthDate_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.BirthDate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SSN_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.SSN_ALLOW_ErrorCount > 0, 1, 0) + IF(le.SSN_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.Lexid_Input_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Street1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Street2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Suite_ALLOW_ErrorCount > 0, 1, 0) + IF(le.City_ALLOW_ErrorCount > 0, 1, 0) + IF(le.State_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.State_ALLOW_ErrorCount > 0, 1, 0) + IF(le.State_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.Zip5_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.Zip5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Zip5_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.Phone_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.Phone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Phone_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.Lexid_Discovered_ALLOW_ErrorCount > 0, 1, 0) + IF(le.RemoteIPAddress_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.RemoteIPAddress_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ConsumerIPAddress_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.ConsumerIPAddress_ALLOW_ErrorCount > 0, 1, 0) + IF(le.Email_Address_ALLOW_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF.Rules_WithEdits := IF(le.TransactionDate_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.TransactionDate_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.BirthDate_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.BirthDate_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.SSN_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.SSN_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.SSN_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.State_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.State_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.State_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.Zip5_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.Zip5_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.Zip5_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.Phone_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.Phone_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.Phone_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.RemoteIPAddress_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.RemoteIPAddress_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.ConsumerIPAddress_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.ConsumerIPAddress_ALLOW_WouldModifyCount > 0, 1, 0);
     SELF := le;
@@ -215,8 +295,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.Transaction_ID_Invalid,le.TransactionDate_Invalid,le.FirstName_Invalid,le.LastName_Invalid,le.MiddleName_Invalid,le.Suffix_Invalid,le.BirthDate_Invalid,le.SSN_Invalid,le.Lexid_Input_Invalid,le.Street1_Invalid,le.Street2_Invalid,le.Suite_Invalid,le.City_Invalid,le.State_Invalid,le.Zip5_Invalid,le.Phone_Invalid,le.Lexid_Discovered_Invalid,le.RemoteIPAddress_Invalid,le.ConsumerIPAddress_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,RDP_Fields.InvalidMessage_Transaction_ID(le.Transaction_ID_Invalid),RDP_Fields.InvalidMessage_TransactionDate(le.TransactionDate_Invalid),RDP_Fields.InvalidMessage_FirstName(le.FirstName_Invalid),RDP_Fields.InvalidMessage_LastName(le.LastName_Invalid),RDP_Fields.InvalidMessage_MiddleName(le.MiddleName_Invalid),RDP_Fields.InvalidMessage_Suffix(le.Suffix_Invalid),RDP_Fields.InvalidMessage_BirthDate(le.BirthDate_Invalid),RDP_Fields.InvalidMessage_SSN(le.SSN_Invalid),RDP_Fields.InvalidMessage_Lexid_Input(le.Lexid_Input_Invalid),RDP_Fields.InvalidMessage_Street1(le.Street1_Invalid),RDP_Fields.InvalidMessage_Street2(le.Street2_Invalid),RDP_Fields.InvalidMessage_Suite(le.Suite_Invalid),RDP_Fields.InvalidMessage_City(le.City_Invalid),RDP_Fields.InvalidMessage_State(le.State_Invalid),RDP_Fields.InvalidMessage_Zip5(le.Zip5_Invalid),RDP_Fields.InvalidMessage_Phone(le.Phone_Invalid),RDP_Fields.InvalidMessage_Lexid_Discovered(le.Lexid_Discovered_Invalid),RDP_Fields.InvalidMessage_RemoteIPAddress(le.RemoteIPAddress_Invalid),RDP_Fields.InvalidMessage_ConsumerIPAddress(le.ConsumerIPAddress_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.Transaction_ID_Invalid,le.TransactionDate_Invalid,le.FirstName_Invalid,le.LastName_Invalid,le.MiddleName_Invalid,le.Suffix_Invalid,le.BirthDate_Invalid,le.SSN_Invalid,le.Lexid_Input_Invalid,le.Street1_Invalid,le.Street2_Invalid,le.Suite_Invalid,le.City_Invalid,le.State_Invalid,le.Zip5_Invalid,le.Phone_Invalid,le.Lexid_Discovered_Invalid,le.RemoteIPAddress_Invalid,le.ConsumerIPAddress_Invalid,le.Email_Address_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,RDP_Fields.InvalidMessage_Transaction_ID(le.Transaction_ID_Invalid),RDP_Fields.InvalidMessage_TransactionDate(le.TransactionDate_Invalid),RDP_Fields.InvalidMessage_FirstName(le.FirstName_Invalid),RDP_Fields.InvalidMessage_LastName(le.LastName_Invalid),RDP_Fields.InvalidMessage_MiddleName(le.MiddleName_Invalid),RDP_Fields.InvalidMessage_Suffix(le.Suffix_Invalid),RDP_Fields.InvalidMessage_BirthDate(le.BirthDate_Invalid),RDP_Fields.InvalidMessage_SSN(le.SSN_Invalid),RDP_Fields.InvalidMessage_Lexid_Input(le.Lexid_Input_Invalid),RDP_Fields.InvalidMessage_Street1(le.Street1_Invalid),RDP_Fields.InvalidMessage_Street2(le.Street2_Invalid),RDP_Fields.InvalidMessage_Suite(le.Suite_Invalid),RDP_Fields.InvalidMessage_City(le.City_Invalid),RDP_Fields.InvalidMessage_State(le.State_Invalid),RDP_Fields.InvalidMessage_Zip5(le.Zip5_Invalid),RDP_Fields.InvalidMessage_Phone(le.Phone_Invalid),RDP_Fields.InvalidMessage_Lexid_Discovered(le.Lexid_Discovered_Invalid),RDP_Fields.InvalidMessage_RemoteIPAddress(le.RemoteIPAddress_Invalid),RDP_Fields.InvalidMessage_ConsumerIPAddress(le.ConsumerIPAddress_Invalid),RDP_Fields.InvalidMessage_Email_Address(le.Email_Address_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.Transaction_ID_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.TransactionDate_Invalid,'LEFTTRIM','ALLOW','UNKNOWN')
@@ -236,12 +316,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.Phone_Invalid,'LEFTTRIM','ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.Lexid_Discovered_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.RemoteIPAddress_Invalid,'LEFTTRIM','ALLOW','UNKNOWN')
-          ,CHOOSE(le.ConsumerIPAddress_Invalid,'LEFTTRIM','ALLOW','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'Transaction_ID','TransactionDate','FirstName','LastName','MiddleName','Suffix','BirthDate','SSN','Lexid_Input','Street1','Street2','Suite','City','State','Zip5','Phone','Lexid_Discovered','RemoteIPAddress','ConsumerIPAddress','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_numeric','invalid_date','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_date','invalid_ssn','invalid_numeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_state','invalid_zip','invalid_phone','invalid_numeric','invalid_ip','invalid_ip','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.Transaction_ID,(SALT311.StrType)le.TransactionDate,(SALT311.StrType)le.FirstName,(SALT311.StrType)le.LastName,(SALT311.StrType)le.MiddleName,(SALT311.StrType)le.Suffix,(SALT311.StrType)le.BirthDate,(SALT311.StrType)le.SSN,(SALT311.StrType)le.Lexid_Input,(SALT311.StrType)le.Street1,(SALT311.StrType)le.Street2,(SALT311.StrType)le.Suite,(SALT311.StrType)le.City,(SALT311.StrType)le.State,(SALT311.StrType)le.Zip5,(SALT311.StrType)le.Phone,(SALT311.StrType)le.Lexid_Discovered,(SALT311.StrType)le.RemoteIPAddress,(SALT311.StrType)le.ConsumerIPAddress,'***SALTBUG***');
+          ,CHOOSE(le.ConsumerIPAddress_Invalid,'LEFTTRIM','ALLOW','UNKNOWN')
+          ,CHOOSE(le.Email_Address_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
+    SELF.FieldName := CHOOSE(c,'Transaction_ID','TransactionDate','FirstName','LastName','MiddleName','Suffix','BirthDate','SSN','Lexid_Input','Street1','Street2','Suite','City','State','Zip5','Phone','Lexid_Discovered','RemoteIPAddress','ConsumerIPAddress','Email_Address','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'invalid_numeric','invalid_date','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_date','invalid_ssn','invalid_numeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_state','invalid_zip','invalid_phone','invalid_numeric','invalid_ip','invalid_ip','invalid_email','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.Transaction_ID,(SALT311.StrType)le.TransactionDate,(SALT311.StrType)le.FirstName,(SALT311.StrType)le.LastName,(SALT311.StrType)le.MiddleName,(SALT311.StrType)le.Suffix,(SALT311.StrType)le.BirthDate,(SALT311.StrType)le.SSN,(SALT311.StrType)le.Lexid_Input,(SALT311.StrType)le.Street1,(SALT311.StrType)le.Street2,(SALT311.StrType)le.Suite,(SALT311.StrType)le.City,(SALT311.StrType)le.State,(SALT311.StrType)le.Zip5,(SALT311.StrType)le.Phone,(SALT311.StrType)le.Lexid_Discovered,(SALT311.StrType)le.RemoteIPAddress,(SALT311.StrType)le.ConsumerIPAddress,(SALT311.StrType)le.Email_Address,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,19,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,20,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
@@ -251,64 +332,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
-      SELF.ruledesc := CHOOSE(c
-          ,'Transaction_ID:invalid_numeric:ALLOW'
-          ,'TransactionDate:invalid_date:LEFTTRIM','TransactionDate:invalid_date:ALLOW'
-          ,'FirstName:invalid_alphanumeric:ALLOW'
-          ,'LastName:invalid_alphanumeric:ALLOW'
-          ,'MiddleName:invalid_alphanumeric:ALLOW'
-          ,'Suffix:invalid_alphanumeric:ALLOW'
-          ,'BirthDate:invalid_date:LEFTTRIM','BirthDate:invalid_date:ALLOW'
-          ,'SSN:invalid_ssn:LEFTTRIM','SSN:invalid_ssn:ALLOW','SSN:invalid_ssn:LENGTHS'
-          ,'Lexid_Input:invalid_numeric:ALLOW'
-          ,'Street1:invalid_alphanumeric:ALLOW'
-          ,'Street2:invalid_alphanumeric:ALLOW'
-          ,'Suite:invalid_alphanumeric:ALLOW'
-          ,'City:invalid_alphanumeric:ALLOW'
-          ,'State:invalid_state:LEFTTRIM','State:invalid_state:ALLOW','State:invalid_state:LENGTHS'
-          ,'Zip5:invalid_zip:LEFTTRIM','Zip5:invalid_zip:ALLOW','Zip5:invalid_zip:LENGTHS'
-          ,'Phone:invalid_phone:LEFTTRIM','Phone:invalid_phone:ALLOW','Phone:invalid_phone:LENGTHS'
-          ,'Lexid_Discovered:invalid_numeric:ALLOW'
-          ,'RemoteIPAddress:invalid_ip:LEFTTRIM','RemoteIPAddress:invalid_ip:ALLOW'
-          ,'ConsumerIPAddress:invalid_ip:LEFTTRIM','ConsumerIPAddress:invalid_ip:ALLOW'
-          ,'field:Number_Errored_Fields:SUMMARY'
-          ,'field:Number_Perfect_Fields:SUMMARY'
-          ,'rule:Number_Errored_Rules:SUMMARY'
-          ,'rule:Number_Perfect_Rules:SUMMARY'
-          ,'rule:Number_OnFail_Rules:SUMMARY'
-          ,'record:Number_Errored_Records:SUMMARY'
-          ,'record:Number_Perfect_Records:SUMMARY'
-          ,'record:Number_Edited_Records:SUMMARY'
-          ,'rule:Number_Edited_Rules:SUMMARY','UNKNOWN');
-      SELF.ErrorMessage := CHOOSE(c
-          ,RDP_Fields.InvalidMessage_Transaction_ID(1)
-          ,RDP_Fields.InvalidMessage_TransactionDate(1),RDP_Fields.InvalidMessage_TransactionDate(2)
-          ,RDP_Fields.InvalidMessage_FirstName(1)
-          ,RDP_Fields.InvalidMessage_LastName(1)
-          ,RDP_Fields.InvalidMessage_MiddleName(1)
-          ,RDP_Fields.InvalidMessage_Suffix(1)
-          ,RDP_Fields.InvalidMessage_BirthDate(1),RDP_Fields.InvalidMessage_BirthDate(2)
-          ,RDP_Fields.InvalidMessage_SSN(1),RDP_Fields.InvalidMessage_SSN(2),RDP_Fields.InvalidMessage_SSN(3)
-          ,RDP_Fields.InvalidMessage_Lexid_Input(1)
-          ,RDP_Fields.InvalidMessage_Street1(1)
-          ,RDP_Fields.InvalidMessage_Street2(1)
-          ,RDP_Fields.InvalidMessage_Suite(1)
-          ,RDP_Fields.InvalidMessage_City(1)
-          ,RDP_Fields.InvalidMessage_State(1),RDP_Fields.InvalidMessage_State(2),RDP_Fields.InvalidMessage_State(3)
-          ,RDP_Fields.InvalidMessage_Zip5(1),RDP_Fields.InvalidMessage_Zip5(2),RDP_Fields.InvalidMessage_Zip5(3)
-          ,RDP_Fields.InvalidMessage_Phone(1),RDP_Fields.InvalidMessage_Phone(2),RDP_Fields.InvalidMessage_Phone(3)
-          ,RDP_Fields.InvalidMessage_Lexid_Discovered(1)
-          ,RDP_Fields.InvalidMessage_RemoteIPAddress(1),RDP_Fields.InvalidMessage_RemoteIPAddress(2)
-          ,RDP_Fields.InvalidMessage_ConsumerIPAddress(1),RDP_Fields.InvalidMessage_ConsumerIPAddress(2)
-          ,'Fields with errors'
-          ,'Fields without errors'
-          ,'Rules with errors'
-          ,'Rules without errors'
-          ,'Rules with possible edits'
-          ,'Records with at least one error'
-          ,'Records without errors'
-          ,'Edited records'
-          ,'Rules leading to edits','UNKNOWN');
+      SELF.ruledesc := toRuleDesc(c);
+      SELF.ErrorMessage := toErrorMessage(c);
       SELF.rulecnt := CHOOSE(c
           ,le.Transaction_ID_ALLOW_ErrorCount
           ,le.TransactionDate_LEFTTRIM_ErrorCount,le.TransactionDate_ALLOW_ErrorCount
@@ -329,6 +354,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.Lexid_Discovered_ALLOW_ErrorCount
           ,le.RemoteIPAddress_LEFTTRIM_ErrorCount,le.RemoteIPAddress_ALLOW_ErrorCount
           ,le.ConsumerIPAddress_LEFTTRIM_ErrorCount,le.ConsumerIPAddress_ALLOW_ErrorCount
+          ,le.Email_Address_ALLOW_ErrorCount
           ,le.FieldsChecked_WithErrors
           ,le.FieldsChecked_NoErrors
           ,le.Rules_WithErrors
@@ -357,7 +383,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.Phone_LEFTTRIM_ErrorCount,le.Phone_ALLOW_ErrorCount,le.Phone_LENGTHS_ErrorCount
           ,le.Lexid_Discovered_ALLOW_ErrorCount
           ,le.RemoteIPAddress_LEFTTRIM_ErrorCount,le.RemoteIPAddress_ALLOW_ErrorCount
-          ,le.ConsumerIPAddress_LEFTTRIM_ErrorCount,le.ConsumerIPAddress_ALLOW_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
+          ,le.ConsumerIPAddress_LEFTTRIM_ErrorCount,le.ConsumerIPAddress_ALLOW_ErrorCount
+          ,le.Email_Address_ALLOW_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)
@@ -416,7 +443,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'Phone:' + getFieldTypeText(h.Phone) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'Lexid_Discovered:' + getFieldTypeText(h.Lexid_Discovered) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'RemoteIPAddress:' + getFieldTypeText(h.RemoteIPAddress) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'ConsumerIPAddress:' + getFieldTypeText(h.ConsumerIPAddress) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix,'UNKNOWN');
+          ,'ConsumerIPAddress:' + getFieldTypeText(h.ConsumerIPAddress) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'Email_Address:' + getFieldTypeText(h.Email_Address) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix,'UNKNOWN');
       SELF.rulecnt := CHOOSE(c
           ,le.populated_Transaction_ID_cnt
           ,le.populated_TransactionDate_cnt
@@ -436,7 +464,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_Phone_cnt
           ,le.populated_Lexid_Discovered_cnt
           ,le.populated_RemoteIPAddress_cnt
-          ,le.populated_ConsumerIPAddress_cnt,0);
+          ,le.populated_ConsumerIPAddress_cnt
+          ,le.populated_Email_Address_cnt,0);
       SELF.rulepcnt := CHOOSE(c
           ,le.populated_Transaction_ID_pcnt
           ,le.populated_TransactionDate_pcnt
@@ -456,10 +485,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_Phone_pcnt
           ,le.populated_Lexid_Discovered_pcnt
           ,le.populated_RemoteIPAddress_pcnt
-          ,le.populated_ConsumerIPAddress_pcnt,0);
+          ,le.populated_ConsumerIPAddress_pcnt
+          ,le.populated_Email_Address_pcnt,0);
       SELF.ErrorMessage := '';
     END;
-    FieldPopStats := NORMALIZE(hygiene_summaryStats,19,xNormHygieneStats(LEFT,COUNTER,'POP'));
+    FieldPopStats := NORMALIZE(hygiene_summaryStats,20,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
     SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
@@ -475,7 +505,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
  
     mod_Delta := RDP_Delta(prevDS, PROJECT(h, RDP_Layout_RDP));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
-    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),19,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
+    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),20,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
     deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
                                       'Updates:count_Updates:DELTA',
                                       TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');

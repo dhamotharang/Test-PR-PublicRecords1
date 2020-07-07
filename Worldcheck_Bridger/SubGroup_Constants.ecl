@@ -1204,6 +1204,29 @@
 		export string KEYWORD_CNPPSD_MW							:= '890';
 		export string KEYWORD_USCBP									:= '891';
 		export string KEYWORD_USCBP_WRO							:= '892';
+		export string KEYWORD_UKEMBARGO							:= '893';
+		export string KEYWORD_LVVID									:= '894';
+		export string KEYWORD_ITOCF									:= '895';
+		export string KEYWORD_MYKPDNHEP							:= '896';
+		export string KEYWORD_BRTCU									:= '897';
+		export string KEYWORD_BGRE_WC								:= '898';
+		export string KEYWORD_EU_NIC								:= '899';
+		export string KEYWORD_IDBAPPEBTI						:= '900';
+		export string KEYWORD_IMOJ_SO								:= '901';
+		export string KEYWORD_CNSAFE								:= '902';
+		export string KEYWORD_OFAC_CAATSA_IRAN			:= '903';
+		export string KEYWORD_IRAN_IEI							:= '904';
+		export string KEYWORD_UNDP									:= '905';
+		export string KEYWORD_JPJETRO								:= '906';
+		export string KEYWORD_AUEPA_VIC							:= '907';
+		export string KEYWORD_MLARB									:= '908';
+		export string KEYWORD_OFAC_SY_CAESAR				:= '909';
+		export string KEYWORD_OFAC_EO13894					:= '910';
+		export string KEYWORD_CNNBS									:= '911';
+		export string KEYWORD_UNOPS									:= '912';
+		export string KEYWORD_SECO_NIC							:= '913';
+		export string KEYWORD_BEGC									:= '914';
+		export string KEYWORD_NLGA									:= '915';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

@@ -1,10 +1,9 @@
 ﻿import lib_WORKUNITSERVICES,STD;
 export fn_Validate_cru (string filedate)  := function
-crubase := dataset('~thor_data400::base::accidents_alpha', FLAccidents_Ecrash.Layout_keybuild_SSv2,thor);
+crubase := Files.base.accidents_alpha;
 
 //father base files
-crubase_father := dataset('~thor_data400::base::accidents_alpha_father', FLAccidents_Ecrash.Layout_keybuild_SSv2,thor);
-
+crubase_father := Files.base.accidents_alpha_father;
 
 cru_threshold := 1000000;
 

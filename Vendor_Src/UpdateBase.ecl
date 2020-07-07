@@ -36,12 +36,39 @@ RolledBase := ROLLUP(SortedNewBaseFile,
 										t_rollup(LEFT, RIGHT),LOCAL);
 
 
-NewBaseFile   :=PROJECT(RolledBase,TRANSFORM({NewBaseData}
+NewBase   :=PROJECT(RolledBase,TRANSFORM({NewBaseData}
 										,SELF.item_source:=IF(LEFT.source_code='','VENDOR',LEFT.source_code)
 										,SELF:=LEFT));
+										
+																			
+NoLexisNexis:=NewBase(~regexfind('\\s*(.*)LEXIS(.*)\\s*',display_name));
 
-	
+YesLexisNexis:=NewBase(regexfind('\\s*(.*)LEXIS(.*)\\s*',display_name));
+
+LexisNexisTransform := PROJECT(YesLexisNexis,TRANSFORM({NewBaseData},
+                              SELF.display_name:='LEXISNEXIS',
+															SELF.clean_phone:='8884970011',
+															SELF.prepped_addr1:='LEXISNEXIS CONSUMER CENTER P.O. BOX 105108',
+															SELF.prepped_addr2:='ALPHARETTA, GA 30348-5108',
+															SELF.prim_range:='105108',SELF.predir:='',
+															SELF.prim_name:='P.O. BOX',SELF.addr_suffix:='',
+															SELF.unit_desig:='',
+															SELF.sec_range:='',
+															SELF.p_city_name:='ALPHARETTA',
+															SELF.v_city_name:='ALPHARETTA',
+															SELF.st:='GA',
+															SELF.zip:='30348',
+															SELF.zip4:='5108',
+															SELF.county:='13121',
+															SELF.geo_lat:='34.093090',
+															SELF.geo_long:='-84.245719',
+															SELF.geo_blk:='0116211',
+															SELF :=LEFT));
+
+NewBaseFile:= NoLexisNexis + LexisNexisTransform;
+
 RETURN NewBaseFile;
 END;
 END;
+
 

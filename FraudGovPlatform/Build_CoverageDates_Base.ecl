@@ -6,12 +6,18 @@ export Build_CoverageDates_Base (
         ) := 
 module 
 
+    /************************       Documentation        ***********************
+    https://confluence.rsi.lexisnexis.com/display/GTG/Data+Source+Identification
+    ****************************************************************************/
+    dBaseFile := distribute(pBaseFile, hash32(classification_Permissible_use_access.gc_id,	classification_source.customer_state, 	classification_Permissible_use_access.ind_type,  	source) );
+;
     slim_rec := RECORD
             Layouts.CoverageDates;
             unsigned8 	Record_ID;
             unsigned3   file_type;	
             unsigned2	Confidence_that_activity_was_deceitful_id;
             string250	reason_description;
+            unsigned1   RIN_Source;
     END;
 
 
@@ -23,7 +29,7 @@ module
     rdp_data_reasons := [ 'APPLICANT ACTIVITY VIA LEXISNEXIS' ] ;
 
 
-    slim_rec slim_rec_t(pBaseFile L) := TRANSFORM
+    slim_rec slim_rec_t(dBaseFile L) := TRANSFORM
         SELF.customer_id := L.classification_Permissible_use_access.gc_id;
         SELF.customer_state := L.classification_source.customer_state;
         SELF.customer_program := functions.customer_program_fn(L.classification_Permissible_use_access.ind_type);
@@ -37,93 +43,72 @@ module
         SELF := L;
     end;
                                                                         
-    slim_file:= project( pBaseFile, slim_rec_t(LEFT));
+    slim_file:= project( dBaseFile, slim_rec_t(LEFT), LOCAL);
 
         
     slim_rec find_nac_data(slim_rec L) := TRANSFORM
-        SELF.source := MAP( ut.CleanSpacesAndUpper(L.Reason_Description) in nac_data_reasons and L.source = '' => 'NAC'
-                            , ut.CleanSpacesAndUpper(L.Reason_Description) in rdp_data_reasons and L.source = '' => 'RDP'
+        SELF.source := MAP(   L.Rin_Source = 8 => 'NAC'
+                            , L.Rin_Source = 10=> 'NAC'
+                            , L.Rin_Source = 11=> 'NAC'
+                            , L.Rin_Source = 9 => 'RDP'
+                            , L.Rin_Source = 4 => 'IDENTITY'
+                            , L.Rin_Source = 5 => 'KNOWNRISK'
+                            , L.Rin_Source = 6 => 'STATUS UPDATE'
+                            , L.Rin_Source = 7 => 'SAFELIST'
+                            , L.Rin_Source = 3 => 'SAFELIST'
+                            , L.Rin_Source = 2 => 'KNOWNRISK'
+                            , L.Rin_Source = 1 => 'IDENTITY'
                             , L.source );
-        SELF.source_group := if(ut.CleanSpacesAndUpper(L.Reason_Description) in (nac_data_reasons + rdp_data_reasons) and L.source_group = '', 'SUPPLEMENTAL', L.source_group );
+
+        SELF.source_group := MAP(   
+                              L.Rin_Source = 8 => 'SUPPLEMENTAL'
+                            , L.Rin_Source = 10=> 'SUPPLEMENTAL'
+                            , L.Rin_Source = 11=> 'SUPPLEMENTAL'                              
+                            , L.Rin_Source = 9 => 'SUPPLEMENTAL'
+                            , L.Rin_Source = 4 => 'AGENCYACTIVITY'
+                            , L.Rin_Source = 5 => 'AGENCYACTIVITY'
+                            , L.Rin_Source = 6 => 'AGENCYACTIVITY'
+                            , L.Rin_Source = 7 => 'AGENCYACTIVITY'
+                            , L.Rin_Source = 3 => 'SAFELIST'
+                            , L.Rin_Source = 2 => 'KNOWNRISK'
+                            , L.Rin_Source = 1 => 'IDENTITY'
+                            , L.source );                            
         SELF := L;
     end;
                                                                         
-    supplemental_data:= project( slim_file, find_nac_data(LEFT));
+    source_data:= project( slim_file, find_nac_data(LEFT), LOCAL);
     
+    pDataset_sort := sort(source_data , Customer_ID, Customer_State, Customer_Program, contribution_code, source, source_group, -max_reported_date, LOCAL);
+            
+    pDataset_sort RollupBase(pDataset_sort l, pDataset_sort r) := 
+    transform
+        self.max_reported_date := max(l.max_reported_date, r.max_reported_date); 
+        self := l;
 
-    slim_rec find_agency_activity(slim_rec L) := transform
-        SELF.source := MAP(
-                              STD.Str.Contains ( L.contribution_code, 'DELTABASE' ,true) and L.source = '' AND L.Confidence_that_activity_was_deceitful_id != 3 AND L.file_type = 3=> 'IDENTITY'
-                            , STD.Str.Contains ( L.contribution_code, 'DELTABASE' ,true) and L.source = '' AND L.Confidence_that_activity_was_deceitful_id != 3 AND L.file_type = 1=> 'KNOWNRISK'
-                            , STD.Str.Contains ( L.contribution_code, 'DELTABASE' ,true) and L.source = '' AND L.file_type = 5 => 'STATUS UPDATE'
-                            , STD.Str.Contains ( L.contribution_code, 'DELTABASE' ,true) and L.source = '' AND L.Confidence_that_activity_was_deceitful_id = 3 => 'SAFELIST'
-                            , L.source 
-                        );
-        SELF.source_group := if(STD.Str.Contains ( L.contribution_code, 'DELTABASE' ,true) and L.source_group = '', 'AGENCYACTIVITY', L.source_group );
-        SELF := L;
     end;
-                                                                        
-    agency_activity:= project( supplemental_data, find_agency_activity(LEFT));
 
+    pDataset_rollup := rollup( pDataset_sort
+            ,RollupBase(left, right)
+            ,Customer_ID,	Customer_State, 	Customer_Program, 	contribution_code, 	source, source_group,
+            LOCAL);
 
-    slim_rec find_safelist_file(slim_rec L) := transform
-        SELF.source := if(L.Confidence_that_activity_was_deceitful_id = 3 and L.source = '', 'SAFELIST', L.source );
-        SELF.source_group := if(L.Confidence_that_activity_was_deceitful_id = 3 and L.source_group = '', 'SAFELIST', L.source_group );
-        SELF := L;
+    pDataset_sort2 := sort(source_data , Customer_ID,	Customer_State, Customer_Program, contribution_code, source, source_group, -max_process_date, LOCAL);
+            
+    pDataset_sort2 RollupBase2(pDataset_sort2 l, pDataset_sort2 r) := 
+    transform
+        self.max_process_date := max(l.max_process_date, r.max_process_date); 
+        self := l;
+
     end;
-                                                                        
-    safelist_file := project( agency_activity, find_safelist_file(LEFT));
 
-    slim_rec find_identity_file(slim_rec L) := transform
-        SELF.source := if(L.file_type = 3 and L.source = '', 'IDENTITY', L.source );
-        SELF.source_group := if(L.file_type = 3 and L.source_group = '', 'IDENTITY', L.source_group );
-        SELF := L;
-    end;
-                                                                        
-    identity_file := project( safelist_file, find_identity_file(LEFT));
-
-    slim_rec find_knownrisk_file(slim_rec L) := transform
-        SELF.source := if(L.file_type = 1 and L.source = '', 'KNOWNRISK', L.source );
-        SELF.source_group := if(L.file_type = 1 and L.source_group = '', 'KNOWNRISK', L.source_group );
-        SELF := L;
-    end;
-                                                                        
-    knownrisk_file := project( identity_file, find_knownrisk_file(LEFT));
-
-
-        pDataset_sort := sort(knownrisk_file , Customer_ID, Customer_State, Customer_Program, contribution_code, source, source_group, -max_reported_date);
-                
-        pDataset_sort RollupBase(pDataset_sort l, pDataset_sort r) := 
-        transform
-            self.max_reported_date := max(l.max_reported_date, r.max_reported_date); 
-            self := l;
-
-        end;
-         
-
-        pDataset_rollup := rollup( pDataset_sort
-                ,RollupBase(left, right)
-                ,Customer_ID,	Customer_State, 	Customer_Program, 	contribution_code, 	source, source_group
-                );
-    
-    
-        pDataset_sort2 := sort(knownrisk_file , Customer_ID,	Customer_State, Customer_Program, contribution_code, source, source_group, -max_process_date);
-                
-        pDataset_sort2 RollupBase2(pDataset_sort2 l, pDataset_sort2 r) := 
-        transform
-            self.max_process_date := max(l.max_process_date, r.max_process_date); 
-            self := l;
-
-        end;
-
-        pDataset_rollup2 := rollup( pDataset_sort2
-            ,RollupBase2(left, right)
-            ,Customer_ID,	Customer_State, Customer_program, contribution_code, 	source, source_group
-            ); 
+    pDataset_rollup2 := rollup( pDataset_sort2
+        ,RollupBase2(left, right)
+        ,Customer_ID,	Customer_State, Customer_program, contribution_code, 	source, source_group
+        ,LOCAL); 
     
 
     my_table2:= table(
-        knownrisk_file
+        source_data
         ,{ Customer_ID
             ,Customer_State
             ,Customer_Program
@@ -138,7 +123,7 @@ module
             ,Customer_State
             ,source
             ,source_group
-    );
+    ,LOCAL);
 
     j1 := join (my_table2,pDataset_rollup,
                             left.Customer_ID = right.Customer_ID
@@ -151,7 +136,7 @@ module
                                 self.max_reported_date := right.max_reported_date;
                                 self := left;
                             )
-                        );
+                        ,LOCAL);
 
     final_rec := join (j1,pDataset_rollup2,
                             left.Customer_ID = right.Customer_ID
@@ -164,7 +149,7 @@ module
                                 self.max_process_date := right.max_process_date;
                                 self := left;
                             )
-                        );
+                        ,LOCAL);
 
     tools.mac_WriteFile(FraudGovPlatform.Filenames(pversion).Base.CoverageDates.New,final_rec,Build_Base_File_CoverageDates);
 

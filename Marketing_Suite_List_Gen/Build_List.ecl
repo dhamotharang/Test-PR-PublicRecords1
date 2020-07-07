@@ -89,6 +89,7 @@ export Build_List(
 			self.state																:=	l.proxid_level.state;
 			self.zip_code															:=	l.proxid_level.zip5;
 			self.county																:=	l.proxid_level.county;
+			self.county_name													:=	l.proxid_level.county_name;
 			self.age																	:=	l.proxid_level.age_of_company;
 			self.phone																:=	l.proxid_level.business_phone;
 			self.email																:=	l.seleid_level.business_email;

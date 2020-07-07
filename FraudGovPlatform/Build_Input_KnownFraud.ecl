@@ -33,7 +33,12 @@ module
 		self.FileDate :=(unsigned)fn[6];
 		self.FileTime :=fn[7];
 		self.ind_type 	:= functions.ind_type_fn(fn[4]);
-		self.file_type := 1 ;		
+		self.file_type := 1 ;
+		//https://confluence.rsi.lexisnexis.com/display/GTG/Data+Source+Identification:
+		self.RIN_Source := map(
+														regexfind('KnownRisk',filename,nocase) => 2, //knownrisk
+														regexfind('Safelist',filename,nocase) => 3, //safelist
+														l.RIN_Source);  // NAC
 		self:=l;
 		self:=[];
 	end;
@@ -107,8 +112,7 @@ module
 		LOOKUP);
 																															
 	dappendName := Standardize_Entity.Clean_Name(Valid_Recs);	
-	dAppendPhone := Standardize_Entity.Clean_Phone (dappendName);
-	dCleanInputFields := Standardize_Entity.Clean_InputFields (dAppendPhone);	
+	dCleanInputFields := Standardize_Entity.Clean_InputFields (dappendName);	
 
 	input_file_1 := fn_dedup(KnownFraud_Sprayed  + project(dCleanInputFields,Layouts.Input.KnownFraud));
 

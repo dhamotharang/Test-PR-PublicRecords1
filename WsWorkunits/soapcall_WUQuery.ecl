@@ -85,7 +85,7 @@ function
   #SET(SOAPCALLCREDENTIALS  ,ut.Credentials().mac_add2Soapcall())
 
   dsoap_results := SOAPCALL(
-    'http://' + esp + '/WsWorkunits?ver_=1.48'
+    'http://' + esp + '/WsWorkunits?ver_=1.74'//1.69 for alpha prod
     // 'http://' + esp + '/WsWorkunits'
     ,'WUQuery'
     ,WUQueryRequest_Record
@@ -95,7 +95,7 @@ function
   );
   
   dsoap_results_remote := SOAPCALL(
-    'http://' + esp + '/WsWorkunits?ver_=1.48'
+    'http://' + esp + '/WsWorkunits?ver_=1.74'//1.69 for alpha prod
     // 'http://' + esp + '/WsWorkunits'
     ,'WUQuery'
     ,WUQueryRequest_Record
@@ -107,6 +107,7 @@ function
 
   returnresult := iff(trim(pesp) in Workman._Config.LocalEsps ,dsoap_results  ,dsoap_results_remote);
 
+  // return returnresult;
   return if(WsWorkunits.Is_Valid_Wuid(pWuid)  ,returnresult  ,dataset([],WUQueryResponse_Record));
 
 end;

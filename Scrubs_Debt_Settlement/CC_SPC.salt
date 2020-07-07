@@ -1,0 +1,46 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_Debt_Settlement
+FILENAME:Debt_Settlement
+NAMESCOPE:CC 
+//Uncomment up to NINES for internal or external adl
+//IDFIELD:EXISTS:<NameOfIDField>
+//RIDFIELD:<NameOfRidField>
+//RECORDS:<NumberOfRecordsInDataFile>
+//POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+//NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+//Uncomment Process if doing external adl
+//PROCESS:<ProcessName>
+
+FIELDTYPE:Invalid_id:CUSTOM(Scrubs.functions.fn_numeric>0,5)
+FIELDTYPE:Invalid_mandatory:LENGTHS(1..)
+FIELDTYPE:Invalid_mandatory_alpha:CUSTOM(Scrubs.functions.fn_ASCII_printable>0):LENGTHS(1..)
+FIELDTYPE:Invalid_alpha:CUSTOM(Scrubs.functions.fn_ASCII_printable>0) 
+FIELDTYPE:Invalid_St:CUSTOM(Scrubs.functions.fn_valid_StateAbbrev>0)
+FIELDTYPE:Invalid_zip:CUSTOM(Scrubs.functions.fn_numeric_optional>0,5)
+FIELDTYPE:Invalid_zip4:CUSTOM(Scrubs.functions.fn_numeric_optional>0,4)
+FIELDTYPE:Invalid_Phone:CUSTOM(Scrubs.functions.fn_verify_optional_phone>0)
+FIELDTYPE:Invalid_Status:CUSTOM(Scrubs_Debt_Settlement.functions.fn_valid_status>0)
+FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.functions.fn_valid_date>0)
+FIELDTYPE:Invalid_Future_Date:CUSTOM(Scrubs.functions.fn_valid_date>0,'future')
+FIELDTYPE:Invalid_OrgType:CUSTOM(Scrubs_Debt_Settlement.functions.fn_valid_orgtype>0)
+
+FIELD:idnum:LIKE(Invalid_id):0,0            
+FIELD:businessname:LIKE(Invalid_mandatory_alpha):0,0
+FIELD:dba:LIKE(Invalid_alpha):0,0          
+FIELD:orgid:LIKE(Invalid_alpha):0,0          
+FIELD:address1:LIKE(Invalid_alpha):0,0       
+FIELD:address2:LIKE(Invalid_alpha):0,0       
+FIELD:city:LIKE(Invalid_alpha):0,0           
+FIELD:state:LIKE(Invalid_St):0,0          
+FIELD:zip:LIKE(Invalid_zip):0,0            
+FIELD:zip4:LIKE(Invalid_zip4):0,0           
+FIELD:phone:LIKE(Invalid_Phone):0,0          
+FIELD:fax:0,0            
+FIELD:email:0,0          
+FIELD:url:LIKE(Invalid_alpha):0,0              
+FIELD:status:LIKE(Invalid_Status):0,0         
+FIELD:licensedatefrom:LIKE(Invalid_Date):0,0
+FIELD:licensedateto:LIKE(Invalid_Future_Date):0,0  
+FIELD:orgtype:LIKE(Invalid_OrgType):0,0        
+FIELD:source:LIKE(Invalid_mandatory):0,0    
+

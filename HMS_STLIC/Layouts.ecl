@@ -389,6 +389,23 @@ EXPORT layouts := MODULE
 				stliclookup_layout;
 		END;
 		
+		EXPORT stliclookup_layout_from_alpha := RECORD
+			string load_id;
+			string lic_state;
+			string lic_class_type;
+			string lic_subtype;
+			string lic_status;
+			string lic_substatus;
+			string lic_qualifier1;
+			string lic_qualifier2;
+			string mapped_class;
+			string mapped_status;
+			string mapped_qualifier1;
+			string mapped_qualifier2;
+			string mapped_pdma;
+			string mapped_pract_type;
+		END;
+		
 		EXPORT statelicense_layout := RECORD
 					license_layout.ln_key;
 					license_layout.hms_src;

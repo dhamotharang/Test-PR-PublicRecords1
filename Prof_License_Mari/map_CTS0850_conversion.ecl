@@ -254,7 +254,13 @@ EXPORT map_CTS0850_conversion(STRING pVersion) := FUNCTION
 		CleanNAME_OFFICE := IF(REGEXFIND('(.COM|.NET|.ORG)',StdNAME_OFFICE), Prof_License_Mari.mod_clean_name_addr.cleanInternetName(StdNAME_OFFICE),
 														IF(REGEXFIND('(%)',StdNAME_OFFICE),StdNAME_OFFICE,
 																	Prof_License_Mari.mod_clean_name_addr.strippunctMisc(StdNAME_OFFICE))); 
-		SELF.NAME_OFFICE	    :=	StringLib.StringCleanSpaces(CleanNAME_OFFICE);
+		// SELF.NAME_OFFICE	    :=	StringLib.StringCleanSpaces(CleanNAME_OFFICE);
+																	
+		SELF.NAME_OFFICE      := MAP(StringLib.StringFind(CleanNAME_OFFICE, 'DBA',1) > 0=>TRIM(REGEXFIND('^(.*)DBA(.*)',CleanNAME_OFFICE,1),LEFT,RIGHT),
+		                           TRIM(CleanNAME_OFFICE,ALL) = TRIM(SELF.NAME_FIRST + SELF.NAME_MID +SELF.NAME_LAST,ALL)=> '',
+														               TRIM(CleanNAME_OFFICE,ALL) = TRIM(SELF.NAME_FIRST + SELF.NAME_LAST,ALL)=> '',
+													                CleanNAME_OFFICE);
+		
 		SELF.OFFICE_PARSE			:= IF(SELF.NAME_OFFICE != '' AND Prof_License_Mari.func_is_company(SELF.NAME_OFFICE),'GR',
 																	IF(SELF.NAME_OFFICE != '' AND NOT Prof_License_Mari.func_is_company(SELF.NAME_OFFICE),'MD',
 																							''));

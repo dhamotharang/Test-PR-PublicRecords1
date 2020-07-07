@@ -23,7 +23,7 @@ fcra_all					:= fcra_v1(vendor not in hygenics_search.sCourt_Vendors_To_Omit
 /////////////////////////////////////////////////////////////
 	
 	fcra_filtered removeInfo(fcra_filtered l):= transform
-		self.fcra_conviction_flag						:= '';
+	//	self.fcra_conviction_flag						:= '';
 		self.fcra_traffic_flag							:= '';
 		self.fcra_date											:= '';
 		self.fcra_date_type									:= '';
