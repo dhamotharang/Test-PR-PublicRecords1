@@ -2,10 +2,10 @@
 
 EXPORT Soapcall_DTEGetRequestInfo(DATASET(IESP.DTE_GetRequestInfo.t_DTEGetRequestInfoRequest) recs_in,
 															  Gateway.Layouts.Config pGWCfg,
-                                                              pWaitTime = 3, 
+                                                              pWaitTime = 3,
                                                               pRetries = 0,
                                                               BOOLEAN pMakeGatewayCall = FALSE) := FUNCTION
-                                
+
     gateway_URL :=  pGWCfg.url;
 
     DTEGetRequestInfoResponseWithErrorHandling := RECORD
@@ -22,14 +22,14 @@ EXPORT Soapcall_DTEGetRequestInfo(DATASET(IESP.DTE_GetRequestInfo.t_DTEGetReques
 
     d_recs_out := IF(pMakeGatewayCall, SOAPCALL(recs_in,
     gateway_URL,
-    'DTEGetRequestInfo', 
+    'DTEGetRequestInfo',
     {recs_in},
     dataset(DTEGetRequestInfoResponseWithErrorHandling),
-    XPATH('DTEGetRequestInfoResponse'),
+    XPATH('DTEGetRequestInfoResponseEx'),
     ONFAIL(onError(left)), timeout(pWaitTime), retry(pRetries)));
 
     ParsedJson := DeferredTask.Functions.ParseGetRequestInfo(d_recs_out);
 
-    RETURN ParsedJSON;	
+    RETURN ParsedJSON;
 
 END;
