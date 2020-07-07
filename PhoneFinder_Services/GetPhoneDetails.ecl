@@ -44,8 +44,7 @@
     SELF.phone_source                                             := PhoneFinder_Services.Constants.PhoneSource.QSentGateway;
     SELF.dt_last_seen                                             := (STRING8)MAX(ri,ri.dt_last_reported);
     SELF.coc_description                                          := IF(le.phone_serv_type <> '',
-                                                                        PhoneFinder_Services.Functions.ServiceClassDesc(le.phone_serv_type),
-                                                                        '');
+                                                                        PhoneFinder_Services.Functions.ServiceClassDesc(le.phone_serv_type, le.phone_line_type), '');
     SELF.carrier_name                                             := le.carrier_name;
     SELF.phone_region_city                                        := le.carrier_city;
     SELF.phone_region_st                                          := le.carrier_state;
