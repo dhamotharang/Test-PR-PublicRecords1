@@ -77,6 +77,7 @@ export Constants := module
     export String40 Avm := 'avminternal '; //Standalone avm gateway. "Automated Valuation Model". Interal calls avm.
     // DeferredTaskESP methods
     export String40 GetRequestInfo := 'dtegetrequestinfo'; // DTE Status Refresh method
+    export String40 OKCcourtrunner := 'okccourtrunner'; // OKC court runner
   end;
 
   export ConfigProperties := module
