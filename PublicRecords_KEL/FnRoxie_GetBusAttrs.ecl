@@ -15,7 +15,7 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 	// cleanBusiness
 	Prep_CleanBusiness := PublicRecords_KEL.ECL_Functions.FnRoxie_Prep_InputBII(ds_input);
 	
-	// cleanReps and get lexids
+// cleanReps and get lexids
 	Prep_RepInput := PublicRecords_KEL.ECL_Functions.FnRoxie_Prep_InputRepPII(ds_input, Options);
 	Rep1Input := Prep_RepInput(RepNumber = 1);
 
@@ -64,7 +64,7 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 	// Get consumer attributes
 	Rep1InputPIIAttributes := KEL.Clean(PublicRecords_KEL.Library.LIB_ConsumerInputAttributes_Function(Rep1Input, Options), TRUE, TRUE, TRUE);
 
-	Rep1PersonAttributes := PublicRecords_KEL.Library.LIB_ConsumerAttributes_Function(MiniAttributes, FDCDataset, Options);
+	Rep1PersonAttributes := PublicRecords_KEL.Library.LIB_ConsumerAttributes_Function(MiniAttributes(RepNumber = 1), FDCDataset, Options);
 
 	// Join Consumer Results back in with business results
 	withRep1InputPII := JOIN(withBusinessProxIDAttributes, Rep1InputPIIAttributes, LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,

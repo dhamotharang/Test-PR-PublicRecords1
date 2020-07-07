@@ -2,6 +2,7 @@
 <message name="MAS_nonFCRA_Service">
 	<part name="input" type="tns:XmlDataSet" cols="100" rows="8"/>
 	<part name="ScoreThreshold" type="xsd:integer"/> 
+	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>
 	<part name="OutputMasterResults" type="xsd:boolean"/>
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
@@ -39,16 +40,21 @@ EXPORT MAS_nonFCRA_Service() := MACRO
     '_GCID'
   ));
 
+STRING5 Default_Industry_Class := '';	
+#stored('IndustryClass',Default_Industry_Class);
+STRING100 Default_data_permission_mask := '';	
+#stored('DataPermissionMask',Default_data_permission_mask);
+
 	// Read interface params
 	ds_input := DATASET([],PublicRecords_KEL.ECL_Functions.Input_Layout) : STORED('input');
 	INTEGER Score_threshold := 80 : STORED('ScoreThreshold');
 	BOOLEAN Output_Master_Results := FALSE : STORED('OutputMasterResults');
 	STRING DataRestrictionMask := '' : STORED('DataRestrictionMask');
-	STRING DataPermissionMask := '' : STORED('DataPermissionMask');
+	STRING100 DataPermissionMask := Default_data_permission_mask : STORED('DataPermissionMask');
 	UNSIGNED1 GLBA := 0 : STORED('GLBPurpose');
 	UNSIGNED1 DPPA := 0 : STORED('DPPAPurpose');
 	BOOLEAN Is_Marketing := FALSE : STORED('IsMarketing');
-	STRING Industry_Class := '' : STORED('IndustryClass');
+	STRING5 Industry_Class := Default_Industry_Class : STORED('IndustryClass');
 	//CCPA fields
 	UNSIGNED1 _LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
 	STRING _TransactionId := '' : STORED ('_TransactionId');
@@ -73,7 +79,7 @@ EXPORT MAS_nonFCRA_Service() := MACRO
 		EXPORT UNSIGNED GLBAPurpose := GLBA;
 		EXPORT UNSIGNED DPPAPurpose := DPPA;
 		EXPORT BOOLEAN isMarketing := Is_Marketing; // When TRUE enables Marketing Restrictions
-		EXPORT UNSIGNED8 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
+		EXPORT DATA100 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 			DataRestrictionMask, 
 			DataPermissionMask, 
 			GLBA, 
@@ -95,7 +101,42 @@ EXPORT MAS_nonFCRA_Service() := MACRO
 		// Override Include* Entity/Association options here if certain entities can be turned off to speed up processing.
 		// This will bypass uneccesary key JOINS in PublicRecords_KEL.Fn_MAS_FCRA_FDC if the keys don't contribute to any 
 		// ENTITIES/ASSOCIATIONS being used by the query.
-		
+		EXPORT BOOLEAN IncludeAccident := TRUE;
+		EXPORT BOOLEAN IncludeAddress := TRUE;
+		EXPORT BOOLEAN IncludeAddressSummary := TRUE;
+		EXPORT BOOLEAN IncludeAircraft := TRUE;
+		EXPORT BOOLEAN IncludeBankruptcy := TRUE;
+		EXPORT BOOLEAN IncludeBusinessSele := TRUE;
+		EXPORT BOOLEAN IncludeBusinessProx := TRUE;
+		EXPORT BOOLEAN IncludeCriminalOffender := TRUE;
+		EXPORT BOOLEAN IncludeCriminalOffense := TRUE;
+		EXPORT BOOLEAN IncludeCriminalPunishment := TRUE;
+		EXPORT BOOLEAN IncludeDriversLicense := TRUE;
+		EXPORT BOOLEAN IncludeEducation := TRUE;
+		EXPORT BOOLEAN IncludeEBRTradeline := TRUE;
+		EXPORT BOOLEAN IncludeEmail := TRUE;
+		EXPORT BOOLEAN IncludeEmployment := TRUE;
+		EXPORT BOOLEAN IncludeGeolink := TRUE;
+		EXPORT BOOLEAN IncludeHousehold := TRUE;
+		EXPORT BOOLEAN IncludeInquiry := TRUE;
+		EXPORT BOOLEAN IncludeLienJudgment := TRUE;
+		EXPORT BOOLEAN IncludeNameSummary := TRUE;
+		EXPORT BOOLEAN IncludePerson := TRUE;
+		EXPORT BOOLEAN IncludePhone := TRUE;
+		EXPORT BOOLEAN IncludeProfessionalLicense := TRUE;
+		EXPORT BOOLEAN IncludeProperty := TRUE;
+		EXPORT BOOLEAN IncludePropertyEvent := TRUE;
+		EXPORT BOOLEAN IncludeSocialSecurityNumber := TRUE;
+		EXPORT BOOLEAN IncludeSSNSummary := TRUE;
+		EXPORT BOOLEAN IncludeSurname := TRUE;
+		EXPORT BOOLEAN IncludeTIN := TRUE;
+		EXPORT BOOLEAN IncludeTradeline := TRUE;
+		EXPORT BOOLEAN IncludeUtility := TRUE;
+		EXPORT BOOLEAN IncludeVehicle := TRUE;
+		EXPORT BOOLEAN IncludeWatercraft := TRUE;
+		EXPORT BOOLEAN IncludeZipCode := TRUE;
+		EXPORT BOOLEAN IncludeUCC := TRUE;
+		EXPORT BOOLEAN IncludeMini := TRUE;
 	END;	
 	
 	ResultSet := PublicRecords_KEL.FnRoxie_GetAttrs(ds_input, Options);		

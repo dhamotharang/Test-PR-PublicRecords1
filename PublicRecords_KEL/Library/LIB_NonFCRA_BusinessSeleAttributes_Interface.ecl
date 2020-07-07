@@ -13,7 +13,7 @@ EXPORT LIB_NonFCRA_BusinessSeleAttributes_Interface(DATASET(PublicRecords_KEL.EC
 																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 
 																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII), 
 																	0, // ArchiveDate
-																	0).res0); //DPM	
+																	PublicRecords_KEL.CFG_Compile.Permit__NONE).res0); //DPM	
 																						
 	EXPORT DATASET({INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes}) Results;
 END;

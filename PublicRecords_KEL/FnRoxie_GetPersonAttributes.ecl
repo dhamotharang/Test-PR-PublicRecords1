@@ -1,4 +1,4 @@
-﻿IMPORT KEL11 AS KEL;
+﻿IMPORT KEL13 AS KEL;
 IMPORT PublicRecords_KEL, Risk_Indicators;
 
 EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) InputData,
@@ -10,8 +10,8 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 	RecordsWithLexID := InputData(P_LexID  > 0);
 	RecordsWithoutLexID := InputData(P_LexID  <= 0);
 	
-	LayoutFCRAPersonAttributes := RECORDOF(PublicRecords_KEL.Q_F_C_R_A_Person_Attributes_V1(0, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, 0).res0);
-	LayoutNonFCRAPersonAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Person_Attributes_V1(0, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, 0).res0);
+	LayoutFCRAPersonAttributes := RECORDOF(PublicRecords_KEL.Q_F_C_R_A_Person_Attributes_V1(0, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0);
+	LayoutNonFCRAPersonAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Person_Attributes_V1(0, DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0);
 	
 	NonFCRAPersonAttributesRaw := PROJECT(RecordsWithLexID, TRANSFORM({INTEGER G_ProcUID, LayoutNonFCRAPersonAttributes},
 		SELF.G_ProcUID := LEFT.G_ProcUID;

@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
-IMPORT KEL12 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.3.0beta5
+IMPORT KEL13 AS KEL;
 IMPORT CFG_Compile,E_Criminal_Offense FROM PublicRecords_KEL;
-IMPORT * FROM KEL12.Null;
+IMPORT * FROM KEL13.Null;
 EXPORT B_Criminal_Offense_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED VIRTUAL TYPEOF(E_Criminal_Offense().__Result) __E_Criminal_Offense := E_Criminal_Offense(__in,__cfg).__Result;
-  SHARED __EE499732 := __E_Criminal_Offense;
-  EXPORT __ST158775_Layout := RECORD
+  SHARED VIRTUAL TYPEOF(E_Criminal_Offense(__in,__cfg).__Result) __E_Criminal_Offense := E_Criminal_Offense(__in,__cfg).__Result;
+  SHARED __EE439860 := __E_Criminal_Offense;
+  EXPORT __ST186010_Layout := RECORD
     KEL.typ.nstr Case_Number_;
     KEL.typ.nkdate Case_Date_;
     KEL.typ.nstr Case_Type_Description_;
@@ -22,9 +22,12 @@ EXPORT B_Criminal_Offense_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST158728_Layout := RECORD
+  EXPORT __ST185963_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Offender_Key_;
     KEL.typ.nstr Offense_Type_;
@@ -70,7 +73,7 @@ EXPORT B_Criminal_Offense_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
     KEL.typ.nstr Court_County_;
     KEL.typ.nstr Arrest_Offense_Level_Mapped_;
     KEL.typ.nstr Court_Offense_Level_Mapped_;
-    KEL.typ.ndataset(__ST158775_Layout) Offense_Charges_;
+    KEL.typ.ndataset(__ST186010_Layout) Offense_Charges_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Criminal_Data_Sources_Layout) Criminal_Data_Sources_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Court_Offense_Level_Layout) Court_Offense_Level_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Fcra_Data_Layout) Fcra_Data_;
@@ -81,17 +84,20 @@ EXPORT B_Criminal_Offense_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST158728_Layout __ND500437__Project(E_Criminal_Offense(__in,__cfg).Layout __PP499998) := TRANSFORM
-    __EE499534 := __PP499998.Offense_Charges_;
-    __ST158775_Layout __ND500424__Project(E_Criminal_Offense(__in,__cfg).Offense_Charges_Layout __PP500000) := TRANSFORM
-      SELF.Criminal_Date_ := KEL.era.ToDate(__PP500000.Date_First_Seen_);
-      SELF.Dismissed_Charges_ := __OR(IF(__T(__NT(__PP499998.Court_Disposition_Description_)),__ECAST(KEL.typ.nbool,__CN(FALSE)),__ECAST(KEL.typ.nbool,__OP2(__PP499998.Court_Disposition_Description_,=,__CN('DISMISSED')))),IF(__T(__NT(__PP499998.Court_Additional_Disposition_Description_)),__ECAST(KEL.typ.nbool,__CN(FALSE)),__ECAST(KEL.typ.nbool,__OP2(__PP499998.Court_Additional_Disposition_Description_,=,__CN('DISMISSED')))));
-      SELF := __PP500000;
+  SHARED __ST185963_Layout __ND3605461__Project(E_Criminal_Offense(__in,__cfg).Layout __PP440240) := TRANSFORM
+    __EE439662 := __PP440240.Offense_Charges_;
+    __ST186010_Layout __ND3605448__Project(E_Criminal_Offense(__in,__cfg).Offense_Charges_Layout __PP440242) := TRANSFORM
+      SELF.Criminal_Date_ := KEL.era.ToDate(__PP440242.Date_First_Seen_);
+      SELF.Dismissed_Charges_ := __OR(IF(__T(__NT(__PP440240.Court_Disposition_Description_)),__ECAST(KEL.typ.nbool,__CN(FALSE)),__ECAST(KEL.typ.nbool,__OP2(__PP440240.Court_Disposition_Description_,=,__CN('DISMISSED')))),IF(__T(__NT(__PP440240.Court_Additional_Disposition_Description_)),__ECAST(KEL.typ.nbool,__CN(FALSE)),__ECAST(KEL.typ.nbool,__OP2(__PP440240.Court_Additional_Disposition_Description_,=,__CN('DISMISSED')))));
+      SELF := __PP440242;
     END;
-    SELF.Offense_Charges_ := __PROJECT(__EE499534,__ND500424__Project(LEFT));
-    SELF := __PP499998;
+    SELF.Offense_Charges_ := __PROJECT(__EE439662,__ND3605448__Project(LEFT));
+    SELF := __PP440240;
   END;
-  EXPORT __ENH_Criminal_Offense_5 := PROJECT(__EE499732,__ND500437__Project(LEFT));
+  EXPORT __ENH_Criminal_Offense_5 := PROJECT(__EE439860,__ND3605461__Project(LEFT));
 END;

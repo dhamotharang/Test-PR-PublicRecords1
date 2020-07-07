@@ -16,7 +16,7 @@ EXPORT LIB_NonFCRA_BusinessSeleAttributes_NoDates_Function(DATASET(PublicRecords
 																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 
 																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII), 
 																	0, // ArchiveDate
-																	0).res1); //DPM	
+																	PublicRecords_KEL.CFG_Compile.Permit__NONE).res1); //DPM	
 
 	BusinessSeleAttributes_NoDates_Results := IF(Options.OutputMasterResults,
 		PROJECT(InputData, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDNoDatesAttributes},
