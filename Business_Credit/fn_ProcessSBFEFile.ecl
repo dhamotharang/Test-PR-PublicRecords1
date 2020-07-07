@@ -294,12 +294,20 @@ EXPORT	fn_ProcessSBFEFile(STRING	filename, STRING	filedate)	:=	FUNCTION
 												TRANSFORM(RECORDOF(Business_Credit.Layouts.AccountDataLayout_Virtual),
 													SELF.Original_Contract_Account_Number	:=	LEFT.Contract_Account_Number;
 													SELF.Contract_Account_Number					:=	fn_removeLeadingZeros(LEFT.Contract_Account_Number);
-													SELF.PaymentFrequency					:=if(filedate > '20201001',Left.Payment_Interval,'');
-													SELF.Payment_Interval					:=if(filedate <= '20201001',Left.Payment_Interval,'');
 													SELF.DelinquencyStatus					:=if(filedate > '20201001',Left.Payment_Status_Category,'');
-													SELF.Payment_Status_Category					:=if(filedate <= '20201001',Left.Payment_Status_Category,'');
+													self.LN_Deliquency_Date:=filedate;		
 													SELF.New_Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided					:=if(filedate > '20201001',Left.Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided,'');
 													SELF.Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided					:=if(filedate <= '20201001',Left.Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided,'');
+													SELF.New_Maximum_Number_Of_Payment_Tracking_Cycle_Periods_Provided					:=if(filedate > '20201001',Left.Maximum_Number_Of_Payment_Tracking_Cycle_Periods_Provided,'');
+													SELF.Maximum_Number_Of_Payment_Tracking_Cycle_Periods_Provided					:=if(filedate <= '20201001',Left.Maximum_Number_Of_Payment_Tracking_Cycle_Periods_Provided,'');
+													self.New_Payment_History_Profile_12_Months:=if(filedate > '20201001',left.Payment_History_Profile_12_Months,'');
+													self.New_Payment_History_Profile_13_24_Months:=if(filedate > '20201001',left.Payment_History_Profile_13_24_Months,'');
+													self.New_Payment_History_Profile_25_36_Months:=if(filedate > '20201001',left.Payment_History_Profile_25_36_Months,'');
+													self.New_Payment_History_Profile_37_48_Months:=if(filedate > '20201001',left.Payment_History_Profile_37_48_Months,'');
+													self.Payment_History_Profile_12_Months:=if(filedate <= '20201001',left.Payment_History_Profile_12_Months,'');
+													self.Payment_History_Profile_13_24_Months:=if(filedate <= '20201001',left.Payment_History_Profile_13_24_Months,'');
+													self.Payment_History_Profile_25_36_Months:=if(filedate <= '20201001',left.Payment_History_Profile_25_36_Months,'');
+													self.Payment_History_Profile_37_48_Months:=if(filedate <= '20201001',left.Payment_History_Profile_37_48_Months,'');
 													SELF:=LEFT,
 													SELF:=[]
 												)

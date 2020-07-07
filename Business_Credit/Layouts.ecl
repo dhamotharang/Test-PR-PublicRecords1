@@ -605,11 +605,17 @@ EXPORT	Layouts	:=	MODULE
 	END;
 
 	EXPORT	AccountDataLayout	:=	RECORD
-		STRING																			process_date;
+		STRING												process_date;
 		AccountBaseSegment;
-		STRING2																			PaymentFrequency;
-		STRING2																			DelinquencyStatus;
-		STRING3																			New_Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided;
+		STRING												LN_Deliquency_Date:='0';		
+		STRING2												DelinquencyStatus:='0';
+		STRING12											New_Payment_History_Profile_12_Months;
+		STRING12											New_Payment_History_Profile_13_24_Months;
+		STRING12											New_Payment_History_Profile_25_36_Months;
+		STRING12											New_Payment_History_Profile_37_48_Months;
+		STRING3												New_Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided:='0';
+		STRING3												New_Maximum_Number_Of_Payment_Tracking_Cycle_Periods_Provided:='0';
+		
 		DATASET(MasterAccountContractSegment)				masterAccount{MAXCOUNT(1)};											//	MA
 		DATASET(AddressSegment)											address{MAXCOUNT(100)};													//	AD
 		DATASET(AccountModificationHistorySegment)	history{MAXCOUNT(1000)};													//	AH
@@ -636,9 +642,14 @@ EXPORT	Layouts	:=	MODULE
 	EXPORT	AccountDataLayout_Virtual	:=	RECORD
 		STRING																			process_date;
 		AB_Virtual;																																									//	AB
-		STRING2																			PaymentFrequency;
+		STRING												LN_Deliquency_Date:='0';
 		STRING2																			DelinquencyStatus;
-		STRING3																			New_Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided;
+		STRING12											New_Payment_History_Profile_12_Months;
+		STRING12											New_Payment_History_Profile_13_24_Months;
+		STRING12											New_Payment_History_Profile_25_36_Months;
+		STRING12											New_Payment_History_Profile_37_48_Months;
+		STRING3												New_Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided:='0';
+		STRING3												New_Maximum_Number_Of_Payment_Tracking_Cycle_Periods_Provided:='0';
 		DATASET(MA_Virtual)													masterAccount{MAXCOUNT(1)};											//	MA
 		DATASET(AD_Virtual)													address{MAXCOUNT(100)};													//	AD
 		DATASET(AH_Virtual)													history{MAXCOUNT(1000)};													//	AH
@@ -713,6 +724,14 @@ EXPORT	Layouts	:=	MODULE
 		STRING9													Federal_TaxID_SSN;
 		STRING3													Federal_TaxID_SSN_Identifier;
 		LayoutTradeline									Tradeline;	//	Tradeline Data
+		STRING												LN_Deliquency_Date:='0';		
+		STRING2												DelinquencyStatus:='0';
+		STRING12											New_Payment_History_Profile_12_Months;
+		STRING12											New_Payment_History_Profile_13_24_Months;
+		STRING12											New_Payment_History_Profile_25_36_Months;
+		STRING12											New_Payment_History_Profile_37_48_Months;
+		STRING3												New_Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided:='0';
+		STRING3												New_Maximum_Number_Of_Payment_Tracking_Cycle_Periods_Provided:='0';
 		DATASET(AddressSegment)					address{MAXCOUNT(100)};
 		DATASET(PhoneNumberSegment)			phone{MAXCOUNT(100)};
 		DATASET(TaxID_SSNSegment)				taxID{MAXCOUNT(100)};
@@ -789,6 +808,14 @@ EXPORT	Layouts	:=	MODULE
 		STRING9		Federal_TaxID_SSN;
 		STRING3		Federal_TaxID_SSN_Identifier;
 		LayoutTradeline		Tradeline;		//	Tradeline Data
+		STRING												LN_Deliquency_Date:='0';		
+		STRING2												DelinquencyStatus:='0';
+		STRING12											New_Payment_History_Profile_12_Months;
+		STRING12											New_Payment_History_Profile_13_24_Months;
+		STRING12											New_Payment_History_Profile_25_36_Months;
+		STRING12											New_Payment_History_Profile_37_48_Months;
+		STRING3												New_Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided:='0';
+		STRING3												New_Maximum_Number_Of_Payment_Tracking_Cycle_Periods_Provided:='0';
 		BIPV2.IDlayouts.l_xlink_ids;		//	Added for BIP project
 		UNSIGNED8	persistent_record_ID;	//	Added for BIP project
 		UNSIGNED8	sbfe_id;							//	Added for BIP project
@@ -812,6 +839,14 @@ EXPORT	Layouts	:=	MODULE
 		STRING8		Extracted_Date;
 		STRING8		Cycle_End_Date;
 		AB;
+		STRING												LN_Deliquency_Date:='0';		
+		STRING2												DelinquencyStatus:='0';
+		STRING12											New_Payment_History_Profile_12_Months;
+		STRING12											New_Payment_History_Profile_13_24_Months;
+		STRING12											New_Payment_History_Profile_25_36_Months;
+		STRING12											New_Payment_History_Profile_37_48_Months;
+		STRING3												New_Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided:='0';
+		STRING3												New_Maximum_Number_Of_Payment_Tracking_Cycle_Periods_Provided:='0';
 		STRING2		source:=Constants().source;
 		BOOLEAN		active;
 	END;
