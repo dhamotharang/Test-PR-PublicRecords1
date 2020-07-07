@@ -81,7 +81,7 @@ SHARED MyRulesCnt := TABLE(MyRules, {RuleName, customerid, industrytype, entityt
 
 //Clean out from Modeling for UI
 codesToIgnore := '-99999\', \'-99998\', \'-99997';
-UIStatsClean := FraudgovKEL.macCleanAnalyticUIOutput(UIStats, RECORDOF(UIStats), codesToIgnore);
+EXPORT UIStatsClean := FraudgovKEL.macCleanAnalyticUIOutput(UIStats, RECORDOF(UIStats), codesToIgnore);
 
 SHARED EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(UIStatsClean, 'industrytype,customerid,entitycontextuid,recordid', 
 'eventdate,' +
@@ -211,7 +211,7 @@ EXPORT EntityAssessment := PROJECT(TABLE(EntityAssessmentPrep, {
 END RULES ASSESSMENT
 */
 
-EXPORT InputWithRules := JOIN(UIStats, EntityAssessment, LEFT.customerid=RIGHT.customerid AND LEFT.industrytype = RIGHT.industrytype AND LEFT.entitycontextuid=RIGHT.entitycontextuid, LEFT OUTER, HASH);
+EXPORT InputWithRules := JOIN(UIStatsClean, EntityAssessment, LEFT.customerid=RIGHT.customerid AND LEFT.industrytype = RIGHT.industrytype AND LEFT.entitycontextuid=RIGHT.entitycontextuid, LEFT OUTER, HASH);
 //output(d1(entitycontextuid = '_1194033204'), all, named('d1_1_1'));
 
 		
