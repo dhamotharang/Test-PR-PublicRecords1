@@ -1227,6 +1227,8 @@
 		export string KEYWORD_SECO_NIC							:= '913';
 		export string KEYWORD_BEGC									:= '914';
 		export string KEYWORD_NLGA									:= '915';
+		export string KEYWORD_AUATO									:= '916';
+		export string KEYWORD_MXSAT_DEF							:= '917';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
