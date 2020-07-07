@@ -1,4 +1,4 @@
-﻿IMPORT KEL11 AS KEL;
+﻿IMPORT KEL13 AS KEL;
 IMPORT PublicRecords_KEL, Risk_Indicators, STD;
 
 EXPORT FnRoxie_GetMiniFDCAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) InputData,
@@ -28,15 +28,15 @@ EXPORT FnRoxie_GetMiniFDCAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
 	Outids := join(RecordsWithLexID, getids, LEFT.p_lexid = right.p_lexid,	
 							transform(temp, self.ids := right.ids, self := left;), left outer, atmost(1));
 								
-	CleanInputs := Outids((INTEGER)p_inparchdt <> 0);//keeping the record with inputs
+	CleanInputs := Outids((INTEGER)p_inpclnarchdt <> 0);//keeping the record with inputs
 	
 	LayoutFCRAPersonAttributes := RECORD
 		INTEGER G_ProcUID;
-		Dataset({RECORDOF(PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1([], 0, 0).res0)}) attributes;
+		Dataset({RECORDOF(PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1([], 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0)}) attributes;
 	END;
 	LayoutNonFCRAPersonAttributes := RECORD
 		INTEGER G_ProcUID;
-		Dataset({RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Mini_Attributes_V1([], 0, 0).res0)}) attributes;
+		Dataset({RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Mini_Attributes_V1([], 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0)}) attributes;
 	END;
 	
 	NonFCRAPersonAttributesRaw := PROJECT(CleanInputs, TRANSFORM(LayoutNonFCRAPersonAttributes,
@@ -53,11 +53,11 @@ EXPORT FnRoxie_GetMiniFDCAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
 			
 	FinalnonFCRA := RECORD
 		INTEGER G_ProcUID;
-		RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Mini_Attributes_V1([], 0, 0).res0);
+		RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Mini_Attributes_V1([], 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0);
 	END;	
 	FinalFCRA := RECORD
 		INTEGER G_ProcUID;
-		RECORDOF(PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1([], 0, 0).res0);
+		RECORDOF(PublicRecords_KEL.Q_F_C_R_A_Mini_Attributes_V1([], 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0);
 	END;
 	
 	FinalnonFCRA Normalize_FinalnonFCRA(RecordOF(LayoutNonFCRAPersonAttributes.attributes) ri, LayoutNonFCRAPersonAttributes le) := TRANSFORM

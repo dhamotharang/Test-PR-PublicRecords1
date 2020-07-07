@@ -6,7 +6,7 @@ EXPORT LIB_NonFCRA_BusinessSeleAttributes_NoDates(DATASET(PublicRecords_KEL.ECL_
 			DATASET(PublicRecords_KEL.ECL_Functions.Layouts_FDC().Layout_FDC) FDCDataset,
 			PublicRecords_KEL.Interface_Options Options) := MODULE
 	
-	LayoutBusinessSeleIDNoDatesAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1(0,0,0,0).res0);
+	LayoutBusinessSeleIDNoDatesAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1(0,0,0,PublicRecords_KEL.CFG_Compile.Permit__NONE).res0);
 
 	BusinessSeleAttributesResults := IF(Options.OutputMasterResults,
 		PROJECT(InputData, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDNoDatesAttributes},

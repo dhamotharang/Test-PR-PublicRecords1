@@ -1,5 +1,5 @@
 ﻿IMPORT $.^.Risk_Indicators, $.^.PublicRecords_KEL;
-IMPORT KEL11 AS KEL;
+IMPORT KEL13 AS KEL;
 
 EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII) InputData,
 			DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) RepInput,
@@ -554,22 +554,13 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			SELF.BE_BestAddrBldgType := IF(ResultsFound, (STRING)RIGHT.BE_BestAddrBldgType, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			SELF.BE_BestAddrIsPOBoxFlag := IF(ResultsFound, (STRING)RIGHT.BE_BestAddrIsPOBoxFlag, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			SELF.BE_BestAddrIsVacantFlag := IF(ResultsFound, (STRING)RIGHT.BE_BestAddrIsVacantFlag, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			
-			//4823
-			// SELF.BE_BestAddrIsOwnedFlag := IF(ResultsFound, (STRING)RIGHT.BE_BestAddrIsOwnedFlag, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			// SELF.BE_BestAddrNewMktValEv := IF(ResultsFound, (INTEGER)RIGHT.BE_BestAddrNewMktValEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
-			// SELF.BE_BestAddrNewTaxValEv := IF(ResultsFound, (INTEGER)RIGHT.BE_BestAddrNewTaxValEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
-			// SELF.BE_BestAddrNewMktValYrEv := IF(ResultsFound, (STRING)RIGHT.BE_BestAddrNewMktValYrEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			// SELF.BE_BestAddrNewTaxValYrEv := IF(ResultsFound, (STRING)RIGHT.BE_BestAddrNewTaxValYrEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			// SELF.BE_BestAddrLotSize := IF(ResultsFound, (INTEGER)RIGHT.BE_BestAddrLotSize, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
-			// SELF.BE_BestAddrBldgSize := IF(ResultsFound, (INTEGER)RIGHT.BE_BestAddrBldgSize, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);			
-			SELF.BE_BestAddrIsOwnedFlag := '0';
-			SELF.BE_BestAddrNewMktValEv := 0;
-			SELF.BE_BestAddrNewTaxValEv := 0;
-			SELF.BE_BestAddrNewMktValYrEv := '0';
-			SELF.BE_BestAddrNewTaxValYrEv := '0';
-			SELF.BE_BestAddrLotSize := 0;
-			SELF.BE_BestAddrBldgSize := 0;
+			SELF.BE_BestAddrIsOwnedFlag := IF(ResultsFound, (STRING)RIGHT.BE_BestAddrIsOwnedFlag, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			SELF.BE_BestAddrNewMktValEv := IF(ResultsFound, (INTEGER)RIGHT.BE_BestAddrNewMktValEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_BestAddrNewTaxValEv := IF(ResultsFound, (INTEGER)RIGHT.BE_BestAddrNewTaxValEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_BestAddrNewMktValYrEv := IF(ResultsFound, (STRING)RIGHT.BE_BestAddrNewMktValYrEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			SELF.BE_BestAddrNewTaxValYrEv := IF(ResultsFound, (STRING)RIGHT.BE_BestAddrNewTaxValYrEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			SELF.BE_BestAddrLotSize := IF(ResultsFound, (INTEGER)RIGHT.BE_BestAddrLotSize, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_BestAddrBldgSize := IF(ResultsFound, (INTEGER)RIGHT.BE_BestAddrBldgSize, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			
 			SELF := LEFT,
 			SELF := [];
@@ -1127,8 +1118,6 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			SELF.BE_BestAddrBldgType := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.BE_BestAddrIsPOBoxFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.BE_BestAddrIsVacantFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
-			
-			//4823
 			SELF.BE_BestAddrIsOwnedFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.BE_BestAddrNewMktValEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_BestAddrNewTaxValEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT; 

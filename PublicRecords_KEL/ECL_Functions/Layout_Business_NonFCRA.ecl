@@ -1285,7 +1285,7 @@
 	STRING60  BE_BusNAICSCode3GroupDesc;
 	STRING6   BE_BusNAICSCode4;
 	STRING150 BE_BusNAICSCode4Desc;
-	STRING60  BE_BusNAICSCode4GroupDesc;	
+	STRING60  BE_BusNAICSCode4GroupDesc;
 	INTEGER3 BE_BusEmplCountCurr;	
 	STRING6 BE_BusEmplCountCurrRnge;		
 	INTEGER6 BE_BusAnnualSalesCurr;		
@@ -1368,7 +1368,7 @@
 	STRING6  BE_BestAddrBldgIsMultiUnitFlag;
 	STRING6 BE_BestAddrBldgType;
 	STRING6 BE_BestAddrIsPOBoxFlag;
-	STRING6 BE_BestAddrIsVacantFlag;
+	STRING6 BE_BestAddrIsVacantFlag; 
 	STRING6 BE_BestAddrIsOwnedFlag;
 	INTEGER BE_BestAddrNewMktValEv;
 	INTEGER BE_BestAddrNewTaxValEv;
