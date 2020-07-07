@@ -83,7 +83,7 @@
   gateway_URL := gateway_cfg.url;
   boolean makeGatewayCall := gateway_URL != '';
 
-  dAccuDataCNAM := Gateway.SoapCall_AccuData_CallerID(dPrimaryPhones,gateway_cfg,inMod.UseAccuData_CNAM AND makeGatewayCall);
+  dAccuDataCNAM := Gateway.SoapCall_AccuData_CallerID(dPrimaryPhones, gateway_cfg, inMod.UseAccuData_CNAM AND makeGatewayCall, $.Constants.AccuData_CallerID_RequestTimeout);
 
   PhoneFinder_Services.Layouts.PhoneFinder.Final getaccu_data(PhoneFinder_Services.Layouts.PhoneFinder.Final l,
                                                               iesp.accudata_accuname.t_AccudataCnamResponseEx r) :=

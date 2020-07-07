@@ -19,7 +19,7 @@ EXPORT GetAccuDataPhones := MODULE
 	  end;
 		
 	  gw_in := project(dedup(sort(din_accu,phone),phone), to_req(left)); // to limit gateway hits for phone request.
-	  gw_recs := Gateway.SoapCall_AccuData_ocn(gw_in, gateway_cfg,,,makeGatewayCall);  
+	  gw_recs := Gateway.SoapCall_AccuData_ocn(gw_in, gateway_cfg, $.Constants.GatewayTimeout.AccuData_OCN_RequestTimeout,,makeGatewayCall);  
 		
 		portedrec := record
 		 string20 acctno;

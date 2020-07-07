@@ -276,6 +276,13 @@ MODULE
     EXPORT STRING Spouse := 'SP';
   END;
 
+  EXPORT GatewayTimeout := MODULE
+    
+    EXPORT DECIMAL AccuData_CallerID_RequestTimeout := 1;
+    EXPORT DECIMAL AccuData_OCN_RequestTimeout := 1.7;
+  END;
+  
+
   EXPORT CategoryCodes := DATASET([
         {PFSourceCategory.Inquiry, MDR.sourceTools.src_Wired_Assets_Royalty, PFSourceType.SelfReported}, //WR
         {PFSourceCategory.Inquiry, MDR.sourceTools.src_Wired_Assets_Owned, PFSourceType.SelfReported}, //WO
