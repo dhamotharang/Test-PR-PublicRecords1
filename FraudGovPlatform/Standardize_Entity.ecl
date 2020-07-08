@@ -7,7 +7,7 @@ FUNCTIONMACRO
 	pInputFile tr(pInputFile l) := TRANSFORM
 			full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
 			cleanperson73 := Address.cleanperson73(full_name);
-			clean_full_name := ut.CleanSpacesAndUpper(cleanperson73[6..25]) + ' ' + ut.CleanSpacesAndUpper(cleanperson73[26..45]) + ' ' + ut.CleanSpacesAndUpper(cleanperson73[46..65]);
+			clean_full_name := ut.CleanSpacesAndUpper(cleanperson73[6..25] + ' ' + cleanperson73[26..45] + ' ' + cleanperson73[46..65]);
 			SELF.cleaned_name.fname				:= if( clean_full_name !='', ut.CleanSpacesAndUpper(cleanperson73[6..25])	, l.raw_first_name);
 			SELF.cleaned_name.mname				:= if( clean_full_name !='', ut.CleanSpacesAndUpper(cleanperson73[26..45]) 	, l.raw_middle_name);
 			SELF.cleaned_name.lname				:= if( clean_full_name !='', ut.CleanSpacesAndUpper(cleanperson73[46..65])  , l.raw_last_name);
