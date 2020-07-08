@@ -23,6 +23,6 @@ EXPORT Input_Layout := record
 	STRING EMAIL; 
 	STRING IPAddress;
 	STRING employername;
-	STRING archivedate; //(adding historydate timestamp) 
+	STRING historydate; //(adding historydate timestamp) 
 	STRING LexID;
 END;

@@ -85,7 +85,7 @@ prii_layout := RECORD
     STRING FormerName          ;
     STRING Email               ;
     STRING EmployerName        ;
-    STRING archivedate;
+    STRING historydate;
     STRING LexID;
     STRING IPAddress;
     STRING Perf;
@@ -95,7 +95,7 @@ END;
 p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"'), HEADING(SINGLE)));
 p := IF (RecordsToRun = 0, p_in, CHOOSEN (p_in, RecordsToRun));
 PP := PROJECT(P(Account != 'Account'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout, 
-SELF.archivedate := if(histDate = '0', LEFT.archivedate, histDate); 
+SELF.historydate := if(histDate = '0', LEFT.historydate, histDate);
 SELF := LEFT;
 // SELF := [];
 ));

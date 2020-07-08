@@ -77,7 +77,7 @@ prii_layout := RECORD
     STRING FormerName          ;
     STRING Email               ;
     STRING EmployerName        ;
-    STRING archivedate;
+		STRING historydate;
     STRING LexID;
     STRING IPAddress;
     STRING Perf;
@@ -89,7 +89,7 @@ p := IF (RecordsToRun = 0, P_IN, CHOOSEN (P_IN, RecordsToRun));
 //p2 := p_in;
 //p := p2(Account in ['TMOBSEP7088-158349', 'TMOBSEP7088-87504','TARG4547-221442', 'TMOBJUN7088-196571','AAAA7833-104166']); 
 PP := PROJECT(P(Account != 'Account'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout, 
-SELF.archivedate := if(histDate = '0', LEFT.archivedate, histDate);
+SELF.historydate := if(histDate = '0', LEFT.historydate, histDate);
 SELF := LEFT));
 
 soapLayout := RECORD
