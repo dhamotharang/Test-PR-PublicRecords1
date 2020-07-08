@@ -2574,7 +2574,7 @@ RECORD
   unsigned8 aotidactcnt30d;
   unsigned8 aotnonstactcnt30d;
   unsigned8 aotnewkraftnonstactcntev;
-  unsigned8 aothiidcurrprofusngcntev;
+  integer8 aothiidcurrprofusngcntev;
   unsigned8 aotidusngcntev;
   unsigned8 aotidactcntev;
   unsigned8 aotidcurrprofusngcntev;
