@@ -2560,7 +2560,7 @@ RECORD
   unsigned industrytype;
  END;
  
- EXPORT EntityProfile	:=RECORD
+ EXPORT EntityProfile	:= RECORD
   integer1 entitytype;
   string label;
   integer1 riskindx;
@@ -2574,7 +2574,7 @@ RECORD
   unsigned8 aotidactcnt30d;
   unsigned8 aotnonstactcnt30d;
   unsigned8 aotnewkraftnonstactcntev;
-  unsigned8 aothiidcurrprofusngcntev;
+  integer8 aothiidcurrprofusngcntev;
   unsigned8 aotidusngcntev;
   unsigned8 aotidactcntev;
   unsigned8 aotidcurrprofusngcntev;
@@ -2937,7 +2937,7 @@ RECORD
   integer8 t1l_fp_sourcerisklevel;
   integer8 t1_adultidnotseenflag;
   integer8 t1_minorwlexidflag;
-  integer8 t1_ssnpriordobflag;
+  string t1_ssnpriordobflag;
   integer8 t1_firstnmnotverflag;
   integer8 t1_lastnmnotverflag;
   integer8 t1_addrnotverflag;
@@ -3121,8 +3121,8 @@ RECORD
   string t_inpdvcserialnumecho;
   string t_inpdvctypeecho;
   string t_inpdvcidprovecho;
-  integer8 t_inpdvclatecho;
-  integer8 t_inpdvclongecho;
+  real8 t_inpdvclatecho;
+  real8 t_inpdvclongecho;
   string t_inpinvestigatoridecho;
   string t_inpreferralcaseidecho;
   string t_inpreferraltypedescecho;
@@ -3143,11 +3143,11 @@ RECORD
   integer8 t15_idcurrprofusngssncntev;
   integer8 t20_idcurrprofusngdlcntev;
   integer8 t19_idcurrprofusngbnkacctcntev;
-  integer8 t9_addrvaltype;
+  string t9_addrvaltype;
   string t9_addrmaildroptype;
-  integer8 t15_ssnvaltype;
-  integer8 t20_dlvaltype;
-  integer8 t16_phnvaltype;
+  string t15_ssnvaltype;
+  string t20_dlvaltype;
+  string t16_phnvaltype;
   integer8 t16_isphnmetahitflag;
   integer8 t16_phnmetanewvenddt;
   integer8 t16_phnmetaoldvenddt;
@@ -3170,6 +3170,30 @@ RECORD
   integer8 p18_idactolddt;
   integer8 p19_idactolddt;
   integer8 p20_idactolddt;
+  integer8 p1_aotactcntev;
+  integer8 p1_aotsrc1actcntev;
+  boolean p1_aotsrc1actonlyflag;
+  integer8 p9_aotactcntev;
+  integer8 p9_aotsrc1actcntev;
+  boolean p9_aotsrc1actonlyflag;
+  integer8 p15_aotactcntev;
+  integer8 p15_aotsrc1actcntev;
+  boolean p15_aotsrc1actonlyflag;
+  integer8 p20_aotactcntev;
+  integer8 p20_aotsrc1actcntev;
+  boolean p20_aotsrc1actonlyflag;
+  integer8 p16_aotactcntev;
+  integer8 p16_aotsrc1actcntev;
+  boolean p16_aotsrc1actonlyflag;
+  integer8 p17_aotactcntev;
+  integer8 p17_aotsrc1actcntev;
+  boolean p17_aotsrc1actonlyflag;
+  integer8 p18_aotactcntev;
+  integer8 p18_aotsrc1actcntev;
+  boolean p18_aotsrc1actonlyflag;
+  integer8 p19_aotactcntev;
+  integer8 p19_aotsrc1actcntev;
+  boolean p19_aotsrc1actonlyflag;
   string t_addrstatusdesc;
   string t_bnkacctstatusdesc;
   string t_dlstatusdesc;
@@ -3223,6 +3247,7 @@ RECORD
   integer1 aotkractflagev;
   integer1 aotsafeactflagev;
   integer1 aotcurrprofflag;
+  unsigned8 iscurrent;
   unsigned4 t_actdtecho;
   integer8 t18_ipaddrlocmiamiflag;
   integer8 t18_ipaddrlocnonusflag;
@@ -3258,7 +3283,7 @@ RECORD
   integer8 t1_lastnmnotverflag;
   integer8 t1_phnnotverflag;
   integer8 t1l_ssnwaddrnotverflag;
-  integer8 t1_ssnpriordobflag;
+  string t1_ssnpriordobflag;
   integer8 t1l_ssnnotverflag;
   integer8 t1l_curraddrnotinagcyjurstflag;
   integer8 t1l_bestdlnotinagcyjurstflag;
@@ -3307,6 +3332,7 @@ RECORD
   integer8 t1l_iddeceasedflag;
   unsigned8 aotidactcntev;
   unsigned4 deceaseddate;
+  integer8 t1_minoridflag;
  END;
 
   //Begin BocaShell Layout

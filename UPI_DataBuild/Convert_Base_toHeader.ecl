@@ -24,6 +24,8 @@ EXPORT Convert_Base_toHeader (string pVersion, boolean pUseProd, string gcid, st
 				SELF.dt_vendor_first_reported	   	:= (unsigned)_validate.date.fCorrectedDateString(trim(stringlib.stringfilterout((string)l.dt_vendor_first_reported,'-.>$!%*@=?&\''),left,right),false);
 				SELF.dt_vendor_last_reported	   	:= (unsigned)_validate.date.fCorrectedDateString(trim(stringlib.stringfilterout((string)l.dt_vendor_last_reported,'-.>$!%*@=?&\''),left,right),false);
 				SELF.lexid												:= L.lexid;
+				SELF.old_lexid										:= L.prev_lexid;
+				SELF.old_crk											:= L.prev_crk;
 				SELF															:= L;
 				SELF															:= [];
 			END;

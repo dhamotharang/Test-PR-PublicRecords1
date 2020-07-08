@@ -73,38 +73,17 @@ rulesoutrec := RECORD
 	 INTEGER1 RuleFlag;
 END;
 
-/*
-MyRules := DATASET([
-  {0, 0, 1, 'Rule1', 'IP Address City is Miami and Address out of state.', 't18_ipaddrlocmiamiflag', '1', 0, 0, 3},
-  {0, 0, 1, 'Rule1', 'IP Address City is Miami and Address out of state.', 'addressoutofstate', '1', 0, 0, 3},
-	{0, 0, 1, 'Rule2', 'Identity deceased.', 'deceased', '1', 0, 0, 3},
-  {0, 0, 1, 'Rule3', 'Address is out of state and IP Address is NOT in the US.', 'addressoutofstate', '1', 0, 0, 3},
-  {0, 0, 1, 'Rule3', 'Address is out of state and IP Address is NOT in the US.', 't18_ipaddrlocnonusflag', '1', 0, 0, 3},
-	{0, 0, 1, 'Rule1-1', 'Identity Deceased', 'deceased', '1', 0, 0, 3},
-	{0, 0, 1, 'Rule1-2', 'Identity is currently incarcerated', 'currentlyincarceratedflag', '1', 0, 0, 3},
-  {8342784, 1014, 1, 'Rule3', 'Address is out of state and IP Address NOT is in the US.', 'addressoutofstate', '1', 0, 0, 1},
-  {8342784, 1014, 1, 'Rule3', 'Address is out of state and IP Address NOT is in the US.', 't18_ipaddrlocnonusflag', '1', 0, 0, 1},
-  {0, 0, 18, 'Rule4', 'Address is a PO Box and IP Address is NOT in the US.', 't18_ipaddrlocnonusflag', '1', 0, 0, 3},
-  {0, 0, 18, 'Rule4', 'Address is a PO Box and IP Address is NOT in the US.', 'addressispobox', '1', 0, 0, 3},
-  {0, 0, 9, 'Rule5', 'Address is vacant.', 'address_is_vacant_', '1', 0, 0, 1},
-  {0, 0, 9, 'Rule6', 'Address is Commercial Receiving Agency', 'addressiscmra', '1', 0, 0, 1},
-  {0, 0, 9, 'Rule7', 'Address is out of state.', 'addressoutofstate', '1', 0, 0, 3},
-  {0, 0, 1, 'Rule9', 'p1_aotidkrgenfrdactflagev.', 'p1_aotidkrgenfrdactflagev', '1', 0, 0, 3},
-  {0, 0, 9, 'Rule11', 'Address is known risk.', 'p9_aotaddrkractflagev', '1', 0, 0, 3},
-  {0, 0, 15, 'Rule11', 'SSN is known risk.', 'p15_aotssnkractflagev', '1', 0, 0, 3},
-  {20995369, 1014, 9, 'Rule5', 'Address is vacant.', 'addressisvacant', '1', 0, 0, 3}
-  ],
-  {UNSIGNED Customer_id, UNSIGNED industry_type, INTEGER1 entitytype, STRING RuleName, STRING Description, STRING200 Field, STRING Value, DECIMAL6_2 Low, DECIMAL6_2 High, INTEGER RiskLevel});
-*/
-
-
 EXPORT MyRules := DATASET('~fraudgov::in::sprayed::configrules', {UNSIGNED Customerid, UNSIGNED industrytype, INTEGER1 entitytype, STRING RuleName, STRING Description, STRING200 Field, STRING Value, DECIMAL6_2 Low, DECIMAL6_2 High, INTEGER RiskLevel}, CSV);
 
 // This is just to make sure there aren't duplicates. Should be moved into the build code for the index to check everything and validate.
 SHARED MyRulesCnt := TABLE(MyRules, {RuleName, customerid, industrytype, entitytype, Reccount := COUNT(GROUP)}, RuleName, customerid, entitytype, industrytype, FEW);
 //output(MyRulesCnt, named('MyRulesCnt'));
 
-SHARED EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(UIStats, 'industrytype,customerid,entitycontextuid,recordid', 
+//Clean out from Modeling for UI
+codesToIgnore := '-99999\', \'-99998\', \'-99997';
+EXPORT UIStatsClean := FraudgovKEL.macCleanAnalyticUIOutput(UIStats, RECORDOF(UIStats), codesToIgnore);
+
+SHARED EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(UIStatsClean, 'industrytype,customerid,entitycontextuid,recordid', 
 'eventdate,' +
 // Need the list of the rules attributes here to limit the pivot to only attributes used in rules.
 't1_adultidnotseenflag,t1_minorwlexidflag,t1l_iddeceasedflag,t1l_iddtofdeathaftidactflagev,t1l_idcurrincarcflag,t1_ssnpriordobflag,t1_firstnmnotverflag,t1_lastnmnotverflag,t1_addrnotverflag,' +
@@ -124,7 +103,7 @@ RulesResult := JOIN(EventStatsPrep(Value != ''), SORT(MyRules, field, -customeri
                            )
                            OR
                            (
-                             RIGHT.Value IN ['','0'] AND (RIGHT.Low = 0 AND RIGHT.High = 0)
+                             RIGHT.Value IN ['','0'] AND (RIGHT.Low = 0 AND RIGHT.High = 0) AND LEFT.Value = '0'
                            )
                            OR
                            (
@@ -171,7 +150,7 @@ EXPORT RulesFlagsMatched  := JOIN(RulesResultAgg, MyRulesCnt,
 
 
 //need to turn this into 
-EntityEventAssessment := TABLE(RulesFlagsMatched, 
+EXPORT EntityEventAssessment := TABLE(RulesFlagsMatched, 
                     {industrytype,customerid,entitycontextuid,
                     entitytype, INTEGER1 risklevel := MAX(GROUP, risklevel)}, 
                     industrytype,customerid,entitycontextuid, entitytype, MERGE);
@@ -204,7 +183,7 @@ EntityAssessmentPrep := SORT(PROJECT(EntityEventAssessment,
                           SELF.P9_AddrRiskIndx := MAP(LEFT.EntityType = 9 => LEFT.RiskLevel, 0),
                           SELF := LEFT, SELF := [])),industrytype,customerid,entitycontextuid, LOCAL);
 
-EntityAssessment := PROJECT(TABLE(EntityAssessmentPrep, {
+EXPORT EntityAssessment := PROJECT(TABLE(EntityAssessmentPrep, {
 											 industrytype, customerid, entitycontextuid, 
 											 INTEGER1 P1_IDRiskIndx := MAX(GROUP, P1_IDRiskIndx),
 											 INTEGER1 P15_SSNRiskIndx:= MAX(GROUP, P15_SSNRiskIndx),
@@ -232,12 +211,9 @@ EntityAssessment := PROJECT(TABLE(EntityAssessmentPrep, {
 END RULES ASSESSMENT
 */
 
-SHARED InputWithRules := JOIN(UIStats, EntityAssessment, LEFT.customerid=RIGHT.customerid AND LEFT.industrytype = RIGHT.industrytype AND LEFT.entitycontextuid=RIGHT.entitycontextuid, LEFT OUTER, HASH);
+EXPORT InputWithRules := JOIN(UIStatsClean, EntityAssessment, LEFT.customerid=RIGHT.customerid AND LEFT.industrytype = RIGHT.industrytype AND LEFT.entitycontextuid=RIGHT.entitycontextuid, LEFT OUTER, HASH);
 //output(d1(entitycontextuid = '_1194033204'), all, named('d1_1_1'));
 
-//Clean out from Modeling for UI
-codesToIgnore := '-99999\', \'-99998\', \'-99997';
-SHARED PivotClean := FraudgovKEL.macCleanAnalyticUIOutput(InputWithRules, RECORDOF(InputWithRules), codesToIgnore);
 		
 SHARED OutRec := RECORD
   INTEGER1 entitytype;
@@ -253,18 +229,17 @@ SHARED OutRec := RECORD
   UNSIGNED aotidactcnt30d;
   UNSIGNED aotnonstactcnt30d;
   UNSIGNED aotnewkraftnonstactcntev;
-  UNSIGNED aothiidcurrprofusngcntev;
+  INTEGER aothiidcurrprofusngcntev;
   UNSIGNED aotidusngcntev;
   UNSIGNED aotidactcntev;
   UNSIGNED aotidcurrprofusngcntev;
   UNSIGNED1 not_aotkractflagev;
   UNSIGNED1 not_aotsafeactflagev;
-  STRING CustomerProgramDescription;
-  
+  STRING CustomerProgramDescription;  
   RECORDOF(InputWithRules);
 END;
         
-OutRec NormIt(PivotClean L, INTEGER C) := TRANSFORM
+OutRec NormIt(InputWithRules L, INTEGER C) := TRANSFORM
     SELF.entitytype := CHOOSE(C, 1, 9, 15, 16, 17, 18, 19, 20);
     SELF.Label := CHOOSE(C, L.personlabel, L.addresslabel, L.ssnlabel, L.phonelabel, L.emaillabel,  L.iplabel, L.bankaccountlabel, L.driverslicenselabel);
     SELF.customerProgramDescription := L.agencyprogjurst + '-' + L.AgencyProgDesc;
@@ -394,7 +369,7 @@ OutRec NormIt(PivotClean L, INTEGER C) := TRANSFORM
                               l.p19_aotbkacnewkraftnonstactcntev,
                               l.p20_aotdlnewkraftnonstactcntev);    
                               
-    SELF.aothiidcurrprofusngcntev := 0; // jp todo set this based on the high risk count     
+    SELF.aothiidcurrprofusngcntev := 0; // jp todo set this based on the high risk count further down.    
 
     SELF.aotidusngcntev := CHOOSE(C, 1,
                               l.p9_aotidusngaddrcntev,
@@ -419,28 +394,102 @@ END;
 NonEntities := ['12638153115695167395', '14695981039346656037','12638153115695167395','','0000000000','4233676119','4073047705','']; 
 
 SHARED PivotToEntities :=
-            NORMALIZE(PivotClean,8,NormIt(LEFT,COUNTER))(label != '' AND entitycontextuid[4..] NOT IN NonEntities) : PERSIST('~temp::fraudgov::temp::eventpivot'); // exclude entities that didn't exist on the transaction.
+            NORMALIZE(InputWithRules,8,NormIt(LEFT,COUNTER))(label != '' AND entitycontextuid[4..] NOT IN NonEntities) : PERSIST('~temp::fraudgov::temp::eventpivot'); // exclude entities that didn't exist on the transaction.
 
 
+SHARED ProfileRowsPrep := PROJECT(PivotToEntities,
+                 TRANSFORM(
+                   RECORDOF(LEFT),
+                    SELF.aothiidcurrprofusngcntev := 
+                      MAP(LEFT.EntityType = 9 => 
+                        MAP(LEFT.T9_AddrPopFlag=0 => -99999,
+                          MAP(LEFT.T_SrcClassType < 2 OR LEFT.P9_AotIDCurrProfUsngAddrCntEv < 1 => -99998, 0)
+                           ),
+                      MAP(LEFT.EntityType = 15 => 
+                        MAP(LEFT.T15_SSNPopFlag=0 => -99999,
+                          MAP(LEFT.T_SrcClassType < 2 OR LEFT.P15_AoTIDCurrProfUsngSSNCntEv < 1 => -99998, 0)
+                           ),
+                      MAP(LEFT.EntityType = 16 => 
+                        MAP(LEFT.T16_PhnPopFlag=0 => -99999,
+                          MAP(LEFT.T_SrcClassType < 2 OR LEFT.P16_AoTIDCurrProfUsngPhnCntEv < 1 => -99998, 0)
+                           ),                      
+                      MAP(LEFT.EntityType = 17 =>
+                        MAP(LEFT.T17_EmailPopFlag=0 => -99999,
+                          MAP(LEFT.T_SrcClassType < 2 OR LEFT.P17_AoTIDCurrProfUsngEmlCntEv < 1 => -99998, 0)
+                           ),
+                      MAP(LEFT.EntityType = 18 =>
+                        MAP(LEFT.T18_IPAddrPopFlag=0 => -99999,
+                          MAP(LEFT.T_SrcClassType < 2 OR LEFT.P18_AoTIDCurrProfUsngIPCntEv < 1 => -99998, 0)
+                           ),                      
+                      MAP(LEFT.EntityType = 19 =>
+                        MAP(LEFT.T19_BnkAcctPopFlag=0 => -99999,
+                          MAP(LEFT.T_SrcClassType < 2 OR LEFT.P19_AoTIDCurrProfUsngBkAcCntEv < 1 => -99998, 0)
+                           ),                   
+                      MAP(LEFT.EntityType = 20 =>
+                        MAP(LEFT.T20_DLPopFlag=0 => -99999,
+                          MAP(LEFT.T_SrcClassType < 2 OR LEFT.P20_AoTIDCurrProfUsngDLCntEv < 1 => -99998, 0)
+                           ),
+                      0
+                      )))))));
+                    SELF := LEFT));
+                    
+EXPORT ProfileRows := ProfileRowsPrep(entitytype != 1 AND AotCurrProfFlag=1);
+
+HighRiskIdentitiesPrep := TABLE(JOIN(ProfileRows(aothiidcurrprofusngcntev=0), PivotToEntities, 
+                            LEFT.customerid=RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype AND
+                            LEFT.entitycontextuid=RIGHT.entitycontextuid AND LEFT.P1_AotIdCurrProfFlag = 1,
+                            TRANSFORM({LEFT.customerid,LEFT.industrytype, LEFT.entitycontextuid, LEFT.entitytype, RIGHT.personentitycontextuid},
+                              SELF.personentitycontextuid := RIGHT.personentitycontextuid,
+                              SELF := LEFT), HASH), 
+                              {customerid,industrytype,entitycontextuid,entitytype,personentitycontextuid}, 
+                              customerid,industrytype,entitycontextuid,entitytype,personentitycontextuid, MERGE);
+
+HighRiskIdentityProfileRows := TABLE(PivotToEntities(AotCurrProfFlag=1 AND EntityType = 1 AND p1_idriskindx=3), 
+                                 {customerid, industrytype, entitycontextuid, personentitycontextuid, addressentitycontextuid, ssnentitycontextuid, phoneentitycontextuid, emailentitycontextuid, ipentitycontextuid, bankaccountentitycontextuid, driverslicenseentitycontextuid}, 
+                                 customerid, industrytype, entitycontextuid, personentitycontextuid, addressentitycontextuid,ssnentitycontextuid,phoneentitycontextuid,emailentitycontextuid,ipentitycontextuid,bankaccountentitycontextuid,driverslicenseentitycontextuid, MERGE); 
+
+HighRiskIdentities := JOIN(HighRiskIdentitiesPrep, HighRiskIdentityProfileRows, 
+                          LEFT.customerid=RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype AND 
+                          LEFT.personentitycontextuid=RIGHT.EntityContextUid AND
+                          (
+                            (LEFT.entitytype = 9 AND LEFT.entitycontextuid = RIGHT.addressentitycontextuid) OR
+                            (LEFT.entitytype = 15 AND LEFT.entitycontextuid = RIGHT.ssnentitycontextuid) OR
+                            (LEFT.entitytype = 16 AND LEFT.entitycontextuid = RIGHT.phoneentitycontextuid) OR
+                            (LEFT.entitytype = 17 AND LEFT.entitycontextuid = RIGHT.emailentitycontextuid) OR
+                            (LEFT.entitytype = 18 AND LEFT.entitycontextuid = RIGHT.ipentitycontextuid) OR
+                            (LEFT.entitytype = 19 AND LEFT.entitycontextuid = RIGHT.bankaccountentitycontextuid) OR
+                            (LEFT.entitytype = 20 AND LEFT.entitycontextuid = RIGHT.driverslicenseentitycontextuid)                          
+                          ),
+                          TRANSFORM(RECORDOF(LEFT), SELF.personentitycontextuid := RIGHT.personentitycontextuid, SELF := LEFT),
+                          HASH) : PERSIST('~fraudgov::temp::deleteme42');
+
+EXPORT HighRiskIdentityCount := TABLE(HighRiskIdentities, {customerid,industrytype,entitycontextuid, aothiidcurrprofusngcntev := COUNT(GROUP)}, customerid,industrytype,entitycontextuid, MERGE);
+
+EXPORT PivotToEntitiesWithHRICounts := JOIN(ProfileRowsPrep, HighRiskIdentityCount, 
+                                  LEFT.customerid=RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype AND LEFT.entitycontextuid=RIGHT.entitycontextuid, 
+                                  TRANSFORM(RECORDOF(LEFT), 
+                                  SELF.aothiidcurrprofusngcntev := MAP(LEFT.aothiidcurrprofusngcntev < 0 => LEFT.aothiidcurrprofusngcntev, RIGHT.aothiidcurrprofusngcntev),
+                                  SELF := LEFT), LEFT OUTER, HASH);
+    
 //Clean out from Modeling for UI
 //codesToIgnore := '-99999\', \'-99998\', \'-99997';
 //SHARED PivotClean := FraudgovKEL.macCleanAnalyticUIOutput(PivotToEntities, RECORDOF(PivotToEntities), codesToIgnore);
 
 // Add Flags for Dashboard to know current vs historical.
-dDistribute := DISTRIBUTE(PivotToEntities, HASH32(customerid,industrytype,personentitycontextuid));//,entitycontextuid,idislasteventid,t_actdtecho));
+dDistribute := DISTRIBUTE(PivotToEntitiesWithHRICounts, HASH32(customerid,industrytype,personentitycontextuid));//,entitycontextuid,idislasteventid,t_actdtecho));
 dSort := SORT(dDistribute, customerid,industrytype,personentitycontextuid,entitycontextuid,-idislasteventid,-t_actdtecho, LOCAL);
-dDedup := DEDUP(dSort, customerid,industrytype,personentitycontextuid,entitycontextuid,LOCAL):          PERSIST('temps::deleteme::identitydup');
+dDedup := DEDUP(dSort, customerid,industrytype,personentitycontextuid,entitycontextuid,LOCAL);
 
 rNew := RECORD
   UNSIGNED isCurrent; 
   UNSIGNED isHistorical; 
 END;
 rOut := RECORD
-  RECORDOF(PivotToEntities);
+  RECORDOF(PivotToEntitiesWithHRICounts);
   rNew;
 END;
 
-SHARED PivotWithHistoricalCurrentFlags := JOIN(PivotToEntities, dDedup,
+SHARED PivotWithHistoricalCurrentFlags := JOIN(PivotToEntitiesWithHRICounts, dDedup,
   LEFT.customerid = RIGHT.customerid
   AND LEFT.industrytype = RIGHT.industrytype
   AND LEFT.entitycontextuid = RIGHT.entitycontextuid
@@ -449,6 +498,7 @@ SHARED PivotWithHistoricalCurrentFlags := JOIN(PivotToEntities, dDedup,
   AND LEFT.t_actdtecho = RIGHT.t_actdtecho
   AND LEFT.t_actuid = RIGHT.t_actuid,
   TRANSFORM(rOut,
+  self.aothiidcurrprofusngcntev := MAP(LEFT.aothiidcurrprofusngcntev < 0 => 0, LEFT.aothiidcurrprofusngcntev), // Doing this here so that we can use the EXPORT with the special values for modeling validation.
   SELF.isCurrent := IF(RIGHT.entitycontextuid <> '', RIGHT.idislasteventid, 0),
   SELF.isHistorical := IF(RIGHT.entitycontextuid <> '', IF((BOOLEAN)RIGHT.idislasteventid, 0, 1), 0);
   SELF := LEFT), LEFT OUTER, HASH);

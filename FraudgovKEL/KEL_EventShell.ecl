@@ -82,8 +82,11 @@ EXPORT KEL_EventShell := MODULE
 't1_minoridflag,t9_idcurrprofusngaddrcntev,t15_idcurrprofusngssncntev,t20_idcurrprofusngdlcntev,t19_idcurrprofusngbnkacctcntev,t9_addrvaltype,t9_addrmaildroptype,' +
 't15_ssnvaltype,t20_dlvaltype,t16_phnvaltype,t16_isphnmetahitflag,t16_phnmetanewvenddt,t16_phnmetaoldvenddt,t9_addrpoboxmultcurridflagev,t9_addrisvacantflag,t9_addrisinvalidflag,' +
 't9_addriscmraflag,t15_ssnmultcurridflagev,t15_ssnisinvalidflag,t20_dlmultcurridflagev,t20_dlisinvalidflag,t16_phnprepdflag,t16_phnisinvalidflag,t19_bnkacctmultcurridflagev,' +
-'p1_idactolddt,p9_idactolddt,p15_idactolddt,p16_idactolddt,p17_idactolddt,p18_idactolddt,p19_idactolddt,p20_idactolddt';
-
+'p1_idactolddt,p9_idactolddt,p15_idactolddt,p16_idactolddt,p17_idactolddt,p18_idactolddt,p19_idactolddt,p20_idactolddt,' +
+'p1_aotactcntev,p1_aotsrc1actcntev,p1_aotsrc1actonlyflag,p9_aotactcntev,p9_aotsrc1actcntev,p9_aotsrc1actonlyflag,' +
+'p15_aotactcntev,p15_aotsrc1actcntev,p15_aotsrc1actonlyflag,p20_aotactcntev,p20_aotsrc1actcntev,p20_aotsrc1actonlyflag,' +
+'p16_aotactcntev,p16_aotsrc1actcntev,p16_aotsrc1actonlyflag,p17_aotactcntev,p17_aotsrc1actcntev,p17_aotsrc1actonlyflag,' +
+'p18_aotactcntev,p18_aotsrc1actcntev,p18_aotsrc1actonlyflag,p19_aotactcntev,p19_aotsrc1actcntev,p19_aotsrc1actonlyflag';
 
 
 	EXPORT UIStats := hipie_ecl.macSlimDataset(CleanEventShell, 'industrytype,customerid,entitycontextuid', 
@@ -93,7 +96,7 @@ EXPORT KEL_EventShell := MODULE
 		NicoleAttr
 		);
 
-	EXPORT ModelingStats := hipie_ecl.macSlimDataset(CleanEventShell(/*(hash(personentitycontextuid) % 2 = 0 OR currentlyincarceratedflag =1 OR deceasedpriortoevent=1) AND */industrytype = 1029 and customerid = 20995239), 'industrytype,customerid,entitycontextuid', 
+	EXPORT ModelingStats := hipie_ecl.macSlimDataset(CleanEventShell(/*T_SrcClassType = 3 (hash(personentitycontextuid) % 2 = 0 OR currentlyincarceratedflag =1 OR deceasedpriortoevent=1) AND */ industrytype = 1029 and customerid = 20995239), 'industrytype,customerid,entitycontextuid', 
 		'recordid,caseid, eventdate,' +
 		NicoleAttr
 		);

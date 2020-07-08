@@ -21,9 +21,9 @@ EXPORT E_Phone := MODULE
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
-  SHARED __d0_KELfiltered := FraudgovKEL.fraudgovshared(TRIM(clean_phones.cell_phone) != '');
+  SHARED __d0_KELfiltered := FraudgovKEL.fraudgovshared((UNSIGNED)record_id > 0 AND TRIM(clean_phones.cell_phone) != '');
   SHARED __d0_Trim := PROJECT(__d0_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.clean_phones.cell_phone)));
-  SHARED __d1_KELfiltered := FraudgovKEL.fraudgovshared(TRIM(clean_phones.phone_number) != '');
+  SHARED __d1_KELfiltered := FraudgovKEL.fraudgovshared((UNSIGNED)record_id > 0 AND TRIM(clean_phones.phone_number) != '');
   SHARED __d1_Trim := PROJECT(__d1_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.clean_phones.phone_number)));
   EXPORT __All_Trim := __d0_Trim + __d1_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
