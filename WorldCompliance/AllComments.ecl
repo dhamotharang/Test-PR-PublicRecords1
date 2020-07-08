@@ -206,7 +206,7 @@ EXPORT rComments AllComments(dataset(Layouts.rEntity) infile) := FUNCTION
 			
 			restored := newcat(segmenttype<>'PEP') + justformer + noformer + ForceFormer;
 			
-			Allreasons := sort((GetReasons(oldrestored) & GetMultReasons(restored)), Ent_ID, cmts, local); //Original
+			Allreasons := sort((GetMultReasons(restored)), Ent_ID, cmts, local); //Original
 					
 		items := SORT(Distribute(
 								//GetConsolidatedRec(infile) &

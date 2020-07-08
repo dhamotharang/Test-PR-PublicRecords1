@@ -149,7 +149,7 @@ EXPORT CCriteria := FUNCTION
 
 //Allreasons := sort((GetReasons(infile) & GetMultReasons(restored)), Ent_ID, cmts, local);
 //finalcat := DEDUP(SORT(DISTRIBUTE(SORT(GetCategories(oldcat) + GetMultCategories(restored),id,criteria,Local),id), id, criteria, LOCAL),id, criteria, LOCAL);
-finalcat := DEDUP(SORT(GetCategories(oldrestored) + GetMultCategories(restored),id,criteria,Local),id, criteria, LOCAL); // Pre IsActivePEP
+finalcat := DEDUP(SORT(GetMultCategories(restored),id,criteria,Local),id, criteria, LOCAL); // Pre IsActivePEP
 //finalcat := DEDUP(SORT(GetCategories(oldrestored),id,criteria,Local),id, criteria, LOCAL); // This is last run
 //finalcat := DEDUP(SORT(GetMultCategories(restored),id,criteria,Local),id, criteria, LOCAL); // This is last run
 

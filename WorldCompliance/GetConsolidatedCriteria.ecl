@@ -14,7 +14,7 @@
 														, LEFT OUTER),
 								id);
 												
-		s2 := PROJECT(SORT(srcs(criteriaValue <> 0),id, criteriaValue, local),
+		s2 := PROJECT(Dedup(SORT(srcs(criteriaValue <> 0),id, criteriaValue, local),id, criteriaValue, local),
 							TRANSFORM($.rSearchCriteria,
 								self.id := left.id;
 								self.criteria := (unicode)left.criteriaValue;));
