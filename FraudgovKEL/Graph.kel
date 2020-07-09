@@ -1115,7 +1115,7 @@ USE FraudgovKEL.fraudgovshared(FLAT,
     DeceasedMatchCode = matchcode,
 		DateFirstSeen = dt_first_seen, // Contains information for ASOF
 		DateLastSeen = dt_last_seen),		// Contains information for ASOF
-	Address(FILTER((UNSIGNED)record_id > 0 AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0),
+	Address(FILTER((UNSIGNED)record_id > 0 AND OttoAddressId != 12638153115695167395),
 		PrimaryRange = clean_address.prim_range,
 		Predirectional = clean_address.predir,
 		PrimaryName = clean_address.prim_name,
@@ -1198,13 +1198,13 @@ USE FraudgovKEL.fraudgovshared(FLAT,
 		CreatedOn=email_address_date,
 		DateFirstSeen = dt_first_seen,
 		DateLastSeen = dt_last_seen),
-	PersonAddress(FILTER((UNSIGNED)did <> 0 AND (STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0 AND AssociatedCustomerFileInfo > 0),
+	PersonAddress(FILTER((UNSIGNED)did <> 0),
     LexId = did,
 		EventDate = event_date,
 		DateLastSeen = dt_last_seen,
 		DateFirstSeen = dt_first_seen),
 
-  CustomerPerson(FILTER((UNSIGNED)did<>0 AND (UNSIGNED)ssn<>0 AND AssociatedCustomerFileInfo > 0),		
+  CustomerPerson(FILTER((UNSIGNED)did<>0 AND AssociatedCustomerFileInfo > 0),		
     LexId = did,
 		DateLastSeen = dt_last_seen,
 		DateFirstSeen = dt_first_seen),
@@ -1214,11 +1214,11 @@ USE FraudgovKEL.fraudgovshared(FLAT,
 		EventDate = event_date,
 		DateLastSeen = dt_last_seen,
 		DateFirstSeen = dt_first_seen),
-	AddressSSN(FILTER((STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0 AND (UNSIGNED)ssn <>0 AND AssociatedCustomerFileInfo > 0),
+	AddressSSN(FILTER((UNSIGNED)ssn <>0 AND AssociatedCustomerFileInfo > 0),
 		EventDate = event_date,
 		DateLastSeen = dt_last_seen,
 		DateFirstSeen = dt_first_seen),
-	PersonPhone(FILTER((UNSIGNED)did <> 0 AND clean_phones.cell_phone != '' AND (STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0),
+	PersonPhone(FILTER((UNSIGNED)did <> 0 AND clean_phones.cell_phone != ''),
     LexId = did,
 		EventDate = event_date,
 		PhoneNumber = clean_phones.cell_phone,
@@ -1280,7 +1280,7 @@ USE FraudgovKEL.fraudgovshared(FLAT,
 		EventDate = event_date,
     Transaction = record_id    
   ),
-  AddressEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0),
+  AddressEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND OttoAddressId != 12638153115695167395),
     EventDate = event_date,
     Transaction = record_id    
   ),
@@ -3793,10 +3793,8 @@ Person: => DtFirstSeen := MIN(PersonEvent.Transaction, EventDate);
 Person: => DtLastSeen := MAX(PersonEvent.Transaction, EventDate);
 Person: => IdActivityDtFirstSeen := MIN(PersonEvent.Transaction(T_SrcClassType = 4), EventDate);
 Person: => IdActivityDtLastSeen := MAX(PersonEvent.Transaction(T_SrcClassType = 4), EventDate);
-Person: => LastRecordId := MAP(ALL(PersonEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(PersonEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Person.DtLastSeen), RecordId),
+Person: => LastRecordId := MAP(ALL(PersonEvent.Transaction,T_SrcClassType IN [2,3]) => MIN(PersonEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Person.DtFirstSeen), RecordId),
                   MAX(PersonEvent.Transaction(T_SrcClassType = 4 AND EventDate=Person.IdActivityDtLastSeen), RecordId));
-
-
 
 Person: => NoLexId := MAP(LexId > 900000000000 => 1, 0);
 Person: => DateOfBirth := MAX(ReportedDateOfBirth, DateOfBirth);
@@ -3989,7 +3987,7 @@ SocialSecurityNumber: => DtFirstSeen := MIN(SsnEvent.Transaction, EventDate);
 SocialSecurityNumber: => DtLastSeen := MAX(SsnEvent.Transaction, EventDate);
 SocialSecurityNumber: => IdActivityDtFirstSeen := MIN(SsnEvent.Transaction(T_SrcClassType = 4), EventDate);
 SocialSecurityNumber: => IdActivityDtLastSeen := MAX(SsnEvent.Transaction(T_SrcClassType = 4), EventDate);
-SocialSecurityNumber: => LastRecordId := MAP(ALL(SsnEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(SsnEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=SocialSecurityNumber.DtLastSeen), RecordId),
+SocialSecurityNumber: => LastRecordId := MAP(ALL(SsnEvent.Transaction,T_SrcClassType IN [2,3]) => MIN(SsnEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=SocialSecurityNumber.DtFirstSeen), RecordId),
                   MAX(SsnEvent.Transaction(T_SrcClassType = 4 AND EventDate=SocialSecurityNumber.IdActivityDtLastSeen), RecordId));
 
 SocialSecurityNumber: => IdentityCount := COUNT(PersonSSN{Subject});
@@ -4049,7 +4047,7 @@ Phone: => DtFirstSeen := MIN(PhoneEvent.Transaction, EventDate);
 Phone: => DtLastSeen := MAX(PhoneEvent.Transaction, EventDate);
 Phone: => IdActivityDtFirstSeen := MIN(PhoneEvent.Transaction(T_SrcClassType = 4), EventDate);
 Phone: => IdActivityDtLastSeen := MAX(PhoneEvent.Transaction(T_SrcClassType = 4), EventDate);
-Phone: => LastRecordId := MAP(ALL(PhoneEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(PhoneEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Phone.DtLastSeen), RecordId),
+Phone: => LastRecordId := MAP(ALL(PhoneEvent.Transaction,T_SrcClassType IN [2,3]) => MIN(PhoneEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Phone.DtFirstSeen), RecordId),
                   MAX(PhoneEvent.Transaction(T_SrcClassType = 4 AND EventDate=Phone.IdActivityDtLastSeen), RecordId));
 
 Phone: => IdentityCount := COUNT(PersonPhone{Subject});
@@ -4108,7 +4106,7 @@ Email: => DtFirstSeen := MIN(EmailEvent.Transaction, EventDate);
 Email: => DtLastSeen := MAX(EmailEvent.Transaction, EventDate);
 Email: => IdActivityDtFirstSeen := MIN(EmailEvent.Transaction(T_SrcClassType = 4), EventDate);
 Email: => IdActivityDtLastSeen := MAX(EmailEvent.Transaction(T_SrcClassType = 4), EventDate);
-Email: => LastRecordId := MAP(ALL(EmailEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(EmailEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Email.DtLastSeen), RecordId),
+Email: => LastRecordId := MAP(ALL(EmailEvent.Transaction,T_SrcClassType IN [2,3]) => MIN(EmailEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Email.DtFirstSeen), RecordId),
                   MAX(EmailEvent.Transaction(T_SrcClassType = 4 AND EventDate=Email.IdActivityDtLastSeen), RecordId));
 
 
@@ -4178,7 +4176,7 @@ BankAccount: => DtLastSeen := MAX(BankAccountEvent.Transaction, EventDate);
 
 BankAccount: => IdActivityDtFirstSeen := MIN(BankAccountEvent.Transaction(T_SrcClassType = 4), EventDate);
 BankAccount: => IdActivityDtLastSeen := MAX(BankAccountEvent.Transaction(T_SrcClassType = 4), EventDate);
-BankAccount: => LastRecordId := MAP(ALL(BankAccountEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(BankAccountEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=BankAccount.DtLastSeen), RecordId),
+BankAccount: => LastRecordId := MAP(ALL(BankAccountEvent.Transaction,T_SrcClassType IN [2,3]) => MIN(BankAccountEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=BankAccount.DtFirstSeen), RecordId),
                   MAX(BankAccountEvent.Transaction(T_SrcClassType = 4 AND EventDate=BankAccount.IdActivityDtLastSeen), RecordId));
 
 BankAccount: => IdentityCount := COUNT(PersonBankAccount{Subject});
@@ -4241,7 +4239,7 @@ DriversLicense: => DtFirstSeen := MIN(DriversLicenseEvent.Transaction, EventDate
 DriversLicense: => DtLastSeen := MAX(DriversLicenseEvent.Transaction, EventDate);
 DriversLicense: => IdActivityDtFirstSeen := MIN(DriversLicenseEvent.Transaction(T_SrcClassType = 4), EventDate);
 DriversLicense: => IdActivityDtLastSeen := MAX(DriversLicenseEvent.Transaction(T_SrcClassType = 4), EventDate);
-DriversLicense: => LastRecordId := MAP(ALL(DriversLicenseEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(DriversLicenseEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=DriversLicense.DtLastSeen), RecordId),
+DriversLicense: => LastRecordId := MAP(ALL(DriversLicenseEvent.Transaction,T_SrcClassType IN [2,3]) => MIN(DriversLicenseEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=DriversLicense.DtFirstSeen), RecordId),
                   MAX(DriversLicenseEvent.Transaction(T_SrcClassType = 4 AND EventDate=DriversLicense.IdActivityDtLastSeen), RecordId));
 
 
@@ -4305,7 +4303,7 @@ InternetProtocol: => DtFirstSeen := MIN(InternetProtocolEvent.Transaction, Event
 InternetProtocol: => DtLastSeen := MAX(InternetProtocolEvent.Transaction, EventDate);
 InternetProtocol: => IdActivityDtFirstSeen := MIN(InternetProtocolEvent.Transaction(T_SrcClassType = 4), EventDate);
 InternetProtocol: => IdActivityDtLastSeen := MAX(InternetProtocolEvent.Transaction(T_SrcClassType = 4), EventDate);
-InternetProtocol: => LastRecordId := MAP(ALL(InternetProtocolEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(InternetProtocolEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=InternetProtocol.DtLastSeen), RecordId),
+InternetProtocol: => LastRecordId := MAP(ALL(InternetProtocolEvent.Transaction,T_SrcClassType IN [2,3]) => MIN(InternetProtocolEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=InternetProtocol.DtFirstSeen), RecordId),
                   MAX(InternetProtocolEvent.Transaction(T_SrcClassType = 4 AND EventDate=InternetProtocol.IdActivityDtLastSeen), RecordId));
 
 
@@ -4382,7 +4380,7 @@ Address: => DtLastSeen := MAX(AddressEvent.Transaction, EventDate);
 
 Address: => IdActivityDtFirstSeen := MIN(AddressEvent.Transaction(T_SrcClassType = 4), EventDate);
 Address: => IdActivityDtLastSeen := MAX(AddressEvent.Transaction(T_SrcClassType = 4), EventDate);
-Address: => LastRecordId := MAP(ALL(AddressEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(AddressEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Address.DtLastSeen), RecordId),
+Address: => LastRecordId := MAP(ALL(AddressEvent.Transaction,T_SrcClassType IN [2,3]) => MIN(AddressEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Address.DtFirstSeen), RecordId),
                   MAX(AddressEvent.Transaction(T_SrcClassType = 4 AND EventDate=Address.IdActivityDtLastSeen), RecordId));
 
 Address: => NotInJurisdictionState := MAP(State != rCustomer.JurisdictionState => 1, 0);
