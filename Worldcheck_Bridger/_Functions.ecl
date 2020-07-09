@@ -1332,6 +1332,7 @@
 				trim(kword, left, right) = 'AUATO' =>SubGroup_Constants.numKeywordsID.KEYWORD_AUATO,
 				trim(kword, left, right) = 'MXSAT-DEF' =>SubGroup_Constants.numKeywordsID.KEYWORD_MXSAT_DEF,
 				trim(kword, left, right) = 'DKGA' =>SubGroup_Constants.numKeywordsID.KEYWORD_DKGA,
+				trim(kword, left, right) = 'AUEPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_AUEPA,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
