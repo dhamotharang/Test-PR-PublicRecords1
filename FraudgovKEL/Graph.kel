@@ -293,7 +293,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     INTEGER fp3_stolenidentityindex,
     INTEGER syntheticidentityindex_v3,
     INTEGER manipulatedidentityindex_v3,
-    INTEGER socsdobflag,
+    STRING socsdobflag,
     INTEGER pwsocsdobflag,
     INTEGER dobmatchlevel,
     INTEGER sourcerisklevel,
@@ -305,7 +305,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     STRING reason6,
     INTEGER socsvalflag,
     INTEGER drlcvalflag,
-    INTEGER hphonevalflag,
+    STRING hphonevalflag,
 
     BOOLEAN truedid	= truedid,
     STRING best_fname	= best_flags.fname,
@@ -2623,9 +2623,8 @@ Event: => T1_MinorWLexIDFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR
 																		 T1_IdAge < 18 AND T1L_IdIsBcShllHitFlag=1 AND T1_LexIdPopFlag=1 => 1,0);
 Event: => T1_SsnPriorDOBFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR T15_SsnPopFlag=0 OR T_DobPopFlag=0 => -99999,
                                      T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																		 STRING(socsdobflag)='' OR socsdobflag > 1 => -99997,
-																		 STRING(socsdobflag));
-Event: => socsdobflagNullFlag := IF(socsdobflag:Null,1,0);
+																		 socsdobflag='' OR INTEGER(socsdobflag) > 1 => -99997,
+																		 socsdobflag);
 Event: => T1_FirstNmNotVerFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR T_FirstNmPopFlag=0 => -99999,
                                        T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
 																			 T1_NapSummary < 1 AND T1L_NasSummary < 1 => -99997,
@@ -3320,8 +3319,8 @@ Event: => T20_DlValType := MAP(T20_DlPopFlag=0 => -99999,
 															 STRING(drlcvalflag));
 Event: => T16_PhnValType := MAP(T16_PhnPopFlag=0 => -99999,
                                 T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
-																STRING(hphonevalflag)='' => -99997,
-																STRING(hphonevalflag));
+																hphonevalflag='' => -99997,
+																hphonevalflag);
 Event: => T16_IsPhnMetaHitFlag := MAP(T16_PhnPopFlag=0 => -99999,
                                       PhonesMetaHit=TRUE => 1, 0);
 Event: => T16_PhnMetaNewVendDt := MAP(T16_PhnPopFlag=0 => -99999,
@@ -3343,8 +3342,8 @@ Event: => T9_AddrIsVacantFlag := MAP(T9_AddrPopFlag=0 => -99999,
 																		 address_vacancy_indicator='Y' => 1, 0);	
 Event: => T9_AddrIsInvalidFlag := MAP(T9_AddrPopFlag=0 => -99999,
                                       T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
-																			ALL(AddressEvent.Transaction,T9_AddrValType=-99997) => -99997,
-																			T9_AddrValType = 'N' => 1, 0);
+																			T9_AddrValType=-99997=> -99997,
+																			TRIM(T9_AddrValType) = 'N' => 1, 0);
 Event: => T9_AddrIsCmraFlag := MAP(T9_AddrPopFlag=0 => -99999,
                                    T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
 																	 T9_AddrMailDropType=-99997 => -99997,
@@ -3369,7 +3368,7 @@ Event: => T16_PhnPrePdFlag := MAP(T16_PhnPopFlag=0 => -99999,
 																	phone_prepaid); 
 Event: => T16_PhnIsInvalidFlag := MAP(T16_PhnPopFlag=0 => -99999,
                                   T_SrcClassType < 4 OR T_IsBcShllHitFlag < 1 => -99998,
-																	ALL(PhoneEvent.Transaction,T16_PhnValType='-99997') => -99997,
+																	T16_PhnValType=-99997 => -99997,
 																	T16_PhnValType = '0' => 1, 0);
 Event: => T19_BnkAcctMultCurrIDFlagEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
                                              T_SrcClassType < 4 => -99998,
