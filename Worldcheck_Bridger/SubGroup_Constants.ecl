@@ -1230,6 +1230,7 @@
 		export string KEYWORD_AUATO									:= '916';
 		export string KEYWORD_MXSAT_DEF							:= '917';
 		export string KEYWORD_DKGA									:= '918';
+		export string KEYWORD_AUEPA									:= '919';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
