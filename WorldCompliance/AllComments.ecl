@@ -26,8 +26,8 @@ END;
    			self					:= L;
    	END;
 			
-   	//return ROLLUP(DEDUP(SORT(dsConsolidated, MasterID),MasterID, comments, ALL), LEFT.MasterID=RIGHT.MasterID, xForm(LEFT,RIGHT));
-		return ROLLUP(SORT(dsConsolidated, MasterID), LEFT.MasterID=RIGHT.MasterID, xForm(LEFT,RIGHT));
+   	return ROLLUP(DEDUP(SORT(dsConsolidated, MasterID),MasterID, comments, ALL), LEFT.MasterID=RIGHT.MasterID, xForm(LEFT,RIGHT));
+		//return ROLLUP(SORT(dsConsolidated, MasterID), LEFT.MasterID=RIGHT.MasterID, xForm(LEFT,RIGHT));
 	END;
 
 	GetPosition(dataset(Layouts.rEntity) src) := PROJECT(src, TRANSFORM(rComments, 
