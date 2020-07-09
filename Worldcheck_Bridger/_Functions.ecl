@@ -1316,6 +1316,21 @@
 				trim(kword, left, right) = 'IDBAPPEBTI' =>SubGroup_Constants.numKeywordsID.KEYWORD_IDBAPPEBTI,
 				trim(kword, left, right) = 'IMOJ-SO' =>SubGroup_Constants.numKeywordsID.KEYWORD_IMOJ_SO,
 				trim(kword, left, right) = 'CNSAFE' =>SubGroup_Constants.numKeywordsID.KEYWORD_CNSAFE,
+				trim(kword, left, right) = 'OFAC-CAATSA-IRAN' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_CAATSA_IRAN,
+				trim(kword, left, right) = 'IRAN-IEI' =>SubGroup_Constants.numKeywordsID.KEYWORD_IRAN_IEI,
+				trim(kword, left, right) = 'UNDP' =>SubGroup_Constants.numKeywordsID.KEYWORD_UNDP,
+				trim(kword, left, right) = 'JPJETRO' =>SubGroup_Constants.numKeywordsID.KEYWORD_JPJETRO,
+				trim(kword, left, right) = 'AUEPA-VIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_AUEPA_VIC,
+				trim(kword, left, right) = 'MLARB' =>SubGroup_Constants.numKeywordsID.KEYWORD_MLARB,
+				trim(kword, left, right) = 'OFAC-SY-CAESAR' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_SY_CAESAR,
+				trim(kword, left, right) = 'OFAC-EO13894' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_EO13894,
+				trim(kword, left, right) = 'CNNBS' =>SubGroup_Constants.numKeywordsID.KEYWORD_CNNBS,
+				trim(kword, left, right) = 'UNOPS' =>SubGroup_Constants.numKeywordsID.KEYWORD_UNOPS,
+				trim(kword, left, right) = 'SECO-NIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_SECO_NIC,
+				trim(kword, left, right) = 'BEGC' =>SubGroup_Constants.numKeywordsID.KEYWORD_BEGC,
+				trim(kword, left, right) = 'NLGA' =>SubGroup_Constants.numKeywordsID.KEYWORD_NLGA,
+				trim(kword, left, right) = 'AUATO' =>SubGroup_Constants.numKeywordsID.KEYWORD_AUATO,
+				trim(kword, left, right) = 'MXSAT-DEF' =>SubGroup_Constants.numKeywordsID.KEYWORD_MXSAT_DEF,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

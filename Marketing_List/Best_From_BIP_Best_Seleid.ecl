@@ -49,7 +49,7 @@ function
     // -- get best address and company name that are marketing approved.  
     best_company_name := topn(left.company_name   ((company_name_data_permits    & mktg_bmap) != 0) ,1,-dt_last_seen          )[1];
     best_address      := topn(left.company_address((company_address_data_permits & mktg_bmap) != 0) ,1, company_address_method)[1];
-    best_phone        := topn(left.company_phone  ((company_phone_data_permits   & mktg_bmap) != 0) ,1, company_phone_method  )[1];
+    best_phone        := topn(left.company_phone  ((company_phone_data_permits   & mktg_bmap) != 0,Marketing_List.Validate_phone(company_phone) != '') ,1, company_phone_method  )[1];
   
   
     self.seleid              := left.seleid                             ;
@@ -74,21 +74,24 @@ function
     self.fips_county         := best_address.county_fips                ;
     self.county_name         := ''                                      ;//get this below
     self.age_of_company      := ''                                      ;
-    self.business_phone      := best_phone.company_phone                ;
+    self.business_phone      := Marketing_List.Validate_phone(best_phone.company_phone)                ;
     self.business_email      := ''                                      ;//need to get this from the base file
     self.annual_revenue      := 0                                       ;
     self.src_revenue         := ''                                      ;
     self.number_of_employees := 0                                       ;
+    self.src_employees       := ''                                      ;
     self.SIC_Primary         := ''                                      ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.SIC2                := ''                                      ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.SIC3                := ''                                      ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.SIC4                := ''                                      ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.SIC5                := ''                                      ; //need to get these from the base file so we can rank them and use dt_last_seen
+    self.src_sics            := ''                                      ;
     self.NAICS_Primary       := ''                                      ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.NAICS2              := ''                                      ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.NAICS3              := ''                                      ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.NAICS4              := ''                                      ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.NAICS5              := ''                                      ; //need to get these from the base file so we can rank them and use dt_last_seen
+    self.src_naics           := ''                                      ;
     self.dt_first_seen       := 0                                       ; //need to get from the base file
     self.dt_last_seen        := 0                                       ; //need to get from the base file
   ));

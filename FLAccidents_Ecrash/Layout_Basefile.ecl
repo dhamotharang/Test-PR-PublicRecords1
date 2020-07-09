@@ -100,6 +100,8 @@
 	STRING11 agency_id;
 	STRING100 agency_name;
 	STRING11 agency_ori;
+	//PR Recon COPPR-49
+	BOOLEAN is_Terminated_Agency;
 	STRING19 sent_to_hpcc_datetime;
 	STRING4 corrected_incident;
 	STRING9 cru_order_id;
@@ -926,6 +928,12 @@
 	STRING10 Dui_Suspected;
 	//Data Ingestion New Enum fields
 	STRING Drug_Test_Result;
-	//CR-1237		
-	STRING Marijuana_Use_Suspected;
-	END;
+	//Data Ingestion CR-1273
+  STRING64 Geo_Coded_Latitude;
+	STRING64 Geo_Coded_Longitude;
+	//PRtCC CR-1237
+  STRING Marijuana_Use_Suspected;
+	//PRtCC CR-1262 
+  STRING Direction_Of_Impact;
+	STRING Event_Sequence;
+END;

@@ -1,76 +1,76 @@
-export relative_titles :=
+EXPORT relative_titles :=
 MODULE
 
-export num_Subject := 1;
-export num_Husband := 2;
-export num_Wife  := 3;
-export num_Spouse := 4;
-export set_Spouse := [num_Husband, num_Wife, num_Spouse];
-export num_ExHusband := 5;
-export num_ExWife := 6;
-export num_ExSpouse := 7;
-export set_ExSpouse := [num_ExHusband, num_ExWife, num_ExSpouse];
-export num_widow := 8;
-export num_widower := 9;
+EXPORT num_Subject := 1;
+EXPORT num_Husband := 2;
+EXPORT num_Wife  := 3;
+EXPORT num_Spouse := 4;
+EXPORT set_Spouse := [num_Husband, num_Wife, num_Spouse];
+EXPORT num_ExHusband := 5;
+EXPORT num_ExWife := 6;
+EXPORT num_ExSpouse := 7;
+EXPORT set_ExSpouse := [num_ExHusband, num_ExWife, num_ExSpouse];
+EXPORT num_widow := 8;
+EXPORT num_widower := 9;
 
-export num_Father  := 10;
-export num_Mother  := 11;
-export set_SpecificParent := [num_Father, num_Mother];
-export num_Parent  := 12;
+EXPORT num_Father  := 10;
+EXPORT num_Mother  := 11;
+EXPORT set_SpecificParent := [num_Father, num_Mother];
+EXPORT num_Parent  := 12;
 
-export num_Grandfather  := 13;
-export num_Grandmother  := 14;
-export num_Grandparent  := 15;
+EXPORT num_Grandfather  := 13;
+EXPORT num_Grandmother  := 14;
+EXPORT num_Grandparent  := 15;
 
-export num_Brother  := 16;
-export num_Sister  := 17;
-export num_Sibling  := 18;
+EXPORT num_Brother  := 16;
+EXPORT num_Sister  := 17;
+EXPORT num_Sibling  := 18;
 
-export num_Son := 19;
-export num_Daughter := 20;
-export num_Child := 21;
+EXPORT num_Son := 19;
+EXPORT num_Daughter := 20;
+EXPORT num_Child := 21;
 
-export num_Grandson  := 22;
-export num_Granddaughter  := 23;
-export num_Gradchild  := 24;
+EXPORT num_Grandson  := 22;
+EXPORT num_Granddaughter  := 23;
+EXPORT num_Gradchild  := 24;
 
-export num_Inlaw  := 25;
-export num_SisterInlaw := 26;
-export num_BrotherInlaw := 27;
-export num_SiblingInlaw := 28;
-export num_MotherInlaw := 29;
-export num_FatherInlaw := 30;
-export num_ParentInlaw := 31;
+EXPORT num_Inlaw  := 25;
+EXPORT num_SisterInlaw := 26;
+EXPORT num_BrotherInlaw := 27;
+EXPORT num_SiblingInlaw := 28;
+EXPORT num_MotherInlaw := 29;
+EXPORT num_FatherInlaw := 30;
+EXPORT num_ParentInlaw := 31;
 
-export num_StepFather := 32;
-export num_StepMother := 33;
-export num_StepParent := 34;
-export num_StepBrother := 35;
-export num_StepSister := 36;
-export num_StepSibling := 37;
+EXPORT num_StepFather := 32;
+EXPORT num_StepMother := 33;
+EXPORT num_StepParent := 34;
+EXPORT num_StepBrother := 35;
+EXPORT num_StepSister := 36;
+EXPORT num_StepSibling := 37;
 
-export num_aunt := 38;
-export num_auncle := 39;
-export num_niece :=  40;
-export num_nephew := 41;
-export num_cousin := 42;
+EXPORT num_aunt := 38;
+EXPORT num_auncle := 39;
+EXPORT num_niece :=  40;
+EXPORT num_nephew := 41;
+EXPORT num_cousin := 42;
 
-export num_relative := 43;
-export num_associate := 44;
+EXPORT num_relative := 43;
+EXPORT num_associate := 44;
 
 
-export num_Neighbor := 45;
-export num_Business := 46;
-export num_transactionalAssociate := 47;
+EXPORT num_Neighbor := 45;
+EXPORT num_Business := 46;
+EXPORT num_transactionalAssociate := 47;
 
-export set_Parent := [num_Father, num_Mother, num_Parent];
-export set_Sibling := [num_Brother, num_Sister, num_Sibling];
+EXPORT set_Parent := [num_Father, num_Mother, num_Parent];
+EXPORT set_Sibling := [num_Brother, num_Sister, num_Sibling];
 
-export set_Child := [num_Son, num_Daughter, num_Child];
+EXPORT set_Child := [num_Son, num_Daughter, num_Child];
 
-export set_FirstDegreeRelative := set_Spouse + set_Parent + set_Sibling + set_Child;
+EXPORT set_FirstDegreeRelative := set_Spouse + set_Parent + set_Sibling + set_Child;
 
-export fn_get_str_title (unsigned num_title):= function
+EXPORT fn_get_str_title (unsigned num_title):= function
 str_title := map(num_title = num_Subject => 'Subject',
                  num_title = num_Husband => 'Husband',
                  num_title = num_Wife => 'Wife',

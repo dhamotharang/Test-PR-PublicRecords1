@@ -189,11 +189,7 @@ full_out_suppress := join(dHeader_withMD5,dSuppressedIn,
                           left.hval=right.hval,
 						  tSuppress(left,right),
 						  left only,lookup);
-						  
-count(full_out);           // Count coming in
-count(dSuppressedIn);      // Count of records in suppressed input file
-count(dHeader_withMD5);    // ...Should equal full_out
-count(full_out_suppress);  // ...Should equal dHeader_withMD5 - dSuppressedIn					  
+						  			  
 // End of code to suppress data based on an MD5 Hash of DID+Address
 
 mini_out_per := mini_out;

@@ -26,13 +26,14 @@ disp_scrubs_report := sequential(
 EXPORT proc_generate_report (boolean submitTheStats = true) := function
         orbitStats        := U.OrbitStats() : persist('~persist::_scrubs_rpt::'+o);;
         disp_orbit_report := output(orbitStats,all,named('en_OrbitReport'));
-        submitStats       := Scrubs.OrbitProfileStats(o,'ScrubsAlerts',orbitStats,v_en,m,CustomTag:='').SubmitStats;
+        // added 'post310' because Scrubs.ecl runs on SALT311 
+        submitStats       := Scrubs.OrbitProfileStatsPost310(o,'ScrubsAlerts',orbitStats,v_en,m,CustomTag:='').SubmitStats;
 
         return SEQUENTIAL(
                         gen_hyg_report,
                         disp_scrubs_report,		
                         disp_orbit_report,
-                        if(submitTheStats,submitStats)
+                         if(submitTheStats,submitStats)
 
         );
 END;

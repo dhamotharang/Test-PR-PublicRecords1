@@ -1,4 +1,6 @@
-﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services,models,AppendIpMetadata,std,AppendRelativesAddressMatch,Advo,didville,PhonesInfo;
+﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services,models,AppendIpMetadata,std,AppendRelativesAddressMatch,Advo,didville,PhonesInfo,
+gateway,riskprocessing,_control,Autokey_batch,DriversV2_Services;
+
 EXPORT fSOAPAppend(boolean	UpdatePii   = _Flags.Update.Pii)	:= MODULE
 
 	Shared nodes				:= thorlib.nodes();
@@ -51,10 +53,14 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 	shared IpAppend_Base		:= Files().base.IpMetaData.qa;
 
 	shared Advo_Base				:= Files().base.Advo.qa;
+
+	shared DLHistory_Base		:= Files().base.DLHistory.qa;
 	
 	shared BestInfo_Base		:= Files().base.BestInfo.qa;
 	
 	shared PrepaidPhone_Base:= Files().base.PrepaidPhone.qa;
+	
+	shared BocaShell_Base		:= Files().base.BocaShell.qa;
 
 	//original soap output files
 
@@ -586,7 +592,113 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 		 
 	END;
 
-	EXPORT Best_Info		:= MODULE
+	EXPORT DL_History	:= MODULE
+
+		service_name	:= 'driversv2_services.batch_service';
+
+		soap_host		:= riskwise.shortcuts.prod_batch_analytics_roxie;
+
+		string DataRestriction := risk_indicators.iid_constants.default_DataRestriction;
+		string DataPermission := risk_indicators.iid_constants.default_DataPermission; 
+		layout_in := layouts.Drivers_Batch.layout_in;
+		layout_out := layouts.Drivers_Batch.layout_out;
+
+		layout_in make_batch_in(layout_in le, integer c) := TRANSFORM
+				self.seq := c;
+				self := le;			
+				SELF := [];
+		END;
+					
+		layout_soap := RECORD
+			datapermissionmask :=DataPermission;
+			string datarestrictionmask:= DataRestriction;
+			BOOLEAN IncludeNonDMVSources := true;
+			INTEGER DPPAPurpose:=1;
+			INTEGER GLBPurpose:= 5;
+			BOOLEAN return_current_only := false;
+			DATASET(layout_in) batch_in;
+		END;
+
+		layout_Soap trans(layout_in L, integer c) := TRANSFORM
+				batch := PROJECT(L, make_batch_in(LEFT, c));
+				SELF.batch_in := batch;
+				self := L;
+		END;
+
+		tr_inputs := project(pii_base, transform( layout_in , 
+				SELF.did := LEFT.did;
+				SELF.name_first := LEFT.fname;
+				SELF.name_middle := LEFT.mname;
+				SELF.name_last := LEFT.lname;
+				SELF.name_suffix := LEFT.name_suffix;
+				SELF.prim_range := LEFT.prim_range;
+				SELF.predir := LEFT.predir;
+				SELF.prim_name := LEFT.prim_name;
+				SELF.addr_suffix := LEFT.addr_suffix;
+				SELF.postdir := LEFT.postdir;
+				SELF.unit_desig := LEFT.unit_desig;
+				SELF.sec_range := LEFT.sec_range;
+				SELF.p_city_name := LEFT.p_city_name;
+				SELF.St := LEFT.st;
+				SELF.z5 := LEFT.ZIP;
+				SELF.SSN := LEFT.SSN;
+				SELF.DOB := (string)LEFT.dob;
+				SELF.homephone := LEFT.home_phone;
+				SELF.workphone := LEFT.work_phone_;
+				SELF.dl := LEFT.drivers_license;
+				SELF.dlstate := LEFT.drivers_license_state;
+				SELF := LEFT;
+				SELF := [];		
+		));
+
+		ddp_inputs := DEDUP(tr_inputs, ALL);
+		
+		soap_input := DISTRIBUTE(project(ddp_inputs, trans(LEFT, counter)),RANDOM() % nodes);
+					
+					
+		xlayout := RECORD
+			(layout_out)
+			STRING errorcode;
+		END;
+
+
+		xlayout myFail(soap_input le) := TRANSFORM
+			SELF.errorcode := FAILCODE +'  '+ FAILMESSAGE;
+			SELF := [];
+		END;			
+
+		soap_results := soapcall( soap_input, 
+			soap_host, 
+			service_name,  
+			{soap_input},
+			DATASET(xlayout),
+			PARALLEL(threads), 
+			onFail(myFail(LEFT))
+			)
+			(errorcode='')
+		;			
+
+		shared p :=	dedup(project(soap_results,
+			Transform(Layouts.DLHistory
+				,self.did	:= (unsigned6)left.did
+				,self:=left
+				,self:=[])),record,all);
+
+		//Assign record_ids to the DL History
+
+		shared DLHistory_base_map	:=  Join( pii_input , P, 
+											left.did = right.did, 
+											Transform(Layouts.DLHistory
+												,self.did := left.did												
+												,self:=right)):independent;
+
+
+		DLHistory_Update	:= if( UpdatePii,  dedup( DLHistory_base_map + DLHistory_Base, ALL ), dedup( DLHistory_base_map, ALL)  );
+
+
+		Export all			:= DLHistory_Update;
+	END;
+	EXPORT Best_Info ( dataset(FraudGovPlatform.Layouts.DLHistory) DLHistory )		:= MODULE
 
 			service_name	:= 'didville.did_batch_service_raw';
 			soap_host		:= riskwise.shortcuts.prod_batch_analytics_roxie;
@@ -605,25 +717,6 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 
 					SELF.acctno := (string)L.record_id;
 					SELF.did := (string)L.did;
-					// SELF.ssn := L.SSN;
-					// SELF.dob := (string)L.dob;
-					// SELF.phoneno := L.home_phone;
-					// SELF.title := '';
-					// SELF.name_first := L.fname;
-					// SELF.name_middle := L.mname;
-					// SELF.name_last := L.lname;
-					// SELF.name_suffix := L.name_suffix;
-					// SELF.prim_range := L.prim_range;
-					// SELF.predir := '';
-					// SELF.prim_name := L.prim_name;
-					// SELF.suffix := '';
-					// SELF.postdir := '';
-					// SELF.unit_desig := '';
-					// SELF.sec_range := L.sec_range;
-					// SELF.p_city_name := '';
-					// SELF.st := L.st;
-					// SELF.z5 := L.ZIP;
-					// SELF.zip4 := '';			
 					SELF := [];
 			END;
 
@@ -690,13 +783,34 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 
 			shared BestInfo_base_map	:= Join(pii_input , BestInfo_recid_map, left.record_id=right.record_id,Transform(Layouts.BestInfo
 													,self.did := left.did
-													,self.fdn_file_info_id := left.fdn_file_info_id
+													,self.reported_date := left.reported_date
 													,self:=right)):independent;
 
-			Export all			:= if(UpdatePii,dedup((BestInfo_base_map + BestInfo_base),all),BestInfo_base_map);
+			shared BestInfo_base_map2	:= Join(BestInfo_base_map , sort(DLHistory, -dt_last_seen), 
+											left.did=right.did and
+											(( 	(Unsigned8) left.reported_date[1..6] between right.dt_first_seen and right.dt_last_seen ) OR 
+											(
+												(Unsigned8) left.reported_date[1..6] >= right.dt_first_seen and 
+												(Unsigned8) left.reported_date[1..6] >= right.dt_last_seen
+											)),
+											Transform(Layouts.BestInfo
+													,self.best_drivers_license_state := right.orig_state
+													,self.best_drivers_license := right.dl_number
+													,self.best_drivers_license_exp := right.expiration_date
+													,self.best_drivers_dt_first_seen := right.dt_first_seen
+													,self.best_drivers_dt_last_seen := right.dt_last_seen
+													,self:=left), 
+													left outer,
+													keep(1)):independent;			
+
+			BestInfo_Update	:= if(UpdatePii,dedup((BestInfo_base_map2 + BestInfo_base),all),BestInfo_base_map2);
+
+			
+
+			Export all := BestInfo_Update;
 								
 	END;
-	
+
 	EXPORT PrepaidPhone	:= MODULE
 		Phone_key := pull(PhonesInfo.Key_Phones_Type)(prepaid='1');
 	//get transactions between phone vendor dates
@@ -744,5 +858,136 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 		 
 	END;
 	
+	 EXPORT BocaShell	:= Module
+   	
+   unsigned1 parallel_calls :=if(_control.ThisEnvironment.Name <> 'Prod_Thor',2,30);  
+   boolean FraudPointMode := true;
+   boolean RemoveFares := false;	
+   boolean LeadIntegrityMode := false; 
+   string DataRestrictionMask := risk_indicators.iid_constants.default_DataRestriction;
+   string DataPermissionMask  := risk_indicators.iid_constants.default_DataPermission; 
+   string IntendedPurpose := '';  
+   unsigned3 LastSeenThreshold := 0;	
+   unsigned1 glba := 5;
+   unsigned1 dppa := 1;
+   boolean RetainInputDID := True; 
+   layout_input := RECORD
+       STRING Account;
+       STRING FirstName;
+       STRING MiddleName;
+       STRING LastName;
+       STRING StreetAddress;
+       STRING City;
+       STRING State;
+       STRING Zip;
+       STRING HomePhone;
+       STRING SSN;
+       STRING DateOfBirth;
+       STRING WorkPhone;
+       STRING income;  
+       string DLNumber;
+       string DLState;			
+       string BALANCE; 
+       string CHARGEOFFD; 
+       string FormerName;
+       string EMAIL;  
+       string employername;
+       string historydate;
+       string IPAddr;
+    		string LexID; 
+   		unsigned8 record_id;
+   		unsigned6 fdn_file_info_id;
+    END;
+   bs_service := 'risk_indicators.boca_shell';  
+   roxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie; 
+	 
+   ds_in := Project(pii_input,Transform(layout_input,
+   						   self.Account :=(string)left.record_id
+   							,self.FirstName :=left.fname
+   							,self.MiddleName :=left.mname
+   							,self.LastName :=left.lname
+   							,self.StreetAddress :=left.address_1
+   							,self.City :=left.p_city_name
+   							,self.State :=left.st
+   							,self.Zip :=left.zip
+   							,self.HomePhone :=left.home_phone
+   							,self.SSN :=left.ssn
+   							,self.DateOfBirth :=left.dob
+   							,self.WorkPhone :=left.work_phone_
+   							,self.income :=''
+   							,self.DLNumber :=left.drivers_license
+   							,self.DLState :=left.drivers_license_state
+   							,self.BALANCE :='' 
+   							,self.CHARGEOFFD :='' 
+   							,self.FormerName :=''
+   							,self.EMAIL :=left.email_address  
+   							,self.employername :=''
+   							,self.historydate :=left.reported_date
+   							,self.IPAddr :=left.ip_address
+   							,self.LexID :=(string)left.did
+   							,self.record_id						:=left.record_id
+   							,self.fdn_file_info_id		:=left.fdn_file_info_id
+   							,self:=left));
+   ds_input := ds_in;
+  
+	l := RECORD
+		string old_account_number;
+    Risk_Indicators.Layout_InstID_SoapCall;
+   END;
+	
+	l assignAccount (ds_input le, INTEGER c) := TRANSFORM
+		self.old_account_number := le.Account;
+		SELF.AccountNumber := (string)c;
+    SELF.GLBPurpose  := glba;
+    SELF.DPPAPurpose := dppa;
+   	self.retainInputDID := RetainInputDID;
+   	self.did := le.LexID; 
+   self.historydateyyyymm := map(
+   		regexfind('^\\d{8} \\d{8}$', le.historydate) => (unsigned)le.historydate[..6],
+   		regexfind('^\\d{8}$',        le.historydate) => (unsigned)le.historydate[..6],
+   		                                                (unsigned)le.historydate
+   );
+     self.historyDateTimeStamp := map(
+         le.historydate in ['', '999999']             => '',  // leave timestamp blank, query will populate it with the current date   	
+   			regexfind('^\\d{8} \\d{8}$', le.historydate) => le.historydate,
+   			regexfind('^\\d{8}$',        le.historydate) => le.historydate +   ' 00000100',
+   			regexfind('^\\d{6}$',        le.historydate) => le.historydate + '01 00000100',		
+   			                                                le.historydate
+   	);
+     SELF.IncludeScore := true;
+     SELF.datarestrictionmask := datarestrictionmask;
+    SELF.datapermissionmask := datapermissionmask;
+    SELF.FraudPointMode := FraudPointMode;
+    SELF.RemoveFares := RemoveFares;
+   SELF.LeadIntegrityMode := LeadIntegrityMode;
+    SELF.LastSeenThreshold := LastSeenThreshold;
+   	self.bsversion := 55;	
+   	tmx_gw := riskwise.shortcuts.gw_threatmetrix;
+    self.gateways := project(tmx_gw, transform(Gateway.Layouts.Config, self := left, self := []) );   //dev TMX gateway
+		self.TurnOffTumblings := true; 
+   	SELF := le;
+    SELF := [];
+   END;
+   p_f := PROJECT (ds_input, assignAccount (LEFT,COUNTER));
+   s := Risk_Indicators.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
+                                                  bs_service, roxieIP, parallel_calls);
+																									
+
+		riskprocessing.layouts.layout_internal_shell getold(s le, l ri) :=	TRANSFORM
+			SELF.AccountNumber := ri.old_account_number;
+			SELF := le;
+		END;
+
+	 res := JOIN (distribute(s,hash(seq))
+						,distribute(p_f,hash(accountnumber)),LEFT.seq=(unsigned)RIGHT.accountnumber,getold(LEFT,RIGHT));	
+						
+   isFCRA := false;
+   Shell_Out := FraudGovPlatform.fn_BocaShell_ToRin(res, isFCRA, DataRestrictionMask, IntendedPurpose);
+	 
+	 Base_Map := Join(Shell_Out,Pii_Input,left.record_id=right.record_id
+											,Transform(recordof(left),self.fdn_file_info_id:=right.fdn_file_info_id,self:=left));
+	 
+	 Export All := dedup(Base_Map,all);
+   END;
 
 END;

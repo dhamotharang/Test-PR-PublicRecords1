@@ -1,10 +1,12 @@
 ﻿EXPORT Layout_VehIncidents := MODULE
 
 	EXPORT SlimIncidents := record
-		STRING40		accident_nbr;
+	 STRING40		accident_nbr;
 	 STRING14 		vehicle_incident_id;
 	 STRING8 		Sent_to_HPCC_DateTime;
 	 STRING11 		agency_id;
+	 //PR Recon COPPR-49
+	 BOOLEAN is_Terminated_Agency;
 	 STRING4 		report_code;
 	 STRING11 		Report_ID;
 	 STRING4 		jurisdiction_state;
@@ -13,12 +15,12 @@
 	 STRING4 		report_type_id;
 	 STRING4 		Work_Type_ID;
 	 STRING9 		CRU_Order_ID;
-		STRING14 		vehicle_incident_id_latest;
-		STRING11 		jurisdiction_nbr;
-		STRING9 		ORI_Number;
-		STRING50 		Crash_City;
-		STRING100 	Loss_Street;
-		STRING100 	Loss_Cross_Street;
+	 STRING14 		vehicle_incident_id_latest;
+	 STRING11 		jurisdiction_nbr;
+	 STRING9 		ORI_Number;
+	 STRING50 		Crash_City;
+	 STRING100 	Loss_Street;
+	 STRING100 	Loss_Cross_Street;
 	END;
 	
 	enum_code_desc := RECORD

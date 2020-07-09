@@ -1,6 +1,6 @@
-﻿import _Control, BuildLogger, PromoteSupers, RoxieKeybuild, Scrubs_IP_Metadata, Std, Orbit3;
+﻿import _Control, BuildLogger, PromoteSupers, RoxieKeybuild, Scrubs_IP_Metadata, Std, Orbit3, VersionControl, dx_ip_metadata, doxie;
 
-EXPORT Proc_Build_IP_Metadata(string version, const varstring eclsourceip, string srcdir = '/data/data_999/phones/ip_metadata/build/', string suffixF = 'ip_metadata_header.csv'):= function
+EXPORT Proc_Build_IP_Metadata(string version, const varstring eclsourceip, string srcdir = '/data/data_999/phones/ip_metadata/build/', string suffixF = 'ip_metadata_header.csv', string suffixF6 = 'ip_metadata_header6.csv', boolean DoDopsOrbit = ~VersionControl._Flags.IsDataland):= function
 
 	#workunit('name', 'IP Metadata Build - ' + version);
 
@@ -8,35 +8,50 @@ EXPORT Proc_Build_IP_Metadata(string version, const varstring eclsourceip, strin
 	//Spray IP_Metadata Files to Thor////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		sprayRaw 				:= IP_Metadata.Spray_IP_Metadata(version, eclsourceip, srcdir, suffixF);
+		sprayRaw 			:= parallel(	IP_Metadata.Spray_IP_Metadata(version, eclsourceip, srcdir, suffixF),
+											IP_Metadata.Spray_IP_Metadata_ipv6(version, eclsourceip, srcdir, suffixF6));
 		
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Build/Move IP_Metadata Base////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-		bldBase					:= output(IP_Metadata.Map_IP_Metadata(version),,'~thor_data400::base::ip_metadata_main_'+version, overwrite, __compressed__);
+		bldBase				:= parallel(	output(IP_Metadata.Map_IP_Metadata(version),,'~thor_data400::base::ip_metadata_main_'+version, overwrite, __compressed__),
+											output(IP_Metadata.Map_IP_Metadata_ipv6(version),,$.File_IP_Metadata.base_path_ipv6+'_'+version, overwrite, __compressed__));
 
-		clrDelete 			:= sequential(nothor(fileservices.clearsuperfile('~thor_data400::base::ip_metadata_main_delete', true)),
-																	nothor(fileservices.clearsuperfile('~thor_data400::in::ip_metadata_history_delete', true)));		
-		
-		mvBase					:= Std.File.PromoteSuperFileList(['~thor_data400::base::ip_metadata_main',
+		clrDelete 			:= parallel(	sequential(nothor(fileservices.clearsuperfile('~thor_data400::base::ip_metadata_main_delete', true)),
+																	nothor(fileservices.clearsuperfile('~thor_data400::in::ip_metadata_history_delete', true))),		
+											sequential(nothor(fileservices.clearsuperfile($.File_IP_Metadata.base_path_ipv6+'_delete', true)),
+																	nothor(fileservices.clearsuperfile($.File_IP_Metadata.history_path_ipv6+'_delete', true))));
+
+	mvBase					:= parallel(	Std.File.PromoteSuperFileList(['~thor_data400::base::ip_metadata_main',
 																											'~thor_data400::base::ip_metadata_main_father',
 																											'~thor_data400::base::ip_metadata_main_grandfather',
 																											'~thor_data400::base::ip_metadata_main_delete'], 
-																											'~thor_data400::base::ip_metadata_main_'+version, true);		
-	
+																											'~thor_data400::base::ip_metadata_main_'+version, true),
+											Std.File.PromoteSuperFileList([$.File_IP_Metadata.base_path_ipv6,
+																											$.File_IP_Metadata.base_path_ipv6+'_father',
+																											$.File_IP_Metadata.base_path_ipv6+'_grandfather',
+																											$.File_IP_Metadata.base_path_ipv6+'_delete'], 
+																											$.File_IP_Metadata.base_path_ipv6+'_'+version, true));
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Build/Move Raw IP_Metadata History Files///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	
-		reformDaily 		:= project(distribute(IP_Metadata.File_IP_Metadata.Raw), IP_Metadata.Layout_IP_Metadata.History);													
-		ccatRawHistory	:= output(dedup(sort(distribute(reformDaily + IP_Metadata.File_IP_Metadata.History, hash(ip_rng_beg, ip_rng_end)), record, local), record, local),,'~thor_data400::in::ip_metadata_history_'+version,__compressed__);
+		reformDaily 		:= project(distribute(IP_Metadata.File_IP_Metadata.Raw), IP_Metadata.Layout_IP_Metadata.History);
+		reformDaily6 		:= project(distribute(IP_Metadata.File_IP_Metadata.Raw_ipv6), IP_Metadata.Layout_IP_Metadata.History_ipv6);											
+		ccatRawHistory		:= parallel(	output(dedup(sort(distribute(reformDaily + IP_Metadata.File_IP_Metadata.History, hash(ip_rng_beg, ip_rng_end)), record, local), record, local),,'~thor_data400::in::ip_metadata_history_'+version,__compressed__),
+											output(dedup(sort(distribute(reformDaily6 + $.File_IP_Metadata.History_ipv6, hash(ip_rng_beg, ip_rng_end)), record, local), record, local),,$.File_IP_Metadata.history_path_ipv6+'_'+version,__compressed__));
 	
-		mvRawHistory		:= Std.File.PromoteSuperFileList(['~thor_data400::in::ip_metadata_history',
+		mvRawHistory		:= parallel( 	Std.File.PromoteSuperFileList(['~thor_data400::in::ip_metadata_history',
 																											'~thor_data400::in::ip_metadata_history_father',
 																											'~thor_data400::in::ip_metadata_history_grandfather',
-																											'~thor_data400::in::ip_metadata_history_delete'], '~thor_data400::in::ip_metadata_history_'+version, true);																					
-	
+																											'~thor_data400::in::ip_metadata_history_delete'], '~thor_data400::in::ip_metadata_history_'+version, true),																			
+											Std.File.PromoteSuperFileList([$.File_IP_Metadata.history_path_ipv6,
+																											$.File_IP_Metadata.history_path_ipv6+'_father',
+																											$.File_IP_Metadata.history_path_ipv6+'_grandfather',
+																											$.File_IP_Metadata.history_path_ipv6+'_delete'], $.File_IP_Metadata.history_path_ipv6+'_'+version, true));
+		
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Build IP_Metadata Keys/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,28 +59,42 @@ EXPORT Proc_Build_IP_Metadata(string version, const varstring eclsourceip, strin
 		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(IP_Metadata.Key_IP_Metadata_IPv4
 																								,'~thor_data400::key::ip_metadata_ipv4'
 																								,'~thor_data400::key::'+version+'::ip_metadata_ipv4'
-																								,bldIPMetadata);	
-
+																								,bldIPMetadata4);
+        
+        df := project(IP_Metadata.File_IP_Metadata.Base_ipv6(is_current=TRUE), dx_IP_Metadata.Layout_IP_Metadata.Key_layout_ipv6);
+        RoxieKeyBuild.MAC_build_logical(dx_ip_metadata.key_ipv6, df, IP_Metadata.File_IP_Metadata.key_ipv6(), IP_Metadata.File_IP_Metadata.key_ipv6(version), bldIPMetadata6)
+/* 		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(dx_ip_metadata.key_ipv6
+																								,$.File_IP_Metadata.key_ipv6()
+																								,$.File_IP_Metadata.key_ipv6(version)
+																								,bldIPMetadata6); */
+		bldIPMetadata := parallel(bldIPMetadata4, bldIPMetadata6);
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Move IP_Metadata Keys to Superfiles////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		RoxieKeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::ip_metadata_ipv4'
 																					,'~thor_data400::key::'+version+'::ip_metadata_ipv4'
-																					,mvBldIPMetadata);
-	
-		PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::ip_metadata_ipv4','Q',mvQAIPMetadata,'3');
+																					,mvBldIPMetadata4);
+		RoxieKeybuild.Mac_SK_Move_to_Built_v2($.File_IP_Metadata.key_ipv6()
+																					,$.File_IP_Metadata.key_ipv6(version)
+																					,mvBldIPMetadata6);
+		mvBldIPMetadata:= parallel(mvBldIPMetadata4, mvBldIPMetadata6);
+
+		PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::ip_metadata_ipv4','Q',mvQAIPMetadata4,'3');
+		PromoteSupers.Mac_SK_Move_v2($.File_IP_Metadata.key_ipv6(),'Q',mvQAIPMetadata6,'3');
+		mvQAIPMetadata := parallel(mvQAIPMetadata4, mvQAIPMetadata6);
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Update DOPs Page///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		dopsUpdate 			:= RoxieKeybuild.updateversion('IP_MetadataKeys', version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', , 'N');
+		dopsUpdate 	:= if(doDopsOrbit, RoxieKeybuild.updateversion('IP_MetadataKeys', version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', , 'N'), output('Dops update disabled'));
 	
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Orbit Update ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('IP Metadata',version,'N'); 
+	
+		orbit_update := if(doDopsOrbit, Orbit3.proc_Orbit3_CreateBuild_AddItem('IP Metadata',version,'N'), output('Orbit update disabled')); 
 
 	
 	
@@ -101,7 +130,9 @@ orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('IP Metadata',version,'N'
 																													bldIPMetadata, mvBldIPMetadata, mvQAIPMetadata, 
 																													BuildLogger.KeyEnd(false),
 																													BuildLogger.PostStart(False),
-																													dopsUpdate, orbit_update, buildStrata, scrubsRuns, 
+																													dopsUpdate, orbit_update, 
+																													if(doDopsOrbit, buildStrata, output('Strata update disabled')), 
+																													if(doDopsOrbit, scrubsRuns, output('Scrubs update disabled')), 
 																													BuildLogger.PostEnd(False), 
 																													BuildLogger.BuildEnd(false)):
 																													Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'PhonesInfo Ported & Metadata Key Build Succeeded', workunit + ': Build complete.')),
