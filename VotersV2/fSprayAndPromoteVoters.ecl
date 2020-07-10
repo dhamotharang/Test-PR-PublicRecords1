@@ -8,7 +8,7 @@ function
 #option('multiplePersistInstances',FALSE);
 
 wuid := thorlib.wuid();
-sourceIP := 'bctlpedata12';
+sourceIP := 'bctlpedata11';
 sourcePath := '/data/load01/voters/sprays/';
 recSize := 1888;
 groupName := STD.System.Thorlib.Group( );									

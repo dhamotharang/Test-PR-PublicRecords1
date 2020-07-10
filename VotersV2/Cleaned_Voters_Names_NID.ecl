@@ -1,8 +1,8 @@
 ﻿import VotersV2, NID, Address;
 //NID processing
-//DF-27577 Moved DID after AID
+//DF-27577 Moved NID between AID and DID, Renamed NID process from Norm_Voters_Cleaned_Base to Cleaned_Voters_Names_NID
 
-in_file := VotersV2.Cleaned_Voters_DID;
+in_file := VotersV2.Cleaned_Addr_Cache_Base;
 
 layout_base := VotersV2.Layouts_Voters.Layout_Voters_Base_new;								
 
@@ -36,7 +36,7 @@ deduped_clean_file  := dedup(sort(dis_clean_norm_file, lname, name_suffix, fname
 							 lname, name_suffix, fname, mname, dob, prim_range, prim_name, predir, addr_suffix, postdir,
 							 unit_desig, sec_range, p_city_name, st, zip, political_party, phone, work_phone, local);
 															
-export Norm_Voters_Cleaned_Base := deduped_clean_file 
+export Cleaned_Voters_Names_NID := deduped_clean_file 
 //uncomment for testing purposes
-// : persist(VotersV2.Cluster+'persist::Norm_Voters_Cleaned_Base', SINGLE)
+// : persist(VotersV2.Cluster+'persist::Cleaned_Voters_Names_NID', SINGLE)
 ;

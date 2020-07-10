@@ -1,12 +1,12 @@
 ﻿import VotersV2, Codes, ut;
-//DF-27577 Moved DID after AID
+//DF-27577 Moved DID after AID and NID processes
 //DF-27577 Moved Rollup from Updated_Voters to Transulate_Voters_Codes
+//DF-27577 Moved NID process to between AID and DID processes
+//DF-27577 Renamed Transulate_Voters_Codes to Translate_Voters_Codes
 
-Cleaned_Norm_vbase := VotersV2.Norm_Voters_Cleaned_Base;
+Cleaned_Voters_DID_Base := VotersV2.Cleaned_Voters_DID;
 
 Layout_outfile := VotersV2.Layouts_Voters.Layout_Voters_base_new;
-
-CleanedNormVbaseAndBase := Cleaned_Norm_vbase;
 
 //*** Code to explode the description values for Race Ethnicity, Active Status, 
 //*** Age Category, Political Party, Voter Status
@@ -15,7 +15,7 @@ Layout_outfile  getRaceEthnicity(Layout_outfile L, codes.File_Codes_V3_In R) := 
 	self          := L;
 end;
 
-Clean_file_Race_Exp := join(CleanedNormVbaseAndBase,
+Clean_file_Race_Exp := join(Cleaned_Voters_DID_Base,
 		                    codes.File_Codes_V3_In(trim(file_name, left, right) = 'EMERGES_HVC',trim(field_name, left, right) = 'RACEETHNICITY'),
 		                    trim(left.race, left, right) = trim(right.code, left, right),
 		                    getRaceEthnicity(LEFT,RIGHT),left outer, lookup);
@@ -125,7 +125,10 @@ Clean_patched_vtid_dob_file := iterate(Srt_dist_vtidCleanedVotersBase, patchRecs
 
 Sort_Cleaned_Patched_file := sort(Clean_patched_vtid_dob_file,RECORD,
 								  EXCEPT vtid, vendor_id, Process_Date, Date_First_Seen, Date_Last_Seen,
-								  file_acquired_date,local) : persist(VotersV2.Cluster+ 'persist::Transulate_Voters_Sort', SINGLE);
+								  file_acquired_date,local)
+									//uncommented for testing purposes
+									// : persist(VotersV2.Cluster+ 'persist::Transulate_Voters_Sort', SINGLE)
+									;
 
 Layout_outfile  rollupXform(Layout_outfile l, Layout_outfile r) := transform
 	self.Process_Date    := if(l.Process_Date > r.Process_Date, l.Process_Date, r.Process_Date);
@@ -136,9 +139,12 @@ end;
 
 Rollup_Voters := rollup(Sort_Cleaned_Patched_file,rollupXform(LEFT,RIGHT),RECORD,
 								EXCEPT vtid, vendor_id, Process_Date, Date_First_Seen, Date_Last_Seen,
-								file_acquired_date, local): persist(VotersV2.Cluster+ 'persist::Transulate_Voters_Rollup', SINGLE);					  
+								file_acquired_date, local)
+								//uncommented for testing purposes
+								// : persist(VotersV2.Cluster+ 'persist::Transulate_Voters_Rollup', SINGLE)
+								;					  
 
-export Transulate_Voters_Codes := Rollup_Voters 
+export Translate_Voters_Codes := Rollup_Voters 
 //uncomment for testing purposes
 // : persist(VotersV2.Cluster+ 'persist::Transulate_Voters_Codes', SINGLE)
 ;

@@ -1,49 +1,16 @@
 ﻿import DID_Add, Header_Slimsort, ut, Lib_Stringlib, WatchDog, didville,mdr,header;
-//DF-27577 Moved DID after AID
+//DF-27577 Moved DID after AID and NID
 //DF-27577 Reduced number of persist files to speed up build
 
-in_file := VotersV2.Cleaned_Addr_Cache_Base;
+in_file := VotersV2.Cleaned_Voters_Names_NID;
 
-// Added for DF-27802 - Emerges Opt Out - This will filter out Voters records that are found in the Emerges Opt Out file.  
-optOut :=  VotersV2.File_OptOut_Cleaned;	
-
-joinLayout := record
-	 VotersV2.Layouts_Voters.Layout_Voters_base_new;	
-	 string optout_flag;
-end;
-	
-distVoters  :=	distribute(in_File,hash(dob)); 
-dedupOptOut :=	dedup(sort(distribute(optOut,hash(dob)),dob,last_name,first_name,state,local),dob,last_name,first_name,state,local)(dob <> '' and last_name <> '' and first_name <> '' and state <> '');
-	
-joinVoters_OptOut := join(distVoters, dedupOptOut,
-													 left.dob        = right.dob and
-													 left.last_name  = right.last_name and
-													 left.first_name = right.first_name and
-													 (left.res_state = right.state or left.mail_state = right.state),
-														transform(joinLayout,
-																			 self.optout_flag := if( left.dob        = right.dob and
-																															 left.last_name  = right.last_name and 
-																															 left.first_name = right.first_name and 
-																															 (left.res_state = right.state or left.mail_state = right.state) and 
-																															 left.dob        <> '' and right.dob        <> ''  and 
-																															 left.last_name  <> '' and right.last_name  <> ''  and 
-																															 left.first_name <> '' and right.first_name <> ''  and 
-																															 (left.res_state <> '' or left.mail_state   <> '') and right.state <> ''
-																															 ,'O' ,'');	
-																			 self 				  := left;
-																			 self  				  := [];),
-															 left outer, lookup, local);
-																	 
-Base_filterOptOuts := project(joinVoters_OptOut(optOut_flag <> 'O'),transform(VotersV2.Layouts_Voters.Layout_Voters_base_new,self := left));
-// End of Emerges Opt Out filter
-
-ut.mac_flipnames(Base_filterOptOuts,fname,mname,lname, base_FlipNames)
+ut.mac_flipnames(in_file,fname,mname,lname, base_FlipNames)
 
 dist_In_Base_File := distribute(base_FlipNames, hash64(source_state, lname, name_suffix, fname, mname, 
 																dob, prim_range, prim_name, predir, addr_suffix, postdir,
 																unit_desig, sec_range, p_city_name, st, zip));
 																
-// deduping the records based on vtid key, political party, mailing address fields.																
+// sorting and deduping the records 																
 ded_In_base_file  := dedup(sort(dist_In_Base_File, vtid, -process_date,
                                 lname, name_suffix, fname, mname, dob, 
 																prim_range, prim_name, predir, addr_suffix, postdir, unit_desig, sec_range,
@@ -58,7 +25,7 @@ ded_In_base_file  := dedup(sort(dist_In_Base_File, vtid, -process_date,
 													 mail_sec_range, mail_p_city_name, mail_st, mail_ace_zip, 
 													 local)
 													 //uncomment for testing
-													 :persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID_Sorted_Deduped', SINGLE)
+													 // :persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID_Sorted_Deduped', SINGLE)
 													 ;
 
 //#stored('did_add_force','roxi'); // remove or set to 'thor' to put recs through thor
@@ -101,5 +68,5 @@ did_add.MAC_Add_SSN_By_DID(Ds_Voters_WithDID, did, ssn, Out_Voters_WithDidSsn)
 
 export Cleaned_Voters_DID := Out_Voters_WithDidSsn 
 //uncomment for testing purposes
-: persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID', SINGLE)
+// : persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID', SINGLE)
 ;

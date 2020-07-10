@@ -15,24 +15,20 @@ VotersV2.Layouts_Voters.Layout_Voters_base_new trfInFile(in_File l, unsigned c) 
 		   trim(l.res_city,left,right) + trim(l.res_zip,left,right) <> '')  	
 	self.addr_type := choose(c, '','M');  		 
   self.prep_addr_line1:= choose(c, ut.CleanSpacesAndUpper(l.res_Addr1 + ' ' + l.res_Addr2), ut.CleanSpacesAndUpper(l.mail_Addr1 + ' ' + l.mail_Addr2));
-	self.prep_addr_line_last := choose(c, ut.CleanSpacesAndUpper(ut.CleanSpacesAndUpper(L.res_city) + 
-																				IF(L.res_City <> '', ', ', '') + 
-																				L.res_State + ' ' + IF(LENGTH(L.res_Zip) >= 5, L.res_zip[1..5], '')
-																				),
-																				ut.CleanSpacesAndUpper(ut.CleanSpacesAndUpper(L.mail_city) + 
-																				IF(L.mail_City <> '', ', ', '') + 
-																				L.mail_State + ' ' + IF(LENGTH(L.mail_Zip) >= 5, L.mail_zip[1..5], '')
-																				));		
+	temp_res_addr_line_last := if((trim(l.res_city,left,right) != '' and trim(l.res_state,left,right) != '') or (trim(l.res_zip,left,right) != '')
+																	,Address.Addr2FromComponents(ut.CleanSpacesAndUpper(l.res_city), ut.CleanSpacesAndUpper(l.res_state), l.res_zip[1..5])			
+																  ,'');	
+	temp_mail_addr_line_last := if((trim(l.mail_city,left,right) != '' and trim(l.mail_state,left,right) != '') or (trim(l.mail_zip,left,right) != '')
+																	,Address.Addr2FromComponents(ut.CleanSpacesAndUpper(l.mail_city), ut.CleanSpacesAndUpper(l.mail_state), l.mail_zip[1..5])			
+																	,'');
+	self.prep_addr_line_last := choose(c, temp_res_addr_line_last, temp_mail_addr_line_last);
 	self.title := l.prefix_title;
 	self.fname := l.first_name;
 	self.mname := l.middle_name;
 	self.lname := l.last_name;
 	self.name_suffix := l.name_suffix_in;
-	self.did := 0;
-	self.did_score := 0;
-	self.ssn := '';
-	self.name_type := '';
 	self := l;	
+	self := [];
 END;
 
 // Normalize the Mailing Addresses 
@@ -73,8 +69,42 @@ baseFile := VotersV2.File_Voters_Base + VotersV2.File_MA_Census_Base
 //Concatenated previous base files with current update
 bothFiles := Infile_Name_Norm + baseFile;
 
+// Added for DF-27802 - Emerges Opt Out - This will filter out Voters records that are found in the Emerges Opt Out file.  
+//Barb moved to this attribute, Cleaned_Addr_Cache_Base since Clean_Voters_DID, since DID process has been moved to after this attribute
+optOut :=  VotersV2.File_OptOut_Cleaned;	
+
+joinLayout := record
+	 VotersV2.Layouts_Voters.Layout_Voters_base_new;	
+	 string optout_flag;
+end;
+	
+distVoters  :=	distribute(bothFiles,hash(dob)); 
+dedupOptOut :=	dedup(sort(distribute(optOut,hash(dob)),dob,last_name,first_name,state,local),dob,last_name,first_name,state,local)(dob <> '' and last_name <> '' and first_name <> '' and state <> '');
+	
+joinVoters_OptOut := join(distVoters, dedupOptOut,
+													 left.dob        = right.dob and
+													 left.last_name  = right.last_name and
+													 left.first_name = right.first_name and
+													 (left.res_state = right.state or left.mail_state = right.state),
+														transform(joinLayout,
+																			 self.optout_flag := if( left.dob        = right.dob and
+																															 left.last_name  = right.last_name and 
+																															 left.first_name = right.first_name and 
+																															 (left.res_state = right.state or left.mail_state = right.state) and 
+																															 left.dob        <> '' and right.dob        <> ''  and 
+																															 left.last_name  <> '' and right.last_name  <> ''  and 
+																															 left.first_name <> '' and right.first_name <> ''  and 
+																															 (left.res_state <> '' or left.mail_state   <> '') and right.state <> ''
+																															 ,'O' ,'');	
+																			 self 				  := left;
+																			 self  				  := [];),
+															 left outer, lookup, local);
+																	 
+Base_filterOptOuts := project(joinVoters_OptOut(optOut_flag <> 'O'),transform(VotersV2.Layouts_Voters.Layout_Voters_base_new,self := left));
+// End of Emerges Opt Out filter
+
 // generating a sequence number for "vtid"
-ut.MAC_Sequence_Records(bothFiles,vtid,vtidBothFiles);
+ut.MAC_Sequence_Records(Base_filterOptOuts,vtid,vtidBothFiles);
 
 File_Addr_filtered_recs := vtidBothFiles(prep_addr_line_last <> '');
 File_Addr_empty_recs    := vtidBothFiles(prep_addr_line_last = '');
@@ -119,21 +149,27 @@ clean_cache_addr_file := project(dwithAID
 									self.geo_blk				:= left.aidwork_acecache.geo_blk			;
 									self.geo_match			:= left.aidwork_acecache.geo_match		;
 									self.err_stat				:= left.aidwork_acecache.err_stat			;
+									//initializing these fields for DID appends in next step
 									self.did 						:= 0;
 									self.did_score 			:= 0;
 									self.ssn 						:= '';
 									self 								:= left;
 			)
 		)
-		+ project(File_Addr_empty_recs,transform(VotersV2.Layouts_Voters.Layout_Voters_base_new,
+		+ project(File_Addr_empty_recs,transform(VotersV2.Layouts_Voters.Layout_Voters_base_new,	
+									//initializing these fields for DID	appends in next step
+									                           self.did 						:= 0;
+									                           self.did_score 			:= 0;
+									                           self.ssn 						:= '';
 		                                         self := left,
 		                                         self := []));
 
-clean_cache_file_dist := distribute(clean_cache_addr_file, vtid);
+// clean_cache_file_dist := distribute(clean_cache_addr_file, vtid);
 
-full_norm_file := sort(clean_cache_file_dist, vtid, -process_date, -date_first_seen, addr_type, local);
+// full_norm_file := sort(clean_cache_file_dist, vtid, -process_date, -date_first_seen, addr_type, local);
 
-export Cleaned_Addr_Cache_Base :=  full_norm_file
+// export Cleaned_Addr_Cache_Base :=  full_norm_file
+export Cleaned_Addr_Cache_Base :=  clean_cache_addr_file
 //uncomment for testing purposes
 // : persist(VotersV2.Cluster+'persist::voters::Cleaned_Addr_Cache_Base',SINGLE)
 ;
