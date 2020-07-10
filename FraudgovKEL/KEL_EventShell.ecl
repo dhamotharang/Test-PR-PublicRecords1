@@ -21,7 +21,8 @@ EXPORT KEL_EventShell := MODULE
 		'idislasteventid,emlislasteventid,addrislasteventid,ipislasteventid,bnkislasteventid,dlislasteventid,ssnislasteventid,phislasteventid,' +
 		'personlabel,emaillabel,addresslabel,iplabel,bankaccountlabel,driverslicenselabel,ssnlabel,phonelabel,' +
 		'addressentitycontextuid,ssnentitycontextuid,personentitycontextuid,phoneentitycontextuid,emailentitycontextuid,ipentitycontextuid,bankaccountentitycontextuid,driverslicenseentitycontextuid,'+ 
-		'streetaddress,city,state,zip'; 
+		'streetaddress,city,state,zip';
+
 	EXPORT NicoleAttr := 'agencyuid,agencyprogtype,agencyprogdesc,agencyprogjurst,t_srcagencyuid,t_srcagencyprogtype,t_actuid,t_actdtecho,t_srctype,t_srcdesc,t_srcclasstype,t_personuidecho,' +
 	    't_inpclnaddrstreetecho,t_inpclnmiddlenmecho,t_inpcaseidecho,t_inpdvcidecho,' +
 		't_inpclntitleecho,t_inpclnfirstnmecho,t_inpclnlastnmecho,t_inpclnnmsuffixecho,t_inpclnaddrprimrangeecho,t_inpclnaddrpredirecho,t_inpclnaddrprimnmecho,t_inpclnaddrsuffixecho,t_inpclnaddrpostdirecho,t_inpclnaddrunitdesigecho,' +
@@ -50,7 +51,7 @@ EXPORT KEL_EventShell := MODULE
 		't_isbcshllhitflag,t_bcshlllexidecho,t1l_lexidseenflag,t1l_bcshlllexidmatchesinpflag,t1l_idisbcshllhitflag,t1_idage,t1l_dobverindx,t1_napsummary,t1l_iddeceasedflag,' +
 		't1l_nassummary,t1_cvi,t1_fp3,t1_fp3_stolenidentityindex,t1_fp3_syntheticidentityindex,t1_fp3_manipidentityindex,t1l_fp_sourcerisklevel,t1_adultidnotseenflag,' +
 		't1_minorwlexidflag,t1_ssnpriordobflag,t1_firstnmnotverflag,t1_lastnmnotverflag,t1_addrnotverflag,t1l_ssnnotverflag,t1l_ssnwaltnaverflag,t1l_ssnwaddrnotverflag,' +
-		't1_phnnotverflag,t1l_dobnotverflag,t1l_hiriskcviflag,t1l_medriskcviflag,t1_hdrsrccatcntlwflag,t1_stolidflag,t1_synthidflag,t1_manipidflag,' +
+		't1_phnnotverflag,t1l_dobnotverflag,t1_hiriskcviflag,t1_medriskcviflag,t1l_hdrsrccatcntlwflag,t1_stolidflag,t1_synthidflag,t1_manipidflag,' +
 		't1l_iddtofdeathaftidactcntev,t1l_iddtofdeathaftidactflagev,t_bcshllarchdtecho,t1l_bestfirstnmecho,t1l_bestlastnmecho,t1l_bestfirstnmpopflag,t1l_bestlastnmpopflag,t1l_bestfullnmecho,' +
 		't1l_curraddrprimrangeecho,t1l_curraddrpredirecho,t1l_curraddrprimnmecho,t1l_curraddrsuffixecho,t1l_curraddrpostdirecho,t1l_curraddrunitdesigecho,t1l_curraddrsecrangeecho,t1l_curraddrcityecho,' +
 		't1l_curraddrstecho,t1l_curraddrzip5echo,t1l_curraddrpopflag,t1l_curraddrfullecho,t1l_curraddrolddt,t1l_curraddrnewdt,t1l_bestssnecho,t1l_bestssnpopflag,' +
@@ -67,7 +68,7 @@ EXPORT KEL_EventShell := MODULE
 		'p19_aotbkacnewkraftaddactcntev,p20_aotdlnewkraftaddactcntev,p1_aotidnewkraftnonstactcntev,p9_aotaddrnewkraftnonstactcntev,p15_aotssnnewkraftnonstactcntev,p16_aotphnnewkraftnonstactcntev,p17_aotemlnewkraftnonstactcntev,p18_aotipnewkraftnonstactcntev,' +
 		'p19_aotbkacnewkraftnonstactcntev,p20_aotdlnewkraftnonstactcntev,p9_aotidcurrprofusngaddrcntev,p15_aotidcurrprofusngssncntev,p16_aotidcurrprofusngphncntev,p17_aotidcurrprofusngemlcntev,p18_aotidcurrprofusngipcntev,p19_aotidcurrprofusngbkaccntev,' +
 		'p20_aotidcurrprofusngdlcntev,p9_aotidhistprofusngaddrcntev,p15_aotidhistprofusngssncntev,p16_aotidhistprofusngphncntev,p17_aotidhistprofusngemlcntev,p18_aotidhistprofusngipcntev,p19_aotidhistprofusngbkaccntev,p20_aotidhistprofusngdlcntev,' +
-		'p9_aotidusngaddrcntev,p15_aotidusngssncntev,p16_aotidusngphncntev,p17_aotidusngemailcntev,p18_aotidusngipaddrcntev,p19_aotidusingbnkacctcntev,p20_aotidusngdlcntev,p1_aotidnaccollactcntev,' +
+		'p9_aotidusngaddrcntev,p15_aotidusngssncntev,p16_aotidusngphncntev,p17_aotidusngemailcntev,p18_aotidusngipaddrcntev,p19_aotidusngbnkacctcntev,p20_aotidusngdlcntev,p1_aotidnaccollactcntev,' +
 		'p1_aotidnaccollflagev,p1_aotidnaccollnewdt,p1_aotidnaccollnewtype,p1_idriskunscrbleflag,p9_addrriskunscrbleflag,p15_ssnriskunscrbleflag,p16_phnriskunscrbleflag,p17_emailriskunscrbleflag,' +
 
 'p18_ipaddrriskunscrbleflag,p19_bnkacctriskunscrbleflag,p20_dlriskunscrbleflag,t1l_idcurrincarcflag,'+  
@@ -77,7 +78,15 @@ EXPORT KEL_EventShell := MODULE
 't_inpdvctypeecho,t_inpdvcidprovecho,t_inpdvclatecho,t_inpdvclongecho,t_inpinvestigatoridecho,t_inpreferralcaseidecho,'+
 't_inpreferraltypedescecho,t_inpreferralreasondescecho,t_inpreferraldispositionecho,t_inpclearedfraudecho,'+
 't_inpreasondescecho,t_inpclientidecho,t_agencyusernm,t_statusactiondesc,'+
-'t_inpclearedreasonecho,t1_idinvupdflag,t1l_iddtofdeath,t1l_idcrimflsdmatchflag,t1l_idcrimhitflag';
+'t_inpclearedreasonecho,t1_idinvupdflag,t1l_iddtofdeath,t1l_idcrimflsdmatchflag,t1l_idcrimhitflag,' +
+'t1_minoridflag,t9_idcurrprofusngaddrcntev,t15_idcurrprofusngssncntev,t20_idcurrprofusngdlcntev,t19_idcurrprofusngbnkacctcntev,t9_addrvaltype,t9_addrmaildroptype,' +
+'t15_ssnvaltype,t20_dlvaltype,t16_phnvaltype,t16_isphnmetahitflag,t16_phnmetanewvenddt,t16_phnmetaoldvenddt,t9_addrpoboxmultcurridflagev,t9_addrisvacantflag,t9_addrisinvalidflag,' +
+'t9_addriscmraflag,t15_ssnmultcurridflagev,t15_ssnisinvalidflag,t20_dlmultcurridflagev,t20_dlisinvalidflag,t16_phnprepdflag,t16_phnisinvalidflag,t19_bnkacctmultcurridflagev,' +
+'p1_idactolddt,p9_idactolddt,p15_idactolddt,p16_idactolddt,p17_idactolddt,p18_idactolddt,p19_idactolddt,p20_idactolddt,' +
+'p1_aotactcntev,p1_aotsrc1actcntev,p1_aotsrc1actonlyflag,p9_aotactcntev,p9_aotsrc1actcntev,p9_aotsrc1actonlyflag,' +
+'p15_aotactcntev,p15_aotsrc1actcntev,p15_aotsrc1actonlyflag,p20_aotactcntev,p20_aotsrc1actcntev,p20_aotsrc1actonlyflag,' +
+'p16_aotactcntev,p16_aotsrc1actcntev,p16_aotsrc1actonlyflag,p17_aotactcntev,p17_aotsrc1actcntev,p17_aotsrc1actonlyflag,' +
+'p18_aotactcntev,p18_aotsrc1actcntev,p18_aotsrc1actonlyflag,p19_aotactcntev,p19_aotsrc1actcntev,p19_aotsrc1actonlyflag';
 
 
 	EXPORT UIStats := hipie_ecl.macSlimDataset(CleanEventShell, 'industrytype,customerid,entitycontextuid', 
@@ -87,7 +96,7 @@ EXPORT KEL_EventShell := MODULE
 		NicoleAttr
 		);
 
-	EXPORT ModelingStats := hipie_ecl.macSlimDataset(CleanEventShell((hash(personentitycontextuid) % 2 = 0 OR currentlyincarceratedflag =1 OR deceasedpriortoevent=1) /*AND industrytype = 1014 and customerid =	20995369*/), 'industrytype,customerid,entitycontextuid', 
+	EXPORT ModelingStats := hipie_ecl.macSlimDataset(CleanEventShell(/*T_SrcClassType = 3 (hash(personentitycontextuid) % 2 = 0 OR currentlyincarceratedflag =1 OR deceasedpriortoevent=1) AND */ industrytype = 1029 and customerid = 20995239), 'industrytype,customerid,entitycontextuid', 
 		'recordid,caseid, eventdate,' +
 		NicoleAttr
 		);

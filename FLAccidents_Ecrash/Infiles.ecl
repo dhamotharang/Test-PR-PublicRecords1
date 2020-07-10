@@ -89,9 +89,8 @@ export tcitation  := project(jcitation, transform(FLAccidents_Ecrash.Layout_Infi
 incidents := join(distribute(incident, hash(incident_id)), incidents_todelete,
    				trim(left.incident_id, all)= trim(right.incident_id,all),
    				left only, local);
-					
-//filter out Nassau TF
-export tincident  := project(incidents(~(source_id in ['TF','TM'] and agency_id = '1603437')),transform(FLAccidents_Ecrash.Layout_Infiles_Fixed.incident
+
+export tincident  := project(incidents,transform(FLAccidents_Ecrash.Layout_Infiles_Fixed.incident
 													,SELF.incident_id := LEFT.incident_id[1..9]; 
 													 SELF.case_identifier := STD.Str.ToUpperCase(LEFT.case_identifier);
 													 SELF.state_report_number := STD.Str.ToUpperCase(LEFT.state_report_number);

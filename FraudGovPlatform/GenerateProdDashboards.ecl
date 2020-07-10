@@ -28,10 +28,11 @@ BuildCoverageDates :=
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
-+'FraudGovPlatform.Build_CoverageDates_Push.push:failure(email(\'Build Coverage Dates failed\'));\n'
++'FraudGovPlatform.Build_CoverageDates_Push.push_to_prod:failure(email(\'Build Coverage Dates failed\'));\n'
 ;
 
 RunDashboards:=  SEQUENTIAL(	FraudGovPlatform_Analytics.GenerateDashboards(true,true),
+								FraudGovPlatform_Analytics.GenerateRinDashboards(true,true),
 								CreateSuper,
 								UpdateRefreshVersion,
 								fsuperadd,
