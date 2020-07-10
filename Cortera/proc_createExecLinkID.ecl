@@ -68,7 +68,8 @@ EXPORT proc_createExecLinkID (DATASET(Cortera.Layout_Header_Out) dCortera) := FU
 												 dExecutiveCleanNameWDID		// output dataset
 												);
 
-  addGlobalSID := mdr.macGetGlobalSID(dExecutiveCleanNameWDID,'Cortera','','global_sid');
+	//Appending global_sid's for CCPA.
+	addGlobalSID := mdr.macGetGlobalSID(dExecutiveCleanNameWDID,'Cortera','','global_sid');
 
-  RETURN PROJECT(addGlobalSID, Cortera.Layout_ExecLinkID);
+  RETURN addGlobalSID;
 END;
