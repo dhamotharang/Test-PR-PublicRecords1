@@ -434,7 +434,12 @@ EXPORT Standardize_Input(STRING pversion, BOOLEAN pUseProd = FALSE) := MODULE
     input               := ALC.Files(, pUseProd).Input.Nurses1 +
 		                          ALC.Files(, pUseProd).Input.Nurses2 +
 								              ALC.Files(, pUseProd).Input.Nurses3;
-		input_initial_clean := Apply_Common_Xform(input, ALC.Layouts.Input.Nurses);
+
+		suppressed_licenses := ALC.Files(, pUseProd).Input.Nurses_Suppression;
+
+		input2 := JOIN(input, suppressed_licenses, LEFT.license_no = RIGHT.license_no, LEFT ONLY);
+
+		input_initial_clean := Apply_Common_Xform(input2, ALC.Layouts.Input.Nurses);
 
 		ALC.Layouts.Base_Plus clean_input(ALC.Layouts.Base L) := TRANSFORM
 		  the_orig_date := Convert_Date(L.orig_date);
