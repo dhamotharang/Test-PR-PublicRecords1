@@ -1248,11 +1248,13 @@ USE FraudgovKEL.fraudgovshared(FLAT,
     Transaction = record_id,
 		EventDate = event_date   
   ),
+  /*
   PhoneEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND clean_phones.cell_phone != ''),
 		PhoneNumber = clean_phones.cell_phone,
 		EventDate = event_date,
     Transaction = record_id    
   ),
+  */
   PhoneEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND clean_phones.phone_number != ''),
 		PhoneNumber = clean_phones.phone_number,
 		EventDate = event_date,
