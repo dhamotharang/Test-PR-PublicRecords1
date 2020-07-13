@@ -216,7 +216,7 @@ EXPORT AddressMatch := TABLE(Matches,
 										 AssociatedCustomerFileInfo,
 										 Person.did,
 										 AssociatedPerson.did,
-										 Person.event_date, MERGE);// : PERSIST('~temp::deleteme30_1');
+										 Person.event_date, MERGE);// : PERSIST('~fraudgov::temp::deleteme30_1');
 																
 	EXPORT PersonAddressMatches := TABLE(AddressMatch((AddressMatch=1 AND DistanceDays <= DateOverLapThreshold) OR AddressMatch=0), 
 													 {
@@ -287,9 +287,9 @@ EXPORT AddressMatch := TABLE(Matches,
 																			SELF := LEFT, SELF := []));
 
 
-	EXPORT PersonAddressMatchStatsPrep3 := PersonAddressMatchStatsPrep1 + PersonAddressMatchStatsPrep2 : PERSIST('~temp::deleteme31_1'); // JP
+	EXPORT PersonAddressMatchStatsPrep3 := PersonAddressMatchStatsPrep1 + PersonAddressMatchStatsPrep2 : PERSIST('~fraudgov::temp::deleteme31_1'); // JP
 
-//  output(FraudgovKEL.AddressPersonAssociations.PersonAddressMatchStatsPrep3,, '~temp::PersonAddressMatchStatsPrep3_1', overwrite, EXPIRE(7));
+//  output(FraudgovKEL.AddressPersonAssociations.PersonAddressMatchStatsPrep3,, '~fraudgov::temp::PersonAddressMatchStatsPrep3_1', overwrite, EXPIRE(7));
 //  SHARED tempAssociations := DATASET('~foreign::10.173.14.201::temp::PersonAddressMatchStatsPrep3_1', RECORDOF(PersonAddressMatchStatsPrep2), THOR);
 //  EXPORT PersonAddressMatchStatsPrep3 := tempAssociations;
 									
