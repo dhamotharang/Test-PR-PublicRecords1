@@ -5,17 +5,20 @@ EXPORT Proc_Build_Base := FUNCTION
     //Input Files
     PRTE2.CleanFields(PRTE2_Certegy.Files.Input_INS, DS_CLEAN_INS);
         
-tempLayout := record
-PRTE2_certegy.Layouts.INPUT;
-string50 concat_address1;
-end;    
+    TempLayout := record
+      PRTE2_certegy.Layouts.INPUT;
+      string50 concat_address1;
+    end;    
         
-//Project GE file into base layout
-DS_CLEAN_INS_temp	:= PROJECT(DS_CLEAN_INS, TRANSFORM(tempLayout, 
-self.concat_address1 := std.str.CleanSpaces(trim(left.orig_house_bldg_num)) + ' ' + std.str.CleanSpaces(trim(left.orig_street_name) + ' ' + std.str.CleanSpaces(trim(left.orig_apt_num))); 
-self := left; 
-self := []
-));        
+    //Project GE file into base layout
+    DS_CLEAN_INS_temp := PROJECT(DS_CLEAN_INS, 
+                                 TRANSFORM(tempLayout, 
+                                            self.concat_address1 := std.str.CleanSpaces(trim(left.orig_house_bldg_num)) + ' ' 
+                                                                  + std.str.CleanSpaces(trim(left.orig_street_name) + ' ' 
+                                                                  + std.str.CleanSpaces(trim(left.orig_apt_num))); 
+                                            self := left; 
+                                            self := []
+                                          ));        
         
         
     //Address Cleaning

@@ -1,4 +1,4 @@
-import AccountMonitoring;
+﻿import AccountMonitoring;
 
 EXPORT DATASET(layouts.history) fn_cgm_bdidupdate(
 		DATASET(AccountMonitoring.layouts.portfolio.base) in_portfolio,
@@ -14,7 +14,7 @@ EXPORT DATASET(layouts.history) fn_cgm_bdidupdate(
 		// Business_Header.Key_Business_Header_RCID (pre-filtered in product_files to only return rcid <> bdid recs)
 		Key_RCID := 
 			DISTRIBUTED(
-				AccountMonitoring.product_files.header_files.business_header_key_rcid, 
+				AccountMonitoring.product_files.header_files.r_business_header_key_rcid, 
 				HASH64(rcid)
 			);
 			
@@ -85,6 +85,6 @@ EXPORT DATASET(layouts.history) fn_cgm_bdidupdate(
 				self.hash_value := left.hash_value + right.hash_value,
 				self := left),
 			pid,rid,local);
-		
+
 		return temp_rolled_hashes;
 END;		

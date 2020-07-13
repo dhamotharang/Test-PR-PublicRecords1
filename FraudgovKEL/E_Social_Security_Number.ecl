@@ -34,7 +34,7 @@ EXPORT E_Social_Security_Number := MODULE
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
-  SHARED __d0_KELfiltered := FraudgovKEL.fraudgovshared((UNSIGNED)ssn <> 0);
+  SHARED __d0_KELfiltered := FraudgovKEL.fraudgovshared((UNSIGNED)record_id > 0 AND (UNSIGNED)ssn <> 0);
   SHARED __d0_Trim := PROJECT(__d0_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.OttoSSNId)));
   EXPORT __All_Trim := __d0_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)

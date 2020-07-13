@@ -114,4 +114,5 @@ MissingRules := NormRules(Std.Str.FindCount(RulesAttr, TRIM(Field))<1);
 //'p1_idriskunscrbleflag,p9_addrriskunscrbleflag,p15_ssnriskunscrbleflag,p16_phnriskunscrbleflag,p17_emailriskunscrbleflag,p18_ipaddrriskunscrbleflag,p19_bnkacctriskunscrbleflag,p20_dlriskunscrbleflag,t18_ipaddrlocmiamiflag,t18_ipaddrlocnonusflag,t18_ipaddrvpnflag,t18_ipaddrhostedflag,t1l_ssnnotverflag,t1_addrnotverflag,t1l_iddeceasedflag,t1l_curraddrnotinagcyjurstflag,t1l_bestdlnotinagcyjurstflag,t17_emaildomaindispflag', Field)>0);
 output(MissingRules, named('MissingRules'));
       
-output(NormRules,,'~fraudgov::in::sprayed::configrules', CSV, overwrite);
+//output(NormRules,,'~fraudgov::in::sprayed::configrules', CSV(QUOTE('"')), overwrite);
+output(NormRules,,'~fraudgov::in::20200701::configrules', CSV(HEADING(SINGLE), SEPARATOR(','), TERMINATOR('\r\n'), QUOTE('"')), OVERWRITE);
