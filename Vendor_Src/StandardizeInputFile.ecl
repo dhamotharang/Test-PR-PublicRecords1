@@ -266,7 +266,7 @@ end;
 		SELF. PhoneVerify             := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.PhoneVerify),LEFT, RIGHT)); 
 		// SELF.OnlineDirectoryAvailable := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.OnlineDirectoryAvailable),LEFT, RIGHT));
 		// SELF.OnlineDirectoryWebsite   := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.OnlineDirectoryWebsite),LEFT, RIGHT));
-		SELF.ContacName               := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.ContacName),LEFT, RIGHT));
+		SELF.ContactName               := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.ContactName),LEFT, RIGHT));
 		SELF.ContactPhone             := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.ContactPhone),LEFT, RIGHT));  
 		SELF										     	:= [];
 	END;

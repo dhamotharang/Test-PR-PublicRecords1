@@ -21,7 +21,7 @@ EXPORT layouts := MODULE
 		 STRING PhoneVerify;
 		 STRING OnlineDirectoryAvailable;
 		 STRING OnlineDirectoryWebsite;
-		 STRING ContacName;
+		 STRING ContactName;
 		 STRING ContactPhone;
 	END;
 	
@@ -165,7 +165,7 @@ EXPORT layouts := MODULE
 		STRING PhoneVerify;
 		// STRING OnlineDirectoryAvailable;
 		// STRING OnlineDirectoryWebsite;
-		STRING ContacName;
+		STRING ContactName;
 		STRING ContactPhone;
 
 	END;
