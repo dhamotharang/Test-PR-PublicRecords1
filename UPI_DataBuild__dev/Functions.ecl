@@ -57,6 +57,17 @@ EXPORT Functions := MODULE
 		
 		RETURN pipe_delimited;
 	END;
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//  UPI Transform Flat History File to Pipe Delimited
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	EXPORT PipeHistoryFile(string pVersion, boolean pUseProd, string gcid, string pHistMode, string Batch_JobID) := FUNCTION
+	
+			flat_file := dataset('~ushc::crk::healthcarenomatchheader::base::' + trim(gcid, all) + '::' + pVersion + '::customerrecordkey', UPI_DataBuild__dev.Layouts_V2.temp_header, thor);
+	
+			pipe_delimited :=	output(flat_file,,'~ushc::crk::' + trim(gcid, all) + '_' + trim(Batch_JobID, all) + '_linkhistory', CSV(HEADING(SINGLE),SEPARATOR('|'),TERMINATOR('\r\n'),QUOTE('\"')),OVERWRITE);
+		
+		RETURN pipe_delimited;
+	END;
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//  UPI Transform Flat Aggregate Report File to Pipe Delimited
@@ -132,7 +143,8 @@ EXPORT Functions := MODULE
 	// DESPRAY LINKING HISTORY TO BATCH
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	EXPORT UPI_History_DeSpray(STRING Batch_JobID, string gcid, STRING Batch_IP, STRING Batch_Destination, STRING Batch_FileType) := FUNCTION
-		Batch_FileName := MAP(STD.Str.ToUpperCase(Batch_FileType) = 'F' => '~ushc::crk::healthcarenomatchheader::base::' + trim(gcid, all) + '::qa::customerrecordkey',
+		Batch_FileName := MAP(STD.Str.ToUpperCase(Batch_FileType) = 'F' => '~ushc::crk::' + trim(gcid, all) + '_'+ trim(Batch_JobID, all) + '_linkhistory',
+		
 																								'unknown_out');																						
 
 		UPI_History_DeSpray := STD.File.DeSpray(
