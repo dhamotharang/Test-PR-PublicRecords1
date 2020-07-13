@@ -261,13 +261,13 @@ end;
 		SELF.prepped_addr1			    	:= ut.fn_RemoveSpecialChars(STD.STR.CleanSpaces(STD.Str.ToUpperCase(L.address1) +' '+ IF(L.address2<>'NULL',STD.Str.ToUpperCase(L.address2),'')));
 		SELF.prepped_addr2            := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(StringLib.StringCleanSpaces(L.city) + IF(L.city <> '',',','')
 																		+ ' '+ L.state	+ ' '+ L.ZipCode), LEFT, RIGHT));
-		SELF.NSCHEnrollVerify         := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.NSCHEnrollVerify),LEFT, RIGHT));
-		SELF.NSCHDegreeVerify         := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.NSCHDegreeVerify),LEFT, RIGHT));
-		SELF. PhoneVerify             := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.PhoneVerify),LEFT, RIGHT)); 
+		SELF.NSCHEnrollVerify         := ut.fn_RemoveSpecialChars(TRIM(IF(L.NSCHEnrollVerify<>'NULL',STD.Str.ToUpperCase(L.NSCHEnrollVerify),''),LEFT, RIGHT));
+		SELF.NSCHDegreeVerify         := ut.fn_RemoveSpecialChars(TRIM(IF(L.NSCHDegreeVerify<>'NULL',STD.Str.ToUpperCase(L.NSCHDegreeVerify),''),LEFT, RIGHT));
+		SELF.PhoneVerify              := ut.fn_RemoveSpecialChars(TRIM(IF(L.PhoneVerify<>'NULL',STD.Str.ToUpperCase(L.PhoneVerify),''),LEFT, RIGHT)); 
 		// SELF.OnlineDirectoryAvailable := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.OnlineDirectoryAvailable),LEFT, RIGHT));
 		// SELF.OnlineDirectoryWebsite   := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.OnlineDirectoryWebsite),LEFT, RIGHT));
-		SELF.ContactName               := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.ContactName),LEFT, RIGHT));
-		SELF.ContactPhone             := ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.ContactPhone),LEFT, RIGHT));  
+		SELF.ContactName              := ut.fn_RemoveSpecialChars(TRIM(IF(L.ContactName<>'NULL',STD.Str.ToUpperCase(L.ContactName),''),LEFT, RIGHT));
+		SELF.ContactPhone             := ut.fn_RemoveSpecialChars(TRIM(IF(L.ContactPhone<>'NULL',STD.Str.ToUpperCase(L.ContactPhone),''),LEFT, RIGHT));  
 		SELF										     	:= [];
 	END;
 	
