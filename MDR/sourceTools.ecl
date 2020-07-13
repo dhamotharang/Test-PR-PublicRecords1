@@ -752,8 +752,9 @@ MODULE
 	];
 
     //DF-24277 - Remove source "NC" from DMV restricted sources
+	//DF-27961 - Remove source "SC" from DMV restricted sources used in Header DMV Restricted Key
 	export set_DMV_restricted             := [
-		 src_CT_DL ,src_FL_DL ,src_LA_DL ,src_MI_DL ,src_MO_DL ,src_OH_DL ,src_TX_DL ,src_WV_DL ,/*src_NC_DL , */src_SC_Experian_DL   
+		 src_CT_DL ,src_FL_DL ,src_LA_DL ,src_MI_DL ,src_MO_DL ,src_OH_DL ,src_TX_DL ,src_WV_DL /*,src_NC_DL , src_SC_Experian_DL*/ 
 		,src_FL_Veh ,src_MO_Veh ,src_OH_Veh ,src_TX_Veh ,src_SC_Experian_Veh //, src_WV_Veh
 	];
 
@@ -1424,7 +1425,9 @@ export set_NonDerog_FCRA_sources_v50 := [
       src_TN_Watercraft,						src_TX_Watercraft,            	src_US_Coastguard,       src_US_Coastguard,
       src_UT_Watercraft,						src_VA_Watercraft,            	src_Voters_v2,           src_WI_Watercraft,
       src_WV_Watercraft,            src_WY_Watercraft,              src_OR_Watercraft,			 src_Death_Restricted,
-			src_AK_Fishing_boats,					src_AlloyMedia_student_list, src_Experian_Credit_Header,    src_MA_Census		/*,
+	  src_AK_Fishing_boats,					src_AlloyMedia_student_list, src_Experian_Credit_Header,    src_MA_Census
+	  //,src_OKC_Students_List
+	  /*,
 			src_Death_CA, 								src_Death_CT, 									src_Death_FL,							src_Death_GA,
 			src_Death_KY, 								src_Death_MA, 									src_Death_ME, 						src_Death_MI,
 			src_Death_MN, 								src_Death_MT, 									src_Death_NC, 						src_Death_NV,
