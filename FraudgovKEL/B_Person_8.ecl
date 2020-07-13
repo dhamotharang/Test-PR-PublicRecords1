@@ -46,5 +46,5 @@ EXPORT B_Person_8 := MODULE
     SELF.Deceased_Name_Match_ := MAP(EXISTS(__BS123884(__T(__AND(__OP2(__T(__PP123611.Full_Name_).First_Name_,=,__PP123611.Deceased_First_),__OP2(__T(__PP123611.Full_Name_).Last_Name_,=,__PP123611.Deceased_Last_)))))=>1,0);
     SELF := __PP123611;
   END;
-  EXPORT __ENH_Person_8 := PROJECT(__EE124001,__ND124693__Project(LEFT)) : PERSIST('~fraudgov::tempKEL::FraudgovKEL::Person::Annotated_8',EXPIRE(7));
+  EXPORT __ENH_Person_8 := PROJECT(__EE124001,__ND124693__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Person::Annotated_8',EXPIRE(7));
 END;

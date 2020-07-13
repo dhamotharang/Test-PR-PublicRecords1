@@ -206,5 +206,5 @@ EXPORT B_Internet_Protocol_5 := MODULE
     SELF.Aot_Ip_Addr_Kr_Act_Cnt_Ev_ := MIN(__PP169666.C_O_U_N_T___Exp1_,9999);
     SELF := __PP169666;
   END;
-  EXPORT __ENH_Internet_Protocol_5 := PROJECT(__EE169665,__ND169750__Project(LEFT)) : PERSIST('~fraudgov::tempKEL::FraudgovKEL::Internet_Protocol::Annotated_5',EXPIRE(7));
+  EXPORT __ENH_Internet_Protocol_5 := PROJECT(__EE169665,__ND169750__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Internet_Protocol::Annotated_5',EXPIRE(7));
 END;

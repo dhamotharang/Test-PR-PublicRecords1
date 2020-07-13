@@ -47008,7 +47008,7 @@ EXPORT B_Event := MODULE
     SELF.T___Status_Action_Desc_ := MAP(__PP3557559.T___Src_Class_Type_ = 1 OR __PP3557559.T___Src_Class_Type_ > 3=>__ECAST(KEL.typ.nstr,__CAST(KEL.typ.str,__CN(-99998))),__PP3557559.T___Src_Class_Type_ = 3=>__ECAST(KEL.typ.nstr,__CN('Added to Known Risk')),__PP3557559.T___Src_Class_Type_ = 2=>__ECAST(KEL.typ.nstr,__CN('Added to Safe List')),__PP3557559.T___Src_Class_Type_ = 0=>__ECAST(KEL.typ.nstr,__CN('Updated Status')),__N(KEL.typ.str));
     SELF := __PP3557559;
   END;
-  EXPORT __ENH_Event := PROJECT(__EE3557558,__ND3557563__Project(LEFT)) : PERSIST('~fraudgov::tempKEL::FraudgovKEL::Event::Annotated',EXPIRE(7));
+  EXPORT __ENH_Event := PROJECT(__EE3557558,__ND3557563__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated',EXPIRE(7));
   SHARED __EE4314564 := __ENH_Event;
   SHARED IDX_Event_UID_Layout := RECORD
     KEL.typ.uid UID;

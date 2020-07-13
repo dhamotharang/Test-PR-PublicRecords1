@@ -1801,7 +1801,7 @@ EXPORT B_Social_Security_Number := MODULE
     SELF.Vl_Event7_All_Active_Flag_ := MAP(__PP4168513.Vl_Event7_All_Count_ > 0=>1,0);
     SELF := __PP4168513;
   END;
-  EXPORT __ENH_Social_Security_Number := PROJECT(__EE4168512,__ND4168517__Project(LEFT)) : PERSIST('~fraudgov::tempKEL::FraudgovKEL::Social_Security_Number::Annotated',EXPIRE(7));
+  EXPORT __ENH_Social_Security_Number := PROJECT(__EE4168512,__ND4168517__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Social_Security_Number::Annotated',EXPIRE(7));
   SHARED __EE4315638 := __ENH_Social_Security_Number;
   SHARED IDX_Social_Security_Number_UID_Layout := RECORD
     KEL.typ.uid UID;

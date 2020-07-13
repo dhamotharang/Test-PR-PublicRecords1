@@ -923,5 +923,5 @@ EXPORT B_Bank_Account_3 := MODULE
     SELF.Id_Activity_Dt_Last_Seen_ := __PP520154.M_A_X___Event_Date__1_;
     SELF := __PP520154;
   END;
-  EXPORT __ENH_Bank_Account_3 := PROJECT(__EE520153,__ND520178__Project(LEFT)) : PERSIST('~fraudgov::tempKEL::FraudgovKEL::Bank_Account::Annotated_3',EXPIRE(7));
+  EXPORT __ENH_Bank_Account_3 := PROJECT(__EE520153,__ND520178__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Bank_Account::Annotated_3',EXPIRE(7));
 END;
