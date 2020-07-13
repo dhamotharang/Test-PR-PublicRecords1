@@ -1,4 +1,5 @@
-﻿IMPORT $.^.Risk_Indicators, $.^.PublicRecords_KEL;
+﻿// IMPORT $.^.Risk_Indicators, $.^.PublicRecords_KEL;
+IMPORT Risk_Indicators, PublicRecords_KEL, STD;
 IMPORT KEL13 AS KEL;
 
 EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII) InputData,
@@ -11,9 +12,67 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 	RecordsWithSeleID := InputData(B_LexIDLegal > 0);
 	RecordsWithoutSeleID := InputData(B_LexIDLegal <= 0);
 	
-	BusinessSeleIDAttributesRaw := KEL.Clean(PublicRecords_KEL.Library.LIB_NonFCRA_BusinessSeleAttributes_Function(RecordsWithSeleID, RepInput, FDCDataset, Options), TRUE, TRUE, TRUE);
+LayoutBIIAndPII := RECORD
+		PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII InputData;
+		DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) RepInput;
+	END;
+	
+	LayoutBusinessSeleIDAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1(
+																	0, // UltID
+																	0, // OrgID
+																	0, // SeleID
+																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 
+																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII), 
+																	0, // ArchiveDate
+																	PublicRecords_KEL.CFG_Compile.Permit__NONE).res0); //DPM	
+																	
+	BusinessSeleAttributesInput := DENORMALIZE(RecordsWithSeleID, RepInput, 
+		LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,  GROUP,
+		TRANSFORM(LayoutBIIAndPII, 
+			SELF.RepInput := ROWS(RIGHT),
+			SELF.InputData := LEFT));
+					
+	BusinessSeleAttributes_Results := PROJECT(BusinessSeleAttributesInput, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes},
+		SELF.G_ProcBusUID := LEFT.InputData.G_ProcBusUID;
+		NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1(
+				LEFT.InputData.B_LexIDUlt,
+				LEFT.InputData.B_LexIDOrg,
+				LEFT.InputData.B_LexIDLegal,
+				LEFT.RepInput,
+				DATASET(LEFT.InputData),
+				(INTEGER)LEFT.InputData.B_InpClnArchDt[1..8],
+				Options.KEL_Permissions_Mask, 
+				FDCDataset).res0;
+		SELF := NonFCRABusinessSeleIDResults[1]));
 
-	BusinessSeleIDNoDatesAttributesRaw := KEL.Clean(PublicRecords_KEL.Library.LIB_NonFCRA_BusinessSeleAttributes_NoDates_Function(RecordsWithSeleID, FDCDataset, Options), TRUE, TRUE, TRUE);
+
+	BusinessSeleIDAttributesRaw := KEL.Clean(BusinessSeleAttributes_Results, true, true, true);
+
+	LayoutBusinessSeleIDNoDatesAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1(
+																	0, // UltID
+																	0, // OrgID
+																	0, // SeleID
+																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 
+																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII), 
+																	0, // ArchiveDate
+																	PublicRecords_KEL.CFG_Compile.Permit__NONE).res1); //DPM	
+
+	BusinessSeleAttributes_NoDates_Results := IF(Options.OutputMasterResults,
+		PROJECT(InputData, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDNoDatesAttributes},
+			SELF.G_ProcBusUID := LEFT.G_ProcBusUID;
+			NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1(
+				LEFT.B_LexIDUlt,
+				LEFT.B_LexIDOrg,
+				LEFT.B_LexIDLegal,
+				DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 
+				DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII), 				
+				STD.Date.Today(), 
+				Options.KEL_Permissions_Mask, 				
+				FDCDataset).res1;
+			SELF := NonFCRABusinessSeleIDResults[1])),
+		DATASET([],{INTEGER G_ProcBusUID, LayoutBusinessSeleIDNoDatesAttributes}));
+	
+	BusinessSeleIDNoDatesAttributesRaw := KEL.Clean(BusinessSeleAttributes_NoDates_Results, TRUE, TRUE, TRUE);
 	
 	BusinessAttributesWithSeleID := JOIN(RecordsWithSeleID, BusinessSeleIDAttributesRaw, LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID, 
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutBusinessSeleID,
