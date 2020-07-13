@@ -6,23 +6,23 @@ in_file := VotersV2.Cleaned_Addr_Cache_Base;
 
 layout_base := VotersV2.Layouts_Voters.Layout_Voters_Base_new;								
 
-	  sendRecs		:= in_file(trim(fname + mname + lname) <> '');
-		notSendRecs := in_file(trim(fname + mname + lname) = '');
+sendRecs		:= in_file(trim(fname + mname + lname) <> '');
+notSendRecs := in_file(trim(fname + mname + lname) = '');
 
-		NID.Mac_CleanParsedNames(PROJECT(sendRecs, VotersV2.Layouts_Voters.Layout_Voters_base_new) 
-																		,NID_output
-																		,fname ,mname ,lname, name_suffix_in);	
-		
-		VotersV2.Layouts_Voters.Layout_Voters_base_new tCleanPers(NID_output L) := TRANSFORM
-			SELF.title		    := L.cln_title;
-			SELF.fname	      := L.cln_fname;
-			SELF.mname	      := L.cln_mname;
-			SELF.lname		    := L.cln_lname;
-			SELF.name_suffix	:= L.cln_suffix;
-			SELF										            := L;			
-		END;
-		
-		dStandardizedPerson := project(NID_output, tCleanPers(LEFT)) + notSendRecs : INDEPENDENT;								
+NID.Mac_CleanParsedNames(PROJECT(sendRecs, VotersV2.Layouts_Voters.Layout_Voters_base_new) 
+																,NID_output
+																,fname ,mname ,lname, name_suffix_in);	
+
+VotersV2.Layouts_Voters.Layout_Voters_base_new tCleanPers(NID_output L) := TRANSFORM
+	SELF.title		    := L.cln_title;
+	SELF.fname	      := L.cln_fname;
+	SELF.mname	      := L.cln_mname;
+	SELF.lname		    := L.cln_lname;
+	SELF.name_suffix	:= L.cln_suffix;
+	SELF							:= L;			
+END;
+
+dStandardizedPerson := project(NID_output, tCleanPers(LEFT)) + notSendRecs : INDEPENDENT;								
 
 dis_clean_norm_file := distribute(dStandardizedPerson, hash64(source_state, lname, name_suffix, fname, mname, dob,
 								  prim_range, prim_name, predir, addr_suffix, postdir, unit_desig, sec_range,
