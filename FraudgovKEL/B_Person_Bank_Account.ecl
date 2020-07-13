@@ -23,7 +23,7 @@ EXPORT B_Person_Bank_Account := MODULE
     SELF.Dt_Last_Seen_ := KEL.Aggregates.MaxNN(__EE4004185,__T(__EE4004185).Event_Date_);
     SELF := __PP4004118;
   END;
-  EXPORT __ENH_Person_Bank_Account := PROJECT(__EE4004223,__ND4004257__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Person_Bank_Account::Annotated',EXPIRE(7));
+  EXPORT __ENH_Person_Bank_Account := PROJECT(__EE4004223,__ND4004257__Project(LEFT)) : PERSIST('~fraudgov::tempKEL::FraudgovKEL::Person_Bank_Account::Annotated',EXPIRE(7));
   SHARED __EE4315770 := __ENH_Person_Bank_Account;
   SHARED __IDX_Person_Bank_Account_Account__Filtered := __EE4315770(__NN(__EE4315770.Account_));
   SHARED IDX_Person_Bank_Account_Account__Layout := RECORD

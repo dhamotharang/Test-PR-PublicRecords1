@@ -943,5 +943,5 @@ EXPORT B_Social_Security_Number_3 := MODULE
     SELF.Kr_Last_Event_Date_ := __PP748161.M_A_X___Event_Date__2_;
     SELF := __PP748161;
   END;
-  EXPORT __ENH_Social_Security_Number_3 := PROJECT(__EE748160,__ND748196__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Social_Security_Number::Annotated_3',EXPIRE(7));
+  EXPORT __ENH_Social_Security_Number_3 := PROJECT(__EE748160,__ND748196__Project(LEFT)) : PERSIST('~fraudgov::tempKEL::FraudgovKEL::Social_Security_Number::Annotated_3',EXPIRE(7));
 END;

@@ -5,7 +5,7 @@ IMPORT Std;
 
 #option('multiplePersistInstances', false);
 #option('defaultSkewError', 1);
-#option('resourceMaxHeavy', 2);
+//#option('resourceMaxHeavy', 2);
 //#option('freezepersists', true);
 
 
@@ -40,13 +40,13 @@ ScoringOutput := FraudgovKEL.KEL_EventPivot.InputWithRules(industrytype = 1029 a
 output(ScoringOutput,,'~fraudgov::deleteme_rules_nd_csv', CSV(QUOTE('"')), overwrite);	
 */
 
-output(FraudgovKEL.KEL_EventPivot.EventPivotShell,,'~fraudgov::eventpivot', overwrite, compressed);
-
 /*
+output(FraudgovKEL.KEL_EventPivot.EventPivotShell,,'~fraudgov::eventpivot', overwrite, compressed);
 output(FraudgovKEL.KEL_EventPivot.EntityProfileRules,,'~fraudgov::entityrules', overwrite, compressed);
 output(FraudgovKEL.KEL_EntityStats,, '~fraudgov::pivotentitystatsfilter', overwrite, compressed);
+*/
 output(FraudgovKEL.KEL_GraphPrep.Edges,,'~fraudgov::rin2::graphedges', overwrite);
 output(FraudgovKEL.KEL_GraphPrep.Vertices,,'~fraudgov::rin2::graphpvertices', overwrite);
-*/
+
 
 //output(FraudgovKEL.KEL_GraphPrep.LinksPrep);
