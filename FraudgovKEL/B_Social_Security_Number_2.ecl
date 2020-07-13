@@ -1540,5 +1540,5 @@ EXPORT B_Social_Security_Number_2 := MODULE
     SELF.Last_Record_Id_ := MAP(NOT (__PP1218475.C_O_U_N_T___Event_ <> 0)=>__ECAST(KEL.typ.nint,__PP1218475.M_I_N___Record_Id_),__ECAST(KEL.typ.nint,__PP1218475.M_A_X___Record_Id_));
     SELF := __PP1218475;
   END;
-  EXPORT __ENH_Social_Security_Number_2 := PROJECT(__EE1218474,__ND1218479__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Social_Security_Number::Annotated_2',EXPIRE(7));
+  EXPORT __ENH_Social_Security_Number_2 := PROJECT(__EE1218474,__ND1218479__Project(LEFT)) : PERSIST('~fraudgov::tempKEL::FraudgovKEL::Social_Security_Number::Annotated_2',EXPIRE(7));
 END;
