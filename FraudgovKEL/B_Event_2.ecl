@@ -10128,5 +10128,5 @@ EXPORT B_Event_2 := MODULE
     SELF.T___Last_Nm_Pop_Flag_ := MAP(__T(__OP2(__PP1031649.T___Inp_Cln_Last_Nm_Echo_,IN,__CN(['-99999','-99998','-99997'])))=>0,1);
     SELF := __PP1031649;
   END;
-  EXPORT __ENH_Event_2 := PROJECT(__EE1035110,__ND1031653__Project(LEFT)) : PERSIST('~fraudgov::tempKEL::FraudgovKEL::Event::Annotated_2',EXPIRE(7));
+  EXPORT __ENH_Event_2 := PROJECT(__EE1035110,__ND1031653__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_2',EXPIRE(7));
 END;

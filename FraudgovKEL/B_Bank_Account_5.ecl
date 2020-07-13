@@ -72,5 +72,5 @@ EXPORT B_Bank_Account_5 := MODULE
     SELF.Aot_Bnk_Acct_Kr_Act_Cnt_Ev_ := MIN(__PP140528.C_O_U_N_T___Exp1_,9999);
     SELF := __PP140528;
   END;
-  EXPORT __ENH_Bank_Account_5 := PROJECT(__EE140527,__ND140545__Project(LEFT)) : PERSIST('~fraudgov::tempKEL::FraudgovKEL::Bank_Account::Annotated_5',EXPIRE(7));
+  EXPORT __ENH_Bank_Account_5 := PROJECT(__EE140527,__ND140545__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Bank_Account::Annotated_5',EXPIRE(7));
 END;

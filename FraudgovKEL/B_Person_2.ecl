@@ -2100,5 +2100,5 @@ EXPORT B_Person_2 := MODULE
     SELF.Kr_Medium_Risk_Flag_ := MAP(__PP1138142.C_O_U_N_T___Exp1__4_ <> 0=>1,0);
     SELF := __PP1138142;
   END;
-  EXPORT __ENH_Person_2 := PROJECT(__EE1138141,__ND1138146__Project(LEFT)) : PERSIST('~fraudgov::tempKEL::FraudgovKEL::Person::Annotated_2',EXPIRE(7));
+  EXPORT __ENH_Person_2 := PROJECT(__EE1138141,__ND1138146__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Person::Annotated_2',EXPIRE(7));
 END;

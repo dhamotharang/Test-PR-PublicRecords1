@@ -673,5 +673,5 @@ EXPORT B_Event_8 := MODULE
     SELF.T___Inp_Cln_Ssn_Echo_ := MAP(__T(__OR(__OR(__OP2(__PP121191.Ssn_,=,__CN('')),__NT(__PP121191.Ssn_)),__OP2(__PP121191.Ssn_,=,__CN('000000000'))))=>__ECAST(KEL.typ.nstr,__CAST(KEL.typ.str,__CN(-99999))),__ECAST(KEL.typ.nstr,__FN1(TRIM,__PP121191.Ssn_)));
     SELF := __PP121191;
   END;
-  EXPORT __ENH_Event_8 := PROJECT(__EE121839,__ND122174__Project(LEFT)) : PERSIST('~fraudgov::tempKEL::FraudgovKEL::Event::Annotated_8',EXPIRE(7));
+  EXPORT __ENH_Event_8 := PROJECT(__EE121839,__ND122174__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_8',EXPIRE(7));
 END;

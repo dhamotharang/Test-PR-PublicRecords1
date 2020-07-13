@@ -68,7 +68,7 @@ RulesResult := JOIN(EventStatsFieldPivot(Value != ''), SORT(MyRules, field, -cus
 														SELF.EntityType := RIGHT.EntityType;
 														SELF.Description := RIGHT.Description;
 														SELF.Default := (INTEGER1)(RIGHT.customer_id = 0);
-                            SELF := LEFT), MANY LOOKUP, LEFT OUTER)(RiskLevel>0);// : PERSIST('~fraudgov::tempdeleteme41');
+                            SELF := LEFT), MANY LOOKUP, LEFT OUTER)(RiskLevel>0);// : PERSIST('~temp::deleteme41');
 														
 //output(RulesResult(entitycontextuid = '_1194033204'), all, named('RulesResult'));
 

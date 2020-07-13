@@ -1469,5 +1469,5 @@ EXPORT B_Phone_2 := MODULE
     SELF.Last_Record_Id_ := MAP(NOT (__PP1177345.C_O_U_N_T___Event_ <> 0)=>__ECAST(KEL.typ.nint,__PP1177345.M_I_N___Record_Id_),__ECAST(KEL.typ.nint,__PP1177345.M_A_X___Record_Id_));
     SELF := __PP1177345;
   END;
-  EXPORT __ENH_Phone_2 := PROJECT(__EE1177344,__ND1177349__Project(LEFT)) : PERSIST('~fraudgov::tempKEL::FraudgovKEL::Phone::Annotated_2',EXPIRE(7));
+  EXPORT __ENH_Phone_2 := PROJECT(__EE1177344,__ND1177349__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Phone::Annotated_2',EXPIRE(7));
 END;

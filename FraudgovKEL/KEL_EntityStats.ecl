@@ -28,7 +28,7 @@ NicoleAttr := 't17_emaildomaindispflag,t18_ipaddrhostedflag,t18_ipaddrvpnflag,t1
 
 NicoleAttr
 
-  ) : PERSIST('~fraudgov::tempdeleteme49');
+  ) : PERSIST('~temp::deleteme49');
 
   EntityStatsPrep1 := PROJECT(EventStatsPrep, TRANSFORM({RECORDOF(LEFT) AND NOT [entityhash]}, SELF := LEFT)); 
                                                  
@@ -92,7 +92,7 @@ NicoleAttr
                             SELF.EntityType := MAP(RIGHT.Field != '' => RIGHT.EntityType, LEFT.EntityType),
                             SELF.IndicatorType := MAP(RIGHT.IndicatorType != '' => RIGHT.IndicatorType, LEFT.IndicatorType);
                             SELF.IndicatorDescription := MAP(RIGHT.IndicatorDescription != '' => RIGHT.IndicatorDescription, LEFT.IndicatorDescription);
-                            SELF := LEFT), LOOKUP, LEFT OUTER);// : PERSIST('~fraudgov::tempdeleteme92', EXPIRE(7));
+                            SELF := LEFT), LOOKUP, LEFT OUTER);// : PERSIST('~temp::deleteme92', EXPIRE(7));
 
 EntityStats := WeightedResult(RiskLevel in [0,1,2,3] AND Value != '0') : INDEPENDENT;
 

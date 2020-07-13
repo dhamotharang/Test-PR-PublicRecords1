@@ -23,7 +23,7 @@ EXPORT B_Person_Email := MODULE
     SELF.Dt_Last_Seen_ := KEL.Aggregates.MaxNN(__EE4004549,__T(__EE4004549).Event_Date_);
     SELF := __PP4004482;
   END;
-  EXPORT __ENH_Person_Email := PROJECT(__EE4004587,__ND4004621__Project(LEFT)) : PERSIST('~fraudgov::tempKEL::FraudgovKEL::Person_Email::Annotated',EXPIRE(7));
+  EXPORT __ENH_Person_Email := PROJECT(__EE4004587,__ND4004621__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Person_Email::Annotated',EXPIRE(7));
   SHARED __EE4316305 := __ENH_Person_Email;
   SHARED __IDX_Person_Email_Emailof__Filtered := __EE4316305(__NN(__EE4316305.Emailof_));
   SHARED IDX_Person_Email_Emailof__Layout := RECORD
