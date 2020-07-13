@@ -52,7 +52,7 @@ EXPORT	proc_Build_All(
 		Business_Credit.proc_Build_Base(pversion,pBuildType).All,
 		BuildLogger.BaseEnd(False),
 		BuildLogger.KeyStart(false),
-		Business_Credit.proc_Build_Keys(pversion,pBuildType).All,
+		//Business_Credit.proc_Build_Keys(pversion,pBuildType).All,
 		BuildLogger.KeyEnd(false),
 		BuildLogger.PostStart(False),
 		IF(pUpdateDOPS,

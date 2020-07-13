@@ -139,6 +139,14 @@ EXPORT Files(	STRING	pFilename	=	'',
 																IF(pFilename='',Filenames(,pUseProd).Out.memberSpecific.QA,pFilename)
 																,Business_Credit.Layouts.rMemberSpecific,THOR,__compressed__)
 																(SBFE_Contributor_Number NOT IN Quarantined_SBFE_Contributor_Number_Set);
+	EXPORT	digitalfootprint	:=	DATASET(
+																IF(pFilename='',Filenames(,pUseProd).Out.digitalfootprint.QA,pFilename)
+																,Business_Credit.Layouts.rDigitalFootprint,THOR,__compressed__)
+																(SBFE_Contributor_Number NOT IN Quarantined_SBFE_Contributor_Number_Set);
+	EXPORT	merchantprocessing	:=	DATASET(
+																IF(pFilename='',Filenames(,pUseProd).Out.merchantprocessing.QA,pFilename)
+																,Business_Credit.Layouts.rMerchantProcessing,THOR,__compressed__)
+																(SBFE_Contributor_Number NOT IN Quarantined_SBFE_Contributor_Number_Set);	
 	EXPORT	SBFEIDCache				:=	IF(pFilename<>'',
 																	DATASET(pFilename,Business_Credit.Layouts.rSBFEIDCache,THOR,__compressed__),
 																	IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames().SBFEIDCache) <> 0),

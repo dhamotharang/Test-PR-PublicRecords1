@@ -32,11 +32,6 @@ EXPORT	Filenames(STRING	pversion	=	'',
 		EXPORT	releasedate				:=	versioncontrol.mBuildFilenameVersions(lOutTemplate	+	'releasedate'	,pversion);
 		EXPORT	digitalfootprint				:=	versioncontrol.mBuildFilenameVersions(lOutTemplate	+	'digitalfootprint'	,pversion);
 		EXPORT	merchantprocessing				:=	versioncontrol.mBuildFilenameVersions(lOutTemplate	+	'merchantprocessing'	,pversion);
-		EXPORT	merchantcardtransaction				:=	versioncontrol.mBuildFilenameVersions(lOutTemplate	+	'merchantcardtransaction'	,pversion);
-		EXPORT	merchantchargeback				:=	versioncontrol.mBuildFilenameVersions(lOutTemplate	+	'merchantchargeback'	,pversion);
-		EXPORT	merchantrefund				:=	versioncontrol.mBuildFilenameVersions(lOutTemplate	+	'merchantrefund'	,pversion);
-		EXPORT	merchantclassification				:=	versioncontrol.mBuildFilenameVersions(lOutTemplate	+	'merchantclassification'	,pversion);
-		EXPORT	merchantdestination				:=	versioncontrol.mBuildFilenameVersions(lOutTemplate	+	'merchantdestination'	,pversion);
 		
 		EXPORT	dAll_filenames	:=
 			active.dAll_filenames
