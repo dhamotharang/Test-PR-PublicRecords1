@@ -77,7 +77,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 
  ds_combinedfrag_recs := ds_search_in + ds_dids_to_use;
 
- ds_fragment_recs_w_value := _RIN_Function.GetFragmentRecs(ds_combinedfrag_recs, ds_allPayloadRecs, TRUE);
+ ds_fragment_recs_w_value := _RIN_Function.GetFragmentRecs(ds_combinedfrag_recs, ds_allPayloadRecs);
 
  _Layout.fragment_w_value_recs do_Rollup(_Layout.fragment_w_value_recs L, dataset(_Layout.fragment_w_value_recs) R) := TRANSFORM
    SELF := L;
@@ -141,8 +141,8 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 
  ds_contributed_recs := JOIN(ds_entityNameUID, FraudGovPlatform.Key_entityprofile,
                             KEYED(RIGHT.customerid = search_params.GlobalCompanyId AND
-                              RIGHT.industrytype = search_params.IndustryType AND
-                              RIGHT.entitycontextuid = LEFT.entity_context_uid) AND
+                                  RIGHT.industrytype = search_params.IndustryType AND
+                                  RIGHT.entitycontextuid = LEFT.entity_context_uid) AND
                             RIGHT.aotcurrprofflag = _Constant.CURR_PROFILE_FLAG,
                             TRANSFORM(iesp.identitysearch.t_RINIdentitySearchRecord,
                                 SELF.RecordSource := _Constant.RECORD_SOURCE.CONTRIBUTED,
