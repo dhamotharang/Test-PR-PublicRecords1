@@ -98,5 +98,5 @@ EXPORT B_Social_Security_Number_5 := MODULE
     SELF.Aot_Ssn_Kr_Act_Cnt_Ev_ := MIN(__PP201328.C_O_U_N_T___Exp1_,9999);
     SELF := __PP201328;
   END;
-  EXPORT __ENH_Social_Security_Number_5 := PROJECT(__EE201327,__ND201358__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Social_Security_Number::Annotated_5',EXPIRE(7));
+  EXPORT __ENH_Social_Security_Number_5 := PROJECT(__EE201327,__ND201358__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Social_Security_Number::Annotated_5',EXPIRE(7));
 END;
