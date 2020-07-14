@@ -2,7 +2,7 @@
 #workunit('name','bwr_Business_Marketing_Attributes_Batch_Service');
 #option ('hthorMemoryLimit', 1000);
 
-IMPORT PublicRecords_KEL,BRM_Marketing_attributes,ut; 
+IMPORT PublicRecords_KEL,BRM_Marketing_attributes,RiskWise; 
 
 /* ********************************************************************
  *                               OPTIONS                              *
@@ -13,26 +13,17 @@ IMPORT PublicRecords_KEL,BRM_Marketing_attributes,ut;
  * roxieIP: IP Address of the non-FCRA roxie.                         *
  **********************************************************************/
  
-recordsToRun := ALL;
+// recordsToRun := ALL;
+recordsToRun := 20;
 eyeball      := 10;
-threads      := 3;
-// RoxieIP := RiskWise.shortcuts.Dev156; //Development Roxie 156
-RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;      // Production
-//RoxieIP := RiskWise.shortcuts.prod_batch_neutral;      // Production
-// RoxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; // Staging/Cert
-// RoxieIP := RiskWise.shortcuts.Dev194;                  // Development Roxie 194
+threads      := 30;
 
-// inputFile := Data_Services.foreign_prod + 'jpyon::in::compass_1190_bus_shell_in_in';
-InputFile := '~temp::kel::ally_01_business_uat_sample_100k_20181015.csv';
+RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;      // Production
+
+inputFile := Data_Services.foreign_prod + 'jpyon::in::compass_1190_bus_shell_in_in';
 OutputFile := '~kandsu01::BRM_test_100K_roxie_'+ ThorLib.wuid();
 
-// Universally Set the History Date for ALL records. Set to 0 to use the History Date located on each record of the input file
-histDateYYYYMM := 0;
-histDate       := 0;
-
-//To process real time use this
-//histDateYYYYMM := 999999;
-//histDate       := 999999999999;
+BOOLEAN runInRealTime := FALSE;   //When TRUE will run request in real time mode, if FALSE will run with archive date from file
 
 		// Configure options:
 	Options := MODULE(PublicRecords_KEL.Interface_Options)
@@ -40,21 +31,21 @@ histDate       := 0;
 		EXPORT STRING100 Data_Restriction_Mask := '0000000000000101000000000000000000000000';
 		EXPORT STRING100 Data_Permission_Mask := '11111111111111111111111111111111111111111111111111111111111';
 		EXPORT UNSIGNED GLBAPurpose := 1;
-		EXPORT UNSIGNED DPPAPurpose := 1;
+		EXPORT UNSIGNED DPPAPurpose := 3;
 		EXPORT BOOLEAN IsFCRA := FALSE; //It is only non-fcra query.
 		EXPORT BOOLEAN isMarketing := true; //always true for this query
 		EXPORT STRING100 Allowed_Sources := '';
 		EXPORT BOOLEAN Override_Experian_Restriction := false;
 		EXPORT STRING IndustryClass := ''; // When set to UTILI or DRMKT this restricts Utility data
-		EXPORT UNSIGNED8 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
+		EXPORT DATA100 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 			Data_Restriction_Mask, 
 			Data_Permission_Mask, 
 			GLBAPurpose, 
 			DPPAPurpose, 
-			FALSE,//isfcra
-			TRUE, //ismarketing
+			IsFCRA,//isfcra
+			isMarketing, //ismarketing
 			0, //Allow_DNBDMI
-			FALSE,//OverrideExperianRestriction
+			Override_Experian_Restriction,//OverrideExperianRestriction
 			'',//PermissiblePurpose - For FCRA Products Only
 			IndustryClass,
 			PublicRecords_KEL.CFG_Compile);
@@ -186,9 +177,11 @@ STRING  pf_declined;
 STRING  pf_approved_not_funded ;
 END;
 
-	p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"')))(AccountNumber != 'AccountNumber');
-	OUTPUT( CHOOSEN(p_in, 100), NAMED('Input_data') );
-	p := CHOOSEN(p_in, RecordsToRun);
+ 
+// load sample data
+	p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));  // use this for a CSV file
+	p := IF(recordsToRun = 0, p_in, CHOOSEN (p_in, recordsToRun));
+ OUTPUT (choosen(p,eyeball), NAMED ('input'));
 
 	pp:= project(P,transform(BRM_Marketing_attributes.Layout_BRM_NonFCRA.Batch_Input, 
 		SELF.G_ProcBusUID :=Counter;
@@ -201,6 +194,7 @@ END;
 		SELF := []));
 			
 output(pp,named('PP'));
+
 soapLayout := RECORD
   DATASET(BRM_Marketing_attributes.Layout_BRM_NonFCRA.Batch_Input) batch_in;
 	UNSIGNED BIPAppendScoreThreshold;
@@ -221,26 +215,24 @@ soapLayout := RECORD
 	UNSIGNED1 LexIdSourceOptout;
 end;
 
-soapLayout trans1(pp le, INTEGER c) := TRANSFORM
-    r2 := project(ut.ds_oneRecord, transform( BRM_Marketing_attributes.Layout_BRM_NonFCRA.Batch_Input, 
-         self.g_procbusuid:=c;
-						self.historydate :=le.historydate;
-						self.historydateyyyymm :=le.historydateyyyymm;
-         self.acctno:=le.acctno;
-         self.companyname := le.companyname;
-         self.AlternateCompanyName := le.AlternateCompanyName;
-         self.streetaddressline1 := le.streetaddressline1;
-         self.City1 := le.City1;
-         self.State1 := le.State1;
-         self.Zip1 := le.Zip1;
-						self.BusinessPhone := le.BusinessPhone;
-						self.BusinessTIN := le.BusinessTIN;
-						self.BusinessURL := le.BusinessURL;
-						self.BusinessEmailAddress := le.BusinessEmailAddress;
-						self                       := [])); 
-						
-			self.batch_in := r2;
- 
+soap_in_pre:= Project(pp,TRANSFORM(soapLayout,
+         self.batch_in := DATASET([TRANSFORM( BRM_Marketing_attributes.Layout_BRM_NonFCRA.Batch_Input, 
+         self.g_procbusuid:=counter;
+						self.historydate :=LEFT.historydate;
+						self.historydateyyyymm :=IF(runInRealTime, 99999999, (UNSIGNED4)LEFT.HistoryDate);;
+         self.acctno:=LEFT.acctno;
+         self.companyname := LEFT.companyname;
+         self.AlternateCompanyName := LEFT.AlternateCompanyName;
+         self.streetaddressline1 := LEFT.streetaddressline1;
+         self.City1 := LEFT.City1;
+         self.State1 := LEFT.State1;
+         self.Zip1 := LEFT.Zip1;
+						self.BusinessPhone := LEFT.BusinessPhone;
+						self.BusinessTIN := LEFT.BusinessTIN;
+						self.BusinessURL := LEFT.BusinessURL;
+						self.BusinessEmailAddress := LEFT.BusinessEmailAddress;
+						self                       := [])]); 
+						 
     self.Score_threshold := Options.ScoreThreshold;
     self.BIPAppendScoreThreshold := Options.BIPAppendScoreThreshold;
     self.BIPAppendWeightThreshold := Options.BIPAppendWeightThreshold;
@@ -258,9 +250,9 @@ soapLayout trans1(pp le, INTEGER c) := TRANSFORM
     self.OverrideExperianRestriction := Options.Override_Experian_Restriction;
     //CCPA fields
     self.LexIdSourceOptout := Options.LexIdSourceOptout;
-    SELF := [];
-end;
-soap_in := distribute(project(pp, trans1(left, counter)));
+    SELF := [];));
+
+soap_in := DISTRIBUTE(soap_in_pre, RANDOM());		
 OUTPUT(CHOOSEN(soap_in, eyeball), NAMED('Sample_SOAPInput'));
 
 layout_SOAP_out := RECORD
@@ -281,11 +273,10 @@ result_SOAPCALL :=
 				{soap_in}, 
 				DATASET(layout_SOAP_out),
 				XPATH('brm_marketing_attributes.brm_marketing_attr_batch_servicesResponse/Results/Result/Dataset[@name=\'Results\']/Row'),
-				// XPATH('*'),
 				RETRY(5), TIMEOUT(500),
 				PARALLEL(threads), onFail(myFail(LEFT)));
 								
-OUTPUT(result_SOAPCALL);
+OUTPUT( CHOOSEN(result_SOAPCALL,eyeball), NAMED('result_SOAPCALL') );
 
 //Passed Records //results without minimum input are also listed in the results passed. Only results with the roxie error will be listed as failed.
 Passed:= result_SOAPCALL(TRIM(ErrorCode) = '');
