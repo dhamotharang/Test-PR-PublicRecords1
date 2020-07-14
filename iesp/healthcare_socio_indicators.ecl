@@ -27,6 +27,10 @@ export t_SocioIndicatorsUDF := record
 	string60 UDF3 {xpath('UDF3')};
 end;
 		
+export t_SocioCompliance := record
+	string50 FCRAPurpose {xpath('FCRAPurpose')};
+end;
+		
 export t_SocioIndicatorsMember := record
 	string50 MemberID {xpath('MemberID')};
 	iesp.share.t_Name Name {xpath('Name')};
@@ -625,6 +629,7 @@ end;
 		
 export t_SocioeconomicIndicatorsRequest := record (iesp.share.t_BaseRequest)
 	iesp.healthcare_account_info.t_HealthcareConfigInput HealthcareConfig {xpath('HealthcareConfig')};//hidden[internal]
+	t_SocioCompliance Compliance {xpath('Compliance')};
 	t_SocioIndicatorsOptions Options {xpath('Options')};
 	t_SocioIndicatorsMember Member {xpath('Member')};
 	iesp.healthcare_account_info.t_HealthcareContext AccountContext {xpath('AccountContext')};//hidden[ecl_only]
