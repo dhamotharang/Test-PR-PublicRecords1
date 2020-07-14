@@ -1527,5 +1527,5 @@ EXPORT B_Email_2 := MODULE
     SELF.Last_Record_Id_ := MAP(NOT (__PP910910.C_O_U_N_T___Event_ <> 0)=>__ECAST(KEL.typ.nint,__PP910910.M_I_N___Record_Id_),__ECAST(KEL.typ.nint,__PP910910.M_A_X___Record_Id_));
     SELF := __PP910910;
   END;
-  EXPORT __ENH_Email_2 := PROJECT(__EE910909,__ND910914__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Email::Annotated_2',EXPIRE(7));
+  EXPORT __ENH_Email_2 := PROJECT(__EE910909,__ND910914__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Email::Annotated_2',EXPIRE(7));
 END;
