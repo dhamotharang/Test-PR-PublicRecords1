@@ -295,7 +295,7 @@ EXPORT	fn_ProcessSBFEFile(STRING	filename, STRING	filedate)	:=	FUNCTION
 													SELF.Original_Contract_Account_Number	:=	LEFT.Contract_Account_Number;
 													SELF.Contract_Account_Number					:=	fn_removeLeadingZeros(LEFT.Contract_Account_Number);
 													SELF.DelinquencyStatus					:=if(filedate > '20201001',Left.Payment_Status_Category,'');
-													self.LN_Deliquency_Date:=filedate;		
+													self.LN_Deliquency_Date:='';		
 													SELF.New_Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided					:=if(filedate > '20201001',Left.Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided,'');
 													SELF.Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided					:=if(filedate <= '20201001',Left.Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided,'');
 													SELF.New_Maximum_Number_Of_Payment_Tracking_Cycle_Periods_Provided					:=if(filedate > '20201001',Left.Maximum_Number_Of_Payment_Tracking_Cycle_Periods_Provided,'');
