@@ -5,6 +5,7 @@ EXPORT FileModule(string esp = ''
 									,string target = ''
 									,string roxieabsolutepatch = '/var/lib/HPCCSystems/hpcc-data/roxie/'
 									,string location = 'uspr' // <country><business> - uspr, usins, ushc
+									,string dopsenv = 'prod'
 									) := module
 									
 	shared getfullesp(string l_esp) := if (~regexfind('http://',l_esp),'http://'+l_esp, l_esp);
@@ -187,7 +188,7 @@ EXPORT FileModule(string esp = ''
 												
 													 ) := FUNCTION
 
-		dTopology := dRoxieTopology(l_esp,l_port,l_targettype,l_target);//: independent;
+		dTopology := dRoxieTopology(l_esp,l_port,l_target,l_targettype);//: independent;
 		
 		rParts xform(dTopology l, UNSIGNED2 cntr) := TRANSFORM
 			dParts := STD.File.RemoteDirectory(l.netaddress,p_dirpath,p_lasttoken+'._*');
@@ -365,6 +366,105 @@ END;
 												);
 	end;
 	
+	export fUpdateCopyStatusinDOPSDB() := function
+		dGetStatus := dCopyStatus();
+		
+		rDBLayout := record
+			string datasetname{xpath('datasetname')};
+			string superkeyname{xpath('superkeyname')};
+			string buildversion{xpath('buildversion')};
+			string locationflag{xpath('locationflag')};
+			string clustername{xpath('clustername')};
+			integer copiedparts{xpath('copiedparts')};
+			integer expectedparts{xpath('expectedparts')};
+			integer pendingpartstocopy{xpath('pendingpartstocopy')};
+			integer percentcopied{xpath('percentcopied')};
+			string statuscode{xpath('statuscode')};
+			string statusdescription {xpath('statusdescription')};
+		end;
+		
+		rDBLayout xDeriveClusterFromPackageName(dGetStatus l) := transform
+			pkgname := STD.Str.SplitWords(l.packagename,'::')[2];
+			self.datasetname := l.packageid;
+			self.superkeyname := l.superfile;
+			self.buildversion := l.buildversion;
+			self.locationflag := dops.constants.location;
+			self.copiedparts := l.copiedfileparts;
+			self.expectedparts := l.expectedfileparts;
+			self.clustername := if (pkgname <> '',STD.Str.SplitWords(pkgname,'_')[2],'');
+			self.statuscode := '';
+			self.statusdescription := '';
+			self := l;
+		end;
+		
+		dDeriveClusterFromPackageName := project(dGetStatus,xDeriveClusterFromPackageName(left));
+		
+		rDBList := record, maxlength(50000)
+			dataset(rDBLayout) DBList{xpath('copystatus')};
+		end;
+		
+		rDBList xDBList(dDeriveClusterFromPackageName L) := transform
+			self.DBList   := DATASET([{ trim(l.datasetname,left,right)
+													,trim(l.superkeyname,left,right)
+													,trim(l.buildversion,left,right)
+													, trim(l.locationflag,left,right)
+													, trim(l.clustername,left,right)
+													, l.copiedparts
+													, l.expectedparts
+													, l.pendingpartstocopy
+													, l.percentcopied
+													,''
+													,''}]
+													, rDBLayout);
+			self := L;
+		end;
+
+		dDBList := project(dDeriveClusterFromPackageName, xDBList(left));
+
+		rDBInfoRequest := record, maxlength(50000)
+			dataset(rDBList) ulist{xpath('ulist')} := dDBList;
+			
+		end;
+		
+		rSOAPResponse := SOAPCALL(
+				
+				dops.constants.prboca.serviceurl(dopsenv),
+				////////////////////////////////////////////////////
+				// to check the soap xml use local machine IP and run soapplus -s -p 4546
+				// 'http://10.176.152.60:4546/',
+				//'http://10.176.152.26:4546/',
+				////////////////////////////////////////////////////
+				'UpdateCopyStatus',
+				rDBInfoRequest,
+				dataset(rDBList),
+				xpath('UpdateCopyStatusResponse/UpdateCopyStatusResult'),
+				NAMESPACE('http://lexisnexis.com/'),
+				LITERAL,
+				SOAPACTION('http://lexisnexis.com/UpdateCopyStatus'));
+		
+		rGetKey := record
+			string l_location;
+			dataset(rDBLayout) ulist;
+		end;
+		
+		rGetKey xGetKey(rSOAPResponse l) := transform
+			self.ulist := l.DBList;
+			self.l_location := location;
+			//self := l;
+			//self.l_buildversion := l_buildversion;
+		end;
+		
+		dGetKey := project(rSOAPResponse,xGetKey(left));
+		
+		rDBLayout xNormRecs(dGetKey l,rDBLayout r) := transform
+			self := r;
+		end;
+		
+		dNormRecs := normalize(dGetKey, left.ulist, xNormRecs(left,right));
+		
+		return if (count(dGetStatus) > 0, dNormRecs, dataset([],rDBLayout));
+	end;
+	
 	export runCopyStatusUpdate(dataset(rInputParameters) dEnvironments
 																,boolean isDespray
 																,string desprayserver
@@ -375,10 +475,12 @@ END;
 																,string senderemail = ''
 																) := if (regexfind('hthor',STD.System.Job.Target())
 																				,if (~STD.File.FileExists(vCopyStatusFileNamePrefix + '_running')	
-																						,fUpdateCopyStatus(dEnvironments
+																						,sequential(fUpdateCopyStatus(dEnvironments
 																													,isDespray
 																													,desprayserver
 																													,despraylocation)
+																												,output(choosen(fUpdateCopyStatusinDOPSDB(),all))
+																												)
 																						,output('Another job running or ' + vCopyStatusFileNamePrefix + '_running was not deleted after completion or failure')
 																					 )
 																				,fail(9999,'Run on *hthor* cluster, not re-scheduling')
