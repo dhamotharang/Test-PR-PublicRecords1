@@ -109,7 +109,7 @@ EXPORT SearchService() := MACRO
   SELF._Header := iesp.ECL2ESP.GetHeaderRow(),
   SELF.RecordCount:= COUNT(ds_searchrecords),
   SELF.InputEcho := SearchBy,
-  SELF.Records := ds_searchrecords
+  SELF.Records := CHOOSEN(ds_searchrecords, iesp.Constants.RIN.MAX_COUNT_SEARCH_RECORDS)
  END;
 
  results := DATASET([final_transform_t_IdentitySearchResponse()]);
