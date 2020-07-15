@@ -3,7 +3,8 @@
 EXPORT TrackBuild(string p_vertical = 'P'
 									,string p_location = dops.constants.location
 									,string p_dopsenv = 'dev'
-									,string p_wuid = '') := module
+									,string p_wuid = ''
+									,string p_adminemails = 'anantha.venkatachalam@lexisnexisrisk.com') := module
 
 	////////////////////////////////////////////////////
 	// DECLRATIONS & DEFINITIONS
@@ -544,7 +545,9 @@ EXPORT TrackBuild(string p_vertical = 'P'
 																,(totaltime > (integer)r.thresholdinsecs) and trim(r.reason,left,right) = ''
 																		=> 'Y'
 																,'G');
-			url := vdopsurlprefix + '/btreason.aspx?dbn_trackingname='+ r.datasetname + '&dbc_componentname=' + regexreplace(':',regexreplace(' ',r.componentname,'%20'),'%3A') + '&dbs_buildversion=' + r.buildversion +'&dbs_wuid='+ r.wuid + '&colorcode='+colorcode;
+			url := vdopsurlprefix + '/btreason.aspx?dbn_trackingname='+ regexreplace(' ',r.datasetname,'%20') + '&dbc_componentname=' + regexreplace(':',regexreplace(' ',r.componentname,'%20'),'%3A') + '&dbs_buildversion=' + r.buildversion +'&dbs_wuid='+ r.wuid + '&colorcode='+colorcode;
+			
+			thresholdresetlink := 'To reset threshold go to: ' + vdopsurlprefix + '/configuration.aspx and choose Build Tracking Name = ' + r.datasetname;
 			self.timeinsecs := timediff;
 			self.thresholddeviation := td;
 			self.emailsubject := MAP( 
@@ -558,6 +561,7 @@ EXPORT TrackBuild(string p_vertical = 'P'
 																		=> m_prefix + '\n' + 'Was it restarted? set reason here: ' + url
 																,(totaltime > (integer)r.thresholdinsecs) and trim(r.reason,left,right) = ''
 																		=> m_prefix + '\n' + 'threshold (in hrs): ' + (string)round(((integer)r.thresholdinsecs / 3600),1) + '\n' + 'actual total build time (in hrs): ' + (string)round((totaltime / 3600),1) + ', which is over set threshold time \n\nset reason here: ' + url
+																							+ '\n\n' + thresholdresetlink
 																,'NA');
 			self.totaltimeinsecs := totaltime;
 			self := r;
@@ -575,12 +579,20 @@ EXPORT TrackBuild(string p_vertical = 'P'
 												(
 													dGetTimeDiff
 													,if (emailid <> '' and emailsubject <> 'NA'
-															,STD.System.Email.SendEmail('anantha.venkatachalam@lexisnexisrisk.com,'+emailid,
+															,STD.System.Email.SendEmail(p_adminemails + ',' +emailid,
 																emailsubject
 																,emailmessage
 																,
 																,
 																,fromemail)
+																,if (emailid = '' and emailsubject <> 'NA'
+																		,STD.System.Email.SendEmail(p_adminemails,
+																			emailsubject
+																			,'******EMAIL ID NOT SET BY USER - ADMINS CHECK WITH USER*******\n\n' + emailmessage
+																			,
+																			,
+																			,fromemail)
+																		)
 															)
 												)
 												,fileservices.deletelogicalfile(LF_EmailNotify(FlagPrefix))
