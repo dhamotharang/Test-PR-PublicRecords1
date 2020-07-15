@@ -1,4 +1,4 @@
-﻿IMPORT Data_Services, STD;
+﻿IMPORT Data_Services, STD, FLAccidents_Ecrash;
 
 EXPORT fn_FL_Fiers_Extraction(STRING Pdate = (STRING) STD.Date.CurrentDate(TRUE)) := FUNCTION
   
@@ -29,227 +29,228 @@ EXPORT fn_FL_Fiers_Extraction(STRING Pdate = (STRING) STD.Date.CurrentDate(TRUE)
 		STRING line;
 		END;
 
-  //Used for CSV header record														
-  VehicleHeader := 'Vehicle_ID,' +    
-		'Creation_Date,' +   
-		'Incident_ID,' +   
-		'VIN,' +   	
-		'VIN_Status,' +   
-		'Damaged_Areas_Derived1,' +   
-		'Damaged_Areas_Derived2,' +   
-		'Airbags_Deployed_Derived,' +   
-		'Vehicle_Towed_Derived,' +   
-		'Unit_Type,' +   
-		'Unit_Number,' +   
-		'Registration_State,' +   
-		'Registration_Year,' +   
-		'License_Plate,' +   
-		'Make,' +   
-		'Model_Yr,' +   
-		'Model,' +   
-		'Body_Type_Category,' +   
-		'Total_Occupants_in_Vehicle,' +   
-		'Special_Function_in_Transport,' +   
-		'Special_Function_in_Transport_Other_Unit,' +   
-		'Emergency_Use,' +   
-		'Posted_Satutory_Speed_Limit,' +   
-		'Direction_of_Travel_Before_Crash,' +   
-		'Trafficway_Description,' +   
-		'Traffic_Control_Device_Type,' +   
-		'Vehicle_Maneuver_Action_Prior1,' +   
-		'Vehicle_Maneuver_Action_Prior2,' +   
-		'Impact_Area1,' +   
-		'Impact_Area2,' +   
-		'Event_Sequence1,' +   
-		'Event_Sequence2,' +   
-		'Event_Sequence3,' +   
-		'Event_Sequence4,' +   
-		'Most_Harmful_Event_for_Vehicle,' +   
-		'Bus_Use,' +   
-		'Vehicle_Hit_and_Run,' +   
-		'Vehicle_Towed,' +   
-		'Contributing_Circumstances_v1,' +   
-		'Contributing_Circumstances_v2,' +   
-		'Contributing_Circumstances_v3,' +   
-		'Contributing_Circumstances_v4,' +   
-		'On_Street,' +   
-		'Vehicle_Color,' +   
-		'Estimated_Speed,' +   
-		'Car_Fire,' +   
-		'Vehicle_Damage_Amount,' +   
-		'Contributing_Factors1,' +   
-		'Contributing_Factors2,' +   
-		'Contributing_Factors3,' +   
-		'Contributing_Factors4,' +   
-		'Other_Contributing_Factors1,' +   
-		'Other_Contributing_Factors2,' +   
-		'Other_Contributing_Factors3,' +   
-		'Vision_Obscured1,' +   
-		'Vision_Obscured2,' +   
-		'Vehicle_on_Road,' +   
-		'Ran_Off_Road,' +   
-		'Skidding_Occurred,' +   
-		'Vehicle_Incident_Location1,' +   
-		'Vehicle_Incident_Location2,' +   
-		'Vehicle_Incident_Location3,' +   
-		'Vehicle_Disabled,' +   
-		'Vehicle_Removed_To,' +   
-		'Removed_By,' +   
-		'Tow_Requested_by_Driver,' +   
-		'Solicitation,' +   
-		'Other_Unit_Vehicle_Damage_Amount,' +   
-		'Other_Unit_Model_Year,' +   
-		'Other_Unit_Make,' +   
-		'Other_Unit_Model,' +   
-		'Other_Unit_VIN,' +   
-		'Other_Unit_VIN_Status,' +   
-		'Other_Unit_Body_Type_Category,' +   
-		'Other_Unit_Registration_State,' +   
-		'Other_Unit_Registration_Year,' +   
-		'Other_Unit_License_Plate,' +   
-		'Other_Unit_Color,' +   
-		'Other_Unit_Type,' +   
-		'Damaged_Areas1,' +   
-		'Damaged_Areas2,' +   
-		'Parked_Vehicle,' +   
-		'Damage_Rating1,' +   
-		'Damage_Rating2,' +   
-		'Vehicle_Inventoried,' +   
-		'Vehicle_Defect_Apparent,' +   
-		'Defect_May_Have_Contributed1,' +   
-		'Defect_May_Have_Contributed2,' +   
-		'Registration_Expiration,' +   
-		'Owner_Driver_Type,' +   
-		'Make_Code,' +   
-		'Number_Trailing_Units,' +   
-		'Vehicle_Position,' +   
-		'Vehicle_Type,' +   
-		'Motorcycle_Engine_Size,' +   
-		'Motorcycle_Driver_Educated,' +   
-		'Motorcycle_Helmet_Type,' +   
-		'Motorcycle_Passenger,' +   
-		'Motorcycle_Helmet_Stayed_On,' +   
-		'Motorcycle_Helmet_DOT_Snell,' +   
-		'Motorcycle_Saddlebag_Trunk,' +   
-		'Motorcycle_Trailer,' +   
-		'Pedacycle_Passenger,' +   
-		'Pedacycle_Headlights,' +   
-		'Pedacycle_Helmet,' +   
-		'Pedacycle_Rear_Reflectors,' +   
-		'CDL_Required,' +   
-		'Truck_Bus_Supplement_Required,' +   
-		'Unit_Damage_Amount,' +   
-		'Airbag_Switch,' +   
-		'Underride_Override_Damage,' +   
-		'Vehicle_Attachment,' +   
-		'Action_on_Impact,' +   
-		'Speed_Detection_Method,' +   
-		'Non_Motorist_Direction_of_Travel_From,' +   
-		'Non_Motorist_Direction_of_Travel_To,' +   
-		'Vehicle_Use,' +   
-		'Department_Unit_Number,' +   
-		'Equipment_in_Use_at_Time_of_Accident,' +   
-		'Actions_of_Police_Vehicle,' +   
-		'Vehicle_Command_ID,' +   
-		'Traffic_Control_Device_Inoperative,' +   
-		'Direction_of_Impact1,' +   
-		'Direction_of_Impact2,' +   
-		'Ran_Off_Road_Direction,' +   
-		'VIN_Other_Unit_Number,' +   
-		'Damaged_Area_Generic,' +   
-		'Vision_Obscured_Description,' +   
-		'Inattention_Description,' +   
-		'Contributing_Circumstances_Defect_Description,' +   
-		'Contributing_Circumstances_Other_Descriptioin,' +   
-		'Vehicle_Maneuver_Action_Prior_Other_Description,' +   
-		'Vehicle_Special_Use,' +   
-		'Vehicle_Type_Extended1,' +   
-		'Vehicle_Type_Extended2,' +   
-		'Fixed_Object_Direction1,' +   
-		'Fixed_Object_Direction2,' +   
-		'Fixed_Object_Direction3,' +   
-		'Fixed_Object_Direction4,' +   
-		'Vehicle_Left_at_Scene,' +   
-		'Vehicle_Impounded,' +   
-		'Vehicle_Driven_From_Scene,' +   
-		'On_Cross_Street,' +   
-		'Actions_of_Police_Vehicle_Description,' +   
-		'Avoidance_Maneuver,' +   
-		'Insurance_Expiration_Date,' +   
-		'Insurance_Policy_Number,' +   
-		'Insurance_Company,' +   
-		'avoidance_maneuver2,' +   
-		' avoidance_maneuver3,' +   
-		' avoidance_maneuver4,' +   
-		' damaged_areas_severity1 ,' +   
-		' damaged_areas_severity2 ,' +   
-		' vehicle_outside_city_indicator,' +   
-		' vehicle_outside_city_distance_miles ,' +   
-		' vehicle_outside_city_direction,' +   
-		' vehicle_crash_cityplace,' +   
-		'Insurance_Company_Standardized,' +    
-		'Insurance_Company_Phone_Number,' +    
-		'Insurance_Effective_Date,' +    
-		'Proof_of_Insurance,' +    
-		'Insurance_Expired,' +    
-		'Insurance_Exempt,' +    
-		'Insurance_Type,' +    
-		'Insurance_Company_Code,' +    
-		'Insurance_Policy_Holder,' +    
-		'Is_Tag_Converted,' +    
-		'VIN_Original ,' +    
-		'Make_Original ,' +    
-		'Model_Original ,' +    
-		'Model_Year_Original ,' +    
-		'Other_Unit_VIN_Original ,' +    
-		'Other_Unit_Make_Original ,' +    
-		'Other_Unit_Model_Original ,' +    
-		'Other_Unit_Model_Year_Original,' +    
-		'initial_point_of_contact	,' +   
-		'vehicle_driveable,' +   
-		'commercial_vehicle,' +   
-		'number_of_lanes,' +   
-		'divided_highway,' +   
-		'not_in_transport,' +   
-		'other_unit_number,' +   
-		'other_unit_length,' +   
-		'other_unit_axles,' +   
-		'other_unit_plate_expiration,' +   
-		'other_unit_permanent_registration,' +   	
-		'other_unit_model_year2,' +   
-		'other_unit_make2,' +   
-		'other_unit_vin2,' +   
-		'other_unit_registration_state2,' +   
-		'other_unit_registration_year2,' +   
-		'other_unit_license_plate2,' +   
-		'other_unit_number2,' +   
-		'other_unit_length2,' +   
-		'other_unit_axles2,' +   
-		'other_unit_plate_expiration2,' +   
-		'other_unit_permanent_registration2,' +   
-		'other_unit_type2,' +   
-		'other_unit_model_year3,' +   
-		'other_unit_make3	,' +   
-		'other_unit_vin3,' +   
-		'other_unit_registration_state3,' +   
-		'other_unit_registration_year3,' +   
-		'other_unit_license_plate3,' +   
-		'other_unit_number3,' +   
-		'other_unit_length3,' +   
-		'other_unit_axles3,' +   
-		'other_unit_plate_expiration3,' +   
-		'other_unit_permanent_registration3,' +   
-		'other_unit_type3,' +   
-		'damaged_areas3,' +   
-		'speed_limit_posted,' +   
-		'Report_Damage_Extent,' +   
-		'Report_Vehicle_Type,' +   
-		'Report_Traffic_Control_Device_Type,' +   	
-		'Report_Contributing_Circumstances_v,' +   	
-		'Report_Vehicle_Maneuver_Action_Prior,' +   	
-		'Report_Vehicle_Body_Type,' +   
-		'Report_Road_Condition';
-										
+  //Used for CSV header record								
+  VehicleHeader := 'Vehicle_ID,' + 
+		'Creation_Date,' + 
+		'Incident_ID,' + 
+		'VIN,' + 	
+		'VIN_Status,' + 
+		'Damaged_Areas_Derived1,' + 
+		'Damaged_Areas_Derived2,' + 
+		'Airbags_Deployed_Derived,' + 
+		'Vehicle_Towed_Derived,' + 
+		'Unit_Type,' + 
+		'Unit_Number,' + 
+		'Registration_State,' + 
+		'Registration_Year,' + 
+		'License_Plate,' + 
+		'Make,' + 
+		'Model_Yr,' + 
+		'Model,' + 
+		'Body_Type_Category,' + 
+		'Total_Occupants_in_Vehicle,' + 
+		'Special_Function_in_Transport,' + 
+		'Special_Function_in_Transport_Other_Unit,' + 
+		'Emergency_Use,' + 
+		'Posted_Satutory_Speed_Limit,' + 
+		'Direction_of_Travel_Before_Crash,' + 
+		'Trafficway_Description,' + 
+		'Traffic_Control_Device_Type,' + 
+		'Vehicle_Maneuver_Action_Prior1,' + 
+		'Vehicle_Maneuver_Action_Prior2,' + 
+		'Impact_Area1,' + 
+		'Impact_Area2,' + 
+		'Event_Sequence1,' + 
+		'Event_Sequence2,' + 
+		'Event_Sequence3,' + 
+		'Event_Sequence4,' + 
+		'Most_Harmful_Event_for_Vehicle,' + 
+		'Bus_Use,' + 
+		'Vehicle_Hit_and_Run,' + 
+		'Vehicle_Towed,' + 
+		'Contributing_Circumstances_v1,' + 
+		'Contributing_Circumstances_v2,' + 
+		'Contributing_Circumstances_v3,' + 
+		'Contributing_Circumstances_v4,' + 
+		'On_Street,' + 
+		'Vehicle_Color,' + 
+		'Estimated_Speed,' + 
+		'Car_Fire,' + 
+		'Vehicle_Damage_Amount,' + 
+		'Contributing_Factors1,' + 
+		'Contributing_Factors2,' + 
+		'Contributing_Factors3,' + 
+		'Contributing_Factors4,' + 
+		'Other_Contributing_Factors1,' + 
+		'Other_Contributing_Factors2,' + 
+		'Other_Contributing_Factors3,' + 
+		'Vision_Obscured1,' + 
+		'Vision_Obscured2,' + 
+		'Vehicle_on_Road,' + 
+		'Ran_Off_Road,' + 
+		'Skidding_Occurred,' + 
+		'Vehicle_Incident_Location1,' + 
+		'Vehicle_Incident_Location2,' + 
+		'Vehicle_Incident_Location3,' + 
+		'Vehicle_Disabled,' + 
+		'Vehicle_Removed_To,' + 
+		'Removed_By,' + 
+		'Tow_Requested_by_Driver,' + 
+		'Solicitation,' + 
+		'Other_Unit_Vehicle_Damage_Amount,' + 
+		'Other_Unit_Model_Year,' + 
+		'Other_Unit_Make,' + 
+		'Other_Unit_Model,' + 
+		'Other_Unit_VIN,' + 
+		'Other_Unit_VIN_Status,' + 
+		'Other_Unit_Body_Type_Category,' + 
+		'Other_Unit_Registration_State,' + 
+		'Other_Unit_Registration_Year,' + 
+		'Other_Unit_License_Plate,' + 
+		'Other_Unit_Color,' + 
+		'Other_Unit_Type,' + 
+		'Damaged_Areas1,' + 
+		'Damaged_Areas2,' + 
+		'Parked_Vehicle,' + 
+		'Damage_Rating1,' + 
+		'Damage_Rating2,' + 
+		'Vehicle_Inventoried,' + 
+		'Vehicle_Defect_Apparent,' + 
+		'Defect_May_Have_Contributed1,' + 
+		'Defect_May_Have_Contributed2,' + 
+		'Registration_Expiration,' + 
+		'Owner_Driver_Type,' + 
+		'Make_Code,' + 
+		'Number_Trailing_Units,' + 
+		'Vehicle_Position,' + 
+		'Vehicle_Type,' + 
+		'Motorcycle_Engine_Size,' + 
+		'Motorcycle_Driver_Educated,' + 
+		'Motorcycle_Helmet_Type,' + 
+		'Motorcycle_Passenger,' + 
+		'Motorcycle_Helmet_Stayed_On,' + 
+		'Motorcycle_Helmet_DOT_Snell,' + 
+		'Motorcycle_Saddlebag_Trunk,' + 
+		'Motorcycle_Trailer,' + 
+		'Pedacycle_Passenger,' + 
+		'Pedacycle_Headlights,' + 
+		'Pedacycle_Helmet,' + 
+		'Pedacycle_Rear_Reflectors,' + 
+		'CDL_Required,' + 
+		'Truck_Bus_Supplement_Required,' + 
+		'Unit_Damage_Amount,' + 
+		'Airbag_Switch,' + 
+		'Underride_Override_Damage,' + 
+		'Vehicle_Attachment,' + 
+		'Action_on_Impact,' + 
+		'Speed_Detection_Method,' + 
+		'Non_Motorist_Direction_of_Travel_From,' + 
+		'Non_Motorist_Direction_of_Travel_To,' + 
+		'Vehicle_Use,' + 
+		'Department_Unit_Number,' + 
+		'Equipment_in_Use_at_Time_of_Accident,' + 
+		'Actions_of_Police_Vehicle,' + 
+		'Vehicle_Command_ID,' + 
+		'Traffic_Control_Device_Inoperative,' + 
+		'Direction_of_Impact1,' + 
+		'Direction_of_Impact2,' + 
+		'Ran_Off_Road_Direction,' + 
+		'VIN_Other_Unit_Number,' + 
+		'Damaged_Area_Generic,' + 
+		'Vision_Obscured_Description,' + 
+		'Inattention_Description,' + 
+		'Contributing_Circumstances_Defect_Description,' + 
+		'Contributing_Circumstances_Other_Descriptioin,' + 
+		'Vehicle_Maneuver_Action_Prior_Other_Description,' + 
+		'Vehicle_Special_Use,' + 
+		'Vehicle_Type_Extended1,' + 
+		'Vehicle_Type_Extended2,' + 
+		'Fixed_Object_Direction1,' + 
+		'Fixed_Object_Direction2,' + 
+		'Fixed_Object_Direction3,' + 
+		'Fixed_Object_Direction4,' + 
+		'Vehicle_Left_at_Scene,' + 
+		'Vehicle_Impounded,' + 
+		'Vehicle_Driven_From_Scene,' + 
+		'On_Cross_Street,' + 
+		'Actions_of_Police_Vehicle_Description,' + 
+		'Avoidance_Maneuver,' + 
+		'Insurance_Expiration_Date,' + 
+		'Insurance_Policy_Number,' + 
+		'Insurance_Company,' + 
+		'avoidance_maneuver2,' + 
+		'avoidance_maneuver3,' + 
+		'avoidance_maneuver4,' + 
+		'damaged_areas_severity1,' + 
+		'damaged_areas_severity2,' + 
+		'vehicle_outside_city_indicator,' + 
+		'vehicle_outside_city_distance_miles,' + 
+		'vehicle_outside_city_direction,' + 
+		'vehicle_crash_cityplace,' + 
+		'Insurance_Company_Standardized,' +  
+		'Insurance_Company_Phone_Number,' +  
+		'Insurance_Effective_Date,' + 
+		'Proof_of_Insurance,' + 
+		'Insurance_Expired,' + 
+		'Insurance_Exempt,' + 
+		'Insurance_Type,' + 
+		'Insurance_Company_Code,' +
+		'Insurance_Policy_Holder,' + 
+		'Is_Tag_Converted,' + 
+		'VIN_Original,' + 
+		'Make_Original,' + 
+		'Model_Original,' + 
+		'Model_Year_Original,' + 
+		'Other_Unit_VIN_Original,' + 
+		'Other_Unit_Make_Original,' + 
+		'Other_Unit_Model_Original,' + 
+		'Other_Unit_Model_Year_Original,' + 
+		'initial_point_of_contact,' + 
+		'vehicle_driveable,' + 
+		'commercial_vehicle,' + 
+		'number_of_lanes,' + 
+		'divided_highway,' + 
+		'not_in_transport,' + 
+		'other_unit_number,' + 
+		'other_unit_length,' + 
+		'other_unit_axles,' + 
+		'other_unit_plate_expiration,' + 
+		'other_unit_permanent_registration,' + 	
+		'other_unit_model_year2,' + 
+		'other_unit_make2,' + 
+		'other_unit_vin2,' + 
+		'other_unit_registration_state2,' + 
+		'other_unit_registration_year2,' + 
+		'other_unit_license_plate2,' + 
+		'other_unit_number2,' + 
+		'other_unit_length2,' + 
+		'other_unit_axles2,' + 
+		'other_unit_plate_expiration2,' + 
+		'other_unit_permanent_registration2,' + 
+		'other_unit_type2,' + 
+		'other_unit_model_year3,' + 
+		'other_unit_make3,' +  
+		'other_unit_vin3,' + 
+		'other_unit_registration_state3,' + 
+		'other_unit_registration_year3,' + 
+		'other_unit_license_plate3,' + 
+		'other_unit_number3,' + 
+		'other_unit_length3,' + 
+		'other_unit_axles3,' + 
+		'other_unit_plate_expiration3,' + 
+		'other_unit_permanent_registration3,' + 
+		'other_unit_type3,' + 
+		'damaged_areas3,' + 
+		'speed_limit_posted,' + 
+		'Report_Damage_Extent,' + 
+		'Report_Vehicle_Type,' + 
+		'Report_Traffic_Control_Device_Type,' + 	
+		'Report_Contributing_Circumstances_v,' + 	
+		'Report_Vehicle_Maneuver_Action_Prior,' + 	
+		'Report_Vehicle_Body_Type,' +
+		'Report_Road_Condition,' + 
+		'Event_Sequence,';
+						
   IncidentHeader := 'Incident_ID,' + 
 		'Creation_Date,' + 
 		'Work_Type_ID,' + 
@@ -544,15 +545,15 @@ EXPORT fn_FL_Fiers_Extraction(STRING Pdate = (STRING) STD.Date.CurrentDate(TRUE)
 		'next_street_prefix	 ,' + 
 		'incident_damage_amount,' +  
 		'dot_use,' + 	
-		' number_of_persons_involved,' + 	
+		'number_of_persons_involved,' + 	
 		'unusual_road_condition_other_description	,' + 
 		'number_of_narrative_sections	,' + 
 		'CAD_number	,' + 
 		'visibility	,' + 
-		' accident_at_intersection,' + 
-		' accident_not_at_intersection	,' + 
-		' first_harmful_event_within_interchange	,' + 
-		' injury_involved,' + 
+		'accident_at_intersection,' + 
+		'accident_not_at_intersection	,' + 
+		'first_harmful_event_within_interchange	,' + 
+		'injury_involved,' + 
 		'Vendor_Code,' + 	
 		'Report_Property_Damage,' + 	
 		'Report_Collision_Type,' + 	
@@ -582,8 +583,11 @@ EXPORT fn_FL_Fiers_Extraction(STRING Pdate = (STRING) STD.Date.CurrentDate(TRUE)
 		'Posted_Satutory_Speed_Limit,' + 
 		'Dispatch_Date,' + 
 		'Drug_Involvement,' + 
-		'Alcohol_Involved,';
-												
+		'Alcohol_Involved,' + 
+		'Geo_Coded_Latitude,' + 
+		'Geo_Coded_Longitude,' + 
+		'Direction_Of_Impact,'; 
+						
   PersonHeader := 'Person_ID,' + 
 		'Creation_Date,' + 
 		'Incident_ID,' + 
@@ -711,30 +715,30 @@ EXPORT fn_FL_Fiers_Extraction(STRING Pdate = (STRING) STD.Date.CurrentDate(TRUE)
 		'Alcohol_Drug_Test_Result,' + 
 		'Law_Enforcement_Suspects_Alcohol_Use1,' + 
 		'Law_Enforcement_Suspects_Drug_Use1,' + 
-		'Solicitation	,' + 
-		'drivers_license_type	,' + 
+		'Solicitation,' +  
+		'drivers_license_type,' +  
 		'alcohol_test_type_refused,' + 	
-		'alcohol_test_type_not_offered	,' + 
+		'alcohol_test_type_not_offered,' +  
 		'alcohol_test_type_field,' + 	
-		'alcohol_test_type_pbt	,' + 
-		'alcohol_test_type_breath	,' + 
-		'alcohol_test_type_blood	,' + 
-		'alcohol_test_type_urine	,' + 
-		'trapped	,' + 
+		'alcohol_test_type_pbt,' +  
+		'alcohol_test_type_breath,' +  
+		'alcohol_test_type_blood,' +  
+		'alcohol_test_type_urine,' +  
+		'trapped,' +  
 		'dl_number_cdl_endorsements,' + 
-		'dl_number_cdl_restrictions	,' + 
-		'dl_number_cdl_exempt	,' + 
-		'dl_number_cdl_medical_card	,' + 
-		'interlock_device_in_use	,' + 
-		'drug_test_type_blood	,' + 
+		'dl_number_cdl_restrictions,' +  
+		'dl_number_cdl_exempt,' +  
+		'dl_number_cdl_medical_card,' +  
+		'interlock_device_in_use,' +  
+		'drug_test_type_blood,' +  
 		'drug_test_type_urine,' + 
 		'driver_distracted_by,' + 	
 		'non_motorist_type,' + 	
 		'seating_position_row,' + 	
-		'seating_position_seat	,' + 
+		'seating_position_seat,' +  
 		'seating_position_description,' + 	
 		'transported_id_number,' + 	
-		'witness_number	,' + 
+		'witness_number,' +  
 		'date_of_birth_derived,' + 
 		'Report_Injury_Status,' +  
 		'Address2,' + 
@@ -749,7 +753,8 @@ EXPORT fn_FL_Fiers_Extraction(STRING Pdate = (STRING) STD.Date.CurrentDate(TRUE)
 		'Pedalcyclist_Actions_At_Time_Of_Crash,' + 
 		'Passenger_Actions_At_Time_Of_Crash,' + 
 		'Dui_Suspected,' + 
-		'Drug_Test_Result,';
+		'Drug_Test_Result,' + 
+		'Marijuana_Use_Suspected,' ;
 		
 	CitationHeader := 'Citation_ID,' +
 		'Creation_Date,' +
@@ -773,11 +778,10 @@ EXPORT fn_FL_Fiers_Extraction(STRING Pdate = (STRING) STD.Date.CurrentDate(TRUE)
 		'Type_Hazardous,' +
 		'Type_Other,' +
 		'Citation_Status,' +
-		//PRtCC new fields
 		'Citation_Type,' +
 		'Violation_Code3,' +
 		'Violation_Code4,';
-												
+						
   SimpleLine := RECORD
 		STRING line;
 		END;
@@ -796,25 +800,21 @@ EXPORT fn_FL_Fiers_Extraction(STRING Pdate = (STRING) STD.Date.CurrentDate(TRUE)
 END;
 
 //Incident input file 
-	ds_incident_fl   :=	DATASET('~thor_data400::in::ecrash::incident_raw::flremoval'
-															,FLAccidents_Ecrash.Layout_Infiles.incident_new
-															,csv(terminator('\n'), separator('|'),quote('"'),maxlength(10000)))(Incident_ID != 'Incident_ID');                    
+ ds_incident_fl   :=	DATASET('~thor_data400::in::ecrash::incident_raw::flremoval'
+									           ,FLAccidents_Ecrash.Layout_Infiles.incident_new
+									           ,CSV(TERMINATOR('\n'), SEPARATOR('|'), QUOTE('"'), MAXLENGTH(10000)))(Incident_ID != 'Incident_ID');                    
 
- ds_incident      := DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::incidnt_raw_new'
-															,FLAccidents_Ecrash.Layout_Infiles.incident_new
-															,csv(terminator('\n'), separator(','),quote('"'),maxlength(60000)))(Incident_ID != 'Incident_ID');                  
+ ds_incident := DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::incidnt_raw_new'
+									     ,FLAccidents_Ecrash.Layout_Infiles.incident_new
+									     ,CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"'), MAXLENGTH(60000)))(Incident_ID != 'Incident_ID');                  
 
 	FLAccidents_Ecrash.Layout_Infiles.incident_new updateIncidents(ds_incident L, ds_incident_fl R) := TRANSFORM
 	  SELF := L;
 	END;
- rm_incidents := JOIN(DISTRIBUTE(ds_incident,HASH32(incident_id)),DISTRIBUTE(ds_incident_fl,HASH32(incident_id)),
-					left.incident_id = right.incident_id,
-					updateIncidents(left,right), inner, LOCAL);
-					
-  //Count Fiers Incidents
-	OUTPUT(COUNT(ds_incident_fl));
-  OUTPUT(COUNT(rm_incidents));
-					
+  rm_incidents := JOIN(DISTRIBUTE(ds_incident,HASH32(incident_id)),DISTRIBUTE(ds_incident_fl(TRIM(incident_id, LEFT, RIGHT) <> ''),HASH32(incident_id)),
+			                 left.incident_id = right.incident_id,
+			                 updateIncidents(left,right), inner, LOCAL);
+	
   SequencingRecSummary xformCtr_inc(rm_incidents L, INTEGER CTR) := TRANSFORM
 	   SELF.recid            	:= CTR;
 		 SELF.LINE             	:= TRIM('"' + TRIM(L.Incident_ID, LEFT, RIGHT) + '"' + ',' + 
@@ -1155,273 +1155,275 @@ END;
 	ExtractHeaderRec_inc  		:= DATASET([{0, IncidentHeader}], SequencingRecSummary);
 	FORMATTEDFINALA_inc 		  := BigLineFormatDespray(ExtractData_inc & ExtractHeaderRec_inc, 'FL_Ecrash_Fiv_Incident.csv');
 
-//Vehicle input file
-	ds_vehicle_fl := dataset('~thor_data400::in::ecrash::vehicle_raw::flremoval'
-													,FLAccidents_Ecrash.Layout_Infiles.vehicl_new
-													,csv(terminator('\n'), separator('|'),quote('"'),maxlength(50000)))(Vehicle_ID != 'Vehicle_ID');
+	//COUNTS
+	// OUTPUT(COUNT(ds_incident_fl), named('cnt_ds_incident_fl'));
+	// OUTPUT(COUNT(rm_incidents), named('cnt_rm_incidents'));
+	
+  //Vehicle input file
+	ds_vehicle_fl := DATASET('~thor_data400::in::ecrash::vehicle_raw::flremoval'
+							            ,FLAccidents_Ecrash.Layout_Infiles.vehicl_new
+							            ,CSV(TERMINATOR('\n'), SEPARATOR('|\t|'), QUOTE('"')))(Vehicle_ID != 'Vehicle_ID');
 
- ds_vehicle :=  dataset(Data_Services.foreign_prod+'thor_data400::in::ecrash::vehicl_raw'
-													,FLAccidents_Ecrash.Layout_Infiles.vehicl_new
-													,csv(terminator('\n'), separator(','),quote('"'),maxlength(50000)))(Vehicle_ID != 'Vehicle_ID');
+  ds_vehicle :=  DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::vehicl_raw'
+							          ,FLAccidents_Ecrash.Layout_Infiles.vehicl_new
+							          ,CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"'), MAXLENGTH(50000)))(Vehicle_ID != 'Vehicle_ID');
    
 	FLAccidents_Ecrash.Layout_Infiles.vehicl_new updateVehicles(ds_vehicle L, ds_vehicle_fl R) := TRANSFORM
 		SELF := L;
 	END;
- rm_vehciles := JOIN(DISTRIBUTE(ds_vehicle,HASH32(vehicle_id, incident_id)),DISTRIBUTE(ds_vehicle_fl,HASH32(vehicle_id, incident_id)),
-					left.vehicle_id = right.vehicle_id AND
-				  left.incident_id = right.incident_id,
-					updateVehicles(left,right), inner, LOCAL);
-					
-  //Count Fiers Incidents
-	OUTPUT(COUNT(ds_incident_fl));
-  OUTPUT(COUNT(rm_incidents));
+ rm_vehciles := JOIN(DISTRIBUTE(ds_vehicle,HASH32(vehicle_id, incident_id)),DISTRIBUTE(ds_vehicle_fl(TRIM(vehicle_id, LEFT, RIGHT) <> ''),HASH32(vehicle_id, incident_id)),
+			               LEFT.vehicle_id = RIGHT.vehicle_id AND
+		                 LEFT.incident_id = RIGHT.incident_id,
+			               updateVehicles(LEFT,RIGHT), INNER, LOCAL);
 
-SequencingRecSummary xformCtr_veh(rm_vehciles L, INTEGER CTR) := TRANSFORM
+ SequencingRecSummary xformCtr_veh(rm_vehciles L, INTEGER CTR) := TRANSFORM
 	   SELF.recid            	:= CTR;
-		 SELF.LINE             	:= TRIM(TRIM(L.Vehicle_ID, LEFT, RIGHT) + ',' +  
-		                                TRIM(L.Creation_Date, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Incident_ID, LEFT, RIGHT) + ',' + 
-																		TRIM(L.VIN, LEFT, RIGHT) + ',' + 	
-																		TRIM(L.VIN_Status, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Damaged_Areas_Derived1, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Damaged_Areas_Derived2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Airbags_Deployed_Derived, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Towed_Derived, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Unit_Type, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Unit_Number, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Registration_State, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Registration_Year, LEFT, RIGHT) + ',' + 
-																		TRIM(L.License_Plate, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Make, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Model_Yr, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Model, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Body_Type_Category, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Total_Occupants_in_Vehicle, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Special_Function_in_Transport, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Special_Function_in_Transport_Other_Unit, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Emergency_Use, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Posted_Satutory_Speed_Limit, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Direction_of_Travel_Before_Crash, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Trafficway_Description, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Traffic_Control_Device_Type, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Maneuver_Action_Prior1, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Maneuver_Action_Prior2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Impact_Area1, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Impact_Area2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Event_Sequence1, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Event_Sequence2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Event_Sequence3, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Event_Sequence4, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Most_Harmful_Event_for_Vehicle, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Bus_Use, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Hit_and_Run, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Towed, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Contributing_Circumstances_v1, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Contributing_Circumstances_v2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Contributing_Circumstances_v3, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Contributing_Circumstances_v4, LEFT, RIGHT) + ',' + 
-																		TRIM(L.On_Street, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Color, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Estimated_Speed, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Car_Fire, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Damage_Amount, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Contributing_Factors1, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Contributing_Factors2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Contributing_Factors3, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Contributing_Factors4, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Other_Contributing_Factors1, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Other_Contributing_Factors2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Other_Contributing_Factors3, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vision_Obscured1, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vision_Obscured2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_on_Road, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Ran_Off_Road, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Skidding_Occurred, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Incident_Location1, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Incident_Location2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Incident_Location3, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Disabled, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Removed_To, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Removed_By, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Tow_Requested_by_Driver, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Solicitation, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Other_Unit_Vehicle_Damage_Amount, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Other_Unit_Model_Year, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Other_Unit_Make, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Other_Unit_Model, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Other_Unit_VIN, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Other_Unit_VIN_Status, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Other_Unit_Body_Type_Category, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Other_Unit_Registration_State, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Other_Unit_Registration_Year, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Other_Unit_License_Plate, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Other_Unit_Color, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Other_Unit_Type, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Damaged_Areas1, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Damaged_Areas2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Parked_Vehicle, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Damage_Rating1, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Damage_Rating2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Inventoried, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Defect_Apparent, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Defect_May_Have_Contributed1, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Defect_May_Have_Contributed2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Registration_Expiration, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Owner_Driver_Type, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Make_Code, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Number_Trailing_Units, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Position, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Type, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Motorcycle_Engine_Size, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Motorcycle_Driver_Educated, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Motorcycle_Helmet_Type, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Motorcycle_Passenger, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Motorcycle_Helmet_Stayed_On, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Motorcycle_Helmet_DOT_Snell, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Motorcycle_Saddlebag_Trunk, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Motorcycle_Trailer, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Pedacycle_Passenger, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Pedacycle_Headlights, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Pedacycle_Helmet, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Pedacycle_Rear_Reflectors, LEFT, RIGHT) + ',' + 
-																		TRIM(L.CDL_Required, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Truck_Bus_Supplement_Required, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Unit_Damage_Amount, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Airbag_Switch, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Underride_Override_Damage, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Attachment, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Action_on_Impact, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Speed_Detection_Method, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Non_Motorist_Direction_of_Travel_From, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Non_Motorist_Direction_of_Travel_To, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Use, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Department_Unit_Number, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Equipment_in_Use_at_Time_of_Accident, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Actions_of_Police_Vehicle, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Command_ID, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Traffic_Control_Device_Inoperative, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Direction_of_Impact1, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Direction_of_Impact2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Ran_Off_Road_Direction, LEFT, RIGHT) + ',' + 
-																		TRIM(L.VIN_Other_Unit_Number, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Damaged_Area_Generic, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vision_Obscured_Description, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Inattention_Description, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Contributing_Circumstances_Defect_Description, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Contributing_Circumstances_Other_Descriptioin, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Maneuver_Action_Prior_Other_Description, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Special_Use, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Type_Extended1, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Type_Extended2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Fixed_Object_Direction1, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Fixed_Object_Direction2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Fixed_Object_Direction3, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Fixed_Object_Direction4, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Left_at_Scene, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Impounded, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Vehicle_Driven_From_Scene, LEFT, RIGHT) + ',' + 
-																		TRIM(L.On_Cross_Street, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Actions_of_Police_Vehicle_Description, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Avoidance_Maneuver, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Insurance_Expiration_Date, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Insurance_Policy_Number, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Insurance_Company, LEFT, RIGHT) + ',' + 
-																		TRIM(L.avoidance_maneuver2, LEFT, RIGHT) + ',' + 
-																		TRIM(L. avoidance_maneuver3, LEFT, RIGHT) + ',' + 
-																		TRIM(L. avoidance_maneuver4, LEFT, RIGHT) + ',' + 
-																		TRIM(L. damaged_areas_severity1 , LEFT, RIGHT) + ',' + 
-																		TRIM(L. damaged_areas_severity2 , LEFT, RIGHT) + ',' + 
-																		TRIM(L. vehicle_outside_city_indicator, LEFT, RIGHT) + ',' + 
-																		TRIM(L. vehicle_outside_city_distance_miles , LEFT, RIGHT) + ',' + 
-																		TRIM(L. vehicle_outside_city_direction, LEFT, RIGHT) + ',' + 
-																		TRIM(L. vehicle_crash_cityplace, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Insurance_Company_Standardized, LEFT, RIGHT) + ',' +  
-																		TRIM(L.Insurance_Company_Phone_Number, LEFT, RIGHT) + ',' +  
-																		TRIM(L.Insurance_Effective_Date, LEFT, RIGHT) + ',' +  
-																		TRIM(L.Proof_of_Insurance, LEFT, RIGHT) + ',' +  
-																		TRIM(L.Insurance_Expired, LEFT, RIGHT) + ',' +  
-																		TRIM(L.Insurance_Exempt, LEFT, RIGHT) + ',' +  
-																		TRIM(L.Insurance_Type, LEFT, RIGHT) + ',' +  
-																		TRIM(L.Insurance_Company_Code, LEFT, RIGHT) + ',' +  
-																		TRIM(L.Insurance_Policy_Holder, LEFT, RIGHT) + ',' +  
-																		TRIM(L.Is_Tag_Converted, LEFT, RIGHT) + ',' +  
-																		TRIM(L.VIN_Original , LEFT, RIGHT) + ',' +  
-																		TRIM(L.Make_Original , LEFT, RIGHT) + ',' +  
-																		TRIM(L.Model_Original , LEFT, RIGHT) + ',' +  
-																		TRIM(L.Model_Year_Original , LEFT, RIGHT) + ',' +  
-																		TRIM(L.Other_Unit_VIN_Original , LEFT, RIGHT) + ',' +  
-																		TRIM(L.Other_Unit_Make_Original , LEFT, RIGHT) + ',' +  
-																		TRIM(L.Other_Unit_Model_Original , LEFT, RIGHT) + ',' +  
-																		TRIM(L.Other_Unit_Model_Year_Original, LEFT, RIGHT) + ',' +  
-																		TRIM(L.initial_point_of_contact	, LEFT, RIGHT) + ',' + 
-																		TRIM(L.vehicle_driveable, LEFT, RIGHT) + ',' + 
-																		TRIM(L.commercial_vehicle, LEFT, RIGHT) + ',' + 
-																		TRIM(L.number_of_lanes, LEFT, RIGHT) + ',' + 
-																		TRIM(L.divided_highway, LEFT, RIGHT) + ',' + 
-																		TRIM(L.not_in_transport, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_number, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_length, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_axles, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_plate_expiration, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_permanent_registration, LEFT, RIGHT) + ',' + 	
-																		TRIM(L.other_unit_model_year2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_make2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_vin2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_registration_state2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_registration_year2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_license_plate2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_number2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_length2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_axles2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_plate_expiration2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_permanent_registration2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_type2, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_model_year3, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_make3	, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_vin3, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_registration_state3, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_registration_year3, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_license_plate3, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_number3, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_length3, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_axles3, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_plate_expiration3, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_permanent_registration3, LEFT, RIGHT) + ',' + 
-																		TRIM(L.other_unit_type3, LEFT, RIGHT) + ',' + 
-																		TRIM(L.damaged_areas3, LEFT, RIGHT) + ',' + 
-																		TRIM(L.speed_limit_posted, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Report_Damage_Extent, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Report_Vehicle_Type, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Report_Traffic_Control_Device_Type, LEFT, RIGHT) + ',' + 	
-																		TRIM(L.Report_Contributing_Circumstances_v, LEFT, RIGHT) + ',' + 	
-																		TRIM(L.Report_Vehicle_Maneuver_Action_Prior, LEFT, RIGHT) + ',' + 	
-																		TRIM(L.Report_Vehicle_Body_Type, LEFT, RIGHT) + ',' + 
-																		TRIM(L.Report_Road_Condition, LEFT, RIGHT)
-																, LEFT, RIGHT); 
-	END;
+		 SELF.LINE             	:= TRIM('"' + TRIM(L.Vehicle_ID, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Creation_Date, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Incident_ID, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.VIN, LEFT, RIGHT) + '"' + ',' +	
+			'"' + TRIM(L.VIN_Status, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Damaged_Areas_Derived1, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Damaged_Areas_Derived2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Airbags_Deployed_Derived, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Towed_Derived, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Unit_Type, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Unit_Number, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Registration_State, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Registration_Year, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.License_Plate, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Make, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Model_Yr, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Model, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Body_Type_Category, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Total_Occupants_in_Vehicle, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Special_Function_in_Transport, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Special_Function_in_Transport_Other_Unit, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Emergency_Use, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Posted_Satutory_Speed_Limit, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Direction_of_Travel_Before_Crash, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Trafficway_Description, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Traffic_Control_Device_Type, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Maneuver_Action_Prior1, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Maneuver_Action_Prior2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Impact_Area1, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Impact_Area2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Event_Sequence1, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Event_Sequence2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Event_Sequence3, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Event_Sequence4, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Most_Harmful_Event_for_Vehicle, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Bus_Use, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Hit_and_Run, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Towed, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Contributing_Circumstances_v1, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Contributing_Circumstances_v2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Contributing_Circumstances_v3, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Contributing_Circumstances_v4, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.On_Street, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Color, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Estimated_Speed, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Car_Fire, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Damage_Amount, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Contributing_Factors1, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Contributing_Factors2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Contributing_Factors3, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Contributing_Factors4, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Other_Contributing_Factors1, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Other_Contributing_Factors2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Other_Contributing_Factors3, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vision_Obscured1, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vision_Obscured2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_on_Road, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Ran_Off_Road, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Skidding_Occurred, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Incident_Location1, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Incident_Location2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Incident_Location3, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Disabled, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Removed_To, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Removed_By, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Tow_Requested_by_Driver, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Solicitation, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Other_Unit_Vehicle_Damage_Amount, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Other_Unit_Model_Year, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Other_Unit_Make, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Other_Unit_Model, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Other_Unit_VIN, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Other_Unit_VIN_Status, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Other_Unit_Body_Type_Category, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Other_Unit_Registration_State, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Other_Unit_Registration_Year, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Other_Unit_License_Plate, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Other_Unit_Color, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Other_Unit_Type, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Damaged_Areas1, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Damaged_Areas2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Parked_Vehicle, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Damage_Rating1, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Damage_Rating2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Inventoried, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Defect_Apparent, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Defect_May_Have_Contributed1, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Defect_May_Have_Contributed2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Registration_Expiration, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Owner_Driver_Type, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Make_Code, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Number_Trailing_Units, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Position, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Type, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Motorcycle_Engine_Size, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Motorcycle_Driver_Educated, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Motorcycle_Helmet_Type, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Motorcycle_Passenger, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Motorcycle_Helmet_Stayed_On, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Motorcycle_Helmet_DOT_Snell, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Motorcycle_Saddlebag_Trunk, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Motorcycle_Trailer, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Pedacycle_Passenger, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Pedacycle_Headlights, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Pedacycle_Helmet, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Pedacycle_Rear_Reflectors, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.CDL_Required, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Truck_Bus_Supplement_Required, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Unit_Damage_Amount, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Airbag_Switch, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Underride_Override_Damage, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Attachment, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Action_on_Impact, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Speed_Detection_Method, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Non_Motorist_Direction_of_Travel_From, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Non_Motorist_Direction_of_Travel_To, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Use, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Department_Unit_Number, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Equipment_in_Use_at_Time_of_Accident, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Actions_of_Police_Vehicle, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Command_ID, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Traffic_Control_Device_Inoperative, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Direction_of_Impact1, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Direction_of_Impact2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Ran_Off_Road_Direction, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.VIN_Other_Unit_Number, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Damaged_Area_Generic, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vision_Obscured_Description, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Inattention_Description, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Contributing_Circumstances_Defect_Description, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Contributing_Circumstances_Other_Descriptioin, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Maneuver_Action_Prior_Other_Description, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Special_Use, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Type_Extended1, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Type_Extended2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Fixed_Object_Direction1, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Fixed_Object_Direction2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Fixed_Object_Direction3, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Fixed_Object_Direction4, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Left_at_Scene, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Impounded, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Vehicle_Driven_From_Scene, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.On_Cross_Street, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Actions_of_Police_Vehicle_Description, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Avoidance_Maneuver, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Insurance_Expiration_Date, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Insurance_Policy_Number, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Insurance_Company, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.avoidance_maneuver2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.avoidance_maneuver3, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.avoidance_maneuver4, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.damaged_areas_severity1, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.damaged_areas_severity2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.vehicle_outside_city_indicator, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.vehicle_outside_city_distance_miles, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.vehicle_outside_city_direction, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.vehicle_crash_cityplace, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Insurance_Company_Standardized, LEFT, RIGHT) + '"' + ',' + 
+			'"' + TRIM(L.Insurance_Company_Phone_Number, LEFT, RIGHT) + '"' + ',' + 
+			'"' + TRIM(L.Insurance_Effective_Date, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Proof_of_Insurance, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Insurance_Expired, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Insurance_Exempt, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Insurance_Type, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Insurance_Company_Code, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Insurance_Policy_Holder, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Is_Tag_Converted, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.VIN_Original, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Make_Original, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Model_Original, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Model_Year_Original, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Other_Unit_VIN_Original, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Other_Unit_Make_Original, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Other_Unit_Model_Original, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Other_Unit_Model_Year_Original, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.initial_point_of_contact, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.vehicle_driveable, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.commercial_vehicle, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.number_of_lanes, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.divided_highway, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.not_in_transport, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_number, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_length, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_axles, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_plate_expiration, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_permanent_registration, LEFT, RIGHT) + '"' + ',' +	
+			'"' + TRIM(L.other_unit_model_year2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_make2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_vin2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_registration_state2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_registration_year2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_license_plate2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_number2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_length2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_axles2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_plate_expiration2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_permanent_registration2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_type2, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_model_year3, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_make3, LEFT, RIGHT) + '"' + ',' + 
+			'"' + TRIM(L.other_unit_vin3, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_registration_state3, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_registration_year3, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_license_plate3, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_number3, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_length3, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_axles3, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_plate_expiration3, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_permanent_registration3, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.other_unit_type3, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.damaged_areas3, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.speed_limit_posted, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Report_Damage_Extent, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Report_Vehicle_Type, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Report_Traffic_Control_Device_Type, LEFT, RIGHT) + '"' + ',' +	
+			'"' + TRIM(L.Report_Contributing_Circumstances_v, LEFT, RIGHT) + '"' + ',' +	
+			'"' + TRIM(L.Report_Vehicle_Maneuver_Action_Prior, LEFT, RIGHT) + '"' + ',' +	
+			'"' + TRIM(L.Report_Vehicle_Body_Type, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Report_Road_Condition, LEFT, RIGHT) + '"' + ',' +
+			'"' + TRIM(L.Event_Sequence, LEFT, RIGHT) + '"', LEFT, RIGHT); 
+  END;
 	ExtractData_veh           := PROJECT(rm_vehciles, xformCtr_veh(LEFT, COUNTER));
 	ExtractHeaderRec_veh  		:= DATASET([{0, VehicleHeader}], SequencingRecSummary);
 	FORMATTEDFINALA_veh 		  := BigLineFormatDespray(ExtractData_veh & ExtractHeaderRec_veh, 'FL_Ecrash_Fiv_Vehicle.csv');
 	
+	//COUNTS
+	// OUTPUT(COUNT(ds_vehicle_fl), named('cnt_ds_vehicle_fl'));
+	// OUTPUT(COUNT(rm_vehciles), named('cnt_rm_vehciles'));
+	
 	//Person input file
- 
-	ds_person_fl :=	dataset('~thor_data400::in::ecrash::person_raw::flremoval'
-													,FLAccidents_Ecrash.Layout_Infiles.persn_new
-													,csv(terminator('\n'), separator('|'),quote('"'),escape('\r'),maxlength(3000000)))(Person_ID != 'Person_ID');
+  ds_person_fl :=	DATASET('~thor_data400::in::ecrash::person_raw::flremoval'
+							           ,FLAccidents_Ecrash.Layout_Infiles.persn_new
+							           ,CSV(TERMINATOR('\n'), SEPARATOR('|\t|'), QUOTE('"')))(Person_ID != 'Person_ID');
                     
- ds_person := DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::persn_raw'
-													,FLAccidents_Ecrash.Layout_Infiles.persn_new
-													,csv(terminator('\n'), separator(','),quote('"'),escape('\r'),maxlength(3000000)))(Person_ID != 'Person_ID');
+  ds_person := DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::persn_raw'
+							        ,FLAccidents_Ecrash.Layout_Infiles.persn_new
+							        ,csv(terminator('\n'), SEPARATOR(','), QUOTE('"'), ESCAPE('\r'), MAXLENGTH(3000000)))(Person_ID != 'Person_ID');
                     
 	FLAccidents_Ecrash.Layout_Infiles.persn_new updatePersons(ds_person L, ds_person_fl R) := TRANSFORM
 	  SELF := L;
 	END;
- rm_persons := JOIN(DISTRIBUTE(ds_person,HASH32(person_id, incident_id)),DISTRIBUTE(ds_person_fl,HASH32(person_id, incident_id)),
-					left.person_id = right.person_id AND
-				  left.incident_id = right.incident_id,
-					updatePersons(left,right), inner, LOCAL);
-					
-
+  rm_persons := JOIN(DISTRIBUTE(ds_person,HASH32(person_id, incident_id)),DISTRIBUTE(ds_person_fl(TRIM(person_id, LEFT, RIGHT) <> ''),HASH32(person_id, incident_id)),
+			               LEFT.person_id = RIGHT.person_id AND
+		                 LEFT.incident_id = RIGHT.incident_id,
+			               updatePersons(LEFT,RIGHT), INNER, LOCAL);
+	
   SequencingRecSummary xformCtr_per(rm_persons L, INTEGER CTR) := TRANSFORM
 	   SELF.recid            	:= CTR;
 		 SELF.LINE             	:= TRIM('"' + TRIM(L.Person_ID , LEFT, RIGHT) + '"' + ',' +
@@ -1594,24 +1596,27 @@ SequencingRecSummary xformCtr_veh(rm_vehciles L, INTEGER CTR) := TRANSFORM
 	ExtractData_per           := PROJECT(rm_persons, xformCtr_per(LEFT, COUNTER));
 	ExtractHeaderRec_per  		:= DATASET([{0, PersonHeader}], SequencingRecSummary);
 	FORMATTEDFINALA_per 		  := BigLineFormatDespray(ExtractData_per & ExtractHeaderRec_per, 'FL_Ecrash_Fiv_Person.csv');
-	
-		
+
+	//COUNTS
+	// OUTPUT(COUNT(ds_person_fl), named('cnt_ds_person_fl'));
+	// OUTPUT(COUNT(rm_persons), named('cnt_rm_persons'));
+
 	//Citation input file
- ds_citation_fl := dataset('~thor_data400::in::ecrash::citation_raw::flremoval'
+  ds_citation_fl := DATASET('~thor_data400::in::ecrash::citation_raw::flremoval'
 													 ,FLAccidents_Ecrash.Layout_Infiles.citation
-													 ,csv(terminator('\n'), separator('|'),quote('"')))(Citation_ID != 'Citation_ID'); 												
-																
- ds_citation := dataset(Data_Services.foreign_prod+'thor_data400::in::ecrash::citatn_raw'
-													 ,FLAccidents_Ecrash.Layout_Infiles.citation
-													 ,csv(terminator('\n'), separator(','),quote('"')))(Citation_ID != 'Citation_ID'); 												
-																
+													 ,CSV(TERMINATOR('\n'), SEPARATOR('|\t|'), QUOTE('"')))(Citation_ID != 'Citation_ID'); 						
+								
+  ds_citation := DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::citatn_raw'
+							          ,FLAccidents_Ecrash.Layout_Infiles.citation
+							          ,CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"')))(Citation_ID != 'Citation_ID'); 						
+								
 	FLAccidents_Ecrash.Layout_Infiles.citation updateCitation(ds_citation L, ds_citation_fl R) := TRANSFORM
 		SELF := L;
 	END;
- rm_citation := JOIN(DISTRIBUTE(ds_citation,HASH32(citation_id, incident_id)),DISTRIBUTE(ds_citation_fl,HASH32(citation_id, incident_id)),
-					left.citation_id = right.citation_id AND
-				  left.incident_id = right.incident_id,
-					updateCitation(left,right), inner, LOCAL);
+  rm_citation := JOIN(DISTRIBUTE(ds_citation,HASH32(citation_id, incident_id)),DISTRIBUTE(ds_citation_fl(TRIM(citation_id, LEFT, RIGHT) <> ''),HASH32(citation_id, incident_id)),
+			                LEFT.citation_id = RIGHT.citation_id AND
+		                  LEFT.incident_id = RIGHT.incident_id,
+			                updateCitation(LEFT,RIGHT), INNER, LOCAL);
 
   SequencingRecSummary xformCtr_cit(rm_citation L, INTEGER CTR) := TRANSFORM
 	   SELF.recid            	:= CTR;
@@ -1644,8 +1649,13 @@ SequencingRecSummary xformCtr_veh(rm_vehciles L, INTEGER CTR) := TRANSFORM
 	ExtractData_cit           := PROJECT(rm_citation, xformCtr_cit(LEFT, COUNTER));
 	ExtractHeaderRec_cit  		:= DATASET([{0, CitationHeader}], SequencingRecSummary);
 	FORMATTEDFINALA_cit 		  := BigLineFormatDespray(ExtractData_cit & ExtractHeaderRec_cit, 'FL_Ecrash_Fiv_Citation.csv');
+ 
+  //COUNTS
+	// OUTPUT(COUNT(ds_citation_fl), named('cnt_ds_citation_fl'));
+	// OUTPUT(COUNT(rm_citation), named('cnt_rm_citation'));
+
 	
-	Write_Output_Files := SEQUENTIAL(FORMATTEDFINALA_inc, FORMATTEDFINALA_per, FORMATTEDFINALA_veh,FORMATTEDFINALA_cit); 
+	Write_Output_Files := SEQUENTIAL(FORMATTEDFINALA_inc, FORMATTEDFINALA_veh, FORMATTEDFINALA_cit, FORMATTEDFINALA_per); 
 	
  RETURN Write_Output_Files;
 END;

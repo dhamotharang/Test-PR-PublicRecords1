@@ -126,7 +126,7 @@ RulesResult := JOIN(EventStatsPrep(Value != ''), SORT(MyRules, field, -customeri
                             SELF.EntityType := RIGHT.EntityType,
                             SELF.Description := RIGHT.Description,
                             SELF.Default := (INTEGER1)(RIGHT.customerid = 0),
-                            SELF := LEFT), MANY LOOKUP, LEFT OUTER)(RiskLevel>0);// : PERSIST('~temp::deleteme41');
+                            SELF := LEFT), MANY LOOKUP, LEFT OUTER)(RiskLevel>0);// : PERSIST('~fraudgov::temp::deleteme41');
 
 //output(RulesResult(entitycontextuid = '_1194033204'), all, named('RulesResult'));
 
@@ -394,7 +394,7 @@ END;
 NonEntities := ['12638153115695167395', '14695981039346656037','12638153115695167395','','0000000000','4233676119','4073047705','']; 
 
 SHARED PivotToEntities :=
-            NORMALIZE(InputWithRules,8,NormIt(LEFT,COUNTER))(label != '' AND entitycontextuid[4..] NOT IN NonEntities) : PERSIST('~temp::fraudgov::temp::eventpivot'); // exclude entities that didn't exist on the transaction.
+            NORMALIZE(InputWithRules,8,NormIt(LEFT,COUNTER))(label != '' AND entitycontextuid[4..] NOT IN NonEntities) : PERSIST('~fraudgov::temp::fraudgov::temp::eventpivot'); // exclude entities that didn't exist on the transaction.
 
 
 SHARED ProfileRowsPrep := PROJECT(PivotToEntities,
@@ -501,7 +501,7 @@ SHARED PivotWithHistoricalCurrentFlags := JOIN(PivotToEntitiesWithHRICounts, dDe
   self.aothiidcurrprofusngcntev := MAP(LEFT.aothiidcurrprofusngcntev < 0 => 0, LEFT.aothiidcurrprofusngcntev), // Doing this here so that we can use the EXPORT with the special values for modeling validation.
   SELF.isCurrent := IF(RIGHT.entitycontextuid <> '', RIGHT.idislasteventid, 0),
   SELF.isHistorical := IF(RIGHT.entitycontextuid <> '', IF((BOOLEAN)RIGHT.idislasteventid, 0, 1), 0);
-  SELF := LEFT), LEFT OUTER, HASH);
+  SELF := LEFT), LEFT OUTER, HASH) : PERSIST('~fraudgov::temp::PivotWithHistoricalCurrentFlags', EXPIRE(2));
 
 // Transform the rules so that we have identity/element entity context uid with the rules at the last transaction that triggered 
 // So one per entity.
@@ -510,10 +510,8 @@ SHARED LastRulesForEntities := JOIN(PivotWithHistoricalCurrentFlags(AotCurrProfF
                           LEFT.customerid=RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype AND ('_11' + LEFT.recordid) = RIGHT.entitycontextuid AND LEFT.entitytype=RIGHT.entitytype, 
                           TRANSFORM(RECORDOF(RIGHT) AND NOT [entitytype], SELF.entitycontextuid := LEFT.entitycontextuid, SELF := RIGHT), HASH);
                                                     
-//output(PivotClean,,'~gov::otto::eventpivot', overwrite, compressed);    
 EXPORT EventPivotShell := PivotWithHistoricalCurrentFlags;
                                  
-//output(LastRulesForEntities,,'~gov::otto::entityrules', overwrite, compressed);
 EXPORT EntityProfileRules := LastRulesForEntities;
 
 END;

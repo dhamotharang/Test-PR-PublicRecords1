@@ -853,5 +853,5 @@ EXPORT B_Bank_Account_4 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ENH_Bank_Account_4 := PROJECT(__EE234874,TRANSFORM(__ST92808_Layout,SELF.Kr_Last_Event_Date_ := LEFT.M_A_X___Event_Date__1_,SELF := LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Bank_Account::Annotated_4',EXPIRE(7));
+  EXPORT __ENH_Bank_Account_4 := PROJECT(__EE234874,TRANSFORM(__ST92808_Layout,SELF.Kr_Last_Event_Date_ := LEFT.M_A_X___Event_Date__1_,SELF := LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Bank_Account::Annotated_4',EXPIRE(7));
 END;
