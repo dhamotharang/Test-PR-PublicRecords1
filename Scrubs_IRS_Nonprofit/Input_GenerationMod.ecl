@@ -3,7 +3,7 @@ IMPORT SALT311;
 EXPORT Input_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.11.8';
+  EXPORT salt_VERSION := 'V3.11.11';
   EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
@@ -45,10 +45,10 @@ EXPORT Input_GenerationMod := MODULE(SALT311.iGenerationMod)
     + '//-------------------------\n'
     + '//FIELDTYPE DEFINITIONS\n'
     + '//-------------------------\n'
-    + 'FIELDTYPE:invalid_emp_id:CUSTOM(Scrubs_IRS_Nonprofit.Functions.fn_numeric >0)\n'
-    + 'FIELDTYPE:invalid_primary_name:CUSTOM(Scrubs_IRS_Nonprofit.Functions.fn_chk_name >0)\n'
+    + 'FIELDTYPE:invalid_emp_id:CUSTOM(Scrubs.Functions.fn_numeric >0)\n'
+    + 'FIELDTYPE:invalid_primary_name:LENGTHS(1..):CUSTOM(Scrubs.Functions.fn_ASCII_printable >0)\n'
     + 'FIELDTYPE:invalid_address:CUSTOM(Scrubs_IRS_Nonprofit.Functions.fn_invalid_addr >0)\n'
-    + 'FIELDTYPE:invalid_city:CUSTOM(Scrubs_IRS_Nonprofit.Functions.fn_chk_city >0)\n'
+    + 'FIELDTYPE:invalid_city:CUSTOM(Scrubs.Functions.fn_ASCII_printable >0)\n'
     + 'FIELDTYPE:invalid_state:CUSTOM(Scrubs.Functions.fn_Valid_StateAbbrev>0)\n'
     + 'FIELDTYPE:invalid_zip:CUSTOM(Scrubs_IRS_Nonprofit.Functions.fn_verify_full_zip >0)\n'
     + 'FIELDTYPE:invalid_date:CUSTOM(Scrubs_IRS_Nonprofit.Functions.fn_invalid_date>0)\n'
@@ -65,7 +65,7 @@ EXPORT Input_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:invalid_req_p1_cd:CUSTOM(Scrubs_IRS_Nonprofit.Functions.fn_fil_req_pt1_code>0)\n'
     + 'FIELDTYPE:invalid_req_p2_cd:CUSTOM(Scrubs_IRS_Nonprofit.Functions.fn_fil_req_pt2_code>0)\n'
     + 'FIELDTYPE:invalid_acct_period:CUSTOM(Scrubs_IRS_Nonprofit.Functions.fn_acct_period_code>0)\n'
-    + 'FIELDTYPE:invalid_asset_amt:CUSTOM(Scrubs_IRS_Nonprofit.Functions.fn_valid_amount>0)\n'
+    + 'FIELDTYPE:invalid_asset_amt:CUSTOM(Scrubs.Functions.fn_numeric_optional>0)\n'
     + 'FIELDTYPE:invalid_form990_amt:CUSTOM(Scrubs_IRS_Nonprofit.Functions.fn_valid_form990_amt>0)\n'
     + 'FIELDTYPE:invalid_natl_tax_cd:CUSTOM(Scrubs_IRS_Nonprofit.Functions.fn_valid_natl_tax_exempt_code>0)\n'
     + '//--------------------------------------------------------------- \n'

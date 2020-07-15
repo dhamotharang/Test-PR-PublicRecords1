@@ -1,10 +1,10 @@
 ﻿IMPORT SALT311,STD;
-IMPORT Scrubs_IRS_Nonprofit,Scrubs; // Import modules for FieldTypes attribute definitions
+IMPORT Scrubs,Scrubs_IRS_Nonprofit; // Import modules for FieldTypes attribute definitions
 EXPORT Input_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 23;
-  EXPORT NumRulesFromFieldType := 23;
+  EXPORT NumRules := 24;
+  EXPORT NumRulesFromFieldType := 24;
   EXPORT NumRulesFromRecordType := 0;
   EXPORT NumFieldsWithRules := 23;
   EXPORT NumFieldsWithPossibleEdits := 0;
@@ -37,6 +37,71 @@ EXPORT Input_Scrubs := MODULE
   EXPORT  Bitmap_Layout := RECORD(Input_Layout_IRS_Nonprofit)
     UNSIGNED8 ScrubsBits1;
   END;
+  EXPORT Rule_Layout := RECORD(Input_Layout_IRS_Nonprofit)
+    STRING Rules {MAXLENGTH(1000)};
+  END;
+  SHARED toRuleDesc(UNSIGNED c) := CHOOSE(c
+          ,'employer_id_number:invalid_emp_id:CUSTOM'
+          ,'primary_name_of_organization:invalid_primary_name:CUSTOM','primary_name_of_organization:invalid_primary_name:LENGTHS'
+          ,'street_address:invalid_address:CUSTOM'
+          ,'city:invalid_city:CUSTOM'
+          ,'state:invalid_state:CUSTOM'
+          ,'zip_code:invalid_zip:CUSTOM'
+          ,'group_exemption_number:invalid_grp_nbr:CUSTOM'
+          ,'subsection_code:invalid_subsect_cd:CUSTOM'
+          ,'affiliation_code:invalid_affilatn_cd:CUSTOM'
+          ,'classification_code:invalid_class_cd:CUSTOM'
+          ,'ruling_date:invalid_date:CUSTOM'
+          ,'deductibility_code:invalid_dedct_cd:CUSTOM'
+          ,'foundation_code:invalid_foundatn_cd:CUSTOM'
+          ,'activity_codes:invalid_activity_cd:CUSTOM'
+          ,'organization_code:invalid_org_cd:CUSTOM'
+          ,'exempt_org_status_code:invalid_org_exmp_cd:CUSTOM'
+          ,'asset_code:invalid_asset_cd:CUSTOM'
+          ,'filing_requirement_code_part1:invalid_req_p1_cd:CUSTOM'
+          ,'filing_requirement_code_part2:invalid_req_p2_cd:CUSTOM'
+          ,'accounting_period:invalid_acct_period:CUSTOM'
+          ,'asset_amount:invalid_asset_amt:CUSTOM'
+          ,'form_990_revenue_amount:invalid_form990_amt:CUSTOM'
+          ,'national_taxonomy_exempt:invalid_natl_tax_cd:CUSTOM'
+          ,'field:Number_Errored_Fields:SUMMARY'
+          ,'field:Number_Perfect_Fields:SUMMARY'
+          ,'rule:Number_Errored_Rules:SUMMARY'
+          ,'rule:Number_Perfect_Rules:SUMMARY'
+          ,'rule:Number_OnFail_Rules:SUMMARY'
+          ,'record:Number_Errored_Records:SUMMARY'
+          ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
+  SHARED toErrorMessage(UNSIGNED c) := CHOOSE(c
+          ,Input_Fields.InvalidMessage_employer_id_number(1)
+          ,Input_Fields.InvalidMessage_primary_name_of_organization(1),Input_Fields.InvalidMessage_primary_name_of_organization(2)
+          ,Input_Fields.InvalidMessage_street_address(1)
+          ,Input_Fields.InvalidMessage_city(1)
+          ,Input_Fields.InvalidMessage_state(1)
+          ,Input_Fields.InvalidMessage_zip_code(1)
+          ,Input_Fields.InvalidMessage_group_exemption_number(1)
+          ,Input_Fields.InvalidMessage_subsection_code(1)
+          ,Input_Fields.InvalidMessage_affiliation_code(1)
+          ,Input_Fields.InvalidMessage_classification_code(1)
+          ,Input_Fields.InvalidMessage_ruling_date(1)
+          ,Input_Fields.InvalidMessage_deductibility_code(1)
+          ,Input_Fields.InvalidMessage_foundation_code(1)
+          ,Input_Fields.InvalidMessage_activity_codes(1)
+          ,Input_Fields.InvalidMessage_organization_code(1)
+          ,Input_Fields.InvalidMessage_exempt_org_status_code(1)
+          ,Input_Fields.InvalidMessage_asset_code(1)
+          ,Input_Fields.InvalidMessage_filing_requirement_code_part1(1)
+          ,Input_Fields.InvalidMessage_filing_requirement_code_part2(1)
+          ,Input_Fields.InvalidMessage_accounting_period(1)
+          ,Input_Fields.InvalidMessage_asset_amount(1)
+          ,Input_Fields.InvalidMessage_form_990_revenue_amount(1)
+          ,Input_Fields.InvalidMessage_national_taxonomy_exempt(1)
+          ,'Fields with errors'
+          ,'Fields without errors'
+          ,'Rules with errors'
+          ,'Rules without errors'
+          ,'Rules with possible edits'
+          ,'Records with at least one error'
+          ,'Records without errors','UNKNOWN');
 EXPORT FromNone(DATASET(Input_Layout_IRS_Nonprofit) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
     SELF.employer_id_number_Invalid := Input_Fields.InValid_employer_id_number((SALT311.StrType)le.employer_id_number);
@@ -67,38 +132,51 @@ EXPORT FromNone(DATASET(Input_Layout_IRS_Nonprofit) h) := MODULE
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Input_Layout_IRS_Nonprofit);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.employer_id_number_Invalid << 0 ) + ( le.primary_name_of_organization_Invalid << 1 ) + ( le.street_address_Invalid << 2 ) + ( le.city_Invalid << 3 ) + ( le.state_Invalid << 4 ) + ( le.zip_code_Invalid << 5 ) + ( le.group_exemption_number_Invalid << 6 ) + ( le.subsection_code_Invalid << 7 ) + ( le.affiliation_code_Invalid << 8 ) + ( le.classification_code_Invalid << 9 ) + ( le.ruling_date_Invalid << 10 ) + ( le.deductibility_code_Invalid << 11 ) + ( le.foundation_code_Invalid << 12 ) + ( le.activity_codes_Invalid << 13 ) + ( le.organization_code_Invalid << 14 ) + ( le.exempt_org_status_code_Invalid << 15 ) + ( le.asset_code_Invalid << 16 ) + ( le.filing_requirement_code_part1_Invalid << 17 ) + ( le.filing_requirement_code_part2_Invalid << 18 ) + ( le.accounting_period_Invalid << 19 ) + ( le.asset_amount_Invalid << 20 ) + ( le.form_990_revenue_amount_Invalid << 21 ) + ( le.national_taxonomy_exempt_Invalid << 22 );
+    SELF.ScrubsBits1 := ( le.employer_id_number_Invalid << 0 ) + ( le.primary_name_of_organization_Invalid << 1 ) + ( le.street_address_Invalid << 3 ) + ( le.city_Invalid << 4 ) + ( le.state_Invalid << 5 ) + ( le.zip_code_Invalid << 6 ) + ( le.group_exemption_number_Invalid << 7 ) + ( le.subsection_code_Invalid << 8 ) + ( le.affiliation_code_Invalid << 9 ) + ( le.classification_code_Invalid << 10 ) + ( le.ruling_date_Invalid << 11 ) + ( le.deductibility_code_Invalid << 12 ) + ( le.foundation_code_Invalid << 13 ) + ( le.activity_codes_Invalid << 14 ) + ( le.organization_code_Invalid << 15 ) + ( le.exempt_org_status_code_Invalid << 16 ) + ( le.asset_code_Invalid << 17 ) + ( le.filing_requirement_code_part1_Invalid << 18 ) + ( le.filing_requirement_code_part2_Invalid << 19 ) + ( le.accounting_period_Invalid << 20 ) + ( le.asset_amount_Invalid << 21 ) + ( le.form_990_revenue_amount_Invalid << 22 ) + ( le.national_taxonomy_exempt_Invalid << 23 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
+  STRING escQuotes(STRING s) := STD.Str.FindReplace(s,'\'','\\\'');
+  Rule_Layout IntoRule(BitmapInfile le, UNSIGNED c) := TRANSFORM
+    mask := 1<<(c-1);
+    hasError := (mask&le.ScrubsBits1)>0;
+    SELF.Rules := IF(hasError,TRIM(toRuleDesc(c))+':\''+escQuotes(TRIM(toErrorMessage(c)))+'\'',IF(le.ScrubsBits1=0 AND c=1,'',SKIP));
+    SELF := le;
+  END;
+  unrolled := NORMALIZE(BitmapInfile,NumRules,IntoRule(LEFT,COUNTER));
+  Rule_Layout toRoll(Rule_Layout le,Rule_Layout ri) := TRANSFORM
+    SELF.Rules := TRIM(le.Rules) + IF(LENGTH(TRIM(le.Rules))>0 AND LENGTH(TRIM(ri.Rules))>0,',','') + TRIM(ri.Rules);
+    SELF := le;
+  END;
+  EXPORT RulesInfile := ROLLUP(unrolled,toRoll(LEFT,RIGHT),EXCEPT Rules);
 END;
 // Module to use if you already have a scrubs bitmap you wish to expand or compare
 EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
   EXPORT Infile := PROJECT(h,Input_Layout_IRS_Nonprofit);
   Expanded_Layout into(h le) := TRANSFORM
     SELF.employer_id_number_Invalid := (le.ScrubsBits1 >> 0) & 1;
-    SELF.primary_name_of_organization_Invalid := (le.ScrubsBits1 >> 1) & 1;
-    SELF.street_address_Invalid := (le.ScrubsBits1 >> 2) & 1;
-    SELF.city_Invalid := (le.ScrubsBits1 >> 3) & 1;
-    SELF.state_Invalid := (le.ScrubsBits1 >> 4) & 1;
-    SELF.zip_code_Invalid := (le.ScrubsBits1 >> 5) & 1;
-    SELF.group_exemption_number_Invalid := (le.ScrubsBits1 >> 6) & 1;
-    SELF.subsection_code_Invalid := (le.ScrubsBits1 >> 7) & 1;
-    SELF.affiliation_code_Invalid := (le.ScrubsBits1 >> 8) & 1;
-    SELF.classification_code_Invalid := (le.ScrubsBits1 >> 9) & 1;
-    SELF.ruling_date_Invalid := (le.ScrubsBits1 >> 10) & 1;
-    SELF.deductibility_code_Invalid := (le.ScrubsBits1 >> 11) & 1;
-    SELF.foundation_code_Invalid := (le.ScrubsBits1 >> 12) & 1;
-    SELF.activity_codes_Invalid := (le.ScrubsBits1 >> 13) & 1;
-    SELF.organization_code_Invalid := (le.ScrubsBits1 >> 14) & 1;
-    SELF.exempt_org_status_code_Invalid := (le.ScrubsBits1 >> 15) & 1;
-    SELF.asset_code_Invalid := (le.ScrubsBits1 >> 16) & 1;
-    SELF.filing_requirement_code_part1_Invalid := (le.ScrubsBits1 >> 17) & 1;
-    SELF.filing_requirement_code_part2_Invalid := (le.ScrubsBits1 >> 18) & 1;
-    SELF.accounting_period_Invalid := (le.ScrubsBits1 >> 19) & 1;
-    SELF.asset_amount_Invalid := (le.ScrubsBits1 >> 20) & 1;
-    SELF.form_990_revenue_amount_Invalid := (le.ScrubsBits1 >> 21) & 1;
-    SELF.national_taxonomy_exempt_Invalid := (le.ScrubsBits1 >> 22) & 1;
+    SELF.primary_name_of_organization_Invalid := (le.ScrubsBits1 >> 1) & 3;
+    SELF.street_address_Invalid := (le.ScrubsBits1 >> 3) & 1;
+    SELF.city_Invalid := (le.ScrubsBits1 >> 4) & 1;
+    SELF.state_Invalid := (le.ScrubsBits1 >> 5) & 1;
+    SELF.zip_code_Invalid := (le.ScrubsBits1 >> 6) & 1;
+    SELF.group_exemption_number_Invalid := (le.ScrubsBits1 >> 7) & 1;
+    SELF.subsection_code_Invalid := (le.ScrubsBits1 >> 8) & 1;
+    SELF.affiliation_code_Invalid := (le.ScrubsBits1 >> 9) & 1;
+    SELF.classification_code_Invalid := (le.ScrubsBits1 >> 10) & 1;
+    SELF.ruling_date_Invalid := (le.ScrubsBits1 >> 11) & 1;
+    SELF.deductibility_code_Invalid := (le.ScrubsBits1 >> 12) & 1;
+    SELF.foundation_code_Invalid := (le.ScrubsBits1 >> 13) & 1;
+    SELF.activity_codes_Invalid := (le.ScrubsBits1 >> 14) & 1;
+    SELF.organization_code_Invalid := (le.ScrubsBits1 >> 15) & 1;
+    SELF.exempt_org_status_code_Invalid := (le.ScrubsBits1 >> 16) & 1;
+    SELF.asset_code_Invalid := (le.ScrubsBits1 >> 17) & 1;
+    SELF.filing_requirement_code_part1_Invalid := (le.ScrubsBits1 >> 18) & 1;
+    SELF.filing_requirement_code_part2_Invalid := (le.ScrubsBits1 >> 19) & 1;
+    SELF.accounting_period_Invalid := (le.ScrubsBits1 >> 20) & 1;
+    SELF.asset_amount_Invalid := (le.ScrubsBits1 >> 21) & 1;
+    SELF.form_990_revenue_amount_Invalid := (le.ScrubsBits1 >> 22) & 1;
+    SELF.national_taxonomy_exempt_Invalid := (le.ScrubsBits1 >> 23) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -109,6 +187,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     TotalCnt := COUNT(GROUP); // Number of records in total
     employer_id_number_CUSTOM_ErrorCount := COUNT(GROUP,h.employer_id_number_Invalid=1);
     primary_name_of_organization_CUSTOM_ErrorCount := COUNT(GROUP,h.primary_name_of_organization_Invalid=1);
+    primary_name_of_organization_LENGTHS_ErrorCount := COUNT(GROUP,h.primary_name_of_organization_Invalid=2);
+    primary_name_of_organization_Total_ErrorCount := COUNT(GROUP,h.primary_name_of_organization_Invalid>0);
     street_address_CUSTOM_ErrorCount := COUNT(GROUP,h.street_address_Invalid=1);
     city_CUSTOM_ErrorCount := COUNT(GROUP,h.city_Invalid=1);
     state_CUSTOM_ErrorCount := COUNT(GROUP,h.state_Invalid=1);
@@ -138,9 +218,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.employer_id_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_name_of_organization_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.street_address_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.city_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.group_exemption_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.subsection_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.affiliation_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.classification_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ruling_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deductibility_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.foundation_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.activity_codes_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.organization_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.exempt_org_status_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.asset_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_requirement_code_part1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_requirement_code_part2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.accounting_period_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.asset_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.form_990_revenue_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.national_taxonomy_exempt_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.employer_id_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_name_of_organization_Total_ErrorCount > 0, 1, 0) + IF(le.street_address_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.city_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.group_exemption_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.subsection_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.affiliation_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.classification_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ruling_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deductibility_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.foundation_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.activity_codes_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.organization_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.exempt_org_status_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.asset_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_requirement_code_part1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_requirement_code_part2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.accounting_period_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.asset_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.form_990_revenue_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.national_taxonomy_exempt_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.employer_id_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_name_of_organization_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.street_address_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.city_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.group_exemption_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.subsection_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.affiliation_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.classification_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ruling_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deductibility_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.foundation_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.activity_codes_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.organization_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.exempt_org_status_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.asset_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_requirement_code_part1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_requirement_code_part2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.accounting_period_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.asset_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.form_990_revenue_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.national_taxonomy_exempt_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.employer_id_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_name_of_organization_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.primary_name_of_organization_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.street_address_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.city_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.group_exemption_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.subsection_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.affiliation_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.classification_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ruling_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.deductibility_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.foundation_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.activity_codes_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.organization_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.exempt_org_status_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.asset_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_requirement_code_part1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_requirement_code_part2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.accounting_period_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.asset_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.form_990_revenue_amount_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.national_taxonomy_exempt_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -159,7 +239,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Input_Fields.InvalidMessage_employer_id_number(le.employer_id_number_Invalid),Input_Fields.InvalidMessage_primary_name_of_organization(le.primary_name_of_organization_Invalid),Input_Fields.InvalidMessage_street_address(le.street_address_Invalid),Input_Fields.InvalidMessage_city(le.city_Invalid),Input_Fields.InvalidMessage_state(le.state_Invalid),Input_Fields.InvalidMessage_zip_code(le.zip_code_Invalid),Input_Fields.InvalidMessage_group_exemption_number(le.group_exemption_number_Invalid),Input_Fields.InvalidMessage_subsection_code(le.subsection_code_Invalid),Input_Fields.InvalidMessage_affiliation_code(le.affiliation_code_Invalid),Input_Fields.InvalidMessage_classification_code(le.classification_code_Invalid),Input_Fields.InvalidMessage_ruling_date(le.ruling_date_Invalid),Input_Fields.InvalidMessage_deductibility_code(le.deductibility_code_Invalid),Input_Fields.InvalidMessage_foundation_code(le.foundation_code_Invalid),Input_Fields.InvalidMessage_activity_codes(le.activity_codes_Invalid),Input_Fields.InvalidMessage_organization_code(le.organization_code_Invalid),Input_Fields.InvalidMessage_exempt_org_status_code(le.exempt_org_status_code_Invalid),Input_Fields.InvalidMessage_asset_code(le.asset_code_Invalid),Input_Fields.InvalidMessage_filing_requirement_code_part1(le.filing_requirement_code_part1_Invalid),Input_Fields.InvalidMessage_filing_requirement_code_part2(le.filing_requirement_code_part2_Invalid),Input_Fields.InvalidMessage_accounting_period(le.accounting_period_Invalid),Input_Fields.InvalidMessage_asset_amount(le.asset_amount_Invalid),Input_Fields.InvalidMessage_form_990_revenue_amount(le.form_990_revenue_amount_Invalid),Input_Fields.InvalidMessage_national_taxonomy_exempt(le.national_taxonomy_exempt_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.employer_id_number_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.primary_name_of_organization_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.primary_name_of_organization_Invalid,'CUSTOM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.street_address_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.city_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.state_Invalid,'CUSTOM','UNKNOWN')
@@ -195,71 +275,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
-      SELF.ruledesc := CHOOSE(c
-          ,'employer_id_number:invalid_emp_id:CUSTOM'
-          ,'primary_name_of_organization:invalid_primary_name:CUSTOM'
-          ,'street_address:invalid_address:CUSTOM'
-          ,'city:invalid_city:CUSTOM'
-          ,'state:invalid_state:CUSTOM'
-          ,'zip_code:invalid_zip:CUSTOM'
-          ,'group_exemption_number:invalid_grp_nbr:CUSTOM'
-          ,'subsection_code:invalid_subsect_cd:CUSTOM'
-          ,'affiliation_code:invalid_affilatn_cd:CUSTOM'
-          ,'classification_code:invalid_class_cd:CUSTOM'
-          ,'ruling_date:invalid_date:CUSTOM'
-          ,'deductibility_code:invalid_dedct_cd:CUSTOM'
-          ,'foundation_code:invalid_foundatn_cd:CUSTOM'
-          ,'activity_codes:invalid_activity_cd:CUSTOM'
-          ,'organization_code:invalid_org_cd:CUSTOM'
-          ,'exempt_org_status_code:invalid_org_exmp_cd:CUSTOM'
-          ,'asset_code:invalid_asset_cd:CUSTOM'
-          ,'filing_requirement_code_part1:invalid_req_p1_cd:CUSTOM'
-          ,'filing_requirement_code_part2:invalid_req_p2_cd:CUSTOM'
-          ,'accounting_period:invalid_acct_period:CUSTOM'
-          ,'asset_amount:invalid_asset_amt:CUSTOM'
-          ,'form_990_revenue_amount:invalid_form990_amt:CUSTOM'
-          ,'national_taxonomy_exempt:invalid_natl_tax_cd:CUSTOM'
-          ,'field:Number_Errored_Fields:SUMMARY'
-          ,'field:Number_Perfect_Fields:SUMMARY'
-          ,'rule:Number_Errored_Rules:SUMMARY'
-          ,'rule:Number_Perfect_Rules:SUMMARY'
-          ,'rule:Number_OnFail_Rules:SUMMARY'
-          ,'record:Number_Errored_Records:SUMMARY'
-          ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
-      SELF.ErrorMessage := CHOOSE(c
-          ,Input_Fields.InvalidMessage_employer_id_number(1)
-          ,Input_Fields.InvalidMessage_primary_name_of_organization(1)
-          ,Input_Fields.InvalidMessage_street_address(1)
-          ,Input_Fields.InvalidMessage_city(1)
-          ,Input_Fields.InvalidMessage_state(1)
-          ,Input_Fields.InvalidMessage_zip_code(1)
-          ,Input_Fields.InvalidMessage_group_exemption_number(1)
-          ,Input_Fields.InvalidMessage_subsection_code(1)
-          ,Input_Fields.InvalidMessage_affiliation_code(1)
-          ,Input_Fields.InvalidMessage_classification_code(1)
-          ,Input_Fields.InvalidMessage_ruling_date(1)
-          ,Input_Fields.InvalidMessage_deductibility_code(1)
-          ,Input_Fields.InvalidMessage_foundation_code(1)
-          ,Input_Fields.InvalidMessage_activity_codes(1)
-          ,Input_Fields.InvalidMessage_organization_code(1)
-          ,Input_Fields.InvalidMessage_exempt_org_status_code(1)
-          ,Input_Fields.InvalidMessage_asset_code(1)
-          ,Input_Fields.InvalidMessage_filing_requirement_code_part1(1)
-          ,Input_Fields.InvalidMessage_filing_requirement_code_part2(1)
-          ,Input_Fields.InvalidMessage_accounting_period(1)
-          ,Input_Fields.InvalidMessage_asset_amount(1)
-          ,Input_Fields.InvalidMessage_form_990_revenue_amount(1)
-          ,Input_Fields.InvalidMessage_national_taxonomy_exempt(1)
-          ,'Fields with errors'
-          ,'Fields without errors'
-          ,'Rules with errors'
-          ,'Rules without errors'
-          ,'Rules with possible edits'
-          ,'Records with at least one error'
-          ,'Records without errors','UNKNOWN');
+      SELF.ruledesc := toRuleDesc(c);
+      SELF.ErrorMessage := toErrorMessage(c);
       SELF.rulecnt := CHOOSE(c
           ,le.employer_id_number_CUSTOM_ErrorCount
-          ,le.primary_name_of_organization_CUSTOM_ErrorCount
+          ,le.primary_name_of_organization_CUSTOM_ErrorCount,le.primary_name_of_organization_LENGTHS_ErrorCount
           ,le.street_address_CUSTOM_ErrorCount
           ,le.city_CUSTOM_ErrorCount
           ,le.state_CUSTOM_ErrorCount
@@ -290,7 +310,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,SELF.recordstotal - le.AnyRule_WithErrorsCount,0);
       SELF.rulepcnt := IF(c <= NumRules, 100 * CHOOSE(c
           ,le.employer_id_number_CUSTOM_ErrorCount
-          ,le.primary_name_of_organization_CUSTOM_ErrorCount
+          ,le.primary_name_of_organization_CUSTOM_ErrorCount,le.primary_name_of_organization_LENGTHS_ErrorCount
           ,le.street_address_CUSTOM_ErrorCount
           ,le.city_CUSTOM_ErrorCount
           ,le.state_CUSTOM_ErrorCount

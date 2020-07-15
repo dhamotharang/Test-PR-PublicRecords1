@@ -1,5 +1,5 @@
 ﻿IMPORT SALT311;
-IMPORT Scrubs_IRS_Nonprofit,Scrubs; // Import modules for FieldTypes attribute definitions
+IMPORT Scrubs,Scrubs_IRS_Nonprofit; // Import modules for FieldTypes attribute definitions
 EXPORT Input_Fields := MODULE
  
 EXPORT NumFields := 28;
@@ -11,14 +11,14 @@ EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'invalid_emp_id' => 1,'invali
 EXPORT MakeFT_invalid_emp_id(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_emp_id(SALT311.StrType s) := WHICH(~Scrubs_IRS_Nonprofit.Functions.fn_numeric(s)>0);
-EXPORT InValidMessageFT_invalid_emp_id(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_IRS_Nonprofit.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_emp_id(SALT311.StrType s) := WHICH(~Scrubs.Functions.fn_numeric(s)>0);
+EXPORT InValidMessageFT_invalid_emp_id(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_primary_name(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_primary_name(SALT311.StrType s) := WHICH(~Scrubs_IRS_Nonprofit.Functions.fn_chk_name(s)>0);
-EXPORT InValidMessageFT_invalid_primary_name(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_IRS_Nonprofit.Functions.fn_chk_name'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_primary_name(SALT311.StrType s) := WHICH(~Scrubs.Functions.fn_ASCII_printable(s)>0,~(LENGTH(TRIM(s)) >= 1));
+EXPORT InValidMessageFT_invalid_primary_name(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.Functions.fn_ASCII_printable'),SALT311.HygieneErrors.NotLength('1..'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_address(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -29,8 +29,8 @@ EXPORT InValidMessageFT_invalid_address(UNSIGNED1 wh) := CHOOSE(wh,SALT311.Hygie
 EXPORT MakeFT_invalid_city(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_city(SALT311.StrType s) := WHICH(~Scrubs_IRS_Nonprofit.Functions.fn_chk_city(s)>0);
-EXPORT InValidMessageFT_invalid_city(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_IRS_Nonprofit.Functions.fn_chk_city'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_city(SALT311.StrType s) := WHICH(~Scrubs.Functions.fn_ASCII_printable(s)>0);
+EXPORT InValidMessageFT_invalid_city(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.Functions.fn_ASCII_printable'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_state(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -131,8 +131,8 @@ EXPORT InValidMessageFT_invalid_acct_period(UNSIGNED1 wh) := CHOOSE(wh,SALT311.H
 EXPORT MakeFT_invalid_asset_amt(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_asset_amt(SALT311.StrType s) := WHICH(~Scrubs_IRS_Nonprofit.Functions.fn_valid_amount(s)>0);
-EXPORT InValidMessageFT_invalid_asset_amt(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_IRS_Nonprofit.Functions.fn_valid_amount'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_asset_amt(SALT311.StrType s) := WHICH(~Scrubs.Functions.fn_numeric_optional(s)>0);
+EXPORT InValidMessageFT_invalid_asset_amt(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.Functions.fn_numeric_optional'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_form990_amt(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -149,7 +149,7 @@ EXPORT InValidMessageFT_invalid_natl_tax_cd(UNSIGNED1 wh) := CHOOSE(wh,SALT311.H
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'employer_id_number','primary_name_of_organization','in_care_of_name','street_address','city','state','zip_code','group_exemption_number','subsection_code','affiliation_code','classification_code','ruling_date','deductibility_code','foundation_code','activity_codes','organization_code','exempt_org_status_code','tax_period','asset_code','income_code','filing_requirement_code_part1','filing_requirement_code_part2','accounting_period','asset_amount','income_amount','form_990_revenue_amount','national_taxonomy_exempt','sort_name');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'employer_id_number','primary_name_of_organization','in_care_of_name','street_address','city','state','zip_code','group_exemption_number','subsection_code','affiliation_code','classification_code','ruling_date','deductibility_code','foundation_code','activity_codes','organization_code','exempt_org_status_code','tax_period','asset_code','income_code','filing_requirement_code_part1','filing_requirement_code_part2','accounting_period','asset_amount','income_amount','form_990_revenue_amount','national_taxonomy_exempt','sort_name');
 EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'employer_id_number' => 0,'primary_name_of_organization' => 1,'in_care_of_name' => 2,'street_address' => 3,'city' => 4,'state' => 5,'zip_code' => 6,'group_exemption_number' => 7,'subsection_code' => 8,'affiliation_code' => 9,'classification_code' => 10,'ruling_date' => 11,'deductibility_code' => 12,'foundation_code' => 13,'activity_codes' => 14,'organization_code' => 15,'exempt_org_status_code' => 16,'tax_period' => 17,'asset_code' => 18,'income_code' => 19,'filing_requirement_code_part1' => 20,'filing_requirement_code_part2' => 21,'accounting_period' => 22,'asset_amount' => 23,'income_amount' => 24,'form_990_revenue_amount' => 25,'national_taxonomy_exempt' => 26,'sort_name' => 27,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['CUSTOM'],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[],['CUSTOM'],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[],['CUSTOM'],['CUSTOM'],[],[]);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['CUSTOM','LENGTHS'],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[],['CUSTOM'],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[],['CUSTOM'],['CUSTOM'],[],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation

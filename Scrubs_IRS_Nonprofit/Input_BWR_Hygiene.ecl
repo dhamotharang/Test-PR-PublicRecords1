@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_IRS_Nonprofit.Input_BWR_Hygiene - Hygiene & Stats - SALT V3.11.8');
+#workunit('name','Scrubs_IRS_Nonprofit.Input_BWR_Hygiene - Hygiene & Stats - SALT V3.11.11');
 IMPORT Scrubs_IRS_Nonprofit,SALT311;
 // First create an instantiated hygiene module
   infile := Scrubs_IRS_Nonprofit.Input_In_IRS_Nonprofit;
