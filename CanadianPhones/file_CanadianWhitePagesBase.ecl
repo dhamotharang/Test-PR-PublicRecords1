@@ -1,4 +1,4 @@
-﻿﻿import ut;
+import ut;
 
 iu_infiles := PROJECT(			
                       dataset(CanadianPhones.thor_cluster +'base::canadianWP',

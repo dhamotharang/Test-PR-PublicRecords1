@@ -1,4 +1,4 @@
-﻿﻿Import Models, STD, Address, risk_indicators, riskwise, ut;
+Import Models, STD, Address, risk_indicators, riskwise, ut;
 Import Models.Healthcare_SocioEconomic_Functions_Core;
 Import Models.Healthcare_SocioEconomic_Ref_Data;
 Import Models.Healthcare_Constants_RT_Service;

@@ -1,4 +1,4 @@
-﻿﻿EXPORT Healthcare_Constants_RT_Service := MODULE
+EXPORT Healthcare_Constants_RT_Service := MODULE
 	
 	Export CFG_False := false;
 	Export CFG_True := true;
