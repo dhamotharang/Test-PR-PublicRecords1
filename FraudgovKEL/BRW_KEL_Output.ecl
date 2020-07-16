@@ -23,7 +23,6 @@ TOPN(t3, 100, -reccount);
 */
 
 
-
 //output(FraudgovKEL.KEL_EventShell.UIStats(ipentitycontextuid in Set_entitycontextuid));
 
 //output(FraudgovKEL.KEL_EventPivot.EventPivotShell);
@@ -41,12 +40,10 @@ output(ScoringOutput,,'~fraudgov::deleteme_rules_nd_csv', CSV(QUOTE('"')), overw
 */
 
 output(FraudgovKEL.KEL_EventPivot.EventPivotShell,,'~fraudgov::eventpivot', overwrite, compressed);
-
-/*
 output(FraudgovKEL.KEL_EventPivot.EntityProfileRules,,'~fraudgov::entityrules', overwrite, compressed);
 output(FraudgovKEL.KEL_EntityStats,, '~fraudgov::pivotentitystatsfilter', overwrite, compressed);
 output(FraudgovKEL.KEL_GraphPrep.Edges,,'~fraudgov::rin2::graphedges', overwrite);
 output(FraudgovKEL.KEL_GraphPrep.Vertices,,'~fraudgov::rin2::graphpvertices', overwrite);
-*/
+
 
 //output(FraudgovKEL.KEL_GraphPrep.LinksPrep);
