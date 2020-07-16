@@ -23,7 +23,7 @@ EXPORT KEL_GraphPrep := MODULE
                      
   EXPORT LinksFinal := DEDUP(SORT(DISTRIBUTE(Links0 + LinksPrep + Links1, HASH32(treeuid)), customerid, industrytype, treeuid, entitycontextuid, -t_actdtecho, LOCAL), customerid, industrytype, treeuid, entitycontextuid, LOCAL);
 
-  GraphFinal := JOIN(LinksFinal, EntityEventPivot, LEFT.customerid = RIGHT.customerid AND LEFT.industrytype = RIGHT.industrytype AND LEFT.entitycontextuid = RIGHT.entitycontextuid, 
+  GraphFinal := JOIN(LinksFinal, EntityEventPivot(aotcurrprofflag=1), LEFT.customerid = RIGHT.customerid AND LEFT.industrytype = RIGHT.industrytype AND LEFT.entitycontextuid = RIGHT.entitycontextuid, 
                   TRANSFORM({LEFT.customerid, LEFT.industrytype, LEFT.treeuid, LEFT.entitycontextuid, RIGHT.t_actdtecho, RIGHT.entitytype, RIGHT.label, 
                     RIGHT.riskindx, RIGHT.aotkractflagev, RIGHT.aotsafeactflagev, RIGHT.personeventcount,
                     RIGHT.t_inpclndobecho, RIGHT.t1L_iddeceasedflag, RIGHT.aotidactcntev, RIGHT.deceaseddate, RIGHT.T1_MinorIDFlag}, 
@@ -39,3 +39,4 @@ EXPORT KEL_GraphPrep := MODULE
   EXPORT Edges := EdgesFinal;	
 
 END;
+
