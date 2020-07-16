@@ -208,66 +208,6 @@ EXPORT FileModule(string esp = ''
 		RETURN dNormParts(~regexfind('\\$',partname));
 END;
 
-	
-	// file copy status
-	export fGetRoxieFileCopyStatus(
-																string l_roxiedali
-																,string l_esp = esp
-																,string l_port = port
-																,string l_targettype = targettype
-																,string l_target = target
-																
-																,string l_roxiepathprefix = roxieabsolutepatch
-															) := function
-	
-		dPackage := dRoxiePackage(l_esp,l_port,l_target);// : independent;
-		rCopyStatus xGetTotalFilePartFromDali(dPackage l) := transform
-                self.expectedfileparts := (unsigned4)STD.File.GetLogicalFileAttribute(if (l_roxiedali <> '','~foreign::'+l_roxiedali+'::','~')+l.subfile,'numparts');
-                self := l;
-		end;
-
-		dGetTotalFilePartFromDali := project(dPackage,xGetTotalFilePartFromDali(left));
-		
-		rCopyStatusWithParts := record
-			rCopyStatus;
-      dataset(rParts - dFParts) dAllParts;
-		end;
-
-		rCopyStatusWithParts xCopyStatus(dGetTotalFilePartFromDali l) := transform
-                wordcount := STD.Str.CountWords(l.subfile,'::');
-                getlasttoken := STD.Str.GetNthWord(regexreplace('::',l.subfile,' '),wordcount);
-                abspath := l_roxiepathprefix+regexreplace(getlasttoken,regexreplace('::',l.subfile,'/'),'');
-                dGetParts := fGetPartsFromRoxie(abspath,getlasttoken
-																								,l_esp := l_esp
-																								,l_port := l_port
-																								,l_target := l_target
-																								,l_targettype := targettype);
-                self.filemask := getlasttoken;
-                self.directory := abspath;
-                self.dAllParts := dGetParts;
-                self.copiedfileparts := count(dedup(dGetParts,partname));
-                self := l;
-		end;
-
-		dCopyStatus := project(dGetTotalFilePartFromDali,xCopyStatus(left));
-		rCopyStatus xNormRecs(dCopyStatus l, rParts - dFParts r) := transform
-			l_tokens := STD.Str.SplitWords(regexreplace('_',l.subfile,'::'),'::');
-			self.tokens := l_tokens;
-                //self.partname := r.partname;
-                self.pendingpartstocopy := l.expectedfileparts - l.copiedfileparts;
-                self.percentcopied := (l.copiedfileparts / l.expectedfileparts) * 100;
-								self.buildversion := dataset(l_tokens,{string tokens})(regexfind('^[0-9]+$',tokens)
-																																				or regexfind('^[0-9]+[a-z]',tokens))[1].tokens;
-								self.wuid := WORKUNIT;
-								self := l;
-		end;
-
-		dFinalCopyStatus := dedup(sort(normalize(dCopyStatus,left.dAllParts,xNormRecs(left,right)),percentcopied,packageid,superfile,subfile),percentcopied,packageid,superfile,subfile);
-
-		return dFinalCopyStatus;
-		
-	end;
-	
 	export rInputParameters := record
 		string rxesp; // only ip (no port or http)
 		string rxdali; // only ip (no port)
@@ -287,6 +227,114 @@ END;
 	shared vDateTime := (string)STD.Date.Today() + (string)STD.Date.CurrentTime(true) : independent;
 	// cannot create a csv with tokens field hence removing it
 	export dCopyStatus() := dataset(vCopyStatusFileNamePrefix,rFullRecord,csv,opt);
+	
+	// file copy status
+	export fGetRoxieFileCopyStatus(
+																string l_roxiedali
+																,string l_esp = esp
+																,string l_port = port
+																,string l_targettype = targettype
+																,string l_target = target
+																
+																,string l_roxiepathprefix = roxieabsolutepatch
+															) := function
+	
+		dPackage := dRoxiePackage(l_esp,l_port,l_target);// : independent;
+		dGetCopyStatusLocal := dCopyStatus();
+		
+		rCopyStatusPending := record
+			rCopyStatus;
+			string previoussubfile := '';
+			integer previouspendingpartstocopy := 0;
+			boolean ispending := false;
+		end;
+		
+		rCopyStatusPending xPendingFiles(dPackage l, dGetCopyStatusLocal r) := transform
+			self.ispending := if (r.subfile = '' or
+															r.pendingpartstocopy > 0
+													,true
+													,false);
+			self.previoussubfile := r.subfile;
+			self.previouspendingpartstocopy := r.pendingpartstocopy;
+			self := l
+		end;
+
+		dPendingFiles := join(dPackage
+													,dGetCopyStatusLocal
+													,left.packageid = right.packageid
+														and left.superfile = right.superfile
+														and left.subfile = right.subfile
+													,xPendingFiles(left,right)
+													,left outer
+													);
+													
+		rCopyStatusWithParts := record
+			rCopyStatusPending;
+      dataset(rParts - dFParts) dAllParts := dataset([],{rParts - dFParts});
+		end;
+		
+		rCopyStatusWithParts xGetTotalFilePartFromDali(dPendingFiles l) := transform
+				l_tokens := STD.Str.SplitWords(regexreplace('_',l.subfile,'::'),'::');
+			
+                wordcount := STD.Str.CountWords(l.subfile,'::');
+                getlasttoken := STD.Str.GetNthWord(regexreplace('::',l.subfile,' '),wordcount);
+                abspath := l_roxiepathprefix+regexreplace(getlasttoken,regexreplace('::',l.subfile,'/'),'');
+                self.expectedfileparts := (unsigned4)STD.File.GetLogicalFileAttribute(if (l_roxiedali <> '','~foreign::'+l_roxiedali+'::','~')+l.subfile,'numparts');
+								self.filemask := getlasttoken;
+                self.directory := abspath;
+                //self.dAllParts := dGetParts;
+                //self.copiedfileparts := count(dedup(dGetParts,partname));
+								self.buildversion := dataset(l_tokens,{string tokens})(regexfind('^[0-9]+$',tokens)
+																																				or regexfind('^[0-9]+[a-z]',tokens))[1].tokens;
+								self.tokens := l_tokens;
+                self := l;
+		end;
+
+		dGetTotalFilePartFromDali := project(dPendingFiles,xGetTotalFilePartFromDali(left));
+		
+		
+		
+		
+
+		rCopyStatusWithParts xCopyStatus(dGetTotalFilePartFromDali l) := transform
+								
+                dGetParts := fGetPartsFromRoxie(l.directory,l.filemask
+																								,l_esp := l_esp
+																								,l_port := l_port
+																								,l_target := l_target
+																								,l_targettype := targettype);
+                self.dAllParts := dGetParts;
+                self.copiedfileparts := count(dedup(dGetParts,partname));
+								
+								self := l;
+		end;
+
+		dCopyStatusWithFileParts := project(dGetTotalFilePartFromDali(ispending),xCopyStatus(left));
+		
+		rCopyStatus xNormRecs(dCopyStatusWithFileParts l, rParts - dFParts r) := transform
+			
+                //self.partname := r.partname;
+                self.pendingpartstocopy := l.expectedfileparts - l.copiedfileparts;
+                self.percentcopied := (l.copiedfileparts / l.expectedfileparts) * 100;
+								
+								self.wuid := WORKUNIT;
+								self := l;
+		end;
+
+		dFinalCopyStatus := dedup(sort(normalize(dCopyStatusWithFileParts,left.dAllParts,xNormRecs(left,right)),percentcopied,packageid,superfile,subfile),percentcopied,packageid,superfile,subfile);
+
+		rCopyStatus xGetAllMissedRecords(dGetTotalFilePartFromDali l) := transform
+			self := l;
+		end;
+		
+		dGetMissed := project(dGetTotalFilePartFromDali(~ispending or count(dAllParts) = 0),xGetAllMissedRecords(left));
+
+		return dedup(sort(dFinalCopyStatus + dGetMissed,percentcopied,packageid,superfile,subfile),percentcopied,packageid,superfile,subfile);
+		
+		
+	end;
+	
+	
 	
 	export fGetCopyStatusByDataset() := function
 		dFullCopy := dCopyStatus();
