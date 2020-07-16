@@ -607,14 +607,14 @@ EXPORT	Layouts	:=	MODULE
 	EXPORT	AccountDataLayout	:=	RECORD
 		STRING												process_date;
 		AccountBaseSegment;
-		STRING												LN_Deliquency_Date:='0';		
-		STRING2												DelinquencyStatus:='0';
+		STRING												LN_Deliquency_Date:='';		
+		STRING2												DelinquencyStatus:='';
 		STRING12											New_Payment_History_Profile_12_Months;
 		STRING12											New_Payment_History_Profile_13_24_Months;
 		STRING12											New_Payment_History_Profile_25_36_Months;
 		STRING12											New_Payment_History_Profile_37_48_Months;
-		STRING3												New_Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided:='0';
-		STRING3												New_Maximum_Number_Of_Payment_Tracking_Cycle_Periods_Provided:='0';
+		STRING3												New_Maximum_Number_Of_Past_Due_Aging_Amounts_Buckets_Provided:='';
+		STRING3												New_Maximum_Number_Of_Payment_Tracking_Cycle_Periods_Provided:='';
 		
 		DATASET(MasterAccountContractSegment)				masterAccount{MAXCOUNT(1)};											//	MA
 		DATASET(AddressSegment)											address{MAXCOUNT(100)};													//	AD
