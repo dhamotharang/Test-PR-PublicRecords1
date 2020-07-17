@@ -44,8 +44,7 @@
     SELF.phone_source                                             := PhoneFinder_Services.Constants.PhoneSource.QSentGateway;
     SELF.dt_last_seen                                             := (STRING8)MAX(ri,ri.dt_last_reported);
     SELF.coc_description                                          := IF(le.phone_serv_type <> '',
-                                                                        PhoneFinder_Services.Functions.ServiceClassDesc(le.phone_serv_type),
-                                                                        '');
+                                                                        PhoneFinder_Services.Functions.ServiceClassDesc(le.phone_serv_type, le.phone_line_type), '');
     SELF.carrier_name                                             := le.carrier_name;
     SELF.phone_region_city                                        := le.carrier_city;
     SELF.phone_region_st                                          := le.carrier_state;
@@ -84,7 +83,7 @@
   gateway_URL := gateway_cfg.url;
   boolean makeGatewayCall := gateway_URL != '';
 
-  dAccuDataCNAM := Gateway.SoapCall_AccuData_CallerID(dPrimaryPhones,gateway_cfg,inMod.UseAccuData_CNAM AND makeGatewayCall);
+  dAccuDataCNAM := Gateway.SoapCall_AccuData_CallerID(dPrimaryPhones, gateway_cfg, inMod.UseAccuData_CNAM AND makeGatewayCall, $.Constants.GatewayMaxTimeout.AccuData_CallerID_RequestTimeout);
 
   PhoneFinder_Services.Layouts.PhoneFinder.Final getaccu_data(PhoneFinder_Services.Layouts.PhoneFinder.Final l,
                                                               iesp.accudata_accuname.t_AccudataCnamResponseEx r) :=

@@ -33,7 +33,7 @@
   get_gong_by_did(did[,targetDate][,radius][,maxDaysBefore][,maxDaysAfter][,fuzzyLast][,exactFirst][,allowNonCurrent])
 */
 
-import AutostandardI, Suppress, dx_Gong, ut, doxie, NID;
+import AutostandardI, doxie, dx_Gong, NID, Relocations, Suppress, ut;
 
 
 // STUB - are these two routines worthy of inclusion in module ut?
@@ -228,7 +228,7 @@ export wdtg := module
     layout_raw_optout toOut(targets L, gong_key R) := transform
       mac_toOut(L,R)
     end;
-    layout_raw toOut_date(targets L, gong_key_date R) := transform
+    layout_raw_optout toOut_date(targets L, gong_key_date R) := transform
       mac_toOut(L,R)
     end;
 
@@ -253,7 +253,7 @@ export wdtg := module
     gong_raw_nodate_optout := Suppress.MAC_SuppressSource(_gong_raw_nodate, mod_access);
     gong_raw_nodate := project(gong_raw_nodate_optout, layout_raw);
 
-    gong_raw_date := join(
+    gong_raw_date_all := join(
       targets, gong_key_date,
       keyed(right.dph_name_last=metaphonelib.DMetaPhone1(left.tLast))
         and keyed(right.dt_first_seen between left.tDateBef and left.tDateAft)
@@ -264,6 +264,9 @@ export wdtg := module
         and mnames_ok(targetMiddle, right.name_middle) , // STUB - optionally allow first mismatch
       toOut_date(left,right), limit(max_rawHits,skip)
     );
+    gong_raw_date_optout := Suppress.MAC_SuppressSource(gong_raw_date_all, mod_access);
+    gong_raw_date := project(gong_raw_date_optout, layout_raw); // to remove _fpos_ field from layout
+    
     gong_raw := if(targetDate<>'', gong_raw_date, gong_raw_nodate);
 
     // rollup dates on each targetZip/addr/phone triple (not needed if we use the custom key)

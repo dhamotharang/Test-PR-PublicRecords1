@@ -110,7 +110,9 @@ export Configuration := module
   export IsNetWise(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.NetWise);
   export IsSocialMediaLocator(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.SocialMediaLocator);
   export IsCaAvmReport(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.CaAvmReport);
-
+  export IsAvm(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.Avm);
+  export IsOKCcourtrunner(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = STD.Str.ToLowerCase(Gateway.Constants.ServiceName.OKCcourtrunner);
+  export IsDTEGetRequestInfo(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = STD.Str.ToLowerCase(Gateway.Constants.ServiceName.GetRequestInfo);
   // ************************************************************************
   // Use functions below to retrieve gateway configuration properties.
   //

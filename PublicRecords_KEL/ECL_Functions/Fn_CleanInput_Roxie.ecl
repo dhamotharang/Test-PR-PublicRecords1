@@ -30,6 +30,10 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		SELF.P_InpDL := le.P_InpDL;
 		SELF.P_InpDLState := le.P_InpDLState;
 		// Clean input
+		cleaned_archivedate := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(le.P_InpArchDt, 
+															PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_DATE_RANGE_LOW_ARCHIVEDATE, 
+															PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_DATE_RANGE_HIGH_ARCHIVEDATE,
+															SetDefault := TRUE /*if no date was input, set to current date/time*/)[1];		
 		cleaned_zip       := PublicRecords_KEL.ECL_Functions.Fn_Clean_Zip(le.P_InpAddrZip);
 		cleaned_Addr      := PublicRecords_KEL.ECL_Functions.Fn_Clean_Address_Roxie(le.P_InpAddrLine1 + ' ' + le.P_InpAddrLine2, le.P_InpAddrCity, le.P_InpAddrState, cleaned_zip);
 		cleaned_DL        := PublicRecords_KEL.ECL_Functions.Fn_Clean_DLNumber(le.P_InpDL);
@@ -39,15 +43,12 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		cleaned_workphone := PublicRecords_KEL.ECL_Functions.Fn_Clean_Phone(le.P_InpPhoneWork);
 		cleaned_SSN       := PublicRecords_KEL.ECL_Functions.Fn_Clean_SSN(le.P_InpSSN);
 		DOB_dates         := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(le.P_InpDOB, 
-															PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_YEAR_RANGE_LOW_DOB, 
-															PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_YEAR_RANGE_HIGH_DOB);
+															PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_DATE_RANGE_LOW_DEFAULT, 
+															(INTEGER)cleaned_archivedate.ValidPortion_01);
 		cleaned_DOB       := DOB_dates[1];
 		cleaned_name      := PublicRecords_KEL.ECL_Functions.Fn_Clean_Name_Roxie(le.P_InpNameFirst, le.P_InpNameMid, le.P_InpNameLast);
   
-		cleaned_archivedate := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(le.P_InpArchDt, 
-															PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_YEAR_RANGE_LOW_ARCHIVEDATE, 
-															PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_YEAR_RANGE_HIGH_ARCHIVEDATE,
-															SetDefault := TRUE /*if no date was input, set to current date/time*/)[1];
+
 
 		// Cleaned Archive Date
 		SELF.P_InpClnArchDt := cleaned_archivedate.ValidPortion_01 + cleaned_archivedate.TimeStamp; 

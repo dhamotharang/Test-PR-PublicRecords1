@@ -1,4 +1,4 @@
-﻿import bipv2, didville, doxie, dx_Gong, iesp, MIDEX_Services, relationshipIdentifier_services, STD, Suppress;
+﻿import AutoStandardI, bipv2, didville, doxie, dx_Gong, iesp, MIDEX_Services, relationshipIdentifier_services, STD, Suppress;
 EXPORT Functions := MODULE
 
   // this function calls the person search to find possible DID's.
@@ -13,8 +13,10 @@ EXPORT Functions := MODULE
 
 	// function just returns Phone number HRI indicators.
 	EXPORT getPhoneHRI(dataset(relationshipIdentifier_services.layouts.Phone_layout) in_phone) := FUNCTION
+			global_mod := AutoStandardI.GlobalModule();
+			mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (global_mod);
 			maxHriPer_value	:= iesp.Constants.MaxCountHRI;
-			doxie.mac_addHRIPhone(in_phone,TmpPhoneHRI);
+			doxie.mac_addHRIPhone(in_phone,TmpPhoneHRI,mod_access);
 			return(tmpPhoneHRI);
 	END;
 

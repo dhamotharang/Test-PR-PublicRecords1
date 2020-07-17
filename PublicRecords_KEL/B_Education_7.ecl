@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
-IMPORT KEL12 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.3.0beta5
+IMPORT KEL13 AS KEL;
 IMPORT CFG_Compile,E_Education FROM PublicRecords_KEL;
-IMPORT * FROM KEL12.Null;
+IMPORT * FROM KEL13.Null;
 EXPORT B_Education_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED VIRTUAL TYPEOF(E_Education().__Result) __E_Education := E_Education(__in,__cfg).__Result;
-  SHARED __EE305952 := __E_Education;
-  EXPORT __ST166070_Layout := RECORD
+  SHARED VIRTUAL TYPEOF(E_Education(__in,__cfg).__Result) __E_Education := E_Education(__in,__cfg).__Result;
+  SHARED __EE315505 := __E_Education;
+  EXPORT __ST193941_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr College_Name_;
     KEL.typ.nstr L_N_College_Name_;
@@ -20,12 +20,15 @@ EXPORT B_Education_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST166070_Layout __ND306099__Project(E_Education(__in,__cfg).Layout __PP305826) := TRANSFORM
-    __BS305902 := __T(__PP305826.College_Characteristics_);
-    SELF.Edu_Rec_Flag_ := EXISTS(__BS305902(__T(__OP2(__T(__PP305826.College_Characteristics_).File_Type_,IN,__CN(['M','C','H','O'])))));
-    SELF := __PP305826;
+  SHARED __ST193941_Layout __ND3526104__Project(E_Education(__in,__cfg).Layout __PP315379) := TRANSFORM
+    __BS315455 := __T(__PP315379.College_Characteristics_);
+    SELF.Edu_Rec_Flag_ := EXISTS(__BS315455(__T(__OP2(__T(__PP315379.College_Characteristics_).File_Type_,IN,__CN(['M','C','H','O'])))));
+    SELF := __PP315379;
   END;
-  EXPORT __ENH_Education_7 := PROJECT(__EE305952,__ND306099__Project(LEFT));
+  EXPORT __ENH_Education_7 := PROJECT(__EE315505,__ND3526104__Project(LEFT));
 END;

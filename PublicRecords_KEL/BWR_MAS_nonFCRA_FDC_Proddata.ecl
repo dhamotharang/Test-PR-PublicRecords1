@@ -1,7 +1,6 @@
-﻿// EXPORT BWR_MAS_nonFCRA_FDC_Proddata := 'todo';
-#workunit('name','MAS FDC Proddata - dev156 - T1 - C1');
-IMPORT KEL011 AS KEL;
-import ut, PublicRecords_KEL, STD,RiskWise;
+﻿#workunit('name','MAS FDC Proddata - dev156 thread 1');
+IMPORT KEL13 AS KEL;
+import ut, PublicRecords_KEL, STD,RiskWise, Gateway;
 
 
 STD.Date.Date_t dtArchiveDate := STD.Date.Today(); // Note: STD.Date.Date_t is UNSIGNED4
@@ -38,12 +37,14 @@ BOOLEAN Geolink := TRUE;
 BOOLEAN Household := TRUE;
 BOOLEAN Inquiry := TRUE;
 BOOLEAN LienJudgment := TRUE;
+BOOLEAN NameSummary := TRUE;
 BOOLEAN Person := TRUE;
 BOOLEAN Phone := TRUE;
 BOOLEAN ProfessionalLicense := TRUE;
 BOOLEAN Property := TRUE;
 BOOLEAN PropertyEvent := TRUE;
 BOOLEAN SocialSecurityNumber := TRUE;
+BOOLEAN SSNSummary := TRUE;
 BOOLEAN Surname := TRUE;
 BOOLEAN TIN := TRUE;
 BOOLEAN Tradeline := TRUE;
@@ -85,7 +86,7 @@ mod_ConfigTestJob(STD.Date.Date_t _dtArchiveDate = STD.Date.Today()) := MODULE
 		EXPORT BOOLEAN BIPAppendReAppend         := TRUE;
 		EXPORT BOOLEAN BIPAppendIncludeAuthRep   := FALSE;
 
-		EXPORT UNSIGNED8 KEL_Permissions_Mask := 
+		EXPORT DATA100 KEL_Permissions_Mask := 
 				PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 						DataRestrictionMask := Data_Restriction_Mask, 
 						DataPermissionMask  := Data_Permission_Mask, 
@@ -264,12 +265,14 @@ soapLayout := RECORD
 		BOOLEAN IncludeHousehold;
 		BOOLEAN IncludeInquiry;
 		BOOLEAN IncludeLienJudgment ;
+		BOOLEAN IncludeNameSummary ;
 		BOOLEAN IncludePerson;
 		BOOLEAN IncludePhone;
 		BOOLEAN IncludeProfessionalLicense;
 		BOOLEAN IncludeProperty ;
 		BOOLEAN IncludePropertyEvent;
 		BOOLEAN IncludeSocialSecurityNumber;
+		BOOLEAN IncludeSSNSummary;
 		BOOLEAN IncludeSurname ;
 		BOOLEAN IncludeTIN;
 		BOOLEAN IncludeTradeline ;
@@ -282,6 +285,8 @@ soapLayout := RECORD
 end;
 
 soapLayout trans_pre (pp le, Integer c):= TRANSFORM 
+	// The inquiry delta base which feeds the 1 day inq attrs is not needed for the input rep 1 at this point. for now we only run this delta base code in the nonFCRA service 
+	
 		SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout,
 		SELF := LEFT;
     SELF := []));	
@@ -315,6 +320,7 @@ soapLayout trans_pre (pp le, Integer c):= TRANSFORM
 		self.IncludeProperty := Property;
 		self.IncludePropertyEvent := PropertyEvent;
 		self.IncludeSocialSecurityNumber := SocialSecurityNumber;
+		self.IncludeSSNSummary := SSNSummary;
 		self.IncludeSurname := Surname;
 		self.IncludeTIN := TIN;
 		self.IncludeTradeline := Tradeline;
@@ -348,7 +354,7 @@ END;
 bwr_results := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'PublicRecords_KEL.MAS_nonFCRA_FDC_Proddata_Service', //prox assoc
+				'PublicRecords_KEL.MAS_nonFCRA_FDC_Proddata_Service', 
 				{soap_in}, 
 				DATASET(layout_FDC_Service),
 				// XPATH('*'),
@@ -364,4 +370,4 @@ Failed := bwr_results(TRIM(ErrorCode) <> '');
 output(choosen(Failed, 25), named('Failed_Results'));
 output(count(failed), named('Failed_Count'));
 
-OUTPUT(Passed,,OutputFile, Thor, overwrite);
+OUTPUT(Passed,,OutputFile, Thor, overwrite, expire(45));

@@ -105,7 +105,7 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 		EXPORT STRING100 Allowed_Sources := AllowedSources;
 		EXPORT STRING IndustryClass := Industry_Class; // When set to UTILI or DRMKT this restricts Utility data
 		EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
-		EXPORT UNSIGNED8 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
+		EXPORT DATA100 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 			DataRestrictionMask, 
 			DataPermissionMask, 
 			GLBA, 
@@ -129,7 +129,26 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 		EXPORT STRING100 TransactionID := _TransactionId;                                
 		EXPORT STRING100 BatchUID := _BatchUID;
 		EXPORT UNSIGNED6 GlobalCompanyId := _GCID;				
-		END;	
+
+		//default options in PublicRecords_KEL.Interface_Options have been changed to FALSE
+		EXPORT BOOLEAN IncludeAircraft := TRUE;
+		EXPORT BOOLEAN IncludeAddress := TRUE;
+		EXPORT BOOLEAN IncludeBankruptcy := TRUE;
+		EXPORT BOOLEAN IncludeBusinessSele := TRUE;
+		EXPORT BOOLEAN IncludeBusinessProx := TRUE;
+		EXPORT BOOLEAN IncludeCriminalOffender := TRUE;
+		EXPORT BOOLEAN IncludeEducation := TRUE;
+		EXPORT BOOLEAN IncludeEmail := TRUE;
+		EXPORT BOOLEAN IncludeLienJudgment := TRUE;
+		EXPORT BOOLEAN IncludePerson := TRUE;
+		EXPORT BOOLEAN IncludeProperty := TRUE;
+		EXPORT BOOLEAN IncludePropertyEvent := TRUE;
+		EXPORT BOOLEAN IncludeTradeline := TRUE;
+		EXPORT BOOLEAN IncludeVehicle := TRUE;
+		EXPORT BOOLEAN IncludeWatercraft := TRUE;
+		EXPORT BOOLEAN IncludeUCC := TRUE;
+    
+  END;	
 				
 	//For now we have only one version of the attributes V1.There are 2 fields for attributes now just in case we will be having new version sooner.
 	AttrsRequested := DATASET([ {STD.Str.ToUpperCase(AttributeVer1_in)},{STD.Str.ToUpperCase(AttributeVer2_in)} ],BRM_Marketing_Attributes.Layout_BRM_NonFCRA.AttributeGroupRec);

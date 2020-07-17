@@ -1,38 +1,62 @@
-//HPCC Systems KEL Compiler Version 1.2.0beta2
-IMPORT KEL12 AS KEL;
-IMPORT CFG_Compile,E_Property,E_Zip_Code,FN_Compile FROM $;
-IMPORT * FROM KEL12.Null;
+﻿//HPCC Systems KEL Compiler Version 1.3.0beta5
+IMPORT KEL13 AS KEL;
+IMPORT B_Property_1,CFG_Compile,E_Property,E_Zip_Code FROM PublicRecords_KEL;
+IMPORT * FROM KEL13.Null;
 EXPORT B_Property(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED VIRTUAL TYPEOF(E_Property(__in,__cfg).__Result) __E_Property := E_Property(__in,__cfg).__Result;
-  SHARED __EE1988489 := __E_Property;
-  EXPORT __ST80522_Layout := RECORD
+  SHARED VIRTUAL TYPEOF(B_Property_1(__in,__cfg).__ENH_Property_1) __ENH_Property_1 := B_Property_1(__in,__cfg).__ENH_Property_1;
+  SHARED __EE6437781 := __ENH_Property_1;
+  EXPORT __ST126805_Layout := RECORD
+    KEL.typ.nstr A_V_M_Unformatted_A_P_N_;
+    KEL.typ.nint A_V_M_Land_Use_Code_;
+    KEL.typ.nkdate A_V_M_Recording_Date_;
+    KEL.typ.nkdate A_V_M_Assessed_Value_Year_;
+    KEL.typ.nint A_V_M_Sales_Price_;
+    KEL.typ.nint A_V_M_Assessed_Total_Value_;
+    KEL.typ.nint A_V_M_Market_Total_Value_;
+    KEL.typ.nint A_V_M_Tax_Assessment_Valuation_;
+    KEL.typ.nint A_V_M_Price_Index_Valuation_;
+    KEL.typ.nint A_V_M_Hedonic_Valuation_;
+    KEL.typ.nint A_V_M_Automated_Valuation_;
+    KEL.typ.nint A_V_M_Confidence_Score_;
+    KEL.typ.nbool A_V_M_Current_Flag_;
+    KEL.typ.nkdate A_V_M_Value_Date_;
+    KEL.typ.nint A_V_M_Years_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
+    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
+  EXPORT __ST126787_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
     KEL.typ.nstr Suffix_;
     KEL.typ.nstr Postdirectional_;
-    KEL.typ.nstr Unit_Designation_;
     KEL.typ.nstr Secondary_Range_;
-    KEL.typ.nstr Postal_City_;
-    KEL.typ.nstr Vanity_City_;
-    KEL.typ.nstr State_;
     KEL.typ.ntyp(E_Zip_Code().Typ) Z_I_P5_;
-    KEL.typ.ndataset(E_Property(__in,__cfg).Automated_Valuation_Model_Layout) Automated_Valuation_Model_;
+    KEL.typ.ndataset(E_Property(__in,__cfg).Address_Components_Layout) Address_Components_;
+    KEL.typ.ndataset(__ST126805_Layout) Automated_Valuation_Model_;
     KEL.typ.ndataset(E_Property(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.nkdate Current_Date_;
-    KEL.typ.nkdate Current_Date_F_C_R_A_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST80522_Layout __ND1988598__Project(E_Property(__in,__cfg).Layout __PP1988343) := TRANSFORM
-    SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('property_build_version'))),__CN(__cfg.CurrentDate));
-    SELF.Current_Date_F_C_R_A_ := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('fcra_property_build_version'))),__CN(__cfg.CurrentDate));
-    SELF := __PP1988343;
+  SHARED __ST126787_Layout __ND6437786__Project(B_Property_1(__in,__cfg).__ST224360_Layout __PP6437782) := TRANSFORM
+    __EE6437825 := __PP6437782.Automated_Valuation_Model_;
+    SELF.Automated_Valuation_Model_ := __BN(PROJECT(__T(__EE6437825),__ST126805_Layout),__NL(__EE6437825));
+    SELF := __PP6437782;
   END;
-  EXPORT __ENH_Property := PROJECT(__EE1988489,__ND1988598__Project(LEFT));
+  EXPORT __ENH_Property := PROJECT(__EE6437781,__ND6437786__Project(LEFT));
 END;

@@ -76,7 +76,7 @@ EXPORT Layouts := MODULE
 		string4 WirelessIndicator;
 		STRING20 InsuranceDLNumber;		
 		STRING2 InsuranceDLState;		
-		STRING2 InsuranceSource;		
+		STRING InsuranceSource;		
 		BOOLEAN InsuranceDLDataUsed;		
 	END;
 	

@@ -614,13 +614,13 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_COUNT_NVP := 1000;
 		export unsigned2 MAX_TIMELINE_PHONES := 20;
 	end;
-  
+
   export RIN := MODULE
     export unsigned2 MAX_COUNT_NVP := 1000;
     export unsigned2 MAX_COUNT_SEARCH_RECORDS := 10000;
     export unsigned2 MAX_COUNT_INDICATOR_ATTRIBUTE := 1000;
   end;
-	
+
   export Fraud_Point := MODULE
 		export unsigned2 MaxAttributes := 256; // update after reviewing attribute return counts.
 	end;
@@ -1244,23 +1244,24 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_COUNT_SMARTLINX_BIZ_ASSOCIATED_PEOPLE   := 500;
 	end;
 
-	// Motor Vehicle Registrations (MVR)
-  export MV := MODULE
+    // Motor Vehicle Registrations (MVR)
+    export MV := MODULE
     // ideally, those should refer to VehicleV2_Services.Constant values...
-    export unsigned1 MaxCountGateways := 2;
-    export unsigned1 MaxCountOwners := 10;
-    export unsigned1 MaxCountRegistrants := 10;
-    export unsigned1 MaxCountLienHolders := 10;
-    export unsigned1 MaxCountLessees := 10;
-    export unsigned1 MaxCountLessors := 10;
-		export unsigned1 MaxCountBrands := 5;
-		export UNSIGNED1 MaxCountMakes := 4;
-		export UNSIGNED1 MaxCountModels := 4;
-		export UNSIGNED1 MaxCountMajorColors := 4;
-		export UNSIGNED1 MaxCountMinorColors := 4;
-		export MAX_COUNT_SEARCH_RESPONSE_RECORDS := 2000;
-		export MAX_COUNT_REPORT_RESPONSE_RECORDS := 2000;
-  end;
+        export unsigned1 MaxCountGateways := 2;
+        export unsigned1 MaxCountOwners := 10;
+        export unsigned1 MaxCountRegistrants := 10;
+        export unsigned1 MaxCountLienHolders := 10;
+        export unsigned1 MaxCountLessees := 10;
+        export unsigned1 MaxCountLessors := 10;
+        export unsigned1 MaxCountBrands := 5;
+        export unsigned1 MaxCountMakes := 4;
+        export unsigned1 MaxCountModels := 4;
+        export unsigned1 MaxCountMajorColors := 4;
+        export unsigned1 MaxCountMinorColors := 4;
+        export unsigned2 MAX_COUNT_SEARCH_RESPONSE_RECORDS := 2000;
+        export unsigned2 MAX_COUNT_REPORT_RESPONSE_RECORDS := 2000;
+        export unsigned1 MAX_VEHICLE_TAG_TYPE := 19;
+    end;
 
 	// Natural Disaster Readiness
 	export NATURAL_DISASTER := MODULE
@@ -1810,7 +1811,7 @@ EXPORT Constants := MODULE
 		// NOTE: this is currently not used in top business report - at present it is only used for combined bip service
 		export unsigned MAX_COUNT_BIZRPT_CTL_SEGMENTS := 50;
 		export unsigned MAX_COUNT_BIZRPT_CTL_ACCTS := 100;
-          
+
            // BUSINESS INSIGHT SECTION CONSTANTS
            export unsigned MAX_COUNT_BUSINESS_RISK_RISKCODE := 20;
            export unsigned MAX_COUNT_BUSINESS_EVIDENCE_RISKCODE := 20;
@@ -2110,8 +2111,8 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxAircrafts       := 1000;
 		export unsigned2 MaxATF             := 200;
 		export unsigned2 MaxAVM             := 2000;
-		export unsigned2 MaxBankruptcies    := 1000;  
-		export unsigned2 MaxCrimOffenders		:= 2000;  
+		export unsigned2 MaxBankruptcies    := 1000;
+		export unsigned2 MaxCrimOffenders		:= 2000;
 		export unsigned2 MaxCrimOffenses		:= 750;
 		export unsigned2 MaxCrimCourtOffenses	:= 900;
 		export unsigned2 MaxCrimPunishment	:= 150;
@@ -2202,5 +2203,9 @@ EXPORT Constants := MODULE
     export unsigned2 MaxCollectionRecords := 2000;
   end;
 
-END;  
+  export ConsumerOptoutReport := module
+    export unsigned2 MaxGlobalSIDs := 1000;
+  end;
+
+END;
 

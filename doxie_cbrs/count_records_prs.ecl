@@ -1,4 +1,4 @@
-﻿import doxie, business_header, doxie_cbrs_raw, LN_PropertyV2_Services;
+﻿import business_header, doxie, doxie_cbrs, doxie_cbrs_raw, LN_PropertyV2_Services;
 doxie_cbrs.mac_Selection_Declare()
 
 unsigned3 get_Count(boolean included, unsigned3 max_val, unsigned3 count_shown, unsigned3 count_simple) :=
@@ -75,7 +75,7 @@ export count_records_prs(dataset(doxie_cbrs.layout_references) bdids, unsigned1 
 		Return_ReversePhone_val, //a little different since no direct key count
 		Max_ReverseLookup_val,
 		sum(doxie_cbrs.reverse_lookup_records_prs_max(bdids), count(listed_name_children)),
-		count(doxie_cbrs.reverse_lookup_records(bdids))),
+		count(doxie_cbrs.reverse_lookup_records(bdids,Include_ReversePhone_val))),
 	get_Count(
 		Include_NameVariations_val,
 		Max_NameVariations_val,

@@ -16,7 +16,7 @@ mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI
 //    -- pick the best BDID
 
 // recs that match input criteria
-best_recs := business_header.fn_RSS_getBestRecords(true,false,INCLUDE_MVAWFA_HEADERS,INCLUDE_BUS_DPPA,true,false,false); 
+best_recs := business_header.fn_RSS_getBestRecords(mod_access, true,false,INCLUDE_MVAWFA_HEADERS,INCLUDE_BUS_DPPA,true,false,false); 
 
 // minimum field population filter
 best_recs_filt := best_recs(company_name != '' and 
@@ -24,7 +24,7 @@ best_recs_filt := best_recs(company_name != '' and
 														postdir != '' or unit_desig != '' or sec_range != '' or city != '' or
 														state != '' or zip != 0 or zip4 != 0));
 
-brByGIDs := SORT(Business_Header.fn_RSS_rollupBestRecords(best_recs_filt, 10), -score, -best_flags);
+brByGIDs := SORT(Business_Header.fn_RSS_rollupBestRecords(best_recs_filt, mod_access, 10), -score, -best_flags);
 // tm := MODULE(PROJECT(AutoStandardI.GlobalModule(), AutoStandardI.InterfaceTranslator.bdid_dataset.params, OPT))
 	// EXPORT bdid := brByGIDs[1].bdid_list;
 // END;

@@ -1,7 +1,7 @@
-import AutoStandardI;
+IMPORT AutoStandardI;
 
 EXPORT input := MODULE
 
-  export gm := AutoStandardI.GlobalModule();
+  EXPORT gm := AutoStandardI.GlobalModule();
 
 END;

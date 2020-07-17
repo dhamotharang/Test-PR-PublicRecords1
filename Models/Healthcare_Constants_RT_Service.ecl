@@ -44,11 +44,15 @@
 	Export SSN_Rej_Message := 'INVALID OR BLANK SSN';
 	Export INTEGER Minor_Rej_Code := 666666;
 	Export Minor_Rej_Message := 'INPUT RECORD IS A MINOR';
+	Export INTEGER Age115_Rej_Code := 115;
+	Export Age115_Rej_Message := 'MEMBER/PATIENT AGE GREATER THAN 115 YEARS';
 	Export INTEGER ADLScoreFail_Code := 10;
 	Export ADLScoreFail_Message := 'MINIMUM CONFIDENCE SCORE THRESHOLD NOT MET';
 	Export GLBRequiredFail_Message := 'A VALID GLB PERMISSIBLE PURPOSE IS REQUIRED TO USE THIS PRODUCT.';
 	Export GLBInvalidFail_Message := 'SUPPLIED GLB PURPOSE IS NOT AN APPROVED USAGE VALUE.';
 	Export DPPAInvalidFail_Message := 'THERE IS NO DPPA PERMISSIBLE PURPOSE FOR THIS PRODUCT.';
+	Export DMFInvalidFail_Message := 'AN APPROVED DMF PERMISSIBLE PURPOSE IS REQUIRED TO USE THIS PRODUCT.';
+	Export FCRAInvalidFail_Message := 'AN APPROVED FCRA PERMISSIBLE PURPOSE IS REQUIRED TO USE THIS PRODUCT.';
 
 	Export InvalidAdmitDate_FieldName := 'AdmitDate';
 	Export InvalidAdmitDate_Code := '67108864';
@@ -580,9 +584,13 @@
 	export unsigned1 val_TotalCostRiskScore_Category_1_High := 50;
 
 	Export usage_GLB_Value := '06';
+	Export transactionsAuthorizedByConsumer_GLB_Value := '01';
 
 	export authorized_DPPA := 0;
 	export authorized_GLBA := 6;
+	export authorized_DMF := '00';
+	export authorized_FCRA := 0;
+	export transactionsAuthorizedByConsumer_GLBA := 1;
 	export default_DataRestriction := '000000000000010000000000000000'; 
 	export default_DataPermission := '000000000000000000000000000000';  
 	export default_LeadIntegrity_Version := 4;
@@ -595,6 +603,7 @@
 
 	Export CFG_MBS_LexIdSourceOptout := 'LexIdSourceOptout';
 	Export CFG_MBS_SuppressResultsForOptOuts := 'SuppressResultsForOptOuts';
+	Export CFG_MBS_allowAltPermissiblePurpose := 'AllowAltPermissiblePurpose';
 
 	Export UNSIGNED1 val_LexIdSourceOptout := 1;
 

@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
-IMPORT KEL12 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.3.0beta5
+IMPORT KEL13 AS KEL;
 IMPORT B_Education_3,B_Education_7,CFG_Compile,E_Education FROM PublicRecords_KEL;
-IMPORT * FROM KEL12.Null;
+IMPORT * FROM KEL13.Null;
 EXPORT B_Education_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED VIRTUAL TYPEOF(B_Education_3().__ENH_Education_3) __ENH_Education_3 := B_Education_3(__in,__cfg).__ENH_Education_3;
-  SHARED __EE1745910 := __ENH_Education_3;
-  EXPORT __ST188478_Layout := RECORD
+  SHARED VIRTUAL TYPEOF(B_Education_3(__in,__cfg).__ENH_Education_3) __ENH_Education_3 := B_Education_3(__in,__cfg).__ENH_Education_3;
+  SHARED __EE4526773 := __ENH_Education_3;
+  EXPORT __ST157502_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr College_Name_;
     KEL.typ.nstr L_N_College_Name_;
@@ -21,12 +21,15 @@ EXPORT B_Education_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST188478_Layout __ND1746062__Project(B_Education_7(__in,__cfg).__ST166070_Layout __PP1745779) := TRANSFORM
-    __BS1745857 := __T(__PP1745779.College_Characteristics_);
-    SELF.Coll_Rec_Flag_ := EXISTS(__BS1745857(__T(__OP2(__T(__PP1745779.College_Characteristics_).File_Type_,IN,__CN(['C','H','O'])))));
-    SELF := __PP1745779;
+  SHARED __ST157502_Layout __ND4526855__Project(B_Education_7(__in,__cfg).__ST193941_Layout __PP4526774) := TRANSFORM
+    __BS4526816 := __T(__PP4526774.College_Characteristics_);
+    SELF.Coll_Rec_Flag_ := EXISTS(__BS4526816(__T(__OP2(__T(__PP4526774.College_Characteristics_).File_Type_,IN,__CN(['C','H','O'])))));
+    SELF := __PP4526774;
   END;
-  EXPORT __ENH_Education_2 := PROJECT(__EE1745910,__ND1746062__Project(LEFT));
+  EXPORT __ENH_Education_2 := PROJECT(__EE4526773,__ND4526855__Project(LEFT));
 END;

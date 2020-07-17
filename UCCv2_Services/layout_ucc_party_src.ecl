@@ -2,8 +2,8 @@ party_raw := uccv2_services.layout_ucc_party_raw;
 party_parsed := uccv2_services.layout_ucc_party_parsed_src;
 party_address := uccv2_services.layout_ucc_party_address_src;
 
-export layout_ucc_party_src := record
+EXPORT layout_ucc_party_src := RECORD
   party_raw.orig_name;
-	dataset(party_parsed)  parsed_parties{maxcount(25)};
-	dataset(party_address) addresses{maxcount(25)};
-end;
+  DATASET(party_parsed) parsed_parties{MAXCOUNT(25)};
+  DATASET(party_address) addresses{MAXCOUNT(25)};
+END;

@@ -1,4 +1,4 @@
-export Layout_Vehicle_DL_Number := record
-	string24		DL_Number;
-	string2			state_origin;
-end;
+EXPORT Layout_Vehicle_DL_Number := RECORD
+  STRING24 DL_Number;
+  STRING2 state_origin;
+END;

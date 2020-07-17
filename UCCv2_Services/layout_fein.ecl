@@ -1,4 +1,4 @@
-import UCCV2;
-export layout_fein := record
-	UCCV2.Layout_UCC_Common.Party.fein;
-end;
+IMPORT UCCV2;
+EXPORT layout_fein := RECORD
+  UCCV2.Layout_UCC_Common.Party.fein;
+END;

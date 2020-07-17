@@ -1,8 +1,7 @@
-IMPORT Business_Header_SS, RiskWise, Business_Risk_BIP;
+IMPORT Business_Header_SS, RiskWise, Business_Risk_BIP, doxie;
 
-EXPORT BusnHeaderRecs(DATASET(Layouts.BusnLayoutV2) BusnIn
-
-														) := FUNCTION
+EXPORT BusnHeaderRecs(DATASET(Layouts.BusnLayoutV2) BusnIn,
+                      doxie.IDataAccess mod_access) := FUNCTION
 //version 2
 BusnHeader := Business_Header_SS.Key_BH_BDID_pl;
 
@@ -10,7 +9,8 @@ BusnHeadRec := join(BusnIn(OrigBdid!=0), BusnHeader,
 										Keyed(right.bdid=left.OrigBdid) and
 										right.dt_first_seen < (unsigned4)(string)(left.historydate + '01') AND
 										right.dt_first_seen <> 0 and
-										right.source not in AMLConstants.ExcludeSrcs,
+										right.source not in AMLConstants.ExcludeSrcs AND 
+                    doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
                     transform({recordof(BusnHeader), unsigned4 seq, unsigned4	historydate }, 
 										self.seq:=left.seq, 
 										self.historydate := left.historydate,
