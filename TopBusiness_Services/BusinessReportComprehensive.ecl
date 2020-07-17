@@ -48,7 +48,7 @@
 </message>
 */
 /*--INFO-- This service produces a full business report.*/
-import iesp, autostandardi, Doxie;
+import TopBusiness_Services,iesp, autostandardi, Doxie, std;
 export BusinessReportComprehensive() := macro
 
 	#constant('NoDeepDive', true);
@@ -111,6 +111,7 @@ export BusinessReportComprehensive() := macro
 	#stored('IncludeDunBradStreet',report_options.IncludeDunBradStreet);
 	#stored('IncludeExperianBusinessReports',report_options.IncludeExperianBusinessReports);
 	#stored('IncludeCriminalIndicators',report_options.IncludeCriminalIndicators);
+     #stored('IncludeBizToBizDelinquencyRiskIndicator', report_options.IncludeBizToBizDelinquencyRiskIndicator);
 	#stored('LnBranded',user_options.LnBranded);
 	
   #WEBSERVICE(FIELDS('ULTID',
@@ -122,7 +123,7 @@ export BusinessReportComprehensive() := macro
 											'DOTID',
 											'BusinessReportFetchLevel',
 											'IncludeAssociatedBusinesses',
-                                                           'IncludeBusinessInsight',
+                                                          'IncludeBusinessInsight',
 											'IncludeParents',
 											'IncludeContacts',
 											'IncludeFinances',
@@ -150,6 +151,7 @@ export BusinessReportComprehensive() := macro
 											'IncludeDunBradStreet',
 											'IncludeExperianBusinessReports',
 											'IncludeCriminalIndicators',
+                                                          'IncludeBizToBizDelinquencyRiskIndicator',
 											'LnBranded',
 											'DataRestrictionMask',
 											'DataPermissionMask',
@@ -186,7 +188,8 @@ export BusinessReportComprehensive() := macro
 	boolean DNBSect 							:= false : stored('IncludeDunBradStreet');
 	boolean ExperianBusReport 		:= false : stored('IncludeExperianBusinessReports');
 	boolean CriminalIndicators 		:= false : stored('IncludeCriminalIndicators');
-      boolean BusinessInsight 		:= false : stored('IncludeBusinessInsight');
+      boolean BusinessInsight 		:= false : stored('IncludeBusinessInsight');     
+     boolean IncludeBizToBizDelinquencyRI := false : stored('IncludeBizToBizDelinquencyRiskIndicator');
 	boolean lnbranded 						:= false : stored('LnBranded');
 	// set DEFAULT for query level report fetches to be at the SELEID = S level.
 	string1 BusinessReportFetchLevel := 'S' : stored('BusinessReportFetchLevel');
@@ -222,9 +225,10 @@ export BusinessReportComprehensive() := macro
 		self.IncludeDunBradStreet 					:= DNBSect;
 		self.IncludeExperianBusinessReports := ExperianBusReport;
 		self.IncludeCriminalIndicators			:= CriminalIndicators;
+           self.IncludeBizToBizDelinquencyRiskIndicator      :=  IncludeBizToBizDelinquencyRI;
 		self.lnbranded 											:= lnbranded;
 		self.internal_testing 							:= false ; //internal_testing;
-		self.BusinessReportFetchLevel 			:= topbusiness_services.functions.fn_fetchLevel(trim(stringlib.stringToUpperCase(BusinessReportFetchLevel),left,right)[1]);    
+		self.BusinessReportFetchLevel 			:= topbusiness_services.functions.fn_fetchLevel(trim(std.str.ToUpperCase(BusinessReportFetchLevel),left,right)[1]);    
 		self := [];
 	end;
 

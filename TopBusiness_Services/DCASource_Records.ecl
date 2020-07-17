@@ -1,16 +1,16 @@
-// ================================================================================
+﻿// ================================================================================
 // ======   RETURNS DCA DATA FOR A GIVEN ENTERPRISE_NUM IN ESP-COMPLIANT WAY  =====
 // ================================================================================
-IMPORT DCAV2, BIPV2, iesp, TopBusiness_Services;
+IMPORT DCAV2, BIPV2, iesp, TopBusiness_Services, std;
 
 EXPORT DCASource_Records(
   dataset(Layouts.rec_input_ids_wSrc) in_docids,
-  SourceService_Layouts.OptionsLayout inoptions, 
+  TopBusiness_Services.SourceService_Layouts.OptionsLayout inoptions, 
 	boolean IsFCRA = false) 
  := MODULE
  
  SHARED dca_layout_wLinkIds := RECORD
-		Layouts.rec_input_ids_wSrc;
+		TopBusiness_Services.Layouts.rec_input_ids_wSrc;
 		DCAV2.Layouts.base.keybuildEntNum;
 	END;
 
@@ -25,7 +25,7 @@ EXPORT DCASource_Records(
 	
 	// *** Key fetch to get enterprise_num from DCAV2 linkids key
   ds_dcakeys := PROJECT(TopBusiness_Services.Key_Fetches(in_docs_linkonly, // input file to join key with
-								                                         inoptions.fetch_level
+								                                         inoptions.fetch_level ,TopBusiness_Services.Constants.defaultJoinLimit
 																												).ds_dca_linkidskey_recs,
 																TRANSFORM(Layouts.rec_input_ids_wSrc,
 																					SELF.IdValue := LEFT.rawfields.Enterprise_num,
@@ -36,7 +36,7 @@ EXPORT DCASource_Records(
 
 	dca_keys := PROJECT(dca_keys_comb(IdValue != ''),TRANSFORM(dca_key_layout,SELF.Enterprise_num := LEFT.IdValue, SELF := []));
 	
-	dca_keys_dedup := DEDUP(dca_keys,ALL); 
+      dca_keys_dedup :=  DEDUP(SORT(dca_keys, Enterprise_num), Enterprise_num);
 	
  	// Since there is no existing ???_Services.raw(???) that accesses DCA data, 
 	// join input ds to DCA.key_EntNum on enterprise_num and use all
@@ -124,7 +124,7 @@ EXPORT DCASource_Records(
   // transform for the main output iesp record layout
   iesp.directorycorpaffiliation.t_DirectoryCorpAffiliationRecord toOut (dca_layout_wLinkIds L, 
 																															DATASET(dca_layout_wLinkIds) allRows) := transform
-		IDmacros.mac_IespTransferLinkids()
+		TopBusiness_Services.IDmacros.mac_IespTransferLinkids()
 	  self.ProcessDate         := iesp.ECL2ESP.toDate ((integer4) L.process_date);
 	  self.EnterpriseNumber    := L.Enterprise_num;
 	  self.TypeOrig            := L.Type_orig;
@@ -149,7 +149,7 @@ EXPORT DCASource_Records(
 	  self.Assets              := allRows(Assets != '')[1].Assets;
 	  self.Liabilities         := allRows(Liabilities != '')[1].Liabilities;
 	  self.NetWorth            := allRows(Net_Worth_ != '')[1].Net_Worth_;
-	  self.EmployeeNumber      := (integer) stringlib.StringFilterOut(allRows(EMP_NUM != '')[1].EMP_NUM,',');
+	  self.EmployeeNumber      := (integer) std.str.FilterOut(allRows(EMP_NUM != '')[1].EMP_NUM,',');
 	  self.BusinessDescription := L.Bus_Desc;
 	  self.TickerSymbol        := L.Ticker_Symbol;
 	  self.Address.StreetNumber        := L.prim_range;

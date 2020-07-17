@@ -1,11 +1,11 @@
-﻿import TopBusiness, iesp, BIPv2, Property, Census_Data, MDR;
+﻿import TopBusiness_services, iesp, BIPv2, Property, MDR, std;
 
 export foreclosureNODSection := module
 
 //situs1 is property address, situs2 is mailing addr		
 
 export Fn_fullView(
-      dataset(ForeclosureNODSection_layouts.rec_Input) ds_in_data,		   				
+      dataset(Topbusiness_services.ForeclosureNODSection_layouts.rec_Input) ds_in_data,		   				
 			 string1 FETCH_LEVEL
 			)  := function
 			
@@ -73,10 +73,9 @@ export Fn_fullView(
 		                          foreclosure_id,recording_date);
 
   			
-		
 		foreclosure_partyDS := dedup(project(foreclosure_raw(deed_category='U'),		                        
 																transform(
-																   TopBusiness_Services.ForeclosureNODSection_layouts.linkids_plus_t_Biz_Foreclosure_rec,																	
+																   TopBusiness_Services.ForeclosureNODSection_layouts.linkids_plus_t_Biz_Foreclosure_rec,
 																	self.ultid := left.ultid;
 																	self.orgid := left.orgid;
 																	self.seleid := left.seleid;
@@ -86,13 +85,9 @@ export Fn_fullView(
 																	self.dotid := left.dotid;				
 																	self.ln_fares_id := '';
 																	// set this from right
-																	                                         
-																	self.apn := trim(stringlib.stringfilter(left.parcel_number_unmatched_id,'0123456789'), left,right);
-																	// set the county name
-																	self.countyName :=  choosen(project(Census_Data.Key_Fips2County(
-							                          keyed(state_code = left.property_state_1) and 
-			                                  keyed(county_fips = left.county)), transform({string18 countyName;},
-																				 self.countyName := left.county_name)),1)[1].countyName;
+																	                                         																	
+                                                                                           self.apn := trim(std.str.filter(left.parcel_number_unmatched_id,'0123456789'), left,right);																	
+													                                                                                
 																	self.recordingDate := iesp.ecl2esp.toDateString8(left.recording_date);
 																					 
 										 self.documentType := left.document_desc; // left.documentType;
@@ -162,7 +157,7 @@ export Fn_fullView(
 										//export src_Foreclosures              := 'FR';
 											//export src_Foreclosures_Delinquent   := 'NT';
 							)),all, record);	  
-																
+
     nod_raw_slim := dedup(project(nod_raw, transform(	 TopBusiness_Services.ForeclosureNODSection_layouts.slim_NODForeRec,
 		                self.ultid := left.ultid;
 																	 self.orgid := left.orgid;
@@ -172,16 +167,11 @@ export Fn_fullView(
 																	 self.empid := left.empid;
 																	 self.dotid := left.dotid;			
 																	 self.ln_fares_id := '';
-																	 	
-																	self.apn := trim(stringlib.stringfilter(left.parcel_number_unmatched_id,'0123456789'), left,right);
-																	self.countyName :=  choosen(project(Census_Data.Key_Fips2County(
-							                          keyed(state_code = left.property_state_1) and 
-			                                  keyed(county_fips = left.county)), transform({string18 countyName;},
-																				 self.countyName := left.county_name)),1)[1].countyName;
+																	 																		
+																      self.apn := trim(std.str.filter(left.parcel_number_unmatched_id,'0123456789'), left,right);
 										self.recordingDate := iesp.ecl2esp.toDateString8(left.recording_date);
 										self.parcel_number_unmatched_id := left.parcel_number_unmatched_id;
-										self.property_state_1 := left.property_state_1;
-										self.county := left.county;
+										self.property_state_1 := left.property_state_1;								
 										self.document_desc := left.document_desc;
 										// this is DATE: on the mockup.
                                // self.Name := iesp.ecl2esp.setName(left.name_first, left.name_middle, left.name_last,
@@ -236,6 +226,7 @@ export Fn_fullView(
 										self.SourceDocId := left.foreclosure_id;
 										self := [];
 										)),all, except sourceDocId, apn, parcel_number_unmatched_id);
+
     NOD_partyDS := dedup(project(nod_raw_slim(deed_category='N'),		                        
 																transform(
 																   TopBusiness_Services.ForeclosureNODSection_layouts.linkids_plus_t_Biz_Foreclosure_rec,																
@@ -247,12 +238,8 @@ export Fn_fullView(
 																	 self.empid := left.empid;
 																	 self.dotid := left.dotid;			
 																	 self.ln_fares_id := '';
-																	 	
-																	self.apn := trim(stringlib.stringfilter(left.parcel_number_unmatched_id,'0123456789'), left,right);
-																	self.countyName :=  choosen(project(Census_Data.Key_Fips2County(
-							                          keyed(state_code = left.property_state_1) and 
-			                                  keyed(county_fips = left.county)), transform({string18 countyName;},
-																				 self.countyName := left.county_name)),1)[1].countyName;
+																	 																		
+																      self.apn := trim(std.str.filter(left.parcel_number_unmatched_id,'0123456789'), left,right);
 										self.recordingDate := left.recordingDate; 
 									
 									self.documentType := left.document_desc; 
@@ -326,10 +313,9 @@ export Fn_fullView(
 																	 // now do the join to see if any recs from
 																	 // assessor list have a matching county/APN on them
 																	 //
-	for_nod_partyDS := 	foreclosure_partyDS + NOD_partyDS;																 
-												
-	 topLevel_struct_ForeclosureNOD_grouped := group(sort(dedup(for_nod_partyDS
-																										 ,all),  #expand(BIPV2.IDmacros.mac_ListTop3Linkids())
+	for_nod_partyDS := 	foreclosure_partyDS + NOD_partyDS;		
+	 topLevel_struct_ForeclosureNOD_grouped := group(sort(dedup(for_nod_partyDS                                                                                                                         
+                                                                                                                                            ,all), #expand(BIPV2.IDmacros.mac_ListTop3Linkids())
 																										 ),
 	                                             #expand(BIPV2.IDmacros.mac_ListTop3Linkids())
 	                                              );
@@ -374,9 +360,7 @@ export Fn_fullView(
 				
 			 
 	// output(ds_assessor_recs_raw, named('ds_assessor_recs_raw'));
-	// output(nod_linkids_raw, named('nod_linkids_raw'));
-	 
-	
+	// output(nod_linkids_raw, named('nod_linkids_raw'));	
 	 // output(nod_linkids_payload, named('nod_linkids_payload'));
 	  // output(nod_raw, named('nod_raw'));
 		// output(nod_raw_slim, named('nod_raw_slim'));
@@ -386,8 +370,7 @@ export Fn_fullView(
 	// output(Foreclosure_raw, named('Foreclosure_raw'));
 	 // output(foreclosure_partyDS, named('foreclosure_partyDS'));
 	
-	 // output(for_nod_partyDS, named('for_nod_partyDS'));
-	
+	 // output(for_nod_partyDS, named('for_nod_partyDS'));  
    // output(topLevel_struct_ForeclosureNOD_grouped, named('topLevel_struct_ForeclosureNOD_grouped'));
 			 			  																		
 	//return final_results;

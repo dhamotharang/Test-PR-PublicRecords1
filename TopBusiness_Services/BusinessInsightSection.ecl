@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, iesp, topbusiness_services, MDR, UCCV2, STD;
+﻿IMPORT  BIPV2, iesp,MDR, UCCV2, STD, Liensv2, Corp2, Cortera_Tradeline, DueDiligence, topbusiness_services;
   // throughout this code there are some indicators calculated.
   // this is all documented heavily in RR-18637 initial release
   // for the smart linx bus report (aka bip report)
@@ -10,8 +10,8 @@
   ///////////////////////////////////////////////////////////////
 EXPORT BusinessInsightSection := MODULE
 
-EXPORT LayoutInBusinessEvidence  := RECORD
-         dataset(bipv2.idlayouts.l_xlink_ids) biplinkids,
+    EXPORT LayoutInBusinessEvidence  := RECORD
+         dataset(bipv2.idlayouts.l_xlink_ids) biplinkids;
          Boolean Risk1_isDefunct;
          Boolean Risk2_isInActive;
          Unsigned4  Risk3_SourceCount;
@@ -24,45 +24,106 @@ EXPORT LayoutInBusinessEvidence  := RECORD
          BOOLEAN   Risk7_AnnualSalesIsZeroOrNotExistSicCodes;
          INTEGER2    Risk8_yearStarted;
          STRING10  Risk9_Phone10Value,
-         UNSIGNED4  Risk10_LessPeopleToBusCount;
+         INTEGER2  Risk10_LessPeopleToBusCount;
          UNSIGNED3   Risk11_HighSourceDocCount;
-         UNSIGNED4  Risk12_HighPeopleToBusCount;
+         INTEGER2  Risk12_HighPeopleToBusCount;
          UNSIGNED4  Risk13_EstablishedDate;
          Iesp.share.t_Date    Risk14_MostRecentDate;
-         BOOLEAN         Risk15_XYearsBackFromCurrentYear;
+         BOOLEAN       Risk15_XYearsBackFromCurrentYear;
       END;
+   
+      
+      EXPORT LayoutInBusinessRisk  := RECORD
+         DATASET (bipv2.idlayouts.l_xlink_ids) biplinkids;
+         DATASET (bipv2.idlayouts.l_xlink_ids)  Risk7_isGovtDebarred;
+         BOOLEAN  Risk8_ForeclosureNODRecordCount;
+         BOOLEAN  Risk9_bankrupctyExists;
+         BOOLEAN  Risk10_LiensWithinTwoYearsBack;
+         BOOLEAN  RIsk11_ExecHasDerog;
+         DATASET ({STRING8 SicCode;}) Risk12_BusinessInHighRiskIndustrySic;
+         DATASET ({STRING8 NaicsCode;}) Risk12_BusinessInHighRiskIndustryNaics;
+         BOOLEAN  Risk15_LiensBipLinkidsHighCount;
+         BOOLEAN  Risk16_BusinessHasB2BDelinquency;
+         BOOLEAN  Risk17_NonExecHasDerog;
+         BOOLEAN  Risk18_BusinessHasNoRevenue;
+         BOOLEAN  Risk19_BusinessHasNoRealProperty;
+         BOOLEAN  Risk20_BusinessHasNoPersonalAssets;
+         BOOLEAN  Risk21_UccActivityWithinLastYear;
+         DATASET ( DueDiligence.layoutsInternal.GeographicLayout) Risk22_BusinessInHighCrimeLocation;
+         STRING5    Risk23_zip5; // business is PO box
+         STRING28  Risk23_StreetName; // business is PO box
+         STRING10  Risk23_StreetNumber; // business is PO box
+         STRING5    Risk24_zip5;  // buiness is residential
+         STRING28  Risk24_StreetName;  // buiness is residential
+         STRING10  Risk24_StreetNumber;  // buiness is residential
+         BOOLEAN  Risk25_BusinessHasNewLocation; // busienss is new location
+         BOOLEAN  Risk26_BusinessHasNoDerog;
+         BOOLEAN  Risk27_BusinessHasCurrentProperty;
+         BOOLEAN  Risk28_BusinessHasCurrentAssets;
+         BOOLEAN  Risk29_BusinessHasRevenueAndIsProfit;
+         STRING5  Risk30_zip5; // business is business address
+         STRING28  Risk30_StreetName;  // business is business address
+         STRING10  Risk30_StreetNumber;  // business is business address
+         BOOLEAN  Risk31_BusinessHasHighRevenue;        
+      END;
+             
+   EXPORT RemoveCrimOffenderBoolean( dataset(TopBusiness_Services.ContactSection_Layouts.rec_final) ContactSectionIn) := FUNCTION
+                   
+                   TmpContactSection := PROJECT(ContactSectionIn,
+                                  TRANSFORM(TopBusiness_Services.ContactSection_Layouts.rec_final,                                         
+                                       SELF.PriorExecutives :=   PROJECT(LEFT.PriorExecutives, TRANSFORM(
+                                                                        iesp.TopbusinessReport.t_TopBusinessIndividual,
+                                                                                 SELF.IsSexualOffender  := FALSE;
+                                                                                 SELF.HasCriminalConviction := FALSE;
+                                                                                 SELF := LEFT));
+                                       SELF.PriorIndividuals := PROJECT(LEFT.PriorIndividuals, TRANSFORM(
+                                                                        iesp.TopbusinessReport.t_TopBusinessIndividual,
+                                                                                 SELF.IsSexualOffender  := FALSE;
+                                                                                 SELF.HasCriminalConviction := FALSE;
+                                                                                 SELF := LEFT));
+                                       SELF.CurrentExecutives := PROJECT(LEFT.CurrentExecutives, TRANSFORM(
+                                                                        iesp.TopbusinessReport.t_TopBusinessIndividual,
+                                                                                 SELF.IsSexualOffender  := FALSE;
+                                                                                 SELF.HasCriminalConviction := FALSE;
+                                                                                 SELF := LEFT));
+                                       SELF.CurrentIndividuals  := PROJECT(LEFT.CurrentIndividuals, TRANSFORM(
+                                                                        iesp.TopbusinessReport.t_TopBusinessIndividual,
+                                                                                 SELF.IsSexualOffender  := FALSE;
+                                                                                 SELF.HasCriminalConviction := FALSE;
+                                                                                 SELF := LEFT));                                       
+                                      SELF := LEFT;                                    
+                                   ));
+                                   
+                  RETURN(TmpContactSection);                                  
+   END;
 
-EXPORT UccActivityWithinXYears(  DATASET (BIPV2.IDlayouts.l_xlink_ids) inbipLinkids
+
+ SHARED UccActivityWithinXYears(  DATASET (BIPV2.IDlayouts.l_xlink_ids) inbipLinkids
                                                                         ,INTEGER NumYrs
                                                                         ,STRING1 FETCH_LEVEL                                                                      
                                                                         ) :=  FUNCTION     
              ds_linkids_keyrecs := Topbusiness_services.uccSection.GetUCCBipLinkids(InBiplinkids, FETCH_LEVEL,
                          Topbusiness_services.constants.BusinessInsight.UCCBusinessInsightKfetchMaxLimit); 
-                  
-             ds_linkids_keyrecs_slimmed := PROJECT (ds_linkids_keyrecs(party_type != 'A'),
-		           TRANSFORM(TopBusiness_Services.UCCSection_Layouts.rec_ids_with_linkidsdata_slimmed, //TODO can slim this down probably to just TMSID			
+                         
+             ds_linkids_keyrecs_slimmed := PROJECT (ds_linkids_keyrecs, 
+		           TRANSFORM(TopBusiness_Services.UCCSection_Layouts.rec_ids_with_linkidsdata_slimmed, 		
 			       SELF := LEFT;
                        SELF := [];
 			));
-                  
+        tmpLayout := RECORD        
+            BIPV2.IDlayouts.l_header_ids;
+            UCCV2.Layout_UCC_Common.Layout_party_With_AID.tmsid;
+        	 UCCV2.Layout_UCC_Common.Layout_ucc_new.filing_date;	
+            UNSIGNED4 Filing_date_unsigned;
+        END;
+        
                   ds_linkids_keyrecs_deduped := DEDUP(SORT(ds_linkids_keyrecs_slimmed,  
                                                                                     #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),tmsid),
-																#expand(BIPV2.IDmacros.mac_ListTop3Linkids()), tmsid);
-                 set_terminated_types := ['LAPSED','L','RELEASE','EXPUNGED','DELETED',
-	                         'TERMINATED','TERMINATION','UCC3 TERMINATION', 'UCC-3 TERMINATION'];
-
+																#expand(BIPV2.IDmacros.mac_ListTop3Linkids()), tmsid);            
                  ds_uccmain_keyrecs := JOIN(ds_linkids_keyrecs_deduped,UCCV2.Key_Rmsid_Main(),
-                               KEYED(LEFT.tmsid = RIGHT.tmsid), //get all recs for the tmsids
-	                  TRANSFORM({TopBusiness_Services.UCCSection_Layouts.rec_ids_with_maindata_slimmed; UNSIGNED4 Filing_date_unsigned;},
-		                                       // Added this additional field here.
-			        temp_status_type           := std.str.ToUpperCase(RIGHT.status_type);
-			        temp_filing_type           :=  std.str.ToUpperCase(RIGHT.filing_type);						
-			        SELF.orig_filing_number    := IF(RIGHT.orig_filing_number != '', RIGHT.orig_filing_number,RIGHT.filing_number),
-			
-                        SELF.filing_date_unsigned := (UNSIGNED4) RIGHT.filing_date;
-	                   // Fill in derived UCC overall status(status_code), A=active or T=terminated
-			        SELF.status_code           := IF (temp_status_type IN set_terminated_types OR  temp_filing_type IN set_terminated_types,
-											topbusiness_services.Constants.TERMINATED,topbusiness_services.Constants.ACTIVE);                                                                
+                               KEYED(LEFT.tmsid = RIGHT.tmsid), //get all recs for the tmsids	                  
+                        TRANSFORM(tmpLayout,		             
+                        SELF.filing_date_unsigned := (UNSIGNED4) RIGHT.filing_date;	                                                               
 			        SELF := RIGHT, // to pull off the ucc main key fields we want                       ???
 			               // (which have the same name on the temp layout as on the main key)
 			        SELF := LEFT, // to preserve ids & other(?) kept linkids key fields ???
@@ -73,23 +134,28 @@ EXPORT UccActivityWithinXYears(  DATASET (BIPV2.IDlayouts.l_xlink_ids) inbipLink
 	            );                                      
             //output(ds_uccmain_keyrecs, named('ds_uccmain_keyrecs'));               
             STRING8 CurDate := (STRING8) STD.Date.today();
-           UNSIGNED4 XYearBack := ((UNSIGNED4) (curdate[1..4])) - NumYrs;   // +  curDate[5..6] + curDate[7..8]);
+           UNSIGNED4 XYearBack := ((UNSIGNED4) (curdate[1..4])) - NumYrs;  
            UNSIGNED4 XYearBackFinal := (UNSIGNED4)( (STRING4) (XYearBack) +  curDate[5..6] + curDate[7..8] );
           res := EXISTS(ds_uccmain_keyrecs(filing_date_unsigned > XYearBackFinal)); 
           RETURN(res);
       END; // function
-
-
-                      
+      
+  
+                EXPORT  outLayout := RECORD
+                     BIPV2.IDlayouts.l_key_ids_bare - [proxid, powid, empid, dotid];
+                    iesp.topbusinessReport.t_TopBusinessBusinessInsightSection;       
+                END;
+                    
        EXPORT FromBipReportBusinessEvidence (DATASET(BIPV2.IDlayouts.l_xlink_ids) biplinkids
-	,Layouts.rec_input_options  in_options
+	,TopBusiness_Services.Layouts.rec_input_options  in_options
       ,TopBusiness_Services.BestSection_Layouts.Final bestSectionIn  
-      ,TopBusiness_Services.ContactSection_Layouts.rec_final ContactSectionIn    
+      , Boolean NoIndustrySectionRecs
+      ,INTEGER2 ContactCount 
       ,UNSIGNED3 SourceCount
       ,STRING2  SourceIdentifier
-      ,TopBusiness_Services.FinanceSection_Layouts.rec_final FinanceSectionIn
+      , Boolean NoRevenue
       ) := FUNCTION
-      
+            
           LayoutInBusinessEvidence  BusinessEvidenceXform() := TRANSFORM
           
           SELF.biplinkids  :=  biplinkids;  // used for input use in risk4 and Risk7 and risk 15 below
@@ -97,38 +163,23 @@ EXPORT UccActivityWithinXYears(  DATASET (BIPV2.IDlayouts.l_xlink_ids) inbipLink
           SELF.Risk2_isInActive  := NOT(bestSectionIn.isActive);
           SELF.Risk3_SourceCount :=   SourceCount;
           SELF.Risk3_SourceIdentifier :=  SourceIdentifier;
-          SELF.RIsk4_NoCorpRecs :=   NOT(exists(Topbusiness_services.incorporationSection.GetCorpBipLinkids( biplinkids, in_options.BusinessReportFetchLevel)));    
+          SELF.RIsk4_NoCorpRecs :=   NOT(EXISTS(Topbusiness_services.incorporationSection.GetCorpBipLinkids( biplinkids, 
+          in_options.BusinessReportFetchLevel,topBusiness_services.constants.SmallestKeepLimit)));    
           SELF.Risk5_zip5 :=  bestSectionIn.address.zip5;
           SELF.Risk5_StreetName  :=  bestSectionIn.address.StreetName;
           SELF.Risk5_StreetNumber :=   bestSectionIn.address.StreetNumber;
-          SELF.Risk6_MostRecentDate :=  BestSectionIn.AddressToDate;
-                                                                          noSales :=   (NOT(EXISTS(FinanceSectionIn.Finances))) OR EXISTS(FinanceSectionIn.Finances(AnnualSales = '0'));
-                                                                          ds_industry_keyrecs := Topbusiness_services.IndustrySection.GetIndustryBipLinkids(
-                                                                                              biplinkids
-                                                                                                , in_options.BusinessReportFetchLevel
-                                                                                                 , TopBusiness_Services.Constants.defaultJoinLimit);
-                                                                                    ds_industry_keyrecs_filtered := ds_industry_keyrecs((SicCode !='' or NAICS !='' OR
-                                                                                    industry_description !=''   OR
-                                                                                  business_description !='')
-									                                        	AND
-									                         	               ((source=MDR.sourceTools.src_EBR AND
-									                       	             record_type='C') OR
-										                                   source !=MDR.sourceTools.src_EBR)
-										                   	                  );
-          SELF.Risk7_AnnualSalesIsZeroOrNotExistSicCodes :=    NOT(EXISTS(ds_industry_keyrecs_filtered)) AND NoSales;       
+          SELF.Risk6_MostRecentDate :=  BestSectionIn.AddressToDate;                                                                      
+                                                                                                                                                   
+          SELF.Risk7_AnnualSalesIsZeroOrNotExistSicCodes :=    NoIndustrySectionRecs AND NoRevenue;       
           SELF.Risk8_yearStarted  :=  bestSectionIn.yearStarted;
           SELF.Risk9_Phone10Value  :=  bestSectionIn.PhoneInfo.Phone10;
-          SELF.Risk10_LessPeopleToBusCount  :=  ContactSectionIn.TotalPriorContactCount  +
-                         ContactSectionIn.TotalCurrentContactCount +
-                         ContactSectionIn.TotalCurrentExecutiveCount +
-                         ContactSectionIn.TotalPriorExecutiveCount;
+          SELF.Risk10_LessPeopleToBusCount  :=  ContactCount;  
+                  
           SELF.Risk11_HighSourceDocCount     :=  SourceCount;
-          SELF.Risk12_HighPeopleToBusCount  :=  ContactSectionIn.TotalPriorContactCount  
-                        +  ContactSectionIn.TotalCurrentContactCount
-                        +  ContactSectionIn.TotalPriorExecutiveCount  
-                        + ContactSectionIn.TotalCurrentExecutiveCount;
+          SELF.Risk12_HighPeopleToBusCount  :=  ContactCount; 
+          
           SELF.Risk13_EstablishedDate               := (unsigned4) bestSectionIn.yearStarted;
-          SELF.Risk14_MostRecentDate               := bestSectionIn.addressToDate;
+          SELF.Risk14_MostRecentDate               := bestSectionIn.addressToDate;       
           SELF.Risk15_XYearsBackFromCurrentYear  := UccActivityWithinXYears(biplinkids, 5, in_options.BusinessReportFetchLevel);
           END;  // transform
          
@@ -137,11 +188,131 @@ EXPORT UccActivityWithinXYears(  DATASET (BIPV2.IDlayouts.l_xlink_ids) inbipLink
        res := BusinessEvidenceInputRec;
     RETURN(RES);
     END;  // FromBipReport function
+    
+      EXPORT FromBipReportBusinessRisk (
+           DATASET(BIPV2.IDlayouts.l_xlink_ids) biplinkids
+	     ,TopBusiness_Services.Layouts.rec_input_options  in_options	
+          ,TopBusiness_Services.BestSection_Layouts.Final bestSectionIn  
+          ,BOOLEAN ContactExecHasDerog
+          ,BOOLEAN ContactNonExecHasDerog
+          ,STRING15  AnnualSales
+          , BOOLEAN NoRevenue         
+          ,DATASET({STRING8 SicCode;}) SicCode
+          ,DATASET({STRING8 NaicsCode;}) NaicsCode
+          ,INTEGER TotalMVRCount
+          ,INTEGER CurrentMVRCount
+          ,INTEGER TotalWatercraftCount
+          ,INTEGER CurrentWatercraftcount
+          ,INTEGER TotalAircraftCount
+          ,INTEGER CurrentAircraftCount
+          ,INTEGER PriorPropertyRecordsCount
+          ,INTEGER CurrentPropertyRecordsCount   
+          ,INTEGER ForeclosureNODRecordCount
+          ,BOOLEAN HasCurrentPropertyAndNoForeNod
+          ,BOOLEAN  UccSectionDoesExist
+          ,BOOLEAN LienSectionDoesExist
+          ,BOOLEAN LienCountOver5
+          ,BOOLEAN BankruptcySectionDoesExist
+           ,iesp.share.t_date LienOrigFilingDate        
+           ,BOOLEAN IncludeBizToBizDelinquencyRiskIndicator
+           ) := FUNCTION
+        STRING8 CurDate := (STRING8) STD.Date.today();         
+       // Topbusiness_services.BusinessInsightSection
+          LayoutInBusinessRisk  BusinessRiskXform() := TRANSFORM
       
-    EXPORT  outLayout := RECORD
-         BIPV2.IDlayouts.l_key_ids_bare - [proxid, powid, empid, dotid];
-          iesp.topbusinessReport.t_TopBusinessBusinessInsightSection;       
-    END;
+              SELF.biplinkids  :=  biplinkids;  // used for input use in risk4 and Risk7 and risk 15 below
+              SELF.Risk7_isGovtDebarred :=  biplinkids;
+              SELF.Risk8_ForeclosureNODRecordCount:=  ForeclosureNODRecordCount  > 0;          
+             SELF.Risk9_bankrupctyExists := BankruptcySectionDoesExist; 
+                                          
+                       TempDatestring :=  IESP.ecl2esp.DateToString(LienOrigFilingDate);
+                       OrigFilingDateNumeric := if (LENGTH(TRIM(TempDatestring,LEFT, RIGHT)) = 8, (UNSIGNED4) (TempDatestring), 0);                                            
+                        YearString :=  (STRING4) (((UNSIGNED4) (CurDate[1..4])) - 2);
+                        TwoYrsBackDate :=  (UNSIGNED4) (YearString + curDate[5..8]);
+                     // output(TwoYrsBackDate, named('TwoYrsBackDate'));                      
+                      // output(LiensRecsTwoYrsBack, named('LiensRecsTwoYrsBack'));                  
+                                                                                                    
+              SELF.Risk10_LiensWithinTwoYearsBack := OrigFilingDateNumeric >= TwoYrsBackDate;  
+                                                                                           
+              SELF.RIsk11_ExecHasDerog := ContactExecHasDerog;
+              SELF.Risk12_BusinessInHighRiskIndustrySic := SicCode; 
+              SELF.Risk12_BusinessInHighRiskIndustryNAICS :=  NaicsCode;                      
+              // fill in later here
+              SELF.Risk15_LiensBipLinkidsHighCount := LienCountOver5;
+              SELF.Risk16_BusinessHasB2BDelinquency :=  IncludeBizToBizDelinquencyRiskIndicator AND
+                                                                                                       EXISTS(Cortera_Tradeline.Key_LinkIds.kfetch2(
+                                                                                                                         PROJECT(biplinkids, TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2,
+                                                                                                                           self  := LEFT; SELF := [];))
+                                                                                                                        ,in_options.BusinessReportFetchLevel
+                                                                                                                        , // take default
+                                                                                                                        ,TopBusiness_Services.Constants.SmallestKeepLimit// only need to find existence so use 1 for keep constant
+                                                                                                                            // take default on last param jointype
+                                                                                                                        )(total_ar <> current_ar));
+                                                                                                                   
+              SELF.Risk17_NonExecHasDerog :=  ContactNonExecHasDerog;
+              
+                ds_corpLinkidsRecs :=   topBusiness_services.IncorporationSection.GetCorpBipLinkids(biplinkids, 
+                                                              in_options.BusinessReportFetchLevel ,topBusiness_services.constants.SmallestKeepLimit);
+                       ds_corprecsSlim := DEDUP(SORT(ds_corpLinkidsRecs,
+														        #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), if (record_type = 'C', 0, 1)),
+                                                                 #expand(BIPV2.IDmacros.mac_ListTop3Linkids()));
+                               
+		             isProfitCompany  := 	EXISTS(ds_corprecsSlim(record_type = 'C' AND corp_for_profit_ind = 'Y')) OR
+                                                                 // per recommendation of data team not all states show this indicator so have to account for this here
+                                                                 EXISTS(ds_corprecsSlim(record_type = 'C' and corp_for_profit_ind = ''));
+                                                                 
+              SELF.Risk18_BusinessHasNoRevenue :=  IsProfitcompany AND   NoRevenue;
+              SELF.Risk19_BusinessHasNoRealProperty := CurrentPropertyRecordsCount   + PriorPropertyRecordsCount = 0;
+              SELF.Risk20_BusinessHasNoPersonalAssets :=  TotalMVRCount + TotalWatercraftcount  +  TotalAircraftCount = 0;
+              SELF.Risk21_UccActivityWithinLastYear := UccActivityWithinXYears(biplinkids, 1, in_options.BusinessReportFetchLevel);
+              
+                             DueDiligence.layoutsInternal.GeographicLayout  DDGeoRiskLayout() := TRANSFORM                            
+                                       SELF.seq := 1;
+                                       SELF.prim_range := BestSectionIn.Address.StreetNumber;
+                                       SELF.predir := BestSectionIn.address.StreetPreDirection;
+                                        SELF.prim_name  := BestSectionIn.address.StreetName;
+                                        SELF.addr_suffix := BestSectionIn.address.StreetSuffix;
+                                        SELF.postdir := BestSectionIn.address.StreetPostDirection;
+                                        SELF.unit_desig := BestSectionIn.address.UnitDesignation;
+                                        SELF.sec_range := BestSectionIn.address.UnitNumber;
+                                        SELF.city := BestSectionIn.address.City;
+                                         SELF.state := BestSectionIn.address.State;
+                                          SELF.zip5 := BestSectionIn.address.zip5;
+                                          SELF.zip4 := BestSectionIn.address.zip4;                           
+                                          SELF := [];
+                                    END;                           
+                                   inDDds := DATASET([ DDGeoRiskLayout() ]);		
+              SELF.Risk22_BusinessInHighCrimeLocation := inDDds; // dataset
+              SELF.Risk23_zip5 :=  bestSectionIn.address.zip5; // po box
+              SELF.Risk23_StreetName  :=  bestSectionIn.address.StreetName;
+              SELF.Risk23_StreetNumber :=   bestSectionIn.address.StreetNumber;
+              SELF.Risk24_zip5 :=  bestSectionIn.address.zip5; // residential address.
+              SELF.Risk24_StreetName  :=  bestSectionIn.address.StreetName;
+              SELF.Risk24_StreetNumber :=   bestSectionIn.address.StreetNumber;                             
+                                FromdateFinal := IF (BestSectionIn.phoneFromDate.year=0, BestSectionIn.AddressFromDate,
+                                                         BestSectionIn.PhoneFromDate);                               
+                                UFromDate := (UNSIGNED4) (iesp.ecl2esp.DateToString(FromdateFinal));                   
+                                XYearBack := ((UNSIGNED4) (CurDate[1..4])) - 1;   
+                                UNSIGNED4 XYearBackFinal :=  (UNSIGNED4)( (STRING4) (XYearBack) +  curDate[5..6] + curDate[7..8] );                                                                                                                                                         
+              SELF.Risk25_BusinessHasNewLocation :=  UFromDate > XYearBackFinal;    
+              SELF.Risk26_BusinessHasNoDerog := 
+                                                                (NOT (ContactNonExecHasDerog OR ContactExecHasDerog))
+                                                                 AND ( NOT (BankruptcySectionDoesExist OR UccSectionDoesExist OR lienSectionDoesExist));
+                                                                                                     
+              SELF.Risk27_BusinessHasCurrentProperty :=  HasCurrentPropertyAndNoForeNod; 
+              SELF.Risk28_BusinessHasCurrentAssets := CurrentMVRCount + CurrentWatercraftcount  +  CurrentAircraftCount > 0;
+              SELF.Risk29_BusinessHasRevenueAndIsProfit :=    isProfitCompany AND (((INTEGER5) (AnnualSales))  > 0);
+             
+              SELF.Risk30_zip5 :=  bestSectionIn.address.zip5; // Business has a Business Address.
+              SELF.Risk30_StreetName  :=  bestSectionIn.address.StreetName;   
+              SELF.Risk30_StreetNumber :=   bestSectionIn.address.StreetNumber; 
+              SELF.Risk31_BusinessHasHighRevenue :=    ((INTEGER5) (AnnualSales)) > 1000000;  
+             END;
+               tDate := iesp.ecl2esp.DateToString(LienOrigFilingDate);
+               // output(biplinkids[1].seleid, named('seleid'));
+               // output(tdate, named('LienOrigFilingDate'));               
+               RETURN( dataset([BusinessRiskXform()]));       
+      END;              
 
      EXPORT fn_FullViewBusinessEvidence(
              LayoutInBusinessEvidence   BusEvidenceIn
@@ -211,14 +382,14 @@ EXPORT UccActivityWithinXYears(  DATASET (BIPV2.IDlayouts.l_xlink_ids) inbipLink
           BusinessEvidences12 :=  DATASET([{val12, 'P', 'Strong evidence of people connected to business'}],
                    iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);  
 
-      //val13 := false;
-      val13 := topbusiness_services.BusinessInsightFunctions.IsLongEstablishedBusiness(BusEvidenceIn.Risk13_EstablishedDate);
-          BusinessEvidences13 :=  DATASET([{val13, 'P', 'Established business'}],
+          //val13 := false;
+         val13 := topbusiness_services.BusinessInsightFunctions.IsLongEstablishedBusiness(BusEvidenceIn.Risk13_EstablishedDate);
+           BusinessEvidences13 :=  DATASET([{val13, 'P', 'Established business'}],
                 iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);  
          
         //val14 := false;
-       val14 := topbusiness_services.BusinessInsightFunctions.BusinessActivityIsLessThan3MonthsBack( BusEvidenceIn.Risk14_MostRecentDate);
-          BusinessEvidences14 :=  DATASET([{val14, 'P', 'Recent business activity'}],
+        val14 := topbusiness_services.BusinessInsightFunctions.BusinessActivityIsLessThan3MonthsBack( BusEvidenceIn.Risk14_MostRecentDate);
+            BusinessEvidences14 :=  DATASET([{val14, 'P', 'Recent business activity'}],
                  iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);                                                      
  
         //val15 := false;    
@@ -245,7 +416,7 @@ EXPORT UccActivityWithinXYears(  DATASET (BIPV2.IDlayouts.l_xlink_ids) inbipLink
           NoBusEvidenceHighRiskIndicators := NOT( EXISTS(BusinessEvidencesNegativeIndicators (Riskflag  AND RiskIndicatorFlag = 'H')));
            CountBusEvidenceMediumRiskIndicators :=   COUNT(BusinessEvidencesNegativeIndicators(Riskflag AND RiskIndicatorFlag = 'M'));   
                                                
-       self.BusinessEvidenceStatus :=  MAP (  (BusinessEvidences1[1].RiskFlag OR  BusinessEvidences2[1].RiskFlag OR 
+            self.BusinessEvidenceStatus :=  MAP (  (BusinessEvidences1[1].RiskFlag OR  BusinessEvidences2[1].RiskFlag OR 
                                                                         BusinessEvidences3[1].RiskFlag)
                                                                         OR
                                                                       ((  NoBusEvidenceHighRiskIndicators )
@@ -264,8 +435,9 @@ EXPORT UccActivityWithinXYears(  DATASET (BIPV2.IDlayouts.l_xlink_ids) inbipLink
                                                                          'P'
                                                                   );
        //output all the error codes.                                                                  
-          SELF.BusinessEvidences := CHOOSEN(BusinessEvidencesAll(Riskflag),//20);
-                                                    TopBusiness_Services.Constants.BusinessInsight.MaxIndicatorCodesReturned); 
+          SELF.BusinessEvidences := CHOOSEN(BusinessEvidencesAll(Riskflag),
+                                           iesp.constants.TOPBUSINESS.MAX_COUNT_BUSINESS_EVIDENCE_RISKCODE);
+                                                   
           SELF.ultid := BusEvidenceIn.biplinkids[1].ultid;
           SELF.orgid := BusEvidenceIn.biplinkids[1].orgid;
           SELF.seleid := BusEvidenceIn.biplinkids[1].seleid;
@@ -274,167 +446,143 @@ EXPORT UccActivityWithinXYears(  DATASET (BIPV2.IDlayouts.l_xlink_ids) inbipLink
        
       results := DATASET([ BusinessEvidence() ]);	   
      // output(sectionReport, named('SectionReport'));
-      // risk_indice1 := BusinessRiskIndice[1];
-      // risk_indice2 := BusinessRiskIndice[2];
-      // risk_indice3 := BusinessRiskIndice[3];
-      // risk_indice4 := BusinessRiskIndice[4];
-      // risk_indice5 := BusinessRiskIndice[5];
-     
-      // results := project(ut.ds_oneRecord, transform(iesp.topbusinessReport.t_businessInsightSection,
-          // self := BusinessInsightSection
-          
-          // ));
-          
-                  
-       //results := '';                  
+                                    
        RETURN(results);
   END; // fn_FullView function
   
   
   EXPORT fn_FullViewRisk(
- 	DATASET(BIPV2.IDlayouts.l_xlink_ids) biplinkids
-	,Layouts.rec_input_options  in_options	
-     ,outLayout BusinessInsightIn 
-   ,TopBusiness_Services.BestSection_Layouts.Final bestSectionIn  
-  ,TopBusiness_Services.ContactSection_Layouts.rec_final ContactSectionIn
-   ,TopBusiness_Services.FinanceSection_Layouts.rec_final FinanceSectionIn
-   ,TopBusiness_Services.industrySection_layouts.rec_final IndustrySectionIn
-   ,INTEGER CurrentMVRCount
-   ,INTEGER CurrentWatercraftcount
-   ,INTEGER CurrentAircraftCount
-   ,INTEGER CurrentPropertyRecordsCount   
-   ,INTEGER ForeclosureNODRecordCount
+     outLayout BusinessInsightIn 
+     ,LayoutInBusinessRisk   BusRiskIn
 	     ) := FUNCTION
-                   
-      FETCH_LEVEL := in_options.BusinessReportFetchLevel;
-    
-     outLayout   BusinessInsightRisk() := TRANSFORM
-      //BusinessEvidences :=dataset(iesp.topbusinessReport.T_topBusinessBusinessRiskIndice) {maxcount (20)};  // make this a constant.
+                       
+     outLayout   BusinessInsightRisk() := TRANSFORM     
            
           // val7 := false;
-          val7 := topbusiness_services.BusinessInsightFunctions.Govdebarred(biplinkids,FETCH_LEVEL);
+          val7 := topbusiness_services.BusinessInsightFunctions.Govdebarred(BusRiskIn.Risk7_isGovtDebarred);
       
           BusinessRisk7 := DATASET([{val7, 'H', 'Business is Government debarred'}],
                 iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);             
           // val8 := false;
-          val8 :=   topbusiness_services.BusinessInsightFunctions.BusinessHasNodORForeclosure(ForeclosureNODRecordCount); // TODO check is this enough to
+          val8 :=   topbusiness_services.BusinessInsightFunctions.BusinessHasNodORForeclosure(BusRiskIn.Risk8_ForeclosureNODRecordCount); // TODO check is this enough to
                          // check for existence in linkids // may have to inspect properyresults
           BusinessRisk8 :=   DATASET([{val8, 'H', 'Business has foreclosure or notice of default record on file'}],
                 iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);
          // val9 := false;                                        
-         val9 :=     topbusiness_services.BusinessInsightFunctions.BankruptcyDebtorBipLiplinkidsExists(biplinkids, FETCH_LEVEL);
+         val9 :=     topbusiness_services.BusinessInsightFunctions.BankruptcyDebtorBipLiplinkidsExists( BusRiskIn.Risk9_bankrupctyExists);
         
          BusinessRisk9 :=   DATASET([{val9, 'H', 'Business has a bankruptcy record on file'}],
                 iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);                                                                
                                          
         // val10 := false;
-        val10 := topbusiness_services.BusinessInsightFunctions.LiensBipLinkidsWithinTwoYrs(biplinkids, FETCH_LEVEL);        
+        val10 := topbusiness_services.BusinessInsightFunctions.LiensBipLinkidsWithinTwoYrs( BusRiskIn.Risk10_LiensWithinTwoYearsBack);        
         BusinessRisk10 := DATASET([{val10,'H', 'Business has judgment or lien record on file in last 24 months'}],
                  iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);
                                                              
         //val11 := false; // hit contact key here or use contacts passed in.             
-        val11 :=  topbusiness_services.BusinessInsightFunctions.ExecHasDerog(ContactSectionIn);
+        val11 :=  topbusiness_services.BusinessInsightFunctions.ExecHasDerog( BusRiskIn.RIsk11_ExecHasDerog);
          BusinessRisk11 := DATASET([{val11,'H', 'Executive has derogatory record on file'}],
                  iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);
                                      
-        //val12 := false;    // TODO   // Business has a value of 2-9 in the Due Diligence Business Attribute: Business Industry               
-         val12 := topbusiness_services.BusinessInsightFunctions.BusinessInHighRiskIndustry(IndustrySectionIn);  
+        //val12 := false;    // Business has a value of 2-9 in the Due Diligence Business Attribute: Business Industry               
+         val12 := topbusiness_services.BusinessInsightFunctions.BusinessInHighRiskIndustry(
+                                             BusRiskIn.Risk12_BusinessInHighRiskIndustrySic,
+                                            BusRiskIn.Risk12_BusinessInHighRiskIndustryNAICS);  
         BusinessRisk12 := DATASET([{val12,'M', 'Business is in a high risk industry'}],
                  iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);
                                                    
         // val15 := false;  
-        val15 :=  topbusiness_services.BusinessInsightFunctions.LiensBipLinkidsHighCount(biplinkids, FETCH_LEVEL);                                      
+        val15 :=  topbusiness_services.BusinessInsightFunctions.LiensBipLinkidsHighCount( BusRiskIn.Risk15_LiensBipLinkidsHighCount);                                      
         BusinessRisk15 := DATASET([{val15,'M', 'High judgment or lien count '}],
                  iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);
                                                      
         //val16 := false; // Business has 1 or more B2B delinquencies on file
-        val16 := topbusiness_services.BusinessInsightFunctions.BusinessHasB2BDelinquency(biplinkids, FETCH_LEVEL);
+        val16 := topbusiness_services.BusinessInsightFunctions.BusinessHasB2BDelinquency(BusRiskIn.Risk16_BusinessHasB2BDelinquency);
         BusinessRisk16 := DATASET([{val16,'M', 'Business to business delinquency'}],
                  iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);
                                                                           
         //val17 := false; // Non-executive has derogatory record on file
-        val17 :=  topbusiness_services.BusinessInsightFunctions.NonExecHasDerog(
-                                               ContactSectionIn.PriorIndividuals(hasDerog)
-                                              ,ContactSectionIn.CurrentIndividuals(hasDerog));
+        val17 :=  topbusiness_services.BusinessInsightFunctions.NonExecHasDerog(BusRiskIn.Risk17_NonExecHasDerog);
+                                              
         BusinessRisk17 :=   DATASET([{val17, 'M', 'Non-executive has derogatory record on file'}],
                  iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);  
                                                     
          // val18 := false; // Business has no revenue on file
-         val18 := topBusiness_services.BusinessInsightFunctions.BusinessHasNoRevenue(biplinkids, FETCH_LEVEL,FinanceSectionIn); 
+         val18 := topBusiness_services.BusinessInsightFunctions.BusinessHasNoRevenue(BusRiskIn.Risk18_BusinessHasNoRevenue); 
          BusinessRisk18 :=  DATASET([{val18, 'M', 'Business has no revenue on file'}],
                   iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);                                                                 
                                                       
          // val19 := false;   // Business has no real property on file                                                   
-         val19 :=  topbusiness_services.BusinessInsightFunctions.BusinessHasNoRealProperty(biplinkids, FETCH_LEVEL); 
+         val19 :=  topbusiness_services.BusinessInsightFunctions.BusinessHasNoRealProperty(BusRiskIn.Risk19_BusinessHasNoRealProperty); 
          BusinessRisk19 :=   DATASET([{val19, 'M', 'Business has no real property on file'}],
                   iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);           
                                                                                     
          //val20 := false;                                                             
-         val20 := topbusiness_services.BusinessInsightFunctions.BusinessHasNoPersonalAssets(biplinkids, FETCH_LEVEL);          
+         val20 := topbusiness_services.BusinessInsightFunctions.BusinessHasNoPersonalAssets(BusRiskIn.Risk20_BusinessHasNoPersonalAssets);          
          BusinessRisk20 :=  DATASET([{val20, 'M', 'Business has no assets on file'}],
                  iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);  
                                           
           // val21 := false;         
-          val21 := UccActivityWithinXYears(biplinkids
-                                                                         ,1
-                                                                         ,FETCH_LEVEL);
+          val21 := topbusiness_services.BusinessInsightFunctions.UccActivity(  BusRISKIn.Risk21_UccActivityWithinLastYear);                                                                      
            BusinessRisk21 :=  DATASET([{val21, 'M', 'Recent UCC activity on file'}],
                    iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);  
                                          
            // val22 := false; 
-           val22 := topbusiness_services.BusinessInsightFunctions.BusinessInHighCrimeLocation(bestSectionIn);
+           val22 := topbusiness_services.BusinessInsightFunctions.BusinessInHighCrimeLocation(
+                                           BusRiskIn.Risk22_BusinessInHighCrimeLocation);                                           
            BusinessRisk22 :=  DATASET([{val22, 'M', 'Business located in high crime location'}],
                     iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);                                                      
    
            //val23 := false;    
-           val23 := topbusiness_services.BusinessInsightFunctions.IsPOBoxAddress(
-                           bestSectionIn.address.zip5
-                           ,bestSectionIn.address.StreetName
-                           ,bestSectionIn.address.StreetNumber);        
+           val23 := topbusiness_services.BusinessInsightFunctions.IsBusinessORPOBoxOrResidentAddress(BusRiskIn.Risk23_zip5,
+                                                                                                                      BusRiskIn.Risk23_StreetName, BusRiskIn.Risk23_StreetNumber,'P');                           
          BusinessRisk23 :=  DATASET([{val23, 'M', 'Address tied to PO Box'}],
                  iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);     
                                          
           //val24 := false;  
-          val24 := topbusiness_services.BusinessInsightFunctions.ResidentialOrBusinessAddressType(biplinkids, FETCH_LEVEL,'R');                                            
+          val24 := topbusiness_services.BusinessInsightFunctions.IsBusinessORPOBoxOrResidentAddress(
+                                                                                            BusRiskIn.Risk24_ZIp5
+                                                                                           ,BusRiskIn.Risk24_StreetName
+                                                                                             ,BusRiskIn.Risk24_StreetNumber, 'R');                                            
           BusinessRisk24 :=  DATASET([{val24, 'M', 'Address tied to residential address'}],
                   iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);     
 
           // val25 := false;  
-          val25 := topbusiness_services.BusinessInsightFunctions.BusinessHasNewLocation(bestSectionIn );                                            
+          val25 := topbusiness_services.BusinessInsightFunctions.BusinessHasNewLocation(BusRiskIn.Risk25_BusinessHasNewLocation);                                            
           BusinessRisk25 :=  DATASET([{val25, 'M', 'Business has new location'}],
                   iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);     
 
           // val26 := false;   
-          val26 := topbusiness_services.BusinessInsightFunctions.BusinessHasNoDerog(biplinkids, FETCH_LEVEL,ContactSectionIn  );                                            
+          val26 := topbusiness_services.BusinessInsightFunctions.BusinessHasNoDerog(BusRiskIn.Risk26_BusinessHasNoDerog  );                                            
           BusinessRisk26 :=  DATASET([{val26, 'P', 'Business has no evidence of derogatory records on file'}],
                   iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);                    
                                          
           // val27 := false;  
-          val27 := topbusiness_services.BusinessInsightFunctions.BusinessHasCurrentProperty(CurrentPropertyRecordsCount);                                            
+          val27 := topbusiness_services.BusinessInsightFunctions.BusinessHasCurrentProperty(BusRiskIn.Risk27_BusinessHasCurrentProperty);                                            
           BusinessRisk27 :=  DATASET([{val27, 'P', 'Business has current real property on file'}],
                   iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);                                                        
                                          
           //val28 := false; 
-          val28 := topbusiness_services.BusinessInsightFunctions.BusinessHasCurrentAssets(CurrentMVRCount
-                                                                                                                                   ,CurrentWatercraftcount
-                                                                                                                                   ,CurrentAircraftCount);                                                                                                                                     
+          val28 := topbusiness_services.BusinessInsightFunctions.BusinessHasCurrentAssets(BusRiskIn.Risk28_BusinessHasCurrentAssets);                                                                                                                                     
           BusinessRisk28 :=  DATASET([{val28, 'P', 'Business has current assets on file'}],
                   iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);       
 
           //val29 := false;  
-          val29 := topBusiness_services.BusinessInsightFunctions.BusinessHasRevenueAndIsProfit(biplinkids, FETCH_LEVEL,FinanceSectionIn);                                          
+          val29 := topBusiness_services.BusinessInsightFunctions.BusinessHasRevenueAndIsProfit(BusRiskIn.Risk29_BusinessHasRevenueAndIsProfit);                                          
           BusinessRisk29 :=  DATASET([{val29, 'P', 'Business has evidence of revenue on file'}],
                   iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);     
 
            // val30 := false;  
-           val30 := topbusiness_services.BusinessInsightFunctions.ResidentialOrBusinessAddressType(biplinkids, FETCH_LEVEL,'B');                                          
+           val30 := topbusiness_services.BusinessInsightFunctions.IsBusinessOrPOBoxOrResidentAddress(BusRiskIn.Risk30_zip5, BusRiskIn.Risk30_StreetName,
+                                                                                          BusRiskIn.Risk30_StreetNumber, 'B');   
            BusinessRisk30 :=  DATASET([{val30, 'P', 'Address tied to business address'}],
                    iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);                                              
    
            // val31 := false; 
-           val31 := topbusiness_services.BusinessInsightFunctions.BusinessHasHighRevenue(FinanceSectionIn);                                            
+           val31 := topbusiness_services.BusinessInsightFunctions.BusinessHasHighRevenue(BusRiskIn.Risk31_BusinessHasHighRevenue);                                            
+           // output(val31, named('val31'));
            BusinessRisk31 :=  DATASET([{val31, 'P', 'Business has evidence of high revenue on file'}],
-                   iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);               
+                   iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);                                                   
                                                                                                                                                  
            BusinessRisksNegativeIndicators  := BusinessRisk7 + BusinessRisk8 
                   + BusinessRisk9 + BusinessRisk10  + BusinessRisk11
@@ -451,7 +599,6 @@ EXPORT UccActivityWithinXYears(  DATASET (BIPV2.IDlayouts.l_xlink_ids) inbipLink
                    + BusinessRisk24 + BusinessRisk25+ BusinessRisk26 + BusinessRisk27
                    + BusinessRisk28 + BusinessRisk29 + BusinessRisk30 + BusinessRisk31;              
                    
-
           // Business Risk Business Rules
           // If any High Risk Indicators are present then overall Status = H
           // If no High Risk Indicators are present but 6 or more Risk Indicators are present then overall Status = H
@@ -461,8 +608,8 @@ EXPORT UccActivityWithinXYears(  DATASET (BIPV2.IDlayouts.l_xlink_ids) inbipLink
 
           // simpler version note  BusinessRisk7- BusinessRisk11 are H (highrisk) indicators    
           NoHighRiskIndicators := NOT( EXISTS(BusinessRisksNegativeIndicators (Riskflag  AND RiskIndicatorFlag = 'H')));
-           CountMediumRiskIndicators :=   COUNT(BusinessRisksNegativeIndicators(Riskflag AND RiskIndicatorFlag = 'M'));                                       
-           self.BusinessRiskStatus  :=  MAP (  ( BusinessRisk7[1].RiskFlag OR  BusinessRisk8[1].RiskFlag OR 
+          CountMediumRiskIndicators :=   COUNT(BusinessRisksNegativeIndicators(Riskflag AND RiskIndicatorFlag = 'M'));                                       
+          self.BusinessRiskStatus  :=  MAP (  ( BusinessRisk7[1].RiskFlag OR  BusinessRisk8[1].RiskFlag OR 
                                                                         BusinessRisk9[1].RiskFlag OR BusinessRisk10[1].RiskFlag OR
                                                                         BusinessRisk11[1].RiskFlag )
                                                                         OR
@@ -479,15 +626,15 @@ EXPORT UccActivityWithinXYears(  DATASET (BIPV2.IDlayouts.l_xlink_ids) inbipLink
                                                                          => 'P',
                                                                          'P'
                                                                   );
-     // set the other two fields based on input                      
-      SELF.BusinessEvidences := BusinessInsightIn.BusinessEvidences;   
+     // set the other two fields based on input                         
+      SELF.BusinessEvidences := BusinessInsightIn.BusinessEvidences;                                                                  
       SELF.BusinessEvidenceStatus := BusinessInsightIn.BusinessEvidenceStatus;
        //output all the error codes.      
-      SELF.BusinessRisks := CHOOSEN(BusinessRisksAll(Riskflag), //20);
-                                 TopBusiness_Services.Constants.BusinessInsight.MaxIndicatorCodesReturned); 
-      SELF.ultid := biplinkids[1].ultid;
-      SELF.orgid := biplinkids[1].orgid;
-      SELF.seleid := biplinkids[1].seleid;
+      SELF.BusinessRisks := CHOOSEN(BusinessRisksAll(Riskflag),
+                       iesp.constants.TOPBUSINESS.MAX_COUNT_BUSINESS_RISK_RISKCODE);                              
+      SELF.ultid :=    BusRiskIn.biplinkids[1].ultid;
+      SELF.orgid :=   BusRiskIn.biplinkids[1].orgid;
+      SELF.seleid := BusRiskIn.biplinkids[1].seleid;
       SELF := [];
    END;
        
