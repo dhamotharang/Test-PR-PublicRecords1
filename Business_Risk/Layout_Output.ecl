@@ -567,10 +567,10 @@ export Layout_Output := record
 	DATASET(risk_indicators.layouts.layout_desc_plus_seq) BusRiskIndicators{MAXCOUNT(iesp.constants.biid.MAXRISKINDICATORS)};
 	DATASET(risk_indicators.layouts.layout_desc_plus_seq) RepRiskIndicators{MAXCOUNT(iesp.constants.biid.MAXRISKINDICATORS)};
 
-  unsigned2 royalty_type_code_targus := '';
+  unsigned2 royalty_type_code_targus := 0;
   string20  royalty_type_targus := ''; 			
-  unsigned2 royalty_count_targus := ''; 			 
-  unsigned2 non_royalty_count_targus := '';  
+  unsigned2 royalty_count_targus := 0; 			 
+  unsigned2 non_royalty_count_targus := 0;  
   string20  count_entity_targus := ''; 
 
 end;	

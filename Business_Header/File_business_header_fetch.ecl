@@ -1,4 +1,4 @@
-import Business_Header,address,Business_Header_SS;
+﻿IMPORT address,Business_Header,Business_Header_SS;
 
 h := Business_Header.File_Business_Header_Base_for_keybuild;
 
@@ -35,7 +35,7 @@ TRANSFORM
 	SELF := R;
 END;
 
-j := JOIN(PostMultiCity, look, LEFT.rcid = RIGHT.rcid, rejoin(LEFT, RIGHT), HASH);
+j := JOIN(PostMultiCity, look, LEFT.rcid = RIGHT.rcid, rejoin(LEFT, RIGHT), HASH, LOCAL);
 
 Business_Header_SS.layout_MakeCNameWords proj(j le, unsigned c) :=
 TRANSFORM

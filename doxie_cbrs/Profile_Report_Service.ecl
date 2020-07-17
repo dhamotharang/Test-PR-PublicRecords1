@@ -60,14 +60,14 @@
 </message>
 */
 
-IMPORT Royalty, WSInput, Risk_Indicators, Gateway;
+IMPORT AutoheaderV2, AutoStandardI, doxie, Gateway, Royalty, Risk_Indicators, WSInput;
 
 EXPORT Profile_Report_Service := MACRO
   #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 		//The following macro defines the field sequence on WsECL page of query. 
 		WSInput.MAC_Profile_Report_Service();
 		
-		#option('spotThroughAggregate', 0);
+    #option('spotThroughAggregate', 0);
 		#constant('useSupergroup',true);
 		#stored('useSupergroupPropertyAddress',false);
 		#constant('AlwaysCompute',true);
@@ -89,9 +89,7 @@ gateways := project(gateways_in, gw_switch(left));
 
 if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
     
-		appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
-
-		all_recs_prs :=doxie_cbrs.all_records_prs(doxie_cbrs.ds_subject_BDIDs, ofac_version, include_ofac, global_watchlist_threshold, mod_access);
+ 		all_recs_prs := doxie_cbrs.all_records_prs(doxie_cbrs.ds_subject_BDIDs, mod_access, ofac_version, include_ofac, global_watchlist_threshold);
 
 		doxie_crs.layout_property_ln property_child(doxie_cbrs.layout_profile_property l):= transform
 		self := l;

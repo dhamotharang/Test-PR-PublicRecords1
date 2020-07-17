@@ -1,10 +1,10 @@
-import ut, suppress, doxie, Prof_LicenseV2;
+﻿import doxie, doxie_cbrs, Prof_LicenseV2, suppress, ut;
 doxie_cbrs.mac_Selection_Declare()
 
-export proflic_records(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
+export proflic_records(dataset(doxie_cbrs.layout_references) bdids,
+                       doxie.IDataAccess mod_access) := FUNCTION
 
-mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
-subadd := doxie_Cbrs.best_address_target(bdids)(Include_ProfessionalLicenses_val);
+subadd := doxie_Cbrs.best_address_target(bdids,mod_access)(Include_ProfessionalLicenses_val);
 kap := Prof_LicenseV2.Key_Addr_Proflic;
 
 kap keepk(kap r) := transform
