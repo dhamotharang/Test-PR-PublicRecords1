@@ -136,7 +136,7 @@ END;
 	GetModifiedDates(dataset(Layouts.rEntity) src) := PROJECT(src, 
 			TRANSFORM(WorldCompliance.rComments,
 				self.Ent_Id := LEFT.Ent_Id;
-				self.sorter := 6;
+				self.sorter := 7;
 				self.subcmts := '';
 				self.cmts := 'Last updated: ' + ut.ConvertDate(TRIM(LEFT.touchdate),'%Y-%m-%d', '%Y-%m-%d');));
 
@@ -219,7 +219,7 @@ EXPORT rComments AllComments(dataset(Layouts.rEntity) infile) := FUNCTION
 								//& Allreasons
 								& GetRelComments(infile) & GetRelExcessive &
 								GetModifiedDates(infile) & GetNotes(infile),Ent_id),
-								Ent_Id, sorter, cmts, LOCAL);
+								Ent_Id, sorter, LOCAL);
 
 			
 		rComments RollRecs(rComments L, rComments R) := TRANSFORM
