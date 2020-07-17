@@ -216,7 +216,7 @@ end;
 soap_in_pre:= Project(pp,TRANSFORM(soapLayout,
 self.batch_in := DATASET([TRANSFORM( BRM_Marketing_attributes.Layout_BRM_NonFCRA.Batch_Input, 
     self.g_procbusuid:=counter;
-    self.historydate :=IF(runInRealTime, 999999, (UNSIGNED4)LEFT.historydate);
+    self.historydate :=IF(runInRealTime, 99999999, (UNSIGNED4)LEFT.historydate);
     self.historydateyyyymm :=IF(runInRealTime, 999999, (UNSIGNED4)LEFT.historydateyyyymm);
     self.acctno:=LEFT.acctno;
     self.companyname := LEFT.companyname;
