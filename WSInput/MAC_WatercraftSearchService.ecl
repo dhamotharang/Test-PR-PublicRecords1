@@ -1,0 +1,45 @@
+EXPORT MAC_WatercraftSearchService() := MACRO
+
+#WEBSERVICE(FIELDS(
+  'DID',
+  'BDID',
+  'WatercraftKey',
+  'SequenceKey',
+  'HullNumber',
+  'UnParsedFullName',
+  'FirstName',
+  'MiddleName',
+  'LastName',
+  'AllowNicknames',
+  'PrimName',
+  'PrimRange',
+  'Addr',
+  'City',
+  'County',
+  'State',
+  'Zip',
+  'ZipRadius',
+  'Phone',
+  'CompanyName',
+  'FEIN',
+  'VesselName',
+  'MinVesselLength',
+  'MaxVesselLength',
+  'MaxResults',
+  'MaxResultsThisTime',
+  'NoDeepDive',
+  'PenaltThreshold',
+  'StrictMatch',
+  'PhoneticMatch',
+  'RecordByDate',
+  'SkipRecords',
+  'DPPAPurpose',
+  'GLBPurpose',
+  'ApplicationType',
+  'DataRestrictionMask',
+  'SSNMask',
+  'IncludeNonRegulatedWatercraftSources'
+  ));
+
+ENDMACRO;
+

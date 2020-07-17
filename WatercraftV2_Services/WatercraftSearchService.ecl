@@ -34,6 +34,7 @@
   <part name="DataRestrictionMask" type="xsd:string"/>
   <part name="ApplicationType" type="xsd:string"/>
   <part name="PenaltThreshold" type="xsd:unsignedInt"/>
+  <part name="StrictMatch" type="xsd:boolean"/>
   <part name="MaxResults" type="xsd:unsignedInt"/>
   <part name="MaxResultsThisTime" type="xsd:unsignedInt"/>
   <part name="SkipRecords" type="xsd:unsignedInt"/>
@@ -41,53 +42,17 @@
   <part name="IncludeNonRegulatedWatercraftSources" type="xsd:boolean" />
 </message>
 */
-/*--INFO-- This service searches all Watercraft datafiles.*/
-IMPORT Text_Search, doxie, AutostandardI;
+
+IMPORT Text_Search, doxie, AutostandardI, WSInput;
 
 EXPORT WatercraftSearchService := MACRO
  #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
-  #WEBSERVICE(FIELDS( 'DID',
-                      'BDID',
-                      'WatercraftKey',
-                      'SequenceKey',
-                      'HullNumber',
-                      'UnParsedFullName',
-                      'FirstName',
-                      'MiddleName',
-                      'LastName',
-                      'AllowNicknames',
-                      'PrimName',
-                      'PrimRange',
-                      'Addr',
-                      'City',
-                      'County',
-                      'State',
-                      'Zip',
-                      'ZipRadius',
-                      'Phone',
-                      'CompanyName',
-                      'FEIN',
-                      'VesselName',
-                      'MinVesselLength',
-                      'MaxVesselLength',
-                      'MaxResults',
-                      'MaxResultsThisTime',
-                      'NoDeepDive',
-                      'PenaltThreshold',
-                      'PhoneticMatch',
-                      'RecordByDate',
-                      'SkipRecords',
-                      'DPPAPurpose',
-                      'GLBPurpose',
-                      'ApplicationType',
-                      'DataRestrictionMask',
-                      'SSNMask',
-                      'IncludeNonRegulatedWatercraftSources'
-                      ));
 
   #CONSTANT('SearchGoodSSNOnly',TRUE)
   #CONSTANT('SearchIgnoresAddressOnly',TRUE)
   #CONSTANT('getBdidsbyExecutive',FALSE)
+
+ WSInput.MAC_WatercraftSearchService();
 
   doxie.MAC_Header_Field_Declare ();
   gm := AutoStandardI.GlobalModule();
