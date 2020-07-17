@@ -254,8 +254,12 @@ soap_in := DISTRIBUTE(soap_in_pre, RANDOM());
 OUTPUT(CHOOSEN(soap_in, eyeball), NAMED('Sample_SOAPInput'));
 
 layout_SOAP_out := RECORD
- BRM_Marketing_attributes.Layout_BRM_NonFCRA.BatchOutput;
-	string ErrorCode;
+BRM_Marketing_attributes.Layout_BRM_NonFCRA.BatchOutput -BE_AssocExecEmailFlag2Y-BE_BusIsResidentialFlag
+ -BE_BusInferFamilyOwnedFlag-BE_AstVehAutoCnt2Y-BE_AstVehAutoCommCnt2Y-BE_AstVehAutoPersCnt2Y-BE_AstVehAutoOtherCnt2Y-BE_AstVehAutoEmrgNewMsncEv
+ -BE_AssocCnt2Y-BE_AssocExecCnt2Y-BE_AssocNexecCnt2Y-BE_AssocExecEmrgMsncAvg2Y-BE_AssocExecAgeAvg2Y-BE_AssocExecWEduCollCnt2Y
+ -BE_AssocExecBusCntAvg2Y-BE_AssocExecWDrgCnt2Y-BE_AssocNexecEmrgMsncAvg2Y-BE_AssocNexecAgeAvg2Y-BE_AssocNexecWEduCollCnt2Y-BE_AssocNexecBusCntAvg2Y
+ -BE_AssocNexecWDrgCnt2Y-BE_AssocEmrgMsncAvg2Y-BE_AssocAgeAvg2Y-BE_AssocWEduCollCnt2Y-BE_AssocBusCntAvg2Y-BE_AssocWDrgCnt2Y;	
+ string ErrorCode;
 END;
 
 layout_SOAP_out myFail(soapLayout le) := TRANSFORM
