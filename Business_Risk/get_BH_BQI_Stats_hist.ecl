@@ -246,11 +246,6 @@ duns_number := join(with_address_counts, dnb.key_dnb_bdid,
 						  left outer);
  //output(duns_number);
 
-
-
-
-
-
 bs_dnb := join(duns_number, dnb.key_DNB_DunsNum, left.dn!='' and
 					keyed(left.dn=right.duns) and mod_access.use_DNB() and
 					 right.active_duns_number = 'Y' and right.record_type = 'C' and

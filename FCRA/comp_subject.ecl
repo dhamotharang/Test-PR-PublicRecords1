@@ -1,4 +1,4 @@
-﻿import fcra, doxie, dx_header, riskwisefcra, doxie_crs, suppress, Gong, risk_Indicators, ut,
+﻿import fcra, doxie, dx_header, riskwisefcra, doxie_crs, suppress, dx_Gong, risk_Indicators, ut,
        NID, header, FFD, data_services;
 
 doxie.MAC_Selection_Declare() //Include_AKAs_val, Include_Imposters_val
@@ -658,7 +658,7 @@ gong_crs := join (gong_records, risk_indicators.Key_Telcordia_tds,
         left.phone[7] = right.tb,
         GetCompPhones(LEFT,RIGHT), left outer, limit(0), keep(1));
 
-str_unlisted := Gong.Constants.STR_UNLISTED;
+str_unlisted := dx_Gong.Constants.STR_UNLISTED;
 
 gong_ddp := dedup (sort (gong_crs, phone, prim_range, prim_name, zip, if (phone=str_unlisted, listing_name, phone)),
                                    phone, prim_range,prim_name,zip, if (phone=str_unlisted, listing_name, phone));

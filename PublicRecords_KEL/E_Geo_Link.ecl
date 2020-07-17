@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -54,8 +54,9 @@ EXPORT E_Geo_Link(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
-  SHARED __d0_Trim := PROJECT(__in.Dataset_ADVO__Key_Addr1_History,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.Geo_Link)));
-  EXPORT __All_Trim := __d0_Trim;
+  SHARED __d0_Trim := PROJECT(__in.Dataset_dx_ConsumerFinancialProtectionBureau__Key_BLKGRP,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.geoid10_blkgrp)));
+  SHARED __d1_Trim := PROJECT(__in.Dataset_dx_ConsumerFinancialProtectionBureau__key_BLKGRP_attr_over18,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.geoind)));
+  EXPORT __All_Trim := __d0_Trim + __d1_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
     __All_Trim.KeyVal;
     UNSIGNED4 Cnt := COUNT(GROUP);
@@ -66,17 +67,27 @@ EXPORT E_Geo_Link(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
   SHARED __SortedTable := SORT(__Table,KeyVal);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
   EXPORT Lookup := NullLookupRec + PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
-  SHARED __Mapping0 := 'UID(DEFAULT:UID),geo_link(OVERRIDE:Geo_Link_:\'\'),islatest(DEFAULT:Is_Latest_),geopercentwhite(DEFAULT:Geo_Percent_White_:0.0),geopercentblack(DEFAULT:Geo_Percent_Black_:0.0),geopercentamericanindianalaskanative(DEFAULT:Geo_Percent_American_Indian_Alaska_Native_:0.0),geopercentasianpacificislander(DEFAULT:Geo_Percent_Asian_Pacific_Islander_:0.0),geopercentmultiracial(DEFAULT:Geo_Percent_Multiracial_:0.0),geopercenthispanic(DEFAULT:Geo_Percent_Hispanic_:0.0),here(DEFAULT:Here_:0.0),heregivenwhite(DEFAULT:Here_Given_White_:0.0),heregivenblack(DEFAULT:Here_Given_Black_:0.0),heregivenamericanindianalaskanative(DEFAULT:Here_Given_American_Indian_Alaska_Native_:0.0),heregivenasianpacificislander(DEFAULT:Here_Given_Asian_Pacific_Islander_:0.0),heregivenmultiracial(DEFAULT:Here_Given_Multiracial_:0.0),heregivenhispanic(DEFAULT:Here_Given_Hispanic_:0.0),statefips10(DEFAULT:State_Fips10_:\'\'),countyfips10(DEFAULT:County_Fips10_:\'\'),tractfips10(DEFAULT:Tract_Fips10_:\'\'),blockgroupfips10(DEFAULT:Block_Group_Fips10_:0),totalpopulation(DEFAULT:Total_Population_:0),hispanictotal(DEFAULT:Hispanic_Total_:0),nonhispanictotal(DEFAULT:Non_Hispanic_Total_:0),nonhispanicwhitealone(DEFAULT:Non_Hispanic_White_Alone_:0),nonhispanicblackalone(DEFAULT:Non_Hispanic_Black_Alone_:0),nonhispanicamericanindianalaskanativealone(DEFAULT:Non_Hispanic_American_Indian_Alaska_Native_Alone_:0),nonhispanicasianpacificislanderalone(DEFAULT:Non_Hispanic_Asian_Pacific_Islander_Alone_:0),nonhispanicotheralone(DEFAULT:Non_Hispanic_Other_Alone_:0),nonhispanicmultiracialalone(DEFAULT:Non_Hispanic_Multiracial_Alone_:0),nonhispanicwhiteother(DEFAULT:Non_Hispanic_White_Other_:0),nonhispanicblackother(DEFAULT:Non_Hispanic_Black_Other_:0),nonhispanicamericanindianalaskanativeother(DEFAULT:Non_Hispanic_American_Indian_Alaska_Native_Other_:0),nonhispanicasianother(DEFAULT:Non_Hispanic_Asian_Other_:0),nonhispanicasianpacificislanderother(DEFAULT:Non_Hispanic_Asian_Pacific_Islander_Other_:0),nonhispanicasianhawaiianpacificislanderother(DEFAULT:Non_Hispanic_Asian_Hawaiian_Pacific_Islander_Other_:0),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),datevendorfirstreported(DEFAULT:Date_Vendor_First_Reported_:EPOCH),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
-  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_ADVO__Key_Addr1_History,TRANSFORM(RECORDOF(__in.Dataset_ADVO__Key_Addr1_History),SELF:=RIGHT));
+  SHARED __Mapping0 := 'UID(DEFAULT:UID),geoid10_blkgrp(OVERRIDE:Geo_Link_:\'\'),is_latest(OVERRIDE:Is_Latest_),geopercentwhite(DEFAULT:Geo_Percent_White_:0.0),geopercentblack(DEFAULT:Geo_Percent_Black_:0.0),geopercentamericanindianalaskanative(DEFAULT:Geo_Percent_American_Indian_Alaska_Native_:0.0),geopercentasianpacificislander(DEFAULT:Geo_Percent_Asian_Pacific_Islander_:0.0),geopercentmultiracial(DEFAULT:Geo_Percent_Multiracial_:0.0),geopercenthispanic(DEFAULT:Geo_Percent_Hispanic_:0.0),here(DEFAULT:Here_:0.0),heregivenwhite(DEFAULT:Here_Given_White_:0.0),heregivenblack(DEFAULT:Here_Given_Black_:0.0),heregivenamericanindianalaskanative(DEFAULT:Here_Given_American_Indian_Alaska_Native_:0.0),heregivenasianpacificislander(DEFAULT:Here_Given_Asian_Pacific_Islander_:0.0),heregivenmultiracial(DEFAULT:Here_Given_Multiracial_:0.0),heregivenhispanic(DEFAULT:Here_Given_Hispanic_:0.0),state_fips10(OVERRIDE:State_Fips10_:\'\'),county_fips10(OVERRIDE:County_Fips10_:\'\'),tract_fips10(OVERRIDE:Tract_Fips10_:\'\'),blkgrp_fips10(OVERRIDE:Block_Group_Fips10_:0),total_pop(OVERRIDE:Total_Population_:0),hispanic_total(OVERRIDE:Hispanic_Total_:0),non_hispanic_total(OVERRIDE:Non_Hispanic_Total_:0),nh_white_alone(OVERRIDE:Non_Hispanic_White_Alone_:0),nh_black_alone(OVERRIDE:Non_Hispanic_Black_Alone_:0),nh_aian_alone(OVERRIDE:Non_Hispanic_American_Indian_Alaska_Native_Alone_:0),nh_api_alone(OVERRIDE:Non_Hispanic_Asian_Pacific_Islander_Alone_:0),nh_other_alone(OVERRIDE:Non_Hispanic_Other_Alone_:0),nh_mult_total(OVERRIDE:Non_Hispanic_Multiracial_Alone_:0),nh_white_other(OVERRIDE:Non_Hispanic_White_Other_:0),nh_black_other(OVERRIDE:Non_Hispanic_Black_Other_:0),nh_aian_other(OVERRIDE:Non_Hispanic_American_Indian_Alaska_Native_Other_:0),nh_asian_hpi(OVERRIDE:Non_Hispanic_Asian_Other_:0),nh_api_other(OVERRIDE:Non_Hispanic_Asian_Pacific_Islander_Other_:0),nh_asian_hpi_other(OVERRIDE:Non_Hispanic_Asian_Hawaiian_Pacific_Islander_Other_:0),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),dt_vendor_first_reported(OVERRIDE:Date_Vendor_First_Reported_:EPOCH),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_dx_ConsumerFinancialProtectionBureau__Key_BLKGRP,TRANSFORM(RECORDOF(__in.Dataset_dx_ConsumerFinancialProtectionBureau__Key_BLKGRP),SELF:=RIGHT));
   SHARED __d0_Out := RECORD
-    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_ADVO__Key_Addr1_History);
+    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_dx_ConsumerFinancialProtectionBureau__Key_BLKGRP);
     KEL.typ.uid UID := 0;
   END;
-  SHARED __d0_UID_Mapped := JOIN(__d0_Norm,Lookup,TRIM((STRING)LEFT.Geo_Link) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_ADVO__Key_Addr1_History_Invalid := __d0_UID_Mapped(UID = 0);
+  SHARED __d0_UID_Mapped := JOIN(__d0_Norm,Lookup,TRIM((STRING)LEFT.geoid10_blkgrp) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_dx_ConsumerFinancialProtectionBureau__Key_BLKGRP_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
-  EXPORT InData := __d0;
+  SHARED __Mapping1 := 'UID(DEFAULT:UID),geoind(OVERRIDE:Geo_Link_:\'\'),is_latest(OVERRIDE:Is_Latest_),geo_pr_white(OVERRIDE:Geo_Percent_White_:0.0),geo_pr_black(OVERRIDE:Geo_Percent_Black_:0.0),geo_pr_aian(OVERRIDE:Geo_Percent_American_Indian_Alaska_Native_:0.0),geo_pr_api(OVERRIDE:Geo_Percent_Asian_Pacific_Islander_:0.0),geo_pr_mult_other(OVERRIDE:Geo_Percent_Multiracial_:0.0),geo_pr_hispanic(OVERRIDE:Geo_Percent_Hispanic_:0.0),here(OVERRIDE:Here_:0.0),here_given_white(OVERRIDE:Here_Given_White_:0.0),here_given_black(OVERRIDE:Here_Given_Black_:0.0),here_given_aian(OVERRIDE:Here_Given_American_Indian_Alaska_Native_:0.0),here_given_api(OVERRIDE:Here_Given_Asian_Pacific_Islander_:0.0),here_given_mult_other(OVERRIDE:Here_Given_Multiracial_:0.0),here_given_hispanic(OVERRIDE:Here_Given_Hispanic_:0.0),statefips10(DEFAULT:State_Fips10_:\'\'),countyfips10(DEFAULT:County_Fips10_:\'\'),tractfips10(DEFAULT:Tract_Fips10_:\'\'),blockgroupfips10(DEFAULT:Block_Group_Fips10_:0),totalpopulation(DEFAULT:Total_Population_:0),hispanictotal(DEFAULT:Hispanic_Total_:0),nonhispanictotal(DEFAULT:Non_Hispanic_Total_:0),nonhispanicwhitealone(DEFAULT:Non_Hispanic_White_Alone_:0),nonhispanicblackalone(DEFAULT:Non_Hispanic_Black_Alone_:0),nonhispanicamericanindianalaskanativealone(DEFAULT:Non_Hispanic_American_Indian_Alaska_Native_Alone_:0),nonhispanicasianpacificislanderalone(DEFAULT:Non_Hispanic_Asian_Pacific_Islander_Alone_:0),nonhispanicotheralone(DEFAULT:Non_Hispanic_Other_Alone_:0),nonhispanicmultiracialalone(DEFAULT:Non_Hispanic_Multiracial_Alone_:0),nonhispanicwhiteother(DEFAULT:Non_Hispanic_White_Other_:0),nonhispanicblackother(DEFAULT:Non_Hispanic_Black_Other_:0),nonhispanicamericanindianalaskanativeother(DEFAULT:Non_Hispanic_American_Indian_Alaska_Native_Other_:0),nonhispanicasianother(DEFAULT:Non_Hispanic_Asian_Other_:0),nonhispanicasianpacificislanderother(DEFAULT:Non_Hispanic_Asian_Pacific_Islander_Other_:0),nonhispanicasianhawaiianpacificislanderother(DEFAULT:Non_Hispanic_Asian_Hawaiian_Pacific_Islander_Other_:0),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),dt_vendor_first_reported(OVERRIDE:Date_Vendor_First_Reported_:EPOCH),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_dx_ConsumerFinancialProtectionBureau__key_BLKGRP_attr_over18,TRANSFORM(RECORDOF(__in.Dataset_dx_ConsumerFinancialProtectionBureau__key_BLKGRP_attr_over18),SELF:=RIGHT));
+  SHARED __d1_Out := RECORD
+    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_dx_ConsumerFinancialProtectionBureau__key_BLKGRP_attr_over18);
+    KEL.typ.uid UID := 0;
+  END;
+  SHARED __d1_UID_Mapped := JOIN(__d1_Norm,Lookup,TRIM((STRING)LEFT.geoind) = RIGHT.KeyVal,TRANSFORM(__d1_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_dx_ConsumerFinancialProtectionBureau__key_BLKGRP_attr_over18_Invalid := __d1_UID_Mapped(UID = 0);
+  SHARED __d1_Prefiltered := __d1_UID_Mapped(UID <> 0);
+  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  EXPORT InData := __d0 + __d1;
   EXPORT Block_Group_Layout := RECORD
     KEL.typ.nbool Is_Latest_;
     KEL.typ.nfloat Geo_Percent_White_;
@@ -170,12 +181,12 @@ EXPORT E_Geo_Link(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
   EXPORT UIDSourceCounts := Lookup;
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT Geo_Link__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Geo_Link_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_ADVO__Key_Addr1_History_Invalid),COUNT(Geo_Link__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_ADVO__Key_Addr1_History_Invalid,KEL.typ.int Geo_Link__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
+  EXPORT Geo_Link__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Geo_Link_);
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_dx_ConsumerFinancialProtectionBureau__Key_BLKGRP_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_dx_ConsumerFinancialProtectionBureau__key_BLKGRP_attr_over18_Invalid),COUNT(Geo_Link__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_dx_ConsumerFinancialProtectionBureau__Key_BLKGRP_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_dx_ConsumerFinancialProtectionBureau__key_BLKGRP_attr_over18_Invalid,KEL.typ.int Geo_Link__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_ADVO__Key_Addr1_History_Invalid),COUNT(__d0)},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Geo_Link',COUNT(__d0(__NL(Geo_Link_))),COUNT(__d0(__NN(Geo_Link_)))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','IsLatest',COUNT(__d0(__NL(Is_Latest_))),COUNT(__d0(__NN(Is_Latest_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_dx_ConsumerFinancialProtectionBureau__Key_BLKGRP_Invalid),COUNT(__d0)},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','geoid10_blkgrp',COUNT(__d0(__NL(Geo_Link_))),COUNT(__d0(__NN(Geo_Link_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','is_latest',COUNT(__d0(__NL(Is_Latest_))),COUNT(__d0(__NN(Is_Latest_)))},
     {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','GeoPercentWhite',COUNT(__d0(__NL(Geo_Percent_White_))),COUNT(__d0(__NN(Geo_Percent_White_)))},
     {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','GeoPercentBlack',COUNT(__d0(__NL(Geo_Percent_Black_))),COUNT(__d0(__NN(Geo_Percent_Black_)))},
     {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','GeoPercentAmericanIndianAlaskaNative',COUNT(__d0(__NL(Geo_Percent_American_Indian_Alaska_Native_))),COUNT(__d0(__NN(Geo_Percent_American_Indian_Alaska_Native_)))},
@@ -189,29 +200,69 @@ EXPORT E_Geo_Link(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HereGivenAsianPacificIslander',COUNT(__d0(__NL(Here_Given_Asian_Pacific_Islander_))),COUNT(__d0(__NN(Here_Given_Asian_Pacific_Islander_)))},
     {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HereGivenMultiracial',COUNT(__d0(__NL(Here_Given_Multiracial_))),COUNT(__d0(__NN(Here_Given_Multiracial_)))},
     {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HereGivenHispanic',COUNT(__d0(__NL(Here_Given_Hispanic_))),COUNT(__d0(__NN(Here_Given_Hispanic_)))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','StateFips10',COUNT(__d0(__NL(State_Fips10_))),COUNT(__d0(__NN(State_Fips10_)))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CountyFips10',COUNT(__d0(__NL(County_Fips10_))),COUNT(__d0(__NN(County_Fips10_)))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TractFips10',COUNT(__d0(__NL(Tract_Fips10_))),COUNT(__d0(__NN(Tract_Fips10_)))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','BlockGroupFips10',COUNT(__d0(__NL(Block_Group_Fips10_))),COUNT(__d0(__NN(Block_Group_Fips10_)))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TotalPopulation',COUNT(__d0(__NL(Total_Population_))),COUNT(__d0(__NN(Total_Population_)))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HispanicTotal',COUNT(__d0(__NL(Hispanic_Total_))),COUNT(__d0(__NN(Hispanic_Total_)))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicTotal',COUNT(__d0(__NL(Non_Hispanic_Total_))),COUNT(__d0(__NN(Non_Hispanic_Total_)))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicWhiteAlone',COUNT(__d0(__NL(Non_Hispanic_White_Alone_))),COUNT(__d0(__NN(Non_Hispanic_White_Alone_)))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicBlackAlone',COUNT(__d0(__NL(Non_Hispanic_Black_Alone_))),COUNT(__d0(__NN(Non_Hispanic_Black_Alone_)))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicAmericanIndianAlaskaNativeAlone',COUNT(__d0(__NL(Non_Hispanic_American_Indian_Alaska_Native_Alone_))),COUNT(__d0(__NN(Non_Hispanic_American_Indian_Alaska_Native_Alone_)))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicAsianPacificIslanderAlone',COUNT(__d0(__NL(Non_Hispanic_Asian_Pacific_Islander_Alone_))),COUNT(__d0(__NN(Non_Hispanic_Asian_Pacific_Islander_Alone_)))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicOtherAlone',COUNT(__d0(__NL(Non_Hispanic_Other_Alone_))),COUNT(__d0(__NN(Non_Hispanic_Other_Alone_)))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicMultiracialAlone',COUNT(__d0(__NL(Non_Hispanic_Multiracial_Alone_))),COUNT(__d0(__NN(Non_Hispanic_Multiracial_Alone_)))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicWhiteOther',COUNT(__d0(__NL(Non_Hispanic_White_Other_))),COUNT(__d0(__NN(Non_Hispanic_White_Other_)))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicBlackOther',COUNT(__d0(__NL(Non_Hispanic_Black_Other_))),COUNT(__d0(__NN(Non_Hispanic_Black_Other_)))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicAmericanIndianAlaskaNativeOther',COUNT(__d0(__NL(Non_Hispanic_American_Indian_Alaska_Native_Other_))),COUNT(__d0(__NN(Non_Hispanic_American_Indian_Alaska_Native_Other_)))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicAsianOther',COUNT(__d0(__NL(Non_Hispanic_Asian_Other_))),COUNT(__d0(__NN(Non_Hispanic_Asian_Other_)))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicAsianPacificIslanderOther',COUNT(__d0(__NL(Non_Hispanic_Asian_Pacific_Islander_Other_))),COUNT(__d0(__NN(Non_Hispanic_Asian_Pacific_Islander_Other_)))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicAsianHawaiianPacificIslanderOther',COUNT(__d0(__NL(Non_Hispanic_Asian_Hawaiian_Pacific_Islander_Other_))),COUNT(__d0(__NN(Non_Hispanic_Asian_Hawaiian_Pacific_Islander_Other_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','state_fips10',COUNT(__d0(__NL(State_Fips10_))),COUNT(__d0(__NN(State_Fips10_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','county_fips10',COUNT(__d0(__NL(County_Fips10_))),COUNT(__d0(__NN(County_Fips10_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','tract_fips10',COUNT(__d0(__NL(Tract_Fips10_))),COUNT(__d0(__NN(Tract_Fips10_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','blkgrp_fips10',COUNT(__d0(__NL(Block_Group_Fips10_))),COUNT(__d0(__NN(Block_Group_Fips10_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','total_pop',COUNT(__d0(__NL(Total_Population_))),COUNT(__d0(__NN(Total_Population_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','hispanic_total',COUNT(__d0(__NL(Hispanic_Total_))),COUNT(__d0(__NN(Hispanic_Total_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','non_hispanic_total',COUNT(__d0(__NL(Non_Hispanic_Total_))),COUNT(__d0(__NN(Non_Hispanic_Total_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','nh_white_alone',COUNT(__d0(__NL(Non_Hispanic_White_Alone_))),COUNT(__d0(__NN(Non_Hispanic_White_Alone_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','nh_black_alone',COUNT(__d0(__NL(Non_Hispanic_Black_Alone_))),COUNT(__d0(__NN(Non_Hispanic_Black_Alone_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','nh_aian_alone',COUNT(__d0(__NL(Non_Hispanic_American_Indian_Alaska_Native_Alone_))),COUNT(__d0(__NN(Non_Hispanic_American_Indian_Alaska_Native_Alone_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','nh_api_alone',COUNT(__d0(__NL(Non_Hispanic_Asian_Pacific_Islander_Alone_))),COUNT(__d0(__NN(Non_Hispanic_Asian_Pacific_Islander_Alone_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','nh_other_alone',COUNT(__d0(__NL(Non_Hispanic_Other_Alone_))),COUNT(__d0(__NN(Non_Hispanic_Other_Alone_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','nh_mult_total',COUNT(__d0(__NL(Non_Hispanic_Multiracial_Alone_))),COUNT(__d0(__NN(Non_Hispanic_Multiracial_Alone_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','nh_white_other',COUNT(__d0(__NL(Non_Hispanic_White_Other_))),COUNT(__d0(__NN(Non_Hispanic_White_Other_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','nh_black_other',COUNT(__d0(__NL(Non_Hispanic_Black_Other_))),COUNT(__d0(__NN(Non_Hispanic_Black_Other_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','nh_aian_other',COUNT(__d0(__NL(Non_Hispanic_American_Indian_Alaska_Native_Other_))),COUNT(__d0(__NN(Non_Hispanic_American_Indian_Alaska_Native_Other_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','nh_asian_hpi',COUNT(__d0(__NL(Non_Hispanic_Asian_Other_))),COUNT(__d0(__NN(Non_Hispanic_Asian_Other_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','nh_api_other',COUNT(__d0(__NL(Non_Hispanic_Asian_Pacific_Islander_Other_))),COUNT(__d0(__NN(Non_Hispanic_Asian_Pacific_Islander_Other_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','nh_asian_hpi_other',COUNT(__d0(__NL(Non_Hispanic_Asian_Hawaiian_Pacific_Islander_Other_))),COUNT(__d0(__NN(Non_Hispanic_Asian_Hawaiian_Pacific_Islander_Other_)))},
     {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
     {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
     {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
     {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorFirstReported',COUNT(__d0(Date_Vendor_First_Reported_=0)),COUNT(__d0(Date_Vendor_First_Reported_!=0))},
-    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorLastReported',COUNT(__d0(Date_Vendor_Last_Reported_=0)),COUNT(__d0(Date_Vendor_Last_Reported_!=0))}]
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorLastReported',COUNT(__d0(Date_Vendor_Last_Reported_=0)),COUNT(__d0(Date_Vendor_Last_Reported_!=0))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_dx_ConsumerFinancialProtectionBureau__key_BLKGRP_attr_over18_Invalid),COUNT(__d1)},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','geoind',COUNT(__d1(__NL(Geo_Link_))),COUNT(__d1(__NN(Geo_Link_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','is_latest',COUNT(__d1(__NL(Is_Latest_))),COUNT(__d1(__NN(Is_Latest_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','geo_pr_white',COUNT(__d1(__NL(Geo_Percent_White_))),COUNT(__d1(__NN(Geo_Percent_White_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','geo_pr_black',COUNT(__d1(__NL(Geo_Percent_Black_))),COUNT(__d1(__NN(Geo_Percent_Black_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','geo_pr_aian',COUNT(__d1(__NL(Geo_Percent_American_Indian_Alaska_Native_))),COUNT(__d1(__NN(Geo_Percent_American_Indian_Alaska_Native_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','geo_pr_api',COUNT(__d1(__NL(Geo_Percent_Asian_Pacific_Islander_))),COUNT(__d1(__NN(Geo_Percent_Asian_Pacific_Islander_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','geo_pr_mult_other',COUNT(__d1(__NL(Geo_Percent_Multiracial_))),COUNT(__d1(__NN(Geo_Percent_Multiracial_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','geo_pr_hispanic',COUNT(__d1(__NL(Geo_Percent_Hispanic_))),COUNT(__d1(__NN(Geo_Percent_Hispanic_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','here',COUNT(__d1(__NL(Here_))),COUNT(__d1(__NN(Here_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','here_given_white',COUNT(__d1(__NL(Here_Given_White_))),COUNT(__d1(__NN(Here_Given_White_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','here_given_black',COUNT(__d1(__NL(Here_Given_Black_))),COUNT(__d1(__NN(Here_Given_Black_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','here_given_aian',COUNT(__d1(__NL(Here_Given_American_Indian_Alaska_Native_))),COUNT(__d1(__NN(Here_Given_American_Indian_Alaska_Native_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','here_given_api',COUNT(__d1(__NL(Here_Given_Asian_Pacific_Islander_))),COUNT(__d1(__NN(Here_Given_Asian_Pacific_Islander_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','here_given_mult_other',COUNT(__d1(__NL(Here_Given_Multiracial_))),COUNT(__d1(__NN(Here_Given_Multiracial_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','here_given_hispanic',COUNT(__d1(__NL(Here_Given_Hispanic_))),COUNT(__d1(__NN(Here_Given_Hispanic_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','StateFips10',COUNT(__d1(__NL(State_Fips10_))),COUNT(__d1(__NN(State_Fips10_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CountyFips10',COUNT(__d1(__NL(County_Fips10_))),COUNT(__d1(__NN(County_Fips10_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TractFips10',COUNT(__d1(__NL(Tract_Fips10_))),COUNT(__d1(__NN(Tract_Fips10_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','BlockGroupFips10',COUNT(__d1(__NL(Block_Group_Fips10_))),COUNT(__d1(__NN(Block_Group_Fips10_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TotalPopulation',COUNT(__d1(__NL(Total_Population_))),COUNT(__d1(__NN(Total_Population_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HispanicTotal',COUNT(__d1(__NL(Hispanic_Total_))),COUNT(__d1(__NN(Hispanic_Total_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicTotal',COUNT(__d1(__NL(Non_Hispanic_Total_))),COUNT(__d1(__NN(Non_Hispanic_Total_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicWhiteAlone',COUNT(__d1(__NL(Non_Hispanic_White_Alone_))),COUNT(__d1(__NN(Non_Hispanic_White_Alone_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicBlackAlone',COUNT(__d1(__NL(Non_Hispanic_Black_Alone_))),COUNT(__d1(__NN(Non_Hispanic_Black_Alone_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicAmericanIndianAlaskaNativeAlone',COUNT(__d1(__NL(Non_Hispanic_American_Indian_Alaska_Native_Alone_))),COUNT(__d1(__NN(Non_Hispanic_American_Indian_Alaska_Native_Alone_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicAsianPacificIslanderAlone',COUNT(__d1(__NL(Non_Hispanic_Asian_Pacific_Islander_Alone_))),COUNT(__d1(__NN(Non_Hispanic_Asian_Pacific_Islander_Alone_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicOtherAlone',COUNT(__d1(__NL(Non_Hispanic_Other_Alone_))),COUNT(__d1(__NN(Non_Hispanic_Other_Alone_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicMultiracialAlone',COUNT(__d1(__NL(Non_Hispanic_Multiracial_Alone_))),COUNT(__d1(__NN(Non_Hispanic_Multiracial_Alone_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicWhiteOther',COUNT(__d1(__NL(Non_Hispanic_White_Other_))),COUNT(__d1(__NN(Non_Hispanic_White_Other_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicBlackOther',COUNT(__d1(__NL(Non_Hispanic_Black_Other_))),COUNT(__d1(__NN(Non_Hispanic_Black_Other_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicAmericanIndianAlaskaNativeOther',COUNT(__d1(__NL(Non_Hispanic_American_Indian_Alaska_Native_Other_))),COUNT(__d1(__NN(Non_Hispanic_American_Indian_Alaska_Native_Other_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicAsianOther',COUNT(__d1(__NL(Non_Hispanic_Asian_Other_))),COUNT(__d1(__NN(Non_Hispanic_Asian_Other_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicAsianPacificIslanderOther',COUNT(__d1(__NL(Non_Hispanic_Asian_Pacific_Islander_Other_))),COUNT(__d1(__NN(Non_Hispanic_Asian_Pacific_Islander_Other_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NonHispanicAsianHawaiianPacificIslanderOther',COUNT(__d1(__NL(Non_Hispanic_Asian_Hawaiian_Pacific_Islander_Other_))),COUNT(__d1(__NN(Non_Hispanic_Asian_Hawaiian_Pacific_Islander_Other_)))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d1(Archive___Date_=0)),COUNT(__d1(Archive___Date_!=0))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorFirstReported',COUNT(__d1(Date_Vendor_First_Reported_=0)),COUNT(__d1(Date_Vendor_First_Reported_!=0))},
+    {'GeoLink','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorLastReported',COUNT(__d1(Date_Vendor_Last_Reported_=0)),COUNT(__d1(Date_Vendor_Last_Reported_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

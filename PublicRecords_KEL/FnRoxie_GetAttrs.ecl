@@ -11,15 +11,15 @@ EXPORT FnRoxie_GetAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) In
         SELF := LEFT ));														
 								
 	Prep_inputPII := PublicRecords_KEL.ECL_Functions.FnRoxie_Prep_InputPII(InputData, Options);
-	
+
 	// 'mini' fdc fetching is to gather address hist data from rank key then pass this to the rest of the FDC after creating prev/curr/emerging address related attributes 
 	OptionsMini := PublicRecords_KEL.Interface_Mini_Options(Options);
 
 	FDCDatasetMini := PublicRecords_KEL.Fn_MAS_FDC( Prep_inputPII, OptionsMini);		
 
 	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(Prep_inputPII, FDCDatasetMini, OptionsMini); 
-	
-	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( MiniAttributes, Options );
+
+	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( MiniAttributes, Options , DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII) ,FDCDatasetMini);
 
   // Get Attributes - cleans the attributes after KEL is done 
   InputPIIAttributes :=PublicRecords_KEL.FnRoxie_GetInputPIIAttributes(Prep_inputPII, Options);

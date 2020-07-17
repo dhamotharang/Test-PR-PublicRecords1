@@ -4,7 +4,7 @@
 //
 //**************************************************************
 
-import fieldstats,did_add,ut,header_slimsort,watchdog,didville,census_data,business_header,business_header_ss;
+import fieldstats,did_add,ut,census_data;
 
 pre := sequential(
 	fileservices.startsuperfiletransaction(),
@@ -14,7 +14,7 @@ pre := sequential(
 	fileservices.addsuperfile('~thor_data400::in::Prof_Licenses_IN','~thor_data400::in::prof_license_' + prof_license.version),
 	fileservices.finishsuperfiletransaction()
 	);
-	
+
 inf := prof_license.file_prof_license;
 
 fieldstats.mac_stat_file(inf,stats,'prof_licenses',50,6,true,
@@ -47,27 +47,27 @@ rec := record
 	unsigned6 temp_did_score;
 	unsigned6	bdid := 0;
 end;
-	
-rec addtemp(infile l) := transform	
+
+rec addtemp(infile l) := transform
 	self.did := 0;
 	self.temp_did_score := 0;
 	self := l;
 end;
-	
+
 inmac := project(infile, addtemp(left));
 
 //****** Add the DIDs
 did_Add.MAC_Match_Flex
-	(inmac, matchset,						
-	 ssn, dob, fname, mname,lname, name_suffix, 
-	 prim_range, prim_name, sec_range, zip, st, phone, 
-	 DID,   			
-	 rec, 
+	(inmac, matchset,
+	 ssn, dob, fname, mname,lname, name_suffix,
+	 prim_range, prim_name, sec_range, zip, st, phone,
+	 DID,
+	 rec,
 	 true, temp_DID_Score,
-	 75,	
+	 75,
 	 wdid)
 
-//****** Add the SSN 
+//****** Add the SSN
 	did_add.MAC_Add_SSN_By_DID(wdid, DID, ssn, wssn)
 
 
@@ -84,7 +84,7 @@ did_Add.MAC_Match_Flex
 	wbdid2 := wbdid1(bdid != 0);
 	wobdid := wbdid1(bdid = 0);
 	myset := ['A','P'];
-	
+
 	business_header_Ss.mac_match_flex(wobdid,myset,
 								company_name,
 								prim_range,prim_name,zip,sec_range,st,
@@ -93,7 +93,7 @@ did_Add.MAC_Match_Flex
 								rec,
 								false, foo,
 								wbdid3)
-	
+
 	wall := wbdid2 + wbdid3;
 
 

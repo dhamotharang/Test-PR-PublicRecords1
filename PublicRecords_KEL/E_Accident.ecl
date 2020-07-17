@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -168,23 +168,23 @@ EXPORT E_Accident(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
   EXPORT UIDSourceCounts := Lookup;
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT Accident_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Accident_Number_);
-  EXPORT Accident_Date__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Accident_Date_);
-  EXPORT Accident_Location__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Accident_Location_);
-  EXPORT Accident_Street__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Accident_Street_);
-  EXPORT Accident_Cross_Street__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Accident_Cross_Street_);
-  EXPORT Next_Street__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Next_Street_);
-  EXPORT Incident_City__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Incident_City_);
-  EXPORT Incident_State__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Incident_State_);
-  EXPORT Jurisdiction_State__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Jurisdiction_State_);
-  EXPORT Jurisdiction__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Jurisdiction_);
-  EXPORT Jurisdiction_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Jurisdiction_Number_);
-  EXPORT Report_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Report_Code_);
-  EXPORT Report_Category__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Report_Category_);
-  EXPORT Report_Type_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Report_Type_I_D_);
-  EXPORT Report_Code_Description__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Report_Code_Description_);
-  EXPORT Report_Has_Cover_Sheet__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Report_Has_Cover_Sheet_);
-  EXPORT Additional_Report_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Additional_Report_Number_);
+  EXPORT Accident_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Accident_Number_);
+  EXPORT Accident_Date__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Accident_Date_);
+  EXPORT Accident_Location__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Accident_Location_);
+  EXPORT Accident_Street__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Accident_Street_);
+  EXPORT Accident_Cross_Street__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Accident_Cross_Street_);
+  EXPORT Next_Street__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Next_Street_);
+  EXPORT Incident_City__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Incident_City_);
+  EXPORT Incident_State__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Incident_State_);
+  EXPORT Jurisdiction_State__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Jurisdiction_State_);
+  EXPORT Jurisdiction__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Jurisdiction_);
+  EXPORT Jurisdiction_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Jurisdiction_Number_);
+  EXPORT Report_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Report_Code_);
+  EXPORT Report_Category__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Report_Category_);
+  EXPORT Report_Type_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Report_Type_I_D_);
+  EXPORT Report_Code_Description__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Report_Code_Description_);
+  EXPORT Report_Has_Cover_Sheet__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Report_Has_Cover_Sheet_);
+  EXPORT Additional_Report_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Additional_Report_Number_);
   EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FLAccidents_Ecrash__Key_ECrash4_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FLAccidents_Ecrash__key_EcrashV2_accnbr_Invalid),COUNT(Accident_Number__SingleValue_Invalid),COUNT(Accident_Date__SingleValue_Invalid),COUNT(Accident_Location__SingleValue_Invalid),COUNT(Accident_Street__SingleValue_Invalid),COUNT(Accident_Cross_Street__SingleValue_Invalid),COUNT(Next_Street__SingleValue_Invalid),COUNT(Incident_City__SingleValue_Invalid),COUNT(Incident_State__SingleValue_Invalid),COUNT(Jurisdiction_State__SingleValue_Invalid),COUNT(Jurisdiction__SingleValue_Invalid),COUNT(Jurisdiction_Number__SingleValue_Invalid),COUNT(Report_Code__SingleValue_Invalid),COUNT(Report_Category__SingleValue_Invalid),COUNT(Report_Type_I_D__SingleValue_Invalid),COUNT(Report_Code_Description__SingleValue_Invalid),COUNT(Report_Has_Cover_Sheet__SingleValue_Invalid),COUNT(Additional_Report_Number__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FLAccidents_Ecrash__Key_ECrash4_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FLAccidents_Ecrash__key_EcrashV2_accnbr_Invalid,KEL.typ.int Accident_Number__SingleValue_Invalid,KEL.typ.int Accident_Date__SingleValue_Invalid,KEL.typ.int Accident_Location__SingleValue_Invalid,KEL.typ.int Accident_Street__SingleValue_Invalid,KEL.typ.int Accident_Cross_Street__SingleValue_Invalid,KEL.typ.int Next_Street__SingleValue_Invalid,KEL.typ.int Incident_City__SingleValue_Invalid,KEL.typ.int Incident_State__SingleValue_Invalid,KEL.typ.int Jurisdiction_State__SingleValue_Invalid,KEL.typ.int Jurisdiction__SingleValue_Invalid,KEL.typ.int Jurisdiction_Number__SingleValue_Invalid,KEL.typ.int Report_Code__SingleValue_Invalid,KEL.typ.int Report_Category__SingleValue_Invalid,KEL.typ.int Report_Type_I_D__SingleValue_Invalid,KEL.typ.int Report_Code_Description__SingleValue_Invalid,KEL.typ.int Report_Has_Cover_Sheet__SingleValue_Invalid,KEL.typ.int Additional_Report_Number__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'Accident','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_FLAccidents_Ecrash__Key_ECrash4_Invalid),COUNT(__d0)},

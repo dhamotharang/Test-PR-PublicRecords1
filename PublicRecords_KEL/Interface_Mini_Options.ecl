@@ -49,14 +49,17 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT BOOLEAN IncludeEducation := FALSE;
 	EXPORT BOOLEAN IncludeEmail := FALSE;
 	EXPORT BOOLEAN IncludeEmployment := FALSE;
+	EXPORT BOOLEAN IncludeGeolink := FALSE;
 	EXPORT BOOLEAN IncludeHousehold := FALSE;
 	EXPORT BOOLEAN IncludeInquiry := FALSE;
+	EXPORT BOOLEAN IncludeLienJudgment := FALSE;
 	EXPORT BOOLEAN IncludePerson := FALSE;
 	EXPORT BOOLEAN IncludePhone := FALSE;
 	EXPORT BOOLEAN IncludeProfessionalLicense := FALSE;
 	EXPORT BOOLEAN IncludeProperty := FALSE;
 	EXPORT BOOLEAN IncludePropertyEvent := FALSE;
 	EXPORT BOOLEAN IncludeSocialSecurityNumber := FALSE;
+	EXPORT BOOLEAN IncludeSurname := FALSE;
 	EXPORT BOOLEAN IncludeTIN := FALSE;
 	EXPORT BOOLEAN IncludeTradeline := FALSE;
 	EXPORT BOOLEAN IncludeUtility := FALSE;
@@ -64,7 +67,6 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT BOOLEAN IncludeWatercraft := FALSE;
 	EXPORT BOOLEAN IncludeZipCode := FALSE;
 	EXPORT BOOLEAN IncludeUCC := FALSE;
-	EXPORT BOOLEAN IncludeLienJudgment := FALSE;
 	EXPORT BOOLEAN IncludeMini := TRUE;
 	
 	// Performance options to turn ON/OFF ASSOCIATIONS in during FDC build. 
@@ -137,7 +139,9 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT BOOLEAN IncludeWatercraftOwner := IncludeWatercraft AND IncludePerson;
 	EXPORT BOOLEAN IncludeZipCodePerson := IncludeZipCode AND IncludePerson;
 	EXPORT BOOLEAN IncludePersonLienJudgment := IncludePerson AND IncludeLienJudgment;
-	EXPORT BOOLEAN IncludeSeleLienJudgment := IncludeBusinessSele AND IncludeLienJudgment; 	
+	EXPORT BOOLEAN IncludeSeleLienJudgment := IncludeBusinessSele AND IncludeLienJudgment;
+ 	EXPORT BOOLEAN IncludeSelePersonSurname := IncludeBusinessSele AND IncludeSurname AND IncludeSelePerson; 	
+	EXPORT BOOLEAN IncludeProxPersonSurname := IncludeBusinessProx AND IncludeSurname AND IncludeProxPerson; 
 
 
 END;	

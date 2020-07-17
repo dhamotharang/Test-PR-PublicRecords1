@@ -7,7 +7,7 @@
   <separator />
   <part name="DID" type="xsd:string" required="1" />
   <part name="DPPAPurpose" type="xsd:byte" default="1"/>
-  <part name="GLBPurpose" type="xsd:byte" default="1"/> 
+  <part name="GLBPurpose" type="xsd:byte" default="1"/>
  
   <part name="AddressCountReportRequest" type="tns:XmlDataSet" cols="80" rows="30" />
 </message>
@@ -30,9 +30,9 @@ EXPORT CountService := MACRO
   //***************************************************
   // iesp.ECL2ESP.SetInputAddress (ReportBy.Address);
   // Unfortunately I cannot use the standard ECL2ESP setIputAddress
-  // because the input can be a single line or components and 
+  // because the input can be a single line or components and
   // I am using the clean address passing the single line address.
-  //****************************************************  
+  //****************************************************
   AddressReport_Services.input.SetInputAddress (ReportBy.Address);
 
   tmp:=AutoStandardI.GlobalModule();
@@ -44,7 +44,7 @@ EXPORT CountService := MACRO
 
   recs := AddressReport_Services.CountService_Records (tempmod,FALSE);
   results_cnts:=recs.record_cnts;
-  output(results_cnts,  named('Results'));
+  output(results_cnts, named('Results'));
 
 ENDMACRO;
 // CountService();

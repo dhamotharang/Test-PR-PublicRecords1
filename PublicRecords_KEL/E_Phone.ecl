@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.2.1-dev
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
 IMPORT KEL12 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -275,24 +275,24 @@ EXPORT E_Phone(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile
   EXPORT UIDSourceCounts := TABLE(InData,{KEL.typ.uid UID := MIN(GROUP,__T(UID)),KEL.typ.int Cnt := COUNT(GROUP)},UID);
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT Phone10__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Phone10_);
-  EXPORT Portability_Indicator__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Portability_Indicator_);
-  EXPORT Current_Flag__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Current_Flag_);
-  EXPORT Business_Flag__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Business_Flag_);
-  EXPORT N_X_X_Type__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,N_X_X_Type_);
-  EXPORT Publish_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Publish_Code_);
-  EXPORT C_O_C_Type__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,C_O_C_Type_);
-  EXPORT S_C_C__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,S_C_C_);
-  EXPORT Phone_Number_Company_Type__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Phone_Number_Company_Type_);
-  EXPORT Ported_Match__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Ported_Match_);
-  EXPORT Phone_Use__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Phone_Use_);
-  EXPORT No_Solicit_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,No_Solicit_Code_);
-  EXPORT Omit_Indicator__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Omit_Indicator_);
-  EXPORT Source_File__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Source_File_);
-  EXPORT Iver_Indicator__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Iver_Indicator_);
-  EXPORT Validation_Flag__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Validation_Flag_);
-  EXPORT Validation_Date__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Validation_Date_);
-  EXPORT Carrier_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Carrier_Name_);
+  EXPORT Phone10__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Phone10_);
+  EXPORT Portability_Indicator__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Portability_Indicator_);
+  EXPORT Current_Flag__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Current_Flag_);
+  EXPORT Business_Flag__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Business_Flag_);
+  EXPORT N_X_X_Type__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,N_X_X_Type_);
+  EXPORT Publish_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Publish_Code_);
+  EXPORT C_O_C_Type__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,C_O_C_Type_);
+  EXPORT S_C_C__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,S_C_C_);
+  EXPORT Phone_Number_Company_Type__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Phone_Number_Company_Type_);
+  EXPORT Ported_Match__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Ported_Match_);
+  EXPORT Phone_Use__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Phone_Use_);
+  EXPORT No_Solicit_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,No_Solicit_Code_);
+  EXPORT Omit_Indicator__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Omit_Indicator_);
+  EXPORT Source_File__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Source_File_);
+  EXPORT Iver_Indicator__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Iver_Indicator_);
+  EXPORT Validation_Flag__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Validation_Flag_);
+  EXPORT Validation_Date__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Validation_Date_);
+  EXPORT Carrier_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Carrier_Name_);
   EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Gong__Key_History_Phone_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Targus__Key_Phone_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_InfutorCID__Key_Phone_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Phone__PhonesPlus_v2_Keys_Scoring_Phone_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Key_Iverification__Keys_Iverification_Phone_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Key_CellPhone__Key_Neustar_Phone_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_PhonesPlus_v2_Key_PhonePlus_Fdid_Records_Invalid),COUNT(Phone10__SingleValue_Invalid),COUNT(Portability_Indicator__SingleValue_Invalid),COUNT(Current_Flag__SingleValue_Invalid),COUNT(Business_Flag__SingleValue_Invalid),COUNT(N_X_X_Type__SingleValue_Invalid),COUNT(Publish_Code__SingleValue_Invalid),COUNT(C_O_C_Type__SingleValue_Invalid),COUNT(S_C_C__SingleValue_Invalid),COUNT(Phone_Number_Company_Type__SingleValue_Invalid),COUNT(Ported_Match__SingleValue_Invalid),COUNT(Phone_Use__SingleValue_Invalid),COUNT(No_Solicit_Code__SingleValue_Invalid),COUNT(Omit_Indicator__SingleValue_Invalid),COUNT(Source_File__SingleValue_Invalid),COUNT(Iver_Indicator__SingleValue_Invalid),COUNT(Validation_Flag__SingleValue_Invalid),COUNT(Validation_Date__SingleValue_Invalid),COUNT(Carrier_Name__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Gong__Key_History_Phone_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Targus__Key_Phone_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_InfutorCID__Key_Phone_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Phone__PhonesPlus_v2_Keys_Scoring_Phone_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Key_Iverification__Keys_Iverification_Phone_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Key_CellPhone__Key_Neustar_Phone_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_PhonesPlus_v2_Key_PhonePlus_Fdid_Records_Invalid,KEL.typ.int Phone10__SingleValue_Invalid,KEL.typ.int Portability_Indicator__SingleValue_Invalid,KEL.typ.int Current_Flag__SingleValue_Invalid,KEL.typ.int Business_Flag__SingleValue_Invalid,KEL.typ.int N_X_X_Type__SingleValue_Invalid,KEL.typ.int Publish_Code__SingleValue_Invalid,KEL.typ.int C_O_C_Type__SingleValue_Invalid,KEL.typ.int S_C_C__SingleValue_Invalid,KEL.typ.int Phone_Number_Company_Type__SingleValue_Invalid,KEL.typ.int Ported_Match__SingleValue_Invalid,KEL.typ.int Phone_Use__SingleValue_Invalid,KEL.typ.int No_Solicit_Code__SingleValue_Invalid,KEL.typ.int Omit_Indicator__SingleValue_Invalid,KEL.typ.int Source_File__SingleValue_Invalid,KEL.typ.int Iver_Indicator__SingleValue_Invalid,KEL.typ.int Validation_Flag__SingleValue_Invalid,KEL.typ.int Validation_Date__SingleValue_Invalid,KEL.typ.int Carrier_Name__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'Phone','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Gong__Key_History_Phone_Invalid),COUNT(__d0)},

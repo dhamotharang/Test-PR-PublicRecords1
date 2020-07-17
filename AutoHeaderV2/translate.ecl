@@ -1,10 +1,10 @@
-﻿IMPORT AutoStandardI, address, doxie, dx_header, ut, header, suppress, lib_stringlib, AutoheaderV2, lib_metaphone, lib_ziplib, _Validate, STD;
+﻿IMPORT AutoStandardI, address, doxie, dx_header, ut, suppress, lib_stringlib, AutoheaderV2, lib_metaphone, lib_ziplib, _Validate, STD;
 
 isFCRAval := false;
 todays_date := STD.Date.Today();
 
 // discard all zero zips
-hasAlpha(string6 s) := stringlib.StringFilterOut(s, '0123456789') <> ''; //iow, looks canadian 
+hasAlpha(string6 s) := stringlib.StringFilterOut(s, '0123456789') <> ''; //iow, looks canadian
 string45 blanks45 := '';
 string73 forceAsLname (string120 fullname) := blanks45 + (string20) fullname;
 
@@ -45,8 +45,8 @@ EXPORT translate := MODULE
     set of string9 only_input_ssn := [ssn_value];
     Self.ssn_set       := if (L.ssntypos, doxie.typossn (ssn_value), only_input_ssn);    //AutoStandardI.InterfaceTranslator.ssn_set.val
   end;
-  
-  EXPORT cssn (AutoheaderV2.layouts.lib_search L) := function  
+
+  EXPORT cssn (AutoheaderV2.layouts.lib_search L) := function
     return row (xform_cssn (L));
   end;
 
@@ -56,26 +56,26 @@ EXPORT translate := MODULE
     cleaned_name := map(
       // mx_lfmname_val.val(in_mod)<>'' => Address.CleanPersonLFM73(mx_lfmname_val.val(in_mod)),
       // new name cleaner was introduced and caused a regression - former version
-      // parsed single word inputs as last names always; new version parses them as first names always.   
+      // parsed single word inputs as last names always; new version parses them as first names always.
       // in order to mimic the behavior of the prior name cleaner when only a single word
-      // is input as an unparsed full name, skip cleaning altogether and fabricate a result 
+      // is input as an unparsed full name, skip cleaning altogether and fabricate a result
       // in the cleanPerson73 format with only last name populated (for both unknown and FML versions)
       ut.NoWords (unparsed_fullname_value) <= 1 => forceAsLname (unparsed_fullname_value),
       // name cleaner with fixed FML order
       // search_code & Constants.SearchCode.CLEAN_FML > 0 => address.CleanPersonFML73 (unparsed_fullname_value),
       address.CleanPerson73 (unparsed_fullname_value));
 
-    valid_cleaned := unparsed_fullname_value <> '';// or 
-                     // mx_nameasis_val.val(in_mod) <> '' or 
-                     // mx_asisname_val.val(in_mod) <> '' or 
+    valid_cleaned := unparsed_fullname_value <> '';// or
+                     // mx_nameasis_val.val(in_mod) <> '' or
+                     // mx_asisname_val.val(in_mod) <> '' or
                      // mx_lfmname_val.val(in_mod) <> '';
-                     
-    pre_fname_val      := if (is_saltFetch,stringlib.StringFilterOut(L.firstname,'\''),L.firstname); 
+
+    pre_fname_val      := if (is_saltFetch,stringlib.StringFilterOut(L.firstname,'\''),L.firstname);
     fname_val          := if (pre_fname_val = '' and valid_cleaned, cleaned_name[6..25], pre_fname_val);
     fname_value        := trim (stringlib.StringToUpperCase(fname_val),left);
     Self.fname         := fname_value;    //AutoStandardI.InterfaceTranslator.fname_value.val
 
-    pre_mname_val    := if (is_saltFetch,stringlib.StringFilterOut(L.middlename,'\''),L.middlename); 
+    pre_mname_val    := if (is_saltFetch,stringlib.StringFilterOut(L.middlename,'\''),L.middlename);
     mname_val        := if (pre_mname_val = '' and valid_cleaned, cleaned_name[26..45], pre_mname_val);
     mname_value      := trim (stringlib.StringToUpperCase(mname_val),left);
     Self.mname       := mname_value;    //AutoStandardI.InterfaceTranslator.mname_value.val
@@ -125,16 +125,16 @@ EXPORT translate := MODULE
                            [lname_value]);
 
     lname_phn_value := metaphonelib.DMetaPhone1(lname_value)[1..6];
-    ds_dist_value := header.key_phonetic_lname (keyed (dph_lname = lname_phn_value), StringLib.EditDistance (lname_value, lname) < L.distancethreshold);
+    ds_dist_value := dx_header.key_phonetic_lname() (keyed (dph_lname = lname_phn_value), StringLib.EditDistance (lname_value, lname) < L.distancethreshold);
     orig_set_value := SET (IF(L.phoneticdistancematch, CHOOSEN (ds_dist_value, 500)), lname);
 
     Self.lname_set_phonetic := orig_set_value + [lname_value];    //AutoStandardI.InterfaceTranslator.lnamephoneticset.val
   end;
-  
+
   EXPORT cname (AutoheaderV2.layouts.lib_search L, boolean is_saltFetch = false) := function
   return row (xform_cname (L,is_saltFetch));
   end;
-  
+
   EXPORT AutoheaderV2.layouts._address xform_caddress (AutoheaderV2.layouts.lib_search L,  boolean is_saltFetch) := transform
 
     // First, values which are common for different address components
@@ -143,7 +143,7 @@ EXPORT translate := MODULE
     pos_space := Stringlib.StringFind (addr_value, ' ', 1);
     pos_comma := Stringlib.StringFind (addr_value, ',', 1);
     pos_colon := Stringlib.StringFind (addr_value, ':', 1);
-    pos_astr  := Stringlib.StringFind (addr_value, '*', 1); 
+    pos_astr  := Stringlib.StringFind (addr_value, '*', 1);
     pos_q     := Stringlib.StringFind (addr_value, '?', 1);
 
     boolean addr_comma := pos_comma <> 0 and pos_comma < pos_space;
@@ -166,7 +166,7 @@ EXPORT translate := MODULE
 
     // cleaning address
     boolean allowclean := addr_value <> '' OR city_val <> '' OR StateCityZip_val <> '';
-    string addr_line_first := IF (addr_range, 
+    string addr_line_first := IF (addr_range,
                                   if (addr_comma,
                                       addr_value[StringLib.StringFind(addr_value, ',', 1)..],
                                       addr_value[StringLib.StringFind(addr_value, ':', 1)..]),
@@ -193,7 +193,7 @@ EXPORT translate := MODULE
     ca_state := clean_address.state;
     ca_zip := clean_address.zip;
     ca_error_msg := clean_address.error_msg;
-    
+
     // ca_prim_range := clean_address[1..10];
     // ca_prim_name := clean_address[13..40];
     // ca_sec_range := clean_address[57..64];
@@ -206,13 +206,13 @@ EXPORT translate := MODULE
     pname_val :=  if (skipTheCleanAddr, '', ca_prim_name);
 
     err_stat := if (allowclean, ca_error_msg, '');
-                      
-    pname_to_use := if(L.primname <> '', StringLib.StringToUpperCase(L.primname),pname_val);             
+
+    pname_to_use := if(L.primname <> '', StringLib.StringToUpperCase(L.primname),pname_val);
     pname_value  := if(is_saltfetch, pname_to_use, doxie.StripOrdinal(pname_to_use)); // if SALT flag is true skip StripOrdinal call.
-                        
+
     city_value := if (isValidCityStateClean, ca_city, input_city_value);
 
-    state_value := if(is_saltFetch and state_val='' , '', 
+    state_value := if(is_saltFetch and state_val='' , '',
     stringlib.StringToUpperCase(map(
         city_val='' and state_val='' and zip_val<>'' => ziplib.ZipToState2(zip_val),
         state_val<>''                                => state_val,
@@ -225,13 +225,13 @@ EXPORT translate := MODULE
     prange_end_value := if (addr_range, (unsigned) addr_value [if (addr_comma, pos_comma+1, pos_colon+1).. pos_space-1], 0);
 
     county_value := stringlib.StringToUpperCase(L.county);
-    
+
     // layouts._address doTranslate () := transform
     Self.prim_range     := map (    //AutoStandardI.InterfaceTranslator.prange_value.val
                             L.primrange <> '' => L.primrange,
                             skipTheCleanAddr => (STRING10) addr_value,
                             addr_wild => if(prange_temp = '', '', (STRING10) prange_wild_value),
-                            addr_range => (STRING10)prange_beg_value, 
+                            addr_range => (STRING10)prange_beg_value,
                             prange_temp);
 
     Self.prim_name      := pname_value;    //AutoStandardI.InterfaceTranslator.pname_value.val
@@ -241,13 +241,13 @@ EXPORT translate := MODULE
                             ca_sec_range);
 
     Self.state          :=  state_value;    //AutoStandardI.InterfaceTranslator.state_value.val
-    
-    zip_val_to_use      := if((integer)ca_zip <> 0 or hasAlpha(ca_zip), ca_zip, '');  
+
+    zip_val_to_use      := if((integer)ca_zip <> 0 or hasAlpha(ca_zip), ca_zip, '');
     Self.zip5           := if(is_saltFetch,
                                 IF(zip_val_to_use<>'',
                                                                 zip_val_to_use, zip_val),//if SALT flag is true using cleaned zip
                                 zip_val);    //AutoStandardI.InterfaceTranslator.zip_val.val
-    
+
     zipradius_value     := map(L.StrictMatch => 0,
                              L.zipradius != 0 => L.zipradius,
                              L.mileradius);
@@ -268,9 +268,9 @@ EXPORT translate := MODULE
     // derived
     city_zip_value := ziplib.CityToZip5 (state_value, city_value);
     // TODO: this call assumes that address may or may not be cleaned properly.
-    zip_value := ut.fn_GetZipSet (city_value, state_value, zip_val, county_value, 
+    zip_value := ut.fn_GetZipSet (city_value, state_value, zip_val, county_value,
                                   city_zip_value, zipradius_value, ca_zip, err_stat[1]='E');
-  
+
     Self.zip_set        := zip_value;    //AutoStandardI.InterfaceTranslator.zip_value.val
 
     city_zip_set := if (state_value <> '' and city_value <> '', ut.ZipsWithinCity(state_value, city_value), []);
@@ -285,7 +285,7 @@ EXPORT translate := MODULE
             project (dx_header.key_nbr_headers() (
                // keyed ((exists(zip_ds) or exists(city_zip_ds)) and zip IN city_zip_set,
                keyed (zip IN all_zip_set),
-               keyed (prim_name[1..length(pname_value)] = pname_value), 
+               keyed (prim_name[1..length(pname_value)] = pname_value),
                ((integer)prim_range >= prange_beg_value and (integer)prim_range <= prange_end_value)),
             {dx_header.key_nbr_headers().prim_range}),
       ut.limits.FETCH_KEYED, skip, keyed), ut.limits.FETCH_UNKEYED, skip));
@@ -302,11 +302,11 @@ EXPORT translate := MODULE
     // change: keep cleaner error as it is, not booleans
     Self.err            := err_stat;
   end;
-  
+
   EXPORT caddress (AutoheaderV2.layouts.lib_search L, boolean is_saltFetch = false) := function
   return row (xform_caddress (L,is_saltFetch));
   end;
-  
+
   EXPORT AutoheaderV2.layouts._phone xform_cphone (AutoheaderV2.layouts.lib_search L) := transform
     temp_val := stringlib.stringfilter (L.phone,'0123456789');
     phone_val := if ((integer) temp_val <> 0, L.phone, '');
@@ -316,7 +316,7 @@ EXPORT translate := MODULE
     valid_phone (string ph) := stringlib.StringFilterOut (ph, '0') != '';
     Self.phone10 := if (valid_phone (phone_nopunct), phone_nopunct, '');    //AutoStandardI.InterfaceTranslator.phone_value.val
   end;
-  
+
   EXPORT cphone (AutoheaderV2.layouts.lib_search L) := function
   return row (xform_cphone (L));
   end;
@@ -326,11 +326,11 @@ EXPORT translate := MODULE
     dob     := doxie.DOBTools(L.dob).dob_val;    //AutoStandardI.InterfaceTranslator.dob_val.val
     agelow  := L.agelow;    //AutoStandardI.InterfaceTranslator.agelow_val.val
     _agehigh := L.agehigh;    //AutoStandardI.InterfaceTranslator.agehigh_val.val
-    
+
     //Adjust upper-age so that DOB-from calculated later wouldn't go back earlier than 1900 (Doxie.DOBTools.ecl)
     agehigh := MIN(STD.Date.Year(todays_date) - 1900 - 1, _agehigh); //"-1" because of inclusion, see 'dob_low' below.
 
-    self.dob       := dob; 
+    self.dob       := dob;
     Self.agelow    := agelow;
     Self.agehigh   := agehigh;
     Self.fuzzy_dob := L.allowFuzzyDOBMatch;    //AutoStandardI.InterfaceTranslator.allowFuzzyDOBMatch.val
@@ -345,8 +345,8 @@ EXPORT translate := MODULE
                           ((todays_date div 10000 - agelow) * 10000) + 1231);
     //Note: there's no check for dob_low <= dob_high; if it is the case, validation should occur elsewhere
   end;
-  
-  EXPORT cdob (AutoheaderV2.layouts.lib_search L) := function  
+
+  EXPORT cdob (AutoheaderV2.layouts.lib_search L) := function
   return row (xform_cdob (L));
   end;
 

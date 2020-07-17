@@ -46,7 +46,7 @@
 </pre>
 */
 
-import address, risk_indicators, models, riskwise, ut, doxie, BIPV2, Business_Risk_BIP, BizLinkFull, STD, DueDiligence, Codes, MDR;
+import address, risk_indicators, models, riskwise, ut, doxie, BIPV2, Business_Risk_BIP, BizLinkFull, STD, DueDiligence, Codes, MDR, DeathV2_Services, dx_death_master;
 
 
 export CDM_Batch_Service := MACRO
@@ -78,7 +78,17 @@ export CDM_Batch_Service := MACRO
 
 	unsigned1 dppa := prep_dppa;
 
-	bsVersion := 41;
+    bsVersion := 41;
+     
+    mod_access := MODULE(Doxie.IDataAccess)
+      EXPORT glb := ^.GLB;
+      EXPORT dppa := ^.DPPA;
+      EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+      EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+      EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+    END;
+
+    death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
 
 	// add sequence to matchup later to add acctno to output
 	Models.layouts.Layout_CDM_Batch_In into_seq(batchin le, integer C) := TRANSFORM
@@ -209,7 +219,6 @@ export CDM_Batch_Service := MACRO
 				*     Gather Deceased Results:        *
 			 *************************************** */
 		deathSSNKey := Death_Master.key_ssn_ssa(isFCRA);
-		deathDIDKey := doxie.key_death_masterV2_ssa_DID;
 		deathHDRKey := doxie.key_Header;   
 
 		layout_decd getSSNDecd(clam le, deathSSNkey ri) := transform
@@ -218,14 +227,7 @@ export CDM_Batch_Service := MACRO
 		 SELF.decd_firstseen_dts := ri.filedate;
 		 SELF := le;
 		END;
-
-		layout_decd getDIDDecd(clam le, deathDIDkey ri) := transform
-		 SELF.decd_src1 := ri.src;
-		 SELF.decd_srcs := ri.src;
-		 SELF.decd_firstseen_dts := ri.filedate;
-		 SELF := le;
-		END;
-
+    
 		layout_decd getHDRDecd(clam le, deathHDRKey ri) := transform
 		 SELF.decd_src1 := ri.src;
 		 SELF.decd_srcs := ri.src;
@@ -244,17 +246,22 @@ export CDM_Batch_Service := MACRO
 										);
 		//output(SSN_Decd,named('SSN_Deceased'));
 
-		DID_Decd := JOIN(clam, deathdidkey, 
-																	 LEFT.did<>0 AND KEYED(LEFT.did=RIGHT.l_did) 
-												 AND (((integer)right.dod8 <> 0 and (UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate) 
-													or ((integer)right.filedate <> 0 and (UNSIGNED)(RIGHT.filedate[1..6]) < LEFT.historydate)) 
-												 AND (right.src <> MDR.sourceTools.src_Death_Restricted or 
-															Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
-																 getDIDDecd(LEFT, RIGHT), LEFT OUTER, 
-										 ATMOST(riskwise.max_atmost)//, KEEP(100)
-										);
-		//output(DID_Decd,named('DID_Deceased'));
-
+        DID_Decd_unformatted := dx_death_master.Append.byDid(clam, did, death_params);
+                
+        layout_decd getDIDDecd(clam le, DID_Decd_unformatted ri) := transform
+		 SELF.decd_src1 := ri.death.src;
+		 SELF.decd_srcs := ri.death.src;
+		 SELF.decd_firstseen_dts := ri.death.filedate;
+		 SELF := le;
+		END;
+    
+		DID_Decd := JOIN(clam, DID_Decd_unformatted, 
+																	 LEFT.did<>0 AND LEFT.did = RIGHT.did
+												 AND (((integer)right.death.dod8 <> 0 and (UNSIGNED)(RIGHT.death.dod8[1..6]) < LEFT.historydate) 
+													or ((integer)right.death.filedate <> 0 and (UNSIGNED)(RIGHT.death.filedate[1..6]) < LEFT.historydate)) 
+												 AND (Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
+																 getDIDDecd(LEFT, RIGHT), LEFT OUTER, KEEP(100));
+                                 
 		HDR_Decd := JOIN(clam, deathhdrkey,
 											 left.did<>0 and keyed(left.did=right.s_did)
 												 and ((right.dod <> 0 and right.dod < left.historydate)
@@ -282,6 +289,7 @@ export CDM_Batch_Service := MACRO
 
 		rolldeceased := rollup(dedup_deceased, left.seq = right.seq, combine_decd(left, right));
 		//output(rolldeceased,named('Rolled_Deceased'));
+    
 		RETURN rolldeceased;
 	ENDMACRO;
 

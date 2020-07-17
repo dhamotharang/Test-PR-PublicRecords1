@@ -1,4 +1,4 @@
-  IMPORT $, Address, Autokey_batch, Doxie, iesp, MDR, Phones, PhoneFinder_Services, std, ut;
+﻿  IMPORT $, Address, Autokey_batch, Doxie, iesp, MDR, Phones, PhoneFinder_Services, std, ut;
 
   pfLayouts     := PhoneFinder_Services.Layouts;
   lBatchInAcctno:= pfLayouts.BatchInAppendAcctno;
@@ -424,7 +424,7 @@
                                     tFormat2IespIdentity(LEFT));
 
     // Primary phone section
-    iesp.phonefinder.t_PhoneFinderDetailedInfo tFormat2IespPrimaryPhone(lFinal pInput) :=
+    $.Layouts.log_primary tFormat2IespPrimaryPhone(lFinal pInput) :=
     TRANSFORM
       doVerify := inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress OR inMod.VerifyPhoneIsActive OR inMod.VerifyPhoneLastName;
 
@@ -521,6 +521,7 @@
       SELF.SourceDetails                    := IF(inMod.isPrimarySearchPII, PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT)));
       SELF.TotalSourceCount                 := IF(inMod.isPrimarySearchPII, pInput.TotalSourceCount, 0);
       SELF.SelfReportedSourcesOnly          := IF(inMod.isPrimarySearchPII, pInput.SelfReportedSourcesOnly, FALSE);
+      SELF.Identity_count                   := pInput.Identity_count;
       SELF                                  := pInput;
 
       // Below two fields are not being used currently
@@ -531,7 +532,7 @@
     dPrimaryPhoneIesp := PROJECT(dIn(isPrimaryPhone AND isPrimaryIdentity), tFormat2IespPrimaryPhone(LEFT));
 
     // Other phones
-    iesp.phonefinder.t_PhoneFinderInfo tFormat2IespOtherPhones(lFinal pInput) :=
+    $.Layouts.log_other tFormat2IespOtherPhones(lFinal pInput) :=
     TRANSFORM
       dt_first_seen := ValidateDate((INTEGER)pInput.dt_first_seen);
       dt_last_seen  := ValidateDate((INTEGER)pInput.dt_last_seen);
@@ -547,6 +548,7 @@
       SELF.PhoneRiskIndicator      := pInput.PhoneRiskIndicator;
       SELF.OTPRIFailed             := pInput.OTPRIFailed;
       SELF.PhoneStatus             := pInput.PhoneStatus,
+      SELF.Prepaid                 := pInput.Prepaid, 
       SELF.Address                 := iesp.ECL2ESP.SetAddress(pInput.prim_name, pInput.prim_range,
                                                               pInput.predir, pInput.postdir, pInput.suffix,
                                                               pInput.unit_desig, pInput.sec_range,
@@ -567,6 +569,7 @@
                                           '');
       // Source details will be populated in OtherPhones in a PII Search.
       SELF.SourceDetails           := PROJECT(pInput.sourceinfo, TRANSFORM(iesp.phonefinder.t_PhoneFinderSourceIndicator, SELF := LEFT));
+      SELF.identity_count          := pInput.identity_count;
       SELF                         := pInput;
       SELF.PhoneAddressState       := '';
 
@@ -578,7 +581,7 @@
     dOtherPhonesIesp := PROJECT(SORT(dIn(~isPrimaryPhone AND ~isPrimaryIdentity AND phone != ''), acctno, -phone_score, -dt_last_seen, dt_first_seen), tFormat2IespOtherPhones(LEFT));
 
     // Format to final iesp layout
-    iesp.phonefinder.t_PhoneFinderSearchRecord tFormat2PhoneFinderSearch() :=
+    $.Layouts.log_PhoneFinderSearchRecord tFormat2PhoneFinderSearch() :=
     TRANSFORM
       // Check if the IF statement is needed
       SELF.Identities          := CHOOSEN(dIdentitiesIesp, iesp.Constants.Phone_Finder.MaxIdentities);

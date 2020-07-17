@@ -1,8 +1,8 @@
 ﻿import models, risk_indicators, easi, riskwise, business_risk, riskview,  iesp;
 
 // model environment options:  1 = both nonfcra and fcra, 2 = FCRA only, 3= nonFCRA only
-EXPORT Runway_function(grouped dataset(risk_indicators.Layout_Boca_Shell) clam,
-boolean exclude_reasons = False,
+EXPORT Runway_function(grouped dataset(risk_indicators.Layout_Boca_Shell) clam, 
+boolean exclude_reasons = False, 
 integer model_environment = 1) := function
 
 ofac := false;
@@ -29,7 +29,7 @@ String Segment := '';
 boolean lexIDOnlyOnInput := false; //for RV 50 models
 
 // set to true if model environment wanted is FCRA only
-isFCRA := if(model_environment=2, true, false);
+isFCRA := if(model_environment=2, true, false); 
 
 riskview.layouts.Layout_Custom_Inputs intoCustomInput(clam le) := TRANSFORM
 		customInputs := PROJECT(dataset([{1}], {unsigned a}), TRANSFORM(iesp.riskview_share.t_ModelOptionRV,
@@ -40,7 +40,7 @@ riskview.layouts.Layout_Custom_Inputs intoCustomInput(clam le) := TRANSFORM
 		Self.seq := (INTEGER)le.seq;
 		self.Custom_Inputs := customInputs;
 		END;
-
+		
 channel_inputs := project(ungroup(clam), intoCustomInput(LEFT));
 
 census := ungroup(join(clam, easi.Key_Easi_Census,
@@ -49,8 +49,8 @@ transform(easi.Layout_Census, self := right, self := []), keep(1)));
 
 paro_clam := project(clam, transform(risk_indicators.Layout_Boca_Shell,
 		// clean the address with the TOMTOM cleaner instead like we do in IT1O_function
-	clean_addr := risk_indicators.MOD_AddressClean.clean_addr_paro(left.shell_input.in_streetaddress, left.shell_input.in_city, left.shell_input.in_State, left.shell_input.in_Zipcode);
-
+	clean_addr := risk_indicators.MOD_AddressClean.clean_addr_paro(left.shell_input.in_streetaddress, left.shell_input.in_city, left.shell_input.in_State, left.shell_input.in_Zipcode);	
+	
 	self.shell_input.prim_range := clean_addr[1..10];
 	self.shell_input.predir := clean_addr[11..12];
 	self.shell_input.prim_name := clean_addr[13..40];
@@ -59,21 +59,21 @@ paro_clam := project(clam, transform(risk_indicators.Layout_Boca_Shell,
 	self.shell_input.unit_desig := clean_addr[47..56];
 	self.shell_input.sec_range := clean_addr[57..64];
 	self.shell_input.p_city_name := clean_addr[90..114];
-
+	
 	self.shell_input.z5 := clean_addr[117..121];
 	self.shell_input.zip4 := clean_addr[122..125];
 	self.shell_input.lat := clean_addr[146..155];
 	self.shell_input.long := clean_addr[156..166];
 	self.shell_input.addr_type := clean_addr[139];
 	self.shell_input.addr_status := clean_addr[179..182];
-
+	
 	// pay special attention to these 3 fields that we use to search the old y2000 census file with for the MSN605
 	self.shell_input.st := clean_addr[115..116];
 	self.shell_input.county := clean_addr[143..145];
 	self.shell_input.geo_blk := clean_addr[171..177];
 
 	self := left));
-
+	
 census2000 := ungroup(join(paro_clam, Easi.Key_Easi_Census_2000,
 right.geolink=left.shell_input.st+left.shell_input.county+left.shell_input.geo_blk,
 transform(easi.Layout_Census, self := right, self := []), keep(1)));
@@ -92,7 +92,7 @@ indata := project(ungroup(clam), transform(RiskWise.Layout_CD2I, self := left));
 modelvariables := project(ungroup(clam), transform(RiskWise.Layouts.cdn706_variables, self := left, self := []));
 // grouped dataset(Risk_Indicators.Layout_CIID_BtSt_Output) iid_results
 iid_results := project(ungroup(clam), transform(Risk_Indicators.Layout_CIID_BtSt_Output, self := left, self := []));
-// dataset(Risk_Indicators.collection_shell_mod.collection_shell_layout_full) cclam )
+// dataset(Risk_Indicators.collection_shell_mod.collection_shell_layout_full) cclam ) 
 cclam := project(ungroup(clam), transform(Risk_Indicators.collection_shell_mod.collection_shell_layout_full, self := left, self := []));
 // dataset(Business_Risk.Layout_Business_Shell) bshell
 bshell := project(ungroup(clam), transform(Business_Risk.Layout_Business_Shell, self.biid := left, self := left, self := []));
@@ -103,15 +103,15 @@ attributes := Models.getFDAttributes(clam, group(iid, seq), '', dataset([], risk
 
 custom_clam := project(clam, transform(Risk_Indicators.Layout_Bocashell_with_Custom, self := left, self := []));
 
-recoverScoreBatchIn := project(ungroup(clam), transform(Models.Layout_RecoverScore_Batch_Input, self := left.shell_input, self := left,
+recoverScoreBatchIn := project(ungroup(clam), transform(Models.Layout_RecoverScore_Batch_Input, self := left.shell_input, self := left, 
 self := []
 ));
 // dataset(riskwise.Layout_IT1O_model_in) rsn_prep
-rsn_prep := project(ungroup(clam), transform(riskwise.Layout_IT1O_model_in, self := left, self := []));
-// dataset(riskwise.Layout_SkipTrace) skiptrace)
-skiptrace:= project(ungroup(clam), transform(riskwise.Layout_SkipTrace, self := left, self := []));
+rsn_prep := project(ungroup(clam), transform(riskwise.Layout_IT1O_model_in, self := left, self := [])); 
+// dataset(riskwise.Layout_SkipTrace) skiptrace) 
+skiptrace:= project(ungroup(clam), transform(riskwise.Layout_SkipTrace, self := left, self := [])); 
 // dataset(riskwise.Layout_BusReasons_Input) orig_input
-input:= project(ungroup(clam), transform(riskwise.Layout_BusReasons_Input, self := left, self := []));
+input:= project(ungroup(clam), transform(riskwise.Layout_BusReasons_Input, self := left, self := [])); 	
 // dataset(Business_Risk.Layout_Output) biid,
 biidRisk:= project(ungroup(clam), transform(Business_Risk.Layout_Output, self := left, self := []));
 
@@ -120,7 +120,7 @@ risk_indicators.Layout_Boca_Shell bs;
 riskwise.Layout_IP2O ip;
 end;
 
-clam_ip := project(clam,transform(bs_with_ip, self.bs := left, self.IP:=[]));
+clam_ip := project(clam,transform(bs_with_ip, self.bs := left, self.IP:=[])); 
 
 BocaShell_With_IP := RECORD
 Risk_Indicators.Layout_Boca_Shell bs;
@@ -247,7 +247,7 @@ self.ain801_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.ain801_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.ain801_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_ain801_1_0, named('with_ain801_1_0'));
+// output(with_ain801_1_0, named('with_ain801_1_0'));	
 
 
 anmk909_0_1_score := Models.ANMK909_0_1	(clam);
@@ -410,9 +410,9 @@ self.CDN1109_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.CDN1109_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.CDN1109_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_CDN1109_1_0, named('with_CDN1109_1_0'));
+// output(with_CDN1109_1_0, named('with_CDN1109_1_0'));		 
 
-
+    
 CDN1205_1_0_score := Models.CDN1205_1_0 (group(clambtst,bill_to_out.seq), indata, false, biid);
 with_CDN1205_1_0	:= join(with_CDN1109_1_0, CDN1205_1_0_score,
 left.seq=right.seq,
@@ -423,9 +423,9 @@ self.CDN1205_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.CDN1205_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.CDN1205_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_CDN1205_1_0, named('with_CDN1205_1_0'));
+// output(with_CDN1205_1_0, named('with_CDN1205_1_0'));		 
 
-CDN1305_1_0_score := Models.CDN1305_1_0 (group(clambtst,bill_to_out.seq), customCDInputs, false, WantstoSeeBillToShipToDifferenceFlag );
+CDN1305_1_0_score := Models.CDN1305_1_0 (group(clambtst,bill_to_out.seq), customCDInputs, false, WantstoSeeBillToShipToDifferenceFlag ); 
 with_CDN1305_1_0	:= join(with_CDN1205_1_0, CDN1305_1_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
@@ -435,9 +435,9 @@ self.CDN1305_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.CDN1305_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.CDN1305_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_CDN1305_1_0, named('with_CDN1305_1_0'));
+// output(with_CDN1305_1_0, named('with_CDN1305_1_0'));		 
 
-CDN1404_1_0_score := Models.CDN1404_1_0 (group(clambtst,bill_to_out.seq), customCDInputs, false, WantstoSeeBillToShipToDifferenceFlag );
+CDN1404_1_0_score := Models.CDN1404_1_0 (group(clambtst,bill_to_out.seq), customCDInputs, false, WantstoSeeBillToShipToDifferenceFlag ); 
 with_CDN1404_1_0	:= join(with_CDN1305_1_0, CDN1404_1_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
@@ -447,9 +447,9 @@ self.CDN1404_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.CDN1404_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.CDN1404_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_CDN1404_1_0, named('with_CDN1404_1_0'));
+// output(with_CDN1404_1_0, named('with_CDN1404_1_0'));	
 
-CDN1410_1_0_score := Models.CDN1410_1_0 (group(clambtst,bill_to_out.seq), customCDInputs, false, WantstoSeeBillToShipToDifferenceFlag, True );
+CDN1410_1_0_score := Models.CDN1410_1_0 (group(clambtst,bill_to_out.seq), customCDInputs, false, WantstoSeeBillToShipToDifferenceFlag, True ); 
 with_CDN1410_1_0	:= join(with_CDN1404_1_0, CDN1410_1_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
@@ -459,9 +459,9 @@ self.CDN1410_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.CDN1410_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.CDN1410_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_CDN1410_1_0, named('with_CDN1410_1_0'));
+// output(with_CDN1410_1_0, named('with_CDN1410_1_0'));	
 
-CDN1506_1_0_score := Models.CDN1506_1_0 (group(clambtst,bill_to_out.seq), customCDInputs, false, WantstoSeeBillToShipToDifferenceFlag, True );
+CDN1506_1_0_score := Models.CDN1506_1_0 (group(clambtst,bill_to_out.seq), customCDInputs, false, WantstoSeeBillToShipToDifferenceFlag, True ); 
 with_CDN1506_1_0	:= join(with_CDN1410_1_0, CDN1506_1_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
@@ -471,9 +471,9 @@ self.CDN1506_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.CDN1506_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.CDN1506_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_CDN1410_1_0, named('with_CDN1410_1_0'));
+// output(with_CDN1410_1_0, named('with_CDN1410_1_0'));	
 
-CDN1508_1_0_score := Models.CDN1508_1_0 (group(clambtst,bill_to_out.seq),indata, false, biid );
+CDN1508_1_0_score := Models.CDN1508_1_0 (group(clambtst,bill_to_out.seq),indata, false, biid ); 
 with_CDN1508_1_0	:= join(with_CDN1506_1_0, CDN1508_1_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
@@ -485,10 +485,10 @@ self.CDN1508_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self.CDN1508_1_0_reason5 := if(exclude_reasons, '',  right.ri[5].hri);
 self.CDN1508_1_0_reason6 := if(exclude_reasons, '',  right.ri[6].hri);
 self := left), keep(1), left outer);
-// output(with_CDN1508_1_0, named('with_CDN1508_1_0'));
+// output(with_CDN1508_1_0, named('with_CDN1508_1_0'));	
 
-/*  Flag ship model for Order Score  */
-OSN1504_0_0_score := Models.OSN1504_0_0 (group(clambtst,bill_to_out.seq), indata, IBICID, WantstoSeeBillToShipToDifferenceFlag, false, false);
+/*  Flag ship model for Order Score  */  
+OSN1504_0_0_score := Models.OSN1504_0_0 (group(clambtst,bill_to_out.seq), indata, IBICID, WantstoSeeBillToShipToDifferenceFlag, false, false); 
 with_OSN1504_0_0	:= join(with_CDN1508_1_0, OSN1504_0_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
@@ -500,11 +500,11 @@ self.OSN1504_0_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self.OSN1504_0_0_reason5 := if(exclude_reasons, '',  right.ri[5].hri);
 self.OSN1504_0_0_reason6 := if(exclude_reasons, '',  right.ri[6].hri);
 self := left), keep(1), left outer);
-// output(with_OSN1504_0_0, named('with_OSN1504_0_0'));
+// output(with_OSN1504_0_0, named('with_OSN1504_0_0'));	
 
-/*  Custom model for Vivid Seats within Order Score  */
-OSN1608_1_0_score :=  models.OSN1608_1_0(group(clambtst,bill_to_out.seq), IBICID, WantstoSeeBillToShipToDifferenceFlag, false, false);
-with_OSN1608_1_0	:= join(with_OSN1504_0_0, OSN1608_1_0_score,                                     //Join this set of reason codes with the previous set
+/*  Custom model for Vivid Seats within Order Score  */  
+OSN1608_1_0_score :=  models.OSN1608_1_0(group(clambtst,bill_to_out.seq), IBICID, WantstoSeeBillToShipToDifferenceFlag, false, false);   
+with_OSN1608_1_0	:= join(with_OSN1504_0_0, OSN1608_1_0_score,                                     //Join this set of reason codes with the previous set 
 left.seq=right.seq,
 transform(Models.layout_Runway,
 self.OSN1608_1_0_score := right.score;
@@ -515,12 +515,12 @@ self.OSN1608_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self.OSN1608_1_0_reason5 := if(exclude_reasons, '',  right.ri[5].hri);
 self.OSN1608_1_0_reason6 := if(exclude_reasons, '',  right.ri[6].hri);
 self := left), keep(1), left outer);
-// output(with_OSN1608_1_0, named('with_OSN1608_1_0'));
+// output(with_OSN1608_1_0, named('with_OSN1608_1_0'));	
 
 
-/*  Custom model for Wallmart within Order Score  */
-OSN1803_1_0_score :=  models.OSN1803_1_0(group(clambtst,bill_to_out.seq), IBICID, WantstoSeeBillToShipToDifferenceFlag, false, false);
-with_OSN1803_1_0	:= join(with_OSN1608_1_0, OSN1803_1_0_score,                                     //Join this set of reason codes with the previous set
+/*  Custom model for Wallmart within Order Score  */  
+OSN1803_1_0_score :=  models.OSN1803_1_0(group(clambtst,bill_to_out.seq), IBICID, WantstoSeeBillToShipToDifferenceFlag, false, false);   
+with_OSN1803_1_0	:= join(with_OSN1608_1_0, OSN1803_1_0_score,                                     //Join this set of reason codes with the previous set 
 left.seq=right.seq,
 transform(Models.layout_Runway,
 self.OSN1803_1_0_score := right.score;
@@ -531,7 +531,7 @@ self.OSN1803_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self.OSN1803_1_0_reason5 := if(exclude_reasons, '',  right.ri[5].hri);
 self.OSN1803_1_0_reason6 := if(exclude_reasons, '',  right.ri[6].hri);
 self := left), keep(1), left outer);
-// output(with_OSN1803_1_0, named('with_OSN1803_1_0'));
+// output(with_OSN1803_1_0, named('with_OSN1803_1_0'));	
 
 
 
@@ -591,7 +591,7 @@ self.cdn604_3_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.cdn604_3_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.cdn604_3_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_CDN604_3_0, named('with_CDN604_3_0'));
+// output(with_CDN604_3_0, named('with_CDN604_3_0')); 
 
 
 
@@ -783,7 +783,7 @@ self.fd5510_0_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.fd5510_0_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.fd5510_0_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_fd5510_0_0, named('with_fd5510_0_0'));
+// output(with_fd5510_0_0, named('with_fd5510_0_0'));   
 
 
 FD5603_1_0_score := Models.FD5603_1_0(clam);
@@ -1655,11 +1655,46 @@ self := left), keep(1), left outer);
 
 
 
+//=== Fifth Third Custom Model ===
+fp1909_1_0_score := Models.fp1909_1_0(clam, 6, attributes);
+// output(fp1909_1_0_score, named('fp1909_1_0_score'));
+
+
+with_fp1909_1_0	:= join(with_fp1908_1_0, fp1909_1_0_score,
+left.seq=right.seq,
+transform(Models.layout_Runway,
+self.fp1909_1_0_score := right.score;
+self.fp1909_1_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
+self.fp1909_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
+self.fp1909_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
+self.fp1909_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
+self.fp1909_1_0_reason5 := if(exclude_reasons, '',  right.ri[5].hri);
+self.fp1909_1_0_reason6 := if(exclude_reasons, '',  right.ri[6].hri);
+self := left), keep(1), left outer);
+// output(with_fp1909_1_0, named('with_fp1909_1_0'));
+
+//=== Fifth Third Custom Model ===
+fp1909_2_0_score := Models.FP1909_2_0(clam, 6, attributes);
+// output(fp1909_2_0_score, named('fp1909_2_0_score'));
+
+
+with_fp1909_2_0	:= join(with_fp1909_1_0, fp1909_2_0_score,
+left.seq=right.seq,
+transform(Models.layout_Runway,
+self.fp1909_2_0_score := right.score;
+self.fp1909_2_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
+self.fp1909_2_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
+self.fp1909_2_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
+self.fp1909_2_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
+self.fp1909_2_0_reason5 := if(exclude_reasons, '',  right.ri[5].hri);
+self.fp1909_2_0_reason6 := if(exclude_reasons, '',  right.ri[6].hri);
+self := left), keep(1), left outer);
+// output(with_fp1909_2_0, named('with_fp1909_2_0'));
 //=== Avenger Model ===
 FP31604_0_0_score := Models.FP31604_0_0( ungroup(clam), 6 );
 
-with_FP31604_0_0	:= join(with_fp1908_1_0, FP31604_0_0_score,
-left.seq=right.seq,
+
+with_FP31604_0_0	:= join(with_fp1909_2_0, FP31604_0_0_score,left.seq=right.seq,
 transform(Models.layout_Runway,
 self.FP31604_0_0_score := right.score;
 self.FP31604_0_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
@@ -1790,7 +1825,7 @@ self := left), keep(1), left outer);
 // output(with_FP3905_1_0, named('with_FP3905_1_0'));
 
 
-
+       
    FP5812_1_0_score := Models.FP5812_1_0(clam, num_reasons, ofac);
  // output(FP5812_1_0_score, named('FP5812_0_0_score'));
 
@@ -1804,8 +1839,8 @@ self := left), keep(1), left outer);
  self.FP5812_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
  self := left), keep(1), left outer);
  // output(with_FP5812_1_0, named('with_FP5812_1_0'));
-
-//192 roxie deployment to this point ---
+ 
+//192 roxie deployment to this point --- 
 
 // return with_FP5812_1_0;
 
@@ -1823,8 +1858,8 @@ HCP1206_0_0_score := Models.HCP1206_0_0(hcpclam, 4);
  self.HCP1206_0_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
  self.HCP1206_0_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
  self := left), keep(1), left outer);
-
- // output(with_HCP1206_0_0, named('with_HCP1206_0_0'));
+ 
+ // output(with_HCP1206_0_0, named('with_HCP1206_0_0'));		 
 IDN605_1_0_score := Models.IDN605_1_0(clam, OFAC);
  // output(IDN605_1_0_score, named('IDN605_1_0_score'));
 
@@ -1915,7 +1950,7 @@ self := left), keep(1), left outer);
 
 MSN605_1_0_score := Models.MSN605_1_0(paro_clam, census2000, ofac);
 // output(MSN605_1_0_score, named('MSN605_1_0_score'));
-
+    
 with_MSN605_1_0	:= join(with_MSN1106_0_0, MSN605_1_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
@@ -1926,7 +1961,7 @@ self := left), keep(1), left outer);
 
 MSN610_0_0_score := Models.MSN610_0_0(clam, history_date);
 // output(MSN610_0_0_score, named('MSN610_0_0_score'));
-
+    
 with_MSN610_0_0	:= join(with_MSN605_1_0, MSN610_0_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
@@ -1937,7 +1972,7 @@ self := left), keep(1), left outer);
 
 MSN1803_1_0_score := Models.MSN1803_1_0(UNGROUP(clam));
 // output(MSN610_0_0_score, named('MSN610_0_0_score'));
-
+    
 with_MSN1803_1_0	:= join(with_MSN610_0_0, MSN1803_1_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
@@ -1948,7 +1983,7 @@ self := left), keep(1), left outer);
 
 MV361006_0_0_score := Models.MV361006_0_0(UNGROUP(clam));
 // output(MV361006_0_0_score, named('MV361006_0_0_score'));
-
+    
 with_MV361006_0_0	:= join(with_MSN1803_1_0, MV361006_0_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
@@ -1958,7 +1993,7 @@ self := left), keep(1), left outer);
 
 MV361006_1_0_score := Models.MV361006_1_0(UNGROUP(clam));
 // output(MV361006_1_0_score, named('MV361006_1_0_score'));
-
+    
 with_MV361006_1_0	:= join(with_MV361006_0_0, MV361006_1_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
@@ -1968,7 +2003,7 @@ self := left), keep(1), left outer);
 
 MX361006_0_0_score := Models.MX361006_0_0(UNGROUP(clam));
 // output(MX361006_0_0_score, named('MX361006_0_0_score'));
-
+    
 with_MX361006_0_0	:= join(with_MV361006_1_0, MX361006_0_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
@@ -1978,7 +2013,7 @@ self := left), keep(1), left outer);
 
 MX361006_1_0_score := Models.MX361006_1_0(UNGROUP(clam));
 // output(MX361006_1_0_score, named('MX361006_1_0_score'));
-
+    
 with_MX361006_1_0	:= join(with_MX361006_0_0, MX361006_1_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
@@ -1989,7 +2024,7 @@ self := left), keep(1), left outer);
 
 RSB801_1_0_score := Models.RSB801_1_0(UNGROUP(bshell));
 // output(RSB801_1_0_score, named('RSB801_1_0_score'));
-
+    
 with_RSB801_1_0	:= join(with_MX361006_1_0, RSB801_1_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
@@ -2000,7 +2035,7 @@ self := left), keep(1), left outer);
 
 RSN1001_1_0_score := Models.RSN1001_1_0(clam);
 // output(RSN1001_1_0_score, named('RSN1001_1_0_score'));
-
+    
 with_RSN1001_1_0	:= join(with_RSB801_1_0, RSN1001_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2010,7 +2045,7 @@ self := left), keep(1), left outer);
 
 RSN1009_1_0_score := Models.RSN1009_1_0(clam);
 // output(RSN1009_1_0_score, named('RSN1009_1_0_score'));
-
+    
 with_RSN1009_1_0	:= join(with_RSN1001_1_0, RSN1009_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2021,7 +2056,7 @@ self := left), keep(1), left outer);
 
 RSN1010_1_0_score := Models.RSN1010_1_0(clam, recoverScoreBatchIn );
 // output(RSN1010_1_0_score, named('RSN1010_1_0_score'));
-
+    
 with_RSN1010_1_0	:= join(with_RSN1009_1_0, RSN1010_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2032,7 +2067,7 @@ self := left), keep(1), left outer);
 
 RSN1103_1_0_score := Models.RSN1103_1_0(clam);
 // output(RSN1103_1_0_score, named('RSN1103_1_0_score'));
-
+    
 with_RSN1103_1_0	:= join(with_RSN1010_1_0, RSN1103_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2040,10 +2075,10 @@ self.RSN1103_1_0_score := right.recover_score ;
 self := left), keep(1), left outer);
 // output(with_RSN1103_1_0, named('with_RSN1103_1_0'));
 
-
+           
 RSN1105_1_0_score := Models.RSN1105_1_0(clam);
 // output(RSN1105_1_0_score, named('RSN1105_1_0_score'));
-
+    
 with_RSN1105_1_0	:= join(with_RSN1103_1_0, RSN1105_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2053,7 +2088,7 @@ self := left), keep(1), left outer);
 
 RSN1105_2_0_score := Models.RSN1105_2_0(clam);
 // output(RSN1105_2_0_score, named('RSN1105_2_0_score'));
-
+    
 with_RSN1105_2_0	:= join(with_RSN1105_1_0, RSN1105_2_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2063,7 +2098,7 @@ self := left), keep(1), left outer);
 
 RSN1105_3_0_score := Models.RSN1105_3_0(clam);
 // output(RSN1105_3_0_score, named('RSN1105_3_0_score'));
-
+    
 with_RSN1105_3_0	:= join(with_RSN1105_2_0, RSN1105_3_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2074,7 +2109,7 @@ self := left), keep(1), left outer);
 
 RSN1108_1_0_score := Models.RSN1108_1_0(clam);
 // output(RSN1108_1_0_score, named('RSN1108_1_0_score'));
-
+    
 with_RSN1108_1_0	:= join(with_RSN1105_3_0, RSN1108_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2085,7 +2120,7 @@ self := left), keep(1), left outer);
 
 RSN1108_2_0_score := Models.RSN1108_2_0(clam);
 // output(RSN1108_2_0_score, named('RSN1108_2_0_score'));
-
+    
 with_RSN1108_2_0	:= join(with_RSN1108_1_0, RSN1108_2_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2096,7 +2131,7 @@ self := left), keep(1), left outer);
 
 RSN1108_3_0_score := Models.RSN1108_3_0(clam);
 // output(RSN1108_3_0_score, named('RSN1108_3_0_score'));
-
+    
 with_RSN1108_3_0	:= join(with_RSN1108_2_0, RSN1108_3_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2106,7 +2141,7 @@ self := left), keep(1), left outer);
 
 RSN508_1_0_score := Models.RSN508_1_0(clam, recoverScoreBatchIn);
 // output(RSN508_1_0_score, named('RSN508_1_0_score'));
-
+    
 with_RSN508_1_0	:= join(with_RSN1108_3_0, RSN508_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2118,7 +2153,7 @@ self := left), keep(1), left outer);
 
 RSN509_1_0_score := Models.RSN509_1_0(clam, rsn_prep);
 // output(RSN509_1_0_score, named('RSN509_1_0_score'));
-
+    
 with_RSN509_1_0	:= join(with_RSN508_1_0, RSN509_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2128,7 +2163,7 @@ self := left), keep(1), left outer);
 
 RSN509_2_0_score := Models.RSN509_2_0(clam, rsn_prep);
 // output(RSN509_2_0_score, named('RSN509_2_0_score'));
-
+    
 with_RSN509_2_0	:= join(with_RSN509_1_0, RSN509_2_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2139,7 +2174,7 @@ self := left), keep(1), left outer);
 
 RSN604_2_0_score := Models.RSN604_2_0(clam, recoverScoreBatchIn);
 // output(RSN604_2_0_score, named('RSN604_2_0_score'));
-
+    
 with_RSN604_2_0	:= join(with_RSN509_2_0, RSN604_2_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2149,7 +2184,7 @@ self := left), keep(1), left outer);
 
 RSN607_0_0_score := Models.RSN607_0_0(clam, recoverScoreBatchIn);
 // output(RSN607_0_0_score, named('RSN607_0_0_score'));
-
+    
 with_RSN607_0_0	:= join(with_RSN604_2_0, RSN607_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2159,7 +2194,7 @@ self := left), keep(1), left outer);
 
 RSN607_1_0_score := Models.RSN607_1_0(clam, recoverScoreBatchIn);
 // output(RSN607_1_0_score, named('RSN607_1_0_score'));
-
+                
 with_RSN607_1_0	:= join(with_RSN607_0_0, RSN607_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2169,7 +2204,7 @@ self := left), keep(1), left outer);
 
 RSN702_1_0_score := Models.RSN702_1_0(clam, recoverScoreBatchIn  );
 // output(RSN702_1_0_score, named('RSN702_1_0_score'));
-
+      
 with_RSN702_1_0	:= join(with_RSN607_1_0, RSN702_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2180,7 +2215,7 @@ self := left), keep(1), left outer);
 
 RSN704_0_0_score := Models.RSN704_0_0(clam, recoverScoreBatchIn  );
 // output(RSN704_0_0_score, named('RSN704_0_0_score'));
-
+      
 with_RSN704_0_0	:= join(with_RSN702_1_0, RSN704_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2191,7 +2226,7 @@ self := left), keep(1), left outer);
 
 RSN704_1_0_score := Models.RSN704_1_0(clam, recoverScoreBatchIn  );
 // output(RSN704_1_0_score, named('RSN704_1_0_score'));
-
+      
 with_RSN704_1_0	:= join(with_RSN704_0_0, RSN704_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2199,10 +2234,10 @@ self.RSN704_1_0_score := right.recover_score ;
 self := left), keep(1), left outer);
 // output(with_RSN704_1_0, named('with_RSN704_1_0'));
 
-
+       
 RSN802_1_0_score := Models.RSN802_1_0(clam, recoverScoreBatchIn  );
 // output(RSN802_1_0_score, named('RSN802_1_0_score'));
-
+      
 with_RSN802_1_0	:= join(with_RSN704_1_0, RSN802_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2210,10 +2245,10 @@ self.RSN802_1_0_score := right.recover_score ;
 self := left), keep(1), left outer);
 // output(with_RSN802_1_0, named('with_RSN802_1_0'));
 
-
+         
 RSN803_1_0_score := Models.RSN803_1_0(clam, recoverScoreBatchIn  );
 // output(RSN803_1_0_score, named('RSN803_1_0_score'));
-
+      
 with_RSN803_1_0	:= join(with_RSN802_1_0, RSN803_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2223,7 +2258,7 @@ self := left), keep(1), left outer);
 
 RSN803_2_0_score := Models.RSN803_2_0(clam, skiptrace);
 // output(RSN803_2_0_score, named('RSN803_2_0_score'));
-
+      
 with_RSN803_2_0	:= join(with_RSN803_1_0, RSN803_2_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2233,7 +2268,7 @@ self := left), keep(1), left outer);
 
 RSN804_1_0_score := Models.RSN804_1_0(clam, skiptrace, census);
 // output(RSN804_1_0_score, named('RSN804_1_0_score'));
-
+      
 with_RSN804_1_0	:= join(with_RSN803_2_0, RSN804_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2243,7 +2278,7 @@ self := left), keep(1), left outer);
 
 RSN807_0_0_score := Models.RSN807_0_0(clam);
 // output(RSN807_0_0_score, named('RSN807_0_0_score'));
-
+      
 with_RSN807_0_0	:= join(with_RSN804_1_0, RSN807_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2254,7 +2289,7 @@ self := left), keep(1), left outer);
 
 RSN810_1_0_score := Models.RSN810_1_0(clam, recoverScoreBatchIn );
 // output(RSN810_1_0_score, named('RSN810_1_0_score'));
-
+      
 with_RSN810_1_0	:= join(with_RSN807_0_0, RSN810_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2264,7 +2299,7 @@ self := left), keep(1), left outer);
 
 RSN912_1_0_score := Models.RSN912_1_0(clam, recoverScoreBatchIn );
 // output(RSN912_1_0_score, named('RSN912_1_0_score'));
-
+      
 with_RSN912_1_0	:= join(with_RSN810_1_0, RSN912_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2332,11 +2367,11 @@ self.RVA1007_3_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA1007_3_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
 // output(with_RVA1007_3_0, named('with_RVA1007_3_0'));
-
-
+         
+                             
 RVA1008_1_0_score := Models.RVA1008_1_0(clam, incalif, in_employment_years, in_employment_months, total_income);
 // output(RVA1008_1_0_score, named('RVA1008_1_0_score'));
-
+     
 with_RVA1008_1_0	:= join(with_RVA1007_3_0, RVA1008_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2348,10 +2383,10 @@ self.RVA1008_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
 // output(with_RVA1008_1_0, named('with_RVA1008_1_0'));
 
-
+         
 RVA1008_2_0_score := Models.RVA1008_2_0(UNGROUP(clam), iscalifornia );
 // output(RVA1008_2_0_score, named('RVA1008_2_0_score'));
-
+  
 with_RVA1008_2_0	:= join(with_RVA1008_1_0, RVA1008_2_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2362,11 +2397,11 @@ self.RVA1008_2_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA1008_2_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
 // output(with_RVA1008_2_0, named('with_RVA1008_2_0'));
-
+         
 
 RVA1104_0_0_score := Models.RVA1104_0_0(clam, iscalifornia, xmlPrescreenOptOut );
 // output(RVA1104_0_0_score, named('RVA1104_0_0_score'));
-
+                             
 with_RVA1104_0_0	:= join(with_RVA1008_2_0, RVA1104_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2376,11 +2411,11 @@ self.RVA1104_0_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVA1104_0_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA1104_0_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVA1104_0_0, named('with_RVA1104_0_0'));
+// output(with_RVA1104_0_0, named('with_RVA1104_0_0'));														 																		 
 
 RVA1304_1_0_score := Models.RVA1304_1_0(clam, iscalifornia);
 // output(RVA1304_1_0_score, named('RVA1304_1_0_score'));
-
+                             
 with_RVA1304_1_0	:= join(with_RVA1104_0_0, RVA1304_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2390,11 +2425,11 @@ self.RVA1304_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVA1304_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA1304_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVA1304_1_0, named('with_RVA1304_1_0'));
+// output(with_RVA1304_1_0, named('with_RVA1304_1_0'));														 																		 
 
 RVA1304_2_0_score := Models.RVA1304_2_0(clam, iscalifornia);
 // output(RVA1304_2_0_score, named('RVA1304_2_0_score'));
-
+                             
 with_RVA1304_2_0	:= join(with_RVA1304_1_0, RVA1304_2_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2404,12 +2439,12 @@ self.RVA1304_2_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVA1304_2_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA1304_2_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVA1304_2_0, named('with_RVA1304_2_0'));
+// output(with_RVA1304_2_0, named('with_RVA1304_2_0'));			
 
 
 RVA1305_1_0_score := Models.RVA1305_1_0(clam, iscalifornia);
 // output(RVA1305_1_0_score, named('RVA1305_1_0_score'));
-
+                             
 with_RVA1305_1_0	:= join(with_RVA1304_2_0, RVA1305_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2419,11 +2454,11 @@ self.RVA1305_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVA1305_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA1305_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVA1305_1_0, named('with_RVA1305_1_0'));
+// output(with_RVA1305_1_0, named('with_RVA1305_1_0'));													 																		 
 
 RVA1306_1_0_score := Models.RVA1306_1_0(clam, iscalifornia);
 // output(RVA1306_1_0_score, named('RVA1306_1_0_score'));
-
+                             
 with_RVA1306_1_0	:= join(with_RVA1305_1_0, RVA1306_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2433,12 +2468,12 @@ self.RVA1306_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVA1306_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA1306_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVA1306_1_0, named('with_RVA1306_1_0'));
-
+// output(with_RVA1306_1_0, named('with_RVA1306_1_0'));														 																		 
+                             
 // RVA1309_1 ---------------------------------------------------------
 RVA1309_1_0_score := Models.RVA1309_1_0(clam, iscalifornia, FALSE);
 // output(RVA1309_1_0_score, named('RVA1309_1_0_score'));
-
+                             
 with_RVA1309_1_0	:= join(with_RVA1306_1_0, RVA1309_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2448,13 +2483,13 @@ self.RVA1309_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVA1309_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA1309_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVA1309_1_0, named('with_RVA1309_1_0'));
+// output(with_RVA1309_1_0, named('with_RVA1309_1_0'));														 																		 
 // -------------------------------------------------------------------
 
 // RVA1310_1 ---------------------------------------------------------
 RVA1310_1_0_score := Models.RVA1310_1_0(clam, iscalifornia);
 // output(RVA1310_1_0_score, named('RVA1310_1_0_score'));
-
+                             
 with_RVA1310_1_0	:= join(with_RVA1309_1_0, RVA1310_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2464,13 +2499,13 @@ self.RVA1310_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVA1310_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA1310_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVA1310_1_0, named('with_RVA1310_1_0'));
+// output(with_RVA1310_1_0, named('with_RVA1310_1_0'));														 																		 
 // -------------------------------------------------------------------
 
 // RVA1310_2 ---------------------------------------------------------
 RVA1310_2_0_score := Models.RVA1310_2_0(clam, iscalifornia);
 // output(RVA1310_2_0_score, named('RVA1310_2_0_score'));
-
+                             
 with_RVA1310_2_0	:= join(with_RVA1310_1_0, RVA1310_2_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2480,13 +2515,13 @@ self.RVA1310_2_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVA1310_2_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA1310_2_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVA1310_2_0, named('with_RVA1310_2_0'));
+// output(with_RVA1310_2_0, named('with_RVA1310_2_0'));														 																		 
 // -------------------------------------------------------------------
 
 // RVA1310_3 ---------------------------------------------------------
 RVA1310_3_0_score := Models.RVA1310_3_0(clam, iscalifornia);
 // output(RVA1310_3_0_score, named('RVA1310_3_0_score'));
-
+                             
 with_RVA1310_3_0	:= join(with_RVA1310_2_0, RVA1310_3_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2496,13 +2531,13 @@ self.RVA1310_3_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVA1310_3_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA1310_3_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVA1310_3_0, named('with_RVA1310_3_0'));
+// output(with_RVA1310_3_0, named('with_RVA1310_3_0'));														 																		 
 // -------------------------------------------------------------------
 
 // RVA1311_1 ---------------------------------------------------------
 RVA1311_1_0_score := Models.RVA1311_1_0(clam, iscalifornia);
 // output(RVA1311_1_0_score, named('RVA1311_1_0_score'));
-
+                             
 with_RVA1311_1_0	:= join(with_RVA1310_3_0, RVA1311_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2512,13 +2547,13 @@ self.RVA1311_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVA1311_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA1311_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVA1311_1_0, named('with_RVA1311_1_0'));
+// output(with_RVA1311_1_0, named('with_RVA1311_1_0'));														 																		 
 // -------------------------------------------------------------------
 
 // RVA1311_2 ---------------------------------------------------------
 RVA1311_2_0_score := Models.RVA1311_2_0(clam, iscalifornia);
 // output(RVA1311_2_0_score, named('RVA1311_2_0_score'));
-
+                             
 with_RVA1311_2_0	:= join(with_RVA1311_1_0, RVA1311_2_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2528,13 +2563,13 @@ self.RVA1311_2_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVA1311_2_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA1311_2_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVA1311_2_0, named('with_RVA1311_2_0'));
+// output(with_RVA1311_2_0, named('with_RVA1311_2_0'));														 																		 
 // -------------------------------------------------------------------
 
 // RVA1311_3 ---------------------------------------------------------
 RVA1311_3_0_score := Models.RVA1311_3_0(clam, iscalifornia);
 // output(RVA1311_3_0_score, named('RVA1311_3_0_score'));
-
+                             
 with_RVA1311_3_0	:= join(with_RVA1311_2_0, RVA1311_3_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2544,13 +2579,13 @@ self.RVA1311_3_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVA1311_3_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA1311_3_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVA1311_3_0, named('with_RVA1311_3_0'));
+// output(with_RVA1311_3_0, named('with_RVA1311_3_0'));														 																		 
 // -------------------------------------------------------------------
 
 // RVA1503_0 ---------------------------------------------------------
 RVA1503_0_0_score := Models.RVA1503_0_0(clam, lexIDOnlyOnInput);
 // output(RVA1503_0_0_score, named('RVA1503_0_0_score'));
-
+                             
 with_RVA1503_0_0	:= join(with_RVA1311_3_0, RVA1503_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2560,13 +2595,13 @@ self.RVA1503_0_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVA1503_0_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA1503_0_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVA1503_0_0, named('with_RVA1503_0_0'));
+// output(with_RVA1503_0_0, named('with_RVA1503_0_0'));														 																		 
 // -------------------------------------------------------------------
 
 // RVA1504_1 ---------------------------------------------------------
 RVA1504_1_0_score := Models.RVA1504_1_0(clam, lexIDOnlyOnInput);
 // output(RVA1503_0_0_score, named('RVA1503_0_0_score'));
-
+                             
 with_RVA1504_1_0	:= join(with_RVA1503_0_0, RVA1504_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2576,13 +2611,13 @@ self.RVA1504_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVA1504_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA1504_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVA1504_1_0, named('with_RVA1504_1_0'));
+// output(with_RVA1504_1_0, named('with_RVA1504_1_0'));														 																		 
 // -------------------------------------------------------------------
 
 // RVA1504_2 ---------------------------------------------------------
 RVA1504_2_0_score := Models.RVA1504_2_0(clam, lexIDOnlyOnInput);
 // output(RVA1503_0_0_score, named('RVA1503_0_0_score'));
-
+                             
 with_RVA1504_2_0	:= join(with_RVA1504_1_0, RVA1504_2_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2592,12 +2627,12 @@ self.RVA1504_2_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVA1504_2_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA1504_2_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVA1504_2_0, named('with_RVA1504_2_0'));
+// output(with_RVA1504_2_0, named('with_RVA1504_2_0'));														 																		 
 // -------------------------------------------------------------------
 
 // RVA1601_1 ---------------------------------------------------------
 RVA1601_1_0_score := Models.RVA1601_1_0(clam);
-
+                             
 with_RVA1601_1_0	:= join(with_RVA1504_2_0, RVA1601_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2610,7 +2645,7 @@ self := left), keep(1), left outer);
 
 // RVA1603_1 ---------------------------------------------------------
 RVA1603_1_0_score := Models.RVA1603_1_0(clam, lexIDOnlyOnInput);
-
+                             
 with_RVA1603_1_0	:= join(with_RVA1601_1_0, RVA1603_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2623,7 +2658,7 @@ self := left), keep(1), left outer);
 
 // RVA1605_1 ---------------------------------------------------------
 RVA1605_1_0_score := Models.RVA1605_1_0(clam);
-
+                             
 with_RVA1605_1_0	:= join(with_RVA1603_1_0, RVA1605_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2633,10 +2668,10 @@ self.RVA1605_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVA1605_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA1605_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-
+													 																		 
 // RVA1607_1 ---------------------------------------------------------
 RVA1607_1_0_score := Models.RVA1607_1_0(clam);
-
+                             
 with_RVA1607_1_0	:= join(with_RVA1605_1_0, RVA1607_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2649,7 +2684,7 @@ self := left), keep(1), left outer);
 
 RVA611_0_0_score := Models.RVA611_0_0(clam, iscalifornia);
 // output(RVA611_0_0_score, named('RVA611_0_0_score'));
-
+                             
 with_RVA611_0_0	:= join(with_RVA1607_1_0, RVA611_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2659,10 +2694,10 @@ self.RVA611_0_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVA611_0_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA611_0_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVA611_0_0, named('with_RVA611_0_0'));
+// output(with_RVA611_0_0, named('with_RVA611_0_0'));	
 RVA707_0_0_score := Models.RVA707_0_0(clam, iscalifornia);
 // output(RVA707_0_0_score, named('RVA707_0_0_score'));
-
+                             
 with_RVA707_0_0	:= join(with_RVA611_0_0, RVA707_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2672,11 +2707,11 @@ self.RVA707_0_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVA707_0_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA707_0_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVA707_0_0, named('with_RVA707_0_0'));
+// output(with_RVA707_0_0, named('with_RVA707_0_0'));	
 
 RVA707_1_0_score := Models.RVA707_1_0(clam, iscalifornia);
 // output(RVA707_1_0_score, named('RVA707_1_0_score'));
-
+                             
 with_RVA707_1_0	:= join(with_RVA707_0_0, RVA707_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2686,11 +2721,11 @@ self.RVA707_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVA707_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA707_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVA707_1_0, named('with_RVA707_1_0'));
+// output(with_RVA707_1_0, named('with_RVA707_1_0'));	
 
 RVA709_1_0_score := Models.RVA709_1_0(clam, iscalifornia);
 // output(RVA707_1_0_score, named('RVA709_1_0_score'));
-
+                             
 with_RVA709_1_0	:= join(with_RVA707_1_0, RVA709_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2700,12 +2735,12 @@ self.RVA709_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVA709_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVA709_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);;
 self := left), keep(1), left outer);
-// output(with_RVA709_1_0, named('with_RVA709_1_0'));
+// output(with_RVA709_1_0, named('with_RVA709_1_0'));	
 
 
 RVA1611_1_0_score := Models.RVA1611_1_0(clam, False);
 // output(RVA1611_1_0_score, named('RVA1611_1_0_score'));
-
+                             
 with_RVA1611_1_0 := join(with_RVA709_1_0, RVA1611_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2719,7 +2754,7 @@ self := left), keep(1), left outer);
 
 RVA1611_2_0_score := Models.RVA1611_2_0(clam, False);
 // output(RVA1611_2_0_score, named('RVA1611_2_0_score'));
-
+                             
 with_RVA1611_2_0 := join(with_RVA1611_1_0, RVA1611_2_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2733,7 +2768,7 @@ self := left), keep(1), left outer);
 
 RVA1811_1_0_score := Models.RVA1811_1_0(clam, False);
 // output(RVA1811_1_0_score, named('RVA1811_1_0_score'));
-
+                             
 with_RVA1811_1_0 := join(with_RVA1611_2_0, RVA1811_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2748,7 +2783,7 @@ self := left), keep(1), left outer);
 
 RVB1003_0_0_score := Models.RVB1003_0_0(clam, iscalifornia);
 // output(RVB1003_0_0_score, named('RVB1003_0_0_score'));
-
+                             
 with_RVB1003_0_0	:= join(with_RVA1811_1_0, RVB1003_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2758,11 +2793,11 @@ self.RVB1003_0_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVB1003_0_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVB1003_0_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVB1003_0_0, named('with_RVB1003_0_00'));
+// output(with_RVB1003_0_0, named('with_RVB1003_0_00'));	
 
 RVB1104_0_0_score := Models.RVB1104_0_0(clam, iscalifornia, xmlPreScreenOptOut);
 // output(RVB1104_0_0_score, named('RVB1104_0_0_score'));
-
+                             
 with_RVB1104_0_0 := join(with_RVB1003_0_0, RVB1104_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2772,11 +2807,11 @@ self.RVB1104_0_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVB1104_0_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVB1104_0_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVB1104_0_0, named('with_RVB1104_0_0'));
+// output(with_RVB1104_0_0, named('with_RVB1104_0_0'));	
 
 RVB1104_1_0_score := Models.RVB1104_1_0(clam, iscalifornia, FALSE);
 // output(RVB1104_1_0_score, named('RVB1104_1_0_score'));
-
+                             
 with_RVB1104_1_0 := join(with_RVB1104_0_0, RVB1104_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2786,11 +2821,11 @@ self.RVB1104_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVB1104_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVB1104_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVB1104_1_0, named('with_RVB1104_1_0'));
+// output(with_RVB1104_1_0, named('with_RVB1104_1_0'));	
 
 RVB1310_1_0_score := Models.RVB1310_1_0(clam, iscalifornia, false);
 // output(RVB1310_1_0_score, named('RVB1310_1_0_score'));
-
+                             
 with_RVB1310_1_0 := join(with_RVB1104_1_0, RVB1310_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2800,11 +2835,11 @@ self.RVB1310_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVB1310_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVB1310_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVB1310_1_0, named('with_RVB1310_1_0'));
+// output(with_RVB1310_1_0, named('with_RVB1310_1_0'));	
 
 RVB1402_1_0_score := Models.RVB1402_1_0(clam, iscalifornia);
 // output(RVB1402_1_0_score, named('RVB1402_1_0_score'));
-
+                             
 with_RVB1402_1_0 := join(with_RVB1310_1_0, RVB1402_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2814,11 +2849,11 @@ self.RVB1402_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVB1402_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVB1402_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVB1402_1_0, named('with_RVB1402_1_0'));
+// output(with_RVB1402_1_0, named('with_RVB1402_1_0'));	
 
 RVB1503_0_0_score := Models.RVB1503_0_0(clam, lexIDOnlyOnInput);
 // output(RVB1503_0_0_score, named('RVB1503_0_0_score'));
-
+                             
 with_RVB1503_0_0 := join(with_RVB1402_1_0, RVB1503_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2828,11 +2863,11 @@ self.RVB1503_0_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVB1503_0_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVB1503_0_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVB1503_0_0, named('with_RVB1503_0_0'));
+// output(with_RVB1503_0_0, named('with_RVB1503_0_0'));	
 
 RVB609_0_0_score := Models.RVB609_0_0(clam, iscalifornia);
 // output(RVB609_0_0_score, named('RVB609_0_0_score'));
-
+                             
 with_RVB609_0_0 := join(with_RVB1503_0_0, RVB609_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2842,12 +2877,12 @@ self.RVB609_0_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVB609_0_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVB609_0_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVB609_0_0, named('with_RVB609_0_0'));
+// output(with_RVB609_0_0, named('with_RVB609_0_0'));	
 
 
 RVB705_1_0_score := Models.RVB705_1_0(UNGROUP(clam), OFAC, iscalifornia);
 // output(RVB705_1_0_score, named('RVB705_1_0_score'));
-
+                             
 with_RVB705_1_0 := join(with_RVB609_0_0, RVB705_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2861,7 +2896,7 @@ self := left), keep(1), left outer);
 
 RVB1610_1_0_score := Models.RVB1610_1_0(clam);
 // output(RVB1610_1_0_score, named('RVB1610_1_0_score'));
-
+                             
 with_RVB1610_1_0 := join(with_RVB705_1_0, RVB1610_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2875,7 +2910,7 @@ self := left), keep(1), left outer);
 
 RVC1110_1_0_score := Models.RVC1110_1_0(UNGROUP(clam), iscalifornia, xmlPreScreenOptOut);
 // output(RVC1110_1_0_score, named('RVC1110_1_0_score'));
-
+                             
 with_RVC1110_1_0 := join(with_RVB1610_1_0, RVC1110_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2891,7 +2926,7 @@ self := left), keep(1), left outer);
 
 RVC1110_2_0_score := Models.RVC1110_2_0(UNGROUP(clam), iscalifornia, xmlPreScreenOptOut);
 // output(RVC1110_2_0_score, named('RVC1110_2_0_score'));
-
+                             
 with_RVC1110_2_0 := join(with_RVC1110_1_0, RVC1110_2_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2905,7 +2940,7 @@ self := left), keep(1), left outer);
 
 RVC1112_0_0_score := Models.RVC1112_0_0(clam, iscalifornia, xmlPreScreenOptOut);
 // output(RVC1112_0_0_score, named('RVC1112_0_0_score'));
-
+                             
 with_RVC1112_0_0 := join(with_RVC1110_2_0, RVC1112_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2915,11 +2950,11 @@ self.RVC1112_0_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVC1112_0_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVC1112_0_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVC1112_0_0, named('with_RVC1112_0_0'));
+// output(with_RVC1112_0_0, named('with_RVC1112_0_0'));	
 
 RVC1208_1_0_score := Models.RVC1208_1_0(clam, iscalifornia, xmlPreScreenOptOut);
 // output(RVC1208_1_0_score, named('RVC1208_1_0_score'));
-
+                             
 with_RVC1208_1_0 := join(with_RVC1112_0_0, RVC1208_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2933,7 +2968,7 @@ self := left), keep(1), left outer);
 
 RVC1210_1_0_score := Models.RVC1210_1_0(clam, isCalifornia, xmlPreScreenOptOut, returncode, pay_frequency);
 // output(RVC1210_1_0_score, named('RVC1210_1_0_score'));
-
+                             
 with_RVC1210_1_0 := join(with_RVC1208_1_0, RVC1210_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2947,7 +2982,7 @@ self := left), keep(1), left outer);
 
 RVC1301_1_0_score := ungroup(Models.RVC1301_1_0(clam));
 // output(RVC1301_1_0_score, named('RVC1301_1_0_score'));
-
+                             
 with_RVC1301_1_0 := join(with_RVC1210_1_0, RVC1301_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2961,7 +2996,7 @@ self := left), keep(1), left outer);
 
 RVC1307_1_0_score := Models.RVC1307_1_0(clam, iscalifornia);
 // output(RVC1307_1_0_score, named('RVC1307_1_0_score'));
-
+                             
 with_RVC1307_1_0 := join(with_RVC1301_1_0, RVC1307_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2975,7 +3010,7 @@ self := left), keep(1), left outer);
 
 RVC1405_1_0_score := Models.RVC1405_1_0(custom_clam, iscalifornia);
 // output(RVC1405_1_0_score, named('RVC1405_1_0_score'));
-
+                             
 with_RVC1405_1_0 := join(with_RVC1307_1_0, RVC1405_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -2989,7 +3024,7 @@ self := left), keep(1), left outer);
 
 RVC1405_2_0_score := Models.RVC1405_2_0(custom_clam, iscalifornia);
 // output(RVC1405_2_0_score, named('RVC1405_2_0_score'));
-
+                             
 with_RVC1405_2_0 := join(with_RVC1405_1_0, RVC1405_2_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3003,7 +3038,7 @@ self := left), keep(1), left outer);
 
 RVC1405_3_0_score := Models.RVC1405_3_0(clam, iscalifornia);
 // output(RVC1405_3_0_score, named('RVC1405_3_0_score'));
-
+                             
 with_RVC1405_3_0 := join(with_RVC1405_2_0, RVC1405_3_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3017,7 +3052,7 @@ self := left), keep(1), left outer);
 
 RVC1405_4_0_score := Models.RVC1405_4_0(clam, iscalifornia);
 // output(RVC1405_4_0_score, named('RVC1405_4_0_score'));
-
+                             
 with_RVC1405_4_0 := join(with_RVC1405_3_0, RVC1405_4_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3031,7 +3066,7 @@ self := left), keep(1), left outer);
 
 RVC1412_1_0_score := Models.RVC1412_1_0(clam, iscalifornia, false);
 // output(RVC1412_1_0_score, named('RVC1412_1_0_score'));
-
+                             
 with_RVC1412_1_0 := join(with_RVC1405_4_0, RVC1412_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3045,7 +3080,7 @@ self := left), keep(1), left outer);
 
 RVC1412_2_0_score := Models.RVC1412_2_0(custom_clam, iscalifornia);
 // output(RVC1412_2_0_score, named('RVC1412_2_0_score'));
-
+                             
 with_RVC1412_2_0 := join(with_RVC1412_1_0, RVC1412_2_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3059,7 +3094,7 @@ self := left), keep(1), left outer);
 
 RVC1602_1_0_score := Models.RVC1602_1_0(clam, channel_inputs);
 // output(RVC1602_1_0_score, named('RVC1602_1_0_score'));
-
+                             
 with_RVC1602_1_0 := join(with_RVC1412_2_0, RVC1602_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3074,7 +3109,7 @@ self := left), keep(1), left outer);
 
 RVC1609_1_0_score := Models.RVC1609_1_0(clam );
 // output(RVC1609_1_0_score, named('RVC1609_1_0_score'));
-
+                             
 with_RVC1609_1_0 := join(with_RVC1602_1_0, RVC1609_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3092,7 +3127,7 @@ self := left), keep(1), left outer);
 
 RVC1703_1_0_score := Models.RVC1703_1_0(clam, iscalifornia);
 // output(RVC1703_1_0_score, named('RVC1703_1_0_score'));
-
+                             
 with_RVC1703_1_0 := join(with_RVC1609_1_0, RVC1703_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3107,7 +3142,7 @@ self := left), keep(1), left outer);
 
 RVC1801_1_0_score := Models.RVC1801_1_0(clam, iscalifornia);
 // output(RVC1801_1_0_score, named('RVC1801_1_0_score'));
-
+                             
 with_RVC1801_1_0 := join(with_RVC1703_1_0, RVC1801_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3122,7 +3157,7 @@ self := left), keep(1), left outer);
 
 RVC1805_1_0_score := Models.RVC1805_1_0(clam, iscalifornia);
 // output(RVC1805_1_0_score, named('RVC1805_1_0_score'));
-
+                             
 with_RVC1805_1_0 := join(with_RVC1801_1_0, RVC1805_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3137,7 +3172,7 @@ self := left), keep(1), left outer);
 
 RVC1805_2_0_score := Models.RVC1805_2_0(clam, iscalifornia);
 // output(RVC1805_2_0_score, named('RVC1805_2_0_score'));
-
+                             
 with_RVC1805_2_0 := join(with_RVC1805_1_0, RVC1805_2_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3154,7 +3189,7 @@ self := left), keep(1), left outer);
 
 RVD1010_0_0_score := Models.RVD1010_0_0(UNGROUP(clam), iscalifornia);
 // output(RVD1010_0_0_score, named('RVD1010_0_0_score'));
-
+                             
 with_RVD1010_0_0 := join(with_RVC1805_2_0, RVD1010_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3170,7 +3205,7 @@ self := left), keep(1), left outer);
 
 RVD1010_1_0_score := Models.RVD1010_1_0(UNGROUP(clam), iscalifornia);
 // output(RVD1010_1_0_score, named('RVD1010_1_0_score'));
-
+                             
 with_RVD1010_1_0 := join(with_RVD1010_0_0, RVD1010_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3186,7 +3221,7 @@ self := left), keep(1), left outer);
 
 RVD1010_2_0_score := Models.RVD1010_2_0(UNGROUP(clam), iscalifornia);
 // output(RVD1010_2_0_score, named('RVD1010_2_0_score'));
-
+                             
 with_RVD1010_2_0 := join(with_RVD1010_1_0, RVD1010_2_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3200,7 +3235,7 @@ self := left), keep(1), left outer);
 
 RVD1110_1_0_score := Models.RVD1110_1_0(clam);
 // output(RVD1110_1_0_score, named('RVD1110_1_0_score'));
-
+                            
 with_RVD1110_1_0 := join(with_RVD1010_2_0, RVD1110_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3216,7 +3251,7 @@ self := left), keep(1), left outer);
 
 RVD1801_1_0_score := Models.RVD1801_1_0(clam);
 // output(RVD1801_1_0_score, named('RVD1801_1_0_score'));
-
+                            
 with_RVD1801_1_0 := join(with_RVD1110_1_0, RVD1801_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3233,7 +3268,7 @@ self := left), keep(1), left outer);
 
 RVG1003_0_0_score := Models.RVG1003_0_0(clam);
 // output(RVG1003_0_0_score, named('RVG1003_0_0_score'));
-
+                            
 with_RVG1003_0_0 := join(with_RVD1801_1_0, RVG1003_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3247,7 +3282,7 @@ self := left), keep(1), left outer);
 
 RVG1103_0_0_score := Models.RVG1103_0_0(clam, isCalifornia, xmlPreScreenOptOut );
 // output(RVG1103_0_0_score, named('RVG1103_0_0_score'));
-
+                            
 with_RVG1103_0_0 := join(with_RVG1003_0_0, RVG1103_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3262,7 +3297,7 @@ self := left), keep(1), left outer);
 
 RVG1106_1_0_score := Models.RVG1106_1_0(clam, isCalifornia, xmlPreScreenOptOut );
 // output(RVG1106_1_0_score, named('RVG1106_1_0_score'));
-
+                            
 with_RVG1106_1_0 := join(with_RVG1103_0_0, RVG1106_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3276,7 +3311,7 @@ self := left), keep(1), left outer);
 
 RVG1201_1_0_score := Models.RVG1201_1_0(clam, isCalifornia, xmlPreScreenOptOut );
 // output(RVG1201_1_0_score, named('RVG1201_1_0_score'));
-
+                            
 with_RVG1201_1_0 := join(with_RVG1106_1_0, RVG1201_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3290,7 +3325,7 @@ self := left), keep(1), left outer);
 
 RVG1302_1_0_score := ungroup(Models.RVG1302_1_0(clam, isCalifornia));
 // output(RVG1302_1_0_score, named('RVG1302_1_0_score'));
-
+                            
 with_RVG1302_1_0 := join(with_RVG1201_1_0, RVG1302_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3304,7 +3339,7 @@ self := left), keep(1), left outer);
 
 RVG1304_1_0_score := ungroup(Models.RVG1304_1_0(clam, isCalifornia));
 // output(RVG1304_1_0_score, named('RVG1304_1_0_score'));
-
+                            
 with_RVG1304_1_0 := join(with_RVG1302_1_0, RVG1304_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3318,7 +3353,7 @@ self := left), keep(1), left outer);
 
 RVG1304_2_0_score := ungroup(Models.RVG1304_2_0(clam, isCalifornia));
 // output(RVG1304_2_0_score, named('RVG1304_2_0_score'));
-
+                            
 with_RVG1304_2_0 := join(with_RVG1304_1_0, RVG1304_2_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3374,7 +3409,7 @@ self := left), keep(1), left outer);
 
 RVG903_1_0_score := Models.RVG903_1_0(ungroup(clam), isCalifornia);
 // output(RVG903_1_0_score, named('RVG903_1_0_score'));
-
+                               
 with_RVG903_1_0 := join(with_RVG812_0_0, RVG903_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3384,7 +3419,7 @@ self := left), keep(1), left outer);
 
 RVG1401_1_0_score := Models.RVG1401_1_0(clam, isCalifornia);
 // output(RVG904_1_0_score, named('RVG904_1_0_score'));
-
+                               
 with_RVG1401_1_0 := join(with_RVG903_1_0, RVG1401_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3398,7 +3433,7 @@ self := left), keep(1), left outer);
 
 RVG1401_2_0_score := Models.RVG1401_2_0(clam, isCalifornia);
 // output(RVG904_1_0_score, named('RVG904_1_0_score'));
-
+                               
 with_RVG1401_2_0 := join(with_RVG1401_1_0, RVG1401_2_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3412,7 +3447,7 @@ self := left), keep(1), left outer);
 
 RVG1310_1_0_score := Models.RVG1310_1_0(clam, isCalifornia);
 // output(RVG1310_1_0_score, named('RVG1310_1_0_score'));
-
+                               
 with_RVG1310_1_0 := join(with_RVG1401_2_0, RVG1310_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3426,7 +3461,7 @@ self := left), keep(1), left outer);
 
 RVG1404_1_0_score := Models.RVG1404_1_0(clam, isCalifornia);
 // output(RVG1404_1_0_score, named('RVG1404_1_0_score'));
-
+                               
 with_RVG1404_1_0 := join(with_RVG1310_1_0, RVG1404_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3473,7 +3508,7 @@ self := left), keep(1), left outer);
 /* ================ */
 RVG1702_1_0_score := Models.RVG1702_1_0(clam);
 // output(RVG1702_1_0_score, named('RVG1702_1_0_score'));
-
+                             
 with_RVG1702_1_0 := join(with_RVG1605_1_0, RVG1702_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3490,7 +3525,7 @@ self := left), keep(1), left outer);
 /* ================ */
 RVA1809_1_0_score := Models.RVA1809_1_0(clam,xmlPrescreenOptOut);
 // output(RVA1809_1_0_score, named('RVA1809_1_0_score'));
-
+                             
 with_RVA1809_1_0 := join(with_RVG1702_1_0, RVA1809_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3506,7 +3541,7 @@ self := left), keep(1), left outer);
 /* ================ */
 RVA1904_1_0_score := Models.RVA1904_1_0(clam,xmlPrescreenOptOut);
 // output(RVA1904_1_0_score, named('RVA1904_1_0_score'));
-
+                             
 with_RVA1904_1_0 := join(with_RVA1809_1_0, RVA1904_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3522,7 +3557,7 @@ self := left), keep(1), left outer);
 /* ================ */
 RVA1908_1_0_score := Models.RVA1908_1_0(clam);
 // output(RVA1908_1_0_score, named('RVA1908_1_0_score'));
-
+                             
 with_RVA1908_1_0 := join(with_RVA1904_1_0, RVA1908_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3538,7 +3573,7 @@ self := left), keep(1), left outer);
 /* ================ */
 RVG1705_1_0_score := Models.RVG1705_1_0(clam);
 // output(RVG1702_1_0_score, named('RVG1702_1_0_score'));
-
+                             
 with_RVG1705_1_0 := join(with_RVA1908_1_0, RVG1705_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3554,7 +3589,7 @@ self := left), keep(1), left outer);
 /* ================ */
 RVG1706_1_0_score := Models.RVG1706_1_0(clam);
 // output(RVG1706_1_0_score, named('RVG1706_1_0_score'));
-
+                             
 with_RVG1706_1_0 := join(with_RVG1705_1_0, RVG1706_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3570,7 +3605,7 @@ self := left), keep(1), left outer);
 /* ================ */
 RVG1802_1_0_score := Models.RVG1802_1_0(clam);
 // output(RVG1802_1_0_score, named('RVG1802_1_0_score'));
-
+                             
 with_RVG1802_1_0 := join(with_RVG1706_1_0, RVG1802_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3652,7 +3687,7 @@ self := left), keep(1), left outer);
 /* ================ */
 RVG1610_1_0_score := Models.RVG1610_1_0(clam);
 // output(RVG1610_1_0_score, named('RVG1610_1_0_score'));
-
+                             
 with_RVG1610_1_0 := join(with_RVG1809_1_0, RVG1610_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3677,75 +3712,75 @@ transform(Models.layout_Runway,
 self.RVP1012_1_0_score := right.score;
 self.RVP1012_1_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
 self := left), keep(1), left outer);
-// output(with_RVP1012_1_0, named('with_RVP1012_1_0'));
+// output(with_RVP1012_1_0, named('with_RVP1012_1_0'));		
 /* ================ */
 
 
 /* ================ */
 RVP1208_1_0_score := Models.RVP1208_1_0(clam);
 // output(RVP1208_1_0_score, named('RVP1208_1_0_score'));
-
+                               
 with_RVP1208_1_0 := join(with_RVP1012_1_0, RVP1208_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
 self.RVP1208_1_0_score := right.score;
 self.RVP1208_1_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
 self := left), keep(1), left outer);
-// output(with_RVP1208_1_0, named('with_RVP1208_1_0'));
+// output(with_RVP1208_1_0, named('with_RVP1208_1_0'));		
 /* ================ */
 
 /* ================ */
 RVP1401_1_0_score := Models.RVP1401_1_0(clam);
 // output(RVP1401_1_0_score, named('RVP1401_1_0_score'));
-
+                               
 with_RVP1401_1_0 := join(with_RVP1208_1_0, RVP1401_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
 self.RVP1401_1_0_score := right.score;
 self.RVP1401_1_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
 self := left), keep(1), left outer);
-// output(with_RVP1401_1_0, named('with_RVP1401_1_0'));
+// output(with_RVP1401_1_0, named('with_RVP1401_1_0'));		
 /* ================ */
 
 /* ================ */
 RVP1401_2_0_score := Models.RVP1401_2_0(clam);
 // output(RVP1401_2_0_score, named('RVP1401_2_0_score'));
-
+                               
 with_RVP1401_2_0 := join(with_RVP1401_1_0, RVP1401_2_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
 self.RVP1401_2_0_score := right.score;
 self.RVP1401_2_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
 self := left), keep(1), left outer);
-// output(with_RVP1401_2_0, named('with_RVP1401_2_0'));
+// output(with_RVP1401_2_0, named('with_RVP1401_2_0'));	
 /* ================ */
 
 /* ================ */
 RVP1503_1_0_score := Models.RVP1503_1_0(clam);
 // output(RVP1503_1_0_score, named('RVP1503_1_0_score'));
-
+                               
 with_RVP1503_1_0 := join(with_RVP1401_2_0, RVP1503_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
 self.RVP1503_1_0_score := right.score;
 self.RVP1503_1_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
 self := left), keep(1), left outer);
-// output(with_RVP1503_1_0, named('with_RVP1503_1_0'));
+// output(with_RVP1503_1_0, named('with_RVP1503_1_0'));	
 /* ================ */
 
 /* ================ */
 RVP1605_1_0_score := Models.RVP1605_1_0(clam);
 // output(RVP1503_1_0_score, named('RVP1503_1_0_score'));
-
+                               
 with_RVP1605_1_0 := join(with_RVP1503_1_0, RVP1605_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
 self.RVP1605_1_0_score := right.score;
 self.RVP1605_1_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
 self := left), keep(1), left outer);
-// output(with_RVP1605_1_0, named('with_RVP1605_1_0'));
+// output(with_RVP1605_1_0, named('with_RVP1605_1_0'));	
 /* ================ */
-
+                      
 
 
 RVP1702_1_0_score := Models.RVP1702_1_0(clam);
@@ -3757,12 +3792,12 @@ transform(Models.layout_Runway,
 self.RVP1702_1_0_score := right.score;
 self.RVP1702_1_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
 self := left), keep(1), left outer);
-// output(with_RVP804_0_0, named('with_RVP804_0_0'));
+// output(with_RVP804_0_0, named('with_RVP804_0_0'));		
 
 
 RVR704_1_0_score := Models.RVR704_1_0(clam, isCalifornia);
 // output(RVR704_1_0_score, named('RVR704_1_0_score'));
-
+                                  
 with_RVR704_1_0 := join(with_RVP1702_1_0, RVR704_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3772,12 +3807,12 @@ self.RVR704_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVR704_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVR704_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVR704_1_0, named('with_RVR704_1_0'));
+// output(with_RVR704_1_0, named('with_RVR704_1_0'));	                         
 
 
 RVR1008_1_0_score := Models.RVR1008_1_0(clam);
 // output(RVR1008_1_0_score, named('RVR1008_1_0_score'));
-
+                                  
 with_RVR1008_1_0 := join(with_RVR704_1_0, RVR1008_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3787,13 +3822,13 @@ self.RVR1008_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVR1008_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVR1008_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVR1008_1_0, named('with_RVR1008_1_0'));
+// output(with_RVR1008_1_0, named('with_RVR1008_1_0'));		
 
 
 
 RVR1103_0_0_score := Models.RVR1103_0_0(clam);
 // output(RVR1103_0_0_score, named('RVR1103_0_0_score'));
-
+                                  
 with_RVR1103_0_0 := join(with_RVR1008_1_0, RVR1103_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3803,13 +3838,13 @@ self.RVR1103_0_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVR1103_0_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVR1103_0_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVR1103_0_0, named('with_RVR1103_0_0'));
+// output(with_RVR1103_0_0, named('with_RVR1103_0_0'));		
 
 
 
 RVR1104_2_0_score := Models.RVR1104_2_0(clam, isCalifornia,xmlPrescreenOptOut);
 // output(RVR1104_1_0_score, named('RVR1104_2_0_score'));
-
+                                  
 with_RVR1104_2_0 := join(with_RVR1103_0_0, RVR1104_2_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3819,11 +3854,11 @@ self.RVR1104_2_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVR1104_2_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVR1104_2_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVR1104_2_0, named('with_RVR1104_2_0'));
+// output(with_RVR1104_2_0, named('with_RVR1104_2_0'));		
 
 RVR1210_1_0_score := Models.RVR1210_1_0(clam);
 // output(RVR1210_1_0_score, named('RVR1210_1_0_score'));
-
+                                  
 with_RVR1210_1_0 := join(with_RVR1104_2_0, RVR1210_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3833,11 +3868,11 @@ self.RVR1210_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVR1210_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVR1210_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVR1210_1_0, named('with_RVR1210_1_0'));
+// output(with_RVR1210_1_0, named('with_RVR1210_1_0'));		
 
 RVR1303_1_0_score := Models.RVR1303_1_0(clam, isCalifornia);
 // output(RVR1303_1_0_score, named('RVR1303_1_0_score'));
-
+                                  
 with_RVR1303_1_0 := join(with_RVR1210_1_0, RVR1303_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3847,12 +3882,12 @@ self.RVR1303_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVR1303_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVR1303_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVR1303_1_0, named('with_RVR1303_1_0'));
+// output(with_RVR1303_1_0, named('with_RVR1303_1_0'));		
 
-
+          
 RVR1410_1_0_score := Models.RVR1410_1_0(clam, isCalifornia,false);
 // output(RVR1410_1_0_score, named('RVR1410_1_0_score'));
-
+                                  
 with_RVR1410_1_0 := join(with_RVR1303_1_0, RVR1410_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3863,11 +3898,11 @@ self.RVR1410_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVR1410_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
 // output(with_RVR1410_1_0, named('with_RVR1410_1_0'));
-
+          
 
 RVR803_1_0_score := Models.RVR803_1_0(clam, isCalifornia);
 // output(RVR803_1_0_score, named('RVR803_1_0_score'));
-
+                                  
 with_RVR803_1_0 := join(with_RVR1410_1_0, RVR803_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3877,11 +3912,11 @@ self.RVR803_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVR803_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVR803_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVR803_1_0, named('with_RVR803_1_0'));
-
+// output(with_RVR803_1_0, named('with_RVR803_1_0'));	
+   
 RVS811_0_0_score := Models.RVS811_0_0(ungroup(clam), bshell);
    // output(RVS811_0_0_score, named('RVS811_0_0_score'));
-
+                                           
    with_RVS811_0_0 := join(with_RVR803_1_0, RVS811_0_0_score,
    left.seq=(unsigned)right.seq,
    transform(Models.layout_Runway,
@@ -3891,11 +3926,11 @@ RVS811_0_0_score := Models.RVS811_0_0(ungroup(clam), bshell);
     self.RVS811_0_0_reason3 := right.scores[1].OwnerAgentHighRiskIndicators[3].RiskCode;
     self.RVS811_0_0_reason4 := right.scores[1].OwnerAgentHighRiskIndicators[4].RiskCode;
    self := left), keep(1), left outer);
-   // output(with_RVS811_0_0, named('with_RVS811_0_0'));
-
+   // output(with_RVS811_0_0, named('with_RVS811_0_0'));		
+   
 	RVS1706_0_score := Models.RVS1706_0_2(clam);
 // output(RVS1706_0_score, named('RVS1706_0_score'));
-
+                                     
 with_RVS1706_0 := join(with_RVS811_0_0, RVS1706_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3905,12 +3940,12 @@ self.RVS1706_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVS1706_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVS1706_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVS1706_0, named('with_RVS1706_0'));
-
+// output(with_RVS1706_0, named('with_RVS1706_0'));	 
+	 
 
 RVT1003_0_0_score := Models.RVT1003_0_0(clam);
 // output(RVT1003_0_0_score, named('RVT1003_0_0_score'));
-
+                                     
 with_RVT1003_0_0 := join(with_RVS1706_0, RVT1003_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3920,12 +3955,12 @@ self.RVT1003_0_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
 self.RVT1003_0_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVT1003_0_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
-// output(with_RVT1003_0_0, named('with_RVT1003_0_0'));
+// output(with_RVT1003_0_0, named('with_RVT1003_0_0'));			
 
 
 RVT1104_0_0_score := Models.RVT1104_0_0(clam, iscalifornia, xmlPreScreenOptOut);
 // output(RVT1104_0_0_score, named('RVT1104_0_0_score'));
-
+                                        
 with_RVT1104_0_0 := join(with_RVT1003_0_0, RVT1104_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3936,12 +3971,12 @@ self.RVT1104_0_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVT1104_0_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 
 self := left), keep(1), left outer);
-// output(with_RVT1104_0_0, named('with_RVT1104_0_0'));
+// output(with_RVT1104_0_0, named('with_RVT1104_0_0'));			
 
 
 RVT1104_1_0_score := Models.RVT1104_1_0(clam, iscalifornia, xmlPreScreenOptOut  );
 // output(RVT1104_1_0_score, named('RVT1104_1_0_score'));
-
+                                        
 with_RVT1104_1_0 := join(with_RVT1104_0_0, RVT1104_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3952,11 +3987,11 @@ self.RVT1104_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVT1104_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 
 self := left), keep(1), left outer);
-// output(with_RVT1104_1_0, named('with_RVT1104_1_0'));
+// output(with_RVT1104_1_0, named('with_RVT1104_1_0'));								
 
 RVT1204_1_score := Models.RVT1204_1(clam, iscalifornia, xmlPreScreenOptOut  );
 // output(RVT1204_1_score, named('RVT1204_1_score'));
-
+                                        
 with_RVT1204_1 := join(with_RVT1104_1_0, RVT1204_1_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3967,11 +4002,11 @@ self.RVT1204_1_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVT1204_1_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 
 self := left), keep(1), left outer);
-// output(with_RVT1204_1, named('with_RVT1204_1'));
+// output(with_RVT1204_1, named('with_RVT1204_1'));								
 
 RVT1210_1_0_score := Models.RVT1210_1_0(clam, iscalifornia, xmlPreScreenOptOut  );
 // output(RVT1210_1_0_score, named('RVT1210_1_0_score'));
-
+                                        
 with_RVT1210_1_0 := join(with_RVT1204_1, RVT1210_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3982,11 +4017,11 @@ self.RVT1210_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVT1210_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 
 self := left), keep(1), left outer);
-// output(with_RVT1210_1_0, named('with_RVT1210_1_0'));
+// output(with_RVT1210_1_0, named('with_RVT1210_1_0'));	
 
 RVT1212_1_0_score := Models.RVT1212_1_0(clam, iscalifornia);
 // output(RVT1212_1_0_score, named('RVT1212_1_0_score'));
-
+                                        
 with_RVT1212_1_0 := join(with_RVT1210_1_0, RVT1212_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -3997,11 +4032,11 @@ self.RVT1212_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVT1212_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 
 self := left), keep(1), left outer);
-// output(with_RVT1212_1_0, named('with_RVT1212_1_0'));
+// output(with_RVT1212_1_0, named('with_RVT1212_1_0'));	
 
 RVT1307_3_0_score := Models.RVT1307_3_0(clam, iscalifornia, FALSE);
 // output(RVT1307_3_0_score, named('RVT1307_3_0_score'));
-
+                                        
 with_RVT1307_3_0 := join(with_RVT1212_1_0, RVT1307_3_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -4012,11 +4047,11 @@ self.RVT1307_3_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVT1307_3_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 
 self := left), keep(1), left outer);
-// output(with_RVT1307_3_0, named('with_RVT1307_3_0'));
+// output(with_RVT1307_3_0, named('with_RVT1307_3_0'));	
 
 RVT1402_1_0_score := Models.RVT1402_1_0(clam, iscalifornia);
 // output(RVT1307_3_0_score, named('RVT1307_3_0_score'));
-
+                                        
 with_RVT1402_1_0 := join(with_RVT1307_3_0, RVT1402_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -4027,11 +4062,11 @@ self.RVT1402_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVT1402_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 
 self := left), keep(1), left outer);
-// output(with_RVT1402_1_0, named('with_RVT1402_1_0'));
+// output(with_RVT1402_1_0, named('with_RVT1402_1_0'));	
 
 RVT1503_0_0_score := Models.RVT1503_0_0(clam, lexIDOnlyOnInput);
 // output(RVT1503_0_0_score, named('RVT1503_0_0_score'));
-
+                                        
 with_RVT1503_0_0 := join(with_RVT1402_1_0, RVT1503_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -4042,12 +4077,12 @@ self.RVT1503_0_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVT1503_0_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 
 self := left), keep(1), left outer);
-// output(with_RVT1503_0_0, named('with_RVT1503_0_0'));
+// output(with_RVT1503_0_0, named('with_RVT1503_0_0'));	
 
 //---------------------------------------------------------
 RVT1601_1_0_score := Models.RVT1601_1_0(clam, lexIDOnlyOnInput);
 // output(RVT1503_0_0_score, named('RVT1503_0_0_score'));
-
+                                        
 with_RVT1601_1_0 := join(with_RVT1503_0_0, RVT1601_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -4058,13 +4093,13 @@ self.RVT1601_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVT1601_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 
 self := left), keep(1), left outer);
-// output(with_RVT1503_0_0, named('with_RVT1503_0_0'));
+// output(with_RVT1503_0_0, named('with_RVT1503_0_0'));	
 //--------------------------------------------------------------------
 
 
 RVT711_1_0_score := Models.RVT711_1_0(clam, isCalifornia);
 // output(RVT711_1_0_score, named('RVT711_1_0_score'));
-
+                                        
 with_RVT711_1_0 := join(with_RVT1601_1_0, RVT711_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -4075,12 +4110,12 @@ self.RVT711_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVT711_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 
 self := left), keep(1), left outer);
-// output(with_RVT711_1_0, named('with_RVT711_1_0'));
+// output(with_RVT711_1_0, named('with_RVT711_1_0'));	
 
 
 RVT1605_1_0_score := Models.RVT1605_1_0(clam, isCalifornia);
 // output(RVT1605_1_0_score, named('RVT1605_1_0_score'));
-
+                                        
 with_RVT1605_1_0 := join(with_RVT711_1_0, RVT1605_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -4096,7 +4131,7 @@ self := left), keep(1), left outer);
 
 RVT1605_2_0_score := Models.RVT1605_2_0(clam, isCalifornia);
 // output(RVT1605_2_0_score, named('RVT1605_2_0_score'));
-
+                                        
 
 with_RVT1605_2_0 := join(with_RVT1605_1_0, RVT1605_2_0_score,
 left.seq=(unsigned)right.seq,
@@ -4113,8 +4148,8 @@ self := left), keep(1), left outer);
 
 RVT1608_1_0_score := Models.RVT1608_1_0(clam);
 // output(RVT1608_1_0_score, named('RVT1608_1_0_score'));
-
- /*  T-Mobile Thin file Model  */
+ 
+ /*  T-Mobile Thin file Model  */  
 with_RVT1608_1_0 := join(with_RVT1605_2_0, RVT1608_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -4128,10 +4163,10 @@ self.RVT1608_1_0_reason5 := if(exclude_reasons, '',  right.ri[5].hri);
 self := left), keep(1), left outer);
 // output(with_RVT1608_1_0, named('with_RVT1608_1_0'));
 
-/*  T-Mobile Thick file Model  */
+/*  T-Mobile Thick file Model  */  
 RVT1608_2_score := Models.RVT1608_2(clam);
 // output(RVT1608_2_score, named('RVT1608_2_score'));
-
+                                        
 with_RVT1608_2 := join(with_RVT1608_1_0, RVT1608_2_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -4143,7 +4178,7 @@ self.RVT1608_2_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self.RVT1608_2_reason5 := if(exclude_reasons, '',  right.ri[5].hri);
 
 self := left), keep(1), left outer);
-// output(with_RVT1608_2, named('with_RVT1608_2'));
+// output(with_RVT1608_2, named('with_RVT1608_2'));	
 
 RVT1705_1_0_score := Models.RVT1705_1_0(clam, isCalifornia);
 // output(RVT1608_1_0_score, named('RVT1608_1_0_score'));
@@ -4165,7 +4200,7 @@ self := left), keep(1), left outer);
 
 TBN509_0_0_score := Models.TBN509_0_0(clam);
 // output(TBN509_0_0_score, named('TBN509_0_0__score'));
-
+                                        
 with_TBN509_0_0:= join(with_RVT1705_1_0, TBN509_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -4180,7 +4215,7 @@ self := left), keep(1), left outer);
 
 TBN604_1_0_score := Models.TBN604_1_0(clam, ofac);
 // output(TBN604_1_0_score, named('TBN604_1_0__score'));
-
+                                        
 with_TBN604_1_0:= join(with_TBN509_0_0, TBN604_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
@@ -4196,18 +4231,18 @@ self := left), keep(1), left outer);
 
 WIN704_0_0_score := Models.WIN704_0_0(clam, census, isFCRA );
 // output(WIN704_0_0_score, named('WIN704_0_0__score'));
-
+                                        
 with_WIN704_0_0:= join(with_TBN604_1_0, WIN704_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
-self.WIN704_0_0_score := right.wealth_indicator;
+self.WIN704_0_0_score := right.wealth_indicator;          
 self := left), keep(1), left outer);
 // output(with_WIN704_0_0, named('with_WIN704_0_0'));
 
-
+      
 WOMV002_0_0_score := Models.WOMV002_0_0(UNGROUP(clam));
 // output(WOMV002_0_0_score, named('WOMV002_0_0__score'));
-
+                                        
 with_WOMV002_0_0:= join(with_WIN704_0_0, WOMV002_0_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
@@ -4215,10 +4250,10 @@ self.WOMV002_0_0_score := right.score;
 self := left), keep(1), left outer);
 // output(with_WOMV002_0_0, named('with_WOMV002_0_0'));
 
-
+                
 WWN604_1_0_score := Models.WWN604_1_0(clam);
 // output(WWN604_1_0_score, named('WWN604_1_0__score'));
-
+                                        
 with_WWN604_1_0:= join(with_WOMV002_0_0, WWN604_1_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
@@ -4409,7 +4444,7 @@ self.CDN604_0_0_reason2	:= if(model_environment in [1,3], left.CDN604_0_0_reason
 self.CDN604_0_0_reason3	:= if(model_environment in [1,3], left.CDN604_0_0_reason3	, '');
 self.CDN604_0_0_reason4	:= if(model_environment in [1,3], left.CDN604_0_0_reason4	, '');
 
-/*  This is the flag ship for Order Score  */
+/*  This is the flag ship for Order Score  */    
 self.OSN1504_0_0_score	:= if(model_environment in [1,3], left.OSN1504_0_0_score	, '');
 self.OSN1504_0_0_reason1	:= if(model_environment in [1,3], left.OSN1504_0_0_reason1	, '');
 self.OSN1504_0_0_reason2	:= if(model_environment in [1,3], left.OSN1504_0_0_reason2	, '');
@@ -4418,7 +4453,7 @@ self.OSN1504_0_0_reason4	:= if(model_environment in [1,3], left.OSN1504_0_0_reas
 self.OSN1504_0_0_reason5	:= if(model_environment in [1,3], left.OSN1504_0_0_reason5	, '');
 self.OSN1504_0_0_reason6	:= if(model_environment in [1,3], left.OSN1504_0_0_reason6	, '');
 
-/*  This is the custom model for Vivid Seats within the Order Score Product  */
+/*  This is the custom model for Vivid Seats within the Order Score Product  */    
 self.OSN1608_1_0_score	:= if(model_environment in [1,3], left.OSN1608_1_0_score	, '');
 self.OSN1608_1_0_reason1	:= if(model_environment in [1,3], left.OSN1608_1_0_reason1	, '');
 self.OSN1608_1_0_reason2	:= if(model_environment in [1,3], left.OSN1608_1_0_reason2	, '');
@@ -4427,7 +4462,7 @@ self.OSN1608_1_0_reason4	:= if(model_environment in [1,3], left.OSN1608_1_0_reas
 self.OSN1608_1_0_reason5	:= if(model_environment in [1,3], left.OSN1608_1_0_reason5	, '');
 self.OSN1608_1_0_reason6	:= if(model_environment in [1,3], left.OSN1608_1_0_reason6	, '');
 
-/*  This is the custom model for Wallmart within the Order Score Product  */
+/*  This is the custom model for Wallmart within the Order Score Product  */    
 self.OSN1803_1_0_score	:= if(model_environment in [1,3], left.OSN1803_1_0_score	, '');
 self.OSN1803_1_0_reason1	:= if(model_environment in [1,3], left.OSN1803_1_0_reason1	, '');
 self.OSN1803_1_0_reason2	:= if(model_environment in [1,3], left.OSN1803_1_0_reason2	, '');
@@ -4946,6 +4981,24 @@ self.fp1908_1_0_reason4	:= if(model_environment in [1,3], left.fp1908_1_0_reason
 self.fp1908_1_0_reason5	:= if(model_environment in [1,3], left.fp1908_1_0_reason5	, '');
 self.fp1908_1_0_reason6	:= if(model_environment in [1,3], left.fp1908_1_0_reason6	, '');
 
+//=== Fifth Third Custom Model ===
+self.fp1909_1_0_score	:= if(model_environment in [1,3],   left.fp1909_1_0_score	, '');
+self.fp1909_1_0_reason1	:= if(model_environment in [1,3], left.fp1909_1_0_reason1	, '');
+self.fp1909_1_0_reason2	:= if(model_environment in [1,3], left.fp1909_1_0_reason2	, '');
+self.fp1909_1_0_reason3	:= if(model_environment in [1,3], left.fp1909_1_0_reason3	, '');
+self.fp1909_1_0_reason4	:= if(model_environment in [1,3], left.fp1909_1_0_reason4	, '');
+self.fp1909_1_0_reason5	:= if(model_environment in [1,3], left.fp1909_1_0_reason5	, '');
+self.fp1909_1_0_reason6	:= if(model_environment in [1,3], left.fp1909_1_0_reason6	, '');
+
+//=== Fifth Third Custom Model ===
+self.fp1909_2_0_score	:= if(model_environment in [1,3],   left.fp1909_2_0_score	, '');
+self.fp1909_2_0_reason1	:= if(model_environment in [1,3], left.fp1909_2_0_reason1	, '');
+self.fp1909_2_0_reason2	:= if(model_environment in [1,3], left.fp1909_2_0_reason2	, '');
+self.fp1909_2_0_reason3	:= if(model_environment in [1,3], left.fp1909_2_0_reason3	, '');
+self.fp1909_2_0_reason4	:= if(model_environment in [1,3], left.fp1909_2_0_reason4	, '');
+self.fp1909_2_0_reason5	:= if(model_environment in [1,3], left.fp1909_2_0_reason5	, '');
+self.fp1909_2_0_reason6	:= if(model_environment in [1,3], left.fp1909_2_0_reason6	, '');
+
 //=== Avenger model ===
 self.fp31604_0_0_score	:= if(model_environment in [1,3],   left.fp31604_0_0_score	, '');
 self.fp31604_0_0_reason1	:= if(model_environment in [1,3], left.fp31604_0_0_reason1	, '');
@@ -4966,7 +5019,7 @@ self.FP31203_1_0_reason1	:= if(model_environment in [1,3], left.FP31203_1_0_reas
 self.FP31203_1_0_reason2	:= if(model_environment in [1,3], left.FP31203_1_0_reason2	, '');
 self.FP31203_1_0_reason3	:= if(model_environment in [1,3], left.FP31203_1_0_reason3	, '');
 self.FP31203_1_0_reason4	:= if(model_environment in [1,3], left.FP31203_1_0_reason4	, '');
-
+ 
 self.FP31310_2_0_score	:= if(model_environment in [1,3], left.FP31310_2_0_score	, '');
 self.FP31310_2_0_reason1	:= if(model_environment in [1,3], left.FP31310_2_0_reason1	, '');
 self.FP31310_2_0_reason2	:= if(model_environment in [1,3], left.FP31310_2_0_reason2	, '');
@@ -4982,7 +5035,7 @@ self.FP31505_0_0_reason3	:= if(model_environment in [1,3], left.FP31505_0_0_reas
 self.FP31505_0_0_reason4	:= if(model_environment in [1,3], left.FP31505_0_0_reason4	, '');
 self.FP31505_0_0_reason5	:= if(model_environment in [1,3], left.FP31505_0_0_reason5	, '');
 self.FP31505_0_0_reason6	:= if(model_environment in [1,3], left.FP31505_0_0_reason6	, '');
-
+     
 self.FP3FDN1505_0_0_score	:= if(model_environment in [1,3], left.FP3FDN1505_0_0_score	, '');
 self.FP3FDN1505_0_0_reason1	:= if(model_environment in [1,3], left.FP3FDN1505_0_0_reason1	, '');
 self.FP3FDN1505_0_0_reason2	:= if(model_environment in [1,3], left.FP3FDN1505_0_0_reason2	, '');

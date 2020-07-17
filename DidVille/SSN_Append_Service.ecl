@@ -1,7 +1,5 @@
-import watchdog,header_slimsort;
-
 export SSN_Append_Service := macro
-	
+
 in_format := DidVille.Layout_SSN_In;
 out_format := Didville.Layout_SSN_Out;
 
