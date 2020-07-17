@@ -194,13 +194,24 @@ EXPORT SearchRecords := MODULE
            aGatewayInputData.noFail => final_result_pre,
            isGatewayFailed => FAIL(final_result_pre,1208,VehicleV2_Services.Polk_Code_Translations.ErrorCodes('1208')),
          //isAllEmpty => FAIL(final_result_pre,10,Doxie.ErrorCodes(10)), /* */
-                                       final_result_pre);
-                                                            
-    RETURN SORT(final_result, -MAX( MAX(owners,(UNSIGNED4)ttl_latest_issue_date), MAX(registrants,(UNSIGNED4)reg_latest_effective_date),
-                                    MAX(owners, IF((UNSIGNED4)src_last_date = 0, (UNSIGNED4)src_first_date, (UNSIGNED4)src_last_date))),
-                              nonDMVSource,
-                              min_party_penalty,
-                              Vehicle_Key);
+                                       final_result_pre);                                          
+	RETURN SORT(final_result, 		
+	   //sort by tag types if entered by the user
+	   -(VehicleV2_Services.Functions.tagTypeSelection(aInputData.SortByTagTypes,
+	     STD.Str.ToUpperCase(MAX(registrants, reg_license_plate_type_code)),
+	     STD.Str.ToUpperCase(state_origin),
+	     STD.Str.ToUpperCase(MAX(registrants, reg_license_plate_type_desc) ) ) ),
+	     //sort by latest record date				   
+	    -MAX(
+	         MAX(owners,     (UNSIGNED4)ttl_latest_issue_date ),
+	         MAX(registrants,(UNSIGNED4)reg_latest_effective_date ),                            
+	         MAX(owners,  if((UNSIGNED4)src_last_date = 0,
+	                         (UNSIGNED4)src_first_date, 
+	                         (UNSIGNED4)src_last_date ) )
+	     ), 
+	nonDMVSource,
+	min_party_penalty, 
+	Vehicle_Key );
   END;
   
   SHARED getCombinedRecords($.IParam.searchParams aInputData) :=FUNCTION
