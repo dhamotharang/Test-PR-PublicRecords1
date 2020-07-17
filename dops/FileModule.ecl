@@ -241,21 +241,8 @@ END;
 	
 		dPackage := dRoxiePackage(l_esp,l_port,l_target);// : independent;
 		dGetCopyStatusLocal := dCopyStatus();
-		
-		rCopyStatusPending := record
-			rCopyStatus;
-			string previoussubfile := '';
-			integer previouspendingpartstocopy := 0;
-			boolean ispending := false;
-		end;
-		
-		rCopyStatusPending xPendingFiles(dPackage l, dGetCopyStatusLocal r) := transform
-			self.ispending := if (r.subfile = '' or
-															r.pendingpartstocopy > 0
-													,true
-													,false);
-			self.previoussubfile := r.subfile;
-			self.previouspendingpartstocopy := r.pendingpartstocopy;
+				
+		rCopyStatus xPendingFiles(dPackage l, dGetCopyStatusLocal r) := transform
 			self := l
 		end;
 
@@ -264,12 +251,26 @@ END;
 													,left.packageid = right.packageid
 														and left.superfile = right.superfile
 														and left.subfile = right.subfile
+														and right.pendingpartstocopy > 0
 													,xPendingFiles(left,right)
-													,left outer
+													,left only
+													);
+		
+		rCopyStatus xCompleted(dGetCopyStatusLocal l, dPackage r) := transform
+			self := l
+		end;
+
+		dCompleted := join(dGetCopyStatusLocal
+													,dPackage
+													,left.packageid = right.packageid
+														and left.superfile = right.superfile
+														and left.subfile = right.subfile
+														and left.pendingpartstocopy = 0
+													,xCompleted(left,right)
 													);
 													
 		rCopyStatusWithParts := record
-			rCopyStatusPending;
+			rCopyStatus;
       dataset(rParts - dFParts) dAllParts := dataset([],{rParts - dFParts});
 		end;
 		
@@ -292,10 +293,6 @@ END;
 
 		dGetTotalFilePartFromDali := project(dPendingFiles,xGetTotalFilePartFromDali(left));
 		
-		
-		
-		
-
 		rCopyStatusWithParts xCopyStatus(dGetTotalFilePartFromDali l) := transform
 								
                 dGetParts := fGetPartsFromRoxie(l.directory,l.filemask
@@ -309,32 +306,20 @@ END;
 								self := l;
 		end;
 
-		dCopyStatusWithFileParts := project(dGetTotalFilePartFromDali(ispending),xCopyStatus(left));
+		dCopyStatusWithFileParts := project(dGetTotalFilePartFromDali,xCopyStatus(left));
 		
 		rCopyStatus xNormRecs(dCopyStatusWithFileParts l, rParts - dFParts r) := transform
-			
-                //self.partname := r.partname;
-                self.pendingpartstocopy := l.expectedfileparts - l.copiedfileparts;
-                self.percentcopied := (l.copiedfileparts / l.expectedfileparts) * 100;
-								
-								self.wuid := WORKUNIT;
-								self := l;
+			self.pendingpartstocopy := l.expectedfileparts - l.copiedfileparts;
+      self.percentcopied := (l.copiedfileparts / l.expectedfileparts) * 100;
+			self.wuid := WORKUNIT;
+			self := l;
 		end;
 
 		dFinalCopyStatus := dedup(sort(normalize(dCopyStatusWithFileParts,left.dAllParts,xNormRecs(left,right)),percentcopied,packageid,superfile,subfile),percentcopied,packageid,superfile,subfile);
 
-		rCopyStatus xGetAllMissedRecords(dGetTotalFilePartFromDali l) := transform
-			self := l;
-		end;
-		
-		dGetMissed := project(dGetTotalFilePartFromDali(~ispending or count(dAllParts) = 0),xGetAllMissedRecords(left));
-
-		return dedup(sort(dFinalCopyStatus + dGetMissed,percentcopied,packageid,superfile,subfile),percentcopied,packageid,superfile,subfile);
-		
+		return dedup(sort(dFinalCopyStatus + dCompleted,percentcopied,packageid,superfile,subfile),percentcopied,packageid,superfile,subfile);
 		
 	end;
-	
-	
 	
 	export fGetCopyStatusByDataset() := function
 		dFullCopy := dCopyStatus();
