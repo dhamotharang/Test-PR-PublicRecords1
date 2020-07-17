@@ -1,4 +1,4 @@
-export layout_rmsid := record
-  string50 tmsid;
-	string50 rmsid;
-end;
+EXPORT layout_rmsid := RECORD
+  STRING50 tmsid;
+  STRING50 rmsid;
+END;
