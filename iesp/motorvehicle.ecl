@@ -66,9 +66,11 @@ export t_MVSearchRecord := record
 	string VehicleNumber {xpath('VehicleNumber')};
 	string StateOfOrigin {xpath('StateOfOrigin')};
 	string StateNameOfOrigin {xpath('StateNameOfOrigin')};
+	string LicensePlateTypeCode {xpath('LicensePlateTypeCode')};
+	string LicensePlateTypeDesc {xpath('LicensePlateTypeDesc')};
 	t_MVSearchPerson BestInfo {xpath('BestInfo')};//hidden[internal]
-	dataset(t_MVSearchPerson) Owners {xpath('Owners/Owner'), MAXCOUNT(Constants.MV.MaxCountOwners)};
-	dataset(t_MVSearchPerson) Registrants {xpath('Registrants/Registrant'), MAXCOUNT(Constants.MV.MaxCountRegistrants)};
+	dataset(t_MVSearchPerson) Owners {xpath('Owners/Owner'), MAXCOUNT(iesp.Constants.MV.MaxCountOwners)};
+	dataset(t_MVSearchPerson) Registrants {xpath('Registrants/Registrant'), MAXCOUNT(iesp.Constants.MV.MaxCountRegistrants)};
 	iesp.share.t_Date RegistrationDate {xpath('RegistrationDate')};
 	boolean IsAccurintData {xpath('IsAccurintData')};//hidden[internal]
 	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
@@ -120,6 +122,7 @@ export t_MotorVehicleSearch2Option := record (iesp.share.t_BaseSearchOption)
 	boolean AuthenticationUsage {xpath('AuthenticationUsage')};//hidden[internal]
 	boolean MultiFamilyDwelling {xpath('MultiFamilyDwelling')};
 	integer RegistrationType {xpath('RegistrationType')};
+	dataset(iesp.share.t_StringArrayItem) SortByTagTypes {xpath('SortByTagTypes/TagType'), MAXCOUNT(iesp.Constants.MV.MAX_VEHICLE_TAG_TYPE)};//values['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','']//hidden[internal]
 end;
 		
 export t_MotorVehicleSearchPersonOrBusiness := record (iesp.share.t_CriminalIndicators)
@@ -245,21 +248,21 @@ export t_MotorVehicleSearch2Record := record
 	boolean NonDMVSource {xpath('NonDMVSource')};
 	t_MotorVehicleSearchVehicleInfo VehicleInfo {xpath('VehicleInfo')};
 	t_MotorVehicleSearchMatchedParty MatchedParty {xpath('MatchedParty')};
-	dataset(t_MotorVehicleSearchRegistrant) Registrants {xpath('Registrants/Registrant'), MAXCOUNT(Constants.MV.MaxCountRegistrants)};
-	dataset(t_MotorVehicleSearchOwner) Owners {xpath('Owners/Owner'), MAXCOUNT(Constants.MV.MaxCountOwners)};
-	dataset(t_MotorVehicleSearchLienHolder) LienHolders {xpath('LienHolders/LienHolder'), MAXCOUNT(Constants.MV.MaxCountLienHolders)};
-	dataset(t_MotorVehicleSearchLessee) Lessees {xpath('Lessees/Lessee'), MAXCOUNT(Constants.MV.MaxCountLessees)};
-	dataset(t_MotorVehicleSearchLessor) Lessors {xpath('Lessors/Lessor'), MAXCOUNT(Constants.MV.MaxCountLessors)};
+	dataset(t_MotorVehicleSearchRegistrant) Registrants {xpath('Registrants/Registrant'), MAXCOUNT(iesp.Constants.MV.MaxCountRegistrants)};
+	dataset(t_MotorVehicleSearchOwner) Owners {xpath('Owners/Owner'), MAXCOUNT(iesp.Constants.MV.MaxCountOwners)};
+	dataset(t_MotorVehicleSearchLienHolder) LienHolders {xpath('LienHolders/LienHolder'), MAXCOUNT(iesp.Constants.MV.MaxCountLienHolders)};
+	dataset(t_MotorVehicleSearchLessee) Lessees {xpath('Lessees/Lessee'), MAXCOUNT(iesp.Constants.MV.MaxCountLessees)};
+	dataset(t_MotorVehicleSearchLessor) Lessors {xpath('Lessors/Lessor'), MAXCOUNT(iesp.Constants.MV.MaxCountLessors)};
 	string255 ExternalKey {xpath('ExternalKey')};//hidden[lndayton]
 	boolean RealTimeDataSearched {xpath('RealTimeDataSearched')};//hidden[internal]
 	boolean IsAccurintData {xpath('IsAccurintData')};//hidden[internal]
-	dataset(t_MotorVehicleSearchBrand) Brands {xpath('Brands/Brand'), MAXCOUNT(Constants.MV.MaxCountBrands)};
+	dataset(t_MotorVehicleSearchBrand) Brands {xpath('Brands/Brand'), MAXCOUNT(iesp.Constants.MV.MaxCountBrands)};
 end;
 		
 export t_MotorVehicleSearch2Response := record
 	iesp.share.t_ResponseHeader _Header {xpath('Header')};
 	integer RecordCount {xpath('RecordCount')};
-	dataset(t_MotorVehicleSearch2Record) Records {xpath('Records/Record'), MAXCOUNT(Constants.MV.MAX_COUNT_SEARCH_RESPONSE_RECORDS)};
+	dataset(t_MotorVehicleSearch2Record) Records {xpath('Records/Record'), MAXCOUNT(iesp.Constants.MV.MAX_COUNT_SEARCH_RESPONSE_RECORDS)};
 end;
 		
 export t_MVReportBy := record
@@ -395,10 +398,10 @@ export t_MVReportRecord := record
 	t_MVReportVessel Vessel {xpath('Vessel')};
 	t_MVReportLicensePlate LicensePlate {xpath('LicensePlate')};
 	t_MVReportTitle Title {xpath('Title')};
-	dataset(t_MVReportOwner) Owners {xpath('Owners/Owner'), MAXCOUNT(Constants.MV.MaxCountOwners)};
-	dataset(t_MVReportRegistrant) Registrants {xpath('Registrants/Registrant'), MAXCOUNT(Constants.MV.MaxCountRegistrants)};
-	dataset(t_MVReportLienHolder) LienHolders {xpath('LienHolders/LienHolder'), MAXCOUNT(Constants.MV.MaxCountLienHolders)};
-	dataset(t_MVReportBrand) Brands {xpath('Brands/Brand'), MAXCOUNT(Constants.MV.MaxCountBrands)};
+	dataset(t_MVReportOwner) Owners {xpath('Owners/Owner'), MAXCOUNT(iesp.Constants.MV.MaxCountOwners)};
+	dataset(t_MVReportRegistrant) Registrants {xpath('Registrants/Registrant'), MAXCOUNT(iesp.Constants.MV.MaxCountRegistrants)};
+	dataset(t_MVReportLienHolder) LienHolders {xpath('LienHolders/LienHolder'), MAXCOUNT(iesp.Constants.MV.MaxCountLienHolders)};
+	dataset(t_MVReportBrand) Brands {xpath('Brands/Brand'), MAXCOUNT(iesp.Constants.MV.MaxCountBrands)};
 	iesp.share.t_Date RegistrationExpirationDate {xpath('RegistrationExpirationDate')};
 	integer DecalYear {xpath('DecalYear')};
 	string1 RegistrationStatusCode {xpath('RegistrationStatusCode')};
@@ -569,19 +572,19 @@ export t_MotorVehicleReport2Record := record
 	t_MotorVehicleReportVehicleInfo VehicleInfo {xpath('VehicleInfo')};
 	t_MVR2VinaData VinaData {xpath('VinaData')};
 	string15 DataSource {xpath('DataSource')}; //values['All','Local','RealTime','']
-	dataset(t_MotorVehicleReportRegistrant) Registrants {xpath('Registrants/Registrant'), MAXCOUNT(Constants.MV.MaxCountRegistrants)};
-	dataset(t_MotorVehicleReportOwner) Owners {xpath('Owners/Owner'), MAXCOUNT(Constants.MV.MaxCountOwners)};
-	dataset(t_MotorVehicleReportLienHolder) LienHolders {xpath('LienHolders/LienHolder'), MAXCOUNT(Constants.MV.MaxCountLienHolders)};
-	dataset(t_MotorVehicleReportLessee) Lessees {xpath('Lessees/Lessee'), MAXCOUNT(Constants.MV.MaxCountLessees)};
-	dataset(t_MotorVehicleReportLessor) Lessors {xpath('Lessors/Lessor'), MAXCOUNT(Constants.MV.MaxCountLessors)};
-	dataset(t_MotorVehicleSearchBrand) Brands {xpath('Brands/Brand'), MAXCOUNT(Constants.MV.MaxCountBrands)};
+	dataset(t_MotorVehicleReportRegistrant) Registrants {xpath('Registrants/Registrant'), MAXCOUNT(iesp.Constants.MV.MaxCountRegistrants)};
+	dataset(t_MotorVehicleReportOwner) Owners {xpath('Owners/Owner'), MAXCOUNT(iesp.Constants.MV.MaxCountOwners)};
+	dataset(t_MotorVehicleReportLienHolder) LienHolders {xpath('LienHolders/LienHolder'), MAXCOUNT(iesp.Constants.MV.MaxCountLienHolders)};
+	dataset(t_MotorVehicleReportLessee) Lessees {xpath('Lessees/Lessee'), MAXCOUNT(iesp.Constants.MV.MaxCountLessees)};
+	dataset(t_MotorVehicleReportLessor) Lessors {xpath('Lessors/Lessor'), MAXCOUNT(iesp.Constants.MV.MaxCountLessors)};
+	dataset(t_MotorVehicleSearchBrand) Brands {xpath('Brands/Brand'), MAXCOUNT(iesp.Constants.MV.MaxCountBrands)};
 	string15 IterationKey {xpath('IterationKey')};//hidden[internal]
 	string15 SequenceKey {xpath('SequenceKey')};//hidden[internal]
 end;
 		
 export t_MotorVehicleReport2Response := record
 	iesp.share.t_ResponseHeader _Header {xpath('Header')};
-	dataset(t_MotorVehicleReport2Record) MotorVehicleRecords {xpath('MotorVehicleRecords/MotorVehicleRecord'), MAXCOUNT(Constants.MV.MAX_COUNT_REPORT_RESPONSE_RECORDS)};
+	dataset(t_MotorVehicleReport2Record) MotorVehicleRecords {xpath('MotorVehicleRecords/MotorVehicleRecord'), MAXCOUNT(iesp.Constants.MV.MAX_COUNT_REPORT_RESPONSE_RECORDS)};
 end;
 		
 export t_MVSearchRequest := record (iesp.share.t_BaseRequest)

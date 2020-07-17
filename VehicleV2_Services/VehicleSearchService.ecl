@@ -1,7 +1,7 @@
 ﻿/*--SOAP--
 <message name="VehicleSearchService" wuTimeout="300000">
-  <part name = 'BDID' type = 'xsd:string'/>
-  <part name = 'DID' type = 'xsd:string'/>
+  <part name='BDID' type = 'xsd:string'/>
+  <part name='DID' type = 'xsd:string'/>
   <part name="DriversLicense" type = 'xsd:string' />
   <part name="ExcludeLessors" type='xsd:boolean'/>
   <part name="Tag" type = 'xsd:string' />
@@ -34,11 +34,11 @@
   <part name="Model" type = 'xsd:string' />
   <part name="DataSource" type = 'xsd:string' />
   <part name="RealTimePermissibleUse" type = 'xsd:string' />
-  <part name ="GLBPurpose" type = 'xsd:byte'/>
-  <part name ="DPPAPurpose" type = 'xsd:byte'/>
-  <part name ="DataRestrictionMask" type="xsd:string"/>
-  <part name ="DataPermissionMask" type="xsd:string"/>
-
+  <part name="GLBPurpose" type = 'xsd:byte'/>
+  <part name="DPPAPurpose" type = 'xsd:byte'/>
+  <part name="DataRestrictionMask" type="xsd:string"/>
+  <part name="DataPermissionMask" type="xsd:string"/>
+  <part name="SortByTagTypes" type="tns:EspStringArray"/>
   <part name="PenaltThreshold" type="xsd:unsignedInt"/>
   <part name="MaxResults" type = 'xsd:unsignedInt' />
   <part name="MaxResultsThisTime" type = 'xsd:unsignedInt' />
@@ -52,16 +52,12 @@
   <part name="IncludeNonRegulatedVehicleSources" type='xsd:boolean'/>
   <part name="multiFamilyDwelling" type='xsd:boolean'/>
   <part name="RegistrationType" type="xsd:unsignedInt"/>
-
   <part name="gateways" type="tns:XmlDataSet" cols="100" rows="6"/>
-  
   <part name="MotorVehicleSearch2Request" type="tns:XmlDataSet" cols="80" rows="20" />
-  
 </message>
 */
-/*--INFO-- This service searches all Vehicle datafiles.*/
 
-IMPORT iesp, Royalty;
+IMPORT VehicleV2_Services, iesp, Royalty, WSInput;
 
 EXPORT VehicleSearchService() := MACRO
 
@@ -69,6 +65,8 @@ EXPORT VehicleSearchService() := MACRO
   #CONSTANT('SearchIgnoresAddressOnly',TRUE);
   #CONSTANT('getBdidsbyExecutive',FALSE);
   #CONSTANT('DisplayMatchedParty',TRUE);
+
+  WSInput.MAC_Vehicle_Search_Service();
   
   ds_in := DATASET ([], iesp.motorvehicle.t_MotorVehicleSearch2Request) : STORED ('MotorVehicleSearch2Request', FEW);
   first_row := ds_in[1] : INDEPENDENT;

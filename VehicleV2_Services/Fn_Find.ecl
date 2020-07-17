@@ -6,6 +6,8 @@
   layout_w_keys := RECORD
     VehicleV2_Services.Layouts.flat_vehicle;
     UNSIGNED2 party_penalty := 0;
+    //adding the plate type desc for the wildcard_search service
+    STRING65 license_plate_desc := '';
   END;
 
 EXPORT Fn_Find(
@@ -497,6 +499,7 @@ EXPORT Fn_Find(
     SELF.decal_year := IF(l.decal_year<>'',l.decal_year,r.Reg_Decal_Year);
     SELF.registration_status_code := IF(l.registration_status_code<>'',l.registration_status_code, r.Reg_Status_Code);
     SELF.license_plate_code := IF(l.license_plate_code<>'',l.license_plate_code, r.Reg_License_Plate_Type_Code);
+    SELF.license_plate_desc := if(l.license_plate_desc<>'',l.license_plate_desc, r.Reg_License_Plate_Type_Desc);
     SELF.title_numberxbg9:=IF(l.title_numberxbg9<>'',l.title_numberxbg9, r.Ttl_Number);
     SELF.title_issue_date :=IF(l.title_issue_date<>'',l.title_issue_date, r.Ttl_Latest_Issue_Date);
     SELF.previous_title_issue_date := IF(l.previous_title_issue_date<>'',l.previous_title_issue_date, r.Ttl_Previous_Issue_Date);
@@ -666,6 +669,8 @@ o14 := JOIN(o13,cdk,
   out_layout := RECORD
     doxie_Raw.Layout_VehRawBatchInput.input_layout input;
     doxie.Layout_VehicleSearch_wCrimInd;
+    //adding the plate type desc for the wildcard_search service
+    STRING65 license_plate_desc := '';
   END;
 
   out_layout map_lein_holder_county_names(o14 L) := TRANSFORM
@@ -678,6 +683,7 @@ o14 := JOIN(o13,cdk,
   EXPORT v1_ret := o15;
 
 END;
+
 
 
 

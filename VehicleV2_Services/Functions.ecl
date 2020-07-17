@@ -981,5 +981,60 @@ EXPORT VehicleV2_Services.Layout_Report RemoveLatLong(VehicleV2_Services.Layout_
   SELF := L;
 END;
 
+EXPORT BOOLEAN tagTypeSelection(set of unsigned1 SortByTagTypes, string4 code, string2 st, string65 desc) := FUNCTION
+    VRT := VehicleV2_Services.Constant.VEHICLE_REG_TYPE;
+    RETURN
+    if(EXISTS(SortByTagTypes),
+    /*01*/  VRT.AGRICULTURE.VAL IN SortByTagTypes and (code in VRT.AGRICULTURE.CODES )
+    OR
+    /*02*/  VRT.ANTIQUE.VAL IN SortByTagTypes and (code in VRT.ANTIQUE.CODES
+              or (code in VRT.ANTIQUE.EXCEPTION_A.CODES and st = VRT.ANTIQUE.EXCEPTION_A.MISSISSIPPI ) )
+    OR
+    /*03*/  VRT.BUS.VAL IN SortByTagTypes and (code in VRT.BUS.CODES
+              or (code in VRT.BUS.EXCEPTION_A.CODES and st = VRT.BUS.EXCEPTION_A.NEBRASKA )
+              or (code in VRT.BUS.EXCEPTION_B.CODES and st = VRT.BUS.EXCEPTION_B.OHIO ) )
+    OR
+    /*04*/  VRT.COMMERCIAL.VAL IN SortByTagTypes and (code in  VRT.COMMERCIAL.CODES
+              or (code in VRT.COMMERCIAL.EXCEPTION_A.CODES and st = VRT.COMMERCIAL.EXCEPTION_A.NEBRASKA )
+              or (code in VRT.COMMERCIAL.EXCEPTION_B.CODES and st = VRT.COMMERCIAL.EXCEPTION_B.OHIO ) ) 
+    OR
+    /*05*/ VRT.DISABLED.VAL IN SortByTagTypes and (code in  VRT.DISABLED.CODES )
+    OR
+    /*06*/  VRT.VETERAN.VAL IN SortByTagTypes and (code in  VRT.VETERAN.CODES
+              or (code in VRT.VETERAN.EXCEPTION_A.CODES and st = VRT.VETERAN.EXCEPTION_A.MISSISSIPPI )
+                                           /* NOTE the "NOT - <>" clause here per the requirements */
+              or (code in VRT.VETERAN.EXCEPTION_B.CODES and st <> VRT.VETERAN.EXCEPTION_B.OHIO ) )
+    OR
+    /*07*/  VRT.EDUCATIONAL.VAL IN SortByTagTypes and (code in  VRT.EDUCATIONAL.CODES )
+    OR
+    /*08*/  VRT.EMERGENCY.VAL IN SortByTagTypes and (code in  VRT.EMERGENCY.CODES )
+    OR
+    /*09*/  VRT.ENVIRONMENTAL.VAL IN SortByTagTypes and (code in  VRT.ENVIRONMENTAL.CODES )
+    OR
+    /*10*/  VRT.EXEMPT.VAL IN SortByTagTypes and (code in VRT.EXEMPT.CODES )
+    OR
+    /*11*/  VRT.GOVERNMENT.VAL IN SortByTagTypes and (code in VRT.GOVERNMENT.CODES
+              or (code in VRT.GOVERNMENT.EXCEPTION_A.CODES and st = VRT.GOVERNMENT.EXCEPTION_A.MISSISSIPPI ) )
+    OR
+    /*12*/  VRT.MILITARY.VAL IN SortByTagTypes and (code in VRT.MILITARY.CODES )
+    OR
+    /*13*/  VRT.MOTORHOME.VAL IN SortByTagTypes and (code in VRT.MOTORHOME.CODES
+              or (code in VRT.MOTORHOME.EXCEPTION_A.CODES and st = VRT.MOTORHOME.EXCEPTION_A.OHIO )
+              or (STD.Str.Find(desc,VRT.MOTORHOME.EXCEPTION_B.DESCRIPTION,1) > 0 ) )
+    OR
+    /*14*/  VRT.MOTORCYCLE.VAL IN SortByTagTypes and (code in VRT.MOTORCYCLE.CODES )
+    OR
+    /*15*/  VRT.PRIVATE.VAL IN SortByTagTypes and (code in VRT.PRIVATE.CODES )
+    OR
+    /*16*/  VRT.TAXI.VAL IN SortByTagTypes and (code in VRT.TAXI.CODES )
+    OR
+    /*17*/  VRT.TEMPORARY.VAL IN SortByTagTypes and (code in VRT.TEMPORARY.CODES )
+    OR
+    /*18*/  VRT.TRAILER.VAL IN SortByTagTypes and (code in VRT.TRAILER.CODES
+              or (STD.Str.Find(desc,VRT.TRAILER.EXCEPTION_A.DESCRIPTION,1) > 0 ) )
+    OR
+    /*19*/  VRT.VANITY.VAL IN SortByTagTypes and (code in VRT.VANITY.CODES ),
+    false);
+END;
 
 END;

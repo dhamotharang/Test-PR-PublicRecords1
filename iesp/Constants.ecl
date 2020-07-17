@@ -1244,23 +1244,24 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_COUNT_SMARTLINX_BIZ_ASSOCIATED_PEOPLE   := 500;
 	end;
 
-	// Motor Vehicle Registrations (MVR)
-  export MV := MODULE
+    // Motor Vehicle Registrations (MVR)
+    export MV := MODULE
     // ideally, those should refer to VehicleV2_Services.Constant values...
-    export unsigned1 MaxCountGateways := 2;
-    export unsigned1 MaxCountOwners := 10;
-    export unsigned1 MaxCountRegistrants := 10;
-    export unsigned1 MaxCountLienHolders := 10;
-    export unsigned1 MaxCountLessees := 10;
-    export unsigned1 MaxCountLessors := 10;
-		export unsigned1 MaxCountBrands := 5;
-		export UNSIGNED1 MaxCountMakes := 4;
-		export UNSIGNED1 MaxCountModels := 4;
-		export UNSIGNED1 MaxCountMajorColors := 4;
-		export UNSIGNED1 MaxCountMinorColors := 4;
-		export MAX_COUNT_SEARCH_RESPONSE_RECORDS := 2000;
-		export MAX_COUNT_REPORT_RESPONSE_RECORDS := 2000;
-  end;
+        export unsigned1 MaxCountGateways := 2;
+        export unsigned1 MaxCountOwners := 10;
+        export unsigned1 MaxCountRegistrants := 10;
+        export unsigned1 MaxCountLienHolders := 10;
+        export unsigned1 MaxCountLessees := 10;
+        export unsigned1 MaxCountLessors := 10;
+        export unsigned1 MaxCountBrands := 5;
+        export unsigned1 MaxCountMakes := 4;
+        export unsigned1 MaxCountModels := 4;
+        export unsigned1 MaxCountMajorColors := 4;
+        export unsigned1 MaxCountMinorColors := 4;
+        export unsigned2 MAX_COUNT_SEARCH_RESPONSE_RECORDS := 2000;
+        export unsigned2 MAX_COUNT_REPORT_RESPONSE_RECORDS := 2000;
+        export unsigned1 MAX_VEHICLE_TAG_TYPE := 19;
+    end;
 
 	// Natural Disaster Readiness
 	export NATURAL_DISASTER := MODULE

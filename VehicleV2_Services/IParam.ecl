@@ -63,6 +63,7 @@ EXPORT IParam := MODULE
     EXPORT BOOLEAN IncludeCriminalIndicators;
     EXPORT BOOLEAN multiFamilyDwelling;
     EXPORT INTEGER registrationType;
+    EXPORT SET OF UNSIGNED1 SortByTagTypes;
   END;
   
   
@@ -241,6 +242,9 @@ EXPORT SetInputSearchBy (iesp.motorvehicle.t_MotorVehicleSearch2By searchBy) := 
     INTEGER registrationType := GLOBAL(options).RegistrationType;
     #STORED('RegistrationType', registrationType);
 
+    SET OF UNSIGNED1 SortByTagTypes := SET(global(options).SortByTagTypes,(unsigned1)value);
+    #STORED('SortByTagTypes', SortByTagTypes);
+
     RETURN OUTPUT (DATASET ([],{INTEGER x}), NAMED('__internal__'), extend);
   END;
   
@@ -360,6 +364,7 @@ EXPORT SetInputSearchBy (iesp.motorvehicle.t_MotorVehicleSearch2By searchBy) := 
       EXPORT BOOLEAN NoFail := mvrCombinedQuery; // set to true in top level service;
       EXPORT BOOLEAN multiFamilyDwelling := FALSE : STORED('MultiFamilyDwelling');
       EXPORT INTEGER registrationType := 0 : STORED('RegistrationType');
+      EXPORT SET OF UNSIGNED1 SortByTagTypes := [] : STORED('SortByTagTypes');
     END;
     RETURN search_mod;
   END;
@@ -429,6 +434,7 @@ EXPORT SetInputSearchBy (iesp.motorvehicle.t_MotorVehicleSearch2By searchBy) := 
       EXPORT BOOLEAN IncludeNonRegulatedSources := FALSE : STORED('IncludeNonRegulatedVehicleSources');
       EXPORT BOOLEAN multiFamilyDwelling := FALSE : STORED('MultiFamilyDwelling');
       EXPORT INTEGER registrationType := 0 : STORED('RegistrationType');
+      EXPORT SET OF UNSIGNED1 SortByTagTypes := [] : STORED('SortByTagTypes');
     END;
     RETURN in_mod;
   END;
