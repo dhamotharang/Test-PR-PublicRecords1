@@ -29,8 +29,7 @@ EXPORT Address_Shell.layoutPropertyCharacteristics searchForeclosures (DATASET(A
 		SELF := [];
 	END;
 		
-	version1Temp := JOIN(working, Property.Key_Foreclosures_Addr, (TRIM(LEFT.Input.Zip5) <> '' AND TRIM(LEFT.Input.StreetNumber) <> '' AND TRIM(LEFT.Input.StreetName) <> '' 
-																																AND TRIM(LEFT.Input.StreetSuffix) <> '' AND TRIM(LEFT.Input.StreetPreDirection) <> '')
+	version1Temp := JOIN(working, Property.Key_Foreclosures_Addr, (TRIM(LEFT.Input.Zip5) <> '' AND TRIM(LEFT.Input.StreetNumber) <> '' AND TRIM(LEFT.Input.StreetName) <> '')
 																																AND KEYED(LEFT.Input.Zip5 = RIGHT.situs1_zip AND LEFT.Input.StreetNumber = RIGHT.situs1_prim_range
 																																AND LEFT.Input.StreetName = RIGHT.situs1_prim_name AND LEFT.Input.StreetSuffix = RIGHT.situs1_addr_suffix
 																																AND LEFT.Input.StreetPreDirection = RIGHT.situs1_predir)
