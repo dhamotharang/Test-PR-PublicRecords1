@@ -1,5 +1,4 @@
-﻿
-#workunit('name','bwr_Business_Marketing_Attributes_Batch_Service');
+﻿#workunit('name','bwr_Business_Marketing_Attributes_Batch_Service');
 #option ('hthorMemoryLimit', 1000);
 
 IMPORT PublicRecords_KEL,BRM_Marketing_attributes,RiskWise; 
