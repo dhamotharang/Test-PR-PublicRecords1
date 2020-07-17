@@ -148,7 +148,8 @@ EXPORT GetRetrievalGateway_Records := MODULE
     END;
 
     get_parties :=  NORMALIZE(dte_gw_recs,
-                             LEFT.ResponseJSON.Parties(STD.Str.ToUpperCase(PartyType) = $.Constants.LIENS_RETRIEVAL.DEFENDANT),
+                             LEFT.ResponseJSON.Parties(STD.Str.ToUpperCase(PartyType) = $.Constants.LIENS_RETRIEVAL.DEFENDANT
+                             OR STD.Str.ToUpperCase(PartyType) = $.Constants.LIENS_RETRIEVAL.DEBTOR),
                              todidville(RIGHT, counter));
 
     BatchShare.MAC_SequenceInput (get_parties, ds_party_sequenced);

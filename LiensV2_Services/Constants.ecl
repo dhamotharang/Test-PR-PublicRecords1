@@ -5,6 +5,7 @@ EXPORT Constants := MODULE
   EXPORT LIENS_RETRIEVAL := MODULE
 
       EXPORT DEFENDANT     := 'DEFENDANT';
+      EXPORT DEBTOR        := 'DEBTOR';
       EXPORT OKC_TASK_DESC := 'Status Refresh Task';
 
       // alert codes and desc

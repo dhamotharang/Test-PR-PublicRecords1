@@ -107,7 +107,7 @@ EXPORT IParam := MODULE
          EXPORT INTEGER8 FFDOptionsMask    := FFD.FFDMask.Get(options.FFDOptionsMask);
          EXPORT INTEGER FCRAPurpose        := FCRA.FCRAPurpose.Get(options.FCRAPurpose);
          EXPORT STRING32 DeferredTransactionID := options.DeferredTransactionID;
-         EXPORT STRING32 TransactionID      := options.TransactionID;
+         EXPORT STRING32 TransactionID         := mod_access.transaction_id;
          EXPORT BOOLEAN DeferredTaskRequest := DeferredTransactionID <> '';
          EXPORT BOOLEAN InputOk             := input_ok;
          END;
