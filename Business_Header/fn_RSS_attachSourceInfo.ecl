@@ -1,4 +1,4 @@
-import AutoStandardI,Business_Header_SS, doxie_cbrs, doxie_raw, ut;
+import AutoStandardI,Business_Header_SS, doxie_cbrs, doxie_raw, ut, MDR, Doxie;
 
 /*	This function is called from Business_Header.BH_GID_RollupSearchService to 
     attach the source document count information in the 'sourceRecs' child dataset 
@@ -103,7 +103,8 @@ export fn_RSS_attachSourceInfo (dataset(business_header.layout_biz_search.final)
   glb_purpose:=AutoStandardI.InterfaceTranslator.glb_purpose.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.glb_purpose.params));
 	ds_in_bh_src_recs := join(ds_in_gids_bdids,Business_Header_SS.Key_BH_BDID_pl,
 	                          left.bdid = right.bdid AND
-                            ut.PermissionTools.glb.SrcOk(glb_purpose,right.source),
+                            ut.PermissionTools.glb.SrcOk(glb_purpose,right.source) AND 
+							(right.source <> MDR.sourceTools.src_Dunn_Bradstreet OR Doxie.DataPermission.use_DNB),
 			                      transform(rec_temp,
 												      self.group_id := left.group_id;
 													    // convert 2 char source code to appropriate description
@@ -185,7 +186,8 @@ export fn_RSS_attachSourceInfo (dataset(business_header.layout_biz_search.final)
 	// For each BDID associated to the GID, get its' associated Business Header payload
 	// records from the thor_data400::key::business_header.bdid_pl_qa file.
 	ds_gids_bh_src_info := join(ds_gids_with_bdids,Business_Header_SS.Key_BH_BDID_pl,
-	                            left.bdid = right.bdid,
+	                            left.bdid = right.bdid AND
+                              (right.source <> MDR.sourceTools.src_Dunn_Bradstreet OR Doxie.DataPermission.use_DNB),
 			                        transform(rec_temp,
 												        self.group_id := left.group_id;
 													      // convert 2 char source code to appropriate description

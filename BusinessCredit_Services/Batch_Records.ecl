@@ -1,38 +1,73 @@
-﻿IMPORT BIPV2,BIPV2_Best,BIPV2_Best_SBFE,Business_Credit,
-       BusinessCredit_Services,Business_Risk_BIP,Codes,doxie;
+﻿IMPORT BIPV2,BIPV2_Best,BIPV2_Best_SBFE,Business_Credit,Business_Risk_BIP,
+       BusinessCredit_Services,Codes,doxie;
 
 EXPORT Batch_Records( DATASET(BusinessCredit_Services.Batch_layouts.Batch_Input_Processed) ds_BatchIn,
 															BusinessCredit_Services.Iparam.BatchParams inMod) :=
 FUNCTION
 
   mod_access := PROJECT(inMod, doxie.IDataAccess);
-  
-  // Get links ids for the search criteria
-  // Format to BIP search layout
-  BIPV2.IDfunctions.rec_SearchInput tFormat2SearchInput(BusinessCredit_Services.Batch_layouts.Batch_Input_Processed pInput) := TRANSFORM
-    SELF.company_name     := pInput.comp_name;
-    SELF.city             := pInput.p_city_name;
-    SELF.state            := pInput.st;
-    SELF.zip5             := pInput.z5;
-    SELF.phone10          := pInput.workphone;
-		SELF.inSeleid					:= (STRING) pInput.SeleID;
-    SELF.zip_radius_miles := IF ((INTEGER)pInput.mileradius > 10, 10, (INTEGER)pInput.mileradius); 
-		SELF.Hsort            := TRUE; // this boolean only affect the proxid level returns not SELEID level.		
-    SELF                  := pInput;
-    SELF                  := [];
-  END;	
-  
+    
 	// Seperate bipid input records from search records, records with ultid id will assume no search
-	ds_Format2SearchInput := PROJECT(ds_batchIn(ultid = 0),tFormat2SearchInput(LEFT));
 	ds_Format2LinkidInput := PROJECT(ds_batchIn(ultid !=0),TRANSFORM(BusinessCredit_Services.Batch_layouts.BipSlim_layout,SELF := LEFT, SELF:=[]));
     
 	// Get the linkids from the search criteria
-	ds_BusinessCredit_IDs_All := PROJECT(BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_Format2SearchInput).uid_results_w_acct,	
-																		TRANSFORM(BusinessCredit_Services.Batch_layouts.BipSlim_layout,SELF := LEFT, SELF:=[]));
-	
-	// Filter out D&B only records 
-  ds_BusinessCredit_IDs := ds_BusinessCredit_IDs_All(DNBDMIRecordOnly=FALSE);
-	
+  BIPV2.IdAppendLayouts.appendInput AppendFormat(BusinessCredit_Services.Batch_layouts.Batch_Input_Processed pInput) := TRANSFORM
+    SELF.request_id := (unsigned)pInput.acctno;
+    SELF.company_name := pInput.comp_name;
+    SELF.prim_range := pInput.prim_range;
+    SELF.prim_name := pInput.prim_name;
+    SELF.sec_range := pInput.sec_range;
+    SELF.city := pInput.p_city_name;
+    SELF.state := pInput.st;
+    SELF.zip5 := pInput.z5;
+    SELF.zip_radius_miles := IF ((integer)pInput.mileradius > 10, 10, (integer)pInput.mileradius);
+    SELF.phone10 := pInput.workphone;   
+    SELF.fein := pInput.fein;
+    SELF.seleid := pInput.seleid;
+    SELF.proxid := pInput.proxid;
+    SELF := [];
+  END;
+
+  ds_Format2AppInput := PROJECT(ds_BatchIn, AppendFormat(LEFT));
+
+  BusinessCredit_Services.Batch_layouts.BipSlim_layout xfm_ToBipSlim_Layout (BIPV2.IdAppendLayouts.IdsOnlyOutput inRec) :=
+    TRANSFORM
+      SELF.acctno := (STRING)inRec.request_id;
+      SELF.DotID := inRec.DotID;
+      SELF.DotScore := inRec.DotScore;
+      SELF.DotWeight := inRec.DotWeight;
+      SELF.EmpID := inRec.EmpID;
+      SELF.EmpScore := inRec.EmpScore;
+      SELF.EmpWeight := inRec.EmpWeight;
+      SELF.POWID := inRec.POWID;
+      SELF.POWScore := inRec.POWScore;
+      SELF.POWWeight := inRec.POWWeight;
+      SELF.ProxID := inRec.ProxID;
+      SELF.ProxScore := inRec.ProxScore;
+      SELF.ProxWeight := inRec.ProxWeight;
+      SELF.SELEID := inRec.SELEID;
+      SELF.SELEScore := inRec.SELEScore;
+      SELF.SELEWeight := inRec.SELEWeight;	
+      SELF.OrgID := inRec.OrgID;
+      SELF.OrgScore := inRec.OrgScore;
+      SELF.OrgWeight := inRec.OrgWeight;
+      SELF.UltID := inRec.UltID;
+      SELF.UltScore	:= inRec.UltScore;
+      SELF.UltWeight := inRec.UltWeight;
+      SELF.company_name := ''; 
+      SELF.company_name_data_permits := 0;
+      SELF.company_name_method := 0;
+      SELF.dt_first_seen := 0;
+      SELF.dt_last_seen := 0;
+      SELF.weight := 0;
+      SELF.DNBDMIRecordOnly := FALSE;
+    END; 
+
+  // get linking info through idAppendRoxie 
+  ds_BusinessCredit_IDs := 
+    PROJECT(BIPV2.IdAppendRoxie(ds_Format2AppInput, inMod.Score_Threshold, reAppend := false).IdsOnly(), 
+      xfm_ToBipSlim_Layout(LEFT));
+
 	// Mask unneeded bip ids based on fetch level 
 	ds_linkidsMasked := PROJECT(ds_BusinessCredit_IDs+ds_Format2LinkidInput,TRANSFORM(BusinessCredit_Services.Batch_layouts.BipSlim_layout,
 															 SELF.UltID := LEFT.UltID,

@@ -1,4 +1,4 @@
-﻿import riskwise, AML, VerificationOfOccupancy, iesp;
+﻿import riskwise, AML, VerificationOfOccupancy, iesp, risk_indicators;
 
 Layout_Address_Validation :=
 RECORD
@@ -820,6 +820,29 @@ RECORD
   string4 digital_insight_reason6 := '';
 END;
 
+layout_custom_FIS_attributes := RECORD
+  Unsigned5 ambiguous_property_total;
+  Unsigned2 sold_property_purchase_count;
+  Unsigned5 sold_property_purchase_total;
+  Unsigned2 sold_property_total;
+  Unsigned5 owned_assessed_total;
+  Unsigned5 owned_purchase_total;
+  Unsigned2 owned_property_total;
+  Unsigned1 addrs_last12;
+  Unsigned1 addrs_last60;
+  Unsigned1 num_nonderogs;
+  Unsigned4 add1_assessed_amount;
+  Unsigned1 add1_naprop;
+  Unsigned4 add1_purchase_amount;
+  Unsigned4 add2_assessed_amount;
+  Unsigned1 add2_naprop;
+  Unsigned4 add2_purchase_amount;
+  Unsigned4 add3_assessed_amount;
+  Unsigned1 add3_naprop;
+  Unsigned4 add3_purchase_amount;
+  Boolean truedid;
+END;
+
 export Layout_Boca_Shell :=
 RECORD
 	unsigned4 seq;
@@ -945,8 +968,12 @@ RECORD
 	Risk_Indicators.Layouts.layout_BIP_Header_info_54 BIP_Header54;	//MS-123	
 	
 	string2 phone_ver_bureau; //replacement for Experian
-  
+	
+  boolean skip_opt_out := false;  // short circuit for opt out suppression, if we know the DID is not on the list, doesn't pay to search it for all records.
+	
   risk_indicators.layouts.layout_threatmetrix_shell_internal_results ThreatMetrix;
+  
+  layout_custom_FIS_attributes FIS; //Fields needed to support FIS custom RV attributes
   
 	//these are child sets...LEAVE as last item in Boca Shell - nothing after them:)
 	Risk_Indicators.Layouts_Derog_Info.LJ_DataSets LnJ_datasets;

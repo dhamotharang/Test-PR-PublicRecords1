@@ -64,7 +64,7 @@ EXPORT reportIndProperty(DATASET(DueDiligence.Layouts.Indv_Internal) inData) := 
     vacancyCleanDate := DueDiligence.Common.CleanDatasetDateFields(checkVacancy, 'advoDateFirstSeen');
     
     // Filter out records after our history date.
-    vacancyFilt := DueDiligence.Common.FilterRecordsSingleDate(vacancyCleanDate, advoDateFirstSeen);
+    vacancyFilt := DueDiligence.CommonDate.FilterRecordsSingleDate(vacancyCleanDate, advoDateFirstSeen);
     
     //Rollup the data was we want the most recent row (if there is more than 1 row per address)
     recentUniqueVacancy := DEDUP(SORT(vacancyFilt, seq, did, prim_range, prim_name[1..8], zip5, -advoDateFirstSeen), seq, did, prim_range, prim_name[1..8], zip5);

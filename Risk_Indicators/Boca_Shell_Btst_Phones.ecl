@@ -4,7 +4,7 @@ Common Phone Link - btst_phones_in_common - btst_schools_in_common - Number of u
 Common Phones Num Land-Lines - btst_landlines_in_common - Number of unique land-line phones in intersection of BT phone history and ST phone history
 Common Phones Num Cellular - btst_cellphones_in_common - Number of unique cellular/mobile phones in intersection of BT phone history and ST phone history
 */
-import Risk_Indicators, riskwise, Gong, Phonesplus_V2, phones, doxie, Suppress;
+import Risk_Indicators, riskwise, dx_Gong, Phonesplus_V2, phones, doxie, Suppress;
 
 export Boca_Shell_Btst_Phones(grouped dataset(Risk_Indicators.layout_ciid_btst_Output) input,
 	unsigned1 dppa, unsigned1 glb, string50 DataRestriction = risk_indicators.iid_constants.default_DataRestriction,
@@ -12,24 +12,25 @@ export Boca_Shell_Btst_Phones(grouped dataset(Risk_Indicators.layout_ciid_btst_O
 
 	CellPhone := 'CELL';
 	LandPhone := 'LAND';
-	
+
 	tmpPhones := record
 		unsigned4 seq;
 		unsigned6 did;
 		string10 phone;
 		string4 phone_type;
-		integer btst_phones_in_common       := 0;             
-		integer btst_landlines_in_common    := 0;             
-		integer btst_cellphones_in_common   := 0; 
+		integer btst_phones_in_common       := 0;
+		integer btst_landlines_in_common    := 0;
+		integer btst_cellphones_in_common   := 0;
 	end;
-  
+
     tmpPhones_CCPA := RECORD
     unsigned4 global_sid; //CCPA Changes
     tmpPhones;
     END;
-    
+
+key_history_did := dx_Gong.key_history_did();
 getBtStLandLines(btStField, LandLineCount) := FUNCTIONMACRO
-	tmpPhones_CCPA searchLandLines(Risk_Indicators.layout_ciid_btst_Output le, Gong.Key_History_did r, integer c):= TRANSFORM
+	tmpPhones_CCPA searchLandLines(Risk_Indicators.layout_ciid_btst_Output le, key_history_did r, integer c):= TRANSFORM
         self.global_sid := r.global_sid;
 		self.did := r.did;
 		self.seq := if(c = 1, le.bill_to_output.seq, le.ship_to_output.seq);
@@ -37,19 +38,19 @@ getBtStLandLines(btStField, LandLineCount) := FUNCTIONMACRO
 		self.phone_type := LandPhone;
 		self := [];
 	END;
-  
+
 	//historical phones
-	hist_unsuppressed := JOIN(Input, Gong.Key_History_did, 
-			left.#EXPAND(btStField).did <> 0 and KEYED(LEFT.#EXPAND(btStField).did = RIGHT.L_DID) AND 
-			(INTEGER)RIGHT.phone10 <> 0 and 
-			((unsigned)RIGHT.dt_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.#EXPAND(btStField).historydate)), 
-			searchLandLines(LEFT, RIGHT, LandLineCount), KEEP(RiskWise.max_atmost), 
+	hist_unsuppressed := JOIN(Input, key_history_did,
+			left.#EXPAND(btStField).did <> 0 and KEYED(LEFT.#EXPAND(btStField).did = RIGHT.L_DID) AND
+			(INTEGER)RIGHT.phone10 <> 0 and
+			((unsigned)RIGHT.dt_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.#EXPAND(btStField).historydate)),
+			searchLandLines(LEFT, RIGHT, LandLineCount), KEEP(RiskWise.max_atmost),
 			ATMOST(2 * RiskWise.max_atmost));
-                      
+
      hist := Suppress.Suppress_ReturnOldLayout(hist_unsuppressed, mod_access, tmpPhones);
-     
+
      RETURN hist;
-     
+
 ENDMACRO;
 
     bt_hist := getBtStLandLines('bill_to_output', 1);
@@ -65,11 +66,11 @@ getBtStCells(btStField, CellCount) := FUNCTIONMACRO
 		self := [];
 	END;
 	//bt cell phones
-	cell_unsuppressed := JOIN(Input, Phonesplus_V2.Key_PhonesPlus_DID, 
-		left.#EXPAND(btStField).did <> 0 AND KEYED(LEFT.#EXPAND(btStField).did = RIGHT.L_DID) AND 
-		Phones.Functions.IsPhoneRestricted(RIGHT.origstate, 
-																			 glb, 
-																			 dppa, 
+	cell_unsuppressed := JOIN(Input, Phonesplus_V2.Key_PhonesPlus_DID,
+		left.#EXPAND(btStField).did <> 0 AND KEYED(LEFT.#EXPAND(btStField).did = RIGHT.L_DID) AND
+		Phones.Functions.IsPhoneRestricted(RIGHT.origstate,
+																			 glb,
+																			 dppa,
 																			 '',//IndustryClass
 																			 , //checkRNA
 																			 RIGHT.datefirstseen,
@@ -80,35 +81,35 @@ getBtStCells(btStField, CellCount) := FUNCTIONMACRO
 																			) = FALSE AND
 		(INTEGER)RIGHT.cellphone <> 0 and
 			RIGHT.datefirstseen < (unsigned)risk_indicators.iid_constants.myGetDate(left.#EXPAND(btStField).historydate),
-		searchCells(LEFT, RIGHT, CellCount), 
+		searchCells(LEFT, RIGHT, CellCount),
 		KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost));
-    
+
       cell := Suppress.Suppress_ReturnOldLayout(cell_unsuppressed, mod_access, tmpPhones);
-    
+
      RETURN cell;
-     
+
 ENDMACRO;
     bt_cell := getBtStCells('bill_to_output', 1);
     st_cell := getBtStCells('ship_to_output', 2);
-                                                  
+
 	bt_phones := DEDUP(SORT(bt_hist + bt_cell, SEQ, phone), SEQ, phone);
-	st_phones := DEDUP(SORT(st_hist + st_cell, SEQ, phone), SEQ, phone);	
+	st_phones := DEDUP(SORT(st_hist + st_cell, SEQ, phone), SEQ, phone);
 
 	tmpPhones phonesCombo(tmpPhones l, tmpPhones r ) := TRANSFORM
 		self.seq := l.seq;
 		CntAsPhone := l.phone <>'' and r.phone <>'' and l.phone = r.phone and l.phone_type = r.phone_type;
-		self.btst_phones_in_common := if(CntAsPhone, 1, 0);            
-		self.btst_landlines_in_common := if(CntAsPhone and l.phone_type = LandPhone, 1, 0);              
-		self.btst_cellphones_in_common := if(CntAsPhone and l.phone_type = CellPhone, 1, 0);  	
+		self.btst_phones_in_common := if(CntAsPhone, 1, 0);
+		self.btst_landlines_in_common := if(CntAsPhone and l.phone_type = LandPhone, 1, 0);
+		self.btst_cellphones_in_common := if(CntAsPhone and l.phone_type = CellPhone, 1, 0);
 		self := [];
 	END;
 
 	btst_Combophones := JOIN(bt_phones, st_phones,
 		left.seq = right.seq - 1 and left.phone <>'' and left.phone = right.phone,
-		phonesCombo(left, right), KEEP(RiskWise.max_atmost), 
+		phonesCombo(left, right), KEEP(RiskWise.max_atmost),
 			ATMOST(RiskWise.max_atmost),
 		left outer);
-	
+
 	btst_Combophones_grpd := group(sort(btst_Combophones, seq, -btst_phones_in_common,
 			-btst_landlines_in_common, -btst_cellphones_in_common), seq);
 
@@ -130,7 +131,7 @@ ENDMACRO;
 		// output(btst_Combophones, named('btst_Combophones'));
 		// output(btst_Combophones_grpd, named('btst_Combophones_grpd'));
 		// output(btst_phones_rolled, named('btst_phones_rolled'));
-		
+
 	return btst_phones_rolled;
-	
+
 end;

@@ -100,6 +100,7 @@ EXPORT Business_Report_Service() := MACRO
 		#CONSTANT('isCRS',true);
 
 		doxie.MAC_Header_Field_Declare()
+  mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 
 		// Have to add these here instead of just calling doxie_cbrs.mac_Selection_Declare()
 		// because of a nasty dependency: 
@@ -112,7 +113,7 @@ EXPORT Business_Report_Service() := MACRO
 		_Include_DunBradstreetRecords_val := _Include_Them_All or _Include_DunBradstreetRecords or _Always_Compute;
 		_Include_Properties_val := _Include_Them_All or _Include_Properties or _Always_Compute;
 
-		base_records_prs :=doxie_cbrs.all_base_records_prs(doxie_cbrs.getBizReportBDIDs().bdids, ssn_mask_val);
+		base_records_prs :=doxie_cbrs.all_base_records_prs(doxie_cbrs.getBizReportBDIDs().bdids, ssn_mask_val, mod_access);
 
 		doxie_crs.layout_property_ln property_child(doxie_cbrs.layout_property_records l):= TRANSFORM
 		self := l;

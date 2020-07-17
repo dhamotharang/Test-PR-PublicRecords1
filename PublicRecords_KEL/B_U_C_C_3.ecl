@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.1.0
-IMPORT KEL11 AS KEL;
-IMPORT B_U_C_C_4,B_U_C_C_6,CFG_Compile,E_U_C_C,FN_Compile FROM PublicRecords_KEL;
-IMPORT * FROM KEL11.Null;
+﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
+IMPORT KEL12 AS KEL;
+IMPORT B_U_C_C_10,B_U_C_C_11,B_U_C_C_4,CFG_Compile,E_U_C_C FROM PublicRecords_KEL;
+IMPORT * FROM KEL12.Null;
 EXPORT B_U_C_C_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED VIRTUAL TYPEOF(B_U_C_C_4(__in,__cfg).__ENH_U_C_C_4) __ENH_U_C_C_4 := B_U_C_C_4(__in,__cfg).__ENH_U_C_C_4;
-  SHARED __EE460224 := __ENH_U_C_C_4;
-  EXPORT __ST104213_Layout := RECORD
+  SHARED VIRTUAL TYPEOF(B_U_C_C_4().__ENH_U_C_C_4) __ENH_U_C_C_4 := B_U_C_C_4(__in,__cfg).__ENH_U_C_C_4;
+  SHARED __EE1168124 := __ENH_U_C_C_4;
+  EXPORT __ST148257_Layout := RECORD
     KEL.typ.nstr R_M_S_I_D_;
     KEL.typ.nstr Filing_Jurisdiction_;
     KEL.typ.nstr Filing_Number_;
@@ -23,42 +23,41 @@ EXPORT B_U_C_C_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     KEL.typ.nstr Statements_Filed_;
     KEL.typ.nstr Foreign_Flag_;
     KEL.typ.nkdate Process_Date_;
+    KEL.typ.nint Age_In_Days_;
+    KEL.typ.str Filing_Type_Filtered_ := '';
+    KEL.typ.str Inferred_Status_ := '';
     KEL.typ.bool Initial_Filing_ := FALSE;
-    KEL.typ.nkdate Recent_Filing_Date_;
+    KEL.typ.nkdate Max_Filing_Date_;
+    KEL.typ.str Status_Type_Filtered_ := '';
+    KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST104209_Layout := RECORD
+  EXPORT __ST148253_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.ndataset(__ST104213_Layout) Sub_Filing_;
+    KEL.typ.ndataset(__ST148257_Layout) Sub_Filing_;
     KEL.typ.ndataset(E_U_C_C(__in,__cfg).Collateral_Layout) Collateral_;
     KEL.typ.ndataset(E_U_C_C(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.nint Age_In_Days_;
-    KEL.typ.nkdate Current_Date_;
-    KEL.typ.int Filing_Status_ := 0;
-    KEL.typ.int Filing_Type_ := 0;
-    KEL.typ.nkdate Most_Recent_Filing_Date_;
-    KEL.typ.nstr Most_Recent_Filing_Type_;
-    KEL.typ.nstr Most_Recent_Non_Blank_Filing_Type_;
-    B_U_C_C_6(__in,__cfg).__NS138302_Layout Most_Recent_Non_Blank_Sub_Filing_;
-    KEL.typ.nstr Most_Recent_Status_Type_;
-    B_U_C_C_6(__in,__cfg).__NS138339_Layout Most_Recent_Sub_Filing_;
+    KEL.typ.nbool Active_Status_;
+    KEL.typ.nstr Best_Inferred_Status_;
+    KEL.typ.ndataset(B_U_C_C_10(__in,__cfg).__ST77536_Layout) Best_U_C_C_Child_Record_;
+    KEL.typ.nbool Terminated_Filing_;
+    KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST104209_Layout __ND460614__Project(B_U_C_C_4(__in,__cfg).__ST109144_Layout __PP459874) := TRANSFORM
-    __EE459997 := __PP459874.Sub_Filing_;
-    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE459997),__ST104213_Layout),__NL(__EE459997));
-    __CC30712 := 2191;
-    SELF.Filing_Status_ := MAP(__PP459874.Filing_Type_ = 1=>3,__T(__AND(__OP2(__PP459874.Most_Recent_Status_Type_,=,__CN('ACTIVE')),__OP2(__PP459874.Age_In_Days_,>,__CN(__CC30712))))=>8,__T(__OP2(__PP459874.Most_Recent_Status_Type_,<>,__CN('')))=>FN_Compile(__cfg).FN__map_Status_Type(__ECAST(KEL.typ.nstr,__PP459874.Most_Recent_Status_Type_)),FN_Compile(__cfg).FN__map_Inferred_Status(__ECAST(KEL.typ.nint,__CN(__PP459874.Filing_Type_))));
-    SELF := __PP459874;
+  SHARED __ST148253_Layout __ND1168431__Project(B_U_C_C_4(__in,__cfg).__ST156826_Layout __PP1167855) := TRANSFORM
+    __EE1167928 := __PP1167855.Sub_Filing_;
+    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE1167928),__ST148257_Layout),__NL(__EE1167928));
+    SELF.Active_Status_ := __OP2(__PP1167855.Best_Inferred_Status_,=,__CN('1'));
+    SELF := __PP1167855;
   END;
-  EXPORT __ENH_U_C_C_3 := PROJECT(__EE460224,__ND460614__Project(LEFT));
+  EXPORT __ENH_U_C_C_3 := PROJECT(__EE1168124,__ND1168431__Project(LEFT));
 END;

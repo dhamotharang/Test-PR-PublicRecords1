@@ -30,4 +30,8 @@
     EXPORT GLOBAL_SID := 28471; // hard-coded here, but coming from Orbit.
   END;
 
+  EXPORT Avm := MODULE
+    EXPORT GLOBAL_SID := 28511 ; // hard-coded here, but coming from Orbit.
+  END;
+
 END;

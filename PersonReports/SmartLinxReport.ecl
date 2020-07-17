@@ -1,6 +1,6 @@
-﻿// Simplified version of compreport, no distributed call to central records, no hash, no versioning of single sources, non-FCRA
+// Simplified version of compreport, no distributed call to central records, no hash, no versioning of single sources, non-FCRA
 IMPORT $, Foreclosure_Services, PersonReports, doxie, doxie_crs, ATF_Services, iesp,
-      AutoStandardI, ut, American_Student_Services, dx_header,
+      AutoStandardI, ut, American_Student_Services, dx_header, EmailV2_Services,
       SmartRollup, FCRA, LN_PropertyV2_Services, Royalty, STD;
 
 iespOut := iesp.smartlinxreport;
@@ -226,7 +226,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
   // OTHER PROPERTY SECTION
   emails      := IF (mod_smartlinx.include_email and mod_smartlinx.email_version=1,  PersonReports.email_records(dids, PROJECT (mod_smartlinx, $.IParam.emails), IsFCRA), dataset([],iesp.emailsearch.t_EmailSearchRecord));
   s_emails    := SmartRollup.fn_smart_rollup_email(emails);  //count children since rows are per source
-  emailsV2    := if (mod_smartlinx.include_email and mod_smartlinx.email_version=2,  PersonReports.emailV2_records(dids, PROJECT (mod_smartlinx, $.IParam.emails)));
+  emailsV2    := if (mod_smartlinx.include_email and mod_smartlinx.email_version=2,  PersonReports.emailV2_records(dids, PROJECT (mod_smartlinx, $.IParam.emails), EmailV2_Services.Constants.Premium));
   s_emails_count := if (mod_smartlinx.email_version=1, count(s_emails), count(emailsV2.EmailV2Records));
 
   p_emails      := choosen (s_emails, iesp.Constants.SMART.MaxEmails);

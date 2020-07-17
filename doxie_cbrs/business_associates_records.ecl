@@ -1,4 +1,4 @@
-import doxie_cbrs, business_header;
+import doxie_cbrs, business_header, MDR, Doxie;
 
 doxie_cbrs.mac_Selection_Declare()
 
@@ -80,7 +80,8 @@ typeof(dedup_rel_gid) SelectBest(dedup_rel_gid l, bhkb r) := TRANSFORM
 END;
 
 relatives_best_ps := JOIN(dedup_rel_gid, bhkb,
-                       keyed(LEFT.bdid = RIGHT.bdid),
+                       keyed(LEFT.bdid = RIGHT.bdid) AND 
+                       (right.source <> MDR.sourceTools.src_Dunn_Bradstreet OR Doxie.DataPermission.use_DNB),
                        SelectBest(LEFT, RIGHT),
                        keep(1), limit(0));
 

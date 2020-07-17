@@ -311,4 +311,5 @@ END;
 	
 	EXPORT checkFraudPoint3RC34 (UNSIGNED score, DATASET(Risk_Indicators.Layout_Desc) RI, UNSIGNED num_reasons) := IF(score < 925 AND RI[1].hri in ['00', ''], RC34_set (num_reasons), RI);
 
+    EXPORT HistoryDateCurrent := 999999;
 END;

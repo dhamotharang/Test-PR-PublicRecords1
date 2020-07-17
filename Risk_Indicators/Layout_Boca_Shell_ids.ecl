@@ -1,7 +1,4 @@
-/*2013-05-28T13:34:48Z (Michele Walklin_prod)
-code review AML
-*/
-export Layout_Boca_Shell_ids := 
+﻿export Layout_Boca_Shell_ids := 
 RECORD
 			unsigned4 seq;
 			unsigned3 historydate;
@@ -10,6 +7,6 @@ RECORD
 			STRING20 fname;
 			STRING20 lname;
 			STRING20 relation;
-			Layout_Overrides;
-
+			$.Layout_Overrides;
+			boolean skip_opt_out := false;
 END;

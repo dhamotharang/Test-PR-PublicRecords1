@@ -1,12 +1,12 @@
-import property,lib_keylib,lib_fileservices,ut,Business_Header,Header;
+import Header;
 
 export	alloy_as_header(dataset(AlloyMedia_student_list.layouts.Layout_base) pAlloy = dataset([],AlloyMedia_student_list.layouts.Layout_base), boolean pForHeaderBuild=false)
  :=
   function
 	dAlloyAsSource	:=	AlloyMedia_student_list.alloy_as_source(pAlloy,pForHeaderBuild);
 
-	Header.Layout_New_Records Translate_Alloy_to_Header(dAlloyAsSource l) := transform	
-		//don't even populate vendor dates because they can eventually get used in watchdog.bestaddress
+	Header.Layout_New_Records Translate_Alloy_to_Header(dAlloyAsSource l) := transform
+		//don't even populate vendor dates because they can eventually get used in watchdog/bestaddress
 		self.did                      :=	0;
 		self.rid                      :=	0;
 		self.src											:=	'AL';	//Is this ok as an identifier?
@@ -15,11 +15,11 @@ export	alloy_as_header(dataset(AlloyMedia_student_list.layouts.Layout_base) pAll
 		self.dt_vendor_first_reported :=	0;
 		self.dt_vendor_last_reported  :=	0;
 		self.dt_nonglb_last_seen      :=	0;
-		
+
 		self.rec_type                 :=	''; //What is this?
-		
+
 		self.vendor_id                :=	(qstring18)HASH32(L.sequence_number + L.key_code); //Will this length fit?
-		
+
 		self.phone                    :=	L.clean_phone_number;
 
 		self.title										:=	L.clean_title;
@@ -27,7 +27,7 @@ export	alloy_as_header(dataset(AlloyMedia_student_list.layouts.Layout_base) pAll
 		self.mname										:=	L.clean_mname;
 		self.lname										:=	L.clean_lname;
 		self.name_suffix							:=	L.clean_name_suffix;
-		
+
 		self.prim_range								:=	L.clean_prim_range;
 		self.predir										:=	L.clean_predir;
 		self.prim_name								:=	L.clean_prim_name;

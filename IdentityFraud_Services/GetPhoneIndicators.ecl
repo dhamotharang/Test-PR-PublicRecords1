@@ -1,4 +1,4 @@
-IMPORT $, doxie, iesp, Risk_Indicators, moxie_phonesplus_server;
+﻿IMPORT $, doxie, iesp, Risk_Indicators, moxie_phonesplus_server;
 
 ifr := iesp.identityfraudreport;
 
@@ -145,7 +145,7 @@ EXPORT GetPhoneIndicators (
   phones_hri_pre := phones_gong_hri + if (param.include_phonesplus, phones_plus_hri);
 
   maxHriPer_value := param.max_hri;
-  doxie.mac_AddHRIPhone (phones_hri_pre, phones_hri);
+  doxie.mac_AddHRIPhone (phones_hri_pre, phones_hri, mod_access);
 
 
   // ===================================================================

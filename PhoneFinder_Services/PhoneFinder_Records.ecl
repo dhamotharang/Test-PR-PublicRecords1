@@ -178,7 +178,7 @@ MODULE
   // EXPORT dFormat2IESP := dataset([], iesp.phonefinder.t_PhoneFinderSearchRecord);
 
   //Deltabase Logging Dataset
-  EXPORT	ReportingDataset := 	PhoneFinder_Services.Get_Reporting_Records(dFormat2IESP, tmpMod, InputEcho);
+  EXPORT	ReportingDataset := 	PhoneFinder_Services.Get_Reporting_Records(dFormat2IESP, tmpMod, InputEcho, dFinalResults);
 
   // Royalties
   // filtering out inhouse phonmetadata records

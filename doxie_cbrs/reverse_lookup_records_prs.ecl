@@ -1,7 +1,7 @@
-import ut;
+﻿import doxie_cbrs, ut;
 doxie_cbrs.mac_Selection_Declare()
 export reverse_lookup_records_prs(dataset(doxie_cbrs.layout_references) bdids) := function
-rlr := doxie_cbrs.reverse_lookup_records(bdids);
+rlr := doxie_cbrs.reverse_lookup_records(bdids,Include_ReversePhone_val);
 
 baserec := record
 	string10          phone10; 

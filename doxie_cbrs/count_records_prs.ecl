@@ -1,4 +1,4 @@
-﻿import doxie, business_header, doxie_cbrs_raw, LN_PropertyV2_Services;
+﻿import business_header, doxie, doxie_cbrs, doxie_cbrs_raw, LN_PropertyV2_Services;
 doxie_cbrs.mac_Selection_Declare()
 
 unsigned3 get_Count(boolean included, unsigned3 max_val, unsigned3 count_shown, unsigned3 count_simple) :=
@@ -6,7 +6,8 @@ unsigned3 get_Count(boolean included, unsigned3 max_val, unsigned3 count_shown, 
 		 count_simple,
 		 count_shown);
 
-export count_records_prs(dataset(doxie_cbrs.layout_references) bdids, unsigned1 ofac_version = 1, boolean include_ofac = false, real global_watchlist_threshold = 0.8) := dataset([{
+export count_records_prs(dataset(doxie_cbrs.layout_references) bdids, unsigned1 ofac_version = 1, boolean include_ofac = false, real global_watchlist_threshold = 0.8,
+                         doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := dataset([{
 	get_Count(
 		Include_CorporationFilings_val,
 		Max_CorporationFilings_val,
@@ -50,7 +51,7 @@ export count_records_prs(dataset(doxie_cbrs.layout_references) bdids, unsigned1 
 		max_AssociatedBusinesses_val,
 		count(doxie_cbrs.Associated_Business_byContact_records_max(bdids)),
 		doxie_cbrs_raw.Associated_Business_byContact(bdids).record_count(true)),
-	(unsigned3)count(doxie_cbrs.DNB_records(bdids)),
+	(unsigned3)count(doxie_cbrs.DNB_records(bdids, mod_access)),
 	get_Count(
 		Include_InternetDomains_val,
 		max_InternetDomains_val,
@@ -74,7 +75,7 @@ export count_records_prs(dataset(doxie_cbrs.layout_references) bdids, unsigned1 
 		Return_ReversePhone_val, //a little different since no direct key count
 		Max_ReverseLookup_val,
 		sum(doxie_cbrs.reverse_lookup_records_prs_max(bdids), count(listed_name_children)),
-		count(doxie_cbrs.reverse_lookup_records(bdids))),
+		count(doxie_cbrs.reverse_lookup_records(bdids,Include_ReversePhone_val))),
 	get_Count(
 		Include_NameVariations_val,
 		Max_NameVariations_val,

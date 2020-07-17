@@ -127,6 +127,9 @@ EXPORT SearchService := MACRO
 
 	 	#constant('StrictMatch', false);
 
+
+		//to do : Can move a lot of code from here to Iparams.
+
     //get XML input 
 		initial_default_ESP_URL := '';
 		initial_default_ESP_NAME := 'DeltaBaseSql';
@@ -170,6 +173,8 @@ EXPORT SearchService := MACRO
 		#stored('Vin', TRIM(STD.Str.ToUpperCase (search_by.Vin),left,right));
 		#stored('LicensePlate', TRIM(STD.Str.ToUpperCase (search_by.LicensePlate),left,right));
 		#stored ('GroupRecords', Search_opt.GroupRecords);
+		#stored ('CustomerType', Search_opt.CustomerType);
+		#stored ('BlockNumber', TRIM(STD.Str.ToUpperCase (search_by.AccidentLocation.BlockNumber),left,right));
 		
 		#stored ('SortOrder', Search_opt.SortOrder);
 		#stored ('SortField', Search_opt.SortField);
@@ -188,10 +193,13 @@ EXPORT SearchService := MACRO
 		
 		dol_end_date_calc:=search_by.EndDate.Year*10000 + search_by.EndDate.Month*100 + search_by.EndDate.Day;
 		dol_end_date := if(dol_end_date_calc=0,'',(string)dol_end_date_calc);
+
+		DateOfBirth := iesp.ECL2ESP.t_DateToString8(search_By.DOB);
 		
 		#stored('DateOfLoss', dol_date);
 		#stored('DolStartdate', dol_start_date);
 		#stored('DolEnddate', dol_end_date);
+		#stored('DateOfBirth', DateOfBirth);
 		
 
 
@@ -244,25 +252,23 @@ EXPORT SearchService := MACRO
 				export string   driversLicenseNumber  :=  '' : stored('DriversLicense');
 				export string   VehicleVin  :=  '' : stored('Vin');
 				export string   LicensePlate  :=  '' : stored('LicensePlate');
-			  export string200 KY_SearchEspURL := gateways_in(STD.Str.ToUpperCase (TRIM(servicename,ALL)) = 'GATEWAY_ESP')[1].url;
+			  export string200 GatewayEspURL := gateways_in(STD.Str.ToUpperCase (TRIM(servicename,ALL)) = 'GATEWAY_ESP')[1].url;
 			  export string KY_SearchEspNAME 	:= 'KYCrashSearch';
+			  export string HPD_SearchEspNAME 	:= 'HPDReportSearch';
+				export string	BlockNumber			:= '' : stored('BlockNumber');
+				export string	CustomerType			:= '' : stored('CustomerType');
+				export string	DateOfBirth			:= '' : stored('DateOfBirth');
     END;
 
-		/* The function should return:
- 	  1. The list of alias agencies that needs to be processed through hpcc & deltabase
-	  2. The KY response in the format of REcords results */
-		/*
-		KY_recs := eCrash_Services.Records_KY(tempmod);		
-	  KY_results := KY_recs.getKYrecords();		
-	 */
+	
 		Recs_in := eCrash_Services.Records(tempmod );		
 		
-		KY_results := Recs_in.getKYrecords();		
-		
+		GW_results := Recs_in.getGatewayrecords();		
+
 		
 		recs := if (tempmod.SubscriptionReports = true, Recs_in.getSubscriptionRecords()
-																									, Recs_in.getSearchRecords(KY_results.alias_agencies
-																																					,  KY_results.ky_response_final));	
+																									, Recs_in.getSearchRecords(GW_results.alias_agencies
+																																					,  GW_results.response_final));	
 		
 		//look to pass Max limit in Macro. 
 		//could be this maxRetCnt:=MaxLimit		

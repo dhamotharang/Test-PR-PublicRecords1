@@ -1,4 +1,4 @@
-﻿IMPORT Address, DidVille, FraudGovPlatform_Services, FraudShared, FraudShared_Services, IDLExternalLinking, iesp, std;
+﻿IMPORT Address, Autokey_batch, BatchServices,  DidVille, FraudGovPlatform_Services, FraudShared, FraudShared_Services, IDLExternalLinking, iesp, std;
 
 EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_in,
                      FraudGovPlatform_Services.IParam.BatchParams batch_params,
@@ -30,36 +30,23 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// **************************************************************************************	  
 
 	//prepare the layout for ADL_BEST DID call
-	SHARED ds_in_didville_layout := PROJECT(ds_in, TRANSFORM(DidVille.Layout_Did_OutBatch,
-                                                  SELF.seq		:= (UNSIGNED)LEFT.acctno;
-                                                  SELF.fname	:= LEFT.name_first;
-                                                  SELF.mname	:= LEFT.name_middle;
-                                                  SELF.lname	:= LEFT.name_last;
-                                                  SELF.suffix	:= LEFT.name_suffix;
-                                                  SELF.ssn 		:= stringlib.stringfilter(LEFT.ssn,'0123456789');
-                                                  SELF.did 		:= 0; //Purposefully sending DID = 0, so we can resolve the adl best did for Input PII. 
-                                                  SELF.phone10:= LEFT.phoneno;
-                                                  SELF				:= LEFT;
-                                                  SELF				:= []));
+	SHARED get_input_in := PROJECT(ds_in, TRANSFORM(Autokey_batch.Layouts.rec_inBatchMaster, 
+																					SELF.did := 0; //Purposefully sending DID = 0, so we can resolve the adl best did for Input PII.
+																					SELF.homephone := LEFT.phoneno,
+																					SELF := LEFT,
+																					SELF := []));
+
+	EXPORT ds_in_w_adl_did_appended := BatchServices.Functions.fn_find_dids_and_append_to_acctno(get_input_in);																										
 	
-	EXPORT ds_in_w_adl_did_appended := DidVille.did_service_common_function( ds_in_didville_layout,
-                                                                           glb_flag := batch_params.isValidGLB(),
-                                                                           glb_purpose_value := batch_params.glb,
-                                                                           appType := batch_params.application_type,
-                                                                           include_minors := TRUE,
-                                                                           IndustryClass_val := batch_params.industry_class,
-                                                                           DRM_val := batch_params.DataRestrictionMask);
-																																			 
-	SHARED ds_in_w_adl_did_appended_ungrup := UNGROUP(ds_in_w_adl_did_appended);
-	
-	EXPORT ds_adl := JOIN(ds_in, ds_in_w_adl_did_appended_ungrup,
-												LEFT.acctno = (string)RIGHT.seq,
+	EXPORT ds_adl := JOIN(ds_in, ds_in_w_adl_did_appended,
+												LEFT.acctno = RIGHT.acctno,
 												TRANSFORM(DidVille.Layout_Did_OutBatch,
-													SELF.Seq := COUNTER,
+													SELF.Seq := (UNSIGNED)LEFT.acctno,
 													SELF.did := MAP(DidFoundInPR OR IsInputDidRINID => LEFT.DID,
 																					~DidFoundInPR => RIGHT.DID,
 																					0); 													
-													SELF	:= []));
+													SELF	:= []),
+													LEFT OUTER);
 													
 	BOOLEAN lexid_resolved := EXISTS(ds_adl(did>0));
 	

@@ -272,6 +272,7 @@ MODULE
     EXPORT STRING Zumigo := 'MNO';
     EXPORT STRING UNDEFINED := 'UNDEFINED';
     EXPORT STRING PeopleAtWork := 'WK';
+    EXPORT STRING Spouse := 'SP';
   END;
 
   EXPORT CategoryCodes := DATASET([
@@ -317,6 +318,7 @@ MODULE
         {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_EMerge_Hunt, PFSourceType.Account},//E1
         {PFSourceCategory.Other, PFSourceCodes.UNDEFINED, PFSourceType.Account},
         {PFSourceCategory.Other, MDR.sourceTools.src_Miscellaneous, PFSourceType.Account},//PQ
+        {PFSourceCategory.EmploymentData, PFSourceCodes.Spouse, PFSourceType.Account},//SP
         {PFSourceCategory.EmploymentData, MDR.sourceTools.src_Professional_License, PFSourceType.Account},//PL
         {PFSourceCategory.PropertyRecord, MDR.sourceTools.src_LnPropV2_Lexis_Deeds_Mtgs, PFSourceType.Account},//LP
         {PFSourceCategory.PropertyRecord, MDR.sourceTools.src_LnPropV2_Lexis_Asrs, PFSourceType.Account},//LA

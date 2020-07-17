@@ -29,6 +29,16 @@ EXPORT FnRoxie_GetInputBIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Lay
 															SELF.B_InpValEmailUserAllZeroFlag     := (STRING)LEFT.B_InpValEmailUserAllZeroFlag,
 															SELF.B_InpValEmailDomBadCharFlag      := (STRING)LEFT.B_InpValEmailDomBadCharFlag,
 															SELF.B_InpValEmailDomAllZeroFlag      := (STRING)LEFT.B_InpValEmailDomAllZeroFlag,
+															SELF.B_InpValNameBadCharFlag        := (STRING)LEFT.B_InpValNameBadCharFlag,
+															SELF.B_InpValAltNameBadCharFlag        := (STRING)LEFT.B_InpValAltNameBadCharFlag,
+															SELF.B_InpValNameMatchesAltNameFlag        := (STRING)LEFT.B_InpValNameMatchesAltNameFlag,
+															// SELF.B_InpClnAddrLocID := (INTEGER)LEFT.B_InpClnAddrLocID, 
+															// SELF.B_Rep1InpClnAddrLocID := (INTEGER)LEFT.B_Rep1InpClnAddrLocID, 
+															// SELF.B_Rep2InpClnAddrLocID := (INTEGER)LEFT.B_Rep2InpClnAddrLocID, 
+															// SELF.B_Rep3InpClnAddrLocID := (INTEGER)LEFT.B_Rep3InpClnAddrLocID, 
+															// SELF.B_Rep4InpClnAddrLocID := (INTEGER)LEFT.B_Rep4InpClnAddrLocID, 
+															// SELF.B_Rep5InpClnAddrLocID := (INTEGER)LEFT.B_Rep5InpClnAddrLocID, 															
+															
 															SELF := LEFT,
 			                        SELF := []));
 

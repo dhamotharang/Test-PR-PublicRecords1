@@ -9,10 +9,8 @@ req_date := (integer) ut.GetDate;
 
 curr_date := req_date + '_1';
 prev_date := scoring_project_ks.get_past_date(req_date, 1) + '_1';
-//prev_date := '20191029_1';
 
-//previous = base
-//current  = test
+
 
 results_rec :=RECORD
   string9 get_score_bin;
@@ -165,14 +163,14 @@ score_data2 := dataset('~scoringqa::bins::socio_ks::' + curr_date + '_data', dat
    		end;
       											 
        	test:=  table(score_data1_project,test_rec,product,version,process1,customer,model1);
-   output(test,NAMED('Line_129'));   	
+   // output(test,NAMED('Line_129'));   	
   
  
    score_data2_project_1:=scores_project(score_data2,data_rec);
    
    score_data2_project:=score_data2_project_1( score<>'' );
-   output(score_data2_project_1,NAMED('Line_132'));
-   output(score_data2_project,NAMED('Line_134'));
+   // output(score_data2_project_1,NAMED('Line_132'));
+   // output(score_data2_project,NAMED('Line_134'));
    score_name_1_layout:= record
    					
      string30 acctno; 
@@ -217,12 +215,12 @@ score_data2 := dataset('~scoringqa::bins::socio_ks::' + curr_date + '_data', dat
       	score_name_layout_ds:= table(score_name_1_layout_ds,score_name_layout,product,version,process1,customer,model1);
    		
    		
-   		 output(score_name_layout_ds,named('Line_194'));
+   		 // output(score_name_layout_ds,named('Line_194'));
 			 
       	
      // score_name_1_layout_ds;
    
-   output(score_data1_project,NAMED('line_226'));
+   // output(score_data1_project,NAMED('line_226'));
    
    score_result1_project:=scores_project(result1,results_rec);
    
@@ -235,8 +233,8 @@ score_data2 := dataset('~scoringqa::bins::socio_ks::' + curr_date + '_data', dat
    
    score_result2_project:=scores_project(result2,results_rec);
 	 
-	 output(score_result1_project,named('line_209'));   
-	 output(score_result2_project,named('line_210'));
+	 // output(score_result1_project,named('line_209'));   
+	 // output(score_result2_project,named('line_210'));
 
    defalut_ds_2_rv:=score_result2_project(product='RiskView'  and get_score_bin in ['100','101','102','103','104','200','210','222']);
    
@@ -273,15 +271,15 @@ score_data2 := dataset('~scoringqa::bins::socio_ks::' + curr_date + '_data', dat
    		score_data1_project_SOCIO := score_data1_project(product='socioeconomic_v5_batch');/* and (decimal10_3)score  >= 0);*/
    		score_data2_project_SOCIO := score_data2_project(product='socioeconomic_v5_batch');/* and (decimal10_3)score  >= 0);*/   
  
-output(score_data1_project_SOCIO,named('line244'));
-output(score_data2_project_SOCIO,named('line245')); 
+// output(score_data1_project_SOCIO,named('line244'));
+// output(score_data2_project_SOCIO,named('line245')); 
  
  
    		dataset_prev:= score_data1_project_SOCIO; 		
    		dataset_curr:= score_data2_project_SOCIO;
    
-output(dataset_prev,named('line_247'));
-output(dataset_curr,named('line_248'));
+// output(dataset_prev,named('line_247'));
+// output(dataset_curr,named('line_248'));
 
 	 
 	 
@@ -377,9 +375,9 @@ output(dataset_curr,named('line_248'));
    											 
     	count_from_default_rec_ds:=  table(from_Default_layout_ds,count_from_default_rec,product,version,process1,customer,model1);																					 
    																								 
-   output(To_Default_layout_ds,named('line_381'));
+   // output(To_Default_layout_ds,named('line_381'));
    
-   output(From_Default_layout_ds,named('line_383'));
+   // output(From_Default_layout_ds,named('line_383'));
 		
    avg_layout_prev:= record
    	  dataset_prev.product;
@@ -416,8 +414,8 @@ output(dataset_curr,named('line_248'));
    		avg_dataset_prev:=  table(dataset_prev,avg_layout_prev,product,version,process1,customer,model1);
    		avg_dataset_curr:=  table(dataset_curr,avg_layout_curr,product,version,process1,customer,model1);
    		
-   		output(avg_dataset_prev,named('line_384'));
-   		output(avg_dataset_curr,named('line_385'));
+   		// output(avg_dataset_prev,named('line_384'));
+   		// output(avg_dataset_curr,named('line_385'));
   	
    dual_rec := record
    			string30 acctno; 
@@ -615,7 +613,7 @@ output(dataset_curr,named('line_248'));
    											 
     	Default_Score_Chng_layout_ds:=  table(final_rec_ds_default,Default_Score_Chng_layout,product,version,process1,customer,model1);
    	
-   	 output(Default_Score_Chng_layout_ds,NAMED('Line569'));
+   	 // output(Default_Score_Chng_layout_ds,NAMED('Line569'));
    
    
    
@@ -702,7 +700,7 @@ output(dataset_curr,named('line_248'));
    //dedup_final_1 := dedup_final_0;
    															
    																										
-   		output(dedup_final_1,named('line_654'));													
+   		// output(dedup_final_1,named('line_654'));													
    															
       final_result_left  :=
       join( result1, result2,
@@ -974,7 +972,7 @@ output(dataset_curr,named('line_248'));
    			
    			
    			
-   			  output(table_max_ks,NAMED('Line_922'));
+   			  // output(table_max_ks,NAMED('Line_922'));
    			
    				table_max_ks_out := project (table_max_ks, transform({recordof(table_max_ks) - check_ks - max_diff_proportion - max_ks   },
    																	
@@ -989,7 +987,7 @@ output(dataset_curr,named('line_248'));
    																	
    																	self := left ;));
    			
-   			output(table_max_ks_out,NAMED('Line_928'));
+   			// output(table_max_ks_out,NAMED('Line_928'));
    					
    		  // output(table_max_ks,,'~kreddy::test::table_max_ks');     
    			table_max_ks_out_layout:=RECORD
@@ -1028,7 +1026,7 @@ output(dataset_curr,named('line_248'));
     table_max_ks_out_project:=scores_project(table_max_ks_out,table_max_ks_out_layout);
     
     
-    output(table_max_ks_out_project,NAMED('Line980'));
+    // output(table_max_ks_out_project,NAMED('Line980'));
      
        		final_rec_stats_join:= record		  
         string30 acctno; 
@@ -1061,7 +1059,7 @@ output(dataset_curr,named('line_248'));
       			self:=right;
       	));
    		
-   		output(final_rec_stats_join_ds,NAMED('Line_1001'));
+   		// output(final_rec_stats_join_ds,NAMED('Line_1001'));
    		
    		
    		
@@ -1088,7 +1086,7 @@ output(dataset_curr,named('line_248'));
       
        	 final_rec_stats_join_ds_stats:=  table(final_rec_stats_join_ds,final_rec_stats_join_ds_stats_layout,product,version,process1,customer,model1);
       	
-      	 output(final_rec_stats_join_ds_stats,named('line1038'));
+      	 // output(final_rec_stats_join_ds_stats,named('line1038'));
    
     Dual_Pos_Scr_ds:=final_rec_stats_join_ds(curr_dual_valid_prev_dual_valid> 0);
     Dual_Neg_Scr_ds:=final_rec_stats_join_ds(curr_dual_valid_prev_dual_valid<0);
@@ -1189,7 +1187,7 @@ output(dataset_curr,named('line_248'));
    			self:=right;
    	));
    	
-   	output(join1,named('join_1'));
+   	// output(join1,named('join_1'));
    
    join2_layout:= record
       recordof(join1_layout);
@@ -1213,7 +1211,7 @@ output(dataset_curr,named('line_248'));
    			self:=left;
    	));
    											 
-    output(join2,named('join_2'));
+    // output(join2,named('join_2'));
    	
      	 join3_layout:= record		 
    		 	  recordof(join2_layout);			
@@ -1234,7 +1232,7 @@ output(dataset_curr,named('line_248'));
             			self.Dual_Perc_Neg_chg  := (right.Dual_Perc_Neg/left.curr_response_count)*100 ;
             			self:=left;
             	));
-          output(join3,named('join_3'));
+          // output(join3,named('join_3'));
    
          	
    				
@@ -1259,7 +1257,7 @@ output(dataset_curr,named('line_248'));
             			self:=left;
             	),left outer);
    					
-   					 output(join4,named('join_4'));
+   					 // output(join4,named('join_4'));
    					
    					
    					
@@ -1307,7 +1305,7 @@ output(dataset_curr,named('line_248'));
             			self:=left;
             	),left outer);
    					
-   				 output(join5,named('join_5'));
+   				 // output(join5,named('join_5'));
    					
     				join7_layout:= record
       		                	recordof(join6_layout);
@@ -1328,7 +1326,7 @@ output(dataset_curr,named('line_248'));
                	),left outer);
    							
    							
-   									 output(join7,named('join_7'));
+   									 // output(join7,named('join_7'));
       		
        					join8_layout:= record      		 
          		                  	recordof(join7_layout);
@@ -1347,7 +1345,7 @@ output(dataset_curr,named('line_248'));
          							self:=left;
                   	),left outer);
    								
-   											 output(join8,named('join_8'));
+   											 // output(join8,named('join_8'));
    											 
    			join10_layout:= record      		 
          		                  	recordof(join8_layout);      		               													
@@ -1370,7 +1368,7 @@ output(dataset_curr,named('line_248'));
          							self:=left;
                   	),left outer);
    
-   			 output(join10,named('join_10'));
+   			 // output(join10,named('join_10'));
    
    		join11_layout:= record      		 
          		                  	recordof(join10_layout);      		               													
@@ -1392,7 +1390,7 @@ output(dataset_curr,named('line_248'));
    						
          							self:=left;
                   	),left outer);
-   					output(join11,named('join_11'));			
+   					// output(join11,named('join_11'));			
    
    SOCIO_Monitoring_v5_infile := scoring_project_pip.Input_Sample_Names.SOCIO_Monitoring_v5_infile;
    

@@ -53,7 +53,7 @@ EXPORT reportIndBestInfo(DATASET(DueDiligence.layouts.Indv_Internal) inData,
                                                     
                                                     inputDOB := (UNSIGNED4)LEFT.indvRawInput.dob;
                                                     
-                                                    validInputDOB := DueDiligence.Common.IsValidDOB(inputDOB);
+                                                    validInputDOB := DueDiligence.CommonDate.IsValidDate(inputDOB);
                                                     validHistDate := STD.Date.IsValidDate(LEFT.historyDate);
                                                     
                                                     SELF.personalInfo.InputAge := IF(validInputDOB AND validHistDate, ut.Age(inputDOB, LEFT.historyDate), 0);
