@@ -85,7 +85,7 @@ boolean bdids_Derived :=  false : stored('bdidsDerived');
 upcr := doxie_cbrs.ultimate_parent_information(bdids)((multibdid or bdids_Derived) and (fromDCA));
 
 //Phone summary and company verification from business instant id
-biid := doxie_cbrs.getBizReportBDIDs().biid; //Business InstantId Search.
+biid := doxie_cbrs.getBizReportBDIDs(mod_access).biid; //Business InstantId Search.
 phone_summary := choosen(doxie.fn_get_phone_summary(biid),con.max_phone_summary);
 verification := choosen(doxie.fn_get_company_verification(biid),con.max_verification);
 nmvr := doxie_cbrs.name_variations_base(bdids);

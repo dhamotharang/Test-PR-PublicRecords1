@@ -4,19 +4,20 @@ EXPORT MAC_Filter_Matches
 	outfile,		 // in Layout_BDID_Mid_Batch
 	returnpayload = false
 ) := MACRO
-import mdr, doxie, ut, AutoStandardI;
+import doxie, ut, AutoStandardI;
 #uniquename(bh_key)
 %bh_key% := business_header_ss.Key_BH_BDID_pl;
-
+#UNIQUENAME(mod_access)			
+%mod_access% :=doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 #uniquename(min2)
 INTEGER %min2%(INTEGER l, INTEGER r) := IF(l < r, l, r);
 
 #uniquename(AddPenalty)
 #if(returnpayload)
-{RECORDOF(infile);RECORDOF(%bh_key%) pl;} %AddPenalty%(infile l, %bh_key% r) := TRANSFORM, SKIP(mdr.sourcetools.SourceIsEBR(r.source) AND doxie.DataRestriction.EBR)
+{RECORDOF(infile);RECORDOF(%bh_key%) pl;} %AddPenalty%(infile l, %bh_key% r) := TRANSFORM
 	SELF.pl := r;
 #else
-TYPEOF(infile) %AddPenalty%(infile l, %bh_key% r) := TRANSFORM, SKIP(mdr.sourcetools.SourceIsEBR(r.source) AND doxie.DataRestriction.EBR)
+TYPEOF(infile) %AddPenalty%(infile l, %bh_key% r) := TRANSFORM
 #end
 	SELF.score := 100 -  
 		%min2%(10,IF(l.company_name = '', 0, ut.CompanySimilar(l.company_name, r.company_name)*2 + ut.StringSimilar(l.company_name, r.company_name))) -
@@ -58,16 +59,14 @@ TYPEOF(infile) %AddPenalty%(infile l, %bh_key% r) := TRANSFORM, SKIP(mdr.sourcet
 	SELF := l;
 END;	
 
-#uniquename(glb_purpose)
-%glb_purpose%:=AutoStandardI.InterfaceTranslator.glb_purpose.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.glb_purpose.params));
-
 #if(returnpayload)
 outfile := JOIN(
 	infile,
 	%bh_key%,
 	LEFT.bdid != 0 AND
 	LEFT.bdid = RIGHT.bdid AND
-	ut.PermissionTools.glb.SrcOk(%glb_purpose%,right.source),
+	doxie.compliance.source_ok(%mod_access%.glb, %mod_access%.DataRestrictionMask, right.source) AND
+  doxie.compliance.isBusHeaderSourceAllowed(right.source, %mod_access%.DataPermissionMask, %mod_access%.DataRestrictionMask),
 	%AddPenalty%(LEFT, RIGHT),
 	LEFT OUTER, LIMIT(0),KEEP(5000));
 #else
@@ -77,7 +76,8 @@ outfile := JOIN(
 			%bh_key%,
 		LEFT.bdid != 0 AND
 		LEFT.bdid = RIGHT.bdid AND
-		ut.PermissionTools.glb.SrcOk(%glb_purpose%,right.source),
+		doxie.compliance.source_ok(%mod_access%.glb, %mod_access%.DataRestrictionMask, right.source) AND 
+    doxie.compliance.isBusHeaderSourceAllowed(right.source, %mod_access%.DataPermissionMask, %mod_access%.DataRestrictionMask),
 		%AddPenalty%(LEFT, RIGHT),
 		LEFT OUTER, LIMIT(0),KEEP(5000));		
 		// LEFT OUTER, ATMOST(5000));

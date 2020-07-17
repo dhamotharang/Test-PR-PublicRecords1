@@ -40,7 +40,7 @@
 */
 
 
-IMPORT Gateway, Suspicious_Fraud_LN, Royalty;
+IMPORT Gateway, Suspicious_Fraud_LN, Royalty, AutoStandardI;
 
 EXPORT Fraud_Defense_Manager_Batch_Service := MACRO
 	/* ************************************************************************
@@ -50,7 +50,8 @@ EXPORT Fraud_Defense_Manager_Batch_Service := MACRO
 	
 	UNSIGNED1 GLBPurpose					:= 8 : STORED('GLBPurpose');
 	UNSIGNED1 DPPAPurpose					:= 0 : STORED('DPPAPurpose');
-	STRING DataRestrictionMask		:= '1    0' : STORED('DataRestrictionMask');
+	STRING DataRestriction		:= '1    0' : STORED('DataRestrictionMask');
+	STRING DataPermission		:= AutoStandardI.Constants.DataPermissionMask_default : STORED('DataPermissionMask') ;
 	
 	//CCPA fields
 	unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
@@ -61,6 +62,8 @@ EXPORT Fraud_Defense_Manager_Batch_Service := MACRO
 	mod_access := MODULE(Doxie.IDataAccess)
 	EXPORT glb := GLBPurpose;
 	EXPORT dppa := DPPAPurpose;
+	EXPORT DataPermissionMask := DataPermission;
+    EXPORT DataRestrictionMask := DataRestriction;
 	EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
 	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
 	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
@@ -73,7 +76,7 @@ END;
 	/* ************************************************************************
 	 *  Get the Identity Fraud Network Results                                      *
 	 ************************************************************************ */
-	results := Suspicious_Fraud_LN.Fraud_Defense_Manager_Search_Function(Batch_In, GLBPurpose, DPPAPurpose, DataRestrictionMask, Gateways, mod_access);
+	results := Suspicious_Fraud_LN.Fraud_Defense_Manager_Search_Function(Batch_In, GLBPurpose, DPPAPurpose, DataRestriction, Gateways, mod_access);
 	
 	/* ************************************************************************
 	 *  Project the Results into the Proper Output Layout                     *

@@ -1,6 +1,6 @@
-IMPORT autoStandardI, bankruptcyv2_services, business_header, doxie_cbrs, iesp;
+IMPORT business_header, doxie_cbrs, iesp, doxie;
 
-EXPORT SmartLinx_Business_Sections ( STRING12 in_bdid, BOOLEAN include_SourceDocs = FALSE, STRING SSNMask ) :=
+EXPORT SmartLinx_Business_Sections ( STRING12 in_bdid, doxie.IDataAccess mod_access, BOOLEAN include_SourceDocs = FALSE ) :=
   FUNCTION
    
     // NOTE:  The constants, max values declared, and the calls to get the records for each section 
@@ -24,7 +24,7 @@ EXPORT SmartLinx_Business_Sections ( STRING12 in_bdid, BOOLEAN include_SourceDoc
     MaxPhoneVariations        := 100 : STORED( 'MaxPhoneVariations' );
     MaxProperties             := 100 : STORED( 'MaxProperties' );
     
-    Bdids := doxie_cbrs.getBizReportBDIDs().bdids;
+    Bdids := doxie_cbrs.getBizReportBDIDs(mod_access).bdids;
     
     //-----------------------------------------------------------------------------------------------------------
     //----- Address Variations ----------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ EXPORT SmartLinx_Business_Sections ( STRING12 in_bdid, BOOLEAN include_SourceDoc
     //----- Bankruptcy V2 ---------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------------------- 
     
-    bnkr_v2 := doxie_cbrs.bankruptcy_records_trimmed_v2(bdids, SSNMask); 
+    bnkr_v2 := doxie_cbrs.bankruptcy_records_trimmed_v2(bdids, mod_access.SSN_Mask); 
     
     ds_bankruptcyV2 := iesp.transform_bankruptcy_v2(bnkr_v2.records);
 
@@ -173,7 +173,7 @@ EXPORT SmartLinx_Business_Sections ( STRING12 in_bdid, BOOLEAN include_SourceDoc
     //-----------------------------------------------------------------------------------------------------------
     //----- Liens Judgments V2  ---------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------------------- 
-    raw_jls := doxie_cbrs.Liens_Judments_records_v2(bdids, SSNMask).report_view(MIDEX_Services.Constants.MAX_LIENS_JUDGMENTS_val)(TRUE);
+    raw_jls := doxie_cbrs.Liens_Judments_records_v2(bdids, mod_access.SSN_Mask).report_view(MIDEX_Services.Constants.MAX_LIENS_JUDGMENTS_val)(TRUE);
     
     judgmentsAndLiensV2Recs := CHOOSEN(raw_jls,MIDEX_Services.Constants.MAX_LIENS_JUDGMENTS_val);
     countOfJudgmentsAndLiensV2 := COUNT(raw_jls);

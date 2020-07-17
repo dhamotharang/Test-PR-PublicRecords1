@@ -1,4 +1,4 @@
-import Census_data, doxie, doxie_cbrs, business_header, Business_Header_SS,drivers,ut,mdr;
+import Census_data, doxie, doxie_cbrs, business_header, Business_Header_SS, ut;
 
 export fn_getBaseRecs(
   dataset(doxie_cbrs.layout_references) in_group_ids,
@@ -7,7 +7,7 @@ export fn_getBaseRecs(
 ) :=
 function
 	doxie_cbrs.mac_Selection_Declare()
-	
+	mod_access := Doxie.compliance.GetGlobalDataAccessModule();
 	bhk2 := business_header_ss.Key_BH_BDID_pl;
 	
 	doxie_cbrs.layout_supergroup keepl(in_group_ids l) := transform
@@ -55,11 +55,11 @@ function
 
 	base_BH_recs := JOIN(mybdids, bhk2
 							         ,KEYED(LEFT.bdid = RIGHT.bdid)
-		                    and IF(ut.IndustryClass.is_knowx
+		                    and IF(mod_access.isConsumer()
 		                           ,RIGHT.source in ut.IndustryClass.BH_KnowX_src
 					                     ,true) AND
-                        ut.PermissionTools.glb.SrcOk(glb_purpose,right.source) AND 
-                        (right.source <> MDR.sourceTools.src_Dunn_Bradstreet OR Doxie.DataPermission.use_DNB)
+                        doxie.compliance.source_ok(mod_access.glb, mod_access.DataRestrictionMask, RIGHT.source) AND
+                        doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask)
 					             ,BaseRecs(left,RIGHT)
 					    				 ,LIMIT(0)											 
 											 ,KEEP(50));
@@ -80,7 +80,7 @@ function
 		self := l;
 	end;
 
-  base_BH_recs_id := project(group(sort(base_BH_recs(NOT MDR.sourceTools.SourceIsEBR(source) OR NOT doxie.DataRestriction.EBR),group_id,record),group_id),project_ids(left,counter));
+  base_BH_recs_id := project(group(sort(base_BH_recs, group_id,record),group_id),project_ids(left,counter));
 
 
 	br_msa_county := RECORD
@@ -108,7 +108,7 @@ function
 	END;
 	
 	
-	tempBaseRecs := JOIN(base_BH_recs_id(not dppa or (ut.dppa_ok(dppa_purpose) AND drivers.state_dppa_ok(vendor_st,dppa_purpose,,source))),
+	tempBaseRecs := JOIN(base_BH_recs_id(not dppa or (mod_access.isValidDPPA() AND mod_access.isValidDPPAState(vendor_st, , source))),
 	                     Census_Data.Key_Fips2County,
 											 KEYED(LEFT.state = RIGHT.state_code and
 							         LEFT.county = RIGHT.county_fips),
