@@ -1,7 +1,7 @@
 ﻿#workunit('name','bwr_Business_Marketing_Attributes_Batch_Service');
 #option ('hthorMemoryLimit', 1000);
 
-IMPORT PublicRecords_KEL,BRM_Marketing_attributes,RiskWise; 
+IMPORT PublicRecords_KEL,BRM_Marketing_attributes,RiskWise,Data_Services; 
 
 /* ********************************************************************
  *                               OPTIONS                              *
@@ -12,8 +12,7 @@ IMPORT PublicRecords_KEL,BRM_Marketing_attributes,RiskWise;
  * roxieIP: IP Address of the non-FCRA roxie.                         *
  **********************************************************************/
  
-// recordsToRun := ALL;
-recordsToRun := 20;
+recordsToRun := 0;
 eyeball      := 10;
 threads      := 30;
 
@@ -36,7 +35,7 @@ BOOLEAN runInRealTime := FALSE;   //When TRUE will run request in real time mode
 		EXPORT STRING100 Allowed_Sources := '';
 		EXPORT BOOLEAN Override_Experian_Restriction := false;
 		EXPORT STRING IndustryClass := ''; // When set to UTILI or DRMKT this restricts Utility data
-		EXPORT DATA100 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
+		EXPORT UNSIGNED8 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 			Data_Restriction_Mask, 
 			Data_Permission_Mask, 
 			GLBAPurpose, 
@@ -215,22 +214,22 @@ soapLayout := RECORD
 end;
 
 soap_in_pre:= Project(pp,TRANSFORM(soapLayout,
-         self.batch_in := DATASET([TRANSFORM( BRM_Marketing_attributes.Layout_BRM_NonFCRA.Batch_Input, 
-         self.g_procbusuid:=counter;
-						self.historydate :=LEFT.historydate;
-						self.historydateyyyymm :=IF(runInRealTime, 99999999, (UNSIGNED4)LEFT.HistoryDate);;
-         self.acctno:=LEFT.acctno;
-         self.companyname := LEFT.companyname;
-         self.AlternateCompanyName := LEFT.AlternateCompanyName;
-         self.streetaddressline1 := LEFT.streetaddressline1;
-         self.City1 := LEFT.City1;
-         self.State1 := LEFT.State1;
-         self.Zip1 := LEFT.Zip1;
-						self.BusinessPhone := LEFT.BusinessPhone;
-						self.BusinessTIN := LEFT.BusinessTIN;
-						self.BusinessURL := LEFT.BusinessURL;
-						self.BusinessEmailAddress := LEFT.BusinessEmailAddress;
-						self                       := [])]); 
+self.batch_in := DATASET([TRANSFORM( BRM_Marketing_attributes.Layout_BRM_NonFCRA.Batch_Input, 
+    self.g_procbusuid:=counter;
+    self.historydate :=IF(runInRealTime, 999999, (UNSIGNED4)LEFT.historydate);
+    self.historydateyyyymm :=IF(runInRealTime, 999999, (UNSIGNED4)LEFT.historydateyyyymm);
+    self.acctno:=LEFT.acctno;
+    self.companyname := LEFT.companyname;
+    self.AlternateCompanyName := LEFT.AlternateCompanyName;
+    self.streetaddressline1 := LEFT.streetaddressline1;
+    self.City1 := LEFT.City1;
+    self.State1 := LEFT.State1;
+    self.Zip1 := LEFT.Zip1;
+    self.BusinessPhone := LEFT.BusinessPhone;
+    self.BusinessTIN := LEFT.BusinessTIN;
+    self.BusinessURL := LEFT.BusinessURL;
+    self.BusinessEmailAddress := LEFT.BusinessEmailAddress;
+    self                       := [])]); 
 						 
     self.Score_threshold := Options.ScoreThreshold;
     self.BIPAppendScoreThreshold := Options.BIPAppendScoreThreshold;
@@ -249,7 +248,7 @@ soap_in_pre:= Project(pp,TRANSFORM(soapLayout,
     self.OverrideExperianRestriction := Options.Override_Experian_Restriction;
     //CCPA fields
     self.LexIdSourceOptout := Options.LexIdSourceOptout;
-    SELF := [];));
+    self := [];));
 
 soap_in := DISTRIBUTE(soap_in_pre, RANDOM());		
 OUTPUT(CHOOSEN(soap_in, eyeball), NAMED('Sample_SOAPInput'));
