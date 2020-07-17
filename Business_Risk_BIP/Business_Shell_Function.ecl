@@ -4038,9 +4038,9 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Verification.NameMiskey := Business_Risk_BIP.Common.SetBoolean(FALSE);
 
 		SBFEExists := (INTEGER)le.SBFE.SBFEAccountCount > 0;
-		SELF.SBFE.SBFESourceIndex := MAP(COUNT(SeqSources) > 0 AND NOT SBFEExists => '1',  //LN only
-																		 COUNT(SeqSources) = 0 AND SBFEExists 		=> '2',  //SBFE only
-																		 COUNT(SeqSources) > 0 AND SBFEExists 		=> '3',  //LN and SBFE
+		SELF.SBFE.SBFESourceIndex := MAP(COUNT(SeqSourcesLinkIds) > 0 AND NOT SBFEExists => '1',  //LN only
+																		 COUNT(SeqSourcesLinkIds) = 0 AND SBFEExists 		=> '2',  //SBFE only
+																		 COUNT(SeqSourcesLinkIds) > 0 AND SBFEExists 		=> '3',  //LN and SBFE
 																																								 '0'); // Else there are no sources as of the archive date
 
 		LNExists := COUNT(SeqSourcesLinkIds) > 0;
