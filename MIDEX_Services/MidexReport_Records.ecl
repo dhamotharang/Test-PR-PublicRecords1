@@ -105,7 +105,7 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod,
     // --------------------------------------------------------------------------------------------------------------
     //              Business SmartLinx Data
     // --------------------------------------------------------------------------------------------------------------
-    rec_smartLinxBusinessRecs_raw	:= IF(MidexReportSearchType = MIDEX_SERVICES.Constants.BUSINESS_REPORT, MIDEX_Services.SmartLinx_Business_Sections(in_mod.bdid, include_SourceDocs, mod_access.SSN_Mask)); 
+    rec_smartLinxBusinessRecs_raw	:= IF(MidexReportSearchType = MIDEX_SERVICES.Constants.BUSINESS_REPORT, MIDEX_Services.SmartLinx_Business_Sections(in_mod.bdid, mod_access, include_SourceDocs)); 
     rec_smartLinxBusinessRecs			:= PROJECT( rec_smartLinxBusinessRecs_raw, MIDEX_Services.Functions.xfm_setSmartLinxBusinessFormat( LEFT ));
 
     // --------------------------------------------------------------------------------------------------------------

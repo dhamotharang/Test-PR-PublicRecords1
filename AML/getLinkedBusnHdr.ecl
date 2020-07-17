@@ -1,6 +1,6 @@
-IMPORT Business_Header_SS, RiskWise, Business_Risk_BIP;
+IMPORT Business_Header_SS, Business_Risk_BIP, doxie;
 
-EXPORT getLinkedBusnHdr(DATASET(Layouts.BusnExecsLayoutV2) linkedBusnIn 	) := FUNCTION
+EXPORT getLinkedBusnHdr(DATASET(Layouts.BusnExecsLayoutV2) linkedBusnIn, doxie.IDataAccess mod_access) := FUNCTION
 
 
 //version 2
@@ -22,7 +22,8 @@ LnkBusnHeadRec := join(DDBusnIds, BusnHeader,
 										Keyed(right.bdid=left.Bdid) and
 										right.dt_first_seen < (unsigned4)(string)(left.historydate + '01') and
 										right.dt_first_seen <> 0 and
-										right.source <> '' ,
+										right.source <> '' AND 
+                    doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
                     transform(LnkSlimHdrLayout, 
 															self.seq := left.seq,
 															self.bdid := left.bdid,

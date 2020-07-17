@@ -137,7 +137,7 @@ EXPORT compliance := MODULE
   // ==============================================================================================
   // EXPORT FARES := (~allow and fixed_DRM[1]<>'0') OR in_mod.ignoreFares; // Fares=property data
   EXPORT boolean isQsentRestricted       (string drm) := drm[2]<>'0'; // QSent = realtime phones gateway
-  // EXPORT EBR   := ~allow and fixed_DRM[3]<>'0'; // EBR=Experian Business Reports
+  EXPORT boolean isEBRRestricted         (string drm) := drm[3] NOT IN restrictedSet; // EBR=Experian Business Reports
   // EXPORT WH     := ~allow and fixed_DRM[4]<>'0'; // WH=Weekly header
   // EXPORT Fidelity := (~allow and (fixed_DRM[5] not in ['0',''])) OR in_mod.ignoreFidelity;
 
@@ -280,6 +280,10 @@ EXPORT compliance := MODULE
   EXPORT boolean use_DnB(string dpm)                 := dpm[28] NOT IN restrictedSet;
 
   // ----------------------------------------------------------------------------------------------
+  EXPORT boolean isBusHeaderSourceAllowed (string src, string dpm, string drm) := MAP (
+    MDR.sourceTools.SourceIsDunn_Bradstreet (src) => use_DnB(dpm),
+    MDR.sourceTools.SourceIsEBR (src) => NOT isEBRRestricted(drm),    
+  TRUE);
 
     // to exclude utility sources:
     EXPORT isUtilityRestricted(string _industry) := _industry = 'UTILI' OR _industry='DRMKT';

@@ -122,7 +122,7 @@ import business_header_ss,AutoStandardI,ut,doxie,business_header,doxie_cbrs,mdr,
 		Business_Header_SS.MAC_Filter_Matches(
 			infile,
 			filtered_res0
-		)
+		);
 			
 		filtered_res1 := if(args.score_results,filtered_res0,infile(bdid>0));
 

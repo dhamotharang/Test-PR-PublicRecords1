@@ -289,7 +289,7 @@ string10 CustomDataFilter:='';
 
 
 // Run the Business Shell
-bshell := Business_Risk.Business_Shell_Function( biid, glb, LexIdSourceOptout, TransactionID, BatchUID, GlobalCompanyId,DataPermission );
+bshell := Business_Risk.Business_Shell_Function( biid, glb, LexIdSourceOptout, TransactionID, BatchUID, GlobalCompanyId,DataPermission, DataRestriction);
 
 scores := map(
 	model_name  = 'rsb801_1' => Models.RSB801_1_0( bshell ),
