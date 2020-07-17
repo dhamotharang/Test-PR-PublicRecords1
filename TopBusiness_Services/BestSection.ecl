@@ -1,5 +1,5 @@
 ﻿import iesp, Doxie, Suppress, AutoStandardI, MDR, BIPV2, BIPV2_Best,
-  TopBusiness_Services, ut, dx_Gong;
+  TopBusiness_Services, ut, dx_Gong, std;
 
 export BestSection := MODULE
 
@@ -21,9 +21,8 @@ export BestSection := MODULE
   END;
 
  FETCH_LEVEL := in_options.BusinessReportFetchLevel;
- string8 CurDate := stringlib.getDateYYYYMMDD();
- unsigned2 CurYear := (unsigned2) stringlib.getDateYYYYMMDD()[1..4];
-
+ string8 CurDate := (STRING8) STD.Date.today();
+ unsigned2 CurYear := (unsigned2) (CurDate[1..4]);
 	 ds_in_unique_ids_only := project(ds_in_ids,
 	                            transform(BIPV2.IDlayouts.l_xlink_ids,
 															 self.dotid := 0;
@@ -53,7 +52,7 @@ export BestSection := MODULE
 										transform(
 												recordof(left),
 		                      self.company_name := left.Company_Name;
-                          self.cnp_Name := trim(stringlib.stringfilterout(left.cnp_Name,' '),left,right);
+                          self.cnp_Name := trim(std.str.filterout(left.cnp_Name,' '),left,right);
 
 															self := left;
 														  )
@@ -76,7 +75,7 @@ export BestSection := MODULE
 															isDNBDMIRow := MDR.sourceTools.SourceIsDunn_Bradstreet(left.source);
 													self.cnp_name := left.cnp_name;
 
-		                      self.companyName :=  stringlib.stringfilterout(trim(left.Company_Name, left, right),
+		                      self.companyName :=  std.str.filterout(trim(left.Company_Name, left, right),
                                                        '.\'`');
 																											//to ensure no dups later in final results.
 													self.DateFirstSeen := iesp.ecl2esp.ToDate(left.dt_first_seen);
@@ -140,7 +139,7 @@ export BestSection := MODULE
 	                                                 rollCnames(left,right));
 	 tmpOtherCompanyNameVariations := project(tmpOtherCompanyNameVariationsAll,
 	                                      transform(iesp.topbusinessREport.t_TopBusinessBestOtherCompany,
-																				         self.SourceDocs := choosen(dedup(left.sourceDocs, all),iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_SRCDOC_RECORDS);
+																				         self.SourceDocs := choosen(dedup(left.sourceDocs, all), Topbusiness_services.constants.OTHERCNAMES_SRCDOC_RECORDS);                                                                                                                                                                                                                       
 																								 self := left));
    // 2 year window
    twoYearBackDateLastSeen := (unsigned4) (((string4)(CurYear  - 2)) + CurDate[5..8]);
@@ -215,8 +214,8 @@ export BestSection := MODULE
           tmpOtherTinVariationsReduced := dedup(sort(dedup(sort(
 					                      project(
 					                      tmpOtherTinVariations, transform(recordof(left),
-																 self.companyName := stringlib.stringcleanspaces(
-																    stringlib.stringfilterout(trim(left.companyname,left, right),
+																 self.companyName := std.str.cleanspaces(
+																    std.str.filterout(trim(left.companyname,left, right),
 																		    ',-.'));
 																				self := left))
 																  , tin, companyname,
@@ -355,7 +354,7 @@ export BestSection := MODULE
 		 // left only join and then a regular join and addition of the two results take care of this.
 
      FinalCompanyNameVariationsWithOutBestRow := sort(join(tmpOtherCompanyNameVariations, ds_year_startedFromBest,
-		                                               trim(left.CompanyName,left,right) = stringlib.stringfilterout(trim(right.company_name[1].company_name,left, right),'.`'),
+		                                               trim(left.CompanyName,left,right) = std.str.filterout(trim(right.company_name[1].company_name,left, right),'.`'),
 																									 transform(recordof(left),
 																									 self := left), left only)
 																									  , CompanyName
@@ -609,7 +608,7 @@ export BestSection := MODULE
 			self.Ticker := ''; //right.Ticker  field removed
 			self.Exchange := ''; //right.Exchange field removed
 			  tmpUrl := right.company_url[1].company_url;
-			  SlashPosition := stringlib.stringfind(tmpurl,'/',1);
+			  SlashPosition := std.str.find(tmpurl,'/',1);
 			self.URL := if (tmpurl <> '' and SlashPosition > 1,  tmpUrl[1..slashPosition-1],
 			                                    tmpUrl);
 			self.Address.StreetNumber := right.company_address[1].company_prim_range,

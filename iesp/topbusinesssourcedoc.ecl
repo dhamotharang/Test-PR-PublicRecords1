@@ -64,6 +64,7 @@ export t_TopBusinessSourceDocRecord := record
 	dataset(topbusinessothersources.t_OtherSourceRecord) CrashCarriers {xpath('CrashCarriers/CrashCarrier'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_CRASH_RECORD)};
 	dataset(topbusinessothersources.t_OtherSourceRecord) InfutorNarbRecords {xpath('InfutorNarbRecords/InFutorNarbRecord'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_INFUTOR_NARB_RECORD)};
 	dataset(topbusinessothersources.t_OtherSourceRecord) EquifaxBusinessDataRecords {xpath('EquifaxBusinessDataRecords/EquifaxBusinessDataRecord'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_EQUIFAXBUSDATA_RECORD)};
+     dataset(topbusinessothersources.t_OtherSourceRecord) DataBridgeRecords {xpath('DataBridgeRecords/DataBridgeRecord'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_EQUIFAXBUSDATA_RECORD)};
 	dataset(proflicense.t_ProfessionalLicenseRecord) CNLDFacilities {xpath('CNLDFacilities/CNLDFacility'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_CNLD_RECORD)};
 	dataset(americanmedicalservices.t_AmericanMedicalServicesProvider) AMSLicenses {xpath('AMSLicenses/AMSLicense'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_AMSLIC_RECORD)};
 	dataset(osha.t_OSHAReportRecord) OSHAReportRecords {xpath('OSHAReportRecords/OSHAReportRecord'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_OSHAIR_RECORD)}; 

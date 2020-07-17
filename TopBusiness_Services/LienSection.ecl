@@ -7,12 +7,13 @@ IMPORT AutoStandardI, BIPV2, iesp, LiensV2, MDR, Suppress,  liensv2_services, To
            
 EXPORT LienSection := MODULE;
 
-EXPORT GetLienBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids_only, 
-                                                  string1 FETCH_LEVEL) := 
+EXPORT GetLienBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids_only 
+                                                  ,string1 FETCH_LEVEL
+                                                  ,UNSIGNED4 FETCH_LIMIT = 25000 ) := 
                      TopBusiness_Services.Key_Fetches(
 	                    ds_in_unique_ids_only // input file to join key with
 				    ,FETCH_LEVEL // level of ids to join with
-										              // 3rd parm is ScoreThreshold, take default of 0
+					,FETCH_LIMIT     
 					 ).ds_liens_linkidskey_recs;		
 
  // *********** Main function to return BIPV2 format business report results
@@ -31,7 +32,7 @@ EXPORT GetLienBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids
   // ****** Get the needed linkids key J&Ls info for each set of input linkids
   //
   // *** Key fetch to get Liens tmsid/rmsid data from new bip2 linkids key file.
-   ds_linkids_keyrecs := GetLienBipLinkids( ds_in_ids_only, FETCH_LEVEL);
+   ds_linkids_keyrecs := GetLienBipLinkids( ds_in_ids_only, FETCH_LEVEL);                                               
   // Project onto a slimmed layout and filter linkids key recs to only use ones where
 	// "name_type" is a D(Debtor) or C(Creditor), but not A(Attorney) or AD(Attorney for Debtor 
 	// or T=Third Party?); per req 0717?). ???
@@ -427,9 +428,9 @@ EXPORT GetLienBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids
     // Output 1 row of dataset with source info.
 		self.SourceDocs := dataset([transform(iesp.topbusiness_share.t_TopBusinessSourceDocInfo,
 			self.BusinessIds := l, // to store all linkids
-      self.IdType      := Constants.tmsid,
+      self.IdType      := TopBusiness_Services.Constants.tmsid,
 		  self.IdValue     := l.source_docid,
-		  self.Section     := Constants.LienSectionName, //needed here???
+		  self.Section     := TopBusiness_Services.Constants.LienSectionName, //needed here???
 		  self.Source      := l.source,
 		  self := []) // null out other fields
 		]);
@@ -475,7 +476,7 @@ EXPORT GetLienBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids
 																 self.BusinessIds.ultid  := l.ultid,
 																 self.BusinessIds.orgid  := l.orgid,
 																 self.BusinessIds.seleid := l.seleid,
-		                             self.Section     := Constants.LienSectionName,
+		                             self.Section     := TopBusiness_Services.Constants.LienSectionName,
 		                             self := [])), // null all other fields
       self := l; //to assign all linkids
 	end;
