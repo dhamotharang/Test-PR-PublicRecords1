@@ -97,15 +97,16 @@ EXPORT IParams := MODULE
 
       EXPORT UNSIGNED1 EmailQualityRulesMask := IF(in_optns.EmailQualityRulesMask != '', GetEmailRulesMask(in_optns.EmailQualityRulesMask), 0);
       EXPORT BOOLEAN isDirectMarketing () := in_optns.IsMarketingUse OR mod_access.isDirectMarketing ();
-      SHARED STRING _SearchTier := MAP($.Constants.isValidTier(in_optns.SearchTier) => in_optns.SearchTier,
-                                       in_optns.CheckEmailDeliverable => $.Constants.Premium, // convert as premium till Web starts to send SearchTier values
-                                       $.Constants.Basic); //default to basic
-      EXPORT STRING   RestrictedUseCase := IF ($.Constants.isBasic(_SearchTier),
-                                               $.Constants.RestrictedUseCase.NoRoyaltySources,
-                                               $.Constants.RestrictedUseCase.Standard);
+      SHARED STRING _SearchTier := IF($.Constants.isValidTier(in_optns.SearchTier), in_optns.SearchTier,'');
+
+      EXPORT STRING   _RestrictedUseCase := in_optns.RestrictedUseCase;
+      EXPORT STRING   RestrictedUseCase := MAP ($.Constants.RestrictedUseCase.isValid(_RestrictedUseCase) => _RestrictedUseCase,
+                                               $.Constants.isPremium(_SearchTier)=>$.Constants.RestrictedUseCase.Standard,
+                                               $.Constants.RestrictedUseCase.NoRoyaltySources);
       EXPORT STRING   BVAPIkey := IF(in_optns.BVAPIkey != '', in_optns.BVAPIkey, $.Constants.GatewayValues.BVAPIkey);;
       EXPORT UNSIGNED MaxEmailsForDeliveryCheck := IF(in_optns.MaxEmailsForDeliveryCheck > 0, in_optns.MaxEmailsForDeliveryCheck, $.Constants.Defaults.MaxEmailsToCheckDeliverable);
-      EXPORT BOOLEAN  CheckEmailDeliverable := $.Constants.isPremium(_SearchTier);
+      BOOLEAN  _CheckEmailDeliverable := in_optns.CheckEmailDeliverable;
+      EXPORT BOOLEAN  CheckEmailDeliverable := $.Constants.isPremium(_SearchTier) OR _CheckEmailDeliverable;
       EXPORT BOOLEAN  KeepUndeliverableEmail := in_optns.KeepUndeliverableEmail;
       BOOLEAN  SkipTMXcheck := in_optns.SkipTMX OR $.Constants.SearchType.isEIA(SearchType)
                                       OR $.Constants.SearchType.isEIC(SearchType); // we never suppress email records for EIC/EIA searches and we are not returning TMX data otherwise
