@@ -1,12 +1,10 @@
 ﻿
- IMPORT $, DeathV2_Services, Doxie, dx_death_master, FCRA, FFD, Gateway, IESP, Liensv2, risk_indicators, Risk_Reporting;
+ IMPORT $, DeathV2_Services, Doxie, dx_death_master, FCRA, FFD, Gateway, IESP, Liensv2, risk_indicators, Risk_Reporting, STD;
 
 EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
                               DATASET(iesp.riskview_publicrecordretrieval.t_PublicRecordRetrievalRequest) input_request) := FUNCTION
 
   srchby := GLOBAL(input_request[1].SearchBy);
-
-  BOOLEAN isCollections              := FCRA.FCRAPurpose.isCollections(input.FCRAPurpose);
 
   gateways := Gateway.Configuration.Get();
 
@@ -38,16 +36,30 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
   liens_srch_recs := LiensV2_Services.liens_raw.Retrieval_view_fcra.by_did (ds_did, ds_flags,
                                                                           slim_pc_recs, input.FFDOptionsMask, input.FCRAPurpose);
  //filtering the search records based on input pri
-  filtered_liens_byinput := liens_srch_recs(((Filing_Type_ID = srchby.FilingTypeID AND
-                              (filing_number = srchby.FilingNumber OR (filing_page = srchby.FilingPage AND filing_book = srchby.FilingBook)))
-                               OR orig_rmsid = srchby.RecordID)
+ //(filing type id and (filing number or (book and page))) or orig_rmsid
+//and
+//(agency name/county/state or agency id)
+
+  in_filing_type_id := TRIM(STD.Str.ToUpperCase(srchby.FilingTypeID));
+  in_filing_number := TRIM(STD.Str.ToUpperCase(srchby.FilingNumber));
+  in_filing_page := TRIM(STD.Str.ToUpperCase(srchby.FilingPage));
+  in_filing_book := TRIM(STD.Str.ToUpperCase(srchby.FilingBook));
+  in_record_id := TRIM(STD.Str.ToUpperCase(srchby.RecordID));
+  in_agency_name := TRIM(STD.Str.ToUpperCase(srchby.Agency));
+  in_agency_county := TRIM(STD.Str.ToUpperCase(srchby.AgencyCounty));
+  in_agency_state := TRIM(STD.Str.ToUpperCase(srchby.AgencyState));
+  in_agency_id := TRIM(STD.Str.ToUpperCase(srchby.AgencyID));
+
+  filtered_liens_byinput := liens_srch_recs(((Filing_Type_ID = in_filing_type_id AND
+                              (filing_number = in_filing_number OR (filing_page = in_filing_page AND filing_book = in_filing_book)))
+                               OR orig_rmsid = in_record_id)
                               AND
-                              ((agency = srchby.Agency AND agency_county = srchby.AgencyCounty AND agency_state = srchby.AgencyState)
-                              OR AgencyID = srchby.AgencyID));
+                              ((agency = in_agency_name AND agency_county = in_agency_county AND agency_state = in_agency_state)
+                              OR AgencyID = in_agency_id));
     
   filtered_liens := filtered_liens_byinput(agencyId <> '' AND ~isDisputed);
   // search should resolve to single record, if yes, drop the disputed records
-  invalid_recs := COUNT(filtered_liens) != 1;
+  invalid_recs := resolved_did <> 0 AND COUNT(filtered_liens) != 1;
 
   liens_recs    := IF(invalid_recs,
                       DATASET([],$.layout_liens_retrieval.search_recs),
@@ -69,12 +81,12 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
                     $.GetRetrievalGateway_Records.callDTE_getrequestInfo(input,
                                                                         liens_recs, gateways, call_dte)));
 
-  // do not show CS if gateway request fails
-  is_gateway_success :=   (~input.DeferredTaskRequest AND search_recs[1].error_code = '' AND search_recs[1].IsOKCSuccess) OR
-                          (input.DeferredTaskRequest AND EXISTS(search_recs(did <> 0)));
-
-  BOOLEAN showConsumerStatements     := FFD.FFDMask.isShowConsumerStatements(input.FFDOptionsMask) AND  is_gateway_success;
-                                   
+       // do not show CS for okc submission request & do not show CS if dte gateway request fails
+  is_dte_gateway_success := input.DeferredTaskRequest AND EXISTS(search_recs(did <> 0));
+  BOOLEAN showConsumerStatements     := FFD.FFDMask.isShowConsumerStatements(input.FFDOptionsMask) AND  is_dte_gateway_success;
+   // do not show alerts for okc submission success or gateway failures
+  BOOLEAN NoshowAlerts     := search_recs[1].IsOKCSuccess OR search_recs[1].error_code = $.constants.LIENS_RETRIEVAL.GATEWAY_FAILURE_CODE;                                                                        
+                                
   // add deceased flag
   recs_w_deceasedflag := dx_death_master.Get.byDid(ds_did, did, input,,,,Data_Services.data_env.iFCRA);
 
@@ -83,27 +95,23 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
 
      BOOLEAN is_legal_hold   := alert_indicators.consumer_flags.alert_legal_flag <> '' AND alert_indicators.suppress_records;
      BOOLEAN subjectdeceased := recs_w_deceasedflag[1].death.is_deceased;
-     BOOLEAN nodidresolved   := resolved_did = 0 OR If(input.DeferredTaskRequest,
-                                search_recs[1].error_code = FCRA.Constants.ALERT_CODE.NO_DID_FOUND, FALSE);
-     BOOLEAN is_OKCsubmitted := search_recs[1].IsOKCSuccess;
+     no_dte_did_resolved     := input.DeferredTaskRequest AND search_recs[1].error_code = FCRA.Constants.ALERT_CODE.NO_DID_FOUND;
+     BOOLEAN no_didresolved   := resolved_did = 0 OR no_dte_did_resolved;
      BOOLEAN isRIState := picklist_resp._Header.Status = 305;// Rhode island verification
-
-    consumer_alerts := FFD.ConsumerFlag.prepareAlertMessages(pc_recs, alert_indicators, input.FFDOptionsMask);
+    // when dte resolved lexid is 0, do not return alerts
+    consumer_alerts := IF(~no_dte_did_resolved, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, alert_indicators, input.FFDOptionsMask));
     cs_alerts_rv := PROJECT(consumer_alerts, TRANSFORM(iesp.riskview2.t_RiskView2Alert,
                                              SELF.Code := LEFT.code,
                                              SELF.Description := LEFT.Message));
     // Adding all consumer alerts and alerts specific to court runner
     //as per dempsey, if there's legal hold no other laerts should be triggered except that.
     alerts :=  cs_alerts_rv +
-              IF(nodidresolved   AND ~is_legal_hold , DATASET([{FCRA.Constants.ALERT_CODE.NO_DID_FOUND,
+              IF(no_didresolved AND ~isRIstate AND ~is_legal_hold , DATASET([{FCRA.Constants.ALERT_CODE.NO_DID_FOUND,
                                                     risk_indicators.getHRIDesc(FCRA.Constants.ALERT_CODE.NO_DID_FOUND)}], iesp.riskview2.t_RiskView2Alert)) +
               IF(subjectdeceased AND ~is_legal_hold, DATASET([{FCRA.Constants.ALERT_CODE.SUBJECT_DECEASED_CODE,
                                                     risk_indicators.getHRIDesc(FCRA.Constants.ALERT_CODE.SUBJECT_DECEASED_CODE)}], iesp.riskview2.t_RiskView2Alert)) +
-              IF(is_OKCsubmitted AND ~is_legal_hold, DATASET([{$.Constants.LIENS_RETRIEVAL.OKC_SUBMISSION_SUCCESS_CODE,
-                                                     $.Constants.LIENS_RETRIEVAL.OKC_SUBMISSION_MESSAGE}], iesp.riskview2.t_RiskView2Alert)) +
               IF(isRIstate AND ~is_legal_hold, DATASET([{FCRA.Constants.ALERT_CODE.STATE_EXCEPTION,
-                                                     FCRA.Constants.getAlertMessage(FCRA.Constants.ALERT_CODE.STATE_EXCEPTION)}], iesp.riskview2.t_RiskView2Alert));
-
+                                                     FCRA.Constants.getAlertDescription(FCRA.Constants.ALERT_CODE.STATE_EXCEPTION)}], iesp.riskview2.t_RiskView2Alert));
 
    RETURN alerts;
 
@@ -130,11 +138,10 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
 
    ds_liens := IF(input.DeferredTaskRequest,
                   PROJECT(search_recs, toRecords(LEFT)));
-
+   
    iesp.riskview_publicrecordretrieval.t_PublicRecordRetrievalResponse toFinal() := TRANSFORM
-
-
-      is_gateway_excep  := search_recs[1].error_code = $.constants.LIENS_RETRIEVAL.GATEWAY_FAILURE_CODE;
+      
+      is_gateway_excep       := search_recs[1].error_code = $.constants.LIENS_RETRIEVAL.GATEWAY_FAILURE_CODE;
       ds_gateway_excep  := DATASET([{$.Constants.LIENS_RETRIEVAL.ERRORSOURCE,
 															   $.Constants.LIENS_RETRIEVAL.GATEWAY_FAILURE_CODE,
 															   '',
@@ -150,17 +157,21 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
 															    $.Constants.LIENS_RETRIEVAL.NO_RECS_FOUND_CODE,
 															    '',
 															     $.Constants.LIENS_RETRIEVAL.NO_RECS_FOUND_EXCEPTION}], iesp.share.t_WsException);
-
+                                   
       SELF._Header.Exceptions:= MAP(is_court_id_blank => ds_courtid_excep,
                                   invalid_recs        => ds_norecs_excep,
                                   is_gateway_excep    => ds_gateway_excep,
                                   DATASET([], iesp.share.t_WsException));
       
+      is_OKCsubmitted := ~input.DeferredTaskRequest AND search_recs[1].IsOKCSuccess;
+      //returns in case of okc submission success
+      SELF._Header.Status   := IF(is_OKCsubmitted, (INTEGER)$.Constants.LIENS_RETRIEVAL.OKC_SUBMISSION_SUCCESS_CODE, 0);
+      SELF._Header.Message  := IF(is_OKCsubmitted, $.Constants.LIENS_RETRIEVAL.OKC_SUBMISSION_MESSAGE, '');
       SELF._Header:= iesp.ECL2ESP.GetHeaderRow();
       SELF.RecordCount := COUNT(ds_liens);
       SELF.InputEcho := srchby;
       SELF.Records := ds_liens;
-      SELF.Alerts := get_alerts();
+      SELF.Alerts := If(NoshowAlerts, DATASET([], iesp.riskview2.t_RiskView2Alert), get_alerts());
       SELF.ConsumerStatements := IF(showConsumerStatements, consumer_statements);
       SELF.Consumer := FFD.MAC.PrepareConsumerRecord(resolved_did, TRUE, srchby);
 

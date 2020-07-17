@@ -521,8 +521,8 @@ export liens_raw := module
       tmsids := join(dedup(sort(in_dids,did),did), liensv2.key_liens_did_fcra,
         keyed(left.did = right.did),
         transform(with_did, self := right),
-        limit(0),
-        keep(1000));
+        atmost(1000),
+        keep(100));
 
       party_recs_raw := join(tmsids, liensv2.key_liens_party_id_fcra,
         keyed(left.tmsid = right.tmsid)
@@ -534,7 +534,7 @@ export liens_raw := module
           self.did := left.did;
           self := right;
           self := [];
-        ), limit(0), keep(1000));
+        ), atmost(1000), keep(100));
 
       $.layout_liens_retrieval.search_recs xformStatements($.layout_liens_Retrieval.search_recs l, FFD.Layouts.PersonContextBatchSlim r)
       := transform, skip((~ShowDisputedRecords AND r.isDisputed) OR (~ShowConsumerStatements AND EXISTS(r.StatementIDs)))
@@ -548,7 +548,7 @@ export liens_raw := module
         and left.persistent_record_id = (integer) right.RecID1,
         xformStatements(left, right),
         left outer,
-        keep(1), limit(0));
+        keep(1), atmost(1000));
 
       main_recs_raw := join(dedup(sort(party_recs, tmsid), tmsid), liensv2.key_liens_main_id_fcra,
         keyed(left.tmsid = right.tmsid)
@@ -557,7 +557,7 @@ export liens_raw := module
         transform($.layout_liens_retrieval.search_recs,
           self := right;
           self := left;
-        ), keep(1), limit(0));
+        ), keep(100), atmost(1000));
 
 	  $.layout_liens_retrieval.search_recs xformStatements_Main($.layout_liens_Retrieval.search_recs l, FFD.Layouts.PersonContextBatchSlim r)
       := transform, skip((~ShowDisputedRecords AND r.isDisputed) OR (~ShowConsumerStatements AND EXISTS(r.StatementIDs)))
@@ -571,7 +571,7 @@ export liens_raw := module
         and left.persistent_record_id = (integer) right.RecID1,
         xformStatements_Main(left, right),
         left outer,
-        keep(1), limit(0));
+        keep(1), atmost(1000));
 
       return main_recs;
 		end;

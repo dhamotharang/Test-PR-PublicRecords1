@@ -26,7 +26,6 @@ end;
 export t_PublicRecordRetrievalOption := record (iesp.share.t_BaseOption)
         string20 FFDOptionsMask {xpath('FFDOptionsMask')};//hidden[ecl_only]
         string32 DeferredTransactionID {xpath('DeferredTransactionID')};
-        string32 TransactionId {xpath('TransactionId')};//hidden[ecl_only]
         string FCRAPurpose {xpath('FCRAPurpose')};//hidden[ecl_only]
 end;
 
