@@ -1,16 +1,20 @@
+﻿IMPORT doxie,doxie_cbrs;
 doxie_cbrs.mac_Selection_Declare()
-export reverse_lookup_records_prs_max(dataset(doxie_cbrs.layout_references) bdids) := function
-r := doxie_cbrs.reverse_lookup_records_prs(bdids)(Return_ReversePhone_val and not past_max);
+EXPORT reverse_lookup_records_prs_max(DATASET(doxie_cbrs.layout_references) bdids,
+                                      doxie.IDataAccess mod_access
+                                     ) := FUNCTION
+                                     
+r := doxie_cbrs.reverse_lookup_records_prs(bdids,mod_access,Include_ReversePhone_val,Max_ReverseLookup_val)(Return_ReversePhone_val AND NOT past_max);
 
 //gonna lop it off for exactly max
-r lop(r l) := transform
+r lop(r l) := TRANSFORM
 	overshot := l.cumulative_count - max_reverselookup_val;
-	self.listed_name_children := 
-		if(overshot < 0, 
+	SELF.listed_name_children := 
+		IF(overshot < 0, 
 			 l.listed_name_children,
-			 choosen(l.listed_name_children, count(l.listed_name_children) - overshot));
-	self := l;
-end;
+			 CHOOSEN(l.listed_name_children, COUNT(l.listed_name_children) - overshot));
+	SELF := l;
+END;
 
-return project(r, lop(left));
-end;
+RETURN PROJECT(r, lop(LEFT));
+END;

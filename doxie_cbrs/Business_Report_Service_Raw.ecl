@@ -92,7 +92,7 @@
  </message>
 */
 /*--INFO-- Dayton Smartlynx Business Report Replacement Sources.*/
-IMPORT doxie_raw, Royalty, WSInput;
+IMPORT AutoStandardI, doxie, doxie_raw, Royalty, WSInput;
 
 EXPORT Business_Report_Service_Raw := MACRO
 		#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -111,11 +111,10 @@ EXPORT Business_Report_Service_Raw := MACRO
 		Exclude_Sources	    := false : stored('ExcludeSources');
 		Include_Sources		  := not Exclude_Sources;
 
-  mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
-		ssn_mask_val := AutoStandardI.InterfaceTranslator.ssn_mask_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.ssn_mask_val.params));
-
+    mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+		
 		// =-=-=-=-=-=-=-=-=-=-=-= SourceInfo ByBDID =-=-=-=-=-=-=-=-=-=-=-=
-		base_records_source := doxie_cbrs.all_base_records_source(doxie_cbrs.ds_subject_BDIDs, ssn_mask_val, mod_access) : INDEPENDENT;
+		base_records_source := doxie_cbrs.all_base_records_source(doxie_cbrs.ds_subject_BDIDs, mod_access) : INDEPENDENT;
 		// =-=-=-=-=-=-=-=-=-=-=-= RoyaltySet =-=-=-=-=-=-=-=-=-=-=-=
 		doxie_crs.layout_property_ln property_child(doxie_cbrs.layout_property_records l):= transform
 			self := l;

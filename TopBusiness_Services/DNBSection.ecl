@@ -1,14 +1,14 @@
-/* TBD:
+﻿/* TBD:
      1. Research/resolve open issues (search for '???') and removed commented out coding.
 */
-IMPORT BIPV2, Codes, DNB_DMI, iesp, MDR, Doxie;
+IMPORT BIPV2, Codes, DNB_DMI, Doxie, iesp, TopBusiness_Services;
 
 EXPORT DNBSection := MODULE;
 
  // *********** Main function to return BIPV2 format business report results
  export fn_FullView(
  	dataset(TopBusiness_Services.Layouts.rec_input_ids) ds_in_ids_wacctno
-	,Layouts.rec_input_options  in_options
+	,TopBusiness_Services.Layouts.rec_input_options  in_options
 	,doxie.IDataAccess mod_access
 	                 ):= function
 
@@ -48,7 +48,7 @@ EXPORT DNBSection := MODULE;
 	// output or for source viewing/linking???
   // Fill in the 3 extra "decoded" fields output in the current (before BIP2) Accurint only DNB section
 	ds_dnbrecs_slimmed := project(ds_dnbrecs_deduped,
-	   transform(DNBSection_Layouts.rec_ids_withdata_slimmed,
+	   transform(TopBusiness_Services.DNBSection_Layouts.rec_ids_withdata_slimmed,
 	     self.structure_type_decoded        := codes.keyCodes('DNB_COMPANIES','structure_type',,left.rawfields.structure_type);
 	     self.type_of_establishment_decoded := codes.keyCodes('DNB_COMPANIES','type_of_establishment',,left.rawfields.type_of_establishment);
 	     self.owns_rents_decoded            := codes.keyCodes('DNB_COMPANIES','owns_rents',,left.rawfields.owns_rents);
@@ -58,7 +58,7 @@ EXPORT DNBSection := MODULE;
   // Normalize to split out the sic info (up to 30) into an individual child dataset.
   ds_sics_normalized := normalize(ds_dnbrecs_slimmed,
 												          30, // 30 sets of sic* & sic*desc fields
-			transform(DNBSection_Layouts.rec_DnbChild_SIC,
+			transform(TopBusiness_Services.DNBSection_Layouts.rec_DnbChild_SIC,
 				self.sic_code := choose(counter,
 					left.rawfields.sic1,left.rawfields.sic1a,left.rawfields.sic1b,left.rawfields.sic1c,left.rawfields.sic1d,
 					left.rawfields.sic2,left.rawfields.sic2a,left.rawfields.sic2b,left.rawfields.sic2c,left.rawfields.sic2d,
@@ -84,15 +84,15 @@ EXPORT DNBSection := MODULE;
 	//
   // Transform to handle the iesp SIC info child dataset layout
 	iesp.TopBusinessReport.t_TopbusinessIndustrySIC 
-	  tf_rpt_sic(DNBSection_Layouts.rec_DnbChild_SIC l) := transform 
+	  tf_rpt_sic(TopBusiness_Services.DNBSection_Layouts.rec_DnbChild_SIC l) := transform 
       self.SICCode            := l.sic_code,
 			// v--- may need to expand length in iesp... from string40 to string60???
       self.SICCodeDescription := l.sic_desc,
 	end;
 
   // Transform for the iesp main DNB Record layout
-	DNBSection_Layouts.rec_ids_plus_DnbDetail
-	  tf_rptdetail(DNBSection_Layouts.rec_ids_withdata_slimmed l) := transform
+	TopBusiness_Services.DNBSection_Layouts.rec_ids_plus_DnbDetail
+	  tf_rptdetail(TopBusiness_Services.DNBSection_Layouts.rec_ids_withdata_slimmed l) := transform
      //assign raw data fields to their corresponding iesp fields
 		 self.DateFirstSeen := iesp.ECL2ESP.toDate(l.date_first_seen),
 		 self.DateLastSeen  := iesp.ECL2ESP.toDate(l.date_last_seen),
@@ -236,7 +236,7 @@ EXPORT DNBSection := MODULE;
   ds_all_wacctno_joined := join(ds_in_ids_wacctno,//ds_all_rptdetail_rolled,
 	                              ds_recs_rptdetail,
                                   BIPV2.IDmacros.mac_JoinTop3Linkids(),
-														    transform(DNBSection_Layouts.rec_ids_plus_DnbSecRec,
+														    transform(TopBusiness_Services.DNBSection_Layouts.rec_ids_plus_DnbSecRec,
 														      self.acctno         := left.acctno,
 																	self.DnbRecordCount := count(ds_recs_rptdetail),
 																	self.Dnb            := right, 
@@ -246,7 +246,7 @@ EXPORT DNBSection := MODULE;
 	// Roll up all recs for the acctno
 	ds_final_results := rollup(group(sort(ds_all_wacctno_joined,acctno),acctno),
 	                           group,
-		                         transform(DNBSection_Layouts.rec_Final,
+		                         transform(TopBusiness_Services.DNBSection_Layouts.rec_Final,
 			                         self := left));
 
   // Uncomment for debugging
