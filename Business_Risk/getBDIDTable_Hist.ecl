@@ -113,7 +113,6 @@ bdid_tbl_gong := join(bdid_tbl_init,
 					  left outer, lookup);
 
 
-// kbh := business_risk.Key_Business_Header_BDID;
 kbh := Business_Header_SS.Key_BH_BDID_pl;
 
 bh := join(biid, kbh,

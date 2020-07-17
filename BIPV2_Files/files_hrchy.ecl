@@ -1,25 +1,24 @@
-import BIPV2, DCAV2, DNB_DMI, Frandx, bipv2_hrchy, ut,tools, Data_Services;
+import BIPV2, DCAV2, DNB_DMI, Frandx, bipv2_hrchy, tools, Data_Services;
 
 
 EXPORT files_HRCHY := module
 
 	// import bipv2_hrchy_dev;  	shared ref := bipv2_hrchy_dev;
-														shared ref := bipv2_hrchy; 
-	
+														shared ref := bipv2_hrchy;
+
 
 	/*----------------- Other Inputs to Hrchy Build ------------------------------------------ */
-	export lnca := DCAV2.Files().base.companies.qa;						
-	export duns := DNB_DMI.Files().base.companies.qa;					
+	export lnca := DCAV2.Files().base.companies.qa;
+	export duns := DNB_DMI.Files().base.companies.qa;
 	export fran := Frandx.files().base.qa;//** NEED TO INCORPORATE THIS FILE TOO
 
   // export location := Data_Services.Data_Location.Prefix('BIPv2_HRCHY');
   // export location := '~';
-	
+
 	shared filePrefix := '~thor_data400::bipv2_HRCHY::';
-	
-	/*----------------- for now, keep the full file separate from micro below ------------------------------------------ */	
-	import Business_DOT;
-	
+
+	/*----------------- for now, keep the full file separate from micro below ------------------------------------------ */
+
 shared headrec2 := RECORD
   unsigned6 rcid;
   unsigned6 dotid;
@@ -163,10 +162,8 @@ shared headrec2 := RECORD
   string50 contact_job_title_derived;
   string30 contact_status_derived;
  END;
-	
-	
-	// export FILE_HRCY_BASE_LF_FULL	:= dataset('~thor_data400::bipv2_hrchy::base::20121128_full::data',{unsigned6 parent_proxid, unsigned6 ultimate_proxid, boolean has_LGID, Business_DOT.Files.l_micro26}, thor);
-//	export FILE_HRCY_BASE_LF_FULL						:= dataset( ut.foreign_prod+'thor_data400::bipv2_hrchy::base::20130521::data',headrec2, thor);
+
+
 //on dataland, default is to pull from prod, on prod, pull from prod
 	export FILE_HRCY_BASE_LF_FULL_nopersist						:= BIPv2_HRCHY.Files(,tools._constants.isdataland).base.qa    ;
 	export FILE_HRCY_BASE_LF_FULL_BUILDING_nopersist	:= BIPv2_HRCHY.Files(,tools._constants.isdataland).base.built ;
@@ -175,7 +172,7 @@ shared headrec2 := RECORD
 	export FILE_HRCY_BASE_LF_FULL_BUILDING_persist	  := FILE_HRCY_BASE_LF_FULL_BUILDING_nopersist : persist('thor::persist::BIPV2_Files::files_hrchy.FILE_HRCY_BASE_LF_FULL_BUILDING');
 
 	export FILE_HRCY_BASE_LF_FULL						:= if(tools._constants.isdataland ,FILE_HRCY_BASE_LF_FULL_persist           ,FILE_HRCY_BASE_LF_FULL_nopersist         );
-	export FILE_HRCY_BASE_LF_FULL_BUILDING	:= if(tools._constants.isdataland ,FILE_HRCY_BASE_LF_FULL_BUILDING_persist  ,FILE_HRCY_BASE_LF_FULL_BUILDING_nopersist); 
+	export FILE_HRCY_BASE_LF_FULL_BUILDING	:= if(tools._constants.isdataland ,FILE_HRCY_BASE_LF_FULL_BUILDING_persist  ,FILE_HRCY_BASE_LF_FULL_BUILDING_nopersist);
 
 	EXPORT KEY_HRCY_PROXID_FULL(dataset(ref.Layouts.lgidr) lt = dataset([], ref.Layouts.lgidr)) :=
 	INDEX(
@@ -190,17 +187,17 @@ shared headrec2 := RECORD
 	INDEX(
 		lt(lgid > 0),
 		{lgid},
-		{lt},		
+		{lt},
 		BIPv2_HRCHY.keynames(pUseOtherEnvironment := tools._Constants.IsDataland).HrchyLgid.qa
-	);	
+	);
 	/*----------------- BIPv2 HRCHY - BASE HEADER FILE------------------------------------------ */
 	// Logical Filenames
 	EXPORT FILE_HRCY_BASE_LF			:= filePrefix + 'base::' + BIPV2.KeySuffix + '::data';
-	
+
 	// BaseFile
 	EXPORT FILE_HRCHY_BASE				:= filePrefix + 'base';
 	EXPORT DS_HRCHY_BASE   				:= BIPv2_HRCHY.Files().base.qa;
-	
+
 	// Father
 	EXPORT FILE_HRCHY_FATHER			:= filePrefix + 'father';
 	EXPORT DS_HRCHY_FATHER   			:= BIPv2_HRCHY.Files().base.father;
@@ -208,11 +205,11 @@ shared headrec2 := RECORD
 	// GrandFather
 	EXPORT FILE_HRCHY_GRANDFATHER := filePrefix + 'grandfather';
 	EXPORT DS_HRCHY_GRANDFATHER		:= BIPv2_HRCHY.Files().base.grandfather;
-	
+
 	/*----------------- BIPv2 HRCHY - INDEXES ------------------------------------------ */
 	// Logical Filenames
 	EXPORT KEYNAME_HRCY_PROXID_LF			:= filePrefix + 'key::' + BIPV2.KeySuffix + '::proxid';
-	
+
 	// QA
 	EXPORT KEYNAME_HRCY_PROXID_QA								:= filePrefix + 'key::proxid_qa';
 
@@ -221,7 +218,7 @@ shared headrec2 := RECORD
 
 	// GrandFather
 	EXPORT KEYNAME_HRCY_PROXID_GrandFather			:= filePrefix + 'key::proxid_GrandFather';
-	
+
 	EXPORT KEY_HRCY_PROXID_QA(dataset(ref.Layouts.lgidr) lt = dataset([], ref.Layouts.lgidr)) :=
 	INDEX(
 		dedup(lt(lgid > 0, proxid > 0), proxid, lgid, lgid_level, proxid_level_within_lgid, src, all),
@@ -267,12 +264,12 @@ shared headrec2 := RECORD
 	// output(count(j_ddp), named('cnt_j_ddp'));
 	// output(enth(j_ddp, 1000), all, named('enth_j_ddp'));
 
-	export key_proxids_needing_update := index(j_ddp, {proxid},{old_seleid,old_orgid,old_ultid},'~thor_data400::key::bizlinkfull::20130330::proxids.needingHrchyUpdate');	
-	
+	export key_proxids_needing_update := index(j_ddp, {proxid},{old_seleid,old_orgid,old_ultid},'~thor_data400::key::bizlinkfull::20130330::proxids.needingHrchyUpdate');
+
 
 	// Logical Filenames
 	EXPORT KEYNAME_HRCY_LGID_LF			:= filePrefix + 'key::' + BIPV2.KeySuffix + '::LGID';
-	
+
 	// QA
 	EXPORT KEYNAME_HRCY_LGID_QA								:= filePrefix + 'key::LGID_qa';
 
@@ -281,7 +278,7 @@ shared headrec2 := RECORD
 
 	// GrandFather
 	EXPORT KEYNAME_HRCY_LGID_GrandFather			:= filePrefix + 'key::LGID_GrandFather';
-	
+
 	EXPORT KEY_HRCY_LGID_QA(dataset(ref.Layouts.lgidr) lt = dataset([], ref.Layouts.lgidr)) :=
 	INDEX(
 		lt(lgid > 0),
@@ -300,23 +297,23 @@ shared headrec2 := RECORD
 							);
 		return action;
 	END;
-	/*-------------------- updateHRCHYSuperKeys ----------------------------------------------------*/	
+	/*-------------------- updateHRCHYSuperKeys ----------------------------------------------------*/
 	EXPORT updateHRCHYSuperKeyProxid(string inFile) := FUNCTION
-		action := Sequential(	
+		action := Sequential(
 								FileServices.PromoteSuperFileList([KEYNAME_HRCY_PROXID_QA,
 																									 KEYNAME_HRCY_PROXID_Father,
-																									 KEYNAME_HRCY_PROXID_GrandFather], inFile, true)																									 
+																									 KEYNAME_HRCY_PROXID_GrandFather], inFile, true)
 							);
 		return action;
 	END;
 	EXPORT updateHRCHYSuperKeyLGID(string inFile) := FUNCTION
-		action := Sequential(	
+		action := Sequential(
 								FileServices.PromoteSuperFileList([KEYNAME_HRCY_LGID_QA,
 																									 KEYNAME_HRCY_LGID_Father,
-																									 KEYNAME_HRCY_LGID_GrandFather], inFile, true)																									 
+																									 KEYNAME_HRCY_LGID_GrandFather], inFile, true)
 							);
 		return action;
-	END;	
+	END;
 
 	/*-------------------- updateHRCHYLinkHist ----------------------------------------------------*/
 	// NONE
