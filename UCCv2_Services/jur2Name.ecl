@@ -1,19 +1,19 @@
-import ut;
+IMPORT ut;
 
 // Convert UCCv2 jurisdictions to their full names
 
-export string jur2Name(string rawJur) := function
+EXPORT STRING jur2Name(STRING rawJur) := FUNCTION
 
-	jur := trim(rawJur);
+  jur := TRIM(rawJur);
 
-	jurName := map(
-		jur = 'NYC' 		=> 'NEW YORK CITY, NEW YORK',
-		jur = 'TXD' 		=> 'DALLAS COUNTY, TEXAS',
-		jur = 'TXH' 		=> 'HARRIS COUNTY, TEXAS',
-		length(jur) = 2 => ut.St2Name(jur),
-		''
-	);
+  jurName := MAP(
+    jur = 'NYC' => 'NEW YORK CITY, NEW YORK',
+    jur = 'TXD' => 'DALLAS COUNTY, TEXAS',
+    jur = 'TXH' => 'HARRIS COUNTY, TEXAS',
+    LENGTH(jur) = 2 => ut.St2Name(jur),
+    ''
+  );
 
-	return if( jurName<>'', jurName, jur);
+  RETURN IF( jurName<>'', jurName, jur);
 
-end;
+END;

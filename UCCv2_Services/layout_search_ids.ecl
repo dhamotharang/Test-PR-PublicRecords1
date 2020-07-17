@@ -1,3 +1,3 @@
-export layout_search_ids := record(UCCv2_Services.layout_rmsid)
-	boolean isDeepDive := false;
-end;
+EXPORT layout_search_ids := RECORD(UCCv2_Services.layout_rmsid)
+  BOOLEAN isDeepDive := FALSE;
+END;
