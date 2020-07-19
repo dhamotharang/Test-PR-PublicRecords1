@@ -13,7 +13,7 @@ send_mail (string pSubject, string pBody) := lib_fileservices.FileServices.sende
 BuildType			:=	If (ut.Weekday((integer)(STRING8)Std.Date.Today()) = 'MONDAY', 
 												'F',
 												'D'
-											);		
+											);
 											
 GetBase		:=	phonesFeedback.proc_build_base(buildType);
 
@@ -26,15 +26,13 @@ build_base  := sequential(
 														fileServices.StartSuperFileTransaction(),
 														If (BuildType = 'F',
 																	sequential(
-																			fileServices.RemoveOwnedSubFiles('~thor_data400::base::phonesfeedback_father',true),
-																			fileServices.RemoveOwnedSubFiles('~thor_data400::base::phonesfeedback_fcra_father',true),
-																			fileServices.AddSuperFile('~thor_data400::base::phonesfeedback_fcra_father','~thor_data400::base::phonesfeedback_fcra'),
-																			fileServices.AddSuperFile('~thor_data400::base::phonesfeedback_father	','~thor_data400::base::phonesfeedback'),
-																			fileServices.RemoveOwnedSubFiles('~thor_data400::base::phonesfeedback'),
-																			fileServices.RemoveOwnedSubFiles('~thor_data400::base::phonesfeedback_fcra')
-																						)),
-														fileServices.AddSuperFile('~thor_data400::base::phonesfeedback_fcra',phonesFeedback.Cluster + 'base::PhonesFeedback_fcra_'+version),
-														fileServices.AddSuperFile('~thor_data400::base::phonesfeedback',phonesFeedback.Cluster + 'base::PhonesFeedback_'+version),														
+																			fileServices.PromoteSuperFileList(['~thor_data400::base::phonesfeedback','~thor_data400::base::phonesfeedback_father'],phonesFeedback.Cluster + 'base::PhonesFeedback_'+version);
+																			fileServices.PromoteSuperFileList(['~thor_data400::base::phonesfeedback_fcra','~thor_data400::base::phonesfeedback_fcra_father'],phonesFeedback.Cluster + 'base::PhonesFeedback_fcra_'+version);
+																						),
+																		sequential(				
+																			fileServices.AddSuperFile('~thor_data400::base::phonesfeedback_fcra',phonesFeedback.Cluster + 'base::PhonesFeedback_fcra_'+version),
+																			fileServices.AddSuperFile('~thor_data400::base::phonesfeedback',phonesFeedback.Cluster + 'base::PhonesFeedback_'+version)
+																							)),
 														fileServices.FinishSuperFileTransaction()
 													)	: success(output('Build for base file successful'))	,																																																
 									            failure(output('Build for base file FAILED'));
