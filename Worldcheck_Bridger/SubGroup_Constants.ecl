@@ -1231,6 +1231,9 @@
 		export string KEYWORD_MXSAT_DEF							:= '917';
 		export string KEYWORD_DKGA									:= '918';
 		export string KEYWORD_AUEPA									:= '919';
+		export string KEYWORD_SEGA									:= '920';
+		export string KEYWORD_GRHGC									:= '921';
+		export string KEYWORD_ILNBCTF_SO						:= '922';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
