@@ -98,12 +98,13 @@ EXPORT GetRetrievalGateway_Records := MODULE
     ref_rec := RECORD
       STRING50 RMSID{xpath('LiensRMSID')};
       STRING50 TMSID{xpath('LiensTMSID')};
+      STRING10 Orig_RMSID{xpath('Orig_RMSID')};
     END;
 
     Ids_from_request :=  PROJECT(dte_gw_recs, TRANSFORM(ref_rec,
-                                out := FROMXML(ref_rec,LEFT.Response.DteRequest.TaskExs[1].RequestOpaqueContent);
-                                SELF.RMSID := out.rmsid,
-                                SELF.TMSID := out.tmsid,
+                                SELF.RMSID := LEFT.rmsid,
+                                SELF.TMSID := LEFT.tmsid,
+                                SELF.Orig_RMSID := LEFT.Orig_RMSID,
                                 SELF := LEFT));
 
     //find the matched lien in liens search records (resolved from input pii and pri)
