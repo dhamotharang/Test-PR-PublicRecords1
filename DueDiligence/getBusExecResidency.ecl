@@ -6,8 +6,8 @@ EXPORT getBusExecResidency(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 		
 		
 		
-    INTEGER bsVersion := DueDiligence.CitDDShared.DEFAULT_BS_VERSION;
-    UNSIGNED8 bsOptions := DueDiligence.CitDDShared.DEFAULT_BS_OPTIONS;
+    INTEGER bsVersion := DueDiligence.ConstantsQuery.DEFAULT_BS_VERSION;
+    UNSIGNED8 bsOptions := DueDiligence.ConstantsQuery.DEFAULT_BS_OPTIONS;
     BOOLEAN isFCRA := DueDiligence.Constants.DEFAULT_IS_FCRA;
 
     UNSIGNED1 dppa := options.DPPA_Purpose;
@@ -24,14 +24,12 @@ EXPORT getBusExecResidency(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                                               SELF.inquiredDID := LEFT.party.did;
                                               SELF.indvType := DueDiligence.Constants.INQUIRED_INDIVIDUAL;
                                               SELF.individual := LEFT.party;
+                                              SELF.bestAddress := LEFT.party;
                                               SELF := [];));
 
 
-    //get the best data for the individual if do not have it
-    execBestData := DueDiligence.getIndInformation(options, mod_access).GetIndividualBestDataWithLexID(indLayout);						
-
     //get relatives of the inquired individual
-    inquiredRelatives := DueDiligence.getIndRelationships(execBestData, options, mod_access);
+    inquiredRelatives := DueDiligence.getIndRelationships(indLayout, options, mod_access);
 
     //get header information
     indHeader := DueDiligence.getIndHeader(inquiredRelatives, dataRestrictionMask, dppa, glba, isFCRA, bsVersion, FALSE, mod_access);
@@ -131,10 +129,9 @@ EXPORT getBusExecResidency(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
 
 
-    // OUTPUT(indata, NAMED('indata_execResidency'));
-    // OUTPUT(pullExecs, NAMED('pullExecs'));
+    // OUTPUT(indata, NAMED('indata_busExecRes'));
+    // OUTPUT(pullExecs, NAMED('pullExecs_busExecRes'));
     // OUTPUT(indLayout, NAMED('indLayout'));
-    // OUTPUT(execBestData, NAMED('execBestData'));
     // OUTPUT(inquiredRelatives, NAMED('inquiredRelatives'));
     // OUTPUT(indHeader, NAMED('indHeader'));
     // OUTPUT(indSSNData, NAMED('indSSNData'));

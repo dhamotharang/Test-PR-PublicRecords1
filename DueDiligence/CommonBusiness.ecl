@@ -30,7 +30,7 @@ EXPORT CommonBusiness := MODULE
 																								SELF := []; )); // Don't populate DotID or EmpID
 		
 		RETURN linkIDsOnly;
-	END;
+	END : DEPRECATED('Use DueDiligence.v3Common.DDBusiness.GetKfetch2LinkIDs');
 	
 	// Grabs just the linking ID's without Unique Seq Number - this is needed to use the BIP kFetch
 	EXPORT GetLinkIDsForKFetch(DATASET(DueDiligence.Layouts.Busn_Internal) BusnData) := FUNCTION
@@ -38,7 +38,7 @@ EXPORT CommonBusiness := MODULE
 		linkIDsOnlyForKFetch := PROJECT(GetLinkIDs(BusnData), TRANSFORM(BIPV2.IDlayouts.l_xlink_ids, SELF := LEFT;));
 		
 		RETURN linkIDsOnlyForKFetch;
-	END;
+	END : DEPRECATED('Use DueDiligence.v3Common.DDBusiness.GetKfetchLinkIDs');
 	
 	//copied/modified from 	Business_Risk_BIP.Common.AppendSeq2
 	//datasetToJoinTo must be of DueDiligence.Layouts.Busn_Internal structure
@@ -64,7 +64,7 @@ EXPORT CommonBusiness := MODULE
 												FEW); 
 												
 		RETURN joinResult;										
-	ENDMACRO;
+	ENDMACRO : DEPRECATED('Use DueDiligence.v3Common.DDBusiness.AppendSeq');
 	
 		
 	EXPORT rollSicNaicBySeqAndBIP(inquiredBusiness, inputDataset) := FUNCTIONMACRO

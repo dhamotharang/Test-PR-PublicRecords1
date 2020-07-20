@@ -5,12 +5,12 @@ EXPORT Common := MODULE
 
     EXPORT firstPopulatedString(field) := FUNCTIONMACRO
       RETURN IF(TRIM(LEFT.field) = DueDiligence.Constants.EMPTY, RIGHT.field, LEFT.field);
-    ENDMACRO;
+    ENDMACRO : DEPRECATED('Use DueDiligence.v3Common.General.firstPopulatedString');
   
     EXPORT firstNonZeroNumber(field) := FUNCTIONMACRO
       //so negative numbers would also be returned (ie -1)
       RETURN IF(LEFT.field = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.field, LEFT.field);
-    ENDMACRO;
+    ENDMACRO : DEPRECATED('Use DueDiligence.v3Common.General.firstNonZeroNumber');
 
     EXPORT createNVPair(STRING name, STRING val) := FUNCTION
       iesp.share.t_NameValuePair createPair(STRING n, STRING v) := TRANSFORM
@@ -20,6 +20,16 @@ EXPORT Common := MODULE
 
       RETURN ROW(createPair(name, val));			
     END;
+    
+    EXPORT createNVPairIntegerValue(STRING name, INTEGER val) := FUNCTION
+      
+      iesp.share.t_NameValuePair createPair(STRING n, INTEGER v) := TRANSFORM
+        SELF.Name := n;
+        SELF.Value := (STRING)v;
+      END;
+
+      RETURN ROW(createPair(name, val));			
+  END;
 	
     EXPORT calcFinalFlagField(STRING1 flag9, STRING1 flag8, STRING1 flag7, STRING1 flag6, STRING1 flag5, STRING1 flag4, STRING1 flag3, STRING1 flag2, STRING1 flag1) := FUNCTION
        

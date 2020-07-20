@@ -11,7 +11,7 @@ EXPORT cit1808_0_0(DATASET(risk_indicators.Layout_Boca_Shell) clam) := FUNCTION
 
     Layout_Debug := RECORD
         //Layout of the Debug/Validation record
-        STRING10 model_name;
+        STRING15 model_name;
         unsigned4 seq;
         INTEGER sysdate;
         INTEGER ver_src_ak_pos;

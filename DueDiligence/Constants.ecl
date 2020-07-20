@@ -3,12 +3,62 @@
 
 EXPORT Constants := MODULE
 
+    //ENUMS
+    EXPORT REQUESTED_SOURCE_ENUM := ENUM(UNSIGNED1, EMPTY=0, NONE=1, ONLINE=2, BATCH=3);
+    
+    //DD_RULES: 
+    // 1) LexID search (if passed in) and all data is based on best if lexID found, 
+    // 2) If lexID not found, will attempt to search using PII (if supplied). 
+    //    a.) If lexID is found and a full address was input use best data EXCEPT for address (will use input address)
+    //    b.) If lexID is found and no address or no full address was input use best data
+    //
+    //AS_IS: 
+    // 1) Use data as is, do not overwrite/populate with anything else - best data will not be populated
+    //
+    //BEST_IF_INPUT_EMPTY: 
+    // 1) Use existing data if provided, anything not populated, use best
+    //    a.) If existing data does not have full address, best will be used
+    EXPORT USE_INPUT_DATA_ENUM := ENUM(UNSIGNED1, DD_RULES=0, AS_IS, BEST_IF_INPUT_EMPTY); 
+    
+
+
+    //GENERAL
+    EXPORT EMPTY := '';
+    
+    EXPORT MAX_500 := 500;
+    EXPORT MAX_1000 := 1000;
+    EXPORT MAX_5000 := 5000;
+    
+    
+    //PERSON
+    EXPORT INQUIRED_INDIVIDUAL := 'II';
+    EXPORT INQUIRED_INDIVIDUAL_SPOUSE := 'IS';
+    EXPORT INQUIRED_INDIVIDUAL_PARENT := 'IP';
+    EXPORT INQUIRED_INDIVIDUAL_OTHER_RELATION := 'RO';
+
+  
+
+    //ATTRIBUTE SPECIFIC
+    // EXPORT ATTRIBUTE_GROUP := ENUM(UNSIGNED1, EMPTY=0, LEGAL, ECONOMIC, PROF_NETWORK, IDENTITY, BUS_ASSOC, GEOGRAPHIC, PER_ASSOC);
+    
+    EXPORT T_INDICATOR := 'T';
+    EXPORT F_INDICATOR := 'F';
+
+
+
+
+
+
+
+
+
+//below to be cleaned up with modularization pieces
+
 EXPORT ATTRIBUTE_RESPONSE_LAYOUT := iesp.duediligenceattributes.t_DueDiligenceAttributesResponse;
 
 EXPORT VERSION_0 := 0;
 EXPORT VERSION_3 := 3;
 
-EXPORT REQUESTED_SOURCE_ENUM := ENUM(UNSIGNED1, EMPTY=0, NONE=1, ONLINE=2, BATCH=3);
 
 
 EXPORT IND_REQ_ATTRIBUTE_V3 := 'DDAPERV3';
@@ -37,8 +87,6 @@ EXPORT NUMBER_OF_BUSINESS_ATTRIBUTES := 24;
 EXPORT STRING_TRUE := 'TRUE';
 EXPORT STRING_FALSE := 'FALSE';
 
-EXPORT T_INDICATOR := 'T';
-EXPORT F_INDICATOR := 'F';
 
 EXPORT FEIN_SOURCE_EXPERIAN_RESTRICTED := 'E5'; 
 
@@ -52,14 +100,14 @@ EXPORT YEARS_TO_LOOK_BACK  := 3;
 EXPORT FIRST_POS := 3;                 
 EXPORT LAST_POS  := 5;  
 
-EXPORT MAX_KEEP        := 1000;             /* The maximum number of records we KEEP */
-EXPORT MAX_ATMOST      := 1000;             /* The maximum number of records we care to use in an ATMOST within a JOIN. */
+EXPORT MAX_KEEP        := 1000 : DEPRECATED('Use DueDiligence.Constants.MAX_1000'); 
+EXPORT MAX_ATMOST      := 1000 : DEPRECATED('Use DueDiligence.Constants.MAX_1000');             
 EXPORT MAX_ATMOST_1    := 1;
 EXPORT MAX_ATMOST_100  := 100;
 EXPORT MAX_ATMOST_150	 := 150;
-EXPORT MAX_ATMOST_500  := 500;
-EXPORT MAX_ATMOST_1000 := 1000;
-EXPORT MAX_ATMOST_5000 := 5000; 
+EXPORT MAX_ATMOST_500  := 500 : DEPRECATED('Use DueDiligence.Constants.MAX_500');
+EXPORT MAX_ATMOST_1000 := 1000 : DEPRECATED('Use DueDiligence.Constants.MAX_1000');
+EXPORT MAX_ATMOST_5000 := 5000 : DEPRECATED('Use DueDiligence.Constants.MAX_5000'); 
 
 EXPORT MAX_SIC_NAIC := 250;
 EXPORT MAX_POSITIONS := 50;
@@ -68,6 +116,8 @@ EXPORT MAX_EXECS := 200;
 EXPORT MAX_LINKED_BUSINESSES := 300;
 EXPORT MAX_REGISTERED_AGENTS := 200;
 EXPORT MAX_PARENTS := 25;  
+EXPORT MAX_SPOUSES := 25;  
+EXPORT MAX_ASSOCIATES := 200;
 EXPORT MAX_OPERATING_LOCATIONS := 500;
 EXPORT MAX_BUREAUS := 200;
 EXPORT MAX_ASSOCIATED_FEIN_NAMES := 500;
@@ -87,7 +137,7 @@ EXPORT RELATIONSHIP_REAL_ESTATE := 95;
 EXPORT RELATIONSHIP_OTHER_PROPERTY := 96;
 
 
-EXPORT EMPTY := '';
+
 EXPORT ZERO := '0';
 EXPORT NUMERIC_ZERO := 0;
 
@@ -275,12 +325,9 @@ EXPORT OPERATING_LOCATION := 'OL';
 EXPORT REGISTERED_AGENT := 'RA';
 EXPORT RELATED_BUSINESS_DEGREE := 'RB';
 
-EXPORT INQUIRED_INDIVIDUAL := 'II';
-EXPORT INQUIRED_INDIVIDUAL_SPOUSE := 'IS';
-EXPORT INQUIRED_INDIVIDUAL_PARENT := 'IP';
+
 EXPORT INQUIRED_INDIVIDUAL_FIRST_DEGREE := 'R1';
 EXPORT INQUIRED_INDIVIDUAL_SECOND_DEGREE := 'R2';
-EXPORT INQUIRED_INDIVIDUAL_OTHER_RELATION := 'RO';
 EXPORT INQUIRED_INDIVIDUAL_BUSINESS_ASSOCIATE := 'RP';
 
 EXPORT STATE_CRIMINAL_DATA := 'S';

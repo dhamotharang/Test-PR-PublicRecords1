@@ -64,8 +64,12 @@ EXPORT getIndSSNData(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                     SELF := [];),
                         LEFT OUTER);
                         
+    //unique related parties
+    uniqueRelatedParties := DEDUP(SORT(validateSSN, seq, did, relationshipToInquired), seq, did);
+     
+                        
 
-    suspiciousSSNs := JOIN(validateSSN, Risk_Indicators.Key_SSN_Table_v4_2,
+    suspiciousSSNs := JOIN(uniqueRelatedParties, Risk_Indicators.Key_SSN_Table_v4_2,
                             KEYED(LEFT.party.ssn = RIGHT.ssn)	AND
                             //only keep records that are suspicious
                             RIGHT.combo.recentcount >= 3,

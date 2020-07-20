@@ -427,6 +427,7 @@ EXPORT Constants := MODULE
 	//Due Diligence
 	export DDRAttributesConst := MODULE
     export unsigned2 MaxAttributes      				:= 24;
+    export unsigned1 MaxModuleGroupings         := 6;
     export unsigned2 MaxReportedAKAs      			:= 500;
     export unsigned2 MaxReportedDOBs      			:= 500;
     export unsigned2 MaxSSNDeviations      			:= 500;
@@ -458,6 +459,7 @@ EXPORT Constants := MODULE
     export unsigned2 MaxBusAssociations   			:= 500;
     export unsigned2 MaxResidence               := 500;
     export unsigned2 MaxPersonAssociations      := 500;
+    export unsigned2 MaxLinkedBusinesses        := 200;
 	end;
 
 	//Digital Mortgage Application Prefill (DMAP)
