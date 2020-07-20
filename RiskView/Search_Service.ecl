@@ -155,6 +155,7 @@ export Search_Service := MACRO
     boolean ExcludeStatusRefresh := option.LiensJudgmentsReportOptions.ExcludeStatusRefresh;
     string32 DeferredTransactionID := option.LiensJudgmentsReportOptions.DeferredTransactionID;
     string5 StatusRefreshWaitPeriod := option.LiensJudgmentsReportOptions.StatusRefreshWaitPeriod;
+    DeferredTransactionIDs := IF(DeferredTransactionID <> '', DATASET([DeferredTransactionID], {STRING32 DeferredTransactionID}), DATASET([], {STRING32 DeferredTransactionID}));
 	
 	// if the boolean flag is true, use the boolean flags
 	// if the boolean flag is not true, then check to ensure the user didn't enter a FilterlienType	
@@ -343,9 +344,10 @@ search_results_temp := ungroup(
       		ExcludeStates := ExcludeStates,
       		ExcludeReportingSources := ExcludeReportingSources,
 			IncludeStatusRefreshChecks := IncludeStatusRefreshChecks,
-            DeferredTransactionID := DeferredTransactionID,
+            DeferredTransactionIDs := DeferredTransactionIDs,
             StatusRefreshWaitPeriod := StatusRefreshWaitPeriod,
-            ESPInterfaceVersion := InterfaceVersion
+            ESPInterfaceVersion := InterfaceVersion,
+            IsBatch := FALSE
       		) 
       	);
   

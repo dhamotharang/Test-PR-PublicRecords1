@@ -35,15 +35,16 @@ EXPORT Search_Function(
 	boolean IncludeLnJ,
 	boolean RetainInputDID,
 	boolean exception_score_reason = FALSE,
-  boolean InsuranceMode = FALSE, //BF _ This value is set to true for insurance only.
+    boolean InsuranceMode = FALSE, //BF _ This value is set to true for insurance only.
 	boolean InsuranceBankruptcyAllow10Yr = FALSE, //Value is true for insurance only.
 	unsigned6 MinimumAmount = 0,
 	dataset(iesp.share.t_StringArrayItem) ExcludeStates = dataset([], iesp.share.t_StringArrayItem),
 	dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem),
 	boolean IncludeStatusRefreshChecks = FALSE,
-	string32 DeferredTransactionID = '',
+	DATASET({string32 DeferredTransactionID}) DeferredTransactionIDs = DATASET([], {string32 DeferredTransactionID}),
     string5 StatusRefreshWaitPeriod = '',
-    string10 ESPInterfaceVersion = ''
+    string10 ESPInterfaceVersion = '',
+    boolean IsBatch = FALSE // Changes the output of the DTE child dataset
   ) := function
 
 boolean   isPreScreenPurpose := STD.Str.ToUpperCase(intended_purpose) = 'PRESCREENING';
@@ -1325,10 +1326,17 @@ transform(riskview.layouts.layout_riskview5_search_results,
   
 riskview5_final_results := if(CheckingIndicatorsRequest, riskview5_attr_search_results_FirstData, riskview5_pre_final_results);
 
-riskview5_with_status_refresh := MAP(IncludeStatusRefreshChecks = TRUE AND DeferredTransactionID = '' AND ~AttributesOnly => Riskview.Functions.JuLiProcessStatusRefresh(clam, gateways, riskview5_final_results, ExcludeStatusRefresh, StatusRefreshWaitPeriod, ESPInterfaceVersion, IncludeStatusRefreshChecks),
-                                                                   IncludeStatusRefreshChecks = TRUE AND DeferredTransactionID <> '' => Riskview.Functions.JuLiProcessDTE(DeferredTransactionID, clam, gateways, riskview5_final_results, IncludeStatusRefreshChecks),
+boolean InvokeStatusRefresh := IncludeStatusRefreshChecks = TRUE AND COUNT(DeferredTransactionIDs) = 0 AND ~AttributesOnly;
+boolean InvokeDTE := IncludeStatusRefreshChecks = TRUE AND COUNT(DeferredTransactionIDs) <> 0;
+
+riskview_status_refresh := IF(InvokeStatusRefresh, Riskview.Functions.JuLiProcessStatusRefresh(clam, gateways, riskview5_final_results, ExcludeStatusRefresh, StatusRefreshWaitPeriod, ESPInterfaceVersion, IsBatch, riskview_input, InvokeStatusRefresh), dataset([], riskview.layouts.layout_riskview5_search_results));
+riskview_dte := IF(InvokeDTE, Riskview.Functions.JuLiProcessDTE(DeferredTransactionIDs, clam, gateways, riskview5_final_results, InvokeDTE), dataset([], riskview.layouts.layout_riskview5_search_results));
+
+riskview5_with_status_refresh := MAP(InvokeStatusRefresh => riskview_status_refresh,
+                                                                   InvokeDTE => riskview_dte,
                                                                    riskview5_final_results);
                                                                    
+                                                                  
  /* *************************************
   *   Boca Shell Logging Functionality  *
   ***************************************/
