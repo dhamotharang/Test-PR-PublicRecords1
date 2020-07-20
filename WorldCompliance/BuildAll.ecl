@@ -16,15 +16,15 @@ dsRegistrations 					:= ProcessFile(Files.srcRegistrations);
 doit := SEQUENTIAL(
 	PARALLEL(
 		WriteXGFormat.OutputDataXMLFile('AM', 'WorldCompliance - Adverse Media.xml', version,
-								dsAdverseMedia, Files.srcAdverseMedia),
+								dsAdverseMedia, Files.srcAdverseMedia,true),
 		WriteXGFormat.OutputDataXMLFile('ENF', 'WorldCompliance - Enforcement.xml', version,
-								dsGlobalEnforcement, Files.srcGlobalEnforcement),
+								dsGlobalEnforcement, Files.srcGlobalEnforcement,true),
 		WriteXGFormat.OutputDataXMLFile('EDD', 'WorldCompliance - Expanded Due Diligence.xml', version,
-								dsGlobalEdd, Files.srcGlobalEdd),
+								dsGlobalEdd, Files.srcGlobalEdd,true),
 		WriteXGFormat.OutputDataXMLFile('SOE', 'WorldCompliance - State Owned Entities.xml', version,
-								dsGlobalStateOwned, Files.srcGlobalStateOwned),
+								dsGlobalStateOwned, Files.srcGlobalStateOwned,true),
 		WriteXGFormat.OutputDataXMLFile('PEP', 'WorldCompliance - Politically Exposed Persons.xml', version,
-								dsPep, Files.srcPep),
+								dsPep, Files.srcPep,true),
 		WriteXGFormat.OutputDataXMLFile('SAE', 'WorldCompliance - Sanctions and Enforcements.xml', version,
 								dsSanctionsAndEnforcement, Files.srcSanctionsAndEnforcement,true),
 		WriteXGFormat.OutputDataXMLFile('SAN', 'WorldCompliance - Sanctions.xml', version,
@@ -34,7 +34,7 @@ doit := SEQUENTIAL(
 		worldcompliance.WriteXGFormat.OutputGeoXMLFile('CNT', 'WorldCompliance - Countries.xml', version,
 								dsNations),
 		WriteXGFormat.OutputDataXMLFile('REG', 'WorldCompliance - Registrations.xml', version,
-   								dsRegistrations, Files.srcRegistrations)
+   								dsRegistrations, Files.srcRegistrations,true)
 	),
 	Unspray('~thor::WorldCompliance::WorldCompliance - Adverse Media.xml', 'WorldCompliance - Adverse Media.xml'),
 	Unspray('~thor::WorldCompliance::WorldCompliance - Enforcement.xml', 'WorldCompliance - Enforcement.xml'),
