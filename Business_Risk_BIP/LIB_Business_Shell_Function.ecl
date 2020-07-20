@@ -4,33 +4,33 @@ Use_Business_Shell_Library := NOT _Control.LibraryUse.ForceOff_Business_Risk_BIP
 
 EXPORT LIB_Business_Shell_Function (
 											DATASET(Business_Risk_BIP.Layouts.Input) Input,
-											UNSIGNED1	DPPA_Purpose_In					= Business_Risk_BIP.Constants.Default_DPPA,
-											UNSIGNED1	GLBA_Purpose_In					= Business_Risk_BIP.Constants.Default_GLBA,
-											STRING50	DataRestrictionMask_In	= Business_Risk_BIP.Constants.Default_DataRestrictionMask,
-											STRING50	DataPermissionMask_In		= Business_Risk_BIP.Constants.Default_DataPermissionMask,
-											STRING10	IndustryClass_In				= Business_Risk_BIP.Constants.Default_IndustryClass,
-											UNSIGNED1	LinkSearchLevel_In			= Business_Risk_BIP.Constants.LinkSearch.Default,
-											UNSIGNED1	BusShellVersion_In			= Business_Risk_BIP.Constants.Default_BusShellVersion,
-											UNSIGNED1	MarketingMode_In				= Business_Risk_BIP.Constants.Default_MarketingMode,
-											STRING50	AllowedSources_In				= Business_Risk_BIP.Constants.Default_AllowedSources,
-											UNSIGNED1 BIPBestAppend_In				= Business_Risk_BIP.Constants.BIPBestAppend.Default,
-											UNSIGNED1	OFAC_Version_In					= Business_Risk_BIP.Constants.Default_OFAC_Version,
-											REAL			Global_Watchlist_Threshold_In	= Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold,
+											UNSIGNED1	DPPA_Purpose_In	= Business_Risk_BIP.Constants.Default_DPPA,
+											UNSIGNED1	GLBA_Purpose_In	= Business_Risk_BIP.Constants.Default_GLBA,
+											STRING50	DataRestrictionMask_In = Business_Risk_BIP.Constants.Default_DataRestrictionMask,
+											STRING50	DataPermissionMask_In = Business_Risk_BIP.Constants.Default_DataPermissionMask,
+											STRING10	IndustryClass_In = Business_Risk_BIP.Constants.Default_IndustryClass,
+											UNSIGNED1	LinkSearchLevel_In = Business_Risk_BIP.Constants.LinkSearch.Default,
+											UNSIGNED1	BusShellVersion_In = Business_Risk_BIP.Constants.Default_BusShellVersion,
+											UNSIGNED1	MarketingMode_In = Business_Risk_BIP.Constants.Default_MarketingMode,
+											STRING50	AllowedSources_In = Business_Risk_BIP.Constants.Default_AllowedSources,
+											UNSIGNED1   BIPBestAppend_In = Business_Risk_BIP.Constants.BIPBestAppend.Default,
+											UNSIGNED1	OFAC_Version_In	= Business_Risk_BIP.Constants.Default_OFAC_Version,
+											REAL		Global_Watchlist_Threshold_In = Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold,
 											DATASET(iesp.Share.t_StringArrayItem) Watchlists_Requested_In = Business_Risk_BIP.Constants.Default_Watchlists_Requested,
-											UNSIGNED1 KeepLargeBusinesses_In	= Business_Risk_BIP.Constants.DefaultJoinType,
-											BOOLEAN IncludeTargusGateway_In   = FALSE,
+											UNSIGNED1 KeepLargeBusinesses_In = Business_Risk_BIP.Constants.DefaultJoinType,
+											BOOLEAN IncludeTargusGateway_In = FALSE,
 											DATASET(Gateway.Layouts.Config) Gateways_in = Business_Risk_BIP.Constants.Default_Gateways_Requested,
-											BOOLEAN RunTargusGateway          = FALSE,
+											BOOLEAN RunTargusGateway  = FALSE,
 											BOOLEAN OverrideExperianRestriction_In = FALSE,
 											BOOLEAN IncludeAuthRepInBIPAppend = FALSE,
-											BOOLEAN IsBIID20_In								= FALSE,
-											BOOLEAN CorteraRetrotest_In       = FALSE,
+											BOOLEAN IsBIID20_In	= FALSE,
+											BOOLEAN CorteraRetrotest_In = FALSE,
 											DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw),
 											unsigned1 LexIdSourceOptout = 1,
 											string TransactionID = '',
 											string BatchUID = '',
 											unsigned6 GlobalCompanyId = 0,
- 											BOOLEAN UseOldBIPAppend_In = FALSE
+ 											BOOLEAN in_useUpdatedBipAppend = true
 											) := FUNCTION
 
 options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
@@ -70,6 +70,7 @@ options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
 	export string16 bus_TransactionID := (string16)TransactionID;
 	export string16 bus_BatchUID := (string16)BatchUID;
 	export unsigned6 bus_GlobalCompanyId := GlobalCompanyId;
+  EXPORT BOOLEAN    UseUpdatedBipAppend := in_useUpdatedBipAppend;
 END;
 
 #if(Use_Business_Shell_Library)
