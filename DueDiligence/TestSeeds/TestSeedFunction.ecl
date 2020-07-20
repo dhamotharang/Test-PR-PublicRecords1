@@ -37,17 +37,17 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                           SELF.datasetName := testDataTableName;
                                           
                                           #EXPAND(IF(indvOrBus = DueDiligence.Constants.INDIVIDUAL,
-                                                      'SELF.hashKey := getHash(LEFT.individual.name.firstName, LEFT.individual.name.lastName, LEFT.individual.ssn,' +
+                                                      'SELF.hashKey := getHash(LEFT.rawPerson.name.firstName, LEFT.rawPerson.name.lastName, LEFT.rawPerson.taxID,' +
                                                                                 'Risk_Indicators.nullstring, Risk_Indicators.nullstring,' +
-                                                                                'LEFT.individual.address.zip5, LEFT.individual.phone);',
+                                                                                'LEFT.rawPerson.address.zip, LEFT.rawPerson.phone);',
                                                       DueDiligence.Constants.EMPTY))
                                                      
                                                      
                                                      
                                           #EXPAND(IF(indvOrBus = DueDiligence.Constants.BUSINESS,
                                                       'SELF.hashKey := getHash(Risk_Indicators.nullstring, Risk_Indicators.nullstring, Risk_Indicators.nullstring,' +
-                                                                                'LEFT.business.companyName, LEFT.business.fein,' +
-                                                                                'LEFT.business.address.zip5, LEFT.business.phone);',
+                                                                                'LEFT.rawBusiness.companyName, LEFT.rawBusiness.taxID,' +
+                                                                                'LEFT.rawBusiness.address.zip, LEFT.rawBusiness.phone);',
                                                       DueDiligence.Constants.EMPTY))
                                               
                                                       
@@ -59,60 +59,60 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                           
                                           //populate input echo for a person
                                           #EXPAND(IF(indvOrBus = DueDiligence.Constants.INDIVIDUAL,
-                                                      'SELF.result.inputEcho.person.lexID := LEFT.individual.lexID;' + 
-                                                      'SELF.result.inputEcho.person.phone := LEFT.individual.phone;' +
-                                                      'SELF.result.inputEcho.person.ssn := LEFT.individual.ssn;' +
-                                                      'SELF.result.inputEcho.person.dob := iesp.ECL2ESP.toDatestring8(LEFT.individual.dob);' +
+                                                      'SELF.result.inputEcho.person.lexID := (STRING)LEFT.rawPerson.lexID;' + 
+                                                      'SELF.result.inputEcho.person.phone := LEFT.rawPerson.phone;' +
+                                                      'SELF.result.inputEcho.person.ssn := LEFT.rawPerson.taxID;' +
+                                                      'SELF.result.inputEcho.person.dob := iesp.ECL2ESP.toDatestring8(LEFT.rawPerson.dob);' +
                                              
-                                                      'SELF.result.inputEcho.person.address := iesp.ECL2ESP.SetAddress(LEFT.individual.address.prim_name,' +
-                                                                                                                       'LEFT.individual.address.prim_range,' + 
-                                                                                                                       'LEFT.individual.address.predir,' + 
-                                                                                                                       'LEFT.individual.address.postdir,' + 
-                                                                                                                       'LEFT.individual.address.addr_suffix,' + 
-                                                                                                                       'LEFT.individual.address.unit_desig,' + 
-                                                                                                                       'LEFT.individual.address.sec_range,' + 
-                                                                                                                       'LEFT.individual.address.city,' + 
-                                                                                                                       'LEFT.individual.address.state,' + 
-                                                                                                                       'LEFT.individual.address.zip5,' + 
-                                                                                                                       'LEFT.individual.address.zip4,' + 
+                                                      'SELF.result.inputEcho.person.address := iesp.ECL2ESP.SetAddress(LEFT.rawPerson.address.prim_name,' +
+                                                                                                                       'LEFT.rawPerson.address.prim_range,' + 
+                                                                                                                       'LEFT.rawPerson.address.predir,' + 
+                                                                                                                       'LEFT.rawPerson.address.postdir,' + 
+                                                                                                                       'LEFT.rawPerson.address.addr_suffix,' + 
+                                                                                                                       'LEFT.rawPerson.address.unit_desig,' + 
+                                                                                                                       'LEFT.rawPerson.address.sec_range,' + 
+                                                                                                                       'LEFT.rawPerson.address.city,' + 
+                                                                                                                       'LEFT.rawPerson.address.state,' + 
+                                                                                                                       'LEFT.rawPerson.address.zip,' + 
+                                                                                                                       'LEFT.rawPerson.address.zip4,' + 
                                                                                                                        'DueDiligence.Constants.EMPTY,' + 
                                                                                                                        'DueDiligence.Constants.EMPTY,' + 
-                                                                                                                       'LEFT.individual.address.streetAddress1,' + 
-                                                                                                                       'LEFT.individual.address.streetAddress2);' +
+                                                                                                                       'LEFT.rawPerson.address.streetAddress1,' + 
+                                                                                                                       'LEFT.rawPerson.address.streetAddress2);' +
                                                       
-                                                      'SELF.result.inputEcho.person.name := iesp.ECL2ESP.SetName(LEFT.individual.name.firstName,' +
-                                                                                                                 'LEFT.individual.name.middleName,' + 
-                                                                                                                 'LEFT.individual.name.lastName,' + 
-                                                                                                                 'LEFT.individual.name.suffix,' + 
+                                                      'SELF.result.inputEcho.person.name := iesp.ECL2ESP.SetName(LEFT.rawPerson.name.firstName,' +
+                                                                                                                 'LEFT.rawPerson.name.middleName,' + 
+                                                                                                                 'LEFT.rawPerson.name.lastName,' + 
+                                                                                                                 'LEFT.rawPerson.name.suffix,' + 
                                                                                                                  'DueDiligence.Constants.EMPTY,' + 
-                                                                                                                 'LEFT.individual.name.fullName);',
+                                                                                                                 'LEFT.rawPerson.name.fullName);',
                                                                                                                  
                                                       DueDiligence.Constants.EMPTY))
                                                       
                                                       
                                           //populate input echo for a business
                                           #EXPAND(IF(indvOrBus = DueDiligence.Constants.BUSINESS,
-                                                      'SELF.result.inputEcho.business.lexID := LEFT.business.lexID;' + 
-                                                      'SELF.result.inputEcho.business.phone := LEFT.business.phone;' +
-                                                      'SELF.result.inputEcho.business.fein := LEFT.business.fein;' +
-                                                      'SELF.result.inputEcho.business.companyName := LEFT.business.companyName;' +
-                                                      'SELF.result.inputEcho.business.alternateCompanyName := LEFT.business.altCompanyName;' +
+                                                      'SELF.result.inputEcho.business.lexID := (STRING)LEFT.rawBusiness.lexID;' + 
+                                                      'SELF.result.inputEcho.business.phone := LEFT.rawBusiness.phone;' +
+                                                      'SELF.result.inputEcho.business.fein := LEFT.rawBusiness.taxID;' +
+                                                      'SELF.result.inputEcho.business.companyName := LEFT.rawBusiness.companyName;' +
+                                                      'SELF.result.inputEcho.business.alternateCompanyName := LEFT.rawBusiness.altCompanyName;' +
                                                       
-                                                      'SELF.result.inputEcho.business.address := iesp.ECL2ESP.SetAddress(LEFT.business.address.prim_name,' +
-                                                                                                                       'LEFT.business.address.prim_range,' + 
-                                                                                                                       'LEFT.business.address.predir,' + 
-                                                                                                                       'LEFT.business.address.postdir,' + 
-                                                                                                                       'LEFT.business.address.addr_suffix,' + 
-                                                                                                                       'LEFT.business.address.unit_desig,' + 
-                                                                                                                       'LEFT.business.address.sec_range,' + 
-                                                                                                                       'LEFT.business.address.city,' + 
-                                                                                                                       'LEFT.business.address.state,' + 
-                                                                                                                       'LEFT.business.address.zip5,' + 
-                                                                                                                       'LEFT.business.address.zip4,' + 
+                                                      'SELF.result.inputEcho.business.address := iesp.ECL2ESP.SetAddress(LEFT.rawBusiness.address.prim_name,' +
+                                                                                                                       'LEFT.rawBusiness.address.prim_range,' + 
+                                                                                                                       'LEFT.rawBusiness.address.predir,' + 
+                                                                                                                       'LEFT.rawBusiness.address.postdir,' + 
+                                                                                                                       'LEFT.rawBusiness.address.addr_suffix,' + 
+                                                                                                                       'LEFT.rawBusiness.address.unit_desig,' + 
+                                                                                                                       'LEFT.rawBusiness.address.sec_range,' + 
+                                                                                                                       'LEFT.rawBusiness.address.city,' + 
+                                                                                                                       'LEFT.rawBusiness.address.state,' + 
+                                                                                                                       'LEFT.rawBusiness.address.zip,' + 
+                                                                                                                       'LEFT.rawBusiness.address.zip4,' + 
                                                                                                                        'DueDiligence.Constants.EMPTY,' + 
                                                                                                                        'DueDiligence.Constants.EMPTY,' + 
-                                                                                                                       'LEFT.business.address.streetAddress1,' + 
-                                                                                                                       'LEFT.business.address.streetAddress2);',
+                                                                                                                       'LEFT.rawBusiness.address.streetAddress1,' + 
+                                                                                                                       'LEFT.rawBusiness.address.streetAddress2);',
                                                                                                                  
                                                       DueDiligence.Constants.EMPTY))
                                                       

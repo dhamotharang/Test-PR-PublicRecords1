@@ -70,7 +70,7 @@ EXPORT CommonIndividual := MODULE
   END;
   
   
-  EXPORT GetAllRelationships(DATASET(DueDiligence.Layouts.Indv_Internal) inquiredData) := FUNCTION
+  EXPORT GetAllRelationships(DATASET(DueDiligence.Layouts.Indv_Internal) inquiredData, BOOLEAN doNotUseFilterdData = FALSE) := FUNCTION
   
       NormalizeRelationships(dsNameFromInquiredInd, relationshipToInquired) := FUNCTIONMACRO
           RETURN NORMALIZE(inquiredData, LEFT.dsNameFromInquiredInd, 
@@ -94,13 +94,13 @@ EXPORT CommonIndividual := MODULE
       filtAssoc := DEDUP(SORT(allInd, seq, did, -relationToInquired), seq, did);
 
       
-      RETURN filtAssoc;
+      RETURN IF(doNotUseFilterdData, allInd, filtAssoc);
   END;  
   
   
   EXPORT UpdateRelationships(DATASET(DueDiligence.Layouts.Indv_Internal) inquiredData, DATASET(DueDiligence.LayoutsInternal.RelatedParty) relatedPartyResults, DueDiligence.DataInterface.iAttributePerAssoc dataOptions) := FUNCTION
   
-      getRelationInfo := GetAllRelationships(inquiredData);                               
+      getRelationInfo := GetAllRelationships(inquiredData, TRUE);                               
                                               
                                               
       updateRelationInfo := JOIN(getRelationInfo, relatedPartyResults,

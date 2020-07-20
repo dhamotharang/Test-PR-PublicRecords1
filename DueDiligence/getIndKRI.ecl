@@ -13,29 +13,6 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
 		SELF.PerUSResidency  := usResidency.name;
     
     
-    //PERSON MATCH LEVEL (based on ADL Score)																																																	 
-		PerMatchLevel_Flag9 := IF (le.individual.score < 21, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);                            
-		PerMatchLevel_Flag8 := IF (le.individual.score BETWEEN 21 AND 30, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);               
-		PerMatchLevel_Flag7 := IF (le.individual.score BETWEEN 31 AND 40, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);               
-		PerMatchLevel_Flag6 := IF (le.individual.score BETWEEN 41 AND 50, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);               
-		PerMatchLevel_Flag5 := IF (le.individual.score BETWEEN 51 AND 60, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);               
-		PerMatchLevel_Flag4 := IF (le.individual.score BETWEEN 61 AND 70, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);               
-		PerMatchLevel_Flag3 := IF (le.individual.score BETWEEN 71 AND 80, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);               
-		PerMatchLevel_Flag2 := IF (le.individual.score BETWEEN 81 AND 90, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);               
-		PerMatchLevel_Flag1 := IF (le.individual.score > 90, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);                            
-    
-    PerMatchLevel_Flag_final := DueDiligence.Common.calcFinalFlagField(PerMatchLevel_Flag9,
-                                                                        PerMatchLevel_Flag8,
-                                                                        PerMatchLevel_Flag7,
-                                                                        PerMatchLevel_Flag6,
-                                                                        PerMatchLevel_Flag5,
-                                                                        PerMatchLevel_Flag4,
-                                                                        PerMatchLevel_Flag3,
-                                                                        PerMatchLevel_Flag2,
-                                                                        PerMatchLevel_Flag1);
-                                      
-    SELF.PerMatchLevel_Flag := PerMatchLevel_Flag_final;                                            
-		SELF.PerMatchLevel := (STRING)(10 - STD.Str.Find(PerMatchLevel_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));       
     
     //PERSON ASSET OWNED PROPERTY
     perAssetOwnProperty_Flag9 := IF(le.ownedPropCount >= 15, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
@@ -373,40 +350,7 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
     SELF.PerAssociates := (STRING)(10-STD.Str.Find(perAssoc_Flag_Final, DueDiligence.Constants.T_INDICATOR, 1));
     
     
-    //PERSON CIVIL EVENTS(LIENS, JUDGEMENTS and EVICTIONS)
-    totalCivilCount := le.liensUnreleasedCntInThePastNYR + le.evictionsCntInThePastNYR;
-    totalCivilCountOlder := le.liensUnreleasedCntOVNYR + le.evictionsCntOVNYR; 
-     
-    perCivilEvent_Flag9 := IF(totalCivilCount >= 10, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);    
-    perCivilEvent_Flag8 := IF(totalCivilCount BETWEEN 5 AND 9, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);   											
-    perCivilEvent_Flag7 := IF(totalCivilCount BETWEEN 3 AND 4, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);    										
-    perCivilEvent_Flag6 := IF(totalCivilCount BETWEEN 1 AND 2, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
-    perCivilEvent_Flag5 := IF(totalCivilCountOlder >= 10, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    perCivilEvent_Flag4 := IF(totalCivilCountOlder BETWEEN 5 AND 9, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 						
-    perCivilEvent_Flag3 := IF(totalCivilCountOlder BETWEEN 3 AND 4, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 										
-    perCivilEvent_Flag2 := IF(totalCivilCountOlder BETWEEN 1 AND 2, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
-    perCivilEvent_Flag1 := IF(perCivilEvent_Flag9 = DueDiligence.Constants.F_INDICATOR AND 
-                              perCivilEvent_Flag8 = DueDiligence.Constants.F_INDICATOR AND 
-                              perCivilEvent_Flag7 = DueDiligence.Constants.F_INDICATOR AND
-                              perCivilEvent_Flag6 = DueDiligence.Constants.F_INDICATOR AND 
-                              perCivilEvent_Flag5 = DueDiligence.Constants.F_INDICATOR AND 
-                              perCivilEvent_Flag4 = DueDiligence.Constants.F_INDICATOR AND 
-                              perCivilEvent_Flag3 = DueDiligence.Constants.F_INDICATOR AND 
-                              perCivilEvent_Flag2 = DueDiligence.Constants.F_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
-     
-    perCivilEvent_Flag_final := DueDiligence.Common.calcFinalFlagField(perCivilEvent_Flag9,
-                                                                        perCivilEvent_Flag8,
-                                                                        perCivilEvent_Flag7,
-                                                                        perCivilEvent_Flag6,
-                                                                        perCivilEvent_Flag5,
-                                                                        perCivilEvent_Flag4,
-                                                                        perCivilEvent_Flag3,
-                                                                        perCivilEvent_Flag2,
-                                                                        perCivilEvent_Flag1); 
-
-     SELF.PerCivilLegalEvent_Flag :=  perCivilEvent_Flag_final;
-     SELF.PerCivilLegalEvent := (STRING)(10 - STD.Str.Find(perCivilEvent_Flag_final, DueDiligence.Constants.T_INDICATOR, 1)); 																																																	 
-     
+    
     
     
     
@@ -415,21 +359,7 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
     
     
     //BELOW ATTRIBUTES HAVE ALREADY BEEN CALC'D IN CODE (DUE TO REUSABILITY BETWEEN BUSINESS AND PERSON)
-    
-    //PERSON LEXID/DID
-    //is already populated in DueDiligence.getIndInformation (if exists)  
-    SELF.PerLexID := (STRING)le.inquiredDID;
-    SELF.PerLexIDMatch := (STRING)le.individual.score;
-    
-    //PERSON STATE CRIMINAL
-    //is populated in DueDiligence.getIndKRILegalStateCriminal, which is ultimately called in DueDiligence.getIndCriminal
-		SELF.PerStateLegalEvent := le.individual.stateCriminalLegalEventsScore;
-    SELF.PerStateLegalEvent_Flag := le.individual.stateCriminalLegalEventsFlags;
-    
-    //PERSON LEGAL EVENT TYPES
-    //is populated in DueDiligence.getIndKRILegalEventType,  
-		SELF.PerOffenseType := le.individual.legalEventTypeScore;
-    SELF.PerOffenseType_Flag := le.individual.legalEventTypeFlags;
+   
     
     //PERSON BUSINESS ASSOCIATIONS
     //is populated in DueDiligence.getIndKRIBusAssoc

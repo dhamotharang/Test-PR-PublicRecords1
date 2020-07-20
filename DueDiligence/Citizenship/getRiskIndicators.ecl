@@ -1,6 +1,7 @@
 ﻿IMPORT DueDiligence, Risk_Indicators, std, Models, MDR, dx_header;
 
-EXPORT getRiskIndicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DATASET(Risk_Indicators.Layout_Boca_Shell) clam) := FUNCTION
+EXPORT getRiskIndicators(DATASET(DueDiligence.v3Layouts.DDInput.PersonSearch) personSearch, 
+                         DATASET(Risk_Indicators.Layout_Boca_Shell) clam) := FUNCTION
 
 
   NULL       := Models.common.NULL;
@@ -13,12 +14,10 @@ EXPORT getRiskIndicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
   
 //========================================================================================
 
-  indicators := JOIN(cleanedInput, clam, 
-                      LEFT.inputEcho.seq = RIGHT.seq, 
+  indicators := JOIN(personSearch, clam, 
+                      LEFT.seq = RIGHT.seq, 
                       TRANSFORM({DueDiligence.Citizenship.Layouts.IndicatorLayout, UNSIGNED8 shell_dob_SAS;}, 
-                                SELF.seq := LEFT.inputEcho.seq;
-                                SELF.inputSeq := IF(LEFT.inputEcho.inputSeq = DueDiligence.Constants.NUMERIC_ZERO, LEFT.inputEcho.seq, LEFT.inputEcho.inputSeq);
-                                SELF.acctNo := LEFT.inputEcho.individual.accountNumber;
+                                SELF.seq := LEFT.seq;
                                 SELF.lexID := RIGHT.did;
                                 SELF.lexIDScore := RIGHT.Name_Verification.adl_score;
                                 
@@ -292,8 +291,8 @@ EXPORT getRiskIndicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
                                     SELF.address_first_seen_date := RIGHT.date_first_seen;
                                     SELF.age := 0;
                                     SELF := LEFT;),
-                         ATMOST(DueDiligence.Constants.MAX_ATMOST_500), 
-                         KEEP(DueDiligence.Constants.MAX_KEEP));
+                         ATMOST(DueDiligence.Constants.MAX_500), 
+                         KEEP(DueDiligence.Constants.MAX_1000));
                             
    Sort_addr_hist := SORT(Temp_addr_hist, seq, LexID_temp, address_history_seq); 
                                      
