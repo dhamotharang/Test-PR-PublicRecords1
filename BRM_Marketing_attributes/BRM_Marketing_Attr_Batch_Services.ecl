@@ -23,7 +23,7 @@
 </message>
 */
 
-IMPORT PublicRecords_KEL,Royalty,iesp,STD;
+IMPORT PublicRecords_KEL, Royalty, iesp, STD, BRM_Marketing_attributes;
 EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 
 		#OPTION('expandSelectCreateRow', TRUE);
@@ -113,13 +113,14 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 			FALSE,//isfcra
 			TRUE, //ismarketing
 			0, //Allow_DNBDMI
-			FALSE,//OverrideExperianRestriction
+			Override_Experian_Restriction,//OverrideExperianRestriction
 			'',//PermissiblePurpose - For FCRA Products Only
 			Industry_Class,
 			PublicRecords_KEL.CFG_Compile);
 		
 		// BIP Append Options
-		EXPORT UNSIGNED BIPAppendScoreThreshold := IF(BIPAppend_Score_Threshold = 0, 75, MIN(MAX(51,BIPAppend_Score_Threshold), 100)); // Score threshold must be between 51 and 100 -- default is 75.
+   EXPORT UNSIGNED BIPAppendScoreThreshold := MAP(BIPAppend_No_ReAppend => 0,
+                                                BIPAppend_Score_Threshold = 0 => 75, MIN(MAX(51,BIPAppend_Score_Threshold), 100));		
 		EXPORT UNSIGNED BIPAppendWeightThreshold := BIPAppend_Weight_Threshold;
 		EXPORT BOOLEAN BIPAppendPrimForce := BIPAppend_PrimForce;
 		EXPORT BOOLEAN BIPAppendReAppend := NOT BIPAppend_No_ReAppend;
