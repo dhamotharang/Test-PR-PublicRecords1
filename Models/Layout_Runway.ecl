@@ -1521,6 +1521,9 @@ string2 RVR1410_1_0_reason2 := '';
 string2 RVR1410_1_0_reason3 := '';
 string2 RVR1410_1_0_reason4 := '';
 
+//NonStandard model, no reason codes
+String3 RVR1903_1_0_score := '';
+
 String3 RVR803_1_0_score := '';
 string2 RVR803_1_0_reason1 := '';
 string2 RVR803_1_0_reason2 := '';

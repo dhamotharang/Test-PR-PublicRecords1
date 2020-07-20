@@ -4577,9 +4577,13 @@ EXPORT iesp.riskview2.t_RiskView2ModelHRI intoModel(riskview.layouts.layout_risk
 			], iesp.riskview2.t_RiskView2RiskIndicator)(ReasonCode NOT IN ['','00']); // Only keep the valid reason codes
 		
 		self.name := score_name;
+    
+    //non-standard custom models, scores must be cast as INTEGER vs UNSIGNED
+    NonStandardModels := ['ShortTermLendingRVR1903_1'];
 		
 		SELF.Scores := DATASET([transform(iesp.riskview2.t_RiskView2ScoreHRI,
-			self.value := (unsigned)score_value;
+			// self.value := (unsigned)score_value;
+			self.value := if(score_name IN NonStandardModels, (integer)score_value, (unsigned)score_value);
 			self._type := score_type;
 			self.ScoreReasons := ds_reasons;
 			)]);
