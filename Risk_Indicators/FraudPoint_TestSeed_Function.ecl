@@ -34,7 +34,7 @@ export FraudPoint_TestSeed_Function(dataset(Risk_Indicators.Layout_Input) inData
                                               risk_indicators.nullstring
                                               )) and
                         ut.nneq(right.model_name, in_Model_Name),
-                        create_output(LEFT,RIGHT), LEFT OUTER, KEEP(1)
+                        create_output(LEFT,RIGHT), LEFT OUTER, KEEP(3)
                         );
 
   fp_rec := Project(fraudpoint_rec, transform(Models.Layouts.Enhanced_layout_fp1109,
@@ -44,7 +44,8 @@ export FraudPoint_TestSeed_Function(dataset(Risk_Indicators.Layout_Input) inData
                                                     self.ri := left.ri, 
                                                     self := left));
 
-  final_fp_rec := fp_rec[1];
-  
-  return final_fp_rec;
+sorted_final_rec := sort(fp_rec,-model_name);
+final_fp_rec := sorted_final_rec[1];  
+
+return final_fp_rec;
 END;
