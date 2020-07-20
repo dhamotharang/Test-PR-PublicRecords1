@@ -23,14 +23,12 @@ end;
 outf_sup := record(outf)
  unsigned4 global_sid;
  unsigned8 record_sid;
-end; 
+end;
 //***** HISTORY KEYS METHOD
 
 str_unlisted := dx_Gong.Constants.STR_UNLISTED;
 
 doxie.gong_append_utils.MAC_lookupAptCount(a, withApt, secRangeStrict);
-
-knowx_ftr_set := ut.IndustryClass.gong_knowx_src;
 
 outf_sup GetPhones (key R) := transform
   self.phone := if(R.publish_code = 'N' or R.omit_phone = 'Y', str_unlisted, R.phone10);
@@ -47,14 +45,13 @@ outf_sup GetPhones (key R) := transform
 end;
 
 
-
-boolean IsRightType (unsigned1 ltype) := function
-  return (knowx_ftr_Set=[]) or (ltype = dx_Gong.Constants.PTYPE.UNKNOWN) OR
-         (((ltype & dx_Gong.Constants.PTYPE.BUSINESS    != dx_Gong.Constants.PTYPE.BUSINESS)    or ('B' in knowx_ftr_Set)) AND
-          ((ltype & dx_Gong.Constants.PTYPE.GOVERNMENT  != dx_Gong.Constants.PTYPE.GOVERNMENT)  or ('G' in knowx_ftr_Set)) AND
-          ((ltype & dx_Gong.Constants.PTYPE.RESIDENTIAL != dx_Gong.Constants.PTYPE.RESIDENTIAL) or ('R' in knowx_ftr_Set))
-         );
-end;
+string search_type := '' : STORED('GONG_SEARCHTYPE');
+boolean IsRightType (unsigned1 ltype) :=
+  ~mod_access.isConsumer() or (ltype = dx_Gong.Constants.PTYPE.UNKNOWN) OR (
+      ((ltype & dx_Gong.Constants.PTYPE.BUSINESS    != dx_Gong.Constants.PTYPE.BUSINESS)    or (search_type='BUSINESS')) AND
+      ((ltype & dx_Gong.Constants.PTYPE.GOVERNMENT  != dx_Gong.Constants.PTYPE.GOVERNMENT)  or (search_type='BUSINESS')) AND
+      ((ltype & dx_Gong.Constants.PTYPE.RESIDENTIAL != dx_Gong.Constants.PTYPE.RESIDENTIAL) or (search_type='PERSON'))
+  );
 
 jr	    :=  join(withApt, key,
                 keyed(left.prim_name=right.prim_name) and
