@@ -1,4 +1,4 @@
-﻿import Address,ut,_control,std; 
+﻿import Address,ut,_control,std,Prof_License_preprocess; 
 
 EXPORT NAHDB_BatchRun_ERI(string filedate) := function 
 
@@ -74,10 +74,10 @@ end;
 filein := dedup(dataset('~thor_data::in::nahdb::name', layoutNahdbBatch, CSV(Terminator (['\n','\r\n']), Heading(1), Quote('"'), Separator([',']))),all);
 
 layoutNahdbBatch convdatestr ( filein l ) := transform
-self.BIRTH_DT := STD.Str.FilterOut ( TRIM(l.BIRTH_DT) , '-/');
-self.ACCIDENT_DT := STD.Str.FilterOut ( TRIM(l.ACCIDENT_DT) , '-/');
-self.ADMIT_DT := STD.Str.FilterOut ( TRIM(l.ADMIT_DT) , '-/');
-self.DISCHARGE_DT := STD.Str.FilterOut ( TRIM(l.DISCHARGE_DT) , '-/');
+self.BIRTH_DT := Prof_License_preprocess.dateconv( STD.Str.FilterOut ( TRIM(l.BIRTH_DT) , '-/'));
+self.ACCIDENT_DT := Prof_License_preprocess.dateconv( STD.Str.FilterOut ( TRIM(l.ACCIDENT_DT) , '-/'));
+self.ADMIT_DT := Prof_License_preprocess.dateconv( STD.Str.FilterOut ( TRIM(l.ADMIT_DT) , '-/'));
+self.DISCHARGE_DT := Prof_License_preprocess.dateconv( STD.Str.FilterOut ( TRIM(l.DISCHARGE_DT) , '-/'));
 self  := l;
 end;
 
@@ -181,10 +181,10 @@ out := project(vin_match,transform(layoutOut, self.source_id := if (left.acc_dol
 
 
 										
-return sequential(FLAccidents_Ecrash.Spray_nahdb_ERI(filedate), 
+return sequential(/*FLAccidents_Ecrash.Spray_nahdb_ERI(filedate), 
                  count(fileinfmt),
 			    count(out); 
-                 count(out(acc_dol <>'')); 
+                 count(out(acc_dol <>'')); */
               
                  output(out,,'~thor_data::out::nahdb_batch_name_'+filedate,csv(
                  HEADING('STATE|ID|FIRST_NAME|MIDDILE_NAME|LAST_NAME|ADDRESS1|ADDRESS2|CITY|ST|ZIPCODE|BIRTH_DT|ACCIDENT_DT|ADMIT_DT|DISCHARGE_DT|MobilePhone|HomePhone|WorkPhone|acc_vin| order_id	| sequence_nbr|	 reason_id| acct_nbr	| vehicle_incident_id| vehicle_unit_number |	vendor_code| work_type_id|  orig_lname | orig_fname | orig_mname |  vehicle_owner| dob| driver_license_nbr| dlnbr_st| vehicle_year|  vehicle_make|  vehicle_model| tag_nbr| tagnbr_st| report_type_id| loss_type| acc_dol| accident_location|  acc_city|	 vehicle_incident_city| acc_st	| jurisdiction| orig_accnbr|	 accident_nbr| addl_report_number| acc_county| crash_county| cru_jurisdiction_nbr| agency_ori| carrier_name|	  Insurance_policy_num|	    Insurance_policy_Eff_Date|    Insurance_policy_Exp_Date| source_id|	 report_code|	 match_flag|	 date_vendor_last_reported   \n','',SINGLE),
