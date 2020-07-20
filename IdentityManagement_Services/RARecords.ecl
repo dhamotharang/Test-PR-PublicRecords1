@@ -1,4 +1,4 @@
-﻿﻿/***
+/***
  ** Module to filter/transform Header records into desired format for Relatives and Associates
 ***/
 

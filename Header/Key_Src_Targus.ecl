@@ -1,4 +1,4 @@
-﻿﻿Import Data_Services, Targus;
+Import Data_Services, Targus;
 t_in := header.Files_SeqdSrc().WP;
 mac_key_src(t_in, targus.layout_consumer_out - [global_sid,record_sid], 
 						targ_child, 

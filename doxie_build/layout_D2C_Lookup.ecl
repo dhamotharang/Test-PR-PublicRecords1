@@ -1,4 +1,4 @@
-﻿﻿EXPORT Layout_D2C_Lookup := record  
+EXPORT Layout_D2C_Lookup := record  
 unsigned6 did	,
 unsigned2 Addresses_cnt := 0	,
 unsigned2 PhonesPlus_cnt := 0	,

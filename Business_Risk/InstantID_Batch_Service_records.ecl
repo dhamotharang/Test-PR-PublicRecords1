@@ -1,4 +1,4 @@
-﻿﻿IMPORT address, risk_indicators, iesp, business_risk, models, ut, riskwise, Gateway, STD;
+IMPORT address, risk_indicators, iesp, business_risk, models, ut, riskwise, Gateway, STD;
 export InstantID_Batch_Service_records(dataset(Gateway.Layouts.Config)  gateways_in,
                                  dataset(business_risk.Layout_Input_Moxie_2) df,
 																 boolean hb,

@@ -1,4 +1,4 @@
-﻿﻿import doxie, data_services;
+import doxie, data_services;
 
 df_NoCCPA :=Inquiry_AccLogs.File_Inquiry_BaseSourced.updates(bus_intel.industry <> '' and bus_q.appended_ein <>'' and 
 						StringLib.StringToUpperCase(trim(search_info.function_description)) not in ['MODELS.ITA_BATCH_SERVICE', 'RISKWISE IP SEARCH (NA99)'] and
