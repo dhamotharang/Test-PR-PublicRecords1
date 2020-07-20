@@ -390,10 +390,16 @@ EXPORT Layouts := MODULE
 		
 	END;
 
-
 	EXPORT Base := MODULE
 		EXPORT AddressCache := record
-			Address.Layout_Clean182_fips;
+            string100 Street_1 := '';
+            string50 Street_2 := '';
+            string100 City := '';
+            string10 State := '';
+            string10 Zip := '';
+            Address.Layout_Clean182_fips clean_address;
+            string100 address_1 := '';   
+            string50 address_2 := '';
 			unsigned4 address_cleaned;
 		END;
 		
