@@ -2,8 +2,9 @@
 		Risk_Indicators, UT, STD;
 
 EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOrig,
-															 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
-															 DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw) ) := FUNCTION
+							   Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
+							   DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw)
+							   ) := FUNCTION
 
   mod_access := MODULE(Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()));
     EXPORT dppa := Options.DPPA_Purpose;
@@ -66,11 +67,10 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 	withDID := Business_Risk_BIP.fn_DIDAppend(cleanedInput, Options, mod_access);
 	
 	prepBIPAppend := PROJECT(withDID, TRANSFORM(Business_Risk_BIP.Layouts.Input, SELF := LEFT.Clean_Input));
-                  
-  BIPAppendOld := Business_Risk_BIP.BIP_LinkID_Append(prepBIPAppend, , Options.DoNotUseAuthRepInBIPAppend);                
-  BIPAppendV31 := Business_Risk_BIP.BIP_LinkID_Append_NEW(prepBIPAppend, Options, linkingOptions);
-	
-	BIPAppend := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, BIPAppendV31, BIPAppendOld);
+  
+  BIPappend := if(Options.UseUpdatedBipAppend, Business_Risk_BIP.BIP_LinkID_Append_NEW(prepBIPAppend, Options, linkingOptions ),
+							   		 Business_Risk_BIP.BIP_LinkID_Append(prepBIPAppend, , Options.DoNotUseAuthRepInBIPAppend)
+							   		 );
 	
   withBIP := JOIN(withDID, BIPAppend, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
                         SELF.BIP_IDs := RIGHT;
@@ -97,7 +97,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 	WatchListHit := Business_Risk_BIP.getWatchlists(withBIP, Options, linkingOptions, AllowedSourcesSet);
 
   ds_KELB2B_Attributes := Business_Risk_BIP.getB2BAttributes(withBIP, Options, AllowedSourcesSet);
-  // ds_KELB2B_Attributes := DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutBusinessSeleID);
+   //ds_KELB2B_Attributes := DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutBusinessSeleID);
     
 	Phone := Business_Risk_BIP.getPhones(withBIP, Options, linkingOptions, AllowedSourcesSet);
 
@@ -4725,7 +4725,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
   
   // OUTPUT(withFinalDelimitedFields, NAMED('withFinalDelimitedFields'));
   // OUTPUT(withBestAddrPhones,NAMED('withBestAddrPhones'));
-  
+
 	RETURN FinalShell_rolled;
 
 END;
