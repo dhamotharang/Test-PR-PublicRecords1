@@ -2,7 +2,7 @@
 
 EXPORT Soapcall_DTEGetRequestInfo(DATASET(IESP.DTE_GetRequestInfo.t_DTEGetRequestInfoRequest) recs_in,
 															  Gateway.Layouts.Config pGWCfg,
-                                                              pWaitTime = 3,
+                                                              pWaitTime = 10,
                                                               pRetries = 0,
                                                               BOOLEAN pMakeGatewayCall = FALSE) := FUNCTION
 
@@ -29,7 +29,23 @@ EXPORT Soapcall_DTEGetRequestInfo(DATASET(IESP.DTE_GetRequestInfo.t_DTEGetReques
     ONFAIL(onError(left)), timeout(pWaitTime), retry(pRetries)));
 
     ParsedJson := DeferredTask.Functions.ParseGetRequestInfo(d_recs_out);
+    
+    rec := RECORD
+    STRING50 RMSID{xpath('RMSID')};
+    STRING50 TMSID{xpath('TMSID')};
+    STRING10 Orig_RMSID{xpath('Orig_RMSID')};
+    END;
 
-    RETURN ParsedJSON;
+    GetRequestTMSIDandRMSID := PROJECT(ParsedJson, TRANSFORM({RECORDOF(LEFT), 
+    STRING50 RMSID{xpath('RMSID')}, 
+    STRING50 TMSID{xpath('TMSID')},
+    STRING10 Orig_RMSID{xpath('Orig_RMSID')}},
+    out := FROMXML(rec,LEFT.RequestOpaqueContent);
+    SELF.RMSID := out.RMSID;
+    SELF.TMSID := out.TMSID;
+    SELF.Orig_RMSID := out.Orig_RMSID;
+    SELF := LEFT;));
+
+    RETURN GetRequestTMSIDandRMSID;
 
 END;

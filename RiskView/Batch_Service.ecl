@@ -107,7 +107,10 @@ boolean IncludeStatusRefreshChecks := false : stored('IncludeStatusRefreshChecks
 boolean AttributesOnly := false : stored('AttributesOnly');
 boolean ExcludeStatusRefresh := false : stored('ExcludeStatusRefresh');
 string5 StatusRefreshWaitPeriod := '' : stored('StatusRefreshWaitPeriod');
-		
+DeferredTransactionIDs := PROJECT(batchin(DeferredTransactionID <> ''), TRANSFORM({STRING32 DeferredTransactionID}, 
+                                                                  SELF.DeferredTransactionID := LEFT.DeferredTransactionID));
+
+
 //Default to being ON, which is 1. If Excluded, we change to 0.
 string tmpFilterLienTypes := Risk_Indicators.iid_constants.LnJDefault;
 
@@ -271,7 +274,8 @@ search_Results := riskview.Search_Function(valid_inputs,
 	ExcludeStates := ExcludedStates,
 	ExcludeReportingSources := ExcludedReportingSources,
 	IncludeStatusRefreshChecks := IncludeStatusRefreshChecks,
-	StatusRefreshWaitPeriod := StatusRefreshWaitPeriod
+	StatusRefreshWaitPeriod := StatusRefreshWaitPeriod,
+    IsBatch := TRUE
 	);
 
 
@@ -282,6 +286,9 @@ Results := join(batchin_with_seq, search_results, left.seq=right.seq,
 			RiskView.Transforms.FormatBatch(left, right),
 			left outer);
 
+AttributesOnlyResults := PROJECT(Results, RiskView.Transforms.AttributesOnlyBatch(LEFT));
+
+FinalResults := IF(AttributesOnly = TRUE AND IncludeLNJ = TRUE, AttributesOnlyResults, Results);
 // OUTPUT(batchin_with_seq, NAMED('batchin_with_seq'));
 // OUTPUT(search_results, NAMED('search_results'));
 
@@ -295,7 +302,7 @@ MLA_royalties := if((STD.Str.ToLowerCase(custom_model_name)  = 'mla1608_0' OR
 
 output(MLA_royalties, NAMED('RoyaltySet'));
 
-output(Results, named('Results')); /*Production*/
+output(FinalResults, named('Results')); /*Production*/
 // output(search_Results, named('Results')); /*Validation*/
 
 // output(FilterLienTypes, named('FilterLienTypes'));
