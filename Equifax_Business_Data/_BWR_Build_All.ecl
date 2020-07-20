@@ -1,6 +1,6 @@
 ﻿IMPORT Equifax_Business_Data, _control;
 
-pversion 	:= '20200121'								 ;		// modify to current date
+pversion 	:= '20191231C'								 ;		// modify to current date
 /////////////////////////////////////////////////////////////
 // -- Quick Documentation
 // -- 	1. Put the Build Date in the pversion attribute above
@@ -17,11 +17,7 @@ Equifax_Business_Data.Build_All(
 pversion,
 '/data/Builds/builds/equifax_business_data/data/processing/' +pversion[1..8],
 _control.IPAddress.bctlpedata11,
-'/data/Builds/builds/equifax_business_data/data/contacts/' +pversion[1..8],
-_control.IPAddress.bctlpedata11
-,
-'*Extract*txt'
-,
+'*Extract*txt',
 '*Contact*txt'
 );
 

@@ -2,10 +2,8 @@
 
 export Build_All(
 	 string															        pversion
-	,string															        pDirectory			     = '/data/hds_180/Equifax_Business_Data/build/' + pversion[1..8]
+	,string															        pDirectory			     = '/data/Builds/builds/equifax_business_data/data/processing/' + pversion[1..8]
 	,string															        pServerIP		         = _control.IPAddress.bctlpedata11
-	,string                                     pDirectoryContact    = '/data/hds_180/Equifax_Business_Data/build/' + pversion[1..8]
-	,string															        pContactServerIP		 = _control.IPAddress.bctlpedata11
 	,string															        pFilename				     = '*Extract*txt'
 	,string															        pFilenameContacts    = '*Contact*txt'
   ,string															        pGroupName			     = STD.System.Thorlib.Group( )
@@ -21,7 +19,7 @@ function
 	full_build :=
 	sequential(
 		Equifax_Business_Data.Create_Supers,
-		Equifax_Business_Data.Spray(pversion,pServerIP,pContactServerIP,pDirectory,pDirectoryContact,pFilename,pFilenameContacts,pGroupName,pIsTesting,pOverwrite),
+		Equifax_Business_Data.Spray(pversion,pServerIP,pDirectory,pFilename,pFilenameContacts,pGroupName,pIsTesting,pOverwrite),
 		Scrubs.ScrubsPlus('Equifax_Business_Data','Scrubs_Equifax_Business_Data','Scrubs_Equifax_Business_Data_Contacts', 'Contacts', pversion,Equifax_Business_Data.Email_Notification_Lists(pIsTesting).BuildFailure,false),
 		Scrubs.ScrubsPlus('Equifax_Business_Data','Scrubs_Equifax_Business_Data','Scrubs_Equifax_Business_Data_Input', 'Input', pversion,Equifax_Business_Data.Email_Notification_Lists(pIsTesting).BuildFailure,false),		
  		if(scrubs.mac_ScrubsFailureTest('Scrubs_Equifax_Business_Data_Contacts',pversion) AND scrubs.mac_ScrubsFailureTest('Scrubs_Equifax_Business_Data_Input',pversion)

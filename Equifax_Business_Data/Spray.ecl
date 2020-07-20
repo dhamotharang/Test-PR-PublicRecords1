@@ -3,9 +3,7 @@
 EXPORT Spray(
 	 STRING		pversion			    = ''
 	,STRING		pServerIP			    = _control.IPAddress.bctlpedata11
-	,STRING		pContactServerIP  = _control.IPAddress.bctlpedata11
 	,STRING		pDirectory		    = '/data/hds_180/Equifax_Business_Data' + pversion[1..8]
-	,STRING		pDirectoryContact = '/data/hds_180/Equifax_Business_Data' + pversion[1..8]
 	,STRING		pFileName			    = ''	
 	,STRING   pFileNameContacts = ''
 	,STRING		pGroupName		    = STD.System.Thorlib.Group( )	
@@ -31,10 +29,9 @@ EXPORT Spray(
 		,''                                      // SOURCE TAG IF DATA IS XML
 		,_Constants().max_record_size            // MAX RECORD SIZE
 	 	}], tools.Layout_Sprays.Info);
-	// ,
 	ContactFilesToSpray := DATASET([
-			{pContactServerIP
-			,pDirectoryContact
+			{pServerIP
+			,pDirectory
 			,pFilenameContacts
 			,0
 			,Filenames(pversion).input.Contacts.logical
@@ -45,15 +42,19 @@ EXPORT Spray(
 			,'VARIABLE'
 			,''
 			,_Constants().max_record_size
+			,'|,|","|'
+			,'\\n,\\r\\n,\\r'
+			,'"'
 	 	}
 	], tools.Layout_Sprays.Info);
 		
 	RETURN parallel(
 						IF( pDirectory != '' AND NOT pExistSprayed,
 						  tools.fun_Spray(FilesToSpray,,,pOverwrite,,FALSE,pIsTesting,,_Constants().Name + ' ' + pversion,pNameOutput)),
-						IF( pDirectoryContact != '' AND NOT pContactsExistSprayed,	
+						IF( pDirectory != '' AND NOT pContactsExistSprayed,	
 						  tools.fun_Spray(ContactFilesToSpray,,,pOverwrite,,FALSE,pIsTesting,,_Constants().Name + ' ' + pversion,pNameOutput))
-						);
+						)
+						;
 
 END;
 														

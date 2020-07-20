@@ -1,29 +1,28 @@
 ﻿#OPTION('multiplePersistInstances',FALSE);
-import mdr,business_header;
+import mdr,business_header,Equifax_Business_Data;
 
 laybus := Business_Header.Layout_Business_Contact_Full_New;
 
 export as_business_contact(
 
 	 boolean 												pUsingInBizHdr		= true
-	,boolean 												pUseOtherEnviron	= _Constants().IsDataland
-	,dataset(layouts.Base_contacts)	pDataset					= if(pUsingInBizHdr
-																												,files().base.contacts.BusinessHeader
-																												,files().base.contacts.qa
+	,boolean 												pUseOtherEnviron	= Equifax_Business_Data._Constants().IsDataland
+	,dataset(Equifax_Business_Data.layouts.Base_contacts)	pDataset					= if(pUsingInBizHdr
+																												,Equifax_Business_Data.files().base.contacts.BusinessHeader
+																												,Equifax_Business_Data.files().base.contacts.qa
 																											)
 	,string1												pTodo							= 'R'	//'R' = recalculate persist,'P' = pull from persist(don't recalculate),'N' = Don't persist code
-	,string													pPersistname			= persistnames(									).AsBusinessContact
-	,dataset(laybus								) pPersist 					= persists		(pUseOtherEnviron	).AsBusinessContact
+	,string													pPersistname			= Equifax_Business_Data.persistnames(									).AsBusinessContact
+	,dataset(laybus								) pPersist 					= Equifax_Business_Data.persists		(pUseOtherEnviron	).AsBusinessContact
 	
 ) :=
 function
 
 	equifax_contacts := pDataset;
 
-	Business_Header.Layout_Business_Contact_Full_New Translate_Busfile_to_BCF(layouts.Base_contacts l) := 
+	Business_Header.Layout_Business_Contact_Full_New Translate_Busfile_to_BCF(Equifax_Business_Data.layouts.Base_contacts l) := 
 	TRANSFORM
 	  self.did                  := l.did;
-		self.bdid                 := l.bdid;
 		self.vl_id 	 							:= L.efx_id;
 		self.company_title 				:= stringlib.stringtouppercase(l.efx_titledesc);
 		self.vendor_id 						:= L.efx_id; 

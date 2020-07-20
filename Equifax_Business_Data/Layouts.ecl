@@ -197,7 +197,7 @@ EXPORT Sprayed_Input := RECORD
 	STRING10 EFX_DATE_CREATED;
 END;
 
-EXPORT Sprayed_Input_Contacts := RECORD
+EXPORT Sprayed_Input_Contacts := RECORD, MAXLENGTH(3000000)
 	STRING10  EFX_ID;
 	STRING130 EFX_CONTCT;
 	STRING2   EFX_TITLECD;
@@ -303,8 +303,6 @@ EXPORT Base_Contacts := RECORD
 			unsigned6														rcid											;
 			unsigned6														did												;
 			unsigned1														did_score									;
-			unsigned6														bdid											;
-			unsigned1														bdid_score								;
 			BIPV2.IDlayouts.l_xlink_ids																		;
 			unsigned4   												dt_first_seen							;
 			unsigned4   												dt_last_seen							;
@@ -372,30 +370,6 @@ END;
 			UNSIGNED1		bdid_score	  := 0;		
 			BIPV2.IDlayouts.l_xlink_ids   ;
 	  END;
-		
-   EXPORT BdidSlim := RECORD
-			unsigned6		unique_id         ;
-			string100 	company_name			;
-			STRING50    title        := '';
-			STRING20 		fname        := '';
-			STRING20 		mname        := '';
-			STRING20 		lname        := '';
-			string5  		name_suffix	  	  ;
-			string10  	prim_range				;
-			string28		prim_name					;
-			string5			zip5							;
-			string8			sec_range					;
-			STRING25 		city              ;   		      // p_city
-			string2			state		 					;
-			string10		phone		  		    ;
-			string      email             ;
-			string9			fein		  		    ;
-		  string6    	source       := '';
-		  unsigned6   rcid          := 0;
-			unsigned6		bdid					:= 0;
-			unsigned1		bdid_score		:= 0;
-			BIPV2.IDlayouts.l_xlink_ids;
-	  end;		
 		
 		EXPORT UniqueId := RECORD
  		  UNSIGNED8		unique_id;

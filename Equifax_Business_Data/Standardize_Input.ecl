@@ -368,7 +368,7 @@ EXPORT fPreProcess(DATASET(Equifax_Business_Data.Layouts.Sprayed_Input) pRawInpu
 	           ) := FUNCTION
 						 
 		dPreprocess	:= fPreProcess(pRawFileInput, pversion)  
-		// : PERSIST(pPersistname,SINGLE)
+		: PERSIST(pPersistname,SINGLE)
 		;
 
 		RETURN dPreprocess;

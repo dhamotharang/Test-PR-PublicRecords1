@@ -49,8 +49,7 @@ function
 		
 	Layouts.Base_Contacts AppendCompanyInfo(Layouts.Base_contacts l, Layouts.Base r) :=
 	transform
-		self.did											          := 0;
-		self.bdid											          := 0;  
+		self.did											          := 0;  
 		self.company_name 						          := r.efx_name;
 		self.clean_company_phone 			          := r.clean_phone;
 		self.company_record_type 			          := r.record_type;
@@ -67,7 +66,7 @@ function
 		self := [];
 	end;
 
-	//Get all company records that are in the valid date range window, then select best one after join
+	// Get all company records that are in the valid date range window, then select best one after join
 	contacts_getcompanyinfo := join(
 														 sortContacts
 														,sortCompanies
@@ -79,23 +78,22 @@ function
 											
 	distContacts	  := distribute	(contacts_getcompanyinfo, hash(rcid));
 	contacts_sort	  := sort				(distContacts, rcid, -company_date_last_seen, local)
-	// : persist(Equifax_Business_Data.Persistnames().CompanyContactJoin,SINGLE)	
+	: persist(Equifax_Business_Data.Persistnames().CompanyContactJoin,SINGLE)	
 	;
 	contacts_dedup	:= dedup			(contacts_sort, rcid, local)
-  // : persist(Equifax_Business_Data.Persistnames().CompanyContactDedup,SINGLE)
+  : persist(Equifax_Business_Data.Persistnames().CompanyContactDedup,SINGLE)
 	;
 	
-	dAppendDIdsContacts  := Equifax_Business_Data.Append_DIds_Contacts.fAll(contacts_dedup);		
-	dAppendBDIdsContacts := Equifax_Business_Data.Append_BDIds_Contacts.fAll(dAppendDIdsContacts);
+	dAppendDIdsContacts  := Equifax_Business_Data.Append_DIds_Contacts.fAll(contacts_dedup);
 	
-	dRollupContacts	:= Rollup_Contacts(dAppendBDIdsContacts);
+	dRollupContacts	:= Rollup_Contacts(dAppendDIdsContacts);
 	
 	tools.mac_WriteFile(Filenames(pversion).base.Companies.new	,dRollup		,Build_Companies_File	,pShouldExport := false);
 	tools.mac_WriteFile(Filenames(pversion).base.Contacts.new		,dRollupContacts	,Build_Contacts_File	,pShouldExport := false);
 
 return	sequential(
-											Build_Companies_File
-											,Build_Contacts_File
+											Build_Companies_File,
+											Build_Contacts_File
 										);							
 							
 end;							

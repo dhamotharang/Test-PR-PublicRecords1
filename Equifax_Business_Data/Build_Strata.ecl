@@ -37,7 +37,7 @@ EXPORT Build_Strata(
 		,BuildContactsUniqueNoGrouping_Strata
 		,BuildContactsBaseNoGrouping_Strata					
 		,BuildContactsBaseUniqueNoGrouping_Strata	
-		);		
+		):INDEPENDENT;		
 
 	RETURN IF(tools.fun_IsValidVersion(pversion)
 		       ,full_build		

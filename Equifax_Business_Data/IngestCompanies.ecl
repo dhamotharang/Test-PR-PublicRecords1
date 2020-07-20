@@ -4,9 +4,7 @@ EXPORT IngestCompanies(BOOLEAN incremental=FALSE
 , DATASET(Equifax_Business_Data.Layouts.Base) dsBase 
 , DATASET(Equifax_Business_Data.Layouts.Base) infile 
 ) := MODULE
-
- SHARED NullFile := DATASET([],Equifax_Business_Data.Layouts.Base); // Use to replace files you wish to remove
-
+ 
   SHARED FilesToIngest := infile;
   In_Src_Cnt_Rec := RECORD
     FilesToIngest.source;
@@ -18,7 +16,7 @@ EXPORT IngestCompanies(BOOLEAN incremental=FALSE
   EXPORT RecordType := ENUM(UNSIGNED1,Unknown,Ancient,Old,Unchanged,Updated,New);
   EXPORT RTToText(unsigned1 c) := CHOOSE(c,'UNKNOWN','Ancient','Old','Unchanged','Updated','New','UNKNOWN');
   SHARED WithRT := RECORD
-    Layout_Base;
+    Layouts.Base;
     BOOLEAN seleidChange := FALSE;
     BOOLEAN hardDeleteAdded := FALSE;
     __Tpe := RecordType.Unknown;
@@ -318,7 +316,7 @@ EXPORT IngestCompanies(BOOLEAN incremental=FALSE
     SELF := ri;
   END;
   NR1 := ITERATE(NR(rcid=0),AddNewRid(LEFT,RIGHT),LOCAL);
-  SHARED AllRecs := ORe+NR1+NR(rcid<>0) : PERSIST('~temp::seleid::Equifax_Business_Data::Ingest_Cache',EXPIRE(Equifax_Business_Data.Config.PersistExpire));
+  SHARED AllRecs := ORe+NR1+NR(rcid<>0) : PERSIST('~temp::seleid::Equifax_Business_Data::Ingest_Cache_Companies',EXPIRE(Equifax_Business_Data.Config.PersistExpire));
   SHARED UpdateStatsFull := SORT(TABLE(AllRecs, {__Tpe,SALT311.StrType INGESTSTATUS:=RTToText(AllRecs.__Tpe),UNSIGNED Cnt:=COUNT(GROUP)}, __Tpe, FEW),__Tpe, FEW);
   UpdateStats_HardDelete := TABLE(HardDeleteRecs, {__Tpe,SALT311.StrType INGESTSTATUS:='HardDeleteOnly',UNSIGNED Cnt:=COUNT(GROUP)}, __Tpe, FEW);
   UpdateStats_seleidChanges := TABLE(seleidChangeAll, {__Tpe,SALT311.StrType INGESTSTATUS:='HardDeleteLinkChange',UNSIGNED Cnt:=COUNT(GROUP)}, __Tpe, FEW);
@@ -379,17 +377,17 @@ EXPORT IngestCompanies(BOOLEAN incremental=FALSE
   SHARED NoFlagsRec := WithRT -[hardDeleteAdded, seleidChange];
   SHARED emptyDS := DATASET([], NoFlagsRec);
   EXPORT NewRecords := PROJECT(AllRecs(__Tpe=RecordType.New), NoFlagsRec);
-  EXPORT NewRecords_NoTag := PROJECT(NewRecords,Layout_Base);
+  EXPORT NewRecords_NoTag := PROJECT(NewRecords,Layouts.Base);
   EXPORT OldRecords :=PROJECT( AllRecs(__Tpe=RecordType.Old), NoFlagsRec);
-  EXPORT OldRecords_NoTag := PROJECT(OldRecords,Layout_Base);
+  EXPORT OldRecords_NoTag := PROJECT(OldRecords,Layouts.Base);
   EXPORT UpdatedRecords := PROJECT(AllRecs(__Tpe=RecordType.Updated), NoFlagsRec);
-  EXPORT UpdatedRecords_NoTag := PROJECT(UpdatedRecords,Layout_Base);
+  EXPORT UpdatedRecords_NoTag := PROJECT(UpdatedRecords,Layouts.Base);
   EXPORT UpdatedRecords_HardDeleteOnly := PROJECT(HardDeleteRecs, NoFlagsRec);
-  EXPORT UpdatedRecords_HardDeleteOnly_NoTag := PROJECT(UpdatedRecords_HardDeleteOnly,Layout_Base);
+  EXPORT UpdatedRecords_HardDeleteOnly_NoTag := PROJECT(UpdatedRecords_HardDeleteOnly,Layouts.Base);
   EXPORT UpdatedRecords_HardDeleteEntityChange := IF(incremental, PROJECT(seleidChangeAll, NoFlagsRec), emptyDS); // no poison pills in full build
-  EXPORT UpdatedRecords_HardDeleteEntityChange_NoTag := PROJECT(UpdatedRecords_HardDeleteEntityChange,Layout_Base);
+  EXPORT UpdatedRecords_HardDeleteEntityChange_NoTag := PROJECT(UpdatedRecords_HardDeleteEntityChange,Layouts.Base);
   EXPORT AllRecords := IF(incremental, NewRecords & UpdatedRecords_HardDeleteOnly & UpdatedRecords_HardDeleteEntityChange, PROJECT(AllRecs, NoFlagsRec));
-  EXPORT AllRecords_NoTag := PROJECT(AllRecords,Layout_Base); // Records in 'pure' format
+  EXPORT AllRecords_NoTag := PROJECT(AllRecords,Layouts.Base); // Records in 'pure' format
  
   // Compute field level differences
   IOR := JOIN(OldRecords,InputSourceCounts,left.source=right.source,TRANSFORM(LEFT),LOOKUP); // Only send in old records from sources in this ingest

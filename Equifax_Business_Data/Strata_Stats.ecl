@@ -29,7 +29,7 @@ EXPORT Strata_Stats(
 												,false);
 	Strata.mac_Pops		(pBaseContactsFile		,dBaseContactsNoGrouping					        );
 	Strata.mac_Uniques(pBaseContactsFile		,dBaseContactsUniqueNoGrouping,'',false,true,false,
-	                      ['rcid','efx_id','did','bdid','UltID','OrgID','SELEID','ProxID','POWID','EmpID','DotID','record_sid','global_sid']
+	                      ['rcid','efx_id','did','UltID','OrgID','SELEID','ProxID','POWID','EmpID','DotID','record_sid','global_sid']
 												,false);
 
 END;

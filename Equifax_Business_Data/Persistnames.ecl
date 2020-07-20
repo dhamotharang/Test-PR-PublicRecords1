@@ -14,7 +14,6 @@ EXPORT Persistnames(
 	EXPORT StandardizeNameContacts  := Root + '::standardize_NameContacts';
 	EXPORT AppendIds						    := Root + '::Append_Ids.xlinkids';
 	EXPORT AppendDIdsContacts		    := Root + '::Append_DIds_Contacts';
-	EXPORT AppendBDIdsContacts	    := Root + '::Append_BDIds_Contacts';
 	EXPORT CompanyContactJoin       := Root + '::CompanyContactJoin';
 	EXPORT CompanyContactDedup      := Root + '::CompanyContactDedup';
 	EXPORT AsBusinessContact        := Root + '::AsBusinessContact';
@@ -28,7 +27,6 @@ EXPORT Persistnames(
 	                            {StandardizeNameContacts},
 		                          {AppendIds},
 															{AppendDIdsContacts},
-															{AppendBDIdsContacts},
 															{CompanyContactJoin},
 															{CompanyContactDedup},
 															{AsBusinessContact}

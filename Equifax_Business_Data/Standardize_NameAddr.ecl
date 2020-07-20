@@ -199,7 +199,7 @@ EXPORT Standardize_NameAddr := MODULE
   	dStandardizeName	:= fStandardizeNamesPhone(pBaseFile);			 
 								 
 		dStandardizeAddr	:= fStandardizeAddresses(dStandardizeName)
-    // : persist(pPersistname, SINGLE)		
+    : persist(pPersistname, SINGLE)		
 		;		
 		
 		RETURN dStandardizeAddr;

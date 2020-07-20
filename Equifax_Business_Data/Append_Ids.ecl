@@ -111,7 +111,7 @@ EXPORT Append_Ids := MODULE
 	EXPORT fAll(DATASET(Equifax_Business_Data.Layouts.Base) pDataset) := FUNCTION
     
 		dAppendLinkID	:= fAppendBIP(pDataset) 
-		// : PERSIST(Persistnames().AppendIds)
+		: PERSIST(Persistnames().AppendIds)
 		;
 		
 		RETURN dAppendLinkID;

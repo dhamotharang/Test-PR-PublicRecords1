@@ -1,18 +1,17 @@
-﻿IMPORT SALT311,Equifax_Business_Data;
+﻿IMPORT STD,SALT311;
 EXPORT IngestContacts(BOOLEAN incremental=FALSE
-, DATASET(Equifax_Business_Data.Layouts.Base_Contacts) Delta = DATASET([],Equifax_Business_Data.Layouts.Base_Contacts) //default empty file
-, DATASET(Equifax_Business_Data.Layouts.Base_Contacts) dsBase 
-, DATASET(Equifax_Business_Data.Layouts.Base_Contacts) infile 
+, DATASET(Layouts.Base_Contacts) Delta = DATASET([],Layouts.Base_Contacts)
+, DATASET(Layouts.Base_Contacts) dsBase 
+, DATASET(RECORDOF(equifax_business_data.Layouts.Base_Contacts))  infile 
 ) := MODULE
-
- SHARED NullFile := DATASET([],Equifax_Business_Data.Layouts.Base_Contacts); // Use to replace files you wish to remove
+  SHARED NullFile := DATASET([],Layouts.Base_Contacts); // Use to replace files you wish to remove
  
   SHARED FilesToIngest := infile;
   // Now need to discover which records are old / new / updated
   EXPORT RecordType := ENUM(UNSIGNED1,Unknown,Ancient,Old,Unchanged,Updated,New);
   EXPORT RTToText(unsigned1 c) := CHOOSE(c,'UNKNOWN','Ancient','Old','Unchanged','Updated','New','UNKNOWN');
   SHARED WithRT := RECORD
-    Layout_Base_Contacts;
+    Layouts.Base_Contacts;
     __Tpe := RecordType.Unknown;
   END;
  
@@ -95,13 +94,13 @@ EXPORT IngestContacts(BOOLEAN incremental=FALSE
   SHARED NoFlagsRec := WithRT;
   SHARED emptyDS := DATASET([], NoFlagsRec);
   EXPORT NewRecords := PROJECT(AllRecs(__Tpe=RecordType.New), NoFlagsRec);
-  EXPORT NewRecords_NoTag := PROJECT(NewRecords,Layout_Base_Contacts);
+  EXPORT NewRecords_NoTag := PROJECT(NewRecords,Layouts.Base_Contacts);
   EXPORT OldRecords :=PROJECT( AllRecs(__Tpe=RecordType.Old), NoFlagsRec);
-  EXPORT OldRecords_NoTag := PROJECT(OldRecords,Layout_Base_Contacts);
+  EXPORT OldRecords_NoTag := PROJECT(OldRecords,Layouts.Base_Contacts);
   EXPORT UpdatedRecords := PROJECT(AllRecs(__Tpe=RecordType.Updated), NoFlagsRec);
-  EXPORT UpdatedRecords_NoTag := PROJECT(UpdatedRecords,Layout_Base_Contacts);
+  EXPORT UpdatedRecords_NoTag := PROJECT(UpdatedRecords,Layouts.Base_Contacts);
   EXPORT AllRecords := IF(incremental, NewRecords, PROJECT(AllRecs, NoFlagsRec));
-  EXPORT AllRecords_NoTag := PROJECT(AllRecords,Layout_Base_Contacts); // Records in 'pure' format
+  EXPORT AllRecords_NoTag := PROJECT(AllRecords,Layouts.Base_Contacts); // Records in 'pure' format
  
 f := TABLE(dsBase,{rcid}) : GLOBAL;
 rcid_clusters := SALT311.MOD_ClusterStats.Counts(f,rcid);

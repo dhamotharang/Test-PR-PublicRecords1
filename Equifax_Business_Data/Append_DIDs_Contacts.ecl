@@ -89,7 +89,7 @@ EXPORT Append_DIDs_Contacts := MODULE
 	EXPORT fAll(DATASET(Equifax_Business_Data.Layouts.Base_Contacts) pDataset) := FUNCTION
     
 		dAppendDid    := fAppendDid(pDataset)
-		// :PERSIST(Equifax_Business_Data.Persistnames().AppendDIDsContacts)
+		:PERSIST(Equifax_Business_Data.Persistnames().AppendDIDsContacts)
 		;
 	
 		RETURN dAppendDid;
