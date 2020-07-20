@@ -11,11 +11,8 @@ ids := dedup(sort(ungroup(ids1),
 	did, historydate, seq),
 	did, historydate)(did<>0);
 	
-vehrec := RECORD
-	Layout_Boca_Shell_ids;
-	Layout_Vehicles.Vehicle_Set;
-	unsigned1 relative_owned_count;
-END;
+vehrec := Layout_Vehicles.vehrec;
+
 vehrecAddl := RECORD
 	Layout_Boca_Shell_ids;
 	Layout_Vehicles.Vehicle_SetAddl;

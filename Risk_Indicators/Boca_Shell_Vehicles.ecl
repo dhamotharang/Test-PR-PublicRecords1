@@ -5,11 +5,7 @@ export Boca_Shell_Vehicles (GROUPED DATASET(risk_indicators.Layout_Boca_Shell_id
 
 kv := VehicleV2.Key_BocaShell_Vehicles;
 
-vehrec := RECORD
-	risk_indicators.Layout_Boca_Shell_ids;
-	risk_indicators.Layout_Vehicles.Vehicle_Set;
-	unsigned1 relative_owned_count;
-END;
+vehrec := risk_indicators.Layout_Vehicles.VehRec;
 
 vehrec get_vehicles(ids L, kv R) := transform
 	self := L;
