@@ -21,7 +21,7 @@ FileServices.CreateSuperfile('~prte::key::consumerstatement::nonfcra::grandfathe
 FileServices.CreateSuperfile('~prte::key::consumerstatement::fcra::qa::lexid');
 FileServices.CreateSuperfile('~prte::key::consumerstatement::fcra::built::lexid');
 FileServices.CreateSuperfile('~prte::key::consumerstatement::fcra::father::lexid');
-FileServices.CreateSuperfile('~prte::key::override::consumerstatement::fcra::grandfather::lexid');
+FileServices.CreateSuperfile('~prte::key::consumerstatement::fcra::grandfather::lexid');
 
 FileServices.CreateSuperfile('~prte::key::consumerstatement::fcra::qa::ssn');
 FileServices.CreateSuperfile('~prte::key::consumerstatement::fcra::built::ssn');

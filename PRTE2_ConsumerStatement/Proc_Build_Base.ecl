@@ -1,4 +1,4 @@
-﻿IMPORT UT, PromoteSupers, std, Prte2, Address, AID, AID_Support, SAM, PRTE2_ConsumerStatement, AccountMonitoring, EPLS;
+﻿IMPORT UT, PromoteSupers, std, Prte2, Address, AID, AID_Support, PRTE2_ConsumerStatement, AccountMonitoring, EPLS;
 EXPORT Proc_build_base := FUNCTION
 
     //Input Files
@@ -16,7 +16,7 @@ EXPORT Proc_build_base := FUNCTION
                                       ['Temp_RawAID']);   //raw_aid_out
     
     //Layout_SAM info
-    clean_file := PROJECT(AddrClean(recordtype = 'CS'), 
+    clean_file := PROJECT(AddrClean, 
                                        TRANSFORM(PRTE2_ConsumerStatement.Layouts.Base,
                                                  SELF.prim_range  :=  LEFT.Clean_Address.prim_range;
                                                  SELF.predir      :=  LEFT.Clean_Address.predir;
