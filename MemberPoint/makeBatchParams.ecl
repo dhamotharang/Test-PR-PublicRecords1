@@ -1,13 +1,15 @@
-IMPORT Gateway, iesp, Std;
+﻿IMPORT Gateway, iesp, Std;
 
 	EXPORT makeBatchParams(iesp.keepcontactreport.t_KeepContactReportOption inOpts) := FUNCTION
-		optAddressConfidenceThreshold:=IF(inOpts.BestAddressReturnCutoff='',(STRING1)MemberPoint.Constants.Defaults.AddressConfidenceThreshold,(STRING1)inOpts.BestAddressReturnCutoff);
+		optAddressConfidenceThreshold:=(STRING1)MemberPoint.Constants.Defaults.AddressConfidenceThreshold;
 		optDeceasedMatchCodes:=IF(inOpts.DeceasedMatchCodes='',MemberPoint.Constants.Defaults.DeceasedMatchCodes,inOpts.DeceasedMatchCodes);
 		optPhonesReturnCutoff:=IF(inOpts.PhonesReturnCutoff='',MemberPoint.Constants.Defaults.PhonesReturnCutoff,inOpts.PhonesReturnCutoff);
 		optTransactionType:=IF(inOpts.PhoneTransactionType='',MemberPoint.Constants.PhoneTransactionType.WaterfallPhones,inOpts.PhoneTransactionType);
 		optUseDMEmailSourcesOnly:=IF(inOpts.EmailTransactionType = MemberPoint.Constants.EmailTransactionType.Premium, MemberPoint.Constants.EmailTransactionType.Premium_UseDMEmailSourcesOnly, MemberPoint.Constants.EmailTransactionType.Basic_UseDMEmailSourcesOnly);
-		optUniqueIdScoreThreshold:=IF(inOpts.UniqueIdScoreThreshold='',MemberPoint.Constants.Defaults.UniqueIdScoreThreshold,(INTEGER)inOpts.UniqueIdScoreThreshold);
-		// optUniqueIdScoreThreshold:=IF(inOpts.UniqueIdScoreThreshold='',MemberPoint.Constants.Defaults.UniqueIdScoreThreshold,(unsigned)inOpts.UniqueIdScoreThreshold);
+		optUniqueIdScoreThreshold:=(INTEGER) MAP(
+											Std.Str.ToUpperCase(TRIM(inOpts.UniqueIdScoreThreshold, left, right)) = 'H' => MemberPoint.Constants.Defaults.UniqueIdScoreThreshold_H,
+											Std.Str.ToUpperCase(TRIM(inOpts.UniqueIdScoreThreshold, left, right)) = 'M' => MemberPoint.Constants.Defaults.UniqueIdScoreThreshold_M,
+											MemberPoint.Constants.Defaults.UniqueIdScoreThreshold_L);
 
 		base_params := MemberPoint.IParam.getBatchParams();
 		// project the base params to read shared parameters from store.
