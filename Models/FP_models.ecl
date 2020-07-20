@@ -269,6 +269,8 @@ EXPORT FP_models := MODULE
     model_fp1909_1 := Models.fp1909_1_0( FP_mod._clam, 6, FP_mod._FDatributes);		
     model_fp1909_2 := Models.FP1909_2_0( FP_mod._clam, 6, FP_mod._FDatributes);    
     model_di31906_0 := Models.DI31906_0_0( ungroup(FP_mod.IID_ret)); 
+    model_fp1907_1 := Models.FP1907_1_0( ungroup(FP_mod._clam_ip), 6);
+    model_fp1907_2 := Models.FP1907_2_0( ungroup(FP_mod._clam), 6);
     
     //These models use the RiskIndicies from fp1109 so they are assigned to temp variables for the joins below
     model_fp1303_1_temp := Models.FP1303_1_0( ungroup(FP_mod._clam), 6, false);
@@ -282,7 +284,6 @@ EXPORT FP_models := MODULE
     model_fp1512_1_temp   := Models.FP1512_1_0( ungroup(FP_mod._clam), 6 );
     model_fp31604_0_temp  := Models.FP31604_0_0( ungroup(FP_mod._clam), 6 );
     model_fp1704_1_temp := Models.FP1704_1_0( ungroup(FP_mod._clam), 6 );
-
 
     model_fp1307_2 := join(model_fp1109_0, model_fp1307_2_temp, //fp1307_2 returns the indice info WITH the fp1109_0 score, etc.
                         left.seq = right.seq,
@@ -462,6 +463,8 @@ EXPORT FP_models := MODULE
                         'di31906_0' => model_di31906_0,
                         'msn1803_1' => model_msn1803_1,
                         'rsn804_1'  => model_rsn804_1,
+                        'fp1907_1'  => model_fp1907_1,
+                        'fp1907_2'  => model_fp1907_2,
                                        DATASET([], models.layouts.layout_fp1109) // Return blank dataset if unknown model
                        );
    #END                  

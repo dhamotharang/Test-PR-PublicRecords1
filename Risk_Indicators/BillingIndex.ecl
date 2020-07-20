@@ -203,4 +203,6 @@ export BillingIndex := MODULE
     export FP1909_1    	:= '184'; //FP1909_1 - Fraudpoint 3.0 Custom Model for Fifth Third (184 - 70 = 114)
     export FP1909_2    	:= '185'; //FP1909_2 - Fraudpoint 3.0 Custom Model for Fifth Third (185 - 70 = 115)
     export FP1908_1     := '188'; //FP1908_1_0 -  Fraudpoint 3.0 Custom Model for SCUSA (188 - 70 = 118)
+    export FP1907_1     := '186'; //FP1907_1 - FraudPoint 3.0 for Kohl's, online
+    export FP1907_2     := '187'; //FP1907_2 - FraudPoint 3.0 for Kohl's, in-store    
 END;
