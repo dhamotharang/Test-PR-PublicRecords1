@@ -34,6 +34,7 @@ export fn_PrepMDandChildren := function
             self.MerchantRefundSegment:=pInput.MerchantProcessingData[cnt].MerchantRefundSegment;
             self.MemberMCSegment:=pInput.MerchantProcessingData[cnt].MemberMCSegment;
             self.MemberDMSegment:=pInput.MerchantProcessingData[cnt].MemberDMSegment;
+            self:=pinput;
             self:=[];
     END;
 
@@ -97,13 +98,13 @@ export fn_PrepMDandChildren := function
         NOCT:=dMerchantData(count(MerchantCTSegment)=0);
         HasCT:=NORMALIZE(dMerchantData(COUNT(MerchantCTSegment)>0),COUNT(LEFT.MerchantCTSegment),tCTRecords(LEFT,COUNTER));
         NOMT:=NOCT(count(MerchantChargebackSegment)=0)+HasCT(count(MerchantChargebackSegment)=0);
-        HasMT:=NORMALIZE(NOCT(count(MerchantChargebackSegment)>0)+HasCT(count(MerchantChargebackSegment)>0),COUNT(LEFT.MerchantChargebackSegment),tCTRecords(LEFT,COUNTER));
+        HasMT:=NORMALIZE(NOCT(count(MerchantChargebackSegment)>0)+HasCT(count(MerchantChargebackSegment)>0),COUNT(LEFT.MerchantChargebackSegment),tMTRecords(LEFT,COUNTER));
         NOMR:=NOMT(count(MerchantRefundSegment)=0)+HasMT(count(MerchantRefundSegment)=0);
-        HasMR:=NORMALIZE(NOMT(count(MerchantRefundSegment)>0)+HasMT(count(MerchantRefundSegment)>0),COUNT(LEFT.MerchantRefundSegment),tCTRecords(LEFT,COUNTER));
+        HasMR:=NORMALIZE(NOMT(count(MerchantRefundSegment)>0)+HasMT(count(MerchantRefundSegment)>0),COUNT(LEFT.MerchantRefundSegment),tMRRecords(LEFT,COUNTER));
         NOMC:=NOMR(count(MemberMCSegment)=0)+HasMR(count(MemberMCSegment)=0);
-        HasMC:=NORMALIZE(NOMR(count(MemberMCSegment)>0)+HasMR(count(MemberMCSegment)>0),COUNT(LEFT.MemberMCSegment),tCTRecords(LEFT,COUNTER));
+        HasMC:=NORMALIZE(NOMR(count(MemberMCSegment)>0)+HasMR(count(MemberMCSegment)>0),COUNT(LEFT.MemberMCSegment),tMCRecords(LEFT,COUNTER));
         NODM:=NOMC(count(MemberDMSegment)=0)+HasMC(count(MemberDMSegment)=0);
-        HasDM:=NORMALIZE(NOMC(count(MemberDMSegment)>0)+HasMC(count(MemberDMSegment)>0),COUNT(LEFT.MemberDMSegment),tCTRecords(LEFT,COUNTER));
+        HasDM:=NORMALIZE(NOMC(count(MemberDMSegment)>0)+HasMC(count(MemberDMSegment)>0),COUNT(LEFT.MemberDMSegment),tDMRecords(LEFT,COUNTER));
         StripInline:=project(NoDM+HasDM,transform(baselayout,self:=left));
 
     return StripInline;
