@@ -1,4 +1,4 @@
-IMPORT Address, doxie_files, FCRA, NID, FFD, STD, CriminalRecords_BatchService;
+﻿IMPORT Address, doxie_files, FCRA, NID, FFD, STD, CriminalRecords_BatchService;
 
 EXPORT Raw := MODULE
 
@@ -75,8 +75,10 @@ EXPORT Raw := MODULE
     boolean showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
     boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask) and showConsumerStatements;
 
-    ds_flags := flagfile(file_id = FCRA.FILE_ID.OFFENDERS_PLUS);
-    ofk_correct_rec_id := set(ds_flags, record_id);
+    ds_flags_ofp := flagfile(file_id = FCRA.FILE_ID.OFFENDERS_PLUS);
+    ds_flags_ofk := flagfile(file_id = FCRA.FILE_ID.OFFENDERS);
+    ofp_correct_rec_id := set(ds_flags_ofp, record_id);
+    ofk_correct_rec_id := set(ds_flags_ofk, record_id);
     offender_key := doxie_files.Key_Offenders_OffenderKey (isFCRA);
 
     // BUG #97804 - Prefered Name and SSN Logic
@@ -86,14 +88,24 @@ EXPORT Raw := MODULE
     END;
     recs1 := join(in_ofks,offender_key,
                    keyed(left.offender_key=right.ofk)
-                   and (~isFCRA or (string)right.offender_persistent_id NOT IN ofk_correct_rec_id),
+                   and (~isFCRA or ((string)right.offender_persistent_id NOT IN ofp_correct_rec_id
+                                    and (string)right.ofk NOT IN ofk_correct_rec_id)),
                    makeOutputOffender(right),
                    ATMOST(CriminalRecords_BatchService.Constants.MAX_OFFENDER_RECS_PER_OFK)); // Need to keep this below 500 otherwise we risk Memory Limit Exceeded errors on Roxie
 
-    //overrides
-    recs_over := join(ds_flags, fcra.key_override_crim.offenders_plus,
+    //overrides (FCRA side only) - we have 2 indices for offenders overrides
+    // we are making this change to now account for both
+    recs_over_ofp := join(ds_flags_ofp, fcra.key_override_crim.offenders_plus,
                       keyed (left.flag_file_id = right.flag_file_id),
                       transform(right), keep(1), ATMOST(CriminalRecords_BatchService.Constants.MAX_RECS_DEFAULT_ATMOST));
+
+    recs_over_ofk := join(ds_flags_ofk, fcra.key_override_crim.offenders,
+                      keyed (left.flag_file_id = right.flag_file_id),
+                      transform(right),
+                      keep(1), ATMOST(CriminalRecords_BatchService.Constants.MAX_RECS_DEFAULT_ATMOST));
+
+    recs_over := dedup(recs_over_ofp+recs_over_ofk, all);
+
     recs_override_final := join(recs_over, in_ofks,
                                 left.offender_key = right.offender_key,
                                 transform(CriminalRecords_BatchService.Layouts.batch_pii_int_offender,
@@ -115,9 +127,11 @@ EXPORT Raw := MODULE
                     self := L;
     end;
     recs_ds := join(recs_fcra, slim_pc_recs,
-                       left.offender_persistent_id = (unsigned) right.RecID1 and
                        (unsigned) left.did  = (unsigned) right.lexid and
-                       right.DataGroup = FFD.Constants.DataGroups.OFFENDERS_PLUS,
+                       ((left.offender_persistent_id = (unsigned) right.RecID1 and
+                         right.DataGroup = FFD.Constants.DataGroups.OFFENDERS_PLUS) or
+                        (right.DataGroup = FFD.Constants.DATAGROUPS.OFFENDERS and
+                          left.offender_key = right.RecId1)),
                        xformOffender(left, right),
                        left outer,
                        keep(1),
@@ -138,8 +152,10 @@ EXPORT Raw := MODULE
     boolean showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
     boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask) and showConsumerStatements;
 
-    ds_flags := flagfile(file_id = FCRA.FILE_ID.OFFENDERS_PLUS);
-    ofk_correct_rec_id := set(ds_flags, record_id);
+    ds_flags_ofp := flagfile(file_id = FCRA.FILE_ID.OFFENDERS_PLUS);
+    ds_flags_ofk := flagfile(file_id=FCRA.FILE_ID.OFFENDERS);
+    ofp_correct_rec_id := set(ds_flags_ofp, record_id);
+    ofk_correct_rec_id := set(ds_flags_ofk, record_id);
     Arrest_datatype := ['5'];
     offender_key := doxie_files.Key_Offenders_OffenderKey (isFCRA);
 
@@ -150,7 +166,8 @@ EXPORT Raw := MODULE
 
     recs1 := join(in_ofks,offender_key,
                    keyed(left.offender_key=right.ofk)
-                   and (~isFCRA or (string)right.offender_persistent_id NOT IN ofk_correct_rec_id)
+                   and (~isFCRA or ((string)right.offender_persistent_id NOT IN ofp_correct_rec_id
+                                    and (string)right.ofk NOT IN ofk_correct_rec_id))
                    and (~isCNSMR or (string)right.data_type not in Arrest_datatype),
                    transform(raw_rec, self.acctno := left.acctno, self := right),
                    KEEP(CriminalRecords_BatchService.Constants.MAX_RECS_PER_OFK), ATMOST(CriminalRecords_BatchService.Constants.MAX_RECS_PER_OFK_ATMOST));
@@ -158,11 +175,11 @@ EXPORT Raw := MODULE
 
 
     //overrides  for offenders are in 2 files
-    recs_over_ofp := join(ds_flags, fcra.key_override_crim.offenders_plus,
+    recs_over_ofp := join(ds_flags_ofp, fcra.key_override_crim.offenders_plus,
                       keyed (left.flag_file_id = right.flag_file_id),
                       transform(right),
                       keep(1), ATMOST(CriminalRecords_BatchService.Constants.MAX_RECS_DEFAULT_ATMOST));
-    recs_over_ofk := join(ds_flags, fcra.key_override_crim.offenders,
+    recs_over_ofk := join(ds_flags_ofk, fcra.key_override_crim.offenders,
                       keyed (left.flag_file_id = right.flag_file_id),
                       transform(right),
                       keep(1), ATMOST(CriminalRecords_BatchService.Constants.MAX_RECS_DEFAULT_ATMOST));
@@ -237,7 +254,6 @@ EXPORT Raw := MODULE
     recs := join(in_ofks, recs_dup,
                  left.offender_key = right.offender_key,
                  makeOutputOffender(left, right));
-
 
     return recs;
   end;

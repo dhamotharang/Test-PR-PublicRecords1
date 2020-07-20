@@ -1,4 +1,4 @@
-import STD, doxie, doxie_files, hygenics_crim, ut, FCRA, FFD, D2C;
+﻿import STD, doxie, doxie_files, hygenics_crim, ut, FCRA, FFD, D2C;
 
 MAX_OVERRIDE_LIMIT := FCRA.compliance.MAX_OVERRIDE_LIMIT;
 
@@ -84,13 +84,16 @@ export Raw := module
     boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask);
 
     correct_puid  := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS_PLUS), record_id);
+    correct_ofk_recid := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS), record_id);
     correct_ffid := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS_PLUS), flag_file_id);
     correct_ofk := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS), flag_file_id);
     offenderkey_key := doxie_files.Key_Offenders_OffenderKey(isFCRA);
     recs1 := join(ids, offenderkey_key,
                   keyed(left.offender_key=right.ofk) and
                   (~isFCRA or
-                  (((string)Right.offender_persistent_id NOT IN correct_puid) and (Right.data_type != '4')))
+                  (((string)Right.offender_persistent_id NOT IN correct_puid
+                  and (string)Right.ofk NOT IN correct_ofk_recid)
+                  and (Right.data_type != '4')))
                   and (~isCNSMR or (right.data_type not in D2C.Constants.DOCRestrictedDataTypes AND right.vendor not in D2C.Constants.DOCRestrictedVendors))  ,//Restricting access to arrest logs (data_type = 5) and source vendor = MH (Minnesota) when industry class = CNSMR
                   transform(CriminalRecords_Services.layouts.l_raw,
                   self:=left,
