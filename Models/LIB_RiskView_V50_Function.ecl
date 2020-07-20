@@ -1,4 +1,4 @@
-IMPORT _Control, Models, Risk_Indicators, RiskView;
+﻿IMPORT _Control, Models, Risk_Indicators, RiskView;
 
 Use_RiskView_V50_Library := NOT _Control.LibraryUse.ForceOff_Models__LIB_RiskView_V50;
 
@@ -11,8 +11,8 @@ EXPORT LIB_RiskView_V50_Function (
 											BOOLEAN preScreenOptOut_in = FALSE,
 											STRING65 returnCode_in = '',
 											STRING65 payFrequency_in = '',
-											DATASET(RiskView.Layouts.Layout_Custom_Inputs) Custom_Inputs_in = DATASET([], RiskView.Layouts.Layout_Custom_Inputs)
-																							) := FUNCTION
+											DATASET(RiskView.Layouts.Layout_Custom_Inputs) Custom_Inputs_in = DATASET([], RiskView.Layouts.Layout_Custom_Inputs),
+											DATASET(RiskView.Layouts.attributes_internal_layout_noscore) Attr_in = DATASET([], RiskView.Layouts.attributes_internal_layout_noscore)) := FUNCTION
 
 arguments := MODULE(Models.RV_LIBIN)
 	EXPORT STRING30 modelName := modelName_in;
@@ -23,6 +23,7 @@ arguments := MODULE(Models.RV_LIBIN)
 	EXPORT STRING65 returnCode := returnCode_in;
 	EXPORT STRING65 payFrequency := payFrequency_in;
 	EXPORT DATASET(RiskView.Layouts.Layout_Custom_Inputs) Custom_Inputs := Custom_Inputs_in;
+	EXPORT DATASET(RiskView.Layouts.attributes_internal_layout_noscore) Attr_in := Attr_in;
 END;
 
 #if(Use_RiskView_V50_Library)

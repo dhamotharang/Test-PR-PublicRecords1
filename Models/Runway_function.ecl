@@ -101,6 +101,8 @@ iid := project(ungroup(clam), transform(Risk_Indicators.Layout_Output, self := l
 
 attributes := Models.getFDAttributes(clam, group(iid, seq), '', dataset([], riskwise.Layout_IP2O));
 
+attrv5 := riskview.get_attributes_v5(clam, False);
+
 custom_clam := project(clam, transform(Risk_Indicators.Layout_Bocashell_with_Custom, self := left, self := []));
 
 recoverScoreBatchIn := project(ungroup(clam), transform(Models.Layout_RecoverScore_Batch_Input, self := left.shell_input, self := left, 
@@ -3898,12 +3900,24 @@ self.RVR1410_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
 self.RVR1410_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
 self := left), keep(1), left outer);
 // output(with_RVR1410_1_0, named('with_RVR1410_1_0'));
+
+
+//NonStandard model, no reason codes
+RVR1903_1_0_score := Models.RVR1903_1_0(attrv5);
+// output(RVR1903_1_0_score, named('RVR1903_1_0_score'));
+                                  
+with_RVR1903_1_0 := join(with_RVR1410_1_0, RVR1903_1_0_score,
+left.seq=(unsigned)right.seq,
+transform(Models.layout_Runway,
+self.RVR1903_1_0_score := right.score;
+self := left), keep(1), left outer);
+// output(with_RVR1903_1_0, named('with_RVR1903_1_0'));
           
 
 RVR803_1_0_score := Models.RVR803_1_0(clam, isCalifornia);
 // output(RVR803_1_0_score, named('RVR803_1_0_score'));
                                   
-with_RVR803_1_0 := join(with_RVR1410_1_0, RVR803_1_0_score,
+with_RVR803_1_0 := join(with_RVR1903_1_0, RVR803_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
 self.RVR803_1_0_score := right.score;
@@ -5814,6 +5828,8 @@ self.RVR1410_1_0_reason1	:= if(model_environment in [1,2], left.RVR1410_1_0_reas
 self.RVR1410_1_0_reason2	:= if(model_environment in [1,2], left.RVR1410_1_0_reason2	, '');
 self.RVR1410_1_0_reason3	:= if(model_environment in [1,2], left.RVR1410_1_0_reason3	, '');
 self.RVR1410_1_0_reason4	:= if(model_environment in [1,2], left.RVR1410_1_0_reason4	, '');
+
+self.RVR1903_1_0_score	:= if(model_environment in [1,2], left.RVR1903_1_0_score	, '');
 
 self.RVR803_1_0_score	:= if(model_environment in [1,2], left.RVR803_1_0_score	, '');
 self.RVR803_1_0_reason1	:= if(model_environment in [1,2], left.RVR803_1_0_reason1	, '');
