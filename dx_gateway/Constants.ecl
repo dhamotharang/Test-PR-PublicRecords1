@@ -34,4 +34,9 @@
     EXPORT GLOBAL_SID := 28511 ; // hard-coded here, but coming from Orbit.
   END;
 
+  EXPORT AccudataCallerID := MODULE
+    EXPORT GLOBAL_SID := 28141; // hard-coded here, but coming from Orbit.
+  END;
+
+
 END;

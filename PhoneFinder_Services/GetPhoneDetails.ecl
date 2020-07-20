@@ -8,6 +8,8 @@
     EXPORT UNSIGNED	max_age_days := PhoneFinder_Services.Constants.LERG6_LastActivityThreshold;
   END;
 
+  mod_access := PROJECT(inMod, Doxie.IDataAccess);
+
   dsPhonesAttr_recs:= Phones.GetPhoneMetadata_wLERG6(dInPhones, tempMod);
 
   Doxie_Raw.PhonesPlus_Layouts.t_QSentCISOCAddress_out addr_format(string contact_address1,string contact_address2,string contact_city,string contact_state,string contact_zip) :=
@@ -75,18 +77,15 @@
   dDetailedCarrierInfo  := ROLLUP(dsPhonesAttrRecsGrp, GROUP, appendDetails(LEFT, ROWS(LEFT)));
 
     // call accudata cname for callerid and listing name
-  dPrimaryPhones := DEDUP(SORT(PROJECT(dInPhones,TRANSFORM(Phones.Layouts.PhoneAcctno, SELF.phone := LEFT.phoneno, SELF.acctno := LEFT.acctno)),
-                                phone, acctno),
-                          phone);
+  dPrimaryPhones := DEDUP(SORT(PROJECT(dInPhones,
+    TRANSFORM(Phones.Layouts.PhoneAcctno, SELF.phone := LEFT.phoneno, SELF.acctno := LEFT.acctno)),
+      phone, acctno), phone);
 
-  gateway_cfg := dGateways(Gateway.Configuration.IsAccuDataCNAM(servicename))[1];
-  gateway_URL := gateway_cfg.url;
-  boolean makeGatewayCall := gateway_URL != '';
+  dAccuDataCNAM := Gateway.AccudataCallerID.Records(dPrimaryPhones, mod_access, dGateways, inMod.UseAccuData_CNAM, $.Constants.GatewayMaxTimeout.AccuData_CallerID_RequestTimeout);
 
-  dAccuDataCNAM := Gateway.SoapCall_AccuData_CallerID(dPrimaryPhones, gateway_cfg, inMod.UseAccuData_CNAM AND makeGatewayCall, $.Constants.GatewayMaxTimeout.AccuData_CallerID_RequestTimeout);
-
-  PhoneFinder_Services.Layouts.PhoneFinder.Final getaccu_data(PhoneFinder_Services.Layouts.PhoneFinder.Final l,
-                                                              iesp.accudata_accuname.t_AccudataCnamResponseEx r) :=
+  PhoneFinder_Services.Layouts.PhoneFinder.Final getaccu_data(
+    PhoneFinder_Services.Layouts.PhoneFinder.Final l,
+    iesp.accudata_accuname.t_AccudataCnamResponseEx r) :=
   TRANSFORM
     callerName	:= STD.Str.ToUpperCase(r.response.AccudataReport.Reply.CallingName);
     errorMessage := IF(r.response._header.Message<>'',r.response._header.Message,r.response.AccudataReport.ErrorMessage);
