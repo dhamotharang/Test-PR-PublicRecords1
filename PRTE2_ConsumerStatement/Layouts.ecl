@@ -205,7 +205,6 @@ EXPORT Layouts := MODULE
            integer8 override_flag;
       END;
 
-
       EXPORT LexID_Key := RECORD
            unsigned8 lexid;
            string9 ssn;
