@@ -1567,6 +1567,8 @@ to_1_record := to_1_record_temp + DI_input_errors;
 
 without_compromised_dl := project(to_1_record, transform(fd_attributes_norm_minus_compromised_dl, self := left));
 
+other_errors_wo_comp_dl := project(Other_errors, transform(fd_attributes_norm_minus_compromised_dl, self := left));
+
 output(choosen(to_1_record, eyeball), named('to_1_record'));
 output(choosen(without_compromised_dl, eyeball), named('without_compromised_dl'));
 
@@ -1577,7 +1579,11 @@ output(to_1_record,,outputfile,CSV(heading(single), quote('"')), overwrite),
 output(without_compromised_dl,,outputfile,CSV(heading(single), quote('"')), overwrite)
 );
 
+if(_SuppressCompromisedDLs,
 output(Other_errors,,outputfile + '_errors',CSV(heading(single), quote('"')), overwrite);
+output(other_errors_wo_comp_dl,,outputfile + '_errors',CSV(heading(single), quote('"')), overwrite)
+);
+
 
 IF(_include_internal_extras, OUTPUT(CHOOSEN(qa_results, eyeball), NAMED('Sample_QA_Results')));
 IF(_include_internal_extras, OUTPUT(qa_results,,qa_outputfile, CSV(heading(single), quote('"')), overwrite));
