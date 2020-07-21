@@ -114,8 +114,8 @@ vin_match:= dedup(join(accidentDedup, distribute(fileinfmt,hash(LAST_NAME,FIRST_
                 
 				trim(left.orig_lname,left,right) = trim(right.LAST_NAME,left,right)  and 
 				trim(left.orig_fname,left,right) = trim(right.FIRST_NAME,left,right)  and 
-				trim(left.dob,left,right) = trim(right.BIRTH_DT,left,right)  , 
-			//	trim(left.accident_date,left,right)  between  ut.getDateOffset ( -30, trim(right.ACCIDENT_DT) ) and  trim( right.DISCHARGE_DT),
+				trim(left.dob,left,right) = trim(right.BIRTH_DT,left,right)  and
+				trim(left.accident_date,left,right)  between  ut.getDateOffset ( -30, trim(right.ACCIDENT_DT) ) and  trim( right.DISCHARGE_DT),
 				transform(layoutOut, 
 					   self.acc_dol := left.accident_date ; 
 				   self.acc_city := left.vehicle_incident_city; 
