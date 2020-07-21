@@ -88,7 +88,7 @@ EXPORT getReportPAR (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Sh
   best_rec_input := PROJECT(ShellResults, getBestRec(LEFT));
 
   // Get the Date of Death (DOD) - This uses the same logic found in PersonReports.Person_records (SmartLinx)
-  Doxie.Layout_Best GetDeathRecords(Doxie.Layout_Best le, Doxie.Key_Death_MasterV2_DID ri) := TRANSFORM
+  Doxie.Layout_Best GetDeathRecords(Doxie.Layout_Best le, Doxie.key_death_masterv2_ssa_DID ri) := TRANSFORM
     SELF.DOD := (STRING)ri.DOD8; // Get all Dates of Death.  We will SORT/Dedup below to keep the oldest DOD
     SELF := le;
   END;
