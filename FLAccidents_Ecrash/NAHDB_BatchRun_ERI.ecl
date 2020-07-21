@@ -114,8 +114,8 @@ vin_match:= dedup(join(accidentDedup, distribute(fileinfmt,hash(LAST_NAME,FIRST_
                 
 				trim(left.orig_lname,left,right) = trim(right.LAST_NAME,left,right)  and 
 				trim(left.orig_fname,left,right) = trim(right.FIRST_NAME,left,right)  and 
-				trim(left.dob,left,right) = trim(right.BIRTH_DT,left,right)  and 
-				trim(left.accident_date,left,right)  between  ut.getDateOffset ( -30, trim(right.ACCIDENT_DT) ) and  trim( right.DISCHARGE_DT),
+				trim(left.dob,left,right) = trim(right.BIRTH_DT,left,right)  , 
+			//	trim(left.accident_date,left,right)  between  ut.getDateOffset ( -30, trim(right.ACCIDENT_DT) ) and  trim( right.DISCHARGE_DT),
 				transform(layoutOut, 
 					   self.acc_dol := left.accident_date ; 
 				   self.acc_city := left.vehicle_incident_city; 
@@ -165,12 +165,12 @@ vin_match:= dedup(join(accidentDedup, distribute(fileinfmt,hash(LAST_NAME,FIRST_
            self.vendor_code           :=  left.vendor_code;
            self.work_type_id          :=  left.work_type_id;
 					 self := right 
-				   ), right outer,local),all);
+				   ), right outer,local),LAST_NAME,FIRST_NAME,BIRTH_DT,local);
 
 
 // remove multiple vin records caused due to VIN lookup from batch
 
-out := project(vin_match,transform(layoutOut, self.source_id := if (left.acc_dol ='', '', left.source_id), self := left)); 
+out := project(vin_match,transform(layoutOut, self.source_id := if (left.acc_dol ='', '', left.source_id), self := left))  :persist('~thor_data400::persist::nahdb_eri'); 
 
 //Add rowid to the output file
 //// Bug #.DF-23776
@@ -181,10 +181,10 @@ out := project(vin_match,transform(layoutOut, self.source_id := if (left.acc_dol
 
 
 										
-return sequential(/*FLAccidents_Ecrash.Spray_nahdb_ERI(filedate), 
-                 count(fileinfmt),
-			    count(out); 
-                 count(out(acc_dol <>'')); */
+return sequential(FLAccidents_Ecrash.Spray_nahdb_ERI(filedate), 
+              /*   count(fileinfmt),
+			    count(out); */
+                 count(out(acc_dol <>'')); 
               
                  output(out,,'~thor_data::out::nahdb_batch_name_'+filedate,csv(
                  HEADING('STATE|ID|FIRST_NAME|MIDDILE_NAME|LAST_NAME|ADDRESS1|ADDRESS2|CITY|ST|ZIPCODE|BIRTH_DT|ACCIDENT_DT|ADMIT_DT|DISCHARGE_DT|MobilePhone|HomePhone|WorkPhone|acc_vin| order_id	| sequence_nbr|	 reason_id| acct_nbr	| vehicle_incident_id| vehicle_unit_number |	vendor_code| work_type_id|  orig_lname | orig_fname | orig_mname |  vehicle_owner| dob| driver_license_nbr| dlnbr_st| vehicle_year|  vehicle_make|  vehicle_model| tag_nbr| tagnbr_st| report_type_id| loss_type| acc_dol| accident_location|  acc_city|	 vehicle_incident_city| acc_st	| jurisdiction| orig_accnbr|	 accident_nbr| addl_report_number| acc_county| crash_county| cru_jurisdiction_nbr| agency_ori| carrier_name|	  Insurance_policy_num|	    Insurance_policy_Eff_Date|    Insurance_policy_Exp_Date| source_id|	 report_code|	 match_flag|	 date_vendor_last_reported   \n','',SINGLE),
