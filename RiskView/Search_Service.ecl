@@ -446,27 +446,22 @@ search_results_temp := ungroup(
 
 				//For MLA, we need to populate the exception area of the result if there was an error flagged in the MLA process.  The
 				//Exception_code field will contain the error code...use it to look up the description and format the exception record.
-				ds_excep_blank := DATASET([], iesp.share.t_WsException); 
-				
-				ds_excep := DATASET([{'Roxie', 
-															 left.Exception_code,  
-															 '', 									
-															 RiskView.Constants.MLA_error_desc(left.Exception_code)}], iesp.share.t_WsException);
-                               
-       ds_excep_Checking_Indicators:= DATASET([{'Roxie', 
-															 left.Exception_code,  
-															 '', 									
-															 RiskView.Constants.SubscriberID_error_desc(left.Exception_code)}], iesp.share.t_WsException);
-               ds_excep_status_refresh := DATASET([{'Roxie', 
-                                                             left.Exception_code,  
-                                                             '', 									
-                                                             RiskView.Constants.StatusRefresh_error_desc(left.Exception_code)}], iesp.share.t_WsException);
+				ds_excep_blank := DATASET([], iesp.share.t_WsException);
 
-				SELF._Header.Exceptions := map((custom_model_name  = 'mla1608_0' or custom2_model_name = 'mla1608_0' or 
-																			  custom3_model_name = 'mla1608_0' or custom4_model_name = 'mla1608_0' or 
+				ds_excep := DATASET([{'Roxie',
+															 left.Exception_code,
+															 '',
+															 RiskView.Constants.MLA_error_desc(left.Exception_code)}], iesp.share.t_WsException);
+
+       ds_excep_Checking_Indicators:= DATASET([{'Roxie',
+															 left.Exception_code,
+															 '',
+															 RiskView.Constants.SubscriberID_error_desc(left.Exception_code)}], iesp.share.t_WsException);
+
+				SELF._Header.Exceptions := map((custom_model_name  = 'mla1608_0' or custom2_model_name = 'mla1608_0' or
+																			  custom3_model_name = 'mla1608_0' or custom4_model_name = 'mla1608_0' or
 																			  custom5_model_name = 'mla1608_0') and left.Exception_code <> '' => ds_excep,
                                         SubscriberId = 0 and STD.Str.ToLowerCase(AttributesVersionRequest) = RiskView.Constants.checking_indicators_attribute_request and left.Exception_code <> '' => ds_excep_Checking_Indicators,
-                                        IncludeStatusRefreshChecks = TRUE AND LEFT.Exception_Code <> '' => ds_excep_status_refresh,
 																			  ds_excep_blank);
         SELF.result.fdcheckingindicator := left.FDGatewayCalled;
 

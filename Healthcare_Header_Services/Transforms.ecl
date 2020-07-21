@@ -1066,7 +1066,7 @@ EXPORT Transforms := MODULE
 		self.npis := dataset([{l.acctno,r.lnfid,r.npi_num,r.npi_num=l.usernpi,2,r.npi_deact_date,'','','2'}],Healthcare_Header_Services.Layouts.layout_npi)(npi<>'');
 		self.StateLicenses := dataset([{l.acctno,r.lnfid,r.lnfid,0,r.lic1_state,r.lic1_num,'',r.lic1_type,r.lic1_status,Healthcare_Header_Services.Functions.cleanOnlyNumbers(r.lic1_begin_date),Healthcare_Header_Services.Functions.cleanOnlyNumbers(r.lic1_end_date),''}],Healthcare_Header_Services.Layouts.layout_licenseinfo)(LicenseNumber<>'' and LicenseNumber<>'0');
 		self.Taxonomy := dataset([{l.acctno,r.group_key,r.lnfid,r.taxonomy,r.taxonomy_primary_ind,'',''}],Healthcare_Header_Services.Layouts.layout_taxonomy);
-		self.sanctions := project(r,transform(Layouts.layout_sanctions, 
+		self.sanctions := project(r,transform(Healthcare_Header_Services.Layouts.layout_sanctions, 
 															self.acctno:=l.acctno;self.ProviderID:=left.lnfid;self.group_key:=left.group_key;
 															self.sanc1_date :=Healthcare_Header_Services.Functions.cleanOnlyNumbers(left.sanc1_date);self.sanc1_state := left.sanc1_state;
 															self.sanc1_lic_num := left.lic1_num; self.sanc1_prof_type := left.facility_type;
@@ -1097,8 +1097,8 @@ EXPORT Transforms := MODULE
 	end;
 
 	//Enclarity rollups
-	export Layouts.layout_addressinfo doSelectFileProvidersBaseRecordAddrRollup(Layouts.layout_addressinfo l,
-																										DATASET(Layouts.layout_addressinfo) allRows) := TRANSFORM
+	export Layouts.layout_addressinfo doSelectFileProvidersBaseRecordAddrRollup(Healthcare_Header_Services.Layouts.layout_addressinfo l,
+																										DATASET(Healthcare_Header_Services.Layouts.layout_addressinfo) allRows) := TRANSFORM
 			self.last_seen := max(allRows,last_seen);
 			self.first_seen := if(min(allRows,first_seen) <> '', min(allRows,first_seen),min(allRows,last_seen));
 			self.addrConfidenceValue := max(allRows,addrConfidenceValue);
@@ -1106,8 +1106,8 @@ EXPORT Transforms := MODULE
 			self := l;
 			self := [];
 	end;
-	export Layouts.CombinedHeaderResults doSelectFileProvidersBaseRecordSrcIdRollup(Layouts.CombinedHeaderResults l, 
-																									DATASET(Layouts.CombinedHeaderResults) allRows) := TRANSFORM
+	export Layouts.CombinedHeaderResults doSelectFileProvidersBaseRecordSrcIdRollup(Healthcare_Header_Services.Layouts.CombinedHeaderResults l, 
+																									DATASET(Healthcare_Header_Services.Layouts.CombinedHeaderResults) allRows) := TRANSFORM
 		SELF.acctno := l.acctno;
 		self.LNPID := l.LNPID;
 		self.SrcId := l.SrcId;
@@ -1135,9 +1135,9 @@ EXPORT Transforms := MODULE
 											 statusHighRetired or statusMediumRetired or statusLowRetired => 'R',
 											 statusActive => 'A',
 											 ' ');
-		self.Sources       := DEDUP( NORMALIZE( allRows, LEFT.Sources, TRANSFORM( Layouts.layout_SrcID, SELF := RIGHT	)	), RECORD, ALL );
-		self.Names         := sort(DEDUP( NORMALIZE( allRows, LEFT.Names, TRANSFORM( Layouts.layout_nameinfo, SELF := RIGHT	)	), RECORD, ALL ),namePenalty);
-		self.Addresses     := sort(rollup(group(sort(NORMALIZE( allRows, LEFT.Addresses(prim_name<>'',p_city_name<>'',st<>'',z5<>''), 
+		self.Sources       := DEDUP( NORMALIZE( allRows(hasoptout=false), LEFT.Sources, TRANSFORM( Layouts.layout_SrcID, SELF := RIGHT	)	), RECORD, ALL );
+		self.Names         := sort(DEDUP( NORMALIZE( allRows(hasoptout=false), LEFT.Names, TRANSFORM( Layouts.layout_nameinfo, SELF := RIGHT	)	), RECORD, ALL ),namePenalty);
+		self.Addresses     := sort(rollup(group(sort(NORMALIZE( allRows(hasoptout=false), LEFT.Addresses(prim_name<>'',p_city_name<>'',st<>'',z5<>''), 
 																											TRANSFORM( Layouts.layout_addressinfo, SELF := RIGHT	)),
 																						prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,z5,-(integer)addrConfidenceValue,-addrVerificationDate),
 																			 prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,z5),group,doSelectFileProvidersBaseRecordAddrRollup(left,rows(left))),-(integer)addrConfidenceValue,-addrVerificationDate);
@@ -1164,12 +1164,12 @@ EXPORT Transforms := MODULE
 																addrVerificationDate,address1,address2,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,
 																sec_range,p_city_name,v_city_name,st,z5,zip4,primaryLocation,practiceAddress,BillingAddress,PhoneNumber,FaxNumber),
 													src,seq);
-		self.Sanctions			:=  sort(dedup(sort(NORMALIZE( allRows, LEFT.Sanctions, TRANSFORM( Layouts.layout_sanctions, SELF := RIGHT	)	), acctno,ProviderID,group_key,GroupSortOrder,sanc1_state,sanc1_lic_num,sanc1_date), acctno,ProviderID,group_key,GroupSortOrder,sanc1_state,sanc1_lic_num,sanc1_date),GroupSortOrder);
-		self.LegacySanctions:=  sort(dedup(sort(NORMALIZE( allRows, LEFT.LegacySanctions, TRANSFORM( Layouts.layout_LegacySanctions, SELF := RIGHT	)	), acctno,ProviderID,group_key,GroupSortOrder,SANC_SANCST,SANC_LICNBR,SANC_SANCDTE), acctno,ProviderID,group_key,GroupSortOrder,SANC_SANCST,SANC_LICNBR,SANC_SANCDTE),groupsortorder);
+		self.Sanctions			:=  sort(dedup(sort(NORMALIZE( allRows(hasoptout=false), LEFT.Sanctions, TRANSFORM( Healthcare_Header_Services.Layouts.layout_sanctions, SELF := RIGHT	)	), acctno,ProviderID,group_key,GroupSortOrder,sanc1_state,sanc1_lic_num,sanc1_date), acctno,ProviderID,group_key,GroupSortOrder,sanc1_state,sanc1_lic_num,sanc1_date),GroupSortOrder);
+		self.LegacySanctions:=  sort(dedup(sort(NORMALIZE( allRows(hasoptout=false), LEFT.LegacySanctions, TRANSFORM( Healthcare_Header_Services.Layouts.layout_LegacySanctions, SELF := RIGHT	)	), acctno,ProviderID,group_key,GroupSortOrder,SANC_SANCST,SANC_LICNBR,SANC_SANCDTE), acctno,ProviderID,group_key,GroupSortOrder,SANC_SANCST,SANC_LICNBR,SANC_SANCDTE),groupsortorder);
 		self := l;
 	end;
-	export Layouts.CombinedHeaderResults doSelectFileFacilitiesBaseRecordSrcIdRollup(Layouts.CombinedHeaderResults l, 
-																									DATASET(Layouts.CombinedHeaderResults) allRows) := TRANSFORM
+	export Layouts.CombinedHeaderResults doSelectFileFacilitiesBaseRecordSrcIdRollup(Healthcare_Header_Services.Layouts.CombinedHeaderResults l, 
+																									DATASET(Healthcare_Header_Services.Layouts.CombinedHeaderResults) allRows) := TRANSFORM
 		SELF.acctno := l.acctno;
 		self.LNPID := l.LNPID;
 		self.SrcId := l.SrcId;

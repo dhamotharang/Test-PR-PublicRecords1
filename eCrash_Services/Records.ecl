@@ -219,11 +219,11 @@ EXPORT Records(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 					 self. Location := L.Location;
 					 self. DateofCrash := L.DateofCrash;
 					 self. InvolvedParties := PROJECT(L,TRANSFORM(iesp.ecrash.t_ECrashInvolvedParty,
-					 																			SpacecleanName := std.str.CleanSpaces(left.NameOfPerson);
-					                                     self.name.full := SpacecleanName,
-																							 // HPD web entry interface has only 2 fields, 1st and last name, trying to replicate the same here
-																							 self.name.first := std.str.GetNthWord(SpacecleanName,1),		
-																							 self.name.last := std.str.ExcludeFirstWord(SpacecleanName),
+					 																		// HPD web entry interface has only 2 fields, 1st and last name, We get them concatenated in 1 field with '/' separator	
+					                                     self.name.full := STD.Str.FindReplace(left.NameOfPerson,'/',' '),
+																							  _Splitname := STD.Str.SplitWords(left.NameOfPerson, '/'); // provides a set 
+																							 self.name.first := _Splitname[1],		
+																							 self.name.last := _Splitname[2],
 																							 self.DriverLicenseNumber :=  left.DLNumber,
 																							 self.dob := left.dob,
 																							 self := []));

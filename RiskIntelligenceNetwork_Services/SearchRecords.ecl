@@ -77,7 +77,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 
  ds_combinedfrag_recs := ds_search_in + ds_dids_to_use;
 
- ds_fragment_recs_w_value := _RIN_Function.GetFragmentRecs(ds_combinedfrag_recs, ds_allPayloadRecs, TRUE);
+ ds_fragment_recs_w_value := _RIN_Function.GetFragmentRecs(ds_combinedfrag_recs, ds_allPayloadRecs);
 
  _Layout.fragment_w_value_recs do_Rollup(_Layout.fragment_w_value_recs L, dataset(_Layout.fragment_w_value_recs) R) := TRANSFORM
    SELF := L;
@@ -89,22 +89,17 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 
  ds_entityNameUID := _RIN_Function.GetAnalyticsUID(ds_fragment_recs_rolled);
 
- PayloadCleandName_rec := RECORD
-  FraudShared.Layouts_Key.Main.Record_ID;
-  FraudShared.Layouts_Key.Main.cleaned_name cleaned_name;
- END;
- 
- ds_PayloadCleandName := PROJECT(ds_allPayloadRecs, TRANSFORM(PayloadCleandName_rec, SELF := LEFT));
-
  iesp.identitysearch.t_RINIdentitySearchProfileInformation createProfileInformation (RECORDOF(FraudGovPlatform.Key_entityprofile) pInfo) := TRANSFORM
   SELF.UniqueId := (string) pInfo.t_personuidecho,
-  cleaned_name := ds_PayloadCleandName(record_id = pInfo.recordid)[1].cleaned_name;
-  SELF.Name := iesp.ECL2ESP.SetName(cleaned_name.fname,
-                                    cleaned_name.mname,
-                                    cleaned_name.lname,
-                                    cleaned_name.name_suffix,
-                                    cleaned_name.title,
-                                    ut.fn_FormatFullName(cleaned_name.lname, cleaned_name.fname, cleaned_name.mname)),
+  fname := pInfo.t_inpclnfirstnmecho;
+  lname := pInfo.t_inpclnlastnmecho;
+  mname := pInfo.nvp(name = 't_inpclnmiddlenmecho')[1].value;
+  SELF.Name := iesp.ECL2ESP.SetName(fname,
+                                    mname,
+                                    lname,
+                                    '',
+                                    '',
+                                    ut.fn_FormatFullName(lname, fname, mname)),
   SELF.SSN := pInfo.t_inpclnssnecho,
   SELF.DOB := iesp.ECL2ESP.toDate(pInfo.t_inpclndobecho),
   st_addr1 := Address.Addr1FromComponents(pInfo.t_inpclnaddrprimrangeecho,pInfo.t_inpclnaddrpredirecho,
@@ -146,8 +141,8 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 
  ds_contributed_recs := JOIN(ds_entityNameUID, FraudGovPlatform.Key_entityprofile,
                             KEYED(RIGHT.customerid = search_params.GlobalCompanyId AND
-                              RIGHT.industrytype = search_params.IndustryType AND
-                              RIGHT.entitycontextuid = LEFT.entity_context_uid) AND
+                                  RIGHT.industrytype = search_params.IndustryType AND
+                                  RIGHT.entitycontextuid = LEFT.entity_context_uid) AND
                             RIGHT.aotcurrprofflag = _Constant.CURR_PROFILE_FLAG,
                             TRANSFORM(iesp.identitysearch.t_RINIdentitySearchRecord,
                                 SELF.RecordSource := _Constant.RECORD_SOURCE.CONTRIBUTED,
@@ -213,7 +208,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 
  // Public records appends for realtimetime identities. inorder to get risk scores from KEL analytics.
  ds_pr_appends := _RIN_Function.getRealtimePRAppends(ungroup(ds_pr_best), search_params);
- ds_realtime_attribute := RiskIntelligenceNetwork_Analytics.Functions.GetRealtimeAssessment(ds_pr_appends);
+ ds_realtime_attribute := RiskIntelligenceNetwork_Analytics.Functions.GetRealtimeAssessment(ds_pr_appends, search_params);
 
  // ****Ends here ****
 
@@ -249,7 +244,6 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
  // OUTPUT(ds_pr_did, NAMED('ds_pr_did'));
  // OUTPUT(ds_pr_did_final, NAMED('ds_pr_did_final'));
  // OUTPUT(ds_allPayloadRecs, NAMED('ds_allPayloadRecs'));
- // OUTPUT(ds_PayloadCleandName, NAMED('ds_PayloadCleandName'));
  // OUTPUT(ds_contributory_dids, NAMED('ds_contributory_dids'));
  // OUTPUT(ds_dids_combined, NAMED('ds_dids_combined'));
  // OUTPUT(ds_dids_combined_dedup, NAMED('ds_dids_combined_dedup'));
