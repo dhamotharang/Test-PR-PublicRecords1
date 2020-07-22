@@ -13,7 +13,7 @@ EXPORT LIB_B2B_attributes (
 #else
   MODULE ($.LIB_B2B_interface (Shell, Options, AllowedSourcesSet))
 #end
-
+#OPTION('expandSelectCreateRow', TRUE);
   BHBuildDate := Risk_Indicators.get_Build_date('bip_build_version');
   allowMarketing := IF(Options.MarketingMode = 1, TRUE, FALSE);
   AllowDNBDMI := IF(Options.AllowedSources = Business_Risk_BIP.Constants.AllowDNBDMI, TRUE, FALSE);
@@ -475,5 +475,5 @@ EXPORT LIB_B2B_attributes (
   // OUTPUT(Shell,NAMED('Shell'));
 
 	EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutBusinessSeleID) Results := BusinessSeleIDAttributes;
-
+	
 END;
