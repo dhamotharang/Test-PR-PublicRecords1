@@ -41,6 +41,15 @@ EXPORT rpc_for_Dids( DATASET(layouts.DIDMetaRec) batch_in ) :=
 	   DidVille.Layout_Did_OutBatch;
 	 end;
 	 
+	 /*
+   matchset   -
+      'A' = Address
+      'D' = DOB
+      'Z' = zip code matching
+      'G' = age matching
+					 '4' = ssn4 matching (last 4 digits of ssn)
+  */
+	 
 	 matchset :=['A', 'D', 'Z', 'G', '4'];
 	 
 	 did_Add.Mac_Match_Flex_V2(
@@ -73,17 +82,16 @@ EXPORT rpc_for_Dids( DATASET(layouts.DIDMetaRec) batch_in ) :=
 	                            ,									       //	addr_suffix_field
 	                            ,									       //	postdir_field
 	                            ,									       //	udesig_field
-	                            ,									       //	city_field
+	                            p_city_name,					//	city_field
 	                            ,									       //	zip4_field
-	                            TRUE,							     //	bool_switch_priority
+	                            FALSE,							    //	bool_switch_priority
 	                            ,									       //	weight_threshold
 	                            ,									       //	distance
 	                            FALSE							     //	segmentation
   );
 		
-		f_out_best    := DISTRIBUTE(f_out, seq);
-		
-		best_out_slim := PROJECT( f_out_best, {DidVille.Layout_Did_OutBatch.seq, DidVille.Layout_Did_OutBatch.did} );
+		f_out_slim := PROJECT( f_out, {DidVille.Layout_Did_OutBatch.seq, DidVille.Layout_Did_OutBatch.did} );
+		best_out_slim := DISTRIBUTE(f_out_slim, seq);
 
 		RETURN best_out_slim; // layout is UNSIGNED4 + UNSIGNED6
 	END;
