@@ -31,9 +31,7 @@ BuildCoverageDates :=
 +'FraudGovPlatform.Build_CoverageDates_Push.push_to_prod:failure(email(\'Build Coverage Dates failed\'));\n'
 ;
 
-RunDashboards:=  SEQUENTIAL(	
-								//GRP-5211 commenting old dashboards
-								// FraudGovPlatform_Analytics.GenerateDashboards(true,true),
+RunDashboards:=  SEQUENTIAL(	FraudGovPlatform_Analytics.GenerateDashboards(true,true),
 								FraudGovPlatform_Analytics.GenerateRinDashboards(true,true),
 								CreateSuper,
 								UpdateRefreshVersion,
