@@ -48,14 +48,14 @@ header_services.Supplemental_Data.mac_verify('didaddress_sup.txt',Suppression_La
  
 Suppression_In := supp_ds_func();
 
-dSuppressedIn := project(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
+dSuppressedIn_tmp := project(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
 
 header.layout_header tSuppress(full_ShortSuppress l) := transform
  self := l;
 end;
 // dSuppressedIn substituted below with full_LongSuppress
 
-full_out_suppress := join(full_ShortSuppress, dSuppressedIn,
+full_out_suppress := join(full_ShortSuppress, dSuppressedIn_tmp,
                           left.hval_address=right.hval,
 													tSuppress(left),
 													left only,lookup);
@@ -157,36 +157,7 @@ Base_File_Append := project(Base_File_Append_In, reformat_header(left)); //REMOV
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-layout_ff := Record
-     data16 hval_did ;
-     data16 hval_ssn ;
-		 string1 nl := '\n' ;
-END ;
-
-header_services.Supplemental_Data.mac_verify('ff_sup.txt',layout_ff, ff_sup_attr); // 
- 
-Base_ff_sup := ff_sup_attr();
-
-
-ff_base := JOIN(fix_name_suffix, Base_ff_sup,
-                    hashmd5((string9)left.ssn) = right.hval_ssn 
-                    AND
-						  hashmd5(intformat(left.did,15,1)) != right.hval_did,
-						  TRANSFORM(LEFT),
-						  LEFT ONLY, ALL) ;
-
-///
-
-header_services.Supplemental_Data.mac_verify('ridrec_sup.txt',Suppression_Layout, base_sup_attr); // 
- 
-Base_rid_sup_in := base_sup_attr() ;
-
-base_rid_sup := PROJECT(Base_rid_sup_in ,header_services.Supplemental_Data.in_to_out(left));
-
-rid_base := JOIN(ff_base, base_rid_sup,
-                 hashmd5(intformat((unsigned6)left.rid,15,1)) = right.hval,                    
-						     TRANSFORM(LEFT),
-						    LEFT ONLY, ALL) ;
+rid_base :=  Header.Prep_Build.applyRidRecSup(fix_name_suffix);						  	
 						  
 base_file_inj := 	rid_base ;					   
 
