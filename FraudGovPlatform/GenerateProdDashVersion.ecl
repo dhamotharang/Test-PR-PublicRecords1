@@ -46,8 +46,9 @@ fsuperadd	:= Sequential(
 												STD.File.AddSuperfile(ProdDashVerRefresh_Super, ProdDashVerRefresh_Logical),
 												STD.File.FinishSuperFileTransaction()
 												);
-DashboardsReady 					:=	If(CustomerDash_WUState='completed' and CustomerDashboard1_1_WUState='completed' and ClusterDetails_WUState='completed'
-																	and FindLeads_WUState='completed' and Dashboard_WUState='completed' and LinksChart_WUState='completed'
+//GRP-5211 Commenting old dashboards												
+DashboardsReady 					:=	If(/*CustomerDash_WUState='completed' and CustomerDashboard1_1_WUState='completed' and ClusterDetails_WUState='completed'
+																	and */FindLeads_WUState='completed' and Dashboard_WUState='completed' and LinksChart_WUState='completed'
 																	and DetailsReport_WUState='completed',true,false);
 
 
