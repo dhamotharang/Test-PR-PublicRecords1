@@ -128,7 +128,7 @@ END;
 	Regional Level
 	Adverse Media
 */
-EXPORT ProcessSearchCriteria(DATASET(Layouts.rEntity) infile) := FUNCTION
+EXPORT ProcessSearchCriteria(DATASET(Layouts.rEntity) infile, boolean IncludeSanctionsCriteria) := FUNCTION
 
 	countries := 	GetCountryCriteria(infile);
 	regions := GetRegionCriteria(infile);
@@ -136,7 +136,7 @@ EXPORT ProcessSearchCriteria(DATASET(Layouts.rEntity) infile) := FUNCTION
 
 	deceased := GetDeceasedCriteria(infile);
 	sources := GetSourceCriteria(infile);
-	sanctions := $.GetConsolidatedCriteria(infile);
+	sanctions := IF (IncludeSanctionsCriteria,$.GetConsolidatedCriteria(infile));
 
 //	crit := SORT(DISTRIBUTE(countries & regions & categories & deceased & sources,id), id, criteria, LOCAL);
 		crit := SORT(DISTRIBUTE(countries & regions & deceased & sources & sanctions,id), id, criteria, LOCAL);

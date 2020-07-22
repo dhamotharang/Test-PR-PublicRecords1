@@ -62,7 +62,7 @@ Layout_XG.routp xForm(Layouts.rEntity infile) := TRANSFORM
 
 END;
 
-EXPORT ProcessFile(DATASET(Layouts.rEntity) infile, boolean useLexId = false) := FUNCTION
+EXPORT ProcessFile(DATASET(Layouts.rEntity) infile, boolean IncludeSanctionsCriteria, boolean useLexId = false) := FUNCTION
 	basis := PROJECT(infile, xForm(LEFT));
 	// add akas
 	withaka := JOIN(basis, dedup(distribute(AllAkas, id),AKA,local), LEFT.id=Right.id,
@@ -96,7 +96,7 @@ EXPORT ProcessFile(DATASET(Layouts.rEntity) infile, boolean useLexId = false) :=
 						self.comments := RIGHT.cmts;
 						self := LEFT;
 					), LEFT OUTER, LOCAL);
-	criteria := ProcessSearchCriteria(infile);
+	criteria := ProcessSearchCriteria(infile,IncludeSanctionsCriteria);
 	withCriteria := JOIN(withCmts, distribute(criteria, id), LEFT.id=Right.id,
 					TRANSFORM(Layout_XG.routp,
 						self.search_criteria := (string)RIGHT.criteria;
