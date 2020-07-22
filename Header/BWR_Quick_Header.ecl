@@ -1,4 +1,4 @@
-﻿#workunit('name','Quick Header')
+#workunit('name','Quick Header')
 import header_quick; 
 
 filedate := '';
@@ -78,6 +78,30 @@ rFullOut := record // Referenced string_rec layout in header.MAC_Despray
 end;
 full_out_r := project(full_out, rFullOut);
 full_out_suppress := Header.Prep_Build.applyDidAddressSup2(full_out_r);
+
+rFullOut_HashDIDAddress := record
+ rFullOut;
+ rHashDIDAddress;
+end;
+
+rFullOut_HashDIDAddress tHashDIDAddress(full_out l) := transform                            
+ self.hash_did_address := hashmd5(l.did,l.st,l.zip,l.city_name,l.prim_name,l.prim_range,l.predir,l.suffix,l.postdir,l.sec_range);
+ self := l;
+end;
+
+dHeader_withMD5 := project(full_out, tHashDIDAddress(left));
+
+rFullOut tSuppress(dHeader_withMD5 l, dSuppressedIn r) := transform
+ self := l;
+end;
+
+full_out_suppress := join(dHeader_withMD5,dSuppressedIn,
+                          left.hash_did_address=right.hash_did_address,
+						  tSuppress(left,right),
+						  left only,lookup);
+						  
+//***//***//***//*** END SUPPRESSION TEXT ***//***//***//***//
+
 
 //Build the out file
 first_step := output(full_out_suppress,,'~thor_data400::out::eq_header',overwrite);

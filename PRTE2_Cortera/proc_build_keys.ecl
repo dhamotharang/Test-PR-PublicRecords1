@@ -12,6 +12,11 @@ RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(keys.Header_Link_Id,
                                            constants.key_prefix + '@version@::hdr_linkid',
                                            constants.key_prefix + filedate + '::hdr_linkid', 
                                            build_key_cortera_hdr_key);
+																					 
+RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(keys.exec_Link_Id,
+                                           constants.key_prefix + '@version@::executive_linkid',
+                                           constants.key_prefix + filedate + '::executive_linkid', 
+                                           build_key_cortera_exec_key);																					 
 
 RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(keys.linkids.key,
                                            constants.key_prefix + '@version@::linkids',
@@ -26,6 +31,10 @@ RoxieKeyBuild.MAC_SK_Move_To_Built_V2(constants.key_prefix + '@version@::attr_li
 RoxieKeyBuild.MAC_SK_Move_To_Built_V2(constants.key_prefix + '@version@::hdr_linkid',
                                       constants.key_prefix + filedate + '::hdr_linkid',
                                       move_built_key_cortera_hdr_key);
+																			
+RoxieKeyBuild.MAC_SK_Move_To_Built_V2(constants.key_prefix + '@version@::executive_linkid',
+                                      constants.key_prefix + filedate + '::executive_linkid',
+                                      move_built_key_cortera_exec_key);
 
 RoxieKeyBuild.MAC_SK_Move_To_Built_V2(constants.key_prefix + 'linkids',
                                       constants.key_prefix + filedate + '::linkids',
@@ -39,6 +48,10 @@ RoxieKeyBuild.MAC_SK_Move_v2(constants.key_prefix + '@version@::attr_linkid',
 RoxieKeyBuild.MAC_SK_Move_v2(constants.key_prefix + '@version@::hdr_linkid',
                             'Q',
                              move_qa_key_cortera_hdr_key);
+														 
+RoxieKeyBuild.MAC_SK_Move_v2(constants.key_prefix + '@version@::executive_linkid',
+                            'Q',
+                             move_qa_key_cortera_exec_key);
 
 RoxieKeyBuild.MAC_SK_Move_v2(constants.key_prefix + '@version@::linkids',
                             'Q',
@@ -55,22 +68,27 @@ RoxieKeyBuild.MAC_SK_Move_v2(constants.key_prefix + '@version@::linkids',
                        parallel(
                                 build_key_cortera_attr_key,
                                 build_key_cortera_hdr_key,
-                                build_key_cortera_lnk_key);
+                                build_key_cortera_lnk_key,
+																build_key_cortera_exec_key);
 
                        //Move to Built
                        Parallel(
                                 move_built_key_cortera_attr_key,
                                 move_built_key_cortera_hdr_key,
-                                move_built_key_cortera_lnk_key);
+                                move_built_key_cortera_lnk_key,
+																move_built_key_cortera_exec_key);
 
                        //Move to QA
                        Parallel(
                                 move_qa_key_cortera_attr_key,
                                 move_qa_key_cortera_hdr_key,
-                                move_qa_key_cortera_lnk_key),
+                                move_qa_key_cortera_lnk_key,
+																move_qa_key_cortera_exec_key)
+																,
                        
                        //Update DOPs         
-                                PerformUpdateOrNot,
-                                orbit_update);
+                               PerformUpdateOrNot,
+                               orbit_update
+															 );
 
 END;

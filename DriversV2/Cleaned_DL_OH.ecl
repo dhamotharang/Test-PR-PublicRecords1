@@ -1,116 +1,66 @@
-import Drivers, Address, ut, lib_stringlib, DriversV2, NID;
+﻿import  Address, _Validate, ut, STD, Corp2_Mapping;
 
 export Cleaned_DL_OH(string processDate, string fileDate) := function
 
-	in_file := DriversV2.File_DL_OH_Update(fileDate);
+	in_file    := DriversV2.File_DL_OH_Update(fileDate);
+	layout_out := DriversV2.Layouts_DL_OH_In.Layout_OH_Cleaned;	
 
-	layout_out := DriversV2.Layouts_DL_OH_In.Layout_OH_Cleaned;
-	
-	string lFixNameCharacters(string pOrigName)
-	  := if(lib_stringlib.stringlib.stringfind(pOrigName,'*',1) <> 0,
-			lib_stringlib.stringlib.stringfindreplace(
-			  lib_stringlib.stringlib.stringfindreplace(
-				lib_stringlib.stringlib.stringfindreplace(pOrigName,'%',' '),
-				',',' '),
-			   '*',', ')
-				,pOrigName
-		   );
-	
-
-	layout_out mapClean(in_file l) := transform
-		string73 tempName := stringlib.StringToUpperCase(if(trim(l.PIMNAM,left,right) <> '',
-															Address.CleanPerson73(trim(lFixNameCharacters(l.PIMNAM),left,right)),
-															''));
-		
-		self.title           := tempName[1..5];
-		self.fname           := tempName[6..25];
-		self.mname           := tempName[26..45];
-		self.lname           := tempName[46..65];
-		self.name_suffix	   := ut.fGetSuffix(tempName[66..70]);
-		self.cleaning_score	 := tempName[71..73];
-		self.prim_range      := '';
-		self.predir 	       := '';
-		self.prim_name 	     := '';
-		self.suffix          := '';
-		self.postdir 	       := '';
-		self.unit_desig 	   := '';
-		self.sec_range 	     := '';
-		self.p_city_name	   := '';
-		self.v_city_name	   := '';
-		self.state	         := '';
-		self.zip 		         := '';
-		self.zip4 		       := '';
-		self.cart 		       := '';
-		self.cr_sort_sz 	   := '';
-		self.lot 		         := '';
-		self.lot_order 	     := '';
-		self.dbpc 		       := '';
-		self.chk_digit 	     := '';
-		self.rec_type	       := '';
-		self.ace_fips_st	   := '';
-		self.county     	   := '';
-		self.geo_lat 	       := '';
-		self.geo_long 	     := '';
-		self.msa 		         := '';
-		self.geo_blk         := '';
-		self.geo_match 	     := '';
-		self.err_stat 	     := '';	
-		self.process_date    := lib_stringlib.stringlib.stringfilter(processDate,'0123456789');
-		self.DBKOLN          := stringlib.StringToUpperCase(trim(l.DBKOLN,left,right));
-		self.PINSS4          := stringlib.StringToUpperCase(trim(l.PINSS4,left,right));
-		self.DVNLIC          := stringlib.StringToUpperCase(trim(l.DVNLIC,left,right));			
-		self.DVCCLS          := stringlib.StringToUpperCase(trim(l.DVCCLS,left,right));
-		self.DVCTYP          := stringlib.StringToUpperCase(trim(l.DVCTYP,left,right));
-		self.PIFDON          := stringlib.StringToUpperCase(trim(l.PIFDON,left,right));
-		self.PICHCL          := stringlib.StringToUpperCase(trim(l.PICHCL,left,right));
-		self.PICECL          := stringlib.StringToUpperCase(trim(l.PICECL,left,right));			
-		self.PIQWGT          := lib_stringlib.stringlib.stringfilter(l.PIQWGT,'0123456789');
-		self.PINHFT          := lib_stringlib.stringlib.stringfilter(l.PINHFT,'0123456789');
-		self.PINHIN          := lib_stringlib.stringlib.stringfilter(l.PINHIN,'0123456789');
-		self.PICSEX          := stringlib.StringToUpperCase(trim(l.PICSEX,left,right));
-		self.DVDDOI          := lib_stringlib.stringlib.stringfilter(l.DVDDOI,'0123456789');
-		self.DVC2PL          := stringlib.StringToUpperCase(trim(l.DVC2PL,left,right));			
-		self.DVDEXP          := lib_stringlib.stringlib.stringfilter(l.DVDEXP,'0123456789');
-		self.DRNAGY          := stringlib.StringToUpperCase(trim(l.DRNAGY,left,right));
-		self.DVFOCD          := stringlib.StringToUpperCase(trim(l.DVFOCD,left,right));
-		self.DVFOPD          := stringlib.StringToUpperCase(trim(l.DVFOPD,left,right));			
-		self.DVNAPP          := stringlib.StringToUpperCase(trim(l.DVNAPP,left,right));
-		self.DVCATT          := stringlib.StringToUpperCase(trim(l.DVCATT,left,right));
-		self.DVDNOV          := stringlib.StringToUpperCase(trim(l.DVDNOV,left,right));
-		self.DVCDED          := stringlib.StringToUpperCase(trim(l.DVCDED,left,right));
-		self.DVCGRS          := stringlib.StringToUpperCase(trim(l.DVCGRS,left,right));			
-		self.DVFDUP          := stringlib.StringToUpperCase(trim(l.DVFDUP,left,right));
-		self.DVCGEN          := stringlib.StringToUpperCase(trim(l.DVCGEN,left,right));
-		self.DVFLSD          := stringlib.StringToUpperCase(trim(l.DVFLSD,left,right));
-		self.DVQDUP          := stringlib.StringToUpperCase(trim(l.DVQDUP,left,right));
-		self.DVFOHR          := stringlib.StringToUpperCase(trim(l.DVFOHR,left,right));
-		self.DBKMTK          := stringlib.StringToUpperCase(trim(l.DBKMTK,left,right));
-		self.DVFRCS          := stringlib.StringToUpperCase(trim(l.DVFRCS,left,right));
-		self.DVNWBI          := stringlib.StringToUpperCase(trim(l.DVNWBI,left,right));
-		self.SYCPGM          := stringlib.StringToUpperCase(trim(l.SYCPGM,left,right));
-		self.SYTDA1          := stringlib.StringToUpperCase(trim(l.SYTDA1,left,right));
-		self.SYCUID          := stringlib.StringToUpperCase(trim(l.SYCUID,left,right));
-		self.DVFFRD          := stringlib.StringToUpperCase(trim(l.DVFFRD,left,right));
-		//TSA & Medical Certificaton in next 5 fields
-		self.DVCTSA          := stringlib.StringToUpperCase(trim(l.DVCTSA,left,right));
-		self.DVDTSA          := stringlib.StringToUpperCase(trim(l.DVDTSA,left,right));
-		self.DVDTEX          := stringlib.StringToUpperCase(trim(l.DVDTEX,left,right));
-		self.DVCSCE          := stringlib.StringToUpperCase(trim(l.DVCSCE,left,right));
-		self.DVDMCE          := stringlib.StringToUpperCase(trim(l.DVDMCE,left,right));
-		self.FILLER          := stringlib.StringToUpperCase(trim(l.FILLER,left,right));
-		self.PIMNAM          := stringlib.StringToUpperCase(trim(l.PIMNAM,left,right));
-		self.PIGSTR          := stringlib.StringToUpperCase(trim(l.PIGSTR,left,right));		
-		self.PIGCTY          := stringlib.StringToUpperCase(trim(l.PIGCTY,left,right));
-		self.PIGSTA          := stringlib.StringToUpperCase(trim(l.PIGSTA,left,right));
-		self.PIGZIP          := trim(l.PIGZIP,left,right);
-		self.PINCNT          := stringlib.StringToUpperCase(trim(l.PINCNT,left,right));
-		self.PIDD01          := stringlib.StringToUpperCase(trim(l.PIDD01,left,right));
-		self.PIDDOD          := stringlib.StringToUpperCase(trim(l.PIDDOD,left,right));
-		self.PIDAUP          := lib_stringlib.stringlib.stringfilter(l.PIDAUP,'0123456789');
-		self                 := l;		
+	layout_out mapClean(in_file l)  	    := transform
+		string73 tempName 				    			:= Address.CleanPerson73(DriversV2.functions.TrimUpper(DriversV2.functions.TrimUpper(l.First_Name)+' '+ DriversV2.functions.TrimUpper(l.Middle_Name)+' '+ 
+																																								               DriversV2.functions.TrimUpper(l.Last_Name) +' '+ DriversV2.functions.TrimUpper(l.Suffix)
+																																					                     ));
+    self.clean_name_prefix        			:= tempName[1..5];
+		self.clean_fname         			      := tempName[6..25];
+		self.clean_mname        			      := tempName[26..45];
+		self.clean_lname          			    := tempName[46..65];
+		self.clean_name_suffix	      			:= tempName[66..70];
+		self.clean_name_score         			:= tempName[71..73];
+		self.process_Date										:= if(_Validate.Date.fIsValid(processDate),processDate,ut.now());
+		self.Key_Number       							:= trim(l.Key_Number,left,right);
+		self.License_Number       					:= DriversV2.functions.TrimUpper(l.License_Number);
+		self.License_Class      						:= DriversV2.functions.TrimUpper(l.License_Class);
+		self.Donor_Flag       							:= DriversV2.functions.TrimUpper(l.Donor_Flag);
+		self.Hair_Color       							:= DriversV2.functions.TrimUpper(l.Hair_Color);
+		self.Eye_Color      								:= DriversV2.functions.TrimUpper(l.Eye_Color);
+		self.Weight_L       								:= trim(l.Weight_L,left,right);
+		self.Height_Feet       							:= trim(l.Height_Feet,left,right);
+		self.Height_Inches       						:= if(length(trim(l.Height_Inches,left,right))=1, '0'+trim(l.Height_Inches,left,right), trim(l.Height_Inches,left,right));
+		self.Sex_Gender       							:= DriversV2.functions.TrimUpper(l.Sex_Gender);
+		self.Permanent_License_Issue_Date   := DriversV2.functions.ValidateDate(l.Permanent_License_Issue_Date);
+		self.Is_Medical_Two_Part_License    := DriversV2.functions.TrimUpper(l.Is_Medical_Two_Part_License);
+		self.License_Expiration_Date      	:= DriversV2.functions.ValidateDate(l.License_Expiration_Date);
+		self.Deputy_Registrar_Agency        := trim(l.Deputy_Registrar_Agency,left,right);
+		self.CDLIS_Flag      							  := DriversV2.functions.TrimUpper(l.CDLIS_Flag);
+		self.Is_on_PDPS       						  := DriversV2.functions.TrimUpper(l.Is_on_PDPS);
+		self.License_App_Ctrl       				:= DriversV2.functions.TrimUpper(l.License_App_Ctrl);
+		self.Is_Temporary      						  := DriversV2.functions.TrimUpper(l.Is_Temporary);
+		self.License_App_Transaction_Type   := DriversV2.functions.TrimUpper(l.License_App_Transaction_Type);
+		self.Motorcycle_Novice_Date       	:= DriversV2.functions.ValidateDate(l.Motorcycle_Novice_Date);
+		self.Restriction_Codes       				:= DriversV2.functions.TrimUpper(l.Restriction_Codes);
+		self.Endorsement_Codes       				:= DriversV2.functions.TrimUpper(l.Endorsement_Codes);
+		self.Is_Ohio_Resident       				:= DriversV2.functions.TrimUpper(l.Is_Ohio_Resident);
+		self.Has_Warrant_Blocks      			  := DriversV2.functions.TrimUpper(l.Has_Warrant_Blocks);
+		self.Is_Fraud      									:= DriversV2.functions.TrimUpper(l.Is_Fraud);
+		self.TSA_Threat_Assessment_Code     := trim(l.TSA_Threat_Assessment_Code,left,right);
+		self.TSA_Notification_Date          := DriversV2.functions.ValidateDate(l.TSA_Notification_Date);
+		self.TSA_Expiration_Date            := DriversV2.functions.ValidateDate(l.TSA_Expiration_Date);
+		self.Med_Certificate_Self_Cert_Code := trim(l.Med_Certificate_Self_Cert_Code,left,right);
+		self.Med_Certificate_Expiration_Date:= DriversV2.functions.ValidateDate(l.Med_Certificate_Expiration_Date);
+		self.First_Name       							:= DriversV2.functions.TrimUpper(l.First_Name);
+		self.Middle_Name      							:= DriversV2.functions.TrimUpper(l.Middle_Name);
+		self.Last_Name       							  := DriversV2.functions.TrimUpper(l.Last_Name);
+		self.Suffix       								  := DriversV2.functions.TrimUpper(l.Suffix);
+		self.Street_Address       				  := DriversV2.functions.fn_RemoveSpecialChars(l.Street_Address);
+		self.City       										:= DriversV2.functions.fn_RemoveSpecialChars(l.City);
+		self.State       										:= if(DriversV2.functions.TrimUpper(l.State) in ['XX','X'],'',DriversV2.functions.TrimUpper(l.State));
+		self.Zip_Code      								  := if((INTEGER)stringlib.stringfilter(l.Zip_Code,'0123456789')<>0,stringlib.stringfilter(l.Zip_Code,'0123456789'),''); 
+		self.County_Number       						:= trim(l.County_Number,left,right);
+		self.Birth_Date                 		:= DriversV2.functions.ValidateDate(l.Birth_Date);
+		self               								  := l ;  
+		self               								  := [] ;
 	end;
 
-	Cleaned_OH_File := project(in_file, mapClean(left));
-	
+	Cleaned_OH_File := project(in_file, mapClean(left));	
 	return Cleaned_OH_File;
-end;
+	
+end;     

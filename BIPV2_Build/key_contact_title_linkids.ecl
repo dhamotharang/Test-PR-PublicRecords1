@@ -15,58 +15,27 @@ EXPORT key_contact_title_linkids(string pVersion=(string) STD.Date.Today()) := m
   export dkeybuild      := contact_title_bipd_pst;
 	
   // DEFINE THE INDEX
-  shared superfile_name := keynames(, tools._Constants.IsDataland).contact_title_linkids.QA;
-  
-  BIPV2.IDmacros.mac_IndexWithXLinkIDs(dkeybuild, k, superfile_name)
-  export Key := k;
+  export Key := BIPV2_Contacts.KeyRead_Contact_Title(pversion).IndexDef(ds := dkeybuild);
  
-    export contact_title_layout := RECORD
-      unsigned8 contact_title_rank;
-      unsigned2 data_permits;
-      unsigned6 contact_did;
-      string50 contact_job_title_derived;
-      unsigned4 global_sid;
-      unsigned8 record_sid;
-   end;
+	export contact_title_layout := BIPV2_Contacts.Layouts.contactTitle.contact_title_layout
+		: deprecated('use BIPV2_Contacts.Layouts.contactTitle.contact_title_layout');
 
-   export finalLayout := RECORD
-     unsigned6 ultid;
-     unsigned6 orgid;
-     unsigned6 seleid;
-     unsigned6 proxid;
-     unsigned4 global_sid;
-     unsigned8 record_sid;
-		 BIPV2.IDlayouts.l_xlink_ids2.uniqueId;
-     DATASET(contact_title_layout) contact_title;
-		 boolean is_suppressed;
-   end;
+	export finalLayout := BIPV2_Contacts.Layouts.contactTitle.linkids
+		: deprecated('use BIPV2_Contacts.Layouts.contactTitle.linkids');
 
   // -- ensure easy access to different logical and super versions of the key
-  export keyvs(string pversion = '',boolean penvironment = tools._Constants.IsDataland) := tools.macf_FilesIndex('Key' ,keynames(pversion,penvironment).contact_title_linkids);
-  export keybuilt       := keyvs().built      ;
-  export keyQA          := keyvs().qa         ;
-  export keyfather      := keyvs().father     ;
-  export keygrandfather := keyvs().grandfather;
+  export keyvs := BIPV2_Contacts.KeyRead_Contact_Title(pversion).keyvs
+		: deprecated('use BIPV2_Contacts.KeyRead_Contact_Title().keyvs');
+  export keybuilt := BIPV2_Contacts.KeyRead_Contact_Title(pversion).keybuilt
+		: deprecated('use BIPV2_Contacts.KeyRead_Contact_Title().keybuilt');
+  export keyQA := BIPV2_Contacts.KeyRead_Contact_Title(pversion).keyQA
+		: deprecated('use BIPV2_Contacts.KeyRead_Contact_Title().keyQA');
+  export keyfather := BIPV2_Contacts.KeyRead_Contact_Title(pversion).keyfather
+		: deprecated('use BIPV2_Contacts.KeyRead_Contact_Title().keyfather');
+  export keygrandfather := BIPV2_Contacts.KeyRead_Contact_Title(pversion).keygrandfather
+		: deprecated('use BIPV2_Contacts.KeyRead_Contact_Title().keygrandfather');
  
-	 export kFetch2(
-                dataset(BIPV2.IDlayouts.l_xlink_ids2) inputs 
-               ,string1 Level = BIPV2.IDconstants.Fetch_Level_ProxID
-               ,unsigned2 ScoreThreshold = 0
-               ,BIPV2.mod_sources.iParams in_mod=PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt)
-               ,boolean includeDMI=false
-							        ,JoinLimit=25000
-							        ,unsigned1 JoinType = BIPV2.IDconstants.JoinTypes.KeepJoin
-			,doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
-               ) := function							 
-    BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, ds_fetched, Level, JoinLimit, JoinType);								 
-    finalLayout apply_restrict(ds_fetched L) := transform
-		                BIPV2_build.mac_check_access(L.contact_title, contact_title_out, mod_access,true);
-					          self.is_suppressed    := exists(contact_title_out(is_suppressed)) and not exists(contact_title_out(not is_suppressed));
-                    self.contact_title		:= project(contact_title_out(not is_suppressed and BIPV2.mod_sources.isPermitted(in_mod,includeDMI).byBmap(data_permits)), contact_title_layout);
-                  	self := L;
-	                end;
-	   ds_restricted := project(ds_fetched, apply_restrict(left));
-        return ds_restricted;
-  END;
+	export kFetch2 := BIPV2_Contacts.KeyRead_Contact_Title(pversion).kFetch2
+		: deprecated('use BIPV2_Contacts.KeyRead_Contact_Title().keygrandfather');
   
 END;

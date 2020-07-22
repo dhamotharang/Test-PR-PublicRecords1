@@ -1,4 +1,4 @@
-﻿import mdr, ut,address,doxie_build, lib_fileservices, header_services;
+import mdr, ut,address,doxie_build, lib_fileservices, header_services;
 #workunit('name', 'Header Despray Prep');
 
 //************************************************************************
@@ -159,6 +159,29 @@ rFullOut := record // Referenced string_rec layout in header.MAC_Despray
 end;
 full_out_r := project(full_out, rFullOut);
 full_out_suppress := Header.Prep_Build.applyDidAddressSup2(full_out_r);
+
+rFullOut_HashDIDAddress := record
+ rFullOut;
+ rHashDIDAddress;
+end;
+
+rFullOut_HashDIDAddress tHashDIDAddress(full_out l) := transform                            
+ self.hval := hashmd5(l.did,l.st,l.zip,l.city_name,l.prim_name,l.prim_range,l.predir,l.suffix,l.postdir,l.sec_range);
+ self := l;
+end;
+
+dHeader_withMD5 := project(full_out, tHashDIDAddress(left));
+
+rFullOut tSuppress(dHeader_withMD5 l, dSuppressedIn r) := transform
+ self := l;
+end;
+
+full_out_suppress := join(dHeader_withMD5,dSuppressedIn,
+                          left.hval=right.hval,
+						  tSuppress(left,right),
+						  left only,lookup);
+						  			  
+// End of code to suppress data based on an MD5 Hash of DID+Address
 
 mini_out_per := mini_out;
 full_out_per := full_out_suppress;
