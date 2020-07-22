@@ -96,8 +96,10 @@ fileinfmt := project( filein, convdatestr(left));
 
 EA_natl_keyed_inquiry_set   := ['FA','EA','TM','TF','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
                                  'IA','IB','IC','ID','IE','IF','IG','IH','II','IJ','IK','IL','IM','IN','IO','IP','IQ','IR','IS','IT','IU','IV','IW','IX','IY','IZ'];
+																 
+EA_ds := dataset('~thor_data400::persist::ecrash_ssV2', Layout_eCrash.Consolidation_AgencyOri ,flat);
 
- accidents0:= FLAccidents_Ecrash.File_KeybuildV2.out(report_code in EA_natl_keyed_inquiry_set); 
+ accidents0:= EA_ds(report_code in EA_natl_keyed_inquiry_set); 
  
  accidents1 := PROJECT(accidents0,transform(recordof(accidents0),self.record_type := trim(regexreplace('\\t|\\n| ',left.record_type,'')),self.cru_jurisdiction_nbr  :=   regexreplace('\\^M',left.cru_jurisdiction_nbr,''),
              self := left));
@@ -170,7 +172,7 @@ vin_match:= dedup(join(accidentDedup, distribute(fileinfmt,hash(LAST_NAME,FIRST_
 
 // remove multiple vin records caused due to VIN lookup from batch
 
-out := project(vin_match,transform(layoutOut, self.source_id := if (left.acc_dol ='', '', left.source_id), self := left))  :persist('~thor_data400::persist::nahdb_eri'); 
+out := project(vin_match,transform(layoutOut, self.source_id := if (left.acc_dol ='', '', left.source_id), self := left)) ; 
 
 //Add rowid to the output file
 //// Bug #.DF-23776
@@ -181,7 +183,7 @@ out := project(vin_match,transform(layoutOut, self.source_id := if (left.acc_dol
 
 
 										
-return sequential(FLAccidents_Ecrash.Spray_nahdb_ERI(filedate), 
+return sequential(//FLAccidents_Ecrash.Spray_nahdb_ERI(filedate), 
               /*   count(fileinfmt),
 			    count(out); */
                  count(out(acc_dol <>'')); 
