@@ -140,7 +140,6 @@ vin_match:= dedup(join(accidentDedup, distribute(fileinfmt,hash(LAST_NAME,FIRST_
 					 self.orig_lname := left.orig_lname;
 					 self.orig_fname := left.orig_fname;
 					 self.orig_mname := left.orig_mname;
-				//	 self.Involved_party := trim(left.orig_lname) + ' '+ trim(left.orig_fname) + ' '+ trim(left.orig_mname);
 					 self.vehicle_owner := if ( trim(left.record_type) = 'UNKNOWN','',left.record_type);
 					 self.vehicle_year  := left.vehicle_year;
 					 self.vehicle_make := left.make_description;
@@ -167,7 +166,7 @@ vin_match:= dedup(join(accidentDedup, distribute(fileinfmt,hash(LAST_NAME,FIRST_
            self.vendor_code           :=  left.vendor_code;
            self.work_type_id          :=  left.work_type_id;
 					 self := right 
-				   ), right outer,local),LAST_NAME,FIRST_NAME,BIRTH_DT,local);
+				   ), right outer,local),all);
 
 
 // remove multiple vin records caused due to VIN lookup from batch
@@ -183,7 +182,7 @@ out := project(vin_match,transform(layoutOut, self.source_id := if (left.acc_dol
 
 
 										
-return sequential(//FLAccidents_Ecrash.Spray_nahdb_ERI(filedate), 
+return sequential(FLAccidents_Ecrash.Spray_nahdb_ERI(filedate), 
               /*   count(fileinfmt),
 			    count(out); */
                  count(out(acc_dol <>'')); 
