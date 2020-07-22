@@ -201,6 +201,7 @@ export t_PhoneFinderInfo := record (t_BasePhoneInfo)
 	boolean PhoneOwnershipIndicator {xpath('PhoneOwnershipIndicator')};
 	t_InquiryInfo InquiryDetails {xpath('InquiryDetails')};//hidden[internal]
 	t_ZumigoDeviceInfo ZumigoDeviceDetails {xpath('ZumigoDeviceDetails')};//hidden[internal]
+	boolean Prepaid {xpath('Prepaid')};
 end;
 
 export t_PhoneIdentityInfo := record

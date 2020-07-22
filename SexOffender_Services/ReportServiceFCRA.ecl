@@ -6,20 +6,20 @@
   <part name="BillingCode"         type="xsd:string"/>
   <part name="QueryId"             type="xsd:string"/>
   <part name="ApplicationType"     type="xsd:string"/>
-    
+
   <!-- COMPLIANCE SETTINGS -->
   <part name="GLBPurpose"          type="xsd:byte"/>
   <part name="DPPAPurpose"         type="xsd:byte"/>
   <part name="FCRAPurpose"         type="xsd:string"/>
   <part name="SSNMask"               type="xsd:string"/>
   <part name="MaxWaitSeconds"      type="xsd:integer"/>
-  
+
   <!-- FCRA REPORT FIELD -->
   <part name="DID"                  type="xsd:string"/>
-  
+
   <!-- Options -->
   <part name="AllowGraphicDescription"     type="xsd:boolean"/>
-    
+
   <part name="FcraSexOffenderReportRequest" type="tns:XmlDataSet" cols="80" rows="30" />
 
 </message>
@@ -32,7 +32,7 @@ export ReportServiceFCRA := macro
   boolean isFCRA := true;
   #constant('NoDeepDive', true);
 
-  // Get XML input 
+  // Get XML input
   rec_in := iesp.sexualoffender_fcra.t_FcraSexOffenderReportRequest;
   ds_in := DATASET ([], rec_in) : STORED ('FcraSexOffenderReportRequest', FEW);
   first_row := ds_in[1] : independent;
@@ -49,7 +49,7 @@ export ReportServiceFCRA := macro
 
   //Store "report-by" fields into soap names to be used below
   #stored('AllowGraphicDescription', options.AllowGraphicDescription);
-  #stored('IncludeBestAddress', options.IncludeBestAddress); //do we want this for FCRA...and if so we need an FCRA key for watchdog.key_watchdog_nonglb (used in Raw.GetBestAddressRec)
+  #stored('IncludeBestAddress', options.IncludeBestAddress);
 
   glbMod := AutoStandardI.GlobalModule(isFCRA);
   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(glbMod);
@@ -62,10 +62,10 @@ export ReportServiceFCRA := macro
   end;
 
   temp := SexOffender_Services.ReportRecords.fcra_val(tempmod);
- 
-  input_consumer := FFD.MAC.PrepareConsumerRecord(tempmod.did, true, , report_by.UniqueId); 
-  
-   iesp.ECL2ESP.Marshall.MAC_Marshall_Results(temp.Records, results, 
+
+  input_consumer := FFD.MAC.PrepareConsumerRecord(tempmod.did, true, , report_by.UniqueId);
+
+   iesp.ECL2ESP.Marshall.MAC_Marshall_Results(temp.Records, results,
                   iesp.sexualoffender_fcra.t_FcraSexOffenderReportResponse, SexualOffenses, true);
  // transform to FCRA FFD layout
   FFD.MAC.AppendConsumerAlertsAndStatements(results, out_results, temp.Statements, temp.ConsumerAlerts, input_consumer, iesp.sexualoffender_fcra.t_FcraSexOffenderReportResponse);

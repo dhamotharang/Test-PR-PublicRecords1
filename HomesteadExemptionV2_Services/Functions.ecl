@@ -1,6 +1,6 @@
-﻿IMPORT AddrBest, Address, Autokey_batch, AutokeyB2, BatchServices, 
-	   BatchShare, DeathV2_Services, DidVille, LN_PropertyV2, 
-	   LN_PropertyV2_Services, Std, Suppress, ut;
+﻿IMPORT AddrBest, Address, Autokey_batch, AutokeyB2, BatchServices,
+	   BatchShare, DeathV2_Services, DidVille, LN_PropertyV2,
+	   LN_PropertyV2_Services, Std, Suppress, ut, iesp;
 
 EXPORT Functions := MODULE
 
@@ -84,7 +84,7 @@ EXPORT Functions := MODULE
 
 		BatchShare.MAC_CapitalizeInput(ds_work_in,ds_cap_recs);
 		BatchShare.MAC_CleanAddresses(ds_cap_recs,ds_cln_recs); // does not fill addr,zip4 or county_name
-		
+
 		ds_validate_name_addr:=PROJECT(ds_cln_recs,
 			TRANSFORM(HomesteadExemptionV2_Services.Layouts.workRecSlim,
 				SELF.error_code:=IF(BatchShare.MAC_IsInputValid(LEFT,BatchShare.Constants.Valid_Min_Cri.DID_OR_Name_Address),
@@ -151,7 +151,7 @@ EXPORT Functions := MODULE
 
 		Constants:=HomesteadExemptionV2_Services.Constants;
 		Suppress.MAC_Suppress(ds_didville_out,ds_dids,in_mod.application_type,Suppress.Constants.LinkTypes.DID,did);
-		
+
 		HomesteadExemptionV2_Services.Layouts.workRecSlim appendDids(ds_work_in L, ds_didville_out R) := TRANSFORM
 			lowLexIdScore:=R.score<in_mod.didScoreThreshold;
 			tooManySubjects:=lowLexIdScore AND R.cnt>1;
@@ -192,8 +192,8 @@ EXPORT Functions := MODULE
 		ak_keyname	:= LN_PropertyV2.Constants.ak_keyname;   //  ln_propertyv2.cluster + 'key::ln_propertyv2::autokey::'
 		ak_dataset	:= LN_PropertyV2.Constants.ak_dataset;   //  LN_PropertyV2.file_search_autokey
 		ak_typeStr	:= LN_PropertyV2.Constants.ak_typeStr;   //  '\'AK\''
-			
-		// 2. Configure the autokey search.	
+
+		// 2. Configure the autokey search.
 		ak_config := MODULE(BatchServices.Interfaces.i_AK_Config)
 			export workHard        := TRUE; // for Autokey_batch.Fetch_Address_Batch to run at all.
 			export useAllLookups   := TRUE; // for Autokey_batch.Fetch_SSN_Batch to run SSN2 key. SSN key is empty.
@@ -203,16 +203,16 @@ EXPORT Functions := MODULE
 
 		ds_fids := Autokey_batch.get_fids(ak_batch_in, ak_keyname, ak_config);
 		AutokeyB2.mac_get_payload( UNGROUP(ds_fids), ak_keyname, ak_dataset, outpl, did, zero, ak_typeStr )
-		ds_fares_ids_by_autokey := DEDUP(SORT( PROJECT(outpl, 
-										BatchServices.Layouts.LN_Property.rec_acctnos_fids), 
-											acctno, ln_fares_id ), 
+		ds_fares_ids_by_autokey := DEDUP(SORT( PROJECT(outpl,
+										BatchServices.Layouts.LN_Property.rec_acctnos_fids),
+											acctno, ln_fares_id ),
 									acctno, ln_fares_id);
 
 		prop_match_rec := RECORD
 			BatchShare.Layouts.ShareAcct;
 			BatchShare.Layouts.ShareDid;
 			BatchShare.Layouts.ShareName;
-			BatchShare.Layouts.ShareAddress;	
+			BatchShare.Layouts.ShareAddress;
 			STRING8 process_date;
 			BOOLEAN isExactNameMatch := FALSE;
 			BOOLEAN isFuzzyNameMatch := FALSE;
@@ -231,10 +231,10 @@ EXPORT Functions := MODULE
 			SELF.z5 := r.zip,
 			SELF := r,
 		END;
-	
+
 		ds_props := JOIN(ds_fares_ids_by_autokey, LN_PropertyV2.key_search_fid(),
 						KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id) AND
-						(RIGHT.source_code_1 = HomesteadExemptionV2_Services.Constants.OWNER OR 
+						(RIGHT.source_code_1 = HomesteadExemptionV2_Services.Constants.OWNER OR
 						RIGHT.source_code_1 = HomesteadExemptionV2_Services.Constants.BORROWER) AND
 						RIGHT.source_code_2 = HomesteadExemptionV2_Services.Constants.PROPERTY, //Property
 						xform_with_prop(LEFT, RIGHT), ATMOST(LN_PropertyV2_Services.consts.max_raw));
@@ -242,24 +242,24 @@ EXPORT Functions := MODULE
 		// Compare name & address of the property records with the name & address of the input
 		// records to set match criteria for determining DID.
 		prop_match_rec xform_prop_matches(prop_match_rec l, HomesteadExemptionV2_Services.Layouts.workRecSlim r ) := TRANSFORM
-			isAddrMatch := l.prim_range = r.prim_range AND 
-						   l.predir = r.predir AND 
+			isAddrMatch := l.prim_range = r.prim_range AND
+						   l.predir = r.predir AND
 						   l.prim_name = r.prim_name AND
-						   l.addr_suffix = r.addr_suffix AND 
-						   l.postdir = r.postdir AND 
-						   l.st = r.st AND 
+						   l.addr_suffix = r.addr_suffix AND
+						   l.postdir = r.postdir AND
+						   l.st = r.st AND
 						   l.z5 = r.z5;
 
 			isNameSuffixMatch := l.name_suffix = '' OR r.name_suffix = '' OR l.name_suffix = r.name_suffix;
 
-			isExactNameMatch := l.name_first = r.name_first AND 
-								l.name_last = r.name_last AND 
+			isExactNameMatch := l.name_first = r.name_first AND
+								l.name_last = r.name_last AND
 								isNameSuffixMatch;
 
-			isFuzzyNameMatch := metaphonelib.DMetaPhone1(trim(l.name_first,all)) =  metaphonelib.DMetaPhone1(trim(r.name_first,all)) AND 
-								metaphonelib.DMetaPhone1(trim(l.name_last,all)) =  metaphonelib.DMetaPhone1(trim(r.name_last,all)) AND 
+			isFuzzyNameMatch := metaphonelib.DMetaPhone1(trim(l.name_first,all)) =  metaphonelib.DMetaPhone1(trim(r.name_first,all)) AND
+								metaphonelib.DMetaPhone1(trim(l.name_last,all)) =  metaphonelib.DMetaPhone1(trim(r.name_last,all)) AND
 								isNameSuffixMatch;
-											
+
 			SELF.isAddrMatch := isAddrMatch;
 			SELF.isSecRangeIgnored := NOT(l.sec_range = r.sec_range);
 
@@ -267,20 +267,20 @@ EXPORT Functions := MODULE
 			SELF.isFuzzyNameMatch := isFuzzyNameMatch;
 			SELF := l;
 		END;
-		
+
 		ds_props_matches := JOIN(ds_props, ds_work_in,
 								LEFT.acctno = RIGHT.acctno,
 								xform_prop_matches(LEFT, RIGHT), LEFT OUTER);
 
-		ds_props_good_lexid := ds_props_matches(did <> 0 AND 
-												isAddrMatch AND 
-												isFuzzyNameMatch);	
+		ds_props_good_lexid := ds_props_matches(did <> 0 AND
+												isAddrMatch AND
+												isFuzzyNameMatch);
 
-		prop_match_rec xdenorm_props(HomesteadExemptionV2_Services.Layouts.workRecSlim l, 
+		prop_match_rec xdenorm_props(HomesteadExemptionV2_Services.Layouts.workRecSlim l,
 								  	 DATASET(prop_match_rec) r) := TRANSFORM
 
-			// If the property records contain more than one DID, use the input tax_year 
-			// to select one.							
+			// If the property records contain more than one DID, use the input tax_year
+			// to select one.
 			num_prop_dids := COUNT(DEDUP(SORT(r, did), did));
 			prop_recs := IF(num_prop_dids = 1, r, r(process_date[1..4] = l.tax_year));
 			// Sort so the best match is on top.  isSecRangeIgnored=false ranks higher
@@ -305,8 +305,8 @@ EXPORT Functions := MODULE
 									LEFT.acctno = RIGHT.acctno,
 									TRANSFORM(HomesteadExemptionV2_Services.Layouts.workRecSlim,
 										SELF.did := IF(RIGHT.did <> 0, RIGHT.did, LEFT.did);
-										// If a LexId was found from Property, replace the 
-										// Didville score with 100.  Otherwise, use the 
+										// If a LexId was found from Property, replace the
+										// Didville score with 100.  Otherwise, use the
 										// Didville score.
 										SELF.score := IF(RIGHT.did <> 0, 100, LEFT.score);
 										SELF := LEFT));
@@ -416,6 +416,59 @@ EXPORT Functions := MODULE
 			SELF.year:=(STRING4)((UNSIGNED)L.year-(C-1));
 		END;
 		RETURN NORMALIZE(DATASET([{year}],rec),cnt,norm(LEFT,COUNTER));
+	END;
+
+	//************************************************/
+	EXPORT getExceptions(DATASET(iesp.Homestead_Exemption_Search.t_HomesteadExemptionRecord) srch_recs) := FUNCTION
+
+		ndxCode:=RECORD
+			INTEGER ndx;
+			STRING2 code;
+		END;
+
+		{DATASET(ndxCode) ds} getCodes(iesp.Homestead_Exemption_Search.t_HomesteadExemptionRecord L, INTEGER ndx) := TRANSFORM
+			codes:=DATASET(Std.Str.SplitWords(L.ExceptionCode,';'),iesp.share.t_StringArrayItem);
+			SELF.ds:=PROJECT(codes,TRANSFORM(ndxCode,SELF.ndx:=ndx,SELF.code:=LEFT.value));
+		END;
+
+		ds_parent:=PROJECT(srch_recs,getCodes(LEFT,COUNTER));
+		ds_children:=NORMALIZE(ds_parent,LEFT.ds,TRANSFORM(ndxCode,SELF:=RIGHT));
+
+		CNST:=HomesteadExemptionV2_Services.Constants;
+		iesp.share.t_WsException exceptions(ndxCode L) := TRANSFORM
+			SELF.source:='Roxie';
+			SELF.code:=CASE(L.Code,
+				CNST.NO_LEXID_FOUND => CNST.NO_LEXID_FOUND_CODE,
+				CNST.LOW_LEXID_SCORE => CNST.LOW_LEXID_SCORE_CODE,
+				CNST.TOO_MANY_SUBJECTS => CNST.TOO_MANY_SUBJECTS_CODE,
+				CNST.INSUFFICIENT_INPUT => CNST.INSUFFICIENT_INPUT_CODE,
+				0);
+			SELF.location:=(STRING)L.ndx;
+			SELF.message:=CASE(L.Code,
+				CNST.NO_LEXID_FOUND => CNST.NO_LEXID_FOUND_MSG,
+				CNST.LOW_LEXID_SCORE => CNST.LOW_LEXID_SCORE_MSG,
+				CNST.TOO_MANY_SUBJECTS => CNST.TOO_MANY_SUBJECTS_MSG,
+				CNST.INSUFFICIENT_INPUT => CNST.INSUFFICIENT_INPUT_MSG,
+				'');
+			END;
+		ds_exceptions:=PROJECT(ds_children,exceptions(LEFT));
+
+		// Return standard FAIL message ESP is expecting if ALL of the names submitted cause exceptions
+		BOOLEAN allFailed:=COUNT(srch_recs)=COUNT(srch_recs(ExceptionCode!=''));
+
+		BOOLEAN notFound:=EXISTS(ds_exceptions(Code=CNST.NO_LEXID_FOUND_CODE));
+		IF(allFailed AND notFound,FAIL(CNST.NO_LEXID_FOUND_CODE,CNST.NO_LEXID_FOUND_MSG));
+
+		BOOLEAN lowScore:=EXISTS(ds_exceptions(Code=CNST.LOW_LEXID_SCORE_CODE));
+		IF(allFailed AND lowScore,FAIL(CNST.LOW_LEXID_SCORE_CODE,CNST.LOW_LEXID_SCORE_MSG));
+
+		BOOLEAN tooMany:=EXISTS(ds_exceptions(Code=CNST.TOO_MANY_SUBJECTS_CODE));
+		IF(allFailed AND tooMany,FAIL(CNST.TOO_MANY_SUBJECTS_CODE,CNST.TOO_MANY_SUBJECTS_MSG));
+
+		BOOLEAN insufficient:=EXISTS(ds_exceptions(Code=CNST.INSUFFICIENT_INPUT_CODE));
+		IF(allFailed AND insufficient,FAIL(CNST.INSUFFICIENT_INPUT_CODE,CNST.INSUFFICIENT_INPUT_MSG));
+
+		RETURN ds_exceptions(code>0);
 	END;
 
 END;

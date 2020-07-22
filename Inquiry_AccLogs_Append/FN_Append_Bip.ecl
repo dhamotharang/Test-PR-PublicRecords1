@@ -1,9 +1,9 @@
-import ut, address, aid, lib_stringlib, address, did_add, Business_Header_SS, header_slimsort, watchdog, business_header,bipv2, inquiry_acclogs;
- 
+import ut, lib_stringlib, Business_Header_SS, business_header,bipv2, inquiry_acclogs;
+
 
 export FN_Append_Bip(dataset(Inquiry_AccLogs.Layout.Common_ThorAdditions_non_fcra) pInFile) := function
 
-bdid_match_set := ['A','P','F']; 
+bdid_match_set := ['A','P','F'];
 bip_layout:=record
   Inquiry_AccLogs.Layout.Common_ThorAdditions_non_fcra;
 	bipv2.IDlayouts.l_xlink_ids   ;
@@ -30,7 +30,7 @@ transform(bip_layout,
 								,self.company_phone := left.Bus_Q.company_phone
 								,self.ein := left.Bus_Q.ein
 								,self.Appended_BDID := left.Bus_Q.Appended_BDID, self := left));
-								
+
 Business_Header_SS.MAC_Add_BDID_FLEX(FiltForBDIDAppend
 								,bdid_match_set
 								,cname
@@ -46,10 +46,10 @@ Business_Header_SS.MAC_Add_BDID_FLEX(FiltForBDIDAppend
 								,false
 								,''
 						    ,dPostBip
-								, 
- 						    , 																
-			          , 															
-			          ,BIPV2.xlink_version_set				 
+								,
+ 						    ,
+			          ,
+			          ,BIPV2.xlink_version_set
 			           );
 
 return project(dPostBip,{Inquiry_AccLogs.Layout.Common_ThorAdditions_non_fcra,bipv2.IDlayouts.l_xlink_ids} );

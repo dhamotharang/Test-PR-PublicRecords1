@@ -1,37 +1,42 @@
-IMPORT BIPV2, SAM;
+﻿IMPORT BIPV2, SAM;
 
 EXPORT Batch_Records( DATASET(SAM_Services.Layouts.Batch_Input_Processed) ds_BatchIn,
 															SAM_Services.Iparam.BatchParams inMod) := FUNCTION
 															
 		// Get linkids from search criteria
-		
 		// Format to BIP search layout
-		BIPV2.IDfunctions.rec_SearchInput tFormat2SearchInput(SAM_Services.Layouts.Batch_Input_Processed pInput) := TRANSFORM
-			SELF.company_name     := pInput.comp_name;
-			SELF.city             := pInput.p_city_name;
-			SELF.state            := pInput.st;
-			SELF.zip5             := pInput.z5;
-			SELF.phone10          := pInput.workphone;
-			SELF.inSeleid					:= (STRING) pInput.SeleID;
-			SELF.zip_radius_miles := IF ((INTEGER)pInput.mileradius > SAM_Services.Constants.BIP_MAX_MILERADIUS, SAM_Services.Constants.BIP_MAX_MILERADIUS, (INTEGER)pInput.mileradius); 
-			SELF.Hsort            := TRUE; // this boolean only affect the proxid level returns not SELEID level.		
-			SELF                  := pInput;
-			SELF                  := [];
-		END;	
-  
+		BIPV2.IdAppendLayouts.appendInput tFormat2SearchInput(SAM_Services.Layouts.Batch_Input_Processed pInput) := TRANSFORM
+      SELF.request_id := (unsigned)pInput.acctno;
+      SELF.company_name := pInput.comp_name;
+      SELF.prim_range := pInput.prim_range;
+      SELF.prim_name := pInput.prim_name;
+      SELF.sec_range := pInput.sec_range;
+      SELF.city := pInput.p_city_name;
+      SELF.state := pInput.st;
+      SELF.zip5 := pInput.z5;
+      SELF.zip_radius_miles := IF ((integer)pInput.mileradius > 10, 10, (integer)pInput.mileradius);
+      SELF.phone10 := pInput.workphone;   // TODO: convert to 10-digit??
+      SELF.fein := pInput.fein;
+      SELF.seleid := pInput.seleid;
+      SELF.proxid := pInput.proxid;
+      SELF := [];
+    END;  
+    
 		// Seperate bipid input records from search records, records with ultid id will assume no search
 		ds_Format2SearchInput := PROJECT(ds_batchIn(ultid = 0),tFormat2SearchInput(LEFT));
 		
 		// Get the linkids from the search criteria
-		ds_SAMSearchIDs := PROJECT(BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_Format2SearchInput).uid_results_w_acct,	
-																		TRANSFORM(SAM_Services.Layouts.SearchSlim_layout,
-																				 SELF.UltID := LEFT.UltID,
-																				 SELF.OrgID := IF(inmod.BIPFetchLevel IN BIPV2.IDconstants.Set_Fetch_Level_OrgID_And_Down,  LEFT.OrgID, 0),
-																				 SELF.SeleID := IF(inmod.BIPFetchLevel IN BIPV2.IDconstants.Set_Fetch_Level_SELEID_And_Down, LEFT.SeleID, 0),
-																				 SELF.ProxID := IF(inmod.BIPFetchLevel IN BIPV2.IDconstants.Set_Fetch_Level_ProxID_And_Down, LEFT.ProxID, 0),
-																				 SELF.PowID := IF(inmod.BIPFetchLevel IN BIPV2.IDconstants.Set_Fetch_Level_PowID_And_Down, LEFT.PowID, 0),
-																				 SELF := LEFT,
-																				 SELF := []));
+		ds_SAMSearchIDs := 
+      PROJECT(BIPV2.IdAppendRoxie(ds_Format2SearchInput, inMod.Score_Threshold, reAppend := false).IdsOnly(),
+        TRANSFORM(SAM_Services.Layouts.SearchSlim_layout,
+          SELF.acctno := (STRING)LEFT.request_id;
+          SELF.UltID := LEFT.UltID,
+          SELF.OrgID := IF(inmod.BIPFetchLevel IN BIPV2.IDconstants.Set_Fetch_Level_OrgID_And_Down,  LEFT.OrgID, 0),
+          SELF.SeleID := IF(inmod.BIPFetchLevel IN BIPV2.IDconstants.Set_Fetch_Level_SELEID_And_Down, LEFT.SeleID, 0),
+          SELF.ProxID := IF(inmod.BIPFetchLevel IN BIPV2.IDconstants.Set_Fetch_Level_ProxID_And_Down, LEFT.ProxID, 0),
+          SELF.PowID := IF(inmod.BIPFetchLevel IN BIPV2.IDconstants.Set_Fetch_Level_PowID_And_Down, LEFT.PowID, 0),
+          SELF := LEFT,
+          SELF := []));
 		
 		ds_SAMSearchIDs_Dedup := DEDUP(SORT(ds_SAMSearchIDs,#expand(BIPV2.IDmacros.mac_ListAllLinkids()),acctno,-weight),#expand(BIPV2.IDmacros.mac_ListAllLinkids()),acctno);
 		

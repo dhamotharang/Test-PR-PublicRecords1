@@ -45,23 +45,16 @@ EXPORT ImageSearchService() := FUNCTION
 	ImageSoapCallGateways := ROW(ImageSoapCallGatewaysStructure);
 	ImageService := eCrash_Services.GetImageSoapCall(ImageSoapCallGateways);	
 	
-	RequestRoyaltyType := Request[1].Options.RoyaltyType;
-	RequestIncludeCoverPage := Request[1].Options.IncludeCoverPage;
-	RequestAppendSuppliments := Request[1].Options.AppendSupplements;
-	RequestTransactionId := Request[1].Options.TransactionID;
+	
 	RequestVendorCode := Request[1].ReportBy.Vendor;
-	RequestAgencyOri := Request[1].ReportBy.AgencyORI;
-	RequestDateOfCrash := Request[1].ReportBy.DateOfCrash;
-	RequestColoredImage := Request[1].Options.ColoredImage;
-	RequestRedact       := Request[1].Options.Redact;
-	RequestType         := Request[1].Options.RequestType;
-	RequestMaxWaitSeconds := Request[1].User.MaxWaitSeconds;
+	
+	isExternalGatewayCall := RequestVendorCode in [eCrash_Services.Constants.VENDOR_CRASHLOGIC,eCrash_Services.Constants.VENDOR_HPD];
 
-	RequestReportIdRaw := Request[1].ReportBy.ReportID;
-	//blanking out RequestReportId for KYCrashLogic since we need to get an image for it straigt away without search performed. 
-	//Also, when it comes to KYCrashLogic the Request[1].ReportBy.ReportID actually contains ReportNumber value (because we don't have the actual reportid
+	// RequestReportIdRaw := Request[1].ReportBy.ReportID;
+	//blanking out RequestReportId for Gateway calls since we need to get an image for it straigt away without search performed. 
+	//Also, when it comes to Gateway calls  the Request[1].ReportBy.ReportID actually contains ReportNumber value (because we don't have the actual reportid
 	//since we don't have those reports in our system and have to request them from the KY gateway)
-	RequestReportId := IF(RequestVendorCode = eCrash_Services.Constants.VENDOR_CRASHLOGIC, '', RequestReportIdRaw);
+	RequestReportId := IF(isExternalGatewayCall, '', Request[1].ReportBy.ReportID);
 	
 	ErrorCodeImageOverflow := 404;
 	ErrorCodeImageRetrievalIssue := 405;
@@ -99,7 +92,7 @@ EXPORT ImageSearchService() := FUNCTION
 	// TODO: When Centralized Logging is implemented in Boca, replace this with a CL call instead.
 	// Except for Kentucky (which we don't have data for anyway), if we SHOULD have the data,
 	// but don't, such as for test cases from QC, just note that so we can find this in the logs later.
-	IF ((RequestVendorCode != eCrash_Services.Constants.VENDOR_CRASHLOGIC) AND
+	IF ((~isExternalGatewayCall) AND
 	    (NOT(EXISTS(ReportHashKeysFromKey) OR EXISTS(ReportHashKeysFromKeyFinal))),
 		Std.System.Log.DbgLog(
 			'eCrash_Services.ImageSearchService: For Vendor ' + RequestVendorCode + ', Report ID ' + RequestReportId +
@@ -141,7 +134,7 @@ EXPORT ImageSearchService() := FUNCTION
 		TRANSFORM(
 			iesp.accident_image.t_AccidentImageCRUImageHash,
 			SELF.Hash := LEFT.hash_key;
-			SELF.IncludeCoverPage := RequestIncludeCoverPage;
+			SELF.IncludeCoverPage := Request[1].Options.IncludeCoverPage;
 		)
 	);
 
@@ -151,20 +144,12 @@ EXPORT ImageSearchService() := FUNCTION
 	ImageRetrievalRequest := ImageService.GetAccidentImageRequest(
 		SuperReportRow, 
 		ImageHashes, 
-		RequestReportIdRaw, 
-		RequestIncludeCoverPage,
-		RequestRoyaltyType,
-		RequestTransactionId,
+		Request,
 		IyetekRedactFlag,
-		RequestAgencyOri,
-		RequestVendorCode,
-		RequestDateOfCrash,
 		isOnlyTm,
-		RequestColoredImage,
-		RequestRedact,
-		RequestType,
-		RequestMaxWaitSeconds
+		isExternalGatewayCall
 	);
+
 
 	//We don't know which report_id was used to retreive image for TM that's why we are searching by all the possible report ids. ESP inserts report_id from the request.
 	AllReportIdSet := SET(ReportsAll, report_id) + SET(ReportHashKeysFromKeyFinal, report_id) + [RequestReportId]; 
@@ -174,12 +159,12 @@ EXPORT ImageSearchService() := FUNCTION
 	// Check the releasable flag for the last item in "ReportsAll", since it will be the most recent.
 	MostRecentReport := ReportsAll[COUNT(ReportsAll)];
 	IF(EXISTS(ReportsAll) AND MostRecentReport.Releasable != '1' AND
-		RequestVendorCode != eCrash_Services.Constants.VENDOR_CRASHLOGIC,
+		~isExternalGatewayCall,
 		FAIL(ErrorCodeImageNonReleasable, 'Image is non-releasable'));
 
 	IF(
 		ImageRetrievalResponse[1].response.ImageData = '' 
-		AND (EXISTS(SuperReportRow) OR RequestVendorCode = eCrash_Services.Constants.VENDOR_CRASHLOGIC),
+		AND (EXISTS(SuperReportRow) OR isExternalGatewayCall),
 		FAIL(ErrorCodeImageRetrievalIssue, 'Image retrieval issue')
 	);
 	
@@ -229,7 +214,7 @@ EXPORT ImageSearchService() := FUNCTION
 	
 	Images := PROJECT(ImageRetrievalResponse, GenerateResponse(LEFT, ResponseHeader, InitialPurchase));
 	EmptyResponse := DATASET([TRANSFORM(iesp.retrieveimage.t_ECrashRetrieveImageResponse, SELF := [])]);
-	Result := IF(EXISTS(SuperReportRow) OR RequestVendorCode = eCrash_Services.Constants.VENDOR_CRASHLOGIC, Images, EmptyResponse);
+	Result := IF(EXISTS(SuperReportRow) OR isExternalGatewayCall, Images, EmptyResponse);
 	
 	RETURN OUTPUT(Result, NAMED('Results'));
 END;

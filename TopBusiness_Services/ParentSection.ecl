@@ -1,4 +1,4 @@
-import TopBusiness_Services, autostandardI, Doxie, iesp, BIPV2, BIPV2_Best, gong, MDR, Suppress;
+import TopBusiness_Services, autostandardI, Doxie, iesp, BIPV2, BIPV2_Best, dx_Gong, MDR, Suppress;
 
 export ParentSection := MODULE;
 
@@ -201,7 +201,7 @@ export fn_fullView (
 																	 self.dotid := left.orig_dotid;
 																	 )); // sets  linkids;
 
-   ds_phone_info_raw := join(ds_trim_phone, gong.Key_History_phone,
+   ds_phone_info_raw := join(ds_trim_phone, dx_Gong.key_history_phone(),
     keyed(left.company_phone[4..10] = right.p7) and
     keyed(left.company_phone[1..3]  = right.p3),
     limit(TopBusiness_Services.Constants.defaultJoinLimit,skip));

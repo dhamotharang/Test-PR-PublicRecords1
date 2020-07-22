@@ -1,4 +1,4 @@
-﻿  IMPORT Doxie, Gateway, Phones, ut;
+﻿  IMPORT $, Doxie, Gateway, Phones, ut;
 
   lBatchIn := PhoneFinder_Services.Layouts.BatchInAppendDID;
   lCommon  := PhoneFinder_Services.Layouts.PhoneFinder.Common;
@@ -99,6 +99,7 @@
     SELF.deceased          := '';
     SELF.ssnmatch          := '';
     SELF.RealTimePhone_Ext := [];
+    SELF.phn_src_all       := DEDUP(SORT(pInput.phn_src_all, src), src);
     SELF                   := pInput;
     SELF                   := [];
   END;
@@ -126,7 +127,7 @@
   // Call the gateway again with the primary phone number using service type 'PVSD' to get the phone info
   dQSentAppendPrimaryPhoneDetails := IF(EXISTS(dIn_PVSD)AND inMod.UseTransUnionPVS
 	                                    AND ~inMod.UseInHousePhoneMetadata AND qSentGateway.url != '',
-                                        $.GetQSentPhones.GetQSentPVSData(dIn_PVSD, inMod, phone, acctno, TRUE, qSentGateway));
+                                        $.GetQSentPhones.GetQSentPVSData(dIn_PVSD, inMod, qSentGateway));
 
 
   // Get QSent PVSD gateway records only for ultimate transaction type

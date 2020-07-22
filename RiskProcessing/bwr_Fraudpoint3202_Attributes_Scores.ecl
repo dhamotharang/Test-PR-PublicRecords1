@@ -36,13 +36,13 @@ prii_layout := RECORD
 		 unsigned did := 0;
 end;
 
-filename := ut.foreign_prod + 'nmontpetit::out::chase_1139_apr_dev_sample_pii';
-outputfile := '~lweiner::out::fp3202_' + thorlib.wuid();
+filename := ut.foreign_prod + 'tfuerstenberg::in::disc_9645_test_in.csv';
+outputfile := '~dvstemp::out::fp3202_' + thorlib.wuid();
 qa_outputfile := outputfile+'_QA';
 
 
 eyeball 								:= 25;	//number of records to display in outputs
-unsigned 	record_limit 	:= 0;   //number of records to process from input file; 0 means ALL
+unsigned 	record_limit 	:= 10;   //number of records to process from input file; 0 means ALL
 
 
 f := if(record_limit = 0, //depending on the record_limit, either process the entire input file or the number of records specified
@@ -225,7 +225,8 @@ Layout_FDAttributesOut myFail(dist_dataset le) := TRANSFORM
 END;
 
 resu := soapcall(dist_dataset, roxieIP,
-				'Models.FraudAdvisor_Service', {dist_dataset}, 
+				'Models.FraudAdvisor_Service', 
+				{dist_dataset}, 
 				DATASET(layout_FDAttributesOut),
 				PARALLEL(30), 
 				retry(10),
@@ -1104,6 +1105,24 @@ end;
 rolled_to_1_record := rollup(attr_plus_scores, true, combine_scores_attributes(left,right));
 output(choosen(rolled_to_1_record, eyeball), named('rolled_records'));
 
+temp_prii_layout := record
+	prii_layout;
+	string errorcode;
+end;
+
+valid_error_codes := ['', '301ReceivedRoxieException: (Insufficient input)'];
+// keep track of any record that gets an error other than the insufficent input error
+// 301ReceivedRoxieException: (Insufficient input)                                                                                                                                                         
+input_file_of_errors := join(dist_dataset, rolled_to_1_record(trim(errorcode) not in valid_error_codes), left.old_account_number=right.accountnumber,
+	transform(temp_prii_layout,
+	self.errorcode := right.errorcode;
+	self.account := left.old_account_number;
+	self.historydate := (string)left.historydateyyyymm;
+	self := left;
+	self := [];));
+output(choosen(input_file_of_errors, eyeball), named('input_file_from_errors'));
+if(count(input_file_of_errors)>0, output(input_file_of_errors,,outputfile + '_errors' ,CSV(heading(single), quote('"'))) );  // don't output this file if there aren't any error records
+
 
 fd_attributes_norm_minus_compromised_dl := record
 	fd_attributes_norm - IdentityDriversLicenseComp;
@@ -1114,9 +1133,14 @@ without_compromised_dl := project(rolled_to_1_record, transform(fd_attributes_no
 // if the option is turned on to suppress compromised DLs, then output the file that has the attribute included
 // otherwise, output the file without that field in the layout
 if(SuppressCompromisedDLs,
-output(rolled_to_1_record,,outputfile,CSV(heading(single), quote('"')), overwrite),
-output(without_compromised_dl,,outputfile,CSV(heading(single), quote('"')), overwrite)
+output(rolled_to_1_record(trim(errorcode) in valid_error_codes),,outputfile,CSV(heading(single), quote('"'))),  // don't include records which failed
+output(without_compromised_dl(trim(errorcode) in valid_error_codes),,outputfile,CSV(heading(single), quote('"')))// don't include records which failed
+);
+
+if(SuppressCompromisedDLs,
+output(rolled_to_1_record,named('rolled_to_1_record')),
+output(without_compromised_dl,named('without_compromised_dl'))
 );
 
 IF(Include_Internal_Extras, OUTPUT(CHOOSEN(qa_results, eyeball), NAMED('Sample_QA_Results')));
-IF(Include_Internal_Extras, OUTPUT(qa_results,,qa_outputfile, CSV(heading(single), quote('"')), overwrite));
+IF(Include_Internal_Extras, OUTPUT(qa_results(trim(errorcode) in valid_error_codes),,qa_outputfile, CSV(heading(single), quote('"')))); // don't include records which failed

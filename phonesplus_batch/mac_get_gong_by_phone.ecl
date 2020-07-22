@@ -1,8 +1,8 @@
 export mac_get_gong_by_phone(f_in, f_out, mod_access, use_gong_flag) := macro
-import gong, Suppress, std;
+import dx_Gong, Suppress, std;
 
 #uniquename(key_gong_history_phone)
-%key_gong_history_phone% := gong.Key_History_phone;
+%key_gong_history_phone% := dx_Gong.key_history_phone();
 
 #uniquename(gong2Pretty)
 phonesplus_batch.layout_phonesplus_reverse_common %gong2Pretty%(f_in l, %key_gong_history_phone% r) := TRANSFORM

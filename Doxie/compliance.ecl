@@ -277,6 +277,7 @@ EXPORT compliance := MODULE
   EXPORT boolean use_InsuranceDLData(string dpm)     := dpm[13] NOT IN restrictedSet;
   EXPORT boolean use_ZumigoIdentity(string dpm)      := dpm[21] NOT IN restrictedSet;
   EXPORT boolean use_AccuityBankData(string dpm)     := dpm[24] NOT IN restrictedSet;
+  EXPORT boolean use_DnB(string dpm)                 := dpm[28] NOT IN restrictedSet;
 
   // ----------------------------------------------------------------------------------------------
 

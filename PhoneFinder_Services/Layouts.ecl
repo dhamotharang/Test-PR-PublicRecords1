@@ -1,4 +1,4 @@
-﻿﻿ IMPORT Autokey_batch,BatchShare,doxie,Doxie_Raw,iesp,Royalty,PhoneFraud, ThreatMetrix, Phones;
+﻿IMPORT Autokey_batch,BatchShare,doxie,Doxie_Raw,iesp,Royalty,PhoneFraud, ThreatMetrix, Phones, iesp;
 
   EXPORT Layouts :=
   MODULE
@@ -73,6 +73,11 @@
     RECORD
       STRING3 Src;
     END;
+
+    EXPORT _type := RECORD
+      STRING40 _Type;
+    END;
+
     // Phones common layout
     EXPORT Common :=
     RECORD(doxie.layout_pp_raw_common)
@@ -770,7 +775,7 @@
   END;
 
   EXPORT DeltabaseResponse := RECORD
-    DATASET (DeltaPortedDataRECORD) RECORDs	 {XPATH('RECORDs/Rec'), MAXCOUNT(PhoneFinder_Services.Constants.MaxPortedMatches)};
+    DATASET (DeltaPortedDataRECORD) RECORDs	 {XPATH('Records/Rec'), MAXCOUNT(PhoneFinder_Services.Constants.MaxPortedMatches)};
     STRING  RecsReturned                     {XPATH('RecsReturned'),MAXLENGTH(5)};
     STRING  Latency													 {XPATH('Latency')};
     STRING  ExceptionMessage								 {XPATH('Exceptions/Exception/Message')};
@@ -788,25 +793,25 @@
   END;
 
   EXPORT SpoofDeltabaseResponse := RECORD
-    DATASET (DeltaSpoofedRec) 			RECORDs	{XPATH('RECORDs/Rec'), MAXCOUNT(PhoneFinder_Services.Constants.MaxSpoofedMatches)};
+    DATASET (DeltaSpoofedRec) 			RECORDs	{XPATH('Records/Rec'), MAXCOUNT(PhoneFinder_Services.Constants.MaxSpoofedMatches)};
     STRING  RecsReturned                    {XPATH('RecsReturned'),MAXLENGTH(5)};
     STRING  Latency													{XPATH('Latency')};
     STRING  ExceptionMessage								{XPATH('Exceptions/Exception/Message')};
   END;
 
   EXPORT DeltaOTPRec := RECORD
-    STRING20  	transaction_id				{XPATH('transaction_id')};
-    STRING     date_added				  	{XPATH('date_added')};
-    STRING 		event_time						{XPATH('event_time')};
-    STRING 		function_name					{XPATH('function_name')};
-    STRING10   otp_phone							{XPATH('otp_phone')};
-    BOOLEAN    verify_passed					{XPATH('verify_passed')};
-    STRING20   otp_id								{XPATH('otp_id')};
-    STRING1    otp_delivery_method		{XPATH('otp_delivery_method')};
+    STRING20  transaction_id                 {XPATH('transaction_id')};
+    STRING  date_added                       {XPATH('date_added')};
+    STRING  event_time                       {XPATH('event_time')};
+    STRING10  otp_phone                      {XPATH('otp_phone')};
+    STRING  function_name                    {XPATH('function_name')};
+    STRING20  otp_id                         {XPATH('otp_id')};
+    BOOLEAN  verify_passed                   {XPATH('verify_passed')};
+    STRING1  otp_delivery_method             {XPATH('otp_delivery_method')};
   END;
 
   EXPORT OTPDeltabaseResponse := RECORD
-    DATASET (DeltaOTPRec) 					RECORDs		{XPATH('RECORDs/Rec'), MAXCOUNT(PhoneFinder_Services.Constants.MaxOTPMatches)};
+    DATASET (DeltaOTPRec) 					RECORDs		{XPATH('Records/Rec'), MAXCOUNT(PhoneFinder_Services.Constants.MaxOTPMatches)};
     STRING  RecsReturned                     	{XPATH('RecsReturned'),MAXLENGTH(5)};
     STRING  Latency													 	{XPATH('Latency')};
     STRING  ExceptionMessage								 	{XPATH('Exceptions/Exception/Message')};
@@ -826,7 +831,7 @@
   END;
 
   EXPORT DeltaInquiryDeltabaseResponse := RECORD
-    DATASET (DeltaInquiryDataRECORD) Response {XPATH('RECORDs/Rec')};
+    DATASET (DeltaInquiryDataRECORD) Response {XPATH('Records/Rec')};
     STRING  RECORDsReturned                  	{XPATH('RecsReturned'),MAXLENGTH(5)};
     STRING  Latency													 	{XPATH('Latency')};
     STRING  ExceptionMessage								 	{XPATH('Exceptions/Exception/Message')};
@@ -850,6 +855,21 @@
     STRING15 PhoneNumber;
     STRING60 ReferenceCode;
     UNSIGNED8 UniqueId;
+  END;
+
+  EXPORT log_other := RECORD(iesp.phonefinder.t_PhoneFinderInfo)
+    INTEGER identity_count;
+  END;
+
+  EXPORT  log_primary := RECORD(iesp.phonefinder.t_PhoneFinderDetailedInfo)
+    INTEGER identity_count;
+  END;
+
+  EXPORT log_PhoneFinderSearchRecord := RECORD
+    DATASET(iesp.phonefinder.t_PhoneIdentityInfo) Identities {xpath('Identities/Identity'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxIdentities)};
+    DATASET(log_other) OtherPhones {xpath('OtherPhones/Phone'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxOtherPhones)};
+    DATASET(iesp.phonefinder.t_PhoneFinderHistory) PhonesHistory {xpath('PhonesHistory/Phone'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxPhoneHistory)};
+    log_primary PrimaryPhoneDetails {xpath('PrimaryPhoneDetails')};
   END;
 
   //	DeltaPhones
@@ -880,6 +900,7 @@
     STRING16 risk_indicator;
     STRING32 phone_type;
     STRING32 phone_status;
+    INTEGER identity_count;
     INTEGER  ported_count;
     STRING32 last_ported_date;
     INTEGER  otp_count;
@@ -897,6 +918,7 @@
     STRING16 risk_indicator;
     STRING32 phone_type;
     STRING32 phone_status;
+    INTEGER identity_count;
     STRING64 listing_name;
     STRING16 porting_code;
     STRING32 phone_forwarded;
@@ -925,11 +947,22 @@
     STRING32 risk_indicator_category;
     END;
 
+    EXPORT delta_phones_rpt_sources:= RECORD
+     STRING16 transaction_id;
+     STRING15 phonenumber;
+     UNSIGNED lexid;
+     STRING category;
+     UNSIGNED totalsourcecount;
+     STRING60 _type;
+     STRING3  Source;
+    END;
+
   EXPORT delta_phones_rpt_Usage_RECORDs := RECORD
     DATASET(delta_phones_rpt_transaction) delta_phones_rpt_transaction {xpath('delta__phonefinder_delta__phones_rpt__transaction/Row')};
     DATASET(delta_phones_rpt_otherphones) delta_phones_rpt_otherphones {xpath('delta__phonefinder_delta__phones_rpt__otherphones/Row')};
     DATASET(delta_phones_rpt_identities) delta_phones_rpt_identities {xpath('delta__phonefinder_delta__phones_rpt__identities/Row')};
     DATASET(delta_phones_rpt_riskindicators) delta_phones_rpt_riskindicators {xpath('delta__phonefinder_delta__phones_rpt__riskindicators/Row')};
+    DATASET(delta_phones_rpt_sources) delta_phones_rpt_sources {xpath('delta__phonefinder_delta__phones_rpt__sources/Row')};
   END;
 
 END;

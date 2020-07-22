@@ -1,4 +1,4 @@
-import AutoStandardI, ut, dnb, iesp;
+﻿import AutoStandardI, ut, dnb, iesp, Doxie;
 
 export SearchService_Records := module
 	export params := interface(
@@ -21,7 +21,7 @@ export SearchService_Records := module
 		// join to payload key.
 		// added condition to limit our records coming back.
 		recs := join(ids,DNB.key_DNB_DunsNum,
-		             keyed(left.duns_number =  right.duns),
+		             keyed(left.duns_number =  right.duns) and Doxie.DataPermission.use_DNB,
 											transform(dnb_Services.Layouts.Rawrec,																									
 																self:=right
 																),limit(dnb_services.constants.max_recs_on_dnbNumber_join, skip));

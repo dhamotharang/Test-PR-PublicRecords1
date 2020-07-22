@@ -2,15 +2,15 @@ import $, ut, suppress, SSNBest_Services, Header;
 import AutoStandardI;
 
 export best_records(DATASET(doxie.layout_references) di,
-										boolean IsFCRA         = false,
-										boolean doSuppress     = true,
-										boolean doTimeZone     = true,
-										boolean useNonBlankKey = false,
-										boolean checkRNA       = false,
-										boolean includeDOD     = false,
-										boolean include_minors = false, //TODO: it may or may not be the same as in doxie.IDataAccess
-										boolean getSSNBest     = false,
-									  doxie.IDataAccess modAccess = MODULE (doxie.IDataAccess) END
+                    boolean IsFCRA         = false,
+                    boolean doSuppress     = true,
+                    boolean doTimeZone     = true,
+                    boolean useNonBlankKey = false,
+                    boolean checkRNA       = false,
+                    boolean includeDOD     = false,
+                    boolean include_minors = false, //TODO: it may or may not be the same as in doxie.IDataAccess
+                    boolean getSSNBest     = false,
+                    doxie.IDataAccess modAccess = MODULE (doxie.IDataAccess) END
                   ):=FUNCTION
 
 //Until macros are changed, need to declare these variables:
@@ -22,22 +22,22 @@ g := modAccess.isValidGLB (checkRNA);
 
 DRM := modAccess.DataRestrictionMask;
 
-doxie.mac_best_records(di,did,o_info,d,g,useNonBlankKey,DRM,,,,includeDOD);
+doxie.mac_best_records(di, did, o_info, d, g, useNonBlankKey, DRM, mod_access.isDirectMarketing(), , , includeDOD);
 Death_source_sort := SORT(o_info, did, dod);
 
 Death_source_grp:= Sort(group(Death_source_sort,did,dod), did, dod, if(IsLimitedAccessDMF, 1,0));
-o := UNGROUP(iterate(Death_source_grp, TRANSFORM(doxie.layout_best, 
-									SELF.IsLimitedAccessDMF :=if(COUNTER = 1 , ((INTEGER)RIGHT.dod != 0 AND RIGHT.IsLimitedAccessDMF),
-	                                            LEFT.IsLimitedAccessDMF ) ,
-									SELF :=right)));
+o := UNGROUP(iterate(Death_source_grp, TRANSFORM(doxie.layout_best,
+                  SELF.IsLimitedAccessDMF :=if(COUNTER = 1 , ((INTEGER)RIGHT.dod != 0 AND RIGHT.IsLimitedAccessDMF),
+                                              LEFT.IsLimitedAccessDMF ) ,
+                  SELF :=right)));
 
 ssnBestParams := SSNBest_Services.IParams.setSSNBestParams(modAccess,
-																													 suppress_and_mask_:=FALSE, //since suppression is done later by all services that currently call getSSNBest
-																									         checkRNA_:= checkRNA);
-																													 
+                                                           suppress_and_mask_:=FALSE, //since suppression is done later by all services that currently call getSSNBest
+                                                           checkRNA_:= checkRNA);
+
 //we hit the BestSSN key to get the 'best ssn' - this will return the same SSN 'most' of the time
 with_bestSSNs := SSNBest_Services.Functions.fetchSSNs_generic(o,ssnBestParams,ssn,did,fromADL:=true);
-	
+
 outfile_ := if(getSSNBest, with_bestSSNs, o);
 
 doxie.MAC_PruneOldSSNs(outfile_,recs,ssn,did);
@@ -46,21 +46,21 @@ suppress.MAC_Mask(recs,out_mskd,ssn,dl_number,true,true, false, true, , modAcces
 //*** when no best (or if called at FCRA-side), get a header record
 
 hfat_1 := doxie.mod_header_records(
-	false,	//DoSearch										
-	true, //include_dailies				
-	false, //allow_wildcard	
-	, //include_gong
-	modAccess := mod_access).results(project(di, doxie.layout_references_hh));
+  false,  //DoSearch
+  true, //include_dailies
+  false, //allow_wildcard
+  , //include_gong
+  modAccess := mod_access).results(project(di, doxie.layout_references_hh));
 
 Header.MAC_GLB_DPPA_Clean_RNA(hfat_1, hfat_rna, mod_access)
 
 hfat := if (checkRNA,hfat_rna,hfat_1);
 
 doxie.layout_best likebest(hfat l) := transform
-	self.dod := (qstring)l.dod;
-	self.age := if ( l.dob = 0, 0, ut.age (l.dob) );
-	self.valid_ssn := L.valid_ssn;
-	self := l;
+  self.dod := (qstring)l.dod;
+  self.age := if ( l.dob = 0, 0, ut.age (l.dob) );
+  self.valid_ssn := L.valid_ssn;
+  self := l;
 end;
 
 h := project(topn(hfat,1,-dt_last_seen,-ssn,-rid), likebest(left));
@@ -71,7 +71,7 @@ best_masked_decided := IF(doSuppress, out_mskd, recs);
 header_masked_decided := IF(doSuppress, h_mskd, h);
 
 // enforce "on-the-fly" calculation at FCRA-side.
-bests0 := IF (exists(out_mskd) AND ~IsFCRA, best_masked_decided, header_masked_decided);	//only one will exist
+bests0 := IF (exists(out_mskd) AND ~IsFCRA, best_masked_decided, header_masked_decided);  //only one will exist
 
 ut.getTimeZone(bests0,phone,timezone,bests_w_timezone)
 

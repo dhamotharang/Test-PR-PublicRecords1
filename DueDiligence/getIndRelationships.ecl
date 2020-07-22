@@ -39,12 +39,6 @@ EXPORT getIndRelationships(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                                                                                                                  LEFT.indvType IN [DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT] => DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT,
                                                                                                                                  DueDiligence.Constants.INQUIRED_INDIVIDUAL_OTHER_RELATION);
                                                                                                                                  
-                                                                                                  amlDegree := IF(LEFT.indvType IN [DueDiligence.Constants.INQUIRED_INDIVIDUAL_SPOUSE, 
-                                                                                                                                    DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT,
-                                                                                                                                    DueDiligence.Constants.INQUIRED_INDIVIDUAL_FIRST_DEGREE], 1, 10);
-                                                                                                                                       
-                                                                                                                                 
-                                                                                                  SELF.amlRelationshipDegree := IF(LEFT.individual.relationship IN Header.relative_titles.set_Parent, 10, amlDegree);
                                                                                                   SELF.rawRelationshipType := LEFT.indvType;
                                                                                                   SELF := LEFT.individual; 
                                                                                                   SELF := [];)]);

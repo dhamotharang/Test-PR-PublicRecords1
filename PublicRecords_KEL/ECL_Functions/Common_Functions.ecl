@@ -1,4 +1,4 @@
-﻿IMPORT $.^.^.Business_Risk_BIP, $.^.^.MDR, $.^.^.ut, PublicRecords_KEL, BIPV2;
+﻿IMPORT $.^.^.Business_Risk_BIP, $.^.^.MDR, $.^.^.ut, PublicRecords_KEL, BIPV2, Codes;
 
 EXPORT Common_Functions := MODULE;
 	
@@ -132,7 +132,7 @@ EXPORT Common_Functions := MODULE;
 																					(LEFT.ProxID = RIGHT.B_LexIDLoc OR LinkSearchLevel IN PublicRecords_KEL.ECL_Functions.Constants.UltOrgSeleIDSet) AND // ProxID should match, OR we were doing an UltID/OrgID/SeleID/Default only search
 																					(LEFT.PowID = RIGHT.B_LexIDSite OR LinkSearchLevel IN PublicRecords_KEL.ECL_Functions.Constants.UltOrgSeleProxIDSet), // PowID should match, OR we were doing an UltID/OrgID/SeleID/Default/ProxID only search
 									TRANSFORM({RECORDOF(LEFT), UNSIGNED4 UniqueID}, 
-											SELF.UniqueID := RIGHT.G_ProcBusUID; 
+											SELF.UniqueID := RIGHT.uidappend; 
 											SELF := LEFT), 
 									FEW); // Can use FEW because the RIGHT side should contain < 10000 rows (100 only average in batch)
 	ENDMACRO;		
@@ -150,4 +150,17 @@ EXPORT Common_Functions := MODULE;
 											SELF := LEFT), 
 									FEW); // Can use FEW because the RIGHT side should contain < 10000 rows (100 only average in batch)
 	ENDMACRO;		
+	
+	EXPORT IsMarketingAllowedKey(string src, string st = '') := FUNCTION
+			RETURN(EXISTS(Codes.Key_Codes_V3(KEYED(file_name = 'VENDOR_SOURCES') AND
+			KEYED(field_name= 'DIRECTMARKETING') AND
+			KEYED(field_name2 = 'SCODE') AND
+			KEYED(code = src)
+			AND NOT (src = MDR.sourceTools.src_LnPropV2_Lexis_Asrs
+			AND st IN ['ID','IL','KS','NM','SC','WA', ''])
+			AND NOT (src = MDR.sourceTools.src_LnPropV2_Lexis_Deeds_Mtgs
+			AND st IN ['ID','IL','KS','NM','SC','WA', '']))));
+	END;
+	
+	
 END;	

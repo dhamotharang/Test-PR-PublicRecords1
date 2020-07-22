@@ -4,14 +4,17 @@ EXPORT Constants := module
 // new NoScore logic to apply across all models and riskview attributes for Riskview Dempsey core project
 export noScore(integer nas, integer nap, integer naprop, boolean truedid) := truedid=false;
 // export noScore(integer nas, integer nap, integer naprop, boolean truedid) := (nas <= 4 and nap <= 4 and naprop <= 3) or truedid=false;
-export noScoreAlert := '222A';  
+export noScoreAlert := '222A';
 
 
 export batch := 'batch';
 export online := 'online';
 export no_riskview_report := false; //default to false as don't want to run the report
 
-export valid_attributes := ['riskviewattrv5', 'insurview2attr', 'rvcheckingattrv5'];
+export checking_indicators_attribute_request := 'rvcheckingattrv5';
+export FIS_custom_attr_request := 'riskviewattrv5fis';
+
+export valid_attributes := ['riskviewattrv5', 'insurview2attr', checking_indicators_attribute_request, FIS_custom_attr_request];
 
 //student
 export Public_schl := 'PUBLIC';
@@ -51,6 +54,12 @@ export MLAScore 	 			:= '444';
 export gatewayErrorCode := '22';
 export InputErrorCode 	:= '23';
 export purposeErrorCode := '24';
+export FDSubscriberIDErrorCode := '25';
+
+export SubscriberID_error_desc(string5 error_code) := function
+	desc := if(trim(error_code) = FDSubscriberIDErrorCode, 'Request for RiskView Checking Indicators denied due to incomplete account setup', '');
+	return desc;
+end;
 
 export MLA_error_desc(string5 error_code) := function
 	desc := map(
@@ -60,6 +69,13 @@ export MLA_error_desc(string5 error_code) := function
 			'');
 	return desc;
 end;
+
+export StatusRefresh_error_desc(string5 error_code) := FUNCTION
+    desc := map(
+			trim(error_code) = '22OKC' => 'Error occurred in status refresh.',
+			'');
+	return desc;
+END;
 
 export set_Valid_Name_Suffix := ['', 'JR', 'SR', 'ST', 'ND', 'RD', 'TH'];
 

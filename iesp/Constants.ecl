@@ -481,6 +481,7 @@ EXPORT Constants := MODULE
 	   export unsigned2 Max_Involved_Parties := 50;
 		 export unsigned2 MaxAnalyticRecords := 200;
 		 export unsigned2 Max_Documents :=200;
+		 export unsigned1 Max_HPD_Results :=1;
 	END;
 
 	// EC (European Commission) Ruling
@@ -614,7 +615,13 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_TIMELINE_PHONES := 20;
 	end;
 
-	export Fraud_Point := MODULE
+  export RIN := MODULE
+    export unsigned2 MAX_COUNT_NVP := 1000;
+    export unsigned2 MAX_COUNT_SEARCH_RECORDS := 10000;
+    export unsigned2 MAX_COUNT_INDICATOR_ATTRIBUTE := 1000;
+  end;
+
+  export Fraud_Point := MODULE
 		export unsigned2 MaxAttributes := 256; // update after reviewing attribute return counts.
 	end;
 
@@ -912,6 +919,14 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxRecords := 100;
 		export unsigned2 MaxPassengers := 20;
 		export unsigned2 MaxOtherParties := 20;
+	end;
+
+  // Homestead Exemption
+	export hmstdExmptn := MODULE
+		export unsigned2 MAX_EXMPTN  := 4;
+		export unsigned2 MAX_OWNERS  := 4;
+		export unsigned2 MAX_PERSONS := 5;
+		export unsigned2 MAX_PROPERTIES := 15;
 	end;
 
   // Hunting & Fishing Licenses
@@ -1796,6 +1811,10 @@ EXPORT Constants := MODULE
 		export unsigned MAX_COUNT_BIZRPT_CTL_SEGMENTS := 50;
 		export unsigned MAX_COUNT_BIZRPT_CTL_ACCTS := 100;
 
+           // BUSINESS INSIGHT SECTION CONSTANTS
+           export unsigned MAX_COUNT_BUSINESS_RISK_RISKCODE := 20;
+           export unsigned MAX_COUNT_BUSINESS_EVIDENCE_RISKCODE := 20;
+
 		// Real Property section limits
 		// ensure that this is 1/2 of MAX_COUNT_BIZRPT_PROPERTY_TOTAL_RECS
 		export unsigned2 MAX_COUNT_BIZRPT_PROPERTY_RECORDS        := 100;
@@ -2091,8 +2110,8 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxAircrafts       := 1000;
 		export unsigned2 MaxATF             := 200;
 		export unsigned2 MaxAVM             := 2000;
-		export unsigned2 MaxBankruptcies    := 1000;  
-		export unsigned2 MaxCrimOffenders		:= 2000;  
+		export unsigned2 MaxBankruptcies    := 1000;
+		export unsigned2 MaxCrimOffenders		:= 2000;
 		export unsigned2 MaxCrimOffenses		:= 750;
 		export unsigned2 MaxCrimCourtOffenses	:= 900;
 		export unsigned2 MaxCrimPunishment	:= 150;
@@ -2183,4 +2202,9 @@ EXPORT Constants := MODULE
     export unsigned2 MaxCollectionRecords := 2000;
   end;
 
+  export ConsumerOptoutReport := module
+    export unsigned2 MaxGlobalSIDs := 1000;
+  end;
+
 END;
+

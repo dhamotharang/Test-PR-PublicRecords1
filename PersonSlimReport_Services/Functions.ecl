@@ -268,7 +268,16 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
       RETURN wc_final;
   END;
 
-
+  shared uccPersonDedup(DATASET(iesp.ucc.t_UCCPerson) ucc_persons) :=
+    dedup(
+      sort(ucc_persons,
+              originname,
+              -parsedParties[1].uniqueId,
+              -addresses[1].zip5,
+              -parsedParties[1].businessid
+              ),
+              originname);
+    
   EXPORT uccRecsByDid(Ioptions in_mod):= FUNCTION
       ucc_mod := module (PROJECT(in_mod, PersonReports.IParam.ucc, OPT))
         EXPORT string1 ucc_party_type := in_mod.ucc_party_type;
@@ -278,7 +287,18 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
       ucc_sorted := sort(ucc_raw, filingJurisdiction, originFilingNumber, -d2i(OriginFilingDate));
       ucc_duped  := dedup(ucc_sorted, filingJurisdiction, originFilingNumber);
       ucc_duped_sorted := sort(ucc_duped,-d2i(OriginFilingDate));
-      RETURN ucc_duped_sorted;
+      ucc_p := project(ucc_duped_sorted,
+                      transform(iesp.ucc.t_UCCReport2Record,
+                          self.Debtors    := uccPersonDedup(left.Debtors),
+                          self.Debtors2   := uccPersonDedup(left.Debtors2),
+                          self.Creditors  := uccPersonDedup(left.Creditors),
+                          self.Creditors2 := uccPersonDedup(left.Creditors2),
+                          self.Secureds   := uccPersonDedup(left.Secureds),
+                          self.Secureds2  := uccPersonDedup(left.Secureds2),
+                          self.Assignees  := uccPersonDedup(left.Assignees),
+                          self.Assignees2 := uccPersonDedup(left.Assignees2),
+                          self := left));
+      RETURN ucc_p;
   END;
 
   EXPORT sexOffRecsByDid(Ioptions in_mod):= FUNCTION

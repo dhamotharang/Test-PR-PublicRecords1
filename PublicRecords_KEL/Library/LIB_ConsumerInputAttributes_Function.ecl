@@ -8,7 +8,7 @@ EXPORT LIB_ConsumerInputAttributes_Function(DATASET(PublicRecords_KEL.ECL_Functi
 #if(Use_ConsumerInputAttributes_Library)
 	ConsumerInputAttributes_Results := LIBRARY('PublicRecords_KEL.Library.LIB_ConsumerInputAttributes', PublicRecords_KEL.Library.LIB_ConsumerInputAttributes_Interface(PersonInput, Options)).Results;
 #else
-	ConsumerInputAttributes_Results := PublicRecords_KEL.Q_Input_Attributes_V1(PersonInput, PersonInput[1].P_InpClnArchDt[1..8], Options.KEL_Permissions_Mask).res0;
+	ConsumerInputAttributes_Results := PublicRecords_KEL.FnRoxie_GetInputPIIAttributes(PersonInput, Options);
 #end
 
 	RETURN(ConsumerInputAttributes_Results);

@@ -39,10 +39,11 @@ module
 
   // main summary results
   // ------------------------------------------
-  export results() := function
+  linking_results() := function
     biz_consumer_ap := biz_links.ConsumerAppend();
     biz_bip_ap := biz_links.BipAppend();
     biz_summary := biz_links.summary;
+    biz_verify := biz_links.VerifyInputs();
 
 
     // add business summary elements and restore original acctno
@@ -61,6 +62,32 @@ module
     results_summary := join(batch_in, biz_summary, 
       (unsigned)left.acctno = right.request_id, 
       summary_trans_0(left, right), 
+      left outer, keep(1), limit(0)
+    );
+
+
+    // add verification info to business summary
+    BusinessBatch_BIP.Layouts.SingleView.Output_Summary verify_trans(BusinessBatch_BIP.Layouts.SingleView.Output_Summary l, 
+      recordof(biz_verify) r) := transform
+      self.match_first_last_name := r.first_last_name;
+      self.match_first_name := r.first_name;
+      self.match_last_name := r.last_name;
+      self.match_first_bus_name_addr1 := r.first_bus_name_addr1;
+      self.match_last_bus_name_addr1 := r.last_bus_name_addr1;
+      self.match_first_bus_name := r.first_bus_name;
+      self.match_last_bus_name := r.last_bus_name;
+      self.match_addr1 := r.addr1;
+      self.match_bus_addr1 := r.bus_addr1;
+      self.match_ssn := r.ssn;
+      self.match_ssn_fein := r.ssn_fein;
+      self.match_phone := r.phone;
+      self.match_bus_phone := r.bus_phone;
+      self := l;
+    end;
+
+    results_verify := join(results_summary, biz_verify, 
+      left.request_id = right.request_id, 
+      verify_trans(left, right), 
       left outer, keep(1), limit(0)
     );
 
@@ -87,7 +114,7 @@ module
       self := l;
     end;
 
-    results_w_consumer := join(results_summary, biz_consumer_ap, 
+    results_w_consumer := join(results_verify, biz_consumer_ap, 
       left.request_id = right.seq, 
       summary_trans_1(left, right), 
       left outer, keep(1), limit(0)
@@ -162,7 +189,7 @@ module
 
   // linked contact results
   // -------------------------------------------
-  export contact_results() := function
+  contact_results() := function
 
     biz_linked_contact := biz_links.contacts();
 
@@ -214,7 +241,7 @@ module
 
   // linked business results
   // -------------------------------------
-  export business_results() := function
+  business_results() := function
 
     biz_linked_business := biz_links.businesses();
 
@@ -329,6 +356,100 @@ module
     //output(results_rolled, named('BR_results_rolled'));
 
     return results_out;
+
+  end;
+
+  // combined results
+  // -------------------------------------
+  export combined_results() := function
+
+    l_res := linking_results();
+    b_res := business_results();
+    c_res := contact_results();
+
+    l_combined := project(l_res, 
+      transform(BusinessBatch_BIP.Layouts.SingleView.Output_Combined, 
+        self.record_type := $.Constants.SingleView.LinkingRecordType, 
+        self := left, 
+        self := []
+      )
+    );
+
+    BusinessBatch_BIP.Layouts.SingleView.Output_Combined b_trans(BusinessBatch_BIP.Layouts.SingleView.Output_Business l) := transform
+      self.record_type := $.Constants.SingleView.BusinessRecordType;
+      self.acctno := l.acctno;
+      self.request_id := l.request_id;
+      self.b_best_co_name := l.best_co_name;
+      self.b_best_co_prim_range := l.best_co_prim_range;
+      self.b_best_co_predir := l.best_co_predir;
+      self.b_best_co_prim_name := l.best_co_prim_name;
+      self.b_best_co_addr_suffix := l.best_co_addr_suffix;
+      self.b_best_co_unit_desig := l.best_co_unit_desig;
+      self.b_best_co_sec_range := l.best_co_sec_range;
+      self.b_best_co_city := l.best_co_city;
+      self.b_best_co_state := l.best_co_state;
+      self.b_best_co_zip := l.best_co_zip;
+      self.b_best_co_zip4 := l.best_co_zip4;
+      self.b_best_co_phone := l.best_co_phone;
+      self.b_ultid := l.ultid;
+      self.b_orgid := l.orgid;
+      self.b_seleid := l.seleid;
+      self.b_proxid := l.proxid;
+      self.b_powid := l.powid;
+      self.b_job_title1 := l.job_title1;
+      self.b_dt_first_seen1 := l.dt_first_seen1;
+      self.b_dt_last_seen1 := l.dt_last_seen1;
+      self.b_job_title2 := l.job_title2;
+      self.b_dt_first_seen2 := l.dt_first_seen2;
+      self.b_dt_last_seen2 := l.dt_last_seen2;
+      self.b_job_title3 := l.job_title3;
+      self.b_dt_first_seen3 := l.dt_first_seen3;
+      self.b_dt_last_seen3 := l.dt_last_seen3;
+      self := [];
+    end;
+    b_combined := project(b_res, b_trans(left));
+
+    BusinessBatch_BIP.Layouts.SingleView.Output_Combined c_trans(BusinessBatch_BIP.Layouts.SingleView.Output_Consumer l) := transform
+      self.record_type := $.Constants.SingleView.ContactRecordType;
+      self.acctno := l.acctno;
+      self.request_id := l.request_id;
+      self.c_best_name_first := l.best_name_first;
+      self.c_best_name_middle := l.best_name_middle;
+      self.c_best_name_last := l.best_name_last;
+      self.c_best_name_suffix := l.best_name_suffix;
+      self.c_best_prim_range := l.best_prim_range;
+      self.c_best_predir := l.best_predir;
+      self.c_best_prim_name := l.best_prim_name;
+      self.c_best_addr_suffix := l.best_addr_suffix;
+      self.c_best_unit_desig := l.best_unit_desig;
+      self.c_best_sec_range := l.best_sec_range;
+      self.c_best_city := l.best_city;
+      self.c_best_state := l.best_state;
+      self.c_best_zip := l.best_zip;
+      self.c_best_zip4 := l.best_zip4;
+      self.c_best_home_phone := l.best_home_phone;
+      self.c_lex_id := l.lex_id;
+      self.c_empid := l.empid;
+      self.c_job_title1 := l.job_title1;
+      self.c_job_title2 := l.job_title2;
+      self.c_job_title3 := l.job_title3;
+      self.c_dt_first_seen := l.dt_first_seen;
+      self.c_dt_last_seen := l.dt_last_seen;
+      self := [];
+    end;
+    c_combined := project(c_res, c_trans(left));
+
+    l_grp := group(sort(l_combined, acctno, request_id), acctno);
+    b_grp := group(sort(b_combined, acctno, request_id), acctno);
+    c_grp := group(sort(c_combined, acctno, request_id), acctno);
+
+    l_limit := topn(l_grp, inMod.MaxResultsPerAcct, acctno);
+    b_limit := topn(b_grp, inMod.MaxBusinessesPerAcct, acctno);
+    c_limit := topn(c_grp, inMod.MaxContactsPerAcct, acctno);
+
+    combined_all := ungroup(l_limit) & ungroup(b_limit) & ungroup(c_limit);
+
+    return combined_all;
 
   end;
   // -------------------------------------------

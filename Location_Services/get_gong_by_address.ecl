@@ -1,8 +1,8 @@
 export get_gong_by_address(inf, attr, mod_access, outf) := macro
-import gong, location_services, suppress;
+import dx_Gong, location_services, suppress;
 
 #uniquename(df_history)
-%df_history% := join(inf, Gong.key_address_current,
+%df_history% := join(inf, dx_Gong.key_address_current(),
   keyed(left.prim_name = right.prim_name) and
   keyed(left.st = right.st) and
   keyed(left.zip = right.z5) and
@@ -11,7 +11,7 @@ import gong, location_services, suppress;
   TRANSFORM(RIGHT), limit(50, skip));
 
 #uniquename(df)
-%df% := Suppress.MAC_SuppressSource(%df_history%, mod_access);  
+%df% := Suppress.MAC_SuppressSource(%df_history%, mod_access);
 
 #uniquename(norm_to_inf)
 inf %norm_to_inf%(inf L, %df% R) := transform

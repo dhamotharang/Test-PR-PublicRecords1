@@ -43,6 +43,7 @@ EXPORT SearchService := MACRO
 		self.glb_ok := ut.glb_ok (GLB);
 		self.dppa_ok := ut.dppa_ok (DL);
 		self.DRM := first_row.user.DataRestrictionMask;		
+		self.DPM := first_row.user.DataPermissionMask;		
 		self.IncludeSpecialties  := Healthcare_Shared.Constants.CFG_False;
 		self.IncludeLicenses  := Healthcare_Shared.Constants.CFG_False;
 		self.IncludeResidencies  := Healthcare_Shared.Constants.CFG_False;

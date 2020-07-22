@@ -1,4 +1,4 @@
-import doxie, tools,autokeyb2,dca;
+﻿import doxie, tools,autokeyb2,dca;
 export Keys(
 	 string													pversion									= ''
 	,boolean												pUseOtherEnvironment			= false
@@ -16,10 +16,12 @@ module
 
 	export EntNumFilt  	 := project(pFileKeybuild	,transform(Layouts.base.keybuildEntNum, self := left));
 	export EntNumNonFilter := pFileKeybuildNonFiltered;
-		
+
 	export FilterBdids	 := Basebdid	(bdid	!= 0);
-	export dFileContacts := pFileContacts;
-	
+	// Creating a BDID key on Contacts base file. Added for CCPA phase 2 requirement as per Jira# CCPA-1029
+	export dFileContacts 		:= pFileContacts;
+	export FilterContBdids	:= dFileContacts(bdid	!= 0);
+
 	shared layout_dca_hierarchy :=
 	record
 		FilterBdids.bdid;
@@ -31,13 +33,13 @@ module
 	end;
 
 	shared dca_hierarchy := table(FilterBdids, layout_dca_hierarchy);
-	
+
 	shared layout_dca_hierarchy_parent_to_child := RECORD
 		STRING9 parent_root := IF( dFileKeybuild.parent_number != '', dFileKeybuild.parent_number[1..9]	, dFileKeybuild.root );
 		STRING4 parent_sub  := IF( dFileKeybuild.parent_number != '', dFileKeybuild.parent_number[11..]	, dFileKeybuild.sub );
 		STRING9 child_root  := dFileKeybuild.root;
 		STRING4 child_sub   := dFileKeybuild.sub;
-		STRING2 child_level := dFileKeybuild.level;	
+		STRING2 child_level := dFileKeybuild.level;
 	END;
 
 	shared dhierp2c := TABLE(dFileKeybuild, layout_dca_hierarchy_parent_to_child);
@@ -62,7 +64,7 @@ module
 		RECORD
 			STRING9 Parent_Enterprise_number 	:= IF( pdataset.Parent_Enterprise_number != '', pdataset.Parent_Enterprise_number, pdataset.Enterprise_num );
 			STRING9 Enterprise_num 						:= pdataset.Enterprise_num;
-			STRING2 child_level 							:= pdataset.level;	
+			STRING2 child_level 							:= pdataset.level;
 		END;
 
 		return TABLE(pdataset, lHierP2C);
@@ -71,8 +73,8 @@ module
 	//Hierarchy Root to sub
 	shared fHierRootSubNew(dataset(Layouts.base.keybuildslim)	pdataset) :=
 	function
-	
-		lHierRootSub := 
+
+		lHierRootSub :=
 		record
 			pdataset.bdid;
 			pdataset.level;
@@ -86,7 +88,7 @@ module
 
 	shared dHierP2CNew			:= fHierP2CNew		(dFileKeybuild);
 	shared dHierRootSubNew	:= fHierRootSubNew(Basebdid			);
-	
+
 	export Bdid 				:= tools.macf_FilesIndex('FilterBdids				,{bdid																												}	,{FilterBdids			}'	,knames.Bdid					);
 	export BdidHier 		:= tools.macf_FilesIndex('dca_hierarchy			,{bdid																												}	,{dca_hierarchy		}'	,knames.BdidHier			);
 	export HierRootSub 	:= tools.macf_FilesIndex('dHierRootSub			,{root, sub																										}	,{dHierRootSub		}'	,knames.HierRootSub		);
@@ -96,9 +98,6 @@ module
 	export HierEntNum 	:= tools.macf_FilesIndex('dHierRootSubNew		,{Enterprise_num																							}	,{dHierRootSubNew	}'	,knames.HierEntNum		);
 	export EntNum				:= tools.macf_FilesIndex('EntNumFilt   		  ,{Enterprise_num																							}	,{EntNumFilt  		}'	,knames.EntNum				);
 	export EntNumNonFilt:= tools.macf_FilesIndex('EntNumNonFilter		,{Enterprise_num																				    	}	,{EntNumNonFilter }'	,knames.EntNumNonFilt	);
+	export ContactBdid 	:= tools.macf_FilesIndex('FilterContBdids		,{bdid																												}	,{FilterContBdids	}'	,knames.ContactBdid		);
 
 end;
-
-
-
-

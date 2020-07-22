@@ -1,4 +1,4 @@
-import address, iesp; 
+﻿import address, iesp; 
 
 in_rec := PropertyCharacteristics_Services.Layouts.batch_in_esdl;
 out_rec := PropertyCharacteristics_Services.Layouts.batch_out;
@@ -50,9 +50,11 @@ export records_batch (dataset(in_rec) indata, IParam.Report in_mod) := function
   // filter according to product type and "reseller" indicator
   // 'A' -- combined with fares, B -- combined without fares, 'C' -- OK (for resellers), D -- only fares
   inhouse_props := inhouse_props_all (
-    ((in_mod.Product = Constants.Product.INSPECTION) and (vendor_source = 'A')) or 
-    ((in_mod.Product = Constants.Product.PROPERTY) and (vendor_source != 'A') and 
-       if (in_mod.Reseller, vendor_source = 'C', vendor_source IN ['B', 'D'])));
+    ((in_mod.Product = Constants.Product.INSPECTION) AND (in_mod.ResultOption IN [Constants.Default_Option, Constants.Default_Plus_Option]) AND (vendor_source = 'A')) OR 
+    ((in_mod.Product = Constants.Product.PROPERTY) AND in_mod.ResultOption = Constants.Default_Option AND (vendor_source IN ['B', 'D'])) OR 
+    ((in_mod.Product = Constants.Product.PROPERTY) AND in_mod.ResultOption = Constants.Default_Plus_Option AND (vendor_source IN ['B', 'D', 'E'])) OR 
+    ((in_mod.ResultOption = Constants.Selected_Source_Option) AND (vendor_source = 'F')) OR
+		((in_mod.ResultOption = Constants.Selected_Source_Plus_Option) AND (vendor_source IN ['F', 'E', 'D', 'C'])));	
   // NB: translation in the final output: A => A, B & C => B; D => A;
 
 
@@ -65,10 +67,11 @@ export records_batch (dataset(in_rec) indata, IParam.Report in_mod) := function
    end;
 
   // this is ready-to-return in-house results
+	limit_value := IF (in_mod.ResultOption = Constants.Default_Option, 2, 4);
   inhouse_res := join (indata_cleaned, inhouse_props, 
                        Left.acctno = Right.acctno,
                        ToBatchInternal (Left, Right),
-                       LEFT OUTER, LIMIT (2, skip)); // atmost 2 sources
+                       LEFT OUTER, LIMIT (limit_value, skip)); // atmost 2 sources
 
 
   // in-house data is generally optional
@@ -143,7 +146,7 @@ export records_batch (dataset(in_rec) indata, IParam.Report in_mod) := function
 	dsInhouse					:= PROJECT(ln_results, TRANSFORM(PropertyCharacteristics_Services.Layouts.inhouse_layout, SELF.acctno := LEFT.acctno, SELF := LEFT.inhouse));
 	
 	dsFilterB					:= dsInhouse(vendor_source IN ['B', 'C']);
-	dsFilterOthers		:= dsInhouse(vendor_source IN ['A', 'D']);
+	dsFilterOthers		:= dsInhouse(vendor_source IN ['A', 'D', 'E']);
 
 	// JOIN B and A records to clear B record DEFLT
 	dsJoinBA := join(dsFilterB, dsFilterOthers, LEFT.acctno = RIGHT.acctno, PropertyCharacteristics_Services.Functions.xJoinAB(LEFT, RIGHT), left outer, ALL);
@@ -152,15 +155,19 @@ export records_batch (dataset(in_rec) indata, IParam.Report in_mod) := function
 	dsRollB := rollup(dsJoinBA, LEFT.acctno = RIGHT.acctno, PropertyCharacteristics_Services.Functions.xRollUpB_Rec(LEFT, RIGHT));
 	
 	// Combine source A and B records
-	dsSourceAB  := SORT(dsRollB + dsFilterOthers, acctno, vendor_source);	
+	dsSourceAll  := SORT(dsRollB + dsFilterOthers + dsInhouse(vendor_source = 'F'), acctno, vendor_source);	
 	
-	layouts.batch_internal xform2(recordof(ln_results) L, recordof(dsSourceAB) R) := TRANSFORM
+	//For Default Plus Option, combine B OKCITY and E MLS records, MLS has higher priority
+	shared DPO_BandE := JOIN(dsSourceAll(vendor_source = 'E'), dsSourceAll(vendor_source = 'B'), LEFT.acctno = RIGHT.acctno, PropertyCharacteristics_Services.Functions.DPOJOin (LEFT, RIGHT), FULL OUTER);
+	SHARED ds_DPO := dsSourceAll(vendor_source = 'D') + DPO_BandE;
+	SHARED FinaldsSourceAll := IF (in_mod.ResultOption = Constants.Default_Plus_Option, ds_DPO, dsSourceAll);
+	layouts.batch_internal xform2(recordof(ln_results) L, recordof(FinaldsSourceAll) R) := TRANSFORM
 		SELF.acctno  := L.acctno;
 	  SELF.inhouse := R;
 		SELF 				 := L;
 	END;
 
-	dsjoin := JOIN(ln_results, dsSourceAB, LEFT.acctno = RIGHT.acctno and LEFT.inhouse.vendor_source = RIGHT.vendor_source, xform2(LEFT, RIGHT), LEFT OUTER);
+	dsjoin := JOIN(ln_results, FinaldsSourceAll, LEFT.acctno = RIGHT.acctno and LEFT.inhouse.vendor_source = RIGHT.vendor_source, xform2(LEFT, RIGHT), LEFT OUTER);
   
 	// append ERC data to the inhouse data; process inhouse data to produce batch output;
   layouts.batch_combined AppendGateway (layouts.batch_internal L /*,layouts.batch_erc R */) := transform

@@ -1,4 +1,4 @@
-import	PropertyCharacteristics; 
+﻿import	PropertyCharacteristics; 
 
 export	Code_Translations	:=
 module
@@ -166,6 +166,7 @@ module
 	export	unsigned	SetConfidenceFactor(string	pSource)	:=	case(	PropertyCharacteristics_Services.Functions.fnClean2Upper(pSource),
 																																		'FARES'	=>	300,
 																																		'OKCTY'	=>	200,
+																																		'MLS' 	=>	100,
 																																		'MLS1'	=>	100,
 																																		'MLS2'	=>	100,
 																																		'MLS3'	=>	100,
@@ -181,6 +182,7 @@ module
 	export	string	SetIntermediateSourceID(string	pSource)	:=	case(	PropertyCharacteristics_Services.Functions.fnClean2Upper(pSource),
 																																			'FARES'	=>	'301',
 																																			'OKCTY'	=>	'201',
+																																			'MLS' 	=>	'101',
 																																			'MLS1'	=>	'101',
 																																			'MLS2'	=>	'102',
 																																			'MLS3'	=>	'103',

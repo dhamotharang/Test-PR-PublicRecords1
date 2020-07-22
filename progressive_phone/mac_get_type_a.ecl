@@ -1,9 +1,9 @@
 export mac_get_type_a(f_a_acctno, f_a_out, mod_access, use_seq = false) := macro
 
-import Suppress, STD, gong, ut, NID, progressive_phone, Person_Models;
+import Suppress, STD, dx_Gong, ut, NID, progressive_phone, Person_Models;
 #uniquename(gong_addr_key)
 #uniquename(optout_tmp_layout)
-%gong_addr_key% := gong.Key_History_Address;
+%gong_addr_key% := dx_Gong.key_history_address();
 
 //get name&addr match from weekly gong
 #uniquename(by_gong_address)

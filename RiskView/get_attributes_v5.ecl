@@ -1,10 +1,10 @@
-import risk_indicators, riskprocessing, models;
+﻿import risk_indicators, riskview, models;
 
-EXPORT get_attributes_v5(grouped DATASET(risk_indicators.Layout_Boca_Shell) clam,
-												boolean isPrescreen)
-:= function
+EXPORT get_attributes_v5(GROUPED DATASET(risk_indicators.Layout_Boca_Shell) clam,
+												 BOOLEAN isPrescreen)
+:= FUNCTION
 
-riskview.layouts.attributes_internal_layout map_attributes(clam le) := transform
+riskview.layouts.attributes_internal_layout map_attributes(clam le) := TRANSFORM
 	self.accountnumber := '';
 				
 	self.seq := le.seq;
@@ -207,6 +207,17 @@ riskview.layouts.attributes_internal_layout map_attributes(clam le) := transform
 	self.PhoneInputSubjectCount	:= attr.PhoneInputSubjectCount;
 	self.PhoneInputMobile 	:= attr.InputPhoneMobile;
 	self.AlertRegulatoryCondition	:= '';  // this is set in riskview.search_function
+  
+  //FIS custom attributes
+  self.rv3ConfirmationSubjectFound := attr.rv3ConfirmationSubjectFound;
+  self.rv3AddrChangeCount12Month := attr.rv3AddrChangeCount12;
+  self.rv3AddrChangeCount60Month := attr.rv3AddrChangeCount60;
+  self.rv3AddrInputTimeOldest := attr.rv3AddrInputTimeOldest;
+  self.rv3SourceNonDerogCount := attr.rv3NonDerogCount;
+  self.rv3AssetPropCurrentCount := attr.rv3AssetPropCurrentCount;
+  self.rv3SSNDeceased := attr.rv3SSNDeceased;
+  self.rv3AssetIndex := attr.rv3AssetIndex;
+  
 	self := [];
 end;
 
@@ -399,7 +410,17 @@ with_attributes_after_noscore_applied := project(with_willingness,
 		self.PhoneInputProblems	 := if(no_score, '-1', left.PhoneInputProblems	);
 		self.PhoneInputSubjectCount	 := if(no_score, '-1', left.PhoneInputSubjectCount	);
 		self.PhoneInputMobile 	 := if(no_score, '-1', left.PhoneInputMobile 	);
-		
+  
+    //FIS custom attributes
+    //rv3 didn't have '-1' logic, so replacing with blanks
+    self.rv3AddrChangeCount12Month := if(no_score, '', left.rv3AddrChangeCount12Month);
+    self.rv3AddrChangeCount60Month := if(no_score, '', left.rv3AddrChangeCount60Month);
+    self.rv3AddrInputTimeOldest := if(no_score, '', left.rv3AddrInputTimeOldest);
+    self.rv3SourceNonDerogCount := if(no_score, '', left.rv3SourceNonDerogCount);
+    self.rv3AssetPropCurrentCount := if(no_score, '', left.rv3AssetPropCurrentCount);
+    self.rv3SSNDeceased := if(no_score, '', left.rv3SSNDeceased);
+    self.rv3AssetIndex := if(no_score, '', left.rv3AssetIndex);		
+    
 		// if the attribute isn't DID based, let it return regardless of the no_score
 		self := left;
 		

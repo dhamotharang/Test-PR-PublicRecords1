@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="PropertyCharacteristicsReportService">	
 	<part name="PropertyInformationRequest"	type="tns:XmlDataSet" cols="80"		rows="30"/>
 	<part	name="InsuranceContext"	type="tns:Xmldataset"	cols="70"		rows="10"/>
@@ -13,7 +13,7 @@
 import Address,AutoStandardI,iesp,insurancecontext_iesp,PropertyCharacteristics,ut,gateway;
 
 export ReportService() := macro
-
+	Constants := PropertyCharacteristics_Services.Constants;
 	// get XML input
 	dIn			:=	dataset([],iesp.property_info.t_PropertyInformationRequest)	:	stored('PropertyInformationRequest',FEW);
 	Request	:=	dIn[1]	:	independent;
@@ -39,7 +39,12 @@ export ReportService() := macro
 	
 	tempMod	:=	module(PropertyCharacteristics_Services.IParam.SearchRecords)
 											export	string1		ReportType									:=	PropertyCharacteristics_Services.Functions.fnClean2Upper(Request.InquiryInfo.ReportType);
-											export	boolean		Reseller										:=	InsContext.Products.PROPINFO.IsReseller;
+											export	string3		ResultOption								:=	IF (InsContext.Products.PROPINFO.IndResultOption not in [
+																																							Constants.Default_Option, 
+																																							Constants.Default_Plus_Option,
+																																							Constants.Selected_Source_Option,
+																																							Constants.Selected_Source_Plus_Option
+																																							], Constants.Default_Option, InsContext.Products.PROPINFO.IndResultOption) ;
 											export	boolean		IncludeConfidenceFactors		:=	InsContext.Products.PROPINFO.IncludeConfidenceFactors;
 											// export 	dataset(Gateway.Layouts.Config) GatewayConfig	:=	vGatewayCfg;
 											// export 	boolean		RunGateway_ERC						 	:=	isAuthorized;

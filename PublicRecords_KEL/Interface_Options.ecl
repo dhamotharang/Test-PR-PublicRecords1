@@ -17,6 +17,7 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT INTEGER ScoreThreshold := 80;
 	EXPORT BOOLEAN ExcludeConsumerAttributes := FALSE;
 	EXPORT BOOLEAN isMarketing := FALSE; // When TRUE enables Marketing Restrictions
+	EXPORT STRING IndustryClass := ''; // When set to UTILI or DRMKT this restricts Utility data
 	EXPORT UNSIGNED8 KEL_Permissions_Mask := 0; // Set by PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate()
 	EXPORT BOOLEAN OutputMasterResults := FALSE;
 
@@ -50,14 +51,17 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN IncludeEducation := TRUE;
 	EXPORT BOOLEAN IncludeEmail := TRUE;
 	EXPORT BOOLEAN IncludeEmployment := TRUE;
+	EXPORT BOOLEAN IncludeGeolink := TRUE;
 	EXPORT BOOLEAN IncludeHousehold := TRUE;
 	EXPORT BOOLEAN IncludeInquiry := TRUE;
+	EXPORT BOOLEAN IncludeLienJudgment := TRUE;
 	EXPORT BOOLEAN IncludePerson := TRUE;
 	EXPORT BOOLEAN IncludePhone := TRUE;
 	EXPORT BOOLEAN IncludeProfessionalLicense := TRUE;
 	EXPORT BOOLEAN IncludeProperty := TRUE;
 	EXPORT BOOLEAN IncludePropertyEvent := TRUE;
 	EXPORT BOOLEAN IncludeSocialSecurityNumber := TRUE;
+	EXPORT BOOLEAN IncludeSurname := TRUE;
 	EXPORT BOOLEAN IncludeTIN := TRUE;
 	EXPORT BOOLEAN IncludeTradeline := TRUE;
 	EXPORT BOOLEAN IncludeUtility := TRUE;
@@ -65,8 +69,7 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN IncludeWatercraft := TRUE;
 	EXPORT BOOLEAN IncludeZipCode := TRUE;
 	EXPORT BOOLEAN IncludeUCC := TRUE;
-	EXPORT BOOLEAN IncludeLienJudgment := TRUE;
-
+	EXPORT BOOLEAN IncludeMini := TRUE;
 	
 	// Performance options to turn ON/OFF ASSOCIATIONS in during FDC build. 
 	// By default, we'll check if their related ENTITIES are needed.
@@ -138,5 +141,7 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN IncludeWatercraftOwner := IncludeWatercraft AND IncludePerson;
 	EXPORT BOOLEAN IncludeZipCodePerson := IncludeZipCode AND IncludePerson;
 	EXPORT BOOLEAN IncludePersonLienJudgment := IncludePerson AND IncludeLienJudgment;
-	EXPORT BOOLEAN IncludeSeleLienJudgment := IncludeBusinessSele AND IncludeLienJudgment; 	
+	EXPORT BOOLEAN IncludeSeleLienJudgment := IncludeBusinessSele AND IncludeLienJudgment;
+ 	EXPORT BOOLEAN IncludeSelePersonSurname := IncludeBusinessSele AND IncludeSurname AND IncludeSelePerson; 	
+	EXPORT BOOLEAN IncludeProxPersonSurname := IncludeBusinessProx AND IncludeSurname AND IncludeProxPerson; 
 END;	

@@ -36,7 +36,8 @@ doxie_cbrs.mac_Selection_Declare()
 #stored('MaxMSWorkComp',50);
 #stored('MaxORWorkComp',50);
 
-EXPORT all_base_records_source(DATASET(doxie_cbrs.layout_references) bdids = dataset([],doxie_cbrs.layout_references), STRING6 SSNMask = 'NONE') := FUNCTION
+EXPORT all_base_records_source(DATASET(doxie_cbrs.layout_references) bdids = dataset([],doxie_cbrs.layout_references), STRING6 SSNMask = 'NONE',
+                               doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	
 //***** RECORDSETS
 //
@@ -51,7 +52,7 @@ hdrr := doxie_cbrs.header_records_raw(bdids)(Include_Finder_val or
 //	
 // DNB										
 //
-dnbr := doxie_cbrs.DNB_records(bdids)(Include_DunBradstreetRecords_val or 
+dnbr := doxie_cbrs.DNB_records(bdids, mod_access)(Include_DunBradstreetRecords_val or 
 										Include_CompanyIDnumbers_val);
 	
 //	

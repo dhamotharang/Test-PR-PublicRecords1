@@ -1,4 +1,4 @@
-/*2017-05-24T17:14:51Z (Andrea Koenen)
+﻿/*2017-05-24T17:14:51Z (Andrea Koenen)
 checkin in changes to keep insufficient hits on stream and sort output by order on input
 */
 //*to run Juli - make IncludeLNJReport uncommented and set to true
@@ -6,7 +6,7 @@ import riskwise, ut, riskview, gateway, RiskProcessing;
 
 #workunit('name','Riskview 5.0 Batch Test');
 
-unsigned record_limit := 0;    //number of records to read from input file; 0 means ALL
+unsigned record_limit := 10;    //number of records to read from input file; 0 means ALL
 unsigned1 parallel_calls := 30;  //number of parallel soap calls to make [1..30]
 unsigned1 eyeball := 100;
 string DataRestrictionMask := '10000100010001000000000000000000000000000'; // to restrict fares, experian and transunion -- returns liens and judgments
@@ -217,12 +217,14 @@ roxie_output_layout_temp := record
 	integer in_seq;
 end;
 
+insufficient_input_message := 'Insufficient PII Inputs';
+
 ds_drops := join(ds_input, ds_inseq,
 	left.in_seq = right.in_seq,
 	transform(roxie_output_layout_temp, 
 		self.acctno := right.account, 
 		self.in_seq := right.in_seq,
-		self.errorcode := 'Insufficient PII Inputs';
+		self.errorcode := insufficient_input_message;
 		self := []),
 		RIGHT ONLY);
 
@@ -243,9 +245,12 @@ all_output :=	join(ho, di,
 rv50 := sort(ds_drops + all_output, in_seq);
 	
 output(choosen(rv50,eyeball), named('rv50'));	
-output(all_output, named('all_output'));
+output(choosen(all_output, eyeball), named('all_output'));
 output(count(roxie_errors), named('error_count'));
 output(choosen(roxie_errors, eyeball), named('errors_sample'));
+
+valid_error_codes := ['', insufficient_input_message];
+
 
 NoiBehavior := project(rv50, transform(roxie_output_layout, 
 // hard code all of the iBehavior attributes because we can't use that data anymore
@@ -253,9 +258,6 @@ NoiBehavior := project(rv50, transform(roxie_output_layout,
 	self.PurchaseActivityCount := '-1';
 	self.PurchaseActivityDollarTotal := '-1';
 	self := left, self := []));	
-//LNJReport is the Juli name as this contains Juli/LNR report info in output
-// output(NoiBehavior,,outfile_name+'_withLNJRreport_details', CSV(heading(single), quote('"')), named('file_LNJRreport_details'));
-// output(choosen(NoiBehavior, 10), named('LNJRreport_details'));
 
 //LNJReport is the Juli name as this contains Juli/LNR report info in output WITH OUT the Juli Details - Liens and Judgments datasets included
 roxie_output_layout_noDetails := record
@@ -264,18 +266,31 @@ roxie_output_layout_noDetails := record
 	STRING errorcode;
 END;
 NoiBehavior_noLnJDetails := project(NoiBehavior, transform(roxie_output_layout_noDetails, self := left, self :=[]));
-output(NoiBehavior_noLnJDetails,,outfile_name+'_withLNJRreport', CSV(heading(single), quote('"')), named('file_LNJRreport'));
+output(NoiBehavior_noLnJDetails(errorcode in valid_error_codes),,outfile_name+'_withLNJRreport', CSV(heading(single), quote('"')), named('file_LNJRreport'));
 output(choosen(NoiBehavior_noLnJDetails, eyeball), named('LNJRreport'));
 
 //no Juli output will be the standard output name 
 noJuli := project(NoiBehavior, transform(RiskProcessing.bwr_LayoutsJuli.layout_riskview5_batch_responseNoJuli, self := left));
-output(noJuli,,outfile_name, CSV(heading(single), quote('"')), named('file_RV50'));
+output(noJuli(errorcode in valid_error_codes),,outfile_name, CSV(heading(single), quote('"')), named('file_RV50'));
 output(choosen(noJuli, eyeball), named('RV50'));
+
+temp_layout_input := record
+	layout_input;
+	string errorcode;
+end;
 
 dsDroppedInputs := join(ds_inseq, rv50,
 	left.in_seq = right.in_seq,
-	transform(layout_input, self := left),
+	transform(temp_layout_input, self := left,
+	self.errorcode := 'dropped record'),
 	left only);
 output(choosen(dsDroppedInputs,eyeball), named('dsDroppedInputs'));
-output(dsDroppedInputs(trim(account) != 'account'),,outfile_name+'_droppedRecs',CSV(heading(''), quote('"')), named('file_droppedRecs'));
-//output(dsDroppedInputs(account != 'account'),,outfile_name+'_droppedRecs', CSV(heading(single), quote('"')), named('file_droppedRecs'));
+
+dsErrorInputs := join(ds_inseq, rv50(errorcode not in valid_error_codes),
+	left.in_seq = right.in_seq,
+	transform(temp_layout_input, 
+	self.errorcode := right.errorcode;
+	self := left));
+output(choosen(dsErrorInputs,eyeball), named('dsErrorInputs'));
+
+output(dsDroppedInputs + dsErrorInputs,,outfile_name+'_RecsToReprocess',CSV(quote('"')));
