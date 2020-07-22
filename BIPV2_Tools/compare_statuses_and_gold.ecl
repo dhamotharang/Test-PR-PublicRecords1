@@ -51,7 +51,7 @@ functionmacro
   old_sprint := BIPV2.KeySuffix_mod2.SprintNumber(old_version);
   new_sprint := BIPV2.KeySuffix_mod2.SprintNumber(new_version);
 
-  ds_new  := pDs_Base  : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_new'); 
+  ds_new  := BIPV2_Statuses.mac_Calculate_Gold(pDs_Base)  : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_new'); 
   ds_old  := pDs_Father : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_old');
 
   ds_new_agg := BIPV2_Tools.Agg_Slim(ds_new ,seleid) : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_new_agg');
