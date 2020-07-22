@@ -513,8 +513,8 @@
 		//PRtcc datatype update for code and description
 		STRING Alcohol_Test_Status;
 		STRING Alcohol_Test_Type;
-		
-		STRING25 Alcohol_Test_Result;
+		//Data Ingestion Enum Field
+		STRING Alcohol_Test_Result;
 		STRING7 Law_Enforcement_Suspects_Drug_Use;
 		STRING20 Drug_Test_Given;
 		STRING100 Non_Motorist_Actions_Prior_to_Crash1;
@@ -665,8 +665,8 @@
 		STRING Pedestrian_Actions_At_Time_Of_Crash;
 		STRING Pedalcyclist_Actions_At_Time_Of_Crash;
 		STRING Passenger_Actions_At_Time_Of_Crash;
-		//Data Ingestion New fields
-		STRING10 Dui_Suspected;
+		//Data Ingestion New Enum fields
+		STRING Dui_Suspected;
 		//Data Ingestion New Enum fields
 		STRING Drug_Test_Result;
 		//PRtCC CR-1237
@@ -1303,8 +1303,8 @@
 		//PRtcc datatype update for code and description
 		STRING Alcohol_Test_Status;
 		STRING Alcohol_Test_Type;
-		
-		STRING25 Alcohol_Test_Result;
+		//Data Ingestion Enum Field
+		STRING Alcohol_Test_Result;
 		STRING7 Law_Enforcement_Suspects_Drug_Use;
 		STRING20 Drug_Test_Given;
 		STRING100 Non_Motorist_Actions_Prior_to_Crash1;
@@ -1753,8 +1753,8 @@
 		STRING10 Dispatch_Date;
 		STRING10 Drug_Involvement;
 		STRING7 Alcohol_Involved;
-		STRING10 Dui_Suspected;
 		//Data Ingestion New Enum fields
+	  STRING  Dui_Suspected;
 		STRING Drug_Test_Result;
 		//Data Ingestion CR-1273
 		STRING64 Geo_Coded_Latitude;

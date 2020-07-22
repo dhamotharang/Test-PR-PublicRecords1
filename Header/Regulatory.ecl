@@ -209,4 +209,61 @@ Export Regulatory := module
 
 				endmacro; 
 
+
+		EXPORT applySsnCorrectionSup(base_ds) := FUNCTIONMACRO
+			import Header, Suppress;
+			
+					SsnCorrectionHash(recordof(base_ds) L) :=  hashmd5(L.ssn); 
+					
+					local _ds1 := Suppress.applyRegulatory.simple_sup(base_ds, 'ssn_corrections.txt', SsnCorrectionHash);
+					return _ds1;
+		ENDMACRO;
+		
+
+		EXPORT applySsnFilterSup(base_ds) := FUNCTIONMACRO
+			import Header, Suppress;
+			
+					SsnFilterHash(recordof(base_ds) L) :=  hashmd5(intformat((unsigned6)L.did,15,1),Trim((string9)L.ssn, left, right)); 
+					local supLayout := Suppress.applyRegulatory.layout_out;		
+						
+					sup_in := suppress.applyregulatory.getFile('file_ssn_filter.thor', supLayout);					
+
+					_ds1 := join(base_ds, sup_in
+											, SsnFilterHash(left) = right.hval
+											, transform(left)
+											, left only
+											, lookup);
+					return _ds1;
+		ENDMACRO;
+		
+			
+		EXPORT applyRidRecSup(base_ds) := FUNCTIONMACRO
+			import Header, Suppress, doxie_build;
+		
+					local RidRecHash(recordof(base_ds) L) :=  hashmd5(intformat((unsigned6)L.rid,15,1)); 
+
+					
+					local _ds1 := Suppress.applyRegulatory.simple_sup(base_ds, 'ridrec_sup.txt', RidRecHash);
+					return _ds1;
+		ENDMACRO;
+
+		EXPORT applyDidAddressSup(base_ds) := FUNCTIONMACRO
+			import Header, Suppress, doxie_build;
+		
+					local DidAddressHash(recordof(base_ds) L) :=  hashmd5(intformat(l.did,15,1),(STRING)l.st, (STRING)l.zip, (STRING)l.city_name, 
+																												(STRING)l.prim_name, (STRING)l.prim_range, (STRING)l.predir, (STRING)l.suffix, (STRING)l.postdir, (STRING)l.sec_range);
+					
+					local _ds1 := Suppress.applyRegulatory.simple_sup(base_ds, 'didaddress_sup.txt', DidAddressHash);
+					return _ds1;
+		ENDMACRO;
+
+		EXPORT applyDidAddressSup2(base_ds) := FUNCTIONMACRO
+			import Header, Suppress, doxie_build;
+		
+					local DidAddressHash(recordof(base_ds) L) :=  hashmd5(l.did,l.st,l.zip,l.city_name,l.prim_name,l.prim_range,l.predir,l.suffix,l.postdir,l.sec_range);
+			
+					local _ds1 := Suppress.applyRegulatory.simple_sup(base_ds, 'didaddress_sup.txt', DidAddressHash);
+					return _ds1;
+		ENDMACRO;
+
 end;

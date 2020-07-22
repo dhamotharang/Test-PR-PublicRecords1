@@ -4,6 +4,6 @@ IMPORT B_Social_Security_Number,E_Customer,E_Social_Security_Number FROM Fraudgo
 IMPORT * FROM KEL011.Null;
 EXPORT Q__show_Customer_Social_Security_Number := MODULE
   SHARED TYPEOF(B_Social_Security_Number.__ENH_Social_Security_Number) __ENH_Social_Security_Number := B_Social_Security_Number.__ENH_Social_Security_Number;
-  SHARED __EE3287981 := __ENH_Social_Security_Number;
-  EXPORT Res0 := __UNWRAP(__EE3287981);
+  SHARED __EE4170770 := __ENH_Social_Security_Number;
+  EXPORT Res0 := __UNWRAP(__EE4170770);
 END;

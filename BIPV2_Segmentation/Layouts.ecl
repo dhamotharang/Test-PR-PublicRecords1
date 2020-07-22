@@ -124,4 +124,10 @@
           COUNT_TYPE addr_state_cnt;
           boolean has_SOS;
 	end;
+
+	export SegKeyLayout := record
+		SegmentationLayout.seleid;
+		SegmentationLayout.category;
+		SegmentationLayout.subcategory;
+	end;
 end;

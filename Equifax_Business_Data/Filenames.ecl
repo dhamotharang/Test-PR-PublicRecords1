@@ -6,14 +6,32 @@ EXPORT Filenames(
 	,BOOLEAN	pUseOtherEnvironment	= FALSE
 
 ) := MODULE
+ 
+	SHARED lversiondate	      := pversion;
+	SHARED lInputRoot		      := _Constants(pUseOtherEnvironment).InputTemplate	+ 'data'	;
+	SHARED lInputRootContacts	:= _Constants(pUseOtherEnvironment).InputTemplate	+ 'data::contacts'	;
+	SHARED lfileRoot		      := _Constants(pUseOtherEnvironment).FileTemplate	+ 'data'	;
+	SHARED lfileRootContacts	:= _Constants(pUseOtherEnvironment).FileTemplate	+ 'data::contacts'	;
 
-	SHARED lversiondate	:= pversion;
-	SHARED lInputRoot		:= _Constants(pUseOtherEnvironment).InputTemplate	+ 'data'	;
-	SHARED lfileRoot		:= _Constants(pUseOtherEnvironment).FileTemplate	+ 'data'	;
+  export Input :=
+	module
+	export Companies := tools.mod_FilenamesInput(lInputRoot,lversiondate);
+	export Contacts  := tools.mod_FilenamesInput(lInputRootContacts,lversiondate);
 
-	EXPORT Input	      := tools.mod_FilenamesInput(lInputRoot ,lversiondate);
-	EXPORT Base		      := tools.mod_FilenamesBuild(lfileRoot  ,lversiondate);
-		     
-	EXPORT dAll_filenames := Base.dAll_filenames; 
+  export dAll_filenames := 
+				Companies.dAll_filenames
+			+ Contacts.dAll_filenames
+			; 	
+	
+	end;	
+	
+	export Base		      := 
+	module 
+	  export Companies := tools.mod_FilenamesBuild(lfileRoot,lversiondate);
+		export Contacts  := tools.mod_FilenamesBuild(lfileRootContacts,lversiondate);
+	end;
+	
+	EXPORT dAll_filenames := Base.Companies.dAll_filenames
+	                         + Base.Contacts.dAll_filenames; 
 
 END;

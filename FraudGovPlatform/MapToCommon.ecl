@@ -112,7 +112,11 @@ module
 
 	//Label RIN Source
 	EXPORT AppendRinSourceLabel := FraudGovPlatform.Append_RinSource(NewBaseDelta):independent;
+	//Add demo data GRP-5144
+	Demo_main := dataset('~fraudgov::base::main_demo_anon',fraudshared.Layouts.base.main,thor);
+	
+	Export Build_Main_Prep := dedup(AppendRinSourceLabel + Demo_main,all);
 	// Build Main File
-	EXPORT Build_Main_Base := FraudShared.Build_Base_Main(pversion,AppendRinSourceLabel);
+	EXPORT Build_Main_Base := FraudShared.Build_Base_Main(pversion,Build_Main_Prep);
 
 END;
