@@ -7,23 +7,44 @@ export  Standardize_Input :=  MODULE;
 	// -- map fields
 	// -- do any conversions/validations
 	//////////////////////////////////////////////////////////////////////////////////////
-EXPORT fPreProcess(DATASET(Layouts.Sprayed_Input) pRawInput, string pversion) := FUNCTION
-	  
-		NAICSCodes.Layouts.NAICSLookup NormTrf(NAICSCodes.Layouts.Sprayed_Input L) := transform			
+EXPORT fPreProcess(DATASET(Layouts.Sprayed_Input) pRawInput, DATASET(Layouts.Sprayed_Input_DnbDmi) pRawDnbDmiInput,string pversion) := FUNCTION
+
+		Layouts.NAICSLookup NormTrf(Layouts.Sprayed_Input L) := transform			
 				SELF			              := L;
 				SELF 									  := [];
 			end;
 
-		RETURN PROJECT(pRawInput, NormTrf(LEFT));
+		naicsProject := PROJECT(pRawInput, NormTrf(LEFT));
+		Gov_NAICS_Lookup_Table := naicsProject
+		: persist('~thor_data400::persist::naics::lookup',SINGLE)
+		;
+					  
+		Layouts.NAICSLookup NormDnbDmiTrf(Layouts.Sprayed_Input_DnbDmi L) := transform			
+				SELF			              := L;
+				SELF 									  := [];
+			end;
+			
+		dnbDmiProject := PROJECT(pRawDnbDmiInput, NormDnbDmiTrf(LEFT));
+		DnbDmi_NAICS_Lookup_Table := dnbDmiProject
+		: persist('~thor_data400::persist::dnb_dmi::lookup',SINGLE)
+		;
+
+    naicsLookupTable := Gov_NAICS_Lookup_Table + DnbDmi_NAICS_Lookup_Table;	
+		
+		sortNaics := sort(naicsLookupTable, naics_code);
+		
+		dedupNaics := dedup(sortNaics,naics_code);
+			
+		RETURN dedupNaics;	
 
 	END;
 
-	EXPORT fAll( DATASET(NAICSCodes.Layouts.Sprayed_Input) pRawFileInput
-							,STRING  pversion
+	EXPORT fAll( DATASET(Layouts.Sprayed_Input) pRawFileInput,
+	             DATASET(Layouts.Sprayed_Input_DnbDmi) pRawDnbDmiFileInput,
+							 STRING  pversion
 	           ) := FUNCTION
 						 
-		dPreprocess	:= fPreProcess(pRawFileInput, pversion) 
-		;
+		dPreprocess	:= fPreProcess(pRawFileInput, pRawDnbDmiFileInput, pversion); 
 
 		RETURN dPreprocess;
 	
