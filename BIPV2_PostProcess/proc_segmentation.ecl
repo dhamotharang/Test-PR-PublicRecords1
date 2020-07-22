@@ -234,8 +234,9 @@ module
     export modgoldSELEV2              := BIPV2_PostProcess.segmentation_gold(SeleFree,  'SELEID',pToday, 'V2'          + pGoldOutputModifier,pLgid3KeyVersion,FALSE,TRUE);  //use new gold on these for seg stats
     export modgoldSELEV2P             := BIPV2_PostProcess.segmentation_gold(SeleProb,  'SELEID',pToday, 'V2Probation' + pGoldOutputModifier,pLgid3KeyVersion,FALSE,TRUE);  //use new gold on these for seg stats
 
-    export modgoldSELEV2_all          := BIPV2_PostProcess.segmentation_gold(SeleFree,  'SELEID',pToday, 'V2_all'      + pGoldOutputModifier,pLgid3KeyVersion ,pPreserveGold ,true ); // used in BIPV2_Tools.compare_statuses_and_gold
-    export modgoldSELEV2_all_old      := BIPV2_PostProcess.segmentation_gold(SeleProb,  'SELEID',pToday, 'V2_all'      + pGoldOutputModifier,pLgid3KeyVersion ,pPreserveGold ,if(pToday[1..8] = '20200601'    ,false  ,true)); // used in BIPV2_Tools.compare_statuses_and_gold
+    // -- used in BIPV2_Tools.compare_statuses_and_gold.  do it both the old way and new way for now to compare.  might eventually remove the old way, but it doesn't hurt anything.
+    export modgoldSELEV2_all          := BIPV2_PostProcess.segmentation_gold(SeleFree,  'SELEID',pToday, 'V2_all'      + pGoldOutputModifier,pLgid3KeyVersion ,pPreserveGold ,true ); // used in BIPV2_Tools.compare_statuses_and_gold. gold the new way
+    export modgoldSELEV2_all_old      := BIPV2_PostProcess.segmentation_gold(SeleFree,  'SELEID',pToday, 'V2_all'      + pGoldOutputModifier,pLgid3KeyVersion ,pPreserveGold ,false); // used in BIPV2_Tools.compare_statuses_and_gold. gold the old way
     
     export goldSELEV2                 := modgoldSELEV2.out;
     export goldSELEV2P                := modgoldSELEV2P.out;
