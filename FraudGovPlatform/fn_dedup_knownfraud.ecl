@@ -1,6 +1,6 @@
 ﻿EXPORT fn_dedup_knownfraud(inputs):=FUNCTIONMACRO
     IMPORT ut;
-    in_srt := sort(inputs , Customer_Id, Customer_State, Customer_Agency_Vertical_Type, Customer_Program, reported_time,
+    in_srt := sort(inputs , Customer_Id, Customer_State, Customer_Agency_Vertical_Type, Customer_Program,reported_date, reported_time,
     reported_by,event_date,event_end_date,event_location,event_type_1,event_type_2,event_type_3,Household_ID,Customer_Person_ID,
     head_of_household_indicator,relationship_indicator,Rawlinkid,raw_Title,raw_First_name,raw_Middle_Name,raw_Last_Name,
     raw_Orig_Suffix,raw_Full_Name,name_risk_code,ssn,ssn_risk_code,dob,dob_risk_code,Drivers_License,Drivers_License_State,
@@ -14,7 +14,7 @@
     tax_preparer_id,business_type_1,business_date,business_risk_code,Customer_Program,start_date,end_date,amount_paid,region_code,
     investigator_id,reason_description,investigation_referral_case_id,investigation_referral_date_opened,
     investigation_referral_date_closed,customer_fraud_code_1,customer_fraud_code_2,type_of_referral,referral_reason,disposition,
-    mitigated,mitigated_amount,external_referral_or_casenumber,cleared_fraud,reason_cleared_code,rin_source,reported_date); // -customer_event_id
+    mitigated,mitigated_amount,external_referral_or_casenumber,cleared_fraud,reason_cleared_code,source, rin_source, source_rec_id); // -customer_event_id
 
     new_rec := record
 		inputs;
@@ -60,7 +60,7 @@
         business_risk_code,Customer_Program,start_date,end_date,amount_paid,region_code,investigator_id,reason_description,
         investigation_referral_case_id,investigation_referral_date_opened,investigation_referral_date_closed,customer_fraud_code_1,
         customer_fraud_code_2,type_of_referral,referral_reason,disposition,mitigated,mitigated_amount,external_referral_or_casenumber,
-        cleared_fraud,reason_cleared_code,rin_source //// -customer_event_id
+        cleared_fraud,reason_cleared_code,source, rin_source //// -customer_event_id
     );
             
     return in_ddp;

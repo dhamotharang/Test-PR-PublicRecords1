@@ -1,11 +1,11 @@
 ﻿EXPORT fn_dedup_identitydata(inputs):=FUNCTIONMACRO
     IMPORT ut;
-    in_srt := sort(inputs , Customer_Id, Customer_State, Customer_Agency_Vertical_Type, Customer_Program, Reason_Description,Rawlinkid,raw_Full_Name,raw_Title,raw_First_name,
+    in_srt := sort(inputs , Customer_Id, Customer_State, Customer_Agency_Vertical_Type, Customer_Program, Reason_Description,Date_of_Transaction,Rawlinkid,raw_Full_Name,raw_Title,raw_First_name,
     raw_Middle_Name,raw_Last_Name,raw_Orig_Suffix,SSN,SSN4,Address_Type,Street_1,Street_2,City,State,Zip,Mailing_Street_1,
     Mailing_Street_2,Mailing_City,Mailing_State,Mailing_Zip,County,Contact_Type,phone_number,Cell_Phone,dob,Email_Address,
     Drivers_License_State,Drivers_License,Bank_Routing_Number_1,Bank_Account_Number_1,Bank_Routing_Number_2,Bank_Account_Number_2,
     Ethnicity,Race,Household_ID,Customer_Person_ID,Head_of_Household_indicator,Relationship_Indicator,IP_Address,Device_ID,
-    Unique_number,MAC_Address,Serial_Number,Device_Type,Device_identification_Provider,geo_lat,geo_long,rin_source, Date_of_Transaction); //transaction_id, Customer_Job_ID,Batch_Record_ID
+    Unique_number,MAC_Address,Serial_Number,Device_Type,Device_identification_Provider,geo_lat,geo_long,source,rin_source, source_rec_id); //transaction_id, Customer_Job_ID,Batch_Record_ID
     new_rec := record
 		inputs;
 		unsigned4 dt_first_seen;
@@ -40,7 +40,7 @@
         Mailing_State,Mailing_Zip,County,Contact_Type,phone_number,Cell_Phone,dob,Email_Address,Drivers_License_State,
         Drivers_License,Bank_Routing_Number_1,Bank_Account_Number_1,Bank_Routing_Number_2,Bank_Account_Number_2,Ethnicity,
         Race,Household_ID,Customer_Person_ID,Head_of_Household_indicator,Relationship_Indicator,IP_Address,Device_ID,Unique_number,
-        MAC_Address,Serial_Number,Device_Type,Device_identification_Provider,geo_lat,geo_long,rin_source
+        MAC_Address,Serial_Number,Device_Type,Device_identification_Provider,geo_lat,geo_long, source, rin_source
     ); //transaction_id ,Customer_Job_ID,  Batch_Record_ID,
                 
     return in_ddp;
