@@ -33,7 +33,6 @@ export IdAppendThorLocal(
 		,weightThreshold = 0
 		,disableSaltForce = false
 		,segmentation = true
-		,reAppend = true
 	) := functionmacro
 
 	import BIPV2_Company_Names, BizLinkFull,ut,_Control,BIPV2_xlink_segmentation;
@@ -43,7 +42,7 @@ export IdAppendThorLocal(
 	#uniquename(outfile0)
 	#uniquename(infilecnp)
 	%infilec% :=
-	project(infile(reAppend or (proxid = 0 and seleid = 0)),
+	project(infile,
 		transform(
 			{infile, unsigned6 cntr, DATASET(BizLinkFull.Process_Biz_layouts.layout_zip_cases) %zipset%},
 				self.cntr := counter,
@@ -342,21 +341,11 @@ export IdAppendThorLocal(
 		left outer
   );
 
-	passThru0 := project(infile(proxid != 0 or seleid != 0),
-		transform(BizLinkFull.Process_Biz_Layouts.id_stream_layout,
-			self.uniqueId := left.request_id,
-			self.proxid := left.proxid,
-			self.seleid := if(left.proxid != 0, 0, left.seleid);
-			self := left;
-			self := []));
-	passThru := if(reAppend, dataset([], recordof(passThru0)),
-	               BizLinkFull.Process_Biz_Layouts.id_stream_complete(passThru0));
+	return %outfile20%;
 
-	postPassThru := project(passThru, transform(recordof(%outfile20%),
-		self.request_id := left.uniqueid,
-		self := left;
-		self := []));
-
-	return %outfile20% + postPassThru;
+	// return parallel(
+		// output(infile_augmented, named('in_biz_batch'));
+		// output(%outfile1%, named('biz_batch'));
+	// );
 
 endmacro;

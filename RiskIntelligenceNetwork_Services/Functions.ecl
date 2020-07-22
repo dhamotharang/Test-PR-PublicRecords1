@@ -62,47 +62,91 @@ EXPORT Functions := MODULE
   return final_recs;
  END;
 
- EXPORT GetFragmentRecs(DATASET(_sharedLayout.BatchInExtended_rec) ds_freg_recs_in,
-                        DATASET(_sharedLayout.Raw_Payload_rec) ds_payload,
-                        Boolean skip_autokey_ds_matching = FALSE) := FUNCTION
+ EXPORT GetFragmentRecs(DATASET(_sharedLayout.BatchInExtended_rec) ds_recs_in,
+                        DATASET(_sharedLayout.Raw_Payload_rec) ds_payload) := FUNCTION
 
-  ds_fragment_recs := FraudShared_Services.Functions.getMatchedEntityTypes(ds_freg_recs_in, ds_payload, skip_autokey_ds_matching, FRAUD_PLATFORM);
+  ds_person_elements := IF(EXISTS(ds_payload(did <> 0)), 
+                            DEDUP(SORT(PROJECT(ds_payload(did <> 0), TRANSFORM(_rin_Layout.fragment_w_value_recs,
+                                                                       SELF.Acctno := LEFT.Acctno,
+                                                                       SELF.fragment := Fragment_Types_const.PERSON_FRAGMENT,
+                                                                       SELF.fragment_value := (string) LEFT.did)), 
+                                  Acctno, fragment_value), Acctno, fragment_value),
+                            DATASET([], _rin_Layout.fragment_w_value_recs));
+  
+  generateAddressElement := (ds_recs_in[1].Addr <> '' OR ds_recs_in[1].prim_name <> '') AND ((ds_recs_in[1].p_city_name <> '' AND ds_recs_in[1].st <> '') OR ds_recs_in[1].z5 <> '');
+  ds_addresss_elements := IF(generateAddressElement, 
+                              DEDUP(SORT(PROJECT(ds_payload, TRANSFORM(_rin_Layout.fragment_w_value_recs,
+                                                               SELF.Acctno := LEFT.Acctno,
+                                                               SELF.fragment := Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT,
+                                                               SELF.fragment_value := STD.Str.CleanSpaces(LEFT.address_1) + 
+                                                                                      _Constants.FRAGMENT_SEPARATOR + 
+                                                                                      STD.Str.CleanSpaces(LEFT.address_2))), 
+                                    Acctno, fragment_value), Acctno, fragment_value),
+                              DATASET([], _rin_Layout.fragment_w_value_recs));
+                                 
+  ds_ssn_elements := IF(ds_recs_in[1].ssn <> '', 
+                          DEDUP(SORT(PROJECT(ds_payload(SSN <> ''), TRANSFORM(_rin_Layout.fragment_w_value_recs,
+                                                                      SELF.Acctno := LEFT.Acctno,
+                                                                      SELF.fragment := Fragment_Types_const.SSN_FRAGMENT,
+                                                                      SELF.fragment_value := LEFT.ssn)),
+                                Acctno, fragment_value), Acctno, fragment_value),
+                          DATASET([], _rin_Layout.fragment_w_value_recs));
+  
+  ds_phone_elements := IF(ds_recs_in[1].phoneno <> '', 
+                          DEDUP(SORT(PROJECT(ds_payload(clean_phones.phone_number <> ''), TRANSFORM(_rin_Layout.fragment_w_value_recs,
+                                                                                            SELF.Acctno := LEFT.Acctno,
+                                                                                            SELF.fragment := Fragment_Types_const.PHONE_FRAGMENT,
+                                                                                            SELF.fragment_value := LEFT.clean_phones.phone_number)),
+                                Acctno, fragment_value), Acctno, fragment_value),
+                          DATASET([], _rin_Layout.fragment_w_value_recs));
 
-  _rin_Layout.fragment_w_value_recs ds_fragment_recs_w_trans(_sharedLayout.layout_velocity_in L,
-                                                             _sharedLayout.Raw_Payload_rec R)  := TRANSFORM
+  ds_email_elements := IF(ds_recs_in[1].email_address <> '', 
+                          DEDUP(SORT(PROJECT(ds_payload(email_address <> ''), TRANSFORM(_rin_Layout.fragment_w_value_recs,
+                                                                                SELF.Acctno := LEFT.Acctno,
+                                                                                SELF.fragment := Fragment_Types_const.EMAIL_FRAGMENT,
+                                                                                SELF.fragment_value := LEFT.email_address)),
+                                Acctno, fragment_value), Acctno, fragment_value),
+                          DATASET([], _rin_Layout.fragment_w_value_recs));
 
-    BOOLEAN isBankAccountNumber1 := EXISTS(ds_freg_recs_in(bank_account_number <> '' AND bank_account_number = R.bank_account_number_1));
-    BOOLEAN isBankAccountNumber2 := EXISTS(ds_freg_recs_in(bank_account_number <> '' AND bank_account_number = R.bank_account_number_2));
+  ds_ipaddress_elements := IF(ds_recs_in[1].ip_address <> '', 
+                            DEDUP(SORT(PROJECT(ds_payload(ip_address <> ''), TRANSFORM(_rin_Layout.fragment_w_value_recs,
+                                                                               SELF.Acctno := LEFT.Acctno,
+                                                                               SELF.fragment := Fragment_Types_const.IP_ADDRESS_FRAGMENT,
+                                                                               SELF.fragment_value := LEFT.ip_address)),
+                                  Acctno, fragment_value), Acctno, fragment_value),
+                            DATASET([], _rin_Layout.fragment_w_value_recs));
 
-    bankRountingNumber1 := IF(isBankAccountNumber1 AND R.bank_routing_number_1 <> '', TRIM(R.bank_routing_number_1, LEFT, RIGHT), ' ');
-    bankRountingNumber2 := IF(isBankAccountNumber2 AND R.bank_routing_number_2 <> '', TRIM(R.bank_routing_number_2, LEFT, RIGHT), ' ');
+  ds_bankaccount1_elements := IF(ds_recs_in[1].bank_account_number <> '', 
+                                DEDUP(SORT(PROJECT(ds_payload, TRANSFORM(_rin_Layout.fragment_w_value_recs,
+                                                                 SELF.Acctno := LEFT.Acctno,
+                                                                 SELF.fragment := Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT,
+                                                                 SELF.fragment_value := IF(LEFT.bank_routing_number_1 <> '', TRIM(LEFT.bank_routing_number_1), ' ') + 
+                                                                                           _Constants.FRAGMENT_SEPARATOR + 
+                                                                                           TRIM(LEFT.bank_account_number_1))),
+                                      Acctno, fragment_value), Acctno, fragment_value),
+                                DATASET([], _rin_Layout.fragment_w_value_recs));
 
-    bank_info_to_use := MAP(isBankAccountNumber1 => bankRountingNumber1 + _Constants.FRAGMENT_SEPARATOR + R.bank_account_number_1,
-                            isBankAccountNumber2 => bankRountingNumber2 + _Constants.FRAGMENT_SEPARATOR + R.bank_account_number_2,
-                            '');
+  ds_bankaccount2_elements := IF(ds_recs_in[1].bank_account_number <> '', 
+                                DEDUP(SORT(PROJECT(ds_payload, TRANSFORM(_rin_Layout.fragment_w_value_recs,
+                                                                 SELF.Acctno := LEFT.Acctno,
+                                                                 SELF.fragment := Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT,
+                                                                 SELF.fragment_value := IF(LEFT.bank_routing_number_2 <> '', TRIM(LEFT.bank_routing_number_2), ' ') + 
+                                                                                           _Constants.FRAGMENT_SEPARATOR + 
+                                                                                           TRIM(LEFT.bank_account_number_2))),
+                                      Acctno, fragment_value), Acctno, fragment_value),
+                                DATASET([], _rin_Layout.fragment_w_value_recs));
 
-    //GEOLOCATION_FRAGMENT and MAILING_ADDRESS_FRAGMENT are not element yet, but will be in future. left in there for future use.
-    SELF.fragment_value := CASE(L.fragment,
-                                Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT => bank_info_to_use,
-                                Fragment_Types_const.DEVICE_ID_FRAGMENT => R.device_id,
-                                Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT => TRIM(R.drivers_license) + _Constants.FRAGMENT_SEPARATOR + TRIM(R.Drivers_License_State),
-                                // Fragment_Types_const.GEOLOCATION_FRAGMENT => R.clean_address.geo_lat + ' ' + R.clean_address.R.geo_long,
-                                Fragment_Types_const.IP_ADDRESS_FRAGMENT => R.ip_address,
-                                // Fragment_Types_const.MAILING_ADDRESS_FRAGMENT => (STD.Str.CleanSpaces(R.additional_address.address_1 + ' ' + R.additional_address.address_2)),
-                                Fragment_Types_const.NAME_FRAGMENT => TRIM(R.cleaned_name.fname) + ' ' + TRIM(R.cleaned_name.lname),
-                                Fragment_Types_const.PERSON_FRAGMENT => (string) R.did,
-                                Fragment_Types_const.PHONE_FRAGMENT => R.clean_phones.phone_number,
-                                Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => STD.Str.CleanSpaces(R.address_1) + _Constants.FRAGMENT_SEPARATOR + STD.Str.CleanSpaces(R.address_2),
-                                Fragment_Types_const.SSN_FRAGMENT => R.ssn,
-                                Fragment_Types_const.EMAIL_FRAGMENT => R.email_address,
-                                '');
-    SELF := L;
-  END;
-
-  ds_fragment_recs_w_value := JOIN(ds_fragment_recs, ds_payload,
-                                LEFT.record_id = RIGHT.record_id,
-                                ds_fragment_recs_w_trans(LEFT, RIGHT),
-                              LIMIT(_Constants.MAX_JOIN_LIMIT, SKIP));
+  ds_DL_elements := IF(ds_recs_in[1].dl_number <> '',
+                        DEDUP(SORT(PROJECT(ds_payload(drivers_license <> ''), TRANSFORM(_rin_Layout.fragment_w_value_recs,
+                                                                                SELF.Acctno := LEFT.Acctno,
+                                                                                SELF.fragment := Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT,
+                                                                                SELF.fragment_value := TRIM(LEFT.drivers_license) + _Constants.FRAGMENT_SEPARATOR + TRIM(LEFT.Drivers_License_State))),
+                              Acctno, fragment_value), Acctno, fragment_value),
+                        DATASET([], _rin_Layout.fragment_w_value_recs));
+                        
+  ds_fragment_recs_w_value := ds_person_elements + ds_addresss_elements + ds_ssn_elements + ds_phone_elements + 
+                              ds_email_elements + ds_ipaddress_elements + ds_bankaccount1_elements + ds_bankaccount2_elements +
+                              ds_DL_elements;                              
   
   RETURN ds_fragment_recs_w_value;
  END;
@@ -113,8 +157,6 @@ EXPORT Functions := MODULE
 
   ds_entityNameValue := PROJECT(ds_entity_rolled,TRANSFORM(_rin_Layout.entity_uid_recs, SELF := LEFT));
 
-  // All the commneted Fragment Types in the below project are not supported as of now (in MVP), However,
-  // ... they will be supported for the final product.
   analytics_uids := PROJECT(ds_entityNameValue,
                       TRANSFORM(_rin_Layout.entity_uid_recs,
                         uid := CASE(LEFT.fragment,

@@ -2,13 +2,13 @@
 
 EXPORT Functions := MODULE
 
-EXPORT JuLiProcessDTE(STRING DeferredTransactionID,  grouped dataset(risk_indicators.Layout_Boca_Shell) clam, dataset(Gateway.Layouts.Config) gateways, dataset(riskview.layouts.layout_riskview5_search_results) riskview5_final_results) := FUNCTION
+EXPORT JuLiProcessDTE(STRING DeferredTransactionID,  grouped dataset(risk_indicators.Layout_Boca_Shell) clam, dataset(Gateway.Layouts.Config) gateways, dataset(riskview.layouts.layout_riskview5_search_results) riskview5_final_results, boolean IncludeStatusRefreshChecks = FALSE) := FUNCTION
 
 RecsToDTE := DATASET([TRANSFORM(IESP.DTE_GetRequestInfo.t_DTEGetRequestInfoRequest, SELF.TransactionID := DeferredTransactionID; SELF := [];)]);
 
 GetRequestInfoGW := gateways(STD.Str.ToLowerCase(ServiceName)=Gateway.Constants.ServiceName.GetRequestInfo)[1];
 
-makeDTEGatewayCall := GetRequestInfoGW.URL <> '';
+makeDTEGatewayCall := GetRequestInfoGW.URL <> '' AND IncludeStatusRefreshChecks = TRUE;
 
 GetRequestInfo := Gateway.Soapcall_DTEGetRequestInfo(RecsToDTE, GetRequestInfoGW, pMakeGatewayCall := makeDTEGatewayCall);
 
@@ -48,9 +48,9 @@ SELF := LEFT;));
 RETURN riskview5_suppressed;
 END; // JuLiProcessDTE END
 
-EXPORT JuLiProcessStatusRefresh(grouped dataset(risk_indicators.Layout_Boca_Shell) clam, dataset(Gateway.Layouts.Config) gateways, dataset(riskview.layouts.layout_riskview5_search_results) riskview5_final_results, boolean ExcludeStatusRefresh, string10 StatusRefreshWaitPeriod, string10 ESPInterfaceVersion) := FUNCTION
+EXPORT JuLiProcessStatusRefresh(grouped dataset(risk_indicators.Layout_Boca_Shell) clam, dataset(Gateway.Layouts.Config) gateways, dataset(riskview.layouts.layout_riskview5_search_results) riskview5_final_results, boolean ExcludeStatusRefresh, string10 StatusRefreshWaitPeriod, string10 ESPInterfaceVersion, boolean IncludeStatusRefreshChecks = FALSE) := FUNCTION
 
-StatusRefreshModule := RiskView.InitiateStatusRefresh(clam[1].LnJ_datasets, gateways, 5, 0, true);
+StatusRefreshModule := RiskView.InitiateStatusRefresh(clam[1].LnJ_datasets, gateways, 5, 0, true, StatusRefreshWaitPeriod, IncludeStatusRefreshChecks);
 StatusRefreshResults := StatusRefreshModule.StatusRefresh;
 StatusRefreshRecommendGWError := StatusRefreshModule.RefreshRecommendedGatewayError;
 StatusRefreshGWError := StatusRefreshModule.RefreshGatewayError;

@@ -152,7 +152,7 @@ EXPORT Get_Reporting_Records(DATASET($.Layouts.log_PhoneFinderSearchRecord) pF_R
      SELF.delta_phones_rpt_otherphones     := PROJECT(OtherPhones_Rec, PhoneFinder_Services.Layouts.delta_phones_rpt_otherphones);
      SELF.delta_phones_rpt_identities      := Identity_Recs;
      SELF.delta_phones_rpt_riskindicators  := Final_RiskIndicators;
-     SELF.delta_phones_rpt_sources         := Src_Recs;
+     SELF.delta_phones_rpt_sources         := []; //Blanking out sources table here as temporary fix to the logging issue in DBA
    END;
 
  dFormat2PhoneFinderReport := DATASET([tFormat2PhoneFinderReport()]);

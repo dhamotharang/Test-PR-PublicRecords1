@@ -617,7 +617,7 @@ EXPORT Constants := MODULE
 
   export RIN := MODULE
     export unsigned2 MAX_COUNT_NVP := 1000;
-    export unsigned2 MAX_COUNT_SEARCH_RECORDS := 2000;
+    export unsigned2 MAX_COUNT_SEARCH_RECORDS := 10000;
     export unsigned2 MAX_COUNT_INDICATOR_ATTRIBUTE := 1000;
   end;
 

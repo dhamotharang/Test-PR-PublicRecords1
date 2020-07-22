@@ -70,11 +70,6 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 	boolean isWildcard := search_code & AutoHeaderV2.Constants.SearchCode.ALLOW_WILDCARD;
   boolean isOtherSt1 := ds_search[1].taddress.state_prev_1<>'';
   boolean isOtherSt2 := ds_search[1].taddress.state_prev_2<>'';
-	// Aditional options to support address only search with strict match
-	boolean isSsn  := length(trim(inDataOne(0)[1].ssn))>=4 and STD.Str.FindCount(inDataOne(0)[1].ssn, '0000')=0;
-	boolean isAddrSecRangeStrict := (ds_search[1].tname.fname='' or ds_search[1].tname.lname='') and 
-			ds_search[1].taddress.zip_radius=0 and isStrict and not isSsn and ds_search[1].taddress.sec_range<>'';
-
   inData := DEDUP(SORT(IF(ds_search[1].tssn.fuzzy_ssn and count(ds_search[1].tssn.ssn_set) >1,  inDataSSn,
               inDataOne(0) + IF(isNickNameLink, inDataNickname(0), dataset([],inLayout)))
               + IF(isOtherSt1, inDataOne(1) + IF(isNickNameLink, inDataNickname(1), dataset([],inLayout))) +
@@ -101,10 +96,10 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 		result7 := IF(isWildcard, result6, result6(lname_match_code<>SALT37.MatchCode.WildMatch or (ssn5weight>0 and ssn4weight>0)));
 		result8 := IF(isWildcard, result7, result7(prim_name_match_code<>SALT37.MatchCode.WildMatch or (ssn5weight>0 and ssn4weight>0)));
 		result9 := IF(isWildcard, result8, result8(prim_range_match_code<>SALT37.MatchCode.WildMatch or (ssn5weight>0 and ssn4weight>0)));
-		result10 := IF(isAddrSecRangeStrict, result9(sec_range_match_code=SALT37.MatchCode.ExactMatch), result9);
 		
 		// remove insurance LexIDs
-		result := result10(DID<IDLExternalLinking.Constants.INSURANCE_LEXID and DID>0);
+		result := result9(DID<IDLExternalLinking.Constants.INSURANCE_LEXID and DID>0);
+		
 		// transform in search output		
 		resultfinal := project(result, 
 					transform (AutoheaderV2.layouts.search_out, 
