@@ -25,8 +25,9 @@ GenerateDashboards :=
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
 +'IF(_control.ThisEnvironment.Name <> \'Prod_Thor\'\n'
-+'	,Sequential(FraudGovPlatform_Analytics.GenerateDashboards(False,False,,True),FraudGovPlatform_Analytics.GenerateRinDashboards(False,False,True))\n'
-+'	,Sequential(FraudGovPlatform_Analytics.GenerateDashboards(False,True),FraudGovPlatform_Analytics.GenerateRinDashboards(False,True))\n'
+//GRP-5211 Commented out Old rin dashboards
++'	,Sequential(/*FraudGovPlatform_Analytics.GenerateDashboards(False,False,,True),*/FraudGovPlatform_Analytics.GenerateRinDashboards(False,False,True))\n'
++'	,Sequential(/*FraudGovPlatform_Analytics.GenerateDashboards(False,True),*/FraudGovPlatform_Analytics.GenerateRinDashboards(False,True))\n'
 +		'):failure(IF(_control.ThisEnvironment.Name <> \'Prod_Thor\',email(\'Dev dashboards failed\'),email(\'Cert dashboards failed\')));\n'
 ;
 BuildCoverageDates := 
@@ -60,11 +61,14 @@ BuildStatusReport :=
 
 			
 	Export	All := Sequential(
-										 Build_Keys(pVersion).Delta_All
-										,Build_Base_Kel(pVersion).Delta_All
-										,Promote(pversion).buildfiles.New2Built
-										,Promote(pversion,,true).buildfiles.Built2QA
-										,Build_Keys(pVersion).All
+//GRP-5211 keeping the code for future use.
+/* 										 Build_Keys(pVersion).Delta_All
+   										,Build_Base_Kel(pVersion).Delta_All
+   										,Promote(pversion).buildfiles.New2Built
+   										,Promote(pversion,,true).buildfiles.Built2QA
+   										,
+*/
+										Build_Keys(pVersion).All
 										,Build_Base_Kel(pVersion).All
 										,Promote(pversion).buildfiles.New2Built
 										,Promote(pversion,,true).buildfiles.Built2QA
