@@ -1,4 +1,5 @@
 #workunit('name','Quick Header')
+import header_quick; 
 
 filedate := '';
 
@@ -40,17 +41,6 @@ header.MAC_Best_Address(addr2, did, 4, b)
 header.mac_despray(a, b, full_out)
 
 
-//***//***//***//*** INSERT SUPPRESSION TEXT CNG 20070417***//***//***//***//
-Suppression_Layout := header_services.Supplemental_Data.layout_in;
-
-header_services.Supplemental_Data.mac_verify('didaddress_sup.txt',Suppression_Layout,supp_ds_func);
- 
-Suppression_In := supp_ds_func();
-
-dSuppressedIn := project(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
-
-rHashDIDAddress := header_services.Supplemental_Data.layout_out;
-
 rFullOut := record // Referenced string_rec layout in header.MAC_Despray
  string12 did;
  string12 rid;
@@ -86,6 +76,8 @@ rFullOut := record // Referenced string_rec layout in header.MAC_Despray
  string1  tnt;  
  string1  valid_ssn;
 end;
+full_out_r := project(full_out, rFullOut);
+full_out_suppress := Header.Prep_Build.applyDidAddressSup2(full_out_r);
 
 rFullOut_HashDIDAddress := record
  rFullOut;
