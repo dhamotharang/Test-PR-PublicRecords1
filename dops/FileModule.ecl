@@ -5,7 +5,7 @@ EXPORT FileModule(string esp = ''
 									,string target = ''
 									,string roxieabsolutepatch = '/var/lib/HPCCSystems/hpcc-data/roxie/'
 									,string location = 'uspr' // <country><business> - uspr, usins, ushc
-									,string dopsenv = 'prod'
+									,string dopsenv = dops.constants.dopsenvironment
 									) := module
 									
 	shared getfullesp(string l_esp) := if (~regexfind('http://',l_esp),'http://'+l_esp, l_esp);
