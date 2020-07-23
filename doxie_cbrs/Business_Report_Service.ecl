@@ -112,7 +112,7 @@ EXPORT Business_Report_Service() := MACRO
 		_Include_DunBradstreetRecords_val := _Include_Them_All OR _Include_DunBradstreetRecords OR _Always_Compute;
 		_Include_Properties_val := _Include_Them_All OR _Include_Properties OR _Always_Compute;
 
-		base_records_prs :=doxie_cbrs.all_base_records_prs(doxie_cbrs.getBizReportBDIDs(mod_access).bdids, ssn_mask_val, mod_access);
+		base_records_prs :=doxie_cbrs.all_base_records_prs(doxie_cbrs.getBizReportBDIDs(mod_access).bdids, mod_access);
 
 		doxie_crs.layout_property_ln property_child(doxie_cbrs.layout_property_records l):= TRANSFORM
 		self := l;

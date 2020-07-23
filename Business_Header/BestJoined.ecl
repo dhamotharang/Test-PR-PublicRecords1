@@ -75,7 +75,7 @@ END;
 
 // This join stalls without the seemingly unnecessary distribute.
 bh_best_cn_a_p_f := JOIN(	
-					DISTRIBUTE(bh_best_cn_a_p, HASH(bdid)), bestfein_local,
+					DISTRIBUTE(bh_best_cn_a_p, HASH(bdid)), DISTRIBUTE(bestfein_local, HASH(bdid)),
 					LEFT.bdid = RIGHT.bdid,
 					JoinFEIN(LEFT, RIGHT), LEFT OUTER, HASH, LOCAL);
 
