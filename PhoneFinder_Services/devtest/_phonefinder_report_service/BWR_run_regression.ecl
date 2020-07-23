@@ -8,4 +8,4 @@ svc_layout := PhoneFinder_Services.devtest._phonefinder_report_service.layout;
 testcases := dev_regression.bucket().get(my_query);
 OUTPUT(testcases, NAMED('testcases'));
 
-dev_regression.mac_run_regression(testcases, service_url, svc_layout.request, svc_layout.response);
+dev_regression.mac_run_regression(testcases, svc_layout.request, svc_layout.response, service_url);

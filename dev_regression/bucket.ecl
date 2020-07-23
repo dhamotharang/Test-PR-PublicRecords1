@@ -25,29 +25,29 @@ EXPORT bucket(string logical_group = 'roxiedev') := MODULE
   */
   EXPORT add(DATASET($.layouts.testcase) test_cases, string in_suite = 'standard') := FUNCTION
 
-    super_fname := $.names(logical_group).super_filename;
-    available_test_cases := DATASET(super_fname, $.layouts.testcase, THOR);
+    file := $.names(logical_group);
+    available_test_cases := DATASET(file.current, $.layouts.testcase, THOR);
     n_available_test_cases := COUNT(available_test_cases);
 
-    subfile_count := STD.File.GetSuperFileSubCount(super_fname) : INDEPENDENT;
-    sub_fname := $.names(logical_group).sub_filename(subfile_count);
+    subfile_count := STD.File.GetSuperFileSubCount(file.current) : INDEPENDENT;
+    sub_fname := file.subfile(subfile_count);
     
     test_cases_ready := project(test_cases, transform($.layouts.testcase, 
       SELF.tid := n_available_test_cases + COUNTER;
       _suite := if(left.suite <> '', left.suite, in_suite);
       SELF.suite := STD.STR.ToLowerCase(_suite); 
       SELF.query := STD.STR.ToLowerCase(left.query); 
-      SELF.request_xml := '<Row>' + left.request_xml +'</Row>'; // making sure xml is surrounded by <row>, so fromxml won't fail
-      self.created_by := STD.System.Job.User();
-      self.wuid := STD.System.Job.WUID();
+      SELF.request_xml := $.utils.wrapXML(left.request_xml); // xml MUST be surrounded by <Row></Row> or else fromxml will fail
+      SELF.created_by := STD.System.Job.User();
+      SELF.wuid := STD.System.Job.WUID();
       SELF := LEFT;
     ));
 
-    IF(~STD.File.FileExists(super_fname), FAIL('ERROR: cannot add test cases. Bucket does not exist.'));
+    IF(~STD.File.FileExists(file.current), FAIL('ERROR: cannot add test cases. Bucket does not exist.'));
     RETURN SEQUENTIAL(
       STD.File.StartSuperFileTransaction();
       output(test_cases_ready,, sub_fname, OVERWRITE);
-      STD.File.AddSuperFile(super_fname, sub_fname);    
+      STD.File.AddSuperFile(file.current, sub_fname);    
       STD.File.FinishSuperFileTransaction();
       output('New test file added: ' + sub_fname);
     );
@@ -63,8 +63,8 @@ EXPORT bucket(string logical_group = 'roxiedev') := MODULE
   **
   */
   EXPORT get(string in_query = '', string in_suite = '') := FUNCTION
-    string bucket_super := $.names(logical_group).super_filename;
-    test_cases := DATASET(bucket_super, $.layouts.testcase, THOR);
+    file := $.names(logical_group);
+    test_cases := DATASET(file.current, $.layouts.testcase, THOR);
     RETURN test_cases(
       (in_query = '' OR query = STD.STR.ToLowerCase(in_query)),
       (in_suite = '' OR suite = STD.STR.ToLowerCase(in_suite))
