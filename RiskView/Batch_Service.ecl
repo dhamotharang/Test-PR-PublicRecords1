@@ -274,6 +274,7 @@ search_Results := riskview.Search_Function(valid_inputs,
 	ExcludeStates := ExcludedStates,
 	ExcludeReportingSources := ExcludedReportingSources,
 	IncludeStatusRefreshChecks := IncludeStatusRefreshChecks,
+    DeferredTransactionIDs := DeferredTransactionIDs,
 	StatusRefreshWaitPeriod := StatusRefreshWaitPeriod,
     IsBatch := TRUE
 	);
