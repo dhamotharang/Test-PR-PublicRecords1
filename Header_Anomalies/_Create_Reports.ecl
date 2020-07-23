@@ -36,13 +36,13 @@ Export full_count_reports := Sequential(Parallel( fname_across_file, lname_acros
 Export fname_percentages := Output(Header_Percentages.fname_percentage, Named('fname_percentages')); // Percentages of populated fname per source
 Export lname_percentages := Output(Header_Percentages.lname_percentage, Named('lname_percentages')); // Percentages of populated lname per source 
 Export dob_percenatges   := Output(Header_Percentages.dob_percentage,   Named('dob_percenateges')); // Percentyages of populated dobs per source
-Export ssn_percenatges   := Output(Header_Percentages.ssn_percentage,   Named('ssn_percentages')); // Percentages of populated ssns per source 
+Export ssn_percentages   := Output(Header_Percentages.ssn_percentage,   Named('ssn_percentages')); // Percentages of populated ssns per source 
 Export addressmatch_percentages    := Output(Header_Percentages.addressMatch_percentage,    Named('address_percentages')); // Percentages of populated addresses with specific 
 Export addressmatchall_percentages := Output(Header_Percentages.addressAllMatch_percentage, Named('addressAll_percentages')); // Percentages of populated full addresses that match watchdog
 
 // Full Percentage Report 
 Export full_percentage_reports := Sequential(Parallel( fname_percentages, lname_percentages, dob_percenatges,
-                                             ssn_percenatges, addressmatch_percentages , addressmatchall_percentages ));
+                                             ssn_percentages, addressmatch_percentages , addressmatchall_percentages ));
 
 // Full report that includes results from Full Percentage Report and Full Count Report
 // The ECL system will send an email to the recipients in your email list when the job fails and when it is successfull   

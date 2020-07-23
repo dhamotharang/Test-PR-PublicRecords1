@@ -1,4 +1,4 @@
-﻿IMPORT _control;
+IMPORT _control;
 export Constants := module
 	export dateMask := enum(unsigned1,NONE=0,DAY,MONTH,YEAR,ALL);
 	Export NonSubjectSuppression := ENUM(integer1,notSpecified=0,doNothing,returnRestrictedDescription,returnBlank,returnNameOnly);

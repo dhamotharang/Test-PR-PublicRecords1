@@ -1,11 +1,16 @@
-﻿IMPORT Data_Services,tools; 
+﻿IMPORT _Control;
+IMPORT Data_Services;
+IMPORT STD;
+IMPORT tools; 
 
 EXPORT FileNames := MODULE
   
 SHARED KeySuper     := 'QA' ; 
 SHARED keyFather    := 'FATHER'; 
 EXPORT Baseprefix   :=  '~thor_data400::base::bipv2_suppression';
-EXPORT prefix       :=  '~thor_data400::key::bipv2_suppression';
+
+environment := STD.Str.ToUpperCase(_Control.ThisEnvironment.Name);
+EXPORT prefix       :=  if(environment = 'ALPHA_DEV', Data_Services.foreign_prod, '~' ) + 'thor_data400::key::bipv2_suppression';
 EXPORT Suffix        :=  'seleprox';
 
 EXPORT Baseseleprox            := BASEprefix + '::' + Suffix;

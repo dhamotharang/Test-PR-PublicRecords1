@@ -1,4 +1,4 @@
-import IBehavior, address, ut,emailservice, mdr, _validate, lib_StringLib, entiera;
+﻿import IBehavior, address, ut,emailservice, mdr, _validate, lib_StringLib, entiera;
 export Map_IBehavior_As_Email(version) := function
 
 IBehavior.layouts.layout_consumer t_norm(IBehavior.layouts.layout_consumer le, c) := transform
@@ -27,14 +27,14 @@ Email_Data.Layout_Email.Base t_map_to_common (domain_d pInput) := transform
 	self.did_type         					:= '';
 	self.orig_pmghousehold_id  			:= '';
 	self.orig_pmgindividual_id  		:= '';
-	self.orig_First_Name  					:= stringlib.stringtouppercase(TRIM(TRIM(pinput.First_Name, RIGHT,LEFT) + ' ' + TRIM(pinput.Middle_Initial,RIGHT,LEFT), RIGHT,LEFT));
-	self.orig_Last_Name  						:= stringlib.stringtouppercase(TRIM(pinput.Last_Name,RIGHT,LEFT));
-	self.Orig_Address  							:= stringlib.stringtouppercase(TRIM(StringLib.StringCleanSpaces(pinput.address_line1 + pinput.address_line2), LEFT, RIGHT));
+	self.orig_First_Name  					:= ut.CleanSpacesAndUpper(TRIM(TRIM(pinput.First_Name, RIGHT,LEFT) + ' ' + TRIM(pinput.Middle_Initial,RIGHT,LEFT), RIGHT,LEFT));
+	self.orig_Last_Name  						:= ut.CleanSpacesAndUpper(TRIM(pinput.Last_Name,RIGHT,LEFT));
+	self.Orig_Address  							:= ut.CleanSpacesAndUpper(TRIM(StringLib.StringCleanSpaces(pinput.address_line1 + pinput.address_line2), LEFT, RIGHT));
 	self.Orig_City  								:= pInput.city;
 	self.Orig_State  								:= pInput.state;
 	self.orig_ZIP  									:= pInput.zip_code;
 	self.orig_zip4  								:= pInput.zip_4;
-	self.orig_email 								:= stringlib.stringtouppercase(TRIM(pInput.email_address_1, RIGHT,LEFT));
+	self.orig_email 								:= ut.CleanSpacesAndUpper(TRIM(pInput.email_address_1, RIGHT,LEFT));
 	self.orig_ip  									:= '';
 	self.orig_site  								:= '';
 	self.orig_e360_id  							:= '';
@@ -80,15 +80,15 @@ Email_Data.Layout_Email.Base t_map_to_common (domain_d pInput) := transform
 	
 	self.Date_Vendor_First_Reported :=  (string8)pInput.date_vendor_first_reported;
 	self.Date_Vendor_Last_Reported  := (string8)pInput.date_vendor_last_reported;
-	self.append_email_username 						:= stringlib.stringtouppercase(Fn_Clean_Email_Username(self.orig_email));
-	self.append_domain 										:= stringlib.stringtouppercase(pInput.domain);
-	self.append_domain_type 								:= stringlib.stringtouppercase(pInput.domain_type);
-	self.append_domain_root 								:= stringlib.stringtouppercase(pInput.domain_root);
-	self.append_domain_ext 								:= stringlib.stringtouppercase(pInput.domain_ext);
-	self.append_is_tld_state								:= pInput.is_tld_state;
+	self.append_email_username 						:= ut.CleanSpacesAndUpper(Fn_Clean_Email_Username(self.orig_email));
+	self.append_domain 										:= ut.CleanSpacesAndUpper(Email_Data.Fn_Clean_Email_Domain(input.domain));
+	self.append_domain_type 							:= ut.CleanSpacesAndUpper(pInput.domain_type);
+	self.append_domain_root 							:= ut.CleanSpacesAndUpper(pInput.domain_root);
+	self.append_domain_ext 								:= ut.CleanSpacesAndUpper(pInput.domain_ext);
+	self.append_is_tld_state							:= pInput.is_tld_state;
 	self.append_is_tld_generic 						:= pInput.is_tld_generic;
 	self.append_is_tld_country 						:= pInput.is_tld_country;
-	self.append_is_valid_domain_ext 				:= pInput.is_valid_domain_ext;
+	self.append_is_valid_domain_ext 			:= pInput.is_valid_domain_ext;
 	self.clean_email    						:= trim(self.append_email_username, left, right) + '@' + trim(self.append_domain, left, right);											 
 	self.Email_rec_key    					:= Email_rec_key(self.clean_email ,
 																									 self.clean_address.prim_range ,

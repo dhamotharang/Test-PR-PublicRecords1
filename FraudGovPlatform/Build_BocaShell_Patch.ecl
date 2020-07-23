@@ -9,6 +9,7 @@ shared Build_Kel_Ecl :=
 +'#CONSTANT(\'Platform\',\'FraudGov\');\n'
 +'#OPTION(\'multiplePersistInstances\',FALSE);\n'
 +'#OPTION(\'defaultSkewError\', 1);\n'
++'#OPTION(\'resourceMaxHeavy\', 2);\n'
 +'wuname := \'FraudGov Kel Build\';\n'
 +'#WORKUNIT(\'protect\', true);\n'
 +'#WORKUNIT(\'name\', wuname);\n'

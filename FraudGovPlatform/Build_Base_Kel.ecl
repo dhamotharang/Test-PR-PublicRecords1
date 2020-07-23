@@ -45,7 +45,16 @@ module
 																												,self.industrytype	:=(unsigned)left.industrytype
 																												,Self:=left));
 
-																					
+	shared Base_EntityRules					:= Project(FraudgovKEL.KEL_EventPivot.EntityProfileRules,Transform(Layouts.EntityRules,self:=left));																				
+	
+	shared Base_EntityAttributes		:= Project(FraudgovKEL.KEL_EntityStats,Transform(Layouts.EntityAttributes,self:=left));																				
+
+	shared Base_GraphEdges					:= Project(FraudgovKEL.KEL_GraphPrep.Edges,Transform(Layouts.GraphEdges,self:=left));																				
+
+	shared Base_GraphVertices				:= Project(FraudgovKEL.KEL_GraphPrep.Vertices,Transform(Layouts.GraphVertices,self:=left));																				
+	
+	shared Base_EntityProfile				:= Project(FraudgovKEL.KEL_EventPivot.EventPivotShell,Transform(Layouts.EntityProfile,self:=left));																				
+	
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_customeraddress.New, Base_customeraddress, Build_kel_customeraddress , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_personstats.New, Base_personstats, Build_kel_personstats , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_personevents.New, Base_personevents, Build_kel_personevents , pOverwrite := true);
@@ -59,8 +68,12 @@ module
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_CustomerDashTopEntityStats.New, Base_customerdashtopentitystats, Build_kel_CustomerDashTopEntityStats , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_CustomerDashTopClustersAndElements.New, Base_customerdashtopclustersandelements, Build_kel_CustomerDashTopClustersAndElements , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_CustomerDashTopClusters.New, Base_CustomerDashTopClusters, Build_kel_CustomerDashTopClusters , pOverwrite := true);
-	tools.mac_WriteFile(Filenames(pversion).Base.kel_EntityProfile.New, FraudgovKEL.KEL_PivotIndexPrep.ds_KEL_PivotIndexPrep, Build_kel_EntityProfile , pOverwrite := true);
+	tools.mac_WriteFile(Filenames(pversion).Base.kel_EntityProfile.New, Base_EntityProfile, Build_kel_EntityProfile , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_ConfigAttributes.New, Base_ConfigAttributes, Build_kel_ConfigAttributes , pOverwrite := true);
+	tools.mac_WriteFile(Filenames(pversion).Base.kel_EntityRules.New, Base_EntityRules, Build_kel_EntityRules , pOverwrite := true);
+	tools.mac_WriteFile(Filenames(pversion).Base.kel_EntityAttributes.New, Base_EntityAttributes, Build_kel_EntityAttributes , pOverwrite := true);
+	tools.mac_WriteFile(Filenames(pversion).Base.kel_GraphEdges.New, Base_GraphEdges, Build_kel_GraphEdges , pOverwrite := true);
+	tools.mac_WriteFile(Filenames(pversion).Base.kel_GraphVertices.New, Base_GraphVertices, Build_kel_GraphVertices , pOverwrite := true);
 	//KEL Demo
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_customeraddress_Demo.New, KELOtto.KelFiles.CustomerAddress, Build_kel_customeraddress_Demo , pOverwrite := true);
 	tools.mac_WriteFile(Filenames(pversion).Base.kel_personstats_Demo.New, KELOtto.KelFiles.PersonStats, Build_kel_personstats_Demo , pOverwrite := true);
@@ -93,22 +106,27 @@ module
 // Return
 	export full_build :=
 		 Parallel(
-			 Build_kel_customeraddress,
-			 Build_kel_personstats,
-			 Build_kel_personevents,
-			 Build_kel_customerstats,
-			 Build_kel_CustomerStatsPivot,
-			 Build_kel_fullgraph,
-			 Build_kel_entitystats,
-			 Build_kel_person_associations_stats,
-			 Build_kel_person_associations_details,
-			 Build_kel_entity_scorebreakdown,
-			 Build_kel_CustomerDashTopEntityStats,
-			 Build_kel_CustomerDashTopClustersAndElements,
-			 Build_kel_CustomerDashTopClusters,
+//GRP-5211 keeping the code for future use.
+/* 			 Build_kel_customeraddress,
+   			 Build_kel_personstats,
+   			 Build_kel_personevents,
+   			 Build_kel_customerstats,
+   			 Build_kel_CustomerStatsPivot,
+   			 Build_kel_fullgraph,
+   			 Build_kel_entitystats,
+   			 Build_kel_person_associations_stats,
+   			 Build_kel_person_associations_details,
+   			 Build_kel_entity_scorebreakdown,
+   			 Build_kel_CustomerDashTopEntityStats,
+   			 Build_kel_CustomerDashTopClustersAndElements,
+   			 Build_kel_CustomerDashTopClusters,
+*/
 			 Build_kel_EntityProfile,
-			 Build_kel_ConfigAttributes
-			 
+			 Build_kel_ConfigAttributes,
+			 Build_kel_EntityRules,
+			 Build_kel_EntityAttributes,
+			 Build_kel_GraphEdges,
+			 Build_kel_GraphVertices		 
 		);
 	
 		export full_build_Demo :=

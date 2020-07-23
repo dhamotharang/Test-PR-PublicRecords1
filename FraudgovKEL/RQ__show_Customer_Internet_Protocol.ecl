@@ -3,6 +3,6 @@ IMPORT KEL011 AS KEL;
 IMPORT B_Internet_Protocol,E_Customer,E_Internet_Protocol FROM FraudgovKEL;
 IMPORT * FROM KEL011.Null;
 EXPORT RQ__show_Customer_Internet_Protocol := MODULE
-  SHARED __EE2807250 := B_Internet_Protocol.IDX_Internet_Protocol_UID_Wrapped;
-  EXPORT Res0 := __UNWRAP(__EE2807250);
+  SHARED __EE4316350 := B_Internet_Protocol.IDX_Internet_Protocol_UID_Wrapped;
+  EXPORT Res0 := __UNWRAP(__EE4316350);
 END;

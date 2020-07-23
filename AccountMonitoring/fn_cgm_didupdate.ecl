@@ -1,4 +1,4 @@
-import AccountMonitoring;
+﻿import AccountMonitoring;
 
 EXPORT DATASET(layouts.history) fn_cgm_didupdate(
 		DATASET(AccountMonitoring.layouts.portfolio.base) in_portfolio,
@@ -14,14 +14,14 @@ EXPORT DATASET(layouts.history) fn_cgm_didupdate(
 		// doxie.Key_Did_Rid (pre-filtered in product_files to only return rid <> did recs)
 		Key_Did_Rid := 
 			DISTRIBUTED(
-				AccountMonitoring.product_files.header_files.doxie_key_rid_did, 
+			  AccountMonitoring.product_files.header_files.r_doxie_key_rid_did, 
 				HASH64(rid)
 			);
 			
 		// doxie.Key_Did_Rid_Split (pre-filtered in product_files to only return rid <> did recs)
 		Key_Did_Rid_Split :=
 			DISTRIBUTED(
-				AccountMonitoring.product_files.header_files.doxie_key_rid_did_split, 
+			  AccountMonitoring.product_files.header_files.r_doxie_key_rid_did_split, 
 				HASH64(rid)
 			);
 		

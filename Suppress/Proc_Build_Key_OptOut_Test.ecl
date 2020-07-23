@@ -1,6 +1,6 @@
-// This is used to build OptOut test key until PRTE is ready
+﻿// This is used to build OptOut test key until PRTE is ready
 IMPORT RoxieKeyBuild, dops, _Control;
-export Proc_Build_Key_OptOut_Test(String pVersion) := FUNCTION
+export Proc_Build_Key_OptOut_Test(String pVersion, string pContact ='\' \'') := FUNCTION
 
     filedate := TRIM(pVersion);
 	spray_opt_out_input_file	:= Suppress.fSprayFiles.OptOutSrc(filedate

@@ -97,7 +97,15 @@ daily_plus_full := Full_hogan_Main +  file_update;
 
 // Sort and rollup full file (local)
 
-full_sort := sort(daily_plus_full,record,except process_date,orig_filing_time,local);
+// full_sort := sort(daily_plus_full,record,except process_date,orig_filing_time,local);
+//VC DF-25909
+full_sort := sort(daily_plus_full, 
+                  tmsid ,rmsid,record_code,date_vendor_removed, filing_jurisdiction,filing_state,orig_filing_number,orig_filing_type, 
+                  orig_filing_date,orig_filing_time , case_number,filing_number,filing_type_desc, filing_date , filing_time, vendor_entry_date,judge,case_title, 
+							    filing_book,filing_page,release_date,amount,eviction,satisifaction_type,judg_satisfied_date,judg_vacated_date,tax_code,irs_serial_number,effective_date,
+							    lapse_date,accident_date,sherrif_indc,expiration_date,agencyID,agency_state,agency_county,legal_lot,legal_block,legal_borough,certificate_number,-collection_date,-process_date
+
+                ,local);
 
 
 liensv2.Layout_liens_main_module_for_hogan.layout_liens_main tmakechildren(liensv2.Layout_liens_main_module_for_hogan.layout_liens_main L, liensv2.Layout_liens_main_module_for_hogan.layout_liens_main R) := transform
@@ -109,7 +117,7 @@ end;
 Hogan_main_out := rollup(full_sort, tmsid +rmsid+record_code+date_vendor_removed+ filing_jurisdiction+filing_state+orig_filing_number+orig_filing_type+ 
                               orig_filing_date+orig_filing_time + case_number+filing_number+filing_type_desc+ filing_date + filing_time+ vendor_entry_date+judge+case_title+ 
 							  filing_book+filing_page+release_date+amount+eviction+satisifaction_type+judg_satisfied_date+judg_vacated_date+tax_code+irs_serial_number+effective_date+
-							  lapse_date+accident_date+sherrif_indc+expiration_date+agency+agency_city+agency_state+agency_county+legal_lot+legal_block+legal_borough+certificate_number, tmakechildren(left, right), local);
+							  lapse_date+accident_date+sherrif_indc+expiration_date+agencyID+agency_state+agency_county+legal_lot+legal_block+legal_borough+certificate_number, tmakechildren(left, right), local);
 
 
 full_sort2 := sort(Hogan_main_out,tmsid, rmsid, -process_date, record_code, date_vendor_removed,  filing_jurisdiction, filing_state, orig_filing_number, orig_filing_type,  
