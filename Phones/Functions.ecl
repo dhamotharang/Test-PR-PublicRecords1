@@ -466,8 +466,8 @@ MODULE
 
   EXPORT ParseAccudataCallingName(STRING callingName) := FUNCTION
     callingNameUpper := STD.Str.ToUpperCase(callingName);
-    wordCount := STD.Str.CountWords(callingName, ' ');
-    lastWord := STD.Str.GetNthWord(callingName, WordCount);
+    wordCount := STD.Str.CountWords(callingNameUpper, ' ');
+    lastWord := STD.Str.GetNthWord(callingNameUpper, WordCount);
 
     // A valid calling name must not be blank, and must not be a state abbreviation.
     // State check details: RQ-16410, RR-18039
