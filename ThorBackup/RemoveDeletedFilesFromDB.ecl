@@ -1,4 +1,4 @@
-import ut,dops;
+﻿import ut,dops;
 EXPORT RemoveDeletedFilesFromDB(string environment,integer noofdays = 0
 ,string dopsenv = dops.constants.dopsenvironment) := module
 
@@ -8,7 +8,7 @@ shared desprayfilename := '~yogurt::desrpay::'+regexreplace('-',WORKUNIT[2..],''
 export getlist() := function
 	superlist := sort(thorbackup.Constants.Fulllist(environment),-subname);
 	ds := sort(fileservices.logicalfilelist()(ut.DaysApart(regexreplace('-',modified,'')[1..8],ut.GetDate) > thorbackup.constants.getthreshold(noofdays).ndays),-name);
-	fromdbds := sort(thorbackup.GetDeleteFilesFromDB(,environment,,,,'2'),-filename);
+	fromdbds := sort(thorbackup.GetDeleteFilesFromDB(,environment,,,,'2')(ut.DaysApart(regexreplace('-',modified,'')[1..8],ut.GetDate) > thorbackup.constants.getthreshold(noofdays).ndays),-filename);
 	// files moved to in super
 	typeof(fromdbds) getfilestodelete(superlist l, fromdbds r) := transform
 		self := r;
