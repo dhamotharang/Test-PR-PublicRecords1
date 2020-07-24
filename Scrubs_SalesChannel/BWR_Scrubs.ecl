@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_SalesChannel.BWR_Scrubs - Checking field validity in a file - SALT V3.11.9');
+#workunit('name','Scrubs_SalesChannel.BWR_Scrubs - Checking field validity in a file - SALT V3.11.11');
 IMPORT Scrubs_SalesChannel,SALT311;
 infile := Scrubs_SalesChannel.In_SalesChannel;
 mod_scrubs := Scrubs_SalesChannel.Scrubs;
