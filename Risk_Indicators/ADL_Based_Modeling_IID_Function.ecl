@@ -309,7 +309,7 @@ key_history_did := dx_Gong.key_history_did(data_environment);
 
 temp_CCPA add_gong(temp le, key_history_did rt) := transform
 	self.Global_Sid := rt.Global_Sid;
-	self.did := rt.did;
+	self.did := le.did;
   self.gong_phone10 := rt.phone10;
 	self.gong_current_flag := rt.current_flag;
 	gong_phonescore := risk_indicators.PhoneScore(le.phone10, rt.phone10);
