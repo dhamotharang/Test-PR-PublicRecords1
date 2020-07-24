@@ -1,5 +1,5 @@
 ﻿IMPORT SALT311,STD;
-IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
+IMPORT Scrubs_SalesChannel,Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
@@ -139,31 +139,31 @@ EXPORT Scrubs := MODULE
           ,'aceaid:Invalid_No:ALLOW'
           ,'record_type:Invalid_No:ALLOW'
           ,'rawfields_row_id:Invalid_No:ALLOW'
-          ,'rawfields_company_name:Invalid_AlphaNum:ALLOW'
-          ,'rawfields_web_address:Invalid_AlphaNum:ALLOW'
+          ,'rawfields_company_name:Invalid_PrintableChar:CUSTOM'
+          ,'rawfields_web_address:Invalid_PrintableChar:CUSTOM'
           ,'rawfields_prefix:Invalid_AlphaChars:ALLOW'
-          ,'rawfields_contact_name:Invalid_Alpha:ALLOW'
-          ,'rawfields_first_name:Invalid_Alpha:ALLOW'
-          ,'rawfields_middle_name:Invalid_Alpha:ALLOW'
-          ,'rawfields_last_name:Invalid_Alpha:ALLOW'
-          ,'rawfields_title:Invalid_AlphaChars:ALLOW'
-          ,'rawfields_address:Invalid_AlphaNum:ALLOW'
-          ,'rawfields_address1:Invalid_AlphaNum:ALLOW'
+          ,'rawfields_contact_name:Invalid_PrintableChar:CUSTOM'
+          ,'rawfields_first_name:Invalid_PrintableChar:CUSTOM'
+          ,'rawfields_middle_name:Invalid_PrintableChar:CUSTOM'
+          ,'rawfields_last_name:Invalid_PrintableChar:CUSTOM'
+          ,'rawfields_title:Invalid_PrintableChar:CUSTOM'
+          ,'rawfields_address:Invalid_PrintableChar:CUSTOM'
+          ,'rawfields_address1:Invalid_PrintableChar:CUSTOM'
           ,'rawfields_city:Invalid_Alpha:ALLOW'
           ,'rawfields_state:Invalid_State:ALLOW','rawfields_state:Invalid_State:LENGTHS'
           ,'rawfields_zip_code:Invalid_Zip:ALLOW','rawfields_zip_code:Invalid_Zip:LENGTHS'
           ,'rawfields_country:Invalid_Alpha:ALLOW'
           ,'rawfields_phone_number:Invalid_Float:ALLOW'
-          ,'rawfields_email:Invalid_AlphaNum:ALLOW'
+          ,'rawfields_email:Invalid_PrintableChar:CUSTOM'
           ,'clean_name_title:Invalid_AlphaNum:ALLOW'
           ,'clean_name_fname:Invalid_Alpha:ALLOW'
           ,'clean_name_mname:Invalid_Alpha:ALLOW'
           ,'clean_name_lname:Invalid_Alpha:ALLOW'
           ,'clean_name_name_suffix:Invalid_Alpha:ALLOW'
           ,'clean_name_name_score:Invalid_No:ALLOW'
-          ,'clean_address_prim_range:Invalid_AlphaNum:ALLOW'
+          ,'clean_address_prim_range:Invalid_PrintableChar:CUSTOM'
           ,'clean_address_predir:Invalid_Alpha:ALLOW'
-          ,'clean_address_prim_name:Invalid_AlphaNum:ALLOW'
+          ,'clean_address_prim_name:Invalid_PrintableChar:CUSTOM'
           ,'clean_address_addr_suffix:Invalid_Alpha:ALLOW'
           ,'clean_address_postdir:Invalid_Alpha:ALLOW'
           ,'clean_address_unit_desig:Invalid_AlphaChars:ALLOW'
@@ -536,16 +536,16 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     aceaid_ALLOW_ErrorCount := COUNT(GROUP,h.aceaid_Invalid=1);
     record_type_ALLOW_ErrorCount := COUNT(GROUP,h.record_type_Invalid=1);
     rawfields_row_id_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_row_id_Invalid=1);
-    rawfields_company_name_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_company_name_Invalid=1);
-    rawfields_web_address_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_web_address_Invalid=1);
+    rawfields_company_name_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_company_name_Invalid=1);
+    rawfields_web_address_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_web_address_Invalid=1);
     rawfields_prefix_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_prefix_Invalid=1);
-    rawfields_contact_name_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_contact_name_Invalid=1);
-    rawfields_first_name_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_first_name_Invalid=1);
-    rawfields_middle_name_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_middle_name_Invalid=1);
-    rawfields_last_name_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_last_name_Invalid=1);
-    rawfields_title_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_title_Invalid=1);
-    rawfields_address_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_address_Invalid=1);
-    rawfields_address1_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_address1_Invalid=1);
+    rawfields_contact_name_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_contact_name_Invalid=1);
+    rawfields_first_name_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_first_name_Invalid=1);
+    rawfields_middle_name_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_middle_name_Invalid=1);
+    rawfields_last_name_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_last_name_Invalid=1);
+    rawfields_title_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_title_Invalid=1);
+    rawfields_address_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_address_Invalid=1);
+    rawfields_address1_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_address1_Invalid=1);
     rawfields_city_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_city_Invalid=1);
     rawfields_state_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_state_Invalid=1);
     rawfields_state_LENGTHS_ErrorCount := COUNT(GROUP,h.rawfields_state_Invalid=2);
@@ -555,16 +555,16 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     rawfields_zip_code_Total_ErrorCount := COUNT(GROUP,h.rawfields_zip_code_Invalid>0);
     rawfields_country_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_country_Invalid=1);
     rawfields_phone_number_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_phone_number_Invalid=1);
-    rawfields_email_ALLOW_ErrorCount := COUNT(GROUP,h.rawfields_email_Invalid=1);
+    rawfields_email_CUSTOM_ErrorCount := COUNT(GROUP,h.rawfields_email_Invalid=1);
     clean_name_title_ALLOW_ErrorCount := COUNT(GROUP,h.clean_name_title_Invalid=1);
     clean_name_fname_ALLOW_ErrorCount := COUNT(GROUP,h.clean_name_fname_Invalid=1);
     clean_name_mname_ALLOW_ErrorCount := COUNT(GROUP,h.clean_name_mname_Invalid=1);
     clean_name_lname_ALLOW_ErrorCount := COUNT(GROUP,h.clean_name_lname_Invalid=1);
     clean_name_name_suffix_ALLOW_ErrorCount := COUNT(GROUP,h.clean_name_name_suffix_Invalid=1);
     clean_name_name_score_ALLOW_ErrorCount := COUNT(GROUP,h.clean_name_name_score_Invalid=1);
-    clean_address_prim_range_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_prim_range_Invalid=1);
+    clean_address_prim_range_CUSTOM_ErrorCount := COUNT(GROUP,h.clean_address_prim_range_Invalid=1);
     clean_address_predir_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_predir_Invalid=1);
-    clean_address_prim_name_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_prim_name_Invalid=1);
+    clean_address_prim_name_CUSTOM_ErrorCount := COUNT(GROUP,h.clean_address_prim_name_Invalid=1);
     clean_address_addr_suffix_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_addr_suffix_Invalid=1);
     clean_address_postdir_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_postdir_Invalid=1);
     clean_address_unit_desig_ALLOW_ErrorCount := COUNT(GROUP,h.clean_address_unit_desig_Invalid=1);
@@ -606,9 +606,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.rid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bdid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bdid_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dotid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dotscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dotweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.empid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.empscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.empweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.powid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.powscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.powweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proxid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proxscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proxweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seleid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.selescore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seleweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orgid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orgscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orgweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ultid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ultscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ultweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.did_ALLOW_ErrorCount > 0, 1, 0) + IF(le.did_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawaid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.aceaid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.record_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_row_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_company_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_web_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_prefix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_contact_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_first_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_middle_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_last_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_title_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_address1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_state_Total_ErrorCount > 0, 1, 0) + IF(le.rawfields_zip_code_Total_ErrorCount > 0, 1, 0) + IF(le.rawfields_country_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_phone_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_email_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_title_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_mname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_name_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_name_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_prim_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_prim_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_addr_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_unit_desig_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_sec_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_p_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_v_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_st_Total_ErrorCount > 0, 1, 0) + IF(le.clean_address_zip_Total_ErrorCount > 0, 1, 0) + IF(le.clean_address_zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_cart_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_cr_sort_sz_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_lot_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_lot_order_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_dbpc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_chk_digit_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_rec_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_fips_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_fips_county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_lat_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_long_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_msa_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_blk_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_match_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_err_stat_ALLOW_ErrorCount > 0, 1, 0) + IF(le.global_sid_Total_ErrorCount > 0, 1, 0) + IF(le.record_sid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.current_rec_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.rid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bdid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bdid_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dotid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dotscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dotweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.empid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.empscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.empweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.powid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.powscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.powweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proxid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proxscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proxweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seleid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.selescore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seleweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orgid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orgscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orgweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ultid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ultscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ultweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.did_ALLOW_ErrorCount > 0, 1, 0) + IF(le.did_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawaid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.aceaid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.record_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_row_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_web_address_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_prefix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_contact_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_first_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_middle_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_last_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_title_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_address_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_address1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_state_Total_ErrorCount > 0, 1, 0) + IF(le.rawfields_zip_code_Total_ErrorCount > 0, 1, 0) + IF(le.rawfields_country_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_phone_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_email_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_name_title_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_mname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_name_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_name_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_prim_range_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_address_predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_prim_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_address_addr_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_unit_desig_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_sec_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_p_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_v_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_st_Total_ErrorCount > 0, 1, 0) + IF(le.clean_address_zip_Total_ErrorCount > 0, 1, 0) + IF(le.clean_address_zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_cart_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_cr_sort_sz_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_lot_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_lot_order_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_dbpc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_chk_digit_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_rec_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_fips_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_fips_county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_lat_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_long_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_msa_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_blk_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_match_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_err_stat_ALLOW_ErrorCount > 0, 1, 0) + IF(le.global_sid_Total_ErrorCount > 0, 1, 0) + IF(le.record_sid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.current_rec_ALLOW_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.rid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bdid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bdid_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dotid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dotscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dotweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.empid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.empscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.empweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.powid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.powscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.powweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proxid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proxscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proxweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seleid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.selescore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seleweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orgid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orgscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orgweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ultid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ultscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ultweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.did_ALLOW_ErrorCount > 0, 1, 0) + IF(le.did_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawaid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.aceaid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.record_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_row_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_company_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_web_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_prefix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_contact_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_first_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_middle_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_last_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_title_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_address1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rawfields_zip_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_zip_code_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rawfields_country_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_phone_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_email_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_title_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_mname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_name_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_name_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_prim_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_prim_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_addr_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_unit_desig_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_sec_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_p_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_v_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_st_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_st_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.clean_address_zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_zip_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.clean_address_zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_cart_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_cr_sort_sz_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_lot_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_lot_order_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_dbpc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_chk_digit_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_rec_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_fips_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_fips_county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_lat_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_long_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_msa_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_blk_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_match_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_err_stat_ALLOW_ErrorCount > 0, 1, 0) + IF(le.global_sid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.global_sid_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.record_sid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.current_rec_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.rid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bdid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bdid_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dotid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dotscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dotweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.empid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.empscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.empweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.powid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.powscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.powweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proxid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proxscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.proxweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seleid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.selescore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seleweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orgid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orgscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orgweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ultid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ultscore_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ultweight_ALLOW_ErrorCount > 0, 1, 0) + IF(le.did_ALLOW_ErrorCount > 0, 1, 0) + IF(le.did_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawaid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.aceaid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.record_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_row_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_web_address_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_prefix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_contact_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_first_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_middle_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_last_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_title_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_address_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_address1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawfields_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rawfields_zip_code_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_zip_code_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.rawfields_country_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_phone_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawfields_email_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_name_title_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_mname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_name_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_name_name_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_prim_range_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_address_predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_prim_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.clean_address_addr_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_unit_desig_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_sec_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_p_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_v_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_st_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_st_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.clean_address_zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_zip_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.clean_address_zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_cart_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_cr_sort_sz_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_lot_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_lot_order_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_dbpc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_chk_digit_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_rec_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_fips_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_fips_county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_lat_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_long_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_msa_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_blk_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_geo_match_ALLOW_ErrorCount > 0, 1, 0) + IF(le.clean_address_err_stat_ALLOW_ErrorCount > 0, 1, 0) + IF(le.global_sid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.global_sid_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.record_sid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.current_rec_ALLOW_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -660,31 +660,31 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.aceaid_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.record_type_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.rawfields_row_id_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_company_name_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_web_address_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.rawfields_company_name_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.rawfields_web_address_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.rawfields_prefix_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_contact_name_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_first_name_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_middle_name_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_last_name_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_title_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_address_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_address1_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.rawfields_contact_name_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.rawfields_first_name_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.rawfields_middle_name_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.rawfields_last_name_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.rawfields_title_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.rawfields_address_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.rawfields_address1_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.rawfields_city_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.rawfields_state_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.rawfields_zip_code_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.rawfields_country_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.rawfields_phone_number_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.rawfields_email_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.rawfields_email_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.clean_name_title_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.clean_name_fname_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.clean_name_mname_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.clean_name_lname_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.clean_name_name_suffix_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.clean_name_name_score_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.clean_address_prim_range_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.clean_address_prim_range_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.clean_address_predir_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.clean_address_prim_name_Invalid,'ALLOW','UNKNOWN')
+          ,CHOOSE(le.clean_address_prim_name_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.clean_address_addr_suffix_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.clean_address_postdir_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.clean_address_unit_desig_Invalid,'ALLOW','UNKNOWN')
@@ -713,7 +713,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.record_sid_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.current_rec_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'rid','bdid','bdid_score','dotid','dotscore','dotweight','empid','empscore','empweight','powid','powscore','powweight','proxid','proxscore','proxweight','seleid','selescore','seleweight','orgid','orgscore','orgweight','ultid','ultscore','ultweight','did','did_score','date_first_seen','date_last_seen','date_vendor_first_reported','date_vendor_last_reported','rawaid','aceaid','record_type','rawfields_row_id','rawfields_company_name','rawfields_web_address','rawfields_prefix','rawfields_contact_name','rawfields_first_name','rawfields_middle_name','rawfields_last_name','rawfields_title','rawfields_address','rawfields_address1','rawfields_city','rawfields_state','rawfields_zip_code','rawfields_country','rawfields_phone_number','rawfields_email','clean_name_title','clean_name_fname','clean_name_mname','clean_name_lname','clean_name_name_suffix','clean_name_name_score','clean_address_prim_range','clean_address_predir','clean_address_prim_name','clean_address_addr_suffix','clean_address_postdir','clean_address_unit_desig','clean_address_sec_range','clean_address_p_city_name','clean_address_v_city_name','clean_address_st','clean_address_zip','clean_address_zip4','clean_address_cart','clean_address_cr_sort_sz','clean_address_lot','clean_address_lot_order','clean_address_dbpc','clean_address_chk_digit','clean_address_rec_type','clean_address_fips_state','clean_address_fips_county','clean_address_geo_lat','clean_address_geo_long','clean_address_msa','clean_address_geo_blk','clean_address_geo_match','clean_address_err_stat','global_sid','record_sid','current_rec','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_AlphaChars','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_AlphaChars','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_Alpha','Invalid_State','Invalid_Zip','Invalid_Alpha','Invalid_Float','Invalid_AlphaNum','Invalid_AlphaNum','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_No','Invalid_AlphaNum','Invalid_Alpha','Invalid_AlphaNum','Invalid_Alpha','Invalid_Alpha','Invalid_AlphaChars','Invalid_AlphaNum','Invalid_Alpha','Invalid_Alpha','Invalid_State','Invalid_Zip','Invalid_No','Invalid_AlphaNum','Invalid_Alpha','Invalid_No','Invalid_Alpha','Invalid_No','Invalid_No','Invalid_Alpha','Invalid_No','Invalid_No','Invalid_Float','Invalid_Float','Invalid_No','Invalid_No','Invalid_No','Invalid_AlphaNum','Invalid_Zip','Invalid_No','Invalid_No','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_Date','Invalid_No','Invalid_No','Invalid_No','Invalid_No','Invalid_PrintableChar','Invalid_PrintableChar','Invalid_AlphaChars','Invalid_PrintableChar','Invalid_PrintableChar','Invalid_PrintableChar','Invalid_PrintableChar','Invalid_PrintableChar','Invalid_PrintableChar','Invalid_PrintableChar','Invalid_Alpha','Invalid_State','Invalid_Zip','Invalid_Alpha','Invalid_Float','Invalid_PrintableChar','Invalid_AlphaNum','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_Alpha','Invalid_No','Invalid_PrintableChar','Invalid_Alpha','Invalid_PrintableChar','Invalid_Alpha','Invalid_Alpha','Invalid_AlphaChars','Invalid_AlphaNum','Invalid_Alpha','Invalid_Alpha','Invalid_State','Invalid_Zip','Invalid_No','Invalid_AlphaNum','Invalid_Alpha','Invalid_No','Invalid_Alpha','Invalid_No','Invalid_No','Invalid_Alpha','Invalid_No','Invalid_No','Invalid_Float','Invalid_Float','Invalid_No','Invalid_No','Invalid_No','Invalid_AlphaNum','Invalid_Zip','Invalid_No','Invalid_No','UNKNOWN');
     SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.rid,(SALT311.StrType)le.bdid,(SALT311.StrType)le.bdid_score,(SALT311.StrType)le.dotid,(SALT311.StrType)le.dotscore,(SALT311.StrType)le.dotweight,(SALT311.StrType)le.empid,(SALT311.StrType)le.empscore,(SALT311.StrType)le.empweight,(SALT311.StrType)le.powid,(SALT311.StrType)le.powscore,(SALT311.StrType)le.powweight,(SALT311.StrType)le.proxid,(SALT311.StrType)le.proxscore,(SALT311.StrType)le.proxweight,(SALT311.StrType)le.seleid,(SALT311.StrType)le.selescore,(SALT311.StrType)le.seleweight,(SALT311.StrType)le.orgid,(SALT311.StrType)le.orgscore,(SALT311.StrType)le.orgweight,(SALT311.StrType)le.ultid,(SALT311.StrType)le.ultscore,(SALT311.StrType)le.ultweight,(SALT311.StrType)le.did,(SALT311.StrType)le.did_score,(SALT311.StrType)le.date_first_seen,(SALT311.StrType)le.date_last_seen,(SALT311.StrType)le.date_vendor_first_reported,(SALT311.StrType)le.date_vendor_last_reported,(SALT311.StrType)le.rawaid,(SALT311.StrType)le.aceaid,(SALT311.StrType)le.record_type,(SALT311.StrType)le.rawfields_row_id,(SALT311.StrType)le.rawfields_company_name,(SALT311.StrType)le.rawfields_web_address,(SALT311.StrType)le.rawfields_prefix,(SALT311.StrType)le.rawfields_contact_name,(SALT311.StrType)le.rawfields_first_name,(SALT311.StrType)le.rawfields_middle_name,(SALT311.StrType)le.rawfields_last_name,(SALT311.StrType)le.rawfields_title,(SALT311.StrType)le.rawfields_address,(SALT311.StrType)le.rawfields_address1,(SALT311.StrType)le.rawfields_city,(SALT311.StrType)le.rawfields_state,(SALT311.StrType)le.rawfields_zip_code,(SALT311.StrType)le.rawfields_country,(SALT311.StrType)le.rawfields_phone_number,(SALT311.StrType)le.rawfields_email,(SALT311.StrType)le.clean_name_title,(SALT311.StrType)le.clean_name_fname,(SALT311.StrType)le.clean_name_mname,(SALT311.StrType)le.clean_name_lname,(SALT311.StrType)le.clean_name_name_suffix,(SALT311.StrType)le.clean_name_name_score,(SALT311.StrType)le.clean_address_prim_range,(SALT311.StrType)le.clean_address_predir,(SALT311.StrType)le.clean_address_prim_name,(SALT311.StrType)le.clean_address_addr_suffix,(SALT311.StrType)le.clean_address_postdir,(SALT311.StrType)le.clean_address_unit_desig,(SALT311.StrType)le.clean_address_sec_range,(SALT311.StrType)le.clean_address_p_city_name,(SALT311.StrType)le.clean_address_v_city_name,(SALT311.StrType)le.clean_address_st,(SALT311.StrType)le.clean_address_zip,(SALT311.StrType)le.clean_address_zip4,(SALT311.StrType)le.clean_address_cart,(SALT311.StrType)le.clean_address_cr_sort_sz,(SALT311.StrType)le.clean_address_lot,(SALT311.StrType)le.clean_address_lot_order,(SALT311.StrType)le.clean_address_dbpc,(SALT311.StrType)le.clean_address_chk_digit,(SALT311.StrType)le.clean_address_rec_type,(SALT311.StrType)le.clean_address_fips_state,(SALT311.StrType)le.clean_address_fips_county,(SALT311.StrType)le.clean_address_geo_lat,(SALT311.StrType)le.clean_address_geo_long,(SALT311.StrType)le.clean_address_msa,(SALT311.StrType)le.clean_address_geo_blk,(SALT311.StrType)le.clean_address_geo_match,(SALT311.StrType)le.clean_address_err_stat,(SALT311.StrType)le.global_sid,(SALT311.StrType)le.record_sid,(SALT311.StrType)le.current_rec,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,86,Into(LEFT,COUNTER));
@@ -763,31 +763,31 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.aceaid_ALLOW_ErrorCount
           ,le.record_type_ALLOW_ErrorCount
           ,le.rawfields_row_id_ALLOW_ErrorCount
-          ,le.rawfields_company_name_ALLOW_ErrorCount
-          ,le.rawfields_web_address_ALLOW_ErrorCount
+          ,le.rawfields_company_name_CUSTOM_ErrorCount
+          ,le.rawfields_web_address_CUSTOM_ErrorCount
           ,le.rawfields_prefix_ALLOW_ErrorCount
-          ,le.rawfields_contact_name_ALLOW_ErrorCount
-          ,le.rawfields_first_name_ALLOW_ErrorCount
-          ,le.rawfields_middle_name_ALLOW_ErrorCount
-          ,le.rawfields_last_name_ALLOW_ErrorCount
-          ,le.rawfields_title_ALLOW_ErrorCount
-          ,le.rawfields_address_ALLOW_ErrorCount
-          ,le.rawfields_address1_ALLOW_ErrorCount
+          ,le.rawfields_contact_name_CUSTOM_ErrorCount
+          ,le.rawfields_first_name_CUSTOM_ErrorCount
+          ,le.rawfields_middle_name_CUSTOM_ErrorCount
+          ,le.rawfields_last_name_CUSTOM_ErrorCount
+          ,le.rawfields_title_CUSTOM_ErrorCount
+          ,le.rawfields_address_CUSTOM_ErrorCount
+          ,le.rawfields_address1_CUSTOM_ErrorCount
           ,le.rawfields_city_ALLOW_ErrorCount
           ,le.rawfields_state_ALLOW_ErrorCount,le.rawfields_state_LENGTHS_ErrorCount
           ,le.rawfields_zip_code_ALLOW_ErrorCount,le.rawfields_zip_code_LENGTHS_ErrorCount
           ,le.rawfields_country_ALLOW_ErrorCount
           ,le.rawfields_phone_number_ALLOW_ErrorCount
-          ,le.rawfields_email_ALLOW_ErrorCount
+          ,le.rawfields_email_CUSTOM_ErrorCount
           ,le.clean_name_title_ALLOW_ErrorCount
           ,le.clean_name_fname_ALLOW_ErrorCount
           ,le.clean_name_mname_ALLOW_ErrorCount
           ,le.clean_name_lname_ALLOW_ErrorCount
           ,le.clean_name_name_suffix_ALLOW_ErrorCount
           ,le.clean_name_name_score_ALLOW_ErrorCount
-          ,le.clean_address_prim_range_ALLOW_ErrorCount
+          ,le.clean_address_prim_range_CUSTOM_ErrorCount
           ,le.clean_address_predir_ALLOW_ErrorCount
-          ,le.clean_address_prim_name_ALLOW_ErrorCount
+          ,le.clean_address_prim_name_CUSTOM_ErrorCount
           ,le.clean_address_addr_suffix_ALLOW_ErrorCount
           ,le.clean_address_postdir_ALLOW_ErrorCount
           ,le.clean_address_unit_desig_ALLOW_ErrorCount
@@ -857,31 +857,31 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.aceaid_ALLOW_ErrorCount
           ,le.record_type_ALLOW_ErrorCount
           ,le.rawfields_row_id_ALLOW_ErrorCount
-          ,le.rawfields_company_name_ALLOW_ErrorCount
-          ,le.rawfields_web_address_ALLOW_ErrorCount
+          ,le.rawfields_company_name_CUSTOM_ErrorCount
+          ,le.rawfields_web_address_CUSTOM_ErrorCount
           ,le.rawfields_prefix_ALLOW_ErrorCount
-          ,le.rawfields_contact_name_ALLOW_ErrorCount
-          ,le.rawfields_first_name_ALLOW_ErrorCount
-          ,le.rawfields_middle_name_ALLOW_ErrorCount
-          ,le.rawfields_last_name_ALLOW_ErrorCount
-          ,le.rawfields_title_ALLOW_ErrorCount
-          ,le.rawfields_address_ALLOW_ErrorCount
-          ,le.rawfields_address1_ALLOW_ErrorCount
+          ,le.rawfields_contact_name_CUSTOM_ErrorCount
+          ,le.rawfields_first_name_CUSTOM_ErrorCount
+          ,le.rawfields_middle_name_CUSTOM_ErrorCount
+          ,le.rawfields_last_name_CUSTOM_ErrorCount
+          ,le.rawfields_title_CUSTOM_ErrorCount
+          ,le.rawfields_address_CUSTOM_ErrorCount
+          ,le.rawfields_address1_CUSTOM_ErrorCount
           ,le.rawfields_city_ALLOW_ErrorCount
           ,le.rawfields_state_ALLOW_ErrorCount,le.rawfields_state_LENGTHS_ErrorCount
           ,le.rawfields_zip_code_ALLOW_ErrorCount,le.rawfields_zip_code_LENGTHS_ErrorCount
           ,le.rawfields_country_ALLOW_ErrorCount
           ,le.rawfields_phone_number_ALLOW_ErrorCount
-          ,le.rawfields_email_ALLOW_ErrorCount
+          ,le.rawfields_email_CUSTOM_ErrorCount
           ,le.clean_name_title_ALLOW_ErrorCount
           ,le.clean_name_fname_ALLOW_ErrorCount
           ,le.clean_name_mname_ALLOW_ErrorCount
           ,le.clean_name_lname_ALLOW_ErrorCount
           ,le.clean_name_name_suffix_ALLOW_ErrorCount
           ,le.clean_name_name_score_ALLOW_ErrorCount
-          ,le.clean_address_prim_range_ALLOW_ErrorCount
+          ,le.clean_address_prim_range_CUSTOM_ErrorCount
           ,le.clean_address_predir_ALLOW_ErrorCount
-          ,le.clean_address_prim_name_ALLOW_ErrorCount
+          ,le.clean_address_prim_name_CUSTOM_ErrorCount
           ,le.clean_address_addr_suffix_ALLOW_ErrorCount
           ,le.clean_address_postdir_ALLOW_ErrorCount
           ,le.clean_address_unit_desig_ALLOW_ErrorCount
