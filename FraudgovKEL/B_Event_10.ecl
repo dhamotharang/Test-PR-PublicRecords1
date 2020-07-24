@@ -4,8 +4,8 @@ IMPORT B_Event_11,E_Address,E_Bank,E_Bank_Account,E_Customer,E_Drivers_License,E
 IMPORT * FROM KEL011.Null;
 EXPORT B_Event_10 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_11.__ENH_Event_11) __ENH_Event_11 := B_Event_11.__ENH_Event_11;
-  SHARED __EE110998 := __ENH_Event_11;
-  EXPORT __ST104921_Layout := RECORD
+  SHARED __EE111690 := __ENH_Event_11;
+  EXPORT __ST105613_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
@@ -77,11 +77,11 @@ EXPORT B_Event_10 := MODULE
     KEL.typ.nint _nap__summary_;
     KEL.typ.nint _nas__summary_;
     KEL.typ.nint _cvi_;
-    KEL.typ.nint _addrvalflag_;
+    KEL.typ.nstr _addrvalflag_;
     KEL.typ.nint _fp3__stolenidentityindex_;
     KEL.typ.nint _syntheticidentityindex__v3_;
     KEL.typ.nint _manipulatedidentityindex__v3_;
-    KEL.typ.nint _socsdobflag_;
+    KEL.typ.nstr _socsdobflag_;
     KEL.typ.nint _pwsocsdobflag_;
     KEL.typ.nint _dobmatchlevel_;
     KEL.typ.nint _sourcerisklevel_;
@@ -93,7 +93,7 @@ EXPORT B_Event_10 := MODULE
     KEL.typ.nstr _reason6_;
     KEL.typ.nint _socsvalflag_;
     KEL.typ.nint _drlcvalflag_;
-    KEL.typ.nint _hphonevalflag_;
+    KEL.typ.nstr _hphonevalflag_;
     KEL.typ.nstr _historydatetimestamp_;
     KEL.typ.nkdate _reported__dob_;
     KEL.typ.nkdate _bocashell__addr1__dt__first__seen_;
@@ -308,9 +308,9 @@ EXPORT B_Event_10 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST104921_Layout __ND111615__Project(B_Event_11.__ST105533_Layout __PP109473) := TRANSFORM
-    SELF.T___Src_Class_Type_ := MAP(__T(__OP2(__PP109473.T___Src_Type_,=,__CN(-99997)))=> -99997,__T(__OP2(__PP109473.T___Src_Type_,IN,__CN([6,14])))=>0,__T(__OP2(__PP109473.T___Src_Type_,IN,__CN([4,8,11])))=>1,__T(__OP2(__PP109473.T___Src_Type_,IN,__CN([3,7])))=>2,__T(__OP2(__PP109473.T___Src_Type_,IN,__CN([2,5])))=>3,4);
-    SELF := __PP109473;
+  SHARED __ST105613_Layout __ND112307__Project(B_Event_11.__ST106225_Layout __PP110165) := TRANSFORM
+    SELF.T___Src_Class_Type_ := MAP(__T(__OP2(__PP110165.T___Src_Type_,=,__CN(-99997)))=> -99997,__T(__OP2(__PP110165.T___Src_Type_,IN,__CN([6,14])))=>0,__T(__OP2(__PP110165.T___Src_Type_,IN,__CN([4,8,11])))=>1,__T(__OP2(__PP110165.T___Src_Type_,IN,__CN([3,7])))=>2,__T(__OP2(__PP110165.T___Src_Type_,IN,__CN([2,5])))=>3,4);
+    SELF := __PP110165;
   END;
-  EXPORT __ENH_Event_10 := PROJECT(__EE110998,__ND111615__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_10',EXPIRE(7));
+  EXPORT __ENH_Event_10 := PROJECT(__EE111690,__ND112307__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Event::Annotated_10',EXPIRE(7));
 END;

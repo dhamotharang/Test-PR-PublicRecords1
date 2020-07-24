@@ -5,6 +5,7 @@ IMPORT Std;
 
 #option('multiplePersistInstances', false);
 #option('defaultSkewError', 1);
+#option('resourceMaxHeavy', 2);
 //#option('freezepersists', true);
 
 
@@ -22,7 +23,6 @@ TOPN(t3, 100, -reccount);
 */
 
 
-
 //output(FraudgovKEL.KEL_EventShell.UIStats(ipentitycontextuid in Set_entitycontextuid));
 
 //output(FraudgovKEL.KEL_EventPivot.EventPivotShell);
@@ -33,17 +33,17 @@ TOPN(t3, 100, -reccount);
 ModelingOutput := FraudgovKEL.KEL_EventShell.ModelingStats;
 output(ModelingOutput,,'~fraudgov::deleteme_nd', overwrite);	
 output(ModelingOutput,,'~fraudgov::deleteme_nd_csv', CSV(QUOTE('"')), overwrite);
-
+*/
+/*
 ScoringOutput := FraudgovKEL.KEL_EventPivot.InputWithRules(industrytype = 1029 and customerid = 20995239);
 output(ScoringOutput,,'~fraudgov::deleteme_rules_nd_csv', CSV(QUOTE('"')), overwrite);	
 */
 
 output(FraudgovKEL.KEL_EventPivot.EventPivotShell,,'~fraudgov::eventpivot', overwrite, compressed);
-/*	
 output(FraudgovKEL.KEL_EventPivot.EntityProfileRules,,'~fraudgov::entityrules', overwrite, compressed);
 output(FraudgovKEL.KEL_EntityStats,, '~fraudgov::pivotentitystatsfilter', overwrite, compressed);
 output(FraudgovKEL.KEL_GraphPrep.Edges,,'~fraudgov::rin2::graphedges', overwrite);
 output(FraudgovKEL.KEL_GraphPrep.Vertices,,'~fraudgov::rin2::graphpvertices', overwrite);
-*/
+
 
 //output(FraudgovKEL.KEL_GraphPrep.LinksPrep);

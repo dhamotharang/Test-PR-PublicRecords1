@@ -1329,6 +1329,14 @@
 				trim(kword, left, right) = 'SECO-NIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_SECO_NIC,
 				trim(kword, left, right) = 'BEGC' =>SubGroup_Constants.numKeywordsID.KEYWORD_BEGC,
 				trim(kword, left, right) = 'NLGA' =>SubGroup_Constants.numKeywordsID.KEYWORD_NLGA,
+				trim(kword, left, right) = 'AUATO' =>SubGroup_Constants.numKeywordsID.KEYWORD_AUATO,
+				trim(kword, left, right) = 'MXSAT-DEF' =>SubGroup_Constants.numKeywordsID.KEYWORD_MXSAT_DEF,
+				trim(kword, left, right) = 'DKGA' =>SubGroup_Constants.numKeywordsID.KEYWORD_DKGA,
+				trim(kword, left, right) = 'AUEPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_AUEPA,
+				trim(kword, left, right) = 'SEGA' =>SubGroup_Constants.numKeywordsID.KEYWORD_SEGA,
+				trim(kword, left, right) = 'GRHGC' =>SubGroup_Constants.numKeywordsID.KEYWORD_GRHGC,
+				trim(kword, left, right) = 'ILNBCTF-SO' =>SubGroup_Constants.numKeywordsID.KEYWORD_ILNBCTF_SO,
+				trim(kword, left, right) = 'PRCSR-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_PRCSR_WC,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

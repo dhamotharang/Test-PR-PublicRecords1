@@ -10,6 +10,12 @@ EXPORT proc_build_all(
   ,boolean                                              pDoDemo       = false
 	,string 													                    pToday 		    = bipv2.KeySuffix_mod2.MostRecentWithIngestVersionDate//in case you want to run as of a date in the past.  default to date of newest data.
 
+  ,boolean                                              pDoVanity_Lexid                   = true // BIPV2_Strata.mac_Vanity_Lexid_VS_BIP_ID        
+  ,boolean                                              pDoSingle_Multi_Sourced_IDS       = true // BIPV2_Strata.mac_Single_Multi_Sourced_IDS     
+  ,boolean                                              pDoUnique_Ids                     = true // BIPV2_Strata.mac_Unique_Ids                   
+  ,boolean                                              pDoPostProcess_Stats              = true // BIPV2_QA_Tool.proc_PostProcess_Stats          
+  ,boolean                                              pDogold_seleid_orgid_persistence  = true // BIPV2_Strata.mac_gold_seleid_orgid_persistence
+  ,boolean                                              pDocompare_statuses_and_gold      = true // BIPV2_Tools.compare_statuses_and_gold         
 
 ) :=
 function
@@ -63,14 +69,14 @@ function
   semail := bipv2_build.Send_Emails(pversion,pBuildName := 'BIPV2 Strata Stats').BIPV2FullKeys;
 
   returnresult :=  parallel(
-     if(pDoBiz  = true  ,BuildBizStrat    )
-    ,if(pDoDemo = true  ,BuildDemoStrata  )
-    ,BIPV2_Strata.mac_Vanity_Lexid_VS_BIP_ID        (pversion)
-    ,BIPV2_Strata.mac_Single_Multi_Sourced_IDS      (pversion)
-    ,BIPV2_Strata.mac_Unique_Ids                    (pversion)
-    ,BIPV2_QA_Tool.proc_PostProcess_Stats           (pversion)
-    ,BIPV2_Strata.mac_gold_seleid_orgid_persistence (pversion)
-    ,BIPV2_Tools.compare_statuses_and_gold          (pversion)
+     if(pDoBiz                            = true  ,BuildBizStrat                                            )
+    ,if(pDoDemo                           = true  ,BuildDemoStrata                                          )
+    ,if(pDoVanity_Lexid                   = true  ,BIPV2_Strata.mac_Vanity_Lexid_VS_BIP_ID        (pversion))
+    ,if(pDoSingle_Multi_Sourced_IDS       = true  ,BIPV2_Strata.mac_Single_Multi_Sourced_IDS      (pversion))
+    ,if(pDoUnique_Ids                     = true  ,BIPV2_Strata.mac_Unique_Ids                    (pversion))
+    ,if(pDoPostProcess_Stats              = true  ,BIPV2_QA_Tool.proc_PostProcess_Stats           (pversion))
+    ,if(pDogold_seleid_orgid_persistence  = true  ,BIPV2_Strata.mac_gold_seleid_orgid_persistence (pversion))
+    ,if(pDocompare_statuses_and_gold      = true  ,BIPV2_Tools.compare_statuses_and_gold          (pversion))
     ,semail.BuildSuccess
   ) : failure(semail.BuildFailure)
   ;
