@@ -4,9 +4,9 @@
 
 in_file := VotersV2.Cleaned_Voters_Names_NID;
 
-ut.mac_flipnames(in_file,fname,mname,lname, base_FlipNames)
+// ut.mac_flipnames(in_file,fname,mname,lname, base_FlipNames)
 
-dist_In_Base_File := distribute(base_FlipNames, hash64(source_state, lname, name_suffix, fname, mname, 
+dist_In_Base_File := distribute(in_file, hash64(source_state, lname, name_suffix, fname, mname, 
 																dob, prim_range, prim_name, predir, addr_suffix, postdir,
 																unit_desig, sec_range, p_city_name, st, zip));
 																
@@ -25,7 +25,7 @@ ded_In_base_file  := dedup(sort(dist_In_Base_File, vtid, -process_date,
 													 mail_sec_range, mail_p_city_name, mail_st, mail_ace_zip, 
 													 local)
 													 //uncomment for testing
-													 // :persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID_Sorted_Deduped', SINGLE)
+													 :persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID_Sorted_Deduped', SINGLE)
 													 ;
 
 //#stored('did_add_force','roxi'); // remove or set to 'thor' to put recs through thor
@@ -68,5 +68,5 @@ did_add.MAC_Add_SSN_By_DID(Ds_Voters_WithDID, did, ssn, Out_Voters_WithDidSsn)
 
 export Cleaned_Voters_DID := Out_Voters_WithDidSsn 
 //uncomment for testing purposes
-// : persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID', SINGLE)
+: persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID', SINGLE)
 ;

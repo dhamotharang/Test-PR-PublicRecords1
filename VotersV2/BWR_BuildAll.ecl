@@ -3,7 +3,7 @@
 
 IMPORT std,VotersV2,_Control;
 
-fileDate := '20200709';
+fileDate := '20200619G';
 
 #workunit('name','Voters Build '+fileDate);
 #option('multiplePersistInstances',FALSE);
@@ -17,7 +17,8 @@ clear_main := sequential(FileServices.StartSuperFileTransaction(),
 spray_main := VotersV2.fSprayAndPromoteVoters(fileDate);
 					 
  sequential(
-           clear_main
-           ,spray_main
-					 ,VotersV2.proc_build_all(fileDate)
+           // clear_main
+           // ,spray_main
+					 // ,
+					 VotersV2.proc_build_all(fileDate)
 					 );					 

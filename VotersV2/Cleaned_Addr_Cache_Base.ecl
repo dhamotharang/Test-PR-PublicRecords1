@@ -22,7 +22,7 @@ VotersV2.Layouts_Voters.Layout_Voters_base_new trfInFile(in_File l, unsigned c) 
 																	,Address.Addr2FromComponents(ut.CleanSpacesAndUpper(l.mail_city), ut.CleanSpacesAndUpper(l.mail_state), l.mail_zip[1..5])			
 																	,'');
 	self.prep_addr_line_last := choose(c, temp_res_addr_line_last, temp_mail_addr_line_last);
-	self.title := l.prefix_title;
+	self.title := if(l.title = '',l.prefix_title,l.title);  
 	self.fname := l.first_name;
 	self.mname := l.middle_name;
 	self.lname := l.last_name;
@@ -44,7 +44,7 @@ Infile_Addr_Norm  := NORMALIZE(in_file,
 									 
 // Transform the Maiden Prior name value
 VotersV2.Layouts_Voters.Layout_Voters_base_new trfMaidenPrior(Infile_Addr_Norm l, unsigned c) := transform												 
-	self.lname      := choose(c, trim(l.lname,left,right), trim(l.clean_maiden_pri,left,right));
+	self.lname      := choose(c, trim(l.last_name,left,right), trim(l.clean_maiden_pri,left,right));
 	self.name_type  := choose(c, '','2');
 	self := l;	
 end;
@@ -63,7 +63,7 @@ Infile_Name_Norm  := NORMALIZE(Infile_Addr_Norm
 //Bringing previous base files into the build process
 baseFile := VotersV2.File_Voters_Base + VotersV2.File_MA_Census_Base 
 //uncomment for testing purposes
-// : persist('~thor_data400::persist::voters::BaseFile',SINGLE) 
+: persist('~thor_data400::persist::voters::BaseFile',SINGLE) 
 ;
 
 //Concatenated previous base files with current update
@@ -171,5 +171,5 @@ clean_cache_addr_file := project(dwithAID
 // export Cleaned_Addr_Cache_Base :=  full_norm_file
 export Cleaned_Addr_Cache_Base :=  clean_cache_addr_file
 //uncomment for testing purposes
-// : persist(VotersV2.Cluster+'persist::voters::Cleaned_Addr_Cache_Base',SINGLE)
+: persist(VotersV2.Cluster+'persist::voters::Cleaned_Addr_Cache_Base',SINGLE)
 ;
