@@ -1,4 +1,4 @@
-﻿import ut;
+﻿import ut,STD;
 
 EXPORT AddComponentsToBuild(string			pLoginToken,
 																	string			pBuildName,
