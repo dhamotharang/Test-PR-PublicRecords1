@@ -71,8 +71,14 @@
 		
 	//PROD Dashboards Code End
 	
+  //QA Dashboards
+	dRunProfileDeltaDashboard		:= FraudGovPlatform_Analytics.fnRunProfileDelta();
+	RunProfileDeltaDashboard		:= OUTPUT(dRunProfileDeltaDashboard);
+
 	RETURN PARALLEL(IF(runProd,
 											SEQUENTIAL(CreateSuper,IF(updateDashboard, RunDashboard_Prod), IF(updateFindLeads, RunFindLeadsDashboard_Prod), IF(updateDetailsReport, RunDetailsReport_Prod), IF(updateLinksChart, RunLinksChart_Prod),AddFileToSuper),
 											SEQUENTIAL(RunFindLeadsDashboard, RunDashboard, RunDetailsReport, RunLinksChart)
-											));
+											)
+								, IF(~runProd AND ~updateROSE, SEQUENTIAL(RunProfileDeltaDashboard))
+									);
 END;
