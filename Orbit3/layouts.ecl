@@ -1,4 +1,4 @@
-EXPORT layouts := module
+﻿EXPORT layouts := module
 
 export rPlatformStatus := RECORD
 string PlatformName { xpath('PlatformName')}  ;
@@ -25,12 +25,13 @@ EXPORT OrbitBuildInstancenewLayout	:=	record
 		string										Name														;
 		string										Status														;
 		string										Version														;
-	end;
-	EXPORT InputItem := record
+	end;	
+
+EXPORT InputItem := record
 string ItemName ;
  string SourceName ;
  string ReceiveDateTape ;
  string FilePathName;
  end;
- 	
-end;
+ 
+ end;

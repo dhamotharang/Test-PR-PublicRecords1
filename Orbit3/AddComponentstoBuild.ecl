@@ -1,4 +1,4 @@
-import ut;
+﻿import ut;
 
 EXPORT AddComponentsToBuild(string			pLoginToken,
 																	string			pBuildName,
@@ -33,6 +33,9 @@ rUpdateBuildRequest	:= RECORD
 	END;
 	
 	 rBuildrequest := RECORD
+	 #IF(STD.System.Util.PlatformVersionCheck('7.8')) 
+	 $.Layouts.AdditionalNamespacesLayout;
+	 #END
 		rUpdateBuildRequest	request	{XPATH('request') };
 	END;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
@@ -79,7 +82,12 @@ end;
 		'AddBuildInstanceComponent',
 		rBuildrequest,
 		rStatus,
-		NAMESPACE(Orbit3.EnvironmentVariables.namespace ),
+		#IF(STD.System.Util.PlatformVersionCheck('7.8'))  
+		                                                              ,NAMESPACE($.EnvironmentVariables.NameSpace)
+		#ELSE
+		                                                               ,NAMESPACE($.EnvironmentVariables.NameSpace + ' xmlns:orb="http://lexisnexis.com/Orbit/" xmlns:arr="http://schemas.microsoft.com/2003/10/Serialization/Arrays"  xmlns:i="http://www.w3.org/2001/XMLSchema-instance')
+		#END
+		//NAMESPACE(Orbit3.EnvironmentVariables.namespace ),
 		LITERAL,
 		SOAPACTION(Orbit3.EnvironmentVariables.soapactionprefix + 'PR/AddBuildInstanceComponent'),
 		LOG
