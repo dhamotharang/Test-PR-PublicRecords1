@@ -72,6 +72,7 @@ module
 
 	shared f1_errors:=append_source
 		(	InqLog_ID = 0 
+			or InqLog_ID in [206041,206171,206141,206031, 207231 ,207211,207241]
 			or (_Validate.Date.fIsValid(STD.Str.FindReplace( STD.Str.FindReplace( reported_date,':',''),'-','')[1..8]) = false  
 			or (unsigned)STD.Str.FindReplace( STD.Str.FindReplace( reported_date,':',''),'-','')[1..8] > (unsigned)(STRING8)Std.Date.Today())
 			or reported_by = ''

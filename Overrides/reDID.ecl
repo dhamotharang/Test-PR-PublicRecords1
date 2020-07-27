@@ -1,4 +1,4 @@
-﻿import ut, FCRA, Doxie, RoxieKeyBuild,_Control, AVM_V2, header, data_Services;
+﻿import ut, FCRA, Doxie, RoxieKeyBuild,_Control, AVM_V2, header, data_Services, STD;
 EXPORT reDID(string filedate, boolean runondev = false ) := module
 
 	export ReDID_Wrapper(filetype
@@ -143,6 +143,7 @@ EXPORT reDID(string filedate, boolean runondev = false ) := module
 			return sequential(
 												header.PostDID_HeaderVer_Update('overrides',,roxieip),
 												fileservices.RemoveOwnedSubfiles('~thor_data400::key::rid_did2_qa_foroverride', true)
+												,STD.File.ClearSuperFile('~thor_data400::key::rid_did2_qa_foroverride')
 													);
 	end;
 

@@ -1,6 +1,6 @@
 ﻿import _Control,STD,Dops,FraudGovPlatform_Validation,FraudGovPlatform;
 
-every_2hours := '0 0-23/2 * * *';
+every_hour := '0 0-23/1 * * *';
 
 ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.hthor_Dev,	FraudGovPlatform_Validation.Constants.hthor_Prod);
 
@@ -51,15 +51,15 @@ Dashboard_WUState							:=	FraudGovPlatform.fn_Getwuinfo(Dashboard_WU,'ramps_pro
 LinksChart_WUState						:=	FraudGovPlatform.fn_Getwuinfo(LinksChart_WU,'ramps_prod_esp.risk.regn.net')[1].state;
 DetailsReport_WUState					:=	FraudGovPlatform.fn_Getwuinfo(DetailsReport_WU,'ramps_prod_esp.risk.regn.net')[1].state;
 
-
-Active_RampsWU := If(CustomerDash_WUState in valid_state or ClusterDetails_WUState in valid_state or CustomerDashboard1_1_WUState in valid_state or
+//GRP-5211 Commenting old dashboards check
+Active_RampsWU := If(/*CustomerDash_WUState in valid_state or ClusterDetails_WUState in valid_state or CustomerDashboard1_1_WUState in valid_state or*/
 											FindLeads_WUState in valid_state or Dashboard_WUState in valid_state or LinksChart_WUState in valid_state or
 											DetailsReport_WUState in valid_state ,true,false);
 
 RunJob := If(RIN_CERT_Version=RIN_PROD_Version and RIN_CERT_Version <> Dashboard_Build_version and ~Active_RampsWU,true,false);
 Run_ECL := if(RunJob=true,ECL, 'output(\'Refresh Prod Dashboards Skipped\');\n' );
 
-_Control.fSubmitNewWorkunit(Run_ECL,ThorName):WHEN(CRON(every_2hours))
+_Control.fSubmitNewWorkunit(Run_ECL,ThorName):WHEN(CRON(every_hour))
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
 			,'FraudGov Prod Dashboards Refresh Schedule failure'
 			,FraudGovPlatform_Validation.Constants.NOC_MSG

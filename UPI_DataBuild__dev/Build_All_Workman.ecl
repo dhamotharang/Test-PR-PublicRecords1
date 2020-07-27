@@ -35,7 +35,7 @@ EXPORT  Build_All_Workman(
 														'\npBatchJobID			:= \''+pBatch_JobID+'\';'+
 														'\npAppendOption		:= \''+pAppendOption+'\';' + 
 														'\npReceivingID			:= \''+pReceivingID+'\';' +
-                            '\n#WORKUNIT(\'name\',\'UPI_DataBuild__dev '+runText+' \' + pVersion + \' gcid \' + gcid + \' Batch_JobID \' + pBatchJobID);' +
+                            '\n#WORKUNIT(\'name\',\'UPI_DataBuild '+runText+' \' + pVersion + \' gcid \' + gcid + \' Batch_JobID \' + pBatchJobID);' +
                             '\n#WORKUNIT(\'priority\',\'high\');' +
 														'\n#STORED(\'did_add_force\',\'thor\');' +
                             '\n';
@@ -56,7 +56,7 @@ EXPORT  Build_All_Workman(
                         ,//pStartIteration       = '1'
                         ,//pNumMaxIterations     = '1'
                         ,//pNumMinIterations     = ''
-                        ,pWuPrefix + 'workunit_history::UPI_DataBuild__dev' + trim(step1_Text) //  pOutputFilename
+                        ,pWuPrefix + 'workunit_history::UPI_DataBuild' + trim(step1_Text) //  pOutputFilename
                         ,pWuSuperfile       //  pOutputSuperfile
                         ,//pIngestSetResults  //  pSetResults
                         ,//pStopCondition        = '\'\''
@@ -91,7 +91,7 @@ EXPORT  Build_All_Workman(
                         ,//pStartIteration       = '1'
                         ,//pMaxNumIter                    //  pNumMaxIterations
                         ,//pNumMinIterations     = ''
-                        ,pWuPrefix + 'workunit_history::UPI_DataBuild__dev' + trim(Step2_Text) //  pOutputFilename  :=  
+                        ,pWuPrefix + 'workunit_history::UPI_DataBuild' + trim(Step2_Text) //  pOutputFilename  :=  
                         ,pWuSuperfile                   //  pOutputSuperfile
                         ,//pIterationSetResults           //  pSetResults
                         ,//pIterationStopCondition        //  pStopCondition
@@ -123,7 +123,7 @@ EXPORT  Build_All_Workman(
                         , //  pStartIteration       = '1'											
                         , //  pNumMaxIterations     = '1'
                         , //  pNumMinIterations     = ''
-                        ,pWuPrefix + 'workunit_history::UPI_DataBuild__dev' + trim(Step3_Text) //  pOutputFilename
+                        ,pWuPrefix + 'workunit_history::UPI_DataBuild' + trim(Step3_Text) //  pOutputFilename
                         ,pWuSuperfile   //  pOutputSuperfile
                         , //  pSetResults           = '[]'
                         , //  pStopCondition        = '\'\''

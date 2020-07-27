@@ -50,7 +50,7 @@ EXPORT Update_Base (boolean isDaily = true, boolean isFCRA = true, string pVersi
 						self.dob                  := left.formatted_dob,
 						self.phone_nbr            := left.formatted_phone_nbr,
 						self.eu_phone_nbr         := left.formatted_eu_phone_nbr,
-						self.appended_did         := left.appendadl,
+						self.appended_did         := if(left.appendadl=0,(unsigned)left.lex_id,left.appendadl);
 						self.appended_ssn         := left.appendssn,
 						self.filedate 						:= (unsigned)Inql_FFD.Fn_Get_Current_Version.fcra_input,
 						self.version              := pVersion,

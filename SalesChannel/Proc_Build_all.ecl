@@ -1,4 +1,4 @@
-﻿import tools, _control, Scrubs_SalesChannel;
+﻿import tools, _control, Scrubs_SalesChannel, SalesChannel;
 
 export proc_Build_All(
 
@@ -20,7 +20,7 @@ function
 		 Create_Supers
 		,Spray								(pversion,pServerIP,pDirectory,pFilename,pGroupName,pIsTesting,pOverwrite)
 		,proc_Build_Base			(pversion,pIsTesting,pSprayedFile,pBaseFile	)
-		,scrubs_salesChannel.fn_RunScrubs(pversion)	
+		,scrubs_salesChannel.fn_RunScrubs(pversion, SalesChannel.Email_Notification_Lists().BuildFailure)	
 		,Build_Keys						(pversion).all
 		,proc_Build_Strata		(pversion,pOverwrite,,pIsTesting		)
 		,Promote().Inputfiles.using2used

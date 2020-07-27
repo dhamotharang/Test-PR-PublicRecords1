@@ -1,5 +1,42 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
-EXPORT GenerationMod := MODULE
+IMPORT SALT311;
+EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
+ 
+  // SALT Version info
+  EXPORT salt_VERSION := 'V3.11.4';
+  EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
+  EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
+ 
+  // Core module configuration values
+  EXPORT spc_MODULE := 'Equifax_Business_Data';
+  EXPORT spc_NAMESCOPE := '';
+  EXPORT spc_PROCESS := '';
+  EXPORT spc_PROCLAYOUTS := 'Process__Layouts()';
+  EXPORT spc_IDNAME := 'seleid'; // cluster id (input)
+  EXPORT spc_IDFIELD := 'seleid'; // cluster id (output)
+  EXPORT spc_RIDFIELD := 'rcid'; // record id
+  EXPORT spc_CONFIG := 'Config';
+  EXPORT spc_CONFIGPARAM := FALSE;
+  EXPORT spc_SOURCEFIELD := 'source';
+  EXPORT spc_FILEPREFIX := 'In_';
+  EXPORT spc_FILENAME := 'Base';
+  EXPORT spc_INGESTSTATUS := '';
+  EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:rcid';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_seleid */,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,dt_effective_first,dt_effective_last,process_date,dotid,dotscore,dotweight,empid,empscore,empweight,powid,powscore,powweight,proxid,proxscore,proxweight,selescore,seleweight,orgid,orgscore,orgweight,ultid,ultscore,ultweight,record_type,EFX_ID,EFX_NAME,EFX_LEGAL_NAME,EFX_ADDRESS,EFX_CITY,EFX_STATE,EFX_STATEC,EFX_ZIPCODE,EFX_ZIP4,EFX_LAT,EFX_LON,EFX_GEOPREC,EFX_REGION,EFX_CTRYISOCD,EFX_CTRYNUM,EFX_CTRYNAME,EFX_COUNTYNM,EFX_COUNTY,EFX_CMSA,EFX_CMSADESC,EFX_SOHO,EFX_BIZ,EFX_RES,EFX_CMRA,EFX_CONGRESS,EFX_SECADR,EFX_SECCTY,EFX_SECSTAT,EFX_STATEC2,EFX_SECZIP,EFX_SECZIP4,EFX_SECLAT,EFX_SECLON,EFX_SECGEOPREC,EFX_SECREGION,EFX_SECCTRYISOCD,EFX_SECCTRYNUM,EFX_SECCTRYNAME,EFX_CTRYTELCD,EFX_PHONE,EFX_FAXPHONE,EFX_BUSSTAT,EFX_BUSSTATCD,EFX_WEB,EFX_YREST,EFX_CORPEMPCNT,EFX_LOCEMPCNT,EFX_CORPEMPCD,EFX_LOCEMPCD,EFX_CORPAMOUNT,EFX_CORPAMOUNTCD,EFX_CORPAMOUNTTP,EFX_CORPAMOUNTPREC,EFX_LOCAMOUNT,EFX_LOCAMOUNTCD,EFX_LOCAMOUNTTP,EFX_LOCAMOUNTPREC,EFX_PUBLIC,EFX_STKEXC,EFX_TCKSYM,EFX_PRIMSIC,EFX_SECSIC1,EFX_SECSIC2,EFX_SECSIC3,EFX_SECSIC4,EFX_PRIMSICDESC,EFX_SECSICDESC1,EFX_SECSICDESC2,EFX_SECSICDESC3,EFX_SECSICDESC4,EFX_PRIMNAICSCODE,EFX_SECNAICS1,EFX_SECNAICS2,EFX_SECNAICS3,EFX_SECNAICS4,EFX_PRIMNAICSDESC,EFX_SECNAICSDESC1,EFX_SECNAICSDESC2,EFX_SECNAICSDESC3,EFX_SECNAICSDESC4,EFX_DEAD,EFX_DEADDT,EFX_MRKT_TELEVER,EFX_MRKT_TELESCORE,EFX_MRKT_TOTALSCORE,EFX_MRKT_TOTALIND,EFX_MRKT_VACANT,EFX_MRKT_SEASONAL,EFX_MBE,EFX_WBE,EFX_MWBE,EFX_SDB,EFX_HUBZONE,EFX_DBE,EFX_VET,EFX_DVET,EFX_8a,EFX_8aEXPDT,EFX_DIS,EFX_SBE,EFX_BUSSIZE,EFX_LBE,EFX_GOV,EFX_FGOV,EFX_GOV1057,EFX_NONPROFIT,EFX_MERCTYPE,EFX_HBCU,EFX_GAYLESBIAN,EFX_WSBE,EFX_VSBE,EFX_DVSBE,EFX_MWBESTATUS,EFX_NMSDC,EFX_WBENC,EFX_CA_PUC,EFX_TX_HUB,EFX_TX_HUBCERTNUM,EFX_GSAX,EFX_CALTRANS,EFX_EDU,EFX_MI,EFX_ANC,AT_CERT1,AT_CERT2,AT_CERT3,AT_CERT4,AT_CERT5,AT_CERT6,AT_CERT7,AT_CERT8,AT_CERT9,AT_CERT10,AT_CERTDESC1,AT_CERTDESC2,AT_CERTDESC3,AT_CERTDESC4,AT_CERTDESC5,AT_CERTDESC6,AT_CERTDESC7,AT_CERTDESC8,AT_CERTDESC9,AT_CERTDESC10,AT_CERTSRC1,AT_CERTSRC2,AT_CERTSRC3,AT_CERTSRC4,AT_CERTSRC5,AT_CERTSRC6,AT_CERTSRC7,AT_CERTSRC8,AT_CERTSRC9,AT_CERTSRC10,AT_CERTLEV1,AT_CERTLEV2,AT_CERTLEV3,AT_CERTLEV4,AT_CERTLEV5,AT_CERTLEV6,AT_CERTLEV7,AT_CERTLEV8,AT_CERTLEV9,AT_CERTLEV10,AT_CERTNUM1,AT_CERTNUM2,AT_CERTNUM3,AT_CERTNUM4,AT_CERTNUM5,AT_CERTNUM6,AT_CERTNUM7,AT_CERTNUM8,AT_CERTNUM9,AT_CERTNUM10,AT_CERTEXP1,AT_CERTEXP2,AT_CERTEXP3,AT_CERTEXP4,AT_CERTEXP5,AT_CERTEXP6,AT_CERTEXP7,AT_CERTEXP8,AT_CERTEXP9,AT_CERTEXP10,EFX_FOREIGN,normCompany_Name,normCompany_Type,Norm_Geo_Precision,Exploded_Desc_Corporate_Amount_Precision,Exploded_Desc_Location_Amount_Precision,Exploded_Desc_Public_Co_Indicator,Exploded_Desc_Stock_Exchange,Exploded_Desc_Telemarketablity_Score,Exploded_Desc_Telemarketablity_Total_Indicator,Exploded_Desc_Telemarketablity_Total_Score,Exploded_Desc_Government1057_Entity,Exploded_Desc_Merchant_Type,Exploded_Desc_Busstatcd,Exploded_Desc_CMSA,Exploded_Desc_Corpamountcd,Exploded_Desc_Corpamountprec,Exploded_Desc_Corpamounttp,Exploded_Desc_Corpempcd,Exploded_Desc_Ctrytelcd,NormAddress_Type,Norm_Address,Norm_City,Norm_State,Norm_StateC2,Norm_Zip,Norm_Zip4,Norm_Lat,Norm_Lon,Norm_Geoprec,Norm_Region,Norm_Ctryisocd,Norm_Ctrynum,Norm_Ctryname,clean_company_name,clean_phone,clean_secondary_phone,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,cart,cr_sort_sz';
+  EXPORT spc_HAS_TWOSTEP := TRUE;
+  EXPORT spc_HAS_PARTITION := FALSE;
+  EXPORT spc_HAS_FIELDTYPES := FALSE;
+  EXPORT spc_HAS_INCREMENTAL := TRUE;
+  EXPORT spc_HAS_ASOF := FALSE;
+  EXPORT spc_HAS_NONCONTIGUOUS := FALSE;
+  EXPORT spc_HAS_SUPERFILES := FALSE;
+  EXPORT spc_HAS_CONSISTENT := FALSE;
+  EXPORT spc_HAS_EXTERNAL := FALSE;
+  EXPORT spc_HAS_PARENTS := FALSE;
+  EXPORT spc_HAS_FORCE := FALSE;
+  EXPORT spc_HAS_BLOCKLINK := FALSE;
+ 
+  // The entire spec file
   EXPORT spcString :=
     'OPTIONS:-gn\n'
     + 'MODULE:Equifax_Business_Data\n'
@@ -15,7 +52,7 @@ EXPORT GenerationMod := MODULE
     + 'FIELD:dt_vendor_last_reported:TYPE(UNSIGNED4):RECORDDATE(LAST):0,0\n'
     + 'FIELD:dt_effective_first:RECORDDATE(FIRST):0,0\n'
     + 'FIELD:dt_effective_last:RECORDDATE(LAST):0,0\n'
-    + 'INCREMENTAL:EFFECTIVEDATES(DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST)\n'
+    + 'INCREMENTAL:EFFECTIVEDATES(dt_effective_first, dt_effective_last)\n'
     + '\n'
     + 'FIELD:process_date:DERIVED:0:0\n'
     + 'FIELD:dotid:DERIVED:0,0\n'
@@ -223,12 +260,12 @@ EXPORT GenerationMod := MODULE
     + 'FIELD:AT_CERTEXP8:0,0\n'
     + 'FIELD:AT_CERTEXP9:0,0\n'
     + 'FIELD:AT_CERTEXP10:0,0\n'
-    + 'FIELD:EFX_EXTRACT_DATE:0,0\n'
-    + 'FIELD:EFX_MERCHANT_ID:0,0\n'
-    + 'FIELD:EFX_PROJECT_ID:0,0\n'
+    + '// FIELD:EFX_EXTRACT_DATE:0,0\n'
+    + '// FIELD:EFX_MERCHANT_ID:0,0\n'
+    + '// FIELD:EFX_PROJECT_ID:0,0\n'
     + 'FIELD:EFX_FOREIGN:0,0\n'
-    + 'FIELD:Record_Update_Refresh_Date:0,0\n'
-    + 'FIELD:EFX_DATE_CREATED:0,0\n'
+    + '// FIELD:Record_Update_Refresh_Date:0,0\n'
+    + '// FIELD:EFX_DATE_CREATED:0,0\n'
     + '\n'
     + 'FIELD:normCompany_Name:0,0\n'
     + 'FIELD:normCompany_Type:0,0\n'
@@ -283,7 +320,9 @@ EXPORT GenerationMod := MODULE
     + 'FIELD:cr_sort_sz:DERIVED:0,0'
     ;
  
+  // Structured values
   EXPORT linkpaths := DATASET([
     ],{STRING linkpath;STRING compulsory;STRING optional;STRING bonus;STRING required;STRING search});
  
 END;
+

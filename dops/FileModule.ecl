@@ -1,12 +1,15 @@
 ﻿import lib_fileservices,lib_thorlib,ut,STD;
-EXPORT FileModule(string esp
+EXPORT FileModule(string esp = ''
 									,string port = '8010'
 									,string targettype = ''
 									,string target = ''
+									,string roxieabsolutepatch = '/var/lib/HPCCSystems/hpcc-data/roxie/'
+									,string location = 'uspr' // <country><business> - uspr, usins, ushc
+									,string dopsenv = dops.constants.dopsenvironment
 									) := module
 									
-	shared l_esp := if (~regexfind('http://',esp),'http://'+esp, esp);
-	shared l_roxiepathprefix := '/var/lib/HPCCSystems/hpcc-data/roxie/';
+	shared getfullesp(string l_esp) := if (~regexfind('http://',l_esp),'http://'+l_esp, l_esp);
+	//shared l_roxiepathprefix := roxieabsolutepatch;
 	shared rParts := record
                 string nodeip := '';
                 string dirpath := '';
@@ -19,6 +22,23 @@ EXPORT FileModule(string esp
 	shared rExceptions := record
 		string errormsg{xpath('Exception/Message')}
 	end;
+	
+	export rCopyStatus := record
+			string packagename := '';
+			string packageid := '';
+			set of string tokens := [];
+			string buildversion := '';
+      string superfile := '';
+      string subfile := '';
+      string directory := '';
+      string filemask := '';
+			unsigned4 copiedfileparts := 0;
+      unsigned4 expectedfileparts := 0;
+      unsigned4 pendingpartstocopy := 0;
+      unsigned4 percentcopied := 0;
+			string wuid := '';
+			string whenlastupdated := '';
+		end;
 	
 	export GetFilesInWorkunit(string wuid = WORKUNIT) := function
 		
@@ -40,7 +60,7 @@ EXPORT FileModule(string esp
 			dataset(rOutputFiles) outfiles{xpath('Results/ECLResult')};
 		end;
 	
-		dWUInfoResponse := SOAPCALL(l_esp+':'+port+'/WsWorkunits'
+		dWUInfoResponse := SOAPCALL(getfullesp(esp)+':'+port+'/WsWorkunits'
 													,'WUInfo' 
 													,rWUInfoRequest
 													,dataset(rWUInfoResponse)
@@ -138,7 +158,7 @@ EXPORT FileModule(string esp
 			dataset(rExceptions) exceptions{xpath('Exceptions')};
 		end;
 	
-		dWUInfoResponse := SOAPCALL(l_esp+':'+port+'/FileSpray'
+		dWUInfoResponse := SOAPCALL(getfullesp(esp)+':'+port+'/FileSpray'
 													,'Copy' 
 													,rCopyRequest
 													,dataset(rCopyResponse)
@@ -150,24 +170,35 @@ EXPORT FileModule(string esp
 	
 	end;
 	
-	export dRoxieTopology := dops.modWsTopology(esp,port).fTpTargetClusterQuery(targettype,target) : independent;
-	export dRoxiePackage := dops.GetRoxiePackage(esp,port,target).Keys() : independent;
+	export dRoxieTopology(string l_esp = esp
+												,string l_port = port
+												,string l_target = target
+												,string l_targettype = targettype) := dops.modWsTopology(l_esp,l_port).fTpTargetClusterQuery(l_targettype,l_target);// : independent;
+	export dRoxiePackage(string l_esp = esp
+												,string l_port = port
+												,string l_target = target) := dops.GetRoxiePackage(l_esp,l_port,l_target).Keys();// : independent;
 	
 	export fGetPartsFromRoxie(string p_dirpath
                            ,string p_lasttoken
                            ,string filedali = ''
+													 ,string l_esp = esp
+												,string l_port = port
+												,string l_target = target
+												,string l_targettype = targettype
+												
 													 ) := FUNCTION
 
+		dTopology := dRoxieTopology(l_esp,l_port,l_target,l_targettype);//: independent;
 		
-		rParts xform(dRoxieTopology l, UNSIGNED2 cntr) := TRANSFORM
+		rParts xform(dTopology l, UNSIGNED2 cntr) := TRANSFORM
 			dParts := STD.File.RemoteDirectory(l.netaddress,p_dirpath,p_lasttoken+'._*');
       SELF.nodeip := l.netaddress;
       self.dirpath := p_dirpath;
       self.dFParts := dParts;
     END;
     
-		dGetNodesAndParts := project(dRoxieTopology, xform(left,COUNTER));
-			rParts - dFParts xNormPath(dGetNodesAndParts l, STD.File.FsFilenameRecord r) := transform
+		dGetNodesAndParts := project(dTopology, xform(left,COUNTER));
+		rParts - dFParts xNormPath(dGetNodesAndParts l, STD.File.FsFilenameRecord r) := transform
       self.partname := r.name;
       self := l;
     end;
@@ -177,68 +208,339 @@ EXPORT FileModule(string esp
 		RETURN dNormParts(~regexfind('\\$',partname));
 END;
 
+	export rInputParameters := record
+		string rxesp; // only ip (no port or http)
+		string rxdali; // only ip (no port)
+		string rxtargetcluster;
+		string rxport := '8010';
+		string rxtargettype := 'roxie';
+		string rxpath := '/var/lib/HPCCSystems/hpcc-data/roxie/';
+	end;
+	
+	export rFullRecord := record
+		rInputParameters;
+		rCopyStatus - tokens;
+	end;
+	
+	shared vCopyStatusFileNamePrefix := '~' + location + '::base::roxie::copystatus';
+	
+	shared vDateTime := (string)STD.Date.Today() + (string)STD.Date.CurrentTime(true) : independent;
+	// cannot create a csv with tokens field hence removing it
+	export dCopyStatus() := dataset(vCopyStatusFileNamePrefix,rFullRecord,csv,opt);
 	
 	// file copy status
 	export fGetRoxieFileCopyStatus(
-																string roxiedali
+																string l_roxiedali
+																,string l_esp = esp
+																,string l_port = port
+																,string l_targettype = targettype
+																,string l_target = target
+																
+																,string l_roxiepathprefix = roxieabsolutepatch
 															) := function
 	
-		rCopyStatus := record
-			string packagename := '';
-			string packageid := '';
-			set of string tokens := [];
-			string buildversion := '';
-      string superfile := '';
-      string subfile := '';
-      string directory := '';
-      string filemask := '';
-			unsigned4 copiedfileparts := 0;
-      unsigned4 expectedfileparts := 0;
-      unsigned4 pendingpartstocopy := 0;
-      unsigned4 percentcopied := 0;
-			string wuid := '';
+		dPackage := dRoxiePackage(l_esp,l_port,l_target);// : independent;
+		dGetCopyStatusLocal := dCopyStatus();
+				
+		rCopyStatus xPendingFiles(dPackage l, dGetCopyStatusLocal r) := transform
+			self := l
 		end;
 
-		rCopyStatus xGetTotalFilePartFromDali(dRoxiePackage l) := transform
-                self.expectedfileparts := (unsigned4)STD.File.GetLogicalFileAttribute(if (roxiedali <> '','~foreign::'+roxiedali+'::','~')+l.subfile,'numparts');
-                self := l;
-		end;
-
-		dGetTotalFilePartFromDali := project(dRoxiePackage,xGetTotalFilePartFromDali(left));
+		dPendingFiles := join(dPackage
+													,dGetCopyStatusLocal
+													,left.packageid = right.packageid
+														and left.superfile = right.superfile
+														and left.subfile = right.subfile
+														and right.pendingpartstocopy > 0
+													,xPendingFiles(left,right)
+													,left only
+													);
 		
+		rCopyStatus xCompleted(dGetCopyStatusLocal l, dPackage r) := transform
+			self := l
+		end;
+
+		dCompleted := join(dGetCopyStatusLocal
+													,dPackage
+													,left.packageid = right.packageid
+														and left.superfile = right.superfile
+														and left.subfile = right.subfile
+														and left.pendingpartstocopy = 0
+													,xCompleted(left,right)
+													);
+													
 		rCopyStatusWithParts := record
 			rCopyStatus;
-      dataset(rParts - dFParts) dAllParts;
+      dataset(rParts - dFParts) dAllParts := dataset([],{rParts - dFParts});
 		end;
-
-		rCopyStatusWithParts xCopyStatus(dGetTotalFilePartFromDali l) := transform
+		
+		rCopyStatusWithParts xGetTotalFilePartFromDali(dPendingFiles l) := transform
+				l_tokens := STD.Str.SplitWords(regexreplace('_',l.subfile,'::'),'::');
+			
                 wordcount := STD.Str.CountWords(l.subfile,'::');
                 getlasttoken := STD.Str.GetNthWord(regexreplace('::',l.subfile,' '),wordcount);
                 abspath := l_roxiepathprefix+regexreplace(getlasttoken,regexreplace('::',l.subfile,'/'),'');
-                dGetParts := fGetPartsFromRoxie(abspath,getlasttoken);
-                self.filemask := getlasttoken;
+                self.expectedfileparts := (unsigned4)STD.File.GetLogicalFileAttribute(if (l_roxiedali <> '','~foreign::'+l_roxiedali+'::','~')+l.subfile,'numparts');
+								self.filemask := getlasttoken;
                 self.directory := abspath;
-                self.dAllParts := dGetParts;
-                self.copiedfileparts := count(dedup(dGetParts,partname));
+                //self.dAllParts := dGetParts;
+                //self.copiedfileparts := count(dedup(dGetParts,partname));
+								self.buildversion := dataset(l_tokens,{string tokens})(regexfind('^[0-9]+$',tokens)
+																																				or regexfind('^[0-9]+[a-z]',tokens))[1].tokens;
+								self.tokens := l_tokens;
                 self := l;
 		end;
 
-		dCopyStatus := project(dGetTotalFilePartFromDali,xCopyStatus(left));
-		rCopyStatus xNormRecs(dCopyStatus l, rParts - dFParts r) := transform
-			l_tokens := STD.Str.SplitWords(regexreplace('_',l.subfile,'::'),'::');
-			self.tokens := l_tokens;
-                //self.partname := r.partname;
-                self.pendingpartstocopy := l.expectedfileparts - l.copiedfileparts;
-                self.percentcopied := (l.copiedfileparts / l.expectedfileparts) * 100;
-								self.buildversion := dataset(l_tokens,{string tokens})(regexfind('^[0-9]+$',tokens)
-																																				or regexfind('^[0-9]+[a-z]',tokens))[1].tokens;
-								self.wuid := WORKUNIT;
+		dGetTotalFilePartFromDali := project(dPendingFiles,xGetTotalFilePartFromDali(left));
+		
+		rCopyStatusWithParts xCopyStatus(dGetTotalFilePartFromDali l) := transform
+								
+                dGetParts := fGetPartsFromRoxie(l.directory,l.filemask
+																								,l_esp := l_esp
+																								,l_port := l_port
+																								,l_target := l_target
+																								,l_targettype := targettype);
+                self.dAllParts := dGetParts;
+                self.copiedfileparts := count(dedup(dGetParts,partname));
+								
 								self := l;
 		end;
 
-		dFinalCopyStatus := dedup(sort(normalize(dCopyStatus,left.dAllParts,xNormRecs(left,right)),percentcopied,packageid,superfile,subfile),percentcopied,packageid,superfile,subfile);
+		dCopyStatusWithFileParts := project(dGetTotalFilePartFromDali,xCopyStatus(left));
+		
+		rCopyStatus xNormRecs(dCopyStatusWithFileParts l, rParts - dFParts r) := transform
+			self.pendingpartstocopy := l.expectedfileparts - l.copiedfileparts;
+      self.percentcopied := (l.copiedfileparts / l.expectedfileparts) * 100;
+			self.wuid := WORKUNIT;
+			self := l;
+		end;
 
-		return dFinalCopyStatus;
+		dFinalCopyStatus := dedup(sort(normalize(dCopyStatusWithFileParts,left.dAllParts,xNormRecs(left,right)),percentcopied,packageid,superfile,subfile),percentcopied,packageid,superfile,subfile);
+
+		return dedup(sort(dFinalCopyStatus + dCompleted,percentcopied,packageid,superfile,subfile),percentcopied,packageid,superfile,subfile);
 		
 	end;
+	
+	export fGetCopyStatusByDataset() := function
+		dFullCopy := dCopyStatus();
+		
+		rOverAll := record
+			dFullCopy.rxesp;
+			dFullCopy.packageid;
+			dFullCopy.buildversion;
+			integer pendingpartstocopy := sum(group,dFullCopy.pendingpartstocopy);
+		end;
+
+		return sort(table(dFullCopy
+	                                  ,rOverAll
+									  ,rxesp
+										,packageid
+										,buildversion
+                                      ,few),rxesp,packageid);
+	end;
+	
+	export fUpdateCopyStatus(dataset(rInputParameters) p_inputparams
+															,boolean isDespray = false
+															,string desprayserver = ''
+															,string despraylocation = ''
+															) := function
+			
+			rTemp := record, maxlength(30000)
+				rInputParameters;
+				dataset(rCopyStatus) dCopyStatus;
+			end;
+			rTemp xGetCopyStatus(p_inputparams l) := transform
+				self.dCopyStatus := fGetRoxieFileCopyStatus(l_roxiedali := l.rxdali
+																,l_esp := l.rxesp
+																,l_port := l.rxport
+																,l_targettype := l.rxtargettype
+																,l_target := l.rxtargetcluster
+																
+																,l_roxiepathprefix := l.rxpath);
+																							
+				self := l;
+			end;
+			
+			dGetCopyStatus := project(p_inputparams,xGetCopyStatus(left));
+			
+			rFullRecord xNormalize(dGetCopyStatus l, rCopyStatus r) := transform
+				self.whenlastupdated := vDateTime;
+				self := l;
+				self := r;
+			end;
+			
+			dNormalize := normalize(dGetCopyStatus
+															,left.dCopyStatus
+															,xNormalize(left,right)
+															);
+			
+			return sequential(
+												output(dataset([{WORKUNIT}],{string wuid}),,vCopyStatusFileNamePrefix + '_running',overwrite)
+												,if (~STD.File.SuperFileExists(vCopyStatusFileNamePrefix)
+													,STD.File.CreateSuperFile(vCopyStatusFileNamePrefix))
+												,if (~STD.File.SuperFileExists(vCopyStatusFileNamePrefix + '_delete')
+													,STD.File.CreateSuperFile(vCopyStatusFileNamePrefix + '_delete'))
+												,output(dNormalize,,vCopyStatusFileNamePrefix + '_' + vDateTime,csv,overwrite)
+												,STD.File.ClearSuperFile(vCopyStatusFileNamePrefix + '_delete', true)
+												,STD.File.AddSuperFile(vCopyStatusFileNamePrefix + '_delete',vCopyStatusFileNamePrefix,, true)
+												,STD.File.ClearSuperFile(vCopyStatusFileNamePrefix)
+												,STD.File.AddSuperFile(vCopyStatusFileNamePrefix,vCopyStatusFileNamePrefix + '_' + vDateTime)
+												,if (desprayserver <> '' and despraylocation <> ''
+														,if (isDespray
+																,STD.File.DeSpray(vCopyStatusFileNamePrefix
+																									,desprayserver
+																									,despraylocation
+																									,allowoverwrite := true)
+																,output('No Despray')
+																)
+														,fail(9999,'Despray server or Despray location is empty but isDespray is set to true. Either set isDespray to false or pass despray server and location. Not re-scheduling')
+														)
+													,STD.File.DeleteLogicalFile(vCopyStatusFileNamePrefix + '_running')	
+												);
+	end;
+	
+	export fUpdateCopyStatusinDOPSDB() := function
+		dGetStatus := dCopyStatus();
+		
+		rDBLayout := record
+			string datasetname{xpath('datasetname')};
+			string superkeyname{xpath('superkeyname')};
+			string buildversion{xpath('buildversion')};
+			string locationflag{xpath('locationflag')};
+			string clustername{xpath('clustername')};
+			integer copiedparts{xpath('copiedparts')};
+			integer expectedparts{xpath('expectedparts')};
+			integer pendingpartstocopy{xpath('pendingpartstocopy')};
+			integer percentcopied{xpath('percentcopied')};
+			string statuscode{xpath('statuscode')};
+			string statusdescription {xpath('statusdescription')};
+		end;
+		
+		rDBLayout xDeriveClusterFromPackageName(dGetStatus l) := transform
+			pkgname := STD.Str.SplitWords(l.packagename,'::')[2];
+			self.datasetname := l.packageid;
+			self.superkeyname := l.superfile;
+			self.buildversion := l.buildversion;
+			self.locationflag := dops.constants.location;
+			self.copiedparts := l.copiedfileparts;
+			self.expectedparts := l.expectedfileparts;
+			self.clustername := if (pkgname <> '',STD.Str.SplitWords(pkgname,'_')[2],'');
+			self.statuscode := '';
+			self.statusdescription := '';
+			self := l;
+		end;
+		
+		dDeriveClusterFromPackageName := project(dGetStatus,xDeriveClusterFromPackageName(left));
+		
+		rDBList := record, maxlength(50000)
+			dataset(rDBLayout) DBList{xpath('copystatus')};
+		end;
+		
+		rDBList xDBList(dDeriveClusterFromPackageName L) := transform
+			self.DBList   := DATASET([{ trim(l.datasetname,left,right)
+													,trim(l.superkeyname,left,right)
+													,trim(l.buildversion,left,right)
+													, trim(l.locationflag,left,right)
+													, trim(l.clustername,left,right)
+													, l.copiedparts
+													, l.expectedparts
+													, l.pendingpartstocopy
+													, l.percentcopied
+													,''
+													,''}]
+													, rDBLayout);
+			self := L;
+		end;
+
+		dDBList := project(dDeriveClusterFromPackageName, xDBList(left));
+
+		rDBInfoRequest := record, maxlength(50000)
+			dataset(rDBList) ulist{xpath('ulist')} := dDBList;
+			
+		end;
+		
+		rSOAPResponse := SOAPCALL(
+				
+				dops.constants.prboca.serviceurl(dopsenv),
+				////////////////////////////////////////////////////
+				// to check the soap xml use local machine IP and run soapplus -s -p 4546
+				// 'http://10.176.152.60:4546/',
+				//'http://10.176.152.26:4546/',
+				////////////////////////////////////////////////////
+				'UpdateCopyStatus',
+				rDBInfoRequest,
+				dataset(rDBList),
+				xpath('UpdateCopyStatusResponse/UpdateCopyStatusResult'),
+				NAMESPACE('http://lexisnexis.com/'),
+				LITERAL,
+				SOAPACTION('http://lexisnexis.com/UpdateCopyStatus'));
+		
+		rGetKey := record
+			string l_location;
+			dataset(rDBLayout) ulist;
+		end;
+		
+		rGetKey xGetKey(rSOAPResponse l) := transform
+			self.ulist := l.DBList;
+			self.l_location := location;
+			//self := l;
+			//self.l_buildversion := l_buildversion;
+		end;
+		
+		dGetKey := project(rSOAPResponse,xGetKey(left));
+		
+		rDBLayout xNormRecs(dGetKey l,rDBLayout r) := transform
+			self := r;
+		end;
+		
+		dNormRecs := normalize(dGetKey, left.ulist, xNormRecs(left,right));
+		
+		return if (count(dGetStatus) > 0, dNormRecs, dataset([],rDBLayout));
+	end;
+	
+	export runCopyStatusUpdate(dataset(rInputParameters) dEnvironments
+																,boolean isDespray
+																,string desprayserver
+																,string despraylocation
+																,string pThorESP = 'prod_esp.br.seisint.com'
+																,string pThorPort = '8010'
+																,string receiveemail = ''
+																,string senderemail = ''
+																) := if (regexfind('hthor',STD.System.Job.Target())
+																				,if (~STD.File.FileExists(vCopyStatusFileNamePrefix + '_running')	
+																						,sequential(fUpdateCopyStatus(dEnvironments
+																													,isDespray
+																													,desprayserver
+																													,despraylocation)
+																												,output(choosen(fUpdateCopyStatusinDOPSDB(),all))
+																												)
+																						,output('Another job running or ' + vCopyStatusFileNamePrefix + '_running was not deleted after completion or failure')
+																					 )
+																				,fail(9999,'Run on *hthor* cluster, not re-scheduling')
+																		) : failure (
+																		sequential(
+																		STD.File.DeleteLogicalFile(vCopyStatusFileNamePrefix + '_running')	
+																		,STD.System.Email.SendEmail
+																				(
+																					receiveemail
+																					,'[RPT]: ' + STD.Str.ToUpperCase(location) + ' CERT COPY STATUS FAILED'
+																					,'ESP:' + pThorESP
+																								+ '; Workunit: ' 
+																								+ WORKUNIT 
+																								+ '; '
+																								+ '\r\n' 
+																								+ 'ERROR: ' + failmessage + '. Re-scheduled job automatically.'
+																					,
+																					,
+																					,senderemail
+																				)
+																		
+																		,if (failcode <> 9999
+																				,output(dops.WorkUnitModule(pThorESP,pThorPort).fSubmitNewWorkunit(
+																						dops.WorkUnitModule(pThorESP,pThorPort).GetWUInfo(WORKUNIT)[1].ecltext
+																						,STD.System.Job.Target()))
+																				,output('not spawning')
+																				)
+																		));
+	
 end;

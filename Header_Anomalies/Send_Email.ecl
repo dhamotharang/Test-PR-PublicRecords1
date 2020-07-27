@@ -1,4 +1,4 @@
-Import STD, _Control, VersionControl;
+Import STD;
 
 Export Send_Email := Module
 

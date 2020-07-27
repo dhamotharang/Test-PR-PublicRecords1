@@ -1,8 +1,11 @@
-﻿import BIPV2;
-import tools;
-import BIPV2_PostProcess;
+﻿import tools;
 
-export Key_LinkIds(string   pversion  = '' ,boolean	pUseOtherEnvironment	= tools._Constants.IsDataland) := module
+export Key_LinkIds(
+   string   pversion              = '' 
+  ,boolean	pUseOtherEnvironment	= tools._Constants.IsDataland
+) := 
+module
+  
   shared superfile_name   := keynames(, pUseOtherEnvironment).seg_linkids.qa;
 	
 	shared headerRecs     := BIPV2.CommonBase.DS_Clean;

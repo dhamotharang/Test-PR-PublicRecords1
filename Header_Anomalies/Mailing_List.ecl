@@ -1,6 +1,5 @@
 // In this module we store all of the emails used in the Send_Email module
 
-Import _Control, RoxieKeyBuild;
 
 Export Mailing_List := Module
     

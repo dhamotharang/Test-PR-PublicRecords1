@@ -2,6 +2,7 @@
 import STD;
 import BIPV2;
 import Bipv2_Best;
+import BIPV2_Statuses;
 
 EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
                     dataset(Bipv2_Best.Layouts.base) best_raw,
@@ -14,8 +15,13 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
 	 // The following 3 lines removes those from the stats. - see Bob Pressel
 	 raw_cleaned := BIPV2.CommonBase.clean(header_rec);
 	 null_cleaned := BIPV2.CommonBase.clean(dataset([],BIPV2.CommonBase.Layout));
-  clean_adjusted := join(raw_cleaned, null_cleaned, left=right, left only, lookup); 
+  shared clean_adjusted := join(raw_cleaned, null_cleaned, left=right, left only, lookup); 
   shared header_clean := distribute(clean_adjusted, hash32(seleid)): independent;
+  
+  // -- recalc new gold
+  shared ds_recalc_gold_clean := BIPV2_Statuses.mac_Calculate_Gold(clean_adjusted);
+  shared header_clean_newgold := distribute(ds_recalc_gold_clean, hash32(seleid)): independent;
+  shared header_rec_newgold   := distribute(join(header_raw,table(ds_recalc_gold_clean(sele_gold = 'G')  ,{seleid} ,seleid ,merge),left.seleid = right.seleid  ,transform(recordof(left),self.sele_gold := if(right.seleid != 0,'G',''),self := left ),left outer ,hash) ,hash32(seleid));
  
   shared header_layout := Bipv2.commonbase.layout;
   shared seleidType := typeof(header_layout.seleid);
@@ -24,6 +30,7 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
     String state;
     header_layout.sele_gold;
     header_layout.seleid_status_private;
+    header_layout.seleid_status_private_score;
     header_layout.seleid_status_public;
     header_layout.source;
   };
@@ -397,15 +404,19 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
     self := l;
   end;
  	
-  shared clean_slim_recs := project(header_clean, toSlimTrans(left), local);
-  export raw_slim_recs := project(header_rec, toSlimTrans(left), local);
+  shared clean_slim_recs          := project(header_clean           , toSlimTrans(left), local);
+  shared clean_slim_recs_newgold  := project(header_clean_newgold   , toSlimTrans(left), local);
+  export raw_slim_recs            := project(header_rec             , toSlimTrans(left), local);
+  export raw_slim_recs_newgold    := project(header_rec_newgold     , toSlimTrans(left), local);
 
-  stateInfo := determineStatesForSeleids(header_rec);
-  export all_clean_recs_with_state := join(clean_slim_recs, stateInfo, left.seleid=right.seleid, 
-                   transform(slim_rec, self.state:=right.state, self:=left;), left outer, local); 
- 
+  shared stateInfo                  := determineStatesForSeleids(header_rec);
+  export all_clean_recs_with_state  := join(clean_slim_recs, stateInfo, left.seleid=right.seleid, transform(slim_rec, self.state:=right.state, self:=left;), left outer, local); 
   export gold_clean_recs_with_state := all_clean_recs_with_state(sele_gold='G');
  
+  shared stateInfo_newgold                  := determineStatesForSeleids(header_rec_newgold);
+  export all_clean_recs_with_state_newgold  := join(clean_slim_recs_newgold, stateInfo_newgold, left.seleid=right.seleid, transform(slim_rec, self.state:=right.state, self:=left;), left outer, local); 
+  export gold_clean_recs_with_state_newgold := all_clean_recs_with_state_newgold(sele_gold='G');
+
   shared MONTHS_6  := 183;
   shared MONTHS_12 := 365;
   shared MONTHS_18 := 548;
@@ -790,10 +801,13 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
   export allStats  := calculateStatsByState(all_clean_recs_with_state,  'All');
   export goldStats := calculateStatsByState(gold_clean_recs_with_state, 'Gold');
  
-  segDsCleanCatagories := BIPV2_PostProcess.segmentation_category.perSeleid(header_clean, (string) reportDate); 
-  noSegRecords := join(header_rec, segDsCleanCatagories, left.seleid=right.seleid, transform(left), left only, local);
-  noSegOnlyCatagories := BIPV2_PostProcess.segmentation_category.perSeleid(distribute(noSegRecords,hash32(seleid)), (string) reportDate);  
-  segCatagories := segDsCleanCatagories + noSegOnlyCatagories;
+  export allStats_newgold  := calculateStatsByState(all_clean_recs_with_state_newgold,  'All');
+  export goldStats_newgold := calculateStatsByState(gold_clean_recs_with_state_newgold, 'Gold');
+
+  segDsCleanCatagories  := BIPV2_PostProcess.segmentation_category.perSeleid(header_clean, (string) reportDate); 
+  noSegRecords          := join(header_rec, segDsCleanCatagories, left.seleid=right.seleid, transform(left), left only, local);
+  noSegOnlyCatagories   := BIPV2_PostProcess.segmentation_category.perSeleid(distribute(noSegRecords,hash32(seleid)), (string) reportDate);  
+  shared segCatagories  := segDsCleanCatagories + noSegOnlyCatagories;
 	
   shared generateSegStats(dataset(slim_rec) slim) := function
 					 SC := BIPV2_PostProcess.segmentation_category;
@@ -817,25 +831,104 @@ EXPORT EntityReport(dataset(BIPV2.CommonBase.Layout) header_raw,
   export rawSegStats   := generateSegStats(raw_slim_recs);
   export cleanSegStats := generateSegStats(clean_slim_recs);
 	
-  export segSortOrder(x) := functionmacro
-             return sort(x, state='NO SEG', state='Defunct', state='Inactive Noise', state='Inactive H-Merge', state='Inactive Valid', state='Active Noise',state='Active C-Merge', state='Active Valid', state='Gold', state='ALL');
-    endmacro;
+  segDsCleanCatagories_newgold  := BIPV2_PostProcess.segmentation_category.perSeleid(header_clean_newgold, (string) reportDate  ,true); 
+  noSegRecords_newgold          := join(header_rec_newgold, segDsCleanCatagories_newgold, left.seleid=right.seleid, transform(left), left only, local);
+  noSegOnlyCatagories_newgold   := BIPV2_PostProcess.segmentation_category.perSeleid(distribute(noSegRecords_newgold,hash32(seleid)), (string) reportDate ,true);  
+  shared segCatagories_newgold  := segDsCleanCatagories_newgold + noSegOnlyCatagories_newgold;
+
+// -- use new active status score fields in categories
+  shared generateSegStats_withscores(dataset(slim_rec) slim) := 
+  function
+    SC := BIPV2_PostProcess.segmentation_category;
+    allRecsWithSeg := join(slim, segCatagories_newgold, left.seleid=right.seleid, 
+      transform(recordof(slim),
+        self.state := map(
+            right.seleid    = 0                                                                         => 'NO SEG'
+           ,right.category  = SC.category.Gold                                                          => 'Gold'
+           ,right.category  = SC.category.Active    and right.subCategory = SC.subCategory.High_Valid   => 'Active High Valid'
+           ,right.category  = SC.category.Active    and right.subCategory = SC.subCategory.Medium_Valid => 'Active Medium Valid'
+           ,right.category  = SC.category.Active    and right.subCategory = SC.subCategory.Low_Valid    => 'Active Low Valid'
+           ,right.category  = SC.category.Active    and right.subCategory = SC.subCategory.C_Merge      => 'Active C-Merge'
+           ,right.category  = SC.category.Active    and right.subCategory = SC.subCategory.Noise        => 'Active Noise'
+           ,right.category  = SC.category.Inactive  and right.subCategory = SC.subCategory.Valid        => 'Inactive Valid'
+           ,right.category  = SC.category.Inactive  and right.subCategory = SC.subCategory.H_Merge      => 'Inactive H-Merge'
+           ,right.category  = SC.category.Inactive  and right.subCategory = SC.subCategory.Noise        => 'Inactive Noise'
+           ,right.category  = SC.category.Defunct                                                       => 'Defunct'
+           ,                                                                                               'BLANK'
+        );
+        self := left;),
+      left outer, keep(1), local);
+    return calculateStatsByState(allRecsWithSeg, 'Seg');
+  end;
+	 
+  export rawSegStats_scores   := generateSegStats_withscores(raw_slim_recs_newgold   );
+  export cleanSegStats_scores := generateSegStats_withscores(clean_slim_recs_newgold );
+
+  export segSortOrder(x) := 
+  functionmacro
+             return sort(x
+              ,state='NO SEG'
+              ,state='Defunct'
+              ,state='Inactive Noise'
+              ,state='Inactive H-Merge'
+              ,state='Inactive Valid'
+              ,state='Active Noise'
+              ,state='Active C-Merge'
+              ,state='Active Valid'
+              ,state='Gold'
+              ,state='ALL'
+  );
+  endmacro;
 
   export formatBySegment(dataset(report_rec) report) := function
         format := project(report, {report_rec -SBFE -source_type_rec}); 
         return segSortOrder(format);
   end;
 		
+  export segSortOrder_new(x) := 
+  functionmacro
+             return sort(x
+              ,state='NO SEG'
+              ,state='Defunct'
+              ,state='Inactive Noise'
+              ,state='Inactive H-Merge'
+              ,state='Inactive Valid'
+              ,state='Active Noise'
+              ,state='Active C-Merge'
+              ,state='Active Valid'
+              ,state='Active Low Valid'
+              ,state='Active Medium Valid'
+              ,state='Active High Valid'
+              ,state='Gold'
+              ,state='ALL'
+  );
+  endmacro;
+
+  export formatBySegment_new(dataset(report_rec) report) := function
+        format := project(report, {report_rec -SBFE -source_type_rec}); 
+        return segSortOrder_new(format);
+  end;
+
   export formatBySegmentSourceMakeup(dataset(report_rec) report) := function
       format := project(report, transform({report.state, report.records,	report.seleids, source_type_rec}, self:=left)); 
       return segSortOrder(format);
 		end ;
 
-		export formatBySegmentSourceMakeupSBFE(dataset(report_rec) report) := function
+	export formatBySegmentSourceMakeupSBFE(dataset(report_rec) report) := function
 						format := project(report, transform({report.state, report.records,	report.seleids, source_type_rec, report.SBFE}, self:=left)); 
 						return segSortOrder(format);
   end ;
 	
+  export formatBySegmentSourceMakeup_new(dataset(report_rec) report) := function
+      format := project(report, transform({report.state, report.records,	report.seleids, source_type_rec}, self:=left)); 
+      return segSortOrder_new(format);
+		end ;
+
+	export formatBySegmentSourceMakeupSBFE_new(dataset(report_rec) report) := function
+						format := project(report, transform({report.state, report.records,	report.seleids, source_type_rec, report.SBFE}, self:=left)); 
+						return segSortOrder_new(format);
+  end ;
+
   export formatCntActiveOnly(dataset(report_rec) report) := function 
       return project(report, {report_rec -seleids -SBFE -Inactive_Private -Defunct_Private -recent_defunct_2to3y -recent_defunct_3to5y -recent_defunct_5y_plus -recent_inactive_2to3y -recent_inactive_3to5y -recent_inactive_5y_plus -recent_unknown -source_type_rec });
 		end ;

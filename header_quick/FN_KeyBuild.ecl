@@ -14,48 +14,7 @@ EXPORT FN_KeyBuild(
 
 	header_in := PROJECT(header_in0,t_set_src(left));
 
-	Suppression_Layout := suppress.ApplyRegulatory.layout_in;
-	header_services.Supplemental_Data.mac_verify('didaddress_sup.txt',Suppression_Layout,supp_ds_func); 
- 
-	Suppression_In := supp_ds_func();
-
-	dSuppressedInOut := PROJECT(Suppression_In, suppress.Applyregulatory.in_to_out(left));
-
-	rHashDIDAddress := header_services.Supplemental_Data.layout_out;
-
-	rFullOut_HashDIDAddress := RECORD
-		header.Layout_Header;
-		rHashDIDAddress;
-	END;
-
-	//***//***// TEST CODE FOR SUPPRESSION - 20070605
-
-	rFullOut_HashDIDAddress tHashDIDAddress(header_in l) := TRANSFORM                            
-		self.hval :=  hashmd5(
-			intformat(l.did,15,1),
-			(STRING)l.st,
-			(STRING)l.zip,
-			(STRING)l.city_name,
-			(STRING)l.prim_name,
-			(STRING)l.prim_range,
-			(STRING)l.predir,
-			(STRING)l.suffix,
-			(STRING)l.postdir,
-			(STRING)l.sec_range
-		);
-		self := l;
-	END;
-
-dHeader_withMD5 := PROJECT(header_in, tHashDIDAddress(left));
-
-header.Layout_Header tSuppress(dHeader_withMD5 l, dSuppressedInOut r) := TRANSFORM
-	self := l;
-END;
-
-full_out_suppress := join(dHeader_withMD5,dSuppressedInOut,
-                          left.hval=right.hval,
-						  tSuppress(left,right),
-						  left only,lookup);
+	full_out_suppress :=  Header.Prep_Build.applyDidAddressSup(header_in);						  	
 
 full_ShortSuppress := DriversV2.Regulatory.applyDriversLicenseSup_DIDVend(full_out_suppress);
 
@@ -125,34 +84,7 @@ dsModified := PROJECT(supplementalData(), ReformatInput(LEFT));
 full_LongSuppress_pre := j1 + dsModified;
 /////////////////////////////////////////////////////////
 
-layout_ff := Record
-     data16 hval_did ;
-     data16 hval_ssn ;
-		 string1 nl := '\n' ;
-END ;
-
-header_services.Supplemental_Data.mac_verify('ff_sup.txt',layout_ff, ff_sup_attr); // 
- 
-Base_ff_sup := ff_sup_attr();
-
-
-full_LongSuppress_1 := JOIN(full_LongSuppress_pre, Base_ff_sup,
-                    hashmd5((string9)left.ssn) = right.hval_ssn 
-                    AND
-						  hashmd5(intformat(left.did,15,1)) != right.hval_did, 
-						TRANSFORM(LEFT),
-						LEFT ONLY, ALL) ;
-						
-header_services.Supplemental_Data.mac_verify('ridrec_sup.txt',Suppression_Layout, base_sup_attr); // 
- 
-Base_rid_sup_in := base_sup_attr() ;
-
-base_rid_sup := PROJECT(Base_rid_sup_in ,header_services.Supplemental_Data.in_to_out(left));
-
-rid_base := JOIN(full_LongSuppress_1, base_rid_sup,
-                 hashmd5(intformat((unsigned6)left.rid,15,1)) = right.hval,                    
-						     TRANSFORM(LEFT),
-						    LEFT ONLY, ALL) ;
+rid_base :=  Header.Prep_Build.applyRidRecSup(full_LongSuppress_pre);						  	
 						 
 						  
 full_LongSuppress := 	rid_base ;						
@@ -173,8 +105,8 @@ PromoteSupers.mac_sf_buildprocess(head_out,'~thor_data400::base::quick_header',b
 //just keys
 autoKeys := header_quick.FN_AutokeyBuild(file_header_quick_skip_PID, filedate);
 
-     didkey := FN_key_DID(file_header_quick_skip_PID,                                 '~thor_data400::key::HeaderQuick::'      +filedate+'::DID') ;
-fcra_didkey := FN_key_DID(file_header_quick(src in mdr.sourceTools.set_scoring_FCRA,src not in mdr.sourceTools.set_scoring_FCRA_retro_test),
+     didkey := header_quick.FN_key_DID(file_header_quick_skip_PID,                                 '~thor_data400::key::HeaderQuick::'      +filedate+'::DID') ;
+fcra_didkey := header_quick.FN_key_DID(file_header_quick(src in mdr.sourceTools.set_scoring_FCRA,src not in mdr.sourceTools.set_scoring_FCRA_retro_test),
 																																											'~thor_data400::key::HeaderQuick::fcra::'+filedate+'::DID') ;
 
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(     didkey,           '',                                            '~thor_data400::key::HeaderQuick::'            +filedate+'::DID',         B1);
@@ -207,7 +139,7 @@ RETURN SEQUENTIAL(
 			SEQUENTIAL(B3,M3,MQ3),
 			SEQUENTIAL(B4,M4,MQ4),
 			SEQUENTIAL(B5,M5,MQ5)
-																		), 615),
+			), 615),
 		build_source_key_prep(filedate)
 	);
 
