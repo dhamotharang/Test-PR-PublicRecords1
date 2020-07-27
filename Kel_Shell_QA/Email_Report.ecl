@@ -31,8 +31,8 @@
 		
 		// XtabOut[no_of_RECORDs];
 	
-		send_file := fileservices.SendEmailAttachText('karthik.reddy@lexisnexis.com',
-		// send_file := fileservices.SENDEmailAttachText(Kel_Shell_QA.email_distribution.Success_list,
+		// send_file := fileservices.SendEmailAttachText('karthik.reddy@lexisnexis.com',
+		send_file := fileservices.SENDEmailAttachText(Kel_Shell_QA.email_distribution.Success_list,
 							 ' '+ report_tag  +  'Test Results Direct From Thor ',
 																			 	 trim(Tag,left,right) + ' '+ '\n Please view attachment.' ,
 																			 XtabOut[no_of_records].line ,
