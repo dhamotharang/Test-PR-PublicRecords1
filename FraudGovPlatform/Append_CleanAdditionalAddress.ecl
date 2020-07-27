@@ -37,29 +37,32 @@ EXPORT Append_CleanAdditionalAddress (
    
     CleanedAddresses :=  $.mac_Append_CleanAddresses(slim_in);  
 
-    MergeRecs := DEDUP( Old_Inputs + 
-    JOIN(
-        New_Inputs, 
-        CleanedAddresses, 
-            LEFT.additional_address.street_1 = RIGHT.street_1 and 
-            LEFT.additional_address.street_2 = RIGHT.street_2 and 
-            LEFT.additional_address.city = RIGHT.city  and  
-            LEFT.additional_address.state = RIGHT.state and 
-            LEFT.additional_address.zip = RIGHT.zip,
-        TRANSFORM(FraudShared.Layouts.Base.Main, 
-            isFound := IF(  LEFT.additional_address.street_1 = RIGHT.street_1 and 
-                            LEFT.additional_address.street_2 = RIGHT.street_2  and 
-                            LEFT.additional_address.city = RIGHT.city  and  
-                            LEFT.additional_address.state = RIGHT.state and 
-                            LEFT.additional_address.zip = RIGHT.zip, 
-                        TRUE, FALSE );
-            SELF.additional_address.Clean_Address := IF( isFound , RIGHT.Clean_Address, LEFT.additional_address.Clean_Address ),
-            SELF.additional_address.address_1 := IF( isFound , RIGHT.address_1, LEFT.additional_address.address_1 ),
-            SELF.additional_address.address_2 := IF( isFound , RIGHT.address_2, LEFT.additional_address.address_2 ),
-            SELF := LEFT),
-         KEEP(1),LEFT OUTER
-    ) , record, except uid );
 
-   return( MergeRecs );	
+    CleanedRecs := JOIN(
+            New_Inputs, 
+            CleanedAddresses, 
+                LEFT.additional_address.street_1 = RIGHT.street_1 and 
+                LEFT.additional_address.street_2 = RIGHT.street_2 and 
+                LEFT.additional_address.city = RIGHT.city  and  
+                LEFT.additional_address.state = RIGHT.state and 
+                LEFT.additional_address.zip = RIGHT.zip,
+            TRANSFORM(FraudShared.Layouts.Base.Main, 
+                isFound := IF(  LEFT.additional_address.street_1 = RIGHT.street_1 and 
+                                LEFT.additional_address.street_2 = RIGHT.street_2  and 
+                                LEFT.additional_address.city = RIGHT.city  and  
+                                LEFT.additional_address.state = RIGHT.state and 
+                                LEFT.additional_address.zip = RIGHT.zip, 
+                            TRUE, FALSE );
+                SELF.additional_address.Clean_Address := IF( isFound , RIGHT.Clean_Address, LEFT.additional_address.Clean_Address ),
+                SELF.additional_address.address_1 := IF( isFound , RIGHT.address_1, LEFT.additional_address.address_1 ),
+                SELF.additional_address.address_2 := IF( isFound , RIGHT.address_2, LEFT.additional_address.address_2 ),
+                SELF := LEFT),
+            KEEP(1),LEFT OUTER
+        );
+
+
+    MergeRecs := FraudGovPlatform.fn_dedup_main( Old_Inputs + CleanedRecs );
+
+    return( MergeRecs );
 
 END;
