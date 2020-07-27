@@ -39,42 +39,14 @@ rUpdateBuildRequest	:= RECORD
 	
 	// SOA Response Results
 	
-	rBatchResults	:= record
-		string									BuildInstanceId				{xpath('BuildInstanceId')};
-		string									BuildName							{xpath('BuildName')};
-		string									BuildVersion					{xpath('BuildVersion')};
-	end;
-	rResult2	:= record
-		rBatchResults						Result								{xpath('Result')};
-		string									Status								{xpath('Status')};
-		string									Message								{xpath('Message')};
+	rStatus	:= record
+		string  Status  {xpath('AddBuildInstanceComponentResponse/AddBuildInstanceComponentResult/Result/RecordResponseAddBuildInstanceComponent/Status')};
+		string Message {xpath('AddBuildInstanceComponentResponse/AddBuildInstanceComponentResult/Result/RecordResponseAddBuildInstanceComponent/Message')};
 	end;
 	
-	rRecordResponseAddBuildInstanceComponent := record
-		rResult2	RecordResponseAddBuildInstanceComponent	{xpath('RecordResponseAddBuildInstanceComponent')};
-	end;
 	
-	rResult	:= record
-		rRecordResponseAddBuildInstanceComponent	Result	{xpath('Result')};	
-		string									Status								{xpath('Status')};
-		string									Message								{xpath('Message')};
-	end;
-	
-	rAddBuildInstanceComponentRslt	:= record
-		rResult	AddBuildInstanceComponentResult			{xpath('AddBuildInstanceComponentResult')};
-	end;
-
-rFault  :=	record
-		string         					FaultCode							{xpath('faultcode')};
-		string    		    			FaultString						{xpath('faultstring')};
-	end;
-
-	rStatus := RECORD
-		rAddBuildInstanceComponentRslt		AddBuildInstanceComponentResponse		{xpath('AddBuildInstanceComponentResponse'), 		maxlength(300000)};
-       rFault		FaultRecord													{xpath('Fault')};
-end;
 ///////////////////////////////////////////////////////////////////////////////
-	lResponse	:=  SOAPCALL (         
+	export retcode	:=  SOAPCALL (         
 			Orbit3.EnvironmentVariables.serviceurl,
 		'AddBuildInstanceComponent',
 		rBuildrequest,
@@ -85,9 +57,6 @@ end;
 		LOG
 	) ;	
 
-xmlds := dataset([rBuildrequest.request.OrbRequest.RecordRequestAddBuildInstanceComponent],Inputrec);
-	
-export retcode :=  lResponse.AddBuildInstanceComponentResponse.AddBuildInstanceComponentResult;
 
 	
 end;	

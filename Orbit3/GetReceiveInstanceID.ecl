@@ -30,9 +30,10 @@ rGetBuildRequest	:= RECORD
 
 	
 rStatus := RECORD
-	STRING	ResultStatus {XPATH('GetReceiveDetailsResponse/GetReceiveDetailsResult/Status')};
+	STRING	ResultStatus {XPATH('GetReceiveDetailsResponse/GetReceiveDetailsResult/Result/RecordGetReceiveDetails/Status')};
 	STRING ReceiveInstanceId {XPATH('GetReceiveDetailsResponse/GetReceiveDetailsResult/Result/RecordGetReceiveDetails/Result/ReceiveInstanceId')};
       STRING ReceiveInstanceStatus {XPATH('GetReceiveDetailsResponse/GetReceiveDetailsResult/Result/RecordGetReceiveDetails/Result/Status')};
+	STRING	Message {XPATH('GetReceiveDetailsResponse/GetReceiveDetailsResult/Result/RecordGetReceiveDetails/Message')};
 
 	end;
 	

@@ -3,6 +3,7 @@
 EXPORT AddReceiveFile(
 				string ptoken,							
 				string ReceivingId, 
+				string FilePathName,
 				string ServerInfo = 'Test-Env'
 	
 				) := module
@@ -16,7 +17,7 @@ string HpccWorkUnit { xpath('HpccWorkUnit')} := '1200';
 string RecordCount { xpath('RecordCount')} := '1';
 string ServerInfo {xpath('ServerInfo' )} := ServerInfo;
 string BatchNumber { xpath('BatchNumber' )} := '';
-string FilePathName {xpath('FilePathName' )} := '';
+string FilePathName {xpath('FilePathName' )} := FilePathName;
 string FileType {xpath('FileType' )} := 'DATA';
 end;
 
@@ -44,6 +45,7 @@ rAddReceiveRequest	:= RECORD
 rStatus := RECORD
 	STRING	Status {XPATH('AddReceiveFileResponse/AddReceiveFileResult/Result/RecordAddReceiveFile/Status')};
 	STRING	Message {XPATH('AddReceiveFileResponse/AddReceiveFileResult/Result/RecordAddReceiveFile/Message')};
+	STRING	FilePathName {XPATH('AddReceiveFileResponse/AddReceiveFileResult/Result/RecordAddReceiveFile/Result/ReceiveFiles/AddReceiveFileReceiveFileResp')};
 
 	end;
 	
