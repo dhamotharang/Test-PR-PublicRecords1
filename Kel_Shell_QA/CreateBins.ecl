@@ -1,8 +1,8 @@
-﻿IMPORT Python; 
+﻿IMPORT python3; 
 
 EXPORT CreateBins:= MODULE
 
-EXPORT string80 CreateBins_ranges( string name,string  score_in,real min_valid,real Max_valid,integer range_bin,set default_values) := embed(Python)
+EXPORT string80 CreateBins_ranges( string name,string  score_in,real min_valid,real Max_valid,integer range_bin,set default_values) := embed(python3)
 result = ''
 if len(str.strip(str(score_in)))==0:
     result = 'NULL'
@@ -27,7 +27,7 @@ else:
 return result												
 endembed;
 
-EXPORT string80 CreateBins_valid_default( string name,string  score_in,real min_valid,real Max_valid, set default_values) := embed(Python)
+EXPORT string80 CreateBins_valid_default( string name,string  score_in,real min_valid,real Max_valid, set default_values) := embed(python3)
 result = ''
 
 if len(str.strip(str(score_in)))==0:
@@ -49,7 +49,7 @@ return result
 
 endembed;
 
-EXPORT string80 CreateBins_Range( string name,string  score_in,real min_valid,real Max_valid, set default_values) := embed(Python)
+EXPORT string80 CreateBins_Range( string name,string  score_in,real min_valid,real Max_valid, set default_values) := embed(python3)
 result = ''
 
 if len(str.strip(str(score_in)))==0:

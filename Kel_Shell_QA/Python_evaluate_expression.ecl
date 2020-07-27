@@ -1,5 +1,5 @@
-﻿IMPORT R, ut, Python;
-EXPORT string Python_evaluate_expression(set of string layout_string, Recordof(Kel_Shell_QA.Layouts.AC_Lay) data_row, set of string cond, set of integer def_vals):= embed(Python)
+﻿IMPORT R, ut, python3;
+EXPORT string Python_evaluate_expression(set of string layout_string, Recordof(Kel_Shell_QA.Layouts.AC_Lay) data_row, set of string cond, set of integer def_vals):= embed(python3)
 #import operator
 #layout_string = 'integer8,personid,string15,firstname,string25,lastname, '
 
