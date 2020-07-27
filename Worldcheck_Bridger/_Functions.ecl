@@ -1337,6 +1337,7 @@
 				trim(kword, left, right) = 'GRHGC' =>SubGroup_Constants.numKeywordsID.KEYWORD_GRHGC,
 				trim(kword, left, right) = 'ILNBCTF-SO' =>SubGroup_Constants.numKeywordsID.KEYWORD_ILNBCTF_SO,
 				trim(kword, left, right) = 'PRCSR-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_PRCSR_WC,
+				trim(kword, left, right) = 'GERS' =>SubGroup_Constants.numKeywordsID.KEYWORD_GERS,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

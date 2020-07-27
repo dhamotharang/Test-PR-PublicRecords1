@@ -1235,6 +1235,7 @@
 		export string KEYWORD_GRHGC									:= '921';
 		export string KEYWORD_ILNBCTF_SO						:= '922';
 		export string KEYWORD_PRCSR_WC							:= '923';
+		export string KEYWORD_GERS									:= '924';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
