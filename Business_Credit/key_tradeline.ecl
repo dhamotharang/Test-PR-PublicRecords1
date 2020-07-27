@@ -34,43 +34,52 @@ EXPORT	key_tradeline(STRING pVersion	=	(STRING8)Std.Date.Today(),
 					  -15);
 		NoCalculateIntervals:=trim(R.Payment_Interval,left,right) not in ['D','W','BW','M','BM',''];
 
-		Hasbucket:=	 (unsigned)TRIM(R.Past_Due_Aging_Amount_Bucket_1,ALL)	<>	0 or
-					 (unsigned)TRIM(R.Past_Due_Aging_Amount_Bucket_2,ALL)	<>	0 or
-					 (unsigned)TRIM(R.Past_Due_Aging_Amount_Bucket_3,ALL)	<>	0 or
-					 (unsigned)TRIM(R.Past_Due_Aging_Amount_Bucket_4,ALL)	<>	0 or
-					 (unsigned)TRIM(R.Past_Due_Aging_Amount_Bucket_5,ALL)	<>	0 or
-					 (unsigned)TRIM(R.Past_Due_Aging_Amount_Bucket_6,ALL)	<>	0 or
-					 (unsigned)TRIM(R.Past_Due_Aging_Amount_Bucket_7,ALL)	<>	0;
+		Hasbucket:=	 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_1,ALL)	<>	0 or
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_2,ALL)	<>	0 or
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_3,ALL)	<>	0 or
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_4,ALL)	<>	0 or
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_5,ALL)	<>	0 or
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_6,ALL)	<>	0 or
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_7,ALL)	<>	0;
 
-		OnlyBucket1:=(unsigned)TRIM(R.Past_Due_Aging_Amount_Bucket_1,ALL)	<>	0 and 
-					 (unsigned)TRIM(R.Past_Due_Aging_Amount_Bucket_2,ALL)	=	0 and
-					 (unsigned)TRIM(R.Past_Due_Aging_Amount_Bucket_3,ALL)	=	0 and
-					 (unsigned)TRIM(R.Past_Due_Aging_Amount_Bucket_4,ALL)	=	0 and
-					 (unsigned)TRIM(R.Past_Due_Aging_Amount_Bucket_5,ALL)	=	0 and
-					 (unsigned)TRIM(R.Past_Due_Aging_Amount_Bucket_6,ALL)	=	0 and
-					 (unsigned)TRIM(R.Past_Due_Aging_Amount_Bucket_7,ALL)	=	0;
+		Nobucket:=	 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_1,ALL)	=	0 and 
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_2,ALL)	=	0 and 
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_3,ALL)	=	0 and 
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_4,ALL)	=	0 and 
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_5,ALL)	=	0 and 
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_6,ALL)	=	0 and 
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_7,ALL)	=	0;	
+
+		OnlyBucket1:=(real)TRIM(R.Past_Due_Aging_Amount_Bucket_1,ALL)	<>	0 and 
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_2,ALL)	=	0 and
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_3,ALL)	=	0 and
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_4,ALL)	=	0 and
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_5,ALL)	=	0 and
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_6,ALL)	=	0 and
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_7,ALL)	=	0;
 		
-		NotBucket1 :=(unsigned)TRIM(R.Past_Due_Aging_Amount_Bucket_2,ALL)	<>	0 or
-					 (unsigned)TRIM(R.Past_Due_Aging_Amount_Bucket_3,ALL)	<>	0 or
-					 (unsigned)TRIM(R.Past_Due_Aging_Amount_Bucket_4,ALL)	<>	0 or
-					 (unsigned)TRIM(R.Past_Due_Aging_Amount_Bucket_5,ALL)	<>	0 or
-					 (unsigned)TRIM(R.Past_Due_Aging_Amount_Bucket_6,ALL)	<>	0 or
-					 (unsigned)TRIM(R.Past_Due_Aging_Amount_Bucket_7,ALL)	<>	0;
+		NotBucket1 :=(real)TRIM(R.Past_Due_Aging_Amount_Bucket_2,ALL)	<>	0 or
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_3,ALL)	<>	0 or
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_4,ALL)	<>	0 or
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_5,ALL)	<>	0 or
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_6,ALL)	<>	0 or
+					 (real)TRIM(R.Past_Due_Aging_Amount_Bucket_7,ALL)	<>	0;
 
 		DaysBetweenOpenCycle:=STD.Date.DaysBetween((unsigned4)R.Date_Account_Opened,(unsigned4)R.cycle_end_date);		
 
-		self.ln_delinquency_date:=map(trim(R.Delinquency_Date,left,right)<>'' =>R.Delinquency_Date,//Deliquency Date is populated
+		self.ln_delinquency_date:=map(length(trim(R.Delinquency_Date,left,right))>=6 => R.Delinquency_Date,//Deliquency Date is populated
+									  (unsigned)trim(R.Payment_Status_Category,left,right)=0 and Nobucket and (unsigned)R.Past_Due_Amount=0=>'',
 									  trim(L.ln_delinquency_date,left,right)<>''=>L.ln_delinquency_date,//preserve Previous ln_delinquency_date
-									  c=0 and NoCalculateIntervals and DaysBetweenOpenCycle<=60 and (unsigned)trim(R.Payment_Status_Category,left,right) =1=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,-(DaysBetweenOpenCycle/2)),
-									  c=0 and NoCalculateIntervals and DaysBetweenOpenCycle<=60 and OnlyBucket1=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,-(DaysBetweenOpenCycle/2)),
-									  c=0 and NoCalculateIntervals=>'-1',//First Record No Deliquency with Payment Intervals not valid for midpoint
-									  c=0 and (unsigned)trim(R.Payment_Status_Category,left,right) =1=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,midpoint),//First Record No Deliquency with Deliquency Status =1
-									  c=0 and (unsigned)trim(R.Payment_Status_Category,left,right)>1=>'-1',//First Record No Deliquency with Deliquency Status >1
-									  c=0 and OnlyBucket1=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,midpoint),//First Record No Deliquency with Bucket Data in 1
-									  c=0 and NotBucket1=>'-1',//First Record No Deliquency with Bucket Data in 1
-									  (unsigned)trim(R.Payment_Status_Category,left,right)>0=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,-15),//Healthy to Deliquent using Deliquency Status
-									  Hasbucket=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,-15),//Healthy to Deliquent using Bucket Amount
-									  (unsigned)R.Past_Due_Amount>0=>'-1',
+									  c=1 and NoCalculateIntervals and DaysBetweenOpenCycle<=60 and (unsigned)trim(R.Payment_Status_Category,left,right) =1=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,-(DaysBetweenOpenCycle/2)),
+									  c=1 and NoCalculateIntervals and DaysBetweenOpenCycle<=60 and OnlyBucket1=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,-(DaysBetweenOpenCycle/2)),
+									  c=1 and NoCalculateIntervals=>'-1',//First Record No Deliquency with Payment Intervals not valid for midpoint
+									  c=1 and (unsigned)trim(R.Payment_Status_Category,left,right) =1=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,midpoint),//First Record No Deliquency with Deliquency Status =1
+									  c=1 and (unsigned)trim(R.Payment_Status_Category,left,right)>1=>'-1',//First Record No Deliquency with Deliquency Status >1
+									  c=1 and OnlyBucket1=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,midpoint),//First Record No Deliquency with Bucket Data in 1
+									  c=1 and NotBucket1=>'-1',//First Record No Deliquency with Bucket Data in 1
+									  c<>1 and (unsigned)trim(R.Payment_Status_Category,left,right)>0=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,-15),//Healthy to Deliquent using Deliquency Status
+									  c<>1 and Hasbucket=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,-15),//Healthy to Deliquent using Bucket Amount
+									  c<>1 and (unsigned)trim(R.Payment_Status_Category,left,right)=0 and Nobucket and (unsigned)R.Past_Due_Amount>0=>'-1',
 									  '');
 		self:=R;
 		self:=[];	
@@ -111,7 +120,9 @@ EXPORT	key_tradeline(STRING pVersion	=	(STRING8)Std.Date.Today(),
 														),'000'
 													),''
 												);
-		self.DBT_V5:=if(trim(pinput.ln_delinquency_date,left,right) not in ['','-1'],'',(String)STD.Date.DaysBetween((unsigned4)pinput.cycle_end_date,(unsigned4)pinput.ln_delinquency_date));
+		self.DBT_V5:=if(trim(pinput.ln_delinquency_date,left,right) in ['','-1'],'',
+					 if(length(pinput.ln_delinquency_date)=6,(String)STD.Date.DaysBetween((unsigned4)pinput.cycle_end_date,(unsigned4)(pinput.ln_delinquency_date+'15')),
+					 (String)STD.Date.DaysBetween((unsigned4)pinput.cycle_end_date,(unsigned4)(pinput.ln_delinquency_date))));
 		SELF					:=	pInput;
 	END;
 	
