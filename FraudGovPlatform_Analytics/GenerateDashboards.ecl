@@ -69,16 +69,8 @@
 	
 	//We want to run the Customer Dashboard first because it runs much faster than the Cluster dashboard	
 
-	
-	//QA Dashboards - ONLY run when runProd is set to FALSE
-	dRunPersonStatsDeltaDashboard		:= FraudGovPlatform_Analytics.fnRunPersonStatsDeltaDashboard();
-	dRunNewClusterRecordsDashboard	:= FraudGovPlatform_Analytics.fnRunNewClusterRecordsDashboard();
-	RunPersonStatsDeltaDashboard		:= OUTPUT(dRunPersonStatsDeltaDashboard);
-	RunNewClusterRecordsDashboard 	:= OUTPUT(dRunNewClusterRecordsDashboard);
 	RETURN PARALLEL(IF(runProd,
 											SEQUENTIAL(CreateSuper,IF(updateCustomerDash, RunCustDashboard_Prod), IF(updateCustomerDash1_1, RunCustDashboard1_1_Prod), IF(updateHighRiskId, RunHighRiskIdentity_Prod), IF(updateClusterDetails, RunClusDetailsDashboard_Prod),AddFileToSuper),
 											SEQUENTIAL(RunCustDashboard, RunCustDashboard1_1, RunHighRiskIdentity, RunClusDetailsDashboard)
-											)
-								, IF(~runProd AND ~updateROSE, SEQUENTIAL(RunPersonStatsDeltaDashboard, RunNewClusterRecordsDashboard))
-									);
+											));
 END;
