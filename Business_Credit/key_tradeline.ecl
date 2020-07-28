@@ -1,4 +1,4 @@
-IMPORT	Business_Credit, Business_Credit_Scoring,	doxie,	Std,ut;
+﻿IMPORT	Business_Credit, Business_Credit_Scoring,	doxie,	Std,ut;
 EXPORT	key_tradeline(STRING pVersion	=	(STRING8)Std.Date.Today(),
 											Constants().buildType	pBuildType	=	Constants().buildType.Daily)	:=	FUNCTION
 
@@ -21,7 +21,7 @@ EXPORT	key_tradeline(STRING pVersion	=	(STRING8)Std.Date.Today(),
 		self:=[];
 	));
 
-	SortFile:=sort(distribute(loadfile,hash(Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported)),Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported,Cycle_End_Date);
+	SortFile:=sort(distribute(loadfile,hash(Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported)),Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported,Cycle_End_Date,local);
 	
 	GroupFile:=group(Sortfile,Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported,LOCAL);
 	
