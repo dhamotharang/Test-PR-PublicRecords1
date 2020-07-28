@@ -33,8 +33,8 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
 
   ds_flags := FFD.GetFlagFile(ds_best, pc_recs);
 
-  liens_srch_recs := LiensV2_Services.liens_raw.Retrieval_view_fcra.by_did (ds_did, ds_flags,
-                                                                          slim_pc_recs, input.FFDOptionsMask, input.FCRAPurpose);
+  liens_srch_recs := IF(~alert_indicators.suppress_records, LiensV2_Services.liens_raw.Retrieval_view_fcra.by_did (ds_did, ds_flags,
+                                                                          slim_pc_recs, input.FFDOptionsMask, input.FCRAPurpose));
  //filtering the search records based on input pri
  //(filing type id and (filing number or (book and page))) or orig_rmsid
 //and
@@ -65,8 +65,6 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
                       DATASET([],$.layout_liens_retrieval.search_recs),
                       filtered_liens);
 
-  IsValidRequest := ~alert_indicators.suppress_records AND EXISTS(liens_recs);
-
  // if initial request, call okc court runner. if deferred request, call dte
   gw_cfg_okc := IF(~input.DeferredTaskRequest, gateways(Gateway.Configuration.IsOKCcourtrunner(ServiceName))[1]);
  // call okc gateway
@@ -74,18 +72,27 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
  // call_dte gateway
   call_dte := input.DeferredTaskRequest AND EXISTS(liens_recs);
 
-  search_recs :=   IF(IsValidRequest,
+  search_recs :=   IF(EXISTS(liens_recs),
                    IF(~input.DeferredTaskRequest,
                     $.GetRetrievalGateway_Records.callOKC_courtrunner(input.TransactionId,
                                                                       liens_recs, gw_cfg_okc, call_okc),
                     $.GetRetrievalGateway_Records.callDTE_getrequestInfo(input,
                                                                         liens_recs, gateways, call_dte)));
 
-       // do not show CS for okc submission request & do not show CS if dte gateway request fails
-  is_dte_gateway_success := input.DeferredTaskRequest AND EXISTS(search_recs(did <> 0));
-  BOOLEAN showConsumerStatements     := FFD.FFDMask.isShowConsumerStatements(input.FFDOptionsMask) AND  is_dte_gateway_success;
-   // do not show alerts for okc submission success or gateway failures
-  BOOLEAN NoshowAlerts     := search_recs[1].IsOKCSuccess OR search_recs[1].error_code = $.constants.LIENS_RETRIEVAL.GATEWAY_FAILURE_CODE;                                                                        
+
+  dte_gateway_success := input.DeferredTaskRequest AND EXISTS(search_recs(did <> 0));
+  OKC_gateway_success := ~input.DeferredTaskRequest AND search_recs[1].IsOKCSuccess;
+  gateway_failed      := search_recs[1].error_code = $.constants.LIENS_RETRIEVAL.GATEWAY_FAILURE_CODE;
+  // do not show CS for okc submission request & do not show CS if dte gateway request fails
+  BOOLEAN showConsumerStatements     := FFD.FFDMask.isShowConsumerStatements(input.FFDOptionsMask) AND  dte_gateway_success;
+  // do not show alerts for okc submission success or gateway failures
+  BOOLEAN NoshowAlerts     := OKC_gateway_success OR gateway_failed;      
+  // do not return UniqueID under Records in case of 222A, gateway failure and OKC success
+  no_dte_did_resolved     := input.DeferredTaskRequest AND search_recs[1].error_code = FCRA.Constants.ALERT_CODE.NO_DID_FOUND;
+  no_didresolved          := resolved_did = 0 OR no_dte_did_resolved;
+  BOOLEAN NoShowUniqueID  := no_didresolved OR OKC_gateway_success OR gateway_failed;
+  //do not log Inquiry in case of gateway failure
+  BOOLEAN NoInquiryLogging :=  gateway_failed;                                                                                       
                                 
   // add deceased flag
   recs_w_deceasedflag := dx_death_master.Get.byDid(ds_did, did, input,,,,Data_Services.data_env.iFCRA);
@@ -95,8 +102,6 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
 
      BOOLEAN is_legal_hold   := alert_indicators.consumer_flags.alert_legal_flag <> '' AND alert_indicators.suppress_records;
      BOOLEAN subjectdeceased := recs_w_deceasedflag[1].death.is_deceased;
-     no_dte_did_resolved     := input.DeferredTaskRequest AND search_recs[1].error_code = FCRA.Constants.ALERT_CODE.NO_DID_FOUND;
-     BOOLEAN no_didresolved   := resolved_did = 0 OR no_dte_did_resolved;
      BOOLEAN isRIState := picklist_resp._Header.Status = 305;// Rhode island verification
     // when dte resolved lexid is 0, do not return alerts
     consumer_alerts := IF(~no_dte_did_resolved, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, alert_indicators, input.FFDOptionsMask));
@@ -120,7 +125,7 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
 // returning data from DTE
   iesp.riskview_publicrecordretrieval.t_PublicRecordRetrievalRecord toRecords($.layout_liens_Retrieval.final_rec L) := TRANSFORM
 
-     SELF.UniqueId := (string)L.did;
+     SELF.UniqueId := (STRING) L.did;
      SELF.DefendantName := iesp.ECL2ESP.SetName(L.fname, L.mname, L.lname, L.name_suffix,'');
      SELF.DefendantAddress := iesp.ECL2ESP.SetAddress(L.prim_name, L.prim_range,
                                                    L.predir, L.postdir, L.addr_suffix, L.unit_desig, L.sec_range,
@@ -136,12 +141,18 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
 
    END;
 
+   iesp.riskview_publicrecordretrieval.t_PublicRecordRetrievalRecord toReturnLexid() := TRANSFORM
+     SELF.UniqueId := (STRING) IF(NoShowUniqueID, 0, resolved_did);
+     SELF := [];
+
+   END;
+
    ds_liens := IF(input.DeferredTaskRequest,
-                  PROJECT(search_recs, toRecords(LEFT)));
+                  PROJECT(search_recs, toRecords(LEFT)),
+                  DATASET([toReturnLexid()]));
    
    iesp.riskview_publicrecordretrieval.t_PublicRecordRetrievalResponse toFinal() := TRANSFORM
       
-      is_gateway_excep       := search_recs[1].error_code = $.constants.LIENS_RETRIEVAL.GATEWAY_FAILURE_CODE;
       ds_gateway_excep  := DATASET([{$.Constants.LIENS_RETRIEVAL.ERRORSOURCE,
 															   $.Constants.LIENS_RETRIEVAL.GATEWAY_FAILURE_CODE,
 															   '',
@@ -160,10 +171,10 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
                                    
       SELF._Header.Exceptions:= MAP(is_court_id_blank => ds_courtid_excep,
                                   invalid_recs        => ds_norecs_excep,
-                                  is_gateway_excep    => ds_gateway_excep,
+                                  gateway_failed    => ds_gateway_excep,
                                   DATASET([], iesp.share.t_WsException));
       
-      is_OKCsubmitted := ~input.DeferredTaskRequest AND search_recs[1].IsOKCSuccess;
+      is_OKCsubmitted := ~input.DeferredTaskRequest AND OKC_gateway_success;
       //returns in case of okc submission success
       SELF._Header.Status   := IF(is_OKCsubmitted, (INTEGER)$.Constants.LIENS_RETRIEVAL.OKC_SUBMISSION_SUCCESS_CODE, 0);
       SELF._Header.Message  := IF(is_OKCsubmitted, $.Constants.LIENS_RETRIEVAL.OKC_SUBMISSION_MESSAGE, '');
@@ -171,9 +182,9 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
       SELF.RecordCount := COUNT(ds_liens);
       SELF.InputEcho := srchby;
       SELF.Records := ds_liens;
-      SELF.Alerts := If(NoshowAlerts, DATASET([], iesp.riskview2.t_RiskView2Alert), get_alerts());
+      SELF.Alerts := IF(NoshowAlerts, DATASET([], iesp.riskview2.t_RiskView2Alert), SORT(get_alerts(), Code));
       SELF.ConsumerStatements := IF(showConsumerStatements, consumer_statements);
-      SELF.Consumer := FFD.MAC.PrepareConsumerRecord(resolved_did, TRUE, srchby);
+      SELF.Consumer := FFD.MAC.PrepareConsumerRecord(IF(NoInquiryLogging, 0, resolved_did), TRUE, srchby);
 
    END;
 

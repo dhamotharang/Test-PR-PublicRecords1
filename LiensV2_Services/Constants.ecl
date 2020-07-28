@@ -6,7 +6,7 @@ EXPORT Constants := MODULE
 
       EXPORT DEFENDANT     := 'DEFENDANT';
       EXPORT DEBTOR        := 'DEBTOR';
-      EXPORT OKC_TASK_DESC := 'Status Refresh Task';
+      EXPORT OKC_TASK_DESC := 'Court Runner Task';
 
       // alert codes and desc
       EXPORT OKC_SUBMISSION_SUCCESS_CODE  := '999';
