@@ -5,14 +5,14 @@
 	runProd 		:= FALSE;
 	useProdData := TRUE;
 	newVersion 	:= TRUE;
-	dspToUse		:= FraudGovPlatform_Analytics.Constants.RampsWebServices.DspQa;
+	dspToUse		:= FraudGovPlatform_Analytics.Constants.RampsWebServices.DspQa;	
+	hpccConnection  := FraudGovPlatform_Analytics.Constants.RampsWebServices.HpccConnectionQa;
 
 	//Input Parameters
 	cmpUuid 						:= FraudGovPlatform_Analytics.Constants.RampsWebServices.ProfileDeltaDashboard.CompositionUuid;
 	vizVersion 					:= FraudGovPlatform_Analytics.Constants.RampsWebServices.ProfileDeltaDashboard.VizServiceVersion;
 	reqSource 					:= FraudGovPlatform_Analytics.Constants.RampsWebServices.reqSource;																
-	encodedCreds 				:= FraudGovPlatform_Analytics.Constants.RampsWebServices.EncodedCredentials;			
-	hpccConnection 			:= FraudGovPlatform_Analytics.configFunctions.getHpccConnection(runProd, newVersion);
+	encodedCreds 				:= FraudgovPlatform_Analytics.Constants.RampsWebServices.DataBuildRampsCertCreds;		
 	eclCompileStrategy	:= FraudGovPlatform_Analytics.Constants.RampsWebServices.EclCompileStrategy;											
 	keepEcl 						:= FraudGovPlatform_Analytics.Constants.RampsWebServices.KeepEcl;					
 	forceRun						:= FraudGovPlatform_Analytics.Constants.RampsWebServices.ForceRun;
