@@ -1,5 +1,5 @@
-﻿IMPORT R, ut, Python;
-EXPORT string test_macro(Recordof(Kel_Shell_QA.Layouts.AC_Lay) data_row,string cond, string def_par, set of string lay_set):= embed(Python)
+﻿IMPORT R, ut, python3;
+EXPORT string test_macro(Recordof(Kel_Shell_QA.Layouts.AC_Lay) data_row,string cond, string def_par, set of string lay_set):= embed(python3)
 import re
 layout_string_old = lay_set
 while ' ' in layout_string_old:

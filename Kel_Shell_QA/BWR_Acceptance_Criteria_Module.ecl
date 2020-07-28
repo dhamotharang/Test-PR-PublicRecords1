@@ -12,7 +12,7 @@ sample_size:=0;
 
 //***************************************************************************************************************************
 
-input_file:=dataset(logical_file_name,Base_Lay,CSV(HEADING(single), QUOTE('"')));
+input_file:=dataset(logical_file_name,Base_Lay,CSV(HEADING(8), QUOTE('"')));
 
 inut_file_records:= if(sample_size=0, choosen(input_file,all),choosen(input_file,sample_size) );
 
@@ -49,11 +49,15 @@ parallel(Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, fi
 				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Best - Best Characteristics'),
 				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Associate'),
 				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Source Verification'),
+				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Email History'),
 				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Education'),
 				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Person Derogs - Lien and Judgment History'),
 				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Derogs - Landlord Tenant Dispute'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'PII Corroboration')
+				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'PII Corroboration'),
+				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Property Ownership'),
+				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Property Sales')
 				 );
+
 
 
 EXPORT BWR_Acceptance_Criteria_Module := 'todo';

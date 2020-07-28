@@ -3,8 +3,8 @@ STRING Quartile1;
 STRING Quartile3;
 END;
 
-IMPORT R, ut, Python;
-EXPORT dataset(layout) getQuartile(set of real nums) := embed(Python)
+IMPORT R, ut, python3;
+EXPORT dataset(layout) getQuartile(set of real nums) := embed(python3)
 
 import math
 
