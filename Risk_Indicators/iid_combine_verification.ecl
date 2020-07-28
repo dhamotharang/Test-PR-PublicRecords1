@@ -781,8 +781,8 @@ risk_indicators.Layout_Output combineVerification(temp le) := transform
 	self := combo_address;
 	// do we need to add an option in here for inquiry miskey in row 3?				  
 	combo_hphone := MAP(le.phonever_type IN ['P','I'] AND le.dirsaddr_phonescore>89 and le.dirsaddr_phonescore<100 => le.dirsaddr_phone,	//used phone from diraddr
-						le.phonever_type IN ['P','I'] AND le.utili_phonescore>89 and le.utili_phonescore<100 => le.utiliphone,	//used phone from utility
 						le.phonever_type IN ['P','I'] AND le.dirs_phonescore=100 => le.phone10,
+						le.phonever_type IN ['P','I'] AND le.utili_phonescore>89 and le.utili_phonescore<100 => le.utiliphone,	//used phone from utility
 						le.phonever_type='A' => le.dirsaddr_phone,
 						le.phonever_type='U' => le.utiliphone,
 						le.phonever_type='S' => le.inquiryNAPphone,
