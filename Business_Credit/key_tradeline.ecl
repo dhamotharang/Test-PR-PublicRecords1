@@ -11,7 +11,7 @@ EXPORT	key_tradeline(STRING pVersion	=	(STRING8)Std.Date.Today(),
 		String3		DBT_V5;
 	END;
 	//AdjustedArchiveDate:=Std.Date.AdjustCalendar(L.dt_vendor_last_reported,0,0,1);
-	Loadfile:=project(Business_Credit.fn_GetSegments.accountBase(active),transform(rTradelines,
+	Loadfile:=project(Business_Credit.fn_GetSegments.accountBase(active and sbfe_contributor_number='0003010111FIA0102' and contract_account_number='4003901014247389' and account_type_reported='003'),transform(rTradelines,
 		SELF.Version					:=	left.process_date;
 		SELF.Original_Version	:=	IF(	left.original_process_date<>'',
 																	left.original_process_date,
@@ -122,7 +122,7 @@ EXPORT	key_tradeline(STRING pVersion	=	(STRING8)Std.Date.Today(),
 												);
 		self.DBT_V5:=if(trim(pinput.ln_delinquency_date,left,right) in ['','-1'],'',
 					 if(length(pinput.ln_delinquency_date)=6,(String)STD.Date.DaysBetween((unsigned4)pinput.cycle_end_date,(unsigned4)(pinput.ln_delinquency_date+'15')),
-					 (String)STD.Date.DaysBetween((unsigned4)pinput.cycle_end_date,(unsigned4)(pinput.ln_delinquency_date))));
+					 (String)STD.Date.DaysBetween((unsigned4)pinput.ln_delinquency_date,(unsigned4)(pinput.cycle_end_date))));
 		SELF					:=	pInput;
 	END;
 	
