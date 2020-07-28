@@ -420,16 +420,18 @@ END;
 												,STD.File.AddSuperFile(vCopyStatusFileNamePrefix + '_delete',vCopyStatusFileNamePrefix,, true)
 												,STD.File.ClearSuperFile(vCopyStatusFileNamePrefix)
 												,STD.File.AddSuperFile(vCopyStatusFileNamePrefix,vCopyStatusFileNamePrefix + '_' + vDateTime)
-												,if (desprayserver <> '' and despraylocation <> ''
-														,if (isDespray
+												,if (isDespray
+													,if (desprayserver <> '' and despraylocation <> ''
+														
 																,STD.File.DeSpray(vCopyStatusFileNamePrefix
 																									,desprayserver
 																									,despraylocation
 																									,allowoverwrite := true)
-																,output('No Despray')
-																)
-														,fail(9999,'Despray server or Despray location is empty but isDespray is set to true. Either set isDespray to false or pass despray server and location. Not re-scheduling')
-														)
+																
+															,fail(9999,'Despray server or Despray location is empty but isDespray is set to true. Either set isDespray to false or pass despray server and location. Not re-scheduling')
+															)
+														,output('No Despray')
+													)
 													,STD.File.DeleteLogicalFile(vCopyStatusFileNamePrefix + '_running')	
 												);
 	end;
