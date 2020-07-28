@@ -34,4 +34,11 @@ string ItemName ;
  string FilePathName;
  end;
  
+ EXPORT AdditionalNamespacesLayout := RECORD
+    STRING arr_namespace {xpath('@xmlns:arr')} := 'http://schemas.microsoft.com/2003/10/Serialization/Arrays';
+    STRING orb_namespace {xpath('@xmlns:orb')} := 'http://lexisnexis.com/Orbit/';
+    STRING i_namespace {xpath('@xmlns:i')} := 'http://www.w3.org/2001/XMLSchema-instance';
+  END;
+
+ 
  end;
