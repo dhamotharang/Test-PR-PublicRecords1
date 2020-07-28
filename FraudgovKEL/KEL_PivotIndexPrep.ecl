@@ -5,7 +5,7 @@ IMPORT HIPIE_ECL;
 
 EXPORT KEL_PivotIndexPrep := MODULE
 
-	MainEventShell := FraudgovKEL.KEL_EventPivot.EventPivotShell(aotcurrprofflag = 1);
+	MainEventShell := FraudgovKEL.KEL_EventPivot.EventPivotShell(aotcurrprofflag = 1 and t_inagencyflag=1);
 
 	/*BaseIndexPrep := hipie_ecl.macSlimDataset(MainEventShell, 'customerid,industrytype,entitycontextuid,entitytype', 
 			'recordid,caseid,eventdate,' +
