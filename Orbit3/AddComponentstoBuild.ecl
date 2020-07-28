@@ -34,7 +34,7 @@ rUpdateBuildRequest	:= RECORD
 	
 	 rBuildrequest := RECORD
 	 #IF(STD.System.Util.PlatformVersionCheck('7.8')) 
-	 $.Layouts.AdditionalNamespacesLayout;
+	 Orbit3.Layouts.AdditionalNamespacesLayout;
 	 #END
 		rUpdateBuildRequest	request	{XPATH('request') };
 	END;
@@ -83,9 +83,9 @@ end;
 		rBuildrequest,
 		rStatus,
 		#IF(STD.System.Util.PlatformVersionCheck('7.8'))  
-		                                                              ,NAMESPACE($.EnvironmentVariables.NameSpace)
+		                                                              NAMESPACE($.EnvironmentVariables.NameSpace),
 		#ELSE
-		                                                               ,NAMESPACE($.EnvironmentVariables.NameSpace + ' xmlns:orb="http://lexisnexis.com/Orbit/" xmlns:arr="http://schemas.microsoft.com/2003/10/Serialization/Arrays"  xmlns:i="http://www.w3.org/2001/XMLSchema-instance')
+		                                                               ,NAMESPACE($.EnvironmentVariables.NameSpace + ' xmlns:orb="http://lexisnexis.com/Orbit/" xmlns:arr="http://schemas.microsoft.com/2003/10/Serialization/Arrays"  xmlns:i="http://www.w3.org/2001/XMLSchema-instance');
 		#END
 		//NAMESPACE(Orbit3.EnvironmentVariables.namespace ),
 		LITERAL,
