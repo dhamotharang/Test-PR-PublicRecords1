@@ -11,7 +11,7 @@ EXPORT	key_tradeline(STRING pVersion	=	(STRING8)Std.Date.Today(),
 		String3		DBT_V5;
 	END;
 	//AdjustedArchiveDate:=Std.Date.AdjustCalendar(L.dt_vendor_last_reported,0,0,1);
-	Loadfile:=project(Business_Credit.fn_GetSegments.accountBase(active and sbfe_contributor_number='0003010111FIA0102' and contract_account_number='4003901014247389' and account_type_reported='003'),transform(rTradelines,
+	Loadfile:=project(Business_Credit.fn_GetSegments.accountBase(active),transform(rTradelines,
 		SELF.Version					:=	left.process_date;
 		SELF.Original_Version	:=	IF(	left.original_process_date<>'',
 																	left.original_process_date,
@@ -68,18 +68,18 @@ EXPORT	key_tradeline(STRING pVersion	=	(STRING8)Std.Date.Today(),
 		DaysBetweenOpenCycle:=STD.Date.DaysBetween((unsigned4)R.Date_Account_Opened,(unsigned4)R.cycle_end_date);		
 
 		self.ln_delinquency_date:=map(length(trim(R.Delinquency_Date,left,right))>=6 => R.Delinquency_Date,//Deliquency Date is populated
-									  (unsigned)trim(R.Payment_Status_Category,left,right)=0 and Nobucket and (unsigned)R.Past_Due_Amount=0=>'',
+									  (unsigned)trim(R.DelinquencyStatus,left,right)=0 and Nobucket and (unsigned)R.Past_Due_Amount=0=>'',
 									  trim(L.ln_delinquency_date,left,right)<>''=>L.ln_delinquency_date,//preserve Previous ln_delinquency_date
-									  c=1 and NoCalculateIntervals and DaysBetweenOpenCycle<=60 and (unsigned)trim(R.Payment_Status_Category,left,right) =1=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,-(DaysBetweenOpenCycle/2)),
+									  c=1 and NoCalculateIntervals and DaysBetweenOpenCycle<=60 and (unsigned)trim(R.DelinquencyStatus,left,right) =1=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,-(DaysBetweenOpenCycle/2)),
 									  c=1 and NoCalculateIntervals and DaysBetweenOpenCycle<=60 and OnlyBucket1=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,-(DaysBetweenOpenCycle/2)),
 									  c=1 and NoCalculateIntervals=>'-1',//First Record No Deliquency with Payment Intervals not valid for midpoint
-									  c=1 and (unsigned)trim(R.Payment_Status_Category,left,right) =1=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,midpoint),//First Record No Deliquency with Deliquency Status =1
-									  c=1 and (unsigned)trim(R.Payment_Status_Category,left,right)>1=>'-1',//First Record No Deliquency with Deliquency Status >1
+									  c=1 and (unsigned)trim(R.DelinquencyStatus,left,right) =1=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,midpoint),//First Record No Deliquency with Deliquency Status =1
+									  c=1 and (unsigned)trim(R.DelinquencyStatus,left,right)>1=>'-1',//First Record No Deliquency with Deliquency Status >1
 									  c=1 and OnlyBucket1=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,midpoint),//First Record No Deliquency with Bucket Data in 1
 									  c=1 and NotBucket1=>'-1',//First Record No Deliquency with Bucket Data in 1
-									  c<>1 and (unsigned)trim(R.Payment_Status_Category,left,right)>0=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,-15),//Healthy to Deliquent using Deliquency Status
+									  c<>1 and (unsigned)trim(R.DelinquencyStatus,left,right)>0=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,-15),//Healthy to Deliquent using Deliquency Status
 									  c<>1 and Hasbucket=>(String)Std.Date.AdjustCalendar((UNSIGNED4)R.Cycle_End_Date,0,0,-15),//Healthy to Deliquent using Bucket Amount
-									  c<>1 and (unsigned)trim(R.Payment_Status_Category,left,right)=0 and Nobucket and (unsigned)R.Past_Due_Amount>0=>'-1',
+									  c<>1 and (unsigned)trim(R.DelinquencyStatus,left,right)=0 and Nobucket and (unsigned)R.Past_Due_Amount>0=>'-1',
 									  '');
 		self:=R;
 		self:=[];	
