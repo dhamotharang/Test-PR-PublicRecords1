@@ -26,10 +26,10 @@ BOOLEAN runInRealTime := FALSE;   //When TRUE will run request in real time mode
 		// Configure options:
 	Options := MODULE(PublicRecords_KEL.Interface_Options)
 		EXPORT INTEGER ScoreThreshold := 80;
-		EXPORT STRING100 Data_Restriction_Mask := '0000000000000101000000000000000000000000';
-		EXPORT STRING100 Data_Permission_Mask := '11111111111111111111111111111111111111111111111111111111111';
-		EXPORT UNSIGNED GLBAPurpose := 1;
-		EXPORT UNSIGNED DPPAPurpose := 3;
+		EXPORT STRING100 Data_Restriction_Mask := '';
+		EXPORT STRING100 Data_Permission_Mask := '';
+		EXPORT UNSIGNED GLBAPurpose := 0;
+		EXPORT UNSIGNED DPPAPurpose := 0;
 		EXPORT BOOLEAN IsFCRA := FALSE; //It is only non-fcra query.
 		EXPORT BOOLEAN isMarketing := true; //always true for this query
 		EXPORT STRING100 Allowed_Sources := '';
@@ -62,7 +62,7 @@ BOOLEAN runInRealTime := FALSE;   //When TRUE will run request in real time mode
 		END;	
 
 prii_layout := RECORD
-STRING  Account;
+STRING  AcctNo;
 STRING  CompanyName;
 STRING  AlternateCompanyName;
 STRING  bus_addr;
@@ -87,10 +87,13 @@ END;
 	p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));  // use this for a CSV file
 	p := IF(recordsToRun = 0, p_in, CHOOSEN (p_in, recordsToRun));
  OUTPUT (choosen(p,eyeball), NAMED ('input'));
+ 
+ //append G_ProcBusUID to the input.
+  inputRecords := PROJECT(P, TRANSFORM({UNSIGNED G_ProcBusUID, RECORDOF(LEFT)}, SELF.G_ProcBusUID := COUNTER; SELF := LEFT;));
 
-	pp:= project(P,transform(BRM_Marketing_attributes.Layout_BRM_NonFCRA.Batch_Input, 
-		SELF.G_ProcBusUID :=Counter;
-		SELF.acctno :=left.account;
+	pp:= project(inputRecords,transform(BRM_Marketing_attributes.Layout_BRM_NonFCRA.Batch_Input, 
+		SELF.G_ProcBusUID := left.G_ProcBusUID;
+		SELF.AcctNo :=left.AcctNo;
 		SELF.historydate:=(INTEGER)left.historydate[1..8];
 		SELF.historydateyyyymm:=(INTEGER)left.historydate[1..6];
 		SELF.streetaddressline1 := left.bus_addr;
@@ -125,7 +128,7 @@ end;
 
 soap_in_pre:= Project(pp,TRANSFORM(soapLayout,
 self.batch_in := DATASET([TRANSFORM( BRM_Marketing_attributes.Layout_BRM_NonFCRA.Batch_Input, 
-    self.g_procbusuid:=counter;
+    self.g_procbusuid:= left.G_ProcBusUID;
     self.historydate :=IF(runInRealTime, 99999999, (UNSIGNED4)LEFT.historydate);
     self.historydateyyyymm :=IF(runInRealTime, 999999, (UNSIGNED4)LEFT.historydateyyyymm);
     self.acctno:=LEFT.acctno;
@@ -174,7 +177,7 @@ layout_SOAP_out myFail(soapLayout le) := TRANSFORM
 	SELF := [];
 END;
 
-result_SOAPCALL := 
+result_SOAPCALL_pre_sort := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
 				'brm_marketing_attributes.brm_marketing_attr_batch_services',
@@ -183,21 +186,21 @@ result_SOAPCALL :=
 				XPATH('brm_marketing_attributes.brm_marketing_attr_batch_servicesResponse/Results/Result/Dataset[@name=\'Results\']/Row'),
 				RETRY(5), TIMEOUT(500),
 				PARALLEL(threads), onFail(myFail(LEFT)));
-								
-OUTPUT( CHOOSEN(result_SOAPCALL,eyeball), NAMED('result_SOAPCALL') );
 
-//dropped input
+result_SOAPCALL := Sort(result_SOAPCALL_pre_sort,	AcctNo);
+							
+OUTPUT( CHOOSEN(result_SOAPCALL,eyeball), NAMED('result_SOAPCALL') );
 
 //Passed Records //results without minimum input are also listed in the results passed. Only results with the roxie error will be listed as failed.
 Passed:= result_SOAPCALL(TRIM(ErrorCode) = '');
 Failed:= result_SOAPCALL(TRIM(ErrorCode)<> '');
 
 //dropped input
-droppedInput := JOIN(PP, Failed,
-                      LEFT.g_procbusuid = RIGHT.g_procbusuid AND
-                      LEFT.acctNo = RIGHT.acctNo,
+//Input Accountnumber here is considered unique for the records.
+droppedInput := JOIN(inputRecords, result_SOAPCALL,
+                      LEFT.AcctNo = RIGHT.AcctNo,
                       TRANSFORM({RECORDOF(LEFT) - g_procbusuid}, SELF := LEFT;), 
-                      LEFT ONLY); //These are in the format as input to be reprocessed	
+                      LEFT ONLY); //These are in the format as input to be reprocessed 
 																				
 OUTPUT( CHOOSEN(Passed,eyeball), NAMED('results_Passed') );
 OUTPUT( COUNT(Passed), NAMED('Passed_Cnt') );
