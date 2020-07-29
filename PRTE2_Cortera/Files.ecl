@@ -13,5 +13,5 @@ EXPORT Files := MODULE
   EXPORT Input_Boca := dataset('~prte::in::cortera::boca', PRTE2_Cortera.Layouts.rlayout, CSV(HEADING(3), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')))(link_id >0); 
   EXPORT Input_INS  := dataset('~prte::in::cortera::Insurance', PRTE2_Cortera.Layouts.rlayout, CSV(HEADING(3), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')))(link_id >0); 
 
-  Export execlinkid := proc_createExecLinkID(key_hdr);
+  Export execlinkid := proc_createExecLinkID(hdr_out);
 END;
