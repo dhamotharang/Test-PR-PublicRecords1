@@ -69,8 +69,8 @@
 		EXPORT HpccConnectionDev		:= 'ramps_dev_fraudgov';
 		EXPORT EclCompileStrategy		:= 'LOCAL';											
 		EXPORT KeepEcl							:= 'FALSE';	
-		EXPORT ForceRun							:= 'FALSE';
-		// EXPORT ForceRun							:= 'TRUE';
+		// EXPORT ForceRun							:= 'FALSE';
+		EXPORT ForceRun							:= 'TRUE';
     EXPORT DeleteOldIndexes     := 'TRUE';
 		EXPORT FindLeads         		:= MODULE
 			EXPORT VizServiceVersion								:= '1';
@@ -114,6 +114,14 @@
 				// EXPORT InputLogicalGraphEdges 	:= '~foreign::10.173.10.159::fraudgov::rin2::graphedges';
         EXPORT InputLogicalGraphVertices:= fileLocation(useProdData) + fileScope + 'graphvertices';
         EXPORT InputLogicalGraphEdges   := fileLocation(useProdData) + fileScope + 'graphedges';
+			END;
+		END;
+		EXPORT ProfileDeltaDashboard := MODULE
+			EXPORT VizServiceVersion															:= '1';
+			EXPORT CompositionUuid																:= 'dbc6730f-8093-437a-8bd1-af5f3b5bfd48'; 	//Fraudgov-ProfileDelta Dashboard Composition ID		
+			EXPORT Filenames(BOOLEAN useProdData = FALSE):= MODULE
+				EXPORT InputLogicalOldProfileFilename	:= fileLocation(useProdData) + fatherFileScope + 'entityprofile';
+				EXPORT InputLogicalNewProfileFilename	:= fileLocation(useProdData) + fileScope + 'entityprofile';
 			END;
 		END;
 		EXPORT CustomerDashboard 		:= MODULE

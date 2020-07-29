@@ -16,7 +16,7 @@ ModelingOutput := EntityAssessment(industrytype = 1029 and customerid = 20995239
 RulesList := TABLE(MyRules, {customerid, industrytype, entitytype, rulename, description}, customerid, industrytype, entitytype, rulename, description, MERGE);
 
 RulesFlagsMatchedPlusPrep := JOIN(ModelingOutput, RulesList, (LEFT.customerid=RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype) OR (RIGHT.customerid = 0),
-                             TRANSFORM({LEFT.customerid, LEFT.industrytype, LEFT.entitycontextuid, RIGHT.entitytype, RIGHT.rulename, RIGHT.description}, SELF := LEFT, SELF := RIGHT), LOOKUP, ALL);
+                             TRANSFORM({LEFT.customerid, LEFT.industrytype, LEFT.entitycontextuid, RIGHT.entitytype, RIGHT.rulename, RIGHT.description}, SELF := LEFT, SELF := RIGHT), ALL);
                              
 RulesFlagsMatchedPlus := JOIN(RulesFlagsMatchedPlusPrep, RulesFlagsMatched, 
                            LEFT.customerid=RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype AND LEFT.entitycontextuid=RIGHT.entitycontextuid AND 
@@ -53,5 +53,39 @@ RulesFlagFinal := JOIN(RulesFlagFinal1, ModelingOutput, LEFT.customerid=RIGHT.cu
                   LEFT.p1_idriskrulelvllist, RIGHT.p1_idriskindx, RIGHT.p15_ssnriskindx, RIGHT.p16_phnriskindx, RIGHT.p17_emailriskindx, 
                   RIGHT.p19_bnkacctriskindx, RIGHT.p20_dlriskindx, RIGHT.p18_ipaddrriskindx, RIGHT.p9_addrriskindx}, SELF.t_actuid := LEFT.entitycontextuid[4..], SELF := LEFT, SELF := RIGHT), HASH);
 
-output(RulesFlagFinal,, '~fraudgov::temp::scoringoutput', CSV(SEPARATOR(','), QUOTE('"')), overwrite);             
+//output(RulesFlagFinal,, '~fraudgov::temp::scoringoutput', CSV(SEPARATOR(','), QUOTE('"')), overwrite);             
 
+HighRiskCountsPrep := TABLE(FraudgovKEL.KEL_EventPivot.PivotToEntitiesWithHRICounts, 
+                    {customerid, industrytype, t_actuid, entitycontextuid,  
+                     INTEGER p15_aothiidcurrprofusngcntev := MAP(entitytype = 15 => aothiidcurrprofusngcntev, -99999),
+                     INTEGER p16_aothiidcurrprofusngcntev := MAP(entitytype = 16 => aothiidcurrprofusngcntev, -99999),
+                     INTEGER p18_aothiidcurrprofusngcntev := MAP(entitytype = 18 => aothiidcurrprofusngcntev, -99999),
+                     INTEGER p17_aothiidcurrprofusngcntev := MAP(entitytype = 17 => aothiidcurrprofusngcntev, -99999),
+                     INTEGER p19_aothiidcurrprofusngcntev := MAP(entitytype = 19 => aothiidcurrprofusngcntev, -99999),
+                     INTEGER p20_aothiidcurrprofusngcntev := MAP(entitytype = 20 => aothiidcurrprofusngcntev, -99999),
+                     INTEGER p9_aothiidcurrprofusngcntev := MAP(entitytype = 9 => aothiidcurrprofusngcntev, -99999)}, 
+                     customerid, industrytype, t_actuid, entitycontextuid, MERGE);
+										 
+HighRiskCounts := TABLE(HighRiskCountsPrep, 
+                    {customerid, industrytype, t_actuid,
+                     INTEGER p15_aothiidcurrprofusngcntev := MAX(GROUP, p15_aothiidcurrprofusngcntev),
+                     INTEGER p16_aothiidcurrprofusngcntev := MAX(GROUP, p16_aothiidcurrprofusngcntev),
+                     INTEGER p17_aothiidcurrprofusngcntev := MAX(GROUP, p17_aothiidcurrprofusngcntev),
+                     INTEGER p18_aothiidcurrprofusngcntev := MAX(GROUP, p18_aothiidcurrprofusngcntev),
+                     INTEGER p19_aothiidcurrprofusngcntev := MAX(GROUP, p19_aothiidcurrprofusngcntev),
+                     INTEGER p20_aothiidcurrprofusngcntev := MAX(GROUP, p20_aothiidcurrprofusngcntev),
+                     INTEGER p9_aothiidcurrprofusngcntev := MAX(GROUP, p9_aothiidcurrprofusngcntev),
+                     }, 
+                     customerid, industrytype, t_actuid, MERGE);        
+
+// JOIN High Risk Counts to Modeling Output
+ModelingAttributeOutput := FraudgovKEL.KEL_EventShell.ModelingStats;
+
+ModelingWithHRICounts := JOIN(ModelingAttributeOutput, HighRiskCounts, LEFT.customerid = RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype AND LEFT.t_actuid=RIGHT.t_actuid, HASH);
+                    
+// JOIN Scoring Debug to Modeling Output
+
+ModelingWithScoringDebug := JOIN(ModelingWithHRICounts, RulesFlagFinal, LEFT.customerid = RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype AND (UNSIGNED8)LEFT.t_actuid=(UNSIGNED8)RIGHT.t_actuid, HASH);
+
+output(ModelingWithScoringDebug,,'~fraudgov::deleteme_nd_full', overwrite);	
+output(ModelingOutput,,'~fraudgov::deleteme_nd_full_csv', CSV(QUOTE('"')), overwrite);
