@@ -19,7 +19,7 @@ unsigned1 eyeball := 25;
 string DataRestrictionMask := '10000100010001'; // to restrict fares, experian, transunion and experian FCRA 
 
 //===================  input-output files  ======================
-infile_name :=  ut.foreign_prod+'dvstemp::in::audit_input_file_w20140701-122932';
+infile_name :=  '~foreign::' + _control.IPAddress.prod_thor_dali + '::dvstemp::in::audit_input_file_w20140701-122932';
 
 outfile_name := '~dvstemp::out::audit::fcrashell_baselines_' + thorlib.wuid();
 
@@ -56,10 +56,10 @@ layout_input := RECORD
 roxie_IP := RiskWise.Shortcuts.staging_neutral_roxieIP;  
 
 // FCRA service settings
-bs_service := 'risk_indicators.boca_shell_fcra.104';
+bs_service := 'risk_indicators.boca_shell_fcra';
 // roxieIP := RiskWise.Shortcuts.prod_batch_fcra; 		// FCRAbatch Roxie
-// roxieIP := RiskWise.Shortcuts.staging_fcra_roxieIP;  
-roxieIP := RiskWise.Shortcuts.dev194;  
+roxieIP := RiskWise.Shortcuts.staging_fcra_roxieIP;  
+// roxieIP := RiskWise.Shortcuts.dev156;  
 
 //====================================================
 //=====================  R U N  ======================
@@ -110,8 +110,8 @@ p_f9 := project(p_f1, transform(l, self.accountnumber := (string)(800000 + (unsi
 // run all 3 versions at once
 // p_f := p_f1 + p_f2 + p_f3 + p_f4 + p_f5 + p_f6;
 // p_f := p_f1 + p_f3 + p_f4 + p_f6;  // heather doesn't need history mode with current date unless it's the beginning of the month
-// p_f := p_f1 ;  // just run 5.0 for this test
-p_f := p_f1 + p_f2 + p_f3 + p_f4 + p_f5 + p_f6 + p_f7 + p_f8 + p_f9 ;  // run the gamut
+p_f := p_f1 ;  // just run 5.0 for this test
+// p_f := p_f1 + p_f2 + p_f3 + p_f4 + p_f5 + p_f6 + p_f7 + p_f8 + p_f9 ;  // run the gamut
 output(choosen(p_f,eyeball), named('BSInput'));
 
 s := Risk_Indicators.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
