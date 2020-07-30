@@ -6,6 +6,11 @@ EXPORT Sprayed_Input := RECORD
 	string80 naics_description;
 END;
 
+EXPORT Sprayed_Input_DnbDmi := RECORD
+	string6  naics_code;
+	string80 naics_description;
+END;
+
 EXPORT naicsLookup := RECORD
 	string6  naics_code;
 	string80 naics_description;

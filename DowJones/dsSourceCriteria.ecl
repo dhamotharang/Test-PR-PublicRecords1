@@ -1908,6 +1908,7 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2020/898 Venezuela List','1895'},
 {'EC 2020/897 Venezuela List','1896'},
 {'PPATK (Indonesia) Proliferation of Weapons of Mass Destruction Funding List','1897'},
-{'SECO (Switzerland) Nicaragua List','1898'}
+{'SECO (Switzerland) Nicaragua List','1898'},
+{'EC 2020/1082 ISIL (Da\'esh) and Al-Qaida List','1899'}
 ],r);
 
