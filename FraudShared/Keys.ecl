@@ -21,10 +21,18 @@ export Keys(
 					
 	shared  layout_iprange :=record,maxlength(60000) //only used for ip range indexing & will not be part of shared layout. GRP-446
 					Layouts_Key.Main;
-					unsigned1	octet1;
-					unsigned1	octet2;
-					unsigned1	octet3;
-					unsigned1	octet4;
+					unsigned1	digit1;
+					unsigned1	digit2;
+					unsigned1	digit3;
+					unsigned1	digit4;
+					unsigned1	digit5;
+					unsigned1	digit6;
+					unsigned1	digit7;
+					unsigned1	digit8;
+					unsigned1	digit9;
+					unsigned1	digit10;
+					unsigned1	digit11;
+					unsigned1	digit12;
 					end;										
 	
 	shared BaseMain           						:= Project(pFileKeybuild, Transform({record,maxlength(60000) Layouts_key.Main,unsigned8 __internal_fpos__:=0 end}
@@ -93,13 +101,33 @@ export Keys(
 // ISP End
 
 //Ip Range Begin 
+LEADING_ZERO_FILL := 1;
+OCTECT_WIDTH := 3;
 
  layout_iprange triprange(BaseMain l) := transform
-				octets := Std.Str.SplitWords(l.ip_address,'.');
-				self.octet1	:= (unsigned1)octets[1];
-				self.octet2	:= (unsigned1)octets[2];
-				self.octet3	:= (unsigned1)octets[3];
-				self.octet4	:= (unsigned1)octets[4];
+
+				octects := Std.Str.SplitWords(l.ip_address,'.');
+
+				octect1 := intformat( (unsigned1) octects[1],OCTECT_WIDTH,LEADING_ZERO_FILL) ;
+				octect2 := intformat( (unsigned1) octects[2],OCTECT_WIDTH,LEADING_ZERO_FILL) ;
+				octect3 := intformat( (unsigned1) octects[3],OCTECT_WIDTH,LEADING_ZERO_FILL) ;
+				octect4 := intformat( (unsigned1) octects[4],OCTECT_WIDTH,LEADING_ZERO_FILL) ;
+
+				self.digit1	:= (unsigned1)octect1[1];
+				self.digit2	:= (unsigned1)octect1[2];
+				self.digit3	:= (unsigned1)octect1[3];
+
+				self.digit4	:= (unsigned1)octect2[1];
+				self.digit5	:= (unsigned1)octect2[2];
+				self.digit6	:= (unsigned1)octect2[3];
+
+				self.digit7	:= (unsigned1)octect3[1];
+				self.digit8	:= (unsigned1)octect3[2];
+				self.digit9	:= (unsigned1)octect3[3];
+
+				self.digit10:= (unsigned1)octect4[1];
+				self.digit11:= (unsigned1)octect4[2];
+				self.digit12:= (unsigned1)octect4[3];
 				self:=l;
 			end;	
 	
@@ -195,7 +223,7 @@ export Keys(
 	tools.mac_FilesIndex('BaseMain_BankRoutingNumber,{Bank_Routing_Number , Entity_type_id, Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.BankRoutingNumber,BankRoutingNumber);		
 	tools.mac_FilesIndex('BaseMain_BankName,{Bank_Name , Entity_type_id, Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.BankName,BankName);		
 	tools.mac_FilesIndex('BaseMain_ISP,{isp , Entity_type_id, Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.Isp,Isp);		
-	tools.mac_FilesIndex('BaseMain_IPRange,{octet1, octet2, octet3, octet4, classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.IPRange,IPRange);		
+	tools.mac_FilesIndex('BaseMain_IPRange,{digit1, digit2, digit3, digit4, digit5, digit6, digit7, digit8, digit9, digit10, digit11, digit12, classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.IPRange,IPRange);		
 	// MBS exclusions 
 	tools.mac_FilesIndex('BaseMbs,{classification_Permissible_use_access.fdn_file_info_id},{record_id , UID}',KeyNames(pversion).Main.Mbs,Mbs);
 	tools.mac_FilesIndex('MbsIndTypExclusion,{fdn_file_info_id},{MbsIndTypExclusion}',KeyNames(pversion).Main.MbsIndTypeExclusion,MbsIndTypeExclusion);
