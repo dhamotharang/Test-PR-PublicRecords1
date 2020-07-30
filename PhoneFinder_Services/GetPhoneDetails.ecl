@@ -36,7 +36,7 @@
     SELF.streetAddress2 := contact_address2;
   END;
 
-  dsPhonesAttrRecsGrp := GROUP(SORT(dsPhonesAttr_recs, acctno, phone, carrier_city = '', contact_name = ''), acctno, phone);
+  dsPhonesAttrRecsGrp := GROUP(SORT(dsPhonesAttr_recs, acctno, phone, -event_date, carrier_city = '', contact_name = ''), acctno, phone);
 
   PhoneFinder_Services.Layouts.PhoneFinder.Final appendDetails(Phones.Layouts.PhoneAttributes.Raw le, DATASET(Phones.Layouts.PhoneAttributes.Raw) ri) :=
   TRANSFORM
