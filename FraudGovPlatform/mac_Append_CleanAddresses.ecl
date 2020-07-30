@@ -68,7 +68,7 @@
 		validAddresses,
 			LEFT.street_1 = RIGHT.street_1 and LEFT.street_2 = RIGHT.street_2 and 
 			LEFT.city = RIGHT.city  and LEFT.state = RIGHT.state and LEFT.zip = RIGHT.zip, 
-        TRANSFORM($.Layouts.Base.AddressCache, SELF := Right),
+        TRANSFORM($.Layouts.Base.AddressCache, SELF := LEFT),
 		INNER, LOOKUP, LOCAL );
 
 	//************************************************** To Clean *****************************************************//
