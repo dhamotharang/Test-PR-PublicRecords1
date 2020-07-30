@@ -292,11 +292,11 @@ END;
 		end;
 		
 		rCopyStatusWithParts xGetTotalFilePartFromDali(dPendingFiles l) := transform
-				l_tokens := STD.Str.SplitWords(regexreplace('_',l.subfile,'::'),'::');
+				l_tokens := STD.Str.SplitWords(l.subfile,'::');
 			
                 wordcount := STD.Str.CountWords(l.subfile,'::');
                 getlasttoken := STD.Str.GetNthWord(regexreplace('::',l.subfile,' '),wordcount);
-                abspath := l_roxiepathprefix+regexreplace(getlasttoken,regexreplace('::',l.subfile,'/'),'');
+                abspath := l_roxiepathprefix+regexreplace(getlasttoken+'$',regexreplace('::',l.subfile,'/'),'');
                 self.expectedfileparts := (unsigned4)STD.File.GetLogicalFileAttribute(if (l_roxiedali <> '','~foreign::'+l_roxiedali+'::','~')+l.subfile,'numparts');
 								self.filemask := getlasttoken;
                 self.directory := abspath;
@@ -324,6 +324,13 @@ END;
 		end;
 
 		dCopyStatusWithFileParts := project(dGetTotalFilePartFromDali,xCopyStatus(left));
+		
+		rCopyStatus xGetMissing(dCopyStatusWithFileParts l) := transform
+			self.pendingpartstocopy := l.expectedfileparts - l.copiedfileparts;
+			self := l;
+		end;
+		
+		dGetMissingParts := project(dCopyStatusWithFileParts(count(dAllParts) = 0),xGetMissing(left));
 		
 		rCopyStatus xNormRecs(dCopyStatusWithFileParts l, rParts - dFParts r) := transform
 			self.pendingpartstocopy := l.expectedfileparts - l.copiedfileparts;
