@@ -46,14 +46,17 @@ EXPORT Proc_Copy_RemoteLinkingKeys_From_Alpha(string filedate) := FUNCTION
     ,fc(get_alogical(aPref + 'dt_last_seen' + sSufx)  , aPref + 'dt_last_seen::' + filedate + '::publish')
     );
   
+
   QAfiles := STD.File.logicalfilelist('thor_data400::insuranceheader_remotelinking::did::word*::qa::current',FALSE,TRUE);
-    
+ 
   moveKeys := sequential(    
-        STD.File.StartSuperFileTransaction( )
+        STD.File.StartSuperFileTransaction( ) 
+        // deletes the files in 'father' that are not needed
+       ,nothor(apply(QAfiles,  STD.File.RemoveOwnedSubFiles('~' + regexreplace('::qa', name, '::father'), true)))
        ,nothor(apply(QAfiles, STD.File.PromoteSuperFileList(['~' + name, '~' + regexreplace('::qa', name, '::father')], '~' + regexreplace('qa::current', name, filedate) + '::publish')))
-       ,STD.File.FinishSuperFileTransaction( )
+       ,STD.File.FinishSuperFileTransaction( ) 
        );
-  
+
   seq := sequential(
           copyKeys,
           moveKeys
