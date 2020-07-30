@@ -3,9 +3,9 @@ IMPORT gateway;
 /*
   ** A generic functionmacro to soapcall a target roxie query.
   ** 
-  ** @param service_url       a dataset of testcases; REQUIRED. 
-  ** @param query_name        the name of the target query; REQUIRED.
-  ** @param in_recs           the target cluster url; REQUIRED, see Gateway._shortcuts for reference.
+  ** @param service_url       target cluster url; REQUIRED, see Gateway._shortcuts for reference.
+  ** @param query_name        target query; REQUIRED.
+  ** @param in_recs           dataset of testcases; REQUIRED. 
   ** @param output_layout     query output layout; REQUIRED.
   ** @param alias_suffix      target query name suffix (alias); OPTIONAL.
   ** @param xpath_results     path used to access results in query response; OPTIONAL. 

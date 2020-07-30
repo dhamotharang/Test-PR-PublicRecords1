@@ -8,4 +8,4 @@ testcases := dev_regression.bucket().get(my_query);
 output(testcases, named('testcases'));
 
 svc_layout := doxie.devtest._phone_noreconn_search.layout;
-dev_regression.mac_run_regression(testcases, service_url, svc_layout.request, svc_layout.response);
+dev_regression.mac_run_regression(testcases, svc_layout.request, svc_layout.response, service_url);
