@@ -69,8 +69,8 @@
 		EXPORT HpccConnectionDev		:= 'ramps_dev_fraudgov';
 		EXPORT EclCompileStrategy		:= 'LOCAL';											
 		EXPORT KeepEcl							:= 'FALSE';	
-		// EXPORT ForceRun							:= 'FALSE';
-		EXPORT ForceRun							:= 'TRUE';
+		EXPORT ForceRun							:= 'FALSE';
+		// EXPORT ForceRun							:= 'TRUE';
     EXPORT DeleteOldIndexes     := 'TRUE';
 		EXPORT FindLeads         		:= MODULE
 			EXPORT VizServiceVersion								:= '1';
