@@ -60,7 +60,7 @@ EXPORT GetRetrievalGateway_Records := MODULE
        OUTPUT(PROJECT(okc_w_xmlreq, TRANSFORM(Risk_Reporting.Layouts.LOG_DTE_Layout,
                                   SELF.TaskId            := LEFT.Response.Result.TaskID;
                                   SELF.TaskDescription   := $.Constants.LIENS_RETRIEVAL.OKC_TASK_DESC;
-                                  SELF.Request_XML       := '<RMSID>' + LEFT.RMSID + '</RMSID>' + '<TMSID>' + LEFT.TMSID + '</TMSID>' + '<ORIG_RMSID>' + LEFT.ORIG_RMSID + '</ORIG_RMSID>')),
+                                  SELF.Request_XML       := '<Request_XML><RMSID>' + LEFT.RMSID + '</RMSID>' + '<TMSID>' + LEFT.TMSID + '</TMSID>' + '<ORIG_RMSID>' + LEFT.ORIG_RMSID + '</ORIG_RMSID></Request_XML>')),
        NAMED('LOG_Deferred_Task_ESP')));
 
   RETURN output_okc;
@@ -96,9 +96,9 @@ EXPORT GetRetrievalGateway_Records := MODULE
 
    // get record level statements to the dte record by using tmsid/rmsid/did saved from original submitted okc request
     ref_rec := RECORD
-      STRING50 RMSID{xpath('LiensRMSID')};
-      STRING50 TMSID{xpath('LiensTMSID')};
-      STRING10 Orig_RMSID{xpath('Orig_RMSID')};
+      STRING50 RMSID;
+      STRING50 TMSID;
+      STRING10 Orig_RMSID;
     END;
 
     Ids_from_request :=  PROJECT(dte_gw_recs, TRANSFORM(ref_rec,
@@ -114,8 +114,9 @@ EXPORT GetRetrievalGateway_Records := MODULE
                            TRANSFORM($.layout_liens_retrieval.search_recs,
                             SELF := LEFT), KEEP(1), LIMIT(0));
 
-    //get filing_date from case - there will be only one case
-    case_filing_date := dte_gw_recs.ResponseJSON[1].Case[1].FilingDate;
+    //get filing_date from case - there will be only one case.Converting from mm/dd/yyyy to yyyymmdd
+    case_filing_date := STD.date.ConvertDateFormat(dte_gw_recs.ResponseJSON[1].Case[1].FilingDate, '%m/%d/%Y', '%Y%m%d');
+    isValid_filingdate:= FCRA.lien_is_ok((STRING) STD.Date.Today(), case_filing_date);
 
 
     // get parties and lexid them
@@ -142,7 +143,7 @@ EXPORT GetRetrievalGateway_Records := MODULE
       SELF.z5   := pinfo.Zip;
       SELF.zip4 := pinfo.Zip4;
       SELF.FilingTypeId := pinfo.FilingTypeId;
-      SELF.ReleaseDate := pinfo.ReleaseDate;
+      SELF.ReleaseDate := STD.date.ConvertDateFormat(pinfo.ReleaseDate);
       SELF.Amount := pinfo.amount;
       SELF := [];
 
@@ -153,11 +154,16 @@ EXPORT GetRetrievalGateway_Records := MODULE
                              OR STD.Str.ToUpperCase(PartyType) = $.Constants.LIENS_RETRIEVAL.DEBTOR),
                              todidville(RIGHT, counter));
 
-    BatchShare.MAC_SequenceInput (get_parties, ds_party_sequenced);
-    BatchShare.MAC_AppendPicklistDID(ds_party_sequenced, ds_did_out, batch_mod, TRUE);
+    valid_party_info := get_parties(FilingTypeId IN $.Constants.LIENS_RETRIEVAL.Valid_FilingtypeID);
+    // not a valid response from DTE if filing date older than 7 years and filingtype ID is not the supported list
+    invalid_dte_party := ~isValid_filingdate OR ~EXISTS(valid_party_info);
 
-    $.layout_liens_Retrieval.final_rec toFinal($.layout_liens_Retrieval.layout_workrec L,
-                                               $.layout_liens_retrieval.search_recs R) := TRANSFORM
+    BatchShare.MAC_SequenceInput (valid_party_info, ds_party_sequenced);
+    BatchShare.MAC_AppendPicklistDID(ds_party_sequenced, ds_did_out_pre, batch_mod, TRUE);
+
+    ds_did_out  := IF(invalid_dte_party, DATASET([], RECORDOF(ds_did_out_pre)), ds_did_out_pre);
+
+    $.layout_liens_Retrieval.final_rec toFinal($.layout_liens_Retrieval.layout_workrec L, $.layout_liens_retrieval.search_recs R) := TRANSFORM
 
      SELF.did             := L.did;
      SELF.fname           := L.name_first;
@@ -180,11 +186,10 @@ EXPORT GetRetrievalGateway_Records := MODULE
      SELF.release_date    := L.ReleaseDate;
      SELF.Filing_Type_ID  := L.FilingTypeId;
      SELF.amount          := L.Amount;
-     SELF.filing_date     := IF(FCRA.lien_is_ok((STRING) STD.Date.Today(), case_filing_date), case_filing_date, '');
+     SELF.filing_date     := IF(isValid_filingdate, case_filing_date, '');
      SELF.isOKCSuccess    := FALSE; //false for dte call
      SELF.isDisputed      := R.isDisputed;
      SELF.StatementIds    := R.StatementIds;
-
     END;
 
     // Lexid validation defendant vs input pii resolved lexid, and attach record level statements and isdisputed flag
@@ -193,11 +198,12 @@ EXPORT GetRetrievalGateway_Records := MODULE
                       toFinal(LEFT,RIGHT));
 
     resolved_to_none := COUNT(output_dte) != 1;
-    err_response := ~valid_response OR resolved_to_none; // if no match/more than one match
+    err_response := ~valid_response OR resolved_to_none OR invalid_dte_party; // if no match/more than one match
 
     $.layout_liens_Retrieval.final_rec ErrorOut() := TRANSFORM
 
        SELF.error_code := MAP(~valid_response => $.constants.LIENS_RETRIEVAL.GATEWAY_FAILURE_CODE,
+                              invalid_dte_party => (STRING) $.constants.LIENS_RETRIEVAL.NO_RECS_FOUND_CODE,
                               resolved_to_none => FCRA.Constants.ALERT_CODE.NO_DID_FOUND,
                               '');
         SELF := [];
