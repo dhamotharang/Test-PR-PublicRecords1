@@ -292,11 +292,11 @@ END;
 		end;
 		
 		rCopyStatusWithParts xGetTotalFilePartFromDali(dPendingFiles l) := transform
-				l_tokens := STD.Str.SplitWords(regexreplace('_',l.subfile,'::'),'::');
+				l_tokens := STD.Str.SplitWords(l.subfile,'::');
 			
                 wordcount := STD.Str.CountWords(l.subfile,'::');
                 getlasttoken := STD.Str.GetNthWord(regexreplace('::',l.subfile,' '),wordcount);
-                abspath := l_roxiepathprefix+regexreplace(getlasttoken,regexreplace('::',l.subfile,'/'),'');
+                abspath := l_roxiepathprefix+regexreplace(getlasttoken+'$',regexreplace('::',l.subfile,'/'),'');
                 self.expectedfileparts := (unsigned4)STD.File.GetLogicalFileAttribute(if (l_roxiedali <> '','~foreign::'+l_roxiedali+'::','~')+l.subfile,'numparts');
 								self.filemask := getlasttoken;
                 self.directory := abspath;
@@ -324,6 +324,13 @@ END;
 		end;
 
 		dCopyStatusWithFileParts := project(dGetTotalFilePartFromDali,xCopyStatus(left));
+		
+		rCopyStatus xGetMissing(dCopyStatusWithFileParts l) := transform
+			self.pendingpartstocopy := l.expectedfileparts - l.copiedfileparts;
+			self := l;
+		end;
+		
+		dGetMissingParts := project(dCopyStatusWithFileParts(count(dAllParts) = 0),xGetMissing(left));
 		
 		rCopyStatus xNormRecs(dCopyStatusWithFileParts l, rParts - dFParts r) := transform
 			self.pendingpartstocopy := l.expectedfileparts - l.copiedfileparts;
@@ -420,16 +427,18 @@ END;
 												,STD.File.AddSuperFile(vCopyStatusFileNamePrefix + '_delete',vCopyStatusFileNamePrefix,, true)
 												,STD.File.ClearSuperFile(vCopyStatusFileNamePrefix)
 												,STD.File.AddSuperFile(vCopyStatusFileNamePrefix,vCopyStatusFileNamePrefix + '_' + vDateTime)
-												,if (desprayserver <> '' and despraylocation <> ''
-														,if (isDespray
+												,if (isDespray
+													,if (desprayserver <> '' and despraylocation <> ''
+														
 																,STD.File.DeSpray(vCopyStatusFileNamePrefix
 																									,desprayserver
 																									,despraylocation
 																									,allowoverwrite := true)
-																,output('No Despray')
-																)
-														,fail(9999,'Despray server or Despray location is empty but isDespray is set to true. Either set isDespray to false or pass despray server and location. Not re-scheduling')
-														)
+																
+															,fail(9999,'Despray server or Despray location is empty but isDespray is set to true. Either set isDespray to false or pass despray server and location. Not re-scheduling')
+															)
+														,output('No Despray')
+													)
 													,STD.File.DeleteLogicalFile(vCopyStatusFileNamePrefix + '_running')	
 												);
 	end;

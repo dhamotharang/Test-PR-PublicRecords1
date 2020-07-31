@@ -24378,5 +24378,5 @@ EXPORT B_Event_1 := MODULE
     SELF.T___Src_Agency_Uid_ := __PP1863865.Customer_Id_;
     SELF := __PP1863865;
   END;
-  EXPORT __ENH_Event_1 := PROJECT(__EE1863864,__ND1863869__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_1',EXPIRE(7));
+  EXPORT __ENH_Event_1 := PROJECT(__EE1863864,__ND1863869__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Event::Annotated_1',EXPIRE(7));
 END;
