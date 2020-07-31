@@ -1,5 +1,5 @@
 ﻿import versioncontrol, _control, ut, tools, UPI_DataBuild__dev, HealthcareNoMatchHeader_InternalLinking, HealthcareNoMatchHeader_Ingest, Workman;
-export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_name, pBatch_jobID, pAppendOption, pReceivingID) := functionmacro
+export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_name, pBatch_jobID, pAppendOption, pReceivingID, crk_suffix) := functionmacro
 	return module
 	export check_supers	:= function
 		superFile_frombatch 						:= if(pHistMode = 'A',FileServices.SuperFileExists('~ushc::crk::from_batch::' + gcid),
@@ -163,7 +163,7 @@ export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_n
 		
 	export pVersion_unique			:= pVersion + '_' + trim(pBatch_jobID);
 	
-	export pMasterBuild					:= 'G' + gcid + '_CRK003';
+	export pMasterBuild					:= 'G' + gcid + '_' + crk_suffix;
 	export Orbit_token					:= UPI_DataBuild__dev.Orbit_Login();
 	
 	export createNewBuild				:= 	UPI_DataBuild__dev.Orbit_CreateBuild(
