@@ -25,4 +25,14 @@
 		return Business_Header.Regulatory.applyBusinessContactInj_AtEnd(base_ds);
 	ENDMACRO;
 
+	EXPORT applyDidAddressBusiness_sup(base_ds) := FUNCTIONMACRO
+		import Business_Header;
+		return Business_Header.Regulatory.applyDidAddressBusiness_sup(base_ds);
+	ENDMACRO;
+
+	EXPORT applyDidAddressBusiness_sup2(base_ds) := FUNCTIONMACRO
+		import Business_Header;
+		return Business_Header.Regulatory.applyDidAddressBusiness_sup2(base_ds);
+	ENDMACRO;
+
 END;
