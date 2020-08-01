@@ -329,5 +329,29 @@
 		
 	ENDMACRO;
 
+	EXPORT applyDidAddressBusiness_sup(base_ds) := FUNCTIONMACRO
+		import Business_Header, Suppress;
+
+		local DidAddressBusinessHash (recordof(base_ds) L) :=  hashmd5(
+															l.bdid,(string)l.state,(string)l.zip,(string)l.city,
+															(string)l.prim_name,(string)l.prim_range,(string)l.predir,
+															(string)l.addr_suffix,(string)l.postdir,(string)l.sec_range);
+						
+		local ds1 := Suppress.applyRegulatory.simple_sup(base_ds, 'didaddressbusiness_sup.txt', DidAddressBusinessHash);
+		return (ds1);
+
+	ENDMACRO;
+
+ 	EXPORT applyDidAddressBusiness_sup2(base_ds) := FUNCTIONMACRO
+		import Business_Header, Suppress;
+		local DidAddressBusinessHash2 (recordof(base_ds) L) :=  hashmd5(
+																intformat((unsigned6)l.bdid,12,1),(string)l.state,(string)l.zip,(string)l.city,
+																(string)l.prim_name,(string)l.prim_range,(string)l.predir,
+																(string)l.addr_suffix,(string)l.postdir,(string)l.sec_range);
+							
+		local ds1 := Suppress.applyRegulatory.simple_sup(base_ds, 'didaddressbusiness_sup.txt', DidAddressBusinessHash2);
+		return (ds1);
+
+	ENDMACRO;
 
 END;
