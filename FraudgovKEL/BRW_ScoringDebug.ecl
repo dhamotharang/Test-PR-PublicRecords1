@@ -81,11 +81,11 @@ HighRiskCounts := TABLE(HighRiskCountsPrep,
 // JOIN High Risk Counts to Modeling Output
 ModelingAttributeOutput := FraudgovKEL.KEL_EventShell.ModelingStats;
 
-ModelingWithHRICounts := JOIN(ModelingAttributeOutput, HighRiskCounts, LEFT.customerid = RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype AND LEFT.t_actuid=RIGHT.t_actuid, HASH);
+ModelingWithHRICounts := JOIN(ModelingAttributeOutput, HighRiskCounts, LEFT.agencyuid = RIGHT.customerid AND LEFT.agencyprogtype=RIGHT.industrytype AND LEFT.t_actuid=RIGHT.t_actuid, HASH);
                     
 // JOIN Scoring Debug to Modeling Output
 
-ModelingWithScoringDebug := JOIN(ModelingWithHRICounts, RulesFlagFinal, LEFT.customerid = RIGHT.customerid AND LEFT.industrytype=RIGHT.industrytype AND (UNSIGNED8)LEFT.t_actuid=(UNSIGNED8)RIGHT.t_actuid, HASH);
+ModelingWithScoringDebug := JOIN(ModelingWithHRICounts, RulesFlagFinal, LEFT.agencyuid = RIGHT.customerid AND LEFT.agencyprogtype=RIGHT.industrytype AND (UNSIGNED8)LEFT.t_actuid=(UNSIGNED8)RIGHT.t_actuid, HASH);
 
 output(ModelingWithScoringDebug,,'~fraudgov::deleteme_nd_full', overwrite);	
-output(ModelingOutput,,'~fraudgov::deleteme_nd_full_csv', CSV(QUOTE('"')), overwrite);
+output(ModelingOutput,,'~fraudgov::deleteme_nd_csv', CSV(QUOTE('"')), overwrite);
