@@ -258,18 +258,18 @@ EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,
       UseTagBlur => STD.STR.Find(ut.blur(wildfile.wd_plate_number), tag_blur, 1) > 0,
                             // blur is too loose for contains or wild; so we'll search for a substring instead and do so all the time
       containsSearch_use => STD.STR.Contains(wildfile.wd_plate_number, tag_value, TRUE),
-      doWild => STD.STR.WildMatch(wildfile.wd_plate_number, wild_tag, TRUE),
+      doWild => stringlib.StringWildMatch(wildfile.wd_plate_number, wild_tag, TRUE),
       FALSE);
 
 // matching the VIN
   vinmatch := MAP(vin_value = '' => TRUE,
       // NOTE: We don't do a "contains" search in VIN, to aid in efficiency
-      doWildVIN => STD.STR.WildMatch(wildfile.wd_VIN, wild_vin, TRUE), // TRUE here ignore CASE of STRING value
+      doWildVIN => stringlib.StringWildMatch(wildfile.wd_VIN, wild_vin, TRUE), // TRUE here ignore CASE of STRING value
       vin_value = wildfile.wd_VIN);
 
   // Zip5 wildcard matching
   WildZipMatch := MAP(
-    doWildZip => STD.STR.WildMatch((STRING5)wildfile.wd_zip, wild_zip, TRUE), // TRUE here ignore CASE of STRING value
+    doWildZip => stringlib.StringWildMatch((STRING5)wildfile.wd_zip, wild_zip, TRUE), // TRUE here ignore CASE of STRING value
     TRUE);
 
 // matching the age range

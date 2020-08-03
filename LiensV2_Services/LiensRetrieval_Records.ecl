@@ -59,9 +59,9 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
     
   filtered_liens := filtered_liens_byinput(agencyId <> '' AND ~isDisputed);
   // search should resolve to single record, if yes, drop the disputed records
-  invalid_recs := resolved_did <> 0 AND COUNT(filtered_liens) != 1;
+  invalid_search_recs := resolved_did <> 0 AND COUNT(filtered_liens) != 1;
 
-  liens_recs    := IF(invalid_recs,
+  liens_recs    := IF(invalid_search_recs,
                       DATASET([],$.layout_liens_retrieval.search_recs),
                       filtered_liens);
 
@@ -164,13 +164,15 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
 															   '',
 															   $.Constants.LIENS_RETRIEVAL.COURTID_BLANK_EXCEPTION}], iesp.share.t_WsException);
 
+     invalid_recs := invalid_search_recs OR search_recs[1].error_code = (STRING) $.constants.LIENS_RETRIEVAL.NO_RECS_FOUND_CODE;
+
      ds_norecs_excep  := DATASET([{$.Constants.LIENS_RETRIEVAL.ERRORSOURCE,
 															    $.Constants.LIENS_RETRIEVAL.NO_RECS_FOUND_CODE,
 															    '',
 															     $.Constants.LIENS_RETRIEVAL.NO_RECS_FOUND_EXCEPTION}], iesp.share.t_WsException);
                                    
       SELF._Header.Exceptions:= MAP(is_court_id_blank => ds_courtid_excep,
-                                  invalid_recs        => ds_norecs_excep,
+                                  invalid_recs   => ds_norecs_excep,
                                   gateway_failed    => ds_gateway_excep,
                                   DATASET([], iesp.share.t_WsException));
       

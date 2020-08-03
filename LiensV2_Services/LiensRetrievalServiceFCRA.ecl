@@ -27,6 +27,9 @@ EXPORT LiensRetrievalServiceFCRA := MACRO
    response :=   PROJECT(srch_recs, TRANSFORM(iesp.riskview_publicrecordretrieval.t_PublicRecordRetrievalResponseEx,
                                     SELF.response := LEFT));
 
-  IF(params.InputOk, OUTPUT(response,named('Response')),FAIL(301, doxie.ErrorCodes(301))) ;
+  MAP( params.Invalid_FilingtypeID => FAIL(LiensV2_Services.Constants.LIENS_RETRIEVAL.Invalid_FilingtypeID_failure),
+      ~params.InputOk =>FAIL(301, doxie.ErrorCodes(301)),
+      params.InputOk => OUTPUT(response,named('Response'))   
+      ) ;
 
  ENDMACRO;
