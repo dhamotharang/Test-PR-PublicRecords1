@@ -155,7 +155,9 @@
 '15434261', //CC-3237 Dempsey correction removal
 '15434271', //CC-3237 Dempsey correction removal
 '15434281', //CC-3237 Dempsey correction removal
-'15434291'  //CC-3237 Dempsey correction removal
+'15434291',  //CC-3237 Dempsey correction removal
+'15454911', //CC-3325 Dempsey correction removal
+'15451461' //CC-3333 Dempsey correction removal
 ];
 
 
