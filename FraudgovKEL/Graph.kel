@@ -1115,7 +1115,7 @@ USE FraudgovKEL.fraudgovshared(FLAT,
     DeceasedMatchCode = matchcode,
 		DateFirstSeen = dt_first_seen, // Contains information for ASOF
 		DateLastSeen = dt_last_seen),		// Contains information for ASOF
-	Address(FILTER((UNSIGNED)record_id > 0 AND OttoAddressId != 12638153115695167395),
+	Address(FILTER((UNSIGNED)record_id > 0 AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0),
 		PrimaryRange = clean_address.prim_range,
 		Predirectional = clean_address.predir,
 		PrimaryName = clean_address.prim_name,
@@ -1198,13 +1198,13 @@ USE FraudgovKEL.fraudgovshared(FLAT,
 		CreatedOn=email_address_date,
 		DateFirstSeen = dt_first_seen,
 		DateLastSeen = dt_last_seen),
-	PersonAddress(FILTER((UNSIGNED)did <> 0),
+	PersonAddress(FILTER((UNSIGNED)did <> 0 AND (STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0 AND AssociatedCustomerFileInfo > 0),
     LexId = did,
 		EventDate = event_date,
 		DateLastSeen = dt_last_seen,
 		DateFirstSeen = dt_first_seen),
 
-  CustomerPerson(FILTER((UNSIGNED)did<>0 AND AssociatedCustomerFileInfo > 0),		
+  CustomerPerson(FILTER((UNSIGNED)did<>0 AND (UNSIGNED)ssn<>0 AND AssociatedCustomerFileInfo > 0),		
     LexId = did,
 		DateLastSeen = dt_last_seen,
 		DateFirstSeen = dt_first_seen),
@@ -1214,11 +1214,11 @@ USE FraudgovKEL.fraudgovshared(FLAT,
 		EventDate = event_date,
 		DateLastSeen = dt_last_seen,
 		DateFirstSeen = dt_first_seen),
-	AddressSSN(FILTER((UNSIGNED)ssn <>0 AND AssociatedCustomerFileInfo > 0),
+	AddressSSN(FILTER((STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0 AND (UNSIGNED)ssn <>0 AND AssociatedCustomerFileInfo > 0),
 		EventDate = event_date,
 		DateLastSeen = dt_last_seen,
 		DateFirstSeen = dt_first_seen),
-	PersonPhone(FILTER((UNSIGNED)did <> 0 AND clean_phones.cell_phone != ''),
+	PersonPhone(FILTER((UNSIGNED)did <> 0 AND clean_phones.cell_phone != '' AND (STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0),
     LexId = did,
 		EventDate = event_date,
 		PhoneNumber = clean_phones.cell_phone,
@@ -1248,13 +1248,11 @@ USE FraudgovKEL.fraudgovshared(FLAT,
     Transaction = record_id,
 		EventDate = event_date   
   ),
-  /*
   PhoneEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND clean_phones.cell_phone != ''),
 		PhoneNumber = clean_phones.cell_phone,
 		EventDate = event_date,
     Transaction = record_id    
   ),
-  */
   PhoneEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND clean_phones.phone_number != ''),
 		PhoneNumber = clean_phones.phone_number,
 		EventDate = event_date,
@@ -1278,11 +1276,11 @@ USE FraudgovKEL.fraudgovshared(FLAT,
 		EventDate = event_date,
     Transaction = record_id    
   ),  
-  InternetProtocolEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND TRIM(ip_address) != '' AND ip_address NOT IN ['0.0.0.0']),
+  InternetProtocolEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND TRIM(ip_address) != '' AND ip_address NOT IN ['0.0.0.0','10.121.146.247','10.121.146.90','10.121.146.15','10.121.146.159','10.121.146.249','10.121.146.34','10.121.146.231','10.121.146.235','10.121.146.232']),
 		EventDate = event_date,
     Transaction = record_id    
   ),
-  AddressEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND OttoAddressId != 12638153115695167395),
+  AddressEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0),
     EventDate = event_date,
     Transaction = record_id    
   ),
@@ -1327,9 +1325,9 @@ USE FraudgovKEL.fraudgovshared(FLAT,
     Transaction = record_id    
   ),
 */
-  InternetProtocol(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND TRIM(ip_address) != '' AND ip_address NOT IN ['0.0.0.0'])),
+  InternetProtocol(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND TRIM(ip_address) != '' AND ip_address NOT IN ['0.0.0.0','10.121.146.247','10.121.146.90','10.121.146.15','10.121.146.159','10.121.146.249','10.121.146.34','10.121.146.231','10.121.146.235','10.121.146.232'])),
 	
-  PersonIpAddress(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND TRIM(ip_address) != '' AND ip_address NOT IN ['0.0.0.0']),
+  PersonIpAddress(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND TRIM(ip_address) != '' AND ip_address NOT IN ['0.0.0.0','10.121.146.247','10.121.146.90','10.121.146.15','10.121.146.159','10.121.146.249','10.121.146.34','10.121.146.231','10.121.146.235','10.121.146.232']),
     LexId = did),
 
   Bank(FILTER(bank_routing_number_1 != '' AND bank_account_number_1 != ''),
@@ -1439,7 +1437,7 @@ USE FraudgovKEL.PersonCrim(FLAT,
 USE FraudgovKEL.PersonIPMetadata(FLAT,
   Event(FILTER((UNSIGNED)record_id > 0 and did > 0), 
     LexId = did),
-  InternetProtocol(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND ip_address NOT IN ['0.0.0.0']),
+  InternetProtocol(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND ip_address NOT IN ['0.0.0.0','10.121.146.247','10.121.146.90','10.121.146.15','10.121.146.159','10.121.146.249','10.121.146.34','10.121.146.231','10.121.146.235','10.121.146.232']),
     IpAddress = ip_address
     )
   );
@@ -2153,7 +2151,7 @@ Event: => P1_AotIdKrAppFrdActShrdOldDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPo
 																		    ALL(PersonEvent.Transaction,P1_AotIdKrAppFrdActShrdFlagEv=-99997) => -99997,
 																				INTEGER(Subject.AotIdKrAppFrdActShrdOldDtEv));
 Event: => P1_AotIdKrAppFrdActShrdNewDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
-																		    T_SrcClassType <2 OR P1_AotIdKrActShrdFlagEv=0 => -99998,
+																		    T_SrcClassType <2 OR P1_AotIdKrAppFrdActShrdFlagEv=0 => -99998,
 																		    ALL(PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
 																				INTEGER(Subject.AotIdKrAppFrdActShrdNewDtEv));	
 //ID KR General Fraud Attrs
@@ -3878,7 +3876,7 @@ Event: => DlIsLastEventId := MAP(rDriversLicense.LastRecordId = RecordId => 1, 0
 
 Event: => PersonLabel := TRIM(LastName) + ', ' + TRIM(FirstName) + TRIM(' ' + SUBSTR(MiddleName,1, 1));
 Event: => EmailLabel := EmailAddress;
-Event: => AddressLabel := CleanSpaces(TRIM(TRIM(TRIM(PrimaryRange) + ' ' + TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(Suffix) + ' ' + TRIM(Postdirectional) + ' ' + TRIM(UnitDesignation) + ' ' + TRIM(SecondaryRange)) + ', ' + TRIM(TRIM(VanityCity) + ', ' + TRIM(State)) + ' ' + TRIM(Zip))));
+Event: => AddressLabel := CleanSpaces(TRIM(TRIM(PrimaryRange) + ' ' + TRIM(TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(TRIM(Suffix) + ' ' + TRIM(TRIM(Postdirectional) + ' ' + TRIM(TRIM(UnitDesignation) + ' ' + TRIM(TRIM(SecondaryRange) + ', ' + TRIM(TRIM(VanityCity) + ', ' + TRIM(State)) + ' ' + TRIM(Zip)))))))));
 Event: => IpLabel := IpAddress;
 Event: => SsnLabel := SsnFormatted;
 Event: => PhoneLabel := PhoneFormatted;
@@ -3989,8 +3987,10 @@ Person: => DtFirstSeen := MIN(PersonEvent.Transaction, EventDate);
 Person: => DtLastSeen := MAX(PersonEvent.Transaction, EventDate);
 Person: => IdActivityDtFirstSeen := MIN(PersonEvent.Transaction(T_SrcClassType = 4), EventDate);
 Person: => IdActivityDtLastSeen := MAX(PersonEvent.Transaction(T_SrcClassType = 4), EventDate);
-Person: => LastRecordId := MAP(ALL(PersonEvent.Transaction,T_SrcClassType IN [2,3]) => MIN(PersonEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Person.DtFirstSeen), RecordId),
+Person: => LastRecordId := MAP(ALL(PersonEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(PersonEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Person.DtLastSeen), RecordId),
                   MAX(PersonEvent.Transaction(T_SrcClassType = 4 AND EventDate=Person.IdActivityDtLastSeen), RecordId));
+
+
 
 Person: => NoLexId := MAP(LexId > 900000000000 => 1, 0);
 Person: => DateOfBirth := MAX(ReportedDateOfBirth, DateOfBirth);
@@ -4183,7 +4183,7 @@ SocialSecurityNumber: => DtFirstSeen := MIN(SsnEvent.Transaction, EventDate);
 SocialSecurityNumber: => DtLastSeen := MAX(SsnEvent.Transaction, EventDate);
 SocialSecurityNumber: => IdActivityDtFirstSeen := MIN(SsnEvent.Transaction(T_SrcClassType = 4), EventDate);
 SocialSecurityNumber: => IdActivityDtLastSeen := MAX(SsnEvent.Transaction(T_SrcClassType = 4), EventDate);
-SocialSecurityNumber: => LastRecordId := MAP(ALL(SsnEvent.Transaction,T_SrcClassType IN [2,3]) => MIN(SsnEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=SocialSecurityNumber.DtFirstSeen), RecordId),
+SocialSecurityNumber: => LastRecordId := MAP(ALL(SsnEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(SsnEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=SocialSecurityNumber.DtLastSeen), RecordId),
                   MAX(SsnEvent.Transaction(T_SrcClassType = 4 AND EventDate=SocialSecurityNumber.IdActivityDtLastSeen), RecordId));
 
 SocialSecurityNumber: => IdentityCount := COUNT(PersonSSN{Subject});
@@ -4243,7 +4243,7 @@ Phone: => DtFirstSeen := MIN(PhoneEvent.Transaction, EventDate);
 Phone: => DtLastSeen := MAX(PhoneEvent.Transaction, EventDate);
 Phone: => IdActivityDtFirstSeen := MIN(PhoneEvent.Transaction(T_SrcClassType = 4), EventDate);
 Phone: => IdActivityDtLastSeen := MAX(PhoneEvent.Transaction(T_SrcClassType = 4), EventDate);
-Phone: => LastRecordId := MAP(ALL(PhoneEvent.Transaction,T_SrcClassType IN [2,3]) => MIN(PhoneEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Phone.DtFirstSeen), RecordId),
+Phone: => LastRecordId := MAP(ALL(PhoneEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(PhoneEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Phone.DtLastSeen), RecordId),
                   MAX(PhoneEvent.Transaction(T_SrcClassType = 4 AND EventDate=Phone.IdActivityDtLastSeen), RecordId));
 
 Phone: => IdentityCount := COUNT(PersonPhone{Subject});
@@ -4302,7 +4302,7 @@ Email: => DtFirstSeen := MIN(EmailEvent.Transaction, EventDate);
 Email: => DtLastSeen := MAX(EmailEvent.Transaction, EventDate);
 Email: => IdActivityDtFirstSeen := MIN(EmailEvent.Transaction(T_SrcClassType = 4), EventDate);
 Email: => IdActivityDtLastSeen := MAX(EmailEvent.Transaction(T_SrcClassType = 4), EventDate);
-Email: => LastRecordId := MAP(ALL(EmailEvent.Transaction,T_SrcClassType IN [2,3]) => MIN(EmailEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Email.DtFirstSeen), RecordId),
+Email: => LastRecordId := MAP(ALL(EmailEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(EmailEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Email.DtLastSeen), RecordId),
                   MAX(EmailEvent.Transaction(T_SrcClassType = 4 AND EventDate=Email.IdActivityDtLastSeen), RecordId));
 
 
@@ -4372,7 +4372,7 @@ BankAccount: => DtLastSeen := MAX(BankAccountEvent.Transaction, EventDate);
 
 BankAccount: => IdActivityDtFirstSeen := MIN(BankAccountEvent.Transaction(T_SrcClassType = 4), EventDate);
 BankAccount: => IdActivityDtLastSeen := MAX(BankAccountEvent.Transaction(T_SrcClassType = 4), EventDate);
-BankAccount: => LastRecordId := MAP(ALL(BankAccountEvent.Transaction,T_SrcClassType IN [2,3]) => MIN(BankAccountEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=BankAccount.DtFirstSeen), RecordId),
+BankAccount: => LastRecordId := MAP(ALL(BankAccountEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(BankAccountEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=BankAccount.DtLastSeen), RecordId),
                   MAX(BankAccountEvent.Transaction(T_SrcClassType = 4 AND EventDate=BankAccount.IdActivityDtLastSeen), RecordId));
 
 BankAccount: => IdentityCount := COUNT(PersonBankAccount{Subject});
@@ -4435,7 +4435,7 @@ DriversLicense: => DtFirstSeen := MIN(DriversLicenseEvent.Transaction, EventDate
 DriversLicense: => DtLastSeen := MAX(DriversLicenseEvent.Transaction, EventDate);
 DriversLicense: => IdActivityDtFirstSeen := MIN(DriversLicenseEvent.Transaction(T_SrcClassType = 4), EventDate);
 DriversLicense: => IdActivityDtLastSeen := MAX(DriversLicenseEvent.Transaction(T_SrcClassType = 4), EventDate);
-DriversLicense: => LastRecordId := MAP(ALL(DriversLicenseEvent.Transaction,T_SrcClassType IN [2,3]) => MIN(DriversLicenseEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=DriversLicense.DtFirstSeen), RecordId),
+DriversLicense: => LastRecordId := MAP(ALL(DriversLicenseEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(DriversLicenseEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=DriversLicense.DtLastSeen), RecordId),
                   MAX(DriversLicenseEvent.Transaction(T_SrcClassType = 4 AND EventDate=DriversLicense.IdActivityDtLastSeen), RecordId));
 
 
@@ -4499,7 +4499,7 @@ InternetProtocol: => DtFirstSeen := MIN(InternetProtocolEvent.Transaction, Event
 InternetProtocol: => DtLastSeen := MAX(InternetProtocolEvent.Transaction, EventDate);
 InternetProtocol: => IdActivityDtFirstSeen := MIN(InternetProtocolEvent.Transaction(T_SrcClassType = 4), EventDate);
 InternetProtocol: => IdActivityDtLastSeen := MAX(InternetProtocolEvent.Transaction(T_SrcClassType = 4), EventDate);
-InternetProtocol: => LastRecordId := MAP(ALL(InternetProtocolEvent.Transaction,T_SrcClassType IN [2,3]) => MIN(InternetProtocolEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=InternetProtocol.DtFirstSeen), RecordId),
+InternetProtocol: => LastRecordId := MAP(ALL(InternetProtocolEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(InternetProtocolEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=InternetProtocol.DtLastSeen), RecordId),
                   MAX(InternetProtocolEvent.Transaction(T_SrcClassType = 4 AND EventDate=InternetProtocol.IdActivityDtLastSeen), RecordId));
 
 
@@ -4576,7 +4576,7 @@ Address: => DtLastSeen := MAX(AddressEvent.Transaction, EventDate);
 
 Address: => IdActivityDtFirstSeen := MIN(AddressEvent.Transaction(T_SrcClassType = 4), EventDate);
 Address: => IdActivityDtLastSeen := MAX(AddressEvent.Transaction(T_SrcClassType = 4), EventDate);
-Address: => LastRecordId := MAP(ALL(AddressEvent.Transaction,T_SrcClassType IN [2,3]) => MIN(AddressEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Address.DtFirstSeen), RecordId),
+Address: => LastRecordId := MAP(ALL(AddressEvent.Transaction,T_SrcClassType IN [2,3]) => MAX(AddressEvent.Transaction(T_SrcClassType IN [2,3] AND EventDate=Address.DtLastSeen), RecordId),
                   MAX(AddressEvent.Transaction(T_SrcClassType = 4 AND EventDate=Address.IdActivityDtLastSeen), RecordId));
 
 Address: => NotInJurisdictionState := MAP(State != rCustomer.JurisdictionState => 1, 0);
