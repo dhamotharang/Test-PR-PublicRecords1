@@ -1,4 +1,4 @@
-﻿import Doxie,didville, header,Healthcare_Header_Services,Suppress,dx_Header;
+﻿﻿import Doxie,didville, header,Healthcare_Header_Services,Suppress,dx_Header;
 EXPORT Datasource_Boca_Header := Module
 	Export get_boca_header_entity (dataset(Healthcare_Header_Services.Layouts.autokeyInput) input, dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg):= function
      mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
@@ -22,13 +22,13 @@ EXPORT Datasource_Boca_Header := Module
 											keep(Constants.MAX_RECS_ON_JOIN), limit(0)); 
 
       supmacbocahdr:=Suppress.MAC_FlagSuppressedSource(base_data0, mod_access); 
-      setOptOutbocahdr := project(supmacbocahdr, transform(Healthcare_Header_Services.Layouts.bocahdr_base_with_input,self.hasOptOut:= left.is_suppressed;self:=left;self:=[]));											
+      setOptOutbocahdr := project(supmacbocahdr, transform({dx_Header.layout_key_header, boolean hasOptOut},self.hasOptOut:= left.is_suppressed;self:=left;self:=[]));											
       basedata1:=project(setOptOutbocahdr,transform({dx_Header.layout_key_header, boolean hasOptOut},self:=left;self:=[]));
 
 			Header.MAC_GlbClean_Header(basedata1, base_data_cleaned, , , mod_access);
 		
 			base_data := join(dup_res, base_data_cleaned,
-												left.prov_id = right.s_did, 
+												left.prov_id = right.did, 
 												transform(Healthcare_Header_Services.Layouts.bocahdr_base_with_input,self.l_providerid:=right.s_did;self.rawData:=right;
 																																		self.name_first:=right.fname;self.name_middle:=right.mname;self.name_last:=right.lname;
 																																		self:=left;self:=right), 
