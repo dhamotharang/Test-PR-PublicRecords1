@@ -201,12 +201,12 @@ EXPORT rComments AllComments(dataset(Layouts.rEntity) infile) := FUNCTION
 				self.SubCategoryLabel := 'Primary PEP';
 				self.SubCategoryDesc := 'Former PEP';
 				self.IsActivePEP := 'Y';
-				self := left;));
+				self := left;),local);
 			
 			
 			restored := newcat(segmenttype<>'PEP') + justformer + noformer + ForceFormer;
 			
-			Allreasons := sort((GetMultReasons(restored)), Ent_ID, cmts, local); //Original
+			Allreasons := (GetMultReasons(restored)); //Original
 					
 		items := SORT(Distribute(
 								//GetConsolidatedRec(infile) &
@@ -215,11 +215,11 @@ EXPORT rComments AllComments(dataset(Layouts.rEntity) infile) := FUNCTION
 								/*& GetAge(infile)*/ //Fix for Bug: 144622 
 								//& GetReasons(Main) & GetMultReasons(newcat)
 								& GetLevel(infile) 
-								& dedup(Allreasons,Ent_ID,cmts, ALL)
+								& dedup(sort(Allreasons,cmts, local),Ent_ID, cmts,ALL)
 								//& Allreasons
 								& GetRelComments(infile) & GetRelExcessive &
 								GetModifiedDates(infile) & GetNotes(infile),Ent_id),
-								Ent_Id, sorter, LOCAL);
+								Ent_Id, sorter, cmts, LOCAL);
 
 			
 		rComments RollRecs(rComments L, rComments R) := TRANSFORM
