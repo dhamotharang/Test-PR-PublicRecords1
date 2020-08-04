@@ -1340,6 +1340,7 @@
 				trim(kword, left, right) = 'GERS' =>SubGroup_Constants.numKeywordsID.KEYWORD_GERS,
 				trim(kword, left, right) = 'DKKFST' =>SubGroup_Constants.numKeywordsID.KEYWORD_DKKFST,
 				trim(kword, left, right) = 'MDBNM' =>SubGroup_Constants.numKeywordsID.KEYWORD_MDBNM,
+				trim(kword, left, right) = 'EU-CYBER' =>SubGroup_Constants.numKeywordsID.KEYWORD_EU_CYBER,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
