@@ -7,9 +7,9 @@ EXPORT proc_build_keys (STRING	pVersion):=function
 	name_did := FCRAprefix + 'did';
 	name_driverslicense:= prefix + 'driverslicense';
 
-	RoxieKeybuild.MAC_build_logical(dx_FirstData.key_DID(),FirstData.data_key_did_fcra,dx_FirstData.names('').i_did_FCRA,name_did,fcra_first_data_key);
+	RoxieKeybuild.MAC_build_logical(dx_FirstData.key_DID(),FirstData.data_key_did_fcra(pversion),dx_FirstData.names('').i_did_FCRA,name_did,fcra_first_data_key);
 	
-	RoxieKeybuild.MAC_build_logical(dx_FirstData.key_driverslicense(),FirstData.data_key_driverslicense,dx_FirstData.names('').i_driverslicense,name_driverslicense,first_data_driverslicense_key);
+	RoxieKeybuild.MAC_build_logical(dx_FirstData.key_driverslicense(),FirstData.data_key_driverslicense(pversion),dx_FirstData.names('').i_driverslicense,name_driverslicense,first_data_driverslicense_key);
 	
 	RoxieKeyBuild.Mac_SK_Move_v3('~thor_data400::key::FirstData::FCRA::@version@::did','D',ma_fcra_first_data_key_to_qa,pVersion,2);
 	RoxieKeyBuild.Mac_SK_Move_v3('~thor_data400::key::FirstData::@version@::driverslicense','D',ma_first_data_driverslicense_key_to_qa,pVersion,2);
