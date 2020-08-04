@@ -16,7 +16,7 @@ export Layout_Transunion_Update_In := RECORD
 	STRING10 TELEPHONE;
 	STRING14 FILLER1;
 	STRING1 ADDRESSSTANDARDIZATION;
-	STRING8 FILESINCEDATE;
+	STRING8 FILESINCEDATE; // From the vendor: :  Date that this consumer’s record was compiled by the data provider
 	STRING6 HOUSENUMBER;
 	STRING2 STREETTYPE;
 	STRING2 STREETDIRECTION;
@@ -27,7 +27,7 @@ export Layout_Transunion_Update_In := RECORD
 	STRING5 ZIPCODE;
 	STRING4 ZIP4;
 	STRING14 FILLER2;
-	STRING8 COMPILATIONDATE;
+	STRING8 COMPILATIONDATE; // From the vendor: Date that this particular record was added to the database.  
 	STRING8 BIRTHDATE;
 	STRING1 BIRTHDATEIND;							               
 	STRING1 DECEASEDINDICATOR;
