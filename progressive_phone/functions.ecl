@@ -895,6 +895,25 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
       ds_src_other       := DATASET([rSource.source_code], {STRING3 src});
 
       SELF.phn_src_all   := DEDUP(SORT(ds_src_all + ds_src_eq + ds_src_lastresort + IF(ph_shell_bit = 0 AND ~EXISTS(ds_src_eq) AND ~EXISTS(ds_src_lastresort), ds_src_other, empty), src), src);
+      
+      // additional Metadata attributes from the Phone Shell
+      m_line := le.Phone_Shell.Metadata.Meta_Line;
+      m_serv := le.Phone_Shell.Metadata.Meta_Serv;
+      SELF.Meta_Line := m_line;
+      SELF.Meta_Serv := m_serv;
+      SELF.Meta_Carrier_Name := le.Phone_Shell.Metadata.Meta_Carrier_Name;
+      SELF.Meta_Most_Recent_OTP_Dt := le.Phone_Shell.Metadata.Meta_Most_Recent_OTP_Dt;
+      SELF.Meta_Count_OTP_30 := le.Phone_Shell.Metadata.Meta_Count_OTP_30;
+      SELF.Meta_Count_OTP_60 := le.Phone_Shell.Metadata.Meta_Count_OTP_60;
+      SELF.Meta_Phone_Status := le.Phone_Shell.Metadata.Meta_Phone_Status;
+      // calculate serv-line type. This mirrors but does not exactly replicate PhoneFinder's method, since this will be available to all products.
+      // (primarily, instead of using PhoneFinder's constants which are longer and all-caps, we are using these from PHZONE-192 for more readability)
+      SELF.Meta_ServLine_Type := map(m_serv = '0' and m_line in ['0',''] => Progressive_Phone.Constants.ServLine_Types.Landline,
+                                     m_serv = '0' and m_line  =  '2'     => Progressive_Phone.Constants.ServLine_Types.Cable,
+                                     m_serv = '1' and m_line in ['1',''] => Progressive_Phone.Constants.ServLine_Types.Wireless,
+                                     m_serv = '2' and m_line in ['2',''] => Progressive_Phone.Constants.ServLine_Types.VoIP,
+                                     m_serv = '3' and m_line in ['3',''] => Progressive_Phone.Constants.ServLine_Types.Unknown,
+                                                                            Progressive_Phone.Constants.ServLine_Types.Unknown);
      //END
       SELF := [];
     END;
@@ -947,6 +966,8 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
 		// output(phones_out1_Gr,named('phones_out1_Gr'));
 		// output(phones_out_temp,named('phones_out_temp'));
 		// output(phones_out1_TN,named('phones_out1_TN'));
+    
+  //  output(choosen( PROJECT(phones_out1_TN, progressive_phone.layout_progressive_phone_common) , 100),named('getphonesv3_output'));
 
 		RETURN PROJECT(phones_out1_TN, progressive_phone.layout_progressive_phone_common);
 
