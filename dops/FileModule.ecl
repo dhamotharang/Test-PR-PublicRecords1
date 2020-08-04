@@ -6,6 +6,7 @@ EXPORT FileModule(string esp = ''
 									,string roxieabsolutepatch = '/var/lib/HPCCSystems/hpcc-data/roxie/'
 									,string location = 'uspr' // <country><business> - uspr, usins, ushc
 									,string dopsenv = dops.constants.dopsenvironment
+									,string dopsclusterflag = ''
 									,integer noofsoapcalls = 30
 									) := module
 									
@@ -491,7 +492,7 @@ END;
 		
 		rSOAPResponse := SOAPCALL(
 				
-				dops.constants.prboca.serviceurl(dopsenv),
+				dops.constants.prboca.serviceurl(dopsenv,environment := dopsclusterflag),
 				////////////////////////////////////////////////////
 				// to check the soap xml use local machine IP and run soapplus -s -p 4546
 				// 'http://10.176.152.60:4546/',
