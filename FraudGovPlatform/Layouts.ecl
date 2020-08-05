@@ -390,10 +390,16 @@ EXPORT Layouts := MODULE
 		
 	END;
 
-
 	EXPORT Base := MODULE
 		EXPORT AddressCache := record
-			Address.Layout_Clean182_fips;
+            string100 Street_1 := '';
+            string50 Street_2 := '';
+            string100 City := '';
+            string10 State := '';
+            string10 Zip := '';
+            Address.Layout_Clean182_fips clean_address;
+            string100 address_1 := '';   
+            string50 address_2 := '';
 			unsigned4 address_cleaned;
 		END;
 		
@@ -447,6 +453,11 @@ EXPORT Layouts := MODULE
 			string Gc_ID;
 		end;
 		
+		export CustomerActiveSprays := record 
+			string20 	Customer_Id;
+			string20	File_type;
+		end;
+
 		export RefreshProdDashVersion := Record
 		boolean RefreshVersion;
 		end;
@@ -846,8 +857,8 @@ Export CIID := RECORD
 		STRING2		best_drivers_license_state := '';
 		STRING25	best_drivers_license := '';    
 		unsigned8   best_drivers_license_exp := 0;
-	    unsigned8 best_drivers_dt_first_seen := '';
-	    unsigned8 best_drivers_dt_last_seen := '';
+	    unsigned8   best_drivers_dt_first_seen := 0;
+	    unsigned8   best_drivers_dt_last_seen := 0;
 	    string8   Reported_Date := '';
  END;
 
@@ -888,6 +899,14 @@ EXPORT Drivers_Batch := MODULE
     unsigned4	max_process_date := 0;
     unsigned4	record_count := 1;				
   END;
+	
+	EXPORT BankNames :=RECORD
+		string50 bank_name;
+	END;
+	
+	EXPORT IspNames :=RECORD
+		string75 isp_name;
+	END;
 	
 	EXPORT AgencyActivityDate := RECORD
 		string8		reported_date;
@@ -2560,8 +2579,8 @@ RECORD
   unsigned industrytype;
  END;
  
- EXPORT EntityProfile	:=RECORD
-   integer1 entitytype;
+ EXPORT EntityProfile	:= RECORD
+  integer1 entitytype;
   string label;
   integer1 riskindx;
   integer1 aotcurrprofflag;
@@ -2574,9 +2593,10 @@ RECORD
   unsigned8 aotidactcnt30d;
   unsigned8 aotnonstactcnt30d;
   unsigned8 aotnewkraftnonstactcntev;
-  unsigned8 aothiidcurrprofusngcntev;
+  integer8 aothiidcurrprofusngcntev;
   unsigned8 aotidusngcntev;
   unsigned8 aotidactcntev;
+  unsigned8 aotidcurrprofusngcntev;
   unsigned1 not_aotkractflagev;
   unsigned1 not_aotsafeactflagev;
   string customerprogramdescription;
@@ -2725,7 +2745,7 @@ RECORD
   string t_inpclnaddrzip4echo;
   real8 t_inpclnaddrlatecho;
   real8 t_inpclnaddrlongecho;
-  integer8 t_inpclnaddrcountyecho;
+  string t_inpclnaddrcountyecho;
   integer8 t_inpclnaddrgeoblkecho;
   string t_inpclnssnecho;
   integer8 t_inpclndobecho;
@@ -2936,7 +2956,7 @@ RECORD
   integer8 t1l_fp_sourcerisklevel;
   integer8 t1_adultidnotseenflag;
   integer8 t1_minorwlexidflag;
-  integer8 t1_ssnpriordobflag;
+  string t1_ssnpriordobflag;
   integer8 t1_firstnmnotverflag;
   integer8 t1_lastnmnotverflag;
   integer8 t1_addrnotverflag;
@@ -2945,9 +2965,9 @@ RECORD
   integer8 t1l_ssnwaddrnotverflag;
   integer8 t1_phnnotverflag;
   integer8 t1l_dobnotverflag;
-  integer8 t1l_hiriskcviflag;
-  integer8 t1l_medriskcviflag;
-  integer8 t1_hdrsrccatcntlwflag;
+  integer8 t1_hiriskcviflag;
+  integer8 t1_medriskcviflag;
+  integer8 t1l_hdrsrccatcntlwflag;
   integer8 t1_stolidflag;
   integer8 t1_synthidflag;
   integer8 t1_manipidflag;
@@ -3084,7 +3104,7 @@ RECORD
   integer8 p16_aotidusngphncntev;
   integer8 p17_aotidusngemailcntev;
   integer8 p18_aotidusngipaddrcntev;
-  integer8 p19_aotidusingbnkacctcntev;
+  integer8 p19_aotidusngbnkacctcntev;
   integer8 p20_aotidusngdlcntev;
   integer8 p1_aotidnaccollactcntev;
   integer8 p1_aotidnaccollflagev;
@@ -3100,7 +3120,7 @@ RECORD
   integer8 p20_dlriskunscrbleflag;
   integer8 t1l_idcurrincarcflag;
   string t_inpclnfullnmecho;
-  integer8 t_acttmecho;
+  string t_acttmecho;
   string t_inpaddrtypeecho;
   string t_inpclnmailingaddrstreetecho;
   string t_inpclnmailingaddrcityecho;
@@ -3120,8 +3140,8 @@ RECORD
   string t_inpdvcserialnumecho;
   string t_inpdvctypeecho;
   string t_inpdvcidprovecho;
-  integer8 t_inpdvclatecho;
-  integer8 t_inpdvclongecho;
+  real8 t_inpdvclatecho;
+  real8 t_inpdvclongecho;
   string t_inpinvestigatoridecho;
   string t_inpreferralcaseidecho;
   string t_inpreferraltypedescecho;
@@ -3137,6 +3157,62 @@ RECORD
   integer8 t1l_iddtofdeath;
   integer8 t1l_idcrimflsdmatchflag;
   integer8 t1l_idcrimhitflag;
+  integer8 t1_minoridflag;
+  integer8 t9_idcurrprofusngaddrcntev;
+  integer8 t15_idcurrprofusngssncntev;
+  integer8 t20_idcurrprofusngdlcntev;
+  integer8 t19_idcurrprofusngbnkacctcntev;
+  string t9_addrvaltype;
+  string t9_addrmaildroptype;
+  string t15_ssnvaltype;
+  string t20_dlvaltype;
+  string t16_phnvaltype;
+  integer8 t16_isphnmetahitflag;
+  integer8 t16_phnmetanewvenddt;
+  integer8 t16_phnmetaoldvenddt;
+  integer8 t9_addrpoboxmultcurridflagev;
+  integer8 t9_addrisvacantflag;
+  integer8 t9_addrisinvalidflag;
+  integer8 t9_addriscmraflag;
+  integer8 t15_ssnmultcurridflagev;
+  integer8 t15_ssnisinvalidflag;
+  integer8 t20_dlmultcurridflagev;
+  integer8 t20_dlisinvalidflag;
+  string t16_phnprepdflag;
+  integer8 t16_phnisinvalidflag;
+  integer8 t19_bnkacctmultcurridflagev;
+  integer8 p1_idactolddt;
+  integer8 p9_idactolddt;
+  integer8 p15_idactolddt;
+  integer8 p16_idactolddt;
+  integer8 p17_idactolddt;
+  integer8 p18_idactolddt;
+  integer8 p19_idactolddt;
+  integer8 p20_idactolddt;
+  integer8 p1_aotactcntev;
+  integer8 p1_aotsrc1actcntev;
+  boolean p1_aotsrc1actonlyflag;
+  integer8 p9_aotactcntev;
+  integer8 p9_aotsrc1actcntev;
+  boolean p9_aotsrc1actonlyflag;
+  integer8 p15_aotactcntev;
+  integer8 p15_aotsrc1actcntev;
+  boolean p15_aotsrc1actonlyflag;
+  integer8 p20_aotactcntev;
+  integer8 p20_aotsrc1actcntev;
+  boolean p20_aotsrc1actonlyflag;
+  integer8 p16_aotactcntev;
+  integer8 p16_aotsrc1actcntev;
+  boolean p16_aotsrc1actonlyflag;
+  integer8 p17_aotactcntev;
+  integer8 p17_aotsrc1actcntev;
+  boolean p17_aotsrc1actonlyflag;
+  integer8 p18_aotactcntev;
+  integer8 p18_aotsrc1actcntev;
+  boolean p18_aotsrc1actonlyflag;
+  integer8 p19_aotactcntev;
+  integer8 p19_aotsrc1actcntev;
+  boolean p19_aotsrc1actonlyflag;
   string t_addrstatusdesc;
   string t_bnkacctstatusdesc;
   string t_dlstatusdesc;
@@ -3173,7 +3249,7 @@ RECORD
  END;
  
  EXPORT EntityAttributes := RECORD
-   string field;
+  string field;
   string value;
   string indicatortype;
   string indicatordescription;
@@ -3189,6 +3265,8 @@ RECORD
   integer8 entitytype;
   integer1 aotkractflagev;
   integer1 aotsafeactflagev;
+  integer1 aotcurrprofflag;
+  unsigned8 iscurrent;
   unsigned4 t_actdtecho;
   integer8 t18_ipaddrlocmiamiflag;
   integer8 t18_ipaddrlocnonusflag;
@@ -3218,20 +3296,32 @@ RECORD
   integer8 t1_addrnotverflag;
   integer8 t1l_ssnwaltnaverflag;
   integer8 t1_firstnmnotverflag;
-  integer8 t1l_hiriskcviflag;
-  integer8 t1l_medriskcviflag;
+  integer8 t1_hiriskcviflag;
+  integer8 t1_medriskcviflag;
   integer8 t1_minorwlexidflag;
   integer8 t1_lastnmnotverflag;
   integer8 t1_phnnotverflag;
   integer8 t1l_ssnwaddrnotverflag;
-  integer8 t1_ssnpriordobflag;
+  string t1_ssnpriordobflag;
   integer8 t1l_ssnnotverflag;
   integer8 t1l_curraddrnotinagcyjurstflag;
   integer8 t1l_bestdlnotinagcyjurstflag;
-  integer8 t1_hdrsrccatcntlwflag;
+  integer8 t1l_hdrsrccatcntlwflag;
   integer8 t1l_iddeceasedflag;
   integer8 t1l_idcurrincarcflag;
   integer8 t1l_iddtofdeathaftidactflagev;
+  unsigned8 aotidcurrprofusngcntev;
+  integer8 t9_addrisvacantflag;
+  integer8 t9_addrisinvalidflag;
+  integer8 t9_addriscmraflag;
+  integer8 t9_addrpoboxmultcurridflagev;
+  integer8 t15_ssnisinvalidflag;
+  integer8 t15_ssnmultcurridflagev;
+  integer8 t16_phnisinvalidflag;
+  string t16_phnprepdflag;
+  integer8 t19_bnkacctmultcurridflagev;
+  integer8 t20_dlisinvalidflag;
+  integer8 t20_dlmultcurridflagev;
   integer8 incustomerpopulation;
   integer1 riskindx;
  END;
@@ -3242,6 +3332,7 @@ RECORD
   string treeuid;
   string fromentitycontextuid;
   string toentitycontextuid;
+  unsigned4 t_actdtecho;
  END;
  
  EXPORT GraphVertices := RECORD
@@ -3260,6 +3351,7 @@ RECORD
   integer8 t1l_iddeceasedflag;
   unsigned8 aotidactcntev;
   unsigned4 deceaseddate;
+  integer8 t1_minoridflag;
  END;
 
   //Begin BocaShell Layout

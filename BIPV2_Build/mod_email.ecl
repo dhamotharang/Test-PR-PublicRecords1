@@ -20,6 +20,7 @@ export mod_email := module
                                                       +   ',Sudhir.Kasavajjala@lexisnexis.com'
                                                       +   ',Ayeesha.Kayttala@lexisnexis.com'
                                                       +   ',Robert.Pressel@lexisnexis.com'
+                                                      +   ',Matheus.DePaulo@lexisnexisrisk.com'
                       );
 	 
 	SHARED String COMPLETED_STATUS 	:= 'COMPLETED';

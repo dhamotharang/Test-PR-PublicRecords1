@@ -1,4 +1,4 @@
-import versioncontrol, _control, ut, Roxiekeybuild,lib_stringlib,scrubs_diversity_certification,scrubs;
+﻿import versioncontrol, _control, ut, Roxiekeybuild,lib_stringlib,scrubs_diversity_certification,scrubs, Diversity_Certification;
 
 export Build_All(string	pversion ,string fileDate) := module
 		export spray_files 		:= fSprayFiles(fileDate);
@@ -40,7 +40,7 @@ export Build_All(string	pversion ,string fileDate) := module
 																					,InputSF_prebuild2
 																					,InputSF_prebuild3
 																				 );
-		run_scrubs						:= scrubs_Diversity_Certification.fn_RunScrubs(pversion);
+		run_scrubs						:= scrubs_Diversity_Certification.fn_RunScrubs(pversion, Diversity_Certification.Email_Notification_Lists.BuildFailure);
 		dops_update 					:= Roxiekeybuild.updateversion('DiversityCertKeys',pVersion,'saritha.myana@lexisnexis.com');														
 									
 		export full_build 	  := sequential( nothor(apply(filenames().Base.dAll_filenames, apply(dSuperfiles, versioncontrol.mUtilities.createsuper(name))))

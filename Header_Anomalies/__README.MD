@@ -55,3 +55,8 @@ When the user executes a full file report, the program will automatically genera
 
 3. Mailing_List.ecl 
 In this file we organize groups and individuals to which the Send_Email.ecl file will send reports.
+
+## F. Formating 
+
+1. Formating_Tools.ecl
+In this module I stored all of the functions that  help the user achieve any special output, such as commas in numbers or date convertions not provided by the STD library.

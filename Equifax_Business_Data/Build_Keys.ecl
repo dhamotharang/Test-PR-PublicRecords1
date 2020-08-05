@@ -5,7 +5,7 @@ module
 
   // Build New Key file
 	RoxieKeyBuild.Mac_SK_BuildProcess_v3_local( dx_Equifax_Business_Data.Key_LinkIds.Key
-																						 ,Equifax_Business_Data.Files().Base.Built
+																						 ,Equifax_Business_Data.Files().Base.Companies.Built
 																						 ,dx_Equifax_Business_Data.keynames().LinkIds.QA
 																						 ,dx_Equifax_Business_Data.keynames(pversion,false).LinkIds.New
 																				 		 ,BuildLinkIdsKey);  

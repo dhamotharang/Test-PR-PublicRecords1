@@ -1220,6 +1220,25 @@
 		export string KEYWORD_JPJETRO								:= '906';
 		export string KEYWORD_AUEPA_VIC							:= '907';
 		export string KEYWORD_MLARB									:= '908';
+		export string KEYWORD_OFAC_SY_CAESAR				:= '909';
+		export string KEYWORD_OFAC_EO13894					:= '910';
+		export string KEYWORD_CNNBS									:= '911';
+		export string KEYWORD_UNOPS									:= '912';
+		export string KEYWORD_SECO_NIC							:= '913';
+		export string KEYWORD_BEGC									:= '914';
+		export string KEYWORD_NLGA									:= '915';
+		export string KEYWORD_AUATO									:= '916';
+		export string KEYWORD_MXSAT_DEF							:= '917';
+		export string KEYWORD_DKGA									:= '918';
+		export string KEYWORD_AUEPA									:= '919';
+		export string KEYWORD_SEGA									:= '920';
+		export string KEYWORD_GRHGC									:= '921';
+		export string KEYWORD_ILNBCTF_SO						:= '922';
+		export string KEYWORD_PRCSR_WC							:= '923';
+		export string KEYWORD_GERS									:= '924';
+		export string KEYWORD_DKKFST								:= '925';
+		export string KEYWORD_MDBNM									:= '926';
+		export string KEYWORD_EU_CYBER							:= '927';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

@@ -5,7 +5,7 @@ IMPORT HIPIE_ECL;
 
 EXPORT KEL_PivotIndexPrep := MODULE
 
-	MainEventShell := FraudgovKEL.KEL_EventPivot.EventPivotShell(aotcurrprofflag = 1);
+	MainEventShell := FraudgovKEL.KEL_EventPivot.EventPivotShell(aotcurrprofflag = 1 and t_inagencyflag=1);
 
 	/*BaseIndexPrep := hipie_ecl.macSlimDataset(MainEventShell, 'customerid,industrytype,entitycontextuid,entitytype', 
 			'recordid,caseid,eventdate,' +
@@ -65,6 +65,7 @@ EXPORT KEL_PivotIndexPrep := MODULE
 
 	BaseIndexPrepWithNVP := PROJECT(MainEventShell, 
 														TRANSFORM(profileRec,
+														SELF.personeventcount := LEFT.aotidcurrprofusngcntev,
 														SELF.event30count := LEFT.aotnonstactcnt30d,
 														SELF.eventcount := LEFT.aotnonstactcntev,
 														SELF.deviceid := LEFT.t_inpdvcidecho,
@@ -77,7 +78,9 @@ EXPORT KEL_PivotIndexPrep := MODULE
 															{'ipentitycontextuid', (STRING)LEFT.ipentitycontextuid},
 															{'bankaccountentitycontextuid', (STRING)LEFT.bankaccountentitycontextuid},
 															{'driverslicenseentitycontextuid', (STRING)LEFT.driverslicenseentitycontextuid},
-															{'t_inagencyflag', (STRING)LEFT.t_inagencyflag}
+															{'t_inagencyflag', (STRING)LEFT.t_inagencyflag},
+															{'t_inpclnmiddlenmecho',(STRING)LEFT.t_inpclnmiddlenmecho},
+															{'aotidactcntev', (STRING)LEFT.aotidactcntev}
 														 ], NvpRec),
 														 SELF := LEFT));
 
