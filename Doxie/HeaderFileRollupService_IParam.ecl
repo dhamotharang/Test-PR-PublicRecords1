@@ -1,9 +1,7 @@
-﻿IMPORT AutoStandardI, Suppress;
-
-EXPORT HeaderFileRollupService_IParam := 
+﻿EXPORT HeaderFileRollupService_IParam :=
   MODULE
-  
-  	EXPORT ta1_IParams := 
+
+  	EXPORT ta1 :=
       INTERFACE
         EXPORT STRING   DLNumber        := '';
         EXPORT STRING   DLState         := '';
@@ -14,11 +12,9 @@ EXPORT HeaderFileRollupService_IParam :=
         EXPORT INTEGER  date_last_seen  := 0;
         EXPORT INTEGER  date_first_seen := 0;
       END;
-    
-    EXPORT ta2_IParams := 
+
+    EXPORT ta2 :=
       INTERFACE
-        EXPORT STRING32      application_type_val    := Suppress.Constants.ApplicationTypes.DEFAULT;
-        EXPORT STRING        DataPermissionMask      := AutoStandardI.Constants.DataPermissionMask_default;
         EXPORT BOOLEAN       Include_BusinessCredit  := FALSE;
         EXPORT BOOLEAN       Include_PhonesFeedback  := FALSE;
         EXPORT BOOLEAN       Include_AddressFeedback := FALSE;
@@ -28,5 +24,5 @@ EXPORT HeaderFileRollupService_IParam :=
         EXPORT UNSIGNED6     OrgId                   := 0;
         EXPORT UNSIGNED6     UltId                   := 0;
       END;
-     
+
   END;

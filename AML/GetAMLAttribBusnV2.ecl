@@ -34,10 +34,6 @@ UseXG5 := Map(UseXG5Flag = '1'                   => '1',
               UseXG5Flag = '2' and IncludeNews   => '2',
                                                  '0');
 
-
-BusnHeader := Business_Header_SS.Key_BH_BDID_pl;
-
-
 bdidprep := project(indata(bdid=0), transform(Business_Header_SS.Layout_BDID_InBatch, self := left));
 
 bdidnoprep := project(indata(bdid<>0), transform(Business_Header_SS.Layout_BDID_OutBatch, self := left));
@@ -154,7 +150,7 @@ GetAddrRisk  := BusnAddrAttrib(ALLBusn);
 
 // add Linked business info
 
-GetLinkedhdr := getLinkedBusnHdr(GetAddrRisk(relatdegree in [AMLConstants.LnkdBusnDegree,AMLConstants.relatedBusnDegree]));
+GetLinkedhdr := getLinkedBusnHdr(GetAddrRisk(relatdegree in [AMLConstants.LnkdBusnDegree,AMLConstants.relatedBusnDegree]), mod_access);
 
 // need to join back to GetLinkedBusn(RelatDegree in [10,20,50])  that were deduped above
 addBusnAddr :=    Join(GetLinkedBusn, GetAddrRisk,
@@ -303,7 +299,7 @@ prepSOS := project(GetAddrRisk, PrepBdidSOS(left));
 
 GetBusnSOS := BusnSOSDetails(prepSOS); //Layouts.BusnLayoutV2         TESTED
 
-GetBusnHeader := BusnHeaderRecs(BDIDbestrecs);  //Layouts.BusnLayoutV2          TESTED
+GetBusnHeader := BusnHeaderRecs(BDIDbestrecs, mod_access);  //Layouts.BusnLayoutV2          TESTED
 
 GetBusnLiens :=  BusnLiens(BDIDbestrecs, mod_access);  //Layouts.BusnLayoutV2             TESTED
 

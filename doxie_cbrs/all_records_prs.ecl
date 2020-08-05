@@ -1,15 +1,18 @@
-﻿import doxie_crs,doxie,LN_PropertyV2_Services;
+﻿IMPORT doxie,doxie_cbrs,doxie_crs;
 
-export all_records_prs(dataset(doxie_cbrs.layout_references) bdids, unsigned1 ofac_version = 1,
-                                                             boolean include_ofac = false, real global_watchlist_threshold = 0.8,
-                                                             doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
+EXPORT all_records_prs(DATASET(doxie_cbrs.layout_references) bdids, 
+                                                             doxie.IDataAccess mod_access,
+                                                             UNSIGNED1 ofac_version = 1,
+                                                             BOOLEAN include_ofac = FALSE, 
+                                                             REAL global_watchlist_threshold = 0.8
+                                                             
 ) := FUNCTION
 
 //***** MY RECORDSETS
-cntr := doxie_cbrs.count_records_prs(bdids, ofac_version, include_ofac, global_watchlist_threshold, mod_access);
-tarr := doxie_cbrs.best_records_prs_target(bdids);
+cntr := doxie_cbrs.count_records_prs(bdids, mod_access, ofac_version, include_ofac, global_watchlist_threshold);
+tarr := doxie_cbrs.best_records_prs_target(bdids,mod_access);
 hirr := doxie_cbrs.hierarchy_records;
-idnr := doxie_cbrs.ID_Number_records(bdids);
+idnr := doxie_cbrs.ID_Number_records(bdids,mod_access);
 nmvr := doxie_cbrs.name_variation_records_max(bdids);
 bnkr := doxie_cbrs.bankruptcy_records_prs_max(bdids);
 bnk2r := doxie_cbrs.bankruptcy_v2_records_prs_max(bdids);
@@ -20,7 +23,7 @@ lier := doxie_cbrs.lien_records_prs_max(bdids);
 judr := doxie_cbrs.Judgement_records_prs_max(bdids);
 cfir := doxie_cbrs.Corporation_Filings_records_prs_max(bdids);
 brer := doxie_cbrs.business_registration_records_prs_max(bdids).records;
-abrr := doxie_cbrs.Associated_Business_records_prs_max(bdids);  
+abrr := doxie_cbrs.Associated_Business_records_prs_max(bdids,mod_access);  
 oaar := doxie_cbrs.others_at_address_records_max(bdids);
 abbc := doxie_cbrs.Associated_Business_byContact_records_max(bdids);
 conr := doxie_cbrs.contact_records_prs_max(bdids);
@@ -28,14 +31,14 @@ pror := doxie_cbrs.property_records_prs_byAddress_max(bdids);
 // pro2r:= doxie_cbrs.property_records_v2; //removing at least for now as it is unused
 idor := doxie_cbrs.Internet_Domains_records_max(bdids);
 dnbr := doxie_cbrs.DNB_records_max(bdids, mod_access);
-rvlr := doxie_cbrs.reverse_lookup_records_prs_max(bdids);
+rvlr := doxie_cbrs.reverse_lookup_records_prs_max(bdids,mod_access);
 ypar := doxie_cbrs.YellowPages_records_prs_max(bdids);
 patr := doxie_cbrs.Patriot_records_max(ofac_version, include_ofac, global_watchlist_threshold);
-plir := doxie_cbrs.proflic_records_prs_max(bdids);
+plir := doxie_cbrs.proflic_records_prs_max(bdids,mod_access);
 bbbr := doxie_cbrs.BBB_records_prs_max(bdids);
 bnmr := doxie_cbrs.BBB_NM_records_prs_max(bdids);
 ebsr := if(not doxie.DataRestriction.EBR,doxie_cbrs.EBR_Summary_records_prs_max(bdids));
-vehr := doxie_cbrs.motor_vehicle_records_prs_max(bdids);
+vehr := doxie_cbrs.motor_vehicle_records_prs_max(bdids,mod_access);
 cadr := doxie_cbrs.contact_address_records(bdids);
 
 reccntr := recordof(cntr);

@@ -950,7 +950,7 @@ risk_indicators.Layout_Output combineVerification(temp le) := transform
 	monthMatch := inMonth not in ['00',''] and inMonth=comboMonth;
 	yearMatch := inYear not in ['0000',''] and inYear=comboYear;
 	
-	self.dobmatchlevel := map(le.dob = '' or combo_dob = '' => '0',											// no dob input or no dob found
+	self.dobmatchlevel := map(le.dob in ['00000000',''] or combo_dob = '' => '0',											// no dob input or no dob found
 														~dayMatch and ~monthMatch and ~yearMatch => '1',					// nothing matches
 														dayMatch and ~monthMatch and ~yearMatch => '2',						// only day matches
 														~dayMatch and monthMatch and ~yearMatch => '3',						// only month matches

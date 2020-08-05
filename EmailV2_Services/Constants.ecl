@@ -63,6 +63,7 @@ EXPORT Constants := MODULE
     EXPORT BOOLEAN skipRoyaltySources(STRING _usecase) := STD.Str.ToUpperCase(TRIM(_usecase, ALL)) = NoRoyaltySources;
     EXPORT BOOLEAN isReseller(STRING _usecase) := STD.Str.ToUpperCase(TRIM(_usecase, ALL)) = Reseller;
     EXPORT BOOLEAN isDirectMarketing(STRING _usecase) := STD.Str.ToUpperCase(TRIM(_usecase, ALL)) = DirectMarketing;
+    EXPORT BOOLEAN isValid(STRING _usecase) := STD.Str.ToUpperCase(_usecase) IN [Standard, NoRoyaltySources, DIRECTMARKETING, RESELLER];
   END;
 
   EXPORT SearchBy := MODULE

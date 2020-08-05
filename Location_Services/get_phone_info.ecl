@@ -1,4 +1,4 @@
-import dx_Gong, doxie, Suppress;
+﻿import dx_Gong, doxie, Suppress;
 
 
 export get_phone_info(string10 in_phone, string20 lname, string10 prim_range, string2 predir,
@@ -43,7 +43,7 @@ export get_phone_info(string10 in_phone, string20 lname, string10 prim_range, st
 
 	maxHRIPer_Value := consts.max_hri_phone;
 
-	doxie.mac_AddHRIPhone(outf1, outf2)
+	doxie.mac_AddHRIPhone(outf1, outf2, mod_access)
 
   outf3 := DEDUP (outf2, record, ALL);
 	return project (outf3, TRANSFORM (layout_person_phone, SELF := LEFT));

@@ -826,13 +826,20 @@ IMPORT iesp;
 
 	DPPAPurpose_user := trim(first_row.user.DLPurpose, LEFT, RIGHT);
 	GLBPurpose_user := trim(first_row.user.GLBPurpose, LEFT, RIGHT);
+	DMFPurpose_user := trim(first_row.user.DeathMasterPurpose, LEFT, RIGHT);
+	FCRAPurpose_user := trim(first_row.Compliance.FCRAPurpose, LEFT, RIGHT);
 	DPPAPurpose_in := (UNSIGNED) DPPAPurpose_user;
 	GLBPurpose_in := (UNSIGNED) GLBPurpose_user; //Values of '','-','0' etc will be casted to 0.
+	DMFPurpose_in := (string) DMFPurpose_user;
+	FCRAPurpose_in := (UNSIGNED) FCRAPurpose_user; //Values of '','-','0' etc will be casted to 0.
 	DPPAPurpose_usage_string := (string) TRIM(acct_configRaw.Common.Usage.DPPA, LEFT, RIGHT); //Getting the usage from the account context
 	GLBPurpose_usage_string := (string) TRIM(acct_configRaw.Common.Usage.GLB, LEFT, RIGHT);
+	//get allowAltPermissiblePurpose from config
+	BOOLEAN allowAltPermissiblePurpose := Models.Healthcare_SocioEconomic_Functions_RT_Service.getBooleanFlagValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_allowAltPermissiblePurpose);
 
 	// Exception#4 Exception#5 Exception#6
-	GLB_DPPA_Exceptions_DS := Models.Healthcare_SocioEconomic_Transforms_RT_Service.BuildPermissiblePurposeErrorsDS(GLBPurpose_in, GLBPurpose_usage_string, DPPAPurpose_in);
+	GLB_DPPA_Exceptions_DS := Models.Healthcare_SocioEconomic_Transforms_RT_Service.BuildPermissiblePurposeErrorsDS(GLBPurpose_in, GLBPurpose_usage_string
+	,DMFPurpose_in, FCRAPurpose_in, DPPAPurpose_in, allowAltPermissiblePurpose);
 	// Pre Core Call Exception Dataset
 	PreCoreException_DS := SubscriptionFail_DS + Condition_1_2_Minor_Reject_DS + GLB_DPPA_Exceptions_DS;
 	ExceptionsInInputRequest := IF(COUNT(PreCoreException_DS(code<>0)) > 0, TRUE, FALSE);
@@ -866,7 +873,7 @@ IMPORT iesp;
 	// OUTPUT(SocioIncicators_Attributes, NAMED('SocioIncicators_Attributes'));
 
 	// Exception#7
-	ADLScoreFailRow := IF(isCoreRequestValid AND (unsigned) coreResults[1].ADLScore < (unsigned)Models.Healthcare_Constants_RT_Service.default_adl_score_filter_val, ROW({_blank, Models.Healthcare_Constants_RT_Service.ADLScoreFail_Code, _blank, Models.Healthcare_Constants_RT_Service.ADLScoreFail_Message }, iesp.share.t_WsException), _EmptyExceptionDSRow0);
+	ADLScoreFailRow := IF(isCoreRequestValid AND (((unsigned) coreResults[1].ADLScore < (unsigned)Models.Healthcare_Constants_RT_Service.default_adl_score_filter_val) OR ((unsigned)coreResults[1].LexID = 0)), ROW({_blank, Models.Healthcare_Constants_RT_Service.ADLScoreFail_Code, _blank, Models.Healthcare_Constants_RT_Service.ADLScoreFail_Message }, iesp.share.t_WsException), _EmptyExceptionDSRow0);
 	ADLScoreFail_DS := EmptyExceptionDS0 + ADLScoreFailRow;
 
 	FinalException_DS := PreCoreException_DS + ADLScoreFail_DS;
@@ -917,7 +924,8 @@ IMPORT iesp;
 	// LOGGING
 	// Populate the input fields
 	 myloggingdata0 := PROJECT(ds_in, Models.Healthcare_SocioEconomic_Transforms_RT_Service.SocioTransactionLog(LEFT, isAttributesRequested, isReadmissionRequested, isMedicationAdherenceRequested, isMotivationRequested, isTotalCostRiskScoreRequested,
-	 																												  isAttributesSubscribed, isReadmissionSubscribed, isMedicationAdherenceSubscribed, isMotivationSubscribed, isTotalCostRiskScoreSubscribed ));
+	 																												  isAttributesSubscribed, isReadmissionSubscribed, isMedicationAdherenceSubscribed, isMotivationSubscribed, isTotalCostRiskScoreSubscribed,
+																													   DPPAPurpose_user, GLBPurpose_user, DMFPurpose_user, FCRAPurpose_user ));
 	// Populate all non input fields
 	Models.Layouts_Healthcare_RT_Service.transactionlog setNonInput(Models.Layouts_Healthcare_RT_Service.transactionlog L):=transform
 			self.product_id := (UNSIGNED) Models.Healthcare_Constants_RT_Service.Socio_product_id; 

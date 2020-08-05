@@ -1,4 +1,4 @@
-export Layout_Report_Batch := record
-	string20 acctno;
-	Layout_Report;
-end;
+EXPORT Layout_Report_Batch := RECORD
+  STRING20 acctno;
+  Layout_Report;
+END;

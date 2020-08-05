@@ -27,7 +27,7 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     associates := DueDiligence.CommonIndividual.GetRelationshipAsInquired(inData, associates, DueDiligence.Constants.INQUIRED_INDIVIDUAL_OTHER_RELATION);
     
     //remove any duplices - make sure we do not have any spouse/parents in associates
-    removeDups := DEDUP(SORT(spouse + parents + associates, seq, individual.did, indvType), seq, individual.did);
+    removeDups := DEDUP(SORT(spouse + parents + associates, seq, inquiredDID, individual.did, indvType), seq, inquiredDID, individual.did);
     
     allInd := removeDups + inData;
 
@@ -155,6 +155,7 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 
 
     // output(parents, named('parents'));
+    // output(removeDups, named('removeDups'));
     // output(allInd, named('allInd'));
 
     // output(keyHeader, named('keyHeader'));

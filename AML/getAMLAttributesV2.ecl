@@ -259,7 +259,7 @@ PrepBusnRisk  := project(ExecBDIDsDD, PrepAddrRisk(left));
 GetBusnRiskCds  :=  BusnAddrAttrib(PrepBusnRisk);  //Layouts.BusnExecsLayoutV2
 
 
-getbusnHeader :=  getLinkedBusnHdr(GetBusnRiskCds);
+getbusnHeader :=  getLinkedBusnHdr(GetBusnRiskCds, mod_access);
 
 
 

@@ -1,4 +1,4 @@
-﻿﻿IMPORT address, risk_indicators, iesp, business_risk, models, ut, riskwise, Gateway, STD;
+IMPORT address, risk_indicators, iesp, business_risk, models, ut, riskwise, Gateway, STD;
 export InstantID_Batch_Service_records(dataset(Gateway.Layouts.Config)  gateways_in,
                                  dataset(business_risk.Layout_Input_Moxie_2) df,
 																 boolean hb,
@@ -289,7 +289,7 @@ string10 CustomDataFilter:='';
 
 
 // Run the Business Shell
-bshell := Business_Risk.Business_Shell_Function( biid, glb, LexIdSourceOptout, TransactionID, BatchUID, GlobalCompanyId,DataPermission );
+bshell := Business_Risk.Business_Shell_Function( biid, glb, LexIdSourceOptout, TransactionID, BatchUID, GlobalCompanyId,DataPermission, DataRestriction);
 
 scores := map(
 	model_name  = 'rsb801_1' => Models.RSB801_1_0( bshell ),

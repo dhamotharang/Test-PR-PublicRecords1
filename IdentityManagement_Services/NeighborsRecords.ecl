@@ -1,4 +1,4 @@
-﻿﻿IMPORT Address, Census_data, DeathV2_Services, DidVille, doxie, doxie_crs, dx_death_master, header,
+IMPORT Address, Census_data, DeathV2_Services, DidVille, doxie, doxie_crs, dx_death_master, header,
        IdentityManagement_Services, iesp, ut;
 
 EXPORT iesp.identitymanagementreport.t_IdmNeighborAddress NeighborsRecords(IdentityManagement_Services.IParam._report in_params, DATASET (doxie.layout_references) dids) := FUNCTION

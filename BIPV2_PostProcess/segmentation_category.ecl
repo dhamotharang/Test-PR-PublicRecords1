@@ -1,4 +1,4 @@
-﻿﻿import BIPV2;
+import BIPV2;
  
 EXPORT segmentation_category := module
 

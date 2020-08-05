@@ -1,4 +1,4 @@
-IMPORT doxie, doxie_crs, doxie_raw, ut, risk_indicators;
+﻿IMPORT AutoStandardI, doxie, doxie_crs, doxie_raw, ut, risk_indicators;
 
 rec_hri := record
   string10 phone;
@@ -41,8 +41,11 @@ EXPORT COMP_PHONES (boolean include_hri = false, integer maxHriPer_value = 0,  b
   phone_hdr_src := project (phones_header, rec_hri);
   phone_all := dedup (phone_addr_src + phone_hdr_src, all);
 	
+  global_mod := AutoStandardI.GlobalModule();
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (global_mod);
+
   // attach phones High Risk Indicators to all phones at once
-  doxie.mac_AddHRIPhone (phone_all, shared phones_hri);
+  doxie.mac_AddHRIPhone (phone_all, shared phones_hri, mod_access);
 	
 	// pick HRIs for phones-by-address
   MAC_ReappendPhoneHRI (phones_wide, phones_hri, phones_wide_hri, doxie.Layout_AddPhoneMetadata);

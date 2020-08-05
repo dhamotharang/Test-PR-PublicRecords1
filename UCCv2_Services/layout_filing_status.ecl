@@ -1,4 +1,4 @@
-export layout_filing_status := record, maxlength(10000)
-	string filing_status := '';
-	string filing_status_desc := '';
-end;
+EXPORT layout_filing_status := RECORD, MAXLENGTH(10000)
+  STRING filing_status := '';
+  STRING filing_status_desc := '';
+END;

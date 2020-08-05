@@ -22,13 +22,15 @@ EXPORT LIB_RiskView_Models (
 	SHARED payFrequency			:= arguments.payFrequency;
 	SHARED customInputs			:= arguments.Custom_Inputs;
 	shared isPreScreenPurpose := STD.Str.ToUpperCase(intendedPurpose) = 'PRESCREENING';
+  SHARED attrv5 := RiskView.get_attributes_v5(BocaShell, False);
 	
 	/* Model Validation -- Use this when trying to validate a new model through the RiskView.Search_Service */
  EXPORT TurnOnValidation := FALSE; // When TRUE allows for Layout_Debug to be OUTPUT in the Search_Service
 	 // EXPORT TurnOnValidation := TRUE; // When TRUE allows for Layout_Debug to be OUTPUT in the RiskView.Search_Service
 	
 	
-	EXPORT ValidatingModel := Models.RVA1908_1_0(BocaShell); // Change this to the model you are tring to validate
+	// EXPORT ValidatingModel := Models.RVG1809_1_0(BocaShell); // Change this to the model you are tring to validate
+	EXPORT ValidatingModel := Models.RVR1903_1_0(attrv5); // Change this to the model you are tring to validate
 	
 	
 	// Version 4.0
@@ -157,9 +159,11 @@ that is sent INTO calcindex for ECL.
 																			{'RVG1808_1', MType_G+'RVG1808_1', calcIndex( 73), '0-999', 0}, //Telechek
 																			{'RVG1808_2', MType_G+'RVG1808_2', calcIndex( 74), '0-999', 0}, //Telechek
 																			{'RVA1809_1', MType_A+'RVA1809_1', calcIndex( 76), '0-999', 0}, //CactusJack
-                                                                            {'RVA1904_1', MType_A+'RVA1904_1', calcIndex( 78), '0-999', 0}, //Westlake Financial
-                                                                            {'RVG1809_1', MType_G+'RVG1809_1', calcIndex( 79), '0-999', 0}, //Tranzaction
-																			{'RVA1908_1', MType_A+'RVA1908_1', calcIndex( 80), '0-999', 0}, //SCUSA
+                                      {'RVA1904_1', MType_A+'RVA1904_1', calcIndex( 78), '0-999', 0}, //Westlake Financial
+                                      {'RVG1809_1', MType_G+'RVG1809_1', calcIndex( 79), '0-999', 0}, //Tranzaction
+                                      {'RVA1908_1', MType_A+'RVA1908_1', calcIndex( 80), '0-999', 0}, //SCUSA
+																			{'RVR1903_1', MType_G+'RVR1903_1', calcIndex( 82), '-1 - 2', 0}, //Sheffield Financial (non-standard score -1,0,1,2)
+																			
 																			
 																		// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 																			{'RVA9999_9', MType_A+'RVA9999_9', 0, '0-999', 0},
@@ -213,9 +217,10 @@ that is sent INTO calcindex for ECL.
 											'RVG1808_1' => UNGROUP(Models.RVG1808_1_0(BocaShell, isPreScreenPurpose)),	
 											'RVG1808_2' => UNGROUP(Models.RVG1808_2_0(BocaShell, isPreScreenPurpose)),	
 											'RVA1809_1' => UNGROUP(Models.RVA1809_1_0(BocaShell, isPreScreenPurpose)),	
+                                            'RVG1809_1' => UNGROUP(Models.RVG1809_1_0(BocaShell)),
                                             'RVA1904_1' => UNGROUP(Models.RVA1904_1_0(BocaShell, isPreScreenPurpose)),
                                             'RVA1908_1' => UNGROUP(Models.RVA1908_1_0(BocaShell)),	
-                                            'RVG1809_1' => UNGROUP(Models.RVG1809_1_0(BocaShell)),	
+                                            'RVR1903_1' => UNGROUP(Models.RVR1903_1_0(attrv5)),		
 											// ----------------------------------------------------------------------------------
 											// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 											'RVA9999_9' => UNGROUP(Models.FAKE_0_0(BocaShell, 'RV50')),

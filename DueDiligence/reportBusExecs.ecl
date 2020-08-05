@@ -72,46 +72,11 @@ EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData,
                   LEFT OUTER,
                   ATMOST(1));
   
-  
-  //grab titles/positions from the internal record
-  positions := NORMALIZE(workingExecs, LEFT.party.positions, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, UNSIGNED4 mostRecentDate, UNSIGNED4 secondRecentDate, STRING lastName, DATASET(iesp.duediligenceshared.t_DDRPositionTitles) titles},
-                                                                        SELF.titles := PROJECT(LEFT, TRANSFORM(iesp.duediligenceshared.t_DDRPositionTitles,
-                                                                                                                SELF.Title := RIGHT.title;
-                                                                                                                SELF.FirstReported := iesp.ECL2ESP.toDate(RIGHT.firstSeen);
-                                                                                                                SELF.LastReported := iesp.ECL2ESP.toDate(RIGHT.lastSeen);
-                                                                                                                SELF := [];));
-                                                                        SELF.mostRecentDate := RIGHT.lastSeen;
-                                                                        SELF.secondRecentDate := RIGHT.firstSeen;
-                                                                        SELF.lastName := LEFT.party.lastName;
-                                                                        SELF.did := LEFT.party.did;
-                                                                        SELF := LEFT;
-                                                                        SELF := [];));
-
-	cleanPosDate := DueDiligence.Common.CleanDatasetDateFields(positions, 'mostRecentDate, secondRecentDate');  
-  
-  limitedPos := GROUP(SORT(cleanPosDate, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, -mostRecentDate, -secondRecentDate, lastName), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did);
-  workingPos := DueDiligence.Common.GetMaxRecords(limitedPos, iesp.constants.DDRAttributesConst.MaxTitles); 
-  
-  rollIndPos := ROLLUP(SORT(workingPos, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did),
-                        #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
-                        LEFT.did = RIGHT.did,
-                        TRANSFORM(RECORDOF(LEFT),
-                                  SELF.titles := LEFT.titles + RIGHT.titles;
-                                  SELF := LEFT));
-  
-  addPos := JOIN(addLics, rollIndPos,
-                  #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
-                  LEFT.did = RIGHT.did,
-                  TRANSFORM(RECORDOF(LEFT),
-                            SELF.Titles := RIGHT.titles;
-                            SELF := LEFT;),
-                  LEFT OUTER,
-                  ATMOST(1));
     
     
   //this section will be used to make calls to the keys to grab additional information pertaining to the BEOs
   //first get all the unique dids  
-  uniqueDIDs := DEDUP(SORT(addPos, did), did);
+  uniqueDIDs := DEDUP(SORT(addLics, did), did);
   
   //----                                                                                                                 ----
   //---- check to see if the individual is tied to another business - no history date since there no date field in key.  ---- 
@@ -179,7 +144,7 @@ EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData,
   
   
   //JOIN the ListOfCompanyNames back to the record set that contains the DID of the BEO of the Inquired Business            
-  addAssociation := JOIN(addPos, rollAssocBus,
+  addAssociation := JOIN(addLics, rollAssocBus,
                           LEFT.did = RIGHT.did,
                           TRANSFORM(RECORDOF(LEFT),
                                     /*  This results in a CHILD DATASET for each DID/BEO      */   
@@ -290,40 +255,33 @@ EXPORT reportBusExecs(DATASET(DueDiligence.layouts.Busn_Internal) inData,
   // OUTPUT(limitedExecs, NAMED('limitedExecs'));
   // OUTPUT(workingExecs, NAMED('workingExecs'));
   // OUTPUT(popExecReport, NAMED('popExecReport'));
-  
+
   // OUTPUT(profLicenses, NAMED('profLicenses'));
   // OUTPUT(limitedLics, NAMED('limitedLics'));
   // OUTPUT(workingLics, NAMED('workingLics'));
   // OUTPUT(rollIndLics, NAMED('rollIndLics'));
   // OUTPUT(addLics, NAMED('addLics'));
-  
-  // OUTPUT(positions, NAMED('positions'));
-  // OUTPUT(limitedPos, NAMED('limitedPos'));
-  // OUTPUT(workingPos, NAMED('workingPos'));
-  // OUTPUT(rollIndPos, NAMED('rollIndPos'));
-  // OUTPUT(addPos, NAMED('addPos'));  
-  
+
   // OUTPUT(uniqueDIDs, NAMED('uniqueDIDs'));  
-      
- // OUTPUT(busAssociations, NAMED('busAssociations'));
+
+  // OUTPUT(busAssociations, NAMED('busAssociations'));
   // OUTPUT(dedupBusMatches, NAMED('dedupBusMatches'));
-  
- // OUTPUT(seqBusMatches, NAMED('seqBusMatches'));
- // OUTPUT(busAssocBestInfo, NAMED('busAssocBestInfo'));
- // OUTPUT(ListOfAssociatedCompanyNames, NAMED('ListOfAssociatedCompanyNames'));
- // OUTPUT(rollAssocBus, NAMED('rollAssocBus'));
-  
-  //OUTPUT(addAssociation, NAMED('addAssociation'));
-  
+
+  // OUTPUT(busAssocBestInfo, NAMED('busAssocBestInfo'));
+  // OUTPUT(ListOfAssociatedCompanyNames, NAMED('ListOfAssociatedCompanyNames'));
+  // OUTPUT(rollAssocBus, NAMED('rollAssocBus'));
+
+  // OUTPUT(addAssociation, NAMED('addAssociation'));
+
   // OUTPUT(deceasedDIDs, NAMED('deceasedDIDs'));
   // OUTPUT(uniqueDeceasedDIDs, NAMED('uniqueDeceasedDIDs'));
   // OUTPUT(addDeceased, NAMED('addDeceased'));
-  
+
   // OUTPUT(indsAssocWithSSN, NAMED('indsAssocWithSSN'));
   // OUTPUT(uniqueIndAssocs, NAMED('uniqueIndAssocs'));
   // OUTPUT(countIndAssocs, NAMED('countIndAssocs'));
   // OUTPUT(addMoreTwoAssocsWithSSN, NAMED('addMoreTwoAssocsWithSSN'));
-  
+
   // OUTPUT(transformData, NAMED('transformData'));
   // OUTPUT(rollExecs, NAMED('rollExecs'));
   // OUTPUT(addBEOToReport, NAMED('addBEOToReport'));

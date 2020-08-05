@@ -1,13 +1,15 @@
-﻿import business_header, doxie_cbrs, autostandardi, Suppress, corp2_services;
+﻿IMPORT autostandardi, business_header, corp2_services, doxie, doxie_cbrs, InView_Services, Suppress;
 
-boolean INCLUDE_MVAWFA_HEADERS := false : stored('IncludeMVAWFAHeaders');
-#constant ('IsCRS', true);  //sets isCRS to true, which prevents some extra work
+BOOLEAN INCLUDE_MVAWFA_HEADERS := FALSE : STORED('IncludeMVAWFAHeaders');
+#CONSTANT ('IsCRS', TRUE);  //sets isCRS to true, which prevents some extra work
 UNSIGNED1 max_bus_reg := 30;
 doxie_cbrs.mac_Selection_Declare();
 
-#stored('bdidsDerived', true);
+#STORED('bdidsDerived', TRUE);
 
-mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+gm := AutoStandardI.GlobalModule();
+
+mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(gm);
 
 //
 // Get the best BDID for the input
@@ -16,15 +18,15 @@ mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI
 //    -- pick the best BDID
 
 // recs that match input criteria
-best_recs := business_header.fn_RSS_getBestRecords(true,false,INCLUDE_MVAWFA_HEADERS,INCLUDE_BUS_DPPA,true,false,false); 
+best_recs := business_header.fn_RSS_getBestRecords(mod_access, true,false,INCLUDE_MVAWFA_HEADERS,INCLUDE_BUS_DPPA,true,false,false); 
 
 // minimum field population filter
-best_recs_filt := best_recs(company_name != '' and 
-													 (prim_range != '' or predir != '' or prim_name != '' or addr_suffix != '' or
-														postdir != '' or unit_desig != '' or sec_range != '' or city != '' or
-														state != '' or zip != 0 or zip4 != 0));
+best_recs_filt := best_recs(company_name != '' AND 
+													 (prim_range != '' OR predir != '' OR prim_name != '' OR addr_suffix != '' OR
+														postdir != '' OR unit_desig != '' OR sec_range != '' OR city != '' OR
+														state != '' OR zip != 0 OR zip4 != 0));
 
-brByGIDs := SORT(Business_Header.fn_RSS_rollupBestRecords(best_recs_filt, 10), -score, -best_flags);
+brByGIDs := SORT(Business_Header.fn_RSS_rollupBestRecords(best_recs_filt, mod_access, 10), -score, -best_flags);
 // tm := MODULE(PROJECT(AutoStandardI.GlobalModule(), AutoStandardI.InterfaceTranslator.bdid_dataset.params, OPT))
 	// EXPORT bdid := brByGIDs[1].bdid_list;
 // END;
@@ -36,30 +38,29 @@ brByGIDs := SORT(Business_Header.fn_RSS_rollupBestRecords(best_recs_filt, 10), -
 // The algorithm was taken from "AutoStandardI.InterfaceTranslator.bdid_dataset.val()".
 // Workaround begins:
 theTop := brByGIDs[1];
-gm := AutoStandardI.GlobalModule();
 bdidsTmp := IF(gm.useSupergroup, PROJECT(business_header.getSupergroup(theTop.bdidRecs[1].bdid, gm.uselevels), {UNSIGNED6 bdid}),
 																														 theTop.bdidRecs);
-app_type := IF (isPeopleWise, Suppress.Constants.ApplicationTypes.PeopleWise, application_type_value);																														 
+app_type := IF (isPeopleWise, Suppress.Constants.ApplicationTypes.PeopleWise, mod_access.application_type);																														 
 Suppress.MAC_Suppress(bdidsTmp,bdids,app_type,Suppress.Constants.LinkTypes.BDID,bdid);
 
 // Workaround ends:
-best_bdid_found := exists(brByGIDs);
+best_bdid_found := EXISTS(brByGIDs);
 
 // get the report records for the best BDIDs
-recs := doxie_cbrs.all_base_records_prs(bdids, ssn_mask_val, mod_access);
+recs := doxie_cbrs.all_base_records_prs(bdids, mod_access);
 
 // add equifax gateway results to the output
 out_rec := doxie_cbrs.layout_report;
 
 // InView gateway takes some variation of a best record
-besr := ungroup (recs[1].Best_Information);
+besr := UNGROUP (recs[1].Best_Information);
 best_bdid := PROJECT (besr, TRANSFORM (doxie_cbrs.Layout_BH_Best_String,
                                        SELF.BDID := (UNSIGNED6)LEFT.BDID, SELF := LEFT, SELF :=[]));
 
 // Best record is used instead of bdids, since the equifax gateway call needs name/address info
 // redundant "include" is passed all the way to the actual soapcall to prevent possible platform
 //    soapcall-always-executed issue
-equir := equifax_bus_records (best_bdid, Include_EquifaxBus_val);
+equir := InView_Services.equifax_bus_records (best_bdid, Include_EquifaxBus_val);
 
 out_rec AppendEquifax (recs L) := transform
   Self.EquifaxBusinessReport := if (Include_EquifaxBus_val, equir.records);
@@ -74,7 +75,7 @@ end;
 recs_plus := project (recs, AppendEquifax (Left));
 
 // filter non-recent records according to product rules
-filt_recs := filter_nonRecent(project(recs_plus, out_rec));
+filt_recs := InView_Services.filter_nonRecent(project(recs_plus, out_rec));
 
 // Do additional filtering by showing only current corporate data and limiting the number of
 // business registrations (after bringing the most recent to the top).

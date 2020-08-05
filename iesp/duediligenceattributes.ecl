@@ -17,7 +17,8 @@ export t_DDRPersonAttributesReportBy := record (iesp.duediligenceshared.t_DDRAtt
 end;
 		
 export t_DDRAttributesReportBy := record
-	string ProductRequestType {xpath('ProductRequestType')}; //values['AttributesOnly','CitizenshipOnly','AttributesAndCitizenship','']
+	string ProductRequestType {xpath('ProductRequestType')}; //values['AttributesOnly','CustomAttributes','CitizenshipOnly','AttributesAndCitizenship','']
+	dataset(iesp.duediligenceshared.t_DDRAttributeModule) AttributeGroups {xpath('AttributeGroups/Group'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxModuleGroupings)};
 	t_DDRPersonAttributesReportBy Person {xpath('Person')};
 	iesp.duediligenceshared.t_DDRAttributesBusiness Business {xpath('Business')};
 end;

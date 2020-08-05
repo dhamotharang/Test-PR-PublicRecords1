@@ -1,15 +1,15 @@
 
 IMPORT UCCV2;
 
-export layout_ucc_rollup_src := record
-	unsigned2 penalt;
-	uccv2_services.layout_ucc_filing_src;
-	dataset(uccv2_services.layout_ucc_hist_src)		filings{maxcount(UCCv2_Services.Constants.MAXCOUNT_FILINGS)};
-	dataset(uccv2_services.layout_ucc_party_src)	debtors{maxcount(UCCv2_Services.Constants.MAXCOUNT_DEBTORS)};
-	dataset(uccv2_services.layout_ucc_party_src)	secureds{maxcount(UCCv2_Services.Constants.MAXCOUNT_SECUREDS)};
-	dataset(uccv2_services.layout_ucc_party_src)	assignees{maxcount(UCCv2_Services.Constants.MAXCOUNT_ASSIGNEES)};
-	dataset(uccv2_services.layout_ucc_party_src)	creditors{maxcount(UCCv2_Services.Constants.MAXCOUNT_CREDITORS)};
-	dataset(uccv2_services.layout_ucc_signer)			signers{maxcount(UCCv2_Services.Constants.MAXCOUNT_SIGNERS)};
-	dataset(uccv2_services.layout_ucc_filofc)			filing_offices{maxcount(UCCv2_Services.Constants.MAXCOUNT_FILING_OFFICES)};
-	dataset(uccv2_services.layout_ucc_coll_src)		collateral{maxcount(UCCv2_Services.Constants.MAXCOUNT_COLLATERAL)};	
-end;
+EXPORT layout_ucc_rollup_src := RECORD
+  UNSIGNED2 penalt;
+  uccv2_services.layout_ucc_filing_src;
+  DATASET(uccv2_services.layout_ucc_hist_src) filings{MAXCOUNT(UCCv2_Services.Constants.MAXCOUNT_FILINGS)};
+  DATASET(uccv2_services.layout_ucc_party_src) debtors{MAXCOUNT(UCCv2_Services.Constants.MAXCOUNT_DEBTORS)};
+  DATASET(uccv2_services.layout_ucc_party_src) secureds{MAXCOUNT(UCCv2_Services.Constants.MAXCOUNT_SECUREDS)};
+  DATASET(uccv2_services.layout_ucc_party_src) assignees{MAXCOUNT(UCCv2_Services.Constants.MAXCOUNT_ASSIGNEES)};
+  DATASET(uccv2_services.layout_ucc_party_src) creditors{MAXCOUNT(UCCv2_Services.Constants.MAXCOUNT_CREDITORS)};
+  DATASET(uccv2_services.layout_ucc_signer) signers{MAXCOUNT(UCCv2_Services.Constants.MAXCOUNT_SIGNERS)};
+  DATASET(uccv2_services.layout_ucc_filofc) filing_offices{MAXCOUNT(UCCv2_Services.Constants.MAXCOUNT_FILING_OFFICES)};
+  DATASET(uccv2_services.layout_ucc_coll_src) collateral{MAXCOUNT(UCCv2_Services.Constants.MAXCOUNT_COLLATERAL)};
+END;

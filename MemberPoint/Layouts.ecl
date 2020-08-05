@@ -1,4 +1,4 @@
-﻿ import BatchServices, BatchShare, DidVille, progressive_phone, DeathV2_Services, Royalty, PhoneFinder_Services;
+﻿import BatchServices, BatchShare, DidVille, progressive_phone, DeathV2_Services, Royalty, PhoneFinder_Services;
 
 export Layouts := module
 
@@ -57,6 +57,11 @@ export Layouts := module
 		STRING4 GuardianSSNLast4;
 	end;
 	
+	EXPORT batch_in_extended:=RECORD
+	BATCHIN;
+	unsigned4	seq;
+	END;
+	
 	
 	export BatchOut := record
 		BatchShare.Layouts.ShareAcct;
@@ -105,6 +110,28 @@ export Layouts := module
 		string10 latitude_new;
 		string11 longitude_new;
 		//string5	 fips_county_new;
+		string4  addressdescriptioncode1;	
+		string100 addressDescription1;	
+		string4 addressdescriptioncode2;	
+		string100 addressDescription2;	
+		string4 addressdescriptioncode3;	
+		string100 addressDescription3;	
+		string4 addressdescriptioncode4;	
+		string100 addressDescription4;	
+		string4 addressdescriptioncode5;	
+		string100 addressDescription5;	
+		string4 addressdescriptioncode6;	
+		string100 addressDescription6;	
+		string4 addressdescriptioncode7;	
+		string100 addressDescription7;	
+		string4 addressdescriptioncode8;	
+		string100 addressDescription8;	
+		string4 addressdescriptioncode9;	
+		string100 addressDescription9;	
+		string4 addressdescriptioncode10;	
+		string100 addressDescription10;	
+
+
 //Scores ,  and 
     string3 name_score;
 		string3 ssn_score;
@@ -275,6 +302,61 @@ end;
 		//BatchOut.fips_county_new;
 end;
 
+
+export AddressesRec_extended := record
+		BatchOut.acctno;
+		BatchOut.address_match_codes;
+		BatchOut.address;
+		BatchOut.city;
+		BatchOut.st;
+		BatchOut.z5;
+		BatchOut.zip4;
+		BatchOut.county_name;
+		BatchOut.addr_dt_last_seen;
+		BatchOut.addr_dt_first_seen;
+		BatchOut.addr_confidence;
+		BatchOut.latitude;
+		BatchOut.longitude;
+		//BatchOut.fips_county
+		
+		BatchOut.address_new;
+		BatchOut.address_new_match_codes;
+		BatchOut.city_new;
+		BatchOut.st_new;
+		BatchOut.z5_new;
+		BatchOut.zip4_new;
+		BatchOut.county_name_new;
+		BatchOut.addr_dt_last_seen_new;
+		BatchOut.addr_dt_first_seen_new;
+		BatchOut.addr_confidence_new;
+		BatchOut.latitude_new;
+		BatchOut.longitude_new;
+		string4 addressCode1;
+    string4  addressdescriptioncode1;	
+		string100 addressDescription1;	
+		string4 addressdescriptioncode2;	
+		string100 addressDescription2;	
+		string4 addressdescriptioncode3;	
+		string100 addressDescription3;	
+		string4 addressdescriptioncode4;	
+		string100 addressDescription4;	
+		string4 addressdescriptioncode5;	
+		string100 addressDescription5;	
+		string4 addressdescriptioncode6;	
+		string100 addressDescription6;	
+		string4 addressdescriptioncode7;	
+		string100 addressDescription7;	
+		string4 addressdescriptioncode8;	
+		string100 addressDescription8;	
+		string4 addressdescriptioncode9;	
+		string100 addressDescription9;	
+		string4 addressdescriptioncode10;	
+		string100 addressDescription10;	
+		UNSIGNED4 SEQ;
+
+		//BatchOut.fips_county_new;
+end;
+
 		export sortRec := record
 						string Matchcode;
 						unsigned MatchcodeScore;
@@ -283,6 +365,7 @@ end;
 		export DeceasedOut := record(DeathV2_Services.layouts.BatchOut)
 		sortRec
 		end;
+	
 	
   export EmailRec := record
 		dataset(BatchServices.Layouts.email.rec_results_raw) Records;
@@ -303,5 +386,32 @@ end;
 		STRING PhoneStatus;
 		STRING ListingType;
 	END;
-	
+	export Layout_Desc :=
+RECORD
+	STRING5 hri;
+	STRING150 desc;
+END;
+
+export reportservice_data_In:=record
+    STRING15 SSN_in;
+		STRING120 fullName := '';
+		STRING30 Name_First;
+		STRING30 Name_Middle;
+		STRING30 Name_Last;
+		STRING5 Name_Suffix;
+		STRING8 DOB_in;
+		STRING140 street_addr := '';
+		STRING25 p_City_name;
+		STRING5 State_in;
+		STRING10 ZIP_in;
+		
+	END;
+	EXPORT reportservice_data_Cln := RECORD 
+		reportservice_data_In;
+		STRING9 SSN_Cln;
+		STRING8 DOB_Cln;
+		STRING2 ST_Cln;
+		STRING5 Z5_Cln;
+		END;
+
 end;

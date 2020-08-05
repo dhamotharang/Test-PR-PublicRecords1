@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
-IMPORT KEL12 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.3.0beta5
+IMPORT KEL13 AS KEL;
 IMPORT B_Address_2,CFG_Compile,E_Address,E_Geo_Link,E_Zip_Code FROM PublicRecords_KEL;
-IMPORT * FROM KEL12.Null;
+IMPORT * FROM KEL13.Null;
 EXPORT B_Address_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED VIRTUAL TYPEOF(B_Address_2().__ENH_Address_2) __ENH_Address_2 := B_Address_2(__in,__cfg).__ENH_Address_2;
-  SHARED __EE2127026 := __ENH_Address_2;
-  EXPORT __ST110291_Layout := RECORD
+  SHARED VIRTUAL TYPEOF(B_Address_2(__in,__cfg).__ENH_Address_2) __ENH_Address_2 := B_Address_2(__in,__cfg).__ENH_Address_2;
+  SHARED __EE4787769 := __ENH_Address_2;
+  EXPORT __ST128087_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -34,20 +34,38 @@ EXPORT B_Address_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.ndataset(E_Address(__in,__cfg).Style_Layout) Style_;
     KEL.typ.ndataset(E_Address(__in,__cfg).Throw_Back_Layout) Throw_Back_;
     KEL.typ.ndataset(E_Address(__in,__cfg).Vacancy_Layout) Vacancy_;
+    KEL.typ.ndataset(E_Address(__in,__cfg).A_D_V_O_Summary_Layout) A_D_V_O_Summary_;
     KEL.typ.ndataset(E_Address(__in,__cfg).Vacation_Layout) Vacation_;
     KEL.typ.ndataset(E_Address(__in,__cfg).High_Risk_Address_Layout) High_Risk_Address_;
     KEL.typ.ndataset(E_Address(__in,__cfg).Data_Sources_Layout) Data_Sources_;
+    KEL.typ.ndataset(E_Address(__in,__cfg).A_D_V_O_Summary_Layout) Bestchild_Advo_;
+    KEL.typ.nstr College_Flag_;
+    KEL.typ.nstr Do_Not_Deliver_Flag_;
+    KEL.typ.nstr Drop_Indicator_Flag_;
     KEL.typ.nbool Is_P_O_Box_;
+    KEL.typ.bool Is_P_O_Box_A_D_V_O_ := FALSE;
+    KEL.typ.nbool Is_P_O_Box_Zip_;
+    KEL.typ.nstr Only_G_M_Flag_;
+    KEL.typ.nstr Res_Bus_Flag_;
+    KEL.typ.nstr Seasonal_Delivery_Flag_;
+    KEL.typ.nstr Style_Flag_;
+    KEL.typ.nstr Throw_Back_Flag_;
+    KEL.typ.nstr Vacant_Flag_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST110291_Layout __ND2129956__Project(B_Address_2(__in,__cfg).__ST125542_Layout __PP2126433) := TRANSFORM
-    SELF.Is_P_O_Box_ := __OR(__PP2126433.Is_P_O_Box_Zip_,__CN(__PP2126433.Is_P_O_Box_A_D_V_O_));
-    SELF := __PP2126433;
+  SHARED __ST128087_Layout __ND4787597__Project(B_Address_2(__in,__cfg).__ST148602_Layout __PP4787006) := TRANSFORM
+    SELF.Is_P_O_Box_ := __OR(__PP4787006.Is_P_O_Box_Zip_,__CN(__PP4787006.Is_P_O_Box_A_D_V_O_));
+    __EE4787592 := __PP4787006.Bestchild_Advo_;
+    SELF.Only_G_M_Flag_ := (__T(__EE4787592))[1].Only_Way_To_Get_Mail_Indicator_;
+    SELF := __PP4787006;
   END;
-  EXPORT __ENH_Address_1 := PROJECT(__EE2127026,__ND2129956__Project(LEFT));
+  EXPORT __ENH_Address_1 := PROJECT(__EE4787769,__ND4787597__Project(LEFT));
 END;

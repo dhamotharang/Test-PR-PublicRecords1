@@ -1,7 +1,7 @@
 ﻿import RiskWise, dx_gong, ut, business_header_ss, mdr, std, Doxie, Suppress, Business_Risk;
 
-export getBDIDTable_Hist(dataset(Business_Risk.Layout_Output) biid, unsigned1 glb,
-                                              doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+export getBDIDTable_Hist(dataset(Business_Risk.Layout_Output) biid,
+                         doxie.IDataAccess mod_access) := FUNCTION
 
 // instead of using the bdid_table, and bdid_risk_table, which aren't historical,
 // we need to search all sources on those tables by bdid, and filter the raw data by the history_date.
@@ -113,14 +113,14 @@ bdid_tbl_gong := join(bdid_tbl_init,
 					  left outer, lookup);
 
 
-// kbh := business_risk.Key_Business_Header_BDID;
 kbh := Business_Header_SS.Key_BH_BDID_pl;
 
 bh := join(biid, kbh,
 				 left.bdid!=0 and
 				  keyed(left.bdid=right.bdid) and
-					ut.PermissionTools.glb.SrcOk(glb, right.source, right.dt_first_seen) and
-				 (unsigned)((STRING)right.dt_first_seen)[1..6] < left.historydate,
+					doxie.compliance.source_ok(mod_access.glb, mod_access.DataRestrictionMask, RIGHT.source, RIGHT.dt_first_seen) AND
+				 (unsigned)((STRING)right.dt_first_seen)[1..6] < left.historydate AND 
+				 doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 				 transform(recordof(kbh), self := right),
 				 ATMOST(keyed(left.bdid=right.bdid), RiskWise.max_atmost), keep(1000));
 

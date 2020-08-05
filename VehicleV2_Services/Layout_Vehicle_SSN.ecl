@@ -1,3 +1,3 @@
-export Layout_Vehicle_SSN := record
-	string9 SSN;
-end;
+EXPORT Layout_Vehicle_SSN := RECORD
+  STRING9 SSN;
+END;

@@ -191,13 +191,16 @@ EXPORT InstantID20_Service() := MACRO
 			FAIL(Risk_Indicators.iid_constants.OFAC4_NoGateway)); // Due to this RQ-14881 ExcludeWatchlists works with other versions of OFAC in this query. 
                                                             // Please refer to the ticket if needing further details.
 
+    Boolean useUpdatedBipAppend := false;
     
     // 4. Pass input to BIID 2.0 logic.
     ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, Options, linkingOptions, ExcludeWatchlists,
                                                                         LexIdSourceOptout := LexIdSourceOptout, 
                                                                         TransactionID := TransactionID, 
                                                                         BatchUID := BatchUID, 
-                                                                        GlobalCompanyID := GlobalCompanyID);
+                                                                        GlobalCompanyID := GlobalCompanyID,
+																		                                    useUpdatedBipAppend := useUpdatedBipAppend
+																		                                    );
    
    
     #IF(Models.LIB_BusinessRisk_Models().TurnOnValidation = FALSE)

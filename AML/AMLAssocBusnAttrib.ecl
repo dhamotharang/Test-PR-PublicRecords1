@@ -65,7 +65,8 @@ BusnHeader := Business_Header_SS.Key_BH_BDID_pl;
 
 BusnHeadRec := join(AssocBusn(bdid!=0), BusnHeader,
                     Keyed(right.Bdid = left.AssocBdid) and
-                    right.dt_first_seen < left.historydate,
+                    right.dt_first_seen < left.historydate AND 
+                    doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
                     transform({recordof(BusnHeader), unsigned4 seq,  unsigned6 AssocBdid,  unsigned4  historydate},
                               self.seq := left.seq,
                               self.bdid := left.bdid,

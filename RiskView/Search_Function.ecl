@@ -35,15 +35,16 @@ EXPORT Search_Function(
 	boolean IncludeLnJ,
 	boolean RetainInputDID,
 	boolean exception_score_reason = FALSE,
-  boolean InsuranceMode = FALSE, //BF _ This value is set to true for insurance only.
+    boolean InsuranceMode = FALSE, //BF _ This value is set to true for insurance only.
 	boolean InsuranceBankruptcyAllow10Yr = FALSE, //Value is true for insurance only.
 	unsigned6 MinimumAmount = 0,
 	dataset(iesp.share.t_StringArrayItem) ExcludeStates = dataset([], iesp.share.t_StringArrayItem),
 	dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem),
 	boolean IncludeStatusRefreshChecks = FALSE,
-	string32 DeferredTransactionID = '',
+	DATASET({string32 DeferredTransactionID}) DeferredTransactionIDs = DATASET([], {string32 DeferredTransactionID}),
     string5 StatusRefreshWaitPeriod = '',
-    string10 ESPInterfaceVersion = ''
+    string10 ESPInterfaceVersion = '',
+    boolean IsBatch = FALSE // Changes the output of the DTE child dataset
   ) := function
 
 boolean   isPreScreenPurpose := STD.Str.ToUpperCase(intended_purpose) = 'PRESCREENING';
@@ -883,103 +884,6 @@ boolean Alerts200 := (le.SubjectDeceased='1' or attr.SubjectDeceased = '1') or (
 	SELF.Crossindustry_reason3 := IF(prescreen_score_scenario_Crossindustry OR score_override_alert_returned or CI_deceased or no_truedid, '', le.Crossindustry_reason3);
 	SELF.Crossindustry_reason4 := IF(prescreen_score_scenario_Crossindustry OR score_override_alert_returned or CI_deceased or no_truedid, '', le.Crossindustry_reason4);
 	SELF.Crossindustry_reason5 := IF(prescreen_score_scenario_Crossindustry OR score_override_alert_returned or CI_deceased or no_truedid, '', le.Crossindustry_reason5);
-
-  //Custom model overrides
-	C1_deceased := has200Score and le.custom_score_name not in deceased_exception_models;
-	SELF.Custom_score := MAP(le.Custom_score <> '' AND score_override_alert_returned 	=> '100',
-													 le.Custom_score <> '' AND prescreen_score_pass_custom		=> '1',
-													 le.Custom_score <> '' AND prescreen_score_fail_custom		=> '0',
-													 le.Custom_score <> '' AND no_truedid											=> '222',
-													 le.Custom_score <> '' AND C1_deceased 										=> '200',
-																																											le.Custom_score);
-	SELF.Custom_Type := IF(prescreen_score_scenario_custom, '0-1', le.Custom_Type);
-
-	SELF.Custom_reason1 := MAP(prescreen_score_scenario_custom OR (score_override_alert_returned AND ~exception_score_reason) or C1_deceased or no_truedid=> '',  
-                             SELF.Custom_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
-                             SELF.Custom_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
-                             SELF.Custom_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
-                                                                                                                                 le.Custom_reason1);
-		SELF.Custom_reason2 := IF(prescreen_score_scenario_custom OR score_override_alert_returned or C1_deceased or no_truedid, '', le.Custom_reason2);
-		SELF.Custom_reason3 := IF(prescreen_score_scenario_custom OR score_override_alert_returned or C1_deceased or no_truedid, '', le.Custom_reason3);
-		SELF.Custom_reason4 := IF(prescreen_score_scenario_custom OR score_override_alert_returned or C1_deceased or no_truedid, '', le.Custom_reason4);
-		SELF.Custom_reason5 := IF(prescreen_score_scenario_custom OR score_override_alert_returned or C1_deceased or no_truedid, '', le.Custom_reason5);
-
-  //Custom2 model overrides
-  C2_deceased := has200Score and le.custom2_score_name not in deceased_exception_models;
-	SELF.Custom2_score := MAP(le.Custom2_score <> '' AND score_override_alert_returned 	=> '100',
-														le.Custom2_score <> '' AND prescreen_score_pass_custom2		=> '1',
-														le.Custom2_score <> '' AND prescreen_score_fail_custom2		=> '0',
-														le.Custom2_score <> '' AND no_truedid											=> '222',
-														le.Custom2_score <> '' AND C2_deceased 										=> '200',
-																																												le.Custom2_score);
-	SELF.Custom2_Type := IF(prescreen_score_scenario_custom2, '0-1', le.Custom2_Type);
-	SELF.Custom2_reason1 := MAP(prescreen_score_scenario_custom2 OR (score_override_alert_returned AND ~exception_score_reason) or C2_deceased or no_truedid=> '', 
-                              SELF.Custom2_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
-                              SELF.Custom2_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
-                              SELF.Custom2_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
-                                                                                                                                   le.Custom2_reason1);	
-		SELF.Custom2_reason2 := IF(prescreen_score_scenario_custom2 OR score_override_alert_returned or C2_deceased or no_truedid, '', le.Custom2_reason2);
-		SELF.Custom2_reason3 := IF(prescreen_score_scenario_custom2 OR score_override_alert_returned or C2_deceased or no_truedid, '', le.Custom2_reason3);
-		SELF.Custom2_reason4 := IF(prescreen_score_scenario_custom2 OR score_override_alert_returned or C2_deceased or no_truedid, '', le.Custom2_reason4);
-		SELF.Custom2_reason5 := IF(prescreen_score_scenario_custom2 OR score_override_alert_returned or C2_deceased or no_truedid, '', le.Custom2_reason5);
-
-  //Custom3 model overrides 
-	C3_deceased := has200Score and le.custom3_score_name not in deceased_exception_models;
-	SELF.Custom3_score := MAP(le.Custom3_score <> '' AND score_override_alert_returned 	=> '100',
-														le.Custom3_score <> '' AND prescreen_score_pass_custom3		=> '1',
-														le.Custom3_score <> '' AND prescreen_score_fail_custom3		=> '0',
-														le.Custom3_score <> '' AND no_truedid											=> '222',
-														le.Custom3_score <> '' AND C3_deceased 										=> '200',
-																																												le.Custom3_score);
-	SELF.Custom3_Type := IF(prescreen_score_scenario_custom3, '0-1', le.Custom3_Type);
-	SELF.Custom3_reason1 := MAP(prescreen_score_scenario_custom3 OR (score_override_alert_returned AND ~exception_score_reason) or C3_deceased or no_truedid=> '',  
-                              SELF.Custom3_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
-                              SELF.Custom3_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
-                              SELF.Custom3_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
-                                                                                                                                   le.Custom3_reason1);
-		SELF.Custom3_reason2 := IF(prescreen_score_scenario_custom3 OR score_override_alert_returned or C3_deceased or no_truedid, '', le.Custom3_reason2);
-		SELF.Custom3_reason3 := IF(prescreen_score_scenario_custom3 OR score_override_alert_returned or C3_deceased or no_truedid, '', le.Custom3_reason3);
-		SELF.Custom3_reason4 := IF(prescreen_score_scenario_custom3 OR score_override_alert_returned or C3_deceased or no_truedid, '', le.Custom3_reason4);
-		SELF.Custom3_reason5 := IF(prescreen_score_scenario_custom3 OR score_override_alert_returned or C3_deceased or no_truedid, '', le.Custom3_reason5);
-
-  //Custom4 model overrides
-	C4_deceased := has200Score and le.custom4_score_name not in deceased_exception_models;
-	SELF.Custom4_score := MAP(le.Custom4_score <> '' AND score_override_alert_returned 	=> '100',
-													  le.Custom4_score <> '' AND prescreen_score_pass_custom4		=> '1',
-													  le.Custom4_score <> '' AND prescreen_score_fail_custom4		=> '0',
-													  le.Custom4_score <> '' AND no_truedid											=> '222',
-													  le.Custom4_score <> '' AND C4_deceased 										=> '200',
-																																											le.Custom4_score);
-
-	SELF.Custom4_Type := IF(prescreen_score_scenario_custom4, '0-1', le.Custom4_Type);
-	SELF.Custom4_reason1 := MAP(prescreen_score_scenario_custom4 OR (score_override_alert_returned AND ~exception_score_reason) or C4_deceased or no_truedid=> '', 
-                              SELF.Custom4_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
-                              SELF.Custom4_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
-                              SELF.Custom4_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
-                                                                                                                                   le.Custom4_reason1);
-		SELF.Custom4_reason2 := IF(prescreen_score_scenario_custom4 OR score_override_alert_returned or C4_deceased or no_truedid, '', le.Custom4_reason2);
-		SELF.Custom4_reason3 := IF(prescreen_score_scenario_custom4 OR score_override_alert_returned or C4_deceased or no_truedid, '', le.Custom4_reason3);
-		SELF.Custom4_reason4 := IF(prescreen_score_scenario_custom4 OR score_override_alert_returned or C4_deceased or no_truedid, '', le.Custom4_reason4);
-		SELF.Custom4_reason5 := IF(prescreen_score_scenario_custom4 OR score_override_alert_returned or C4_deceased or no_truedid, '', le.Custom4_reason5);
-
-  //Custom5 model overrides
-  C5_deceased := has200Score and le.custom5_score_name not in deceased_exception_models;
-	SELF.Custom5_score := MAP(le.Custom5_score <> '' AND score_override_alert_returned 	=> '100',
-														le.Custom5_score <> '' AND prescreen_score_pass_custom5		=> '1',
-														le.Custom5_score <> '' AND prescreen_score_fail_custom5		=> '0',
-														le.Custom5_score <> '' AND no_truedid											=> '222',
-														le.Custom5_score <> '' AND C5_deceased 										=> '200',
-																																												le.Custom5_score);
-	SELF.Custom5_Type := IF(prescreen_score_scenario_custom5, '0-1', le.Custom5_Type);
-	SELF.Custom5_reason1 := MAP(prescreen_score_scenario_custom5 OR (score_override_alert_returned AND ~exception_score_reason) or C5_deceased or no_truedid=> '', 
-                              SELF.Custom5_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
-                              SELF.Custom5_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
-                              SELF.Custom5_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
-                                                                                                                                   le.Custom5_reason1);
-		SELF.Custom5_reason2 := IF(prescreen_score_scenario_custom5 OR score_override_alert_returned or C5_deceased or no_truedid, '', le.Custom5_reason2);
-		SELF.Custom5_reason3 := IF(prescreen_score_scenario_custom5 OR score_override_alert_returned or C5_deceased or no_truedid, '', le.Custom5_reason3);
-		SELF.Custom5_reason4 := IF(prescreen_score_scenario_custom5 OR score_override_alert_returned or C5_deceased or no_truedid, '', le.Custom5_reason4);
-		SELF.Custom5_reason5 := IF(prescreen_score_scenario_custom5 OR score_override_alert_returned or C5_deceased or no_truedid, '', le.Custom5_reason5);
   
 	AlertRegulatoryCondition := map(
 		(hasSecurityFreeze and ~isCollectionsPurpose) or isStateException or tooYoungForPrescreen or PrescreenOptOut OR 
@@ -1000,6 +904,126 @@ boolean Alerts200 := (le.SubjectDeceased='1' or attr.SubjectDeceased = '1') or (
 	self.ConsumerStatementText := if(hasConsumerStatement, statementText, ''); 
 	
 	suppress_condition := AlertRegulatoryCondition='3';
+  
+  //non-standard custom models which must be treated as attributes for alert purposes
+  //suppress_condition returns 100
+  //no_truedid (222) returns -1
+  //deceased (200) returns score as normal
+  NonStandardModels := ['RVR1903_1'];
+  
+  //Custom model overrides
+	C1_deceased := has200Score and le.custom_score_name not in deceased_exception_models;
+	SELF.Custom_score := MAP(custom_model IN NonStandardModels AND suppress_condition => '100',
+                           custom_model IN NonStandardModels AND no_truedid         => '-1',
+                           custom_model IN NonStandardModels AND C1_deceased        => le.Custom_score,
+                           le.Custom_score <> '' AND score_override_alert_returned  => '100',
+													 le.Custom_score <> '' AND prescreen_score_pass_custom    => '1',
+													 le.Custom_score <> '' AND prescreen_score_fail_custom    => '0',
+													 le.Custom_score <> '' AND no_truedid									    => '222',
+													 le.Custom_score <> '' AND C1_deceased 									  => '200',
+                                                                                       le.Custom_score);
+	SELF.Custom_Type := IF(prescreen_score_scenario_custom, '0-1', le.Custom_Type);
+
+	SELF.Custom_reason1 := MAP(prescreen_score_scenario_custom OR (score_override_alert_returned AND ~exception_score_reason) or C1_deceased or no_truedid=> '',  
+                             SELF.Custom_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
+                             SELF.Custom_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
+                             SELF.Custom_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
+                                                                                                                                 le.Custom_reason1);
+		SELF.Custom_reason2 := IF(prescreen_score_scenario_custom OR score_override_alert_returned or C1_deceased or no_truedid, '', le.Custom_reason2);
+		SELF.Custom_reason3 := IF(prescreen_score_scenario_custom OR score_override_alert_returned or C1_deceased or no_truedid, '', le.Custom_reason3);
+		SELF.Custom_reason4 := IF(prescreen_score_scenario_custom OR score_override_alert_returned or C1_deceased or no_truedid, '', le.Custom_reason4);
+		SELF.Custom_reason5 := IF(prescreen_score_scenario_custom OR score_override_alert_returned or C1_deceased or no_truedid, '', le.Custom_reason5);
+
+  //Custom2 model overrides
+  C2_deceased := has200Score and le.custom2_score_name not in deceased_exception_models;
+	SELF.Custom2_score := MAP(custom2_model IN NonStandardModels AND suppress_condition => '100',
+                            custom2_model IN NonStandardModels AND no_truedid         => '-1',
+                            custom2_model IN NonStandardModels AND C2_deceased        => le.Custom2_score,
+                            le.Custom2_score <> '' AND score_override_alert_returned 	=> '100',
+														le.Custom2_score <> '' AND prescreen_score_pass_custom2		=> '1',
+														le.Custom2_score <> '' AND prescreen_score_fail_custom2		=> '0',
+														le.Custom2_score <> '' AND no_truedid											=> '222',
+														le.Custom2_score <> '' AND C2_deceased 										=> '200',
+                                                                                         le.Custom2_score);
+	SELF.Custom2_Type := IF(prescreen_score_scenario_custom2, '0-1', le.Custom2_Type);
+	SELF.Custom2_reason1 := MAP(prescreen_score_scenario_custom2 OR (score_override_alert_returned AND ~exception_score_reason) or C2_deceased or no_truedid=> '', 
+                              SELF.Custom2_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
+                              SELF.Custom2_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
+                              SELF.Custom2_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
+                                                                                                                                   le.Custom2_reason1);	
+		SELF.Custom2_reason2 := IF(prescreen_score_scenario_custom2 OR score_override_alert_returned or C2_deceased or no_truedid, '', le.Custom2_reason2);
+		SELF.Custom2_reason3 := IF(prescreen_score_scenario_custom2 OR score_override_alert_returned or C2_deceased or no_truedid, '', le.Custom2_reason3);
+		SELF.Custom2_reason4 := IF(prescreen_score_scenario_custom2 OR score_override_alert_returned or C2_deceased or no_truedid, '', le.Custom2_reason4);
+		SELF.Custom2_reason5 := IF(prescreen_score_scenario_custom2 OR score_override_alert_returned or C2_deceased or no_truedid, '', le.Custom2_reason5);
+
+  //Custom3 model overrides 
+	C3_deceased := has200Score and le.custom3_score_name not in deceased_exception_models;
+	SELF.Custom3_score := MAP(custom3_model IN NonStandardModels AND suppress_condition => '100',
+                            custom3_model IN NonStandardModels AND no_truedid         => '-1',
+                            custom3_model IN NonStandardModels AND C3_deceased        => le.Custom3_score,
+                            le.Custom3_score <> '' AND score_override_alert_returned 	=> '100',
+														le.Custom3_score <> '' AND prescreen_score_pass_custom3		=> '1',
+														le.Custom3_score <> '' AND prescreen_score_fail_custom3		=> '0',
+														le.Custom3_score <> '' AND no_truedid											=> '222',
+														le.Custom3_score <> '' AND C3_deceased 										=> '200',
+                                                                                         le.Custom3_score);
+	SELF.Custom3_Type := IF(prescreen_score_scenario_custom3, '0-1', le.Custom3_Type);
+	SELF.Custom3_reason1 := MAP(prescreen_score_scenario_custom3 OR (score_override_alert_returned AND ~exception_score_reason) or C3_deceased or no_truedid=> '',  
+                              SELF.Custom3_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
+                              SELF.Custom3_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
+                              SELF.Custom3_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
+                                                                                                                                   le.Custom3_reason1);
+		SELF.Custom3_reason2 := IF(prescreen_score_scenario_custom3 OR score_override_alert_returned or C3_deceased or no_truedid, '', le.Custom3_reason2);
+		SELF.Custom3_reason3 := IF(prescreen_score_scenario_custom3 OR score_override_alert_returned or C3_deceased or no_truedid, '', le.Custom3_reason3);
+		SELF.Custom3_reason4 := IF(prescreen_score_scenario_custom3 OR score_override_alert_returned or C3_deceased or no_truedid, '', le.Custom3_reason4);
+		SELF.Custom3_reason5 := IF(prescreen_score_scenario_custom3 OR score_override_alert_returned or C3_deceased or no_truedid, '', le.Custom3_reason5);
+
+  //Custom4 model overrides
+	C4_deceased := has200Score and le.custom4_score_name not in deceased_exception_models;
+	SELF.Custom4_score := MAP(custom4_model IN NonStandardModels AND suppress_condition => '100',
+                            custom4_model IN NonStandardModels AND no_truedid         => '-1',
+                            custom4_model IN NonStandardModels AND C4_deceased        => le.Custom4_score,
+                            le.Custom4_score <> '' AND score_override_alert_returned 	=> '100',
+													  le.Custom4_score <> '' AND prescreen_score_pass_custom4		=> '1',
+													  le.Custom4_score <> '' AND prescreen_score_fail_custom4		=> '0',
+													  le.Custom4_score <> '' AND no_truedid											=> '222',
+													  le.Custom4_score <> '' AND C4_deceased 										=> '200',
+                                                                                         le.Custom4_score);
+
+	SELF.Custom4_Type := IF(prescreen_score_scenario_custom4, '0-1', le.Custom4_Type);
+	SELF.Custom4_reason1 := MAP(prescreen_score_scenario_custom4 OR (score_override_alert_returned AND ~exception_score_reason) or C4_deceased or no_truedid=> '', 
+                              SELF.Custom4_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
+                              SELF.Custom4_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
+                              SELF.Custom4_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
+                                                                                                                                   le.Custom4_reason1);
+		SELF.Custom4_reason2 := IF(prescreen_score_scenario_custom4 OR score_override_alert_returned or C4_deceased or no_truedid, '', le.Custom4_reason2);
+		SELF.Custom4_reason3 := IF(prescreen_score_scenario_custom4 OR score_override_alert_returned or C4_deceased or no_truedid, '', le.Custom4_reason3);
+		SELF.Custom4_reason4 := IF(prescreen_score_scenario_custom4 OR score_override_alert_returned or C4_deceased or no_truedid, '', le.Custom4_reason4);
+		SELF.Custom4_reason5 := IF(prescreen_score_scenario_custom4 OR score_override_alert_returned or C4_deceased or no_truedid, '', le.Custom4_reason5);
+
+  //Custom5 model overrides
+  C5_deceased := has200Score and le.custom5_score_name not in deceased_exception_models;
+	SELF.Custom5_score := MAP(custom5_model IN NonStandardModels AND suppress_condition => '100',
+                            custom5_model IN NonStandardModels AND no_truedid         => '-1',
+                            custom5_model IN NonStandardModels AND C5_deceased        => le.Custom5_score,
+                            le.Custom5_score <> '' AND score_override_alert_returned 	=> '100',
+														le.Custom5_score <> '' AND prescreen_score_pass_custom5		=> '1',
+														le.Custom5_score <> '' AND prescreen_score_fail_custom5		=> '0',
+														le.Custom5_score <> '' AND no_truedid											=> '222',
+														le.Custom5_score <> '' AND C5_deceased 										=> '200',
+                                                                                         le.Custom5_score);
+	SELF.Custom5_Type := IF(prescreen_score_scenario_custom5, '0-1', le.Custom5_Type);
+	SELF.Custom5_reason1 := MAP(prescreen_score_scenario_custom5 OR (score_override_alert_returned AND ~exception_score_reason) or C5_deceased or no_truedid=> '', 
+                              SELF.Custom5_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
+                              SELF.Custom5_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
+                              SELF.Custom5_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
+                                                                                                                                   le.Custom5_reason1);
+		SELF.Custom5_reason2 := IF(prescreen_score_scenario_custom5 OR score_override_alert_returned or C5_deceased or no_truedid, '', le.Custom5_reason2);
+		SELF.Custom5_reason3 := IF(prescreen_score_scenario_custom5 OR score_override_alert_returned or C5_deceased or no_truedid, '', le.Custom5_reason3);
+		SELF.Custom5_reason4 := IF(prescreen_score_scenario_custom5 OR score_override_alert_returned or C5_deceased or no_truedid, '', le.Custom5_reason4);
+		SELF.Custom5_reason5 := IF(prescreen_score_scenario_custom5 OR score_override_alert_returned or C5_deceased or no_truedid, '', le.Custom5_reason5);
+  
+  //attribute suppression
 	self.InputProvidedFirstName	 := if(suppress_condition, '', le.InputProvidedFirstName	);
 	self.InputProvidedLastName	 := if(suppress_condition, '', le.InputProvidedLastName	);
 	self.InputProvidedStreetAddress	 := if(suppress_condition, '', le.InputProvidedStreetAddress	);
@@ -1325,10 +1349,17 @@ transform(riskview.layouts.layout_riskview5_search_results,
   
 riskview5_final_results := if(CheckingIndicatorsRequest, riskview5_attr_search_results_FirstData, riskview5_pre_final_results);
 
-riskview5_with_status_refresh := MAP(IncludeStatusRefreshChecks = TRUE AND DeferredTransactionID = '' AND ~AttributesOnly => Riskview.Functions.JuLiProcessStatusRefresh(clam, gateways, riskview5_final_results, ExcludeStatusRefresh, StatusRefreshWaitPeriod, ESPInterfaceVersion, IncludeStatusRefreshChecks),
-                                                                   IncludeStatusRefreshChecks = TRUE AND DeferredTransactionID <> '' => Riskview.Functions.JuLiProcessDTE(DeferredTransactionID, clam, gateways, riskview5_final_results, IncludeStatusRefreshChecks),
+boolean InvokeStatusRefresh := IncludeStatusRefreshChecks = TRUE AND COUNT(DeferredTransactionIDs) = 0 AND ~AttributesOnly;
+boolean InvokeDTE := IncludeStatusRefreshChecks = TRUE AND COUNT(DeferredTransactionIDs) <> 0;
+
+riskview_status_refresh := IF(InvokeStatusRefresh, Riskview.Functions.JuLiProcessStatusRefresh(clam, gateways, riskview5_final_results, ExcludeStatusRefresh, StatusRefreshWaitPeriod, ESPInterfaceVersion, IsBatch, riskview_input, InvokeStatusRefresh), dataset([], riskview.layouts.layout_riskview5_search_results));
+riskview_dte := IF(InvokeDTE, Riskview.Functions.JuLiProcessDTE(DeferredTransactionIDs, clam, gateways, riskview5_final_results, InvokeDTE), dataset([], riskview.layouts.layout_riskview5_search_results));
+
+riskview5_with_status_refresh := MAP(InvokeStatusRefresh => riskview_status_refresh,
+                                                                   InvokeDTE => riskview_dte,
                                                                    riskview5_final_results);
                                                                    
+                                                                  
  /* *************************************
   *   Boca Shell Logging Functionality  *
   ***************************************/
@@ -1396,6 +1427,3 @@ return riskview5_with_status_refresh;
 return Models.LIB_RiskView_Models(clam, lib_in).ValidatingModel;
 #end
 END;
-	
-	
-	

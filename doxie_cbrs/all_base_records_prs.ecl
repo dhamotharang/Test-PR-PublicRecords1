@@ -1,9 +1,14 @@
-﻿IMPORT doxie_crs, liens_superior, iesp, ut;
+﻿IMPORT Business_Header, doxie, doxie_cbrs, doxie_crs, iesp, liens_superior;
 
 doxie_cbrs.mac_Selection_Declare()
 
-EXPORT all_base_records_prs(DATASET(doxie_cbrs.layout_references) bdids = DATASET([],doxie_cbrs.layout_references), STRING6 SSNMask = 'NONE',
-                            doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+// NOTE: This attribute is referenced several times as "record of".  Per Ricardo, we are 
+//       calling this ONE attribute an exception due to this fact and have left the 
+//       mod_access defaulted here. With future plans of modifying the "record of" references
+//       in the various attributes and removing this default also.
+EXPORT all_base_records_prs(DATASET(doxie_cbrs.layout_references) bdids = DATASET([],doxie_cbrs.layout_references),
+                            doxie.IDataAccess mod_access = MODULE(doxie.IDataAccess) END 
+                           ) := FUNCTION
 
 //
 // SL based limits for a Report, where possible
@@ -35,7 +40,7 @@ EXPORT all_base_records_prs(DATASET(doxie_cbrs.layout_references) bdids = DATASE
 name_table := dedup(table(sort(doxie_cbrs.fn_getBaseRecs(bdids,false),company_name),{company_name,name_source_id}));
 addr_table := dedup(table(sort(doxie_cbrs.fn_getBaseRecs(bdids,false),state,zip,prim_name,prim_range,sec_range),{state,zip,prim_name,prim_range,sec_range,addr_source_id}));
 phone_table := dedup(table(sort(doxie_cbrs.fn_getBaseRecs(bdids,false),phone),{phone,phone_source_id}));
-is_knowx := ut.IndustryClass.is_knowx;	
+is_knowx := mod_access.isConsumer();	
 shared con := doxie_crs.constants;
 
 //***** MY RECORDSETS
@@ -85,7 +90,7 @@ boolean bdids_Derived :=  false : stored('bdidsDerived');
 upcr := doxie_cbrs.ultimate_parent_information(bdids)((multibdid or bdids_Derived) and (fromDCA));
 
 //Phone summary and company verification from business instant id
-biid := doxie_cbrs.getBizReportBDIDs().biid; //Business InstantId Search.
+biid := doxie_cbrs.getBizReportBDIDs(mod_access).biid; //Business InstantId Search.
 phone_summary := choosen(doxie.fn_get_phone_summary(biid),con.max_phone_summary);
 verification := choosen(doxie.fn_get_company_verification(biid),con.max_verification);
 nmvr := doxie_cbrs.name_variations_base(bdids);
@@ -94,9 +99,9 @@ phvr := doxie_cbrs.phone_variations_base(bdids);
 idnr := doxie_cbrs.ID_Number_records_base(bdids);
 
 bnkr := doxie_cbrs.bankruptcy_records_trimmed(bdids);
-bnkr_v2 := doxie_cbrs.bankruptcy_records_trimmed_v2(bdids, SSNMask);
-ljur := doxie_cbrs.Liens_Judgments_UCC_records_trimmed(bdids, SSNMask);
-ljur_v2 := doxie_cbrs.Liens_Judgments_UCC_records_trimmed_v2(bdids,SSNMask);
+bnkr_v2 := doxie_cbrs.bankruptcy_records_trimmed_v2(bdids, mod_access.ssn_mask);
+ljur := doxie_cbrs.Liens_Judgments_UCC_records_trimmed(bdids, mod_access.ssn_mask);
+ljur_v2 := doxie_cbrs.Liens_Judgments_UCC_records_trimmed_v2(bdids,mod_access.ssn_mask);
 
 prfr := doxie_cbrs.profile_records(bdids);
 prfr_v2 := doxie_cbrs.profile_records_v2(bdids);
@@ -127,7 +132,7 @@ dnbr := doxie_cbrs.dnb_records(bdids, mod_access)(Include_DunBradstreetRecords_v
 ebrr := doxie_cbrs.experian_business_reports_trimmed(bdids); 
 irsr := doxie_cbrs.IRS5500_records_trimmed(bdids);
 sancr := doxie.Ingenix_Business_records(bdids).records;
-srcr := doxie_cbrs.count_records_prs_dayton(bdids,SSNMask, mod_access);
+srcr := doxie_cbrs.count_records_prs_dayton(bdids,mod_access);
 divcert := doxie_cbrs.diversity_cert_records(bdids);
 riskMet := doxie_cbrs.risk_metrics_records(bdids);
 laborAct := doxie_cbrs.laborActions_WHD_records(bdids);

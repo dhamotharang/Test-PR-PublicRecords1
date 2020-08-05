@@ -42,9 +42,28 @@ EXPORT ReportService := MACRO
 
 	//d.2	Project glbMod into the BatchIn Layout: 
 	BatchInput := MemberPoint.makeSingleBatchInput();
-
+	
+	
 	//e.	Make a (single batch input) call (TaxRefundIS_Service.functions.callTRISbatch)
 	BatchShare.MAC_CapitalizeInput(BatchInput, cBatchInput);
+	
+	
+	memberpoint.layouts.reportservice_data_In getReportbyInfo() := transform
+			self.SSN_in := report_by.SSN;
+			self.fullName := report_by.Name.Full;
+			self.name_First := report_by.Name.First;
+			self.name_Middle := report_by.Name.Middle;
+			self.name_Last := report_by.Name.Last;
+			self.name_Suffix := report_by.Name.Suffix;
+			self.DOB_in := iesp.ECL2ESP.DateToString(report_by.DOB);
+      street_address3:= if(report_by.Address.StreetNumber <>'' AND report_by.Address.StreetName<>'' AND report_by.Address.StreetSuffix<>'',report_by.Address.StreetNumber+report_by.Address.StreetName+report_by.Address.StreetSuffix,'');
+			self.street_addr := if (report_by.Address.StreetAddress1<>'' or   street_address3<>'',report_by.Address.StreetAddress1,'');
+			self.p_City_name := report_by.Address.City;
+			self.State_in := report_by.Address.State;
+			self.Zip_in := report_by.Address.Zip5;
+			end;
+	dsMemberInfo := dataset([getReportbyInfo()]);
+
 
 	// **************************************************************************************
 	//    Call main attribute to fetch records. 
@@ -54,22 +73,35 @@ EXPORT ReportService := MACRO
 
 	input_ssn_mask_value := stringlib.stringtouppercase(first_row.User.SSNMask);
 	input_dob_mask_value := suppress.date_mask_math.MaskIndicator (first_row.User.DOBMask);
+	input_include_dob_value:=options.includedob;
+	_blank:='';
+  Trimmed_Input := PROJECT(dsMemberInfo, MemberPoint.Transforms.Trim_Input(LEFT));
+	Cleaned_Input := PROJECT(Trimmed_Input, MemberPoint.Transforms.Clean(LEFT,COUNTER));
+	Condition_1_2_Minor_Reject_DS := MemberPoint.functions.BuildMinInputErrorsDS(Cleaned_Input);
+	hasExceptions := IF(COUNT(Condition_1_2_Minor_Reject_DS(code<>0)) > 0, TRUE, FALSE);
 	
+	iesp.keepcontactreport.t_KeepContactReportResponse format() := transform
+				self._Header.Status := if(hasExceptions, memberpoint.constants.InvalidInput_Code, 0);
+				self._Header.Message := if(hasExceptions, memberpoint.constants.InvalidInput_Message, _blank);
+				self._Header.Exceptions := if(hasExceptions,															
+																    Condition_1_2_Minor_Reject_DS(code<>0),
+																    dataset([],iesp.share.t_WsException));
+																
+				self._Header.QueryId := first_row.user.QueryId;
+				self:=[];
+	end;
+	
+	formatdata := dataset([format()]);
+	//IsSufficientInput := MemberPoint.IsSufficientInput();
+
 	//g.	Convert batch result record to ESDL result record & do DOB/SSN Masking:
-	Results := MemberPoint.makeESDLOutput(BatchResults,report_by,input_ssn_mask_value,input_dob_mask_value);
-	
-
-	//i. Give back Results
-	IsSufficientInput := MemberPoint.IsSufficientInput();
-
+	Results := MemberPoint.makeESDLOutput(BatchResults,report_by,input_ssn_mask_value,input_include_dob_value,input_dob_mask_value);
+	do_format_data:=output(formatdata,named('formatdata'));
 	DO_OUTPUT 		:= output(Results,named('Results'));
 	DO_ROYALTIES  := output(PROJECT(fullBatchOutput.Royalties, Royalty.Layouts.Royalty), named('RoyaltySet'));
 
-	if(not IsSufficientInput,
-		 FAIL(301, doxie.ErrorCodes(301)),
-		 DO_OUTPUT);
-		 DO_ROYALTIES;
-	 
+ if(hasExceptions,do_format_data,
+		                   DO_OUTPUT);
+		                 DO_ROYALTIES;			 
 ENDMACRO;
-
 

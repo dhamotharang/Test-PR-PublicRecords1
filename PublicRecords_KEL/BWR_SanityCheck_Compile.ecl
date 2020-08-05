@@ -1,8 +1,8 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
+﻿//HPCC Systems KEL Compiler Version 1.3.0beta5
 #OPTION('expandSelectCreateRow',true);
-IMPORT KEL12 AS KEL;
-IMPORT CFG_Compile,E_Address,E_Aircraft,E_Aircraft_Owner,E_Bankruptcy,E_Business_Org,E_Business_Prox,E_Business_Sele,E_Business_Ult,E_Criminal_Offense,E_Education,E_Email,E_First_Degree_Associations,E_First_Degree_Relative,E_Geo_Link,E_Input_B_I_I,E_Input_B_I_I_Input_P_I_I,E_Input_P_I_I,E_Lien_Judgment,E_Person,E_Person_Address,E_Person_Bankruptcy,E_Person_Education,E_Person_Email,E_Person_Lien_Judgment,E_Person_Offenses,E_Person_Vehicle,E_Phone,E_Professional_License,E_Professional_License_Person,E_Property,E_Property_Event,E_Prox_Address,E_Prox_Phone_Number,E_Prox_T_I_N,E_Sele_Address,E_Sele_Aircraft,E_Sele_Bankruptcy,E_Sele_Lien_Judgment,E_Sele_Person,E_Sele_Phone_Number,E_Sele_Property,E_Sele_Property_Event,E_Sele_T_I_N,E_Sele_Tradeline,E_Sele_U_C_C,E_Sele_Vehicle,E_Sele_Watercraft,E_Surname,E_T_I_N,E_Tradeline,E_U_C_C,E_Vehicle,E_Watercraft,E_Watercraft_Owner,E_Zip_Code FROM PublicRecords_KEL;
-IMPORT * FROM KEL12.Null;
+IMPORT KEL13 AS KEL;
+IMPORT CFG_Compile,E_Accident,E_Address,E_Address_Inquiry,E_Address_Phone,E_Address_Property,E_Address_Property_Event,E_Address_Summary,E_Aircraft,E_Aircraft_Owner,E_Bankruptcy,E_Business_Org,E_Business_Pow,E_Business_Prox,E_Business_Sele,E_Business_Ult,E_Criminal_Details,E_Criminal_Offender,E_Criminal_Offense,E_Criminal_Punishment,E_Drivers_License,E_E_B_R_Tradeline,E_Education,E_Email,E_Email_Inquiry,E_First_Degree_Associations,E_First_Degree_Relative,E_Geo_Link,E_House_Hold_Phone,E_Household,E_Household_Member,E_Input_B_I_I,E_Input_B_I_I_Input_P_I_I,E_Input_P_I_I,E_Inquiry,E_Lien_Judgment,E_Name_Summary,E_Person,E_Person_Accident,E_Person_Address,E_Person_Bankruptcy,E_Person_Drivers_License,E_Person_Education,E_Person_Email,E_Person_Email_Phone_Address,E_Person_Inquiry,E_Person_Lien_Judgment,E_Person_Offender,E_Person_Offenses,E_Person_Phone,E_Person_Property,E_Person_Property_Event,E_Person_S_S_N,E_Person_U_C_C,E_Person_Vehicle,E_Phone,E_Phone_Inquiry,E_Phone_Summary,E_Professional_License,E_Professional_License_Person,E_Property,E_Property_Event,E_Prox_Address,E_Prox_Email,E_Prox_Person,E_Prox_Phone_Number,E_Prox_T_I_N,E_Prox_Utility,E_S_S_N_Address,E_S_S_N_Inquiry,E_S_S_N_Summary,E_Second_Degree_Associations,E_Sele_Address,E_Sele_Aircraft,E_Sele_Bankruptcy,E_Sele_E_B_R_Tradeline,E_Sele_Email,E_Sele_Inquiry,E_Sele_Lien_Judgment,E_Sele_Person,E_Sele_Phone_Number,E_Sele_Property,E_Sele_Property_Event,E_Sele_T_I_N,E_Sele_Tradeline,E_Sele_U_C_C,E_Sele_Utility,E_Sele_Vehicle,E_Sele_Watercraft,E_Social_Security_Number,E_Surname,E_T_I_N,E_T_I_N_Address,E_T_I_N_Inquiry,E_T_I_N_Phone_Number,E_Tradeline,E_U_C_C,E_Utility,E_Utility_Address,E_Utility_Person,E_Vehicle,E_Watercraft,E_Watercraft_Owner,E_Zip_Code,E_Zip_Code_Person FROM PublicRecords_KEL;
+IMPORT * FROM KEL13.Null;
  
 RunAll := TRUE;
 RunFast := FALSE;
@@ -48,6 +48,18 @@ IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Phone().TopSourcedUIDs(TopNU
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Phone().UIDSourceDistribution,NAMED('E_Phone_UIDSourceDistribution')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Phone().NullCounts,NAMED('E_Phone_NullCounts')));
  
+//SocialSecurityNumber sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Social_Security_Number().SanityCheck,NAMED('E_Social_Security_Number_SanityCheck')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Social_Security_Number().S_S_N__SingleValue_Invalid,NAMED('E_Social_Security_Number_S_S_N__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Social_Security_Number().Official_First_Seen__SingleValue_Invalid,NAMED('E_Social_Security_Number_Official_First_Seen__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Social_Security_Number().Official_Last_Seen__SingleValue_Invalid,NAMED('E_Social_Security_Number_Official_Last_Seen__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Social_Security_Number().Issue_State__SingleValue_Invalid,NAMED('E_Social_Security_Number_Issue_State__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Social_Security_Number().Header_First_Seen__SingleValue_Invalid,NAMED('E_Social_Security_Number_Header_First_Seen__SingleValue_Invalid')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Social_Security_Number().UIDSourceCounts,NAMED('E_Social_Security_Number_UIDSourceCounts')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Social_Security_Number().TopSourcedUIDs(TopNUids),NAMED('E_Social_Security_Number_TopSourcedUIDs')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Social_Security_Number().UIDSourceDistribution,NAMED('E_Social_Security_Number_UIDSourceDistribution')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Social_Security_Number().NullCounts,NAMED('E_Social_Security_Number_NullCounts')));
+ 
 //Bankruptcy sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Bankruptcy().SanityCheck,NAMED('E_Bankruptcy_SanityCheck')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Bankruptcy().T_M_S_I_D__SingleValue_Invalid,NAMED('E_Bankruptcy_T_M_S_I_D__SingleValue_Invalid')));
@@ -76,6 +88,20 @@ IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Lien_Judgment().UIDSourceCou
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Lien_Judgment().TopSourcedUIDs(TopNUids),NAMED('E_Lien_Judgment_TopSourcedUIDs')));
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Lien_Judgment().UIDSourceDistribution,NAMED('E_Lien_Judgment_UIDSourceDistribution')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Lien_Judgment().NullCounts,NAMED('E_Lien_Judgment_NullCounts')));
+ 
+//CriminalOffender sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Criminal_Offender().SanityCheck,NAMED('E_Criminal_Offender_SanityCheck')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Criminal_Offender().Offender_Key__SingleValue_Invalid,NAMED('E_Criminal_Offender_Offender_Key__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Criminal_Offender().Citizenship__SingleValue_Invalid,NAMED('E_Criminal_Offender_Citizenship__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Criminal_Offender().Hair_Color__SingleValue_Invalid,NAMED('E_Criminal_Offender_Hair_Color__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Criminal_Offender().Eye_Color__SingleValue_Invalid,NAMED('E_Criminal_Offender_Eye_Color__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Criminal_Offender().Skin_Color__SingleValue_Invalid,NAMED('E_Criminal_Offender_Skin_Color__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Criminal_Offender().Height__SingleValue_Invalid,NAMED('E_Criminal_Offender_Height__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Criminal_Offender().Weight__SingleValue_Invalid,NAMED('E_Criminal_Offender_Weight__SingleValue_Invalid')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Criminal_Offender().UIDSourceCounts,NAMED('E_Criminal_Offender_UIDSourceCounts')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Criminal_Offender().TopSourcedUIDs(TopNUids),NAMED('E_Criminal_Offender_TopSourcedUIDs')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Criminal_Offender().UIDSourceDistribution,NAMED('E_Criminal_Offender_UIDSourceDistribution')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Criminal_Offender().NullCounts,NAMED('E_Criminal_Offender_NullCounts')));
  
 //CriminalOffense sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Criminal_Offense().SanityCheck,NAMED('E_Criminal_Offense_SanityCheck')));
@@ -127,6 +153,26 @@ IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Criminal_Offense().UIDSource
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Criminal_Offense().TopSourcedUIDs(TopNUids),NAMED('E_Criminal_Offense_TopSourcedUIDs')));
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Criminal_Offense().UIDSourceDistribution,NAMED('E_Criminal_Offense_UIDSourceDistribution')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Criminal_Offense().NullCounts,NAMED('E_Criminal_Offense_NullCounts')));
+ 
+//CriminalPunishment sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Criminal_Punishment().SanityCheck,NAMED('E_Criminal_Punishment_SanityCheck')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Criminal_Punishment().Punishment_Type__SingleValue_Invalid,NAMED('E_Criminal_Punishment_Punishment_Type__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Criminal_Punishment().Source_State__SingleValue_Invalid,NAMED('E_Criminal_Punishment_Source_State__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Criminal_Punishment().Current_Known_Inmate_Status__SingleValue_Invalid,NAMED('E_Criminal_Punishment_Current_Known_Inmate_Status__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Criminal_Punishment().Sentence_County__SingleValue_Invalid,NAMED('E_Criminal_Punishment_Sentence_County__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Criminal_Punishment().Current_Location_Of_Inmate__SingleValue_Invalid,NAMED('E_Criminal_Punishment_Current_Location_Of_Inmate__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Criminal_Punishment().Current_Location_Security__SingleValue_Invalid,NAMED('E_Criminal_Punishment_Current_Location_Security__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Criminal_Punishment().Offender_Key__SingleValue_Invalid,NAMED('E_Criminal_Punishment_Offender_Key__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Criminal_Punishment().Current_Status__SingleValue_Invalid,NAMED('E_Criminal_Punishment_Current_Status__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Criminal_Punishment().Probation_Time_Period__SingleValue_Invalid,NAMED('E_Criminal_Punishment_Probation_Time_Period__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Criminal_Punishment().Consecutive_And_Concurrent_Information__SingleValue_Invalid,NAMED('E_Criminal_Punishment_Consecutive_And_Concurrent_Information__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Criminal_Punishment().Instituiton_Name__SingleValue_Invalid,NAMED('E_Criminal_Punishment_Instituiton_Name__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Criminal_Punishment().Restitution__SingleValue_Invalid,NAMED('E_Criminal_Punishment_Restitution__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Criminal_Punishment().Community_Service__SingleValue_Invalid,NAMED('E_Criminal_Punishment_Community_Service__SingleValue_Invalid')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Criminal_Punishment().UIDSourceCounts,NAMED('E_Criminal_Punishment_UIDSourceCounts')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Criminal_Punishment().TopSourcedUIDs(TopNUids),NAMED('E_Criminal_Punishment_TopSourcedUIDs')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Criminal_Punishment().UIDSourceDistribution,NAMED('E_Criminal_Punishment_UIDSourceDistribution')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Criminal_Punishment().NullCounts,NAMED('E_Criminal_Punishment_NullCounts')));
  
 //Address sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Address().SanityCheck,NAMED('E_Address_SanityCheck')));
@@ -520,6 +566,20 @@ IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Business_Prox().TopSourcedUI
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Business_Prox().UIDSourceDistribution,NAMED('E_Business_Prox_UIDSourceDistribution')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Business_Prox().NullCounts,NAMED('E_Business_Prox_NullCounts')));
  
+//BusinessPow sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Business_Pow().SanityCheck,NAMED('E_Business_Pow_SanityCheck')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Business_Pow().Ult_I_D__SingleValue_Invalid,NAMED('E_Business_Pow_Ult_I_D__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Business_Pow().Org_I_D__SingleValue_Invalid,NAMED('E_Business_Pow_Org_I_D__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Business_Pow().Sele_I_D__SingleValue_Invalid,NAMED('E_Business_Pow_Sele_I_D__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Business_Pow().Prox_I_D__SingleValue_Invalid,NAMED('E_Business_Pow_Prox_I_D__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Business_Pow().Pow_I_D__SingleValue_Invalid,NAMED('E_Business_Pow_Pow_I_D__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Business_Pow().Pow_Org__SingleValue_Invalid,NAMED('E_Business_Pow_Pow_Org__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Business_Pow().Pow_Segment__SingleValue_Invalid,NAMED('E_Business_Pow_Pow_Segment__SingleValue_Invalid')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Business_Pow().UIDSourceCounts,NAMED('E_Business_Pow_UIDSourceCounts')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Business_Pow().TopSourcedUIDs(TopNUids),NAMED('E_Business_Pow_TopSourcedUIDs')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Business_Pow().UIDSourceDistribution,NAMED('E_Business_Pow_UIDSourceDistribution')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Business_Pow().NullCounts,NAMED('E_Business_Pow_NullCounts')));
+ 
 //InputBII sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Input_B_I_I().SanityCheck,NAMED('E_Input_B_I_I_SanityCheck')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Input_B_I_I().Legal__SingleValue_Invalid,NAMED('E_Input_B_I_I_Legal__SingleValue_Invalid')));
@@ -591,6 +651,16 @@ IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Input_B_I_I().TopSourcedUIDs
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Input_B_I_I().UIDSourceDistribution,NAMED('E_Input_B_I_I_UIDSourceDistribution')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Input_B_I_I().NullCounts,NAMED('E_Input_B_I_I_NullCounts')));
  
+//Inquiry sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Inquiry().SanityCheck,NAMED('E_Inquiry_SanityCheck')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Inquiry().Transaction_I_D__SingleValue_Invalid,NAMED('E_Inquiry_Transaction_I_D__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Inquiry().Sequence_Number__SingleValue_Invalid,NAMED('E_Inquiry_Sequence_Number__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Inquiry().Fraudpoint_Score__SingleValue_Invalid,NAMED('E_Inquiry_Fraudpoint_Score__SingleValue_Invalid')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Inquiry().UIDSourceCounts,NAMED('E_Inquiry_UIDSourceCounts')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Inquiry().TopSourcedUIDs(TopNUids),NAMED('E_Inquiry_TopSourcedUIDs')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Inquiry().UIDSourceDistribution,NAMED('E_Inquiry_UIDSourceDistribution')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Inquiry().NullCounts,NAMED('E_Inquiry_NullCounts')));
+ 
 //Aircraft sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Aircraft().SanityCheck,NAMED('E_Aircraft_SanityCheck')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Aircraft().N_Number__SingleValue_Invalid,NAMED('E_Aircraft_N_Number__SingleValue_Invalid')));
@@ -635,6 +705,17 @@ IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Email().UIDSourceCounts,NAME
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Email().TopSourcedUIDs(TopNUids),NAMED('E_Email_TopSourcedUIDs')));
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Email().UIDSourceDistribution,NAMED('E_Email_UIDSourceDistribution')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Email().NullCounts,NAMED('E_Email_NullCounts')));
+ 
+//PersonEmailPhoneAddress sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Person_Email_Phone_Address().SanityCheck,NAMED('E_Person_Email_Phone_Address_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Person_Email_Phone_Address().NullCounts,NAMED('E_Person_Email_Phone_Address_NullCounts')));
+ 
+//Household sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Household().SanityCheck,NAMED('E_Household_SanityCheck')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Household().UIDSourceCounts,NAMED('E_Household_UIDSourceCounts')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Household().TopSourcedUIDs(TopNUids),NAMED('E_Household_TopSourcedUIDs')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Household().UIDSourceDistribution,NAMED('E_Household_UIDSourceDistribution')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Household().NullCounts,NAMED('E_Household_NullCounts')));
  
 //Education sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Education().SanityCheck,NAMED('E_Education_SanityCheck')));
@@ -760,6 +841,18 @@ IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Vehicle().TopSourcedUIDs(Top
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Vehicle().UIDSourceDistribution,NAMED('E_Vehicle_UIDSourceDistribution')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Vehicle().NullCounts,NAMED('E_Vehicle_NullCounts')));
  
+//Utility sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Utility().SanityCheck,NAMED('E_Utility_SanityCheck')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Utility().Utility_I_D__SingleValue_Invalid,NAMED('E_Utility_Utility_I_D__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Utility().Date_Added_To_Exchange__SingleValue_Invalid,NAMED('E_Utility_Date_Added_To_Exchange__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Utility().Connect_Date__SingleValue_Invalid,NAMED('E_Utility_Connect_Date__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Utility().Utility_Type__SingleValue_Invalid,NAMED('E_Utility_Utility_Type__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Utility().Record_Date__SingleValue_Invalid,NAMED('E_Utility_Record_Date__SingleValue_Invalid')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Utility().UIDSourceCounts,NAMED('E_Utility_UIDSourceCounts')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Utility().TopSourcedUIDs(TopNUids),NAMED('E_Utility_TopSourcedUIDs')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Utility().UIDSourceDistribution,NAMED('E_Utility_UIDSourceDistribution')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Utility().NullCounts,NAMED('E_Utility_NullCounts')));
+ 
 //InputPII sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Input_P_I_I().SanityCheck,NAMED('E_Input_P_I_I_SanityCheck')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Input_P_I_I().Subject__SingleValue_Invalid,NAMED('E_Input_P_I_I_Subject__SingleValue_Invalid')));
@@ -795,7 +888,8 @@ IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Input_P_I_I().P___Inp_Cln_Name_Firs
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Input_P_I_I().P___Inp_Cln_Name_Mid__SingleValue_Invalid,NAMED('E_Input_P_I_I_P___Inp_Cln_Name_Mid__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Input_P_I_I().P___Inp_Cln_Name_Last__SingleValue_Invalid,NAMED('E_Input_P_I_I_P___Inp_Cln_Name_Last__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Input_P_I_I().P___Inp_Cln_Name_Sffx__SingleValue_Invalid,NAMED('E_Input_P_I_I_P___Inp_Cln_Name_Sffx__SingleValue_Invalid')));
-IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Input_P_I_I().P___Inp_Cln_Addr_Property_U_I_D__SingleValue_Invalid,NAMED('E_Input_P_I_I_P___Inp_Cln_Addr_Property_U_I_D__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Input_P_I_I().Prop__SingleValue_Invalid,NAMED('E_Input_P_I_I_Prop__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Input_P_I_I().Location__SingleValue_Invalid,NAMED('E_Input_P_I_I_Location__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Input_P_I_I().P___Inp_Cln_Addr_Prim_Rng__SingleValue_Invalid,NAMED('E_Input_P_I_I_P___Inp_Cln_Addr_Prim_Rng__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Input_P_I_I().P___Inp_Cln_Addr_Pre_Dir__SingleValue_Invalid,NAMED('E_Input_P_I_I_P___Inp_Cln_Addr_Pre_Dir__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Input_P_I_I().P___Inp_Cln_Addr_Prim_Name__SingleValue_Invalid,NAMED('E_Input_P_I_I_P___Inp_Cln_Addr_Prim_Name__SingleValue_Invalid')));
@@ -839,6 +933,40 @@ IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Input_P_I_I().TopSourcedUIDs
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Input_P_I_I().UIDSourceDistribution,NAMED('E_Input_P_I_I_UIDSourceDistribution')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Input_P_I_I().NullCounts,NAMED('E_Input_P_I_I_NullCounts')));
  
+//DriversLicense sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Drivers_License().SanityCheck,NAMED('E_Drivers_License_SanityCheck')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().Drivers_License_Number__SingleValue_Invalid,NAMED('E_Drivers_License_Drivers_License_Number__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().Issuing_State__SingleValue_Invalid,NAMED('E_Drivers_License_Issuing_State__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().State_Name__SingleValue_Invalid,NAMED('E_Drivers_License_State_Name__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().Drivers_License_Sequence__SingleValue_Invalid,NAMED('E_Drivers_License_Drivers_License_Sequence__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().License_Class__SingleValue_Invalid,NAMED('E_Drivers_License_License_Class__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().License_Type__SingleValue_Invalid,NAMED('E_Drivers_License_License_Type__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().Moxie_License_Type__SingleValue_Invalid,NAMED('E_Drivers_License_Moxie_License_Type__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().Attention__SingleValue_Invalid,NAMED('E_Drivers_License_Attention__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().Attention_Code__SingleValue_Invalid,NAMED('E_Drivers_License_Attention_Code__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().Restrictions__SingleValue_Invalid,NAMED('E_Drivers_License_Restrictions__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().Restrictions_Delimited__SingleValue_Invalid,NAMED('E_Drivers_License_Restrictions_Delimited__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().Original_Expiration_Date__SingleValue_Invalid,NAMED('E_Drivers_License_Original_Expiration_Date__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().Original_Issue_Date__SingleValue_Invalid,NAMED('E_Drivers_License_Original_Issue_Date__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().Issue_Date__SingleValue_Invalid,NAMED('E_Drivers_License_Issue_Date__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().Expiration_Date__SingleValue_Invalid,NAMED('E_Drivers_License_Expiration_Date__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().Active_Date__SingleValue_Invalid,NAMED('E_Drivers_License_Active_Date__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().Inactive_Date__SingleValue_Invalid,NAMED('E_Drivers_License_Inactive_Date__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().Endorsement__SingleValue_Invalid,NAMED('E_Drivers_License_Endorsement__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().Motorcycle_Code__SingleValue_Invalid,NAMED('E_Drivers_License_Motorcycle_Code__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().Driver_Education_Code__SingleValue_Invalid,NAMED('E_Drivers_License_Driver_Education_Code__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().Duplicate_Count__SingleValue_Invalid,NAMED('E_Drivers_License_Duplicate_Count__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().R_C_D_Stat__SingleValue_Invalid,NAMED('E_Drivers_License_R_C_D_Stat__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().Issuance__SingleValue_Invalid,NAMED('E_Drivers_License_Issuance__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().C_D_L_Status__SingleValue_Invalid,NAMED('E_Drivers_License_C_D_L_Status__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().County__SingleValue_Invalid,NAMED('E_Drivers_License_County__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().History_Name__SingleValue_Invalid,NAMED('E_Drivers_License_History_Name__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Drivers_License().History__SingleValue_Invalid,NAMED('E_Drivers_License_History__SingleValue_Invalid')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Drivers_License().UIDSourceCounts,NAMED('E_Drivers_License_UIDSourceCounts')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Drivers_License().TopSourcedUIDs(TopNUids),NAMED('E_Drivers_License_TopSourcedUIDs')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Drivers_License().UIDSourceDistribution,NAMED('E_Drivers_License_UIDSourceDistribution')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Drivers_License().NullCounts,NAMED('E_Drivers_License_NullCounts')));
+ 
 //ProfessionalLicense sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Professional_License().SanityCheck,NAMED('E_Professional_License_SanityCheck')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Professional_License().License_Number__SingleValue_Invalid,NAMED('E_Professional_License_License_Number__SingleValue_Invalid')));
@@ -862,6 +990,30 @@ IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Zip_Code().UIDSourceCounts,N
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Zip_Code().TopSourcedUIDs(TopNUids),NAMED('E_Zip_Code_TopSourcedUIDs')));
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Zip_Code().UIDSourceDistribution,NAMED('E_Zip_Code_UIDSourceDistribution')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Zip_Code().NullCounts,NAMED('E_Zip_Code_NullCounts')));
+ 
+//Accident sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Accident().SanityCheck,NAMED('E_Accident_SanityCheck')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Accident().Accident_Number__SingleValue_Invalid,NAMED('E_Accident_Accident_Number__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Accident().Accident_Date__SingleValue_Invalid,NAMED('E_Accident_Accident_Date__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Accident().Accident_Location__SingleValue_Invalid,NAMED('E_Accident_Accident_Location__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Accident().Accident_Street__SingleValue_Invalid,NAMED('E_Accident_Accident_Street__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Accident().Accident_Cross_Street__SingleValue_Invalid,NAMED('E_Accident_Accident_Cross_Street__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Accident().Next_Street__SingleValue_Invalid,NAMED('E_Accident_Next_Street__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Accident().Incident_City__SingleValue_Invalid,NAMED('E_Accident_Incident_City__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Accident().Incident_State__SingleValue_Invalid,NAMED('E_Accident_Incident_State__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Accident().Jurisdiction_State__SingleValue_Invalid,NAMED('E_Accident_Jurisdiction_State__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Accident().Jurisdiction__SingleValue_Invalid,NAMED('E_Accident_Jurisdiction__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Accident().Jurisdiction_Number__SingleValue_Invalid,NAMED('E_Accident_Jurisdiction_Number__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Accident().Report_Code__SingleValue_Invalid,NAMED('E_Accident_Report_Code__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Accident().Report_Category__SingleValue_Invalid,NAMED('E_Accident_Report_Category__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Accident().Report_Type_I_D__SingleValue_Invalid,NAMED('E_Accident_Report_Type_I_D__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Accident().Report_Code_Description__SingleValue_Invalid,NAMED('E_Accident_Report_Code_Description__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Accident().Report_Has_Cover_Sheet__SingleValue_Invalid,NAMED('E_Accident_Report_Has_Cover_Sheet__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Accident().Additional_Report_Number__SingleValue_Invalid,NAMED('E_Accident_Additional_Report_Number__SingleValue_Invalid')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Accident().UIDSourceCounts,NAMED('E_Accident_UIDSourceCounts')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Accident().TopSourcedUIDs(TopNUids),NAMED('E_Accident_TopSourcedUIDs')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Accident().UIDSourceDistribution,NAMED('E_Accident_UIDSourceDistribution')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Accident().NullCounts,NAMED('E_Accident_NullCounts')));
  
 //Tradeline sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Tradeline().SanityCheck,NAMED('E_Tradeline_SanityCheck')));
@@ -892,6 +1044,7 @@ IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_U_C_C().NullCounts,NAMED('E_U_C_C
  
 //TIN sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_T_I_N().SanityCheck,NAMED('E_T_I_N_SanityCheck')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_T_I_N().Header_Hit_Flag__SingleValue_Invalid,NAMED('E_T_I_N_Header_Hit_Flag__SingleValue_Invalid')));
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_T_I_N().UIDSourceCounts,NAMED('E_T_I_N_UIDSourceCounts')));
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_T_I_N().TopSourcedUIDs(TopNUids),NAMED('E_T_I_N_TopSourcedUIDs')));
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_T_I_N().UIDSourceDistribution,NAMED('E_T_I_N_UIDSourceDistribution')));
@@ -916,6 +1069,51 @@ IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Surname().TopSourcedUIDs(Top
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Surname().UIDSourceDistribution,NAMED('E_Surname_UIDSourceDistribution')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Surname().NullCounts,NAMED('E_Surname_NullCounts')));
  
+//EBRTradeline sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_E_B_R_Tradeline().SanityCheck,NAMED('E_E_B_R_Tradeline_SanityCheck')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_E_B_R_Tradeline().File_Number__SingleValue_Invalid,NAMED('E_E_B_R_Tradeline_File_Number__SingleValue_Invalid')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_E_B_R_Tradeline().UIDSourceCounts,NAMED('E_E_B_R_Tradeline_UIDSourceCounts')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_E_B_R_Tradeline().TopSourcedUIDs(TopNUids),NAMED('E_E_B_R_Tradeline_TopSourcedUIDs')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_E_B_R_Tradeline().UIDSourceDistribution,NAMED('E_E_B_R_Tradeline_UIDSourceDistribution')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_E_B_R_Tradeline().NullCounts,NAMED('E_E_B_R_Tradeline_NullCounts')));
+ 
+//SSNSummary sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_S_S_N_Summary().SanityCheck,NAMED('E_S_S_N_Summary_SanityCheck')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_S_S_N_Summary().S_S_N__SingleValue_Invalid,NAMED('E_S_S_N_Summary_S_S_N__SingleValue_Invalid')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_S_S_N_Summary().UIDSourceCounts,NAMED('E_S_S_N_Summary_UIDSourceCounts')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_S_S_N_Summary().TopSourcedUIDs(TopNUids),NAMED('E_S_S_N_Summary_TopSourcedUIDs')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_S_S_N_Summary().UIDSourceDistribution,NAMED('E_S_S_N_Summary_UIDSourceDistribution')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_S_S_N_Summary().NullCounts,NAMED('E_S_S_N_Summary_NullCounts')));
+ 
+//NameSummary sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Name_Summary().SanityCheck,NAMED('E_Name_Summary_SanityCheck')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Name_Summary().First_Name__SingleValue_Invalid,NAMED('E_Name_Summary_First_Name__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Name_Summary().Last_Name__SingleValue_Invalid,NAMED('E_Name_Summary_Last_Name__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Name_Summary().Date_Of_Birth__SingleValue_Invalid,NAMED('E_Name_Summary_Date_Of_Birth__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Name_Summary().Record_Count__SingleValue_Invalid,NAMED('E_Name_Summary_Record_Count__SingleValue_Invalid')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Name_Summary().UIDSourceCounts,NAMED('E_Name_Summary_UIDSourceCounts')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Name_Summary().TopSourcedUIDs(TopNUids),NAMED('E_Name_Summary_TopSourcedUIDs')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Name_Summary().UIDSourceDistribution,NAMED('E_Name_Summary_UIDSourceDistribution')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Name_Summary().NullCounts,NAMED('E_Name_Summary_NullCounts')));
+ 
+//PhoneSummary sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Phone_Summary().SanityCheck,NAMED('E_Phone_Summary_SanityCheck')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Phone_Summary().Phone10__SingleValue_Invalid,NAMED('E_Phone_Summary_Phone10__SingleValue_Invalid')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Phone_Summary().UIDSourceCounts,NAMED('E_Phone_Summary_UIDSourceCounts')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Phone_Summary().TopSourcedUIDs(TopNUids),NAMED('E_Phone_Summary_TopSourcedUIDs')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Phone_Summary().UIDSourceDistribution,NAMED('E_Phone_Summary_UIDSourceDistribution')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Phone_Summary().NullCounts,NAMED('E_Phone_Summary_NullCounts')));
+ 
+//AddressSummary sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Address_Summary().SanityCheck,NAMED('E_Address_Summary_SanityCheck')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Address_Summary().Primary_Name__SingleValue_Invalid,NAMED('E_Address_Summary_Primary_Name__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Address_Summary().Primary_Range__SingleValue_Invalid,NAMED('E_Address_Summary_Primary_Range__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Address_Summary().Zip__SingleValue_Invalid,NAMED('E_Address_Summary_Zip__SingleValue_Invalid')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Address_Summary().UIDSourceCounts,NAMED('E_Address_Summary_UIDSourceCounts')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Address_Summary().TopSourcedUIDs(TopNUids),NAMED('E_Address_Summary_TopSourcedUIDs')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Address_Summary().UIDSourceDistribution,NAMED('E_Address_Summary_UIDSourceDistribution')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Address_Summary().NullCounts,NAMED('E_Address_Summary_NullCounts')));
+ 
 //ProxTIN sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Prox_T_I_N().SanityCheck,NAMED('E_Prox_T_I_N_SanityCheck')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Prox_T_I_N().NullCounts,NAMED('E_Prox_T_I_N_NullCounts')));
@@ -924,9 +1122,21 @@ IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Prox_T_I_N().NullCounts,NAMED('E_
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Sele_T_I_N().SanityCheck,NAMED('E_Sele_T_I_N_SanityCheck')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Sele_T_I_N().NullCounts,NAMED('E_Sele_T_I_N_NullCounts')));
  
+//TINPhoneNumber sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_T_I_N_Phone_Number().SanityCheck,NAMED('E_T_I_N_Phone_Number_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_T_I_N_Phone_Number().NullCounts,NAMED('E_T_I_N_Phone_Number_NullCounts')));
+ 
+//TINAddress sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_T_I_N_Address().SanityCheck,NAMED('E_T_I_N_Address_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_T_I_N_Address().NullCounts,NAMED('E_T_I_N_Address_NullCounts')));
+ 
 //SeleUCC sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Sele_U_C_C().SanityCheck,NAMED('E_Sele_U_C_C_SanityCheck')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Sele_U_C_C().NullCounts,NAMED('E_Sele_U_C_C_NullCounts')));
+ 
+//PersonUCC sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Person_U_C_C().SanityCheck,NAMED('E_Person_U_C_C_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Person_U_C_C().NullCounts,NAMED('E_Person_U_C_C_NullCounts')));
  
 //PersonAddress sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Person_Address().SanityCheck,NAMED('E_Person_Address_SanityCheck')));
@@ -940,13 +1150,77 @@ IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Person_Bankruptcy().NullCounts,NA
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Sele_Bankruptcy().SanityCheck,NAMED('E_Sele_Bankruptcy_SanityCheck')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Sele_Bankruptcy().NullCounts,NAMED('E_Sele_Bankruptcy_NullCounts')));
  
+//PersonPhone sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Person_Phone().SanityCheck,NAMED('E_Person_Phone_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Person_Phone().NullCounts,NAMED('E_Person_Phone_NullCounts')));
+ 
+//HouseHoldPhone sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_House_Hold_Phone().SanityCheck,NAMED('E_House_Hold_Phone_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_House_Hold_Phone().NullCounts,NAMED('E_House_Hold_Phone_NullCounts')));
+ 
+//AddressPhone sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Address_Phone().SanityCheck,NAMED('E_Address_Phone_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Address_Phone().NullCounts,NAMED('E_Address_Phone_NullCounts')));
+ 
 //PersonOffenses sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Person_Offenses().SanityCheck,NAMED('E_Person_Offenses_SanityCheck')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Person_Offenses().NullCounts,NAMED('E_Person_Offenses_NullCounts')));
  
+//CriminalDetails sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Criminal_Details().SanityCheck,NAMED('E_Criminal_Details_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Criminal_Details().NullCounts,NAMED('E_Criminal_Details_NullCounts')));
+ 
+//PersonOffender sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Person_Offender().SanityCheck,NAMED('E_Person_Offender_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Person_Offender().NullCounts,NAMED('E_Person_Offender_NullCounts')));
+ 
+//PersonSSN sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Person_S_S_N().SanityCheck,NAMED('E_Person_S_S_N_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Person_S_S_N().NullCounts,NAMED('E_Person_S_S_N_NullCounts')));
+ 
+//SSNAddress sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_S_S_N_Address().SanityCheck,NAMED('E_S_S_N_Address_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_S_S_N_Address().NullCounts,NAMED('E_S_S_N_Address_NullCounts')));
+ 
+//PersonInquiry sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Person_Inquiry().SanityCheck,NAMED('E_Person_Inquiry_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Person_Inquiry().NullCounts,NAMED('E_Person_Inquiry_NullCounts')));
+ 
+//AddressInquiry sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Address_Inquiry().SanityCheck,NAMED('E_Address_Inquiry_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Address_Inquiry().NullCounts,NAMED('E_Address_Inquiry_NullCounts')));
+ 
+//SSNInquiry sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_S_S_N_Inquiry().SanityCheck,NAMED('E_S_S_N_Inquiry_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_S_S_N_Inquiry().NullCounts,NAMED('E_S_S_N_Inquiry_NullCounts')));
+ 
+//TINInquiry sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_T_I_N_Inquiry().SanityCheck,NAMED('E_T_I_N_Inquiry_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_T_I_N_Inquiry().NullCounts,NAMED('E_T_I_N_Inquiry_NullCounts')));
+ 
+//EmailInquiry sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Email_Inquiry().SanityCheck,NAMED('E_Email_Inquiry_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Email_Inquiry().NullCounts,NAMED('E_Email_Inquiry_NullCounts')));
+ 
+//PhoneInquiry sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Phone_Inquiry().SanityCheck,NAMED('E_Phone_Inquiry_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Phone_Inquiry().NullCounts,NAMED('E_Phone_Inquiry_NullCounts')));
+ 
+//SeleInquiry sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Sele_Inquiry().SanityCheck,NAMED('E_Sele_Inquiry_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Sele_Inquiry().NullCounts,NAMED('E_Sele_Inquiry_NullCounts')));
+ 
+//PersonDriversLicense sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Person_Drivers_License().SanityCheck,NAMED('E_Person_Drivers_License_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Person_Drivers_License().NullCounts,NAMED('E_Person_Drivers_License_NullCounts')));
+ 
 //FirstDegreeAssociations sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_First_Degree_Associations().SanityCheck,NAMED('E_First_Degree_Associations_SanityCheck')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_First_Degree_Associations().NullCounts,NAMED('E_First_Degree_Associations_NullCounts')));
+ 
+//SecondDegreeAssociations sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Second_Degree_Associations().SanityCheck,NAMED('E_Second_Degree_Associations_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Second_Degree_Associations().NullCounts,NAMED('E_Second_Degree_Associations_NullCounts')));
  
 //FirstDegreeRelative sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_First_Degree_Relative().SanityCheck,NAMED('E_First_Degree_Relative_SanityCheck')));
@@ -964,6 +1238,26 @@ IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Watercraft_Owner().NullCounts,NAM
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Person_Email().SanityCheck,NAMED('E_Person_Email_SanityCheck')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Person_Email().NullCounts,NAMED('E_Person_Email_NullCounts')));
  
+//HouseholdMember sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Household_Member().SanityCheck,NAMED('E_Household_Member_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Household_Member().NullCounts,NAMED('E_Household_Member_NullCounts')));
+ 
+//PersonProperty sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Person_Property().SanityCheck,NAMED('E_Person_Property_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Person_Property().NullCounts,NAMED('E_Person_Property_NullCounts')));
+ 
+//PersonPropertyEvent sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Person_Property_Event().SanityCheck,NAMED('E_Person_Property_Event_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Person_Property_Event().NullCounts,NAMED('E_Person_Property_Event_NullCounts')));
+ 
+//AddressProperty sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Address_Property().SanityCheck,NAMED('E_Address_Property_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Address_Property().NullCounts,NAMED('E_Address_Property_NullCounts')));
+ 
+//AddressPropertyEvent sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Address_Property_Event().SanityCheck,NAMED('E_Address_Property_Event_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Address_Property_Event().NullCounts,NAMED('E_Address_Property_Event_NullCounts')));
+ 
 //SeleProperty sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Sele_Property().SanityCheck,NAMED('E_Sele_Property_SanityCheck')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Sele_Property().NullCounts,NAMED('E_Sele_Property_NullCounts')));
@@ -980,13 +1274,29 @@ IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Person_Education().NullCounts,NAM
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Input_B_I_I_Input_P_I_I().SanityCheck,NAMED('E_Input_B_I_I_Input_P_I_I_SanityCheck')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Input_B_I_I_Input_P_I_I().NullCounts,NAMED('E_Input_B_I_I_Input_P_I_I_NullCounts')));
  
+//UtilityAddress sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Utility_Address().SanityCheck,NAMED('E_Utility_Address_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Utility_Address().NullCounts,NAMED('E_Utility_Address_NullCounts')));
+ 
+//UtilityPerson sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Utility_Person().SanityCheck,NAMED('E_Utility_Person_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Utility_Person().NullCounts,NAMED('E_Utility_Person_NullCounts')));
+ 
 //ProfessionalLicensePerson sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Professional_License_Person().SanityCheck,NAMED('E_Professional_License_Person_SanityCheck')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Professional_License_Person().NullCounts,NAMED('E_Professional_License_Person_NullCounts')));
  
+//ZipCodePerson sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Zip_Code_Person().SanityCheck,NAMED('E_Zip_Code_Person_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Zip_Code_Person().NullCounts,NAMED('E_Zip_Code_Person_NullCounts')));
+ 
 //PersonVehicle sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Person_Vehicle().SanityCheck,NAMED('E_Person_Vehicle_SanityCheck')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Person_Vehicle().NullCounts,NAMED('E_Person_Vehicle_NullCounts')));
+ 
+//PersonAccident sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Person_Accident().SanityCheck,NAMED('E_Person_Accident_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Person_Accident().NullCounts,NAMED('E_Person_Accident_NullCounts')));
  
 //PersonLienJudgment sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Person_Lien_Judgment().SanityCheck,NAMED('E_Person_Lien_Judgment_SanityCheck')));
@@ -1004,6 +1314,18 @@ IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Sele_Tradeline().NullCounts,NAMED
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Sele_Person().SanityCheck,NAMED('E_Sele_Person_SanityCheck')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Sele_Person().NullCounts,NAMED('E_Sele_Person_NullCounts')));
  
+//ProxPerson sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Prox_Person().SanityCheck,NAMED('E_Prox_Person_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Prox_Person().NullCounts,NAMED('E_Prox_Person_NullCounts')));
+ 
+//SeleEmail sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Sele_Email().SanityCheck,NAMED('E_Sele_Email_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Sele_Email().NullCounts,NAMED('E_Sele_Email_NullCounts')));
+ 
+//ProxEmail sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Prox_Email().SanityCheck,NAMED('E_Prox_Email_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Prox_Email().NullCounts,NAMED('E_Prox_Email_NullCounts')));
+ 
 //ProxAddress sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Prox_Address().SanityCheck,NAMED('E_Prox_Address_SanityCheck')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Prox_Address().NullCounts,NAMED('E_Prox_Address_NullCounts')));
@@ -1020,6 +1342,14 @@ IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Prox_Phone_Number().NullCounts,NA
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Sele_Phone_Number().SanityCheck,NAMED('E_Sele_Phone_Number_SanityCheck')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Sele_Phone_Number().NullCounts,NAMED('E_Sele_Phone_Number_NullCounts')));
  
+//ProxUtility sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Prox_Utility().SanityCheck,NAMED('E_Prox_Utility_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Prox_Utility().NullCounts,NAMED('E_Prox_Utility_NullCounts')));
+ 
+//SeleUtility sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Sele_Utility().SanityCheck,NAMED('E_Sele_Utility_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Sele_Utility().NullCounts,NAMED('E_Sele_Utility_NullCounts')));
+ 
 //SeleWatercraft sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Sele_Watercraft().SanityCheck,NAMED('E_Sele_Watercraft_SanityCheck')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Sele_Watercraft().NullCounts,NAMED('E_Sele_Watercraft_NullCounts')));
@@ -1031,3 +1361,7 @@ IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Sele_Aircraft().NullCounts,NAMED(
 //SeleVehicle sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Sele_Vehicle().SanityCheck,NAMED('E_Sele_Vehicle_SanityCheck')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Sele_Vehicle().NullCounts,NAMED('E_Sele_Vehicle_NullCounts')));
+ 
+//SeleEBRTradeline sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Sele_E_B_R_Tradeline().SanityCheck,NAMED('E_Sele_E_B_R_Tradeline_SanityCheck')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Sele_E_B_R_Tradeline().NullCounts,NAMED('E_Sele_E_B_R_Tradeline_NullCounts')));

@@ -1,7 +1,5 @@
 import Business_Header;
 
-//f := Business_Header.BH_Super_Group;
-
 f := dataset('~thor_data400::TEMP::BH_Super_Group', Business_Header.Layout_BH_Super_Group, flat);
 
 layout_stat := record

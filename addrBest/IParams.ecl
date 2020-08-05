@@ -1,6 +1,6 @@
 EXPORT IParams := MODULE
 
-  EXPORT InputOptionsParams := INTERFACE
+  EXPORT SearchParams := INTERFACE
     EXPORT BOOLEAN Include_Military_Address := FALSE;
     EXPORT BOOLEAN ReturnOverLimitIndicator := FALSE;
     EXPORT BOOLEAN ReturnAddrPhone := FALSE;
@@ -48,8 +48,6 @@ EXPORT IParams := MODULE
     EXPORT BOOLEAN IncludeSTRSplitFlag := FALSE;
   END;
 
-  EXPORT SearchParams := INTERFACE(InputOptionsParams) END;
-  
   EXPORT DefaultParams := module(SearchParams)
     EXPORT BOOLEAN Include_Military_Address := FALSE : STORED('Include_Military_Address');
     EXPORT BOOLEAN ReturnOverLimitIndicator := FALSE : STORED('ReturnOverLimitIndicator');
