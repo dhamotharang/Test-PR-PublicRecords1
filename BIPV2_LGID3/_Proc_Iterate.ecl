@@ -46,7 +46,7 @@ functionmacro
     ,updateBuilding()
     ,updateLinkHist
     ,BIPV2_LGID3._Lgid3Changes(piteration,pversion, InFile).out
-    ,output_lnk_197
+    // ,output_lnk_197
     ,lgid3_iteration_stats
   )
     : SUCCESS(bipv2_build.mod_email.SendSuccessEmail(,'BIPv2', , 'LGID3')),
