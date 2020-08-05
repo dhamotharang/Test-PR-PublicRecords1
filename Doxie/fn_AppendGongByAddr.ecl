@@ -47,7 +47,10 @@ end;
 
 string search_type := '' : STORED('GONG_SEARCHTYPE');
 boolean IsRightType (unsigned1 ltype) :=
-  ~mod_access.isConsumer() or (ltype = dx_Gong.Constants.PTYPE.UNKNOWN) OR (
+  search_type = '' OR //note: by-passing all other tests, including D2C
+  ~mod_access.isConsumer() OR
+  (ltype = dx_Gong.Constants.PTYPE.UNKNOWN) OR
+  (
       ((ltype & dx_Gong.Constants.PTYPE.BUSINESS    != dx_Gong.Constants.PTYPE.BUSINESS)    or (search_type='BUSINESS')) AND
       ((ltype & dx_Gong.Constants.PTYPE.GOVERNMENT  != dx_Gong.Constants.PTYPE.GOVERNMENT)  or (search_type='BUSINESS')) AND
       ((ltype & dx_Gong.Constants.PTYPE.RESIDENTIAL != dx_Gong.Constants.PTYPE.RESIDENTIAL) or (search_type='PERSON'))
