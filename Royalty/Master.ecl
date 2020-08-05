@@ -65,6 +65,7 @@ export Master := dataset(
       // 160: not used (500-520 has been alocated for GDC)
       {'ROYALTY', 'GDCVERIFY'				, '160', 'G', ''			, 'Global Data Company Gateway'},
       {'ROYALTY', 'NETACUITY'				, '170', 'G', ''			, 'Digital Envoy Gateway'},
+      {'ROYALTY', 'NETACUITY_IP_METADATA', '171', 'I', '',  'Digital Envoy In House IP Metadata'},
       {'ROYALTY', 'ERC'							, '180', 'G', ''			, ''},
       {'ROYALTY', 'ATTUS'						, '190', 'G', ''			, ''},
       {'ROYALTY', 'FARES'						, '200', 'G', ''			, 'In House Property data'},
@@ -256,5 +257,6 @@ export Master := dataset(
       {'ROYALTY', 'ACCUDATA_OCN_LNP',                 '712', 'G', '' , 'Accudata local number portability data'},
       {'ROYALTY', 'BRITE_VERIFY_EMAIL',               '720', 'G', '' , 'BRITE VERIFY realtime email'},
       {'ROYALTY', 'FIRST_DATA',                       '735', 'G', '' , 'First Data/Fiserv'},
-      {'ROYALTY', 'NETWISE_EMAIL',                    '750', 'G', '' , 'NetWise Data Social Media Email gateway'}    ]
+      {'ROYALTY', 'NETWISE_EMAIL',                    '750', 'G', '' , 'NetWise Data Social Media Email gateway'},
+      {'ROYALTY', 'IDA',                              '760', 'G', '' , 'ID Analytics'}    ]
     , MasterLayout);
