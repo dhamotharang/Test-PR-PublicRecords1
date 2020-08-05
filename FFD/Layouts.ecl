@@ -50,7 +50,8 @@ EXPORT Layouts := MODULE
     STRING20 acctno;  //for batch input
     BOOLEAN suppress_for_legal_hold := FALSE; // indicator whether all data has to be suppressed if Legal Hold alert is set
     SecurityFreezeSuppression security_freeze_suppression;
-    PersonContext.Layouts.Layout_PCResponseRec;
+    PersonContext.Layouts.Layout_PCResponseRec - RecId1;
+    STRING100 RecId1;
   END;
   
   EXPORT PersonContextBatchResponse := RECORD
@@ -68,7 +69,8 @@ EXPORT Layouts := MODULE
   EXPORT PersonContextBatchSlim := RECORD(CommonRawRecordElements)
     STRING20 acctno;	
     PersonContext.Layouts.Layout_PCResponseRec AND NOT [StatementID, RecordType, SearchStatus, CD_Id, DataTypeVersion,
-                                                        DateAdded, EventType, SourceSystem, StatementSequence, Content];
+                                                        DateAdded, EventType, SourceSystem, StatementSequence, Content, RecId1];
+    STRING100 RecId1;
   END;
 
   

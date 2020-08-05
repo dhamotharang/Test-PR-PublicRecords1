@@ -112,13 +112,17 @@ EXPORT RawCriminal := MODULE
       KEYED(LEFT.did = RIGHT.sdid) AND
       FCRA.crim_is_ok (todaysdate, RIGHT.fcra_date, RIGHT.fcra_conviction_flag, RIGHT.fcra_traffic_flag),
       TRANSFORM(layout_offender_rawrec,
+        offender_key := (STRING) RIGHT.offender_key;
+        RecId1 := offender_key;
+        RecId2 := offender_key[51..]; // Offender keys with over 50 chars are split into RecId1 & RecId2
         SELF.compliance_flags.IsOverwritten := (RIGHT.offender_key<>'' AND RIGHT.offender_key IN offenders_override_ids);
         SELF.compliance_flags.IsSuppressed := (RIGHT.offender_key<>'' AND RIGHT.offender_key IN offenders_suppressed_ids);
         SELF.subject_did := LEFT.did;
-        SELF.record_ids.RecId1 := (STRING) RIGHT.offender_key;
+        SELF.record_ids.RecId1 := RecId1;
+        SELF.record_ids.RecId2 := RecId2;
         SELF := RIGHT;
         SELF := LEFT;
-        SELF := []), // recid2, recid3, recid4
+        SELF := []), // recid3, recid4
       LIMIT(0), KEEP($.Constants.Limits.MaxCrimOffendersPerDID));
                                   
     offenders_recs_all := offenders_main_recs + offenders_override_recs;
