@@ -16,7 +16,7 @@ EXPORT macRunComposition(cmpUuid, 		//Composition ID
   useDspNext = FALSE                  //Use DSP Next
 	) := FUNCTIONMACRO
 
-	LOCAL url := 'https://' + TRIM(dsp) + '.risk.regn.net/' + IF(useDspNext, 'next/', '') + 'ws/wsCompositions/run/json?uuid='+cmpUuid
+	LOCAL url := 'https://' + TRIM(dsp) + '.risk.regn.net/' + IF(useDspNext, 'next-', '') + 'ws/wsCompositions/run/json?uuid='+cmpUuid
 		+'&reqsource='+TRIM(reqSource)
 		+'&hpccconnection='+TRIM(hpccConnection)
 		+IF(~useDspNext, '&ECL_COMPILE_STRATEGY='+TRIM(eclCompileStrategy), '')
