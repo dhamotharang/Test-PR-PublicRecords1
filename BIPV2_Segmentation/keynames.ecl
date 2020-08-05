@@ -1,4 +1,4 @@
-﻿﻿import tools;
+import tools;
 EXPORT keynames(
    string   pversion              = ''
   ,boolean	pUseOtherEnvironment	= false

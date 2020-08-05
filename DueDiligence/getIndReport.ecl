@@ -15,9 +15,7 @@ EXPORT getIndReport(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 
     getWatercraftReportData := DueDiligence.reportIndWatercraft(getPropertyReportData);
 
-    getCriminalReportData := DueDiligence.reportIndCriminal(getWatercraftReportData, ssnMask);
-
-    getProfessionalLicenseData := DueDiligence.reportIndProfLicense(getCriminalReportData);  
+    getProfessionalLicenseData := DueDiligence.reportIndProfLicense(getWatercraftReportData);  
 
     getVehicleData := DueDiligence.reportIndVehicle(getProfessionalLicenseData);  
 
@@ -31,23 +29,20 @@ EXPORT getIndReport(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     
     getPersonAssociateReportData := DueDiligence.reportIndAssociates(getMobilityReportData, ssnMask);
     
-    getCivilEventReportData := DueDiligence.reportIndCivilEvent(getPersonAssociateReportData);
-
+    
 
 
 
     // OUTPUT(getInputBestInfo, NAMED('getInputBestInfo'));
     // OUTPUT(getPropertyReportData, NAMED('getPropertyReportData'));
     // OUTPUT(getWatercraftReportData, NAMED('getWatercraftReportData'));
-    // OUTPUT(getCriminalReportData, NAMED('getCriminalReportData'));
     // OUTPUT(getProfessionalLicenseData, NAMED('getProfessionalLicenseData'));
     // OUTPUT(getVehicleData, NAMED('getVehicleData'));
     // OUTPUT(getBusinessAssociationReportData, NAMED('getBusinessAssociationReportData'));
     // OUTPUT(getIdentityReportData, NAMED('getIdentityReportData'));
     // OUTPUT(getMobilityReportData, NAMED('getMobilityReportData'));
     // OUTPUT(getPersonAssociateReportData, NAMED('getPersonAssociateReportData'));
-    // OUTPUT(getCivilEventReportData, NAMED('getCivilEventReportData'));
 
 
-    RETURN getCivilEventReportData;     
+    RETURN getPersonAssociateReportData;     
 END;

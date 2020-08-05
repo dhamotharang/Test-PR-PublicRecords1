@@ -78,7 +78,7 @@
 */
 /*--INFO-- Dayton Smartlynx Business Report Replacement.*/
 
-IMPORT AutoStandardI, Royalty, WSInput;
+IMPORT AutoheaderV2, AutoStandardI, doxie, doxie_cbrs, Royalty, WSInput;
 
 EXPORT Business_Report_Service() := MACRO
   #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -99,8 +99,7 @@ EXPORT Business_Report_Service() := MACRO
 		#CONSTANT('usePropMarshall',true);
 		#CONSTANT('isCRS',true);
 
-		doxie.MAC_Header_Field_Declare()
-  mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+    mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 
 		// Have to add these here instead of just calling doxie_cbrs.mac_Selection_Declare()
 		// because of a nasty dependency: 
@@ -109,11 +108,11 @@ EXPORT Business_Report_Service() := MACRO
 		boolean	  _Always_Compute := false : stored('AlwaysCompute');
 		boolean   _Include_DunBradstreetRecords := false : stored('IncludeDunBradstreetRecords'); 
 		boolean   _Include_Properties := false : stored('IncludeProperties'); 
-		_Include_Them_All := not _Select_Indiv;	
-		_Include_DunBradstreetRecords_val := _Include_Them_All or _Include_DunBradstreetRecords or _Always_Compute;
-		_Include_Properties_val := _Include_Them_All or _Include_Properties or _Always_Compute;
+		_Include_Them_All := NOT _Select_Indiv;	
+		_Include_DunBradstreetRecords_val := _Include_Them_All OR _Include_DunBradstreetRecords OR _Always_Compute;
+		_Include_Properties_val := _Include_Them_All OR _Include_Properties OR _Always_Compute;
 
-		base_records_prs :=doxie_cbrs.all_base_records_prs(doxie_cbrs.getBizReportBDIDs().bdids, ssn_mask_val, mod_access);
+		base_records_prs :=doxie_cbrs.all_base_records_prs(doxie_cbrs.getBizReportBDIDs(mod_access).bdids, mod_access);
 
 		doxie_crs.layout_property_ln property_child(doxie_cbrs.layout_property_records l):= TRANSFORM
 		self := l;
@@ -143,5 +142,5 @@ EXPORT Business_Report_Service() := MACRO
 			IF(sendHashes,output(outputHashes,named('Hashes'))),
 			IF(sendHashes,output(hashmap,named('Hashmap'))));
 
-		IF(EXISTS(doxie_cbrs.getBizReportBDIDs().bdids), DO_ALL, output(doxie.ErrorCodes (10),named('Results')));
+		IF(EXISTS(doxie_cbrs.getBizReportBDIDs(mod_access).bdids), DO_ALL, output(doxie.ErrorCodes (10),named('Results')));
 ENDMACRO;

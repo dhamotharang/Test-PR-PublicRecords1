@@ -1,4 +1,4 @@
-﻿﻿import CanadianPhones, autokey, ut;
+import CanadianPhones, autokey, ut;
 
 canadianWP := CanadianPhones.file_CanadianWhitePagesBase;
 

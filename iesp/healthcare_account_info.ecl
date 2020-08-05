@@ -9,12 +9,14 @@ export healthcare_account_info := MODULE
 export t_HCGLBDPPAUsage := record
 	string50 GLB {xpath('GLB')};
 	string50 DPPA {xpath('DPPA')};
+	string50 DMF {xpath('DMF')};
+	string50 IsFCRA {xpath('IsFCRA')};
 end;
 		
 export t_HCCommonInfo := record
 	string14 ReferenceNumber {xpath('ReferenceNumber')};
-	string16 TransactionId {xpath('TransactionId')};
-	string10 GlobalCompanyId {xpath('GlobalCompanyId')};
+	string20 TransactionId {xpath('TransactionId')};
+	string11 GlobalCompanyId {xpath('GlobalCompanyId')};
 	t_HCGLBDPPAUsage Usage {xpath('Usage')};
 end;
 		
@@ -56,7 +58,7 @@ export t_HCConfigParsedValue := record
 	integer4 LineNumber {xpath('LineNumber')};
 	boolean Active {xpath('Active')};
 end;
-
+		
 export t_HCConfigParsedSection := record
 	string30 Name {xpath('Name')};
 	dataset(t_HCConfigParsedValue) KeyValues {xpath('KeyValues/KeyValue'), MAXCOUNT(500)};
@@ -79,6 +81,7 @@ export t_HealthcareConfigInput := record
 	string1 _Type {xpath('Type')};
 	string50 ProductKey {xpath('ProductKey')};
 end;
+		
 
 end;
 

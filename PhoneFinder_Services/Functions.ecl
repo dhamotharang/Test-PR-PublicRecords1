@@ -58,11 +58,12 @@
 
   END;
 
-  EXPORT STRING ServiceClassDesc(STRING pServiceClass) := CASE(pServiceClass,
-                                                                '0' => PhoneFinder_Services.Constants.PhoneType.Landline,
-                                                                '1' => PhoneFinder_Services.Constants.PhoneType.Wireless,
-                                                                '2' => PhoneFinder_Services.Constants.PhoneType.VoIP,
-                                                                PhoneFinder_Services.Constants.PhoneType.Other);
+  EXPORT STRING ServiceClassDesc(STRING pServiceClass, STRING pLineClass = '') := MAP(pServiceClass = '0' AND (pLineClass = '0' OR pLineClass = '') => $.Constants.PhoneType.LANDLINE,
+                                                                                       pServiceClass = '0' AND (pLineClass = '2' ) => $.Constants.PhoneType.CABLE,
+                                                                                       pServiceClass = '1' AND (pLineClass = '1' OR pLineClass = '') => $.Constants.PhoneType.WIRELESS,
+                                                                                       pServiceClass = '2' AND (pLineClass = '2' OR pLineClass = '') => $.Constants.PhoneType.VOIP,
+                                                                                       pServiceClass = '3' AND (pLineClass = '3' OR pLineClass = '') => $.Constants.PhoneType.Other,
+                                                                                    PhoneFinder_Services.Constants.PhoneType.Other);
 
   EXPORT STRING PhoneStatusDesc(INTEGER pPhoneStatus):= MAP(pPhoneStatus IN [10, 11, 12, 13, 20, 21, 22, 23] => PhoneFinder_Services.Constants.PhoneStatus.Active,
                                                             pPhoneStatus IN [30, 31, 32, 33]             => PhoneFinder_Services.Constants.PhoneStatus.Inactive,
@@ -548,7 +549,7 @@
       SELF.PhoneRiskIndicator      := pInput.PhoneRiskIndicator;
       SELF.OTPRIFailed             := pInput.OTPRIFailed;
       SELF.PhoneStatus             := pInput.PhoneStatus,
-      SELF.Prepaid                 := pInput.Prepaid, 
+      SELF.Prepaid                 := pInput.Prepaid,
       SELF.Address                 := iesp.ECL2ESP.SetAddress(pInput.prim_name, pInput.prim_range,
                                                               pInput.predir, pInput.postdir, pInput.suffix,
                                                               pInput.unit_desig, pInput.sec_range,

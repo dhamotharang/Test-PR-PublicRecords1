@@ -582,8 +582,8 @@ wRep_nobest := join(repOut, indata,
 			 rep_to_output(LEFT,RIGHT), 
 			 left outer, lookup);
 
-glb_ok := ut.PermissionTools.glb.ok(glb);		 
-dppa_ok := ut.PermissionTools.dppa.ok(dppa);
+glb_ok := doxie.compliance.glb_ok(glb);
+dppa_ok := doxie.compliance.dppa_ok(dppa);
 
 doxie.mac_best_records(wRep_nobest,
 											 Repdid,
@@ -1514,12 +1514,13 @@ end;
 bestcounts := join(got_feinTable(bdid != 0),
 										Business_Header_SS.Key_BH_BDID_pl,
 										keyed(left.bdid = right.bdid) and
-										ut.PermissionTools.glb.SrcOk(glb, right.source, right.dt_first_seen) and
+										doxie.compliance.source_ok(glb, DataRestriction, RIGHT.source, right.dt_first_seen) AND
 										(RIGHT.dt_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate)) AND
 										(
 											RestrictExperianData = FALSE OR
 											right.Source NOT IN SET(Business_Risk_BIP.Constants.ExperianRestrictedSources, Source)
-										),
+										) AND 
+										doxie.compliance.isBusHeaderSourceAllowed(right.source, DataPermission, DataRestriction),
 										get_BusHeader(left, right),
 										left outer, keep(500), ATMOST(keyed(left.bdid = right.bdid),1500))
 										+ 

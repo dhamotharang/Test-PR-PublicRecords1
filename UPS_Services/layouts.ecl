@@ -1,11 +1,11 @@
-﻿Import BIPV2;
-EXPORT layouts := module
+﻿IMPORT BIPV2;
+EXPORT layouts := MODULE
 
-	 export RecBipRecordOut2 := record(BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(dataset([],BIPV2.IDfunctions.rec_SearchInput)).RecordOut2)
-																	 string1 powid_status_public;
-																	 string1 seleid_status_public;
-																	 string1 orgid_status_public;
-																	 string1 ultid_status_public;
-																 end;
+   EXPORT RecBipRecordOut2 := RECORD(BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(DATASET([],BIPV2.IDfunctions.rec_SearchInput)).RecordOut2)
+    STRING1 powid_status_public;
+    STRING1 seleid_status_public;
+    STRING1 orgid_status_public;
+    STRING1 ultid_status_public;
+  END;
 
-end;
+END;

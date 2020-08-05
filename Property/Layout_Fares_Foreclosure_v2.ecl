@@ -1,4 +1,4 @@
-﻿﻿IMPORT AID, BIPV2;
+IMPORT AID, BIPV2;
 
 export Layout_Fares_Foreclosure_v2 := record
 	string70	foreclosure_id;

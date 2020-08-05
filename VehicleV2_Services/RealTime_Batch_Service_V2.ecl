@@ -1,20 +1,20 @@
 ﻿/*--SOAP--
-<message name="RealTime_Batch_Service_V2">	
-	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
-	<part name="DPPAPurpose" type="xsd:byte" default="1"/>
-	<part name="GLBPurpose" type="xsd:byte" default="1"/> 
+<message name="RealTime_Batch_Service_V2">
+<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
+  <part name="DPPAPurpose" type="xsd:byte" default="1"/>
+  <part name="GLBPurpose" type="xsd:byte" default="1"/>
 	<part name="ApplicationType" type="xsd:string"/>
 	<part name="RealTimePermissibleUse" type="xsd:string" default="LAWENFORCEMENT"/> 
 	<part name="Operation" type="xsd:unsignedInt"/> 
-	<part name="gateways" type="tns:XmlDataSet" cols="90" rows="6"/>
-	
-	// for Vin and Licplate Batch Services
+  <part name="gateways" type="tns:XmlDataSet" cols="90" rows="6"/>
+  
+  // for Vin and Licplate Batch Services
 	<part name="ReturnCurrent" type="xsd:boolean"/>
 	<part name="Run_Deep_Dive" type="xsd:boolean"/>
 	<part name="PenaltThreshold" type="xsd:unsignedInt"/>
 	<part name="IncludeNonRegulatedVehicleSources" type="xsd:boolean"/>
-	
-	// for best info function
+  
+  // for best info function
 	<part name="Appends" type="xsd:string"/>
   <part name="Verify" type="xsd:string"/>
   <part name="Fuzzies" type="xsd:string"/>
@@ -25,8 +25,8 @@
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="IncludeMinors" type="xsd:boolean"/>
   <part name="IndustryClass" type="xsd:string"/>
-	
-	// for this service
+  
+  // for this service
 	<part name="UseDate" type="xsd:boolean"/>
 	<part name="SelectYears" type="xsd:boolean"/>
 	<part name="NumberOfYears" type="xsd:unsignedInt"/>
@@ -49,64 +49,64 @@
 <tr><th>Return Current:</th><td>Default/False=Historical and current registrations will be returned.</td><td>True=Most current registration based on Expiration Date will be returned</td></tr>
 <tr><th>GatewayNameMatch:</th><td>Default/False=All vehicles returned from the gateway will be returned</td><td>True=Only vehicles from the gateway with a Name and Address match will be returned</td></tr>
 <tr><th>Use Date:</th><td>Default/False=No Filtering</td><td>True=Determines who the vehicle was registered to during that time using Date</td></tr>
-<tr><th>Select Years :</th><td>Default/False=No Filterting</td><td>True=Search records from # of years specified to current date</td></tr>
+<tr><th>Select Years :</th><td>Default/False=No Filtering</td><td>True=Search records from # of years specified to current date</td></tr>
 </table>
 */
 
-import address, doxie, AutoStandardI, Royalty, VehicleV2_Services;
+IMPORT address, doxie, AutoStandardI, Royalty, VehicleV2_Services;
 
-export RealTime_Batch_Service_V2 := macro
-	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
-	inputData := DATASET([], VehicleV2_Services.Batch_Layout.RealTime_InLayout_V2) : STORED('batch_in',FEW);
-	
-	STRING1 sBIPFetchLevel := BIPV2.IDconstants.Fetch_Level_SELEID	 : STORED('BIPFetchLevel');
-	
+EXPORT RealTime_Batch_Service_V2 := MACRO
+  #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+  inputData := DATASET([], VehicleV2_Services.Batch_Layout.RealTime_InLayout_V2) : STORED('batch_in',FEW);
+  
+  STRING1 sBIPFetchLevel := BIPV2.IDconstants.Fetch_Level_SELEID : STORED('BIPFetchLevel');
+  
   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 
-  //Note, some fields have default values different from mod_access.
-	mod := module(VehicleV2_Services.IParam.RTBatch_V2_params)
-		export unsigned1 Operation           := 0     : stored('Operation');
-		export boolean   use_date            := false : stored('usedate');
-		export boolean   select_years        := false : stored('selectyears');
-		export unsigned  years               := 0     : stored('numberofyears');
-		export boolean   include_ssn         := false : stored('includeSSN');
-		export boolean   include_dob         := false : stored('includeDOB');
-		export boolean   include_addr        := false : stored('includeAddress');
-		export boolean   include_phone       := false : stored('includePhone');
-		export string120 append_l            := '' 		: stored('Appends');
-		export string120 verify_l            := '' 		: stored('Verify');
-		export string120 fuzzy_l             := '' 		: stored('Fuzzies');
-		export boolean   dedup_results_l     := true 	: stored('Deduped');
-		export string3   thresh_val          := '' 		: stored('AppendThreshold');
-		export unsigned1 glb                 := 8     : stored('glbpurpose');
-	  export unsigned1 dppa                := mod_access.dppa;
-		export boolean   patriotproc         := false : stored('PatriotProcess');
-		export boolean   show_minors         := false : stored('IncludeMinors');
-		// 127542 - GatewayNameMatch option works only for gateways - It filters
-		//by person's name who owns the vehicle at input address.
-		export boolean   GatewayNameMatch    := false : stored('GatewayNameMatch');
-	  export boolean   AlwaysHitGateway    := ~doxie.compliance.use_Polk(mod_access.DataPermissionMask);
-		export boolean   ReturnCurrent	     := false : stored('ReturnCurrent');
-		export boolean   FullNameMatch       := false : stored('FullNameMatch');
-		export string32  application_type	   := mod_access.application_type;
-		export string5   industry_class      := mod_access.industry_class;
-		export string    DataRestrictionMask := mod_access.DataRestrictionMask;
-		export boolean   Is_UseDate          := use_date;
-		export boolean   IncludeRanking  	   := false : stored('IncludeRanking');
-		//unlike other services, we purposely set GetSSNBest to false by default
-		//since batch will send in TRUE only for their government verticals
-		export boolean   GetSSNBest          := false : stored('GetSSNBest');
-		export string1 	 BIPFetchLevel  		 := STD.Str.touppercase(sBIPFetchLevel);
-	end;
-	
-	recs := VehicleV2_Services.RealTime_Batch_Service_V2_records(inputdata, mod, true);		
-	
-	returnDetailedRoyalties	:= false : stored('ReturnDetailedRoyalties');	
-	Royalty.RoyaltyVehicles.MAC_Append(recs, results, vin, hit_flag, true);	
-	Royalty.RoyaltyVehicles.MAC_BatchSet(results, royalties,,returnDetailedRoyalties);	
-	
-	output(results, named('Results'));
-	output(royalties,named('RoyaltySet'));
+  //Note, some fields have default values dIFferent from mod_access.
+  mod := MODULE(VehicleV2_Services.IParam.RTBatch_V2_params)
+    EXPORT UNSIGNED1 Operation := 0 : STORED('Operation');
+    EXPORT BOOLEAN use_date := FALSE : STORED('usedate');
+    EXPORT BOOLEAN select_years := FALSE : STORED('selectyears');
+    EXPORT UNSIGNED years := 0 : STORED('numberofyears');
+    EXPORT BOOLEAN include_ssn := FALSE : STORED('includeSSN');
+    EXPORT BOOLEAN include_dob := FALSE : STORED('includeDOB');
+    EXPORT BOOLEAN include_addr := FALSE : STORED('includeAddress');
+    EXPORT BOOLEAN include_phone := FALSE : STORED('includePhone');
+    EXPORT STRING120 append_l := '' : STORED('Appends');
+    EXPORT STRING120 verify_l := '' : STORED('Verify');
+    EXPORT STRING120 fuzzy_l := '' : STORED('Fuzzies');
+    EXPORT BOOLEAN DEDUP_results_l := TRUE : STORED('Deduped');
+    EXPORT STRING3 thresh_val := '' : STORED('AppendThreshold');
+    EXPORT UNSIGNED1 glb := 8 : STORED('glbpurpose');
+    EXPORT UNSIGNED1 dppa := mod_access.dppa;
+    EXPORT BOOLEAN patriotproc := FALSE : STORED('PatriotProcess');
+    EXPORT BOOLEAN show_minors := FALSE : STORED('IncludeMinors');
+    // 127542 - GatewayNameMatch option works only for gateways - It filters
+    //by person's name who owns the vehicle at input address.
+    EXPORT BOOLEAN GatewayNameMatch := FALSE : STORED('GatewayNameMatch');
+    EXPORT BOOLEAN AlwaysHitGateway := ~doxie.compliance.use_Polk(mod_access.DataPermissionMask);
+    EXPORT BOOLEAN ReturnCurrent := FALSE : STORED('ReturnCurrent');
+    EXPORT BOOLEAN FullNameMatch := FALSE : STORED('FullNameMatch');
+    EXPORT STRING32 application_type := mod_access.application_type;
+    EXPORT STRING5 industry_class := mod_access.industry_class;
+    EXPORT STRING DataRestrictionMask := mod_access.DataRestrictionMask;
+    EXPORT BOOLEAN Is_UseDate := use_date;
+    EXPORT BOOLEAN IncludeRanking := FALSE : STORED('IncludeRanking');
+    //unlike other services, we purposely set GetSSNBest to false by default
+    //since batch will send in TRUE only for their government verticals
+    EXPORT BOOLEAN GetSSNBest := FALSE : STORED('GetSSNBest');
+    EXPORT STRING1 BIPFetchLevel := STD.Str.touppercase(sBIPFetchLevel);
+  END;
+  
+  recs := VehicleV2_Services.RealTime_Batch_Service_V2_records(inputdata, mod, TRUE);
+  
+  returnDetailedRoyalties := FALSE : STORED('ReturnDetailedRoyalties');
+  Royalty.RoyaltyVehicles.MAC_Append(recs, results, vin, hit_flag, TRUE);
+  Royalty.RoyaltyVehicles.MAC_BatchSet(results, royalties,,returnDetailedRoyalties);
+  
+  OUTPUT(results, NAMED('Results'));
+  OUTPUT(royalties,NAMED('RoyaltySet'));
 
-endmacro;
+ENDMACRO;
 // RealTime_Batch_Service_V2()

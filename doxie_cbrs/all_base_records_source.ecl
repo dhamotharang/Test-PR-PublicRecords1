@@ -1,4 +1,4 @@
-﻿IMPORT doxie_crs, doxie, business_header;
+﻿IMPORT doxie, doxie_cbrs, doxie_crs;
 doxie_cbrs.mac_Selection_Declare()
 
 //
@@ -36,8 +36,9 @@ doxie_cbrs.mac_Selection_Declare()
 #stored('MaxMSWorkComp',50);
 #stored('MaxORWorkComp',50);
 
-EXPORT all_base_records_source(DATASET(doxie_cbrs.layout_references) bdids = dataset([],doxie_cbrs.layout_references), STRING6 SSNMask = 'NONE',
-                               doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+EXPORT all_base_records_source(DATASET(doxie_cbrs.layout_references) bdids = DATASET([],doxie_cbrs.layout_references),
+                               doxie.IDataAccess mod_access
+                              ) := FUNCTION
 	
 //***** RECORDSETS
 //
@@ -94,14 +95,14 @@ bnkr_v2 := choosen(doxie_cbrs.bankruptcy_records_v2(bdids).source_view(Max_Bankr
 //
 // UCC
 //
-uccr := choosen(doxie_cbrs.UCC_Records(bdids,SSNMask)(Include_UCCFilings_val or 
+uccr := choosen(doxie_cbrs.UCC_Records(bdids,mod_access.ssn_mask)(Include_UCCFilings_val or 
 										Include_LiensJudgmentsUCC_val),
 				Max_UCCFilings_val);
 
 //
 // UCC_V2
 //
-uccr_v2 := choosen(doxie_cbrs.UCC_Records_v2(bdids,SSNMask).source_view(Max_UCCFilings_val)(Include_UCCFilingsV2_val or 
+uccr_v2 := choosen(doxie_cbrs.UCC_Records_v2(bdids,mod_access.ssn_mask).source_view(Max_UCCFilings_val)(Include_UCCFilingsV2_val OR 
 										Include_LiensJudgmentsUCCV2_val),
 				Max_UCCFilings_val);
 
@@ -116,7 +117,7 @@ ljr  := choosen(doxie_cbrs.Liens_Judments_records(bdids)(Include_LiensJudgments_
 //										
 // LIENS_JUDGMENTS_V2
 //
-ljr_v2  := choosen(doxie_cbrs.Liens_Judments_records_v2(bdids,SSNMask).source_view(Max_LiensJudgmentsUCC_val)(Include_LiensJudgmentsV2_val or
+ljr_v2  := choosen(doxie_cbrs.Liens_Judments_records_v2(bdids,mod_access.ssn_mask).source_view(Max_LiensJudgmentsUCC_val)(Include_LiensJudgmentsV2_val or
 										Include_LiensJudgmentsUCCV2_val or
 										Include_CompanyIDNumbers_val),
 				Max_LiensJudgmentsUCC_val);

@@ -96,8 +96,7 @@ STRING100 Default_Data_Restriction_Mask := '';
 		SELF.url := le.url; 
 		SELF := le;
 	END;
-
-	DATASET(Gateway.Layouts.Config) GatewaysClean := PROJECT(gateways_in, gw_switch(LEFT));
+	DATASET(Gateway.Layouts.Config) GatewaysClean := PROJECT(gateways_in, gw_switch(LEFT));	
 	
 	Options := MODULE(PublicRecords_KEL.Interface_Options)
 		EXPORT INTEGER ScoreThreshold := Score_threshold;
@@ -111,7 +110,7 @@ STRING100 Default_Data_Restriction_Mask := '';
 		EXPORT BOOLEAN isMarketing := Is_Marketing; // When TRUE enables Marketing Restrictions
 		EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
 		EXPORT STRING100 Allowed_Sources := AllowedSources;
-		EXPORT UNSIGNED8 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
+		EXPORT DATA100 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 			DataRestrictionMask, 
 			DataPermissionMask, 
 			GLBA, 
@@ -137,11 +136,47 @@ STRING100 Default_Data_Restriction_Mask := '';
 		EXPORT UNSIGNED6 GlobalCompanyId := _GCID;
 		
 		EXPORT DATASET(Gateway.Layouts.Config) Gateways := GatewaysClean;
-		
+		// The inquiry delta base which feeds the 1 day inq attrs is not needed for the input rep 1 at this point. for now we only run this delta base code in the nonFCRA service 
+
 		// Override Include* Entity/Association options here if certain entities can be turned off to speed up processing.
 		// This will bypass uneccesary key JOINS in PublicRecords_KEL.Fn_MAS_FCRA_FDC if the keys don't contribute to any 
 		// ENTITIES/ASSOCIATIONS being used by the query.
-		
+		EXPORT BOOLEAN IncludeAccident := TRUE;
+		EXPORT BOOLEAN IncludeAddress := TRUE;
+		EXPORT BOOLEAN IncludeAddressSummary := TRUE;
+		EXPORT BOOLEAN IncludeAircraft := TRUE;
+		EXPORT BOOLEAN IncludeBankruptcy := TRUE;
+		EXPORT BOOLEAN IncludeBusinessSele := TRUE;
+		EXPORT BOOLEAN IncludeBusinessProx := TRUE;
+		EXPORT BOOLEAN IncludeCriminalOffender := TRUE;
+		EXPORT BOOLEAN IncludeCriminalOffense := TRUE;
+		EXPORT BOOLEAN IncludeCriminalPunishment := TRUE;
+		EXPORT BOOLEAN IncludeDriversLicense := TRUE;
+		EXPORT BOOLEAN IncludeEducation := TRUE;
+		EXPORT BOOLEAN IncludeEBRTradeline := TRUE;
+		EXPORT BOOLEAN IncludeEmail := TRUE;
+		EXPORT BOOLEAN IncludeEmployment := TRUE;
+		EXPORT BOOLEAN IncludeGeolink := TRUE;
+		EXPORT BOOLEAN IncludeHousehold := TRUE;
+		EXPORT BOOLEAN IncludeInquiry := TRUE;
+		EXPORT BOOLEAN IncludeLienJudgment := TRUE;
+		EXPORT BOOLEAN IncludeNameSummary := TRUE;
+		EXPORT BOOLEAN IncludePerson := TRUE;
+		EXPORT BOOLEAN IncludePhone := TRUE;
+		EXPORT BOOLEAN IncludeProfessionalLicense := TRUE;
+		EXPORT BOOLEAN IncludeProperty := TRUE;
+		EXPORT BOOLEAN IncludePropertyEvent := TRUE;
+		EXPORT BOOLEAN IncludeSocialSecurityNumber := TRUE;
+		EXPORT BOOLEAN IncludeSSNSummary := TRUE;
+		EXPORT BOOLEAN IncludeSurname := TRUE;
+		EXPORT BOOLEAN IncludeTIN := TRUE;
+		EXPORT BOOLEAN IncludeTradeline := TRUE;
+		EXPORT BOOLEAN IncludeUtility := TRUE;
+		EXPORT BOOLEAN IncludeVehicle := TRUE;
+		EXPORT BOOLEAN IncludeWatercraft := TRUE;
+		EXPORT BOOLEAN IncludeZipCode := TRUE;
+		EXPORT BOOLEAN IncludeUCC := TRUE;
+		EXPORT BOOLEAN IncludeMini := TRUE;
 	END;	
 	
   ResultSet := PublicRecords_KEL.FnRoxie_GetBusAttrs(ds_input, Options);		

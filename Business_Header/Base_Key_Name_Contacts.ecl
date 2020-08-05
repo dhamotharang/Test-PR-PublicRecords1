@@ -1,1 +1,0 @@
-export string Base_Key_Name_Contacts := bus_thor + 'key::moxie.bh.contacts.';

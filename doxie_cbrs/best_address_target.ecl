@@ -1,14 +1,16 @@
-import doxie;
+﻿IMPORT doxie, doxie_cbrs;
 
-export best_address_target(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
+EXPORT best_address_target(DATASET(doxie_cbrs.layout_references) bdids,
+                           doxie.IDataAccess mod_access
+                          ) := FUNCTION
 
-thebest := doxie_cbrs.best_records_prs_target(bdids);
+thebest := doxie_cbrs.best_records_prs_target(bdids,mod_access);
 
-doxie.layout_addressSearch prep(thebest l) := transform
-	self.seq := 0;
-	self.zip := (string5)l.zip;
-	self := l;
-end;
+doxie.layout_addressSearch prep(thebest l) := TRANSFORM
+	SELF.seq := 0;
+	SELF.zip := (STRING5)l.zip;
+	SELF := l;
+END;
 
-return project(thebest, prep(left));
+RETURN PROJECT(thebest, prep(LEFT));
 END;

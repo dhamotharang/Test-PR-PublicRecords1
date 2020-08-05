@@ -14,7 +14,7 @@
 </message>
 */
 
-IMPORT Std, PublicRecords_KEL, Gateway;
+IMPORT Std, PublicRecords_KEL, Gateway, Business_Risk_BIP;
 
 EXPORT MAS_FCRA_Service() := MACRO
 
@@ -64,7 +64,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 		EXPORT UNSIGNED GLBAPurpose := GLBA;
 		EXPORT UNSIGNED DPPAPurpose := DPPA;
 		EXPORT BOOLEAN isMarketing := Is_Marketing; // When TRUE enables Marketing Restrictions
-		EXPORT UNSIGNED8 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
+		EXPORT DATA100 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 			DataRestrictionMask, 
 			DataPermissionMask, 
 			GLBA, 
@@ -83,8 +83,46 @@ EXPORT MAS_FCRA_Service() := MACRO
 		// This will bypass uneccesary key JOINS in PublicRecords_KEL.Fn_MAS_FDC if the keys don't contribute to any 
 		// ENTITIES/ASSOCIATIONS being used by the query.	
 
+		EXPORT BOOLEAN IncludeAccident := TRUE;
+		EXPORT BOOLEAN IncludeAddress := TRUE;
+		EXPORT BOOLEAN IncludeAddressSummary := TRUE;
+		EXPORT BOOLEAN IncludeAircraft := TRUE;
+		EXPORT BOOLEAN IncludeBankruptcy := TRUE;
+		EXPORT BOOLEAN IncludeBusinessSele := TRUE;
+		EXPORT BOOLEAN IncludeBusinessProx := TRUE;
+		EXPORT BOOLEAN IncludeCriminalOffender := TRUE;
+		EXPORT BOOLEAN IncludeCriminalOffense := TRUE;
+		EXPORT BOOLEAN IncludeCriminalPunishment := TRUE;
+		EXPORT BOOLEAN IncludeDriversLicense := TRUE;
+		EXPORT BOOLEAN IncludeEducation := TRUE;
+		EXPORT BOOLEAN IncludeEBRTradeline := TRUE;
+		EXPORT BOOLEAN IncludeEmail := TRUE;
+		EXPORT BOOLEAN IncludeEmployment := TRUE;
+		EXPORT BOOLEAN IncludeGeolink := TRUE;
+		EXPORT BOOLEAN IncludeHousehold := TRUE;
+		EXPORT BOOLEAN IncludeInquiry := TRUE;
+		EXPORT BOOLEAN IncludeLienJudgment := TRUE;
+		EXPORT BOOLEAN IncludeNameSummary := TRUE;
+		EXPORT BOOLEAN IncludePerson := TRUE;
+		EXPORT BOOLEAN IncludePhone := TRUE;
+		EXPORT BOOLEAN IncludeProfessionalLicense := TRUE;
+		EXPORT BOOLEAN IncludeProperty := TRUE;
+		EXPORT BOOLEAN IncludePropertyEvent := TRUE;
+		EXPORT BOOLEAN IncludeSocialSecurityNumber := TRUE;
+		EXPORT BOOLEAN IncludeSSNSummary := TRUE;
+		EXPORT BOOLEAN IncludeSurname := TRUE;
+		EXPORT BOOLEAN IncludeTIN := TRUE;
+		EXPORT BOOLEAN IncludeTradeline := TRUE;
+		EXPORT BOOLEAN IncludeUtility := TRUE;
+		EXPORT BOOLEAN IncludeVehicle := TRUE;
+		EXPORT BOOLEAN IncludeWatercraft := TRUE;
+		EXPORT BOOLEAN IncludeZipCode := TRUE;
+		EXPORT BOOLEAN IncludeUCC := TRUE;
+		EXPORT BOOLEAN IncludeMini := TRUE;
+
 	END;
-	
+
+
   ResultSet := PublicRecords_KEL.FnRoxie_GetAttrs(ds_input, Options);
 
 	FinalResults := PROJECT(ResultSet, 

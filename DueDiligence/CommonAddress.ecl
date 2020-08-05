@@ -63,7 +63,7 @@ EXPORT CommonAddress := MODULE
                                               SELF := [];)])[1];
 
         RETURN cleanedAddress;
-    END;
+    END : DEPRECATED('Use DueDiligence.v3Common.Address.GetCleanAddress');
     
     
     
@@ -125,7 +125,7 @@ EXPORT CommonAddress := MODULE
         Census_Data.MAC_Fips2County_Keyed(tempFIPS, state, tempFIPSCode, countyNameText, addrWithCounty);
         
         RETURN addrWithCounty;
-    ENDMACRO;
+    ENDMACRO : DEPRECATED('Use DueDiligence.v3Common.Address.GetAddressCounty');
     
     
     EXPORT getAddressRisk(DATASET(DueDiligence.layoutsInternal.GeographicLayout) addressList, BOOLEAN theseAddressesNeedToBeCleaned = FALSE) := FUNCTION

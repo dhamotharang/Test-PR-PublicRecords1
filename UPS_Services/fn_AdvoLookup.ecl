@@ -1,19 +1,19 @@
-﻿import Advo, UPS_Services;
+﻿IMPORT Advo, UPS_Services;
 
-EXPORT fn_AdvoLookup(dataset(UPS_Services.layout_Common) preRecords ) := function 
+EXPORT fn_AdvoLookup(DATASET(UPS_Services.layout_Common) preRecords ) := FUNCTION
 
-	finalRecords :=  join(preRecords, Advo.Key_Addr1,
-												keyed(left.zip = right.zip) and
-												keyed(left.prim_range = right.prim_range) and
-												keyed(left.prim_name = right.prim_name) and
-												keyed(left.suffix = right.addr_suffix) and
-												keyed(left.predir = right.predir) and
-												keyed(left.postdir = right.postdir) and
-												keyed(left.sec_range = right.sec_range),
-												transform(UPS_Services.layout_Common,
-													self.AddressType := right.residential_or_business_ind,
-													self 	:= left),
-												LEFT OUTER	, keep(1),limit(0));
+  finalRecords := JOIN(preRecords, Advo.Key_Addr1,
+    KEYED(LEFT.zip = RIGHT.zip) AND
+    KEYED(LEFT.prim_range = RIGHT.prim_range) AND
+    KEYED(LEFT.prim_name = RIGHT.prim_name) AND
+    KEYED(LEFT.suffix = RIGHT.addr_suffix) AND
+    KEYED(LEFT.predir = RIGHT.predir) AND
+    KEYED(LEFT.postdir = RIGHT.postdir) AND
+    KEYED(LEFT.sec_range = RIGHT.sec_range),
+    TRANSFORM(UPS_Services.layout_Common,
+      SELF.AddressType := RIGHT.residential_or_business_ind,
+      SELF := LEFT),
+    LEFT OUTER , KEEP(1),LIMIT(0));
 
-	return(finalRecords);
-end;
+  RETURN(finalRecords);
+END;

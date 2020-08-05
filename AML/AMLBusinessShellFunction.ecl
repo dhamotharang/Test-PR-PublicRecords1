@@ -305,7 +305,8 @@ AddBusnBnas  := join(bestrecs_init, rolled_bnas,
 
 BusnHeadRec := join(bestrecs_init(bdid!=0), BusnHeader,
                     Keyed(right.bdid=left.bdid) and
-                    right.dt_first_seen <= left.historydate,
+                    right.dt_first_seen <= left.historydate AND 
+                    doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
                     transform({recordof(BusnHeader), unsigned4 seq, unsigned4  historydate },
                     self.seq:=left.seq,
                     self.historydate := left.historydate,

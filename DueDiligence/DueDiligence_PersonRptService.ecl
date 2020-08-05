@@ -8,64 +8,47 @@ EXPORT DueDiligence_PersonRptService := MACRO
 
     requestResponseLayout := iesp.duediligencepersonreport.t_DueDiligencePersonReportResponse;
     
-    productsRequested := DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.DUEDILIGENCE_ONLY;
+    productsRequested := DueDiligence.ConstantsQuery.PRODUCT_REQUESTED_ENUM.DUEDILIGENCE_ONLY;
     
     
 
     //The following macro defines the field sequence on WsECL page of query.
     WSInput.MAC_DueDiligence_Service(requestName);
-
-    DueDiligence.CommonQuery.mac_CreateInputFromXML(requestLayout, requestName, TRUE, DueDiligence.Constants.INDIVIDUAL);
-
-    validatedRequest := DueDiligence.CommonQuery.ValidateRequest(input, glba, dppa, DueDiligence.Constants.INDIVIDUAL);
-
+    
+    DueDiligence.CommonQueryXML.mac_CreateInputFromXML(requestLayout, requestName, TRUE, DueDiligence.Constants.INDIVIDUAL);
+    
+    validatedRequest := DueDiligence.CommonQuery.ValidateRequest(input, glba, dppa, DueDiligence.Constants.INDIVIDUAL, TRUE);                              
+                          
     DueDiligence.CommonQuery.mac_FailOnError(validatedRequest(validRequest = FALSE));
 
-    cleanData := DueDiligence.CommonQuery.GetCleanData(validatedRequest(validRequest));
-
-
-    //********************************************************PERSON REPORT LOGIC HERE**********************************************************
-    DueDiligence.CommonQuery.mac_GetBusinessOptionSettings(dppa, glba, drm, dpm, userIn.IndustryClass);
-    
-    //retrieve the data based on input to be used in searches (PII vs LexID vs Combo of PII and LexID)
-    dataToSearchBy := DueDiligence.fn_getProductInput(productsRequested, cleanData, busOptions, busLinkingOptions,
-                                                                                                 LexIdSourceOptout := LexIdSourceOptout, 
-                                                                                                 TransactionID := TransactionID, 
-                                                                                                 BatchUID := BatchUID, 
-                                                                                                 GlobalCompanyID := GlobalCompanyID);
-
-    consumerResults := DueDiligence.getIndAttributes(dataToSearchBy, DD_SSNMask, TRUE, busOptions, busLinkingOptions, debugIndicator,
-                                                                                            LexIdSourceOptout := LexIdSourceOptout, 
-                                                                                            TransactionID := TransactionID, 
-                                                                                            BatchUID := BatchUID, 
-                                                                                            GlobalCompanyID := GlobalCompanyID);
-
-    indIndex := DueDiligence.CommonQuery.GetIndividualAttributes(consumerResults);
-    indIndexHits := DueDiligence.CommonQuery.GetIndividualAttributeFlags(consumerResults);
-
-    final_actual := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, consumerResults, requestResponseLayout, DueDiligence.Constants.INDIVIDUAL,
-                                                                  DueDiligence.Constants.STRING_TRUE, indIndex, indIndexHits, requestedVersion,
-                                                                  optionsIn.AdditionalInput);
     
     
+    validRequest := validatedRequest(validRequest);
+    
+    //clean the input of the valid requests for requested products Citizenship and Due Diligence (DueDiligence.Layouts.CleanedData)
+    cleanData := DueDiligence.CommonQuery.GetCleanData(validRequest);
+   
+    //retrieve options & compliance information
+    regulatoryCompliance := DueDiligence.CommonQuery.mac_GetCompliance(dppa, glba, drm, dpm, userIn.IndustryClass, lexIdSourceOptout, transactionID, batchUID, globalCompanyID);
+
+    //based on what was requested, call the appropriate attributes  
+    ddResults := DueDiligence.CommonQueryXML.mac_v3PersonXML(wseq, cleanData, regulatoryCompliance, DDssnMask, optionsIn.AdditionalInput, 
+                                                             requestResponseLayout, DueDiligence.Constants.STRING_TRUE, debugIndicator, FALSE);
+
+ 
     
     
     //********************************************************PERSON TEST SEED LOGIC HERE**********************************************************
     final_testSeeds := DueDiligence.TestSeeds.TestSeedFunction(input, testSeedTableName, optionsIn.AdditionalInput).GetPersonReportSeeds;
 
-    final := IF(executeTestSeeds, final_testSeeds, final_actual);
-
-
-
-    OUTPUT(final, NAMED('Results')); //This is the customer facing output    
-
+    final := IF(executeTestSeeds, final_testSeeds, ddResults);
 
 
     IF(debugIndicator, OUTPUT(cleanData, NAMED('cleanData')));
     IF(debugIndicator, OUTPUT(wseq, NAMED('wseq')));
-    IF(intermediates, OUTPUT(consumerResults, NAMED('indResults')));
 
 	
+    OUTPUT(final, NAMED('Results')); //This is the customer facing output    
 
 ENDMACRO;
 

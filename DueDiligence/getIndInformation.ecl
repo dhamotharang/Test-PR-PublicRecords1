@@ -12,8 +12,8 @@ EXPORT getIndInformation(Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
         UNSIGNED1 appendBest := 0;	
         gateways := DATASET([], Gateway.Layouts.Config);
         
-        INTEGER bsVersion := DueDiligence.CitDDShared.DEFAULT_BS_VERSION;
-        UNSIGNED8 bsOptions := DueDiligence.CitDDShared.DEFAULT_BS_OPTIONS;
+        INTEGER bsVersion := DueDiligence.ConstantsQuery.DEFAULT_BS_VERSION;
+        UNSIGNED8 bsOptions := DueDiligence.ConstantsQuery.DEFAULT_BS_OPTIONS;
         
         glbaOK := Risk_Indicators.iid_constants.glb_ok(options.GLBA_Purpose, FALSE );
         dppaOK := Risk_Indicators.iid_constants.dppa_ok(options.DPPA_Purpose, FALSE);

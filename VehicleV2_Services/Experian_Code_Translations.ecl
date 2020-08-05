@@ -1,6 +1,6 @@
-export Experian_Code_Translations := module
+EXPORT Experian_Code_Translations := MODULE
 
-  export plate_type_description(string code) := map(
+  EXPORT plate_type_description(STRING code) := MAP(
     code = 'AG' => 'Agriculture',
     code = 'ANQ' => 'Antique',
     code = 'AR' => 'Amateur Radio',
@@ -35,6 +35,6 @@ export Experian_Code_Translations := module
     code = 'TRL' => 'Trailer',
     code = 'UNK' => 'Unknown',
     code = 'VAN' => 'Vanity',
-		'');
+    '');
   
-end;
+END;

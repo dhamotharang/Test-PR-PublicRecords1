@@ -1,8 +1,10 @@
-import Census_Data, doxie_crs, doxie, business_header;
+﻿import business_header, Census_Data, doxie, doxie_cbrs;
 
 doxie_cbrs.mac_Selection_Declare()
 
-export best_information(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
+export best_information(dataset(doxie_cbrs.layout_references) bdids,
+                        doxie.IDataAccess mod_access
+                       ) := FUNCTION
 
 thebest := doxie_cbrs.fn_getBaseRecs(bdids,false);  // filters empty addresses
 allr := dedup(sort(thebest,-dt_last_seen,bdid,company_name,fein,phone,prim_name,zip),company_name,ALL);
@@ -45,7 +47,7 @@ END;
 
 best_rec_trimmed := project(best_allr,trim_best(LEFT));
 
-besr := choosen(sort(doxie_cbrs.best_records_prs(bdids)(prim_name <> '' and zip <> ''),-best_flags,-dt_last_seen,level,bdid,company_name,fein,phone,prim_name,zip),1);
+besr := choosen(sort(doxie_cbrs.best_records_prs(bdids,mod_access)(prim_name <> '' and zip <> ''),-best_flags,-dt_last_seen,level,bdid,company_name,fein,phone,prim_name,zip),1);
 
 best_rec trans_best(besr L) := TRANSFORM
 	//SELF.blue_check := false;

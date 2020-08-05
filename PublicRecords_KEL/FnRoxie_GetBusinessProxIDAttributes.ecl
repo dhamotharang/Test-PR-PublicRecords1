@@ -1,4 +1,4 @@
-﻿IMPORT KEL11 AS KEL;
+﻿IMPORT KEL13 AS KEL;
 IMPORT PublicRecords_KEL;
 
 EXPORT FnRoxie_GetBusinessProxIDAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII) InputData,
@@ -24,7 +24,7 @@ EXPORT FnRoxie_GetBusinessProxIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 																														DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 
 																														DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII), 		
 																														0, 
-																														0).res0);
+																														PublicRecords_KEL.CFG_Compile.Permit__NONE).res0);
 
 	
  BusinessProxAttributesInput := DENORMALIZE(InputData, RepInput, 

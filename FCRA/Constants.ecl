@@ -13,6 +13,7 @@ EXPORT Constants := MODULE
 		EXPORT STRING IDENTITY_THEFT_ALERT := '100G';
 		EXPORT STRING LEGAL_HOLD_ALERT := '100H';
 		EXPORT STRING NO_DID_FOUND := '222A';
+        EXPORT SUBJECT_DECEASED_CODE       := '200A';  // code used by Riskview products
 		
 		/*  -- the following alert codes are used by RiskView products:
 				200A - Subject Reported as Deceased

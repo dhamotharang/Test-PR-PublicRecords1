@@ -1,6 +1,7 @@
-﻿/* PublicRecords_KEL.BWR_FCRA_MAS_Roxie */
+﻿
 #workunit('name','MAS FCRA Consumer dev156 1 thread');
 IMPORT PublicRecords_KEL, RiskWise, STD, Gateway, UT, SALT38, SALTRoutines;
+/* PublicRecords_KEL.BWR_FCRA_MAS_Roxie */
 threads := 1;
 
 RoxieIP := RiskWise.shortcuts.Dev156;
@@ -33,9 +34,9 @@ Intended_Purpose := '';
 // Intended_Purpose := 'PRESCREENING'; 
 
 // Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
-histDate := '0';
-// histDate := '20190116';
-// histDate := (STRING)STD.Date.Today(); // Run with today's date
+// histDate := '0';
+// histDate := '20190116'; 
+histDate := (STRING)STD.Date.Today(); // Run with today's date
 
 Score_threshold := 80;
 // Score_threshold := 90;
@@ -52,7 +53,7 @@ Output_SALT_Profile := TRUE;
 RecordsToRun := 0;
 eyeball := 100;
 
-OutputFile := '~lweiner::out::PersonFCRA_Roxie_100k_Archive_KS-4216_'+ ThorLib.wuid();
+OutputFile := '~bbraaten::out::PersonFCRA_Roxie_100k_Current_RR_20200728_'+ ThorLib.wuid();
 
 prii_layout := RECORD
     STRING Account             ;
@@ -76,7 +77,7 @@ prii_layout := RECORD
     STRING FormerName          ;
     STRING Email               ;
     STRING EmployerName        ;
-    STRING historydate;
+		STRING historydate;
     STRING LexID;
     STRING IPAddress;
     STRING Perf;
@@ -120,22 +121,21 @@ END;
 
 
 soapLayout trans (pp le):= TRANSFORM 
-  // SELF.CustomerId := le.CustomerId;
-	SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout,
-		SELF := LEFT;
-		SELF := []));
-	SELF.Gateways := PROJECT(ut.ds_oneRecord, 
-			TRANSFORM(Gateway.Layouts.Config, 
-				SELF.ServiceName := 'neutralroxie'; 
-				SELF.URL := NeutralRoxieIP; 
-				SELF := []));
-	SELF.ScoreThreshold := Settings.LexIDThreshold;
-	SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
-	SELF.DataPermissionMask := Settings.Data_Permission_Mask;
-	SELF.GLBPurpose := Settings.GLBAPurpose;
-	SELF.DPPAPurpose := Settings.DPPAPurpose;
-	SELF.IsMarketing := FALSE;
-	SELF.OutputMasterResults := Output_Master_Results;
+// SELF.CustomerId := le.CustomerId;
+    SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout,
+        SELF := LEFT;
+        SELF := []));   
+    SELF.Gateways := DATASET([TRANSFORM(Gateway.Layouts.Config,
+                SELF.ServiceName := 'neutralroxie';
+                SELF.URL := NeutralRoxieIP;
+                SELF := [])]);
+    SELF.ScoreThreshold := Settings.LexIDThreshold;
+    SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
+    SELF.DataPermissionMask := Settings.Data_Permission_Mask;
+    SELF.GLBPurpose := Settings.GLBAPurpose;
+    SELF.DPPAPurpose := Settings.DPPAPurpose;
+    SELF.IsMarketing := FALSE;
+    SELF.OutputMasterResults := Output_Master_Results;
 END;
 
 soap_in := PROJECT(pp, trans(LEFT));
@@ -221,15 +221,15 @@ Passed_Person :=
 			SELF := []),
 		INNER, KEEP(1));
       
-Error_Inputs := JOIN(DISTRIBUTE(p, HASH64(Account)), DISTRIBUTE(Passed_Person, HASH64(P_InpAcct)), LEFT.Account = RIGHT.P_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY); 
-OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV (QUOTE('"')), OVERWRITE);
+Error_Inputs := JOIN(DISTRIBUTE(p, HASH64(Account)), DISTRIBUTE(Passed_Person, HASH64(P_InpAcct)), LEFT.Account = RIGHT.P_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY, LOCAL); 
+OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV (QUOTE('"')), OVERWRITE, expire(45));
 
   
 IF(Output_Master_Results, OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout')));
 OUTPUT(CHOOSEN(Passed_Person, eyeball), NAMED('Sample_FCRA_Layout'));
 
-IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"'))));
-OUTPUT(Passed_Person,,OutputFile + '.csv', CSV(HEADING(single), QUOTE('"')));
+IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"')), expire(45)));
+OUTPUT(Passed_Person,,OutputFile + '.csv', CSV(HEADING(single), QUOTE('"')), expire(45));
 	
 Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(Settings);
 		

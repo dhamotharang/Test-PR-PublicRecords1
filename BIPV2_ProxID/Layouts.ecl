@@ -1,6 +1,6 @@
-﻿import 
+﻿import
 // Business_DOT_SALT_micro4,
-business_header,salt22,Business_DOT,BIPV2_Files,BIPV2;
+business_header,salt22,BIPV2;
 export Layouts :=
 module
 	export linking := Business_Header.Layout_Business_Linking;
@@ -143,9 +143,9 @@ record
    string50             contact_job_title_derived                                                   ;
    string30             contact_status_derived                                                      ;
 end;
-//	export orig_DOT_Base := Business_DOT.Files.l_dot;
+
 	export orig_DOT_Base := BIPV2.CommonBase.Layout;
-  
+
 	export DOT_Base := {
  orig_DOT_Base.rcid
 ,orig_DOT_Base.dotid
@@ -190,7 +190,7 @@ end;
 ,orig_DOT_Base.st
 ,orig_DOT_Base.zip
 ,orig_DOT_Base.unk_corp_key
-,orig_DOT_Base.vl_id  
+,orig_DOT_Base.vl_id
 ,orig_DOT_Base.deleted_key
   };
 //	export attfile_duns_entum := {dot_base.proxid,dot_base.duns_number,dot_base.enterprise_number};
@@ -250,7 +250,7 @@ export wkhistory := RECORD
   DATASET(r___1) ruleefficacy;
   DATASET(layout_names) filesread;
   DATASET(layout_names) fileswritten;
- END;                                                     
+ END;
 
 export wkhistoryold := RECORD
   string24 wuid;
@@ -277,10 +277,10 @@ export wkhistoryold := RECORD
   DATASET(r___1) ruleefficacy;
   DATASET(layout_names) filesread;
   DATASET(layout_names) fileswritten;
- END;                                                     
+ END;
 
   // export wkhistory := {		 string24 wuid 	,string owner 	,string cluster 	,string job 	,string10 state 	,string7 priority 	,boolean online 	,boolean protected ,string TotalThorTime,string Description,string Version,string Iteration,string MatchesPerformed,string PreClusterCount,string PostClusterCount,string AllSamplesCands,dataset( {UNSIGNED2 Conf,UNSIGNED MatchesFound}) ConfidenceLevels,dataset( {INTEGER PatchingError0, INTEGER DidsNoRid0, INTEGER DidsAboveRid0, INTEGER DuplicateRids0, UNSIGNED UnlinkableRecords0}) ValidityStatistics,dataset( {UNSIGNED2 RuleNumber;STRING Rule;UNSIGNED MatchesFound ;}) RuleEfficacy,dataset({string name}) FilesRead,dataset({string name}) FilesWritten};
-  
+
   export layerrorcounts := {unsigned Checked_matches,unsigned bad_Matches, unsigned questionable_matches};
   export layconflevels := wkhistory.confidencelevels;
   export precision := {string version,string iteration,layconflevels,layerrorcounts Review_Info};

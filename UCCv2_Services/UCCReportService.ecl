@@ -1,29 +1,29 @@
 ﻿/*--SOAP--
 <message name="UCCReportService">
 
-  <part name="DID" 					       type="xsd:string"/>
-  <part name="BDID" 				       type="xsd:string"/>
-  <part name="TMSID" 				       type="xsd:string"/>
-  <part name="SSNMask"			       type="xsd:string"/>
-	<part name="ApplicationType" type="xsd:string"/>
-	<part name="ReturnMultiplePages" type="xsd:boolean"/>
+  <part name="DID" type="xsd:string"/>
+  <part name="BDID" type="xsd:string"/>
+  <part name="TMSID" type="xsd:string"/>
+  <part name="SSNMask" type="xsd:string"/>
+  <part name="ApplicationType" type="xsd:string"/>
+  <part name="ReturnMultiplePages" type="xsd:boolean"/>
 
 </message>
 */
 /*--INFO-- This service returns one UCC Record. */
 
-export UCCReportService() := macro
+EXPORT UCCReportService() := MACRO
 
-#STORED('IncludeMultipleSecured', true);
-#STORED('ReturnRolledDebtors', true);
+#STORED('IncludeMultipleSecured', TRUE);
+#STORED('ReturnRolledDebtors', TRUE);
 
-#constant('getBdidsbyExecutive',FALSE);
-#constant('usehigherlimit',TRUE);
+#CONSTANT('getBdidsbyExecutive',FALSE);
+#CONSTANT('usehigherlimit',TRUE);
 
 BOOLEAN return_multiple_pgs := FALSE : STORED('ReturnMultiplePages');
 
 res := UCCv2_Services.UCCReportService_records(return_multiple_pgs);
 
-output(res, named('Results'));
+OUTPUT(res, NAMED('Results'));
 
-endmacro;
+ENDMACRO;
