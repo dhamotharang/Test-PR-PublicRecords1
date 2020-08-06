@@ -105,7 +105,7 @@ module
 	
 	tools.mac_WriteFile(Filenames().Input.ByPassed_Deltabase.New(pversion),
 		distribute(f1_bypass_dedup,hash(source_rec_id)),
-		Build_Bypass_Records,
+		Build_Bypass_Deltabase,
 		pCompress := true,
 		pHeading := false,
 		pOverwrite := true);
@@ -126,7 +126,7 @@ module
 
 	tools.mac_WriteFile(Filenames(pversion).Input.Deltabase.New(pversion),
 		distribute(input_file_1,hash(source_rec_id)),
-		Build_Input_File,
+		Build_Deltabase,
 		pCompress := true,
 		pHeading := false,
 		pOverwrite := true);
@@ -134,8 +134,8 @@ module
 // Return
 	export build_prepped := 
 			 sequential(
-			   Build_Input_File
-				,Build_Bypass_Records 
+			   Build_Deltabase
+				,Build_Bypass_Deltabase 
 		);
 		
 	export All :=
