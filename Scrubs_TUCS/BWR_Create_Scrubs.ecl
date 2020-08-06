@@ -27,7 +27,7 @@ gen_init_spec_file := output(choosen(output_spc,500));
 // Hygiene reports																	<-- STEP 2
 h := S.hygiene(F);											
 m := h.Summary('SummaryReport');
-zz_gmarcan.MAC_TransposeDS_1Row(m,_m);
+// zz_gmarcan.MAC_TransposeDS_1Row(m,_m);
 p := h.allprofiles;
 gen_hyg_report := sequential(
 	OUTPUT(_m,NAMED('SummaryReport'),ALL));  // Generate population profile for all fields

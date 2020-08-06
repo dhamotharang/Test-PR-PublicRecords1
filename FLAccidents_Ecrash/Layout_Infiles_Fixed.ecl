@@ -1,4 +1,34 @@
 ﻿EXPORT Layout_Infiles_Fixed := MODULE 
+ 
+ EXPORT agency := RECORD
+		STRING11  Agency_ID;
+	  STRING100 Agency_Name;
+	  STRING3   Source_ID;
+	  STRING10  Agency_State_Abbr;
+	  STRING11  Agency_ori; 
+	  STRING1   Allow_Open_Search; 
+	  STRING2   Append_Overwrite_Flag;
+	  STRING1   Drivers_Exchange_Flag; 
+	END; 
+	
+	EXPORT agency_contrib_source := RECORD
+		STRING11  Agency_ID;
+	  STRING100 Agency_Name;
+		STRING10  Agency_State_Abbr;
+	  STRING11  Agency_ori;
+	  STRING1   Allow_Open_Search;
+	  STRING2   Append_Overwrite_Flag;
+	  STRING1   Drivers_Exchange_Flag;   
+	  STRING3   Source_ID;
+	  STRING10  Source_Start_Date; 
+	  STRING10  Source_End_Date; 
+	  STRING20  Source_Termination_Date; 
+	  STRING1   Source_Resale_Allowed; 
+	  STRING1   Source_Auto_Renew; 
+	  STRING1   Source_Allow_Sale_Of_Component_Data; 
+	  STRING1   Source_Allow_Extract_Of_Vehicle_Data; 
+	END; 
+	
 	EXPORT agency_cmbnd := RECORD
 		STRING11   Agency_ori;
 		STRING3    Agency_State_Abbr;
@@ -8,6 +38,13 @@
 		UNSIGNED3  Cru_State_Number;
 		STRING2    Source_ID;
 		STRING2    Append_Overwrite_Flag;
+		STRING10   Source_Start_Date; 
+	  STRING10   Source_End_Date; 
+	  STRING20   Source_Termination_Date; 
+	  STRING1    Source_Resale_Allowed; 
+	  STRING1    Source_Auto_Renew; 
+	  STRING1    Source_Allow_Sale_Of_Component_Data; 
+	  STRING1    Source_Allow_Extract_Of_Vehicle_Data; 
 	END;
 
 	EXPORT citation := RECORD
@@ -513,8 +550,8 @@
 		//PRtcc datatype update for code and description
 		STRING Alcohol_Test_Status;
 		STRING Alcohol_Test_Type;
-		
-		STRING25 Alcohol_Test_Result;
+		//Data Ingestion Enum Field
+		STRING Alcohol_Test_Result;
 		STRING7 Law_Enforcement_Suspects_Drug_Use;
 		STRING20 Drug_Test_Given;
 		STRING100 Non_Motorist_Actions_Prior_to_Crash1;
@@ -665,8 +702,8 @@
 		STRING Pedestrian_Actions_At_Time_Of_Crash;
 		STRING Pedalcyclist_Actions_At_Time_Of_Crash;
 		STRING Passenger_Actions_At_Time_Of_Crash;
-		//Data Ingestion New fields
-		STRING10 Dui_Suspected;
+		//Data Ingestion New Enum fields
+		STRING Dui_Suspected;
 		//Data Ingestion New Enum fields
 		STRING Drug_Test_Result;
 		//PRtCC CR-1237
@@ -1303,8 +1340,8 @@
 		//PRtcc datatype update for code and description
 		STRING Alcohol_Test_Status;
 		STRING Alcohol_Test_Type;
-		
-		STRING25 Alcohol_Test_Result;
+		//Data Ingestion Enum Field
+		STRING Alcohol_Test_Result;
 		STRING7 Law_Enforcement_Suspects_Drug_Use;
 		STRING20 Drug_Test_Given;
 		STRING100 Non_Motorist_Actions_Prior_to_Crash1;
@@ -1753,8 +1790,8 @@
 		STRING10 Dispatch_Date;
 		STRING10 Drug_Involvement;
 		STRING7 Alcohol_Involved;
-		STRING10 Dui_Suspected;
 		//Data Ingestion New Enum fields
+	  STRING  Dui_Suspected;
 		STRING Drug_Test_Result;
 		//Data Ingestion CR-1273
 		STRING64 Geo_Coded_Latitude;

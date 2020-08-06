@@ -148,7 +148,16 @@
 '15432971', //CC-3142 Dempsey correction removal
 '15406481', //CC-3160 Dempsey correction removal
 '15406491', //CC-3160 Dempsey correction removal
-'15406501'  //CC-3160 Dempsey correction removal
+'15406501',  //CC-3160 Dempsey correction removal
+'15419211', //CC-3208 Dempsey correction removal
+'15434241', //CC-3237 Dempsey correction removal
+'15434251', //CC-3237 Dempsey correction removal
+'15434261', //CC-3237 Dempsey correction removal
+'15434271', //CC-3237 Dempsey correction removal
+'15434281', //CC-3237 Dempsey correction removal
+'15434291',  //CC-3237 Dempsey correction removal
+'15454911', //CC-3325 Dempsey correction removal
+'15451461' //CC-3333 Dempsey correction removal
 ];
 
 

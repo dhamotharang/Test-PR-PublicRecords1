@@ -86,39 +86,7 @@ Base_File_Append_In := attr();
 
 	shared in_hdr2 := bh1;// + header.transunion_did;
 
-	// Start of code to suppress data based on an MD5 Hash of DID+Address
-Suppression_Layout := header_services.Supplemental_Data.layout_in;
-
-header_services.Supplemental_Data.mac_verify('didaddressbusiness_sup.txt',Suppression_Layout,supp_ds_func);
- 
-Suppression_In := supp_ds_func();
-
-shared dSuppressedIn := project(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
-
-shared rHashDIDAddress2 := header_services.Supplemental_Data.layout_out;
-
-	rFullOut_HashDIDAddress2 := record
-	 business_header.Layout_Business_Header_Base;
-	 rHashDIDAddress2;
-	end;
-
-	rFullOut_HashDIDAddress2 tHashDIDAddress2(business_header.Layout_Business_Header_Base l) := transform                            
-	 self.hval := hashmd5(intformat(l.bdid,12,1),(string)l.state,(string)l.zip,(string)l.city,
-										(string)l.prim_name,(string)l.prim_range,(string)l.predir,(string)l.addr_suffix,(string)l.postdir,(string)l.sec_range);
-	 self := l;
-	end;
-
-	dHeader_withMD52 := project(in_hdr2, tHashDIDAddress2(left));
-
-	business_header.Layout_Business_Header_Base tSuppress2(dHeader_withMD52 l, dSuppressedIn r) := transform
-	 self := l;
-	end;
-
-	full_out_suppress2 := join(dHeader_withMD52,dSuppressedIn,
-														left.hval = right.hval,
-								tSuppress2(left,right),
-								left only,lookup);
-
+	full_out_suppress2 := project(Business_Header.Prep_Build.applyDidAddressBusiness_sup2(in_hdr2), Business_Header.Layout_Business_Header_Base);
 
 	/////////////////////////////////////////////////////////////////////////
 	// -- Start of moxie
@@ -533,9 +501,9 @@ shared rHashDIDAddress2 := header_services.Supplemental_Data.layout_out;
 
 	Suppression_In := supp_ds_func();
 
-	dRelativesSuppressedIn := project(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
+	dRelativesSuppressedIn := project(Suppression_In, Suppress.applyRegulatory.in_to_out(left));
 
-	rHashBDID := header_services.Supplemental_Data.layout_out;
+	rHashBDID := Suppress.applyRegulatory.layout_out;
 
 	rFullOut_HashBDID := record
 	 business_header.Layout_Business_Relative;
@@ -675,43 +643,7 @@ shared rHashDIDAddress2 := header_services.Supplemental_Data.layout_out;
 
 	rDataSet := f_bbs + Base_File_Append2;
 	/////////////////////////////////////////////////////
-
-	// Start of code to suppress data based on an MD5 Hash of DID+Address
-	Suppression_Layout := header_services.Supplemental_Data.layout_in;
-
-	header_services.Supplemental_Data.mac_verify('didaddressbusiness_sup.txt',Suppression_Layout,supp_ds_func);
-	 
-	Suppression_In := supp_ds_func();
-
-	dBestSuppressedIn := project(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
-
-	rHashDIDAddress := header_services.Supplemental_Data.layout_out;
-
-	rFullOut_HashDIDAddress := record
-		business_header.Layout_BH_Best;
-		rHashDIDAddress;
-		data16 hval1;
-	end;
-
-	rFullOut_HashDIDAddress tHashDIDAddress(business_header.Layout_BH_Best l) := transform                            
-		self.hval := hashmd5(intformat(l.bdid,12,1),(string)l.state,(string)l.zip,(string)l.city,
-									(string)l.prim_name,(string)l.prim_range,(string)l.predir,(string)l.addr_suffix,(string)l.postdir,(string)l.sec_range);
-		self.hval1 := hashmd5(intformat(l.bdid,12,1));
-		self := l;
-	end;
-
-	dBestHeader_withMD5 := project(rDataSet, tHashDIDAddress(left));
-
-	business_header.Layout_BH_Best tSuppress(dBestHeader_withMD5 l) := transform
-	 self := l;
-	end;
-
-	best_full_out_suppress := join(dBestHeader_withMD5,
-														dBestSuppressedIn,
-														left.hval = right.hval,
-														tSuppress(left),
-														left only,
-														lookup);
+	best_full_out_suppress := project(Business_Header.Prep_Build.applyDidAddressBusiness_sup2(rDataSet), Business_Header.Layout_BH_Best);
 
 	bhb := best_full_out_suppress;
 

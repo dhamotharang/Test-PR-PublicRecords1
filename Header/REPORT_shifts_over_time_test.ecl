@@ -23,11 +23,14 @@ EXPORT REPORT_shifts_over_time_test() := FUNCTION
      : success(STD.System.Email.SendEmail(
             'veronica.aldous@lexisnexisrisk.com,gabriel.marcan@lexisnexisrisk.com',
             'REPORT_shifts_over_time success',
-            'this build was a success')),
+            'this build was a success ' + WORKUNIT)), // adds workunit here instead of success text
           failure(STD.System.Email.SendEmail(
             'veronica.aldous@lexisnexisrisk.com,gabriel.marcan@lexisnexisrisk.com',
             'REPORT_shifts_over_time failure',
-            'this build fails'));
+            'this build fails ' + WORKUNIT)); // adds workunit here instead of failure text
+
+
+         
 
     return seq;
 

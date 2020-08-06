@@ -2,7 +2,11 @@
 	BOOLEAN runProd = FALSE,			//set to TRUE it will run against DSP Prod on the RAMPS Prod cluster. Set to FALSE it will run against DSP QA on the RAMPS Cert cluster
 	BOOLEAN useProdData = FALSE,	//set to TRUE it will use the files generated in Thor Prod, else it will use the files generated in Dataland
 	BOOLEAN newVersion = FALSE,		//set to FALSE it will create the new indexes but not automatically update the existing dashboard service to use them
-	BOOLEAN updateROSE = FALSE		//set to TRUE it will run from the specified DSP  on ramps dev cluster for ROSE environment
+	BOOLEAN updateROSE = FALSE, 	//set to TRUE it will run from the specified DSP  on ramps dev cluster for ROSE environment
+  BOOLEAN updateCustomerDash    = TRUE,
+  BOOLEAN updateCustomerDash1_1 = TRUE,
+  BOOLEAN updateHighRiskId      = TRUE,
+  BOOLEAN updateClusterDetails  = TRUE
 	) := FUNCTION
 	#OPTION('soapTraceLevel',10);
 	
@@ -46,35 +50,27 @@
 															IF(~(STD.File.SuperFileExists(ClusterSuperFileName)), STD.File.CreateSuperFile(ClusterSuperFileName),output('ClusterSuperFileName Superfile already exists. Skipping creating superfile.')),
 															IF(~(STD.File.SuperFileExists(highriskidSuperFileName)), STD.File.CreateSuperFile(highriskidSuperFileName),output('highriskidentity Superfile already exists. Skipping creating superfile.')),															IF(~(STD.File.SuperFileExists(ClusterSuperFileName)), STD.File.CreateSuperFile(ClusterSuperFileName),output('ClusterDetails Superfile already exists. Skipping creating superfile.')),
 															STD.File.StartSuperFileTransaction(),
-															STD.File.ClearSuperfile(CustSuperFileName,true),
-															STD.File.ClearSuperfile(Cust1_1SuperFileName,true),
-															STD.File.ClearSuperfile(HighRiskIdSuperFileName,true),
-															STD.File.ClearSuperfile(ClusterSuperFileName,true),
+															IF(updateCustomerDash, STD.File.ClearSuperfile(CustSuperFileName,true)),
+															IF(updateCustomerDash1_1, STD.File.ClearSuperfile(Cust1_1SuperFileName,true)),
+															IF(updateHighRiskId, STD.File.ClearSuperfile(HighRiskIdSuperFileName,true)),
+															IF(updateClusterDetails, STD.File.ClearSuperfile(ClusterSuperFileName,true)),
 															STD.File.FinishSuperFileTransaction();
 														);
 														
 	AddFileToSuper := SEQUENTIAL(
 		STD.File.StartSuperFileTransaction(),
-		STD.File.AddSuperFile(CustSuperFileName, custLogicalfilename),
-		STD.File.AddSuperFile(Cust1_1SuperFileName, cust1_1Logicalfilename),
-		STD.File.AddSuperFile(highriskidSuperFileName, highriskidLogicalfilename),
-		STD.File.AddSuperFile(ClusterSuperFileName, clusterLogicalfilename),
+		IF(updateCustomerDash, STD.File.AddSuperFile(CustSuperFileName, custLogicalfilename)),
+		IF(updateCustomerDash1_1, STD.File.AddSuperFile(Cust1_1SuperFileName, cust1_1Logicalfilename)),
+		IF(updateHighRiskId, STD.File.AddSuperFile(highriskidSuperFileName, highriskidLogicalfilename)),
+		IF(updateClusterDetails, STD.File.AddSuperFile(ClusterSuperFileName, clusterLogicalfilename)),
 		STD.File.FinishSuperFileTransaction());
 		
 	//PROD Dashboards Code End
 	
 	//We want to run the Customer Dashboard first because it runs much faster than the Cluster dashboard	
 
-	
-	//QA Dashboards - ONLY run when runProd is set to FALSE
-	dRunPersonStatsDeltaDashboard		:= FraudGovPlatform_Analytics.fnRunPersonStatsDeltaDashboard();
-	dRunNewClusterRecordsDashboard	:= FraudGovPlatform_Analytics.fnRunNewClusterRecordsDashboard();
-	RunPersonStatsDeltaDashboard		:= OUTPUT(dRunPersonStatsDeltaDashboard);
-	RunNewClusterRecordsDashboard 	:= OUTPUT(dRunNewClusterRecordsDashboard);
 	RETURN PARALLEL(IF(runProd,
-											SEQUENTIAL(CreateSuper,RunCustDashboard_Prod,RunCustDashboard1_1_Prod,RunHighRiskIdentity_Prod,RunClusDetailsDashboard_Prod,AddFileToSuper),
+											SEQUENTIAL(CreateSuper,IF(updateCustomerDash, RunCustDashboard_Prod), IF(updateCustomerDash1_1, RunCustDashboard1_1_Prod), IF(updateHighRiskId, RunHighRiskIdentity_Prod), IF(updateClusterDetails, RunClusDetailsDashboard_Prod),AddFileToSuper),
 											SEQUENTIAL(RunCustDashboard, RunCustDashboard1_1, RunHighRiskIdentity, RunClusDetailsDashboard)
-											)
-								, IF(~runProd AND ~updateROSE, SEQUENTIAL(RunPersonStatsDeltaDashboard, RunNewClusterRecordsDashboard))
-									);
+											));
 END;
