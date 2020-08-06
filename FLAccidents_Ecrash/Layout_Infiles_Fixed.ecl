@@ -28,24 +28,6 @@
 	  STRING1   Source_Allow_Sale_Of_Component_Data; 
 	  STRING1   Source_Allow_Extract_Of_Vehicle_Data; 
 	END; 
-	
-	EXPORT agency_cmbnd := RECORD
-		STRING11   Agency_ori;
-		STRING3    Agency_State_Abbr;
-		STRING100  Agency_Name;
-		STRING11   MBSI_Agency_ID;
-		STRING5    Cru_Agency_ID;
-		UNSIGNED3  Cru_State_Number;
-		STRING2    Source_ID;
-		STRING2    Append_Overwrite_Flag;
-		STRING10   Source_Start_Date; 
-	  STRING10   Source_End_Date; 
-	  STRING20   Source_Termination_Date; 
-	  STRING1    Source_Resale_Allowed; 
-	  STRING1    Source_Auto_Renew; 
-	  STRING1    Source_Allow_Sale_Of_Component_Data; 
-	  STRING1    Source_Allow_Extract_Of_Vehicle_Data; 
-	END;
 
 	EXPORT citation := RECORD
 		STRING11 Citation_ID;
@@ -1819,6 +1801,20 @@
 		STRING10 property_owner_zip_code;
 		STRING7 property_owner_notified;
 	END; 
+	
+	EXPORT Document := RECORD
+		STRING11 document_id,
+		STRING11 incident_id,
+		STRING64 document_hash_key,
+		STRING19 date_created,
+		STRING1 is_deleted,
+		STRING3 report_type,
+		STRING3 page_count,
+		STRING3 extension;
+		//COPPR-69 New field
+		STRING3 report_source;
+  END;
+
 	EXPORT DidSlim := RECORD 
 		STRING10 prim_range;
 		STRING2 predir;
