@@ -41,17 +41,17 @@ EXPORT Proc_FirstData_buildall(
 		FirstData.Build_BaseFile(pversion, day_of_week).ALL,
 		BuildLogger.BaseEnd(False),
 		BuildLogger.KeyStart(false),
-		FirstData.proc_build_keys(pVersion),
+		FirstData.proc_build_keys(pVersion, day_of_week != 'MONDAY'),
 		BuildLogger.KeyEnd(false),
 		 BuildLogger.PostStart(False),
 		FirstData.QA_Records(),
-		dops_update,
+ 		dops_update,
 		FirstData.Strata_Population_Stats(pversion,pIsTesting).All,
 		Scrubs_FirstData.fn_RunScrubs(pversion,''),
 		BuildLogger.PostEnd(False), 
-		BuildLogger.BuildEnd(false)
+		BuildLogger.BuildEnd(false) 
 	) : 
-	SUCCESS(
+ 	SUCCESS(
 		Send_Emails(
 			pversion,,,,
 			pContacts,
@@ -64,7 +64,7 @@ EXPORT Proc_FirstData_buildall(
 			pContacts,
 			RoxieKeyBuild.Email_Notification_List + ';' + pContacts
 		).BuildFailure
-	) ;
+	)  ;
 	EXPORT All :=
 	IF(VersionControl.IsValidVersion(pversion)
 		,full_build
