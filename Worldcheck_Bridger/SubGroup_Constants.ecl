@@ -1239,6 +1239,11 @@
 		export string KEYWORD_DKKFST								:= '925';
 		export string KEYWORD_MDBNM									:= '926';
 		export string KEYWORD_EU_CYBER							:= '927';
+		export string KEYWORD_CHESBK								:= '928';
+		export string KEYWORD_FIKKV									:= '929';
+		export string KEYWORD_NOGA									:= '930';
+		export string KEYWORD_IUUVES								:= '931';
+		export string KEYWORD_TWMOJ_INT							:= '932';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

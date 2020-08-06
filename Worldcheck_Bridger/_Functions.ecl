@@ -1341,6 +1341,11 @@
 				trim(kword, left, right) = 'DKKFST' =>SubGroup_Constants.numKeywordsID.KEYWORD_DKKFST,
 				trim(kword, left, right) = 'MDBNM' =>SubGroup_Constants.numKeywordsID.KEYWORD_MDBNM,
 				trim(kword, left, right) = 'EU-CYBER' =>SubGroup_Constants.numKeywordsID.KEYWORD_EU_CYBER,
+				trim(kword, left, right) = 'CHESBK' =>SubGroup_Constants.numKeywordsID.KEYWORD_CHESBK,
+				trim(kword, left, right) = 'FIKKV' =>SubGroup_Constants.numKeywordsID.KEYWORD_FIKKV,
+				trim(kword, left, right) = 'NOGA' =>SubGroup_Constants.numKeywordsID.KEYWORD_NOGA,
+				trim(kword, left, right) = 'IUUVES' =>SubGroup_Constants.numKeywordsID.KEYWORD_IUUVES,
+				trim(kword, left, right) = 'TWMOJ-INT' =>SubGroup_Constants.numKeywordsID.KEYWORD_TWMOJ_INT,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
