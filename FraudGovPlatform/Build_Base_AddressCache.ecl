@@ -1,7 +1,7 @@
 ﻿Import FraudShared,tools; 
 EXPORT Build_Base_AddressCache (
    string pversion	
-	,dataset(FraudShared.Layouts.Base.Main) FileBase = FraudShared.Files().Base.Main.Built 
+	,dataset(FraudShared.Layouts.Base.Main) FileBase = $.Files().Base.Main_Orig.Built
     ,dataset(FraudShared.Layouts.Base.Main) Previous_Build =  $.Files().Base.Main_Orig.QA
     ,dataset($.Layouts.Base.AddressCache) Previous_AddressCache = $.Files().Base.AddressCache.QA
 ) := 
