@@ -1,15 +1,15 @@
-import irs5500;
+IMPORT irs5500;
 
-export IRS5500_records(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
+EXPORT IRS5500_records(DATASET(doxie_cbrs.layout_references) bdids) := FUNCTION
 
 k := irs5500.key_irs5500_BDID;
 
-k tra(k r) := transform
-	self := r;
-end;
+k tra(k r) := TRANSFORM
+  SELF := r;
+END;
 
-j := join(bdids, k, keyed(left.bdid = right.bdid), tra(right),
-				  limit(10000, skip));
+j := JOIN(bdids, k, KEYED(LEFT.bdid = RIGHT.bdid), tra(RIGHT),
+          LIMIT(10000, SKIP));
 
-return sort(j,-form_plan_year_begin_date,record);
+RETURN SORT(j,-form_plan_year_begin_date,RECORD);
 END;

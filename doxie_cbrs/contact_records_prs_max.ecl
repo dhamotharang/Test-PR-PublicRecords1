@@ -1,18 +1,18 @@
-import doxie, business_header, ut;
+IMPORT doxie, business_header, ut;
 doxie_cbrs.mac_Selection_Declare()
 
-export contact_records_prs_max(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
+EXPORT contact_records_prs_max(DATASET(doxie_cbrs.layout_references) bdids) := FUNCTION
 r := doxie_cbrs.contact_records_prs(bdids);
-s := sort(r, level, /*company_name,*/ lowest_title_rank, lname, fname, -did);
+s := SORT(r, level, /*company_name,*/ lowest_title_rank, lname, fname, -did);
 
 //add seq num to match sort elsewhere
-seqrec := record
-	s;
-	unsigned2 seq := 0;
-end;
+seqrec := RECORD
+  s;
+  UNSIGNED2 seq := 0;
+END;
 
-p := project(s, seqrec);
+p := PROJECT(s, seqrec);
 ut.MAC_Sequence_Records(p,seq,pseq)
 
-return choosen(pseq, Max_AssociatedPeople_val);
+RETURN CHOOSEN(pseq, Max_AssociatedPeople_val);
 END;
