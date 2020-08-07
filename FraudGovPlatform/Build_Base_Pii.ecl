@@ -46,12 +46,7 @@ tools.mac_WriteFile(Filenames(pversion).Base.BocaShell.New,BocaShell_Base,Build_
 tools.mac_WriteFile(Filenames(pversion).Base.CIID_Orig.New,Ciid_Orig,Build_ciid_Orig);
 tools.mac_WriteFile(Filenames(pversion).Base.Crim_Orig.New,Crim_Orig,Build_crim_Orig);
 tools.mac_WriteFile(Filenames(pversion).Base.Death_Orig.New,Death_Orig,Build_death_Orig);
-
-Export Bocashell :=Sequential(
-															Build_BocaShell_Base
-															,Promote(pversion).buildfiles.New2Built
-															);
-																																							
+																			
 Export All := 	Sequential
 											(
 											 Build_pii_Base
@@ -69,7 +64,9 @@ Export All := 	Sequential
 											,Build_DLHistory_Base
 											,Build_BestInfo_Base
 											,Build_PrepaidPhone_Base
+											,Build_BocaShell_Base
 											,Promote(pversion).buildfiles.New2Built
+											,Promote(pversion).buildfiles.Built2QA
 											)
 								;
 END;

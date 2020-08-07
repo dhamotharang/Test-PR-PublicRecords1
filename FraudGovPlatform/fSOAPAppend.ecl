@@ -3,7 +3,7 @@ gateway,riskprocessing,_control,Autokey_batch,DriversV2_Services;
 
 EXPORT fSOAPAppend(boolean	UpdatePii   = _Flags.Update.Pii)	:= MODULE
 
-	Shared nodes				:= thorlib.nodes();
+	Shared nodes				:= 50;//The data to be distributed on 50 nodes before sending to soapcall. 
 	Shared threads			:= 2;
 
 	//PII Input Process Begin
@@ -860,7 +860,7 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 	
 	 EXPORT BocaShell	:= Module
    	
-   unsigned1 parallel_calls :=if(_control.ThisEnvironment.Name <> 'Prod_Thor',2,30);  
+   unsigned1 parallel_calls :=threads;  
    boolean FraudPointMode := true;
    boolean RemoveFares := false;	
    boolean LeadIntegrityMode := false; 
@@ -969,7 +969,7 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
     SELF := [];
    END;
    p_f := PROJECT (ds_input, assignAccount (LEFT,COUNTER));
-   s := Risk_Indicators.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
+   s := BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
                                                   bs_service, roxieIP, parallel_calls);
 																									
 

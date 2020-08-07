@@ -11,20 +11,23 @@ export Build_All(
 module
 
 ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.hthor_Dev,	FraudGovPlatform_Validation.Constants.hthor_Prod);
-ECLThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.Shell_ThorName_Dev,	FraudGovPlatform_Validation.Constants.Shell_ThorName_Prod);
+ECLThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.ThorName_Dev,	FraudGovPlatform_Validation.Constants.ThorName_Prod);
 
-Build_BocaShell_Ecl := 
- 'import tools, FraudGovPlatform, FraudGovPlatform_Validation, STD;\n'
+Build_Kel_Ecl := 
+ 'import tools, FraudGovPlatform, FraudShared, Orbit3, FraudGovPlatform_Validation, STD, FraudGovPlatform_Analytics;\n'
++'#CONSTANT(\'RunKelDemo\',false);\n'
 +'#CONSTANT(\'Platform\',\'FraudGov\');\n'
 +'#OPTION(\'multiplePersistInstances\',FALSE);\n'
-+'wuname := \'FraudGov BocaShell Build\';\n'
++'#OPTION(\'defaultSkewError\', 1);\n'
++'#OPTION(\'resourceMaxHeavy\', 2);\n'
++'wuname := \'FraudGov Kel Build\';\n'
 +'#WORKUNIT(\'protect\', true);\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
 +'   FraudGovPlatform_Validation.Mailing_List().Alert\n'
-+' 	 ,\'FraudGov BocaShell Build\'\n'
++' 	 ,\'FraudGov Kel Build\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
@@ -34,13 +37,12 @@ Build_BocaShell_Ecl :=
 +'active_workunit :=  exists(d);\n'
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
-+'		,FraudGovPlatform.Build_BocaShell(\''+version+'\').All\n'
-+'	):failure(email(\'FraudGov BocaShell Build failed\'));\n'
++'		,FraudGovPlatform.Build_Kel(\''+version+'\').All\n'
++'	):failure(email(\'FraudGov Kel Build failed\'));\n'
 ;
-
 	export build_all := sequential(
-		// FraudGovPlatform.Build_Input(version).ALL,
-		// FraudGovPlatform.Build_Base(version).ALL,
+		FraudGovPlatform.Build_Input(version).ALL,
+		FraudGovPlatform.Build_Base(version).ALL,
 		if ( FraudGovPlatform.Mac_TestRecordID(version) = 'Passed' and FraudGovPlatform.Mac_TestRinID(version) = 'Passed', 
 				sequential(
 					FraudGovPlatform.Promote(version).promote_base,
@@ -49,8 +51,8 @@ Build_BocaShell_Ecl :=
 					FraudGovPlatform.Append_DemoData(version),
 					FraudShared.Build_AutoKeys(version),
 					FraudGovPlatform.Promote().Clear_DemoData,
-					// FraudGovPlatform.Build_Base_Pii(version).All,
-					// _Control.fSubmitNewWorkunit(Build_BocaShell_Ecl,ECLThorName)
+					FraudGovPlatform.Build_Base_Pii(version).All,
+					_Control.fSubmitNewWorkunit(Build_Kel_Ecl,ECLThorName)
 				),
 				FAIL('Unit Test Failed'))
 	): success(FraudGovPlatform.Send_Emails(version).BuildSuccess), failure(FraudGovPlatform.Send_Emails(version).BuildFailure);
