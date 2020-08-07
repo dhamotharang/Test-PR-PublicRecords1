@@ -1,211 +1,211 @@
-import Census_data, doxie, doxie_cbrs, business_header, Business_Header_SS, ut;
+IMPORT Census_data, doxie, doxie_cbrs, business_header, Business_Header_SS, ut;
 
-export fn_getBaseRecs(
-  dataset(doxie_cbrs.layout_references) in_group_ids,
-	boolean in_use_supergroup,
-	boolean append_goup_id = true
+EXPORT fn_getBaseRecs(
+  DATASET(doxie_cbrs.layout_references) in_group_ids,
+  BOOLEAN in_use_supergroup,
+  BOOLEAN append_goup_id = TRUE
 ) :=
-function
-	doxie_cbrs.mac_Selection_Declare()
-	mod_access := Doxie.compliance.GetGlobalDataAccessModule();
-	bhk2 := business_header_ss.Key_BH_BDID_pl;
-	
-	doxie_cbrs.layout_supergroup keepl(in_group_ids l) := transform
-	  self.group_id := 0;
-	  self := l;
-	end;
-	
-	tempsg :=
-		if(
-			in_use_supergroup,
-			doxie_cbrs.fn_getSupergroup(
-				project(
-					in_group_ids,
-					transform(
-						doxie_cbrs.layout_supergroup,
-						self.group_id := 0,
-						self.level := 0,
-						self := left)),
-				business_header.stored_use_Levels_val),
-			project(
-				in_group_ids,
-				keepl(left)));
+FUNCTION
+  doxie_cbrs.mac_Selection_Declare()
+  mod_access := Doxie.compliance.GetGlobalDataAccessModule();
+  bhk2 := business_header_ss.Key_BH_BDID_pl;
+  
+  doxie_cbrs.layout_supergroup keepl(in_group_ids l) := TRANSFORM
+    SELF.group_id := 0;
+    SELF := l;
+  END;
+  
+  tempsg :=
+    IF(
+      in_use_supergroup,
+      doxie_cbrs.fn_getSupergroup(
+        PROJECT(
+          in_group_ids,
+          TRANSFORM(
+            doxie_cbrs.layout_supergroup,
+            SELF.group_id := 0,
+            SELF.level := 0,
+            SELF := LEFT)),
+        business_header.stored_use_Levels_val),
+      PROJECT(
+        in_group_ids,
+        keepl(LEFT)));
 
-	kb := Business_Header.Key_BH_SuperGroup_BDID;
-	tempsg attachgroupid(tempsg l, kb r) := transform
-	  self.group_id := r.group_id;
-		self := l;
-	end;
-	tempsg0 := join(tempsg, kb,
-                  append_goup_id and 
-                  keyed (left.bdid=right.bdid),
-                  attachgroupid(left,right),
-                  left outer, keep (1), limit (0));
+  kb := Business_Header.Key_BH_SuperGroup_BDID;
+  tempsg attachgroupid(tempsg l, kb r) := TRANSFORM
+    SELF.group_id := r.group_id;
+    SELF := l;
+  END;
+  tempsg0 := JOIN(tempsg, kb,
+                  append_goup_id AND
+                  KEYED (LEFT.bdid=RIGHT.bdid),
+                  attachgroupid(LEFT,RIGHT),
+                  LEFT OUTER, KEEP (1), LIMIT (0));
   mybdids := table(tempsg0,{bdid,group_id});
-	
-	extralayout := record
-	  bhk2;
-		unsigned6 group_id;
-	end;
-	
-	extralayout BaseRecs(recordof(mybdids) l, bhk2 r) := TRANSFORM
-	  self.group_id := l.group_id;
-		SELF := r;
-	END;
+  
+  extralayout := RECORD
+    bhk2;
+    UNSIGNED6 group_id;
+  END;
+  
+  extralayout BaseRecs(RECORDOF(mybdids) l, bhk2 r) := TRANSFORM
+    SELF.group_id := l.group_id;
+    SELF := r;
+  END;
 
-	base_BH_recs := JOIN(mybdids, bhk2
-							         ,KEYED(LEFT.bdid = RIGHT.bdid)
-		                    and IF(mod_access.isConsumer()
-		                           ,RIGHT.source in ut.IndustryClass.BH_KnowX_src
-					                     ,true) AND
+  base_BH_recs := JOIN(mybdids, bhk2
+                       ,KEYED(LEFT.bdid = RIGHT.bdid)
+                        AND IF(mod_access.isConsumer()
+                               ,RIGHT.source IN ut.IndustryClass.BH_KnowX_src
+                               ,TRUE) AND
                         doxie.compliance.source_ok(mod_access.glb, mod_access.DataRestrictionMask, RIGHT.source) AND
-                        doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask)
-					             ,BaseRecs(left,RIGHT)
-					    				 ,LIMIT(0)											 
-											 ,KEEP(50));
+                        doxie.compliance.isBusHeaderSourceAllowed(RIGHT.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask)
+                       ,BaseRecs(LEFT,RIGHT)
+                       ,LIMIT(0)
+                       ,KEEP(50));
 
-	ext_rec := record
-		base_bh_recs;
-		unsigned2 name_source_id;
-		unsigned2 addr_source_id;
-		unsigned2 phone_source_id;
-		unsigned2 fein_source_id;
-	end;
+  ext_rec := RECORD
+    base_bh_recs;
+    UNSIGNED2 name_source_id;
+    UNSIGNED2 addr_source_id;
+    UNSIGNED2 phone_source_id;
+    UNSIGNED2 fein_source_id;
+  END;
 
-	ext_rec project_ids(base_BH_recs l, unsigned c) := transform
-		self.name_source_id := c;
-		self.addr_source_id := c;
-		self.phone_source_id := c;
-		self.fein_source_id := c;
-		self := l;
-	end;
+  ext_rec project_ids(base_BH_recs l, UNSIGNED c) := TRANSFORM
+    SELF.name_source_id := c;
+    SELF.addr_source_id := c;
+    SELF.phone_source_id := c;
+    SELF.fein_source_id := c;
+    SELF := l;
+  END;
 
-  base_BH_recs_id := project(group(sort(base_BH_recs, group_id,record),group_id),project_ids(left,counter));
+  base_BH_recs_id := PROJECT(GROUP(SORT(base_BH_recs, group_id,RECORD),group_id),project_ids(LEFT,COUNTER));
 
 
-	br_msa_county := RECORD
-		doxie_cbrs.Layout_BH;
-		string60 msaDesc := '';
-		string18 county_name := '';
-		string120 company_clean := '';
-		unsigned2 name_source_id := 0;
-		unsigned2 addr_source_id := 0;
-		unsigned2 phone_source_id := 0;
-		unsigned2 fein_source_id := 0;
-		unsigned6 group_id := 0;
-	END;
-					
-	br_msa_county add_msa_county(base_BH_recs_id L, Census_Data.Key_Fips2County R) := TRANSFORM
-		SELF.msaDesc := if(L.msa <> '' and L.msa <> '0000', ziplib.MSAToCityState(L.msa), '');
-		SELF.county_name := if (L.county <> '', R.county_name, '');
-//		SELF.phone := if(L.phone > 0, (string)L.phone, '');
-		SELF.phone := if(L.phone % 10000000 != 0, (string)L.phone, ''); // Filters out phone numbers whose value is zero, or whose last seven digits are zero. cda May 2006.
-		SELF.fein := if(L.fein > 0, INTFORMAT(L.fein, 9, 1), '');
-		SELF.zip := if(L.zip > 0, INTFORMAT(L.zip,5,1), '');
-		SELF.zip4 := if(L.zip4 > 0, INTFORMAT(L.zip4,4,1), '');
-		SELF.msa := if(L.msa <> '0000', L.msa, '');
-		SELF := L;
-	END;
-	
-	
-	tempBaseRecs := JOIN(base_BH_recs_id(not dppa or (mod_access.isValidDPPA() AND mod_access.isValidDPPAState(vendor_st, , source))),
-	                     Census_Data.Key_Fips2County,
-											 KEYED(LEFT.state = RIGHT.state_code and
-							         LEFT.county = RIGHT.county_fips),
-							         add_msa_county(LEFT,RIGHT), LEFT OUTER, KEEP (1), LIMIT (0));
-	
-	br_msa_county project_clean(tempBaseRecs l) := transform
-		self.company_clean := doxie_cbrs.cleancompany(l.company_name);
-		self := l;
-	end;
+  br_msa_county := RECORD
+    doxie_cbrs.Layout_BH;
+    STRING60 msaDesc := '';
+    STRING18 county_name := '';
+    STRING120 company_clean := '';
+    UNSIGNED2 name_source_id := 0;
+    UNSIGNED2 addr_source_id := 0;
+    UNSIGNED2 phone_source_id := 0;
+    UNSIGNED2 fein_source_id := 0;
+    UNSIGNED6 group_id := 0;
+  END;
+          
+  br_msa_county add_msa_county(base_BH_recs_id L, Census_Data.Key_Fips2County R) := TRANSFORM
+    SELF.msaDesc := IF(L.msa <> '' AND L.msa <> '0000', ziplib.MSAToCityState(L.msa), '');
+    SELF.county_name := IF (L.county <> '', R.county_name, '');
+    // SELF.phone := if(L.phone > 0, (string)L.phone, '');
+    SELF.phone := IF(L.phone % 10000000 != 0, (STRING)L.phone, ''); // Filters out phone numbers whose value is zero, OR whose last seven digits are zero. cda May 2006.
+    SELF.fein := IF(L.fein > 0, INTFORMAT(L.fein, 9, 1), '');
+    SELF.zip := IF(L.zip > 0, INTFORMAT(L.zip,5,1), '');
+    SELF.zip4 := IF(L.zip4 > 0, INTFORMAT(L.zip4,4,1), '');
+    SELF.msa := IF(L.msa <> '0000', L.msa, '');
+    SELF := L;
+  END;
+  
+  
+  tempBaseRecs := JOIN(base_BH_recs_id(NOT dppa OR (mod_access.isValidDPPA() AND mod_access.isValidDPPAState(vendor_st, , source))),
+                       Census_Data.Key_Fips2County,
+                       KEYED(LEFT.state = RIGHT.state_code AND
+                       LEFT.county = RIGHT.county_fips),
+                       add_msa_county(LEFT,RIGHT), LEFT OUTER, KEEP (1), LIMIT (0));
+  
+  br_msa_county project_clean(tempBaseRecs l) := TRANSFORM
+    SELF.company_clean := doxie_cbrs.cleancompany(l.company_name);
+    SELF := l;
+  END;
 
-	sortbyname := sort(project(tempBaseRecs,project_clean(left)),group_id,company_clean,name_source_id);
-	//////////////////////
-	tempded := dedup(table(sortbyname,{group_id,company_clean,clean_len := length(trim(company_clean,left,right))}),group_id,company_clean);
-	tempjoinrec := record
-	  unsigned6 group_id;
-		string shortclean;
-		string longclean;
-	end;
-	tempjoinrec xform_join(tempded l, tempded r) := transform
-	  self.group_id := l.group_id;
-		self.shortclean := trim(l.company_clean,left,right);
-		self.longclean := trim(r.company_clean,left,right);
-	end;
-	tempjoin := join(tempded,tempded,left.group_id = right.group_id and left.company_clean[1] = right.company_clean[1] and left.clean_len < right.clean_len and left.company_clean = right.company_clean[1..left.clean_len],xform_join(left,right));
-	tempjoinrec xform_roll(tempjoinrec l, tempjoinrec r) := transform
-	   self.group_id := l.group_id;
-		 self.shortclean := l.shortclean;
-		 self.longclean := if(trim(l.longclean,left,right) = l.shortclean,l.shortclean,
-												 if(length(l.longclean) > length(r.longclean),
-														 if(l.longclean[1..length(r.longclean)] = r.longclean,
-																l.longclean,doxie_cbrs.getmatchinginitialstring(l.longclean,r.longclean)),
-														 if(r.longclean[1..length(l.longclean)] = l.longclean,
-																r.longclean,doxie_cbrs.getmatchinginitialstring(l.longclean,r.longclean))));
-		// self.longclean := doxie_cbrs.getmatchinginitialstring(l.longclean,r.longclean);
-	end;
-	temproll := rollup(sort(tempjoin,group_id,shortclean,longclean),left.group_id = right.group_id and left.shortclean = right.shortclean,xform_roll(left,right));
-	temproll xform_jointemp(temproll l) := transform
-	  self := l;
-	end;
-	
-	tempfilt := dedup(join(temproll(longclean <> ''),tempded,left.group_id = right.group_id and left.longclean = right.company_clean,xform_jointemp(left)));
-	br_msa_county xform_join2(br_msa_county l, tempfilt r) := transform
-		self.company_clean := if(r.longclean <> '',r.longclean,l.company_clean);
-		self := l;
-	end;
-	reduced_names := join(sortbyname,tempfilt,left.group_id = right.group_id and left.company_clean = right.shortclean,xform_join2(left,right),left outer);
-	br_msa_county xform_remove(br_msa_county l) := transform
-		self.company_clean := doxie_cbrs.stripcompany(l.company_clean);
-		self := l;
-	end;
-	sortbyname2 := group(sort(project(reduced_names,xform_remove(left)),group_id,company_clean,name_source_id),group_id);
+  sortbyname := SORT(PROJECT(tempBaseRecs,project_clean(LEFT)),group_id,company_clean,name_source_id);
+  //////////////////////
+  tempded := DEDUP(table(sortbyname,{group_id,company_clean,clean_len := LENGTH(TRIM(company_clean,LEFT,RIGHT))}),group_id,company_clean);
+  tempjoinrec := RECORD
+    UNSIGNED6 group_id;
+    STRING shortclean;
+    STRING longclean;
+  END;
+  tempjoinrec xform_join(tempded l, tempded r) := TRANSFORM
+    SELF.group_id := l.group_id;
+    SELF.shortclean := TRIM(l.company_clean,LEFT,RIGHT);
+    SELF.longclean := TRIM(r.company_clean,LEFT,RIGHT);
+  END;
+  tempjoin := JOIN(tempded,tempded,LEFT.group_id = RIGHT.group_id AND LEFT.company_clean[1] = RIGHT.company_clean[1] AND LEFT.clean_len < RIGHT.clean_len AND LEFT.company_clean = RIGHT.company_clean[1..LEFT.clean_len],xform_join(LEFT,RIGHT));
+  tempjoinrec xform_roll(tempjoinrec l, tempjoinrec r) := TRANSFORM
+     SELF.group_id := l.group_id;
+     SELF.shortclean := l.shortclean;
+     SELF.longclean := IF(TRIM(l.longclean,LEFT,RIGHT) = l.shortclean,l.shortclean,
+                         IF(LENGTH(l.longclean) > LENGTH(r.longclean),
+                             IF(l.longclean[1..LENGTH(r.longclean)] = r.longclean,
+                                l.longclean,doxie_cbrs.getmatchinginitialstring(l.longclean,r.longclean)),
+                             IF(r.longclean[1..LENGTH(l.longclean)] = l.longclean,
+                                r.longclean,doxie_cbrs.getmatchinginitialstring(l.longclean,r.longclean))));
+    // self.longclean := doxie_cbrs.getmatchinginitialstring(l.longclean,r.longclean);
+  END;
+  temproll := ROLLUP(SORT(tempjoin,group_id,shortclean,longclean),LEFT.group_id = RIGHT.group_id AND LEFT.shortclean = RIGHT.shortclean,xform_roll(LEFT,RIGHT));
+  temproll xform_jointemp(temproll l) := TRANSFORM
+    SELF := l;
+  END;
+  
+  tempfilt := DEDUP(JOIN(temproll(longclean <> ''),tempded,LEFT.group_id = RIGHT.group_id AND LEFT.longclean = RIGHT.company_clean,xform_jointemp(LEFT)));
+  br_msa_county xform_join2(br_msa_county l, tempfilt r) := TRANSFORM
+    SELF.company_clean := IF(r.longclean <> '',r.longclean,l.company_clean);
+    SELF := l;
+  END;
+  reduced_names := JOIN(sortbyname,tempfilt,LEFT.group_id = RIGHT.group_id AND LEFT.company_clean = RIGHT.shortclean,xform_join2(LEFT,RIGHT),LEFT OUTER);
+  br_msa_county xform_remove(br_msa_county l) := TRANSFORM
+    SELF.company_clean := doxie_cbrs.stripcompany(l.company_clean);
+    SELF := l;
+  END;
+  sortbyname2 := GROUP(SORT(PROJECT(reduced_names,xform_remove(LEFT)),group_id,company_clean,name_source_id),group_id);
 
-	//////////////////////
+  //////////////////////
 
-	br_msa_county iterbyname(br_msa_county l, br_msa_county r, unsigned c) := transform
-		self.name_source_id := if(c != 1 and l.company_clean = r.company_clean,l.name_source_id,r.name_source_id);
-		self := r;
-	end;
+  br_msa_county iterbyname(br_msa_county l, br_msa_county r, UNSIGNED c) := TRANSFORM
+    SELF.name_source_id := IF(c != 1 AND l.company_clean = r.company_clean,l.name_source_id,r.name_source_id);
+    SELF := r;
+  END;
 
-	rollbyname := iterate(sortbyname2,iterbyname(left,right,counter));
+  rollbyname := ITERATE(sortbyname2,iterbyname(LEFT,RIGHT,COUNTER));
 
-	sortbyaddr := sort(rollbyname,state,zip,prim_name,prim_range,sec_range,addr_source_id);
+  sortbyaddr := SORT(rollbyname,state,zip,prim_name,prim_range,sec_range,addr_source_id);
 
-	br_msa_county iterbyaddr(br_msa_county l, br_msa_county r) := transform
-		self.addr_source_id := if(l.state = r.state and
-															l.zip = r.zip and
-															l.prim_name = r.prim_name and
-															l.prim_range = r.prim_range and
-															l.sec_range = r.sec_range,l.addr_source_id,r.addr_source_id);
-		self := r;
-	end;
+  br_msa_county iterbyaddr(br_msa_county l, br_msa_county r) := TRANSFORM
+    SELF.addr_source_id := IF(l.state = r.state AND
+                              l.zip = r.zip AND
+                              l.prim_name = r.prim_name AND
+                              l.prim_range = r.prim_range AND
+                              l.sec_range = r.sec_range,l.addr_source_id,r.addr_source_id);
+    SELF := r;
+  END;
 
-	rollbyaddr := iterate(sortbyaddr,iterbyaddr(left,right));
+  rollbyaddr := ITERATE(sortbyaddr,iterbyaddr(LEFT,RIGHT));
 
-	sortbyphone := sort(rollbyaddr,phone,phone_source_id);
+  sortbyphone := SORT(rollbyaddr,phone,phone_source_id);
 
-	br_msa_county iterbyphone(br_msa_county l, br_msa_county r) := transform
-		self.phone_source_id := if(l.phone = r.phone,l.phone_source_id,r.phone_source_id);
-		self := r;
-	end;
+  br_msa_county iterbyphone(br_msa_county l, br_msa_county r) := TRANSFORM
+    SELF.phone_source_id := IF(l.phone = r.phone,l.phone_source_id,r.phone_source_id);
+    SELF := r;
+  END;
 
-	rollbyphone := iterate(sortbyphone,iterbyphone(left,right));
-	
-	sortbyfein := sort(rollbyphone,fein,fein_source_id);
-	
-	br_msa_county iterbyfein(br_msa_county l, br_msa_county r) := transform
-	  self.fein_source_id := if(l.fein = r.fein,l.fein_source_id,r.fein_source_id);
-		self := r;
-	end;
-	
-	rollbyfein := iterate(sortbyfein,iterbyfein(left,right));
+  rollbyphone := ITERATE(sortbyphone,iterbyphone(LEFT,RIGHT));
+  
+  sortbyfein := SORT(rollbyphone,fein,fein_source_id);
+  
+  br_msa_county iterbyfein(br_msa_county l, br_msa_county r) := TRANSFORM
+    SELF.fein_source_id := IF(l.fein = r.fein,l.fein_source_id,r.fein_source_id);
+    SELF := r;
+  END;
+  
+  rollbyfein := ITERATE(sortbyfein,iterbyfein(LEFT,RIGHT));
 
-	filterbyid := rollbyfein((SourceIdName = '' or name_source_id = (unsigned)SourceIdName) and
-													 (SourceIdAddr = '' or addr_source_id = (unsigned)SourceIdAddr) and
-													 (SourceIdPhone = '' or phone_source_id = (unsigned)SourceIdPhone) and
-													 (SourceIdFein = '' or fein_source_id = (unsigned)SourceIdFein));
+  filterbyid := rollbyfein((SourceIdName = '' OR name_source_id = (UNSIGNED)SourceIdName) AND
+                           (SourceIdAddr = '' OR addr_source_id = (UNSIGNED)SourceIdAddr) AND
+                           (SourceIdPhone = '' OR phone_source_id = (UNSIGNED)SourceIdPhone) AND
+                           (SourceIdFein = '' OR fein_source_id = (UNSIGNED)SourceIdFein));
 
-	return filterbyid;
+  RETURN filterbyid;
 
-end;
+END;

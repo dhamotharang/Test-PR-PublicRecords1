@@ -1,22 +1,25 @@
-import doxie, doxie_raw;
+IMPORT doxie, doxie_raw;
 doxie.MAC_Header_Field_Declare();
 
-export mac_SortByLevel(inf, outfile, sort1 = 'true', sort2 = 'true', sort3 = 'true') := macro
+EXPORT mac_SortByLevel(inf, outfile, sort1 = 'TRUE', sort2 = 'TRUE', sort3 = 'TRUE') := MACRO
 
-temprec := record
-	inf;
-	unsigned1 level := 200;
-end;
+temprec := RECORD
+  inf;
+  UNSIGNED1 level := 200;
+END;
 
-temprec addlv(inf l, unsigned1 lv) := transform
-	self.level := lv;
-	self := l;
-end;
+temprec addlv(inf l, UNSIGNED1 lv) := TRANSFORM
+  SELF.level := lv;
+  SELF := l;
+END;
 
-wlv := join(inf, doxie_cbrs.ds_SupergroupLevels(), left.bdid = right.bdid, addlv(left, right.level), left outer, lookup);
+wlv := JOIN(inf, doxie_cbrs.ds_SupergroupLevels(), 
+  LEFT.bdid = RIGHT.bdid, 
+  addlv(LEFT, RIGHT.level),
+  LEFT OUTER, lookup);
 
-srt := sort(wlv, level, sort1, sort2, sort3);
+srt := SORT(wlv, level, sort1, sort2, sort3);
 
-ut.MAC_Slim_Back(srt, recordof(inf), outfile)
+ut.MAC_Slim_Back(srt, RECORDOF(inf), outfile)
 
-endmacro;
+ENDMACRO;

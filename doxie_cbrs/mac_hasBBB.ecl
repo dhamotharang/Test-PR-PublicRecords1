@@ -1,22 +1,25 @@
-export mac_hasBBB(infile, outfile, bdids) := macro
+EXPORT mac_hasBBB(infile, outfile, bdids) := MACRO
 
-BBBs := dedup(table(doxie_cbrs.BBB_records(bdids)(bdid >0), {bdid}), all);
+BBBs := DEDUP(table(doxie_cbrs.BBB_records(bdids)(bdid >0), {bdid}), ALL);
 
-infile bbbtra(infile l, BBBs r) := transform
-	self.hasBBB := r.bdid > 0;
-	self := l;
-end;
+infile bbbtra(infile l, BBBs r) := TRANSFORM
+  SELF.hasBBB := r.bdid > 0;
+  SELF := l;
+END;
 
-midfile := join(infile, BBBs, left.bdid = right.bdid, bbbtra(left, right), left outer, lookup);
+midfile := JOIN(infile, BBBs, LEFT.bdid = RIGHT.bdid, bbbtra(LEFT, RIGHT), LEFT OUTER, lookup);
 
-BNMs := dedup(table(doxie_cbrs.BBB_NM_records(bdids)(bdid >0), {bdid}), all);
+BNMs := DEDUP(table(doxie_cbrs.BBB_NM_records(bdids)(bdid >0), {bdid}), ALL);
 
-infile bnmtra(midfile l, BNMs r) := transform
-	self.hasBBB_NM := r.bdid > 0;
-	self := l;
-end;
+infile bnmtra(midfile l, BNMs r) := TRANSFORM
+  SELF.hasBBB_NM := r.bdid > 0;
+  SELF := l;
+END;
 
-outfile := join(midfile, BNMs, left.bdid = right.bdid, bnmtra(left, right), left outer, lookup);
+outfile := JOIN(midfile, BNMs, 
+  LEFT.bdid = RIGHT.bdid, 
+  bnmtra(LEFT, RIGHT), 
+  LEFT OUTER, lookup);
 
 
-endmacro;
+ENDMACRO;

@@ -1,18 +1,18 @@
-export MAC_GetBestNameGlb(outfile, infile, key) := macro
-	#uniquename(tra)
-	typeof(infile) %tra%(infile l, recordof(key) r) := transform	
-		isbest := r.fname <> '';
-		self.title := if(isbest, r.title, l.title);
-		self.fname := if(isbest, r.fname, l.fname);
-		self.mname := if(isbest, r.mname, l.mname);
-		self.lname := if(isbest, r.lname, l.lname);
-		self.name_suffix := if(isbest, r.name_suffix, l.name_suffix);
-		self := l;
-	end;
+EXPORT MAC_GetBestNameGlb(outfile, infile, key) := MACRO
+  #uniquename(tra)
+  TYPEOF(infile) %tra%(infile l, RECORDOF(key) r) := TRANSFORM
+    isbest := r.fname <> '';
+    SELF.title := IF(isbest, r.title, l.title);
+    SELF.fname := IF(isbest, r.fname, l.fname);
+    SELF.mname := IF(isbest, r.mname, l.mname);
+    SELF.lname := IF(isbest, r.lname, l.lname);
+    SELF.name_suffix := IF(isbest, r.name_suffix, l.name_suffix);
+    SELF := l;
+  END;
 
-	outfile := join(infile,key, 
-		left.did > 0 and 
-		keyed(left.did = right.did) and
-		right.fname <> '' and right.lname <> '',
-		%tra%(left, right), left outer, keep(1));
-endmacro;
+  outfile := JOIN(infile,key,
+    LEFT.did > 0 AND
+    KEYED(LEFT.did = RIGHT.did) AND
+    RIGHT.fname <> '' AND RIGHT.lname <> '',
+    %tra%(LEFT, RIGHT), LEFT OUTER, KEEP(1));
+ENDMACRO;

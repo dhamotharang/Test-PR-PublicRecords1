@@ -1,29 +1,29 @@
-import doxie_cbrs_Raw;
+IMPORT doxie_cbrs_Raw;
 doxie_cbrs.mac_Selection_Declare()
 
-export EBR_Summary_records_prs(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
+EXPORT EBR_Summary_records_prs(DATASET(doxie_cbrs.layout_references) bdids) := FUNCTION
 
 raw := doxie_cbrs_Raw.EBR_Summary(bdids,Include_EBRSummary_val, Max_EBRSummary_val).records;
 
-string DPP(string pp) := case(pp,
-	'F' => 'Pays sooner than 50%',
-	'L' => 'Pays slower than 70%',
-	'S' => 'Pays the same',
-	'H' => 'Pays slower than 50%',
-	'');
-	
-string DPT(string pt) := case(pt,
-	'S' => 'Stable',
-	'L' => 'Increasingly late',
-	'B' => 'Increasingly late, but better than industry',
-	'I' => 'Improving',
-	'P' => 'Improving, but slower than industry',
-	'N' => 'No trend identifiable',
-	'');
+STRING DPP(STRING pp) := CASE(pp,
+  'F' => 'Pays sooner than 50%',
+  'L' => 'Pays slower than 70%',
+  'S' => 'Pays the same',
+  'H' => 'Pays slower than 50%',
+  '');
+  
+STRING DPT(STRING pt) := CASE(pt,
+  'S' => 'Stable',
+  'L' => 'Increasingly late',
+  'B' => 'Increasingly late, but better than industry',
+  'I' => 'Improving',
+  'P' => 'Improving, but slower than industry',
+  'N' => 'No trend identifiable',
+  '');
 
-newrec := record
-	 raw.level;
-	 raw.bdid;
+newrec := RECORD
+   raw.level;
+   raw.bdid;
    raw.process_date;
    raw.FILE_NUMBER;
    raw.SEGMENT_CODE;
@@ -41,13 +41,13 @@ newrec := record
    raw.HIGH_CREDIT_EXTENDED;
    raw.MEDIAN_CREDIT_EXTENDED;
    raw.PAYMENT_PERFORMANCE;
-	 string20 PAYMENT_PERFORMANCE_DECODE := DPP(raw.PAYMENT_PERFORMANCE);
+   STRING20 PAYMENT_PERFORMANCE_DECODE := DPP(raw.PAYMENT_PERFORMANCE);
    raw.PAYMENT_TREND;
-	 string50 PAYMENT_TREND_DECODE := DPT(raw.PAYMENT_TREND);
+   STRING50 PAYMENT_TREND_DECODE := DPT(raw.PAYMENT_TREND);
    raw.INDUSTRY_DESCRIPTION;
    raw.predicted_dbt_date;
-end;
+END;
 
 
-return table(raw, newrec);
+RETURN table(raw, newrec);
 END;
