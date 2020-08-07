@@ -9,7 +9,7 @@ module
 	export Run_AgencyActivity := $.Build_AgencyActivityDate_Base(pversion).All:independent;
 	export Run_AddressCache := $.Build_Base_AddressCache(pversion).All:independent;
 	export Run_Anonymize := $.Build_Base_Anonymized(pversion).All:independent;
-	export Run_Demo := $.Append_DemoData;
+	export Run_Demo := $.Append_DemoData(pversion);
 	
 	export All :=
 	if(tools.fun_IsValidVersion(pversion)
