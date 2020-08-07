@@ -26,7 +26,9 @@ EXPORT Functions := MODULE
       LH_flag := IF(le.RecordType = FFD.Constants.RecordType.LH, STD.Str.CleanSpaces(le.Content), ''); // Expected values in content field: SP (Suppress Product), SA (Suppress All), Empty for no suppression
 
       suppress_for_LH := LH_flag = PersonContext.Constants.LegalFlag.SuppressProduct OR LH_flag = PersonContext.Constants.LegalFlag.SuppressAll;
-      SELF.RecId1 := IF(le.DataGroup = FFD.Constants.DataGroups.OFFENDERS, le.RecId1 + le.RecId2, le.RecId1);
+      offenderRecId1 := TRIM(le.RecId1, LEFT, RIGHT) + TRIM(le.RecId2, LEFT, RIGHT);
+      SELF.RecId1 := IF(le.DataGroup = FFD.Constants.DataGroups.OFFENDERS, offenderRecId1, le.RecId1);
+      SELF.RecId2 := IF(le.DataGroup = FFD.Constants.DataGroups.OFFENDERS, '', le.RecId2);
       SELF.suppress_for_legal_hold := suppress_for_LH;
       SELF.security_freeze_suppression.apply_to_all := le.RecordType = FFD.Constants.RecordType.SF AND TRIM(le.Content,LEFT,RIGHT) = '*';
       SELF.security_freeze_suppression.set_FCRA_purpose := CovertSetStr2Int(inl_set);

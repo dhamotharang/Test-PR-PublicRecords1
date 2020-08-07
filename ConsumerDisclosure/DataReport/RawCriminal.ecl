@@ -92,11 +92,15 @@ EXPORT RawCriminal := MODULE
         KEYED (LEFT.flag_file_id = RIGHT.flag_file_id), 
         TRANSFORM(layout_offender_rawrec,
           is_override := LEFT.flag_file_id <> '' AND LEFT.flag_file_id = RIGHT.flag_file_id;
+          offender_key := (STRING) RIGHT.offender_key;
+          RecId1 := offender_key[1..50];
+          RecId2 := offender_key[51..]; // Offender keys with over 50 chars are split into RecId1 & RecId2
           SELF.compliance_flags.isOverride := is_override;
           SELF.compliance_flags.isSuppressed := ~is_override;
           SELF.subject_did := (UNSIGNED6) LEFT.did;
           SELF.combined_record_id := LEFT.record_id;
-          SELF.record_ids.RecId1 := (STRING) RIGHT.offender_key;
+          SELF.record_ids.RecId1 := RecId1;
+          SELF.record_ids.RecId2 := RecId2;
           SELF := RIGHT;
           SELF := LEFT;
           SELF := []),
@@ -113,7 +117,7 @@ EXPORT RawCriminal := MODULE
       FCRA.crim_is_ok (todaysdate, RIGHT.fcra_date, RIGHT.fcra_conviction_flag, RIGHT.fcra_traffic_flag),
       TRANSFORM(layout_offender_rawrec,
         offender_key := (STRING) RIGHT.offender_key;
-        RecId1 := offender_key;
+        RecId1 := offender_key[1..50];
         RecId2 := offender_key[51..]; // Offender keys with over 50 chars are split into RecId1 & RecId2
         SELF.compliance_flags.IsOverwritten := (RIGHT.offender_key<>'' AND RIGHT.offender_key IN offenders_override_ids);
         SELF.compliance_flags.IsSuppressed := (RIGHT.offender_key<>'' AND RIGHT.offender_key IN offenders_suppressed_ids);
