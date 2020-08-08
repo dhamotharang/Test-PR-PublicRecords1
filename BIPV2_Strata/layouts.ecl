@@ -20,7 +20,7 @@ MODULE
 	END;
   
 //  export fieldstats := recordof(BIPV2_PostProcess.fieldstats_prox.active_fieldStats);  //should be same for each id here
-  EXPORT laysegmentation := 
+  EXPORT laysegmentation :=
   record
       string10	idName      ;
       unsigned6 id          ;
@@ -28,6 +28,7 @@ MODULE
       string2   core        ;		// TC = tri core, DC = Dual Core, TS = trusted source, SS := Single Trusted Source
       string2   emergingCore;	  // Trusted source singleton
       string2   inactive    ;		// RI - Reported as inactive, NA - Inactive due to no activity
+      string1   status_score;
   end;
   export Id_Integrity := {
    string   Identifier
