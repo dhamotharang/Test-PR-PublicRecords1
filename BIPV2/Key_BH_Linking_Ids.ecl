@@ -8,7 +8,7 @@ MODULE
 	shared superfile_name         := BIPV2_Build.keynames(, pUseOtherEnvironment:= tools._Constants.IsDataland).linkids.qa        ;
 	shared superfile_name_hidden  := BIPV2_Build.keynames(, pUseOtherEnvironment:= tools._Constants.IsDataland).linkids_hidden.qa ;
 	
-	shared infile         := BIPV2.CommonBase.DS_PROD_CLEAN;
+	shared infile         := BIPV2.CommonBase.DS_CLEAN;
   shared Infile_hidden  := join(BIPV2.CommonBase.DS_BUILT,infile, left.rcid=right.rcid  ,transform({BIPV2.CommonBase.DS_BASE}  ,self:=left), left only,hash); //Add hash because RHS skewed, based on distribution of LHS partition points
 	
 	shared infile_rec := record
