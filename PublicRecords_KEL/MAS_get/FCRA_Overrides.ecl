@@ -421,7 +421,7 @@ EXPORT GetOverrideDeath(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 		INTEGER UIDAppend;
 		INTEGER G_ProcUID;
 		INTEGER P_lexid;
-		recordof (doxie.key_death_masterV2_DID_fcra);
+		recordof (doxie.key_death_masterV2_ssa_DID_fcra);
 		string20 flag_file_id;
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides.Death_correct_ffid;
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides.Death_correct_record_id;
