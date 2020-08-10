@@ -1,4 +1,4 @@
-EXPORT layouts := module
+﻿EXPORT layouts := module
 
 export rPlatformStatus := RECORD
 string PlatformName { xpath('PlatformName')}  ;
@@ -26,4 +26,19 @@ EXPORT OrbitBuildInstancenewLayout	:=	record
 		string										Status														;
 		string										Version														;
 	end;	
-end;
+
+EXPORT InputItem := record
+string ItemName ;
+ string SourceName ;
+ string ReceiveDateTape ;
+ string FilePathName;
+ end;
+ 
+ EXPORT AdditionalNamespacesLayout := RECORD
+    STRING arr_namespace {xpath('@xmlns:arr')} := 'http://schemas.microsoft.com/2003/10/Serialization/Arrays';
+    STRING orb_namespace {xpath('@xmlns:orb')} := 'http://lexisnexis.com/Orbit/';
+    STRING i_namespace {xpath('@xmlns:i')} := 'http://www.w3.org/2001/XMLSchema-instance';
+  END;
+
+ 
+ end;

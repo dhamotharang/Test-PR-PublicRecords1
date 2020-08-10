@@ -7,7 +7,7 @@ export Proc_Orbit3_CreateBuild(string buildname,string Buildvs,string Envmt = 'N
 string wuid := workunit;
 
 ECL1 := '#workunit(\'name\',\'Orbit Create Build Instance -- '+ buildname + '-- '+Buildvs+'\');\r\n'+
-		 'Orbit3.proc_Orbit3_CreateBuild_sp( \''+buildname+'\',  \''+Buildvs+'\', \''+Envmt+'\', \''+email_list+'\', '+skipcreatebuild+', '+skipupdatebuild+', '+runcreatebuild+',  \''+wuid+'\') \n' 
+		 'Orbit3.proc_Orbit3_CreateBuild_sp( \''+buildname+'\',  \''+Buildvs+'\', \''+Envmt+'\', \''+email_list+'\', '+skipcreatebuild+', '+skipupdatebuild+', (boolean)'+runcreatebuild+',  \''+wuid+'\') \n' 
 		+'	  : success(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_success)\n'
           +'	, failure(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_failure)\n'
            +'	;\n';
