@@ -1018,7 +1018,7 @@ EXPORT GetCorps(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWit
     //
     // Get Property Deeds
   dDeeds_raw := JOIN(dPropertyLinkids, LN_PropertyV2.key_deed_fid(),
-      KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id),// AND
+      KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id) AND right.record_type NOT IN LN_PropertyV2.Constants.setAssignRelsRecordTypes,//Assignments and Releases codes excluded
       //RIGHT.Buyer_Or_Borrower_Ind = 'O',
       TRANSFORM(BusinessBatch_BIP.Layouts.PropertyInfoExtra,
 

@@ -1,4 +1,4 @@
-import LN_Mortgage, risk_indicators,doxie_crs;
+﻿import LN_Mortgage, risk_indicators,doxie_crs;
 
 deedrec := record
 	LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE.buyer_mailing_address_care_of_name;
@@ -15,6 +15,7 @@ deedrec := record
 	string12	Total_Mortgage_Amount;
 	LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE.first_td_loan_type_code;
 	string50	Loan_Type_Desc;
+	LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE.first_td_due_date;
 	LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE.fares_mortgage_deed_type;
 	string50	Mortgage_Deed_Subtype;
 	LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE.fares_mortgage_term_code;

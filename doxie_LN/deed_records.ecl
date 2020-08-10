@@ -140,7 +140,8 @@ export deed_records (
   outf_reg_base := JOIN (final_ids, kdf,
                          left.fid <> '' and keyed (left.fid=right.ln_fares_id)
                          and ~((string)right.ln_fares_id in set( flags((unsigned6)did=left.did ),record_id) and isFCRA)
-												             and (~isCNSMR or right.vendor_source_flag not in D2C.Constants.LNPropertyV2RestrictedSources ),
+												             and (~isCNSMR or right.vendor_source_flag not in D2C.Constants.LNPropertyV2RestrictedSources )
+																									AND right.record_type NOT IN LN_PropertyV2.Constants.setAssignRelsRecordTypes, //Assignments and Releases codes excluded
                          take_right2 (left, right), keep (1), limit (0)); //should be atmost one record at right anyway
 
   // adding join to addl_fares key to populate fares fields for non-fcra comp report        

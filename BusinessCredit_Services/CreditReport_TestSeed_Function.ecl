@@ -2471,6 +2471,7 @@ EXPORT CreditReport_TestSeed_Function(DATASET(BusinessCredit_Services.Layouts.in
 												self.Name.Prefix                     := rt.Prop_Recs_Part_Foreclose_FDocs_Prefix              ;
 												self.Name.CompanyName                := rt.Prop_Recs_Part_Foreclose_FDocs_CompanyName         ;
 										));
+										self := [];
 								));
 								self.NoticeOfDefaults :=
 									project(Risk_Indicators.iid_constants.ds_Record, transform(iesp.TopBusinessReport.t_TopBusinessPropertyForeclosure,
@@ -2582,6 +2583,7 @@ EXPORT CreditReport_TestSeed_Function(DATASET(BusinessCredit_Services.Layouts.in
 												self.Name.Prefix                 := rt.Prop_Recs_Part_Default_FDocs_Prefix                ;
 												self.Name.CompanyName            := rt.Prop_Recs_Part_Default_FDocs_CompanyName           ;
 										));
+										self := [];
 								));
 						));
 						self.FIDType                                := rt.Prop_Recs_FIDType                           ;

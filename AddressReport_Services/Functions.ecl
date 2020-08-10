@@ -63,7 +63,7 @@ EXPORT Functions := MODULE
 
   shared entity_rec := LN_PropertyV2_Services.layouts.parties.entity;
 
-  shared string FormatName (entity_rec L) := function
+	shared string FormatName (entity_rec L) := function
     return
       if (trim (L.title) != '', trim (L.title), '') +
       if (trim (L.fname) != '', ' ' + trim (L.fname), '') +
@@ -113,16 +113,16 @@ EXPORT Functions := MODULE
   //****************************************************//
 
   EXPORT iesp.bizreport.t_BizLienJudgment ProjectLiens (dataset(LiensV2_Services.layout_lien_rollup) ljdata) := FUNCTION
-    iesp.bizreport.t_BizLienJudgment projectLiensJudgments (ljdata ds):=transform
-      Self.FilingType:=ds.filings[1].filing_type_desc;//ds.orig_filing_type;
-      Self.CourtLocation :=ds.filings[1].agency_county;//ds.filing_jurisdiction_name;
-      Self.CourtState :=ds.filings[1].agency_state;//ds.filing_state;
-      Self.CourtDescription :=ds.filings[1].agency;
-      Self.CaseNumber := ds.filings[1].filing_number;//ds.case_number;
-      Self.Amount := ds.amount;
-      Self.DateFiled := iesp.ECL2ESP.toDatestring8(ds.orig_filing_date);
-      Self.DateDisposed := iesp.ECL2ESP.toDatestring8(ds.release_date);
-      Self.Plaintiff :=ds.creditors[1].orig_name;
+		iesp.bizreport.t_BizLienJudgment projectLiensJudgments (ljdata ds):=transform
+			Self.FilingType:=ds.filings[1].filing_type_desc;//ds.orig_filing_type;
+			Self.CourtLocation :=ds.filings[1].agency_county;//ds.filing_jurisdiction_name;
+			Self.CourtState :=ds.filings[1].agency_state;//ds.filing_state;
+			Self.CourtDescription :=ds.filings[1].agency;
+			Self.CaseNumber := ds.filings[1].filing_number;//ds.case_number;
+			Self.Amount := ds.amount;
+			Self.DateFiled := iesp.ECL2ESP.toDatestring8(ds.orig_filing_date);
+			Self.DateDisposed := iesp.ECL2ESP.toDatestring8(ds.release_date);
+			Self.Plaintiff :=ds.creditors[1].orig_name;
       party := ds.debtors[1].parsed_parties[1];
       Self.Defendant.name := iesp.ECL2ESP.SetName (party.fname, party.mname, party.lname, party.name_suffix, party.title);
       Self.Defendant.SSN :=ds.debtors[1].parsed_parties[1].ssn;
@@ -146,12 +146,11 @@ EXPORT Functions := MODULE
   END;
 
 
-
   //****************************************************//
   // Residents Data Transform Function                  //
   //****************************************************//
   EXPORT iesp.addressreport.t_AddrReportPresentResident ProjectPresentResidents (dataset(AddressReport_Services.Layouts.residents_final_out) res,
-                                                                                 boolean isLocationReport) := FUNCTION
+																																								 boolean isLocationReport) := FUNCTION
     iesp.addressreport.t_AddrReportPresentResident SetCurrent (res l) := TRANSFORM
       self.identity := l.identity;
       self.AKAs := choosen(l.akas,iesp.constants.AR.MaxAkas);
@@ -207,17 +206,18 @@ EXPORT Functions := MODULE
       self.BusinessIds.OrgID := l.orgid;
     END;
     identity_recs:=PROJECT (bus, SetIdentity (Left));
-
-    iesp.addressreport.t_AddrReportBusiness SetBus (bus l) := TRANSFORM
-      Self.address := iesp.ECL2ESP.SetAddress (L.prim_name, L.prim_range, L.predir, L.postdir,
-        L.addr_suffix, L.unit_desig, L.sec_range, L.city, L.state, L.zip, L.zip4, '');
-      self.identities:=identity_recs;
+		
+		iesp.addressreport.t_AddrReportBusiness SetBus (bus l) := TRANSFORM
+			Self.address := iesp.ECL2ESP.SetAddress (L.prim_name, L.prim_range, L.predir, L.postdir,
+						L.addr_suffix, L.unit_desig, L.sec_range, L.city, L.state, L.zip, L.zip4, '');
+			self.identities:=identity_recs;
     END;
 
     RETURN PROJECT (choosen(bus,1), SetBus (Left));
-
+		
+		
   END;
-
+  
   //****************************************************//
   // Property Transform Function //
   //****************************************************//
@@ -266,7 +266,7 @@ EXPORT iesp.bpsreport.t_BpsReportProperty ProjectProp (dataset(LN_PropertyV2_Ser
       (unsigned4) assess.sale_date));
     SELF.RecordingDate := if(l.fid_type='D',iesp.ECL2ESP.toDate ((unsigned4) deed.recording_date),
       iesp.ECL2ESP.toDate ((unsigned4) assess.recording_date));
-    SELF.LoanDueDate := []; //iesp.ECL2ESP.toDate ((unsigned4) l.Loan_Due_Date);
+    SELF.LoanDueDate := iesp.ECL2ESP.toDate ((unsigned4) deed.first_td_due_date);
     SELF.SalePrice := if(l.fid_type='D', iesp.ECL2ESP.FormatDollarAmount (deed.sales_price),
       iesp.ECL2ESP.FormatDollarAmount (assess.sales_price));//l.Sale_Price;
     SELF.NameSeller := FormatName (seller.entity[1]); //l.name_of_seller;
@@ -277,6 +277,8 @@ EXPORT iesp.bpsreport.t_BpsReportProperty ProjectProp (dataset(LN_PropertyV2_Ser
     SELF.MortgageTerm := deed.fares_mortgage_term + if (deed.fares_mortgage_term_code_desc != '',
       ' ' + deed.fares_mortgage_term_code_desc, '');
     SELF.DocumentType := deed.document_type_desc;
+    SELF.DocumentTypeCode := deed.document_type_code;
+    SELF.RecordType := deed.record_type; // This is a possible future enhancement
     SELF.DocumentNumber := deed.document_number;
     SELF.TransactionType := deed.fares_transaction_type_desc;;
     SELF.MortgageLoanType := if(l.fid_type='D',deed.first_td_loan_type_desc,assess.mortgage_loan_type_desc);//codes.FARES_1080.mortgage_loan_type_code(L.loan_amount);//l.Loan_Type;
@@ -341,9 +343,9 @@ EXPORT iesp.bpsreport.t_BpsReportProperty ProjectProp (dataset(LN_PropertyV2_Ser
   return project(prop_in,set_prop(LEFT));
 END;
 
-  //****************************************************//
-  // Relative and Associate Transform Function          //
-  //****************************************************//
+	//****************************************************//
+	// Relative and Associate Transform Function					//
+	//****************************************************//
 export projectRelativeAssociate(dataset(AddressReport_Services.Layouts.rel_asst_layout) in_ds) := function
   iesp.addressreport.t_AddrReportRelativeAssociate set_rel_assoc(in_ds L) := transform
     self.ResidentUniqueId := (string)L.person1;
@@ -360,9 +362,9 @@ export projectRelativeAssociate(dataset(AddressReport_Services.Layouts.rel_asst_
   return project(in_ds,set_rel_assoc(left));
 end;
 
-  //****************************************************//
-  // Vehicles Transform Function                        //
-  //****************************************************//
+	//****************************************************//
+	// Vehicles Transform Function												//
+	//****************************************************//
 export projectVehicles(dataset(VehicleV2_Services.Layout_Report) in_ds,
   AddressReport_Services.Layouts.in_address in_addr) := function
   AddressReport_Services.Layouts.iesp_addrpt_possveh_plusdid_layout set_vehicles(in_ds L) := transform
@@ -395,9 +397,9 @@ export projectVehicles(dataset(VehicleV2_Services.Layout_Report) in_ds,
   return project(in_ds, set_vehicles(left));
 end;
 
-  //**************************************************** //
-  // Hunting and Fishing Lics Transform Function         //
-  //**************************************************** //
+	//**************************************************** //
+	// Hunting and Fishing Lics Transform Function  			 //
+	//**************************************************** //
 export projectHuntFish(dataset(iesp.huntingfishing.t_HuntFishRecord) in_ds,
   AddressReport_Services.Layouts.in_address in_addr) := function
   AddressReport_Services.Layouts.iesp_addrpt_posshf_plusdid_layout tf_hunt_fish(in_ds L) := transform
@@ -458,9 +460,9 @@ export projectSexOffenders(dataset(SexOffender_Services.Layouts.t_OffenderRecord
   return project(in_ds, set_sex_off(left));
 end;
 
-  //****************************************************//
-  // Possible Other Occupants Transform Function        //
-  //****************************************************//
+	//****************************************************//
+	// Possible Other Occupants Transform Function				//
+	//****************************************************//
 export projectOtherOccupants(dataset(iesp.bpsreport.t_NeighborAddressSlim) in_ds) := function
   iesp.addressreport.t_AddrReportPossibleOccupants set_other_occupants(in_ds L) := transform
     self.Address := L.Address;
@@ -470,9 +472,9 @@ export projectOtherOccupants(dataset(iesp.bpsreport.t_NeighborAddressSlim) in_ds
   return project(in_ds, set_other_occupants(left));
 end;
 
-  //****************************************************//
-  // Possible Owner Transform Function                  //
-  //****************************************************//
+	//****************************************************//
+	// Possible Owner Transform Function									//
+	//****************************************************//
 export projectPossibleOwner(dataset(AddressReport_Services.Layouts.possible_owner_layout) in_ds) := function
   iesp.addressreport.t_AddrReportPossibleOwner set_owner(in_ds L) := transform
     self.Name := iesp.ECL2ESP.SetNameAndCompany(L.fname, L.mname, L.lname, L.name_suffix, L.title, '', L.company_name);

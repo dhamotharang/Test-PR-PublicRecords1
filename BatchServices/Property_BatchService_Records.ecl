@@ -40,7 +40,8 @@ EXPORT Property_BatchService_Records(DATASET(LN_PropertyV2_Services.layouts.batc
 																							dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
 																							integer8 inFFDOptionsMask = 0,
 																							dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile,
-																							Boolean isCNSMR = false) := 
+																							Boolean isCNSMR = false,
+																							boolean includeAssignmentsAndReleases=false) := 
 	MODULE
 
 		// Below Exports used by BatchServices.Property_BatchCommon
@@ -58,15 +59,12 @@ EXPORT Property_BatchService_Records(DATASET(LN_PropertyV2_Services.layouts.batc
 		// 3. Get autokeys based on batch input.
 		SHARED ak_batch_in := PROJECT(ds_batch_in,Autokey_batch.Layouts.rec_inBatchMaster);
 		
-		EXPORT ds_fids := Autokey_batch.get_fids(ak_batch_in, ak_keyname, ak_config_data);
-																			
+		EXPORT ds_fids := Autokey_batch.get_fids(ak_batch_in, ak_keyname, ak_config_data);	
 		// 4. Get autokey payloads (the real DIDs/BDIDs, record ids, and other goodies).		
 		AutokeyB2.mac_get_payload( UNGROUP(ds_fids), ak_keyname, ak_dataset, outpl, did, zero, ak_typeStr )
-
 		// 5. Slim the autokey payload (outpl) to just what's needed for matching (acctno and fid). 
 		// Then sort and dedup.
 		ds_fares_ids_by_autokey := DEDUP(SORT( PROJECT(outpl, BatchServices.Layouts.LN_Property.rec_acctnos_fids), acctno, ln_fares_id ), acctno, ln_fares_id);
-
 	/* ================ GET FARES IDS VIA THE LINKIDs key ================ */
 
 	
@@ -128,14 +126,13 @@ EXPORT Property_BatchService_Records(DATASET(LN_PropertyV2_Services.layouts.batc
     non_fcra_fares_ids0	:= DEDUP(SORT(( ds_ak_plus_hdr + ds_fares_ids_by_deed_apn + ds_fares_ids_by_assessor_apn + ds_fares_linkids), acctno, ln_fares_id),acctno, ln_fares_id);
 	  fcra_fares_ids0 := 	DEDUP(SORT(ds_fares_ids_via_did,acctno, ln_fares_id), acctno, ln_fares_id);
 	  ds_all_fares_ids0 := if (isFCRA,fcra_fares_ids0,non_fcra_fares_ids0);
-
-		// Add back in -- temporarily -- the fips_code from input.
+	  // Add back in -- temporarily -- the fips_code from input.
 		ds_all_fares_ids_plus_input_fips := JOIN(ds_all_fares_ids0,ds_batch_in,
 																										LEFT.acctno = RIGHT.acctno,
 																										TRANSFORM(BatchServices.Layouts.LN_Property.rec_acctnos_fids_plus_fips,
 																											SELF.fips_code := RIGHT.fips_code,
 																											SELF := LEFT));
-																											
+		
 		// Now, filter based on FIPS code match.
 		ds_deeds_filt_by_fips := JOIN(ds_all_fares_ids_plus_input_fips(ln_fares_id[2] in ['M','D']),LN_PropertyV2.key_deed_fid(isFCRA),
 																				 KEYED(RIGHT.ln_fares_id = LEFT.ln_fares_id) AND
@@ -166,7 +163,7 @@ EXPORT Property_BatchService_Records(DATASET(LN_PropertyV2_Services.layouts.batc
 		//at this step we need for FCRA to get all statemetIds disregarding input inFFDOptionsMask 1st bit 
 		// filtering of Dempsey hits if needed is addressed later in the code
 		FFDOptionsMask_adj := if(isFCRA,inFFDOptionsMask | FFD.Constants.ConsumerOptions.SHOW_CONSUMER_STATEMENTS, inFFDOptionsMask);
-		_ds_property_output := LN_PropertyV2_Services.resultFmt.widest_view.get_by_fid(ds_prep_fids_for_raw,,,nonss,isFCRA,slim_pc_recs,FFDOptionsMask_adj,ds_flags)(fid_type != '');
+		_ds_property_output := LN_PropertyV2_Services.resultFmt.widest_view.get_by_fid(ds_prep_fids_for_raw,,,nonss,isFCRA,slim_pc_recs,FFDOptionsMask_adj,ds_flags,includeAssignmentsAndReleases)(fid_type != '');
 
 		//Apply Party Type filter (return only parties requested by subscriber) and 
 		//tax data filter (return only records where assessment.standardized_land_use_code[1] is not misc. category of 0.

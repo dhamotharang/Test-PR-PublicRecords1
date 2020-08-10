@@ -68,9 +68,10 @@ EXPORT resultFmt := module
 			BOOLEAN skipPenaltyFilter = FALSE,
 			dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
 			integer8 inFFDOptionsMask = 0,
-			dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
+			dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile,
+			boolean includeBlackKnight = false
 		) := function
-			tmp := LN_PropertyV2_Services.fn_get_report(in_sids,skipPenaltyFilter,inMaxProperties,inTrimBySortBy,nonSS,isFCRA,slim_pc_recs,inFFDOptionsMask, ds_flags);
+			tmp := LN_PropertyV2_Services.fn_get_report(in_sids,skipPenaltyFilter,inMaxProperties,inTrimBySortBy,nonSS,isFCRA,slim_pc_recs,inFFDOptionsMask, ds_flags, includeBlackKnight);
 			xform(tmp, results, l_tmp, l_widest, l_assess_widest, l_deeds_widest);
 		  return results;
 		end;
@@ -84,9 +85,10 @@ EXPORT resultFmt := module
 			boolean isFCRA = false,
 			dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
 			integer8 inFFDOptionsMask = 0,
-			dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
+			dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile,
+			boolean includeBlackKnight = false
 			) := function
-		  return get_by_sid(LN_PropertyV2_Services.Raw.get_sids_from_fids(in_fids),inMaxProperties,inTrimBySortBy,nonSS,isFCRA,,slim_pc_recs,inFFDOptionsMask, ds_flags);
+		  return get_by_sid(LN_PropertyV2_Services.Raw.get_sids_from_fids(in_fids),inMaxProperties,inTrimBySortBy,nonSS,isFCRA,,slim_pc_recs,inFFDOptionsMask, ds_flags, includeBlackKnight);
 		end;
 		
 	  // ...using DID as the lookup mechanism
@@ -114,9 +116,10 @@ EXPORT resultFmt := module
 			boolean isFCRA = false,
 			dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
 			integer8 inFFDOptionsMask = 0,
-			dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
+			dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile,
+			boolean includeBlackKnight = false
 		) := function
-			tmp := LN_PropertyV2_Services.fn_get_report(in_sids,,inMaxProperties,inTrimBySortBy,nonSS,isFCRA,slim_pc_recs,inFFDOptionsMask,ds_flags);
+			tmp := LN_PropertyV2_Services.fn_get_report(in_sids,,inMaxProperties,inTrimBySortBy,nonSS,isFCRA,slim_pc_recs,inFFDOptionsMask,ds_flags, includeBlackKnight);
 			xform(tmp, results, l_tmp, l_wider, l_assess_wider, l_deeds_wider);
 		  return results;
 		end;
