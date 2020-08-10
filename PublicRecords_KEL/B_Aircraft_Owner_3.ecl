@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.3.0beta5
+//HPCC Systems KEL Compiler Version 1.3.0
 IMPORT KEL13 AS KEL;
 IMPORT CFG_Compile,E_Aircraft,E_Aircraft_Owner,E_Person,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL13.Null;
 EXPORT B_Aircraft_Owner_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Aircraft_Owner(__in,__cfg).__Result) __E_Aircraft_Owner := E_Aircraft_Owner(__in,__cfg).__Result;
-  SHARED __EE613850 := __E_Aircraft_Owner;
-  EXPORT __ST163444_Layout := RECORD
+  SHARED __EE642650 := __E_Aircraft_Owner;
+  EXPORT __ST171755_Layout := RECORD
     KEL.typ.ntyp(E_Aircraft().Typ) Plane_;
     KEL.typ.ntyp(E_Person().Typ) Owner_;
     KEL.typ.nint Registrant_Type_;
@@ -23,10 +23,10 @@ EXPORT B_Aircraft_Owner_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST163444_Layout __ND613862__Project(E_Aircraft_Owner(__in,__cfg).Layout __PP613788) := TRANSFORM
-    __CC10786 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('faa_build_version'))),__CN(__cfg.CurrentDate));
-    SELF.Date_First_Seen_Capped_ := IF(__T(__OP2(KEL.era.ToDate(__PP613788.Date_First_Seen_),>,__CC10786)),__ECAST(KEL.typ.nkdate,__CC10786),__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP613788.Date_First_Seen_)));
-    SELF := __PP613788;
+  SHARED __ST171755_Layout __ND642662__Project(E_Aircraft_Owner(__in,__cfg).Layout __PP642588) := TRANSFORM
+    __CC10182 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('faa_build_version'))),__CN(__cfg.CurrentDate));
+    SELF.Date_First_Seen_Capped_ := IF(__T(__OP2(KEL.era.ToDate(__PP642588.Date_First_Seen_),>,__CC10182)),__ECAST(KEL.typ.nkdate,__CC10182),__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP642588.Date_First_Seen_)));
+    SELF := __PP642588;
   END;
-  EXPORT __ENH_Aircraft_Owner_3 := PROJECT(__EE613850,__ND613862__Project(LEFT));
+  EXPORT __ENH_Aircraft_Owner_3 := PROJECT(__EE642650,__ND642662__Project(LEFT));
 END;
