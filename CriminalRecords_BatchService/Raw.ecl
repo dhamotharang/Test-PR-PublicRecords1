@@ -221,14 +221,15 @@ EXPORT Raw := MODULE
     //----------------------------------------------------------------------------------------------------------------
     recs2 := if(isFCRA, recs_ds, project(recs1,raw_rec));
 
-    recs_dup := dedup(sort(recs2, did, offender_key, -ssn, -lname, -fname, -mname, -prim_range, -predir, -prim_name, -addr_suffix, -postdir, -sec_range, -p_city_name, -st, -zip5),
-                      did, offender_key);
+    recs_dup := dedup(sort(recs2, acctno, did, offender_key, -ssn, -lname, -fname, -mname, -prim_range, 
+                           -predir, -prim_name, -addr_suffix, -postdir, -sec_range, -p_city_name, -st, -zip5),
+                      acctno, did, offender_key);
 
     CriminalRecords_BatchService.Layouts.batch_int makeOutputOffender(CriminalRecords_BatchService.Layouts.lookup_id L, raw_rec R) := TRANSFORM
       // SELF.did := if(L.did <> 0, L.did, (unsigned)R.did); //having this line changes the results as the alias records do not have DID or ssn_appended appended, so they don't get deduped later down the code
       SELF.did := (unsigned)R.did;
       SELF.output_type := 'O';
-      SELF.state_origin := Address.Map_State_Name_To_Abbrev(StringLib.StringToUpperCase(R.orig_state));
+      SELF.state_origin := Address.Map_State_Name_To_Abbrev(STD.Str.ToUpperCase(R.orig_state));
       SELF.offender_key := R.ofk;
       SELF.ssn  := R.ssn_appended;
       SELF.pty_typ := R.pty_typ;
@@ -459,8 +460,8 @@ EXPORT Raw := MODULE
                   ,cur_stat_inm,cur_loc_inm,cur_loc_sec,latest_adm_dt,act_rel_dt,ctl_rel_dt);
 
     recs_grp  := GROUP(SORT(recs_dup
-                        ,did,offender_key,punishment_type,-event_dt,-latest_adm_dt)
-                        ,did,offender_key) ;
+                        ,acctno,did,offender_key,punishment_type,-event_dt,-latest_adm_dt)
+                        ,acctno,did,offender_key) ;
 
     recs_final :=  ROLLUP(recs_grp,group,CriminalRecords_BatchService.Transforms.makePunishmentOutput(LEFT,ROWS(LEFT)));
 
