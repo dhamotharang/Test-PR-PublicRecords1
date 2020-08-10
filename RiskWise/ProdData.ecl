@@ -798,7 +798,7 @@ if(include_all_files=true or include_CFPB=true, output(withCFPB_BLKGRP_attr_over
 //
 
 // BDID section
-	bus_best_recs := choosen(Business_Header.Key_BH_Best(keyed(bdid=in_bdid and in_bdid!=0)),max_recs);
+	bus_best_recs := choosen(Business_Header.Key_BH_Best(keyed(bdid=in_bdid and in_bdid!=0) AND doxie.compliance.isBusHeaderSourceAllowed(source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask)),max_recs);
 	if(in_bdid!=0 and (include_all_files=true or include_business_header=true), output(bus_best_recs, named('business_best')) );
 
 	bus_header_recs := choosen(Business_Header_SS.Key_BH_BDID_pl(keyed(bdid=in_bdid and in_bdid!=0) and doxie.compliance.source_ok(mod_access.glb, mod_access.DataRestrictionMask, source, dt_first_seen) AND doxie.compliance.isBusHeaderSourceAllowed(source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask)),max_recs);

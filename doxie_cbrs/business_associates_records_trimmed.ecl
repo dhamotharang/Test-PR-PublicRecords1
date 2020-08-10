@@ -1,9 +1,10 @@
-EXPORT business_associates_records_trimmed(DATASET(doxie_cbrs.layout_references) bdids) :=
+IMPORT doxie, doxie_cbrs;
+EXPORT business_associates_records_trimmed(DATASET(doxie_cbrs.layout_references) bdids, doxie.IDataAccess mod_access) := 
 MODULE
 
 doxie_cbrs.mac_Selection_Declare()
 
-bus_assoc := doxie_cbrs.business_associates_records(bdids)(Include_BusinessAssociates_val);
+bus_assoc := doxie_cbrs.business_associates_records(bdids, mod_access)(Include_BusinessAssociates_val);
 
 ba_rec := RECORD
   UNSIGNED6 bdid := 0; // Seisint Business Identifier

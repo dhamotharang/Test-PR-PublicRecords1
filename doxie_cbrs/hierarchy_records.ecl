@@ -1,5 +1,7 @@
-IMPORT business_header,doxie;
-doxie.mac_header_field_Declare()
+IMPORT doxie, AutoStandardI;
+
+gm := AutoStandardI.GlobalModule();
+mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(gm);
 d := doxie_cbrs.dca_hierarchy_prs;
 i := doxie_cbrs.infousa_hierarchy_prs;
 
@@ -16,7 +18,7 @@ besrec := RECORD
 END;
 
 //get best info
-doxie_cbrs.mac_best_records(inf, bes, besrec, TRUE)
+doxie_cbrs.mac_best_records(inf, bes, mod_access, besrec, TRUE)
 s := SORT(bes, level);
 
 //patch name

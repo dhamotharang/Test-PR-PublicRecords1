@@ -1,5 +1,5 @@
-EXPORT mac_best_records(inbdids, outfile, outrec = 'doxie_cbrs.Layout_BH_Best_String',outerjoin = 'FALSE') := MACRO
-IMPORT doxie,drivers,ut,Business_HEader,MDR;
+EXPORT mac_best_records(inbdids, outfile, mod_access, outrec = 'doxie_cbrs.Layout_BH_Best_String',outerjoin = 'FALSE') := MACRO
+IMPORT doxie, Business_Header;
 //doxie.mac_header_field_Declare()
 
 #uniquename(bhbf)
@@ -17,17 +17,12 @@ outrec %tra%(inbdids l, %bhbf% r) := TRANSFORM
 END;
 
 outfile := JOIN(inbdids, %bhbf%,
-  KEYED(LEFT.bdid = RIGHT.bdid) AND
-  (NOT MDR.sourceTools.SourceIsEBR(RIGHT.source) OR NOT doxie.DataRestriction.EBR) AND
-  (RIGHT.dppa_state = '' OR (dppa_ok AND drivers.state_dppa_ok(RIGHT.dppa_state,dppa_purpose,,RIGHT.source))) AND
-  (RIGHT.source <> MDR.sourceTools.src_Dunn_Bradstreet OR Doxie.DataPermission.use_DNB),
-  %tra%(LEFT, RIGHT),
-  #IF(outerjoin)
-  LEFT OUTER,
-  #END
-  KEEP (1), LIMIT (0)
-  );
-
-
-      
+                      KEYED(LEFT.bdid = RIGHT.bdid) AND
+                      doxie.compliance.isBusHeaderSourceAllowed(RIGHT.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask) AND
+                      (RIGHT.dppa_state = '' or (mod_access.isValidDPPA() AND mod_access.isValidDPPAState(RIGHT.dppa_state, , RIGHT.source))),
+                      %knowx_tra%(LEFT, RIGHT)
+                      #IF(outerjoin)				
+                         ,LEFT OUTER
+                      #END
+                     );      
 ENDMACRO;

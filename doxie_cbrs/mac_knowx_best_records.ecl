@@ -1,5 +1,5 @@
-EXPORT mac_knowx_best_records(inbdids, knowx_outfile, outrec = 'doxie_cbrs.Layout_BH_Best_String',outerjoin = 'FALSE') := MACRO
-IMPORT doxie,drivers,ut,Business_HEader,MDR;
+EXPORT mac_knowx_best_records(inbdids, knowx_outfile, mod_access, outrec = 'doxie_cbrs.Layout_BH_Best_String',outerjoin = 'FALSE') := MACRO
+IMPORT doxie,drivers,ut,Business_Header,MDR;
 //doxie.mac_header_field_Declare()
 
 #uniquename(knowxbf)
@@ -17,15 +17,13 @@ outrec %knowx_tra%(inbdids l, %knowxbf% r) := TRANSFORM
 END;
 
 knowx_outfile := JOIN(inbdids, %knowxbf%,
-  KEYED(LEFT.bdid = RIGHT.bdid) AND
-  (NOT MDR.sourceTools.SourceIsEBR(RIGHT.source) OR NOT doxie.DataRestriction.EBR) AND
-  (RIGHT.dppa_state = '' OR (dppa_ok AND drivers.state_dppa_ok(RIGHT.dppa_state,dppa_purpose,,RIGHT.source))) AND
-  (RIGHT.source <> MDR.sourceTools.src_Dunn_Bradstreet OR Doxie.DataPermission.use_DNB),
-  %knowx_tra%(LEFT, RIGHT)
-  #IF(outerjoin)
-  ,LEFT OUTER
-  #END
-  );
-
+                      KEYED(LEFT.bdid = RIGHT.bdid) AND
+                      doxie.compliance.isBusHeaderSourceAllowed(RIGHT.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask) AND
+                      (RIGHT.dppa_state = '' or (mod_access.isValidDPPA() AND mod_access.isValidDPPAState(RIGHT.dppa_state, , RIGHT.source))),
+                      %knowx_tra%(LEFT, RIGHT)
+                      #IF(outerjoin)				
+                         ,LEFT OUTER
+                      #END
+                     );
     
 ENDMACRO;

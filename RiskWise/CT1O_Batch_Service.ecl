@@ -12,7 +12,7 @@
 */
 /*--INFO-- This service makes ct02, ct03 and ct50 available via batch */
 
-import risk_indicators,AutoStandardI, gateway;
+import risk_indicators,AutoStandardI, gateway, RiskWise, STD;
 
 export CT1O_Batch_Service := MACRO
 
@@ -24,19 +24,20 @@ export CT1O_Batch_Service := MACRO
 string4 tribcode_value := '' : stored('tribcode');
 batchin := dataset([],riskwise.Layout_CT1O_BatchIn) : stored('batch_in', few);
 gateways_in := Gateway.Configuration.Get();
-unsigned1 DPPA_Purpose := RiskWise.permittedUse.fraudDPPA : stored('DPPAPurpose');
-unsigned1 GLB_Purpose := RiskWise.permittedUse.fraudGLBA : stored('GLBPurpose');
 unsigned3 history_date := 999999 : stored('HistoryDateYYYYMM');
 boolean isUtility := false;
-boolean ln_branded := false;
 boolean ofac_only := true;
 boolean suppressNearDups := true;
 boolean require2Ele := true;
-string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
-appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
 
+mod_access := MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+	EXPORT unsigned1 glb := RiskWise.permittedUse.fraudGLBA : stored('GLBPurpose');
+	EXPORT unsigned1 dppa := RiskWise.permittedUse.fraudDPPA : stored('DPPAPurpose');
+	EXPORT string DataRestrictionMask := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
+	EXPORT boolean ln_branded := false;
+END;  
 
-tribcode := StringLib.StringToLowerCase(tribcode_value);
+tribcode := STD.Str.ToLowerCase(tribcode_value);
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
@@ -59,7 +60,7 @@ end;
 
 indata := project(batchin, prep(left, counter));
 
-almost_final := riskwise.CT1O_Function(indata, gateways, dppa_purpose, glb_purpose, isUtility, ln_branded, DataRestriction, appType);
+almost_final := riskwise.CT1O_Function(indata, gateways, mod_access, isUtility);
 final := project(almost_final, RiskWise.Layout_CT1O);
 output(final, named('Results'));
 

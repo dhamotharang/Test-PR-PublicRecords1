@@ -1,8 +1,8 @@
-IMPORT doxie_cbrs, business_header, MDR, Doxie;
+IMPORT doxie_cbrs, business_header, Doxie;
 
 doxie_cbrs.mac_Selection_Declare()
 
-EXPORT business_associates_records(DATASET(doxie_cbrs.layout_references) bdids) := FUNCTION
+EXPORT business_associates_records(DATASET(doxie_cbrs.layout_references) bdids, doxie.IDataAccess mod_access) := FUNCTION
 
 bhrl := doxie_cbrs.layout_relatives;
 
@@ -80,10 +80,10 @@ TYPEOF(dedup_rel_gid) SelectBest(dedup_rel_gid l, bhkb r) := TRANSFORM
 END;
 
 relatives_best_ps := JOIN(dedup_rel_gid, bhkb,
-  KEYED(LEFT.bdid = RIGHT.bdid) AND
-  (RIGHT.source <> MDR.sourceTools.src_Dunn_Bradstreet OR Doxie.DataPermission.use_DNB),
-  SelectBest(LEFT, RIGHT),
-  KEEP(1), LIMIT(0));
+                       KEYED(LEFT.bdid = RIGHT.bdid) AND 
+                       doxie.compliance.isBusHeaderSourceAllowed(RIGHT.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
+                       SelectBest(LEFT, RIGHT),
+                       KEEP(1), LIMIT(0));
 
                    
 RETURN CHOOSEN(SORT(relatives_best_ps,company_name),Max_BusinessAssociates_val);

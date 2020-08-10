@@ -327,7 +327,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
     ));
 
   //Old business header
-  business_recs_old := dedup(project(Location_Services.business_records(bus_input),transform(
+  business_recs_old := dedup(project(Location_Services.business_records(bus_input, mod_access),transform(
                                           AddressReport_Services.layouts.layout_Business_out,
                                           self.zip:=(string) left.zip,
                                           self.zip4:=(string) left.zip4,

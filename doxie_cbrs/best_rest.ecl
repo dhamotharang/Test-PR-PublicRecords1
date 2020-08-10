@@ -1,8 +1,8 @@
-IMPORT Business_Header,doxie_cbrs_raw;
+IMPORT doxie_cbrs, doxie_cbrs_raw;
 doxie_cbrs.mac_Selection_Declare()
 
 EXPORT best_rest(DATASET(doxie_cbrs.layout_references) bdids) := FUNCTION
-
+mod_access := Doxie.compliance.GetGlobalDataAccessModule();
 srcrec := RECORD
   BOOLEAN isRel := FALSE;
   BOOLEAN isOAA := FALSE;
@@ -49,7 +49,7 @@ END;
 wsource2 := PROJECT(bycbdids, markem2(LEFT));
 
 wsource := DEDUP(SORT(wsource1 & wsourcenmv & wsource2, bdid, isByC), bdid); //this drops the ByC where already
-doxie_cbrs.mac_best_records(wsource, best_info, srcrec)
+doxie_cbrs.mac_best_records(wsource, best_info, mod_access, srcrec)
 
 RETURN best_info;
 END;
