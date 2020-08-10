@@ -140,8 +140,9 @@ UNSIGNED2 MaxNumSpouse := 0 : STORED('MaxNumSpouse');
 UNSIGNED2 MaxNumSubject := 0 : STORED('MaxNumSubject');
 UNSIGNED2 MaxNumNeighbor := 0 : STORED('MaxNumNeighbor');
 BOOLEAN RunRelocation	:= FALSE :STORED('RunRelocation');
-// CommonScore is using the latest and greatest Phone Shell and model (currently v2.1)
-boolean UseCommonScore := FALSE : STORED('UseCommonScore');
+// CommonScore is using the latest and greatest Phone Shell and model (currently v3.0)
+// only chosen KTRs (e.g. Lifelock) are set up to send FALSE here for now (until we are certain it will perform well on 3.0)
+boolean UseCommonScore := TRUE : STORED('UseCommonScore');
 
 // Options for phone_shell WFP V8
 STRING25 scoreModel := '' : STORED('Phone_Score_Model'); //COLLECTIONSCORE_V3 for new score model.
@@ -160,7 +161,7 @@ f_in_raw := PROJECT(f_in_raw_unfixed,
 
 // To temporarily ease performance concerns for very large batch jobs (e.g. Lifelock) we need to force
 // this service (progressive_phone_batch_service) to run Phone Shell V1 while still allowing all other
-// Phone Shell services/products to go to Phone Shell V2 by default. 
+// Phone Shell services/products to go to the latest Phone Shell (currently 3.0) by default. 
 // So for now we need to hijack the scoreModel we are	sending to progressive_phone_common below
 // while still allowing the original scoreModel value to continue on its normal use
 // Expect original scoreModel to already use 18 chars so we only have about 7 chars max to work with

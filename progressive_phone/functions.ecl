@@ -687,8 +687,8 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
 
     // For now, since progressive_phone_batch_service still needs to use Phone Shell V1, need to check that and
     // retain old logic/models for them. Everyone else gets the latest product-available Phone Shell model (currently v3.0)
-    model_results := if(PhoneShellVersion = 10,
-                        if(version = v_enum.CP_V3, // these are the models for Phone Shell v1.0, use the old score threshold too
+    model_results := IF(PhoneShellVersion = 10,
+                        IF(version = v_enum.CP_V3, // these are the models for Phone Shell v1.0, use the old score threshold too
                            Phone_Shell.PhoneScore_cp3_v3(phones_with_attrs, 217),  //v_enum.CP_V3
                            Phone_Shell.PhoneScore_wf8_v3(phones_with_attrs, 217)), //v_enum.WFP_V8
                         Phone_Shell.PhoneModel_v30_1(phones_with_attrs) // new combined model for Phone Shell v3.0+ , uses common/default score threshold
