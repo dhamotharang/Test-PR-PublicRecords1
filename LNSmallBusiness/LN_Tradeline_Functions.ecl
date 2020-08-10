@@ -1,5 +1,8 @@
 ﻿import $, AutoKeyI, iesp, BIPV2, BusinessCredit_Services, Cortera_Tradeline, Std, ut;
 
+// Note - currently only single inputs (ie records with only 1 uniqueid value) are supported
+// most functions support multiple uniqueid values, but some future work is still required to fully 
+// support inputs with multiple uniqueid values
 export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := module
 
   shared current_date := Std.Date.Today();
@@ -54,7 +57,7 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
 
   // sort within each account with most recent recs on top
   shared tradelineRecsSorted_tmp := sort(tradelineRecsEx, uniqueid, account_key, _age_days);
-  acct_recs := dedup(tradelineRecsSorted_tmp, uniqueid, account_key);
+  shared acct_recs := dedup(tradelineRecsSorted_tmp, uniqueid, account_key);
 
   // stores info for each unique account including the segment and the mapped account_id value
   shared acct_info := project(acct_recs, 
@@ -415,15 +418,21 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
     pmt24_recs := compose_payment_summary(0, 24);
 
     seg_recs := compose_segment_summary(daysLimitedRecs(active_age_days));
-    acct_recs := compose_account_summary(tradelineRecsSorted, active_age_days);
+    acct_d_recs := compose_account_summary(tradelineRecsSorted, active_age_days);
 
+    // used to get the most recent trade date in any account
+    recent_trade_recs := sort(acct_recs, _age_days);
+
+    // note that the uniqueid in the inputs is not supported in this function, 
+    // therefore the first uniqueid is implicity used for the results
     iesp.smallbusinessbipcombinedreport.t_B2BTradeData trans() := transform
+      self.RecentTradeDate := iesp.ECL2ESP.toDatestring8(recent_trade_recs[1].ar_date);
       self.TradeSummary := sum_recs[1];
       self.CurrentPaymentSummary := cur_pmt_recs[1];
       self.PaymentSummary := pmt_recs[1];
       self.Payment24MonthHistory := pmt24_recs[1];
       self.IndustrySegments := choosen(seg_recs, iesp.Constants.TOPBUSINESS.MAX_COUNT_BIZRPT_CTL_SEGMENTS);
-      self.AccountDetails := choosen(acct_recs, iesp.Constants.TOPBUSINESS.MAX_COUNT_BIZRPT_CTL_ACCTS);
+      self.AccountDetails := choosen(acct_d_recs, iesp.Constants.TOPBUSINESS.MAX_COUNT_BIZRPT_CTL_ACCTS);
       self.StatusCode := '0';     // StatusCode 0 indicates successful data hit
       self := [];
     end;

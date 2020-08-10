@@ -167,6 +167,8 @@ FUNCTION
 
   iesp.smallbusinessbipcombinedreport.t_B2BTradeData getB2BTradeData:= 
   TRANSFORM
+    // temp pending test seed update
+    SELF.RecentTradeDate := ROW([], iesp.share.t_Date);
     SELF.TradeSummary := ds_tradeSummary;
     SELF.CurrentPaymentSummary := ds_corteraCurPmtSummary;
     SELF.PaymentSummary := ds_corteraPmtSummaryEx;
@@ -179,6 +181,7 @@ FUNCTION
 
   iesp.smallbusinessbipcombinedreport.t_B2BTradeData getBlankTradesData:= 
   TRANSFORM
+    SELF.RecentTradeDate := ROW([], iesp.share.t_Date);
     SELF.TradeSummary := ROW([],iesp.businesscreditreport.t_BusinessCreditTradeSummary);
     SELF.CurrentPaymentSummary := ROW([],iesp.businesscreditreport.t_BusinessCreditPaymentSummary);
     SELF.PaymentSummary := ROW([],iesp.smallbusinessbipcombinedreport.t_DatedPaymentSummaryEx);
