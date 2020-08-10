@@ -155,7 +155,7 @@ EXPORT MidexReportService  :=
 			EXPORT BOOLEAN	 IncludeCorporateAffiliations 		 := ReportOptions.IncludeCorporateAffiliations;
 			EXPORT BOOLEAN	 IncludeNoticeOfDefault 					 := ReportOptions.IncludeNoticeOfDefault;
 			EXPORT BOOLEAN	 IncludeForeclosures 							 := ReportOptions.IncludeForeclosures;
-      EXPORT BOOLEAN   TrackAddress                      := AlertOptions.TrackAddress;
+			   EXPORT BOOLEAN   TrackAddress                      := AlertOptions.TrackAddress;
 			EXPORT BOOLEAN   TrackBankruptcy                   := AlertOptions.TrackBankruptcy;
       EXPORT BOOLEAN   TrackCriminal                     := AlertOptions.TrackCriminal;
 			EXPORT BOOLEAN   TrackDisciplinary                 := AlertOptions.TrackNMLSDisciplinary;
@@ -197,10 +197,11 @@ EXPORT MidexReportService  :=
 			EXPORT STRING25  SOSHash													 := AlertHashes.SecretaryOfStateFiling.HashValue;
 			EXPORT DATASET 	 LinkIds													 := bip_ds;
 			EXPORT STRING1	 BusinessReportFetchLevel 				 := trim(STD.STR.ToUpperCase(BusinessReportFetchLevel),left,right);
+			EXPORT boolean   includeVendorSourceB          := ReportOptions.IncludeVendorSourceB;
     END;
   
   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
-   
+  
   // *** call service records
   ds_results := Midex_Services.MidexReport_Records(tempmod, mod_access);
   

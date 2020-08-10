@@ -1,4 +1,4 @@
-import Suppress;
+﻿import Suppress;
 
 l_out := LN_PropertyV2_Services.layouts.out_wider;
 export dataset(l_out) Embed_records(
@@ -7,14 +7,15 @@ export dataset(l_out) Embed_records(
 	dataset(layouts.search_bdid)	in_bdids	= dataset([], layouts.search_bdid),
 	unsigned inMaxProperties = 0,
 	dataset(LN_PropertyV2_Services.layouts.parties.pparty) parties = 	dataset([],LN_PropertyV2_Services.layouts.parties.pparty),
-	boolean isPeopleWise=false
+	boolean isPeopleWise=false,
+	boolean includeBlackKnight=false
 ) := function
 
 // determine records to display
 ids := SearchService_ids(isAssetReport,,in_dids,in_bdids);
 
 // retrieve results
-results := LN_PropertyV2_Services.resultFmt.wider_view.get_by_sid(ids,inMaxProperties,TRUE);
+results := LN_PropertyV2_Services.resultFmt.wider_view.get_by_sid(ids,inMaxProperties,TRUE,,,,,, includeBlackKnight);
 app_type := IF (isPeopleWise, Suppress.Constants.ApplicationTypes.PeopleWise, '');
 Suppress.MAC_Suppress(results,suppress_fares_id,app_type,,,Suppress.Constants.DocTypes.FaresID,ln_fares_id);
 

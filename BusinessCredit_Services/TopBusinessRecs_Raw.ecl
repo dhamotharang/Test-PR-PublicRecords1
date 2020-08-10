@@ -72,7 +72,7 @@ EXPORT TopBusinessRecs_Raw(BusinessCredit_Services.Iparam.reportrecords inmod ,
   
   self.Address.StreetAddress1 := street_addr;
   self.Address.StateCityZip   := csz;
-	self.OtherCompanyNames      := project(r, transform(iesp.TopBusinessReport.t_TopBusinessBestOtherCompany, self := left));
+	self.OtherCompanyNames      := choosen(project(r, transform(iesp.TopBusinessReport.t_TopBusinessBestOtherCompany, self := left)), iesp.Constants.TOPBUSINESS.MAX_COUNT_BIZRPT_OTHER_COMPANIES);
 	self                        := l;
 	
 	end;
@@ -105,7 +105,7 @@ EXPORT TopBusinessRecs_Raw(BusinessCredit_Services.Iparam.reportrecords inmod ,
                                                           iesp.Constants.BusinessCredit.MAX_COUNT_BIZRPT_SRCDOC_RECORDS);
 
 	add_aircraft := TopBusiness_Services.AircraftSection.fn_fullView(	PROJECT(in_topbusiness_ds, TopBusiness_Services.aircraftSection_Layouts.rec_Input),
-																																		PROJECT(DATASET(in_options),TopBusiness_Services.AircraftSection_Layouts.rec_OptionsLayout)[1],
+																																		PROJECT(DATASET(in_options),TopBusiness_Services.layouts.rec_input_options)[1],
 																																		in_topbusiness_mod,
                                                                     iesp.Constants.BusinessCredit.MAX_COUNT_BIZRPT_SRCDOC_RECORDS);
 																																	
@@ -176,7 +176,7 @@ EXPORT TopBusinessRecs_Raw(BusinessCredit_Services.Iparam.reportrecords inmod ,
   ds_incorporation_sorted := DATASET([xfm_createCorpFilings()]);
   
 	add_parent :=	TopBusiness_Services.ParentSection.fn_fullView( PROJECT(in_topbusiness_ds, TopBusiness_Services.ParentSection_Layouts.rec_Input),
-																																PROJECT(DATASET(in_options),TopBusiness_Services.ParentSection_Layouts.rec_OptionsLayout)[1],
+																																PROJECT(DATASET(in_options),TopBusiness_Services.layouts.rec_input_options)[1],
 																																in_topbusiness_mod,
 																																ds_busHeaderRecs,
                                                                 iesp.Constants.BusinessCredit.MAX_COUNT_BIZRPT_SRCDOC_RECORDS);

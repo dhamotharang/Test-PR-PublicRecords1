@@ -3,6 +3,7 @@
 export SearchService_IDs := module
 	export params := interface(AutoKey_IDs.params, TopBusiness_Services.iParam.BIDParams)
 		export string70 foreclosure_id := '';
+		export string45 parcel_num := '';
 		export boolean noDeepDive := false;
 		export unsigned2 MAX_DEEP_DIDS := 100;
 		export unsigned2 MAX_DEEP_BDIDS := 100;
@@ -29,6 +30,9 @@ export SearchService_IDs := module
 		
 		by_ForeclosureId := if(in_mod.foreclosure_id != '',Foreclosure_services.Raw.byforeclosureid(foreclosure_id,isNodSearch,true));
 		
+		apn_in := dataset([{in_mod.parcel_num}],Layouts.Layout_apn);
+		by_apn := if(in_mod.parcel_num != '',Foreclosure_services.Raw.byApn(apn_in, isNodSearch, true));
+		
 		// lookup by DID
 		dids := dataset([{(unsigned)in_mod.DID}],doxie.layout_references);
 		by_did := if((unsigned)in_mod.DID > 0,Foreclosure_services.Raw.byDIDs(dids,isNodSearch));
@@ -48,6 +52,7 @@ export SearchService_IDs := module
 			(unsigned)in_mod.DID <> 0 => by_did,
 			(unsigned)in_mod.BDID <> 0 => by_bdid,
 	 		 exists(by_bids) => by_bids,
+			 in_mod.parcel_num <> '' => by_apn,
 			 by_auto + 
 			  project(by_deep_dids + by_deep_bdids,
 						  transform(Foreclosure_services.Layouts.FIDNumberPlus,

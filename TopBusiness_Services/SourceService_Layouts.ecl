@@ -1,4 +1,4 @@
-import iesp;
+﻿import iesp;
 
 export SourceService_Layouts := module
 
@@ -11,6 +11,7 @@ export SourceService_Layouts := module
 		string32  app_type;
 		string6 	ssn_mask;
 		string1		fetch_level;
+    boolean   IncludeVendorSourceB;
 	end;
 	
 	export OutputLayout := record

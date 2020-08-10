@@ -43,6 +43,7 @@
 	<part name="IncludeSourceCounts" type="xsd:boolean"/>
 	<part name="IncludeCriminalIndicators" type="xsd:boolean"/>
 	<part name="LnBranded" type="xsd:boolean"/>
+ <part name="IncludeVendorSourceB" type="xsd:boolean"/>
 	<part name="BusinessReportFetchLevel" type="xsd:string"/>
 	<part name="TopBusinessReportRequest" type="tns:XmlDataSet" cols="80" rows="30"/>
 </message>
@@ -113,7 +114,7 @@ export BusinessReportComprehensive() := macro
 	#stored('IncludeCriminalIndicators',report_options.IncludeCriminalIndicators);
      #stored('IncludeBizToBizDelinquencyRiskIndicator', report_options.IncludeBizToBizDelinquencyRiskIndicator);
 	#stored('LnBranded',user_options.LnBranded);
-	
+	#stored('IncludeVendorSourceB',report_options.IncludeVendorSourceB);	
   #WEBSERVICE(FIELDS('ULTID',
 	                    'ORGID',
 											'SELEID',
@@ -153,6 +154,7 @@ export BusinessReportComprehensive() := macro
 											'IncludeCriminalIndicators',
                                                           'IncludeBizToBizDelinquencyRiskIndicator',
 											'LnBranded',
+											'IncludeVendorSourceB',
 											'DataRestrictionMask',
 											'DataPermissionMask',
 											'DPPAPurpose',
@@ -191,6 +193,7 @@ export BusinessReportComprehensive() := macro
       boolean BusinessInsight 		:= false : stored('IncludeBusinessInsight');     
      boolean IncludeBizToBizDelinquencyRI := false : stored('IncludeBizToBizDelinquencyRiskIndicator');
 	boolean lnbranded 						:= false : stored('LnBranded');
+	boolean includeVendorSourceB 						:= false : stored('IncludeVendorSourceB');
 	// set DEFAULT for query level report fetches to be at the SELEID = S level.
 	string1 BusinessReportFetchLevel := 'S' : stored('BusinessReportFetchLevel');
 	  
@@ -227,6 +230,7 @@ export BusinessReportComprehensive() := macro
 		self.IncludeCriminalIndicators			:= CriminalIndicators;
            self.IncludeBizToBizDelinquencyRiskIndicator      :=  IncludeBizToBizDelinquencyRI;
 		self.lnbranded 											:= lnbranded;
+		self.IncludeVendorSourceB           := includeVendorSourceB;
 		self.internal_testing 							:= false ; //internal_testing;
 		self.BusinessReportFetchLevel 			:= topbusiness_services.functions.fn_fetchLevel(trim(std.str.ToUpperCase(BusinessReportFetchLevel),left,right)[1]);    
 		self := [];
@@ -262,11 +266,10 @@ export BusinessReportComprehensive() := macro
 		export boolean 		includeMinors 			:= false;
 	end;
 
-	// Get report
-	tmpresults := TopBusiness_Services.Guts.getReport(ds,options,tempmod);   
-    // scoutLogInfo := tmpresults[1].businessInsightSection;   
-     // output(scoutLogInfo, named('ScoutLogInfo'));  // tmp output for QA testing will remove later.               
-    tmp2 := project(tmpresults, transform(iesp.TopBusinessReport.t_topBusinessReportRecord,
+ // Get report
+	tmpresults := TopBusiness_Services.Guts.getReport(ds,options,tempmod);
+
+  tmp2 := project(tmpresults, transform(iesp.TopBusinessReport.t_topBusinessReportRecord,
 	                             self := left, self := []));
 
 	iesp.topbusinessReport.t_TopBusinessReportResponse format() := transform
