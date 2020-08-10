@@ -2926,6 +2926,9 @@ EXPORT BIP_Layouts := MODULE
 		STRING3	SBFEPrincipalAccountCount;
 		STRING3	SBFEPrincipalMinCount;
 		STRING3	SBFEPrincipalMaxCount;
+		STRING3 SBFEDelq91CountEverTtl; 
+		STRING3 SBFEDelq121CountEverTtl;
+		STRING3 SBFEDelq121CountTtl;
 	END;
 	
 	EXPORT BatchScoreData := RECORD

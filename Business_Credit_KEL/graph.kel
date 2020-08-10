@@ -1,4 +1,4 @@
-#OPTION(configmod)
+﻿#OPTION(configmod)
 #OPTION(persist, 0) 
  
 //IMPORT Business_Credit_KEL.entities; 
@@ -4044,6 +4044,16 @@ Business: => Sbfedelinquentcountever := MAP(BusinessNotOnFile => NOT_ON_FILE,
 Business: => Sbfedelq61counteverttl := MAP(BusinessNotOnFile => NOT_ON_FILE,
 															 ALL(BusinessAccount.acc, WorstEver = UNKNOWN_DATA) => UNKNOWN_DATA,
 															 COUNT(BusinessAccount.acc(WorstEver = 4)));
+                               
+//Introducing two new attributes Sbfedelq91counteverttl & Sbfedelq121counteverttl - these are used just for Insurance
+Business: => Sbfedelq91counteverttl := MAP(BusinessNotOnFile => NOT_ON_FILE,
+															 ALL(BusinessAccount.acc, WorstEver = UNKNOWN_DATA) => UNKNOWN_DATA,
+															 COUNT(BusinessAccount.acc(WorstEver = 5)));
+                               
+Business: => Sbfedelq121counteverttl := MAP(BusinessNotOnFile => NOT_ON_FILE,
+															 ALL(BusinessAccount.acc, WorstEver = UNKNOWN_DATA) => UNKNOWN_DATA,
+															 COUNT(BusinessAccount.acc(WorstEver = 6)));
+                               
 
 
 Business: => Sbfedelinquentcountloan := MAP(BusinessNotOnFile => NOT_ON_FILE,
@@ -4333,16 +4343,21 @@ Business: => Sbfedelq61revcountttlchargeoff := MAP(BusinessNotOnFile => NOT_ON_F
 															 NOT EXISTS(BusinessAccount.acc(IsRevolvingAccount AND (IsOpen OR IsChargeoff))) => NO_DATA_AVAILABLE,
 															 ALL(BusinessAccount.acc(IsRevolvingAccount AND IsOpen), CurrentPaymentStatus=UNKNOWN_DATA) AND NOT EXISTS(BusinessAccount.acc(IsRevolvingAccount AND IsChargeoff)) => UNKNOWN_DATA,
 															 COUNT(BusinessAccount.acc(IsRevolvingAccount AND ((IsOpen AND CurrentPaymentStatus >= 4) OR IsChargeoff))));
-															 
+												 
 Business: => Sbfedelq91countttl := MAP(BusinessNotOnFile => NOT_ON_FILE,
 															 Sbfeopenallcount = 0 => NO_DATA_AVAILABLE,
 															 ALL(BusinessAccount.acc(IsOpen), CurrentPaymentStatus=UNKNOWN_DATA) => UNKNOWN_DATA,
 															 COUNT(BusinessAccount.acc(IsOpen AND CurrentPaymentStatus = 5)));
+                               
+//Introducting one new attribute - used just for Insurance
+Business: => Sbfedelq121countttl := MAP(BusinessNotOnFile => NOT_ON_FILE,
+															 Sbfeopenallcount = 0 => NO_DATA_AVAILABLE,
+															 ALL(BusinessAccount.acc(IsOpen), CurrentPaymentStatus=UNKNOWN_DATA) => UNKNOWN_DATA,
+															 COUNT(BusinessAccount.acc(IsOpen AND CurrentPaymentStatus = 6)));                         
 Business: => Sbfedelq91countttlchargeoff := MAP(BusinessNotOnFile => NOT_ON_FILE,
 															 NOT EXISTS(BusinessAccount.acc(IsOpen OR IsChargeoff)) => NO_DATA_AVAILABLE,
 															 ALL(BusinessAccount.acc(IsOpen), CurrentPaymentStatus=UNKNOWN_DATA) AND NOT EXISTS(BusinessAccount.acc(IsChargeoff)) => UNKNOWN_DATA,
 															 COUNT(BusinessAccount.acc((IsOpen AND CurrentPaymentStatus >= 5) OR IsChargeoff)));
-
 Business: => Sbfedpd91count := MAP(BusinessNotOnFile => NOT_ON_FILE,
 															 Sbfeopenallcount = 0 => NO_DATA_AVAILABLE,
 															 ALL(BusinessAccount.acc(IsOpen), CurrentPaymentStatus=UNKNOWN_DATA) => UNKNOWN_DATA,
@@ -9343,6 +9358,8 @@ QUERY: SBFE_Shell <= Business{UID,
 															Sbfedelinquentcount84,
 															Sbfedelinquentcountever,
 															Sbfedelq61counteverttl,
+                              Sbfedelq91counteverttl, 
+                              Sbfedelq121counteverttl, 
 															Sbfedelinquentcountloan,
 															Sbfedelq61loancount03m,
 															Sbfedelinquentcountloan06,
@@ -9414,6 +9431,7 @@ QUERY: SBFE_Shell <= Business{UID,
 															Sbfedelq61revcountttl,
 															Sbfedelq61revcountttlchargeoff,
 															Sbfedelq91countttl,
+                              Sbfedelq121countttl, 
 															Sbfedelq91countttlchargeoff,
 															Sbfedpd91count,
 															Sbfedelq91count03m,
@@ -10345,7 +10363,6 @@ QUERY: SBFE_Shell <= Business{UID,
 															Sbfeprincipalmincount,
 															Sbfeprincipalmaxcount
 															};
-
 
 QUERY: Dump <= Business;
 													 
