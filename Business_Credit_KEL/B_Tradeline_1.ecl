@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 0.8.2
-IMPORT KEL08a AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
+IMPORT KEL12 AS KEL;
 IMPORT B_Tradeline_2,CFG_graph FROM Business_Credit_KEL;
-IMPORT * FROM KEL08a.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT B_Tradeline_1(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __cfg = CFG_graph) := MODULE
   SHARED VIRTUAL TYPEOF(B_Tradeline_2(__in,__cfg).__ENH_Tradeline_2) __ENH_Tradeline_2 := B_Tradeline_2(__in,__cfg).__ENH_Tradeline_2;
-  SHARED __EE1778270 := __ENH_Tradeline_2;
-  EXPORT __ST1777922_Layout := RECORD
+  SHARED __EE2432607 := __ENH_Tradeline_2;
+  EXPORT __ST255623_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nkdate _load__date_;
     KEL.typ.nstr _sbfe__contributor__number_;
@@ -152,9 +152,9 @@ EXPORT B_Tradeline_1(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph
     KEL.typ.nint _acc_;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST1777922_Layout __ND1779006__Project(B_Tradeline_2(__in,__cfg).__ST532730_Layout __PP1778273) := TRANSFORM
-    SELF.Utilization_Percent_ := __OP2(__OP2(__PP1778273.Cycle_Balance_,/,__PP1778273._current__credit__limit_),*,__CN(100));
-    SELF := __PP1778273;
+  SHARED __ST255623_Layout __ND2432756__Project(B_Tradeline_2(__in,__cfg).__ST254668_Layout __PP2431875) := TRANSFORM
+    SELF.Utilization_Percent_ := __OP2(__OP2(__PP2431875.Cycle_Balance_,/,__PP2431875._current__credit__limit_),*,__CN(100));
+    SELF := __PP2431875;
   END;
-  EXPORT __ENH_Tradeline_1 := PROJECT(__EE1778270,__ND1779006__Project(LEFT));
+  EXPORT __ENH_Tradeline_1 := PROJECT(__EE2432607,__ND2432756__Project(LEFT));
 END;

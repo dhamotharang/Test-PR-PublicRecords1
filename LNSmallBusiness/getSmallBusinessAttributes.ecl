@@ -2752,6 +2752,9 @@ EXPORT getSmallBusinessAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusSh
 		SELF.SBFEPrincipalAccountCount := attr.SBFEPrincipalAccountCount;
 		SELF.SBFEPrincipalMinCount := attr.SBFEPrincipalMinCount;
 		SELF.SBFEPrincipalMaxCount := attr.SBFEPrincipalMaxCount;
+		SELF.SBFEDelq91CountEverTtl := attr.SBFEDelq91CountEverTtl;
+		SELF.SBFEDelq121CountEverTtl := attr.SBFEDelq121CountEverTtl;
+		SELF.SBFEDelq121CountTtl := attr.SBFEDelq121CountTtl;
 		SELF := le;
 		SELF := [];
 	END;

@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 0.8.2
-IMPORT KEL08a AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
+IMPORT KEL12 AS KEL;
 IMPORT B_Tradeline_5,CFG_graph FROM Business_Credit_KEL;
-IMPORT * FROM KEL08a.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT B_Tradeline_4(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __cfg = CFG_graph) := MODULE
   SHARED VIRTUAL TYPEOF(B_Tradeline_5(__in,__cfg).__ENH_Tradeline_5) __ENH_Tradeline_5 := B_Tradeline_5(__in,__cfg).__ENH_Tradeline_5;
-  SHARED __EE242059 := __ENH_Tradeline_5;
-  EXPORT __ST241821_Layout := RECORD
+  SHARED __EE381791 := __ENH_Tradeline_5;
+  EXPORT __ST237317_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nkdate _load__date_;
     KEL.typ.nstr _sbfe__contributor__number_;
@@ -119,21 +119,21 @@ EXPORT B_Tradeline_4(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph
     KEL.typ.nbool Shows_Closed_Account_;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST241821_Layout __ND242717__Project(B_Tradeline_5(__in,__cfg).__ST203178_Layout __PP242062) := TRANSFORM
+  SHARED __ST237317_Layout __ND381907__Project(B_Tradeline_5(__in,__cfg).__ST238465_Layout __PP381137) := TRANSFORM
     SELF.Current_Date_Month_ := KEL.Routines.DateFromParts(KEL.Routines.Year(__cfg.CurrentDate),KEL.Routines.Month(__cfg.CurrentDate),1);
-    SELF.Cycle_End_Month_Date_ := __FN3(KEL.Routines.DateFromParts,__FN1(KEL.Routines.Year,__PP242062._cycle__end__date_),__FN1(KEL.Routines.Month,__PP242062._cycle__end__date_),__CN(1));
-    SELF.Is12_Months_Ago_ := __AND(__OP2(__FN2(KEL.Routines.MonthsBetween,__PP242062._cycle__end__date_,__CN(__cfg.CurrentDate)),IN,__CN([10,11,12])),__CN(NOT (__PP242062.Account_Closed_)));
-    SELF.Is24_Months_Ago_ := __AND(__OP2(__FN2(KEL.Routines.MonthsBetween,__PP242062._cycle__end__date_,__CN(__cfg.CurrentDate)),IN,__CN([22,23,24])),__CN(NOT (__PP242062.Account_Closed_)));
-    SELF.Past_Due_Amount_Bucket1_ := IF(__T(__NT(__PP242062._past__due__aging__amount__bucket__1_)),__CN(0),__FN1(ABS,__PP242062._past__due__aging__amount__bucket__1_));
-    SELF.Past_Due_Amount_Bucket2_ := IF(__T(__NT(__PP242062._past__due__aging__amount__bucket__2_)),__CN(0),__FN1(ABS,__PP242062._past__due__aging__amount__bucket__2_));
-    SELF.Past_Due_Amount_Bucket3_ := IF(__T(__NT(__PP242062._past__due__aging__amount__bucket__3_)),__CN(0),__FN1(ABS,__PP242062._past__due__aging__amount__bucket__3_));
-    SELF.Past_Due_Amount_Bucket4_ := IF(__T(__NT(__PP242062._past__due__aging__amount__bucket__4_)),__CN(0),__FN1(ABS,__PP242062._past__due__aging__amount__bucket__4_));
-    SELF.Past_Due_Amount_Bucket5_ := IF(__T(__NT(__PP242062._past__due__aging__amount__bucket__5_)),__CN(0),__FN1(ABS,__PP242062._past__due__aging__amount__bucket__5_));
-    SELF.Past_Due_Amount_Bucket6_ := IF(__T(__NT(__PP242062._past__due__aging__amount__bucket__6_)),__CN(0),__FN1(ABS,__PP242062._past__due__aging__amount__bucket__6_));
-    SELF.Past_Due_Amount_Bucket7_ := IF(__T(__NT(__PP242062._past__due__aging__amount__bucket__7_)),__CN(0),__FN1(ABS,__PP242062._past__due__aging__amount__bucket__7_));
-    __CC324 := -97;
-    SELF.Payment_Status_ := MAP(__T(__PP242062.Is_Chargeoff_)=>9,__T(__AND(__NT(__PP242062._payment__status__category_),__OP2(__PP242062.Past_Due_Amount_,>,__CN(0))))=>__PP242062.Past_Due_Amount_Status_,__T(__AND(__NT(__PP242062._payment__status__category_),__OP2(__PP242062.Past_Due_Amount_,=,__CN(0))))=>0,__T(__OP2(__PP242062._payment__status__category_,=,__CN('000')))=>0,__T(__OP2(__PP242062._payment__status__category_,=,__CN('001')))=>2,__T(__OP2(__PP242062._payment__status__category_,=,__CN('002')))=>3,__T(__OP2(__PP242062._payment__status__category_,=,__CN('003')))=>4,__T(__OP2(__PP242062._payment__status__category_,=,__CN('004')))=>5,__T(__OP2(__PP242062._payment__status__category_,=,__CN('005')))=>6,__T(__OP2(__PP242062._payment__status__category_,=,__CN('006')))=>7,__T(__OP2(__PP242062._payment__status__category_,=,__CN('007')))=>8,__CC324);
-    SELF := __PP242062;
+    SELF.Cycle_End_Month_Date_ := __FN3(KEL.Routines.DateFromParts,__FN1(KEL.Routines.Year,__PP381137._cycle__end__date_),__FN1(KEL.Routines.Month,__PP381137._cycle__end__date_),__CN(1));
+    SELF.Is12_Months_Ago_ := __AND(__OP2(__FN2(KEL.Routines.MonthsBetween,__PP381137._cycle__end__date_,__CN(__cfg.CurrentDate)),IN,__CN([10,11,12])),__CN(NOT (__PP381137.Account_Closed_)));
+    SELF.Is24_Months_Ago_ := __AND(__OP2(__FN2(KEL.Routines.MonthsBetween,__PP381137._cycle__end__date_,__CN(__cfg.CurrentDate)),IN,__CN([22,23,24])),__CN(NOT (__PP381137.Account_Closed_)));
+    SELF.Past_Due_Amount_Bucket1_ := IF(__T(__NT(__PP381137._past__due__aging__amount__bucket__1_)),__ECAST(KEL.typ.nint,__CN(0)),__ECAST(KEL.typ.nint,__FN1(ABS,__PP381137._past__due__aging__amount__bucket__1_)));
+    SELF.Past_Due_Amount_Bucket2_ := IF(__T(__NT(__PP381137._past__due__aging__amount__bucket__2_)),__ECAST(KEL.typ.nint,__CN(0)),__ECAST(KEL.typ.nint,__FN1(ABS,__PP381137._past__due__aging__amount__bucket__2_)));
+    SELF.Past_Due_Amount_Bucket3_ := IF(__T(__NT(__PP381137._past__due__aging__amount__bucket__3_)),__ECAST(KEL.typ.nint,__CN(0)),__ECAST(KEL.typ.nint,__FN1(ABS,__PP381137._past__due__aging__amount__bucket__3_)));
+    SELF.Past_Due_Amount_Bucket4_ := IF(__T(__NT(__PP381137._past__due__aging__amount__bucket__4_)),__ECAST(KEL.typ.nint,__CN(0)),__ECAST(KEL.typ.nint,__FN1(ABS,__PP381137._past__due__aging__amount__bucket__4_)));
+    SELF.Past_Due_Amount_Bucket5_ := IF(__T(__NT(__PP381137._past__due__aging__amount__bucket__5_)),__ECAST(KEL.typ.nint,__CN(0)),__ECAST(KEL.typ.nint,__FN1(ABS,__PP381137._past__due__aging__amount__bucket__5_)));
+    SELF.Past_Due_Amount_Bucket6_ := IF(__T(__NT(__PP381137._past__due__aging__amount__bucket__6_)),__ECAST(KEL.typ.nint,__CN(0)),__ECAST(KEL.typ.nint,__FN1(ABS,__PP381137._past__due__aging__amount__bucket__6_)));
+    SELF.Past_Due_Amount_Bucket7_ := IF(__T(__NT(__PP381137._past__due__aging__amount__bucket__7_)),__ECAST(KEL.typ.nint,__CN(0)),__ECAST(KEL.typ.nint,__FN1(ABS,__PP381137._past__due__aging__amount__bucket__7_)));
+    __CC333 := -97;
+    SELF.Payment_Status_ := MAP(__T(__PP381137.Is_Chargeoff_)=>9,__T(__AND(__NT(__PP381137._payment__status__category_),__OP2(__PP381137.Past_Due_Amount_,>,__CN(0))))=>__PP381137.Past_Due_Amount_Status_,__T(__AND(__NT(__PP381137._payment__status__category_),__OP2(__PP381137.Past_Due_Amount_,=,__CN(0))))=>0,__T(__OP2(__PP381137._payment__status__category_,=,__CN('000')))=>0,__T(__OP2(__PP381137._payment__status__category_,=,__CN('001')))=>2,__T(__OP2(__PP381137._payment__status__category_,=,__CN('002')))=>3,__T(__OP2(__PP381137._payment__status__category_,=,__CN('003')))=>4,__T(__OP2(__PP381137._payment__status__category_,=,__CN('004')))=>5,__T(__OP2(__PP381137._payment__status__category_,=,__CN('005')))=>6,__T(__OP2(__PP381137._payment__status__category_,=,__CN('006')))=>7,__T(__OP2(__PP381137._payment__status__category_,=,__CN('007')))=>8,__CC333);
+    SELF := __PP381137;
   END;
-  EXPORT __ENH_Tradeline_4 := PROJECT(__EE242059,__ND242717__Project(LEFT));
+  EXPORT __ENH_Tradeline_4 := PROJECT(__EE381791,__ND381907__Project(LEFT));
 END;
