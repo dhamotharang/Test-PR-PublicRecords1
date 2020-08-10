@@ -3,8 +3,8 @@ gateway,riskprocessing,_control,Autokey_batch,DriversV2_Services;
 
 EXPORT fSOAPAppend(boolean	UpdatePii   = _Flags.Update.Pii)	:= MODULE
 
-	Shared nodes				:= 50;//The data to be distributed on 50 nodes before sending to soapcall. 
-	Shared threads			:= 2;
+	Shared nodes				:= 150;//The data to be distributed on 150 nodes before sending to soapcall. 
+	Shared threads			:= 1;
 
 	//PII Input Process Begin
 
@@ -970,7 +970,7 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
    END;
    p_f := PROJECT (ds_input, assignAccount (LEFT,COUNTER));
    s := BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
-                                                  bs_service, roxieIP, parallel_calls);
+                                                  bs_service, roxieIP, parallel_calls,nodes);
 																									
 
 		riskprocessing.layouts.layout_internal_shell getold(s le, l ri) :=	TRANSFORM
@@ -987,7 +987,7 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 	 Base_Map := Join(Shell_Out,Pii_Input,left.record_id=right.record_id
 											,Transform(recordof(left),self.fdn_file_info_id:=right.fdn_file_info_id,self:=left));
 	 
-	 Export All := dedup(Base_Map,all);
+	 Export All := If(UpdatePii, dedup((Base_Map + BocaShell_Base),all) , dedup(Base_Map,all));
    END;
 
 END;
