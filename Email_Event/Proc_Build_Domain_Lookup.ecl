@@ -1,4 +1,4 @@
-﻿IMPORT Email_DataV2, dx_Email, STD, PromoteSupers, RoxieKeyBuild, MDR,dops, Orbit3;
+﻿IMPORT Email_DataV2, dx_Email, STD, PromoteSupers, RoxieKeyBuild, MDR,dops, Orbit3,ut;
 
 EXPORT Proc_Build_Domain_Lookup(STRING version) := FUNCTION
 	
@@ -47,7 +47,9 @@ EXPORT Proc_Build_Domain_Lookup(STRING version) := FUNCTION
 
 	dops_update :=  DOPS.updateversion('EmailDataV2EventKeys',version,'xia.sheng@lexisNexis.com',,'N');
 
-	orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem ('Email Data V2 Events',version,'N');
+	orbit_update := if(ut.Weekday((integer)version) <> 'SATURDAY' and ut.Weekday((integer)version) <> 'SUNDAY',
+	                                                                                           Orbit3.proc_Orbit3_CreateBuild_AddItem ('Email Data V2 Events',version,'N')
+																		,output('No Orbit Entries Needed for weekend builds'));																												 
 
 	RETURN SEQUENTIAL(
 	                  Email_Event.Map_BV_Delta_Domain_Lookup(version)
