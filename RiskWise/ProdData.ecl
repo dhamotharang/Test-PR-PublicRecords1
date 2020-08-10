@@ -804,10 +804,20 @@ if(include_all_files=true or include_CFPB=true, output(withCFPB_BLKGRP_attr_over
 	bus_header_recs := choosen(Business_Header_SS.Key_BH_BDID_pl(keyed(bdid=in_bdid and in_bdid!=0) and doxie.compliance.source_ok(mod_access.glb, mod_access.DataRestrictionMask, source, dt_first_seen) AND doxie.compliance.isBusHeaderSourceAllowed(source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask)),max_recs);
 	if(in_bdid!=0 and (include_all_files=true or include_business_header=true), output(bus_header_recs, named('business_header')) );
 
-	bdid_table_recs := choosen(Business_Risk.key_bdid_table(keyed(bdid=in_bdid) and in_bdid!=0),max_recs);
+	bdid_table_recs := choosen( PROJECT( Business_Risk.key_bdid_table(keyed(bdid=in_bdid) and in_bdid!=0), 
+                                                     TRANSFORM(RECORDOF(Business_Risk.key_bdid_table),
+                                                     SELF.cnt_d := IF(mod_access.use_DnB(), LEFT.cnt_d, 0),
+                                                     SELF.dnb_emps := IF(mod_access.use_DnB(), LEFT.dnb_emps, 0),
+                                                     SELF.dt_first_seen_D := IF(mod_access.use_DnB(), LEFT.dt_first_seen_D, 0) ,
+                                                     SELF.dt_last_seen_D  := IF(mod_access.use_DnB(), LEFT.dt_last_seen_D, 0) ,
+                                                     SELF:=LEFT) ),max_recs);
 	if(in_bdid!=0 and (include_all_files=true or include_business_header=true), output(bdid_table_recs, named('bdid_table')) );
 
-	bdid_risk_table_recs := choosen(business_risk.key_BDID_risk_table(keyed(bdid=in_bdid) and in_bdid!=0),max_recs);
+	bdid_risk_table_recs := choosen( PROJECT( business_risk.key_BDID_risk_table(keyed(bdid=in_bdid) and in_bdid!=0), 
+                                                   TRANSFORM(RECORDOF(Business_Risk.key_BDID_risk_table),
+                                                   SELF.currdnb := IF(mod_access.use_DnB(), LEFT.currdnb, 0 ),
+                                                   SELF.dnb_flag := IF(mod_access.use_DnB(), LEFT.dnb_flag, 0),
+                                                   SELF:=LEFT )),max_recs);
 	if(in_bdid!=0 and (include_all_files=true or include_business_header=true), output(bdid_risk_table_recs, named('bdid_risk_table')) );
 
 	dl_number_data := DriversV2.Key_DL_Number(keyed(s_dl=in_DL_number));
