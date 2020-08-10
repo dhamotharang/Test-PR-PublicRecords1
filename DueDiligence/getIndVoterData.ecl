@@ -11,8 +11,8 @@ EXPORT getIndVoterData(inquiredInternal, inquiredAndParentHeaderData) := FUNCTIO
     //determine if there was a voter source for the individual or inquired's parent
     voterSources := inquiredAndParentHeaderData(src = MDR.sourceTools.src_Voters_v2);
 
-    sortVoterSources := SORT(voterSources, seq, did);
-    dedupVoterSources := DEDUP(sortVoterSources, seq, did);
+    sortVoterSources := SORT(voterSources, seq, inquiredDID, did, indvType);
+    dedupVoterSources := DEDUP(sortVoterSources, inquiredDID, seq, did, indvType);
 
     projectVoterSources := PROJECT(dedupVoterSources, TRANSFORM({RECORDOF(LEFT), BOOLEAN inquiredVoterSource, BOOLEAN parentVoterSource},
                                                                 SELF.inquiredVoterSource := LEFT.indvType = DueDiligence.Constants.INQUIRED_INDIVIDUAL;
@@ -58,15 +58,13 @@ EXPORT getIndVoterData(inquiredInternal, inquiredAndParentHeaderData) := FUNCTIO
                         
 
 
+    // output(inquiredInternal, named('inquiredInternal_voter'));
     // output(voterSources, named('voterSources'));
     // output(dedupVoterSources, named('dedupVoterSources'));
 
     // output(projectVoterSources, named('projectVoterSources'));
     // output(rollVoterSources, named('rollVoterSources'));
     // output(addRegVoter, named('addRegVoter'));
-
-    // output(parentRegVoters, named('parentRegVoters'));
-    // output(addParentRegVoter, named('addParentRegVoter'));
 
     // output(addIndStateVoter, named('addIndStateVoter'));
                               

@@ -267,7 +267,8 @@ EXPORT SmallBusiness_Function(
                                                                                            TransactionID := TransactionID, 
                                                                                            BatchUID := BatchUID, 
                                                                                            GlobalCompanyID := GlobalCompanyID,
-                                                                                           DataPermission := DataPermission);
+                                                                                           DataPermission := DataPermission,
+																																													 DataRestriction := DataRestriction);
 
 	model := case( model_name,
 		'rvs811_0' => Models.RVS811_0_0( clam, bshell ),

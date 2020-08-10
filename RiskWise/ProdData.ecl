@@ -62,6 +62,7 @@
 	<part name="IncludeDeathDID" type="xsd:boolean"/>
 	<part name="IncludeVehicles" type="xsd:boolean"/>
 	<part name="IncludeCFPB" type="xsd:boolean"/>
+  <part name="CompanyID" type="xsd:string"/>
  </message>
 */
 
@@ -137,7 +138,8 @@ export ProdData := MACRO
 		'IncludeMari',
 		'IncludeDeathDID',
 		'IncludeVehicles',
-		'IncludeCFPB'
+		'IncludeCFPB',
+    'CompanyID'
 		));
 
 unsigned6 in_did := 0 	  : stored('did');
@@ -157,6 +159,7 @@ string in_dob := '' 			: stored('dob');
 string in_apn := '' 				 : stored('apn');
 STRING20 in_DL_number := ''  : stored('DLNumber');
 string45 in_ip_value := '' 	 : stored('ipaddr');
+string in_CompanyID := '' 		: stored('CompanyID');
 
 // can't have duplicate definitions for the Stored value DataRestrictionMask,
 // so we need workaround to check if datarestriction stored is the global default
@@ -218,6 +221,7 @@ mod_access := MODULE(Doxie.IDataAccess)
 	EXPORT glb := ^.GLB;
     EXPORT dppa := ^.DPPA;
 	EXPORT DataRestrictionMask := DataRestriction;
+	EXPORT DataPermissionMask := AutoStandardI.GlobalModule().DataPermissionMask;
 END;
 
 
@@ -760,7 +764,7 @@ if(include_all_files=true or include_CFPB=true, output(withCFPB_BLKGRP_attr_over
 
 	utiliRecsByAddr := JOIN(indata, UtilFile.Key_Address,
 					left.z5!='' and left.prim_name != '' and
-					ut.PermissionTools.glb.ok( glb) and
+					mod_access.isValidGLB() and
 					keyed (left.prim_name=right.prim_name) and keyed(left.st=right.st) and
 					keyed(left.z5=right.zip) and keyed(left.prim_range=right.prim_range) and keyed(left.sec_range=right.sec_range) and
 					// addr type = 'S' means that this is the service address
@@ -777,7 +781,8 @@ if(include_all_files=true or include_CFPB=true, output(withCFPB_BLKGRP_attr_over
 					keyed((unsigned)left.z5=right.zip) and
 					keyed(left.prim_range=right.prim_range) and
 					keyed (left.prim_name=right.prim_name) and
-					keyed(left.sec_range=right.sec_range),
+					keyed(left.sec_range=right.sec_range) AND 
+					doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 
 					transform(recordof(Business_Risk.Key_Business_Header_Address), self := right),
 				   ATMOST(riskwise.max_atmost), keep(100));
@@ -796,7 +801,7 @@ if(include_all_files=true or include_CFPB=true, output(withCFPB_BLKGRP_attr_over
 	bus_best_recs := choosen(Business_Header.Key_BH_Best(keyed(bdid=in_bdid and in_bdid!=0)),max_recs);
 	if(in_bdid!=0 and (include_all_files=true or include_business_header=true), output(bus_best_recs, named('business_best')) );
 
-	bus_header_recs := choosen(Business_Header_SS.Key_BH_BDID_pl(keyed(bdid=in_bdid and in_bdid!=0) and ut.PermissionTools.glb.SrcOk(glb, source, dt_first_seen)),max_recs);
+	bus_header_recs := choosen(Business_Header_SS.Key_BH_BDID_pl(keyed(bdid=in_bdid and in_bdid!=0) and doxie.compliance.source_ok(mod_access.glb, mod_access.DataRestrictionMask, source, dt_first_seen) AND doxie.compliance.isBusHeaderSourceAllowed(source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask)),max_recs);
 	if(in_bdid!=0 and (include_all_files=true or include_business_header=true), output(bus_header_recs, named('business_header')) );
 
 	bdid_table_recs := choosen(Business_Risk.key_bdid_table(keyed(bdid=in_bdid) and in_bdid!=0),max_recs);
@@ -860,6 +865,7 @@ vehicles_party := JOIN(vehicle_ids, VehicleV2.Key_Vehicle_Party_Key,
 						self := right;
 						), atmost(riskwise.max_atmost), keep(max_recs));
 
-if(searchdid!=0 and (include_all_files=true or include_vehicles=true), output(vehicles_party, named('vehicles_party')) );
-
+company_opt_out := choosen(inquiry_acclogs.key_lookup_company_optout(keyed(Company_ID = (UNSIGNED)in_CompanyID)), max_recs);
+if(in_CompanyID != '', OUTPUT(company_opt_out, NAMED('Company_Opt_out')));
+   
 ENDMACRO;

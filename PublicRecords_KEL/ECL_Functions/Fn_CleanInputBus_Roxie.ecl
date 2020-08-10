@@ -12,8 +12,8 @@ EXPORT Fn_CleanInputBus_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.L
 				cleaned_phone10   := PublicRecords_KEL.ECL_Functions.Fn_Clean_Phone(le.B_InpPhone);
 				cleaned_TIN       := PublicRecords_KEL.ECL_Functions.Fn_Clean_SSN(le.B_InpTIN, IsTIN := TRUE);
 				cleaned_archivedate := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(le.B_InpArchDt, 
-																																						PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_YEAR_RANGE_LOW_ARCHIVEDATE, 
-																																						PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_YEAR_RANGE_HIGH_ARCHIVEDATE,
+																																						PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_DATE_RANGE_LOW_ARCHIVEDATE, 
+																																						PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_DATE_RANGE_HIGH_ARCHIVEDATE,
 																																						SetDefault := TRUE /*if no date was input, set to current date/time*/)[1];
 
 				// Input Echo perserved

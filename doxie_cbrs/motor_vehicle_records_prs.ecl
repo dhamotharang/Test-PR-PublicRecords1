@@ -1,11 +1,13 @@
-import doxie, doxie_raw, ut, doxie_ln, suppress;
+﻿IMPORT doxie, doxie_cbrs, doxie_raw, suppress;
 
 doxie_cbrs.mac_Selection_Declare()
 
-export motor_vehicle_records_prs(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
+EXPORT motor_vehicle_records_prs(DATASET(doxie_cbrs.layout_references) bdids,
+                                 doxie.IDataAccess mod_access
+                                ) := FUNCTION
 
 //***** Get our target address
-br := doxie_cbrs.best_records_prs_target(bdids)(Include_MotorVehicles_val and doxie_cbrs.stored_ShowPersonalData_value);
+br := doxie_cbrs.best_records_prs_target(bdids,mod_access)(Include_MotorVehicles_val AND doxie_cbrs.stored_ShowPersonalData_value);
 
 doxie_raw.Layout_VehRawBatchInput.out_layout tra(br l) := transform
 	self.input.seq := 1;

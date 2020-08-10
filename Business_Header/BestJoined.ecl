@@ -1,9 +1,9 @@
-IMPORT ut;
+﻿IMPORT Business_Header,ut;
 
-export BestJoined(
+EXPORT BestJoined(
 
-	 dataset(business_header.Layout_Business_Header_Base) bh_base					= Files().Base.Business_Headers.Built
-	,string																								pPersistUnique	= ''
+  DATASET(Business_Header.Layout_Business_Header_Base) bh_base	= Business_Header.Files().Base.Business_Headers.Built
+  ,STRING pPersistUnique	= ''
 
 ) := FUNCTION
 
@@ -11,11 +11,11 @@ bh_d_bdid := DISTRIBUTE(bh_base, HASH(bdid));
 
 lbhb := Business_Header.Layout_BH_Best;
 
-lbhb tobestlayout(bh_d_bdid l) := transform
-self := l;
+lbhb tobestlayout(bh_d_bdid l) := TRANSFORM
+SELF := l;
 SELF.DPPA_State := if(L.dppa, L.vendor_id[1..2], '');
-end;
-bh_best := dedup(sort(project(bh_d_bdid,tobestlayout(left)),bdid,local),bdid,local);
+END;
+bh_best := DEDUP(SORT(PROJECT(bh_d_bdid,tobestlayout(LEFT)),bdid,LOCAL),bdid,LOCAL);
 //bh_best := TABLE(bh_d_bdid, lbhb, bdid, LOCAL);
 
 bestcompanyname_local := BestCompanyName(bh_base) : persist(_dataset().thor_cluster_Persists + 'persist::Business_Header::BestJoined::BestCompanyName' + pPersistUnique);
@@ -75,9 +75,9 @@ END;
 
 // This join stalls without the seemingly unnecessary distribute.
 bh_best_cn_a_p_f := JOIN(	
-					DISTRIBUTE(bh_best_cn_a_p, HASH(bdid)), bestfein_local,
+					DISTRIBUTE(bh_best_cn_a_p, HASH(bdid)), DISTRIBUTE(bestfein_local, HASH(bdid)),
 					LEFT.bdid = RIGHT.bdid,
-					JoinFEIN(LEFT, RIGHT), LEFT OUTER, HASH);
+					JoinFEIN(LEFT, RIGHT), LEFT OUTER, HASH, LOCAL);
 
 return bh_best_cn_a_p_f;
 end;

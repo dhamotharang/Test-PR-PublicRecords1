@@ -1,4 +1,4 @@
-﻿﻿Import Models, STD, Address, risk_indicators, riskwise, ut;
+Import Models, STD, Address, risk_indicators, riskwise, ut;
 Import Models.Healthcare_SocioEconomic_Functions_Core;
 Import Models.Healthcare_SocioEconomic_Ref_Data;
 Import Models.Healthcare_Constants_RT_Service;
@@ -62,7 +62,8 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 
 	//Modeled after HC Profile Search
 	EXPORT Models.Layouts_Healthcare_RT_Service.transactionLog SocioTransactionLog(iesp.healthcare_socio_indicators.t_SocioeconomicIndicatorsRequest L, Boolean isAttributesRequested, Boolean isReadmissionRequested, Boolean isMedicationAdherenceRequested, Boolean isMotivationRequested, Boolean isTotalCostRiskScoreRequested, 
-																				 	Boolean isAttributesSubscribed, Boolean isReadmissionSubscribed, Boolean isMedicationAdherenceSubscribed, Boolean isMotivationSubscribed, Boolean isTotalCostRiskScoreSubscribed ) := TRANSFORM
+																				 	Boolean isAttributesSubscribed, Boolean isReadmissionSubscribed, Boolean isMedicationAdherenceSubscribed, Boolean isMotivationSubscribed, Boolean isTotalCostRiskScoreSubscribed ,
+																					String	DPPAPurpose_in, String GLBPurpose_in, String DMFPurpose_in, String FCRAPurpose_in) := TRANSFORM
 		SELF.transaction_id	:= L.AccountContext.Common.TransactionID;
 		SELF.billing_code	:= L.User.BillingCode;
 		SELF.gc_id	:= (integer) L.AccountContext.Common.GlobalCompanyId;
@@ -102,6 +103,7 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
  		subscription_options_bit_4 := IF(isMotivationSubscribed, '1', '0');
  		subscription_options_bit_5 := IF(isTotalCostRiskScoreSubscribed, '1', '0');
 		SELF.i_provider_id := subscription_options_bit_1 + subscription_options_bit_2 + subscription_options_bit_3 + subscription_options_bit_4 + subscription_options_bit_5; // Reusing the i_provider_id field to log subscription options to the database.
+		SELF.i_bus_city := 'DPPA:'+DPPAPurpose_in+',GLB:'+GLBPurpose_in+',DMF:'+DMFPurpose_in+',FCRA:'+FCRAPurpose_in; // Reusing the i_bus_city field to log permissible purpose inputs to the database.
 		SELF := [];	
 	END; // Transaction Log TRANSFORM
 
@@ -785,6 +787,7 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 		SSN_Cln := Cleaned_Member_Input.SSN_Cln;
 		Admit_date_cln := Cleaned_Member_Input.Admit_date_cln;
 		isMinor:= IF(Cleaned_Member_Input.Age<18,TRUE,FALSE);
+		isAge115:= IF(Cleaned_Member_Input.Age>=116,TRUE,FALSE);
 
 		Met_MinInput_Condition_1 := IF(SSN_Cln<>_blank AND MemberGender_Cln<>_blank AND DOB_Cln<>_blank AND ST_Cln<>_blank,TRUE, FALSE);
 		//Met_MinInput_Condition_1;
@@ -812,22 +815,39 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 		Minor_Rej_Row := IF(COUNT(Condition_1_2_Reject_DS(code<>0)) < 1 AND isMinor, ROW({_blank, Models.Healthcare_Constants_RT_Service.Minor_Rej_Code, _blank, Models.Healthcare_Constants_RT_Service.Minor_Rej_Message}, iesp.share.t_WsException), _EmptyExceptionDSRow);
 		Minor_Rej_DS := EmptyExceptionDS + Minor_Rej_Row;
 		Output_Condition_1_2_Minor_Reject_DS := Output_Condition_1_2_Reject_DS + Minor_Rej_DS;
-		return Output_Condition_1_2_Minor_Reject_DS(code<>0);
+		Age115_Rej_Row := IF(COUNT(Condition_1_2_Reject_DS(code<>0)) < 1 AND isAge115, ROW({_blank, Models.Healthcare_Constants_RT_Service.Age115_Rej_Code, _blank, Models.Healthcare_Constants_RT_Service.Age115_Rej_Message}, iesp.share.t_WsException), _EmptyExceptionDSRow);
+		Age115_Rej_DS := EmptyExceptionDS + Age115_Rej_Row;
+		Output_Condition_1_2_Minor_Age115_Reject_DS := Output_Condition_1_2_Minor_Reject_DS + Age115_Rej_DS;		
+
+		return Output_Condition_1_2_Minor_Age115_Reject_DS(code<>0);
 	ENDMACRO;
 
-	Export BuildPermissiblePurposeErrorsDS(GLBPurpose_in, GLBPurpose_usage_string, DPPAPurpose_in) := FUNCTIONMACRO
+	Export BuildPermissiblePurposeErrorsDS(GLBPurpose_in, GLBPurpose_usage_string, DMFPurpose_in, FCRAPurpose_in,DPPAPurpose_in, allowAltPermissiblePurpose) := FUNCTIONMACRO
 		EmptyExceptionDS1 := DATASET([], iesp.share.t_WsException);
 		_EmptyExceptionDSRow1 := ROW({_blank, 0, _blank, _blank}, iesp.share.t_WsException);
 
 		GLBRequiredFailRow := IF(GLBPurpose_in = 0, ROW({_blank, Models.Healthcare_Constants_RT_Service.InvalidInput_Code, _blank, Models.Healthcare_Constants_RT_Service.GLBRequiredFail_Message}, iesp.share.t_WsException), _EmptyExceptionDSRow1);
 
 		RiskControl := (UNSIGNED) IF(GLBPurpose_usage_string[13..14] = Models.Healthcare_Constants_RT_Service.usage_GLB_Value, Models.Healthcare_Constants_RT_Service.authorized_GLBA, 0);
+		TransactionsAuthorizedByConsumer := (UNSIGNED) IF(GLBPurpose_usage_string[1..2] = Models.Healthcare_Constants_RT_Service.transactionsAuthorizedByConsumer_GLB_Value, Models.Healthcare_Constants_RT_Service.transactionsAuthorizedByConsumer_GLBA, 0);
 		// Exception#5
-		GLBInvalidFailRow := IF( (GLBPurpose_in<>0) AND (GLBPurpose_in <> RiskControl), ROW({_blank, Models.Healthcare_Constants_RT_Service.InvalidInput_Code, _blank, Models.Healthcare_Constants_RT_Service.GLBInvalidFail_Message}, iesp.share.t_WsException), _EmptyExceptionDSRow1);
+		GLBInvalidFailRow := IF( 
+			(
+			allowAltPermissiblePurpose = FALSE AND (GLBPurpose_in<>0) AND (GLBPurpose_in <> RiskControl)
+			)
+			OR
+			(
+			allowAltPermissiblePurpose = TRUE AND (GLBPurpose_in <> TransactionsAuthorizedByConsumer)
+			)
+			, ROW({_blank, Models.Healthcare_Constants_RT_Service.InvalidInput_Code, _blank, Models.Healthcare_Constants_RT_Service.GLBInvalidFail_Message}, iesp.share.t_WsException)
+			, _EmptyExceptionDSRow1);
 
 		DPPAInvalidFailRow := IF(DPPAPurpose_in <> 0, ROW({_blank, Models.Healthcare_Constants_RT_Service.InvalidInput_Code, _blank, Models.Healthcare_Constants_RT_Service.DPPAInvalidFail_Message}, iesp.share.t_WsException), _EmptyExceptionDSRow1);
+		DMFPurpose_in_val := IF(DMFPurpose_in=_blank, '00', DMFPurpose_in);
+		DMFInvalidFailRow := IF(DMFPurpose_in_val <> '00', ROW({_blank, Models.Healthcare_Constants_RT_Service.InvalidInput_Code, _blank, Models.Healthcare_Constants_RT_Service.DMFInvalidFail_Message}, iesp.share.t_WsException), _EmptyExceptionDSRow1);
+		FCRAInvalidFailRow := IF(FCRAPurpose_in <> 0, ROW({_blank, Models.Healthcare_Constants_RT_Service.InvalidInput_Code, _blank, Models.Healthcare_Constants_RT_Service.FCRAInvalidFail_Message}, iesp.share.t_WsException), _EmptyExceptionDSRow1);
 
-		Output_PermissiblePurposeErrorsDS := EmptyExceptionDS1 + GLBRequiredFailRow + GLBInvalidFailRow + DPPAInvalidFailRow;
+		Output_PermissiblePurposeErrorsDS := EmptyExceptionDS1 + GLBRequiredFailRow + GLBInvalidFailRow + DPPAInvalidFailRow + DMFInvalidFailRow + FCRAInvalidFailRow;
 
 		return Output_PermissiblePurposeErrorsDS(code<>0);
 	ENDMACRO;

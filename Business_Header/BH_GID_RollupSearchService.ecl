@@ -71,7 +71,7 @@ string30 pre_lname_val := '' : stored('LastName');
 string30 pre_mname_val := '' : stored('MiddleName');
 
 doxie.MAC_Header_Field_Declare();
-
+mod_access := Doxie.compliance.GetGlobalDataAccessModule();
 // *** If input contains SIC and either zip or city&state ONLY and no other input 
 //     fields, set boolean on to be passed to Business_Header.fn_RSS_getBestRecords.
 boolean SIC_CODE_SEARCH := SIC_value<>'' AND
@@ -81,11 +81,11 @@ boolean SIC_CODE_SEARCH := SIC_value<>'' AND
                            pre_fname_val='' AND pre_lname_val='' AND pre_mname_val='';
 
 display_set :=
-	business_header.fn_RSS_getBestRecords(
+	business_header.fn_RSS_getBestRecords(mod_access, 
 		USE_GID,RETURN_BDLS,INCLUDE_MVAWFA_HEADERS,INCLUDE_BUS_DPPA,,FORCE_PHONE_MATCH,FORCE_FEIN_MATCH,,FALSE,FUZZINESS_DIAL,SIC_CODE_SEARCH);
 
 rollup_display_set :=
-	business_header.fn_RSS_rollupBestRecords(display_set,ROLLUP_LIMIT);
+	business_header.fn_RSS_rollupBestRecords(display_set, mod_access, ROLLUP_LIMIT);
 
 // Get sic_code info for all records, then filter out records that don't match 
 // the filter-by sic-code, if one was input.
@@ -150,7 +150,7 @@ join_verified := join(pos_display_set,rollup_append,right.__seq = if(RETURN_BDLS
 	self := left),left outer);
 
 // Append the source document count information if requested.
-src_info_appended := if(INCLUDE_SOURCE_DOC_COUNTS,business_header.fn_RSS_attachSourceInfo(join_verified,USE_GID),join_verified);
+src_info_appended := if(INCLUDE_SOURCE_DOC_COUNTS,business_header.fn_RSS_attachSourceInfo(join_verified, mod_access, USE_GID),join_verified);
 
 // Use project to blank out the bdidrecs child dataset which used to be done in 
 // fn_RSS_AttachPOSInfo, but then they were needed in the new (Feb 2010)

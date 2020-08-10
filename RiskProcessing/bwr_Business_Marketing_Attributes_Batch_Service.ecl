@@ -18,7 +18,7 @@ threads      := 30;
 
 RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;      // Production
 
-inputFile := Data_Services.foreign_prod + 'jpyon::in::compass_1190_bus_shell_in_in';
+inputFile := Data_Services.foreign_prod + 'tfuerstenberg::in::amex_9834_gcp_sba_in.csv';
 OutputFile := '~kandsu01::BRM_test_100K_roxie_'+ ThorLib.wuid();
 
 BOOLEAN runInRealTime := FALSE;   //When TRUE will run request in real time mode, if FALSE will run with archive date from file
@@ -26,10 +26,10 @@ BOOLEAN runInRealTime := FALSE;   //When TRUE will run request in real time mode
 		// Configure options:
 	Options := MODULE(PublicRecords_KEL.Interface_Options)
 		EXPORT INTEGER ScoreThreshold := 80;
-		EXPORT STRING100 Data_Restriction_Mask := '0000000000000101000000000000000000000000';
-		EXPORT STRING100 Data_Permission_Mask := '11111111111111111111111111111111111111111111111111111111111';
-		EXPORT UNSIGNED GLBAPurpose := 1;
-		EXPORT UNSIGNED DPPAPurpose := 3;
+		EXPORT STRING100 Data_Restriction_Mask := '';
+		EXPORT STRING100 Data_Permission_Mask := '';
+		EXPORT UNSIGNED GLBAPurpose := 0;
+		EXPORT UNSIGNED DPPAPurpose := 0;
 		EXPORT BOOLEAN IsFCRA := FALSE; //It is only non-fcra query.
 		EXPORT BOOLEAN isMarketing := true; //always true for this query
 		EXPORT STRING100 Allowed_Sources := '';
@@ -62,117 +62,24 @@ BOOLEAN runInRealTime := FALSE;   //When TRUE will run request in real time mode
 		END;	
 
 prii_layout := RECORD
-STRING  AccountNumber;
+STRING  AcctNo;
 STRING  CompanyName;
 STRING  AlternateCompanyName;
-STRING  Addr1;
-STRING  City1; 
-STRING  State1;
-STRING  Zip1;
+STRING  bus_addr;
+STRING  bus_city; 
+STRING  bus_state;
+STRING  bus_zip;
 STRING  BusinessPhone;
 STRING  TaxIdNumber;
 STRING  BusinessIPAddress;
+STRING  historydate;
 STRING  BusinessURL;
 STRING  BusinessEmailAddress;
-STRING  Rep1firstname;
-STRING  Rep1MiddleName;
-STRING  Rep1lastname;
-STRING  Rep1NameSuffix;
-STRING  Rep1Addr;
-STRING  Rep1City;
-STRING  Rep1State;
-STRING  Rep1Zip;
-STRING  Rep1SSN;
-STRING  Rep1DOB;
-STRING  Rep1Age;
-STRING  Rep1DLNumber;
-STRING  Rep1DLState;
-STRING  Rep1HomePhone;
-STRING  Rep1EmailAddress;
-STRING  Rep1FormerLastName;
-STRING  Rep1LexID;
-STRING  ArchiveDate;
 STRING  PowID;
 STRING  ProxID;
 STRING  SeleID;
 STRING  OrgID;
 STRING  UltID;
-STRING  SIC_Code;
-STRING  NAIC_Code;
-STRING  Rep2firstname;
-STRING  Rep2MiddleName;
-STRING  Rep2lastname;
-STRING  Rep2NameSuffix;
-STRING  Rep2Addr;
-STRING  Rep2City;
-STRING  Rep2State;
-STRING  Rep2Zip;
-STRING  Rep2SSN;
-STRING  Rep2DOB;
-STRING  Rep2Age;
-STRING  Rep2DLNumber;
-STRING  Rep2DLState;
-STRING  Rep2HomePhone;
-STRING  Rep2EmailAddress;
-STRING  Rep2FormerLastName;
-STRING  Rep2LexID;
-STRING  Rep3firstname;
-STRING  Rep3MiddleName;
-STRING  Rep3lastname;
-STRING  Rep3NameSuffix;
-STRING  Rep3Addr;
-STRING  Rep3City;
-STRING  Rep3State;
-STRING  Rep3Zip;
-STRING  Rep3SSN;
-STRING  Rep3DOB;
-STRING  Rep3Age;
-STRING  Rep3DLNumber;
-STRING  Rep3DLState;
-STRING  Rep3HomePhone;
-STRING  Rep3EmailAddress;
-STRING  Rep3FormerLastName;
-STRING  Rep3LexID;
-STRING  Rep4firstname;
-STRING  Rep4MiddleName;
-STRING  Rep4lastname;
-STRING  Rep4NameSuffix;
-STRING  Rep4Addr;
-STRING  Rep4City;
-STRING  Rep4State;
-STRING  Rep4Zip;
-STRING  Rep4SSN;
-STRING  Rep4DOB;
-STRING  Rep4Age;
-STRING  Rep4DLNumber;
-STRING  Rep4DLState;
-STRING  Rep4HomePhone;
-STRING  Rep4EmailAddress;
-STRING  Rep4FormerLastName;
-STRING  Rep4LexID;
-STRING  Rep5firstname;
-STRING  Rep5MiddleName;
-STRING  Rep5lastname;
-STRING  Rep5NameSuffix;
-STRING  Rep5Addr;
-STRING  Rep5City;
-STRING  Rep5State;
-STRING  Rep5Zip;
-STRING  Rep5SSN;
-STRING  Rep5DOB;
-STRING  Rep5Age;
-STRING  Rep5DLNumber;
-STRING  Rep5DLState;
-STRING  Rep5HomePhone;
-STRING  Rep5EmailAddress;
-STRING  Rep5FormerLastName;
-STRING  Rep5LexID;
-STRING  ln_project_id;
-STRING  pf_fraud;
-STRING  pf_bad;
-STRING  pf_funded;
-STRING  pf_declined;
-STRING  pf_approved_not_funded ;
 END;
 
  
@@ -180,13 +87,19 @@ END;
 	p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));  // use this for a CSV file
 	p := IF(recordsToRun = 0, p_in, CHOOSEN (p_in, recordsToRun));
  OUTPUT (choosen(p,eyeball), NAMED ('input'));
+ 
+ //append G_ProcBusUID to the input.
+  inputRecords := PROJECT(P, TRANSFORM({UNSIGNED G_ProcBusUID, RECORDOF(LEFT)}, SELF.G_ProcBusUID := COUNTER; SELF := LEFT;));
 
-	pp:= project(P,transform(BRM_Marketing_attributes.Layout_BRM_NonFCRA.Batch_Input, 
-		SELF.G_ProcBusUID :=Counter;
-		SELF.acctno :=left.accountnumber;
-		SELF.historydate:=(INTEGER)left.archivedate[1..8];
-		SELF.historydateyyyymm:=(INTEGER)left.archivedate[1..6];
-		SELF.streetaddressline1 := left.Addr1;
+	pp:= project(inputRecords,transform(BRM_Marketing_attributes.Layout_BRM_NonFCRA.Batch_Input, 
+		SELF.G_ProcBusUID := left.G_ProcBusUID;
+		SELF.AcctNo :=left.AcctNo;
+		SELF.historydate:=(INTEGER)left.historydate[1..8];
+		SELF.historydateyyyymm:=(INTEGER)left.historydate[1..6];
+		SELF.streetaddressline1 := left.bus_addr;
+		SELF.city1 := left.bus_city;
+		SELF.state1 := left.bus_state;
+		SELF.zip1 := left.bus_zip;
 		SELF.BusinessTIN := left.TaxIdNumber;
 		SELF := left;
 		SELF := []));
@@ -215,7 +128,7 @@ end;
 
 soap_in_pre:= Project(pp,TRANSFORM(soapLayout,
 self.batch_in := DATASET([TRANSFORM( BRM_Marketing_attributes.Layout_BRM_NonFCRA.Batch_Input, 
-    self.g_procbusuid:=counter;
+    self.g_procbusuid:= left.G_ProcBusUID;
     self.historydate :=IF(runInRealTime, 99999999, (UNSIGNED4)LEFT.historydate);
     self.historydateyyyymm :=IF(runInRealTime, 999999, (UNSIGNED4)LEFT.historydateyyyymm);
     self.acctno:=LEFT.acctno;
@@ -268,7 +181,7 @@ layout_SOAP_out myFail(soapLayout le) := TRANSFORM
 	SELF := [];
 END;
 
-result_SOAPCALL := 
+result_SOAPCALL_pre_sort := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
 				'brm_marketing_attributes.brm_marketing_attr_batch_services',
@@ -277,14 +190,24 @@ result_SOAPCALL :=
 				XPATH('brm_marketing_attributes.brm_marketing_attr_batch_servicesResponse/Results/Result/Dataset[@name=\'Results\']/Row'),
 				RETRY(5), TIMEOUT(500),
 				PARALLEL(threads), onFail(myFail(LEFT)));
-								
+
+result_SOAPCALL := Sort(result_SOAPCALL_pre_sort,	AcctNo);
+							
 OUTPUT( CHOOSEN(result_SOAPCALL,eyeball), NAMED('result_SOAPCALL') );
 
 //Passed Records //results without minimum input are also listed in the results passed. Only results with the roxie error will be listed as failed.
 Passed:= result_SOAPCALL(TRIM(ErrorCode) = '');
 Failed:= result_SOAPCALL(TRIM(ErrorCode)<> '');
 
+//dropped input
+//Input Accountnumber here is considered unique for the records.
+droppedInput := JOIN(inputRecords, result_SOAPCALL,
+                      LEFT.AcctNo = RIGHT.AcctNo,
+                      TRANSFORM({RECORDOF(LEFT) - g_procbusuid}, SELF := LEFT;), 
+                      LEFT ONLY); //These are in the format as input to be reprocessed 
+																				
 OUTPUT( CHOOSEN(Passed,eyeball), NAMED('results_Passed') );
+OUTPUT( COUNT(Passed), NAMED('Passed_Cnt') );
 OUTPUT( CHOOSEN(Failed,eyeball), NAMED('results_Failed') );
 OUTPUT( COUNT(Failed), NAMED('Failed_Cnt') );
 
@@ -293,6 +216,8 @@ Minimum_Input_not_met := Passed(TRIM(Error_msg)='minimum input criteria not met'
 OUTPUT( CHOOSEN(Minimum_Input_not_met,eyeball), NAMED('Minimum_Input_not_met_records') );
 OUTPUT( COUNT(Minimum_Input_not_met), NAMED('Minimum_Input_not_met_Cnt') );
 
-OUTPUT(Passed,, OutputFile, CSV(HEADING(single), QUOTE('"')), OVERWRITE);
+OUTPUT(Passed,, OutputFile + '_Passed_records', CSV(HEADING(single), QUOTE('"')), OVERWRITE);
 OUTPUT(Minimum_Input_not_met,, OutputFile + 'Minimum_Input_not_met', CSV(HEADING(single), QUOTE('"')), OVERWRITE);
 OUTPUT(Failed,, OutputFile + '_failed_records', CSV(QUOTE('"')), OVERWRITE);
+OUTPUT(droppedInput,, OutputFile + '_reprocess', CSV(QUOTE('"')), OVERWRITE);
+OUTPUT(result_SOAPCALL,, OutputFile + 'All_records', CSV(QUOTE('"')), OVERWRITE);

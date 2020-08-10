@@ -1,6 +1,6 @@
-﻿import Easi, ut, risk_indicators, Riskwise, ADVO, business_risk, Address_Attributes, AML;
+﻿import Easi, risk_indicators, Riskwise, ADVO, business_risk, Address_Attributes, AML, doxie;
 
-export AMLAddrAttrib(GROUPED DATASET(Risk_indicators.layout_output) AMLAddr) := FUNCTION 
+export AMLAddrAttrib(GROUPED DATASET(Risk_indicators.layout_output) AMLAddr, doxie.IDataAccess mod_access) := FUNCTION 
 
 
 used_census := EASI.Layout_Easi_Census;
@@ -76,7 +76,8 @@ withBusHeader := join(AMLAddr, bha,
 						keyed(left.prim_name=right.prim_name) and
 						keyed(right.prim_range=left.prim_range) and
 						keyed(right.sec_range=left.sec_range) and
-						(unsigned)(((STRING)right.dt_first_seen)[1..6]) < left.historydate,
+						(unsigned)(((STRING)right.dt_first_seen)[1..6]) < left.historydate AND 
+						doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 			      transform(Layout_AMLAddr, self.bdid := (string)right.bdid, self := left, self := []), 
 						atmost(1000),
 						keep(1),

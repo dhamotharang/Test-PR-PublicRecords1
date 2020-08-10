@@ -15,7 +15,7 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 	// cleanBusiness
 	Prep_CleanBusiness := PublicRecords_KEL.ECL_Functions.FnRoxie_Prep_InputBII(ds_input);
 	
-	// cleanReps and get lexids
+// cleanReps and get lexids
 	Prep_RepInput := PublicRecords_KEL.ECL_Functions.FnRoxie_Prep_InputRepPII(ds_input, Options);
 	Rep1Input := Prep_RepInput(RepNumber = 1);
 
@@ -41,9 +41,9 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 
 	// Get Business attributes
 	// When we get the cleaned attributes, then B_InpArchDt will change to B_InpClnArchDt
-	InputPIIBIIAttributes := PublicRecords_KEL.Library.LIB_BusinessInputAttributes_Function(CheckTDSPhone, Prep_RepInput, Options);
+	InputPIIBIIAttributes := PublicRecords_KEL.FnRoxie_GetInputBIIAttributes(CheckTDSPhone, Prep_RepInput, Options);
 
-	BusinessSeleIDAttributes := PublicRecords_KEL.Library.LIB_BusinessSeleAttributes_Function(CheckTDSPhone, Prep_RepInput, FDCDataset, Options);
+	BusinessSeleIDAttributes := PublicRecords_KEL.FnRoxie_GetBusinessSeleIDAttributes(CheckTDSPhone, Prep_RepInput, FDCDataset, Options);
 	
 	withBusinessSeleIDAttributes := JOIN(InputPIIBIIAttributes, BusinessSeleIDAttributes, LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
@@ -62,9 +62,9 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 		LEFT OUTER, KEEP(1), ATMOST(100));	
 
 	// Get consumer attributes
-	Rep1InputPIIAttributes := KEL.Clean(PublicRecords_KEL.Library.LIB_ConsumerInputAttributes_Function(Rep1Input, Options), TRUE, TRUE, TRUE);
+	Rep1InputPIIAttributes := KEL.Clean(PublicRecords_KEL.FnRoxie_GetInputPIIAttributes(Rep1Input, Options), TRUE, TRUE, TRUE);
 
-	Rep1PersonAttributes := PublicRecords_KEL.Library.LIB_ConsumerAttributes_Function(MiniAttributes, FDCDataset, Options);
+	Rep1PersonAttributes := PublicRecords_KEL.FnRoxie_GetPersonAttributes(MiniAttributes(RepNumber = 1), FDCDataset, Options);
 
 	// Join Consumer Results back in with business results
 	withRep1InputPII := JOIN(withBusinessProxIDAttributes, Rep1InputPIIAttributes, LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,

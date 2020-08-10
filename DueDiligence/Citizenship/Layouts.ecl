@@ -36,6 +36,11 @@
       Indicators;
     END;
     
+    EXPORT ScoreAndIndicators := RECORD
+      UNSIGNED6 seq;
+      LayoutScoreAndIndicators;
+    END;
+    
     //Used in conjunction with Due Diligence Input
     //but specific to Citizenship
     EXPORT Input := RECORD

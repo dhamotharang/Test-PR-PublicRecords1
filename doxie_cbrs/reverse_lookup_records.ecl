@@ -1,8 +1,10 @@
-﻿import AutoStandardI, doxie, doxie_cbrs, dx_Gong, Suppress;
+﻿import doxie, doxie_cbrs, dx_Gong, Suppress;
 
-export reverse_lookup_records(dataset(doxie_cbrs.layout_references) bdids, boolean Include_ReversePhone_val) := FUNCTION
+export reverse_lookup_records(DATASET(doxie_cbrs.layout_references) bdids, 
+                              doxie.IDataAccess mod_access,
+                              BOOLEAN Include_ReversePhone) := FUNCTION
 
-phones := dedup(doxie_cbrs.best_records_bdids(bdids)(Include_ReversePhone_val and (integer)phone <> 0), phone, all);
+phones := dedup(doxie_cbrs.best_records_bdids(bdids)(Include_ReversePhone AND (integer)phone <> 0), phone, ALL);
 k := dx_Gong.key_phone10();
 
 {unsigned1 level, k} keepk(unsigned1 l, k r) := transform
@@ -17,8 +19,6 @@ jnd := join(phones, k,
          keepk(left.level, right), 
          KEEP(10), 
          LIMIT(100,SKIP));
-
-mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 
 ds_out := Suppress.MAC_SuppressSource(jnd, mod_access, did);
 

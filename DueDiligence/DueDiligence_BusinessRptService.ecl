@@ -8,51 +8,42 @@ EXPORT DueDiligence_BusinessRptService := MACRO
 
     requestResponseLayout := iesp.duediligencebusinessreport.t_DueDiligenceBusinessReportResponse;
 
-    productsRequested := DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.DUEDILIGENCE_ONLY;
+    productsRequested := DueDiligence.ConstantsQuery.PRODUCT_REQUESTED_ENUM.DUEDILIGENCE_ONLY;
 
 
     //The following macro defines the field sequence on WsECL page of query.
     WSInput.MAC_DueDiligence_Service(requestName);
-
-    DueDiligence.CommonQuery.mac_CreateInputFromXML(requestLayout, requestName, TRUE, DueDiligence.Constants.BUSINESS);
-
-    validatedRequest := DueDiligence.CommonQuery.ValidateRequest(input, glba, dppa, DueDiligence.Constants.BUSINESS);
-
+    
+    
+    DueDiligence.CommonQueryXML.mac_CreateInputFromXML(requestLayout, requestName, TRUE, DueDiligence.Constants.BUSINESS);
+    
+    validatedRequest := DueDiligence.CommonQuery.ValidateRequest(input, glba, dppa, DueDiligence.Constants.BUSINESS, TRUE);                              
+                          
     DueDiligence.CommonQuery.mac_FailOnError(validatedRequest(validRequest = FALSE));
 
-    cleanData := DueDiligence.CommonQuery.GetCleanData(validatedRequest(validRequest));
+    
+    
+    validRequest := validatedRequest(validRequest);
+    
+    //clean the input of the valid requests for requested products Citizenship and Due Diligence (DueDiligence.Layouts.CleanedData)
+    cleanData := DueDiligence.CommonQuery.GetCleanData(validRequest);
+   
+    //retrieve options & compliance information
+    regulatoryCompliance := DueDiligence.CommonQuery.mac_GetCompliance(dppa, glba, drm, dpm, userIn.IndustryClass, lexIdSourceOptout, transactionID, batchUID, globalCompanyID);
+
+    //based on what was requested, call the appropriate attributes  
+    ddResults := DueDiligence.CommonQueryXML.mac_v3BusinessXML(wseq, cleanData, regulatoryCompliance, DDssnMask, optionsIn.AdditionalInput, 
+                                                               requestResponseLayout, DueDiligence.Constants.STRING_TRUE, debugIndicator);
 
 
-    //********************************************************BUSINESS ATTRIBUTES STARTS HERE********************************************************
-    DueDiligence.CommonQuery.mac_GetBusinessOptionSettings(dppa, glba, drm, dpm, userIn.IndustryClass);
 
-    //retrieve the data based on input to be used in searches (PII vs LexID vs Combo of PII and LexID)
-    dataToSearchBy := DueDiligence.fn_getProductInput(productsRequested, cleanData, busOptions, busLinkingOptions,
-                                                                                                 LexIdSourceOptout := LexIdSourceOptout, 
-                                                                                                 TransactionID := TransactionID, 
-                                                                                                 BatchUID := BatchUID, 
-                                                                                                 GlobalCompanyID := GlobalCompanyID);
-
-    businessResults := DueDiligence.getBusAttributes(dataToSearchBy, DD_SSNMask, TRUE, busOptions, busLinkingOptions, debugIndicator,
-                                                                                            LexIdSourceOptout := LexIdSourceOptout, 
-                                                                                            TransactionID := TransactionID, 
-                                                                                            BatchUID := BatchUID, 
-                                                                                            GlobalCompanyID := GlobalCompanyID);
-
-    busnIndex := DueDiligence.CommonQuery.GetBusinessAttributes(businessResults);
-    busIndexHits := DueDiligence.CommonQuery.GetBusinessAttributeFlags(businessResults);
-
-
-    final := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, businessResults, requestResponseLayout, DueDiligence.Constants.BUSINESS,
-                                                            DueDiligence.Constants.STRING_TRUE, busnIndex, busIndexHits, requestedVersion,
-                                                            optionsIn.AdditionalInput);
-
-
-    OUTPUT(final, NAMED('Results')); //This is the customer facing output    
+    
 
     IF(debugIndicator, OUTPUT(cleanData, NAMED('cleanData'))); //This is for debug mode 	
-    IF(debugIndicator, OUTPUT(wseq, NAMED('wseq'))); //This is for debug mode 
-    IF(intermediates, OUTPUT(businessResults, NAMED('busResults'))); //This is for debug mode
+    IF(debugIndicator, OUTPUT(wseq, NAMED('wseq'))); //This is for debug mode
+    
+    
+    OUTPUT(ddResults, NAMED('Results')); //This is the customer facing output    
 
 ENDMACRO;
 

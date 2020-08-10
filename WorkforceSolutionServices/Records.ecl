@@ -1,79 +1,79 @@
-﻿Import AutoStandardI, Gateway, iesp, WorkforceSolutionServices, Royalty, FCRA, STD, FCRAGateway_Services,InsuranceHeader_RemoteLinking, FFD;
+﻿IMPORT AutoStandardI, Gateway, iesp, WorkforceSolutionServices, Royalty, FCRA, STD, FCRAGateway_Services,InsuranceHeader_RemoteLinking, FFD;
 
-EXPORT Records(dataset(iesp.employment_verification_fcra.t_FcraVerificationOfEmploymentReportRequest) Input,
-                        WorkforceSolutionServices.IParam.report_params	InputParams
-                      ) := function
+EXPORT Records(DATASET(iesp.employment_verification_fcra.t_FcraVerificationOfEmploymentReportRequest) Input,
+                        WorkforceSolutionServices.IParam.report_params InputParams
+                      ) := FUNCTION
 
   in_gateways := Gateway.Configuration.Get();
 
-  lexid_request := project(Input,WorkforceSolutionServices.transforms.InRequest_to_lexID_Resolution(left,InputParams));
+  lexid_request := PROJECT(Input,WorkforceSolutionServices.transforms.InRequest_to_lexID_Resolution(LEFT,InputParams));
 
-  gw_params := module(project(AutoStandardI.GlobalModule(true), FCRAGateway_Services.IParam.common_params, opt))
-      export FFDOptionsMask := InputParams.FFDOptionsMask;
-      export FCRAPurpose := InputParams.FCRAPurpose;
-      export dataset(Gateway.Layouts.Config) gateways := in_gateways;
-  end;
+  gw_params := MODULE(PROJECT(AutoStandardI.GlobalModule(TRUE), FCRAGateway_Services.IParam.common_params, opt))
+    EXPORT FFDOptionsMask := InputParams.FFDOptionsMask;
+    EXPORT FCRAPurpose := InputParams.FCRAPurpose;
+    EXPORT DATASET(Gateway.Layouts.Config) gateways := in_gateways;
+  END;
 
   //Retrieve and ensure we can resolve input to a Lexid.
   dville_resp := FCRA.getDidVilleRecords(lexid_request[1]);
   err_code := dville_resp[1]._Header.Status;
-  InputDid := IF(err_code = 0, (unsigned6)dville_resp[1].Records[1].UniqueId, 0);
+  InputDid := IF(err_code = 0, (UNSIGNED6)dville_resp[1].Records[1].UniqueId, 0);
 
   isFoundInputDid := InputDid > 0;
 
   //Send Input SSN to Equifax
-  OutputFromEquifax := if(isFoundInputDid,WorkforceSolutionServices.getVerificationDataFromEquifax(Input, InputParams, isFoundInputDid, in_gateways));
+  OutputFromEquifax := IF(isFoundInputDid,WorkforceSolutionServices.getVerificationDataFromEquifax(Input, InputParams, isFoundInputDid, in_gateways));
 
   //Error codes are sent in 2 places.
-  SignonMsgs_StatusCode :=  OutputFromEquifax[1].Response.EvsResponse.SignonMsgsRsV1.SonRs.Status.Code;
+  SignonMsgs_StatusCode := OutputFromEquifax[1].Response.EvsResponse.SignonMsgsRsV1.SonRs.Status.Code;
   SignonMsgs_StatusMessage := OutputFromEquifax[1].Response.EvsResponse.SignonMsgsRsV1.SonRs.Status.Message;
 
-  TsVTwnSelectTrnRs_StatusCode :=  OutputFromEquifax[1].Response.EvsResponse.TsVerMsgsRsV1.TsVTwnSelectTrnRs.Status.Code;
+  TsVTwnSelectTrnRs_StatusCode := OutputFromEquifax[1].Response.EvsResponse.TsVerMsgsRsV1.TsVTwnSelectTrnRs.Status.Code;
   TsVTwnSelectTrnRs_StatusMessage := OutputFromEquifax[1].Response.EvsResponse.TsVerMsgsRsV1.TsVTwnSelectTrnRs.Status.Message;
-  useSignon := trim(SignonMsgs_StatusCode,LEFT,RIGHT) <> '0';
+  useSignon := TRIM(SignonMsgs_StatusCode,LEFT,RIGHT) <> '0';
 
-  EquifaxStatusCode := if(useSignon,SignonMsgs_StatusCode,TsVTwnSelectTrnRs_StatusCode);
-  EquifaxStatusMessage := if(useSignon,SignonMsgs_StatusMessage,TsVTwnSelectTrnRs_StatusMessage);
+  EquifaxStatusCode := IF(useSignon,SignonMsgs_StatusCode,TsVTwnSelectTrnRs_StatusCode);
+  EquifaxStatusMessage := IF(useSignon,SignonMsgs_StatusMessage,TsVTwnSelectTrnRs_StatusMessage);
 
-  isEquifaxSentData :=  trim(EquifaxStatusCode,LEFT,RIGHT) = '0';
-  isEquifaxSentError :=  ~isEquifaxSentData and TRIM(EquifaxStatusCode) <>'';
+  isEquifaxSentData := TRIM(EquifaxStatusCode,LEFT,RIGHT) = '0';
+  isEquifaxSentError := ~isEquifaxSentData AND TRIM(EquifaxStatusCode) <>'';
 
   //Get PII from Equifax for lexID resolution.
   dsResponseData_pre := OutputFromEquifax[1].Response.EvsResponse.TsVerMsgsRsV1.TsVTwnSelectTrnRs.TsVTwnSelectRs.TsVResponseData;
 
   // Try match PII with an active record if available
-  dsResponseData := sort(dsResponseData_pre,STD.Str.ToUpperCase(trim(TsVEmployee_V100.EmployeeStatus.Message))= 'ACTIVE',TsVEmployee_V100.EmployeeStatus.Message);
+  dsResponseData := SORT(dsResponseData_pre,STD.Str.ToUpperCase(TRIM(TsVEmployee_V100.EmployeeStatus.Message))= 'ACTIVE',TsVEmployee_V100.EmployeeStatus.Message);
 
-  isAvailable_EmpRec_1 := isEquifaxSentData and count(dsResponseData_pre) > 0;
+  isAvailable_EmpRec_1 := isEquifaxSentData AND count(dsResponseData_pre) > 0;
 
-  EmployeeRecord_1 := if(isAvailable_EmpRec_1, dsResponseData[1].TsVEmployee_V100);
+  EmployeeRecord_1 := IF(isAvailable_EmpRec_1, dsResponseData[1].TsVEmployee_V100);
 
-  EmpRec1_lexID_in := project(EmployeeRecord_1,
-                                              WorkforceSolutionServices.transforms.GwEmployee_to_lexID_Resolution(left,InputParams));
+  EmpRec1_lexID_in := PROJECT(EmployeeRecord_1,
+                                              WorkforceSolutionServices.transforms.GwEmployee_to_lexID_Resolution(LEFT,InputParams));
 
-  EmpRec_lexID_out := FCRA.getDidVilleRecords(dataset(EmpRec1_lexID_in)[1]);
+  EmpRec_lexID_out := FCRA.getDidVilleRecords(DATASET(EmpRec1_lexID_in)[1]);
 
-  EmpRec1_lexID_out := if(isAvailable_EmpRec_1, EmpRec_lexID_out[1]);
+  EmpRec1_lexID_out := IF(isAvailable_EmpRec_1, EmpRec_lexID_out[1]);
 
   //Didville will return a header message if there are errors.
-  is_emprec_plist_ok :=  EmpRec1_lexID_out._header.message = '' and EmpRec1_lexID_out.SubjectTotalCount=1;
+  is_emprec_plist_ok := EmpRec1_lexID_out._header.message = '' AND EmpRec1_lexID_out.SubjectTotalCount=1;
   //Find DID for Output PII
-  OutputDID := if(is_emprec_plist_ok,
-                              (unsigned)(EmpRec1_lexID_out.Records[1].UniqueId),0);
+  OutputDID := IF(is_emprec_plist_ok,
+    (UNSIGNED)(EmpRec1_lexID_out.Records[1].UniqueId),0);
   isFoundOutputDid := OutputDID > 0;
 
   // not sure if that is correct criteria:
-  noEqEmploymentData := ~isEquifaxSentError and ~isAvailable_EmpRec_1;
+  noEqEmploymentData := ~isEquifaxSentError AND ~isAvailable_EmpRec_1;
 
   validation_code := WorkforceSolutionServices.Constants.ValidationCode;
   //Query Status Code
-  StatusCode := map(	~isFoundInputDid => validation_code.INPUT_DID_NOTFOUND,
-                      // is_suppressed_by_alert => validation_code.NO_CALL,
-                      isEquifaxSentError => validation_code.INVALID_RESPONSE,
-                      ~isFoundOutputDid => validation_code.OUTPUT_DID_NOTFOUND,
-                      (InputDid <> OutputDid) => validation_code.DID_MISMATCH,
-                      (InputDid = OutputDid) and isFoundInputDid => validation_code.DID_MATCH,
-                      validation_code.NONE);
+  StatusCode := MAP( ~isFoundInputDid => validation_code.INPUT_DID_NOTFOUND,
+    // is_suppressed_by_alert => validation_code.NO_CALL,
+    isEquifaxSentError => validation_code.INVALID_RESPONSE,
+    ~isFoundOutputDid => validation_code.OUTPUT_DID_NOTFOUND,
+    (InputDid <> OutputDid) => validation_code.DID_MISMATCH,
+    (InputDid = OutputDid) AND isFoundInputDid => validation_code.DID_MATCH,
+    validation_code.NONE);
 
   // Check if the status code is Did_Mismatch and go for an additional check with remote linking
   InsuranceHeader_RemoteLinking.Layouts.ServiceInputLayout_Batch ip_op_to_remote_linking(
@@ -85,8 +85,8 @@ EXPORT Records(dataset(iesp.employment_verification_fcra.t_FcraVerificationOfEmp
 
           SELF.ReferenceId := 1;
           //Lexids
-          SELF.Inquiry_Lexid	:= InputDid;
-          SELF.Results_Lexid	:= OutputDid;
+          SELF.Inquiry_Lexid := InputDid;
+          SELF.Results_Lexid := OutputDid;
 
           //Inquiry Input data
           SELF.SSN_Inq := INTFORMAT((INTEGER)inquiry_subject.SSN, 9, 1);
@@ -116,9 +116,9 @@ EXPORT Records(dataset(iesp.employment_verification_fcra.t_FcraVerificationOfEmp
           SELF := [];
       END;
 
-  RL_inp := Dataset([ip_op_to_remote_linking()]);
-  RL_resp := IF(StatusCode = validation_code.DID_MISMATCH or StatusCode = validation_code.OUTPUT_DID_NOTFOUND,
-                  Gateway.SoapCall_RemoteLinking_Batch(RL_inp, in_gateways));
+  RL_inp := DATASET([ip_op_to_remote_linking()]);
+  RL_resp := IF(StatusCode = validation_code.DID_MISMATCH OR StatusCode = validation_code.OUTPUT_DID_NOTFOUND,
+    Gateway.SoapCall_RemoteLinking_Batch(RL_inp, in_gateways));
 
   is_RL_match := RL_resp[1].match;
 
@@ -129,7 +129,7 @@ EXPORT Records(dataset(iesp.employment_verification_fcra.t_FcraVerificationOfEmp
   //Retrieve consumer alerts, consumer statements, and ensure we are using the best Lexid in case of Remote Linking match.
   consumer_ip_did := IF(is_RL_match, RL_resp[1].best_lexID , InputDid);
 
-  consumer:= FFD.MAC.PrepareConsumerRecord((string)consumer_ip_did, TRUE, lexid_request[1].searchby);
+  consumer:= FFD.MAC.PrepareConsumerRecord((STRING)consumer_ip_did, TRUE, lexid_request[1].searchby);
 
   isReseller := TRUE;
 
@@ -144,49 +144,48 @@ EXPORT Records(dataset(iesp.employment_verification_fcra.t_FcraVerificationOfEmp
   Consumer_Statements := CIA_data[1].ConsumerStatements;
 
   //Only return report information if our Lexids match, and we have no suppression from consumer alerts.
-  return_results := isSuccess and ~is_suppressed_by_alert ;
+  return_results := isSuccess AND ~is_suppressed_by_alert ;
   //Only return consumer data if we have a valid lexID match or suppress due alerts or no employment data returned by gateway.
-  return_consumer_data := isFoundInputDid and (is_suppressed_by_alert or noEqEmploymentData or isSuccess);
+  return_consumer_data := isFoundInputDid AND (is_suppressed_by_alert OR noEqEmploymentData OR isSuccess);
 
   //Calculate Royalty
-  royal_out_voe := if(isFoundInputDid  ,Royalty.RoyaltyEquifaxEVS.GetOnlineRoyaltiesVOE(isEquifaxSentData));
-  royal_out_voi := if(isFoundInputDid  ,Royalty.RoyaltyEquifaxEVS.GetOnlineRoyaltiesVOI(isEquifaxSentData));
+  royal_out_voe := IF(isFoundInputDid ,Royalty.RoyaltyEquifaxEVS.GetOnlineRoyaltiesVOE(isEquifaxSentData));
+  royal_out_voi := IF(isFoundInputDid ,Royalty.RoyaltyEquifaxEVS.GetOnlineRoyaltiesVOI(isEquifaxSentData));
 
   //Return Royalty almost aslways
-  Royalties  :=  if(InputParams.IncludeIncome,royal_out_voi,royal_out_voe);
+  Royalties := IF(InputParams.IncludeIncome,royal_out_voi,royal_out_voe);
 
 
-  message := 	STD.STr.RemoveSuffix(trim(EquifaxStatusMessage),'.')+' ('+ EquifaxStatusCode +').';
+  message := STD.STr.RemoveSuffix(TRIM(EquifaxStatusMessage),'.')+' ('+ EquifaxStatusCode +').';
   validation_code_desc := WorkforceSolutionServices.Constants.GetValidationCodeDesc(StatusCode_Fin, message);
   validation_row := ROW(
-                          TRANSFORM(iesp.share.t_CodeMap,
-                                    SELF.Code := IF(validation_code_desc<>'', (STRING) StatusCode_Fin, '');  // status codes without description are used for internal purpose and excluded from reporting
-                                    SELF.Description := validation_code_desc;
-                                                              )
-                                  );
+    TRANSFORM(iesp.share.t_CodeMap,
+      SELF.Code := IF(validation_code_desc<>'', (STRING) StatusCode_Fin, ''); // status codes without description are used for internal purpose AND excluded from reporting
+      SELF.Description := validation_code_desc;
+    ));
 
   // Prepare the output. If data is blanked makes sure to fill the output message.
 
   WorkforceSolutionServices.Layouts.record_out xtOut() := TRANSFORM
   //Always return the header, royalties, and DID validation.
-    self.eq_header := if(isFoundInputDid and ~is_suppressed_by_alert ,OutputFromEquifax[1].response._Header);  // including exceptions
-    self.validation := validation_row;
-    self.Royalty := Royalties;
+    SELF.eq_header := IF(isFoundInputDid AND ~is_suppressed_by_alert ,OutputFromEquifax[1].response._Header); // including exceptions
+    SELF.validation := validation_row;
+    SELF.Royalty := Royalties;
 
-    //Return consumer data if we don't call gateway  due to alerts, or if we do and get a matching lexID or no employement data.
-    self.LexId :=  IF(return_consumer_data, consumer_ip_did,0);
-    self.Consumer :=  IF(return_consumer_data, consumer);
-    self.ConsumerStatements := IF(return_consumer_data, consumer_statements);
-    self.ConsumerAlerts := IF(return_consumer_data, consumer_alerts);
+    //Return consumer data if we don't call gateway due to alerts, or if we do and get a matching lexID or no employement data.
+    SELF.LexId := IF(return_consumer_data, consumer_ip_did,0);
+    SELF.Consumer := IF(return_consumer_data, consumer);
+    SELF.ConsumerStatements := IF(return_consumer_data, consumer_statements);
+    SELF.ConsumerAlerts := IF(return_consumer_data, consumer_alerts);
 
   //Only return results if we have no suppression from personContext and have a matching input and output lexID.
-    self.GWResponse := IF(return_results, OutputFromEquifax);
-    self := [];
+    SELF.GWResponse := IF(return_results, OutputFromEquifax);
+    SELF := [];
   END;
 
-  out_row := row(xtOut());
+  out_row := ROW(xtOut());
 
-/* 		output(OutputFromEquifax,named('OutputFromEquifax'));
+/* output(OutputFromEquifax,named('OutputFromEquifax'));
   output(lexid_request,named('lexid_request_input'));
   output(pick_response,named('pick_response_input'));
   output(isFoundInputDid,named('isFoundInputDid'));
@@ -195,5 +194,5 @@ EXPORT Records(dataset(iesp.employment_verification_fcra.t_FcraVerificationOfEmp
   output(OutputDID,named('OutputDID')); */
 
 
-return out_row;
-end;
+RETURN out_row;
+END;

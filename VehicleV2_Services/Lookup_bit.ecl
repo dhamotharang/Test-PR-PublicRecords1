@@ -1,6 +1,6 @@
-export Lookup_bit := MODULE
+EXPORT Lookup_bit := MODULE
 
-export no_lessors :='NO LESSORS';
-export no_minors :='NO MINORS';
+EXPORT no_lessors :='NO LESSORS';
+EXPORT no_minors :='NO MINORS';
 
 END;

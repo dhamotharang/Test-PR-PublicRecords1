@@ -1,6 +1,6 @@
 ﻿IMPORT Risk_Indicators, Gateway, IESP, STD;
 
-EXPORT InitiateStatusRefresh(ROW(Risk_Indicators.Layouts_Derog_Info.LJ_DataSets) LnJDataset,
+EXPORT InitiateStatusRefresh(DATASET(Risk_Indicators.Layouts_Derog_Info.LJ_DataSets) LnJDataset,
 											dataset(Gateway.Layouts.Config) gateways, 
 											pWaitTime = 5, 
 											pRetries = 0, 

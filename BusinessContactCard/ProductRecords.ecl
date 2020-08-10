@@ -6,117 +6,122 @@ IMPORT AutoStandardI, doxie, doxie_cbrs, iesp, dx_Gong, moxie_phonesplus_server,
 // used in the manner deemed best by whichever service is using them.
 EXPORT ProductRecords := MODULE
 
-	// ========================================================================================
-	//
-	//                                   SUBJECT COMPANY
-	//
-	// ========================================================================================
-	// For the Subject Company, obtain Best_Info (i.e. Name, Address, Phone) for each BDID.
-	// NOTE: fn_best_information returns only one record, and the group_id in its bdid field,
-	// regardless of what is input.
-	EXPORT companyRecords(dataset(BusinessContactCard.Layouts.rec_ids_in) ds_in,
-												BusinessContactCard.IParam.options in_mod) := function
-		ds_companies_by_acctno := 	BusinessContactCard.Raw.getBusinessHeaderBest(ds_in, in_mod);
-		// ...and obtain the most recent Corp Key data for each ids to attach for corporate filing status.
-		ds_corp_recs_most_recent_status := BusinessContactCard.Raw.getCorpRecords(ds_in, in_mod);
+  // ========================================================================================
+  //
+  // SUBJECT COMPANY
+  //
+  // ========================================================================================
+  // For the Subject Company, obtain Best_Info (i.e. Name, Address, Phone) for each BDID.
+  // NOTE: fn_best_information returns only one record, and the group_id in its bdid field,
+  // regardless of what is input.
+  EXPORT companyRecords(DATASET(BusinessContactCard.Layouts.rec_ids_in) ds_in,
+                        BusinessContactCard.IParam.options in_mod) := FUNCTION
+    ds_companies_by_acctno := BusinessContactCard.Raw.getBusinessHeaderBest(ds_in, in_mod);
+    // ...and obtain the most recent Corp Key data for each ids to attach for corporate filing status.
+    ds_corp_recs_most_recent_status := BusinessContactCard.Raw.getCorpRecords(ds_in, in_mod);
 
-		ds_companies_with_status := JOIN(ds_companies_by_acctno, ds_corp_recs_most_recent_status,
-																		 LEFT.acctno = RIGHT.acctno,
-																		 TRANSFORM(BusinessContactCard.Layouts.rec_company_best,
-																							 SELF.corp_status_desc := RIGHT.corp_status_desc,
-																							 SELF := LEFT),
-																		 LEFT OUTER,
-																		 LIMIT(0), KEEP(BusinessContactCard.Constants.MAX_RECS_PER_ACCTNO));
-		return ds_companies_with_status;
-	end;
+    ds_companies_with_status := 
+      JOIN(ds_companies_by_acctno, ds_corp_recs_most_recent_status,
+        LEFT.acctno = RIGHT.acctno,
+        TRANSFORM(BusinessContactCard.Layouts.rec_company_best,
+          SELF.corp_status_desc := RIGHT.corp_status_desc;
+          SELF := LEFT;
+        ),
+      LEFT OUTER,
+      LIMIT(0), KEEP(BusinessContactCard.Constants.MAX_RECS_PER_ACCTNO));
 
-	// ========================================================================================
-	//
-	//                                   PARENT COMPANY
-	//
-	// ========================================================================================
-	// For the Parent Company, obtain Best_Info (i.e. Name, Address, Phone) for each BDID.
-	// NOTE: as above, ultimate_parent_information returns only one record, and the group_id
-	// in its bdid field, regardless of what is input.
-	EXPORT parentsRecords(dataset(BusinessContactCard.Layouts.rec_ids_in) ds_in,
-												BusinessContactCard.IParam.options in_mod) := function
-		ds_parents_by_acctno := BusinessContactCard.Raw.getBusinessHeaderParentRecord(ds_in, in_mod);
-		return ds_parents_by_acctno;
-	end;
+    RETURN ds_companies_with_status;
+  END;
 
-
-	// ========================================================================================
-	//
-	//                            SUBJECT COMPANY PHONE VARIATIONS
-	//
-	// ========================================================================================
-	// Obtain the Business Header data for that BDID for Phone Variations. Note that
-	// doxie_cbrs.phone_variations_base returns only the fields 'phone' and 'phone_source_id',
-	// so we need to obtain phone variations from within a Transform to ensure they're
-	// associated with their Group_ID/bdid.
-	EXPORT phoneVariationsRecords(dataset(BusinessContactCard.Layouts.rec_ids_in) ds_in,
-																BusinessContactCard.IParam.options in_mod) := function
-		ds_phone_variations_company := BusinessContactCard.Raw.getPhoneVariationsRecords(ds_in, in_mod);
-		return ds_phone_variations_company;
-	end;
+  // ========================================================================================
+  //
+  // PARENT COMPANY
+  //
+  // ========================================================================================
+  // For the Parent Company, obtain Best_Info (i.e. Name, Address, Phone) for each BDID.
+  // NOTE: as above, ultimate_parent_information returns only one record, and the group_id
+  // in its bdid field, regardless of what is input.
+  EXPORT parentsRecords(DATASET(BusinessContactCard.Layouts.rec_ids_in) ds_in,
+                        BusinessContactCard.IParam.options in_mod) := FUNCTION
+    ds_parents_by_acctno := BusinessContactCard.Raw.getBusinessHeaderParentRecord(ds_in, in_mod);
+    RETURN ds_parents_by_acctno;
+  END;
 
 
-	// ========================================================================================
-	//
-	//                             CONTACTS FOR THE SUBJECT COMPANY
-	//
-	// ========================================================================================
-	// Pull the Business Contacts Key data by BDID (to get Contacts, Executives, DIDs, Titles,
-	// Names & Last Seens). We must rank and sort the contacts by their title.
-	EXPORT contactsRecords(dataset(BusinessContactCard.Layouts.rec_contact) ds_contacts_in,
-												 BusinessContactCard.IParam.options in_mod) := function
+  // ========================================================================================
+  //
+  // SUBJECT COMPANY PHONE VARIATIONS
+  //
+  // ========================================================================================
+  // Obtain the Business Header data for that BDID for Phone Variations. Note that
+  // doxie_cbrs.phone_variations_base returns only the fields 'phone' and 'phone_source_id',
+  // so we need to obtain phone variations from within a Transform to ensure they're
+  // associated with their Group_ID/bdid.
+  EXPORT phoneVariationsRecords(DATASET(BusinessContactCard.Layouts.rec_ids_in) ds_in,
+                                BusinessContactCard.IParam.options in_mod) := FUNCTION
+    ds_phone_variations_company := BusinessContactCard.Raw.getPhoneVariationsRecords(ds_in, in_mod);
+    RETURN ds_phone_variations_company;
+  END;
+
+
+  // ========================================================================================
+  //
+  // CONTACTS FOR THE SUBJECT COMPANY
+  //
+  // ========================================================================================
+  // Pull the Business Contacts Key data by BDID (to get Contacts, Executives, DIDs, Titles,
+  // Names & Last Seens). We must rank and SORT the contacts by their title.
+  EXPORT contactsRecords(DATASET(BusinessContactCard.Layouts.rec_contact) ds_contacts_in,
+                         BusinessContactCard.IParam.options in_mod) := FUNCTION
 
     mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
-		UNRANKED_TITLE_VALUE := 100;
+    UNRANKED_TITLE_VALUE := 100;
 
-		ds_contacts_ranked := JOIN(ds_contacts_in, doxie_cbrs.executive_titles,
-															 LEFT.company_title = RIGHT.stored_title,
-															 TRANSFORM(BusinessContactCard.Layouts.rec_contact,
-																				 SELF.title_rank := RIGHT.title_rank,
-																				 SELF            := LEFT),
-															 LEFT OUTER);
+    ds_contacts_ranked := JOIN(ds_contacts_in, doxie_cbrs.executive_titles,
+      LEFT.company_title = RIGHT.STORED_title,
+      TRANSFORM(BusinessContactCard.Layouts.rec_contact,
+        SELF.title_rank := RIGHT.title_rank;
+        SELF := LEFT),
+      LEFT OUTER);
 
-		ds_contacts := PROJECT(ds_contacts_ranked,
-													TRANSFORM(BusinessContactCard.Layouts.rec_contact,
-																		SELF.title_rank := IF( LEFT.title_rank = 0, UNRANKED_TITLE_VALUE, LEFT.title_rank ),
-																		SELF.is_exec    := IF( LEFT.title_rank = 0, FALSE, TRUE ),
-																		SELF            := LEFT));
+    ds_contacts := PROJECT(ds_contacts_ranked,
+      TRANSFORM(BusinessContactCard.Layouts.rec_contact,
+        SELF.title_rank := IF( LEFT.title_rank = 0, UNRANKED_TITLE_VALUE, LEFT.title_rank );
+        SELF.is_exec := IF( LEFT.title_rank = 0, FALSE, TRUE );
+        SELF := LEFT));
 
-		just_dids := DEDUP(SORT(PROJECT( ds_contacts_in, doxie.layout_references ), did), did);
+    just_dids := DEDUP(SORT(PROJECT( ds_contacts_in, doxie.layout_references ), did), did);
 
-		// Get the home address for each Contact and join it to the list of Contacts.
-		doxie.layout_best best_records := doxie.best_records(just_dids, modAccess := mod_access);
+    // Get the home address for each Contact and JOIN it to the list of Contacts.
+    doxie.layout_best best_records := doxie.best_records(just_dids, modAccess := mod_access);
 
-		ds_contacts_with_home_address := JOIN( ds_contacts, best_records,
-																					 LEFT.did = RIGHT.did,
-																					 TRANSFORM(BusinessContactCard.Layouts.rec_contact,
-																										 SELF.did   := LEFT.did,
-																										 SELF.lname := LEFT.lname,
-																										 SELF.fname := LEFT.fname,
-																										 SELF.mname := LEFT.mname,
-																										 SELF.title := LEFT.title,
-																										 SELF.phone := (UNSIGNED6)LEFT.phone,
-																										 SELF.zip   := (UNSIGNED3)LEFT.zip,
-																										 SELF.zip4  := (UNSIGNED2)LEFT.zip4,
-																										 SELF       := RIGHT,
-																										 SELF       := LEFT),
-																					 LEFT OUTER,
-																					 LIMIT(0), KEEP(BusinessContactCard.Constants.MAX_CONTACTS_PER_REC));
-		return ds_contacts_with_home_address;
-	end;
+    ds_contacts_with_home_address := JOIN(ds_contacts, best_records,
+      LEFT.did = RIGHT.did,
+      TRANSFORM(BusinessContactCard.Layouts.rec_contact,
+        SELF.did := LEFT.did;
+        SELF.lname := LEFT.lname;
+        SELF.fname := LEFT.fname;
+        SELF.mname := LEFT.mname;
+        SELF.title := LEFT.title;
+        SELF.phone := (UNSIGNED6)LEFT.phone;
+        SELF.zip := (UNSIGNED3)LEFT.zip;
+        SELF.zip4 := (UNSIGNED2)LEFT.zip4;
+        SELF := RIGHT;
+        SELF := LEFT
+      ),
+      LEFT OUTER,
+      LIMIT(0), KEEP(BusinessContactCard.Constants.MAX_CONTACTS_PER_REC));
 
-	// ========================================================================================
-	//
-	//                           EDA (GONG) PHONE RECORDS FOR CONTACTS
-	//
-	// ========================================================================================
-	// Obtain the most recent EDA/Gong phone number for each Contact.
-	EXPORT gongRecords(dataset(BusinessContactCard.Layouts.rec_ids_did_in) ds_in, doxie.IDataAccess mod_access) := FUNCTION
+    RETURN ds_contacts_with_home_address;
+  END;
+
+  // ========================================================================================
+  //
+  // EDA (GONG) PHONE RECORDS FOR CONTACTS
+  //
+  // ========================================================================================
+  // Obtain the most recent EDA/Gong phone number for each Contact.
+  EXPORT gongRecords(DATASET(BusinessContactCard.Layouts.rec_ids_did_in) ds_in, doxie.IDataAccess mod_access) := FUNCTION
 
     // Temporary layout to keep suppression related fields from key.
     tmp_layout := RECORD
@@ -142,40 +147,41 @@ EXPORT ProductRecords := MODULE
     gong_records_acctno_no_timezone := PROJECT(gong_records_ant_suppressed,
       BusinessContactCard.Layouts.rec_gong_records_acctno);
 
-		// Add timezone
-		ut.getTimeZone(gong_records_acctno_no_timezone, phone10, TimeZone, gong_records_acctno);
-		return gong_records_acctno;
-	end;
+    // Add timezone
+    ut.getTimeZone(gong_records_acctno_no_timezone, phone10, TimeZone, gong_records_acctno);
+    RETURN gong_records_acctno;
+  END;
 
-	// ========================================================================================
-	//
-	//                           PHONESPLUS RECORDS FOR CONTACTS
-	//
-	// ========================================================================================
-	// Obtain most recent PhonesPlus phone number for each Contact.
-	EXPORT phonesPlusRecords(dataset(BusinessContactCard.Layouts.rec_ids_did_in) ds_in) := FUNCTION
-		just_dids := DEDUP(SORT(PROJECT( ds_in, doxie.layout_references ), did), did);
-		// TODO: Use constants, proper input params.
-		pplus_recs := moxie_phonesplus_server.phonesplus_did_records (
-				dids                  := just_dids,
-				max_count_value       := iesp.Constants.BR.MaxPhones,
-				score_threshold_value := AutoStandardI.DefaultModule().scorethreshold, // no default value
-				glb_value             := 0,
-				dppa_value            := 0,
-				min_confidencescore   := 11, // 11 is the parameter default value
-				is_roxie              := TRUE
-				).w_timezoneSeenDt;
+  // ========================================================================================
+  //
+  // PHONESPLUS RECORDS FOR CONTACTS
+  //
+  // ========================================================================================
+  // Obtain most recent PhonesPlus phone number for each Contact.
+  EXPORT phonesPlusRecords(DATASET(BusinessContactCard.Layouts.rec_ids_did_in) ds_in) := FUNCTION
+    just_dids := DEDUP(SORT(PROJECT( ds_in, doxie.layout_references ), did), did);
+    // TODO: Use constants, proper input params.
+    pplus_recs := moxie_phonesplus_server.phonesplus_did_records (
+        dids := just_dids,
+        max_count_value := iesp.Constants.BR.MaxPhones,
+        score_threshold_value := AutoStandardI.DefaultModule().scorethreshold, // no default value
+        glb_value := 0,
+        dppa_value := 0,
+        min_confidencescore := 11, // 11 is the parameter default value
+        is_roxie := TRUE
+        ).w_timezoneSeenDt;
 
-		pplus_recs_deduped := DEDUP(SORT(pplus_recs, did, -last_seen), did);
+    pplus_recs_deduped := DEDUP(SORT(pplus_recs, did, -last_seen), did);
 
-		phonesplus_records_acctno := JOIN(ds_in, pplus_recs_deduped,
-																			LEFT.did = (UNSIGNED6)RIGHT.did,
-																			TRANSFORM(BusinessContactCard.Layouts.rec_phonesplus_acctno,
-																				SELF.acctno   := LEFT.acctno,
-																				SELF.group_id := LEFT.group_id,
-																				SELF          := RIGHT),
-																			LIMIT(0), KEEP(BusinessContactCard.Constants.MAX_PHONESPLUS_PER_REC) );
-		return phonesplus_records_acctno;
-	END;
+    phonesplus_records_acctno := JOIN(ds_in, pplus_recs_deduped,
+      LEFT.did = (UNSIGNED6)RIGHT.did,
+      TRANSFORM(BusinessContactCard.Layouts.rec_phonesplus_acctno,
+        SELF.acctno := LEFT.acctno;
+        SELF.group_id := LEFT.group_id;
+        SELF := RIGHT),
+      LIMIT(0), KEEP(BusinessContactCard.Constants.MAX_PHONESPLUS_PER_REC) );
+      
+    RETURN phonesplus_records_acctno;
+  END;
 
 END;

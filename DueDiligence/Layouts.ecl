@@ -92,8 +92,56 @@ EXPORT Layouts := MODULE
     Address cleanAddress;
   END;
 
+  EXPORT SharedInput := RECORD
+    UNSIGNED6 lexID;
+    DueDiligence.v3Layouts.Internal.Address address;
+    STRING14 phone; 
+    STRING11 taxID;
+  END;
+  
+  EXPORT BusInput := RECORD
+    STRING120 companyName;
+    STRING120 altCompanyName;
+    SharedInput;
+  END;
+  
+  EXPORT IndInput := RECORD
+    Name name;
+    STRING3 nameInputOrder;
+    SharedInput;
+    STRING8 dob;
+  END;
+
 
   EXPORT Input := RECORD
+    UNSIGNED4 seq;
+    UNSIGNED4 inputSeq;
+    STRING30 accountNumber;
+    BOOLEAN validRequest;
+    STRING200 errorMessage;
+    STRING25 productRequested; //attributesonly, citizenshiponly, attributesandcitizenship, customattributes, standard
+    STRING10 requestedVersion; //DDAPERV3, DDABUSV3
+    DATASET({STRING15 attributeModules}) requestedModules;
+    UNSIGNED4 historyDateYYYYMMDD;
+    BusInput rawBusiness;
+    BusInput cleanedBusiness;
+    IndInput rawPerson;
+    IndInput cleanedPerson;
+    DueDiligence.Citizenship.Layouts.Input;
+    
+    
+    //existing
+    BOOLEAN containsCitizenshipReq;
+    BOOLEAN containsPersonReq;
+    BOOLEAN addressProvided;
+    BOOLEAN fullCleanAddressExists;
+    BOOLEAN lexIDPopulated;
+    BOOLEAN piiPopulated;
+    // Busn_Input business;
+    // Indv_Input individual;
+  END;
+  
+  EXPORT OldInput := RECORD
     BOOLEAN validRequest;
     STRING200 errorMessage;
     BOOLEAN containsCitizenshipReq;
@@ -113,8 +161,8 @@ EXPORT Layouts := MODULE
   END;
 
   EXPORT CleanedData := RECORD
-    Input inputEcho;
-    Input cleanedInput;
+    OldInput inputEcho;
+    OldInput cleanedInput;
   END;
 
   //ALSO USED BY BATCH - changing name will impact batch

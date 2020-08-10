@@ -3,12 +3,14 @@ import Address_Rank, AutoStandardI, Doxie;
 export Records (dataset(AddrBest.Layout_BestAddr.Batch_in) batch_in,
   AddrBest.IParams.SearchParams in_mod) := module
 
+  mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+
   //*****************Get ranked records to account for any address not returned based on input***************/
   rank_batch_in := project(batch_in, transform(Address_Rank.Layouts.Batch_in, self:=left, self:=[]));
   temp_mod := module(project(in_mod, Address_Rank.IParams.BatchParams, opt))
+    doxie.compliance.MAC_CopyModAccessValues(mod_access);
     export unsigned1 MaxRecordsToReturn := max(in_mod.MaxRecordsToReturn,Address_Rank.Constants.MaxRecordsToReturn);
   end;
-  mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
   ranked_recs := Address_Rank.fn_getRank_wMetadata(rank_batch_in,temp_mod);
 
   AddrBest.layout_header_ext popHeaderFormat(Address_Rank.Layouts.Bestrec l):= transform

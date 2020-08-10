@@ -275,8 +275,12 @@ export Identifier2_Service := MACRO
     string50 StateCityZip := search_address.StateCityZip; 
     #stored('StateCityZip',StateCityZip);
   												
-  iesp.ECL2ESP.SetInputName (search_by.Name,true);
-	
+    #stored ('FirstName', search_by.Name.First);
+    #stored ('MiddleName', search_by.Name.Middle);
+    #stored ('LastName', search_by.Name.Last);
+    #stored ('namesuffix', search_by.Name.Suffix); // unlikely used anywhere.
+    #stored ('UnParsedFullName', search_by.Name.Full);	
+
 	boolean useFML := true;
 	#stored ('cleanNameFML', useFML);
   iesp.ECL2ESP.SetInputDate (search_by.DOB , 'DOB'); 

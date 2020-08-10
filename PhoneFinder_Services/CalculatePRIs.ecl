@@ -137,6 +137,7 @@ FUNCTION
                                 47 => pInput.phone_inresponse_count > le.ThresholdA,
                                 48 => isSelfReportedSourcesOnly,
                                 49 => Std.Str.ToUpperCase(pInput.coc_description) = $.Constants.PhoneType.Other,
+                                50 => Std.Str.ToUpperCase(pInput.coc_description) = $.Constants.PhoneType.Cable,
                                 FALSE);
 
       SELF.RiskId      := IF(isPRIFail, le.RiskId, SKIP);

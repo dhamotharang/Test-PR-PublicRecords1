@@ -4,9 +4,9 @@
 IMPORT BIPV2, Cortera, Doxie, iesp, MDR, TopBusiness_Services;
 
 EXPORT CorteraSource_Records (
-  DATASET(Layouts.rec_input_ids_wSrc) in_docids,
+  DATASET(TopBusiness_Services.Layouts.rec_input_ids_wSrc) in_docids,
   Doxie.IDataAccess mod_access,
-  SourceService_Layouts.OptionsLayout inoptions, 
+  TopBusiness_Services.SourceService_Layouts.OptionsLayout inoptions, 
 	BOOLEAN IsFCRA = FALSE) 
  := MODULE
  	
@@ -16,7 +16,7 @@ EXPORT CorteraSource_Records (
 																																		SELF := []));																																		
 	// *** Key fetch to get cortera data from linkids key
   SHARED ds_corterakeys := PROJECT(TopBusiness_Services.Key_Fetches(DEDUP(in_docs_linkonly,ALL),
-													                               inoptions.fetch_level
+													                               inoptions.fetch_level,topbusiness_services.constants.SlimKeepLimit
 																									      ).ds_cortera_linkidskey_recs,
 																TRANSFORM(TopBusiness_Services.Layouts.rec_input_ids_wSrc,
 																             SELF.IdValue := (STRING) LEFT.link_id;

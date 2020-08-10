@@ -92,11 +92,175 @@ EXPORT Common_Functions := MODULE;
 		RawSource IN MDR.SourceTools.set_Phones_Plus								=> Business_Risk_BIP.Constants.Src_PhonesPlus,
 		RawSource IN MDR.SourceTools.set_Business_Credit						=> Business_Risk_BIP.Constants.Src_Business_Credit,
 																																	 RawSource);
-																																	 
+
+	// Ideally we would roll this ConsumerSourceGroup function into the SourceGroup logic above that is used for source groupings from 
+	// the BIP Header. However, since there are some differences in the source roll-up groupings between business and consumer,
+	// we'll keep them separate.
+	EXPORT ConsumerSourceGroup(STRING RawSource) := CASE(RawSource,
+		MDR.sourceTools.src_AK_Perm_Fund => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_AK_Perm_Fund,
+		MDR.sourceTools.src_Airmen => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Airmen,
+		MDR.sourceTools.src_Aircrafts => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Aircrafts,
+		MDR.sourceTools.src_Bankruptcy => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Bankruptcy,
+		MDR.sourceTools.src_US_Coastguard => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_US_Coastguard,
+		MDR.sourceTools.src_Certegy => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Certegy,
+		MDR.sourceTools.src_DE_Experian_DL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DL,
+		MDR.sourceTools.src_ID_Experian_DL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DL,
+		MDR.sourceTools.src_IL_Experian_DL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DL,
+		MDR.sourceTools.src_KY_Experian_DL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DL,
+		MDR.sourceTools.src_MS_Experian_DL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DL,
+		MDR.sourceTools.src_ME_DL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DL,
+		MDR.sourceTools.src_MI_DL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DL,
+		MDR.sourceTools.src_FL_DL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DL,
+		MDR.sourceTools.src_ID_DL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DL,
+		MDR.sourceTools.src_KY_DL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DL,
+		MDR.sourceTools.src_MO_DL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DL,
+		MDR.sourceTools.src_MN_DL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DL,
+		MDR.sourceTools.src_OH_DL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DL,
+		MDR.sourceTools.src_MA_DL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DL,
+		MDR.sourceTools.src_NC_DL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DL,
+		MDR.sourceTools.src_TN_DL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DL,
+		MDR.sourceTools.src_TX_DL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DL,
+		MDR.sourceTools.src_WI_DL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DL,
+		MDR.sourceTools.src_SC_Experian_DL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DL,
+		MDR.sourceTools.src_WY_DL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DL,
+		MDR.sourceTools.src_DEA => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_DEA,
+		MDR.sourceTools.src_Death_NV => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Death,
+		MDR.sourceTools.src_Death_VA => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Death,
+		MDR.sourceTools.src_Death_CA => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Death,
+		MDR.sourceTools.src_Death_FL => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Death,
+		MDR.sourceTools.src_Death_GA => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Death,
+		MDR.sourceTools.src_Death_MI => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Death,
+		MDR.sourceTools.src_Death_MT => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Death,
+		MDR.sourceTools.src_Death_OH => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Death,
+		MDR.sourceTools.src_Death_Master => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Death,
+		MDR.sourceTools.src_Death_State => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Death,
+		MDR.sourceTools.src_Death_Obituary => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Death,
+		MDR.sourceTools.src_OKC_Probate => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Death,
+		MDR.sourceTools.src_Death_Tributes => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Death,
+		MDR.sourceTools.src_EMerge_Boat => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_EMerge_Boat,
+		MDR.sourceTools.src_Experian_Phones => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Experian_Phones,
+		MDR.sourceTools.src_EMerge_Hunt => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_EMerge,
+		MDR.sourceTools.src_EMerge_Fish => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_EMerge,
+		MDR.sourceTools.src_EMerge_CCW => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_EMerge,
+		MDR.sourceTools.src_EMerge_Cens => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_EMerge,
+		MDR.sourceTools.src_EMerge_Master => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_EMerge,
+		MDR.sourceTools.src_Experian_Credit_Header => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Experian_Credit_Header,
+		MDR.sourceTools.src_Equifax => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Equifax,
+		MDR.sourceTools.src_Equifax_Quick => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Equifax,
+		MDR.sourceTools.src_Equifax_Weekly => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Equifax,
+		MDR.sourceTools.src_Federal_Explosives => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Federal_Explosives,
+		MDR.sourceTools.src_Federal_Firearms => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Federal_Firearms,
+		MDR.sourceTools.src_Foreclosures => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Foreclosures,
+		MDR.sourceTools.src_Liens_v2 => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Liens_v2,
+		MDR.sourceTools.src_Liens => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Liens_v2,
+		MDR.sourceTools.src_MS_Worker_Comp => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_MS_Worker_Comp,
+		MDR.sourceTools.src_Foreclosures_Delinquent => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Foreclosures_Delinquent,
+		MDR.sourceTools.src_LnPropV2_Fares_Asrs => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_LnPropV2,
+		MDR.sourceTools.src_LnPropV2_Fares_Deeds => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_LnPropV2,
+		MDR.sourceTools.src_LnPropV2_Lexis_Asrs => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_LnPropV2,
+		MDR.sourceTools.src_LnPropV2_Lexis_Deeds_Mtgs => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_LnPropV2,
+		MDR.sourceTools.src_Fares_Deeds_from_Asrs => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_LnPropV2,
+		MDR.sourceTools.src_AlloyMedia_student_list => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_StudentList,
+		MDR.sourceTools.src_American_Students_List => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_StudentList,
+		MDR.sourceTools.src_OKC_Students_List => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_OKC_Students_List,
+		MDR.sourceTools.src_TU_CreditHeader => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_TU_CreditHeader,
+		MDR.sourceTools.src_TUCS_Ptrack => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_TUCS_Ptrack,
+		MDR.sourceTools.src_Lexis_Trans_Union => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_TransUnion,
+		MDR.sourceTools.src_TransUnion => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_TransUnion,
+		MDR.sourceTools.src_Mixed_Utilities => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Utilities,
+		MDR.sourceTools.src_Utilities => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Utilities,
+		MDR.sourceTools.src_Util_Work_Phone => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Utilities,
+		MDR.sourceTools.src_ZUtil_Work_Phone => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Utilities,
+		MDR.sourceTools.src_ZUtilities => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Utilities,
+		MDR.sourceTools.src_OH_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_WY_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_DE_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_DC_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_TX_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_SD_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_AR_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_AZ_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_IA_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_KS_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_NC_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_RI_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_VT_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_ND_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_AK_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_ME_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_AL_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_CO_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_NE_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_FL_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_FL_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_NE_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_IL_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_ID_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_ID_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_KY_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_KY_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_LA_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_MT_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_GA_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle, 
+		MDR.sourceTools.src_MD_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_MS_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_MA_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_MN_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_OK_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_OH_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_MI_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_NY_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_ME_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_NC_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_SC_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_MO_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_TN_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_TX_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_UT_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_MN_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_WI_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_WI_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_MS_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_MO_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_WY_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_MT_Experian_Veh => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Vehicle,
+		MDR.sourceTools.src_Voters_v2 => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Voters_v2,
+		MDR.sourceTools.src_AK_Fishing_boats => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_AK_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_WA_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_MN_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_MS_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_MT_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_NE_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_UT_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_WY_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_MO_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_FL_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_GA_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_KS_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_MA_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_KY_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_AL_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_NC_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_OH_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_IL_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_ME_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_AR_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_SC_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_TN_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_WI_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_MI_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_NY_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_AZ_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_TX_Watercraft => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Watercraft,
+		MDR.sourceTools.src_Targus_White_pages => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Targus_White_pages,
+		MDR.sourceTools.src_Professional_License => PublicRecords_KEL.ECL_Functions.Constants.SourceGroup_Professional_License,
+		'');
+
 	EXPORT GetLinkIDs(DATASET(PublicRecords_KEL.ECL_Functions.Layouts_FDC(PublicRecords_KEL.Interface_Options).Layout_FDC) shell) := FUNCTION
 		
 		BIPV2.IDlayouts.l_xlink_ids2 grabLinkIDs(PublicRecords_KEL.ECL_Functions.Layouts_FDC(PublicRecords_KEL.Interface_Options).Layout_FDC le) := TRANSFORM
-			SELF.UniqueID		:= le.G_ProcBusUID;
+			SELF.UniqueID		:= le.UIDAppend;
 			SELF.PowID			:= le.B_LexIDSite;
 			SELF.PowScore		:= 0;
 			SELF.PowWeight	:= 0;
@@ -151,16 +315,34 @@ EXPORT Common_Functions := MODULE;
 									FEW); // Can use FEW because the RIGHT side should contain < 10000 rows (100 only average in batch)
 	ENDMACRO;		
 	
-	EXPORT IsMarketingAllowedKey(string src, string st = '') := FUNCTION
-			RETURN(EXISTS(Codes.Key_Codes_V3(KEYED(file_name = 'VENDOR_SOURCES') AND
-			KEYED(field_name= 'DIRECTMARKETING') AND
-			KEYED(field_name2 = 'SCODE') AND
-			KEYED(code = src)
+SHARED marketinglay := record
+Codes.layout_codes_v3-long_flag;
+end;	
+
+SHARED marketinglayout := record
+string2 code;
+end;	
+
+SHARED marketingtemp := dataset([{'VENDOR_SOURCES','DIRECTMARKETING','SCODE','',''}],marketinglay);	
+	
+SHARED getmarketing := join(marketingtemp,	Codes.Key_Codes_V3,
+							keyed(left.file_name = right.file_name and 
+										left.field_name = right.field_name and 
+										left.field_name2 = right.field_name2),
+										Transform(marketinglayout,
+											self.code := right.code,
+											self := []));
+
+SHARED s1_daily := set(getmarketing, (string)code);
+
+EXPORT IsMarketingAllowedKey(string src, string st = '') := FUNCTION
+			
+			RETURN(((src IN s1_daily)
 			AND NOT (src = MDR.sourceTools.src_LnPropV2_Lexis_Asrs
 			AND st IN ['ID','IL','KS','NM','SC','WA', ''])
 			AND NOT (src = MDR.sourceTools.src_LnPropV2_Lexis_Deeds_Mtgs
-			AND st IN ['ID','IL','KS','NM','SC','WA', '']))));
-	END;
-	
+			AND st IN ['ID','IL','KS','NM','SC','WA', ''])));
+			
+end;			
 	
 END;	

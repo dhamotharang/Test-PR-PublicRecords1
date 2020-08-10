@@ -42,4 +42,11 @@ export Vehicle_InformationAddl :=
 		Vehicle_InformationAddl Vehicle3;
 	END;
 
+	export VehRec :=
+    RECORD
+		Layout_Boca_Shell_ids;
+		Vehicle_Set;
+		unsigned1 relative_owned_count;
+	END;
 END;
+

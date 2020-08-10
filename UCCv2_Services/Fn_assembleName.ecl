@@ -1,19 +1,19 @@
-export Fn_assembleName(
-	String title,
-	String fname,
-	String mname,
-	String lname,
-	String suffix
-) := function
+EXPORT Fn_assembleName(
+  STRING title,
+  STRING fname,
+  STRING mname,
+  STRING lname,
+  STRING suffix
+) := FUNCTION
 
-	result := trim(
-		if(title<>'', title + ' ', '') +
-		if(fname<>'', fname + ' ', '') +
-		if(mname<>'', mname + ' ', '') +
-		if(lname<>'', lname + ' ', '') +
-		if(suffix<>'', suffix + ' ', '')
-	);
+  result := TRIM(
+    IF(title<>'', title + ' ', '') +
+    IF(fname<>'', fname + ' ', '') +
+    IF(mname<>'', mname + ' ', '') +
+    IF(lname<>'', lname + ' ', '') +
+    IF(suffix<>'', suffix + ' ', '')
+  );
 
-	return(result);
-	
-end;
+  RETURN(result);
+  
+END;

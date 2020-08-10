@@ -66,6 +66,7 @@ MODULE
     EXPORT Pager    := 'PAGER';
     EXPORT VoIP     := 'POSSIBLE VOIP';
     EXPORT Other    := 'OTHER/UNKNOWN';
+    EXPORT Cable    := 'CABLE';
   END;
 
   EXPORT serviceType   := ENUM(LandLine = 0,Wireless = 1,VOIP = 2,Unknown = 3);
@@ -274,6 +275,14 @@ MODULE
     EXPORT STRING PeopleAtWork := 'WK';
     EXPORT STRING Spouse := 'SP';
   END;
+
+  EXPORT GatewayMaxTimeout := MODULE
+    
+    EXPORT DECIMAL AccuData_CallerID_RequestTimeout := 1;
+    EXPORT DECIMAL AccuData_OCN_RequestTimeout := 1.7;
+  END;
+
+  
 
   EXPORT CategoryCodes := DATASET([
         {PFSourceCategory.Inquiry, MDR.sourceTools.src_Wired_Assets_Royalty, PFSourceType.SelfReported}, //WR

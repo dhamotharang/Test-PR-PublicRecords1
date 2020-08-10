@@ -1,7 +1,12 @@
-﻿import doxie_cbrs, ut;
-doxie_cbrs.mac_Selection_Declare()
-export reverse_lookup_records_prs(dataset(doxie_cbrs.layout_references) bdids) := function
-rlr := doxie_cbrs.reverse_lookup_records(bdids,Include_ReversePhone_val);
+﻿IMPORT doxie, doxie_cbrs, ut;
+
+EXPORT reverse_lookup_records_prs(DATASET(doxie_cbrs.layout_references) bdids, 
+                                  doxie.IDataAccess mod_access,
+                                  BOOLEAN Include_ReversePhone,
+                                  UNSIGNED3 Max_ReverseLookup
+                                  ) := FUNCTION
+                                  
+rlr := doxie_cbrs.reverse_lookup_records(bdids,mod_access,Include_ReversePhone);
 
 baserec := record
 	string10          phone10; 
@@ -50,7 +55,7 @@ end;
 slm := project(rlr, slim(left));
 
 //**** limit our numbers
-lmt := choosen(sort(slm, level, phone10, listed_name), Max_ReverseLookup_val * 2);
+lmt := choosen(sort(slm, level, phone10, listed_name), Max_ReverseLookup * 2);
 
 //***** rollup the names
 srt := sort(lmt, phone10, prim_range, prim_name, sec_range, z5, listed_name);
@@ -77,7 +82,7 @@ ddp := project(srt2, dedupit(left));
 //***** try out a cum. count
 rec iter(rec l, rec r) := transform
 	self.cumulative_count := l.cumulative_count + count(r.listed_name_children);
-	self.past_max := l.cumulative_count >= Max_ReverseLookup_val;
+	self.past_max := l.cumulative_count >= Max_ReverseLookup;
 	self := r;
 end;
 

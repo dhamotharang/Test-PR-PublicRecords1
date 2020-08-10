@@ -1,8 +1,9 @@
 ﻿IMPORT BIPV2, Business_Risk_BIP, iesp, Patriot, BusinessInstantID20_Services;
 
 EXPORT mod_BusinessShell(DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) ds_input,
-                           BusinessInstantID20_Services.iOptions Options) := 
-	MODULE
+                         BusinessInstantID20_Services.iOptions Options,
+						 Boolean useUpdatedBipAppend = true) := 	MODULE
+
 
 			SHARED Business_Risk_BIP.Layouts.Input convertToBusinessShellInput(RECORDOF(ds_input) le) := TRANSFORM
 				SELF.Seq                 := le.Seq;
@@ -132,26 +133,27 @@ EXPORT mod_BusinessShell(DATASET(BusinessInstantID20_Services.layouts.InputCompa
 			 
 			// Grab Business Shell results. Layout is Business_Risk_BIP.Layouts.Shell .
 			SHARED Shell_Results := Business_Risk_BIP.LIB_Business_Shell_Function(Shell_Input,
-																																		 Options.DPPA_Purpose,
-																																		 Options.GLBA_Purpose,
-																																		 Options.DataRestrictionMask,
-																																		 Options.DataPermissionMask,
-																																		 Options.IndustryClass,
-																																		 Options.LinkSearchLevel,
-																																		 Options.BusShellVersion,
-																																		 Options.MarketingMode,
-																																		 Options.AllowedSources,
-																																		 Options.BIPBestAppend,
-																																		 Options.OFAC_Version,
-																																		 Options.Global_Watchlist_Threshold,
-																																		 ds_WatchlistsRequested,
-																																		 Options.KeepLargeBusinesses, 
-																																		 Options.IncludeTargusGateway,
-																																		 Options.Gateways,
-																																		 Options.RunTargusGatewayAnywayForTesting, // for testing purposes only
-																																		 Options.OverRideExperianRestriction, 
-																																		 BusinessInstantID20_Services.Constants.INCLUDE_AUTHREP_IN_BIP_APPEND,
-																																		 BusinessInstantID20_Services.Constants.IS_BIID_20);						
+																				  Options.DPPA_Purpose,
+																				  Options.GLBA_Purpose,
+																				  Options.DataRestrictionMask,
+																				  Options.DataPermissionMask,
+																				  Options.IndustryClass,
+																			      Options.LinkSearchLevel,
+																				  Options.BusShellVersion,
+																				  Options.MarketingMode,
+																				  Options.AllowedSources,
+																				  Options.BIPBestAppend,
+																				  Options.OFAC_Version,
+																				  Options.Global_Watchlist_Threshold,
+																				  ds_WatchlistsRequested,
+																				  Options.KeepLargeBusinesses, 
+																				  Options.IncludeTargusGateway,
+																				  Options.Gateways,
+																				  Options.RunTargusGatewayAnywayForTesting, // for testing purposes only
+																				  Options.OverRideExperianRestriction, 
+																				  BusinessInstantID20_Services.Constants.INCLUDE_AUTHREP_IN_BIP_APPEND,
+																				  BusinessInstantID20_Services.Constants.IS_BIID_20,
+																				  in_useUpdatedBipAppend := useUpdatedBipAppend);						
 
 			SHARED BIPV2.IDlayouts.l_xlink_ids2 grabLinkIDs(Business_Risk_BIP.Layouts.Shell le) := 
 				TRANSFORM

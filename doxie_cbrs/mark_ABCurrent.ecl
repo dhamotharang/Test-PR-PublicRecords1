@@ -1,9 +1,11 @@
-﻿import did_add,doxie_cbrs,ut;
+﻿IMPORT did_add,doxie,doxie_cbrs,ut;
 doxie_cbrs.mac_Selection_Declare()
-export mark_ABCurrent(dataset(doxie_cbrs.layout_best_records_prs) inf,dataset(doxie_cbrs.layout_references) bdids) :=
+EXPORT mark_ABCurrent(DATASET(doxie_cbrs.layout_best_records_prs) inf,
+                      DATASET(doxie_cbrs.layout_references) bdids,
+                      doxie.IDataAccess mod_access) :=
 FUNCTION
 
-rlr := table(doxie_cbrs.reverse_lookup_records(bdids,Include_ReversePhone_val), {phone10, listed_name});
+rlr := table(doxie_cbrs.reverse_lookup_records(bdids,mod_access,Include_ReversePhone_val), {phone10, listed_name});
 
 
 inf tra(inf le, rlr ri) := transform

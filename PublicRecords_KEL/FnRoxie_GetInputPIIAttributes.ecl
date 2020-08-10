@@ -1,9 +1,9 @@
-﻿IMPORT KEL11 AS KEL;
+﻿IMPORT KEL13 AS KEL;
 EXPORT FnRoxie_GetInputPIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) RepInput,
             PublicRecords_KEL.Interface_Options Options) := FUNCTION
             		
     
-	InputPIIAttributesResults := PublicRecords_KEL.Q_Input_Attributes_V1(RepInput, (STRING) RepInput[1].P_InpClnArchDt[1..8], Options.KEL_Permissions_Mask).Res0;
+	InputPIIAttributesResults := PublicRecords_KEL.Q_Input_Attributes_V1(RepInput, (INTEGER) RepInput[1].P_InpClnArchDt[1..8], Options.KEL_Permissions_Mask).Res0;
 	InputPIIAttributes := KEL.Clean(InputPIIAttributesResults, TRUE, TRUE, TRUE);		
 		
 		ds_changedatatype :=

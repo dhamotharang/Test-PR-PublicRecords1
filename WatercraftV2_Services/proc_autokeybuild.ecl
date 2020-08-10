@@ -1,52 +1,52 @@
-import autokeyb2,doxie,ut,corp2,address,watercraft;
+IMPORT autokeyb2,doxie,ut,corp2,address,watercraft;
 
-export proc_autokeybuild(string filedate) := FUNCTION
+EXPORT proc_autokeybuild(STRING filedate) := FUNCTION
 
-dis_watercraft :=distribute(watercraft.File_Base_search_Dev(watercraft_key <> ''),hash(watercraft_key));
+dis_watercraft :=DISTRIBUTE(watercraft.File_Base_search_Dev(watercraft_key <> ''),hash(watercraft_key));
 
-layout_watercraft := record
+layout_watercraft := RECORD
 Watercraft.Layout_Watercraft_Search_Base;
-	unsigned6 ldid;
-	unsigned6 lbdid;
-	string10 phone :='';
-	unsigned1 zero := 0;
-	string25 city;
-	string2 bstate :='';
-	string25 bcity :='';
-	string10 bphone :='';
-	string10	bprim_range :='';
-	string28	bprim_name :='';
-	string8		bsec_range :='';
-	string5 bzip5 :='';
-	string9 fein_use :='';
-	string9 ssn_use := '';
+  UNSIGNED6 ldid;
+  UNSIGNED6 lbdid;
+  STRING10 phone :='';
+  UNSIGNED1 zero := 0;
+  STRING25 city;
+  STRING2 bstate :='';
+  STRING25 bcity :='';
+  STRING10 bphone :='';
+  STRING10 bprim_range :='';
+  STRING28 bprim_name :='';
+  STRING8 bsec_range :='';
+  STRING5 bzip5 :='';
+  STRING9 fein_use :='';
+  STRING9 ssn_use := '';
 END;
 
 
 
 
-layout_watercraft both_cities(Watercraft.Layout_Watercraft_Search_Base le,integer C):=transform
-self.city :=choose(C,le.p_city_name,if(le.v_city_name='' or le.v_city_name=le.p_city_name,skip,le.v_city_name ));
-self.ldid :=(unsigned6) le.did;
-self.lbdid :=(unsigned6) le.bdid;
-self :=le;
-end;
+layout_watercraft both_cities(Watercraft.Layout_Watercraft_Search_Base le,INTEGER C):=TRANSFORM
+SELF.city :=CHOOSE(C,le.p_city_name,IF(le.v_city_name='' OR le.v_city_name=le.p_city_name,skip,le.v_city_name ));
+SELF.ldid :=(UNSIGNED6) le.did;
+SELF.lbdid :=(UNSIGNED6) le.bdid;
+SELF :=le;
+END;
 
 //capture both city names
-watercraft_both_cities :=normalize(dis_watercraft,2,both_cities(left,counter));
+watercraft_both_cities :=normalize(dis_watercraft,2,both_cities(LEFT,COUNTER));
 
 
 //capture all phones
 
-layout_watercraft all_phones(layout_watercraft le,integer C):=transform
-self.phone :=choose(C,le.phone_1,if(le.phone_2='' or le.phone_2=le.phone_1,skip,le.phone_2));
-self :=le;
-end;
+layout_watercraft all_phones(layout_watercraft le,INTEGER C):=TRANSFORM
+SELF.phone :=CHOOSE(C,le.phone_1,IF(le.phone_2='' OR le.phone_2=le.phone_1,skip,le.phone_2));
+SELF :=le;
+END;
 
-watercraft_both_phones :=dedup(normalize(watercraft_both_cities,2, all_phones(left,counter)),record,all,local );
+watercraft_both_phones :=DEDUP(normalize(watercraft_both_cities,2, all_phones(LEFT,COUNTER)),RECORD,all,local );
 
 
-layout_watercraft_use := record
+layout_watercraft_use := RECORD
 Watercraft.Layout_Watercraft_Search_Base.watercraft_key;
 Watercraft.Layout_Watercraft_Search_Base.sequence_key;
 Watercraft.Layout_Watercraft_Search_Base.state_origin;
@@ -59,38 +59,38 @@ Watercraft.Layout_Watercraft_Search_Base.prim_range;
 Watercraft.Layout_Watercraft_Search_Base.st;
 Watercraft.Layout_Watercraft_Search_Base.zip5;
 Watercraft.Layout_Watercraft_Search_Base.sec_range;
-Watercraft.Layout_Watercraft_Search_Base.company_name;	
-	unsigned6 ldid;
-	unsigned6 lbdid;
-	string10 phone :='';
-	unsigned1 zero := 0;
-	string25 city;
-	string2 bstate :='';
-	string25 bcity :='';
-	string10 bphone :='';
-	string10	bprim_range :='';
-	string28	bprim_name :='';
-	string8		bsec_range :='';
-	string5 bzip5 :='';
-	string9 fein_use :='';
-	string9 ssn_use := '';
+Watercraft.Layout_Watercraft_Search_Base.company_name;
+  UNSIGNED6 ldid;
+  UNSIGNED6 lbdid;
+  STRING10 phone :='';
+  UNSIGNED1 zero := 0;
+  STRING25 city;
+  STRING2 bstate :='';
+  STRING25 bcity :='';
+  STRING10 bphone :='';
+  STRING10 bprim_range :='';
+  STRING28 bprim_name :='';
+  STRING8 bsec_range :='';
+  STRING5 bzip5 :='';
+  STRING9 fein_use :='';
+  STRING9 ssn_use := '';
 END;
 
-layout_watercraft_use w_bState(layout_watercraft le):=transform
+layout_watercraft_use w_bState(layout_watercraft le):=TRANSFORM
 c :=le.company_name <> '';
-self.fein_use :=if(le.orig_fein <> '',le.orig_fein,le.fein);
-self.ssn_use :=if(le.orig_ssn <>'',le.orig_ssn,le.ssn);
-self.bstate := if(c,le.st,'');
-self.bcity := if(c,le.city,'');
-self.bzip5 :=if(c,le.zip5,'');
-self.bprim_name := if(c,le.prim_name,'');
-self.bprim_range :=if(c,le.prim_range,'');
-self.bsec_range :=if(c,le.sec_range,'');
-self.bphone :=if(c,le.phone,'');
-self :=le;
+SELF.fein_use :=IF(le.orig_fein <> '',le.orig_fein,le.fein);
+SELF.ssn_use :=IF(le.orig_ssn <>'',le.orig_ssn,le.ssn);
+SELF.bstate := IF(c,le.st,'');
+SELF.bcity := IF(c,le.city,'');
+SELF.bzip5 :=IF(c,le.zip5,'');
+SELF.bprim_name := IF(c,le.prim_name,'');
+SELF.bprim_range :=IF(c,le.prim_range,'');
+SELF.bsec_range :=IF(c,le.sec_range,'');
+SELF.bphone :=IF(c,le.phone,'');
+SELF :=le;
 END;
 
-watercraft :=project(watercraft_both_phones,w_bState(left));
+watercraft :=PROJECT(watercraft_both_phones,w_bState(LEFT));
 
 persistname := '~thor_data400::' + 'persist::WaterCraftV2_services::BWR_buildautokey';
 autokey_ready := watercraft :persist(persistname);
@@ -111,25 +111,25 @@ ut.mac_create_superkey_files(t + 'Payload');
 
 
 AutoKeyB2.MAC_Build (autokey_ready,fname,mname,lname,
-						ssn_use,
-						dob,
-						phone,
-						prim_name,prim_range,st,city,zip5,sec_range,
-						zero,
-						zero,zero,zero,
-						zero,zero,zero,
-						zero,zero,zero,
-						zero,
-						ldid,
-						company_name,
-						fein_use,
-						bphone,
-						bprim_name,bprim_range,	bstate,bcity,	bzip5,bsec_range,
-						lbdid,
-						WatercraftV2_Services.Constants(filedate).ak_keyname,
-						WatercraftV2_Services.Constants(filedate).ak_logical,
-						outaction,false,
-						[],true,WatercraftV2_Services.Constants(filedate).ak_typeStr,true) 
+            ssn_use,
+            dob,
+            phone,
+            prim_name,prim_range,st,city,zip5,sec_range,
+            zero,
+            zero,zero,zero,
+            zero,zero,zero,
+            zero,zero,zero,
+            zero,
+            ldid,
+            company_name,
+            fein_use,
+            bphone,
+            bprim_name,bprim_range, bstate,bcity, bzip5,bsec_range,
+            lbdid,
+            WatercraftV2_Services.Constants(filedate).ak_keyname,
+            WatercraftV2_Services.Constants(filedate).ak_logical,
+            outaction,FALSE,
+            [],TRUE,WatercraftV2_Services.Constants(filedate).ak_typeStr,TRUE)
 
 
 
@@ -138,6 +138,6 @@ AutoKeyB2.MAC_AcceptSK_to_QA(WatercraftV2_Services.Constants(filedate).ak_keynam
 
 Autokey_ret := sequential(outaction,mymove);
 
-return Autokey_ret;
+RETURN Autokey_ret;
 
 END;

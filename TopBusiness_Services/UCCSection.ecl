@@ -3,7 +3,7 @@
       replace join limit with Constants.
    2. Research/resolve open issues, search on "???"
 */
-IMPORT AutoStandardI, BIPV2, iesp, MDR, Suppress, UCCV2, UCCV2_Services;
+IMPORT AutoStandardI, BIPV2, iesp, MDR, Suppress, UCCV2, UCCV2_Services, std, TopBusiness_Services;
 
 EXPORT UCCSection := MODULE;
 
@@ -14,7 +14,7 @@ EXPORT GetUCCBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids_
 	                    ds_in_unique_ids_only // input file to join key with
 				    ,FETCH_LEVEL // level of ids to join with				    						              
                           ,FETCH_KEEP_LIMIT  
-					 ).ds_ucc_linkidskey_recs;			
+					 ).ds_ucc_linkidskey_recs(party_type != 'A');		
 
  // *********** Main function to return BIPV2 format business report results
  export fn_FullView(
@@ -39,7 +39,7 @@ EXPORT GetUCCBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids_
                                                                             ,TopBusiness_Services.Constants.UCCKfetchMaxLimit);
 	// Filter to only use recs that are not 'A'/Assignee (bug 138650) and 
 	// then project onto a slimmed layout.
-  ds_linkids_keyrecs_slimmed := project (ds_linkids_keyrecs(party_type != 'A'),
+  ds_linkids_keyrecs_slimmed := project (ds_linkids_keyrecs,
 		  transform(TopBusiness_Services.UCCSection_Layouts.rec_ids_with_linkidsdata_slimmed,
 				self.source       := MDR.sourceTools.src_UCCv2, // not needed here???
 				// v--- not needed here???
@@ -50,8 +50,8 @@ EXPORT GetUCCBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids_
 				//      between the "role" of the "reported-on" company on the UCC filing vs 
 				//      the party_type of the record on the party file.
 				self.role_type    := //left.party_type,  bip2, vers1???
-				                     if(left.party_type = Constants.DEBTOR, //D = Debtor
-														    Constants.DEBTOR,Constants.SECUREDPARTY), //S = SecuredParty
+				                     if(left.party_type = TopBusiness_Services.Constants.DEBTOR, //D = Debtor
+														    TopBusiness_Services.Constants.DEBTOR,TopBusiness_Services.Constants.SECUREDPARTY), //S = SecuredParty
 			  self              := left, // to preserve ids & other key fields being kept
 			));
 
@@ -75,8 +75,8 @@ EXPORT GetUCCBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids_
                                keyed(left.tmsid = right.tmsid), //get all recs for the tmsids
 	  transform(TopBusiness_Services.UCCSection_Layouts.rec_ids_with_maindata_slimmed,
 		  //self.source_docid := left.tmsid, // store tmsid into the bip source_docid field???
-			temp_status_type           := StringLib.StringToUpperCase(right.status_type);
-			temp_filing_type           := StringLib.StringToUpperCase(right.filing_type);
+			temp_status_type           := std.str.ToUpperCase(right.status_type);
+			temp_filing_type           := std.str.ToUppercase(right.filing_type);
 			//temp_filing_status         := StringLib.StringToUpperCase(right.filing_status),//???
 			// rename/check certain fields
 			                           // from bip1 ---v, is this still needed ???
@@ -89,7 +89,7 @@ EXPORT GetUCCBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids_
 	    // Fill in derived UCC overall status(status_code), A=active or T=terminated
 			self.status_code           := if(temp_status_type in set_terminated_types or
 						                           temp_filing_type in set_terminated_types,
-																			 Constants.TERMINATED,Constants.ACTIVE
+											TopBusiness_Services.Constants.TERMINATED,TopBusiness_Services.Constants.ACTIVE
 			                     // also look at filing_status field on the main key ???    AND/OR  
 			                     // if expiration_date <= today's date ???
 													 // Discuss with Tim B. ???
@@ -212,8 +212,8 @@ EXPORT GetUCCBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids_
 																			BIPV2.IDmacros.mac_JoinTop3Linkids() and
 																      left.role_type = right.role_type,
 																		transform(TopBusiness_Services.UCCSection_Layouts.rec_ids_with_maindata_slimmed,
-																		  self.total_as_debtor  := if(left.role_type  = Constants.DEBTOR,right.role_count,0);
-																		  self.total_as_secured := if(left.role_type != Constants.DEBTOR,right.role_count,0);
+																		  self.total_as_debtor  := if(left.role_type  = TopBusiness_Services.Constants.DEBTOR,right.role_count,0);
+																		  self.total_as_secured := if(left.role_type != TopBusiness_Services.Constants.DEBTOR,right.role_count,0);
 																			self := left),
 																		inner, //??? or left outer??? should be many to 1 match so inner should be OK???
 																		keep(1)  //from bip1, why 1 ???
@@ -324,7 +324,7 @@ EXPORT GetUCCBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids_
 	iesp.topbusiness_share.t_TopBusinessSourceDocInfo
 	  tf_sourcedoc(TopBusiness_Services.UCCSection_Layouts.rec_parent_ucc L) := transform
 		   self.BusinessIds := l, // to store all linkids
-       self.IdType      := Constants.tmsid,
+       self.IdType      := TopBusiness_Services.Constants.tmsid,
 		   self.IdValue     := l.tmsid,
 		   //self.Section     := Constants.UCCSectionName,  //not needed here???
 		   self.Source      := l.source,
@@ -380,18 +380,18 @@ EXPORT GetUCCBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids_
 			self.FilingType     := L.filing_type,
 			self.ExpirationDate := iesp.ECL2ESP.toDate((unsigned)L.expiration_date),
 			self.Debtors   := choosen(dedup(project(
-				 dedup(R(party_type = Constants.DEBTOR and party_linkids.seleid != 0),party_linkids.seleid,all) +
-				 R(party_type = Constants.DEBTOR and party_linkids.seleid = 0), tf_party(left)),
+				 dedup(R(party_type = TopBusiness_Services.Constants.DEBTOR and party_linkids.seleid != 0),party_linkids.seleid,all) +
+				 R(party_type = TopBusiness_Services.Constants.DEBTOR and party_linkids.seleid = 0), tf_party(left)),
 																		  record,all),
 															  iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_UCC_DEBTORS),
 			self.Secureds  := choosen(dedup(project(
-				 dedup(R(party_type = Constants.SECUREDPARTY and party_linkids.seleid != 0),party_linkids.seleid,all) +
-				 R(party_type = Constants.SECUREDPARTY and party_linkids.seleid = 0), tf_party(left)),
+				 dedup(R(party_type = TopBusiness_Services.Constants.SECUREDPARTY and party_linkids.seleid != 0),party_linkids.seleid,all) +
+				 R(party_type = TopBusiness_Services.Constants.SECUREDPARTY and party_linkids.seleid = 0), tf_party(left)),
 																		  record,all),
 															  iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_UCC_SECUREDS),
 			self.Assignees := choosen(dedup(project(
-				 dedup(R(party_type = Constants.ASSIGNEE and party_linkids.seleid != 0),party_linkids.seleid,all) +
-				 R(party_type = Constants.ASSIGNEE and party_linkids.seleid = 0), tf_party(left)),
+				 dedup(R(party_type = TopBusiness_Services.Constants.ASSIGNEE and party_linkids.seleid != 0),party_linkids.seleid,all) +
+				 R(party_type = TopBusiness_Services.Constants.ASSIGNEE and party_linkids.seleid = 0), tf_party(left)),
 																		  record,all),
 															  iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_UCC_ASSIGNEES),
 			self.Collaterals := [], //null here, will be filled in below
@@ -470,7 +470,7 @@ EXPORT GetUCCBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids_
 			     self.BusinessIds := l, // to store all linkids
 		       //self.SourceCode  := l.source,       //vers1???
            //self.SourceDocId := l.tmsid, //vers1???
-           self.IdType      := Constants.tmsid,
+           self.IdType      := TopBusiness_Services.Constants.tmsid,
 		       self.IdValue     := l.tmsid,
 		       //self.Section     := Constants.UCCSectionName,
 		       self.Source      := l.source,
@@ -509,25 +509,25 @@ EXPORT GetUCCBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids_
 	  tf_role_parent(TopBusiness_Services.UCCSection_Layouts.rec_parent_ucc l,
 	                 dataset(TopBusiness_Services.UCCSection_Layouts.rec_parent_ucc) allrows)	:= transform
 			// Use all rows with appropriate status_code to create the "*UCCs" & "*SourceDocs" child datasets
-			self.ActiveUCCs := choosen(sort(project(allrows(status_code = Constants.ACTIVE),
+			self.ActiveUCCs := choosen(sort(project(allrows(status_code = TopBusiness_Services.Constants.ACTIVE),
 			                                        iesp.TopbusinessReport.t_TopbusinessUCC), 
 																			-OriginalFilingDate.Year,-OriginalFilingDate.Month,
 																			-OriginalFilingDate.Day,-OriginalFilingNumber), 
 																 iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_ACTIVE_UCCS),
-			self.ActiveSourceDocs := if(count(allrows(status_code = Constants.ACTIVE)) > 0,
-           choosen(project(allrows(status_code = Constants.ACTIVE),
+			self.ActiveSourceDocs := if(count(allrows(status_code = TopBusiness_Services.Constants.ACTIVE)) > 0,
+           choosen(project(allrows(status_code = TopBusiness_Services.Constants.ACTIVE),
 													 tf_sourcedoc(left)),
 								   in_sourceDocMaxCount),
 					 //[] caused syntax errors???
            dataset([],iesp.topbusiness_share.t_TopBusinessSourceDocInfo)
 					 ),
-			self.TerminatedUCCs := choosen(sort(project(allrows(status_code = Constants.TERMINATED),
+			self.TerminatedUCCs := choosen(sort(project(allrows(status_code = TopBusiness_Services.Constants.TERMINATED),
 																									iesp.TopBusinessReport.t_TopBusinessUCC), 
 																									-OriginalFilingDate.Year,-OriginalFilingDate.Month,
 																									-OriginalFilingDate.Day,-OriginalFilingNumber), 			
 																     iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_TERMINATED_UCCS),
-			self.TerminatedSourceDocs := if(count(allrows(status_code = Constants.TERMINATED)) > 0,
-           choosen(project(allrows(status_code = Constants.TERMINATED),
+			self.TerminatedSourceDocs := if(count(allrows(status_code = TopBusiness_Services.Constants.TERMINATED)) > 0,
+           choosen(project(allrows(status_code = TopBusiness_Services.Constants.TERMINATED),
 													 tf_sourcedoc(left)),
 								   in_sourceDocMaxCount),
 					 //[] caused syntax errors???
@@ -554,10 +554,10 @@ EXPORT GetUCCBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids_
     // v--- change to stand-alone transform???																				
 		transform(TopBusiness_Services.UCCSection_Layouts.rec_parent_uccsection,
 			self.acctno    := left.acctno,
-			self.AsDebtor  := project(rows(right)(role_type = Constants.DEBTOR), 
+			self.AsDebtor  := project(rows(right)(role_type = TopBusiness_Services.Constants.DEBTOR), 
 			                          iesp.TopbusinessReport.t_TopbusinessUCCRole)[1], // had to use [1]???
 			self.AsSecured := if (in_options.IncludeUCCFilingsSecureds,
-                            project(rows(right)(role_type != Constants.DEBTOR), //in ['S','A']),
+                            project(rows(right)(role_type != TopBusiness_Services.Constants.DEBTOR), //in ['S','A']),
 														        iesp.TopbusinessReport.t_TopbusinessUCCRole)[1], // had to use [1]???
 														// even though creating empty ds, had to use [1] (------v) due to syntax error???
 														dataset([],iesp.TopbusinessReport.t_TopbusinessUCCRole)[1] 

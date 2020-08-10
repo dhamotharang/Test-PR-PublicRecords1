@@ -5,8 +5,8 @@ export ContactSection_Layouts := module
 		boolean lnbranded;
 		boolean internal_testing;
 		string1 businessReportFetchLevel;
-		boolean IncludeCriminalIndicators;		
-		boolean restrictexperian := false;
+		boolean IncludeCriminalIndicators := false;
+		boolean restrictexperian := false;           
 		
 	end;
 	
