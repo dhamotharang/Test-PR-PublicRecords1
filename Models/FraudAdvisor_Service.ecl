@@ -526,7 +526,8 @@ doTMXAttributes := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models
 DisableInquiriesInCVI := True;																																								//Disable Customer Network: True
 unsigned3 LastSeenThresholdIn := map(	
 																		Models.FP_models.Model_Check(Valid_requested_models, ['fp1702_1','fp1702_2']) => risk_indicators.iid_constants.max_unsigned3,
-																		Models.FP_models.Model_Check(Valid_requested_models, ['fp1403_2','fp1510_2']) => 730, 
+																		Models.FP_models.Model_Check(Valid_requested_models, ['fp1403_2','fp1510_2']) => 730,
+                                    Models.FP_models.Model_Check(Valid_requested_models, ['fp1908_1','fp1909_1','fp1909_2']) => risk_indicators.iid_constants.oneyear,
 																		doAttributesVersion201 OR doAttributesVersion202 => 9999,
 																		risk_indicators.iid_constants.oneyear);	//Last Seen Threshold: 365 days (1 year) for fp1403_2, otherwise use default
 
