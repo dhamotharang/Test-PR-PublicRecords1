@@ -54,8 +54,9 @@ export proc_build_base(string version_date) := function
 	// Append sequence number to normalize records so as to pass to the AddressID macro
 	ut.MAC_Sequence_Records(base_minusOptOuts, Append_SeqNum, dHuntCCW_AppendSeqNum);
 
-	dHuntCCW_AppendSeqNum_Dist	:=	distribute(dHuntCCW_AppendSeqNum, hash(Append_SeqNum));
-	
+  //**** NOTE ****:  Persist added to correct an issue.  Do not remove this persist.  DF-28055  
+	dHuntCCW_AppendSeqNum_Dist	:=	distribute(dHuntCCW_AppendSeqNum, hash(Append_SeqNum)) : persist('~thor_data400::persist::emerges::dHuntCCW_AppendSeqNum_Dist');
+
 	// Clean data, append DID and SSN
 	dHuntCCW_DID			:=	emerges.hvccw_did(dHuntCCW_AppendSeqNum_Dist);
 	
