@@ -106,11 +106,8 @@ module
 	// Append RinID
 	EXPORT NewBaseRinID := $.Append_RinID (NewBaseLexid):independent;
 	
-	//Validate Deltabase 
-	Export NewBaseDelta	:= $.fn_validate_delta(NewBaseRinID):independent;
-
 	//Label RIN Source
-	EXPORT AppendRinSourceLabel := $.Append_RinSource(NewBaseDelta):independent;
+	EXPORT AppendRinSourceLabel := $.Append_RinSource(NewBaseRinID):independent;
 
 	// Rollup Main Base 
 	pDataset_sort := sort(AppendRinSourceLabel , record, -dt_last_seen,-process_date);
