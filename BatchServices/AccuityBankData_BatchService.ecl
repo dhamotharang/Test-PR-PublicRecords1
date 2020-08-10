@@ -7,9 +7,11 @@
 </message>
 */
 
-IMPORT BatchServices,BatchShare,STD,Royalty;
+IMPORT BatchServices,BatchShare,STD,Royalty,WSInput;
 
 EXPORT AccuityBankData_BatchService := MACRO
+
+	WSInput.MAC_AccuityBankData_BatchService();
 
 	CNST:=BatchServices.AccuityBankData_Constants;
 
@@ -36,30 +38,14 @@ EXPORT AccuityBankData_BatchService := MACRO
 	ds_batch_rejects := ds_batch_wrk(error_code!=0);
 	ds_batch_records := BatchServices.AccuityBankData_Records(ds_batch_wrk(error_code=0));
 
-	BatchServices.AccuityBankData_Layouts.batch_out setOutputs(ds_batch_wrk L) := TRANSFORM
-		SELF.acctno:=L.orig_acctno;
-		SELF.ultimate_bank_in_state:=MAP(
-			L.error_code=CNST.ErrCode.INSUFFICIENT_INPUT => CNST.ErrMsg.INSUFFICIENT_INPUT,
-			L.err_search=CNST.SrchCode.BANK_STATE_MATCHED => CNST.SrchMsg.BANK_STATE_MATCHED,
-			L.err_search=CNST.SrchCode.BANK_STATE_NO_MATCH => CNST.SrchMsg.BANK_STATE_NO_MATCH,
-			L.err_search=CNST.SrchCode.BANK_STATE_NULL => CNST.SrchMsg.BANK_STATE_NULL,
-			L.err_search=CNST.SrchCode.ABA_RTN_NOT_FOUND => CNST.SrchMsg.ABA_RTN_NOT_FOUND,
-			'');
-		NO_MATCH_OR_NULL:=[CNST.SrchCode.BANK_STATE_NO_MATCH,CNST.SrchCode.BANK_STATE_NULL];
-		SELF.geotriangulation:=IF(IncludeGeotriangulationComparison,
-			MAP(L.error_code=CNST.ErrCode.INSUFFICIENT_INPUT OR
-				L.err_search=CNST.SrchCode.ABA_RTN_NOT_FOUND => '',
-				L.in_region='' => CNST.ErrMsg.INSUFFICIENT_INPUT,
-				L.err_search=CNST.SrchCode.BANK_STATE_MATCHED AND L.in_region=L.in_state => CNST.GeoMsg.REGION_MATCHED,
-				L.err_search=CNST.SrchCode.BANK_STATE_MATCHED AND L.in_region!=L.in_state => CNST.GeoMsg.REGION_IP_MISMATCH,
-				L.err_search IN NO_MATCH_OR_NULL AND L.in_region=L.in_state => CNST.GeoMsg.REGION_BANK_MISMATCH,
-				L.err_search IN NO_MATCH_OR_NULL AND L.in_region!=L.in_state => CNST.GeoMsg.REGION_NO_MATCH,
-				''),
-			'');
-		SELF:=L;
-	END;
+  // 2020-08-25, for JIRA RR-19445 moved the setOutputs transform to a new BatchServices.AccuityBankData_Functions.fn_SetOutputs, 
+  // so that logic could also be used by the new GeoTriangulation_Services.BatchService.
+  //
+  // Call new function to set the 2 bank routing_transit_nbr/state/edge_region related fields
+  ds_batch_out := BatchServices.AccuityBankData_Functions.fn_SetOutputs(
+                                SORT(ds_batch_rejects+ds_batch_records, (UNSIGNED)acctno),
+                                IncludeGeotriangulationComparison);
 
-	ds_batch_out := PROJECT(SORT(ds_batch_rejects+ds_batch_records,(UNSIGNED)acctno),setOutputs(LEFT));
 	ds_royalties := Royalty.RoyaltyAccuityBankData.GetBatchRoyaltiesByAcctno(ds_batch_rejects+ds_batch_records);
 	dRoyalties := Royalty.GetBatchRoyalties(ds_royalties,in_mod.ReturnDetailedRoyalties);		
 
