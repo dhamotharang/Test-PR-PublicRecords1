@@ -1,8 +1,8 @@
 ﻿IMPORT aca, codes, Business_Header, Business_Header_SS, BankruptcyV3, corp2, 
 		yellowpages, Risk_Indicators, did_add, doxie, ut, riskwise, suppress, 
-		Risk_Reporting, liensv2, PAW, census_data, EBR, DCA, iesp, gateway, Royalty, Business_Risk_BIP;
+		Risk_Reporting, liensv2, PAW, census_data, EBR, DCA, iesp, gateway, Royalty, Business_Risk_BIP, Business_Risk;
 
-export InstantID_Function(DATASET(Layout_Input) indata1, dataset(Gateway.Layouts.Config) gateways, 
+export InstantID_Function(DATASET(Business_Risk.Layout_Input) indata1, dataset(Gateway.Layouts.Config) gateways, 
 					boolean hasbdids = false, unsigned1 dppa, unsigned1 glb, 
 					boolean isUtility=false, boolean ln_branded=false, string4 tribcode='', boolean ExcludeWatchLists = false,boolean ofac_only=false,
 					unsigned1 ofac_version=1,boolean include_ofac=FALSE,boolean include_additional_watchlists=FALSE,
@@ -1388,7 +1388,7 @@ bdidnoprep := project(indata, transform(Business_Header_SS.Layout_BDID_OutBatch,
 bdidbatch := if(hasbdids, bdidnoprep, bdidappend1);
 
 // append bests
-Business_Header_SS.MAC_BestAppend(bdidbatch,appends,verify,bdidbest,true)
+Business_Header_SS.MAC_BestAppend(bdidbatch, appends, verify, bdidbest, DataPermission, DataRestriction, true);
 
 working_layout intoOutLayout(with_bnap_bnas l, bdidbest r) := transform
   self.bdid 		 := r.bdid;

@@ -8,6 +8,7 @@ EXPORT MAC_BDID_Append
 	do_looser_match = 'true'
 					 // filter results on all input fields
 ) := MACRO
+IMPORT Business_Header_SS, ut;
 
 #uniquename(temp_id)
 #uniquename(layout_midbatch)

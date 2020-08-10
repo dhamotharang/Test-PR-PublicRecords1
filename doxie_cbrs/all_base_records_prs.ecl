@@ -127,12 +127,12 @@ dcar := doxie_cbrs.DCA_records_trimmed(bdids); // parent company section - dca d
 salr := doxie_cbrs.sales_records_trimmed(bdids); // dca data
 indr := doxie_cbrs.industry_information_records_trimmed(bdids); // dca data
 
-basr := doxie_cbrs.business_associates_records_trimmed(bdids);
+basr := doxie_cbrs.business_associates_records_trimmed(bdids, mod_access); 
 dnbr := doxie_cbrs.dnb_records(bdids, mod_access)(Include_DunBradstreetRecords_val);
 ebrr := doxie_cbrs.experian_business_reports_trimmed(bdids);
 irsr := doxie_cbrs.IRS5500_records_trimmed(bdids);
 sancr := doxie.Ingenix_Business_records(bdids).records;
-srcr := doxie_cbrs.count_records_prs_dayton(bdids,mod_access);
+srcr := doxie_cbrs.count_records_prs_dayton(bdids, mod_access);
 divcert := doxie_cbrs.diversity_cert_records(bdids);
 riskMet := doxie_cbrs.risk_metrics_records(bdids);
 laborAct := doxie_cbrs.laborActions_WHD_records(bdids);

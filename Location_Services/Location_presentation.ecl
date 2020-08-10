@@ -4,6 +4,8 @@ boolean include_hri := false : stored('IncludeHRI');
 unsigned1 maxHriPer_value := 10 : stored('MaxHriPer');
 
 doxie.MAC_Header_Field_Declare();
+mod_access := doxie.compliance.GetGlobalDataAccessModule();
+
 headerRecs := doxie.header_records()(ut.stringsimilar(prim_name,pname_val) < 3, 
                                    ut.NNEQ(prim_range, prange_value));
 
@@ -41,7 +43,8 @@ layout_AddressPresentation getBus(filtered_res l,  bhkb r) := transform
 end;
  
 busRecs := join(filtered_res(bdid != 0), bhkb,
-				keyed(left.bdid = right.bdid),
+				keyed(left.bdid = right.bdid) AND 
+        doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 				getBus(left, right),
 				left outer,
 				keep (1), limit (0));

@@ -58,7 +58,8 @@ phonesplus form_paw(paw le) :=
 TRANSFORM
   SELF.did := (unsigned6)le.did;
   SELF.WorkPhones := CHOOSEN(JOIN (DATASET(PROJECT(le,form_paw_phones(LEFT))), business_header.Key_BH_Best,
-                                   LEFT.bdid<>0 AND keyed(LEFT.bdid=RIGHT.bdid),
+                                   LEFT.bdid<>0 AND keyed(LEFT.bdid=RIGHT.bdid) AND 
+                                   doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
                                    add_bus_phone(LEFT,RIGHT), KEEP(1), LIMIT (0)),
                              50);
   SELF := [];

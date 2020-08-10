@@ -32,6 +32,8 @@ export BH_ProfileSearchService() := macro
 
 Business_Header.doxie_MAC_Field_Declare(true)
 
+mod_access := Doxie.compliance.GetGlobalDataAccessModule();
+
 res_rec := record
 	unsigned6 BDID;
 	UNSIGNED4 seq := 0;
@@ -78,7 +80,7 @@ filtered_res_dups :=
 
 filtered_res_srt := sort(filtered_res_dups, bdid, seq, -score); //not sure seq is needed
 filtered_res_preSuppress := dedup(filtered_res_srt, bdid);
-Suppress.MAC_Suppress(filtered_res_preSuppress,filtered_res,application_type_value,Suppress.Constants.LinkTypes.BDID,bdid,'','',false,'');
+Suppress.MAC_Suppress( filtered_res_preSuppress, filtered_res, mod_access.application_type , Suppress.Constants.LinkTypes.BDID, bdid, '', '', false, '');
 
 //***** APPEND THE BEST INFO
 bhkb := Business_Header.Key_BH_Best;
@@ -149,7 +151,8 @@ end;
 
 best_wls := join(filtered_res(bdid != 0), bhkb,
 				keyed(left.bdid = right.bdid) and 
-				(right.dppa_state = '' or (dppa_ok AND drivers.state_dppa_ok(right.dppa_state,dppa_purpose,,right.source))),
+				doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask) AND
+				(right.dppa_state = '' or (mod_access.isValidDPPA() AND mod_access.isValidDPPAState(right.dppa_state, , right.source))),
 				AddBest(left, right),
 				keep (1), limit (0));
 

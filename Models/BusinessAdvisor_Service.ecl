@@ -54,7 +54,7 @@
 */
 /*--INFO--  */
 
-import ut, doxie, seed_files, risk_indicators, riskwise, business_risk,Gateway, AutoStandardI, STD;
+import ut, doxie, seed_files, risk_indicators, riskwise, business_risk,Gateway, AutoStandardI, STD, Models;
  
 export BusinessAdvisor_Service := MACRO
 
@@ -373,7 +373,7 @@ isUtility  := false;
 ln_branded := false;
 tribcode   := '';
 biid := business_risk.InstantID_Function(df2, gateways, if (bdid_value = '', false, true),dppa_purpose,glb_purpose,isUtility,ln_branded, tribcode, ExcludeWatchLists,
-	ofac_only, OFACVersion, IncludeOfac, addtl_watchlists, gwThreshold, dobradius, IsPOBoxCompliant, LexIdSourceOptout := LexIdSourceOptout, 
+	ofac_only, OFACVersion, IncludeOfac, addtl_watchlists, gwThreshold, dobradius, IsPOBoxCompliant, DataRestriction := DataRestriction, DataPermission:= DataPermission, LexIdSourceOptout := LexIdSourceOptout, 
                                                                                         TransactionID := TransactionID, 
                                                                                         BatchUID := BatchUID, 
                                                                                         GlobalCompanyID := GlobalCompanyID

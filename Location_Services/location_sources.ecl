@@ -76,7 +76,7 @@ headerSrcs := header_sources(headerRecs);
 // bus data
 bus_hdr_raw := recordof(doxie_cbrs.header_records_raw);
 
-bus_mod := GetByBDID(addr, application_type_value);
+bus_mod := GetByBDID(addr, mod_access);
 bus_hdr_county := bus_mod.GetCountyRecs(); 
 
 bus_hdr_link_ids := GetByBusinessIds(addr, mod_access).GetSourceRecs();

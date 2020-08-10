@@ -136,7 +136,7 @@ EXPORT SmartLinx_Business_Sections ( STRING12 in_bdid, doxie.IDataAccess mod_acc
     //----- Business Associates ---------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------------------- 
 
-    basr := doxie_cbrs.business_associates_records_trimmed(bdids); 
+    basr := doxie_cbrs.business_associates_records_trimmed(bdids, mod_access); 
 
     ds_businessAssociates :=
       PROJECT( GLOBAL(basr.records), 
