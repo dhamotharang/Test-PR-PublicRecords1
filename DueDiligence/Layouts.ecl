@@ -119,7 +119,7 @@ EXPORT Layouts := MODULE
     STRING30 accountNumber;
     BOOLEAN validRequest;
     STRING200 errorMessage;
-    STRING25 productRequested; //attributesonly, citizenshiponly, attributesandcitizenship, customattributes, standard
+    STRING25 productRequested; //attributesonly, citizenshiponly, attributesandcitizenship, modules, standard
     STRING10 requestedVersion; //DDAPERV3, DDABUSV3
     DATASET({STRING15 attributeModules}) requestedModules;
     UNSIGNED4 historyDateYYYYMMDD;
