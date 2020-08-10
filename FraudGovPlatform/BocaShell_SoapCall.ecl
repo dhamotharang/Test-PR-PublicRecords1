@@ -1,11 +1,9 @@
-﻿//copied the code from "Risk_Indicators.test_BocaShell_SoapCall" to customize the data distribution to 50 nodes,
+﻿//copied the code from "Risk_Indicators.test_BocaShell_SoapCall" to customize the data distribution
 // this will reduce the number of calls to roxie when running on a 400 cluster
 Import risk_indicators;
 EXPORT BocaShell_SoapCall (dataset (risk_indicators.Layout_InstID_SoapCall) indataset, 
                                 string service_name, string service_url,
-                                const unsigned1 call_number = 1)  := FUNCTION
-nodes				:= 50;//The data to be distributed on 50 nodes before sending to soapcall. 
-
+                                const unsigned1 call_number = 1,unsigned1 nodes)  := FUNCTION
 dist_dataset := DISTRIBUTE (indataset, RANDOM() % nodes);
 
 xlayout := RECORD
