@@ -3,7 +3,7 @@ export proc_Orbit3_CreateBuild_AddItem(string buildname,string Buildvs,string En
 
 string wuid := workunit;
 
-ECL1 := '#workunit(\'name\',\'Orbit4 Create Build Instance and Add Items -- '+ buildname + '-- '+Buildvs+'\');\r\n'+
+ECL1 := '#workunit(\'name\',\'Orbit3 Create Build Instance and Add Items -- '+ buildname + '-- '+Buildvs+'\');\r\n'+
 		   'Orbit3.proc_Orbit3_CreateBuild_AddItem_sp( \''+buildname+'\',  \''+Buildvs+'\', \''+Envmt+'\',\''+email_list+'\', '+skipcreatebuild+', '+skipupdatebuild+', '+skipaddcomponents+', (boolean)'+runcreatebuild+', '+runaddcomponentsonly+',  \''+wuid+'\')\n' 
 		+'	  : success(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_success)\n'
           +'	, failure(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_failure)\n'
@@ -17,12 +17,12 @@ spcluster := map  ( regexfind('_eclcc',tgtcluster)  and _Control.ThisEnvironment
 							 'hthor'									 );
 
 fswu :=   _control.fSubmitNewWorkunit(ECL1 ,trim(spcluster)) :   SUCCESS(fileservices.sendemail(Send_Email(Buildvs,email_list).emaillist
-																			                                                                                                     ,'Orbit4 submit WU to spawn status'+ workunit
-																			                                                                                                      ,'Orbit4 submit WU to spawn success -- '+ workunit
+																			                                                                                                     ,'Orbit3 submit WU to spawn status'+ workunit
+																			                                                                                                      ,'Orbit3 submit WU to spawn success -- '+ workunit
 																			                                                                                                       )),
 		                                                                                                                                                                                      FAILURE(fileservices.sendemail(Send_Email(Buildvs,email_list).emaillist
-																			                                                                                                     ,'Orbit4 submit WU to spawn status'+ workunit
-																			                                                                                                      ,'Orbit4 submit WU to spawn failed -- '+ workunit
+																			                                                                                                     ,'Orbit3 submit WU to spawn status'+ workunit
+																			                                                                                                      ,'Orbit3 submit WU to spawn failed -- '+ workunit
 																			                                                                                                       ));
 																																																																						 
 																																																											

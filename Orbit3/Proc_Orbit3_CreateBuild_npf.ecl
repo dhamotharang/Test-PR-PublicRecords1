@@ -4,7 +4,7 @@ export Proc_Orbit3_CreateBuild_npf(string buildname,string Buildvs,string BuildS
 	string wuid := workunit;
 
 ECL1 := '#workunit(\'name\',\'Orbit Create Build Instance -- '+ buildname + '-- '+Buildvs+'\');\r\n'+
-		 'Orbit3.Proc_Orbit3_CreateBuild_npf_sp( \''+buildname+'\',  \''+Buildvs+'\',  \''+BuildStatus+'\', \''+email_list+'\', '+skipcreatebuild+', '+skipupdatebuild+', '+runcreatebuild+',  \''+wuid+'\') \n' 
+		 'Orbit3.Proc_Orbit3_CreateBuild_npf_sp( \''+buildname+'\',  \''+Buildvs+'\',  \''+BuildStatus+'\', \''+email_list+'\', '+skipcreatebuild+', '+skipupdatebuild+', (boolean)'+runcreatebuild+',  \''+wuid+'\') \n' 
 		+'	  : success(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_success)\n'
           +'	, failure(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_failure)\n'
            +'	;\n';
