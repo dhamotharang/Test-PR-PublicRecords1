@@ -177,11 +177,11 @@ Move_keys_new	:=	parallel(mv3, mv4, mv5, mv7, mv10, mv11, mv12, mv13, mv14, mv26
 													mv20_fcra, mv23_fcra, mv24_fcra);
 
 //Move Orig to QA
-RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::addlfaresdeed.fid',					'Q',mv1_qa,3);
-RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::addlfarestax.fid',					'Q',mv2_qa,3);
-RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::assessor.parcelNum',				'Q',mv6_qa,3);
-RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::deed.parcelNum',						'Q',mv8_qa,3);
-RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::deed.zip_loanamt',					'Q',mv9_qa,3);
+RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::addlfaresdeed.fid',					'Q',mv1_qa,2);
+RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::addlfarestax.fid',					'Q',mv2_qa,2);
+RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::assessor.parcelNum',				'Q',mv6_qa,2);
+RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::deed.parcelNum',						'Q',mv8_qa,2);
+RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::deed.zip_loanamt',					'Q',mv9_qa,2);
 RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::tax_summary',								'Q',mv15_qa,2);
 RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::addr.full_v4',							'Q',mv16_qa,2);
 RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::addr.full_v4_no_fares',			'Q',mv17_qa,2);
@@ -197,32 +197,34 @@ RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::ownership_addr',						'Q',
 RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::ownership.did',							'Q',mv24_qa,2);
 RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::ownership_bdid',						'Q',mv25_qa,2);
 
-
-To_qa_orig	:=	parallel(mv1_qa, mv2_qa, mv6_qa, mv8_qa, mv9_qa, mv15_qa, 
-													mv16_qa, mv17_qa, mv18_qa, mv19_qa,
-													mv20_qa, mv21_qa, mv22_qa, mv23_qa, mv24_qa,mv25_qa, mv28_qa);
+To_qa_orig_isfast	:=			parallel(
+	                        mv15_qa, mv16_qa, mv17_qa, mv18_qa, mv19_qa,
+													mv20_qa, mv21_qa, mv22_qa, mv23_qa, mv24_qa,mv25_qa, mv28_qa );
+To_qa_orig_notfast :=			parallel(mv1_qa, mv2_qa, mv6_qa, mv8_qa, mv9_qa,
+	                        mv15_qa, mv16_qa, mv17_qa, mv18_qa, mv19_qa,
+													mv20_qa, mv21_qa, mv22_qa, mv23_qa, mv24_qa,mv25_qa, mv28_qa );
 // Move New to QA
 
-Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::addr_search.fid',   'Q',mv14_qa,3);
-Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::addllegal.fid',		  'Q',mv3_qa,3);
-Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::addlnames.fid',     'Q',mv4_qa,3);
-Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::assessor.fid', 		  'Q',mv5_qa,3);
-Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.fid_county',	'Q',mv13_qa,3);
-Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::deed.fid',					'Q',mv7_qa,3);
-Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.did',   			'Q',mv10_qa,3);
-Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.fid', 				'Q',mv12_qa,3);
-Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.bdid', 			'Q',mv11_qa,3);
-Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.linkids', 		'Q',mv26_qa,3);
+Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::addr_search.fid',   'Q',mv14_qa,2);
+Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::addllegal.fid',		  'Q',mv3_qa,2);
+Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::addlnames.fid',     'Q',mv4_qa,2);
+Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::assessor.fid', 		  'Q',mv5_qa,2);
+Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.fid_county',	'Q',mv13_qa,2);
+Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::deed.fid',					'Q',mv7_qa,2);
+Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.did',   			'Q',mv10_qa,2);
+Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.fid', 				'Q',mv12_qa,2);
+Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.bdid', 			'Q',mv11_qa,2);
+Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.linkids', 		'Q',mv26_qa,2);
 //Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.fid_linkids','Q',mv27_qa,2);
 //Move FCRA Keys to QA
-Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::addr_search.fid',	  'Q',mv14_qa_fcra,3);
-Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::addllegal.fid',		  'Q',mv3_qa_fcra,3);
-Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::addlnames.fid',   	  'Q',mv4_qa_fcra,3);
-Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::assessor.fid', 		  'Q',mv5_qa_fcra,3);
-Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::search.fid_county',  'Q',mv13_qa_fcra,3);
-Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::deed.fid',					  'Q',mv7_qa_fcra,3);
-Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::search.did',   		  'Q',mv10_qa_fcra,3);
-Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::search.fid', 			  'Q',mv12_qa_fcra,3);
+Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::addr_search.fid',	  'Q',mv14_qa_fcra,2);
+Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::addllegal.fid',		  'Q',mv3_qa_fcra,2);
+Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::addlnames.fid',   	  'Q',mv4_qa_fcra,2);
+Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::assessor.fid', 		  'Q',mv5_qa_fcra,2);
+Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::search.fid_county',  'Q',mv13_qa_fcra,2);
+Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::deed.fid',					  'Q',mv7_qa_fcra,2);
+Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::search.did',   		  'Q',mv10_qa_fcra,2);
+Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::search.fid', 			  'Q',mv12_qa_fcra,2);
 //Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::bdid', 						  'Q',mv11_qa_fcra,2);
 Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::addr.full_v4',			  'Q',mv16_qa_fcra,2);
 //Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::deedv2.fid', 			  'Q',mv17_qa_fcra,2);
@@ -231,13 +233,13 @@ Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::ownership_did',			'Q'
 Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::ownership_addr', 		'Q',mv23_qa_fcra,2);
 Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::ownership.did', 			'Q',mv24_qa_fcra,2);
 
-To_qa_fcra	:=	parallel(	mv14_qa, mv3_qa, mv4_qa, mv5_qa, mv13_qa, mv7_qa, mv10_qa,
-													mv12_qa, mv11_qa, mv26_qa, /*mv27_qa,*/ 
-													
-													mv14_qa_fcra,mv3_qa_fcra, mv4_qa_fcra, mv5_qa_fcra, mv13_qa_fcra,
-													mv7_qa_fcra, mv10_qa_fcra,mv12_qa_fcra, /*mv11_qa_fcra,*/
-													mv16_qa_fcra,/*mv17_qa_fcra,*/ mv18_qa_fcra,
-													mv20_qa_fcra, mv23_qa_fcra, mv24_qa_fcra);
+To_qa_fcra_isfast	:=			parallel(
+	                        /*mv27_qa, mv11_qa_fcra,*/ mv16_qa_fcra, /*mv17_qa_fcra,*/ mv18_qa_fcra,
+													mv20_qa_fcra, mv23_qa_fcra, mv24_qa_fcra );
+To_qa_fcra_notfast	:=		parallel(mv3_qa, mv3_qa_fcra, mv4_qa, mv4_qa_fcra, mv5_qa, mv5_qa_fcra, mv7_qa, mv7_qa_fcra,mv10_qa, 
+                          mv10_qa_fcra, mv11_qa, mv12_qa, mv12_qa_fcra, mv13_qa, mv13_qa_fcra, mv14_qa, mv14_qa_fcra, mv26_qa,
+	                        /*mv27_qa, mv11_qa_fcra,*/ mv16_qa_fcra, /*mv17_qa_fcra,*/ mv18_qa_fcra,
+													mv20_qa_fcra, mv23_qa_fcra, mv24_qa_fcra );
 													
 // OTHER STUFF
 
@@ -287,14 +289,15 @@ DopsGrowthCheck.PersistenceCheck('~thor_data400::key::ln_propertyv2::fcra::'+fil
 
 );
 
-	
+promotedelta := LN_PropertyV2_Fast.Promote(filedate,'key').BuildFiles.Built2QA;
 
 buildKey	:=	sequential( LN_PropertyV2_Fast.BuildLogger.update(filedate,'key_build_start_date',(STRING8)Std.Date.Today()),
 													parallel(Keys, Keys_fcra),
 												  parallel(Move_keys_orig, Move_keys_new),
-												  parallel(to_qa_orig, To_qa_fcra),
 													LN_PropertyV2_Fast.Proc_FCRA_Field_Deprecation_Stats(isFast),				//DF-21968
 													autokeys,
+												  if(isFast,parallel(to_qa_orig_isFast, To_qa_fcra_isFast, promotedelta),
+													          parallel(to_qa_orig_notFast, To_qa_fcra_notFast));
 													deeds_boolean_keys,
 													assessor_boolean_keys,		
 													DeltaCommands,
