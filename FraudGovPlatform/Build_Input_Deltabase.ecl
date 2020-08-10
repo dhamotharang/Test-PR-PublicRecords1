@@ -41,28 +41,8 @@ module
 	max_uid := max(Deltabase_Sprayed, Deltabase_Sprayed.source_rec_id) + 1;
 
 	MAC_Sequence_Records( f1, source_rec_id, f1_source_rec_id, max_uid);
-	
-	f1_did := f1_source_rec_id(rawlinkid>0 and rawlinkid <firstrinid);
-	f1_rinid := f1_source_rec_id(rawlinkid>=firstrinid);
-	f1_rawlinkid_zero:= f1_source_rec_id(rawlinkid=0);
-	
-//validate did with PR
-	validate_did := IDLExternalLinking.did_getAllRecs_batch(f1_did,rawlinkid,source_rec_id);
-	j_did := Join(f1_did,validate_did,left.source_rec_id=right.source_rec_id and right.did>0
-							,Transform(recordof(left)
-							,self.rawlinkid :=if(right.did>0,left.rawlinkid,0)
-							,self:=left),left outer,keep(1));
-							
-//validate rinid's with RIN system						
-	j_rinid :=Join(f1_rinid,Fraudshared.key_did('FraudGov'),
-								left.rawlinkid =right.did
-								,Transform(recordof(left)
-								,self.rawlinkid :=if(left.rawlinkid=right.did,left.rawlinkid,0)
-								,self:=left),left outer,keep(1));
-								
-	final_rawlinkid := 	f1_rawlinkid_zero+j_did+j_rinid;						
-		
-	shared d_source_rec_id := distribute(final_rawlinkid);
+
+	shared d_source_rec_id := distribute(f1_source_rec_id);
 	
 	shared append_source := join(
 		d_source_rec_id,
