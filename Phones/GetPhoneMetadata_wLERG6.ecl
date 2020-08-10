@@ -238,6 +238,7 @@ EXPORT GetPhoneMetadata_wLERG6(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) d
      daysbetween_deact_port := STD.Date.DaysBetween(max_port_start_dt, max_deact_start_dt);
      daysbetween_deact_today  := STD.Date.DaysBetween(max_deact_start_dt , today);
      daysbetween_swap_today := STD.Date.DaysBetween(max_swap_start_dt, today);
+     yearsbetween_deact_today := STD.Date.YearsBetween(max_deact_start_dt, today);
 
      // check if there are multiple most recent phone records
      recent_records := allrows(event_date = max_event_dt);
@@ -267,12 +268,12 @@ EXPORT GetPhoneMetadata_wLERG6(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) d
                 (max_deact_start_dt > max_react_start_dt OR max_swap_start_dt > max_react_start_dt);
 
      Boolean Is_recent_deactswap(Integer Threshold_val) := daysbetween_deact_today <= Threshold_val  OR daysbetween_swap_today <= Threshold_val;
-
      SELF.phone_status := MAP(	hasRecentASRecord AND is_active_record => Phones.Constants.PhoneStatus.Active,
                                 Isport_react_event AND max_port_start_dt = 0 AND
                                 (max_deact_start_dt <= max_react_start_dt OR max_swap_start_dt <= max_react_start_dt) => Phones.Constants.PhoneStatus.Active,
                                 max_port_start_dt != 0 AND ~IsDeactInactiveStatus AND Is_recent_swap => Phones.Constants.PhoneStatus.Active,
-
+                                
+                                (IsDeactInactiveStatus OR max_deact_start_dt != 0) AND yearsbetween_deact_today >= Phones.Constants.PhoneStatus.DeactInactiveThresholdYears => Phones.Constants.PhoneStatus.Inactive,
                                 hasRecentASRecord AND ~is_active_record => Phones.Constants.PhoneStatus.PresumedActive,
                                 IsportInactiveStatus AND ~Is_recent_deactswap(Phones.Constants.PhoneStatus.ActLowerTh) AND
                                 (daysbetween_deact_today >= Phones.Constants.PhoneStatus.ActUpperTh AND daysbetween_swap_today >= Phones.Constants.PhoneStatus.ActUpperTh) => Phones.Constants.PhoneStatus.PresumedActive,
