@@ -18,7 +18,7 @@ EXPORT Fn_Append_DPMBitmap(
 							watchdogPermissionsColumn = 0,
 							Is_Consumer_Header_Rules = 'FALSE') := FUNCTIONMACRO
 							
-	appended := PROJECT(InputDataset, TRANSFORM({RECORDOF(LEFT), DATA100 DPMBitmap},
+	appended := PROJECT(InputDataset, TRANSFORM({RECORDOF(LEFT), DATA57 DPMBitmap},
 		SELF.DPMBitmap := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.SetValue(
 																													#EXPAND(Source_Column), 
 																													Is_A_FCRA_File, 

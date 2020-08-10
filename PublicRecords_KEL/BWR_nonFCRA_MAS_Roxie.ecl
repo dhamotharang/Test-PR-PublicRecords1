@@ -8,6 +8,7 @@ threads := 1;
 RoxieIP := RiskWise.shortcuts.Dev156;
 
 InputFile := '~mas::uatsamples::consumer_nonfcra_100k_07102019.csv ';
+//InputFile := '~mas::uat::mas_nonfcra_10k_sample_20200707.csv';
 //InputFile := '~mas::uatsamples::consumer_nonfcra_1m_07092019.csv';
 // InputFile := '~mas::uatsamples::consumer_nonfcra_iptest_04232020.csv';
 
@@ -28,7 +29,7 @@ GLBA := 1;
 DPPA := 1;
 DataPermissionMask := '0000000001101';  
 DataRestrictionMask := '0000000000000000000000000000000000000000000000000'; 
-
+Include_Minors := TRUE;
 // CCPA Options;
 LexIdSourceOptout := 1;
 TransactionId := '';
@@ -56,6 +57,10 @@ Output_SALT_Profile := TRUE;
 IncludeDeltaBase := FALSE;
 // IncludeDeltaBase := true;
 
+// Use default list of allowed sources
+AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+// Do not exclude any additional sources from allowed sources dataset.
+ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 
 
 RecordsToRun := 0;
@@ -111,6 +116,9 @@ soapLayout := RECORD
 	UNSIGNED1 DPPAPurpose;
 	BOOLEAN OutputMasterResults;
 	BOOLEAN IsMarketing;
+	BOOLEAN IncludeMinors;
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
   UNSIGNED1 LexIdSourceOptout;
   STRING _TransactionId;
   STRING _BatchUID;
@@ -128,6 +136,7 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT UNSIGNED GLBAPurpose := GLBA;
 	EXPORT UNSIGNED DPPAPurpose := DPPA;
 	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
+	EXPORT BOOLEAN IncludeMinors := Include_Minors;
 END;
 
 	// Options := MODULE(PublicRecords_KEL.Interface_Options)
@@ -175,7 +184,10 @@ soapLayout trans (pp le):= TRANSFORM
 	SELF.DataPermissionMask := Settings.Data_Permission_Mask;
 	SELF.GLBPurpose := Settings.GLBAPurpose;
 	SELF.DPPAPurpose := Settings.DPPAPurpose;
+	SELF.IncludeMinors := Settings.IncludeMinors;
 	SELF.IsMarketing := FALSE;
+	SELF.AllowedSourcesDataset := AllowedSourcesDataset;
+	SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;
 	SELF.OutputMasterResults := Output_Master_Results;
 	SELF.LexIdSourceOptout := LexIdSourceOptout;
 	SELF._TransactionId := TransactionId;
