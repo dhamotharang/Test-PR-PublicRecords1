@@ -6,6 +6,11 @@ import iesp;
 
 export duediligencebusinessreport := MODULE
 			
+export t_DDRBusinessNameWithLexID := record
+	string BusinessName {xpath('BusinessName')};
+	string LexID {xpath('LexID')};
+end;
+		
 export t_DDRComponentsOfBusiness := record
 	integer2 Sequence {xpath('Sequence')};
 	string Name {xpath('Name')};
@@ -17,9 +22,25 @@ export t_DDRSOSActions := record
 	iesp.share.t_Date SOSActionDate {xpath('SOSActionDate')};
 end;
 		
-export t_DDRBusinessNameWithLexID := record
-	string BusinessName {xpath('BusinessName')};
-	string LexID {xpath('LexID')};
+export t_DDRSICNAICSDetails := record
+	string8 Code {xpath('Code')};
+	string50 Description {xpath('Description')};
+	string10 Risk {xpath('Risk')};
+end;
+		
+export t_DDRLinkedBusinesses := record
+	t_DDRBusinessNameWithLexID BusinessName {xpath('BusinessName')};
+	iesp.share.t_Address Address {xpath('Address')};
+	t_DDRSICNAICSDetails BestSIC {xpath('BestSIC')};
+	t_DDRSICNAICSDetails BestNAICS {xpath('BestNAICS')};
+	iesp.share.t_Date SosDateFirstSeen {xpath('SosDateFirstSeen')};
+	string MostRecentFilingStatus {xpath('MostRecentFilingStatus')};
+	string FEIN {xpath('FEIN')};
+	boolean CivilLegalEventHit {xpath('CivilLegalEventHit')};
+	boolean StateLegalEventHit {xpath('StateLegalEventHit')};
+	boolean OffenseTypeHit {xpath('OffenseTypeHit')};
+	boolean HasMoreThanOneOperatingLocation {xpath('HasMoreThanOneOperatingLocation')};
+	boolean AllSOSFilingsActive {xpath('AllSOSFilingsActive')};
 end;
 		
 export t_DDRBusinessInformation := record
@@ -243,6 +264,7 @@ end;
 export t_DDRBusinessNetworkDetails := record
 	dataset(t_DDRBusinessExecutives) BusinessExecutives {xpath('BusinessExecutives/BusinessExecutive'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxBusinessExecs)};
 	dataset(t_DDRRegisteredAgents) RegisteredAgents {xpath('RegisteredAgents/RegisteredAgent'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxRegisteredAgents)};
+	dataset(t_DDRLinkedBusinesses) LinkedBusinesses {xpath('LinkedBusinesses/LinkedBusiness'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxLinkedBusinesses)};
 end;
 		
 export t_DDRBusinessAttributeDetails := record
@@ -259,8 +281,8 @@ export t_DDRBusinessReport := record
 end;
 		
 export t_DDRBusinessReportBy := record
-	string ProductRequestType {xpath('ProductRequestType')}; //values['Standard','CustomAttributes','']
-	dataset(iesp.duediligenceshared.t_DDRAttributeModule) AttributeGroups {xpath('AttributeGroups/Group'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxModuleGroupings)};
+	string ProductRequestType {xpath('ProductRequestType')}; //values['Standard','Modules','']
+	dataset(iesp.duediligenceshared.t_DDRAttributeModule) AttributeModules {xpath('AttributeModules/Entry'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxAttributeModules)};
 	iesp.duediligenceshared.t_DDRAttributesBusiness Business {xpath('Business')};
 end;
 		
