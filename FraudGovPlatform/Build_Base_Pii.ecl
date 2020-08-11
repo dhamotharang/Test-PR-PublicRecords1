@@ -85,7 +85,9 @@ Export All := 	Sequential
 											,Build_DLHistory_Base
 											,Build_BestInfo_Base
 											,Build_PrepaidPhone_Base
+											,Build_BocaShell_Base
 											,Promote(pversion).buildfiles.New2Built
+											,Promote(pversion).buildfiles.Built2QA
 											)
 								;
 END;
