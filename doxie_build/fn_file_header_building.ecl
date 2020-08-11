@@ -1,4 +1,4 @@
-﻿import doxie_build, header, header_services,ut, yellowpages, AID, suppress, DriversV2, mdr;
+﻿import doxie_build, header, header_services,ut, yellowpages, AID, suppress, DriversV2;
 
 export fn_file_header_building(dataset(recordof(header.Layout_Header)) in_hdr0) := 
 function
@@ -10,13 +10,7 @@ yes_from_raw := in_hdr1(~(src in ['TS','TU','LT']));
 
 header.macGetCleanAddr(not_from_raw, RawAID, true, not_from_raw_recleaned);
 
-not_from_raw_recleaned_TS     := not_from_raw_recleaned(src = 'TS');
-not_from_raw_recleaned_not_TS := not_from_raw_recleaned(src <> 'TS');
-
-//rollup to remove duplicate TS records after address cleaning
-Header.Mac_dedup_header(not_from_raw_recleaned_TS, not_from_raw_recleaned_uniq_TS, '_TS');
-
-in_hdr2 := yes_from_raw + not_from_raw_recleaned_uniq_TS + not_from_raw_recleaned_not_TS;
+in_hdr2 := yes_from_raw + not_from_raw_recleaned;
 
 in_hdr3 := project(in_hdr2,transform(recordof(in_hdr2)
 									,self.name_suffix:=if(left.name_suffix[1..2]='UN','',left.name_suffix)
