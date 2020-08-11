@@ -49,13 +49,17 @@ EXPORT Proc_Copy_RemoteLinkingKeys_From_Alpha(string filedate) := FUNCTION
 
   QAfiles := STD.File.logicalfilelist('thor_data400::insuranceheader_remotelinking::did::word*::qa::current',FALSE,TRUE);
  
+
   moveKeys := sequential(    
-        STD.File.StartSuperFileTransaction( ) 
-        // deletes the files in 'father' that are not needed
-       ,nothor(apply(QAfiles,  STD.File.RemoveOwnedSubFiles('~' + regexreplace('::qa', name, '::father'), true)))
-       ,nothor(apply(QAfiles, STD.File.PromoteSuperFileList(['~' + name, '~' + regexreplace('::qa', name, '::father')], '~' + regexreplace('qa::current', name, filedate) + '::publish')))
-       ,STD.File.FinishSuperFileTransaction( ) 
-       );
+    // if the father superfile already exists, remove the logical files from father superfile
+    nothor(apply(QAfiles,  
+      if(   STD.File.SuperFileExists('~' + regexreplace('::qa', name, '::father')),
+            STD.File.RemoveOwnedSubFiles('~' + regexreplace('::qa', name, '::father'), true) 
+      ))),
+    STD.File.StartSuperFileTransaction( ) 
+    ,nothor(apply(QAfiles, STD.File.PromoteSuperFileList(['~' + name, '~' + regexreplace('::qa', name, '::father')], '~' + regexreplace('qa::current', name, filedate) + '::publish'))) 
+    ,STD.File.FinishSuperFileTransaction( ) 
+  );
 
   seq := sequential(
           copyKeys,
