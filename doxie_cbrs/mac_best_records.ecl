@@ -19,8 +19,8 @@ END;
 outfile := JOIN(inbdids, %bhbf%,
                       KEYED(LEFT.bdid = RIGHT.bdid) AND
                       doxie.compliance.isBusHeaderSourceAllowed(RIGHT.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask) AND
-                      (RIGHT.dppa_state = '' or (mod_access.isValidDPPA() AND mod_access.isValidDPPAState(RIGHT.dppa_state, , RIGHT.source))),
-                      %knowx_tra%(LEFT, RIGHT)
+                      (RIGHT.dppa_state = '' OR (mod_access.isValidDPPA() AND mod_access.isValidDPPAState(RIGHT.dppa_state, , RIGHT.source))),
+                      %tra%(LEFT, RIGHT)
                       #IF(outerjoin)				
                          ,LEFT OUTER
                       #END
