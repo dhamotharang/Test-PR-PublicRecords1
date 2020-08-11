@@ -24,7 +24,7 @@ mreason := RECORD
 
 //Multi Cat/Subcat section
 mreason xform (Layouts.rWCOCategories restored, integer n) := TRANSFORM,
-			SKIP(n < 2 or restored.IsActivePEP = 'N') //New for Mult to remove extras
+			SKIP(n < 2) //New for Mult to remove extras
 			self.Ent_Id := restored.EntityID;			
 			self.sorter := 2;
 			//temphead := if(n in ['N/A', ''] or newcat.SegmentType != 'PEP', '', n + ':');
@@ -95,7 +95,7 @@ EXPORT rComments Reason_listed(dataset(Layouts.rEntity) infile) := FUNCTION
 				self.IsActivePEP := 'Y';
 				self := left;));
 			
-			restored := newcat(segmenttype<>'PEP') + justformer + noformer + ForceFormer;
+			restored := newcat(segmenttype<>'PEP') + justformer + Active + ForceFormer;
 
 			X := GROUP(SORT(restored, entityid, local), entityid, local);
 			Y := Project(X, xForm(LEFT,Counter));
