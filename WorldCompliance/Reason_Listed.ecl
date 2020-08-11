@@ -95,7 +95,7 @@ EXPORT rComments Reason_listed(dataset(Layouts.rEntity) infile) := FUNCTION
 				self.IsActivePEP := 'Y';
 				self := left;));
 			
-			restored := newcat(segmenttype<>'PEP') + justformer + Active + ForceFormer;
+			restored := Distribute(newcat(segmenttype<>'PEP') + justformer + Active + ForceFormer,EntityID);
 
 			X := GROUP(SORT(restored, entityid, local), entityid, local);
 			Y := Project(X, xForm(LEFT,Counter));
