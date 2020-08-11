@@ -170,14 +170,12 @@ concat_srt
 							sort(concat_all
 										,did
 										,pri
-										)
-							:persist(Filenames().OutputF.mod_collisions_concat_srt);
+										);
 concat_ddp
 					:=
 							dedup(concat_srt
 										,did
-										)
-							:persist(Filenames().OutputF.mod_collisions_concat_ddp);
+										);
 
 EXPORT matches := concat_ddp;
 
