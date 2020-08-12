@@ -29,7 +29,7 @@ EXPORT LiensRetrievalServiceFCRA := MACRO
 
   MAP( params.Invalid_FilingtypeID => FAIL(LiensV2_Services.Constants.LIENS_RETRIEVAL.Invalid_FilingtypeID_failure),
       ~params.InputOk =>FAIL(301, doxie.ErrorCodes(301)),
-      params.InputOk => OUTPUT(response,named('Response'))   
+      params.InputOk => OUTPUT(response,named('Results'))   
       ) ;
 
  ENDMACRO;

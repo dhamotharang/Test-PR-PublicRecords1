@@ -90,7 +90,7 @@ EXPORT GetRetrievalGateway_Records := MODULE
 
     dte_out := Gateway.Soapcall_DTEGetRequestInfo(dte_in,gw_cfg_dte,,, call_dte);
 
-    valid_response := dte_out.ResponseJSON[1].ErrorCode = '';
+    valid_response := dte_out[1].ErrorCode = '0';
 
     dte_gw_recs    := IF(valid_response, dte_out, DATASET([],{dte_out}));
 
@@ -117,7 +117,6 @@ EXPORT GetRetrievalGateway_Records := MODULE
     //get filing_date from case - there will be only one case.Converting from mm/dd/yyyy to yyyymmdd
     case_filing_date := STD.date.ConvertDateFormat(dte_gw_recs.ResponseJSON[1].Case[1].FilingDate, '%m/%d/%Y', '%Y%m%d');
     isValid_filingdate:= FCRA.lien_is_ok((STRING) STD.Date.Today(), case_filing_date);
-
 
     // get parties and lexid them
     $.layout_liens_Retrieval.layout_workrec todidville(DeferredTask.Layouts.PartiesLayout pinfo, integer c)  := TRANSFORM
@@ -200,16 +199,26 @@ EXPORT GetRetrievalGateway_Records := MODULE
     resolved_to_none := COUNT(output_dte) != 1;
     err_response := ~valid_response OR resolved_to_none OR invalid_dte_party; // if no match/more than one match
 
-    $.layout_liens_Retrieval.final_rec ErrorOut() := TRANSFORM
+    /* OKC error messages
+    41-The requested public record was not available.
+    43-The requested public record could not be located.
+    44-Error occurred in JSON parsing
+    45-Error occurred in XML parsing
+    */
 
-       SELF.error_code := MAP(~valid_response => $.constants.LIENS_RETRIEVAL.GATEWAY_FAILURE_CODE,
-                              invalid_dte_party => (STRING) $.constants.LIENS_RETRIEVAL.NO_RECS_FOUND_CODE,
-                              resolved_to_none => FCRA.Constants.ALERT_CODE.NO_DID_FOUND,
-                              '');
+    $.layout_liens_Retrieval.final_rec ErrorOut(RECORDOF(dte_out) L) := TRANSFORM
+
+         SELF.error_code := MAP(L.ErrorCode <> '' => L.ErrorCode,
+                                invalid_dte_party => $.constants.LIENS_RETRIEVAL.NO_RECS_FOUND_CODE,
+                                resolved_to_none => FCRA.Constants.ALERT_CODE.NO_DID_FOUND,
+                                '');
+
+         SELF.error_desc := IF(L.ErrorMessage <> '', L.ErrorMessage, '');
+                              
         SELF := [];
     END;
 
-    error_ds := DATASET([ErrorOut()]);
+    error_ds := PROJECT(dte_out, ErrorOut(LEFT));
 
     res_ds := IF(err_response,
                  error_ds,
