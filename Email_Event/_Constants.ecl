@@ -10,7 +10,7 @@ INLINE MODULE
 	//	Server IP to Spray from
 	EXPORT	serverIP	:=	IF(	Tools._Constants.IsDataland,
 																								_Control.IPAddress.bctlpedata12,
-																								_Control.IPAddress.bctlpedata12);
+																								_Control.IPAddress.bctlpedata10);
 	//	Directory to Spray from
 	EXPORT	Directory_delta	:=	'/data/data_999/email/delta_gateway/';
 	
