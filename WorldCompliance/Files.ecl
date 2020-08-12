@@ -102,7 +102,7 @@ export dsMainCats := Join(distribute(dsMasters_base, Ent_ID),MdsWcoCategories,Le
 											self.EntityID := Left.Ent_ID;
 											self.SegmentType := if (left.Entrycategory = 'Sanction List','Sanction', if (left.Entrycategory = 'Registrations' or left.Entrycategory = 'Associated Entity','AdditionalSegments',left.Entrycategory));
 											self.SubCategoryLabel := if(left.Entrycategory='PEP','Primary PEP',
-																									if(left.Entrycategory = 'Sanction List',left.Entrycategory,left.EntrySubcategory));
+																									if(left.Entrycategory = 'Sanction List' or (left.Entrycategory = 'Associated Entity' and left.EntrySubcategory = 'N/A') ,left.Entrycategory,left.EntrySubcategory));
 											self.SubCategoryDesc := if (left.Entrycategory='PEP',left.EntrySubcategory,
 																									if (left.Entrycategory = 'Sanction List' and left.EntrySubcategory <> 'N/A',left.EntrySubcategory,''));
 											self.isActivePEP := if(left.Entrycategory = 'PEP','Y','');
@@ -135,13 +135,13 @@ export dsMult :=   Join(distribute(MdsWCOCategories, EntityID),dsMasters_base, L
 
 export FMdsWCOCategories := Join(distribute(MdsWCOCategories, EntityID),MdsWcoCategories,Left.EntityID=Right.EntityID,
 										Transform(Layouts.rWCOCategories,
-											self.SegmentType := left.SegmentType;
-											self.SubCategoryLabel := if((left.SegmentType='AdditionalSegments' AND (left.SubCategoryLabel = 'Associated Entity' or left.SubCategoryLabel = 'IHS OFAC Vessels')),
-																										'N/A', 
+											self.SegmentType := if (left.SegmentType='AdditionalSegments' AND left.SubCategoryLabel = 'IHS OFAC Vessels','Sanction',left.SegmentType);
+											self.SubCategoryLabel := if((left.SegmentType='AdditionalSegments' AND left.SubCategoryLabel = 'IHS OFAC Vessels'),
+																										'Sanction List', 
 																									if(left.SegmentType='SOE',
 																										if((left.SubCategoryLabel = 'Minority' or left.SubCategoryLabel = 'Multiple Minority'), 
 																												'Govt Linked Corp',
-																												if ((left.SubCategoryLabel = 'Majority' or left.SubCategoryLabel = 'Multiple Majority'),'Govt Owned Corp', if ((left.SubCategoryLabel = 'Sanction List'),'',left.SubCategoryLabel))),
+																												if ((left.SubCategoryLabel = 'Majority' or left.SubCategoryLabel = 'Multiple Majority'),'Govt Owned Corp', if ((left.SubCategoryLabel = 'Sanction List'),left.SubCategoryLabel,left.SubCategoryLabel))),
 																												left.SubCategoryLabel));
 											self.SubCategoryDesc := if(left.SubCategoryLabel = 'Primary PEP' or left.SubCategoryLabel = 'Secondary PEP', 
 																								if (left.SubCategoryDesc = 'Judiciary','Courts',
@@ -155,6 +155,7 @@ export FMdsWCOCategories := Join(distribute(MdsWCOCategories, EntityID),MdsWcoCa
 export dsMasters := dsMasters_base + dsMult;
 
 export dsWCOCategories := dsMainCats + FMdsWCOCategories;
+//export dsWCOCategories := dsMainCats + MdsWCOCategories;
 export srcAdverseMedia := dedup(dsMasters(EntryCategory in Filters.fAdverseMedia),Ent_ID,ALL);
 export srcGlobalEnforcement := dedup(dsMasters(EntryCategory in Filters.fEnforcement),Ent_ID,ALL);
 
