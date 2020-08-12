@@ -5207,7 +5207,7 @@ EXPORT SeRs_M1_doMapping(ds, outRecord) := FUNCTIONMACRO
 				outRecord doXform(Models.Layouts_Healthcare_Core.layout_SocioEconomic_LI_PB_flat_typed L) := TRANSFORM 
 					SELF.Gender := (integer)CASE(L.GenderStr,'F' => 1, 'M' => 2, 1);
 					SELF.patient_type := (integer)CASE(L.patient_type, 'I' => 1, 'N' => 2, 1);
-					SELF.financial_class := (integer)CASE(L.financial_class, 'MA' => 9, 'SP' => 14, 'BL' => 3, 'MC' => 11, 'MH' => 12, '9' => 2, 'FI' => 6, 'MB' => 10, 'CI' => 5, 'HM' => 7, 'VA' => 15, 'OT' => 13, 'WC' => 16, '16' => 1, 'CH' => 4, 'IC' => 8, 1);
+					SELF.financial_class := (integer)CASE(L.financial_class, 'MA' => 9, 'SP' => 14, 'BL' => 3, 'MC' => 11, 'MH' => 12, '9' => 2, 'FI' => 6, 'MB' => 10, 'CI' => 5, 'HM' => 7, 'VA' => 15, 'OT' => 13, 'WC' => 16, '16' => 1, 'CH' => 4, 'IC' => 8, 9);
 					SELF.admit_diag := (integer)CASE(L.admit_diag, 'TOP_1' => 4, 'MISC_HIGH' => 1, 'MISC_LOW' => 2, 'MISC_MEDIUM' => 3, 'TOP_2' => 6, 'TOP_3' => 7, 'TOP_4' => 8, 'TOP_5' => 9, 'TOP_6' => 10, 'TOP_7' => 11, 'TOP_8' => 12, 'TOP_9' => 13, 'TOP_10' => 5, 1);
 					SELF.readmit_diag := (integer)CASE(L.readmit_diag, 'MISC_LOW' => 2, 'TOP_1' => 4, 'MISC_HIGH' => 1, 'MISC_MEDIUM' => 3, 'TOP_2' => 6, 'TOP_3' => 7, 'TOP_7' => 11, 'TOP_5' => 9, 'TOP_8' => 12, 'TOP_4' => 8, 'TOP_6' => 10, 'TOP_10' => 5, 'TOP_9' => 13, 1);
 					SELF.readmit_lift := (integer)CASE(L.readmit_lift, 'MISC_LOW' => 2, 'MISC_HIGH' => 1, 'MISC_MEDIUM' => 3, 'TOP_9' => 13, 'TOP_6' => 10, 'TOP_4' => 8, 'TOP_10' => 5, 'TOP_7' => 11, 'TOP_5' => 9, 'TOP_2' => 6, 'TOP_1' => 4, 'TOP_8' => 12, 'TOP_3' => 7, 1);
