@@ -1348,6 +1348,7 @@
 				trim(kword, left, right) = 'TWMOJ-INT' =>SubGroup_Constants.numKeywordsID.KEYWORD_TWMOJ_INT,
 				trim(kword, left, right) = 'UZDCEC-INT' =>SubGroup_Constants.numKeywordsID.KEYWORD_UZDCEC_INT,
 				trim(kword, left, right) = 'OFAC-HK-EO13936' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_HK_EO13936,
+				trim(kword, left, right) = 'NOKT' =>SubGroup_Constants.numKeywordsID.KEYWORD_NOKT,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
