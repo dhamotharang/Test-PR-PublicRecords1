@@ -2,7 +2,9 @@
 //Ported Phones Deltabase Build for Telo///////////////////////
 ///////////////////////////////////////////////////////////////
 
-import std, _control, PromoteSupers, RoxieKeyBuild, ut;
+IMPORT std, _control, PromoteSupers, RoxieKeyBuild, ut;
+
+//DF-28036: Convert 6-Digit Spids to 4-Character Spids
 
 EXPORT Proc_Build_Ported_Metadata_DeltaFile_Temp(string version, string filename, string newDay, const varstring eclsourceip, string thor_name):= function
 
@@ -10,7 +12,7 @@ EXPORT Proc_Build_Ported_Metadata_DeltaFile_Temp(string version, string filename
 	sprayDailyDelta 		:= PhonesInfo.Spray_Telo_DailyDelta(version, filename, eclsourceip, thor_name);
 	
 	//Build DeltaBaseFile, Using the Raw Delta Files
-	buildBaseDelta			:= output(PhonesInfo.Map_Ported_Metadata_DeltaFile_Temp(version),,'~thor_data400::base::phones::ported_metadata_deltamain_'+version, csv(heading(1), terminator('\n'), separator('\t')), overwrite, __compressed__);
+	buildBaseDelta			:= output(PhonesInfo.Map_Ported_Metadata_DeltaFile_Temp(version),,'~thor_data400::base::phones::ported_metadata_deltamain_'+version, csv(heading(single), terminator('\n'), separator('\t')), overwrite, __compressed__);
 	
 	//Despray Processed DeltaBase File - BASE DESPRAYED FOR DB TEAM
 	desprayBaseDelta		:= FileServices.DeSpray('~thor_data400::base::phones::ported_metadata_deltamain_'+version,

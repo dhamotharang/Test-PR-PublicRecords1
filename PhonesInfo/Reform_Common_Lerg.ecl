@@ -1,5 +1,7 @@
 ﻿IMPORT std, ut;
 
+//DF-28036: Convert 6-Digit Spids to 4-Character Spids
+
 //MAP INPUTS TO COMMON LAYOUT
 
 EXPORT Reform_Common_Lerg(string version) := MODULE
@@ -27,8 +29,8 @@ EXPORT Reform_Common_Lerg(string version) := MODULE
 					self.high_risk_indicator						:= '';
 					self.activation_dt									:= 0;
 					self.number_in_service							:= '';
-					self.spid														:= '';
-					self.operator_full_name							:= '';
+					self.spid														:= PhonesInfo._functions.fn_standardName(l.ocn);			//Assume OCN is equivalent to SPID
+					self.operator_full_name							:= l.ocn_name; 																				//Assume OCN is equivalent to SPID
 					self.is_current											:= TRUE;
 					self.data_type 											:= '';
 					self.ocn_state 											:= l.ocn_state;
@@ -141,8 +143,8 @@ EXPORT Reform_Common_Lerg(string version) := MODULE
 					self.high_risk_indicator						:= '';
 					self.activation_dt									:= 0;
 					self.number_in_service							:= '';
-					self.spid														:= '';
-					self.operator_full_name							:= '';
+					self.spid														:= PhonesInfo._functions.fn_standardName(l.ocn);	//Assume OCN is equivalent to SPID
+					self.operator_full_name							:= l.ocn_name;																		//Assume OCN is equivalent to SPID
 					self.is_current											:= TRUE;
 					self.data_type 											:= '';	
 					self.ocn_state 											:= l.ocn_state;
