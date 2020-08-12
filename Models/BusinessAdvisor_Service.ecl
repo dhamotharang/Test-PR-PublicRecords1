@@ -176,7 +176,7 @@ boolean runAreaCodeSplitSearch:=true;
 boolean allowCellphones:=false;
 string10 ExactMatchLevel := risk_indicators.iid_constants.default_ExactMatchLevel;
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
-string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 
 string10 CustomDataFilter:='';
 //
@@ -409,8 +409,8 @@ riskwise.Layout_BusReasons_Input into_orig_input(biid le) := transform
 	self.orig_wphone := busphone_value;
 	self.telcoPhoneType := le.TelcordiaPhoneType;
 	
-	bans_current := if(((integer)(ut.GetDate[1..6]) - (integer)(le.RecentBkDate[1..6])) < 1000, true, false);  // make sure the bans is within the last 10 years
-	lien_current := if(((integer)(ut.GetDate[1..6]) - (integer)(le.RecentLienDate[1..6])) < 1000, true, false);  // make sure the bans is within the last 10 years
+	bans_current := if(((integer)((STRING8)Std.Date.Today()[1..6]) - (integer)(le.RecentBkDate[1..6])) < 1000, true, false);  // make sure the bans is within the last 10 years
+	lien_current := if(((integer)((STRING8)Std.Date.Today()[1..6]) - (integer)(le.RecentLienDate[1..6])) < 1000, true, false);  // make sure the bans is within the last 10 years
 	self.cmpy_bans :=  map(fein='' or (company_name='' and addr='') => '3',
 											  le.bkbdidflag and le.lienbdidflag and bans_current and lien_current => '5',
 										       le.bkbdidflag and bans_current => '2', 

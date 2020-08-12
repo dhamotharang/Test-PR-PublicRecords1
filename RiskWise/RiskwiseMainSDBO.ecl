@@ -241,7 +241,7 @@ string2  countrycode_value := '' 		: stored('countrycode');
 string2  countrycode2_value := '' 		: stored('countrycode2');
 boolean  runSeed_value := false 		: stored('runSeed');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
-string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 gateways_in := Gateway.Configuration.Get();
 
 unsigned1 DPPA_Purpose := RiskWise.permittedUse.fraudDPPA : stored('DPPAPurpose');
