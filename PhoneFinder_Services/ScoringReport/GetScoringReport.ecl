@@ -57,19 +57,24 @@ dGWIn := PhoneFinder_Services.ScoringReport.GetGateways();
 Request_Layout  := RECORD
   DATASET(iesp.phonefinder.t_PhoneFinderSearchRequest) phonefindersearchRequest;
   DATASET(risk_indicators.Layout_Gateways_In) gateways;
+  STRING50 account_number;
 END;
 
 Request_Layout  tRequest(iesp.phonefinder.t_PhoneFinderSearchRequest Inreq) := TRANSFORM
   SELF.phonefindersearchRequest := Inreq;
   SELF.gateways := dGWIn;
+  SELF.account_number := Inreq.User.QueryID;
 END;     
+
 
 dSoapRequest := project(ds_Inreq,tRequest(LEFT));
 
+
 iesp.phonefinder.t_PhoneFinderSearchResponse myFail(Request_Layout l) := TRANSFORM
+  
+  SELF._Header.QueryID := l.account_number;
   SELF._Header.Status := failcode;
-  SELF._Header.Message := if(failcode=0,'success',failmessage);
-	SELF._Header.QueryId := l.phonefindersearchRequest.User.QueryId;//Transaction ID is String 16, this is to get account number in output
+  SELF._Header.Message := if(failcode=0,'success',failmessage);	
   SELF          :=  [];
 END; 
        
@@ -201,9 +206,7 @@ LOADXML('<xml/>');
                 'BOOLEAN  OtherPhone' + %'cntPhone'% + '_RI45;' +
                 'BOOLEAN  OtherPhone' + %'cntPhone'% + '_RI46;' +
                 'BOOLEAN  OtherPhone' + %'cntPhone'% + '_RI47;' +
-                'BOOLEAN  OtherPhone' + %'cntPhone'% + '_RI48;' +
-                'BOOLEAN  OtherPhone' + %'cntPhone'% + '_RI49;' +
-                'BOOLEAN  OtherPhone' + %'cntPhone'% + '_RI50;');
+                'BOOLEAN  OtherPhone' + %'cntPhone'% + '_RI48;');
         #SET(cntPhone,%cntPhone% + 1)
       #END
     #END
@@ -255,8 +258,6 @@ BOOLEAN  PrimaryPhone_RI45;
 BOOLEAN  PrimaryPhone_RI46;
 BOOLEAN  PrimaryPhone_RI47;
 BOOLEAN  PrimaryPhone_RI48;
-BOOLEAN  PrimaryPhone_RI49;
-BOOLEAN  PrimaryPhone_RI50;
 STRING PrimaryPhone;  
 STRING PrimaryPhone_Type;  
 STRING PrimaryPhone_Carrier;  
@@ -368,8 +369,6 @@ LOADXML('<xml/>');
           #APPEND(OtherPhones, 'SELF.OtherPhone' + %'j'% + '_RI46:= 46 IN '+ %'RI_set'% + ';\n')
           #APPEND(OtherPhones, 'SELF.OtherPhone' + %'j'% + '_RI47:= 47 IN '+ %'RI_set'% + ';\n')
           #APPEND(OtherPhones, 'SELF.OtherPhone' + %'j'% + '_RI48:= 48 IN '+ %'RI_set'% + ';\n')
-          #APPEND(OtherPhones, 'SELF.OtherPhone' + %'j'% + '_RI49:= 49 IN '+ %'RI_set'% + ';\n')
-          #APPEND(OtherPhones, 'SELF.OtherPhone' + %'j'% + '_RI50:= 50 IN '+ %'RI_set'% + ';\n')
           #APPEND(OtherPhones, 'SELF.OtherPhone' + %'j'% + '_Type := pInput.records[1].OtherPhones[' + %'j'% + ']._Type;\n')
           #APPEND(OtherPhones, 'SELF.OtherPhone' + %'j'% + '_Carrier := pInput.records[1].OtherPhones[' + %'j'% + '].Carrier;\n')
           #APPEND(OtherPhones, 'SELF.OtherPhone' + %'j'% + '_CarrierCity := pInput.records[1].OtherPhones[' + %'j'% + '].CarrierCity;\n')
@@ -565,8 +564,6 @@ Layout_out tFormat2CSV(iesp.phonefinder.t_PhoneFinderSearchResponse pInput) := T
         SELF.PrimaryPhone_RI46:= 46 IN RI_set;
         SELF.PrimaryPhone_RI47:= 47 IN RI_set;
         SELF.PrimaryPhone_RI48:= 48 IN RI_set;
-        SELF.PrimaryPhone_RI49:= 49 IN RI_set;
-        SELF.PrimaryPhone_RI50:= 50 IN RI_set;
         SELF                                    := [];
 END;                            
 
