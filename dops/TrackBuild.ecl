@@ -423,7 +423,9 @@ EXPORT TrackBuild(string p_vertical = 'P'
 			// from "using" to "prod"
 	////////////////////////////////////////////////////		
 	export fPrepInfoForTracking() := function
-			dGWS := fGetWUStatus(SU_FileTrackBuild(FileInfoPrefix)) : independent;
+			dGWS_Full := fGetWUStatus(SU_FileTrackBuild(FileInfoPrefix)) : independent;
+			dGWS := dGWS_Full(regexfind('^[0-9]',buildversion)); // valid build version
+			dGWS_Invalid := dGWS_Full(~regexfind('^[0-9]',buildversion)); // invalid build version
 			dDopsBTUpdate := DB_BTInfo(dGWS) : independent;
 			return if (regexfind('hthor', STD.System.Job.Target())
 								,if (~fileservices.fileexists(LF_PrepforTracking(FlagPrefix))
@@ -431,6 +433,7 @@ EXPORT TrackBuild(string p_vertical = 'P'
 										(
 												output(dataset([{WORKUNIT}],{string wuidflag}),,LF_PrepforTracking(FlagPrefix),overwrite)
 												,fAddTrackFilesToSuper()
+												,output(choosen(dGWS_Invalid,all),named('Invalid_Records'))
 												,if (count(dGWS) > 0
 															,if (count(dDopsBTUpdate(trim(datasetname,left,right) = 'ERROR')) = 0
 																		,sequential

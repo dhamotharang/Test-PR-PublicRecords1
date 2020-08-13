@@ -1741,7 +1741,7 @@ EXPORT B_Event_4 := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE360874 := JOIN(__EE360377,__EE272102,__JC360383(LEFT,RIGHT),__JT360383(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __EE360874 := JOIN(__EE360377,__EE272102,__JC360383(LEFT,RIGHT),__JT360383(LEFT,RIGHT),LEFT OUTER,SMART);
   SHARED __EE272038 := __ENH_Drivers_License_5;
   SHARED __ST287354_Layout := RECORD
     KEL.typ.nuid UID;
@@ -10154,5 +10154,5 @@ EXPORT B_Event_4 := MODULE
     SELF.T9___Addr_Is_Safe_Flag_ := MAP(__PP369572.T9___Addr_Pop_Flag_ = 0=> -99999,__PP369572.T___Src_Class_Type_ <> 2=> -99998,__T(__OP2(__PP369572.T___Addr_Status_Code_Echo_,=,__CN(-99997)))=>0,__T(__OP2(__PP369572.T___Addr_Status_Code_Echo_,IN,__CN([5300,5301,5302,5303,5390])))=>1, -99997);
     SELF := __PP369572;
   END;
-  EXPORT __ENH_Event_4 := PROJECT(__EE369571,__ND369576__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_4',EXPIRE(7));
+  EXPORT __ENH_Event_4 := PROJECT(__EE369571,__ND369576__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Event::Annotated_4',EXPIRE(7));
 END;

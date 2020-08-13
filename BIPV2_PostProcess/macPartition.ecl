@@ -1,4 +1,4 @@
-import BIPV2;
+﻿import BIPV2;
 EXPORT macPartition(
    Infile
   ,idName 
@@ -29,7 +29,7 @@ join(
 );
 
 // output(enth(%marked%, 100), named('marked'));
-shared outFileFreeSourced		:= project(%marked%(    Free), {Infile});
-shared outFileProbationOnly	:= project(%marked%(not Free), {Infile});
+shared outFileFreeSourced		:= project(%marked%(    Free), recordof(Infile));
+shared outFileProbationOnly	:= project(%marked%(not Free), recordof(Infile));
 
 ENDmacro;

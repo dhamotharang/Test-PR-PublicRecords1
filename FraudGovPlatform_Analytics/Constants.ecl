@@ -116,6 +116,14 @@
         EXPORT InputLogicalGraphEdges   := fileLocation(useProdData) + fileScope + 'graphedges';
 			END;
 		END;
+		EXPORT ProfileDeltaDashboard := MODULE
+			EXPORT VizServiceVersion															:= '1';
+			EXPORT CompositionUuid																:= 'dbc6730f-8093-437a-8bd1-af5f3b5bfd48'; 	//Fraudgov-ProfileDelta Dashboard Composition ID		
+			EXPORT Filenames(BOOLEAN useProdData = FALSE):= MODULE
+				EXPORT InputLogicalOldProfileFilename	:= fileLocation(useProdData) + fatherFileScope + 'entityprofile';
+				EXPORT InputLogicalNewProfileFilename	:= fileLocation(useProdData) + fileScope + 'entityprofile';
+			END;
+		END;
 		EXPORT CustomerDashboard 		:= MODULE
 			EXPORT VizServiceVersion								:= '1';
 			EXPORT CompositionUuid									:= '1d19c97e-2588-4b3f-9c8f-9c42536fde5b'; 	//Customer Dashboard Composition ID
