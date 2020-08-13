@@ -1229,7 +1229,7 @@ QUERY: InputRin(DATASET OF RiskIntelligenceNetwork_Analytics.Layouts.LayoutInput
                     IdAge,
                     NoLexId,
                     NoLexIdAdult,
-T1L_CurrAddrStEcho, // testing only...need to be removed before merge request
+
 AgencyUid,
 AgencyProgType,
 AgencyProgJurSt,

@@ -59,9 +59,7 @@ EXPORT Functions := MODULE
 																																													SELF := LEFT,
 																																													SELF := []));
 					
-					raw_res := RiskIntelligenceNetwork_Analytics.Q_Input_Rin(j2).Res0;
-					CleanAttributes := KEL.Clean(raw_res, TRUE /*Remove __Flags*/, TRUE /*Remove __recordcounts*/, TRUE /*Remove _ from Field Names*/);
-					// CleanAttributes := KEL.Clean(RiskIntelligenceNetwork_Analytics.Q_Input_Rin(j2).Res0, TRUE /*Remove __Flags*/, TRUE /*Remove __recordcounts*/, TRUE /*Remove _ from Field Names*/);
+					CleanAttributes := KEL.Clean(RiskIntelligenceNetwork_Analytics.Q_Input_Rin(j2).Res0, TRUE /*Remove __Flags*/, TRUE /*Remove __recordcounts*/, TRUE /*Remove _ from Field Names*/);
 					
 					codesToIgnore := '-99999\', \'-99998\', \'-99997';
 					AttrClean := FraudgovKEL.macCleanAnalyticUIOutput(CleanAttributes, RECORDOF(CleanAttributes), codesToIgnore);
@@ -175,35 +173,7 @@ EXPORT Functions := MODULE
 					*/
 
 					 MyRules := FraudGovPlatform.Key_ConfigRules;
-					/*MyRules := DATASET([
-						{0, 0, 1, 'Rule1', 'IP Address City is Miami and Address out of state.', 't15_ssnpopflag', '1', 0, 0, 3},
-						{0, 0, 1, 'Rule1', 'IP Address City is Miami and Address out of state.', 't1_lexidpopflag', '1', 0, 0, 3},
-						{0, 0, 1, 'Rule99_1', 'Unscorable', 'p1_idriskunscrbleflag', '1', 0, 0, 99},
-						{0, 0, 9, 'Rule99_9', 'Unscorable', 'p9_addrriskunscrbleflag', '1', 0, 0, 99},
-						{0, 0, 15, 'Rule99_15', 'Unscorable', 'p15_ssnriskunscrbleflag', '1', 0, 0, 99},
-						{0, 0, 16, 'Rule99_16', 'Unscorable', 'p16_phnriskunscrbleflag', '1', 0, 0, 99},
-						{0, 0, 17, 'Rule99_17', 'Unscorable', 'p17_emailriskunscrbleflag', '1', 0, 0, 99},
-						{0, 0, 18, 'Rule99_18', 'Unscorable', 'p18_ipaddrriskunscrbleflag', '1', 0, 0, 99},
-						{0, 0, 19, 'Rule99_19', 'Unscorable', 'p19_bnkacctriskunscrbleflag', '1', 0, 0, 99},
-						{0, 0, 20, 'Rule99_20', 'Unscorable', 'p20_dlriskunscrbleflag', '1', 0, 0, 99},
-						{0, 0, 1, 'Rule3', 'Address is out of state and IP Address is NOT in the US.', 'addressoutofstate', '1', 0, 0, 3},
-						{0, 0, 1, 'Rule3', 'Address is out of state and IP Address is NOT in the US.', 't18_ipaddrlocnonusflag', '1', 0, 0, 3},
-						{0, 0, 1, 'Rule1-1', 'Identity Deceased', 'deceased', '1', 0, 0, 3},
-						{0, 0, 1, 'Rule1-2', 'Identity is currently incarcerated', 'currentlyincarceratedflag', '1', 0, 0, 3},
-						{8342784, 1014, 1, 'Rule3', 'Address is out of state and IP Address NOT is in the US.', 'addressoutofstate', '1', 0, 0, 1},
-						{8342784, 1014, 1, 'Rule3', 'Address is out of state and IP Address NOT is in the US.', 't18_ipaddrlocnonusflag', '1', 0, 0, 1},
-						{0, 0, 18, 'Rule4', 'Address is a PO Box and IP Address is NOT in the US.', 't18_ipaddrlocnonusflag', '1', 0, 0, 3},
-						{0, 0, 18, 'Rule4', 'Address is a PO Box and IP Address is NOT in the US.', 'addressispobox', '1', 0, 0, 3},
-						{0, 0, 9, 'Rule5', 'Address is vacant.', 'address_is_vacant_', '1', 0, 0, 1},
-						{0, 0, 9, 'Rule6', 'Address is Commercial Receiving Agency', 'addressiscmra', '1', 0, 0, 1},
-						{0, 0, 9, 'Rule7', 'Address is out of state.', 'addressoutofstate', '1', 0, 0, 3},
-						{0, 0, 1, 'Rule9', 'p1_aotidkrgenfrdactflagev.', 'p1_aotidkrgenfrdactflagev', '1', 0, 0, 3},
-						{0, 0, 9, 'Rule11', 'Address is known risk.', 'p9_aotaddrkractflagev', '1', 0, 0, 3},
-						{0, 0, 15, 'Rule11', 'SSN is known risk.', 'p15_aotssnkractflagev', '1', 0, 0, 3},
-						{20995369, 1014, 9, 'Rule5', 'Address is vacant.', 'addressisvacant', '1', 0, 0, 3}
-						],
-						{UNSIGNED Customerid, UNSIGNED industrytype, INTEGER1 entitytype, STRING RuleName, STRING Description, STRING200 Field, STRING Value, DECIMAL6_2 Low, DECIMAL6_2 High, INTEGER RiskLevel});
-						*/
+					
 					 MyRulesCnt := TABLE(MyRules, {RuleName, customerid, industrytype, entitytype, Reccount := COUNT(GROUP)}, RuleName, customerid, entitytype, industrytype, FEW);
 
 						RulesResult := JOIN(EventStatsPrepWithKr(Value != ''), SORT(MyRules, field, -customerid), 
@@ -318,9 +288,9 @@ EXPORT Functions := MODULE
 																																																															SELF.EntityStats := entityStats_final,
 																																																															SELF := LEFT));
 																																																															
-						output(ds_in,named('analytics_ds_in'));
-						output(j2,named('analytics_j2'));
-						output(AttrClean,named('analytics_AttrClean'));
+						// output(ds_in,named('analytics_ds_in'));
+						// output(j2,named('analytics_j2'));
+						// output(AttrClean,named('analytics_AttrClean'));
 						// output(EventStatsPrep,named('analytics_EventStatsPrep'));
 						// output(elementEntityContextUids,named('analytics_elementEntityContextUids'));
 						// output(elementProfiles,named('analytics_elementProfiles'));
