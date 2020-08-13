@@ -65,7 +65,7 @@ export Master := dataset(
       // 160: not used (500-520 has been alocated for GDC)
       {'ROYALTY', 'GDCVERIFY'				, '160', 'G', ''			, 'Global Data Company Gateway'},
       {'ROYALTY', 'NETACUITY'				, '170', 'G', ''			, 'Digital Envoy Gateway'},
-      {'ROYALTY', 'NETACUITY_IP_METADATA', '171', 'I', '',  'Digital Envoy In House IP Metadata'},
+      {'ROYALTY', 'NETACUITY_IPM', '171', 'I', '',  'Digital Envoy In House IP Metadata'},
       {'ROYALTY', 'ERC'							, '180', 'G', ''			, ''},
       {'ROYALTY', 'ATTUS'						, '190', 'G', ''			, ''},
       {'ROYALTY', 'FARES'						, '200', 'G', ''			, 'In House Property data'},

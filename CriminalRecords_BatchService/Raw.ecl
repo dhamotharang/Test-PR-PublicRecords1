@@ -79,6 +79,9 @@ EXPORT Raw := MODULE
     ds_flags_ofk := flagfile(file_id = FCRA.FILE_ID.OFFENDERS);
     ofp_correct_rec_id := set(ds_flags_ofp, record_id);
     ofk_correct_rec_id := set(ds_flags_ofk, record_id);
+    //here we identify offender_key values which are suppressions - flag_file_id is blank
+    //we need them to support suppression of override records for cluster which is based on offender_key
+    suppressed_ofk := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS AND flag_file_id=''), record_id);
     offender_key := doxie_files.Key_Offenders_OffenderKey (isFCRA);
 
     // BUG #97804 - Prefered Name and SSN Logic
@@ -95,12 +98,15 @@ EXPORT Raw := MODULE
 
     //overrides (FCRA side only) - we have 2 indices for offenders overrides
     // we are making this change to now account for both
+    // we check against suppressed_ofk to support suppression of overrides based on cluster
     recs_over_ofp := join(ds_flags_ofp, fcra.key_override_crim.offenders_plus,
-                      keyed (left.flag_file_id = right.flag_file_id),
+                      keyed (left.flag_file_id = right.flag_file_id)
+                      and right.offender_key not in suppressed_ofk,
                       transform(right), keep(1), ATMOST(CriminalRecords_BatchService.Constants.MAX_RECS_DEFAULT_ATMOST));
 
     recs_over_ofk := join(ds_flags_ofk, fcra.key_override_crim.offenders,
-                      keyed (left.flag_file_id = right.flag_file_id),
+                      keyed (left.flag_file_id = right.flag_file_id)
+                      and right.offender_key not in suppressed_ofk,
                       transform(right),
                       keep(1), ATMOST(CriminalRecords_BatchService.Constants.MAX_RECS_DEFAULT_ATMOST));
 
@@ -156,6 +162,9 @@ EXPORT Raw := MODULE
     ds_flags_ofk := flagfile(file_id=FCRA.FILE_ID.OFFENDERS);
     ofp_correct_rec_id := set(ds_flags_ofp, record_id);
     ofk_correct_rec_id := set(ds_flags_ofk, record_id);
+    //here we identify offender_key values which are suppressions - flag_file_id is blank
+    //we need them to support suppression of override records for cluster which is based on offender_key
+    suppressed_ofk  := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS AND flag_file_id=''), record_id);
     Arrest_datatype := ['5'];
     offender_key := doxie_files.Key_Offenders_OffenderKey (isFCRA);
 
@@ -175,12 +184,16 @@ EXPORT Raw := MODULE
 
 
     //overrides  for offenders are in 2 files
+    // we check against suppressed_ofk to support suppression of overrides based on cluster
     recs_over_ofp := join(ds_flags_ofp, fcra.key_override_crim.offenders_plus,
-                      keyed (left.flag_file_id = right.flag_file_id),
+                      keyed (left.flag_file_id = right.flag_file_id)
+                      and right.offender_key not in suppressed_ofk,
                       transform(right),
                       keep(1), ATMOST(CriminalRecords_BatchService.Constants.MAX_RECS_DEFAULT_ATMOST));
+
     recs_over_ofk := join(ds_flags_ofk, fcra.key_override_crim.offenders,
-                      keyed (left.flag_file_id = right.flag_file_id),
+                      keyed (left.flag_file_id = right.flag_file_id)
+                      and right.offender_key not in suppressed_ofk,
                       transform(right),
                       keep(1), ATMOST(CriminalRecords_BatchService.Constants.MAX_RECS_DEFAULT_ATMOST));
 
