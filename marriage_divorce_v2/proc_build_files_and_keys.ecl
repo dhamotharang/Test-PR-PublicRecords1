@@ -57,7 +57,6 @@ End;
 p_option_to_reclean := project(marriage_divorce_v2.file_mar_div_intermediate,t_option_to_reclean(left));
 
 PromoteSupers.MAC_SF_BuildProcess(marriage_divorce_v2.proc_clean_and_did(concat_them+p_option_to_reclean).base_file_intermediate,'~thor_data400::base::mar_div::intermediate',build_intermediate,3,,true);
-PromoteSupers.MAC_SF_BuildProcess(marriage_divorce_v2.proc_clean_and_did(concat_them+p_option_to_reclean).base_file             ,'~thor_data400::base::mar_div::base'        ,build_base,3,,true);
 PromoteSupers.MAC_SF_BuildProcess(marriage_divorce_v2.proc_clean_and_did(concat_them+p_option_to_reclean).search_file           ,'~thor_data400::base::mar_div::search'      ,build_search,3,,true);
 
 //send email to qa with sample records.
@@ -71,7 +70,9 @@ orbit_update := sequential(Orbit3.proc_Orbit3_CreateBuild ('Marriages and Divorc
 								Orbit3.proc_Orbit3_CreateBuild ('FCRA Marriage and Divorces',filedate,'F'));
 
 
- do_all := sequential(marriage_divorce_v2.File_In_FL_Validate,build_intermediate,parallel(build_base,build_search),
+ do_all := sequential(marriage_divorce_v2.File_In_FL_Validate,
+									build_intermediate,
+									build_search,
 									marriage_divorce_v2.proc_build_keys(filedate),
 									marriage_divorce_v2.Proc_Build_Boolean_Keys(filedate),
 									marriage_divorce_v2.proc_move_to_qa,

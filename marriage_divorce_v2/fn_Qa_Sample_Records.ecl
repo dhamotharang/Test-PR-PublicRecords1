@@ -1,14 +1,16 @@
-export fn_Qa_Sample_Records :=
+﻿export fn_Qa_Sample_Records :=
 function
 
 	samplefile := topn(marriage_divorce_v2.file_mar_div_base(filing_type = '3' and vendor = 'INGHM'), 100, -process_date,-marriage_filing_dt);
 
-//marriage samples
-mar_div_base := marriage_divorce_v2.file_mar_div_base(filing_type = '3' and trim(marriage_filing_number) <> '');
-mar_div_base_father := dataset('~thor_data400::base::mar_div::base_father',marriage_divorce_v2.layout_mar_div_base,flat)(filing_type = '3'and trim(marriage_filing_number) <> '');
+//base files
+mar_div_base := marriage_divorce_v2.file_mar_div_base;
+mar_div_intm_father := dataset('~thor_data400::base::mar_div::intermediate_father',layout_mar_div_intermediate,flat);
+mar_div_base_father := project(mar_div_intm_father ,transform(marriage_divorce_v2.layout_mar_div_base ,self := left));
 
-dist_base := distribute(mar_div_base,HASH32(party1_name,party2_name,marriage_filing_number));
-dist_base_father := distribute(mar_div_base_father,HASH32(party1_name,party2_name,marriage_filing_number));
+//marriage samples
+dist_base := distribute(mar_div_base(filing_type = '3' and trim(marriage_filing_number) <> ''),HASH32(party1_name,party2_name,marriage_filing_number));
+dist_base_father := distribute(mar_div_base_father(filing_type = '3' and trim(marriage_filing_number) <> ''),HASH32(party1_name,party2_name,marriage_filing_number));
 marriage_divorce_v2.layout_mar_div_base join_mar_tr(dist_base l,dist_base_father r) := transform
 self := l;
 end;
@@ -17,11 +19,8 @@ join_mar := join(dist_base,dist_base_father,LEFT.party1_name = RIGHT.party1_name
 
  samplefile1 := choosen(join_mar,100);
 //divorce samples
-div_base := marriage_divorce_v2.file_mar_div_base(filing_type = '7' and trim(divorce_filing_number) <> '');
-div_base_father := dataset('~thor_data400::base::mar_div::base_father',marriage_divorce_v2.layout_mar_div_base,flat)(filing_type = '7'and trim(divorce_filing_number) <> '');
-
-dist_base_div := distribute(div_base,HASH32(party1_name,party2_name,divorce_filing_number));
-dist_base_father_div := distribute(div_base_father,HASH32(party1_name,party2_name,divorce_filing_number));
+dist_base_div := distribute(mar_div_base(filing_type = '7' and trim(divorce_filing_number) <> ''),HASH32(party1_name,party2_name,divorce_filing_number));
+dist_base_father_div := distribute(mar_div_base_father(filing_type = '7' and trim(divorce_filing_number) <> ''),HASH32(party1_name,party2_name,divorce_filing_number));
 
 marriage_divorce_v2.layout_mar_div_base join_div_tr(dist_base_div  l,dist_base_father_div  r) := transform
 self := l;

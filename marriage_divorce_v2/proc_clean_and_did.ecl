@@ -1,4 +1,4 @@
-import ut, header_slimsort, did_add, didville, header,address;
+﻿import ut, header_slimsort, did_add, didville, header,address;
 
 export proc_clean_and_did(dataset(marriage_divorce_v2.layout_mar_div_intermediate) in0) :=
 module
@@ -103,7 +103,7 @@ marriage_divorce_v2.layout_mar_div_intermediate t_clean(marriage_divorce_v2.layo
 
 end;
 
-p_clean := project(out_suppress,t_clean(left)) : persist('~thor_data400::persist::mar_div_clean_new');
+p_clean := project(out_suppress,t_clean(left)); 
 
 
 //Re-sequence records irregardless of whether it's already been cleaned
@@ -111,11 +111,12 @@ ut.MAC_Sequence_Records(p_clean,record_id,p_clean_seq)
 
 export base_file_intermediate := p_clean_seq : persist('~thor_data400::persist::mar_div_sequenced_new');
 
-marriage_divorce_v2.layout_mar_div_base t_map_to_base(marriage_divorce_v2.layout_mar_div_intermediate le) := transform
- self := le;
-end;
+// Audra -- Delete these lines before moving to Prod 
+// marriage_divorce_v2.layout_mar_div_base t_map_to_base(marriage_divorce_v2.layout_mar_div_intermediate le) := transform
+ // self := le;
+// end;
 
-export base_file := project(base_file_intermediate,t_map_to_base(left));
+// export base_file := project(base_file_intermediate,t_map_to_base(left));
 
 did_prep_rec := record
  unsigned3 dt_first_seen;
@@ -203,7 +204,7 @@ did_prep_rec t_did_prep_rec(marriage_divorce_v2.layout_mar_div_intermediate le, 
 
 end;
 
-p_did_prep_rec := normalize(base_file_intermediate,4,t_did_prep_rec(left,counter))(pname<>'') : persist('~thor_data400::persist::mar_div_normalize');
+p_did_prep_rec := normalize(base_file_intermediate,4,t_did_prep_rec(left,counter))(pname<>''); 
 
 
 did_prep_id_rec := record
@@ -359,7 +360,7 @@ redefine_rec t_dob_or_age(redefine_rec le) := transform
  self            := le;
 end;
 
-p_redefine2 := project(p_redefine,t_dob_or_age(left)): persist('~thor_200::persist::mar_div_pre_did_new');
+p_redefine2 := project(p_redefine,t_dob_or_age(left)); 
 
 matchset := ['A','Z','D','Q','G','S'];
 #stored('is_xADL2',false); 
