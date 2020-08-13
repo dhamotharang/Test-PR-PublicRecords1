@@ -1,33 +1,33 @@
-﻿IMPORT $, ConsumerDisclosure, doxie, FFD, iesp;
+IMPORT $, ConsumerDisclosure, doxie, FFD, iesp;
 
-EXPORT ReportRecords(DATASET(doxie.layout_references) in_dids, $.IParams.IParam in_mod) := 
+EXPORT ReportRecords(DATASET(doxie.layout_references) in_dids, $.IParams.IParam in_mod) :=
 FUNCTION
-  
+
   // person context/consumer statements
   in_pc_request := PROJECT(in_dids, transform(FFD.Layouts.DidBatch, self.acctno := (string) counter; self.did := left.did;));
-  
+
   BOOLEAN FailOnSoapError := TRUE;
   pc_response := FFD.Functions.FetchPersonContextAsResponse(in_pc_request, in_mod.gateways,,,FailOnSoapError );
   pc_recs := PROJECT(pc_response.Records, FFD.Layouts.PersonContextBatch);
   slim_pc_recs := FFD.SlimPersonContext(pc_recs);
-  consumer_statements := FFD.prepareConsumerStatements(pc_recs); 
-    
+  consumer_statements := FFD.prepareConsumerStatements(pc_recs);
+
   in_uniqids := PROJECT(in_dids, doxie.layout_best);
-  
-  flag_file := FFD.GetFlagFile(in_uniqids, pc_recs);
-  
+
+  flag_file := FFD.Functions.GetFlagFileCombined(in_uniqids, pc_recs);
+
   pull_by_address := in_mod.IncludeAdvo OR in_mod.IncludeAVM or in_mod.IncludeProperties;
-  
+
   header_data := $.RawHeader.GetData(in_dids, flag_file, slim_pc_recs, in_mod);
   address_data := IF(pull_by_address, $.RawHeader.GetAddressList(header_data));
   ssn_from_header_in := IF(in_mod.IncludeSSN, $.RawHeader.PickBestSSN(header_data));
-  
+
   inquiry_recs := IF(in_mod.IncludeInquiries, $.RawInquiry.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
   ssn_from_inquiry_in := IF(in_mod.IncludeSSNFromInquiries, $.RawInquiry.GetSSNList(inquiry_recs));
-  
+
   ssn_data := ssn_from_header_in + ssn_from_inquiry_in;
   ssn_recs := IF(in_mod.IncludeSSN, $.RawSSN.GetData(ssn_data,  flag_file, slim_pc_recs, in_mod));
-  
+
   header_recs := IF(in_mod.IncludeHeader, header_data);
   advo_recs := IF(in_mod.IncludeAdvo, $.RawAdvo.GetData(address_data, flag_file, slim_pc_recs, in_mod));
   avm_recs := IF(in_mod.IncludeAVM, $.RawAVM.GetAVMAddressData(address_data, flag_file, slim_pc_recs, in_mod));
@@ -56,7 +56,7 @@ FUNCTION
   thrive_recs := IF(in_mod.IncludeThrive, $.RawThrive.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
   so_recs := IF(in_mod.IncludeOffenders, $.RawOffender.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
   watercraft_recs := IF(in_mod.IncludeWatercraft, $.RawWatercraft.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
-  
+
   optout_recs := IF(in_mod.IncludeOptOut, $.RawOptOut.GetData(in_dids));
 
   // ------- OUTPUT section ----------------
@@ -95,20 +95,20 @@ FUNCTION
     SELF.Thrive := PROJECT(thrive_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceThriveData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
     SELF.Watercraft := PROJECT(watercraft_recs, $.Transforms.xformWatercraftData(LEFT));
     SELF.PersonContext := PROJECT(pc_recs, iesp.fcradataservice.t_FcraDataServicePersonContextRecord); // --> maybe this should be the raw records as returned from person context instead?
-    SELF:=[]; 
+    SELF:=[];
   END;
-  
+
   res := ROW(xformResult());
 
   isResultFound := EXISTS(aircraft_recs) OR EXISTS(advo_recs) OR EXISTS(alloy_media_student_recs) OR EXISTS(american_student_recs) OR
-    EXISTS(atf_recs) OR EXISTS(avm_recs) OR EXISTS(avm_median_recs) OR EXISTS(bk_recs) OR EXISTS(crim_recs) OR EXISTS(death_recs) OR 
-    EXISTS(email_recs) OR EXISTS(gong_recs) OR EXISTS(header_recs) OR EXISTS(huntfish_recs) OR EXISTS(infutor_recs) OR EXISTS(inquiry_recs) OR 
-    EXISTS(liens_recs) OR EXISTS(marriage_recs) OR EXISTS(optout_recs) OR EXISTS(paw_recs) OR EXISTS(pilot_recs) OR EXISTS(proflic_recs) OR 
-    EXISTS(proflic_mari_recs) OR EXISTS(property_by_owner_recs) OR EXISTS(property_by_residence_recs) OR EXISTS(so_recs) OR 
-    EXISTS(ssn_recs) OR EXISTS(thrive_recs) OR EXISTS(watercraft_recs) OR EXISTS(pc_recs); 
+    EXISTS(atf_recs) OR EXISTS(avm_recs) OR EXISTS(avm_median_recs) OR EXISTS(bk_recs) OR EXISTS(crim_recs) OR EXISTS(death_recs) OR
+    EXISTS(email_recs) OR EXISTS(gong_recs) OR EXISTS(header_recs) OR EXISTS(huntfish_recs) OR EXISTS(infutor_recs) OR EXISTS(inquiry_recs) OR
+    EXISTS(liens_recs) OR EXISTS(marriage_recs) OR EXISTS(optout_recs) OR EXISTS(paw_recs) OR EXISTS(pilot_recs) OR EXISTS(proflic_recs) OR
+    EXISTS(proflic_mari_recs) OR EXISTS(property_by_owner_recs) OR EXISTS(property_by_residence_recs) OR EXISTS(so_recs) OR
+    EXISTS(ssn_recs) OR EXISTS(thrive_recs) OR EXISTS(watercraft_recs) OR EXISTS(pc_recs);
 
-  isPCSoapFail := pc_response._Header.Status = ConsumerDisclosure.Constants.StatusCodes.SOAPError; 
-  
+  isPCSoapFail := pc_response._Header.Status = ConsumerDisclosure.Constants.StatusCodes.SOAPError;
+
   $.Layouts.ReportResponse xformResponse() := TRANSFORM
     StatusCode := MAP(isPCSoapFail => ConsumerDisclosure.Constants.StatusCodes.SOAPError,
                       isResultFound => ConsumerDisclosure.Constants.StatusCodes.ResultsFound,
@@ -121,12 +121,12 @@ FUNCTION
   out_resp := ROW(xformResponse());
 
   // ------- OUTPUT section ----------------
-  
+
   IF(ConsumerDisclosure.Debug, OUTPUT(flag_file, named('flag_file')));
   IF(ConsumerDisclosure.Debug, OUTPUT(slim_pc_recs, named('slim_pc_recs')));
   IF(ConsumerDisclosure.Debug AND pull_by_address, OUTPUT(address_data, named('address_list')));
   IF(ConsumerDisclosure.Debug, OUTPUT(consumer_statements, named('consumer_statements')));
 
   RETURN out_resp;
-  
+
 END;
