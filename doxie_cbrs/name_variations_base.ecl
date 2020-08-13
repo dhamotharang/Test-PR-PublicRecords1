@@ -1,17 +1,21 @@
-import doxie, business_header;
-export name_variations_base(dataset(doxie_cbrs.layout_references) bdids) := 
+IMPORT doxie, business_header;
+EXPORT name_variations_base(DATASET(doxie_cbrs.layout_references) bdids) :=
 MODULE
 
-doxie_cbrs.mac_Selection_Declare()
+  doxie_cbrs.mac_Selection_Declare()
 
-thebest := sort(doxie_cbrs.fn_getBaseRecs(bdids,false)(Include_NameVariations_val),company_clean,-length(trim(company_name,left,right)),company_name);
+  thebest := SORT(doxie_cbrs.fn_getBaseRecs(bdids,FALSE)(Include_NameVariations_val), 
+      company_clean,-LENGTH(TRIM(company_name, LEFT, RIGHT)), company_name);
 
-shared deduped_thebest := dedup(thebest,name_source_id);
+  SHARED deduped_thebest := DEDUP(thebest, name_source_id);
 
-doxie_cbrs.mac_Selection_Declare()
+  doxie_cbrs.mac_Selection_Declare()
 
-export records := table(choosen(sort(deduped_thebest,company_name),Max_NameVariations_val),{company_name,name_source_id});
-export records_count := count(deduped_thebest);
+  EXPORT records := TABLE(
+    CHOOSEN(SORT(deduped_thebest, company_name), Max_NameVariations_val),
+    {company_name,name_source_id});
+    
+  EXPORT records_count := COUNT(deduped_thebest);
 
 END;
-						
+            

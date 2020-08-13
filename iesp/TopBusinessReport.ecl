@@ -39,6 +39,7 @@ export t_TopBusinessReportOption := record (iesp.share.t_BaseReportOption)
 	boolean IncludeCriminalIndicators {xpath('IncludeCriminalIndicators')};//hidden[internal]
       boolean IncludeBizToBizDelinquencyRiskIndicator {xpath('IncludeBizToBizDelinquencyRiskIndicator')};//hidden[internal]
 	string1 BusinessReportFetchLevel {xpath('BusinessReportFetchLevel')}; //values['S','D','E','W','P','O','U','','']
+	boolean IncludeVendorSourceB {xpath('IncludeVendorSourceB')};//hidden[ecl_only]
 end;
 		
 export t_TopBusinessReportBy := record
@@ -610,11 +611,17 @@ export t_TopBusinessPropertyForeclosure := record
 	string120 DefendantCompanyName4 {xpath('DefendantCompanyName4')};
 	iesp.share.t_Address SiteAddress1 {xpath('SiteAddress1')};
 	iesp.share.t_Address SiteAddress2 {xpath('SiteAddress2')}; 
+	string2 VendorSource {xpath('VendorSource')};
+	string1 LenderType {xpath('LenderType')};
+	string55 LenderTypeDescription {xpath('LenderTypeDescription')};
+	string10 LoanAmount {xpath('LoanAmount')};
+	string1 LoanType {xpath('LoanType')};
+	string60 LoanTypeDescription {xpath('LoanTypeDescription')};
 	string30 LenderFirstName {xpath('LenderFirstName')};
 	string30 LenderLastName {xpath('LenderLastName')};
 	string30 LenderCompanyName {xpath('LenderCompanyName')};
 	string60 AttorneyName {xpath('AttorneyName')};
-	string10 AttorneyPhoneNumber {xpath('AttorneyPhoneNumber')};
+ string10 AttorneyPhoneNumber {xpath('AttorneyPhoneNumber')};
 	iesp.share.t_Address Address {xpath('Address')};
 	string45 DocumentType {xpath('DocumentType')};
 	dataset(iesp.topbusiness_share.t_TopBusinessSourceDocInfo) FSourceDocs {xpath('FSourceDocs/SourceDoc'), MAXCOUNT(iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_SRCDOC_RECORDS)};

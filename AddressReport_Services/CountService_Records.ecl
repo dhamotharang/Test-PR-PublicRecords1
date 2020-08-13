@@ -66,7 +66,7 @@ EXPORT CountService_Records ($.input.params param,
     //*************************************//
     // Business
     //*************************************//
-    business_recs := Location_Services.business_records(bus_input);
+    business_recs := Location_Services.business_records(bus_input, mod_access);
     shared Bus_cnt := count(business_recs);
 
     //*************************************//

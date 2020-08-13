@@ -117,8 +117,9 @@ export DCALead_BatchService_Records(dataset(Autokey_Batch.Layouts.rec_inBatchMas
 	
 	// Join to the best file
 	add_best_data := table(
-		join(add_incorp_state,Business_Header.Key_BH_Best,
-			keyed (left.bdid = right.bdid),
+		join(add_incorp_state, Business_Header.Key_BH_Best,
+			keyed (left.bdid = right.bdid) AND 
+      doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 			left outer,
 			keep (1), limit (0)),
 		{acctno,bdid,company_name,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,city,state, string zip := intformat(zip,5,1), string zip4 := intformat(zip4,4,1),phone,corp_inc_date,corp_inc_state});

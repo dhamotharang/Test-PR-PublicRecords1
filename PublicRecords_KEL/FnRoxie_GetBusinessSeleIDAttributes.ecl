@@ -48,27 +48,23 @@ LayoutBIIAndPII := RECORD
 
 	BusinessSeleIDAttributesRaw := KEL.Clean(BusinessSeleAttributes_Results, true, true, true);
 
-	LayoutBusinessSeleIDNoDatesAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1(
+	LayoutBusinessSeleIDNoDatesAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1(
 																	0, // UltID
 																	0, // OrgID
 																	0, // SeleID
-																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 
-																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII), 
 																	0, // ArchiveDate
-																	PublicRecords_KEL.CFG_Compile.Permit__NONE).res1); //DPM	
+																	PublicRecords_KEL.CFG_Compile.Permit__NONE).res0); //DPM	
 
 	BusinessSeleAttributes_NoDates_Results := IF(Options.OutputMasterResults,
 		PROJECT(InputData, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDNoDatesAttributes},
 			SELF.G_ProcBusUID := LEFT.G_ProcBusUID;
-			NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1(
+			NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1(
 				LEFT.B_LexIDUlt,
 				LEFT.B_LexIDOrg,
-				LEFT.B_LexIDLegal,
-				DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 
-				DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII), 				
+				LEFT.B_LexIDLegal, 				
 				STD.Date.Today(), 
 				Options.KEL_Permissions_Mask, 				
-				FDCDataset).res1;
+				FDCDataset).res0;
 			SELF := NonFCRABusinessSeleIDResults[1])),
 		DATASET([],{INTEGER G_ProcBusUID, LayoutBusinessSeleIDNoDatesAttributes}));
 	
@@ -77,7 +73,6 @@ LayoutBIIAndPII := RECORD
 	BusinessAttributesWithSeleID := JOIN(RecordsWithSeleID, BusinessSeleIDAttributesRaw, LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID, 
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutBusinessSeleID,
 			ResultsFound := RIGHT.B_LexIDLegal > 0 AND RIGHT.B_LexIDLegalSeenFlag = '1';
-			SELF.G_BuildBusHdrDt := Risk_Indicators.get_build_date('bip_build_version');
 			SELF.B_LexIDLegalSeenFlag := IF(ResultsFound, RIGHT.B_LexIDLegalSeenFlag, '0');
 			SELF.BE_VerSrcListEv := IF(ResultsFound, RIGHT.BE_VerSrcListEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			SELF.BE_VerSrcCntEv := IF(ResultsFound, RIGHT.BE_VerSrcCntEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
@@ -133,7 +128,6 @@ LayoutBIIAndPII := RECORD
 			SELF.BE_VerPhoneSrcOldMsncEv := IF(ResultsFound, RIGHT.BE_VerPhoneSrcOldMsncEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_VerPhoneSrcNewMsncEv := IF(ResultsFound, RIGHT.BE_VerPhoneSrcNewMsncEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			//Tradeline Attributes		
-			SELF.G_BuildB2BDt := Risk_Indicators.get_Build_date('cortera_build_version');
 			SELF.BE_B2BCntEv := IF(ResultsFound, RIGHT.BE_B2BCntEv,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_B2BCnt2Y := IF(ResultsFound, RIGHT.BE_B2BCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_B2BCarrCnt2Y := IF(ResultsFound, RIGHT.BE_B2BCarrCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
@@ -352,7 +346,6 @@ LayoutBIIAndPII := RECORD
 			SELF.BE_DrgBkCh13Cnt10Y := IF(ResultsFound, RIGHT.BE_DrgBkCh13Cnt10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_DrgBkNewChType10Y := IF(ResultsFound, RIGHT.BE_DrgBkNewChType10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			//Sos Build Date//			
-			SELF.G_BuildSOSDt := Risk_Indicators.get_build_date('Corp_build_version');
 			SELF.BE_SOSCntEv := IF(ResultsFound, RIGHT.BE_SOSCntEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_SOSNewDtEv := IF(ResultsFound, RIGHT.BE_SOSNewDtEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			SELF.BE_SOSOldDtEv := IF(ResultsFound, RIGHT.BE_SOSOldDtEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
@@ -381,7 +374,6 @@ LayoutBIIAndPII := RECORD
 			SELF.BE_BestTIN := IF(ResultsFound, RIGHT.BE_BestTIN, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			SELF.BE_BestPhone := IF(ResultsFound, RIGHT.BE_BestPhone, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			//LeinJudgment Build Date//			
-			SELF.G_BuildDrgLnJDt := Risk_Indicators.get_build_date('liens_build_version');
 			SELF.BE_DrgGovDebarredFlagEv := IF(ResultsFound, RIGHT.BE_DrgGovDebarredFlagEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			SELF.BE_DrgLTDCnt1Y := IF(ResultsFound, RIGHT.BE_DrgLTDCnt1Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_DrgLTDCnt7Y := IF(ResultsFound, RIGHT.BE_DrgLTDCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
@@ -392,7 +384,6 @@ LayoutBIIAndPII := RECORD
 			SELF.BE_DrgLTDNewMsnc7Y := IF(ResultsFound, RIGHT.BE_DrgLTDNewMsnc7Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_DrgLTDOldMsnc7Y := IF(ResultsFound, RIGHT.BE_DrgLTDOldMsnc7Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT)	;	
 					//UCC Attributes
-			SELF.G_BuildUCCDt := Risk_Indicators.get_build_date('ucc_build_version');
 			SELF.BE_UCCCntEv := IF(ResultsFound, RIGHT.BE_UCCCntEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_UCCDebtorCntEv := IF(ResultsFound, RIGHT.BE_UCCDebtorCntEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_UCCDebtorOldDtEv := IF(ResultsFound, RIGHT.BE_UCCDebtorOldDtEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
@@ -639,7 +630,6 @@ LayoutBIIAndPII := RECORD
 	BusinessAttributesWithoutSeleID := PROJECT(RecordsWithoutSeleID,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutBusinessSeleID,
 			// Attributes from NonFCRABusinessSeleIDAttributesV1 KEL query
-			SELF.G_BuildBusHdrDt := Risk_Indicators.get_build_date('bip_build_version');
 			SELF.B_LexIDLegalSeenFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.BE_VerSrcListEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.BE_VerSrcCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
@@ -695,7 +685,6 @@ LayoutBIIAndPII := RECORD
 			SELF.BE_VerPhoneSrcOldMsncEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_VerPhoneSrcNewMsncEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			//Tradeline Attributes No ID
-			SELF.G_BuildB2BDt := Risk_Indicators.get_Build_date('cortera_build_version');
 			SELF.BE_B2BCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_B2BCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_B2BCarrCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
@@ -914,7 +903,6 @@ LayoutBIIAndPII := RECORD
 			SELF.BE_DrgBkCh13Cnt10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_DrgBkNewChType10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			//SOS Build Date//			
-			SELF.G_BuildSOSDt := Risk_Indicators.get_build_date('Corp_build_version');
 			SELF.BE_SOSCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_SOSNewDtEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.BE_SOSOldDtEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
@@ -943,7 +931,6 @@ LayoutBIIAndPII := RECORD
 			SELF.BE_BestTIN := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.BE_BestPhone := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			//LeinJudgment Build Date//			
-			SELF.G_BuildDrgLnJDt := Risk_Indicators.get_build_date('liens_build_version');
 			SELF.BE_DrgGovDebarredFlagEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.BE_DrgLTDCnt1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_DrgLTDCnt7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
@@ -954,7 +941,6 @@ LayoutBIIAndPII := RECORD
 			SELF.BE_DrgLTDNewMsnc7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_DrgLTDOldMsnc7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			//UCC Attributes	
-			SELF.G_BuildUCCDt := Risk_Indicators.get_build_date('ucc_build_version');
 			SELF.BE_UCCCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_UCCDebtorCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_UCCDebtorOldDtEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;

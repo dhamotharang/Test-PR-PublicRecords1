@@ -24,6 +24,8 @@ best_verify_val := stringlib.StringToUpperCase(best_verify_val1);
 
 Business_Header.doxie_MAC_Field_Declare(true)
 
+string DataRestrictionMask := AutoStandardI.Constants.DataRestrictionMask_default : STORED('DataRestrictionMask');
+string DataPermissionMask := AutoStandardI.Constants.DataPermissionMask_default : STORED('DataPermissionMask');
 Business_Header_SS.MAC_BDID_Append(
 	precs,
 	match_res,
@@ -34,6 +36,8 @@ Business_Header_SS.MAC_BestAppend(
 	best_append_val,
 	best_verify_val,
 	best_res,
+  DataPermissionMask,
+  DataRestrictionMask,
 	true
 )
 

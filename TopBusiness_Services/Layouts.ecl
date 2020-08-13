@@ -1,4 +1,4 @@
-IMPORT BIPV2;
+﻿IMPORT BIPV2;
 
 EXPORT Layouts := MODULE
 
@@ -7,6 +7,7 @@ EXPORT Layouts := MODULE
 	  boolean lnbranded;
 	  boolean internal_testing;
 		string1 BusinessReportFetchLevel;
+    boolean IncludeVendorSourceB;
 	end;
 
   // Additional input boolena needed for UCC section

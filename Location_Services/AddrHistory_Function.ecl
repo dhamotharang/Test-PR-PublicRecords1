@@ -556,7 +556,7 @@ slimrec own2slim_d2(slimrec L, k_deed2 R) := transform
 end;
 currentProp_d1 := join(
   currOwn(hist[1].ln_fares_id[2]='D'), k_deed1,
-  left.hist[1].ln_fares_id = right.ln_fares_id,
+  left.hist[1].ln_fares_id = right.ln_fares_id AND right.record_type NOT IN LN_PropertyV2.Constants.setAssignRelsRecordTypes,//Assignments and Releases codes excluded
   own2slim_d1(left,right),
   limit(0), keep(1));
 currentProp_d2 := join(

@@ -1,14 +1,15 @@
-import dca;
+IMPORT dca;
 
-export DCA_records_raw(dataset(doxie_cbrs.layout_references) bdids = dataset([], doxie_cbrs.layout_references)) 
-	:= FUNCTION
+EXPORT DCA_records_raw(DATASET(doxie_cbrs.layout_references) bdids = DATASET([], doxie_cbrs.layout_references))
+  := FUNCTION
 
 k := DCA.Key_DCA_BDID;
 
-k tra(k r) := transform
-	self := r;
-end;
+k tra(k r) := TRANSFORM
+  SELF := r;
+END;
 
-return join(bdids, k, keyed(left.bdid = right.bdid), tra(right),
-				  limit(10000, skip));
+RETURN JOIN(bdids, k, KEYED(LEFT.bdid = RIGHT.bdid), 
+  tra(RIGHT),
+  LIMIT(10000, SKIP));
 END;

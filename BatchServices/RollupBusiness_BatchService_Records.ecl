@@ -259,7 +259,8 @@ EXPORT RollupBusiness_BatchService_Records(
 
 	// Next, go and get the best info for each record
 	SHARED BestInfo_Records := JOIN(Deduped_GroupId_Results_No_Filter,Business_Header.Key_BH_Best,
-		KEYED(LEFT.related_bdid = RIGHT.bdid),
+		KEYED(LEFT.related_bdid = RIGHT.bdid) AND 
+    doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 		KEEP(limits.BEST_KEEP), LIMIT (0));
 
 	SHARED Penalized_BestInfo_Records := JOIN(indata,BestInfo_Records,

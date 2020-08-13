@@ -227,7 +227,7 @@ MODULE
       EXPORT BOOLEAN UseTargus          		 := (TransactionType = $.Constants.TransType.Ultimate OR IncludeTargus) AND ~doxie.compliance.isPhoneFinderTargusRestricted(drm);
 
       EXPORT BOOLEAN IncludeEquifax          := pfOptions.IncludeEquifax;
-      EXPORT BOOLEAN UseEquifax         		 := (TransactionType = $.Constants.TransType.Ultimate OR IncludeEquifax) AND ~doxie.compliance.isPhoneMartRestricted(drm);
+      EXPORT BOOLEAN UseEquifax         		 := (TransactionType = $.Constants.TransType.Ultimate OR IncludeEquifax) AND ~doxie.compliance.isPhoneMartRestricted(drm) AND mod_access.isValidGLB();
 
       EXPORT BOOLEAN IncludeTransUnionIQ411  := pfOptions.IncludeTransUnionIQ411;
       EXPORT BOOLEAN IncludeTransUnionPVS    := pfOptions.IncludeTransUnionPVS;
@@ -323,7 +323,7 @@ MODULE
       EXPORT BOOLEAN   UseInHouseQSent     := doxie.compliance.use_QSent(dpm) AND TransactionType <> $.Constants.TransType.PHONERISKASSESSMENT;
       EXPORT BOOLEAN   UseQSent            := ~doxie.compliance.isQSentRestricted(drm) AND TransactionType IN [$.Constants.TransType.Premium,$.Constants.TransType.Ultimate];
       EXPORT BOOLEAN   UseTargus           := ~doxie.compliance.isPhoneFinderTargusRestricted(drm) AND TransactionType = $.Constants.TransType.Ultimate;
-      EXPORT BOOLEAN   UseEquifax          := ~doxie.compliance.isPhoneMartRestricted(drm) AND TransactionType = $.Constants.TransType.Ultimate;
+      EXPORT BOOLEAN   UseEquifax          := ~doxie.compliance.isPhoneMartRestricted(drm) AND TransactionType = $.Constants.TransType.Ultimate AND mod_access.isValidGLB();
       EXPORT BOOLEAN   useWaterfallv6			 := FALSE : STORED('useWaterfallv6');//internal
       EXPORT BOOLEAN   IncludePhoneMetadata:= FALSE : STORED('IncludePhoneMetadata');
 

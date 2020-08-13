@@ -33,7 +33,9 @@ EXPORT FnRoxie_GetAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) In
 			SELF := []),
 		LEFT OUTER, KEEP(1), ATMOST(100));
 
-	MasterResults := SORT(withPersonAttributes, G_ProcUID);
+	FinalResultWithBuildDates := PublicRecords_KEL.FnRoxie_GetBuildDates(withPersonAttributes, Options);
+
+	MasterResults := SORT(FinalResultWithBuildDates, G_ProcUID);
 	
 	IF(Options.OutputMasterResults, OUTPUT(MasterResults, NAMED('MasterResults')));
 

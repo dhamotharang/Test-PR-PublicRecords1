@@ -62,6 +62,7 @@ EXPORT IParam := MODULE
         EXPORT STRING32 TransactionID := ''; // to pass to okc gateway
         EXPORT BOOLEAN  DeferredTaskRequest := FALSE;
         EXPORT BOOLEAN  InputOk := FALSE;
+        EXPORT BOOLEAN  Invalid_FilingtypeID := FALSE;
     END;
 
 	EXPORT GetLiensRetrievalParams(iesp.riskview_publicrecordretrieval.t_PublicRecordRetrievalRequest request) := FUNCTION
@@ -110,6 +111,8 @@ EXPORT IParam := MODULE
          EXPORT STRING32 TransactionID         := mod_access.transaction_id;
          EXPORT BOOLEAN DeferredTaskRequest := DeferredTransactionID <> '';
          EXPORT BOOLEAN InputOk             := input_ok;
+         EXPORT BOOLEAN Invalid_FilingtypeID  := search_by.FilingTypeID <> '' AND 
+                                                 search_by.FilingTypeID NOT IN $.Constants.LIENS_RETRIEVAL.Valid_FilingtypeID;
          END;
          RETURN params;
 	END;

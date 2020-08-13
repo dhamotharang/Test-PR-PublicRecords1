@@ -10,7 +10,7 @@ SHARED SetDPMBitmap := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.SetValue
 SHARED CFG_File     := PublicRecords_KEL.CFG_Compile;
 
 
-EXPORT GetDeltaBaseRec(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) shell) := function
+EXPORT GetDeltaBaseRec(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII_Overrides) shell) := function
 													
 	deltabase_Name := Options.gateways(servicename = Gateway.Constants.ServiceName.DeltaInquiry)[1].servicename;
 	deltabase_check := Options.gateways(servicename = Gateway.Constants.ServiceName.DeltaInquiry)[1].url;

@@ -26,6 +26,9 @@ best_verify_val := STD.Str.ToUpperCase(best_verify_val1);
 inbatch := DATASET([], Business_Header_SS.Layout_BDID_InBatch) : stored('bdid_batch_in', FEW);
 //inbatch := infile;
 
+string DataRestrictionMask := AutoStandardI.Constants.DataRestrictionMask_default : STORED('DataRestrictionMask');
+string DataPermissionMask := AutoStandardI.Constants.DataPermissionMask_default : STORED('DataPermissionMask');
+
 Business_Header_SS.MAC_BDID_Append(
 	inbatch,
 	match_res,
@@ -40,6 +43,8 @@ Business_Header_SS.MAC_BestAppend(
 	best_append_val,
 	best_verify_val,
 	best_res,
+	DataPermissionMask,
+	DataRestrictionMask,
 	TRUE
 )
 

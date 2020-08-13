@@ -11,6 +11,7 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 	// ---------------[ Consumer ]---------------
 
 	EXPORT DoFDCJoin_Doxie__Key_Header := 
+			Options.IncludeMini OR
 			Options.IncludePerson OR 
 			Options.IncludePersonAddress OR 
 			Options.IncludePersonPhone OR 
@@ -18,19 +19,11 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 			Options.IncludeSocialSecurityNumber OR 
 			Options.IncludeSSNAddress OR
 			Options.IncludeSSNPhone;
-	
-	EXPORT DoFDCJoin_Header_Quick__Key_Did := 
-			Options.IncludePerson OR 
-			Options.IncludePersonAddress OR 
-			Options.IncludePersonPhone OR
-			Options.IncludePersonSSN OR 
-			Options.IncludeSocialSecurityNumber OR 
-			Options.IncludeSSNAddress OR
-			Options.IncludeSSNPhone;
-			
+				
 	EXPORT DoFDCJoin_Dx_Header__key_wild_SSN := 
-			NOT Options.isFCRA AND			
-			(Options.IncludePersonSSN OR 
+			NOT Options.isFCRA AND
+			(Options.IncludeMini OR
+			Options.IncludePersonSSN OR 
 			Options.IncludeSocialSecurityNumber OR 
 			Options.IncludeSSNAddress OR
 			Options.IncludeSSNPhone);
@@ -154,9 +147,6 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 	EXPORT DoFDCJoin_Prof_License_Mari__Key_Did :=
 		(Options.IncludeProfessionalLicense OR
 		 Options.IncludeProfessionalLicensePerson );
-		
-	EXPORT DoFDCJoin_ADVO__Key_Addr1 := 
-		Options.IncludeAddress;
 
 	EXPORT DoFDCJoin_ADVO__Key_Addr1_History := 
 		Options.IncludeAddress;
@@ -589,7 +579,8 @@ EXPORT DoFDCJoin_dx_CFPB__key_Census_Surnames :=
 			 
 	EXPORT DoFDCJoin_Best_Person__Key_Watchdog :=
 			NOT Options.isFCRA AND
-			(Options.IncludePerson OR
+			(Options.IncludeMini OR
+			Options.IncludePerson OR
 			 Options.IncludePersonSSN OR 
 			 Options.IncludePersonPhone);
 	
@@ -599,7 +590,8 @@ EXPORT DoFDCJoin_dx_CFPB__key_Census_Surnames :=
 	EXPORT DoFDCJoin_Best_Person__Key_Watchdog_FCRA_nonEN :=
 			Options.isFCRA AND
 			Options.Data_Restriction_Mask[Risk_Indicators.iid_constants.posEquifaxRestriction] <> '1' AND //lets not put more ssns through the inq keys than we need too
-			(Options.IncludePerson OR
+			(Options.IncludeMini OR
+			Options.IncludePerson OR
 			 Options.IncludePersonSSN OR 
 			 Options.IncludePersonPhone);
 			 
@@ -609,7 +601,8 @@ EXPORT DoFDCJoin_dx_CFPB__key_Census_Surnames :=
 	EXPORT DoFDCJoin_Best_Person__Key_Watchdog_FCRA_nonEQ :=
 			Options.isFCRA AND
 			Options.Data_Restriction_Mask[Risk_Indicators.iid_constants.posEquifaxRestriction] = '1' AND //lets not put more ssns through the inq keys than we need too
-			(Options.IncludePerson OR
+			(Options.IncludeMini OR
+			Options.IncludePerson OR
 			 Options.IncludePersonSSN OR 
 			 Options.IncludePersonPhone);
 			 
@@ -639,7 +632,9 @@ EXPORT DoFDCJoin_dx_CFPB__key_Census_Surnames :=
 			 NOT Options.isFCRA AND
 			Options.IncludePerson;				
 		
-		
+	EXPORT DoFDCJoin_Thrive__Key_did_QA :=		
+			 Options.IncludePerson;				
+			 
 //inquiries
 	EXPORT DoFDCJoin_Inquiry_AccLogs__Key_DID_FCRA := 
 		Options.IsFCRA AND
@@ -730,4 +725,6 @@ EXPORT DoFDCJoin_dx_CFPB__key_Census_Surnames :=
 		 NOT Options.IsFCRA
 		 AND Options.IncludeSSNSummary;
 
+	EXPORT DoFDCJoin_Overrides := 
+		 Options.IncludeOverrides;
 END;

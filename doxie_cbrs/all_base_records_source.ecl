@@ -4,226 +4,226 @@ doxie_cbrs.mac_Selection_Declare()
 //
 // Limit the amount of source docs until we can figure out how to return them all
 //
-#stored('MaxNameVariations',100);
-#stored('MaxPhoneVariations',100);
-#stored('MaxAddressVariations',100);
-#stored('MaxProfessionalLicenses',50);
-#stored('MaxAssociatedPeople',150);
-#stored('MaxInternetDomains',50);
-#stored('MaxBankruptcies',50);
-#stored('MaxProperties',100);
-#stored('MaxMotorVehicles',100);
-#stored('MaxWatercrafts',100);
-#stored('MaxAircrafts',100);
-#stored('MaxExperianBusinessReports',25);
-#stored('MaxExecutives',50);
-#stored('MaxDCA',50);
-#stored('MaxSales',50);
-#stored('MaxIndustryInformation',100);
-#stored('MaxUCCFilings',100);  // 100 UCCs
-#stored('MaxLiensJudgmentsUCC',100); // 100 LJs - doesn't affect UCC see MaxUCCFilings
-#stored('MaxParentCompany',50);	
-#stored('MaxRegisteredAgents',50);
-#stored('MaxCompanyIDnumbers',100);
-#stored('MaxBusinessAssociates',50);
-#stored('MaxIRS5500',50);
-#stored('MaxIRSNonP',50);
-#stored('MaxFDIC',50);
-#stored('MaxBBBMember',50);
-#stored('MaxBBBNonMember',50);
-#stored('MaxCASalesTax',50);
-#stored('MaxIASalesTax',50);
-#stored('MaxMSWorkComp',50);
-#stored('MaxORWorkComp',50);
+#STORED('MaxNameVariations',100);
+#STORED('MaxPhoneVariations',100);
+#STORED('MaxAddressVariations',100);
+#STORED('MaxProfessionalLicenses',50);
+#STORED('MaxAssociatedPeople',150);
+#STORED('MaxInternetDomains',50);
+#STORED('MaxBankruptcies',50);
+#STORED('MaxProperties',100);
+#STORED('MaxMotorVehicles',100);
+#STORED('MaxWatercrafts',100);
+#STORED('MaxAircrafts',100);
+#STORED('MaxExperianBusinessReports',25);
+#STORED('MaxExecutives',50);
+#STORED('MaxDCA',50);
+#STORED('MaxSales',50);
+#STORED('MaxIndustryInformation',100);
+#STORED('MaxUCCFilings',100); // 100 UCCs
+#STORED('MaxLiensJudgmentsUCC',100); // 100 LJs - doesn't affect UCC see MaxUCCFilings
+#STORED('MaxParentCompany',50);
+#STORED('MaxRegisteredAgents',50);
+#STORED('MaxCompanyIDnumbers',100);
+#STORED('MaxBusinessAssociates',50);
+#STORED('MaxIRS5500',50);
+#STORED('MaxIRSNonP',50);
+#STORED('MaxFDIC',50);
+#STORED('MaxBBBMember',50);
+#STORED('MaxBBBNonMember',50);
+#STORED('MaxCASalesTax',50);
+#STORED('MaxIASalesTax',50);
+#STORED('MaxMSWorkComp',50);
+#STORED('MaxORWorkComp',50);
 
 EXPORT all_base_records_source(DATASET(doxie_cbrs.layout_references) bdids = DATASET([],doxie_cbrs.layout_references),
                                doxie.IDataAccess mod_access
                               ) := FUNCTION
-	
+  
 //***** RECORDSETS
 //
 // FINDER
 //
-hdrr := doxie_cbrs.header_records_raw(bdids)(Include_Finder_val or 
-										Include_NameVariations_val or 
-										Include_AddressVariations_val or 
-										Include_PhoneVariations_val or
-										Include_CompanyIDNumbers_val);				
-	
-//	
-// DNB										
+hdrr := doxie_cbrs.header_records_raw(bdids)(Include_Finder_val OR
+                    Include_NameVariations_val OR
+                    Include_AddressVariations_val OR
+                    Include_PhoneVariations_val OR
+                    Include_CompanyIDNumbers_val);
+  
 //
-dnbr := doxie_cbrs.DNB_records(bdids, mod_access)(Include_DunBradstreetRecords_val or 
-										Include_CompanyIDnumbers_val);
-	
-//	
-// CORPORATE_FILINGS										
+// DNB
 //
-corr := choosen(doxie_cbrs.Corporation_Filings_records(bdids)(Include_CorporationFilings_val or
-										Include_CompanyIDnumbers_val or
-										Include_CompanyProfile_val),
-			Max_CorporationFilings_val);
-										
+dnbr := doxie_cbrs.DNB_records(bdids, mod_access)(Include_DunBradstreetRecords_val OR
+                    Include_CompanyIDnumbers_val);
+  
+//
+// CORPORATE_FILINGS
+//
+corr := CHOOSEN(doxie_cbrs.Corporation_Filings_records(bdids)(Include_CorporationFilings_val OR
+                    Include_CompanyIDnumbers_val OR
+                    Include_CompanyProfile_val),
+      Max_CorporationFilings_val);
+                    
 rarr := doxie_cbrs.registered_agents_records_raw(bdids)(Include_RegisteredAgents_val);
 
-crpr := choosen(sort(dedup(corr + rarr, ALL),corp_state_origin), Max_CompanyIDnumbers_val);
+crpr := CHOOSEN(SORT(DEDUP(corr + rarr, ALL),corp_state_origin), Max_CompanyIDnumbers_val);
 
-//	
-// CORPORATE_FILINGS_V2										
 //
-corr_v2 := choosen(doxie_cbrs.Corporation_Filings_records_v2(bdids).source_view(Max_CorporationFilings_val)(Include_CorporationFilingsV2_val or
-										Include_CompanyIDnumbersV2_val or
-										Include_CompanyProfileV2_val),
-			Max_CorporationFilings_val);
+// CORPORATE_FILINGS_V2
+//
+corr_v2 := CHOOSEN(doxie_cbrs.Corporation_Filings_records_v2(bdids).source_view(Max_CorporationFilings_val)(Include_CorporationFilingsV2_val OR
+                    Include_CompanyIDnumbersV2_val OR
+                    Include_CompanyProfileV2_val),
+      Max_CorporationFilings_val);
 
 rarr_v2 := doxie_cbrs.registered_agents_records_raw_v2(bdids)(Include_RegisteredAgentsV2_val);
-										
-crpr_v2 := choosen(sort(dedup(corr_v2 + rarr_v2, ALL),corp_state_origin), Max_CompanyIDnumbers_val);
+                    
+crpr_v2 := CHOOSEN(SORT(DEDUP(corr_v2 + rarr_v2, ALL),corp_state_origin), Max_CompanyIDnumbers_val);
 
 //
-// BANKRUPTCY										
+// BANKRUPTCY
 //
-bnkr := choosen(doxie_cbrs.bankruptcy_records(bdids)(Include_Bankruptcies_val),
-			Max_Bankruptcies_val);
+bnkr := CHOOSEN(doxie_cbrs.bankruptcy_records(bdids)(Include_Bankruptcies_val),
+      Max_Bankruptcies_val);
 
 //
-// BANKRUPTCY	_V2									
+// BANKRUPTCY _V2
 //
-bnkr_v2 := choosen(doxie_cbrs.bankruptcy_records_v2(bdids).source_view(Max_Bankruptcies_val)(Include_BankruptciesV2_val),
-			Max_Bankruptcies_val);
+bnkr_v2 := CHOOSEN(doxie_cbrs.bankruptcy_records_v2(bdids).source_view(Max_Bankruptcies_val)(Include_BankruptciesV2_val),
+      Max_Bankruptcies_val);
 
 //
 // UCC
 //
-uccr := choosen(doxie_cbrs.UCC_Records(bdids,mod_access.ssn_mask)(Include_UCCFilings_val or 
-										Include_LiensJudgmentsUCC_val),
-				Max_UCCFilings_val);
+uccr := CHOOSEN(doxie_cbrs.UCC_Records(bdids,mod_access.ssn_mask)(Include_UCCFilings_val OR
+                    Include_LiensJudgmentsUCC_val),
+        Max_UCCFilings_val);
 
 //
 // UCC_V2
 //
-uccr_v2 := choosen(doxie_cbrs.UCC_Records_v2(bdids,mod_access.ssn_mask).source_view(Max_UCCFilings_val)(Include_UCCFilingsV2_val OR 
-										Include_LiensJudgmentsUCCV2_val),
-				Max_UCCFilings_val);
+uccr_v2 := CHOOSEN(doxie_cbrs.UCC_Records_v2(bdids,mod_access.ssn_mask).source_view(Max_UCCFilings_val)(Include_UCCFilingsV2_val OR
+                    Include_LiensJudgmentsUCCV2_val),
+        Max_UCCFilings_val);
 
-//										
-// LIENS_JUDGMENTS										
 //
-ljr  := choosen(doxie_cbrs.Liens_Judments_records(bdids)(Include_LiensJudgments_val or
-										Include_LiensJudgmentsUCC_val or
-										Include_CompanyIDNumbers_val),
-				Max_LiensJudgmentsUCC_val);
+// LIENS_JUDGMENTS
+//
+ljr := CHOOSEN(doxie_cbrs.Liens_Judments_records(bdids)(Include_LiensJudgments_val OR
+                    Include_LiensJudgmentsUCC_val OR
+                    Include_CompanyIDNumbers_val),
+        Max_LiensJudgmentsUCC_val);
 
-//										
+//
 // LIENS_JUDGMENTS_V2
 //
-ljr_v2  := choosen(doxie_cbrs.Liens_Judments_records_v2(bdids,mod_access.ssn_mask).source_view(Max_LiensJudgmentsUCC_val)(Include_LiensJudgmentsV2_val or
-										Include_LiensJudgmentsUCCV2_val or
-										Include_CompanyIDNumbers_val),
-				Max_LiensJudgmentsUCC_val);
-	
+ljr_v2 := CHOOSEN(doxie_cbrs.Liens_Judments_records_v2(bdids,mod_access.ssn_mask).source_view(Max_LiensJudgmentsUCC_val)(Include_LiensJudgmentsV2_val OR
+                    Include_LiensJudgmentsUCCV2_val OR
+                    Include_CompanyIDNumbers_val),
+        Max_LiensJudgmentsUCC_val);
+  
 //
 // IRS 5500
 //
-irs5500 := choosen(doxie_cbrs.IRS5500_records(bdids)(Include_CompanyIDNumbers_val or
+irs5500 := CHOOSEN(doxie_cbrs.IRS5500_records(bdids)(Include_CompanyIDNumbers_val OR
                     Include_IRS5500_val),
                    Max_IRS5500_val);
-									 
+                   
 //
 // IRS Non Profit
 //
-irsnonpr := choosen(doxie_cbrs.IRSNonP_records(bdids)(Include_CompanyIDNumbers_val or
+irsnonpr := CHOOSEN(doxie_cbrs.IRSNonP_records(bdids)(Include_CompanyIDNumbers_val OR
                     Include_IRSNonP_val),
                    Max_IRSNonP_val);
-									 
+                   
 //
 // FDIC
 //
-fdicr := choosen(doxie_cbrs.FDIC_member_records(bdids)(Include_FDIC_val),
+fdicr := CHOOSEN(doxie_cbrs.FDIC_member_records(bdids)(Include_FDIC_val),
                    Max_FDIC_val);
 
 //
 // BBBMember
 //
-bbbmemberr := choosen(doxie_cbrs.BBBMember_member_records(bdids)(Include_BBBMember_val),
+bbbmemberr := CHOOSEN(doxie_cbrs.BBBMember_member_records(bdids)(Include_BBBMember_val),
                    Max_BBBMember_val);
 
 //
 // BBBNonMember
 //
-bbbnonmemberr := choosen(doxie_cbrs.BBBNonMember_member_records(bdids)(Include_BBBNonMember_val),
+bbbnonmemberr := CHOOSEN(doxie_cbrs.BBBNonMember_member_records(bdids)(Include_BBBNonMember_val),
                    Max_BBBNonMember_val);
 
 //
 // CASalesTax
 //
-casalestaxr := choosen(doxie_cbrs.CASalesTax_member_records(bdids)(Include_CASalesTax_val),
+casalestaxr := CHOOSEN(doxie_cbrs.CASalesTax_member_records(bdids)(Include_CASalesTax_val),
                    Max_CASalesTax_val);
 
 //
 // IASalesTax
 //
-iasalestaxr := choosen(doxie_cbrs.IASalesTax_member_records(bdids)(Include_IASalesTax_val),
+iasalestaxr := CHOOSEN(doxie_cbrs.IASalesTax_member_records(bdids)(Include_IASalesTax_val),
                    Max_IASalesTax_val);
 
 //
 // MSWorkComp
 //
-msworkcompr := choosen(doxie_cbrs.MSWorkComp_member_records(bdids)(Include_MSWorkComp_val),
+msworkcompr := CHOOSEN(doxie_cbrs.MSWorkComp_member_records(bdids)(Include_MSWorkComp_val),
                    Max_MSWorkComp_val);
 
 //
 // ORWorkComp
 //
-orworkcompr := choosen(doxie_cbrs.ORWorkComp_member_records(bdids)(Include_ORWorkComp_val),
+orworkcompr := CHOOSEN(doxie_cbrs.ORWorkComp_member_records(bdids)(Include_ORWorkComp_val),
                    Max_ORWorkComp_val);
 
-//	
+//
 // CONTACTS
 //
-conr := choosen(sort(doxie_cbrs.contact_records_standardized(bdids)(Include_AssociatedPeople_val),lname,fname),
-				Max_AssociatedPeople_val);
+conr := CHOOSEN(SORT(doxie_cbrs.contact_records_standardized(bdids)(Include_AssociatedPeople_val),lname,fname),
+        Max_AssociatedPeople_val);
 
 //
 // PROPERTY
 //
-pror := choosen(doxie_cbrs.property_records(bdids)(Include_Properties_val and byBDID),Max_Properties_val);
+pror := CHOOSEN(doxie_cbrs.property_records(bdids)(Include_Properties_val AND byBDID),Max_Properties_val);
 
 //
 // PROPERTY_V2
 //
-pror_v2_assess := choosen(doxie_cbrs.property_records_source(bdids).assessments(Include_PropertiesV2_val),Max_PropertiesV2_val);
-pror_v2_deed := choosen(doxie_cbrs.property_records_source(bdids).deeds(Include_PropertiesV2_val),Max_PropertiesV2_val);
+pror_v2_assess := CHOOSEN(doxie_cbrs.property_records_source(bdids).assessments(Include_PropertiesV2_val),Max_PropertiesV2_val);
+pror_v2_deed := CHOOSEN(doxie_cbrs.property_records_source(bdids).deeds(Include_PropertiesV2_val),Max_PropertiesV2_val);
 
 //
 // INTERNET
 //
-idor := choosen(doxie_cbrs.Internet_Domains_records(bdids)(Include_InternetDomains_val),Max_InternetDomains_val);
+idor := CHOOSEN(doxie_cbrs.Internet_Domains_records(bdids)(Include_InternetDomains_val),Max_InternetDomains_val);
 
 //
 // PROFESSIONAL_LICENSES
 //
-plir := choosen(doxie_cbrs.proflic_records_dayton(bdids)(Include_ProfessionalLicenses_val),Max_ProfessionalLicenses_val);
+plir := CHOOSEN(doxie_cbrs.proflic_records_dayton(bdids)(Include_ProfessionalLicenses_val),Max_ProfessionalLicenses_val);
 
 //
 // MOTOR_VEHICLES
 //
-mvrr := choosen(doxie_cbrs.motor_vehicle_records_dayton(bdids)(Include_Bus_DPPA AND Include_MotorVehicles_val),Max_MotorVehicles_val);
+mvrr := CHOOSEN(doxie_cbrs.motor_vehicle_records_dayton(bdids)(Include_Bus_DPPA AND Include_MotorVehicles_val),Max_MotorVehicles_val);
 
 //
 // MOTOR_VEHICLES_V2
 //
-mvrr_v2 := choosen(doxie_cbrs.motor_vehicle_records_v2(bdids).source_view(Max_MotorVehicles_val)(Include_Bus_DPPA AND Include_MotorVehiclesV2_val),Max_MotorVehicles_val);
+mvrr_v2 := CHOOSEN(doxie_cbrs.motor_vehicle_records_v2(bdids).source_view(Max_MotorVehicles_val)(Include_Bus_DPPA AND Include_MotorVehiclesV2_val),Max_MotorVehicles_val);
 
 //
 // WATERCRAFTS
 //
-wtcr := choosen(doxie_cbrs.watercraft_records(bdids)(Include_Bus_DPPA AND Include_Watercrafts_val),Max_Watercrafts_val);
+wtcr := CHOOSEN(doxie_cbrs.watercraft_records(bdids)(Include_Bus_DPPA AND Include_Watercrafts_val),Max_Watercrafts_val);
 
 //
 // AIRCRAFTS
 //
-airr := choosen(doxie_cbrs.aircraft_records(bdids)(Include_Aircrafts_val),Max_Aircrafts_val);
+airr := CHOOSEN(doxie_cbrs.aircraft_records(bdids)(Include_Aircrafts_val),Max_Aircrafts_val);
 
 //
 // EXPERIAN_BUSINESS_REPORTS
@@ -231,24 +231,24 @@ airr := choosen(doxie_cbrs.aircraft_records(bdids)(Include_Aircrafts_val),Max_Ai
 ebrr_1 := doxie_cbrs.experian_business_reports_raw(bdids,Include_Experian_Business_Reports_val,Max_Experian_Business_Reports_val).records;
 // ebrr_2 := choosen(doxie_cbrs.experian_business_reports_raw((Include_UCCFilings_val or
                     // Include_LiensJudgmentsUCC_val) and
-										// exists(ucc_filing_recs)),
-				// Max_UCCFilings_val - count(uccr));
+                    // exists(ucc_filing_recs)),
+        // Max_UCCFilings_val - count(uccr));
 // ebrr_3 := choosen(doxie_cbrs.experian_business_reports_raw((Include_LiensJudgments_val or
-										// Include_LiensJudgmentsUCC_val) and
-										// (exists(tax_lien_recs) or exists(judgment_recs))),
-				// Max_LiensJudgmentsUCC_val - count(ljr));
+                    // Include_LiensJudgmentsUCC_val) and
+                    // (exists(tax_lien_recs) or exists(judgment_recs))),
+        // Max_LiensJudgmentsUCC_val - count(ljr));
 // ebrr := dedup(sort(ebrr_1 + ebrr_2,file_number),file_number);
 ebrr := ebrr_1;
 
 //
 // NOTICE OF DEFAULTS
 //
-nodr := choosen(doxie_cbrs.foreclosure_records(bdids,true).records (Include_NoticeOfDefaults_val),Max_NoticeOfDefaults_val);
+nodr := CHOOSEN(doxie_cbrs.foreclosure_records(bdids,TRUE).records (Include_NoticeOfDefaults_val),Max_NoticeOfDefaults_val);
 
 //
 // FORECLOSURES
 //
-forr := choosen(doxie_cbrs.foreclosure_records(bdids,false).records (Include_Foreclosures_val),Max_Foreclosures_val);
+forr := CHOOSEN(doxie_cbrs.foreclosure_records(bdids,FALSE).records (Include_Foreclosures_val),Max_Foreclosures_val);
 
 //
 // BUSINESS_ASSOCIATES
@@ -258,220 +258,220 @@ forr := choosen(doxie_cbrs.foreclosure_records(bdids,false).records (Include_For
 //
 // BUSINESS REGISTRATIONS
 //
-brer_count := count(doxie_cbrs.business_registration_records_prs(bdids)(Include_BusinessRegistrations_val));
+brer_count := COUNT(doxie_cbrs.business_registration_records_prs(bdids)(Include_BusinessRegistrations_val));
 
 //
 // BUSINESS SANCTIONS
 //
-sancsr_count			:= count(doxie.Ingenix_Business_records(bdids).records (Include_Sanctions_val)) ;
+sancsr_count := COUNT(doxie.Ingenix_Business_records(bdids).records (Include_Sanctions_val)) ;
 
 //***** SYNTAX REQUIRES THAT I CREATE A NAME FOR THE LAYOUT OF SOME (CANNOT ASSIGN TABLE OF UNNAMED...)
-mac_give_name(r, outr) := macro
-	#uniquename(rec)
-	#uniquename(renameit)
-	%rec% := recordof(r);
-	%rec% %renameit%(r l) := transform
-		self := l;
-	end;
-	outr := project(r, %renameit%(left));
-endmacro;
+mac_give_name(r, outr) := MACRO
+  #uniquename(rec)
+  #uniquename(renameit)
+  %rec% := RECORDOF(r);
+  %rec% %renameit%(r l) := TRANSFORM
+    SELF := l;
+  END;
+  outr := PROJECT(r, %renameit%(LEFT));
+ENDMACRO;
 
 
 mac_give_name(bnkr, bnkr_named)
 mac_give_name(idor, idor_named)
 mac_give_name(hdrr, hdrr_named)
 
-temprec := record
-	unsigned3 FINDER,
-	unsigned3 DNB,
-	unsigned3 CORPORATE_FILINGS,
-	unsigned3 CORPORATE_FILINGS_V2,
-	unsigned3 BANKRUPTCY,
-	unsigned3 BANKRUPTCY_V2,
-	unsigned3 UCCS,
-	unsigned3 UCCS_V2,
-	unsigned3 LIENS_JUDGMENTS,
-	unsigned3 LIENS_JUDGMENTS_V2,
-	unsigned3 IRS5500,
-	unsigned3 IRSNONP,
-	unsigned3 FDIC,
-	unsigned3 BBBMember,
-	unsigned3 BBBNonMember,
-	unsigned3 CASalesTax,
-	unsigned3 IASalesTax,
-	unsigned3 MSWorkComp,
-	unsigned3 ORWorkComp,
-	unsigned3 CONTACTS,
-	unsigned3 PROPERTY,
-	unsigned3 PROPERTY_V2,
-	unsigned3 INTERNET,
-	unsigned3 PROFESSIONAL_LICENSES,
-	unsigned3 BUSINESS_REGISTRATIONS,
-	unsigned3 MOTOR_VEHICLES,
-	unsigned3 MOTOR_VEHICLES_V2,
-	unsigned3 WATERCRAFTS,
-	unsigned3 AIRCRAFTS,
-	unsigned3 EXPERIAN_BUSINESS_REPORTS,
-	unsigned3 SUPERIOR_LIENS,
-	unsigned3 NOTICE_OF_DEFAULTS,
-	unsigned3 FORECLOSURES,
-	unsigned3 BUSINESS_SANCTIONS
-end;
+temprec := RECORD
+  UNSIGNED3 FINDER,
+  UNSIGNED3 DNB,
+  UNSIGNED3 CORPORATE_FILINGS,
+  UNSIGNED3 CORPORATE_FILINGS_V2,
+  UNSIGNED3 BANKRUPTCY,
+  UNSIGNED3 BANKRUPTCY_V2,
+  UNSIGNED3 UCCS,
+  UNSIGNED3 UCCS_V2,
+  UNSIGNED3 LIENS_JUDGMENTS,
+  UNSIGNED3 LIENS_JUDGMENTS_V2,
+  UNSIGNED3 IRS5500,
+  UNSIGNED3 IRSNONP,
+  UNSIGNED3 FDIC,
+  UNSIGNED3 BBBMember,
+  UNSIGNED3 BBBNonMember,
+  UNSIGNED3 CASalesTax,
+  UNSIGNED3 IASalesTax,
+  UNSIGNED3 MSWorkComp,
+  UNSIGNED3 ORWorkComp,
+  UNSIGNED3 CONTACTS,
+  UNSIGNED3 PROPERTY,
+  UNSIGNED3 PROPERTY_V2,
+  UNSIGNED3 INTERNET,
+  UNSIGNED3 PROFESSIONAL_LICENSES,
+  UNSIGNED3 BUSINESS_REGISTRATIONS,
+  UNSIGNED3 MOTOR_VEHICLES,
+  UNSIGNED3 MOTOR_VEHICLES_V2,
+  UNSIGNED3 WATERCRAFTS,
+  UNSIGNED3 AIRCRAFTS,
+  UNSIGNED3 EXPERIAN_BUSINESS_REPORTS,
+  UNSIGNED3 SUPERIOR_LIENS,
+  UNSIGNED3 NOTICE_OF_DEFAULTS,
+  UNSIGNED3 FORECLOSURES,
+  UNSIGNED3 BUSINESS_SANCTIONS
+END;
 
-srcr := project(dataset([{0}],{unsigned _a}),transform(temprec,
-	self.FINDER                       := count(hdrr_named),
-	self.DNB                          := count(dnbr),
-	self.CORPORATE_FILINGS            := count(crpr),
-	self.CORPORATE_FILINGS_V2         := count(crpr_v2),
-	self.BANKRUPTCY                   := count(bnkr_named),
-	self.BANKRUPTCY_V2                := count(bnkr_v2),
-	self.UCCS                         := count(uccr),
-	self.UCCS_V2                      := count(uccr_v2),
-	self.LIENS_JUDGMENTS              := count(ljr),
-	self.LIENS_JUDGMENTS_V2           := count(ljr_v2),
-	self.IRS5500                      := count(irs5500),
-	self.IRSNONP                      := count(irsnonpr),
-	self.FDIC                         := count(fdicr),
-	self.BBBMEMBER                    := count(bbbmemberr),
-	self.BBBNONMEMBER                 := count(bbbnonmemberr),
-	self.CASALESTAX                   := count(casalestaxr),
-	self.IASALESTAX                   := count(iasalestaxr),
-	self.MSWORKCOMP                   := count(msworkcompr),
-	self.ORWORKCOMP                   := count(orworkcompr),
-	self.CONTACTS                     := count(conr),
-	self.PROPERTY                     := count(pror),
-	self.PROPERTY_V2                  := count(pror_v2_assess) +
-	                                     count(pror_v2_deed),
-	self.INTERNET                     := count(idor_named),
-	self.PROFESSIONAL_LICENSES        := count(plir),
-	self.BUSINESS_REGISTRATIONS       := brer_count                              , // NEED TO STANDARDIZE
-	self.MOTOR_VEHICLES               := count(mvrr),
-	self.MOTOR_VEHICLES_V2            := count(mvrr_v2),
-	self.WATERCRAFTS                  := count(wtcr),
-	self.AIRCRAFTS                    := count(airr),
-	self.EXPERIAN_BUSINESS_REPORTS    := count(ebrr),
-	self.SUPERIOR_LIENS               := 0                                       , // NEED TO REMOVE
-	self.NOTICE_OF_DEFAULTS           := count(nodr)                             , // NEED TO STANDARDIZE
-	self.FORECLOSURES                 := count(forr)                             , // NEED TO STANDARDIZE
-	self.BUSINESS_SANCTIONS           := sancsr_count                            , // NEED TO STANDARDIZE
-	self := []));
+srcr := PROJECT(DATASET([{0}],{UNSIGNED _a}),TRANSFORM(temprec,
+  SELF.FINDER := COUNT(hdrr_named),
+  SELF.DNB := COUNT(dnbr),
+  SELF.CORPORATE_FILINGS := COUNT(crpr),
+  SELF.CORPORATE_FILINGS_V2 := COUNT(crpr_v2),
+  SELF.BANKRUPTCY := COUNT(bnkr_named),
+  SELF.BANKRUPTCY_V2 := COUNT(bnkr_v2),
+  SELF.UCCS := COUNT(uccr),
+  SELF.UCCS_V2 := COUNT(uccr_v2),
+  SELF.LIENS_JUDGMENTS := COUNT(ljr),
+  SELF.LIENS_JUDGMENTS_V2 := COUNT(ljr_v2),
+  SELF.IRS5500 := COUNT(irs5500),
+  SELF.IRSNONP := COUNT(irsnonpr),
+  SELF.FDIC := COUNT(fdicr),
+  SELF.BBBMEMBER := COUNT(bbbmemberr),
+  SELF.BBBNONMEMBER := COUNT(bbbnonmemberr),
+  SELF.CASALESTAX := COUNT(casalestaxr),
+  SELF.IASALESTAX := COUNT(iasalestaxr),
+  SELF.MSWORKCOMP := COUNT(msworkcompr),
+  SELF.ORWORKCOMP := COUNT(orworkcompr),
+  SELF.CONTACTS := COUNT(conr),
+  SELF.PROPERTY := COUNT(pror),
+  SELF.PROPERTY_V2 := COUNT(pror_v2_assess) +
+                                       COUNT(pror_v2_deed),
+  SELF.INTERNET := COUNT(idor_named),
+  SELF.PROFESSIONAL_LICENSES := COUNT(plir),
+  SELF.BUSINESS_REGISTRATIONS := brer_count , // NEED TO STANDARDIZE
+  SELF.MOTOR_VEHICLES := COUNT(mvrr),
+  SELF.MOTOR_VEHICLES_V2 := COUNT(mvrr_v2),
+  SELF.WATERCRAFTS := COUNT(wtcr),
+  SELF.AIRCRAFTS := COUNT(airr),
+  SELF.EXPERIAN_BUSINESS_REPORTS := COUNT(ebrr),
+  SELF.SUPERIOR_LIENS := 0 , // NEED TO REMOVE
+  SELF.NOTICE_OF_DEFAULTS := COUNT(nodr) , // NEED TO STANDARDIZE
+  SELF.FORECLOSURES := COUNT(forr) , // NEED TO STANDARDIZE
+  SELF.BUSINESS_SANCTIONS := sancsr_count , // NEED TO STANDARDIZE
+  SELF := []));
 
 mac_give_name(srcr, srcr_named)
 
 //***** THEIR LAYOUTS
-recsrcr := recordof(srcr_named);
-rechdrr := recordof(hdrr_named);
-recdnbr := recordof(dnbr);
-reccorr := recordof(crpr);
-reccorr_v2 := recordof(crpr_v2);
-recbnkr := recordof(bnkr_named);
-recbnkr_v2 := recordof(bnkr_v2);
-recuccr := recordof(uccr);
-recuccr_v2 := recordof(uccr_v2);
-recljr  := recordof(ljr);
-recljr_v2 := recordof(ljr_v2);
-recconr := recordof(conr);
-recpror := recordof(pror);
-recpror_v2_assess := recordof(pror_v2_assess);
-recpror_v2_deed := recordof(pror_v2_deed);
-recnodr := recordof(nodr);
-recforr := recordof(forr);
-recidor := recordof(idor_named);
-recplir := recordof(plir);
-recmvrr := recordof(mvrr);
-recmvrr_v2 := recordof(mvrr_v2);
-recwtcr := recordof(wtcr);
-recairr := recordof(airr);
-recebrr := recordof(ebrr);
-recirs  := recordof(irs5500);
-recirsn := recordof(irsnonpr);
+recsrcr := RECORDOF(srcr_named);
+rechdrr := RECORDOF(hdrr_named);
+recdnbr := RECORDOF(dnbr);
+reccorr := RECORDOF(crpr);
+reccorr_v2 := RECORDOF(crpr_v2);
+recbnkr := RECORDOF(bnkr_named);
+recbnkr_v2 := RECORDOF(bnkr_v2);
+recuccr := RECORDOF(uccr);
+recuccr_v2 := RECORDOF(uccr_v2);
+recljr := RECORDOF(ljr);
+recljr_v2 := RECORDOF(ljr_v2);
+recconr := RECORDOF(conr);
+recpror := RECORDOF(pror);
+recpror_v2_assess := RECORDOF(pror_v2_assess);
+recpror_v2_deed := RECORDOF(pror_v2_deed);
+recnodr := RECORDOF(nodr);
+recforr := RECORDOF(forr);
+recidor := RECORDOF(idor_named);
+recplir := RECORDOF(plir);
+recmvrr := RECORDOF(mvrr);
+recmvrr_v2 := RECORDOF(mvrr_v2);
+recwtcr := RECORDOF(wtcr);
+recairr := RECORDOF(airr);
+recebrr := RECORDOF(ebrr);
+recirs := RECORDOF(irs5500);
+recirsn := RECORDOF(irsnonpr);
 //recsupr := recordof(supr);
 //recbasr := recordof(basr);
-recfdicr         := recordof(fdicr);
-recbbbmemberr    := recordof(bbbmemberr);
-recbbbnonmemberr := recordof(bbbnonmemberr);
-reccasalestaxr   := recordof(casalestaxr);
-reciasalestaxr   := recordof(iasalestaxr);
-recmsworkcompr   := recordof(msworkcompr);
-recorworkcompr   := recordof(orworkcompr);
+recfdicr := RECORDOF(fdicr);
+recbbbmemberr := RECORDOF(bbbmemberr);
+recbbbnonmemberr := RECORDOF(bbbnonmemberr);
+reccasalestaxr := RECORDOF(casalestaxr);
+reciasalestaxr := RECORDOF(iasalestaxr);
+recmsworkcompr := RECORDOF(msworkcompr);
+recorworkcompr := RECORDOF(orworkcompr);
 
 //***** THE COMBINED LAYOUT
-rec := record, maxlength(doxie_crs.maxlength_report)
-	dataset(rechdrr) FINDER;
-	dataset(recdnbr) DNB;
-	dataset(reccorr) CORPORATE_FILINGS;
-	dataset(reccorr_v2) CORPORATE_FILINGS_V2;
-	dataset(recbnkr) BANKRUPTCY;
-	dataset(recbnkr_v2) BANKRUPTCY_V2;
-	dataset(recuccr) UCCS;
-	dataset(recuccr_v2) UCCS_V2;
-	dataset(recljr)  LIENS_JUDGMENTS;
-	dataset(recljr_v2) LIENS_JUDGMENTS_V2;
-	dataset(recconr) CONTACTS;
-	dataset(recpror) PROPERTY;
-	dataset(recpror_v2_assess) PROPERTY_V2_ASSESS;
-	dataset(recpror_v2_deed) PROPERTY_V2_DEED;
-	dataset(recnodr) NOTICE_OF_DEFAULTS{xpath('NoticesOfDefaults/NoticeOfDefaults')};
-	dataset(recforr) FORECLOSURES{xpath('ForeclosureDocuments/ForeclosureDocument')};
-	dataset(recidor) INTERNET;
-	dataset(recplir) PROFESSIONAL_LICENSES;
-	dataset(recmvrr) MOTOR_VEHICLES;
-	dataset(recmvrr_V2) MOTOR_VEHICLES_V2;
-	dataset(recwtcr) WATERCRAFTS;
-	dataset(recairr) AIRCRAFTS;
-	dataset(recebrr) EXPERIAN_BUSINESS_REPORTS;
-	dataset(recirs)  IRS_5500;
-	dataset(recirsn) IRS_NON_PROFIT;
-	dataset(recfdicr) FDIC;
-	dataset(recbbbmemberr) BBBMember;
-	dataset(recbbbnonmemberr) BBBNonMember;
-	dataset(reccasalestaxr) CASalesTax;
-	dataset(reciasalestaxr) IASalesTax;
-	dataset(recmsworkcompr) MSWorkComp;
-	dataset(recorworkcompr) ORWorkComp;
-//	dataset(recbasr) BUSINESS_ASSOCIATES;
-	dataset(recsrcr) SOURCE_COUNTS;
-end;
+rec := RECORD, MAXLENGTH(doxie_crs.maxlength_report)
+  DATASET(rechdrr) FINDER;
+  DATASET(recdnbr) DNB;
+  DATASET(reccorr) CORPORATE_FILINGS;
+  DATASET(reccorr_v2) CORPORATE_FILINGS_V2;
+  DATASET(recbnkr) BANKRUPTCY;
+  DATASET(recbnkr_v2) BANKRUPTCY_V2;
+  DATASET(recuccr) UCCS;
+  DATASET(recuccr_v2) UCCS_V2;
+  DATASET(recljr) LIENS_JUDGMENTS;
+  DATASET(recljr_v2) LIENS_JUDGMENTS_V2;
+  DATASET(recconr) CONTACTS;
+  DATASET(recpror) PROPERTY;
+  DATASET(recpror_v2_assess) PROPERTY_V2_ASSESS;
+  DATASET(recpror_v2_deed) PROPERTY_V2_DEED;
+  DATASET(recnodr) NOTICE_OF_DEFAULTS{xpath('NoticesOfDefaults/NoticeOfDefaults')};
+  DATASET(recforr) FORECLOSURES{xpath('ForeclosureDocuments/ForeclosureDocument')};
+  DATASET(recidor) INTERNET;
+  DATASET(recplir) PROFESSIONAL_LICENSES;
+  DATASET(recmvrr) MOTOR_VEHICLES;
+  DATASET(recmvrr_V2) MOTOR_VEHICLES_V2;
+  DATASET(recwtcr) WATERCRAFTS;
+  DATASET(recairr) AIRCRAFTS;
+  DATASET(recebrr) EXPERIAN_BUSINESS_REPORTS;
+  DATASET(recirs) IRS_5500;
+  DATASET(recirsn) IRS_NON_PROFIT;
+  DATASET(recfdicr) FDIC;
+  DATASET(recbbbmemberr) BBBMember;
+  DATASET(recbbbnonmemberr) BBBNonMember;
+  DATASET(reccasalestaxr) CASalesTax;
+  DATASET(reciasalestaxr) IASalesTax;
+  DATASET(recmsworkcompr) MSWorkComp;
+  DATASET(recorworkcompr) ORWorkComp;
+// dataset(recbasr) BUSINESS_ASSOCIATES;
+  DATASET(recsrcr) SOURCE_COUNTS;
+END;
 
 //***** PROJECT THEM IN
-nada := dataset([0], {unsigned1 a});
-rec getall(nada l) := transform
-	self.FINDER 				:= global(hdrr_named);
-	self.DNB 					:= global(dnbr);
-	self.CORPORATE_FILINGS 		:= global(crpr);
-	self.CORPORATE_FILINGS_V2 := global(crpr_v2);
-	self.BANKRUPTCY 			:= global(bnkr_named);
-	self.BANKRUPTCY_V2 			:= global(bnkr_v2);
-	self.UCCS 				:= global(uccr);
-	self.UCCS_V2 				:= global(uccr_v2);
-	self.LIENS_JUDGMENTS 		:= global(ljr);
-	self.LIENS_JUDGMENTS_V2 := global(ljr_v2);
-	self.CONTACTS 				:= global(conr);
-	self.PROPERTY 				:= global(pror);
-	self.PROPERTY_V2_ASSESS 				:= global(pror_v2_assess);
-	self.PROPERTY_V2_DEED 				:= global(pror_v2_deed);
-	self.NOTICE_OF_DEFAULTS := global(nodr);
-	self.FORECLOSURES       := global(forr);
-	self.INTERNET 				:= global(idor_named);
-	self.PROFESSIONAL_LICENSES 	:= global(plir);
-	self.MOTOR_VEHICLES     := global(mvrr);
-	self.MOTOR_VEHICLES_V2 := global(ungroup(mvrr_v2));
-	self.WATERCRAFTS        := global(wtcr);
-	self.AIRCRAFTS          := global(airr);
-	self.EXPERIAN_BUSINESS_REPORTS := global(ebrr);
-	self.IRS_5500           := global(irs5500);
-	self.IRS_NON_PROFIT     := global(irsnonpr);
-	self.FDIC               := global(fdicr);
-	self.BBBMember          := global(bbbmemberr);
-	self.BBBNonMember       := global(bbbnonmemberr);
-	self.CASalesTax         := global(casalestaxr);
-	self.IASalesTax         := global(iasalestaxr);
-	self.MSWorkComp         := global(msworkcompr);
-	self.ORWorkComp         := global(orworkcompr);
-//	self.BUSINESS_ASSOCIATES	:= global(basr);
-	self.SOURCE_COUNTS 			:= global(srcr_named);	
-end;
+nada := DATASET([0], {UNSIGNED1 a});
+rec getall(nada l) := TRANSFORM
+  SELF.FINDER := GLOBAL(hdrr_named);
+  SELF.DNB := GLOBAL(dnbr);
+  SELF.CORPORATE_FILINGS := GLOBAL(crpr);
+  SELF.CORPORATE_FILINGS_V2 := GLOBAL(crpr_v2);
+  SELF.BANKRUPTCY := GLOBAL(bnkr_named);
+  SELF.BANKRUPTCY_V2 := GLOBAL(bnkr_v2);
+  SELF.UCCS := GLOBAL(uccr);
+  SELF.UCCS_V2 := GLOBAL(uccr_v2);
+  SELF.LIENS_JUDGMENTS := GLOBAL(ljr);
+  SELF.LIENS_JUDGMENTS_V2 := GLOBAL(ljr_v2);
+  SELF.CONTACTS := GLOBAL(conr);
+  SELF.PROPERTY := GLOBAL(pror);
+  SELF.PROPERTY_V2_ASSESS := GLOBAL(pror_v2_assess);
+  SELF.PROPERTY_V2_DEED := GLOBAL(pror_v2_deed);
+  SELF.NOTICE_OF_DEFAULTS := GLOBAL(nodr);
+  SELF.FORECLOSURES := GLOBAL(forr);
+  SELF.INTERNET := GLOBAL(idor_named);
+  SELF.PROFESSIONAL_LICENSES := GLOBAL(plir);
+  SELF.MOTOR_VEHICLES := GLOBAL(mvrr);
+  SELF.MOTOR_VEHICLES_V2 := GLOBAL(UNGROUP(mvrr_v2));
+  SELF.WATERCRAFTS := GLOBAL(wtcr);
+  SELF.AIRCRAFTS := GLOBAL(airr);
+  SELF.EXPERIAN_BUSINESS_REPORTS := GLOBAL(ebrr);
+  SELF.IRS_5500 := GLOBAL(irs5500);
+  SELF.IRS_NON_PROFIT := GLOBAL(irsnonpr);
+  SELF.FDIC := GLOBAL(fdicr);
+  SELF.BBBMember := GLOBAL(bbbmemberr);
+  SELF.BBBNonMember := GLOBAL(bbbnonmemberr);
+  SELF.CASalesTax := GLOBAL(casalestaxr);
+  SELF.IASalesTax := GLOBAL(iasalestaxr);
+  SELF.MSWorkComp := GLOBAL(msworkcompr);
+  SELF.ORWorkComp := GLOBAL(orworkcompr);
+// self.BUSINESS_ASSOCIATES := global(basr);
+  SELF.SOURCE_COUNTS := GLOBAL(srcr_named);
+END;
 
 // need a dummy set of allowable sections/sources that can be asked for
-return project(nada, getall(left));
+RETURN PROJECT(nada, getall(LEFT));
 END;

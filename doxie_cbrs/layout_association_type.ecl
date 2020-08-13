@@ -1,3 +1,3 @@
-export layout_association_type := record
-	string30 assoc_type;
-end;
+EXPORT layout_association_type := RECORD
+  STRING30 assoc_type;
+END;

@@ -6,6 +6,9 @@ export Layouts := MODULE;
 	EXPORT layout_fid := record
 			string70	fid;
 	end;
+	EXPORT layout_apn := record
+			string45	apn;
+	end;
 	export FIDNumberPlus := record
 		   string70	fid;
 		   unsigned6 did;
@@ -55,5 +58,10 @@ export Layouts := MODULE;
 		string45 parcel_number_unmatched_id;
 		string3 property_type_cd;
 		String1 source;
+		String1 lender_type;
+		String55 lender_type_desc;
+		String10 loan_amount;
+		String1 loan_type;
+		String60 loan_type_desc;	
 	end;
 END;

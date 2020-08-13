@@ -1,4 +1,4 @@
-//IMPORT:KEL12.RmFlags
+﻿//IMPORT:KEL12.RmFlags
 /**
  *Removes the KEL-generated null flag fields
  *@param s an ECL dataset (i.e., Q__q.Res0, a dataset with KEL-generated flag fields)

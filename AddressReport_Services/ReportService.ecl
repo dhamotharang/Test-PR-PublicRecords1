@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ReportService" wuTimeout="300000">
   <part name="Addr" type="xsd:string"/>
   <part name="City" type="xsd:string"/>
@@ -83,36 +83,36 @@ EXPORT ReportService := MACRO
 
   // reads "volatile" [includes] from XML, if any, and stores them for subsequent reading
   SetInputSearchOptions (iesp.addressreportreq.t_AddressReportOption tag) := FUNCTION
-      #stored ('IncludeProperties', global(tag).IncludeProperties);
-      #stored ('IncludeDriversLicenses', global(tag).IncludeDriversLicenses);
-      #stored ('IncludeMotorVehicles', global(tag).IncludeMotorVehicles);
-      #stored ('IncludeBusinesses', global(tag).IncludeBusinesses);
-      #stored ('IncludeNeighbors', global(tag).IncludeNeighbors);
-      #stored ('IncludeBankruptcies', global(tag).IncludeBankruptcies);
-      #stored ('IncludeResidentialPhones', global(tag).IncludeResidentialPhones);
-      #stored ('IncludeBusinessPhones', global(tag).IncludeBusinessPhones);
-      #stored ('IncludeCensusData', global(tag).IncludeCensusData);
-      #stored ('IncludeLiensJudgments', global(tag).IncludeLiensJudgments);
-      #stored ('IncludeCriminalRecords', global(tag).IncludeCriminalRecords);
-      #stored ('IncludeSexualOffenses', global(tag).IncludeSexualOffenses);
-      #stored ('IncludeHuntingFishingLicenses', global(tag).IncludeHuntingFishings);
-      #stored ('IncludeWeaponPermits', global(tag).IncludeConcealedWeapons);
+			#stored ('IncludeProperties', global(tag).IncludeProperties);
+			#stored ('IncludeDriversLicenses', global(tag).IncludeDriversLicenses);
+			#stored ('IncludeMotorVehicles', global(tag).IncludeMotorVehicles);
+			#stored ('IncludeBusinesses', global(tag).IncludeBusinesses);
+			#stored ('IncludeNeighbors', global(tag).IncludeNeighbors);
+			#stored ('IncludeBankruptcies', global(tag).IncludeBankruptcies);
+			#stored ('IncludeResidentialPhones', global(tag).IncludeResidentialPhones);
+			#stored ('IncludeBusinessPhones', global(tag).IncludeBusinessPhones);
+			#stored ('IncludeCensusData', global(tag).IncludeCensusData);
+			#stored ('IncludeLiensJudgments', global(tag).IncludeLiensJudgments);
+			#stored ('IncludeCriminalRecords', global(tag).IncludeCriminalRecords);
+			#stored ('IncludeSexualOffenses', global(tag).IncludeSexualOffenses);
+			#stored ('IncludeHuntingFishingLicenses', global(tag).IncludeHuntingFishings);
+			#stored ('IncludeWeaponPermits', global(tag).IncludeConcealedWeapons);
 
-      #stored ('MaxDriversLicenses', global(tag).MaxDriversLicenses);
-      #stored ('MaxProperties', global(tag).MaxProperties);
-      #stored ('MaxMotorVehicles', global(tag).MaxMotorVehicles);
-      #stored ('MaxBusinesses', global(tag).MaxBusinesses);
-      #stored ('NeighborCount', global(tag).NeighborCount);
-      #stored ('MaxNeighbors', global(tag).MaxNeighbors);
-      #stored ('MaxBankruptcies', global(tag).MaxBankruptcies);
-      #stored ('MaxResidentialPhones', global(tag).MaxResidentialPhones);
-      #stored ('MaxBusinessPhones', global(tag).MaxBusinessPhones);
-      #stored ('MaxResidents', global(tag).MaxResidents);
-      #stored ('MaxLiens', global(tag).MaxLiens);
-      #stored ('MaxCriminalRecords', global(tag).MaxCriminalRecords);
-      #stored ('MaxSexualOffenses', global(tag).MaxSexualOffenses);
-      #stored ('MaxHuntingAndFishingLicenses', global(tag).MaxHuntingFishings);
-      #stored ('MaxWeaponPermits', global(tag).MaxConcealedWeapons);
+			#stored ('MaxDriversLicenses', global(tag).MaxDriversLicenses);
+			#stored ('MaxProperties', global(tag).MaxProperties);
+			#stored ('MaxMotorVehicles', global(tag).MaxMotorVehicles);
+			#stored ('MaxBusinesses', global(tag).MaxBusinesses);
+			#stored ('NeighborCount', global(tag).NeighborCount);
+			#stored ('MaxNeighbors', global(tag).MaxNeighbors);
+			#stored ('MaxBankruptcies', global(tag).MaxBankruptcies);
+			#stored ('MaxResidentialPhones', global(tag).MaxResidentialPhones);
+			#stored ('MaxBusinessPhones', global(tag).MaxBusinessPhones);
+			#stored ('MaxResidents', global(tag).MaxResidents);
+			#stored ('MaxLiens', global(tag).MaxLiens);
+			#stored ('MaxCriminalRecords', global(tag).MaxCriminalRecords);
+			#stored ('MaxSexualOffenses', global(tag).MaxSexualOffenses);
+			#stored ('MaxHuntingAndFishingLicenses', global(tag).MaxHuntingFishings);
+			#stored ('MaxWeaponPermits', global(tag).MaxConcealedWeapons);
     return output (dataset ([],{integer x}), named('__internal__'), extend);
   end;
   
@@ -138,6 +138,7 @@ EXPORT ReportService := MACRO
   boolean location_report := first_raw.Options.LocationReportOnly : STORED('LocationReportOnly');
   boolean use_new_business_header := first_raw.Options.useNewBusinessHeader : STORED('useNewBusinessHeader');
   string1 bus_report_fetch_level := 'S' : stored('BusinessReportFetchLevel');
+  boolean includeAssignmentsAndReleases := first_raw.Options.IncludeAssignmentsAndReleases : STORED('IncludeAssignmentsAndReleases');
 
   include_stored := PersonReports.GlobalIncludes ();
   
@@ -165,10 +166,10 @@ EXPORT ReportService := MACRO
       export string1 BusinessReportFetchLevel := STD.Str.ToUpperCase(bus_report_fetch_level);
   end;
 
-  Relationship.IParams.storeParams(first_raw.Options.RelationshipOption);
-  addr_mod := Relationship.IParams.getParams(tempmod,AddressReport_Services.input._addressreport);
+	Relationship.IParams.storeParams(first_raw.Options.RelationshipOption);
+	addr_mod := Relationship.IParams.getParams(tempmod,AddressReport_Services.input._addressreport);
 
-  recs := AddressReport_Services.ReportService_Records (addr_mod, FALSE);
+  recs := AddressReport_Services.ReportService_Records (addr_mod, FALSE,includeAssignmentsAndReleases);
   results_recs := project(recs, transform(iesp.addressreport.t_AddressReportResponse, self := left.ReportResponse));
   output(results_recs, named ('Results'));
   

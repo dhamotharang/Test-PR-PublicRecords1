@@ -3,7 +3,7 @@
   <part name="DID" type="xsd:string" required="1" />
   <part name="SSN" type="xsd:string"/>
   <part name="DPPAPurpose" type="xsd:byte" default="1"/>
-  <part name="GLBPurpose" type="xsd:byte" default="1"/>
+  <part name="GLBPurpose" type="xsd:byte" default="1"/> 
   <part name="LnBranded" type="xsd:boolean"/>
   <part name="DataRestrictionMask" type="xsd:string" default="00000000000"/>
   <part name="DataPermissionMask" type="xsd:string" default="00000000000"/>
@@ -15,7 +15,7 @@
   <part name="IncludeBpsAddress" type="xsd:boolean" default="true" description=" ...new selector"/>
         <part name="IncludeCensusData" type="xsd:boolean" indent="true" />
         <part name="IncludePhonesFeedback" type="xsd:boolean" indent="true" />
-        <part name="ExactSecondRangeMatch" type="xsd:boolean" indent="true"
+        <part name="ExactSecondRangeMatch" type="xsd:boolean" indent="true" 
                     description=" not in doxie CRS: address-phone linking"/>
   <part name="IncludeAKAs" type="xsd:boolean" default="true"/>
   <part name="IncludeImposters" type="xsd:boolean" default="true"/>
@@ -23,7 +23,7 @@
   <part name="IncludeAssociates" type="xsd:boolean" />
   <part name="IncludeRelatives"  type="xsd:boolean" />
         <part name="MaxRelatives" type="xsd:unsignedInt" indent="true" default="100"/>
-        <part name="RelativeDepth" type="xsd:byte" indent="true" default="3"/>
+        <part name="RelativeDepth" type="xsd:byte" indent="true" default="3"/> 
         <part name="IncludeRelativeAddresses" type="xsd:boolean" indent="true" />
         <part name="MaxRelativeAddresses" type="xsd:unsignedInt" indent="true" />
   <separator />
@@ -75,7 +75,7 @@
   <part name="ExcludeSources" type="xsd:boolean" />
   <part name="IncludeHRI" type="xsd:boolean"/>
   <part name="MaxHriPer" type="xsd:unsignedInt"/>
-  <part name="MaxAddresses" type="xsd:unsignedInt" default="1000"
+  <part name="MaxAddresses" type="xsd:unsignedInt" default="1000" 
         description=" limits number of Comp_addresses; should it be exposed?"/>
   <part name="MaxAssociates" type="xsd:unsignedInt" default="10" description=" number of associates to return"/>
 <!--
@@ -88,7 +88,7 @@
   <part name="PhonesPerAddress" type="xsd:byte"/>
   <part name="LawEnforcement" type="xsd:boolean"/>
   <part name="IncludeTimeline" type="xsd:boolean"/>
-  <part name="ExcludeResidentsForAssociatesAddresses" type="xsd:boolean"/>
+  <part name="ExcludeResidentsForAssociatesAddresses" type="xsd:boolean"/>         
   <part name="ProbationOverride" type="xsd:boolean"/>
   <part name="NoSmartRollup" type="xsd:boolean"/>
   <part name="IncludeKeyRiskIndicators" type="xsd:boolean"/>
@@ -121,10 +121,10 @@
 
 </message>
 */
-/*--INFO--
+/*--INFO-- 
 <b>Note on options:</b> "SOAP" options will always override ESDL options
 (this is an unfortuante consequence of not being able to choose modules conditionally, but it seems
-to be relatively harmless anyway). <br />
+to be relatively harmless anyway). <br /> 
 */
 
 IMPORT iesp, doxie, AutoStandardI, Royalty;
@@ -132,8 +132,10 @@ IMPORT iesp, doxie, AutoStandardI, Royalty;
 EXPORT SmartLinxReportService () := MACRO
   #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
   #onwarning(4207, ignore);
+
   //The following macro defines the field sequence on WsECL page of query.
   WSInput.MAC_PersonReports_SmartLinxReportService();
+
 
   #CONSTANT('TwoPartySearch', FALSE);
   #constant('SelectIndividually', true); // we will setup all components explicitly
@@ -173,9 +175,9 @@ EXPORT SmartLinxReportService () := MACRO
 
   // *** Input parameters handling ***
   // General idea is that we may want to support reading from "stored" for a quite long time.
-  // Thus, even when reading from ESDL-input, parameters are #stored anyway, and then
+  // Thus, even when reading from ESDL-input, parameters are #stored anyway, and then 
   // being read again -- this time from 'stored', creating a module containing required parameters.
-  // I will create the same module directly from ESDL input anyway, so later
+  // I will create the same module directly from ESDL input anyway, so later 
   // we could bypass generally redundant in ESDL mode "save - read" processing.
 
   // parse ESDL input
@@ -188,10 +190,11 @@ EXPORT SmartLinxReportService () := MACRO
   iesp.ECL2ESP.SetInputBaseRequest (first_row);
   iesp.ECL2ESP.SetInputReportBy (first_row.ReportBy);
 
-  // create module incorporating XML input options
+  // create module incorporating XML input options 
   options_in := PersonReports.functions.GetInputOptions (global (first_row.Options));
 
   // todo move prunedAgedSSNs to appropriate location
+
   #stored ('UsingKeepSSNs', first_row.options.PruneAgedSSNs);
   #stored ('KeepOldSsns', ~first_row.options.PruneAgedSSNs);
     // set up defaults: comp report options are the most detailed, so they can be used here
@@ -203,7 +206,7 @@ EXPORT SmartLinxReportService () := MACRO
   // store XML options for subsequent legacy-style reading
   PersonReports.functions.SetInputSearchOptions (options_esdl);
 
-  // Read from stored.
+  // Read from stored. 
   SR := PersonReports.StoredReader;
   options_stored := module (SR.relatives_options, SR.neighbors_options, SR.imposters_options, SR.email_options,
                             SR.global_options, SR.phones_options, SR.providers_options, SR.versions)
@@ -211,8 +214,8 @@ EXPORT SmartLinxReportService () := MACRO
 
   // TODO: cannot choose module conditionally: if (exists (first_raw), options_esdl, options_stored);
   // to bypass global storage use "options_esdl"
-  options := options_stored;
-  // options := options_esdl;
+  options := options_stored; 
+  // options := options_esdl;  
 
 
   // get search parameters from global #stored variables;
@@ -265,6 +268,7 @@ EXPORT SmartLinxReportService () := MACRO
     export boolean include_criminalindicators := false : stored ('IncludeCriminalIndicators');
     export boolean Include_NonRegulated_WatercraftSources := false : stored ('IncludeNonRegulatedWatercraftSources');
     export boolean include_AddressSourceInfo := false : stored('IncludeAddressSourceInfo');
+    export boolean includeVendorSourceB := first_row.options.IncludeVendorSourceB;
   end;
 
 
@@ -273,7 +277,8 @@ EXPORT SmartLinxReportService () := MACRO
   did_value := AutoStandardI.InterfaceTranslator.did_value.val(project(search_mod,AutoStandardI.InterfaceTranslator.did_value.params));
   dids := dataset ([(unsigned6) did_value], doxie.layout_references);
 
-  // main records
+	// main records
+  //boolean includeVendorSourceB := first_row.options.IncludeVendorSourceB;
 
   Relationship.IParams.storeParams(first_row.Options.RelationshipOption);
   smartMod := Relationship.IParams.getParams(report_mod,PersonReports.IParam._smartlinxreport);
@@ -282,7 +287,7 @@ EXPORT SmartLinxReportService () := MACRO
   // wrap it into output structure
   iesp.smartlinxreport.t_SmartLinxReportResponse SetResponse (recs L) := transform
     Self._Header := iesp.ECL2ESP.GetHeaderRow ();
-    Self.Messages := L.messages;
+    Self.Messages := L.messages; 
     Self.Individual := L;
   end;
   results := PROJECT (recs, SetResponse (Left));

@@ -1,10 +1,10 @@
-import doxie;
+IMPORT doxie;
 thebest := doxie_cbrs.best_records;
 
-doxie.layout_addressSearch prep(thebest l) := transform
-	self.seq := 0;
-	self.zip := (string5)l.zip;
-	self := l;
-end;
+doxie.layout_addressSearch prep(thebest l) := TRANSFORM
+  SELF.seq := 0;
+  SELF.zip := (STRING5)l.zip;
+  SELF := l;
+END;
 
-export best_address := dedup(project(thebest, prep(left)),all);
+EXPORT best_address := DEDUP(PROJECT(thebest, prep(LEFT)),ALL);

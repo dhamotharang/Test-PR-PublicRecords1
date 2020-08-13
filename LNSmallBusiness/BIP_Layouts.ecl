@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, iesp, SALT28;
+﻿IMPORT BIPV2, Business_Risk_BIP, iesp;
 
 EXPORT BIP_Layouts := MODULE
 	EXPORT Input := RECORD
@@ -716,7 +716,7 @@ EXPORT BIP_Layouts := MODULE
 		STRING1 InputCheckBusCity;
 		STRING1 InputCheckBusState;
 		STRING1 InputCheckBusZip;
-		STRING1 InputCheckBusFEIN;
+		STRING1 InputCheckBusTIN;
 		STRING1 InputCheckBusPhone;
 		STRING1 InputCheckBusFax;
 		STRING1 InputCheckBusNAICS;
@@ -766,7 +766,7 @@ EXPORT BIP_Layouts := MODULE
 		STRING25 OutBestBusCity;
 		STRING2 OutBestBusState;
 		STRING9 OutBestBusZip;
-		STRING9 OutBestBusFEIN;
+		STRING9 OutBestBusTIN;
 		STRING10 OutBestBusPhone;
 		STRING6 OutBestNAICS;
 		STRING4 OutBestSIC;
@@ -919,9 +919,9 @@ EXPORT BIP_Layouts := MODULE
 		STRING5 BusExecLinkPropOverlapCount3;
 		STRING5 BusExecLinkBusAddrRep3Owned;
 		STRING2 BusAddrPersonNameOverlap;
-		STRING2 BusFEINPersonAddrOverlap;
-		STRING2 BusFEINPersonPhoneOverlap;
-		STRING2 BusFEINPersonOverlap;
+		STRING2 BusTINPersonAddrOverlap;
+		STRING2 BusTINPersonPhoneOverlap;
+		STRING2 BusTINPersonOverlap;
 		STRING5 InputAddrConsumerCount;
 		STRING3 InputTINEntityCount;
 		STRING3 InputPhoneEntityCount;
@@ -2926,6 +2926,9 @@ EXPORT BIP_Layouts := MODULE
 		STRING3	SBFEPrincipalAccountCount;
 		STRING3	SBFEPrincipalMinCount;
 		STRING3	SBFEPrincipalMaxCount;
+		STRING3 SBFEDelq91CountEverTtl; 
+		STRING3 SBFEDelq121CountEverTtl;
+		STRING3 SBFEDelq121CountTtl;
 	END;
 	
 	EXPORT BatchScoreData := RECORD

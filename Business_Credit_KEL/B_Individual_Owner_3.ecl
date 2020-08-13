@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 0.8.2
-IMPORT KEL08a AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
+IMPORT KEL12 AS KEL;
 IMPORT CFG_graph,E_Individual_Owner FROM Business_Credit_KEL;
-IMPORT * FROM KEL08a.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT B_Individual_Owner_3(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __cfg = CFG_graph) := MODULE
   SHARED VIRTUAL TYPEOF(E_Individual_Owner(__in,__cfg).__Result) __E_Individual_Owner := E_Individual_Owner(__in,__cfg).__Result;
-  SHARED __EE302324 := __E_Individual_Owner;
-  EXPORT __ST302275_Layout := RECORD
+  SHARED __EE467138 := __E_Individual_Owner;
+  EXPORT __ST234876_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr _sbfe__contributor__number_;
     KEL.typ.nstr _contract__account__number_;
@@ -31,9 +31,9 @@ EXPORT B_Individual_Owner_3(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CF
     KEL.typ.nstr Name_;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST302275_Layout __ND302458__Project(E_Individual_Owner(__in,__cfg).Layout __PP302327) := TRANSFORM
-    SELF.Name_ := __OP2(__OP2(__FN1(TRIM,__PP302327._first__name_),+,__CN(' ')),+,__FN1(TRIM,__PP302327._last__name_));
-    SELF := __PP302327;
+  SHARED __ST234876_Layout __ND467167__Project(E_Individual_Owner(__in,__cfg).Layout __PP467009) := TRANSFORM
+    SELF.Name_ := __OP2(__OP2(__FN1(TRIM,__PP467009._first__name_),+,__CN(' ')),+,__FN1(TRIM,__PP467009._last__name_));
+    SELF := __PP467009;
   END;
-  EXPORT __ENH_Individual_Owner_3 := PROJECT(__EE302324,__ND302458__Project(LEFT));
+  EXPORT __ENH_Individual_Owner_3 := PROJECT(__EE467138,__ND467167__Project(LEFT));
 END;

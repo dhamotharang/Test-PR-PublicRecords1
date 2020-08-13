@@ -15,6 +15,9 @@ UNSIGNED1 threshold_value := 1 : stored('Threshold');
 best_append_val := stringlib.StringToUpperCase(best_append_val1);
 best_verify_val := stringlib.StringToUpperCase(best_verify_val1);
 
+string DataRestrictionMask := AutoStandardI.Constants.DataRestrictionMask_default : STORED('DataRestrictionMask');
+string DataPermissionMask := AutoStandardI.Constants.DataPermissionMask_default : STORED('DataPermissionMask');
+
 /* input batch with acctno */
 inBatch_rec := rECORD
 	  String20  acctno;
@@ -79,6 +82,8 @@ Business_Header_SS.MAC_BestAppend(
 	best_append_val,
 	best_verify_val,
 	best_res,
+	DataPermissionMask,
+	DataRestrictionMask,
 	true
 )
 

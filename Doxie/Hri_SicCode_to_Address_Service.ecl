@@ -20,7 +20,7 @@
 
 
 export hri_siccode_to_address_service := macro
-import risk_indicators,watchdog,AutoStandardI,ut;
+import risk_indicators, watchdog, AutoStandardI, doxie;
 
 unsigned1 max_adder := 10 : STORED('MaxAddresses');
 unsigned1 max_people_per := 10 : STORED('MaxPeoplePerAddress');
@@ -68,7 +68,8 @@ get_recs := PROJECT(final_recs, slim(LEFT));
 // get did's
 dids := doxie.did_from_address(get_recs, false);
 gm := AutoStandardI.GlobalModule();
-doxie.mac_best_records(dids, did, best_recs, true, ut.glb_ok(gm.GLBPurpose), , doxie.DataRestriction.fixed_DRM);	
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(gm);
+doxie.mac_best_records(dids, did, best_recs, true, mod_access.isValidGLB(), , mod_access.DataRestrictionMask);	
 
 layout_people :=
 RECORD
@@ -106,7 +107,8 @@ layout_buesiness getbus(final_recs le, bhbf ri) := TRANSFORM,
 	SELF := le;
 END;
 get_bbest := JOIN(final_recs, bhbf,
-				keyed((unsigned6)LEFT.bdid = RIGHT.bdid),
+				keyed((unsigned6)LEFT.bdid = RIGHT.bdid) AND 
+				doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 				getbus(LEFT, RIGHT),
 				keep (1), limit (0));
 

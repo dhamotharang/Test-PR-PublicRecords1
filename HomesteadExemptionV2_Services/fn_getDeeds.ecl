@@ -47,7 +47,7 @@ EXPORT fn_getDeeds(DATASET(HomesteadExemptionV2_Services.Layouts.fidSrchRec) fid
 
 	// GET RAW RECS
 	rawDeeds:=JOIN(fids,LN_PropertyV2.key_deed_fid(),
-		KEYED(LEFT.ln_fares_id=RIGHT.ln_fares_id),
+		KEYED(LEFT.ln_fares_id=RIGHT.ln_fares_id) AND right.record_type NOT IN LN_PropertyV2.Constants.setAssignRelsRecordTypes,//Assignments and Releases codes excluded
 		TRANSFORM(addrWorkRec,
 			SELF.did:=LEFT.search_did,
 			SELF:=LEFT,

@@ -152,7 +152,7 @@ EXPORT CommonQueryXML := MODULE
                                 DueDiligence.Constants.REQUESTED_SOURCE_ENUM.EMPTY);
 
 
-        requestedAttributes := PROJECT(reportByIn.attributeGroups, TRANSFORM({STRING15 attributeModules},
+        requestedAttributes := PROJECT(reportByIn.attributeModules, TRANSFORM({STRING15 attributeModules},
                                                                               SELF.attributeModules := LEFT.name;
                                                                               SELF := [];));
 
@@ -206,7 +206,7 @@ EXPORT CommonQueryXML := MODULE
                                     TRANSFORM({RECORDOF(results), BOOLEAN includeAll, BOOLEAN useMods, SET OF STRING15 requestedMods},
                                               SELF.requestedMods := SET(RIGHT.requestedModules, STD.Str.ToUpperCase(TRIM(attributeModules)));
                                               SELF.includeAll := STD.Str.ToLowerCase(TRIM(RIGHT.productRequested)) IN [DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_ONLY, DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_AND_CITIZENSHIP];
-                                              SELF.useMods := STD.Str.ToLowerCase(TRIM(RIGHT.productRequested)) = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_CUSTOM_ATTRIBUTES AND COUNT(RIGHT.requestedModules) > 0;
+                                              SELF.useMods := STD.Str.ToLowerCase(TRIM(RIGHT.productRequested)) = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_MODULES AND COUNT(RIGHT.requestedModules) > 0;
                                               SELF := LEFT;),
                                     LEFT OUTER,
                                     ATMOST(1));

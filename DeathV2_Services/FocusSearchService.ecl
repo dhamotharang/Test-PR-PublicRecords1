@@ -5,7 +5,7 @@
 	<part name="GLBPurpose" type="xsd:byte" />
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
-	
+
 	<part name="MaxResults" type="xsd:unsignedInt"/>
   <part name="MaxResultsThisTime" type="xsd:unsignedInt"/>
   <part name="SkipRecords" type="xsd:unsignedInt"/>
@@ -49,11 +49,9 @@ noErr := errCode = 0;
 
 IF(~noErr, ut.outputMessage(errCode, errMsg));
 
-// sdid_key := Death_Master.Key_Boolean_SSA_ID; //not used directly through sdid_key, but kept in case someone wants to search through repository to see where this key is used
-
 wkeys := PROJECT( ans, TRANSFORM(deathv2_services.layouts.death_id, self.state_death_id := left.ExternalKey) );
 sdids := dedup(wkeys, state_death_id, all);
-rpen := 
+rpen :=
 // deathv2_services.fn_DedupSearch(
 deathv2_services.raw.get_report.from_death_ids(sdids,ssn_mask_value);
 

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="PropertyHistory_Report_Service">
 	<part name="apn"  type="xsd:string"/>
 	<part name="StreetAddress" type="xsd:string"/>
@@ -30,10 +30,11 @@ export PropertyHistory_Report_Service := MACRO
 	UNSIGNED1 glbaFlag 		:= 8 	: STORED('GLBPurpose');
 	BOOLEAN 	LNBranded  	:= FALSE	: STORED('LnBranded');
 	BOOLEAN	doAVM		:= FALSE	: STORED('IncludeAVM');
+	BOOLEAN	includeAssignmentsAndReleases		:= FALSE	: STORED('includeAssignmentsAndReleases');
 	appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
 
 	in0 := DATASET([{1}], {INTEGER seq});
-	
+ 	
 	Location_Services.Layout_PropHistory_In copyArgs(in0 l) := TRANSFORM
 		STRING cityLine 	:= Address.Addr2FromComponents(city, st, zip5);
 		STRING182 fline 	:= Address.CleanAddress182(streetLine,cityLine);
@@ -77,7 +78,7 @@ export PropertyHistory_Report_Service := MACRO
 						wild(right.postdir) and
 						keyed(left.addr_suffix = right.suffix) and
 						wild(right.sec_range) and
-						keyed(right.source_code_2 = 'P'),
+						keyed(right.source_code_2 = 'P'), //P = Property address, O = Owner address, C = careof address, S = seller address
             // actual counts can be as high as hundreds of thousands: appartments, condos, business, etc.,
             // but for the purpose of input verification this is irrelevant
 						secChecker(LEFT,RIGHT),limit (2000, skip), left outer),
@@ -92,7 +93,7 @@ export PropertyHistory_Report_Service := MACRO
 	
 	if (count(inD) = 0, fail(310, doxie.ErrorCodes(310)));
 	
-	res := Location_Services.Property_History_Function(inD, dppaFlag, glbaFlag, appType, LNBranded, doAVM);
+	res := Location_Services.Property_History_Function(inD, dppaFlag, glbaFlag, appType, LNBranded, doAVM, includeAssignmentsAndReleases);
 
 	// payroy := RECORD
 // string5 Royalty_Type;

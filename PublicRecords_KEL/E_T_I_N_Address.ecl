@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.3.0beta5
+//HPCC Systems KEL Compiler Version 1.3.0
 IMPORT KEL13 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Address,E_Geo_Link,E_T_I_N,E_Zip_Code FROM PublicRecords_KEL;
@@ -25,7 +25,7 @@ EXPORT E_T_I_N_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
     KEL.typ.epoch Vault_Date_First_Seen_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    DATA100 __Permits;
+    DATA57 __Permits;
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;

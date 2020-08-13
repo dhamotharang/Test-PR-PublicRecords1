@@ -1,6 +1,6 @@
 import doxie, doxie_raw, ut, Business_Header;
 
-export business_records(dataset(Doxie_Raw.Layout_address_input) addrs) := FUNCTION
+export business_records(dataset(Doxie_Raw.Layout_address_input) addrs, doxie.IDataAccess mod_access) := FUNCTION
 
 doxie.layout_addressSearch trafam(Doxie_Raw.Layout_address_input l) := transform
 	SELF.seq := 0;
@@ -26,7 +26,8 @@ layout_result AddBest(by_addr l,  bhkb r) := transform
 end;
 
 best_j := join(by_addr(bdid != 0), bhkb,
-				keyed(left.bdid = right.bdid),
+				keyed(left.bdid = right.bdid) AND 
+				doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 				AddBest(left, right),
 				left outer,
         keep(1), limit(0));

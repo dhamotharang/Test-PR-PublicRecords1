@@ -1,10 +1,10 @@
-//HPCC Systems KEL Compiler Version 0.8.2
-IMPORT KEL08a AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
+IMPORT KEL12 AS KEL;
 IMPORT B_Business,B_Business_1,CFG_graph,E_Business FROM Business_Credit_KEL;
-IMPORT * FROM KEL08a.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT RQ_S_B_F_E___Shell := MODULE
-  SHARED __EE5624587 := B_Business().IDX_Business_UID_Wrapped;
-  SHARED __ST128859_Layout := RECORD
+  SHARED __EE9642973 := B_Business().IDX_Business_UID_Wrapped;
+  SHARED __ST9631737_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Sbfedatefirstcycleall_;
     KEL.typ.nint Sbfetimeoldestcycle_;
@@ -861,6 +861,8 @@ EXPORT RQ_S_B_F_E___Shell := MODULE
     KEL.typ.int Sbfedelinquentcount84_ := 0;
     KEL.typ.int Sbfedelinquentcountever_ := 0;
     KEL.typ.int Sbfedelq61counteverttl_ := 0;
+    KEL.typ.int Sbfedelq91counteverttl_ := 0;
+    KEL.typ.int Sbfedelq121counteverttl_ := 0;
     KEL.typ.int Sbfedelinquentcountloan_ := 0;
     KEL.typ.int Sbfedelq61loancount03m_ := 0;
     KEL.typ.int Sbfedelinquentcountloan06_ := 0;
@@ -932,6 +934,7 @@ EXPORT RQ_S_B_F_E___Shell := MODULE
     KEL.typ.int Sbfedelq61revcountttl_ := 0;
     KEL.typ.int Sbfedelq61revcountttlchargeoff_ := 0;
     KEL.typ.int Sbfedelq91countttl_ := 0;
+    KEL.typ.int Sbfedelq121countttl_ := 0;
     KEL.typ.int Sbfedelq91countttlchargeoff_ := 0;
     KEL.typ.int Sbfedpd91count_ := 0;
     KEL.typ.int Sbfedelq91count03m_ := 0;
@@ -1864,5 +1867,5 @@ EXPORT RQ_S_B_F_E___Shell := MODULE
     KEL.typ.nint Sbfeprincipalmaxcount_;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE5624587,__ST128859_Layout));
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE9642973,__ST9631737_Layout));
 END;

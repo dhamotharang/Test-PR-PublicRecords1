@@ -31,7 +31,7 @@ GENERATES INLINE
     STRING %Prefix%FacilityName;
   END;
   
-  %^edsOutput% := PROJECT(%dsInput%, TRANSFORM(rOut,
+  %^edsOutput% := PROJECT(DISTRIBUTE(%dsInput%), TRANSFORM(rOut,
     SELF.%Prefix%FacilityName := IF((STRING)LEFT.%FacilityName% <> '', HealthCareFacility.clean_facility_name ((STRING)LEFT.%FacilityName%), '');
     SELF := LEFT));
 ENDGENERATES

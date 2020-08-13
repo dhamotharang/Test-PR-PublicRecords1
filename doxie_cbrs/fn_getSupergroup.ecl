@@ -1,9 +1,9 @@
-import doxie_cbrs, business_header;
+IMPORT doxie_cbrs, business_header;
 
-export fn_getSupergroup(dataset(doxie_cbrs.layout_supergroup) thegroupids, boolean use_Levels_val = false) := 
+EXPORT fn_getSupergroup(DATASET(doxie_cbrs.layout_supergroup) thegroupids, BOOLEAN use_Levels_val = FALSE) :=
 FUNCTION
 
-unsigned4 max_Supergroup_val := 300 : stored('MaxSupergroup');
+UNSIGNED4 max_Supergroup_val := 300 : STORED('MaxSupergroup');
 
 //****** GET ALL THE GROUP IDS
 kb := JOIN (thegroupids, Business_Header.Key_BH_SuperGroup_BDID,
@@ -16,30 +16,30 @@ kg := Business_Header.Key_BH_SuperGroup_GroupID;
 
 outrec := doxie_cbrs.layout_supergroup;
 
-outrec FetchBDIDGroup(kg r) := transform
-self := r;
-end;
+outrec FetchBDIDGroup(kg r) := TRANSFORM
+SELF := r;
+END;
 
-bh_group := limit(kg(keyed(group_id in set(kb, group_id))), 30000, skip);
-bh_group_count := count(bh_group);
-bh_group_fetched := project(bh_group, FetchBDIDGroup(left));
-	
-//***** THIS WALKS THRU THE RELATIVE KEYS TO FIND LEVEL OF RELATION	
-ssg := doxie_cbrs.fn_getSmallerSupergroup( thegroupids, max_supergroup_val);				
+bh_group := LIMIT(kg(KEYED(group_id IN SET(kb, group_id))), 30000, SKIP);
+bh_group_count := COUNT(bh_group);
+bh_group_fetched := PROJECT(bh_group, FetchBDIDGroup(LEFT));
+  
+//***** THIS WALKS THRU THE RELATIVE KEYS TO FIND LEVEL OF RELATION
+ssg := doxie_cbrs.fn_getSmallerSupergroup( thegroupids, max_supergroup_val);
 
 //***** ADD LEVEL INFO TO FETCHED GROUP
-outrec addlevels(bh_group_fetched l, ssg r) := transform
-	self.level := if(r.bdid > 0, r.level, 10);
-	self := l;
-end;
+outrec addlevels(bh_group_fetched l, ssg r) := TRANSFORM
+  SELF.level := IF(r.bdid > 0, r.level, 10);
+  SELF := l;
+END;
 
-wlevels := join(bh_group_fetched, ssg, left.bdid = right.bdid, addlevels(left, right), left outer);
+wlevels := JOIN(bh_group_fetched, ssg, LEFT.bdid = RIGHT.bdid, addlevels(LEFT, RIGHT), LEFT OUTER);
 
-bh_group_out := 
-	if((max_supergroup_val = 0 or max_Supergroup_val > bh_group_count) and bh_group_count > 0,
-		 if(use_Levels_val, wlevels ,bh_group_fetched),
-		 ssg);
-						 
-return bh_group_out;
+bh_group_out :=
+  IF((max_supergroup_val = 0 OR max_Supergroup_val > bh_group_count) AND bh_group_count > 0,
+     IF(use_Levels_val, wlevels ,bh_group_fetched),
+     ssg);
+             
+RETURN bh_group_out;
 
 END;

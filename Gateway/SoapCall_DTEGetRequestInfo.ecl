@@ -29,23 +29,51 @@ EXPORT Soapcall_DTEGetRequestInfo(DATASET(IESP.DTE_GetRequestInfo.t_DTEGetReques
     ONFAIL(onError(left)), timeout(pWaitTime), retry(pRetries)));
 
     ParsedJson := DeferredTask.Functions.ParseGetRequestInfo(d_recs_out);
-    
+ 
     rec := RECORD
     STRING50 RMSID{xpath('RMSID')};
     STRING50 TMSID{xpath('TMSID')};
     STRING10 Orig_RMSID{xpath('Orig_RMSID')};
+    STRING XMLErrorCode;
+    STRING XMLErrorMessage;
     END;
+    
+  rec createFailure() := 
+  TRANSFORM
+    SELF.XMLErrorCode := (STRING)FAILCODE;
+    SELF.XMLErrorMessage := FAILMESSAGE;
+    SELF := [];
+  END;
 
     GetRequestTMSIDandRMSID := PROJECT(ParsedJson, TRANSFORM({RECORDOF(LEFT), 
     STRING50 RMSID{xpath('RMSID')}, 
     STRING50 TMSID{xpath('TMSID')},
-    STRING10 Orig_RMSID{xpath('Orig_RMSID')}},
-    out := FROMXML(rec,LEFT.RequestOpaqueContent);
+    STRING10 Orig_RMSID{xpath('Orig_RMSID')},
+    STRING XMLErrorCode,
+    STRING XMLErrorMessage},
+    out := FROMXML(rec, LEFT.RequestOpaqueContent, ONFAIL(createFailure()));
     SELF.RMSID := out.RMSID;
     SELF.TMSID := out.TMSID;
     SELF.Orig_RMSID := out.Orig_RMSID;
+    SELF.XMLErrorCode := out.XMLErrorCode;
+    SELF.XMLErrorMessage := out.XMLErrorMessage;
     SELF := LEFT;));
 
-    RETURN GetRequestTMSIDandRMSID;
+    RollupErrorCodes := PROJECT(GetRequestTMSIDandRMSID, TRANSFORM({RECORDOF(LEFT) - XMLErrorCode - XMLErrorMessage},
+    SELF.ErrorCode := MAP(LEFT.TaskErrorCode = '1' => '41',
+                                                LEFT.TaskErrorCode = '2' => '42',
+                                                LEFT.TaskErrorCode = '3' => '43',
+                                                LEFT.ResponseJSON[1].ErrorCode <> '' => '44',
+                                                LEFT.XMLErrorCode <> '' => '45',
+                                                LEFT.ErrorCode <> '' => LEFT.ErrorCode,
+                                                '0');
+    SELF.ErrorMessage := MAP(LEFT.TaskErrorDescription <> '' => LEFT.TaskErrorDescription,
+                                                       LEFT.ResponseJSON[1].ErrorCode <> '' => 'Error processing the requested public record',
+                                                       LEFT.XMLErrorMessage <> '' => 'Error processing the requested public record',
+                                                       LEFT.ErrorMessage <> '' => LEFT.ErrorMessage,
+                                                       '');
+    SELF := LEFT;));
+    
+    RETURN RollupErrorCodes;
 
 END;

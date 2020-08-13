@@ -1,5 +1,5 @@
 ﻿import Business_Risk, Business_Header_SS, ut,
-       Risk_indicators, doxie, Gateway, AML;
+       Risk_indicators, doxie, Gateway, AML, STD;
 
 EXPORT GetAMLAttribBusnV2(DATASET(Business_Risk.Layout_Input) indata,
                                   $.IParam.IAml mod_aml,
@@ -55,7 +55,7 @@ END;
 
 
 // append bests
-Business_Header_SS.MAC_BestAppend(bdidAppendAll,appends,verify,bdidbest,true);
+Business_Header_SS.MAC_BestAppend(bdidAppendAll, appends, verify, bdidbest, mod_access.DataPermissionMask, DataRestriction, true);
 
 Layouts.AMLBusnAssocLayout addBDID(bdidAppendAll le, indata ri)  := Transform
   self.bdid      := le.bdid;
@@ -318,7 +318,7 @@ CheckSSNmatch :=  BusnFeinSSN(AddLnkBusnhdr(relatdegree = AMLConstants.execSubjB
                       left.seq = right.seq and
                       left.origbdid = right.origbdid,
                       transform(Layouts.BusnLayoutV2,
-                            FipsCodetoUse :=  ut.st2FipsCode(StringLib.StringToUpperCase(left.st)) + left.county;
+                            FipsCodetoUse :=  ut.st2FipsCode(STD.Str.ToUpperCase(left.st)) + left.county;
                             self.AddressVacancyInd  := right.AddressVacancyInd,
                             self.HRBusPct   := right.HRBusPct,
                             self.HighFelonNeighborhood  := right.HighFelonNeighborhood,

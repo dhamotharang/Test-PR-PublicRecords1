@@ -1,5 +1,5 @@
 
-EXPORT SET OF BOOLEAN fn_GetBusinessRecordVerification( BusinessInstantID20_Services.layouts.OutputLayout_intermediate le ) := 
+EXPORT  fn_GetBusinessRecordVerification( BusinessInstantID20_Services.layouts.OutputLayout_intermediate le ) := 
 	FUNCTION
 	
 		nothingVerified := [ 0, 0, 0, 0 ];
