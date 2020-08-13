@@ -1919,6 +1919,8 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2020/1125 Cyber-Attacks List','1906'},
 {'EC 2020/1128 Terrorism List','1907'},
 {'EC 2020/1129 Democratic People\'s Republic of Korea List','1908'},
-{'EC 2020/1130  Libya List','1909'}
+{'EC 2020/1130  Libya List','1909'},
+{'EC (CFSP) 2020/1172 Central African Republic List','1910'},
+{'EC 2020/1171 Central African Republic List','1911'}
 ],r);
 
