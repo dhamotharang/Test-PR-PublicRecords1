@@ -1229,7 +1229,7 @@ QUERY: InputRin(DATASET OF RiskIntelligenceNetwork_Analytics.Layouts.LayoutInput
                     IdAge,
                     NoLexId,
                     NoLexIdAdult,
-
+T1L_CurrAddrStEcho, // testing only...need to be removed before merge request
 AgencyUid,
 AgencyProgType,
 AgencyProgJurSt,
@@ -1350,7 +1350,7 @@ P20_AotDlKrActFlagEv
          Customer(
            CustomerId=gc_id,
            IndustryType=ind_type,
-               JurisdictionState = batchin_rec.st // jp this will need to be switched to a col passed in from MBS
+               JurisdictionState = agency_state
                  ),
 
                  SocialSecurityNumber(FILTER((UNSIGNED)batchin_rec.ssn <> 0),
@@ -1537,9 +1537,9 @@ P20_AotDlKrActFlagEv
                     OttoBankAccountId = OttoBankAccountId
                     ),
 
-                    DriversLicense(FILTER(TRIM(batchin_rec.dl_number) != ''),
-                        LicenseNumber = batchin_rec.dl_number,
-                        State = batchin_rec.dl_state,
+                    DriversLicense(FILTER(TRIM(dl_number) != ''),
+                        LicenseNumber = dl_number,
+                        State = dl_state,
                         OttoDriversLicenseId = OttoDriversLicenseId
                     ),
 
@@ -1605,8 +1605,8 @@ P20_AotDlKrActFlagEv
                     ACECleanerErrorCode = advo_appends.err_stat,
                     isAdditional=FALSE,
                     PhoneFormatted = batchin_rec.phoneno,   //Doesn't exist...I can create it with whatever format we need
-                    LicenseNumber = batchin_rec.dl_number,
-                    LicenseState = batchin_rec.dl_state,
+                    LicenseNumber = dl_number, //batchin_rec.dl_number,
+                    LicenseState = dl_state, //batchin_rec.dl_state,
                     
                     EmailAddress=batchin_rec.email_address,
                     Type = '', // ??
@@ -1707,8 +1707,8 @@ P20_AotDlKrActFlagEv
                             fraudpoint_v3 = boca_shell_appends.fd_scores.fraudpoint_v3,
                             BestHit = TRUE, //by definition
                             best_phone = pr_best_appends.best_phone, //or boca_shell_appends.best_flags.best_phone_phoneval
-                            best_drivers_license_state = pr_best_appends.dl_state,
-                            best_drivers_license = pr_best_appends.dl_nbr,
+                            best_drivers_license_state =dl_state,
+                            best_drivers_license = dl_number,
                             best_drivers_license_exp = dl_appends.expiration_date,
                             DeceasedDate = boca_shell_appends.iid.diddeceaseddate,
                             DeceasedDateOfBirth = boca_shell_appends.iid.diddeceaseddob,

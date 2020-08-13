@@ -1,10 +1,6 @@
-﻿IMPORT RiskIntelligenceNetwork_Services;
-IMPORT FraudgovKEL;
+﻿IMPORT Data_Services, FraudgovKEL, FraudgovPlatform, FraudgovPlatform_Analytics, FraudShared;
 IMPORT KEL12 AS KEL;
-IMPORT Std;
-IMPORT FraudgovPlatform, RiskIntelligenceNetwork_Analytics,FraudgovPlatform_Analytics;
-IMPORT Data_Services;
-IMPORT ut;
+IMPORT RiskIntelligenceNetwork_Analytics, RiskIntelligenceNetwork_Services, Std, ut;
 
 EXPORT Functions := MODULE
 
@@ -12,6 +8,19 @@ EXPORT Functions := MODULE
 																																														RiskIntelligenceNetwork_Services.IParam.Params in_mod) := FUNCTION
 		
 					_constants_EntityId := RiskIntelligenceNetwork_Services.Constants.KelEntityIdentifier;
+					
+					agencyStRec := RECORD
+					STRING2 st;
+					END;
+					
+					recids := CHOOSEN(FraudShared.Key_CustomerID('FraudGov')(customer_id = (STRING)in_mod.GlobalCompanyId),1);
+					
+					agency_state_ds := JOIN(recids, FraudShared.Key_Id(RiskIntelligenceNetwork_Services.Constants.FRAUD_PLATFORM),
+																												KEYED(LEFT.RECORD_ID = RIGHT.RECORD_ID),
+																												TRANSFORM(agencyStRec,
+																																									SELF.st := RIGHT.classification_source.customer_state,
+																																									SELF := []));
+					
 					j2 := PROJECT(ds_in, TRANSFORM(RiskIntelligenceNetwork_Analytics.Layouts.LayoutInputPII_2,
                                                              
 																																														 SELF.EmailLastDomain := Std.Str.ToUpperCase(Std.Str.SplitWords(LEFT.batchin_rec.email_Address, '.')[Std.Str.CountWords(LEFT.batchin_rec.email_address, '.')]),
@@ -24,7 +33,7 @@ EXPORT Functions := MODULE
 																																															SELF.OttoPhoneId := HASH64(LEFT.batchin_rec.phoneno),
 																																															SELF.OttoBankAccountId := HASH64(TRIM(LEFT.batchin_rec.bank_routing_number, LEFT, RIGHT) + '|' + TRIM(LEFT.batchin_rec.bank_account_number, LEFT, RIGHT)),
 																																													 //SELF.OttoBankAccountId2 := HASH64(TRIM(LEFT.bank_routing_number_2, LEFT, RIGHT) + '|' + TRIM(LEFT.bank_account_number_2, LEFT, RIGHT)),
-																																													 SELF.OttoDriversLicenseId := HASH64(STD.Str.CleanSpaces(TRIM(LEFT.batchin_rec.dl_number, LEFT, RIGHT)+ '|' + TRIM(LEFT.batchin_rec.dl_state, LEFT, RIGHT))),                                                                                                                                                                                 
+																																													 SELF.OttoDriversLicenseId := HASH64(STD.Str.CleanSpaces(TRIM(LEFT.dl_appends[1].dl_number, LEFT, RIGHT)+ '|' + TRIM(LEFT.dl_appends[1].orig_state, LEFT, RIGHT))),                                                                                                                                                                                 
 																																													 SELF.event_date := Std.Date.Today(),
 																																														//SELF.Customer_State := LEFT.classification_source.Customer_State,
 																																												 // fake bank account and dl risk stuff for testing JP
@@ -41,13 +50,18 @@ EXPORT Functions := MODULE
 																																													SELF.gc_id := (STRING)in_mod.GlobalCompanyId,
 																																													SELF.ind_type := (STRING)in_mod.IndustryType,
 																																													SELF.record_id := LEFT.batchin_rec.did,
+																																													SELF.agency_state := agency_state_ds[1].st,
 																																													SELF.curr_incar_flag := LEFT.crim_appends[1].curr_incar_flag,
 																																													SELF.crim_match_type := (INTEGER)LEFT.crim_appends[1].match_type,
 																																													SELF.crim_hit := IF(LEFT.crim_appends[1].did <> 0, TRUE, FALSE),
+																																													SELF.dl_number := LEFT.dl_appends[1].dl_number,
+																																													SELF.dl_state := LEFT.dl_appends[1].orig_state,
 																																													SELF := LEFT,
 																																													SELF := []));
-																																													
-					CleanAttributes := KEL.Clean(RiskIntelligenceNetwork_Analytics.Q_Input_Rin(j2).Res0, TRUE /*Remove __Flags*/, TRUE /*Remove __recordcounts*/, TRUE /*Remove _ from Field Names*/);
+					
+					raw_res := RiskIntelligenceNetwork_Analytics.Q_Input_Rin(j2).Res0;
+					CleanAttributes := KEL.Clean(raw_res, TRUE /*Remove __Flags*/, TRUE /*Remove __recordcounts*/, TRUE /*Remove _ from Field Names*/);
+					// CleanAttributes := KEL.Clean(RiskIntelligenceNetwork_Analytics.Q_Input_Rin(j2).Res0, TRUE /*Remove __Flags*/, TRUE /*Remove __recordcounts*/, TRUE /*Remove _ from Field Names*/);
 					
 					codesToIgnore := '-99999\', \'-99998\', \'-99997';
 					AttrClean := FraudgovKEL.macCleanAnalyticUIOutput(CleanAttributes, RECORDOF(CleanAttributes), codesToIgnore);
@@ -304,9 +318,9 @@ EXPORT Functions := MODULE
 																																																															SELF.EntityStats := entityStats_final,
 																																																															SELF := LEFT));
 																																																															
-						// output(ds_in,named('analytics_ds_in'));
-						// output(j2,named('analytics_j2'));
-						// output(AttrClean,named('analytics_AttrClean'));
+						output(ds_in,named('analytics_ds_in'));
+						output(j2,named('analytics_j2'));
+						output(AttrClean,named('analytics_AttrClean'));
 						// output(EventStatsPrep,named('analytics_EventStatsPrep'));
 						// output(elementEntityContextUids,named('analytics_elementEntityContextUids'));
 						// output(elementProfiles,named('analytics_elementProfiles'));
