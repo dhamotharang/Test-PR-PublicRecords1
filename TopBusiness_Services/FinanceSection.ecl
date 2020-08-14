@@ -1,11 +1,11 @@
-﻿IMPORT AutoStandardI, BIPV2, iesp, MDR, TopBusiness_Services, STD;
+﻿IMPORT AutoStandardI, BIPV2, iesp, MDR, TopBusiness_Services;
 
-EXPORT FinanceSection := MODULE;
+EXPORT FinanceSection := MODULE
 
  // *********** Main function to return BIPV2 format business report results
  export fn_FullView(
  	dataset(TopBusiness_Services.Layouts.rec_input_ids) ds_in_ids_wacctno
-	,Layouts.rec_input_options  in_options
+	,TopBusiness_Services.Layouts.rec_input_options  in_options
 	,AutoStandardI.DataRestrictionI.params in_mod
 	                 ):= function
 
@@ -21,9 +21,10 @@ EXPORT FinanceSection := MODULE;
   // ***** Get needed data from individual sources by fetching from the appropriate key file.
 
   // *** Key fetch to get DCAV2 (aka LNCA) data.
-  ds_dca_keyrecs := TopBusiness_Services.Key_Fetches(ds_in_ids_only, // input file to join key with
-								                                     FETCH_LEVEL,
-																										 TopBusiness_Services.Constants.defaultJoinLimit).ds_dca_linkidskey_recs;
+  ds_dca_keyrecs := TopBusiness_Services.Key_Fetches(ds_in_ids_only // input file to join key with
+								                                     ,FETCH_LEVEL
+														     ,TopBusiness_Services.Constants.SmallKeepLimit                                                                       
+                                                                                  ).ds_dca_linkidskey_recs;
 
   // Project DCAV2 key recs onto common layout with just fields needed for the section 
   // output or source viewing/linking.
@@ -49,13 +50,13 @@ EXPORT FinanceSection := MODULE;
   // *** Key fetch to get EBR 5600(Demographic) data.
   ds_ebr_key5600recs := TopBusiness_Services.Key_Fetches(ds_in_ids_only, // input file to join key with
 								                                         FETCH_LEVEL,
-										TopBusiness_Services.Constants.defaultJoinLimit).ds_ebr5600_linkidskey_recs;
+										TopBusiness_Services.Constants.SmallKeepLimit).ds_ebr5600_linkidskey_recs;
 
   // Filter to only use the Current (record_type=C) records and then
   // project EBR key recs onto common layout with just the fields needed for the section 
   // output or source viewing/linking.
   ds_ebr_slimmed := project(ds_ebr_key5600recs(record_type='C'),
-	   transform(FinanceSection_Layouts.rec_ids_withdata_slimmed,
+	   transform(TopBusiness_Services.FinanceSection_Layouts.rec_ids_withdata_slimmed,
 	     self.source       := MDR.sourceTools.src_EBR,
 			 self.source_docid := trim(left.file_number), 
 			 self.sales_as_of_date := (unsigned4) left.process_date_last_seen;
@@ -83,9 +84,9 @@ EXPORT FinanceSection := MODULE;
 
   // Filter to only use the recs with a non-blank "sales" amount.
 	ds_sg_keyrecs_wsales := ds_sg_keyrecs(rawfields.sales !='');
-
+     
 	ds_sg_slimmed := project(ds_sg_keyrecs_wsales,
-	   transform(FinanceSection_Layouts.rec_ids_withdata_slimmed,
+	   transform(TopBusiness_Services.FinanceSection_Layouts.rec_ids_withdata_slimmed,
 				self.source      := MDR.sourceTools.src_Sheila_Greco,
 			 self.source_docid := '', 
        // v--- On 04/09/13 by comparision of the raw data against how it is displayed in
@@ -100,15 +101,15 @@ EXPORT FinanceSection := MODULE;
 			 
       // *** Key fetch to get EquifaxBusData
  
-     ds_equifax_bus_data_keyRecs := Topbusiness_Services.Key_fetches(ds_in_ids_only, FETCH_LEVEL, 
-                                                       TopBusiness_Services.Constants.defaultJoinLimit).ds_equifax_bus_data_linkidskey_recs;
+     ds_equifax_bus_data_keyRecs := Topbusiness_Services.Key_fetches(ds_in_ids_only, FETCH_LEVEL,                                                                                                                                                            
+                                                        TopBusiness_Services.Constants.SmallerKeepLimit).ds_equifax_bus_data_linkidskey_recs;
 																											 
      // filter to use recs with a non blank 'sales' amount
                  																																						
      ds_equifax_bus_data_wsales := ds_equifax_bus_data_keyRecs(EFX_corpamount != '');
 											 
     ds_equifax_bus_data_slimmed := Project(ds_equifax_bus_data_wsales,
-		     Transform(FinanceSection_Layouts.rec_ids_withdata_slimmed,
+		     Transform(TopBusiness_Services.FinanceSection_Layouts.rec_ids_withdata_slimmed,
 				 self.source := MDR.sourceTools.src_Equifax_Business_Data;
 				 self.source_docid := LEFT.efx_id;
 			       self.annual_sales_amount  := ((UNSIGNED4)(trim(LEFT.EFX_corpamount,left,right) )) * 1000;
@@ -149,22 +150,22 @@ EXPORT FinanceSection := MODULE;
 	//
   // transform to handle "Source" child dataset
 	iesp.topbusiness_share.t_TopBusinessSourceDocInfo
-	  tf_rpt_source(FinanceSection_Layouts.rec_ids_withdata_slimmed  l) := transform
+	  tf_rpt_source(TopBusiness_Services.FinanceSection_Layouts.rec_ids_withdata_slimmed  l) := transform
 		self.BusinessIds := l, // to store all linkids
     self.IdType      := //depends upon source 
-		                    if(l.source=MDR.sourceTools.src_DCA,Constants.enterprisenumber,
-												   if(l.source=MDR.sourceTools.src_EBR,Constants.filenumber,
-													   if (l.source=MDR.sourceTools.src_Equifax_Business_Data,Constants.EfxID,														     
+		                    if(l.source=MDR.sourceTools.src_DCA,TopBusiness_Services.Constants.enterprisenumber,
+												   if(l.source=MDR.sourceTools.src_EBR,TopBusiness_Services.Constants.filenumber,
+													   if (l.source=MDR.sourceTools.src_Equifax_Business_Data,TopBusiness_Services.Constants.EfxID,														     
 													    ''))),  // otherwise SheilaGreco, but no SG has no specific id field
 		self.IdValue     := l.source_docid,
-		self.Section     := Constants.FinanceSectionName,
+		self.Section     := TopBusiness_Services.Constants.FinanceSectionName,
 		self.Source      := l.source,
 		self := [],
   end;
 
   // Project onto the iesp report detail layout.
-	FinanceSection_Layouts.rec_ids_plus_FinanceDetail
-	  tf_rptdetail(FinanceSection_Layouts.rec_ids_withdata_slimmed l) := transform
+	TopBusiness_Services.FinanceSection_Layouts.rec_ids_plus_FinanceDetail
+	  tf_rptdetail(TopBusiness_Services.FinanceSection_Layouts.rec_ids_withdata_slimmed l) := transform
      self.SourceDocs 	:= project(l,tf_rpt_source(left)),
 	   self.AnnualSales := (string) l.annual_sales_amount,
 		 self.SalesDate   := iesp.ECL2ESP.toDate(l.sales_as_of_date);
@@ -173,7 +174,7 @@ EXPORT FinanceSection := MODULE;
 
   ds_recs_rptdetail := project(ds_finrecs_deduped,tf_rptdetail(left));
 
-	ds_recs_rptdetail tf_rptdetail_denormed(FinanceSection_Layouts.rec_ids_plus_FinanceDetail l, 
+	ds_recs_rptdetail tf_rptdetail_denormed(TopBusiness_Services.FinanceSection_Layouts.rec_ids_plus_FinanceDetail l, 
 																					dataset(iesp.topbusiness_share.t_TopBusinessSourceDocInfo) r) := transform
 		self.SourceDocs := choosen(r, iesp.Constants.TOPBUSINESS.MAX_COUNT_BIZRPT_SRCDOC_RECORDS);
 		self := l;
@@ -188,8 +189,8 @@ EXPORT FinanceSection := MODULE;
 																						tf_rptdetail_denormed(left,rows(right)));					
 
   // Sort/Group/Rollup all recs for each set of linkids.
-  FinanceSection_Layouts.rec_ids_plus_FinanceSecRec tf_rollup_rptdetail(
-	  FinanceSection_Layouts.rec_ids_plus_FinanceDetail l,
+  TopBusiness_Services.FinanceSection_Layouts.rec_ids_plus_FinanceSecRec tf_rollup_rptdetail(
+	  TopBusiness_Services.FinanceSection_Layouts.rec_ids_plus_FinanceDetail l,
 	  dataset(FinanceSection_Layouts.rec_ids_plus_FinanceDetail) allrows) := transform
       self.acctno   := '';  // just null out here; it will be assigned in a join below
 		  self.Finances := choosen(project(allrows,
@@ -215,13 +216,13 @@ EXPORT FinanceSection := MODULE;
   // Attach input acctnos back to the linkids
   ds_all_wacctno_joined := join(ds_in_ids_wacctno,ds_all_rptdetail_rolled,
                                   BIPV2.IDmacros.mac_JoinTop3Linkids(),
-														    transform(FinanceSection_Layouts.rec_ids_plus_FinanceSecRec,
+														    transform(TopBusiness_Services.FinanceSection_Layouts.rec_ids_plus_FinanceSecRec,
 														      self.acctno := left.acctno,
 															    self        := right),
 														    left outer); // 1 out rec for every left (input ds) rec
 															 
 	ds_final_results := project(ds_all_wacctno_joined,
-		                         transform(FinanceSection_Layouts.rec_Final,
+		                         transform(TopBusiness_Services.FinanceSection_Layouts.rec_Final,
 			                         self := left));								 
 															 
   // Uncomment for debugging

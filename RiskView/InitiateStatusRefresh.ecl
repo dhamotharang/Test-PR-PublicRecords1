@@ -1,11 +1,12 @@
 ﻿IMPORT Risk_Indicators, Gateway, IESP, STD;
 
-EXPORT InitiateStatusRefresh(ROW(Risk_Indicators.Layouts_Derog_Info.LJ_DataSets) LnJDataset,
+EXPORT InitiateStatusRefresh(DATASET(Risk_Indicators.Layouts_Derog_Info.LJ_DataSets) LnJDataset,
 											dataset(Gateway.Layouts.Config) gateways, 
 											pWaitTime = 5, 
 											pRetries = 0, 
 											BOOLEAN TestOKCStatusRefresh = FALSE,
-                                            string5 StatusRefreshWaitPeriod = ''
+                                            string5 StatusRefreshWaitPeriod = '',
+                                            boolean IncludeStatusRefreshChecks = FALSE
 											) := MODULE
 											
 SHARED HighRisk_Layout_In := RECORD
@@ -41,7 +42,7 @@ SHARED cleaned_gw_input := gw_input(highriskcheck = true);
 ******************************************************************/
 SHARED StatusRefreshRecommendedGatewayCfg := gateways(STD.Str.ToLowerCase(ServiceName)='okcstatusrefreshrecommended')[1];
 
-SHARED makeStatusRefreshRecommendedGatewayCall := StatusRefreshRecommendedGatewayCfg.url!='';
+SHARED makeStatusRefreshRecommendedGatewayCall := StatusRefreshRecommendedGatewayCfg.url!='' AND IncludeStatusRefreshChecks = TRUE;
 
 SHARED high_risk_gw_input := PROJECT(cleaned_gw_input, 
                                                         TRANSFORM(iesp.okc_statusrefreshrecommended_request.t_OkcStatusRefreshRecommendedRequest,
@@ -61,7 +62,7 @@ EXPORT RefreshRecommendedGatewayError := COUNT(StatusRefreshRecommended(response
 ******************************************************************/
 SHARED StatusRefreshGatewayCfg := gateways(STD.Str.ToLowerCase(ServiceName)='okcstatusrefresh')[1];
 	
-SHARED makeStatusRefreshGatewayCall := StatusRefreshGatewayCfg.url!='';
+SHARED makeStatusRefreshGatewayCall := StatusRefreshGatewayCfg.url!=''  AND IncludeStatusRefreshChecks = TRUE;
 					
 SHARED status_refresh_gw_input := JOIN(StatusRefreshRecommended, cleaned_gw_input, 
                                                                   LEFT.Response.Result.CourtID = RIGHT.CourtID AND

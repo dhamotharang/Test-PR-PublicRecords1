@@ -1,13 +1,13 @@
 /*--SOAP--
-<message name="RealTime_Batch_Service">	
-	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
-	<part name="DPPAPurpose" type="xsd:byte" default="1"/>
-	<part name="GLBPurpose" type="xsd:byte" default="1"/> 
-	<part name="RealTimePermissibleUse" type="xsd:string" default="LAWENFORCEMENT"/> 
-	<part name="Operation" type="xsd:unsignedInt"/> 
+<message name="RealTime_Batch_Service">
+  <part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
+  <part name="DPPAPurpose" type="xsd:byte" default="1"/>
+  <part name="GLBPurpose" type="xsd:byte" default="1"/>
+  <part name="RealTimePermissibleUse" type="xsd:string" default="LAWENFORCEMENT"/>
+  <part name="Operation" type="xsd:unsignedInt"/>
   <part name="DataPermissionMask" type="xsd:string"/>
-	<part name="gateways" type="tns:XmlDataSet" cols="90" rows="6"/>
-	<part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
+  <part name="gateways" type="tns:XmlDataSet" cols="90" rows="6"/>
+  <part name="ReturnDetailedRoyalties" type="xsd:boolean"/>
 </message>
 */
 /*--INFO-- Real-Time Motor Vehicle Report via the Polk gateway<br>
@@ -19,17 +19,17 @@
 
 EXPORT RealTime_Batch_Service() := MACRO
 
-	UNSIGNED1 Operation := 0 : STORED('Operation');
-	inputData := DATASET([],VehicleV2_Services.Batch_Layout.RealTime_InLayout) : STORED('batch_in',FEW);
-	_recs := VehicleV2_Services.RealTime_Batch_Service_Records(inputData,Operation);
-	recs := PROJECT(_recs, VehicleV2_Services.Batch_Layout.RealTime_OutLayout_V1); // Plate number only returned by V2 version.
-	
-	returnDetailedRoyalties	:= false : stored('ReturnDetailedRoyalties');
-	Royalty.RoyaltyVehicles.MAC_Append(recs, results, vin);
-	Royalty.RoyaltyVehicles.MAC_BatchSet(results, royalties,,returnDetailedRoyalties);	
+  UNSIGNED1 Operation := 0 : STORED('Operation');
+  inputData := DATASET([],VehicleV2_Services.Batch_Layout.RealTime_InLayout) : STORED('batch_in',FEW);
+  _recs := VehicleV2_Services.RealTime_Batch_Service_Records(inputData,Operation);
+  recs := PROJECT(_recs, VehicleV2_Services.Batch_Layout.RealTime_OutLayout_V1); // Plate number only returned by V2 version.
+  
+  returnDetailedRoyalties := FALSE : STORED('ReturnDetailedRoyalties');
+  Royalty.RoyaltyVehicles.MAC_Append(recs, results, vin);
+  Royalty.RoyaltyVehicles.MAC_BatchSet(results, royalties,,returnDetailedRoyalties);
 
-	OUTPUT(results,NAMED('results'));
-	OUTPUT(royalties,NAMED('RoyaltySet'));
+  OUTPUT(results,NAMED('results'));
+  OUTPUT(royalties,NAMED('RoyaltySet'));
 
 ENDMACRO;
 //VehicleV2_Services.RealTime_Batch_Service();

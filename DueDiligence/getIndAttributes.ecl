@@ -1,7 +1,21 @@
 ﻿IMPORT BIPV2, Business_Risk_BIP, Doxie, DueDiligence;
+IMPORT Risk_Indicators;
 
 
-EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData,
+/*
+
+NOTE: Logic is currently being moved to DueDiligence.v3.getPerson
+      where code can be executed modularly. While moving code, clean-up
+      is underway and will be marking 'old' code as deprecated. Once each 
+      attribute is converted over the deprecations will go away. This new
+      function will be used by both DD and Internal customers to retrieve
+      DD specific attributes/reports. So please excuse the mess while we
+      transition. Eventually this function will also be deprecated and
+      removed. Think of this function as under construction :) 
+
+*/
+
+EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                         STRING6 ssnMask,
                         BOOLEAN includeReport,
                         Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
@@ -14,8 +28,8 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
 
 																					 
 																						 
-    INTEGER bsVersion := DueDiligence.CitDDShared.DEFAULT_BS_VERSION;
-    UNSIGNED8 bsOptions := DueDiligence.CitDDShared.DEFAULT_BS_OPTIONS;
+    INTEGER bsVersion := DueDiligence.ConstantsQuery.DEFAULT_BS_VERSION;
+    UNSIGNED8 bsOptions := DueDiligence.ConstantsQuery.DEFAULT_BS_OPTIONS;
     BOOLEAN isFCRA := DueDiligence.Constants.DEFAULT_IS_FCRA;
     
     UNSIGNED1 dppa := options.DPPA_Purpose;
@@ -31,17 +45,17 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
       EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
       EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
     END;
-
-
-
+    
+    
+    
+ 
 
     //convert the incoming data to the DueDiligence.Layouts.Indv_Internal used
     //for processing an individual
-    inquiredInd := DueDiligence.getInd(inData);
-
-
-    didFound := inquiredInd(inquiredDID <> 0);
-    noDIDFound := inquiredInd(inquiredDID = 0);
+    // inquiredInd := DueDiligence.getInd(inData);
+    
+    didFound := inData(inquiredDID <> 0);
+    noDIDFound := inData(inquiredDID = 0);
 
 
     //get estimated income
@@ -86,11 +100,8 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     //get identity risk
     indIDRisk := DueDiligence.getIndIdentityRisk(indPerAssoc, dataRestrictionMask, dppa, glba, isFCRA, bsVersion, bsOptions, mod_access);
     
-    //get civil events(liens/judgements/evictions)
-    indCivilEvents := DueDiligence.getIndCivilEvent(indIDRisk, mod_access);
-
     //populate the attributes and flags
-    indKRI := DueDiligence.getIndKRI(indCivilEvents);
+    indKRI := DueDiligence.getIndKRI(indIDRisk);
 
     //if a person report is being requested, populate the report
     indReportData :=  IF(includeReport, DueDiligence.getIndReport(indKRI, options, linkingOptions, ssnMask, mod_access), indKRI);
@@ -106,7 +117,10 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     
 
     //debugging section
-    IF(debugMode, OUTPUT(inquiredInd, NAMED('inquiredInd')));
+    
+    
+    
+    
     IF(debugMode, OUTPUT(didFound, NAMED('didFound')));
     IF(debugMode, OUTPUT(noDIDFound, NAMED('noDIDFound')));
     IF(debugMode, OUTPUT(indEstIncome, NAMED('indEstIncome')));
@@ -123,7 +137,6 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     IF(debugMode, OUTPUT(indCriminalData, NAMED('indCriminalData')));
     IF(debugMode, OUTPUT(indPerAssoc, NAMED('indPerAssoc')));
     IF(debugMode, OUTPUT(indIDRisk, NAMED('indIDRisk')));
-    IF(debugMode, OUTPUT(indCivilEvents, NAMED('indCivilEvents')));
     IF(debugMode, OUTPUT(indKRI, NAMED('indKRI')));
     IF(debugMode, OUTPUT(indReportData, NAMED('indReportData')));
     IF(debugMode, OUTPUT(indNoDIDKRI, NAMED('indNoDIDKRI')));
@@ -132,4 +145,4 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
 
 
     RETURN finalInd;
-END;
+END : DEPRECATED('Use DueDiligence.v3.getPerson');

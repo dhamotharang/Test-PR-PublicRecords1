@@ -1,8 +1,8 @@
-import Business_Header,address,Business_Header_SS;
+﻿IMPORT address,Business_Header,Business_Header_SS;
 
 h := Business_Header.File_Business_Header_Base_for_keybuild;
 
-look := distribute(project(h,transform(Layouts.File_Hdr_Biz_Keybuild_Layout,
+look := project(h,transform(Layouts.File_Hdr_Biz_Keybuild_Layout,
 	self.prim_name := left.prim_name,
 	self.prim_range := left.prim_range,
 	self.sec_range := left.sec_range,
@@ -15,7 +15,7 @@ look := distribute(project(h,transform(Layouts.File_Hdr_Biz_Keybuild_Layout,
 	self.indic     := if(left.company_name = '','',trim(datalib.companyclean(left.company_name)[1..40])),
 	self.sec       := if(left.company_name = '','',trim(datalib.companyclean(left.company_name)[41..80])),
 	self := left,
-	self := [])),hash(bdid));
+	self := []));
 
 SlimRec :=
 RECORD,maxlength(4096)

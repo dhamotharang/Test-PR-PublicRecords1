@@ -1,9 +1,9 @@
 ﻿/*2014-12-03T01:11:33Z (David Schlangen)
 change for bug 165691
 */
-import ut, business_risk, did_add, Risk_Indicators;
+import ut, business_risk, did_add, Risk_Indicators, doxie;
 
-export Boca_Shell_Bus_Header(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam_pre_bus_header, integer bsversion) := FUNCTION
+export Boca_Shell_Bus_Header(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam_pre_bus_header, doxie.IDataAccess mod_access, integer bsversion) := FUNCTION
 
 bha := business_risk.Key_Business_Header_Address;
 
@@ -162,7 +162,8 @@ with_business_header := join(clam_pre_bus_header, bha,
 						keyed(left.shell_input.prim_name=right.prim_name) and
 						keyed(right.prim_range=left.shell_input.prim_range) and
 						keyed(right.sec_range=left.shell_input.sec_range) and
-						(unsigned)(((STRING)right.dt_first_seen)[1..6]) < left.historydate,
+						(unsigned)(((STRING)right.dt_first_seen)[1..6]) < left.historydate and 
+						doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 			 add_business_header(left, right), atmost(10000),
 						keep(1000),
 			 left outer);

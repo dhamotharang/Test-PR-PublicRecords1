@@ -1,14 +1,14 @@
 ﻿IMPORT BIPV2, Business_Risk_BIP, Risk_Reporting, LNSmallBusiness, BusinessInstantID20_Services, iesp, std, Models, Risk_Indicators;
 
 EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) ds_input,
-                             BusinessInstantID20_Services.iOptions Options,
-														 BIPV2.mod_sources.iParams linkingOptions,
-                             Boolean ExcludeWatchlists,
-				unsigned1 LexIdSourceOptout								  = 1,
-			string TransactionID 												= '',
-			string BatchUID														  = '',
-			unsigned6 GlobalCompanyId 									= 0) := 
-	FUNCTION
+                            BusinessInstantID20_Services.iOptions Options,
+							              BIPV2.mod_sources.iParams linkingOptions,
+                            Boolean ExcludeWatchlists,
+							              unsigned1 LexIdSourceOptout = 1,
+			                      string TransactionID = '',
+							              string BatchUID	 = '',
+							              unsigned6 GlobalCompanyId = 0,
+							              Boolean useUpdatedBipAppend = true) := FUNCTION
 
 		AllowedSourcesSet := BusinessInstantID20_Services.set_AllowedSources( Options );
 
@@ -17,7 +17,7 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
 		ds_OriginalInput := ds_input;
 		
 		// 1. Run Business Shell.
-		mod_BusShell := BusinessInstantID20_Services.mod_BusinessShell(ds_OriginalInput, Options);
+		mod_BusShell := BusinessInstantID20_Services.mod_BusinessShell(ds_OriginalInput, Options, useUpdatedBipAppend);
 
 		ds_Shell_Results := mod_BusShell.Records;
 		

@@ -1,7 +1,7 @@
-﻿import dnb, codes, business_header, doxie, ut;;
+﻿IMPORT codes, dnb, doxie, doxie_cbrs, ut;
 doxie_cbrs.mac_Selection_Declare()
 
-export DNB_records(dataset(doxie_cbrs.layout_references) in_bdids, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+EXPORT DNB_records(DATASET(doxie_cbrs.layout_references) in_bdids, doxie.IDataAccess mod_access) := FUNCTION
 
 //**** keep the group bdids but the target info for comparison
 outrec := record
@@ -16,7 +16,7 @@ bes := project(temprecs,outrec);
 ut.MAC_Slim_Back(bes, doxie_cbrs.layout_best_records_prs, wla)
 
 //indicators
-wcur := doxie_cbrs.mark_ABCurrent(wla,in_bdids);
+wcur := doxie_cbrs.mark_ABCurrent(wla,in_bdids,mod_access);
 doxie_cbrs.mac_hasBBB(wcur, wbbb, in_bdids)
 
 bdids0 := wbbb(Include_DunBradstreetRecords_val);

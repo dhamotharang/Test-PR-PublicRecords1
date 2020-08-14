@@ -1,187 +1,187 @@
-﻿import BIPV2; 
-export assorted_layouts := MODULE
+﻿IMPORT BIPV2;
+EXPORT asSORTed_layouts := MODULE
 
-	EXPORT lic_plate_key_payload_fields := RECORD
-		string2 state_origin;
-		string6 dph_lname;
-		string20 pfname;
-		boolean is_minor;
-		string30 vehicle_key;
-		string15 iteration_key;
-		string15 sequence_key;
-		boolean is_current;
-		unsigned integer4 date;
-		string8 orig_dob;
-		string9 use_ssn;
-		string20 fname;
-		string20 lname;
-		string20 mname;
-		string2 predir;
-		string28 prim_name;
-		string10 prim_range;
-		string4 addr_suffix;
-		string2 postdir;
-		string8 sec_range;
-		string25 v_city_name;
-		string5 zip5;
-		string70 append_clean_cname;
-		string1 state_type :='C';
+  EXPORT lic_plate_key_payload_fields := RECORD
+    STRING2 state_origin;
+    STRING6 dph_lname;
+    STRING20 pfname;
+    BOOLEAN is_minor;
+    STRING30 vehicle_key;
+    STRING15 iteration_key;
+    STRING15 sequence_key;
+    BOOLEAN is_current;
+    UNSIGNED INTEGER4 date;
+    STRING8 orig_dob;
+    STRING9 use_ssn;
+    STRING20 fname;
+    STRING20 lname;
+    STRING20 mname;
+    STRING2 predir;
+    STRING28 prim_name;
+    STRING10 prim_range;
+    STRING4 addr_suffix;
+    STRING2 postdir;
+    STRING8 sec_range;
+    STRING25 v_city_name;
+    STRING5 zip5;
+    STRING70 append_clean_cname;
+    STRING1 state_type :='C';
  END;
 
 
 
-	EXPORT standard__addr := RECORD
-   string10 prim_range;
-   string2 predir;
-   string28 prim_name;
-   string4 addr_suffix;
-   string2 postdir;
-   string10 unit_desig;
-   string8 sec_range;
-   string25 v_city_name;
-   string2 st;
-   string5 zip5;
-   string4 zip4;
-   string2 addr_rec_type;
-   string2 fips_state;
-   string3 fips_county;
-   string10 geo_lat;
-   string11 geo_long;
-   string4 cbsa;
-   string7 geo_blk;
-   string1 geo_match;
-   string4 err_stat;
+  EXPORT standard__addr := RECORD
+    STRING10 prim_range;
+    STRING2 predir;
+    STRING28 prim_name;
+    STRING4 addr_suffix;
+    STRING2 postdir;
+    STRING10 unit_desig;
+    STRING8 sec_range;
+    STRING25 v_city_name;
+    STRING2 st;
+    STRING5 zip5;
+    STRING4 zip4;
+    STRING2 addr_rec_type;
+    STRING2 fips_state;
+    STRING3 fips_county;
+    STRING10 geo_lat;
+    STRING11 geo_long;
+    STRING4 cbsa;
+    STRING7 geo_blk;
+    STRING1 geo_match;
+    STRING4 err_stat;
   END;
 
   EXPORT standard__name := RECORD
-   string5 title;
-   string20 fname;
-   string20 mname;
-   string20 lname;
-   string5 name_suffix;
-   string3 name_score;
+    STRING5 title;
+    STRING20 fname;
+    STRING20 mname;
+    STRING20 lname;
+    STRING5 name_suffix;
+    STRING3 name_score;
   END;
 
-  export layout_common := RECORD
-   string30 vehicle_key;
-   string15 iteration_key;
-   string15 sequence_key;
-   unsigned integer1 zero;
-	 unsigned4 lookup_bit;
-	 string2	 Source_Code;
-   unsigned integer6 append_did;
-   unsigned integer6 append_bdid;
-   string70 append_clean_cname;
-   string9 append_ssn;
-   string9 append_fein;
-   standard__addr company_addr;
-   standard__addr person_addr;
-   standard__name person_name;
-  string1 orig_name_type;
-  string1 history;
-  unsigned4 global_sid;
-  unsigned8 record_sid;
-  unsigned integer4 reg_latest_effective_date;
-  unsigned integer4 reg_latest_expiration_date;
-  unsigned integer4 ttl_latest_issue_date;
+  EXPORT layout_common := RECORD
+    STRING30 vehicle_key;
+    STRING15 iteration_key;
+    STRING15 sequence_key;
+    UNSIGNED INTEGER1 zero;
+    UNSIGNED4 lookup_bit;
+    STRING2 Source_Code;
+    UNSIGNED INTEGER6 append_did;
+    UNSIGNED INTEGER6 append_bdid;
+    STRING70 append_clean_cname;
+    STRING9 append_ssn;
+    STRING9 append_fein;
+    standard__addr company_addr;
+    standard__addr person_addr;
+    standard__name person_name;
+    STRING1 orig_name_type;
+    STRING1 history;
+    UNSIGNED4 global_sid;
+    UNSIGNED8 record_sid;
+    UNSIGNED INTEGER4 reg_latest_effective_date;
+    UNSIGNED INTEGER4 reg_latest_expiration_date;
+    UNSIGNED INTEGER4 ttl_latest_issue_date;
   END;
   
-	export matched_party_rec := RECORD
-   		string1 orig_name_type;	
-	 // vehiclev2_services.Layout_Report_Party;
-	 	string70		Orig_Name;
-		VehicleV2_Services.layout_vehicle_party_out.layout_standard_name;
-   		VehicleV2_Services.layout_vehicle_party_out.layout_standard_address;
-	END;
-	
-  export layout_match_flags := RECORD
-		string1 surnameFlag;
-		string1 fullNameFlag;
-		string1 addressMatchFlag;
-	END;
-
-  export layout_crim_indicators := RECORD
-    boolean HasCriminalConviction := false;
-    boolean IsSexualOffender := false;
+  EXPORT matched_party_rec := RECORD
+    STRING1 orig_name_type;
+    // vehiclev2_services.Layout_Report_Party;
+    STRING70 Orig_Name;
+    VehicleV2_Services.layout_vehicle_party_out.layout_standard_name;
+    VehicleV2_Services.layout_vehicle_party_out.layout_standard_address;
+  END;
+  
+  EXPORT layout_match_flags := RECORD
+    STRING1 surnameFlag;
+    STRING1 fullNameFlag;
+    STRING1 addressMatchFlag;
   END;
 
-	export layout_registrant := RECORD
-		VehicleV2_Services.Layout_vehicle_party_out.layout_vehicle_party_registrant and not [append_did, append_bdid];
-		string3 age;
-		string12 append_did;
-		string12 append_bdid;
-		BIPV2.IDlayouts.l_header_ids;
-		layout_match_flags matchFlags;
-    	layout_crim_indicators;
-		string10   geo_lat := '';
-		string11   geo_long := '';
-		string8 title_issue_date;
-		string1 name_source_cd;
-		string30 name_source;
-		string17 title_number; 		// populated with data from ExperianVIN gateway	
-		string30 reported_name;		// populated with data from ExperianVIN gateway	
-	END;
+  EXPORT layout_crim_indicators := RECORD
+    BOOLEAN HasCriminalConviction := FALSE;
+    BOOLEAN IsSexualOffender := FALSE;
+  END;
 
-	export layout_owner := RECORD
-		VehicleV2_Services.Layout_vehicle_party_out.layout_vehicle_party_owner and not [append_did, append_bdid];
-		string3 age;
-		string12 append_did;
-		string12 append_bdid;
-		BIPV2.IDlayouts.l_header_ids;
-		layout_match_flags matchFlags;
+  EXPORT layout_registrant := RECORD
+    VehicleV2_Services.Layout_vehicle_party_out.layout_vehicle_party_registrant AND NOT [append_did, append_bdid];
+    STRING3 age;
+    STRING12 append_did;
+    STRING12 append_bdid;
+    BIPV2.IDlayouts.l_header_ids;
+    layout_match_flags matchFlags;
     layout_crim_indicators;
-		string10   geo_lat := '';
-		string11   geo_long := '';
-		string30 reported_name;
-	END;
-	
-	export layout_lienholder := RECORD
-		VehicleV2_Services.Layout_vehicle_party_out.layout_vehicle_party_lienholder and not [append_did, append_bdid];
-		string3 age;
-		string12 append_did;
-		string12 append_bdid;
-		BIPV2.IDlayouts.l_header_ids;
-		layout_match_flags matchFlags;
-    layout_crim_indicators;
-		string70 std_lienholder_name;
-		string10   geo_lat := '';
-		string11   geo_long := '';
-		string1 name_source_cd;
-		string30 name_source;
-   string30 reported_name;
-	END;
-	
-	export layout_lessee_or_lessor := RECORD
-		VehicleV2_Services.Layout_vehicle_party_out.layout_vehicle_party_lessor and not [append_did, append_bdid];
-		string3 age;
-		string12 append_did;
-		string12 append_bdid;
-		BIPV2.IDlayouts.l_header_ids;
-		layout_match_flags matchFlags;
-    layout_crim_indicators;
-		string10   geo_lat := '';
-		string11   geo_long := '';
-		string1 name_source_cd;
-		string30 name_source;
-	END;
+    STRING10 geo_lat := '';
+    STRING11 geo_long := '';
+    STRING8 title_issue_date;
+    STRING1 name_source_cd;
+    STRING30 name_source;
+    STRING17 title_number; // populated with data from ExperianVIN gateway
+    STRING30 reported_name; // populated with data from ExperianVIN gateway
+  END;
 
-	export layout_lessee := RECORD
-		VehicleV2_Services.Layout_vehicle_party_out.layout_vehicle_party_lessee and not [append_did, append_bdid];
-		string3 age;
-		string12 append_did;
-		string12 append_bdid;
-		BIPV2.IDlayouts.l_header_ids;
-		layout_match_flags matchFlags;
+  EXPORT layout_owner := RECORD
+    VehicleV2_Services.Layout_vehicle_party_out.layout_vehicle_party_owner AND NOT [append_did, append_bdid];
+    STRING3 age;
+    STRING12 append_did;
+    STRING12 append_bdid;
+    BIPV2.IDlayouts.l_header_ids;
+    layout_match_flags matchFlags;
     layout_crim_indicators;
-		string10   geo_lat := '';
-		string11   geo_long := '';
-	end;
-	
-	export layout_brand := RECORD		
-		string10 brand_date;	
-		string2 brand_state;
-		string3 brand_code;
-		string50 brand_type := '';				
-	end;	
-	
-END;	
+    STRING10 geo_lat := '';
+    STRING11 geo_long := '';
+    STRING30 reported_name;
+  END;
+  
+  EXPORT layout_lienholder := RECORD
+    VehicleV2_Services.Layout_vehicle_party_out.layout_vehicle_party_lienholder AND NOT [append_did, append_bdid];
+    STRING3 age;
+    STRING12 append_did;
+    STRING12 append_bdid;
+    BIPV2.IDlayouts.l_header_ids;
+    layout_match_flags matchFlags;
+    layout_crim_indicators;
+    STRING70 std_lienholder_name;
+    STRING10 geo_lat := '';
+    STRING11 geo_long := '';
+    STRING1 name_source_cd;
+    STRING30 name_source;
+   STRING30 reported_name;
+  END;
+  
+  EXPORT layout_lessee_or_lessor := RECORD
+    VehicleV2_Services.Layout_vehicle_party_out.layout_vehicle_party_lessor AND NOT [append_did, append_bdid];
+    STRING3 age;
+    STRING12 append_did;
+    STRING12 append_bdid;
+    BIPV2.IDlayouts.l_header_ids;
+    layout_match_flags matchFlags;
+    layout_crim_indicators;
+    STRING10 geo_lat := '';
+    STRING11 geo_long := '';
+    STRING1 name_source_cd;
+    STRING30 name_source;
+  END;
+
+  EXPORT layout_lessee := RECORD
+    VehicleV2_Services.Layout_vehicle_party_out.layout_vehicle_party_lessee AND NOT [append_did, append_bdid];
+    STRING3 age;
+    STRING12 append_did;
+    STRING12 append_bdid;
+    BIPV2.IDlayouts.l_header_ids;
+    layout_match_flags matchFlags;
+    layout_crim_indicators;
+    STRING10 geo_lat := '';
+    STRING11 geo_long := '';
+  END;
+  
+  EXPORT layout_brand := RECORD
+    STRING10 brand_date;
+    STRING2 brand_state;
+    STRING3 brand_code;
+    STRING50 brand_type := '';
+  END;
+  
+END;

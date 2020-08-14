@@ -1406,8 +1406,8 @@ old_Tag:= regexreplace('~',old_logical_file_name,'');
 
 sample_size:=0;
    
-new_input_file := dataset(new_logical_file_name ,Lay,CSV(HEADING(single), QUOTE('"')));
-old_input_file := dataset(old_logical_file_name ,Lay,CSV(HEADING(single), QUOTE('"')));
+new_input_file := dataset(new_logical_file_name ,Lay,CSV(HEADING(8), QUOTE('"')));
+old_input_file := dataset(old_logical_file_name ,Lay,CSV(HEADING(8), QUOTE('"')));
 
 new_input_file_records:= if(sample_size=0, choosen(new_input_file,all),choosen(new_input_file,sample_size) );
 old_input_file_records:= if(sample_size=0, choosen(old_input_file,all),choosen(old_input_file,sample_size) );

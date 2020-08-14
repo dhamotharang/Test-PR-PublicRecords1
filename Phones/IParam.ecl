@@ -1,4 +1,4 @@
-﻿﻿IMPORT BatchShare,Gateway,Phones, AutoStandardI, iesp, suppress,doxie;
+IMPORT BatchShare,Gateway,Phones, AutoStandardI, iesp, suppress,doxie;
 
 EXPORT IParam := MODULE
 	

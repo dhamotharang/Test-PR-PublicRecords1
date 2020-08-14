@@ -18,7 +18,7 @@ EXPORT EquifaxBusinessDataSource_Records (
 	// *** Key fetch to get Equifax Bus Data.
 		
    SHARED ds_EquifaxBusinessDataRecs := TopBusiness_Services.Key_Fetches(DEDUP(in_docs_linkonly,ALL),
-													                               inoptions.fetch_level,TopBusiness_Services.Constants.SlimKeepLimit
+													                               inoptions.fetch_level,TopBusiness_Services.Constants.SmallKeepLimit
 																									      ).ds_equifax_bus_data_linkidskey_recs;
 																												
    SHARED ds_EquifaxBusinessDataRecsSlim := DEDUP(SORT(ds_EquifaxBusinessDataRecs, #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), efx_id,IF(record_type = 'C', 0, 1), -dt_last_seen),
@@ -47,7 +47,7 @@ EXPORT EquifaxBusinessDataSource_Records (
 	
 	iesp.topbusinessOtherSources.t_OtherSourceRecord toOut(RECORDOF(EquifaxBusinessDataRecs_idValue) L) := TRANSFORM
 	      // shortcut way to set all linkids
-		IDmacros.mac_IespTransferLinkids(UseIdValue:=false)
+		TopBusiness_Services.IDmacros.mac_IespTransferLinkids(UseIdValue:=false)
 		SELF.IdValue 								:= L.efx_id;
 		SELF.Source 								:= L.source;
 		SELF.CompanyName        		:= L.Clean_company_Name;		

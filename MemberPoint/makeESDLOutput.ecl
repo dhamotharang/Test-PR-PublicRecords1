@@ -1,8 +1,8 @@
-import iesp, Suppress;
+﻿import iesp, Suppress,std,lib_date;
 
 EXPORT iesp.keepcontactreport.t_KeepContactReportResponse makeESDLOutput(dataset(MemberPoint.Layouts.BatchOut) BatchOut,
 																																							iesp.keepcontactreport.t_KeepContactReportBy report_by, 
-																																							string input_ssn_mask_value,
+																																							string input_ssn_mask_value,string includedob,
 																																							unsigned1 input_dob_mask_value) := function
 
 
@@ -84,8 +84,13 @@ EXPORT iesp.keepcontactreport.t_KeepContactReportResponse makeESDLOutput(dataset
 				self.value:= CHOOSE(c, l.email1, l.email2, l.email3, l.email4, l.email5,l.email6, l.email7, l.email8, l.email9, l.email10, '');
 			end;
 
+      iesp.share.t_StringArrayItem normXformAddressDescriptionCodes(MemberPoint.Layouts.BatchOut l,integer c) := transform
+				self.value:= CHOOSE(c, l.addressdescriptioncode1, l.addressdescriptioncode2, l.addressdescriptioncode3, l.addressdescriptioncode4, l.addressdescriptioncode5,l.addressdescriptioncode6, l.addressdescriptioncode7, l.addressdescriptioncode8, l.addressdescriptioncode9, l.addressdescriptioncode10, '');
+			end;
+      
 			PhonesChild := normalize(BatchOut,3,normXformPhones(left,counter));
 			EmailChild := normalize(BatchOut,10,normXformEmails(left,counter));
+			AddressDescriptionCodes:=normalize(BatchOut,10,normXformAddressDescriptionCodes(left,counter));
 			header_row 	 :=  iesp.ECL2ESP.GetHeaderRow();
 
 			 iesp.keepcontactreport.t_KeepContactReportResponse xformESDL(BatchOut l) := transform
@@ -157,10 +162,11 @@ EXPORT iesp.keepcontactreport.t_KeepContactReportResponse makeESDLOutput(dataset
 				self.Member.PossibleNewAddress.DateFirstSeen := iesp.ECL2ESP.toDatestring8(L.addr_dt_first_seen_new);
 				self.Member.PossibleNewAddress.DateLastSeen  := iesp.ECL2ESP.toDatestring8(L.addr_dt_last_seen_new);
 				self.Member.Phones :=  PhonesChild;
-				self.Member.DOD := iesp.ECL2ESP.toDatestring8(L.Date_of_death);
-				self.Member.DeceasedMatchCodes := l.dcd_match_code;
+        self.member.CalculatedAge:=if(includedob='1' and STD.Date.IsValidDate((integer)l.dob, 1900 , 2099),(string)lib_date.getage(l.dob),'');				self.Member.DOD := if(l.LN_search_name_type='M',iesp.ECL2ESP.toDatestring8(''),iesp.ECL2ESP.toDatestring8(L.Date_of_death));
+				self.Member.DeceasedMatchCodes := if(l.LN_search_name_type='M','',l.dcd_match_code);
+				self.member.AddressDescriptionCodes:=AddressDescriptionCodes;
 				self.Member.Emails := EmailChild;
-			end;
+				end;
 
 			ESDLOutput := project(BatchOut,xformESDL(left));
 

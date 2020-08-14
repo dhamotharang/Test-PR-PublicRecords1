@@ -1,4 +1,4 @@
-﻿﻿/*
+/*
 This function pulls inhouse phones data from gong, phonesplus, and bip.
 */
 IMPORT Doxie, BIPV2, dx_Gong, MDR, Phones, phonesplus_batch, Suppress, ut;

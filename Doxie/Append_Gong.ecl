@@ -384,7 +384,7 @@ END;
 
 rec_out_roll_ext checkAddr(out_roll le, curr_addr_key ri) := TRANSFORM
   self.gong_addr_rec := ri;
-  self.gong_addr_phones := DATASET(PROJECT(ri,add_addr_phones(LEFT, 0)));//self.gong_score)));
+  self.gong_addr_phones := DATASET(PROJECT(ri,add_addr_phones(LEFT, le.gong_score)));
   self := le;
   self := [];
 end;
@@ -419,14 +419,16 @@ j_addr := project(j_addr_sup_flag, transform(recordof(out_roll),
   self.phone_first_seen := if(left.listed_phone = '' and _gong_addr_rec.phone10<>'',(integer)_gong_addr_rec.date_first_seen[1..6],left.phone_first_seen);
   self.phone_last_seen := if(left.listed_phone = '' and _gong_addr_rec.phone10<>'',(integer)(todays_date[1..6]),left.phone_last_seen);
   self.publish_code := IF(left.listed_phone != '', left.publish_code, '');
-  SELF.gong_score := 
-    if(_gong_addr_rec.listed_name = '' or (_gong_addr_rec.lname ='' and _gong_addr_rec.fname =''), 500,
-    datalib.nameMatch(left.fname, left.mname, left.lname, _gong_addr_rec.fname, _gong_addr_rec.mname, _gong_addr_rec.lname)) 
+  _gong_score :=
+  if(_gong_addr_rec.listed_name = '' or (_gong_addr_rec.lname ='' and _gong_addr_rec.fname =''), 500,
+    datalib.nameMatch(left.fname, left.mname, left.lname, _gong_addr_rec.fname, _gong_addr_rec.mname, _gong_addr_rec.lname))
     + address.Sec_Range_EQ(left.sec_range,_gong_addr_rec.sec_range);
+  self.gong_score := _gong_score;
   // if name/addr match, upgrade tnt to a 'V' since it is a 'virtual' hhid match (test lname match and optional
   // input phone match)
-  SELF.tnt := IF(left.tnt = 'C' and left.lname = _gong_addr_rec.lname and (ut.NNEQ(phoneToMatch,_gong_addr_rec.phone10)),'V',left.tnt);
-  SELF.phones := choosen(left.phones & IF(_gong_addr_rec.prim_name<>'', left.gong_addr_phones), rollup_limits.phones);
+  self.tnt := IF(left.tnt = 'C' and left.lname = _gong_addr_rec.lname and (ut.NNEQ(phoneToMatch,_gong_addr_rec.phone10)),'V',left.tnt);
+  _addr_phone_patch := PROJECT(left.gong_addr_phones, TRANSFORM(doxie.Layout_Phones, self.gong_score := _gong_score; self := left));
+  self.phones := choosen(left.phones & IF(_gong_addr_rec.prim_name<>'', _addr_phone_patch), rollup_limits.phones);
   self := left;
   ));
 

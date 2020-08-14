@@ -1,12 +1,15 @@
-import doxie, business_header;
+﻿IMPORT doxie, doxie_cbrs;
+
 doxie_cbrs.mac_Selection_Declare()
 
-export ID_Number_records(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
+EXPORT ID_Number_records(DATASET(doxie_cbrs.layout_references) bdids,
+                         doxie.IDataAccess mod_access
+                        ) := FUNCTION
 
 
 //inputs
 cfr := doxie_cbrs.Corporation_Filings_records(bdids)(Include_CompanyIDnumbers_val);
-bes := (doxie_cbrs.best_records_prs_others_max(bdids) + doxie_cbrs.best_records_prs_target(bdids))(Include_CompanyIDnumbers_val);
+bes := (doxie_cbrs.best_records_prs_others_max(bdids,mod_access) + doxie_cbrs.best_records_prs_target(bdids,mod_access))(Include_CompanyIDnumbers_val);
 
 
 feinrec := record

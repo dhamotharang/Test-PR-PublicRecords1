@@ -11,7 +11,7 @@ export t_Task := record
 	boolean IsTaskTimedOut {xpath('IsTaskTimedOut')};
 	string10 TaskErrorCode {xpath('TaskErrorCode')};
 	string50 TaskErrorDescription {xpath('TaskErrorDescription')};
-	string4096 ResponseOpaqueContent {xpath('ResponseOpaqueContent')};
+	varstring ResponseOpaqueContent {xpath('ResponseOpaqueContent'), maxlength(65535)}; // Xsd type: string
 end;
 		
 export t_TaskExtended := record (t_Task)

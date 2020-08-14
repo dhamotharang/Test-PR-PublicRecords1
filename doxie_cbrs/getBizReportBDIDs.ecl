@@ -1,6 +1,6 @@
-import doxie, business_risk, ut, Business_Header, AutoStandardI;
+import doxie, business_risk, Business_Header, AutoStandardI;
 
-export getBizReportBDIDs():= MODULE
+export getBizReportBDIDs(doxie.IDataAccess mod_access):= MODULE
 
 	EXPORT biid := Business_Risk.business_instantid_records;
 	
@@ -11,7 +11,7 @@ export getBizReportBDIDs():= MODULE
 	shared groupID_BInstantID := LIMIT (Business_Header.Key_BH_SuperGroup_BDID(KEYED (bdid=businessInstantID_bdid)), 1, SKIP);
 	
 	//GET BDID SET, BDID OR GROUPID FROM BUSINESS HEADER ROLLUP SERVICE
-	shared best_recs := business_header.fn_RSS_getBestRecords(true,false,false,false,true,false,false); 
+	shared best_recs := business_header.fn_RSS_getBestRecords(mod_access,true,false,false,false,true,false,false); 
 
 	//minimum field population filter
 	shared best_recs_filt := best_recs(company_name != '' and 
@@ -19,7 +19,7 @@ export getBizReportBDIDs():= MODULE
 	    				postdir != '' or unit_desig != '' or sec_range != '' or city != '' or
 		           		state != '' or zip != 0 or zip4 != 0));
 
-	shared brByGIDs_0 := Business_Header.fn_RSS_rollupBestRecords(best_recs_filt, 10);
+	shared brByGIDs_0 := Business_Header.fn_RSS_rollupBestRecords(best_recs_filt, mod_access, 10);
 	
 	shared brByGIDs := SORT(Business_Header.fn_RSS_attachParentInfo(brByGIDs_0,true,true), -score);
 

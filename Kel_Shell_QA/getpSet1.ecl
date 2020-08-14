@@ -1,5 +1,5 @@
-﻿IMPORT R, ut, Python;
-EXPORT string80 getpSet1(string Attr1,string plist,string Attr2):= embed(Python)
+﻿IMPORT R, ut, python3;
+EXPORT string80 getpSet1(string Attr1,string plist,string Attr2):= embed(python3)
 import operator
 result = ''
 symbs = {'<=' : operator.le , '=': operator.eq, '>=' :operator.ge,'>' :operator.gt,'<' :operator.lt} 

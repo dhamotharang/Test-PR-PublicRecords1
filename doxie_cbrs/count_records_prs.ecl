@@ -1,4 +1,4 @@
-﻿import business_header, doxie, doxie_cbrs, doxie_cbrs_raw, LN_PropertyV2_Services;
+﻿import doxie, doxie_cbrs, doxie_cbrs_raw, LN_PropertyV2_Services;
 doxie_cbrs.mac_Selection_Declare()
 
 unsigned3 get_Count(boolean included, unsigned3 max_val, unsigned3 count_shown, unsigned3 count_simple) :=
@@ -6,8 +6,12 @@ unsigned3 get_Count(boolean included, unsigned3 max_val, unsigned3 count_shown, 
 		 count_simple,
 		 count_shown);
 
-export count_records_prs(dataset(doxie_cbrs.layout_references) bdids, unsigned1 ofac_version = 1, boolean include_ofac = false, real global_watchlist_threshold = 0.8,
-                         doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := dataset([{
+export count_records_prs(dataset(doxie_cbrs.layout_references) bdids, 
+                         doxie.IDataAccess mod_access,
+                         unsigned1 ofac_version = 1, 
+                         boolean include_ofac = false, 
+                         real global_watchlist_threshold = 0.8
+                         ) := dataset([{
 	get_Count(
 		Include_CorporationFilings_val,
 		Max_CorporationFilings_val,
@@ -25,7 +29,7 @@ export count_records_prs(dataset(doxie_cbrs.layout_references) bdids, unsigned1 
 		Include_Liens_val,
 		Max_Liens_val,
 		count(doxie_cbrs.liens_v2_records_prs_max(bdids)),
-		doxie_cbrs_raw.liens_v2(bdids,,,,application_type_value).record_count(true)),
+		doxie_cbrs_raw.liens_v2(bdids,,,,mod_access.application_type).record_count(true)),
 	(unsigned3)count(doxie_cbrs.lien_records_prs(bdids)),
 	(unsigned3)count(doxie_cbrs.judgement_records_prs(bdids)),
 	(unsigned3)count(doxie_cbrs.bankruptcy_records_prs(bdids)),
@@ -44,20 +48,20 @@ export count_records_prs(dataset(doxie_cbrs.layout_references) bdids, unsigned1 
 		Include_AssociatedPeople_val,
 		Max_AssociatedPeople_val,
 		count(doxie_cbrs.contact_records_prs_max(bdids)), 
-		doxie_Cbrs_Raw.contacts(bdids,,,application_type_value).record_count(true)),
-	(unsigned3)count(doxie_cbrs.Associated_Business_records_prs(bdids)),
+		doxie_Cbrs_Raw.contacts(bdids,,,mod_access.application_type).record_count(true)),
+	(unsigned3)count(doxie_cbrs.Associated_Business_records_prs(bdids,mod_access)),
 	get_Count(
 		Include_AssociatedBusinesses_val,
 		max_AssociatedBusinesses_val,
 		count(doxie_cbrs.Associated_Business_byContact_records_max(bdids)),
 		doxie_cbrs_raw.Associated_Business_byContact(bdids).record_count(true)),
-	(unsigned3)count(doxie_cbrs.DNB_records(bdids, mod_access)),
+	(unsigned3)count(doxie_cbrs.DNB_records(bdids,mod_access)),
 	get_Count(
 		Include_InternetDomains_val,
 		max_InternetDomains_val,
 		count(doxie_cbrs.Internet_Domains_records_max(bdids)),
 		doxie_cbrs_raw.Internet_Domains(bdids).record_count(true)),
-	(unsigned3)count(doxie_cbrs.proflic_records_prs(bdids)),
+	(unsigned3)count(doxie_cbrs.proflic_records_prs(bdids,mod_access)),
 	(unsigned3)count(doxie_cbrs.BBB_records_prs(bdids)),
 	(unsigned3)count(doxie_cbrs.BBB_records_prs(bdids)(bdid <> doxie_cbrs.subject_BDID)),
 	get_Count(
@@ -74,8 +78,8 @@ export count_records_prs(dataset(doxie_cbrs.layout_references) bdids, unsigned1 
 	get_Count(
 		Return_ReversePhone_val, //a little different since no direct key count
 		Max_ReverseLookup_val,
-		sum(doxie_cbrs.reverse_lookup_records_prs_max(bdids), count(listed_name_children)),
-		count(doxie_cbrs.reverse_lookup_records(bdids,Include_ReversePhone_val))),
+		sum(doxie_cbrs.reverse_lookup_records_prs_max(bdids,mod_access), count(listed_name_children)),
+		count(doxie_cbrs.reverse_lookup_records(bdids,mod_access,Include_ReversePhone_val))),
 	get_Count(
 		Include_NameVariations_val,
 		Max_NameVariations_val,
@@ -96,8 +100,8 @@ export count_records_prs(dataset(doxie_cbrs.layout_references) bdids, unsigned1 
 	get_Count(
 		Include_MotorVehicles_val,
 		Max_MotorVehicles_val,
-		count(doxie_cbrs.motor_vehicle_records_prs_max(bdids)),
-		count(doxie_cbrs.motor_vehicle_records_prs(bdids))),
+		count(doxie_cbrs.motor_vehicle_records_prs_max(bdids,mod_access)),
+		count(doxie_cbrs.motor_vehicle_records_prs(bdids,mod_access))),
 	
 	}], {
 	unsigned3 corporation_filings_count,

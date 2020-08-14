@@ -25,6 +25,27 @@ export key_contact_linkids := module
 	 export kfetch_layout :={Key()};
 	
   //DEFINE THE INDEX ACCESS
+  export kFetch2(
+                  dataset(BIPV2.IDlayouts.l_xlink_ids2) inputs 			  
+                  ,string1 Level = BIPV2.IDconstants.Fetch_Level_DotID
+                  ,unsigned2 ScoreThreshold = 0
+									,BIPV2.mod_sources.iParams in_mod=PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt)
+									,JoinLimit=25000
+									,boolean includeDMI=false
+                  ,doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
+									,unsigned1 JoinType = BIPV2.IDconstants.JoinTypes.KeepJoin
+                  ) :=
+  function
+                  BIPV2.IDmacros.mac_IndexFetch2(inputs, Key(), out, Level, JoinLimit, JoinType);
+									ds_restricted :=out(BIPV2.mod_sources.isPermitted(in_mod,includeDMI).bySource(source, vl_id) );							
+									BIPV2_Suppression.mac_contacts(ds_restricted, ds_suppressed_clean, ds_suppressed_dirty)
+									
+                  BIPV2_Contacts.mac_check_access(ds_suppressed_clean, ds_suppressed_clean_out, mod_access);
+                  return ds_suppressed_clean_out;
+ 
+									
+  end;
+
   export kFetch(
                   dataset(BIPV2.IDlayouts.l_xlink_ids) inputs 			  
                   ,string1 Level = BIPV2.IDconstants.Fetch_Level_DotID
@@ -35,17 +56,13 @@ export key_contact_linkids := module
                   ,doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
                   ) :=
   function
-                  BIPV2.IDmacros.mac_IndexFetch(inputs, Key(), out, Level, JoinLimit);
-									ds_restricted :=out(BIPV2.mod_sources.isPermitted(in_mod,includeDMI).bySource(source, vl_id) );							
-									BIPV2_Suppression.mac_contacts(ds_restricted, ds_suppressed_clean, ds_suppressed_dirty)
-									
-                  BIPV2_Contacts.mac_check_access(ds_suppressed_clean, ds_suppressed_clean_out, mod_access);
-                  return ds_suppressed_clean_out;
- 
+	
+                  inputs_for2 := project(inputs, BIPV2.IDlayouts.l_xlink_ids2);
+									f2 := kFetch2(inputs_for2, Level, ScoreThreshold, in_mod, JoinLimit, includeDMI, mod_access);
+									return project(f2, recordof(Key));	                               
 									
   end;
-
-  
+	
 	//DEFINE THE INDEX ACCESS
   export kFetchMarketing(
                   dataset(BIPV2.IDlayouts.l_xlink_ids) inputs 			   

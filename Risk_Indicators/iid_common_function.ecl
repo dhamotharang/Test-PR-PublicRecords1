@@ -115,11 +115,11 @@ email_in:= Project(ret_email,transform(EmailV2_Services.Layouts.batch_in_rec,
                                       self:=left));
 
 in_email_mod := Module(EmailV2_Services.IParams.EmailParams);
-    EXPORT UNSIGNED2  PenaltThreshold      := EmailV2_Services.Constants.Defaults.PenaltThreshold;  
-    EXPORT UNSIGNED  MaxResultsPerAcct    := EmailV2_Services.Constants.Defaults.MaxResultsPerAcct;  
-    EXPORT BOOLEAN   IncludeHistoricData  := TRUE; 
+    EXPORT UNSIGNED2  PenaltThreshold      := EmailV2_Services.Constants.Defaults.PenaltThreshold;
+    EXPORT UNSIGNED  MaxResultsPerAcct    := EmailV2_Services.Constants.Defaults.MaxResultsPerAcct;
+    EXPORT BOOLEAN   IncludeHistoricData  := TRUE;
     EXPORT STRING5   Industry_Class       := IndustryClass;
-    EXPORT BOOLEAN   RequireLexidMatch    := FALSE;  
+    EXPORT BOOLEAN   RequireLexidMatch    := FALSE;
     EXPORT UNSIGNED1  EmailQualityRulesMask := 0;
     EXPORT BOOLEAN   RunDeepDive          := FALSE;  
     EXPORT STRING    SearchType :='EIA';

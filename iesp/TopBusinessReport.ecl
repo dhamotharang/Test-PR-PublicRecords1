@@ -37,6 +37,7 @@ export t_TopBusinessReportOption := record (iesp.share.t_BaseReportOption)
 	boolean IncludeSanctions {xpath('IncludeSanctions')};
 	boolean IncludeBusinessRegistrations {xpath('IncludeBusinessRegistrations')};
 	boolean IncludeCriminalIndicators {xpath('IncludeCriminalIndicators')};//hidden[internal]
+      boolean IncludeBizToBizDelinquencyRiskIndicator {xpath('IncludeBizToBizDelinquencyRiskIndicator')};//hidden[internal]
 	string1 BusinessReportFetchLevel {xpath('BusinessReportFetchLevel')}; //values['S','D','E','W','P','O','U','','']
 end;
 		
@@ -608,7 +609,7 @@ export t_TopBusinessPropertyForeclosure := record
 	string120 DefendantCompanyName3 {xpath('DefendantCompanyName3')};
 	string120 DefendantCompanyName4 {xpath('DefendantCompanyName4')};
 	iesp.share.t_Address SiteAddress1 {xpath('SiteAddress1')};
-	iesp.share.t_Address SiteAddress2 {xpath('SiteAddress2')};
+	iesp.share.t_Address SiteAddress2 {xpath('SiteAddress2')}; 
 	string30 LenderFirstName {xpath('LenderFirstName')};
 	string30 LenderLastName {xpath('LenderLastName')};
 	string30 LenderCompanyName {xpath('LenderCompanyName')};

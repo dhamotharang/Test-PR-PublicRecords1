@@ -51,8 +51,8 @@ iesp.phonefinder.t_PhoneFinderRiskIndicator gt5() := TRANSFORM
     SELF.level := 'H';
     SELF.LevelCount := 1;
     SELF.RiskId := 6;
-    SELF.ThresholdA := 7;
-    SELF.RiskDescription := 'Phone # has been ported within the past “ThresholdA” days';
+    SELF.Threshold := 7;
+    SELF.RiskDescription := 'Phone # has been ported within the past “Threshold” days';
     SELF.Active := true;
     SELF := [];
   END;
@@ -62,8 +62,8 @@ iesp.phonefinder.t_PhoneFinderRiskIndicator gt5() := TRANSFORM
     SELF.level := 'M';
     SELF.LevelCount := 3;
     SELF.RiskId := 7;
-    SELF.ThresholdA := 5;
-    SELF.RiskDescription := 'Phone # has been ported more than “ThresholdA” times with this person';
+    SELF.Threshold := 5;
+    SELF.RiskDescription := 'Phone # has been ported more than “Threshold” times with this person';
     SELF.Active := true;
     SELF := [];
   END;
@@ -71,9 +71,9 @@ iesp.phonefinder.t_PhoneFinderRiskIndicator gt5() := TRANSFORM
     SELF.Category := 'Phone Activity';
     SELF.level := 'L';
     SELF.LevelCount := 99;
-    SELF.ThresholdA := 30;
+    SELF.Threshold := 30;
     SELF.RiskId := 8;
-    SELF.RiskDescription := 'Phone # was the origination phone used to spoof another phone # within the past “ThresholdA” days';
+    SELF.RiskDescription := 'Phone # was the origination phone used to spoof another phone # within the past “Threshold” days';
     SELF.Active := true;
     SELF := [];
   END;
@@ -83,8 +83,8 @@ iesp.phonefinder.t_PhoneFinderRiskIndicator gt8() := TRANSFORM
     SELF.level := 'L';
     SELF.LevelCount := 99;
     SELF.RiskId := 9;
-    SELF.ThresholdA := 60;
-    SELF.RiskDescription := 'Phone # has been spoofed within the past “ThresholdA” days';
+    SELF.Threshold := 60;
+    SELF.RiskDescription := 'Phone # has been spoofed within the past “Threshold” days';
     SELF.Active := true;
     SELF := [];
   END;
@@ -196,9 +196,9 @@ iesp.phonefinder.t_PhoneFinderRiskIndicator gt17() := TRANSFORM
     SELF.Category := 'Phone Activity';
     SELF.level := 'H';
     SELF.LevelCount := 1;
-    SELF.ThresholdA := 14;
+    SELF.Threshold := 14;
     SELF.RiskId := 26;
-    SELF.RiskDescription := 'Phone # was the destination phone used in a spoofing activity within the past “ThresholdA” days';
+    SELF.RiskDescription := 'Phone # was the destination phone used in a spoofing activity within the past “Threshold” days';
     SELF.Active := true;
     // SELF.OTP := true;
     SELF := [];
@@ -209,8 +209,8 @@ iesp.phonefinder.t_PhoneFinderRiskIndicator gt20() := TRANSFORM
     SELF.level := 'H';
     SELF.LevelCount := 1;
     SELF.RiskId := 27;
-    SELF.ThresholdA := 7;
-    SELF.RiskDescription := 'Phone # was the spoofed phone used in a spoofing activity within the past “ThresholdA” days';
+    SELF.Threshold := 7;
+    SELF.RiskDescription := 'Phone # was the spoofed phone used in a spoofing activity within the past “Threshold” days';
     SELF.Active := true;
     SELF := [];
   END;
@@ -230,8 +230,7 @@ iesp.phonefinder.t_PhoneFinderRiskIndicator gt20() := TRANSFORM
     SELF.level := 'L';
     SELF.LevelCount := 99;
     SELF.RiskId := 29;
-   SELF.ThresholdA := 7;
-    SELF.RiskDescription := 'SIM Card Information has changed in the last “ThresholdA” days';
+    SELF.RiskDescription := 'Primary Phone Area Code is not in same state as Primary Address';
     SELF.Active := true;
     SELF := [];
   END;
@@ -291,9 +290,9 @@ iesp.phonefinder.t_PhoneFinderRiskIndicator gt26() := TRANSFORM
     SELF.Category := 'Phone Activity';
     SELF.level := 'H';
     SELF.LevelCount := 1;
-    SELF.ThresholdA := 5;
+    SELF.Threshold := 5;
     SELF.RiskId := 35;
-    SELF.RiskDescription := 'SIM Card Information has changed in the last “ThresholdA” days';
+    SELF.RiskDescription := 'SIM Card Information has changed in the last “Threshold” days';
     SELF.Active := true;
     SELF := [];
   END;
@@ -303,7 +302,7 @@ iesp.phonefinder.t_PhoneFinderRiskIndicator gt29() := TRANSFORM
     SELF.level := 'H';
     SELF.LevelCount := 1;
     SELF.RiskId := 36;
-    SELF.ThresholdA := 5;
+    SELF.Threshold := 5;
     SELF.RiskDescription := 'Device Information has changed in the last # days';
     SELF.Active := true;
     SELF := [];
@@ -388,8 +387,8 @@ iesp.phonefinder.t_PhoneFinderRiskIndicator gt37() := TRANSFORM
     SELF.level := 'H';
     SELF.LevelCount := 1;
     SELF.RiskId := 45;
-    SELF.ThresholdA := 8;
-    SELF.RiskDescription := 'Phone Number is associated to more than "ThresholdA" Identities';
+    SELF.Threshold := 8;
+    SELF.RiskDescription := 'Phone Number is associated to more than "Threshold" Identities';
     SELF.Active := true;
     // SELF.OTP := true;
     SELF := [];
@@ -437,6 +436,26 @@ iesp.phonefinder.t_PhoneFinderRiskIndicator gt38() := TRANSFORM
     SELF.Active := true;
     SELF := [];
   END;
+	
+	    iesp.phonefinder.t_PhoneFinderRiskIndicator gt42() := TRANSFORM
+    SELF.Category := 'Phone Activity';
+    SELF.level := 'M';
+    SELF.LevelCount := 3;
+    SELF.RiskId := 49;
+    SELF.RiskDescription := 'Phone Type is Other';
+    SELF.Active := true;
+    SELF := [];
+  END;
+	
+	    iesp.phonefinder.t_PhoneFinderRiskIndicator gt43() := TRANSFORM
+    SELF.Category := 'Phone Activity';
+    SELF.level := 'M';
+    SELF.LevelCount := 3;
+    SELF.RiskId := 50;
+    SELF.RiskDescription := 'Phone Type is Cable';
+    SELF.Active := true;
+    SELF := [];
+  END;
 
   RiskRule1:= DATASET([gt1()]);
   RiskRule2:= DATASET([gt2()]);
@@ -479,6 +498,8 @@ iesp.phonefinder.t_PhoneFinderRiskIndicator gt38() := TRANSFORM
   RiskRule39:= DATASET([gt39()]);
   RiskRule40:= DATASET([gt40()]);
   RiskRule41:= DATASET([gt41()]);
+  RiskRule42:= DATASET([gt42()]);
+  RiskRule43:= DATASET([gt43()]);
   
   RiskRules:= RiskRule1 + RiskRule2 + RiskRule3+
               RiskRule4 + RiskRule5 + RiskRule6+
@@ -493,7 +514,8 @@ iesp.phonefinder.t_PhoneFinderRiskIndicator gt38() := TRANSFORM
               RiskRule31 + RiskRule32 + RiskRule33+
               RiskRule34 + RiskRule35 + RiskRule36+
               RiskRule37 + RiskRule38 + RiskRule39
-              + RiskRule40 + RiskRule41;
+              + RiskRule40 + RiskRule41
+              + RiskRule42 + RiskRule43;
 
 RETURN RiskRules;
 

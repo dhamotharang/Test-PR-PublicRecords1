@@ -1,7 +1,7 @@
-export Layout_Vehicle_Key := RECORD
-	string30 Vehicle_Key;
-	string15 Iteration_Key;
-	string15 Sequence_Key := '';
-	string2	state_origin := ''; //needed for dppa stuff
-	boolean is_deep_dive := false;
+EXPORT Layout_Vehicle_Key := RECORD
+  STRING30 Vehicle_Key;
+  STRING15 Iteration_Key;
+  STRING15 Sequence_Key := '';
+  STRING2 state_origin := ''; //needed for dppa stuff
+  BOOLEAN is_deep_dive := FALSE;
 END;
