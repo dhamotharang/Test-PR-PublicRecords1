@@ -56,8 +56,10 @@ Active_RampsWU := If(/*CustomerDash_WUState in valid_state or ClusterDetails_WUS
 											FindLeads_WUState in valid_state or Dashboard_WUState in valid_state or LinksChart_WUState in valid_state or
 											DetailsReport_WUState in valid_state ,true,false);
 
+SkipJob := FraudGovPlatform.Files().Flags.SkipModules[1].SkipDashboards;
+
 RunJob := If(RIN_CERT_Version=RIN_PROD_Version and RIN_CERT_Version <> Dashboard_Build_version and ~Active_RampsWU,true,false);
-Run_ECL := if(RunJob=true,ECL, 'output(\'Refresh Prod Dashboards Skipped\');\n' );
+Run_ECL := if(RunJob=true and SkipJob =false,ECL, 'output(\'Refresh Prod Dashboards Skipped\');\n' );
 
 _Control.fSubmitNewWorkunit(Run_ECL,ThorName):WHEN(CRON(every_hour))
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
