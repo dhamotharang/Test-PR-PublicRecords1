@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_SalesChannel.BWR_DataUpdateStandardStats - Data Update Standard Stats - SALT V3.11.9');
+#workunit('name','Scrubs_SalesChannel.BWR_DataUpdateStandardStats - Data Update Standard Stats - SALT V3.11.11');
 IMPORT Scrubs_SalesChannel,SALT311;
 mynewfile := ''; // THOR file containing new data
 myprevfile := ''; // THOR file containing previous data (can be empty)

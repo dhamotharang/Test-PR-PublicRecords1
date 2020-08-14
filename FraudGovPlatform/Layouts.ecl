@@ -390,10 +390,16 @@ EXPORT Layouts := MODULE
 		
 	END;
 
-
 	EXPORT Base := MODULE
 		EXPORT AddressCache := record
-			Address.Layout_Clean182_fips;
+            string100 Street_1 := '';
+            string50 Street_2 := '';
+            string100 City := '';
+            string10 State := '';
+            string10 Zip := '';
+            Address.Layout_Clean182_fips clean_address;
+            string100 address_1 := '';   
+            string50 address_2 := '';
 			unsigned4 address_cleaned;
 		END;
 		
@@ -447,6 +453,11 @@ EXPORT Layouts := MODULE
 			string Gc_ID;
 		end;
 		
+		export CustomerActiveSprays := record 
+			string20 	Customer_Id;
+			string20	File_type;
+		end;
+
 		export RefreshProdDashVersion := Record
 		boolean RefreshVersion;
 		end;
@@ -2574,7 +2585,7 @@ RECORD
   unsigned8 aotidactcnt30d;
   unsigned8 aotnonstactcnt30d;
   unsigned8 aotnewkraftnonstactcntev;
-  unsigned8 aothiidcurrprofusngcntev;
+  integer8 aothiidcurrprofusngcntev;
   unsigned8 aotidusngcntev;
   unsigned8 aotidactcntev;
   unsigned8 aotidcurrprofusngcntev;

@@ -14,8 +14,10 @@ Export DC 	:= Module
 															'GENERAL COOPERATIVE ASSOCIATION DOMESTIC','GENERAL PARTNERSHIP DOMESTIC','LIABILITY COMPANY DOMESTIC',
 															'LIMITED COOPERATIVE ASSOCIATION DOMESTIC','LIMITED LIABILITY COMPANY DOMESTIC',
 															'LIMITED LIABILITY COMPANY DOMESTIC FOR-PROFIT','LIMITED LIABILITY PARTNERSHIP DOMESTIC',
-															'LIMITED PARTNERSHIP DOMESTIC','NON-PROFIT CORPORATION DOMESTIC','PROFESSIONAL LIMITED LIABILITY COMPANY DOMESTIC',
-															'PROFESSIONAL LIMITED LIABILITY COMPANY DOMESTIC PROFESSIONAL','STATUTORY TRUST DOMESTIC','TRADE NAME DOMESTIC'];
+															'LIMITED PARTNERSHIP DOMESTIC','NON-PROFIT CORPORATION DOMESTIC','NAME RESERVATION DOMESTIC',
+															'NAME RESERVATION DOMESTIC NON-PROFIT','PROFESSIONAL LIMITED LIABILITY COMPANY DOMESTIC',
+															'PROFESSIONAL LIMITED LIABILITY COMPANY DOMESTIC PROFESSIONAL','STATUTORY TRUST DOMESTIC',
+															'TRADE NAME DOMESTIC'];
 															
 		foreign_list					:= ['ACT OF CONGRESS CORPORATION FOREIGN','ACT OF CONGRESS CORPORATION FOREIGN NON-PROFIT',
 															'FOR-PROFIT CORPORATION FOREIGN','FOR-PROFIT CORPORATION FOREIGN FOR-PROFIT',
@@ -23,16 +25,19 @@ Export DC 	:= Module
 															'GENERAL COOPERATIVE ASSOCIATION FOREIGN','LIMITED LIABILITY COMPANY FOREIGN',
 															'LIMITED LIABILITY COMPANY FOREIGN FOR-PROFIT','LIMITED LIABILITY PARTNERSHIP FOREIGN',
 															'LIMITED PARTNERSHIP FOREIGN','NON-PROFIT CORPORATION FOREIGN','NON-PROFIT CORPORATION FOREIGN NON-PROFIT',
-															'NONREGISTERED NONFILING ENTITY NONE' ];
+															'NONREGISTERED NONFILING ENTITY NONE','NAME RESERVATION FOREIGN' ];
 															
 		profit_list 					:= ['ACT OF CONGRESS CORPORATION FOREIGN NON-PROFIT','FOR-PROFIT BENEFIT CORPORATION DOMESTIC FOR-PROFIT',
 															'FOR-PROFIT CORPORATION DOMESTIC FOR-PROFIT','FOR-PROFIT CORPORATION DOMESTIC FOR-PROFIT PROFESSIONAL',
 															'FOR-PROFIT CORPORATION DOMESTIC','FOR-PROFIT CORPORATION FOREIGN','FOR-PROFIT CORPORATION FOREIGN FOR-PROFIT',
 															'FOR-PROFIT CORPORATION FOREIGN FOR-PROFIT PROFESSIONAL','LIMITED LIABILITY COMPANY DOMESTIC FOR-PROFIT',
-															'LIMITED LIABILITY COMPANY FOREIGN FOR-PROFIT'];
+															'LIMITED LIABILITY COMPANY FOREIGN FOR-PROFIT' ];
 															
-		Nonprofit_list				:= ['NON-PROFIT CORPORATION DOMESTIC', 'NON-PROFIT CORPORATION FOREIGN','NON-PROFIT CORPORATION FOREIGN NON-PROFIT'];				
-				
+		Nonprofit_list				:= ['NON-PROFIT CORPORATION DOMESTIC', 'NON-PROFIT CORPORATION FOREIGN','NON-PROFIT CORPORATION FOREIGN NON-PROFIT',
+		                          'NAME RESERVATION DOMESTIC NON-PROFIT'];	
+															
+		Reserv_list           := ['NAME RESERVATION DOMESTIC','NAME RESERVATION DOMESTIC NON-PROFIT','NAME RESERVATION FOREIGN'];
+		
 		Corp2_Mapping.LayoutsCommon.Main DC_corpTransform(Corp2_Raw_DC.Layouts.CorporationsLayoutIn L):= transform 
 		
 				st_code                           := Corp2_Raw_DC.Functions.fGetStateCode(L.StateOfFormation);// When we have invalid values or new values in raw data !this function will return '**',We can reject those records through Scrubs for further investigation
@@ -54,8 +59,12 @@ Export DC 	:= Module
 				self.corp_inc_state				 				:= state_origin ;
 				self.corp_orig_sos_charter_nbr	  := corp2.t2u(L.FileNumber);
 				self.corp_legal_name						  := Corp2_Mapping.fCleanBusinessName(state_origin,state_desc,L.EntityName).BusinessName;					
-				self.corp_ln_name_type_cd				  := if(EntityType_upper = 'TRADE NAME DOMESTIC', '04', '01');													   
-				self.corp_ln_name_type_desc		    := if(EntityType_upper = 'TRADE NAME DOMESTIC', 'TRADE NAME','LEGAL');		
+				self.corp_ln_name_type_cd				  := map(EntityType_upper = 'TRADE NAME DOMESTIC'=>'04',
+				                                         EntityType_upper in Reserv_list         =>'07',
+																								 '01');													   
+				self.corp_ln_name_type_desc		    := map(EntityType_upper = 'TRADE NAME DOMESTIC'=> 'TRADE NAME',
+				                                         EntityType_upper in Reserv_list         => 'RESERVED',
+																								 'LEGAL');																							
 				self.corp_status_desc							:= corp2.t2u(L.EntityStatus);
 				self.corp_orig_org_structure_desc := if(EntityType_upper = 'TRADE NAME DOMESTIC','',Corp2_Raw_DC.Functions.CorpOrigOrgStructDesc(L.EntityType));
 				self.corp_foreign_domestic_ind    := map(EntityType_upper in domestic_list 		  																									 =>'D',
@@ -65,12 +74,12 @@ Export DC 	:= Module
 				self.corp_for_profit_ind          := map(EntityType_upper in profit_list		=>'Y',
 																								 EntityType_upper in Nonprofit_list	=>'N',
 																								 '');				
-				self.corp_inc_date								:= map(st_code = state_origin															  => fix_Date,
-																								 state_upper=''and EntityType_upper in domestic_list  => fix_Date,
+				self.corp_inc_date								:= map(st_code in [state_origin ,''] and EntityType_upper not in foreign_list => fix_Date,
+																								 EntityType_upper in domestic_list   									                  => fix_Date,
 																								 '');
-				self.corp_forgn_date							:= map(st_code not in[state_origin ,'','**']								=> fix_Date,
-																								 state_upper='' and EntityType_upper  in foreign_list	=> fix_Date,
-																								 Country_desc not in['','US']													=> fix_Date,
+				self.corp_forgn_date							:= map(st_code not in[state_origin ,'','**']	 => fix_Date,
+																								 EntityType_upper  in foreign_list       => fix_Date,
+																								 Country_desc not in['','US']						 => fix_Date,
 																								 '');
 				Self.corp_forgn_state_CD 	 				:=if(st_code <> state_origin ,st_code,'');
 				Self.corp_forgn_state_desc 	 			:=if(Self.corp_forgn_state_CD <>'',state_upper,If(Country_desc<>'US', Country_desc,'' ));
@@ -125,10 +134,10 @@ Export DC 	:= Module
 		
 		
 	  //Creates Profile's alert template for Orbit - can be copied and imported into Orbit; Only required if rules in Orbit change
-		Main_AlertsCSVTemplate		:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+state_origin+'_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp2_'+state_origin+'_Main').ProfileAlertsTemplate;
+		Main_AlertsCSVTemplate		:= Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_'+state_origin+'_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp2_'+state_origin+'_Main').ProfileAlertsTemplate;
 		//Submits Profile's stats to Orbit
-		Main_SubmitStats 			  	:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+state_origin+'_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp2_'+state_origin+'_Main').SubmitStats;
-		Main_ScrubsWithExamples		:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+state_origin+'_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp2_'+state_origin+'_Main').CompareToProfile_with_Examples;
+		Main_SubmitStats 			  	:= Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_'+state_origin+'_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp2_'+state_origin+'_Main').SubmitStats;
+		Main_ScrubsWithExamples		:= Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_'+state_origin+'_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp2_'+state_origin+'_Main').CompareToProfile_with_Examples;
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
 		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList

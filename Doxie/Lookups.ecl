@@ -1,8 +1,15 @@
 import driversv2, header, atf, faa, prof_licensev2, 
        business_header, bankrupt, doxie_files, doxie_build, SexOffender, watercraft, ut,
-       ln_propertyv2, vehicleV2, paw, PRTE2_Header;
-			 
-v := vehiclev2.file_vehicleV2_party(history='' and append_did <> 0);
+       ln_propertyv2, vehicleV2, paw, PRTE2_Header, suppress, Data_Services, dx_header, mdr;
+
+// declare mod_access so it can be applied to suppression code
+mod_access := MODULE(doxie.IDataAccess) END;
+
+// this is the code to add suppression for paw and filters the dataset
+v_filtered := vehiclev2.file_vehicleV2_party(history='' and append_did <> 0);
+
+// modified to add ccpa suppression for vehicles
+v := Suppress.MAC_SuppressSource(v_filtered,mod_access, append_did , ,TRUE, data_services.data_env.iNonFCRA);
 
 v_dedup := dedup(v, vehicle_key,append_did, all); 
 
@@ -38,14 +45,18 @@ r from_prop(pr le) := transform
   end;
   
 ps := project(pr,from_prop(left));  
-  
-b := business_header.File_Business_Contacts_Plus;
+
+
+// modified to add ccpa suppression for business header 
+ b := Suppress.MAC_SuppressSource(business_header.File_Business_Contacts_Plus,mod_access,,,TRUE, data_services.data_env.iNonFCRA);
+
 
 r from_b(b le) := transform
   self.did := le.did;
   self.bus_count := 1;
   end;
-  
+
+
 bs := project(b,from_b(left));
 
 r from_bc(recordof(business_header.Files().Out.Contacts.qa) le) :=
@@ -62,7 +73,16 @@ TRANSFORM
   self.paw_count := 1;
 END;
 
-d_paw := project(paw.files().base.built(score>'003' and (unsigned)did<>0),from_paw(LEFT));
+// this is the code to add suppression for paw and filters the dataset
+d_paw_filtered := paw.files().base.built(score>'003' and (unsigned)did<>0);
+
+// modified to add ccpa suppression for paw
+d_paw_suppressed := Suppress.MAC_SuppressSource(d_paw_filtered,mod_access,,,TRUE, data_services.data_env.iNonFCRA);
+
+// projects the filtered dataset and applies from_paw transformation to each record in the dataset- which only keeps the did field and sets a paw_count field= 1
+d_paw := project(d_paw_suppressed,from_paw(LEFT));
+
+
 
 m := dedup(sort( 
 		distribute(watercraft.file_base_search_prod((unsigned6)did<>0),hash(watercraft_key,state_origin)),
@@ -75,7 +95,14 @@ r from_m(m le) := transform
 
 ms := project(m,from_m(left));
 
-pl := prof_licensev2.File_ProfLic_Base;
+
+// updated code to include global_sid assignment macro 
+mdrPl := mdr.macGetGlobalSID(prof_licensev2.File_ProfLic_Base, 'PersonHeader', 'vendor', 'global_sid');
+
+// modified to add ccpa suppression for professional licenses
+pl := Suppress.MAC_SuppressSource(mdrPl, mod_access,,,TRUE, data_services.data_env.iNonFCRA);
+
+
 
 r from_pl(pl le) := transform
   self.did := (unsigned6)le.did;
@@ -127,7 +154,10 @@ r from_d(d le) := transform
   
 ds := project(d,from_d(left));
 
-h := doxie_build.file_header_building; 
+
+// modified to add ccpa suppression for person header 
+ hdrP:=project( doxie_build.file_header_building , dx_header.layout_header);
+ h := header.fn_suppress_ccpa(hdrP,true);
 
 r from_h(h le) := transform
   self.head_cnt := 1;

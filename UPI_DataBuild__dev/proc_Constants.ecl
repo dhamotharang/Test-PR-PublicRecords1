@@ -3,8 +3,8 @@ IMPORT tools, _Control, UPI_DataBuild__dev, HealthcareNoMatchHeader_InternalLink
  
 EXPORT proc_Constants := MODULE
   EXPORT  IsDataland        		:=  tools._Constants.IsDataland;
-  EXPORT  primaryQueue      		:=  IF(IsDataland, 'thor400_sta', 'thor400_44');
-  EXPORT  secondaryQueue    		:=  IF(IsDataland, 'hthor_sta', 'hthor');
+  EXPORT  primaryQueue      		:=  IF(IsDataland, 'thor400_sta', 'thor400_44_eclcc');
+  EXPORT  secondaryQueue    		:=  IF(IsDataland, 'hthor_sta', 'hthor_eclcc');
   EXPORT  maxNumIters       		:=  1;
   EXPORT  pollingFreq       		:=  '1';
   EXPORT  emailNotifyOps    		:=  '';
