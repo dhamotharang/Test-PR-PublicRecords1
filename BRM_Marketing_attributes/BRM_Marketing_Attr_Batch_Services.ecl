@@ -105,7 +105,8 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 		EXPORT STRING100 Allowed_Sources := AllowedSources;
 		EXPORT STRING IndustryClass := Industry_Class; // When set to UTILI or DRMKT this restricts Utility data
 		EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
-		EXPORT DATA100 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
+		EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA;
+		EXPORT DATA57 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 			DataRestrictionMask, 
 			DataPermissionMask, 
 			GLBA, 
@@ -114,13 +115,15 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 			TRUE, //ismarketing
 			0, //Allow_DNBDMI
 			Override_Experian_Restriction,//OverrideExperianRestriction
-			'',//PermissiblePurpose - For FCRA Products Only
+			'',//IntendedPurpose - For FCRA Products Only
 			Industry_Class,
-			PublicRecords_KEL.CFG_Compile);
+			PublicRecords_KEL.CFG_Compile,
+			FALSE, /*IsInsuranceProduct*/
+			PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA);
 		
 		// BIP Append Options
    EXPORT UNSIGNED BIPAppendScoreThreshold := MAP(BIPAppend_No_ReAppend => 0,
-                                                BIPAppend_Score_Threshold = 0 => 75, MIN(MAX(51,BIPAppend_Score_Threshold), 100));		
+                                                BIPAppend_Score_Threshold = 0 => 75, MIN(MAX(51,BIPAppend_Score_Threshold), 100));	
 		EXPORT UNSIGNED BIPAppendWeightThreshold := BIPAppend_Weight_Threshold;
 		EXPORT BOOLEAN BIPAppendPrimForce := BIPAppend_PrimForce;
 		EXPORT BOOLEAN BIPAppendReAppend := NOT BIPAppend_No_ReAppend;

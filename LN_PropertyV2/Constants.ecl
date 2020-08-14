@@ -1,4 +1,4 @@
-import Data_Services;
+﻿import Data_Services;
 export	Constants	:=
 module
 	// Autokey constants
@@ -36,12 +36,30 @@ module
 	END;
 	
 	export	maxRecsByOwnership	:=	100;
-	
+
 	// Lookup constants
 	export	Lookups	:=
 	module
 		export	Rights				:=	['CP','CT','EA','ES','EU','FM','IR','JS','JT','JV','LE','LV','RS','RT','TC','TE','TR','TS'];
 		export	Relationships	:=	['AK','CO','DB','EX','FK','GV','HH','HW','MI','MM','MW','PA','SM','SO','SW','TN','WD'];
 	end;
+	
+	export	ASSIGN_RELS	:=
+	MODULE	
+		export Assignments_Record_Type := 'Z';
+		export Releases_Record_Type := 'P';
+		export Assignments_HI_MN_Record_Type := 'M';
+		export Releases_HI_MN_Record_Type := 'Q';
+		
+	END;
+	
+	EXPORT setAssignRelsRecordTypes := [ASSIGN_RELS.Assignments_Record_Type, ASSIGN_RELS.Releases_Record_Type, ASSIGN_RELS.Assignments_HI_MN_Record_Type, ASSIGN_RELS.Releases_HI_MN_Record_Type];
+	
+	export	SOURCE_CD_PARTY_TP	:=
+	MODULE	
+		export Owner := 'O';
+		export Seller := 'S';
+		export Borrower := 'B';
+	END;
 	
 end;

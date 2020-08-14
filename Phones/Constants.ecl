@@ -140,6 +140,7 @@ MODULE
 		EXPORT PresumedActive 	:= 'PRESUMED ACTIVE';
 		EXPORT ActLowerTh		:= 180;
 		EXPORT ActUpperTh		:= 365;
+		EXPORT DeactInactiveThresholdYears:= 10;
 		EXPORT LastActivityThreshold:= 30;
 
 	END;

@@ -1,4 +1,4 @@
-﻿/*
+/*
   ***********************************************************************************************************
   * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
   * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
@@ -21,7 +21,7 @@ EXPORT RawGong := MODULE
   END;
 
   EXPORT GetData(DATASET (doxie.layout_references) in_dids,
-                DATASET (fcra.Layout_override_flag) flag_file,
+                DATASET (FFD.Layouts.flag_ext_rec) flag_file,
                 DATASET (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs,
                 $.IParams.IParam in_mod) :=
   FUNCTION
@@ -36,8 +36,9 @@ EXPORT RawGong := MODULE
         KEYED (LEFT.flag_file_id = RIGHT.flag_file_id),
         TRANSFORM(layout_Gong_rawrec,
           is_override := LEFT.flag_file_id <> '' AND LEFT.flag_file_id = RIGHT.flag_file_id;
-          SELF.compliance_flags.isOverride := is_override;
-          SELF.compliance_flags.isSuppressed := ~is_override;
+          rec_id_oldway := TRIM((STRING12)RIGHT.did + (STRING8)RIGHT.dt_first_seen + (STRING10)RIGHT.phone10);
+          SELF.compliance_flags.isOverride := LEFT.isOverride AND is_override;
+          SELF.compliance_flags.isSuppressed := LEFT.isSuppressed AND (RIGHT.persistent_record_id=0 OR LEFT.record_id=(STRING) RIGHT.persistent_record_id OR rec_id_oldway=LEFT.record_id);
           SELF.subject_did := (UNSIGNED6) LEFT.did;
           SELF.combined_record_id := LEFT.record_id;
           SELF.record_ids.RecId1 := (STRING) RIGHT.persistent_record_id;
@@ -47,7 +48,7 @@ EXPORT RawGong := MODULE
         LEFT OUTER, KEEP(FCRA.compliance.MAX_OVERRIDE_limit), LIMIT(0));
 
     override_recs := flag_recs(compliance_flags.isOverride);
-    suppressed_recs := flag_recs(compliance_flags.isSuppressed);
+    suppressed_recs := flag_recs(compliance_flags.isSuppressed AND ~compliance_flags.isOverride);
 
     override_ids := SET(override_recs, combined_record_id);
     suppressed_ids := SET(suppressed_recs, combined_record_id);

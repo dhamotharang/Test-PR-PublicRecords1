@@ -1,16 +1,15 @@
 ﻿IMPORT std;
 EXPORT AccLogs_Constants :=  module
 
-EXPORT	inquiry_is_ok_FCRA := '((trim(std.str.ToUpperCase(search_info.function_description)) IN PublicRecords_KEL.ECL_Functions.AccLogs_Constants.FCRA_Functions)	AND (trim(bus_intel.use) = PublicRecords_KEL.ECL_Functions.AccLogs_Constants.Check_Bus_Intel_Uses) AND (trim(search_info.product_code) IN PublicRecords_KEL.ECL_Functions.AccLogs_Constants.valid_product_codes_FCRA))';
-EXPORT	inquiry_is_ok_nonFCRA := '((trim(std.str.ToUpperCase(search_info.function_description)) IN PublicRecords_KEL.ECL_Functions.AccLogs_Constants.nonFCRA_Functions)	AND (trim(bus_intel.use) = PublicRecords_KEL.ECL_Functions.AccLogs_Constants.Check_Bus_Intel_Uses) AND (trim(search_info.product_code) IN PublicRecords_KEL.ECL_Functions.AccLogs_Constants.valid_product_codes_nonFCRA))';
+EXPORT	inquiry_is_ok_FCRA := '((trim(std.str.ToUpperCase(search_info.function_description)) IN PublicRecords_KEL.ECL_Functions.AccLogs_Constants.FCRA_Functions)	AND (trim(bus_intel.use) = PublicRecords_KEL.ECL_Functions.AccLogs_Constants.Check_Bus_Intel_Uses) AND (trim(search_info.product_code) IN PublicRecords_KEL.ECL_Functions.AccLogs_Constants.valid_product_codes))';
+EXPORT	inquiry_is_ok_nonFCRA := '((trim(std.str.ToUpperCase(search_info.function_description)) IN PublicRecords_KEL.ECL_Functions.AccLogs_Constants.nonFCRA_Functions)	AND (trim(bus_intel.use) = PublicRecords_KEL.ECL_Functions.AccLogs_Constants.Check_Bus_Intel_Uses) AND (trim(search_info.product_code) IN PublicRecords_KEL.ECL_Functions.AccLogs_Constants.valid_product_codes))';
 
 //old product codes consumer and busienss
 // EXPORT valid_product_codes := ['1', '2', '7'];  // 1 = ACCURINT, 2=RISKWISE, 7=IDM
 // EXPORT valid_business_shell_product_codes := ['1', '2']; // 1 = ACCURINT, 2 = RISKWISE
 
 //combined for FCRA & nonFCRA
-EXPORT valid_product_codes_FCRA := ['1', '2'];  // 1 = ACCURINT, 2=RISKWISE, 7=IDM
-EXPORT valid_product_codes_nonFCRA := ['1', '2', '7']; // 1 = ACCURINT, 2 = RISKWISE
+EXPORT valid_product_codes := ['1', '2', '7']; // 1 = ACCURINT, 2 = RISKWISE
 
 EXPORT Check_Bus_Intel_Uses := '';
 

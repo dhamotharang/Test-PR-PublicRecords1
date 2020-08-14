@@ -12,14 +12,14 @@ EXPORT Person_Quick_Header_LexID(DATASET(PublicRecords_KEL.ECL_Functions.Layouts
 
 Quick_Header_data := 
 		JOIN(shell, Header_Quick__Key_Did,
-				PublicRecords_KEL.ECL_Functions.Common(Options).DoFDCJoin_Header_Quick__Key_Did = TRUE AND
+				PublicRecords_KEL.ECL_Functions.Common(Options).DoFDCJoin_Doxie__Key_Header = TRUE AND //we would never run QH without running header
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = (UNSIGNED)RIGHT.did),
-				TRANSFORM(Layouts_FDC.Layout_Header_Quick__Key_Did,
+				TRANSFORM(Layouts_FDC.Layout_Header_Quick__Key_Did,//for corrections we need to start out with the same layout as header.
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.P_LexID := LEFT.P_LexID,
-					SELF.DPMBitmap := SetDPMBitmap( Source := PublicRecords_KEL.ECL_Functions.Constants.SetQuickHeaderSource(RIGHT.src), FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := PublicRecords_KEL.ECL_Functions.Constants.PreGLBRegulatedRecord(RIGHT.Src, RIGHT.dt_nonglb_last_seen, RIGHT.dt_first_seen), DPPA_Restricted := NotRegulated, DPPA_State := PublicRecords_KEL.ECL_Functions.Constants.GetDPPAState(PublicRecords_KEL.ECL_Functions.Constants.SetQuickHeaderSource(RIGHT.src)), KELPermissions := CFG_File, Is_Consumer_Header := TRUE),
+					SELF.HeaderRec := FALSE,
 					SELF := RIGHT,
 					SELF := LEFT,
 					SELF := []), 

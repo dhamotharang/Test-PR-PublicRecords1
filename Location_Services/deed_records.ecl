@@ -1,7 +1,7 @@
-import doxie_ln, doxie_raw, LN_PropertyV2, LN_PropertyV2_Services;
+﻿import Location_Services, doxie_ln, doxie_raw, LN_PropertyV2, LN_PropertyV2_Services;
 
 export deed_records(DATASET(Doxie_Raw.Layout_address_input) addrs, 
-                    DATASET(layout_fid) bfids) := FUNCTION
+                    DATASET(Location_Services.layout_fid) bfids) := FUNCTION
 
 k		:= LN_PropertyV2.key_deed_fid();
 kf	:= LN_PropertyV2.key_addl_fares_deed_fid;
@@ -48,7 +48,8 @@ rec take_right2(layout_fid l, k r) := transform
 addrFids := Location_Services.property_ids(addrs);
 fids := dedup(sort(addrFids + bfids, fid),fid);
 
-d := JOIN(fids(fid[2]<>'A'),k,left.fid=right.ln_fares_id,
+d := JOIN(fids(fid[2]<>'A'),k,left.fid=right.ln_fares_id
+											AND right.record_type NOT IN LN_PropertyV2.Constants.setAssignRelsRecordTypes, //Assignments and Releases codes excluded
           take_right2(left, right), limit(0), keep(1));
 
 rec addlFares(rec L, kf R) := transform

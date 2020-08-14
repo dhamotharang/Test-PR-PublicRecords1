@@ -21,9 +21,12 @@ FUNCTION
   dIdentitiesInfo := $.GetIdentitiesFinal(dSearchResultsWCnt, dInBestInfo, inMod);
 
   // Primary phone
+  //TOPN here to pick the best (Qsent gateway with metadata(PVSD)/InHouse) record associated with primary identity.
+  dPrimaryPhonePII := TOPN(GROUP(SORT(dSearchResultsWCnt(isPrimaryPhone), acctno, phone_source <> $.Constants.PhoneSource.QSentGateway, ~isPrimaryIdentity, phone_source), acctno),
+                           1,acctno, phone_source <> $.Constants.PhoneSource.QSentGateway, ~isPrimaryIdentity, phone_source);
+
   dSearchResultsPrimaryPhone := IF(~inMod.IsPrimarySearchPII,
-                                    dSearchResultsWCnt,
-                                    dSearchResultsWCnt(isPrimaryPhone AND phone_source in [$.Constants.PhoneSource.Waterfall, $.Constants.PhoneSource.QSentGateway]));
+                                    dSearchResultsWCnt, UNGROUP(dPrimaryPhonePII));
 
   dPrimaryPhoneInfo := $.GetPhonesFinal(dSearchResultsPrimaryPhone, inMod, TRUE);
 
@@ -190,3 +193,4 @@ FUNCTION
 
   RETURN dFinal;
 END;
+

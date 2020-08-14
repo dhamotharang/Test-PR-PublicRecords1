@@ -108,7 +108,7 @@ export Guts := MODULE
 	 
     parentSection := IF(section_parent, TopBusiness_Services.ParentSection.fn_fullView(
 				project(ds_input_data, transform(TopBusiness_Services.ParentSection_Layouts.rec_Input, self := left)),
-				project(dataset(in_options),TopBusiness_Services.ParentSection_Layouts.rec_OptionsLayout)[1],
+				project(dataset(in_options),TopBusiness_Services.layouts.rec_input_options)[1],
 				in_mod,
 				ds_busHeaderRecs
 				)
@@ -201,7 +201,7 @@ export Guts := MODULE
 				
 				AircraftSection := if (section_aircraft,  TopBusiness_Services.AircraftSection.fn_fullView(
 					project(ds_input_data, transform(TopBusiness_Services.aircraftSection_Layouts.rec_Input, self := left)),
-					project(dataset(in_options),TopBusiness_Services.AircraftSection_Layouts.rec_OptionsLayout)[1],
+					project(dataset(in_options),TopBusiness_Services.layouts.rec_input_options)[1],
 					in_mod)
 				);
 				

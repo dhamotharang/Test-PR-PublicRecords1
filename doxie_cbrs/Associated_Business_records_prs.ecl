@@ -7,7 +7,7 @@ EXPORT Associated_Business_records_prs(DATASET(doxie_cbrs.layout_references) bdi
                                       ) := FUNCTION
 
 sgb := doxie_cbrs.best_records_prs(bdids,mod_access)(Include_AssociatedBusinesses_val,
-			 prim_range <> '' or prim_name <> '');
+       prim_range <> '' OR prim_name <> '');
 
 
 RETURN SORT(sgb(level > 0), level, company_name);

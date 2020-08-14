@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.3.0beta5
+//HPCC Systems KEL Compiler Version 1.3.0
 IMPORT KEL13 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -20,7 +20,7 @@ EXPORT E_Name_Summary(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
     KEL.typ.epoch Vault_Date_First_Seen_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    DATA100 __Permits;
+    DATA57 __Permits;
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
@@ -40,7 +40,10 @@ EXPORT E_Name_Summary(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
   SHARED __SortedTable := SORT(__Table,KeyVal);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
   EXPORT Lookup := NullLookupRec + PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
-  SHARED __Mapping0 := 'UID(DEFAULT:UID),fname(OVERRIDE:First_Name_:\'\'),lname(OVERRIDE:Last_Name_:\'\'),dob(OVERRIDE:Date_Of_Birth_:DATE),record_count(OVERRIDE:Record_Count_:0),src(OVERRIDE:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH),datevendorfirstreported(DEFAULT:Date_Vendor_First_Reported_:EPOCH),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatefirstseen(DEFAULT:Vault_Date_First_Seen_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED Date_Of_Birth_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
+  SHARED Date_First_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
+  SHARED Date_Last_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..8]))=>a[1..8],KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
+  SHARED __Mapping0 := 'UID(DEFAULT:UID),fname(OVERRIDE:First_Name_:\'\'),lname(OVERRIDE:Last_Name_:\'\'),dob(OVERRIDE:Date_Of_Birth_:DATE:Date_Of_Birth_0Rule),record_count(OVERRIDE:Record_Count_:0),src(OVERRIDE:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),dt_first_seen(OVERRIDE:Date_First_Seen_:EPOCH:Date_First_Seen_0Rule),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_0Rule),datevendorfirstreported(DEFAULT:Date_Vendor_First_Reported_:EPOCH),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatefirstseen(DEFAULT:Vault_Date_First_Seen_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_RiskTable__Key_Name_Dob_Summary,TRANSFORM(RECORDOF(__in.Dataset_RiskTable__Key_Name_Dob_Summary),SELF:=RIGHT));
   SHARED __d0_Out := RECORD
     RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_RiskTable__Key_Name_Dob_Summary);

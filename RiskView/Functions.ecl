@@ -15,19 +15,20 @@ GetRequestInfo := Gateway.Soapcall_DTEGetRequestInfo(RecsToDTE, GetRequestInfoGW
 LiensAppendSuppressFlag := JOIN(GetRequestInfo, clam[1].LnJ_datasets.lnjliens, 
 LEFT.RMSID = RIGHT.RMSID AND LEFT.TMSID = RIGHT.TMSID, 
 TRANSFORM(RECORDOF(RIGHT), 
-SELF.SuppressRecord := IF(LEFT.TaskStatus <> '0', TRUE, FALSE);
+SELF.SuppressRecord := IF(LEFT.TaskStatus <> '0' OR LEFT.ErrorMessage <> '', TRUE, FALSE);
 SELF := RIGHT;
 ));
 
 JudgmentsAppendSuppressFlag := JOIN(GetRequestInfo, clam[1].LnJ_datasets.lnjjudgments, 
 LEFT.RMSID = RIGHT.RMSID AND LEFT.TMSID = RIGHT.TMSID, 
-TRANSFORM(RECORDOF(RIGHT), 
-SELF.SuppressRecord := IF(LEFT.TaskStatus <> '0', TRUE, FALSE);
+TRANSFORM(RECORDOF(RIGHT),
+SELF.SuppressRecord := IF(LEFT.TaskStatus <> '0' OR LEFT.ErrorMessage <> '', TRUE, FALSE);
 SELF := RIGHT;
 ));
 
 riskview5_suppressed := PROJECT(riskview5_final_results, 
-TRANSFORM(RECORDOF(LEFT), 
+TRANSFORM(RECORDOF(LEFT),
+SELF.Exception_Code := '41';
 SELF.LnJLiens := LiensAppendSuppressFlag(SuppressRecord = FALSE);
 SELF.LnJJudgments := JudgmentsAppendSuppressFlag(SuppressRecord = FALSE);
 SELF := LEFT;));
@@ -37,12 +38,20 @@ END; // JuLiProcessDTE END
 
 EXPORT JuLiProcessStatusRefresh(grouped dataset(risk_indicators.Layout_Boca_Shell) clam, dataset(Gateway.Layouts.Config) gateways, dataset(riskview.layouts.layout_riskview5_search_results) riskview5_final_results, boolean ExcludeStatusRefresh, string10 StatusRefreshWaitPeriod, string10 ESPInterfaceVersion, boolean IsBatch, dataset(RiskView.Layouts.layout_riskview_input) riskview_in, BOOLEAN InvokeStatusRefresh = FALSE) := FUNCTION
 
-LNJRow := PROJECT(UNGROUP(clam), 
-TRANSFORM(Risk_Indicators.Layouts_Derog_Info.LJ_DataSets, 
-SELF.lnjliens := LEFT.LnJ_datasets.lnjliens;
-SELF.lnjjudgments := LEFT.LnJ_datasets.lnjjudgments;));
+{Risk_Indicators.Layouts_Derog_Info.LJ_DataSets, STRING UID} LNJAppendUID(risk_indicators.Layout_Boca_Shell L, INTEGER c) := TRANSFORM
+UID := 'LNJ' + (STRING)c + '|';
+SELF.UID := UID;
+lnjliens := PROJECT(L.LnJ_datasets.lnjliens, TRANSFORM(Risk_Indicators.Layouts_Derog_Info.Liens, SELF.UID := UID; SELF := LEFT));
+SELF.lnjliens := lnjliens;
+lnjjudgments := PROJECT(L.LnJ_datasets.lnjjudgments, TRANSFORM(Risk_Indicators.Layouts_Derog_Info.Judgments, SELF.UID := UID; SELF := LEFT));
+SELF.lnjjudgments := lnjjudgments;
+END;
 
-StatusRefreshModule := RiskView.InitiateStatusRefresh(LNJRow, gateways, 5, 0, true, StatusRefreshWaitPeriod, InvokeStatusRefresh);
+LNJRow := PROJECT(UNGROUP(clam), LNJAppendUID(LEFT,COUNTER));
+
+DoRefresh := InvokeStatusRefresh AND ExcludeStatusRefresh = FALSE;
+
+StatusRefreshModule := RiskView.InitiateStatusRefresh(LNJRow, gateways, 5, 0, true, StatusRefreshWaitPeriod, DoRefresh);
 StatusRefreshResults := StatusRefreshModule.StatusRefresh;
 StatusRefreshRecommendGWError := StatusRefreshModule.RefreshRecommendedGatewayError;
 StatusRefreshGWError := StatusRefreshModule.RefreshGatewayError;
@@ -51,7 +60,7 @@ Suppressed_Judgments :=  StatusRefreshModule.SuppressRecordsJudgments();
 
 riskview5_status_refresh_error := IF(StatusRefreshRecommendGWError OR StatusRefreshGWError, 
 PROJECT(riskview5_final_results, TRANSFORM(RECORDOF(LEFT),
-SELF.Exception_Code := '22OKC';
+SELF.Exception_Code := '22';
 SELF := LEFT;
 )));
 
@@ -107,8 +116,16 @@ SELF.TMSID := LEFT.TMSID;
 SELF := RIGHT;)
 );
 
-GetAccountNumbers := JOIN(JoinStatusRefreshWithLNJ, riskview_in, 
-LEFT.LexID = (INTEGER)RIGHT.LexID,
+{RECORDOF(riskview_in), STRING UID} InputAppendUID(Riskview_In L, INTEGER c) := TRANSFORM
+UID := 'LNJ' + (STRING)c;
+SELF.UID := UID;
+SELF := L;
+END;
+
+riskview_in_w_UID := PROJECT(Riskview_In, InputAppendUID(LEFT,COUNTER));
+
+GetAccountNumbers := JOIN(JoinStatusRefreshWithLNJ, riskview_in_w_UID, 
+REGEXFIND('^[^|]+', LEFT.Response._Header.QueryID, 0) = RIGHT.UID,
 TRANSFORM({RECORDOF(LEFT), STRING AcctNo},
 SELF.AcctNo := RIGHT.AcctNo;
 SELF := LEFT;));

@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.3.0beta5
+//HPCC Systems KEL Compiler Version 1.3.0
 IMPORT KEL13 AS KEL;
 IMPORT CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Ult,E_Input_B_I_I,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL13.Null;
 EXPORT B_Input_B_I_I_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Input_B_I_I(__in,__cfg).__Result) __E_Input_B_I_I := E_Input_B_I_I(__in,__cfg).__Result;
-  SHARED __EE246863 := __E_Input_B_I_I;
-  EXPORT __ST199156_Layout := RECORD
+  SHARED __EE255427 := __E_Input_B_I_I;
+  EXPORT __ST208117_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.nint G___Proc_Bus_U_I_D_;
@@ -82,11 +82,11 @@ EXPORT B_Input_B_I_I_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST199156_Layout __ND3500618__Project(E_Input_B_I_I(__in,__cfg).Layout __PP246522) := TRANSFORM
-    __CC11043 := '-99999';
-    __CC11048 := '-99998';
-    SELF.Bus_Input_Name_Clean_Value_ := FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP246522.B___Inp_Name_),__ECAST(KEL.typ.nstr,__CN(__CC11043)),__ECAST(KEL.typ.nstr,__PP246522.B___Inp_Cln_Name_),__ECAST(KEL.typ.nstr,__CN(__CC11048)));
-    SELF := __PP246522;
+  SHARED __ST208117_Layout __ND3493962__Project(E_Input_B_I_I(__in,__cfg).Layout __PP255086) := TRANSFORM
+    __CC10495 := '-99999';
+    __CC10500 := '-99998';
+    SELF.Bus_Input_Name_Clean_Value_ := FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP255086.B___Inp_Name_),__ECAST(KEL.typ.nstr,__CN(__CC10495)),__ECAST(KEL.typ.nstr,__PP255086.B___Inp_Cln_Name_),__ECAST(KEL.typ.nstr,__CN(__CC10500)));
+    SELF := __PP255086;
   END;
-  EXPORT __ENH_Input_B_I_I_10 := PROJECT(__EE246863,__ND3500618__Project(LEFT));
+  EXPORT __ENH_Input_B_I_I_10 := PROJECT(__EE255427,__ND3493962__Project(LEFT));
 END;

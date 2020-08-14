@@ -1,13 +1,17 @@
-﻿IMPORT BIPV2, BankruptcyV3, DeathV2_Services, doxie, LiensV2, TopBusiness_Services,
-       iesp, LN_PropertyV2, MDR, Property, Suppress, UCCV2, UCCV2_Services, VehicleV2, Watercraft;
+﻿IMPORT BIPV2, BankruptcyV3, DeathV2_Services, doxie, LiensV2,TopBusiness_Services, iesp, LN_PropertyV2, MDR, 
+       Property, Suppress, UCCV2, UCCV2_Services, VehicleV2, Watercraft, Foreclosure_Services;
+
 
 EXPORT AssociateSection := MODULE;
 
  // *********** Main function to return BIPV2 format business report results
- export fn_FullView(dataset(TopBusiness_Services.Layouts.rec_input_ids) ds_in_ids_wacctno
-                    ,TopBusiness_Services.Layouts.rec_input_options in_options
-                    ,doxie.IDataAccess mod_access
-                   ):= function
+
+ export fn_FullView(
+   dataset(TopBusiness_Services.Layouts.rec_input_ids) ds_in_ids_wacctno
+	 ,TopBusiness_Services.Layouts.rec_input_options in_options
+	 ,doxie.IDataAccess mod_access
+                   ):= function 
+  
 
 
 	 FETCH_LEVEL := in_options.BusinessReportFetchLevel;
@@ -30,7 +34,7 @@ EXPORT AssociateSection := MODULE;
 
   // Project onto a slimmed layout.
   ds_bankr_linkids_keyrecs_slimmed := project(ds_bankr_linkids_keyrecs,
-                                        transform(AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed,
+                                        transform(TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed,
                                           self.source      := MDR.sourceTools.src_Bankruptcy,
                                           self.role_source := Constants.ASSOCIATE_ROLE_BANKR;
                                           self             := left, // to preserve ids & other key fields being kept
@@ -48,8 +52,8 @@ EXPORT AssociateSection := MODULE;
   //temp layout for needed linkids key fields plus party key fields
   rec_bankr_linkids_party_combo := record
     BIPV2.IDlayouts.l_header_ids;
-	   AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.source;
-	   AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.role_source;
+	   TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed.source;
+	   TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed.role_source;
 		  recordof(BankruptcyV3.key_bankruptcyv3_search_full_bip()) - BIPV2.IDlayouts.l_header_ids;
 	   BIPV2.IDlayouts.l_header_ids associated_business_linkids;
 	 end;
@@ -119,7 +123,7 @@ EXPORT AssociateSection := MODULE;
 
   // Project bankruptcy party+linkids data onto temp business/person common child record layout
   ds_bankr_common_child := project(ds_bankr_linkids_keyrecs_plusparty_dd,
-		                           transform(AssociateSection_Layouts.rec_child_party,
+		                           transform(TopBusiness_Services.AssociateSection_layouts.rec_child_party,
                                self.company_name               := left.cname,
                                self.person_name.title          := left.title,
                                self.person_name.fname          := left.fname,
@@ -155,7 +159,7 @@ EXPORT AssociateSection := MODULE;
 
   // Project onto a slimmed layout.
   ds_liens_linkids_keyrecs_slimmed := project(ds_liens_linkids_keyrecs,
-                                        transform(AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed,
+                                        transform(TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed,
                                           self.source      := MDR.sourceTools.src_Liens_v2,
                                           self.role_source := Constants.ASSOCIATE_ROLE_JL,
                                           self             := left, // to preserve ids & other key fields being kept
@@ -175,8 +179,8 @@ EXPORT AssociateSection := MODULE;
   //temp layout for needed linkids key fields plus party key fields
   rec_liens_linkids_party_combo := record
 	   BIPV2.IDlayouts.l_header_ids;
-	   AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.source;
-	   AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.role_source;
+	   TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed.source;
+	   TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed.role_source;
 	   recordof(LiensV2.key_liens_party_ID) - BIPV2.IDlayouts.l_header_ids; //TODO: check if was meant to be "- BIPV2.IDlayouts.l_xlink_ids"
 	   BIPV2.IDlayouts.l_header_ids associated_business_linkids;
 	 end;
@@ -247,7 +251,7 @@ EXPORT AssociateSection := MODULE;
 
   // Project liens party+linkids data onto temp business/person common child record layout
   ds_liens_common_child := project(ds_liens_linkids_keyrecs_plusparty_dd,
-                                     transform(AssociateSection_Layouts.rec_child_party,
+                                     transform(TopBusiness_Services.AssociateSection_layouts.rec_child_party,
                                        self.company_name               := left.cname,
                                        self.person_name.title          := left.title;
                                        self.person_name.fname          := left.fname;
@@ -292,7 +296,7 @@ EXPORT AssociateSection := MODULE;
 	                                             orig_name_type = Constants.VEH_OWNER or
 																				                          orig_name_type = Constants.VEH_REGISTRANT or
 																				                          orig_name_type = Constants.VEH_LESSEE),
-		                                              transform(AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed,
+		                                              transform(TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed,
 				                                              self.source      := MDR.sourceTools.fVehicles(left.state_origin,left.source_code),
 				                                              self.role_source := Constants.ASSOCIATE_ROLE_MVR;
 			                                               self.date_vendor_last_reported := (string) left.date_vendor_last_reported;
@@ -313,8 +317,8 @@ EXPORT AssociateSection := MODULE;
   //temp layout for needed linkids key fields plus party key fields
   rec_mvr_linkids_party_combo := record
 	   BIPV2.IDlayouts.l_header_ids;
-	   AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.source;
-	   AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.role_source;
+	   TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed.source;
+	   TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed.role_source;
 	   recordof(VehicleV2.Key_Vehicle_Party_Key) - BIPV2.IDlayouts.l_header_ids;
 	   BIPV2.IDlayouts.l_header_ids associated_business_linkids;
 	 end;
@@ -387,7 +391,7 @@ EXPORT AssociateSection := MODULE;
 
   // Project vehicle party+linkids data onto temp business/person common child record layout
   ds_mvr_common_child := project(ds_mvr_linkids_keyrecs_plusparty_dd,
-		                                 transform(AssociateSection_Layouts.rec_child_party,
+		                                 transform(TopBusiness_Services.AssociateSection_layouts.rec_child_party,
                                      self.company_name               := left.append_clean_cname,
                                      self.person_name.title          := left.append_clean_name.title;
 	                                    self.person_name.fname          := left.append_clean_name.fname;
@@ -429,7 +433,7 @@ EXPORT AssociateSection := MODULE;
 
   // Project onto a slimmed layout.
   ds_ucc_linkids_keyrecs_slimmed := project(ds_ucc_linkids_keyrecs,
-		                                            transform(AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed,
+		                                            transform(TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed,
 				                                            self.source                    := MDR.sourceTools.src_UCCv2,
 				                                            self.role_source               := Constants.ASSOCIATE_ROLE_UCC;
                                                 self.date_vendor_last_reported := (string8)left.dt_vendor_last_reported,
@@ -451,15 +455,15 @@ EXPORT AssociateSection := MODULE;
   // Next fix the rmsid, if needed on D&B UCCs so we get the right party recs.
 	 // This is due to an idiosyncrasy in the UCC D&B data.
   ds_ucc_linkids_keyrecs_deduped2 := project(ds_ucc_linkids_keyrecs_deduped1,
-	                                              transform(AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed,
+	                                              transform(TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed,
 			                                              self.rmsid := UCCV2_Services.fn_remove_DNB_rmsid_seq(left.rmsid,left.tmsid);
 							                                          self       := left));
 
   //temp layout for needed linkids key fields plus party key fields
   rec_ucc_linkids_party_combo := record
 	   BIPV2.IDlayouts.l_header_ids;
-	   AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.source;
-	   AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.role_source;
+	   TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed.source;
+	   TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed.role_source;
 		  recordof(UCCV2.Key_rmsid_party()) - BIPV2.IDlayouts.l_header_ids;
 	   BIPV2.IDlayouts.l_header_ids associated_business_linkids;
 	 end;
@@ -530,7 +534,7 @@ EXPORT AssociateSection := MODULE;
 
   // Project ucc party+linkids data onto temp business/person common child record layout.
   ds_ucc_common_child := project(ds_ucc_linkids_keyrecs_plusparty_dd,
-		                                 transform(AssociateSection_Layouts.rec_child_party,
+		                                 transform(TopBusiness_Services.AssociateSection_layouts.rec_child_party,
                                      self.company_name               := left.company_name,
                                      self.person_name.title          := left.title;
 	                                    self.person_name.fname          := left.fname;
@@ -571,7 +575,7 @@ EXPORT AssociateSection := MODULE;
 
   // Project onto a slimmed layout.
   ds_wc_linkids_keyrecs_slimmed := project(ds_wc_linkids_keyrecs,
-		                                           transform(AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed,
+		                                           transform(TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed,
 				                                           self.source      := MDR.sourceTools.fWatercraft(left.source_code,left.state_origin),
 				                                           self.role_source := Constants.ASSOCIATE_ROLE_WC;
 			                                            self             := left, // to preserve ids & other key fields being kept
@@ -592,8 +596,8 @@ EXPORT AssociateSection := MODULE;
   //temp layout for needed linkids key fields plus party key fields
   rec_wc_linkids_party_combo := record
 	   BIPV2.IDlayouts.l_header_ids;
-	   AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.source;
-	   AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.role_source;
+	   TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed.source;
+	   TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed.role_source;
 	   recordof(Watercraft.key_watercraft_sid_linkids) - BIPV2.IDlayouts.l_header_ids;
 	   BIPV2.IDlayouts.l_header_ids associated_business_linkids;
 	 end;
@@ -667,7 +671,7 @@ EXPORT AssociateSection := MODULE;
 
   // Project watercraft party+linkids data onto temp business/person common child record layout
   ds_wc_common_child := project(ds_wc_linkids_keyrecs_plusparty_dd,
-		                                transform(AssociateSection_Layouts.rec_child_party,
+		                                transform(TopBusiness_Services.AssociateSection_layouts.rec_child_party,
                                     self.company_name               := left.company_name,
                                     self.person_name.title          := left.title;
 	                                   self.person_name.fname          := left.fname;
@@ -702,7 +706,7 @@ EXPORT AssociateSection := MODULE;
 
   // Project onto a slimmed layout
   ds_prop_linkids_keyrecs_slimmed := project(ds_prop_linkids_keyrecs,
-		                                             transform(AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed,
+		                                             transform(TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed,
 				                                             self.source      := MDR.sourceTools.fProperty(left.ln_fares_id),
 				                                             self.role_source := Constants.ASSOCIATE_ROLE_RP;
 			                                              self             := left, // to preserve ids & other key fields being kept
@@ -722,8 +726,8 @@ EXPORT AssociateSection := MODULE;
   //temp layout for needed linkids key fields plus party key fields
   rec_prop_linkids_party_combo := record
 	   BIPV2.IDlayouts.l_header_ids;
-	   AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.source;
-	   AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.role_source;
+	   TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed.source;
+	   TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed.role_source;
 		  recordof(LN_PropertyV2.key_search_fid()) - BIPV2.IDlayouts.l_header_ids;
 	   BIPV2.IDlayouts.l_header_ids associated_business_linkids;
 	 end;
@@ -794,7 +798,7 @@ EXPORT AssociateSection := MODULE;
 
   // Project property party+linkids data onto temp business/person common child record layout
   ds_prop_common_child := project(ds_prop_linkids_keyrecs_plusparty_dd,
-		                                  transform(AssociateSection_Layouts.rec_child_party,
+		                                  transform(TopBusiness_Services.AssociateSection_layouts.rec_child_party,
                                       self.company_name               := left.cname,
                                       self.person_name.title          := left.title;
 	                                     self.person_name.fname          := left.fname;
@@ -837,7 +841,7 @@ EXPORT AssociateSection := MODULE;
 
   // Project onto a common slimmed layout
   ds_fc_linkids_keyrecs_slimmed := project(ds_fc_linkids_keyrecs,
-		                                           transform(AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed,
+		                                           transform(TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed,
 				                                           self.source             := MDR.sourceTools.src_Foreclosures, //???
 	                                              //self.source_docid     := left.foreclosure_id; //???
 	                                              //self.source_recid     := left.source_rec_id; //???
@@ -861,11 +865,11 @@ EXPORT AssociateSection := MODULE;
 																			                    foreclosure_id);
 
   // First just get all foreclosure fid plus linkids key recs for each set of linkids.
-  // Is a new AssociateSection_layouts record needed for fc linkids key fields plus party(fid) key fields???
+  // Is a new TopBusiness_Services.AssociateSection_layouts record needed for fc linkids key fields plus party(fid) key fields???
   rec_fc_linkids_party_combo := record
 	   BIPV2.IDlayouts.l_header_ids;
-	   AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.role_source;
-		  AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.forec_name_Company;
+	   TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed.role_source;
+		  TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed.forec_name_Company;
 		  recordof(Property.Key_Foreclosures_FID_Linkids()) - [name1,name2, name3, name4];
 	   BIPV2.IDlayouts.l_header_ids associated_business_linkids1;
 		  BIPV2.IDlayouts.l_header_ids associated_business_linkids2;
@@ -874,54 +878,59 @@ EXPORT AssociateSection := MODULE;
 	 end;
 
   // Next join the deduped foreclosure linkids keyrecs to the foreclosure fid(party?) plus linkids key to get
-	 // all of the foreclosure "party" data for the foreclosure_ids involved to output on the report.
-  ds_fc_linkids_keyrecs_plusparty := join(ds_fc_linkids_keyrecs_deduped,
-	                                         Property.Key_Foreclosures_FID_Linkids,
-                                          keyed(left.foreclosure_id = right.fid) AND RIGHT.source=MDR.sourceTools.src_Foreclosures,
-																	                         // vers1, just get all recs because they will have to be normalized first due to multiple names???
-														                            // vers1b can't do here???
-																	                         // v--- only get the "parties" not on the linkids key,
-														                            //   i.e. the parties other than the company the report
-																	                         // is being run on.
-														                            //and (left.forec_name_company != right.name1_company
-                                          //     and
-                                          //     left.forec_name_company != right.name2_company
-                                          //and
-                                          //     ... thru 4th
-                                          // and plaintiff_1 and plaintiff_2??? (NO? contains either a company name or unparsed person name(s)???)
-																		                        //	 )
-																	                         // v--- vers 2, once new party+linkids key is created ???
-																	                         // still can't do here???
-																	                         //and left.seleid != right.name1.seleid //???
-														                            //and left.seleid != right.name*.seleid //and 3 or 5 others need added to key???
-                                          // ...
-														                            // and that have either a person last name or company name ???
-														                            //and (right.lname !='' or
-														                            //     right.cname !='')
-	                                           transform(rec_fc_linkids_party_combo,
-													                                 // assign reported on ids from left first because
-														                                // right/key has fields with the same name.
-														                                // v--- revise to use some kind on macro like BIPV2.IDmacros.mac_ListTop3Linkids()???
-														                                self.ultid                        := left.ultid,
-        													                         self.orgid                        := left.orgid,
-														                                self.seleid                       := left.seleid,
-														                                self.proxid                       := left.proxid, //???
-														                                self.powid                        := left.powid,  //???
-														                                self.empid                        := left.empid,  //???
-														                                self.dotid                        := left.dotid,  //???
-												                                  // associate ids from right/key
-														                                self.associated_business_linkids1 := right.name1, //???
-																	                             // v--- vers2
-														                                self.associated_business_linkids2 := right.name2, //???
-														                                self.associated_business_linkids3 := right.name3, //???
-														                                self.associated_business_linkids4 := right.name4, //???
-			                                           self                              := right,
-			                                           self                              := left, // to preserve input linkids & any other kept linkids key fields
-                                            ),
-		                                        inner, // only ones that match(?) OR left outer, //???
-                                          //keep(TopBusiness_Services.Constants.liens_max_party_recs)); //from bip1??? only keep 100 recs
-		                                        limit(10000,skip) //???
-																                     );
+	// all of the foreclosure "party" data for the foreclosure_ids involved to output on the report.
+  ds_fc_linkids_keyrecs_plusparty := 
+	                         join(ds_fc_linkids_keyrecs_deduped,
+	                              Property.Key_Foreclosures_FID_Linkids,
+                                   keyed(left.foreclosure_id = right.fid) //AND RIGHT.source=MDR.sourceTools.src_Foreclosures
+																																			AND right.source IN Foreclosure_Services.Functions.getCodes(in_options.IncludeVendorSourceB)
+																	 // vers1, just get all recs because they will have to be normalized first due to multiple names???
+
+														       // vers1b can't do here??? 
+																	 // v--- only get the "parties" not on the linkids key,
+														       //   i.e. the parties other than the company the report
+																	 //        is being run on.
+														       //and (left.forec_name_company != right.name1_company
+                                   //     and 
+                                   //     left.forec_name_company != right.name2_company
+                                   //     and
+                                   //     ... thru 4th
+                                   // and plaintiff_1 and plaintiff_2??? (NO? contains either a company name or unparsed person name(s)???)
+																		//	 )
+																	 // v--- vers 2, once new party+linkids key is created ???
+																	 // still can't do here???
+																	 //and left.seleid != right.name1.seleid //???
+														       //and left.seleid != right.name*.seleid //and 3 or 5 others need added to key???
+                                   // ...
+														       // and that have either a person last name or company name ???
+														       //and (right.lname !='' or 
+														       //     right.cname !='')
+																,
+	                              transform(rec_fc_linkids_party_combo,
+													         // assign reported on ids from left first because 
+														       // right/key has fields with the same name.
+														       // v--- revise to use some kind on macro like BIPV2.IDmacros.mac_ListTop3Linkids()???
+														       self.ultid  := left.ultid,  
+        													 self.orgid  := left.orgid, 
+														       self.seleid := left.seleid, 
+														       self.proxid := left.proxid, //???
+														       self.powid  := left.powid,  //???
+														       self.empid  := left.empid,  //???
+														       self.dotid  := left.dotid,  //???
+												           // associate ids from right/key
+														       self.associated_business_linkids1 := right.name1, //???
+																	 // v--- vers2
+														       self.associated_business_linkids2 := right.name2, //???
+														       self.associated_business_linkids3 := right.name3, //???
+														       self.associated_business_linkids4 := right.name4, //???
+																	 
+			                             self := right,
+			                             self := left, // to preserve input linkids & any other kept linkids key fields
+                                 ),
+		                             inner, // only ones that match(?) OR left outer, //???
+                                 //keep(TopBusiness_Services.Constants.liens_max_party_recs)); //from bip1??? only keep 100 recs
+		                             limit(10000,skip) //???
+																);
 
   // Then sort/dedup all fid (party) key recs by linkids & foreclosure_id since it appears that
 	 // some foreclosure_ids have partial duplicate recs/name data (except tax_year etc. are diff) ???
@@ -952,7 +961,7 @@ EXPORT AssociateSection := MODULE;
 	 // So the "situs1" address (the address of the property being foreclosed on) should go with
 	 // the "plaintiff*" fields and the "situs2" address (the mailing address, when present)
 	 // should go with the "*_defendant_*"/"name*" fields.
- 	AssociateSection_Layouts.rec_child_party tf_norm_fcnames(
+ 	TopBusiness_Services.AssociateSection_layouts.rec_child_party tf_norm_fcnames(
     recordof(ds_fc_linkids_keyrecs_pp_dd) L, integer C) := transform
 				  // parse/clean the trustee_mailing_address only if trustee_name != blank
 				  //trustee_exists := if(trustee_name !='',true,false);
@@ -1091,7 +1100,7 @@ EXPORT AssociateSection := MODULE;
 																				                    //app_ssn ???
                                       );
 
-  ds_fc_common_child := //dataset([], AssociateSection_Layouts.rec_child_party);  //vers1 for testing
+  ds_fc_common_child := //dataset([], TopBusiness_Services.AssociateSection_layouts.rec_child_party);  //vers1 for testing
 	                       ds_fc_common_child_normed_dd;
 
 
@@ -1103,7 +1112,7 @@ EXPORT AssociateSection := MODULE;
 
   // Project onto a common slimmed layout
   ds_nod_linkids_keyrecs_slimmed := project(ds_nod_linkids_keyrecs,
-		                                            transform(AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed,
+		                                            transform(TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed,
 				                                            self.source      := MDR.sourceTools.src_Foreclosures_Delinquent, //???
 	                                               //self.source_docid := left.foreclosure_id; //???
 	                                               //self.source_recid := left.source_rec_id; //???
@@ -1128,8 +1137,8 @@ EXPORT AssociateSection := MODULE;
   // First just get all NOD fid links recs for each set of linkids.
   rec_nod_linkids_party_combo := record
 	   BIPV2.IDlayouts.l_header_ids;
-	   AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.role_source;
-		  AssociateSection_Layouts.rec_ids_with_linkidsdata_slimmed.nod_name_Company;
+	   TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed.role_source;
+		  TopBusiness_Services.AssociateSection_layouts.rec_ids_with_linkidsdata_slimmed.nod_name_Company;
 		  recordof(Property.Key_NOD_FID_Linkids) - [name1, name2, name3, name4];
 	   BIPV2.IDlayouts.l_header_ids associated_business_linkids1;
 	   BIPV2.IDlayouts.l_header_ids associated_business_linkids2;
@@ -1138,53 +1147,59 @@ EXPORT AssociateSection := MODULE;
 	 end;
 
   // Next join the deduped NOD linkids keyrecs to the NOD fid(party?) plus linkids key to get
-	 // all of the NOD "party" data for the foreclosure_ids involved to output on the report.
-  ds_nod_linkids_keyrecs_plusparty := join(ds_nod_linkids_keyrecs_deduped,
-	                                          Property.Key_NOD_FID_Linkids,
-                                           keyed(left.foreclosure_id = right.fid) AND RIGHT.source=MDR.sourceTools.src_Foreclosures,
-																	                          // vers1, just get all recs because they will have to be normalized first due to multiple names???
-														                             // vers1b can't do here???
-																	                          // v--- only get the "parties" not on the linkids key,
-														                             //   i.e. the parties other than the company the report
-																	                          // is being run on.
-														                             //and (left.nod_name_company != right.name1_company
-                                           //and
-                                           //left.nod_name_company != right.name2_company
-                                           //and
-                                           //     ... thru 4th
-                                           // and plaintiff_1 and plaintiff_2??? (NO? contains either a company or unparsed person name(s)???)
-																		                         //	 )
-																	                          // v--- vers 2b, once fid+linkids key is revised ???
-																	                          // still can't do here???
-																	                          //and left.seleid != right.name1.seleid //???
-														                             //and left.seleid != right.name*.seleid //and 3 or 5 others need added to key???
-                                           // ...
-														                             // and that have either a person last name or company name ???
-														                             //and (right.lname !='' or
-														                             //     right.cname !='')
-	                                            transform(rec_nod_linkids_party_combo,
-													                                  // assign reported on ids from left first because
-														                                 // right/key has fields with the same name.
-														                                 // v--- revise to use some kind on macro like BIPV2.IDmacros.mac_ListTop3Linkids()???
-														                                 self.ultid                        := left.ultid,
-        													                          self.orgid                        := left.orgid,
-														                                 self.seleid                       := left.seleid,
-														                                 self.proxid                       := left.proxid, //???
-														                                 self.powid                        := left.powid,  //???
-														                                 self.empid                        := left.empid,  //???
-														                                 self.dotid                        := left.dotid,  //???
-												                                   // associate ids from right/key
-														                                 self.associated_business_linkids1 := right.name1, //vers1???
-														                                 self.associated_business_linkids2 := right.name2, //vers2???
-														                                 self.associated_business_linkids3 := right.name3, //vers2???
-														                                 self.associated_business_linkids4 := right.name4, //vers3???
-                                               self                              := right,
-			                                            self                              := left, // to preserve input linkids & any other kept linkids key fields
-                                             ),
-		                                         inner, // only ones that match(?) OR left outer, //???
-                                           //keep(TopBusiness_Services.Constants.liens_max_party_recs)); //from bip1??? only keep 100 recs
-		                                         limit(10000,skip) //???
-																                      );
+	// all of the NOD "party" data for the foreclosure_ids involved to output on the report.
+  ds_nod_linkids_keyrecs_plusparty := 
+	                         join(ds_nod_linkids_keyrecs_deduped,
+	                              Property.Key_NOD_FID_Linkids,
+                                   keyed(left.foreclosure_id = right.fid) //AND RIGHT.source=MDR.sourceTools.src_Foreclosures
+																								AND right.source IN Foreclosure_Services.Functions.getCodes(in_options.IncludeVendorSourceB)
+																	 // vers1, just get all recs because they will have to be normalized first due to multiple names???
+
+														       // vers1b can't do here??? 
+																	 // v--- only get the "parties" not on the linkids key,
+														       //   i.e. the parties other than the company the report
+																	 //        is being run on.
+														       //and (left.nod_name_company != right.name1_company
+                                   //     and 
+                                   //     left.nod_name_company != right.name2_company
+                                   //     and
+                                   //     ... thru 4th
+                                   // and plaintiff_1 and plaintiff_2??? (NO? contains either a company or unparsed person name(s)???)
+																		//	 )
+																	 // v--- vers 2b, once fid+linkids key is revised ???
+																	 // still can't do here???
+																	 //and left.seleid != right.name1.seleid //???
+														       //and left.seleid != right.name*.seleid //and 3 or 5 others need added to key???
+                                   // ...
+														       // and that have either a person last name or company name ???
+														       //and (right.lname !='' or 
+														       //     right.cname !='')
+																,
+	                              transform(rec_nod_linkids_party_combo,
+													         // assign reported on ids from left first because 
+														       // right/key has fields with the same name.
+														       // v--- revise to use some kind on macro like BIPV2.IDmacros.mac_ListTop3Linkids()???
+														       self.ultid  := left.ultid,  
+        													 self.orgid  := left.orgid, 
+														       self.seleid := left.seleid, 
+														       self.proxid := left.proxid, //???
+														       self.powid  := left.powid,  //???
+														       self.empid  := left.empid,  //???
+														       self.dotid  := left.dotid,  //???
+												           // associate ids from right/key
+														       self.associated_business_linkids1 := right.name1, //vers1???
+														       self.associated_business_linkids2 := right.name2, //vers2???
+														       self.associated_business_linkids3 := right.name3, //vers2???
+														       self.associated_business_linkids4 := right.name4, //vers3???
+
+			                             self := right,
+			                             self := left, // to preserve input linkids & any other kept linkids key fields
+                                 ),
+		                             inner, // only ones that match(?) OR left outer, //???
+                                 //keep(TopBusiness_Services.Constants.liens_max_party_recs)); //from bip1??? only keep 100 recs
+		                             limit(10000,skip) //???
+																);
+
 
   // Then sort/dedup all fid (party) key recs by linkids & foreclosure_id since it appears that
 	 // some foreclosure_ids have partial duplicate recs/name data (except some dates???, etc.
@@ -1215,7 +1230,7 @@ EXPORT AssociateSection := MODULE;
 	 // So the "situs1" address (the address of the property being foreclosed on) should go with
 	 // the "*_defendant/name*" fields and the "situs2" address (the mailing address, when present)
 	 // should go with the "plaintiff*" fields.
- 	AssociateSection_Layouts.rec_child_party tf_norm_nodnames(
+ 	TopBusiness_Services.AssociateSection_layouts.rec_child_party tf_norm_nodnames(
     recordof(ds_nod_linkids_keyrecs_pp_dd) L, integer C) := transform
       // trustee ????????????????????????????????????????????????????????????????????
 				  // v--- Also below normalize/use: title_company_name, attorney_name (bus & per unparsed?),
@@ -1367,14 +1382,14 @@ EXPORT AssociateSection := MODULE;
 	                        ds_liens_common_child +
                         
 	                        project(ds_mvr_common_child, 
-                           transform(AssociateSection_Layouts.rec_child_party,
+                           transform(TopBusiness_Services.AssociateSection_layouts.rec_child_party,
                              self.date_first_seen           := date_convertToString8(left.date_first_seen),
                              self.date_last_seen            := date_convertToString8(left.date_last_seen),
                              self.date_vendor_last_reported := date_convertToString8(left.date_vendor_last_reported),
                              self                           := left)) +
                         
                          project(ds_ucc_common_child, 
-                           transform(AssociateSection_Layouts.rec_child_party,
+                           transform(TopBusiness_Services.AssociateSection_layouts.rec_child_party,
                              self.date_first_seen           := date_convertToString8(left.date_first_seen),
                              self.date_last_seen            := date_convertToString8(left.date_last_seen),
                              self.date_vendor_last_reported := date_convertToString8(left.date_vendor_last_reported),
@@ -1383,7 +1398,7 @@ EXPORT AssociateSection := MODULE;
 	                        ds_wc_common_child    +
                          
                          project(ds_prop_common_child, 
-                           transform(AssociateSection_Layouts.rec_child_party,
+                           transform(TopBusiness_Services.AssociateSection_layouts.rec_child_party,
                              self.date_first_seen           := date_convertToString8(left.date_first_seen),
                              self.date_last_seen            := date_convertToString8(left.date_last_seen),
                              self.date_vendor_last_reported := date_convertToString8(left.date_vendor_last_reported),
@@ -1437,9 +1452,9 @@ EXPORT AssociateSection := MODULE;
   // Rollup record pairs for the same entity (person/did/ssn & company/linkids) into 1 rec
 	 // keeping all the role values separated by a ";" (or a ???) to signify to the gui to
 	 // separate with line break(?).
-  AssociateSection_Layouts.rec_child_party  tf_rollup_common_child(
-	   AssociateSection_Layouts.rec_child_party l,
-	   AssociateSection_Layouts.rec_child_party r) := transform
+  TopBusiness_Services.AssociateSection_layouts.rec_child_party  tf_rollup_common_child(
+	   TopBusiness_Services.AssociateSection_layouts.rec_child_party l,
+	   TopBusiness_Services.AssociateSection_layouts.rec_child_party r) := transform
       // fix date first/last seen to add dd=00 if missing???
 	  	  //string8 fix_ldfs := if(l.date_first_seen[7..8] != '  ', l.date_first_seen,...), ???
 			   //... ???
@@ -1561,7 +1576,7 @@ EXPORT AssociateSection := MODULE;
 																		                    ds_all_tabled,
 																                      BIPV2.IDmacros.mac_JoinTop3Linkids()
 																                      and left.associate_type = right.associate_type,
-																		                      transform(AssociateSection_Layouts.rec_child_party,
+																		                      transform(TopBusiness_Services.AssociateSection_layouts.rec_child_party,
 																		                        self.total_business := if(left.associate_type=Constants.BUSINESS,right.bp_count,0);
 																		                        self.total_person   := if(left.associate_type=Constants.PERSON,right.bp_count,0);
 																			                       self                := left
@@ -1605,7 +1620,7 @@ EXPORT AssociateSection := MODULE;
   ds_all_common_child_top100_per_decind := join(ds_all_common_child_top100_per,
 	                                               ds_dids_deceased,
 			                                             left.did = right.did,
-															                                   transform(AssociateSection_Layouts.rec_child_party,
+															                                   transform(TopBusiness_Services.AssociateSection_layouts.rec_child_party,
 															                                     self.is_deceased := ((unsigned6) right.did) != 0;
 															                                     self             := left),
 															                                left outer, // all recs from left even if no match to right
@@ -1620,7 +1635,7 @@ EXPORT AssociateSection := MODULE;
   ds_all_common_child_top100_per_derogb := join(ds_all_common_child_top100_per_masked,
 	                                               BankruptcyV3.key_bankruptcyv3_did(),
 	                                               keyed((unsigned6)left.did = right.did),
-																							                           transform(AssociateSection_Layouts.rec_child_party,
+																							                           transform(TopBusiness_Services.AssociateSection_layouts.rec_child_party,
 															                                     self.has_derog := right.did != 0;
 												                                        self           := left
                                                   ),
@@ -1629,7 +1644,7 @@ EXPORT AssociateSection := MODULE;
 	 ds_all_common_child_top100_per_derogl:= join(ds_all_common_child_top100_per_derogb,
 	                                              LiensV2.key_liens_DID,
 			                                            keyed((unsigned6)left.did = right.did),
-																							                          transform(AssociateSection_Layouts.rec_child_party,
+																							                          transform(TopBusiness_Services.AssociateSection_layouts.rec_child_party,
 															                                    self.has_derog := if(left.has_derog,left.has_derog,if(right.did != 0,true,false)),
 													                                      self           := left
                                                  ),
@@ -1638,7 +1653,7 @@ EXPORT AssociateSection := MODULE;
   ds_all_common_child_top100_per_derogf := join(ds_all_common_child_top100_per_derogl,
 	                                               Property.Key_Foreclosure_DID,
 			                                             keyed((unsigned6)left.did = right.did),
-																							                           transform(AssociateSection_Layouts.rec_child_party,
+																							                           transform(TopBusiness_Services.AssociateSection_layouts.rec_child_party,
 															                                     self.has_derog := if(left.has_derog,left.has_derog,if(right.did != 0,true,false)),
 													                                       self := left
                                                   ),
@@ -1647,7 +1662,7 @@ EXPORT AssociateSection := MODULE;
 	ds_all_common_child_top100_per_derogn:= join(ds_all_common_child_top100_per_derogf,
 	                                             Property.Key_NOD_DID,
 			                                           keyed((unsigned6)left.did = right.did),
-																							                         transform(AssociateSection_Layouts.rec_child_party,
+																							                         transform(TopBusiness_Services.AssociateSection_layouts.rec_child_party,
 															                                   self.has_derog := if(left.has_derog,left.has_derog,if(right.did != 0,true,false)),
 													                                     self           := left
                                                 ),
@@ -1664,14 +1679,14 @@ EXPORT AssociateSection := MODULE;
   ds_parent_empty_recs := project(dedup(sort(ds_all_common_child_top100_bp2,
 	                                         #expand(BIPV2.IDmacros.mac_ListTop3Linkids())),
 	                                       #expand(BIPV2.IDmacros.mac_ListTop3Linkids())),
-																	                         transform(AssociateSection_Layouts.rec_parent_section,
+																	                         transform(TopBusiness_Services.AssociateSection_layouts.rec_parent_section,
 																		                          self := left,
 																		                          self := []));
 
   // Denormalize to attach all child recs for a set of linkids to their parent rec.
-  AssociateSection_Layouts.rec_parent_section tf_denorm_children(
-		  AssociateSection_Layouts.rec_parent_section L,
-	     dataset(AssociateSection_Layouts.rec_child_party) R) := transform
+  TopBusiness_Services.AssociateSection_layouts.rec_parent_section tf_denorm_children(
+		  TopBusiness_Services.AssociateSection_layouts.rec_parent_section L,
+	     dataset(TopBusiness_Services.AssociateSection_layouts.rec_child_party) R) := transform
         // Determine total values
 		      self.total_business := max(R,total_business);
 		      self.total_person   := max(R,total_person);
@@ -1680,14 +1695,14 @@ EXPORT AssociateSection := MODULE;
 			     self.business_associates := choosen(project(sort(R(associate_type=Constants.BUSINESS), company_name
 																                       //also address fields and/or role_source???
 																	                     ),
-																	                     AssociateSection_Layouts.rec_child_Party),
+																	                     TopBusiness_Services.AssociateSection_layouts.rec_child_Party),
 				                                  iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_ASSOCIATE_RECORDS);
 			     self.person_associates   := choosen(project(sort(R(associate_type=Constants.PERSON),
 			                                   person_name.lname, person_name.fname,
 																                      person_name.mname, person_name.name_suffix
 																                      // also address fields and/or role_source???
 																	                     ),
-															                       AssociateSection_Layouts.rec_child_Party),
+															                       TopBusiness_Services.AssociateSection_layouts.rec_child_Party),
 				                                  iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_ASSOCIATE_RECORDS);
 			     self := L;
 	 end;
@@ -1704,7 +1719,7 @@ EXPORT AssociateSection := MODULE;
   //
   // The transform to handle the Business Associate child dataset
 	 iesp.TopBusinessReport.t_TopBusinessAssociateBusiness
-	   tf_child_business(AssociateSection_Layouts.rec_child_party l) := transform
+	   tf_child_business(TopBusiness_Services.AssociateSection_layouts.rec_child_party l) := transform
       self.CompanyName                 := l.company_name,
 		    self.BusinessIds                 := l.associated_business_linkids,
       self.Address.StreetName          := l.common_address.prim_name,
@@ -1729,7 +1744,7 @@ EXPORT AssociateSection := MODULE;
 
   // The transform to handle the Person Associate child dataset
 	 iesp.TopBusinessReport.t_TopBusinessAssociatePerson
-	   tf_child_person(AssociateSection_Layouts.rec_child_party l) := transform
+	   tf_child_person(TopBusiness_Services.AssociateSection_layouts.rec_child_party l) := transform
       self.Name.Full                   := '';
       self.Name.First                  := l.person_name.fname;
 	     self.Name.Middle                 := l.person_name.mname;
@@ -1763,9 +1778,9 @@ EXPORT AssociateSection := MODULE;
   end;
 
   // The transform to store data in the iesp Associate Section parent dataset fields
-  AssociateSection_Layouts.rec_ids_plus_AssociateSection tf_rollup_rptdetail(
-	   AssociateSection_Layouts.rec_parent_section l,
-	   dataset(AssociateSection_Layouts.rec_parent_section) allrows) := transform
+  TopBusiness_Services.AssociateSection_layouts.rec_ids_plus_AssociateSection tf_rollup_rptdetail(
+	   TopBusiness_Services.AssociateSection_layouts.rec_parent_section l,
+	   dataset(TopBusiness_Services.AssociateSection_layouts.rec_parent_section) allrows) := transform
       self.acctno              := '';  // just null out here; it will be assigned in a join below
       self.ReturnBusinessCount := count(allrows.business_associates);
 	     self.TotalBusinessCount  := l.total_business;
@@ -1795,7 +1810,7 @@ EXPORT AssociateSection := MODULE;
   // Attach input acctnos back to the linkids.
   ds_all_wacctno_joined := join(ds_in_ids_wacctno,ds_all_rptdetail_rolled,
 																	               BIPV2.IDmacros.mac_JoinTop3Linkids(),
-														                    transform(AssociateSection_Layouts.rec_ids_plus_AssociateSection,
+														                    transform(TopBusiness_Services.AssociateSection_layouts.rec_ids_plus_AssociateSection,
 														                      self.acctno   := left.acctno,
 															                     self          := right),
 														                      left outer); // 1 output rec for every left (in_data) rec
@@ -1803,7 +1818,7 @@ EXPORT AssociateSection := MODULE;
 	 // Roll up all recs for the acctno.
 	 ds_final_results := rollup(group(sort(ds_all_wacctno_joined,acctno),acctno),
 	                        group,
-		                         transform(AssociateSection_Layouts.rec_final,
+		                         transform(TopBusiness_Services.AssociateSection_layouts.rec_final,
 			                          self := left));
   // Uncomment for debugging
   // output(ds_in_ids_wacctno,                     named('ds_in_ids_wacctno'));

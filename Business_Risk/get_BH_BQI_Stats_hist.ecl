@@ -29,7 +29,8 @@ end;
 // append the zip, prim_name and prim_range from the bh_best file
 bdid_best_data := join(biid, business_header.key_bh_best,
 						left.bdid!=0 and
-						  keyed(left.bdid=right.bdid),
+						  keyed(left.bdid=right.bdid) AND 
+							doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 						  append_best(left, right),
 						  ATMOST(keyed(left.bdid=right.bdid), RiskWise.max_atmost), keep(1), left outer);
 

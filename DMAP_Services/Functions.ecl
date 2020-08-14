@@ -203,7 +203,7 @@ EXPORT Functions:= MODULE
 		END; 
 	
 		deed_Raw:= JOIN(fids, k_deed(FALSE),
-										KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id),
+										KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id) AND right.record_type NOT IN LN_PropertyV2.Constants.setAssignRelsRecordTypes,//Assignments and Releases codes excluded
 										x_deed(LEFT, RIGHT), LIMIT(max_deeds));
 		
 		sorted_deeds_raw:= SORT(deed_Raw, AddrSeq, -RecordingDate, -YearLotAcquired);

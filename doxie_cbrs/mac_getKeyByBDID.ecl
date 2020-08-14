@@ -1,10 +1,10 @@
-export mac_getKeyByBDID(k, kbdid_field, outlay, include_flag, bdids, outfile) := macro
+EXPORT mac_getKeyByBDID(k, kbdid_field, outlay, include_flag, bdids, outfile) := MACRO
 
 #uniquename(keepk)
-outlay %keepk%(k l) := transform
-	self := l;
-end;
+outlay %keepk%(k l) := TRANSFORM
+  SELF := l;
+END;
 
-outfile := join(bdids, k, include_flag and keyed(left.bdid = right.kbdid_field), %keepk%(right));
+outfile := JOIN(bdids, k, include_flag AND KEYED(LEFT.bdid = RIGHT.kbdid_field), %keepk%(RIGHT));
 
-endmacro;
+ENDMACRO;

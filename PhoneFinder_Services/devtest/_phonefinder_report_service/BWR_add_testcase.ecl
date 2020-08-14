@@ -28,7 +28,7 @@ END;
 dev_regression.layouts.testcase xt() := TRANSFORM
   SELF.query := my_query;
   SELF.short_description := 'a quick description should go here...';
-  SELF.request_xml := TOXML(ROW(wrapESDL()));
+  SELF.request_xml := dev_regression.utils.wrapTOXML(ROW(wrapESDL()));
 END;
 
 testcases := DATASET([xt()]);

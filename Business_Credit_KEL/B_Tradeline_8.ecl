@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 0.8.2
-IMPORT KEL08a AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
+IMPORT KEL12 AS KEL;
 IMPORT B_Tradeline_9,CFG_graph FROM Business_Credit_KEL;
-IMPORT * FROM KEL08a.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT B_Tradeline_8(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __cfg = CFG_graph) := MODULE
   SHARED VIRTUAL TYPEOF(B_Tradeline_9(__in,__cfg).__ENH_Tradeline_9) __ENH_Tradeline_9 := B_Tradeline_9(__in,__cfg).__ENH_Tradeline_9;
-  SHARED __EE156891 := __ENH_Tradeline_9;
-  EXPORT __ST156702_Layout := RECORD
+  SHARED __EE275719 := __ENH_Tradeline_9;
+  EXPORT __ST240134_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nkdate _load__date_;
     KEL.typ.nstr _sbfe__contributor__number_;
@@ -99,10 +99,10 @@ EXPORT B_Tradeline_8(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph
     KEL.typ.nbool Shows_Closed_Account_;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST156702_Layout __ND157383__Project(B_Tradeline_9(__in,__cfg).__ST147852_Layout __PP156894) := TRANSFORM
-    __CC787 := ['002','003','004','005','008','009','011','016','017','018','022'];
-    SELF.Is_Closed_ := __OR(__OR(__OR(__OR(__NOT(__NT(__PP156894._date__account__closed_)),__OP2(__PP156894._account__closure__basis_,<>,__CN(''))),__OP2(__PP156894._account__status__1_,IN,__CN(__CC787))),__OP2(__PP156894._account__status__2_,IN,__CN(__CC787))),__PP156894.Is_Chargeoff_);
-    SELF := __PP156894;
+  SHARED __ST240134_Layout __ND275823__Project(B_Tradeline_9(__in,__cfg).__ST240501_Layout __PP275239) := TRANSFORM
+    __CC767 := ['002','003','004','005','008','009','011','016','017','018','022'];
+    SELF.Is_Closed_ := __OR(__OR(__OR(__OR(__NOT(__NT(__PP275239._date__account__closed_)),__OP2(__PP275239._account__closure__basis_,<>,__CN(''))),__OP2(__PP275239._account__status__1_,IN,__CN(__CC767))),__OP2(__PP275239._account__status__2_,IN,__CN(__CC767))),__PP275239.Is_Chargeoff_);
+    SELF := __PP275239;
   END;
-  EXPORT __ENH_Tradeline_8 := PROJECT(__EE156891,__ND157383__Project(LEFT));
+  EXPORT __ENH_Tradeline_8 := PROJECT(__EE275719,__ND275823__Project(LEFT));
 END;

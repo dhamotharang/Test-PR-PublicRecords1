@@ -1,9 +1,8 @@
-IMPORT BatchServices, Business_Header, ut, address;
+IMPORT BatchServices, Business_Header, ut, address, doxie;
 
 EXPORT SicCode_BatchService_Records(
 	DATASET(BatchServices.SicCode_BatchService_Layouts.Input) in_data,
-	UNSIGNED1 dppa_purpose,
-	UNSIGNED1 glb_purpose,
+    Doxie.IDataAccess mod_access,
 	UNSIGNED1 max_results_per_acct) := FUNCTION
 	
 	Zip_Rec := RECORD
@@ -80,7 +79,8 @@ EXPORT SicCode_BatchService_Records(
 	END;
 	
 	WithBestData := JOIN(SortedByDistance,Business_Header.Key_BH_Best,
-		KEYED(LEFT.BDID = RIGHT.BDID),
+		KEYED(LEFT.BDID = RIGHT.BDID) AND
+        doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 		TRANSFORM(BestData_Rec,
 			SELF := RIGHT,
 			SELF := LEFT),

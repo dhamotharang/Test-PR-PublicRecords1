@@ -92,16 +92,9 @@ EXPORT ReportService := MACRO
 	end;
 	
 	formatdata := dataset([format()]);
-	//IsSufficientInput := MemberPoint.IsSufficientInput();
-
-	//g.	Convert batch result record to ESDL result record & do DOB/SSN Masking:
-	Results := MemberPoint.makeESDLOutput(BatchResults,report_by,input_ssn_mask_value,input_include_dob_value,input_dob_mask_value);
-	do_format_data:=output(formatdata,named('formatdata'));
-	DO_OUTPUT 		:= output(Results,named('Results'));
-	DO_ROYALTIES  := output(PROJECT(fullBatchOutput.Royalties, Royalty.Layouts.Royalty), named('RoyaltySet'));
-
- if(hasExceptions,do_format_data,
-		                   DO_OUTPUT);
-		                 DO_ROYALTIES;			 
+	esdloutput:= MemberPoint.makeESDLOutput(BatchResults,report_by,input_ssn_mask_value,input_include_dob_value,input_dob_mask_value);
+	Results:=if(hasExceptions,formatdata,esdloutput);
+	output(Results,named('Results'));
+	output(PROJECT(fullBatchOutput.Royalties, Royalty.Layouts.Royalty), named('RoyaltySet'));			 
 ENDMACRO;
 

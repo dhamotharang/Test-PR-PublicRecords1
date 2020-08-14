@@ -13,4 +13,4 @@ payload := RECORD
 END;
 
 EXPORT key_DID() := 
-         INDEX ({keyed_fields}, {payload}, $.names().i_did_FCRA, OPT);
+         INDEX ({keyed_fields}, {payload}, $.names().i_did_FCRA);

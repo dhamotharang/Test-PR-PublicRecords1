@@ -1,7 +1,7 @@
 ﻿IMPORT doxie,doxie_cbrs,ut;
 
 EXPORT best_records_prs(DATASET(doxie_cbrs.layout_references) bdids,
-                        doxie.IDataAccess mod_access) := FUNCTION 
+                        doxie.IDataAccess mod_access) := FUNCTION
 
 bes := doxie_cbrs.best_records_bdids(bdids);
 

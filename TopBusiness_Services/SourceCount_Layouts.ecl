@@ -1,4 +1,4 @@
-import iesp;
+﻿import iesp;
 
 export SourceCount_Layouts := module
 
@@ -33,6 +33,7 @@ export SourceCount_Layouts := module
 		string32  app_type;
 		string6 	ssn_mask;
 		string1		fetch_level;
+    boolean   IncludeVendorSourceB;
 	end;
 
 end;

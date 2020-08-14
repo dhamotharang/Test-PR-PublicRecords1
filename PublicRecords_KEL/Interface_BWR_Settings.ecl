@@ -4,7 +4,7 @@
 	EXPORT BOOLEAN isFCRA := FALSE;
 	EXPORT STRING ArchiveDate := '0';
 	EXPORT STRING InputFileName := '';
-	EXPORT STRING PermissiblePurpose := '';
+	EXPORT STRING IntendedPurpose := '';
 	EXPORT STRING Data_Restriction_Mask := '';
 	EXPORT STRING Data_Permission_Mask := '';
 	EXPORT UNSIGNED GLBAPurpose := 0;

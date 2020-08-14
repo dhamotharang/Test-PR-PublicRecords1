@@ -1,37 +1,39 @@
-import business_header,doxie;
-doxie.mac_header_field_Declare()
+IMPORT doxie, AutoStandardI;
+
+gm := AutoStandardI.GlobalModule();
+mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(gm);
 d := doxie_cbrs.dca_hierarchy_prs;
 i := doxie_cbrs.infousa_hierarchy_prs;
 
-inf := if(count(d) > count(i), d, i);
+inf := IF(COUNT(d) > COUNT(i), d, i);
 
-outrec := record
-	inf.level;
-	doxie_cbrs.Layout_BH_Best_String;
-end;
+outrec := RECORD
+  inf.level;
+  doxie_cbrs.Layout_BH_Best_String;
+END;
 
-besrec := record
-	inf.name;
-	outrec;
-end;
+besrec := RECORD
+  inf.name;
+  outrec;
+END;
 
 //get best info
-doxie_cbrs.mac_best_records(inf, bes, besrec, true)
-s := sort(bes, level);
+doxie_cbrs.mac_best_records(inf, bes, mod_access, besrec, TRUE)
+s := SORT(bes, level);
 
 //patch name
-outrec form(s l) := transform
-	self.company_name := if(l.company_name = '', l.name, l.company_name);
-	self.level := 0;	//blank out and reseed below
-	self := l;
-end;
+outrec form(s l) := TRANSFORM
+  SELF.company_name := IF(l.company_name = '', l.name, l.company_name);
+  SELF.level := 0; //blank out and reseed below
+  SELF := l;
+END;
 
-namepatch := project(s, form(left));
+namepatch := PROJECT(s, form(LEFT));
 
 //use a level indicator
-outrec iter(outrec l, outrec r) := transform
-	self.level := l.level + 1;
-	self := r;
-end;
+outrec iter(outrec l, outrec r) := TRANSFORM
+  SELF.level := l.level + 1;
+  SELF := r;
+END;
 
-export hierarchy_records := iterate(namepatch, iter(left, right));
+EXPORT hierarchy_records := ITERATE(namepatch, iter(LEFT, RIGHT));

@@ -35,7 +35,7 @@ EXPORT CommonQuery := MODULE
                                                                                 requestedProducts = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_AND_CITIZENSHIP AND validModel = FALSE => DueDiligence.ConstantsQuery.VALIDATION_INVALID_MODEL_NAME,
                                                                                 requestedProducts = DueDiligence.ConstantsQuery.VALID_PRODUCT_CITIZENSHIP_ONLY AND validModel = FALSE => DueDiligence.ConstantsQuery.VALIDATION_INVALID_MODEL_NAME,
                                                                                 requestedProducts = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_ONLY AND validIndVersion = FALSE AND validBusVersion = FALSE => DueDiligence.ConstantsQuery.VALIDATION_INVALID_DD_VERSION,
-                                                                                (requestedProducts = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_CUSTOM_ATTRIBUTES OR (requestedProducts = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_REPORT_DEFAULT AND reportRequested)) AND COUNT(input[1].requestedModules) = 0 => DueDiligence.ConstantsQuery.VALIDATION_NO_MODULES_REQUESTED,
+                                                                                (requestedProducts = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_MODULES OR (requestedProducts = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_REPORT_DEFAULT AND reportRequested)) AND COUNT(input[1].requestedModules) = 0 => DueDiligence.ConstantsQuery.VALIDATION_NO_MODULES_REQUESTED,
                                                                                 validGLB = FALSE => DueDiligence.ConstantsQuery.VALIDATION_INVALID_GLB,
                                                                                 validDPPA = FALSE => DueDiligence.ConstantsQuery.VALIDATION_INVALID_DPPA,
                                                                                 DueDiligence.Constants.EMPTY);
@@ -54,7 +54,7 @@ EXPORT CommonQuery := MODULE
                                                       updatedOhNoMessage := MAP(OhNoMessage = DueDiligence.ConstantsQuery.VALIDATION_INVALID_DD_VERSION => TRIM(OhNoMessage) + ': ' + validDDVersions, 
                                                                                 OhNoMessage = DueDiligence.ConstantsQuery.VALIDATION_INVALID_MODEL_NAME => TRIM(OhNoMessage) + ' Supported models include: CIT1808_0_0',
                                                                                 OhNoMessage = DueDiligence.ConstantsQuery.VALIDATION_NO_MODULES_REQUESTED => TRIM(OhNoMessage) + ' Supported modules are: ' + validModules,
-                                                                                OhNoMessage = DueDiligence.ConstantsQuery.VALIDATION_INVALID_PRODUCT_REQUEST_TYPE => TRIM(OhNoMessage) + IF(reportRequested, 'CustomAttributes or Standard(default to all attributes)', 'AttributesOnly, CitizenshipOnly, CustomAttributes, or AttributesAndCitizenship'),
+                                                                                OhNoMessage = DueDiligence.ConstantsQuery.VALIDATION_INVALID_PRODUCT_REQUEST_TYPE => TRIM(OhNoMessage) + IF(reportRequested, ' Modules or Standard (default to all attributes)', 'AttributesAndCitizenship, AttributesOnly, CitizenshipOnly, or Modules'),
                                                                                 OhNoMessage);
 
                                                       trimOhNo := TRIM(updatedOhNoMessage);
@@ -85,7 +85,7 @@ EXPORT CommonQuery := MODULE
         RETURN MAP(littleProduct = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_AND_CITIZENSHIP => DueDiligence.ConstantsQuery.PRODUCT_REQUESTED_ENUM.BOTH,
                     littleProduct = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_ONLY => DueDiligence.ConstantsQuery.PRODUCT_REQUESTED_ENUM.DUEDILIGENCE_ONLY,
                     littleProduct = DueDiligence.ConstantsQuery.VALID_PRODUCT_CITIZENSHIP_ONLY => DueDiligence.ConstantsQuery.PRODUCT_REQUESTED_ENUM.CITIZENSHIP_ONLY,
-                    littleProduct = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_CUSTOM_ATTRIBUTES => DueDiligence.ConstantsQuery.PRODUCT_REQUESTED_ENUM.CUSTOM_ATTRIBUTES,
+                    littleProduct = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_MODULES => DueDiligence.ConstantsQuery.PRODUCT_REQUESTED_ENUM.CUSTOM_ATTRIBUTES,
                     littleProduct = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_REPORT_DEFAULT => DueDiligence.ConstantsQuery.PRODUCT_REQUESTED_ENUM.DUEDILIGENCE_ONLY,
                     DueDiligence.ConstantsQuery.PRODUCT_REQUESTED_ENUM.EMPTY);
     END;
@@ -99,7 +99,7 @@ EXPORT CommonQuery := MODULE
                                           personRequest := MAP(TRIM(STD.Str.ToLowerCase(LEFT.productRequested)) = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_ONLY AND TRIM(STD.Str.ToUpperCase(LEFT.requestedVersion)) IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS => TRUE,
                                                                TRIM(STD.Str.ToLowerCase(LEFT.productRequested)) = DueDiligence.ConstantsQuery.VALID_PRODUCT_CITIZENSHIP_ONLY => TRUE,
                                                                TRIM(STD.Str.ToLowerCase(LEFT.productRequested)) = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_AND_CITIZENSHIP AND TRIM(STD.Str.ToUpperCase(LEFT.requestedVersion)) IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS => TRUE,
-                                                               TRIM(STD.Str.ToLowerCase(LEFT.productRequested)) = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_CUSTOM_ATTRIBUTES AND TRIM(STD.Str.ToUpperCase(LEFT.requestedVersion)) IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS => TRUE,
+                                                               TRIM(STD.Str.ToLowerCase(LEFT.productRequested)) = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_MODULES AND TRIM(STD.Str.ToUpperCase(LEFT.requestedVersion)) IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS => TRUE,
                                                                FALSE);
                                           
                                           
@@ -284,7 +284,7 @@ EXPORT CommonQuery := MODULE
     EXPORT GetPersonAttributes(DueDiligence.Layouts.Input input) := FUNCTION
     
         setMods := SET(input.requestedModules, STD.Str.ToUpperCase(TRIM(attributeModules)));
-        useMods := STD.Str.ToLowerCase(TRIM(input.productRequested)) = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_CUSTOM_ATTRIBUTES AND COUNT(setMods) > 0;
+        useMods := STD.Str.ToLowerCase(TRIM(input.productRequested)) = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_MODULES AND COUNT(setMods) > 0;
                    
         allAttributes := STD.Str.ToLowerCase(TRIM(input.productRequested)) IN [DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_ONLY, DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_AND_CITIZENSHIP];
                                 
@@ -320,7 +320,7 @@ EXPORT CommonQuery := MODULE
     EXPORT GetBusinessAttributes(DueDiligence.Layouts.Input input) := FUNCTION
     
         setMods := SET(input.requestedModules, STD.Str.ToUpperCase(TRIM(attributeModules)));
-        useMods := STD.Str.ToLowerCase(TRIM(input.productRequested)) = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_CUSTOM_ATTRIBUTES AND COUNT(setMods) > 0;
+        useMods := STD.Str.ToLowerCase(TRIM(input.productRequested)) = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_MODULES AND COUNT(setMods) > 0;
                    
         allAttributes := STD.Str.ToLowerCase(TRIM(input.productRequested)) = DueDiligence.ConstantsQuery.VALID_PRODUCT_DUE_DILIGENCE_ONLY;
                          

@@ -7,7 +7,7 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN isFCRA := FALSE;
 	EXPORT STRING8 ArchiveDate := '0';
 	EXPORT STRING250 InputFileName := '';
-	EXPORT STRING100 PermissiblePurpose := '';
+	EXPORT STRING100 IntendedPurpose := '';
 	EXPORT STRING100 Data_Restriction_Mask := '';
 	EXPORT STRING100 Data_Permission_Mask := '';
 	EXPORT UNSIGNED GLBAPurpose := 0;
@@ -18,8 +18,11 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN ExcludeConsumerAttributes := FALSE;
 	EXPORT BOOLEAN isMarketing := FALSE; // When TRUE enables Marketing Restrictions
 	EXPORT STRING IndustryClass := ''; // When set to UTILI or DRMKT this restricts Utility data
-	EXPORT DATA100 KEL_Permissions_Mask := x''; // Set by PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate()
+	EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+	EXPORT DATA57 KEL_Permissions_Mask := x''; // Set by PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate()
 	EXPORT BOOLEAN OutputMasterResults := FALSE;
+	EXPORT BOOLEAN IncludeMinors := TRUE;
+	EXPORT INTEGER upperage := 20;
 
 	EXPORT DATASET(Gateway.Layouts.Config) Gateways := DATASET([], Gateway.Layouts.Config);
 	
@@ -74,6 +77,7 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN IncludeWatercraft := FALSE;
 	EXPORT BOOLEAN IncludeZipCode := FALSE;
 	EXPORT BOOLEAN IncludeUCC := FALSE;
+	EXPORT BOOLEAN IncludeOverrides := FALSE;
 	EXPORT BOOLEAN IncludeMini := FALSE;
 	
 	// Performance options to turn ON/OFF ASSOCIATIONS in during FDC build. 
