@@ -140,7 +140,7 @@ EXPORT out_rec SourceCounts_records (dataset (doxie.layout_references) dids,
              {'Student Locator', src_row.student_cnt, did_ref_prefix + 'STUDENT', 'Retrievable'},
              {'STUDENT',            0,         did_ref_prefix + 'STUDENT', 'Section'}], iesp.share.t_SourceSection)) +
          if (header_include and (src_row.ak_cnt > 0),             dataset ([
-             {'Alaska Permenant Fund', src_row.ak_cnt, did_ref_prefix + 'AK', 'Retrievable'},
+             {'Alaska Permanent Fund', src_row.ak_cnt, did_ref_prefix + 'AK', 'Retrievable'},
              {'AK',                     0,              did_ref_prefix + 'AK', 'Section'}], iesp.share.t_SourceSection)) +
          if (header_include and (src_row.mswork_cnt > 0), dataset ([
              {'Mississippi Worker\'s Compensation', src_row.mswork_cnt, did_ref_prefix + 'MSWORK', 'Retrievable'},

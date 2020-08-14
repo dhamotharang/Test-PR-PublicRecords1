@@ -2,26 +2,24 @@ IMPORT gateway;
 
 /*
   ** A generic functionmacro to soapcall a target roxie query.
-  ** 
-  ** @param service_url       a dataset of testcases; REQUIRED. 
-  ** @param query_name        the name of the target query; REQUIRED.
-  ** @param in_recs           the target cluster url; REQUIRED, see Gateway._shortcuts for reference.
+  **
+  ** @param service_url       target cluster url; REQUIRED, see Gateway._shortcuts for reference.
+  ** @param query_name        target query; REQUIRED.
+  ** @param in_recs           dataset of testcases; REQUIRED.
   ** @param output_layout     query output layout; REQUIRED.
-  ** @param alias_suffix      target query name suffix (alias); OPTIONAL.
-  ** @param xpath_results     path used to access results in query response; OPTIONAL. 
+  ** @param xpath_results     path used to access results in query response; REQUIRED.
   **
   ** @returns                 a dataset containing query results.
-  ** 
+  **
 */
 EXPORT SOAPCallRoxieQuery(
-  service_url, 
+  service_url,
   query_name,
-  in_recs, 
+  in_recs,
   output_layout,
-  alias_suffix = '\'\'',
-  xpath_results = '\'\''
+  xpath_results
   ) := FUNCTIONMACRO
-  
+
   IMPORT dev_regression, gateway, risk_indicators;
 
   LOCAL gateways := Gateway.Configuration.Get();
@@ -41,7 +39,7 @@ EXPORT SOAPCallRoxieQuery(
 
   LOCAL soap_response_rec xt_fail() := TRANSFORM
     SELF.soap_status := FAILCODE;
-    SELF.soap_message := FAILMESSAGE('soapresponse');
+    SELF.soap_message := FAILMESSAGE;
     SELF :=	[];
   END;
 
@@ -50,13 +48,12 @@ EXPORT SOAPCallRoxieQuery(
     SELF := le;
   END;
 
-  LOCAL _query_name := query_name + IF(alias_suffix <> '', TRIM(alias_suffix, LEFT, RIGHT), '');
-  LOCAL _xpath := _query_name + IF(xpath_results <> '', xpath_results, 'Response/Results/Result/Dataset[@name=\'Results\']/Row');
-  
+  LOCAL _xpath := query_name + xpath_results;
+
   LOCAL soap_response_rec make_soap_call(input_layout in_request) := FUNCTION
     soap_recs_in := DATASET([wrap_request(in_request)]);
     soap_recs_out := SOAPCALL(soap_recs_in, service_url,
-      _query_name, {soap_recs_in}, DATASET(soap_response_rec),
+      query_name, {soap_recs_in}, DATASET(soap_response_rec),
       // PARALLEL(30),
       XPATH(_xpath),
       ONFAIL(xt_fail())

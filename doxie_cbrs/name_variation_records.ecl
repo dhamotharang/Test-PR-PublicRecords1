@@ -1,10 +1,10 @@
-import doxie, business_header;
+IMPORT doxie, business_header;
 doxie_cbrs.mac_Selection_Declare()
 
-export name_variation_records(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
+EXPORT name_variation_records(DATASET(doxie_cbrs.layout_references) bdids) := FUNCTION
 
 df := doxie_cbrs.best_rest(bdids)
-	(Include_NameVariations_val and isNMV);
+  (Include_NameVariations_val AND isNMV);
 
-return sort(df,company_name);
+RETURN SORT(df,company_name);
 END;

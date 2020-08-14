@@ -79,6 +79,9 @@ EXPORT Raw := MODULE
     ds_flags_ofk := flagfile(file_id = FCRA.FILE_ID.OFFENDERS);
     ofp_correct_rec_id := set(ds_flags_ofp, record_id);
     ofk_correct_rec_id := set(ds_flags_ofk, record_id);
+    //here we identify offender_key values which are suppressions - flag_file_id is blank
+    //we need them to support suppression of override records for cluster which is based on offender_key
+    suppressed_ofk := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS AND flag_file_id=''), record_id);
     offender_key := doxie_files.Key_Offenders_OffenderKey (isFCRA);
 
     // BUG #97804 - Prefered Name and SSN Logic
@@ -95,12 +98,15 @@ EXPORT Raw := MODULE
 
     //overrides (FCRA side only) - we have 2 indices for offenders overrides
     // we are making this change to now account for both
+    // we check against suppressed_ofk to support suppression of overrides based on cluster
     recs_over_ofp := join(ds_flags_ofp, fcra.key_override_crim.offenders_plus,
-                      keyed (left.flag_file_id = right.flag_file_id),
+                      keyed (left.flag_file_id = right.flag_file_id)
+                      and right.offender_key not in suppressed_ofk,
                       transform(right), keep(1), ATMOST(CriminalRecords_BatchService.Constants.MAX_RECS_DEFAULT_ATMOST));
 
     recs_over_ofk := join(ds_flags_ofk, fcra.key_override_crim.offenders,
-                      keyed (left.flag_file_id = right.flag_file_id),
+                      keyed (left.flag_file_id = right.flag_file_id)
+                      and right.offender_key not in suppressed_ofk,
                       transform(right),
                       keep(1), ATMOST(CriminalRecords_BatchService.Constants.MAX_RECS_DEFAULT_ATMOST));
 
@@ -156,6 +162,9 @@ EXPORT Raw := MODULE
     ds_flags_ofk := flagfile(file_id=FCRA.FILE_ID.OFFENDERS);
     ofp_correct_rec_id := set(ds_flags_ofp, record_id);
     ofk_correct_rec_id := set(ds_flags_ofk, record_id);
+    //here we identify offender_key values which are suppressions - flag_file_id is blank
+    //we need them to support suppression of override records for cluster which is based on offender_key
+    suppressed_ofk  := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS AND flag_file_id=''), record_id);
     Arrest_datatype := ['5'];
     offender_key := doxie_files.Key_Offenders_OffenderKey (isFCRA);
 
@@ -175,12 +184,16 @@ EXPORT Raw := MODULE
 
 
     //overrides  for offenders are in 2 files
+    // we check against suppressed_ofk to support suppression of overrides based on cluster
     recs_over_ofp := join(ds_flags_ofp, fcra.key_override_crim.offenders_plus,
-                      keyed (left.flag_file_id = right.flag_file_id),
+                      keyed (left.flag_file_id = right.flag_file_id)
+                      and right.offender_key not in suppressed_ofk,
                       transform(right),
                       keep(1), ATMOST(CriminalRecords_BatchService.Constants.MAX_RECS_DEFAULT_ATMOST));
+
     recs_over_ofk := join(ds_flags_ofk, fcra.key_override_crim.offenders,
-                      keyed (left.flag_file_id = right.flag_file_id),
+                      keyed (left.flag_file_id = right.flag_file_id)
+                      and right.offender_key not in suppressed_ofk,
                       transform(right),
                       keep(1), ATMOST(CriminalRecords_BatchService.Constants.MAX_RECS_DEFAULT_ATMOST));
 
@@ -221,14 +234,15 @@ EXPORT Raw := MODULE
     //----------------------------------------------------------------------------------------------------------------
     recs2 := if(isFCRA, recs_ds, project(recs1,raw_rec));
 
-    recs_dup := dedup(sort(recs2, did, offender_key, -ssn, -lname, -fname, -mname, -prim_range, -predir, -prim_name, -addr_suffix, -postdir, -sec_range, -p_city_name, -st, -zip5),
-                      did, offender_key);
+    recs_dup := dedup(sort(recs2, acctno, did, offender_key, -ssn, -lname, -fname, -mname, -prim_range, 
+                           -predir, -prim_name, -addr_suffix, -postdir, -sec_range, -p_city_name, -st, -zip5),
+                      acctno, did, offender_key);
 
     CriminalRecords_BatchService.Layouts.batch_int makeOutputOffender(CriminalRecords_BatchService.Layouts.lookup_id L, raw_rec R) := TRANSFORM
       // SELF.did := if(L.did <> 0, L.did, (unsigned)R.did); //having this line changes the results as the alias records do not have DID or ssn_appended appended, so they don't get deduped later down the code
       SELF.did := (unsigned)R.did;
       SELF.output_type := 'O';
-      SELF.state_origin := Address.Map_State_Name_To_Abbrev(StringLib.StringToUpperCase(R.orig_state));
+      SELF.state_origin := Address.Map_State_Name_To_Abbrev(STD.Str.ToUpperCase(R.orig_state));
       SELF.offender_key := R.ofk;
       SELF.ssn  := R.ssn_appended;
       SELF.pty_typ := R.pty_typ;
@@ -459,8 +473,8 @@ EXPORT Raw := MODULE
                   ,cur_stat_inm,cur_loc_inm,cur_loc_sec,latest_adm_dt,act_rel_dt,ctl_rel_dt);
 
     recs_grp  := GROUP(SORT(recs_dup
-                        ,did,offender_key,punishment_type,-event_dt,-latest_adm_dt)
-                        ,did,offender_key) ;
+                        ,acctno,did,offender_key,punishment_type,-event_dt,-latest_adm_dt)
+                        ,acctno,did,offender_key) ;
 
     recs_final :=  ROLLUP(recs_grp,group,CriminalRecords_BatchService.Transforms.makePunishmentOutput(LEFT,ROWS(LEFT)));
 

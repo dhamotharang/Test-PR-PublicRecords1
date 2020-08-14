@@ -1,10 +1,10 @@
 ﻿import doxie,dx_death_master,PersonReports,AutoStandardI,iesp,ut,DeathV2_Services,doxie_crs,suppress, DriversV2_Services, header,Healthcare_Header_Services;
 
-export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData, 
+export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData,
                        doxie.IDataAccess mod_access, dataset(doxie.layout_references) dsDids) := MODULE
 
   shared gmod := AutoStandardI.GlobalModule();
-	shared in_params:= MODULE(PROJECT(gmod, PersonReports.IParam.personal, OPT)) 
+	shared in_params:= MODULE(PROJECT(gmod, PersonReports.IParam.personal, OPT))
 		export unsigned1 neighborhoods := inputData.NeighborhoodCount;
 		export unsigned1 historical_neighborhoods := inputData.HistoricalNeighborhoodCount;
 		export unsigned1 relative_depth := inputData.RelativeDepth;
@@ -45,16 +45,11 @@ export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData
 
 	dids_owners := dedup (sort (all_dids_pre, did, ~is_subject), did);
 
-	doxie_crs.layout_deathfile_records GetDeadRecords (rec_did_owner L, doxie.key_death_masterV2_DID R) := transform
-		self.age_at_death := ut.Age((unsigned8)R.dob8,(unsigned8)R.dod8);
-		self.did := (string)((integer)(R.did));
-		self := R;
-	end;
 dear:=project(dx_death_master.Get.byDid(dids_owners,did,death_params),transform(doxie_crs.layout_deathfile_records,self.did:=(string)left.did;self:=left;self:=[];))	;
 		// for the purpose of deceased indicator we need only one record per person, preferrably with a county
 	export src_deceased := dedup (sort (dear, did, -dod8, trim (county_name) = ''), did, dod8);
 
-		besr_choice := IF(EXISTS(bestrecs), bestrecs, project (dsDids, transform (doxie.layout_best, 
+		besr_choice := IF(EXISTS(bestrecs), bestrecs, project (dsDids, transform (doxie.layout_best,
 																																						Self.did := Left.did, Self := [];)));
 
 		iesp.bpsreport.t_BpsReportBestInfo transform_best (doxie.layout_best L) := transform
@@ -82,7 +77,7 @@ dear:=project(dx_death_master.Get.byDid(dids_owners,did,death_params),transform(
 	dl_rec := DriversV2_Services.layouts.result_wide;
 
 	// need to export it just because of "we also found"
-	export dlsr := choosen (project (DriversV2_Services.DLRaw.wide_view.by_did (dsDids), dl_rec), 
+	export dlsr := choosen (project (DriversV2_Services.DLRaw.wide_view.by_did (dsDids), dl_rec),
 													iesp.Constants.MaxCountDL) : global;
 	esp_drivers := project (dlsr, iesp.transform_dl_bps (Left));
 	EXPORT driver_licenses := if (in_params.include_driverslicenses,
@@ -109,7 +104,7 @@ dear:=project(dx_death_master.Get.byDid(dids_owners,did,death_params),transform(
 	export src_address := if (in_params.expand_address, address_expanded, address_orig);
 
 
-	// This is performance fix for the cases when no other data than address itself 
+	// This is performance fix for the cases when no other data than address itself
 	// is required (like in eAuth); can be extended with risk indicators, etc. if needed.
 	PersonReports.layouts.t_AddressTimeLine GetSubjectShortAddress (doxie.Layout_Comp_Addresses L) := transform
 		Self.StreetName          := L.prim_name;
@@ -151,7 +146,7 @@ dear:=project(dx_death_master.Get.byDid(dids_owners,did,death_params),transform(
 
 	// FinderReport style: verifies phones by last residents' names, among other things
 	// Address-phone match is done at that point, so "extra" addresses appended (if any) from residents list can be removed.
-	export addr_base := PersonReports.Functions.Address (in_params).AttachPhones (src_address, phor) 
+	export addr_base := PersonReports.Functions.Address (in_params).AttachPhones (src_address, phor)
 		(address_seq_no != PersonReports.Constants.APPENDED_BY_RESIDENTS);
 	// ---------- Now have addresses with phones ----------
 
@@ -167,7 +162,7 @@ dear:=project(dx_death_master.Get.byDid(dids_owners,did,death_params),transform(
 
 	// flat table of residents with SSN, death, etc. info;
 	// contains DID and address sequence, which can be used for linking.
-	// Residents are effectively CURRENT RESIDENTS (i.e. those who reside recently). 
+	// Residents are effectively CURRENT RESIDENTS (i.e. those who reside recently).
 	shared residents_base := PersonReports.Functions.GetPersonBase (src_residents, ssn_lookups, src_deceased, mod_access, in_params);
 
 
@@ -203,13 +198,13 @@ dear:=project(dx_death_master.Get.byDid(dids_owners,did,death_params),transform(
 	// =======================================================================
 	// ==============  Address: add Residents, Properties, etc. ==============
 	// =======================================================================
-	// Residents are effectively CURRENT RESIDENTS (i.e. those who reside recently). 
+	// Residents are effectively CURRENT RESIDENTS (i.e. those who reside recently).
 	// Thus, some of the addresses from address sequence table will not have residents yet (say, historical neighbors)
 
 	// ------------------------- wide addresses -------------------------
 	shared addr_wide := PersonReports.Functions.Address (in_params).AddResidents (addr_base, residents_wide);
 	// NOTE: these addresses don't contain properties, census, etc. data;
-	//       Since they are used in relatives and neighbors sections so far, it is not required. 
+	//       Since they are used in relatives and neighbors sections so far, it is not required.
 	//       But, if either is needed, it should be done here.
 
 
@@ -241,7 +236,7 @@ dear:=project(dx_death_master.Get.byDid(dids_owners,did,death_params),transform(
 	// represented by a slim Identity in the output
 
 	// flat table of ssn records, containing imposters and subject's AKAs
-	// contains DID, which can be used for linking 
+	// contains DID, which can be used for linking
 	shared all_persons := PersonReports.Functions.GetSSNRecordsBase (src_ssn_main, src_deceased, in_params);
 
 	EXPORT Imposters := PersonReports.Functions.GetImposters (all_persons (did NOT IN input_dids_set), bestrecs, in_params);
@@ -279,7 +274,7 @@ dear:=project(dx_death_master.Get.byDid(dids_owners,did,death_params),transform(
 
 	// add together AKA from "best" file and all other AKAs
 	// TODO: use filter instead of join
-	shared other_akas := project (join (all_persons, dsDids, left.did=right.did, keep (1)), 
+	shared other_akas := project (join (all_persons, dsDids, left.did=right.did, keep (1)),
 																			transform (iesp.bps_share.t_BpsReportIdentity,
 																			Self.SubjectSSNIndicator := IF(Left.SSNInfo.SSN!='' and Left.SSNInfo.SSN=bestrecs[1].SSN,'yes','no'),
 																			Self := Left, Self := []));
@@ -304,7 +299,7 @@ dear:=project(dx_death_master.Get.byDid(dids_owners,did,death_params),transform(
 	// AKAs will be taken from 'names_src', so we don't need to keep dupes in relatives.
 	// Dedup by DID, choose the closest relatives
 	//max_relassoc := iesp.Constants.BR.MaxRelatives + iesp.Constants.BR.MaxAssociates;
-	max_relassoc := iesp.Constants.SMART.MaxRelatives + iesp.Constants.SMART.MaxAssociates;  
+	max_relassoc := iesp.Constants.SMART.MaxRelatives + iesp.Constants.SMART.MaxAssociates;
 	export rel_assoc := choosen (dedup (sort (src_relatives, person2, depth, ~relative), person2), max_relassoc);
 
 
@@ -358,7 +353,7 @@ dear:=project(dx_death_master.Get.byDid(dids_owners,did,death_params),transform(
 	end;
 
 	iesp.bpsreport.t_BpsReportAssociate Relative2Associate (iesp.bpsreport.t_BpsReportRelative L) := transform
-		Self.Addresses := project (L.addresses, transform (iesp.bpsreport.t_BpsReportAssociateAddress, 
+		Self.Addresses := project (L.addresses, transform (iesp.bpsreport.t_BpsReportAssociateAddress,
 																											 phones := project (Left.Phones, BpsPhone2Phone (Left));
 																											 Self.Phones := project (phones, iesp.share.t_PhoneInfo);
 																											 Self.PhonesEx := phones;
@@ -465,7 +460,7 @@ dear:=project(dx_death_master.Get.byDid(dids_owners,did,death_params),transform(
 		Self.SubjectAddress.AddressEx := project (R.Address, transform (iesp.share.t_AddressEx, self.HighRiskIndicators := []; self := Left));
 		// Self.SubjectAddress.Residents := project (R.residents, UnfoldResidents (Left));
 		Self.SubjectAddress.Residents := project (R.residents, iesp.bps_share.t_BpsReportIdentity);
-		Self.SubjectAddress := R; //DateFirstSeen, DateLastSeen, Verified, _Shared 
+		Self.SubjectAddress := R; //DateFirstSeen, DateLastSeen, Verified, _Shared
 		Self.NeighborAddresses := L.NeighborAddresses; //choosen was used before
 	end;
 
@@ -531,7 +526,7 @@ dear:=project(dx_death_master.Get.byDid(dids_owners,did,death_params),transform(
 	// Finally, set subject's address
 	iesp.bpsreport.t_NeighborSlim SetSubjectAddressSlim (layout_nbr_ext_slim L, PersonReports.layouts.address_slim R) := transform
 		phones := choosen (project (R.phones, BpsPhone2Phone (Left)), iesp.Constants.BR.Neigbors_Phones);
-		Self.SubjectAddress := project (R, transform (iesp.bpsreport.t_NeighborAddressSlim, 
+		Self.SubjectAddress := project (R, transform (iesp.bpsreport.t_NeighborAddressSlim,
 																									Self.Phones := phones; Self := Left));
 		Self.NeighborAddresses := L.NeighborAddresses; //choosen was used before
 	end;
@@ -556,5 +551,5 @@ dear:=project(dx_death_master.Get.byDid(dids_owners,did,death_params),transform(
 	 dsDodBlankVerified := dsDODBlank(death.dod8='');
 	 blankDODExists := exists(dsDodBlankVerified) and inputData.IncludeBlankDOD;
 	export DeceasedFlag := exists (dsDOD )or blankDODExists;
-	export echo := dsDids; 
+	export echo := dsDids;
 end;

@@ -617,9 +617,9 @@ vermiddle := Map(ischase AND isMiddleExpressionFound => '',
                      le.chronosuffix2 = le.versuffix and le.chronopostdir2 = le.verpostdir and le.chronosec_range2 = le.versec_range;
 	verifiedAddr3   := le.chronoprim_range3 = le.verprim_range and le.chronopredir3 = le.verpredir and le.chronoprim_name3 = le.verprim_name and 
                      le.chronosuffix3 = le.versuffix and le.chronopostdir3 = le.verpostdir and le.chronosec_range3 = le.versec_range;
-  chronodate_last := map(verifiedAddr2 and le.chronodate_last < le.chronodate_last2  => le.chronodate_last2,
-                         verifiedAddr3 and le.chronodate_last < le.chronodate_last3  => le.chronodate_last3,
-                         le.chronodate_last);
+  chronodate_last := map(verifiedAddr2 and le.chronodate_last < le.chronodate_last2 and risk_indicators.iid_constants.ga(le.addrscore) => le.chronodate_last2,
+                         verifiedAddr3 and le.chronodate_last < le.chronodate_last3 and risk_indicators.iid_constants.ga(le.addrscore) => le.chronodate_last3,
+                         le.chronodate_last); 
 	
 	Chronology := DATASET([{1, addr1, le.chronoprim_range, le.chronopredir, le.chronoprim_name, le.chronosuffix, le.chronopostdir, le.chronounit_desig, le.chronosec_range, 
 										le.chronocity, le.chronostate, le.chronozip, le.chronozip4, le.chronophone, le.chronodate_first, chronodate_last, le.chronoaddr_isbest, if(IncludeDPBC,chrono1_dpbc,'')},

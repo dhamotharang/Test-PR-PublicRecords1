@@ -1,4 +1,4 @@
-//IMPORT:KEL12.Unmangle
+﻿//IMPORT:KEL12.Unmangle
 EXPORT Unmangle(s) := FUNCTIONMACRO
     LoadXml('<xml/>');
     #DECLARE(out) #SET(out, '')

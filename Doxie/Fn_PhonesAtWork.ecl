@@ -1,16 +1,11 @@
-﻿import AutoStandardI, doxie, business_header, ut, doxie_raw, contactcard, std;
+﻿import doxie, business_header, ut, doxie_raw, contactcard, std;
 
 export Fn_PhonesAtWork(
 	dataset(doxie.layout_references) in_dids,
-	unsigned3 dateVal = 0,
-	unsigned1 dppa_purpose = 0,
-	unsigned1 glb_purpose = 0,
+	doxie.IDataAccess mod_access,
 	unsigned4 recencyInDays = 365,
 	unsigned2 minScore = 0) := 
 FUNCTION
-
-global_mod := AutoStandardI.GlobalModule();
-mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (global_mod);
 
 outrec := contactcard.layouts.contact_phone_addr_rec;
 con := contactcard.constants;
@@ -21,7 +16,7 @@ end;
 	
 	
 //***** FIND EMPLOYERS
-pawraw := doxie_raw.paw_raw(in_dids,dateVal,dppa_purpose,glb_purpose)((unsigned)score >= minScore);	
+pawraw := doxie_raw.paw_raw(in_dids, mod_access.date_threshold, mod_access.dppa, mod_access.glb)((unsigned)score >= minScore);	
 
 business_header.Layout_Employment_Out get_paw(pawraw ri) :=
 TRANSFORM
@@ -63,7 +58,8 @@ END;
 
 
 wp := JOIN(pp, business_header.Key_BH_Best,
-				   keyed(LEFT.bdid<>0 AND keyed(LEFT.bdid=RIGHT.bdid)),
+				   keyed(LEFT.bdid<>0 AND keyed(LEFT.bdid=RIGHT.bdid)) AND 
+					 doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 				   add_bus_phone(LEFT,RIGHT),
 					 keep(1), limit(0));
 

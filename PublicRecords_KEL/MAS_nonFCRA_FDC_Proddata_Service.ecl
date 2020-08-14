@@ -6,6 +6,8 @@
 	<part name="GLBPurpose" type="xsd:integer"/>
 	<part name="DPPAPurpose" type="xsd:integer"/>
 	<part name="IsMarketing" type="xsd:boolean"/>
+	<part name="AllowedSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
+	<part name="ExcludeSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
 	<part name="LexIdSourceOptout" type="xsd:integer"/>
 	<part name="IncludeAccident,"type=xsd:boolean"/>
 	<part name="IncludeAddress,"type=xsd:boolean"/>
@@ -55,7 +57,8 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
     'DataPermissionMask',
     'GLBA',
     'DPPA',
-		'PDPM',
+		'AllowedSourcesDataset',
+		'ExcludeSourcesDataset',
 		'LexIdSourceOptout',
 		'ViewFDC',
 		'IsMarketing',
@@ -124,6 +127,12 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 	UNSIGNED DPPA              := 2 : STORED('DPPA');
 	BOOLEAN is_Marketing               := FALSE : STORED('IsMarketing');
 	BOOLEAN OverrideExperianRestriction := FALSE : STORED('OverrideExperianRestriction');
+	AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) : STORED('AllowedSourcesDataset');
+	ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) : STORED('ExcludeSourcesDataset');
+	// If allowed sources aren't passed in, use default list of allowed sources
+	SetAllowedSources := IF(COUNT(AllowedSourcesDataset) = 0, PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA, AllowedSourcesDataset);
+	// If a source is on the Exclude list, remove it from the allowed sources list. 
+	FinalAllowedSources := JOIN(SetAllowedSources, ExcludeSourcesDataset, LEFT=RIGHT, TRANSFORM(RECORDOF(LEFT), SELF := LEFT), LEFT ONLY);
 	
 	Options := MODULE(PublicRecords_KEL.Interface_Options)
 		EXPORT STRING100 AttributeSetName           := '';
@@ -131,7 +140,6 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		EXPORT BOOLEAN isFCRA                   		 := is_fcra;
 		EXPORT STRING8 ArchiveDate               		 := (STRING)dtArchiveDate;
 		EXPORT STRING250 InputFileName              := '';
-		EXPORT STRING100 PermissiblePurpose         := '';
 		EXPORT STRING IndustryClass        					 := '';
 		EXPORT UNSIGNED1 LexIdSourceOptout := _LexIdSourceOptout;
 		EXPORT STRING100 Data_Restriction_Mask      := DataRestrictionMask;
@@ -143,7 +151,8 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		EXPORT INTEGER ScoreThreshold            := 80 : STORED('ScoreThreshold');
 		EXPORT BOOLEAN ExcludeConsumerShell      := FALSE;
 		EXPORT BOOLEAN isMarketing               := is_Marketing;
-		EXPORT DATA100 KEL_Permissions_Mask    := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
+		EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := FinalAllowedSources;
+		EXPORT DATA57 KEL_Permissions_Mask    := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 				DataRestrictionMask, 
 				DataPermissionMask, 
 				GLBA, 
@@ -152,10 +161,12 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 				is_Marketing, 
 				AllowDNBDMI, 
 				OverrideExperianRestriction, 
-				'', // PermissiblePurpose
+				'', // IntendedPurpose
 				'', // IndustryClass
 				PublicRecords_KEL.CFG_Compile,
-				IsInsuranceProduct );
+				IsInsuranceProduct,
+				FinalAllowedSources);
+				
 		EXPORT BOOLEAN OutputMasterResults       := FALSE;
 		EXPORT UNSIGNED BIPAppendScoreThreshold  := 75;
 		EXPORT UNSIGNED BIPAppendWeightThreshold := 0;

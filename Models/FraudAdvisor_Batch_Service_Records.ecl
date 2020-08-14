@@ -20,6 +20,7 @@ mod_access := MODULE(Doxie.IDataAccess)
 END;
 
 Boolean VALIDATION := false; //True when validating model, false for production mode.
+// Boolean VALIDATION := true; //True when validating model, false for production mode.
 
 //These 2 value types are being used multiple times.
     boolean  doVersion1               := args.doVersion1;
@@ -33,7 +34,8 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 		fraudpoint2_models := ['fp1109_0', 'fp1109_9', 'fp1307_2'];
 		fraudpoint3_models := ['fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9']; // FP3 Flagship models
 		FP3_models_requiring_GLB	:= ['fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9']; //these models require valid GLB, else fail
-		fraudpoint3_custom_models := ['fp1702_2','fp1702_1','fp1508_1','fp1705_1','fp1902_1', 'fp1908_1', 'fp1909_1', 'fp1909_2'];
+		fraudpoint3_custom_models := ['fp1702_2','fp1702_1','fp1508_1','fp1705_1','fp1902_1','fp1908_1','fp1909_1','fp1909_2'];
+    fraudpoint3_special_case_models := ['fp1908_1','fp1909_1','fp1909_2']; //specific models for LastSeenThreshold and BSOption changes - eventually expanding to all models
 
 		bill_to_ship_to_models := ['fp1409_2']; // Populate with real model ids when the time comes.
   
@@ -58,15 +60,29 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 			self     := le;
 		END;
 		inIPdata_seq := project(inIPdata, tf_seq_ipdata(left,counter));
-
-		// new options for fp attributes 2.0
+    
+    /*
+    /////////////////////////////////////////////////
+    // Setting up additional BSOptions for use in Batch
+    // only touching latest 3 models (fraudpoint3_special_case_models - FP1908_1, FP1909_1, FP1909_2)
+    // Modified from FraudAdvisor_Service
+    /////////////////////////////////////////////////
+    */
+    doAttributesVersion201 := requestedattributegroups = Models.FraudAdvisor_Constants.attrV201;	  // output version201 if requested
+    doAttributesVersion202 := requestedattributegroups = Models.FraudAdvisor_Constants.attrV202 or model_name = 'fp1908_1'; // run attributes by this model name in case model called by FlexID... output version202 if requested
+    doTMXAttributes := requestedattributegroups = Models.FraudAdvisor_Constants.attrvTMX;
+    turn_on_AllowInsuranceDLInfo := doAttributesVersion201 OR doAttributesVersion202 OR doTMXAttributes;
+    turn_on_AlwaysCheckInsurance := doAttributesVersion201 OR doAttributesVersion202 OR doTMXAttributes;
 		IncludeDLverification := doVersion2 OR requestedattributegroups IN ['fraudpointattrv201','fraudpointattrv202','fraudpointattrv203'] ;
 		unsigned8 BSOptions := if(doVersion2 OR requestedattributegroups IN ['fraudpointattrv201','fraudpointattrv202','fraudpointattrv203']
                               or model_name in ['fp1210_1',fraudpoint3_models,fraudpoint3_custom_models], 
                                 risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary +
                                 risk_indicators.iid_constants.BSOptions.IncludeDoNotMail +
                                 risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity,
-                                0);
+                                0) +
+                                //specific options for latest 3 models
+                                if(turn_on_AllowInsuranceDLInfo and model_name in fraudpoint3_special_case_models, Risk_indicators.iid_constants.BSOptions.AllowInsuranceDLInfo, 0) +
+                                if(turn_on_AlwaysCheckInsurance and model_name in fraudpoint3_special_case_models, Risk_indicators.iid_constants.BSOptions.AlwaysCheckInsurance, 0);
 
 		// add sequence to matchup later to add acctno to output
 		Models.FraudAdvisor_Batch_Service_Layouts.BatchInput into_seq(batchin le, integer C) := TRANSFORM
@@ -170,7 +186,7 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 		boolean   isLn := false;	// not needed anymore
 		boolean   doRelatives := true;
 		boolean   doDL := false;
-		boolean   doVehicle := IF(model_name IN ['fp31105_1','fp1702_2','fp1702_1','fp1508_1','fp1705_1'] or doVersion2, TRUE, FALSE);
+		boolean   doVehicle := IF(model_name IN ['fp31105_1','fp1702_2','fp1702_1','fp1508_1','fp1705_1','fp1909_1','fp1909_2'] or doVersion2, TRUE, FALSE);
 		boolean   doDerogs := true;
 		boolean   suppressNearDups := false;
 		boolean   fromBIID := false;
@@ -183,6 +199,22 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 		boolean   glb_ok 	:= Risk_Indicators.iid_constants.glb_ok(args.glb, isFCRA);
 		InvalidFP3GLBRequest := model_name in FP3_models_requiring_GLB and ~glb_ok; 
 		if(InvalidFP3GLBRequest, fail('Valid Gramm-Leach-Bliley Act (GLBA) purpose required'));
+    
+    /*
+    /////////////////////////////////////////////////
+    // Setting up LastSeenThresholdIn for use in Batch
+    // Shouldn't change anything (default for LastSeenThreshold is risk_indicators.iid_constants.oneyear if not passed to iid)
+    // only touching latest 3 models (and model_name in fraudpoint3_special_case_models - FP1908_1, FP1909_1, FP1909_2)
+    // Modified from FraudAdvisor_Service
+    /////////////////////////////////////////////////
+    */
+    unsigned3 LastSeenThresholdIn := map(	
+																		// (model_name IN ['fp1702_1','fp1702_2']) => risk_indicators.iid_constants.max_unsigned3,
+																		// (model_name IN ['fp1403_2','fp1510_2']) => 730,
+                                    // (model_name IN ['fp1907_1','fp1907_2','fp1908_1','fp1909_1','fp1909_2']) => risk_indicators.iid_constants.oneyear, //is this redundant w/ default value?
+                                    (model_name IN fraudpoint3_special_case_models) => risk_indicators.iid_constants.oneyear, //is this redundant w/ default value?
+																		// doAttributesVersion201 OR doAttributesVersion202 => 9999,
+																		risk_indicators.iid_constants.oneyear);
 
 		iid := risk_indicators.InstantID_Function(cleanIn, gateways, args.dppa, args.glb, isUtility, isLn, args.ofac_only, 
                                               suppressNearDups, require2Ele, fromBIID, isFCRA, args.excludewatchlists, fromIT1O, 
@@ -194,7 +226,8 @@ Boolean VALIDATION := false; //True when validating model, false for production 
                                               LexIdSourceOptout := LexIdSourceOptout, 
                                               TransactionID := TransactionID, 
                                               BatchUID := BatchUID, 
-                                              GlobalCompanyID := GlobalCompanyID);
+                                              GlobalCompanyID := GlobalCompanyID,
+                                              in_LastSeenThreshold := LastSeenThresholdIn);
 
 		clam := risk_indicators.Boca_Shell_Function(iid, gateways, args.dppa, args.glb, isUtility, isLn, doRelatives, doDL, 
                                                 doVehicle, doDerogs, bsVersion, doScore, nugen, DataRestriction:=args.DataRestriction,
@@ -946,7 +979,7 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 		);
 
 #IF(VALIDATION)
-	wmodel := Models.FP1908_1_0(clam, 6, attr); 	// For validation only 
+	wmodel := Models.FP1909_2_0(clam, 6, attr); 	// For validation only 
   // RETURN wmodel ;	
 #ELSE
 
@@ -1114,7 +1147,8 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 	// OUTPUT( model, NAMED('model') );
 	// OUTPUT( wmodel, NAMED('wmodel') );
 	// OUTPUT( wAcctNo, NAMED('wAcctNo') );
-	// OUTPUT( attr, NAMED('attr') );
+	// OUTPUT( attr, NAMED('attr') );\
+  
 #END	
 
 	return wmodel;

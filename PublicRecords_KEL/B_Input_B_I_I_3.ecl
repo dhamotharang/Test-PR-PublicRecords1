@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.3.0beta5
+//HPCC Systems KEL Compiler Version 1.3.0
 IMPORT KEL13 AS KEL;
 IMPORT B_Input_B_I_I_4,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Ult,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL13.Null;
 EXPORT B_Input_B_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Input_B_I_I_4(__in,__cfg).__ENH_Input_B_I_I_4) __ENH_Input_B_I_I_4 := B_Input_B_I_I_4(__in,__cfg).__ENH_Input_B_I_I_4;
-  SHARED __EE3956500 := __ENH_Input_B_I_I_4;
-  EXPORT __ST170612_Layout := RECORD
+  SHARED __EE4015306 := __ENH_Input_B_I_I_4;
+  EXPORT __ST178969_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.nint G___Proc_Bus_U_I_D_;
@@ -109,13 +109,13 @@ EXPORT B_Input_B_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST170612_Layout __ND3956896__Project(B_Input_B_I_I_4(__in,__cfg).__ST180590_Layout __PP3956501) := TRANSFORM
-    __CC11043 := '-99999';
-    __CC11048 := '-99998';
-    SELF.B___Inp_Cln_Addr_Full_Flag_Value_ := FN_Compile(__cfg).FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP3956501.Bus_Input_Full_Address_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC11043)),__ECAST(KEL.typ.nstr,__CN(__CC11048)));
-    SELF.Email_Domain_ := __FN1(KEL.Routines.ToUpperCase,__FN3(KEL.Routines.SubStr2,__PP3956501.B___Inp_Email_,__OP2(__PP3956501.At_Position_,+,__CN(1)),__FN1(LENGTH,__PP3956501.B___Inp_Email_)));
-    SELF.Email_Username_ := __FN1(KEL.Routines.ToUpperCase,__FN3(KEL.Routines.SubStr2,__PP3956501.B___Inp_Email_,__CN(1),__OP2(__PP3956501.At_Position_,-,__CN(1))));
-    SELF := __PP3956501;
+  SHARED __ST178969_Layout __ND4015702__Project(B_Input_B_I_I_4(__in,__cfg).__ST189219_Layout __PP4015307) := TRANSFORM
+    __CC10495 := '-99999';
+    __CC10500 := '-99998';
+    SELF.B___Inp_Cln_Addr_Full_Flag_Value_ := FN_Compile(__cfg).FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP4015307.Bus_Input_Full_Address_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC10495)),__ECAST(KEL.typ.nstr,__CN(__CC10500)));
+    SELF.Email_Domain_ := __FN1(KEL.Routines.ToUpperCase,__FN3(KEL.Routines.SubStr2,__PP4015307.B___Inp_Email_,__OP2(__PP4015307.At_Position_,+,__CN(1)),__FN1(LENGTH,__PP4015307.B___Inp_Email_)));
+    SELF.Email_Username_ := __FN1(KEL.Routines.ToUpperCase,__FN3(KEL.Routines.SubStr2,__PP4015307.B___Inp_Email_,__CN(1),__OP2(__PP4015307.At_Position_,-,__CN(1))));
+    SELF := __PP4015307;
   END;
-  EXPORT __ENH_Input_B_I_I_3 := PROJECT(__EE3956500,__ND3956896__Project(LEFT));
+  EXPORT __ENH_Input_B_I_I_3 := PROJECT(__EE4015306,__ND4015702__Project(LEFT));
 END;

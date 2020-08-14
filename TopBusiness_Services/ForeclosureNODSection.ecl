@@ -1,4 +1,5 @@
-﻿import TopBusiness_services, iesp, BIPv2, Property, MDR, std;
+﻿import TopBusiness_services, iesp, BIPv2, Property, Census_Data, MDR, Foreclosure_Services, std;
+
 
 export foreclosureNODSection := module
 
@@ -6,7 +7,8 @@ export foreclosureNODSection := module
 
 export Fn_fullView(
       dataset(Topbusiness_services.ForeclosureNODSection_layouts.rec_Input) ds_in_data,		   				
-			 string1 FETCH_LEVEL
+			 string1 FETCH_LEVEL,
+			 boolean IncludeVendorSourceB
 			)  := function
 			
 		in_data_deduped := dedup(sort(ds_in_data,
@@ -33,9 +35,10 @@ export Fn_fullView(
   
 	    nod_linkids_rawSlim := Dedup(sort(nod_linkids_raw,foreclosure_id), foreclosure_id);												 
 													 
-		  
+			 
      foreclosure_linkids_payload := join(foreclosure_linkids_rawSlim,Property.Key_Foreclosures_FID,		                                        
-		                      keyed(left.foreclosure_id = right.fid) AND RIGHT.source=MDR.sourceTools.src_Foreclosures,																										
+		                      keyed(left.foreclosure_id = right.fid) //AND RIGHT.source=MDR.sourceTools.src_Foreclosures,																										
+																								AND right.source IN Foreclosure_Services.Functions.getCodes(IncludeVendorSourceB),
 													transform({iesp.share.t_businessIdentity;recordof(right);},
 													         self.ultid := left.ultid;
 																	 self.orgid := left.orgid;
@@ -47,9 +50,10 @@ export Fn_fullView(
 													self := right;
 													),
 													limit(0),keep(iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_FORECLOSURE_NODS));
-													
+				
     nod_linkids_payload := join(nod_linkids_rawSlim, Property.Key_NOD_FID,
-		                        keyed(left.foreclosure_id = right.fid) AND RIGHT.source=MDR.sourceTools.src_Foreclosures,
+		                        keyed(left.foreclosure_id = right.fid) //AND RIGHT.source=MDR.sourceTools.src_Foreclosures,
+																										AND right.source IN Foreclosure_Services.Functions.getCodes(IncludeVendorSourceB),
 															transform({iesp.share.t_businessIdentity;recordof(right);},
 													         self.ultid := left.ultid;
 																	 self.orgid := left.orgid;
@@ -61,7 +65,7 @@ export Fn_fullView(
 													self := right;
 													),
 													limit(0),keep(iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_FORECLOSURE_NODS));
-																																						 
+				
     Foreclosure_raw := dedup(dedup(sort(foreclosure_linkids_payload(deed_category='U'), 
 		               foreclosure_id), 
 									   foreclosure_id),all, except foreclosure_id, fid, batch_date_and_seq_nbr, parcel_number_parcel_id,
@@ -72,7 +76,6 @@ export Fn_fullView(
     nod_raw := dedup(sort(nod_linkids_payload(deed_category='N'), foreclosure_id, recording_date,record),
 		                          foreclosure_id,recording_date);
 
-  			
 		foreclosure_partyDS := dedup(project(foreclosure_raw(deed_category='U'),		                        
 																transform(
 																   TopBusiness_Services.ForeclosureNODSection_layouts.linkids_plus_t_Biz_Foreclosure_rec,
@@ -118,6 +121,15 @@ export Fn_fullView(
 										self.AttorneyName := left.attorney_name;
 										self.AttorneyPhoneNumber := left.attorney_phone_nbr;
 										self.AuctionDate := iesp.ecl2esp.toDateString8(left.auction_date); // or is this Date on the mockup??
+										
+ 									self.VendorSource := if(left.source=MDR.sourceTools.src_Foreclosures, Foreclosure_services.Constants('').src_Fares, 
+																																																Foreclosure_services.Constants('').src_BlackKnight);
+         	self.LenderType := left.lender_type;
+         	self.LenderTypeDescription := left.lender_type_desc;
+         	self.LoanAmount := left.loan_amount;
+         	self.LoanType := left.loan_type;
+         	self.LoanTypeDescription := left.loan_type_desc;
+
 										self.LenderFirstName := left.lender_beneficiary_first_name;
 										self.LenderLastName := left.lender_beneficiary_last_name;
 										self.LenderCompanyName := left.lender_beneficiary_company_name;			
@@ -150,7 +162,7 @@ export Fn_fullView(
 					 self.businessIDs.powid := left.powid;
 			     self.businessIDs.empid := left.empid;
 					 self.businessIDs.dotid := left.dotid;			
-				self.Source := MDR.sourceTools.Src_foreclosures;
+				self.Source := MDR.sourceTools.Src_foreclosures;       //NJ****not being used in final layout of for/nod - used in FSourceDocs
 				//self.SourceDocID := l.SourceDocID;  //foreclosureid
 				  )]);			
 										self := []; // TODO remove later
@@ -204,6 +216,15 @@ export Fn_fullView(
 										self.AttorneyName := left.attorney_name;
 										self.AttorneyPhoneNumber := left.attorney_phone_nbr;
 										self.AuctionDate := iesp.ecl2esp.toDateString8(left.auction_date);// or is this Date on the mockup??
+
+										self.VendorSource := if(left.source=MDR.sourceTools.src_Foreclosures, Foreclosure_services.Constants('').src_Fares, 
+																																																Foreclosure_services.Constants('').src_BlackKnight);
+         	self.LenderType := left.lender_type;
+         	self.LenderTypeDescription := left.lender_type_desc;
+         	self.LoanAmount := left.loan_amount;
+         	self.LoanType := left.loan_type;
+         	self.LoanTypeDescription := left.loan_type_desc;
+										
 										self.LenderFirstName := left.lender_beneficiary_first_name;
 										self.LenderLastName := left.lender_beneficiary_last_name;
 										self.LenderCompanyName := left.lender_beneficiary_company_name;	
@@ -270,6 +291,14 @@ export Fn_fullView(
 										self.AttorneyName := left.AttorneyName; //left.attorney_name;
 										self.AttorneyPhoneNumber := left.AttorneyPhoneNumber; //left.attorney_phone_nbr;
 										self.AuctionDate := left.AuctionDate; //iesp.ecl2esp.toDateString8(left.auction_date);// or is this Date on the mockup??
+
+										self.VendorSource := left.VendorSource; 
+         	self.LenderType := left.LenderType;
+         	self.LenderTypeDescription := left.LenderTypeDescription;
+         	self.LoanAmount := left.LoanAmount;
+         	self.LoanType := left.LoanType;
+         	self.LoanTypeDescription := left.LoanTypeDescription;
+										
 										self.LenderFirstName := left.LenderFirstName;// left.lender_beneficiary_first_name;
 										self.LenderLastName := left.LenderLastname; //left.lender_beneficiary_last_name;
 										self.LenderCompanyName := left.LenderCompanyName; //left.lender_beneficiary_company_name;	

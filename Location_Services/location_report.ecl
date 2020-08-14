@@ -96,7 +96,7 @@ addrVars := dedup(sort(joinedAddrs, RECORD), EXCEPT zip4);
 
 addrVarsAsInput := PROJECT(addrVars, doxie_raw.Layout_address_input);
 
-busMod := Location_Services.GetByBDID(addr_in, mod_access.application_type);
+busMod := Location_Services.GetByBDID(addr_in, mod_access);
 
 busFids := IF(useBusinessIds, Location_Services.GetByBusinessIds(addr_in, mod_access).GetPropFids(), 
 													    busMod.GetPropFids());

@@ -1575,6 +1575,7 @@ EXPORT AttributesMaster (Business_Risk_BIP.Layouts.Shell BusShell, UNSIGNED BusS
 	EXPORT STRING3 SBFEDelq31RevCountTtl := BusShell.SBFE.SBFEDelq31RevCountTtl;
 	EXPORT STRING3 SBFEDelq31RevCountTtlChargeoff := BusShell.SBFE.SBFEDelq31RevCountTtlChargeoff;
 	EXPORT STRING3 SBFEDelq61CountTtl := BusShell.SBFE.SBFEDelq61CountTtl;
+	EXPORT STRING3 SBFEDelq121CountTtl := BusShell.SBFE.SBFEDelq121CountTtl; 
 	EXPORT STRING3 SBFEDelq61CountTtlChargeoff := BusShell.SBFE.SBFEDelq61CountTtlChargeoff;
 	EXPORT STRING3 SBFEDelq61Count := BusShell.SBFE.SBFEDelinquentCount;
 	EXPORT STRING3 SBFEDelq61Count03M := BusShell.SBFE.SBFEDelq61Count03M;
@@ -1586,6 +1587,8 @@ EXPORT AttributesMaster (Business_Risk_BIP.Layouts.Shell BusShell, UNSIGNED BusS
 	EXPORT STRING3 SBFEDelq61Count84M := BusShell.SBFE.SBFEDelinquentCount84;
 	EXPORT STRING3 SBFEDelq61CountEver := BusShell.SBFE.SBFEDelinquentCountEver;
 	EXPORT STRING3 SBFEDelq61CountEverTtl := BusShell.SBFE.SBFEDelq61CountEverTtl;
+	EXPORT STRING3 SBFEDelq91CountEverTtl := BusShell.SBFE.SBFEDelq91CountEverTtl; 
+	EXPORT STRING3 SBFEDelq121CountEverTtl := BusShell.SBFE.SBFEDelq121CountEverTtl; 
 	EXPORT STRING3 SBFEDelq61LoanCount := BusShell.SBFE.SBFEDelinquentCountLoan;
 	EXPORT STRING3 SBFEDelq61LoanCount03M := BusShell.SBFE.SBFEDelq61LoanCount03M;
 	EXPORT STRING3 SBFEDelq61LoanCount06M := BusShell.SBFE.SBFEDelinquentCountLoan06;

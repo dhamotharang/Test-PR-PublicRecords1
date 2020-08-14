@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 1.3.0beta5
+//HPCC Systems KEL Compiler Version 1.3.0
 IMPORT KEL13 AS KEL;
 IMPORT $,Email_Data,PublicRecords_KEL,Risk_Indicators,STD,address,header;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -61,6 +61,12 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     RawSource := __T(__PRawSource);
     __IsNull := __NL(__PRawSource);
     __Value := PublicRecords_KEL.ECL_Functions.Common_Functions.SourceGroup(RawSource);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
+  END;
+  EXPORT KEL.typ.nstr FN_Consumer_Source_Group(KEL.typ.nstr __PRawSource) := FUNCTION
+    RawSource := __T(__PRawSource);
+    __IsNull := __NL(__PRawSource);
+    __Value := PublicRecords_KEL.ECL_Functions.Common_Functions.ConsumerSourceGroup(RawSource);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
   EXPORT KEL.typ.nstr FN_Filter(KEL.typ.nstr __PSource, KEL.typ.nstr __PFilterString) := FUNCTION
@@ -127,9 +133,9 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __Value := PublicRecords_KEL.ECL_Functions.Fn_STD_Str_FilterOut_ValidChars(Field);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
-  SHARED __CC11046 := -99999;
+  SHARED __CC10498 := -99999;
   EXPORT KEL.typ.str FN_Validate_Flag(KEL.typ.nstr __PFieldToCheck) := FUNCTION
-    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC11046,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
+    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC10498,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
   END;
   EXPORT KEL.typ.nstr FN__fn_Bogus_Names(KEL.typ.nstr __PsNameFirst, KEL.typ.nstr __PsNameMid, KEL.typ.nstr __PsNameLast) := FUNCTION
     sNameFirst := __T(__PsNameFirst);

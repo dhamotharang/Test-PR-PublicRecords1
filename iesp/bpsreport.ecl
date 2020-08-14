@@ -193,13 +193,16 @@ export t_BpsReportProperty := record
 	share.t_Date LoanDueDate {xpath('LoanDueDate')};
 	string SalePrice {xpath('SalePrice')};
 	string NameSeller {xpath('NameSeller')};
+	string BorrowerName {xpath('BorrowerName')};
 	string LenderName {xpath('LenderName')};
 	string LegalDescription {xpath('LegalDescription')};
 	string MortgageAmount {xpath('MortgageAmount')};
 	string MortgageTermCode {xpath('MortgageTermCode')};
 	string MortgageTerm {xpath('MortgageTerm')};
 	string DocumentType {xpath('DocumentType')};
+	string DocumentTypeCode {xpath('DocumentTypeCode')};
 	string DocumentNumber {xpath('DocumentNumber')};
+	string RecordType {xpath('RecordType')};
 	string TransactionType {xpath('TransactionType')};
 	string MortgageLoanType {xpath('MortgageLoanType')};
 	string LeaderName {xpath('LeaderName')};

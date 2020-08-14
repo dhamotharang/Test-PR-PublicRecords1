@@ -10,6 +10,8 @@
 	<part name="DPPAPurpose" type="xsd:integer"/>
 	<part name="IsMarketing" type="xsd:boolean"/>
 	<part name="IndustryClass" type="xsd:string"/>
+	<part name="AllowedSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
+	<part name="ExcludeSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
 	<part name="LexIdSourceOptout" type="xsd:integer"/>
 	<part name="_TransactionId" type="xsd:string"/>
 	<part name="_BatchUID" type="xsd:string"/>
@@ -34,7 +36,10 @@ EXPORT MAS_nonFCRA_Service() := MACRO
 		'DPPAPurpose',
 		'IndustryClass',
 		'IsMarketing',
-    'LexIdSourceOptout',
+		'IncludeMinors',
+		'AllowedSourcesDataset',
+		'ExcludeSourcesDataset',
+		'LexIdSourceOptout',
     '_TransactionId',
     '_BatchUID',
     '_GCID'
@@ -54,7 +59,10 @@ STRING100 Default_data_permission_mask := '';
 	UNSIGNED1 GLBA := 0 : STORED('GLBPurpose');
 	UNSIGNED1 DPPA := 0 : STORED('DPPAPurpose');
 	BOOLEAN Is_Marketing := FALSE : STORED('IsMarketing');
+	BOOLEAN Include_Minors := TRUE : STORED('IncludeMinors');
 	STRING5 Industry_Class := Default_Industry_Class : STORED('IndustryClass');
+	AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) : STORED('AllowedSourcesDataset');
+	ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) : STORED('ExcludeSourcesDataset');
 	//CCPA fields
 	UNSIGNED1 _LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
 	STRING _TransactionId := '' : STORED ('_TransactionId');
@@ -70,6 +78,11 @@ STRING100 Default_data_permission_mask := '';
 
 	DATASET(Gateway.Layouts.Config) GatewaysClean := PROJECT(gateways_in, gw_switch(LEFT));
 	
+	// If allowed sources aren't passed in, use default list of allowed sources
+	SetAllowedSources := IF(COUNT(AllowedSourcesDataset) = 0, PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA, AllowedSourcesDataset);
+	// If a source is on the Exclude list, remove it from the allowed sources list. 
+	FinalAllowedSources := JOIN(SetAllowedSources, ExcludeSourcesDataset, LEFT=RIGHT, TRANSFORM(RECORDOF(LEFT), SELF := LEFT), LEFT ONLY);
+	
 	Options := MODULE(PublicRecords_KEL.Interface_Options)
 		EXPORT INTEGER ScoreThreshold := Score_threshold;
 		EXPORT BOOLEAN IsFCRA := FALSE;
@@ -79,7 +92,9 @@ STRING100 Default_data_permission_mask := '';
 		EXPORT UNSIGNED GLBAPurpose := GLBA;
 		EXPORT UNSIGNED DPPAPurpose := DPPA;
 		EXPORT BOOLEAN isMarketing := Is_Marketing; // When TRUE enables Marketing Restrictions
-		EXPORT DATA100 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
+		EXPORT BOOLEAN IncludeMinors := Include_Minors; // When TRUE enables Marketing Restrictions
+		EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := FinalAllowedSources;
+		EXPORT DATA57 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 			DataRestrictionMask, 
 			DataPermissionMask, 
 			GLBA, 
@@ -88,9 +103,11 @@ STRING100 Default_data_permission_mask := '';
 			Is_Marketing, 
 			'' /* Allowed_Sources */ = Business_Risk_BIP.Constants.AllowDNBDMI, 
 			FALSE, /*OverrideExperianRestriction*/
-			'', /* PermissiblePurpose - For FCRA Products Only */
+			'', /* IntendedPurpose - For FCRA Products Only */
 			Industry_Class,
-			PublicRecords_KEL.CFG_Compile);
+			PublicRecords_KEL.CFG_Compile,
+			FALSE, /*IsInsuranceProduct*/
+			FinalAllowedSources);
 		EXPORT UNSIGNED1 LexIdSourceOptout := _LexIdSourceOptout;
 		EXPORT STRING100 TransactionID := _TransactionId;
 		EXPORT STRING100 BatchUID := _BatchUID;
@@ -137,6 +154,8 @@ STRING100 Default_data_permission_mask := '';
 		EXPORT BOOLEAN IncludeZipCode := TRUE;
 		EXPORT BOOLEAN IncludeUCC := TRUE;
 		EXPORT BOOLEAN IncludeMini := TRUE;
+		EXPORT BOOLEAN IncludeOverrides := FALSE;
+
 	END;	
 	
 	ResultSet := PublicRecords_KEL.FnRoxie_GetAttrs(ds_input, Options);		

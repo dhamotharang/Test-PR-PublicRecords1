@@ -1,4 +1,4 @@
-import ut, Census_Data, Foreclosure_services, iesp, suppress, AutoStandardI, MDR;
+﻿import ut, Census_Data, Foreclosure_services, iesp, suppress, AutoStandardI, MDR, doxie;
 
 export Functions := module
 
@@ -161,6 +161,26 @@ out_raw_county := JOIN (out_raw_county_tmp, Census_Data.Key_Fips2County,
 return out_raw_county;
 end;
 
+//*****************************
+// Function to check for Data restriction for FARES and BK
+//*****************************
+
+export getCodes(boolean includeBlackKnight=false) := function
+
+ ds := {STRING2 code};
+
+	boolean isFRRestricted := doxie.DataRestriction.Fares;
+	boolean isBKRestricted := doxie.DataRestriction.BlackKnight or (not includeBlackKnight);
+
+ codeDS := if(isFRRestricted, if(isBKRestricted, DATASET([{''}], ds), DATASET([{MDR.sourceTools.src_BKFS_Reo},{MDR.sourceTools.src_BKFS_Nod}], ds)), 
+		                        if(isBKRestricted, DATASET([{MDR.sourceTools.src_Foreclosures}], ds), 
+         														         DATASET([{MDR.sourceTools.src_BKFS_Reo},{MDR.sourceTools.src_BKFS_Nod},{MDR.sourceTools.src_Foreclosures}], ds)));
+ srcCodeSet := SET(codeDS, code);
+				 
+	return srcCodeSet;
+end;
+
+
 //**************************************************************//
 // Search Function																							//
 //**************************************************************//
@@ -171,6 +191,11 @@ end;
 			//Setting VendorSource to 'A' if source of records is FARES and 'B' for BlackKnight, per requirement, to distinguish between Fares and Blackknight data 
 			self.VendorSource:=if(l.source=MDR.sourceTools.src_Foreclosures, Foreclosure_services.Constants('').src_Fares, 
 																																																Foreclosure_services.Constants('').src_BlackKnight);
+			self.LenderType := l.lender_type;
+			self.LenderTypeDescription := l.lender_type_desc;
+			self.LoanAmount := l.loan_amount;
+			self.LoanType := l.loan_type;
+			self.LoanTypeDescription := l.loan_type_desc;
 			self.RecordingDate :=iesp.ECL2ESP.toDatestring8(l.recording_date);
 			self.SiteAddress :=setAddressFields(l.situs1_prim_name, l.situs1_prim_range, l.situs1_predir, l.situs1_postdir, l.situs1_addr_suffix,
 			                              l.situs1_unit_desig,l.situs1_sec_range, l.situs1_p_city_name,l.situs1_v_city_name, '',
@@ -204,6 +229,11 @@ export fnforeclosureReportval(dataset(foreclosure_services.Layouts.rawrec) in_re
 	
 	self.ForeclosureId:= l.foreclosure_id;
 	self.VendorSource:= if(l.source=MDR.sourceTools.src_Foreclosures, Foreclosure_services.Constants('').src_Fares, Foreclosure_services.Constants('').src_BlackKnight);
+ self.LenderType := l.lender_type;
+	self.LenderTypeDescription := l.lender_type_desc;
+	self.LoanAmount := l.loan_amount;
+	self.LoanType := l.loan_type;
+	self.LoanTypeDescription := l.loan_type_desc;	
 	self.CaseNumber :=l.court_case_nbr;
 	self.DeedType :=l.deed_desc;
 	self.SiteAddress :=setAddressFields(l.situs1_prim_name, l.situs1_prim_range, l.situs1_predir, l.situs1_postdir, l.situs1_addr_suffix,

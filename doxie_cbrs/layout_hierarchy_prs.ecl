@@ -1,5 +1,5 @@
-export layout_hierarchy_prs := record
-	doxie_cbrs.layout_references;
-	string120 name;
-	unsigned1 level;
-end;
+EXPORT layout_hierarchy_prs := RECORD
+  doxie_cbrs.layout_references;
+  STRING120 name;
+  UNSIGNED1 level;
+END;

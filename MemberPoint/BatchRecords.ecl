@@ -378,7 +378,7 @@
 
 		//Common BatchOut Transformation
 		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		MemberPoint.Layouts.BatchOut buildCommonBatchOut(MemberPoint.Layouts.batchInter adultsOrGuardians) := TRANSFORM
+		MemberPoint.Layouts.BatchOut buildCommonBatchOut(MemberPoint.Layouts.batchInter adultsOrGuardians,MemberPoint.Layouts.batchIn batchin) := TRANSFORM
 			rowBest := dsBestGood(seq = (UNSIGNED)adultsOrGuardians.acctno)[1];
 			rowAddress := dsAddresses(acctno = adultsOrGuardians.acctno)[1];
 			rowDeceased := dsDeceased(acctno = adultsOrGuardians.acctno)[1];
@@ -458,7 +458,10 @@
 			//MemberPoint Enhancements: For derived guardians (LN_Search_Name_Type = D) Name, SSN AND DOB score fields output should be null.
 			isDerived:= adultsOrGuardians.LN_search_name_type = MemberPoint.Constants.LNSearchNameType.Derived;
 			isPartial:= (LENGTH(TRIM(adultsOrGuardians.SSN)) < 5);
-			SELF.name_score:= IF(isDerived, '', (STRING)rowBest.verify_best_name);
+      SELF.name_score:= map(isDerived =>'',
+			                      isIncludeGender=true and rowBest.verify_best_name=0 and StringLib.StringToUpperCase(batchin.name_first[1..3])=StringLib.StringToUpperCase(rowBest.best_fname[1..3]) and StringLib.StringToUpperCase(batchIn.name_last)!=StringLib.StringToUpperCase(rowBest.best_lname) and StringLib.StringToUpperCase(rowBest.gender)='M'=>'30',
+                            isIncludeGender=true  and rowBest.verify_best_name=0 and StringLib.StringToUpperCase(batchin.name_first[1..3])=StringLib.StringToUpperCase(rowBest.best_fname[1..3]) and StringLib.StringToUpperCase(batchin.name_last)!=StringLib.StringToUpperCase(rowBest.best_lname) and StringLib.StringToUpperCase(rowBest.gender)='F'=>'40',
+								            (string) rowBest.verify_best_name);
 			SELF.ssn_score:= IF(~isPartial AND isIncludeSSN AND ~isDerived, (STRING)rowBest.verify_best_ssn, '');
 			SELF.dob_score:= IF(~isDerived AND isIncludeDOB, (STRING)rowBest.verify_best_dob, '');
 			// Death
@@ -568,7 +571,8 @@
 			SELF:= common;
 		END;
 		
-		commonBatchOut						:= PROJECT(AdultsOrGuardiansBatchInter, buildCommonBatchOut(LEFT));
+   commonBatchOut						:= join(AdultsOrGuardiansBatchInter, rawbatchin,
+		                              LEFT.acctno = RIGHT.acctno,buildCommonBatchOut(LEFT,right));
 		waterfallBatchOut					:= JOIN(AdultsOrGuardiansBatchInter, 
 																			commonBatchOut, 
 																			LEFT.acctno = RIGHT.acctno, 

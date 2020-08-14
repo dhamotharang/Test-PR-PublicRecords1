@@ -1,10 +1,11 @@
-import  TopBusiness, iesp;
+﻿import  TopBusiness, iesp;
 export PropertySection_layouts := MODULE
 
 	export rec_OptionsLayout := record
 		boolean lnbranded;
 		boolean internal_testing;
 		string1 businessReportFetchLevel;
+    boolean IncludeVendorSourceB;
 	end;
 	
 	export rec_input := record

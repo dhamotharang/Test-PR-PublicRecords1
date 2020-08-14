@@ -120,12 +120,35 @@
 	STRING30 P_InpClnEmailDom;		
 	STRING6  P_InpClnEmailExt;
 	STRING45 P_InpClnIPAddr;
+	STRING6 P_InpValNameInvalidFlag,
+	STRING6 P_InpValAddrStInvalidFlag,
+	STRING6 P_InpValPhoneHomeInvalidFlag,
+	STRING6 P_InpValPhoneWorkInvalidFlag,
+	STRING6 P_InpValSSNInvalidFlag,
+	STRING6 P_InpValDLInvalidFlag,
+	STRING6 P_InpValDLStateInvalidFlag,
+	STRING6 P_InpValDOBInvalidFlag,
+	STRING6 P_InpValEmailInvalidFlag,
+	STRING6 P_InpValArchDtInvalidFlag,
 	// INTEGER4 PI_InpAddrAVMVal;
 	// INTEGER4 PI_InpAddrAVMValA1Y;
 	// DECIMAL7_2 PI_InpAddrAVMRatio1Y;
 	// INTEGER4 PI_InpAddrAVMValA5Y;
 	// DECIMAL7_2 PI_InpAddrAVMRatio5Y;
 	// INTEGER4 PI_InpAddrAVMConfScore;
+	STRING6 PI_InpAddrOnFileFlagEv;
+	STRING6 PI_InpAddrIsVacantFlag;
+	STRING6 PI_InpAddrIsThrowbackFlag;
+	STRING6 PI_InpAddrSeasonalType;
+	STRING6 PI_InpAddrIsDNDFlag;
+	STRING6 PI_InpAddrIsCollegeFlag;
+	STRING6 PI_InpAddrIsCMRAFlag;
+	STRING6 PI_InpAddrIsSimpAddrFlag;
+	STRING6 PI_InpAddrIsDropDeliveryFlag;
+	STRING6 PI_InpAddrIsBusinessFlag;
+	STRING6 PI_InpAddrOWGMFlag;
+	STRING6 PI_InpAddrIsMultiUnitFlag;
+	STRING6 PI_InpAddrIsAptFlag;
 	STRING10 G_BuildDrgCrimDt;
 	STRING10 G_BuildAstVehAirDt;
 	STRING10 G_BuildAstVehWtrDt;
@@ -258,7 +281,18 @@
 	// STRING200 PL_CurrAddrLocID;
 	STRING200 PL_PrevAddrFull;
 	// STRING200 PL_PrevAddrLocID;
-		//consumer liens		
+	//Current Address
+	STRING6 PL_CurrAddrIsVacantFlag;
+	STRING6 PL_CurrAddrIsThrowbackFlag;
+	STRING6 PL_CurrAddrSeasonalType;
+	STRING6 PL_CurrAddrIsDNDFlag;
+	STRING6 PL_CurrAddrIsCollegeFlag;
+	STRING6 PL_CurrAddrIsCMRAFlag;
+	STRING6 PL_CurrAddrIsSimpAddrFlag;
+	STRING6 PL_CurrAddrIsDropDeliveryFlag;
+	STRING6 PL_CurrAddrIsBusinessFlag;
+		//consumer liens	
+	STRING10 G_BuildDrgLnJDt;
 	INTEGER3 PL_DrgJudgCnt7Y;		
 	INTEGER3 PL_DrgLTDCnt7Y;		
 	INTEGER3 PL_DrgLienCnt7Y;		

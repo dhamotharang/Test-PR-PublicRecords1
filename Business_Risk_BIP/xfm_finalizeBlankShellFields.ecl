@@ -1658,6 +1658,8 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.SBFE.SBFEDelinquentCount84 := '-99';
 		SELF.SBFE.SBFEDelinquentCountEver := '-99';
 		SELF.SBFE.SBFEDelq61CountEverTtl := '-99';
+		SELF.SBFE.SBFEDelq91CountEverTtl := '-99';
+		SELF.SBFE.SBFEDelq121CountEverTtl := '-99'; 
 		SELF.SBFE.SBFEDelinquentCountLoan := '-99';
 		SELF.SBFE.SBFEDelq61LoanCount03M := '-99';
 		SELF.SBFE.SBFEDelinquentCountLoan06 := '-99';
@@ -1729,6 +1731,7 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.SBFE.SBFEDelq61RevCountTtl := '-99';
 		SELF.SBFE.SBFEDelq61RevCountTtlChargeoff := '-99';
 		SELF.SBFE.SBFEDelq91CountTtl := '-99';
+		SELF.SBFE.SBFEDelq121CountTtl := '-99';
 		SELF.SBFE.SBFEDelq91CountTtlChargeoff := '-99';
 		SELF.SBFE.SBFEDPD91Count := '-99'; 
 		SELF.SBFE.SBFEDelq91Count03M := '-99';

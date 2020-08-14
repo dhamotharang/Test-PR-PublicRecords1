@@ -72,7 +72,14 @@ end;
 
 export StatusRefresh_error_desc(string5 error_code) := FUNCTION
     desc := map(
-			trim(error_code) = '22OKC' => 'Error occurred in status refresh.',
+			trim(error_code) = '22' => 'Error occurred in status refresh.',
+			'');
+	return desc;
+END;
+
+export DTE_error_desc(string5 error_code) := FUNCTION
+    desc := map(
+			trim(error_code) = '41' => 'The requested public record was not available.',
 			'');
 	return desc;
 END;

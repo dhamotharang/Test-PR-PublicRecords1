@@ -6,9 +6,12 @@ threads := 1;
 
 RoxieIP := RiskWise.shortcuts.Dev156;
 NeutralRoxieIP:= RiskWise.Shortcuts.Dev156;
+// PCG_Dev := 'http://delta_dempers_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
+// PCG_Cert := 'http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on PROD servers DO NOT USE THIS UNLESS YOU NEED TO				
 
 InputFile := '~mas::uatsamples::consumer_fcra_100k_07102019.csv';
-//InputFile := '~mas::uatsamples::consumer_fcra_1m_07092019.csv';
+// InputFile := '~mas::uat::mas_fcra_10k_sample_20200707.csv';
+// InputFile := '~mas::uatsamples::consumer_fcra_1m_07092019.csv';
 // InputFile := '~mas::uatsamples::consumer_nonfcra_iptest_04232020.csv'; //Samesample as NonFCRA only testing IP validation
 
 
@@ -28,7 +31,7 @@ GLBA := 0; // FCRA isn't GLBA restricted
 DPPA := 0; // FCRA isn't DPPA restricted
 DataPermissionMask := '0000000000000';  
 DataRestrictionMask := '1000010000000100000000000000000000000000000000000'; 
-
+Include_Minors := TRUE;
 // Inteded Purpose for FCRA. Stubbing this out for now so it can be used in the settings output for now.
 Intended_Purpose := ''; 
 // Intended_Purpose := 'PRESCREENING'; 
@@ -49,6 +52,11 @@ Output_Master_Results := TRUE;
 // Toggle to include/exclude SALT profile of results file
 // Output_SALT_Profile := FALSE;
 Output_SALT_Profile := TRUE;
+
+// Use default list of allowed sources
+AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+// Do not exclude any additional sources from allowed sources dataset.
+ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 
 RecordsToRun := 0;
 eyeball := 100;
@@ -102,7 +110,10 @@ soapLayout := RECORD
 	UNSIGNED1 DPPAPurpose;
 	BOOLEAN OutputMasterResults;
 	BOOLEAN IsMarketing;
+	BOOLEAN IncludeMinors;
 	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 end;
 
 Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
@@ -111,12 +122,14 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT BOOLEAN isFCRA := TRUE;
 	EXPORT STRING ArchiveDate := histDate;
 	EXPORT STRING InputFileName := InputFile;
-	EXPORT STRING PermissiblePurpose := Intended_Purpose; // FCRA only
+	EXPORT STRING IntendedPurpose := Intended_Purpose; // FCRA only
 	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
 	EXPORT STRING Data_Permission_Mask := DataPermissionMask;
 	EXPORT UNSIGNED GLBAPurpose := GLBA;
 	EXPORT UNSIGNED DPPAPurpose := DPPA;
 	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
+	EXPORT BOOLEAN IncludeMinors := Include_Minors;
+
 END;
 
 
@@ -125,17 +138,20 @@ soapLayout trans (pp le):= TRANSFORM
     SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout,
         SELF := LEFT;
         SELF := []));   
-    SELF.Gateways := DATASET([TRANSFORM(Gateway.Layouts.Config,
-                SELF.ServiceName := 'neutralroxie';
-                SELF.URL := NeutralRoxieIP;
-                SELF := [])]);
+    SELF.Gateways := 	DATASET([{'neutralroxie', NeutralRoxieIP}], Gateway.Layouts.Config);
+    // SELF.Gateways := 	DATASET([{'neutralroxie', NeutralRoxieIP},
+									//	{'delta_personcontext', PCG_Dev}], Gateway.Layouts.Config);
+		
     SELF.ScoreThreshold := Settings.LexIDThreshold;
     SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
     SELF.DataPermissionMask := Settings.Data_Permission_Mask;
     SELF.GLBPurpose := Settings.GLBAPurpose;
     SELF.DPPAPurpose := Settings.DPPAPurpose;
+    SELF.IncludeMinors := Settings.IncludeMinors;
     SELF.IsMarketing := FALSE;
     SELF.OutputMasterResults := Output_Master_Results;
+		SELF.AllowedSourcesDataset := AllowedSourcesDataset;
+		SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;
 END;
 
 soap_in := PROJECT(pp, trans(LEFT));

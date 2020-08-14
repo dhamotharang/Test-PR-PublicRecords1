@@ -1,3 +1,3 @@
-export layout_references := record
-  unsigned6 bdid;
-  end;
+EXPORT layout_references := RECORD
+  UNSIGNED6 bdid;
+END;

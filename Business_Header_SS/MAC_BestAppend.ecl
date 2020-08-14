@@ -4,10 +4,12 @@ EXPORT MAC_BestAppend
   best_flags,
   verify_flags,
   outfile,
+  dpm,
+  drm,
   bool_use_keyed_joins = 'false'
 ) := MACRO
 
-IMPORT business_header, STD, did_add;
+IMPORT business_header, STD, did_add, doxie;
 
 #uniquename(bhfb)
 %bhfb% :=
@@ -63,7 +65,8 @@ END;
 #uniquename(best_joined)
 %best_joined% := JOIN(infile, %bhfb%,
           (UNSIGNED6) LEFT.bdid != 0 AND
-          (UNSIGNED6) LEFT.bdid = RIGHT.bdid,
+          (UNSIGNED6) LEFT.bdid = RIGHT.bdid AND 
+          doxie.compliance.isBusHeaderSourceAllowed(right.source, dpm, drm),
           %append_best%(LEFT, RIGHT),
           LEFT OUTER,
 #if(not bool_use_keyed_joins)
