@@ -445,6 +445,8 @@ EXPORT Layouts := MODULE
 			boolean SkipMBS;
 			boolean SkipDeltabase;
 			boolean SkipRDP;
+			boolean SkipDashboards;
+			boolean SkipDashboardVersion;
 		END;
 
 		export SkipValidationByGCID	 := RECORD

@@ -1,12 +1,14 @@
 ## Description
 
+<!--Replace this comment with a description-->
+
 ## Query Deploy List
 <p>
 <details>
 <summary>Toggle</summary>
 <pre><code id="d">
 
-**Replace me with query list (one per line)**
+<!--Replace this comment with query list (one per line)-->
 
 </code></pre>
 </details>
@@ -18,7 +20,7 @@
 <summary>Toggle</summary>
 <pre><code id="r">
 
-**Replace me with query list (one per line)**
+<!--Replace this comment with query list (one per line)-->
 
 </code></pre>
 </details>
