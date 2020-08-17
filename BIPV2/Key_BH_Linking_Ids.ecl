@@ -17,90 +17,260 @@ MODULE
 		BIPV2.IDlayouts.l_xlink_ids.SELEscore;
 		BIPV2.IDlayouts.l_xlink_ids.SELEweight;
 	end;	
-	
-	shared layout_key := record
-		infile_rec;
-		BIPV2.IDlayouts.l_xlink_ids.DotScore;
-		BIPV2.IDlayouts.l_xlink_ids.DotWeight;
-		BIPV2.IDlayouts.l_xlink_ids.EmpScore;
-		BIPV2.IDlayouts.l_xlink_ids.EmpWeight;
-		BIPV2.IDlayouts.l_xlink_ids.POWScore;
-		BIPV2.IDlayouts.l_xlink_ids.POWWeight;
-		BIPV2.IDlayouts.l_xlink_ids.ProxScore;
-		BIPV2.IDlayouts.l_xlink_ids.ProxWeight;
-		BIPV2.IDlayouts.l_xlink_ids.OrgScore;
-		BIPV2.IDlayouts.l_xlink_ids.OrgWeight;
-		BIPV2.IDlayouts.l_xlink_ids.UltScore;
-		BIPV2.IDlayouts.l_xlink_ids.UltWeight;
-    unsigned4 global_sid;
-    unsigned8 record_sid;
-	end;
 
-    shared layout_key_with_locid := record(layout_key)
-      unsigned6 locid;
-    end;
+shared layout_key := RECORD
+  unsigned6 ultid;
+  unsigned6 orgid;
+  unsigned6 seleid;
+  unsigned6 proxid;
+  unsigned6 powid;
+  unsigned6 empid;
+  unsigned6 dotid;
+  unsigned2 ultscore;
+  unsigned2 orgscore;
+  unsigned2 selescore;
+  unsigned2 proxscore;
+  unsigned2 powscore;
+  unsigned2 empscore;
+  unsigned2 dotscore;
+  unsigned2 ultweight;
+  unsigned2 orgweight;
+  unsigned2 seleweight;
+  unsigned2 proxweight;
+  unsigned2 powweight;
+  unsigned2 empweight;
+  unsigned2 dotweight;
+  unsigned6 rcid;
+  string2 source;
+  string9 ingest_status;
+  unsigned6 lgid3;
+  unsigned6 vanity_owner_did;
+  unsigned8 cnt_rcid_per_dotid;
+  unsigned8 cnt_dot_per_proxid;
+  unsigned8 cnt_prox_per_lgid3;
+  unsigned8 cnt_prox_per_powid;
+  unsigned8 cnt_dot_per_empid;
+  boolean has_lgid;
+  boolean is_sele_level;
+  boolean is_org_level;
+  boolean is_ult_level;
+  unsigned6 parent_proxid;
+  unsigned6 sele_proxid;
+  unsigned6 org_proxid;
+  unsigned6 ultimate_proxid;
+  unsigned2 levels_from_top;
+  unsigned3 nodes_below;
+  unsigned3 nodes_total;
+  string1 sele_gold;
+  string1 ult_seg;
+  string1 org_seg;
+  string1 sele_seg;
+  string1 prox_seg;
+  string1 pow_seg;
+  string1 ult_prob;
+  string1 org_prob;
+  string1 sele_prob;
+  string1 prox_prob;
+  string1 pow_prob;
+  string1 iscontact;
+  string5 title;
+  string20 fname;
+  string20 mname;
+  string20 lname;
+  string5 name_suffix;
+  string3 name_score;
+  string1 iscorp;
+  string120 company_name;
+  string50 company_name_type_raw;
+  string50 company_name_type_derived;
+  string1 cnp_hasnumber;
+  string250 cnp_name;
+  string30 cnp_number;
+  string10 cnp_store_number;
+  string10 cnp_btype;
+  string1 cnp_component_code;
+  string20 cnp_lowv;
+  boolean cnp_translated;
+  integer4 cnp_classid;
+  unsigned8 company_rawaid;
+  unsigned8 company_aceaid;
+  string10 prim_range;
+  string10 prim_range_derived;
+  string2 predir;
+  string28 prim_name;
+  string28 prim_name_derived;
+  string4 addr_suffix;
+  string2 postdir;
+  string10 unit_desig;
+  string8 sec_range;
+  string25 p_city_name;
+  string25 v_city_name;
+  string2 st;
+  string5 zip;
+  string4 zip4;
+  string4 cart;
+  string1 cr_sort_sz;
+  string4 lot;
+  string1 lot_order;
+  string2 dbpc;
+  string1 chk_digit;
+  string2 rec_type;
+  string2 fips_state;
+  string3 fips_county;
+  string10 geo_lat;
+  string11 geo_long;
+  string4 msa;
+  string7 geo_blk;
+  string1 geo_match;
+  string4 err_stat;
+  string250 corp_legal_name;
+  string250 dba_name;
+  string9 active_duns_number;
+  string9 hist_duns_number;
+  string9 deleted_key;
+  string9 deleted_fein;
+  string9 active_enterprise_number;
+  string9 hist_enterprise_number;
+  string9 ebr_file_number;
+  string30 active_domestic_corp_key;
+  string30 hist_domestic_corp_key;
+  string30 foreign_corp_key;
+  string30 unk_corp_key;
+  unsigned4 dt_first_seen;
+  unsigned4 dt_last_seen;
+  unsigned4 dt_vendor_first_reported;
+  unsigned4 dt_vendor_last_reported;
+  unsigned6 company_bdid;
+  string50 company_address_type_raw;
+  string9 company_fein;
+  string1 best_fein_indicator;
+  string10 company_phone;
+  string1 phone_type;
+  string60 company_org_structure_raw;
+  unsigned4 company_incorporation_date;
+  string8 company_sic_code1;
+  string8 company_sic_code2;
+  string8 company_sic_code3;
+  string8 company_sic_code4;
+  string8 company_sic_code5;
+  string6 company_naics_code1;
+  string6 company_naics_code2;
+  string6 company_naics_code3;
+  string6 company_naics_code4;
+  string6 company_naics_code5;
+  string6 company_ticker;
+  string6 company_ticker_exchange;
+  string1 company_foreign_domestic;
+  string80 company_url;
+  string2 company_inc_state;
+  string32 company_charter_number;
+  unsigned4 company_filing_date;
+  unsigned4 company_status_date;
+  unsigned4 company_foreign_date;
+  unsigned4 event_filing_date;
+  string50 company_name_status_raw;
+  string50 company_status_raw;
+  unsigned4 dt_first_seen_company_name;
+  unsigned4 dt_last_seen_company_name;
+  unsigned4 dt_first_seen_company_address;
+  unsigned4 dt_last_seen_company_address;
+  string34 vl_id;
+  boolean current;
+  unsigned8 source_record_id;
+  unsigned2 phone_score;
+  string9 duns_number;
+  string100 source_docid;
+  unsigned4 dt_first_seen_contact;
+  unsigned4 dt_last_seen_contact;
+  unsigned6 contact_did;
+  string50 contact_type_raw;
+  string50 contact_job_title_raw;
+  string9 contact_ssn;
+  unsigned4 contact_dob;
+  string30 contact_status_raw;
+  string60 contact_email;
+  string30 contact_email_username;
+  string30 contact_email_domain;
+  string10 contact_phone;
+  string1 from_hdr;
+  string35 company_department;
+  string50 company_address_type_derived;
+  string60 company_org_structure_derived;
+  string50 company_name_status_derived;
+  string50 company_status_derived;
+  string1 proxid_status_private;
+  string1 powid_status_private;
+  string1 seleid_status_private;
+  string1 orgid_status_private;
+  string1 ultid_status_private;
+  string1 proxid_status_public;
+  string1 powid_status_public;
+  string1 seleid_status_public;
+  string1 orgid_status_public;
+  string1 ultid_status_public;
+  string50 contact_type_derived;
+  string50 contact_job_title_derived;
+  string30 contact_status_derived;
+  string1 address_type_derived;
+  boolean is_vanity_name_derived;
+  string10 employee_count_org_raw;
+  unsigned6 employee_count_org_derived;
+  string28 revenue_org_raw;
+  unsigned6 revenue_org_derived;
+  string10 employee_count_local_raw;
+  unsigned6 employee_count_local_derived;
+  string28 revenue_local_raw;
+  unsigned6 revenue_local_derived;
+  unsigned4 global_sid;
+  unsigned8 record_sid;
+  unsigned6 locid;
+  unsigned1 seleid_status_private_score;
+  unsigned1 seleid_status_public_score;
+END;
 
-		    	
-	shared infile_key := project(infile, transform(layout_key,  
-																											self.DotScore   := 100,
-																											self.DotWeight  := 100,
-																											self.EmpScore   := 100,
-																											self.EmpWeight  := 100,
-																											self.POWScore   := 100,
-																											self.POWWeight  := 100,
-																											self.ProxScore  := 100,
-																											self.ProxWeight := 100,
-																											self.OrgScore   := 100,
-																											self.OrgWeight  := 100,
-																											self.UltScore   := 100,
-																											self.UltWeight  := 100,
-																											self.SELEscore	:= 100,
-																											self.SELEweight	:= 100,
-                                                      self.global_sid := 0  ,
-                                                      self.record_sid := 0  ,
-                                                      self 						:= left,
-																											));
-		    
-	shared infile_hidden_key := project(infile_hidden, transform(layout_key_with_locid,  
-                                                self.DotScore   := 100,
-                                                self.DotWeight  := 100,
-                                                self.EmpScore   := 100,
-                                                self.EmpWeight  := 100,
-                                                self.POWScore   := 100,
-                                                self.POWWeight  := 100,
-                                                self.ProxScore  := 100,
-                                                self.ProxWeight := 100,
-                                                self.OrgScore   := 100,
-                                                self.OrgWeight  := 100,
-                                                self.UltScore   := 100,
-                                                self.UltWeight  := 100,
-                                                self.SELEscore  := 100,
-                                                self.SELEweight := 100,
-                                                self.global_sid := 0  ,
-                                                self.record_sid := 0  ,
-                                                self.locid      := 0  ,
-                                                self            := left,
-                                                ));
+shared infile_key := dataset([],layout_key);		    	
+	// shared infile_key := project(infile, transform(layout_key,  
+																											// self.DotScore   := 100,
+																											// self.DotWeight  := 100,
+																											// self.EmpScore   := 100,
+																											// self.EmpWeight  := 100,
+																											// self.POWScore   := 100,
+																											// self.POWWeight  := 100,
+																											// self.ProxScore  := 100,
+																											// self.ProxWeight := 100,
+																											// self.OrgScore   := 100,
+																											// self.OrgWeight  := 100,
+																											// self.UltScore   := 100,
+																											// self.UltWeight  := 100,
+																											// self.SELEscore	:= 100,
+																											// self.SELEweight	:= 100,
+                                            
+                                                      // self 						:= left,
+																											// ));
 
-
-     LocationID_xLink.Append(infile_key, 
-		                   prim_range, 
-                             predir, 
-		                   prim_name, 
-                             addr_suffix, 
-                             postdir, 
-                             sec_range, 
-                             v_city_name, 
-                             st, 
-                             zip, 
-                             out_infile_key_with_locid); 			
-	
-     shared infile_key_with_locid := project(out_infile_key_with_locid, layout_key_with_locid);
-  
+shared infile_hidden_key := dataset([],layout_key);			    
+	// shared infile_hidden_key := project(infile_hidden, transform(layout_key,  
+                                                // self.DotScore   := 100,
+                                                // self.DotWeight  := 100,
+                                                // self.EmpScore   := 100,
+                                                // self.EmpWeight  := 100,
+                                                // self.POWScore   := 100,
+                                                // self.POWWeight  := 100,
+                                                // self.ProxScore  := 100,
+                                                // self.ProxWeight := 100,
+                                                // self.OrgScore   := 100,
+                                                // self.OrgWeight  := 100,
+                                                // self.UltScore   := 100,
+                                                // self.UltWeight  := 100,
+                                                // self.SELEscore  := 100,
+                                                // self.SELEweight := 100,
+                                                // self            := left,
+                                                // ));
+		  
   BIPV2.IDmacros.mac_IndexWithXLinkIDs(infile_hidden_key, k1, superfile_name_hidden);																					
   Export Key_hidden := k1;
 
-	BIPV2.IDmacros.mac_IndexWithXLinkIDs(infile_key_with_locid, k, superfile_name);	
+	BIPV2.IDmacros.mac_IndexWithXLinkIDs(infile_key, k, superfile_name);	
 	export Key      := k;//withOUT ParentAbovSeleField (see comment below)
 	export KeyPlus  := BIPV2.IDmacros.mac_AddParentAbovSeleField(Key); //with ParentAbovSeleField
   export keyversions(string pversion = 'qa',boolean pUseOtherEnvironment = false) := tools.macf_FilesIndex('Key',BIPV2_Build.keynames(pversion, pUseOtherEnvironment).linkids); //allow easy access to other versions(logical or super) of key
