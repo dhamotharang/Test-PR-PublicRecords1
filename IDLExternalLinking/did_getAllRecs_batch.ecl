@@ -5,9 +5,10 @@
 		To have access to collapsed DIDs you have to join with the inputDID after 
 	   the final results is returned
 */
-import InsuranceHeader_xlink;
 
 EXPORT did_getAllRecs_batch(infile, in_DID, in_Uniqueid ):= FUNCTIONMACRO
+import InsuranceHeader_xlink, SALT311;
+
 	asIndex := IF(thorlib.nodes() < 400 OR COUNT(infile) < 15000000, TRUE, FALSE);
 	
 	payloadKey := InsuranceHeader_xlink.key_InsuranceHeader_did;
