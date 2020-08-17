@@ -1,5 +1,6 @@
 ﻿import Address, Autokey_batch, BatchServices, doxie, dx_Gong, mdr, POE, PSS, ut, Yellowpages, PAW_Services, paw, spoke, zoom,
-       corp2, POEsFromEmails, one_click_data, SalesChannel, thrive, Email_Data, DCA, doxie_cbrs, Prof_LicenseV2, suppress, STD;
+       corp2, POEsFromEmails, one_click_data, SalesChannel, thrive, Email_Data, DCA, doxie_cbrs, Prof_LicenseV2, suppress, STD,
+       dx_DataBridge, dx_Database_USA;
 
 // NOTE: Within this module certain BatchServices.Workplace_* attributes are used.
 // This is because the BatchServices.WorkPlace_BatchService was created first,
@@ -618,7 +619,7 @@ export Functions := module
 
       STRING cap_s1:= std.Str.ToUpperCase(email_in);
       email_domain := Std.Str.SplitWords(cap_s1,'@');
-      BOOLEAN isNonPersonalEmail:= email_domain[2] NOT IN BatchServices.WorkPlace_Constants.PERSONAL_EMAIL_DOMAIN_DCT;
+      BOOLEAN isNonPersonalEmail:= email_domain[2] <> '' AND email_domain[2] NOT IN BatchServices.WorkPlace_Constants.PERSONAL_EMAIL_DOMAIN_DCT;
 
     RETURN isNonPersonalEmail;
   END; // end of checkNonPersonalEmail function
@@ -626,6 +627,8 @@ export Functions := module
   EXPORT getDetailedWithEmail(DATASET(WorkPlace_Services.Layouts.poe_didkey_plus)
                                ds_recs_in, doxie.IDataAccess mod_access) := FUNCTION
 
+    ds_recs_databridge   := ds_recs_in(MDR.sourceTools.SourceIsDataBridge(source));
+    ds_recs_database_USA := ds_recs_in(MDR.sourceTools.SourceIsDatabase_USA(source));
     ds_recs_spoke := ds_recs_in(MDR.sourceTools.SourceIsSpoke(source));
     ds_recs_zoom := ds_recs_in(MDR.sourceTools.SourceIsZoom(source));
     ds_recs_corp := ds_recs_in(MDR.sourceTools.SourceIsCorpV2(source));
@@ -643,9 +646,64 @@ export Functions := module
                                  ~MDR.sourceTools.SourceIsOne_Click_Data(source) AND
                                  ~MDR.sourceTools.SourceIsSalesChannel(source) AND
                                  ~MDR.sourceTools.SourceIsThrive_LT(source) AND
-                                 ~MDR.sourceTools.SourceIsThrive_PD(source)
+                                 ~MDR.sourceTools.SourceIsThrive_PD(source) AND
+                                 ~MDR.sourceTools.SourceIsDataBridge(source) AND
+                                 ~MDR.sourceTools.SourceIsDatabase_USA(source)
                                 );
 
+    ds_detail_databridge_all := dx_DataBridge.Append.byDid(ds_recs_databridge, did, BatchServices.WorkPlace_Constants.Limits.APPEND_LIMIT);
+
+    _ds_detail_databridge := project(ds_detail_databridge_all,
+                                     transform(WorkPlace_Services.Layouts.poe_didkey_plus,
+                                       //Refer dx_Databridge.Append and dx_Databridge.Layout_Keybase
+                                       key_data := left.databridge_data;
+                                       email_filter(string50 email, string7 status) := if(
+                                         checkNonPersonalEmail(email) and status <> BatchServices.WorkPlace_Constants.EMAIL_INVALID,
+                                         email,
+                                       '');
+                                       self.dt_last_seen := if(left.dt_last_seen = key_data.dt_last_seen, left.dt_last_seen, skip);
+                                       self.email1 := email_filter(key_data.email1, key_data.email_status),
+                                       self.email2 := email_filter(key_data.email2, key_data.email_status),
+                                       self.email3 := email_filter(key_data.email3, key_data.email_status),
+                                       self.email_src1 := if(self.email1 <> '', left.source, ''),
+                                       self.email_src2 := if(self.email2 <> '', left.source, ''),
+                                       self.email_src3 := if(self.email3 <> '', left.source, ''),
+                                       self.global_sid := left.global_sid,
+                                       self.record_sid := left.record_sid,
+                                       self := left));
+
+    ds_detail_databridge_flagged := Suppress.MAC_FlagSuppressedSource(_ds_detail_databridge, mod_access);
+
+    ds_detail_databridge := project(ds_detail_databridge_flagged,
+                                    transform($.Layouts.poe_didkey_plus,
+                                      self.email1 := if(left.is_suppressed, '', left.email1),
+                                      self.email2 := if(left.is_suppressed, '', left.email2),
+                                      self.email3 := if(left.is_suppressed, '', left.email3),
+                                      self.email_src1 := if(left.is_suppressed, '', left.email_src1),
+                                      self.email_src2 := if(left.is_suppressed, '', left.email_src2),
+                                      self.email_src3 := if(left.is_suppressed, '', left.email_src3),
+                                      self := left));
+
+    ds_detail_database_usa_all := dx_Database_USA.Append.byDid(ds_recs_database_USA, did, BatchServices.WorkPlace_Constants.Limits.APPEND_LIMIT);
+
+    _ds_detail_database_usa := project(ds_detail_database_usa_all,
+                                       transform(WorkPlace_Services.Layouts.poe_didkey_plus,
+                                         //Refer dx_Database_USA.Append and dx_Database_USA.Layout_Keybase
+                                         key_data := left.dbusa_data;
+                                         self.dt_last_seen := if(left.dt_last_seen = key_data.dt_last_seen, left.dt_last_seen, skip),
+                                         self.email1 := if(checkNonPersonalEmail(key_data.email), key_data.email, ''),
+                                         self.email_src1 := if(self.email1 <> '', left.source, ''),
+                                         self.global_sid := left.global_sid,
+                                         self.record_sid := left.record_sid,
+                                         self := left));
+
+    ds_detail_database_usa_flagged := Suppress.MAC_FlagSuppressedSource(_ds_detail_database_usa, mod_access);
+
+    ds_detail_database_usa := project(ds_detail_database_usa_flagged,
+                                      transform($.Layouts.poe_didkey_plus,
+                                        self.email1 := if(left.is_suppressed, '', left.email1),
+                                        self.email_src1 := if(left.is_suppressed, '', left.email_src1),
+                                        self := left));
 
     ds_detail_spoke_all := JOIN(ds_recs_spoke,spoke.keys().did.qa,
                             KEYED(LEFT.did = RIGHT.did) AND
@@ -842,7 +900,9 @@ export Functions := module
                              );
 
   // Combine all source detail recs into 1 dataset.
-  ds_detail_all := ds_detail_spoke
+  ds_detail_all := ds_detail_databridge
+                   + ds_detail_database_usa
+                   + ds_detail_spoke
                    + ds_detail_zoom
                    + ds_detail_corp
                    + ds_detail_poeemail
@@ -1001,7 +1061,7 @@ export Functions := module
                                TRANSFORM(BatchServices.WorkPlace_Layouts.dca_info,
                                  // Get parent company fields from RIGHT file
                                  SELF.parent_company_bdid := IF(RIGHT.bdid<>0,(string) RIGHT.bdid,'');
-                                 SELF.parent_company_name := StringLib.StringToUpperCase(RIGHT.Name),
+                                 SELF.parent_company_name := STD.Str.ToUpperCase(RIGHT.Name),
                                  SELF.parent_company_address := Address.Addr1FromComponents(
                                                                 RIGHT.prim_range,
                                                                 RIGHT.predir,

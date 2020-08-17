@@ -132,6 +132,8 @@ MODULE
 	export src_CrashCarrier							 := 'KC';  // aka US DOT "Safer Census" data for BIP
 	export src_Credit_Unions             := 'CU';
 	export src_DataBridge								 := 'RQ';
+	export src_DataBase_USA              := '9I';
+	export src_OPM                       := '33';
 	export src_Datagence								 := 'DG';
 	export src_DCA                       := 'DF';  // Directory of Corporate Affiliations; aka LNCA
 	export src_DEA                       := 'DA';  // US Drug Enforcement Administration
@@ -1339,7 +1341,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_POE := [
 		 /*src_jigsaw	 ,*/							src_spoke											,src_zoom											 ,src_teletrack
 	  ,src_one_click_data						 ,src_Clarity										,src_Garnishments							 ,src_Thrive_LT
-		,src_Thrive_PD
+		,src_Thrive_PD, src_Databridge, src_Database_USA, src_OPM
 	] 
 	+ set_CorpV2
 	+ set_email
@@ -1686,6 +1688,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_CrashCarrier              := [src_CrashCarrier              ];	
 	export set_Credit_Unions             := [src_Credit_Unions             ];
 	export set_DataBridge                := [src_DataBridge                ];
+	export set_Database_USA              := [src_Database_USA              ];
+	export set_OPM                       := [src_OPM                       ];
 	export set_Datagence                 := [src_Datagence                 ];
 	export set_DCA                       := [src_DCA                       ];
 	export set_Death_Michigan            := [src_Death_Michigan            ];
@@ -2202,6 +2206,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsCredit_Unions              (string  sr) := sr               in set_Credit_Unions              ;		
 	export SourceIsCriminal_History           (string  sr) := sr               in set_Criminal_History           ;
 	export SourceIsDataBridge                 (string  sr) := sr               in set_DataBridge                 ;
+	export SourceIsDatabase_USA               (string  sr) := sr               in set_Database_USA               ;
+	export SourceIsOPM                        (string  sr) := sr               in set_OPM                        ;
 	export SourceDatagence                    (string  sr) := sr               in set_Datagence;
 	export SourceIsDCA                        (string  sr) := sr               in set_DCA                        ;
 	export SourceIsDea                        (string  sr) := sr               in set_Dea                        ;
