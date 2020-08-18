@@ -450,7 +450,7 @@ MODULE
 										KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id) and //1:1 mapping
 										(LEFT.ln_fares_id[2] = Location_services.Consts.FaresCodes.Deed or 
 													if(includeAssignmentsAndReleases, LEFT.ln_fares_id[2] = Location_services.Consts.FaresCodes.Mortgage 
-													     and right.record_type IN LN_PropertyV2.Constants.setAssignRelsRecordTypes, false) ), //get only deed records (changed this to return also 'M' records based on the flag)
+													     and LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code), false) ), //get only deed records (changed this to return also 'M' records based on the flag)
 										tGetDeeds(LEFT,RIGHT),
 										LIMIT(0), KEEP(1) );
 			

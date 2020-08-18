@@ -49,7 +49,7 @@ addrFids := Location_Services.property_ids(addrs);
 fids := dedup(sort(addrFids + bfids, fid),fid);
 
 d := JOIN(fids(fid[2]<>'A'),k,left.fid=right.ln_fares_id
-											AND right.record_type NOT IN LN_PropertyV2.Constants.setAssignRelsRecordTypes, //Assignments and Releases codes excluded
+											AND not LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code), //Assignments and Releases codes excluded
           take_right2(left, right), limit(0), keep(1));
 
 rec addlFares(rec L, kf R) := transform

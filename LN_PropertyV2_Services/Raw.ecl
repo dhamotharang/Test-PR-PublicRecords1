@@ -121,7 +121,7 @@ export Raw := module
 		pnum_d := join(
 			fids, keys.deed(isFCRA),
 			keyed(left.ln_fares_id = right.ln_fares_id)
-			AND if(includeVendorSourceB, true, right.record_type NOT IN LN_PropertyV2.Constants.setAssignRelsRecordTypes),
+			AND if(includeVendorSourceB, true, not LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code)),
 			transform(layouts.search_pnum, self.pnum := LN_PropertyV2.fn_strip_pnum(right.apnt_or_pin_number)),
 			limit(Ln_PropertyV2_Services.consts.max_raw, skip)
 		);

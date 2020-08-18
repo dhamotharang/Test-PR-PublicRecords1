@@ -33,7 +33,7 @@ export dataset(l_raw) fn_get_deeds_raw(
 	  keyed(left.ln_fares_id = right.ln_fares_id)
 		and ~((string)right.ln_fares_id in set( flags( (unsigned6)did=left.search_did), record_id) and isFCRA)
 		and (~isCNSMR or right.vendor_source_flag not in D2C.Constants.LNPropertyV2RestrictedSources )
-		AND if(includeBlackKnight, true, right.record_type NOT IN LN_PropertyV2.Constants.setAssignRelsRecordTypes),
+		AND if(includeBlackKnight, true, not LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code)),
 		transform(l_raw,self:=left,self:=right,self:=[]),
 		limit(max_raw)
 	);
