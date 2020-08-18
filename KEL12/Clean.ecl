@@ -1,4 +1,4 @@
-//IMPORT:KEL12.Clean
+﻿//IMPORT:KEL12.Clean
 /**
  *Cleans the set of field names of a dataset by applying any combination of three alterations.
  *<p>
@@ -101,4 +101,4 @@ EXPORT Clean(s, flags, counts, unmang) := FUNCTIONMACRO
     #APPEND(Code, '})')
 
     RETURN #EXPAND(%'Code'%);
-  ENDMACRO;
+ENDMACRO;

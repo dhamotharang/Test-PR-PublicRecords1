@@ -86,6 +86,9 @@ export Raw := module
     correct_puid  := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS_PLUS), record_id);
     correct_ofk_recid := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS), record_id);
     correct_ffid := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS_PLUS), flag_file_id);
+    //here we identify offender_key values which are suppressions - flag_file_id is blank
+    //we need them to support suppression of override records for cluster which is based on offender_key
+    suppressed_ofk  := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS AND flag_file_id=''), record_id);
     correct_ofk := SET (flagfile (file_id=FCRA.FILE_ID.OFFENDERS), flag_file_id);
     offenderkey_key := doxie_files.Key_Offenders_OffenderKey(isFCRA);
     recs1 := join(ids, offenderkey_key,
@@ -102,8 +105,13 @@ export Raw := module
 
     // overrides (FCRA side only) - we have 2 indices for offenders overrides
     // we are making this change to now account for both
-    ds_override_ofp := CHOOSEN (fcra.key_override_crim.offenders_plus (keyed (flag_file_id IN correct_ffid)), MAX_OVERRIDE_LIMIT);
-    ds_override_ofk := CHOOSEN (fcra.key_override_crim.offenders (keyed (flag_file_id IN correct_ofk)), MAX_OVERRIDE_LIMIT);
+    // we check against suppressed_ofk to support suppression of overrides based on cluster
+    ds_override_ofp := CHOOSEN (fcra.key_override_crim.offenders_plus (KEYED (flag_file_id IN correct_ffid)
+                                AND offender_key NOT IN suppressed_ofk),
+                                 MAX_OVERRIDE_LIMIT);
+    ds_override_ofk := CHOOSEN (fcra.key_override_crim.offenders (KEYED (flag_file_id IN correct_ofk)
+                                AND offender_key NOT IN suppressed_ofk),
+                                MAX_OVERRIDE_LIMIT);
 
     ds_override := DEDUP(ds_override_ofp + ds_override_ofk, ALL);
 
@@ -133,7 +141,7 @@ export Raw := module
                             left outer,
                             keep(1),limit(0));
     recs := if(isFCRA, recs_ds, recs1);
-//output(recs,named('OffendersPlusRaw'),EXTEND);
+
     return recs;
   end;
 end;

@@ -1,4 +1,4 @@
-IMPORT ContactCard,Doxie_Raw,Header,LN_PropertyV2,Person_Models,Risk_Indicators;
+﻿IMPORT ContactCard,Doxie_Raw,Header,LN_PropertyV2,Person_Models,Risk_Indicators;
 
 EXPORT Layouts :=
 MODULE
@@ -170,6 +170,8 @@ MODULE
 		LN_Propertyv2.layout_deed_mortgage_common_model_base.name2;
 		LN_Propertyv2.layout_deed_mortgage_common_model_base.seller1;
 		LN_Propertyv2.layout_deed_mortgage_common_model_base.seller2;
+		LN_Propertyv2.layout_deed_mortgage_common_model_base.first_td_due_date;
+		LN_Propertyv2.layout_deed_mortgage_common_model_base.record_type;
 		DATASET(NameWithCollusionAttrs)      buyers;
 		DATASET(NameWithCollusionAttrs)      sellers;
 		DATASET(Risk_Indicators.Layout_Desc) hri_transactions;

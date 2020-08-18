@@ -1,16 +1,16 @@
 ﻿/*2010-09-09T20:45:34Z (Adam Shirey)
 Returning iesp.intermediate_log.t_IntermediateLogRecord for customer support tool
 */
-import address, ut, Risk_Indicators, ADVO, AddrFraud, Property, iesp, models, std, MDR, Foreclosure_Services;
+import address, ut, Risk_Indicators, ADVO, AddrFraud, Property, iesp, models, std, MDR, Foreclosure_Services, foreclosure_vacancy;
  
 //Data sources
 export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],Foreclosure_Vacancy.Layouts.in_data), boolean isRenewal = FALSE) := MODULE
 
 	//Clean Addresses
-	layouts.in_clean AddressClean(indata l) := TRANSFORM
+	foreclosure_vacancy.layouts.in_clean AddressClean(indata l) := TRANSFORM
 		//echo input
 		self.UniqueID_in       := l.UniqueID;
-		tempname               := stringlib.stringfilterout(l.last_name, ' ');
+		tempname               := std.str.filterout(l.last_name, ' ');
 		clean_last             := address.CleanPersonLFM73(tempname);
 		self.first_name_in     := l.first_name;
 		self.middle_initial_in := l.middle_initial;
@@ -50,7 +50,7 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 	export Cleaned := project(indata, AddressClean(Left));
 
 	//Get ADVO data
-	layouts.ADVO_full addADVOFull(Cleaned l, ADVO.Key_Addr1 r) := transform
+	foreclosure_vacancy.layouts.ADVO_full addADVOFull(Cleaned l, ADVO.Key_Addr1 r) := transform
 		self.UniqueID := l.UniqueID_in;
 		self := r;
 		self := [];
@@ -68,7 +68,7 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 		addADVOFull(left, right),Left Outer,
 			atmost(50),keep(1));
 	
-	layouts.ADVO addADVO(Cleaned l, base_ADVO_Full r) := transform
+	foreclosure_vacancy.layouts.ADVO addADVO(Cleaned l, base_ADVO_Full r) := transform
 		self.UniqueID := l.UniqueID_in;
 		self.Potentially_Vacant := if(r.Address_Vacancy_Indicator='', 'N', r.Address_Vacancy_Indicator);		
 		self.Vacancy_First_Seen := if(r.Address_Vacancy_Indicator='Y', r.vac_begdt, '');
@@ -93,6 +93,11 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 		self.CP_DATA_DATE            := tmp_data_date;//Derived newest of filing_date and record_date 
 		self.source           							:= if(r.source=MDR.sourceTools.src_Foreclosures, Foreclosure_services.Constants('').src_Fares, 
 																																																																																					Foreclosure_services.Constants('').src_BlackKnight);																																																																																	 
+		self.LENDER_TYPE := r.lender_type;
+		self.LENDER_TYPE_DESC := r.lender_type_desc;
+		self.LOAN_AMOUNT := r.loan_amount;
+		self.LOAN_TYPE := r.loan_type;
+		self.LOAN_TYPE_DESC := r.loan_type_desc;		
 		self.DEED_EVENT_TYPE_CD      := r.deed_category;
 		self.DEED_EVENT_TYPE_DESC    := r.deed_desc;
 		self.DOC_TYPE_CD             := if( isRenewal, r.document_type, '' );
@@ -160,7 +165,7 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 		self := [];
 	end;
 
-	EXPORT fn_Find_Foreclosure_By_Addr(DATASET(layouts.in_clean) clnd, DATASET(RECORDOF(Property.Key_Foreclosures_Addr)) keyfile, boolean includeBlackKnight=false) :=
+	EXPORT fn_Find_Foreclosure_By_Addr(DATASET(foreclosure_vacancy.layouts.in_clean) clnd, DATASET(RECORDOF(Property.Key_Foreclosures_Addr)) keyfile, boolean includeBlackKnight=false) :=
 		FUNCTION
 			clnd_filtered := clnd(zip != '' and prim_range != '' and prim_name != '');
 			foreclosure_recs := 
@@ -219,7 +224,7 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 	shared foreclosure_sort := sort(foreclosure_records, fc_unique_id, -CP_DATA_DATE);
 
 	//Count Foreclosure records in last 12 months
-	layouts.Foreclosure add12MoForeclosures(Find_Foreclosure_By_Addr l) := TRANSFORM
+	foreclosure_vacancy.layouts.Foreclosure add12MoForeclosures(Find_Foreclosure_By_Addr l) := TRANSFORM
 		tmp_data_date := if(l.filing_date >= l.recording_date, l.filing_date, l.recording_date);
 		fc_populate := if(tmp_data_date <> '' and ut.DaysApart((STRING)Std.Date.Today() , tmp_data_date) < 365, 1, 0);
 		
@@ -245,7 +250,7 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 	export getInteractive() := FUNCTION
 		//Build results
 		//Interactive-------------------------------------------------------
-		layouts.Final_Interactive PrefillADVO(Cleaned l, base_ADVO r) := transform
+		foreclosure_vacancy.layouts.Final_Interactive PrefillADVO(Cleaned l, base_ADVO r) := transform
 			self.Potentially_Vacant := MAP( r.Potentially_Vacant = 'Y' => TRUE, r.Potentially_Vacant = 'F' => FALSE, FALSE);
 			self := r;
 			self := l;
@@ -255,7 +260,7 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 			(left.UniqueID_in = right.UniqueID),
 			PrefillADVO(left, right),Left Outer);
 
-		layouts.Final_Interactive PrefillForeclosure(Prefill_with_ADVO l, foreclosure_sort r) := transform
+		foreclosure_vacancy.layouts.Final_Interactive PrefillForeclosure(Prefill_with_ADVO l, foreclosure_sort r) := transform
 			self.foreclosure_12mo := r.fc_found_12mo;
 			self.foreclosure_type := r.DEED_EVENT_TYPE_CD;
 			self.foreclosure_type_description := r.DEED_EVENT_TYPE_DESC;
@@ -267,7 +272,7 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 			(left.UniqueID_in = right.FC_Unique_ID),
 			PrefillForeclosure(left, right),Left Outer, KEEP(1));
 
-		layouts.Final_Interactive PrefillFinal(Prefill_with_Count l, FC_Count_Sort r) := transform
+		foreclosure_vacancy.layouts.Final_Interactive PrefillFinal(Prefill_with_Count l, FC_Count_Sort r) := transform
 			self.foreclosure_12mo := if(r.fc_found_12mo = '1','1','0');
 			self.foreclosure_count_12mo := (string)r.number;
 			self := l;
@@ -283,7 +288,7 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 		//Foreclosure Address Search - Sort and dedup to get newest record
 		ForeclosureNewest := dedup(Foreclosure_sort, fc_unique_id);
 		
-		layouts.Renewal AddrSearch(ForeclosureNewest l) := transform
+		foreclosure_vacancy.layouts.Renewal AddrSearch(ForeclosureNewest l) := transform
 				self.OWNER_TYPE 	:= 'UK';
 				self.FC_IND 			:= 'N';										
 				self.FC_ADDR_IND 	:= 'Y';
@@ -294,7 +299,7 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 		
 		
 		//Foreclosure Name and Address Search on Owner Name 1
-		layouts.Renewal NameAddrSearch1(Foreclosure_sort l, Cleaned r) := transform
+		foreclosure_vacancy.layouts.Renewal NameAddrSearch1(Foreclosure_sort l, Cleaned r) := transform
 			self.FC_IND 			:= 'Y';							//foreclosure match by name and address
 			self.FC_ADDR_IND 	:= 'N';							//foreclosure match by address
 			self 							:= l;
@@ -307,7 +312,7 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 		NameAddrForeclosuresDedup1 := dedup(NameAddrForeclosures1, fc_unique_id);
 		
 		//Foreclosure Name and Address Search on Owner Name 1
-		layouts.Renewal NameAddrSearch2(Foreclosure_sort l, Cleaned r) := transform
+		foreclosure_vacancy.layouts.Renewal NameAddrSearch2(Foreclosure_sort l, Cleaned r) := transform
 			self.FC_IND 			:= 'Y';							//foreclosure match by name and address
 			self.FC_ADDR_IND 	:= 'N';							//foreclosure match by address
 			self 							:= l;
@@ -323,7 +328,7 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 		
 		NameAddrForeclosuresFinal := dedup(sort(NameAddrForeclosuresTemp, fc_unique_id),  fc_unique_id);
 		
-		layouts.Renewal joinForeclosures(Address_Foreclosures l, NameAddrForeclosuresFinal r) :=transform
+		foreclosure_vacancy.layouts.Renewal joinForeclosures(Address_Foreclosures l, NameAddrForeclosuresFinal r) :=transform
 			self := if(r.fc_unique_id <>'', r, l);
 		end;
 
@@ -336,7 +341,7 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 	
 		//Build results
 		//Batch--------------------------------------------------------------
-		layouts.Final_Renewal BatchADVO(Cleaned l, base_ADVO r) := transform
+		foreclosure_vacancy.layouts.Final_Renewal BatchADVO(Cleaned l, base_ADVO r) := transform
 			self := l;
 			self.VACANCY_IND := r.Potentially_Vacant;
 			self.VAC_BEGDT := r.Vacancy_First_Seen;
@@ -346,7 +351,7 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 			(left.UniqueID_in = right.UniqueID),
 			BatchADVO(left, right),Left Outer);
 
-		layouts.Final_Renewal BatchFinal(Batch_with_ADVO l, Foreclosure_Results r) := transform
+		foreclosure_vacancy.layouts.Final_Renewal BatchFinal(Batch_with_ADVO l, Foreclosure_Results r) := transform
 			self.FC_IND := if(r.fc_unique_ID <>'', r.FC_IND, 'N');
 			self.FC_ADDR_IND := if(r.fc_unique_ID <>'', r.FC_ADDR_IND, 'N');
 			self.OWNER_TYPE := if(r.fc_unique_ID <>'', r.OWNER_TYPE, '');

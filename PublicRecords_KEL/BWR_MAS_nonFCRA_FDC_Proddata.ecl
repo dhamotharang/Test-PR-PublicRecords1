@@ -19,6 +19,11 @@ RecordsToRun := ALL;
 eyeball := 100;
 
 //options
+// Use default list of allowed sources
+AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+// Do not exclude any additional sources from allowed sources dataset.
+ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+
 BOOLEAN FDC := FALSE; //defaulted to false in query to see FDC turn on.  File to big to output when = TRUE
 BOOLEAN Accident := TRUE;
 BOOLEAN Address := TRUE;
@@ -56,6 +61,11 @@ BOOLEAN UCC := TRUE;
 BOOLEAN Mini := TRUE;
 
 
+// If allowed sources aren't passed in, use default list of allowed sources
+SetAllowedSources := IF(COUNT(AllowedSourcesDataset) = 0, PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES, AllowedSourcesDataset);
+// If a source is on the Exclude list, remove it from the allowed sources list. 
+FinalAllowedSources := JOIN(SetAllowedSources, ExcludeSourcesDataset, LEFT=RIGHT, TRANSFORM(RECORDOF(LEFT), SELF := LEFT), LEFT ONLY);
+	
 mod_ConfigTestJob(STD.Date.Date_t _dtArchiveDate = STD.Date.Today()) := MODULE
 
 	SHARED BOOLEAN Is_Insurance_Product := FALSE;
@@ -68,7 +78,6 @@ mod_ConfigTestJob(STD.Date.Date_t _dtArchiveDate = STD.Date.Today()) := MODULE
 		EXPORT BOOLEAN isFCRA                    := FALSE; // ------------------------------------- FCRA is FALSE;
 		EXPORT STRING8 ArchiveDate                := (STRING)_dtArchiveDate;
 		EXPORT STRING250 InputFileName              := '';
-		EXPORT STRING100 PermissiblePurpose         := '';
 		EXPORT STRING100 Data_Restriction_Mask      := '00000000000000000000000000000000000000000000000000';
 		EXPORT STRING100 Data_Permission_Mask       := '11111111111111111111111111111111111111111111111111';
 		EXPORT UNSIGNED GLBAPurpose              := 1;
@@ -79,6 +88,8 @@ mod_ConfigTestJob(STD.Date.Date_t _dtArchiveDate = STD.Date.Today()) := MODULE
 		EXPORT BOOLEAN ExcludeConsumerShell      := FALSE;
 		EXPORT BOOLEAN isMarketing               := FALSE;
 		EXPORT BOOLEAN OutputMasterResults       := FALSE;
+		EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := FinalAllowedSources;
+
 		// BIP Append Options
 		EXPORT UNSIGNED BIPAppendScoreThreshold  := 75;
 		EXPORT UNSIGNED BIPAppendWeightThreshold := 0;
@@ -86,7 +97,7 @@ mod_ConfigTestJob(STD.Date.Date_t _dtArchiveDate = STD.Date.Today()) := MODULE
 		EXPORT BOOLEAN BIPAppendReAppend         := TRUE;
 		EXPORT BOOLEAN BIPAppendIncludeAuthRep   := FALSE;
 
-		EXPORT DATA100 KEL_Permissions_Mask := 
+		EXPORT DATA57 KEL_Permissions_Mask := 
 				PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 						DataRestrictionMask := Data_Restriction_Mask, 
 						DataPermissionMask  := Data_Permission_Mask, 
@@ -96,10 +107,11 @@ mod_ConfigTestJob(STD.Date.Date_t _dtArchiveDate = STD.Date.Today()) := MODULE
 						isMarketing         := isMarketing, 
 						AllowDNBDMI         := Allow_DNBDMI, 
 						OverrideExperianRestriction := Override_Experian_Restriction, 
-						PermissiblePurpose  := '',
+						IntendedPurpose  := '',
 						IndustryClass  := '',
 						KELPermissions      := PublicRecords_KEL.CFG_Compile, 
-						IsInsuranceProduct  := Is_Insurance_Product );
+						IsInsuranceProduct  := Is_Insurance_Product,
+						AllowedSources := FinalAllowedSources);
 	END;		
 
 END;
@@ -247,6 +259,8 @@ soapLayout := RECORD
 		STRING GLBA;
 		STRING DPPA;
 		STRING PDPM;
+		DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+		DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 		BOOLEAN ViewFDC;
 		BOOLEAN IncludeAccident;
 		BOOLEAN IncludeAddress;
@@ -296,6 +310,8 @@ soapLayout trans_pre (pp le, Integer c):= TRANSFORM
 		SELF.GLBA := (STRING)m.Options.GLBAPurpose;
 		SELF.DPPA := (STRING)m.Options.DPPAPurpose;
 		SELF.PDPM := (STRING)m.Options.KEL_Permissions_Mask;
+		SELF.AllowedSourcesDataset := AllowedSourcesDataset;
+		SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;
 		SELF.ViewFDC := FDC; //defaulted to false in query to see FDC turn on
 		self.IncludeAccident := Accident;
 		self.IncludeAddress := Address;

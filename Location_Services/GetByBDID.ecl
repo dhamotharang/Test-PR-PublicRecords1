@@ -1,11 +1,11 @@
-IMPORT business_header, Census_Data, doxie_cbrs, Doxie_Raw;
+IMPORT business_header, Census_Data, doxie_cbrs, Doxie_Raw, doxie;
 
 EXPORT GetByBDID(DATASET(Doxie_Raw.Layout_address_input) addr_in,
-											STRING application_type_value) := MODULE
+											   doxie.IDataAccess mod_access) := MODULE
 
-	EXPORT best_group := business_records(addr_in);
+	EXPORT best_group := business_records(addr_in, mod_access);
 
-	addrDidsWithInputs := getDids(addr_in,application_type_value);
+	addrDidsWithInputs := getDids(addr_in,mod_access.application_type);
 		
 	EXPORT getPropFids() := FUNCTION
 											

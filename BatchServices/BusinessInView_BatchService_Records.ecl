@@ -150,6 +150,10 @@ export setInput(Gateway.Layouts.Config gateway_cfg,
 		BOOLEAN tmpincludebusinessfailurerisklevel := FALSE : STORED('Includebusinessfailurerisklevel');
 	 	BOOLEAN tmpincludecustombcir               := FALSE : STORED('Includecustombcir');									 
 
+    SHARED mod_access := MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+      EXPORT unsigned1 glb := args.glbpurpose;
+      EXPORT unsigned1 dppa := args.dppapurpose;
+    END;    
   // sequence the records
 	batch_input := SequenceInputRecs(false);
 	
@@ -212,7 +216,7 @@ layout_with_dt_last_seen
 					END;
 								
 duns_num_only := JOIN(batch_input(duns_num <> ''),DNB.key_DNB_DunsNum, KEYED(LEFT.duns_num=RIGHT.duns)
-           AND Doxie.DataPermission.use_DNB
+                                            AND Doxie.Compliance.use_DNB(mod_access.DataPermissionMask)
 											AND RIGHT.record_type = 'C',
 											Xfm_joined_recset(LEFT, RIGHT));
 											
@@ -266,7 +270,8 @@ duns_num_dedup_formatted := PROJECT(duns_num_dedup, BatchServices.BusinessInView
 											
   
 	bestBusinessRecs :=  join (batch_input(bdid <> '' and duns_num = ''), Business_Header.Key_BH_Best,
-	                          keyed( (unsigned6) left.bdid = right.bdid),
+	                          keyed( (unsigned6) left.bdid = right.bdid) AND 
+                            doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 														transform(BatchServices.BusinessInView_BatchService_Layouts.layout_input_gateway,
 														   self.bdid := (qstring15) right.bdid,
 															  self.acctno      := left.acctno;
@@ -398,8 +403,8 @@ duns_num_dedup_formatted := PROJECT(duns_num_dedup, BatchServices.BusinessInView
 	  // SELF.user.BillingCode 
 	  // SELF.user.QueryId 
 	  // SELF.user.CompanyId 
-		SELF.user.glbpurpose := (string) args.GLBPurpose;
-		SELF.user.dlpurpose := (string) args.dppapurpose;
+		SELF.user.glbpurpose := (string) mod_access.glb;
+		SELF.user.dlpurpose := (string) mod_access.dppa;
 		// SELF.user.LoginHistoryId 
 	  // SELF.user.DebitUnits 
 	  // SELF.user.IP 

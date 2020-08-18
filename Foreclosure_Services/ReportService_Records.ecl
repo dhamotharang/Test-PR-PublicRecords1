@@ -1,4 +1,4 @@
-import AutoStandardI, Foreclosure_Services, doxie, iesp, suppress;
+﻿import AutoStandardI, Foreclosure_Services, doxie, iesp, suppress;
 
 export ReportService_Records := module
 	export params := interface(
@@ -18,7 +18,7 @@ export ReportService_Records := module
 		recs_sort := sort(recs_fmt, -recordingdate.year, -recordingdate.month, -recordingdate.day,record);
   		tempresults_slim := project(recs_sort, iesp.foreclosure.t_ForeclosureReportRecord); 
 	 
-		return if(not doxie.DataRestriction.Fares,tempresults_slim,tempresults_slim(VendorSource!=Foreclosure_services.Constants('').src_Fares));
+	 return tempresults_slim;
 		
 		end;
 end;

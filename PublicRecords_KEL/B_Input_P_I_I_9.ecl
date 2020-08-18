@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.3.0beta5
+//HPCC Systems KEL Compiler Version 1.3.0
 IMPORT KEL13 AS KEL;
 IMPORT CFG_Compile,E_Address,E_Geo_Link,E_Input_P_I_I,E_Person,E_Property,E_Surname,E_Zip_Code FROM PublicRecords_KEL;
 IMPORT * FROM KEL13.Null;
 EXPORT B_Input_P_I_I_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Input_P_I_I(__in,__cfg).__Result) __E_Input_P_I_I := E_Input_P_I_I(__in,__cfg).__Result;
-  SHARED __EE261258 := __E_Input_P_I_I;
-  EXPORT __ST198267_Layout := RECORD
+  SHARED __EE275059 := __E_Input_P_I_I;
+  EXPORT __ST206744_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -91,9 +91,9 @@ EXPORT B_Input_P_I_I_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST198267_Layout __ND3504863__Project(E_Input_P_I_I(__in,__cfg).Layout __PP260863) := TRANSFORM
-    SELF.P___Inp_Addr_ := __OP2(IF(__T(__NT(__PP260863.P___Inp_Addr_Line1_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__PP260863.P___Inp_Addr_Line1_,+,__CN(' ')))),+,IF(__T(__NT(__PP260863.P___Inp_Addr_Line2_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__PP260863.P___Inp_Addr_Line2_)));
-    SELF := __PP260863;
+  SHARED __ST206744_Layout __ND3503131__Project(E_Input_P_I_I(__in,__cfg).Layout __PP274664) := TRANSFORM
+    SELF.P___Inp_Addr_ := __OP2(IF(__T(__NT(__PP274664.P___Inp_Addr_Line1_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__PP274664.P___Inp_Addr_Line1_,+,__CN(' ')))),+,IF(__T(__NT(__PP274664.P___Inp_Addr_Line2_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__PP274664.P___Inp_Addr_Line2_)));
+    SELF := __PP274664;
   END;
-  EXPORT __ENH_Input_P_I_I_9 := PROJECT(__EE261258,__ND3504863__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I_9 := PROJECT(__EE275059,__ND3503131__Project(LEFT));
 END;

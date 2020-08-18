@@ -123,11 +123,11 @@ export SearchService() := macro
 	// Unlike in Foreclosure_Services.SearchService, including Forclosures must be set to FALSE by default.
   boolean IncludeForeclosures      := false : STORED ('IncludeForeclosures');
   boolean IncludeNoticesOfDefault  := false : STORED ('IncludeNoticesOfDefault');
-
+	 boolean IncludeVendorSourceB  := false : STORED ('IncludeVendorSourceB');
 	// Foreclosure_Services.Records will return either Foeclosures or Notices of Default, but not both. 
 	// So, two calls to the same function, each with a different parameter value.	
-  for := if( IncludeForeclosures, Foreclosure_Services.Records.val(tempmod,mod_access,false));
-  nod := if( IncludeNoticesOfDefault, Foreclosure_Services.Records.val(tempmod,mod_access,true));
+  for := if( IncludeForeclosures, Foreclosure_Services.Records.val(tempmod, mod_access, false, IncludeVendorSourceB));
+  nod := if( IncludeNoticesOfDefault, Foreclosure_Services.Records.val(tempmod, mod_access, true, IncludeVendorSourceB));
   tmp := sort( for + nod , if(AlsoFound,1,0), _penalty, -recordingdate, record );
 
   iesp.ECL2ESP.Marshall.MAC_Marshall_Results (tmp, foreclosureResults, iesp.foreclosure.t_ForeclosureSearchResponse);

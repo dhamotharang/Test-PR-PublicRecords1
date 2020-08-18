@@ -1,4 +1,4 @@
-IMPORT ut;
+﻿IMPORT ut;
 
 EXPORT Consts :=
 MODULE
@@ -36,6 +36,12 @@ MODULE
 	END;
 	
 	EXPORT RecordType := ENUM(INTEGER1,Suppress = -1,Duplicate = 0,Display = 1);
+	
+	EXPORT FaresCodes :=
+	MODULE
+		EXPORT Deed             := 'D';
+		EXPORT Mortgage         := 'M';
+	END;
 	
 	EXPORT Debug :=
 	MODULE

@@ -45,8 +45,7 @@ out_best :=
 		temp_bdids_suppress,
 		bh_key,
 		keyed(left.bdid = right.bdid) AND
-		((NOT (mdr.sourcetools.SourceIsEBR(RIGHT.source))) OR not doxie.DataRestriction.EBR) AND 
-    (right.source <> MDR.sourceTools.src_Dunn_Bradstreet OR Doxie.DataPermission.use_DNB),
+		doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 		transform(
 			business_header.layout_biz_search.result,
 			self.bdid := left.bdid,

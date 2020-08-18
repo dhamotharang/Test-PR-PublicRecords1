@@ -60,13 +60,17 @@ EXPORT Soapcall_DTEGetRequestInfo(DATASET(IESP.DTE_GetRequestInfo.t_DTEGetReques
     SELF := LEFT;));
 
     RollupErrorCodes := PROJECT(GetRequestTMSIDandRMSID, TRANSFORM({RECORDOF(LEFT) - XMLErrorCode - XMLErrorMessage},
-    SELF.ErrorCode := MAP(LEFT.TaskErrorCode <> '0' => LEFT.TaskErrorCode,
-                                                LEFT.ResponseJSON[1].ErrorCode <> '' => '4',
-                                                LEFT.XMLErrorCode <> '' => '5',
+    SELF.ErrorCode := MAP(LEFT.TaskErrorCode = '1' => '41',
+                                                LEFT.TaskErrorCode = '2' => '42',
+                                                LEFT.TaskErrorCode = '3' => '43',
+                                                LEFT.ResponseJSON[1].ErrorCode <> '' => '44',
+                                                LEFT.XMLErrorCode <> '' => '45',
+                                                LEFT.ErrorCode <> '' => LEFT.ErrorCode,
                                                 '0');
     SELF.ErrorMessage := MAP(LEFT.TaskErrorDescription <> '' => LEFT.TaskErrorDescription,
-                                                       LEFT.ResponseJSON[1].ErrorCode <> '' => 'Error occurred in JSON parsing',
-                                                       LEFT.XMLErrorMessage <> '' => 'Error occurred in XML parsing',
+                                                       LEFT.ResponseJSON[1].ErrorCode <> '' => 'Error processing the requested public record',
+                                                       LEFT.XMLErrorMessage <> '' => 'Error processing the requested public record',
+                                                       LEFT.ErrorMessage <> '' => LEFT.ErrorMessage,
                                                        '');
     SELF := LEFT;));
     

@@ -1,7 +1,7 @@
 ﻿IMPORT FFD;
 EXPORT Constants := MODULE
 	EXPORT STRING20 FCRA_Restricted := 'FCRA Restricted';
-	
+
 	EXPORT ALERT_CODE := MODULE
 		EXPORT STRING INSUFFICIENT_INPUT_INFO := '50A';
 		EXPORT STRING SECURITY_FREEZE := '100A';
@@ -14,7 +14,7 @@ EXPORT Constants := MODULE
 		EXPORT STRING LEGAL_HOLD_ALERT := '100H';
 		EXPORT STRING NO_DID_FOUND := '222A';
         EXPORT SUBJECT_DECEASED_CODE       := '200A';  // code used by Riskview products
-		
+
 		/*  -- the following alert codes are used by RiskView products:
 				200A - Subject Reported as Deceased
 				300A - Chapter 7 Bankruptcy On File
@@ -36,15 +36,21 @@ EXPORT Constants := MODULE
 					{ALERT_CODE.SECURITY_FREEZE, 'Security Freeze on file', FFD.Constants.RecordType.SF, FFD.Constants.AlertMessage.FreezeMessage},
 					{ALERT_CODE.SECURITY_FRAUD_ALERT, 'Security Fraud Alert on file',  FFD.Constants.RecordType.FA, FFD.Constants.AlertMessage.FraudMessage}
   ], {STRING code, STRING description, STRING alert_type, STRING message});
-  
+
  dict_AlertCode2Description := DICTIONARY (ds_alerts, {code => description});
 	EXPORT STRING getAlertDescription(STRING cd) := dict_AlertCode2Description[cd].description;
-  
+
  dict_AlertCode2Message := DICTIONARY (ds_alerts, {code => message});
 	EXPORT STRING getAlertMessage(STRING cd) := dict_AlertCode2Message[cd].message;
-  
+
  dict_AlertType2Code := DICTIONARY (ds_alerts(alert_type<>''), {alert_type => code});
 	EXPORT STRING convertAlertType2Code(STRING cd) := dict_AlertType2Code[cd].code;
-	
-		
+
+ EXPORT OverrideFlag := MODULE
+ // below values are based on FlagFile override_flag field
+	  EXPORT UNSIGNED1 CorrectionInd := 1;
+	  EXPORT UNSIGNED1 SuppressionInd := 2;
+	  EXPORT UNSIGNED1 UnSuppressInd := 3;
+ END;
+
 END;

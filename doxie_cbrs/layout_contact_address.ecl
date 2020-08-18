@@ -1,8 +1,8 @@
 lc := doxie_cbrs.layout_contacts;
 
-export layout_contact_address := record
+EXPORT layout_contact_address := RECORD
 
-unsigned4 address_id := 0;
+UNSIGNED4 address_id := 0;
 
 lc.prim_range;
 lc.predir;
@@ -20,4 +20,4 @@ lc.msa;
 lc.geo_lat;
 lc.geo_long;
 
-end;
+END;

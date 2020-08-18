@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ReportService">
 
 	<!-- Property Keys -->
@@ -33,10 +33,11 @@
 /*--INFO-- Search for Property Records via simple keys. */
 
 export ReportService() := macro
-
+	
+	BOOLEAN	includeAssignmentsAndReleases		:= FALSE	: STORED('includeAssignmentsAndReleases');
 	// compute results
 	#CONSTANT('usePropMarshall', true);
-	raw := LN_PropertyV2_Services.ReportService_records(false).Records;
+	raw := LN_PropertyV2_Services.ReportService_records(false, includeVendorSourceB:=includeAssignmentsAndReleases).Records;
 
 	// standard record counts & limits
 	doxie.MAC_Header_Field_Declare()

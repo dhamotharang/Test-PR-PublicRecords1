@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Credit, Business_Credit_KEL,  Business_Risk,  Business_Risk_BIP, DID_Add, doxie, MDR, risk_indicators, ut, STD;
+﻿IMPORT BIPV2, Business_Credit, Business_Credit_KEL,  Business_Risk,  Business_Risk_BIP, DID_Add, doxie, MDR, risk_indicators, STD;
 
 EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -95,7 +95,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 
 		AddressPopulated		:= le.Input.InputCheckBusAddr='1';
 		ZIPScore						:= IF(le.Clean_Input.Zip5 <> '' AND ri.Zip <> '' AND le.Clean_Input.Zip5[1] = ri.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(le.Clean_Input.Zip5, ri.Zip), NoScoreValue);
-		StateMatched				:= StringLib.StringToUpperCase(le.Clean_Input.State) = StringLib.StringToUpperCase(ri.st);
+		StateMatched				:= STD.Str.ToUpperCase(le.Clean_Input.State) = STD.Str.ToUpperCase(ri.st);
 		CityStateScore			:= IF(le.Clean_Input.City <> '' AND le.Clean_Input.State <> '' AND ri.p_city_name <> '' AND ri.st <> '' AND StateMatched,
 															Risk_Indicators.AddrScore.CityState_Score(le.Clean_Input.City, le.Clean_Input.State, ri.p_city_name, ri.st, ''), NoScoreValue);
 		CityStateZipMatched	:= Risk_Indicators.iid_constants.ga(ZIPScore) AND Risk_Indicators.iid_constants.ga(CityStateScore) AND AddressPopulated;
@@ -264,16 +264,16 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 		Rep5InputLNamePopulated := TRIM(le.Clean_Input.Rep5_LastName) <> '';
 		Rep5InputNamePopulated := Rep5InputFNamePopulated OR Rep5InputLNamePopulated;
 		
-		Rep1FNameMatched := Rep1InputFNamePopulated AND Business_Risk_BIP.Common.SetBoolean(StringLib.StringFind(ri.clean_fname, le.Clean_Input.Rep_FirstName, 1) > 0)='1';
-		Rep1LNameMatched := Rep1InputLNamePopulated AND Business_Risk_BIP.Common.SetBoolean(StringLib.StringFind(ri.clean_lname, le.Clean_Input.Rep_LastName, 1) > 0)='1';
-		Rep2FNameMatched := Rep2InputFNamePopulated AND Business_Risk_BIP.Common.SetBoolean(StringLib.StringFind(ri.clean_fname, le.Clean_Input.Rep2_FirstName, 1) > 0)='1';
-		Rep2LNameMatched := Rep2InputLNamePopulated AND Business_Risk_BIP.Common.SetBoolean(StringLib.StringFind(ri.clean_lname, le.Clean_Input.Rep2_LastName, 1) > 0)='1';
-		Rep3FNameMatched := Rep3InputFNamePopulated AND Business_Risk_BIP.Common.SetBoolean(StringLib.StringFind(ri.clean_fname, le.Clean_Input.Rep3_FirstName, 1) > 0)='1';
-		Rep3LNameMatched := Rep3InputLNamePopulated AND Business_Risk_BIP.Common.SetBoolean(StringLib.StringFind(ri.clean_lname, le.Clean_Input.Rep3_LastName, 1) > 0)='1';
-		Rep4FNameMatched := Rep4InputFNamePopulated AND Business_Risk_BIP.Common.SetBoolean(StringLib.StringFind(ri.clean_fname, le.Clean_Input.Rep4_FirstName, 1) > 0)='1';
-		Rep4LNameMatched := Rep4InputLNamePopulated AND Business_Risk_BIP.Common.SetBoolean(StringLib.StringFind(ri.clean_lname, le.Clean_Input.Rep4_LastName, 1) > 0)='1';
-		Rep5FNameMatched := Rep5InputFNamePopulated AND Business_Risk_BIP.Common.SetBoolean(StringLib.StringFind(ri.clean_fname, le.Clean_Input.Rep5_FirstName, 1) > 0)='1';
-		Rep5LNameMatched := Rep5InputLNamePopulated AND Business_Risk_BIP.Common.SetBoolean(StringLib.StringFind(ri.clean_lname, le.Clean_Input.Rep5_LastName, 1) > 0)='1';	
+		Rep1FNameMatched := Rep1InputFNamePopulated AND Business_Risk_BIP.Common.SetBoolean(STD.Str.Find(ri.clean_fname, le.Clean_Input.Rep_FirstName, 1) > 0)='1';
+		Rep1LNameMatched := Rep1InputLNamePopulated AND Business_Risk_BIP.Common.SetBoolean(STD.Str.Find(ri.clean_lname, le.Clean_Input.Rep_LastName, 1) > 0)='1';
+		Rep2FNameMatched := Rep2InputFNamePopulated AND Business_Risk_BIP.Common.SetBoolean(STD.Str.Find(ri.clean_fname, le.Clean_Input.Rep2_FirstName, 1) > 0)='1';
+		Rep2LNameMatched := Rep2InputLNamePopulated AND Business_Risk_BIP.Common.SetBoolean(STD.Str.Find(ri.clean_lname, le.Clean_Input.Rep2_LastName, 1) > 0)='1';
+		Rep3FNameMatched := Rep3InputFNamePopulated AND Business_Risk_BIP.Common.SetBoolean(STD.Str.Find(ri.clean_fname, le.Clean_Input.Rep3_FirstName, 1) > 0)='1';
+		Rep3LNameMatched := Rep3InputLNamePopulated AND Business_Risk_BIP.Common.SetBoolean(STD.Str.Find(ri.clean_lname, le.Clean_Input.Rep3_LastName, 1) > 0)='1';
+		Rep4FNameMatched := Rep4InputFNamePopulated AND Business_Risk_BIP.Common.SetBoolean(STD.Str.Find(ri.clean_fname, le.Clean_Input.Rep4_FirstName, 1) > 0)='1';
+		Rep4LNameMatched := Rep4InputLNamePopulated AND Business_Risk_BIP.Common.SetBoolean(STD.Str.Find(ri.clean_lname, le.Clean_Input.Rep4_LastName, 1) > 0)='1';
+		Rep5FNameMatched := Rep5InputFNamePopulated AND Business_Risk_BIP.Common.SetBoolean(STD.Str.Find(ri.clean_fname, le.Clean_Input.Rep5_FirstName, 1) > 0)='1';
+		Rep5LNameMatched := Rep5InputLNamePopulated AND Business_Risk_BIP.Common.SetBoolean(STD.Str.Find(ri.clean_lname, le.Clean_Input.Rep5_LastName, 1) > 0)='1';	
 		
 		
 		SELF.SBFE.SBFEBusExecLinkRep1NameonFile := MAP(	Rep1FNameMatched AND Rep1LNameMatched 		=> '3',
@@ -518,7 +518,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 		JOIN(SBFEPersonVerificationRolled, SBFE_data, 
 			LEFT.seq = RIGHT.UID,
 			TRANSFORM(Business_Risk_BIP.Layouts.Shell,
-				dateToday := IF(((STRING)LEFT.Clean_Input.HistoryDateTime)[1..6] = '999999', (UNSIGNED)StringLib.getDateYYYYMMDD(), (UNSIGNED4)((((STRING)LEFT.Clean_Input.HistoryDateTime) + '01')[1..8]));
+				dateToday := IF(((STRING)LEFT.Clean_Input.HistoryDateTime)[1..6] = '999999', STD.Date.Today(), (UNSIGNED4)((((STRING)LEFT.Clean_Input.HistoryDateTime) + '01')[1..8]));
 
 				SBFENameMatchDateFirstSeen := IF(LEFT.SBFE.SBFENameMatchDateFirstSeen ='', '-98', LEFT.SBFE.SBFENameMatchDateFirstSeen);
 				SELF.SBFE.SBFENameMatchDateFirstSeen := SBFENameMatchDateFirstSeen;
@@ -1438,6 +1438,8 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 				SELF.SBFE.SBFEDelq61CountTtl := (STRING)capNum(RIGHT.SBFEDelq61CountTtl_, 99),
 				SELF.SBFE.SBFEDelq61CountTtlChargeoff := (STRING)capNum(RIGHT.SBFEDelq61CountTtlChargeoff_, 99),
 				SELF.SBFE.SBFEDelq61CountEverTtl := (STRING)capNum(RIGHT.SBFEDelq61CountEverTtl_, 99),
+				SELF.SBFE.SBFEDelq91CountEverTtl := (STRING)capNum(RIGHT.SBFEDelq91CountEverTtl_, 99), 
+				SELF.SBFE.SBFEDelq121CountEverTtl := (STRING)capNum(RIGHT.SBFEDelq121CountEverTtl_, 99),
 				SELF.SBFE.SBFEDelinquentCountLoan := (STRING)capNum(RIGHT.Sbfedelinquentcountloan_, 99),
 				SELF.SBFE.SBFEDelq61LoanCount03M := (STRING)capNum(RIGHT.SBFEDelq61LoanCount03M_, 99);
 				SELF.SBFE.SBFEDelinquentCountLoan06 := (STRING)capNum(RIGHT.Sbfedelinquentcountloan06_, 99),
@@ -1509,6 +1511,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 				SELF.SBFE.SBFEDelq61RevCountTtl := (STRING)capNum(RIGHT.SBFEDelq61RevCountTtl_, 99),
 				SELF.SBFE.SBFEDelq61RevCountTtlChargeoff := (STRING)capNum(RIGHT.SBFEDelq61RevCountTtlChargeoff_, 99),
 				SELF.SBFE.SBFEDelq91CountTtl := (STRING)capNum(RIGHT.SBFEDelq91CountTtl_, 99),
+				SELF.SBFE.SBFEDelq121CountTtl := (STRING)capNum(RIGHT.SBFEDelq121CountTtl_, 99), 
 				SELF.SBFE.SBFEDelq91CountTtlChargeoff := (STRING)capNum(RIGHT.SBFEDelq91CountTtlChargeoff_, 99),
 				SELF.SBFE.SBFEDPD91Count := (STRING)capNum(RIGHT.Sbfedpd91count_, 99),
 				SELF.SBFE.SBFEDelq91Count03M := (STRING)capNum(RIGHT.SBFEDelq91Count03M_, 99);
@@ -2490,8 +2493,8 @@ END;
 	// *********************
 	//   DEBUGGING OUTPUTS
 	// *********************
-
-  // OUTPUT(SBFE_data, NAMED('SBFE_data'));																
+	// OUTPUT(SBFERaw, NAMED('SBFERaw'));
+	// OUTPUT(SBFE_data, NAMED('SBFE_data'));
 	// OUTPUT(SBFE_raw_data_future, NAMED('SBFErawdatafuture'));
 	// OUTPUT(SBFE_recs_added, NAMED('SBFE_recs_added'));
 	// OUTPUT(SBFE_data_future, NAMED('SBFE_data_future'));

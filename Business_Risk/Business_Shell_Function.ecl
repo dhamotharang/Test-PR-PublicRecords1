@@ -18,7 +18,7 @@ END;
 	// check the first record in the batch to determine if this a realtime transaction or an archive test
 	production_realtime_mode := biid[1].historydate=risk_indicators.iid_constants.default_history_date;
 	
-prof_risk := if(production_realtime_mode, Business_Risk.getBDIDTable(biid), business_risk.getBDIDTable_Hist(biid, mod_access));
+prof_risk := if(production_realtime_mode, Business_Risk.getBDIDTable(biid, mod_access), business_risk.getBDIDTable_Hist(biid, mod_access));
 
 withPRS := join(biid, prof_risk, left.seq=right.seq, 
 				transform(business_risk.Layout_Business_Shell,

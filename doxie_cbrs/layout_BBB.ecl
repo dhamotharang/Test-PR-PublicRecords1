@@ -1,46 +1,46 @@
-export layout_BBB := record
-unsigned1 level := 0;
-unsigned6 bdid;
-string7  bbb_id;
-string100 company_name;
+EXPORT layout_BBB := RECORD
+UNSIGNED1 level := 0;
+UNSIGNED6 bdid;
+STRING7 bbb_id;
+STRING100 company_name;
 //string100 address;
-string12 country;
-string14 phone;
-string8  phone_type;
-string8  report_date;
-string255 http_link;
-string100 member_title := '';
-string8  member_since_date := '';
+STRING12 country;
+STRING14 phone;
+STRING8 phone_type;
+STRING8 report_date;
+STRING255 http_link;
+STRING100 member_title := '';
+STRING8 member_since_date := '';
 // clean address
-string10 prim_range;
-string2  predir;
-string28 prim_name;
-string4  addr_suffix;
-string2  postdir;
-string10 unit_desig;
-string8  sec_range;
+STRING10 prim_range;
+STRING2 predir;
+STRING28 prim_name;
+STRING4 addr_suffix;
+STRING2 postdir;
+STRING10 unit_desig;
+STRING8 sec_range;
 //string25 p_city_name;
-string25 v_city_name;
-string2  st;
-string5  zip;
-string4  zip4;
-string4  cart;
-string1  cr_sort_sz;
-string4  lot;
-string1  lot_order;
-string2  dbpc;
-string1  chk_digit;
-string2  rec_type;
-string2  fips_state;
-string3  fips_county;
-string10 geo_lat;//
-string11 geo_long;
-string4  msa;
-string7  geo_blk;
-string1  geo_match;
-string4  err_stat;
+STRING25 v_city_name;
+STRING2 st;
+STRING5 zip;
+STRING4 zip4;
+STRING4 cart;
+STRING1 cr_sort_sz;
+STRING4 lot;
+STRING1 lot_order;
+STRING2 dbpc;
+STRING1 chk_digit;
+STRING2 rec_type;
+STRING2 fips_state;
+STRING3 fips_county;
+STRING10 geo_lat;//
+STRING11 geo_long;
+STRING4 msa;
+STRING7 geo_blk;
+STRING1 geo_match;
+STRING4 err_stat;
 // clean pphone
-string10 phone10;
+STRING10 phone10;
 /* ******** place holder */
-string1 TypeOfBusiness := '';
-end;
+STRING1 TypeOfBusiness := '';
+END;

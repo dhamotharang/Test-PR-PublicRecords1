@@ -1,7 +1,7 @@
 IMPORT STD;
 EXPORT names(string logical_group = 'roxiedev') := MODULE
-  SHARED base_prefix := '~devregression';
-  EXPORT super_filename := base_prefix + '::'+STD.STR.ToLowerCase(logical_group);
-  EXPORT consolidated_filename := base_prefix + '::' + STD.STR.ToLowerCase(logical_group) + '::consolidated';
-  EXPORT sub_filename(integer sub_file_id) := base_prefix + '::' + STD.STR.ToLowerCase(logical_group) + '::' + sub_file_id;
+  EXPORT prefix := '~devregression';
+  EXPORT current :=  prefix + '::' + STD.STR.ToLowerCase(logical_group) + '::current';
+  EXPORT consolidated := prefix + '::' + STD.STR.ToLowerCase(logical_group) + '::consolidated';
+  EXPORT subfile(integer fid) := prefix + '::' + STD.STR.ToLowerCase(logical_group) + '::' + fid;
 END;

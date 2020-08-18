@@ -1,4 +1,4 @@
-IMPORT Advo, Autokey_batch, AutokeyB2, Codes, doxie, Doxie_Raw, iesp,
+﻿IMPORT Advo, Autokey_batch, AutokeyB2, Codes, doxie, Doxie_Raw, iesp,
 			LN_PropertyV2, LN_PropertyV2_Services, PropertyCharacteristics,
 			Risk_Indicators, SNA, Suppress, ut, STD;
 
@@ -414,7 +414,8 @@ MODULE
 	// Get deeds information
 	EXPORT GetDeeds(DATASET(lPropHistCollusion.FaresId)           dIn,
 									DATASET(lPropHistCollusion.PropCleanNameAddr) dPartyInfo,
-									Location_Services.iParam.PropHistHRI          inMod) := 
+									Location_Services.iParam.PropHistHRI          inMod,
+									boolean includeAssignmentsAndReleases=false) := 
 	FUNCTION
 		keyDeedFID := LN_PropertyV2.key_deed_fid();
 		
@@ -437,6 +438,8 @@ MODULE
 			SELF.book_page_num         := IF(ri.recorder_book_number != '' and ri.recorder_page_number != '',
 																				TRIM(ri.recorder_book_number,ALL) + ';' + TRIM(ri.recorder_page_number,ALL),
 																				'');
+			SELF.first_td_due_date     := ri.first_td_due_date;
+			SELF.record_type           := ri.record_type;
 			SELF                       := ri;
 			SELF                       := le;
 			SELF                       := []; //fields not defined in the deeds layout
@@ -445,10 +448,12 @@ MODULE
 		dDeeds := JOIN( dIn,
 										keyDeedFID,
 										KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id) and //1:1 mapping
-										LEFT.ln_fares_id[2] = 'D', //get only deed records
+										(LEFT.ln_fares_id[2] = Location_services.Consts.FaresCodes.Deed or 
+													if(includeAssignmentsAndReleases, LEFT.ln_fares_id[2] = Location_services.Consts.FaresCodes.Mortgage 
+													     and right.record_type IN LN_PropertyV2.Constants.setAssignRelsRecordTypes, false) ), //get only deed records (changed this to return also 'M' records based on the flag)
 										tGetDeeds(LEFT,RIGHT),
 										LIMIT(0), KEEP(1) );
-		
+			
 		// Append sequence number
 		ut.MAC_Sequence_Records(dDeeds,seq,dDeedsSeqNum);
 		
@@ -696,11 +701,11 @@ MODULE
 																			LEFT.ln_fares_id = RIGHT.ln_fares_id,
 																			GROUP,
 																			tPopulateBuyerSeller(LEFT,ROWS(RIGHT)));
-		
+				
 		// Dedup transaction records
 		// Sort by recording date and document number
 		dTransDocNumSort := SORT(dDeedsTransactions,recording_date,document_number);
-		
+			
 		// Assign group id
 		lPropHistCollusion.Deeds tAssignDocNumGrpId(lPropHistCollusion.Deeds le,lPropHistCollusion.Deeds ri) :=
 		TRANSFORM
@@ -765,7 +770,7 @@ MODULE
 		
 		dDeedsTransactionsIterate := UNGROUP(ITERATE(dDeedsTransactionsGrp,tIterate(LEFT,RIGHT)));
 		
-		// Remove records that need to be suppressed
+		// Remove records that need to be suppressed (rec_type=-1 is suppressed)
 		dTransactions := SORT(dDeedsTransactionsIterate(rec_type != Location_Services.consts.RecordType.Suppress),
 													-group_id,-rec_type,-IF(contract_date != '',contract_date,recording_date));
 		

@@ -1,20 +1,20 @@
-import ut;
+IMPORT ut;
 
-export Internet_Domains_records_prs(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
+EXPORT Internet_Domains_records_prs(DATASET(doxie_cbrs.layout_references) bdids) := FUNCTION
 
 dr := doxie_cbrs.Internet_Domains_records(bdids);
 
-rec := record
-	dr.level;
-	dr.bdid;
-	dr.domain_name;
-	dr.create_date_decode
-end;
+rec := RECORD
+  dr.level;
+  dr.bdid;
+  dr.domain_name;
+  dr.create_date_decode
+END;
 
 ut.MAC_Slim_Back(dr, rec, drs)
-	
-s := sort(drs, level, domain_name, -(integer)create_date_decode, bdid);
-d := dedup(s, level, domain_name, create_date_decode, bdid);
-	
-return d;
+  
+s := SORT(drs, level, domain_name, -(INTEGER)create_date_decode, bdid);
+d := DEDUP(s, level, domain_name, create_date_decode, bdid);
+  
+RETURN d;
 END;

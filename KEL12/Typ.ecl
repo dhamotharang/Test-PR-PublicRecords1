@@ -1,4 +1,4 @@
-//IMPORT:KEL12.Typ
+﻿//IMPORT:KEL12.Typ
 EXPORT Typ := MODULE
   // This definition must match the one in Kel.Null.  The definition must
   // be duplicated in order to avoid circular references between Kel.Typ

@@ -302,9 +302,14 @@ EXPORT GetCorps(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWit
                         TRANSFORM(RECORDOF(RIGHT),SELF := RIGHT),
                         LIMIT(BusinessBatch_BIP.Constants.Limits.MaxCorps,SKIP)
                       );
+     // sort field corp_filing_date updated in order to match sort order of Smart linx bus report incorporation section.
+     dCorpsInfoTmp := PROJECT(dCorpsInfo, TRANSFORM(RECORDOF(LEFT),
+                                   SELF.corp_filing_date :=   IF(LEFT.corp_filing_date !='',LEFT.corp_filing_date,
+                                                   IF (LEFT.corp_inc_date != '',LEFT.corp_inc_date, LEFT.corp_forgn_date));
+                                          SELF := LEFT));
 
     // Sort/dedup all the corp recs fetched to keep the most recent "Current" record (or Historical, if no Current record exists) for each corp_key.
-      dCorpsInfoDedup := SORT(DEDUP(SORT(dCorpsInfo,
+      dCorpsInfoDedup := SORT(DEDUP(SORT(dCorpsInfoTmp,
                                   #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()),
                                   corp_key,
                                   record_type, // c and h so sorting by this put c (current) before h (historical)
@@ -331,7 +336,7 @@ EXPORT GetCorps(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWit
                                                 left.corp_state_origin,
                                                 left.corp_orig_bus_type_desc,
                                                 left.corp_name_comment);
-
+                                                                      
         temp_business_type := BIPV2.BL_Tables.CompanyOrgStructure(temp_company_org_structure_raw);
 
         corp_filing_desc := if(temp_business_type !='',
@@ -1018,7 +1023,7 @@ EXPORT GetCorps(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWit
     //
     // Get Property Deeds
   dDeeds_raw := JOIN(dPropertyLinkids, LN_PropertyV2.key_deed_fid(),
-      KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id),// AND
+      KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id) AND right.record_type NOT IN LN_PropertyV2.Constants.setAssignRelsRecordTypes,//Assignments and Releases codes excluded
       //RIGHT.Buyer_Or_Borrower_Ind = 'O',
       TRANSFORM(BusinessBatch_BIP.Layouts.PropertyInfoExtra,
 

@@ -1,4 +1,4 @@
-﻿IMPORT Business_Risk_BIP, Risk_Indicators, RiskWise, Models, UT;
+﻿IMPORT Business_Risk_BIP,LNSmallBusiness;
 
 EXPORT getSmallBusinessAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusShell, UNSIGNED BusShellVersion) := FUNCTION
 
@@ -543,7 +543,7 @@ EXPORT getSmallBusinessAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusSh
 		SELF.Version21.InputCheckBusCity := attr.InputCheckBusCity;
 		SELF.Version21.InputCheckBusState := attr.InputCheckBusState;
 		SELF.Version21.InputCheckBusZip := attr.InputCheckBusZip;
-		SELF.Version21.InputCheckBusFEIN := attr.InputCheckBusFEIN;
+		SELF.Version21.InputCheckBusTIN := attr.InputCheckBusFEIN;
 		SELF.Version21.InputCheckBusPhone := attr.InputCheckBusPhone;
 		SELF.Version21.InputCheckBusFax := attr.InputCheckBusFax;
 		SELF.Version21.InputCheckBusNAICS := attr.InputCheckBusNAICS;
@@ -593,7 +593,7 @@ EXPORT getSmallBusinessAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusSh
 		SELF.Version21.OutBestBusCity := attr.OutBestBusCity;
 		SELF.Version21.OutBestBusState := attr.OutBestBusState;
 		SELF.Version21.OutBestBusZip := attr.OutBestBusZip;
-		SELF.Version21.OutBestBusFEIN := attr.OutBestBusFEIN;
+		SELF.Version21.OutBestBusTIN := attr.OutBestBusFEIN;
 		SELF.Version21.OutBestBusPhone := attr.OutBestBusPhone;
 		SELF.Version21.OutBestNAICS := attr.OutBestNAICS;
 		SELF.Version21.OutBestSIC := attr.OutBestSIC;
@@ -746,9 +746,9 @@ EXPORT getSmallBusinessAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusSh
 		SELF.Version21.BusExecLinkPropOverlapCount3 := attr.BusExecLinkPropOverlapCount3;
 		SELF.Version21.BusExecLinkBusAddrRep3Owned := attr.BusExecLinkBusAddrRep3Owned;
 		SELF.Version21.BusAddrPersonNameOverlap := attr.BusAddrPersonNameOverlap;
-		SELF.Version21.BusFEINPersonAddrOverlap := attr.BusFEINPersonAddrOverlap;
-		SELF.Version21.BusFEINPersonPhoneOverlap := attr.BusFEINPersonPhoneOverlap;
-		SELF.Version21.BusFEINPersonOverlap := attr.BusFEINPersonOverlap;
+		SELF.Version21.BusTINPersonAddrOverlap := attr.BusFEINPersonAddrOverlap;
+		SELF.Version21.BusTINPersonPhoneOverlap := attr.BusFEINPersonPhoneOverlap;
+		SELF.Version21.BusTINPersonOverlap := attr.BusFEINPersonOverlap;
 		SELF.Version21.InputAddrConsumerCount := attr.InputAddrConsumerCount;
 		SELF.Version21.InputTINEntityCount := attr.InputTINEntityCount;
 		SELF.Version21.InputPhoneEntityCount := attr.InputPhoneEntityCount;
@@ -2752,6 +2752,9 @@ EXPORT getSmallBusinessAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusSh
 		SELF.SBFEPrincipalAccountCount := attr.SBFEPrincipalAccountCount;
 		SELF.SBFEPrincipalMinCount := attr.SBFEPrincipalMinCount;
 		SELF.SBFEPrincipalMaxCount := attr.SBFEPrincipalMaxCount;
+		SELF.SBFEDelq91CountEverTtl := attr.SBFEDelq91CountEverTtl;
+		SELF.SBFEDelq121CountEverTtl := attr.SBFEDelq121CountEverTtl;
+		SELF.SBFEDelq121CountTtl := attr.SBFEDelq121CountTtl;
 		SELF := le;
 		SELF := [];
 	END;

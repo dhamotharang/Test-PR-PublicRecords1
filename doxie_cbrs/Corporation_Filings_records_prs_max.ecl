@@ -1,8 +1,8 @@
-import doxie, business_header;
+IMPORT doxie, business_header;
 doxie_cbrs.mac_Selection_Declare()
 
-export Corporation_Filings_records_prs_max(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
-	r := doxie_cbrs.Corporation_Filings_records_prs(bdids);
+EXPORT Corporation_Filings_records_prs_max(DATASET(doxie_cbrs.layout_references) bdids) := FUNCTION
+  r := doxie_cbrs.Corporation_Filings_records_prs(bdids);
 
-	return choosen(r, Max_CorporationFilings_val);
+  RETURN CHOOSEN(r, Max_CorporationFilings_val);
 END;

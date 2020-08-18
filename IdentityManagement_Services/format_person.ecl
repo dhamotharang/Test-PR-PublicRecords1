@@ -38,28 +38,28 @@ EXPORT out_rec format_person (dataset(doxie.layout_references) dids):= FUNCTION
       
 	d_person_hr := Header.MAC_Append_Addr_Ind(d_person_hdr_plus, addr_ind, /*src*/, did, prim_range , 
                                              prim_name, sec_range, city_name, st, zip,
-                                             /*predir*/, /*postdir*/, /*addr_suffix */, 
-                                             /*dt_first_seen*/, /*dt_last_seen*/, /*dt_vendor_first_reported*/,
-                                             /*dt_vendor_last_reported*/ , /*isTrusted*/ ,
-                                             /*isFCRA*/, /*hitQH*/, /*debug*/);
+                                             predir, postdir, suffix, 
+                                             dt_first_seen, dt_last_seen, dt_vendor_first_reported,
+                                             dt_vendor_last_reported , /*isTrusted*/ ,
+                                             false, /*hitQH*/, /*debug*/);
 	d_person := project(d_person_hr,transform(rec_header_plus_out,
     		Self.AddressHierarchy.BestAddress := (Left.Best_addr_rank = '1');
-   			Self.AddressHierarchy.DateFirstSeen := iesp.ECL2ESP.toDate(Left.dt_first_seen_addr);
-   			Self.AddressHierarchy.DateLastSeen := iesp.ECL2ESP.toDate(Left.dt_last_seen_addr);
-   			Self.AddressHierarchy.DateFirstReported := iesp.ECL2ESP.toDate(Left.dt_vendor_first_reported_addr);
-   			Self.AddressHierarchy.DateLastReported := iesp.ECL2ESP.toDate(Left.dt_vendor_last_reported_addr);
-   			Self.AddressHierarchy.SourceCounts.UnitNumberVariations := Left.apt_cnt;
-   			Self.AddressHierarchy.SourceCounts.UniqueSources := Left.src_cnt;
-   			Self.AddressHierarchy.SourceCounts.Insurance := Left.insurance_src_cnt;
-   			Self.AddressHierarchy.SourceCounts.Bureau := Left.bureau_src_cnt;
-   			Self.AddressHierarchy.SourceCounts.Property := Left.property_src_cnt;
-   			Self.AddressHierarchy.SourceCounts.Utility := Left.utility_src_cnt;
-   			Self.AddressHierarchy.SourceCounts.Vehicle := Left.vehicle_src_cnt;
-   			Self.AddressHierarchy.SourceCounts.DriverLicense := Left.dl_src_cnt;
-   			Self.AddressHierarchy.SourceCounts.Voter := Left.voter_src_cnt;
-   			Self.AddressHierarchy.AddressStatus := Left.addressstatus;
-   			Self.AddressHierarchy.AddressType := Left.addresstype;
-       Self := Left; 
+    		Self.AddressHierarchy.DateFirstSeen := iesp.ECL2ESP.toDateYM(Left.dt_first_seen_addr);
+    		Self.AddressHierarchy.DateLastSeen := iesp.ECL2ESP.toDateYM(Left.dt_last_seen_addr);
+    		Self.AddressHierarchy.DateFirstReported := iesp.ECL2ESP.toDateYM(Left.dt_vendor_first_reported_addr);
+    		Self.AddressHierarchy.DateLastReported := iesp.ECL2ESP.toDateYM(Left.dt_vendor_last_reported_addr);
+    		Self.AddressHierarchy.SourceCounts.UnitNumberVariations := Left.apt_cnt;
+    		Self.AddressHierarchy.SourceCounts.UniqueSources := Left.src_cnt;
+    		Self.AddressHierarchy.SourceCounts.Insurance := Left.insurance_src_cnt;
+    		Self.AddressHierarchy.SourceCounts.Bureau := Left.bureau_src_cnt;
+    		Self.AddressHierarchy.SourceCounts.Property := Left.property_src_cnt;
+    		Self.AddressHierarchy.SourceCounts.Utility := Left.utility_src_cnt;
+    		Self.AddressHierarchy.SourceCounts.Vehicle := Left.vehicle_src_cnt;
+    		Self.AddressHierarchy.SourceCounts.DriverLicense := Left.dl_src_cnt;
+    		Self.AddressHierarchy.SourceCounts.Voter := Left.voter_src_cnt;
+    		Self.AddressHierarchy.AddressStatus := Left.addressstatus;
+    		Self.AddressHierarchy.AddressType := Left.addresstype;
+    		Self := Left; 
  
   ));
 	// #STEP-1: rollup addresses
@@ -75,6 +75,16 @@ EXPORT out_rec format_person (dataset(doxie.layout_references) dids):= FUNCTION
 														R.sec_range <> '' => R.unit_desig,
 														'');
 			self.rawaid := IF(L.rawaid <> 0,L.rawaid,R.rawaid);
+			self.AddressHierarchy.BestAddress := (L.AddressHierarchy.BestAddress or R.AddressHierarchy.BestAddress);
+   		self.AddressHierarchy.SourceCounts.UnitNumberVariations := L.AddressHierarchy.SourceCounts.UnitNumberVariations + R.AddressHierarchy.SourceCounts.UnitNumberVariations;
+   		self.AddressHierarchy.SourceCounts.UniqueSources := L.AddressHierarchy.SourceCounts.UniqueSources + R.AddressHierarchy.SourceCounts.UniqueSources;
+   		self.AddressHierarchy.SourceCounts.Insurance := L.AddressHierarchy.SourceCounts.Insurance + R.AddressHierarchy.SourceCounts.Insurance;
+   		self.AddressHierarchy.SourceCounts.Bureau := L.AddressHierarchy.SourceCounts.Bureau + R.AddressHierarchy.SourceCounts.Bureau;
+   		self.AddressHierarchy.SourceCounts.Property := L.AddressHierarchy.SourceCounts.Property + R.AddressHierarchy.SourceCounts.Property;
+   		self.AddressHierarchy.SourceCounts.Utility := L.AddressHierarchy.SourceCounts.Utility + R.AddressHierarchy.SourceCounts.Utility;
+   		self.AddressHierarchy.SourceCounts.Vehicle := L.AddressHierarchy.SourceCounts.Vehicle + R.AddressHierarchy.SourceCounts.Vehicle;
+   		self.AddressHierarchy.SourceCounts.DriverLicense := L.AddressHierarchy.SourceCounts.DriverLicense + R.AddressHierarchy.SourceCounts.DriverLicense;
+   		self.AddressHierarchy.SourceCounts.Voter := L.AddressHierarchy.SourceCounts.UnitNumberVariations + R.AddressHierarchy.SourceCounts.UnitNumberVariations;
 			self := L; // copy at least 20 other fields
 	end;
 	

@@ -54,7 +54,7 @@
 */
 /*--INFO--  */
 
-import ut, doxie, seed_files, risk_indicators, riskwise, business_risk,Gateway, AutoStandardI, STD;
+import ut, doxie, seed_files, risk_indicators, riskwise, business_risk,Gateway, AutoStandardI, STD, Models;
  
 export BusinessAdvisor_Service := MACRO
 
@@ -176,7 +176,7 @@ boolean runAreaCodeSplitSearch:=true;
 boolean allowCellphones:=false;
 string10 ExactMatchLevel := risk_indicators.iid_constants.default_ExactMatchLevel;
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
-string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 
 string10 CustomDataFilter:='';
 //
@@ -373,7 +373,7 @@ isUtility  := false;
 ln_branded := false;
 tribcode   := '';
 biid := business_risk.InstantID_Function(df2, gateways, if (bdid_value = '', false, true),dppa_purpose,glb_purpose,isUtility,ln_branded, tribcode, ExcludeWatchLists,
-	ofac_only, OFACVersion, IncludeOfac, addtl_watchlists, gwThreshold, dobradius, IsPOBoxCompliant, LexIdSourceOptout := LexIdSourceOptout, 
+	ofac_only, OFACVersion, IncludeOfac, addtl_watchlists, gwThreshold, dobradius, IsPOBoxCompliant, DataRestriction := DataRestriction, DataPermission:= DataPermission, LexIdSourceOptout := LexIdSourceOptout, 
                                                                                         TransactionID := TransactionID, 
                                                                                         BatchUID := BatchUID, 
                                                                                         GlobalCompanyID := GlobalCompanyID
@@ -409,8 +409,8 @@ riskwise.Layout_BusReasons_Input into_orig_input(biid le) := transform
 	self.orig_wphone := busphone_value;
 	self.telcoPhoneType := le.TelcordiaPhoneType;
 	
-	bans_current := if(((integer)(ut.GetDate[1..6]) - (integer)(le.RecentBkDate[1..6])) < 1000, true, false);  // make sure the bans is within the last 10 years
-	lien_current := if(((integer)(ut.GetDate[1..6]) - (integer)(le.RecentLienDate[1..6])) < 1000, true, false);  // make sure the bans is within the last 10 years
+	bans_current := if(((integer)((STRING8)Std.Date.Today()[1..6]) - (integer)(le.RecentBkDate[1..6])) < 1000, true, false);  // make sure the bans is within the last 10 years
+	lien_current := if(((integer)((STRING8)Std.Date.Today()[1..6]) - (integer)(le.RecentLienDate[1..6])) < 1000, true, false);  // make sure the bans is within the last 10 years
 	self.cmpy_bans :=  map(fein='' or (company_name='' and addr='') => '3',
 											  le.bkbdidflag and le.lienbdidflag and bans_current and lien_current => '5',
 										       le.bkbdidflag and bans_current => '2', 

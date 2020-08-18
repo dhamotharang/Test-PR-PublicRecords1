@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.3.0beta5
+//HPCC Systems KEL Compiler Version 1.3.0
 IMPORT KEL13 AS KEL;
 IMPORT B_Input_B_I_I_8,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Ult,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL13.Null;
 EXPORT B_Input_B_I_I_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Input_B_I_I_8(__in,__cfg).__ENH_Input_B_I_I_8) __ENH_Input_B_I_I_8 := B_Input_B_I_I_8(__in,__cfg).__ENH_Input_B_I_I_8;
-  SHARED __EE3526149 := __ENH_Input_B_I_I_8;
-  EXPORT __ST194122_Layout := RECORD
+  SHARED __EE3525866 := __ENH_Input_B_I_I_8;
+  EXPORT __ST202495_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.nint G___Proc_Bus_U_I_D_;
@@ -94,17 +94,17 @@ EXPORT B_Input_B_I_I_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST194122_Layout __ND3526515__Project(B_Input_B_I_I_8(__in,__cfg).__ST196379_Layout __PP3526150) := TRANSFORM
-    __CC11043 := '-99999';
-    __CC11048 := '-99998';
-    SELF.Bus_Input_Addr_Suffix_Clean_Value_ := MAP(__PP3526150.Addr_Not_Populated_=>__ECAST(KEL.typ.nstr,__CN(__CC11043)),__T(__PP3526150.City_State_Zip_Not_Populated_)=>__ECAST(KEL.typ.nstr,__CN(__CC11048)),__ECAST(KEL.typ.nstr,FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP3526150.B___Inp_Cln_Addr_Sffx_),__ECAST(KEL.typ.nstr,__CN(__CC11048)))));
-    SELF.Bus_Input_Post_Dir_Clean_Value_ := MAP(__PP3526150.Addr_Not_Populated_=>__ECAST(KEL.typ.nstr,__CN(__CC11043)),__T(__PP3526150.City_State_Zip_Not_Populated_)=>__ECAST(KEL.typ.nstr,__CN(__CC11048)),__ECAST(KEL.typ.nstr,FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP3526150.B___Inp_Cln_Addr_Post_Dir_),__ECAST(KEL.typ.nstr,__CN(__CC11048)))));
-    SELF.Bus_Input_Pre_Dir_Clean_Value_ := MAP(__PP3526150.Addr_Not_Populated_=>__ECAST(KEL.typ.nstr,__CN(__CC11043)),__T(__PP3526150.City_State_Zip_Not_Populated_)=>__ECAST(KEL.typ.nstr,__CN(__CC11048)),__ECAST(KEL.typ.nstr,FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP3526150.B___Inp_Cln_Addr_Pre_Dir_),__ECAST(KEL.typ.nstr,__CN(__CC11048)))));
-    SELF.Bus_Input_Prim_Name_Clean_Value_ := MAP(__PP3526150.Addr_Not_Populated_=>__ECAST(KEL.typ.nstr,__CN(__CC11043)),__T(__PP3526150.City_State_Zip_Not_Populated_)=>__ECAST(KEL.typ.nstr,__CN(__CC11048)),__ECAST(KEL.typ.nstr,FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP3526150.B___Inp_Cln_Addr_Prim_Name_),__ECAST(KEL.typ.nstr,__CN(__CC11048)))));
-    SELF.Bus_Input_Prim_Range_Clean_Value_ := MAP(__PP3526150.Addr_Not_Populated_=>__ECAST(KEL.typ.nstr,__CN(__CC11043)),__T(__PP3526150.City_State_Zip_Not_Populated_)=>__ECAST(KEL.typ.nstr,__CN(__CC11048)),__ECAST(KEL.typ.nstr,FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP3526150.B___Inp_Cln_Addr_Prim_Rng_),__ECAST(KEL.typ.nstr,__CN(__CC11048)))));
-    SELF.Bus_Input_Sec_Range_Clean_Value_ := MAP(__PP3526150.Addr_Not_Populated_=>__ECAST(KEL.typ.nstr,__CN(__CC11043)),__T(__PP3526150.City_State_Zip_Not_Populated_)=>__ECAST(KEL.typ.nstr,__CN(__CC11048)),__ECAST(KEL.typ.nstr,FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP3526150.B___Inp_Cln_Addr_Sec_Rng_),__ECAST(KEL.typ.nstr,__CN(__CC11048)))));
-    SELF.Bus_Input_Unit_Desig_Clean_Value_ := MAP(__PP3526150.Addr_Not_Populated_=>__ECAST(KEL.typ.nstr,__CN(__CC11043)),__T(__PP3526150.City_State_Zip_Not_Populated_)=>__ECAST(KEL.typ.nstr,__CN(__CC11048)),__ECAST(KEL.typ.nstr,FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP3526150.B___Inp_Cln_Addr_Unit_Desig_),__ECAST(KEL.typ.nstr,__CN(__CC11048)))));
-    SELF := __PP3526150;
+  SHARED __ST202495_Layout __ND3526232__Project(B_Input_B_I_I_8(__in,__cfg).__ST204791_Layout __PP3525867) := TRANSFORM
+    __CC10495 := '-99999';
+    __CC10500 := '-99998';
+    SELF.Bus_Input_Addr_Suffix_Clean_Value_ := MAP(__PP3525867.Addr_Not_Populated_=>__ECAST(KEL.typ.nstr,__CN(__CC10495)),__T(__PP3525867.City_State_Zip_Not_Populated_)=>__ECAST(KEL.typ.nstr,__CN(__CC10500)),__ECAST(KEL.typ.nstr,FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP3525867.B___Inp_Cln_Addr_Sffx_),__ECAST(KEL.typ.nstr,__CN(__CC10500)))));
+    SELF.Bus_Input_Post_Dir_Clean_Value_ := MAP(__PP3525867.Addr_Not_Populated_=>__ECAST(KEL.typ.nstr,__CN(__CC10495)),__T(__PP3525867.City_State_Zip_Not_Populated_)=>__ECAST(KEL.typ.nstr,__CN(__CC10500)),__ECAST(KEL.typ.nstr,FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP3525867.B___Inp_Cln_Addr_Post_Dir_),__ECAST(KEL.typ.nstr,__CN(__CC10500)))));
+    SELF.Bus_Input_Pre_Dir_Clean_Value_ := MAP(__PP3525867.Addr_Not_Populated_=>__ECAST(KEL.typ.nstr,__CN(__CC10495)),__T(__PP3525867.City_State_Zip_Not_Populated_)=>__ECAST(KEL.typ.nstr,__CN(__CC10500)),__ECAST(KEL.typ.nstr,FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP3525867.B___Inp_Cln_Addr_Pre_Dir_),__ECAST(KEL.typ.nstr,__CN(__CC10500)))));
+    SELF.Bus_Input_Prim_Name_Clean_Value_ := MAP(__PP3525867.Addr_Not_Populated_=>__ECAST(KEL.typ.nstr,__CN(__CC10495)),__T(__PP3525867.City_State_Zip_Not_Populated_)=>__ECAST(KEL.typ.nstr,__CN(__CC10500)),__ECAST(KEL.typ.nstr,FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP3525867.B___Inp_Cln_Addr_Prim_Name_),__ECAST(KEL.typ.nstr,__CN(__CC10500)))));
+    SELF.Bus_Input_Prim_Range_Clean_Value_ := MAP(__PP3525867.Addr_Not_Populated_=>__ECAST(KEL.typ.nstr,__CN(__CC10495)),__T(__PP3525867.City_State_Zip_Not_Populated_)=>__ECAST(KEL.typ.nstr,__CN(__CC10500)),__ECAST(KEL.typ.nstr,FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP3525867.B___Inp_Cln_Addr_Prim_Rng_),__ECAST(KEL.typ.nstr,__CN(__CC10500)))));
+    SELF.Bus_Input_Sec_Range_Clean_Value_ := MAP(__PP3525867.Addr_Not_Populated_=>__ECAST(KEL.typ.nstr,__CN(__CC10495)),__T(__PP3525867.City_State_Zip_Not_Populated_)=>__ECAST(KEL.typ.nstr,__CN(__CC10500)),__ECAST(KEL.typ.nstr,FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP3525867.B___Inp_Cln_Addr_Sec_Rng_),__ECAST(KEL.typ.nstr,__CN(__CC10500)))));
+    SELF.Bus_Input_Unit_Desig_Clean_Value_ := MAP(__PP3525867.Addr_Not_Populated_=>__ECAST(KEL.typ.nstr,__CN(__CC10495)),__T(__PP3525867.City_State_Zip_Not_Populated_)=>__ECAST(KEL.typ.nstr,__CN(__CC10500)),__ECAST(KEL.typ.nstr,FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP3525867.B___Inp_Cln_Addr_Unit_Desig_),__ECAST(KEL.typ.nstr,__CN(__CC10500)))));
+    SELF := __PP3525867;
   END;
-  EXPORT __ENH_Input_B_I_I_7 := PROJECT(__EE3526149,__ND3526515__Project(LEFT));
+  EXPORT __ENH_Input_B_I_I_7 := PROJECT(__EE3525866,__ND3526232__Project(LEFT));
 END;

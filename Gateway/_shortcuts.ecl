@@ -1,7 +1,8 @@
 import STD, risk_indicators;
 export _shortcuts := module
 
-  export neutral_roxie_cert := 'http://roxiestaging.br.seisint.com:9876';
+  // export neutral_roxie_cert := 'http://roxiestaging.br.seisint.com:9876';
+  export neutral_roxie_cert := 'http://roxieqavip.br.seisint.com:9876';
   export dev_one_way_1 := 'http://10.173.3.1:9876';
   export dev_one_way_2 := 'http://10.173.3.2:9876';
   export dev_one_way_3 := 'http://10.173.3.3:9876';

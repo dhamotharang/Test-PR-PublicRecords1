@@ -1,13 +1,13 @@
-import ut;
+IMPORT ut;
 
-export contact_address_records(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
+EXPORT contact_address_records(DATASET(doxie_cbrs.layout_references) bdids) := FUNCTION
 
 cr := doxie_cbrs.contact_records(bdids);
 outrec := doxie_cbrs.layout_contact_address;
-addrs := project(cr, outrec);
+addrs := PROJECT(cr, outrec);
 
-addrs_ddp := dedup(addrs(prim_name <> ''), prim_range, prim_name, sec_range, zip, all);
+addrs_ddp := DEDUP(addrs(prim_name <> ''), prim_range, prim_name, sec_range, zip, ALL);
 ut.MAC_Sequence_Records(addrs_ddp, address_id, addrs_wid)
 
-return addrs_wid;
+RETURN addrs_wid;
 END;

@@ -1,6 +1,6 @@
-﻿Import business_header, PAW, RiskWise, doxie, Business_Risk, Business_Header_SS, did_add,Risk_Indicators, Address, Header,Relationship, Suppress, AML;
+﻿Import business_header, PAW, RiskWise, doxie, Business_Risk, Business_Header_SS, Risk_Indicators, Address, Header,Relationship, Suppress, AML;
 
-EXPORT GetLinkedBusnExecs(DATASET(Layouts.BusnLayoutV2) BusnIds, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+EXPORT GetLinkedBusnExecs(DATASET(AML.Layouts.BusnLayoutV2) BusnIds, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 gScore(UNSIGNED1 i) := i BETWEEN 5 AND 79;
 
@@ -70,7 +70,7 @@ Linkedprep := project(wLinkedBusn, transform(Business_Header_SS.Layout_BDID_OutB
 LinkedprepSD := dedup(sort(Linkedprep, seq, bdid), seq, bdid);
 
 
-Business_Header_SS.MAC_BestAppend(LinkedprepSD,appendsVerify,appendsVerify,linkedbest,true);
+Business_Header_SS.MAC_BestAppend(LinkedprepSD, appendsVerify, appendsVerify, linkedbest, mod_access.DataPermissionMask, mod_access.DataRestrictionMask, true);
 
 
 Layouts.BusnExecsLayoutV2 appendBest(wLinkedBusn l, linkedbest r) := transform
@@ -300,7 +300,7 @@ execBdidsprep := project(DDBexecBdids, transform(Business_Header_SS.Layout_BDID_
 																						self.seq := left.seq, 
 																						self := []));
 
-Business_Header_SS.MAC_BestAppend(execBdidsprep,appendsVerify,appendsVerify,ExecBdidbest,true);
+Business_Header_SS.MAC_BestAppend(execBdidsprep, appendsVerify, appendsVerify, ExecBdidbest, mod_access.DataPermissionMask, mod_access.DataRestrictionMask, true);
 
 
 Layouts.BusnExecsLayoutV2 appendBest2(DDBexecBdids l, ExecBdidbest r) := transform

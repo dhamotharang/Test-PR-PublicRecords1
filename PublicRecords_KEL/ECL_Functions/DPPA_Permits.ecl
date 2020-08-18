@@ -3,7 +3,7 @@ IMPORT KEL13 AS KEL;
 
 EXPORT DPPA_Permits := MODULE
 	
-	EXPORT BitOr(DATA100 a, DATA100 b) := KEL.Permits.BitOr(a, b);
+	EXPORT BitOr(DATA57 a, DATA57 b) := KEL.Permits.BitOr(a, b);
 	
 	// Any states listed in this key are RESTRICTED with the DPPA value indicated in the Code field.
 	// We also need to differentiate whether the source is Experian or not.

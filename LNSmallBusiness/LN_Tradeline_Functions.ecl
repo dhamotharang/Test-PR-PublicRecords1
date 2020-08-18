@@ -1,5 +1,8 @@
 ﻿import $, AutoKeyI, iesp, BIPV2, BusinessCredit_Services, Cortera_Tradeline, Std, ut;
 
+// Note - currently only single inputs (ie records with only 1 uniqueid value) are supported
+// most functions support multiple uniqueid values, but some future work is still required to fully 
+// support inputs with multiple uniqueid values
 export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := module
 
   shared current_date := Std.Date.Today();
@@ -54,7 +57,7 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
 
   // sort within each account with most recent recs on top
   shared tradelineRecsSorted_tmp := sort(tradelineRecsEx, uniqueid, account_key, _age_days);
-  acct_recs := dedup(tradelineRecsSorted_tmp, uniqueid, account_key);
+  shared acct_recs := dedup(tradelineRecsSorted_tmp, uniqueid, account_key);
 
   // stores info for each unique account including the segment and the mapped account_id value
   shared acct_info := project(acct_recs, 
@@ -122,12 +125,20 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
       self := [];
     end;
     local layout_pmt_intermediate calc_trans(layout_pmt_intermediate l) := transform
+      // ensure the percentages sum to 100 and handle negative current values
+      tot_val := if(l.tot.current < 0, l.tot.balance - l.tot.current, l.tot.balance);
+      per_1to30 := if(tot_val > 0, truncate((l.tot.amt1to30 / tot_val) * 100), 0);
+      per_31to60 := if(tot_val > 0, truncate((l.tot.amt31to60 / tot_val) * 100), 0);
+      per_61to90 := if(tot_val > 0, truncate((l.tot.amt61to90 / tot_val) * 100), 0);
+      per_91plus := if(tot_val > 0, truncate((l.tot.amt91plus / tot_val) * 100), 0);
+      per_cur := if(tot_val > 0, 100 - (per_1to30 + per_31to60 + per_61to90 + per_91plus), 0);
+
       self.per.balance := 100;
-      self.per.current := if(l.tot.balance > 0, round((l.tot.current / l.tot.balance) * 100), 0);
-      self.per.amt1to30 := if(l.tot.balance > 0, round((l.tot.amt1to30 / l.tot.balance) * 100), 0);
-      self.per.amt31to60 := if(l.tot.balance > 0, round((l.tot.amt31to60 / l.tot.balance) * 100), 0);
-      self.per.amt61to90 := if(l.tot.balance > 0, round((l.tot.amt61to90 / l.tot.balance) * 100), 0);
-      self.per.amt91plus := if(l.tot.balance > 0, round((l.tot.amt91plus / l.tot.balance) * 100), 0);
+      self.per.current := per_cur;
+      self.per.amt1to30 := per_1to30;
+      self.per.amt31to60 := per_31to60;
+      self.per.amt61to90 := per_61to90;
+      self.per.amt91plus := per_91plus;
       self := l;
     end;
 
@@ -161,8 +172,8 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
       self.account_key := l.account_key;
       self._segment := l._segment;
       self.provider_cnt := 1;
-      self.avg_balance := if(r_cnt > 0, round(t_balance / r_cnt, 2), 0);
-      self.avg_dbt := if(t_balance > 0, round(ptot_sum / t_balance, 2), 0);
+      self.avg_balance := if(r_cnt > 0, round(t_balance / r_cnt), 0);
+      self.avg_dbt := if(t_balance > 0, round(ptot_sum / t_balance), 0);
       self.max_balance := max(recs, (integer)total_ar);
     end;
 
@@ -187,8 +198,8 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
       self.account_key := '';
       self._segment := l._segment;
       self.provider_cnt := r_cnt;
-      self.avg_balance := if(r_cnt > 0, round(t_avg_balance / r_cnt, 2), 0);
-      self.avg_dbt := if(r_cnt > 0, round(t_avg_dbt / r_cnt, 2), 0);
+      self.avg_balance := if(r_cnt > 0, round(t_avg_balance / r_cnt), 0);
+      self.avg_dbt := if(r_cnt > 0, round(t_avg_dbt / r_cnt), 0);
       self.max_balance := max(recs, max_balance);
     end;
 
@@ -217,8 +228,8 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
     iesp.smallbusinessbipcombinedreport.t_SegmentPaymentSummary combine_trans(layout_seg_intermediate l, recordof(recs_psum) r) := transform
       self.IndustrySegment := l._segment;
       self.ProviderCount := l.provider_cnt;
-      self.AverageBalance := (string)round(l.avg_balance, 2);
-      self.AverageDBT := (string)round(l.avg_dbt, 2);
+      self.AverageBalance := (string)round(l.avg_balance);
+      self.AverageDBT := (string)round(l.avg_dbt);
       self.HighestBalance := (string)l.max_balance;
       self.PastDueAgingAmount31to60Percent := (string)r.per.amt31to60;
       self.PastDueAgingAmount61to90Percent := (string)r.per.amt61to90;
@@ -311,7 +322,7 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
     t_balance := sum(recs_recent, (integer)total_ar);
     t_current := sum(recs_recent, (integer)current_ar);
     t_over := t_balance - t_current;
-    avg_over := round(t_over / num_act, 2);
+    avg_over := round(t_over / num_act);
 
     max_bal := max(recs_recent, (integer)total_ar);
     max_1 := max(recs_recent, (integer)aging_1to30);
@@ -336,7 +347,7 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
       self.MostSevereStatus := if(num_act > 0, stat, '');
       self.HighestCredit := if(num_act > 0, (string)max_bal, '');
       self.TotalCurrentExposure := if(num_act > 0, (string)t_balance, '');
-      self.MedianBalance := if(num_act > 0, (string)med_bal, '');
+      self.MedianBalance := if(num_act > 0, (string)round(med_bal), '');
       self.AvgOpenBalance := if(num_act > 0, (string)avg_over, '');
       self := [];
     end;
@@ -407,15 +418,21 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
     pmt24_recs := compose_payment_summary(0, 24);
 
     seg_recs := compose_segment_summary(daysLimitedRecs(active_age_days));
-    acct_recs := compose_account_summary(tradelineRecsSorted, active_age_days);
+    acct_d_recs := compose_account_summary(tradelineRecsSorted, active_age_days);
 
+    // used to get the most recent trade date in any account
+    recent_trade_recs := sort(acct_recs, _age_days);
+
+    // note that the uniqueid in the inputs is not supported in this function, 
+    // therefore the first uniqueid is implicity used for the results
     iesp.smallbusinessbipcombinedreport.t_B2BTradeData trans() := transform
+      self.RecentTradeDate := iesp.ECL2ESP.toDatestring8(recent_trade_recs[1].ar_date);
       self.TradeSummary := sum_recs[1];
       self.CurrentPaymentSummary := cur_pmt_recs[1];
       self.PaymentSummary := pmt_recs[1];
       self.Payment24MonthHistory := pmt24_recs[1];
       self.IndustrySegments := choosen(seg_recs, iesp.Constants.TOPBUSINESS.MAX_COUNT_BIZRPT_CTL_SEGMENTS);
-      self.AccountDetails := choosen(acct_recs, iesp.Constants.TOPBUSINESS.MAX_COUNT_BIZRPT_CTL_ACCTS);
+      self.AccountDetails := choosen(acct_d_recs, iesp.Constants.TOPBUSINESS.MAX_COUNT_BIZRPT_CTL_ACCTS);
       self.StatusCode := '0';     // StatusCode 0 indicates successful data hit
       self := [];
     end;
