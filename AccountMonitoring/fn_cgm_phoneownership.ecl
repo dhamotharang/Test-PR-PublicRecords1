@@ -1,4 +1,4 @@
-IMPORT AccountMonitoring, PhonesInfo;
+﻿IMPORT AccountMonitoring, PhonesInfo;
 
 EXPORT fn_cgm_phoneownership (
 			DATASET(AccountMonitoring.layouts.portfolio.base) in_portfolio,
@@ -53,7 +53,8 @@ EXPORT fn_cgm_phoneownership (
 	temp_all_joins :=
 		temp_join_phone;
 		
-	// Distribute and dedup joined candidates
+	// Distribute and dedup joined candidates 
+  // Added all monitored fields to sort/dedup since all unique records for a phone will now be used for the hash calc. 
 	temp_joins_deduped := 
 	dedup(
 		sort(
@@ -61,9 +62,9 @@ EXPORT fn_cgm_phoneownership (
 				temp_all_joins,
 				hash64(pid,rid, hid)
 			),
-			pid,rid,hid,phone,local
+			pid,rid,hid,phone,deact_start_dt,account_owner,spid,serv,line,dt_last_reported,port_start_dt,swap_start_dt,phone_swap,deact_code,is_deact,source,local
 		),
-		pid,rid,hid,phone,local
+		pid,rid,hid,phone,deact_start_dt,account_owner,spid,serv,line,dt_last_reported,port_start_dt,swap_start_dt,phone_swap,deact_code,is_deact,source,local
 	);
 
 	// Now, create a hash value from only those fields we're interested in 
@@ -109,6 +110,6 @@ EXPORT fn_cgm_phoneownership (
 			),
 			pid,rid,local
 		);
-			
+	
 RETURN temp_rolled_hashes;
 END;
