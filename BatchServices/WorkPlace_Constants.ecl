@@ -9,6 +9,7 @@ export WorkPlace_Constants := module
     export unsigned4 KEYED_JOIN_UNLIMITED := 0;
     export unsigned1 KEEP_HIST            := 4;
     export unsigned1 KEEP_EMAIL           := 3;
+    export unsigned1 APPEND_LIMIT         := 10000;
   end;
 
  // A set of all the royalty source codes.
@@ -128,5 +129,6 @@ export WorkPlace_Constants := module
   EXPORT PERSONAL_EMAIL_DOMAIN_DCT := DICTIONARY(PERSONAL_EMAIL_DOMAIN_SET,{domain});
 
   EXPORT UNSIGNED1 DEFAULT_SOURCE_ORDER:=255;
+  EXPORT STRING7 EMAIL_INVALID := 'INVALID'; //Databridge key field which indicates if the email is valid or not
 
 end;

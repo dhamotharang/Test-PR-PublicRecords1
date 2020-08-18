@@ -28,7 +28,7 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
   // *** Main processing
 
 	// 0.1 First edit the input ExcludedSources string as needed for processing below.
-  in_excluded_sources_edited := TRIM(Stringlib.StringToUpperCase(in_excluded_sources),
+  in_excluded_sources_edited := TRIM(STD.Str.ToUpperCase(in_excluded_sources),
 	                                   LEFT,RIGHT,ALL);
 
   // 0.2 Next if not empty, parse the input "ExcludedSources" comma de-limited list
@@ -735,18 +735,18 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
                                   self.in_zip4        := left.zip4;
                                   self.in_ssn         := left.ssn;
 																	// rest of fields from right, converting some
-			                            self.company_name         := stringlib.StringToUpperCase(right.company_name);
-			                            self.parent_company_name  := stringlib.StringToUpperCase(right.parent_company_name);
-                                  self.addl_wpl_comp_name_1 := stringlib.StringToUpperCase(right.addl_wpl_comp_name_1);
-                                  self.addl_wpl_comp_name_2 := stringlib.StringToUpperCase(right.addl_wpl_comp_name_2);
-                                  self.addl_wpl_comp_name_3 := stringlib.StringToUpperCase(right.addl_wpl_comp_name_3);
-                                  self.addl_wpl_comp_name_4 := stringlib.StringToUpperCase(right.addl_wpl_comp_name_4);
-																	self.spouse_company_name         := stringlib.StringToUpperCase(right.spouse_company_name);
-			                            self.spouse_parent_company_name  := stringlib.StringToUpperCase(right.spouse_parent_company_name);
-                                  self.spouse_addl_wpl_comp_name_1 := stringlib.StringToUpperCase(right.spouse_addl_wpl_comp_name_1);
-                                  self.spouse_addl_wpl_comp_name_2 := stringlib.StringToUpperCase(right.spouse_addl_wpl_comp_name_2);
-                                  self.spouse_addl_wpl_comp_name_3 := stringlib.StringToUpperCase(right.spouse_addl_wpl_comp_name_3);
-                                  self.spouse_addl_wpl_comp_name_4 := stringlib.StringToUpperCase(right.spouse_addl_wpl_comp_name_4);
+                                  self.company_name         := STD.Str.ToUpperCase(right.company_name);
+                                  self.parent_company_name  := STD.Str.ToUpperCase(right.parent_company_name);
+                                  self.addl_wpl_comp_name_1 := STD.Str.ToUpperCase(right.addl_wpl_comp_name_1);
+                                  self.addl_wpl_comp_name_2 := STD.Str.ToUpperCase(right.addl_wpl_comp_name_2);
+                                  self.addl_wpl_comp_name_3 := STD.Str.ToUpperCase(right.addl_wpl_comp_name_3);
+                                  self.addl_wpl_comp_name_4 := STD.Str.ToUpperCase(right.addl_wpl_comp_name_4);
+                                  self.spouse_company_name         := STD.Str.ToUpperCase(right.spouse_company_name);
+                                  self.spouse_parent_company_name  := STD.Str.ToUpperCase(right.spouse_parent_company_name);
+                                  self.spouse_addl_wpl_comp_name_1 := STD.Str.ToUpperCase(right.spouse_addl_wpl_comp_name_1);
+                                  self.spouse_addl_wpl_comp_name_2 := STD.Str.ToUpperCase(right.spouse_addl_wpl_comp_name_2);
+                                  self.spouse_addl_wpl_comp_name_3 := STD.Str.ToUpperCase(right.spouse_addl_wpl_comp_name_3);
+                                  self.spouse_addl_wpl_comp_name_4 := STD.Str.ToUpperCase(right.spouse_addl_wpl_comp_name_4);
 																  self                := RIGHT),
 														 inner, // only return input recs that had results
 														 limit(WorkPlace_Constants.Limits.JOIN_LIMIT));

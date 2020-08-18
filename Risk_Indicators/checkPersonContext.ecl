@@ -1,4 +1,4 @@
-﻿import _Control, Gateway, PersonContext, risk_indicators, iesp, FFD;
+﻿import _Control, Gateway, PersonContext, risk_indicators, iesp, FFD, STD;
 onThor := _Control.Environment.OnThor;
 
 // this function will be used by every FCRA transaction coming in from a scoring product.  
@@ -7,7 +7,7 @@ onThor := _Control.Environment.OnThor;
 EXPORT checkPersonContext(grouped DATASET(risk_indicators.layout_output) input_with_DID, 
 		DATASET (Gateway.Layouts.Config) gateways, integer BSversion=1, string100 IntendedPurpose='') := function
 
-URL := gateways(stringlib.StringToLowerCase(trim(servicename))=gateway.constants.ServiceName.delta_personcontext)[1].url;
+URL := gateways(std.str.ToLowerCase(trim(servicename))=gateway.constants.ServiceName.delta_personcontext)[1].url;
 
 PCkeys := project(ungroup(input_with_DID), transform(PersonContext.Layouts.Layout_PCSearchKey, 
 	self.LexID := (string)left.did, 
@@ -29,13 +29,13 @@ dsResponse := PersonContext.GetPersonContext(dsRequest[1]);
 dsResponseRecords_roxie := dedup(
 	sort(dsResponse[1].records, dsResponse[1].records.LexID, 
 	if(recordtype in [personContext.Constants.RecordTypes.cs, personcontext.Constants.RecordTypes.rs], 2, 1),  // condider alerts to be higher priority than consumer statements https://jira.rsi.lexisnexis.com/browse/DEMPSEY-273
-	-(integer) stringLib.StringFilter(dsResponse[1].records.dateadded[1..10], '0123456789'), dsResponse[1].records.statementID), 
+	-(integer) std.str.Filter(dsResponse[1].records.dateadded[1..10], '0123456789'), dsResponse[1].records.statementID), 
 	dsResponse[1].records.LexID, keep(iesp.Constants.MAX_CONSUMER_STATEMENTS));
 
 // When running on thor, GetPersonContext takes in multiple rows of data and returns multiple rows of data, instead of using child datasets like the roxie version in order to avoid errors 
 // dsResponseRecords_thor := DEDUP(SORT(PersonContext.GetPersonContext_thor(PCKeys), LexID, 
 // if(recordtype in [personContext.Constants.RecordTypes.cs, personcontext.Constants.RecordTypes.rs], 2, 1),  // condider alerts to be higher priority than consumer statements, https://jira.rsi.lexisnexis.com/browse/DEMPSEY-273
-// -(integer) stringLib.StringFilter(dateadded[1..10], '0123456789'), statementID), LexID, keep(iesp.Constants.MAX_CONSUMER_STATEMENTS)) ;
+// -(integer) std.str.Filter(dateadded[1..10], '0123456789'), statementID), LexID, keep(iesp.Constants.MAX_CONSUMER_STATEMENTS)) ;
 
 // when running on Vault, the graph is getting hung up in PersonContext.Functions.PerformCombineDatasets, going to work around that issue for now
 dsResponseRecords_thor := dataset([], PersonContext.Layouts.Layout_PCResponseRec);
@@ -93,7 +93,7 @@ PersonContext_transformed := project(dsResponseRecords(searchStatus=personContex
 		legal_hold_alert := statementtype in [personContext.Constants.RecordTypes.la, personContext.Constants.RecordTypes.lh];
     id_theft_flag := statementtype = personContext.Constants.RecordTypes.it;
     record_level_statement := statementtype = personContext.Constants.RecordTypes.rs;
-		
+		suppression_record := statementtype = personContext.Constants.RecordTypes.sr;
     		
 		// for legal hold, we only consider the legal hold if the legal flag = SA or SP.  otherwise we need to skip that record,  https://jira.rsi.lexisnexis.com/browse/DEMPSEY-277
 		skip_legal_hold := left.recordtype=FFD.Constants.RecordType.LH and trim(left.content) not in [PersonContext.Constants.LegalFlag.SuppressProduct,PersonContext.Constants.LegalFlag.SuppressAll]; 
@@ -113,7 +113,7 @@ PersonContext_transformed := project(dsResponseRecords(searchStatus=personContex
     self.id_theft_flag := id_theft_flag;
     
 // this list will grow as we add more types of alerts to person context that we need to suppress data for
-		alert_needs_suppression := record_level_statement or isDispute or securityfraudalert or legal_hold_alert or (id_theft_flag and bsversion<50);
+		alert_needs_suppression := record_level_statement or isDispute or securityfraudalert or legal_hold_alert or (id_theft_flag and bsversion<50) or suppression_record;
 
 		SELF.bankrupt_correct_cccn := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.BANKRUPTCY_MAIN, 
 																																		PersonContext.constants.datagroups.BANKRUPTCY_SEARCH ], 
@@ -290,8 +290,6 @@ with_personContext := join(input_with_DID, rolled_personContext, left.did=right.
 // output(PersonContext_transformed, named('PersonContext_transformed'));	
 // output(rolled_personContext, named('rolled_personContext'));			
 // output(with_personContext, named('with_personcontext'));			
-
-// output(PCKeys,,'~dvstemp::in::getpersoncontext_thor_debugging', __compressed__);
 
 return group(with_personContext,seq);
 

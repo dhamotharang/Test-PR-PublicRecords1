@@ -102,6 +102,7 @@ export layout_liens_retrieval := module
   boolean isDisputed := false;
   dataset(FFD.Layouts.StatementIdRec) StatementIds := dataset([],FFD.Layouts.StatementIdRec);
   string error_code := '';
+  string error_desc := '';
  end;
 
 
