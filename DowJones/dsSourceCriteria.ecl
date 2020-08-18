@@ -1912,8 +1912,8 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2020/1082 ISIL (Da\'esh) and Al-Qaida List','1899'},
 {'EC (CFSP) 2020/1126 ISIL (Da\'esh) and Al-Qaeda List','1900'},
 {'EC (CFSP) 2020/1127 Cyber-Attacks List','1901'},
-{U'EC (CFSP) 2020/1132 Terrorism List','1902'},
-{'EC (CFSP) 2020/1136  Democratic People\'s Republic Korea List','1903'},
+{'EC (CFSP) 2020/1132 EU Terrorism List','1902'},
+{'EC (CFSP) 2020/1136 Democratic People\'s Republic Korea List','1903'},
 {'EC (CFSP) 2020/1137 Libya List','1904'},
 {'EC 2020/1124 ISIL (Da\'esh) and Al-Qaida List','1905'},
 {'EC 2020/1125 Cyber-Attacks List','1906'},
@@ -1922,5 +1922,6 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2020/1130  Libya List','1909'},
 {'EC (CFSP) 2020/1172 Central African Republic List','1910'},
 {'EC 2020/1171 Central African Republic List','1911'}
+
 ],r);
 
