@@ -53,7 +53,7 @@ EXPORT fn_getOwnership(DATASET(HomesteadExemptionV2_Services.Layouts.inputNotOwn
 
 	// CONTRACT DATE
 	ownershipContractDateRecs:=JOIN(ownershipSaleDateRecs,LN_PropertyV2.key_deed_fid(),
-		KEYED(LEFT.ln_fares_id=RIGHT.ln_fares_id) AND right.record_type NOT IN LN_PropertyV2.Constants.setAssignRelsRecordTypes,//Assignments and Releases codes excluded
+		KEYED(LEFT.ln_fares_id=RIGHT.ln_fares_id) AND not LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code),//Assignments and Releases codes excluded
 		TRANSFORM(HomesteadExemptionV2_Services.Layouts.ownershipRec,
 			SELF.contract_date:=RIGHT.contract_date,
 			SELF:=LEFT),
