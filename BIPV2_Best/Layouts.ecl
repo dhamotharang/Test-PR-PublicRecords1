@@ -47,11 +47,11 @@ EXPORT dba_name := RECORD
    string120 dba_name;
    unsigned2 dba_name_data_permits;
    unsigned1 dba_name_method;
-  END;	
+  END;
 EXPORT dba_name_case_layout := RECORD
     dba_name;
     unsigned1 score := 0 ;
-  END;	
+  END;
 EXPORT company_address := RECORD
    string10 address_prim_range;
    string2 address_predir;
@@ -83,9 +83,9 @@ EXPORT company_address_case_layout := RECORD
   string2 state_fips;
   string3 county_fips;
   string18 county_name;
-	unsigned6 company_locid;
-	unsigned4 address_dt_first_seen;
-	unsigned4 address_dt_last_seen;
+	unsigned6 company_locid := 0;
+	unsigned4 address_dt_first_seen := 0;
+	unsigned4 address_dt_last_seen := 0;
   unsigned2 company_address_data_permits;
   unsigned1 company_address_method; // This value could come from multiple BESTTYPE; track which one
   unsigned1 score := 0 ;
@@ -196,7 +196,7 @@ export base := RECORD
 EXPORT key := RECORD
     BIPV2.IDlayouts.l_xlink_ids;
     boolean isActive ; //seleid level
-    boolean isDefunct; //seleid level   
+    boolean isDefunct; //seleid level
     unsigned1 seleid_status_private_score; //seleid level
     unsigned6 company_bdid;
     DATASET(company_name_case_layout and not score) company_name;
@@ -217,7 +217,7 @@ END;
 EXPORT key_static := RECORD
     BIPV2.IDlayouts.l_xlink_ids;
     boolean isActive ; //seleid level
-    boolean isDefunct; //seleid level   
+    boolean isDefunct; //seleid level
     unsigned1 seleid_status_private_score; //seleid level
     unsigned6 company_bdid;
     DATASET(company_name_case_layout and not score) company_name;
