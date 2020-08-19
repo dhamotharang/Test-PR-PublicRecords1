@@ -213,14 +213,6 @@ shared layout_key := RECORD
   string30 contact_status_derived;
   string1 address_type_derived;
   boolean is_vanity_name_derived;
-  string10 employee_count_org_raw;
-  unsigned6 employee_count_org_derived;
-  string28 revenue_org_raw;
-  unsigned6 revenue_org_derived;
-  string10 employee_count_local_raw;
-  unsigned6 employee_count_local_derived;
-  string28 revenue_local_raw;
-  unsigned6 revenue_local_derived;
   unsigned4 global_sid;
   unsigned8 record_sid;
   unsigned6 locid;

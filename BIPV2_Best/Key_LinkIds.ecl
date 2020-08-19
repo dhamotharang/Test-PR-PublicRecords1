@@ -10,6 +10,7 @@ EXPORT Key_LinkIds := MODULE
      layouts.key
     ,self.isdefunct := if(right.seleid_status_private = 'D'           ,true   ,false)
     ,self.isactive  := if(right.seleid_status_private  in ['I','D']   ,false  ,true )
+		,self.seleid_status_private_score := 0;
     ,self := left
   ),hash,keep(1),left outer);
   
