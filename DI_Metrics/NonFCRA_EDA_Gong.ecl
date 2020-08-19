@@ -5,19 +5,19 @@ IMPORT _Control, Gong_Neustar, MDR, STD, ut;
 export NonFCRA_EDA_GONG(string pHostname, string pTarget, string pContact ='\' \'') := function
 
 filedate := (STRING8)Std.Date.Today();
-rpt_yyyymmdd := filedate[1..8];
 
 Key_Non_FCRA_Gong_History_did := PULL(Gong_Neustar.Key_History_did);
 rs_Key_Non_FCRA_Gong_History_did := Key_Non_FCRA_Gong_History_did;
 
-Non_FCRA_Gong_History_DIDs := DEDUP(sort(distribute(rs_Key_Non_FCRA_Gong_History_did(did <> 0), hash(did))
-																		,did, -dt_last_seen,-current_record_flag,local,skew(1.0))
-																		,did, all,local);
+Non_FCRA_Gong_History_DIDs := DEDUP(sort(distribute(rs_Key_Non_FCRA_Gong_History_did(did <> 0)
+													, hash(did))
+										,did, -dt_last_seen,-current_record_flag,local,skew(1.0))
+									,did, local);
 
 since_date := 20100101;
 
-Gong_Non_FCRA_key_src_first_seen 	:= DEDUP(sort(distribute(rs_Key_Non_FCRA_Gong_History_did(did <> 0), hash(did)), src,did,dt_first_seen, local), src,did,dt_first_seen, all,local)((unsigned6) dt_first_seen >= since_date);
-Gong_Non_FCRA_key_src_last_seen 	:= DEDUP(sort(distribute(rs_Key_Non_FCRA_Gong_History_did(did <> 0), hash(did)), src,did, -dt_last_seen, local), src,did,dt_last_seen, all,local)((unsigned6) dt_last_seen >= since_date);
+Gong_Non_FCRA_key_src_first_seen 	:= DEDUP(sort(distribute(rs_Key_Non_FCRA_Gong_History_did(did <> 0), hash(src,did)), src,did,dt_first_seen, local), src,did,dt_first_seen, local)((unsigned6) dt_first_seen >= since_date);
+Gong_Non_FCRA_key_src_last_seen 	:= DEDUP(sort(distribute(rs_Key_Non_FCRA_Gong_History_did(did <> 0), hash(src,did)), src,did, -dt_last_seen, local), src,did,dt_last_seen, local)((unsigned6) dt_last_seen >= since_date);
 
 rec_src_dates_first_seen := RECORD
 		Gong_Non_FCRA_key_src_first_seen.src;
@@ -26,7 +26,7 @@ rec_src_dates_first_seen := RECORD
 		unsigned6	did_count := count(group);
 	END;
 	
-tbl_src_dates_first_seen := TABLE(Gong_Non_FCRA_key_src_first_seen, rec_src_dates_first_seen, src,dt_first_seen[1..6], few);	
+tbl_src_dates_first_seen := TABLE(Gong_Non_FCRA_key_src_first_seen, rec_src_dates_first_seen, src,dt_first_seen[1..6], MANY);	
 
 rec_src_dates_last_seen := RECORD
 		Gong_Non_FCRA_key_src_last_seen.src;
@@ -35,7 +35,7 @@ rec_src_dates_last_seen := RECORD
 		unsigned6	did_count := count(group);
 	END;
 	
-tbl_src_dates_last_seen := TABLE(Gong_Non_FCRA_key_src_last_seen, rec_src_dates_last_seen, src,dt_last_seen[1..6], few);	
+tbl_src_dates_last_seen := TABLE(Gong_Non_FCRA_key_src_last_seen, rec_src_dates_last_seen, src,dt_last_seen[1..6], MANY);	
 
 
 //Despray to bctlpedata12 (one thor file and one csv file). FTP to \\Risk\inf\Data_Factory\DI_Landingzone

@@ -8,9 +8,8 @@ IMPORT BankruptcyV2, BankruptcyV3, data_services, STD, ut;
 export NonFCRA_Bankruptcy(string pHostname, string pTarget, string pContact ='\' \'') := function
 
 filedate := (STRING8)Std.Date.Today();
-rpt_yyyymmdd := filedate[1..8];
 
-Key_BKv3_Non_FCRA_main := BankruptcyV3.key_bankruptcyV3_main_full(false);
+Key_BKv3_Non_FCRA_main := PULL(BankruptcyV3.key_bankruptcyV3_main_full(false));
 
 layout_filing_period := RECORD
 		Key_BKv3_Non_FCRA_main;
@@ -21,8 +20,8 @@ Key_BKv3_Non_FCRA := PROJECT(Key_BKv3_Non_FCRA_main, transform(layout_filing_per
 					, self.filing_period := (integer4) left.date_first_seen[1..6]
 					, self := left));
 Key_BKv3_Non_FCRA_2010 := Key_BKv3_Non_FCRA((integer4) date_first_seen[1..4] >= 2010, source = 'L');
-Key_BKv3_Non_FCRA_2010_filings := DEDUP(sort(distribute(Key_BKv3_Non_FCRA_2010, hash(tmsid)), filing_period,filing_jurisdiction, tmsid, orig_chapter,filing_status,filer_type, local), filing_period,filing_jurisdiction, tmsid, orig_chapter, all,local);
-tbl_Key_BKv3_Non_FCRA_2010_filings := TABLE(Key_BKv3_Non_FCRA_2010_filings, {filing_period,filing_jurisdiction, orig_chapter,filing_status,filer_type, tmsid_count := count(group)}, filing_period,filing_jurisdiction, orig_chapter,filing_status,filer_type, few);
+Key_BKv3_Non_FCRA_2010_filings := DEDUP(sort(distribute(Key_BKv3_Non_FCRA_2010, hash (filing_period, filing_jurisdiction, tmsid)), filing_period, filing_jurisdiction, tmsid, orig_chapter, filing_status, filer_type, local), filing_period, filing_jurisdiction, tmsid, orig_chapter, local);
+tbl_Key_BKv3_Non_FCRA_2010_filings := TABLE(Key_BKv3_Non_FCRA_2010_filings, {filing_period,filing_jurisdiction, orig_chapter,filing_status,filer_type, tmsid_count := count(group)}, filing_period,filing_jurisdiction, orig_chapter,filing_status,filer_type, MANY);
 srt_tbl_Key_BKv3_Non_FCRA_2010_filings := sort(tbl_Key_BKv3_Non_FCRA_2010_filings, -filing_period, filing_jurisdiction, orig_chapter, filing_status, filer_type, skew(1.0));
 
 //Despray to bctlpedata12 (one thor file and one csv file). FTP to \\Risk\inf\Data_Factory\DI_Landingzone

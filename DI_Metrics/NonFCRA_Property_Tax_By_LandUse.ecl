@@ -6,10 +6,9 @@ IMPORT _Control, data_services, LN_PropertyV2, LN_PropertyV2_Fast, STD, ut;
 export NonFCRA_Property_Tax_By_LandUse(string pHostname, string pTarget, string pContact ='\' \'') := function 
 
 filedate := (STRING8)Std.Date.Today();
-rpt_yyyymmdd := filedate[1..8];
 
-tax_key1 := LN_PropertyV2.key_assessor_fid(false);
-tax_key2 := LN_PropertyV2_Fast.key_assessor_fid(false,true);
+tax_key1 := PULL(LN_PropertyV2.key_assessor_fid(false));
+tax_key2 := PULL(LN_PropertyV2_Fast.key_assessor_fid(false,true));
 Key_Tax_Non_FCRA_monthly := tax_key1 + tax_key2;
 
 rSource := RECORD
@@ -30,13 +29,13 @@ Key_Tax_Non_FCRA_monthly_plus_2010 := PROJECT(Key_Tax_Non_FCRA_monthly((proc_dat
 //tbl_Key_Tax_Non_FCRA_monthly_2010_use := TABLE(Key_Tax_Non_FCRA_monthly_plus_2010, {standardized_land_use_code, record_count := count(group)}, standardized_land_use_code, few);
 //output(sort(tbl_Key_Tax_Non_FCRA_monthly_2010_use, standardized_land_use_code), ALL);
 
-//Key_Tax_Non_FCRA_2010_props := DEDUP(sort(distribute(Key_Tax_Non_FCRA_monthly_plus_2010, hash(fares_unformatted_apn)), source_val, proc_date,state_code, fips_code,fares_unformatted_apn,standardized_land_use_code, local), proc_date,state_code, fips_code,fares_unformatted_apn,standardized_land_use_code, all,local);
-Key_Tax_Non_FCRA_2010_props_srcA := DEDUP(sort(distribute(Key_Tax_Non_FCRA_monthly_plus_2010(source_val = 'Source A' AND fares_unformatted_apn <> ''), hash(fares_unformatted_apn)), proc_date,state_code, fips_code,fares_unformatted_apn,standardized_land_use_code, local), proc_date,state_code, fips_code,fares_unformatted_apn,standardized_land_use_code, all,local);
-Key_Tax_Non_FCRA_2010_props_srcB := DEDUP(sort(distribute(Key_Tax_Non_FCRA_monthly_plus_2010(source_val = 'Source B' AND fares_unformatted_apn <> ''), hash(fares_unformatted_apn)), proc_date,state_code, fips_code,fares_unformatted_apn,standardized_land_use_code, local), proc_date,state_code, fips_code,fares_unformatted_apn,standardized_land_use_code, all,local);
+//Key_Tax_Non_FCRA_2010_props := DEDUP(sort(distribute(Key_Tax_Non_FCRA_monthly_plus_2010, hash(source_val, proc_date,state_code, fips_code,fares_unformatted_apn)), source_val, proc_date,state_code, fips_code,fares_unformatted_apn,standardized_land_use_code, local), proc_date,state_code, fips_code,fares_unformatted_apn,standardized_land_use_code, local);
+Key_Tax_Non_FCRA_2010_props_srcA := DEDUP(sort(distribute(Key_Tax_Non_FCRA_monthly_plus_2010(source_val = 'Source A' AND fares_unformatted_apn <> ''), hash(proc_date,state_code, fips_code,fares_unformatted_apn)), proc_date,state_code, fips_code,fares_unformatted_apn,standardized_land_use_code, local), proc_date,state_code, fips_code,fares_unformatted_apn,standardized_land_use_code, local);
+Key_Tax_Non_FCRA_2010_props_srcB := DEDUP(sort(distribute(Key_Tax_Non_FCRA_monthly_plus_2010(source_val = 'Source B' AND fares_unformatted_apn <> ''), hash(proc_date,state_code, fips_code,fares_unformatted_apn)), proc_date,state_code, fips_code,fares_unformatted_apn,standardized_land_use_code, local), proc_date,state_code, fips_code,fares_unformatted_apn,standardized_land_use_code, local);
 
 //proc_date is YYYYMM from the value for Recording Date, which is when the transaction was filed at the county
-tbl_Key_Tax_Non_FCRA_2010_props_srcA := TABLE(Key_Tax_Non_FCRA_2010_props_srcA, {source_val, proc_date, state_code, standardized_land_use_code, standardized_land_use := DI_Metrics.fnPropertyStandardizedLandUseDesc('Source A',standardized_land_use_code), property_count := count(group)}, source_val, proc_date, state_code, standardized_land_use_code, few);
-tbl_Key_Tax_Non_FCRA_2010_props_srcB := TABLE(Key_Tax_Non_FCRA_2010_props_srcB, {source_val, proc_date, state_code, standardized_land_use_code, standardized_land_use := DI_Metrics.fnPropertyStandardizedLandUseDesc('Source B',standardized_land_use_code), property_count := count(group)}, source_val, proc_date, state_code, standardized_land_use_code, few);
+tbl_Key_Tax_Non_FCRA_2010_props_srcA := TABLE(Key_Tax_Non_FCRA_2010_props_srcA, {source_val, proc_date, state_code, standardized_land_use_code, standardized_land_use := DI_Metrics.fnPropertyStandardizedLandUseDesc('Source A',standardized_land_use_code), property_count := count(group)}, source_val, proc_date, state_code, standardized_land_use_code, MANY);
+tbl_Key_Tax_Non_FCRA_2010_props_srcB := TABLE(Key_Tax_Non_FCRA_2010_props_srcB, {source_val, proc_date, state_code, standardized_land_use_code, standardized_land_use := DI_Metrics.fnPropertyStandardizedLandUseDesc('Source B',standardized_land_use_code), property_count := count(group)}, source_val, proc_date, state_code, standardized_land_use_code, MANY);
 
 //Despray to bctlpedata12 (one thor file and one csv file). FTP to \\Risk\inf\Data_Factory\DI_Landingzone
 tbl_Non_FCRA_props_srcA := STD.File.Despray('~thor_data400::data_insight::data_metrics::tbl_Key_Tax_Non_FCRA_2010_properties_by_StandLandUse_SrcA_'+ filedate +'.csv',

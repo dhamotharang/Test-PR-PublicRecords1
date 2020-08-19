@@ -6,11 +6,10 @@ IMPORT _Control, data_services, LN_PropertyV2, LN_PropertyV2_Fast, STD, ut;
 EXPORT NonFCRA_Property_Deeds_By_DocType(string pHostname, string pTarget, string pContact ='\' \'') := function
 
 filedate := (STRING8)Std.Date.Today();
-rpt_yyyymmdd := filedate[1..8];
 
 //NonFCRA keys:
-Key_Deeds_Non_FCRA_monthly := LN_PropertyV2.key_deed_fid(false);;
-Key_Deeds_Non_FCRA_fast := LN_PropertyV2_Fast.Key_Deed_FID(false,true);
+Key_Deeds_Non_FCRA_monthly := PULL(LN_PropertyV2.key_deed_fid(false));
+Key_Deeds_Non_FCRA_fast := PULL(LN_PropertyV2_Fast.Key_Deed_FID(false,true));
 
 rSource := RECORD
 		string source_val;
@@ -33,18 +32,18 @@ rSource TwoSourcesFast(Key_Deeds_Non_FCRA_fast pInput) := TRANSFORM
 		SELF := pInput;
 	END;
 
-//File_Base_Deeds_Fast_plus_2010 := PROJECT(Key_Deeds_Non_FCRA_fast((proc_date between 201001 and (unsigned6) data_services.GetDate[1..6]), state <> '', document_type_code <> ''), TwoSourcesFast(LEFT));
+//File_Base_Deeds_Fast_plus_2010 := PROJECT(Key_Deeds_Non_FCRA_fast((proc_date between 201001 and (unsigned6) filedate[1..6]), state <> '', document_type_code <> ''), TwoSourcesFast(LEFT));
 File_Base_Deeds_Fast_plus_2010 := PROJECT(Key_Deeds_Non_FCRA_fast((proc_date between 201001 and (unsigned6) filedate[1..6]), state <> '', document_type_code <> ''), TwoSourcesFast(LEFT));
 
 Key_Deeds_Non_FCRA_2010 := File_Base_Deeds_Mnthly_plus_2010 + File_Base_Deeds_Fast_plus_2010;
 // output(Key_Deeds_Non_FCRA_2010);
 
-Key_Deeds_Non_FCRA_2010_props_srcA := DEDUP(sort(distribute(Key_Deeds_Non_FCRA_2010(source_val = 'Source A' AND fares_unformatted_apn <> ''), hash(fares_unformatted_apn)), proc_date,state, fips_code,fares_unformatted_apn,document_type_code, local), proc_date,state, fips_code,fares_unformatted_apn,document_type_code, all,local);
-Key_Deeds_Non_FCRA_2010_props_srcB := DEDUP(sort(distribute(Key_Deeds_Non_FCRA_2010(source_val = 'Source B' AND fares_unformatted_apn <> ''), hash(fares_unformatted_apn)), proc_date,state, fips_code,fares_unformatted_apn,document_type_code, local), proc_date,state, fips_code,fares_unformatted_apn,document_type_code, all,local);
+Key_Deeds_Non_FCRA_2010_props_srcA := DEDUP(sort(distribute(Key_Deeds_Non_FCRA_2010(source_val = 'Source A' AND fares_unformatted_apn <> ''), hash(proc_date,state, fips_code,fares_unformatted_apn)), proc_date,state, fips_code,fares_unformatted_apn,document_type_code, local), proc_date,state, fips_code,fares_unformatted_apn,document_type_code, local);
+Key_Deeds_Non_FCRA_2010_props_srcB := DEDUP(sort(distribute(Key_Deeds_Non_FCRA_2010(source_val = 'Source B' AND fares_unformatted_apn <> ''), hash(proc_date,state, fips_code,fares_unformatted_apn)), proc_date,state, fips_code,fares_unformatted_apn,document_type_code, local), proc_date,state, fips_code,fares_unformatted_apn,document_type_code, local);
 
 //proc_date is YYYYMM from the value for Recording Date, which is when the transaction was filed at the county
-tbl_Key_Deeds_Non_FCRA_2010_props_srcA := TABLE(Key_Deeds_Non_FCRA_2010_props_srcA, {source_val, proc_date, state, document_type_code, document_type := DI_Metrics.fnDeedsDocTypes(document_type_code,vendor_source_flag), property_count := count(group)}, source_val, proc_date, state, document_type_code, few);
-tbl_Key_Deeds_Non_FCRA_2010_props_srcB := TABLE(Key_Deeds_Non_FCRA_2010_props_srcB, {source_val, proc_date, state, document_type_code, document_type := DI_Metrics.fnDeedsDocTypes(document_type_code,vendor_source_flag), property_count := count(group)}, source_val, proc_date, state, document_type_code, few);
+tbl_Key_Deeds_Non_FCRA_2010_props_srcA := TABLE(Key_Deeds_Non_FCRA_2010_props_srcA, {source_val, proc_date, state, document_type_code, document_type := DI_Metrics.fnDeedsDocTypes(document_type_code,vendor_source_flag), property_count := count(group)}, source_val, proc_date, state, document_type_code, MANY);
+tbl_Key_Deeds_Non_FCRA_2010_props_srcB := TABLE(Key_Deeds_Non_FCRA_2010_props_srcB, {source_val, proc_date, state, document_type_code, document_type := DI_Metrics.fnDeedsDocTypes(document_type_code,vendor_source_flag), property_count := count(group)}, source_val, proc_date, state, document_type_code, MANY);
 
 //Despray to bctlpedata12 (one thor file and one csv file). FTP to \\Risk\inf\Data_Factory\DI_Landingzone
 tbl_Non_FCRA_Deeds_srcA := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_Key_Deeds_Non_FCRA_2010_properties_by_DocType_SrcA_'+ filedate +'.csv',

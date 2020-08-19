@@ -5,10 +5,9 @@ IMPORT _Control, LiensV2, STD, ut;
 EXPORT NonFCRA_LiensV2_Evictions(string pHostname, string pTarget, string pContact ='\' \'') := function
 
 filedate := (STRING8)Std.Date.Today();
-rpt_yyyymmdd := filedate[1..8];
 
 //thor_data400::key::liensv2::fcra::20141219::main::tmsid.rmsid
-Key_LiensV2_main := LiensV2.key_liens_main_ID(eviction = 'Y');
+Key_LiensV2_main := PULL(LiensV2.key_liens_main_ID(eviction = 'Y'));
 
 layout_filing_period := RECORD
 		Key_LiensV2_main;
@@ -28,13 +27,13 @@ Key_LiensV2 := PROJECT(Key_LiensV2_main,
 
 //Evictions Since 2010
 Key_LiensV2_Evic := Key_LiensV2(tmsid[1..2] = 'HG');
-Key_LiensV2_Evic_filings := DEDUP(sort(distribute(Key_LiensV2_Evic, hash(tmsid)), filing_jurisdiction, tmsid,rmsid, local), filing_jurisdiction, tmsid, all, local);
-tbl_Key_LiensV2_Evic_filings := TABLE(Key_LiensV2_Evic_filings, {filing_jurisdiction, eviction, tmsid_count := count(group)}, filing_jurisdiction, eviction, few);
+Key_LiensV2_Evic_filings := DEDUP(sort(distribute(Key_LiensV2_Evic, hash(filing_jurisdiction, tmsid)), filing_jurisdiction, tmsid, rmsid, local), filing_jurisdiction, tmsid, local);
+tbl_Key_LiensV2_Evic_filings := TABLE(Key_LiensV2_Evic_filings, {filing_jurisdiction, eviction, tmsid_count := count(group)}, filing_jurisdiction, eviction, MANY);
 
 //Evictions Since 2010
 Key_LiensV2_2010 := Key_LiensV2((integer4) orig_filing_date[1..4] >= 2010, tmsid[1..2] = 'HG');
-Key_LiensV2_2010_filings := DEDUP(sort(distribute(Key_LiensV2_2010, hash(tmsid)), filing_period, filing_jurisdiction, tmsid,rmsid, local), filing_period,filing_jurisdiction, tmsid, all, local);
-tbl_Key_LiensV2_2010_filings := TABLE(Key_LiensV2_2010_filings, {filing_period,filing_jurisdiction, eviction, tmsid_count := count(group)}, filing_period,filing_jurisdiction, eviction, few);
+Key_LiensV2_2010_filings := DEDUP(sort(distribute(Key_LiensV2_2010, hash(filing_period, filing_jurisdiction, tmsid)), filing_period, filing_jurisdiction, tmsid,rmsid, local), filing_period,filing_jurisdiction, tmsid, local);
+tbl_Key_LiensV2_2010_filings := TABLE(Key_LiensV2_2010_filings, {filing_period,filing_jurisdiction, eviction, tmsid_count := count(group)}, filing_period,filing_jurisdiction, eviction, MANY);
 
 //Despray to bctlpedata12 (one thor file and one csv file). FTP to \\Risk\inf\Data_Factory\DI_Landingzone
 despray_evic_all_tbl  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_Key_LiensV2_all_evictions_'+ filedate +'.csv',

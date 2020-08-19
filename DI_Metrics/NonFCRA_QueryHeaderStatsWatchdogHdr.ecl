@@ -5,7 +5,6 @@ IMPORT _control, Header, Doxie, watchdog, ut, data_services;
 export NonFCRA_QueryHeaderStatsWatchdogHdr(string pHostname, string pTarget, string pContact ='\' \'') := function
 
 filedate := (STRING8)Std.Date.Today();
-rpt_yyyymmdd := filedate[1..8];
 
 Layout_hdr_data_key := RECORD
   unsigned6 s_did;
@@ -91,7 +90,7 @@ end;
 hdr_key := project(ds_hdr_key,collecthdr(left));
 
 //sort files by DID
-base_wdog_best := dataset(ut.foreign_prod + 'thor_data400::BASE::Watchdog_best', watchdog.layout_key, flat);
+base_wdog_best := watchdog.file_best; //ask chris:  should this be base_wdog_best := dataset(data_services.foreign_prod + 'thor_data400::BASE::Watchdog_best', watchdog.layout_key, flat);
 
 layout_watchdog_to_check := RECORD
   unsigned6 did;
@@ -112,7 +111,7 @@ layout_watchdog_to_check := RECORD
 end;
  
 layout_watchdog_to_check collectwatchdog (base_wdog_best l) := transform
-	// SELF.current_age  := ut.Age(l.dob);  
+	// SELF.current_age  := data_services.Age(l.dob);  
 	self := l;
 end;
 
@@ -149,93 +148,101 @@ tbl_WatchDogHeaderCoreSegments := table(watchdog_to_Check,{adl_ind,cnt:=count(gr
 // % of records or identities that have Name, Address, Phone
  // Even better, could you provide the above breakdown by 18-24 year olds vs. non 18-24 year olds?
 
-// % of records or identities that have Name and Address
-did_address := dedup(sort(distribute(hdr_watchdog(lname <> '' and prim_name <> '' and city_name <> '' and st <> ''),hash(did)),did,local),did,local);
-tbl_DIDAddressHasNameAndAddress := table(did_address,{adl_ind,cnt:=count(group)},adl_ind,few);
- 
-// % of records or identities that have Name, Address, and DOB
- did_dob_address := dedup(sort(distribute(hdr_watchdog(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and dob <> 0),hash(did)),did,local),did,local);
- tbl_DIDAddressHasNameAndAddressAndDOB := table(did_dob_address,{adl_ind,cnt:=count(group)},adl_ind,few);
-  
-// % of records or identities that have Name, Address, and DL Number
-did_DL_address := dedup(sort(distribute(hdr_watchdog(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and dl_number <> ''),hash(did)),did,local),did,local);
-tbl_DIDAddressHasNameAndAddressAndDL := table(did_DL_address,{adl_ind,cnt:=count(group)},adl_ind,few);
- 
-  // % of records or identities that have Name, Address, and SSN
- did_ssn_address := dedup(sort(distribute(hdr_watchdog(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and ssn <> ''),hash(did)),did,local),did,local);
- tbl_DIDAddressHasNameAndAddressAndSSN := table( did_ssn_address,{adl_ind,cnt:=count(group)},adl_ind,few);
- 
-  // % of records or identities that have Name, Address, SSN, and DOB
- did_ssn_DOB_address := dedup(sort(distribute(hdr_watchdog(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and ssn <> '' and dob <> 0),hash(did)),did,local),did,local);
-tbl_DIDAddressHasNameAndAddressAndSSNandDOB :=  table( did_ssn_DOB_address,{adl_ind,cnt:=count(group)},adl_ind,few);
- 
-   // % of records or identities that have Name, Address, SSN, DOB, and DL Number
- did_ssn_DOB_DL_address := dedup(sort(distribute(hdr_watchdog(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and ssn <> '' and dob <> 0 and dl_number <> ''),hash(did)),did,local),did,local);
- tbl_DIDAddressHasNameAndAddressAndSSNandDOBAndDL := table(did_ssn_DOB_DL_address,{adl_ind,cnt:=count(group)},adl_ind,few);
- 
-   // % of records or identities that have Name, Address, Phone
- did_Phone_address := dedup(sort(distribute(hdr_watchdog(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and phone <> '' ),hash(did)),did,local),did,local);
- tbl_DIDAddressHasNameAndAddressAndPhone := table(did_Phone_address,{adl_ind,cnt:=count(group)},adl_ind,few);
+// Create a high level filter and if the Hash is on Did, make sure the Did is populated
+did_address := dedup(sort(distribute(hdr_watchdog(did > 0 and lname <> '' and prim_name <> '' and city_name <> '' and st <> ''),hash(did)),did,local),did,local);
 
-  //18-24 year olds
+//% of records or identities that have Name and Address
+tbl_DIDAddressHasNameAndAddress := table(did_address,{adl_ind,cnt:=count(group)},adl_ind,few);
+
+//% of records or identities that have Name, Address, and DOB
+//did_dob_address := dedup(sort(distribute(hdr_watchdog(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and dob <> 0),hash(did)),did,local),did,local);
+ tbl_DIDAddressHasNameAndAddressAndDOB := table(did_address(dob <> 0),{adl_ind,cnt:=count(group)},adl_ind,few);
+
+// % of records or identities that have Name, Address, and DL Number
+//did_DL_address := dedup(sort(distribute(hdr_watchdog(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and dl_number <> ''),hash(did)),did,local),did,local);
+tbl_DIDAddressHasNameAndAddressAndDL := table(did_address (dl_number <>''),{adl_ind,cnt:=count(group)},adl_ind,few);
+ 
+// % of records or identities that have Name, Address, and SSN
+//did_ssn_address := dedup(sort(distribute(hdr_watchdog(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and ssn <> ''),hash(did)),did,local),did,local);
+ tbl_DIDAddressHasNameAndAddressAndSSN := table( did_address(ssn <> ''),{adl_ind,cnt:=count(group)},adl_ind,few);
+ 
+ // % of records or identities that have Name, Address, SSN, and DOB
+ //did_ssn_DOB_address := dedup(sort(distribute(hdr_watchdog(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and ssn <> '' and dob <> 0),hash(did)),did,local),did,local);
+tbl_DIDAddressHasNameAndAddressAndSSNandDOB :=  table(did_address ( ssn <> '' and dob <> 0) ,{adl_ind,cnt:=count(group)},adl_ind,few);
+ 
+  // % of records or identities that have Name, Address, SSN, DOB, and DL Number
+ //did_ssn_DOB_DL_address := dedup(sort(distribute(hdr_watchdog(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and ssn <> '' and dob <> 0 and dl_number <> ''),hash(did)),did,local),did,local);
+ tbl_DIDAddressHasNameAndAddressAndSSNandDOBAndDL := table(did_address (ssn <> '' and dob <> 0 and dl_number <> ''),{adl_ind,cnt:=count(group)},adl_ind,few);
+  
+  // % of records or identities that have Name, Address, Phone
+ //did_Phone_address := dedup(sort(distribute(hdr_watchdog(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and phone <> '' ),hash(did)),did,local),did,local);
+ tbl_DIDAddressHasNameAndAddressAndPhone := table(did_address (phone <> '' ) ,{adl_ind,cnt:=count(group)},adl_ind,few);
+
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  //18-24 year olds with an address
  hdr_watchdog_18_24 := hdr_watchdog(current_age between 18 and 24);
+ did_address_1814 := dedup(sort(distribute(hdr_watchdog_18_24(did > 0 and  lname <> '' and prim_name <> '' and city_name <> '' and st <> ''),hash(did)),did,local),did,local);
+
  //  % of records or identities that have Name and Address
- did_address_1814 := dedup(sort(distribute(hdr_watchdog_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> ''),hash(did)),did,local),did,local);
- tbl_DIDAddressHasNameAndAddress1824 := table(did_address_1814,{adl_ind,cnt:=count(group)},adl_ind,few);
+ tbl_DIDAddressHasNameAndAddress1824 := table(did_address_1814 () ,{adl_ind,cnt:=count(group)},adl_ind,few);
    
  // % of records or identities that have Name, Address, and DOB
- did_dob_address_1814 := dedup(sort(distribute(hdr_watchdog_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and dob <> 0),hash(did)),did,local),did,local);
- tbl_DIDAddressHasNameAndAddressAndDOB1824 := table(did_dob_address_1814,{adl_ind,cnt:=count(group)},adl_ind,few);
+ //did_dob_address_1814 := dedup(sort(distribute(hdr_watchdog_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and dob <> 0),hash(did)),did,local),did,local);
+ tbl_DIDAddressHasNameAndAddressAndDOB1824 := table(did_address_1814(dob <> 0) ,{adl_ind,cnt:=count(group)},adl_ind,few);
 
 // % of records or identities that have Name, Address, and DL Number
-did_DL_address_1814 := dedup(sort(distribute(hdr_watchdog_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and dl_number <> ''),hash(did)),did,local),did,local);
-tbl_DIDAddressHasNameAndAddressAndDL1824 :=  table(did_DL_address_1814,{adl_ind,cnt:=count(group)},adl_ind,few);
+//did_DL_address_1814 := dedup(sort(distribute(hdr_watchdog_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and dl_number <> ''),hash(did)),did,local),did,local);
+tbl_DIDAddressHasNameAndAddressAndDL1824 :=  table(did_address_1814(dl_number <> '') ,{adl_ind,cnt:=count(group)},adl_ind,few);
   
   // % of records or identities that have Name, Address, and SSN
- did_ssn_address_1814 := dedup(sort(distribute(hdr_watchdog_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and ssn <> ''),hash(did)),did,local),did,local);
- tbl_DIDAddressHasNameAndAddressAndSSN1824 := table( did_ssn_address_1814,{adl_ind,cnt:=count(group)},adl_ind,few);
+ //did_ssn_address_1814 := dedup(sort(distribute(hdr_watchdog_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and ssn <> ''),hash(did)),did,local),did,local);
+ tbl_DIDAddressHasNameAndAddressAndSSN1824 := table( did_address_1814(ssn <> '') ,{adl_ind,cnt:=count(group)},adl_ind,few);
   
     // % of records or identities that have Name, Address, SSN, and DOB
- did_ssn_DOB_address_1814 := dedup(sort(distribute(hdr_watchdog_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and ssn <> '' and dob <> 0),hash(did)),did,local),did,local);
- tbl_DIDAddressHasNameAndAddressAndSSNandDOB1824 := table( did_ssn_DOB_address_1814,{adl_ind,cnt:=count(group)},adl_ind,few);
+ //did_ssn_DOB_address_1814 := dedup(sort(distribute(hdr_watchdog_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and ssn <> '' and dob <> 0),hash(did)),did,local),did,local);
+ tbl_DIDAddressHasNameAndAddressAndSSNandDOB1824 := table( did_address_1814(ssn <> '' and dob <> 0) ,{adl_ind,cnt:=count(group)},adl_ind,few);
    
  // % of records or identities that have Name, Address, SSN, DOB, and DL Number
- did_ssn_DOB_DL_address_1814 := dedup(sort(distribute(hdr_watchdog_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and ssn <> '' and dob <> 0 and dl_number <> ''),hash(did)),did,local),did,local);
- tbl_DIDAddressHasNameAndAddressAndSSNandDOBAndDL1824 := table(did_ssn_DOB_DL_address_1814,{adl_ind,cnt:=count(group)},adl_ind,few);
+ //did_ssn_DOB_DL_address_1814 := dedup(sort(distribute(hdr_watchdog_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and ssn <> '' and dob <> 0 and dl_number <> ''),hash(did)),did,local),did,local);
+ tbl_DIDAddressHasNameAndAddressAndSSNandDOBAndDL1824 := table(did_address_1814(ssn <> '' and dob <> 0 and dl_number <> '') ,{adl_ind,cnt:=count(group)},adl_ind,few);
   
  // % of records or identities that have Name, Address, Phone
- did_Phone_address_1814 := dedup(sort(distribute(hdr_watchdog_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and phone <> '' ),hash(did)),did,local),did,local);
- tbl_DIDAddressHasNameAndAddressAndPhone1824 :=  table(did_Phone_address_1814, {adl_ind,cnt:=count(group)},adl_ind,few);
+ //did_Phone_address_1814 := dedup(sort(distribute(hdr_watchdog_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and phone <> '' ),hash(did)),did,local),did,local);
+ tbl_DIDAddressHasNameAndAddressAndPhone1824 :=  table(did_address_1814(phone <> '' ) , {adl_ind,cnt:=count(group)},adl_ind,few);
 
-//not 18-24 year olds
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//not 18-24 year olds with an address
  hdr_watchdog_not_18_24 := hdr_watchdog(current_age not between 18 and 24);
+ did_address_Not_1814 := dedup(sort(distribute(hdr_watchdog_not_18_24(did > 0 and lname <> '' and prim_name <> '' and city_name <> '' and st <> ''),hash(did)),did,local),did,local); 
+
  //  % of records or identities that have Name and Address
- did_address_Not_1814 := dedup(sort(distribute(hdr_watchdog_not_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> ''),hash(did)),did,local),did,local);
  tbl_DIDAddressHasNameAndAddressNot1824 := table(did_address_Not_1814,{adl_ind,cnt:=count(group)},adl_ind,few);
   
  // % of records or identities that have Name, Address, and DOB
- did_dob_address_Not_1814 := dedup(sort(distribute(hdr_watchdog_not_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and dob <> 0),hash(did)),did,local),did,local);
- tbl_DIDAddressHasNameAndAddressAndDOBNot1824 := table(did_dob_address_Not_1814,{adl_ind,cnt:=count(group)},adl_ind,few);
+ //did_dob_address_Not_1814 := dedup(sort(distribute(hdr_watchdog_not_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and dob <> 0),hash(did)),did,local),did,local);
+ tbl_DIDAddressHasNameAndAddressAndDOBNot1824 := table(did_address_Not_1814 (dob <> 0) ,{adl_ind,cnt:=count(group)},adl_ind,few);
   
 // % of records or identities that have Name, Address, and DL Number
-did_DL_address_Not_1814 := dedup(sort(distribute(hdr_watchdog_not_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and dl_number <> ''),hash(did)),did,local),did,local);
-tbl_DIDAddressHasNameAndAddressAndDLNot1824 := table(did_DL_address_Not_1814,{adl_ind,cnt:=count(group)},adl_ind,few);
+//did_DL_address_Not_1814 := dedup(sort(distribute(hdr_watchdog_not_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and dl_number <> ''),hash(did)),did,local),did,local);
+tbl_DIDAddressHasNameAndAddressAndDLNot1824 := table(did_address_Not_1814 (dl_number <> '') ,{adl_ind,cnt:=count(group)},adl_ind,few);
   
  // % of records or identities that have Name, Address, and SSN
- did_ssn_address_Not_1814 := dedup(sort(distribute(hdr_watchdog_not_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and ssn <> ''),hash(did)),did,local),did,local);
- tbl_DIDAddressHasNameAndAddressAndSSNNot1824 := table( did_ssn_address_Not_1814,{adl_ind,cnt:=count(group)},adl_ind,few);
+ //did_ssn_address_Not_1814 := dedup(sort(distribute(hdr_watchdog_not_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and ssn <> ''),hash(did)),did,local),did,local);
+ tbl_DIDAddressHasNameAndAddressAndSSNNot1824 := table( did_address_Not_1814 (ssn <> '') ,{adl_ind,cnt:=count(group)},adl_ind,few);
   
  // % of records or identities that have Name, Address, SSN, and DOB
- did_ssn_DOB_address_Not_1814 := dedup(sort(distribute(hdr_watchdog_not_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and ssn <> '' and dob <> 0),hash(did)),did,local),did,local);
- tbl_DIDAddressHasNameAndAddressAndSSNandDOBNot1824 := table( did_ssn_DOB_address_Not_1814,{adl_ind,cnt:=count(group)},adl_ind,few);
+ //did_ssn_DOB_address_Not_1814 := dedup(sort(distribute(hdr_watchdog_not_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and ssn <> '' and dob <> 0),hash(did)),did,local),did,local);
+ tbl_DIDAddressHasNameAndAddressAndSSNandDOBNot1824 := table( did_address_Not_1814 (ssn <> '' and dob <> 0) ,{adl_ind,cnt:=count(group)},adl_ind,few);
   
  // % of records or identities that have Name, Address, SSN, DOB, and DL Number
- did_ssn_DOB_DL_address_Not_1814 := dedup(sort(distribute(hdr_watchdog_not_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and ssn <> '' and dob <> 0 and dl_number <> ''),hash(did)),did,local),did,local);
- tbl_DIDAddressHasNameAndAddressAndSSNandDOBAndDLNot1824 := table(did_ssn_DOB_DL_address_Not_1814,{adl_ind,cnt:=count(group)},adl_ind,few);
+ //did_ssn_DOB_DL_address_Not_1814 := dedup(sort(distribute(hdr_watchdog_not_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and ssn <> '' and dob <> 0 and dl_number <> ''),hash(did)),did,local),did,local);
+ tbl_DIDAddressHasNameAndAddressAndSSNandDOBAndDLNot1824 := table(did_address_Not_1814 (ssn <> '' and dob <> 0 and dl_number <> '') ,{adl_ind,cnt:=count(group)},adl_ind,few);
   
  // % of records or identities that have Name, Address, Phone
- did_Phone_address_Not_1814 := dedup(sort(distribute(hdr_watchdog_not_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and phone <> '' ),hash(did)),did,local),did,local);
- tbl_DIDAddressHasNameAndAddressAndPhoneNot1824 := table(did_Phone_address_Not_1814,{adl_ind,cnt:=count(group)},adl_ind,few);
+ //did_Phone_address_Not_1814 := dedup(sort(distribute(hdr_watchdog_not_18_24(lname <> '' and prim_name <> '' and city_name <> '' and st <> '' and phone <> '' ),hash(did)),did,local),did,local);
+ tbl_DIDAddressHasNameAndAddressAndPhoneNot1824 := table(did_address_Not_1814 (phone <> '') ,{adl_ind,cnt:=count(group)},adl_ind,few);
 
 //Despray CSV to bctlpedata12 (one thor file and one csv file). FTP to \\Risk\inf\Data_Factory\DI_Landingzone
 despray_HeaderCoreSegmentsJoin:= STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_HeaderCoreSegmentsJoin_'+ filedate +'.csv', 

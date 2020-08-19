@@ -9,7 +9,6 @@ IMPORT _Control, corrections, data_services, Doxie_files, hygenics_crim, STD;
 EXPORT NonFCRA_Criminal(string pHostname, string pTarget, string pContact ='\' \'') := function
 
 filedate := (STRING8)Std.Date.Today();
-rpt_yyyymmdd := filedate[1..8];
 
 //orig_state, county_of_origin, process_date, datasource, source_file, case_type_desc
 //rs_key_nonFCRA_CrimOffender := dataset(data_services.foreign_prod+'thor_data400::base::corrections_offenders_public', corrections.layout_offender, flat);
@@ -17,8 +16,8 @@ base_nonFCRA_CrimOffender := Hygenics_crim.File_Moxie_Crim_Offender2_Dev;
 key_nonFCRA_CrimOffender := base_nonFCRA_CrimOffender; //PULL(Doxie_files.key_Offenders());
 tbl_nonFCRA_CrimOffender_records := TABLE(key_nonFCRA_CrimOffender, {datasource, orig_state, record_count := count(group)}, datasource, orig_state, few);
 srt_tbl_nonFCRA_CrimOffender_records := sort(tbl_nonFCRA_CrimOffender_records, datasource, orig_state);
-NonFCRA_CrimOffender_DIDs := DEDUP(sort(distribute(key_nonFCRA_CrimOffender, hash(did)), did, local), did, all);
-NonFCRA_CrimOffender_DIDs_bySource := DEDUP(sort(distribute(key_nonFCRA_CrimOffender, hash(did)), datasource, orig_state, did, local), datasource, orig_state,did, all);
+NonFCRA_CrimOffender_DIDs := DEDUP(sort(distribute(key_nonFCRA_CrimOffender, hash(did)), did, local), did, local);
+NonFCRA_CrimOffender_DIDs_bySource := DEDUP(sort(distribute(key_nonFCRA_CrimOffender, hash(datasource, orig_state, did)), datasource, orig_state, did, local), datasource, orig_state, did, local);
 tbl_nonFCRA_CrimOffender_DIDs_bySource := TABLE(NonFCRA_CrimOffender_DIDs_bySource, {datasource, orig_state, did_count := count(group)}, datasource, orig_state, few);
 
 //state_origin, process date, data_type, source_file, fcra_offense_key, offense_persistent_id, court_off_lev,offense_score, offender_key
@@ -26,8 +25,8 @@ tbl_nonFCRA_CrimOffender_DIDs_bySource := TABLE(NonFCRA_CrimOffender_DIDs_bySour
 base_nonFCRA_CourtOffenses := Hygenics_crim.File_Moxie_Court_Offenses_Dev;
 key_nonFCRA_CourtOffenses	:= base_nonFCRA_CourtOffenses; //PULL(doxie_files.Key_Court_Offenses());
 
-NonFCRA_CourtOffenses_offenses := DEDUP(sort(distribute(key_nonFCRA_CourtOffenses, hash(fcra_offense_key)), fcra_offense_key, local), fcra_offense_key, all, local);
-NonFCRA_CourtOffenses_offenses_bySource := DEDUP(sort(distribute(key_nonFCRA_CourtOffenses, hash(fcra_offense_key)), data_type, state_origin, offense_score, fcra_offense_key, local), data_type, state_origin, offense_score, fcra_offense_key, all, local);
+NonFCRA_CourtOffenses_offenses := DEDUP(sort(distribute(key_nonFCRA_CourtOffenses, hash(fcra_offense_key)), fcra_offense_key, local), fcra_offense_key, local);
+NonFCRA_CourtOffenses_offenses_bySource := DEDUP(sort(distribute(key_nonFCRA_CourtOffenses, hash(data_type, state_origin, offense_score, fcra_offense_key)), data_type, state_origin, offense_score, fcra_offense_key, local), data_type, state_origin, offense_score, fcra_offense_key, local);
 
 tbl_nonFCRA_CourtOffenses_records := TABLE(key_nonFCRA_CourtOffenses, {data_type, state_origin, record_count := count(group)}, data_type, state_origin, few);
 tbl_nonFCRA_CourtOffenses_offenses_bySource := TABLE(NonFCRA_CourtOffenses_offenses_bySource, {data_type, state_origin, offense_score, offense_key_count := count(group)}, data_type,state_origin,offense_score, few);
@@ -38,8 +37,8 @@ tbl_nonFCRA_CourtOffenses_offenses_bySource := TABLE(NonFCRA_CourtOffenses_offen
 base_nonFCRA_DOCOffenses := Hygenics_crim.File_Moxie_DOC_Offenses_Dev;
 key_nonFCRA_DOCOffenses	:= base_nonFCRA_DOCOffenses; //PULL(doxie_files.Key_Offenses());
 
-NonFCRA_DOCOffenses_offenses := DEDUP(sort(distribute(key_nonFCRA_DOCOffenses, hash(fcra_offense_key)), fcra_offense_key, local), fcra_offense_key, all, local);
-NonFCRA_DOCOffenses_offenses_bySource := DEDUP(sort(distribute(key_nonFCRA_DOCOffenses, hash(fcra_offense_key)), data_type,orig_state,offense_score,fcra_offense_key, local), data_type,orig_state,offense_score,fcra_offense_key, all, local);
+NonFCRA_DOCOffenses_offenses := DEDUP(sort(distribute(key_nonFCRA_DOCOffenses, hash(fcra_offense_key)), fcra_offense_key, local), fcra_offense_key,  local);
+NonFCRA_DOCOffenses_offenses_bySource := DEDUP(sort(distribute(key_nonFCRA_DOCOffenses, hash(data_type,orig_state,offense_score,fcra_offense_key)), data_type,orig_state,offense_score,fcra_offense_key, local), data_type,orig_state,offense_score,fcra_offense_key, local);
 
 tbl_nonFCRA_DOCOffenses_records := TABLE(key_nonFCRA_DOCOffenses, {data_type,orig_state, record_count := count(group)}, data_type,orig_state, few);
 tbl_nonFCRA_DOCOffenses_offenses_bySource := TABLE(NonFCRA_DOCOffenses_offenses_bySource, {data_type,orig_state, offense_score, offense_key_count := count(group)}, data_type,orig_state,offense_score, few);

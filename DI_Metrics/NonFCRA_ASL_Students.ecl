@@ -6,16 +6,15 @@ IMPORT _control, data_services, alloymedia_student_list, american_student_list, 
 export NonFCRA_ASL_Students(string pHostname, string pTarget, string pContact ='\' \'') := function
 
 filedate := (STRING8)Std.Date.Today();
-rpt_yyyymmdd := filedate[1..8];
 
 //NonFCRA Alloy Student Data
 Key_DID_AlloyStudent := PULL(AlloyMedia_student_list.Key_DID);
-AlloySL_DIDs := DEDUP(sort(distribute(Key_DID_AlloyStudent(did <> 0), hash(did)),did, local,skew(1.0)),did, all, local); //ask chris a. if local is needed here
+AlloySL_DIDs := DEDUP(sort(distribute(Key_DID_AlloyStudent(did <> 0), hash(did)),did, local,skew(1.0)),did,  local); 
 
 //NonFCRA AmericanStudentKeys, includes ASL and OKC sourced student records
 //there are 2 DID keys: this one contains historical records, the other only current records
 Key_DID_AmericanSL := PULL(American_student_list.key_DID);
-AmericanSL_DIDs := DEDUP(sort(distribute(Key_DID_AmericanSL(did <> 0), hash(did)),did, local,skew(1.0)),did, all,local); //ask chris a. if local is needed here
+AmericanSL_DIDs := DEDUP(sort(distribute(Key_DID_AmericanSL(did <> 0), hash(did)),did, local,skew(1.0)),did, local); 
 
 //Combined Student List:
 rec_All_Students := RECORD
@@ -26,14 +25,14 @@ rec_All_Students := RECORD
  end;
 
 All_Students := PROJECT(AlloySL_DIDs, rec_All_Students) + PROJECT(AmericanSL_DIDs, rec_All_Students); 
-All_Students_DIDs := DEDUP(sort(distribute(All_Students(did <> 0), hash(did)),did, local,skew(1.0)),did, all,local); //ask chris a. if local is needed here
-All_Students_Schools := DEDUP(sort(distribute(All_Students(LN_COLLEGE_NAME <> ''), hash(LN_COLLEGE_NAME)),LN_COLLEGE_NAME, local,skew(1.0)),LN_COLLEGE_NAME, all,local);  //ask chris a. if local is needed here
+All_Students_DIDs := DEDUP(sort(distribute(All_Students(did <> 0), hash(did)),did, local,skew(1.0)),did, local); 
+All_Students_Schools := DEDUP(sort(distribute(All_Students(LN_COLLEGE_NAME <> ''), hash(LN_COLLEGE_NAME)),LN_COLLEGE_NAME, local,skew(1.0)),LN_COLLEGE_NAME, local);  
 
 //No High Scool (college only):
 All_Students_No_HighSchool := PROJECT(AlloySL_DIDs(file_type<>'M'),rec_All_Students) 
 														+ PROJECT(AmericanSL_DIDs(file_type<>'M' OR college_code <>'' OR college_major <>''),rec_All_Students);
 															
-All_Students_No_HighSchool_DIDs := DEDUP(sort(distribute(All_Students_No_HighSchool(did <> 0), hash(did)),did, local,skew(1.0)),did, all,local);  //ask chris a. if local is needed here
+All_Students_No_HighSchool_DIDs := DEDUP(sort(distribute(All_Students_No_HighSchool(did <> 0), hash(did)),did, local,skew(1.0)),did, local);  
 tbl_All_Students_No_HighSchool_DIDs := TABLE(All_Students_No_HighSchool_DIDs, {LN_COLLEGE_NAME, did_count := count(group)}, LN_COLLEGE_NAME, few);
 srt_tbl_All_Students_No_HighSchool_DIDs := sort(tbl_All_Students_No_HighSchool_DIDs, LN_COLLEGE_NAME, skew(1.0));
 

@@ -14,27 +14,26 @@ IMPORT _Control, BIPV2, BIPV2_PostProcess, corp2, data_services, STD, ut;
 EXPORT NonFCRA_BIP_Corps(string pHostname, string pTarget, string pContact ='\' \'') := function
 
 filedate := (STRING8)Std.Date.Today();
-rpt_yyyymmdd := filedate[1..8];
 
 //key_BIPV2_Header := INDEX(layout_BIP_linkids, rec_nonkeyed_fields_BIP, data_services.foreign_prod+ 'thor_data400::key::bipv2::business_header::qa::linkids');
 key_BIPV2_Header := PULL(BIPV2.Key_BH_Linking_Ids.key);
-BIPV2_Header_SELEIDs := DEDUP(sort(distribute(key_BIPV2_Header(seleid > 0), hash(seleid)), seleid, -dt_vendor_last_reported, -dt_last_seen, local), seleid, all,local); 
+BIPV2_Header_SELEIDs := DEDUP(sort(distribute(key_BIPV2_Header(seleid > 0), hash(seleid)), seleid, -dt_vendor_last_reported, -dt_last_seen, local), seleid, local); 
 
 tbl_SELEIDs_gold := TABLE(BIPV2_Header_SELEIDs, {sele_gold, seleid_count := count(group)}, sele_gold, few);
 tbl_SELEIDs_by_Segment := TABLE(BIPV2_Header_SELEIDs, {sele_seg, sele_seg_desc := BIPV2_PostProcess.constants.fDesc(sele_seg), seleid_count := count(group)}, sele_seg, few);
 
-BIPV2_Header_PROXIDs := DEDUP(sort(distribute(key_BIPV2_Header(PROXid > 0), hash(PROXid)), PROXid, -dt_vendor_last_reported, -dt_last_seen, local), PROXid, all,local); 
+BIPV2_Header_PROXIDs := DEDUP(sort(distribute(key_BIPV2_Header(PROXid > 0), hash(PROXid)), PROXid, -dt_vendor_last_reported, -dt_last_seen, local), PROXid, local); 
 tbl_PROXIDs_by_Segment := TABLE(BIPV2_Header_PROXIDs, {prox_seg, prox_seg_desc := BIPV2_PostProcess.constants.fDesc(prox_seg), proxid_count := count(group)}, prox_seg, few);
 
 //There are 2 slides on Corporations (Corps) data.  Corps can be sourced from BIP Header, but using the Corps build to run stats.
 //key_Corps := INDEX(layout_BIP_linkids, rec_nonkeyed_fields_Corps, data_services.foreign_prod+ 'thor_data400::key::corp2::qa::corp::linkids');
 key_Corps := PULL(Corp2.Key_LinkIDs.corp.key);
-Corps_SELEIDs := DEDUP(sort(distribute(key_Corps(seleid <> 0), hash(seleid)), seleid,-dt_last_seen,-dt_vendor_last_reported, local,skew(1.0)),seleid, all,local);
+Corps_SELEIDs := DEDUP(sort(distribute(key_Corps(seleid <> 0), hash(seleid)), seleid,-dt_last_seen,-dt_vendor_last_reported, local,skew(1.0)),seleid, local);
 
 since_date := (unsigned6) 20100101;
 
-key_Corps_src_first_seen 	:= DEDUP(sort(distribute(key_Corps(seleid <> 0), hash(seleid)), corp_state_origin,seleid,dt_first_seen, local), corp_state_origin,seleid,dt_first_seen, all,local)(dt_first_seen >= since_date);
-key_Corps_src_last_seen 	:= DEDUP(sort(distribute(key_Corps(seleid <> 0), hash(seleid)), corp_state_origin,seleid, -dt_last_seen, local), corp_state_origin,seleid,dt_last_seen, all,local)(dt_last_seen >= since_date);
+key_Corps_src_first_seen 	:= DEDUP(sort(distribute(key_Corps(seleid <> 0), hash(corp_state_origin, seleid)), corp_state_origin, seleid, dt_first_seen, local), corp_state_origin, seleid, dt_first_seen, local)(dt_first_seen >= since_date);
+key_Corps_src_last_seen 	:= DEDUP(sort(distribute(key_Corps(seleid <> 0), hash(corp_state_origin, seleid)), corp_state_origin, seleid, -dt_last_seen, local), corp_state_origin, seleid, dt_last_seen, local)(dt_last_seen >= since_date);
 
 rec_src_dates_first_seen_Corps :=	RECORD
 		key_Corps_src_first_seen.corp_state_origin;
@@ -43,7 +42,7 @@ rec_src_dates_first_seen_Corps :=	RECORD
 		unsigned6	seleid_count := count(group);
 	END;
 	
-tbl_src_dates_first_seen_Corps := TABLE(key_Corps_src_first_seen, rec_src_dates_first_seen_Corps, corp_state_origin,dt_first_seen DIV 100, few);	
+tbl_src_dates_first_seen_Corps := TABLE(key_Corps_src_first_seen, rec_src_dates_first_seen_Corps, corp_state_origin,dt_first_seen DIV 100, MANY);	
 
 rec_src_dates_last_seen_Corps := RECORD
 		key_Corps_src_last_seen.corp_state_origin;
@@ -52,7 +51,7 @@ rec_src_dates_last_seen_Corps := RECORD
 		unsigned6	seleid_count := count(group);
 	END;
 	
-tbl_src_dates_last_seen_Corps := TABLE(key_Corps_src_last_seen, rec_src_dates_last_seen_Corps, corp_state_origin,dt_last_seen DIV 100, few);	
+tbl_src_dates_last_seen_Corps := TABLE(key_Corps_src_last_seen, rec_src_dates_last_seen_Corps, corp_state_origin,dt_last_seen DIV 100, MANY);	
 
 //Despray CSV to bctlpedata12 (one thor file and one csv file). FTP to \\Risk\inf\Data_Factory\DI_Landingzone
 despray_bip_selid_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_SELEIDs_by_Segment_'+ filedate +'.csv',

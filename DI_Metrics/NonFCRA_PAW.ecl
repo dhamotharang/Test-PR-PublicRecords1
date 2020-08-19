@@ -5,7 +5,6 @@ IMPORT _Control, PAW, STD, ut;
 EXPORT NonFCRA_PAW(string pHostname, string pTarget, string pContact ='\' \'') := function
 
 filedate := (STRING8)Std.Date.Today();
-rpt_yyyymmdd := filedate[1..8];
 
 Key_PAW := PAW.File_Base;
 Key_PAW_2010 := PROJECT(Key_PAW((integer4) dt_first_seen[1..4] >= 2010) 
@@ -15,8 +14,8 @@ Key_PAW_2010 := PROJECT(Key_PAW((integer4) dt_first_seen[1..4] >= 2010)
 						, self.company_title := stringlib.stringcleanspaces(left.company_title)
 						, self := left));
 
-Key_PAW_2010_DIDs := DEDUP(sort(distribute(Key_PAW_2010, hash(did)), did,dt_first_seen, local), did, all, local);
-tbl_Key_PAW_2010_DIDs := TABLE(Key_PAW_2010_DIDs, {first_seen, state, did_count := count(group)}, first_seen, state, few);
+Key_PAW_2010_DIDs := DEDUP(sort(distribute(Key_PAW_2010, hash(did)), did,dt_first_seen, local), did,  local);
+tbl_Key_PAW_2010_DIDs := TABLE(Key_PAW_2010_DIDs, {first_seen, state, did_count := count(group)}, first_seen, state, MANY);
 
 //Despray to bctlpedata12 (one thor file and one csv file). FTP to \\Risk\inf\Data_Factory\DI_Landingzone
 despray_paw_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_Key_PAW_2010_DIDs_FirstSeen_'+ filedate +'.csv',

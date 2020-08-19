@@ -5,9 +5,8 @@ IMPORT _Control, data_services, STD, watercraft;
 export NonFCRA_Watercraft(string pHostname, string pTarget, string pContact ='\' \'') := function
 
 filedate := (STRING8)Std.Date.Today();
-rpt_yyyymmdd := filedate[1..6];
 
-Key_Boats_Non_FCRA_wid := Watercraft.key_watercraft_wid(false);
+Key_Boats_Non_FCRA_wid := PULL(Watercraft.key_watercraft_wid(false));
 //output(Key_Boats_Non_FCRA_wid);
 //output(TABLE(Key_Boats_Non_FCRA_wid, {watercraft_make_description, rec_count := count(group)}, watercraft_make_description,few),all);
 
@@ -18,8 +17,8 @@ Key_Boats_Non_FCRA_wid_2010 := PROJECT(Key_Boats_Non_FCRA_wid(source_code = 'AW'
 								, self.wid := TRIM((string) (self.hull_number + left.watercraft_make_description + left.model_year + left.watercraft_class_code + left.hull_type_description + (integer) left.watercraft_length), all);
 								, self := left));
 
-Key_Boats_Non_FCRA_wid_2010_IDs := DEDUP(sort(distribute(Key_Boats_Non_FCRA_wid_2010, hash(wid)), wid, registration_date, state_origin, watercraft_class_description, local), wid, all,local);
-tbl_Key_Boats_Non_FCRA_wid_2010_IDs := TABLE(Key_Boats_Non_FCRA_wid_2010_IDs, {first_registration, state_origin, watercraft_class_description, wid_count := count(group)}, first_registration, state_origin, watercraft_class_description, few);
+Key_Boats_Non_FCRA_wid_2010_IDs := DEDUP(sort(distribute(Key_Boats_Non_FCRA_wid_2010, hash(wid)), wid, registration_date, state_origin, watercraft_class_description, local), wid, local);
+tbl_Key_Boats_Non_FCRA_wid_2010_IDs := TABLE(Key_Boats_Non_FCRA_wid_2010_IDs, {first_registration, state_origin, watercraft_class_description, wid_count := count(group)}, first_registration, state_origin, watercraft_class_description, MANY);
 
 //Despray to bctlpedata12 (one thor file and one csv file). FTP to \\Risk\inf\Data_Factory\DI_Landingzone
 despray_boat_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_Key_Boats_Non_FCRA_wid_2010_IDs_FirstSeen'+ filedate +'.csv',
