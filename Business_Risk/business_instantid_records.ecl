@@ -43,6 +43,7 @@ string6 ssnmask := 'NONE' : stored('SSNMask');
 boolean IncludeTargus3220 := false : stored('IncludeTargusE3220');
 string10 ExactMatchLevel := risk_indicators.iid_constants.default_ExactMatchLevel;  // default this for now, until the project is kicked off to add exact matching logic to BIID
 string DataRestriction := AutoStandardI.GlobalModule().DataRestrictionMask;
+string DataPermission := AutoStandardI.GlobalModule().DataPermissionMask;
 
 dob_radius_use := if(use_dob_filter,dob_radius,-1);
 
@@ -147,6 +148,6 @@ df2 := project(df,into_input(LEFT));
 bsVersion := 2; // need bs version 2
 outf := business_risk.InstantID_Function(df2, gateways, if (bdid_value = 0, false, true),DPPA_Purpose,GLB_Purpose,false,false, '', 
 	ExcludeWatchLists,ofac_only,ofac_version,include_ofac,include_additional_watchlists,Global_WatchList_Threshold,
-	dob_radius_use,IsPOBoxCompliant,bsVersion, ExactMatchLevel, DataRestriction);
+	dob_radius_use,IsPOBoxCompliant,bsVersion, ExactMatchLevel, DataRestriction, Datapermission:= DataPermission);
 
 export business_instantid_records := outf;
