@@ -1,12 +1,15 @@
-﻿Import Data_Services, doxie,FLAccidents;
+﻿allrecs := FLAccidents_Ecrash.File_KeybuildV2.prout(vin <> '' AND vin <> '0' );
+dVinBase := DISTRIBUTE(allrecs, HASH32(vin, orig_accnbr));
+sVinBase := SORT(dVinBase, vin, orig_accnbr, LOCAL);
+uVinBase := DEDUP(sVinBase, vin, orig_accnbr, LOCAL);  
 
-ecrash_vin_base := FLAccidents_Ecrash.File_KeybuildV2.prout(vin<>'' and vin<>'0' );
+Layout_Keys_PR.VIN xformVIN(uVinBase l) :=  TRANSFORM
+ SELF.l_vin := l.vin;
+ SELF := l;
+END;
+VINBase := PROJECT(uVinBase, xformVIN(LEFT));
 
-dst_vin_base := distribute(ecrash_vin_base, hash(vin, orig_accnbr));
-srt_vin_base := sort(dst_vin_base, vin, orig_accnbr, local);
-dep_vin_base := dedup(srt_vin_base, vin, orig_accnbr, local);
-
-export key_ecrashV2_vin := index(dep_vin_base
-                               ,{l_vin := vin}
-							   ,{accident_nbr,orig_accnbr}
-							   ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_vin_' + doxie.Version_SuperKey);
+EXPORT key_ecrashV2_vin := INDEX(VINBase
+                                ,{l_vin}
+							                  ,{VINBase}
+							                  ,Files_PR.FILE_KEY_VIN_SF);
