@@ -1,4 +1,5 @@
-﻿IMPORT	Address, BIPV2;
+﻿ IMPORT	Address, BIPV2;
+
 EXPORT	Layouts	:=	MODULE
 	EXPORT	FileHeaderSegment	:=	RECORD	// (FA)
 		STRING2		Segment_Identifier;
@@ -607,7 +608,6 @@ EXPORT	Layouts	:=	MODULE
 	EXPORT	AccountDataLayout	:=	RECORD
 		STRING												process_date;
 		AccountBaseSegment;
-		STRING3												DelinquencyStatus;
 		DATASET(MasterAccountContractSegment)				masterAccount{MAXCOUNT(1)};											//	MA
 		DATASET(AddressSegment)											address{MAXCOUNT(100)};													//	AD
 		DATASET(AccountModificationHistorySegment)	history{MAXCOUNT(1000)};													//	AH
@@ -634,7 +634,6 @@ EXPORT	Layouts	:=	MODULE
 	EXPORT	AccountDataLayout_Virtual	:=	RECORD
 		STRING																			process_date;
 		AB_Virtual;																																									//	AB
-		STRING3																			DelinquencyStatus;
 		DATASET(MA_Virtual)													masterAccount{MAXCOUNT(1)};											//	MA
 		DATASET(AD_Virtual)													address{MAXCOUNT(100)};													//	AD
 		DATASET(AH_Virtual)													history{MAXCOUNT(1000)};													//	AH
@@ -709,7 +708,6 @@ EXPORT	Layouts	:=	MODULE
 		STRING9													Federal_TaxID_SSN;
 		STRING3													Federal_TaxID_SSN_Identifier;
 		LayoutTradeline									Tradeline;	//	Tradeline Data
-		STRING3												DelinquencyStatus;
 		DATASET(AddressSegment)					address{MAXCOUNT(100)};
 		DATASET(PhoneNumberSegment)			phone{MAXCOUNT(100)};
 		DATASET(TaxID_SSNSegment)				taxID{MAXCOUNT(100)};
@@ -786,7 +784,6 @@ EXPORT	Layouts	:=	MODULE
 		STRING9		Federal_TaxID_SSN;
 		STRING3		Federal_TaxID_SSN_Identifier;
 		LayoutTradeline		Tradeline;		//	Tradeline Data
-		STRING3												DelinquencyStatus;
 		BIPV2.IDlayouts.l_xlink_ids;		//	Added for BIP project
 		UNSIGNED8	persistent_record_ID;	//	Added for BIP project
 		UNSIGNED8	sbfe_id;							//	Added for BIP project
@@ -810,7 +807,6 @@ EXPORT	Layouts	:=	MODULE
 		STRING8		Extracted_Date;
 		STRING8		Cycle_End_Date;
 		AB;
-		STRING3												DelinquencyStatus;
 		STRING2		source:=Constants().source;
 		BOOLEAN		active;
 	END;

@@ -294,7 +294,6 @@ EXPORT	fn_ProcessSBFEFile(STRING	filename, STRING	filedate)	:=	FUNCTION
 												TRANSFORM(RECORDOF(Business_Credit.Layouts.AccountDataLayout_Virtual),
 													SELF.Original_Contract_Account_Number	:=	LEFT.Contract_Account_Number;
 													SELF.Contract_Account_Number					:=	fn_removeLeadingZeros(LEFT.Contract_Account_Number);
-													SELF.DelinquencyStatus					:=if(filedate > '20201001',Left.Payment_Status_Category,'');
 													SELF:=LEFT,
 													SELF:=[]
 												)
