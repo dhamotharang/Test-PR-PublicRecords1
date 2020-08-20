@@ -317,13 +317,13 @@ self := L;
 
 end;
 
-/*jrecs4 := join(distribute(jrecs3,hash(incident_id)),distribute(tcitation(incident_id!='' and person_id not in ['','NULL']),hash(incident_id)),
+jrecs4 := join(distribute(jrecs3,hash(incident_id)),distribute(tcitation(incident_id!='' and person_id not in ['','NULL']),hash(incident_id)),
 							left.incident_id = right.incident_id and
 							left.person_id =right.person_id, 
-							trecs4(left,right),left outer,local);	*/
-jrecs4 := join(distribute(jrecs3,hash(incident_id)),tcitation(incident_id!=''),
-							left.incident_id = right.incident_id,
 							trecs4(left,right),left outer,local);	
+/*jrecs4 := join(distribute(jrecs3,hash(incident_id)),tcitation(incident_id!=''),
+							left.incident_id = right.incident_id,
+							trecs4(left,right),left outer,local);	*/
 //------------------------------------------------------------------------------------------------------------------										
 
 // Property OWNER 
