@@ -5,7 +5,7 @@ o := 'Scrubs_Experian_Monthly';		// orbit profile name
 m := 'Experian';
 
 loc := data_services.Data_location.Prefix('PersonHeader');
-v_en := regexfind('w201.*-',nothor(fileservices.SuperFileContents(ExperianCred.SuperFile_List.Base_File))[1].name,0)[2..9];
+v_en := regexfind('w20.*-',nothor(fileservices.SuperFileContents(ExperianCred.SuperFile_List.Base_File))[1].name,0)[2..9];
 
 
 N := S.Scrubs.FromNone(F);
