@@ -172,8 +172,8 @@ SELF := [])]);
     self.LexIdSourceOptout := Options.LexIdSourceOptout;
     self := [];
 		END;
-
-soap_in := Project(with_G_ProcBusUID, into_input(LEFT));
+    
+soap_in := Distribute(Project(with_G_ProcBusUID, into_input(LEFT)),RANDOM());
 OUTPUT(CHOOSEN(soap_in, eyeball), NAMED('Sample_SOAPInput'));
 
 //we are stripping off some attributes from the layout as per Product Manager. 
@@ -372,7 +372,21 @@ OUTPUT( COUNT(dropped_records_as_input), NAMED('COUNT_dropped_records') );
 
 Failed := records_having_other_ErrorCode_as_input + dropped_records_as_input;
 
-Failed_Inputs := SORT( Failed, AccountNumber );
+finalLayout getFile_Ind1(Failed le, with_G_ProcBusUID ri) := TRANSFORM
+		SELF.G_ProcBusUID := (integer)ri.accountnumber;
+		SELF.AcctNo := ri.G_ProcBusUID;
+		SELF	 := le;
+   SELF :=[];
+END;
+					
+with_G_ProcBusUID_layout UID_Acc_switch (Failed le):= TRANSFORM
+SELF.G_ProcBusUID := le.accountnumber;
+SELF.accountnumber := le.G_ProcBusUID;
+SELF	 := le;
+END; 
+
+failedRecords := Project(Failed, UID_Acc_switch(LEFT));       
+Failed_Inputs := SORT(PROJECT(failedRecords, TRANSFORM({RECORDOF(LEFT) - G_ProcBusUID}, SELF := LEFT)),AccountNumber);
 										 										 
 OUTPUT(COUNT(Passed), NAMED('countPassedResults'));
 OUTPUT(CHOOSEN(Passed, eyeball), NAMED('PassedResults'));
