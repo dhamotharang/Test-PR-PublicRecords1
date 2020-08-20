@@ -44,6 +44,10 @@
 		STRING Type_Hazardous;
 		STRING Type_Other;
 		STRING Citation_Status;
+		//PRtCC new fields
+		STRING Citation_Type;
+		STRING Violation_Code3;
+		STRING Violation_Code4;
 	END;
 
 
@@ -451,7 +455,29 @@
 		STRING ReportLinkID;
 		STRING Page_Count;
 		STRING is_delete;
+		STRING last_update_date;
 		STRING Contrib_source;
+		//BuyCrash Release 6
+		STRING Date_Report_Submitted;
+		//CrashLogic Release 4
+	  STRING Releasable;
+		//Nucleus 
+		STRING Platform;
+		STRING Agency_Report_Number;
+		//PRtCC new fields
+		STRING Dispatch_Time;
+		STRING Photograph_Type;
+		STRING Ready_To_Sell_Data;
+		STRING Posted_Satutory_Speed_Limit;
+		//Data Ingestion New fields
+		STRING Dispatch_Date;
+		STRING Drug_Involvement;
+		STRING Alcohol_Involved;
+		//Data Ingestion CR-1273
+		STRING Geo_Coded_Latitude;
+		STRING Geo_Coded_Longitude;
+		//PRtCC CR-1262 
+    STRING Direction_Of_Impact;
 	END;
 
 	EXPORT persn_NEW := RECORD ,MAXLENGTH(20000)
@@ -610,9 +636,25 @@
 		STRING date_of_birth_derived;
 		STRING Report_Injury_Status; 
 		STRING Address2;
+		//PRtCC new fields
+		STRING Condition_At_Time_Of_Crash;
+		STRING Drug_Use_Suspected;
+		STRING Alcohol_Use_Suspected;
+		STRING Drug_Test_Status;
+		STRING Report_Contributing_Circumstances_P;
+		STRING Driver_Actions_At_Time_Of_Crash;
+		STRING Prior_Nonmotorist_Action;
+		STRING Pedestrian_Actions_At_Time_Of_Crash;
+		STRING Pedalcyclist_Actions_At_Time_Of_Crash;
+		STRING Passenger_Actions_At_Time_Of_Crash;
+		//Data Ingestion New fields
+		STRING Dui_Suspected;
+		STRING Drug_Test_Result;
+		//PRtCC CR-1237
+    STRING Marijuana_Use_Suspected;
 	END;
 
-	EXPORT vehicl_NEW:= RECORD,MAXLENGTH(20000)
+	EXPORT vehicl_NEW := RECORD,MAXLENGTH(20000)
 		STRING Vehicle_ID;
 		STRING Creation_Date;
 		STRING Incident_ID;
@@ -833,6 +875,10 @@
 		STRING Report_Contributing_Circumstances_v;	
 		STRING Report_Vehicle_Maneuver_Action_Prior;	
 		STRING Report_Vehicle_Body_Type;
+		//PRtCC new fields
+		STRING Report_Road_Condition;
+		//Data Ingestion CR-1262 
+    STRING Event_Sequence;
 	END;
 
 	EXPORT property_damage := RECORD
@@ -851,6 +897,19 @@
 		STRING property_owner_zip_code;
 		STRING property_owner_notified;
 	END; 
+	
+	EXPORT Document := RECORD
+    STRING document_id;
+    STRING incident_id;
+    STRING document_hash_key;
+    STRING date_created;
+    STRING is_deleted;
+    STRING report_type;
+    STRING page_count;
+    STRING extension;
+		//COPPR-69 New field
+    STRING report_source;
+	END;
 
 	EXPORT layoutNahdbBatch := RECORD
 		STRING EVENT_ID;
@@ -877,12 +936,12 @@
 		STRING suffix; 
 		STRING clean_dob; 
 		STRING clean_DATE_OF_INCIDENT; 
-		STRING acc_dol,
-		STRING acc_city,	
-		STRING acc_st	,
-		STRING acc_county,	
-		STRING acc_vin,
-		STRING order_id	,
+		STRING acc_dol;
+		STRING acc_city;	
+		STRING acc_st	;
+		STRING acc_county;	
+		STRING acc_vin;
+		STRING order_id	;
 		STRING sequence_nbr,	
 		STRING acct_nbr	,
 		STRING vehicle_incident_id,	
@@ -917,4 +976,3 @@
 	END; 
 
 END;
-

@@ -142,7 +142,9 @@ export ReportVersion := record
 	string4     work_type_id,
 	string3     report_type_id; 
 	string9     agency_ori;
-	string11    agency_id; 
+	string11    agency_id;
+	//PR Recon COPPR-49
+	boolean is_terminated_agency;
 	string100   Vendor_Code;
   string20    vendor_report_id ;
 	string2     source_id; 
@@ -305,14 +307,36 @@ export key_slim_layout := record
 end;
 
 export PhotoLayout := record
-string11 document_id,
-string11 incident_id,
-string64 document_hash_key,
-string19 date_created,
-string1 is_deleted,
-string3 Report_type,
-string3 Page_Count,
-string3 extension;
+	string11 document_id;
+	string11 incident_id;
+	string64 document_hash_key;
+	string19 date_created;
+	string1 is_deleted;
+	string3 report_type;
+	string3 page_count;
+	string3 extension;
+	//PR Recon COPPR-49
+	string3 report_source;
+	boolean is_terminated_agency;
+end;
+
+	
+export agency_cmbnd := record
+	string11   agency_ori;
+	string3    agency_state_abbr;
+	string100  agency_name;
+	string11   mbsi_agency_id;
+	string5    cru_agency_id;
+	unsigned3  cru_state_number;
+	string3    source_id;
+	string2    append_overwrite_flag;
+	string10   source_start_date; 
+	string10   source_end_date; 
+	string20   source_termination_date; 
+	string1    source_resale_allowed; 
+	string1    source_auto_renew; 
+	string1    source_allow_sale_of_component_data; 
+	string1    source_allow_extract_of_vehicle_data; 
 end;
 
 export Scrubs := FLAccidents_Ecrash.Layout_Basefile - ScrubsBits1;

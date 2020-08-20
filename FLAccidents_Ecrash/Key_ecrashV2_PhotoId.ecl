@@ -1,25 +1,33 @@
-﻿IMPORT Data_Services, Doxie;
+﻿IMPORT STD;
 
-ds_SupplementalBase := FLAccidents_Ecrash.Files.Base.Supplemental(TRIM(report_type_id,all) IN ['A','DE']);
-ds_PhotoBase := FLAccidents_Ecrash.Files.Base.PhotoBase;
+ds_PhotoBase := Files.Base.PhotoBase;
 
-ds_SuperReport := DEDUP(SORT(DISTRIBUTE(ds_SupplementalBase, HASH64(Super_report_id)), super_report_id,report_id, LOCAL), Super_report_id,report_id,LOCAL);
+ds_SupplementalBase := Files.Base.Supplemental(TRIM(Report_Type_Id, LEFT, RIGHT) IN ['A','DE'] OR
+                                               STD.Str.ToUpperCase(TRIM(Vendor_Code, LEFT, RIGHT)) = 'CMPD');
+d_SupplementalBase := DISTRIBUTE(ds_SupplementalBase, HASH32(Super_Report_Id));
+ds_SuperReport := DEDUP(SORT(d_SupplementalBase, Super_Report_Id, Report_Id, LOCAL), Super_Report_Id, Report_Id, LOCAL);
 
-layout_photo_SuperReport := RECORD
-	STRING11 Super_report_id,
-	FLAccidents_Ecrash.Layouts.PhotoLayout
+Layout_Keys_eCrash.PhotoId trans_PhotoSuperReport(ds_PhotoBase l, ds_SuperReport r):= TRANSFORM
+	SELF.Super_Report_Id := r.Super_Report_Id;
+	SELF.Document_ID := l.Document_ID;
+	SELF.Report_Type := l.Report_Type;
+	SELF.Incident_ID := l.Incident_ID;
+	SELF.Document_Hash_Key := l.Document_Hash_Key;
+	SELF.Date_Created := l.Date_Created;
+	SELF.Is_Deleted := l.Is_Deleted;
+	SELF.Page_Count := l.Page_Count;
+	SELF.Extension := l.Extension;
+	SELF.Report_Source := l.Report_Source;
+	SELF := l;
+	SELF := [];
 END;
-
-layout_photo_SuperReport trans_PhotoSuperReport(ds_PhotoBase le, ds_SuperReport ri):= TRANSFORM
-	SELF.Super_report_id := ri.Super_report_id;
-	SELF := le;
-END;
-
 ds_PhotoSuperCmbnd	:= JOIN(ds_PhotoBase, ds_SuperReport,
-																											TRIM(LEFT.incident_id,LEFT,RIGHT) = TRIM(RIGHT.Incident_id, LEFT,RIGHT),
-																											trans_PhotoSuperReport(LEFT, RIGHT), HASH);
+														TRIM(LEFT.Incident_Id, LEFT, RIGHT) = TRIM(RIGHT.Incident_Id, LEFT, RIGHT),
+														trans_PhotoSuperReport(LEFT, RIGHT), HASH);
 
-EXPORT Key_ecrashV2_PhotoId := INDEX(ds_PhotoSuperCmbnd
-                                     ,{Super_report_id,Document_id,Report_Type}
-							                       ,{ds_PhotoSuperCmbnd}
-							                       ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_PhotoId_' + doxie.Version_SuperKey);
+EXPORT Key_ecrashV2_PhotoId := INDEX(ds_PhotoSuperCmbnd,
+                                     {Super_Report_Id, Document_id, Report_Type},
+							                       {ds_PhotoSuperCmbnd},
+							                       Files_eCrash.FILE_KEY_PHOTO_ID_SF);
+																		
+																		
