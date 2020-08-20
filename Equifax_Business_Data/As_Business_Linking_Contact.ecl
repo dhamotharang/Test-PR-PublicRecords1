@@ -57,7 +57,7 @@ EXPORT As_Business_Linking_Contact (
 	  END;
 		
     equifaxDist   := DISTRIBUTE(mapBL,HASH(source_docid, company_name));
-    equifaxSort   := SORT(equifaxDist, source_docid, vl_id, company_rawaid, company_aceaid, company_name, company_address.st, 
+    equifaxSort   := SORT(equifaxDist, source_docid, company_name, company_rawaid, company_aceaid, company_address.st, 
                                 company_address.p_city_name, company_address.v_city_name, company_address.zip, company_address.zip4, company_address.prim_range,
                                 company_address.predir, company_address.prim_name, company_address.addr_suffix,
                                 company_address.postdir, company_address.unit_desig, company_address.sec_range,  
@@ -65,8 +65,7 @@ EXPORT As_Business_Linking_Contact (
                                 contact_name.title, contact_type_raw, contact_email, company_phone, dt_last_seen,
                                 LOCAL);
 		equifaxRollup := ROLLUP(equifaxSort, 
-                                  LEFT.source_docid                = RIGHT.source_docid AND
-                                  LEFT.vl_id                       = RIGHT.vl_id AND
+                                  LEFT.source_docid                = RIGHT.source_docid AND																	
 																	LEFT.company_rawaid              = RIGHT.company_rawaid AND
 																	LEFT.company_aceaid              = RIGHT.company_aceaid AND
                                   LEFT.company_name                = RIGHT.company_name AND
