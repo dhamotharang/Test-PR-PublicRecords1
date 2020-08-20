@@ -18,16 +18,14 @@ threads      := 30;
 
 RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;      // Production
 
-inputFile := Data_Services.foreign_prod + 'tfuerstenberg::in::amex_9834_gcp_sba_in.csv';
+inputFile := '~tfuerstenberg::in::amex_9834_gcp_sba_in.csv';
 OutputFile := '~kandsu01::BRM_test_100K_roxie_'+ ThorLib.wuid();
-
-BOOLEAN runInRealTime := FALSE;   //When TRUE will run request in real time mode, if FALSE will run with archive date from file
 
 		// Configure options:
 	Options := MODULE(PublicRecords_KEL.Interface_Options)
 		EXPORT INTEGER ScoreThreshold := 80;
-		EXPORT STRING100 Data_Restriction_Mask := '';
-		EXPORT STRING100 Data_Permission_Mask := '';
+		EXPORT STRING100 Data_Restriction_Mask := '0000010001001100000000000';
+		EXPORT STRING100 Data_Permission_Mask := '0000000000000'; //(non SBFE)
 		EXPORT UNSIGNED GLBAPurpose := 0;
 		EXPORT UNSIGNED DPPAPurpose := 0;
 		EXPORT BOOLEAN IsFCRA := FALSE; //It is only non-fcra query.
@@ -35,7 +33,7 @@ BOOLEAN runInRealTime := FALSE;   //When TRUE will run request in real time mode
 		EXPORT STRING100 Allowed_Sources := '';
 		EXPORT BOOLEAN Override_Experian_Restriction := false;
 		EXPORT STRING IndustryClass := ''; // When set to UTILI or DRMKT this restricts Utility data
-		EXPORT UNSIGNED8 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
+		EXPORT DATA57 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 			Data_Restriction_Mask, 
 			Data_Permission_Mask, 
 			GLBAPurpose, 
@@ -62,49 +60,62 @@ BOOLEAN runInRealTime := FALSE;   //When TRUE will run request in real time mode
 		END;	
 
 prii_layout := RECORD
-STRING  AcctNo;
+STRING  AccountNumber;
 STRING  CompanyName;
 STRING  AlternateCompanyName;
-STRING  bus_addr;
-STRING  bus_city; 
-STRING  bus_state;
-STRING  bus_zip;
+STRING  Addr1;
+STRING  City1; 
+STRING  State1;
+STRING  Zip1;
 STRING  BusinessPhone;
 STRING  TaxIdNumber;
 STRING  BusinessIPAddress;
-STRING  historydate;
-STRING  BusinessURL;
-STRING  BusinessEmailAddress;
+STRING  Rep1firstname;
+STRING  Rep1MiddleName;
+STRING  Rep1lastname;
+STRING  Rep1NameSuffix;
+STRING  Rep1Addr;
+STRING  Rep1City;
+STRING  Rep1State;
+STRING  Rep1Zip;
+STRING  Rep1SSN;
+STRING  Rep1DOB;
+STRING  Rep1Age;
+STRING  Rep1DLNumber;
+STRING  Rep1DLState;
+STRING  Rep1HomePhone;
+STRING  Rep1EmailAddress;
+STRING  Rep1FormerLastName;
+STRING  ArchiveDate;
 STRING  PowID;
 STRING  ProxID;
 STRING  SeleID;
 STRING  OrgID;
 STRING  UltID;
+STRING  SIC_Code;
+STRING  NAIC_Code;
+STRING  BusinessEmailAddress;
 END;
-
  
 // load sample data
-	p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));  // use this for a CSV file
-	p := IF(recordsToRun = 0, p_in, CHOOSEN (p_in, recordsToRun));
- OUTPUT (choosen(p,eyeball), NAMED ('input'));
+	p := IF(recordsToRun = 0,
+	      DATASET(InputFile, prii_layout, CSV(QUOTE('"'))),
+				CHOOSEN (DATASET(InputFile, prii_layout, CSV(QUOTE('"'))), recordsToRun));
+ OUTPUT (choosen(p,eyeball), NAMED ('original_input'));
  
  //append G_ProcBusUID to the input.
-  inputRecords := PROJECT(P, TRANSFORM({UNSIGNED G_ProcBusUID, RECORDOF(LEFT)}, SELF.G_ProcBusUID := COUNTER; SELF := LEFT;));
+with_G_ProcBusUID_layout := RECORD
+prii_layout;
+string30 G_ProcBusUID;
+END;
 
-	pp:= project(inputRecords,transform(BRM_Marketing_attributes.Layout_BRM_NonFCRA.Batch_Input, 
-		SELF.G_ProcBusUID := left.G_ProcBusUID;
-		SELF.AcctNo :=left.AcctNo;
-		SELF.historydate:=(INTEGER)left.historydate[1..8];
-		SELF.historydateyyyymm:=(INTEGER)left.historydate[1..6];
-		SELF.streetaddressline1 := left.bus_addr;
-		SELF.city1 := left.bus_city;
-		SELF.state1 := left.bus_state;
-		SELF.zip1 := left.bus_zip;
-		SELF.BusinessTIN := left.TaxIdNumber;
-		SELF := left;
-		SELF := []));
-			
-output(pp,named('PP'));
+with_G_ProcBusUID_layout getUID(P le, INTEGER C) := TRANSFORM
+	SELF.G_ProcBusUID  := le.accountnumber;
+	SELF.AccountNumber := (string)c;
+	SELF:=le;
+	END;
+
+with_G_ProcBusUID := Project(P,getUID(left,counter));
 
 soapLayout := RECORD
   DATASET(BRM_Marketing_attributes.Layout_BRM_NonFCRA.Batch_Input) batch_in;
@@ -126,34 +137,32 @@ soapLayout := RECORD
 	UNSIGNED1 LexIdSourceOptout;
 end;
 
-soap_in_pre:= Project(pp,TRANSFORM(soapLayout,
-self.batch_in := DATASET([TRANSFORM( BRM_Marketing_attributes.Layout_BRM_NonFCRA.Batch_Input, 
-    self.g_procbusuid:= left.G_ProcBusUID;
-    self.historydate :=IF(runInRealTime, 99999999, (UNSIGNED4)LEFT.historydate);
-    self.historydateyyyymm :=IF(runInRealTime, 999999, (UNSIGNED4)LEFT.historydateyyyymm);
-    self.acctno:=LEFT.acctno;
-    self.companyname := LEFT.companyname;
-    self.AlternateCompanyName := LEFT.AlternateCompanyName;
-    self.streetaddressline1 := LEFT.streetaddressline1;
-    self.City1 := LEFT.City1;
-    self.State1 := LEFT.State1;
-    self.Zip1 := LEFT.Zip1;
-    self.BusinessPhone := LEFT.BusinessPhone;
-    self.BusinessTIN := LEFT.BusinessTIN;
-    self.BusinessURL := LEFT.BusinessURL;
-    self.BusinessEmailAddress := LEFT.BusinessEmailAddress;
-    self                       := [])]); 
-						 
-    self.Score_threshold := Options.ScoreThreshold;
-    self.BIPAppendScoreThreshold := Options.BIPAppendScoreThreshold;
-    self.BIPAppendWeightThreshold := Options.BIPAppendWeightThreshold;
-    self.BIPAppendPrimForce := Options.BIPAppendPrimForce;
-    self.BIPAppendIncludeAuthRep := Options.BIPAppendIncludeAuthRep;
-    self.BIPAppendReAppend := Options.BIPAppendReAppend;
-    self.DataRestrictionMask :=Options.Data_Restriction_Mask;
-    self.DataPermissionMask :=Options.Data_Permission_Mask;
-    self.GLBpurpose := Options.GLBApurpose;
-    self.DPPApurpose := Options.DPPApurpose;
+soapLayout into_input (with_G_ProcBusUID le) := TRANSFORM
+SELF.batch_in := DATASET([TRANSFORM( BRM_Marketing_attributes.Layout_BRM_NonFCRA.Batch_Input, 
+SELF.AcctNo :=le.accountnumber;
+SELF.StreetAddressLine1 :=le.addr1;
+SELF.BusinessTIN := le.TaxIdNumber;
+
+	 // self.historydateyyyymm := 999999; //query will populate it with the current date  
+  // self.historyDate := '';  // leave date blank, query will populate it with the current date  
+  // self.historyDate := 0;  // query will populate it with the current date  
+SELF.historydateyyyymm := (unsigned)(le.ArchiveDate[1..6]);
+SELF.historyDate := (unsigned)(le.ArchiveDate[1..8]);
+
+SELF.G_ProcBusUID:= (INTEGER)le.G_ProcBusUID;	
+SELF := le;
+SELF := [])]); 
+
+    SELF.Score_threshold := Options.ScoreThreshold;
+    SELF.BIPAppendScoreThreshold := Options.BIPAppendScoreThreshold;
+    SELF.BIPAppendWeightThreshold := Options.BIPAppendWeightThreshold;
+    SELF.BIPAppendPrimForce := Options.BIPAppendPrimForce;
+    SELF.BIPAppendIncludeAuthRep := Options.BIPAppendIncludeAuthRep;
+    SELF.BIPAppendReAppend := Options.BIPAppendReAppend;
+    SELF.DataRestrictionMask :=Options.Data_Restriction_Mask;
+    SELF.DataPermissionMask :=Options.Data_Permission_Mask;
+    SELF.GLBpurpose := Options.GLBApurpose;
+    SELF.DPPApurpose := Options.DPPApurpose;
     self.AttributeVer1 :='MA';
     self.AttributeVer2 := '';
     self.AllowedSources := Options.Allowed_Sources;
@@ -161,27 +170,140 @@ self.batch_in := DATASET([TRANSFORM( BRM_Marketing_attributes.Layout_BRM_NonFCRA
     self.OverrideExperianRestriction := Options.Override_Experian_Restriction;
     //CCPA fields
     self.LexIdSourceOptout := Options.LexIdSourceOptout;
-    self := [];));
-
-soap_in := DISTRIBUTE(soap_in_pre, RANDOM());		
+    self := [];
+		END;
+    
+soap_in := Distribute(Project(with_G_ProcBusUID, into_input(LEFT)),RANDOM());
 OUTPUT(CHOOSEN(soap_in, eyeball), NAMED('Sample_SOAPInput'));
 
-layout_SOAP_out := RECORD
-BRM_Marketing_attributes.Layout_BRM_NonFCRA.BatchOutput -BE_AssocExecEmailFlag2Y-BE_BusIsResidentialFlag
- -BE_BusInferFamilyOwnedFlag-BE_AstVehAutoCnt2Y-BE_AstVehAutoCommCnt2Y-BE_AstVehAutoPersCnt2Y-BE_AstVehAutoOtherCnt2Y-BE_AstVehAutoEmrgNewMsncEv
- -BE_AssocCnt2Y-BE_AssocExecCnt2Y-BE_AssocNexecCnt2Y-BE_AssocExecEmrgMsncAvg2Y-BE_AssocExecAgeAvg2Y-BE_AssocExecWEduCollCnt2Y
- -BE_AssocExecBusCntAvg2Y-BE_AssocExecWDrgCnt2Y-BE_AssocNexecEmrgMsncAvg2Y-BE_AssocNexecAgeAvg2Y-BE_AssocNexecWEduCollCnt2Y-BE_AssocNexecBusCntAvg2Y
- -BE_AssocNexecWDrgCnt2Y-BE_AssocEmrgMsncAvg2Y-BE_AssocAgeAvg2Y-BE_AssocWEduCollCnt2Y-BE_AssocBusCntAvg2Y-BE_AssocWDrgCnt2Y;	
- string ErrorCode;
+//we are stripping off some attributes from the layout as per Product Manager. 
+//By commenting out the attributes, instead of removing them, will allow in the future for the attributes to be easily added back in to the script
+	layout_SOAP_out := RECORD
+	BRM_Marketing_attributes.Layout_BRM_NonFCRA.Batch_Input;
+	BRM_Marketing_attributes.Layout_BRM_NonFCRA.Layout_BII;
+	STRING120 BE_BestName;
+	STRING120 BE_BestAddrSt;
+	STRING50 BE_BestAddrCity;
+	STRING25 BE_BestAddrState;
+	STRING10 BE_BestAddrZip;
+	STRING10 BE_BestTIN;
+	STRING16 BE_BestPhone;
+	STRING6 BE_URLFlag;		
+	BRM_Marketing_attributes.Layout_BRM_NonFCRA.Layout_BusinessProx;
+	INTEGER BE_VerSrcCntEv;
+	INTEGER BE_VerSrcOldMsncEv;
+	INTEGER BE_VerSrcNewMsncEv;
+	INTEGER BE_VerSrcCredCntEv;
+	STRING6  BE_VerNameFlag;
+	STRING6 BE_VerAddrFlag;
+	INTEGER BE_VerAddrSrcOldMsncEv;
+	STRING6 BE_AddrPOBoxFlag;
+	STRING6 BE_VerTINFlag;
+	INTEGER BE_VerTINSrcOldMsncEv;
+	STRING6 BE_VerPhoneFlag;
+	INTEGER BE_VerPhoneSrcOldMsncEv;
+	STRING6 BE_VerSrcRptNewBusFlag;
+	STRING6 BE_VerSrcBureauFlag;
+	INTEGER BE_VerSrcBureauOldMsncEv;
+	STRING6 	BE_BusSICCode1; 
+	STRING150	BE_BusSICCode1Desc; 
+	STRING6	BE_BusSICCode2; 
+	STRING150	BE_BusSICCode2Desc; 
+	STRING6	BE_BusSICCode3; 
+	STRING150	BE_BusSICCode3Desc; 
+	STRING6	BE_BusSICCode4; 
+	STRING150	BE_BusSICCode4Desc; 
+	STRING6   BE_BusNAICSCode1;
+	STRING150 BE_BusNAICSCode1Desc;
+	STRING6   BE_BusNAICSCode2;
+	STRING150 BE_BusNAICSCode2Desc;
+	STRING6   BE_BusNAICSCode3;
+	STRING150 BE_BusNAICSCode3Desc;
+	STRING6   BE_BusNAICSCode4;
+	STRING150 BE_BusNAICSCode4Desc;
+	INTEGER3 BE_BusEmplCountCurr;		
+	INTEGER6 BE_BusAnnualSalesCurr;
+	STRING6 BE_BusIsNonProfitFlag;	
+	STRING6 BE_BusIsFranchiseFlag;
+	STRING6 BE_BusInferFemaleOwnedFlag;	
+	STRING6 BE_BusIsFemaleOwnedFlag;	
+	STRING6 BE_BusIsMinorityOwnedFlag;	
+	STRING6 BE_BusOffers401kFlag;		
+	STRING6 BE_BusHasNewLocationFlag1Y;		
+	INTEGER3 BE_BusLocActvCnt;		
+	INTEGER3 BE_DBANameCnt2Y;
+	INTEGER3 BE_AstPropCntEv;		
+	INTEGER3 BE_AstPropCurrCnt;		
+	INTEGER3 BE_AstPropOldMsncEv;		
+	INTEGER3 BE_AstPropNewMsncEv; 		
+	INTEGER4 BE_AstPropCurrValTot;		
+	INTEGER4 BE_AstPropCurrLotSizeTot;		
+	INTEGER4 BE_AstPropCurrBldgSizeTot;	
+	INTEGER3 BE_AstVehWtrCntEv;
+	INTEGER3 BE_AstVehAirCntEv;
+	STRING6 BE_BestAddrBldgType;
+	INTEGER BE_BestAddrNewTaxValEv;
+	INTEGER BE_BestAddrLotSize;
+	INTEGER BE_BestAddrBldgSize;
+	STRING6 BE_BestAddrIsOwnedFlag;
+	INTEGER3 BE_BestAddrSrcOldMsncEv;
+	STRING6 BE_DrgFlag7Y;
+	STRING6 BE_DrgGovDebarredFlagEv;
+	INTEGER3 BE_DrgBkCnt10Y;
+	INTEGER3 BE_DrgBkNewMsnc10Y;
+	STRING6 BE_DrgBkNewChType10Y;
+	INTEGER3 BE_DrgLienCnt7Y;
+	INTEGER3 BE_DrgLienNewMsnc7Y;
+	INTEGER3 BE_DrgJudgCnt7Y;
+	INTEGER3 BE_DrgJudgNewMsnc7Y;
+	INTEGER3  BE_DrgLTDCnt7Y;
+	INTEGER3  BE_DrgLTDNewMsnc7Y;
+	INTEGER3 BE_SOSOldMsncEv;
+	INTEGER6 BE_SOSDomStatusIndxEv;
+	INTEGER3 BE_SOSStateCntEv;		
+	INTEGER3 BE_UCCCntEv;
+	INTEGER3 BE_UCCActvCnt;
+	INTEGER3 BE_UCCDebtorTermCntEv;
+	INTEGER3 BE_UCCDebtorOtherCntEv;
+	INTEGER3 BE_UCCDebtorOldMsncEv;
+	INTEGER3 BE_UCCDebtorNewMsncEv;
+	INTEGER3 BE_UCCDebtorTermNewMsncEv;
+	INTEGER3 BE_UCCDebtorCntEv;
+	INTEGER3 BE_UCCCreditorCntEv;	
+	INTEGER3 BE_AssocCntEv;
+	INTEGER3 BE_AssocExecCntEv;
+	INTEGER3 BE_AssocNexecCntEv;
+	INTEGER3 BE_B2BActvCnt;
+	INTEGER3 BE_B2BActvFltCnt;
+	INTEGER3 BE_B2BActvCarrCnt;
+	INTEGER3 BE_B2BActvMatCnt;
+	INTEGER3 BE_B2BActvOpsCnt;
+	INTEGER3 BE_B2BActvOthCnt;
+	INTEGER4 BE_B2BActvBalTot;
+	INTEGER4 BE_B2BActvFltBalTot;
+	INTEGER4 BE_B2BActvCarrBalTot;
+	INTEGER4 BE_B2BActvMatBalTot;
+	INTEGER4 BE_B2BActvOpsBalTot;
+	INTEGER4 BE_B2BActvOthBalTot;
+	STRING6 BE_B2BActvBalTotRnge;
+	STRING6 BE_B2BActvFltBalTotRnge;
+	STRING6 BE_B2BActvCarrBalTotRnge;
+	STRING6 BE_B2BActvMatBalTotRnge;
+	STRING6 BE_B2BActvOpsBalTotRnge;
+	STRING6 BE_B2BActvOthBalTotRnge;	
+	STRING6 BE_B2BActvWorstPerfIndx;
+	STRING6 BE_B2BWorstPerfIndx2Y;
+	STRING error_msg:='';
+	STRING ErrorCode;
 END;
 
-layout_SOAP_out myFail(soapLayout le) := TRANSFORM
+layout_SOAP_out myFail(soap_in le) := TRANSFORM
 	SELF.ErrorCode := StringLib.StringFilterOut(TRIM(FAILCODE + ' ' + FAILMESSAGE),'\n');
 	SELF := le;
 	SELF := [];
 END;
 
-result_SOAPCALL_pre_sort := 
+result_SOAPCALL := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
 				'brm_marketing_attributes.brm_marketing_attr_batch_services',
@@ -191,33 +313,82 @@ result_SOAPCALL_pre_sort :=
 				RETRY(5), TIMEOUT(500),
 				PARALLEL(threads), onFail(myFail(LEFT)));
 
-result_SOAPCALL := Sort(result_SOAPCALL_pre_sort,	AcctNo);
-							
+OUTPUT(count(result_SOAPCALL), named('count_result_SOAPCALL'));							
 OUTPUT( CHOOSEN(result_SOAPCALL,eyeball), NAMED('result_SOAPCALL') );
 
-//Passed Records //results without minimum input are also listed in the results passed. Only results with the roxie error will be listed as failed.
-Passed:= result_SOAPCALL(TRIM(ErrorCode) = '');
-Failed:= result_SOAPCALL(TRIM(ErrorCode)<> '');
 
-//dropped input
-//Input Accountnumber here is considered unique for the records.
-droppedInput := JOIN(inputRecords, result_SOAPCALL,
-                      LEFT.AcctNo = RIGHT.AcctNo,
-                      TRANSFORM({RECORDOF(LEFT) - g_procbusuid}, SELF := LEFT;), 
-                      LEFT ONLY); //These are in the format as input to be reprocessed 
-																				
-OUTPUT( CHOOSEN(Passed,eyeball), NAMED('results_Passed') );
-OUTPUT( COUNT(Passed), NAMED('Passed_Cnt') );
-OUTPUT( CHOOSEN(Failed,eyeball), NAMED('results_Failed') );
-OUTPUT( COUNT(Failed), NAMED('Failed_Cnt') );
+finalLayout := RECORD
+ layout_SOAP_out;
+END;
 
-// passed results without minimum input.
-Minimum_Input_not_met := Passed(TRIM(Error_msg)='minimum input criteria not met');
-OUTPUT( CHOOSEN(Minimum_Input_not_met,eyeball), NAMED('Minimum_Input_not_met_records') );
-OUTPUT( COUNT(Minimum_Input_not_met), NAMED('Minimum_Input_not_met_Cnt') );
+finalLayout getFile_Ind(result_SOAPCALL le, with_G_ProcBusUID ri) := TRANSFORM
+		SELF.G_ProcBusUID := (integer)ri.accountnumber;
+		SELF.AcctNo := ri.G_ProcBusUID;
+		SELF	 := le;
+END;
+										 
+finalResults := sort(join(result_SOAPCALL, with_G_ProcBusUID,
+										 LEFT.AcctNo = RIGHT.accountnumber,
+										 getFile_Ind(LEFT, RIGHT), LEFT OUTER),G_ProcBusUID,AcctNo);										 
 
-OUTPUT(Passed,, OutputFile + '_Passed_records', CSV(HEADING(single), QUOTE('"')), OVERWRITE);
-OUTPUT(Minimum_Input_not_met,, OutputFile + 'Minimum_Input_not_met', CSV(HEADING(single), QUOTE('"')), OVERWRITE);
-OUTPUT(Failed,, OutputFile + '_failed_records', CSV(QUOTE('"')), OVERWRITE);
-OUTPUT(droppedInput,, OutputFile + '_reprocess', CSV(QUOTE('"')), OVERWRITE);
-OUTPUT(result_SOAPCALL,, OutputFile + 'All_records', CSV(QUOTE('"')), OVERWRITE);
+// ----------[ PASSED RECORDS ]----------
+
+// Records that completed having a MinInputErrorCode shall be kept in the "Passed"
+// dataset. However, we still need to display them.
+	Passed := finalResults(TRIM(ErrorCode) = '');
+	records_having_MinInputErrorCode := Passed(Error_msg='minimum input criteria not met');
+  
+	OUTPUT( records_having_MinInputErrorCode, NAMED('MinimumInputErrorCode_recs') );
+
+// ----------[ FAILED RECORDS ]----------
+// Records that have an ErrorCode besides MinInputErrorCode will be put 
+// in the "Failed" dataset. Display these too. Transform them into original input
+// ("_as_input") so they can be rerun.
+records_having_other_ErrorCode := 
+	finalResults(TRIM(ErrorCode)<>'');
+
+OUTPUT( records_having_other_ErrorCode, NAMED('OtherErrorCode_recs') );
+
+ds_input_dist := DISTRIBUTE(with_G_ProcBusUID, HASH32(AccountNumber)) : INDEPENDENT;
+
+records_having_other_ErrorCode_as_input :=
+	JOIN(
+		ds_input_dist, DISTRIBUTE(records_having_other_ErrorCode, HASH32(AcctNo)),
+		LEFT.AccountNumber = RIGHT.AcctNo,
+		TRANSFORM(LEFT),
+		KEEP(1),
+		INNER, LOCAL);
+	
+// Grab any dropped records, i.e. those records not returned by the Roxie. These
+// get tossed into the "Failed" dataset also.
+dropped_records_as_input :=
+	JOIN(
+		ds_input_dist, DISTRIBUTE(result_SOAPCALL, HASH32(AcctNo)),
+		LEFT.AccountNumber = RIGHT.AcctNo,
+		TRANSFORM(LEFT),
+		LEFT ONLY, LOCAL);
+
+OUTPUT( COUNT(dropped_records_as_input), NAMED('COUNT_dropped_records') );
+
+Failed := records_having_other_ErrorCode_as_input + dropped_records_as_input;
+
+finalLayout getFile_Ind1(Failed le, with_G_ProcBusUID ri) := TRANSFORM
+		SELF.G_ProcBusUID := (integer)ri.accountnumber;
+		SELF.AcctNo := ri.G_ProcBusUID;
+		SELF	 := le;
+   SELF :=[];
+END;
+					
+with_G_ProcBusUID_layout UID_Acc_switch (Failed le):= TRANSFORM
+SELF.G_ProcBusUID := le.accountnumber;
+SELF.accountnumber := le.G_ProcBusUID;
+SELF	 := le;
+END; 
+
+failedRecords := Project(Failed, UID_Acc_switch(LEFT));       
+Failed_Inputs := SORT(PROJECT(failedRecords, TRANSFORM({RECORDOF(LEFT) - G_ProcBusUID}, SELF := LEFT)),AccountNumber);
+										 										 
+OUTPUT(COUNT(Passed), NAMED('countPassedResults'));
+OUTPUT(CHOOSEN(Passed, eyeball), NAMED('PassedResults'));
+output(Passed,, outputFile + '_' + thorlib.wuid(),CSV(heading(single), quote('"')), overwrite);
+OUTPUT(Failed_Inputs, , outputFile + '_Failed_Inputs.csv', CSV(HEADING(0), QUOTE('"')), EXPIRE(30), OVERWRITE);
