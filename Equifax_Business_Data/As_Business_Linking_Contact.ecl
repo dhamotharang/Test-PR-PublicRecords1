@@ -7,7 +7,8 @@ EXPORT As_Business_Linking_Contact (
 		BIPV2.Layout_Business_Linking_Full trfMAPBLInterface(Equifax_Business_Data.Layouts.Base_Contacts l) := TRANSFORM			
         SELF.source_docid                := l.efx_id;
 		    SELF.vl_id                       := l.efx_id;
-				SELF.rcid                        := l.rcid;
+				SELF.rcid                        := 0;
+				SELF.source_record_id            := l.rcid;
 				SELF.source                      := MDR.sourceTools.src_Equifax_Business_Data;       
 				SELF.dt_first_seen               := IF(_Validate.date.fIsValid((STRING)l.dt_first_seen), l.dt_first_seen, 0);
 				SELF.dt_last_seen                := IF(_Validate.date.fIsValid((STRING)l.dt_last_seen), l.dt_last_seen, 0);
@@ -52,45 +53,36 @@ EXPORT As_Business_Linking_Contact (
 		  SELF.dt_last_seen             := max(L.dt_last_seen,R.dt_last_seen);
 		  SELF.dt_vendor_last_reported  := max(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 		  SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-		  SELF.company_address.prim_range  := IF(L.company_address.prim_range  <> '', L.company_address.prim_range,  R.company_address.prim_range);
-			SELF.company_address.predir      := IF(L.company_address.predir      <> '', L.company_address.predir,      R.company_address.predir);
-			SELF.company_address.prim_name   := IF(L.company_address.prim_name   <> '', L.company_address.prim_name,   R.company_address.prim_name);
-			SELF.company_address.addr_suffix := IF(L.company_address.addr_suffix <> '', L.company_address.addr_suffix, R.company_address.addr_suffix);
-			SELF.company_address.postdir     := IF(L.company_address.postdir     <> '', L.company_address.postdir,     R.company_address.postdir);
-			SELF.company_address.unit_desig  := IF(L.company_address.unit_desig  <> '', L.company_address.unit_desig,  R.company_address.unit_desig);
-			SELF.company_address.sec_range   := IF(L.company_address.sec_range   <> '', L.company_address.sec_range,   R.company_address.sec_range);
-			SELF.company_address.p_city_name := IF(L.company_address.p_city_name <> '', L.company_address.p_city_name, R.company_address.p_city_name);
-			SELF.company_address.v_city_name := IF(L.company_address.v_city_name <> '', L.company_address.v_city_name, R.company_address.v_city_name);
-			SELF.company_address.st          := IF(L.company_address.st          <> '', L.company_address.st,          R.company_address.st);
-			SELF.company_address.zip	       := IF(L.company_address.zip         <> '', L.company_address.zip,         R.company_address.zip);
-			SELF.company_address.zip4        := IF(L.company_address.zip4        <> '', L.company_address.zip4,        R.company_address.zip4);
-			SELF.company_phone            := IF(TRIM(L.company_phone) = '', R.company_phone, L.company_phone);
-			SELF.phone_type               := IF(TRIM(L.phone_type) = '', R.phone_type, L.phone_type); 
-			SELF.contact_phone            := '';
 		  SELF                          := L;
 	  END;
 		
     equifaxDist   := DISTRIBUTE(mapBL,HASH(source_docid, company_name));
-    equifaxSort   := SORT(equifaxDist, source_docid, company_name, company_address.st, 
-                                company_address.p_city_name, company_address.zip, company_address.prim_range,
+    equifaxSort   := SORT(equifaxDist, source_docid, vl_id, source_record_id, company_rawaid, company_aceaid, company_name, company_address.st, 
+                                company_address.p_city_name, company_address.v_city_name, company_address.zip, company_address.zip4, company_address.prim_range,
                                 company_address.predir, company_address.prim_name, company_address.addr_suffix,
-                                company_address.postdir, company_address.unit_desig,  
+                                company_address.postdir, company_address.unit_desig, company_address.sec_range,  
                                 contact_did, contact_name.lname, contact_name.fname, contact_name.mname, contact_name.name_suffix, 
                                 contact_name.title, contact_type_raw, contact_email, company_phone, -dt_vendor_last_reported,
                                 LOCAL);
 		equifaxRollup := ROLLUP(equifaxSort, 
                                   LEFT.source_docid                = RIGHT.source_docid AND
                                   LEFT.vl_id                       = RIGHT.vl_id AND
+                                  LEFT.source_record_id            = RIGHT.source_record_id AND
+																	LEFT.company_rawaid              = RIGHT.company_rawaid AND
+																	LEFT.company_aceaid              = RIGHT.company_aceaid AND
                                   LEFT.company_name                = RIGHT.company_name AND
                                   LEFT.company_address.st          = RIGHT.company_address.st AND
-                                  LEFT.company_address.p_city_name = RIGHT.company_address.p_city_name AND
+                                  LEFT.company_address.p_city_name = RIGHT.company_address.p_city_name AND																	
+                                  LEFT.company_address.v_city_name = RIGHT.company_address.v_city_name AND
                                   LEFT.company_address.zip         = RIGHT.company_address.zip AND
+                                  LEFT.company_address.zip4        = RIGHT.company_address.zip4 AND
                                   LEFT.company_address.prim_range  = RIGHT.company_address.prim_range AND
                                   LEFT.company_address.predir      = RIGHT.company_address.predir AND
                                   LEFT.company_address.prim_name   = RIGHT.company_address.prim_name AND
                                   LEFT.company_address.addr_suffix = RIGHT.company_address.addr_suffix AND
                                   LEFT.company_address.postdir     = RIGHT.company_address.postdir AND
-                                  LEFT.company_address.unit_desig  = RIGHT.company_address.unit_desig AND
+                                  LEFT.company_address.unit_desig  = RIGHT.company_address.unit_desig AND																	
+                                  LEFT.company_address.sec_range   = RIGHT.company_address.sec_range AND
                                   LEFT.contact_did                 = RIGHT.contact_did AND
                                   LEFT.contact_name.lname          = RIGHT.contact_name.lname AND
                                   LEFT.contact_name.fname          = RIGHT.contact_name.fname AND
