@@ -62,7 +62,7 @@ EXPORT As_Business_Linking_Contact (
                                 company_address.predir, company_address.prim_name, company_address.addr_suffix,
                                 company_address.postdir, company_address.unit_desig, company_address.sec_range,  
                                 contact_did, contact_name.lname, contact_name.fname, contact_name.mname, contact_name.name_suffix, 
-                                contact_name.title, contact_type_raw, contact_email, company_phone, -dt_vendor_last_reported,
+                                contact_name.title, contact_type_raw, contact_email, company_phone, dt_last_seen,
                                 LOCAL);
 		equifaxRollup := ROLLUP(equifaxSort, 
                                   LEFT.source_docid                = RIGHT.source_docid AND
