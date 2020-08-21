@@ -1,8 +1,10 @@
 ﻿EXPORT Orbit_UpdateReceiveItem (	  STRING ReceivingID
 																	, STRING Status
 																	, STRING TokenID
+																	, STRING OrbitEnv
 																)	:= FUNCTION
-	IMPORT UPI_DataBuild__dev.Orbit_Tracking as config;
+	IMPORT UPI_DataBuild__dev.Orbit_Tracking as configQA;
+	IMPORT UPI_DataBuild__dev.Orbit_TrackingPROD as configPROD;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	STRING sService := 'UpdateReceiveItem'	;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
@@ -36,24 +38,38 @@
 		STRING 			ReceivingId										{	XPATH('ReceivingId'											)	}											;
 	END;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
-	OrbitCall	:=	SOAPCALL(		config.targetURL
-													,	config.SOAPService(sService)
+	OrbitCallQA	:=	SOAPCALL(		configQA.targetURL
+													,	configQA.SOAPService(sService)
 													,	rRequest
 													,	rResponse
-													,	XPATH(config.OrbitRR(sService)	)
-													,	NAMESPACE(config.Namespace_D)
+													,	XPATH(configQA.OrbitRR(sService)	)
+													,	NAMESPACE(configQA.Namespace_D)
 													,	LITERAL
-													,	SOAPACTION(config.SoapPath(sService) )
+													,	SOAPACTION(configQA.SoapPath(sService) )
 													, RETRY(2)
 													, LOG
 												)	;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
-	OrbitReturn := PROJECT( OrbitCall,
+	OrbitCallPROD	:=	SOAPCALL(		configPROD.targetURL
+													,	configPROD.SOAPService(sService)
+													,	rRequest
+													,	rResponse
+													,	XPATH(configPROD.OrbitRR(sService)	)
+													,	NAMESPACE(configPROD.Namespace_D)
+													,	LITERAL
+													,	SOAPACTION(configPROD.SoapPath(sService) )
+													, RETRY(2)
+													, LOG
+												)	;
+	//-----------------------------------------------------------------------------------------------------------------------------------------
+	OrbitCall_to_use := IF(OrbitEnv = 'QA', OrbitCallQA, OrbitCallPROD);
+	OrbitReturn := PROJECT( OrbitCall_to_use,
 													TRANSFORM( RECORDOF(LEFT),
 																		 SELF.ReceivingId := ReceivingId,
 																		 SELF := LEFT));
 	// RETURN	OrbitCall;//.OrbitStatus.OrbitStatusCode	;
-	RETURN	OrbitCall.OrbitStatus.OrbitStatusCode	;
+	// RETURN	OrbitCall.OrbitStatus.OrbitStatusCode	;
+	RETURN	IF(OrbitEnv = 'QA', OrbitCallQA.OrbitStatus.OrbitStatusCode, OrbitCallPROD.OrbitStatus.OrbitStatusCode);
 	// RETURN	OrbitReturn	;
 	// -----------------------------------------------------------------------------------------------------------------------------------------
 END	;	// End UpdateReceive Function

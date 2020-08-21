@@ -1,4 +1,4 @@
-﻿EXPORT Orbit_Tracking := MODULE
+﻿EXPORT Orbit_TrackingPROD := MODULE
 
 import std, AID_Support;
 
@@ -124,7 +124,7 @@ import std, AID_Support;
 	// These need adjusted for CRK (copied from Sharecare for example)
 	EXPORT STRING OrbitUser 							:= 	'svc_orbithc_crk@mbs';
 	// EXPORT STRING OrbitPasswordProd				:=  'i2jk518A4Y'						; 
-	EXPORT STRING OrbitPasswordDev				:=  'i2jk518A4Y'						; // QA
+	// EXPORT STRING OrbitPasswordDev				:=  'i2jk518A4Y'						; // QA
 	EXPORT STRING OrbitPasswordProd				:=  '7bB3Ubom73'						; // Prod
 	EXPORT STRING SOAPService	(STRING s) 	:= 	'lex:' + s													;
 	EXPORT STRING OrbitRR			(STRING s)	:= 	s + 'Response/' + s + 'Result'			;
@@ -137,91 +137,11 @@ import std, AID_Support;
 	EXPORT STRING Namespace_F             :=  'http://lexisnexis.com/" xmlns:lex="http://lexisnexis.com/" xmlns:orb="http://lexisnexis.com/Orbit/" xmlns:arr="http://schemas.microsoft.com/2003/10/Serialization/Arrays';
 	EXPORT STRING SoapPath(STRING s)			:= 	'http://lexisnexis.com/IOrbitServiceGeneric/' + s ;
 	// EXPORT STRING BatchIds								:= 	'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ';
-	// EXPORT STRING	devOrbit 								:= 	'https://qa.orbit3.risk.regn.net/Orbit3/Orbit3Services/OrbitServiceGeneric.svc';
-	EXPORT STRING	devOrbit 								:= 	'https://orbitqa-hc.noam.lnrm.net/Orbit4Services/OrbitServiceGeneric.svc';
-	// EXPORT STRING	prodOrbit 							:= 	'https://orbit3.risk.regn.net/Orbit3/Orbit3Services/OrbitServiceGeneric.svc?Wsdl';
-	// EXPORT STRING	prodOrbit 							:= 	'https://orbithc.noam.lnrm.net/Orbit4Services/OrbitServiceGeneric.svc?wsdl';
-
-	// EXPORT STRING	RoxieServiceName 				:= 	'healthcare_sharecare_eligibility.eligibility_service_v3';
-	// EXPORT STRING	certRoxie_url 					:= 	'http://10.176.68.135:9876/';
-	// EXPORT STRING	prodRoxie_url						:= 	'http://10.176.71.3:9876/';
-	// EXPORT STRING	uatCertRoxie_url				:= 	'http://10.176.68.132:9876/';
-	// EXPORT STRING	uatProdRoxie_url				:= 	'http://10.176.71.5:9876/';
-  // EXPORT STRING	Env_Var_Name 						:= 	'sharecare_build_version';
+	// EXPORT STRING	devOrbit 								:= 	'https://orbitqa-hc.noam.lnrm.net/Orbit4Services/OrbitServiceGeneric.svc';
+	EXPORT STRING	prodOrbit 							:= 	'https://orbithc.noam.lnrm.net/Orbit4Services/OrbitServiceGeneric.svc?wsdl';
 
   EXPORT STRING	CRKDatasetname 					:= 	'CRK - LexisNexisRiskSolutions';
-  // EXPORT STRING	RoxieEnvironmentProd		:= 	'H';
-  // EXPORT STRING	RoxieEnvironmentUat			:= 	'HU';
-  // EXPORT STRING	UpdateProd_Email_list 	:= 	'BocaRoxiePackageTeam@lexisnexis.com;Richard.Wiggins@lexisnexisrisk.com;David.J.Miller@lexisnexisrisk.com;albert.metzmaier@lexisnexisrisk.com;Jorge.Diaz@lexisnexisrisk.com;Yeng.Vang@lexisnexisrisk.com;Joseph.Schaedler@lexisnexisrisk.com;Jaymes.Kloehn@lexisnexisrisk.com';
-  // EXPORT STRING	UpdateUatProd_Email_list:= 	'BocaRoxiePackageTeam@lexisnexis.com;Richard.Wiggins@lexisnexisrisk.com;David.J.Miller@lexisnexisrisk.com;albert.metzmaier@lexisnexisrisk.com;Jorge.Diaz@lexisnexisrisk.com;yeng.vang@lexisnexisrisk.com;joseph.schaedler@lexisnexisrisk.com';
-
-	// EXPORT STRING EligibilityBuildName		:= 	'AutoBuild_Sharecare_Eligibility'		;
-	// EXPORT STRING LabsBuildName						:= 	'AutoBuild_Sharecare_Labs'					;
-	// EXPORT STRING EmbraceBuildName				:= 	'AutoBuild_Sharecare_Embrace'				;
-	// EXPORT STRING MedicalClaimsBuildName	:= 	'AutoBuild_Sharecare_MedicalClaims'	;
-	// EXPORT STRING RxClaimsBuildName				:= 	'AutoBuild_Sharecare_RxClaims'			;
-	// EXPORT STRING CorrectionsBuildName		:= 	'AutoBuild_Sharecare_Corrections'		;	
-	// EXPORT STRING ReferralBuildName				:= 	'Auto_Build_Sharecare_Referral'		;	
-	// EXPORT STRING EventsBuildName					:= 	'Auto_Build_Sharecare_Events'		;
-	// EXPORT STRING GuidShiftBuildName			:= 	'Auto_Build_Sharecare_GuidShiftTracker'		;
 	
-	// EXPORT STRING EligibilityMasterBuildName			:= 	'Sharecare_Base_Eligibility'					;
-	// EXPORT STRING LabsMasterBuildName				  		:= 	'Sharecare_Base_Labs'									;
-	// EXPORT STRING EmbraceMasterBuildName					:= 	'Sharecare_Base_EmbraceID'						;
-	// EXPORT STRING MedicalClaimsMasterBuildName		:= 	'Sharecare_Base_MedicalClaims'				;
-	// EXPORT STRING RxClaimsMasterBuildName					:= 	'Sharecare_Base_RxClaims'							;
-	// EXPORT STRING CorrecctionsMasterBuildName			:= 	'Sharecare_Base_Corrections'					;
-	// EXPORT STRING ExternalEventsMasterBuildName		:= 	'Sharecare_Base_Events'								;
-	// EXPORT STRING ReferralsMasterBuildName				:= 	'Sharecare_Base_Referrals'						;
-	// EXPORT STRING GuidShiftTrackerMasterBuildName	:= 	'Sharecare_Base_GuidShiftTracker'			;
-	
-	// EXPORT STRING MasterFFProdFromTO			:= 	'Sharecare Production'								;
-	// EXPORT STRING MasterFFPreProdFromTO		:= 	'Sharecare PRE Production'						;
-	// EXPORT STRING MasterFFCertFromTO			:= 	'Sharecare Certification'							;
-	// EXPORT STRING MasterFFUATFromTO				:= 	'Sharecare User Acceptance Test'			;
-	
-	// Below value differs for Dev 
-
-	// EXPORT STRING EligibilityMasterFFProd			:= 	'6476'	;
-	// EXPORT STRING EligibilityMasterFFPreProd	:= 	'6540'	;
-	// EXPORT STRING EligibilityMasterFFCert			:= 	'6536'	;
-	// EXPORT STRING EligibilityMasterFFUAT			:= 	'6538'	;	
-	
-	// EXPORT STRING MedClaimsMasterFFProd			:= 	'6484'	;
-	// EXPORT STRING MedClaimsMasterFFPreProd	:= 	'6482'	;
-	// EXPORT STRING MedClaimsMasterFFCert			:= 	'6478'	;
-	// EXPORT STRING MedClaimsMasterFFUAT			:= 	'6480'	;
-
-	// EXPORT STRING LabsMasterFFProd			:= 	'6502'	;
-	// EXPORT STRING LabsMasterFFPreProd		:= 	'6504'	;
-	// EXPORT STRING LabsMasterFFCert			:= 	'6506'	;
-	// EXPORT STRING LabsMasterFFUAT				:= 	'6508'	;
-	
-	// EXPORT STRING RxClaimsMasterFFProd			:= 	'6524'	;
-	// EXPORT STRING RxClaimsMasterFFPreProd		:= 	'6526'	;
-	// EXPORT STRING RxClaimsMasterFFCert			:= 	'6528'	;
-	// EXPORT STRING RxClaimsMasterFFUAT				:= 	'6530'	;
-
-	// EXPORT STRING ExternalEventsMasterFFProd		:= '6520';
-	// EXPORT STRING ExternalEventsMasterFFPreProd	:= '6518';
-	// EXPORT STRING ExternalEventsMasterFFCert		:= '6514';
-	// EXPORT STRING ExternalEventsMasterFFUAT			:= '6516';
-
-	// EXPORT STRING ReferralsMasterFFProd			:= '6548';
-	// EXPORT STRING ReferralsMasterFFPreProd	:= '6546';
-	// EXPORT STRING ReferralsMasterFFCert			:= '6544';
-	// EXPORT STRING ReferralsMasterFFUAT			:= '6550';
-
-	// EXPORT STRING GuidShiftTrackerMasterFFProd		:= '6586';
-	// EXPORT STRING GuidShiftTrackerMasterFFPreProd	:= '6584';
-	// EXPORT STRING GuidShiftTrackerMasterFFCert		:= '6582';
-	// EXPORT STRING GuidShiftTrackerMasterFFUAT			:= '6588';
-
-	// EXPORT STRING OrbitSubBuildMaster			:= 	'SubmissionBuildMaster'							;
-	// EXPORT STRING OrbitCVBuildMaster			:= 	'CVBuildMaster'											;
-	// EXPORT STRING OrbitSubBuild						:= 	'SubmissionBuild'										;
-	// EXPORT STRING OrbitCVBuild						:= 	'CVBuild'														;
-	// EXPORT STRING OrbitGraveyard					:= 	'Graveyard'													;
 	EXPORT STRING OrbitFailed							:= 	'Failed'														;
 	EXPORT STRING OrbitLoaded							:= 	'Loaded'														;
 	EXPORT STRING OrbitReceived						:= 	'Received'													;
@@ -258,21 +178,22 @@ import std, AID_Support;
 
 	//----------------------------------------------------------------------------------------------
 	// The following will cause dev to skip Orbit interactions.  Sandbox to test in Dev
-	// EXPORT boolean UseOrbit               := IF(WhereAmI = daliDev, false, true);
-	EXPORT boolean UseOrbit               := true; //IF(WhereAmI = daliDev, false, false);   // no orbit yet
+	EXPORT boolean UseOrbit               := true;
+	// EXPORT boolean UseOrbit               := IF(WhereAmI = daliDev, false, false);   // no orbit yet
 	
-	EXPORT STRING targetURL	 							:= devOrbit;
-																							// TRIM	(
+	EXPORT STRING targetURL	 							:= prodOrbit; 
+																						// TRIM	(
 																									// CASE	( 	WhereAmI
-																													// , daliProd 	=> devOrbit // prodOrbit
+																													// , daliProd 	=> prodOrbit
 																													// ,	daliDev 	=> devOrbit
+																													// ,	'Unknown' 
 																													// ,	devOrbit
 																												// )
 																								// )	;
-	EXPORT STRING OrbitPassword 	 				:= OrbitPasswordDev;
+	EXPORT STRING OrbitPassword 	 				:= OrbitPasswordProd;
 																						// TRIM	(
 																									// CASE	( 	WhereAmI
-																													// , daliProd 	=> OrbitPasswordDev // OrbitPasswordProd
+																													// , daliProd 	=> OrbitPasswordProd
 																													// ,	daliDev 	=> OrbitPasswordDev
 																													// ,	'Unknown' 
 																												// )
