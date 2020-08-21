@@ -78,6 +78,8 @@ self.BIRTH_DT := Prof_License_preprocess.dateconv( STD.Str.FilterOut ( TRIM(l.BI
 self.ACCIDENT_DT := Prof_License_preprocess.dateconv( STD.Str.FilterOut ( TRIM(l.ACCIDENT_DT) , '-/'));
 self.ADMIT_DT := Prof_License_preprocess.dateconv( STD.Str.FilterOut ( TRIM(l.ADMIT_DT) , '-/'));
 self.DISCHARGE_DT := Prof_License_preprocess.dateconv( STD.Str.FilterOut ( TRIM(l.DISCHARGE_DT) , '-/'));
+self.FIRST_NAME := STD.Str.ToUpperCase ( l.FIRST_NAME);
+self.LAST_NAME := STD.Str.ToUpperCase ( l.LAST_NAME);
 self  := l;
 end;
 
