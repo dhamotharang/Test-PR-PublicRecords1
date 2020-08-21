@@ -1244,6 +1244,11 @@
 		export string KEYWORD_NOGA									:= '930';
 		export string KEYWORD_IUUVES								:= '931';
 		export string KEYWORD_TWMOJ_INT							:= '932';
+		export string KEYWORD_UZDCEC_INT						:= '933';
+		export string KEYWORD_OFAC_HK_EO13936				:= '934';
+		export string KEYWORD_NOKT									:= '935';
+		export string KEYWORD_UZDCEC_NAT						:= '936';
+		export string KEYWORD_PHDENR								:= '937';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

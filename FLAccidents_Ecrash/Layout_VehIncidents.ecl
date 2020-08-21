@@ -127,6 +127,7 @@
 		STRING60 transported_to;
 		STRING20 dispatch_time;
 		STRING1 ready_to_sell_data;
+    STRING3 page_count;
 		//PRtcc enum fields
 		DATASET(enum_code_desc) report_weather_condition;
 		DATASET(enum_code_desc) report_road_condition;

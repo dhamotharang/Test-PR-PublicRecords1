@@ -215,7 +215,7 @@ EXPORT FileModule(string esp = ''
       self.dFParts := dParts;
     END;
     
-		dGetNodesAndParts := project(dTopology, xform(left,COUNTER));
+		dGetNodesAndParts := project(dTopology(isNodeUp), xform(left,COUNTER));
 		rParts - dFParts xNormPath(dGetNodesAndParts l, STD.File.FsFilenameRecord r) := transform
       self.partname := r.name;
       self := l;
