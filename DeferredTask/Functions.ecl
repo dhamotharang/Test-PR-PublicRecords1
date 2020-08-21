@@ -44,7 +44,9 @@ EXPORT Functions := MODULE;
         SELF.RequestOpaqueContent := R.RequestOpaqueContent;
         END;
 
-        NormedDTERecs := NORMALIZE(FlattenDTERecs, LEFT.TaskExs,normalizeChildDS(LEFT,RIGHT));
+        NormedDTERecs := IF(COUNT(FlattenDTERecs.TaskExs) > 0, 
+        NORMALIZE(FlattenDTERecs, LEFT.TaskExs,normalizeChildDS(LEFT,RIGHT)), 
+        PROJECT(FlattenDTERecs, TRANSFORM(DeferredTask.Layouts.FlattenedDTERequestInfoLayoutWFlatTaskExs, SELF := LEFT; SELF := [])));
         
         OutLayout := RECORD
         DeferredTask.Layouts.FlattenedDTERequestInfoLayoutWFlatTaskExs;

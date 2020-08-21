@@ -70,19 +70,9 @@ export MLA_error_desc(string5 error_code) := function
 	return desc;
 end;
 
-export StatusRefresh_error_desc(string5 error_code) := FUNCTION
-    desc := map(
-			trim(error_code) = '22' => 'Error occurred in status refresh.',
-			'');
-	return desc;
-END;
+export StatusRefresh_error_desc := 'Error occurred in status refresh.';
 
-export DTE_error_desc(string5 error_code) := FUNCTION
-    desc := map(
-			trim(error_code) = '41' => 'The requested public record was not available.',
-			'');
-	return desc;
-END;
+export DTE_error_desc := 'The requested public record was not available.';
 
 export set_Valid_Name_Suffix := ['', 'JR', 'SR', 'ST', 'ND', 'RD', 'TH'];
 

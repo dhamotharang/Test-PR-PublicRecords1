@@ -60,7 +60,7 @@ Suppressed_Judgments :=  StatusRefreshModule.SuppressRecordsJudgments();
 
 riskview5_status_refresh_error := IF(StatusRefreshRecommendGWError OR StatusRefreshGWError, 
 PROJECT(riskview5_final_results, TRANSFORM(RECORDOF(LEFT),
-SELF.Exception_Code := '22';
+SELF.Exception_Code := '22OKC';
 SELF := LEFT;
 )));
 
@@ -147,9 +147,27 @@ SELF.TaskDescription := 'Status Refresh Task';
 SELF.Request_XML := '<Request_XML><RMSID>' + LEFT.RMSID + '</RMSID>' + '<TMSID>' + LEFT.TMSID + '</TMSID></Request_XML>';
 )), NAMED('LOG_Deferred_Task_ESP')));
 
+riskview_final_results_with_deferred := IF(COUNT(StatusRefreshResults) > 0,
+                                                                    PROJECT(riskview5_final_results, 
+                                                                    TRANSFORM(RECORDOF(LEFT), 
+                                                                    SELF.Status_Code := '0'; 
+                                                                    SELF.Message := 'Request has been submitted';
+                                                                    SELF.TransactionID := StatusRefreshResults[1].response._Header.TransactionID;
+                                                                    SELF := LEFT;)),
+                                                                    riskview5_final_results);
+                                                                    
+riskview5_suppressed_with_deferred := IF(COUNT(StatusRefreshResults) > 0,
+                                                                    PROJECT(riskview5_suppressed, 
+                                                                    TRANSFORM(RECORDOF(LEFT), 
+                                                                    SELF.Status_Code := '0';
+                                                                    SELF.Message := 'Request has been submitted';
+                                                                    SELF.TransactionID := StatusRefreshResults[1].response._Header.TransactionID;
+                                                                    SELF := LEFT;)),
+                                                                    riskview5_suppressed);
+
 RETURN MAP(StatusRefreshRecommendGWError OR StatusRefreshGWError => riskview5_status_refresh_error,
-                          (REAL)ESPInterfaceVersion >= 2.4 AND (REAL)ESPInterfaceVersion < 2.5 => riskview5_final_results,
-                          riskview5_suppressed);
+                          (REAL)ESPInterfaceVersion >= 2.4 AND (REAL)ESPInterfaceVersion < 2.5 => riskview_final_results_with_deferred,
+                          riskview5_suppressed_with_deferred);
 END; // JuLiProcessStatusRefresh END
 
   EXPORT Format_riskview_attrs(Dataset(riskview.layouts.layout_riskview5_search_results) Search_results,
