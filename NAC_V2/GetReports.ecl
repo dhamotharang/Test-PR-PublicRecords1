@@ -46,6 +46,8 @@ EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string ilfn) := function
 
 		errs := DISTRIBUTE((+)(addresses.dsErrs,clients.dsErrs,cases.dsErrs,contacts.dsErrs,exceptions.dsErrs,badRecords.dsErrs), RANDOM());
 
+
+
 		total := COUNT(nac2);
 		nErrors := COUNT(errs(Severity='E'));
 		nWarnings := COUNT(errs(Severity='W'));
@@ -57,7 +59,48 @@ EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string ilfn) := function
 		ExcessiveInvalidRecordsFound :=	(total=0) OR (err_rate	> $.Mod_Sets.threshld);
 
 
-		ncr := nac_v2.Print.NCR2_Report(fn, errs, total, nErrors, nWarnings, 'XX', ExcessiveInvalidRecordsFound);
+
+	addresses_programcodes := TABLE(addresses, {addresses.programcode, cnt:= COUNT(GROUP)}, programcode);
+	cases_programcodes := TABLE(cases, {cases.programcode, cnt:= COUNT(GROUP)}, programcode);
+	clients_programcodes := TABLE(clients, {clients.programcode, cnt:= COUNT(GROUP)}, programcode);
+	all_programs := SORT(addresses_programcodes + cases_programcodes + clients_programcodes, programcode, LOCAL);
+	tbl_programs := TABLE(all_programs, {all_programs.programcode, sumprogs:= SUM(GROUP, all_programs.cnt)}, programcode );
+
+	NAC_V2.Layouts2.rItemSummary transform_programs(RECORDOF(tbl_programs) l) := TRANSFORM
+		SELF.itemcode := l.programcode;
+		SELF.counts :=  l.sumprogs;
+	END;
+	ds_programs01 := PROJECT(tbl_programs, transform_programs(LEFT));
+
+	programs_fake := DATASET(
+	[
+		{'T','311'},
+		{'M','2'},
+		{'C','2340'},
+		{'N','9000'},
+		{'I','100'},
+		{'D','1200'},
+		{'P','40'}
+	], NAC_V2.Layouts2.rItemSummary);
+
+		programs :=  ds_programs01 + programs_fake;
+ 		//programs := SORT(ds_programs01 , itemcode, LOCAL);
+ 		
+		 
+
+
+
+	types01 := SORT(Nac_V2.ExtractRecords(ilfn).Types, RecordCode, LOCAL);
+	NAC_V2.Layouts2.rItemSummary transform_types(RECORDOF(types01) l) := TRANSFORM
+		SELF.itemcode := l.recordcode;
+		SELF.counts :=  l.n;
+	END;
+	types := PROJECT(types01, transform_types(LEFT));
+
+
+
+
+		ncr := nac_v2.Print.NCR2_Report(fn, errs, total, nErrors, nWarnings, 'XX', ExcessiveInvalidRecordsFound, programs, types);
 
 		ncd := nac_v2.Print.NCD2_Report(fn, errs, total, nErrors, nWarnings, nWarned, nRejected, 'XX', ExcessiveInvalidRecordsFound);
 

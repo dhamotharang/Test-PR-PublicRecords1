@@ -71,13 +71,19 @@ EXPORT Send_Email(string filedate='',string fn='', string groupid='') := MODULE
 								,'File not found -> '+fn
 							);
 
-	EXPORT FileValidationReport
-						:= SendMail(
-								NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('File Input Notifications', groupid)
-								,'NCF2 Contributory File Validation Report'
-								,$.Print.NCR2_to_Text(fn)
-							);
 
+
+// nac2 := NAC_V2.PreprocessNCF2(fn);
+// dsNcr2 := NAC_V2.GetReports(nac2, fn).dsNcr2;
+
+	EXPORT FileValidationReport
+						:=  
+						   SendMail(
+							//	NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('File Input Notifications', groupid)
+								'radames.ortega@lexisnexisrisk.com'
+								,'NCF2 Contributory File Validation Report'
+								,  NAC_V2.Print.NCR2_to_Text(NAC_V2.GetReports(NAC_V2.PreprocessNCF2(fn), fn).dsNcr2)			 
+							);
 
 END; 
 
