@@ -101,7 +101,10 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
     
  // don't log the lexid if the person got a noscore
     self.inquiry_lexid := if(riskview.constants.noScoreAlert in [ri.Alert1,ri.Alert2,ri.Alert3,ri.Alert4,ri.Alert5,ri.Alert6,ri.Alert7,ri.Alert8,ri.Alert9,ri.Alert10], '', ri.LexID);
-    
+        SELF.Exception_Code := IF(ri.Exception_Code = '22OKC', '22', ri.Exception_Code);
+        SELF.Exception_Message := MAP(ri.Exception_Code = '22OKC' => RiskView.Constants.StatusRefresh_error_desc,
+                                                                      TRIM(ri.Exception_Code, ALL) = '41' => RiskView.Constants.DTE_error_desc,
+                                                                       '');
 		self.Liens1_Seq          := ri.LnJliens[1].Seq;
 		self.Liens1_DateFiled    := ri.LnJliens[1].DateFiled;
   self.Liens1_LienTypeID   := ri.LnJliens[1].LienTypeID;

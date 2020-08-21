@@ -906,7 +906,10 @@ export layout_riskview5_search_results := record
 	string10 Custom4_Type := '';	
 	string10 Custom5_Type := '';
 	iesp.riskview2.t_RiskView2Report report;
-  string5  Exception_code := '';
+    string5 Exception_code := '';
+    string5 Status_Code := '';
+    string256 Message := '';
+    string16 TransactionID := '';
 	dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
 	string3	 Billing_Index2 := '';
 	Risk_Indicators.Layouts_Derog_Info.LJ_Records;
@@ -1034,7 +1037,8 @@ end;
 export layout_riskview5_batch_response := record
 	string30 acctno;
 	layout_riskview5;
-  string5  Exception_code := '';
+    string5  Exception_code := '';
+    string256 Exception_message := '';
 	string3	 Billing_Index2 := '';
 	layout_riskview_lnj_batch;
 	STRING12 inquiry_lexid := '';
