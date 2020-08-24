@@ -1,3 +1,6 @@
+﻿/*2015-11-16T20:58:47Z (Srilatha Katukuri)
+#193680 - CR323
+*/
 /*2015-07-24T21:31:44Z (Srilatha Katukuri)
 #173256
 */
@@ -8,11 +11,12 @@
 /*2015-02-11T00:44:35Z (Ayeesha Kayttala)
 bug# 173256 - code review 
 */
-Import Data_Services, doxie,FLAccidents;
+Import Data_Services, doxie,FLAccidents, STD;
 
  // Allowing only EA agency and iyetek
  
-in_accnbr := FLAccidents_Ecrash.key_EcrashV2_accnbrv1(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3']);
+in_accnbr := FLAccidents_Ecrash.key_EcrashV2_accnbrv1(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and 
+																											(trim(report_type_id,all) in ['A','DE'] or STD.str.ToUpperCase(trim(vendor_code,left,right)) = 'CMPD'));
                             														
 // parsing 40 char reportnumber 
 slim := record 
@@ -72,7 +76,7 @@ end;
 
 parse_report := project(in_accnbr, transform(slim, 
 
-  part_num := if(trim(stringlib.StringFilterout(left.l_accnbr,'0-'),left,right) ='' , '', trim(left.l_accnbr,left,right));
+  part_num := if(trim(STD.Str.FilterOut(left.l_accnbr,'0-'),left,right) ='' , '', trim(left.l_accnbr,left,right));
   
   SELF.f1 := part_num[1..4];
   SELF.f2 := if(length(trim(part_num[2..5],left,right)) < 4 , '',part_num[2..5]) ;
@@ -177,10 +181,10 @@ end;
 	norm_report := normalize(parse_report, 37, tslim(left, counter))(partial_report_nbr <>''); 
 	 
  clean_partnbr := dedup(distribute(project(norm_report , transform(slim_rec , 
-          self.partial_report_nbr := if(trim(stringlib.StringFilterout(left.partial_report_nbr,'0-'),left,right) ='' , '', trim(left.partial_report_nbr,left,right)),
+          self.partial_report_nbr := if(trim(STD.Str.FilterOut(left.partial_report_nbr,'0-'),left,right) ='' , '', trim(left.partial_report_nbr,left,right)),
 					self := left))(partial_report_nbr <>''),hash(l_accnbr)), all,local);
 	 
 export Key_EcrashV2_Partial_Report_Nbr := index(clean_partnbr,{partial_report_nbr,report_code, jurisdiction_state,jurisdiction,accident_date} ,{l_accnbr,orig_Accnbr,addl_report_number, report_type_id,work_type_id,vendor_code,vendor_report_id,Idfield,ReportLinkID }
 																								 ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_partialaccnbr_' + doxie.Version_SuperKey);
-																								 
+																							
 																								 
