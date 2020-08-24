@@ -116,6 +116,7 @@ EXPORT Functions := MODULE
         SELF.CustomerId := RIGHT.customer_id,
         SELF.CompanyId := RIGHT.company_id,
         SELF.GCId := RIGHT.global_company_id,
+        SELF.ReportOptions  := RIGHT.report_options;
         SELF:=[]),
       KEEP($.Constants.MaxIHperLexId),LIMIT(0));
 
