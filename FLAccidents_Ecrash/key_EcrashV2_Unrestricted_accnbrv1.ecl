@@ -10,7 +10,7 @@ Filter_CRU := FLAccidents_Ecrash.File_KeybuildV2.out(report_code not in ['EA','T
 // eCrash Reports:  normalize addl_report_number for ecrash TM,TF and EA work type 1,0
 NormAddlRpt := project(EcrashAndCru(trim(addl_report_number,left,right) not in ['','0','UNK', 'UNKNOWN'] and work_type_id not in ['2','3']), 
                        transform( {EcrashAndCru},
-                                 self.accident_nbr := STD.Str.Filter(left.addl_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+                                 self.accident_nbr := stringlib.StringFilter(left.addl_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
                                  self := left;)); 
 
 crash_accnbr_base_norm := (EcrashAndCru + NormAddlRpt + Filter_CRU (vin+driver_license_nbr+tag_nbr+lname <> '')) (trim(accident_nbr,left,right)<> '');

@@ -1,6 +1,6 @@
-﻿Import Data_Services, doxie,FLAccidents;
+Import Data_Services, doxie,FLAccidents;
 
-allrecs := FLAccidents_Ecrash.File_KeybuildV2.prout;
+allrecs := FLAccidents_Ecrash.File_KeybuildV2.out;
 dst_bdid_base := distribute(allrecs(b_did<>'',b_did<>'000000000000'), hash(b_did, orig_accnbr));
 srt_bdid_base := sort(dst_bdid_base, b_did, orig_accnbr, local);
 ded_bdid_base := dedup(srt_bdid_base, b_did, orig_accnbr, local);  

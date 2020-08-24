@@ -1,13 +1,9 @@
-﻿/*2017-03-22T17:49:34Z (Srilatha Katukuri)
-ECH-4531 Analytics key Injury Count
-*/
 IMPORT FLAccidents_Ecrash, STD,doxie,Data_Services;
 
-BaseKey := FLAccidents_Ecrash.File_Keybuild_analytics;
+BaseKey := FLAccidents_Ecrash.File_KeybuildV2.out(report_code = 'EA' AND report_type_id = 'A' AND work_type_id NOT IN['2','3']);
 
-Dedup1 := DEDUP(SORT(DISTRIBUTE(BaseKey(DID > '0'),hash32(Vehicle_Incident_Id)),DID , Vehicle_Incident_id, local),DID , Vehicle_Incident_id,local);
-Dedup2 := DEDUP(SORT(DISTRIBUTE(BaseKey(DID = '0'), hash32(Vehicle_Incident_Id)), Vehicle_Incident_Id ,fname , lname , name_suffix , dob , driver_license_nbr,local)
-														,Vehicle_Incident_Id ,fname , lname , name_suffix , dob , driver_license_nbr, local );
+Dedup1 := DEDUP(BaseKey(DID > '0'),DID + Vehicle_Incident_id);
+Dedup2 := DEDUP(BaseKey(DID = '0'),Vehicle_Incident_Id + fname + lname + name_suffix);
 
 DedupedKey := SORT(Dedup1 + Dedup2, jurisdiction_nbr + Vehicle_Incident_id + Vehicle_unit_number);
 
