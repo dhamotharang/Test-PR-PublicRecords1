@@ -21,7 +21,7 @@ EXPORT BuildData(string pversion) := FUNCTION
 														Build_Exec_Base_File,
 														Build_Attr_Base_File
 														),
-													Promote(pversion).buildfiles.New2Built;													
+													Promote(pversion,'base').buildfiles.New2Built;													
 												)
 							,output('No Valid version parameter passed, skipping Cortera.BuildData atribute') 
 					 );

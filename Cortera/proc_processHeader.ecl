@@ -32,13 +32,13 @@ EXPORT proc_processHeader(dataset(cortera.Layout_Header) hdr, string8 version) :
 		//This is being done in the above transform itself.
 		//ds := Cortera.FixFirstSeen(ds1);
 								
-		us := ds(country='US');
+		//us := ds(country='US');
 									
-		clean := Cortera.proc_cleanAddresses(us);
+		clean := Cortera.proc_cleanAddresses(ds);
 		
-		linked := Cortera.proc_linkBiz(clean);
+		linked := Cortera.proc_linkBiz(clean(country='US'));
 		
-		restored := linked + ds(country<>'US');		// get all records
+		restored := linked + clean(country<>'US');		// get all records
 		
 		dated := cortera.proc_merge_hdr(restored, cortera.Files().Base.Header.qa, version);	// set dt_first_seen
 		
