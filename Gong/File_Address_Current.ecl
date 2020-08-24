@@ -1,9 +1,8 @@
 ﻿//gong key based on some address fields
-import doxie, gong, Data_Services, header_services;
+import doxie, gong, Data_Services, header_services, Gong_Neustar ;
 
 g := Gong.File_Gong_Full_Prepped_For_Keys(trim(prim_name)<>'', trim(z5)<>'');
 
-//CCPA-22 
 lraw := Gong.Layout_bscurrent_raw;
 
 // TODO: if "history" key will ever be adjusted, then it'd make sense to publish this layout
@@ -30,9 +29,6 @@ rec_address := record
   lraw.listed_name;
   string8 date_first_seen;// := lraw.filedate[1..8];
   lraw.dual_name_flag;
-	UNSIGNED6 DID:=0;
-	UNSIGNED4 global_sid:=0;
-	UNSIGNED8 record_sid:=0;
 end;
 
 rec_address addcn(g l) := transform
@@ -46,32 +42,8 @@ rec_address addcn(g l) := transform
 	self := l;
 end;
 
-/////////////////////////////////////////////////////////////
 
-layout_gong_inj := RECORD
- gong.Layout_history ;
- string2 eor ;
-END;
-
-header_services.Supplemental_Data.mac_verify('file_gong_inj.txt', layout_gong_inj , attr);
-
-Base_File_Append_In := attr();
-
-g  xTo_bscurrent_raw (Base_File_Append_In L ):= TRANSFORM
-
-	SELF := L ;
- 
-END ;
-
-File_Append_In:= project(Base_File_Append_In, xTo_bscurrent_raw(left)); // in gong.Layout_bscurrent_raw format
-
-all_in := g + File_Append_In ;
-
-////////////////////////////////////////////////////
-
-
-
-wcn := dedup (sort (project (all_in, addcn(left)), record), record) : persist('~thor_data400::persist::gong::address_current'); //"record" is temporarily here, I hope.
+wcn := dedup (sort (project (Gong_Neustar.Prep_Build.applyGong(g), addcn(left)), record), record) : persist('~thor_data400::persist::gong::address_current'); //"record" is temporarily here, I hope.
 
 
 
