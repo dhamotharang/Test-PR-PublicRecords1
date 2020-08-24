@@ -3,8 +3,8 @@ IMPORT Scrubs,Scrubs_Govdata; // Import modules for FieldTypes attribute definit
 EXPORT Base_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 13;
-  EXPORT NumRulesFromFieldType := 13;
+  EXPORT NumRules := 15;
+  EXPORT NumRulesFromFieldType := 15;
   EXPORT NumRulesFromRecordType := 0;
   EXPORT NumFieldsWithRules := 12;
   EXPORT NumFieldsWithPossibleEdits := 0;
@@ -45,7 +45,7 @@ EXPORT FromNone(DATASET(Base_Layout_SEC_BrokerDealer) h) := MODULE
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Base_Layout_SEC_BrokerDealer);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.dt_first_reported_Invalid << 0 ) + ( le.dt_last_reported_Invalid << 1 ) + ( le.cik_number_Invalid << 2 ) + ( le.company_name_Invalid << 3 ) + ( le.address1_Invalid << 5 ) + ( le.address2_Invalid << 6 ) + ( le.city_Invalid << 7 ) + ( le.state_code_Invalid << 8 ) + ( le.zip_code_Invalid << 9 ) + ( le.irs_taxpayer_id_Invalid << 10 ) + ( le.fname_Invalid << 11 ) + ( le.is_company_flag_Invalid << 12 );
+    SELF.ScrubsBits1 := ( le.dt_first_reported_Invalid << 0 ) + ( le.dt_last_reported_Invalid << 1 ) + ( le.cik_number_Invalid << 2 ) + ( le.company_name_Invalid << 3 ) + ( le.address1_Invalid << 5 ) + ( le.address2_Invalid << 7 ) + ( le.city_Invalid << 9 ) + ( le.state_code_Invalid << 10 ) + ( le.zip_code_Invalid << 11 ) + ( le.irs_taxpayer_id_Invalid << 12 ) + ( le.fname_Invalid << 13 ) + ( le.is_company_flag_Invalid << 14 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -58,14 +58,14 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.dt_last_reported_Invalid := (le.ScrubsBits1 >> 1) & 1;
     SELF.cik_number_Invalid := (le.ScrubsBits1 >> 2) & 1;
     SELF.company_name_Invalid := (le.ScrubsBits1 >> 3) & 3;
-    SELF.address1_Invalid := (le.ScrubsBits1 >> 5) & 1;
-    SELF.address2_Invalid := (le.ScrubsBits1 >> 6) & 1;
-    SELF.city_Invalid := (le.ScrubsBits1 >> 7) & 1;
-    SELF.state_code_Invalid := (le.ScrubsBits1 >> 8) & 1;
-    SELF.zip_code_Invalid := (le.ScrubsBits1 >> 9) & 1;
-    SELF.irs_taxpayer_id_Invalid := (le.ScrubsBits1 >> 10) & 1;
-    SELF.fname_Invalid := (le.ScrubsBits1 >> 11) & 1;
-    SELF.is_company_flag_Invalid := (le.ScrubsBits1 >> 12) & 1;
+    SELF.address1_Invalid := (le.ScrubsBits1 >> 5) & 3;
+    SELF.address2_Invalid := (le.ScrubsBits1 >> 7) & 3;
+    SELF.city_Invalid := (le.ScrubsBits1 >> 9) & 1;
+    SELF.state_code_Invalid := (le.ScrubsBits1 >> 10) & 1;
+    SELF.zip_code_Invalid := (le.ScrubsBits1 >> 11) & 1;
+    SELF.irs_taxpayer_id_Invalid := (le.ScrubsBits1 >> 12) & 1;
+    SELF.fname_Invalid := (le.ScrubsBits1 >> 13) & 1;
+    SELF.is_company_flag_Invalid := (le.ScrubsBits1 >> 14) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -81,7 +81,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     company_name_LENGTHS_ErrorCount := COUNT(GROUP,h.company_name_Invalid=2);
     company_name_Total_ErrorCount := COUNT(GROUP,h.company_name_Invalid>0);
     address1_CUSTOM_ErrorCount := COUNT(GROUP,h.address1_Invalid=1);
+    address1_LENGTHS_ErrorCount := COUNT(GROUP,h.address1_Invalid=2);
+    address1_Total_ErrorCount := COUNT(GROUP,h.address1_Invalid>0);
     address2_CUSTOM_ErrorCount := COUNT(GROUP,h.address2_Invalid=1);
+    address2_LENGTHS_ErrorCount := COUNT(GROUP,h.address2_Invalid=2);
+    address2_Total_ErrorCount := COUNT(GROUP,h.address2_Invalid>0);
     city_CUSTOM_ErrorCount := COUNT(GROUP,h.city_Invalid=1);
     state_code_CUSTOM_ErrorCount := COUNT(GROUP,h.state_code_Invalid=1);
     zip_code_CUSTOM_ErrorCount := COUNT(GROUP,h.zip_code_Invalid=1);
@@ -96,9 +100,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.dt_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.cik_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_Total_ErrorCount > 0, 1, 0) + IF(le.address1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.address2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.city_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.state_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.irs_taxpayer_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.is_company_flag_ENUM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.dt_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.cik_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_Total_ErrorCount > 0, 1, 0) + IF(le.address1_Total_ErrorCount > 0, 1, 0) + IF(le.address2_Total_ErrorCount > 0, 1, 0) + IF(le.city_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.state_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.irs_taxpayer_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.is_company_flag_ENUM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.dt_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.cik_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.address1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.address2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.city_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.state_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.irs_taxpayer_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.is_company_flag_ENUM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.dt_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.cik_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.company_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.address1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.address1_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.address2_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.address2_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.city_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.state_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.zip_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.irs_taxpayer_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.fname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.is_company_flag_ENUM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -120,8 +124,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.dt_last_reported_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.cik_number_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.company_name_Invalid,'CUSTOM','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.address1_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.address2_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.address1_Invalid,'CUSTOM','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.address2_Invalid,'CUSTOM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.city_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.state_code_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.zip_code_Invalid,'CUSTOM','UNKNOWN')
@@ -129,7 +133,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.fname_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.is_company_flag_Invalid,'ENUM','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'dt_first_reported','dt_last_reported','cik_number','company_name','address1','address2','city','state_code','zip_code','irs_taxpayer_id','fname','is_company_flag','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'Invalid_Date','Invalid_Date','Invalid_numeric','Invalid_mandatory_alpha','Invalid_alpha','Invalid_alpha','Invalid_alpha','Invalid_St','Invalid_zip','Invalid_numeric','invalid_fname','Invalid_company_flag','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'Invalid_Date','Invalid_Date','Invalid_numeric','Invalid_mandatory_alpha','Invalid_mandatory_alpha','Invalid_mandatory_alpha','Invalid_alpha','Invalid_St','Invalid_zip','Invalid_numeric_optional','invalid_fname','Invalid_company_flag','UNKNOWN');
     SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.dt_first_reported,(SALT311.StrType)le.dt_last_reported,(SALT311.StrType)le.cik_number,(SALT311.StrType)le.company_name,(SALT311.StrType)le.address1,(SALT311.StrType)le.address2,(SALT311.StrType)le.city,(SALT311.StrType)le.state_code,(SALT311.StrType)le.zip_code,(SALT311.StrType)le.irs_taxpayer_id,(SALT311.StrType)le.fname,(SALT311.StrType)le.is_company_flag,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,12,Into(LEFT,COUNTER));
@@ -147,12 +151,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'dt_last_reported:Invalid_Date:CUSTOM'
           ,'cik_number:Invalid_numeric:CUSTOM'
           ,'company_name:Invalid_mandatory_alpha:CUSTOM','company_name:Invalid_mandatory_alpha:LENGTHS'
-          ,'address1:Invalid_alpha:CUSTOM'
-          ,'address2:Invalid_alpha:CUSTOM'
+          ,'address1:Invalid_mandatory_alpha:CUSTOM','address1:Invalid_mandatory_alpha:LENGTHS'
+          ,'address2:Invalid_mandatory_alpha:CUSTOM','address2:Invalid_mandatory_alpha:LENGTHS'
           ,'city:Invalid_alpha:CUSTOM'
           ,'state_code:Invalid_St:CUSTOM'
           ,'zip_code:Invalid_zip:CUSTOM'
-          ,'irs_taxpayer_id:Invalid_numeric:CUSTOM'
+          ,'irs_taxpayer_id:Invalid_numeric_optional:CUSTOM'
           ,'fname:invalid_fname:CUSTOM'
           ,'is_company_flag:Invalid_company_flag:ENUM'
           ,'field:Number_Errored_Fields:SUMMARY'
@@ -167,8 +171,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,Base_Fields.InvalidMessage_dt_last_reported(1)
           ,Base_Fields.InvalidMessage_cik_number(1)
           ,Base_Fields.InvalidMessage_company_name(1),Base_Fields.InvalidMessage_company_name(2)
-          ,Base_Fields.InvalidMessage_address1(1)
-          ,Base_Fields.InvalidMessage_address2(1)
+          ,Base_Fields.InvalidMessage_address1(1),Base_Fields.InvalidMessage_address1(2)
+          ,Base_Fields.InvalidMessage_address2(1),Base_Fields.InvalidMessage_address2(2)
           ,Base_Fields.InvalidMessage_city(1)
           ,Base_Fields.InvalidMessage_state_code(1)
           ,Base_Fields.InvalidMessage_zip_code(1)
@@ -187,8 +191,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.dt_last_reported_CUSTOM_ErrorCount
           ,le.cik_number_CUSTOM_ErrorCount
           ,le.company_name_CUSTOM_ErrorCount,le.company_name_LENGTHS_ErrorCount
-          ,le.address1_CUSTOM_ErrorCount
-          ,le.address2_CUSTOM_ErrorCount
+          ,le.address1_CUSTOM_ErrorCount,le.address1_LENGTHS_ErrorCount
+          ,le.address2_CUSTOM_ErrorCount,le.address2_LENGTHS_ErrorCount
           ,le.city_CUSTOM_ErrorCount
           ,le.state_code_CUSTOM_ErrorCount
           ,le.zip_code_CUSTOM_ErrorCount
@@ -207,8 +211,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.dt_last_reported_CUSTOM_ErrorCount
           ,le.cik_number_CUSTOM_ErrorCount
           ,le.company_name_CUSTOM_ErrorCount,le.company_name_LENGTHS_ErrorCount
-          ,le.address1_CUSTOM_ErrorCount
-          ,le.address2_CUSTOM_ErrorCount
+          ,le.address1_CUSTOM_ErrorCount,le.address1_LENGTHS_ErrorCount
+          ,le.address2_CUSTOM_ErrorCount,le.address2_LENGTHS_ErrorCount
           ,le.city_CUSTOM_ErrorCount
           ,le.state_code_CUSTOM_ErrorCount
           ,le.zip_code_CUSTOM_ErrorCount

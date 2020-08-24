@@ -17,11 +17,12 @@ NAMESCOPE:Base
 // If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running
 // a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
 FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.functions.fn_valid_date>0)
-FIELDTYPE:Invalid_numeric:CUSTOM(Scrubs.functions.fn_numeric>0)
+FIELDTYPE:Invalid_numeric:CUSTOM(Scrubs.functions.fn_numeric>0,10)
 FIELDTYPE:Invalid_mandatory_alpha:CUSTOM(Scrubs.functions.fn_ASCII_printable>0):LENGTHS(1..)
 FIELDTYPE:Invalid_alpha:CUSTOM(Scrubs.functions.fn_ASCII_printable>0) 
-FIELDTYPE:Invalid_St:CUSTOM(Scrubs.functions.fn_valid_StateAbbrev>0)
+FIELDTYPE:Invalid_St:CUSTOM(Scrubs.functions.fn_verify_state>0)
 FIELDTYPE:Invalid_zip:CUSTOM(Scrubs_Govdata.Functions.fn_verify_zip59>0)
+FIELDTYPE:Invalid_numeric_optional:CUSTOM(Scrubs.functions.fn_numeric_optional>0,9)
 FIELDTYPE:invalid_fname:CUSTOM(Scrubs.Functions.fn_populated_strings>0,mname,lname)
 FIELDTYPE:Invalid_company_flag:ENUM(0|1)
 
@@ -31,12 +32,12 @@ FIELD:dt_last_reported:TYPE(STRING8):LIKE(Invalid_Date):0,0
 FIELD:cik_number:TYPE(STRING10):LIKE(Invalid_numeric):0,0
 FIELD:company_name:TYPE(STRING60):LIKE(Invalid_mandatory_alpha):0,0
 FIELD:reporting_file_number:TYPE(STRING8):0,0
-FIELD:address1:TYPE(STRING40):LIKE(Invalid_alpha):0,0
-FIELD:address2:TYPE(STRING40):LIKE(Invalid_alpha):0,0
+FIELD:address1:TYPE(STRING40):LIKE(Invalid_mandatory_alpha):0,0
+FIELD:address2:TYPE(STRING40):LIKE(Invalid_mandatory_alpha):0,0
 FIELD:city:TYPE(STRING30):LIKE(Invalid_alpha):0,0
 FIELD:state_code:TYPE(STRING2):LIKE(Invalid_St):0,0  
 FIELD:zip_code:TYPE(STRING10):LIKE(Invalid_zip):0,0
-FIELD:irs_taxpayer_id:TYPE(STRING9):LIKE(Invalid_numeric):0,0
+FIELD:irs_taxpayer_id:TYPE(STRING9):LIKE(Invalid_numeric_optional):0,0
 FIELD:prim_range:TYPE(STRING10):0,0
 FIELD:predir:TYPE(STRING2):0,0
 FIELD:prim_name:TYPE(STRING28):0,0
