@@ -1,12 +1,23 @@
-Import Data_Services, doxie,FLAccidents;
+﻿allrecs := FLAccidents_Ecrash.File_KeybuildV2.prout(Vin <> '' AND Vin <> '0' );
+dVinBase := DISTRIBUTE(allrecs, HASH32(Vin, Orig_Accnbr));
+sVinBase := SORT(dVinBase, Vin, Orig_Accnbr, LOCAL);
+uVinBase := DEDUP(sVinBase, Vin, Orig_Accnbr, LOCAL);  
 
-ecrash_vin_base := FLAccidents_Ecrash.File_KeybuildV2.out(vin<>'' and vin<>'0' );
+Layout_Keys_PR.VIN xformVin(uVinBase l) :=  TRANSFORM
+ SELF.l_Vin := l.Vin;
+ SELF.Accident_Nbr := l.Accident_Nbr;
+ SELF.Orig_Accnbr := l.Orig_Accnbr;
+ SELF.report_code := l.report_code;
+ SELF.jurisdiction := l.jurisdiction;
+ SELF.jurisdiction_state := l.jurisdiction_state;
+ SELF.jurisdiction_nbr := l.jurisdiction_nbr;
+ SELF.vehicle_incident_st := l.vehicle_incident_st;
+ SELF := l;
+ SELF := [];
+END;
+VinBase := PROJECT(uVinBase, xformVin(LEFT));
 
-dst_vin_base := distribute(ecrash_vin_base, hash(vin, orig_accnbr));
-srt_vin_base := sort(dst_vin_base, vin, orig_accnbr, local);
-dep_vin_base := dedup(srt_vin_base, vin, orig_accnbr, local);
-
-export key_ecrashV2_vin := index(dep_vin_base
-                               ,{l_vin := vin}
-							   ,{accident_nbr,orig_accnbr}
-							   ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_vin_' + doxie.Version_SuperKey);
+EXPORT Key_EcrashV2_Vin := INDEX(VinBase,
+                                {l_Vin},
+							                  {VINBase},
+							                  Files_PR.FILE_KEY_VIN_SF);
