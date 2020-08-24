@@ -3,8 +3,7 @@ import doxie, Data_Services, header_services, gong;
 
 g := File_History_Full_Prepped_For_Keys(current_record_flag='Y',trim(prim_name)<>'', trim(z5)<>'');
 
-//DF-26180 - Need to include lexid, global_sid and record_sid
-lraw := Layout_Gong_DID;
+lraw := Layout_bscurrent_raw;
 
 // TODO: if "history" key will ever be adjusted, then it'd make sense to publish this layout
 rec_address := record
@@ -30,9 +29,6 @@ rec_address := record
   lraw.listed_name;
   string8 date_first_seen;// := lraw.filedate[1..8];
   lraw.dual_name_flag;
-  lraw.DID;
-  lraw.global_sid;
-  lraw.record_sid;
 end;
 
 rec_address addcn(g l) := transform
@@ -46,37 +42,9 @@ rec_address addcn(g l) := transform
 	self := l;
 end;
 
-/////////////////////////////////////////////////////////////
-/*
-the injection is already in File_History_Full_Prepped_For_Keys
-
-layout_gong_inj := RECORD
- Layout_history ;
- string2 eor ;
-END;
-
-header_services.Supplemental_Data.mac_verify('file_gong_inj.txt', layout_gong_inj , attr);
-
-Base_File_Append_In := attr();
-
-
-Layout_bscurrent_raw  xTo_bscurrent_raw (Base_File_Append_In L ):= TRANSFORM
-
-	SELF := L ;
- 
-END ;
-
-File_Append_In:= project(Base_File_Append_In, xTo_bscurrent_raw(left)); // in Layout_bscurrent_raw format
-
-all_in := g + File_Append_In ;
-*/
 all_in := g;
-////////////////////////////////////////////////////
 
-
-
-wcn := dedup (sort (
-					project (all_in, addcn(left)), record), record) : persist('~thor_data400::persist::gong::address_current'); 
+wcn := dedup (sort (project (Gong_Neustar.Prep_Build.applyGongNeustar(g), addcn(left)), record), record) : persist('~thor_data400::persist::gong::address_current'); 
 
 
 
