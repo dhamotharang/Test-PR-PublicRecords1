@@ -1,4 +1,4 @@
-﻿import ut, risk_indicators, header_services, gong, dops, std;
+﻿import ut, risk_indicators, header_services, gong, dops, std ;
 
 h := DISTRIBUTE(File_Gong_History_FullEx);	
 
@@ -12,21 +12,6 @@ trSwapCityNames := project(histGong_out,
 												self.v_city_name := left.p_city_name;
 												self := left));
 
-
-layout_gong_inj := RECORD
- gong.Layout_history - [global_sid,record_sid];
- string2 eor ;
-END;
-
-header_services.Supplemental_Data.mac_verify('file_gong_inj.txt', layout_gong_inj , attr);
-
-gong_append_in := attr();
-
-gong_in1 := PROJECT (gong_append_in, transform(gong_Neustar.Layout_history, self := left; self := [];)) ;
-
-gong_in := PROJECT(gong_in1, Transform(gong_Neustar.Layout_history,
-				self.Persistent_Record_id := (unsigned8)0x7FFFFFFFFFFFFFFF - COUNTER;
-				self := left;));
 
 trSwapCityNamesFiltWithGong0 := trSwapCityNames;
 
@@ -135,6 +120,6 @@ end;
 first_seen_patched := project(concat_all_sources,xform4(left));
 
 EXPORT File_History_PreProcess_for_Keys := 
-	first_seen_patched(deletion_date<>'' OR current_record_flag='Y')		// filter out "replaced" records)
-			 + gong_in	// include supplemental records
+	Gong_Neustar.Prep_Build.applyGongNeustar(first_seen_patched(deletion_date<>'' OR current_record_flag='Y'))		// filter out "replaced" records)
+			 // including supplemental records
 							: persist('~thor_data400::persist::neustar::gong_history_preprocess_for_keys');
