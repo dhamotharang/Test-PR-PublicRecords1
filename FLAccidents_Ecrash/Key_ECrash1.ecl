@@ -1,4 +1,4 @@
-﻿Import Data_Services, doxie, FLAccidents, STD;
+Import Data_Services, doxie,FLAccidents;
 
 /////////////////////////////////////////////////////////////////
 //Expand Florida file 
@@ -106,7 +106,7 @@ xpnd_layout xpndrecs(flc1 L) := transform
 self.report_code					:= 'FA';
 self.report_category				:= 'Auto Report';
 self.report_code_desc				:= 'Auto Accident';
-self.accident_nbr := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+self.accident_nbr := stringlib.StringFilter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 self.orig_accnbr := l.accident_nbr; 
 self.invest_agency_desc := trim(l.dept_name,left,right); 
 self 								:= L;
@@ -118,13 +118,12 @@ pflc1:= project(flc1,xpndrecs(left));
 //ntlFile := FLAccidents.BaseFile_NtlAccidents_Alpharetta;
 //National file does not have information pertinent to this layout.  Therefore only passing FL records.
 
-ecrashfile := eCrashBaseAgencyExclusion; 
-
+ecrashfile := FLAccidents_Ecrash.BaseFile; 
 xpnd_layout xpndecrash(ecrashfile L) := transform
 
 	self.rec_type_1 := '1'; 
 	t_accident_nbr 			:= if(l.source_id in ['TM','TF'],L.state_report_number, L.case_identifier);
-	t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+	t_scrub := stringlib.StringFilter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
   self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);  
   self.orig_accnbr := t_accident_nbr;
 	self.hr_off_notified :=l.time_notified[1..2];
@@ -182,7 +181,7 @@ iyetekFile := FLAccidents_Ecrash.BaseFile_Iyetek;
 
 xpnd_layout xpndiyetek(iyetekFile L) := transform
  
- t_scrub := STD.Str.Filter(L.state_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+ t_scrub := stringlib.StringFilter(L.state_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);  
 self.orig_accnbr := L.state_report_number; 
 self.invest_agency_desc  := l.agency_name;

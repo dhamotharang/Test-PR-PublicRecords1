@@ -20,7 +20,7 @@ IMPORT BIPV2, BIPV2_Best, BIPV2_Best_SBFE;
 			 + '<p>Best is determined for both Sele and Prox level entities.  If the sele_level_only option is set (defaults to false), prox level results will be removed and only sele level Best will be shown.</p>'
 			 )
 	);
-
+				
 EXPORT Best_Combined_Service() := FUNCTION
   input_ultid   := 0 : STORED('Ultid',  FORMAT(SEQUENCE(1)));
   input_orgid   := 0 : STORED('Orgid',  FORMAT(SEQUENCE(2)));
@@ -29,17 +29,17 @@ EXPORT Best_Combined_Service() := FUNCTION
   boolean sele_level_only := false : STORED('sele_level_only', FORMAT(SEQUENCE(5)));
 
 
-  input := dataset([{input_ultid, input_orgid, input_seleid, input_proxid, sele_level_only}],
+  input := dataset([{input_ultid, input_orgid, input_seleid, input_proxid, sele_level_only}], 
                     {unsigned ultid, unsigned orgid,unsigned seleid,unsigned proxid, boolean sele_level_only});
   BestKey :=   BIPV2_Best.Key_Linkids.key;
 	 SBFEKey :=   BIPV2_Best_SBFE.Key_Linkids().key;
-
-
-  string1 Level := map(input_ultid<>0 => BIPV2.IDconstants.Fetch_Level_UltID,
+	
+	
+  string1 Level := map(input_ultid<>0 => BIPV2.IDconstants.Fetch_Level_UltID, 
                        input_orgid<>0 => BIPV2.IDconstants.Fetch_Level_OrgID,
                        input_seleid<>0 => BIPV2.IDconstants.Fetch_Level_SeleID,
                        BIPV2.IDconstants.Fetch_Level_ProxID);
-
+                      
   inputs := DATASET([{0,0,0,0,0,0,0,0,0,input_proxid,0,0,input_seleid,0,0,input_orgid,0,0,input_ultid}],BIPV2.IDlayouts.l_xlink_ids2);
 
 	 // I had to put BIPV2.IDmacros.mac_IndexFetch2 in it's own macro because it can't be called twice in same scope
@@ -47,10 +47,10 @@ EXPORT Best_Combined_Service() := FUNCTION
      BIPV2.IDmacros.mac_IndexFetch2(inp_ds, key, ds_fetched, lvl);
      return ds_fetched;
   endmacro;
-
+ 
   ds_best_fetched := fetchData(inputs, BestKey, Level);
-  ds_sbfe_fetched := project(fetchData(inputs, SBFEKey, Level), transform(recordof(ds_best_fetched), self := left, self := []));
-
+  ds_sbfe_fetched := fetchData(inputs, SBFEKey, Level);
+	
 
   filterSrcCode(ds, permits, ds_src='', codeBmap) := functionmacro
     ds_filt := ds(permits & codeBmap <> 0);
@@ -69,7 +69,7 @@ EXPORT Best_Combined_Service() := FUNCTION
 			 return project(ds_filt, xform(left)); //Using a SKIP in the transform was giving a syntax error and hence, had to use to this EXISTS filter condition
     #END
   endmacro;
-
+	
   allowCodeBmap := BIPV2.mod_Sources.code2bmap(BIPV2.mod_Sources.code.MARKETING_UNRESTRICTED);
 
   recordof(ds_best_fetched) apply_src_filter(recordof(ds_best_fetched) L) := transform
@@ -83,18 +83,18 @@ EXPORT Best_Combined_Service() := FUNCTION
     self.dba_name       := filterSrcCode(L.dba_name,        dba_name_data_permits,               , allowCodeBmap);
     self := L;
   end;
-
+	
   marketing_ds_best_fetched := project(ds_best_fetched, apply_src_filter(left));
 
-  out_format := {recordof(ds_best_fetched) -fetch_error_code -uniqueid -powid -empid -dotid
+  out_format := {recordof(ds_best_fetched) -fetch_error_code -uniqueid -powid -empid -dotid 
                 -ultscore -orgscore -selescore -proxscore -powscore -empscore -dotscore
-                -ultweight -orgweight -seleweight -proxweight -powweight -empweight -dotweight
+                -ultweight -orgweight -seleweight -proxweight -powweight -empweight -dotweight 
                 -isactive -isdefunct};
   best_out      := project(ds_best_fetched, transform(out_format, self:=left));
   sbfe_out      := project(ds_sbfe_fetched, transform(out_format, self:=left));
   marketing_out := project(marketing_ds_best_fetched, transform(out_format, self:=left));
 
-
+ 
   rank1_slim_layout := {
      ds_best_fetched.ultid;
      ds_best_fetched.orgid;
@@ -136,22 +136,22 @@ EXPORT Best_Combined_Service() := FUNCTION
     self.company_locid := l.company_address[1].company_locid;
 		self.address_dt_first_seen := l.company_address[1].address_dt_first_seen;
 	  self.address_dt_last_seen := l.company_address[1].address_dt_last_seen;
-    self := l;
+    self := l;  
   end;
 
-  best_slim_rec := project(ds_best_fetched, rank1SlimTrans(left));
-  sbfe_slim_rec := project(ds_sbfe_fetched, rank1SlimTrans(left));
-  marketing_slim_rec := project(marketing_ds_best_fetched, rank1SlimTrans(left));
-
+  best_slim_rec := project(ds_best_fetched, rank1SlimTrans(left)); 
+  sbfe_slim_rec := project(ds_sbfe_fetched, rank1SlimTrans(left));  
+  marketing_slim_rec := project(marketing_ds_best_fetched, rank1SlimTrans(left)); 
+ 
   result := parallel (
     // Echo what the user's inputs were
     output(input, named('input')),
-
+  
     // Slim rank 1 output
     output(best_slim_rec(not(proxid<>0 and sele_level_only)), named('Best_Rank_1')),
     output(sbfe_slim_rec(not(proxid<>0 and sele_level_only)), named('SBFE_Rank_1')),
     output(marketing_slim_rec(not(proxid<>0 and sele_level_only)), named('Marketing_Rank_1')),
-
+  
     // Full Best key output
     output(best_out(not(proxid<>0 and sele_level_only)), named('Best_Full')),
     output(sbfe_out(not(proxid<>0 and sele_level_only)), named('SBFE_Full')),

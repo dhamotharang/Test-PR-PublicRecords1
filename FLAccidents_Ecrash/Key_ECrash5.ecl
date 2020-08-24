@@ -1,4 +1,4 @@
-﻿Import Data_Services, doxie, FLAccidents, lib_stringlib, STD;
+Import Data_Services, doxie,FLAccidents,lib_stringlib;
 
 /////////////////////////////////////////////////////////////////
 //Expand Florida file 
@@ -70,7 +70,7 @@ xpnd_layout xpndrecs(flc5 L) := transform
 self.report_code					:= 'FA';
 self.report_category				:= 'Auto Report';
 self.report_code_desc				:= 'Auto Accident';
-self.accident_nbr := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+self.accident_nbr := stringlib.StringFilter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 self.orig_accnbr := l.accident_nbr; 
 self 								:= L;
 end;
@@ -79,49 +79,49 @@ pflc5:= project(flc5,xpndrecs(left));
 
 //ntlFile := FLAccidents.BaseFile_NtlAccidents_Alpharetta;
 //National file does not have information pertinent to this layout.  Therefore only passing FL records.
-ecrashFile := eCrashBaseAgencyExclusion(STD.Str.ToUpperCase(trim(person_type)) in ['\\PASSENGER',
-																																													 '3PASSENGER',
-																																													 'ÃƒÂ¢?Ã‚Â¢THEY ENTERED: PASSENGER',
-																																													 'BICYCLE',
-																																													 'BICYCLIST',
-																																													 'BYCICLIST',
-																																													 'INJURED PASSENGER',
-																																													 'OASSENGER',
-																																													 'PAASENGER',
-																																													 'PAS',
-																																													 'PASEENGER',
-																																													 'PASENGER',
-																																													 'PASS',
-																																													 'PASSANGER',
-																																													 'PASSE',
-																																													 'PASSEBGER',
-																																													 'PASSEDNGER',
-																																													 'PASSEENGER',
-																																													 'PASSEGER',
-																																													 'PASSEGNER',
-																																													 'PASSEMGER',
-																																													 'PASSENDER',
-																																													 'PASSENEGER',
-																																													 'PASSENEGR',
-																																													 'PASSENER',
-																																													 'PASSENGER',
-																																													 'PASSENGER',
-																																													 'PASSENGER1',
-																																													 'PASSENGERA',
-																																													 'PASSENGERJENNIFER',
-																																													 'PASSENGERS',
-																																													 'PASSENGERT',
-																																													 'PASSENGFER',
-																																													 'PASSENGR',
-																																													 'PASSENJGER',
-																																													 'PASSENNGER',
-																																													 'PASSSENGER']); 
+ecrashFile := FLAccidents_Ecrash.BaseFile(StringLib.StringToUpperCase(trim(person_type)) in ['\\PASSENGER',
+'3PASSENGER',
+'â?¢THEY ENTERED: PASSENGER',
+'BICYCLE',
+'BICYCLIST',
+'BYCICLIST',
+'INJURED PASSENGER',
+'OASSENGER',
+'PAASENGER',
+'PAS',
+'PASEENGER',
+'PASENGER',
+'PASS',
+'PASSANGER',
+'PASSE',
+'PASSEBGER',
+'PASSEDNGER',
+'PASSEENGER',
+'PASSEGER',
+'PASSEGNER',
+'PASSEMGER',
+'PASSENDER',
+'PASSENEGER',
+'PASSENEGR',
+'PASSENER',
+'PASSENGER',
+'PASSENGER',
+'PASSENGER1',
+'PASSENGERA',
+'PASSENGERJENNIFER',
+'PASSENGERS',
+'PASSENGERT',
+'PASSENGFER',
+'PASSENGR',
+'PASSENJGER',
+'PASSENNGER',
+'PASSSENGER']); 
 
 xpnd_layout xpndecrash(ecrashFile L) := transform
 
 self.rec_type_5 := '5';
 t_accident_nbr 			:= if(l.source_id in ['TM','TF'],L.state_report_number, L.case_identifier);
-t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+t_scrub := stringlib.StringFilter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
 self.orig_accnbr := t_accident_nbr;
 self.did								:= if(L.did = 0,'000000000000',intformat(L.did,12,1));	
@@ -156,9 +156,9 @@ pecrash :=project(ecrashFile, xpndecrash(left));
 
 //iyetek 
 /*
-iyetekFile := FLAccidents_Ecrash.BaseFile_Iyetek (STD.Str.ToUpperCase(trim(person_type)) in ['\\PASSENGER',
+iyetekFile := FLAccidents_Ecrash.BaseFile_Iyetek (StringLib.StringToUpperCase(trim(person_type)) in ['\\PASSENGER',
 '3PASSENGER',
-'ÃƒÂ¢?Ã‚Â¢THEY ENTERED: PASSENGER',
+'â?¢THEY ENTERED: PASSENGER',
 'BICYCLE',
 'BICYCLIST',
 'BYCICLIST',
@@ -198,7 +198,7 @@ xpnd_layout xpndiyetek(iyetekFile L) := transform
 
 t_accident_nbr 			    := L.state_report_number;
 self.rec_type_5         := '5';
-t_scrub := STD.Str.Filter(L.state_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+t_scrub := stringlib.StringFilter(L.state_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);  
 self.orig_accnbr := L.state_report_number; 
 self.section_nbr := l.vehicle_unit_number; 

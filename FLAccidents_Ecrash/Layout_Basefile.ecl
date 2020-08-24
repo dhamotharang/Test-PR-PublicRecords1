@@ -15,14 +15,10 @@
 	STRING30 section_number1;
 	STRING10 court_date;
 	STRING9 court_time;
-	//PRtcc datatype update
-	STRING100 citation_detail1;
-	
+	STRING200 citation_detail1;
 	STRING3 local_code;
-	//PRtcc datatype update
-	STRING60 violation_code1;
-	STRING60 violation_code2;
-	
+	STRING30 violation_code1;
+	STRING30 violation_code2;
 	STRING7 multiple_charges_indicator;
 	STRING7 dui_indicator;
 	STRING11 commercial_id;
@@ -98,10 +94,6 @@
 	STRING4 work_type_id;
 	STRING11 report_id;
 	STRING11 agency_id;
-	STRING100 agency_name;
-	STRING11 agency_ori;
-	//PR Recon COPPR-49
-	BOOLEAN is_Terminated_Agency;
 	STRING19 sent_to_hpcc_datetime;
 	STRING4 corrected_incident;
 	STRING9 cru_order_id;
@@ -245,12 +237,11 @@
 	STRING60 injured_taken_by;
 	STRING60 injured_taken_to;
 	STRING7 incident_transported_for_medical_care;
-	//PRtcc datatype update
-	STRING1 photographs_taken;
-	STRING100 photographed_by;
-	
+	STRING7 photographs_taken;
+	STRING60 photographed_by;
 	STRING20 photographer_id;
 	STRING50 photography_agency_name;
+	STRING100 agency_name;
 	STRING30 judicial_district;
 	STRING30 precinct;
 	STRING20 beat;
@@ -362,9 +353,7 @@
 	STRING30 injury_status;
 	STRING3 occupant_vehicle_unit_number;
 	STRING50 seating_position1;
-	//PRtcc datatype update for code and description
-	STRING Safety_Equipment_Restraint1;
-	
+	STRING40 safety_equipment_restraint1;
 	STRING40 safety_equipment_restraint2;
 	STRING40 safety_equipment_helmet;
 	STRING100 air_bag_deployed;
@@ -381,25 +370,19 @@
 	STRING50 condition_at_time_of_crash1;
 	STRING50 condition_at_time_of_crash2;
 	STRING50 law_enforcement_suspects_alcohol_use;
-	//PRtcc datatype update for code and description
-	STRING alcohol_test_status;
-	STRING alcohol_test_type;
-	//Data Ingestion Enum Field
-	STRING  alcohol_test_result;
+	STRING25 alcohol_test_status;
+	STRING25 alcohol_test_type;
+	STRING25 alcohol_test_result;
 	STRING7 law_enforcement_suspects_drug_use;
 	STRING20 drug_test_given;
 	STRING100 non_motorist_actions_prior_to_crash1;
 	STRING100 non_motorist_actions_prior_to_crash2;
-	//PRtcc datatype update for code and description
-	STRING non_motorist_actions_at_time_of_crash;
-	
+	STRING100 non_motorist_actions_at_time_of_crash;
 	STRING50 non_motorist_location_at_time_of_crash;
 	STRING50 non_motorist_safety_equipment1;
 	STRING3 age;
 	STRING50 driver_license_restrictions1;
-	//PRtcc datatype update for code and description
-	STRING drug_test_type;
-	
+	STRING10 drug_test_type;
 	STRING25 drug_test_result1;
 	STRING50 drug_test_result2;
 	STRING50 drug_test_result3;
@@ -441,9 +424,7 @@
 	STRING10 death_date;
 	STRING9 death_time;
 	STRING7 extricated;
-	//PRtcc datatype update for code and description
-	STRING alcohol_drug_use;
-	
+	STRING40 alcohol_drug_use;
 	STRING40 physical_defects;
 	STRING40 driver_residence;
 	STRING30 id_type;
@@ -454,9 +435,7 @@
 	STRING3 violent_crime_victim_notified;
 	STRING10 insurance_company_code;
 	STRING3 refused_medical_treatment;
-	//PRtcc datatype update
-	STRING25 safety_equipment_available_or_used;
-	
+	STRING10 safety_equipment_available_or_used;
 	STRING10 apartment_number;
 	STRING10 licensed_driver;
 	STRING30 physical_emotional_status;
@@ -487,10 +466,8 @@
 	STRING7 motorcycle_over_ankle_boots;
 	STRING40 contributing_circumstances_environmental_non_incident1;
 	STRING40 contributing_circumstances_environmental_non_incident2;
-	//PRtcc datatype update for code and description
-	STRING alcohol_drug_test_given;
-  STRING alcohol_drug_test_type;
-	
+	STRING7 alcohol_drug_test_given;
+	STRING10 alcohol_drug_test_type;
 	STRING20 alcohol_drug_test_result;
 	STRING30 vin;
 	STRING5 vin_status;
@@ -511,9 +488,7 @@
 	STRING30 special_function_in_transport;
 	STRING30 special_function_in_transport_other_unit;
 	STRING7 emergency_use;
-	//PRtcc datatype update
-	STRING10 posted_satutory_speed_limit;
-	
+	STRING2 posted_satutory_speed_limit;
 	STRING15 direction_of_travel_before_crash;
 	STRING60 trafficway_description;
 	STRING50 traffic_control_device_type;
@@ -833,9 +808,7 @@
 	STRING7 other_unit_permanent_registration3	;
 	STRING30 other_unit_type3	;
 	STRING70 damaged_areas3	;
-	//PRtcc datatype update for code and description
-	STRING driver_distracted_by;	
-	
+	STRING64 driver_distracted_by;	
 	STRING64 non_motorist_type;	
 	STRING64 seating_position_row;	
 	STRING64 seating_position_seat	;
@@ -858,18 +831,13 @@
 	STRING   Report_Collision_Type;
 	STRING   Report_First_Harmful_Event;
 	STRING   Report_Light_Condition;
-	
-	//PRtcc datatype update for code and description
-	STRING Report_Weather_Condition;
-	STRING Report_Road_Condition;
-	STRING Report_Injury_Status;
-	
+	STRING   Report_Weather_Condition;
+	STRING   Report_Road_Condition;
+	STRING   Report_Injury_Status;
 	STRING   Report_Damage_Extent;
 	STRING   Report_Vehicle_Type;
 	STRING   Report_Traffic_Control_Device_Type;
-	//PRtcc datatype update for code and description
-	STRING Report_Contributing_Circumstances_v;
-	
+	STRING   Report_Contributing_Circumstances_v;
 	STRING   Report_Vehicle_Maneuver_Action_Prior;
 	STRING   Report_Vehicle_Body_Type;
 
@@ -893,47 +861,4 @@
 
 	//BuyCrash Project KY Integration
 	STRING3 Contrib_source; 
-	
-	//BuyCrash Release 6
-  STRING10 Date_Report_Submitted;
-	
-	//CrashLogic Release 4
-	STRING1 Releasable;
-	
-	//Nucleus 
-	STRING50 Platform;
-	STRING40 Agency_Report_Number;
-	
-	//PRtCC new fields
-	STRING7 Citation_Type;
-	STRING60 Violation_Code3;
-	STRING60 Violation_Code4;
-	STRING20 Dispatch_Time;
-	STRING100 Photograph_Type;
-	STRING1 Ready_To_Sell_Data;
-	STRING Condition_At_Time_Of_Crash;
-	STRING Drug_Use_Suspected;
-	STRING Alcohol_Use_Suspected;
-	STRING Drug_Test_Status;	
-	STRING Report_Contributing_Circumstances_P;
-	STRING Driver_Actions_At_Time_Of_Crash;
-	STRING Prior_Nonmotorist_Action;
-	STRING Pedestrian_Actions_At_Time_Of_Crash;
-	STRING Pedalcyclist_Actions_At_Time_Of_Crash;
-	STRING Passenger_Actions_At_Time_Of_Crash;
-	//Data Ingestion New fields
-	STRING10 Dispatch_Date;
-	STRING10 Drug_Involvement;
-	STRING7 Alcohol_Involved;
-	//Data Ingestion New Enum fields
-	STRING Dui_Suspected;
-	STRING Drug_Test_Result;
-	//Data Ingestion CR-1273
-  STRING64 Geo_Coded_Latitude;
-	STRING64 Geo_Coded_Longitude;
-	//PRtCC CR-1237
-  STRING Marijuana_Use_Suspected;
-	//PRtCC CR-1262 
-  STRING Direction_Of_Impact;
-	STRING Event_Sequence;
 END;

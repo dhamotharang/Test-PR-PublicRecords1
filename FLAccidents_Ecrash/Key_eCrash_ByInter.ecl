@@ -1,16 +1,12 @@
-﻿// Ecrash Reports key, by Intersection
+// Ecrash Reports key, by Intersection
 
 IMPORT FLAccidents_Ecrash, STD, UT, doxie,Data_Services;
 
-BaseKey := FLAccidents_Ecrash.File_Keybuild_analytics(accident_street + accident_cross_street > '');
+BaseKey := FLAccidents_Ecrash.File_KeybuildV2.out(report_code = 'EA' AND report_type_id = 'A' AND work_type_id NOT IN['2','3'] AND (accident_street + accident_cross_street > ''));
 
-/* Dedup1 := DEDUP(BaseKey(DID > '0'),DID + Vehicle_Incident_id);
-   Dedup2 := DEDUP(BaseKey(DID = '0'),Vehicle_Incident_Id + fname + lname + name_suffix);
-*/
+Dedup1 := DEDUP(BaseKey(DID > '0'),DID + Vehicle_Incident_id);
+Dedup2 := DEDUP(BaseKey(DID = '0'),Vehicle_Incident_Id + fname + lname + name_suffix);
 
-Dedup1 := DEDUP(SORT(DISTRIBUTE(BaseKey(DID > '0'),hash32(Vehicle_Incident_Id)),DID , Vehicle_Incident_id, local),DID , Vehicle_Incident_id,local);
-Dedup2 := DEDUP(SORT(DISTRIBUTE(BaseKey(DID = '0'), hash32(Vehicle_Incident_Id)), Vehicle_Incident_Id , fname , lname , name_suffix , dob , driver_license_nbr,local)
-														,Vehicle_Incident_Id , fname , lname , name_suffix , dob , driver_license_nbr, local );
 DedupedKey := SORT(Dedup1 + Dedup2, jurisdiction_nbr + Vehicle_Incident_id + Vehicle_unit_number);
 
 
@@ -97,8 +93,8 @@ accidents_by_slim2 := RECORD
 END;
 
 accidents_by_slim2 PerformCounts({dsVehiclesRolled} L) := TRANSFORM
-	    NewBTString := STD.Str.ToUpperCase(TRIM(L.Report_vehicle_body_type,LEFT,RIGHT));
-			NewFHEString := STD.Str.ToUpperCase(TRIM(L.Report_first_harmful_event,LEFT,RIGHT));
+	    NewBTString := stringlib.StringToUpperCase(TRIM(L.Report_vehicle_body_type,LEFT,RIGHT));
+			NewFHEString := stringlib.StringToUpperCase(TRIM(L.Report_first_harmful_event,LEFT,RIGHT));
 	SELF.ATVehicle 						:= FLAccidents_Ecrash.Functions.KnownVT(NewBTString);
 	SELF.ATPedestrian         := IF(STD.Str.FindCount(NewFHEString, FLAccidents_Ecrash.Constants.PEDESTRIAN) > 0,1,0);
 	SELF.ATBicycle            := IF(STD.Str.FindCount(NewFHEString, FLAccidents_Ecrash.Constants.BICYCLE) > 0,1,0);
@@ -108,7 +104,7 @@ accidents_by_slim2 PerformCounts({dsVehiclesRolled} L) := TRANSFORM
 	SELF.ATUnknown            := IF((NewBTString = '') OR
 	                                FLAccidents_Ecrash.Functions.UnknownVT(NewBTString) > 0 OR
 																	FLAccidents_Ecrash.Functions.UnknownFHE(NewFHEString) > 0,1,0);
-			NewCTString := STD.Str.ToUpperCase(TRIM(L.Report_Collision_Type,LEFT,RIGHT));
+			NewCTString := stringlib.StringToUpperCase(TRIM(L.Report_Collision_Type,LEFT,RIGHT));
 	SELF.CTFrontRear					:= IF(STD.Str.FindCount(NewCTString, FLAccidents_Ecrash.Constants.FRONTREAR) > 0,1,0); 
 	SELF.CTFrontFront					:= IF(STD.Str.FindCount(NewCTString, FLAccidents_Ecrash.Constants.FRONTFRONT) > 0,1,0);
 	SELF.CTAngle							:= IF(STD.Str.FindCount(NewCTString, FLAccidents_Ecrash.Constants.ANGLE) > 0,1,0);

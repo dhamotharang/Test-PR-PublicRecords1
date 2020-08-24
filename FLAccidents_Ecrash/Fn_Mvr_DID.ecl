@@ -1,6 +1,6 @@
-﻿import VehicleV2; 
+import VehicleV2; 
 
-export Fn_Mvr_DID(dataset(recordof(Layout_eCrash.Consolidation_AgencyOri)) infile) := function
+export Fn_Mvr_DID(dataset(recordof(FLAccidents_Ecrash.Layout_keybuild_SSv2)) infile) := function
 
 // get only valid vins
 
@@ -36,7 +36,7 @@ end;
 
 roll_ := rollup(j_sort, left.fname = right.fname and 
                          left.lname = right.lname and 
-												 left.vina_vin = right.vina_vin, t_roll(left,right), local):persist('~thor_data400::persist::vehicle_rollup'); 
+												 left.vina_vin = right.vina_vin, t_roll(left,right), local):persist('vehicle_rollup'); 
 
 // allow only owners and drivers. 
 
