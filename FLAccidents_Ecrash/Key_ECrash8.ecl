@@ -1,4 +1,4 @@
-﻿Import Data_Services, doxie,FLAccidents, STD;
+Import Data_Services, doxie,FLAccidents;
 
 /////////////////////////////////////////////////////////////////
 //Expand Florida file 
@@ -27,7 +27,7 @@ xpnd_layout xpndrecs(flc8 L) := transform
 self.report_code					:= 'FA';
 self.report_category				:= 'Auto Report';
 self.report_code_desc				:= 'Auto Accident';
-self.accident_nbr := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+self.accident_nbr := stringlib.StringFilter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 self.orig_accnbr := l.accident_nbr; 
 self 								:= L;
 end;
@@ -42,7 +42,7 @@ xpnd_layout xpndecrash(ecrashFile L) := transform
 
 self.rec_type_8						:= '8';
 t_accident_nbr 			:= if(l.source_id in ['TF','TM'],L.state_report_number, L.case_identifier);
-t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+t_scrub := stringlib.StringFilter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
 self.orig_accnbr := t_accident_nbr;
 self.carrier_name     := L.Insurance_Company;
@@ -58,7 +58,7 @@ iyetekFile := FLAccidents_Ecrash.BaseFile_Iyetek ;
 xpnd_layout xpndiyetek(iyetekFile L) := transform
 
 self.rec_type_8						:= '8';
-t_scrub := STD.Str.Filter(L.state_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+t_scrub := stringlib.StringFilter(L.state_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);  
 self.orig_accnbr := L.state_report_number; 
 self.carrier_name     := L.Insurance_Company;

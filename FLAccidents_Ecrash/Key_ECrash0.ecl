@@ -1,4 +1,4 @@
-﻿Import Data_Services, doxie, FLAccidents, STD;
+Import doxie,FLAccidents, data_services;
 
 /////////////////////////////////////////////////////////////////
 //Expand Florida file 
@@ -73,7 +73,7 @@ xpnd_layout xpndrecs(flc0 L) := transform
 self.report_code					:= 'FA';
 self.report_category				:= 'Auto Report';
 self.report_code_desc				:= 'Auto Accident';
-self.accident_nbr           := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+self.accident_nbr           := stringlib.StringFilter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 self.orig_accnbr           := l.accident_nbr; 
 self 								:= L;
 end;
@@ -87,17 +87,12 @@ ntlFile := FLAccidents.BaseFile_NtlAccidents_Alpharetta;
 
 pflc0 slimrec(ntlFile L) := transform
 
-string8     fSlashedMDYtoCYMD(string pDateIn) :=
-								intformat((integer2)regexreplace('.*/.*/([0-9]+)',pDateIn,'$1'),4,1) 
-					+     intformat((integer1)regexreplace('([0-9]+)/.*/.*',pDateIn,'$1'),2,1)
-					+     intformat((integer1)regexreplace('.*/([0-9]+)/.*',pDateIn,'$1'),2,1);
-
 self.rec_type_o 			:= '0';
 t_accident_nbr 			:= (string40)((unsigned6)L.vehicle_incident_id+10000000000);
-t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+t_scrub := stringlib.StringFilter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub);  
 self.orig_accnbr := t_accident_nbr; 
-self.accident_date						:= fSlashedMDYtoCYMD(L.loss_date[1..10]);
+self.accident_date 			:= L.loss_date[7..10]+ L.loss_date[1..2]+ L.loss_date[4..5];
 self.city_town_name 		:= stringlib.stringtouppercase(L.inc_city);
 
        
@@ -123,12 +118,12 @@ t_accident_nbr := if(L.vehicle_incident_id[1..3] = 'OID',
 													(string40)((unsigned6)L.vehicle_incident_id[4..11]+100000000000),
 													(string40)((unsigned6)L.vehicle_incident_id+10000000000));
 
-t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+t_scrub := stringlib.StringFilter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub);  
 self.orig_accnbr := t_accident_nbr; 
 
 self.accident_date			:= fSlashedMDYtoCYMD(L.loss_date[1..10]);
-self.city_town_name 		:= STD.Str.ToUpperCase(L.city);
+self.city_town_name 		:= stringlib.stringtouppercase(L.city);
 self.report_code					:= 'I'+ L.report_code;
 self						:= L;
 self						:= [];
@@ -138,17 +133,17 @@ pInq := project(inqFile,slimrecinq(left));
 
 // ecrash 
 
-ecrashFile := eCrashBaseAgencyExclusion;
+ecrashFile := FLAccidents_Ecrash.BaseFile;
 
 pflc0 slimrececrash(ecrashFile L) := transform
 
 self.rec_type_o 			:= '0';
 t_accident_nbr 			:= if(l.source_id in['TM','TF'],L.state_report_number, L.case_identifier);
-t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+t_scrub := stringlib.StringFilter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
 self.orig_accnbr := t_accident_nbr;
 self.accident_date 			:= if(L.incident_id[1..9] ='188188188','20100901',L.crash_date);
-self.city_town_name 		:= STD.Str.ToUpperCase(L.crash_city);
+self.city_town_name 		:= stringlib.stringtouppercase(L.crash_city);
 self.county_name        := l.crash_county; 
 self.ft_miles_node := l.distance_from_node_miles;
 self.dot_milepost := l.milepost1;
@@ -168,11 +163,11 @@ metadata := FLAccidents_Ecrash.BaseFile_Iyetek;
 pflc0 slimiyetek(metadata L) := transform
 
 self.rec_type_o 			:= '0';
-t_scrub := STD.Str.Filter(L.state_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+t_scrub := stringlib.StringFilter(L.state_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);  
 self.orig_accnbr := L.state_report_number; 
 self.accident_date 			:= L.crash_date;
-self.city_town_name 		:= STD.Str.ToUpperCase(L.Crash_City);
+self.city_town_name 		:= stringlib.stringtouppercase(L.Crash_City);
 self.county_name        := l.crash_county; 
 self						:= L;
 self						:= [];
@@ -181,8 +176,7 @@ piyetek := project(metadata,slimiyetek(left));*/
 
 allrecs :=dedup(pflc0+pntl+pInq+pecrash/*+piyetek*/,record,all): persist('~thor_data400::persist::ecrash0');
 
-export Key_ECrash0 := index(allrecs
-                            ,{string40 l_acc_nbr :=accident_nbr}
-							,{allrecs}
-							,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrash0_' + doxie.Version_SuperKey);
-						 	 
+export Key_ECrash0 := index(allrecs,
+                            {string40 l_acc_nbr :=accident_nbr},
+                            {allrecs},
+                            Data_Services.Data_location.Prefix() + 'thor_data400::key::ecrash0_' + doxie.Version_SuperKey);

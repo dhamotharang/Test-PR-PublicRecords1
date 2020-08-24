@@ -1,4 +1,4 @@
-﻿import Data_services, STD, ut;
+﻿import Data_services,lib_fileservices, lib_stringLib;
 
 export Infiles    := module
 
@@ -25,49 +25,25 @@ vProperty_Damage_ea  := if ( nothor (fileservices.FindSuperFileSubName('~thor_da
 																 
 //Sequential( vIncident_ea , vCitation_ea, vCommercial_ea , vPerson_ea, vVehicle_ea , vProperty_Damage_ea );
 
-// Agency_View_HPCC_Export
+
+
 export agency0     := dataset(Data_Services.foreign_prod+'thor_data400::in::ecrash::agency'
 													 ,FLAccidents_Ecrash.Layout_Infiles.agency
-															 ,csv(terminator(['|\n', '\n', '\nr', '\r', '\rn']), separator('|\t|'),quote('"')))(Agency_ID != 'Agency_ID');
-shared agencyInput := project(agency0, transform(Layout_Infiles_Fixed.agency, 
+															 ,csv(terminator(['\n', '\nr', '\r', '\rn']), separator('~~'),quote('"')))(Agency_ID != 'Agency_ID');
+export agency:= project(agency0, transform({agency0}, 
                             self.agency_id := IF(trim(Left.agency_id,left,right) <>'', Left.agency_id,ERROR('agency file bad')),
 														agency_name := IF(trim(Left.agency_name,left,right) <>'', Left.agency_name,ERROR('agency file bad'));
-														self.agency_name := IF(STD.Str.ToUpperCase(trim(agency_name,left,right)) IN ['\\N', 'NULL'],  '', agency_name);
-														self.source_id := IF(STD.Str.ToUpperCase(trim(left.source_id,left,right)) IN ['\\N', 'NULL'],  '', left.source_id);
-														self.agency_state_abbr := IF(STD.Str.ToUpperCase(trim(left.agency_state_abbr,left,right)) IN ['\\N', 'NULL'],  '', left.agency_state_abbr);
-														self.agency_ori := IF(STD.Str.ToUpperCase(trim(left.agency_ori,left,right)) IN ['\\N', 'NULL'],  '', left.agency_ori);
-														self.append_overwrite_flag := IF(STD.Str.ToUpperCase(trim(left.append_overwrite_flag,left,right)) IN ['\\N', 'NULL'],  '', left.append_overwrite_flag);
-                            self:= left));											
+														self.agency_name := IF(stringlib.stringtouppercase(trim(agency_name,left,right)) IN ['\\N', 'NULL'],  '', agency_name);
+														self.source_id := IF(stringlib.stringtouppercase(trim(left.source_id,left,right)) IN ['\\N', 'NULL'],  '', left.source_id);
+														self.agency_state_abbr := IF(stringlib.stringtouppercase(trim(left.agency_state_abbr,left,right)) IN ['\\N', 'NULL'],  '', left.agency_state_abbr);
+														self.agency_ori := IF(stringlib.stringtouppercase(trim(left.agency_ori,left,right)) IN ['\\N', 'NULL'],  '', left.agency_ori);
+														self.append_overwrite_flag := IF(stringlib.stringtouppercase(trim(left.append_overwrite_flag,left,right)) IN ['\\N', 'NULL'],  '', left.append_overwrite_flag);
+                            self:= left));
+//export dagency				:= dedup(sort(distribute(agency, hash32(agency_id)),agency_id),agency_id);
+shared billingagencies := dataset(Data_Services.foreign_prod+'thor_data400::in::ecrash::billingagency_raw'
+																			,FLAccidents_Ecrash.Layout_Infiles.billing_agencies
+																			,csv(terminator(['\n', '\nr', '\r', '\rn']), separator(','),quote('"')), OPT)(Cru_Agency_ID != 'cru_agency_id');
 
-//Expand agency file with termination information
-FLAccidents_Ecrash.Layout_Infiles_Fixed.agency_contrib_source addTermination(agencyInput l) := transform
-	self := l;
-	self := [];
-end;
-export agency := project(agencyInput, addTermination(left));
-		
-shared fabAgency := project(agencyInput, transform(Layout_Infiles_Fixed.agency,
-                     self.agency_ori := map(left.agency_ori = '' and trim(left.agency_id,all) = '1520042' => 'GA0280000',
-                                            left.agency_ori = '' and trim(left.agency_id,all) = '1521562' => 'GA0331200',
-											                      left.agency_ori);
-																			 self := left;));		
-
-// Suppress the DE records basing on the drivers_exchange_flag in the agency file. -- #187626
-shared suppressAgencies := agency(drivers_exchange_flag ='0');
-
-shared uAgency := dedup(sort(distribute(agency(Agency_ID != ''), hash32(Agency_ID)), 
-                             Agency_ID, -(Agency_Name <> ''), local), 
-												Agency_ID, local);
-
-// CRU Billing agencies
-billingagencies := dataset(Data_Services.foreign_prod+'thor_data400::in::ecrash::billingagency_raw'
-													 ,FLAccidents_Ecrash.Layout_Infiles.billing_agencies
-													 ,csv(terminator(['\n', '\nr', '\r', '\rn']), separator(','),quote('"')), OPT)(Cru_Agency_ID != 'cru_agency_id');
-
-shared uBillingagencies := dedup(sort(distribute(billingagencies, hash32(Mbsi_Agency_ID)), 
-                                      Mbsi_Agency_ID, local), 
-																 Mbsi_Agency_ID, local);
-																 
 export commercl   := dataset(Data_Services.foreign_prod+'thor_data400::in::ecrash::commercl_raw'
 													,FLAccidents_Ecrash.Layout_Infiles.commercial
 													,csv(terminator('\n'), separator(','),quote('"')))(Commercial_ID != 'Commercial_ID') 
@@ -113,16 +89,17 @@ export tcitation  := project(jcitation, transform(FLAccidents_Ecrash.Layout_Infi
 incidents := join(distribute(incident, hash(incident_id)), incidents_todelete,
    				trim(left.incident_id, all)= trim(right.incident_id,all),
    				left only, local);
-
-export tincident  := project(incidents,transform(FLAccidents_Ecrash.Layout_Infiles_Fixed.incident
-													,SELF.incident_id := LEFT.incident_id[1..9]; 
-													 SELF.case_identifier := STD.Str.ToUpperCase(LEFT.case_identifier);
-													 SELF.state_report_number := STD.Str.ToUpperCase(LEFT.state_report_number);
-													 SELF.crash_time := IF(left.incident_id IN ['10560507','10405314', '10405522','10403933','10560555','10560530']  , '', LEFT.crash_time);
-													 SELF.contrib_source := IF(STD.Str.ToUpperCase(TRIM(LEFT.contrib_source,left,right)) IN ['\\N', 'NULL'],  '', LEFT.contrib_source);
-													 SELF.releasable := IF(STD.Str.ToUpperCase(TRIM(LEFT.releasable,left,right)) IN ['\\N', 'NULL', ''],  '1', LEFT.releasable);
-													 SELF.Supplemental_Report := IF(STD.Str.ToUpperCase(TRIM(LEFT.Supplemental_Report,left,right)) IN ['\\N', 'NULL', ''],  '', LEFT.Supplemental_Report);
-													 SELF:= LEFT;));		
+					
+//filter out Nassau TF
+export tincident  := project(incidents(~(source_id in ['TF','TM'] and agency_id = '1603437')),transform(FLAccidents_Ecrash.Layout_Infiles_Fixed.incident
+													,self.incident_id := left.incident_id[1..9], 
+													self.case_identifier := stringlib.stringtouppercase(left.case_identifier),
+													self.state_report_number := stringlib.stringtouppercase(left.state_report_number),
+													self.crash_time := if(left.incident_id in ['10560507','10405314', '10405522','10403933','10560555','10560530']  , '', left.crash_time),  
+													SELF.ori_number := IF (left.ori_number = 'FL0130600','FL0130000',left.ori_number); //MDPD ORI correction remove this code after the historical update completed successfully
+								        	SELF.report_agency_ori := IF (left.report_agency_ori = 'FL0130600','FL0130000',left.report_agency_ori); //MDPD ORI correction remove this code after the historical update completed successfully
+													SELF.contrib_source := IF(stringlib.stringtouppercase(trim(left.contrib_source,left,right)) IN ['\\N', 'NULL'],  '', left.contrib_source);
+													self:= left));		
 
  jpersn := 	join(distribute(persn, hash(incident_id)), incidents_todelete, 
 								trim(left.incident_id, all)= trim(right.incident_id,all),
@@ -130,7 +107,7 @@ export tincident  := project(incidents,transform(FLAccidents_Ecrash.Layout_Infil
 																	
 													
 export tpersn     := project(jpersn, transform(FLAccidents_Ecrash.Layout_Infiles_Fixed.persn
-                          		,self.person_type := /*stringlib.StringFilter(*/STD.Str.ToUpperCase(left.person_type);//,'ABCDEFGHIJKLMNOPQRSTUVWXYZ |');
+                          		,self.person_type := /*stringlib.StringFilter(*/stringlib.stringtouppercase(left.person_type);//,'ABCDEFGHIJKLMNOPQRSTUVWXYZ |');
 															,self:= left));			
 															
 jvehicl := 	join(distribute(vehicl, hash(incident_id)), incidents_todelete,
@@ -154,47 +131,41 @@ export tcommercial:= project(commercl, transform(FLAccidents_Ecrash.Layout_Infil
 
 dincident_EA :=	dedup(sort(distribute(
 																		tincident(source_id not in ['TF','TM'] and work_type_id not in ['2','3'] and trim(vendor_code,left,right) <> 'COPLOGIC'),hash(case_identifier))
-															,case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,Sent_to_HPCC_DateTime,creation_date,report_id,record,local)
+															,case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,Sent_to_HPCC_DateTime,creation_date,report_id,local)
 													,case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,right,local
 											);
 dincident_EA_Coplogic :=	dedup(sort(distribute(
 																		tincident(source_id not in ['TF','TM'] and work_type_id not in ['2','3'] and trim(vendor_code,left,right) = 'COPLOGIC'),hash(case_identifier))
-															,case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,Sent_to_HPCC_DateTime,creation_date,report_id,record,local)
+															,case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,Sent_to_HPCC_DateTime,creation_date,report_id,local)
 													,case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,supplemental_report,right,local
 											);											
 dincident_EA_CRU:= 	dedup(sort(distribute(
 																		tincident(work_type_id in ['2','3']),hash(case_identifier))
-															,case_identifier,agency_id,loss_state_abbr,work_type_id,report_type_id,cru_order_id,Sent_to_HPCC_DateTime,creation_date,CRU_Sequence_Nbr,report_id,record,local)
+															,case_identifier,agency_id,loss_state_abbr,work_type_id,report_type_id,cru_order_id,Sent_to_HPCC_DateTime,creation_date,CRU_Sequence_Nbr,report_id,local)
 													,case_identifier,agency_id,loss_state_abbr,work_type_id,report_type_id,cru_order_id,right,local
 										);
 											
 
 dincident_TF :=  	dedup(sort(distribute(
 																		tincident(source_id in ['TM','TF']),hash(state_report_number))
-															,state_report_number,agency_id,ORI_Number,loss_state_abbr,work_type_id,report_type_id,source_id,Sent_to_HPCC_DateTime,creation_date,report_id,record,local)
+															,state_report_number,agency_id,ORI_Number,loss_state_abbr,work_type_id,report_type_id,source_id,Sent_to_HPCC_DateTime,creation_date,report_id,local)
 													,state_report_number,agency_id,ORI_Number,loss_state_abbr,work_type_id,report_type_id,source_id,right,local)
 											;	
 											
-dincidentCombined := dincident_EA + dincident_EA_Coplogic + dincident_EA_CRU	+ dincident_TF ;
-
+dincidentCombined := dincident_EA + dincident_EA_Coplogic + dincident_EA_CRU	+ dincident_TF ;										
 //------------------------------------------------------------------------------------------------------------------							
-Layout_Infiles_Fixed.incident_ori trecs0(dincidentCombined L, fabAgency R) := transform
+tincident trecs0(tincident L, agency R) := transform
 self.agency_name := if(L.agency_id = R.agency_id,R.Agency_Name,'');// use this for QC ,if(work_type_id not in ['2','3'],l.agency_name,''));
-self.agency_ori := if(L.agency_id = R.agency_id,R.Agency_Ori,'');
 self := L;
-self := [];
 end;
 
-jrecs0 := distribute(join(dincidentCombined,fabAgency,
+jrecs0 := distribute(join(dincidentCombined,agency,
 							left.agency_id = right.agency_id,
 							trecs0(left,right),left outer,lookup),hash(incident_id)):independent;
 
 //------------------------------------------------------------------------------------------------------------------								
 FLAccidents_Ecrash.Layout_Infiles_Fixed.cmbnd  trecs1(jrecs0 L, tvehicl R) := transform
 self.incident_id         := L.incident_id;
-self.agency_id           := L.agency_id;
-self.agency_name         := L.agency_name;
-self.agency_ori          := L.agency_ori;
 self.creation_date       := L.creation_date;
 self.Avoidance_Maneuver2 := R.Avoidance_Maneuver2;
 self.Avoidance_Maneuver3 := R.Avoidance_Maneuver3;
@@ -208,9 +179,7 @@ self.Vehicle_Crash_Cityplace := R.Vehicle_Crash_Cityplace;
 self.Insurance_Company_Standardized := R.Insurance_Company_Standardized;
 self.number_of_lanes               := if(l.number_of_lanes not in ['','NULL'], l.number_of_lanes, r.number_of_lanes); 
 self.divided_highway               := if(l.divided_highway not in ['','NULL'], l.divided_highway, r.divided_highway);
-self.speed_limit_posted            := if(l.speed_limit_posted  not in ['','NULL'], l.speed_limit_posted, r.speed_limit_posted);
-self.posted_satutory_speed_limit   := if(l.posted_satutory_speed_limit  not in ['','NULL'], l.posted_satutory_speed_limit, r.posted_satutory_speed_limit);
-self.report_road_condition         := if(l.report_road_condition  not in ['','NULL'], l.report_road_condition, r.report_road_condition);
+self.speed_limit_posted            := if(l.speed_limit_posted  not in ['','NULL'], l.speed_limit_posted , r.speed_limit_posted );
 self := R;
 self := L;
 self := [];
@@ -230,15 +199,12 @@ d_person :=		dedup(
 									sort(
 										tpersn(incident_id!=''),
 												incident_id,vehicle_unit_number,last_name,first_name,date_of_birth,address,city,state,zip_code,home_phone,map(regexfind('DRIVER|VEHICLE DRIVER|VEHICLEDRIVER' , person_type) => 3
-                                                                                                                                      ,regexfind('OWNER|VEHICLE OWNER|VEHICLEOWNER' , person_type) => 2,1),creation_date,person_id,local)
-								       ,incident_id,vehicle_unit_number,last_name,first_name,date_of_birth,address,city,state,zip_code,home_phone,right,local); 
+                                                                                                                                      ,regexfind('OWNER|VEHICLE OWNER|VEHICLEOWNER' , person_type) => 2,1),creation_date,local)
+								       ,incident_id,vehicle_unit_number,last_name,first_name,date_of_birth,address,city,state,zip_code,right,local); 
 											 
 //------------------------------------------------------------------------------------------------------------------
 FLAccidents_Ecrash.Layout_Infiles_Fixed.cmbnd  trecs2(jrecs1 L, tpersn R) := transform
 self.incident_id         := L.incident_id;
-self.agency_id           := L.agency_id;
-self.agency_name         := L.agency_name;
-self.agency_ori          := L.agency_ori;
 self.creation_date       := L.creation_date;
 self.law_enforcement_suspects_alcohol_use1 := R.law_enforcement_suspects_alcohol_use1;
 self.law_enforcement_suspects_drug_use1 := R.law_enforcement_suspects_drug_use1 ;
@@ -255,7 +221,7 @@ self.Insurance_Expired:=l.Insurance_Expired;
 self.Insurance_Exempt:=l.Insurance_Exempt; 
 self.Insurance_Type:=l.Insurance_Type; 
 self.Insurance_Company_Code:=l.Insurance_Company_Code; 
-self.Address2 := STD.str.CleanSpaces(trim(L.Address2,left,right));
+self.Address2 := lib_StringLib.StringLib.StringCleanSpaces(trim(L.Address2,left,right));
 self := R;
 self := L;
 self := [];
@@ -288,9 +254,6 @@ allrecs := dedup(sort(jrecs2 + jrecsOthersPerson + Jperson,record,local),record,
 //------------------------------------------------------------------------------------------------------------------
 FLAccidents_Ecrash.Layout_Infiles_Fixed.cmbnd  trecs3(allrecs L, tcommercial R) := transform
 self.incident_id := L.incident_id;
-self.agency_id           := L.agency_id;
-self.agency_name         := L.agency_name;
-self.agency_ori          := L.agency_ori;
 self.vehicle_id := L.vehicle_id;
 self.creation_date := L.creation_date;
 self := R;
@@ -307,9 +270,6 @@ jrecs3 := join(distribute(allrecs,hash(vehicle_id))
 //------------------------------------------------------------------------------------------------------------------								
 FLAccidents_Ecrash.Layout_Infiles_Fixed.cmbnd  trecs4(jrecs3 L, tcitation R) := transform
 self.incident_id := L.incident_id;
-self.agency_id           := L.agency_id;
-self.agency_name         := L.agency_name;
-self.agency_ori          := L.agency_ori;
 self.creation_date := L.creation_date;
 self.person_id := l.person_id ; 
 self := R;
@@ -317,13 +277,13 @@ self := L;
 
 end;
 
-jrecs4 := join(distribute(jrecs3,hash(incident_id)),distribute(tcitation(incident_id!='' and person_id not in ['','NULL']),hash(incident_id)),
+/*jrecs4 := join(distribute(jrecs3,hash(incident_id)),distribute(tcitation(incident_id!='' and person_id not in ['','NULL']),hash(incident_id)),
 							left.incident_id = right.incident_id and
 							left.person_id =right.person_id, 
-							trecs4(left,right),left outer,local);	
-/*jrecs4 := join(distribute(jrecs3,hash(incident_id)),tcitation(incident_id!=''),
-							left.incident_id = right.incident_id,
 							trecs4(left,right),left outer,local);	*/
+jrecs4 := join(distribute(jrecs3,hash(incident_id)),tcitation(incident_id!=''),
+							left.incident_id = right.incident_id,
+							trecs4(left,right),left outer,local);	
 //------------------------------------------------------------------------------------------------------------------										
 
 // Property OWNER 
@@ -351,30 +311,43 @@ jrecs5 := join(jrecs0,tproperty(incident_id!=''),
 							left.incident_id = right.incident_id,
 							trecs5(left,right),local);		
 
-Combined := jrecs4 + jrecs5; 
+Combined := jrecs4 + jrecs5 ; 
+
+// Suppress the DE records basing on the drivers_exchange_flag in the agency file. -- #187626
+suppressAgencies := agency(drivers_exchange_flag ='0');
+
 updtdCombined := join(Combined,suppressAgencies(agency_id!=''),
-							        trim(left.agency_id,left,right) = trim(right.agency_id,left,right) and trim(left.report_type_id,left,right) ='DE',
-							        many lookup , left only );		
+							trim(left.agency_id,left,right) = trim(right.agency_id,left,right) and trim(left.report_type_id,left,right) ='DE',
+							many lookup , left only );		
 
 // end
+
 
 FLAccidents_Ecrash.macRemoveNulls(updtdCombined,outrecs);
 export cmbnd := dedup(sort(outrecs,record,local),record,local)(trim(agency_id,left,right) not in ['5','6','7']):persist('~thor_data400::persist::ecrash_cmbnd');
 
+
 //Agency cmbnd file for agency key in Buycrash KY Integration
-FLAccidents_Ecrash.Layouts.agency_cmbnd jagency0(uAgency le, uBillingagencies ri) := transform
-																																		self.Agency_ori := le.Agency_ori;
-																																		self.Agency_State_abbr := STD.Str.ToUpperCase(trim(le.Agency_State_abbr,left,right));
-																																		self.Agency_Name := STD.Str.ToUpperCase(trim(le.Agency_Name,left,right));
-																																		self.Mbsi_Agency_ID := le.Agency_ID;
-																																		self.Cru_Agency_ID := ri.Cru_Agency_ID;
-																																		self.Cru_State_Number := (unsigned3)ri.Cru_State_Number;
-																																		self.Source_ID := le.Source_ID;
-																																		self.Append_Overwrite_Flag := le.Append_Overwrite_Flag;
-																																		self := [];
+shared uBillingagencies := dedup(sort(distribute(billingagencies, hash32(Mbsi_Agency_ID)), 
+                                      Mbsi_Agency_ID, local), 
+																 Mbsi_Agency_ID, local);
+shared uAgency := dedup(sort(distribute(agency(Agency_ID != ''), hash32(Agency_ID)), 
+                             Agency_ID, -(Agency_Name <> ''), local), 
+												Agency_ID, local);
+												
+
+FLAccidents_Ecrash.Layout_Infiles_Fixed.agency_cmbnd jagency0(uBillingagencies le, uAgency ri) := transform
+																																		self.Agency_ori := ri.Agency_ori;
+																																		self.Agency_State_abbr := stringlib.stringtouppercase(trim(ri.Agency_State_abbr,left,right));
+																																		self.Agency_Name := stringlib.stringtouppercase(trim(ri.Agency_Name,left,right));
+																																		self.Mbsi_Agency_ID := ri.Agency_ID;
+																																		self.Cru_Agency_ID := le.Cru_Agency_ID;
+																																		self.Cru_State_Number := (unsigned3)le.Cru_State_Number;
+																																		self.Source_ID := ri.Source_ID;
+																																		self.Append_Overwrite_Flag := ri.Append_Overwrite_Flag;
 																																	 end;
-EXPORT agencycmbnd := 	join(uAgency, uBillingagencies, left.Agency_ID = right.Mbsi_Agency_ID,
-									           jagency0(left, right), left outer, local);
+EXPORT agencycmbnd := 	join(uBillingagencies, uAgency, left.Mbsi_Agency_ID = right.Agency_ID,
+									           jagency0(left, right), right outer, local);
 														 
 
 end;
