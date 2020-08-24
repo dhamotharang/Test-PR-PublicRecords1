@@ -1,7 +1,7 @@
 ﻿//NonFCRA Query Header Stats Watchdog Header
 //W20200810-174548	Prod 
 
-IMPORT _control, Header, Doxie, watchdog, ut, data_services;
+IMPORT STD, _control, Header, Doxie, watchdog, ut, data_services;
 export NonFCRA_QueryHeaderStatsWatchdogHdr(string pHostname, string pTarget, string pContact ='\' \'') := function
 
 filedate := (STRING8)Std.Date.Today();
