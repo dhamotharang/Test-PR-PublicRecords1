@@ -1,11 +1,15 @@
-// Ecrash Reports key, by Month Of Year
+﻿// Ecrash Reports key, by Month Of Year
 
 IMPORT FLAccidents_Ecrash, STD, UT,Data_Services,doxie;
 
-BaseKey := FLAccidents_Ecrash.File_KeybuildV2.out(report_code = 'EA' AND report_type_id = 'A' AND work_type_id NOT IN['2','3']);
+BaseKey := FLAccidents_Ecrash.File_Keybuild_analytics;
 
-Dedup1 := DEDUP(BaseKey(DID > '0'),DID + Vehicle_Incident_id);
-Dedup2 := DEDUP(BaseKey(DID = '0'),Vehicle_Incident_Id + fname + lname + name_suffix);
+/* Dedup1 := DEDUP(BaseKey(DID > '0'),DID + Vehicle_Incident_id);
+   Dedup2 := DEDUP(BaseKey(DID = '0'),Vehicle_Incident_Id + fname + lname + name_suffix);
+*/
+Dedup1 := DEDUP(SORT(DISTRIBUTE(BaseKey(DID > '0'),hash32(Vehicle_Incident_Id)),DID , Vehicle_Incident_id, local),DID , Vehicle_Incident_id,local);
+Dedup2 := DEDUP(SORT(DISTRIBUTE(BaseKey(DID = '0'), hash32(Vehicle_Incident_Id)), Vehicle_Incident_Id ,fname , lname , name_suffix , dob , driver_license_nbr,local)
+														,Vehicle_Incident_Id , fname , lname , name_suffix , dob , driver_license_nbr, local );
 
 DedupedKey := SORT(Dedup1 + Dedup2, jurisdiction_nbr + Vehicle_Incident_id + Vehicle_unit_number);
 
