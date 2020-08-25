@@ -3,6 +3,7 @@
 														, STRING BuildVersion
 														, STRING TOKEN
 														, STRING Comments =''
+														, STRING OrbitEnv
 
 													) := FUNCTION
 	IMPORT UPI_DataBuild__dev;
@@ -60,7 +61,7 @@
 		rOrbit			OrbitStatus 								{	XPATH('StatusCode'								)	}										;		
 	END;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
-	OrbitCall	:=	SOAPCALL(		UPI_DataBuild__dev.Orbit_Tracking.TargetURL
+	OrbitCallQA	:=	SOAPCALL(		UPI_DataBuild__dev.Orbit_Tracking.TargetURL
 													,	UPI_DataBuild__dev.Orbit_Tracking.SOAPService(sService)
 													,	rRequest
 													,	rResponse
@@ -72,7 +73,20 @@
 													, LOG
 												)	;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
-	RETURN	OrbitCall.BuildsR.BuildsSU.Status.Status;
+	OrbitCallPROD	:=	SOAPCALL(		UPI_DataBuild__dev.Orbit_TrackingPROD.TargetURL
+													,	UPI_DataBuild__dev.Orbit_TrackingPROD.SOAPService(sService)
+													,	rRequest
+													,	rResponse
+													,	XPATH(UPI_DataBuild__dev.Orbit_TrackingPROD.OrbitRR(sService)	)
+													,	NAMESPACE(UPI_DataBuild__dev.Orbit_TrackingPROD.Namespace_B)
+													,	LITERAL
+													,	SOAPACTION(UPI_DataBuild__dev.Orbit_TrackingPROD.SoapPath(sService) )
+													, RETRY(2)
+													, LOG
+												)	;
+	//-----------------------------------------------------------------------------------------------------------------------------------------
+	// RETURN	OrbitCall.BuildsR.BuildsSU.Status.Status;
+	RETURN	IF(OrbitEnv = 'QA', OrbitCallQA.BuildsR.BuildsSU.Status.Status, OrbitCallPROD.BuildsR.BuildsSU.Status.Status);
 	/*RETURN	IF ( 		OrbitCall.BuildsR.BuildsSU.BuildID = '0'
 								,	'Failure - Scrub Build Instance is invalid'
 								, OrbitCall.BuildsR.BuildsSU.Status.Status

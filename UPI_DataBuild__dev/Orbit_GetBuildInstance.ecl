@@ -1,7 +1,8 @@
 ﻿IMPORT UPI_DataBuild__dev;
 EXPORT Orbit_GetBuildInstance		 (	STRING BuildName
 														,	STRING BuildVersion
-														, STRING Token	
+														, STRING Token
+														, STRING OrbitEnv
 														)	:= FUNCTION
 														
 	// IMPORT Healthcare_Orbit;
@@ -136,7 +137,7 @@ EXPORT Orbit_GetBuildInstance		 (	STRING BuildName
 		STRING 				OriginalRequest								{	XPATH('OriginalRequest'							)	}							;
 	END;
 
-	OrbitCall	:=	SOAPCALL(		UPI_DataBuild__dev.Orbit_Tracking.TargetURL
+	OrbitCallQA	:=	SOAPCALL(		UPI_DataBuild__dev.Orbit_Tracking.TargetURL
 														,	UPI_DataBuild__dev.Orbit_Tracking.SOAPService(sService)
 														,	rRequest
 														,	rResponse
@@ -147,7 +148,19 @@ EXPORT Orbit_GetBuildInstance		 (	STRING BuildName
 														, RETRY(2)
 														, LOG
 													)	;
-		RETURN	OrbitCall	;
+
+	OrbitCallPROD	:=	SOAPCALL(		UPI_DataBuild__dev.Orbit_TrackingPROD.TargetURL
+														,	UPI_DataBuild__dev.Orbit_TrackingPROD.SOAPService(sService)
+														,	rRequest
+														,	rResponse
+														,	XPATH(UPI_DataBuild__dev.Orbit_TrackingPROD.OrbitRR(sService)	)
+														,	NAMESPACE(UPI_DataBuild__dev.Orbit_TrackingPROD.Namespace_B)
+														,	LITERAL
+														,	SOAPACTION(UPI_DataBuild__dev.Orbit_TrackingPROD.SoapPath(sService) )
+														, RETRY(2)
+														, LOG
+													)	;
+		RETURN	IF(OrbitEnv = 'QA', OrbitCallQA, OrbitCallPROD)	;
 	
 END ; 
  
