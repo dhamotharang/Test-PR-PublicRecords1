@@ -370,7 +370,7 @@
     today := STD.Date.Today();
 
     // Identities section
-    iesp.phonefinder.t_PhoneIdentityInfo tFormat2IespIdentity(lFinal pInput) :=
+    $.Layouts.log_identities tFormat2IespIdentity(lFinal pInput) :=
     TRANSFORM
       dt_first_seen := ValidateDate((INTEGER)pInput.dt_first_seen);
       dt_last_seen  := ValidateDate((INTEGER)pInput.dt_last_seen);
@@ -581,6 +581,27 @@
 
     dOtherPhonesIesp := PROJECT(SORT(dIn(~isPrimaryPhone AND ~isPrimaryIdentity AND phone != ''), acctno, -phone_score, -dt_last_seen, dt_first_seen), tFormat2IespOtherPhones(LEFT));
 
+   //Sourcing Deltabase
+  //In a PIISearch sourcedetails are reported in OtherPhones and PrimaryPhone.
+   dsFinalSrcRecs := IF(~inMod.isPrimarySearchPII, dIn(fname != '' OR lname != '' OR listed_name != ''),
+                                                   dIn(isPrimaryPhone AND isPrimaryIdentity) & dIn(~isPrimaryPhone AND ~isPrimaryIdentity AND phone != ''));
+
+   $.Layouts.delta_phones_rpt_sources xfm_src(PhoneFinder_Services.Layouts.PhoneFinder.Final l,  $.Layouts.PhoneFinder.Src_Rec r, INTEGER C) := TRANSFORM
+       SELF.transaction_id      := inMod.TransactionId;
+       SELF.sequence_number     := C;
+       SELF.lexid               := l.did;
+       SELF.phone_id            := IF(inMod.IsPrimarySearchPII, l.phone_id, 0); //PII 
+       SELF.identity_id         := IF(~inMod.IsPrimarySearchPII, l.identity_id, 0); //Phone
+       SELF.totalsourcecount    := l.totalsourcecount;
+       SELF.Category            := $.Constants.MapCategoryDCT(r.Src);
+       SELF.source_type         := $.Constants.MapSourceTypeDCT(r.src);
+       SELF.phonenumber         := l.phone;
+       SELF.Source              := r.src;
+       SELF                     := [];
+   END;
+
+   Src_Recs := NORMALIZE(dsFinalSrcRecs, LEFT.phn_src_all, xfm_src(LEFT, RIGHT, COUNTER));
+    
     // Format to final iesp layout
     $.Layouts.log_PhoneFinderSearchRecord tFormat2PhoneFinderSearch() :=
     TRANSFORM
@@ -596,6 +617,7 @@
                                                                 SELF           := LEFT)),
                                               iesp.Constants.Phone_Finder.MaxPhoneHistory));
       SELF.OtherPhones         := IF(inMod.isPrimarySearchPII, CHOOSEN(dOtherPhonesIesp, iesp.Constants.Phone_Finder.MaxOtherPhones));
+      SELF.log_source          := Src_Recs;
     END;
 
     dFormat2PhoneFinderSearch := DATASET([tFormat2PhoneFinderSearch()]);
