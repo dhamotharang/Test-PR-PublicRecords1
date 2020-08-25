@@ -1,4 +1,5 @@
 ﻿#OPTION('multiplePersistInstances',FALSE);
+#OPTION('remoteKeyedLookup', FALSE);
 
 IMPORT ut,LN_PropertyV2,LN_PropertyV2_Fast,PropertyScrubs, nid,ln_propertyv2_addressenhancements, InsuranceHeader_Property_Transactions_DeedsMortgages, PromoteSupers, STD;
 
@@ -38,6 +39,8 @@ EXPORT proc3Enhance( string versionDate, boolean isFast, string8 forceDeltaStart
                                    LN_PropertyV2_Fast.Files.prep.addl_legal);
 	prepAddlNames  := if(isFast,JOIN(distribute(LN_PropertyV2_Fast.Files.prep.addl_names,hash32(ln_fares_id)),ln_fares_ids, LEFT.ln_fares_id = RIGHT.ln_fares_id, TRANSFORM(LEFT),local),
                                    LN_PropertyV2_Fast.Files.prep.addl_names);
+	prepAddlNameInfo  := if(isFast,JOIN(distribute(LN_PropertyV2_Fast.Files.prep.addl_name_info,hash32(ln_fares_id)),ln_fares_ids, LEFT.ln_fares_id = RIGHT.ln_fares_id, TRANSFORM(LEFT),local),
+                                   LN_PropertyV2_Fast.Files.prep.addl_name_info);
 	
 // *** BELOW code will drop when we retire old "in files"	*** // ****************************************************//
 	// LOAD OKC OLD "IN" FILES
@@ -127,10 +130,11 @@ EXPORT proc3Enhance( string versionDate, boolean isFast, string8 forceDeltaStart
 
 // *** ABOVE code will drop when we retire old "in files"	*** //****************************************************//
 
-	prepAssessmentR := LN_PropertyV2_Fast.ReplaceRecords(prepAssessment,prepDeedMortga,prepAddlNames,prepAddlLegal,prepSearchProp).assessmnt;
-	prepDeedMortgaR	:= LN_PropertyV2_Fast.ReplaceRecords(prepAssessment,prepDeedMortga,prepAddlNames,prepAddlLegal,prepSearchProp).deedMortg;
-	prepAddlNamesR	:= LN_PropertyV2_Fast.ReplaceRecords(prepAssessment,prepDeedMortga,prepAddlNames,prepAddlLegal,prepSearchProp).addlNames;
-	prepAddlLegalR	:= LN_PropertyV2_Fast.ReplaceRecords(prepAssessment,prepDeedMortga,prepAddlNames,prepAddlLegal,prepSearchProp).addlLegal;
+	prepAssessmentR := LN_PropertyV2_Fast.ReplaceRecords(prepAssessment,prepDeedMortga,prepAddlNames,prepAddlLegal,prepSearchProp/*,prepAddlNameInfo*/).assessmnt;
+	prepDeedMortgaR	:= LN_PropertyV2_Fast.ReplaceRecords(prepAssessment,prepDeedMortga,prepAddlNames,prepAddlLegal,prepSearchProp/*,prepAddlNameInfo*/).deedMortg;
+	prepAddlNamesR	:= LN_PropertyV2_Fast.ReplaceRecords(prepAssessment,prepDeedMortga,prepAddlNames,prepAddlLegal,prepSearchProp/*,prepAddlNameInfo*/).addlNames;
+	prepAddlLegalR	:= LN_PropertyV2_Fast.ReplaceRecords(prepAssessment,prepDeedMortga,prepAddlNames,prepAddlLegal,prepSearchProp/*,prepAddlNameInfo*/).addlLegal;
+//	prepAddlNmInfoR	:= LN_PropertyV2_Fast.ReplaceRecords(prepAssessment,prepDeedMortga,prepAddlNames,prepAddlLegal,prepSearchProp,prepAddlNameInfo).addlNameInfo;
 	prepSearchPrpR	:= LN_PropertyV2_Fast.ReplaceRecords(prepAssessment+project(oldOkcAssmnt + oldFrsAssessment
 																																							,TRANSFORM(LN_PropertyV2_Fast.Layout_prep_assessment
 																																												 ,SELF.update_type := ''
@@ -147,7 +151,7 @@ EXPORT proc3Enhance( string versionDate, boolean isFast, string8 forceDeltaStart
 																																												 ,SELF := LEFT
 																																												 )
 																																							 )
-																											                              ,prepAddlNames,prepAddlLegal,prepSearchProp).searchPrp;
+																											                              ,prepAddlNames,prepAddlLegal,prepSearchProp/*,prepAddlNameInfo*/).searchPrp;
 		
 	// -- COMBINE NEW PREP AND OLD "IN" FILES -- //
 	irs_a := LN_PropertyV2.irs_dummy_recs_assessor;
@@ -261,6 +265,8 @@ EXPORT proc3Enhance( string versionDate, boolean isFast, string8 forceDeltaStart
 										LN_PropertyV2_Fast.FileNames.baseFull.assessment);
 	ade := if (isFast,LN_PropertyV2_Fast.FileNames.base.deed_mortg,
 										LN_PropertyV2_Fast.FileNames.baseFull.deed_mortg);
+	// ani := if (isFast,LN_PropertyV2_Fast.FileNames.base.addl_name_info,
+										// LN_PropertyV2_Fast.FileNames.baseFull.addl_name_info);
 	
 	// Deed property linking (Jira SLP-1)
 	
@@ -282,6 +288,7 @@ EXPORT proc3Enhance( string versionDate, boolean isFast, string8 forceDeltaStart
 	search_withdid_d						:= dedup(LN_PropertyV2_fast.files.base.search_prp+search_withdid,all);
 	assesswBitmap_d							:= dedup(fast_base_assessment+assesswBitmap,all);
 	deedswbitmap_d							:= dedup(fast_base_deed_mortg+deedswbitmap,all);
+	// addlNameInfo_d							:= dedup(LN_PropertyV2_fast.files.base.addl_name_info + prepAddlNmInfoR,all);
 
 	combined_addl_legal_c				:= if(isfast,combined_addl_legal_d,combined_addl_legal);
 	addlFaresAssessorPatched_c	:= if(isfast,addlFaresAssessorPatched_d,addlFaresAssessorPatched);
@@ -290,6 +297,7 @@ EXPORT proc3Enhance( string versionDate, boolean isFast, string8 forceDeltaStart
 	search_withdid_c						:= if(isfast,search_withdid_d,search_withdid);
 	assesswBitmap_c							:= if(isfast,assesswBitmap_d,assesswBitmap);
 	deedswbitmap_c							:= if(isfast,deedswbitmap_d,deedswbitmap);
+	// addlNameInfo_c							:= if(isfast,addlNameInfo_d,prepAddlNmInfoR);
 
 	PromoteSupers.MAC_SF_BuildProcess(combined_addl_legal_c,		 alg,bld_propertyv2_legal,2,,true,versionDate);
 	PromoteSupers.MAC_SF_BuildProcess(addlFaresAssessorPatched_c,afa,bld_propertyv2_fares_tax,2,,true,versionDate);
@@ -297,7 +305,8 @@ EXPORT proc3Enhance( string versionDate, boolean isFast, string8 forceDeltaStart
 	PromoteSupers.MAC_SF_BuildProcess(addlNames_c,							 aln,bld_propertyv2_ln_addl_names,2,,true,versionDate);
 	PromoteSupers.MAC_SF_BuildProcess(search_withdid_c,					 asr,bld_propertyv2_search,2,,true,versionDate);
 	PromoteSupers.MAC_SF_BuildProcess(assesswBitmap_c,					 asm,bld_propertyv2_Assesor,2,,true,versionDate);
-	PromoteSupers.MAC_SF_BuildProcess(deedswbitmap_c,						 ade,bld_propertyv2_Deed,2,,true,versionDate);		
+	PromoteSupers.MAC_SF_BuildProcess(deedswbitmap_c,						 ade,bld_propertyv2_Deed,2,,true,versionDate);
+//	PromoteSupers.MAC_SF_BuildProcess(addlNameInfo_c,						 ani,bld_propertyv2_addl_name_info,2,,true,versionDate);
 
 // ** End lines to implement true delta **
 
@@ -309,6 +318,7 @@ EXPORT proc3Enhance( string versionDate, boolean isFast, string8 forceDeltaStart
 	bld_propertyv2_search 			:= output(search_withdid,,asr+'_'+versionDate,compressed,overwrite);
 	bld_propertyv2_Assesor 			:= output(assesswBitmap,,asm+'_f_'+versionDate,compressed,overwrite);
 	bld_propertyv2_Deed 				:= output(deedswbitmap,,ade+'_'+versionDate,compressed,overwrite);
+	//bld_propertyv2_addl_name_info	:= output(prepAddlNmInfoR,,ani+'_'+versionDate,compressed,overwrite);
 	
 	PromoteSupers.MAC_SF_BuildProcess(combined_addl_legal, 			alg,bld_propertyv2_legal,2,,true,versionDate);
   PromoteSupers.MAC_SF_BuildProcess(addlFaresAssessorPatched, 	afa,bld_propertyv2_fares_tax,2,,true,versionDate);
@@ -316,7 +326,8 @@ EXPORT proc3Enhance( string versionDate, boolean isFast, string8 forceDeltaStart
   PromoteSupers.MAC_SF_BuildProcess(addlNames, 								aln,bld_propertyv2_ln_addl_names,2,,true,versionDate);
   PromoteSupers.MAC_SF_BuildProcess(search_withdid, 						asr,bld_propertyv2_search,2,,true,versionDate);
   PromoteSupers.MAC_SF_BuildProcess(assesswBitmap, 						asm,bld_propertyv2_Assesor,2,,true,versionDate);
-	PromoteSupers.MAC_SF_BuildProcess(deedswbitmap, 							ade,bld_propertyv2_Deed,2,,true,versionDate);										 
+	PromoteSupers.MAC_SF_BuildProcess(deedswbitmap, 							ade,bld_propertyv2_Deed,2,,true,versionDate);
+	//PromoteSupers.MAC_SF_BuildProcess(prepAddlNmInfoR, 							ani,bld_propertyv2_addl_name_info,2,,true,versionDate);										 
 */ 	
 
 	return	sequential(	
@@ -330,6 +341,7 @@ EXPORT proc3Enhance( string versionDate, boolean isFast, string8 forceDeltaStart
 											bld_propertyv2_search,
 											bld_propertyv2_Assesor,
 											bld_propertyv2_Deed,
+											//bld_propertyv2_addl_name_info,
 											LN_PropertyV2_Fast.BuildLogger.update(versionDate,'base_build_end_date',(STRING8)Std.Date.Today()),
 											);	
 END;

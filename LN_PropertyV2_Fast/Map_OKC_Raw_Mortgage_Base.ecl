@@ -1,4 +1,4 @@
-/*2014-07-11T21:47:48Z (Gabriel Marcan_prod)
+﻿/*2014-07-11T21:47:48Z (Gabriel Marcan_prod)
 updated to latest dev version
 */
 IMPORT ln_propertyv2,Tools,ut,Address,Census_Data,nid;
