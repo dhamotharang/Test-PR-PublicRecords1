@@ -278,129 +278,129 @@ despray_WatchDogHeaderCoreSegments:= STD.File.DeSpray('~thor_data400::data_insig
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true);
 																				
-despray_DIDAddressHasNameAndAddress:= STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddress_'+ filedate +'.csv', 
+despray_DIDAddressHasNameAndAddress:= STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddress_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddress_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddress_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true);
 
-despray_DIDAddressHasNameAndAddressAndDOB:= STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddressAndDOB_'+ filedate +'.csv', 
+despray_DIDAddressHasNameAndAddressAndDOB:= STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndDOB_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddressAndDOB_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddressAndDOB_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true);
 
-despray_DIDAddressHasNameAndAddressAndDL := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddressAndDL_'+ filedate +'.csv', 
+despray_DIDAddressHasNameAndAddressAndDL := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndDL_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddressAndDL_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddressAndDL_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true); 
 
-despray_DIDAddressHasNameAndAddressAndSSN := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddressAndSSN_'+ filedate +'.csv', 
+despray_DIDAddressHasNameAndAddressAndSSN := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSN_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddressAndSSN_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSN_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true);  
 
-despray_DIDAddressHasNameAndAddressAndSSNandDOB := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddressAndSSNandDOB_'+ filedate +'.csv', 
+despray_DIDAddressHasNameAndAddressAndSSNandDOB := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOB_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddressAndSSNandDOB_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOB_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true);   
 
-despray_DIDAddressHasNameAndAddressAndSSNandDOBAndDL := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddressAndSSNandDOBAndDL_'+ filedate +'.csv', 
+despray_DIDAddressHasNameAndAddressAndSSNandDOBAndDL := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOBAndDL_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddressAndSSNandDOBAndDL_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOBAndDL_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true);   
 
-despray_DIDAddressHasNameAndAddressAndPhone := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddressAndPhone_'+ filedate +'.csv', 
+despray_DIDAddressHasNameAndAddressAndPhone := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndPhone_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddressAndPhone_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddressAndPhone_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true);     
 
- despray_DIDAddressHasNameAndAddress1824 := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddress1824_'+ filedate +'.csv', 
+ despray_DIDAddressHasNameAndAddress1824 := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddress1824_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddress1824_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddress1824_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true); 
 
- despray_DIDAddressHasNameAndAddressAndDOB1824 := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddressAndDOB1824_'+ filedate +'.csv', 
+ despray_DIDAddressHasNameAndAddressAndDOB1824 := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndDOB1824_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddressAndDOB1824_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddressAndDOB1824_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true);   
 
-despray_DIDAddressHasNameAndAddressAndDL1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddressAndDL1824_'+ filedate +'.csv', 
+despray_DIDAddressHasNameAndAddressAndDL1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndDL1824_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddressAndDL1824_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddressAndDL1824_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true);   
 																				
- despray_DIDAddressHasNameAndAddressAndSSN1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddressAndSSN1824_'+ filedate +'.csv', 
+ despray_DIDAddressHasNameAndAddressAndSSN1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSN1824_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddressAndSSN1824_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSN1824_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true);      
 
-  despray_DIDAddressHasNameAndAddressAndSSNandDOB1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddressAndSSNandDOB1824_'+ filedate +'.csv', 
+  despray_DIDAddressHasNameAndAddressAndSSNandDOB1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOB1824_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddressAndSSNandDOB1824_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOB1824_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true);     
 
- despray_DIDAddressHasNameAndAddressAndSSNandDOBAndDL1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddressAndSSNandDOBAndDL1824_'+ filedate +'.csv', 
+ despray_DIDAddressHasNameAndAddressAndSSNandDOBAndDL1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOBAndDL1824_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddressAndSSNandDOBAndDL1824_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOBAndDL1824_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true);    
 
- despray_DIDAddressHasNameAndAddressAndPhone1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddressAndPhone1824_'+ filedate +'.csv', 
+ despray_DIDAddressHasNameAndAddressAndPhone1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndPhone1824_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddressAndPhone1824_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddressAndPhone1824_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true);  
 
- despray_DIDAddressHasNameAndAddressNot1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddressNot1824_'+ filedate +'.csv', 
+ despray_DIDAddressHasNameAndAddressNot1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressNot1824_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddressNot1824_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddressNot1824_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true);    
 
- despray_DIDAddressHasNameAndAddressAndDOBNot1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddressAndDOBNot1824_'+ filedate +'.csv', 
+ despray_DIDAddressHasNameAndAddressAndDOBNot1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndDOBNot1824_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddressAndDOBNot1824_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddressAndDOBNot1824_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true);  
 
- despray_DIDAddressHasNameAndAddressAndDLNot1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddressAndDLNot1824_'+ filedate +'.csv', 
+ despray_DIDAddressHasNameAndAddressAndDLNot1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndDLNot1824_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddressAndDLNot1824_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddressAndDLNot1824_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true);      
 
- despray_DIDAddressHasNameAndAddressAndSSNNot1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddressAndSSNNot1824_'+ filedate +'.csv', 
+ despray_DIDAddressHasNameAndAddressAndSSNNot1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNNot1824_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddressAndSSNNot1824_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNNot1824_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true);    
 
-despray_DIDAddressHasNameAndAddressAndSSNandDOBNot1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddressAndSSNandDOBNot1824_'+ filedate +'.csv', 
+despray_DIDAddressHasNameAndAddressAndSSNandDOBNot1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOBNot1824_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddressAndSSNandDOBNot1824_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOBNot1824_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true);   
 
-despray_DIDAddressHasNameAndAddressAndSSNandDOBAndDLNot1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddressAndSSNandDOBAndDLNot1824_'+ filedate +'.csv', 
+despray_DIDAddressHasNameAndAddressAndSSNandDOBAndDLNot1824  := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOBAndDLNot1824_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddressAndSSNandDOBAndDLNot1824_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddressAndSSNandDOBAndDLNot1824_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true);  
 																				
-despray_DIDAddressHasNameAndAddressAndPhoneNot1824   := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_DIDAddressHasNameAndAddressAndPhoneNot1824_'+ filedate +'.csv', 
+despray_DIDAddressHasNameAndAddressAndPhoneNot1824   := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_NonFCRA_DIDAddressHasNameAndAddressAndPhoneNot1824_'+ filedate +'.csv', 
 																				pHostname, 
-																				pTarget + '/tbl_DIDAddressHasNameAndAddressAndPhoneNot1824_'+ filedate +'.csv' 
+																				pTarget + '/tbl_NonFCRA_DIDAddressHasNameAndAddressAndPhoneNot1824_'+ filedate +'.csv' 
 																				//charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																				,,,,true);   																				
 
