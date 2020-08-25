@@ -317,14 +317,14 @@ MODULE
         {PFSourceCategory.MarketingData, MDR.sourceTools.src_Cellphones_traffix, PFSourceType.SelfReported},//02
         {PFSourceCategory.MarketingData, MDR.sourceTools.src_Cellphones_kroll, PFSourceType.SelfReported},//01
         {PFSourceCategory.MNOCarrier, PFSourceCodes.Zumigo, PFSourceType.Account},//MNO
-        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_MO_Veh, PFSourceType.Account},//SV
-        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_NC_Watercraft, PFSourceType.Account},//NW
-        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_Federal_Firearms, PFSourceType.Account},//FF
-        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_Federal_Explosives, PFSourceType.Account},//FE
-        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_EMerge_Master, PFSourceType.Account},//EM
-        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_EMerge_Cens, PFSourceType.Account},//E4
-        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_EMerge_Fish, PFSourceType.Account},//E2
-        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_EMerge_Hunt, PFSourceType.Account},//E1
+        {PFSourceCategory.NonProfessionalLicense, MDR.sourceTools.src_MO_Veh, PFSourceType.Account},//SV
+        {PFSourceCategory.NonProfessionalLicense, MDR.sourceTools.src_NC_Watercraft, PFSourceType.Account},//NW
+        {PFSourceCategory.NonProfessionalLicense, MDR.sourceTools.src_Federal_Firearms, PFSourceType.Account},//FF
+        {PFSourceCategory.NonProfessionalLicense, MDR.sourceTools.src_Federal_Explosives, PFSourceType.Account},//FE
+        {PFSourceCategory.NonProfessionalLicense, MDR.sourceTools.src_EMerge_Master, PFSourceType.Account},//EM
+        {PFSourceCategory.NonProfessionalLicense, MDR.sourceTools.src_EMerge_Cens, PFSourceType.Account},//E4
+        {PFSourceCategory.NonProfessionalLicense, MDR.sourceTools.src_EMerge_Fish, PFSourceType.Account},//E2
+        {PFSourceCategory.NonProfessionalLicense, MDR.sourceTools.src_EMerge_Hunt, PFSourceType.Account},//E1
         {PFSourceCategory.Other, PFSourceCodes.UNDEFINED, PFSourceType.Account},
         {PFSourceCategory.Other, MDR.sourceTools.src_Miscellaneous, PFSourceType.Account},//PQ
         {PFSourceCategory.EmploymentData, PFSourceCodes.Spouse, PFSourceType.Account},//SP
