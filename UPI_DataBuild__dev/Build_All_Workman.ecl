@@ -10,6 +10,7 @@ EXPORT  Build_All_Workman(
 		, pBatch_jobID
 		, pAppendOption
 		, pReceivingID
+		, pCrk_suffix
 		, pOrbEnv) := functionmacro
 
   #WORKUNIT('NAME','Customer Record Key Thor Build for GCID='+gcid);
@@ -36,6 +37,7 @@ EXPORT  Build_All_Workman(
 														'\npBatchJobID			:= \''+pBatch_JobID+'\';'+
 														'\npAppendOption		:= \''+pAppendOption+'\';' + 
 														'\npReceivingID			:= \''+pReceivingID+'\';' +
+														'\npCrk_suffix			:= \''+pCrk_suffix+'\';' +
 														'\npOrbEnv					:= \''+pOrbEnv+'\';' +
                             '\n#WORKUNIT(\'name\',\'UPI_DataBuild '+runText+' \' + pVersion + \' gcid \' + gcid + \' Batch_JobID \' + pBatchJobID);' +
                             '\n#WORKUNIT(\'priority\',\'high\');' +
@@ -48,7 +50,7 @@ EXPORT  Build_All_Workman(
   step1_Text  :=  'NoMatchBuild_' + gcid + '_' + pbatch_jobID;
   step1_ECL   :=  workmanPreamble(step1_Text)+
                       '\nUPI_DataBuild__dev.Build_All_V2(pVersion,pUseProd,gcid,pLexidThreshold,pHistMode,gcid_name'+
-											',pBatchJobID,pAppendOption,pReceivingID,pOrbEnv).Step1;';
+											',pBatchJobID,pAppendOption,pReceivingID,pCrk_suffix,pOrbEnv).Step1;';
 
 	// workman code should be called from hthor, and then within the code, switch to other clusters if needed	
   pStep1      :=  Workman.mac_WorkMan(
@@ -85,7 +87,7 @@ EXPORT  Build_All_Workman(
   Step2_Text :=  'CallingCRKMacro GCID = ' + gcid + ' JobID = ' + pBatch_jobID;
   Step2_ECL  :=  workmanPreamble(Step2_Text) +
                         '\nUPI_DataBuild__dev.Build_all_V2(pVersion,pUseProd,gcid,pLexidThreshold,pHistMode,gcid_name'+
-												',pBatchJobID,pAppendOption,pReceivingID,pOrbEnv).Step2;';
+												',pBatchJobID,pAppendOption,pReceivingID,pCrk_suffix,pOrbEnv).Step2;';
   pStep2    :=  Workman.mac_WorkMan(
                         Step2_ECL                //  pECL
                         ,pVersion                       //  pversion
@@ -117,7 +119,7 @@ EXPORT  Build_All_Workman(
   Step3_Text  := 'NoMatchResults_' + gcid + '_' + pbatch_jobID;
   Step3_ECL   := workmanPreamble(Step3_Text)+
                         '\nUPI_DataBuild__dev.Build_all_V2(pVersion,pUseProd,gcid,pLexidThreshold,pHistMode,gcid_name'+
-												',pBatchJobID,pAppendOption,pReceivingID,pOrbEnv).Step3;';
+												',pBatchJobID,pAppendOption,pReceivingID,pCrk_suffix,pOrbEnv).Step3;';
   pStep3     :=  Workman.mac_WorkMan(
                         Step3_ECL   //  pECL
                         ,pVersion       //  pversion
