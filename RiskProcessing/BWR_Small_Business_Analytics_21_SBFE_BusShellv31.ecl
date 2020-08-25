@@ -421,7 +421,7 @@ layout_flat_v21 := RECORD
 		LNSmallBusiness.BIP_Layouts.Version21Attributes;
 		#END
 		#IF(IncludeSBFE)
-		LNSmallBusiness.BIP_Layouts.SBFEAttributes;			
+		LNSmallBusiness.BIP_Layouts.SBFEAttributes - SBFEDelq91CountEverTtl - SBFEDelq121CountEverTtl - SBFEDelq121CountTtl;			
 		#END
 
 		// SBA Supports up to a max of 10 model scores
@@ -530,7 +530,7 @@ layout_flat_v21 flatten_v21(layout_soap le, SmallBusinessAnalyticsoutput ri) := 
 	SELF.InputCheckBusCity := V21AttributeResults[5].value;
 	SELF.InputCheckBusState := V21AttributeResults[6].value;
 	SELF.InputCheckBusZip := V21AttributeResults[7].value;
-	SELF.InputCheckBusFEIN := V21AttributeResults[8].value;
+	SELF.InputCheckBusTIN := V21AttributeResults[8].value;
 	SELF.InputCheckBusPhone := V21AttributeResults[9].value;
 	SELF.InputCheckBusFax := V21AttributeResults[10].value;
 	SELF.InputCheckBusNAICS := V21AttributeResults[11].value;
@@ -580,7 +580,7 @@ layout_flat_v21 flatten_v21(layout_soap le, SmallBusinessAnalyticsoutput ri) := 
 	SELF.OutBestBusCity := V21AttributeResults[55].value;
 	SELF.OutBestBusState := V21AttributeResults[56].value;
 	SELF.OutBestBusZip := V21AttributeResults[57].value;
-	SELF.OutBestBusFEIN := V21AttributeResults[58].value;
+	SELF.OutBestBusTIN := V21AttributeResults[58].value;
 	SELF.OutBestBusPhone := V21AttributeResults[59].value;
 	SELF.OutBestNAICS := V21AttributeResults[60].value;
 	SELF.OutBestSIC := V21AttributeResults[61].value;
@@ -733,9 +733,9 @@ layout_flat_v21 flatten_v21(layout_soap le, SmallBusinessAnalyticsoutput ri) := 
 	SELF.BusExecLinkPropOverlapCount3 := V21AttributeResults[208].value;
 	SELF.BusExecLinkBusAddrRep3Owned := V21AttributeResults[209].value;
 	SELF.BusAddrPersonNameOverlap := V21AttributeResults[210].value;
-	SELF.BusFEINPersonAddrOverlap := V21AttributeResults[211].value;
-	SELF.BusFEINPersonPhoneOverlap := V21AttributeResults[212].value;
-	SELF.BusFEINPersonOverlap := V21AttributeResults[213].value;
+	SELF.BusTINPersonAddrOverlap := V21AttributeResults[211].value;
+	SELF.BusTINPersonPhoneOverlap := V21AttributeResults[212].value;
+	SELF.BusTINPersonOverlap := V21AttributeResults[213].value;
 	SELF.InputAddrConsumerCount := V21AttributeResults[214].value;
 	SELF.InputTINEntityCount := V21AttributeResults[215].value;
 	SELF.InputPhoneEntityCount := V21AttributeResults[216].value;
