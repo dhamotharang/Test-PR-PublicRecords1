@@ -360,7 +360,7 @@ layout_flat_v2 := RECORD
 		LNSmallBusiness.BIP_Layouts.Version2Attributes - SourceIndex;
 		#END
 		#IF(IncludeSBFE)
-		LNSmallBusiness.BIP_Layouts.SBFEAttributes;			
+		LNSmallBusiness.BIP_Layouts.SBFEAttributes - SBFEDelq91CountEverTtl - SBFEDelq121CountEverTtl - SBFEDelq121CountTtl;			
 		#END
 		// SBA Supports up to a max of 10 model scores
 		STRING50 Model1Name;
