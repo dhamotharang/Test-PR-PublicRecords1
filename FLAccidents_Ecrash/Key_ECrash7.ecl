@@ -1,4 +1,4 @@
-Import Data_Services, doxie,FLAccidents,lib_stringlib;
+﻿Import Data_Services, doxie, FLAccidents, lib_stringlib, STD;
 
 /////////////////////////////////////////////////////////////////
 //Expand Florida file 
@@ -68,7 +68,7 @@ xpnd_layout xpndrecs(flc7 L) := transform
 self.report_code					:= 'FA';
 self.report_category				:= 'Auto Report';
 self.report_code_desc				:= 'Auto Accident';
-self.accident_nbr := stringlib.StringFilter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+self.accident_nbr := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 self.orig_accnbr := l.accident_nbr; 
 self 								:= L;
 end;
@@ -76,8 +76,7 @@ end;
 pflc7:= project(flc7,xpndrecs(left));
 
 //ecrash 
-
-pecrshFile := FLAccidents_Ecrash.BaseFile ( StringLib.StringToUpperCase(trim(person_type)) in ['PROPERTY DAMAGE OWNER','PROPERTY OWNER']); 
+pecrshFile := eCrashBaseAgencyExclusion( STD.Str.ToUpperCase(trim(person_type)) in ['PROPERTY DAMAGE OWNER','PROPERTY OWNER']); 
 
 xpnd_layout xpndecrash(pecrshFile L) := transform
 
@@ -86,7 +85,7 @@ self.did							:= if(L.did = 0,'000000000000',intformat(L.did,12,1));
 self.b_did							:= if(L.bdid = 0,'',intformat(L.bdid,12,1)); 
 self.b_did_score      := l.bdid_score ; 
 t_accident_nbr 			:= if(l.source_id in ['TM','TF'],L.state_report_number, L.case_identifier);
-t_scrub := stringlib.StringFilter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
 self.orig_accnbr := t_accident_nbr;
 self.prop_damage_nbr := ''; // need to be populated after property damage file added in prod 
@@ -116,7 +115,7 @@ pecrash := project(pecrshFile, xpndecrash(left));
 
 //iyetek 
 
-/*iyetekFile := FLAccidents_Ecrash.BaseFile_Iyetek( StringLib.StringToUpperCase(trim(person_type)) in ['PROPERTY DAMAGE OWNER','PROPERTY OWNER']); 
+/*iyetekFile := FLAccidents_Ecrash.BaseFile_Iyetek( STD.Str.ToUpperCase(trim(person_type)) in ['PROPERTY DAMAGE OWNER','PROPERTY OWNER']); 
 
 xpnd_layout xpndiyetek(iyetekFile L) := transform
 
@@ -124,7 +123,7 @@ self.rec_type_7						:= '7';
 self.did							:= if(L.did = 0,'000000000000',intformat(L.did,12,1));
 self.b_did							:= if(L.bdid = 0,'',intformat(L.bdid,12,1)); 
 self.b_did_score      := l.bdid_score ; 
-t_scrub := stringlib.StringFilter(L.state_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+t_scrub := STD.Str.Filter(L.state_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);  
 self.orig_accnbr := L.state_report_number; 
 

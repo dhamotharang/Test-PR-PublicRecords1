@@ -1,10 +1,18 @@
+﻿/*2017-03-22T17:50:04Z (Srilatha Katukuri)
+ECH-4531 Analytics key Injury count correction
+*/
 IMPORT FLAccidents_Ecrash, STD, UT, doxie, Data_Services;
 
-BaseKey := FLAccidents_Ecrash.File_KeybuildV2.out(report_code = 'EA' AND report_type_id = 'A' AND work_type_id NOT IN['2','3']);
+BaseKey := FLAccidents_Ecrash.File_Keybuild_analytics;
 
-Dedup1 := DEDUP(BaseKey(DID > '0'),DID + Vehicle_Incident_id);
-Dedup2 := DEDUP(BaseKey(DID = '0'),Vehicle_Incident_Id + fname + lname + name_suffix);
+/* Dedup1 := DEDUP(BaseKey(DID > '0'),DID + Vehicle_Incident_id);
+   Dedup2 := DEDUP(BaseKey(DID = '0'),Vehicle_Incident_Id + fname + lname + name_suffix);
+*/
 
+Dedup1 := DEDUP(SORT(DISTRIBUTE(BaseKey(DID > '0'),hash32(Vehicle_Incident_Id)),DID , Vehicle_Incident_id, local),DID , Vehicle_Incident_id,local);
+Dedup2 := DEDUP(SORT(DISTRIBUTE(BaseKey(DID = '0'), hash32(Vehicle_Incident_Id)), Vehicle_Incident_Id ,fname , lname , name_suffix , dob , driver_license_nbr,local)
+														,Vehicle_Incident_Id ,fname ,lname ,name_suffix ,dob ,driver_license_nbr, local );
+														 
 DedupedKey := SORT(Dedup1 + Dedup2, jurisdiction_nbr + Vehicle_Incident_id + Vehicle_unit_number);
 
 
@@ -59,7 +67,7 @@ END;
 
 accidents_by_CT_slim2 CountCT({dsVehiclesRolled} L) := TRANSFORM
 	SELF.AccidentCnt					:= 1;
-	    NewCTString  := stringlib.StringToUpperCase(TRIM(L.Report_Collision_Type,LEFT,RIGHT));
+	    NewCTString  := STD.Str.ToUpperCase(TRIM(L.Report_Collision_Type,LEFT,RIGHT));
 	SELF.CTFrontRear					:= IF(STD.Str.FindCount(NewCTString, FLAccidents_Ecrash.Constants.FRONTREAR) > 0,1,0); 
 	SELF.CTFrontFront					:= IF(STD.Str.FindCount(NewCTString, FLAccidents_Ecrash.Constants.FRONTFRONT) > 0,1,0);
 	SELF.CTAngle							:= IF(STD.Str.FindCount(NewCTString, FLAccidents_Ecrash.Constants.ANGLE) > 0,1,0);

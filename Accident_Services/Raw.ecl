@@ -171,11 +171,8 @@ export Raw := MODULE
     layout_driver := doxie_crs.layout_FSR_driver;
     layout_passenger := doxie_crs.layout_FSR_passenger;
     layout_pedestrian := doxie_crs.layout_FSR_pedestrian;
-    layout_did_acc_nbr := record
-      recordof(FLAccidents_eCrash.Key_eCrashV2_did);
-      string2 report_code;
-      string2 vehicle_incident_st;
-    end;
+    layout_did_acc_nbr := FLAccidents_Ecrash.Layout_Keys_PR.DID;
+
 
     layout_report initReport(layout_did_acc_nbr L) := TRANSFORM
       SELF.accident_nbr := L.accident_nbr;
@@ -381,6 +378,7 @@ export Raw := MODULE
       KEYED(LEFT.did=RIGHT.l_did),LIMIT(ut.limits.ACCIDENTS_PER_DID,SKIP)),
       accident_nbr,-vin),accident_nbr);
 
+    // TO-DO, Since the did key would start having these fields, we can avoid accNbrs1 altogether
     // get report code and vehicle incident state for filtering
     accNbrs1 :=
       JOIN(accNbrs0,FLAccidents_eCrash.Key_eCrashV2_accnbrV1,
