@@ -94,7 +94,7 @@ FUNCTION
     SELF.SSNFromInquiries := PROJECT(ssn_recs(isInquirySource), TRANSFORM(iesp.fcradataservice.t_FcraDataServiceSSNData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData, SELF.SourceData.death_sources := LEFT.death_sources));
     SELF.Thrive := PROJECT(thrive_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceThriveData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
     SELF.Watercraft := PROJECT(watercraft_recs, $.Transforms.xformWatercraftData(LEFT));
-    SELF.PersonContext := PROJECT(pc_recs, iesp.fcradataservice.t_FcraDataServicePersonContextRecord); // --> maybe this should be the raw records as returned from person context instead?
+    SELF.PersonContext := PROJECT(pc_recs, $.Transforms.xformPersonContextData(LEFT));
     SELF:=[];
   END;
 
