@@ -1249,6 +1249,7 @@
 		export string KEYWORD_NOKT									:= '935';
 		export string KEYWORD_UZDCEC_NAT						:= '936';
 		export string KEYWORD_PHDENR								:= '937';
+		export string KEYWORD_THAMLO_SANC						:= '938';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
