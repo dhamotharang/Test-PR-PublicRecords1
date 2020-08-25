@@ -98,22 +98,15 @@ EXPORT fn_getadvsearch_raw_recs (
 											dataset([], FraudShared_Services.Layouts.Recid_rec));
 	
 	//Find which IP_Address key to hit.
-	BOOLEAN isIPRangeKey := STD.Str.Contains(in_rec.ip_address, 'XXX', true);
+ octets := STD.STr.SplitWords(in_rec.ip_address,'.');
+ octet1 := FraudGovPlatform_Services.Functions.GetFormatted_IP(octets[1]);
+ octet2 := FraudGovPlatform_Services.Functions.GetFormatted_IP(octets[2]);
+ octet3 := FraudGovPlatform_Services.Functions.GetFormatted_IP(octets[3]);
+ octet4 := FraudGovPlatform_Services.Functions.GetFormatted_IP(octets[4]);
 
-	octets := STD.STr.SplitWords(in_rec.ip_address,'.');										
-	octet1 := (unsigned1) IF(STD.Str.EqualIgnoreCase(octets[1], 'xxx'), '', octets[1]);
-	octet2 := (unsigned1) IF(STD.Str.EqualIgnoreCase(octets[2], 'xxx'), '', octets[2]);
-	octet3 := (unsigned1) IF(STD.Str.EqualIgnoreCase(octets[3], 'xxx'), '', octets[3]);
-	octet4 := (unsigned1) IF(STD.Str.EqualIgnoreCase(octets[4], 'xxx'), '', octets[4]);	
-	
-	//Flags for IP Range Filtering.
-	isIPRange123 := in_rec.ip_address <> '' AND isIPRangeKey AND octet1 <> 0 AND octet2 <> 0 AND octet3 <> 0 AND octet4 = 0;
-	isIPRange12 := in_rec.ip_address <> '' AND isIPRangeKey AND octet1 <> 0 AND octet2 <> 0 AND octet3 = 0 AND octet4 = 0;
-	isIPRange1 := in_rec.ip_address <> '' AND isIPRangeKey AND octet1 <> 0 AND octet2 = 0 AND octet3 = 0 AND octet4 = 0;		
+ ip_address_cleaned := octet1 + octet2 + octet3 + octet4; 
+ ds_ip := Search_EntitiesIDs_.GetIPRangeIds(ip_address_cleaned);
 
-	ds_ip := MAP(	isIPRangeKey => Search_EntitiesIDs_.GetIPRangeIds(octet1, octet2, octet3, octet4, isIPRange123, isIPRange12, isIPRange1), 
-								IsOnline and NOT isIPRangeKey => EntitiesIds_.GetIp(),
-								dataset([], FraudShared_Services.Layouts.Recid_rec));
 
 	initial_rec := RECORD
 		unsigned2 cnt;
@@ -175,13 +168,6 @@ EXPORT fn_getadvsearch_raw_recs (
 																			if(in_rec.bank_account_number <> '', bank_account_number_1 = in_rec.bank_account_number OR 
 																																					 bank_account_number_2 = in_rec.bank_account_number, true) AND 
 																			if(in_rec.ispname <> '', isp = in_rec.ispname, true) AND
-																			if(in_rec.ip_address <> '' AND NOT isIPRangeKey , ip_address = in_rec.ip_address, true) AND
-																			if(isIPRange123 , (unsigned1)STD.STr.SplitWords(ip_address,'.')[1] = octet1 AND
-																												(unsigned1)STD.STr.SplitWords(ip_address,'.')[2] = octet2 AND
-																												(unsigned1)STD.STr.SplitWords(ip_address,'.')[3] = octet3 , true) AND
-																			if(isIPRange12	, (unsigned1)STD.STr.SplitWords(ip_address,'.')[1] = octet1 AND
-																												(unsigned1)STD.STr.SplitWords(ip_address,'.')[2] = octet2 , true) AND
-																			if(isIPRange1 	, (unsigned1)STD.STr.SplitWords(ip_address,'.')[1] = octet1 , true) AND
 																			if(in_rec.MACAddress <> '', mac_address = in_rec.MACAddress, true) AND
 																			if(in_rec.device_id <> '', device_id = in_rec.device_id, true) AND
 																			if(in_rec.DeviceSerialNumber <> '', serial_number = in_rec.DeviceSerialNumber, true) AND
@@ -232,11 +218,19 @@ EXPORT fn_getadvsearch_raw_recs (
 																ds_recs_filtered_address);	
 
 	//AND Filter with ssn Autokey,
-	ds_recs_filtered_final := IF(in_rec.ssn <> '',
+	ds_recs_filtered_ssn  := IF(in_rec.ssn <> '',
 																JOIN(ds_recs_filtered_phone, ds_auto_ssn,
 																	LEFT.record_id = RIGHT.record_id,
 																	TRANSFORM(LEFT)),
 																ds_recs_filtered_phone);	
+
+ //AND Filter with IP / IP Range input,
+ ds_recs_filtered_final := IF(in_rec.ip_address <> '',
+                              JOIN(ds_recs_filtered_ssn, ds_ip,
+                                LEFT.record_id = RIGHT.record_id,
+                                TRANSFORM(LEFT)),
+                              ds_recs_filtered_ssn);
+                                
 	
 	ds_allPayloadRecs := LIMIT(ds_recs_filtered_final,FraudGovPlatform_Services.Constants.MAX_RECS_ON_JOIN, FAIL(203, doxie.ErrorCodes(203)));
 	
