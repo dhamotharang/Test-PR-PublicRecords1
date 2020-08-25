@@ -4,7 +4,7 @@
 //date_last_seen = case_closing_date or date of last action in the case
 //process_date = date_vendor_last_reported = date of last update
 
-IMPORT BankruptcyV2, BankruptcyV3, data_services, STD, ut;
+IMPORT _control, BankruptcyV2, BankruptcyV3, data_services, STD, ut;
 export NonFCRA_Bankruptcy(string pHostname, string pTarget, string pContact ='\' \'') := function
 
 filedate := (STRING8)Std.Date.Today();
