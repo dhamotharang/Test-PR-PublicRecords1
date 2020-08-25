@@ -1,10 +1,28 @@
 ﻿EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,inputFile,MemailList)	:=	FUNCTIONMACRO
-	import FraudShared,FraudGovPlatform,Salt35;
+	import FraudShared,FraudGovPlatform,Salt35,Scrubs,ut,tools;
 	folder := #EXPAND(myFolder);
 	inFile := inputFile;
-	scrubs_name := IF(TRIM(scopename,ALL)<>'',TRIM(scopename,ALL)+'_Scrubs','Scrubs');
-	scope_datasetName := IF(TRIM(scopename,ALL)<>'',scopename+'_'+datasetName,datasetName);
+	DatasetName := 'MBS';
+	scrubs_name := TRIM(scopename,ALL)+'_SCRUBS';
+	scope_datasetName := TRIM(scopename,ALL)+'_' + DatasetName	;
 	profilename := 'Scrubs_MBS'+ if(scopename != 'MBS' , '_'+scopename, '');
+	Filename := '~'+map(
+			scopename = 'CCID' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MBSFdnCCID.Sprayed,1),
+			scopename = 'ColvalDesc' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MBSColValDesc.Sprayed,1),
+			scopename = 'HHID' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MBSFdnHHID.Sprayed,1),
+			scopename = 'IndType' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MBSFdnIndType.Sprayed,1),
+			scopename = 'IndTypeExclusion' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MbsIndTypeExclusion.Sprayed,1),
+			scopename = 'MarketAppend' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MBSmarketAppend.Sprayed,1),
+			scopename = 'MasterIdIndTypeIncl' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MbsFdnMasterIDIndTypeInclusion.Sprayed,1),
+			scopename = 'MBS' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MBS.Sprayed,1),
+			scopename = 'NewGcIdExcl' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MbsNewGcIdExclusion.Sprayed,1),
+			scopename = 'ProductInclude' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MbsProductInclude.Sprayed,1),
+			scopename = 'SourceGcExclusion' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MBSSourceGcExclusion.Sprayed,1),
+			scopename = 'TableCol' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MBSTableCol.Sprayed,1),
+			''
+			);
+	process_date := BuildDate;
+	file_date := STD.Str.SplitWords(Filename, '::', FALSE)[3];
 	
 	// F := inFile(process_date=filedate); //	Records to scrub
 	F := inFile; //	Records to scrub
@@ -90,17 +108,20 @@
 	EmailReport:=if(MemailList <>'', fileservices.sendEmail(MemailList,
 		'Scrubs Plus Reporting '+ProfileName,
 		'Scrubs Plus Reporting\n\n'+
-		'DatasetName:'+DatasetName+'\n'+
-		'ProfileName:'+ProfileName+'\n'+
-		'ScopeName:'+scopename+'\n'+
-		'FileDate:'+filedate+'\n'+
-		'Total Number of Records:'+TotalRecs+'\n'+
-		'Total Number of Rules:'+NumRules+'\n'+
-		'Total Number of Failed Rules:'+NumFailedRules+'\n'+
-		'Total Number of Errored Records:'+ErroredRecords+'\n'+
-		'Percent Errored Records:'+PcntErroredRec+'\n'+
-		'Total Number of Removed Recs:'+TotalRemovedRecs+'\n'+
-		'Workunit:'+tools.fun_GetWUBrowserString()+'\n'));
+		'DatasetName: '+DatasetName+'\n'+
+		'ProfileName: '+ProfileName+'\n'+
+		'ScopeName: '+scopename+'\n'+
+		'Process Date: '+process_date+'\n'+
+		'FileDate: '+file_date+'\n'+
+		'Filename: '+TRIM(STD.Str.ToLowerCase(Filename),ALL )+'\n'+
+		'\n'+
+		'Total Number of Records: '+TotalRecs+'\n'+
+		'Total Number of Rules: '+NumRules+'\n'+
+		'Total Number of Failed Rules: '+NumFailedRules+'\n'+
+		'Total Number of Errored Records: '+ErroredRecords+'\n'+
+		'Percent Errored Records: '+PcntErroredRec+'\n'+
+		'Total Number of Removed Recs: '+TotalRemovedRecs+'\n'+
+		'Workunit: '+tools.fun_GetWUBrowserString()+'\n'));
 
 	SubmitStats :=	Scrubs.OrbitProfileStats(profilename,'ScrubsAlerts',Orbit_stats,filedate,profilename).SubmitStats;
 	//Submits Profile's stats to Orbit
