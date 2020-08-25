@@ -1,4 +1,4 @@
-﻿import ut, risk_indicators, gong, header_services, Gong_Neustar ;
+import ut, risk_indicators, gong, header_services ;
 
 ut.mac_suppress_by_phonetype(File_Gong_History_FullEx,phone10,st,histGong_out,true,did);
 
@@ -13,6 +13,17 @@ trSwapCityNames := project(temp_apply_title,
 
 Gong.macRecordSuppression(trSwapCityNames, trSwapCityNamesFilt, phone10) ;
 
-trSwapCityNamesFiltWithGong := Gong_Neustar.Prep_Build.applyGongNeustar(trSwapCityNamesFilt) ;
+layout_gong_inj := RECORD
+ gong.Layout_history ;
+ string2 eor ;
+END;
+
+header_services.Supplemental_Data.mac_verify('file_gong_inj.txt', layout_gong_inj , attr);
+
+gong_append_in := attr();
+
+gong_in := PROJECT (gong_append_in, transform(Layout_historyaid, self := left)) ;
+
+trSwapCityNamesFiltWithGong := trSwapCityNamesFilt + gong_in ;
 
 export File_History_Full_Prepped_for_Keys := trSwapCityNamesFiltWithGong:persist('~thor_data400::persist::gong_history_full_prepped_for_keys');
