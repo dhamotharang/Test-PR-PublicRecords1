@@ -280,6 +280,7 @@ MODULE
     
     EXPORT DECIMAL AccuData_CallerID_RequestTimeout := 1;
     EXPORT DECIMAL AccuData_OCN_RequestTimeout := 1.7;
+    EXPORT DECIMAL QSENT_RequestTimeout := 3;
   END;
 
   
