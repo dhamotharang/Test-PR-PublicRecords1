@@ -28,7 +28,7 @@ DPPA := 3;
 // Bit counter:         12345678901234567890123456789012345678901234567890
 DataPermissionMask  := '00000000000000000000000000000000000000000000000000'; 
 DataRestrictionMask := '00100000000000000000000000000000000000000000000000'; 
-
+Include_Minors := TRUE;
 // CCPA Options;
 LexIdSourceOptout := 1;
 TransactionId := '';
@@ -60,6 +60,11 @@ Output_SALT_Profile := FALSE;
 // Output_SALT_Profile := TRUE;
 
 Exclude_Consumer_Attributes := FALSE; //if TRUE, bypasses consumer logic and sets all consumer shell fields to blank/0.
+
+// Use default list of allowed sources
+AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+// Do not exclude any additional sources from allowed sources dataset.
+ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 
 RecordsToRun := 10;
 eyeball := 120;
@@ -211,11 +216,14 @@ soapLayout := RECORD
 	BOOLEAN OutputMasterResults;
 	BOOLEAN ExcludeConsumerAttributes;
 	BOOLEAN IsMarketing;
+	BOOLEAN IncludeMinors;
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	
 	UNSIGNED BIPAppendScoreThreshold;
 	UNSIGNED BIPAppendWeightThreshold;
 	BOOLEAN BIPAppendPrimForce;
-	BOOLEAN BIPAppendReAppend;
+	BOOLEAN bipappendnoreappend;
 	BOOLEAN BIPAppendIncludeAuthRep;
   BOOLEAN OverrideExperianRestriction;
 	
@@ -243,7 +251,9 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT BOOLEAN BusinessLexIDPrimForce := BIPAppend_PrimForce;
 	EXPORT BOOLEAN BusinessLexIDReAppend := BIPAppend_ReAppend;
 	EXPORT BOOLEAN BusinessLexIDIncludeAuthRep := BIPAppend_Include_AuthRep;
+	EXPORT BOOLEAN IncludeMinors := Include_Minors;
 END;
+
 // Uncomment this code to run as test harness on Thor instead of SOAPCALL to Roxie
 // Options := MODULE(PublicRecords_KEL.Interface_Options)
 	// EXPORT INTEGER ScoreThreshold := Score_threshold;
@@ -252,12 +262,15 @@ END;
 // ResultSet:= PublicRecords_KEL.FnRoxie_GetBusAttrs(inDataReadyDist, Options);
 
 layout_MAS_Business_Service_output := RECORD
+    unsigned8 time_ms{xpath('_call_latency_ms')} := 0;  // picks up timing
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster MasterResults {XPATH('Results/Result/Dataset[@name=\'MasterResults\']/Row')};
 	PublicRecords_KEL.ECL_Functions.Layout_Business_NonFCRA Results {XPATH('Results/Result/Dataset[@name=\'Results\']/Row')};
 	STRING G_ProcErrorCode := '';
 END;
 
 soapLayout trans (inDataReadyDist le):= TRANSFORM 
+	// The inquiry delta base which feeds the 1 day inq attrs is not needed for the input rep 1 at this point. for now we only run this delta base code in the nonFCRA service 
+	
 	// SELF.CustomerId := le.CustomerId;
 	SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout,
 		SELF := LEFT;
@@ -267,14 +280,17 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 	SELF.DataPermissionMask := Settings.Data_Permission_Mask;
 	SELF.GLBPurpose := Settings.GLBAPurpose;
 	SELF.DPPAPurpose := Settings.DPPAPurpose;
+	SELF.IncludeMinors := Settings.IncludeMinors;
 	SELF.OverrideExperianRestriction := Settings.Override_Experian_Restriction;
 	SELF.IsMarketing := FALSE;
 	SELF.OutputMasterResults := Output_Master_Results;
+	SELF.AllowedSourcesDataset := AllowedSourcesDataset;
+	SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;
 	SELF.ExcludeConsumerAttributes := Exclude_Consumer_Attributes;
 	SELF.BIPAppendScoreThreshold := Settings.BusinessLexIDThreshold;
 	SELF.BIPAppendWeightThreshold := Settings.BusinessLexIDWeightThreshold;
 	SELF.BIPAppendPrimForce := Settings.BusinessLexIDPrimForce;
-	SELF.BIPAppendReAppend := Settings.BusinessLexIDReAppend;
+	SELF.bipappendnoreappend := NOT Settings.BusinessLexIDReAppend;
 	SELF.BIPAppendIncludeAuthRep := Settings.BusinessLexIDIncludeAuthRep;
 	SELF.LexIdSourceOptout := LexIdSourceOptout;
 	SELF._TransactionId := TransactionId;
@@ -316,6 +332,7 @@ OUTPUT( CHOOSEN(Failed,eyeball), NAMED('bwr_results_Failed') );
 OUTPUT( COUNT(Failed), NAMED('Failed_Cnt') );
 
 LayoutMaster_With_Extras := RECORD
+    unsigned8 time_ms;
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster;
 	STRING G_ProcErrorCode;
 	STRING ln_project_id;
@@ -329,6 +346,7 @@ LayoutMaster_With_Extras := RECORD
 END;
 
 Layout_Business := RECORD
+    unsigned8 time_ms;
 	PublicRecords_KEL.ECL_Functions.Layout_Business_NonFCRA;
 	STRING G_ProcErrorCode;
 END;
@@ -337,6 +355,7 @@ Passed_with_Extras :=
 	JOIN(inDataRecs, Passed, LEFT.AccountNumber = RIGHT.MasterResults.B_InpAcct, 
 		TRANSFORM(LayoutMaster_With_Extras,
 			SELF := RIGHT.MasterResults, //fields from passed
+            SELF.time_ms := RIGHT.time_ms,
 			SELF := LEFT, //input performance fields
 			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),
@@ -346,12 +365,13 @@ Passed_Business :=
 	JOIN(inDataRecs, Passed, LEFT.AccountNumber = RIGHT.Results.B_InpAcct, 
 		TRANSFORM(Layout_Business,
 			SELF := RIGHT.Results, //fields from passed
+            SELF.time_ms := RIGHT.time_ms,
 			SELF := LEFT, //input performance fields
 			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),
 		INNER, KEEP(1));
        
-Error_Inputs := JOIN(DISTRIBUTE(inDataRecs, HASH64(AccountNumber)), DISTRIBUTE(Passed_Business, HASH64(B_InpAcct)), LEFT.AccountNumber = RIGHT.B_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY);  
+Error_Inputs := JOIN(DISTRIBUTE(inDataRecs, HASH64(AccountNumber)), DISTRIBUTE(Passed_Business, HASH64(B_InpAcct)), LEFT.AccountNumber = RIGHT.B_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY, LOCAL);  
 OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE);
   
   
