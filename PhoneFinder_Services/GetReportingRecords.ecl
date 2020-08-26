@@ -76,6 +76,7 @@ EXPORT GetReportingRecords(DATASET($.Layouts.log_PhoneFinderSearchRecord) pF_Rec
          SELF.PhoneNumber          := R.Number;
          SELF.Risk_Indicator       := R.PhoneRiskIndicator;
          SELF.phone_type           := R._Type;
+         SELF.carrier              := R.carrier;
          SELF.phone_status         := R.PhoneStatus;
          SELF.identity_Count       := R.identity_count;
          SELF.listing_name         := R.ListingName;
