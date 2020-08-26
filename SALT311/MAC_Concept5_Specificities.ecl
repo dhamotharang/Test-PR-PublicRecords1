@@ -61,24 +61,24 @@ EXPORT MAC_Concept5_Specificities(addfield,infile1,infield1,countfield1,ed_thres
 						);	
 #uniquename(file2)
 %file2%:=IF(ed_threshold2>0 AND LENGTH(TRIM((SALT311.StrType)infile2[1].infield2))<ed_threshold2,
-            JOIN(%file1%,infile2,LEFT.infield1=(TYPEOF (infile1.infield1))RIGHT.infield2,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%is_eandp_cnt2%) (RIGHT.#EXPAND(%e1_e_cnt2%)+RIGHT.p_cnt-RIGHT.#EXPAND(%e1_countfield2%)) #ELSE RIGHT.#EXPAND(%e1_countfield2%) #END;;SELF:=LEFT;),LEFT OUTER,SMART)
-            ,JOIN(%file1%,infile2,LEFT.infield1=(TYPEOF (infile1.infield1))RIGHT.infield2,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%is_eandp_cnt2%) (RIGHT.#EXPAND(%e1_e_cnt2%)+RIGHT.p_cnt-RIGHT.countfield2) #ELSE RIGHT.countfield2 #END;;SELF:=LEFT;),LEFT OUTER,SMART)
+            JOIN(%file1%,infile2,(SALT311.StrType)LEFT.infield1=(SALT311.StrType)RIGHT.infield2,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%is_eandp_cnt2%) (RIGHT.#EXPAND(%e1_e_cnt2%)+RIGHT.p_cnt-RIGHT.#EXPAND(%e1_countfield2%)) #ELSE RIGHT.#EXPAND(%e1_countfield2%) #END;;SELF:=LEFT;),LEFT OUTER,SMART)
+            ,JOIN(%file1%,infile2,(SALT311.StrType)LEFT.infield1=(SALT311.StrType)RIGHT.infield2,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%is_eandp_cnt2%) (RIGHT.#EXPAND(%e1_e_cnt2%)+RIGHT.p_cnt-RIGHT.countfield2) #ELSE RIGHT.countfield2 #END;;SELF:=LEFT;),LEFT OUTER,SMART)
 						);
 						
 #uniquename(file3)
 %file3%:=IF(ed_threshold3>0 AND LENGTH(TRIM((SALT311.StrType)infile3[1].infield3))<ed_threshold3,
-            JOIN(%file2%,infile3,LEFT.infield1=(TYPEOF (infile1.infield1))RIGHT.infield3,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%is_eandp_cnt3%) (RIGHT.#EXPAND(%e1_e_cnt3%)+RIGHT.p_cnt-RIGHT.#EXPAND(%e1_countfield3%)) #ELSE RIGHT.#EXPAND(%e1_countfield3%) #END;;SELF:=LEFT;),LEFT OUTER,SMART)
-            ,JOIN(%file2%,infile3,LEFT.infield1=(TYPEOF (infile1.infield1))RIGHT.infield3,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%is_eandp_cnt3%) (RIGHT.#EXPAND(%e1_e_cnt3%)+RIGHT.p_cnt-RIGHT.countfield3) #ELSE RIGHT.countfield3 #END;;SELF:=LEFT;),LEFT OUTER,SMART)
+            JOIN(%file2%,infile3,(SALT311.StrType)LEFT.infield1=(SALT311.StrType)RIGHT.infield3,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%is_eandp_cnt3%) (RIGHT.#EXPAND(%e1_e_cnt3%)+RIGHT.p_cnt-RIGHT.#EXPAND(%e1_countfield3%)) #ELSE RIGHT.#EXPAND(%e1_countfield3%) #END;;SELF:=LEFT;),LEFT OUTER,SMART)
+            ,JOIN(%file2%,infile3,(SALT311.StrType)LEFT.infield1=(SALT311.StrType)RIGHT.infield3,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%is_eandp_cnt3%) (RIGHT.#EXPAND(%e1_e_cnt3%)+RIGHT.p_cnt-RIGHT.countfield3) #ELSE RIGHT.countfield3 #END;;SELF:=LEFT;),LEFT OUTER,SMART)
 						);
 #uniquename(file4)
 %file4%:=IF(ed_threshold4>0 AND LENGTH(TRIM((SALT311.StrType)infile4[1].infield4))<ed_threshold4,
-            JOIN(%file3%,infile4,LEFT.infield1=(TYPEOF (infile1.infield1))RIGHT.infield4,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%is_eandp_cnt4%) (RIGHT.#EXPAND(%e1_e_cnt4%)+RIGHT.p_cnt-RIGHT.#EXPAND(%e1_countfield4%)) #ELSE RIGHT.#EXPAND(%e1_countfield4%) #END;;SELF:=LEFT;),LEFT OUTER,SMART)
-            ,JOIN(%file3%,infile4,LEFT.infield1=(TYPEOF (infile1.infield1))RIGHT.infield4,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%is_eandp_cnt4%) (RIGHT.#EXPAND(%e1_e_cnt4%)+RIGHT.p_cnt-RIGHT.countfield4) #ELSE RIGHT.countfield4 #END;;SELF:=LEFT;),LEFT OUTER,SMART)
+            JOIN(%file3%,infile4,(SALT311.StrType)LEFT.infield1=(SALT311.StrType)RIGHT.infield4,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%is_eandp_cnt4%) (RIGHT.#EXPAND(%e1_e_cnt4%)+RIGHT.p_cnt-RIGHT.#EXPAND(%e1_countfield4%)) #ELSE RIGHT.#EXPAND(%e1_countfield4%) #END;;SELF:=LEFT;),LEFT OUTER,SMART)
+            ,JOIN(%file3%,infile4,(SALT311.StrType)LEFT.infield1=(SALT311.StrType)RIGHT.infield4,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%is_eandp_cnt4%) (RIGHT.#EXPAND(%e1_e_cnt4%)+RIGHT.p_cnt-RIGHT.countfield4) #ELSE RIGHT.countfield4 #END;;SELF:=LEFT;),LEFT OUTER,SMART)
 						);
 #uniquename(file5)
 %file5%:=IF(ed_threshold5>0 AND LENGTH(TRIM((SALT311.StrType)infile5[1].infield5))<ed_threshold5,
-            JOIN(%file4%,infile5,LEFT.infield1=(TYPEOF (infile1.infield1))RIGHT.infield5,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%is_eandp_cnt5%) (RIGHT.#EXPAND(%e1_e_cnt5%)+RIGHT.p_cnt-RIGHT.#EXPAND(%e1_countfield5%)) #ELSE RIGHT.#EXPAND(%e1_countfield5%) #END;;SELF:=LEFT;),LEFT OUTER,SMART)
-            ,JOIN(%file4%,infile5,LEFT.infield1=(TYPEOF (infile1.infield1))RIGHT.infield5,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%is_eandp_cnt5%) (RIGHT.#EXPAND(%e1_e_cnt5%)+RIGHT.p_cnt-RIGHT.countfield5) #ELSE RIGHT.countfield5 #END;;SELF:=LEFT;),LEFT OUTER,SMART)
+            JOIN(%file4%,infile5,(SALT311.StrType)LEFT.infield1=(SALT311.StrType)RIGHT.infield5,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%is_eandp_cnt5%) (RIGHT.#EXPAND(%e1_e_cnt5%)+RIGHT.p_cnt-RIGHT.#EXPAND(%e1_countfield5%)) #ELSE RIGHT.#EXPAND(%e1_countfield5%) #END;;SELF:=LEFT;),LEFT OUTER,SMART)
+            ,JOIN(%file4%,infile5,(SALT311.StrType)LEFT.infield1=(SALT311.StrType)RIGHT.infield5,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%is_eandp_cnt5%) (RIGHT.#EXPAND(%e1_e_cnt5%)+RIGHT.p_cnt-RIGHT.countfield5) #ELSE RIGHT.countfield5 #END;;SELF:=LEFT;),LEFT OUTER,SMART)
 						);
 						
 outfile:=%file5%;	
