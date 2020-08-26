@@ -3,9 +3,8 @@ C:\Users\KasavaSX\AppData\Roaming\HPCC Systems\eclide\skasavajjala\bocadataland\
 */
 import	lib_stringlib,lib_fileservices,_control,AID,Address, std;
 
-export	Spray_In(string	process_date, STRING pSource)	:=
+export	Spray_In(string	process_date, STRING pSource, STRING srcIP = _control.IPAddress.bctlpedata11)	:=
 function
-	srcIP			:=	_control.IPAddress.bctlpedata11;
 	targetGrp	:=		STD.System.Thorlib.Group(); //'thor400_44'; 
 
 	filenames	:=	'~thor_data400::in::faa::'	+	process_date;
