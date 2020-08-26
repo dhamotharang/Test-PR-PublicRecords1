@@ -82,7 +82,10 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
 
   dte_gateway_success := input.DeferredTaskRequest AND EXISTS(search_recs(did <> 0));
   OKC_gateway_success := ~input.DeferredTaskRequest AND search_recs[1].IsOKCSuccess;
-  gateway_failed      := search_recs[1].error_code = $.constants.LIENS_RETRIEVAL.GATEWAY_FAILURE_CODE;
+  // gateway_failed includes g/w network failures and exceptions returned from gateway and 
+  // excludes did not found and no recs found
+  gateway_failed      := search_recs[1].error_code <> '' AND search_recs[1].error_code NOT IN [$.constants.LIENS_RETRIEVAL.NO_RECS_FOUND_CODE,
+                                                          FCRA.Constants.ALERT_CODE.NO_DID_FOUND];
   // do not show CS for okc submission request & do not show CS if dte gateway request fails
   BOOLEAN showConsumerStatements     := FFD.FFDMask.isShowConsumerStatements(input.FFDOptionsMask) AND  dte_gateway_success;
   // do not show alerts for okc submission success or gateway failures
@@ -152,11 +155,6 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
                   DATASET([toReturnLexid()]));
    
    iesp.riskview_publicrecordretrieval.t_PublicRecordRetrievalResponse toFinal() := TRANSFORM
-      
-      ds_gateway_excep  := DATASET([{$.Constants.LIENS_RETRIEVAL.ERRORSOURCE,
-															   $.Constants.LIENS_RETRIEVAL.GATEWAY_FAILURE_CODE,
-															   '',
-															   $.Constants.LIENS_RETRIEVAL.GATEWAY_EXCEPTION}], iesp.share.t_WsException);
 
       is_court_id_blank := EXISTS(filtered_liens_byinput) AND  EXISTS(filtered_liens_byinput(agencyId = ''));
       ds_courtid_excep  := DATASET([{$.Constants.LIENS_RETRIEVAL.ERRORSOURCE,
@@ -164,21 +162,38 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
 															   '',
 															   $.Constants.LIENS_RETRIEVAL.COURTID_BLANK_EXCEPTION}], iesp.share.t_WsException);
 
-     invalid_recs := invalid_search_recs OR search_recs[1].error_code = (STRING) $.constants.LIENS_RETRIEVAL.NO_RECS_FOUND_CODE;
+     invalid_recs := invalid_search_recs OR search_recs[1].error_code = $.constants.LIENS_RETRIEVAL.NO_RECS_FOUND_CODE;
 
      ds_norecs_excep  := DATASET([{$.Constants.LIENS_RETRIEVAL.ERRORSOURCE,
-															    $.Constants.LIENS_RETRIEVAL.NO_RECS_FOUND_CODE,
+															   (INTEGER) $.Constants.LIENS_RETRIEVAL.NO_RECS_FOUND_CODE,
 															    '',
 															     $.Constants.LIENS_RETRIEVAL.NO_RECS_FOUND_EXCEPTION}], iesp.share.t_WsException);
+
+      // OKC exceptions
+      OKC_task_exceptions := search_recs[1].error_code <> '' AND search_recs[1].error_code IN [$.constants.LIENS_RETRIEVAL.OKC_TASK_ERRORS];
+      ds_task_exceptions := DATASET([{$.Constants.LIENS_RETRIEVAL.ERRORSOURCE,
+															       search_recs[1].error_code,
+															       '',
+															       search_recs[1].error_desc}], iesp.share.t_WsException); 
+   
+      // considering n/w errors excluding okc exceptions, no did found, no records found exception
+      gateway_network_failures := search_recs[1].error_code <> '' AND search_recs[1].error_code NOT IN [$.constants.LIENS_RETRIEVAL.OKC_TASK_ERRORS,
+                                                                    $.constants.LIENS_RETRIEVAL.NO_RECS_FOUND_CODE,
+                                                                    FCRA.Constants.ALERT_CODE.NO_DID_FOUND];
+                                                                    
+      ds_gateway_excep  := DATASET([{$.Constants.LIENS_RETRIEVAL.ERRORSOURCE,
+															   $.Constants.LIENS_RETRIEVAL.GATEWAY_FAILURE_CODE,
+															   '',
+															   $.Constants.LIENS_RETRIEVAL.GATEWAY_EXCEPTION}], iesp.share.t_WsException);                            
                                    
       SELF._Header.Exceptions:= MAP(is_court_id_blank => ds_courtid_excep,
                                   invalid_recs   => ds_norecs_excep,
-                                  gateway_failed    => ds_gateway_excep,
+                                  gateway_network_failures    => ds_gateway_excep,
+                                  OKC_task_exceptions => ds_task_exceptions,
                                   DATASET([], iesp.share.t_WsException));
       
       is_OKCsubmitted := ~input.DeferredTaskRequest AND OKC_gateway_success;
       //returns in case of okc submission success
-      SELF._Header.Status   := IF(is_OKCsubmitted, (INTEGER)$.Constants.LIENS_RETRIEVAL.OKC_SUBMISSION_SUCCESS_CODE, 0);
       SELF._Header.Message  := IF(is_OKCsubmitted, $.Constants.LIENS_RETRIEVAL.OKC_SUBMISSION_MESSAGE, '');
       SELF._Header:= iesp.ECL2ESP.GetHeaderRow();
       SELF.RecordCount := COUNT(ds_liens);

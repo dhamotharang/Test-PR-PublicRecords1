@@ -193,13 +193,17 @@
 		STRING   Report_Collision_Type;
 		STRING   Report_First_Harmful_Event;
 		STRING   Report_Light_Condition;
-		STRING   Report_Weather_Condition;
-		STRING   Report_Road_Condition;
-		STRING   Report_Injury_Status;
+	  //PRtcc datatype update for code and description
+		STRING Report_Weather_Condition;
+		STRING Report_Road_Condition;
+    STRING Report_Injury_Status;
+
 		STRING   Report_Damage_Extent;
 		STRING   Report_Vehicle_Type;
 		STRING   Report_Traffic_Control_Device_Type;
-		STRING   Report_Contributing_Circumstances_v;
+		//PRtcc datatype update for code and description
+		STRING Report_Contributing_Circumstances_v;
+		
 		STRING   Report_Vehicle_Maneuver_Action_Prior;
 		STRING   Report_Vehicle_Body_Type;
 		STRING1  CRU_inq_name_type := '' ; 
@@ -234,4 +238,43 @@
 		
 		//BuyCrash Release 6
     STRING10 Date_Report_Submitted;
+
+		//PRtCC new fields
+		STRING7 Citation_Issued;
+		STRING7 Citation_Type;
+		STRING100 Citation_Detail1;
+		STRING60 Violation_Code1;
+		STRING60 Violation_Code2;
+		STRING60 Violation_Code3;
+		STRING60 Violation_Code4;
+		STRING1 Photographs_Taken;
+		STRING100 Photographed_By;
+		STRING100 Photograph_Type;
+		STRING10 Posted_Satutory_Speed_Limit;
+		STRING25 Safety_Equipment_Available_Or_Used;
+		STRING20 Ejection;
+		STRING40 Safety_Equipment_Helmet;
+		STRING60 Transported_To;
+		STRING20 Dispatch_Time;
+		STRING1 Ready_To_Sell_Data;
+		//PRtcc new Enum fields
+		STRING Alcohol_Drug_Use;
+		STRING Alcohol_Drug_Test_Given;
+		STRING Alcohol_Test_Status;
+		STRING Alcohol_Test_Type;
+		STRING Alcohol_Drug_Test_Type;
+		STRING Drug_Test_Type;
+		STRING Driver_Distracted_By;
+		STRING Safety_Equipment_Restraint1;
+		STRING Condition_At_Time_Of_Crash;
+		STRING Drug_Use_Suspected;
+		STRING Alcohol_Use_Suspected;
+		STRING Drug_Test_Status;
+		STRING Report_Contributing_Circumstances_P;
+		STRING Driver_Actions_At_Time_Of_Crash;
+		STRING Prior_Nonmotorist_Action;
+		STRING Non_Motorist_Actions_At_Time_Of_Crash;
+		STRING Pedestrian_Actions_At_Time_Of_Crash;
+		STRING Pedalcyclist_Actions_At_Time_Of_Crash;
+		STRING Passenger_Actions_At_Time_Of_Crash;
 END;

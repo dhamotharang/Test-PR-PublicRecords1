@@ -460,14 +460,13 @@ search_results_temp := ungroup(
 															 '', 									
 															 RiskView.Constants.SubscriberID_error_desc(left.Exception_code)}], iesp.share.t_WsException);
                ds_excep_status_refresh := DATASET([{'Roxie', 
-                                                             left.Exception_code,  
+                                                             IF(left.Exception_code = '22OKC', '22', left.Exception_code),
                                                              '', 									
-                                                             RiskView.Constants.StatusRefresh_error_desc(left.Exception_code)}], iesp.share.t_WsException); 
+                                                             RiskView.Constants.StatusRefresh_error_desc}], iesp.share.t_WsException); 
                ds_excep_DTE := DATASET([{'Roxie', 
                                                              left.Exception_code,  
                                                              '', 									
-                                                             RiskView.Constants.DTE_error_desc(left.Exception_code)}], iesp.share.t_WsException);
-                   
+                                                             RiskView.Constants.DTE_error_desc}], iesp.share.t_WsException);
 
 				SELF._Header.Exceptions := map((custom_model_name  = 'mla1608_0' or custom2_model_name = 'mla1608_0' or 
 																			  custom3_model_name = 'mla1608_0' or custom4_model_name = 'mla1608_0' or 
@@ -477,7 +476,9 @@ search_results_temp := ungroup(
                                         IncludeStatusRefreshChecks = TRUE AND COUNT(DeferredTransactionIDs) <> 0 AND LEFT.Exception_Code <> '' => ds_excep_DTE,
 																			  ds_excep_blank);
         SELF.result.fdcheckingindicator := left.FDGatewayCalled;
-
+                SELF._Header.Status := (INTEGER)left.Status_Code;
+                SELF._Header.Message := left.Message;
+                SELF._Header.TransactionID := left.TransactionID;
 				SELF._Header := [];
 	));
 

@@ -131,7 +131,7 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 	// DEED SECTION
 	deeds := join( addr_filtered, LN_PropertyV2.key_deed_fid(false),
 			keyed(left.ln_fares_id=right.ln_fares_id)
-			AND right.record_type NOT IN LN_PropertyV2.Constants.setAssignRelsRecordTypes,//Assignments and Releases codes excluded
+			AND not LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code),//Assignments and Releases codes excluded
 		iesp.transform_property.deed_assess.format_deed_all(left,right), atmost(riskwise.max_atmost) );
 
 	iesp.transform_property.working_layout populateDeeds( iesp.transform_property.working_layout le ) := TRANSFORM

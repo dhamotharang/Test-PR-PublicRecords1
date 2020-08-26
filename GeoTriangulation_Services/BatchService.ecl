@@ -38,8 +38,24 @@ EXPORT BatchService := MACRO
                             SELF := LEFT;  //rest of output fields have the same name as the input layout fields
                            ));
 
-  ds_royalties   := Royalty.RoyaltyAccuityBankData.GetBatchRoyaltiesByAcctno(ds_batch_records);
-  ds_royalty_set := Royalty.GetBatchRoyalties(ds_royalties,in_mod.ReturnDetailedRoyalties);
+  // First determine the Accuity bank routing number royalties
+  ds_royalties_br   := Royalty.RoyaltyAccuityBankData.GetBatchRoyaltiesByAcctno(ds_batch_records);
+  ds_royalty_br_set := Royalty.GetBatchRoyalties(ds_royalties_br,FALSE); //FALSE=do not ReturnDetailedRoyalties
+  
+  // Next determine the Digital Envoy NetAcuity ip_metadata royalties for each acctno/ip_address
+  ds_royalties_ip   := Royalty.RoyaltyNetAcuityIpMetadata.GetBatchRoyaltiesByAcctno(ds_batch_records);
+  ds_royalty_ip_set := //Royalty.GetBatchRoyalties( // will be needed in the near future (Sept 2020)
+  // for initial release ---v.  Replace with above (---^) when Royalty.Layouts.RoyaltyForBatch.count_entity is revised
+                      Royalty.GetBatchRoyalties_GeoTri(ds_royalties_ip,FALSE); //FALSE=do not ReturnDetailedRoyalties
+
+  // Temp need to project ds_royalty_br_set onto same layout as ds_royalty_ip_set until Sept 2020 when 
+  // a permanent change is made to Royalty.Layouts.RoyaltyForBatch.count_entity length
+  ds_royalty_br_set_proj := PROJECT(ds_royalty_br_set, Royalty.Layouts_GeoTri.RoyaltyForBatch);
+
+  // Combine the 2 individual royalty sets for just 1 standard output 'RoyaltySet' ds
+  ds_royalty_set := //ds_royalty_br_set + ... // will be needed in the near future (Sept 2020)
+  // for initial release ---v.  Replace with above (---^) when Royalty.Layouts.RoyaltyForBatch.count_entity is revised
+                    ds_royalty_br_set_proj + ds_royalty_ip_set;
 
   IF(NOT use_AccuityBankData,FAIL(CNST.ErrCode.CONFIG_ERR, CNST.ErrMsg.CONFIG_ERR));
 
@@ -50,7 +66,10 @@ EXPORT BatchService := MACRO
   //OUTPUT(ds_batch_records,       NAMED('ds_batch_records'));
   //OUTPUT(ds_batch_restored,      NAMED('ds_batch_restored'));
   //OUTPUT(ds_batch_out,           NAMED('ds_batch_out'));
-  //OUTPUT(ds_royalties,           NAMED('ds_royalties'));
+  //OUTPUT(ds_royalties_br,        NAMED('ds_royalties_br'));
+  //OUTPUT(ds_royalty_br_set,      NAMED('ds_royalty_br_set'));
+  //OUTPUT(ds_royalties_ip,        NAMED('ds_royalties_ip'));
+  //OUTPUT(ds_royalty_ip_set,      NAMED('ds_royalty_ip_set'));
   //OUTPUT(ds_royalty_set,         NAMED('ds_royalty_set'));
 
   OUTPUT(ds_batch_out,   NAMED('Results'));
