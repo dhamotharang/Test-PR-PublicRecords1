@@ -41,7 +41,8 @@ EXPORT LIB_B2B_attributes (
     EXPORT DPPAPurpose := Options.DPPA_Purpose;
     EXPORT Override_Experian_Restriction := Options.OverrideExperianRestriction;
     AllowedSources := Options.AllowedSources;
-    EXPORT DATA100 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
+		EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA;
+    EXPORT DATA57 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
             Options.DataRestrictionMask,
             Options.DataPermissionMask,
             Options.GLBA_Purpose,
@@ -50,9 +51,11 @@ EXPORT LIB_B2B_attributes (
             allowMarketing,
             AllowDNBDMI,
             Options.OverrideExperianRestriction,
-            '', /* PermissiblePurpose - For FCRA Products Only */
+            '', /* IntendedPurpose - For FCRA Products Only */
             Options.IndustryClass,
-            PublicRecords_KEL.CFG_Compile);
+            PublicRecords_KEL.CFG_Compile,
+            FALSE, /*IsInsuranceProduct*/
+            PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA);
 
     EXPORT isMarketing := IF(Options.MarketingMode = 1, TRUE, FALSE);
 		
@@ -100,7 +103,7 @@ EXPORT LIB_B2B_attributes (
 
 	BusinessAttributesWithSeleID := JOIN(RecordsWithSeleID, BusinessSeleIDAttributesRaw,
     LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,
-		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutBusinessSeleID,
+		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutB2B,
 
     	ResultsFound := RIGHT.B_LexIDLegal > 0 AND RIGHT.B_LexIDLegalSeenFlag = '1';
 
@@ -286,7 +289,7 @@ EXPORT LIB_B2B_attributes (
 
 	// Assign special values to records with no SeleID
 	BusinessAttributesWithoutSeleID := PROJECT(RecordsWithoutSeleID,
-		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutBusinessSeleID,
+		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutB2B,
 			SELF.G_BuildB2BDt := Risk_Indicators.get_Build_date('cortera_build_version');
 			SELF.BE_B2BCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_B2BCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
@@ -474,6 +477,6 @@ EXPORT LIB_B2B_attributes (
   // OUTPUT(BusinessInput,NAMED('BusinessInput'));
   // OUTPUT(Shell,NAMED('Shell'));
 
-	EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutBusinessSeleID) Results := BusinessSeleIDAttributes;
-	
+	EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutB2B) Results := BusinessSeleIDAttributes;
+
 END;

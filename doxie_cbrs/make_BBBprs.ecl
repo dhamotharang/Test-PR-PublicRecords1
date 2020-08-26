@@ -1,3 +1,3 @@
-export make_BBBprs(dataset(doxie_cbrs.layout_BBB) ds_bbb) := 
-	sort(dedup(ds_bbb, record, all), level, company_name, prim_range, bdid);//
+EXPORT make_BBBprs(DATASET(doxie_cbrs.layout_BBB) ds_bbb) :=
+  SORT(DEDUP(ds_bbb, RECORD, ALL), level, company_name, prim_range, bdid);//
 

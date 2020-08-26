@@ -45,7 +45,7 @@ export Constants := MODULE
       {'Phone', 0, 'PHONE', 'Retrievable'},
       {'Accident', 0, 'FLCRASH', 'Retrievable'},
       {'SexualOffense', 0, 'SO', 'Retrievable'},
-      {'Alaska Permenant Fund', 0, 'AK', 'Retrievable'},
+      {'Alaska Permanent Fund', 0, 'AK', 'Retrievable'},
       {'Mississippi Worker\'s Compensation', 0, 'MSWORK', 'Retrievable'},
       {'Foreclosure Records', 0, 'FOR', 'Retrievable'},
       {'Notice Of Defaults Records', 0, 'NOD', 'Retrievable'},
@@ -64,17 +64,17 @@ export Constants := MODULE
       {'State Death Records', 0, 'STATEDEATH', 'Retrievable'},
       {'Person Locator 4', 0, 'TARG', 'Retrievable'}
     ], iesp.share.t_SourceSection);
-		
+
 export RealEstate := 1;
 export UCC := 2;
-export JudgementLien := 3;		
+export JudgementLien := 3;
 export Bankruptcy := 4;
 export AttorneyClient := 5;
 export OtherProp := 6;
 export Business := 7;
 export PossibleRoommate := 8;
 export Associate := 9;
-		
+
 export rolesSet := ['Real Property','UCC','Judgment/Lien','Bankruptcy','Attorney-Client','Personal Property','Business','Possible Roommate','Associate'];
 
 END;

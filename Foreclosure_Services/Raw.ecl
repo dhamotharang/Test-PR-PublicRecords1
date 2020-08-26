@@ -1,4 +1,4 @@
-import $, doxie, doxie_cbrs, Property, UT, BIPV2, Suppress, MDR;
+﻿import $, doxie, doxie_cbrs, Property, UT, BIPV2, Suppress, MDR;
 
 export Raw := module
 
@@ -56,11 +56,11 @@ export Raw := module
       isCNSMR := IndustryClass = ut.IndustryClass.Knowx_IC;
       keyFID := if(isNodSearch,Property.Key_NOD_FID,Property.Key_Foreclosures_FID);
 
-      isBkAllowed := (includeBlackKnight and (not doxie.DataRestriction.BlackKnight));
+      codes := $.Functions.getCodes(includeBlackKnight);
 
       recs_info := join(ids,keyFID,
                  keyed(left.fid =  right.fid) AND
-                  (isBkAllowed OR right.source=MDR.sourceTools.src_Foreclosures),
+                 right.source IN codes,
                       transform($.Layouts.Rawrec,
                                 self.foreclosure_id :=left.fid,
                                 self:=right,  // set for use later.
@@ -82,6 +82,15 @@ export Raw := module
 
          return joinup;
        end;
+ 
+ export $.Layouts.FIDNumberPlus byApn(dataset(Layouts.layout_apn) apn_in, boolean isNodSearch=false, boolean includeBlackKnight=false) := function
+     deduped := dedup(sort(apn_in,apn),apn);
+     joinup := join(deduped, Property.Key_Foreclosure_ParcelNum, keyed(left.apn = right.parcel_number_parcel_id),transform(Layouts.FIDNumberPlus,
+            self.fid := right.fid,
+            self.did := 0,
+            self.bdid := 0));
+   return joinup;
+ end;
 
   // ================================================================
   // Returns data in the IESP format for report view
@@ -104,11 +113,12 @@ export Raw := module
          return rpt;
        end;
 
-    export by_did (dataset(doxie.layout_references) in_dids, params in_mod, boolean isNodSearch=false) := function
-      recs:= GetRawRecs(byDIDs(in_dids,isNodSearch), in_mod.industry_class, isNodSearch);
-      rpt:=format_rpt(recs,in_mod);
-      return rpt;
-    end;
+		export by_did (dataset(doxie.layout_references) in_dids, params in_mod, boolean isNodSearch=false, boolean includeBlackKnight=false) := function
+		 //No need for includeVendorSourceB in the call to byDIDs
+			recs:= GetRawRecs(byDIDs(in_dids,isNodSearch),in_mod.industry_class, isNodSearch,  includeBlackKnight);
+			rpt:=format_rpt(recs,in_mod);
+			return rpt;
+		end;
 
   export by_bdid (dataset(doxie_cbrs.layout_references) in_bdids, params in_mod, boolean isNodSearch=false) := function
    recs:= GetRawRecs(byBDIDs(in_bdids,isNodSearch), in_mod.industry_class, isNodSearch);

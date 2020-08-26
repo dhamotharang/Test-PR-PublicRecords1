@@ -1,41 +1,14 @@
-﻿//HPCC Systems KEL Compiler Version 1.3.0beta5
+//HPCC Systems KEL Compiler Version 1.3.0
 IMPORT KEL13 AS KEL;
 IMPORT B_First_Degree_Relative_5,B_Sele_Person_5,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Ult,E_First_Degree_Relative,E_Person,E_Sele_Person,E_Surname FROM PublicRecords_KEL;
 IMPORT * FROM KEL13.Null;
 EXPORT B_Sele_Person_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_First_Degree_Relative_5(__in,__cfg).__ENH_First_Degree_Relative_5) __ENH_First_Degree_Relative_5 := B_First_Degree_Relative_5(__in,__cfg).__ENH_First_Degree_Relative_5;
   SHARED VIRTUAL TYPEOF(B_Sele_Person_5(__in,__cfg).__ENH_Sele_Person_5) __ENH_Sele_Person_5 := B_Sele_Person_5(__in,__cfg).__ENH_Sele_Person_5;
-  SHARED __EE3700394 := __ENH_Sele_Person_5;
-  SHARED __EE3700397 := __ENH_First_Degree_Relative_5;
-  SHARED __ST606747_Layout := RECORD
-    KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
-    KEL.typ.ntyp(E_Person().Typ) Contact_;
-    KEL.typ.nint Ult_I_D_;
-    KEL.typ.nint Org_I_D_;
-    KEL.typ.nint Sele_I_D_;
-    KEL.typ.ndataset(E_Sele_Person(__in,__cfg).Contact_Info_Layout) Contact_Info_;
-    KEL.typ.ndataset(E_Sele_Person(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.nint Age_In_Days_;
-    KEL.typ.nkdate Assoc_Date_;
-    KEL.typ.nbool Two_Years_;
-    KEL.typ.ndataset(E_First_Degree_Relative(__in,__cfg).Layout) First_Degree_Relative_;
-    KEL.typ.epoch Archive___Date_ := 0;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
-    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
-    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
-    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  __JC3700574(B_Sele_Person_5(__in,__cfg).__ST188660_Layout __EE3700394, E_First_Degree_Relative(__in,__cfg).Layout __EE3700397) := __EEQP(__EE3700394.Contact_,__EE3700397.Subject_) AND __T(__AND(__EEQ(__EE3700394.Contact_,__EE3700397.Subject_),__CN(__NN(__EE3700394.Contact_))));
-  __ST606747_Layout __Join__ST606747_Layout(B_Sele_Person_5(__in,__cfg).__ST188660_Layout __r, DATASET(E_First_Degree_Relative(__in,__cfg).Layout) __recs) := TRANSFORM
-    SELF := __r;
-    SELF.First_Degree_Relative_ := __CN(__recs);
-  END;
-  SHARED __EE3700620 := DENORMALIZE(DISTRIBUTE(__EE3700394,HASH(Contact_)),DISTRIBUTE(__EE3700397,HASH(Subject_)),__JC3700574(LEFT,RIGHT),GROUP,__Join__ST606747_Layout(LEFT,ROWS(RIGHT)),LOCAL);
-  EXPORT __ST82823_Layout := RECORD
+  SHARED __EE3707545 := __ENH_Sele_Person_5;
+  SHARED __EE3707548 := __ENH_First_Degree_Relative_5;
+  SHARED __ST3707729_Layout := RECORD
+    KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Person().Typ) Relative_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -47,7 +20,48 @@ EXPORT B_Sele_Person_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST183083_Layout := RECORD
+  SHARED __EE3707733 := PROJECT(TABLE(PROJECT(__EE3707548,__ST3707729_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_First_Reported_,MIN,FALSE),KEL.typ.epoch Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_Last_Reported_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,FALSE),Subject_,Relative_},Subject_,Relative_,MERGE),__ST3707729_Layout);
+  SHARED __ST3707748_Layout := RECORD
+    KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
+    KEL.typ.ntyp(E_Person().Typ) Contact_;
+    KEL.typ.nint Ult_I_D_;
+    KEL.typ.nint Org_I_D_;
+    KEL.typ.nint Sele_I_D_;
+    KEL.typ.ndataset(E_Sele_Person(__in,__cfg).Contact_Info_Layout) Contact_Info_;
+    KEL.typ.ndataset(E_Sele_Person(__in,__cfg).Data_Sources_Layout) Data_Sources_;
+    KEL.typ.nint Age_In_Days_;
+    KEL.typ.nkdate Assoc_Date_;
+    KEL.typ.nbool Two_Years_;
+    KEL.typ.ndataset(__ST3707729_Layout) First_Degree_Relative_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
+    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
+  __JC3707909(B_Sele_Person_5(__in,__cfg).__ST196978_Layout __EE3707545, __ST3707729_Layout __EE3707733) := __EEQP(__EE3707545.Contact_,__EE3707733.Subject_) AND __T(__AND(__EEQ(__EE3707545.Contact_,__EE3707733.Subject_),__CN(__NN(__EE3707545.Contact_))));
+  __ST3707748_Layout __Join__ST3707748_Layout(B_Sele_Person_5(__in,__cfg).__ST196978_Layout __r, DATASET(__ST3707729_Layout) __recs) := TRANSFORM
+    SELF := __r;
+    SELF.First_Degree_Relative_ := __CN(__recs);
+  END;
+  SHARED __EE3707947 := DENORMALIZE(DISTRIBUTE(__EE3707545,HASH(Contact_)),DISTRIBUTE(__EE3707733,HASH(Subject_)),__JC3707909(LEFT,RIGHT),GROUP,__Join__ST3707748_Layout(LEFT,ROWS(RIGHT)),LOCAL);
+  EXPORT __ST87447_Layout := RECORD
+    KEL.typ.ntyp(E_Person().Typ) Relative_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
+    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
+  EXPORT __ST191592_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Person().Typ) Contact_;
     KEL.typ.nint Ult_I_D_;
@@ -58,7 +72,7 @@ EXPORT B_Sele_Person_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nint Age_In_Days_;
     KEL.typ.nkdate Assoc_Date_;
     KEL.typ.bool Is_Executive_Ever_ := FALSE;
-    KEL.typ.ndataset(__ST82823_Layout) Relatives_;
+    KEL.typ.ndataset(__ST87447_Layout) Relatives_;
     KEL.typ.nbool Two_Years_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -70,12 +84,12 @@ EXPORT B_Sele_Person_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST183083_Layout __ND3700629__Project(__ST606747_Layout __PP3700625) := TRANSFORM
-    __BS3700682 := __T(__PP3700625.Contact_Info_);
-    SELF.Is_Executive_Ever_ := EXISTS(__BS3700682(__T(__OP2(__T(__PP3700625.Contact_Info_).Is_Executive_,=,__CN(TRUE)))));
-    __EE3700623 := __PP3700625.First_Degree_Relative_;
-    SELF.Relatives_ := __BN(PROJECT(TABLE(PROJECT(__T(__EE3700623),__ST82823_Layout)(__NN(Relative_)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_First_Reported_,MIN,FALSE),KEL.typ.epoch Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_Last_Reported_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,FALSE),Relative_},Relative_,MERGE),__ST82823_Layout),__NL(__EE3700623));
-    SELF := __PP3700625;
+  SHARED __ST191592_Layout __ND3707956__Project(__ST3707748_Layout __PP3707952) := TRANSFORM
+    __BS3708009 := __T(__PP3707952.Contact_Info_);
+    SELF.Is_Executive_Ever_ := EXISTS(__BS3708009(__T(__OP2(__T(__PP3707952.Contact_Info_).Is_Executive_,=,__CN(TRUE)))));
+    __EE3707950 := __PP3707952.First_Degree_Relative_;
+    SELF.Relatives_ := __PROJECT(__EE3707950,__ST87447_Layout);
+    SELF := __PP3707952;
   END;
-  EXPORT __ENH_Sele_Person_4 := PROJECT(PROJECT(__EE3700620,__ND3700629__Project(LEFT)),__ST183083_Layout);
+  EXPORT __ENH_Sele_Person_4 := PROJECT(__EE3707947,__ND3707956__Project(LEFT));
 END;

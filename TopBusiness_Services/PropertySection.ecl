@@ -16,8 +16,8 @@ EXPORT fn_fullView(
 	dataset(TopBusiness_Services.PropertySection_Layouts.rec_Input) ds_in_data
 	,TopBusiness_Services.PropertySection_Layouts.rec_OptionsLayout in_options
 	,AutoStandardI.DataRestrictionI.params in_mod	
-	,string120 ReportCompanyName	
-  ,unsigned2 in_sourceDocMaxCount = iesp.Constants.TopBusiness.MAX_COUNT_BIZRPT_SRCDOC_RECORDS
+ ,string120 ReportCompanyName
+	 ,unsigned2 in_sourceDocMaxCount = iesp.Constants.TopBusiness.MAX_COUNT_BIZRPT_SRCDOC_RECORDS
   ,unsigned2 in_propertyRecordsMaxCount = iesp.Constants.TopBusiness.MAX_COUNT_BIZRPT_PROPERTY_RECORDS
   ,unsigned2 in_propertyTotalRecsMaxCount = iesp.Constants.TopBusiness.MAX_COUNT_BIZRPT_PROPERTY_TOTAL_RECS
 	) := function	
@@ -43,7 +43,9 @@ EXPORT fn_fullView(
     TmpMort_info_forLNFARESIDNoExplosCodes := sort(dedup(
 	                                 join(property_recs_raw,																	      
 																	      LN_PropertyV2.key_deed_fid(),																	     
-																	keyed(left.ln_fares_id = right.ln_fares_id), 
+																	keyed(left.ln_fares_id = right.ln_fares_id)
+																	AND if(in_options.IncludeVendorSourceB, true, not LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code)), //flag is for checking if BK assignments and releases should be
+																																																																																								//included. If not remove the rcd types for assgns and releases.
 																	transform(TopBusiness_Services.PropertySection_layouts.rec_mortgage,																																		
 																	self.st := right.state;
 																	self.apn := right.apnt_or_pin_number;
@@ -324,7 +326,7 @@ EXPORT fn_fullView(
 	 // party_type_addresses here are types S,  (Seller) P (Property), O (Owner)
 	 //
 	 // now sort the property party information
-	 	 																																																																			
+	 	
    property_Transaction :=  project(property_partyPayloadDeduped,
 														  transform(TopBusiness_Services.PropertySection_layouts.rec_PropertyTransactionExtra,
 															self.ln_fares_id := left.ln_fares_id;
@@ -341,7 +343,8 @@ EXPORT fn_fullView(
 	
 	   foreclosureNODSection :=  TopBusiness_Services.ForeclosureNODSection.fn_fullView(
 	                      ds_in_data,
-												FETCH_LEVEL												
+												FETCH_LEVEL,
+												in_options.IncludeVendorSourceB
 												);
                     
     nod := nofold(foreclosureNODSection).NoticeOfDefaults : onwarning(2131, ignore);
@@ -461,7 +464,7 @@ EXPORT fn_fullView(
                           // SELF.siteAddress1.zip5 := LEFT.siteAddress2.zip5;
 													// SELF.siteAddress1.unitNumber := LEFT.siteAddress2.unitNumber;
 													// SELF := LEFT));
-	
+			
   tmpNods2_Situs1 := join(tmpNODS, property_party1,             
 									  left.siteAddress1.streetNumber  = right.property_Address.StreetNumber  and
 											left.siteAddress1.Streetname = right.property_Address.StreetName  and
@@ -472,11 +475,11 @@ EXPORT fn_fullView(
 													left.siteAddress1.zip5 <> '' and
 													left.siteAddress1.unitNumber = right.property_Address.UnitNumber,																																																																
 													transform(iesp.TopBusinessReport.t_TopBusinessPropertyForeclosure,
-													 SELF := LEFT),limit(0), keep(TopBusiness_Services.Constants.PropertyKeepConstant)													
+													 SELF := LEFT),limit(0), keep(TopBusiness_Services.Constants.PropertyKeepConstant)
 													); 
- 
- tmpNods2 := dedup(tmpNods2_Situs1, all,HASH);
 													
+ tmpNods2 := dedup(tmpNods2_Situs1, all,HASH);
+	
  property_party_WNOD := denormalize(property_party, tmpNods2,
                           left.property_Address.StreetNumber  = right.siteAddress1.streetNumber and
 											    left.property_Address.StreetName = right.siteAddress1.Streetname  and
@@ -497,10 +500,10 @@ EXPORT fn_fullView(
 												     self.IsNOD := false;												 												 
                              self := left;
 														 self := []));																																							
-
+		
   tmpFores := project(foreclos, transform(iesp.TopBusinessReport.t_TopBusinessPropertyForeclosure,
 																			    self := left));										
-  
+	
 	 tmpFores2 := dedup(join(tmpFores, property_party1,
 	                 left.siteAddress1.streetNumber  = right.property_Address.StreetNumber  and
 											left.siteAddress1.Streetname = right.property_Address.StreetName  and
@@ -511,7 +514,7 @@ EXPORT fn_fullView(
 													left.siteAddress1.zip5 <> '' and
 													left.siteAddress1.unitNumber = right.property_Address.UnitNumber,
 													transform(left),limit(0), keep(TopBusiness_Services.Constants.PropertyKeepConstant)), all,HASH);
-																								 
+		
 	property_party_WFORE_NODS := denormalize(property_party_WNOD, tmpFores2,
                           left.property_Address.StreetNumber  = right.siteAddress1.streetNumber and
 											    left.property_Address.StreetName = right.siteAddress1.Streetname  and
@@ -532,7 +535,7 @@ EXPORT fn_fullView(
 												      self.IsNOD := false;												 												 
                               self := left;
 															self := []));
-  						                               
+															
   property_party_dedup := dedup(sort(property_party_WFORE_NODS, ln_fares_id,
 	                              if (exists(Sellers),0,1),
 																if (exists(Borrowers),0,1),
@@ -1100,7 +1103,9 @@ denorm1stParamLarge := project(property_partyPayLoadDeduped,
     tmp_deed_info_plus_assessmentWITHOUTDEED_EXPLOSIONCODES := join(Assessment_info_ds_OWNER_RELATIONSHIP_RIGHTS_CODE,
 		                            LN_PropertyV2.key_deed_fid(),		                   
                          keyed(left.in_ln_fares_id = right.ln_fares_id) and 											     
-														 (left.ln_fares_id[2]='D' or left.ln_fares_id[2]='M'),
+														 (left.ln_fares_id[2]='D' or left.ln_fares_id[2]='M')
+														 AND if(in_options.IncludeVendorSourceB, true, not LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code)), //flag is for checking if BK assignments and releases should be
+																																																																																								//included. If not remove the rcd types for assgns and releases.
 											   deed_info(left, right), left outer,keep(TopBusiness_Services.Constants.PropertyKeepDeedConstant));
 
 

@@ -6,7 +6,7 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT BOOLEAN isFCRA := OptionsRaw.isFCRA;
 	EXPORT STRING8 ArchiveDate := OptionsRaw.ArchiveDate;
 	EXPORT STRING250 InputFileName := OptionsRaw.InputFileName;
-	EXPORT STRING100 PermissiblePurpose := OptionsRaw.PermissiblePurpose;
+	EXPORT STRING100 IntendedPurpose := OptionsRaw.IntendedPurpose;
 	EXPORT STRING100 Data_Restriction_Mask := OptionsRaw.Data_Restriction_Mask;
 	EXPORT STRING100 Data_Permission_Mask := OptionsRaw.Data_Permission_Mask;
 	EXPORT UNSIGNED GLBAPurpose := OptionsRaw.GLBAPurpose;
@@ -16,9 +16,12 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT INTEGER ScoreThreshold := OptionsRaw.ScoreThreshold;
 	EXPORT BOOLEAN ExcludeConsumerAttributes := OptionsRaw.ExcludeConsumerAttributes;
 	EXPORT BOOLEAN isMarketing := OptionsRaw.isMarketing ;// When TRUE enables Marketing Restrictions
-	EXPORT DATA100 KEL_Permissions_Mask := OptionsRaw.KEL_Permissions_Mask ;// Set by PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate()
+	EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := OptionsRaw.Allowed_Sources_Dataset;
+	EXPORT DATA57 KEL_Permissions_Mask := OptionsRaw.KEL_Permissions_Mask ;// Set by PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate()
 	EXPORT BOOLEAN OutputMasterResults := OptionsRaw.OutputMasterResults;
-
+	EXPORT BOOLEAN IncludeMinors := OptionsRaw.IncludeMinors;
+	EXPORT INTEGER upperage := OptionsRaw.upperage;
+	
 	EXPORT DATASET(Gateway.Layouts.Config) Gateways := OptionsRaw.Gateways;
 	
 	// BIP Append Options
@@ -72,7 +75,9 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
   EXPORT BOOLEAN IncludeNameSummary := FALSE;
   EXPORT BOOLEAN IncludePhoneSummary := FALSE;
 	EXPORT BOOLEAN IncludeSSNSummary := FALSE;
+	EXPORT BOOLEAN IncludeOverrides := TRUE;
 	EXPORT BOOLEAN IncludeMini := TRUE;
+
 	
 	// Performance options to turn ON/OFF ASSOCIATIONS in during FDC build. 
 	// By default, we'll check if their related ENTITIES are needed.

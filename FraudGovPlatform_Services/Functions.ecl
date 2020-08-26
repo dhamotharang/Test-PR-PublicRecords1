@@ -663,5 +663,15 @@ EXPORT Functions := MODULE
 	EXPORT GetLastRecentActivityDate() := FUNCTION
 		return STD.Date.AdjustDate(STD.Date.Today(),day_delta:=FraudGovPlatform_Services.Constants.RECENT_ACTIVITY_DAYS*-1);
 	END;
+  
+  EXPORT GetFormatted_IP (string octet) := FUNCTION
+    Len := length(trim(octet, all));
+    append_zero := MAP(Len = 0 => FraudGovPlatform_Services.Constants.IP_ADDRESS_ELEMENT.APPEND_THREE_ZERO, 
+                       Len = 1 => FraudGovPlatform_Services.Constants.IP_ADDRESS_ELEMENT.APPEND_TWO_ZERO,
+                       Len = 2 => FraudGovPlatform_Services.Constants.IP_ADDRESS_ELEMENT.APPEND_ONE_ZERO,
+                       '');
+    out := trim(append_zero) + octet;
+    return out;
+  END;
 
 END;

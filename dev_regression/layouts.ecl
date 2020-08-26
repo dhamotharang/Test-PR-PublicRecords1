@@ -4,6 +4,7 @@ EXPORT layouts := MODULE
     INTEGER soap_seq;
     INTEGER soap_status := 0;
     STRING  soap_message := '';
+    UNSIGNED hash_val := 0;
   END;
 
   EXPORT testcase := RECORD
@@ -27,7 +28,7 @@ EXPORT layouts := MODULE
 
   EXPORT summary_count := RECORD
     STRING s;
-    INTEGER c;
+    STRING c;
   END;
 
 END;

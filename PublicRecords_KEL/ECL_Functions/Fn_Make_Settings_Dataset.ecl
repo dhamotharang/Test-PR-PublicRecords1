@@ -6,7 +6,7 @@ EXPORT fn_make_settings_dataset(PublicRecords_KEL.Interface_BWR_Settings Setting
 	PermittedSet := ['','0'];
 	RestrictedSet := ['','0'];
 	
-	PermissiblePurpose_output := CASE(STD.Str.ToUpperCase(Settings.PermissiblePurpose),
+	PermissiblePurpose_output := CASE(STD.Str.ToUpperCase(Settings.IntendedPurpose),
 		'APPLICATION' 												=> 'A: APPLICATION',
 		'CHILD SUPPORT' 											=> 'B: CHILD SUPPORT',
 		'COLLECTIONS' 												=> 'C: COLLECTIONS',

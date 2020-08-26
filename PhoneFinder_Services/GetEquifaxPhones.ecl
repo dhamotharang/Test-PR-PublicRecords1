@@ -1,10 +1,10 @@
-IMPORT $, MDR, Phones;
+IMPORT $, MDR, Phones, doxie;
 
 // Equifax data
 EXPORT GetEquifaxPhones(DATASET($.Layouts.BatchInAppendDID) dIn,
 												$.iParam.SearchParams               inMod) :=
 FUNCTION
-	dEquifaxPhones := Phones.Raw.EquifaxPhones.ByPhone(dIn, homephone, FALSE);
+	dEquifaxPhones := IF(inMod.UseEquifax, Phones.Raw.EquifaxPhones.ByPhone(dIn, homephone, FALSE));
 
 	$.Layouts.PhoneFinder.Common tFormat2Common(RECORDOF(dEquifaxPhones) pInput) :=
 	TRANSFORM

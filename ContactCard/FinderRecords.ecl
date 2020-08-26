@@ -380,7 +380,7 @@ pa_pp := pa_srt + if(ipprna,oph_rna);
 
 //***** WORK PHONES
 wphones_chsn1 := choosen(sort(doxie.Fn_PhonesAtWork((dids+spouseDIDs)(not SubjectIsDeceased),
-                                  mod_access.date_threshold, mod_access.dppa, mod_access.glb, con.min_PAWRecencyInDays,con.min_PAWConfidencescore),
+                                  mod_access, con.min_PAWRecencyInDays,con.min_PAWConfidencescore),
                               ut.StringSimilar100(contact.lname, phone.listing_name)),
                         con.max_workphones);
 

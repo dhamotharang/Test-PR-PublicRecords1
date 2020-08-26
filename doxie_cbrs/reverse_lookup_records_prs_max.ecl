@@ -8,12 +8,12 @@ r := doxie_cbrs.reverse_lookup_records_prs(bdids,mod_access,Include_ReversePhone
 
 //gonna lop it off for exactly max
 r lop(r l) := TRANSFORM
-	overshot := l.cumulative_count - max_reverselookup_val;
-	SELF.listed_name_children := 
-		IF(overshot < 0, 
-			 l.listed_name_children,
-			 CHOOSEN(l.listed_name_children, COUNT(l.listed_name_children) - overshot));
-	SELF := l;
+  overshot := l.cumulative_count - max_reverselookup_val;
+  SELF.listed_name_children :=
+    IF(overshot < 0,
+       l.listed_name_children,
+       CHOOSEN(l.listed_name_children, COUNT(l.listed_name_children) - overshot));
+  SELF := l;
 END;
 
 RETURN PROJECT(r, lop(LEFT));

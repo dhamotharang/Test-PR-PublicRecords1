@@ -5,7 +5,7 @@ EXPORT Fn_GetBRM_InputBIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
             PublicRecords_KEL.Interface_Options Options) := FUNCTION
             		
     InputPIIBIIAttributes := KEL.Clean(PublicRecords_KEL.Q_Input_Bus_Attributes_V1(RepInput, BusinessInput, 
-        (INTEGER)BusinessInput[1].B_InpClnArchDt[1..8], Options.KEL_Permissions_Mask).res0, TRUE, TRUE, TRUE);
+        (INTEGER) BusinessInput[1].B_InpClnArchDt[1..8], Options.KEL_Permissions_Mask).res0, TRUE, TRUE, TRUE);
 	ds_changedatatype :=
 		                  PROJECT(InputPIIBIIAttributes,
 											        TRANSFORM(BRM_Marketing_Attributes.Layout_BRM_NonFCRA.Layout_master,

@@ -1,4 +1,4 @@
-﻿IMPORT PublicRecords_KEL, STD, InsuranceHeader_BestOfBest, Business_Risk_BIP;
+﻿IMPORT PublicRecords_KEL, STD, InsuranceHeader_BestOfBest, Business_Risk_BIP, ut;
 
 EXPORT FnRoxie_Prep_InputPII(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) Input,
                 PublicRecords_KEL.Interface_Options Options) := FUNCTION
@@ -22,8 +22,8 @@ EXPORT FnRoxie_Prep_InputPII(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layou
 
 	InputEcho := PublicRecords_KEL.ECL_Functions.Fn_InputEcho_Roxie( ds_input_slim );	
 
-	cleanInput := PublicRecords_KEL.ECL_Functions.Fn_CleanInput_Roxie( InputEcho );	
-	
+	cleanInput := PublicRecords_KEL.ECL_Functions.Fn_CleanInput_Roxie( InputEcho);
+		
   // Append LexID
   withLexID := IF(Options.isFCRA, 
 		PublicRecords_KEL.ECL_Functions.Neutral_Lexid_Soapcall(cleanInput, Options), //FCRA uses soapcall
@@ -98,6 +98,13 @@ EXPORT FnRoxie_Prep_InputPII(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layou
 //Check isFCRA to return the insurance DL data only for NonFCRA query
 	InputPII := IF(~Options.isFCRA, UNGROUP(InputPII_NonFCRA), CheckTPMPhone); 
 
- RETURN InputPII;
+
+	FinalPII := project(InputPII, transform(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII,
+			temp_age :=  if(~options.IncludeMinors AND (integer)left.P_InpClnDOB != 0, 
+														(integer)ut.Age((unsigned)left.P_InpClnDOB, (unsigned)left.P_InpClnArchDt),0);	//remove minors if Includeminors is FALSE
+			SELF.PI_InpDOBAgeIsMinorFlag  := IF(~options.IncludeMinors AND temp_age >= 0 AND temp_age <= options.upperage,TRUE, FALSE);//remove minors if Includeminors is FALSE
+			self := left));
+
+ RETURN FinalPII;
  
  END;				

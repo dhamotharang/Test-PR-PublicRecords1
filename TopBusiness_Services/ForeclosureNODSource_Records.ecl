@@ -8,7 +8,8 @@ EXPORT ForeclosureNODSource_Records(
   dataset(topbusiness_services.Layouts.rec_input_ids_wSrc) in_docids,
   topbusiness_services.SourceService_Layouts.OptionsLayout inoptions,
 	boolean IsFCRA = false,
-	boolean IsNod = false) 
+	boolean IsNod = false
+  ) 
  := MODULE
  
 	// For in_docids records that don't have IdValue's retrieve them from linkid file
@@ -52,7 +53,7 @@ EXPORT ForeclosureNODSource_Records(
 		EXPORT string ssn_mask := gmod.ssnmask;
 	END;
 	// Get the foreclosure or Nod raw data from the appropriate view.
-   Foreclosure_sourceview := Foreclosure_Services.raw.REPORT_VIEW.by_fid (fid_keys_dedupSlim, in_mod, IsNod);
+	Foreclosure_sourceview := Foreclosure_Services.raw.REPORT_VIEW.by_fid (fid_keys_dedupSlim, in_mod, IsNod, inoptions.IncludeVendorSourceB);
 
 	// Add linkids to the output. 
      SHARED foreclosure_sourceview_wLinkIds := JOIN(Foreclosure_sourceview,fid_keys_comb,

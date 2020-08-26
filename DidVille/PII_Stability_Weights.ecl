@@ -44,7 +44,7 @@ EXPORT PII_STABILITY_WEIGHTS := MODULE
 											SELF.SSN4 := LEFT.SSN[6..9]; 
 											SELF.ZIP_cases := Dataset([{LEFT.Z5, 100}],InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases) ;
 											SELF:= LEFT));
-											
+
 		InsuranceHeader_xLink.MAC_MEOW_xIDL_Batch(interm, 
 																						UniqueID, 
 																						, // did
@@ -68,7 +68,8 @@ EXPORT PII_STABILITY_WEIGHTS := MODULE
 																						,// src
 																						,// src_rid
 																						,// fname2
-																						,// lname2																						
+																						,// lname2
+																						,// vin
 																						outfile
 																						);			
 																						

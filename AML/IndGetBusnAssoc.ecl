@@ -1,7 +1,7 @@
-﻿IMPORT paw, riskwise, risk_indicators, Business_Header, doxie, Business_Header_SS, did_add, Suppress, 
+﻿IMPORT paw, riskwise, risk_indicators, Business_Header, doxie, Business_Header_SS, Suppress, 
 Address, header, Relationship, AML;
 
-export IndGetBusnAssoc( DATASET(Layouts.LayoutAMLShellV2) BusnIndv,
+export IndGetBusnAssoc( DATASET(AML.Layouts.LayoutAMLShellV2) BusnIndv,
 											doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION;
 //version 2
 patw := record
@@ -72,7 +72,7 @@ pawTitle := Suppress.Suppress_ReturnOldLayout(pawTitle_unsuppressed, mod_access,
 						
 BusnExecs := dedup(sort(pawTitle(BusnExec <= 3), seq,did,bid), seq,did,bid);
 
- Layouts.AMLExecLayoutV2  ExecsOut(BusnExecs le)  := TRANSFORM
+ AML.Layouts.AMLExecLayoutV2  ExecsOut(BusnExecs le)  := TRANSFORM
   SELF.seq := le.seq;
 	SELF.historydate  := le.historydate;
 	SELF.origdid  := le.origdid;
@@ -146,7 +146,7 @@ pawAssocTitle := Suppress.Suppress_ReturnOldLayout(pawAssocTitle_unsuppressed, m
 
  AssocBusnExecs := dedup(sort(pawAssocTitle, seq,did,bid), seq,did,bid);  
  
- Layouts.AMLExecLayoutV2  AssocExecsOut(AssocBusnExecs le)  := TRANSFORM
+ AML.Layouts.AMLExecLayoutV2 AssocExecsOut(AssocBusnExecs le)  := TRANSFORM
   SELF.seq := le.seq;
 	SELF.historydate  := le.historydate;
 	SELF.origdid  := le.origdid;
@@ -171,7 +171,7 @@ pawAssocTitle := Suppress.Suppress_ReturnOldLayout(pawAssocTitle_unsuppressed, m
 	rellyids := Relationship.proc_GetRelationshipNeutral(DDAssocExecs_dids,TopNCount:=100,
 			RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost).result; 
 
- Layouts.AMLExecLayoutV2  Getparents(DDAssocExecs le, Relationship.layout_GetRelationship.interfaceOutputNeutral ri) := TRANSFORM 
+ AML.Layouts.AMLExecLayoutV2 Getparents(DDAssocExecs le, Relationship.layout_GetRelationship.interfaceOutputNeutral ri) := TRANSFORM 
 	
 		self.seq := le.seq;
 		self.origdid := le.origdid;
@@ -201,9 +201,9 @@ Linkedprep := project(ExecBusn, transform(Business_Header_SS.Layout_BDID_OutBatc
 																						
 LinkedprepSD := dedup(sort(Linkedprep, seq, bdid), seq, bdid);
 
-Business_Header_SS.MAC_BestAppend(LinkedprepSD,appendsVerify,appendsVerify,linkedbest,true);
+Business_Header_SS.MAC_BestAppend(LinkedprepSD, appendsVerify, appendsVerify, linkedbest, mod_access.DataPermissionMask, mod_access.DataRestrictionMask, true);
 
-Layouts.AMLExecLayoutV2 appendBest(ExecBusn le, linkedbest r) := transform
+AML.Layouts.AMLExecLayoutV2 appendBest(ExecBusn le, linkedbest r) := transform
 	SELF.seq := le.seq;
 	SELF.historydate  := le.historydate;
 	SELF.origdid  := le.origdid;

@@ -22,14 +22,11 @@ EXPORT LiensRetrievalServiceFCRA := MACRO
 
    params := LiensV2_Services.IParam.GetLiensRetrievalParams(first_row);
 
-   srch_recs  := LiensV2_Services.LiensRetrieval_Records(params, in_req);
+   response  := LiensV2_Services.LiensRetrieval_Records(params, in_req);
 
-   response :=   PROJECT(srch_recs, TRANSFORM(iesp.riskview_publicrecordretrieval.t_PublicRecordRetrievalResponseEx,
-                                    SELF.response := LEFT));
-
-  MAP( params.Invalid_FilingtypeID => FAIL(LiensV2_Services.Constants.LIENS_RETRIEVAL.Invalid_FilingtypeID_failure),
+   MAP( params.Invalid_FilingtypeID => FAIL(LiensV2_Services.Constants.LIENS_RETRIEVAL.Invalid_FilingtypeID_failure),
       ~params.InputOk =>FAIL(301, doxie.ErrorCodes(301)),
-      params.InputOk => OUTPUT(response,named('Response'))   
+      params.InputOk => OUTPUT(response,named('Results'))   
       ) ;
 
  ENDMACRO;

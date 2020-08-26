@@ -1,1 +1,1 @@
-export stored_ShowPersonalData_value := false : stored('ShowPersonalData');
+EXPORT stored_ShowPersonalData_value := FALSE : STORED('ShowPersonalData');

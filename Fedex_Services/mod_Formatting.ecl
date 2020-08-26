@@ -1,4 +1,4 @@
-import doxie,ut,Address,did_add,mdr, dx_header, Suppress;
+﻿import doxie,ut,Address,did_add,mdr, dx_header, Suppress;
 
 //NOTE: address_type gets set here, but then updated later by Fedex_Services.fn_CheckAddrType
 
@@ -223,8 +223,8 @@ function
 			self.company_name := stringlib.StringToUpperCase(left.company_name),
 			self.err_stat := left.errstat,
 			self.country := if (Fedex_Services.Inputs.isCanadaSearch,Fedex_Services.Contants.str_CA,Fedex_Services.Contants.str_US);
-			self := left,
-			self.did := 0,
+      self.did := 0,			
+      self := left,
 			self.bdid := 0,
 			self.postdir := ''
 		)

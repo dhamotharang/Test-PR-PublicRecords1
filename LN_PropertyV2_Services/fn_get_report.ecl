@@ -1,4 +1,4 @@
-﻿IMPORT doxie, LN_PropertyV2, ut, Codes, suppress, fcra , FFD, LN_PropertyV2_Services;
+﻿IMPORT doxie, LN_PropertyV2, ut, Codes, suppress, fcra , FFD, LN_PropertyV2_Services, std;
 
 l_sid		:= LN_PropertyV2_Services.layouts.search_fid;
 l_fid		:= LN_PropertyV2_Services.layouts.fid;
@@ -16,7 +16,8 @@ export dataset(l_out) fn_get_report(
 	boolean isFCRA = false,
 	dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
 	integer8 inFFDOptionsMask = 0,
-	dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
+	dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile,
+	boolean includeBlackKnight = false
 	) := function
 																							
  isCNSMR := ut.IndustryClass.is_Knowx;
@@ -31,7 +32,7 @@ export dataset(l_out) fn_get_report(
 		string8 sortby_date;
 	end;
 	
-	deeds_raw_early		:= project(LN_PropertyV2_Services.fn_get_deeds_raw(fids2a,isFCRA,ds_flags,slim_pc_recs,inFFDOptionsMask,isCNSMR),early_fid_rec);
+	deeds_raw_early		:= project(LN_PropertyV2_Services.fn_get_deeds_raw(fids2a,isFCRA,ds_flags,slim_pc_recs,inFFDOptionsMask,isCNSMR, includeBlackKnight),early_fid_rec);
 	assess_raw_early	:= project(LN_PropertyV2_Services.fn_get_assessments_raw(fids2a,isFCRA,ds_flags,slim_pc_recs,inFFDOptionsMask,isCNSMR),early_fid_rec);
 	
 	fids2 := if(inTrimBySortBy,project(topn(
@@ -50,7 +51,7 @@ export dataset(l_out) fn_get_report(
 											Suppress.Constants.LinkTypes.SSN,app_ssn,ln_fares_id,'',false);
 
 	// retrieve raw results with minimal processing (just the JOINs)
-	deeds_raw		:= LN_PropertyV2_Services.fn_get_deeds_raw(fids3,isFCRA,ds_flags,slim_pc_recs,inFFDOptionsMask,isCNSMR);
+	deeds_raw		:= LN_PropertyV2_Services.fn_get_deeds_raw(fids3,isFCRA,ds_flags,slim_pc_recs,inFFDOptionsMask,isCNSMR, includeBlackKnight);
 	assess_raw	:= LN_PropertyV2_Services.fn_get_assessments_raw(fids3,isFCRA,ds_flags,slim_pc_recs,inFFDOptionsMask,isCNSMR);
 	
 	aNames_raw	:= join(
@@ -167,7 +168,7 @@ assess	:= fn_get_assessments(assess_paged);
 																					or ~LN_PropertyV2_Services.input.DisplayMatchedParty_val);
 
 	// If CurrentByVendor is set, only keep APNs if _all_ of their records have a perfect sec_range match in the property address
-	sec_clean(string s) := StringLib.StringFilter(Stringlib.StringToUpperCase(s),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+	sec_clean(string s) := std.str.filter(std.str.toUpperCase(s),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 	apns_bad := project(partied_xadl2_thresh(sec_clean(parties(party_type='P')[1].sec_range)<>sec_clean(LN_PropertyV2_Services.input.sec_range)), transform({partied_xadl2_thresh.apn},self.apn:=LN_PropertyV2.fn_strip_pnum(left.apn)));
 	apns_set := set(table(apns_bad, {apn}, apn), apn);
 	partied_out := if(LN_PropertyV2_Services.input.currentVend, partied_xadl2_thresh(LN_PropertyV2.fn_strip_pnum(apn) not in apns_set), partied_xadl2_thresh);
@@ -340,7 +341,7 @@ assess	:= fn_get_assessments(assess_paged);
 	     
 			
 	                                                  // output for QA
-	
+
 	return results_final;
 
 end;

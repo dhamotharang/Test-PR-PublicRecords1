@@ -9,7 +9,7 @@
 // Or something similar. [1..9] refers to the root, and [11..14] refers to the particular subsidiary.
 // We omit [10] of course, which is the dash.
 
-IMPORT BatchServices, Business_Header_SS, Doxie, DCA, Doxie_cbrs, dx_dca, YellowPages, ut, Business_Header, STD;
+IMPORT BatchServices, Business_Header_SS, Doxie, DCA, Doxie_cbrs, dx_dca, YellowPages, Business_Header, STD;
 
 EXPORT Business_BatchService_Records(BOOLEAN useCannedRecs, Doxie.IDataAccess mod_access) :=
 	FUNCTION
@@ -86,7 +86,8 @@ EXPORT Business_BatchService_Records(BOOLEAN useCannedRecs, Doxie.IDataAccess mo
 		END;
 
 		best_res := JOIN(match_res, Business_Header.Key_BH_Best,
-							KEYED((UNSIGNED6) LEFT.bdid != 0 AND (UNSIGNED6) LEFT.bdid = RIGHT.bdid),
+							KEYED((UNSIGNED6) LEFT.bdid != 0 AND (UNSIGNED6) LEFT.bdid = RIGHT.bdid) AND 
+              doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 							append_best(LEFT, RIGHT),
 							LEFT OUTER,
 							KEEP (1), LIMIT (0)

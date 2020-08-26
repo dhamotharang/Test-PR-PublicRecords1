@@ -24,7 +24,7 @@ xml_recs := dataset([xt('5102062894')]);
 dev_regression.layouts.testcase xtTc() := TRANSFORM
   SELF.query := my_query;
   SELF.short_description := 'a quick description should go here...';
-  SELF.request_xml := TOXML(xml_recs[1]);
+  SELF.request_xml := dev_regression.utils.wrapTOXML(xml_recs[1]);
 END;
 
 testcases := DATASET([xtTc()]);

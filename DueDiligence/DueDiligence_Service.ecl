@@ -19,8 +19,6 @@ EXPORT DueDiligence_Service := MACRO
     selectedProduct := STD.Str.ToLowerCase(input[1].productRequested);
     modelName := STD.Str.ToUpperCase(TRIM(input[1].modelName));
 
-    IF(selectedProduct = DueDiligence.Constants.EMPTY OR selectedProduct NOT IN DueDiligence.ConstantsQuery.VALID_REQUESTED_PRODUCTS , FAIL(DueDiligence.ConstantsQuery.VALIDATION_INVALID_PRODUCT_REQUEST_TYPE));
-                    
     validatedRequest := DueDiligence.CommonQuery.ValidateRequest(input, glba, dppa, DueDiligence.Constants.ATTRIBUTES, FALSE, modelName);                              
                            
     DueDiligence.CommonQuery.mac_FailOnError(validatedRequest(validRequest = FALSE));

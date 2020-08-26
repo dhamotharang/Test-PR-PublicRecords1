@@ -2471,6 +2471,8 @@ EXPORT Layouts := MODULE
 		STRING3 SBFEDelinquentCount84;			
 		STRING3 SBFEDelinquentCountEver;
 		STRING3 SBFEDelq61CountEverTtl;
+		STRING3 SBFEDelq91CountEverTtl; 
+		STRING3 SBFEDelq121CountEverTtl; 
 		STRING3 SBFEDelinquentCountLoan;		
 		STRING3 SBFEDelq61LoanCount03M;
 		STRING3 SBFEDelinquentCountLoan06;		
@@ -2542,6 +2544,7 @@ EXPORT Layouts := MODULE
 		STRING3 SBFEDelq61RevCountTtl;
 		STRING3 SBFEDelq61RevCountTtlChargeoff;
 		STRING3 SBFEDelq91CountTtl;
+		STRING3 SBFEDelq121CountTtl;
 		STRING3 SBFEDelq91CountTtlChargeoff;
 		STRING3 SBFEDPD91Count;		
 		STRING3 SBFEDelq91Count03M;
@@ -3924,7 +3927,7 @@ EXPORT LayoutKELB2BAttributes := RECORD
  END;
 	// Internal Business Shell layout - this is what will get passed around to append data
 	EXPORT Shell := RECORD
-		UNSIGNED4 					Seq := 0; // This is uniquely sequenced in Business_Shell_Function to work for batch
+		UNSIGNED4 Seq := 0; // This is uniquely sequenced in Business_Shell_Function to work for batch
     INTEGER2 UltIDWeight;
 		UNSIGNED2 UltIDScore;
 		INTEGER2 OrgIDWeight;

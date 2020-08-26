@@ -1,23 +1,23 @@
-export ID_Number_BBB(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
+EXPORT ID_Number_BBB(DATASET(doxie_cbrs.layout_references) bdids) := FUNCTION
 
-br := dedup(doxie_cbrs.BBB_records_prs(bdids),bdid,bbb_id,all);
+br := DEDUP(doxie_cbrs.BBB_records_prs(bdids),bdid,bbb_id,ALL);
 
-rec := record
-	br.bdid;
-	dataset(doxie_cbrs.layout_ID_BBB_children) BBB_children;
-end;
+rec := RECORD
+  br.bdid;
+  DATASET(doxie_cbrs.layout_ID_BBB_children) BBB_children;
+END;
 
-rec prep(br l) := transform
-	self.BBB_children := dataset([{l.bbb_id}], doxie_cbrs.layout_ID_BBB_children);
-	self := l;
-end;
+rec prep(br l) := TRANSFORM
+  SELF.BBB_children := DATASET([{l.bbb_id}], doxie_cbrs.layout_ID_BBB_children);
+  SELF := l;
+END;
 
-brs := sort(project(br, prep(left)), bdid);
+brs := SORT(PROJECT(br, prep(LEFT)), bdid);
 
-rec rollem(brs l, brs r) := transform
-	self.BBB_children := l.BBB_children + r.BBB_children;//if(r.bdid > 0, r.BBB_children, []);
-	self := l;
-end;
+rec rollem(brs l, brs r) := TRANSFORM
+  SELF.BBB_children := l.BBB_children + r.BBB_children;//IF(r.bdid > 0, r.BBB_children, []);
+  SELF := l;
+END;
 
-return rollup(brs, left.bdid = right.bdid, rollem(left, right));
+RETURN ROLLUP(brs, LEFT.bdid = RIGHT.bdid, rollem(LEFT, RIGHT));
 END;
