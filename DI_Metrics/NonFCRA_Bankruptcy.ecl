@@ -36,8 +36,8 @@ email_alert := SEQUENTIAL(
 					output(srt_tbl_Key_BKv3_Non_FCRA_2010_filings,,'~thor_data400::data_insight::data_metrics::tbl_Key_BKv3_Non_FCRA_2010_Filings_by_Chapter_'+ filedate +'.csv'
 					,csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
 					,despray_bk_tbl):
-					Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'NonFCRA Group: NonFCRA_Bankruptcy Build Succeeded', workunit + ': Build complete.' + filedate)),
-					Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'NonFCRA Group: NonFCRA_Bankruptcy Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
+					Success(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_Bankruptcy Build Succeeded', workunit + ': Build complete.' + filedate)),
+					Failure(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_Bankruptcy Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
 													);
 return email_alert;
 

@@ -1,5 +1,5 @@
 ﻿// Begin code to produce match candidates
-IMPORT SALT37;
+IMPORT SALT311,STD;
 EXPORT match_candidates(DATASET(layout_InsuranceHeader) ih,BOOLEAN incremental=FALSE) := MODULE
 SHARED s := Specificities(ih).Specificities[1];
   h00 := InsuranceHeader_xLink.Specificities(ih).input_file_np;
@@ -39,7 +39,7 @@ EXPORT poprec := RECORD
 	STRING label;
 		REAL8 pop;
 	END;
-EXPORT PrePropogationStats := SALT37.MAC_Pivot(PPS, poprec);
+EXPORT PrePropogationStats := SALT311.MAC_Pivot(PPS, poprec);
 SHARED layout_withpropvars := RECORD
   thin_table;
   UNSIGNED1 SNAME_prop := 0;
@@ -58,8 +58,9 @@ SHARED layout_withpropvars := RECORD
 END;
 SHARED with_props := TABLE(thin_table,layout_withpropvars);
 SHARED RES_prop0 := DISTRIBUTE( Specificities(ih).RES_values_persisted(Basis_cnt<5000), HASH(DID)); // Not guaranteed distributed by DID :(
+SHARED VINATTR_prop0 := DISTRIBUTE( Specificities(ih).VINATTR_values_persisted(Basis_cnt<5000), HASH(DID)); // Not guaranteed distributed by DID :(
  
-SALT37.mac_prop_field(with_props(SNAME NOT IN SET(s.nulls_SNAME,SNAME)),SNAME,DID,SNAME_props); // For every DID find the best FULL SNAME
+SALT311.mac_prop_field(thin_table(SNAME NOT IN SET(s.nulls_SNAME,SNAME)),SNAME,DID,SNAME_props); // For every DID find the best FULL SNAME
 layout_withpropvars take_SNAME(with_props le,SNAME_props ri) := TRANSFORM
   SELF.SNAME := IF ( le.SNAME IN SET(s.nulls_SNAME,SNAME) and ri.DID<>(TYPEOF(ri.DID))'', ri.SNAME, le.SNAME );
   SELF.SNAME_prop := le.SNAME_prop + IF ( le.SNAME IN SET(s.nulls_SNAME,SNAME) and ri.SNAME NOT IN SET(s.nulls_SNAME,SNAME) and ri.DID<>(TYPEOF(ri.DID))'', 1, 0 ); // <>0 => propogation
@@ -67,7 +68,7 @@ layout_withpropvars take_SNAME(with_props le,SNAME_props ri) := TRANSFORM
   END;
 SHARED pj0 := JOIN(with_props,SNAME_props,left.DID=right.DID,take_SNAME(left,right),LEFT OUTER,HASH,HINT(parallel_match));
  
-SALT37.mac_prop_field_init(with_props(MNAME NOT IN SET(s.nulls_MNAME,MNAME)),MNAME,DID,MNAME_props); // For every DID find the best FULL MNAME
+SALT311.mac_prop_field_init(thin_table(MNAME NOT IN SET(s.nulls_MNAME,MNAME)),MNAME,DID,MNAME_props); // For every DID find the best FULL MNAME
 layout_withpropvars take_MNAME(with_props le,MNAME_props ri) := TRANSFORM
   SELF.MNAME := IF ( le.MNAME = ri.MNAME[1..LENGTH(TRIM(le.MNAME))], ri.MNAME, le.MNAME );
   SELF.MNAME_prop := IF ( LENGTH(TRIM(le.MNAME)) < LENGTH(TRIM(ri.MNAME)) and le.MNAME=ri.MNAME[1..LENGTH(TRIM(le.MNAME))],LENGTH(TRIM(ri.MNAME)) - LENGTH(TRIM(le.MNAME)) , le.MNAME_prop ); // Store the amount propogated
@@ -76,7 +77,7 @@ layout_withpropvars take_MNAME(with_props le,MNAME_props ri) := TRANSFORM
   END;
 SHARED pj2 := JOIN(pj0,MNAME_props,left.DID=right.DID AND (left.MNAME='' OR left.MNAME[1]=right.MNAME[1]),take_MNAME(left,right),LEFT OUTER,HASH,HINT(parallel_match));
  
-SALT37.mac_prop_field_init(with_props(DERIVED_GENDER NOT IN SET(s.nulls_DERIVED_GENDER,DERIVED_GENDER)),DERIVED_GENDER,DID,DERIVED_GENDER_props); // For every DID find the best FULL DERIVED_GENDER
+SALT311.mac_prop_field_init(thin_table(DERIVED_GENDER NOT IN SET(s.nulls_DERIVED_GENDER,DERIVED_GENDER)),DERIVED_GENDER,DID,DERIVED_GENDER_props); // For every DID find the best FULL DERIVED_GENDER
 layout_withpropvars take_DERIVED_GENDER(with_props le,DERIVED_GENDER_props ri) := TRANSFORM
   SELF.DERIVED_GENDER := IF ( le.DERIVED_GENDER = ri.DERIVED_GENDER[1..LENGTH(TRIM(le.DERIVED_GENDER))], ri.DERIVED_GENDER, le.DERIVED_GENDER );
   SELF.DERIVED_GENDER_prop := IF ( LENGTH(TRIM(le.DERIVED_GENDER)) < LENGTH(TRIM(ri.DERIVED_GENDER)) and le.DERIVED_GENDER=ri.DERIVED_GENDER[1..LENGTH(TRIM(le.DERIVED_GENDER))],LENGTH(TRIM(ri.DERIVED_GENDER)) - LENGTH(TRIM(le.DERIVED_GENDER)) , le.DERIVED_GENDER_prop ); // Store the amount propogated
@@ -84,7 +85,7 @@ layout_withpropvars take_DERIVED_GENDER(with_props le,DERIVED_GENDER_props ri) :
   END;
 SHARED pj4 := JOIN(pj2,DERIVED_GENDER_props,left.DID=right.DID AND (left.DERIVED_GENDER='' OR left.DERIVED_GENDER[1]=right.DERIVED_GENDER[1]),take_DERIVED_GENDER(left,right),LEFT OUTER,HASH,HINT(parallel_match));
  
-SALT37.mac_prop_field(with_props(SSN5 NOT IN SET(s.nulls_SSN5,SSN5)),SSN5,DID,SSN5_props); // For every DID find the best FULL SSN5
+SALT311.mac_prop_field(thin_table(SSN5 NOT IN SET(s.nulls_SSN5,SSN5)),SSN5,DID,SSN5_props); // For every DID find the best FULL SSN5
 layout_withpropvars take_SSN5(with_props le,SSN5_props ri) := TRANSFORM
   SELF.SSN5 := IF ( le.SSN5 IN SET(s.nulls_SSN5,SSN5) and ri.DID<>(TYPEOF(ri.DID))'', ri.SSN5, le.SSN5 );
   SELF.SSN5_prop := le.SSN5_prop + IF ( le.SSN5 IN SET(s.nulls_SSN5,SSN5) and ri.SSN5 NOT IN SET(s.nulls_SSN5,SSN5) and ri.DID<>(TYPEOF(ri.DID))'', 1, 0 ); // <>0 => propogation
@@ -93,8 +94,9 @@ layout_withpropvars take_SSN5(with_props le,SSN5_props ri) := TRANSFORM
   END;
 SHARED pj11 := JOIN(pj4,SSN5_props,left.DID=right.DID,take_SSN5(left,right),LEFT OUTER,HASH,HINT(parallel_match));
 SHARED RES_prop1 := JOIN(RES_prop0,SSN5_props,left.DID=right.DID,LEFT OUTER,LOCAL);
+SHARED VINATTR_prop1 := JOIN(VINATTR_prop0,SSN5_props,left.DID=right.DID,LEFT OUTER,LOCAL);
  
-SALT37.mac_prop_field(with_props(SSN4 NOT IN SET(s.nulls_SSN4,SSN4)),SSN4,DID,SSN4_props); // For every DID find the best FULL SSN4
+SALT311.mac_prop_field(thin_table(SSN4 NOT IN SET(s.nulls_SSN4,SSN4)),SSN4,DID,SSN4_props); // For every DID find the best FULL SSN4
 layout_withpropvars take_SSN4(with_props le,SSN4_props ri) := TRANSFORM
   SELF.SSN4 := IF ( le.SSN4 IN SET(s.nulls_SSN4,SSN4) and ri.DID<>(TYPEOF(ri.DID))'', ri.SSN4, le.SSN4 );
   SELF.SSN4_prop := le.SSN4_prop + IF ( le.SSN4 IN SET(s.nulls_SSN4,SSN4) and ri.SSN4 NOT IN SET(s.nulls_SSN4,SSN4) and ri.DID<>(TYPEOF(ri.DID))'', 1, 0 ); // <>0 => propogation
@@ -103,8 +105,9 @@ layout_withpropvars take_SSN4(with_props le,SSN4_props ri) := TRANSFORM
   END;
 SHARED pj12 := JOIN(pj11,SSN4_props,left.DID=right.DID,take_SSN4(left,right),LEFT OUTER,HASH,HINT(parallel_match));
 SHARED RES_prop2 := JOIN(RES_prop1,SSN4_props,left.DID=right.DID,LEFT OUTER,LOCAL);
+SHARED VINATTR_prop2 := JOIN(VINATTR_prop1,SSN4_props,left.DID=right.DID,LEFT OUTER,LOCAL);
  
-SALT37.mac_prop_field(with_props(DOB_year NOT IN SET(s.nulls_DOB_year,DOB_year)),DOB_year,DID,DOB_year_props); // For every DID find the best FULL DOB_year
+SALT311.mac_prop_field(thin_table(DOB_year NOT IN SET(s.nulls_DOB_year,DOB_year)),DOB_year,DID,DOB_year_props); // For every DID find the best FULL DOB_year
 layout_withpropvars take_DOB_year(with_props le,DOB_year_props ri) := TRANSFORM
   SELF.DOB_year := IF ( le.DOB_year IN SET(s.nulls_DOB_year,DOB_year) and ri.DID<>(TYPEOF(ri.DID))'', ri.DOB_year, le.DOB_year );
   SELF.DOB_prop := le.DOB_prop + IF ( le.DOB_year IN SET(s.nulls_DOB_year,DOB_year) and ri.DOB_year NOT IN SET(s.nulls_DOB_year,DOB_year) and ri.DID<>(TYPEOF(ri.DID))'', 4, 0 ); // <>0 => propogation
@@ -112,7 +115,7 @@ layout_withpropvars take_DOB_year(with_props le,DOB_year_props ri) := TRANSFORM
   END;
 SHARED pj14000 := JOIN(pj12,DOB_year_props,left.DID=right.DID,take_DOB_year(left,right),LEFT OUTER,HASH,HINT(parallel_match));
  
-SALT37.mac_prop_field(with_props(DOB_month NOT IN SET(s.nulls_DOB_month,DOB_month)),DOB_month,DID,DOB_month_props); // For every DID find the best FULL DOB_month
+SALT311.mac_prop_field(thin_table(DOB_month NOT IN SET(s.nulls_DOB_month,DOB_month)),DOB_month,DID,DOB_month_props); // For every DID find the best FULL DOB_month
 layout_withpropvars take_DOB_month(with_props le,DOB_month_props ri) := TRANSFORM
   SELF.DOB_month := IF ( le.DOB_month IN SET(s.nulls_DOB_month,DOB_month) and ri.DID<>(TYPEOF(ri.DID))'', ri.DOB_month, le.DOB_month );
   SELF.DOB_prop := le.DOB_prop + IF ( le.DOB_month IN SET(s.nulls_DOB_month,DOB_month) and ri.DOB_month NOT IN SET(s.nulls_DOB_month,DOB_month) and ri.DID<>(TYPEOF(ri.DID))'', 2, 0 ); // <>0 => propogation
@@ -120,7 +123,7 @@ layout_withpropvars take_DOB_month(with_props le,DOB_month_props ri) := TRANSFOR
   END;
 SHARED pj14001 := JOIN(pj14000,DOB_month_props,left.DID=right.DID,take_DOB_month(left,right),LEFT OUTER,HASH,HINT(parallel_match));
  
-SALT37.mac_prop_field(with_props(DOB_day NOT IN SET(s.nulls_DOB_day,DOB_day)),DOB_day,DID,DOB_day_props); // For every DID find the best FULL DOB_day
+SALT311.mac_prop_field(thin_table(DOB_day NOT IN SET(s.nulls_DOB_day,DOB_day)),DOB_day,DID,DOB_day_props); // For every DID find the best FULL DOB_day
 layout_withpropvars take_DOB_day(with_props le,DOB_day_props ri) := TRANSFORM
   SELF.DOB_day := IF ( le.DOB_day IN SET(s.nulls_DOB_day,DOB_day) and ri.DID<>(TYPEOF(ri.DID))'', ri.DOB_day, le.DOB_day );
   SELF.DOB_prop := le.DOB_prop + IF ( le.DOB_day IN SET(s.nulls_DOB_day,DOB_day) and ri.DOB_day NOT IN SET(s.nulls_DOB_day,DOB_day) and ri.DID<>(TYPEOF(ri.DID))'', 1, 0 ); // <>0 => propogation
@@ -130,8 +133,11 @@ SHARED pj14002 := JOIN(pj14001,DOB_day_props,left.DID=right.DID,take_DOB_day(lef
 SHARED RES_prop3 := JOIN(RES_prop2,DOB_year_props,left.DID=right.DID,LEFT OUTER,LOCAL);
 SHARED RES_prop4 := JOIN(RES_prop3,DOB_month_props,left.DID=right.DID,LEFT OUTER,LOCAL);
 SHARED RES_prop5 := JOIN(RES_prop4,DOB_day_props,left.DID=right.DID,LEFT OUTER,LOCAL);
+SHARED VINATTR_prop3 := JOIN(VINATTR_prop2,DOB_year_props,left.DID=right.DID,LEFT OUTER,LOCAL);
+SHARED VINATTR_prop4 := JOIN(VINATTR_prop3,DOB_month_props,left.DID=right.DID,LEFT OUTER,LOCAL);
+SHARED VINATTR_prop5 := JOIN(VINATTR_prop4,DOB_day_props,left.DID=right.DID,LEFT OUTER,LOCAL);
  
-SALT37.mac_prop_field(with_props(PHONE NOT IN SET(s.nulls_PHONE,PHONE)),PHONE,DID,PHONE_props); // For every DID find the best FULL PHONE
+SALT311.mac_prop_field(thin_table(PHONE NOT IN SET(s.nulls_PHONE,PHONE)),PHONE,DID,PHONE_props); // For every DID find the best FULL PHONE
 layout_withpropvars take_PHONE(with_props le,PHONE_props ri) := TRANSFORM
   SELF.PHONE := IF ( le.PHONE IN SET(s.nulls_PHONE,PHONE) and ri.DID<>(TYPEOF(ri.DID))'', ri.PHONE, le.PHONE );
   SELF.PHONE_prop := le.PHONE_prop + IF ( le.PHONE IN SET(s.nulls_PHONE,PHONE) and ri.PHONE NOT IN SET(s.nulls_PHONE,PHONE) and ri.DID<>(TYPEOF(ri.DID))'', 1, 0 ); // <>0 => propogation
@@ -139,7 +145,7 @@ layout_withpropvars take_PHONE(with_props le,PHONE_props ri) := TRANSFORM
   END;
 SHARED pj14 := JOIN(pj14002,PHONE_props,left.DID=right.DID,take_PHONE(left,right),LEFT OUTER,HASH,HINT(parallel_match));
  
-SALT37.mac_prop_field(with_props(DL_NBR NOT IN SET(s.nulls_DL_NBR,DL_NBR)),DL_NBR,DID,DL_NBR_props); // For every DID find the best FULL DL_NBR
+SALT311.mac_prop_field(thin_table(DL_NBR NOT IN SET(s.nulls_DL_NBR,DL_NBR)),DL_NBR,DID,DL_NBR_props); // For every DID find the best FULL DL_NBR
 layout_withpropvars take_DL_NBR(with_props le,DL_NBR_props ri) := TRANSFORM
   SELF.DL_NBR := IF ( le.DL_NBR IN SET(s.nulls_DL_NBR,DL_NBR) and ri.DID<>(TYPEOF(ri.DID))'', ri.DL_NBR, le.DL_NBR );
   SELF.DL_NBR_prop := le.DL_NBR_prop + IF ( le.DL_NBR IN SET(s.nulls_DL_NBR,DL_NBR) and ri.DL_NBR NOT IN SET(s.nulls_DL_NBR,DL_NBR) and ri.DID<>(TYPEOF(ri.DID))'', 1, 0 ); // <>0 => propogation
@@ -148,7 +154,7 @@ layout_withpropvars take_DL_NBR(with_props le,DL_NBR_props ri) := TRANSFORM
   END;
 SHARED pj16 := JOIN(pj14,DL_NBR_props,left.DID=right.DID,take_DL_NBR(left,right),LEFT OUTER,HASH,HINT(parallel_match));
  
-SALT37.mac_prop_field(with_props(SRC NOT IN SET(s.nulls_SRC,SRC)),SRC,DID,SRC_props); // For every DID find the best FULL SRC
+SALT311.mac_prop_field(thin_table(SRC NOT IN SET(s.nulls_SRC,SRC)),SRC,DID,SRC_props); // For every DID find the best FULL SRC
 layout_withpropvars take_SRC(with_props le,SRC_props ri) := TRANSFORM
   SELF.SRC := IF ( le.SRC IN SET(s.nulls_SRC,SRC) and ri.DID<>(TYPEOF(ri.DID))'', ri.SRC, le.SRC );
   SELF.SRC_prop := le.SRC_prop + IF ( le.SRC IN SET(s.nulls_SRC,SRC) and ri.SRC NOT IN SET(s.nulls_SRC,SRC) and ri.DID<>(TYPEOF(ri.DID))'', 1, 0 ); // <>0 => propogation
@@ -156,15 +162,16 @@ layout_withpropvars take_SRC(with_props le,SRC_props ri) := TRANSFORM
   END;
 SHARED pj17 := JOIN(pj16,SRC_props,left.DID=right.DID,take_SRC(left,right),LEFT OUTER,HASH,HINT(parallel_match));
 SHARED RES_prp := RES_prop5;
+SHARED VINATTR_prp := VINATTR_prop5;
  
 pj17 do_computes(pj17 le) := TRANSFORM
-  SELF.MAINNAME := IF (Fields.InValid_MAINNAME((SALT37.StrType)le.FNAME,(SALT37.StrType)le.MNAME,(SALT37.StrType)le.LNAME)>0,0,HASH32((SALT37.StrType)le.FNAME,(SALT37.StrType)le.MNAME,(SALT37.StrType)le.LNAME)); // Combine child fields into 1 for specificity counting
+  SELF.MAINNAME := IF (Fields.InValid_MAINNAME((SALT311.StrType)le.FNAME,(SALT311.StrType)le.MNAME,(SALT311.StrType)le.LNAME)>0,0,HASH32((SALT311.StrType)le.FNAME,(SALT311.StrType)le.MNAME,(SALT311.StrType)le.LNAME)); // Combine child fields into 1 for specificity counting
   SELF.MAINNAME_prop := IF( le.MNAME_prop > 0, 2, 0 );
-  SELF.FULLNAME := IF (Fields.InValid_FULLNAME((SALT37.StrType)SELF.MAINNAME,(SALT37.StrType)le.SNAME)>0,0,HASH32((SALT37.StrType)SELF.MAINNAME,(SALT37.StrType)le.SNAME)); // Combine child fields into 1 for specificity counting
+  SELF.FULLNAME := IF (Fields.InValid_FULLNAME((SALT311.StrType)le.FNAME,(SALT311.StrType)le.MNAME,(SALT311.StrType)le.LNAME,(SALT311.StrType)le.SNAME)>0,0,HASH32((SALT311.StrType)le.FNAME,(SALT311.StrType)le.MNAME,(SALT311.StrType)le.LNAME,(SALT311.StrType)le.SNAME)); // Combine child fields into 1 for specificity counting
   SELF.FULLNAME_prop := IF( SELF.MAINNAME_prop > 0, 1, 0 ) + IF( le.SNAME_prop > 0, 2, 0 );
-  SELF.ADDR1 := IF (Fields.InValid_ADDR1((SALT37.StrType)le.PRIM_RANGE,(SALT37.StrType)le.SEC_RANGE,(SALT37.StrType)le.PRIM_NAME)>0,0,HASH32((SALT37.StrType)le.PRIM_RANGE,(SALT37.StrType)le.SEC_RANGE,(SALT37.StrType)le.PRIM_NAME)); // Combine child fields into 1 for specificity counting
-  SELF.LOCALE := IF (Fields.InValid_LOCALE((SALT37.StrType)le.CITY,(SALT37.StrType)le.ST,(SALT37.StrType)le.ZIP)>0,0,HASH32((SALT37.StrType)le.CITY,(SALT37.StrType)le.ST,(SALT37.StrType)le.ZIP)); // Combine child fields into 1 for specificity counting
-  SELF.ADDRESS := IF (Fields.InValid_ADDRESS((SALT37.StrType)SELF.ADDR1,(SALT37.StrType)SELF.LOCALE)>0,0,HASH32((SALT37.StrType)SELF.ADDR1,(SALT37.StrType)SELF.LOCALE)); // Combine child fields into 1 for specificity counting
+  SELF.ADDR1 := IF (Fields.InValid_ADDR1((SALT311.StrType)le.PRIM_RANGE,(SALT311.StrType)le.SEC_RANGE,(SALT311.StrType)le.PRIM_NAME)>0,0,HASH32((SALT311.StrType)le.PRIM_RANGE,(SALT311.StrType)le.SEC_RANGE,(SALT311.StrType)le.PRIM_NAME)); // Combine child fields into 1 for specificity counting
+  SELF.LOCALE := IF (Fields.InValid_LOCALE((SALT311.StrType)le.CITY,(SALT311.StrType)le.ST,(SALT311.StrType)le.ZIP)>0,0,HASH32((SALT311.StrType)le.CITY,(SALT311.StrType)le.ST,(SALT311.StrType)le.ZIP)); // Combine child fields into 1 for specificity counting
+  SELF.ADDRESS := IF (Fields.InValid_ADDRESS((SALT311.StrType)le.PRIM_RANGE,(SALT311.StrType)le.SEC_RANGE,(SALT311.StrType)le.PRIM_NAME,(SALT311.StrType)le.CITY,(SALT311.StrType)le.ST,(SALT311.StrType)le.ZIP)>0,0,HASH32((SALT311.StrType)le.PRIM_RANGE,(SALT311.StrType)le.SEC_RANGE,(SALT311.StrType)le.PRIM_NAME,(SALT311.StrType)le.CITY,(SALT311.StrType)le.ST,(SALT311.StrType)le.ZIP)); // Combine child fields into 1 for specificity counting
   SELF := le;
 END;
 SHARED propogated := PROJECT(pj17,do_computes(left)); // to allow to 'jump' over an exported value
@@ -197,29 +204,35 @@ PostPropCounts := RECORD
   REAL8 ADDRESS_pop := AVE(GROUP,IF((((propogated.PRIM_RANGE  IN SET(s.nulls_PRIM_RANGE,PRIM_RANGE) OR propogated.PRIM_RANGE = (TYPEOF(propogated.PRIM_RANGE))'') AND (propogated.SEC_RANGE  IN SET(s.nulls_SEC_RANGE,SEC_RANGE) OR propogated.SEC_RANGE = (TYPEOF(propogated.SEC_RANGE))'') AND (propogated.PRIM_NAME  IN SET(s.nulls_PRIM_NAME,PRIM_NAME) OR propogated.PRIM_NAME = (TYPEOF(propogated.PRIM_NAME))'')) AND ((propogated.CITY  IN SET(s.nulls_CITY,CITY) OR propogated.CITY = (TYPEOF(propogated.CITY))'') AND (propogated.ST  IN SET(s.nulls_ST,ST) OR propogated.ST = (TYPEOF(propogated.ST))'') AND (propogated.ZIP  IN SET(s.nulls_ZIP,ZIP) OR propogated.ZIP = (TYPEOF(propogated.ZIP))''))),0,100));
 END;
  PoPS := TABLE(propogated,PostPropCounts);
-EXPORT PostPropogationStats := SALT37.MAC_Pivot(PoPS, poprec);
-  Grpd := GROUP( SORT(
-    DISTRIBUTE( TABLE( propogated, { propogated, UNSIGNED2 Buddies := 0 }),HASH(DID)),
-    DID,SNAME,FNAME,MNAME,LNAME,DERIVED_GENDER,PRIM_RANGE,PRIM_NAME,SEC_RANGE,CITY,ST,ZIP,SSN5,SSN4,DOB_year,DOB_month,DOB_day,PHONE,DL_STATE,DL_NBR,SRC,SOURCE_RID,DT_FIRST_SEEN,DT_LAST_SEEN,DT_EFFECTIVE_FIRST,DT_EFFECTIVE_LAST, LOCAL),
-    DID,SNAME,FNAME,MNAME,LNAME,DERIVED_GENDER,PRIM_RANGE,PRIM_NAME,SEC_RANGE,CITY,ST,ZIP,SSN5,SSN4,DOB_year,DOB_month,DOB_day,PHONE,DL_STATE,DL_NBR,SRC,SOURCE_RID,DT_FIRST_SEEN,DT_LAST_SEEN,DT_EFFECTIVE_FIRST,DT_EFFECTIVE_LAST, LOCAL);
-  Grpd Tr(Grpd le, Grpd ri) := TRANSFORM
-    SELF.Buddies := le.Buddies+1;
-    SELF := le;
-  END;
-SHARED h0 := UNGROUP(ROLLUP(Grpd,TRUE,Tr(LEFT,RIGHT)));// Only one copy of each record
+EXPORT PostPropogationStats := SALT311.MAC_Pivot(PoPS, poprec);
+  SHARED MAC_RollupCandidates(inCandidates, sortFields, groupFields, addBuddies) := FUNCTIONMACRO
+    Grpd0 := GROUP(SORT(
+      DISTRIBUTE(TABLE(inCandidates, {inCandidates #IF(addBuddies) , UNSIGNED2 Buddies := 0 #END}), HASH(DID)),
+      DID, #EXPAND(sortFields), LOCAL),
+      DID, #EXPAND(groupFields), LOCAL);
+    Grpd0 Tr0(Grpd0 le, Grpd0 ri) := TRANSFORM
+      SELF.Buddies := le.Buddies + ri.Buddies + 1;
+      SELF := le;
+    END;
+    RETURN UNGROUP(ROLLUP(Grpd0,TRUE,Tr0(LEFT,RIGHT)));// Only one copy of each record
+  ENDMACRO;
+  SHARED fieldList := 'SNAME,FNAME,MNAME,LNAME,DERIVED_GENDER,PRIM_RANGE,PRIM_NAME,SEC_RANGE,CITY,ST,ZIP,SSN5,SSN4,DOB_year,DOB_month,DOB_day,PHONE,DL_STATE,DL_NBR,SRC,SOURCE_RID,DT_FIRST_SEEN,DT_LAST_SEEN,DT_EFFECTIVE_FIRST,DT_EFFECTIVE_LAST';
+  SHARED fieldListWithPropFlags := fieldList + ',SNAME_prop,FNAME_prop,MNAME_prop,LNAME_prop,DERIVED_GENDER_prop,SSN5_prop,SSN4_prop,DOB_prop,PHONE_prop,DL_NBR_prop,SRC_prop,MAINNAME_prop,FULLNAME_prop';
+  GrpdRoll := MAC_RollupCandidates(propogated, fieldListWithPropFlags, fieldList, TRUE);
+SHARED h0 := GrpdRoll;// Only one copy of each record
  
 EXPORT Layout_Matches := RECORD//in this module for because of ,foward bug
   UNSIGNED2 Rule;
   INTEGER2 Conf := 0;
   INTEGER2 DateOverlap := 0; // Number of months of overlap, -ve to show distance of non-overlap
   INTEGER2 Conf_Prop := 0; // Confidence provided by propogated fields
-  SALT37.UIDType DID1;
-  SALT37.UIDType DID2;
-  SALT37.UIDType RID1 := 0;
-  SALT37.UIDType RID2 := 0;
+  SALT311.UIDType DID1;
+  SALT311.UIDType DID2;
+  SALT311.UIDType RID1 := 0;
+  SALT311.UIDType RID2 := 0;
 END;
 EXPORT Layout_Attribute_Matches := RECORD(layout_matches),MAXLENGTH(32000)
-  SALT37.StrType source_id;
+  SALT311.StrType source_id;
 END;
 EXPORT Layout_RES_Candidates := RECORD
   {RES_prp};
@@ -241,6 +254,26 @@ EXPORT Layout_RES_Candidates := RECORD
   UNSIGNED2 DOB_day_weight100 := 0; // Contains 100x the specificity
 END;
 SHARED RES_pp := TABLE(RES_prp,Layout_RES_Candidates);
+EXPORT Layout_VINATTR_Candidates := RECORD
+  {VINATTR_prp};
+  INTEGER2 SSN5_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN SSN5_isnull := (VINATTR_prp.SSN5  IN SET(s.nulls_SSN5,SSN5) OR VINATTR_prp.SSN5 = (TYPEOF(VINATTR_prp.SSN5))''); // Simplify later processing 
+  UNSIGNED SSN5_cnt := 0; // Number of instances with this particular field value
+  UNSIGNED SSN5_e1_cnt := 0; // Number of names instances matching this one by edit distance
+  UNSIGNED1 SSN5_len := LENGTH(TRIM(VINATTR_prp.SSN5));
+  INTEGER2 SSN4_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN SSN4_isnull := (VINATTR_prp.SSN4  IN SET(s.nulls_SSN4,SSN4) OR VINATTR_prp.SSN4 = (TYPEOF(VINATTR_prp.SSN4))''); // Simplify later processing 
+  UNSIGNED SSN4_cnt := 0; // Number of instances with this particular field value
+  UNSIGNED SSN4_e1_cnt := 0; // Number of names instances matching this one by edit distance
+  UNSIGNED1 SSN4_len := LENGTH(TRIM(VINATTR_prp.SSN4));
+  BOOLEAN DOB_year_isnull := VINATTR_prp.DOB_year IN SET(s.nulls_DOB_year,DOB_year); // Simplifies later processing
+  BOOLEAN DOB_month_isnull := VINATTR_prp.DOB_month IN SET(s.nulls_DOB_month,DOB_month); // Do for each of three parts of date
+  BOOLEAN DOB_day_isnull := VINATTR_prp.DOB_day IN SET(s.nulls_DOB_day,DOB_day);
+  UNSIGNED2 DOB_year_weight100 := 0; // Contains 100x the specificity
+  UNSIGNED2 DOB_month_weight100 := 0; // Contains 100x the specificity
+  UNSIGNED2 DOB_day_weight100 := 0; // Contains 100x the specificity
+END;
+SHARED VINATTR_pp := TABLE(VINATTR_prp,Layout_VINATTR_Candidates);
 EXPORT Layout_Candidates := RECORD // A record to hold weights of each field value
   {h0};
   INTEGER2 SNAME_weight100 := 0; // Contains 100x the specificity
@@ -332,6 +365,8 @@ EXPORT Layout_Candidates := RECORD // A record to hold weights of each field val
 END;
 h1 := TABLE(h0,layout_candidates);
 //Now add the weights of each field one by one
+//   Note - If JOINs below are taking too long to build match candidates consider
+//          adding HACK:USE_MATCH_CANDIDATES_OPTIMIZATION to the spc and regenerate the code!
  
 //Would also create auto-id fields here
  
@@ -360,24 +395,24 @@ layout_candidates add_SEC_RANGE(layout_candidates le,Specificities(ih).SEC_RANGE
   SELF.SEC_RANGE_weight100 := MAP (le.SEC_RANGE_isnull => 0, patch_default and ri.field_specificity=0 => s.SEC_RANGE_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(j20,s.nulls_SEC_RANGE,Specificities(ih).SEC_RANGE_values_persisted,SEC_RANGE,SEC_RANGE_weight100,add_SEC_RANGE,j19);
+SALT311.MAC_Choose_JoinType(j20,s.nulls_SEC_RANGE,Specificities(ih).SEC_RANGE_values_persisted,SEC_RANGE,SEC_RANGE_weight100,add_SEC_RANGE,j19);
 layout_candidates add_MNAME(layout_candidates le,Specificities(ih).MNAME_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.MNAME_cnt := ri.cnt;
   SELF.MNAME_e2_cnt := ri.e2_cnt;
   INTEGER2 MNAME_weight100 := MAP (le.MNAME_isnull => 0, patch_default and ri.field_specificity=0 => s.MNAME_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF.MNAME_weight100 := MNAME_weight100;
   SELF.MNAME_MAINNAME_cnt := ri.MAINNAME_cnt;
-  SELF.MNAME_MAINNAME_weight100 := IF(MNAME_weight100>0, SALT37.Min1(MNAME_weight100 + 100*log(ri.cnt/ri.MAINNAME_cnt)/log(2)), 0); // Precompute CONCEPT-WORDBAG specificity 
-  SELF.MNAME_MAINNAME_fuzzy_weight100 := SALT37.Min1(MNAME_weight100 + 100*log(ri.MAINNAME_cnt/ri.MAINNAME_fuzzy_cnt)/log(2)); // Precompute CONCEPT-WORDBAG specificity 
+  SELF.MNAME_MAINNAME_weight100 := IF(MNAME_weight100>0, SALT311.Min1(MNAME_weight100 + 100*log(ri.cnt/ri.MAINNAME_cnt)/log(2)), 0); // Precompute CONCEPT-WORDBAG specificity 
+  SELF.MNAME_MAINNAME_fuzzy_weight100 :=  IF(MNAME_weight100>0, SALT311.Min1(MNAME_weight100 + 100*log(ri.MAINNAME_cnt/ri.MAINNAME_fuzzy_cnt) /*HACK36*//log(2)),0); // Precompute CONCEPT-WORDBAG specificity 
   SELF.MNAME_initial_char_weight100 := MAP (le.MNAME_isnull => 0, ri.InitialChar_specificity) * 100;
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(j19,s.nulls_MNAME,Specificities(ih).MNAME_values_persisted,MNAME,MNAME_weight100,add_MNAME,j18);
+SALT311.MAC_Choose_JoinType(j19,s.nulls_MNAME,Specificities(ih).MNAME_values_persisted,MNAME,MNAME_weight100,add_MNAME,j18);
 layout_candidates add_DL_STATE(layout_candidates le,Specificities(ih).DL_STATE_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.DL_STATE_weight100 := MAP (le.DL_STATE_isnull => 0, patch_default and ri.field_specificity=0 => s.DL_STATE_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(j18,s.nulls_DL_STATE,Specificities(ih).DL_STATE_values_persisted,DL_STATE,DL_STATE_weight100,add_DL_STATE,j17);
+SALT311.MAC_Choose_JoinType(j18,s.nulls_DL_STATE,Specificities(ih).DL_STATE_values_persisted,DL_STATE,DL_STATE_weight100,add_DL_STATE,j17);
 layout_candidates add_FNAME(layout_candidates le,Specificities(ih).FNAME_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.FNAME_cnt := ri.cnt;
   SELF.FNAME_p_cnt := ri.p_cnt;
@@ -388,31 +423,31 @@ layout_candidates add_FNAME(layout_candidates le,Specificities(ih).FNAME_values_
   INTEGER2 FNAME_weight100 := MAP (le.FNAME_isnull => 0, patch_default and ri.field_specificity=0 => s.FNAME_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF.FNAME_weight100 := FNAME_weight100;
   SELF.FNAME_MAINNAME_cnt := ri.MAINNAME_cnt;
-  SELF.FNAME_MAINNAME_weight100 := IF(FNAME_weight100>0, SALT37.Min1(FNAME_weight100 + 100*log(ri.cnt/ri.MAINNAME_cnt)/log(2)), 0); // Precompute CONCEPT-WORDBAG specificity 
-  SELF.FNAME_MAINNAME_fuzzy_weight100 := SALT37.Min1(FNAME_weight100 + 100*log(ri.MAINNAME_cnt/ri.MAINNAME_fuzzy_cnt)/log(2)); // Precompute CONCEPT-WORDBAG specificity 
+  SELF.FNAME_MAINNAME_weight100 := IF(FNAME_weight100>0, SALT311.Min1(FNAME_weight100 + 100*log(ri.cnt/ri.MAINNAME_cnt)/log(2)), 0); // Precompute CONCEPT-WORDBAG specificity 
+  SELF.FNAME_MAINNAME_fuzzy_weight100 :=  IF(FNAME_weight100>0, SALT311.Min1(FNAME_weight100 + 100*log(ri.MAINNAME_cnt/ri.MAINNAME_fuzzy_cnt) /*HACK36*//log(2)),0); // Precompute CONCEPT-WORDBAG specificity 
   SELF.FNAME_initial_char_weight100 := MAP (le.FNAME_isnull => 0, ri.InitialChar_specificity) * 100;
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(j17,s.nulls_FNAME,Specificities(ih).FNAME_values_persisted,FNAME,FNAME_weight100,add_FNAME,j16);
+SALT311.MAC_Choose_JoinType(j17,s.nulls_FNAME,Specificities(ih).FNAME_values_persisted,FNAME,FNAME_weight100,add_FNAME,j16);
 layout_candidates add_CITY(layout_candidates le,Specificities(ih).CITY_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.CITY_weight100 := MAP (le.CITY_isnull => 0, patch_default and ri.field_specificity=0 => s.CITY_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(j16,s.nulls_CITY,Specificities(ih).CITY_values_persisted,CITY,CITY_weight100,add_CITY,j15);
+SALT311.MAC_Choose_JoinType(j16,s.nulls_CITY,Specificities(ih).CITY_values_persisted,CITY,CITY_weight100,add_CITY,j15);
 layout_candidates add_PRIM_NAME(layout_candidates le,Specificities(ih).PRIM_NAME_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.PRIM_NAME_cnt := ri.cnt;
   SELF.PRIM_NAME_e1_cnt := ri.e1_cnt;
   SELF.PRIM_NAME_weight100 := MAP (le.PRIM_NAME_isnull => 0, patch_default and ri.field_specificity=0 => s.PRIM_NAME_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(j15,s.nulls_PRIM_NAME,Specificities(ih).PRIM_NAME_values_persisted,PRIM_NAME,PRIM_NAME_weight100,add_PRIM_NAME,j14);
+SALT311.MAC_Choose_JoinType(j15,s.nulls_PRIM_NAME,Specificities(ih).PRIM_NAME_values_persisted,PRIM_NAME,PRIM_NAME_weight100,add_PRIM_NAME,j14);
 layout_candidates add_PRIM_RANGE(layout_candidates le,Specificities(ih).PRIM_RANGE_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.PRIM_RANGE_cnt := ri.cnt;
   SELF.PRIM_RANGE_e1_cnt := ri.e1_cnt;
   SELF.PRIM_RANGE_weight100 := MAP (le.PRIM_RANGE_isnull => 0, patch_default and ri.field_specificity=0 => s.PRIM_RANGE_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(j14,s.nulls_PRIM_RANGE,Specificities(ih).PRIM_RANGE_values_persisted,PRIM_RANGE,PRIM_RANGE_weight100,add_PRIM_RANGE,j13);
+SALT311.MAC_Choose_JoinType(j14,s.nulls_PRIM_RANGE,Specificities(ih).PRIM_RANGE_values_persisted,PRIM_RANGE,PRIM_RANGE_weight100,add_PRIM_RANGE,j13);
 layout_candidates add_LNAME(layout_candidates le,Specificities(ih).LNAME_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.LNAME_cnt := ri.cnt;
   SELF.LNAME_p_cnt := ri.p_cnt;
@@ -421,28 +456,28 @@ layout_candidates add_LNAME(layout_candidates le,Specificities(ih).LNAME_values_
   INTEGER2 LNAME_weight100 := MAP (le.LNAME_isnull => 0, patch_default and ri.field_specificity=0 => s.LNAME_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF.LNAME_weight100 := LNAME_weight100;
   SELF.LNAME_MAINNAME_cnt := ri.MAINNAME_cnt;
-  SELF.LNAME_MAINNAME_weight100 := IF(LNAME_weight100>0, SALT37.Min1(LNAME_weight100 + 100*log(ri.cnt/ri.MAINNAME_cnt)/log(2)), 0); // Precompute CONCEPT-WORDBAG specificity 
-  SELF.LNAME_MAINNAME_fuzzy_weight100 := SALT37.Min1(LNAME_weight100 + 100*log(ri.MAINNAME_cnt/ri.MAINNAME_fuzzy_cnt)/log(2)); // Precompute CONCEPT-WORDBAG specificity 
+  SELF.LNAME_MAINNAME_weight100 := IF(LNAME_weight100>0, SALT311.Min1(LNAME_weight100 + 100*log(ri.cnt/ri.MAINNAME_cnt)/log(2)), 0); // Precompute CONCEPT-WORDBAG specificity 
+  SELF.LNAME_MAINNAME_fuzzy_weight100 :=  IF(LNAME_weight100>0, SALT311.Min1(LNAME_weight100 + 100*log(ri.MAINNAME_cnt/ri.MAINNAME_fuzzy_cnt) /*HACK36*//log(2)),0); // Precompute CONCEPT-WORDBAG specificity 
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(j13,s.nulls_LNAME,Specificities(ih).LNAME_values_persisted,LNAME,LNAME_weight100,add_LNAME,j12);
+SALT311.MAC_Choose_JoinType(j13,s.nulls_LNAME,Specificities(ih).LNAME_values_persisted,LNAME,LNAME_weight100,add_LNAME,j12);
 layout_candidates add_SSN4(layout_candidates le,Specificities(ih).SSN4_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.SSN4_cnt := ri.cnt;
   SELF.SSN4_e1_cnt := ri.e1_cnt;
   SELF.SSN4_weight100 := MAP (le.SSN4_isnull => 0, patch_default and ri.field_specificity=0 => s.SSN4_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(j12,s.nulls_SSN4,Specificities(ih).SSN4_values_persisted,SSN4,SSN4_weight100,add_SSN4,j11);
+SALT311.MAC_Choose_JoinType(j12,s.nulls_SSN4,Specificities(ih).SSN4_values_persisted,SSN4,SSN4_weight100,add_SSN4,j11);
 layout_candidates add_LOCALE(layout_candidates le,Specificities(ih).LOCALE_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.LOCALE_weight100 := MAP (le.LOCALE_isnull => 0, patch_default and ri.field_specificity=0 => s.LOCALE_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(j11,s.nulls_LOCALE,Specificities(ih).LOCALE_values_persisted,LOCALE,LOCALE_weight100,add_LOCALE,j10);
+SALT311.MAC_Choose_JoinType(j11,s.nulls_LOCALE,Specificities(ih).LOCALE_values_persisted,LOCALE,LOCALE_weight100,add_LOCALE,j10);
 layout_candidates add_ZIP(layout_candidates le,Specificities(ih).ZIP_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.ZIP_weight100 := MAP (le.ZIP_isnull => 0, patch_default and ri.field_specificity=0 => s.ZIP_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(j10,s.nulls_ZIP,Specificities(ih).ZIP_values_persisted,ZIP,ZIP_weight100,add_ZIP,j9);
+SALT311.MAC_Choose_JoinType(j10,s.nulls_ZIP,Specificities(ih).ZIP_values_persisted,ZIP,ZIP_weight100,add_ZIP,j9);
 layout_candidates add_DOB_year(layout_candidates le,Specificities(ih).DOB_year_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.DOB_year_weight100 := MAP (le.DOB_year_isnull => 0, patch_default and ri.field_specificity=0 => s.DOB_year_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
@@ -464,54 +499,57 @@ layout_candidates add_SSN5(layout_candidates le,Specificities(ih).SSN5_values_pe
   SELF.SSN5_weight100 := MAP (le.SSN5_isnull => 0, patch_default and ri.field_specificity=0 => s.SSN5_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(j9002,s.nulls_SSN5,Specificities(ih).SSN5_values_persisted,SSN5,SSN5_weight100,add_SSN5,j7);
+SALT311.MAC_Choose_JoinType(j9002,s.nulls_SSN5,Specificities(ih).SSN5_values_persisted,SSN5,SSN5_weight100,add_SSN5,j7);
 layout_candidates add_ADDR1(layout_candidates le,Specificities(ih).ADDR1_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.ADDR1_weight100 := MAP (le.ADDR1_isnull => 0, patch_default and ri.field_specificity=0 => s.ADDR1_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(j7,s.nulls_ADDR1,Specificities(ih).ADDR1_values_persisted,ADDR1,ADDR1_weight100,add_ADDR1,j6);
+SALT311.MAC_Choose_JoinType(j7,s.nulls_ADDR1,Specificities(ih).ADDR1_values_persisted,ADDR1,ADDR1_weight100,add_ADDR1,j6);
 layout_candidates add_PHONE(layout_candidates le,Specificities(ih).PHONE_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.PHONE_weight100 := MAP (le.PHONE_isnull => 0, patch_default and ri.field_specificity=0 => s.PHONE_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(j6,s.nulls_PHONE,Specificities(ih).PHONE_values_persisted,PHONE,PHONE_weight100,add_PHONE,j5);
+SALT311.MAC_Choose_JoinType(j6,s.nulls_PHONE,Specificities(ih).PHONE_values_persisted,PHONE,PHONE_weight100,add_PHONE,j5);
 layout_candidates add_FULLNAME(layout_candidates le,Specificities(ih).FULLNAME_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.FULLNAME_weight100 := MAP (le.FULLNAME_isnull => 0, patch_default and ri.field_specificity=0 => s.FULLNAME_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(j5,s.nulls_FULLNAME,Specificities(ih).FULLNAME_values_persisted,FULLNAME,FULLNAME_weight100,add_FULLNAME,j4);
+SALT311.MAC_Choose_JoinType(j5,s.nulls_FULLNAME,Specificities(ih).FULLNAME_values_persisted,FULLNAME,FULLNAME_weight100,add_FULLNAME,j4);
 layout_candidates add_MAINNAME(layout_candidates le,Specificities(ih).MAINNAME_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.MAINNAME_weight100 := MAP (le.MAINNAME_isnull => 0, patch_default and ri.field_specificity=0 => s.MAINNAME_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(j4,s.nulls_MAINNAME,Specificities(ih).MAINNAME_values_persisted,MAINNAME,MAINNAME_weight100,add_MAINNAME,j3);
+SALT311.MAC_Choose_JoinType(j4,s.nulls_MAINNAME,Specificities(ih).MAINNAME_values_persisted,MAINNAME,MAINNAME_weight100,add_MAINNAME,j3);
 layout_candidates add_SOURCE_RID(layout_candidates le,Specificities(ih).SOURCE_RID_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.SOURCE_RID_weight100 := MAP (le.SOURCE_RID_isnull => 0, patch_default and ri.field_specificity=0 => s.SOURCE_RID_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(j3,s.nulls_SOURCE_RID,Specificities(ih).SOURCE_RID_values_persisted,SOURCE_RID,SOURCE_RID_weight100,add_SOURCE_RID,j2);
+SALT311.MAC_Choose_JoinType(j3,s.nulls_SOURCE_RID,Specificities(ih).SOURCE_RID_values_persisted,SOURCE_RID,SOURCE_RID_weight100,add_SOURCE_RID,j2);
 layout_candidates add_DL_NBR(layout_candidates le,Specificities(ih).DL_NBR_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.DL_NBR_cnt := ri.cnt;
   SELF.DL_NBR_e1_cnt := ri.e1_cnt;
   SELF.DL_NBR_weight100 := MAP (le.DL_NBR_isnull => 0, patch_default and ri.field_specificity=0 => s.DL_NBR_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(j2,s.nulls_DL_NBR,Specificities(ih).DL_NBR_values_persisted,DL_NBR,DL_NBR_weight100,add_DL_NBR,j1);
+SALT311.MAC_Choose_JoinType(j2,s.nulls_DL_NBR,Specificities(ih).DL_NBR_values_persisted,DL_NBR,DL_NBR_weight100,add_DL_NBR,j1);
 layout_candidates add_ADDRESS(layout_candidates le,Specificities(ih).ADDRESS_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.ADDRESS_weight100 := MAP (le.ADDRESS_isnull => 0, patch_default and ri.field_specificity=0 => s.ADDRESS_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(j1,s.nulls_ADDRESS,Specificities(ih).ADDRESS_values_persisted,ADDRESS,ADDRESS_weight100,add_ADDRESS,j0);
-LOCALEPropLayout := {SALT37.StrType LOCALE, INTEGER2 LOCALE_weight100};
+SALT311.MAC_Choose_JoinType(j1,s.nulls_ADDRESS,Specificities(ih).ADDRESS_values_persisted,ADDRESS,ADDRESS_weight100,add_ADDRESS,j0);
+/*hack*/
+LOCALEPropLayout := {SALT311.StrType LOCALE, INTEGER2 LOCALE_weight100};
 layout_candidates patch_LOCALE_weight(layout_candidates le,LOCALEPropLayout ri) := TRANSFORM
     SELF.LOCALE_weight100 := IF(ri.LOCALE='',le.LOCALE_weight100,MIN(le.LOCALE_weight100,ri.LOCALE_weight100));
     SELF := le;
 END;
-LOCALEPropInput := PROJECT(j0,TRANSFORM(LOCALEPropLayout, SELF.LOCALE:=IF(LEFT.CITY_isnull,'',(SALT37.StrType)LEFT.CITY)+'|'+IF(LEFT.ST_isnull,'',(SALT37.StrType)LEFT.ST)+'|'+IF(LEFT.ZIP_isnull,'',(SALT37.StrType)LEFT.ZIP),SELF := LEFT));
-LOCALEMins := SALT37.MAC_Select_Min_Weights(LOCALEPropInput,LOCALE,LOCALE_weight100,3,1)+SALT37.MAC_Select_Min_Weights(LOCALEPropInput,LOCALE,LOCALE_weight100,3,2)+SALT37.MAC_Select_Min_Weights(LOCALEPropInput,LOCALE,LOCALE_weight100,3,3);
-LOCALEProp := JOIN(j0,LOCALEMins,IF(LEFT.CITY_isnull,'',(SALT37.StrType)LEFT.CITY)+'|'+IF(LEFT.ST_isnull,'',(SALT37.StrType)LEFT.ST)+'|'+IF(LEFT.ZIP_isnull,'',(SALT37.StrType)LEFT.ZIP)=RIGHT.LOCALE,patch_LOCALE_weight(LEFT,RIGHT),SMART,LEFT OUTER);
+LOCALEPropInput := PROJECT(j0,TRANSFORM(LOCALEPropLayout, SELF.LOCALE:=IF(LEFT.CITY_isnull,'',(SALT311.StrType)LEFT.CITY)+'|'+IF(LEFT.ST_isnull,'',(SALT311.StrType)LEFT.ST)+'|'+IF(LEFT.ZIP_isnull,'',(SALT311.StrType)LEFT.ZIP),SELF := LEFT));
+LOCALEMins := SALT311.MAC_Select_Min_Weights(LOCALEPropInput,LOCALE,LOCALE_weight100,3,1)+SALT311.MAC_Select_Min_Weights(LOCALEPropInput,LOCALE,LOCALE_weight100,3,2)+SALT311.MAC_Select_Min_Weights(LOCALEPropInput,LOCALE,LOCALE_weight100,3,3);
+LOCALEProp := JOIN(j0,LOCALEMins,IF(LEFT.CITY_isnull,'',(SALT311.StrType)LEFT.CITY)+'|'+IF(LEFT.ST_isnull,'',(SALT311.StrType)LEFT.ST)+'|'+IF(LEFT.ZIP_isnull,'',(SALT311.StrType)LEFT.ZIP)=RIGHT.LOCALE,patch_LOCALE_weight(LEFT,RIGHT),SMART,LEFT OUTER);
+/*hack*/
+
 //Using HASH(did) to get smoother distribution
-SHARED Annotated := DISTRIBUTE(LOCALEProp,hash(DID)); // Distributed for keybuild case
+SHARED Annotated := DISTRIBUTE(LOCALEProp, HASH(DID)); // Distributed for keybuild case
  
 //Now prepare candidate file for RES attribute file
 layout_RES_candidates add_RES_SSN5(layout_RES_candidates le,Specificities(ih).SSN5_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
@@ -520,7 +558,7 @@ layout_RES_candidates add_RES_SSN5(layout_RES_candidates le,Specificities(ih).SS
   SELF.SSN5_weight100 := MAP (le.SSN5_isnull => 0, patch_default and ri.field_specificity=0 => s.SSN5_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(RES_pp,s.nulls_SSN5,Specificities(ih).SSN5_values_persisted,SSN5,SSN5_weight100,add_RES_SSN5,jRES_7);
+SALT311.MAC_Choose_JoinType(RES_pp,s.nulls_SSN5,Specificities(ih).SSN5_values_persisted,SSN5,SSN5_weight100,add_RES_SSN5,jRES_7);
 layout_RES_candidates add_RES_DOB_year(layout_RES_candidates le,Specificities(ih).DOB_year_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.DOB_year_weight100 := MAP (le.DOB_year_isnull => 0, patch_default and ri.field_specificity=0 => s.DOB_year_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
@@ -542,8 +580,40 @@ layout_RES_candidates add_RES_SSN4(layout_RES_candidates le,Specificities(ih).SS
   SELF.SSN4_weight100 := MAP (le.SSN4_isnull => 0, patch_default and ri.field_specificity=0 => s.SSN4_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT37.MAC_Choose_JoinType(jRES_9002,s.nulls_SSN4,Specificities(ih).SSN4_values_persisted,SSN4,SSN4_weight100,add_RES_SSN4,jRES_11);
+SALT311.MAC_Choose_JoinType(jRES_9002,s.nulls_SSN4,Specificities(ih).SSN4_values_persisted,SSN4,SSN4_weight100,add_RES_SSN4,jRES_11);
 EXPORT RES_candidates := jRES_11 : PERSIST('~temp::DID::InsuranceHeader_xLink::mc::RES',EXPIRE(InsuranceHeader_xLink.Config.PersistExpire));
+ 
+//Now prepare candidate file for VINATTR attribute file
+layout_VINATTR_candidates add_VINATTR_SSN5(layout_VINATTR_candidates le,Specificities(ih).SSN5_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.SSN5_cnt := ri.cnt;
+  SELF.SSN5_e1_cnt := ri.e1_cnt;
+  SELF.SSN5_weight100 := MAP (le.SSN5_isnull => 0, patch_default and ri.field_specificity=0 => s.SSN5_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT311.MAC_Choose_JoinType(VINATTR_pp,s.nulls_SSN5,Specificities(ih).SSN5_values_persisted,SSN5,SSN5_weight100,add_VINATTR_SSN5,jVINATTR_7);
+layout_VINATTR_candidates add_VINATTR_DOB_year(layout_VINATTR_candidates le,Specificities(ih).DOB_year_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.DOB_year_weight100 := MAP (le.DOB_year_isnull => 0, patch_default and ri.field_specificity=0 => s.DOB_year_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+jVINATTR_9000 := JOIN(jVINATTR_7,PULL(Specificities(ih).DOB_year_values_persisted),LEFT.DOB_year=RIGHT.DOB_year,add_VINATTR_DOB_year(LEFT,RIGHT,TRUE),LOOKUP,LEFT OUTER);
+layout_VINATTR_candidates add_VINATTR_DOB_month(layout_VINATTR_candidates le,Specificities(ih).DOB_month_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.DOB_month_weight100 := MAP (le.DOB_month_isnull => 0, patch_default and ri.field_specificity=0 => s.DOB_month_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+jVINATTR_9001 := JOIN(jVINATTR_9000,PULL(Specificities(ih).DOB_month_values_persisted),LEFT.DOB_month=RIGHT.DOB_month,add_VINATTR_DOB_month(LEFT,RIGHT,TRUE),LOOKUP,FEW,LEFT OUTER);
+layout_VINATTR_candidates add_VINATTR_DOB_day(layout_VINATTR_candidates le,Specificities(ih).DOB_day_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.DOB_day_weight100 := MAP (le.DOB_day_isnull => 0, patch_default and ri.field_specificity=0 => s.DOB_day_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+jVINATTR_9002 := JOIN(jVINATTR_9001,PULL(Specificities(ih).DOB_day_values_persisted),LEFT.DOB_day=RIGHT.DOB_day,add_VINATTR_DOB_day(LEFT,RIGHT,TRUE),LOOKUP,FEW,LEFT OUTER);
+layout_VINATTR_candidates add_VINATTR_SSN4(layout_VINATTR_candidates le,Specificities(ih).SSN4_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.SSN4_cnt := ri.cnt;
+  SELF.SSN4_e1_cnt := ri.e1_cnt;
+  SELF.SSN4_weight100 := MAP (le.SSN4_isnull => 0, patch_default and ri.field_specificity=0 => s.SSN4_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT311.MAC_Choose_JoinType(jVINATTR_9002,s.nulls_SSN4,Specificities(ih).SSN4_values_persisted,SSN4,SSN4_weight100,add_VINATTR_SSN4,jVINATTR_11);
+EXPORT VINATTR_candidates := jVINATTR_11 : PERSIST('~temp::DID::InsuranceHeader_xLink::mc::VINATTR',EXPIRE(InsuranceHeader_xLink.Config.PersistExpire));
 //Now see if these records are actually linkable
 TotalWeight := Annotated.ADDRESS_weight100 + Annotated.DL_NBR_weight100 + Annotated.SOURCE_RID_weight100 + Annotated.FULLNAME_weight100 + Annotated.PHONE_weight100 + Annotated.SSN5_weight100 + Annotated.DOB_year_weight100 + Annotated.DOB_month_weight100 + Annotated.DOB_day_weight100 + Annotated.SSN4_weight100 + Annotated.DL_STATE_weight100 + Annotated.SRC_weight100 + Annotated.DERIVED_GENDER_weight100;
 SHARED Linkable := TotalWeight >= Config.MatchThreshold;

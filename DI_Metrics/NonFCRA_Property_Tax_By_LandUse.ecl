@@ -54,8 +54,8 @@ email_alert := SEQUENTIAL(
 					,output(sort(tbl_Key_Tax_Non_FCRA_2010_props_srcB, source_val, proc_date,state_code, standardized_land_use_code, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_Tax_Non_FCRA_2010_properties_by_StandLandUse_SrcB_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
 					,tbl_Non_FCRA_props_srcA  
 					,tbl_Non_FCRA_props_srcB):
-					Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'NonFCRA Group: NonFCRA_Property_Tax_By_LandUse Build Succeeded', workunit + ': Build complete.' + filedate)),
-					Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'NonFCRA Group: NonFCRA_Property_Tax_By_LandUse Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
+					Success(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_Property_Tax_By_LandUse Build Succeeded', workunit + ': Build complete.' + filedate)),
+					Failure(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_Property_Tax_By_LandUse Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
 					);
 return email_alert;
 
