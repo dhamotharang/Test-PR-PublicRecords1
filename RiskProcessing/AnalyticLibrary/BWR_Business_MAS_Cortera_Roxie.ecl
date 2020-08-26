@@ -57,6 +57,11 @@ Output_SALT_Profile := FALSE;
 
 Exclude_Consumer_Attributes := TRUE; //if TRUE, bypasses consumer logic and sets all consumer shell fields to blank/0.
 
+// Use default list of allowed sources
+AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+// Do not exclude any additional sources from allowed sources dataset.
+ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+
 RecordsToRun := 0;
 eyeball := 120;
 
@@ -208,11 +213,13 @@ soapLayout := RECORD
 	BOOLEAN OutputMasterResults;
 	BOOLEAN ExcludeConsumerAttributes;
 	BOOLEAN IsMarketing;
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	
 	UNSIGNED BIPAppendScoreThreshold;
 	UNSIGNED BIPAppendWeightThreshold;
 	BOOLEAN BIPAppendPrimForce;
-	BOOLEAN BIPAppendReAppend;
+	BOOLEAN bipappendnoreappend;
 	BOOLEAN BIPAppendIncludeAuthRep;
 	BOOLEAN OverrideExperianRestriction;
 
@@ -263,11 +270,13 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 	SELF.DPPAPurpose := Settings.DPPAPurpose;
 	SELF.IsMarketing := FALSE;
 	SELF.OutputMasterResults := Output_Master_Results;
+	SELF.AllowedSourcesDataset := AllowedSourcesDataset;
+	SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;
 	SELF.ExcludeConsumerAttributes := Exclude_Consumer_Attributes;
 	SELF.BIPAppendScoreThreshold := Settings.BusinessLexIDThreshold;
 	SELF.BIPAppendWeightThreshold := Settings.BusinessLexIDWeightThreshold;
 	SELF.BIPAppendPrimForce := Settings.BusinessLexIDPrimForce;
-	SELF.BIPAppendReAppend := Settings.BusinessLexIDReAppend;
+	SELF.bipappendnoreappend := NOT Settings.BusinessLexIDReAppend;
 	SELF.BIPAppendIncludeAuthRep := Settings.BusinessLexIDIncludeAuthRep;
 	SELF.OverrideExperianRestriction := Settings.Override_Experian_Restriction;
 END;
@@ -512,7 +521,7 @@ Passed_Business :=
 			SELF := []),
 		INNER, KEEP(1));
 
-Error_Inputs := JOIN(DISTRIBUTE(inDataRecs, HASH64(AccountNumber)), DISTRIBUTE(Passed_Business, HASH64(B_InpAcct)), LEFT.AccountNumber = RIGHT.B_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY);  
+Error_Inputs := JOIN(DISTRIBUTE(inDataRecs, HASH64(AccountNumber)), DISTRIBUTE(Passed_Business, HASH64(B_InpAcct)), LEFT.AccountNumber = RIGHT.B_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY, LOCAL);  
 OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE);
 
 IF(Output_Master_Results, OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout')));
