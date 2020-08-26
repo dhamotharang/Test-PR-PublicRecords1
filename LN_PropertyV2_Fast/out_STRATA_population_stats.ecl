@@ -35,8 +35,8 @@ import STRATA;
 	#uniquename(dPopulationStats_paddlnames);
 	#uniquename(rPopulationStats_pParty);
 	#uniquename(dPopulationStats_pParty);
-	#uniquename(rPopulationStats_pAddlNameInfo);
-	#uniquename(dPopulationStats_pAddlNameInfo);
+	//#uniquename(rPopulationStats_pAddlNameInfo);
+	//#uniquename(dPopulationStats_pAddlNameInfo);
 	
 	#uniquename(zAssesStats);
 	#uniquename(zAssesPlusStats);
@@ -855,14 +855,14 @@ import STRATA;
 		end;
 		
 		//ADDL NAME INFO -future use
-		%rPopulationStats_pAddlNameInfo% := record
+	/*	%rPopulationStats_pAddlNameInfo% := record
 				CountGroup                              := count(group);
 				string3  grouping                       := 'ALL';
 				ln_fares_id_CountNonBlank               := sum(group,if(pAddlNameInfo.ln_fares_id<>'',1,0));
 				other_borrower_names_CountNonBlank      := sum(group,if(pAddlNameInfo.other_borrower_names<>'',1,0));
 				other_lender_names_CountNonBlank        := sum(group,if(pAddlNameInfo.other_lender_names<>'',1,0));    
 		end;
-
+	*/
 
 	//OUTPUT ASSESS STATS
 		%dPopulationStats_pAsses% 		:= table(pAssess
