@@ -53,8 +53,8 @@ email_alert := SEQUENTIAL(
 					,despray_evic_all_tbl
 					,despray_evic_2010_tbl
 					):
-					Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'NonFCRA Group: NonFCRA_LiensV2_Evictions Build Succeeded', workunit + ': Build complete.' + filedate)),
-					Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'NonFCRA Group: NonFCRA_LiensV2_Evictions Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
+					Success(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_LiensV2_Evictions Build Succeeded', workunit + ': Build complete.' + filedate)),
+					Failure(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_LiensV2_Evictions Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
 													);
 return email_alert;
 

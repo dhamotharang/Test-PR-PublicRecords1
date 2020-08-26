@@ -124,8 +124,8 @@ email_alert := SEQUENTIAL(
 					,despray_phdr_lasttseen_tbl
 					,despray_ProLic_firstseen_tbl
 					,despray_ProLic_lasttseen_tbl):
-					Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA Group: FCRA_People_Header_and_Prof_Licenses Build Succeeded', workunit + ': Build complete.' + filedate)),
-					Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA Group: FCRA_People_Header_and_Prof_Licenses Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
+					Success(FileServices.SendEmail(pContact, 'FCRA Group: FCRA_People_Header_and_Prof_Licenses Build Succeeded', workunit + ': Build complete.' + filedate)),
+					Failure(FileServices.SendEmail(pContact, 'FCRA Group: FCRA_People_Header_and_Prof_Licenses Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
 													);
 return email_alert;
 

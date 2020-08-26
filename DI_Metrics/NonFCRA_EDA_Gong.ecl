@@ -55,8 +55,8 @@ email_alert := SEQUENTIAL(
 					,output(sort(tbl_src_dates_last_seen, -src, last_seen, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_GongEDA_Non_FCRA_DIDs_LastSeen_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
 					,despray_gong_fs_tbl
 					,despray_gong_ls_tbl):
-					Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'NonFCRA Group: NonFCRA_EDA_GONG Build Succeeded', workunit + ': Build complete.' + filedate)),
-					Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'NonFCRA Group: NonFCRA_EDA_GONG Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
+					Success(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_EDA_GONG Build Succeeded', workunit + ': Build complete.' + filedate)),
+					Failure(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_EDA_GONG Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
 													);
 return email_alert;
 

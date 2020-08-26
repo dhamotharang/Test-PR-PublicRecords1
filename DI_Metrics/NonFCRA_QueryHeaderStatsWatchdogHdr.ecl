@@ -452,8 +452,8 @@ email_alert := SEQUENTIAL(
 					,despray_DIDAddressHasNameAndAddressAndSSNandDOBNot1824
 					,despray_DIDAddressHasNameAndAddressAndSSNandDOBAndDLNot1824
 					,despray_DIDAddressHasNameAndAddressAndPhoneNot1824) :
-					Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'NonFCRA Group: NonFCRA_QueryHeaderStatsWatchdogHdr Build Succeeded', workunit + ': Build complete.' + filedate)),
-					Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'NonFCRA Group:  NonFCRA_QueryHeaderStatsWatchdogHdr Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
+					Success(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_QueryHeaderStatsWatchdogHdr Build Succeeded', workunit + ': Build complete.' + filedate)),
+					Failure(FileServices.SendEmail(pContact, 'NonFCRA Group:  NonFCRA_QueryHeaderStatsWatchdogHdr Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
 					);
 return email_alert;
 
