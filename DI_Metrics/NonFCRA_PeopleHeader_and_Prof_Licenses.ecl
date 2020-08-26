@@ -127,8 +127,8 @@ email_alert := SEQUENTIAL(
 					,despray_hdr_ls_tbl
 					,despray_pls_fs_tbl
 					,despray_pls_ls_tbl):
-					Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'NonFCRA Group: NonFCRA_PeopleHeader_and_Prof_Licenses Build Succeeded', workunit + ': Build complete.' + filedate)),
-					Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'NonFCRA Group: NonFCRA_PeopleHeader_and_Prof_Licenses Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
+					Success(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_PeopleHeader_and_Prof_Licenses Build Succeeded', workunit + ': Build complete.' + filedate)),
+					Failure(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_PeopleHeader_and_Prof_Licenses Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
 													);
 return email_alert;
 

@@ -88,8 +88,8 @@ email_alert := SEQUENTIAL(
 					,despray_court_src_tbl
 					,despray_doc_tbl
 					,despray_doc_src_tbl):
-					Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'NonFCRA Group: NonFCRA_Criminal Build Succeeded', workunit + ': Build complete.' + filedate)),
-					Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'NonFCRA Group: NonFCRA_Criminal Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
+					Success(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_Criminal Build Succeeded', workunit + ': Build complete.' + filedate)),
+					Failure(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_Criminal Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
 					);											
 return email_alert;
 
