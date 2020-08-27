@@ -3,9 +3,9 @@
 EXPORT Key_LinkIds := MODULE
 
   // DEFINE THE INDEX
-	shared superfile_name		:= cortera.keynames().LinkIds.QA;
+	shared superfile_name		:= cortera.keynames().LinkIds.Built;
 	
-	shared Base				:= Cortera.Files.Hdr_Out(COUNTRY='US');
+	shared Base				:= Cortera.Files().Base.Header.built(COUNTRY='US');
 	
 	BIPV2.IDmacros.mac_IndexWithXLinkIDs(Base, k, superfile_name)
 	export Key := k;

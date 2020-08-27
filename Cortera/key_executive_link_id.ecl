@@ -1,7 +1,7 @@
-IMPORT $, _control, doxie, data_services, Cortera, Cortera_Tradeline, Suppress;
+﻿IMPORT $, _control, doxie, data_services, Cortera, Cortera_Tradeline, Suppress;
 
 #IF(_control.environment.onThor and ~_control.Environment.onVault)
-dExecLinkID := Cortera.Files.ExecLinkID(link_id<>0);
+dExecLinkID := Project(Cortera.Files().Base.Executives.built(link_id<>0), $.Layout_ExecLinkID);
 #ELSE
 dExecLinkID := dataset([], $.Layout_ExecLinkID);
 #END
