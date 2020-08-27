@@ -135,10 +135,10 @@ EXPORT reDID(string filedate, boolean runondev = false ) := module
 														_Control.RoxieEnv.prodvip,		
 														_Control.RoxieEnv.staging_neutral_roxieIP);
 	
-	export isNewHeader := true; //if (_Control.ThisEnvironment.Name = 'Prod_Thor' or runondev,
-															// Header.IsNewProdHeaderVersion('overrides',,roxieip),
-															// false);
-	
+	export isNewHeader := if (_Control.ThisEnvironment.Name = 'Prod_Thor' or runondev,
+													Header.IsNewProdHeaderVersion('overrides',,roxieip),
+													false);
+
 	export postprocess := function
 			return sequential(
 												header.PostDID_HeaderVer_Update('overrides',,roxieip),
