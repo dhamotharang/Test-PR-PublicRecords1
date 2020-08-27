@@ -7,8 +7,7 @@ export Spray(
 	,string		pDirectory			= '/data/projects/cortera/data/'+pversion[1..8]
 	,string		pFilenamehdr		= 'bugatti_hdr*output.dat'
 	,string		pFilenamestats	= 'bugatti_stats*output.dat'
-	//,string		pGroupName			= _Constants().groupname
-	,string		pGroupName			= 'thor400_sta01'
+	,string		pGroupName			= _Constants().groupname
 	,boolean	pIsTesting			= false
 	,boolean	pOverwrite			= false
 	,boolean	pExistSprayed		= _Flags.ExistCurrentSprayed
