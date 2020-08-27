@@ -55,7 +55,6 @@ export IdAppendRoxie(
 	export WithBest(string fetchLevel = BIPV2.IdConstants.fetch_level_proxid, boolean allBest = false
 	                ,boolean isMarketing = false
 					,Doxie.IDataAccess mod_access = defaultDataAccess) := function
-                  
 		#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
 			res0 := BIPV2.IdAppendLocal.AppendBest(localAppend, fetchLevel := fetchLevel, allBest := allBest
 			                                       ,isMarketing := isMarketing
