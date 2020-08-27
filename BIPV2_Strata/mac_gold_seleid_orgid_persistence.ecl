@@ -10,10 +10,10 @@ EXPORT mac_gold_seleid_orgid_persistence(
 ) :=
 functionmacro
 
-  import tools,BIPV2_Strata;
+  import tools,BIPV2_Strata,BIPV2_Statuses;
   
-  ds_new  := pNew_Base_File ;
-  ds_old  := pOld_Base_File ;
+  ds_new  := BIPV2_Statuses.mac_Calculate_Gold(pNew_Base_File );
+  ds_old  := BIPV2_Statuses.mac_Calculate_Gold(pOld_Base_File );
 
   ds_gold_seleids_new   := table(ds_new(trim(sele_gold) = 'G') ,{seleid,orgid,ultid} ,seleid,orgid,ultid ,merge) : persist('~persist::BIPV2_Strata::mac_gold_seleid_orgid_persistence::ds_gold_seleids_new_' + pversion );
   ds_gold_seleids_old   := table(ds_old(trim(sele_gold) = 'G') ,{seleid,orgid,ultid} ,seleid,orgid,ultid ,merge) : persist('~persist::BIPV2_Strata::mac_gold_seleid_orgid_persistence::ds_gold_seleids_old_' + pversion );
