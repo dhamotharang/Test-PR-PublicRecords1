@@ -1,10 +1,11 @@
 ﻿EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,inputFile,MemailList)	:=	FUNCTIONMACRO
-	import FraudShared,FraudGovPlatform,Salt35,Scrubs,ut,tools;
+	import FraudShared,FraudGovPlatform,Salt35,Scrubs,tools,STD,ut;
 	folder := #EXPAND(myFolder);
 	inFile := inputFile;
-	DatasetName := 'MBS';
+	#UNIQUENAME(DatasetName);
+  	%DatasetName% := 'MBS';
 	scrubs_name := TRIM(scopename,ALL)+'_SCRUBS';
-	scope_datasetName := TRIM(scopename,ALL)+'_' + DatasetName	;
+	scope_datasetName := TRIM(scopename,ALL)+'_' + %DatasetName%	;
 	profilename := 'Scrubs_MBS'+ if(scopename != 'MBS' , '_'+scopename, '');
 	Filename := '~'+map(
 			scopename = 'CCID' => STD.File.GetSuperFileSubName(FraudShared.Filenames(BuildDate).Input.MBSFdnCCID.Sprayed,1),
@@ -102,13 +103,13 @@
 	TranslateBitmap	:=	OUTPUT(T);
 	NumRemovedRecs := '';
 	WU := '';
-	new_entry:=dataset([{DatasetName,ProfileName,scopename,filedate,TotalRecs,NumRules,NumFailedRules,ErroredRecords,TotalRemovedRecs,PcntErroredRec,NumRemovedRecs,WU,workunit}],Scrubs.Layouts.LogRecord);
+	new_entry:=dataset([{%DatasetName%,ProfileName,scopename,filedate,TotalRecs,NumRules,NumFailedRules,ErroredRecords,TotalRemovedRecs,PcntErroredRec,NumRemovedRecs,WU,workunit}],Scrubs.Layouts.LogRecord);
 	outnew:=output(new_entry,named(scope_datasetName+'_LogEntry'));
 
 	EmailReport:=if(MemailList <>'', fileservices.sendEmail(MemailList,
 		'Scrubs Plus Reporting '+ProfileName,
 		'Scrubs Plus Reporting\n\n'+
-		'DatasetName: '+DatasetName+'\n'+
+		'DatasetName: '+%DatasetName%+'\n'+
 		'ProfileName: '+ProfileName+'\n'+
 		'ScopeName: '+scopename+'\n'+
 		'Process Date: '+process_date+'\n'+
