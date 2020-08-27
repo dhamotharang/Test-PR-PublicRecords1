@@ -1341,6 +1341,17 @@
 				trim(kword, left, right) = 'DKKFST' =>SubGroup_Constants.numKeywordsID.KEYWORD_DKKFST,
 				trim(kword, left, right) = 'MDBNM' =>SubGroup_Constants.numKeywordsID.KEYWORD_MDBNM,
 				trim(kword, left, right) = 'EU-CYBER' =>SubGroup_Constants.numKeywordsID.KEYWORD_EU_CYBER,
+				trim(kword, left, right) = 'CHESBK' =>SubGroup_Constants.numKeywordsID.KEYWORD_CHESBK,
+				trim(kword, left, right) = 'FIKKV' =>SubGroup_Constants.numKeywordsID.KEYWORD_FIKKV,
+				trim(kword, left, right) = 'NOGA' =>SubGroup_Constants.numKeywordsID.KEYWORD_NOGA,
+				trim(kword, left, right) = 'IUUVES' =>SubGroup_Constants.numKeywordsID.KEYWORD_IUUVES,
+				trim(kword, left, right) = 'TWMOJ-INT' =>SubGroup_Constants.numKeywordsID.KEYWORD_TWMOJ_INT,
+				trim(kword, left, right) = 'UZDCEC-INT' =>SubGroup_Constants.numKeywordsID.KEYWORD_UZDCEC_INT,
+				trim(kword, left, right) = 'OFAC-HK-EO13936' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_HK_EO13936,
+				trim(kword, left, right) = 'NOKT' =>SubGroup_Constants.numKeywordsID.KEYWORD_NOKT,
+				trim(kword, left, right) = 'UZDCEC-NAT' =>SubGroup_Constants.numKeywordsID.KEYWORD_UZDCEC_NAT,
+				trim(kword, left, right) = 'PHDENR' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHDENR,
+				trim(kword, left, right) = 'THAMLO-SANC' =>SubGroup_Constants.numKeywordsID.KEYWORD_THAMLO_SANC,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

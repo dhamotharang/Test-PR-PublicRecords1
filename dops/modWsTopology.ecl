@@ -1,10 +1,19 @@
-﻿import STD, UT;
+﻿import STD, UT, Python;
 EXPORT modWsTopology(
 									string p_esp = ''
 									,string p_port = '8010'
 												) := module
 	
 	export vWebService := 'WsTopology';
+	
+	export integer fIsNodeUp(STRING ip) := EMBED(Python)
+	import socket
+	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	sock.settimeout(1)
+	result = sock.connect_ex((ip, 7100))
+	sock.close()
+	return result
+	ENDEMBED;
 
 	export fTpTargetClusterQuery(
 												string p_type = '' // roxie or thor
@@ -80,6 +89,7 @@ EXPORT modWsTopology(
 		end;
 		
 		rParts := record
+			boolean isNodeUp := true;
 			rPartsWithDataset - [dTpTargetClusters, dTpClusterInfo, dTpMachineInfo];
 		end;
 		
@@ -109,7 +119,14 @@ EXPORT modWsTopology(
 		
 		dParts := normalize(dClusterInfo,left.dTpMachineInfo,xMachineInfo(left,right));
 		
-		return dParts;
+		rParts xCheckNodes(dParts l) := transform
+			self.isNodeUp := if (fisNodeUp(l.NetAddress) = 0, true, false);
+			self := l;
+		end;
+		
+		dCheckNodes := project(dParts,xCheckNodes(left));
+		
+		return dCheckNodes;
 		
 	end;
 end;

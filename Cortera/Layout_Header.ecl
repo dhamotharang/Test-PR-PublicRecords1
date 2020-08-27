@@ -53,4 +53,5 @@
 	string1			STATUS;			//	CHAR(1)	Possible Values: 'A' - Active, 'D' - Dormant  (Dormant means we have not seen any activity within 30 months)
 	string1			IS_CLOSED;		//	CHAR(1)	Possible Values: 'Y' - Yes
 	string9			CLOSED_DATE;
+	unsigned4   FIRST_SEEN;  // NEW FIELD - Need to be excluded from the keys
 END;

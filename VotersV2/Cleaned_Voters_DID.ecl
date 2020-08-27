@@ -31,17 +31,14 @@ transformedBaseFile := project(baseFile, transformBase(left)): persist('~thor_da
 inputAndBaseFile := In_Base_File + transformedBaseFile;
 
 // Added for DF-27802 - Emerges Opt Out - This will filter out Voters records that are found in the Emerges Opt Out file.  
-optOut :=  VotersV2.File_OptOut_Cleaned;	
+OptOut :=	dedup(sort(distribute(VotersV2.File_OptOut_Cleaned,hash(dob)),dob,last_name,first_name,state,local),dob,last_name,first_name,state,local)(dob <> '' and last_name <> '' and first_name <> '' and state <> '');
 
 joinLayout := record
 	 Layout_outfile;	
 	 string optout_flag;
 end;
 	
-distVoters  :=	distribute(inputAndBaseFile,hash(dob)); 
-dedupOptOut :=	dedup(sort(distribute(optOut,hash(dob)),dob,last_name,first_name,state,local),dob,last_name,first_name,state,local)(dob <> '' and last_name <> '' and first_name <> '' and state <> '');
-	
-joinVoters_OptOut := join(distVoters, dedupOptOut,
+joinVoters_OptOut := join(inputAndBaseFile, OptOut,
 													 left.dob        = right.dob and
 													 left.last_name  = right.last_name and
 													 left.first_name = right.first_name and
@@ -58,7 +55,7 @@ joinVoters_OptOut := join(distVoters, dedupOptOut,
 																															 ,'O' ,'');	
 																			 self 				  := left;
 																			 self  				  := [];),
-															 left outer, lookup, local);
+															 left outer, lookup);
 																	 
 Base_filterOptOuts := project(joinVoters_OptOut(optOut_flag <> 'O'),transform(Layout_outfile,self := left));
 // End of Emerges Opt Out filter

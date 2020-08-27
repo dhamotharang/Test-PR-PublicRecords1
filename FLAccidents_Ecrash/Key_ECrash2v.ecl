@@ -199,7 +199,7 @@ self 								:= L;
 end;
 
 pflc2v := join(distribute(flc2v,hash(accident_nbr))
-			  ,distribute(pull(FLAccidents.BaseFile_FLCrash0),hash(accident_nbr))
+			  ,distribute(FLAccidents.BaseFile_FLCrash0,hash(accident_nbr))
 			  ,left.accident_nbr = right.accident_nbr,
 			   xpndrecs(left,right),left outer,local);
   

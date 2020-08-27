@@ -1,4 +1,4 @@
-IMPORT Data_Services;
+﻿IMPORT Data_Services;
 
 compare_bases(boolean isFast,string process_date,string baseLine = '') := FUNCTION
 
@@ -21,11 +21,11 @@ compare_bases(boolean isFast,string process_date,string baseLine = '') := FUNCTI
 				keyEndingNamesSet1 :=  if( isFast
 				
 																,dataset([	'assessment_',				'deed_mortgage_', 						'search_',						'addl::ln_names_',
-																					'addl::legal_',		'addl_frs_assessment_',	'addl_frs_deed_mortgage_'							], {string fileName})
+																					'addl::legal_',		'addl_frs_assessment_',	'addl_frs_deed_mortgage_', 'addl::name_info_'	], {string fileName})
 																
 				
 																,dataset([	'assesor_',				'deed_', 						'search_',						'addl::ln_names_',
-																				'addl::legal_',		'addl::fares_tax_',	'addl::fares_deed_'											], {string fileName})
+																				'addl::legal_',		'addl::fares_tax_',	'addl::fares_deed_', 'addl::name_info_'							], {string fileName})
 																	
 																	);
 																					

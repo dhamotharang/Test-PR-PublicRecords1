@@ -30,8 +30,9 @@ ECL :=
 #WORKUNIT('protect',true);
 #WORKUNIT('name', 'FraudGov Prod Dashboards Version Refresh Schedule');
 
+SkipJob := FraudGovPlatform.Files().Flags.SkipModules[1].SkipDashboardVersion;
 RunJob := FraudGovPlatform.Files().Flags.RefreshProdDashVersion[1].refreshversion;
-Run_ECL := if(RunJob=true,ECL, 'output(\'Refresh Prod Dashboards Version Skipped\');\n' );
+Run_ECL := if(RunJob=true and SkipJob =false,ECL, 'output(\'Refresh Prod Dashboards Version Skipped\');\n' );
 
 _Control.fSubmitNewWorkunit(Run_ECL,ThorName):WHEN(CRON(Every_Nine_Minutes))
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert

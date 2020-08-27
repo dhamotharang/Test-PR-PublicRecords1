@@ -17,7 +17,7 @@ EXPORT proc_processAttributes(dataset(Cortera.Layout_Header_Out) hdr, dataset(Co
 								left.ULTIMATE_LINKID=right.LINK_ID, xAttr(left,right), LEFT OUTER, LOCAL);
 	
 	// 
-	result := Cortera.proc_merge_attr(j, Cortera.Files.Attributes, version);
+	result := Cortera.proc_merge_attr(j, Cortera.Files().Base.Attributes.qa, version);
 								
 	return result;
 

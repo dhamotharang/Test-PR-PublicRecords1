@@ -22,7 +22,7 @@ EXPORT Assign_GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'BKMortgage';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:record_id';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,date_first_seen,date_last_seen,date_vendor_first_reported,date_vendor_last_reported,process_date,source,ln_filedate,bk_infile_type,rectype,documenttype,fipscode,mersindicator,mainaddendum,assigrecdate,assigeffecdate,assigdoc,assigbk,assigpg,multiplepageimage,bkfsimageid,origdotrecdate,origdotcontractdate,origdotdoc,origdotbk,origdotpg,origlenderben,origloanamnt,assignorname,loannumber,assignee,mers,mersvalidation,assigneepool,mspsvcrloan,borrowername,apn,multiapncode,taxacctid,propertyfulladd,propertyunit,propertycity,propertystate,propertyzip,propertyzip4,dataentrydate,dataentryopercode,vendorsourcecode,hids_recordingflag,hids_docnumber,transfercertificateoftitle,hi_condo_cpr_hpr,hi_situs_unit_number,hids_previous_docnumber,prevtransfercertificateoftitle,pid,matchedororphan,deed_pid,sam_pid,assessorparcelnumber_matched,assessorpropertyfulladd,assessorpropertyunittype,assessorpropertyunit,assessorpropertycity,assessorpropertystate,assessorpropertyzip,assessorpropertyzip4,assessorpropertyaddrsource,clnoriglenderben,clnassignorname,clnassignee,clnborrowername,DBAOrigLenderBen,DBAAssignor,DBAAssignee,raw_file_name';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,date_first_seen,date_last_seen,date_vendor_first_reported,date_vendor_last_reported,process_date,source,ln_filedate,bk_infile_type,rectype,documenttype,fipscode,mersindicator,mainaddendum,assigrecdate,assigeffecdate,assigdoc,assigbk,assigpg,multiplepageimage,bkfsimageid,origdotrecdate,origdotcontractdate,origdotdoc,origdotbk,origdotpg,origlenderben,origloanamnt,assignorname,loannumber,assignee,mers,mersvalidation,assigneepool,mspsvcrloan,borrowername,apn,multiapncode,taxacctid,propertyfulladd,propertyunit,propertycity,propertystate,propertyzip,propertyzip4,dataentrydate,dataentryopercode,vendorsourcecode,hids_recordingflag,hids_docnumber,transfercertificateoftitle,hi_condo_cpr_hpr,hi_situs_unit_number,hids_previous_docnumber,prevtransfercertificateoftitle,pid,matchedororphan,deed_pid,sam_pid,assessorparcelnumber_matched,assessorpropertyfulladd,assessorpropertyunittype,assessorpropertyunit,assessorpropertycity,assessorpropertystate,assessorpropertyzip,assessorpropertyzip4,assessorpropertyaddrsource,clnoriglenderben,clnassignorname,clnassignee,DBAOrigLenderBen,DBAAssignor,DBAAssignee,raw_file_name';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := FALSE;
@@ -64,8 +64,8 @@ EXPORT Assign_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:assigdoc:TYPE(STRING20):0,0\n'
     + 'FIELD:assigbk:TYPE(STRING10):0,0\n'
     + 'FIELD:assigpg:TYPE(STRING10):0,0\n'
-    + 'FIELD:multiplepageimage:TYPE(STRING1):0,0\n'
-    + 'FIELD:bkfsimageid:TYPE(STRING50):0,0\n'
+    + 'FIELD:multiplepageimage:DERIVED:TYPE(STRING1):0,0\n'
+    + 'FIELD:bkfsimageid:DERIVED:TYPE(STRING50):0,0\n'
     + 'FIELD:origdotrecdate:TYPE(STRING8):0,0\n'
     + 'FIELD:origdotcontractdate:TYPE(STRING8):0,0\n'
     + 'FIELD:origdotdoc:TYPE(STRING20):0,0\n'
@@ -90,8 +90,8 @@ EXPORT Assign_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:propertystate:TYPE(STRING2):0,0\n'
     + 'FIELD:propertyzip:TYPE(STRING5):0,0\n'
     + 'FIELD:propertyzip4:TYPE(STRING4):0,0\n'
-    + 'FIELD:dataentrydate:TYPE(STRING8):0,0\n'
-    + 'FIELD:dataentryopercode:TYPE(STRING4):0,0\n'
+    + 'FIELD:dataentrydate:DERIVED:TYPE(STRING8):0,0\n'
+    + 'FIELD:dataentryopercode:DERIVED:TYPE(STRING4):0,0\n'
     + 'FIELD:vendorsourcecode:TYPE(STRING3):0,0\n'
     + 'FIELD:hids_recordingflag:TYPE(STRING1):0,0\n'
     + 'FIELD:hids_docnumber:TYPE(STRING9):0,0\n'
@@ -116,11 +116,10 @@ EXPORT Assign_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:clnoriglenderben:DERIVED:TYPE(STRING):0,0\n'
     + 'FIELD:clnassignorname:DERIVED:TYPE(STRING):0,0\n'
     + 'FIELD:clnassignee:DERIVED:TYPE(STRING):0,0\n'
-    + 'FIELD:clnborrowername:DERIVED:TYPE(STRING):0,0\n'
     + 'FIELD:DBAOrigLenderBen:DERIVED:TYPE(STRING):0,0\n'
     + 'FIELD:DBAAssignor:DERIVED:TYPE(STRING):0,0\n'
     + 'FIELD:DBAAssignee:DERIVED:TYPE(STRING):0,0\n'
-    + 'FIELD:raw_file_name:DERIVED:TYPE(STRING100):0,0'
+    + 'FIELD:raw_file_name:DERIVED:TYPE(STRING100):0,0\n'
     ;
  
   // Structured values
