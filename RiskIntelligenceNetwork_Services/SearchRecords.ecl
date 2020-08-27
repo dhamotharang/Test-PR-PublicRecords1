@@ -143,7 +143,9 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
                             KEYED(RIGHT.customerid = search_params.GlobalCompanyId AND
                                   RIGHT.industrytype = search_params.IndustryType AND
                                   RIGHT.entitycontextuid = LEFT.entity_context_uid) AND
-                            RIGHT.aotcurrprofflag = _Constant.CURR_PROFILE_FLAG,
+                            RIGHT.aotcurrprofflag = _Constant.CURR_PROFILE_FLAG AND
+                            IF(ds_search_in[1].transactionstartdate <> '', (unsigned4) ds_search_in[1].transactionstartdate <= RIGHT.eventdate, TRUE) AND
+                            IF(ds_search_in[1].transactionenddate <> '', (unsigned4) ds_search_in[1].transactionenddate >= RIGHT.eventdate, TRUE),
                             TRANSFORM(iesp.identitysearch.t_RINIdentitySearchRecord,
                                 SELF.RecordSource := _Constant.RECORD_SOURCE.CONTRIBUTED,
                                 SELF.RecordType   := IF(RIGHT.entitytype = _Constant.EntityType.LEXID, _Constant.RECORD_TYPE.IDENTITY, _Constant.RECORD_TYPE.ELEMENT),
