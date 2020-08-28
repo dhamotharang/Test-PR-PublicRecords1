@@ -33,6 +33,10 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN BIPAppendReAppend := TRUE;
 	EXPORT BOOLEAN BIPAppendIncludeAuthRep := FALSE;
 
+	//lexid append and pii append
+	EXPORT BOOLEAN RetainInputLexid := False; //keep input lexid
+	EXPORT BOOLEAN BestPIIAppend := False; //do not append best pii for running
+
 	// CCPA Options
 	EXPORT UNSIGNED1 LexIdSourceOptout := 1;
 	EXPORT STRING100 TransactionID := '';
@@ -67,6 +71,7 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN IncludeProfessionalLicense := FALSE;
 	EXPORT BOOLEAN IncludeProperty := FALSE;
 	EXPORT BOOLEAN IncludePropertyEvent := FALSE;
+	EXPORT BOOLEAN IncludeSexOffender := FALSE;
 	EXPORT BOOLEAN IncludeSocialSecurityNumber := FALSE;
 	EXPORT BOOLEAN IncludeSSNSummary := FALSE;
 	EXPORT BOOLEAN IncludeSurname := FALSE;
@@ -114,6 +119,7 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN IncludePersonPhone := IncludePerson AND IncludePhone;
 	EXPORT BOOLEAN IncludePersonProperty := IncludePerson AND IncludeProperty;
 	EXPORT BOOLEAN IncludePersonPropertyEvent := IncludePersonProperty AND IncludePropertyEvent;
+	EXPORT BOOLEAN IncludePersonSexOffender := IncludePerson AND IncludeSexOffender;
 	EXPORT BOOLEAN IncludePersonSSN := IncludePerson AND IncludeSocialSecurityNumber;
 	EXPORT BOOLEAN IncludePersonVehicle := IncludePerson AND IncludeVehicle;
 	EXPORT BOOLEAN IncludePersonUCC := IncludePerson AND IncludeUCC;

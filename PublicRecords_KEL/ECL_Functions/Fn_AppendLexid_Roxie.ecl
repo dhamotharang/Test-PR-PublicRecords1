@@ -13,7 +13,7 @@ EXPORT Fn_AppendLexid_Roxie(
   dedup_these := FALSE; //allow multiple DID's
   fz := '4GZ';
   allscores := FALSE;
-  indata_did := PROJECT(indata, 
+  indata_did := PROJECT(indata(P_InpLexID = 0),
     TRANSFORM(didville.Layout_Did_OutBatch, 
       SELF.Did := LEFT.P_InpLexID;
       SELF.dl_nbr:= LEFT.P_InpClnDL;
@@ -43,8 +43,19 @@ EXPORT Fn_AppendLexid_Roxie(
       SELF.dl_state:= LEFT.P_InpClnDLState;
 	  SELF := LEFT;
       )); 
+			
+  keepinputdid :=   PROJECT(indata(P_InpLexID <> 0),
+    TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII, 
+      SELF.P_LexID := left.P_InpLexID;
+      SELF.P_LexIDScore := PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT;
+      SELF := LEFT));			
+
+			
+
+			
   //The Roxie Lexid Append
 	didville.Mac_DIDAppend(indata_did, resu, dedup_these, fz, allscores) ;
+
  //Since Layout_Did_OutBatch doesn't have all the output from our indata, rejoin back to indata
   IndataGotDid := JOIN(indata, resu,
    LEFT.G_ProcUID = RIGHT.Seq,
@@ -73,6 +84,24 @@ EXPORT Fn_AppendLexid_Roxie(
 	// On thor, this code is not needed since thor append only returns one did.
 	dids_deduped := DEDUP(SORT(all_dids, G_ProcUID, -P_LexIDScore, P_LexID), G_ProcUID);
 	
-RETURN dids_deduped;
+	
+	PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII chooser(recordof(dids_deduped) le, recordof(keepinputdid) ri) := transform
+		SELF.P_InpLexID := le.P_InpLexID;
+		SELF.G_ProcUID := le.G_ProcUID;
+
+		retain := IF(options.RetainInputLexid and ri.P_LexID > 0, TRUE, FALSE);
+		//if we set retain input did and we have a good did on file then keep the input one, else go find one
+		
+		self.P_Lexid := if(retain = TRUE, ri.P_LexID, le.P_LexID);
+		self.P_LexIDScore := if(retain = TRUE, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT, le.P_LexIDScore);
+		self := le;
+	end;
+	
+	didchooser := join(dids_deduped, keepinputdid, 
+						LEFT.G_ProcUID = right.G_ProcUID,
+						chooser(left,right),LEFT OUTER);
+
+					
+RETURN didchooser;
 
 END;

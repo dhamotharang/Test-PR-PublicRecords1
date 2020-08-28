@@ -9,6 +9,8 @@
 	<part name="GLBPurpose" type="xsd:integer"/>
 	<part name="DPPAPurpose" type="xsd:integer"/>
 	<part name="IsMarketing" type="xsd:boolean"/>
+	<part name="RetainInputLexid" type="xsd:boolean"/>
+	<part name="AppendPII" type="xsd:boolean"/>
 	<part name="IndustryClass" type="xsd:string"/>
 	<part name="IntendedPurpose" type="xsd:string"/>
 	<part name="AllowedSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
@@ -33,10 +35,13 @@ EXPORT MAS_FCRA_Service() := MACRO
 		'DPPAPurpose',
 		'IndustryClass',
 		'IsMarketing',
+		'RetainInputLexid',
+		'AppendPII',
 		'IncludeMinors',
 		'IntendedPurpose',
 		'AllowedSourcesDataset',
 		'ExcludeSourcesDataset'
+
   ));
 
 	// Read interface params
@@ -53,6 +58,11 @@ EXPORT MAS_FCRA_Service() := MACRO
 	STRING Intended_Purpose := '' : STORED('IntendedPurpose'); // Can be set to 'PRESCREENING' for FCRA Pre-Screen applications
 	AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) : STORED('AllowedSourcesDataset');
 	ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) : STORED('ExcludeSourcesDataset'); 
+	
+	BOOLEAN Retain_Input_Lexid := FALSE : STORED('RetainInputLexid');//keep what we have on input
+	BOOLEAN Append_PII := FALSE : STORED('AppendPII');//keep what we have on input
+	
+	
 	
 	gateways_in := Gateway.Configuration.Get();
 	Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
@@ -95,6 +105,9 @@ EXPORT MAS_FCRA_Service() := MACRO
 			FinalAllowedSources);
 		
 		EXPORT DATASET(Gateway.Layouts.Config) Gateways := GatewaysClean;
+		EXPORT BOOLEAN RetainInputLexid := Retain_Input_Lexid;
+		EXPORT BOOLEAN BestPIIAppend := Append_PII; //do not append best pii for running
+
 		
 		// Override Include* Entity/Association options here if certain entities can be turned off to speed up processing.
 		// This will bypass uneccesary key JOINS in PublicRecords_KEL.Fn_MAS_FDC if the keys don't contribute to any 
@@ -140,6 +153,8 @@ EXPORT MAS_FCRA_Service() := MACRO
 
 
 	END;
+
+	IF(options.RetainInputLexid = FALSE AND options.BestPIIAppend = TRUE, FAIL('Insufficient Input'));
 
   ResultSet := PublicRecords_KEL.FnRoxie_GetAttrs(ds_input, Options);
 

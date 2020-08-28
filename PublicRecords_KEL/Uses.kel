@@ -3843,6 +3843,15 @@ USE PublicRecords_KEL.ECL_Functions.Dataset_FDC(FDC,
 			BestZip4 = zip4,
 			BestAddressRank = 1, // BIP Best Rank will always be 1 on Roxie since only one best value is returned by the BIP Best Interface. On Vault, where we use the BIP Best key directly, we will need to choose the record with the lowest rank in our best attribute logic.
 			Source = src), 		//need dummy source since Vault needs source for permissions but roxie does not have source avaiable
+		Address(FILTER((STRING28)prim_name != '' AND (UNSIGNED3)zip != 0),  // Make sure we have something in the Address ENTITY for all best addresses
+			PrimaryRange = prim_range, 
+			Predirectional = predir, 
+			PrimaryName = prim_name, 
+			Suffix = addr_suffix, 
+			Postdirectional = postdir, 
+			SecondaryRange = sec_range,
+			ZIP5 = zip,
+			Source = src), 		//need dummy source since Vault needs source for permissions but roxie does not have source avaiable
 		PERMITS(DPMBitmap)),
 
 	Dataset_Gong__Key_History_DID(
@@ -5911,7 +5920,25 @@ Dataset_Thrive__Key___Did_QA(
 		PayFrequency = pay_frequency,
 		Income = income,
 		Source = src),	
-  PERMITS (DPMBitmap))
+  PERMITS (DPMBitmap)),
+	
+Dataset_SexOffender__Key_SexOffender_SPK(
+	SexOffender(
+		SeisintPrimaryKey=sspk,	
+		DateFirstSeen = dt_first_reported, //this is updated every build
+		DateLastSeen = dt_last_reported, //this is updated every build
+		Source = src),
+	PersonSexOffender(FILTER((UNSIGNED)did != 0),
+		Subject=did,
+		SeisintPrimaryKey=sspk,
+		DateFirstSeen = dt_first_reported, //this is updated every build
+		DateLastSeen = dt_last_reported, //this is updated every build
+		FCRADate = fcra_date, //this is updated every build
+		FcraConvictionFlag = fcra_conviction_flag,
+		FcraTrafficFlag = fcra_traffic_flag,
+		SexOffenderRegistryNumber = sor_number,
+		Source = src),
+	PERMITS (DPMBitmap))
 	
     );    
 
