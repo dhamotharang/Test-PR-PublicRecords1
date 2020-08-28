@@ -4,10 +4,16 @@ export Key_LinkIds := module
 
   // DEFINE THE INDEX
   shared superfile_name  := $.Keynames().LinkIds.QA;
+	
+	export key_rec := RECORD
+    BIPV2.IDlayouts.l_key_ids;
+    $.Layouts.Layout_Header_Out - BIPV2.IDlayouts.l_xlink_ids;
+    integer1 fp := 0;  					//for platform?
+  end;
   
   export Key := index(
-											 BIPV2.IDlayouts.l_key_ids_bare, //{UltID,OrgID,SELEID,ProxID,POWID,EmpID,DotID},    
-											 $.Layouts.Layout_Header_Out - BIPV2.IDlayouts.l_xlink_ids,    
+											 {BIPV2.IDlayouts.l_key_ids_bare}, //{UltID,OrgID,SELEID,ProxID,POWID,EmpID,DotID},    
+											 {key_rec},    
 											 superfile_name
 										 );  
   
