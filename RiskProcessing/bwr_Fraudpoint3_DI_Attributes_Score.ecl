@@ -17,7 +17,7 @@ unsigned retrys         := 5 ;  //number of retrys in the soapcall
 
 //---------------- FILE NAMES -----------------
 filename := data_services.foreign_prod + 'nmontpetit::out::chase_1139_apr_dev_sample_pii';
-outputfile := '~tfuerstenberg::out::TMX_examples_' + '_' + thorlib.wuid();
+outputfile := '~tfuerstenberg::out::TMX_examples_' + thorlib.wuid();
 qa_outputfile := outputfile+'_QA';
 
 
@@ -1448,14 +1448,17 @@ qa_results := GROUP(SORT(JOIN(resu(Shell.Account<>''), fdInput, LEFT.Shell.Accou
                       TRANSFORM({Models.Layout_Fraudpoint_Debug.Shell, STRING errorcode}, 
                       SELF.Account := RIGHT.old_account_number, SELF := LEFT.Shell, SELF := LEFT)), Account), Account);
 
-DI_input_errors := normed(errorcode = '0ReceivedRoxieException: (Invalid request for Digital Insights, must supply a phone number and email.)');
+Input_errors := normed(errorcode in ['0ReceivedRoxieException: (Invalid request for Digital Insights, must supply a phone number and email.)',
+                                     '301ReceivedRoxieException: (Insufficient input)']);
 
-Other_errors := normed(errorcode not in ['','0ReceivedRoxieException: (Invalid request for Digital Insights, must supply a phone number and email.)']);
+Other_errors := normed(errorcode not in ['','0ReceivedRoxieException: (Invalid request for Digital Insights, must supply a phone number and email.)',
+                                            '301ReceivedRoxieException: (Insufficient input)']);
 
-// output(choosen(normed, eyeball), named('sample'));
-output(choosen(DI_input_errors, eyeball), named('DI_input_errors'));
-output(choosen(Other_errors, eyeball), named('Other_errors'));
-output(count(Other_errors), named('Other_error_count'));
+// output(choosen(Input_errors, eyeball), named('Input_errors'));
+// output(count(Input_errors), named('Input_error_count'));
+
+// output(choosen(Other_errors, eyeball), named('Other_errors'));
+// output(count(Other_errors), named('Other_error_count'));
 
 attr_plus_scores := group(sort(normed, accountnumber), accountnumber);
 
@@ -1562,8 +1565,8 @@ fd_attributes_norm_minus_compromised_dl := record
 	fd_attributes_norm - IdentityDriversLicenseComp;
 end;
 
-//Add any errors back to the results so that we have all the input records
-to_1_record := to_1_record_temp + DI_input_errors;
+//Add any input errors back to the results so that we have all the input records
+to_1_record := to_1_record_temp + Input_errors;
 
 without_compromised_dl := project(to_1_record, transform(fd_attributes_norm_minus_compromised_dl, self := left));
 
@@ -1580,7 +1583,7 @@ output(without_compromised_dl,,outputfile,CSV(heading(single), quote('"')), over
 );
 
 if(_SuppressCompromisedDLs,
-output(Other_errors,,outputfile + '_errors',CSV(heading(single), quote('"')), overwrite);
+output(Other_errors,,outputfile + '_errors',CSV(heading(single), quote('"')), overwrite),
 output(other_errors_wo_comp_dl,,outputfile + '_errors',CSV(heading(single), quote('"')), overwrite)
 );
 
