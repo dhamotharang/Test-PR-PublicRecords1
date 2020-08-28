@@ -2,7 +2,7 @@
 		Cortera, Cortera_Tradeline, Data_Services, DCAV2, Death_Master,  Doxie, Doxie_Files, DriversV2, DMA, dx_BestRecords, dx_ConsumerFinancialProtectionBureau, dx_DataBridge, DX_Email, 
 		dx_Equifax_Business_Data, dx_Gong, dx_Header, dx_Infutor_NARB, dx_Relatives_v3, EBR, Email_Data, emerges, Experian_CRDB, FAA, FBNv2, FLAccidents_Ecrash, Fraudpoint3, Gong, 
 		GovData, Header, Header_Quick, InfoUSA, IRS5500, InfutorCID, Inquiry_AccLogs, LiensV2, LN_PropertyV2, MDR, OSHAIR, Phonesplus_v2, Prof_License_Mari, 
-		Prof_LicenseV2, Relationship, Risk_Indicators, RiskView, RiskWise, SAM, STD, Suppress, Targus, thrive, USPIS_HotList, Utilfile, ut,
+		Prof_LicenseV2, Relationship, Risk_Indicators, RiskView, RiskWise, SAM, SexOffender, STD, Suppress, Targus, thrive, USPIS_HotList, Utilfile, ut,
 		VehicleV2, Watercraft, Watchdog, UCCV2, YellowPages;
 /*
 		[4:08 PM] Nicla, Laura (RIS-MIN)
@@ -111,12 +111,31 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 
 	//get corrections early since we will need them for a lot of the FCRA datasets.
 	//check to see if we need this or if we got this from the mini FDC.  we only should be calling to this once
-	Input_pre:= IF(FDCMiniPop, PublicRecords_KEL.MAS_get.FCRA_Overrides(Options).GetOverrideFlags(Input_pre_override, FDCMiniPop), overridemini);		
+	Input_getoverides:= IF(FDCMiniPop, PublicRecords_KEL.MAS_get.FCRA_Overrides(Options).GetOverrideFlags(Input_pre_override, FDCMiniPop), overridemini);		
 
-	SixthRepInput := Input_pre(RepNumber = 6);
+	SixthRepInput := Input_getoverides(RepNumber = 6);
 
 
-	Input := Input_pre(RepNumber <> 6);
+	Input_pre := Input_getoverides(RepNumber <> 6);
+
+	input :=	IF(NOT FDCMiniPop AND options.BestPIIAppend, 
+		Join(Input_pre, Input_pre_override, 
+					left.G_ProcBusUID = right.G_ProcBusUID and
+					left.G_ProcUID = right.G_ProcUID,
+						TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII_Overrides,
+							self.G_ProcBusUID := right.G_ProcBusUID,
+							self.G_ProcUID := right.G_ProcUID,
+							SELF.P_LexID := right.P_LexID,
+							SELF.P_InpClnEmail := right.P_InpClnEmail,
+							SELF.P_InpClnDL := right.P_InpClnDL,	
+							SELF.P_InpClnSSN := right.P_InpClnSSN,
+							SELF.P_InpClnNameLast := right.P_InpClnNameLast,
+							SELF.P_InpClnNameMid := right.P_InpClnNameMid,
+							SELF.P_InpClnNameFirst := right.P_InpClnNameFirst,
+							SELF.P_InpClnDOB := right.P_InpClnDOB,
+							SELF := left,
+							SELF := [])), Input_pre);
+
 
 	//6th rep is nonfcra only so we can skip overrides
 	//we only need this lexid to go through 3 datasets so we are keeping this seperated to avoid extra searching
@@ -160,7 +179,6 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 							self := left;
 							SELF := []), FULL OUTER );
 
-		
 	Input_Address_Consumer_recs :=
 		PROJECT( Input,
 			TRANSFORM( Layouts_FDC.LayoutAddressGeneric_inputs,
@@ -408,7 +426,7 @@ Current_Address_Consumer_recs_Contacts := Current_Address_Consumer_recs_pre((INT
 				SELF.acctno 			:= (STRING)LEFT.UIDAppend + ' ' + (STRING)LEFT.P_LexID,
 				SELF.contact_did 	:= LEFT.P_LexID,
 				SELF := [])));
-
+            
 	//after getting lexids use a different key to get all of the businesses these indidiuals are associated with
 	Lookup_LinkIDs := PROJECT(BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(For_Lexid_Search).uid_results_w_acct,
 																			TRANSFORM(Layouts_FDC.Layout_FDC,
@@ -421,14 +439,16 @@ Current_Address_Consumer_recs_Contacts := Current_Address_Consumer_recs_pre((INT
 																								SELF.B_LexIDSite := LEFT.PowID,
 																								SELF.B_LexIDLoc := LEFT.ProxID,
 																								SELF := []));
-                                                
-     // Lookup_And_Input_LinkIDs_Combined := JOIN(Lookup_LinkIDs, Input_FDC, 
-                                                                                        // LEFT.P_LexID = RIGHT.P_LexID AND 
-                                                                                        // LEFT.UIDAppend = RIGHT.UIDAppend,
-                                                                                        // TRANSFORM(RECORDOF(LEFT),
-                                                                                        // SELF := LEFT));
-     
-     // Lookup_And_Input_LinkIDs := DEDUP(SORT(Lookup_And_Input_LinkIDs_Combined, B_LexIDUlt, B_LexIDOrg, B_LexIDLegal, B_LexIDSite, B_LexIDLoc), B_LexIDUlt, B_LexIDOrg, B_LexIDLegal, B_LexIDSite, B_LexIDLoc);
+ 
+      Lookup_And_Input_LinkIDs_Combined := JOIN(Input_FDC, Lookup_LinkIDs, 
+                                                                                        LEFT.P_LexID = RIGHT.P_LexID AND 
+                                                                                        LEFT.UIDAppend = RIGHT.UIDAppend,
+                                                                                        TRANSFORM(RECORDOF(RIGHT),
+                                                                                        SELF := LEFT,
+                                                                                        SELF := RIGHT),
+                                                                                        LEFT OUTER);
+                                                                                        
+     Lookup_And_Input_LinkIDs := DEDUP(SORT(Lookup_And_Input_LinkIDs_Combined, UIDAppend, B_LexIDUlt, B_LexIDOrg, B_LexIDLegal, B_LexIDSite, B_LexIDLoc), UIDAppend, B_LexIDUlt, B_LexIDOrg, B_LexIDLegal, B_LexIDSite, B_LexIDLoc);
 				
 	//lets not run more records than we need to
 	Unique_Raw_Lexid_Matches := DEDUP(SORT(Lookup_LinkIDs, UIDAppend, B_LexIDUlt, B_LexIDOrg, B_LexIDLegal, B_LexIDLoc, B_LexIDSite, P_LexID),	UIDAppend, B_LexIDUlt, B_LexIDOrg, B_LexIDLegal, B_LexIDLoc, B_LexIDSite, P_LexID);
@@ -487,7 +507,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 	END;
 	
 	BIPBestInputsele := PROJECT(Input_FDC(B_LexIDLegal > 0), PrepBIPInputsele(LEFT));
-	BIPBestInputprox := PROJECT(Input_FDC(B_LexIDLoc > 0 OR B_LexIDLegal > 0), PrepBIPInputprox(LEFT));
+	BIPBestInputprox := PROJECT(Input_FDC(B_LexIDLoc > 0 AND B_LexIDLegal > 0), PrepBIPInputprox(LEFT));
 
 	BIP_Best_Records_Raw_sele := IF(Common.DoFDCJoin_BIPV2_Best__Key_LinkIds,
 										BIPV2.IdAppendRoxie(BIPBestInputsele, ReAppend := FALSE).WithBest(
@@ -1206,7 +1226,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 	// --------------------[ Business Header records ]--------------------
 	
 		Business_Header_Key_Linking := IF(Common.DoFDCJoin_Business_Files__Business__Key_BH_Linking_Ids = TRUE, 
-																							PublicRecords_KEL.ecl_functions.DateSelector(BIPV2.Key_BH_Linking_Ids.kfetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Input_FDC),
+																							PublicRecords_KEL.ecl_functions.DateSelector(BIPV2.Key_BH_Linking_Ids.kfetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Lookup_And_Input_LinkIDs),
 																									PublicRecords_KEL.ECL_Functions.Constants.SetLinkSearchLevel(PublicRecords_KEL.ECL_Functions.Constants.LinkSearch.SeleID),
 																									0, /*ScoreThreshold --> 0 = Give me everything*/
 																									linkingOptions,
@@ -1215,7 +1235,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 																									TRUE, /* bypassContactSuppression */
 																									BIPV2.IDconstants.JoinTypes.LimitTransformJoin,
 																									mod_access := mod_access),FALSE,TRUE));
-						
+		
 	With_Business_Header_Key_Linking := DENORMALIZE(With_Email_Data__Key_Did_FCRA_Records, Business_Header_Key_Linking,	
 			LEFT.G_ProcBusUID = RIGHT.UniqueID AND 
 			LEFT.B_LexIDUlt = RIGHT.ULTID AND 
@@ -1244,7 +1264,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 																											self := []));
 					SELF := LEFT,
 					SELF := []));
-					
+							
 	Associated_Business_Address := PROJECT(Business_Header_Key_Linking, TRANSFORM(Layouts_FDC.LayoutAddressGeneric_inputs,
 																					SELF.UIDAppend      	:= LEFT.UniqueID,
 																					SELF.PrimaryRange  		:= LEFT.prim_range_derived,
@@ -2305,7 +2325,7 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
 	// --------------------[ Address (business) ]--------------------
 
 	Corp2_Kfetch_LinkIds_Corp := PublicRecords_KEL.ecl_functions.DateSelector(IF(Common.DoFDCJoin_Corp2__Key_LinkIDs_Corp = TRUE, 
-																							Corp2.Key_LinkIDs.Corp.kfetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Input_FDC),
+																							Corp2.Key_LinkIDs.Corp.kfetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Lookup_And_Input_LinkIDs),
 																									PublicRecords_KEL.ECL_Functions.Constants.SetLinkSearchLevel(PublicRecords_KEL.ECL_Functions.Constants.LinkSearch.SeleID),
 																									0, /*ScoreThreshold --> 0 = Give me everything*/
 																									PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT,
@@ -2516,7 +2536,7 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
 	// UCC Key Linkids  
    
 		UCC_LinkIds_Records := IF(Common.DoFDCJoin_UCC_Files__Key_Linkids = TRUE,
-														PublicRecords_KEL.ecl_functions.DateSelector(UCCV2.Key_LinkIds.kFetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Input_FDC),
+														PublicRecords_KEL.ecl_functions.DateSelector(UCCV2.Key_LinkIds.kFetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Lookup_And_Input_LinkIDs),
 														PublicRecords_KEL.ECL_Functions.Constants.SetLinkSearchLevel(PublicRecords_KEL.ECL_Functions.Constants.LinkSearch.SeleID),
 														0, /*ScoreThreshold --> 0 = Give me everything*/
 														PublicRecords_KEL.ECL_Functions.Constants.UCC_JOIN_LIMIT,
@@ -3243,9 +3263,14 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
 		PropertyV2__Key_Addr_Fid_Records :=	// dates not kept, does not need DateSelector
 			JOIN(Input_Address_BusBest_Current_Previous, LN_PropertyV2.key_addr_fid(Options.isFCRA),
 				Common.DoFDCJoin_PropertyV2__Key_Addr_Fid = TRUE AND 
-				KEYED(LEFT.PrimaryName = RIGHT.prim_name AND
-					LEFT.PrimaryRange = RIGHT.prim_range AND
-					LEFT.ZIP5 = RIGHT.zip),
+				KEYED(LEFT.PrimaryRange = RIGHT.prim_range AND
+					LEFT.Predirectional = RIGHT.predir AND
+					LEFT.PrimaryName = RIGHT.prim_name AND
+					LEFT.AddrSuffix = RIGHT.suffix AND 
+					LEFT.Postdirectional = RIGHT.postdir AND
+					LEFT.SecondaryRange = RIGHT.sec_range AND 
+					LEFT.ZIP5 = RIGHT.zip AND
+					RIGHT.source_code_2 = 'P'),
 				TRANSFORM(Layouts_FDC.Layout_PropertyV2_Data_Temp,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
@@ -3777,6 +3802,7 @@ LienJudgement_DID_Key := IF(Options.IsFCRA, liensv2.key_liens_did_FCRA, liensv2.
 																				self := []));
 																				
 	Input_Best_SSN_nonFCRA := Dedup(Sort(Best_SSN_NonFCRA+Input_FDC, UIDAppend, P_InpClnSSN),UIDAppend, P_InpClnSSN);
+
 	
 	Key_QH_SSN :=	
 			PublicRecords_KEL.ecl_functions.DateSelector(JOIN(Input_FDC, autokey.Key_SSN(header_quick.str_AutokeyName),//non FCRA only
@@ -4320,8 +4346,57 @@ key_ccw_rid := IF( Options.isFCRA, eMerges.key_ccw_rid(TRUE), eMerges.key_ccw_ri
 					SELF.Dataset_eMerges__key_ccw_rid := ROWS(RIGHT),
 					SELF := LEFT,
 					SELF := []));		
+	
+//MAS is only using the FCRA version of these keys right now, however the nonFCRA version was left here if that changes in the future.		
+Key_SexOffender_DID := IF( Options.isFCRA,SexOffender.Key_SexOffender_DID(TRUE), SexOffender.Key_SexOffender_DID(FALSE) );			
+	SexOffender__Key_SexOffender_DID :=
+			JOIN(Input_FDC, Key_SexOffender_DID,
+			Common.DoFDCJoin_Key_SexOffender =TRUE AND
+			LEFT.P_LexID <> 0 AND
+				KEYED(LEFT.P_LexID =RIGHT.did),
+				TRANSFORM(Layouts_FDC.Layout_SexOffender__Key_SexOffender_DID,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.P_LexID := LEFT.P_LexID,
+					SELF := RIGHT,
+					SELF := LEFT,
+					SELF := []),
+					ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));		
+
+//MAS is only using the FCRA version of these keys right now, however the nonFCRA version was left here if that changes in the future.
+Key_SexOffender_SPK := IF( Options.isFCRA, SexOffender.Key_SexOffender_SPK(TRUE), SexOffender.Key_SexOffender_SPK(FALSE) );//no ccpa as of 5/12/2020
+	SexOffender__Key_SexOffender_SPK := 
+		PublicRecords_KEL.ecl_functions.DateSelector(JOIN(SexOffender__Key_SexOffender_DID, Key_SexOffender_SPK,
+					Common.DoFDCJoin_Key_SexOffender = TRUE AND
+					KEYED(LEFT.seisint_primary_key = RIGHT.sspk),
+				TRANSFORM(Layouts_FDC.Layout_SexOffender__Key_SexOffender_SPK,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.P_LexID := LEFT.P_LexID,	
+					SELF.Src := MDR.sourceTools.src_sexoffender;
+					SELF.DPMBitmap := SetDPMBitmap( Source := self.Src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					SELF := RIGHT,
+					SELF := LEFT,
+					SELF := []), 
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),FALSE,FALSE);		
+
+		WithSuppressionsSexOffender := IF((unsigned)input[1].p_inpclnarchdt = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..8]) and Options.isFCRA, 
+																		SexOffender__Key_SexOffender_SPK((string)offender_persistent_id NOT IN SexOffender_correct_record_id), 
+																		SexOffender__Key_SexOffender_SPK);
 		
-		
+		GetOverrideSexOffender := IF((unsigned)input[1].p_inpclnarchdt = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..8]) and Options.isFCRA AND Common.DoFDCJoin_Key_SexOffender = TRUE,
+															PublicRecords_KEL.MAS_get.FCRA_Overrides(options).GetOverrideSexOffenders(input_fdc));//consumer only since FCRA only -- no business in FCRA
+	
+		WithCorrectionsSexOffender := WithSuppressionsSexOffender+GetOverrideSexOffender;
+
+	With_SexOffender__Key_SexOffender_SPK := DENORMALIZE(With_eMerges__key_ccw_rid, WithCorrectionsSexOffender,
+			LEFT.UIDAppend = RIGHT.UIDAppend AND 
+			LEFT.P_LexID = RIGHT.P_LexID, GROUP,
+			TRANSFORM(Layouts_FDC.Layout_FDC,
+					SELF.Dataset_SexOffender__Key_SexOffender_SPK := ROWS(RIGHT),
+					SELF := LEFT,
+					SELF := []));	
+	
 	key_thrive_did := IF( Options.isFCRA, thrive.keys().Did_fcra.qa, thrive.keys().did.qa );//no ccpa as of 5/12/2020
 
 	thrive__keys__Did_qa := PublicRecords_KEL.ecl_functions.DateSelector(JOIN(input_FDC, key_thrive_did,
@@ -4348,7 +4423,7 @@ key_ccw_rid := IF( Options.isFCRA, eMerges.key_ccw_rid(TRUE), eMerges.key_ccw_ri
 	
 		WithCorrectionsThrive := WithSuppressionsThrive+GetOverrideThrive;	
 
-	With_thrive__keys__Did_qa := DENORMALIZE(With_eMerges__Key_HuntFish_Rid, WithCorrectionsThrive,
+	With_thrive__keys__Did_qa := DENORMALIZE(With_SexOffender__Key_SexOffender_SPK, WithCorrectionsThrive,
 			LEFT.UIDAppend = RIGHT.UIDAppend AND 
 			LEFT.P_LexID = RIGHT.P_LexID, GROUP,
 			TRANSFORM(Layouts_FDC.Layout_FDC,
@@ -4794,7 +4869,7 @@ Key_AccLogs_FCRA_SSN :=
 //Inquiries nonFCRA Bipids
 
 	Inquiry_AccLogs__Key_Inquiry_LinkIds_Table := IF(Common.DoFDCJoin_Inquiry_AccLogs__Inquiry_Table_LinkIDs = TRUE, 
-																							PublicRecords_KEL.ecl_functions.DateSelector(Inquiry_AccLogs.Key_Inquiry_LinkIds.kFetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Input_FDC),
+																							PublicRecords_KEL.ecl_functions.DateSelector(Inquiry_AccLogs.Key_Inquiry_LinkIds.kFetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Lookup_And_Input_LinkIDs),
 																							 mod_access,
 																							PublicRecords_KEL.ECL_Functions.Constants.SetLinkSearchLevel(PublicRecords_KEL.ECL_Functions.Constants.LinkSearch.SeleID),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
@@ -4804,7 +4879,7 @@ Key_AccLogs_FCRA_SSN :=
 	
 	
 	Inquiry_AccLogs__Key_Inquiry_LinkIds_Update := IF(Common.DoFDCJoin_Inquiry_AccLogs__Inquiry_Table_LinkIDs = TRUE, 
-																							PublicRecords_KEL.ecl_functions.DateSelector(Inquiry_AccLogs.Key_Inquiry_LinkIds_Update.kFetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Input_FDC),
+																							PublicRecords_KEL.ecl_functions.DateSelector(Inquiry_AccLogs.Key_Inquiry_LinkIds_Update.kFetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Lookup_And_Input_LinkIDs),
 																							mod_access,
 																							PublicRecords_KEL.ECL_Functions.Constants.SetLinkSearchLevel(PublicRecords_KEL.ECL_Functions.Constants.LinkSearch.SeleID),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/

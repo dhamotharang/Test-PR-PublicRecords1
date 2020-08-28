@@ -28,6 +28,58 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 			Options.IncludeSSNAddress OR
 			Options.IncludeSSNPhone);
 			
+	EXPORT DoFDCJoin_Best_Person__Key_Watchdog :=
+			NOT Options.isFCRA AND
+			(Options.IncludeMini OR
+			Options.IncludePerson OR
+			 Options.IncludePersonSSN OR 
+			 Options.IncludePersonPhone);
+	
+		//DataRestrictionMask[Risk_Indicators.iid_constants.posEquifaxRestriction] != '1'
+	// If Equifax Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL			
+	EXPORT DoFDCJoin_Best_Person__Key_Watchdog_FCRA_nonEN :=
+			Options.isFCRA AND
+			Options.Data_Restriction_Mask[Risk_Indicators.iid_constants.posEquifaxRestriction] <> '1' AND //lets not put more ssns through the inq keys than we need too
+			(Options.IncludeMini OR
+			Options.IncludePerson OR
+			 Options.IncludePersonSSN OR 
+			 Options.IncludePersonPhone);
+
+	//DataRestrictionMask[Risk_Indicators.iid_constants.posEquifaxRestriction] != '1'
+	// If Equifax Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL						 
+	EXPORT DoFDCJoin_Best_Person__Key_Watchdog_FCRA_nonEQ :=
+			Options.isFCRA AND
+			Options.Data_Restriction_Mask[Risk_Indicators.iid_constants.posEquifaxRestriction] = '1' AND //lets not put more ssns through the inq keys than we need too
+			(Options.IncludeMini OR
+			Options.IncludePerson OR
+			 Options.IncludePersonSSN OR 
+			 Options.IncludePersonPhone);			
+
+	EXPORT DoFDCJoin_Header__Key_Addr_Hist := 
+		Options.IncludeMini OR
+		Options.IncludePerson OR
+		Options.IncludePersonAddress OR
+		Options.IncludeZipCodePerson;
+
+	
+	EXPORT DoFDCJoin_BIPV2_Build__kfetch_contact_linkids :=
+		NOT Options.isFCRA AND
+	  (Options.IncludeMini OR
+		 Options.IncludeBusinessProx OR
+		 Options.IncludeProxPerson OR
+		 Options.IncludeSelePerson OR
+		 Options.IncludeSeleEmail OR
+		 Options.IncludeProxEmail);	
+			
+	EXPORT DoFDCJoinfn_IndexedSearchForXLinkIDs	:= 
+			NOT Options.isFCRA AND
+			 (Options.IncludeMini OR
+			 Options.IncludeBusinessSele OR
+			 Options.IncludeBusinessProx OR
+			 Options.IncludeProxPerson OR 
+			 Options.IncludeSelePerson OR 
+			 Options.IncludePerson);
+		 			
 	// FCRA only
 	EXPORT DoFDCJoin_Doxie_Files__Key_BocaShell_Crim_FCRA := 
 		Options.isFCRA AND
@@ -163,14 +215,7 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 	EXPORT DoFDCJoin_Fraudpoint3__Key_SSN := 
 		NOT Options.IsFCRA AND 
 		(Options.IncludePersonSSN OR 
-		 Options.IncludeSSNAddress);		
-
-	EXPORT DoFDCJoin_Header__Key_Addr_Hist := 
-		Options.IncludeMini OR
-		Options.IncludePerson OR
-		Options.IncludePersonAddress OR
-		Options.IncludeZipCodePerson;
-
+		 Options.IncludeSSNAddress);	
 
 	EXPORT DoFDCJoin_USPIS_HotList__key_addr_search_zip :=
 		NOT Options.IsFCRA AND   
@@ -416,16 +461,7 @@ EXPORT DoFDCJoin_dx_CFPB__key_Census_Surnames :=
 	   Options.IncludeSeleAddress OR
 	   Options.IncludeProxPhoneNumber OR
 	   Options.IncludeSelePhoneNumber);
-	
-	EXPORT DoFDCJoin_BIPV2_Build__kfetch_contact_linkids :=
-		NOT Options.isFCRA AND
-	  (Options.IncludeMini OR
-		 Options.IncludeBusinessProx OR
-		 Options.IncludeProxPerson OR
-		 Options.IncludeSelePerson OR
-		 Options.IncludeSeleEmail OR
-		 Options.IncludeProxEmail);	
-		 
+
 	EXPORT DoFDCJoin_BIPV2_Build__kfetch_contact_linkids_slim :=
 		NOT Options.isFCRA AND
 	  (Options.IncludeBusinessProx OR
@@ -561,15 +597,6 @@ EXPORT DoFDCJoin_dx_CFPB__key_Census_Surnames :=
 	
 	EXPORT DoFDCJoin_AVM_V2__Key_AVM_Address := 
 			Options.IncludeProperty;
-			
-	EXPORT DoFDCJoinfn_IndexedSearchForXLinkIDs	:= 
-			NOT Options.isFCRA AND
-			 (Options.IncludeMini OR
-			 Options.IncludeBusinessSele OR
-			 Options.IncludeBusinessProx OR
-			 Options.IncludeProxPerson OR 
-			 Options.IncludeSelePerson OR 
-			 Options.IncludePerson);
 			 
 	//used for ecrash by lexid, accnbr and ecrash4 NONFCRA only 
 	EXPORT DoFDCJoinfn_FLAccidents_Ecrash__key_Ecrash	:= 
@@ -577,34 +604,7 @@ EXPORT DoFDCJoin_dx_CFPB__key_Census_Surnames :=
 			 (Options.IncludePersonAccident OR
 			 Options.IncludeAccident);
 			 
-	EXPORT DoFDCJoin_Best_Person__Key_Watchdog :=
-			NOT Options.isFCRA AND
-			(Options.IncludeMini OR
-			Options.IncludePerson OR
-			 Options.IncludePersonSSN OR 
-			 Options.IncludePersonPhone);
-	
-	
-	//DataRestrictionMask[Risk_Indicators.iid_constants.posEquifaxRestriction] != '1'
-	// If Equifax Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL			
-	EXPORT DoFDCJoin_Best_Person__Key_Watchdog_FCRA_nonEN :=
-			Options.isFCRA AND
-			Options.Data_Restriction_Mask[Risk_Indicators.iid_constants.posEquifaxRestriction] <> '1' AND //lets not put more ssns through the inq keys than we need too
-			(Options.IncludeMini OR
-			Options.IncludePerson OR
-			 Options.IncludePersonSSN OR 
-			 Options.IncludePersonPhone);
-			 
 
-	//DataRestrictionMask[Risk_Indicators.iid_constants.posEquifaxRestriction] != '1'
-	// If Equifax Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL						 
-	EXPORT DoFDCJoin_Best_Person__Key_Watchdog_FCRA_nonEQ :=
-			Options.isFCRA AND
-			Options.Data_Restriction_Mask[Risk_Indicators.iid_constants.posEquifaxRestriction] = '1' AND //lets not put more ssns through the inq keys than we need too
-			(Options.IncludeMini OR
-			Options.IncludePerson OR
-			 Options.IncludePersonSSN OR 
-			 Options.IncludePersonPhone);
 			 
 	EXPORT DoFDCJoin_dx_Header__key_did_hhid :=		
 			 NOT Options.isFCRA AND
@@ -726,5 +726,10 @@ EXPORT DoFDCJoin_dx_CFPB__key_Census_Surnames :=
 		 AND Options.IncludeSSNSummary;
 
 	EXPORT DoFDCJoin_Overrides := 
-		 Options.IncludeOverrides;
+		 Options.IncludeOverrides;	
+		 
+	EXPORT DoFDCJoin_Key_SexOffender := 
+		Options.IsFCRA AND (
+		 Options.IncludeSexOffender OR
+		 Options.IncludePersonSexOffender);
 END;
