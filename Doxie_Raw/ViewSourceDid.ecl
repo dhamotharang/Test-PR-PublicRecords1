@@ -129,7 +129,7 @@ Doxie_Raw.layout_crs_raw getDidChildren(Doxie_Raw.Layout_input fileL) := transfo
     ds_proflic_child := if(viewProfLic(fileL.section), Doxie_Raw.PL_Raw(dids, mod_access, ''));
     ds_sanc_child := if(viewSanc(fileL.section),Doxie_Raw.Sanc_Raw(dids,,mod_access.date_threshold));
     ds_prov_child := if(viewProv(fileL.section),Doxie_Raw.Prov_Raw(dids));
-    ds_veh_child := if(viewVeh(fileL.section), Doxie_Raw.Veh_Raw(dids, , , , , , , mod_access.date_threshold, mod_access.dppa, mod_access.glb, mod_access.ln_branded,mod_access.ssn_mask,dl_mask_value,,,,mod_access.application_type,IncludeNonRegulatedVehicleSources));
+    ds_veh_child := if(viewVeh(fileL.section), Doxie_Raw.Veh_Raw(dids, mod_access, include_non_regulated_data := IncludeNonRegulatedVehicleSources));
     ds_veh_v2_child := if(viewVehV2(fileL.section), Doxie_Raw.VehV2_Raw(dids,,mod_access.ssn_mask,mod_access.date_threshold));
     ds_dea_child := if(viewDea(fileL.section), Doxie_Raw.Dea_Raw(dids, bdid0, mod_access.date_threshold, mod_access.dppa, mod_access.glb, mod_access.ssn_mask));
     ds_dea_v2_child := if(viewDeaV2(fileL.section), Doxie_Raw.DeaV2_Raw(dids, bdid0,, mod_access.dppa, mod_access.glb, mod_access.ssn_mask,mod_access.application_type));
@@ -186,7 +186,7 @@ Doxie_Raw.layout_crs_raw getDidChildren(Doxie_Raw.Layout_input fileL) := transfo
     ds_doc_events_child := if(viewDOC(fileL.section),Doxie_Raw.DOC_Events_Raw(doc_persons,true,true,true,true,true,,,,mod_access.date_threshold,mod_access.dppa,mod_access.glb));
     // same as in doxie@Comprehensive_Report_Service
     tempmod := module(project(global_mod,CriminalRecords_Services.IParam.report,opt))
-      doxie.compliance.MAC_CopyModAccessValues(mod_access);    
+      doxie.compliance.MAC_CopyModAccessValues(mod_access);
       export string14 did := input[1].id;
       export string25   doc_number   := '' ;
       export string60   offender_key := '' ;

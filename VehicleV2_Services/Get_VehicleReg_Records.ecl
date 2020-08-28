@@ -1,19 +1,19 @@
 IMPORT Vehiclev2_services, doxie, suppress, vehicle_wildcard, ut,
-       NID, drivers, doxie_Raw, doxie_build, iesp, STD;
+       NID, doxie_Raw, doxie_build, iesp, STD;
 
 EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,
                               BOOLEAN returnIesp,
                               BOOLEAN RawRecs = FALSE) := MODULE //TODO: make a FUNCTION
-   
+
   SHARED getVehRecs := VehicleV2_Services.Get_Vehicle_Records(aInput, returnIesp);
-  
+
     mod_access := PROJECT(aInput, doxie.IDataAccess);
-    
+
     // BEGIN ADDITION OF WILDCARD INPUT ENTRIES
     UNSIGNED zipRadius_val := 1 : STORED('Radius');
     STRING30 vin_val := '' : STORED('VinWild');
     STRING20 tag_val := '' : STORED('TagWild');
-            
+
     STRING30 county_value := aInput.County;
     STRING30 fname_val := aInput.FirstName;
     STRING30 mname_val := aInput.MiddleName;
@@ -25,11 +25,11 @@ EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,
     UNSIGNED8 maxResultsThisTime_val := IF (aInput.MaxResultsVal > 1000,1000,
                                           aInput.MaxResultsVal);
     UNSIGNED8 SkipRecords_val := 0 : STORED('SkipRecords');
-  
+
     BOOLEAN IncludeCriminalIndicators := aInput.includeCriminalIndicators;
     BOOLEAN IncludeNonRegulatedVehicleSources := aInput.IncludeNonRegulatedSources;
     // TODO ******* DOUBLECHECK MAY NEED SPECIAL CASE HERE TO KEEP DEFAULT SETTING
-     
+
     vin_value := STD.STR.ToUpperCase(vin_val);
     tag_value := STD.STR.ToUpperCase(tag_val);
     city_value := STD.STR.ToUpperCase(city_val);
@@ -40,7 +40,7 @@ EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,
     bodyIndex := Vehicle_Wildcard.Key_BodyStyle;
 
     BOOLEAN containsSearch_use := FALSE : STORED('containsSearch');
-    
+
     SET of STRING5 zips_in := IF (aInput.zip != '',[aInput.zip], []);
     STRING5 zip5_value := IF (AInput.zip != '', aInput.zip, '');
     UNSIGNED2 zipradius_value := (UNSIGNED2) IF (zipRadius_val = 0, 1, zipRadius_val);
@@ -50,7 +50,7 @@ EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,
     doWild := LENGTH(STD.STR.Filter(tag_value,'*?')) > 0;
     doWildVIN := LENGTH(STD.STR.Filter(vin_value,'*?')) > 0;
     doWildZip := LENGTH(STD.STR.Filter(zip5_value,'*?')) > 0;
-   
+
     // Determine allowable zip codes based on Zip5, ZipRadius, Zip, County, City and State inputs
     SET of INTEGER4 zipr_set := ut.fn_GetZipSet(,,zip5_value,,,zipradius_value);
     SET of INTEGER4 zipcity_set := ut.fn_GetZipSet(,,city_zip_value,,,zipradius_value);
@@ -81,18 +81,18 @@ EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,
       SELF.code:=ut.St2Code(ziplib.ZipToState2(LEFT.zip))
       ));
     SET of UNSIGNED1 state_use := SET(DEDUP(SORT(zipCdRec(code!=0)+zipCdRecs,code),code),code);
-          
-    
+
+
     STRING2 regState := '' : STORED('registerState'); // can possibly revert to dropping STORED after jira HPCC-13417
                                                       // is fixed. regState currently not used in query
     UNSIGNED1 regState_use := IF (regState = '', -1,
                                   ut.st2Code(STD.STR.ToUpperCase(regState)));
-    
+
     STRING tmpMake := '' : STORED('Make');
     STRING tmpMake2 := '' : STORED('Make2');
     STRING tmpMake3 := '' : STORED('Make3');
     STRING tmpMake4 := '' : STORED('Make4');
-  
+
      SET of STRING4 _make := IF (tmpMake != '' AND tmpmake2 != '' AND tmpMake3 != '' AND tmpmake4 != '',
                                 [tmpMake,tmpMake2,tmpMake3,tmpMake4],
                                 IF (tmpmake != '' AND tmpMake2 != '' AND tmpMake3 != '',
@@ -104,12 +104,12 @@ EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,
                                     )
                                   );
     make_use := IF (EXISTS(_make), vehicle_wildcard.Make2Code(_make),[]);
-                           
+
     STRING colorTmp := '' : STORED('Color');
     STRING ColorTmp2 := '' : STORED('Color2');
     STRING ColorTmp3 := '' : STORED('Color3');
     STRING ColorTmp4 := '' : STORED('Color4');
-        
+
     SET of STRING3 _majorColor := IF (ColorTmp != '' AND ColorTmp2 != '' AND ColorTmp3 != '' AND ColorTmp4 != '',
                                 [ColorTmp,ColorTmp2,ColorTmp3,ColorTmp4],
                                 IF (ColorTmp != '' AND ColorTmp2 != '' AND
@@ -122,7 +122,7 @@ EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,
                                   );
     vehicle_wildcard.MAC_SetConvert(_majorColor, vehicle_wildcard.Color2Code,
                     majorColor_use, 'majorColor_use')
-    
+
     STRING MinorcolorTmp := '' : STORED('MinorColor');
     STRING MinorColorTmp2 := '' : STORED('MinorColor2');
     STRING MinorColorTmp3 := '' : STORED('MinorColor3');
@@ -141,12 +141,12 @@ EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,
                                   );
     vehicle_wildcard.MAC_SetConvert(_minorColor, vehicle_wildcard.Color2Code,
                     minorColor_use, 'minorColor_use')
-        
+
     STRING tmpModel := '' : STORED('Model');
     STRING tmpModel2 := '' : STORED('Model2');
     STRING tmpModel3 := '' : STORED('Model3');
     STRING tmpModel4 := '' : STORED('Model4');
-    
+
     SET of STRING36 _model := IF (tmpModel != '' AND tmpModel2 != '' AND
                                  tmpModel3 != '' AND tmpModel4 != '',
                                 [tmpModel,tmpModel2,tmpModel3,tmpModel4],
@@ -163,7 +163,7 @@ EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,
                       KEYED((QSTRING36)LEFT.m = RIGHT.str[1..LENGTH(TRIM(LEFT.m))]),
                       KEEP (100));
     model_use := SET(model_convert, i);
-  
+
     SET of STRING36 _body := [] : STORED('body');
     body_dataset := DATASET(_body, {STRING36 b});
     body_convert := JOIN(DEDUP (body_dataset, b, all), bodyIndex,
@@ -173,11 +173,11 @@ EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,
 
     INTEGER _modelYearStart_use := 0 : STORED('YearMake');
     INTEGER modelYearStart_use := (INTEGER)_modelYearStart_use;
-    
+
     INTEGER _modelYearEnd_use := 0 : STORED('YearMakeMax');
     INTEGER modelYearEnd_use := IF (_modelYearStart_use <> 0 AND _modelYearEnd_use = 0,
                                         modelYearStart_use, _modelYearEnd_use);
-                                        
+
     INTEGER _ageRangeStart := 0 : STORED('Age');
     INTEGER ageRangeStart_ := IF (LENGTH(TRIM((STRING) _ageRangeStart)) < 4,
                 (INTEGER)_ageRangeStart,
@@ -192,12 +192,10 @@ EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,
 
     INTEGER ageRangeStart_use := IF(ageRangeStart_ < ageRangeEnd_, ageRangeStart_, ageRangeEnd_);
     INTEGER ageRangeEnd_use := IF(ageRangeStart_ < ageRangeEnd_, ageRangeEnd_, ageRangeStart_);
-    
-    
+
+
     STRING1 _sex := '' : STORED('Gender');
     STRING8 sex_use := STD.STR.ToUpperCase(_sex);
-    
-    UNSIGNED8 pre_MaxResultsThisTime_val := IF (aInput.MaxResultsthistimeVal = 0, 2000, aInput.MaxResultsthistimeVal );
 
     // allows to choose between record timeline statuses
     historyConstant := VehicleV2_services.Constant.HISTORY;
@@ -208,12 +206,12 @@ EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,
     UNSIGNED1 USE_ALL := 4;
     BOOLEAN incDetailedReg := FALSE : STORED('IncludeDetailedRegistrationType');
     STRING _tline_temp1 := '' : STORED('RegistrationStatus');
-    
+
     UNSIGNED1 tline_temp1 := MAP (STD.STR.ToUpperCase(_tline_temp1) = 'ALL' => USE_ALL,
                         STD.STR.ToUpperCase(_tline_temp1) = 'CURRENT' => USE_CURRENT,
                         STD.STR.ToUpperCase(_tline_temp1) = 'EXPIRED' => USE_EXPIRED,
                         USE_ALL);
-                     
+
     //unsigned1 tline_temp1 := IF (_tline_temp1 = '', USE_RECENT, (unsigned1) _tline_temp1);// : STORED ('RegistrationType');
     UNSIGNED1 tline_temp2 := USE_ALL : STORED ('RecordStatus'); // no longer the preferred input value
     UNSIGNED1 tline_use := MAP(
@@ -239,7 +237,7 @@ EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,
     // this point forward we're calling them what they are: CURRENT, EXPIRED, or HISTORICAL.
     // For backward compatibility, though, the incDetailedReg flag will indicate whether to
     // use the corrected terminology in the history_name output field.
- 
+
    wildfile := vehicle_wildcard.file_veh_hole;
 
   WILDFILE_READ_LIMIT := 50000; // to avoid excessive reading before postfiltering
@@ -273,7 +271,8 @@ EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,
     TRUE);
 
 // matching the age range
-CurrentYear := (INTEGER)(STD.Date.Today()[1..4]);
+todays_date := (string)STD.Date.Today();
+CurrentYear :=  (INTEGER)todays_date[1..4];
 AgeFrom1900 := CurrentYear - (1900 + wildfile.wd_years_since_1900);
 agematch := ageRangeStart_use = 0 OR ageRangeEnd_use = 0 OR
         (ageRangeStart_use-1 <= AgeFrom1900 AND
@@ -283,13 +282,13 @@ agematch := ageRangeStart_use = 0 OR ageRangeEnd_use = 0 OR
 //
 // used by to filter regular MVR search later.
 STRING ageStart := (STRING) ( currentYear - ageRangeEND_ -1)
-                              + STD.Date.Today()[5..6]
-                              + STD.Date.Today()[7..8];
+                              + todays_date[5..6]
+                              + todays_date[7..8];
                                  // used the ageRangeEn_ in case user enters just a value for ageStart.
 // used by to filter regular MVR search later.
 STRING ageEnd := (STRING) ( CurrentYear - ageRangeStart_ )
-                                    + STD.Date.Today()[5..6]
-                                    + STD.Date.Today()[7..8];
+                                    + todays_date[5..6]
+                                    + todays_date[7..8];
 /////////////////////////////////////////////////////////////////////////
 // matching the car year range
 yearMatch := modelYearStart_use = 0 OR modelYearEnd_use = 0 OR
@@ -330,8 +329,8 @@ wildfileAttr := CHOOSEN(wildfile (
 // Combine matches
 pre_filtered := LIMIT (wildfileAttr, WILDFILE_READ_LIMIT, SKIP);
  // THIS WAS THE ORGINAL LINE in QUERY ATTEMPT to make it fail gracefully i..e w pre_filtered hopefully set to 0.
- 
- 
+
+
 // ORIGINAL LINE BUT WE DON"T WANT FAIL QUERY because regular MVR search has to run so just return empty set.
 // the check if count< WILDFILE_READ_LIMIT ensures we don't run a
 // Fn_Find call if input is over the threshold : WILDFILE_READ_LIMIT
@@ -348,7 +347,7 @@ UNSIGNED2 REAL_LIMIT := ut.Min2(MaxResults_val,UPPER_LIMIT);
 
 dup_pre_filtered_wseq := DEDUP(SORT(pre_Filtered_wseq,vehicle_key,iteration_key,sequence_key),
     vehicle_key,iteration_key,sequence_key);
-    
+
 UNSIGNED1 dppa_purpose := mod_access.dppa;
 Vehiclev2_services.Mac_DppaCheck(dup_pre_filtered_wseq,dup_pre_filtered_wdppa)
 
@@ -363,8 +362,8 @@ F := PROJECT(filtered_wseq,TRANSFORM(doxie_Raw.Layout_VehRawBatchInput.input_w_k
   SELF := LEFT,SELF.input.seq := LEFT.wd_veh_id, SELF :=[]));
 
 FT := IF (Count(F) > 0,
-         Vehiclev2_services.Fn_Find(F,TRUE,,TRUE,IncludeCriminalIndicators,IncludeNonRegulatedVehicleSources).v1_ret);
-         
+         Vehiclev2_services.Fn_Find(F,mod_access,TRUE,,TRUE,IncludeCriminalIndicators,IncludeNonRegulatedVehicleSources));
+
 doxie.Layout_VehicleSearch getRaw(Filtered_wseq L,FT R) :=
 TRANSFORM
   //SELF.pick := L.wd_person_source;
@@ -420,7 +419,7 @@ toOut := PROJECT(FT(
 // overhead, but it allows to remove duplicates and enforce MaxResults_val returned.
 
 results_out := SORT(CHOOSEN (toOut, REAL_LIMIT),seq);
-                                   
+
    // inputfile, outputfile, ssnfield, DLfield, maskSSN, maskDL
    // now mask the SSN and the DL numbers
 suppress.MAC_Mask(results_out, outf_c, own_1_ssn, OWN_1_DRIVER_LICENSE_NUMBER, TRUE, TRUE);
@@ -429,7 +428,7 @@ suppress.MAC_Mask(outf_d, outf_e, reg_1_ssn, REG_1_DRIVER_LICENSE_NUMBER, TRUE, 
 suppress.MAC_Mask(outf_e, results_cleaned, reg_2_ssn, REG_2_DRIVER_LICENSE_NUMBER, TRUE, TRUE);
 
 result_return := results_cleaned;
-   
+
 // Sort Filtered by TAG, id, and name to create unique ordering
 outfile := SORT(result_return, make_code, -model_description, LICENSE_PLATE_NUMBERxBG4, VID, own_1_lname, own_1_fname, own_1_mname, pick);
 
@@ -454,7 +453,7 @@ doxie.MAC_Marshall_Results(outfile,outf);
  // This comes as a result of noFail being passed in by VehicleV2_Services.VehicleRegSearchService
  // as a constant to VehicleV2_Services.IParam.getSearchModule in order to bypass the
  // experian gateway error code so that wildcard search above here can be preformed.
- 
+
    VehicleV2_Services.Layouts.layout_MVRRegistrationExtra toOutRecord (RECORDOF(wildCardRecsTmp) L) := TRANSFORM
     SELF.DataSource := L.Source;
     //SELF.ExternalKey := //(String)l.Vehicle_Key+l.Iteration_Key+l.Sequence_Key;
@@ -479,7 +478,7 @@ doxie.MAC_Marshall_Results(outfile,outf);
       //SELF.MatchCode := LEFT.matchCode;
       SELF := [];
     ));
-        
+
      Registrant1 := PROJECT(L, TRANSFORM(iesp.motorvehicle.t_MotorVehicleSearchRegistrant,
                       SELF.RegistrantInfo.HasCriminalConviction := LEFT.reg_1_hascriminalconviction;
                       SELF.RegistrantInfo.IsSexualOffender := LEFT.reg_1_hascriminalconviction;
@@ -494,7 +493,7 @@ doxie.MAC_Marshall_Results(outfile,outf);
                                                           ''); // VALUES of M, F, U;
                       SELF.RegistrantInfo.DriverLicenseNumber := LEFT.Reg_1_driver_license_number;
                       SELF.RegistrantInfo.BusinessName := LEFT.reg_1_company_name;
-                     
+
                       SELF.RegistrantInfo.Name := iesp.ecl2esp.setName(LEFT.reg_1_fname,
                                                                           LEFT.reg_1_mname,
                                                                           LEFT.reg_1_lname,
@@ -502,7 +501,7 @@ doxie.MAC_Marshall_Results(outfile,outf);
                                                                           LEFT.reg_1_title,
                                                                           '');
                         // probably don't want to call Address cleaner for every rec from wildcard search
-        
+
                       SELF.RegistrantInfo.Address := iesp.ECL2ESP.SetAddress(
                                   //LEFT.prim_name,LEFT.prim_range,LEFT.predir,LEFT.postdir,
                                   '','','','',
@@ -520,7 +519,7 @@ doxie.MAC_Marshall_Results(outfile,outf);
                         SELF := [];
                         ));
       Registrant2 := PROJECT(L, TRANSFORM(iesp.motorvehicle.t_MotorVehicleSearchRegistrant,
-      
+
                       SELF.RegistrantInfo.HasCriminalConviction := LEFT.reg_2_hascriminalconviction;
                       SELF.RegistrantInfo.IsSexualOffender := LEFT.reg_2_hascriminalconviction;
                       SELF.RegistrantInfo.UniqueId := (STRING) LEFT.reg_2_did;
@@ -534,7 +533,7 @@ doxie.MAC_Marshall_Results(outfile,outf);
                                                           ''); // VALUES of M, F, U;
                       SELF.RegistrantInfo.DriverLicenseNumber := LEFT.reg_2_driver_license_number;
                       SELF.RegistrantInfo.BusinessName := LEFT.reg_2_company_name;
-                    
+
                       SELF.RegistrantInfo.Name := iesp.ecl2esp.setName(LEFT.reg_2_fname,
                                                                           LEFT.reg_2_mname,
                                                                           LEFT.reg_2_lname,
@@ -554,14 +553,14 @@ doxie.MAC_Marshall_Results(outfile,outf);
                                   LEFT.reg_2_county_name,'',LEFT.reg_2_street_address,'','');
                         SELF := [];
                         ));
-                        
+
       SELF.Registrants := CHOOSEN(Registrant1+Registrant2,iesp.Constants.MV.MaxCountRegistrants);
      SELF.unacceptableInput := badSearch; // use this field as flag to trigger roxie eror code
     SELF := []
   END;
-  
+
  WildRecsToIESP := IF (~badSearch, PROJECT (WildCardRecsTmp, toOutRecord(LEFT)));
-   
+
   // Now filter the recs form the Regular MVR search based on Current/historical/expired
   // AND also by color if that condition applies.
   // NOTE : mvr wildcard search results have these filters applied.
@@ -574,7 +573,7 @@ doxie.MAC_Marshall_Results(outfile,outf);
   CURRENT_HISTORICAL_FILTER2 := IF (CURRENT_HISTORICAL_FILTER = 'HISTORICAL', 'EXPIRED', '');
   // if neither we can shortcut filter here and just use
   // Filter out current/historical info from the regular MVR search results
-  
+
     mvrSearchIESPResults := PROJECT(getVehRecs.iespREsults, TRANSFORM(VehicleV2_Services.Layouts.layout_MVRRegistrationExtra,
                                    SELF.seqNumber := COUNTER;
                                    SELF := LEFT,
@@ -599,7 +598,7 @@ doxie.MAC_Marshall_Results(outfile,outf);
                                                         VehicleRegistrantsFiltered(RegistrantInfo.Gender[1] = sex_use OR
                                                                                    RegistrantInfo.Gender[1] = 'U')
                                                         );
-                                                         
+
                  VehicleRegistrantsFilteredAge := IF (ageRangeStart_ <> 0 AND ageRangeEnd_ <> 0,
                                                         VehicleRegistrantsFilteredGender(
                                                          ((((RegistrantInfo.DOB.Year * 10000) + (RegistrantInfo.DOB.Month *100) + RegistrantInfo.DOB.DAY)
@@ -616,7 +615,7 @@ doxie.MAC_Marshall_Results(outfile,outf);
              ))(VehicleInfo.vin <> '' AND VehicleInfo.Vin <> restrictedCONSTANT);
 
  // filter out DOB and gender by owner:
- 
+
   filteredMVROwners := PROJECT(filteredMVRSearchIespResults,
                 TRANSFORM(VehicleV2_Services.Layouts.layout_MVRRegistrationExtra,
             vehicleOwners :=
@@ -624,7 +623,7 @@ doxie.MAC_Marshall_Results(outfile,outf);
             TRANSFORM( iesp.motorvehicle.t_MotorVehicleSearchOwner,
                   SELF := LEFT));
                   tmpCount := COUNT(vehicleOwners);
-                  
+
                  VehicleOwnersFilteredAge := IF (ageRangeStart_ <> 0 AND ageRangeEnd_ <> 0,
                                                   VehicleOwners(
                                                   ((((OwnerInfo.DOB.Year * 10000) + (OwnerInfo.DOB.Month *100) + OwnerInfo.DOB.Day)
@@ -644,7 +643,7 @@ doxie.MAC_Marshall_Results(outfile,outf);
              SELF.Owners := vehicleOwnersGender;
              SELF := IF (tmpCountFiltered > 0 OR tmpCount = 0, LEFT);
              ))(VehicleInfo.vin <> '' AND VehicleInfo.Vin <> restrictedCONSTANT);
-             
+
   // filter out by color
      filteredMVRSearchIespResults2Color := IF ( ColorTmp <> '',
         filteredMVROwners(VehicleInfo.MajorColor = '' OR
@@ -653,17 +652,17 @@ doxie.MAC_Marshall_Results(outfile,outf);
         STD.STR.ToUpperCase(TRIM(VehicleInfo.MajorColor,LEFT,RIGHT)) = ColorTmp3 OR
         STD.STR.ToUpperCase(TRIM(VehicleInfo.MajorColor,LEFT,RIGHT)) = ColorTmp4),
         filteredMVROwners);
-        
+
  // filter by year make
          filteredMVRSearchMakeYear := IF (modelYearStart_use <> 0,
          filteredMVRSearchIespResults2Color(VehicleInfo.YearMake >= ModelYearStart_use AND
                                             VehicleInfo.YearMake <= ModelYearEnd_use),
                             filteredMVRSearchIespResults2Color);
-                                            
+
   filteredMVRSearch := filteredMVRSearchMakeYear;
   // also do two joins here each a left outer that way if we don't have results from either search
   // we are sure to get the results combined.
-  
+
   RegVehRecsRegSearchTmp := JOIN(filteredMVRSearch, WildREcsToIESP,
                             LEFT.VehicleInfo.VIN = RIGHT.VehicleInfo.Vin,
                             TRANSFORM(VehicleV2_Services.Layouts.layout_MVRRegistrationExtra,
@@ -672,7 +671,7 @@ doxie.MAC_Marshall_Results(outfile,outf);
                             SELF.RealTimeDataSearched := LEFT.DataSource = 'RealTime';
                             SELF := LEFT;
                             SELF := []), LEFT OUTER);
-                            
+
   RegVehRecsWildTmp := JOIN(WildREcsToIESP, getVehRecs.iespResults,
                             LEFT.VehicleInfo.VIN = RIGHT.VehicleInfo.Vin,
                             TRANSFORM(VehicleV2_Services.Layouts.layout_MVRRegistrationExtra,
@@ -691,7 +690,7 @@ doxie.MAC_Marshall_Results(outfile,outf);
   // 2. 0 recs in regular MVR search and 1 default rec in wildcard and 'unacceptable input' flag set to true.
   // 3. 1 or more recs in MVR search and 1 more more good recs in wildcard and unacceptableInput set to false.
   // 4. 0 recs in regular MVR search and 0 recs in wildcard search
-  
+
   // this short cut of error logic above using 'unaccceptable input' is now removed.
   RegVehRecsWildCardRegSearchTmp := IF (COUNT(RegVehRecsWildTmp) = 0
                                         AND EXISTS(RegVehRecsRegSearchTmp),
@@ -710,4 +709,3 @@ doxie.MAC_Marshall_Results(outfile,outf);
 
   EXPORT RegVehRecsWildCardRegSearch := RegVehRecsWildCardRegSearchSorted;
   END;
-  
