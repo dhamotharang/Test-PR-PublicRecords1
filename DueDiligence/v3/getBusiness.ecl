@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, Doxie, DueDiligence, Header, Risk_Indicators, STD;
+﻿IMPORT DueDiligence;
 
 /*
   This function is to be used as an entrance to retrieve Due Diligence business
@@ -25,7 +25,8 @@
 
 
   INPUT DEPENDENCIES:
-    Legal Attributes - data is searched by seleID level only
+    Legal Attributes - civil legal data is searched by seleID level
+                     - other legal attributes are based on the LexID/DID of the BEO(s)
     
 */
 
@@ -36,6 +37,13 @@ EXPORT getBusiness(DATASET(DueDiligence.v3Layouts.DDInput.BusinessSearch) inData
                    BOOLEAN debugMode = FALSE) := FUNCTION
 
 
+
+    //see which grouping of attributes that have been requested (ie economic vs legal)
+    requestingLegalAttributes := DueDiligence.v3Common.DDBusiness.IsRequestedModuleBeingRequested(DueDiligence.ConstantsQuery.MODULE_LEGAL, attributesRequested);
+    requestingEconomicAttributes := DueDiligence.v3Common.DDBusiness.IsRequestedModuleBeingRequested(DueDiligence.ConstantsQuery.MODULE_ECONOMIC, attributesRequested);
+    requestingOperatingAttributes := DueDiligence.v3Common.DDBusiness.IsRequestedModuleBeingRequested(DueDiligence.ConstantsQuery.MODULE_OPERATING, attributesRequested);
+    requestingNetworkAttributes := DueDiligence.v3Common.DDBusiness.IsRequestedModuleBeingRequested(DueDiligence.ConstantsQuery.MODULE_NETWORK, attributesRequested);
+      
 
 
 
@@ -72,47 +80,99 @@ EXPORT getBusiness(DATASET(DueDiligence.v3Layouts.DDInput.BusinessSearch) inData
                                                     SELF := [];));
 
 
+
+    //////////////////////////////////
+    //     Prerequisite Section
+    ///////////////////////////////// 
     
-    //get information from shared resources and/or additional data used in various calls: header, executives
-    retrievePrereqs := DueDiligence.v3BusinessData.getDataDependencies(convertToInternal, attributesRequested, regulatoryAccess, ddOptions);
+    //retrieve the best data
+    bestInquired := DueDiligence.v3BusinessData.getInputBestData(convertToInternal, regulatoryAccess, ddOptions);
     
-    validBusiness := retrievePrereqs(inquiredBusiness.seleID > 0);
-    invalidBusiness := retrievePrereqs(inquiredBusiness.seleID = 0);
+    validBusiness := bestInquired(inquiredBusiness.seleID > 0);
+    invalidBusiness := bestInquired(inquiredBusiness.seleID = 0);
+    
+
+    //get BEO information - information pertaining to individuals associated with the business
+    beoData := DueDiligence.v3BusinessData.getExec(validBusiness, attributesRequested, regulatoryAccess, ddOptions);
+    
+    
+    //get information from shared resources and/or additional data used in various calls: bestinfo, header
+    // retrievePrereqs := DueDiligence.v3BusinessData.getDataDependencies(convertToInternal, attributesRequested, regulatoryAccess, ddOptions);
+    
+    
+    businessesToUse := beoData;
+
+    
     
  
    
-    //see which grouping of attributes that have been requested (ie assets vs legal)
-    requestingLegalAttributes := DueDiligence.v3Common.DDBusiness.IsRequestedModuleBeingRequested(DueDiligence.ConstantsQuery.MODULE_LEGAL, attributesRequested);
     
 
 
     //get requested attributes and report data if requested
     noResults := DATASET([], DueDiligence.v3Layouts.InternalBusiness.BusinessResults);
-        
-    matchLevelAttributeData := DueDiligence.v3BusinessAttributes.getMatchLevel(validBusiness, inData); //always called regardless of module(s)
-    
-    legalAttributeData := IF(requestingLegalAttributes, 
-                                DueDiligence.v3AttributeModules.getBusinessLegal(validBusiness, attributesRequested, regulatoryAccess, ddOptions),
-                                noResults);
-                                
-
-
-    //Temp Code
-    tempMods := DueDiligence.v3Common.DDBusiness.IsRequestedModuleBeingRequested(DueDiligence.ConstantsQuery.MODULE_ECONOMIC, attributesRequested) OR
-                DueDiligence.v3Common.DDBusiness.IsRequestedModuleBeingRequested(DueDiligence.ConstantsQuery.MODULE_OPERATING, attributesRequested) OR
-                DueDiligence.v3Common.DDBusiness.IsRequestedModuleBeingRequested(DueDiligence.ConstantsQuery.MODULE_NETWORK, attributesRequested);
-
-
-    oldAttributesWithReport := IF(tempMods, 
-                                  DueDiligence.getAllBusAttrRpt(retrievePrereqs, inData, attributesRequested, regulatoryAccess, ddOptions, debugMode), 
-                                  noResults);
-                                
     
     //for those that did not have a valid lexID return -1 for attribute and flags for those attributes requested
     noDataForAttribute := DueDiligence.v3BusinessAttributes.notFound(invalidBusiness, attributesRequested);
+     
+     
+    //////////////////////////////////
+    //          Match Level
+    ///////////////////////////////// 
+    matchLevelData := DueDiligence.v3BusinessAttributes.getMatchLevel(businessesToUse, inData); //always called regardless of module(s)
+    
+    
+    //////////////////////////////////
+    //      Legal Module Data
+    /////////////////////////////////
+    legalModuleInfo := IF(requestingLegalAttributes, 
+                                DueDiligence.v3AttributeModules.getBusinessLegal(businessesToUse, attributesRequested, regulatoryAccess, ddOptions),
+                                noResults);
+                                
+                                
+    //////////////////////////////////
+    //     Economic Module Data
+    /////////////////////////////////
+    economicModuleInfo := noResults;
+    
+    
+    //////////////////////////////////
+    //     Operating Module Data
+    /////////////////////////////////
+    operatingModuleInfo := noResults;
+    
+    
+    //////////////////////////////////
+    //      Network Module Data
+    /////////////////////////////////
+    networkModuleInfo := IF(requestingNetworkAttributes, 
+                            DueDiligence.v3AttributeModules.getBusinessNetwork(businessesToUse, attributesRequested),
+                            noResults);
+                                
+
+
+    //////////////////////////////////
+    //  Temp to not break existing
+    /////////////////////////////////
+    tempMods := requestingEconomicAttributes OR
+                requestingOperatingAttributes OR
+                requestingNetworkAttributes;
+
+
+    oldAttributesWithReport := IF(tempMods, 
+                                  DueDiligence.getAllBusAttrRpt(businessesToUse + invalidBusiness, inData, attributesRequested, regulatoryAccess, ddOptions, debugMode), 
+                                  noResults);
+                                
+    
+    
     
 
-    allAttributesAndReports := matchLevelAttributeData + legalAttributeData + oldAttributesWithReport + noDataForAttribute;
+
+
+    allAttributesAndReports := matchLevelData + legalModuleInfo + economicModuleInfo + 
+                               operatingModuleInfo + networkModuleInfo + noDataForAttribute +
+                               oldAttributesWithReport;
+                               
     
     rollAllData := ROLLUP(SORT(allAttributesAndReports, seq, ultID, orgID, seleID),
                           LEFT.seq = RIGHT.seq AND
@@ -169,8 +229,8 @@ EXPORT getBusiness(DATASET(DueDiligence.v3Layouts.DDInput.BusinessSearch) inData
                                     SELF.busBEOProfLicense_Flag := DueDiligence.v3Common.General.FirstPopulatedString(busBEOProfLicense_Flag);
                                     SELF.busBEOUSResidency := DueDiligence.v3Common.General.FirstPopulatedString(busBEOUSResidency);
                                     SELF.busBEOUSResidency_Flag := DueDiligence.v3Common.General.FirstPopulatedString(busBEOUSResidency_Flag);
-                                    // SELF.busBEOAccessToFundsProperty := DueDiligence.v3Common.General.FirstPopulatedString(busBEOAccessToFundsProperty);
-                                    // SELF.busBEOAccessToFundsProperty_Flag := DueDiligence.v3Common.General.FirstPopulatedString(busBEOAccessToFundsProperty_Flag);
+                                    SELF.busBEOAccessToFundsProperty := DueDiligence.v3Common.General.FirstPopulatedString(busBEOAccessToFundsProperty);
+                                    SELF.busBEOAccessToFundsProperty_Flag := DueDiligence.v3Common.General.FirstPopulatedString(busBEOAccessToFundsProperty_Flag);
                                     // SELF.busLinkedBusinesses := DueDiligence.v3Common.General.FirstPopulatedString(busLinkedBusinesses);
                                     // SELF.busLinkedBusinesses_Flag := DueDiligence.v3Common.General.FirstPopulatedString(busLinkedBusinesses_Flag);
                                     
@@ -231,15 +291,27 @@ EXPORT getBusiness(DATASET(DueDiligence.v3Layouts.DDInput.BusinessSearch) inData
     //DEBUGGING
     IF(debugMode, OUTPUT(inData, NAMED('v3BusInData')));
     IF(debugMode, OUTPUT(convertToInternal, NAMED('convertToInternalBus')));
-    IF(debugMode, OUTPUT(retrievePrereqs, NAMED('retrievePrereqsBus')));
-    IF(debugMode, OUTPUT(legalAttributeData, NAMED('getLegalAttributeDataBus')));
+    
+    IF(debugMode, OUTPUT(bestInquired, NAMED('bestInquired')));
+    IF(debugMode, OUTPUT(validBusiness, NAMED('validBusiness')));
+    IF(debugMode, OUTPUT(invalidBusiness, NAMED('invalidBusiness')));
+    IF(debugMode, OUTPUT(beoData, NAMED('beoData')));
+    
+    IF(debugMode, OUTPUT(matchLevelData, NAMED('matchLevelDataBus')));
+    IF(debugMode, OUTPUT(legalModuleInfo, NAMED('legalModuleInfoBus')));
+    IF(debugMode, OUTPUT(economicModuleInfo, NAMED('economicModuleInfo')));
+    IF(debugMode, OUTPUT(operatingModuleInfo, NAMED('operatingModuleInfo')));
+    IF(debugMode, OUTPUT(networkModuleInfo, NAMED('networkModuleInfo')));
+    
     IF(debugMode, OUTPUT(tempMods, NAMED('tempMods')));
     IF(debugMode, OUTPUT(oldAttributesWithReport, NAMED('oldAttributesWithReportBus')));
+    
     IF(debugMode, OUTPUT(allAttributesAndReports, NAMED('allAttributesAndReportsBus')));
     IF(debugMode, OUTPUT(rollAllData, NAMED('rollAllDataBus')));
     IF(debugMode, OUTPUT(addInputBest, NAMED('addInputBestBus')));
     IF(debugMode, OUTPUT(noDataForAttribute, NAMED('noDataForAttributeBus')));
     IF(debugMode, OUTPUT(final, NAMED('finalBus')));
+    
     
    
     
