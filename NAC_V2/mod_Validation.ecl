@@ -33,9 +33,6 @@ EXPORT mod_Validation := MODULE
 
 
 
-
-
-
 	shared validProgram(string1 program, string2 state, string4 RecordCode) := IF(program not in Mod_Sets.Benefit_Type,
 										DATASET([{errcodes.E103, 'E', 'F', FieldCode('E',errcodes.E103), program, state, RecordCode}], rErr)); 
 	
@@ -113,9 +110,9 @@ EXPORT mod_Validation := MODULE
 					NOT isAlpha2(MatchedGroupId[1..2]) OR NOT ut.isNumeric(MatchedGroupId[3..4]),
 							DATASET([{errcodes.E124, 'E', 'F', '2052', MatchedGroupId, state, RecordCode}], rErr));
 					
-	shared validMatchedProgram(string1 program, string2 state, string4 RecordCode) := 
-						IF(program not in Mod_Sets.Benefit_Type,
-							DATASET([{errcodes.E103, 'E', 'F', '2053', program, state, RecordCode}], rErr)); 
+	shared validMatchedProgram(string1 program, string2 state, string4 RecordCode) :=  
+						IF(program not in Mod_Sets.Benefit_Type, 
+							DATASET([{errcodes.E126, 'E', 'F', '2053', program, state, RecordCode}], rErr));  
 
 	shared boolean isOptionalInteger(string n) := REGEXFIND('^\\d*$', TRIM(n));
 						
@@ -123,17 +120,9 @@ EXPORT mod_Validation := MODULE
 	shared string ReplaceInvalidChar(string s) := s;	//REGEXREPLACE('([^ -~])', s, '?');
 
 
-
-	shared ValidGroupIDFormat(string GroupID, string2 state, string4 RecordCode) := 
-				IF((REGEXFIND('[A-Z]{2}[0-9]{2}', STD.Str.ToUpperCase(GroupID)) AND LENGTH(TRIM(GroupID)) = 4) = FALSE,
-							DATASET([{errcodes.E126, 'E', 'F', FieldCode('E',errcodes.E126), GroupID, state, RecordCode}], rErr)); 
+	shared ValidRecordLength(BOOLEAN invalidLength, string2 state, string4 RecordCode, unsigned4 textLength) := IF(invalidLength = TRUE, 
+										DATASET([{errcodes.E127, 'E', 'F', FieldCode('E',errcodes.E127), textLength, state, RecordCode}], rErr));  
 	
-	
-	shared ValidRecordLength(BOOLEAN invalidLength, string2 state, string4 RecordCode) := IF(invalidLength = TRUE,
-										DATASET([{errcodes.E127, 'E', 'F', FieldCode('E',errcodes.E127), invalidLength, state, RecordCode}], rErr)); 
-	
-
-
 
 	EXPORT ClientFile(Dataset(Layouts2.rClientEx) ds) := 
 			PROJECT(ds, TRANSFORM(Layouts2.rClientEx,
@@ -153,7 +142,7 @@ EXPORT mod_Validation := MODULE
 							+ ValidEligibilityPeriod(left.PeriodType, left.ProgramState, left.RecordCode)
 							+ ValidStartDate(left.StartDate, left.ProgramState, left.RecordCode)
 							+ ValidEndDate(left.StartDate, left.EndDate, left.ProgramState, left.RecordCode)
-							+ ValidRecordLength(left.invalidLength,  left.ProgramState, left.RecordCode)
+							+ ValidRecordLength(left.invalidLength,  left.ProgramState, left.RecordCode, left.textLength)
 							// warnings
 							+ ValidEligibilityDate(left.EffectiveDate, left.Eligibility, left.ProgramState, left.RecordCode)
 							+	IF(HasInvalidChar(left.LastName), 
@@ -206,7 +195,7 @@ EXPORT mod_Validation := MODULE
 							validProgramState(left.ProgramState, left.ProgramState, left.RecordCode)
 							+ validProgram(left.ProgramCode, left.ProgramState, left.RecordCode)
 							+ validCaseId(left.CaseID, left.ProgramState, left.RecordCode)
-							+ ValidRecordLength(left.invalidLength,  left.ProgramState, left.RecordCode)
+							+ ValidRecordLength(left.invalidLength,  left.ProgramState, left.RecordCode, left.textLength)
 							// warnings
 							+ IF(left.CountyCode='', 
 									DATASET([{warningCodes.W117, 'W', 'F', FieldCode('W',warningCodes.W117), left.CountyCode, left.ProgramState, left.RecordCode}], rErr))
@@ -234,7 +223,7 @@ EXPORT mod_Validation := MODULE
 								validProgramState(left.ProgramState, left.ProgramState, left.RecordCode)
 							+ validProgram(left.ProgramCode, left.ProgramState, left.RecordCode)
 							+ validCaseId(left.CaseID, left.ProgramState, left.RecordCode) 
-							+ ValidRecordLength(left.invalidLength,  left.ProgramState, left.RecordCode)
+							+ ValidRecordLength(left.invalidLength,  left.ProgramState, left.RecordCode, left.textLength)
 							+ IF(left.ClientId <> '',  validClientId(left.ClientId, left.ProgramState, left.RecordCode))		// client id is optional
 							+ IF(left.AddressType = '' OR left.AddressType not in NAC_V2.Mod_sets.Address_Type, 
 									DATASET([{errcodes.E108, 'E', 'F', FieldCode('E', errcodes.E108), left.AddressType, left.ProgramState, left.RecordCode}], rErr))
@@ -270,7 +259,7 @@ EXPORT mod_Validation := MODULE
 				PROJECT(ds, TRANSFORM(Layouts2.rStateContactEx,
 					self.dsErrs := 
 							validProgramState(left.ProgramState, left.ProgramState, left.RecordCode)
-							+ 	ValidRecordLength(left.invalidLength,  left.ProgramState, left.RecordCode)
+							+ 	ValidRecordLength(left.invalidLength,  left.ProgramState, left.RecordCode, left.textLength)
 							+ validProgram(left.ProgramCode, left.ProgramState, left.RecordCode)
 							+ IF(left.CaseID<>'', validCaseId(left.CaseID, left.ProgramState, left.RecordCode))
 							+ IF(left.ClientId<>'', validClientId(left.ClientId, left.ProgramState, left.RecordCode))
@@ -292,10 +281,9 @@ EXPORT mod_Validation := MODULE
 					self.dsErrs := 
 							// source fields
 							validProgramState(left.SourceProgramState, left.SourceProgramState, left.RecordCode)
-							+ ValidGroupIDFormat(left.SourceGroupId, left.SourceProgramState, left.RecordCode)
 							+ validProgram(left.SourceProgramCode, left.SourceProgramState, left.RecordCode)
 							+ validClientId(left.SourceClientId, left.SourceProgramState, left.RecordCode)
-							+ ValidRecordLength(left.invalidLength,  left.SourceProgramState, left.RecordCode)
+							+ ValidRecordLength(left.invalidLength,  left.SourceProgramState, left.RecordCode, left.textLength)
 							// 
 							// matched fields
 							+ validMatchedProgramState(left.MatchedState, left.SourceProgramState, left.RecordCode)

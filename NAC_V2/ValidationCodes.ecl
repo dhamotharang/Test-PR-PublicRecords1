@@ -82,8 +82,8 @@
 		{errcodes.E123,'E123','R','3003','Missing Related Case Record'},
 		{errcodes.E124,'E124','F','2052','Invalid/Missing Matched Group Id'},
 		{errcodes.E125,'E125','F','2043','Missing Contact Information'},
-		{errcodes.E126,'E126','F','2053','Invalid/Matched Program Code Format'},
-		{errcodes.E127,'E127','F','3006','Invalid/Extraneous Trailing Data'}
+		{errcodes.E126,'E126','F','2053','Invalid/Matched Program Code'}, 
+		{errcodes.E127,'E127','R','3006','Invalid/Extraneous Trailing Data'} 
 	], rCodeTable);
 
 

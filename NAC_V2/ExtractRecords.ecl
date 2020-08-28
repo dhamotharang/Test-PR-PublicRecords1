@@ -22,14 +22,6 @@ EXPORT ExtractRecords(string ilfn) := MODULE
 	END;	
 
 
-	// shared UNSIGNED4 CA01_maxvalidlength := 0;
-	// shared UNSIGNED4 AD01_maxvalidlength := 0;
-	// shared UNSIGNED4 CL01_maxvalidlength := 0;
-	// shared UNSIGNED4 SC01_maxvalidlength := 0;
-	// shared UNSIGNED4 EX01_maxvalidlength := 0;
-	
-
-
 	shared ds := SORT(
 						dataset(ilfn, NAC_V2.Layouts2.rRawFile, CSV)(LENGTH(TRIM(text,left,right)) > 4),
 						GetFileName(filename));
@@ -51,8 +43,6 @@ EXPORT ExtractRecords(string ilfn) := MODULE
 				self.textLength :=  (LENGTH(left.text) -4);
 	 ));
 
-	//	export nacin := UNGROUP(ds1);
-
 
 rNac2 := RECORD
 	rNac;
@@ -60,29 +50,27 @@ rNac2 := RECORD
 	BOOLEAN 		invalidLength;
 END;	
 rNac2 xform2(rNac l) := TRANSFORM 
-	self.sizeof_rec := MAP(
+	self.sizeof_rec := MAP( 
 		l.recordcode = 'CA01' => SIZEOF(l.CaseRec),
 		l.recordcode = 'AD01' => SIZEOF(l.AddressRec),
 		l.recordcode = 'CL01' => SIZEOF(l.ClientRec),
 		l.recordcode = 'SC01' => SIZEOF(l.StateContactRec),
 		l.recordcode = 'EX01' => SIZEOF(l.ExceptionRec),
-		0);
+		0); 
 		self.invalidLength := IF( (l.textLength-4) >
 			MAP(
 			l.recordcode = 'CA01' => SIZEOF(l.CaseRec),
 			l.recordcode = 'AD01' => SIZEOF(l.AddressRec),
 			l.recordcode = 'CL01' => SIZEOF(l.ClientRec),
 			l.recordcode = 'SC01' => SIZEOF(l.StateContactRec),
-			l.recordcode = 'EX01' => SIZEOF(l.ExceptionRec),
+			l.recordcode = 'EX01' => SIZEOF(l.ExceptionRec), 
 			0)
 		 , TRUE, FALSE);
 		self := l;
 END;
  
 
-EXPORT nacin := UNGROUP(PROJECT(ds1, xform2(left)));
-
-
+EXPORT nacin := UNGROUP(PROJECT(ds1, xform2(left))); 
 
 
 	export cases := 
@@ -91,24 +79,12 @@ EXPORT nacin := UNGROUP(PROJECT(ds1, xform2(left)));
 										self.RecordCode := left.RecordCode;
 										self.GroupId := GetGid(left.filename);
 										self.OrigGroupId := GetGid(left.filename);
-										//self.filename := fname;
 										self.Created := RightNow;
 										self.Updated := RightNow;
 										self.filename := left.filename;
 										self.seqnum := left.seqnum;
-									//	self.recordLength := left.recordLength;
-										self.textLength := left.textLength;
-										self.invalidLength := left.invalidLength;
-										//self.BadRec := 
-										
-					// 					           If LENGTH(left.text) > SIZEOF(Nac_V2.Layouts2.rCase
-          //             TRANSFER(text, Nac_V2.Layouts2.rBadRecord – [RecordCode, invalidLength, recordLength));
-          //             Or maybe this works better:
-          //             TRANSFER(text, Nac_V2.Layouts2.rBadRecord.text);
-          // else
-          //        TRANSFER(text, Nac_V2.Layouts2.rCase - RecordCode));
-
-
+										self.textLength := left.textLength; 
+										self.invalidLength := left.invalidLength; 
 										self := [];
 										));
 
@@ -118,13 +94,12 @@ EXPORT nacin := UNGROUP(PROJECT(ds1, xform2(left)));
 											self.RecordCode := left.RecordCode;
 											self.GroupId := GetGid(left.filename);
 											self.OrigGroupId := GetGid(left.filename);
-											//self.filename := fname;
 											self.Created := RightNow;
 											self.Updated := RightNow;
 											self.filename := left.filename;
 											self.seqnum := left.seqnum;
-											self.textLength := left.textLength;
-											self.invalidLength := left.invalidLength;
+											self.textLength := left.textLength; 
+											self.invalidLength := left.invalidLength; 
 											self := [];
 											)
 										);
@@ -135,13 +110,12 @@ EXPORT nacin := UNGROUP(PROJECT(ds1, xform2(left)));
 												self.RecordCode := left.RecordCode;
 												self.GroupId := GetGid(left.filename);
 												self.OrigGroupId := GetGid(left.filename);
-												//self.filename := fname;
 												self.Created := RightNow;
 												self.Updated := RightNow;
 												self.filename := left.filename;
 												self.seqnum := left.seqnum;
-												self.textLength := left.textLength;
-												self.invalidLength := left.invalidLength;
+												self.textLength := left.textLength; 
+												self.invalidLength := left.invalidLength; 
 												self := [])
 										);
 										
@@ -151,7 +125,6 @@ EXPORT nacin := UNGROUP(PROJECT(ds1, xform2(left)));
 										self.RecordCode := left.RecordCode;
 										self.GroupId := GetGid(left.filename);
 										self.OrigGroupId := GetGid(left.filename);
-										//self.filename := fname;
 										self.Created := RightNow;
 										self.Updated := RightNow;
 										self.filename := left.filename;
@@ -170,8 +143,8 @@ EXPORT nacin := UNGROUP(PROJECT(ds1, xform2(left)));
 										self.Created := RightNow;
 										self.Updated := RightNow;
 										self.seqnum := left.seqnum;
-										self.textLength := left.textLength;
-										self.invalidLength := left.invalidLength;
+										self.textLength := left.textLength; 
+										self.invalidLength := left.invalidLength; 
 										self := [];
 										));
 										
@@ -190,19 +163,6 @@ EXPORT nacin := UNGROUP(PROJECT(ds1, xform2(left)));
 			TABLE(nacin, {nacin.filename, n := COUNT(GROUP)}, filename, few);
 
 		export RecordCount := COUNT(nacin);
-
-
-
-// rl_test_length := RECORD
-// 	NAC_V2.Layouts2.rRawFile;
-// 	UNSIGNED4  line_length;
-// END;
-// rl_test_length xform_add_length(NAC_V2.Layouts2.rRawFile l) := TRANSFORM	
-// 	SELF.line_length := LENGTH(TRIM(l.text)) -4;
-// 	SELF := l;
-// END;
-// ds_test_length := CHOOSEN(SORT(PROJECT(ds, xform_add_length(LEFT)), -line_length), 1);
-// EXPORT UNSIGNED4 max_line_length := ds_test_length[1].line_length;      
 
 
 END;

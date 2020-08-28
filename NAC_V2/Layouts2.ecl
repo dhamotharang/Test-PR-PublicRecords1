@@ -107,10 +107,6 @@ END;
 export rBadRecord := RECORD
 	string4			RecordCode;
 	string64		text;
-	// unsigned4   recordLength := 0;
-	// unsigned4   textLength := 0;
-	// boolean     invalidLength := false;
-	
 END;
 
 EXPORT validRecordCodes := ['CA01','CL01','AD01','SC01','EX01'];
@@ -149,10 +145,8 @@ export rCommonEx := RECORD
 		string4						OrigGroupId := '';
 		string32					filename := '';
 		unsigned4					seqnum := 0;
-	//	unsigned4					recordLength;
 		unsigned4   			textLength;
 		boolean 					invalidLength;
-
 END;
 
 // extended records

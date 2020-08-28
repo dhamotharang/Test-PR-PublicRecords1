@@ -10,12 +10,12 @@ EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string ilfn) := function
 
 		fn := ExtractFileName(ilfn);
 
-		//nac2 := DATASET(lfn, $.Layouts2.rNac2Ex, thor);
 
 		cases := PROJECT(nac2(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCaseEx,
 										self.RecordCode := left.RecordCode;
 										self := LEFT.CaseRec;
 										));
+
 
 		clients := PROJECT(nac2(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClientEx,
 										self.RecordCode := left.RecordCode;
@@ -72,23 +72,10 @@ EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string ilfn) := function
 	END;
 	ds_programs01 := PROJECT(tbl_programs, transform_programs(LEFT));
 
-	programs_fake := DATASET(
-	[
-		{'T','311'},
-		{'M','2'},
-		{'C','2340'},
-		{'N','9000'},
-		{'I','100'},
-		{'D','1200'},
-		{'P','40'}
-	], NAC_V2.Layouts2.rItemSummary);
 
-		programs :=  ds_programs01 + programs_fake;
- 		//programs := SORT(ds_programs01 , itemcode, LOCAL);
+ 		programs := SORT(ds_programs01 , itemcode, LOCAL);
  		
-		 
-
-
+		
 
 	types01 := SORT(Nac_V2.ExtractRecords(ilfn).Types, RecordCode, LOCAL);
 	NAC_V2.Layouts2.rItemSummary transform_types(RECORDOF(types01) l) := TRANSFORM
@@ -98,13 +85,12 @@ EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string ilfn) := function
 	types := PROJECT(types01, transform_types(LEFT));
 
 
-
-
 		ncr := nac_v2.Print.NCR2_Report(fn, errs, total, nErrors, nWarnings, 'XX', ExcessiveInvalidRecordsFound, programs, types);
 
 		ncd := nac_v2.Print.NCD2_Report(fn, errs, total, nErrors, nWarnings, nWarned, nRejected, 'XX', ExcessiveInvalidRecordsFound);
 
 		ncx := Nac_v2.Print.NCX2_Report(cases, clients, addresses, contacts, exceptions, badRecords); 
+
 
 		return MODULE
 			EXPORT	DATASET($.ValidationCodes.rError) dsErrs := errs;

@@ -132,7 +132,7 @@ EXPORT Print := MODULE
 	p_prog := programs(itemcode = 'P');  // CHIP
 	UNSIGNED4 p_count := p_prog[1].counts;
 	i_prog := programs(itemcode = 'I');  // WIC
-  UNSIGNED4 i_count := i_prog[1].counts;              
+  UNSIGNED4 i_count := i_prog[1].counts;               
 
 	ds_programs_label := DATASET([{0, 'RECORD COUNTS BY PROGRAM:'}] , {UNSIGNED4 id, string130 text});
 	ds_programs_dsnap := DATASET([{1, 'DSNAP         \t' + INTFORMAT(d_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
@@ -143,7 +143,7 @@ EXPORT Print := MODULE
 	ds_programs_cn    := DATASET([{6, 'Child Nutr.   \t' + INTFORMAT(n_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
 	ds_programs_chip  := DATASET([{7, 'CHIP          \t' + INTFORMAT(p_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
 	ds_programs_wic   := DATASET([{8, 'WIC           \t' + INTFORMAT(i_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
-  ds_programs_endspace := DATASET([{999, ''}] , {UNSIGNED4 id, string130 text});
+  ds_programs_endspace := DATASET([{999, ''}] , {UNSIGNED4 id, string130 text}); 
 
 	ds_programs_all_01 :=  
 		ds_programs_label +
@@ -155,9 +155,9 @@ EXPORT Print := MODULE
 		IF(c_count>0 , ds_programs_cc) +
 		IF(i_count>0 , ds_programs_wic) +
 		IF(n_count>0 , ds_programs_cn) +
-		ds_programs_endspace ;
+		ds_programs_endspace; 
 
-		ds_programs_all := PROJECT(SORT(ds_programs_all_01, id, LOCAL), drow);
+		ds_programs_all := PROJECT(SORT(ds_programs_all_01, id, LOCAL), drow); 
 
 		AD01_type := types(itemcode = 'AD01');  // Addresses
 		UNSIGNED4 AD01_count := AD01_type[1].counts;
@@ -168,7 +168,7 @@ EXPORT Print := MODULE
 		SC01_type := types(itemcode = 'SC01');  //  State Contacts
 		UNSIGNED4 SC01_count := SC01_type[1].counts;
 		EX01_type := types(itemcode = 'EX01');  //  Exceptions
-		UNSIGNED4 EX01_count := EX01_type[1].counts;
+		UNSIGNED4 EX01_count := EX01_type[1].counts; 
 
 
 				ds := DATASET([{lfn}], dRow)
@@ -190,7 +190,7 @@ EXPORT Print := MODULE
 												
 
 	 			 
-					& ds_programs_all
+					& ds_programs_all 
 			 
 
 				 	& DATASET([
@@ -200,7 +200,7 @@ EXPORT Print := MODULE
 										{'CL01          \t' + INTFORMAT(CL01_count , 12, 0)},
 										{'SC01          \t' + INTFORMAT(SC01_count , 12, 0)},
 										{'EX01          \t' + INTFORMAT(EX01_count , 12, 0)},
-										{''}
+										{''} 
 									], dRow)																
 							& IF(reject,
 										DATASET([{'FILE CONTAINS TOO MANY ERRORS AND CANNOT BE ACCEPTED FOR PROCESSING.   ****   FILE WAS REJECTED   ********'},{''}], dRow),
@@ -224,28 +224,6 @@ EXPORT Print := MODULE
 		toText		:=	rollup(ds, true, tText(left, right));
 		return toText[1].Text;
 	END;
-
-
-	// dText := RECORD
-	// 	string			text;
-	// END;	
-	// export string NCR2_to_Text(string lfn) := FUNCTION
-	// 		dNcr2 := dataset(lfn, dRow, thor);
-	// 		ds := PROJECT(dNcr2, TRANSFORM(dText,
-	// 							self.Text := TRIM(left.Text);));
-	// 		dText	tText(dText l, dText r)	:= 
-	// 			transform
-	// 				self.Text	:=	trim(l.Text) + LF + trim(r.Text);
-	// 			end;
-	// 	toText		:=	rollup(ds, true, tText(left, right));
-	// 	return toText[1].Text;
-	// END;
-
-	
-
-
-
-
 
 
 	export	rNCD	:=
@@ -326,8 +304,10 @@ EXPORT Print := MODULE
 									self.ErrorCode := nac_V2.ValidationCodes.GetErrorText(err.Severity, err.errCode);
 									self.FieldName := nac_v2.ValidationCodes.GetFieldName(err.FieldCode);
 									self.SampleValue := if(err.badValue='', Missing, 
-														IF(self.ErrorCode = 'W116', $.ValidationCodes.addr_errors(err.badValue),
-											err.badValue));
+											IF(self.ErrorCode = 'W116', $.ValidationCodes.addr_errors(err.badValue),
+								err.badValue));
+
+
 									self := err;
 							END;
 
