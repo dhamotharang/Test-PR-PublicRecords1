@@ -1,4 +1,4 @@
-﻿IMPORT AutoStandardI, DueDiligence, iesp, STD, WSInput;
+﻿IMPORT DueDiligence, iesp, WSInput;
 
 
 EXPORT DueDiligence_BusinessRptService := MACRO
@@ -33,7 +33,7 @@ EXPORT DueDiligence_BusinessRptService := MACRO
 
     //based on what was requested, call the appropriate attributes  
     ddResults := DueDiligence.CommonQueryXML.mac_v3BusinessXML(wseq, cleanData, regulatoryCompliance, DDssnMask, optionsIn.AdditionalInput, 
-                                                               requestResponseLayout, DueDiligence.Constants.STRING_TRUE, debugIndicator);
+                                                               requestResponseLayout, DueDiligence.Constants.STRING_TRUE, FALSE);
 
 
 

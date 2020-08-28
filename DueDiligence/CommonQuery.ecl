@@ -1,4 +1,4 @@
-﻿IMPORT Address, Business_Risk_BIP, DueDiligence, iesp, Risk_Indicators, STD, ut;
+﻿IMPORT Address, Business_Risk_BIP, DueDiligence, Risk_Indicators, STD, ut;
 
 
 EXPORT CommonQuery := MODULE
@@ -348,7 +348,7 @@ EXPORT CommonQuery := MODULE
             EXPORT BOOLEAN includeOffenseType := useMods AND DueDiligence.ConstantsQuery.MODULE_LEGAL IN setMods;
             EXPORT BOOLEAN includeBEOProfLicense := useMods AND DueDiligence.ConstantsQuery.MODULE_NETWORK IN setMods;
             EXPORT BOOLEAN includeBEOUSResidency := useMods AND DueDiligence.ConstantsQuery.MODULE_NETWORK IN setMods;
-            // EXPORT BOOLEAN includeBEOAccessToFundsProperty := useMods AND DueDiligence.ConstantsQuery.MODULE_NETWORK IN setMods; 
+            EXPORT BOOLEAN includeBEOAccessToFundsProperty := useMods AND DueDiligence.ConstantsQuery.MODULE_NETWORK IN setMods; 
             // EXPORT BOOLEAN includeLinkedBusinesses := useMods AND DueDiligence.ConstantsQuery.MODULE_NETWORK IN setMods;      
             EXPORT BOOLEAN includeAll := allAttributes;
         END;

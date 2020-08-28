@@ -60,6 +60,19 @@ EXPORT DDBusiness := MODULE
   END;
   
   
+  EXPORT GetBEOExecDetails(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) inData) := FUNCTION
+  
+    RETURN NORMALIZE(inData, LEFT.beos, TRANSFORM(DueDiligence.v3Layouts.InternalBusinessExec.ExecDetails,
+                                                  SELF.seq := LEFT.seq;
+                                                  SELF.ultID := LEFT.inquiredBusiness.ultID;
+                                                  SELF.orgID := LEFT.inquiredBusiness.orgID;
+                                                  SELF.seleID := LEFT.inquiredBusiness.seleID;
+                                                  SELF := RIGHT;
+                                                  SELF := [];));
+  END;
+  
+  
+  
   EXPORT GetBEOBusiness(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) inData) := FUNCTION
     
     //get all the BEOs with lexID
@@ -120,7 +133,7 @@ EXPORT DDBusiness := MODULE
                           attributesRequested.includePublicRecordAgeRange OR attributesRequested.includeShellShelf;
                           
         legalAttrs := attributesRequested.includeStateLegalEvent OR attributesRequested.includeCivilLegalEvent OR attributesRequested.includeOffenseType;
-        networkAttrs := attributesRequested.includeBEOProfLicense OR attributesRequested.includeBEOUSResidency;
+        networkAttrs := attributesRequested.includeBEOProfLicense OR attributesRequested.includeBEOUSResidency OR attributesRequested.includeBEOAccessToFundsProperty;
         
         
         modUpper := STD.Str.ToUpperCase(moduleName);
