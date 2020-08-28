@@ -229,7 +229,8 @@ export Constants := module
     MDR.sourceTools.src_Teletrack,
     MDR.sourceTools.src_SalesChannel,
     MDR.sourceTools.src_Thrive_LT,
-    MDR.sourceTools.src_Thrive_PD
+    MDR.sourceTools.src_Thrive_PD,
+    MDR.sourceTools.src_Netwise
     ];
 
   // Email Royalties: Ensure that removed providers are absent from FCRA/non-FCRA queries

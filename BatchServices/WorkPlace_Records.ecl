@@ -21,6 +21,7 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 	boolean IncludeSpouseOnly   := false : STORED('IncludeSpouseOnlyIfNoDebtor');
 	boolean IncludeCorp         := false : STORED('IncludeCorpInfo');
 	boolean IncludeSelfRepCompanyName := false : STORED('IncludeSelfRepCompanyName');
+	boolean IncludeNetwise      := false : STORED('IncludeNetwise');
 
  	string in_excluded_sources  := '' : stored('ExcludedSources');
 
@@ -155,9 +156,14 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 	// Bring back to the slimmed PAW layout
 	ds_paw_recs_slimmed:= PROJECT(ds_paw_recs,BatchServices.WorkPlace_Layouts.POE_DIDKey_Slimmed);
 
+  // Get Netwise (Gateway) records and transform to poe slim layout
+  _ds_netwise_recs := WorkPlace_Services.Functions.GetNetwiseRecords(ds_subject_dids, false);
+  ds_netwise_recs := if(IncludeNetwise, _ds_netwise_recs);
+  ds_netwise_recs_slim := PROJECT(ds_netwise_recs, $.WorkPlace_Layouts.POE_DIDKey_Slimmed);
+
   // 7.1 Combine POE, PSS & PAW slimmed recs into 1 dataset here and
-	//     join to POE source_hierarchy key file to assign the source_order.
-	ds_combine_sources	:=	ds_poe_recs_slimmed	+	ds_PSS_Results_Slim + ds_paw_recs_slimmed;
+  //     join to POE source_hierarchy key file to assign the source_order.
+  ds_combine_sources	:=	ds_poe_recs_slimmed	+	ds_PSS_Results_Slim + ds_paw_recs_slimmed + ds_netwise_recs_slim;
 
 	ds_all_recs_slimmed := join(ds_combine_sources,
 	                            POE.Keys().source_hierarchy.qa,
