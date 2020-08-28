@@ -8,6 +8,8 @@ export ReportService_Records := module
     export string12 unique_id := ''; // same as did
     export boolean include_sos := false;
     export boolean is_spouse := false;
+    export boolean IncludeNetwise := false;
+    export boolean CachedResponseOnly := true;
     export string excluded_sources := ''; // default to null (no excluded sources)
   end;
 
@@ -62,9 +64,12 @@ export ReportService_Records := module
     // Get PAW data only for the dids with POE data.
     ds_paw_recs := WorkPlace_Services.Functions.getPawRecs(ds_poe_recs, mod_access);
 
+    _ds_netwise_recs := WorkPlace_Services.Functions.GetNetwiseRecords(ds_did_in, in_mod.CachedResponseOnly);
+    ds_netwise_recs := if(in_mod.IncludeNetwise, _ds_netwise_recs);
+
     // 5. Combine POE & PSS slimmed recs into 1 dataset here and
     // join to POE source_hierarchy key file to assign the source_order.
-    ds_all_recs := join(ds_poe_recs + ds_pss_recs + ds_paw_recs,
+    ds_all_recs := join(ds_poe_recs + ds_pss_recs + ds_paw_recs + ds_netwise_recs,
       POE.Keys().source_hierarchy.qa,
       keyed(left.source = right.source),
       transform(WorkPlace_Services.Layouts.poe_didkey_plus,
