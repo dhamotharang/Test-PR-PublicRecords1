@@ -3,7 +3,7 @@
 EXPORT Key_LinkIds := MODULE
 
   // DEFINE THE INDEX
-	shared superfile_name		:= cortera.keynames().LinkIds.Built;
+	shared superfile_name		:= cortera.keynames().LinkIds.qa;
 	
 	shared Base				:= Cortera.Files().Base.Header.built(COUNTRY='US');
 	
