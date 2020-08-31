@@ -4,6 +4,7 @@ EXPORT Rollup_Base(DATASET(DataBridge.Layouts.Base) pDataset) := FUNCTION
 
 	pDataset_Dist := DISTRIBUTE(pDataset, HASH(name+company));
 	pDataset_sort := SORT( pDataset_Dist 
+	                      ,-process_date
 												,name                ,company                ,address             ,address2
 												,city                ,state                  ,scf                 ,zip_code5              
 												,zip_code4           ,mail_score             ,area_code           ,telephone_number
@@ -17,7 +18,7 @@ EXPORT Rollup_Base(DATASET(DataBridge.Layouts.Base) pDataset) := FUNCTION
 												,site_source8        ,site_source9           ,site_source10			  ,individual_source1 
 												,individual_source2  ,individual_source3     ,individual_source4  ,individual_source5 
 												,individual_source6  ,individual_source7     ,individual_source8  ,individual_source9 
-												,individual_source10 ,email_status           ,-process_date
+												,individual_source10 ,email_status
 												,LOCAL );
 	
 	DataBridge.Layouts.Base RollupUpdate(DataBridge.Layouts.Base L, DataBridge.Layouts.Base R) := TRANSFORM
