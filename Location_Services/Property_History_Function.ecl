@@ -325,7 +325,10 @@ FUNCTION
 	dmData0 := JOIN(fares,
    				key_deed,
    				keyed(LEFT.fares_id=RIGHT.ln_fares_id) //and right.ln_fares_id[2]='D', 
-   				and if(includeAssignmentsAndReleases, right.ln_fares_id[2] ='D' or (right.ln_fares_id[2]='M' and right.record_type IN LN_PropertyV2.Constants.setAssignRelsRecordTypes), right.ln_fares_id[2]='D'),
+   				and if(includeAssignmentsAndReleases, 
+                 right.ln_fares_id[2] ='D' or (right.ln_fares_id[2]='M' and LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code)), 
+                 right.ln_fares_id[2]='D'
+                ),
    				get_deed_summary(LEFT,RIGHT),
 				limit(0), keep(1));
 	// Make buyers and sellers child datasets as opposed to using so many denormalize statements

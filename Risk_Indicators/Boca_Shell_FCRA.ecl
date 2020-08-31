@@ -48,10 +48,10 @@
 	<part name="ExcludeOtherLiens" type="xsd:boolean"/>
 	<part name="ExcludeJudgments" type="xsd:boolean"/>
 	<part name="ExcludeEvictions" type="xsd:boolean"/>
-<!--	<part name="Gateways" type = 'tns:XmlDataSet' cols = '70' rows = '10'/>-->
+	<part name="Gateways" type = 'tns:XmlDataSet' cols = '70' rows = '10'/>
  </message>
 */ 
-import gateway, risk_indicators;
+import gateway, risk_indicators, ut, doxie, std;
 export Boca_Shell_FCRA := MACRO
 
 /* Force layout of WsECL page */
@@ -103,7 +103,8 @@ export Boca_Shell_FCRA := MACRO
   'ExcludeFederalTaxLiens',
   'ExcludeOtherLiens',
   'ExcludeJudgments',
-  'ExcludeEvictions'
+  'ExcludeEvictions',
+	'Gateways'
 	));
 	
 
@@ -137,7 +138,7 @@ STRING30 prev_lname_value := ''      : stored('FormerName');
 unsigned1 DPPA_Purpose := 0;
 unsigned1 GLB_Purpose := 8;
 STRING5 industry_class_val := '' : STORED('IndustryClass');
-industry_class_value := StringLib.StringToUpperCase(industry_class_val);
+industry_class_value := std.str.ToUpperCase(industry_class_val);
 unsigned3 history_date := 999999 : stored('HistoryDateYYYYMM');
 string20	historyDateTimeStamp := '' : stored('historyDateTimeStamp');  // new for shell 5.0
 boolean	includeRelativeInfo := false;
@@ -191,7 +192,9 @@ tmpCityFltr := if(ExcludeCityTaxLiens, '0', tmpFilterLienTypes[1..1]);
 		tmpJdgmtsFltr +
 		tmpEvictionsFltr;
 
-gateways := DATASET ([{'neutralroxie', neutral_ip}], Gateway.Layouts.Config);
+ 	gateways_orig := DATASET ([{'neutralroxie', neutral_ip}], Gateway.Layouts.Config);
+	gateways_new := Gateway.Configuration.Get();
+	gateways := if(count(gateways_new(servicename<>'')) > 0, gateways_new, gateways_orig);  // allow for old habits/scripts to use just the neutral_ip field
 
 //Since RiskView only runs ADL shell for Prescreen, enforce that here as well
 if(ADL_Based_Shell and ~isPreScreen, FAIL('Request for ADL shell must also request Prescreen'));
@@ -222,10 +225,10 @@ risk_indicators.Layout_Input into() := transform
 	self.phone10 := phone_value;
 	self.wphone10 := wphone_value;
 	
-	self.fname := stringlib.stringtouppercase(fname_val);
-	self.mname := stringlib.stringtouppercase(mname_val);
-	self.lname := stringlib.stringtouppercase(lname_val);
-	self.suffix := stringlib.stringtouppercase(suffix_val);
+	self.fname := std.str.touppercase(fname_val);
+	self.mname := std.str.touppercase(mname_val);
+	self.lname := std.str.touppercase(lname_val);
+	self.suffix := std.str.touppercase(suffix_val);
 
 	self.prim_range := clean_a2[1..10];
 	self.predir := clean_a2[11..12];
@@ -249,14 +252,14 @@ risk_indicators.Layout_Input into() := transform
 	
 	dl_num_clean := riskwise.cleanDL_num(dl_number_value);
 	
-	SELF.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	SELF.dl_state := stringlib.stringtouppercase(dl_state_value);
+	SELF.dl_number := std.str.touppercase(dl_num_clean);
+	SELF.dl_state := std.str.touppercase(dl_state_value);
 	
 	SELF.email_address := email_value;
 	SELF.ip_address := ip_value;
 	
-	SELF.employer_name := stringlib.stringtouppercase(employe_name_value);
-	SELF.lname_prev := stringlib.stringtouppercase(prev_lname_value);
+	SELF.employer_name := std.str.touppercase(employe_name_value);
+	SELF.lname_prev := std.str.touppercase(prev_lname_value);
 	self.historydate := if(historyDateTimeStamp<>'',(unsigned)historyDateTimeStamp[1..6], history_date);
 	self.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp(historydateTimeStamp, history_date);
 end;
@@ -283,5 +286,5 @@ ret := risk_indicators.Boca_Shell_Function_FCRA
 
 output (ret, NAMED('Results'))
 
+
 ENDMACRO;
-// Risk_Indicators.Boca_Shell_FCRA()

@@ -52,9 +52,7 @@ module
 		export Releases_HI_MN_Record_Type := 'Q';
 		
 	END;
-	
-	EXPORT setAssignRelsRecordTypes := [ASSIGN_RELS.Assignments_Record_Type, ASSIGN_RELS.Releases_Record_Type, ASSIGN_RELS.Assignments_HI_MN_Record_Type, ASSIGN_RELS.Releases_HI_MN_Record_Type];
-	
+		
 	export	SOURCE_CD_PARTY_TP	:=
 	MODULE	
 		export Owner := 'O';

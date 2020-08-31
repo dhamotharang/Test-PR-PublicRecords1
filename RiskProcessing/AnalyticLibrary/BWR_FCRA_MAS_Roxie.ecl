@@ -27,7 +27,7 @@ GLBA := 0; // FCRA isn't GLBA restricted
 DPPA := 0; // FCRA isn't DPPA restricted
 DataPermissionMask := '0000000000000';  
 DataRestrictionMask := '1000010000000100000000000000000000000000000000000'; 
-
+Include_Minors := TRUE;
 // Inteded Purpose for FCRA. Stubbing this out for now so it can be used in the settings output for now.
 Intended_Purpose := ''; 
 // Intended_Purpose := 'PRESCREENING'; 
@@ -48,6 +48,11 @@ Output_Master_Results := FALSE;
 // Toggle to include/exclude SALT profile of results file
 Output_SALT_Profile := FALSE;
 // Output_SALT_Profile := TRUE;
+
+// Use default list of allowed sources
+AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+// Do not exclude any additional sources from allowed sources dataset.
+ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 
 RecordsToRun := 10;
 eyeball := 100;
@@ -102,7 +107,10 @@ soapLayout := RECORD
 	UNSIGNED1 DPPAPurpose;
 	BOOLEAN OutputMasterResults;
 	BOOLEAN IsMarketing;
+	BOOLEAN IncludeMinors;
 	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 end;
 
 Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
@@ -111,32 +119,33 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT BOOLEAN isFCRA := TRUE;
 	EXPORT STRING ArchiveDate := histDate;
 	EXPORT STRING InputFileName := InputFile;
-	EXPORT STRING PermissiblePurpose := Intended_Purpose; // FCRA only
+	EXPORT STRING IntendedPurpose := Intended_Purpose; // FCRA only
 	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
 	EXPORT STRING Data_Permission_Mask := DataPermissionMask;
 	EXPORT UNSIGNED GLBAPurpose := GLBA;
 	EXPORT UNSIGNED DPPAPurpose := DPPA;
 	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
+	EXPORT BOOLEAN IncludeMinors := Include_Minors;
+
 END;
 
 
 soapLayout trans (pp le):= TRANSFORM 
-  // SELF.CustomerId := le.CustomerId;
-	SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout,
-		SELF := LEFT;
-		SELF := []));
-	SELF.Gateways := PROJECT(ut.ds_oneRecord, 
-			TRANSFORM(Gateway.Layouts.Config, 
-				SELF.ServiceName := 'neutralroxie'; 
-				SELF.URL := NeutralRoxieIP; 
-				SELF := []));
-	SELF.ScoreThreshold := Settings.LexIDThreshold;
-	SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
-	SELF.DataPermissionMask := Settings.Data_Permission_Mask;
-	SELF.GLBPurpose := Settings.GLBAPurpose;
-	SELF.DPPAPurpose := Settings.DPPAPurpose;
-	SELF.IsMarketing := FALSE;
-	SELF.OutputMasterResults := Output_Master_Results;
+// SELF.CustomerId := le.CustomerId;
+    SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout,
+        SELF := LEFT;
+        SELF := []));   
+    SELF.Gateways := 	DATASET([{'neutralroxie', NeutralRoxieIP}], Gateway.Layouts.Config);
+    SELF.ScoreThreshold := Settings.LexIDThreshold;
+    SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
+    SELF.DataPermissionMask := Settings.Data_Permission_Mask;
+    SELF.GLBPurpose := Settings.GLBAPurpose;
+    SELF.DPPAPurpose := Settings.DPPAPurpose;
+    SELF.IncludeMinors := Settings.IncludeMinors;
+    SELF.IsMarketing := FALSE;
+    SELF.OutputMasterResults := Output_Master_Results;
+		SELF.AllowedSourcesDataset := AllowedSourcesDataset;
+		SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;
 END;
 
 soap_in := PROJECT(pp, trans(LEFT));
@@ -152,6 +161,7 @@ OUTPUT(CHOOSEN(soap_in, eyeball), NAMED('Sample_SOAPInput'));
 	
 
 layout_MAS_Test_Service_output := RECORD
+    unsigned8 time_ms{xpath('_call_latency_ms')} := 0;  // picks up timing
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster MasterResults {XPATH('Results/Result/Dataset[@name=\'MasterResults\']/Row')};
 	PublicRecords_KEL.ECL_Functions.Layout_Person_FCRA Results {XPATH('Results/Result/Dataset[@name=\'Results\']/Row')};
 	STRING G_ProcErrorCode := '';
@@ -182,6 +192,7 @@ OUTPUT( CHOOSEN(Failed,eyeball), NAMED('bwr_results_Failed') );
 OUTPUT( COUNT(Failed), NAMED('Failed_Cnt') );
 
 LayoutMaster_With_Extras := RECORD
+    unsigned8 time_ms;
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster;
 	STRING G_ProcErrorCode;
 	STRING ln_project_id;
@@ -195,6 +206,7 @@ LayoutMaster_With_Extras := RECORD
 END;
 
 Layout_Person := RECORD
+    unsigned8 time_ms;
 	PublicRecords_KEL.ECL_Functions.Layout_Person_FCRA;
 	STRING G_ProcErrorCode;
 END;
@@ -203,6 +215,7 @@ Passed_with_Extras :=
 	JOIN(p, Passed, LEFT.Account = RIGHT.MasterResults.P_InpAcct, 
 		TRANSFORM(LayoutMaster_With_Extras,
 			SELF := RIGHT.MasterResults, //fields from passed
+            SELF.time_ms := RIGHT.time_ms,
 			SELF := LEFT, //input performance fields
 			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),
@@ -212,12 +225,13 @@ Passed_Person :=
 	JOIN(p, Passed, LEFT.Account = RIGHT.Results.P_InpAcct, 
 		TRANSFORM(Layout_Person,
 			SELF := RIGHT.Results, //fields from passed
+            SELF.time_ms := RIGHT.time_ms,
 			SELF := LEFT, //input performance fields
 			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),
 		INNER, KEEP(1));
       
-Error_Inputs := JOIN(DISTRIBUTE(p, HASH64(Account)), DISTRIBUTE(Passed_Person, HASH64(P_InpAcct)), LEFT.Account = RIGHT.P_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY); 
+Error_Inputs := JOIN(DISTRIBUTE(p, HASH64(Account)), DISTRIBUTE(Passed_Person, HASH64(P_InpAcct)), LEFT.Account = RIGHT.P_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY, LOCAL); 
 OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV (QUOTE('"')), OVERWRITE);
 
   

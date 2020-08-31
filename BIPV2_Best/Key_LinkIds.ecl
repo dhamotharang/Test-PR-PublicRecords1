@@ -10,6 +10,7 @@ EXPORT Key_LinkIds := MODULE
      layouts.key
     ,self.isdefunct := if(right.seleid_status_private = 'D'           ,true   ,false)
     ,self.isactive  := if(right.seleid_status_private  in ['I','D']   ,false  ,true )
+		,self.seleid_status_private_score := 0;
     ,self := left
   ),hash,keep(1),left outer);
   
@@ -104,7 +105,9 @@ FUNCTION
   self.company_fein    :=            restrict(L.company_fein,               in_mod, company_fein_data_permits,          sources, false,false);
   self.company_url     :=            restrict(L.company_url,                in_mod, company_url_data_permits,                  , false,false);
   self.duns_number     :=            restrict(L.duns_number,                in_mod, duns_number_data_permits,                  , false,false);
-  self.company_incorporation_date := restrict(L.company_incorporation_date, in_mod, company_incorporation_date_permits, sources, false,false);
+	self.employee_count  := 					 restrict(L.employee_count, in_mod, employee_count_data_permits);
+	self.sales           := 					 restrict(L.sales, in_mod,sales_data_permits);
+	self.company_incorporation_date := restrict(L.company_incorporation_date, in_mod, company_incorporation_date_permits, sources, false,false);
   self.dba_name        :=            restrict(L.dba_name,                   in_mod, dba_name_data_permits,                     , true, false);
   // SIC and NAICS are allways permitted and not filterd by restrict()
   self := L;
@@ -136,6 +139,8 @@ FUNCTION
 		self.company_url			 := filterSrcCode(L.company_url,     company_url_data_permits,            , allowCodeBmap);
 		self.company_incorporation_date := filterSrcCode(L.company_incorporation_date, company_incorporation_date_permits, sources, allowCodeBmap);
 		self.dba_name       := filterSrcCode(L.dba_name,        dba_name_data_permits,               , allowCodeBmap);
+		self.employee_count   := restrict(L.employee_count, in_mod, employee_count_data_permits, ,allowCodeBmap);
+		self.sales            := restrict(L.sales, in_mod,sales_data_permits, ,allowCodeBmap);
 		self := L;
 	end;
 	return project(ds, apply_src_filter(left));
@@ -159,4 +164,11 @@ FUNCTION
 	
 END;
 export kFetchOutRec := recordof(kFetch(dataset([],BIPV2.IDlayouts.l_xlink_ids)));
+
+export kFetch_thor() :=
+FUNCTION
+  ds_key := pull(Key);
+  return ds_key;
+END;
+
 END;

@@ -26,9 +26,9 @@ FUNCTION
                            SELF.isDeltabaseSource := TRUE,
                            SELF := LEFT,
                            SELF := []));
-  payoad_IH_recs := $.Functions.GetIHPayloadData(ValidSearchLexids, isFCRA);
+  payload_IH_recs := $.Functions.GetIHPayloadData(ValidSearchLexids, isFCRA);
   
-  all_recs := delta_IH_recs + payoad_IH_recs;
+  all_recs := delta_IH_recs + payload_IH_recs;
   all_recs_filter := all_recs((integer)ppc not in [420,426]); // dropping banko transactions before release (11/04/19); to be removed once in place on data side.
 
   // now combine results and remove diplicates. 
@@ -102,16 +102,7 @@ FUNCTION
   
   res_soapfail := DATASET([xform_onfail()]);
   
-  res_vldt := IF(isPCSoapFail OR isIHSoapFail, res_soapfail, res_srtd);
-  
-  //output(pc_recs, named('pc_recs'));
-  //output(delta_IH_results, named('delta_IH_results'));
-  //output(payoad_IH_recs, named('payoad_IH_recs'));
-  //output(recent_IH_recs, named('recent_IH_recs'));
-  //output(with_suppression_flags, named('with_suppression_flags'));
-  //output(final_IH_recs, named('final_IH_recs'));
-  //output(res_vldt, named('IH_report_recs'));
-  
+  res_vldt := IF(isPCSoapFail OR isIHSoapFail, res_soapfail, res_srtd);  
  
   RETURN res_vldt;
 END;

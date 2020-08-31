@@ -1,4 +1,4 @@
-﻿﻿IMPORT _Control, Ut, riskwise, models, easi, doxie, dma, fcra_opt_out, USPIS_HotList, AML, gateway, LN_PropertyV2_Services, riskview, Business_Risk_BIP, BIPV2, MDR, ADVO, risk_indicators, STD, iesp;
+﻿IMPORT _Control, Ut, riskwise, models, easi, doxie, dma, fcra_opt_out, USPIS_HotList, AML, gateway, LN_PropertyV2_Services, riskview, Business_Risk_BIP, BIPV2, MDR, ADVO, risk_indicators, STD, iesp;
 onThor := _Control.Environment.OnThor;
 
 EXPORT getAllBocaShellData (
@@ -526,24 +526,15 @@ vehicles_rolled := if (production_realtime_mode, vehicles, vehicles_hist);
 
   // =============== Watercraft ===============
 
-  //WaterCraft need to follow the dppa guidelines,  easiest way is to provide the empty DataSet if the dppa_ok flag is false, 
-  /* we need to set up a ds that is empty, but is also groupped the same way the results of the Boca_Shell_Watercraft or Boca_Shell_Watercraft_FCRA so that
-  we dont get silly ecl errors. the next 3 lines accomplish that */  
-  WaterCraftLayout :=  riskwise.layouts.Layout_Watercraft_Plus;
-  emptyWatercraftDS := DATASET([], WaterCraftLayout);
-  finalempty :=  group(sort(emptyWatercraftDS, seq),seq);
-//end empty ds
-   watercraft := IF(dppa_ok or IsFCRA, 
-                    IF(IsFCRA,
-                        Risk_Indicators.Boca_Shell_Watercraft_FCRA (ids_only(~isrelat), isPreScreen, bsversion),
-                        Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/, mod_access)),
-                    finalempty);
-  watercraft_hist := IF(dppa_ok or IsFCRA, 
-                        IF(IsFCRA,
-                          Risk_Indicators.Boca_Shell_Watercraft_Hist_FCRA (ids_only(~isrelat), isPreScreen, bsversion),
-                          Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/, mod_access)),
-                        finalempty);
-  watercraft_rolled := if (production_realtime_mode, watercraft, watercraft_hist);
+  watercraft := IF(IsFCRA,
+									Risk_Indicators.Boca_Shell_Watercraft_FCRA (ids_only(~isrelat), isPreScreen, bsversion),
+									Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/, mod_access));
+
+	watercraft_hist := IF(IsFCRA,
+										Risk_Indicators.Boca_Shell_Watercraft_Hist_FCRA (ids_only(~isrelat), isPreScreen, bsversion),
+										Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/, mod_access));
+										
+	watercraft_rolled := if (production_realtime_mode, watercraft, watercraft_hist);
 
   watercraft_relat := watercraft_rolled(isrelat);
   watercraft_rolled_indv := watercraft_rolled(~isrelat);

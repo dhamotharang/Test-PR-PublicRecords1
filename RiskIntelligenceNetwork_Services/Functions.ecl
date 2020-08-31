@@ -192,16 +192,27 @@ EXPORT Functions := MODULE
  END;
 
  EXPORT GetCleanAddressFragmentValue(string address) := FUNCTION
-  return REGEXREPLACE(RiskIntelligenceNetwork_Services.Constants.FRAGMENT_SEPARATOR ,address,', ');
+  return REGEXREPLACE(_Constants.FRAGMENT_SEPARATOR ,address,', ');
  END;
 
  EXPORT GetCleanFragmentValue(string FragmentValue, integer pos) := FUNCTION
-  return REGEXFIND('(.*)' + RiskIntelligenceNetwork_Services.Constants.FRAGMENT_SEPARATOR + '(.*)$',FragmentValue, pos);
+  return REGEXFIND('(.*)' + _Constants.FRAGMENT_SEPARATOR + '(.*)$',FragmentValue, pos);
  END;
 
  EXPORT IsValidInputDate(iesp.share.t_Date date) := FUNCTION
   date_int := iesp.ECL2ESP.DateToInteger(date);
   return STD.Date.IsValidDate(date_int) OR date_int = 0;
  END;
+ 
+ EXPORT GetFormatted_IP (string octet) := FUNCTION
+  Len := length(trim(octet, all));
+  append_zero := MAP(Len = 0 => _Constants.IP_ADDRESS_ELEMENT.APPEND_THREE_ZERO, 
+                     Len = 1 => _Constants.IP_ADDRESS_ELEMENT.APPEND_TWO_ZERO,
+                     Len = 2 => _Constants.IP_ADDRESS_ELEMENT.APPEND_ONE_ZERO,
+                     '');
+  out := trim(append_zero) + octet;
+  return out;
+ END;
+
 
 END;

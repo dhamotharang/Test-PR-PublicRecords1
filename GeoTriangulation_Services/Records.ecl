@@ -12,7 +12,7 @@ EXPORT Records(DATASET(GeoTriangulation_Services.Layouts.rec_batch_seq) ds_batch
   // TRANSFORM onto the AccuityBankData_BatchService interim/work layout so can use it to call BS.ABD_Records later
   BatchServices.AccuityBankData_Layouts.batch_wrk tf_ValidateInputs(GeoTriangulation_Services.Layouts.rec_batch_seq L) := TRANSFORM
     RTN := L.bank_routing_number;
-    ST  := L.st;
+    ST  := STD.Str.ToUpperCase(L.st);
     IP  := L.ip_address;
 
     // Fill in fields used by BatchServices.AccuityBankData_Records

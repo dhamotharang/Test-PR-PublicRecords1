@@ -3,7 +3,7 @@
 export mac_xLinking_on_thor_Boca (infile, IDL ='', Input_SNAME = '', Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_Gender = '', Input_Derived_Gender = '',
 														Input_PRIM_NAME = '',Input_PRIM_RANGE = '',Input_SEC_RANGE = '',Input_CITY = '',Input_ST = '',Input_ZIP = '',Input_SSN = '',
 														Input_DOB = '', Input_Phone = '', Input_DL_STATE = '',Input_DL_NBR = '', 
-														outfile, weight_score = 30, Distance = 3, Segmentation = true, forcePull =false, Input_RelFname = '', Input_RelLname = '', disableForce='InsuranceHeader_xLink.Config.DOB_NotUseForce') := MACRO
+														outfile, weight_score = 30, Distance = 3, Segmentation = true, forcePull =false, Input_RelFname = '', Input_RelLname = '', disableForce='InsuranceHeader_xLink.Config.DOB_NotUseForce', Input_VIN='') := MACRO
 
 IMPORT InsuranceHeader_xLink, ut;
 	
@@ -86,7 +86,7 @@ IMPORT InsuranceHeader_xLink, ut;
 		#IF ( #TEXT(Input_ZIP) <> '' )
     SELF.ZIP_cases := DATASET([{le.Input_ZIP, 100}],InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases);
   #ELSE
-     SELF.ZIP := DATASET([],InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases);
+     SELF.ZIP_cases := DATASET([],InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases);
   #END
 		#IF ( #TEXT(Input_SSN) <> '')
 			self.SSN5 := InsuranceHeader_xLink.mod_SSNParse(le.Input_SSN).ssn5;
@@ -125,6 +125,11 @@ IMPORT InsuranceHeader_xLink, ut;
 		#ELSE
 			self.lname2 := (typeof(SELF.lname2))'';
 		#END
+		#IF ( #TEXT(Input_VIN) <> '' )
+			self.VIN := (typeof(SELF.VIN))le.Input_VIN;
+		#ELSE
+			self.VIN := (typeof(SELF.VIN))'';
+		#END
 		self.SRC := (typeof(SELF.SRC))'';
 		self.SOURCE_RID := (typeof(SELF.SOURCE_RID))'';  
 		self.MaxIDs := IDLExternalLinking.Constants.max_idls,
@@ -137,7 +142,7 @@ IMPORT InsuranceHeader_xLink, ut;
 	InsuranceHeader_xLink.MAC_MEOW_xIDL_Batch(%pr%, UniqueId, ,SNAME, fname, mname, lname, derived_gender, 
 																prim_range, prim_name, SEC_RANGE, CITY, ST, ZIP_cases,
 																SSN5, SSN4, DOB, PHONE, DL_STATE, DL_NBR,
-																SRC, SOURCE_RID, Input_relFname, Input_RelLname, %res_out%, %asIndex%, , , disableForce);
+																SRC, SOURCE_RID, fname2, lname2, VIN, %res_out%, %asIndex%, , , disableForce);
 
 	#UNIQUENAME(result_trim)
 	IDLExternalLinking.mac_trim_xidl_layout(%res_out%, %result_trim%, reference);
