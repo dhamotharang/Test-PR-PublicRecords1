@@ -1,17 +1,17 @@
 ﻿/* TBD:
    1. Research/resolve open issues, search on "???".
 */
-IMPORT AutoStandardI, BIPV2, BusReg, Corp2, iesp, MDR;
+IMPORT AutoStandardI, BIPV2, BusReg, Corp2, iesp, MDR, topbusiness_services;
 
 
 EXPORT IncorporationSection := MODULE;
 
 EXPORT GetCorpBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids_only, 
-                     string1 FETCH_LEVEL) := 
+                     string1 FETCH_LEVEL, unsigned4 FETCH_LIMIT 	= 25000) := 
                      TopBusiness_Services.Key_Fetches(
 	                    ds_in_unique_ids_only // input file to join key with
 				    ,FETCH_LEVEL // level of ids to join with
-										              // 3rd parm is ScoreThreshold, take default of 0
+					,FETCH_LIMIT		              // 3rd parm is ScoreThreshold, take default of 0
 					 ).ds_corp_linkidskey_recs;			
 
  // *********** Main function to return BIPV2 format business report results
@@ -34,13 +34,7 @@ EXPORT GetCorpBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids
   //
   // *** Key fetch to get Incorporation(Secretary of State) data from the linkids key.
    ds_corplirecs := GetCorpBIPlinkids(ds_in_unique_ids_only, FETCH_LEVEL);
-   // ds_corplirecs :=  TopBusiness_Services.Key_Fetches(
-	                    // ds_in_unique_ids_only // input file to join key with
-										 // ,FETCH_LEVEL // level of ids to join with
-										              //3rd parm is ScoreThreshold, take default of 0
-										 // ).ds_corp_linkidskey_recs;			
-										 
-
+											 
   // Sort/dedup corp linkids recs by linkids & corp_key to keep 1 (doesn't matter which???)
 	// record per corp_key.
   ds_corplirecs_deduped := dedup(sort(ds_corplirecs,
@@ -77,7 +71,7 @@ EXPORT GetCorpBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids
 			                keyed(left.corp_key = right.corp_key 
 											      // and right.record_type='C" // no since deduping below??? 
 													 ),
-									    transform(IncorporationSection_Layouts.rec_ids_with_keydata_slimmed,
+									    transform(topbusiness_services.IncorporationSection_Layouts.rec_ids_with_keydata_slimmed,
                         // keep reported on linkids from the left corp linkids key recs deduped,
 												// since some right corp_key recs might be for another set of ids???
 												self.DotID  := left.dotid,  //should not need this one???
@@ -510,8 +504,8 @@ EXPORT GetCorpBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids
 	// to attach the state_corp_count to the recs.
   ds_allrecs_plus_cpscnt  := join(ds_allrecs_deduped,
 	                                ds_ids_corpstates_tabled,
-																	   BIPV2.IDmacros.mac_JoinTop3Linkids(),
-																	transform(IncorporationSection_Layouts.rec_ids_with_keydata_slimmed,
+						        BIPV2.IDmacros.mac_JoinTop3Linkids(),
+							transform(topbusiness_services.IncorporationSection_Layouts.rec_ids_with_keydata_slimmed,
 																		 self.total_corps_per_linkids := right.ids_corp_count;
 																		 self := left),
 																	left outer, // keep all recs from left even if no match to right
@@ -573,7 +567,7 @@ EXPORT GetCorpBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids
 																        // all others fields from main (left) file
 																        self := left),
 														          left outer, // at least one rec for every rec in left
-														          limit(20000,skip) //for bug 160023 needed more than 10000 default
+														          limit(20000,skip) //for bug 160023 needed more than 10000 default                                                                                  
 														         );
 
   // Sort/dedup to keep the 1 record with the most recent event_filing_date for each corp_key.
@@ -665,7 +659,7 @@ EXPORT GetCorpBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids
 	// "corp_info" and the "corp_historys", "SourceDocs" & "corp_addresses" child datasets.
 	TopBusiness_Services.IncorporationSection_Layouts.rec_IncorporationParent_CorpInfo 
 	  tf_rollup_corprecs(TopBusiness_Services.IncorporationSection_Layouts.rec_ids_with_keydata_slimmed l,
-	                     dataset(IncorporationSection_Layouts.rec_ids_with_keydata_slimmed) allrows)	
+	                     dataset(TopBusiness_Services.IncorporationSection_Layouts.rec_ids_with_keydata_slimmed) allrows)	
 		:= transform
 			// Use all rows of the group to create the "CorpHistorys" & SourceDocs child datasets
 			self.CorpHistorys := choosen(project(allrows(event_filing_date != '' and event_filing_desc != ''),
@@ -728,7 +722,7 @@ EXPORT GetCorpBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids
 	  tf_rpt_source(TopBusiness_Services.IncorporationSection_Layouts.rec_IncorporationChild_Source  l) := transform
 		self.BusinessIds := l, // to store all linkids
     self.IdType      := if(l.source=MDR.sourceTools.src_Business_Registration,
-		                       Constants.sourcerecid,Constants.corpkey),
+		                       TopBusiness_Services.Constants.sourcerecid,TopBusiness_Services.Constants.corpkey),
 		self.IdValue     := l.source_docid,
 		self.Source      := l.source,
 		self := [], // null all other fields
@@ -870,7 +864,7 @@ EXPORT GetCorpBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids
 		                             self.BusinessIds := l, // to store all linkids
 																 // v--- Indicates to the SourceService to output docs for all 
 																 //      sources (Corp & BusReg) in this section.
-		                             self.Section     := Constants.CorpSectionName, //no longer needed???
+		                             self.Section     := TopBusiness_Services.Constants.CorpSectionName, //no longer needed???
 																 // since section name used, self.source is not needed //use this instead???
 		                             self := [])),  //null all other fields
     self := l, // to store all linkids
@@ -883,8 +877,8 @@ EXPORT GetCorpBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids
 
   // Attach input acctnos back to the linkids
   ds_all_wacctno_joined := join(ds_in_ids,ds_allrecs_rptdetail,
-																BIPV2.IDmacros.mac_JoinTop3Linkids(),
-														    transform(IncorporationSection_Layouts.rec_ids_plus_IncorporationSection,
+											BIPV2.IDmacros.mac_JoinTop3Linkids(),
+					 transform(topbusiness_services.IncorporationSection_Layouts.rec_ids_plus_IncorporationSection,
 														      self.acctno   := left.acctno,
 															    self          := right),
 														    left outer); // 1 out rec for every left (in_data) rec
@@ -931,7 +925,7 @@ EXPORT GetCorpBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids
 	// output(ds_allrecs_parents,              named('ds_allrecs_parents'));
   // output(ds_allrecs_rptdetail,            named('ds_allrecs_rptdetail'));	
   // output(ds_all_wacctno_joined,           named('ds_all_wacctno_joined'));
-
+  // output(count(ds_allrecs_top10_wall_events), named('count_ds_allrecs_top10_wall_events'));
 	//return ds_in_unique_ids_only;
 	return ds_final_results;
 

@@ -588,7 +588,7 @@ EXPORT Transforms := MODULE
 		self.hasOPM := l.opm_flag='Y';
     self.hasoptout:=l.hasoptout;
 		self.status := l.provider_status;
-		self.names := if(l.hasoptout=false,project(l,transform(Healthcare_Header_Services.Layouts.layout_nameinfo,
+		self.names := project(l,transform(Healthcare_Header_Services.Layouts.layout_nameinfo,
 																			self.nameSeq := 1;
 																			self.namePenalty := 0;
 																			self.FullName := Healthcare_Header_Services.Functions.getCleanHealthCareName(left.orig_fullname);
@@ -598,8 +598,8 @@ EXPORT Transforms := MODULE
 																			self.Suffix := Healthcare_Header_Services.Functions.getCleanHealthCareName(left.suffix_name);
 																			self.Title := Healthcare_Header_Services.Functions.getCleanHealthCareName(left.title);
 																			self.Gender := left.gender;
-																			self.CompanyName := left.clean_company_name;)));
-		self.Addresses := if(l.hasoptout=false,project(l,transform(Healthcare_Header_Services.Layouts.layout_addressinfo,
+																			self.CompanyName := left.clean_company_name;));
+		self.Addresses := project(l,transform(Healthcare_Header_Services.Layouts.layout_addressinfo,
 																		self.addrSeq := Constants.ADDR_SEQ_ENCLARITY;
 																		self.addrSeqGrp := 0;
 																		self.addrGoldFlag := '';
@@ -636,20 +636,20 @@ EXPORT Transforms := MODULE
 																		self.fips_county := left.fips_county;
 																		self.PhoneNumber := left.phone1;
 																		self.FaxNumber := left.fax1;
-																		self.Phones := dataset([{left.phone1,left.fax1}],Healthcare_Header_Services.Layouts.layout_addressphone);)));
-		self.dobs := dataset([{if(goodDidLink and l.hasoptout=false,(string)l.clean_dob,if((integer)l.birth_year>0,(integer)l.birth_year+'0101',''))}],Healthcare_Header_Services.Layouts.layout_dob)(dob<>'');
+																		self.Phones := dataset([{left.phone1,left.fax1}],Healthcare_Header_Services.Layouts.layout_addressphone);));
+		self.dobs := dataset([{if(goodDidLink,(string)l.clean_dob,if((integer)l.birth_year>0,(integer)l.birth_year+'0101',''))}],Healthcare_Header_Services.Layouts.layout_dob)(dob<>'');
 		phoneData:= dataset([{l.phone1,map(l.prac1_phone_ind='Y' => 'OFFICE PHONE',l.bill1_phone_ind='Y' => 'BILLING PHONE','OFFICE PHONE')}],Healthcare_Header_Services.Layouts.layout_phone)(phone<>'');
 		faxData:= dataset([{l.fax1,map(l.prac1_fax_ind='Y' => 'OFFICE FAX',l.bill1_fax_ind='Y' => 'BILLING FAX','OFFICE FAX')}],Healthcare_Header_Services.Layouts.layout_phone)(phone<>'');
 		self.phones := phoneData+faxData;
-		self.dids := if(goodDidLink and l.hasoptout=false and l.did_score>Constants.DID_SCORE_THRESHOLD and l.did>0,dataset([{l.did}],Healthcare_Header_Services.Layouts.layout_did));
-		self.bdids := if(l.bdid_score>Constants.DID_SCORE_THRESHOLD and l.bdid>0 and l.hasoptout=false,dataset([{l.bdid}],Healthcare_Header_Services.Layouts.layout_bdid));
+		self.dids := if(goodDidLink and l.did_score>Constants.DID_SCORE_THRESHOLD and l.did>0,dataset([{l.did}],Healthcare_Header_Services.Layouts.layout_did));
+		self.bdids := if(l.bdid_score>Constants.DID_SCORE_THRESHOLD and l.bdid>0,dataset([{l.bdid}],Healthcare_Header_Services.Layouts.layout_bdid));
 		self.bipkeys := project(l,transform(Healthcare_Header_Services.Layouts.layout_bipkeys, self := left));
-		self.ssns := dataset([{if(goodDidLink and l.hasoptout=false and l.best_ssn<>'',l.best_ssn,'')}],Healthcare_Header_Services.Layouts.layout_ssn)(ssn<>'');
+		self.ssns := dataset([{if(goodDidLink and l.best_ssn<>'',l.best_ssn,'')}],Healthcare_Header_Services.Layouts.layout_ssn)(ssn<>'');
 		self.optouts := dataset([{'','','','','','',
 															if(l.date_of_death<>'','Y',''),
 															l.date_of_death}],Healthcare_Header_Services.Layouts.layout_optout);
 		self.upins := dataset([{l.acctno,l.lnpid,l.upin}],Healthcare_Header_Services.Layouts.layout_upin)(upin<>'');
-		self.npis := dataset([{l.acctno,l.lnpid,l.npi_num,l.npi_num=l.usernpi,2,l.npi_deact_date,'',l.npi_enum_date,l.type1}],Healthcare_Header_Services.Layouts.layout_npi)(npi<>'',l.hasoptout=false);
+		self.npis := dataset([{l.acctno,l.lnpid,l.npi_num,l.npi_num=l.usernpi,2,l.npi_deact_date,'',l.npi_enum_date,l.type1}],Healthcare_Header_Services.Layouts.layout_npi)(npi<>'');
 		self.deas := project(l,transform(Healthcare_Header_Services.Layouts.layout_dea,
 									self.acctno := left.acctno;
 									self.ProviderID:=left.lnpid;
@@ -695,8 +695,8 @@ EXPORT Transforms := MODULE
 									self.dea_geo_lat := left.geo_lat;
 									self.dea_geo_long := left.geo_long;));
 		self.Degrees := dataset([{l.acctno,l.lnpid,l.suffix_other,0}],Healthcare_Header_Services.Layouts.layout_degree)(Degree<>'');
-		self.StateLicenses := dataset([{l.acctno,l.lnpid,l.lnpid,0,l.lic_state,l.lic_num,'',l.lic_type,l.lic_status,l.lic_begin_date,l.lic_end_date,''}],Healthcare_Header_Services.Layouts.layout_licenseinfo)(LicenseNumber<>'',l.hasoptout=false);
-		Self.SrcRecRaw :=  if(l.hasoptout=false,project(l,transform(Healthcare_Header_Services.Layouts.layout_SrcRec,
+		self.StateLicenses := dataset([{l.acctno,l.lnpid,l.lnpid,0,l.lic_state,l.lic_num,'',l.lic_type,l.lic_status,l.lic_begin_date,l.lic_end_date,''}],Healthcare_Header_Services.Layouts.layout_licenseinfo)(LicenseNumber<>'');
+		Self.SrcRecRaw :=  project(l,transform(Healthcare_Header_Services.Layouts.layout_SrcRec,
 																		self.Src := constants.SRC_SELECTFILE;
 																		self.nameSeq := 1;
 																		self.namePenalty := 0;
@@ -750,7 +750,7 @@ EXPORT Transforms := MODULE
 																		self.did := if(goodDidLink and left.did_score>Constants.DID_SCORE_THRESHOLD and left.did>0,left.did,0);
 																		self.bdid := if(left.bdid_score>Constants.DID_SCORE_THRESHOLD and left.bdid>0,left.bdid,0);
 																		self := left;
-																		self:=[];)));
+																		self:=[];));
 		self:=[]; 
 	end;
 
@@ -1066,7 +1066,7 @@ EXPORT Transforms := MODULE
 		self.npis := dataset([{l.acctno,r.lnfid,r.npi_num,r.npi_num=l.usernpi,2,r.npi_deact_date,'','','2'}],Healthcare_Header_Services.Layouts.layout_npi)(npi<>'');
 		self.StateLicenses := dataset([{l.acctno,r.lnfid,r.lnfid,0,r.lic1_state,r.lic1_num,'',r.lic1_type,r.lic1_status,Healthcare_Header_Services.Functions.cleanOnlyNumbers(r.lic1_begin_date),Healthcare_Header_Services.Functions.cleanOnlyNumbers(r.lic1_end_date),''}],Healthcare_Header_Services.Layouts.layout_licenseinfo)(LicenseNumber<>'' and LicenseNumber<>'0');
 		self.Taxonomy := dataset([{l.acctno,r.group_key,r.lnfid,r.taxonomy,r.taxonomy_primary_ind,'',''}],Healthcare_Header_Services.Layouts.layout_taxonomy);
-		self.sanctions := project(r,transform(Layouts.layout_sanctions, 
+		self.sanctions := project(r,transform(Healthcare_Header_Services.Layouts.layout_sanctions, 
 															self.acctno:=l.acctno;self.ProviderID:=left.lnfid;self.group_key:=left.group_key;
 															self.sanc1_date :=Healthcare_Header_Services.Functions.cleanOnlyNumbers(left.sanc1_date);self.sanc1_state := left.sanc1_state;
 															self.sanc1_lic_num := left.lic1_num; self.sanc1_prof_type := left.facility_type;
@@ -1097,8 +1097,8 @@ EXPORT Transforms := MODULE
 	end;
 
 	//Enclarity rollups
-	export Layouts.layout_addressinfo doSelectFileProvidersBaseRecordAddrRollup(Layouts.layout_addressinfo l,
-																										DATASET(Layouts.layout_addressinfo) allRows) := TRANSFORM
+	export Layouts.layout_addressinfo doSelectFileProvidersBaseRecordAddrRollup(Healthcare_Header_Services.Layouts.layout_addressinfo l,
+																										DATASET(Healthcare_Header_Services.Layouts.layout_addressinfo) allRows) := TRANSFORM
 			self.last_seen := max(allRows,last_seen);
 			self.first_seen := if(min(allRows,first_seen) <> '', min(allRows,first_seen),min(allRows,last_seen));
 			self.addrConfidenceValue := max(allRows,addrConfidenceValue);
@@ -1106,8 +1106,8 @@ EXPORT Transforms := MODULE
 			self := l;
 			self := [];
 	end;
-	export Layouts.CombinedHeaderResults doSelectFileProvidersBaseRecordSrcIdRollup(Layouts.CombinedHeaderResults l, 
-																									DATASET(Layouts.CombinedHeaderResults) allRows) := TRANSFORM
+	export Layouts.CombinedHeaderResults doSelectFileProvidersBaseRecordSrcIdRollup(Healthcare_Header_Services.Layouts.CombinedHeaderResults l, 
+																									DATASET(Healthcare_Header_Services.Layouts.CombinedHeaderResults) allRows) := TRANSFORM
 		SELF.acctno := l.acctno;
 		self.LNPID := l.LNPID;
 		self.SrcId := l.SrcId;
@@ -1135,9 +1135,9 @@ EXPORT Transforms := MODULE
 											 statusHighRetired or statusMediumRetired or statusLowRetired => 'R',
 											 statusActive => 'A',
 											 ' ');
-		self.Sources       := DEDUP( NORMALIZE( allRows, LEFT.Sources, TRANSFORM( Layouts.layout_SrcID, SELF := RIGHT	)	), RECORD, ALL );
-		self.Names         := sort(DEDUP( NORMALIZE( allRows, LEFT.Names, TRANSFORM( Layouts.layout_nameinfo, SELF := RIGHT	)	), RECORD, ALL ),namePenalty);
-		self.Addresses     := sort(rollup(group(sort(NORMALIZE( allRows, LEFT.Addresses(prim_name<>'',p_city_name<>'',st<>'',z5<>''), 
+		self.Sources       := DEDUP( NORMALIZE( allRows(hasoptout=false), LEFT.Sources, TRANSFORM( Layouts.layout_SrcID, SELF := RIGHT	)	), RECORD, ALL );
+		self.Names         := sort(DEDUP( NORMALIZE( allRows(hasoptout=false), LEFT.Names, TRANSFORM( Layouts.layout_nameinfo, SELF := RIGHT	)	), RECORD, ALL ),namePenalty);
+		self.Addresses     := sort(rollup(group(sort(NORMALIZE( allRows(hasoptout=false), LEFT.Addresses(prim_name<>'',p_city_name<>'',st<>'',z5<>''), 
 																											TRANSFORM( Layouts.layout_addressinfo, SELF := RIGHT	)),
 																						prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,z5,-(integer)addrConfidenceValue,-addrVerificationDate),
 																			 prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,z5),group,doSelectFileProvidersBaseRecordAddrRollup(left,rows(left))),-(integer)addrConfidenceValue,-addrVerificationDate);
@@ -1164,12 +1164,12 @@ EXPORT Transforms := MODULE
 																addrVerificationDate,address1,address2,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,
 																sec_range,p_city_name,v_city_name,st,z5,zip4,primaryLocation,practiceAddress,BillingAddress,PhoneNumber,FaxNumber),
 													src,seq);
-		self.Sanctions			:=  sort(dedup(sort(NORMALIZE( allRows, LEFT.Sanctions, TRANSFORM( Layouts.layout_sanctions, SELF := RIGHT	)	), acctno,ProviderID,group_key,GroupSortOrder,sanc1_state,sanc1_lic_num,sanc1_date), acctno,ProviderID,group_key,GroupSortOrder,sanc1_state,sanc1_lic_num,sanc1_date),GroupSortOrder);
-		self.LegacySanctions:=  sort(dedup(sort(NORMALIZE( allRows, LEFT.LegacySanctions, TRANSFORM( Layouts.layout_LegacySanctions, SELF := RIGHT	)	), acctno,ProviderID,group_key,GroupSortOrder,SANC_SANCST,SANC_LICNBR,SANC_SANCDTE), acctno,ProviderID,group_key,GroupSortOrder,SANC_SANCST,SANC_LICNBR,SANC_SANCDTE),groupsortorder);
+		self.Sanctions			:=  sort(dedup(sort(NORMALIZE( allRows(hasoptout=false), LEFT.Sanctions, TRANSFORM( Healthcare_Header_Services.Layouts.layout_sanctions, SELF := RIGHT	)	), acctno,ProviderID,group_key,GroupSortOrder,sanc1_state,sanc1_lic_num,sanc1_date), acctno,ProviderID,group_key,GroupSortOrder,sanc1_state,sanc1_lic_num,sanc1_date),GroupSortOrder);
+		self.LegacySanctions:=  sort(dedup(sort(NORMALIZE( allRows(hasoptout=false), LEFT.LegacySanctions, TRANSFORM( Healthcare_Header_Services.Layouts.layout_LegacySanctions, SELF := RIGHT	)	), acctno,ProviderID,group_key,GroupSortOrder,SANC_SANCST,SANC_LICNBR,SANC_SANCDTE), acctno,ProviderID,group_key,GroupSortOrder,SANC_SANCST,SANC_LICNBR,SANC_SANCDTE),groupsortorder);
 		self := l;
 	end;
-	export Layouts.CombinedHeaderResults doSelectFileFacilitiesBaseRecordSrcIdRollup(Layouts.CombinedHeaderResults l, 
-																									DATASET(Layouts.CombinedHeaderResults) allRows) := TRANSFORM
+	export Layouts.CombinedHeaderResults doSelectFileFacilitiesBaseRecordSrcIdRollup(Healthcare_Header_Services.Layouts.CombinedHeaderResults l, 
+																									DATASET(Healthcare_Header_Services.Layouts.CombinedHeaderResults) allRows) := TRANSFORM
 		SELF.acctno := l.acctno;
 		self.LNPID := l.LNPID;
 		self.SrcId := l.SrcId;
@@ -2975,7 +2975,7 @@ Export Healthcare_Header_Services.Layouts.CombinedHeaderResults build_hms_facili
 		self.NPPESVerified := map(exists(allRows(NPPESVerified='YES')) => 'YES',
 															exists(allRows(NPPESVerified='CORRECTED')) => 'CORRECTED',
 															' ');
-		self.Sources       := DEDUP( NORMALIZE( allRows(hasoptout=false), LEFT.Sources, TRANSFORM( Healthcare_Header_Services.Layouts.layout_SrcID, SELF := RIGHT	)	), RECORD, ALL );
+		self.Sources       := DEDUP( NORMALIZE( allRows, LEFT.Sources, TRANSFORM( Healthcare_Header_Services.Layouts.layout_SrcID, SELF := RIGHT	)	), RECORD, ALL );
 				//normalize the set for any name that has a first or last or full name building a full name it it does not exist
 				nNames := NORMALIZE( allRows, LEFT.Names( (FirstName<>'' or LastName<>'' or FullName<>'' )), 
 																																TRANSFORM( Healthcare_Header_Services.Layouts.layout_nameinfo, 
@@ -3041,13 +3041,13 @@ Export Healthcare_Header_Services.Layouts.CombinedHeaderResults build_hms_facili
 		self.Residencies   := DEDUP( NORMALIZE( allRows, LEFT.Residencies, TRANSFORM( Healthcare_Header_Services.Layouts.layout_residency, SELF := RIGHT	)	), RECORD, ALL, HASH );
 		self.MedSchools    := sort(DEDUP( NORMALIZE( allRows, LEFT.MedSchools, TRANSFORM( Healthcare_Header_Services.Layouts.layout_medschool, SELF := RIGHT	)	), RECORD, ALL, HASH ),-GraduationYear);
 		self.Taxonomy      := DEDUP( NORMALIZE( allRows, LEFT.Taxonomy, TRANSFORM( Healthcare_Header_Services.Layouts.layout_taxonomy, SELF := RIGHT	)	), RECORD, ALL, HASH );
-		self.Sanctions     := allRows(exists(Sanctions),hasoptout=false).Sanctions ;
-		self.LegacySanctions := sort(DEDUP(allRows(exists(LegacySanctions),hasoptout=false).LegacySanctions,record, all, hash),groupsortorder);
+		self.Sanctions     := allRows(exists(Sanctions)).Sanctions ;
+		self.LegacySanctions := sort(DEDUP(allRows(exists(LegacySanctions)).LegacySanctions,record, all, hash),groupsortorder);
 		self.SrcRecRaw		 := sort(allRows.SrcRecRaw,src,seq);
-		self.NPIRaw        := allRows(exists(NPIRaw),hasoptout=false).NPIRaw; 
-		self.DEARaw        := allRows(exists(DEARaw),hasoptout=false).DEARaw; 
-		self.ProfLicRaw    := allRows(exists(ProfLicRaw),hasoptout=false).ProfLicRaw;
-		self.CLIARaw    	 := allRows(exists(CLIARaw),hasoptout=false).CLIARaw ;
+		self.NPIRaw        := allRows(exists(NPIRaw)).NPIRaw; 
+		self.DEARaw        := allRows(exists(DEARaw)).DEARaw; 
+		self.ProfLicRaw    := allRows(exists(ProfLicRaw)).ProfLicRaw;
+		self.CLIARaw    	 := allRows(exists(CLIARaw)).CLIARaw ;
 		self.NCPDPRaw    := sort(DEDUP( NORMALIZE( allRows, LEFT.NCPDPRaw, TRANSFORM( iesp.ncpdp.t_PharmacyReport, SELF := RIGHT	)	), RECORD, ALL, HASH ),-EntityInformation.ClosureDate);
 		self :=[];
 	END;

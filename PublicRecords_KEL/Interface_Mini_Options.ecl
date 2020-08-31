@@ -6,7 +6,7 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT BOOLEAN isFCRA := OptionsRaw.isFCRA;
 	EXPORT STRING8 ArchiveDate := OptionsRaw.ArchiveDate;
 	EXPORT STRING250 InputFileName := OptionsRaw.InputFileName;
-	EXPORT STRING100 PermissiblePurpose := OptionsRaw.PermissiblePurpose;
+	EXPORT STRING100 IntendedPurpose := OptionsRaw.IntendedPurpose;
 	EXPORT STRING100 Data_Restriction_Mask := OptionsRaw.Data_Restriction_Mask;
 	EXPORT STRING100 Data_Permission_Mask := OptionsRaw.Data_Permission_Mask;
 	EXPORT UNSIGNED GLBAPurpose := OptionsRaw.GLBAPurpose;
@@ -16,9 +16,12 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT INTEGER ScoreThreshold := OptionsRaw.ScoreThreshold;
 	EXPORT BOOLEAN ExcludeConsumerAttributes := OptionsRaw.ExcludeConsumerAttributes;
 	EXPORT BOOLEAN isMarketing := OptionsRaw.isMarketing ;// When TRUE enables Marketing Restrictions
-	EXPORT UNSIGNED8 KEL_Permissions_Mask := OptionsRaw.KEL_Permissions_Mask ;// Set by PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate()
+	EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := OptionsRaw.Allowed_Sources_Dataset;
+	EXPORT DATA57 KEL_Permissions_Mask := OptionsRaw.KEL_Permissions_Mask ;// Set by PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate()
 	EXPORT BOOLEAN OutputMasterResults := OptionsRaw.OutputMasterResults;
-
+	EXPORT BOOLEAN IncludeMinors := OptionsRaw.IncludeMinors;
+	EXPORT INTEGER upperage := OptionsRaw.upperage;
+	
 	EXPORT DATASET(Gateway.Layouts.Config) Gateways := OptionsRaw.Gateways;
 	
 	// BIP Append Options
@@ -35,9 +38,10 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT UNSIGNED6 GlobalCompanyId := OptionsRaw.GlobalCompanyId;
 	
 	// Performance options to turn ON/OFF ENTITIES in during FDC build.
-	// By default, all ENTITIES are ON.
+	// By default, all ENTITIES are OFF.
 	EXPORT BOOLEAN IncludeAccident := FALSE;
 	EXPORT BOOLEAN IncludeAddress := FALSE;
+	EXPORT BOOLEAN IncludeAddressSummary := FALSE;
 	EXPORT BOOLEAN IncludeAircraft := FALSE;
 	EXPORT BOOLEAN IncludeBankruptcy := FALSE;
 	EXPORT BOOLEAN IncludeBusinessSele := FALSE;
@@ -48,6 +52,7 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT BOOLEAN IncludeDriversLicense := FALSE;
 	EXPORT BOOLEAN IncludeEducation := FALSE;
 	EXPORT BOOLEAN IncludeEmail := FALSE;
+	EXPORT BOOLEAN IncludeEBRTradeline := TRUE;
 	EXPORT BOOLEAN IncludeEmployment := FALSE;
 	EXPORT BOOLEAN IncludeGeolink := FALSE;
 	EXPORT BOOLEAN IncludeHousehold := FALSE;
@@ -67,7 +72,12 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT BOOLEAN IncludeWatercraft := FALSE;
 	EXPORT BOOLEAN IncludeZipCode := FALSE;
 	EXPORT BOOLEAN IncludeUCC := FALSE;
+  EXPORT BOOLEAN IncludeNameSummary := FALSE;
+  EXPORT BOOLEAN IncludePhoneSummary := FALSE;
+	EXPORT BOOLEAN IncludeSSNSummary := FALSE;
+	EXPORT BOOLEAN IncludeOverrides := TRUE;
 	EXPORT BOOLEAN IncludeMini := TRUE;
+
 	
 	// Performance options to turn ON/OFF ASSOCIATIONS in during FDC build. 
 	// By default, we'll check if their related ENTITIES are needed.
@@ -83,6 +93,7 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT BOOLEAN IncludeDriversLicenseInquiry := IncludeDriversLicense AND IncludeInquiry;
 	EXPORT BOOLEAN IncludeEducationStudentAddress := IncludeEducation AND IncludeAddress;
 	EXPORT BOOLEAN IncludeEmailHousehold := IncludeHousehold AND IncludeEmail;
+	EXPORT BOOLEAN IncludeEmailInquiry := IncludeInquiry AND IncludeEmail;
 	EXPORT BOOLEAN IncludeEmploymentBusinessAddress := IncludeEmployment AND IncludeAddress;
 	EXPORT BOOLEAN IncludeEmploymentPerson := IncludeEmployment AND IncludePerson;
 	EXPORT BOOLEAN IncludeFirstDegreeAssociations := IncludePerson;
@@ -113,26 +124,29 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT BOOLEAN IncludeProxTIN := IncludeTIN AND IncludeBusinessProx;	
 	EXPORT BOOLEAN IncludeProxUtility   := IncludeBusinessProx AND IncludeUtility;
 	EXPORT BOOLEAN IncludeProxEmail   := IncludeBusinessProx AND IncludeEmail;
-	EXPORT BOOLEAN IncludeSeleEmail   := IncludeBusinessSele AND IncludeEmail;
 	EXPORT BOOLEAN IncludeSeleAddress := IncludeAddress AND IncludeBusinessSele;	
 	EXPORT BOOLEAN IncludeSeleAircraft := IncludeAircraft AND IncludeBusinessSele;
 	EXPORT BOOLEAN IncludeSeleBankruptcy := IncludeBusinessSele AND IncludeBankruptcy;
+	EXPORT BOOLEAN IncludeSeleEmail   := IncludeBusinessSele AND IncludeEmail;
+	EXPORT BOOLEAN IncludeSeleEBRTradeline := IncludeEBRTradeline AND IncludeBusinessSele;
 	EXPORT BOOLEAN IncludeSelePerson := IncludePerson AND IncludeBusinessSele;
 	EXPORT BOOLEAN IncludeSeleProperty := IncludeProperty AND IncludeBusinessSele;
 	EXPORT BOOLEAN IncludeSelePropertyEvent := IncludeSeleProperty AND IncludePropertyEvent;
 	EXPORT BOOLEAN IncludeSelePhoneNumber := IncludePhone AND IncludeBusinessSele;
-	EXPORT BOOLEAN IncludeSeleVehicle := IncludeVehicle AND IncludeBusinessSele;
-	EXPORT BOOLEAN IncludeSeleWatercraft := IncludeWatercraft AND IncludeBusinessSele;
+	EXPORT BOOLEAN IncludeSeleInquiry := IncludeInquiry AND IncludeBusinessSele;
 	EXPORT BOOLEAN IncludeSeleUCC := IncludeBusinessSele AND IncludeUCC;
 	EXPORT BOOLEAN IncludeSeleTIN := IncludeBusinessSele AND IncludeTIN;
 	EXPORT BOOLEAN IncludeSeleTradeline := IncludeBusinessSele AND IncludeTradeline;
 	EXPORT BOOLEAN IncludeSeleUtility   := IncludeBusinessSele AND IncludeUtility;
+	EXPORT BOOLEAN IncludeSeleWatercraft := IncludeWatercraft AND IncludeBusinessSele;
+	EXPORT BOOLEAN IncludeSeleVehicle := IncludeVehicle AND IncludeBusinessSele;
 	EXPORT BOOLEAN IncludeSSNAddress := IncludeSocialSecurityNumber AND IncludeAddress;
 	EXPORT BOOLEAN IncludeSSNInquiry := IncludeSocialSecurityNumber AND IncludeInquiry;
 	EXPORT BOOLEAN IncludeSSNProperty := IncludeSocialSecurityNumber AND IncludeProperty;
 	EXPORT BOOLEAN IncludeSSNPhone := IncludeSocialSecurityNumber AND IncludePhone;
-	EXPORT BOOLEAN IncludeTINPhone := IncludePhone AND IncludeTIN;
 	EXPORT BOOLEAN IncludeTINAddress := IncludeAddress AND IncludeTIN;
+	EXPORT BOOLEAN IncludeTINInquiry := IncludeInquiry AND IncludeTIN;
+	EXPORT BOOLEAN IncludeTINPhone := IncludePhone AND IncludeTIN;
 	EXPORT BOOLEAN IncludeUtilityAddress := IncludeUtility AND IncludeAddress;
 	EXPORT BOOLEAN IncludeUtilityPerson := IncludeUtility AND IncludePerson;
 	EXPORT BOOLEAN IncludeUtilityPhone := IncludeUtility AND IncludePhone;

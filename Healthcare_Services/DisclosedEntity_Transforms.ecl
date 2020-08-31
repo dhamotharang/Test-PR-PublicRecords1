@@ -1,4 +1,4 @@
-Import iesp,BatchServices,DidVille,Business_Header,Healthcare_Header_Services,doxie, ut;
+﻿Import iesp,BatchServices,DidVille,Business_Header,Healthcare_Header_Services,doxie, ut;
 EXPORT DisclosedEntity_Transforms := MODULE
 	Shared myFn := Healthcare_Services.DisclosedEntity_Functions;
 
@@ -9,7 +9,7 @@ EXPORT DisclosedEntity_Transforms := MODULE
 		return stringlib.stringfilter(toUpperCase(inStr),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ ');
 	end;
 
-	export BatchServices.RollupBusiness_BatchService_Layouts.Input convertToBusinessRollup(DisclosedEntity_Layouts.flatInput inRecs):= TRANSFORM
+	export BatchServices.RollupBusiness_BatchService_Layouts.Input convertToBusinessRollup(Healthcare_Services.DisclosedEntity_Layouts.flatInput inRecs):= TRANSFORM
 				self.acctno := inRecs.acctno;
 				self.comp_name:= cleanRemovePunctuation(inRecs.comp_name);
 				self.prim_range:= inRecs.prim_range;
@@ -335,7 +335,7 @@ EXPORT DisclosedEntity_Transforms := MODULE
 			self.st_c5 := relatedBus5Addr.st;
 			self.z5_c5 := relatedBus5Addr.z5;
 	end;
-	export Healthcare_Services.DisclosedEntity_Layouts.entityIdsParent convertToEntityIDLayout(DisclosedEntity_Layouts.resultsWithInput inRec):= TRANSFORM
+	export Healthcare_Services.DisclosedEntity_Layouts.entityIdsParent convertToEntityIDLayout(Healthcare_Services.DisclosedEntity_Layouts.resultsWithInput inRec):= TRANSFORM
 			i1 := myFn.buildEntityDSRow(inRec.acctno,1,inRec.FirstName_i1,InRec.MiddleName_i1,inRec.LastName_i1,inRec.Name_Suffix_i1,
 																	inRec.ssn_i1,inRec.dob_i1,inRec.PhoneNumber_i1,'','',
 																	inRec.prim_range_i1,inRec.predir_i1,inRec.prim_name_i1,inRec.addr_suffix_i1,
@@ -384,7 +384,7 @@ EXPORT DisclosedEntity_Transforms := MODULE
 			self.acctno := inRec.acctno;
 			self.entityIDChildren := i1+i2+i3+i4+i5+c1+c2+c3+c4+c5;
 	end;
-	export BatchServices.RollupBusiness_BatchService_Layouts.Input convertRelatedCompanyToBusinessRollup(DisclosedEntity_Layouts.entityIds inRec, boolean feinonly=false):= TRANSFORM
+	export BatchServices.RollupBusiness_BatchService_Layouts.Input convertRelatedCompanyToBusinessRollup(Healthcare_Services.DisclosedEntity_Layouts.entityIds inRec, boolean feinonly=false):= TRANSFORM
 				self.acctno := (string)inRec.acctnoseq;
 				self.comp_name:= if(feinonly,'',inRec.CompanyName);
 				self.prim_range:= if(feinonly,'',inRec.prim_range);
@@ -404,7 +404,7 @@ EXPORT DisclosedEntity_Transforms := MODULE
 				self.zip4 := '';
 				self.mileradius := '';
 	end;
-	export DidVille.Layout_Did_OutBatch convertToDidvilleBatch(DisclosedEntity_Layouts.entityIds inRec, boolean ssnonly=false):= TRANSFORM
+	export DidVille.Layout_Did_OutBatch convertToDidvilleBatch(Healthcare_Services.DisclosedEntity_Layouts.entityIds inRec, boolean ssnonly=false):= TRANSFORM
 		self.seq := inRec.acctnoseq;
 		self.ssn := inRec.ssn;
 		self.dob := if(ssnonly,'',inRec.dob);
@@ -426,10 +426,10 @@ EXPORT DisclosedEntity_Transforms := MODULE
 		self.title :='';
 		self.zip4:='';
 	end;
-	export Healthcare_Header_Services.Layouts.autokeyInput convertToHCConsolidateBatch(DisclosedEntity_Layouts.resultsWithInput inRec):= TRANSFORM
+	export Healthcare_Header_Services.Layouts.autokeyInput convertToHCConsolidateBatch(Healthcare_Services.DisclosedEntity_Layouts.resultsWithInput inRec):= TRANSFORM
 		self := inRec;
 	end;
-	export DisclosedEntity_Layouts.entityIds xFormBus(DisclosedEntity_Layouts.entityIds src, DisclosedEntity_Layouts.baseRecords bus):= TRANSFORM
+	export Healthcare_Services.DisclosedEntity_Layouts.entityIds xFormBus(Healthcare_Services.DisclosedEntity_Layouts.entityIds src, Healthcare_Services.DisclosedEntity_Layouts.baseRecords bus):= TRANSFORM
 		self.acctno := src.acctno;
 		self.seq := src.seq; 
 		self.acctnoseq := src.acctnoseq;
@@ -447,17 +447,18 @@ EXPORT DisclosedEntity_Transforms := MODULE
 										 bus.fein_var8 <> '' => bus.fein_var8,
 										 bus.fein_var9 <> '' => bus.fein_var9,'');
 		self.fein := bestFein;
-		self.best_addr_date := bus.best_dt_last_seen;
-		self.prim_range := bus.best_prim_range;
-		self.predir := bus.best_predir;
-		self.prim_name := bus.best_prim_name;
-		self.addr_suffix := bus.best_addr_suffix;
-		self.postdir := bus.best_postdir;
-		self.unit_desig := bus.best_unit_desig;
-		self.sec_range := bus.best_sec_range;
-		self.p_city_name := bus.best_city;
-		self.st := bus.best_state;
-		self.z5 := bus.best_zip;
+		useBestVar := bus.best_prim_range<>'' ;
+		self.best_addr_date := if(useBestVar,bus.best_dt_last_seen,bus.dt_last_seen_var2);
+		self.prim_range := if(useBestVar,bus.best_prim_range,bus.prim_range_var2);
+		self.predir := if(useBestVar,bus.best_predir,bus.predir_var2);
+		self.prim_name := if(useBestVar,bus.best_prim_name,bus.prim_name_var2);
+		self.addr_suffix := if(useBestVar,bus.best_addr_suffix,bus.addr_suffix_var2);
+		self.postdir := if(useBestVar,bus.best_postdir,bus.postdir_var2);
+		self.unit_desig := if(useBestVar,bus.best_unit_desig,bus.unit_desig_var2);
+		self.sec_range := if(useBestVar,bus.best_sec_range,bus.sec_range_var2);
+		self.p_city_name := if(useBestVar,bus.best_city,bus.city_var2);
+		self.st := if(useBestVar,bus.best_state,bus.state_var2);
+		self.z5 := if(useBestVar,bus.best_zip,bus.zip_var2); 
 		self.grpID := bus.groupID;
 		self.activeBusiness := bus.status[1..6] = 'ACTIVE';
 		self.FEINExists := src.FEIN <> '' and bestFein <> '' and (integer)src.fein = (integer)bestFein;//If false later need to check to see actually exists
@@ -465,7 +466,7 @@ EXPORT DisclosedEntity_Transforms := MODULE
 		self.related := src.grpID = bus.groupid;
 		self.did := 0;
 	end;
-	export DisclosedEntity_Layouts.entityIds xFormHdr(DisclosedEntity_Layouts.entityIds src, DidVille.Layout_Did_OutBatch hdr):= TRANSFORM
+	export Healthcare_Services.DisclosedEntity_Layouts.entityIds xFormHdr(Healthcare_Services.DisclosedEntity_Layouts.entityIds src, DidVille.Layout_Did_OutBatch hdr):= TRANSFORM
 		self.acctno := src.acctno;
 		self.seq := src.seq; 
 		self.acctnoseq := src.acctnoseq;
@@ -498,22 +499,22 @@ EXPORT DisclosedEntity_Transforms := MODULE
 		self.bdid := 0;
 	end;
 
-	export DisclosedEntity_Layouts.entityIdsParent entitydoRollup(DisclosedEntity_Layouts.entityIds l, dataset(DisclosedEntity_Layouts.entityIds) r) := TRANSFORM
+	export Healthcare_Services.DisclosedEntity_Layouts.entityIdsParent entitydoRollup(Healthcare_Services.DisclosedEntity_Layouts.entityIds l, dataset(Healthcare_Services.DisclosedEntity_Layouts.entityIds) r) := TRANSFORM
 		SELF.acctno := l.acctno;
 		self.entityIDChildren := r;
 	END;
 
-	export DisclosedEntity_Layouts.resultsWithInput mergeBaseWithInput(DisclosedEntity_Layouts.flatInput l,DisclosedEntity_Layouts.baseRecords r) := TRANSFORM
+	export Healthcare_Services.DisclosedEntity_Layouts.resultsWithInput mergeBaseWithInput(Healthcare_Services.DisclosedEntity_Layouts.flatInput l,Healthcare_Services.DisclosedEntity_Layouts.baseRecords r) := TRANSFORM
 		SELF := l;
 		self := r;
 	END;
 
-	export DisclosedEntity_Layouts.finalRecords mergeBaseWithHeader(DisclosedEntity_Layouts.resultsWithInput l, DisclosedEntity_Layouts.entityIdsParent r) := TRANSFORM
+	export Healthcare_Services.DisclosedEntity_Layouts.finalRecords mergeBaseWithHeader(Healthcare_Services.DisclosedEntity_Layouts.resultsWithInput l, Healthcare_Services.DisclosedEntity_Layouts.entityIdsParent r) := TRANSFORM
 		SELF := l;
 		self := r;
 	END;
 
-	export DisclosedEntity_Layouts.entityIdsWithGrpIDtoBDID xFormBusinessRelationships(DisclosedEntity_Layouts.entityIds l, recordof(Business_Header.Key_BH_SuperGroup_GroupID) r) := TRANSFORM
+	export Healthcare_Services.DisclosedEntity_Layouts.entityIdsWithGrpIDtoBDID xFormBusinessRelationships(Healthcare_Services.DisclosedEntity_Layouts.entityIds l, recordof(Business_Header.Key_BH_SuperGroup_GroupID) r) := TRANSFORM
 		SELF.grpBDID := r.bdid;
 		SELF := l;
 		self := r;
@@ -550,7 +551,7 @@ EXPORT DisclosedEntity_Transforms := MODULE
 		return ds(validRow);
 	end;
 
-	shared fmtIndividuals(dataset(DisclosedEntity_Layouts.entityIds) resultRow, iesp.disclosed_entity_search.t_DisclosedEntitySearchByIndividual src) := function
+	shared fmtIndividuals(dataset(Healthcare_Services.DisclosedEntity_Layouts.entityIds) resultRow, iesp.disclosed_entity_search.t_DisclosedEntitySearchByIndividual src) := function
 		validRow := src.Individual.Name.Last <> '' or src.Individual.Name.Full <> '' or src.SSN <> '';
 		iesp.disclosed_entity_search.t_DisclosedEntityAssociatedIndividual getRow():= transform
 			self.SearchedIndividual := src;
@@ -569,7 +570,7 @@ EXPORT DisclosedEntity_Transforms := MODULE
 		return ds(validRow);
 	end;
 
-	shared buildIndividuals (dataset(DisclosedEntity_Layouts.entityIds) results, 
+	shared buildIndividuals (dataset(Healthcare_Services.DisclosedEntity_Layouts.entityIds) results, 
 													 dataset(iesp.disclosed_entity_search.t_DisclosedEntitySearchByIndividual) src) := function
 		mergeIndvData1 := fmtIndividuals(results(seq=1),src[1]);
 		mergeIndvData2 := fmtIndividuals(results(seq=2),src[2]);
@@ -579,7 +580,7 @@ EXPORT DisclosedEntity_Transforms := MODULE
 		return mergeIndvData1+mergeIndvData2+mergeIndvData3+mergeIndvData4+mergeIndvData5;
 	end;
 
-	shared fmtBusiness(dataset(DisclosedEntity_Layouts.entityIds) resultRow, iesp.disclosed_entity_search.t_DisclosedEntitySearchByBusiness src) := function
+	shared fmtBusiness(dataset(Healthcare_Services.DisclosedEntity_Layouts.entityIds) resultRow, iesp.disclosed_entity_search.t_DisclosedEntitySearchByBusiness src) := function
 		validRow := src.Company.CompanyName <> '' or src.FEIN <> '';
 		iesp.disclosed_entity_search.t_DisclosedEntityAssociatedCompany getRow():= transform
 			self.SearchedBusiness := src;
@@ -598,7 +599,7 @@ EXPORT DisclosedEntity_Transforms := MODULE
 		return ds(validRow);
 	end;
 
-	shared buildCompany (dataset(DisclosedEntity_Layouts.entityIds) results, 
+	shared buildCompany (dataset(Healthcare_Services.DisclosedEntity_Layouts.entityIds) results, 
 													 dataset(iesp.disclosed_entity_search.t_DisclosedEntitySearchByBusiness) src) := function
 		mergeBusData1 := fmtBusiness(results(seq=101),src[1]);
 		mergeBusData2 := fmtBusiness(results(seq=102),src[2]);
@@ -608,7 +609,7 @@ EXPORT DisclosedEntity_Transforms := MODULE
 		return mergeBusData1+mergeBusData2+mergeBusData3+mergeBusData4+mergeBusData5;
 	end;
 
-	export iesp.disclosed_entity_search.t_DisclosedEntityResults fmtResults(DisclosedEntity_Layouts.finalRecords l, iesp.disclosed_entity_search.t_DisclosedEntitySearchBy src) := TRANSFORM
+	export iesp.disclosed_entity_search.t_DisclosedEntityResults fmtResults(Healthcare_Services.DisclosedEntity_Layouts.finalRecords l, iesp.disclosed_entity_search.t_DisclosedEntitySearchBy src) := TRANSFORM
 		self.AccountNumber := l.acctno;
 		self.CustomerKey := src.CustomerKey;
 		self.GroupId := (string)l.groupid;
@@ -709,7 +710,7 @@ EXPORT DisclosedEntity_Transforms := MODULE
 		Self.AssociatedCompanies := choosen(buildCompany (Companies, src.AssociatedCompanies),iesp.Constants.BR.MaxCompanyResult);
 	END;
 	
-	export Healthcare_Header_Services.Layouts.autokeyInput convertToSancAutokey(DisclosedEntity_Layouts.entityIds inRecs):= TRANSFORM
+	export Healthcare_Header_Services.Layouts.autokeyInput convertToSancAutokey(Healthcare_Services.DisclosedEntity_Layouts.entityIds inRecs):= TRANSFORM
 		self.acctno := (string)inRecs.acctnoseq;
 		self.name_first := inRecs.FirstName;
 		self.name_middle := inRecs.MiddleName;
@@ -732,7 +733,7 @@ EXPORT DisclosedEntity_Transforms := MODULE
 		self.bdid := inRecs.bdid;
 	END;
 	
-	export DisclosedEntity_Layouts.resultsWithInput updateInputWithProvider(DisclosedEntity_Layouts.resultsWithInput inRec, Healthcare_Header_Services.Layouts.CombinedHeaderResultsDoxieLayout matchRec):= TRANSFORM
+	export Healthcare_Services.DisclosedEntity_Layouts.resultsWithInput updateInputWithProvider(Healthcare_Services.DisclosedEntity_Layouts.resultsWithInput inRec, Healthcare_Header_Services.Layouts.CombinedHeaderResultsDoxieLayout matchRec):= TRANSFORM
 		//Populate whatever you can....
 		unsigned1 addrRows := count(matchRec.Addresses);
 		boolean existsRow2 := addrRows >= 2;
@@ -923,7 +924,7 @@ EXPORT DisclosedEntity_Transforms := MODULE
 		// self.sancIDs := DEDUP(NORMALIZE(allRows, LEFT.sancIDs, TRANSFORM(Healthcare_Provider_Services.Layouts.layout_sancid, self.sanc_id := (integer)right.sanc_id; SELF := RIGHT)),ALL)(sanc_id > 0);
 	// END;
 	
-	export DisclosedEntity_Layouts.flatOutput fmtBatchResults(DisclosedEntity_Layouts.finalRecords l):= TRANSFORM
+	export Healthcare_Services.DisclosedEntity_Layouts.flatOutput fmtBatchResults(Healthcare_Services.DisclosedEntity_Layouts.finalRecords l):= TRANSFORM
 		self.penalt:= (string)l.penalt;
 		self.Groupid:= (string)l.Groupid;
 		self.CompanyName:=  l.best_company_name;

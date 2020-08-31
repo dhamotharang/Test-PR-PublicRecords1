@@ -455,23 +455,23 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 
 				verified := BusinessInstantID20_Services.fn_GetBusinessRecordVerification( le );
 				
-				SELF.VerifiedEcho.bus_ver_name             := IF( verified[COMPANYNAME], ri.CompanyName, '' );
-				SELF.VerifiedEcho.bus_ver_altname          := IF( verified[COMPANYNAME], ri.AltCompanyName, '' );
-				SELF.VerifiedEcho.bus_ver_addr             := IF( verified[COMPANYADDR], ri.StreetAddress, '' );
-				SELF.VerifiedEcho.bus_ver_city             := IF( verified[COMPANYADDR], ri.City, '' );
-				SELF.VerifiedEcho.bus_ver_state            := IF( verified[COMPANYADDR], ri.State, '' );
-				SELF.VerifiedEcho.bus_ver_zip              := IF( verified[COMPANYADDR], ri.Zip5, '' );
-				SELF.VerifiedEcho.bus_ver_phone            := IF( verified[COMPANYPHON], ri.Phone10, '' );
-				SELF.VerifiedEcho.bus_ver_tin              := IF( verified[COMPANYFEIN], ri.FEIN, '' );
+				SELF.VerifiedEcho.bus_ver_name             := IF( verified[COMPANYNAME]=1, ri.CompanyName, '' );
+				SELF.VerifiedEcho.bus_ver_altname          := IF( verified[COMPANYNAME]=1, ri.AltCompanyName, '' );
+				SELF.VerifiedEcho.bus_ver_addr             := IF( verified[COMPANYADDR]=1, ri.StreetAddress, '' );
+				SELF.VerifiedEcho.bus_ver_city             := IF( verified[COMPANYADDR]=1, ri.City, '' );
+				SELF.VerifiedEcho.bus_ver_state            := IF( verified[COMPANYADDR]=1, ri.State, '' );
+				SELF.VerifiedEcho.bus_ver_zip              := IF( verified[COMPANYADDR]=1, ri.Zip5, '' );
+				SELF.VerifiedEcho.bus_ver_phone            := IF( verified[COMPANYPHON]=1, ri.Phone10, '' );
+				SELF.VerifiedEcho.bus_ver_tin              := IF( verified[COMPANYFEIN]=1, ri.FEIN, '' );
 				
-				SELF.Verification.ver_name_indicator       := IF( verified[COMPANYNAME], '1', '0' );
-				SELF.Verification.ver_altname_indicator    := IF( verified[COMPANYNAME], '1', '0' );
-				SELF.Verification.ver_streetaddr_indicator := IF( verified[COMPANYADDR], '1', '0' );
-				SELF.Verification.ver_city_indicator       := IF( verified[COMPANYADDR], '1', '0' );
-				SELF.Verification.ver_state_indicator      := IF( verified[COMPANYADDR], '1', '0' );
-				SELF.Verification.ver_zip_indicator        := IF( verified[COMPANYADDR], '1', '0' );
-				SELF.Verification.ver_phone_indicator      := IF( verified[COMPANYPHON], '1', '0' );
-				SELF.Verification.ver_tin_indicator        := IF( verified[COMPANYFEIN], '1', '0' );
+				SELF.Verification.ver_name_indicator       := IF( verified[COMPANYNAME]=1, '1', '0' );
+				SELF.Verification.ver_altname_indicator    := IF( verified[COMPANYNAME]=1, '1', '0' );
+				SELF.Verification.ver_streetaddr_indicator := IF( verified[COMPANYADDR]=1, '1', '0' );
+				SELF.Verification.ver_city_indicator       := IF( verified[COMPANYADDR]=1, '1', '0' );
+				SELF.Verification.ver_state_indicator      := IF( verified[COMPANYADDR]=1, '1', '0' );
+				SELF.Verification.ver_zip_indicator        := IF( verified[COMPANYADDR]=1, '1', '0' );
+				SELF.Verification.ver_phone_indicator      := IF( verified[COMPANYPHON]=1, '1', '0' );
+				SELF.Verification.ver_tin_indicator        := IF( verified[COMPANYFEIN]=1, '1', '0' );
 
 				SELF := le;
 				SELF := [];

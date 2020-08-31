@@ -96,19 +96,21 @@ EXPORT Fraud_Defense_Manager_Service := MACRO
 	// Get GLB and DPPA and make sure they are at least set to 0
 	UNSIGNED1 GLBPurpose					:= MAX((INTEGER)users.GLBPurpose, 0);
 	UNSIGNED1 DPPAPurpose					:= MAX((INTEGER)users.DLPurpose, 0);
-	
+		
+	// Make sure DataRestrictionMask is populated - if not set it to the default Data Restriction Mask
+	STRING50 DataRestriction	:= IF(TRIM(users.DataRestrictionMask) <> '', TRIM(users.DataRestrictionMask), Risk_Indicators.iid_constants.default_DataRestriction);
+	BOOLEAN TestDataEnabled				:= (INTEGER)users.TestDataEnabled = 1;
+	STRING32 TestDataTableName		:= STD.Str.ToUpperCase(TRIM(users.TestDataTableName));
+
 	mod_access := MODULE(Doxie.IDataAccess)
 		EXPORT glb := GLBPurpose;
 		EXPORT dppa := DPPAPurpose;
+		EXPORT DataPermissionMask := users.DataPermissionMask;
+        EXPORT DataRestrictionMask := DataRestriction;
 		EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
 		EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
 		EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
 	END;
-	
-	// Make sure DataRestrictionMask is populated - if not set it to the default Data Restriction Mask
-	STRING50 DataRestrictionMask	:= IF(TRIM(users.DataRestrictionMask) <> '', TRIM(users.DataRestrictionMask), Risk_Indicators.iid_constants.default_DataRestriction);
-	BOOLEAN TestDataEnabled				:= (INTEGER)users.TestDataEnabled = 1;
-	STRING32 TestDataTableName		:= STD.Str.ToUpperCase(TRIM(users.TestDataTableName));
 
 	/* ************************************************************************
 	 *  Convert the ESDL input into the batch layout so that we can use the   *
@@ -163,7 +165,7 @@ EXPORT Fraud_Defense_Manager_Service := MACRO
 	/* ************************************************************************
 	 * Get the Suspicious Fraud Results - Search TestSeeds is TestDataEnabled *
 	 ************************************************************************ */
-	results := IF(TestDataEnabled = FALSE, Suspicious_Fraud_LN.Fraud_Defense_Manager_Search_Function(Batch_In, GLBPurpose, DPPAPurpose, DataRestrictionMask, Gateways, mod_access),
+	results := IF(TestDataEnabled = FALSE, Suspicious_Fraud_LN.Fraud_Defense_Manager_Search_Function(Batch_In, GLBPurpose, DPPAPurpose, DataRestriction, Gateways, mod_access),
 																				 Suspicious_Fraud_LN.Fraud_Defense_Manager_TestSeed_Function(Batch_In, TestDataTableName));
 	
 	/* ************************************************************************

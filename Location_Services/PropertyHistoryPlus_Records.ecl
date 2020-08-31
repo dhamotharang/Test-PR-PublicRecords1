@@ -1,10 +1,11 @@
-IMPORT Address,Autokey_batch,doxie,iesp, LN_PropertyV2,ut;
+﻿IMPORT Address,Autokey_batch,doxie,iesp, LN_PropertyV2,ut;
 
 lPropHistCollusion := Location_Services.Layouts;
 
 EXPORT PropertyHistoryPlus_Records(DATASET(Autokey_batch.Layouts.rec_inBatchMaster)       dIn,
 																		Location_Services.iParam.PropHistHRI                   inMod,
-																		iesp.propertyhistoryplus.t_PropertyHistoryPlusReportBy reportBy) :=
+																		iesp.propertyhistoryplus.t_PropertyHistoryPlusReportBy reportBy,
+																		boolean includeAssignmentsAndReleases=false) :=
 FUNCTION
 	keyAddrFID       := LN_PropertyV2.key_addr_fid();
   keyAssessmentFID := LN_PropertyV2.key_assessor_fid();
@@ -26,7 +27,9 @@ FUNCTION
 													KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id)
 											and WILD(RIGHT.which_orig)
 											and WILD(RIGHT.source_code_2)
-											and KEYED(RIGHT.source_code_1 IN ['O','S']),
+											//and KEYED(RIGHT.source_code_1 IN (if(includeAssignmentsAndReleases, ['O','S','B'], ['O','S'])) ),
+											and KEYED(RIGHT.source_code_1 IN (if(includeAssignmentsAndReleases, [LN_PropertyV2.Constants.SOURCE_CD_PARTY_TP.Owner, LN_PropertyV2.Constants.SOURCE_CD_PARTY_TP.Seller, LN_PropertyV2.Constants.SOURCE_CD_PARTY_TP.Borrower], 
+																																																			[LN_PropertyV2.Constants.SOURCE_CD_PARTY_TP.Owner, LN_PropertyV2.Constants.SOURCE_CD_PARTY_TP.Seller])) ),
 											tGetPartyInfo(LEFT,RIGHT),
 											LEFT OUTER,ATMOST(Location_Services.consts.MaxFaresIDs));
 	
@@ -50,7 +53,7 @@ FUNCTION
 	dLatestAssessment := Location_Services.Functions.GetLatestAssessment(dFaresIdGood);
 	
 	// Deeds data with collusion attributes
-	dDeedTransactions := Location_Services.Functions.GetDeeds(dFaresIdGood,dPartyInfo,inMod);
+	dDeedTransactions := Location_Services.Functions.GetDeeds(dFaresIdGood,dPartyInfo,inMod, includeAssignmentsAndReleases);
 	
 	// Current residents
 	dCurrentResidents := Location_Services.Functions.GetCurrentResidents(dPropAddress,inMod);
@@ -157,6 +160,9 @@ FUNCTION
 			SELF.Deed.MortgageAmount           := pInput.first_td_loan_amount + pInput.second_td_loan_amount;
 			SELF.Deed.DocumentType             := pInput.document_type_desc;
 			SELF.Deed.RecordingDate            := iesp.ECL2ESP.toDatestring8(pInput.recording_date);
+			//SELF.Deed.BorrowerName           := pInput.name1; 
+			SELF.Deed.MortgagePayOffDate       := iesp.ECL2ESP.toDatestring8(pInput.first_td_due_date);
+			SELF.Deed.RecordType               := pInput.record_type;
 			SELF.Deed.PropertyDocument.Book    := pInput.recorder_book_number;
 			SELF.Deed.PropertyDocument.Page    := pInput.recorder_page_number;
 			SELF.Deed.PropertyDocument.Number  := pInput.document_number;

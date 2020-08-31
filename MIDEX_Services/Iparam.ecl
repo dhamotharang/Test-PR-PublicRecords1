@@ -112,6 +112,7 @@ EXPORT IParam := MODULE
     EXPORT BOOLEAN  includeLicRptsFromNMLS := TRUE; // defaulting to TRUE so the comp report can return multiple 
                                                     // license reports with the same/associated NMLS id and 
                                                     // is not impacted by this change.
+    EXPORT BOOLEAN includeVendorSourceB := FALSE;  
   END;
 
   

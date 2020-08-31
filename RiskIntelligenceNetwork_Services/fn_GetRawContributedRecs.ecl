@@ -3,9 +3,10 @@
 EXPORT fn_GetRawContributedRecs(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_search_in,
                                 RiskIntelligenceNetwork_Services.IParam.Params search_params) := FUNCTION
 
+ _Constants := RiskIntelligenceNetwork_Services.Constants;
  //Since its batch of 1 record, there will always be only one row of input.
  in_rec := ds_search_in[1];
- fraud_platform := RiskIntelligenceNetwork_Services.Constants.FRAUD_PLATFORM;
+ fraud_platform := _Constants.FRAUD_PLATFORM;
 
  //Following project is necessary to transform "BatchInExtended_rec" back to "BatchIn_rec" , which is actually used by Batch & Report & FDN services.
  ds_search_in_orig := PROJECT(ds_search_in, FraudShared_Services.Layouts.BatchIn_rec);
@@ -52,7 +53,7 @@ EXPORT fn_GetRawContributedRecs(DATASET(FraudShared_Services.Layouts.BatchInExte
 
  //Hitting the Fraud shared keys.. which are based on BatchIn_rec record structure.
  ds_valid_in  := FraudShared_Services.ValidateInput.BuildValidityRecs(ds_search_in_orig,fraud_platform);
- EntitiesIds_ := FraudShared_Services.EntitiesIds(ds_valid_in, fraud_platform, FALSE ,RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT);
+ EntitiesIds_ := FraudShared_Services.EntitiesIds(ds_valid_in, fraud_platform, FALSE ,_Constants.MAX_JOIN_LIMIT);
 
  ds_did                  := EntitiesIds_.GetLexID();
  ds_linkId               := EntitiesIds_.GetLinkIds();
@@ -62,7 +63,6 @@ EXPORT fn_GetRawContributedRecs(DATASET(FraudShared_Services.Layouts.BatchInExte
  ds_appended_provider_id := EntitiesIds_.GetAppendedProviderID();
  ds_provider_npi         := EntitiesIds_.GetNPI();
  ds_provider_lnpid       := EntitiesIds_.GetLNPID();
- ds_bankaccountnumber    := EntitiesIds_.GetBankAccountNumber();
 
  //Hitting the Advance Search spcific only keys.. which are based on BatchInExtended_rec record structure.
  Search_EntitiesIDs_ := RiskIntelligenceNetwork_Services.fn_GetEntityRecordIds(ds_search_in, fraud_platform);
@@ -79,7 +79,8 @@ EXPORT fn_GetRawContributedRecs(DATASET(FraudShared_Services.Layouts.BatchInExte
  ds_CountyIds        := Search_EntitiesIDs_.GetCountyIds();
  ds_ZipIds           := Search_EntitiesIDs_.GetZipIds();
  ds_DriverLicensesIds:= Search_EntitiesIDs_.GetDriverLicenses();
-
+ ds_bankaccountnumberIds:= Search_EntitiesIDs_.GetBankAccountNumber();
+ 
  //Find which email key to hit.
  email_user_name   :=  TRIM(regexfind('(.*)@(.*)$',in_rec.email_address,1));
  email_user_domain := TRIM(regexfind('(.*)@(.*)$',in_rec.email_address,2));
@@ -90,29 +91,21 @@ EXPORT fn_GetRawContributedRecs(DATASET(FraudShared_Services.Layouts.BatchInExte
 
  ds_emailIds := MAP (userNameOnly => Search_EntitiesIDs_.GetEmailUserIds(),
                     domainNameOnly => Search_EntitiesIDs_.GetEmailDomainIds(),
-                    fullemail => EntitiesIds_.GetEmail(),
+                    fullemail => Search_EntitiesIDs_.GetEmail(),
                     dataset([], FraudShared_Services.Layouts.Recid_rec));
 
- //Find which IP_Address key to hit.
- BOOLEAN isIPRangeKey := STD.Str.Contains(in_rec.ip_address, 'XXX', true);
 
  octets := STD.STr.SplitWords(in_rec.ip_address,'.');
- octet1 := (unsigned1) IF(STD.Str.EqualIgnoreCase(octets[1], 'xxx'), '', octets[1]);
- octet2 := (unsigned1) IF(STD.Str.EqualIgnoreCase(octets[2], 'xxx'), '', octets[2]);
- octet3 := (unsigned1) IF(STD.Str.EqualIgnoreCase(octets[3], 'xxx'), '', octets[3]);
- octet4 := (unsigned1) IF(STD.Str.EqualIgnoreCase(octets[4], 'xxx'), '', octets[4]);
+ octet1 := RiskIntelligenceNetwork_Services.Functions.GetFormatted_IP(octets[1]);
+ octet2 := RiskIntelligenceNetwork_Services.Functions.GetFormatted_IP(octets[2]);
+ octet3 := RiskIntelligenceNetwork_Services.Functions.GetFormatted_IP(octets[3]);
+ octet4 := RiskIntelligenceNetwork_Services.Functions.GetFormatted_IP(octets[4]);
 
- //Flags for IP Range Filtering.
- isIPRange123 := in_rec.ip_address <> '' AND isIPRangeKey AND octet1 <> 0 AND octet2 <> 0 AND octet3 <> 0 AND octet4 = 0;
- isIPRange12  := in_rec.ip_address <> '' AND isIPRangeKey AND octet1 <> 0 AND octet2 <> 0 AND octet3 = 0 AND octet4 = 0;
- isIPRange1   := in_rec.ip_address <> '' AND isIPRangeKey AND octet1 <> 0 AND octet2 = 0 AND octet3 = 0 AND octet4 = 0;
-
- ds_ip := MAP(isIPRangeKey => Search_EntitiesIDs_.GetIPRangeIds(octet1, octet2, octet3, isIPRange123, isIPRange12, isIPRange1),
-              NOT isIPRangeKey => EntitiesIds_.GetIp(),
-              dataset([], FraudShared_Services.Layouts.Recid_rec));
-
+ ip_address_cleaned := octet1 + octet2 + octet3 + octet4; 
+ ds_ip := Search_EntitiesIDs_.GetIPRangeIds(ip_address_cleaned);
+ 
  initial_rec := RECORD
-  unsigned2 cnt;
+  integer2 cnt;
   string100 key_identifier;
   dataset(FraudShared_Services.Layouts.Recid_rec) ds_rec_ids;
  END;
@@ -123,29 +116,29 @@ EXPORT fn_GetRawContributedRecs(DATASET(FraudShared_Services.Layouts.BatchInExte
                         {count(ds_auto_ssn), 'autossn', ds_auto_ssn},
                         {count(ds_auto_phone), 'autophone', ds_auto_phone},
                         {count(ds_did), 'DID', ds_did},
-                        {count(ds_ip), 'IpAddress', ds_ip},
+                        {IF(EXISTS(ds_ip(record_id=0)),-1,count(ds_ip)), 'IpAddress', ds_ip},
                         {count(ds_linkId), 'LinkID', ds_linkId},
                         {count(ds_device_id), 'DeviceID', ds_device_id},
                         {count(ds_professional_id), 'ProfessionalID', ds_professional_id},
                         {count(ds_tin), 'TIN', ds_tin},
-                        {count(ds_emailIds), 'EMAIL', ds_emailIds},
+                        {IF(EXISTS(ds_emailIds(record_id=0)),-1,count(ds_emailIds)), 'EMAIL', ds_emailIds},
                         {count(ds_appended_provider_id), 'PROVIDERID', ds_appended_provider_id},
                         {count(ds_provider_npi), 'NPI', ds_provider_npi},
                         {count(ds_provider_lnpid), 'LNPID', ds_provider_lnpid},
-                        {count(ds_householdid), 'HOUSEHOLDID', ds_householdid},
-                        {count(ds_CustomerPersonId), 'CustomerPersonId', ds_CustomerPersonId},
-                        {count(ds_AmountRangeIds), 'AmountRange', ds_AmountRangeIds},
-                        {count(ds_BankNameIds), 'BankName', ds_BankNameIds},
-                        {count(ds_BankRoutingIds), 'BankRoutingNumber', ds_BankRoutingIds},
-                        {count(ds_bankaccountnumber), 'BankAccountNumber', ds_bankaccountnumber},
-                        {count(ds_ReportedDateIds), 'ReportedDate', ds_ReportedDateIds},
-                        {count(ds_ISPNameIds), 'ISPName', ds_ISPNameIds},
-                        {count(ds_MACAddressIds), 'MACAddress', ds_MACAddressIds},
-                        {count(ds_SerialNumberIds), 'SerialNumber', ds_SerialNumberIds},
-                        {count(ds_CityStateIds), 'CityState', ds_CityStateIds},
-                        {count(ds_CountyIds), 'County', ds_CountyIds},
-                        {count(ds_ZipIds), 'Zip', ds_ZipIds},
-                        {count(ds_DriverLicensesIds), 'DLNumber', ds_DriverLicensesIds}], initial_rec),
+                        {IF(EXISTS(ds_householdid(record_id=0)),-1,count(ds_householdid)), 'HOUSEHOLDID', ds_householdid},
+                        {IF(EXISTS(ds_CustomerPersonId(record_id=0)),-1,count(ds_CustomerPersonId)), 'CustomerPersonId', ds_CustomerPersonId},
+                        {IF(EXISTS(ds_AmountRangeIds(record_id=0)),-1,count(ds_AmountRangeIds)), 'AmountRange', ds_AmountRangeIds},
+                        {IF(EXISTS(ds_BankNameIds(record_id=0)),-1,count(ds_BankNameIds)), 'BankName', ds_BankNameIds},
+                        {IF(EXISTS(ds_BankRoutingIds(record_id=0)),-1,count(ds_BankRoutingIds)), 'BankRoutingNumber', ds_BankRoutingIds},
+                        {IF(EXISTS(ds_bankaccountnumberIds(record_id=0)),-1,count(ds_bankaccountnumberIds)), 'BankAccountNumber', ds_bankaccountnumberIds},
+                        {IF(EXISTS(ds_ReportedDateIds(record_id=0)),-1,count(ds_ReportedDateIds)), 'ReportedDate', ds_ReportedDateIds},
+                        {IF(EXISTS(ds_ISPNameIds(record_id=0)),-1,count(ds_ISPNameIds)), 'ISPName', ds_ISPNameIds},
+                        {IF(EXISTS(ds_MACAddressIds(record_id=0)),-1,count(ds_MACAddressIds)), 'MACAddress', ds_MACAddressIds},
+                        {IF(EXISTS(ds_SerialNumberIds(record_id=0)),-1,count(ds_SerialNumberIds)), 'SerialNumber', ds_SerialNumberIds},
+                        {IF(EXISTS(ds_CityStateIds(record_id=0)),-1,count(ds_CityStateIds)), 'CityState', ds_CityStateIds},
+                        {IF(EXISTS(ds_CountyIds(record_id=0)),-1,count(ds_CountyIds)), 'County', ds_CountyIds},
+                        {IF(EXISTS(ds_ZipIds(record_id=0)),-1,count(ds_ZipIds)), 'Zip', ds_ZipIds},
+                        {IF(EXISTS(ds_DriverLicensesIds(record_id=0)),-1,count(ds_DriverLicensesIds)), 'DLNumber', ds_DriverLicensesIds}], initial_rec),
             dataset([], initial_rec));
 
  ds_recs_sorted := SORT(ds_recs(cnt > 0), cnt);
@@ -166,14 +159,7 @@ EXPORT fn_GetRawContributedRecs(DATASET(FraudShared_Services.Layouts.BatchInExte
                                                                           bank_routing_number_2 = in_rec.bank_routing_number, true) AND
                                      if(in_rec.bank_account_number <> '', bank_account_number_1 = in_rec.bank_account_number OR
                                                                           bank_account_number_2 = in_rec.bank_account_number, true) AND
-                                     if(in_rec.ispname <> '', isp = in_rec.ispname, true) AND
-                                     if(in_rec.ip_address <> '' AND NOT isIPRangeKey , ip_address = in_rec.ip_address, true) AND
-                                     if(isIPRange123 ,(unsigned1)STD.STr.SplitWords(ip_address,'.')[1] = octet1 AND
-                                                      (unsigned1)STD.STr.SplitWords(ip_address,'.')[2] = octet2 AND
-                                                      (unsigned1)STD.STr.SplitWords(ip_address,'.')[3] = octet3 , true) AND
-                                     if(isIPRange12	, (unsigned1)STD.STr.SplitWords(ip_address,'.')[1] = octet1 AND
-                                                      (unsigned1)STD.STr.SplitWords(ip_address,'.')[2] = octet2 , true) AND
-                                     if(isIPRange1 	, (unsigned1)STD.STr.SplitWords(ip_address,'.')[1] = octet1 , true) AND
+
                                      if(in_rec.MACAddress <> '', mac_address = in_rec.MACAddress, true) AND
                                      if(in_rec.device_id <> '', device_id = in_rec.device_id, true) AND
                                      if(in_rec.DeviceSerialNumber <> '', serial_number = in_rec.DeviceSerialNumber, true) AND
@@ -189,25 +175,32 @@ EXPORT fn_GetRawContributedRecs(DATASET(FraudShared_Services.Layouts.BatchInExte
                                    );
 
  //AND filter with BankName , explicit join because we do not have BankName field in the payload.
- ds_recs_filtered_bankname := IF(in_rec.BankName <> '',
+ ds_recs_filtered_bankname := IF(in_rec.BankName <> '' AND ~EXISTS(ds_BankNameIds(record_id=0)),
                                 JOIN(ds_recs_filtered, ds_BankNameIds,
                                   LEFT.record_id = RIGHT.record_id,
                                   TRANSFORM(LEFT)),
                                 ds_recs_filtered);
 
  //AND filter with County , explicit join because we wanted to use recordid filtering...
- ds_recs_filtered_county := IF(in_rec.county_name <> '',
+ ds_recs_filtered_county := IF(in_rec.county_name <> '' AND ~EXISTS(ds_CountyIds(record_id=0)),
                               JOIN(ds_recs_filtered_bankname, ds_CountyIds,
                                 LEFT.record_id = RIGHT.record_id,
                                 TRANSFORM(LEFT)),
                               ds_recs_filtered_bankname);
 
+ //AND filter with ISP dataset, explicit join because we do not have ISPName populated in the payload field.
+ ds_recs_filtered_isp := IF(in_rec.ispname <> '' AND ~EXISTS(ds_ISPNameIds(record_id=0)),
+                            JOIN(ds_recs_filtered_county, ds_ISPNameIds,
+                              LEFT.record_id = RIGHT.record_id,
+                              TRANSFORM(LEFT)),
+                            ds_recs_filtered_county);
+
  //AND Filter with Name Autokey,
  ds_recs_filtered_name := IF(in_rec.name_last <> '',
-                              JOIN(ds_recs_filtered_county, ds_auto_name,
+                              JOIN(ds_recs_filtered_isp, ds_auto_name,
                                 LEFT.record_id = RIGHT.record_id,
                                 TRANSFORM(LEFT)),
-                              ds_recs_filtered_county);
+                              ds_recs_filtered_isp);
 
  //AND Filter with Address Autokey,
  ds_recs_filtered_address := IF(in_rec.prim_name <> '' AND ((in_rec.p_city_name <> '' AND in_rec.st <> '') OR in_rec.z5 <> ''),
@@ -224,13 +217,23 @@ EXPORT fn_GetRawContributedRecs(DATASET(FraudShared_Services.Layouts.BatchInExte
                               ds_recs_filtered_address);
 
  //AND Filter with ssn Autokey,
- ds_recs_filtered_final := IF(in_rec.ssn <> '',
+ ds_recs_filtered_ssn := IF(in_rec.ssn <> '',
                               JOIN(ds_recs_filtered_phone, ds_auto_ssn,
                                 LEFT.record_id = RIGHT.record_id,
                                 TRANSFORM(LEFT)),
                               ds_recs_filtered_phone);
 
- ds_allPayloadRecs := LIMIT(ds_recs_filtered_final,RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT , FAIL(203, doxie.ErrorCodes(203)));
+ //AND Filter with IP / IP Range input,
+ ds_recs_filtered_final := IF(in_rec.ip_address <> '',
+                              JOIN(ds_recs_filtered_ssn, ds_ip,
+                                LEFT.record_id = RIGHT.record_id,
+                                TRANSFORM(LEFT)),
+                              ds_recs_filtered_ssn);
+
+ // If there is a key join that failed due to limit and no other key joins yielded any records, fail with code 203
+ IF(EXISTS(ds_recs(cnt = -1)) AND NOT EXISTS(ds_final_rec_ids), FAIL(_Constants.TOO_MAY_RECORDS_CODE, _Constants.TOO_MAY_RECORDS_MSG));
+
+ ds_allPayloadRecs := LIMIT(ds_recs_filtered_final,_Constants.MAX_JOIN_LIMIT , FAIL(_Constants.TOO_MAY_RECORDS_CODE, _Constants.TOO_MAY_RECORDS_MSG));
  
  // output(ds_search_in, named('ds_search_in'));
  // output(ds_payload_recs, named('ds_payload_recs'));

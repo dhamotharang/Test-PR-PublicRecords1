@@ -1,60 +1,55 @@
 /*--SOAP--
 <message name="Wildcard Vehicle Search">
-	<part name="Tag" type="xsd:string"/>
-	<part name="UseTagBlur" type='xsd:boolean' />
-	<part name="VIN" type="xsd:string" />
-	<part name="containsSearch" type="xsd:boolean"/>
-	<part name="Zip" type="tns:EspStringArray"/>
-	<part name="City" type="xsd:string"/>
-	<part name="State" type="xsd:string"/>
-	<part name="County" type="xsd:string"/>
-	<part name="make" type="tns:EspStringArray"/>
-	<part name="MajorColor" type="tns:EspStringArray"/>
-	<part name="Model" type="tns:EspStringArray"/>
-	<part name="Body" type="tns:EspStringArray"/>
-	<part name="Sex" type="xsd:string"/>
-	<part name="FilterLimit" type="xsd:string"/>
-	<part name="ModelYearStart" type="xsd:string"/>
-	<part name="ModelYearEnd" type="xsd:string"/>
-	<part name="AgeLow" type="xsd:string"/>
-	<part name="AgeHigh" type="xsd:string"/>
-	<part name="UnParsedFullName" type="xsd:string"/>
-	<part name="FirstName" type="xsd:string"/>
-	<part name="LastName" type="xsd:string"/>
-	<part name="MiddleName" type="xsd:string"/>
-	<part name="RegisterState" type="xsd:string"/>
-	<part name="MaxResults" type="xsd:unsignedInt"/>
-	<part name="MaxResultsThisTime" type="xsd:unsignedInt"/>
-	<part name="SkipRecords" type="xsd:unsignedInt"/>
-	<part name="DPPAPurpose" type="xsd:byte"/>
-	<part name="Raw" type="xsd:boolean"/>
-	<part name="RemoteOptimization" type="xsd:boolean"/>
-	<part name="NeighborService" type="tns:EspStringArray"/>
-	<part name="IsANeighbor" type="xsd:boolean"/>
-	<part name="SSNMask" type="xsd:string"/>
-	<part name="DLMask" type="xsd:string"/>
-  <part name="DataRestrictionMask" type="xsd:string" default="000000000000000000"/>
-	<part name="RegistrationType" type="xsd:unsignedInt"/>
-	<part name="IncludeDetailedRegistrationType" type="xsd:boolean"/>
-	<part name="IncludeCriminalIndicators" type="xsd:boolean"/>
-	<part name="IncludeNonRegulatedVehicleSources" type="xsd:boolean"/>
-	<part name="Zip5" type="xsd:string"/>
-	<part name="ZipRadius" type="xsd:unsignedInt"/>
+   <part name="Tag" type="xsd:string"/>
+   <part name="UseTagBlur" type='xsd:boolean' />
+   <part name="VIN" type="xsd:string" />
+   <part name="containsSearch" type="xsd:boolean"/>
+   <part name="Zip" type="tns:EspStringArray"/>
+   <part name="City" type="xsd:string"/>
+   <part name="State" type="xsd:string"/>
+   <part name="County" type="xsd:string"/>
+   <part name="make" type="tns:EspStringArray"/>
+   <part name="MajorColor" type="tns:EspStringArray"/>
+   <part name="SortByTagTypes" type="tns:EspStringArray"/>
+   <part name="Model" type="tns:EspStringArray"/>
+   <part name="Body" type="tns:EspStringArray"/>
+   <part name="Sex" type="xsd:string"/>
+   <part name="FilterLimit" type="xsd:string"/>
+   <part name="ModelYearStart" type="xsd:string"/>
+   <part name="ModelYearEnd" type="xsd:string"/>
+   <part name="AgeLow" type="xsd:string"/>
+   <part name="AgeHigh" type="xsd:string"/>
+   <part name="UnParsedFullName" type="xsd:string"/>
+   <part name="FirstName" type="xsd:string"/>
+   <part name="LastName" type="xsd:string"/>
+   <part name="MiddleName" type="xsd:string"/>
+   <part name="RegisterState" type="xsd:string"/>
+   <part name="MaxResults" type="xsd:unsignedInt"/>
+   <part name="MaxResultsThisTime" type="xsd:unsignedInt"/>
+   <part name="SkipRecords" type="xsd:unsignedInt"/>
+   <part name="DPPAPurpose" type="xsd:byte"/>
+   <part name="Raw" type="xsd:boolean"/>
+   <part name="RemoteOptimization" type="xsd:boolean"/>
+   <part name="NeighborService" type="tns:EspStringArray"/>
+   <part name="IsANeighbor" type="xsd:boolean"/>
+   <part name="SSNMask" type="xsd:string"/>
+   <part name="DLMask" type="xsd:string"/>
+   <part name="DataRestrictionMask" type="xsd:string" default="000000000000000000"/>
+   <part name="RegistrationType" type="xsd:unsignedInt"/>
+   <part name="IncludeDetailedRegistrationType" type="xsd:boolean"/>
+   <part name="IncludeCriminalIndicators" type="xsd:boolean"/>
+   <part name="IncludeNonRegulatedVehicleSources" type="xsd:boolean"/>
+   <part name="Zip5" type="xsd:string"/>
+   <part name="ZipRadius" type="xsd:unsignedInt"/>
 </message>
 */
-/*--INFO-- Welcome to Wildcard Vehicle Search.
-*/ 
+IMPORT vehicle_wildcard, doxie, WSInput, STD, VehicleV2_Services;
 
-export Wildcard_Search := MACRO
+EXPORT Wildcard_Search() := MACRO
 
-string8 agerlow := '': stored('agelow');
-#stored('agelower',agerlow);
-string8 agerhigh :=  '': stored('agehigh');
-#stored('agehigher',agerhigh);
+vehicle_wildcard.MAC_Field_Declare();
 
-vehicle_wildcard.MAC_Field_Declare()
-
-boolean is_remote := false : STORED('RemoteOptimization');
+WSInput.MAC_Doxie_Wildcard_Search();
 
 result_return := doxie.Wildcard_Search_Records;
 
@@ -132,9 +127,17 @@ TRANSFORM
   SELF := le;
 END;
 Fetched := project(result_return, pushup(LEFT));
-
+// SORT by tagTypeSelection first ONLY if the user sent in values for the SortByTagTypes input field
 // Sort Filtered by TAG, id, and name to create unique ordering
-outfile := SORT(Fetched, make_code, -model_description, LICENSE_PLATE_NUMBERxBG4, VID, own_1_lname, own_1_fname, own_1_mname, pick);
+outfile := SORT(Fetched, 		
+               -(VehicleV2_Services.Functions.tagTypeSelection(
+                   SortByTagTypes,
+                   STD.Str.ToUpperCase(license_plate_code ),
+                   STD.Str.ToUpperCase(orig_state ),
+                   STD.Str.ToUpperCase(license_plate_desc ) )
+                ),
+               make_code, -model_description, LICENSE_PLATE_NUMBERxBG4,
+               VID, own_1_lname, own_1_fname, own_1_mname, pick);
 
 doxie.MAC_Marshall_Results(outfile,outf);
 
@@ -162,6 +165,8 @@ PrettyLayout := record
 	outf.orig_vin;
 	outf.LICENSE_PLATE_NUMBERxBG4;
 	outf.VEHICLE_NUMBERxBG1;
+	outf.license_plate_code;
+	outf.license_plate_desc;
 	outf.orig_state;
 	outf.orig_state_name;
   
@@ -282,7 +287,6 @@ end;
 
 outRec := TABLE(outf, PrettyLayout);
 
-
 outRec blanker(outRec le) :=
 TRANSFORM
 	SELF.vid := le.vid;
@@ -331,7 +335,7 @@ END;
 
 p := IF(is_remote, PROJECT(outRec, blanker(LEFT)), outRec);
 
-map(	~dppa_ok => FAIL(2, doxie.ErrorCodes(2)),
+map(~dppa_ok    => FAIL(2, doxie.ErrorCodes(2)),
 	raw_records => output(result_return),
 	output(p, NAMED('results')))
 

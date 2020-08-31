@@ -17,15 +17,15 @@ export Guts := MODULE
  
 	section_aircraft      := in_options.IncludeAircrafts OR in_options.IncludeBusinessInsight;
 	section_associateBus  := in_options.IncludeAssociatedBusinesses;
-	section_bankruptcy    := in_options.IncludeBankruptcies; 
-  section_BusinessInsight := in_options.IncludeBusinessInsight;
-  section_connectedBusinesses := in_options.IncludeConnectedBusinesses;
+	section_bankruptcy    := in_options.IncludeBankruptcies  OR in_options.IncludeBusinessInsight;
+     section_businessInsight :=  in_options.IncludeBusinessInsight;
+     section_connectedBusinesses := in_options.IncludeConnectedBusinesses;
 	section_contact       := in_options.IncludeContacts  OR in_options.IncludeBusinessInsight;
 	section_finance       := in_options.IncludeFinances OR in_options.IncludeBusinessInsight;
 	section_incorporation := in_options.IncludeIncorporation; 
 	section_industry      := in_options.IncludeIndustries  OR in_options.IncludeBusinessInsight;
 	section_licenses      := in_options.IncludeProfessionalLicenses;
-	section_lien          := in_options.IncludeLiensJudgments; 
+	section_lien          := in_options.IncludeLiensJudgments OR in_options.IncludeBusinessInsight;
 	section_motorvehicle  := in_options.IncludeMotorVehicles OR in_options.IncludeBusinessInsight;
 	section_opssites      := in_options.IncludeOpsSites;
 	section_parent        := in_options.IncludeParents; 
@@ -33,9 +33,11 @@ export Guts := MODULE
 	section_registeredAgents := in_options.IncludeRegisteredAgents;
 	section_sources       := in_options.IncludeSourceCounts OR in_options.IncludeBusinessInsight;
 	section_ucc           := in_options.IncludeUCCFilings OR in_options.IncludeBusinessInsight;
-	section_uccSecureds   := (in_options.IncludeUCCFilings AND in_options.IncludeUCCFilingsSecureds) OR in_options.IncludeBusinessInsight;;
+	section_uccSecureds   := (in_options.IncludeUCCFilings AND in_options.IncludeUCCFilingsSecureds) OR in_options.IncludeBusinessInsight;
 	section_url           := in_options.IncludeInternetDomains; 
-  section_watercraft    := in_options.IncludeWatercrafts OR in_options.IncludeBusinessInsight;
+     section_watercraft    := in_options.IncludeWatercrafts OR in_options.IncludeBusinessInsight;
+     // needed to allow special access to this risk indicator if internally user is allowed
+     IncludeBizToBizDelinquency := in_options.IncludeBizToBizDelinquencyRiskIndicator;
 
   // For "Accurint" only additional sections	
 	section_businessRegistrations := in_options.IncludeBusinessRegistrations;
@@ -49,8 +51,9 @@ export Guts := MODULE
   // set the FETCH LEVEL for join to main bus header key 
   FETCH_LEVEL := in_options.BusinessReportFetchLevel;
 	
-	  // set the last 3 values of linkids to 0 regardless of what is input															  
+	  // set the last 4 values of linkids to 0 regardless of what is input															  
   ds_input_data := project(ds_tmpInput_data, transform(TopBusiness_Services.Layouts.rec_input_ids,
+                               self.proxid := 0;
 	                          self.dotid := 0;
 														self.empid := 0;
 														self.powid := 0;
@@ -105,7 +108,7 @@ export Guts := MODULE
 	 
     parentSection := IF(section_parent, TopBusiness_Services.ParentSection.fn_fullView(
 				project(ds_input_data, transform(TopBusiness_Services.ParentSection_Layouts.rec_Input, self := left)),
-				project(dataset(in_options),TopBusiness_Services.ParentSection_Layouts.rec_OptionsLayout)[1],
+				project(dataset(in_options),TopBusiness_Services.layouts.rec_input_options)[1],
 				in_mod,
 				ds_busHeaderRecs
 				)
@@ -119,8 +122,13 @@ export Guts := MODULE
      
 		 ContactSection := if (section_contact, TopBusiness_Services.ContactSection.fn_fullView(
 				project(ds_input_data, transform(TopBusiness_Services.ContactSection_Layouts.rec_Input, self := left))
-				,project(dataset(in_options),TopBusiness_Services.ContactSection_Layouts.rec_OptionsLayout)[1],
-				in_mod)
+				,project(dataset(in_options),transform(TopBusiness_Services.ContactSection_Layouts.rec_OptionsLayout,
+                                     self.IncludeCriminalIndicators := in_options.IncludeBusinessInsight OR in_options.IncludeCriminalIndicators;
+                                     self := left;))[1],
+				in_mod)                                          
+                      // per above having: in_options.IncludeBusinessInsight OR in_options.IncludeCriminalIndicators) 
+                      // have to include Criminal offender indicators here if BusinessInsight risk indicators
+                      // meaning (includeBusinessInsight = true) are wanted
 		 );
 
      IncorporationSection := if (section_incorporation, TopBusiness_Services.IncorporationSection.fn_fullView(
@@ -193,7 +201,7 @@ export Guts := MODULE
 				
 				AircraftSection := if (section_aircraft,  TopBusiness_Services.AircraftSection.fn_fullView(
 					project(ds_input_data, transform(TopBusiness_Services.aircraftSection_Layouts.rec_Input, self := left)),
-					project(dataset(in_options),TopBusiness_Services.AircraftSection_Layouts.rec_OptionsLayout)[1],
+					project(dataset(in_options),TopBusiness_Services.layouts.rec_input_options)[1],
 					in_mod)
 				);
 				
@@ -260,47 +268,105 @@ export Guts := MODULE
 						project(dataset(in_options),TopBusiness_Services.Layouts.rec_input_options)[1],
 						source_mod_access,ds_busHeaderRecs)
 				);              
-                  
-            TmpBusinessInsightPreLayoutPopulation := if (section_BusinessInsight,                           
+                                               
+            BusinessEvidencePreLayoutPopulation := IF (section_BusinessInsight,                           
                            TopBusiness_Services.BusinessInsightSection.FromBipReportBusinessEvidence(
-                            project(ds_input_data, transform(BIPV2.IDlayouts.l_xlink_ids, self := left))
-                            ,project(dataset(in_options),TopBusiness_Services.Layouts.rec_input_options)[1]
-                            ,BestSection[1]
-                           ,ContactSection[1]                                         
-                           ,SourceSection[1].AllSourcesCount
-                           ,SourceSection[1].SourceDocs[1].source                          
-                           ,FinanceSection[1]
-                           )
-                           );
-              tmpBusinessInsightSection := if (section_BusinessInsight, TopBusiness_Services.BusinessInsightSection.fn_FullViewBusinessEvidence( 
-                                                                            TmpBusinessInsightPreLayoutPopulation[1] ));
+                               PROJECT(ds_input_data, TRANSFORM(BIPV2.IDlayouts.l_xlink_ids, SELF := LEFT))
+                              ,PROJECT(DATASET(in_options),TopBusiness_Services.Layouts.rec_input_options)[1]                             
+                              ,PROJECT(BestSection[1],  TRANSFORM(TopBusiness_Services.BestSection_Layouts.Final,
+                                             SELF.IsActive := LEFT.isActive;
+                                             SELF.isDefunct := LEFT.isDefunct;
+                                             SELF.Address := LEFT.address;
+                                             SELF.AddressToDate := LEFT.AddressToDate;
+                                             SELF.yearStarted := LEFT.YearStarted;
+                                             SELF.PhoneInfo.Phone10 := LEFT.PhoneInfo.Phone10;                                        
+                                             SELF := []))                                                                    
+                                ,NOT(EXISTS(PROJECT(IndustrySection[1].IndustryRecords.Sics, 
+                                             TRANSFORM({STRING8  SICCode;}, SELF.sicCode := LEFT.SicCode;))) OR
+                                          EXISTS(PROJECT(IndustrySection[1].IndustryRecords.NAICSs, 
+                                                  TRANSFORM({STRING8 NaicsCode;},  SELF.NaicsCode := LEFT.Naics;)))
+                                              )                                  
+                             ,ContactSection[1].TotalPriorContactCount  +
+                              ContactSection[1].TotalCurrentContactCount +
+                              ContactSection[1].TotalCurrentExecutiveCount +
+                              ContactSection[1].TotalPriorExecutiveCount
+                              ,SourceSection[1].AllSourcesCount
+                              ,SourceSection[1].SourceDocs[1].source                                                    
+                             , (EXISTS(FinanceSection[1].Finances(AnnualSales = '0')) OR (NOT (EXISTS(FinanceSection[1].Finances))))
+                             )
+                 );
+                           
+              BusinessInsightBusinessEvidenceSection := IF (section_BusinessInsight, TopBusiness_Services.BusinessInsightSection.fn_FullViewBusinessEvidence( 
+                                                                            BusinessEvidencePreLayoutPopulation[1] ));
+               BusinessInsightRiskPreLayoutPopulation := IF (section_BusinessInsight,                           
+                           TopBusiness_Services.BusinessInsightSection.FromBipReportBusinessRisk(
+                            PROJECT(ds_input_data, TRANSFORM(BIPV2.IDlayouts.l_xlink_ids, SELF := LEFT))
+                            ,PROJECT(DATASET(in_options),TopBusiness_Services.Layouts.rec_input_options)[1]        
+                           , PROJECT(BestSection[1], TRANSFORM(TopBusiness_Services.BestSection_Layouts.Final,
+                                             SELF.Address := LEFT.ADDRESS;
+                                             SELF.phoneFromDate := LEFT.PhoneFromDate;
+                                             SELF.AddressFromDate := LEFT.AddressFromDate;                                      
+                                             SELF := []))
+                                           
+                              ,EXISTS(ContactSection[1].CurrentExecutives(hasDerog)) OR EXISTS((ContactSection[1].PriorExecutives(hasDerog))) OR
+                               EXISTS(ContactSection[1].CurrentExecutives(HasCriminalConviction)) OR EXISTS(ContactSection[1].PriorExecutives(HasCriminalConviction)) OR
+                               EXISTS(ContactSection[1].CurrentExecutives(IsSexualOffender)) OR EXISTS(ContactSection[1].PriorExecutives(IsSexualOffender))
+                               
+                              ,EXISTS(ContactSection[1].PriorIndividuals(hasDerog)) OR EXISTS(ContactSection[1].CurrentIndividuals(hasDerog)) OR
+                               EXISTS(ContactSection[1].PriorIndividuals(HasCriminalConviction)) OR EXISTS(ContactSection[1].CurrentIndividuals(HasCriminalConviction)) OR
+                                EXISTS(ContactSection[1].PriorIndividuals(IsSexualOffender)) OR EXISTS(ContactSection[1].CurrentIndividuals(IsSexualOffender))
+                              
+                            ,FinanceSection[1].Finances[1].AnnualSales
+                            , (EXISTS(FinanceSection[1].Finances(AnnualSales = '0')) OR (NOT (EXISTS(FinanceSection[1].Finances))))
+                            ,PROJECT(IndustrySection[1].IndustryRecords.Sics, 
+                                  TRANSFORM({STRING8  SICCode;}, SELF.sicCode := LEFT.SicCode;))
+                            ,PROJECT(IndustrySection[1].IndustryRecords.NAICSs, 
+                                  TRANSFORM({STRING8 NaicsCode;},  SELF.NaicsCode := LEFT.Naics;))                                                                                            
+                           ,MotorVehicleSection[1].TotalMotorVehicleRecordCount
+                            ,MotorVehicleSection[1].MotorVehicleRecords.CurrentRecordCount
+                            ,WatercraftSection[1].TotalWatercraftRecordCount
+                            ,WatercraftSection[1].WatercraftRecords.CurrentRecordCount
+                            ,AircraftSection[1].TotalAircraftRecordCount
+                            ,AircraftSection[1].AircraftRecords.CurrentRecordCount
+                            ,PropertySection[1].propertyRecords.PriorRecordsCount
+                            ,PropertySection[1].propertyRecords.CurrentRecordsCount             
+                            ,PropertySection[1].propertyRecords.DerogSummaryCntForeclosureNOD
+                            ,EXISTS(PropertySection[1].propertyRecords.properties(  CurrentRecord = 'Y' AND (NOT(isforeclosed OR isNoticeOfDefault))))                           
+                            ,UccSection[1].TotalAsSecuredCount > 0 OR UccSection[1].TotalAsDebtorCount > 0
+                            ,LienSection[1].TotalRecordCount > 0
+                            ,LienSection[1].TotalRecordCount > 5
+                            ,BankruptcySection[1].DerogSummaryCntBankruptcy > 0                         
+                             ,LienSection[1].JudgmentsLiens[1].OrigFilingDate                                                                                                                                  
+                             ,IncludeBizToBizDelinquency
+                            )
+                       );                                                                            
+                                                                                                                                                                 
              BusinessInsightSection := if (section_businessInsight,
                            TopBusiness_Services.BusinessInsightSection.fn_FullViewRisk(
-                            project(ds_input_data, transform(BIPV2.IDlayouts.l_xlink_ids, self := left))
-                            ,project(dataset(in_options),TopBusiness_Services.Layouts.rec_input_options)[1]                        
-                           ,TmpBusinessInsightSection[1]
-                           ,BestSection[1]
-                           ,ContactSection[1]         
-                            ,FinanceSection[1]                           
-                            ,Industrysection[1]
-                            ,MotorVehicleSection[1].MotorVehicleRecords.CurrentRecordCount
-                            ,WatercraftSection[1].WatercraftRecords.CurrentRecordCount
-                            ,AircraftSection[1].AircraftRecords.CurrentRecordCount
-                            ,PropertySection[1].propertyRecords.CurrentRecordsCount             
-                            ,PropertySection[1].propertyRecords.ForeclosureNODRecordCount
-                            )
+                           BusinessInsightBusinessEvidenceSection[1]
+                            ,BusinessInsightRiskPreLayoutPopulation[1])                            
                             );
                             
-                    SourceSectionFinal := if (in_options.IncludeSourceCounts, SourceSection);
-                    ContactSectionFinal := if (in_options.IncludeContacts, ContactSection);
+                    SourceSectionFinal := if (in_options.IncludeSourceCounts, SourceSection);                  
+                    ContactSectionFinal := if ((in_options.IncludeBusinessInsight AND (in_options.IncludeContacts AND
+                                                                                                                                  (NOT(In_options.IncludeCriminalIndicators)))),
+                                                                     TopBusiness_Services.BusinessInsightSection.RemoveCrimOffenderBoolean(ContactSection),
+                                                                     if (in_options.IncludeContacts,ContactSection)
+                                                                     );                                                                  
+                                                                                                                                                                                                              
                     IndustrySectionFinal := if ( in_options.IncludeIndustries, IndustrySection);
                     MotorVehicleSectionFinal :=   if ( in_options.IncludeMotorVehicles,  MotorVehicleSection);
                     PropertySectionFinal := if (in_options.IncludeProperties, PropertySection);
                     AircraftSectionFinal := if (in_options.IncludeAircrafts, AircraftSection);
                     WatercraftSectionFinal := if (in_options.IncludeWatercrafts, WatercraftSection);
 			    FinanceSectionFinal := if (in_options.IncludeFinances, FinanceSection);
- 				
-				
+                    UccSectionFinal := if (in_options.IncludeUCCFilings, UccSection);
+                    BankruptcySectionFinal := if (in_options.IncludeBankruptcies, BankruptcySection);
+                    LienSectionFinal := if (in_options.IncludeLiensJudgments, LienSection);
+                    BusinessInsightSectionFinal := if (in_options.IncludeBusinessInsight, BusinessInsightSection);  
+                  
+              
+ 								
  TopBusiness_Services.BranchReport_Layouts.Final BIPREPORTXFORM() := TRANSFORM
       SELF.acctno := ds_tmpinput_data[1].acctno;
 		     SELF.BestSection := BestSection[1];
@@ -314,9 +380,9 @@ export Guts := MODULE
 			SELF.IndustrySection := IndustrySectionFinal[1];
 			SELF.LicenseSection := LicenseSection[1];
 			SELF.UrlSection      := UrlSection[1];
-			SELF.BankruptcySection := BankruptcySection[1];
-			SELF.LienSection := LienSection[1];
-			SELF.UCCSection :=  UccSection[1];
+			SELF.BankruptcySection := BankruptcySectionFinal[1];
+			SELF.LienSection := LienSectionFinal[1];
+			SELF.UCCSection :=  UccSectionFinal[1];
 			SELF.AircraftSEction := AircraftSectionFinal[1];
 			SELF.MotorVehicleSection         := MotorVehicleSectionFinal[1];
 			SELF.WatercraftSection           := WatercraftSectionFinal[1];
@@ -327,11 +393,9 @@ export Guts := MODULE
 			SELF.SanctionSection             := SanctionsSection[1];
 			SElf.ExperianBusinessReportSection := ExperianBusinessReportSection[1];
 			SELF.DunBradStreetSection        := DunBradStreetSection[1];		
-                SELF.SourceSection               := SourceSectionFinal[1];
-      
-                //SELF.businessInsightSection := BusinessInsightSection[1];
-                SELF.BusinessInsightSection := TmpBusinessInsightSection[1];
-			//SELF.CompanyVerifcationSection := []		//purposely like this not a typo.	
+                SELF.SourceSection               := SourceSectionFinal[1];      
+                SELF.businessInsightSection := BusinessInsightSectionFinal[1];                
+			// SELF.CompanyVerifcationSection := []		//purposely like this not a typo.	
 		  SELF := [];
 	END;
   SectionReport := DATASET([ BIPREPORTXFORM() ]);		 

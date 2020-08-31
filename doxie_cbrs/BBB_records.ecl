@@ -1,14 +1,14 @@
-import bbb;
+IMPORT bbb;
 
-export BBB_records(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
+EXPORT BBB_records(DATASET(doxie_cbrs.layout_references) bdids) := FUNCTION
 
 k := bbb.Key_BBB_BDID;
 
-k tra(k r) := transform
-	self := r;
-end;
+k tra(k r) := TRANSFORM
+  SELF := r;
+END;
 
-return join(bdids, k, keyed(left.bdid = right.bdid), tra(right),
-						limit(10000, skip));
+RETURN JOIN(bdids, k, KEYED(LEFT.bdid = RIGHT.bdid), tra(RIGHT),
+            LIMIT(10000, SKIP));
 
 END;

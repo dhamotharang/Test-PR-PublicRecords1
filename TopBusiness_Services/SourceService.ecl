@@ -102,6 +102,8 @@ export SourceService() := macro
 		self.app_type  		:= AutoStandardI.GlobalModule().ApplicationType;
 		self.ssn_mask  		:= AutoStandardI.GlobalModule().ssnmask;
 		self.fetch_level 	:= topbusiness_services.functions.fn_fetchLevel(options_by.SourceDocFetchLevel);
+    self.IncludeVendorSourceB := false;
+    
 	end;
 
 	options := row(search_options());

@@ -8,6 +8,12 @@ EXPORT fn_GetEntityRecordIds( DATASET(FraudShared_Services.Layouts.BatchInExtend
 
   SHARED BOOLEAN validInput(string s1) := s1 <> '';
   SHARED BOOLEAN validNumberInput(string i1) := (REAL) i1 > 0;
+  
+  SHARED FraudShared_Services.Layouts.Recid_rec fail_trans (FraudShared_Services.Layouts.BatchInExtended_rec L) := TRANSFORM
+   SELF.acctno := L.acctno;
+   SELF.record_id := 0;
+   SELF := [];
+  END;
 
   EXPORT GetHouseHoldIDs() := FUNCTION
     ds_householdid := IF(validNumberInput(in_rec.HouseholdId),
@@ -18,7 +24,7 @@ EXPORT fn_GetEntityRecordIds( DATASET(FraudShared_Services.Layouts.BatchInExtend
                                   SELF := RIGHT,
                                   SELF := LEFT,
                                   SELF := []),
-                                LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, SKIP)),
+                             LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, fail_trans(LEFT))),
                         dataset([], FraudShared_Services.Layouts.Recid_rec));
     RETURN ds_householdid;
   END;
@@ -32,7 +38,7 @@ EXPORT fn_GetEntityRecordIds( DATASET(FraudShared_Services.Layouts.BatchInExtend
                                     SELF := RIGHT,
                                     SELF := LEFT,
                                     SELF := []),
-                                  LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, SKIP)),
+                                  LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, fail_trans(LEFT))),
                             dataset([], FraudShared_Services.Layouts.Recid_rec));
     RETURN ds_CustomerPersonId;
   END;
@@ -45,7 +51,7 @@ EXPORT fn_GetEntityRecordIds( DATASET(FraudShared_Services.Layouts.BatchInExtend
                                     SELF := RIGHT,
                                     SELF := LEFT,
                                     SELF := []),
-                                LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, SKIP));
+                                LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, fail_trans(LEFT)));
 
     ds_Amount_maxonly := JOIN(ds_batch_in, FraudShared.Key_AmountPaid(fraud_platform),
                                   KEYED(LEFT.AmountMax >= RIGHT.Amount_Paid),
@@ -54,7 +60,7 @@ EXPORT fn_GetEntityRecordIds( DATASET(FraudShared_Services.Layouts.BatchInExtend
                                     SELF := RIGHT,
                                     SELF := LEFT,
                                     SELF := []),
-                                  LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, SKIP));
+                                  LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, fail_trans(LEFT)));
 
     ds_Amount_both := JOIN(ds_batch_in, FraudShared.Key_AmountPaid(fraud_platform),
                               KEYED(LEFT.AmountMin <= RIGHT.Amount_Paid) AND
@@ -64,7 +70,7 @@ EXPORT fn_GetEntityRecordIds( DATASET(FraudShared_Services.Layouts.BatchInExtend
                                 SELF := RIGHT,
                                 SELF := LEFT,
                                 SELF := []),
-                              LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, SKIP));
+                              LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, fail_trans(LEFT)));
 
     ds_AmountRangeIds := MAP(validNumberInput(in_rec.AmountMin) AND NOT validNumberInput(in_rec.AmountMax) => ds_Amount_minOnly,
                              NOT validNumberInput(in_rec.AmountMin) AND validNumberInput(in_rec.AmountMax) => ds_Amount_maxonly,
@@ -82,7 +88,7 @@ EXPORT fn_GetEntityRecordIds( DATASET(FraudShared_Services.Layouts.BatchInExtend
                                 SELF := RIGHT,
                                 SELF := LEFT,
                                 SELF := []),
-                              LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, SKIP)),
+                              LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, fail_trans(LEFT))),
                         dataset([], FraudShared_Services.Layouts.Recid_rec));
     RETURN ds_BankName;
   END;
@@ -96,7 +102,7 @@ EXPORT fn_GetEntityRecordIds( DATASET(FraudShared_Services.Layouts.BatchInExtend
                                     SELF := RIGHT,
                                     SELF := LEFT,
                                     SELF := []),
-                                  LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, SKIP)),
+                                  LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, fail_trans(LEFT))),
                             dataset([], FraudShared_Services.Layouts.Recid_rec));
     RETURN ds_BankRoutingIds;
   END;
@@ -110,7 +116,7 @@ EXPORT fn_GetEntityRecordIds( DATASET(FraudShared_Services.Layouts.BatchInExtend
                                     SELF := RIGHT,
                                     SELF := LEFT,
                                     SELF := []),
-                                  LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, SKIP)),
+                                  LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, fail_trans(LEFT))),
                             dataset([], FraudShared_Services.Layouts.Recid_rec));
     RETURN ds_ReportedDate;
   END;
@@ -124,7 +130,7 @@ EXPORT fn_GetEntityRecordIds( DATASET(FraudShared_Services.Layouts.BatchInExtend
                               SELF := RIGHT,
                               SELF := LEFT,
                               SELF := []),
-                            LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, SKIP)),
+                            LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, fail_trans(LEFT))),
                       dataset([], FraudShared_Services.Layouts.Recid_rec));
     RETURN ds_ISPName;
   END;
@@ -138,7 +144,7 @@ EXPORT fn_GetEntityRecordIds( DATASET(FraudShared_Services.Layouts.BatchInExtend
                                 SELF := RIGHT,
                                 SELF := LEFT,
                                 SELF := []),
-                              LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, SKIP)),
+                              LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, fail_trans(LEFT))),
                         dataset([], FraudShared_Services.Layouts.Recid_rec));
     RETURN ds_MACAddress;
   END;
@@ -152,9 +158,23 @@ EXPORT fn_GetEntityRecordIds( DATASET(FraudShared_Services.Layouts.BatchInExtend
                                   SELF := RIGHT,
                                   SELF := LEFT,
                                   SELF := []),
-                                LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, SKIP)),
+                                LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, fail_trans(LEFT))),
                           dataset([], FraudShared_Services.Layouts.Recid_rec));
     RETURN ds_SerialNumber;
+  END;
+  
+  EXPORT GetEmail := FUNCTION
+    ds_EmailIds := IF(validInput(in_rec.Email_Address),
+                      JOIN(ds_batch_in, FraudShared.Key_Email(fraud_platform),
+                            KEYED(LEFT.email_address = RIGHT.email_address),
+                             TRANSFORM(FraudShared_Services.Layouts.Recid_rec,
+                              SELF.acctno := LEFT.acctno,
+                              SELF := RIGHT,
+                              SELF := LEFT,
+                              SELF := []),
+                            LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, fail_trans(LEFT))),
+                      dataset([], FraudShared_Services.Layouts.Recid_rec));
+    RETURN ds_EmailIds;
   END;
 
   EXPORT GetEmailUserIds() := FUNCTION
@@ -166,7 +186,7 @@ EXPORT fn_GetEntityRecordIds( DATASET(FraudShared_Services.Layouts.BatchInExtend
                                   SELF := RIGHT,
                                   SELF := LEFT,
                                   SELF := []),
-                                LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, SKIP)),
+                                LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, fail_trans(LEFT))),
                           dataset([], FraudShared_Services.Layouts.Recid_rec));
     RETURN ds_EmailUserIds;
   END;
@@ -180,7 +200,7 @@ EXPORT fn_GetEntityRecordIds( DATASET(FraudShared_Services.Layouts.BatchInExtend
                                   SELF := RIGHT,
                                   SELF := LEFT,
                                   SELF := []),
-                                LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, SKIP)),
+                                LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, fail_trans(LEFT))),
                           dataset([], FraudShared_Services.Layouts.Recid_rec));
     RETURN ds_EmailDomainIds;
   END;
@@ -195,7 +215,7 @@ EXPORT fn_GetEntityRecordIds( DATASET(FraudShared_Services.Layouts.BatchInExtend
                                   SELF := RIGHT,
                                   SELF := LEFT,
                                   SELF := []),
-                                LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, SKIP)),
+                                LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, fail_trans(LEFT))),
                           dataset([], FraudShared_Services.Layouts.Recid_rec));
     RETURN ds_CityStateIds;
   END;
@@ -209,7 +229,7 @@ EXPORT fn_GetEntityRecordIds( DATASET(FraudShared_Services.Layouts.BatchInExtend
                                   SELF := RIGHT,
                                   SELF := LEFT,
                                   SELF := []),
-                                LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, SKIP)),
+                                LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, fail_trans(LEFT))),
                           dataset([], FraudShared_Services.Layouts.Recid_rec));
     RETURN ds_CountyIds;
   END;
@@ -223,46 +243,35 @@ EXPORT fn_GetEntityRecordIds( DATASET(FraudShared_Services.Layouts.BatchInExtend
                                   SELF := RIGHT,
                                   SELF := LEFT,
                                   SELF := []),
-                                LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, SKIP)),
+                                LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, fail_trans(LEFT))),
                           dataset([], FraudShared_Services.Layouts.Recid_rec));
     RETURN ds_ZipIds;
   END;
 
-  EXPORT GetIPRangeIds(unsigned1 octet1, unsigned1 octet2, unsigned1 octet3,
-                        boolean isIPRange123, boolean isIPRange12, boolean isIPRange1) := FUNCTION
+  EXPORT GetIPRangeIds(string ip_address) := FUNCTION
+    wildchar := RiskIntelligenceNetwork_Services.Constants.IP_ADDRESS_ELEMENT.IP_ADDRESS_WILD_CHAR;
 
-    ds_IPRangeIds123 := JOIN(ds_batch_in, FraudShared.Key_IPRange(fraud_platform),
-                            KEYED(octet1 = RIGHT.octet1 AND octet2 = RIGHT.octet2 AND octet3 = RIGHT.octet3),
-                             TRANSFORM(FraudShared_Services.Layouts.Recid_rec,
-                              SELF.acctno := LEFT.acctno,
-                              SELF := RIGHT,
-                              SELF := LEFT,
-                              SELF := []),
-                            LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, SKIP));
-
-    ds_IPRangeIds12  := JOIN(ds_batch_in, FraudShared.Key_IPRange(fraud_platform),
-                            KEYED(octet1 = RIGHT.octet1 AND octet2 = RIGHT.octet2),
-                             TRANSFORM(FraudShared_Services.Layouts.Recid_rec,
-                              SELF.acctno := LEFT.acctno,
-                              SELF := RIGHT,
-                              SELF := LEFT,
-                              SELF := []),
-                            LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, SKIP));
-
-    ds_IPRangeIds1   := JOIN(ds_batch_in, FraudShared.Key_IPRange(fraud_platform),
-                            KEYED(octet1 = RIGHT.octet1),
-                             TRANSFORM(FraudShared_Services.Layouts.Recid_rec,
-                              SELF.acctno := LEFT.acctno,
-                              SELF := RIGHT,
-                              SELF := LEFT,
-                              SELF := []),
-                            LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, SKIP));
-
-    ds_IPRangeIds := MAP (validInput(in_rec.ip_address) AND isIPRange123 => ds_IPRangeIds123,
-                          validInput(in_rec.ip_address) AND isIPRange12	=> ds_IPRangeIds12,
-                          validInput(in_rec.ip_address) AND isIPRange1 => ds_IPRangeIds1,
-                          DATASET([], FraudShared_Services.Layouts.Recid_rec));
-
+    ds_IPRangeIds := IF(validInput(ip_address),
+                        JOIN(ds_batch_in, FraudShared.Key_IPRange(fraud_platform),
+                           KEYED((unsigned1) ip_address[1] = RIGHT.Digit1 AND
+                                 (unsigned1) ip_address[2] = RIGHT.Digit2 AND
+                                 (unsigned1) ip_address[3] = RIGHT.Digit3 AND
+                                 (unsigned1) ip_address[4] = RIGHT.Digit4 AND
+                                 (unsigned1) ip_address[5] = RIGHT.Digit5 AND
+                                 (unsigned1) ip_address[6] = RIGHT.Digit6 AND
+                                  if(ip_address[7] NOT IN wildchar, (unsigned1) ip_address[7] = RIGHT.Digit7, true) AND     
+                                  if(ip_address[8] NOT IN wildchar, (unsigned1) ip_address[8] = RIGHT.Digit8, true) AND     
+                                  if(ip_address[9] NOT IN wildchar, (unsigned1) ip_address[9] = RIGHT.Digit9, true) AND     
+                                  if(ip_address[10] NOT IN wildchar, (unsigned1) ip_address[10] = RIGHT.Digit10, true) AND     
+                                  if(ip_address[11] NOT IN wildchar, (unsigned1) ip_address[11] = RIGHT.Digit11, true) AND     
+                                  if(ip_address[12] NOT IN wildchar, (unsigned1) ip_address[12] = RIGHT.Digit12, true)),
+                           TRANSFORM(FraudShared_Services.Layouts.Recid_rec,
+                             SELF.acctno := LEFT.acctno,
+                             SELF := RIGHT,
+                             SELF := LEFT,
+                             SELF := []),
+                           LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, fail_trans(LEFT))),
+                     dataset([], FraudShared_Services.Layouts.Recid_rec));
     RETURN ds_IPRangeIds;
   END;
 
@@ -276,9 +285,24 @@ EXPORT fn_GetEntityRecordIds( DATASET(FraudShared_Services.Layouts.BatchInExtend
                                     SELF := RIGHT,
                                     SELF := LEFT,
                                     SELF := []),
-                                  LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, SKIP)),
+                                  LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, fail_trans(LEFT))),
                             dataset([], FraudShared_Services.Layouts.Recid_rec));
     RETURN ds_DriverLicenses;
+  END;
+
+  EXPORT GetBankAccountNumber() := FUNCTION
+
+    ds_BankAccountNoIds := IF(validInput(in_rec.bank_account_number),
+                            JOIN(ds_batch_in, FraudShared.Key_BankAccount(fraud_platform),
+                                  KEYED(LEFT.bank_account_number = RIGHT.bank_account_number),
+                                  TRANSFORM(FraudShared_Services.Layouts.Recid_rec,
+                                    SELF.acctno := LEFT.acctno,
+                                    SELF := RIGHT,
+                                    SELF := LEFT,
+                                    SELF := []),
+                                  LIMIT(RiskIntelligenceNetwork_Services.Constants.MAX_JOIN_LIMIT, fail_trans(LEFT))),
+                            dataset([], FraudShared_Services.Layouts.Recid_rec));
+    RETURN ds_BankAccountNoIds;
   END;
 
 END;

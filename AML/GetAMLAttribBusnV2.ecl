@@ -1,5 +1,5 @@
 ﻿import Business_Risk, Business_Header_SS, ut,
-       Risk_indicators, doxie, Gateway, AML;
+       Risk_indicators, doxie, Gateway, AML, STD;
 
 EXPORT GetAMLAttribBusnV2(DATASET(Business_Risk.Layout_Input) indata,
                                   $.IParam.IAml mod_aml,
@@ -34,10 +34,6 @@ UseXG5 := Map(UseXG5Flag = '1'                   => '1',
               UseXG5Flag = '2' and IncludeNews   => '2',
                                                  '0');
 
-
-BusnHeader := Business_Header_SS.Key_BH_BDID_pl;
-
-
 bdidprep := project(indata(bdid=0), transform(Business_Header_SS.Layout_BDID_InBatch, self := left));
 
 bdidnoprep := project(indata(bdid<>0), transform(Business_Header_SS.Layout_BDID_OutBatch, self := left));
@@ -59,7 +55,7 @@ END;
 
 
 // append bests
-Business_Header_SS.MAC_BestAppend(bdidAppendAll,appends,verify,bdidbest,true);
+Business_Header_SS.MAC_BestAppend(bdidAppendAll, appends, verify, bdidbest, mod_access.DataPermissionMask, DataRestriction, true);
 
 Layouts.AMLBusnAssocLayout addBDID(bdidAppendAll le, indata ri)  := Transform
   self.bdid      := le.bdid;
@@ -154,7 +150,7 @@ GetAddrRisk  := BusnAddrAttrib(ALLBusn);
 
 // add Linked business info
 
-GetLinkedhdr := getLinkedBusnHdr(GetAddrRisk(relatdegree in [AMLConstants.LnkdBusnDegree,AMLConstants.relatedBusnDegree]));
+GetLinkedhdr := getLinkedBusnHdr(GetAddrRisk(relatdegree in [AMLConstants.LnkdBusnDegree,AMLConstants.relatedBusnDegree]), mod_access);
 
 // need to join back to GetLinkedBusn(RelatDegree in [10,20,50])  that were deduped above
 addBusnAddr :=    Join(GetLinkedBusn, GetAddrRisk,
@@ -303,7 +299,7 @@ prepSOS := project(GetAddrRisk, PrepBdidSOS(left));
 
 GetBusnSOS := BusnSOSDetails(prepSOS); //Layouts.BusnLayoutV2         TESTED
 
-GetBusnHeader := BusnHeaderRecs(BDIDbestrecs);  //Layouts.BusnLayoutV2          TESTED
+GetBusnHeader := BusnHeaderRecs(BDIDbestrecs, mod_access);  //Layouts.BusnLayoutV2          TESTED
 
 GetBusnLiens :=  BusnLiens(BDIDbestrecs, mod_access);  //Layouts.BusnLayoutV2             TESTED
 
@@ -322,7 +318,7 @@ CheckSSNmatch :=  BusnFeinSSN(AddLnkBusnhdr(relatdegree = AMLConstants.execSubjB
                       left.seq = right.seq and
                       left.origbdid = right.origbdid,
                       transform(Layouts.BusnLayoutV2,
-                            FipsCodetoUse :=  ut.st2FipsCode(StringLib.StringToUpperCase(left.st)) + left.county;
+                            FipsCodetoUse :=  ut.st2FipsCode(STD.Str.ToUpperCase(left.st)) + left.county;
                             self.AddressVacancyInd  := right.AddressVacancyInd,
                             self.HRBusPct   := right.HRBusPct,
                             self.HighFelonNeighborhood  := right.HighFelonNeighborhood,

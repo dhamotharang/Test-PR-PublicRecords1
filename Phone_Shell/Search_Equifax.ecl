@@ -15,7 +15,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Equifax (DA
      UNSIGNED2 PhoneShellVersion = 10,
      doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	
-	EquifaxAllowed :=	UsePremiumSource_A = true and Phone_Shell.Constants.EquiaxDRMCheck(DataRestrictionMask);
+	EquifaxAllowed :=	UsePremiumSource_A = true and Phone_Shell.Constants.EquiaxDRMCheck(DataRestrictionMask) and mod_access.isValidGLB();
  IncludeLexIDCounts := if(PhoneShellVersion >= 21,true,false);   // LexID counts/'all' attributes added in PhoneShell version 2.1
 
 	{Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus, unsigned4 global_sid} getEquiFax(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, PhoneMart.key_phonemart_did ri) := TRANSFORM

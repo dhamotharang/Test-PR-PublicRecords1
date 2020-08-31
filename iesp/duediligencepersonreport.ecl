@@ -269,6 +269,8 @@ export t_DDRPersonReport := record
 end;
 		
 export t_DDRPersonReportBy := record
+	string ProductRequestType {xpath('ProductRequestType')}; //values['Standard','Modules','']
+	dataset(iesp.duediligenceshared.t_DDRAttributeModule) AttributeModules {xpath('AttributeModules/Entry'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxAttributeModules)};
 	iesp.duediligenceshared.t_DDRAttributesPerson Person {xpath('Person')};
 end;
 		

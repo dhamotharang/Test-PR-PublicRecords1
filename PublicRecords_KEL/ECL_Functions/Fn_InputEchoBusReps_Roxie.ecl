@@ -144,8 +144,35 @@ EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_
 				SELF := [];
 	END;
 	InputEcho5 := PROJECT(ds_input, GetInputEcho5(LEFT));
+	PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII GetInputEcho6( RECORDOF(ds_input) le ) := 
+      TRANSFORM
+				SELF.RepNumber := 6;
+				SELF.P_InpAcct := le.AccountNumber;
+				SELF.G_ProcBusUID := le.G_ProcBusUID;
+				SELF.P_InpLexID := (INTEGER) le.Rep6LexID;
+				SELF.P_InpNameFirst := le.Rep6firstname;
+				SELF.P_InpNameMid := le.Rep6MiddleName;
+				SELF.P_InpNameLast := le.Rep6lastname;
+				SELF.P_InpAddrLine1 := le.Rep6StreetAddressLine1;
+				SELF.P_InpAddrLine2 := le.Rep6StreetAddressLine2;
+				SELF.P_InpAddrCity := le.Rep6City;
+				SELF.P_InpAddrState := le.Rep6State; 
+				SELF.P_InpAddrZip := le.Rep6Zip;
+				SELF.P_InpPhoneHome := le.Rep6HomePhone;
+				SELF.P_InpSSN := le.Rep6SSN;
+				SELF.P_InpDOB := le.Rep6DOB;
+				SELF.P_InpDL := le.Rep6DLNumber;
+				SELF.P_InpDLState := le.Rep6DLState;
+				SELF.InputFormernameEcho := le.Rep6FormerLastName;
+				SELF.P_InpEmail := le.Rep6EmailAddress; 
+				SELF.P_InpArchDt := le.ArchiveDate;
+				SELF.P_InpPhoneWork := '';
+				SELF.G_ProcUID := 0; //defined further below
+				SELF := [];
+	END;
+	InputEcho6 := PROJECT(ds_input, GetInputEcho6(LEFT));
 
-	srtedEcho := SORT(InputEcho1 + InputEcho2 + InputEcho3 + InputEcho4 + InputEcho5, G_ProcBusUID, RepNumber);
+	srtedEcho := SORT(InputEcho1 + InputEcho2 + InputEcho3 + InputEcho4 + InputEcho5 + InputEcho6, G_ProcBusUID, RepNumber);
 	EchoWUqId := PROJECT(srtedEcho, TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII, SELF.G_ProcUID := COUNTER, SELF := LEFT));
 
 	RETURN EchoWUqId;

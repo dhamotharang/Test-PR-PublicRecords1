@@ -10,11 +10,13 @@
 	<part name="DPPAPurpose" type="xsd:integer"/>
 	<part name="IsMarketing" type="xsd:boolean"/>
 	<part name="IndustryClass" type="xsd:string"/>
-	<part name="PermissiblePurpose" type="xsd:string"/>
+	<part name="IntendedPurpose" type="xsd:string"/>
+	<part name="AllowedSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
+	<part name="ExcludeSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
 </message>
 */
 
-IMPORT Std, PublicRecords_KEL, Gateway;
+IMPORT Std, PublicRecords_KEL, Gateway, Business_Risk_BIP;
 
 EXPORT MAS_FCRA_Service() := MACRO
 
@@ -31,7 +33,10 @@ EXPORT MAS_FCRA_Service() := MACRO
 		'DPPAPurpose',
 		'IndustryClass',
 		'IsMarketing',
-		'PermissiblePurpose'
+		'IncludeMinors',
+		'IntendedPurpose',
+		'AllowedSourcesDataset',
+		'ExcludeSourcesDataset'
   ));
 
 	// Read interface params
@@ -43,8 +48,11 @@ EXPORT MAS_FCRA_Service() := MACRO
 	UNSIGNED1 GLBA := 0 : STORED('GLBPurpose');
 	UNSIGNED1 DPPA := 0 : STORED('DPPAPurpose');
 	BOOLEAN Is_Marketing := FALSE : STORED('IsMarketing');
+	BOOLEAN Include_Minors := TRUE : STORED('IncludeMinors');
 	STRING Industry_Class := '' : STORED('IndustryClass');
-	STRING Permissible_Purpose := '' : STORED('PermissiblePurpose'); // Can be set to 'PRESCREENING' for FCRA Pre-Screen applications
+	STRING Intended_Purpose := '' : STORED('IntendedPurpose'); // Can be set to 'PRESCREENING' for FCRA Pre-Screen applications
+	AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) : STORED('AllowedSourcesDataset');
+	ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) : STORED('ExcludeSourcesDataset'); 
 	
 	gateways_in := Gateway.Configuration.Get();
 	Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
@@ -54,6 +62,11 @@ EXPORT MAS_FCRA_Service() := MACRO
 	END;
 
 	DATASET(Gateway.Layouts.Config) GatewaysClean := PROJECT(gateways_in, gw_switch(LEFT));
+
+	// If allowed sources aren't passed in, use default list of allowed sources
+	SetAllowedSources := IF(COUNT(AllowedSourcesDataset) = 0, PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_FCRA, AllowedSourcesDataset);
+	// If a source is on the Exclude list, remove it from the allowed sources list. 
+	FinalAllowedSources := JOIN(SetAllowedSources, ExcludeSourcesDataset, LEFT=RIGHT, TRANSFORM(RECORDOF(LEFT), SELF := LEFT), LEFT ONLY);
 	
 	Options := MODULE(PublicRecords_KEL.Interface_Options)
 		EXPORT INTEGER ScoreThreshold := Score_threshold;
@@ -64,7 +77,9 @@ EXPORT MAS_FCRA_Service() := MACRO
 		EXPORT UNSIGNED GLBAPurpose := GLBA;
 		EXPORT UNSIGNED DPPAPurpose := DPPA;
 		EXPORT BOOLEAN isMarketing := Is_Marketing; // When TRUE enables Marketing Restrictions
-		EXPORT UNSIGNED8 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
+		EXPORT BOOLEAN IncludeMinors := Include_Minors; // When TRUE enables Marketing Restrictions
+		EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := FinalAllowedSources;
+		EXPORT DATA57 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 			DataRestrictionMask, 
 			DataPermissionMask, 
 			GLBA, 
@@ -73,9 +88,11 @@ EXPORT MAS_FCRA_Service() := MACRO
 			Is_Marketing, 
 			'' /* Allowed_Sources */ = Business_Risk_BIP.Constants.AllowDNBDMI, 
 			FALSE, /*OverrideExperianRestriction*/
-			Permissible_Purpose,
+			Intended_Purpose,
 			Industry_Class,
-			PublicRecords_KEL.CFG_Compile);
+			PublicRecords_KEL.CFG_Compile,
+			FALSE, /*IsInsuranceProduct*/
+			FinalAllowedSources);
 		
 		EXPORT DATASET(Gateway.Layouts.Config) Gateways := GatewaysClean;
 		
@@ -83,8 +100,47 @@ EXPORT MAS_FCRA_Service() := MACRO
 		// This will bypass uneccesary key JOINS in PublicRecords_KEL.Fn_MAS_FDC if the keys don't contribute to any 
 		// ENTITIES/ASSOCIATIONS being used by the query.	
 
+		EXPORT BOOLEAN IncludeAccident := TRUE;
+		EXPORT BOOLEAN IncludeAddress := TRUE;
+		EXPORT BOOLEAN IncludeAddressSummary := TRUE;
+		EXPORT BOOLEAN IncludeAircraft := TRUE;
+		EXPORT BOOLEAN IncludeBankruptcy := TRUE;
+		EXPORT BOOLEAN IncludeBusinessSele := TRUE;
+		EXPORT BOOLEAN IncludeBusinessProx := TRUE;
+		EXPORT BOOLEAN IncludeCriminalOffender := TRUE;
+		EXPORT BOOLEAN IncludeCriminalOffense := TRUE;
+		EXPORT BOOLEAN IncludeCriminalPunishment := TRUE;
+		EXPORT BOOLEAN IncludeDriversLicense := TRUE;
+		EXPORT BOOLEAN IncludeEducation := TRUE;
+		EXPORT BOOLEAN IncludeEBRTradeline := TRUE;
+		EXPORT BOOLEAN IncludeEmail := TRUE;
+		EXPORT BOOLEAN IncludeEmployment := TRUE;
+		EXPORT BOOLEAN IncludeGeolink := TRUE;
+		EXPORT BOOLEAN IncludeHousehold := TRUE;
+		EXPORT BOOLEAN IncludeInquiry := TRUE;
+		EXPORT BOOLEAN IncludeLienJudgment := TRUE;
+		EXPORT BOOLEAN IncludeNameSummary := TRUE;
+		EXPORT BOOLEAN IncludePerson := TRUE;
+		EXPORT BOOLEAN IncludePhone := TRUE;
+		EXPORT BOOLEAN IncludeProfessionalLicense := TRUE;
+		EXPORT BOOLEAN IncludeProperty := TRUE;
+		EXPORT BOOLEAN IncludePropertyEvent := TRUE;
+		EXPORT BOOLEAN IncludeSocialSecurityNumber := TRUE;
+		EXPORT BOOLEAN IncludeSSNSummary := TRUE;
+		EXPORT BOOLEAN IncludeSurname := TRUE;
+		EXPORT BOOLEAN IncludeTIN := TRUE;
+		EXPORT BOOLEAN IncludeTradeline := TRUE;
+		EXPORT BOOLEAN IncludeUtility := TRUE;
+		EXPORT BOOLEAN IncludeVehicle := TRUE;
+		EXPORT BOOLEAN IncludeWatercraft := TRUE;
+		EXPORT BOOLEAN IncludeZipCode := TRUE;
+		EXPORT BOOLEAN IncludeUCC := TRUE;
+		EXPORT BOOLEAN IncludeMini := TRUE;
+		EXPORT BOOLEAN IncludeOverrides := TRUE;
+
+
 	END;
-	
+
   ResultSet := PublicRecords_KEL.FnRoxie_GetAttrs(ds_input, Options);
 
 	FinalResults := PROJECT(ResultSet, 

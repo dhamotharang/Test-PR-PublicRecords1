@@ -231,7 +231,7 @@ biid := business_risk.InstantID_Function(indata, gateways, false, dppa, glb, fal
                                             BatchUID := BatchUID, 
                                             GlobalCompanyID := GlobalCompanyID);
 
-bus_shell := business_risk.Business_Shell_Function(biid, glb, LexIdSourceOptout, TransactionID, BatchUID, GlobalCompanyID, DataPermission);
+bus_shell := business_risk.Business_Shell_Function(biid, glb, LexIdSourceOptout, TransactionID, BatchUID, GlobalCompanyID, DataPermission, DataRestriction);
 
 output(bus_shell, named('Results'));
 

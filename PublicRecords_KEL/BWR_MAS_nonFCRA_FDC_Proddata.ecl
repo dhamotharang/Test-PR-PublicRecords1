@@ -1,7 +1,6 @@
-﻿// EXPORT BWR_MAS_nonFCRA_FDC_Proddata := 'todo';
-#workunit('name','MAS FDC Proddata - dev156 - T1 - C1');
-IMPORT KEL011 AS KEL;
-import ut, PublicRecords_KEL, STD,RiskWise;
+﻿#workunit('name','MAS FDC Proddata - dev156 thread 1');
+IMPORT KEL13 AS KEL;
+import ut, PublicRecords_KEL, STD,RiskWise, Gateway;
 
 
 STD.Date.Date_t dtArchiveDate := STD.Date.Today(); // Note: STD.Date.Date_t is UNSIGNED4
@@ -20,6 +19,11 @@ RecordsToRun := ALL;
 eyeball := 100;
 
 //options
+// Use default list of allowed sources
+AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+// Do not exclude any additional sources from allowed sources dataset.
+ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+
 BOOLEAN FDC := FALSE; //defaulted to false in query to see FDC turn on.  File to big to output when = TRUE
 BOOLEAN Accident := TRUE;
 BOOLEAN Address := TRUE;
@@ -38,12 +42,14 @@ BOOLEAN Geolink := TRUE;
 BOOLEAN Household := TRUE;
 BOOLEAN Inquiry := TRUE;
 BOOLEAN LienJudgment := TRUE;
+BOOLEAN NameSummary := TRUE;
 BOOLEAN Person := TRUE;
 BOOLEAN Phone := TRUE;
 BOOLEAN ProfessionalLicense := TRUE;
 BOOLEAN Property := TRUE;
 BOOLEAN PropertyEvent := TRUE;
 BOOLEAN SocialSecurityNumber := TRUE;
+BOOLEAN SSNSummary := TRUE;
 BOOLEAN Surname := TRUE;
 BOOLEAN TIN := TRUE;
 BOOLEAN Tradeline := TRUE;
@@ -55,6 +61,11 @@ BOOLEAN UCC := TRUE;
 BOOLEAN Mini := TRUE;
 
 
+// If allowed sources aren't passed in, use default list of allowed sources
+SetAllowedSources := IF(COUNT(AllowedSourcesDataset) = 0, PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES, AllowedSourcesDataset);
+// If a source is on the Exclude list, remove it from the allowed sources list. 
+FinalAllowedSources := JOIN(SetAllowedSources, ExcludeSourcesDataset, LEFT=RIGHT, TRANSFORM(RECORDOF(LEFT), SELF := LEFT), LEFT ONLY);
+	
 mod_ConfigTestJob(STD.Date.Date_t _dtArchiveDate = STD.Date.Today()) := MODULE
 
 	SHARED BOOLEAN Is_Insurance_Product := FALSE;
@@ -67,7 +78,6 @@ mod_ConfigTestJob(STD.Date.Date_t _dtArchiveDate = STD.Date.Today()) := MODULE
 		EXPORT BOOLEAN isFCRA                    := FALSE; // ------------------------------------- FCRA is FALSE;
 		EXPORT STRING8 ArchiveDate                := (STRING)_dtArchiveDate;
 		EXPORT STRING250 InputFileName              := '';
-		EXPORT STRING100 PermissiblePurpose         := '';
 		EXPORT STRING100 Data_Restriction_Mask      := '00000000000000000000000000000000000000000000000000';
 		EXPORT STRING100 Data_Permission_Mask       := '11111111111111111111111111111111111111111111111111';
 		EXPORT UNSIGNED GLBAPurpose              := 1;
@@ -78,6 +88,8 @@ mod_ConfigTestJob(STD.Date.Date_t _dtArchiveDate = STD.Date.Today()) := MODULE
 		EXPORT BOOLEAN ExcludeConsumerShell      := FALSE;
 		EXPORT BOOLEAN isMarketing               := FALSE;
 		EXPORT BOOLEAN OutputMasterResults       := FALSE;
+		EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := FinalAllowedSources;
+
 		// BIP Append Options
 		EXPORT UNSIGNED BIPAppendScoreThreshold  := 75;
 		EXPORT UNSIGNED BIPAppendWeightThreshold := 0;
@@ -85,7 +97,7 @@ mod_ConfigTestJob(STD.Date.Date_t _dtArchiveDate = STD.Date.Today()) := MODULE
 		EXPORT BOOLEAN BIPAppendReAppend         := TRUE;
 		EXPORT BOOLEAN BIPAppendIncludeAuthRep   := FALSE;
 
-		EXPORT UNSIGNED8 KEL_Permissions_Mask := 
+		EXPORT DATA57 KEL_Permissions_Mask := 
 				PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 						DataRestrictionMask := Data_Restriction_Mask, 
 						DataPermissionMask  := Data_Permission_Mask, 
@@ -95,10 +107,11 @@ mod_ConfigTestJob(STD.Date.Date_t _dtArchiveDate = STD.Date.Today()) := MODULE
 						isMarketing         := isMarketing, 
 						AllowDNBDMI         := Allow_DNBDMI, 
 						OverrideExperianRestriction := Override_Experian_Restriction, 
-						PermissiblePurpose  := '',
+						IntendedPurpose  := '',
 						IndustryClass  := '',
 						KELPermissions      := PublicRecords_KEL.CFG_Compile, 
-						IsInsuranceProduct  := Is_Insurance_Product );
+						IsInsuranceProduct  := Is_Insurance_Product,
+						AllowedSources := FinalAllowedSources);
 	END;		
 
 END;
@@ -246,6 +259,8 @@ soapLayout := RECORD
 		STRING GLBA;
 		STRING DPPA;
 		STRING PDPM;
+		DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+		DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 		BOOLEAN ViewFDC;
 		BOOLEAN IncludeAccident;
 		BOOLEAN IncludeAddress;
@@ -264,12 +279,14 @@ soapLayout := RECORD
 		BOOLEAN IncludeHousehold;
 		BOOLEAN IncludeInquiry;
 		BOOLEAN IncludeLienJudgment ;
+		BOOLEAN IncludeNameSummary ;
 		BOOLEAN IncludePerson;
 		BOOLEAN IncludePhone;
 		BOOLEAN IncludeProfessionalLicense;
 		BOOLEAN IncludeProperty ;
 		BOOLEAN IncludePropertyEvent;
 		BOOLEAN IncludeSocialSecurityNumber;
+		BOOLEAN IncludeSSNSummary;
 		BOOLEAN IncludeSurname ;
 		BOOLEAN IncludeTIN;
 		BOOLEAN IncludeTradeline ;
@@ -282,6 +299,8 @@ soapLayout := RECORD
 end;
 
 soapLayout trans_pre (pp le, Integer c):= TRANSFORM 
+	// The inquiry delta base which feeds the 1 day inq attrs is not needed for the input rep 1 at this point. for now we only run this delta base code in the nonFCRA service 
+	
 		SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout,
 		SELF := LEFT;
     SELF := []));	
@@ -291,6 +310,8 @@ soapLayout trans_pre (pp le, Integer c):= TRANSFORM
 		SELF.GLBA := (STRING)m.Options.GLBAPurpose;
 		SELF.DPPA := (STRING)m.Options.DPPAPurpose;
 		SELF.PDPM := (STRING)m.Options.KEL_Permissions_Mask;
+		SELF.AllowedSourcesDataset := AllowedSourcesDataset;
+		SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;
 		SELF.ViewFDC := FDC; //defaulted to false in query to see FDC turn on
 		self.IncludeAccident := Accident;
 		self.IncludeAddress := Address;
@@ -315,6 +336,7 @@ soapLayout trans_pre (pp le, Integer c):= TRANSFORM
 		self.IncludeProperty := Property;
 		self.IncludePropertyEvent := PropertyEvent;
 		self.IncludeSocialSecurityNumber := SocialSecurityNumber;
+		self.IncludeSSNSummary := SSNSummary;
 		self.IncludeSurname := Surname;
 		self.IncludeTIN := TIN;
 		self.IncludeTradeline := Tradeline;
@@ -348,7 +370,7 @@ END;
 bwr_results := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'PublicRecords_KEL.MAS_nonFCRA_FDC_Proddata_Service', //prox assoc
+				'PublicRecords_KEL.MAS_nonFCRA_FDC_Proddata_Service', 
 				{soap_in}, 
 				DATASET(layout_FDC_Service),
 				// XPATH('*'),
@@ -364,4 +386,4 @@ Failed := bwr_results(TRIM(ErrorCode) <> '');
 output(choosen(Failed, 25), named('Failed_Results'));
 output(count(failed), named('Failed_Count'));
 
-OUTPUT(Passed,,OutputFile, Thor, overwrite);
+OUTPUT(Passed,,OutputFile, Thor, overwrite, expire(45));

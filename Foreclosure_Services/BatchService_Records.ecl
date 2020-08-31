@@ -147,9 +147,9 @@ EXPORT BatchService_Records(DATASET(Foreclosure_Services.Layouts.layout_batch_in
 			);
 
 		// restore unique id input
-		RETURN JOIN(results,ds_xml_in,LEFT.acctno=RIGHT.acctno,
+		RETURN SORT(JOIN(results,ds_xml_in,LEFT.acctno=RIGHT.acctno,
 			TRANSFORM(layout_final_batch_plus,
 				SELF.UniqueID_in:=RIGHT.UniqueID,
-				SELF:=LEFT),LEFT OUTER);
+				SELF:=LEFT),LEFT OUTER), -deed_recording_date);
 		
 	END;

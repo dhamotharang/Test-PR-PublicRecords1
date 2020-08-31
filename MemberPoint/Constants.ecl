@@ -1,4 +1,4 @@
-﻿IMPORT MemberPoint;
+﻿﻿IMPORT MemberPoint;
 
 	export Constants := module
 	
@@ -42,6 +42,9 @@
 																					'SWCZ, SWC, SWZ, SW, AVSZC, SVZC, AVSC, AVS, SVZC,SVCZ, SVC, SVZ, SV, AXSZC, SXZC, AXSC, AXS, SXZC,'+
 																					'SXCZ, SXC, SXZ, SX, AYSZC, SYZC, AYSC, AYS, SYZC,SYCZ, SYC, SYZ, SY';
 			export INTEGER UniqueIdScoreThreshold :=  80;
+			export INTEGER UniqueIdScoreThreshold_L :=  80;
+			export INTEGER UniqueIdScoreThreshold_M :=  90;
+			export INTEGER UniqueIdScoreThreshold_H :=  100;
 			export boolean UseDOBDeathMatch := false;
 			export boolean IncludeEmail := false;
 			export boolean IncludePhone := true;
@@ -135,13 +138,13 @@
 			EXPORT BOOLEAN BlankOutDuplicatePhones:= FALSE;
 			EXPORT BOOLEAN DedupInputPhones:= FALSE;
 			EXPORT BOOLEAN IncludeLastResort:= FALSE;
-			EXPORT UNSIGNED2 MaxNumAssociate:= 50;
+			EXPORT UNSIGNED2 MaxNumAssociate:= 0;
 			EXPORT UNSIGNED2 MaxNumAssociateOther:= 0;
-			EXPORT UNSIGNED2 MaxNumFamilyClose:= 50;
+			EXPORT UNSIGNED2 MaxNumFamilyClose:= 0;
 			EXPORT UNSIGNED2 MaxNumFamilyOther:= 0;
 			EXPORT UNSIGNED2 MaxNumNeighbor:= 0;
 			EXPORT UNSIGNED2 MaxNumParent:= 0;
-			EXPORT UNSIGNED2 MaxNumSpouse:= 50;
+			EXPORT UNSIGNED2 MaxNumSpouse:= 0;
 			EXPORT UNSIGNED2 MaxNumSubject:= 50;
 			EXPORT INTEGER MaxPhoneCount:= 3;
 			EXPORT BOOLEAN ReturnScore:= TRUE;
@@ -178,6 +181,26 @@
 		export PhoneScore         := ENUM(UNSIGNED, LowMin = 350,LowMax = 419 ,MidMin = 420,MidMax = 539 ,HighMin = 540);
 		export AdlBestAddressScore := ENUM(LowMin = 1,LowMax = 59 ,MidMin = 60,MidMax = 79 ,HighMin = 80, HighMax = 100 ,MidAverage = 65);
 		export BestAddressScore 	 := ENUM(LowMin = 1,LowMax = 39 ,MidMin = 40,MidMax = 79 ,HighMin = 80, HighMax = 100 );
+		Export InvalidInput_Code := 303;   
+	  Export InvalidInput_Message := 'INVALID INPUT';    
+		Export INTEGER Name_First_Rej_Code := 8;
+		Export Name_First_Rej_Message := 'INVALID OR BLANK FIRST NAME';
+		Export INTEGER Name_Last_Rej_Code := 4;
+		Export Name_Last_Rej_Message := 'INVALID OR BLANK LAST NAME';
+		Export INTEGER Street_addr_Rej_Code := 512;
+		Export Street_addr_Rej_Message := 'INVALID OR BLANK STREET ADDRESS';
+		Export INTEGER p_City_name_Rej_Code := 1024;
+		Export p_City_name_Rej_Message := 'INVALID OR BLANK CITY';
+		Export INTEGER ST_name_Rej_Code := 2048;
+		Export ST_name_Rej_Message := 'INVALID OR BLANK STATE';
+		Export INTEGER Z5_Rej_Code := 4096;
+		Export Z5_Rej_Message := 'INVALID OR BLANK ZIP CODE';
+		Export INTEGER DOB_Rej_Code := 256;
+		Export DOB_Rej_Message := 'INVALID OR BLANK DATE OF BIRTH';
+		Export INTEGER MemberGender_Rej_Code := 16777216;
+		Export MemberGender_Rej_Message := 'INVALID OR BLANK GENDER';
+		Export INTEGER SSN_Rej_Code := 128;
+		Export SSN_Rej_Message := 'INVALID OR BLANK SSN';
 
 		//Star rate, intended to replace phones confidence score (High, Middle, Low)
 		EXPORT ConfidenceStarRateMod:= MODULE

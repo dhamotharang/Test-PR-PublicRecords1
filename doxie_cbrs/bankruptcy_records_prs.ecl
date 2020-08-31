@@ -1,86 +1,86 @@
-import ut,doxie;
+IMPORT ut,doxie;
 
-export bankruptcy_records_prs(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
+EXPORT bankruptcy_records_prs(DATASET(doxie_cbrs.layout_references) bdids) := FUNCTION
 
 br := doxie_cbrs.bankruptcy_records(bdids);
 
-rec := record , maxlength(200000)
-  integer   penalt := 0;
-	  string20 filer_type_mapped;
-       string20 court_state;
-	  	string1    source;
-	string5    court_code;
-	string7    case_number;
-	string25   orig_case_number;
-	string12   id;
-	string10   seq_number;
-	string8    date_created;
-	string8    date_modified;
-	string50   court_name;
-	string40   court_location;
-	string8    case_closing_date;
-	string3    chapter;
-	string10   orig_filing_type;
-	string12   filing_status;
-	string3    orig_chapter;
-	string8    orig_filing_date;
-	string3    corp_flag;
-	string8    meeting_date;
-	string8    meeting_time;
-	string90   address_341;
-	string8    claims_deadline;
-	string8    complaint_deadline;
-	string8    disposed_date;
-	string35   disposition;
-	string8	   converted_date;
-	string8	   reopen_date;
-	string35   judge_name;
-	string128  record_type;
-	string8    date_filed;
-	string5    assets_no_asset_indicator;
-	string1    filing_type;
-	string1    filer_type;
-	string3    pro_se_ind;
-	string5    judges_identification;
-	string55   attorney_name;
-	string10   attorney_phone;
-	string65   attorney_company;
-	string60   attorney_address1;
-	string60   attorney_address2;
-	string25   attorney_city;
-	string2    attorney_st;
-	string5    attorney_zip;
-	string4    attorney_zip4;
-	string55   attorney2_name;
-	string10   attorney2_phone;
-	string65   attorney2_company;
-	string60   attorney2_address1;
-	string60   attorney2_address2;
-	string25   attorney2_city;
-	string2    attorney2_st;
-	string5    attorney2_zip;
-	string4    attorney2_zip4;
-	dataset(doxie.layout_bk_child) debtor_records; 
-	boolean    SelfRepresented;		//to match accurint
-	boolean    AssetsForUnsecured;
-end;
+rec := RECORD , MAXLENGTH(200000)
+  INTEGER penalt := 0;
+  STRING20 filer_type_mapped;
+  STRING20 court_state;
+  STRING1 source;
+  STRING5 court_code;
+  STRING7 case_number;
+  STRING25 orig_case_number;
+  STRING12 id;
+  STRING10 seq_number;
+  STRING8 date_created;
+  STRING8 date_modified;
+  STRING50 court_name;
+  STRING40 court_location;
+  STRING8 case_closing_date;
+  STRING3 chapter;
+  STRING10 orig_filing_type;
+  STRING12 filing_status;
+  STRING3 orig_chapter;
+  STRING8 orig_filing_date;
+  STRING3 corp_flag;
+  STRING8 meeting_date;
+  STRING8 meeting_time;
+  STRING90 address_341;
+  STRING8 claims_deadline;
+  STRING8 complaint_deadline;
+  STRING8 disposed_date;
+  STRING35 disposition;
+  STRING8 converted_date;
+  STRING8 reopen_date;
+  STRING35 judge_name;
+  STRING128 record_type;
+  STRING8 date_filed;
+  STRING5 assets_no_asset_indicator;
+  STRING1 filing_type;
+  STRING1 filer_type;
+  STRING3 pro_se_ind;
+  STRING5 judges_identification;
+  STRING55 attorney_name;
+  STRING10 attorney_phone;
+  STRING65 attorney_company;
+  STRING60 attorney_address1;
+  STRING60 attorney_address2;
+  STRING25 attorney_city;
+  STRING2 attorney_st;
+  STRING5 attorney_zip;
+  STRING4 attorney_zip4;
+  STRING55 attorney2_name;
+  STRING10 attorney2_phone;
+  STRING65 attorney2_company;
+  STRING60 attorney2_address1;
+  STRING60 attorney2_address2;
+  STRING25 attorney2_city;
+  STRING2 attorney2_st;
+  STRING5 attorney2_zip;
+  STRING4 attorney2_zip4;
+  DATASET(doxie.layout_bk_child) debtor_records;
+  BOOLEAN SelfRepresented; //to match accurint
+  BOOLEAN AssetsForUnsecured;
+END;
 
-doxie.layout_bk_child tra0(doxie.layout_bk_child l) := transform
-	self.names := l.names(debtor_company <> '' and debtor_fname = '' and debtor_lname ='');
-	self.debtor_ssn := '';
-	self := l;
-end;
+doxie.layout_bk_child tra0(doxie.layout_bk_child l) := TRANSFORM
+  SELF.names := l.names(debtor_company <> '' AND debtor_fname = '' AND debtor_lname ='');
+  SELF.debtor_ssn := '';
+  SELF := l;
+END;
 
 //slim down and pull out person debtor info
-rec tra(br l) := transform
-	self.debtor_records := 
-		if(doxie_cbrs.stored_ShowPersonalData_value,
-		   l.debtor_records,
-		   project(l.debtor_records((integer)debtor_did = 0), tra0(left)));
-	self := l;
-end;
+rec tra(br l) := TRANSFORM
+  SELF.debtor_records :=
+    IF(doxie_cbrs.stored_ShowPersonalData_value,
+       l.debtor_records,
+       PROJECT(l.debtor_records((INTEGER)debtor_did = 0), tra0(LEFT)));
+  SELF := l;
+END;
 
-brslim := project(br, tra(left));
+brslim := PROJECT(br, tra(LEFT));
 
-return brslim;
+RETURN brslim;
 END;

@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 0.8.2
-IMPORT KEL08a AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
+IMPORT KEL12 AS KEL;
 IMPORT B_Tradeline_11,CFG_graph FROM Business_Credit_KEL;
-IMPORT * FROM KEL08a.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT B_Tradeline_10(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __cfg = CFG_graph) := MODULE
   SHARED VIRTUAL TYPEOF(B_Tradeline_11(__in,__cfg).__ENH_Tradeline_11) __ENH_Tradeline_11 := B_Tradeline_11(__in,__cfg).__ENH_Tradeline_11;
-  SHARED __EE141231 := __ENH_Tradeline_11;
-  EXPORT __ST141048_Layout := RECORD
+  SHARED __EE257295 := __ENH_Tradeline_11;
+  EXPORT __ST240731_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nkdate _load__date_;
     KEL.typ.nstr _sbfe__contributor__number_;
@@ -97,9 +97,9 @@ EXPORT B_Tradeline_10(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_grap
     KEL.typ.nbool Shows_Closed_Account_;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST141048_Layout __ND141703__Project(B_Tradeline_11(__in,__cfg).__ST140114_Layout __PP141234) := TRANSFORM
-    SELF.Shows_Closed_Account_ := __AND(__AND(__NOT(__NT(__PP141234.Date_Reported_Closed_)),__OP2(__PP141234.Date_Reported_Closed_,<=,__CN(__cfg.CurrentDate))),__NOT(__OP2(__PP141234.Date_Reported_Closed_,<,__PP141234._date__account__opened_)));
-    SELF := __PP141234;
+  SHARED __ST240731_Layout __ND257391__Project(B_Tradeline_11(__in,__cfg).__ST240916_Layout __PP256829) := TRANSFORM
+    SELF.Shows_Closed_Account_ := __AND(__AND(__NOT(__NT(__PP256829.Date_Reported_Closed_)),__OP2(__PP256829.Date_Reported_Closed_,<=,__CN(__cfg.CurrentDate))),__NOT(__OP2(__PP256829.Date_Reported_Closed_,<,__PP256829._date__account__opened_)));
+    SELF := __PP256829;
   END;
-  EXPORT __ENH_Tradeline_10 := PROJECT(__EE141231,__ND141703__Project(LEFT));
+  EXPORT __ENH_Tradeline_10 := PROJECT(__EE257295,__ND257391__Project(LEFT));
 END;

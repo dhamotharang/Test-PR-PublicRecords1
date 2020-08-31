@@ -1,4 +1,4 @@
-﻿/*
+/*
   ***********************************************************************************************************
   * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
   * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
@@ -9,9 +9,9 @@ import $, ConsumerDisclosure, doxie, fcra, ut, header_quick, Riskwise, risk_indi
 // call full header, call full override
 // join them together by rid, left outer
 // override key will only have fields populated that were corrected (recordid is RID), such as SSN, this will also have a bitmap field that stores a 1 for a null corrected value
-// use left except for where right is populated 
+// use left except for where right is populated
 // add temporary fields to store old value and new value for each field (first, middle, last, addr, city, state, zip, ssn, dob, and addr flags also)
-// project through all the header records and replace old value fields with new value fields (this will correct any new records that came in with wrong value and has been corrected by customer) 
+// project through all the header records and replace old value fields with new value fields (this will correct any new records that came in with wrong value and has been corrected by customer)
 // fcra data layout will be layout_header plus addr flags
 // layout override will be layout header plus string blankout plus addr flags
 
@@ -34,9 +34,9 @@ export RawHeader := module
     boolean isPropagatedCorrection := false;
   end;
 
-export GetData(dataset (doxie.layout_references) bshell_dids, 
-                dataset (fcra.Layout_override_flag) ds_flagfile,
-                dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs,														 
+export GetData(dataset (doxie.layout_references) bshell_dids,
+                dataset (FFD.Layouts.flag_ext_rec) ds_flagfile,
+                dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs,
                 $.IParams.IParam in_mod) := function
 
 boolean showDisputedRecords := in_mod.ReturnDisputed;
@@ -46,10 +46,10 @@ header_pc_flags := slim_pc_recs(datagroup = FFD.Constants.DataGroups.HDR);
 Layout_working := RiskWiseFCRA.layouts.working;
 
 // suppressions for header
-flagged_hdr_suppressions := ds_flagfile(file_id = FCRA.FILE_ID.hdr);	
-header_correction_keys  := SET(flagged_hdr_suppressions, trim(record_id) );	
-                      
-quick_header_suppressions := join(flagged_hdr_suppressions, Header_Quick.key_DID_fcra,	
+flagged_hdr_suppressions := ds_flagfile(file_id = FCRA.FILE_ID.hdr);
+header_correction_keys  := SET(flagged_hdr_suppressions, trim(record_id) );
+
+quick_header_suppressions := join(flagged_hdr_suppressions, Header_Quick.key_DID_fcra,
                       keyed((unsigned)left.did=right.did) and
                       (
                         trim((string)right.did) + trim((string)right.rid) = trim(left.record_id) or // old way - retrieving corrected records from prior to 11/13/2012
@@ -64,14 +64,14 @@ header_main_suppressions := join(flagged_hdr_suppressions, key_header,
                         trim((string)right.did) + trim((string)right.rid) = trim(left.record_id) or // old way - retrieving corrected records from prior to 11/13/2012
                         trim( (string)right.persistent_record_id ) = trim(left.record_id)   // new way - using persistent_record_id
                       ),
-                    transform( dx_Header.layout_key_header, 
+                    transform( dx_Header.layout_key_header,
                       ssnToUse := IF(right.valid_ssn<>'M', right.ssn, '');	// if manufactured, then blank out
                       dobToUse := IF(right.valid_dob<>'M', right.dob, 0);	// if manufactured, then blank out
                       self.ssn := ssnToUse;
                       self.dob := dobToUse;
                       self := right),
-                    LIMIT(0),KEEP($.Constants.Limits.MaxHeaderPerDID));	
-                    
+                    LIMIT(0),KEEP($.Constants.Limits.MaxHeaderPerDID));
+
 header_suppressions := quick_header_suppressions + header_main_suppressions;
 
 // get the header corrections
@@ -80,48 +80,48 @@ header_corr := join(bshell_dids, FCRA.Key_Override_Header_DID,	// this includes 
                     ((right.head.src='BA' and FCRA.bankrupt_is_ok(todaysdate,(string)right.head.dt_first_seen)) or
                     (right.head.src='L2' and FCRA.lien_is_ok(todaysdate,(string)right.head.dt_first_seen)) OR right.head.src not in ['BA','L2']) and
                     trim((string)right.did) + trim((string)right.head.rid) not in header_correction_keys	// old way - exclude corrected records from prior to 11/13/2012
-                    and trim( (string)right.head.persistent_record_id ) not in header_correction_keys,  // new way - using persistent_record_id										
+                    and trim( (string)right.head.persistent_record_id ) not in header_correction_keys,  // new way - using persistent_record_id
                     transform(fcra.Layout_Override_Header, self := right),
-                    LIMIT(0),KEEP($.Constants.Limits.MaxHeaderPerDID));	
+                    LIMIT(0),KEEP($.Constants.Limits.MaxHeaderPerDID));
 
-                    
-// search the main keys										
-qheader_main := join(bshell_dids, Header_Quick.key_DID_fcra,	
+
+// search the main keys
+qheader_main := join(bshell_dids, Header_Quick.key_DID_fcra,
                       left.did<>0 and keyed(left.did=right.did) and
                       ((right.src='BA' and FCRA.bankrupt_is_ok(todaysdate,(string)right.dt_first_seen)) or
                       (right.src='L2' and FCRA.lien_is_ok(todaysdate,(string)right.dt_first_seen)) OR right.src not in ['BA','L2']) and
-                      ~FCRA.Restricted_Header_Src(right.src, right.vendor_id[1]) and 
+                      ~FCRA.Restricted_Header_Src(right.src, right.vendor_id[1]) and
                       trim((string)right.did) + trim((string)right.rid) not in header_correction_keys // old way - exclude corrected records from prior to 11/13/2012
-                      and trim( (string)right.persistent_record_id ) not in header_correction_keys,  // new way - using persistent_record_id		
+                      and trim( (string)right.persistent_record_id ) not in header_correction_keys,  // new way - using persistent_record_id
                       transform( dx_header.layout_key_header, self.src:=if(right.src in ['QH','WH'],'EQ',right.src), self := right,  self := [] ),
                       LIMIT(0),KEEP($.Constants.Limits.MaxHeaderPerDID));
 
-header_main := join(bshell_dids, key_header,	
+header_main := join(bshell_dids, key_header,
                     left.did<>0 and keyed(left.did=right.s_did) and
                     ((right.src='BA' and FCRA.bankrupt_is_ok(todaysdate,(string)right.dt_first_seen)) or
                     (right.src='L2' and FCRA.lien_is_ok(todaysdate,(string)right.dt_first_seen)) OR right.src not in ['BA','L2']) and
                     ~FCRA.Restricted_Header_Src(right.src, right.vendor_id[1]) and
                     trim((string)right.did) + trim((string)right.rid) not in header_correction_keys// old way - exclude corrected records from prior to 11/13/2012
-                    and trim( (string)right.persistent_record_id ) not in header_correction_keys,  // new way - using persistent_record_id	
+                    and trim( (string)right.persistent_record_id ) not in header_correction_keys,  // new way - using persistent_record_id
                     transform( dx_header.layout_key_header, self := right ),
-                    LIMIT(ut.limits.HEADER_PER_DID));	
+                    LIMIT(ut.limits.HEADER_PER_DID));
 
 combo_header := qheader_main + header_main;
-            
+
 // search citystatezip for each header record to get the corp/mil flag
 Riskwise.layouts_vru.Layout_Header_Data getZipFlag(dx_Header.layout_key_header le, riskwise.Key_CityStZip ri) := transform
   self.addr_flags.corpMil := if(ri.zipclass in ['U','M'], '1', '0');
   self := le;
   self := [];	// rest of the addr flags
 end;
-wZipClass := join(combo_header, riskwise.Key_CityStZip,	
+wZipClass := join(combo_header, riskwise.Key_CityStZip,
                               keyed(right.zip5=left.zip) and left.zip!='',
                               getZipFlag(left, right), left outer, ATMOST(keyed(right.zip5=left.zip),RiskWise.max_atmost));
 
 
 
 Riskwise.layouts_vru.Layout_Header_Data zipRoll(Riskwise.layouts_vru.Layout_Header_Data le, wZipClass ri) := transform
-  self.addr_flags.corpMil := if(le.addr_flags.corpMil='1', '1', ri.addr_flags.corpMil);	
+  self.addr_flags.corpMil := if(le.addr_flags.corpMil='1', '1', ri.addr_flags.corpMil);
   self := le;
 end;
 wZipClassRoll := ROLLUP(SORT(wZipClass, rid),left.rid=right.rid,zipRoll(left,right));
@@ -134,21 +134,21 @@ Riskwise.layouts_vru.Layout_Header_Data getHRIflags(Riskwise.layouts_vru.Layout_
   self.addr_flags.highRisk := if(ri.sic_code<>'', '1', '0');
   self := le;
 end;
-wHRI := join(wZipClassRoll, risk_indicators.key_HRI_Address_To_SIC_filtered_fcra,  
+wHRI := join(wZipClassRoll, risk_indicators.key_HRI_Address_To_SIC_filtered_fcra,
                     left.zip!='' and left.prim_name != '' and
-                    keyed(left.zip=right.z5) and keyed(left.prim_name=right.prim_name) and keyed(left.suffix=right.suffix) and 
-                    keyed(left.predir=right.predir) and keyed(left.postdir=right.postdir) and keyed(left.prim_range=right.prim_range) and 
-                    keyed(left.sec_range=right.sec_range) AND 
+                    keyed(left.zip=right.z5) and keyed(left.prim_name=right.prim_name) and keyed(left.suffix=right.suffix) and
+                    keyed(left.predir=right.predir) and keyed(left.postdir=right.postdir) and keyed(left.prim_range=right.prim_range) and
+                    keyed(left.sec_range=right.sec_range) AND
                     // check date
                     right.dt_first_seen < history_Date, getHRIflags(left,right), left outer,
                     ATMOST(keyed(left.zip=right.z5) and keyed(left.prim_name=right.prim_name) and keyed(left.suffix=right.suffix) and
                         keyed(left.predir=right.predir) and keyed(left.postdir=right.postdir) and keyed(left.prim_range=right.prim_range) and
-                        keyed(left.sec_range=right.sec_range), RiskWise.max_atmost), keep(100));	
-            
-            
+                        keyed(left.sec_range=right.sec_range), RiskWise.max_atmost), keep(100));
+
+
 
 Riskwise.layouts_vru.Layout_Header_Data hriRoll(Riskwise.layouts_vru.Layout_Header_Data le, Riskwise.layouts_vru.Layout_Header_Data ri) := transform
-  self.addr_flags.prisonAddr := if(le.addr_flags.prisonAddr='1', '1', ri.addr_flags.prisonAddr);	
+  self.addr_flags.prisonAddr := if(le.addr_flags.prisonAddr='1', '1', ri.addr_flags.prisonAddr);
   self.addr_flags.highRisk := if(le.addr_flags.highRisk='1', '1', ri.addr_flags.highRisk);
   self := le;
 end;
@@ -176,7 +176,7 @@ Riskwise.layouts_vru.Layout_Header_Data getAdvoFlags(wHRIRoll le, Advo.Key_Addr1
                                         '');
 
   self.addr_flags.mail_usage  := ri.Mixed_Address_Usage;
-                                        
+
   self := le;
 end;
 wAdvo  := join(wHRIRoll, Advo.Key_Addr1_FCRA,
@@ -196,15 +196,15 @@ Riskwise.layouts_vru.Layout_Header_Data addUnitCount(Riskwise.layouts_vru.Layout
   SELF.addr_flags.unit_count := ri.apt_cnt;
   SELF := le;
 end;
-wUnitCount := join(wADVO, key_apt_buildings,	
+wUnitCount := join(wADVO, key_apt_buildings,
   left.did<>0 and trim(left.prim_name)<>'' and
-    keyed(left.prim_range=right.prim_range) and 
+    keyed(left.prim_range=right.prim_range) and
     keyed(left.prim_name=right.prim_name) and
-    keyed(left.zip=right.zip) and 
-    keyed(left.suffix=right.suffix) and 
+    keyed(left.zip=right.zip) and
+    keyed(left.suffix=right.suffix) and
     keyed(left.predir=right.predir),
-  addUnitCount(left,right), 
-    left outer, atmost(riskwise.max_atmost), keep(1));														
+  addUnitCount(left,right),
+    left outer, atmost(riskwise.max_atmost), keep(1));
 
 
 // added this project to separate logic of applying corrections from logic of assigning values to all payload records
@@ -216,18 +216,18 @@ header_combined_data := project(wUnitCount, transform(Riskwise.layouts_vru.Layou
   cleanAddr := risk_indicators.MOD_AddressClean.clean_addr( street_address, left.city_name, left.st, left.zip+left.zip4 ) ;
   addrVal := Risk_Indicators.iid_constants.addrvalflag(cleanAddr[179..182]);
   self.addr_flags.dwelltype := cleanAddr[139];
-  self.addr_flags.valid := if(addrVal='N' and street_address<>'' and 
+  self.addr_flags.valid := if(addrVal='N' and street_address<>'' and
                               ((left.city_name<>'' and left.st<>'') or left.zip<>''), '0', '1');
 
   // the ssn and dob will get blanked out in the _header_data results whenever the valid_ssn or valid_dob = 'M' indicating that these records had the DOB or SSN manufactured from another source.
   self.ssn := if(left.valid_ssn <>'M',left.ssn,''); // if manufactured, then blank out
   self.dob := if(left.valid_dob <>'M',left.dob,0); // if manufactured, then blank out
-  self:=left));																																																																								
-  
+  self:=left));
+
 //header_combined_data has all payload data before corrections applied.
 
 Layout_working combineHeaderCorrections(Riskwise.layouts_vru.Layout_Header_Data le, header_corr ri) := transform
-  
+
   // correct fields where a correction was done or suppressed
   self.title := if(ri.head.title<>'' or ri.blankout[risk_indicators.iid_constants.suppress.title]='1', ri.head.title, le.title);
   self.fname := if(ri.head.fname<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Fname]='1', ri.head.fname, le.fname);
@@ -248,7 +248,7 @@ Layout_working combineHeaderCorrections(Riskwise.layouts_vru.Layout_Header_Data 
   self.ssn := if(ri.head.ssn<>'' or ri.blankout[risk_indicators.iid_constants.suppress.SSN]='1', ri.head.ssn, le.ssn);
   self.dob := if(ri.head.dob<>0 or ri.blankout[risk_indicators.iid_constants.suppress.DOB]='1', ri.head.dob, le.dob);
   self.dod := if(ri.head.dod<>0 or ri.blankout[risk_indicators.iid_constants.suppress.DOD]='1', ri.head.dod, le.dod);
-  
+
   // check to see what was changed to what and if changed, then populate the fields for the next project
   titleCorrected := ri.head.title<>'' or ri.blankout[risk_indicators.iid_constants.suppress.title]='1';	// correction field will only be populated if a correction was done
   self.oldTitle := if(titleCorrected, le.title, '');			// only populate the old if there is a new
@@ -257,47 +257,47 @@ Layout_working combineHeaderCorrections(Riskwise.layouts_vru.Layout_Header_Data 
   fnameCorrected := ri.head.fname<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Fname]='1';	// correction field will only be populated if a correction was done
   self.oldFname := if(fnameCorrected, le.fname, '');			// only populate the old if there is a new
   self.newFname := if(fnameCorrected, ri.head.fname, '');	// only populate the new if there is a new
-  
+
   mnameCorrected := ri.head.mname<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Mname]='1';	// correction field will only be populated if a correction was done
   self.oldmname := if(mnameCorrected, le.mname, '');			// only populate the old if there is a new
   self.newmname := if(mnameCorrected, ri.head.mname, '');	// only populate the new if there is a new
-  
+
   lnameCorrected := ri.head.lname<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Lname]='1';	// correction field will only be populated if a correction was done
   self.oldLname := if(lnameCorrected, le.lname, '');			// only populate the old if there is a new
   self.newLname := if(lnameCorrected, ri.head.lname, '');	// only populate the new if there is a new
-  
+
   nameSuffixCorrected := ri.head.name_suffix<>'' or ri.blankout[risk_indicators.iid_constants.suppress.NameSuffix]='1';	// correction field will only be populated if a correction was done
   self.oldNameSuffix := if(nameSuffixCorrected, le.name_suffix, '');			// only populate the old if there is a new
   self.newNameSuffix := if(nameSuffixCorrected, ri.head.name_suffix, '');	// only populate the new if there is a new
-  
+
   // check to see if any part of the address was corrected, if so, then populate all fields in the address so we can compare later to see what the original address was
-  streetAddrCorrected := 	ri.head.prim_range<>'' or ri.blankout[risk_indicators.iid_constants.suppress.PrimName]='1' or 
-                          ri.head.predir<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Predir]='1' or 
+  streetAddrCorrected := 	ri.head.prim_range<>'' or ri.blankout[risk_indicators.iid_constants.suppress.PrimName]='1' or
+                          ri.head.predir<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Predir]='1' or
                           ri.head.prim_name<>'' or ri.blankout[risk_indicators.iid_constants.suppress.PrimName]='1' or
-                          ri.head.suffix<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Suffix]='1' or 
-                          ri.head.postdir<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Postdir]='1' or 
+                          ri.head.suffix<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Suffix]='1' or
+                          ri.head.postdir<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Postdir]='1' or
                           ri.head.unit_desig<>'' or ri.blankout[risk_indicators.iid_constants.suppress.UnitDesig]='1' or
                           ri.head.sec_range<>'' or ri.blankout[risk_indicators.iid_constants.suppress.SecRange]='1';
-  
+
   // in the old fields for street address, check if streetAddrCorrected then use the original from left
   self.oldPrimRange := if(streetAddrCorrected, le.prim_range, '');			// only populate the old if there is a new
   self.newPrimRange := map(streetAddrCorrected and ri.head.prim_range<>'' => ri.head.prim_range,
                            streetAddrCorrected and ri.blankout[risk_indicators.iid_constants.suppress.PrimRange]='1' => '',
                            streetAddrCorrected => le.prim_range,	// if another addr field was corrected, then keep the original
                            '');
-    
+
   self.oldPredir := if(streetAddrCorrected, le.predir, '');			// only populate the old if there is a new
   self.newPredir := map(streetAddrCorrected and ri.head.predir<>'' => ri.head.predir,
                         streetAddrCorrected and ri.blankout[risk_indicators.iid_constants.suppress.predir]='1' => '',
                         streetAddrCorrected => le.predir,	// if another addr field was corrected, then keep the original
                         '');	// only populate the new if there is a new
-  
+
   self.oldPrimName := if(streetAddrCorrected, le.prim_name, '');			// only populate the old if there is a new
   self.newPrimName := map(streetAddrCorrected and ri.head.prim_name<>'' => ri.head.prim_name,
                            streetAddrCorrected and ri.blankout[risk_indicators.iid_constants.suppress.PrimName]='1' => '',
                            streetAddrCorrected => le.prim_name,	// if another addr field was corrected, then keep the original
                            '');	// only populate the new if there is a new
-  
+
   self.oldSuffix := if(streetAddrCorrected, le.suffix, '');			// only populate the old if there is a new
   self.newSuffix := map(streetAddrCorrected and ri.head.suffix<>'' => ri.head.suffix,
                            streetAddrCorrected and ri.blankout[risk_indicators.iid_constants.suppress.suffix]='1' => '',
@@ -309,39 +309,39 @@ Layout_working combineHeaderCorrections(Riskwise.layouts_vru.Layout_Header_Data 
                            streetAddrCorrected and ri.blankout[risk_indicators.iid_constants.suppress.postdir]='1' => '',
                            streetAddrCorrected => le.postdir,	// if another addr field was corrected, then keep the original
                            '');	// only populate the new if there is a new
-  
+
   self.oldUnitDesig := if(streetAddrCorrected, le.unit_desig, '');			// only populate the old if there is a new
   self.newUnitDesig := map(streetAddrCorrected and ri.head.unit_desig<>'' => ri.head.unit_desig,
                            streetAddrCorrected and ri.blankout[risk_indicators.iid_constants.suppress.unitdesig]='1' => '',
                            streetAddrCorrected => le.unit_desig,	// if another addr field was corrected, then keep the original
                            '');	// only populate the new if there is a new
-  
+
   self.oldSecRange := if(streetAddrCorrected, le.sec_range, '');			// only populate the old if there is a new
   self.newSecRange := map(streetAddrCorrected and ri.head.sec_range<>'' => ri.head.sec_range,
                            streetAddrCorrected and ri.blankout[risk_indicators.iid_constants.suppress.secrange]='1' => '',
                            streetAddrCorrected => le.sec_range,	// if another addr field was corrected, then keep the original
                            '');	// only populate the new if there is a new
-  
+
   cityNameCorrected := ri.head.city_name<>'' or ri.blankout[risk_indicators.iid_constants.suppress.cityname]='1';	// correction field will only be populated if a correction was done
   self.oldCityname := if(cityNameCorrected, le.city_name, '');			// only populate the old if there is a new
   self.newCityName := if(cityNameCorrected, ri.head.city_name, '');	// only populate the new if there is a new
-  
+
   stCorrected := ri.head.st<>'' or ri.blankout[risk_indicators.iid_constants.suppress.St]='1';	// correction field will only be populated if a correction was done
   self.oldSt := if(stCorrected, le.st, '');			// only populate the old if there is a new
   self.newSt := if(stCorrected, ri.head.st, '');	// only populate the new if there is a new
-  
+
   zipCorrected := ri.head.zip<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Zip]='1';	// correction field will only be populated if a correction was done
   self.oldZip := if(zipCorrected, le.zip, '');			// only populate the old if there is a new
   self.newZip := if(zipCorrected, ri.head.zip, '');	// only populate the new if there is a new
-  
+
   zip4Corrected := ri.head.zip4<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Zip4]='1';	// correction field will only be populated if a correction was done
   self.oldZip4 := if(zip4Corrected, le.zip4, '');			// only populate the old if there is a new
   self.newZip4 := if(zip4Corrected, ri.head.zip4, '');	// only populate the new if there is a new
-  
+
   ssnCorrected := ri.head.ssn<>'' or ri.blankout[risk_indicators.iid_constants.suppress.SSN]='1';	// correction field will only be populated if a correction was done
   self.oldSSN := if(ssnCorrected, le.ssn, '');			// only populate the old if there is a new
   self.newSSN := if(ssnCorrected, ri.head.ssn, '');	// only populate the new if there is a new
-  
+
   dobCorrected := ri.head.dob<>0 or ri.blankout[risk_indicators.iid_constants.suppress.DOB]='1';	// correction field will only be populated if a correction was done
   self.oldDOB := if(dobCorrected, (string)le.dob, '');			// only populate the old if there is a new
   self.newDOB := if(dobCorrected, (string)ri.head.dob, '');	// only populate the new if there is a new
@@ -352,75 +352,75 @@ Layout_working combineHeaderCorrections(Riskwise.layouts_vru.Layout_Header_Data 
 
   // set the flags
   self.addr_flags.dwelltype := if(ri.addr_flags.dwelltype<>'' or ri.blankout[risk_indicators.iid_constants.suppress.DwellType]='1', ri.addr_flags.dwelltype, le.addr_flags.dwelltype);
-  self.addr_flags.valid := if(ri.addr_flags.valid<>'' or ri.blankout[19]='1', ri.addr_flags.valid, le.addr_flags.valid);																																																														
-  
+  self.addr_flags.valid := if(ri.addr_flags.valid<>'' or ri.blankout[19]='1', ri.addr_flags.valid, le.addr_flags.valid);
+
   self.addr_flags.prisonAddr := if(ri.addr_flags.prisonAddr<>'' or ri.blankout[risk_indicators.iid_constants.suppress.PrisonAddr]='1', ri.addr_flags.prisonAddr, le.addr_flags.prisonAddr);
-  
-// set the high risk address source and description based upon what the highrisk flag says	
+
+// set the high risk address source and description based upon what the highrisk flag says
   self.addr_flags.highRisk := if(ri.addr_flags.highRisk<>'' or ri.blankout[risk_indicators.iid_constants.suppress.HighRisk]='1', ri.addr_flags.highRisk, le.addr_flags.highRisk);
   self.high_Risk_Address_Source := if(ri.addr_flags.highRisk<>'' or ri.blankout[risk_indicators.iid_constants.suppress.HighRisk]='1', ri.high_Risk_Address_Source, le.high_Risk_Address_Source);
   self.high_Risk_Address_Description := if(ri.addr_flags.highRisk<>'' or ri.blankout[risk_indicators.iid_constants.suppress.HighRisk]='1', ri.high_Risk_Address_Description, le.high_Risk_Address_Description);
-  
+
   self.addr_flags.corpMil := if(ri.addr_flags.corpMil<>'' or ri.blankout[risk_indicators.iid_constants.suppress.CorpMil]='1', ri.addr_flags.corpMil, le.addr_flags.corpMil);
-  
+
   self.addr_flags.doNotDeliver := if(ri.addr_flags.doNotDeliver<>'' or ri.blankout[risk_indicators.iid_constants.suppress.DoNotDeliver]='1', ri.addr_flags.doNotDeliver, le.addr_flags.doNotDeliver);
   self.addr_flags.deliveryStatus := if(ri.addr_flags.deliveryStatus<>'' or ri.blankout[risk_indicators.iid_constants.suppress.DeliveryStatus]='1', ri.addr_flags.deliveryStatus, le.addr_flags.deliveryStatus);
   self.addr_flags.addressType := if(ri.addr_flags.addressType<>'' or ri.blankout[risk_indicators.iid_constants.suppress.AddressType]='1', ri.addr_flags.addressType, le.addr_flags.addressType);
   self.addr_flags.dropIndicator := if(ri.addr_flags.dropIndicator<>'' or ri.blankout[risk_indicators.iid_constants.suppress.DropIndicator]='1', ri.addr_flags.dropIndicator, le.addr_flags.dropIndicator);
   self.addr_flags.unit_count := if(ri.addr_flags.unit_count<>0 or ri.blankout[risk_indicators.iid_constants.suppress.unit_count]='1', ri.addr_flags.unit_count, le.addr_flags.unit_count);
   self.addr_flags.mail_usage := if(ri.addr_flags.mail_usage<>'' or ri.blankout[risk_indicators.iid_constants.suppress.mail_usage]='1', ri.addr_flags.mail_usage, le.addr_flags.mail_usage);
-  
-  
+
+
   dwellTypeCorrected := ri.addr_flags.dwelltype<>'' or ri.blankout[risk_indicators.iid_constants.suppress.DwellType]='1';	// correction field will only be populated if a correction was done
   self.oldDwellType := if(dwellTypeCorrected, le.addr_flags.dwelltype, '');					// only populate the old if there is a new
   self.newDwellType := if(dwellTypeCorrected, ri.addr_flags.dwelltype, '');	// only populate the new if there is a new
-  
+
   validCorrected := ri.addr_flags.valid<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Valid]='1';	// correction field will only be populated if a correction was done
   self.oldValid := if(validCorrected, le.addr_flags.valid, '');		// only populate the old if there is a new
   self.newValid := if(validCorrected, ri.addr_flags.valid, '');			// only populate the new if there is a new
-  
+
   prisonAddrCorrected := ri.addr_flags.prisonAddr<>'' or ri.blankout[risk_indicators.iid_constants.suppress.PrisonAddr]='1';	// correction field will only be populated if a correction was done
   self.oldPrisonAddr := if(prisonAddrCorrected, le.addr_flags.prisonAddr, '');			// only populate the old if there is a new
   self.newPrisonAddr := if(prisonAddrCorrected, ri.addr_flags.prisonAddr, '');			// only populate the new if there is a new
-  
+
   highRiskCorrected := ri.addr_flags.highRisk<>'' or ri.blankout[risk_indicators.iid_constants.suppress.HighRisk]='1';	// correction field will only be populated if a correction was done
   self.oldHighRisk := if(highRiskCorrected, le.addr_flags.highRisk, '');			// only populate the old if there is a new
   self.newHighRisk := if(highRiskCorrected, ri.addr_flags.highRisk, '');			// only populate the new if there is a new
   self.oldHighRiskAddressSource := if(highRiskCorrected, le.high_risk_address_source, '');			// only populate the old if there is a new
-  self.newHighRiskAddressSource := if(highRiskCorrected, ri.high_risk_address_source, '');			// only populate the new if there is a new	
+  self.newHighRiskAddressSource := if(highRiskCorrected, ri.high_risk_address_source, '');			// only populate the new if there is a new
   self.oldHighRiskAddressDescription := if(highRiskCorrected, le.high_risk_address_description, '');			// only populate the old if there is a new
   self.newHighRiskAddressDescription := if(highRiskCorrected, ri.high_risk_address_description, '');			// only populate the new if there is a new
-  
+
   corpMilCorrected := ri.addr_flags.corpMil<>'' or ri.blankout[risk_indicators.iid_constants.suppress.CorpMil]='1';	// correction field will only be populated if a correction was done
   self.oldCorpMil := if(corpMilCorrected, le.addr_flags.corpMil, '');			// only populate the old if there is a new
   self.newCorpMil := if(corpMilCorrected, ri.addr_flags.corpMil, '');			// only populate the new if there is a new
-  
+
   doNotDeliverCorrected := ri.addr_flags.doNotDeliver<>'' or ri.blankout[risk_indicators.iid_constants.suppress.DoNotDeliver]='1';	// correction field will only be populated if a correction was done
   self.oldDoNotDeliver := if(doNotDeliverCorrected, le.addr_flags.doNotDeliver, '');			// only populate the old if there is a new
   self.newDoNotDeliver := if(doNotDeliverCorrected, ri.addr_flags.doNotDeliver, '');			// only populate the new if there is a new
-  
+
   deliveryStatusCorrected := ri.addr_flags.deliveryStatus<>'' or ri.blankout[risk_indicators.iid_constants.suppress.DeliveryStatus]='1';	// correction field will only be populated if a correction was done
   self.oldDeliveryStatus := if(deliveryStatusCorrected, le.addr_flags.deliveryStatus, '');			// only populate the old if there is a new
   self.newDeliveryStatus := if(deliveryStatusCorrected, ri.addr_flags.deliveryStatus, '');			// only populate the new if there is a new
-  
+
   addressTypeCorrected := ri.addr_flags.addressType<>'' or ri.blankout[risk_indicators.iid_constants.suppress.AddressType]='1';	// correction field will only be populated if a correction was done
   self.oldAddressType := if(addressTypeCorrected, le.addr_flags.addressType, '');			// only populate the old if there is a new
   self.newAddressType := if(addressTypeCorrected, ri.addr_flags.addressType, '');			// only populate the new if there is a new
-  
+
   dropIndicatorCorrected := ri.addr_flags.dropIndicator<>'' or ri.blankout[risk_indicators.iid_constants.suppress.DropIndicator]='1';	// correction field will only be populated if a correction was done
   self.oldDropIndicator := if(dropIndicatorCorrected, le.addr_flags.dropIndicator, '');			// only populate the old if there is a new
   self.newDropIndicator := if(dropIndicatorCorrected, ri.addr_flags.dropIndicator, '');			// only populate the new if there is a new
-  
+
   unit_countCorrected := ri.addr_flags.unit_count<>0 or ri.blankout[risk_indicators.iid_constants.suppress.unit_count]='1';	// correction field will only be populated if a correction was done
   self.oldunit_count := if(unit_countCorrected, le.addr_flags.unit_count, 0);			// only populate the old if there is a new
   self.newunit_count := if(unit_countCorrected, ri.addr_flags.unit_count, 0);			// only populate the new if there is a new
-  
+
   mail_usageCorrected := ri.addr_flags.mail_usage<>'' or ri.blankout[risk_indicators.iid_constants.suppress.mail_usage]='1';	// correction field will only be populated if a correction was done
   self.oldmail_usage := if(mail_usageCorrected, le.addr_flags.mail_usage, '');			// only populate the old if there is a new
   self.newmail_usage := if(mail_usageCorrected, ri.addr_flags.mail_usage, '');			// only populate the new if there is a new
-  
+
   self.isCorrected := (string)ri.head.rid not in ['','0'] or ri.head.persistent_record_id<>0;
-  
+
   self := le;
 end;
 
@@ -429,36 +429,36 @@ corrPlusHeader := join(header_combined_data, header_corr,
                       right.head.did<>0 and left.did=right.head.did and
                       (
                       (left.rid=right.head.rid)  // old way
-                        or 
+                        or
                       (left.persistent_record_id=right.head.persistent_record_id) // new way, using persistent_record_id
-                      ),  
-                      combineHeaderCorrections(left, right), 
+                      ),
+                      combineHeaderCorrections(left, right),
                       LEFT OUTER, many lookup);
 
-// we need to identify 3 separate data sets:  
-// records before correction, records after overrides applied and records with no overrides applied 
+// we need to identify 3 separate data sets:
+// records before correction, records after overrides applied and records with no overrides applied
 
 // --- records after correction-----
 corrOnly := corrPlusHeader(isCorrected);
 
 // --- records where no overrides were applied-----
 unCorrOnly := corrPlusHeader(~isCorrected);
- 
+
 // --- records before correction-----
 before_CorrOnly := join(header_combined_data, header_corr,
                       right.head.did<>0 and left.did=right.head.did and
                       (
                       (left.rid=right.head.rid)  // old way
-                        or 
+                        or
                       (left.persistent_record_id=right.head.persistent_record_id) // new way, using persistent_record_id
-                      ),  
-                      transform(layout_header_internal, 
+                      ),
+                      transform(layout_header_internal,
                                 self.subject_did := left.did,
                                 self.compliance_flags.IsOverwritten := true,
                                 self.record_ids.RecId1 := (string) left.persistent_record_id,
-                                self.head:=left, 
-                                self:=left, 
-                                self:=[]), 
+                                self.head:=left,
+                                self:=left,
+                                self:=[]),
                       limit(0));
 
 Layout_working correctFutureData(unCorrOnly le, corrOnly ri) := transform
@@ -467,12 +467,12 @@ Layout_working correctFutureData(unCorrOnly le, corrOnly ri) := transform
   self.mname := if((trim(ri.oldMname)<>'' or trim(ri.newMname)<>'') and ri.oldMname=le.mname, ri.newMname, le.mname);
   self.lname := if((trim(ri.oldLname)<>'' or trim(ri.newLname)<>'') and ri.oldLname=le.lname, ri.newLname, le.lname);
   self.name_suffix := if((trim(ri.oldNameSuffix)<>'' or trim(ri.newNameSuffix)<>'') and ri.oldNameSuffix=le.name_suffix, ri.newNameSuffix, le.name_suffix);
-  
+
   // need to check same address here and not individual parts before changing them
-  origAddr := if(ri.oldPrimName<>'' or ri.oldPrimRange<>'', 
+  origAddr := if(ri.oldPrimName<>'' or ri.oldPrimRange<>'',
                               address.Addr1FromComponents(ri.oldPrimRange,ri.oldPreDir,ri.oldPrimName,ri.oldSuffix,ri.oldPostDir,ri.oldUnitDesig,ri.oldSecRange),// use old because it has been corrected
                               address.Addr1FromComponents(ri.prim_range,ri.predir,ri.prim_name,ri.suffix,ri.postdir,ri.unit_desig,ri.sec_range));	// use original because there is no old address because is has not been corrected
-  sameAddr := address.Addr1FromComponents(le.prim_range,le.predir,le.prim_name,le.suffix,le.postdir,le.unit_desig,le.sec_range) = origAddr;		
+  sameAddr := address.Addr1FromComponents(le.prim_range,le.predir,le.prim_name,le.suffix,le.postdir,le.unit_desig,le.sec_range) = origAddr;
   self.prim_range := if((trim(ri.oldPrimRange)<>'' or trim(ri.newPrimRange)<>'') and sameAddr, ri.newPrimRange, le.prim_range);
   self.predir := if((trim(ri.oldPreDir)<>'' or trim(ri.newPreDir)<>'') and sameAddr, ri.newPreDir, le.predir);
   self.prim_name := if((trim(ri.oldPrimName)<>'' or trim(ri.newPrimName)<>'') and sameAddr, ri.newPrimName, le.prim_name);
@@ -484,11 +484,11 @@ Layout_working correctFutureData(unCorrOnly le, corrOnly ri) := transform
   self.st := if((trim(ri.oldSt)<>'' or trim(ri.newSt)<>'') and sameAddr, ri.newSt, le.st);
   self.zip := if((trim(ri.oldZip)<>'' or trim(ri.newZip)<>'') and sameAddr, ri.newZip, le.Zip);
   self.zip4 := if((trim(ri.oldZip4)<>'' or trim(ri.newZip4)<>'') and sameAddr, ri.newZip4, le.Zip4);
-  
+
   self.ssn := if((trim(ri.oldSSN)<>'' or trim(ri.newSSN)<>'') and ri.oldSSN=le.ssn, ri.newSSN, le.ssn);
   self.dob := if((trim(ri.oldDOB)<>'' or trim(ri.newDOB)<>'') and ri.oldDOB=(string)le.dob, (unsigned)ri.newDOB, le.dob);
   self.dod := if((trim(ri.oldDOD)<>'' or trim(ri.newDOD)<>'') and ri.oldDOD=(string)le.dod, (unsigned)ri.newDOD, le.dod);
-  
+
   self.addr_flags.dwellType := if((trim(ri.oldDwellType)<>'' or trim(ri.newDwellType)<>'') and sameAddr, ri.newDwellType, le.addr_flags.dwellType);
   self.addr_flags.valid := if((trim(ri.oldValid)<>'' or trim(ri.newValid)<>'') and sameAddr, ri.newValid, le.addr_flags.Valid);
   self.addr_flags.prisonAddr := if((trim(ri.oldPrisonAddr)<>'' or trim(ri.newPrisonAddr)<>'') and sameAddr, ri.newPrisonAddr, le.addr_flags.prisonAddr);
@@ -500,7 +500,7 @@ Layout_working correctFutureData(unCorrOnly le, corrOnly ri) := transform
   self.addr_flags.dropIndicator := if((trim(ri.oldDropIndicator)<>'' or trim(ri.newDropIndicator)<>'') and sameAddr, ri.newDropIndicator, le.addr_flags.DropIndicator);
   self.addr_flags.unit_count := if((ri.oldunit_count<>0 or ri.newunit_count<>0) and sameAddr, ri.newunit_count, le.addr_flags.unit_count);
   self.addr_flags.mail_usage := if((trim(ri.oldmail_usage)<>'' or trim(ri.newmail_usage)<>'') and sameAddr, ri.newmail_usage, le.addr_flags.mail_usage);
-  
+
   // keep the old/new fields for below rollup
   self.oldTitle := if(sameAddr and (trim(ri.oldTitle)<>'' or trim(ri.newTitle)<>''), ri.oldTitle, '');
   self.newTitle := if(sameAddr and (trim(ri.oldTitle)<>'' or trim(ri.newTitle)<>''), ri.newTitle, '');
@@ -562,17 +562,17 @@ Layout_working correctFutureData(unCorrOnly le, corrOnly ri) := transform
   self.newunit_count := if(sameAddr and (ri.oldunit_count<>0 or ri.newunit_count<>0), ri.newunit_count, 0);
   self.oldmail_usage := if(sameAddr and (trim(ri.oldmail_usage)<>'' or trim(ri.newmail_usage)<>''), ri.oldmail_usage, '');
   self.newmail_usage := if(sameAddr and (trim(ri.oldmail_usage)<>'' or trim(ri.newmail_usage)<>''), ri.newmail_usage, '');
-  
+
   self.high_risk_address_source := if((trim(ri.oldHighRiskAddressSource)<>'' or trim(ri.newHighRiskAddressSource)<>'') and sameAddr, ri.newHighRiskAddressSource, le.high_risk_address_source);
   self.high_risk_address_description := if((trim(ri.oldHighRiskAddressDescription)<>'' or trim(ri.newHighRiskAddressDescription)<>'') and sameAddr, ri.newHighRiskAddressDescription, le.high_risk_address_description);
-  
+
   self := le;	// keep the remaining left fields
 end;
-finalCorr := join(unCorrOnly, corrOnly, 
-                  left.did=right.did and 
+finalCorr := join(unCorrOnly, corrOnly,
+                  left.did=right.did and
                   // should we take title and DOD into account here?
-                  ((trim(right.oldTitle)<>'' or trim(right.newTitle)<>'') and right.oldTitle=left.title OR	
-                  (trim(right.oldFname)<>'' or trim(right.newFname)<>'') and right.oldFname=left.fname OR	
+                  ((trim(right.oldTitle)<>'' or trim(right.newTitle)<>'') and right.oldTitle=left.title OR
+                  (trim(right.oldFname)<>'' or trim(right.newFname)<>'') and right.oldFname=left.fname OR
                   (trim(right.oldMname)<>'' or trim(right.newMname)<>'') and right.oldMname=left.mname  OR
                   (trim(right.oldLname)<>'' or trim(right.newLname)<>'') and right.oldLname=left.lname OR
                   (trim(right.oldNameSuffix)<>'' or trim(right.newNameSuffix)<>'') and right.oldNameSuffix=left.name_suffix  OR
@@ -580,10 +580,10 @@ finalCorr := join(unCorrOnly, corrOnly,
                   (trim(right.oldDOB)<>'' or trim(right.newDOB)<>'') and right.oldDOB=(string)left.dob OR
                   (trim(right.oldDOD)<>'' or trim(right.newDOD)<>'') and right.oldDOD=(string)left.dod OR
                   // same address and an address field is different
-                  address.Addr1FromComponents(right.oldPrimRange,right.oldPredir,right.oldPrimName,right.oldSuffix,right.oldPostDir,right.oldUnitDesig,right.oldSecRange) = 
+                  address.Addr1FromComponents(right.oldPrimRange,right.oldPredir,right.oldPrimName,right.oldSuffix,right.oldPostDir,right.oldUnitDesig,right.oldSecRange) =
                   address.Addr1FromComponents(left.Prim_Range,left.PreDir,left.Prim_Name,left.Suffix,left.PostDir,left.Unit_Desig,left.Sec_Range) OR
                   // same address and a flag is different
-                  (	address.Addr1FromComponents(right.oldPrimRange,right.oldPredir,right.oldPrimName,right.oldSuffix,right.oldPostDir,right.oldUnitDesig,right.oldSecRange) = 
+                  (	address.Addr1FromComponents(right.oldPrimRange,right.oldPredir,right.oldPrimName,right.oldSuffix,right.oldPostDir,right.oldUnitDesig,right.oldSecRange) =
                     address.Addr1FromComponents(left.Prim_Range,left.PreDir,left.Prim_Name,left.Suffix,left.PostDir,left.Unit_Desig,left.Sec_Range) AND
                   (trim(right.oldDwellType)<>'' or trim(right.newDwellType)<>'') and right.oldDwellType=left.addr_flags.dwelltype OR
                   (trim(right.oldValid)<>'' or trim(right.newValid)<>'')  and right.oldValid=left.addr_flags.valid OR
@@ -593,11 +593,11 @@ finalCorr := join(unCorrOnly, corrOnly,
                   (trim(right.oldDoNotDeliver)<>'' or trim(right.newDoNotDeliver)<>'')  and right.oldDoNotDeliver=left.addr_flags.DoNotDeliver OR
                   (trim(right.oldDeliveryStatus)<>'' or trim(right.newDeliveryStatus)<>'')  and right.oldDeliveryStatus=left.addr_flags.DeliveryStatus OR
                   (trim(right.oldAddressType)<>'' or trim(right.newAddressType)<>'')  and right.oldAddressType=left.addr_flags.AddressType OR
-                  (trim(right.oldDropIndicator)<>'' or trim(right.newDropIndicator)<>'')  and right.oldDropIndicator=left.addr_flags.DropIndicator)), 
+                  (trim(right.oldDropIndicator)<>'' or trim(right.newDropIndicator)<>'')  and right.oldDropIndicator=left.addr_flags.DropIndicator)),
                   correctFutureData(left, right), all, left outer);
-                  
-              
-                  
+
+
+
 // doing the above join results in too many records per rid (potentially), we need to rollup by rid and figure out which field to keep from the multiple choices
 layout_working getCorrectCorrections(finalCorr le, finalCorr ri) := transform
   self.title := map(trim(le.title)=trim(ri.title) => le.title,	// same on both, keep left
@@ -625,7 +625,7 @@ layout_working getCorrectCorrections(finalCorr le, finalCorr ri) := transform
                           (trim(le.oldNameSuffix)<>'' or trim(le.newNameSuffix)<>'') => ri.name_suffix, // correction on this rid and left doesnt match new, so keep right
                           (trim(ri.oldNameSuffix)<>'' or trim(ri.newNameSuffix)<>'') => ri.name_suffix,	// correction on this rid and right had the correction, so keep right?
                           le.name_suffix);	// default to keep left
-  
+
   self.prim_range := map(	trim(le.prim_range)=trim(ri.prim_range) => le.prim_range,	// same on both, keep left
                           (trim(le.oldPrimRange)<>'' or trim(le.newPrimRange)<>'') and trim(le.newPrimRange)=trim(le.prim_range) => le.prim_range,	// correction on this rid and left matches new, so keep left
                           (trim(le.oldPrimRange)<>'' or trim(le.newPrimRange)<>'') => ri.prim_range, // correction on this rid and left doesnt match new, so keep right
@@ -681,7 +681,7 @@ layout_working getCorrectCorrections(finalCorr le, finalCorr ri) := transform
                     (trim(le.oldzip4)<>'' or trim(le.newzip4)<>'') => ri.zip4, // correction on this rid and left doesnt match new, so keep right
                     (trim(ri.oldZip4)<>'' or trim(ri.newZip4)<>'') => ri.zip4,	// correction on this rid and right had the correction, so keep right?
                     le.zip4);	// default to keep left
-  
+
   self.ssn := map(trim(le.ssn)=trim(ri.ssn) => le.ssn,	// same on both, keep left
                   (trim(le.oldssn)<>'' or trim(le.newssn)<>'') and trim(le.newssn)=trim(le.ssn) => le.ssn,	// correction on this rid and left matches new, so keep left
                   (trim(le.oldssn)<>'' or trim(le.newssn)<>'') => ri.ssn, // correction on this rid and left doesnt match new, so keep right
@@ -726,7 +726,7 @@ layout_working getCorrectCorrections(finalCorr le, finalCorr ri) := transform
   self.addr_flags.doNotDeliver := map((le.addr_flags.doNotDeliver)=(ri.addr_flags.doNotDeliver) => le.addr_flags.doNotDeliver,	// same on both, keep left
                                       (trim(le.olddoNotDeliver)<>'' or trim(le.newdoNotDeliver)<>'') and trim(le.newdoNotDeliver)=(string)le.addr_flags.doNotDeliver => le.addr_flags.doNotDeliver,	// correction on this rid and left matches new, so keep left
                                       (trim(le.olddoNotDeliver)<>'' or trim(le.newdoNotDeliver)<>'') => ri.addr_flags.doNotDeliver, // correction on this rid and left doesnt match new, so keep right
-                                      (trim(ri.oldDoNotDeliver)<>'' or trim(ri.newDoNotDeliver)<>'') => ri.addr_flags.doNotDeliver,	// correction on this rid and right had the correction, so keep right?																			
+                                      (trim(ri.oldDoNotDeliver)<>'' or trim(ri.newDoNotDeliver)<>'') => ri.addr_flags.doNotDeliver,	// correction on this rid and right had the correction, so keep right?
                                       le.addr_flags.doNotDeliver);	// default to keep left
   self.addr_flags.deliveryStatus := map((le.addr_flags.deliveryStatus)=(ri.addr_flags.deliveryStatus) => le.addr_flags.deliveryStatus,	// same on both, keep left
                                         (trim(le.olddeliveryStatus)<>'' or trim(le.newdeliveryStatus)<>'') and trim(le.newdeliveryStatus)=(string)le.addr_flags.deliveryStatus => le.addr_flags.deliveryStatus,	// correction on this rid and left matches new, so keep left
@@ -743,31 +743,31 @@ layout_working getCorrectCorrections(finalCorr le, finalCorr ri) := transform
                                         (trim(le.olddropIndicator)<>'' or trim(le.newdropIndicator)<>'') => ri.addr_flags.dropIndicator, // correction on this rid and left doesnt match new, so keep right
                                         (trim(ri.oldDropIndicator)<>'' or trim(ri.newDropIndicator)<>'') => ri.addr_flags.dropIndicator,	// correction on this rid and right had the correction, so keep right?
                                         le.addr_flags.dropIndicator);	// default to keep left
-                                                                          
+
   self.addr_flags.unit_count := map(	(le.addr_flags.unit_count)=(ri.addr_flags.unit_count) => le.addr_flags.unit_count,	// same on both, keep left
                                         (le.oldunit_count<>0 or le.newunit_count<>0) and le.newunit_count=le.addr_flags.unit_count => le.addr_flags.unit_count,	// correction on this rid and left matches new, so keep left
                                         (le.oldunit_count<>0 or le.newunit_count<>0) => ri.addr_flags.unit_count, // correction on this rid and left doesnt match new, so keep right
                                         (ri.oldunit_count<>0 or ri.newunit_count<>0) => ri.addr_flags.unit_count,	// correction on this rid and right had the correction, so keep right?
-                                        le.addr_flags.unit_count);	// default to keep left	
-                                        
+                                        le.addr_flags.unit_count);	// default to keep left
+
   self.addr_flags.mail_usage := map(	(le.addr_flags.mail_usage)=(ri.addr_flags.mail_usage) => le.addr_flags.mail_usage,	// same on both, keep left
                                         (trim(le.oldmail_usage)<>'' or trim(le.newmail_usage)<>'') and trim(le.newmail_usage)=(string)le.addr_flags.mail_usage => le.addr_flags.mail_usage,	// correction on this rid and left matches new, so keep left
                                         (trim(le.oldmail_usage)<>'' or trim(le.newmail_usage)<>'') => ri.addr_flags.mail_usage, // correction on this rid and left doesnt match new, so keep right
                                         (trim(ri.oldmail_usage)<>'' or trim(ri.newmail_usage)<>'') => ri.addr_flags.mail_usage,	// correction on this rid and right had the correction, so keep right?
                                         le.addr_flags.mail_usage);	// default to keep left
-  
+
   self := le;	// keep the remaining left fields
 end;
 s := sort(finalCorr, persistent_record_id, -Title, -Fname,-Mname,-Lname,-Name_Suffix,-Prim_Range,-Predir,-Prim_Name,-Suffix,-Postdir,-Unit_Desig,-Sec_Range,-City_Name,-St,-Zip,-Zip4,-SSN,-DOB,-DOD,
                                       -addr_flags.DwellType,-addr_flags.Valid,-addr_flags.PrisonAddr,-addr_flags.HighRisk,-addr_flags.CorpMil,-addr_flags.DoNotDeliver,
                                       -addr_flags.DeliveryStatus,-addr_flags.AddressType,-addr_flags.DropIndicator,-addr_flags.unit_count, -addr_flags.mail_usage);
-finalCorr2 := rollup (s, left.persistent_record_id=right.persistent_record_id, getCorrectCorrections(left,right));									
-                
+finalCorr2 := rollup (s, left.persistent_record_id=right.persistent_record_id, getCorrectCorrections(left,right));
+
 // now we need to identify among finalCorr2 what additional records were corrected vs uncorrected recs
 layout_header_internal xfaddcorrflag(layout_working le, layout_working ri) := transform
 
   is_corrected := le.Title<>ri.Title
-          or le.Fname<>ri.Fname 
+          or le.Fname<>ri.Fname
           or le.Mname<>ri.Mname or le.Lname<>ri.Lname
           or le.Name_Suffix<>ri.Name_Suffix or le.Prim_Range<>ri.Prim_Range
           or le.Predir<>ri.Predir or le.Prim_Name<>ri.Prim_Name
@@ -784,7 +784,7 @@ layout_header_internal xfaddcorrflag(layout_working le, layout_working ri) := tr
           or le.addr_flags.DeliveryStatus<>ri.addr_flags.DeliveryStatus
           or le.addr_flags.AddressType<>ri.addr_flags.AddressType
           or le.addr_flags.DropIndicator<>ri.addr_flags.DropIndicator
-          or le.addr_flags.unit_count<>ri.addr_flags.unit_count 
+          or le.addr_flags.unit_count<>ri.addr_flags.unit_count
           or le.addr_flags.mail_usage<>ri.addr_flags.mail_usage
           or le.high_risk_address_source<>ri.high_risk_address_source
           or le.high_risk_address_description<>ri.high_risk_address_description;
@@ -798,7 +798,7 @@ layout_header_internal xfaddcorrflag(layout_working le, layout_working ri) := tr
 end;
 
 // we check potentially corrected record against record before future correction
-with_corr_flag := join(finalCorr2,unCorrOnly, 
+with_corr_flag := join(finalCorr2,unCorrOnly,
                         left.did=right.did and
                         left.persistent_record_id=right.persistent_record_id
                         and left.rid=right.rid, // to ensure we compare exact same record
@@ -809,8 +809,8 @@ no_correction_recs := with_corr_flag(~compliance_flags.IsOverride);
 before_future_corr_recs := join(unCorrOnly, no_correction_recs,
                         left.did=right.head.did and
                         left.persistent_record_id=right.head.persistent_record_id,
-                        transform(layout_header_internal, 
-                              self.head := left, 
+                        transform(layout_header_internal,
+                              self.head := left,
                               self.subject_did := left.did,
                               self.compliance_flags.IsOverwritten := true,
                               self.isPropagatedCorrection := true,
@@ -821,7 +821,7 @@ before_future_corr_recs := join(unCorrOnly, no_correction_recs,
 
 // need to add back the corrOnly records
 header_recs_with_correction := no_correction_recs + future_corr_recs + before_future_corr_recs + before_CorrOnly
-                        + project(corrOnly, 
+                        + project(corrOnly,
                                   transform(layout_header_internal,
                                     self.head := left,
                                     self.compliance_flags.IsOverride := true,
@@ -830,17 +830,17 @@ header_recs_with_correction := no_correction_recs + future_corr_recs + before_fu
                                     self := left,
                                     self := []));
 
-// in case of no overrides available we need to do rollup by persistent_record_id 
+// in case of no overrides available we need to do rollup by persistent_record_id
 header_combined_ddp := dedup(sort(header_combined_data, persistent_record_id, -Title, -Fname,-Mname,-Lname,-Name_Suffix,-Prim_Range,-Predir,-Prim_Name,-Suffix,-Postdir,-Unit_Desig,-Sec_Range,-City_Name,-St,-Zip,-Zip4,-SSN,-DOB,-DOD,
                                       -addr_flags.DwellType,-addr_flags.Valid,-addr_flags.PrisonAddr,-addr_flags.HighRisk,-addr_flags.CorpMil,-addr_flags.DoNotDeliver,
                                       -addr_flags.DeliveryStatus,-addr_flags.AddressType,-addr_flags.DropIndicator,-addr_flags.unit_count, -addr_flags.mail_usage, did),
                               persistent_record_id);
-                                
-no_correction_needed := project(header_combined_ddp, transform(layout_header_internal, 
+
+no_correction_needed := project(header_combined_ddp, transform(layout_header_internal,
                                 self.subject_did := left.did,
                                 self.record_ids.RecId1 := (string) left.persistent_record_id,
-                                self.head:=left, 
-                                self:=left, 
+                                self.head:=left,
+                                self:=left,
                                 self:=[]));
 
 header_recs_temp := IF(EXISTS(header_corr), header_recs_with_correction, no_correction_needed);
@@ -861,7 +861,7 @@ layout_header_internal xfmarksuppressed (layout_header_internal le, dx_header.la
             le.head.unit_desig=ri.unit_desig and
             le.head.sec_range=ri.sec_range and
             (le.head.ssn=ri.ssn OR (le.head.ssn='' and le.head.valid_ssn='M') OR (ri.ssn='' and ri.valid_ssn='M')) and
-            (le.head.dob=ri.dob  OR (le.head.dob=0 and le.head.valid_dob='M') OR (ri.dob=0 and ri.valid_dob='M')) and 
+            (le.head.dob=ri.dob  OR (le.head.dob=0 and le.head.valid_dob='M') OR (ri.dob=0 and ri.valid_dob='M')) and
             le.head.dod=ri.dod;
   self.compliance_flags.isSuppressed := is_suppressed_by_propagation or le.compliance_flags.isSuppressed;
   self.isPropagatedCorrection := is_suppressed_by_propagation or le.isPropagatedCorrection;
@@ -872,9 +872,9 @@ end;
 // identify any future header records with PII information that has been suppressed in a previous RID
 header_suppressions_ddp := dedup(sort(header_suppressions,did,title,fname,mname,lname,name_suffix,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,ssn,dob,dod,-valid_ssn,-valid_dob),
                                 did,title,fname,mname,lname,name_suffix,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,ssn,dob,dod);
-                                
+
 header_recs_with_future_suppression := join(header_recs_temp, header_suppressions_ddp,
-            left.head.did=right.did and 
+            left.head.did=right.did and
             // do we need to take title and DOD into account here?
             left.head.title=right.title and
             left.head.fname=right.fname and
@@ -891,10 +891,10 @@ header_recs_with_future_suppression := join(header_recs_temp, header_suppression
             (left.head.ssn=right.ssn OR (left.head.ssn='' and left.head.valid_ssn='M') OR (right.ssn='' and right.valid_ssn='M') ) and
             (left.head.dob=right.dob OR (left.head.dob=0 and left.head.valid_dob='M') OR (right.dob=0 and right.valid_dob='M') ) and
             left.head.dod=right.dod,
-            xfmarksuppressed(left, right), 
-            left outer, limit(0), keep(1));  
+            xfmarksuppressed(left, right),
+            left outer, limit(0), keep(1));
 
-header_recs_suppressed := project(header_suppressions, 
+header_recs_suppressed := project(header_suppressions,
                                   transform(layout_header_internal,
                                     self.head := left,
                                     self.compliance_flags.isSuppressed := true,
@@ -904,12 +904,12 @@ header_recs_suppressed := project(header_suppressions,
                                     self := []));
 
 header_recs_all := header_recs_suppressed + header_recs_with_future_suppression;
-          
+
 header_recs_filt:= header_recs_all(
       in_mod.ReturnOverwritten or ~compliance_flags.isOverwritten,
       in_mod.ReturnSuppressed or ~compliance_flags.isSuppressed
       );
-                      
+
 layout_header_internal xformStatements( layout_header_internal l,	FFD.Layouts.PersonContextBatchSlim r ) := transform,
         skip(~ShowDisputedRecords and r.isDisputed)
             self.statement_ids := r.StatementIDs;
@@ -920,41 +920,41 @@ end;
 header_recs_final_ds := join(header_recs_filt, header_pc_flags,
                             left.subject_did = (UNSIGNED6) right.lexid and
                             left.record_ids.RecId1 = right.RecID1,
-                            xformStatements(left,right), 
+                            xformStatements(left,right),
                             left outer,
                             keep(1),
                             limit(0));
-        
-with_highriskaddr_source := join(header_recs_final_ds, risk_indicators.key_HRI_Address_To_SIC_filtered_fcra,  
+
+with_highriskaddr_source := join(header_recs_final_ds, risk_indicators.key_HRI_Address_To_SIC_filtered_fcra,
                     left.addr_flags.highRisk='1' and
-                    keyed(left.head.zip=right.z5) and 
-                    keyed(left.head.prim_name=right.prim_name) and 
-                    keyed(left.head.suffix=right.suffix) and 
-                    keyed(left.head.predir=right.predir) and 
-                    keyed(left.head.postdir=right.postdir) and 
-                    keyed(left.head.prim_range=right.prim_range) and 
-                    keyed(left.head.sec_range=right.sec_range) and 
-                    right.sic_code<>'', 
+                    keyed(left.head.zip=right.z5) and
+                    keyed(left.head.prim_name=right.prim_name) and
+                    keyed(left.head.suffix=right.suffix) and
+                    keyed(left.head.predir=right.predir) and
+                    keyed(left.head.postdir=right.postdir) and
+                    keyed(left.head.prim_range=right.prim_range) and
+                    keyed(left.head.sec_range=right.sec_range) and
+                    right.sic_code<>'',
                     transform(layout_header_internal,
                       self.high_risk_address_source := right.source,
                       self.high_risk_address_description := risk_indicators.iid_constants.hri_sic_code_description(right.sic_code);
                       self := left),
                     left outer,
-                    limit(0), keep(1));	
+                    limit(0), keep(1));
 
 header_recs_final_srt :=  sort (with_highriskaddr_source, -head.dt_last_seen, -head.dt_first_seen, head.persistent_record_id);
 
-header_recs := project(header_recs_final_srt, 
-                          transform(layout_header_out,			
+header_recs := project(header_recs_final_srt,
+                          transform(layout_header_out,
                           self.Metadata := $.Functions.GetMetadataESDL(left.compliance_flags,
                                                 left.record_ids,
                                                 left.statement_IDs,
-                                                left.subject_did, 
+                                                left.subject_did,
                                                 FFD.Constants.DataGroups.HDR),
-                          self.isPropagatedCorrection := left.isPropagatedCorrection,			
-                          self.RawData := left			
-                          ));			
-        
+                          self.isPropagatedCorrection := left.isPropagatedCorrection,
+                          self.RawData := left
+                          ));
+
   IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(qheader_main, NAMED('qheader_main')));
   IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(header_main, NAMED('header_main')));
   IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(wUnitCount, NAMED('header_wUnitCount')));
@@ -971,32 +971,32 @@ header_recs := project(header_recs_final_srt,
   IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(header_suppressions, NAMED('header_suppressions')));
   IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(header_recs_with_future_suppression, NAMED('header_recs_with_future_suppression')));
   IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(header_recs, NAMED('header_recs_out')));
-  
+
   return header_recs;
 end;
 
-// Caller of this function is responsible for filtering suppressed/overwritten records, if required. 
-// Keep in mind though that this function, as well as everything else in this module, is not supposed to be used for anything other 
+// Caller of this function is responsible for filtering suppressed/overwritten records, if required.
+// Keep in mind though that this function, as well as everything else in this module, is not supposed to be used for anything other
 // than consumer disclosure.
-export GetAddressList(DATASET(layout_header_out) in_header_recs) := 
+export GetAddressList(DATASET(layout_header_out) in_header_recs) :=
   FUNCTION
-  all_addresses := PROJECT(in_header_recs, TRANSFORM($.Layouts.address_rec, 
+  all_addresses := PROJECT(in_header_recs, TRANSFORM($.Layouts.address_rec,
     SELF.subject_did := (UNSIGNED) LEFT.Metadata.Lexid;
     SELF:=LEFT.RawData.head;
     ));
 
-  unique_address_list := DEDUP(SORT(all_addresses, subject_did,zip,prim_name,prim_range,predir,postdir,suffix,sec_range,-geo_blk), 
+  unique_address_list := DEDUP(SORT(all_addresses, subject_did,zip,prim_name,prim_range,predir,postdir,suffix,sec_range,-geo_blk),
                             subject_did,zip,prim_name,prim_range,predir,postdir,suffix,sec_range);
-  
-  return unique_address_list;													
+
+  return unique_address_list;
 end;
 
-export  PickBestSSN(dataset(layout_header_out) in_header_recs) := 
+export  PickBestSSN(dataset(layout_header_out) in_header_recs) :=
   function
   filtered_recs := in_header_recs(~MetaData.ComplianceFlags.isSuppressed,
                               // ~MetaData.ComplianceFlags.isDisputed,
                               ~MetaData.ComplianceFlags.isOverwritten);
-  sorted_recs := sort(project(filtered_recs, 
+  sorted_recs := sort(project(filtered_recs,
                               transform($.Layouts.ssn_rec,
                               SELF.subject_did:=(UNSIGNED)LEFT.Metadata.Lexid,
                               SELF:=LEFT.RawData.head)),
@@ -1007,8 +1007,8 @@ export  PickBestSSN(dataset(layout_header_out) in_header_recs) :=
     boolean prefer_left_ssn := (L.valid_ssn = 'G') or (R.ssn = '') or ((L.valid_ssn = 'M') and (R.valid_ssn != 'G'));
     Self.ssn := if (prefer_left_ssn, L.ssn, R.ssn);
     Self.valid_ssn := if (prefer_left_ssn, L.valid_ssn, R.valid_ssn);
-    Self.subject_did := L.subject_did; 
-    Self.dt_last_seen := if (prefer_left_ssn, L.dt_last_seen, R.dt_last_seen); 
+    Self.subject_did := L.subject_did;
+    Self.dt_last_seen := if (prefer_left_ssn, L.dt_last_seen, R.dt_last_seen);
     self.header_source := true;
   end;
   rolled_recs := rollup (sorted_recs, Left.subject_did=Right.subject_did, AssignBestSSN (Left, Right));

@@ -1,8 +1,8 @@
-//HPCC Systems KEL Compiler Version 0.8.2
-IMPORT KEL08a AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
+IMPORT KEL12 AS KEL;
 IMPORT Business_Credit_KEL;
 IMPORT CFG_graph FROM Business_Credit_KEL;
-IMPORT * FROM KEL08a.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT E_Industry(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __cfg = CFG_graph) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
@@ -19,11 +19,11 @@ EXPORT E_Industry(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'seq_num(UID),record_type(_record__type_:0),sbfe_contributor_number(_sbfe__contributor__number_:\'\'),contract_account_number(_contract__account__number_:\'\'),dt_first_seen(_dt__first__seen_:DATE),dt_last_seen(_dt__last__seen_:DATE),classification_code_type(_classification__code__type_:0),classification_code(_classification__code_:0),primary_industry_code_indicator(_primary__industry__code__indicator_:\'\'),privacy_indicator(_privacy__indicator_:\'\')';
+  SHARED __Mapping := 'seq_num(DEFAULT:UID),record_type(DEFAULT:_record__type_:0),sbfe_contributor_number(DEFAULT:_sbfe__contributor__number_:\'\'),contract_account_number(DEFAULT:_contract__account__number_:\'\'),dt_first_seen(DEFAULT:_dt__first__seen_:DATE),dt_last_seen(DEFAULT:_dt__last__seen_:DATE),classification_code_type(DEFAULT:_classification__code__type_:0),classification_code(DEFAULT:_classification__code_:0),primary_industry_code_indicator(DEFAULT:_primary__industry__code__indicator_:\'\'),privacy_indicator(DEFAULT:_privacy__indicator_:\'\')';
   SHARED __d0_Norm := NORMALIZE(__in,LEFT.BusinessClassification,TRANSFORM(RECORDOF(__in.BusinessClassification),SELF:=RIGHT));
   EXPORT Business_Credit_KEL_File_SBFE_temp_BusinessClassification_Invalid := __d0_Norm((KEL.typ.uid)seq_num = 0);
   SHARED __d0_Prefiltered := __d0_Norm((KEL.typ.uid)seq_num <> 0);
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping));
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping,'Business_Credit_KEL.File_SBFE_temp'));
   EXPORT InData := __d0;
   EXPORT Layout := RECORD
     KEL.typ.nuid UID;
@@ -60,6 +60,9 @@ EXPORT E_Industry(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __
   EXPORT __PreResult := ROLLUP(HAVING(Industry_Group,COUNT(ROWS(LEFT))=1),GROUP,Industry__Single_Rollup(LEFT)) + ROLLUP(HAVING(Industry_Group,COUNT(ROWS(LEFT))>1),GROUP,Industry__Rollup(LEFT, ROWS(LEFT)));
   EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
+  EXPORT UIDSourceCounts := TABLE(InData,{KEL.typ.uid UID := MIN(GROUP,__T(UID)),KEL.typ.int Cnt := COUNT(GROUP)},UID);
+  EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
+  EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
   EXPORT _record__type__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_record__type_);
   EXPORT _sbfe__contributor__number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_sbfe__contributor__number_);
   EXPORT _contract__account__number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_contract__account__number_);
@@ -69,7 +72,7 @@ EXPORT E_Industry(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __
   EXPORT _classification__code__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_classification__code_);
   EXPORT _primary__industry__code__indicator__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_primary__industry__code__indicator_);
   EXPORT _privacy__indicator__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_privacy__indicator_);
-  EXPORT SanityCheck := DATASET([{COUNT(Business_Credit_KEL_File_SBFE_temp_BusinessClassification_Invalid),COUNT(_record__type__SingleValue_Invalid),COUNT(_sbfe__contributor__number__SingleValue_Invalid),COUNT(_contract__account__number__SingleValue_Invalid),COUNT(_dt__first__seen__SingleValue_Invalid),COUNT(_dt__last__seen__SingleValue_Invalid),COUNT(_classification__code__type__SingleValue_Invalid),COUNT(_classification__code__SingleValue_Invalid),COUNT(_primary__industry__code__indicator__SingleValue_Invalid),COUNT(_privacy__indicator__SingleValue_Invalid)}],{KEL.typ.int Business_Credit_KEL_File_SBFE_temp_BusinessClassification_Invalid,KEL.typ.int _record__type__SingleValue_Invalid,KEL.typ.int _sbfe__contributor__number__SingleValue_Invalid,KEL.typ.int _contract__account__number__SingleValue_Invalid,KEL.typ.int _dt__first__seen__SingleValue_Invalid,KEL.typ.int _dt__last__seen__SingleValue_Invalid,KEL.typ.int _classification__code__type__SingleValue_Invalid,KEL.typ.int _classification__code__SingleValue_Invalid,KEL.typ.int _primary__industry__code__indicator__SingleValue_Invalid,KEL.typ.int _privacy__indicator__SingleValue_Invalid});
+  EXPORT SanityCheck := DATASET([{COUNT(Business_Credit_KEL_File_SBFE_temp_BusinessClassification_Invalid),COUNT(_record__type__SingleValue_Invalid),COUNT(_sbfe__contributor__number__SingleValue_Invalid),COUNT(_contract__account__number__SingleValue_Invalid),COUNT(_dt__first__seen__SingleValue_Invalid),COUNT(_dt__last__seen__SingleValue_Invalid),COUNT(_classification__code__type__SingleValue_Invalid),COUNT(_classification__code__SingleValue_Invalid),COUNT(_primary__industry__code__indicator__SingleValue_Invalid),COUNT(_privacy__indicator__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int Business_Credit_KEL_File_SBFE_temp_BusinessClassification_Invalid,KEL.typ.int _record__type__SingleValue_Invalid,KEL.typ.int _sbfe__contributor__number__SingleValue_Invalid,KEL.typ.int _contract__account__number__SingleValue_Invalid,KEL.typ.int _dt__first__seen__SingleValue_Invalid,KEL.typ.int _dt__last__seen__SingleValue_Invalid,KEL.typ.int _classification__code__type__SingleValue_Invalid,KEL.typ.int _classification__code__SingleValue_Invalid,KEL.typ.int _primary__industry__code__indicator__SingleValue_Invalid,KEL.typ.int _privacy__indicator__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'Industry','Business_Credit_KEL.File_SBFE_temp','UID',COUNT(Business_Credit_KEL_File_SBFE_temp_BusinessClassification_Invalid),COUNT(__d0)},
     {'Industry','Business_Credit_KEL.File_SBFE_temp','record_type',COUNT(__d0(__NL(_record__type_))),COUNT(__d0(__NN(_record__type_)))},

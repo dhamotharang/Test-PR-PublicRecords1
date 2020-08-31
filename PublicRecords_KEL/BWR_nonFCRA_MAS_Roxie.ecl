@@ -1,12 +1,14 @@
-﻿﻿/* PublicRecords_KEL.BWR_nonFCRA_MAS_Roxie */
+﻿IMPORT PublicRecords_KEL, RiskWise, salt38, Saltroutines, std, gateway;
+
+/* PublicRecords_KEL.BWR_nonFCRA_MAS_Roxie */
 #workunit('name','MAS NonFCRA Consumer dev156 1 Thread-Testfile');
-IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD;
 
 threads := 1;
 
 RoxieIP := RiskWise.shortcuts.Dev156;
 
 InputFile := '~mas::uatsamples::consumer_nonfcra_100k_07102019.csv ';
+//InputFile := '~mas::uat::mas_nonfcra_10k_sample_20200707.csv';
 //InputFile := '~mas::uatsamples::consumer_nonfcra_1m_07092019.csv';
 // InputFile := '~mas::uatsamples::consumer_nonfcra_iptest_04232020.csv';
 
@@ -27,7 +29,7 @@ GLBA := 1;
 DPPA := 1;
 DataPermissionMask := '0000000001101';  
 DataRestrictionMask := '0000000000000000000000000000000000000000000000000'; 
-
+Include_Minors := TRUE;
 // CCPA Options;
 LexIdSourceOptout := 1;
 TransactionId := '';
@@ -35,9 +37,9 @@ BatchUID := '';
 GCID := 0;
 
 // Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
-histDate := '0';
+// histDate := '0';
 // histDate := '20190116';
-// histDate := (STRING)STD.Date.Today(); // Run with today's date
+histDate := (STRING)STD.Date.Today(); // Run with today's date
 
 Score_threshold := 80;
 // Score_threshold := 90;
@@ -51,10 +53,20 @@ Output_Master_Results := TRUE;
 // Output_SALT_Profile := FALSE;
 Output_SALT_Profile := TRUE;
 
+//lets not get extra inquiries unless we need to
+IncludeDeltaBase := FALSE;
+// IncludeDeltaBase := true;
+
+// Use default list of allowed sources
+AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+// Do not exclude any additional sources from allowed sources dataset.
+ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+
+
 RecordsToRun := 0;
 eyeball := 120;
 
-OutputFile := '~bbraaten::out::PersonNonFCRA_Roxie_100k_Archive_KS-5842_test_marketing_'+ ThorLib.wuid();
+OutputFile := '~bbraaten::out::PersonNonFCRA_Roxie_100k_Current_KS-5842_test_marketing_'+ ThorLib.wuid();
 
 prii_layout := RECORD
     STRING Account             ;
@@ -88,7 +100,7 @@ END;
 p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"'), HEADING(SINGLE)));
 p := IF (RecordsToRun = 0, p_in, CHOOSEN (p_in, RecordsToRun));
 PP := PROJECT(P(Account != 'Account'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout, 
-SELF.historydate := if(histDate = '0', LEFT.historydate, histDate); 
+SELF.historydate := if(histDate = '0', LEFT.historydate, histDate);
 SELF := LEFT;
 // SELF := [];
 ));
@@ -97,12 +109,16 @@ soapLayout := RECORD
   // STRING CustomerId; // This is used only for failed transactions here; it's ignored by the ECL service.
 	DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) input;
 	INTEGER ScoreThreshold;
+	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
 	STRING DataRestrictionMask;
 	STRING DataPermissionMask;
 	UNSIGNED1 GLBPurpose;
 	UNSIGNED1 DPPAPurpose;
 	BOOLEAN OutputMasterResults;
 	BOOLEAN IsMarketing;
+	BOOLEAN IncludeMinors;
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
   UNSIGNED1 LexIdSourceOptout;
   STRING _TransactionId;
   STRING _BatchUID;
@@ -120,6 +136,7 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT UNSIGNED GLBAPurpose := GLBA;
 	EXPORT UNSIGNED DPPAPurpose := DPPA;
 	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
+	EXPORT BOOLEAN IncludeMinors := Include_Minors;
 END;
 
 	// Options := MODULE(PublicRecords_KEL.Interface_Options)
@@ -141,17 +158,36 @@ layout_MAS_Test_Service_output := RECORD
 	STRING G_ProcErrorCode := '';
 END;
 
+
 soapLayout trans (pp le):= TRANSFORM 
 	// SELF.CustomerId := le.CustomerId;
 	SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout,
 		SELF := LEFT;
 		SELF := []));
+	SELF.Gateways := IF(includedeltabase = TRUE, 
+				DATASET([TRANSFORM(Gateway.Layouts.Config,
+			// The inquiry delta base which feeds the 1 day inq attrs is not needed for the input rep 1 at this point. for now we only run this delta base code in the nonFCRA service 
+			
+			//below is the dev delta base for inquiries, this is the default to prevent hammering the production gateway by accident
+				SELF.ServiceName := RiskWise.shortcuts.gw_delta_dev[1].servicename; 
+				SELF.URL := RiskWise.shortcuts.gw_delta_dev[1].url; //dev
+			//below is the production delta base for inquiries.  be careful not to hammer this production gateway with too much traffic
+			// SELF.ServiceName := RiskWise.shortcuts.gw_delta_prod[1].servicename; 
+			// SELF.URL := RiskWise.shortcuts.gw_delta_prod[1].url; 
+				SELF := [])]), 
+				DATASET([TRANSFORM(Gateway.Layouts.Config, 
+				SELF.ServiceName := ''; 
+				SELF.URL := ''; 
+				SELF := [])]));				
 	SELF.ScoreThreshold := Settings.LexIDThreshold;
 	SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
 	SELF.DataPermissionMask := Settings.Data_Permission_Mask;
 	SELF.GLBPurpose := Settings.GLBAPurpose;
 	SELF.DPPAPurpose := Settings.DPPAPurpose;
+	SELF.IncludeMinors := Settings.IncludeMinors;
 	SELF.IsMarketing := FALSE;
+	SELF.AllowedSourcesDataset := AllowedSourcesDataset;
+	SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;
 	SELF.OutputMasterResults := Output_Master_Results;
 	SELF.LexIdSourceOptout := LexIdSourceOptout;
 	SELF._TransactionId := TransactionId;
@@ -228,15 +264,15 @@ Passed_Person :=
 			SELF := []),
 		INNER, KEEP(1));
     
-Error_Inputs := JOIN(DISTRIBUTE(p, HASH64(Account)), DISTRIBUTE(Passed_Person, HASH64(P_InpAcct)), LEFT.Account = RIGHT.P_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY); 
-OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE);
+Error_Inputs := JOIN(DISTRIBUTE(p, HASH64(Account)), DISTRIBUTE(Passed_Person, HASH64(P_InpAcct)), LEFT.Account = RIGHT.P_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY, LOCAL); 
+OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE, expire(45));
 
 	
 IF(Output_Master_Results, OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout')));
 OUTPUT(CHOOSEN(Passed_Person, eyeball), NAMED('Sample_NonFCRA_Layout'));
 
-IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"'))));
-OUTPUT(Passed_Person,,OutputFile + '.csv', CSV(HEADING(single), QUOTE('"')));
+IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"')), expire(45)));
+OUTPUT(Passed_Person,,OutputFile + '.csv', CSV(HEADING(single), QUOTE('"')), expire(45));
 
 Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(Settings);
 		

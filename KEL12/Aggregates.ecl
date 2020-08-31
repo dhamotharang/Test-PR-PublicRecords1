@@ -1,4 +1,4 @@
-//IMPORT:KEL12.Aggregates
+﻿//IMPORT:KEL12.Aggregates
 IMPORT KEL12 AS KEL;
 IMPORT * FROM KEL12.Null;
 

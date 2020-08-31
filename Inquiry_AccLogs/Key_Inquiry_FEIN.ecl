@@ -1,4 +1,4 @@
-﻿﻿import doxie, Data_Services;
+import doxie, Data_Services;
 
 dfbefore :=Inquiry_AccLogs.File_Inquiry_BaseSourced.history(bus_intel.industry <> '' and bus_q.appended_ein <>'' and 
 						StringLib.StringToUpperCase(trim(search_info.function_description)) not in ['MODELS.ITA_BATCH_SERVICE', 'RISKWISE IP SEARCH (NA99)'] and

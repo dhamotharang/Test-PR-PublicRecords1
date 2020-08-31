@@ -526,7 +526,8 @@ doTMXAttributes := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models
 DisableInquiriesInCVI := True;																																								//Disable Customer Network: True
 unsigned3 LastSeenThresholdIn := map(	
 																		Models.FP_models.Model_Check(Valid_requested_models, ['fp1702_1','fp1702_2']) => risk_indicators.iid_constants.max_unsigned3,
-																		Models.FP_models.Model_Check(Valid_requested_models, ['fp1403_2','fp1510_2']) => 730, 
+																		Models.FP_models.Model_Check(Valid_requested_models, ['fp1403_2','fp1510_2']) => 730,
+                                    Models.FP_models.Model_Check(Valid_requested_models, ['fp1908_1','fp1909_1','fp1909_2']) => risk_indicators.iid_constants.oneyear,
 																		doAttributesVersion201 OR doAttributesVersion202 => 9999,
 																		risk_indicators.iid_constants.oneyear);	//Last Seen Threshold: 365 days (1 year) for fp1403_2, otherwise use default
 
@@ -561,7 +562,7 @@ IncludeDLverification := if(doAttributesVersion2, true, false);
 //=========================
 bsVersion := map(
   Models.FP_models.Model_Check(Valid_requested_models, ['di31906_0']) or doTMXAttributes => 55,
-  Models.FP_models.Model_Check(Valid_requested_models, ['fp1902_1', 'fp1908_1', 'fp1909_1', 'fp1909_2']) => 54,  
+  Models.FP_models.Model_Check(Valid_requested_models, ['fp1902_1', 'fp1908_1', 'fp1909_1', 'fp1909_2', 'fp1907_1', 'fp1907_2']) => 54,
   Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.BS_Version53_List) or doParoAttributes or doAttributesVersion202 => 53,
 	Models.FP_models.Model_Check(Valid_requested_models, ['fp1706_1','fp1705_1','fp1704_1']) => 52,
 	Models.FP_models.Model_Check(Valid_requested_models, ['fp1506_1', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9','fp1509_1', 

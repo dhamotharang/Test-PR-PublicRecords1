@@ -1,29 +1,29 @@
-import LN_PropertyV2, BIPV2;
+﻿import LN_PropertyV2, Ln_PropertyV2_Services, BIPV2;
 
 export Raw := module
 
 	// ------------------------------------------
 	// Key & layout abbreviations
 	// ------------------------------------------
-	shared k_did(boolean isFCRA)		:= keys.search_did(isFCRA);
-	shared k_bdid		:= keys.search_bdid;
-	shared k_pnum_a	:= keys.search_pnum_a;
-	shared k_pnum_d	:= keys.search_pnum_d;
-	shared k_addr(boolean isFCRA)		:= keys.search_addr(isFCRA);
+	shared k_did(boolean isFCRA)		:=  Ln_PropertyV2_Services.keys.search_did(isFCRA);
+	shared k_bdid		:= Ln_PropertyV2_Services.keys.search_bdid;
+	shared k_pnum_a	:= Ln_PropertyV2_Services.keys.search_pnum_a;
+	shared k_pnum_d	:= Ln_PropertyV2_Services.keys.search_pnum_d;
+	shared k_addr(boolean isFCRA)		:= Ln_PropertyV2_Services.keys.search_addr(isFCRA);
 	shared k_linkId	:= LN_propertyv2.key_Linkids;
-	shared l_did		:= layouts.search_did;
-	shared l_bdid		:= layouts.search_bdid;
-	shared l_pnum		:= layouts.search_pnum;
-	shared l_addr		:= layouts.search_addr;
-	shared l_fid		:= layouts.fid;
-	shared l_sid		:= layouts.search_fid;
+	shared l_did		:= Ln_PropertyV2_Services.layouts.search_did;
+	shared l_bdid		:= Ln_PropertyV2_Services.layouts.search_bdid;
+	shared l_pnum		:= Ln_PropertyV2_Services.layouts.search_pnum;
+	shared l_addr		:= Ln_PropertyV2_Services.layouts.search_addr;
+	shared l_fid		:= Ln_PropertyV2_Services.layouts.fid;
+	shared l_sid		:= Ln_PropertyV2_Services.layouts.search_fid;
 	
 	
 	// ------------------------------------------
 	// Key conversions
 	// ------------------------------------------
-	shared lookupValOK(string fid)			:= input.lookupVal in ['',LN_PropertyV2.fn_fid_type(fid)];
-	shared partyTypeOK(string src_code)	:= input.partyType in ['',src_code[1]];
+	shared lookupValOK(string fid)			:= Ln_PropertyV2_Services.input.lookupVal in ['',LN_PropertyV2.fn_fid_type(fid)];
+	shared partyTypeOK(string src_code)	:= Ln_PropertyV2_Services.input.partyType in ['',src_code[1]];
 	// shared partyTypeOK(string src_code)	:= case(input.partyType, ''=>true, 'P'=>src_code[2]='P', src_code[1]=input.partyType);
 	
 	export dataset(l_fid) cleanFids(dataset(l_fid) in_fids) := function
@@ -52,7 +52,7 @@ export Raw := module
       // filter out "Care-Of" records on FCRA side
       (~IsFCRA or right.source_code[1] <> 'C'),
 			transform(l_fid, self := right, self.search_did := right.s_did),
-			limit(consts.max_raw,skip)
+			limit(Ln_PropertyV2_Services.consts.max_raw,skip)
 		);
 		return cleanFids(res);
 	end;
@@ -62,7 +62,7 @@ export Raw := module
 			dedup(sort(in_bdids,bdid),bdid), k_bdid,
 			keyed(left.bdid = right.s_bid) and lookupValOK(right.ln_fares_id) and partyTypeOK(right.source_code),
 			transform(l_fid, self := right),
-			limit(consts.max_raw,skip)
+			limit(Ln_PropertyV2_Services.consts.max_raw,skip)
 		);
 		return cleanFids(res);
 	end;
@@ -81,13 +81,13 @@ export Raw := module
 			in_d, k_pnum_a,
 			keyed(left.pnum = right.fares_unformatted_apn) and lookupValOK(right.ln_fares_id),
 			transform(l_fid, self := right),
-			limit(consts.max_raw,skip)
+			limit(Ln_PropertyV2_Services.consts.max_raw,skip)
 		);
 		res_d := join(
 			in_d, k_pnum_d,
 			keyed(left.pnum = right.fares_unformatted_apn) and lookupValOK(right.ln_fares_id),
 			transform(l_fid, self := right),
-			limit(consts.max_raw,skip)
+			limit(Ln_PropertyV2_Services.consts.max_raw,skip)
 		);
 		return cleanFids(res_a+res_d);
 	end;
@@ -105,7 +105,7 @@ export Raw := module
 				right.source_code_2='P' and
 				lookupValOK(right.ln_fares_id),
 			transform(layouts.fid,self:=right),
-			limit(consts.max_raw,skip)
+			limit(Ln_PropertyV2_Services.consts.max_raw,skip)
 		);
 		return cleanFids(by_addr);
 	
@@ -115,20 +115,21 @@ export Raw := module
 	// ------------------------------------------
 	// FaresID expansions
 	// ------------------------------------------
-	export dataset(layouts.fid) exp_fids_by_pnum(dataset(layouts.fid) fids,boolean isFCRA = false) := function
+	export dataset(Ln_PropertyV2_Services.layouts.fid) exp_fids_by_pnum(dataset(Ln_PropertyV2_Services.layouts.fid) fids,boolean isFCRA = false, boolean includeVendorSourceB=false) := function
 
 		// get ParcelIDs for specified FaresIDs
 		pnum_d := join(
 			fids, keys.deed(isFCRA),
-			keyed(left.ln_fares_id = right.ln_fares_id),
+			keyed(left.ln_fares_id = right.ln_fares_id)
+			AND if(includeVendorSourceB, true, not LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code)),
 			transform(layouts.search_pnum, self.pnum := LN_PropertyV2.fn_strip_pnum(right.apnt_or_pin_number)),
-			limit(consts.max_raw, skip)
+			limit(Ln_PropertyV2_Services.consts.max_raw, skip)
 		);
 		pnum_a := join(
 			fids, keys.assessor(isFCRA),
 			keyed(left.ln_fares_id = right.ln_fares_id),
 			transform(layouts.search_pnum, self.pnum := LN_PropertyV2.fn_strip_pnum(right.apna_or_pin_number)),
-			limit(consts.max_raw, skip)
+			limit(Ln_PropertyV2_Services.consts.max_raw, skip)
 		);
 		pnum := pnum_d + pnum_a;
 		
@@ -144,7 +145,7 @@ export Raw := module
 		
 	end; // exp_fids_by_pnum
 	
-	export dataset(layouts.fid) exp_fids_by_addr(dataset(layouts.fid) fids,boolean isFCRA=false) := function
+	export dataset(Ln_PropertyV2_Services.layouts.fid) exp_fids_by_addr(dataset(Ln_PropertyV2_Services.layouts.fid) fids,boolean isFCRA=false) := function
 	
 		// get property addrs for specified records
 		addr_raw := join(
@@ -152,7 +153,7 @@ export Raw := module
 			keyed(left.ln_fares_id=right.ln_fares_id) and right.source_code_2='P',
 			transform(l_addr,self:=right),
 			keep(1), // only 1 prop addr per ln_fares_id
-			limit(consts.max_raw,skip)
+			limit(Ln_PropertyV2_Services.consts.max_raw,skip)
 		);
 		addr := dedup(addr_raw, record, all);
 		

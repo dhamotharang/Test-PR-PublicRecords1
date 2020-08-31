@@ -1,4 +1,4 @@
-/* 
+﻿/* 
 DONE:
      1. See TBD comments in TBS.EBRSource_records.
      2. Temp add/chg EBR section in iesp to use iesp.bizcredit with chgs.  
@@ -53,6 +53,7 @@ EXPORT EBRSection := MODULE;
 		self.app_type  := AutoStandardI.GlobalModule().ApplicationType;
 		self.ssn_mask  := AutoStandardI.GlobalModule().ssnmask;
 		self.fetch_level := FETCH_LEVEL;
+    self.IncludeVendorsourceB := in_options.IncludeVendorsourceB;
 	end;
 	
 	row_in_options := row(tf_options());

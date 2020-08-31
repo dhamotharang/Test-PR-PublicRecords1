@@ -23,7 +23,7 @@
 </message>
 */
 
-IMPORT PublicRecords_KEL,Royalty,iesp,STD;
+IMPORT PublicRecords_KEL, Royalty, iesp, STD, BRM_Marketing_attributes;
 EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 
 		#OPTION('expandSelectCreateRow', TRUE);
@@ -105,7 +105,8 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 		EXPORT STRING100 Allowed_Sources := AllowedSources;
 		EXPORT STRING IndustryClass := Industry_Class; // When set to UTILI or DRMKT this restricts Utility data
 		EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
-		EXPORT UNSIGNED8 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
+		EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA;
+		EXPORT DATA57 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 			DataRestrictionMask, 
 			DataPermissionMask, 
 			GLBA, 
@@ -113,13 +114,16 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 			FALSE,//isfcra
 			TRUE, //ismarketing
 			0, //Allow_DNBDMI
-			FALSE,//OverrideExperianRestriction
-			'',//PermissiblePurpose - For FCRA Products Only
+			Override_Experian_Restriction,//OverrideExperianRestriction
+			'',//IntendedPurpose - For FCRA Products Only
 			Industry_Class,
-			PublicRecords_KEL.CFG_Compile);
+			PublicRecords_KEL.CFG_Compile,
+			FALSE, /*IsInsuranceProduct*/
+			PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA);
 		
 		// BIP Append Options
-		EXPORT UNSIGNED BIPAppendScoreThreshold := IF(BIPAppend_Score_Threshold = 0, 75, MIN(MAX(51,BIPAppend_Score_Threshold), 100)); // Score threshold must be between 51 and 100 -- default is 75.
+   EXPORT UNSIGNED BIPAppendScoreThreshold := MAP(BIPAppend_No_ReAppend => 0,
+                                                BIPAppend_Score_Threshold = 0 => 75, MIN(MAX(51,BIPAppend_Score_Threshold), 100));	
 		EXPORT UNSIGNED BIPAppendWeightThreshold := BIPAppend_Weight_Threshold;
 		EXPORT BOOLEAN BIPAppendPrimForce := BIPAppend_PrimForce;
 		EXPORT BOOLEAN BIPAppendReAppend := NOT BIPAppend_No_ReAppend;
@@ -129,7 +133,26 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 		EXPORT STRING100 TransactionID := _TransactionId;                                
 		EXPORT STRING100 BatchUID := _BatchUID;
 		EXPORT UNSIGNED6 GlobalCompanyId := _GCID;				
-		END;	
+
+		//default options in PublicRecords_KEL.Interface_Options have been changed to FALSE
+		EXPORT BOOLEAN IncludeAircraft := TRUE;
+		EXPORT BOOLEAN IncludeAddress := TRUE;
+		EXPORT BOOLEAN IncludeBankruptcy := TRUE;
+		EXPORT BOOLEAN IncludeBusinessSele := TRUE;
+		EXPORT BOOLEAN IncludeBusinessProx := TRUE;
+		EXPORT BOOLEAN IncludeCriminalOffender := TRUE;
+		EXPORT BOOLEAN IncludeEducation := TRUE;
+		EXPORT BOOLEAN IncludeEmail := TRUE;
+		EXPORT BOOLEAN IncludeLienJudgment := TRUE;
+		EXPORT BOOLEAN IncludePerson := TRUE;
+		EXPORT BOOLEAN IncludeProperty := TRUE;
+		EXPORT BOOLEAN IncludePropertyEvent := TRUE;
+		EXPORT BOOLEAN IncludeTradeline := TRUE;
+		EXPORT BOOLEAN IncludeVehicle := TRUE;
+		EXPORT BOOLEAN IncludeWatercraft := TRUE;
+		EXPORT BOOLEAN IncludeUCC := TRUE;
+    
+  END;	
 				
 	//For now we have only one version of the attributes V1.There are 2 fields for attributes now just in case we will be having new version sooner.
 	AttrsRequested := DATASET([ {STD.Str.ToUpperCase(AttributeVer1_in)},{STD.Str.ToUpperCase(AttributeVer2_in)} ],BRM_Marketing_Attributes.Layout_BRM_NonFCRA.AttributeGroupRec);

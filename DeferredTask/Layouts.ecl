@@ -1,4 +1,6 @@
-﻿EXPORT Layouts := MODULE
+﻿IMPORT IESP;
+
+EXPORT Layouts := MODULE
 
 EXPORT CaseLayout := RECORD
 	STRING CollectionDate{xpath('Collection_date')};
@@ -53,4 +55,20 @@ EXPORT ResponseOpaqueContentLayout := RECORD
 	STRING ErrorCode;
 END;
 
+EXPORT FlattenedDTERequestInfoLayoutSimple := RECORD
+    STRING ErrorMessage;
+    STRING ErrorCode;
+    STRING InputTransactionID;
+    STRING DTERequestStatus;
+END;
+
+EXPORT FlattenedDTERequestInfoLayoutWTaskExs := RECORD
+    FlattenedDTERequestInfoLayoutSimple;
+    dataset(iesp.dte_share.t_TaskExtended) TaskExs;
+END;
+
+EXPORT FlattenedDTERequestInfoLayoutWFlatTaskExs := RECORD
+    FlattenedDTERequestInfoLayoutSimple;
+    iesp.dte_share.t_TaskExtended;
+END;
 END; // Layouts Module END

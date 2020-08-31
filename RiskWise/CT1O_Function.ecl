@@ -1,8 +1,7 @@
-import risk_indicators, address, ut, Business_Header, doxie, suppress, gateway, Royalty, MDR;
+import risk_indicators, Business_Header, doxie, suppress, gateway, RiskWise;
 
-export CT1O_Function(dataset(Layout_CT1I) indata, dataset(Gateway.Layouts.Config) gateways,
-				 unsigned1 dppa_purpose, unsigned1 glb_purpose, boolean isUtility=false, boolean ln_branded=false,
-				 string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction, string32 appType) := function
+export CT1O_Function(dataset(RiskWise.Layout_CT1I) indata, dataset(Gateway.Layouts.Config) gateways, doxie.IDataAccess mod_access,
+				 boolean isUtility=false) := function
 
 // full_history_date := (STRING8)((STRING6)history_date+'01');
 // myGetDate := IF(history_date=999999,ut.GetDate,full_history_date);
@@ -133,7 +132,7 @@ Risk_Indicators.Layouts.Layout_Input_Plus_Overrides t_f(phonerec le) := transfor
 	self.historydate := le.historydate;
 	self := [];
 end;
-dirsphon := riskwise.getDirsByPhone(project(ungroup(phonerec), t_f(left)), gateways, DPPA_Purpose, glb_Purpose);
+dirsphon := riskwise.getDirsByPhone(project(ungroup(phonerec), t_f(left)), gateways, mod_access.dppa, mod_access.glb);
 
 
 working_layout add_gong(phonerec le, dirsphon ri) := transform
@@ -185,7 +184,7 @@ d := record
 	unsigned6 did := 0;
 end;
 
-eqfs := riskwise.getHeaderByDid(ungroup(project(one_gong, transform(d, self:=left))), DPPA_Purpose, GLB_Purpose, ln_branded, DataRestriction);
+eqfs := riskwise.getHeaderByDid(ungroup(project(one_gong, transform(d, self:=left))), mod_access.dppa, mod_access.glb, mod_access.ln_branded, mod_access.DataRestrictionMask);
 
 working_layout gongheader(one_gong le, eqfs ri) := transform
 	self.hdr_fname := ri.fname;
@@ -245,7 +244,8 @@ working_layout gongbheader(rolled_header le, Business_Header.Key_BH_Best ri) := 
 end;
 
 combined_gong_bheader := join(rolled_header, Business_Header.Key_BH_Best, 
-						keyed(right.bdid = left.bdid) and left.bdid<>0 and RIGHT.dt_last_seen < left.historydate, 
+						keyed(right.bdid = left.bdid) and left.bdid<>0 and RIGHT.dt_last_seen < left.historydate AND 
+						doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask), 
 						gongbheader(left, right), left outer, ATMOST(keyed(right.bdid = left.bdid),RiskWise.max_atmost), keep(100));
 
 finalheader := group(sort(combined_gong_bheader, seq, -hdr_date_last_seen), seq);
@@ -287,8 +287,8 @@ END;
 pre_output := PROJECT(one_header, prep_output(LEFT));
 
 // remove output if on the following files
-Suppress.MAC_Suppress(pre_output,out,appType,Suppress.Constants.LinkTypes.SSN,hdr_ssn);
-Suppress.MAC_Suppress(out,out2,appType,Suppress.Constants.LinkTypes.DID,did);
+Suppress.MAC_Suppress(pre_output,out,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,hdr_ssn);
+Suppress.MAC_Suppress(out,out2,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did);
 
 working_layout one_for_each(pre_output le, out2 rt) := transform
 	self.seq := le.seq;

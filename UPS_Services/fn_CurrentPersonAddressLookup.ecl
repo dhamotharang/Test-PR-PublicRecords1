@@ -1,42 +1,44 @@
-﻿Import dx_header, ut, std, UPS_Services;
+﻿IMPORT dx_header, ut, std, UPS_Services;
 
-EXPORT fn_CurrentPersonAddressLookup(dataset(UPS_Services.layout_Common)dsPreCurrent) := function 
-/* The 31st bit of lookups field in key_address  indicates if the person is a current resident of the address or not*/
-	dsWithCurrent := join(dsPreCurrent , dx_header.key_address(),
-										  keyed(
-											 ut.StripOrdinal(left.prim_name) = right.prim_name and
-											 left.prim_range = right.prim_range and
-											 left.state = right.st and
-											 hash(left.city_name) = right.city_code and
-											 left.zip = right.zip and
-											 left.sec_range = right.sec_range) 
-											 AND
-											 ( 
-											   (
-												   left.rollup_key <> 0 and 
-													 left.rollup_key_type = UPS_Services.Constants.TAG_ROLLUP_KEY_DID and 
-													 left.rollup_key = right.did
-													 )
-											    OR
-											   (
-												   (
-														 left.lname = right.lname or													   
-														 std.Metaphone.Primary(left.lname) = right.dph_lname  
-														) 
-													  and 
-													  (
-														  left.fname = right.pfname or 
-															left.fname = right.fname  
-														 )
-													)
-												) 
-											 ,
-											transform
-												(UPS_Services.layout_Common,
-												 self.Current := if(ut.bit_test(right.lookups,31),'Y',left.Current);
-												 self := left ),left outer, keep(1),limit(0));											 
+EXPORT fn_CurrentPersonAddressLookup(DATASET(UPS_Services.layout_Common)dsPreCurrent) := FUNCTION
+/* The 31st bit of lookups field in key_address indicates if the person is a current resident of the address or not*/
+  dsWithCurrent := 
+    JOIN(dsPreCurrent, dx_header.key_address(),
+    KEYED(
+      ut.StripOrdinal(LEFT.prim_name) = RIGHT.prim_name AND
+      LEFT.prim_range = RIGHT.prim_range AND
+      LEFT.state = RIGHT.st AND
+      hash(LEFT.city_name) = RIGHT.city_code AND
+      LEFT.zip = RIGHT.zip AND
+      LEFT.sec_range = RIGHT.sec_range)
+      AND
+      (
+        (
+          LEFT.rollup_key <> 0 AND
+          LEFT.rollup_key_type = UPS_Services.Constants.TAG_ROLLUP_KEY_DID AND
+          LEFT.rollup_key = RIGHT.did
+          )
+        OR
+        (
+          (
+            LEFT.lname = RIGHT.lname OR
+            std.Metaphone.Primary(LEFT.lname) = RIGHT.dph_lname
+          )
+          AND
+          (
+            LEFT.fname = RIGHT.pfname OR
+            LEFT.fname = RIGHT.fname
+            )
+        )
+      )
+      ,
+    TRANSFORM
+      (UPS_Services.layout_Common,
+        SELF.Current := IF(ut.bit_test(RIGHT.lookups,31),'Y',LEFT.Current);
+        SELF := LEFT ),
+    LEFT OUTER, KEEP(1),LIMIT(0));
 
-	
-return dsWithCurrent;
+  
+RETURN dsWithCurrent;
 
-end;
+END;

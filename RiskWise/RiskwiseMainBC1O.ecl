@@ -143,7 +143,7 @@ unsigned1 GLB_Purpose := RiskWise.permittedUse.fraudGLBA  : stored('GLBPurpose')
 unsigned3 history_date := 999999 : stored('HistoryDateYYYYMM');
 boolean runSeed_value := false   : stored('runSeed');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction  : stored('DataRestrictionMask');
-string50 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+string DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 
 //CCPA fields
 unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');

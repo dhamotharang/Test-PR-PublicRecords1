@@ -1,4 +1,4 @@
-﻿import fcra, FFD, LN_PropertyV2_Services, D2C;
+﻿import fcra, FFD, LN_PropertyV2_Services, D2C, LN_PropertyV2;
 
 k_deed(boolean isFCRA=false)	:= LN_PropertyV2_Services.keys.deed(isFCRA);
 k_fares	:= LN_PropertyV2_Services.keys.addl_fares_d;
@@ -15,7 +15,8 @@ export dataset(l_raw) fn_get_deeds_raw(
 	dataset(fcra.Layout_override_flag) flagfile = fcra.compliance.blank_flagfile,
   dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
   integer8 inFFDOptionsMask = 0,
-	 boolean isCNSMR = false
+	 boolean isCNSMR = false,
+	 boolean includeBlackKnight = false
 ) := function
 
 // canned data for testing
@@ -25,13 +26,14 @@ export dataset(l_raw) fn_get_deeds_raw(
 
   boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask);
 	boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
-
+ 
 	// join inputs to index to get raw data
 	ds_raw0 := join(
 		in_sids, k_deed(isFCRA),
 	  keyed(left.ln_fares_id = right.ln_fares_id)
 		and ~((string)right.ln_fares_id in set( flags( (unsigned6)did=left.search_did), record_id) and isFCRA)
-		and (~isCNSMR or right.vendor_source_flag not in D2C.Constants.LNPropertyV2RestrictedSources ),
+		and (~isCNSMR or right.vendor_source_flag not in D2C.Constants.LNPropertyV2RestrictedSources )
+		AND if(includeBlackKnight, true, not LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code)),
 		transform(l_raw,self:=left,self:=right,self:=[]),
 		limit(max_raw)
 	);

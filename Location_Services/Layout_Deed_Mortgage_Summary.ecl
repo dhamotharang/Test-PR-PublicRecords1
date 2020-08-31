@@ -1,4 +1,4 @@
-//
+﻿//
 import LN_Mortgage;
 export Layout_Deed_Mortgage_Summary := RECORD
 	INTEGER seq;
@@ -20,6 +20,7 @@ export Layout_Deed_Mortgage_Summary := RECORD
 	LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE.second_td_lender_type_code;
 	LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE.second_td_loan_amount;
 	LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE.first_td_loan_type_code;
+	LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE.first_td_due_date;
 	LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE.fares_mortgage_deed_type;
 	LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE.fares_mortgage_term_code;
 	LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE.fares_mortgage_term;

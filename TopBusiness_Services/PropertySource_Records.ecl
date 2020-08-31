@@ -1,18 +1,18 @@
-//=================================================================================
+﻿//=================================================================================
 // ====== RETURNS PROPERTY DATA FOR A GIVEN LN_FARES_ID IN ESP-COMPLIANT WAY. =====
 // ================================================================================
 //
-import iesp, LN_PropertyV2, LN_PropertyV2_Services, BIPV2, Suppress, address, fcra, ut;
+import iesp, LN_PropertyV2, LN_PropertyV2_Services, BIPV2, Suppress, address, fcra, ut, TopBusiness_Services, std;
 
 EXPORT PropertySource_Records(
-  dataset(Layouts.rec_input_ids_wSrc) in_docids,
-  SourceService_Layouts.OptionsLayout inoptions,
+  dataset(TopBusiness_Services.Layouts.rec_input_ids_wSrc) in_docids,
+  TopBusiness_Services.SourceService_Layouts.OptionsLayout inoptions,
 	integer nonSS = suppress.Constants.NonSubjectSuppression.doNothing,
 	boolean IsFCRA = false) 
  := MODULE
   
 	SHARED prop_layout_wLinkIds := RECORD
-		Layouts.rec_input_ids_wSrc;
+		TopBusiness_Services.Layouts.rec_input_ids_wSrc;
 		LN_PropertyV2_Services.layouts.combined.widest;
 		string8 recording_date;
 	END;
@@ -24,27 +24,27 @@ EXPORT PropertySource_Records(
 	
 	// *** Key fetch to get ln_fares_id's from linkids
   ds_propkeys := PROJECT(LN_PropertyV2.Key_LinkIds.kFetch(in_docs_linkonly,inoptions.fetch_level,,,TopBusiness_Services.Constants.PropertyKfetchMaxLimit),
-																TRANSFORM(Layouts.rec_input_ids_wSrc,
+																TRANSFORM(TopBusiness_Services.Layouts.rec_input_ids_wSrc,
 																					SELF.IdValue := LEFT.ln_fares_id,
 																					SELF := LEFT,
 																					SELF := []));
 	
 	// For records with an id value assigned and an Id type of vl_id, we need to strip the first 
 	// 3 characters (2 char source code and 1 char source flag) of the idvalue to get the fares id 
-	in_docs_vlIDRecs := in_docids(IdValue != '' and Idtype = constants.busvlid);
-	ds_vlIdKeys := PROJECT(in_docs_vlIDRecs,TRANSFORM(Layouts.rec_input_ids_wSrc,
+	in_docs_vlIDRecs := in_docids(IdValue != '' and Idtype = TopBusiness_Services.constants.busvlid);
+	ds_vlIdKeys := PROJECT(in_docs_vlIDRecs,TRANSFORM(TopBusiness_Services.Layouts.rec_input_ids_wSrc,
 																					SELF.IdValue := LEFT.IdValue[4..],
 																					SELF := LEFT,
 																					SELF := []));
 	
 	// For records with an id value assigned and not a idtype of vl_id, assumes idvalue is fares_id
-	ds_faresKeys := in_docids(IdValue != '' and Idtype != constants.busvlid);
+	ds_faresKeys := in_docids(IdValue != '' and Idtype != TopBusiness_Services.constants.busvlid);
 																		
 	prop_keys_comb := ds_propkeys+ds_vlIdKeys+ds_faresKeys;
 	
 	prop_keys := PROJECT(prop_keys_comb(IdValue != ''),TRANSFORM(LN_PropertyV2_Services.layouts.search_fid,SELF.ln_fares_id := LEFT.IdValue, SELF := []));
 	
-	prop_keys_dedup := DEDUP(prop_keys,ALL);
+      prop_keys_dedup := DEDUP(SORT(prop_keys, ln_fares_id), ln_fares_id);
 	
 	// Get the raw data from the appropriate view.
   prop_sourceview := LN_PropertyV2_Services.resultFmt.widest_view.get_by_fid(prop_keys_dedup,,,nonSS,IsFCRA);
@@ -86,7 +86,7 @@ EXPORT PropertySource_Records(
 		Self.UniqueId := if(L.did <> '', intformat((unsigned)L.did,12,1), '');
 		Self.BusinessId := if(L.bdid <> '', intformat((unsigned)L.bdid,12,1), '');
 		Self.AppendedSSN := L.app_ssn;
-		Self.Full := if(l.lname!='' and l.lname <> fcra.constants.FCRA_Restricted,stringlib.StringCleanSpaces(l.lname + ' , ' + l.fname + ' ' + l.mname + ' ' +  l.name_suffix),'');;
+		Self.Full := if(l.lname!='' and l.lname <> fcra.constants.FCRA_Restricted,std.str.CleanSpaces(l.lname + ' , ' + l.fname + ' ' + l.mname + ' ' +  l.name_suffix),'');;
 		Self.First := L.fname;
 		Self.Middle := L.mname;
 		Self.Last := L.lname;
@@ -128,7 +128,7 @@ EXPORT PropertySource_Records(
 	end;
 	
 	SHARED iesp.property.t_PropertyReport2Record toOut (prop_layout_wLinkIds L) := TRANSFORM
-		IDmacros.mac_IespTransferLinkids()
+		TopBusiness_Services.IDmacros.mac_IespTransferLinkids()
 		assess := L.assessments[1];	
 		deed := L.deeds[1];
 		

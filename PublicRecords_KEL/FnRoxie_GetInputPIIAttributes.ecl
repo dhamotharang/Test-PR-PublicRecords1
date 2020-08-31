@@ -1,9 +1,9 @@
-﻿IMPORT KEL11 AS KEL;
+﻿IMPORT KEL13 AS KEL;
 EXPORT FnRoxie_GetInputPIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) RepInput,
             PublicRecords_KEL.Interface_Options Options) := FUNCTION
             		
     
-	InputPIIAttributesResults := PublicRecords_KEL.Q_Input_Attributes_V1(RepInput, (STRING) RepInput[1].P_InpClnArchDt[1..8], Options.KEL_Permissions_Mask).Res0;
+	InputPIIAttributesResults := PublicRecords_KEL.Q_Input_Attributes_V1(RepInput, (INTEGER) RepInput[1].P_InpClnArchDt[1..8], Options.KEL_Permissions_Mask).Res0;
 	InputPIIAttributes := KEL.Clean(InputPIIAttributesResults, TRUE, TRUE, TRUE);		
 		
 		ds_changedatatype :=
@@ -39,6 +39,19 @@ EXPORT FnRoxie_GetInputPIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Lay
 																																														// TRIM((STRING)LEFT.P_InpClnAddrSecRng))[1].uid;
 																		// SELF.PI_InpAddrAVMRatio1Y := (DECIMAL7_2)LEFT.PI_InpAddrAVMRatio1Y;
 																		// SELF.PI_InpAddrAVMRatio5Y := (DECIMAL7_2)LEFT.PI_InpAddrAVMRatio5Y;
+																		SELF.PI_InpAddrOnFileFlagEv := (STRING)LEFT.PI_InpAddrOnFileFlagEv,
+																		SELF.PI_InpAddrIsVacantFlag := (STRING)LEFT.PI_InpAddrIsVacantFlag,
+																		SELF.PI_InpAddrIsThrowbackFlag := (STRING)LEFT.PI_InpAddrIsThrowbackFlag,
+																		SELF.PI_InpAddrSeasonalType := (STRING)LEFT.PI_InpAddrSeasonalType,
+																		SELF.PI_InpAddrIsDNDFlag := (STRING)LEFT.PI_InpAddrIsDNDFlag,
+																		SELF.PI_InpAddrIsCollegeFlag := (STRING)LEFT.PI_InpAddrIsCollegeFlag,
+																		SELF.PI_InpAddrIsCMRAFlag := (STRING)LEFT.PI_InpAddrIsCMRAFlag,
+																		SELF.PI_InpAddrIsSimpAddrFlag := (STRING)LEFT.PI_InpAddrIsSimpAddrFlag,
+																		SELF.PI_InpAddrIsDropDeliveryFlag := (STRING)LEFT.PI_InpAddrIsDropDeliveryFlag,
+																		SELF.PI_InpAddrIsBusinessFlag := (STRING)LEFT.PI_InpAddrIsBusinessFlag,
+																		SELF.PI_InpAddrOWGMFlag := (STRING)LEFT.PI_InpAddrOWGMFlag,
+																		SELF.PI_InpAddrIsMultiUnitFlag := (STRING)LEFT.PI_InpAddrIsMultiUnitFlag,
+																		SELF.PI_InpAddrIsAptFlag := (STRING)LEFT.PI_InpAddrIsAptFlag,
 																		SELF := LEFT,
 																		SELF := []));
 

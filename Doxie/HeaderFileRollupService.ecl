@@ -76,7 +76,7 @@
   <part name="StrictMatch" type="xsd:boolean"/>
   <part name="IncludeAddressCDSDetails" type="xsd:boolean"/>
   <part name="IncludeDLInfo" type="xsd:boolean"/>
-  <part name="IncludeNonDMVSources"	type="xsd:boolean"/>
+  <part name="IncludeNonDMVSources"  type="xsd:boolean"/>
   <part name="IncludePhonesPlus" type="xsd:boolean"/>
   <part name="IncludePeopleAtWork" type = "xsd:boolean"/>
   <part name="ReturnAlsoFound" type = "xsd:boolean"/> // utilize same name as in ESP
@@ -103,23 +103,23 @@
 
   <!-- FDN only option/fields -->
   <part name="IncludeFraudDefenseNetwork" type="xsd:boolean"/>
-  <part name="GlobalCompanyId"				    type="xsd:unsignedInt"/>
-  <part name="IndustryType"	    			    type="xsd:unsignedInt"/>
-  <part name="ProductCode"		  		      type="xsd:unsignedInt"/>
+  <part name="GlobalCompanyId"            type="xsd:unsignedInt"/>
+  <part name="IndustryType"               type="xsd:unsignedInt"/>
+  <part name="ProductCode"                type="xsd:unsignedInt"/>
 
   <!-- Progressive/waterfall Phone options -->
   <part name="IncludeProgressivePhone" type="xsd:boolean"/>
-  <part name="ScoreModel" 						type="xsd:string"/>
-  <part name="MaxNumAssociate"  			type="xsd:unsignedInt"/>
-  <part name="MaxNumAssociateOther"  	type="xsd:unsignedInt"/>
-  <part name="MaxNumFamilyOther"  		type="xsd:unsignedInt"/>
-  <part name="MaxNumFamilyClose"  		type="xsd:unsignedInt"/>
-  <part name="MaxNumParent"  					type="xsd:unsignedInt"/>
-  <part name="MaxNumSpouse"  					type="xsd:unsignedInt"/>
-  <part name="MaxNumSubject"  				type="xsd:unsignedInt"/>
-  <part name="MaxNumNeighbor"  				type="xsd:unsignedInt"/>
-  <part name="ReturnPhoneScore" 			type="xsd:boolean"/>
-  <part name="IncludePhonesFeedback" 	type="xsd:boolean"/>
+  <part name="ScoreModel"             type="xsd:string"/>
+  <part name="MaxNumAssociate"        type="xsd:unsignedInt"/>
+  <part name="MaxNumAssociateOther"   type="xsd:unsignedInt"/>
+  <part name="MaxNumFamilyOther"      type="xsd:unsignedInt"/>
+  <part name="MaxNumFamilyClose"      type="xsd:unsignedInt"/>
+  <part name="MaxNumParent"           type="xsd:unsignedInt"/>
+  <part name="MaxNumSpouse"           type="xsd:unsignedInt"/>
+  <part name="MaxNumSubject"          type="xsd:unsignedInt"/>
+  <part name="MaxNumNeighbor"         type="xsd:unsignedInt"/>
+  <part name="ReturnPhoneScore"       type="xsd:boolean"/>
+  <part name="IncludePhonesFeedback"  type="xsd:boolean"/>
 
   <part name="Gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
 </message>
@@ -144,10 +144,11 @@ EXPORT HeaderFileRollupService := MACRO
     BOOLEAN   BatchFriendly           := FALSE : STORED('BatchFriendly');
     STRING    DLNumber_Value          := ''    : STORED('DLNumber');
     STRING    DLState_Value           := ''    : STORED('DLState');
-    BOOLEAN   IncProgressivePhone			:= FALSE : STORED('IncludeProgressivePhone');
+    BOOLEAN   IncProgressivePhone     := FALSE : STORED('IncludeProgressivePhone');
     #STORED('dl_number',stringlib.stringtouppercase(DLNumber_Value));
 
     doxie.MAC_Header_Field_Declare();
+    mod_access := doxie.compliance.GetGlobalDataAccessModule();
     /*  The Business Credit (SBFE) project includes a person & business searches as well
         as a wrapper service (BusinessCredit_Services.BusinessAuthRepSearch) which calls
         both the person search (doxie.headerFileRollupService) and the business search
@@ -159,8 +160,8 @@ EXPORT HeaderFileRollupService := MACRO
 
     // the call to the records attribute is done in two parts to allow for the various output to
     // remain in tact and not break existing services.
-    ta1_tempmod :=
-      MODULE(doxie.HeaderFileRollupService_IParam.ta1_iparams);
+    mod_ta1 :=
+      MODULE(doxie.HeaderFileRollupService_IParam.ta1);
         EXPORT BOOLEAN allow_date_seen    := allow_date_seen_value;
         EXPORT BOOLEAN allow_wildcard     := allow_wildcard_val;
         EXPORT INTEGER date_last_seen     := date_last_seen_value;
@@ -174,18 +175,16 @@ EXPORT HeaderFileRollupService := MACRO
     // Set progressive phone params
     ProgPhone_mod := doxie.iParam.getProgressivePhoneParams();
 
-    ta1_tmp := doxie.HeaderFileRollupService_Records.fn_get_ta1_temp(ta1_tempmod);
+    ta1 := doxie.HeaderFileRollupService_Records.fn_get_ta1(mod_access, mod_ta1);
 
-    ta1_tmp_results := ta1_tmp.Results;
-    royalties := ta1_tmp.Royalty;
-    householdAvailableCount := ta1_tmp.householdRecordsAvailable;
+    ta1_results := ta1.Results;
+    royalties := ta1.Royalty;
+    householdAvailableCount := ta1.householdRecordsAvailable;
 
     global_mod := AutoStandardI.GlobalModule();
-    mod_access := doxie.compliance.GetGlobalDataAccessModule();
 
-    ta2_tempmod :=
-      MODULE(PROJECT(global_mod, doxie.HeaderFileRollupService_IParam.ta2_iparams, OPT));
-        EXPORT STRING32      application_type_val     := application_type_value;     // doxie.MAC_Header_Field_Declare();
+    mod_ta2 :=
+      MODULE(PROJECT(global_mod, doxie.HeaderFileRollupService_IParam.ta2, OPT));
         EXPORT BOOLEAN       Include_BusinessCredit   := FALSE : STORED('IncludeBusinessCredit');
         EXPORT BOOLEAN       Include_PhonesFeedback   := FALSE : STORED('IncludePhonesFeedback');
         EXPORT BOOLEAN       Include_AddressFeedback  := FALSE : STORED('IncludeAddressFeedback');
@@ -193,7 +192,7 @@ EXPORT HeaderFileRollupService := MACRO
         EXPORT BOOLEAN       Smart_Rollup             := FALSE : STORED('SmartRollup');
       END;
 
-    ta2 := doxie.HeaderFileRollupService_Records.fn_get_ta2(ta1_tmp_results, ta2_tempmod);
+    ta2 := doxie.HeaderFileRollupService_Records.fn_get_ta2(ta1_results, mod_access, mod_ta2);
 
     ta_phones := doxie.HeaderFileRollupService_Records.get_progressive_phone(ta2,ProgPhone_mod);
 

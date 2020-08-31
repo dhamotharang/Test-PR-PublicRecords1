@@ -1,4 +1,4 @@
-﻿﻿export layoutCanadianWhitepagesBase := 
+export layoutCanadianWhitepagesBase := 
 
  RECORD
   string8 Date_first_reported;

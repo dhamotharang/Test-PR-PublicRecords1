@@ -1,5 +1,5 @@
-export Version := MODULE
+EXPORT Version := MODULE
 
-	export key := '20070207';
+  EXPORT key := '20070207';
 
 END;

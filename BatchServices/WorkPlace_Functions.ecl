@@ -246,7 +246,8 @@ shared glb_ok := death_params.isValidGlb();
     LEADING_ZERO_FILL := 1;
     // 2. Join the ds of unique non-zero bdids with the business_header best key file.
     ds_inrecs_bdids_wbestinfo := join(ds_inrecs_bdids_deduped, Business_Header.Key_BH_Best,
-                                        keyed(left.bdid=right.bdid),
+                                        keyed(left.bdid=right.bdid) AND 
+                                        doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
                                       transform(WorkPlace_Services.Layouts.poe_didkey_plus,
                                         // save company name/address/phone/fein from right bh best
                                         self.company_name        := right.company_name,

@@ -1,9 +1,10 @@
-﻿IMPORT AutoStandardI, BIPV2, Business_Risk_BIP, Cortera, Doxie, MDR, PublicRecords_KEL, 
+﻿IMPORT AutoStandardI, BIPV2, Business_Risk_BIP, Cortera, Doxie, MDR, PublicRecords_KEL.ECL_Functions, PublicRecords_KEL,
 		Risk_Indicators, UT, STD;
 
 EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOrig,
-															 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
-															 DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw) ) := FUNCTION
+							   Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
+							   DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw)
+							   ) := FUNCTION
 
   mod_access := MODULE(Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()));
     EXPORT dppa := Options.DPPA_Purpose;
@@ -66,11 +67,10 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 	withDID := Business_Risk_BIP.fn_DIDAppend(cleanedInput, Options, mod_access);
 	
 	prepBIPAppend := PROJECT(withDID, TRANSFORM(Business_Risk_BIP.Layouts.Input, SELF := LEFT.Clean_Input));
-                  
-  BIPAppendOld := Business_Risk_BIP.BIP_LinkID_Append(prepBIPAppend, , Options.DoNotUseAuthRepInBIPAppend);                
-  BIPAppendV31 := Business_Risk_BIP.BIP_LinkID_Append_NEW(prepBIPAppend, Options, linkingOptions);
-	
-	BIPAppend := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31, BIPAppendV31, BIPAppendOld);
+  
+  BIPappend := if(Options.UseUpdatedBipAppend, Business_Risk_BIP.BIP_LinkID_Append_NEW(prepBIPAppend, Options, linkingOptions ),
+							   		 Business_Risk_BIP.BIP_LinkID_Append(prepBIPAppend, , Options.DoNotUseAuthRepInBIPAppend)
+							   		 );
 	
   withBIP := JOIN(withDID, BIPAppend, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
                         SELF.BIP_IDs := RIGHT;
@@ -97,7 +97,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 	WatchListHit := Business_Risk_BIP.getWatchlists(withBIP, Options, linkingOptions, AllowedSourcesSet);
 
   ds_KELB2B_Attributes := Business_Risk_BIP.getB2BAttributes(withBIP, Options, AllowedSourcesSet);
-  // ds_KELB2B_Attributes := DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutBusinessSeleID);
+   //ds_KELB2B_Attributes := DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutBusinessSeleID);
     
 	Phone := Business_Risk_BIP.getPhones(withBIP, Options, linkingOptions, AllowedSourcesSet);
 
@@ -2253,6 +2253,8 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.SBFE.SBFEDelinquentCount84 := checkBlank(RIGHT.SBFE.SBFEDelinquentCount84, '-99');
 																								SELF.SBFE.SBFEDelinquentCountEver := checkBlank(RIGHT.SBFE.SBFEDelinquentCountEver, '-99');
 																								SELF.SBFE.SBFEDelq61CountEverTtl := checkBlank(RIGHT.SBFE.SBFEDelq61CountEverTtl, '-99');
+																								SELF.SBFE.SBFEDelq91CountEverTtl := checkBlank(RIGHT.SBFE.SBFEDelq91CountEverTtl, '-99');  
+																								SELF.SBFE.SBFEDelq121CountEverTtl := checkBlank(RIGHT.SBFE.SBFEDelq121CountEverTtl, '-99'); 
 																								SELF.SBFE.SBFEDelinquentCountLoan := checkBlank(RIGHT.SBFE.SBFEDelinquentCountLoan, '-99');
 																								SELF.SBFE.SBFEDelq61LoanCount03M := checkBlank(RIGHT.SBFE.SBFEDelq61LoanCount03M, '-99');
 																								SELF.SBFE.SBFEDelinquentCountLoan06 := checkBlank(RIGHT.SBFE.SBFEDelinquentCountLoan06, '-99');
@@ -2324,6 +2326,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.SBFE.SBFEDelq61RevCountTtl := checkBlank(RIGHT.SBFE.SBFEDelq61RevCountTtl, '-99');
 																								SELF.SBFE.SBFEDelq61RevCountTtlChargeoff := checkBlank(RIGHT.SBFE.SBFEDelq61RevCountTtlChargeoff, '-99');
 																								SELF.SBFE.SBFEDelq91CountTtl := checkBlank(RIGHT.SBFE.SBFEDelq91CountTtl, '-99');
+																								SELF.SBFE.SBFEDelq121CountTtl := checkBlank(RIGHT.SBFE.SBFEDelq121CountTtl, '-99'); 
 																								SELF.SBFE.SBFEDelq91CountTtlChargeoff := checkBlank(RIGHT.SBFE.SBFEDelq91CountTtlChargeoff, '-99');
 																								SELF.SBFE.SBFEDPD91Count := checkBlank(RIGHT.SBFE.SBFEDPD91Count, '-99');
 																								SELF.SBFE.SBFEDelq91Count03M := checkBlank(RIGHT.SBFE.SBFEDelq91Count03M, '-99');
@@ -4038,9 +4041,9 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Verification.NameMiskey := Business_Risk_BIP.Common.SetBoolean(FALSE);
 
 		SBFEExists := (INTEGER)le.SBFE.SBFEAccountCount > 0;
-		SELF.SBFE.SBFESourceIndex := MAP(COUNT(SeqSources) > 0 AND NOT SBFEExists => '1',  //LN only
-																		 COUNT(SeqSources) = 0 AND SBFEExists 		=> '2',  //SBFE only
-																		 COUNT(SeqSources) > 0 AND SBFEExists 		=> '3',  //LN and SBFE
+		SELF.SBFE.SBFESourceIndex := MAP(COUNT(SeqSourcesLinkIds) > 0 AND NOT SBFEExists => '1',  //LN only
+																		 COUNT(SeqSourcesLinkIds) = 0 AND SBFEExists 		=> '2',  //SBFE only
+																		 COUNT(SeqSourcesLinkIds) > 0 AND SBFEExists 		=> '3',  //LN and SBFE
 																																								 '0'); // Else there are no sources as of the archive date
 
 		LNExists := COUNT(SeqSourcesLinkIds) > 0;
@@ -4725,7 +4728,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
   
   // OUTPUT(withFinalDelimitedFields, NAMED('withFinalDelimitedFields'));
   // OUTPUT(withBestAddrPhones,NAMED('withBestAddrPhones'));
-  
+
 	RETURN FinalShell_rolled;
 
 END;

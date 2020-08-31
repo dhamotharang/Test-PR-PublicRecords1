@@ -133,6 +133,9 @@ EXPORT Best_Combined_Service() := FUNCTION
     self.company_sic_code1 := l.sic_code[1].company_sic_code1;
     self.company_naics_code1 := l.naics_code[1].company_naics_code1;
     self.dba_name := l.dba_name[1].dba_name;
+    self.company_locid := l.company_address[1].company_locid;
+		self.address_dt_first_seen := l.company_address[1].address_dt_first_seen;
+	  self.address_dt_last_seen := l.company_address[1].address_dt_last_seen;
     self := l;  
   end;
 

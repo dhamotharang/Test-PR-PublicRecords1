@@ -4,7 +4,7 @@ EXPORT Constants := module
 // new NoScore logic to apply across all models and riskview attributes for Riskview Dempsey core project
 export noScore(integer nas, integer nap, integer naprop, boolean truedid) := truedid=false;
 // export noScore(integer nas, integer nap, integer naprop, boolean truedid) := (nas <= 4 and nap <= 4 and naprop <= 3) or truedid=false;
-export noScoreAlert := '222A';  
+export noScoreAlert := '222A';
 
 
 export batch := 'batch';
@@ -70,12 +70,9 @@ export MLA_error_desc(string5 error_code) := function
 	return desc;
 end;
 
-export StatusRefresh_error_desc(string5 error_code) := FUNCTION
-    desc := map(
-			trim(error_code) = '22OKC' => 'Error occurred in status refresh.',
-			'');
-	return desc;
-END;
+export StatusRefresh_error_desc := 'Error occurred in status refresh.';
+
+export DTE_error_desc := 'The requested public record was not available.';
 
 export set_Valid_Name_Suffix := ['', 'JR', 'SR', 'ST', 'ND', 'RD', 'TH'];
 

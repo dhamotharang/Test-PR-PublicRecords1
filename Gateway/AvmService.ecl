@@ -7,9 +7,8 @@ IMPORT AutoStandardI, Doxie, iesp, Gateway;
 
 EXPORT AvmService := MACRO
 
-  // ***IMPORTANT*** In order to compile on dev environments, in the ecl command include -foptimizeLevel=0
-  // Never release to PROD with this option on.
-  // #OPTION('optimizeLevel', 0);
+  // Will not compile without this setting due to the size of the response layout in the soapcall.
+  #OPTION('optimizeLevel', 0);
 
   ds_in := DATASET([], iesp.avm_property_report.t_AVMPropertyReportRequest) : STORED('AVMPropertyReportRequest', FEW);
   first_row := ds_in[1] : INDEPENDENT;

@@ -5207,7 +5207,7 @@ EXPORT SeRs_M1_doMapping(ds, outRecord) := FUNCTIONMACRO
 				outRecord doXform(Models.Layouts_Healthcare_Core.layout_SocioEconomic_LI_PB_flat_typed L) := TRANSFORM 
 					SELF.Gender := (integer)CASE(L.GenderStr,'F' => 1, 'M' => 2, 1);
 					SELF.patient_type := (integer)CASE(L.patient_type, 'I' => 1, 'N' => 2, 1);
-					SELF.financial_class := (integer)CASE(L.financial_class, 'MA' => 9, 'SP' => 14, 'BL' => 3, 'MC' => 11, 'MH' => 12, '9' => 2, 'FI' => 6, 'MB' => 10, 'CI' => 5, 'HM' => 7, 'VA' => 15, 'OT' => 13, 'WC' => 16, '16' => 1, 'CH' => 4, 'IC' => 8, 1);
+					SELF.financial_class := (integer)CASE(L.financial_class, 'MA' => 9, 'SP' => 14, 'BL' => 3, 'MC' => 11, 'MH' => 12, '9' => 2, 'FI' => 6, 'MB' => 10, 'CI' => 5, 'HM' => 7, 'VA' => 15, 'OT' => 13, 'WC' => 16, '16' => 1, 'CH' => 4, 'IC' => 8, 9);
 					SELF.admit_diag := (integer)CASE(L.admit_diag, 'TOP_1' => 4, 'MISC_HIGH' => 1, 'MISC_LOW' => 2, 'MISC_MEDIUM' => 3, 'TOP_2' => 6, 'TOP_3' => 7, 'TOP_4' => 8, 'TOP_5' => 9, 'TOP_6' => 10, 'TOP_7' => 11, 'TOP_8' => 12, 'TOP_9' => 13, 'TOP_10' => 5, 1);
 					SELF.readmit_diag := (integer)CASE(L.readmit_diag, 'MISC_LOW' => 2, 'TOP_1' => 4, 'MISC_HIGH' => 1, 'MISC_MEDIUM' => 3, 'TOP_2' => 6, 'TOP_3' => 7, 'TOP_7' => 11, 'TOP_5' => 9, 'TOP_8' => 12, 'TOP_4' => 8, 'TOP_6' => 10, 'TOP_10' => 5, 'TOP_9' => 13, 1);
 					SELF.readmit_lift := (integer)CASE(L.readmit_lift, 'MISC_LOW' => 2, 'MISC_HIGH' => 1, 'MISC_MEDIUM' => 3, 'TOP_9' => 13, 'TOP_6' => 10, 'TOP_4' => 8, 'TOP_10' => 5, 'TOP_7' => 11, 'TOP_5' => 9, 'TOP_2' => 6, 'TOP_1' => 4, 'TOP_8' => 12, 'TOP_3' => 7, 1);
@@ -9245,19 +9245,19 @@ EXPORT getSeRS_M0_M1_RiskDrivers(ds) := FUNCTIONMACRO
          SELF := R;
    END;
 
-   SeRS_M0_AttributeWeight_DS := JOIN(SeRS_M0_Normalized_Attributes, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SERS_M0_RD_COEFFICIENTS_DS, STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
+   SeRS_M0_AttributeWeight_DS := JOIN(SeRS_M0_Normalized_Attributes, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SERS_M0_RD_COEFFICIENTS_DS(STD.Str.ToUpperCase(RD_CATEGORY) NOT IN Models.Healthcare_Constants_Core.caredriver_suppression_list), STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
    // OUTPUT(SeRS_M0_AttributeWeight_DS, NAMED('SeRS_M0_AttributeWeight_DS'));
-   SeRS_M1_AttributeWeight_DS := JOIN(SeRS_M1_Normalized_Attributes, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SERS_M1_RD_COEFFICIENTS_DS, STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
+   SeRS_M1_AttributeWeight_DS := JOIN(SeRS_M1_Normalized_Attributes, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SERS_M1_RD_COEFFICIENTS_DS(STD.Str.ToUpperCase(RD_CATEGORY) NOT IN Models.Healthcare_Constants_Core.caredriver_suppression_list), STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
    // OUTPUT(SeRS_M1_AttributeWeight_DS, NAMED('SeRS_M1_AttributeWeight_DS'));
 
 
-   SeRS_M0_TABLE_DS := TABLE(SeRS_M0_AttributeWeight_DS, {seq, RD_CATEGORY, SumOfWeights := SUM(GROUP, AttributeWeight)}, seq, RD_CATEGORY);
+   SeRS_M0_TABLE_DS := (TABLE(SeRS_M0_AttributeWeight_DS, {seq, RD_CATEGORY, SumOfWeights := SUM(GROUP, AttributeWeight)}, seq, RD_CATEGORY));
 
    SeRS_M0_SORTED_HI := SORT(GROUP(SORT(SeRS_M0_TABLE_DS, seq), seq), -SumOfWeights);
 
    SeRS_M0_SORTED_LO := SORT(GROUP(SORT(SeRS_M0_TABLE_DS, seq), seq), SumOfWeights);
 
-   SeRS_M1_TABLE_DS := TABLE(SeRS_M1_AttributeWeight_DS, {seq, RD_CATEGORY, SumOfWeights := SUM(GROUP, AttributeWeight)}, seq, RD_CATEGORY);
+   SeRS_M1_TABLE_DS := (TABLE(SeRS_M1_AttributeWeight_DS, {seq, RD_CATEGORY, SumOfWeights := SUM(GROUP, AttributeWeight)}, seq, RD_CATEGORY));
 
    SeRS_M1_SORTED_HI := SORT(GROUP(SORT(SeRS_M1_TABLE_DS, seq), seq), -SumOfWeights);
 
@@ -9646,10 +9646,10 @@ EXPORT getSeMA_RiskDrivers(ds) := FUNCTIONMACRO
          SELF := R;
    END;
 
-   AttributeWeight_DS := JOIN(Normalized_SeMA_Attributes, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SEMA_RD_COEFFICIENTS_DS, STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
+   AttributeWeight_DS := JOIN(Normalized_SeMA_Attributes, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SEMA_RD_COEFFICIENTS_DS(STD.Str.ToUpperCase(RD_CATEGORY) NOT IN Models.Healthcare_Constants_Core.caredriver_suppression_list), STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
    // OUTPUT(AttributeWeight_DS, NAMED('AttributeWeight_DS'));
 
-   TABLE_DS := TABLE(AttributeWeight_DS, {seq, RD_CATEGORY, SumOfWeights := SUM(GROUP, AttributeWeight)}, seq, RD_CATEGORY);
+   TABLE_DS := (TABLE(AttributeWeight_DS, {seq, RD_CATEGORY, SumOfWeights := SUM(GROUP, AttributeWeight)}, seq, RD_CATEGORY));
 
    SORTED_HI := SORT(GROUP(SORT(TABLE_DS, seq), seq), -SumOfWeights);
 
@@ -10008,10 +10008,10 @@ EXPORT getSeMO_RiskDrivers(ds) := FUNCTIONMACRO
          SELF := R;
    END;
 
-   AttributeWeight_DS := JOIN(Normalized_SeMO_Attributes, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SEMO_RD_COEFFICIENTS_DS, STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
+   AttributeWeight_DS := JOIN(Normalized_SeMO_Attributes, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SEMO_RD_COEFFICIENTS_DS(STD.Str.ToUpperCase(RD_CATEGORY) NOT IN Models.Healthcare_Constants_Core.caredriver_suppression_list), STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
    // OUTPUT(AttributeWeight_DS, NAMED('AttributeWeight_DS'));
 
-   TABLE_DS := TABLE(AttributeWeight_DS, {seq, RD_CATEGORY, SumOfWeights := SUM(GROUP, AttributeWeight)}, seq, RD_CATEGORY);
+   TABLE_DS := (TABLE(AttributeWeight_DS, {seq, RD_CATEGORY, SumOfWeights := SUM(GROUP, AttributeWeight)}, seq, RD_CATEGORY));
 
    SORTED_HI := SORT(GROUP(SORT(TABLE_DS, seq), seq), -SumOfWeights);
 
@@ -11754,12 +11754,12 @@ EXPORT getSeTC_RiskDrivers(ds) := FUNCTIONMACRO
          SELF := R;
    END;
 
-   AttributeWeight_DS_ZERO := JOIN(Normalized_SeTC_Attributes_ZERO_Model, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SETC_V3_ZERO_COEFFICIENTS_DS, STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
-   AttributeWeight_DS_LOB := JOIN(Normalized_SeTC_Attributes_LOB_Model, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SETC_V3_LOB_COEFFICIENTS_DS, STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
-   AttributeWeight_DS_LOB_EXT := JOIN(Normalized_SeTC_Attributes_LOB_EXT_Model, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SETC_V3_LOB_EXT_COEFFICIENTS_DS, STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
+   AttributeWeight_DS_ZERO := JOIN(Normalized_SeTC_Attributes_ZERO_Model, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SETC_V3_ZERO_COEFFICIENTS_DS(STD.Str.ToUpperCase(RD_CATEGORY) NOT IN Models.Healthcare_Constants_Core.caredriver_suppression_list), STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
+   AttributeWeight_DS_LOB := JOIN(Normalized_SeTC_Attributes_LOB_Model, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SETC_V3_LOB_COEFFICIENTS_DS(STD.Str.ToUpperCase(RD_CATEGORY) NOT IN Models.Healthcare_Constants_Core.caredriver_suppression_list), STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
+   AttributeWeight_DS_LOB_EXT := JOIN(Normalized_SeTC_Attributes_LOB_EXT_Model, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SETC_V3_LOB_EXT_COEFFICIENTS_DS(STD.Str.ToUpperCase(RD_CATEGORY) NOT IN Models.Healthcare_Constants_Core.caredriver_suppression_list), STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
    AttributeWeight_DS := AttributeWeight_DS_ZERO + AttributeWeight_DS_LOB + AttributeWeight_DS_LOB_EXT;
    // OUTPUT(AttributeWeight_DS, NAMED('AttributeWeight_DS'));
-   TABLE_DS := TABLE(AttributeWeight_DS, {seq, RD_CATEGORY, SumOfWeights := SUM(GROUP, AttributeWeight)}, seq, RD_CATEGORY);
+   TABLE_DS := (TABLE(AttributeWeight_DS, {seq, RD_CATEGORY, SumOfWeights := SUM(GROUP, AttributeWeight)}, seq, RD_CATEGORY));
 
    SORTED_HI := SORT(GROUP(SORT(TABLE_DS, seq), seq), -SumOfWeights);
 

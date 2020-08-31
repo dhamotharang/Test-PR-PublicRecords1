@@ -1,5 +1,6 @@
-﻿IMPORT $.^.Risk_Indicators, $.^.PublicRecords_KEL;
-IMPORT KEL11 AS KEL;
+﻿// IMPORT $.^.Risk_Indicators, $.^.PublicRecords_KEL;
+IMPORT Risk_Indicators, PublicRecords_KEL, STD;
+IMPORT KEL13 AS KEL;
 
 EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII) InputData,
 			DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) RepInput,
@@ -11,14 +12,67 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 	RecordsWithSeleID := InputData(B_LexIDLegal > 0);
 	RecordsWithoutSeleID := InputData(B_LexIDLegal <= 0);
 	
-	BusinessSeleIDAttributesRaw := KEL.Clean(PublicRecords_KEL.Library.LIB_NonFCRA_BusinessSeleAttributes_Function(RecordsWithSeleID, RepInput, FDCDataset, Options), TRUE, TRUE, TRUE);
+LayoutBIIAndPII := RECORD
+		PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII InputData;
+		DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) RepInput;
+	END;
+	
+	LayoutBusinessSeleIDAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1(
+																	0, // UltID
+																	0, // OrgID
+																	0, // SeleID
+																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 
+																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII), 
+																	0, // ArchiveDate
+																	PublicRecords_KEL.CFG_Compile.Permit__NONE).res0); //DPM	
+																	
+	BusinessSeleAttributesInput := DENORMALIZE(RecordsWithSeleID, RepInput, 
+		LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,  GROUP,
+		TRANSFORM(LayoutBIIAndPII, 
+			SELF.RepInput := ROWS(RIGHT),
+			SELF.InputData := LEFT));
+					
+	BusinessSeleAttributes_Results := PROJECT(BusinessSeleAttributesInput, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes},
+		SELF.G_ProcBusUID := LEFT.InputData.G_ProcBusUID;
+		NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1(
+				LEFT.InputData.B_LexIDUlt,
+				LEFT.InputData.B_LexIDOrg,
+				LEFT.InputData.B_LexIDLegal,
+				LEFT.RepInput,
+				DATASET(LEFT.InputData),
+				(INTEGER)LEFT.InputData.B_InpClnArchDt[1..8],
+				Options.KEL_Permissions_Mask, 
+				FDCDataset).res0;
+		SELF := NonFCRABusinessSeleIDResults[1]));
 
-	BusinessSeleIDNoDatesAttributesRaw := KEL.Clean(PublicRecords_KEL.Library.LIB_NonFCRA_BusinessSeleAttributes_NoDates_Function(RecordsWithSeleID, FDCDataset, Options), TRUE, TRUE, TRUE);
+
+	BusinessSeleIDAttributesRaw := KEL.Clean(BusinessSeleAttributes_Results, true, true, true);
+
+	LayoutBusinessSeleIDNoDatesAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1(
+																	0, // UltID
+																	0, // OrgID
+																	0, // SeleID
+																	0, // ArchiveDate
+																	PublicRecords_KEL.CFG_Compile.Permit__NONE).res0); //DPM	
+
+	BusinessSeleAttributes_NoDates_Results := IF(Options.OutputMasterResults,
+		PROJECT(InputData, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDNoDatesAttributes},
+			SELF.G_ProcBusUID := LEFT.G_ProcBusUID;
+			NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1(
+				LEFT.B_LexIDUlt,
+				LEFT.B_LexIDOrg,
+				LEFT.B_LexIDLegal, 				
+				STD.Date.Today(), 
+				Options.KEL_Permissions_Mask, 				
+				FDCDataset).res0;
+			SELF := NonFCRABusinessSeleIDResults[1])),
+		DATASET([],{INTEGER G_ProcBusUID, LayoutBusinessSeleIDNoDatesAttributes}));
+	
+	BusinessSeleIDNoDatesAttributesRaw := KEL.Clean(BusinessSeleAttributes_NoDates_Results, TRUE, TRUE, TRUE);
 	
 	BusinessAttributesWithSeleID := JOIN(RecordsWithSeleID, BusinessSeleIDAttributesRaw, LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID, 
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutBusinessSeleID,
 			ResultsFound := RIGHT.B_LexIDLegal > 0 AND RIGHT.B_LexIDLegalSeenFlag = '1';
-			SELF.G_BuildBusHdrDt := Risk_Indicators.get_build_date('bip_build_version');
 			SELF.B_LexIDLegalSeenFlag := IF(ResultsFound, RIGHT.B_LexIDLegalSeenFlag, '0');
 			SELF.BE_VerSrcListEv := IF(ResultsFound, RIGHT.BE_VerSrcListEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			SELF.BE_VerSrcCntEv := IF(ResultsFound, RIGHT.BE_VerSrcCntEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
@@ -74,7 +128,6 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			SELF.BE_VerPhoneSrcOldMsncEv := IF(ResultsFound, RIGHT.BE_VerPhoneSrcOldMsncEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_VerPhoneSrcNewMsncEv := IF(ResultsFound, RIGHT.BE_VerPhoneSrcNewMsncEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			//Tradeline Attributes		
-			SELF.G_BuildB2BDt := Risk_Indicators.get_Build_date('cortera_build_version');
 			SELF.BE_B2BCntEv := IF(ResultsFound, RIGHT.BE_B2BCntEv,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_B2BCnt2Y := IF(ResultsFound, RIGHT.BE_B2BCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_B2BCarrCnt2Y := IF(ResultsFound, RIGHT.BE_B2BCarrCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
@@ -293,7 +346,6 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			SELF.BE_DrgBkCh13Cnt10Y := IF(ResultsFound, RIGHT.BE_DrgBkCh13Cnt10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_DrgBkNewChType10Y := IF(ResultsFound, RIGHT.BE_DrgBkNewChType10Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			//Sos Build Date//			
-			SELF.G_BuildSOSDt := Risk_Indicators.get_build_date('Corp_build_version');
 			SELF.BE_SOSCntEv := IF(ResultsFound, RIGHT.BE_SOSCntEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_SOSNewDtEv := IF(ResultsFound, RIGHT.BE_SOSNewDtEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			SELF.BE_SOSOldDtEv := IF(ResultsFound, RIGHT.BE_SOSOldDtEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
@@ -322,7 +374,6 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			SELF.BE_BestTIN := IF(ResultsFound, RIGHT.BE_BestTIN, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			SELF.BE_BestPhone := IF(ResultsFound, RIGHT.BE_BestPhone, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			//LeinJudgment Build Date//			
-			SELF.G_BuildDrgLnJDt := Risk_Indicators.get_build_date('liens_build_version');
 			SELF.BE_DrgGovDebarredFlagEv := IF(ResultsFound, RIGHT.BE_DrgGovDebarredFlagEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			SELF.BE_DrgLTDCnt1Y := IF(ResultsFound, RIGHT.BE_DrgLTDCnt1Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_DrgLTDCnt7Y := IF(ResultsFound, RIGHT.BE_DrgLTDCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
@@ -333,7 +384,6 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			SELF.BE_DrgLTDNewMsnc7Y := IF(ResultsFound, RIGHT.BE_DrgLTDNewMsnc7Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_DrgLTDOldMsnc7Y := IF(ResultsFound, RIGHT.BE_DrgLTDOldMsnc7Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT)	;	
 					//UCC Attributes
-			SELF.G_BuildUCCDt := Risk_Indicators.get_build_date('ucc_build_version');
 			SELF.BE_UCCCntEv := IF(ResultsFound, RIGHT.BE_UCCCntEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_UCCDebtorCntEv := IF(ResultsFound, RIGHT.BE_UCCDebtorCntEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			SELF.BE_UCCDebtorOldDtEv := IF(ResultsFound, RIGHT.BE_UCCDebtorOldDtEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
@@ -554,22 +604,13 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			SELF.BE_BestAddrBldgType := IF(ResultsFound, (STRING)RIGHT.BE_BestAddrBldgType, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			SELF.BE_BestAddrIsPOBoxFlag := IF(ResultsFound, (STRING)RIGHT.BE_BestAddrIsPOBoxFlag, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			SELF.BE_BestAddrIsVacantFlag := IF(ResultsFound, (STRING)RIGHT.BE_BestAddrIsVacantFlag, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			
-			//4823
-			// SELF.BE_BestAddrIsOwnedFlag := IF(ResultsFound, (STRING)RIGHT.BE_BestAddrIsOwnedFlag, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			// SELF.BE_BestAddrNewMktValEv := IF(ResultsFound, (INTEGER)RIGHT.BE_BestAddrNewMktValEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
-			// SELF.BE_BestAddrNewTaxValEv := IF(ResultsFound, (INTEGER)RIGHT.BE_BestAddrNewTaxValEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
-			// SELF.BE_BestAddrNewMktValYrEv := IF(ResultsFound, (STRING)RIGHT.BE_BestAddrNewMktValYrEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			// SELF.BE_BestAddrNewTaxValYrEv := IF(ResultsFound, (STRING)RIGHT.BE_BestAddrNewTaxValYrEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			// SELF.BE_BestAddrLotSize := IF(ResultsFound, (INTEGER)RIGHT.BE_BestAddrLotSize, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
-			// SELF.BE_BestAddrBldgSize := IF(ResultsFound, (INTEGER)RIGHT.BE_BestAddrBldgSize, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);			
-			SELF.BE_BestAddrIsOwnedFlag := '0';
-			SELF.BE_BestAddrNewMktValEv := 0;
-			SELF.BE_BestAddrNewTaxValEv := 0;
-			SELF.BE_BestAddrNewMktValYrEv := '0';
-			SELF.BE_BestAddrNewTaxValYrEv := '0';
-			SELF.BE_BestAddrLotSize := 0;
-			SELF.BE_BestAddrBldgSize := 0;
+			SELF.BE_BestAddrIsOwnedFlag := IF(ResultsFound, (STRING)RIGHT.BE_BestAddrIsOwnedFlag, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			SELF.BE_BestAddrNewMktValEv := IF(ResultsFound, (INTEGER)RIGHT.BE_BestAddrNewMktValEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_BestAddrNewTaxValEv := IF(ResultsFound, (INTEGER)RIGHT.BE_BestAddrNewTaxValEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_BestAddrNewMktValYrEv := IF(ResultsFound, (STRING)RIGHT.BE_BestAddrNewMktValYrEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			SELF.BE_BestAddrNewTaxValYrEv := IF(ResultsFound, (STRING)RIGHT.BE_BestAddrNewTaxValYrEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			SELF.BE_BestAddrLotSize := IF(ResultsFound, (INTEGER)RIGHT.BE_BestAddrLotSize, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.BE_BestAddrBldgSize := IF(ResultsFound, (INTEGER)RIGHT.BE_BestAddrBldgSize, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
 			
 			SELF := LEFT,
 			SELF := [];
@@ -589,7 +630,6 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 	BusinessAttributesWithoutSeleID := PROJECT(RecordsWithoutSeleID,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutBusinessSeleID,
 			// Attributes from NonFCRABusinessSeleIDAttributesV1 KEL query
-			SELF.G_BuildBusHdrDt := Risk_Indicators.get_build_date('bip_build_version');
 			SELF.B_LexIDLegalSeenFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.BE_VerSrcListEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.BE_VerSrcCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
@@ -645,7 +685,6 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			SELF.BE_VerPhoneSrcOldMsncEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_VerPhoneSrcNewMsncEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			//Tradeline Attributes No ID
-			SELF.G_BuildB2BDt := Risk_Indicators.get_Build_date('cortera_build_version');
 			SELF.BE_B2BCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_B2BCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_B2BCarrCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
@@ -864,7 +903,6 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			SELF.BE_DrgBkCh13Cnt10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_DrgBkNewChType10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			//SOS Build Date//			
-			SELF.G_BuildSOSDt := Risk_Indicators.get_build_date('Corp_build_version');
 			SELF.BE_SOSCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_SOSNewDtEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.BE_SOSOldDtEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
@@ -893,7 +931,6 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			SELF.BE_BestTIN := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.BE_BestPhone := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			//LeinJudgment Build Date//			
-			SELF.G_BuildDrgLnJDt := Risk_Indicators.get_build_date('liens_build_version');
 			SELF.BE_DrgGovDebarredFlagEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.BE_DrgLTDCnt1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_DrgLTDCnt7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
@@ -904,7 +941,6 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			SELF.BE_DrgLTDNewMsnc7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_DrgLTDOldMsnc7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			//UCC Attributes	
-			SELF.G_BuildUCCDt := Risk_Indicators.get_build_date('ucc_build_version');
 			SELF.BE_UCCCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_UCCDebtorCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_UCCDebtorOldDtEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
@@ -1127,8 +1163,6 @@ EXPORT FnRoxie_GetBusinessSeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functio
 			SELF.BE_BestAddrBldgType := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.BE_BestAddrIsPOBoxFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.BE_BestAddrIsVacantFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
-			
-			//4823
 			SELF.BE_BestAddrIsOwnedFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.BE_BestAddrNewMktValEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_BestAddrNewTaxValEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT; 

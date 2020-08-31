@@ -16,6 +16,8 @@
 	<part name="IsMarketing" type="xsd:boolean"/>
 	<part name="AllowedSources" type="xsd:string"/>
 	<part name="IndustryClass" type="xsd:string"/>
+	<part name="AllowedSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
+	<part name="ExcludeSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
 	<part name="LexIdSourceOptout" type="xsd:integer"/>
 	<part name="_TransactionId" type="xsd:string"/>
 	<part name="_BatchUID" type="xsd:string"/>
@@ -45,8 +47,11 @@ EXPORT MAS_Business_nonFCRA_Service() := MACRO
         'DPPAPurpose',
         'IndustryClass',
         'IsMarketing',
+        'IncludeMinors',
         'AllowedSources',
         'OverrideExperianRestriction',
+				'AllowedSourcesDataset',
+				'ExcludeSourcesDataset',
         'LexIdSourceOptout',
         '_TransactionId',
         '_BatchUID',
@@ -77,8 +82,11 @@ STRING100 Default_Data_Restriction_Mask := '';
 	BOOLEAN BIPAppend_Include_AuthRep := FALSE : STORED('BIPAppendIncludeAuthRep');
 	BOOLEAN BIPAppend_No_ReAppend := FALSE : STORED('BIPAppendNoReAppend');
 	BOOLEAN Is_Marketing := FALSE : STORED('IsMarketing');
+	BOOLEAN Include_Minors := TRUE : STORED('IncludeMinors');
 	BOOLEAN OverrideExperianRestriction := FALSE : STORED('OverrideExperianRestriction');
 	STRING100 AllowedSources := '' : STORED('AllowedSources');
+	AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) : STORED('AllowedSourcesDataset');
+	ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) : STORED('ExcludeSourcesDataset');
 	STRING5 Industry_Class := Default_Industry_Class : STORED('IndustryClass');
 	//CCPA fields
 	UNSIGNED1 _LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
@@ -96,8 +104,12 @@ STRING100 Default_Data_Restriction_Mask := '';
 		SELF.url := le.url; 
 		SELF := le;
 	END;
-
-	DATASET(Gateway.Layouts.Config) GatewaysClean := PROJECT(gateways_in, gw_switch(LEFT));
+	DATASET(Gateway.Layouts.Config) GatewaysClean := PROJECT(gateways_in, gw_switch(LEFT));	
+	
+	// If allowed sources aren't passed in, use default list of allowed sources
+	SetAllowedSources := IF(COUNT(AllowedSourcesDataset) = 0, PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA, AllowedSourcesDataset);
+	// If a source is on the Exclude list, remove it from the allowed sources list. 
+	FinalAllowedSources := JOIN(SetAllowedSources, ExcludeSourcesDataset, LEFT=RIGHT, TRANSFORM(RECORDOF(LEFT), SELF := LEFT), LEFT ONLY);
 	
 	Options := MODULE(PublicRecords_KEL.Interface_Options)
 		EXPORT INTEGER ScoreThreshold := Score_threshold;
@@ -109,9 +121,12 @@ STRING100 Default_Data_Restriction_Mask := '';
 		EXPORT BOOLEAN ExcludeConsumerAttributes := Exclude_Consumer_Attributes;
 		EXPORT BOOLEAN OutputMasterResults := Output_Master_Results;
 		EXPORT BOOLEAN isMarketing := Is_Marketing; // When TRUE enables Marketing Restrictions
+		EXPORT BOOLEAN IncludeMinors := Include_Minors; // When TRUE enables Marketing Restrictions
 		EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
 		EXPORT STRING100 Allowed_Sources := AllowedSources;
-		EXPORT UNSIGNED8 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
+		EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := FinalAllowedSources;
+
+		EXPORT DATA57 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 			DataRestrictionMask, 
 			DataPermissionMask, 
 			GLBA, 
@@ -120,12 +135,15 @@ STRING100 Default_Data_Restriction_Mask := '';
 			Is_Marketing, 
 			Allow_DNBDMI, 
 			OverrideExperianRestriction,
-			'', /* PermissiblePurpose - For FCRA Products Only */
+			'', /* IntendedPurpose - For FCRA Products Only */
 			Industry_Class,
-			PublicRecords_KEL.CFG_Compile);
+			PublicRecords_KEL.CFG_Compile,
+			FALSE, /*IsInsuranceProduct*/
+			FinalAllowedSources);
 		
 		// BIP Append Options
-		EXPORT UNSIGNED BIPAppendScoreThreshold := IF(BIPAppend_Score_Threshold = 0, 75, MIN(MAX(51,BIPAppend_Score_Threshold), 100)); // Score threshold must be between 51 and 100 -- default is 75.
+		EXPORT UNSIGNED BIPAppendScoreThreshold := MAP(BIPAppend_No_ReAppend => 0, 
+														BIPAppend_Score_Threshold = 0 => 75, MIN(MAX(51,BIPAppend_Score_Threshold), 100)); // Score threshold must be between 51 and 100 -- default is 75.
 		EXPORT UNSIGNED BIPAppendWeightThreshold := BIPAppend_Weight_Threshold;
 		EXPORT BOOLEAN BIPAppendPrimForce := BIPAppend_PrimForce;
 		EXPORT BOOLEAN BIPAppendReAppend := NOT BIPAppend_No_ReAppend;
@@ -135,13 +153,50 @@ STRING100 Default_Data_Restriction_Mask := '';
 		EXPORT STRING100 TransactionID := _TransactionId;
 		EXPORT STRING100 BatchUID := _BatchUID;
 		EXPORT UNSIGNED6 GlobalCompanyId := _GCID;
-		
 		EXPORT DATASET(Gateway.Layouts.Config) Gateways := GatewaysClean;
-		
+		// The inquiry delta base which feeds the 1 day inq attrs is not needed for the input rep 1 at this point. for now we only run this delta base code in the nonFCRA service 
+
 		// Override Include* Entity/Association options here if certain entities can be turned off to speed up processing.
 		// This will bypass uneccesary key JOINS in PublicRecords_KEL.Fn_MAS_FCRA_FDC if the keys don't contribute to any 
 		// ENTITIES/ASSOCIATIONS being used by the query.
-		
+		EXPORT BOOLEAN IncludeAccident := TRUE;
+		EXPORT BOOLEAN IncludeAddress := TRUE;
+		EXPORT BOOLEAN IncludeAddressSummary := TRUE;
+		EXPORT BOOLEAN IncludeAircraft := TRUE;
+		EXPORT BOOLEAN IncludeBankruptcy := TRUE;
+		EXPORT BOOLEAN IncludeBusinessSele := TRUE;
+		EXPORT BOOLEAN IncludeBusinessProx := TRUE;
+		EXPORT BOOLEAN IncludeCriminalOffender := TRUE;
+		EXPORT BOOLEAN IncludeCriminalOffense := TRUE;
+		EXPORT BOOLEAN IncludeCriminalPunishment := TRUE;
+		EXPORT BOOLEAN IncludeDriversLicense := TRUE;
+		EXPORT BOOLEAN IncludeEducation := TRUE;
+		EXPORT BOOLEAN IncludeEBRTradeline := TRUE;
+		EXPORT BOOLEAN IncludeEmail := TRUE;
+		EXPORT BOOLEAN IncludeEmployment := TRUE;
+		EXPORT BOOLEAN IncludeGeolink := TRUE;
+		EXPORT BOOLEAN IncludeHousehold := TRUE;
+		EXPORT BOOLEAN IncludeInquiry := TRUE;
+		EXPORT BOOLEAN IncludeLienJudgment := TRUE;
+		EXPORT BOOLEAN IncludeNameSummary := TRUE;
+		EXPORT BOOLEAN IncludePerson := TRUE;
+		EXPORT BOOLEAN IncludePhone := TRUE;
+		EXPORT BOOLEAN IncludeProfessionalLicense := TRUE;
+		EXPORT BOOLEAN IncludeProperty := TRUE;
+		EXPORT BOOLEAN IncludePropertyEvent := TRUE;
+		EXPORT BOOLEAN IncludeSocialSecurityNumber := TRUE;
+		EXPORT BOOLEAN IncludeSSNSummary := TRUE;
+		EXPORT BOOLEAN IncludeSurname := TRUE;
+		EXPORT BOOLEAN IncludeTIN := TRUE;
+		EXPORT BOOLEAN IncludeTradeline := TRUE;
+		EXPORT BOOLEAN IncludeUtility := TRUE;
+		EXPORT BOOLEAN IncludeVehicle := TRUE;
+		EXPORT BOOLEAN IncludeWatercraft := TRUE;
+		EXPORT BOOLEAN IncludeZipCode := TRUE;
+		EXPORT BOOLEAN IncludeUCC := TRUE;
+		EXPORT BOOLEAN IncludeMini := TRUE;
+		EXPORT BOOLEAN IncludeOverrides := FALSE;
+
 	END;	
 	
   ResultSet := PublicRecords_KEL.FnRoxie_GetBusAttrs(ds_input, Options);		

@@ -1,5 +1,5 @@
-﻿IMPORT PublicRecords_KEL;
-
+﻿IMPORT PublicRecords_KEL, Risk_Indicators;
+ 
 // NOTE: These are meant to be turned on or off at compile time (NOT run-time)
 // for the sake of optimizing joins for a particular product.
 //
@@ -11,6 +11,7 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 	// ---------------[ Consumer ]---------------
 
 	EXPORT DoFDCJoin_Doxie__Key_Header := 
+			Options.IncludeMini OR
 			Options.IncludePerson OR 
 			Options.IncludePersonAddress OR 
 			Options.IncludePersonPhone OR 
@@ -18,19 +19,11 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 			Options.IncludeSocialSecurityNumber OR 
 			Options.IncludeSSNAddress OR
 			Options.IncludeSSNPhone;
-	
-	EXPORT DoFDCJoin_Header_Quick__Key_Did := 
-			Options.IncludePerson OR 
-			Options.IncludePersonAddress OR 
-			Options.IncludePersonPhone OR
-			Options.IncludePersonSSN OR 
-			Options.IncludeSocialSecurityNumber OR 
-			Options.IncludeSSNAddress OR
-			Options.IncludeSSNPhone;
-			
+				
 	EXPORT DoFDCJoin_Dx_Header__key_wild_SSN := 
-			NOT Options.isFCRA AND			
-			(Options.IncludePersonSSN OR 
+			NOT Options.isFCRA AND
+			(Options.IncludeMini OR
+			Options.IncludePersonSSN OR 
 			Options.IncludeSocialSecurityNumber OR 
 			Options.IncludeSSNAddress OR
 			Options.IncludeSSNPhone);
@@ -154,9 +147,6 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 	EXPORT DoFDCJoin_Prof_License_Mari__Key_Did :=
 		(Options.IncludeProfessionalLicense OR
 		 Options.IncludeProfessionalLicensePerson );
-		
-	EXPORT DoFDCJoin_ADVO__Key_Addr1 := 
-		Options.IncludeAddress;
 
 	EXPORT DoFDCJoin_ADVO__Key_Addr1_History := 
 		Options.IncludeAddress;
@@ -167,7 +157,8 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 
 	EXPORT DoFDCJoin_Fraudpoint3__Key_Address := 
 		NOT Options.IsFCRA AND 
-		(Options.IncludeAddress);
+		(Options.IncludeAddress OR
+		Options.IncludePersonAddress);
 
 	EXPORT DoFDCJoin_Fraudpoint3__Key_SSN := 
 		NOT Options.IsFCRA AND 
@@ -180,29 +171,6 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 		Options.IncludePersonAddress OR
 		Options.IncludeZipCodePerson;
 
-	EXPORT DoFDCJoin_Inquiry_AccLogs__Key_DID := 
-		Options.IsFCRA AND
-		(Options.IncludeInquiry OR
-		 Options.IncludePerson OR
-		 Options.IncludePersonInquiry OR
-		 Options.IncludeAddressInquiry OR
-		 Options.IncludeSSNInquiry OR
-		 Options.IncludePhoneInquiry OR
-		 Options.IncludeDriversLicenseInquiry OR
-		 Options.IncludePersonSSN OR
-		 Options.IncludeSSNAddress);
-
-	EXPORT DoFDCJoin_Inquiry_AccLogs__Key_SSN := 
-		Options.IsFCRA AND
-		(Options.IncludeSSNAddress);
-
-	EXPORT DoFDCJoin_Inquiry_AccLogs__Inquiry_Table_SSN := 
-		NOT Options.IsFCRA AND
-		(Options.IncludeSSNAddress);
-
-	EXPORT DoFDCJoin_Inquiry_AccLogs__Inquiry_Table_Update_SSN := 
-		NOT Options.IsFCRA AND
-		(Options.IncludeSSNAddress);
 
 	EXPORT DoFDCJoin_USPIS_HotList__key_addr_search_zip :=
 		NOT Options.IsFCRA AND   
@@ -266,6 +234,10 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 		 Options.IncludePerson OR
 		 Options.IncludePersonDriversLicense);
 
+	EXPORT DoFDCJoin_Certegy__Key_Certegy_DID := 
+		NOT Options.IsFCRA AND 
+		Options.IncludePersonDriversLicense;
+		
 	EXPORT DoFDCJoin_Doxie__Key_Header_Address := 
 		 Options.IncludeAddress OR
 		 Options.IncludeSSNAddress OR
@@ -280,7 +252,13 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 	EXPORT DoFDCJoin_AlloyMedia_student_list__key_DID := 
 			(Options.IncludeEducation OR
 			Options.IncludePersonEducation);
-			
+/*-----------------------AddressSummary-----------------------*/
+	EXPORT DoFDCJoin_Risk_Indicators__Correlation_Risk__key_addr_dob_summary :=
+		 NOT Options.IsFCRA
+		 AND Options.IncludeAddressSummary;
+	EXPORT DoFDCJoin_Risk_Indicators__Correlation_Risk__key_addr_name_summary :=
+		 NOT Options.IsFCRA
+		 AND Options.IncludeAddressSummary;
 /*-----------------------Surname-----------------------*/
 
 EXPORT DoFDCJoin_dx_CFPB__key_Census_Surnames := 
@@ -358,8 +336,14 @@ EXPORT DoFDCJoin_dx_CFPB__key_Census_Surnames :=
 
 	EXPORT DoFDCJoin_Relatives__Key_Relatives_v3 := 
 		NOT Options.isFCRA AND	
+		NOT Options.isMarketing AND
 		(Options.IncludeFirstDegreeAssociations);
-		 
+
+	EXPORT DoFDCJoin_Marketing_Relatives__Key_Relatives_v3 := 
+		NOT Options.isFCRA AND	
+		(Options.isMarketing AND
+		Options.IncludeFirstDegreeAssociations);	
+	
 	EXPORT DoFDCJoin_BBB2__kfetch_BBB_LinkIds :=
 		NOT Options.isFCRA AND
 		Options.IncludeBusinessSele;				
@@ -448,7 +432,23 @@ EXPORT DoFDCJoin_dx_CFPB__key_Census_Surnames :=
 		 Options.IncludeProxPerson OR
 		 Options.IncludeSelePerson OR
 		 Options.IncludeSeleEmail OR
-		 Options.IncludeProxEmail);			 
+		 Options.IncludeProxEmail);			
+		 
+	EXPORT DoFDCJoin_EBR__Key_0010_Header_linkids :=
+		NOT Options.isFCRA AND
+	  Options.IncludeSeleEBRTradeline;			 
+
+	EXPORT DoFDCJoin_EBR__Key_2015_Trade_Payment_Totals_FILE_NUMBER :=
+		NOT Options.isFCRA AND
+	  Options.IncludeEBRTradeline;	
+		 
+	EXPORT DoFDCJoin_Experian_CRDB__Key_LinkIDs :=
+		NOT Options.isFCRA AND
+	  Options.IncludeBusinessSele;	
+		 
+	EXPORT DoFDCJoin_dx_DataBridge__Key_LinkIds :=
+		NOT Options.isFCRA AND
+	  Options.IncludeBusinessSele;			 	 
 		 
  	EXPORT DoFDCJoin_BIPV2_Best__Key_LinkIds := 
 		NOT Options.isFCRA AND
@@ -579,19 +579,30 @@ EXPORT DoFDCJoin_dx_CFPB__key_Census_Surnames :=
 			 
 	EXPORT DoFDCJoin_Best_Person__Key_Watchdog :=
 			NOT Options.isFCRA AND
-			(Options.IncludePerson OR
+			(Options.IncludeMini OR
+			Options.IncludePerson OR
 			 Options.IncludePersonSSN OR 
 			 Options.IncludePersonPhone);
 	
+	
+	//DataRestrictionMask[Risk_Indicators.iid_constants.posEquifaxRestriction] != '1'
+	// If Equifax Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL			
 	EXPORT DoFDCJoin_Best_Person__Key_Watchdog_FCRA_nonEN :=
 			Options.isFCRA AND
-			(Options.IncludePerson OR
+			Options.Data_Restriction_Mask[Risk_Indicators.iid_constants.posEquifaxRestriction] <> '1' AND //lets not put more ssns through the inq keys than we need too
+			(Options.IncludeMini OR
+			Options.IncludePerson OR
 			 Options.IncludePersonSSN OR 
 			 Options.IncludePersonPhone);
 			 
+
+	//DataRestrictionMask[Risk_Indicators.iid_constants.posEquifaxRestriction] != '1'
+	// If Equifax Source is NOT restricted in the DataRestrictionMask, allow its usage in KEL						 
 	EXPORT DoFDCJoin_Best_Person__Key_Watchdog_FCRA_nonEQ :=
 			Options.isFCRA AND
-			(Options.IncludePerson OR
+			Options.Data_Restriction_Mask[Risk_Indicators.iid_constants.posEquifaxRestriction] = '1' AND //lets not put more ssns through the inq keys than we need too
+			(Options.IncludeMini OR
+			Options.IncludePerson OR
 			 Options.IncludePersonSSN OR 
 			 Options.IncludePersonPhone);
 			 
@@ -603,6 +614,117 @@ EXPORT DoFDCJoin_dx_CFPB__key_Census_Surnames :=
 			 
 			 
 	EXPORT DoFDCJoin_dx_CFPB__key_BLKGRP :=
-			Options.IncludeGeolink;			 
+			Options.IncludeGeolink;		
+			
+	EXPORT DoFDCJoin_fraudpoint3__Key_DID :=		
+			 NOT Options.isFCRA AND
+			(Options.IncludePerson OR
+			Options.IncludePersonAddress OR	
+			Options.IncludePersonSSN );	
+
+//MAS is only using the nonFCRA version of these keys right now, however the FCRA version was left in the FDC joins in case future changes are wanted.
+	EXPORT DoFDCJoin_eMerges__key_ccw_rid :=		
+			 NOT Options.isFCRA AND
+			Options.IncludePerson;	
+			
+//MAS is only using the nonFCRA version of these keys right now, however the FCRA version was left in the FDC joins in case future changes are wanted.		
+	EXPORT DoFDCJoin_eMerges__Key_HuntFish_Rid :=		
+			 NOT Options.isFCRA AND
+			Options.IncludePerson;				
+		
+	EXPORT DoFDCJoin_Thrive__Key_did_QA :=		
+			 Options.IncludePerson;				
 			 
+//inquiries
+	EXPORT DoFDCJoin_Inquiry_AccLogs__Key_DID_FCRA := 
+		Options.IsFCRA AND
+		(Options.IncludeInquiry OR
+		 Options.IncludePersonInquiry);
+
+	EXPORT DoFDCJoin_Inquiry_AccLogs__Key_Address_FCRA := 
+		Options.IsFCRA AND
+		(Options.IncludeInquiry OR
+		 Options.IncludeAddressInquiry);
+
+	EXPORT DoFDCJoin_Inquiry_AccLogs__Key_SSN_FCRA := 
+		Options.IsFCRA AND
+		(Options.IncludeInquiry OR
+		 Options.IncludeSSNInquiry);
+		
+	EXPORT DoFDCJoin_Inquiry_AccLogs__Key_Phone_FCRA := 
+		Options.IsFCRA AND
+		(Options.IncludeInquiry OR
+		 Options.IncludePhoneInquiry);
+		 
+	EXPORT DoFDCJoin_Inquiry_AccLogs__Inquiry_Table_SSN := 
+		NOT Options.IsFCRA AND
+		(Options.IncludeInquiry OR
+		Options.IncludeSSNInquiry);
+
+	EXPORT DoFDCJoin_Inquiry_AccLogs__Inquiry_Table_Address := 
+		NOT Options.IsFCRA AND
+		(Options.IncludeInquiry OR
+		Options.IncludeAddressInquiry);
+		
+	EXPORT DoFDCJoin_Inquiry_AccLogs__Inquiry_Table_DID := 
+		NOT Options.IsFCRA AND
+		(Options.IncludeInquiry OR
+		Options.IncludePersonInquiry);
+		
+	EXPORT DoFDCJoin_Inquiry_AccLogs__Inquiry_Table_EMAIL := 
+		NOT Options.IsFCRA AND
+		(Options.IncludeInquiry OR
+		Options.IncludeEMAILInquiry);
+	
+	EXPORT DoFDCJoin_Inquiry_AccLogs__Inquiry_Table_FEIN := 
+		NOT Options.IsFCRA AND
+		(Options.IncludeInquiry OR
+		Options.IncludeTINInquiry);
+		
+	EXPORT DoFDCJoin_Inquiry_AccLogs__Inquiry_Table_LinkIDs := 
+		NOT Options.IsFCRA AND
+		(Options.IncludeInquiry OR
+		Options.IncludeSeleInquiry);
+		
+	EXPORT DoFDCJoin_Inquiry_AccLogs__Inquiry_Table_Phone := 
+		NOT Options.IsFCRA AND
+		(Options.IncludeInquiry OR
+		Options.IncludePhoneInquiry);	
+		
+	EXPORT DoFDCJoin_Inquiry_AccLogs__Inquiry_DeltaBase := 
+		NOT Options.IsFCRA AND
+		(Options.IncludeInquiry OR
+		Options.IncludePhoneInquiry OR
+		Options.IncludeEMAILInquiry OR
+		Options.IncludePersonInquiry OR
+		Options.IncludeAddressInquiry OR
+		Options.IncludeSSNInquiry);
+	
+    EXPORT DoFDCJoin_RiskTable__Key_Name_Dob_Summary :=
+        NOT Options.isFCRA AND
+        Options.IncludeNameSummary;
+            
+    EXPORT DoFDCJoin_RiskTable__Key_Phone_Summary :=
+        NOT Options.isFCRA AND
+        Options.IncludePhoneSummary;
+		
+			/*-----------------------SSN Summary-----------------------*/
+	EXPORT DoFDCJoin_Risk_Indicators__Key_SSN_Addr_Summary :=
+		 NOT Options.IsFCRA
+		 AND Options.IncludeSSNSummary;
+	
+	EXPORT DoFDCJoin_Risk_Indicators__Key_SSN_DOB_Summary :=
+		 NOT Options.IsFCRA
+		 AND Options.IncludeSSNSummary;
+	
+	EXPORT DoFDCJoin_Risk_Indicators__Key_SSN_Name_Summary :=
+		 NOT Options.IsFCRA
+		 AND Options.IncludeSSNSummary;
+	
+	EXPORT DoFDCJoin_Risk_Indicators__Key_SSN_Phone_Summary :=
+		 NOT Options.IsFCRA
+		 AND Options.IncludeSSNSummary;
+
+	EXPORT DoFDCJoin_Overrides := 
+		 Options.IncludeOverrides;
 END;

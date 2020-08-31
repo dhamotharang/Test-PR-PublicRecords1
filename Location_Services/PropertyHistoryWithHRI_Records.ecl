@@ -1,4 +1,4 @@
-IMPORT Autokey_batch, doxie, iesp, LN_PropertyV2, ut, STD;
+﻿IMPORT Autokey_batch, doxie, iesp, LN_PropertyV2, ut, STD;
 
 lPropHistCollusion := Location_Services.Layouts;
 
@@ -179,6 +179,7 @@ FUNCTION
 																														TRANSFORM(iesp.share.t_RiskIndicator,
 																																			SELF.RiskCode := LEFT.hri,SELF.Description := LEFT.desc)),
 																										iesp.Constants.PropertyHistoryPlusReport.MaxCountHRI);
+   SELF := [];																										
 		END;
 		
 		// Current residents

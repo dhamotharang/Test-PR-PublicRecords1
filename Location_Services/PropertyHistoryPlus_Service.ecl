@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="PropertyHistoryPlus_Service">
 	<part name="APN"                 type="xsd:string"/>
 	<part name="Addr"                type="xsd:string"/>
@@ -34,6 +34,7 @@ MACRO
 	// Global module
 	globalMod := AutoStandardI.GlobalModule();
 	searchMod := PROJECT(globalMod,AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full,OPT);
+	boolean includeAssignmentsAndReleases := mcRequest.Options.IncludeAssignmentsAndReleases;
 	
 	reportParams := MODULE(Location_Services.iParam.PropHistHRI)
 		EXPORT UNSIGNED1 GLBPurpose          := AutoStandardI.InterfaceTranslator.glb_purpose.val(searchMod);
@@ -83,7 +84,7 @@ MACRO
   // NB: in case APN is in the input search will go on by APN.
 	IF(trim(vAPN) = '' and (count(dUnitNumbersDedup) > 1), FAIL(310,doxie.ErrorCodes(310)));
 	
-	dResults := Location_Services.PropertyHistoryPlus_Records(dReqCleanAddr,reportParams,propHistPlusSearchBy);
+    dResults := Location_Services.PropertyHistoryPlus_Records(dReqCleanAddr,reportParams,propHistPlusSearchBy, includeAssignmentsAndReleases);
 	
 	OUTPUT(dResults,NAMED('Results'));
 ENDMACRO;

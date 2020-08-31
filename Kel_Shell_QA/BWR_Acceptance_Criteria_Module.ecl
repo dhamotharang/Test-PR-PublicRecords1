@@ -12,7 +12,7 @@ sample_size:=0;
 
 //***************************************************************************************************************************
 
-input_file:=dataset(logical_file_name,Base_Lay,CSV(HEADING(single), QUOTE('"')));
+input_file:=dataset(logical_file_name,Base_Lay,CSV(HEADING(8), QUOTE('"')));
 
 inut_file_records:= if(sample_size=0, choosen(input_file,all),choosen(input_file,sample_size) );
 
@@ -25,33 +25,45 @@ inut_file_records:= if(sample_size=0, choosen(input_file,all),choosen(input_file
  
  // step 2
  // run this action Attribute 
-parallel(Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Professional License'),
-		 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Assets'),
-		 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'B2B Trade'),
-		 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay, 'Criminal History'),
-		 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Bankruptcy History'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Input Validation'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Validation'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Asset Attributes'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Derog - Bankruptcy History'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Secretary of State'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Best BII'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Best PII'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Uniform Commercial Code'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Address History'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Judgments'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Derogs - Landlord Tenant Disputes'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Derogs - Overall History'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Derogs - Lien and Judgment History'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Input - Business Header Velocity'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Firmographics'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Best - Best Sources'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Best - Best Characteristics'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Associate'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Business Source Verification'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Education'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Suit Derogs - Lien and Judgment History'),
-				 Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Derogs - Landlord Tenant Dispute')
+parallel(Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Professional License'),
+		     Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Assets'),
+		     Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'B2B Trade'),
+		     Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay, 'Criminal History'),
+		     Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Bankruptcy History'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Business Input Validation'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Validation'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Business Asset Attributes'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Business Derog - Bankruptcy History'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Secretary of State'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Best BII'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Best PII'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Business Uniform Commercial Code'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Address History'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Business Judgments'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Business Derogs - Landlord Tenant Disputes'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Business Derogs - Overall History'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Business Derogs - Lien and Judgment History'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Business Input - Business Header Velocity'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Business Firmographics'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Business Best - Best Sources'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Business Best - Best Characteristics'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Business Associate'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Business Source Verification'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Email History'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Education'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Person Derogs - Lien and Judgment History'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Derogs - Lien and Judgment History'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Derogs - Landlord Tenant Dispute'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'PII Corroboration'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Property Ownership'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Property Sales'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Inquiry History'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Inquiry Velocity'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Utility'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Overall Derog History'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Input PII Characteristics'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Accidents'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Person - Business Property')
 				 );
 
 

@@ -1,11 +1,11 @@
-﻿IMPORT AutokeyB2_batch, BatchServices,LN_PropertyV2_Services,LN_PropertyV2,BatchShare,ut,Gateway,FFD, FCRA;
+﻿IMPORT AutokeyB2_batch, BatchServices,LN_PropertyV2_Services,LN_PropertyV2,BatchShare,ut,Gateway,FFD, FCRA, std;
 
 rec_batch_in_plus_date_filter := LN_PropertyV2_Services.layouts.batch_in_plus_date_filter;
 
 
 EXPORT Property_BatchCommon (boolean isFCRA, unsigned1 nss, boolean useCannedRecs,
 													   DATASET(LN_PropertyV2_Services.layouts.batch_in_plus_date_filter) ds_in,
-														 STRING BIPFetchLevel = 'S'):= FUNCTION
+														 STRING BIPFetchLevel = 'S', boolean includeAssignmentsAndReleases=false):= FUNCTION
 														 
 		#OPTION('optimizeProjects', TRUE);
 		// Constants.
@@ -89,8 +89,8 @@ EXPORT Property_BatchCommon (boolean isFCRA, unsigned1 nss, boolean useCannedRec
 
 		isCNSMR := batch_params.isConsumer();
 		p := BatchServices.Property_BatchService_Records(ds_batch_in, record_types, party_type, nSS, isFCRA, 
-																											BIPFetchLevel, slim_pc_recs, inFFDOptionsMask, ds_flags, isCNSMR);
-		 
+																											BIPFetchLevel, slim_pc_recs, inFFDOptionsMask, ds_flags, isCNSMR, includeAssignmentsAndReleases);
+
 		// obtain the match codes from the soap inputs.
 		boolean nameMatch_value :=    p.NameMatch_value;
 		boolean streetAddressMatch_value := p.StreetAddressMatch_value;
@@ -237,42 +237,41 @@ EXPORT Property_BatchCommon (boolean isFCRA, unsigned1 nss, boolean useCannedRec
 		// *** TODO: *** Add another matchcode type 'C' for 'Care Of'. Occurs where there is a buyer and/or a seller
 		// in a transaction of type 'deed'.		
 		//
-		UCase            := StringLib.StringToUpperCase;
 		apply_penalty_to := BatchServices.Functions.LN_Property.fn_apply_penalty;
 
 		BatchServices.Layouts.LN_Property.rec_input_and_matchcodes xfm_derive_matchcodes(ds_input_and_matchcodes l, 
 		                                                                                 BatchServices.Layouts.LN_Property.rec_widest_plus_acctnos_plus_matchcodes r)   :=
 			TRANSFORM
 				SELF.assess_prop_addr_match_code := 
-				      IF( EXISTS(r.parties(UCase(party_type_name) = 'PROPERTY')) AND
-									EXISTS(r.parties(UCase(party_type_name) = 'ASSESSEE')),
-									apply_penalty_to(l, r.parties(UCase(party_type_name) = 'PROPERTY')[1], isFCRA),
+				      IF( EXISTS(r.parties(std.str.ToUpperCase(party_type_name) = 'PROPERTY')) AND
+									EXISTS(r.parties(std.str.ToUpperCase(party_type_name) = 'ASSESSEE')),
+									apply_penalty_to(l, r.parties(std.str.ToUpperCase(party_type_name) = 'PROPERTY')[1], isFCRA),
 									OTHERWISE_DISPLAY_NO_PENALTY
 								 );
 				SELF.assess_mail_addr_match_code := 
-				      IF( EXISTS(r.parties(UCase(party_type_name) = 'ASSESSEE')),
-									apply_penalty_to(l, r.parties(UCase(party_type_name) = 'ASSESSEE')[1], isFCRA),
+				      IF( EXISTS(r.parties(std.str.ToUpperCase(party_type_name) = 'ASSESSEE')),
+									apply_penalty_to(l, r.parties(std.str.ToUpperCase(party_type_name) = 'ASSESSEE')[1], isFCRA),
 									OTHERWISE_DISPLAY_NO_PENALTY
 								 );
 				SELF.assess_ownr_addr_match_code := 
-				      IF( EXISTS(r.parties(UCase(party_type_name) = 'OWNER')),
-									apply_penalty_to(l, r.parties(UCase(party_type_name) = 'OWNER')[1], isFCRA),
+				      IF( EXISTS(r.parties(std.str.ToUpperCase(party_type_name) = 'OWNER')),
+									apply_penalty_to(l, r.parties(std.str.ToUpperCase(party_type_name) = 'OWNER')[1], isFCRA),
 									OTHERWISE_DISPLAY_NO_PENALTY
 								 );
 				SELF.deed_prop_addr_match_code   := 
-				      IF( EXISTS(r.parties(UCase(party_type_name) = 'PROPERTY')) AND NOT
-									EXISTS(r.parties(UCase(party_type_name) = 'ASSESSEE')),																								
-									apply_penalty_to(l, r.parties(UCase(party_type_name) = 'PROPERTY')[1], isFCRA),
+				      IF( EXISTS(r.parties(std.str.ToUpperCase(party_type_name) = 'PROPERTY')) AND NOT
+									EXISTS(r.parties(std.str.ToUpperCase(party_type_name) = 'ASSESSEE')),																								
+									apply_penalty_to(l, r.parties(std.str.ToUpperCase(party_type_name) = 'PROPERTY')[1], isFCRA),
 									OTHERWISE_DISPLAY_NO_PENALTY
 								 );
 				SELF.deed_buyr_addr_match_code   := 
-				      IF( EXISTS(r.parties(UCase(party_type_name) = 'BUYER')),
-									apply_penalty_to(l, r.parties(UCase(party_type_name) = 'BUYER')[1], isFCRA),
+				      IF( EXISTS(r.parties(std.str.ToUpperCase(party_type_name) = 'BUYER')),
+									apply_penalty_to(l, r.parties(std.str.ToUpperCase(party_type_name) = 'BUYER')[1], isFCRA),
 									OTHERWISE_DISPLAY_NO_PENALTY
 								 );
 				SELF.deed_sell_addr_match_code   := 
-				      IF( EXISTS(r.parties(UCase(party_type_name) = 'SELLER')),
-									apply_penalty_to(l, r.parties(UCase(party_type_name) = 'SELLER')[1], isFCRA),
+				      IF( EXISTS(r.parties(std.str.ToUpperCase(party_type_name) = 'SELLER')),
+									apply_penalty_to(l, r.parties(std.str.ToUpperCase(party_type_name) = 'SELLER')[1], isFCRA),
 									OTHERWISE_DISPLAY_NO_PENALTY
 								 );				
 				SELF                             := l;

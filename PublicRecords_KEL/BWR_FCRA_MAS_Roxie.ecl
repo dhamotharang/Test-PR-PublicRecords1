@@ -1,13 +1,17 @@
-﻿/* PublicRecords_KEL.BWR_FCRA_MAS_Roxie */
+﻿
 #workunit('name','MAS FCRA Consumer dev156 1 thread');
 IMPORT PublicRecords_KEL, RiskWise, STD, Gateway, UT, SALT38, SALTRoutines;
+/* PublicRecords_KEL.BWR_FCRA_MAS_Roxie */
 threads := 1;
 
 RoxieIP := RiskWise.shortcuts.Dev156;
 NeutralRoxieIP:= RiskWise.Shortcuts.Dev156;
+// PCG_Dev := 'http://delta_dempers_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
+// PCG_Cert := 'http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on PROD servers DO NOT USE THIS UNLESS YOU NEED TO				
 
 InputFile := '~mas::uatsamples::consumer_fcra_100k_07102019.csv';
-//InputFile := '~mas::uatsamples::consumer_fcra_1m_07092019.csv';
+// InputFile := '~mas::uat::mas_fcra_10k_sample_20200707.csv';
+// InputFile := '~mas::uatsamples::consumer_fcra_1m_07092019.csv';
 // InputFile := '~mas::uatsamples::consumer_nonfcra_iptest_04232020.csv'; //Samesample as NonFCRA only testing IP validation
 
 
@@ -27,15 +31,15 @@ GLBA := 0; // FCRA isn't GLBA restricted
 DPPA := 0; // FCRA isn't DPPA restricted
 DataPermissionMask := '0000000000000';  
 DataRestrictionMask := '1000010000000100000000000000000000000000000000000'; 
-
+Include_Minors := TRUE;
 // Inteded Purpose for FCRA. Stubbing this out for now so it can be used in the settings output for now.
 Intended_Purpose := ''; 
 // Intended_Purpose := 'PRESCREENING'; 
 
 // Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
-histDate := '0';
-// histDate := '20190116';
-// histDate := (STRING)STD.Date.Today(); // Run with today's date
+// histDate := '0';
+// histDate := '20190116'; 
+histDate := (STRING)STD.Date.Today(); // Run with today's date
 
 Score_threshold := 80;
 // Score_threshold := 90;
@@ -49,10 +53,15 @@ Output_Master_Results := TRUE;
 // Output_SALT_Profile := FALSE;
 Output_SALT_Profile := TRUE;
 
+// Use default list of allowed sources
+AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+// Do not exclude any additional sources from allowed sources dataset.
+ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+
 RecordsToRun := 0;
 eyeball := 100;
 
-OutputFile := '~lweiner::out::PersonFCRA_Roxie_100k_Archive_KS-4216_'+ ThorLib.wuid();
+OutputFile := '~bbraaten::out::PersonFCRA_Roxie_100k_Current_RR_20200728_'+ ThorLib.wuid();
 
 prii_layout := RECORD
     STRING Account             ;
@@ -76,7 +85,7 @@ prii_layout := RECORD
     STRING FormerName          ;
     STRING Email               ;
     STRING EmployerName        ;
-    STRING historydate;
+		STRING historydate;
     STRING LexID;
     STRING IPAddress;
     STRING Perf;
@@ -101,7 +110,10 @@ soapLayout := RECORD
 	UNSIGNED1 DPPAPurpose;
 	BOOLEAN OutputMasterResults;
 	BOOLEAN IsMarketing;
+	BOOLEAN IncludeMinors;
 	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 end;
 
 Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
@@ -110,32 +122,36 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT BOOLEAN isFCRA := TRUE;
 	EXPORT STRING ArchiveDate := histDate;
 	EXPORT STRING InputFileName := InputFile;
-	EXPORT STRING PermissiblePurpose := Intended_Purpose; // FCRA only
+	EXPORT STRING IntendedPurpose := Intended_Purpose; // FCRA only
 	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
 	EXPORT STRING Data_Permission_Mask := DataPermissionMask;
 	EXPORT UNSIGNED GLBAPurpose := GLBA;
 	EXPORT UNSIGNED DPPAPurpose := DPPA;
 	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
+	EXPORT BOOLEAN IncludeMinors := Include_Minors;
+
 END;
 
 
 soapLayout trans (pp le):= TRANSFORM 
-  // SELF.CustomerId := le.CustomerId;
-	SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout,
-		SELF := LEFT;
-		SELF := []));
-	SELF.Gateways := PROJECT(ut.ds_oneRecord, 
-			TRANSFORM(Gateway.Layouts.Config, 
-				SELF.ServiceName := 'neutralroxie'; 
-				SELF.URL := NeutralRoxieIP; 
-				SELF := []));
-	SELF.ScoreThreshold := Settings.LexIDThreshold;
-	SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
-	SELF.DataPermissionMask := Settings.Data_Permission_Mask;
-	SELF.GLBPurpose := Settings.GLBAPurpose;
-	SELF.DPPAPurpose := Settings.DPPAPurpose;
-	SELF.IsMarketing := FALSE;
-	SELF.OutputMasterResults := Output_Master_Results;
+// SELF.CustomerId := le.CustomerId;
+    SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout,
+        SELF := LEFT;
+        SELF := []));   
+    SELF.Gateways := 	DATASET([{'neutralroxie', NeutralRoxieIP}], Gateway.Layouts.Config);
+    // SELF.Gateways := 	DATASET([{'neutralroxie', NeutralRoxieIP},
+									//	{'delta_personcontext', PCG_Dev}], Gateway.Layouts.Config);
+		
+    SELF.ScoreThreshold := Settings.LexIDThreshold;
+    SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
+    SELF.DataPermissionMask := Settings.Data_Permission_Mask;
+    SELF.GLBPurpose := Settings.GLBAPurpose;
+    SELF.DPPAPurpose := Settings.DPPAPurpose;
+    SELF.IncludeMinors := Settings.IncludeMinors;
+    SELF.IsMarketing := FALSE;
+    SELF.OutputMasterResults := Output_Master_Results;
+		SELF.AllowedSourcesDataset := AllowedSourcesDataset;
+		SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;
 END;
 
 soap_in := PROJECT(pp, trans(LEFT));
@@ -221,15 +237,15 @@ Passed_Person :=
 			SELF := []),
 		INNER, KEEP(1));
       
-Error_Inputs := JOIN(DISTRIBUTE(p, HASH64(Account)), DISTRIBUTE(Passed_Person, HASH64(P_InpAcct)), LEFT.Account = RIGHT.P_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY); 
-OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV (QUOTE('"')), OVERWRITE);
+Error_Inputs := JOIN(DISTRIBUTE(p, HASH64(Account)), DISTRIBUTE(Passed_Person, HASH64(P_InpAcct)), LEFT.Account = RIGHT.P_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY, LOCAL); 
+OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV (QUOTE('"')), OVERWRITE, expire(45));
 
   
 IF(Output_Master_Results, OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout')));
 OUTPUT(CHOOSEN(Passed_Person, eyeball), NAMED('Sample_FCRA_Layout'));
 
-IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"'))));
-OUTPUT(Passed_Person,,OutputFile + '.csv', CSV(HEADING(single), QUOTE('"')));
+IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"')), expire(45)));
+OUTPUT(Passed_Person,,OutputFile + '.csv', CSV(HEADING(single), QUOTE('"')), expire(45));
 	
 Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(Settings);
 		

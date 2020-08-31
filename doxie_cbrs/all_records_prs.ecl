@@ -1,15 +1,18 @@
-﻿import doxie_crs,doxie,LN_PropertyV2_Services;
+﻿IMPORT doxie,doxie_cbrs,doxie_crs;
 
-export all_records_prs(dataset(doxie_cbrs.layout_references) bdids, unsigned1 ofac_version = 1,
-                                                             boolean include_ofac = false, real global_watchlist_threshold = 0.8,
-                                                             doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
+EXPORT all_records_prs(DATASET(doxie_cbrs.layout_references) bdids,
+                                                             doxie.IDataAccess mod_access,
+                                                             UNSIGNED1 ofac_version = 1,
+                                                             BOOLEAN include_ofac = FALSE,
+                                                             REAL global_watchlist_threshold = 0.8
+                                                             
 ) := FUNCTION
 
 //***** MY RECORDSETS
-cntr := doxie_cbrs.count_records_prs(bdids, ofac_version, include_ofac, global_watchlist_threshold, mod_access);
-tarr := doxie_cbrs.best_records_prs_target(bdids);
+cntr := doxie_cbrs.count_records_prs(bdids, mod_access, ofac_version, include_ofac, global_watchlist_threshold);
+tarr := doxie_cbrs.best_records_prs_target(bdids,mod_access);
 hirr := doxie_cbrs.hierarchy_records;
-idnr := doxie_cbrs.ID_Number_records(bdids);
+idnr := doxie_cbrs.ID_Number_records(bdids,mod_access);
 nmvr := doxie_cbrs.name_variation_records_max(bdids);
 bnkr := doxie_cbrs.bankruptcy_records_prs_max(bdids);
 bnk2r := doxie_cbrs.bankruptcy_v2_records_prs_max(bdids);
@@ -20,7 +23,7 @@ lier := doxie_cbrs.lien_records_prs_max(bdids);
 judr := doxie_cbrs.Judgement_records_prs_max(bdids);
 cfir := doxie_cbrs.Corporation_Filings_records_prs_max(bdids);
 brer := doxie_cbrs.business_registration_records_prs_max(bdids).records;
-abrr := doxie_cbrs.Associated_Business_records_prs_max(bdids);  
+abrr := doxie_cbrs.Associated_Business_records_prs_max(bdids,mod_access);
 oaar := doxie_cbrs.others_at_address_records_max(bdids);
 abbc := doxie_cbrs.Associated_Business_byContact_records_max(bdids);
 conr := doxie_cbrs.contact_records_prs_max(bdids);
@@ -28,121 +31,121 @@ pror := doxie_cbrs.property_records_prs_byAddress_max(bdids);
 // pro2r:= doxie_cbrs.property_records_v2; //removing at least for now as it is unused
 idor := doxie_cbrs.Internet_Domains_records_max(bdids);
 dnbr := doxie_cbrs.DNB_records_max(bdids, mod_access);
-rvlr := doxie_cbrs.reverse_lookup_records_prs_max(bdids);
+rvlr := doxie_cbrs.reverse_lookup_records_prs_max(bdids,mod_access);
 ypar := doxie_cbrs.YellowPages_records_prs_max(bdids);
 patr := doxie_cbrs.Patriot_records_max(ofac_version, include_ofac, global_watchlist_threshold);
-plir := doxie_cbrs.proflic_records_prs_max(bdids);
+plir := doxie_cbrs.proflic_records_prs_max(bdids,mod_access);
 bbbr := doxie_cbrs.BBB_records_prs_max(bdids);
 bnmr := doxie_cbrs.BBB_NM_records_prs_max(bdids);
-ebsr := if(not doxie.DataRestriction.EBR,doxie_cbrs.EBR_Summary_records_prs_max(bdids));
-vehr := doxie_cbrs.motor_vehicle_records_prs_max(bdids);
+ebsr := IF(NOT doxie.DataRestriction.EBR,doxie_cbrs.EBR_Summary_records_prs_max(bdids));
+vehr := doxie_cbrs.motor_vehicle_records_prs_max(bdids,mod_access);
 cadr := doxie_cbrs.contact_address_records(bdids);
 
-reccntr := recordof(cntr);
-rectarr := recordof(tarr);
-rechirr := recordof(hirr);
-recidnr := recordof(idnr);
-recnmvr := recordof(nmvr);
-recbnkr := recordof(bnkr);
-recbnk2r:= recordof(bnk2r);
-recuccr := recordof(uccr);
-recucc2r:= recordof(ucc2r);
-recli2r := recordof(li2r);
-reclier := recordof(lier);
-recjudr := recordof(judr);
-reccfir := recordof(cfir);
-recbrer := recordof(brer);
-recabrr := recordof(abrr); 
-recoaar := recordof(oaar);
-recabbc := recordof(abbc);
-recconr := recordof(conr);
-recpror := recordof(pror);
+reccntr := RECORDOF(cntr);
+rectarr := RECORDOF(tarr);
+rechirr := RECORDOF(hirr);
+recidnr := RECORDOF(idnr);
+recnmvr := RECORDOF(nmvr);
+recbnkr := RECORDOF(bnkr);
+recbnk2r:= RECORDOF(bnk2r);
+recuccr := RECORDOF(uccr);
+recucc2r:= RECORDOF(ucc2r);
+recli2r := RECORDOF(li2r);
+reclier := RECORDOF(lier);
+recjudr := RECORDOF(judr);
+reccfir := RECORDOF(cfir);
+recbrer := RECORDOF(brer);
+recabrr := RECORDOF(abrr);
+recoaar := RECORDOF(oaar);
+recabbc := RECORDOF(abbc);
+recconr := RECORDOF(conr);
+recpror := RECORDOF(pror);
 // recpro2r:= recordof(pro2r);
-recidor := recordof(idor);
-recdnbr := recordof(dnbr);
-recrvlr := recordof(rvlr);
-recypar := recordof(ypar);
-recpatr := recordof(patr);
-recplir := recordof(plir);
-recbbbr := recordof(bbbr);
-recbnmr := recordof(bnmr);
-recebsr := recordof(ebsr);
-recvehr := recordof(vehr);
-reccadr := recordof(cadr);
+recidor := RECORDOF(idor);
+recdnbr := RECORDOF(dnbr);
+recrvlr := RECORDOF(rvlr);
+recypar := RECORDOF(ypar);
+recpatr := RECORDOF(patr);
+recplir := RECORDOF(plir);
+recbbbr := RECORDOF(bbbr);
+recbnmr := RECORDOF(bnmr);
+recebsr := RECORDOF(ebsr);
+recvehr := RECORDOF(vehr);
+reccadr := RECORDOF(cadr);
 
 //***** THE COMBINED LAYOUT
-rec := record, maxlength(doxie_crs.maxlength_report)
-	dataset(reccntr) count_children;
-	dataset(rectarr) target_children;
-	dataset(rechirr) hierarchy_children;
-	dataset(recidnr) ID_number_children;
-	dataset(recnmvr) name_variation_children;
-	dataset(recbnkr) bankruptcy_children;
-	dataset(recbnk2r) bankruptcy_v2_children;
-	dataset(recuccr) ucc_children;
-	dataset(recucc2r) ucc_v2_children;
-	dataset(recli2r) liens_v2_children;
-	dataset(reclier) Liens_children;
-	dataset(recjudr) Judgements_children;
-	dataset(reccfir) Corporation_Filings_children;
-	dataset(recbrer) business_registration_children;
-	dataset(recabrr) Associated_Business_children;
-	dataset(recoaar) others_at_address_children;
-	dataset(recabbc) Associated_ByContact_children;
-	dataset(recconr) contact_children;
-	dataset(recpror) property_children;
-	// dataset(recpro2r) property2_children;
-	dataset(recidor) Internet_Domains_children;
-	dataset(recdnbr) DNB_children;
-	dataset(recrvlr) reverse_lookup_children;
-	dataset(recypar) yellow_page_children;
-	dataset(recpatr) patriot_children;
-	dataset(recplir) professional_license_children;
-	dataset(recbbbr) bbb_children;
-	dataset(recbnmr) bbb_nonmember_children;
-	dataset(recebsr) ebr_summary_children;
-	dataset(recvehr) vehicle_children;
-	dataset(reccadr) contact_address_children;
-end;
+rec := RECORD, MAXLENGTH(doxie_crs.maxlength_report)
+  DATASET(reccntr) count_children;
+  DATASET(rectarr) target_children;
+  DATASET(rechirr) hierarchy_children;
+  DATASET(recidnr) ID_number_children;
+  DATASET(recnmvr) name_variation_children;
+  DATASET(recbnkr) bankruptcy_children;
+  DATASET(recbnk2r) bankruptcy_v2_children;
+  DATASET(recuccr) ucc_children;
+  DATASET(recucc2r) ucc_v2_children;
+  DATASET(recli2r) liens_v2_children;
+  DATASET(reclier) Liens_children;
+  DATASET(recjudr) Judgements_children;
+  DATASET(reccfir) Corporation_Filings_children;
+  DATASET(recbrer) business_registration_children;
+  DATASET(recabrr) Associated_Business_children;
+  DATASET(recoaar) others_at_address_children;
+  DATASET(recabbc) Associated_ByContact_children;
+  DATASET(recconr) contact_children;
+  DATASET(recpror) property_children;
+  // dataset(recpro2r) property2_children;
+  DATASET(recidor) Internet_Domains_children;
+  DATASET(recdnbr) DNB_children;
+  DATASET(recrvlr) reverse_lookup_children;
+  DATASET(recypar) yellow_page_children;
+  DATASET(recpatr) patriot_children;
+  DATASET(recplir) professional_license_children;
+  DATASET(recbbbr) bbb_children;
+  DATASET(recbnmr) bbb_nonmember_children;
+  DATASET(recebsr) ebr_summary_children;
+  DATASET(recvehr) vehicle_children;
+  DATASET(reccadr) contact_address_children;
+END;
 
 
 //***** PROJECT THEM IN
-nada := dataset([0], {unsigned1 a});
+nada := DATASET([0], {UNSIGNED1 a});
 
-rec getall(nada l) := transform
-	self.count_children := cntr;
-	self.target_children := tarr;
-	self.hierarchy_children := hirr;
-	self.ID_number_children := idnr;
-	self.name_variation_children := nmvr;
-	self.bankruptcy_children := bnkr;
-	self.bankruptcy_v2_children := bnk2r;
-	self.ucc_children := uccr;
-	self.ucc_v2_children := ucc2r;
-	self.liens_v2_children := li2r;
-	self.Liens_children := lier;
-	self.Judgements_children := judr;
-	self.Corporation_Filings_children := cfir;
-	self.business_registration_children := brer;
-	self.Associated_Business_children := abrr;
-	self.others_at_address_children := oaar;
-	self.Associated_ByContact_children := abbc;
-	self.contact_children := conr;
-	self.property_children := pror;
-	// self.property2_children := pro2r;
-	self.Internet_Domains_children := idor;
-	self.DNB_children := dnbr;
-	self.reverse_lookup_children := rvlr;
-	self.yellow_page_children := ypar;
-	self.patriot_children := patr;
-	self.professional_license_children := plir;
-	self.bbb_children := bbbr;
-	self.bbb_nonmember_children := bnmr;
-	self.ebr_summary_children := ebsr;
-	self.vehicle_children := vehr;
-	self.contact_address_children := cadr;
-	self := [];
-end;
+rec getall(nada l) := TRANSFORM
+  SELF.count_children := cntr;
+  SELF.target_children := tarr;
+  SELF.hierarchy_children := hirr;
+  SELF.ID_number_children := idnr;
+  SELF.name_variation_children := nmvr;
+  SELF.bankruptcy_children := bnkr;
+  SELF.bankruptcy_v2_children := bnk2r;
+  SELF.ucc_children := uccr;
+  SELF.ucc_v2_children := ucc2r;
+  SELF.liens_v2_children := li2r;
+  SELF.Liens_children := lier;
+  SELF.Judgements_children := judr;
+  SELF.Corporation_Filings_children := cfir;
+  SELF.business_registration_children := brer;
+  SELF.Associated_Business_children := abrr;
+  SELF.others_at_address_children := oaar;
+  SELF.Associated_ByContact_children := abbc;
+  SELF.contact_children := conr;
+  SELF.property_children := pror;
+  // self.property2_children := pro2r;
+  SELF.Internet_Domains_children := idor;
+  SELF.DNB_children := dnbr;
+  SELF.reverse_lookup_children := rvlr;
+  SELF.yellow_page_children := ypar;
+  SELF.patriot_children := patr;
+  SELF.professional_license_children := plir;
+  SELF.bbb_children := bbbr;
+  SELF.bbb_nonmember_children := bnmr;
+  SELF.ebr_summary_children := ebsr;
+  SELF.vehicle_children := vehr;
+  SELF.contact_address_children := cadr;
+  SELF := [];
+END;
 
-return project(nada, getall(left));
+RETURN PROJECT(nada, getall(LEFT));
 END;

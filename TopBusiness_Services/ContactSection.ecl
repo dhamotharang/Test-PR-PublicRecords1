@@ -1,4 +1,5 @@
-import AutoStandardI,BankruptcyV3,BipV2,BizLinkFull,CriminalRecords_Services,deathv2_services,iesp,LiensV2,NID,Property,Suppress,Std,ut,BusinessCredit_Services;
+﻿import AutoStandardI,BankruptcyV3,BipV2,BizLinkFull,CriminalRecords_Services,deathv2_services,iesp,
+LiensV2,NID,Property,Suppress,Std,ut,BusinessCredit_Services, topbusiness_services;
  
 export ContactSection := module
 	export fn_fullView(	dataset(TopBusiness_Services.ContactSection_Layouts.rec_Input) ds_in_data,
@@ -27,7 +28,7 @@ export ContactSection := module
 														project(ds_in_data, BIPV2.IDlayouts.l_xlink_ids),
 														FETCH_LEVEL,TopBusiness_Services.Constants.ContactsKfetchMaxLimit
 														).ds_contact_linkidskey_recs;
-																			
+                            
 		ds_quickheader_contactsRaw_ddp := dedup(ds_contactLinkds(source <> 'D' and source <> ''),all, except dt_vendor_last_reported, dt_vendor_first_reported);
 		ds_quickheader_contactsRaw_w_rest := ds_quickheader_contactsRaw_ddp(source not in BusinessCredit_Services.Constants.EXCLUDED_EXPERIAN_SRC);	// restricting experian sources
 		ds_quickheader_contactsRaw := if(in_options.restrictexperian, ds_quickheader_contactsRaw_w_rest, ds_quickheader_contactsRaw_ddp);

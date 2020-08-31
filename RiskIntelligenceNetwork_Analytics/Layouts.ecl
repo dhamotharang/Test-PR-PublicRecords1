@@ -7,13 +7,14 @@ EXPORT LayoutInputPII_2 := RECORD
 			//Note all the below extra fields are needed as KEL input but currently aren't provided to us
 					UNSIGNED event_date,
 					STRING EmailLastDomain,
-					INTEGER8 OttoAddressId, 
-					INTEGER8 OttoIpAddressId, 
-					INTEGER8 OttoEmailId,
-					INTEGER8 OttoSSNId,
-					INTEGER8 OttoBankAccountId,
+					UNSIGNED OttoAddressId, 
+					UNSIGNED OttoIpAddressId, 
+					UNSIGNED OttoEmailId,
+					UNSIGNED OttoSSNId,
+					UNSIGNED OttoBankAccountId,
 					//INTEGER8 OttoBankAccountId2,
-					INTEGER8 OttoDriversLicenseId,
+					UNSIGNED OttoDriversLicenseId,
+					UNSIGNED OttoPhoneId,
 					INTEGER1 BocaShellHit,
 					STRING mac_address,
 					STRING serial_number,
@@ -115,8 +116,14 @@ EXPORT LayoutInputPII_2 := RECORD
 					//END IP Fields
 					STRING gc_id,
 					STRING ind_type,
+					STRING agency_state,
 					INTEGER record_id,
-					unsigned2 rin_source
+					UNSIGNED2 rin_source,
+					STRING curr_incar_flag,
+					INTEGER crim_match_type,
+					BOOLEAN crim_hit,
+					STRING dl_number,
+					STRING dl_state
 END;
 
 	source := RECORD

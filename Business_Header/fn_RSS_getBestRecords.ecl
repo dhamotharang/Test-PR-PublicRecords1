@@ -1,6 +1,7 @@
-import business_header, Business_Header_SS, doxie, drivers, ut, Suppress, mdr;
+import business_header, Business_Header_SS, doxie, ut, Suppress, mdr;
 
 export fn_RSS_getBestRecords(
+	doxie.IDataAccess mod_access,
 	boolean USE_GID,
 	boolean RETURN_BDLS,
 	boolean INCLUDE_MVAWFA_HEADERS,
@@ -44,8 +45,7 @@ out_best :=
 		temp_bdids_suppress,
 		bh_key,
 		keyed(left.bdid = right.bdid) AND
-		((NOT (mdr.sourcetools.SourceIsEBR(RIGHT.source))) OR not doxie.DataRestriction.EBR) AND 
-    (right.source <> MDR.sourceTools.src_Dunn_Bradstreet OR Doxie.DataPermission.use_DNB),
+		doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 		transform(
 			business_header.layout_biz_search.result,
 			self.bdid := left.bdid,
@@ -60,9 +60,9 @@ ENDMACRO;
 
 
 
-mac_temp_best(Business_Header.Key_BH_Best_KnowX,out_best1)
-mac_temp_best(Business_Header.Key_BH_Best,out_best2)
-temp_best := IF(ut.IndustryClass.is_knowx,out_best1,out_best2);
+mac_temp_best( Business_Header.Key_BH_Best_KnowX, out_best1)
+mac_temp_best( Business_Header.Key_BH_Best, out_best2)
+temp_best := IF( mod_access.isConsumer(), out_best1, out_best2);
 
 
 															 
@@ -166,8 +166,8 @@ blist_BH  := sort(join(blist, Business_Header_SS.Key_BH_BDID_pl,
 										 left.prim_name = right.prim_name AND
 										 left.prim_range = right.prim_range AND
 										 left.zip = right.zip AND
-                     ut.PermissionTools.glb.SrcOk(glb_purpose,right.source) AND 
-                     (right.source <> MDR.sourceTools.src_Dunn_Bradstreet OR Doxie.DataPermission.use_DNB),
+                     doxie.compliance.source_ok(mod_access.glb, mod_access.DataRestrictionMask, right.source) AND
+                     doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
                   transform(business_header.layout_biz_search.result_dateRange,
 									     // copy dates into separate fields in preparation for rollup
 											 // ensure dates come from business header file. (right side).									     		
@@ -206,8 +206,8 @@ temp_best_with_dppa_restrictions(
 			   NOT (mdr.sourcetools.SourceIsVehicle(source) OR
 			        mdr.sourcetools.SourceIsWC(source)) OR (
 				INCLUDE_BUS_DPPA and
-				ut.dppa_ok(dppa_purpose) and
-				drivers.state_dppa_ok(dppa_state,dppa_purpose,,source))));
+				mod_access.isValidDPPA() and
+				mod_access.isValidDPPAState(dppa_state, ,source))));
 				
 // output(temp_best, named('temp_best'));
 // output(temp_bdids0, named('temp_bdids0'));

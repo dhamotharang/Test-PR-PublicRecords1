@@ -1,24 +1,39 @@
-﻿IMPORT RiskIntelligenceNetwork_Services;
-IMPORT FraudgovKEL;
+﻿IMPORT Data_Services, FraudgovKEL, FraudgovPlatform, FraudgovPlatform_Analytics, FraudShared;
 IMPORT KEL12 AS KEL;
-IMPORT Std;
-IMPORT FraudgovPlatform, RiskIntelligenceNetwork_Analytics,FraudgovPlatform_Analytics;
-IMPORT Data_Services;
-IMPORT ut;
+IMPORT RiskIntelligenceNetwork_Analytics, RiskIntelligenceNetwork_Services, Std, ut;
 
 EXPORT Functions := MODULE
 
-		EXPORT GetRealtimeAssessment(DATASET(RiskIntelligenceNetwork_Services.Layouts.realtime_appends_rec) ds_in) := FUNCTION
+		EXPORT GetRealtimeAssessment(DATASET(RiskIntelligenceNetwork_Services.Layouts.realtime_appends_rec) ds_in,
+																																														RiskIntelligenceNetwork_Services.IParam.Params in_mod) := FUNCTION
+		
+					_constants_EntityId := RiskIntelligenceNetwork_Services.Constants.KelEntityIdentifier;
+					
+					agencyStRec := RECORD
+					STRING2 st;
+					END;
+					
+					recids := CHOOSEN(FraudShared.Key_CustomerID('FraudGov')(customer_id = (STRING)in_mod.GlobalCompanyId),1);
+					
+					agency_state_ds := JOIN(recids, FraudShared.Key_Id(RiskIntelligenceNetwork_Services.Constants.FRAUD_PLATFORM),
+																												KEYED(LEFT.RECORD_ID = RIGHT.RECORD_ID),
+																												TRANSFORM(agencyStRec,
+																																									SELF.st := RIGHT.classification_source.customer_state,
+																																									SELF := []));
+					
 					j2 := PROJECT(ds_in, TRANSFORM(RiskIntelligenceNetwork_Analytics.Layouts.LayoutInputPII_2,
                                                              
 																																														 SELF.EmailLastDomain := Std.Str.ToUpperCase(Std.Str.SplitWords(LEFT.batchin_rec.email_Address, '.')[Std.Str.CountWords(LEFT.batchin_rec.email_address, '.')]),
-																																															SELF.OttoAddressId := HASH64(LEFT.batchin_rec.addr);//(TRIM(LEFT.address_1)+ '|' + TRIM(LEFT.address_2)), cp this needs to match the roxie context uid code.
+																																															SELF.OttoAddressId := HASH64(stringlib.StringToUpperCase(trim(LEFT.batchin_rec.addr) + '|' + (trim(LEFT.batchin_rec.p_city_name) + 
+																																																		if( LEFT.batchin_rec.p_city_name !='' and(LEFT.batchin_rec.st != '' or LEFT.batchin_rec.z5 !=''), ', ', '') + trim(LEFT.batchin_rec.st) +' '+ trim(LEFT.batchin_rec.z5))));
 																																															SELF.OttoIpAddressId := HASH64(LEFT.batchin_rec.ip_address), 
 																																														 SELF.OttoEmailId := HASH64(LEFT.batchin_rec.email_address),
 																																															SELF.OttoSSNId := HASH64(LEFT.batchin_rec.ssn),
+																																															// SELF.OttoSSNId := 7687709163006051155, //kr ssn
+																																															SELF.OttoPhoneId := HASH64(LEFT.batchin_rec.phoneno),
 																																															SELF.OttoBankAccountId := HASH64(TRIM(LEFT.batchin_rec.bank_routing_number, LEFT, RIGHT) + '|' + TRIM(LEFT.batchin_rec.bank_account_number, LEFT, RIGHT)),
 																																													 //SELF.OttoBankAccountId2 := HASH64(TRIM(LEFT.bank_routing_number_2, LEFT, RIGHT) + '|' + TRIM(LEFT.bank_account_number_2, LEFT, RIGHT)),
-																																													 SELF.OttoDriversLicenseId := HASH64(STD.Str.CleanSpaces(TRIM(LEFT.batchin_rec.dl_number, LEFT, RIGHT)+ '|' + TRIM(LEFT.batchin_rec.dl_state, LEFT, RIGHT))),                                                                                                                                                                                 
+																																													 SELF.OttoDriversLicenseId := HASH64(STD.Str.CleanSpaces(TRIM(LEFT.dl_appends[1].dl_number, LEFT, RIGHT)+ '|' + TRIM(LEFT.dl_appends[1].orig_state, LEFT, RIGHT))),                                                                                                                                                                                 
 																																													 SELF.event_date := Std.Date.Today(),
 																																														//SELF.Customer_State := LEFT.classification_source.Customer_State,
 																																												 // fake bank account and dl risk stuff for testing JP
@@ -28,13 +43,22 @@ EXPORT Functions := MODULE
 																																													// Clean name to avoid blank labels
 																																													SELF.batchin_rec.name_first := TRIM(ut.fn_RemoveSpecialChars(LEFT.batchin_rec.name_first)),
 																																													SELF.batchin_rec.name_last := TRIM(ut.fn_RemoveSpecialChars(LEFT.batchin_rec.name_last)),
-																																													SELF.boca_shell_appends := LEFT.boca_shell_appends[0],
-																																													SELF.BocaShellHit := (INTEGER1)(LEFT.Boca_shell_appends[0].seq > 0 and LEFT.Boca_shell_appends[0].did > 0),
+																																													SELF.boca_shell_appends := LEFT.boca_shell_appends[1],
+																																													SELF.crim_appends := LEFT.crim_appends[1],
+																																													SELF.BocaShellHit := (INTEGER1)(LEFT.Boca_shell_appends[1].seq > 0 and LEFT.Boca_shell_appends[1].did > 0),
 																																													SELF.rin_source := 1,
-																																													SELF.gc_id := '234',
+																																													SELF.gc_id := (STRING)in_mod.GlobalCompanyId,
+																																													SELF.ind_type := (STRING)in_mod.IndustryType,
+																																													SELF.record_id := LEFT.batchin_rec.did,
+																																													SELF.agency_state := agency_state_ds[1].st,
+																																													SELF.curr_incar_flag := LEFT.crim_appends[1].curr_incar_flag,
+																																													SELF.crim_match_type := (INTEGER)LEFT.crim_appends[1].match_type,
+																																													SELF.crim_hit := IF(LEFT.crim_appends[1].did <> 0, TRUE, FALSE),
+																																													SELF.dl_number := LEFT.dl_appends[1].dl_number,
+																																													SELF.dl_state := LEFT.dl_appends[1].orig_state,
 																																													SELF := LEFT,
 																																													SELF := []));
-																																													
+					
 					CleanAttributes := KEL.Clean(RiskIntelligenceNetwork_Analytics.Q_Input_Rin(j2).Res0, TRUE /*Remove __Flags*/, TRUE /*Remove __recordcounts*/, TRUE /*Remove _ from Field Names*/);
 					
 					codesToIgnore := '-99999\', \'-99998\', \'-99997';
@@ -43,24 +67,51 @@ EXPORT Functions := MODULE
 										/* 
 					 COMPUTE ENTITY STATS (RISK INDICATORS)
 					*/
-
-					NicoleAttr := 'agencyuid,agencyprogtype,agencyprogjurst,t_srcagencyuid,t_srcagencyprogtype,t_actdtecho,t_srctype,t_srcclasstype,t_personuidecho,t_inpclntitleecho,'+
-					't_inpclnfullnmecho,t_inpclnfirstnmecho,t_inpclnmiddlenmecho,t_inpclnlastnmecho,t_inpclnnmsuffixecho,t_inpclnaddrprimrangeecho,t_inpclnaddrpredirecho,t_inpclnaddrprimnmecho,t_inpclnaddrsuffixecho,t_inpclnaddrpostdirecho,t_inpclnaddrunitdesigecho,'+
-					't_inpclnaddrsecrangeecho,t_inpclnaddrcityecho,t_inpclnaddrstecho,t_inpclnaddrzip5echo,t_inpclnaddrzip4echo,t_inpclnaddrlatecho,t_inpclnaddrlongecho,t_inpclnaddrcountyecho,t_inpclnaddrgeoblkecho,t_inpclnssnecho,t_inpclndobecho,'+
-					't_inpclndlstecho,t_inpclnemailecho,t_inpclnbnkacctecho,t_inpclnbnkacctrtgecho,t_inpclnipaddrecho,t_inpclnphnecho,t1_lexidpopflag,t1_rinidpopflag,t18_isipmetahitflag,t18_ipaddrcity,t18_ipaddrcountry ,'+
-					't18_ipaddrregion,t18_ipaddrdomain,t18_ipaddrispnm,t18_ipaddrloctype,t18_ipaddrproxytype,t18_ipaddrproxydesc,t18_ipaddrisispflag,t18_ipaddrasncompnm,t18_ipaddrasn,t18_ipaddrcompnm,t18_ipaddrorgnm,'+
-					't18_ipaddrhostedflag,t18_ipaddrvpnflag,t18_ipaddrtornodeflag,t18_ipaddrlocnonusflag,t18_ipaddrlocmiamiflag,t19_bnkacctpopflag,t19_isbnkapphitflag,t19_bnkacctbnknm,t19_bnkaccthrprepdrtgflag,t17_emailpopflag,t17_emaildomain,'+
-					't17_emaildomaindispflag,t9_addrpopflag,t9_addrtype,t9_addrstatus,t16_phnpopflag,t15_ssnpopflag,t18_ipaddrpopflag,' +
-					'p1_idriskunscrbleflag,p9_addrriskunscrbleflag,p15_ssnriskunscrbleflag,p16_phnriskunscrbleflag,p17_emailriskunscrbleflag,p18_ipaddrriskunscrbleflag,p19_bnkacctriskunscrbleflag,p20_dlriskunscrbleflag';
+					inputrow := j2[1];
+					elementEntityContextUids := [_constants_EntityId.PHYSICAL_ADDRESS + inputrow.OttoAddressId, _constants_EntityId.IPADDRESS + inputrow.OttoIpAddressId,
+																																																	_constants_EntityId.EMAIL + inputrow.OttoEmailId, _constants_EntityId.SSN + inputrow.OttoSSNId,
+																																																	_constants_EntityId.BANKACCOUNT + inputrow.OttoBankAccountId, _constants_EntityId.DLNUMBER + inputrow.OttoDriversLicenseId,
+																																																	_constants_EntityId.PHONENO + inputrow.OttoPhoneId];
+																																																		
+						elementProfiles := FraudgovPlatform.Key_entityprofile(customerid = in_mod.GlobalCompanyId AND industrytype = in_mod.IndustryType AND entitycontextuid IN elementEntityContextUids);
 
 
+					NicoleAttr := 't17_emaildomaindispflag,t18_ipaddrhostedflag,t18_ipaddrvpnflag,t18_ipaddrtornodeflag,t18_ipaddrlocnonusflag,t18_ipaddrlocmiamiflag,t19_bnkaccthrprepdrtgflag,t1l_dobnotverflag,' +
+																						't1_stolidflag,t1_synthidflag,t1_manipidflag,t1_adultidnotseenflag,t1_addrnotverflag,t1l_ssnwaltnaverflag,t1_firstnmnotverflag,t1l_hiriskcviflag,t1l_medriskcviflag,t1_minorwlexidflag,t1_lastnmnotverflag,' +
+																						't1_phnnotverflag,t1l_ssnwaddrnotverflag,t1_ssnpriordobflag,t1l_ssnnotverflag,t1l_curraddrnotinagcyjurstflag,t1l_bestdlnotinagcyjurstflag,t1_hdrsrccatcntlwflag,t1l_iddeceasedflag,t1l_idcurrincarcflag,' +
+																						't1l_iddtofdeathaftidactflagev,p1_aotidkrstolidactflagev,p1_aotidkrgenfrdactflagev,p1_aotidkrappfrdactflagev,p1_aotidkrothfrdactflagev,' +
+																						't15_ssnpopflag, t1_lexidpopflag, p1_idriskunscrbleflag, p9_addrriskunscrbleflag, p15_ssnriskunscrbleflag, p16_phnriskunscrbleflag, p17_emailriskunscrbleflag, p18_ipaddrriskunscrbleflag,' +
+																						'p19_bnkacctriskunscrbleflag, p20_dlriskunscrbleflag';
 
 						EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(AttrClean, 'entitycontextuid,t_actuid',//,recordid', 
 					NicoleAttr
-
 						);
+						
+						KnownRiskProfileAttributes := PROJECT(elementProfiles,TRANSFORM(RECORDOF(EventStatsPrep),
+																																																																SELF.field := MAP(
+																																																																																						LEFT.entitytype = 9 => 'p9_aotaddrkractflagev',
+																																																																																						LEFT.entitytype = 15 => 'p15_aotssnkractflagev',
+																																																																																						LEFT.entitytype = 16 => 'p16_aotphnkractflagev',
+																																																																																						LEFT.entitytype = 17 => 'p17_aotemailkractflagev',
+																																																																																						LEFT.entitytype = 18 => 'p18_aotipaddrkractflagev',
+																																																																																						LEFT.entitytype = 19 => 'p19_aotbnkacctkractflagev',
+																																																																																						LEFT.entitytype = 20 => 'p20_aotdlkractflagev',''),
+																																																																	SELF.value :=(STRING)LEFT.aotkractflagev,
+																																																																	SELF.entitycontextuid := '_01' + inputrow.record_id,
+																																																																	SELF := []));
+																																																																	
+								SafeListProfileAttributes := PROJECT(elementProfiles(entitytype IN [9, 16, 18]),TRANSFORM(RECORDOF(EventStatsPrep),
+																																																																SELF.field := MAP(
+																																																																																						LEFT.entitytype = 9 => 'p9_aotaddrsafeactflagev',
+																																																																																						LEFT.entitytype = 16 => 'p16_aotphnsafeactflagev',
+																																																																																						LEFT.entitytype = 18 => 'p18_aotipaddrsafeactflagev',''),
+																																																																	SELF.value :=(STRING)LEFT.aotsafeactflagev,
+																																																																	SELF.entitycontextuid := '_01' + inputrow.record_id,
+																																																																	SELF := []));
+																																																																		
+						EventStatsPrepWithKr := EventStatsPrep + KnownRiskProfileAttributes + SafeListProfileAttributes;
 
-					WeightedResultDefault := JOIN(EventStatsPrep(Value != ''), FraudGovPlatform.Key_ConfigAttributes, 
+					WeightedResultDefault := JOIN(EventStatsPrepWithKr(Value != ''), FraudGovPlatform.Key_ConfigAttributes, 
 																	 LEFT.Field=RIGHT.Field AND ((INTEGER)LEFT.entitycontextuid[2..3] = RIGHT.EntityType OR (INTEGER)LEFT.entitycontextuid[2..3] = 1) AND
 																	 (
 																		 (
@@ -90,7 +141,7 @@ EXPORT Functions := MODULE
 
 					WeightedResult := JOIN(WeightedResultDefault(Value != ''), FraudGovPlatform.Key_ConfigAttributes, 
 																	 //(UNSIGNED)LEFT.customerid = (UNSIGNED)RIGHT.customerid AND (UNSIGNED)LEFT.industrytype= (UNSIGNED)RIGHT.industrytype AND
-																	 LEFT.Field=RIGHT.Field AND ((INTEGER)LEFT.entitycontextuid[2..3] = RIGHT.EntityType OR (INTEGER)LEFT.entitycontextuid[2..3] = 1 AND RIGHT.EntityType = 11) AND
+																	 LEFT.Field=RIGHT.Field AND ((INTEGER)LEFT.entitycontextuid[2..3] = RIGHT.EntityType OR (INTEGER)LEFT.entitycontextuid[2..3] = 1) AND
 																	 (
 																		 (
 																			 RIGHT.Value NOT IN ['','0'] AND LEFT.Value = RIGHT.Value
@@ -112,7 +163,7 @@ EXPORT Functions := MODULE
 																			SELF.RiskLevel := MAP(RIGHT.Field != '' => RIGHT.RiskLevel, LEFT.RiskLevel), // If there is no specific configuration for a field assign the risk level to -1 so it can be hidden.
 																			SELF.Label := MAP(TRIM(RIGHT.UiDescription) != '' => Std.Str.FindReplace(RIGHT.UiDescription, '{value}', LEFT.Value), LEFT.Label);
 																			SELF.field := LEFT.field,
-																			SELF.EntityType := RIGHT.EntityType,
+																			SELF.EntityType := MAP(RIGHT.EntityType != 0 => RIGHT.EntityType, LEFT.EntityType),
 																			SELF.IndicatorType := MAP(RIGHT.IndicatorType != '' => RIGHT.IndicatorType, LEFT.IndicatorType);
 																			SELF.IndicatorDescription := MAP(RIGHT.IndicatorDescription != '' => RIGHT.IndicatorDescription, LEFT.IndicatorDescription);
 																			SELF := LEFT), KEYED, LEFT OUTER);
@@ -121,39 +172,11 @@ EXPORT Functions := MODULE
 					RULES ASSESSMENT
 					*/
 
-					//MyRules := FraudGovPlatform.Key_ConfigRules;
-					MyRules := DATASET([
-						{0, 0, 1, 'Rule1', 'IP Address City is Miami and Address out of state.', 't15_ssnpopflag', '1', 0, 0, 3},
-						{0, 0, 1, 'Rule1', 'IP Address City is Miami and Address out of state.', 't1_lexidpopflag', '1', 0, 0, 3},
-						{0, 0, 1, 'Rule99_1', 'Unscorable', 'p1_idriskunscrbleflag', '1', 0, 0, 99},
-						{0, 0, 9, 'Rule99_9', 'Unscorable', 'p9_addrriskunscrbleflag', '1', 0, 0, 99},
-						{0, 0, 15, 'Rule99_15', 'Unscorable', 'p15_ssnriskunscrbleflag', '1', 0, 0, 99},
-						{0, 0, 16, 'Rule99_16', 'Unscorable', 'p16_phnriskunscrbleflag', '1', 0, 0, 99},
-						{0, 0, 17, 'Rule99_17', 'Unscorable', 'p17_emailriskunscrbleflag', '1', 0, 0, 99},
-						{0, 0, 18, 'Rule99_18', 'Unscorable', 'p18_ipaddrriskunscrbleflag', '1', 0, 0, 99},
-						{0, 0, 19, 'Rule99_19', 'Unscorable', 'p19_bnkacctriskunscrbleflag', '1', 0, 0, 99},
-						{0, 0, 20, 'Rule99_20', 'Unscorable', 'p20_dlriskunscrbleflag', '1', 0, 0, 99},
-						{0, 0, 1, 'Rule3', 'Address is out of state and IP Address is NOT in the US.', 'addressoutofstate', '1', 0, 0, 3},
-						{0, 0, 1, 'Rule3', 'Address is out of state and IP Address is NOT in the US.', 't18_ipaddrlocnonusflag', '1', 0, 0, 3},
-						{0, 0, 1, 'Rule1-1', 'Identity Deceased', 'deceased', '1', 0, 0, 3},
-						{0, 0, 1, 'Rule1-2', 'Identity is currently incarcerated', 'currentlyincarceratedflag', '1', 0, 0, 3},
-						{8342784, 1014, 1, 'Rule3', 'Address is out of state and IP Address NOT is in the US.', 'addressoutofstate', '1', 0, 0, 1},
-						{8342784, 1014, 1, 'Rule3', 'Address is out of state and IP Address NOT is in the US.', 't18_ipaddrlocnonusflag', '1', 0, 0, 1},
-						{0, 0, 18, 'Rule4', 'Address is a PO Box and IP Address is NOT in the US.', 't18_ipaddrlocnonusflag', '1', 0, 0, 3},
-						{0, 0, 18, 'Rule4', 'Address is a PO Box and IP Address is NOT in the US.', 'addressispobox', '1', 0, 0, 3},
-						{0, 0, 9, 'Rule5', 'Address is vacant.', 'address_is_vacant_', '1', 0, 0, 1},
-						{0, 0, 9, 'Rule6', 'Address is Commercial Receiving Agency', 'addressiscmra', '1', 0, 0, 1},
-						{0, 0, 9, 'Rule7', 'Address is out of state.', 'addressoutofstate', '1', 0, 0, 3},
-						{0, 0, 1, 'Rule9', 'p1_aotidkrgenfrdactflagev.', 'p1_aotidkrgenfrdactflagev', '1', 0, 0, 3},
-						{0, 0, 9, 'Rule11', 'Address is known risk.', 'p9_aotaddrkractflagev', '1', 0, 0, 3},
-						{0, 0, 15, 'Rule11', 'SSN is known risk.', 'p15_aotssnkractflagev', '1', 0, 0, 3},
-						{20995369, 1014, 9, 'Rule5', 'Address is vacant.', 'addressisvacant', '1', 0, 0, 3}
-						],
-						{UNSIGNED Customerid, UNSIGNED industrytype, INTEGER1 entitytype, STRING RuleName, STRING Description, STRING200 Field, STRING Value, DECIMAL6_2 Low, DECIMAL6_2 High, INTEGER RiskLevel});
-						
+					 MyRules := FraudGovPlatform.Key_ConfigRules;
+					
 					 MyRulesCnt := TABLE(MyRules, {RuleName, customerid, industrytype, entitytype, Reccount := COUNT(GROUP)}, RuleName, customerid, entitytype, industrytype, FEW);
 
-						RulesResult := JOIN(EventStatsPrep(Value != ''), SORT(MyRules, field, -customerid), 
+						RulesResult := JOIN(EventStatsPrepWithKr(Value != ''), SORT(MyRules, field, -customerid), 
 																	 LEFT.Field=RIGHT.Field AND 
 																	 (
 																		 (
@@ -161,7 +184,7 @@ EXPORT Functions := MODULE
 																		 )
 																		 OR
 																		 (
-																			 RIGHT.Value IN ['','0'] AND (RIGHT.Low = 0 AND RIGHT.High = 0)
+																			 RIGHT.Value IN ['','0'] AND (RIGHT.Low = 0 AND RIGHT.High = 0) AND LEFT.Value = '0'
 																		 )                           
 																		 OR
 																		 (
@@ -256,7 +279,7 @@ EXPORT Functions := MODULE
 					
 					rulesFlagsMatched_final := PROJECT(RulesFlagsMatched,TRANSFORM(RiskIntelligenceNetwork_Analytics.Layouts.LayoutRulesFlagsMatched,
 																																																							SELF := LEFT));
-					entityStats_final := PROJECT(WeightedResult,TRANSFORM(RiskIntelligenceNetwork_Analytics.Layouts.LayoutEntityStats,
+					entityStats_final := PROJECT(WeightedResult(risklevel > -1),TRANSFORM(RiskIntelligenceNetwork_Analytics.Layouts.LayoutEntityStats,
 																																																							SELF := LEFT));
 
 					results := PROJECT(EntityAssessment,TRANSFORM(RiskIntelligenceNetwork_analytics.Layouts.LayoutRiskScore,
@@ -264,6 +287,23 @@ EXPORT Functions := MODULE
 																																																															SELF.RulesFlagsMatched := rulesFlagsMatched_final,
 																																																															SELF.EntityStats := entityStats_final,
 																																																															SELF := LEFT));
+																																																															
+						// output(ds_in,named('analytics_ds_in'));
+						// output(j2,named('analytics_j2'));
+						// output(AttrClean,named('analytics_AttrClean'));
+						// output(EventStatsPrep,named('analytics_EventStatsPrep'));
+						// output(elementEntityContextUids,named('analytics_elementEntityContextUids'));
+						// output(elementProfiles,named('analytics_elementProfiles'));
+						// output(EventStatsPrepWithKr,named('analytics_EventStatsPrepWithKr'));
+						// output(WeightedResult,named('analytics_WeightedResult'));
+						// output(RulesResult,named('analytics_RulesResult'));
+						// output(RulesResultAggPrep,named('analytics_RulesResultAggPrep'));
+						// output(RulesResultAgg,named('analytics_RulesResultAgg'));
+						// output(RulesFlagsMatched,named('analytics_RulesFlagsMatched'));
+						// output(entityStats_final,named('analytics_entityStats_final'));
+						// output(rulesFlagsMatched_final,named('analytics_rulesFlagsMatched_final'));
+						// output(results,named('analytics_results'));
+						
 					RETURN results;
 		END;
 		

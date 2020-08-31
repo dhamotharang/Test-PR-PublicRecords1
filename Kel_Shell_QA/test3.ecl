@@ -1,5 +1,5 @@
-﻿IMPORT R, ut, Python;
-EXPORT string test3(Recordof(Kel_Shell_QA.Layouts.AC_Lay) data_row,string cond, string def_par, set of string lay_set):= embed(Python)
+﻿IMPORT R, ut, python3;
+EXPORT string test3(Recordof(Kel_Shell_QA.Layouts.AC_Lay) data_row,string cond, string def_par, set of string lay_set):= embed(python3)
 import re
 str_list = lay_set
 layout_string_new = ['']

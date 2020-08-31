@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 0.8.2
-IMPORT KEL08a AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
+IMPORT KEL12 AS KEL;
 IMPORT B_Tradeline_7,B_Tradeline_8,CFG_graph FROM Business_Credit_KEL;
-IMPORT * FROM KEL08a.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT B_Tradeline_6(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __cfg = CFG_graph) := MODULE
   SHARED VIRTUAL TYPEOF(B_Tradeline_7(__in,__cfg).__ENH_Tradeline_7) __ENH_Tradeline_7 := B_Tradeline_7(__in,__cfg).__ENH_Tradeline_7;
-  SHARED __EE178710 := __ENH_Tradeline_7;
-  EXPORT __ST178514_Layout := RECORD
+  SHARED __EE301321 := __ENH_Tradeline_7;
+  EXPORT __ST239144_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nkdate _load__date_;
     KEL.typ.nstr _sbfe__contributor__number_;
@@ -102,11 +102,11 @@ EXPORT B_Tradeline_6(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph
     KEL.typ.nbool Shows_Closed_Account_;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST178514_Layout __ND179195__Project(B_Tradeline_8(__in,__cfg).__ST156702_Layout __PP178713) := TRANSFORM
-    SELF.Days_Ago_ := __FN2(KEL.Routines.DaysBetween,__PP178713._cycle__end__date_,__CN(__cfg.CurrentDate));
-    SELF.Months_Since_Trade_ := __FN2(KEL.Routines.MonthsBetween,__PP178713._cycle__end__date_,__CN(__cfg.CurrentDate));
-    SELF.Past_Due_Amount_ := __FN1(ABS,__PP178713._past__due__amount_);
-    SELF := __PP178713;
+  SHARED __ST239144_Layout __ND301420__Project(B_Tradeline_8(__in,__cfg).__ST240134_Layout __PP300840) := TRANSFORM
+    SELF.Days_Ago_ := __FN2(KEL.Routines.DaysBetween,__PP300840._cycle__end__date_,__CN(__cfg.CurrentDate));
+    SELF.Months_Since_Trade_ := __FN2(KEL.Routines.MonthsBetween,__PP300840._cycle__end__date_,__CN(__cfg.CurrentDate));
+    SELF.Past_Due_Amount_ := __FN1(ABS,__PP300840._past__due__amount_);
+    SELF := __PP300840;
   END;
-  EXPORT __ENH_Tradeline_6 := PROJECT(__EE178710,__ND179195__Project(LEFT));
+  EXPORT __ENH_Tradeline_6 := PROJECT(__EE301321,__ND301420__Project(LEFT));
 END;

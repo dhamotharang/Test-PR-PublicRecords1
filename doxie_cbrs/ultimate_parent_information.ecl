@@ -1,15 +1,15 @@
-import doxie_cbrs, Business_Header;
+IMPORT doxie_cbrs, Business_Header;
 
-export ultimate_parent_information(dataset(doxie_cbrs.layout_references) in_bdids) := FUNCTION
+EXPORT ultimate_parent_information(DATASET(doxie_cbrs.layout_references) in_bdids) := FUNCTION
 
-bdids := choosen(in_bdids,1);
+bdids := CHOOSEN(in_bdids,1);
 rec := doxie_cbrs.layout_references;
-rec joinrec(Business_Header.Key_BH_SuperGroup_BDID l) := transform
-  self.bdid := l.group_id;
-end;
+rec joinrec(Business_Header.Key_BH_SuperGroup_BDID l) := TRANSFORM
+  SELF.bdid := l.group_id;
+END;
 
-thebdid := join(bdids,Business_Header.Key_BH_SuperGroup_BDID,left.bdid=right.bdid,joinrec(right),limit(2));
+thebdid := JOIN(bdids,Business_Header.Key_BH_SuperGroup_BDID,LEFT.bdid=RIGHT.bdid,joinrec(RIGHT),LIMIT(2));
 
-return choosen(join(thebdid,doxie_cbrs.fn_best_information(thebdid,true),left.bdid=(unsigned6)right.bdid),1);
+RETURN CHOOSEN(JOIN(thebdid,doxie_cbrs.fn_best_information(thebdid,TRUE),LEFT.bdid=(UNSIGNED6)RIGHT.bdid),1);
 
-end;
+END;

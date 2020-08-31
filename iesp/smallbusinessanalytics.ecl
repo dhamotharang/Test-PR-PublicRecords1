@@ -56,6 +56,7 @@ end;
 export t_SBAOptions := record (iesp.share.t_BaseOption)
 	dataset(iesp.share.t_StringArrayItem) AttributesVersionRequest {xpath('AttributesVersionRequest/Name'), MAXCOUNT(iesp.constants.SBAnalytics.MaxAttributeVersionCount)};
 	t_SBAModels IncludeModels {xpath('IncludeModels')};
+	iesp.share.t_Date HistoryDate {xpath('HistoryDate')};//hidden[internal]
 end;
 		
 export t_SBAAttributesGroup := record
@@ -81,8 +82,8 @@ export t_SBAModelHRI := record
 end;
 		
 export t_SmallBusinessAnalyticsResult := record
-	UNSIGNED1 BillingHit {xpath('BillingHit')};
 	t_SBASearchBy InputEcho {xpath('InputEcho')};
+	unsigned1 BillingHit {xpath('BillingHit')};//hidden[ecldev]
 	iesp.share.t_BusinessIdentity BusinessID {xpath('BusinessID')};//hidden[ecldev]
 	dataset(t_SBAModelHRI) Models {xpath('Models/Model'), MAXCOUNT(iesp.constants.SBAnalytics.MaxModelCount)};
 	dataset(t_SBAAttributesGroup) AttributeGroups {xpath('AttributeGroups/AttributesGroup'), MAXCOUNT(iesp.constants.SBAnalytics.MaxModelCount)};

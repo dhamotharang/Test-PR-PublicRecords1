@@ -1,4 +1,4 @@
-IMPORT LN_PropertyV2_Services,Suppress,LN_PropertyV2,BatchShare,Codes;
+﻿IMPORT LN_PropertyV2_Services,Suppress,LN_PropertyV2,BatchShare,Codes;
 
 EXPORT fn_getPropertyRecs(DATASET(Layouts.batch_working) ds_work_recs,
 													IParams.BatchParams in_mod) := FUNCTION
@@ -38,7 +38,7 @@ EXPORT fn_getPropertyRecs(DATASET(Layouts.batch_working) ds_work_recs,
 		END;
 
 		rawDeeds:=JOIN(fids,LN_PropertyV2.key_deed_fid(),
-			KEYED(LEFT.ln_fares_id=RIGHT.ln_fares_id),
+			KEYED(LEFT.ln_fares_id=RIGHT.ln_fares_id) AND not LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code),//Assignments and Releases codes excluded
 			TRANSFORM(acctnoDeedRec,SELF:=LEFT,SELF:=RIGHT,SELF:=[]),
 			LIMIT(LN_PropertyV2_Services.consts.MAX_RAW,SKIP));
 

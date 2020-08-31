@@ -12,10 +12,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 	
 
 	DueDiligence.Layouts.Busn_Internal  BusnKRIs(BusnBIPIDs le)  := TRANSFORM
-		
-    SELF.BusLexID := (STRING)le.Busn_info.BIP_IDS.SeleID.LinkID;
-    
-    SELF.BusLexIDMatch := (STRING)le.score;
+
 
     //BUSINESS ASSETS OWNED PROPERTY  																																																	 
     BusAssetOwnProperty_Flag9 := IF(le.CurrPropOwnedCount >= 15, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);            
@@ -395,125 +392,8 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
     SELF.BusGeographic_Flag := BusGeoRisk_Flag_final;                                             
     SELF.BusGeographic := (STRING)(10-STD.Str.Find(BusGeoRisk_Flag_final, DueDiligence.Constants.T_INDICATOR, 1)); 
       
-      
+ 
 
-
-    //BUSINESS MATCH LEVEL 	
-    inputLexIDOnly := le.busn_input.lexID <> DueDiligence.Constants.EMPTY AND 
-                      le.busn_input.companyName = DueDiligence.Constants.EMPTY AND 
-                      le.busn_input.altCompanyName = DueDiligence.Constants.EMPTY AND 
-                      le.busn_input.fein = DueDiligence.Constants.EMPTY AND
-                      le.busn_input.phone = DueDiligence.Constants.EMPTY AND
-                      le.inputaddressprovided = FALSE;
-
-    BusMatchLevel_Flag9 := IF(le.score < 50 AND inputLexIDOnly = FALSE, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    BusMatchLevel_Flag8 := IF(le.score BETWEEN 50 AND 74, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    BusMatchLevel_Flag7 := IF(le.score BETWEEN 75 AND 84, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    BusMatchLevel_Flag6 := IF(le.score BETWEEN 85 AND 95, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    BusMatchLevel_Flag5 := IF(le.score = 96, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    BusMatchLevel_Flag4 := IF(le.score = 97, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    BusMatchLevel_Flag3 := IF(le.score = 98, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    BusMatchLevel_Flag2 := IF(le.score = 99, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    BusMatchLevel_Flag1 := IF(le.score = 100 OR inputLexIDOnly, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);             
-
-    BusMatchLevel_Flag_final := DueDiligence.Common.calcFinalFlagField(BusMatchLevel_Flag9,
-                                                                       BusMatchLevel_Flag8,
-                                                                       BusMatchLevel_Flag7,
-                                                                       BusMatchLevel_Flag6,
-                                                                       BusMatchLevel_Flag5,
-                                                                       BusMatchLevel_Flag4,
-                                                                       BusMatchLevel_Flag3,
-                                                                       BusMatchLevel_Flag2,
-                                                                       BusMatchLevel_Flag1); 
-
-    SELF.BusMatchLevel_Flag := BusMatchLevel_Flag_final;
-    SELF.BusMatchLevel := (STRING)(10 - STD.Str.Find(BusMatchLevel_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));        
-
-
-
-    //BUSINESS LEGAL EVENTS - CRIMINAL STATE 																																																	 
-    BusStateLegalEvent_Flag9 := IF(le.BEOevidenceOfCurrentIncarcerationOrParole, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);           
-    BusStateLegalEvent_Flag8 := IF(le.BEOevidenceOfFelonyConvictionInLastNYR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);           
-    BusStateLegalEvent_Flag7 := IF(le.BEOevidenceOfFelonyConvictionOlderNYR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);           
-    BusStateLegalEvent_Flag6 := IF(le.BEOevidenceOfPreviousIncarceration, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);           
-    BusStateLegalEvent_Flag5 := IF(le.BEOevidenceOfUncatagorizedConvictionInLastNYR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);    
-    BusStateLegalEvent_Flag4 := IF(le.BEOevidenceOfMisdeameanorConvictionInLastNYR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);    
-    BusStateLegalEvent_Flag3 := IF(le.BEOevidenceOfUncatagorizedConvictionOlderNYR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);    
-    BusStateLegalEvent_Flag2 := IF(le.BEOevidenceOfMisdeameanorConvictionOlderNYR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);    
-    BusStateLegalEvent_Flag1 := IF(le.BEONoEvidenceOfStateCriminal OR le.execCount = 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-     
-    BusStateLegalEvent_Flag_final  := DueDiligence.Common.calcFinalFlagField(BusStateLegalEvent_Flag9,
-                                                                             BusStateLegalEvent_Flag8,
-                                                                             BusStateLegalEvent_Flag7,
-                                                                             BusStateLegalEvent_Flag6,
-                                                                             BusStateLegalEvent_Flag5,
-                                                                             BusStateLegalEvent_Flag4,
-                                                                             BusStateLegalEvent_Flag3,
-                                                                             BusStateLegalEvent_Flag2,
-                                                                             BusStateLegalEvent_Flag1); 
-
-    SELF.BusStateLegalEvent_Flag := BusStateLegalEvent_Flag_final;   
-    SELF.BusStateLegalEvent := (STRING)(10 - STD.Str.Find(BusStateLegalEvent_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));
-
-
-    //BUSINESS LEGAL EVENTS - CIVIL (LIENS, JUDGEMENTS and EVICTIONS)
-    totalBusCivilCount := le.liensUnreleasedCntInThePastNYR + le.evictionsCntInThePastNYR;
-    totalBusCivilCountOlder := le.liensUnreleasedCntOVNYR + le.evictionsCntOVNYR; 
-     
-    BusCivilLegalEvent_Flag9 := IF(totalBusCivilCount >= 10, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);    
-    BusCivilLegalEvent_Flag8 := IF(totalBusCivilCount BETWEEN 5 AND 9, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);   											
-    BusCivilLegalEvent_Flag7 := IF(totalBusCivilCount BETWEEN 3 AND 4, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);    										
-    BusCivilLegalEvent_Flag6 := IF(totalBusCivilCount BETWEEN 1 AND 2, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
-    BusCivilLegalEvent_Flag5 := IF(totalBusCivilCountOlder >= 10, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    BusCivilLegalEvent_Flag4 := IF(totalBusCivilCountOlder BETWEEN 5 AND 9, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 						
-    BusCivilLegalEvent_Flag3 := IF(totalBusCivilCountOlder BETWEEN 3 AND 4, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 										
-    BusCivilLegalEvent_Flag2 := IF(totalBusCivilCountOlder BETWEEN 1 AND 2, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
-    BusCivilLegalEvent_Flag1 := IF(BusCivilLegalEvent_Flag9 = DueDiligence.Constants.F_INDICATOR 
-                                    AND BusCivilLegalEvent_Flag8 = DueDiligence.Constants.F_INDICATOR
-                                    AND BusCivilLegalEvent_Flag7 = DueDiligence.Constants.F_INDICATOR 
-                                    AND BusCivilLegalEvent_Flag6 = DueDiligence.Constants.F_INDICATOR
-                                    AND BusCivilLegalEvent_Flag5 = DueDiligence.Constants.F_INDICATOR 
-                                    AND BusCivilLegalEvent_Flag4 = DueDiligence.Constants.F_INDICATOR
-                                    AND BusCivilLegalEvent_Flag3 = DueDiligence.Constants.F_INDICATOR
-                                    AND BusCivilLegalEvent_Flag2 = DueDiligence.Constants.F_INDICATOR, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
-     
-    BusCivilLegalEvent_Flag_final := DueDiligence.Common.calcFinalFlagField(BusCivilLegalEvent_Flag9,
-                                                                            BusCivilLegalEvent_Flag8,
-                                                                            BusCivilLegalEvent_Flag7,
-                                                                            BusCivilLegalEvent_Flag6,
-                                                                            BusCivilLegalEvent_Flag5,
-                                                                            BusCivilLegalEvent_Flag4,
-                                                                            BusCivilLegalEvent_Flag3,
-                                                                            BusCivilLegalEvent_Flag2,
-                                                                            BusCivilLegalEvent_Flag1); 
-
-     SELF.BusCivilLegalEvent_Flag :=  BusCivilLegalEvent_Flag_final;                                            /* This a string of T or F based on how the data used to calculate the KRI  */
-     SELF.BusCivilLegalEvent := (STRING)(10 - STD.Str.Find(BusCivilLegalEvent_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));        /* Set the index to the position of the first 'T'.  */  																																																	 
-     
-     
-    //BUSINESS LEGAL EVENT TYPE
-    legalEventTypeFlag9 := IF(le.atleastOneBEOInCategory9, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    legalEventTypeFlag8 := IF(le.atleastOneBEOInCategory8, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    legalEventTypeFlag7 := IF(le.atleastOneBEOInCategory7, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    legalEventTypeFlag6 := IF(le.atleastOneBEOInCategory6, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    legalEventTypeFlag5 := IF(le.atleastOneBEOInCategory5, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    legalEventTypeFlag4 := IF(le.atleastOneBEOInCategory4, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    legalEventTypeFlag3 := IF(le.atleastOneBEOInCategory3, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    legalEventTypeFlag2 := IF(le.atleastOneBEOInCategory2, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    legalEventTypeFlag1 := IF(le.BEOsHaveNoConvictionsOrCategoryHits OR le.execCount = 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-                        
-    legalEventTypeConcat_Final := DueDiligence.Common.calcFinalFlagField(legalEventTypeFlag9,
-                                                                          legalEventTypeFlag8,
-                                                                          legalEventTypeFlag7,
-                                                                          legalEventTypeFlag6,
-                                                                          legalEventTypeFlag5,
-                                                                          legalEventTypeFlag4,
-                                                                          legalEventTypeFlag3,
-                                                                          legalEventTypeFlag2,
-                                                                          legalEventTypeFlag1);
-
-    SELF.BusOffenseType_Flag := legalEventTypeConcat_Final;
-    SELF.BusOffenseType := (STRING)(10-STD.Str.Find(legalEventTypeConcat_Final, DueDiligence.Constants.T_INDICATOR, 1)); 
 
 
     //BUSINESS EXECUTIVE OFFICER US RESIDENCY
@@ -597,18 +477,10 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
                                                     SELF.BusPublicRecordAgeRange_Flag := INVALID_BUSINESS_FLAGS;
                                                     SELF.BusShellShelf := INVALID_BUSINESS_SCORE;
                                                     SELF.BusShellShelf_Flag := INVALID_BUSINESS_FLAGS;
-                                                    SELF.BusMatchLevel := INVALID_BUSINESS_SCORE;
-                                                    SELF.BusMatchLevel_Flag := INVALID_BUSINESS_FLAGS;
-                                                    SELF.BusStateLegalEvent := INVALID_BUSINESS_SCORE;
-                                                    SELF.BusStateLegalEvent_Flag := INVALID_BUSINESS_FLAGS;
                                                     // SELF.BusFederalLegalEvent := INVALID_BUSINESS_SCORE;
                                                     // SELF.BusFederalLegalEvent_Flag := INVALID_BUSINESS_FLAGS;
                                                     // SELF.BusFederalLegalMatchLevel := INVALID_BUSINESS_SCORE;
                                                     // SELF.BusFederalLegalMatchLevel_Flag := INVALID_BUSINESS_FLAGS;
-                                                    SELF.BusCivilLegalEvent := INVALID_BUSINESS_SCORE;
-                                                    SELF.BusCivilLegalEvent_Flag := INVALID_BUSINESS_FLAGS;
-                                                    SELF.BusOffenseType := INVALID_BUSINESS_SCORE;
-                                                    SELF.BusOffenseType_Flag := INVALID_BUSINESS_FLAGS;
                                                     SELF.BusBEOProfLicense := INVALID_BUSINESS_SCORE;
                                                     SELF.BusBEOProfLicense_Flag := INVALID_BUSINESS_FLAGS;
                                                     SELF.BusBEOUSResidency := INVALID_BUSINESS_SCORE;

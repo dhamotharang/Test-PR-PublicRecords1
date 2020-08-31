@@ -120,12 +120,35 @@
 	STRING30 P_InpClnEmailDom;		
 	STRING6  P_InpClnEmailExt;	
 	STRING45 P_InpClnIPAddr,
+	STRING6 P_InpValNameInvalidFlag,
+	STRING6 P_InpValAddrStInvalidFlag,
+	STRING6 P_InpValPhoneHomeInvalidFlag,
+	STRING6 P_InpValPhoneWorkInvalidFlag,
+	STRING6 P_InpValSSNInvalidFlag,
+	STRING6 P_InpValDLInvalidFlag,
+	STRING6 P_InpValDLStateInvalidFlag,
+	STRING6 P_InpValDOBInvalidFlag,
+	STRING6 P_InpValEmailInvalidFlag,
+	STRING6 P_InpValArchDtInvalidFlag,
 	// INTEGER4 PI_InpAddrAVMVal;		
 	// INTEGER4 PI_InpAddrAVMValA1Y;		
 	// DECIMAL7_2 PI_InpAddrAVMRatio1Y;		
 	// INTEGER4 PI_InpAddrAVMValA5Y;		
 	// DECIMAL7_2 PI_InpAddrAVMRatio5Y;		
 	// INTEGER4 PI_InpAddrAVMConfScore;
+	STRING6 PI_InpAddrOnFileFlagEv;
+	STRING6 PI_InpAddrIsVacantFlag;
+	STRING6 PI_InpAddrIsThrowbackFlag;
+	STRING6 PI_InpAddrSeasonalType;
+	STRING6 PI_InpAddrIsDNDFlag;
+	STRING6 PI_InpAddrIsCollegeFlag;
+	STRING6 PI_InpAddrIsCMRAFlag;
+	STRING6 PI_InpAddrIsSimpAddrFlag;
+	STRING6 PI_InpAddrIsDropDeliveryFlag;
+	STRING6 PI_InpAddrIsBusinessFlag;
+	STRING6 PI_InpAddrOWGMFlag;
+	STRING6 PI_InpAddrIsMultiUnitFlag;
+	STRING6 PI_InpAddrIsAptFlag;
 	STRING10 G_BuildDrgCrimDt;
 	STRING10 G_BuildAstVehAutoDt;
 	STRING10 G_BuildAstVehAirDt;
@@ -277,6 +300,17 @@
 	// STRING200 PL_CurrAddrLocID;
 	STRING200 PL_PrevAddrFull;
 	// STRING200 PL_PrevAddrLocID;
+	//Current Address
+	STRING6 PL_CurrAddrIsVacantFlag;
+	STRING6 PL_CurrAddrIsThrowbackFlag;
+	STRING6 PL_CurrAddrSeasonalType;
+	STRING6 PL_CurrAddrIsDNDFlag;
+	STRING6 PL_CurrAddrIsCollegeFlag;
+	STRING6 PL_CurrAddrIsCMRAFlag;
+	STRING6 PL_CurrAddrIsSimpAddrFlag;
+	STRING6 PL_CurrAddrIsDropDeliveryFlag;
+	STRING6 PL_CurrAddrIsBusinessFlag;
+	//
 	STRING6 PL_EduRecFlagEv;		
 	STRING50 PL_EduSrcListEv;		
 	STRING6 PL_EduHSRecFlagEv;		
@@ -1285,7 +1319,7 @@
 	STRING60  BE_BusNAICSCode3GroupDesc;
 	STRING6   BE_BusNAICSCode4;
 	STRING150 BE_BusNAICSCode4Desc;
-	STRING60  BE_BusNAICSCode4GroupDesc;	
+	STRING60  BE_BusNAICSCode4GroupDesc;
 	INTEGER3 BE_BusEmplCountCurr;	
 	STRING6 BE_BusEmplCountCurrRnge;		
 	INTEGER6 BE_BusAnnualSalesCurr;		
@@ -1368,7 +1402,7 @@
 	STRING6  BE_BestAddrBldgIsMultiUnitFlag;
 	STRING6 BE_BestAddrBldgType;
 	STRING6 BE_BestAddrIsPOBoxFlag;
-	STRING6 BE_BestAddrIsVacantFlag;
+	STRING6 BE_BestAddrIsVacantFlag; 
 	STRING6 BE_BestAddrIsOwnedFlag;
 	INTEGER BE_BestAddrNewMktValEv;
 	INTEGER BE_BestAddrNewTaxValEv;
