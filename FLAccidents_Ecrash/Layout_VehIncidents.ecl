@@ -23,10 +23,21 @@
 	 STRING100 	Loss_Cross_Street;
 	END;
 	
-	enum_code_desc := RECORD
+	EXPORT enum_code_desc := RECORD
    STRING50 code;
    STRING50 description;
   END;
+	
+	EXPORT Citations_ChildRec := RECORD
+		STRING7 Citation_Issued;
+		STRING7 Citation_Type;
+		STRING100 Citation_Detail1;
+		STRING64 Citation_Status;
+		STRING60 Violation_Code1;
+		STRING60 Violation_Code2;
+		STRING60 Violation_Code3;
+		STRING60 Violation_Code4;
+	END;
 
 	EXPORT MeowLayout := RECORD
 		UNSIGNED6 	idfield;
@@ -154,6 +165,8 @@
 		DATASET(enum_code_desc) passenger_actions_at_time_of_crash;
 	  //CR-1237		
 	  DATASET(enum_code_desc) marijuana_use_suspected;
+		
+		DATASET(Citations_ChildRec) Citation_Details {MAXCOUNT(Constants.Max_Citations_ChildRec_Count)};
 		UNSIGNED8 	__internal_fpos__;
 	END;
 
