@@ -58,6 +58,7 @@ parallel(Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_fil
 				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Property Ownership'),
 				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Property Sales'),
 				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Inquiry History'),
+				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Inquiry Velocity'),
 				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Utility'),
 				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Overall Derog History'),
 				 Kel_Shell_QA.AC_automated_file(logical_file_name,unique_field, inut_file_records, Tag, filtered_lay,'Input PII Characteristics'),
