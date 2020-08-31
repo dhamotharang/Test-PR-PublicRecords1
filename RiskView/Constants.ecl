@@ -55,10 +55,14 @@ export gatewayErrorCode := '22';
 export InputErrorCode 	:= '23';
 export purposeErrorCode := '24';
 export FDSubscriberIDErrorCode := '25';
+export FDGatewayTimeout := '26';
 export Deferred_request_code := '801';
 
-export SubscriberID_error_desc(string5 error_code) := function
-	desc := if(trim(error_code) = FDSubscriberIDErrorCode, 'Request for RiskView Checking Indicators denied due to incomplete account setup', '');
+export Checking_Indicator_error_desc(string5 error_code) := function
+  desc := map(
+			trim(error_code) = FDSubscriberIDErrorCode => 'Request for RiskView Checking Indicators denied due to incomplete account setup.',
+			trim(error_code) = FDGatewayTimeout 	=> 'Request for RiskView Checking Indicator attributes could not complete due to an error with the server. Note: This error is valid only for the RiskView Checking Indicators.',
+			'');
 	return desc;
 end;
 

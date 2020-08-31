@@ -71,6 +71,7 @@ fd_results_slim := project(fd_results, transform(fd_ln_names,
 FIRST_SEEN_DATE_temp := STD.Str.FilterOut(left.Response.FDCheckingIndicators.Indicator13, 'FIRST_SEEN_DATE=');
 FIRST_SEEN_DATE_TRUE_temp := STD.Str.FilterOut(left.Response.FDCheckingIndicators.Indicator14, 'FIRST_SEEN_DATE_TRUE=');
 LAST_SEEN_DATE_temp := STD.Str.FilterOut(left.Response.FDCheckingIndicators.Indicator15, 'LAST_SEEN_DATE=');
+TimeOutSet := STD.Str.Contains(left.Response._header.message,'timeout' ,false);
 
 self.seq := indata[1].input.seq;
 self.ARCHIVE_DATE := indata[1].input.historyDateTimeStamp[1..6];
@@ -87,7 +88,7 @@ self.NO_NEG_DECL_DAYS := STD.Str.FilterOut(left.Response.FDCheckingIndicators.In
 self.PREV_HOURS := STD.Str.FilterOut(left.Response.FDCheckingIndicators.Indicator26, 'PREV_HOURS=');
 self.RISK_PNC := STD.Str.FilterOut(left.Response.FDCheckingIndicators.Indicator30, 'RISK_PNC=');
 self.FD_Gateway_Pass := left.response._header.message = '';
-self.Exception_Code := '';
+self.Exception_Code := IF(TimeOutSet, RiskView.Constants.FDGatewayTimeout, '');
 
 self := left;));
 
