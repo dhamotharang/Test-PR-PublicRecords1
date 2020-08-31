@@ -148,15 +148,16 @@ checknegpaidtimenewest_1 := map(
                              min(84, max(1, round((Integer)left.LTD_DAYS / (365.25 / 12)))));
 
 checkcounttotal_1 := map(
-    left.LTD_QTY_TRUE = '' or left.LTD_AMT_TRUE = '' => -1,
-    (Real)left.LTD_AMT_TRUE <= 0                          => 0,
-                                                  (min(9999, max(0, (integer)left.LTD_QTY_TRUE))));
+                        left.LTD_QTY_TRUE = '' or left.LTD_AMT_TRUE = '' or (Real)left.LTD_AMT_TRUE = 0 or (Integer)left.LTD_QTY_TRUE = 0 => -1,
+                        (Real)left.LTD_AMT_TRUE < 0 => 0,
+                        (min(9999, max(0, (integer)left.LTD_QTY_TRUE))));
 
 checkamounttotal_1 := map(
-    left.LTD_QTY_TRUE = '' or left.LTD_AMT_TRUE = '' => -1,
-    (Integer)left.LTD_QTY_TRUE <= 0                          => 0,
-                                                  (min(9999999, max(1, round((real)left.LTD_AMT_TRUE)))));
+                          left.LTD_QTY_TRUE = '' or left.LTD_AMT_TRUE = '' or (Real)left.LTD_AMT_TRUE = 0 or (Integer)left.LTD_QTY_TRUE = 0 => -1,
+                          (Integer)left.LTD_QTY_TRUE < 0 => 0,
+                          (min(9999999, max(1, round((real)left.LTD_AMT_TRUE)))));
 
+                          
 _first_seen_date := models.common.sas_date((string)(left.FIRST_SEEN_DATE));
 
 mos_snc_first_seen_date := if(not(_first_seen_date = NULL), (string)round((sysdate - (integer)_first_seen_date) / (365.25 / 12)), '');
