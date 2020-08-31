@@ -76,12 +76,15 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
 					SELF := LEFT
 				)
 			);
-			
+
+   			
 		ds_ConsumerInstantIDInfo := BusinessInstantID20_Services.fn_GetConsumerInstantIDRecs( ds_CleanedInputWithValidAuthReps, Options, ds_GlobalWatchlistInfo,
 		LexIdSourceOptout := LexIdSourceOptout, 
 	  TransactionID := TransactionID, 
 	  BatchUID := BatchUID, 
-	  GlobalCompanyID := GlobalCompanyID );
+	  GlobalCompanyID := GlobalCompanyID,
+    TransformOptions := Options
+    );
 		
 		// 15. Get Person titles within the Business.
 		ds_PersonRoleInfo := BusinessInstantID20_Services.fn_GetPersonRoles(ds_WithLexIDs, ds_BIPIDsFound, Options, linkingOptions, AllowedSourcesSet);
