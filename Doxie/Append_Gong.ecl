@@ -108,8 +108,10 @@ end;
 hhid_base_recs := join(in_hhid,hhid_key,
                          left.hhid = right.s_hhid,get_hhid_base(LEFT, RIGHT), ATMOST(50));
 
-final_hhid := dedup(sort(hhid_base_recs(ut.NNEQ(phoneToMatch,phone10)),
-                    bdid,did,listed_name,phone10),bdid,did,listed_name,phone10);;
+final_hhid_pre := dedup(sort(hhid_base_recs(ut.NNEQ(phoneToMatch,phone10)),
+                    bdid,did,listed_name,phone10),bdid,did,listed_name,phone10);
+										
+final_hhid := suppress.MAC_SuppressSource(final_hhid_pre,mod_access,did2return2);
 
 layout_gong_out hhid2did(final_hhid le) :=
 TRANSFORM
