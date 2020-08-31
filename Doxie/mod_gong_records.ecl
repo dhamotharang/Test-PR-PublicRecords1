@@ -1,4 +1,4 @@
-import doxie, dx_header, dx_Gong, Suppress, ut;
+﻿import doxie, dx_header, dx_Gong, Suppress, ut;
 
 export mod_gong_records(
 	dataset(doxie.layout_references) dids,
@@ -17,28 +17,6 @@ layout_res_supp := RECORD
 END;
 
 iKeep := ut.limits.default;
-
-// DID and HHID lookups
-kh := dx_header.key_did_hhid();
-
-layout_hid := RECORD
-	UNSIGNED8 hhid_relat;
-END;
-
-layout_hid TakeHHID(kh l) := TRANSFORM
-	SELF := l;
-END;
-hhids := DEDUP(JOIN(dids, kh, keyed(LEFT.did = RIGHT.did), TakeHHID(RIGHT), keep(ikeep)), hhid_relat, ALL);
-
-// Find gong records by did or hhid
-kghh := dx_Gong.key_hhid();
-
-layout_res TakeGongByHHID(kghh r) :=
-TRANSFORM
-	SELF := r;
-	self := [];
-END;
-reshhid := JOIN(hhids, kghh, keyed(LEFT.hhid_relat = RIGHT.s_hhid), TakeGongByHHID(RIGHT), keep(ikeep));
 
 kgdid := dx_Gong.key_did();
 
