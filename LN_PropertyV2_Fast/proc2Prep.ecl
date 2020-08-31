@@ -40,9 +40,6 @@ EXPORT proc2Prep(string	prepDate, boolean isFast) :=  FUNCTION
 		
 		iRbkAs		:=	dedup(sort(BKMortgage.Files().fAssign(new_record = TRUE),-ln_filedate,pid),record, except raw_file_name, ln_filedate,all);
 		iRbkRl		:=	dedup(sort(BKMortgage.Files().fRelease(new_record = TRUE),-ln_filedate,pid),record, except raw_file_name, ln_filedate,all);
-	//Temp for testing only
-		// SampleRbkAs := CHOOSEN(iRbkAs,500);
-		// SampleRbkRl := CHOOSEN(iRbkRl,500);
 
 		// Load Fares data
 		iRfrD		:=	dedup(LN_PropertyV2_Fast.Files.raw.frs_deed,record,except raw_file_name,all);
@@ -101,11 +98,11 @@ EXPORT proc2Prep(string	prepDate, boolean isFast) :=  FUNCTION
 		combinedPrepAssessment		:=	prepOkcAssessment	
 			+ dedup(sort(LN_PropertyV2_Fast.fn_get_frs_assessment_cert_date(prepFrsAssessment),record),record)
 			+ project(LN_PropertyV2.irs_dummy_recs_assessor,tReformatToCommon(LEFT));
-		combinedPrepDeedMortgage	:= 	prepOkcDeed   + prepOkcMortgage + prepFrsDeed /*+ prepBKMortgage*/
+		combinedPrepDeedMortgage	:= 	prepOkcDeed   + prepOkcMortgage + prepFrsDeed + prepBKMortgage
 			+ project(LN_PropertyV2.irs_dummy_recs_deed,tReformatDeedToCommon(LEFT));
-		combinedPrepSearch_no_sri	:= 	prepOkcSearch + prepFrsSearch /*+ prepBKSearch*/;
+		combinedPrepSearch_no_sri	:= 	prepOkcSearch + prepFrsSearch + prepBKSearch;
 		combinedPrepAddlLegal			:=	prepAddlLegal + prepFrsAddlLegal;
-		combinedPrepAddlNames			:=	prepAddlNames /*+ prepBKAddlNames*/;
+		combinedPrepAddlNames			:=	prepAddlNames + prepBKAddlNames;
 
 		combinedPrepSearch_no_sri map_assign_source_rec_id(combinedPrepSearch_no_sri L) := TRANSFORM
 		
@@ -150,8 +147,8 @@ EXPORT proc2Prep(string	prepDate, boolean isFast) :=  FUNCTION
 							addToSuperFile(LN_PropertyV2_Fast.FileNames.prep.addl_frs_d,prefix_dated+'addl_frs_deed_mortgage'))
 						, sequential(output(combinedPrepSearch,										 	 ,prefix_dated+'search',overwrite,compressed), 
 							addToSuperFile(LN_PropertyV2_Fast.FileNames.prep.search_prp,prefix_dated+'search'))
-						//, sequential(output(prepBKAddlNameInfo,												 	 ,prefix_dated+'addl_name_info',overwrite,compressed), 
-						//	addToSuperFile(LN_PropertyV2_Fast.FileNames.prep.addl_name_info,prefix_dated+'addl_name_info'))
+						, sequential(output(prepBKAddlNameInfo,											 ,prefix_dated+'addl_name_info',overwrite,compressed), 
+							addToSuperFile(LN_PropertyV2_Fast.FileNames.prep.addl_name_info,prefix_dated+'addl_name_info'))
 					 );
 		archiveRawFile(string rawSuperFile) := FUNCTION 
 			  archiveSuperFile := rawSuperFile+'_archive';

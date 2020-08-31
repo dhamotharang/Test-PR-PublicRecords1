@@ -354,4 +354,112 @@
 
 	ENDMACRO;
 
+	//
+	// Business Header
+	//
+	EXPORT Drop_Header_Business_Header_Layout := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
+	Record
+		string15 rcid;
+		string15 bdid; 
+		string2 source; 
+		string34 source_group; 
+		string3 pflag; 
+		string15 group1_id; 
+		string34 vendor_id; 
+		string10 dt_first_seen; 
+		string10 dt_last_seen; 
+		string10 dt_vendor_first_reported;
+		string10 dt_vendor_last_reported;
+		string120 company_name;
+		string10 prim_range;
+		string2 predir;
+		string28 prim_name;
+		string4 addr_suffix;
+		string2 postdir;
+		string5 unit_desig;
+		string8 sec_range;
+		string25 city;
+		string2 state;
+		string8 zip;
+		string5 zip4;
+		string3 county;
+		string4 msa;
+		string10 geo_lat;
+		string11 geo_long;
+		string15 phone;
+		string5 phone_score; 
+		string10 fein; 
+		string1 current; 
+		string1 dppa; 
+		string81 match_company_name;
+		string20 match_branch_unit;
+		string25 match_geo_city := '';
+		string2 eor := '';
+ end;
+
+	EXPORT applyBusinessHeaderInj(base_ds) := FUNCTIONMACRO
+		import Business_Header, Suppress, ut;
+
+		local Base_File_Append_In := suppress.applyregulatory.getFile('file_business_header_inj.txt', Business_Header.Regulatory.Drop_Header_Business_Header_Layout);
+
+		recordof(base_ds) FormatOutput(Business_Header.Regulatory.Drop_Header_Business_Header_Layout L, integer c) := TRANSFORM
+			self.rcid := (unsigned6) L.rcid;
+			self.bdid := (unsigned6) L.bdid;
+			self.group1_id := (unsigned6) L.group1_id;
+			self.dt_first_seen := (unsigned4) L.dt_first_seen;
+			self.dt_last_seen := (unsigned4) L.dt_last_seen;
+			self.dt_vendor_first_reported := (unsigned4) L.dt_vendor_first_reported;
+			self.dt_vendor_last_reported := (unsigned4) L.dt_vendor_last_reported;	
+			self.zip := (unsigned3) L.zip;
+			self.zip4 := (unsigned2) L.zip4;
+			self.phone := (unsigned6) L.phone;
+			self.phone_score := (unsigned2) L.phone_score;
+			self.fein := (unsigned4) L.fein;
+			self.current := (boolean) L.current;
+			self.dppa := (boolean) L.dppa;
+			self := L;
+			SELF := [];
+		end;
+
+		
+		local Base_File_Append_Out := project(Base_File_Append_In, FormatOutput(left, counter));
+
+		return base_ds + Base_File_Append_Out;
+		
+	ENDMACRO;
+
+	EXPORT applyBusinessHeaderInj_AtEnd(base_ds) := FUNCTIONMACRO
+		import Business_Header, Suppress, ut;
+
+		local Base_File_Append_In := suppress.applyregulatory.getFile('file_business_header_inj.txt', Business_Header.Regulatory.Drop_Header_Business_Header_Layout);
+
+		max_file_pos := max(Business_Header.files(,Business_Header._Dataset().IsDataland).base.business_headers.keybuild,__filepos) : global;
+
+		recordof(base_ds) FormatOutput(Business_Header.Regulatory.Drop_Header_Business_Header_Layout L, integer c) := TRANSFORM
+			self.rcid := (unsigned6) L.rcid;
+			self.bdid := (unsigned6) L.bdid;
+			self.group1_id := (unsigned6) L.group1_id;
+			self.dt_first_seen := (unsigned4) L.dt_first_seen;
+			self.dt_last_seen := (unsigned4) L.dt_last_seen;
+			self.dt_vendor_first_reported := (unsigned4) L.dt_vendor_first_reported;
+			self.dt_vendor_last_reported := (unsigned4) L.dt_vendor_last_reported;	
+			self.zip := (unsigned3) L.zip;
+			self.zip4 := (unsigned2) L.zip4;
+			self.phone := (unsigned6) L.phone;
+			self.phone_score := (unsigned2) L.phone_score;
+			self.fein := (unsigned4) L.fein;
+			self.current := (boolean) L.current;
+			self.dppa := (boolean) L.dppa;
+			self.__filepos := max_file_pos + c;
+			self := L;
+			SELF := [];
+		end;
+
+		
+		local Base_File_Append_Out := project(Base_File_Append_In, FormatOutput(left, counter));
+
+		return base_ds + Base_File_Append_Out;
+		
+	ENDMACRO;
+
 END;

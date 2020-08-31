@@ -13,77 +13,6 @@ module
 
 	shared bh1 := pBH_Base;
 
-	//CNG W20070816-171946 dat//////////////////////////////////
-
-	Drop_Header_Layout := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
-	Record
-	 string15 rcid;
-	 string15 bdid; 
-	 string2 source; 
-	 string34 source_group; 
-	 string3 pflag; 
-	 string15 group1_id; 
-	 string34 vendor_id; 
-	 string10 dt_first_seen; 
-	 string10 dt_last_seen; 
-	 string10 dt_vendor_first_reported;
-	 string10 dt_vendor_last_reported;
-	 string120 company_name;
-	 string10 prim_range;
-	 string2 predir;
-	 string28 prim_name;
-	 string4 addr_suffix;
-	 string2 postdir;
-	 string5 unit_desig;
-	 string8 sec_range;
-	 string25 city;
-	 string2 state;
-	 string8 zip;
-	 string5 zip4;
-	 string3 county;
-	 string4 msa;
-	 string10 geo_lat;
-	 string11 geo_long;
-	 string15 phone;
-	 string5 phone_score; 
-	 string10 fein; 
-	 string1 current; 
-	 string1 dppa; 
-	 string81 match_company_name;
-	 string20 match_branch_unit;
-	 string25 match_geo_city := '';
-	 string2 eor := '';
-	end; 
-
-header_services.Supplemental_Data.mac_verify('file_business_header_inj.txt', Drop_Header_Layout, attr);
-
-Base_File_Append_In := attr();
-	 
-	business_header.Layout_Business_Header_Base reformat_header(Base_File_Append_In L) := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
-	 transform
-		self.rcid := (unsigned6) L.rcid;
-		self.bdid := (unsigned6) L.bdid;
-		self.group1_id := (unsigned6) L.group1_id;
-		self.dt_first_seen := (unsigned4) L.dt_first_seen;
-		self.dt_last_seen := (unsigned4) L.dt_last_seen;
-		self.dt_vendor_first_reported := (unsigned4) L.dt_vendor_first_reported;
-		self.dt_vendor_last_reported := (unsigned4) L.dt_vendor_last_reported;	
-		self.zip := (unsigned3) L.zip;
-		self.zip4 := (unsigned2) L.zip4;
-		self.phone := (unsigned6) L.phone;
-		self.phone_score := (unsigned2) L.phone_score;
-		self.fein := (unsigned4) L.fein;
-		self.current := (boolean) L.current;
-			self.dppa := (boolean) L.dppa;
-		self.match_geo_city := L.match_geo_city;
-		self := L;
-	 end;
-	 
-	 
-	shared Base_File_Append := project(Base_File_Append_In, reformat_header(left)); //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
-
-	/////////////////////////////////////////////////////
-
 	shared in_hdr2 := bh1;// + header.transunion_did;
 
 	full_out_suppress2 := project(Business_Header.Prep_Build.applyDidAddressBusiness_sup2(in_hdr2), Business_Header.Layout_Business_Header_Base);
@@ -92,8 +21,8 @@ Base_File_Append_In := attr();
 	// -- Start of moxie
 	/////////////////////////////////////////////////////////////////////////
 
-	bh := full_out_suppress2 + Base_File_Append;
-
+	bh := Business_Header.Prep_Build.applyBusinessHeaderInj(full_out_suppress2);
+	
 	bh_Filtered := filters.outs.business_headers(bh);
 
 	Business_Header.Layout_Business_Header_Base fixbhdates(bh L) := transform
