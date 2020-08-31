@@ -10,12 +10,12 @@ EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string ilfn) := function
 
 		fn := ExtractFileName(ilfn);
 
-		//nac2 := DATASET(lfn, $.Layouts2.rNac2Ex, thor);
 
 		cases := PROJECT(nac2(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCaseEx,
 										self.RecordCode := left.RecordCode;
 										self := LEFT.CaseRec;
 										));
+
 
 		clients := PROJECT(nac2(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClientEx,
 										self.RecordCode := left.RecordCode;
@@ -46,6 +46,8 @@ EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string ilfn) := function
 
 		errs := DISTRIBUTE((+)(addresses.dsErrs,clients.dsErrs,cases.dsErrs,contacts.dsErrs,exceptions.dsErrs,badRecords.dsErrs), RANDOM());
 
+
+
 		total := COUNT(nac2);
 		nErrors := COUNT(errs(Severity='E'));
 		nWarnings := COUNT(errs(Severity='W'));
@@ -57,11 +59,38 @@ EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string ilfn) := function
 		ExcessiveInvalidRecordsFound :=	(total=0) OR (err_rate	> $.Mod_Sets.threshld);
 
 
-		ncr := nac_v2.Print.NCR2_Report(fn, errs, total, nErrors, nWarnings, 'XX', ExcessiveInvalidRecordsFound);
+
+	addresses_programcodes := TABLE(addresses, {addresses.programcode, cnt:= COUNT(GROUP)}, programcode);
+	cases_programcodes := TABLE(cases, {cases.programcode, cnt:= COUNT(GROUP)}, programcode);
+	clients_programcodes := TABLE(clients, {clients.programcode, cnt:= COUNT(GROUP)}, programcode);
+	all_programs := SORT(addresses_programcodes + cases_programcodes + clients_programcodes, programcode, LOCAL);
+	tbl_programs := TABLE(all_programs, {all_programs.programcode, sumprogs:= SUM(GROUP, all_programs.cnt)}, programcode );
+
+	NAC_V2.Layouts2.rItemSummary transform_programs(RECORDOF(tbl_programs) l) := TRANSFORM
+		SELF.itemcode := l.programcode;
+		SELF.counts :=  l.sumprogs;
+	END;
+	ds_programs01 := PROJECT(tbl_programs, transform_programs(LEFT));
+
+
+ 		programs := SORT(ds_programs01 , itemcode, LOCAL);
+ 		
+		
+
+	types01 := SORT(Nac_V2.ExtractRecords(ilfn).Types, RecordCode, LOCAL);
+	NAC_V2.Layouts2.rItemSummary transform_types(RECORDOF(types01) l) := TRANSFORM
+		SELF.itemcode := l.recordcode;
+		SELF.counts :=  l.n;
+	END;
+	types := PROJECT(types01, transform_types(LEFT));
+
+
+		ncr := nac_v2.Print.NCR2_Report(fn, errs, total, nErrors, nWarnings, 'XX', ExcessiveInvalidRecordsFound, programs, types);
 
 		ncd := nac_v2.Print.NCD2_Report(fn, errs, total, nErrors, nWarnings, nWarned, nRejected, 'XX', ExcessiveInvalidRecordsFound);
 
 		ncx := Nac_v2.Print.NCX2_Report(cases, clients, addresses, contacts, exceptions, badRecords); 
+
 
 		return MODULE
 			EXPORT	DATASET($.ValidationCodes.rError) dsErrs := errs;

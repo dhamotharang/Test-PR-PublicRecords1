@@ -127,6 +127,7 @@ EXPORT Address_Category
 			[
 			'O'			//Other(Rehab, shelter, etc.)
 			,'T'		// Temporary
+			,'H'		// Homeless
 			]
 			;
 EXPORT Eligible_Status
