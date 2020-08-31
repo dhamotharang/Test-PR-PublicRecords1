@@ -1,5 +1,6 @@
 ﻿import Address, ut, AID;
-//DF-27577 Moved DID after AID
+//DF-27577 Moved DID after AID and Name processes
+//DF-27577 Removed Address.MAC_Address_Clean because it was not getting called/used
 in_file := VotersV2.Updated_Voters;
 
 //DF-27577 Added prep address fields
@@ -63,7 +64,7 @@ Infile_Name_Norm  := NORMALIZE(Infile_Addr_Norm
 //Bringing previous base files into the build process
 baseFile := VotersV2.File_Voters_Base + VotersV2.File_MA_Census_Base 
 //uncomment for testing purposes
-: persist('~thor_data400::persist::voters::BaseFile',SINGLE) 
+// : persist('~thor_data400::persist::voters::BaseFile',SINGLE) 
 ;
 
 //Concatenated previous base files with current update
@@ -171,5 +172,5 @@ clean_cache_addr_file := project(dwithAID
 // export Cleaned_Addr_Cache_Base :=  full_norm_file
 export Cleaned_Addr_Cache_Base :=  clean_cache_addr_file
 //uncomment for testing purposes
-: persist(VotersV2.Cluster+'persist::voters::Cleaned_Addr_Cache_Base',SINGLE)
+// : persist(VotersV2.Cluster+'persist::voters::Cleaned_Addr_Cache_Base',SINGLE)
 ;

@@ -18,8 +18,8 @@ export proc_build_all(string filedate) := function
 
   //DF-26929 - MA recs were determined to be Census records and not Voter Regs and thus need removed
   voter_reg := VotersV2.Translate_Voters_Codes;
-	PromoteSupers.MAC_SF_BuildProcess(voter_reg(source_state != 'MA'),VotersV2.Cluster+'base::Voters_Reg',aVotersMainBuild,2,,true);
-	PromoteSupers.MAC_SF_BuildProcess(voter_reg(source_state = 'MA'),VotersV2.Cluster+'base::MA_Census',aCensusMainBuild,2,,true);
+	PromoteSupers.MAC_SF_BuildProcess(voter_reg(source_state != 'MA'),VotersV2.Cluster+'base::Voters_Reg',aVotersMainBuild,3,,true);
+	PromoteSupers.MAC_SF_BuildProcess(voter_reg(source_state = 'MA'),VotersV2.Cluster+'base::MA_Census',aCensusMainBuild,3,,true);
   voter_hist      := VotersV2.Mapping_Voters_VoteHistory;
   voter_hist_only := VotersV2.Extract_Census_History(voter_reg, voter_hist).VoteHistOnly;
   census_hist     := VotersV2.Extract_Census_History(voter_reg, voter_hist).VoteHistCensus;

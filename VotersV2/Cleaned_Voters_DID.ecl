@@ -1,8 +1,8 @@
 ﻿import DID_Add, Header_Slimsort, ut, Lib_Stringlib, WatchDog, didville,mdr,header;
-//DF-27577 Moved DID after AID and NID
+//DF-27577 Moved DID after AID and Name processes
 //DF-27577 Reduced number of persist files to speed up build
 
-in_file := VotersV2.Cleaned_Voters_Names_NID;
+in_file := VotersV2.Cleaned_Voters_Names;
 
 // ut.mac_flipnames(in_file,fname,mname,lname, base_FlipNames)
 
@@ -25,7 +25,7 @@ ded_In_base_file  := dedup(sort(dist_In_Base_File, vtid, -process_date,
 													 mail_sec_range, mail_p_city_name, mail_st, mail_ace_zip, 
 													 local)
 													 //uncomment for testing
-													 :persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID_Sorted_Deduped', SINGLE)
+													 // :persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID_Sorted_Deduped', SINGLE)
 													 ;
 
 //#stored('did_add_force','roxi'); // remove or set to 'thor' to put recs through thor
@@ -57,7 +57,7 @@ Ds_Voters_WithDID := project(Ds_Voters_WithDID_src,
                              transform(VotersV2.Layouts_Voters.Layout_Voters_base_new, 	
 																			 string2 temp_st := if(trim(left.source_state,right,left) <> '',left.source_state,
 																														 if(trim(left.st,left,right) <> '',left.st,left.mail_st));
-																			 //persistent hash value										 
+                                       // persistent hash value									 
 	                                     self.rid := if (left.rid = 0, hash64(temp_st, left.vendor_id, left.lname, left.name_suffix, left.fname, left.mname, 
 																											                      left.name_type, left.dob, left.addr_type, left.prim_range, left.prim_name, left.predir,
 																																						left.addr_suffix, left.postdir, left.unit_desig, left.sec_range, left.p_city_name,
@@ -68,5 +68,5 @@ did_add.MAC_Add_SSN_By_DID(Ds_Voters_WithDID, did, ssn, Out_Voters_WithDidSsn)
 
 export Cleaned_Voters_DID := Out_Voters_WithDidSsn 
 //uncomment for testing purposes
-: persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID', SINGLE)
+// : persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID', SINGLE)
 ;

@@ -1,6 +1,6 @@
 ﻿import VotersV2, ut, _Validate, emerges, std;
-//DF-27577 Moved DID after AID
-//DF-27577 Moved Rollup from Updated_Voters to Transulate_Voters_Codes
+//DF-27577 Moved DID after AID and Name processes
+//DF-27577 Moved Rollup from Updated_Voters to Translate_Voters_Codes
 
 Clean_In_file  := VotersV2.File_Voters_Cleaned_Super;
 
@@ -34,6 +34,6 @@ emerges.MAC_eMerge_Date_Patch(clean_file,regdate,lastdatevote,regdate,regdate,da
 
 export Updated_Voters := date_fix
 //uncomment for tesing
- : persist(VotersV2.Cluster + 'persist::Updated_Voters', SINGLE)
+ // : persist(VotersV2.Cluster + 'persist::Updated_Voters', SINGLE)
  ;
 

@@ -1,7 +1,7 @@
 ﻿import VotersV2, Codes, ut;
-//DF-27577 Moved DID after AID and NID processes
+//DF-27577 Moved DID after AID and Name processes
 //DF-27577 Moved Rollup from Updated_Voters to Transulate_Voters_Codes
-//DF-27577 Moved NID process to between AID and DID processes
+//DF-27577 Moved Name process to between AID and DID processes
 //DF-27577 Renamed Transulate_Voters_Codes to Translate_Voters_Codes
 
 Cleaned_Voters_DID_Base := VotersV2.Cleaned_Voters_DID;
@@ -140,5 +140,5 @@ Rollup_Voters := rollup(Sort_Cleaned_Patched_file,rollupXform(LEFT,RIGHT),RECORD
 
 export Translate_Voters_Codes := Rollup_Voters 
 //uncomment for testing purposes
-: persist(VotersV2.Cluster+ 'persist::Transulate_Voters_Codes', SINGLE)
+// : persist(VotersV2.Cluster+ 'persist::Transulate_Voters_Codes', SINGLE)
 ;
