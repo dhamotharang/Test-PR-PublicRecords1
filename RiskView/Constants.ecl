@@ -55,6 +55,7 @@ export gatewayErrorCode := '22';
 export InputErrorCode 	:= '23';
 export purposeErrorCode := '24';
 export FDSubscriberIDErrorCode := '25';
+export Deferred_request_code := '801';
 
 export SubscriberID_error_desc(string5 error_code) := function
 	desc := if(trim(error_code) = FDSubscriberIDErrorCode, 'Request for RiskView Checking Indicators denied due to incomplete account setup', '');
@@ -73,6 +74,8 @@ end;
 export StatusRefresh_error_desc := 'Error occurred in status refresh.';
 
 export DTE_error_desc := 'The requested public record was not available.';
+
+export Deferred_request_desc := 'Request has been Deferred';
 
 export set_Valid_Name_Suffix := ['', 'JR', 'SR', 'ST', 'ND', 'RD', 'TH'];
 
