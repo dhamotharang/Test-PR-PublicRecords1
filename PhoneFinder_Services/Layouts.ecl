@@ -938,6 +938,7 @@
     STRING15 phonenumber;
     STRING16 risk_indicator;
     STRING32 phone_type;
+    STRING30 carrier;
     STRING32 phone_status;
     INTEGER identity_count;
     STRING64 listing_name;
