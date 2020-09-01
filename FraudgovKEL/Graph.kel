@@ -927,6 +927,7 @@ PersonPerson := ASSOCIATION(FLAT(
 
     ));
 
+
 USE FraudgovKEL.fraudgovshared(FLAT,
   Event(FILTER((UNSIGNED)record_id > 0), 
     LexId = did,
@@ -1115,7 +1116,7 @@ USE FraudgovKEL.fraudgovshared(FLAT,
     DeceasedMatchCode = matchcode,
 		DateFirstSeen = dt_first_seen, // Contains information for ASOF
 		DateLastSeen = dt_last_seen),		// Contains information for ASOF
-	Address(FILTER((UNSIGNED)record_id > 0 AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0),
+	Address(FILTER((UNSIGNED)record_id > 0 AND OttoAddressId != 12638153115695167395),
 		PrimaryRange = clean_address.prim_range,
 		Predirectional = clean_address.predir,
 		PrimaryName = clean_address.prim_name,
@@ -1198,13 +1199,13 @@ USE FraudgovKEL.fraudgovshared(FLAT,
 		CreatedOn=email_address_date,
 		DateFirstSeen = dt_first_seen,
 		DateLastSeen = dt_last_seen),
-	PersonAddress(FILTER((UNSIGNED)did <> 0 AND (STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0 AND AssociatedCustomerFileInfo > 0),
+	PersonAddress(FILTER((UNSIGNED)did <> 0),
     LexId = did,
 		EventDate = event_date,
 		DateLastSeen = dt_last_seen,
 		DateFirstSeen = dt_first_seen),
 
-  CustomerPerson(FILTER((UNSIGNED)did<>0 AND (UNSIGNED)ssn<>0 AND AssociatedCustomerFileInfo > 0),		
+  CustomerPerson(FILTER((UNSIGNED)did<>0 AND AssociatedCustomerFileInfo > 0),		
     LexId = did,
 		DateLastSeen = dt_last_seen,
 		DateFirstSeen = dt_first_seen),
@@ -1214,11 +1215,11 @@ USE FraudgovKEL.fraudgovshared(FLAT,
 		EventDate = event_date,
 		DateLastSeen = dt_last_seen,
 		DateFirstSeen = dt_first_seen),
-	AddressSSN(FILTER((STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0 AND (UNSIGNED)ssn <>0 AND AssociatedCustomerFileInfo > 0),
+	AddressSSN(FILTER((UNSIGNED)ssn <>0 AND AssociatedCustomerFileInfo > 0),
 		EventDate = event_date,
 		DateLastSeen = dt_last_seen,
 		DateFirstSeen = dt_first_seen),
-	PersonPhone(FILTER((UNSIGNED)did <> 0 AND clean_phones.cell_phone != '' AND (STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0),
+	PersonPhone(FILTER((UNSIGNED)did <> 0 AND clean_phones.cell_phone != ''),
     LexId = did,
 		EventDate = event_date,
 		PhoneNumber = clean_phones.cell_phone,
@@ -1248,11 +1249,13 @@ USE FraudgovKEL.fraudgovshared(FLAT,
     Transaction = record_id,
 		EventDate = event_date   
   ),
+  /*
   PhoneEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND clean_phones.cell_phone != ''),
 		PhoneNumber = clean_phones.cell_phone,
 		EventDate = event_date,
     Transaction = record_id    
   ),
+  */
   PhoneEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND clean_phones.phone_number != ''),
 		PhoneNumber = clean_phones.phone_number,
 		EventDate = event_date,
@@ -1276,11 +1279,11 @@ USE FraudgovKEL.fraudgovshared(FLAT,
 		EventDate = event_date,
     Transaction = record_id    
   ),  
-  InternetProtocolEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND TRIM(ip_address) != '' AND ip_address NOT IN ['0.0.0.0','10.121.146.247','10.121.146.90','10.121.146.15','10.121.146.159','10.121.146.249','10.121.146.34','10.121.146.231','10.121.146.235','10.121.146.232']),
+  InternetProtocolEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND TRIM(ip_address) != '' AND ip_address NOT IN ['0.0.0.0']),
 		EventDate = event_date,
     Transaction = record_id    
   ),
-  AddressEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0),
+  AddressEvent(FILTER(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND OttoAddressId != 12638153115695167395),
     EventDate = event_date,
     Transaction = record_id    
   ),
@@ -1325,9 +1328,9 @@ USE FraudgovKEL.fraudgovshared(FLAT,
     Transaction = record_id    
   ),
 */
-  InternetProtocol(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND TRIM(ip_address) != '' AND ip_address NOT IN ['0.0.0.0','10.121.146.247','10.121.146.90','10.121.146.15','10.121.146.159','10.121.146.249','10.121.146.34','10.121.146.231','10.121.146.235','10.121.146.232'])),
+  InternetProtocol(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND TRIM(ip_address) != '' AND ip_address NOT IN ['0.0.0.0'])),
 	
-  PersonIpAddress(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND TRIM(ip_address) != '' AND ip_address NOT IN ['0.0.0.0','10.121.146.247','10.121.146.90','10.121.146.15','10.121.146.159','10.121.146.249','10.121.146.34','10.121.146.231','10.121.146.235','10.121.146.232']),
+  PersonIpAddress(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND TRIM(ip_address) != '' AND ip_address NOT IN ['0.0.0.0']),
     LexId = did),
 
   Bank(FILTER(bank_routing_number_1 != '' AND bank_account_number_1 != ''),
@@ -1437,7 +1440,7 @@ USE FraudgovKEL.PersonCrim(FLAT,
 USE FraudgovKEL.PersonIPMetadata(FLAT,
   Event(FILTER((UNSIGNED)record_id > 0 and did > 0), 
     LexId = did),
-  InternetProtocol(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND ip_address NOT IN ['0.0.0.0','10.121.146.247','10.121.146.90','10.121.146.15','10.121.146.159','10.121.146.249','10.121.146.34','10.121.146.231','10.121.146.235','10.121.146.232']),
+  InternetProtocol(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND ip_address NOT IN ['0.0.0.0']),
     IpAddress = ip_address
     )
   );
