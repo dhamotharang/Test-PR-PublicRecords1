@@ -8,10 +8,10 @@ IMPORT Std;
 //#option('freezepersists', true);
 
 EntityAssessment := FraudgovKEL.KEL_EventPivot.EntityAssessment;
-MyRules := FraudgovKEL.KEL_EventPivot.MyRules;
+MyRules := FraudgovKEL.KEL_EventPivot.MyRules(rulename != 'rulename');
 RulesFlagsMatched := FraudgovKEL.KEL_EventPivot.RulesFlagsMatched;
 
-ModelingOutput := EntityAssessment(industrytype = 1029 and customerid = 20995239);
+ModelingOutput := EntityAssessment/*(industrytype = 1029 and customerid = 20995239)*/;
 
 RulesList := TABLE(MyRules, {customerid, industrytype, entitytype, rulename, description}, customerid, industrytype, entitytype, rulename, description, MERGE);
 
@@ -85,7 +85,8 @@ ModelingWithHRICounts := JOIN(ModelingAttributeOutput, HighRiskCounts, LEFT.agen
                     
 // JOIN Scoring Debug to Modeling Output
 
-ModelingWithScoringDebug := JOIN(ModelingWithHRICounts, RulesFlagFinal, LEFT.agencyuid = RIGHT.customerid AND LEFT.agencyprogtype=RIGHT.industrytype AND (UNSIGNED8)LEFT.t_actuid=(UNSIGNED8)RIGHT.t_actuid, HASH);
+ModelingWithScoringDebug := PROJECT(JOIN(ModelingWithHRICounts, RulesFlagFinal, LEFT.agencyuid = RIGHT.customerid AND LEFT.agencyprogtype=RIGHT.industrytype AND (UNSIGNED8)LEFT.t_actuid=(UNSIGNED8)RIGHT.t_actuid, HASH), 
+                              TRANSFORM({RECORDOF(LEFT) AND NOT [customerid, industrytype]}, SELF := LEFT));
 
-output(ModelingWithScoringDebug,,'~fraudgov::deleteme_nd_full', overwrite);	
-output(ModelingOutput,,'~fraudgov::deleteme_nd_csv', CSV(QUOTE('"')), overwrite);
+output(ModelingWithScoringDebug,,'~fraudgov::deleteme_nd_full_' + Std.Date.CurrentDate(), overwrite);	
+output(ModelingWithScoringDebug,,'~fraudgov::RIN2_ScoringOutput_' + Std.Date.CurrentDate() + '_csv', CSV(QUOTE('"')), overwrite);
