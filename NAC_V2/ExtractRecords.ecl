@@ -17,7 +17,7 @@ EXPORT ExtractRecords(string ilfn) := MODULE
 		string	  filename;
 		unsigned4	seqnum;
 		Nac_V2.Layouts2.rNac2;
-		STRING left_text;   //  rada remove
+		STRING left_text; 
 		UNSIGNED4 textLength;
 	END;	
 

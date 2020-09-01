@@ -207,7 +207,7 @@
 			'E302'	=> 'No primary address line',
 			'E412'	=> 'Street name not found', 
 			'E413'	=> 'Possible street-name matches',
-			'E420'	=> 'Primary ranZge is missing', 
+			'E420'	=> 'Primary range is missing', 
 			'E421'	=> 'Primary range is invalid',
 			'E422'	=> 'Predirectional is wrong or missing',
 			'E423'	=> 'Suffix needed is wrong or missing',

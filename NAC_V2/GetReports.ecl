@@ -92,6 +92,7 @@ EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string ilfn) := function
 		ncx := Nac_v2.Print.NCX2_Report(cases, clients, addresses, contacts, exceptions, badRecords); 
 
 
+
 		return MODULE
 			EXPORT	DATASET($.ValidationCodes.rError) dsErrs := errs;
 			EXPORT	DATASET($.Print.dRow) dsNcr2 := ncr;

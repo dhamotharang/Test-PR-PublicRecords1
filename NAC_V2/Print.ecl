@@ -115,7 +115,6 @@ EXPORT Print := MODULE
 																				DATASET(NAC_V2.Layouts2.rItemSummary) types
 																				) := FUNCTION
 
-	nac2 := nac_v2.PreprocessNCF2(lfn);
 
   d_prog := programs(itemcode = 'D');  // DSNAP
 	UNSIGNED4	d_count :=  d_prog[1].counts;  
@@ -171,7 +170,7 @@ EXPORT Print := MODULE
 		UNSIGNED4 EX01_count := EX01_type[1].counts; 
 
 
-				ds := DATASET([{lfn}], dRow)
+				ds := DATASET([{lfn}], dRow) 
 							& NCR_Header
 							& PROJECT(SORT(NCR_Samples(errs, nTotal, st),textValue), TRANSFORM(dRow,
 										self.text := (string6)left.state + (string6)left.RecordCode +
@@ -224,6 +223,8 @@ EXPORT Print := MODULE
 		toText		:=	rollup(ds, true, tText(left, right));
 		return toText[1].Text;
 	END;
+
+
 
 
 	export	rNCD	:=
