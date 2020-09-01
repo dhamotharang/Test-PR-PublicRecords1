@@ -159,6 +159,7 @@ EXPORT nacin := UNGROUP(PROJECT(ds1, xform2(left)));
 		export types := 
 			TABLE(nacin, {nacin.RecordCode, n := COUNT(GROUP)}, RecordCode, few);			
 		
+
 		export filenames := 
 			TABLE(nacin, {nacin.filename, n := COUNT(GROUP)}, filename, few);
 
