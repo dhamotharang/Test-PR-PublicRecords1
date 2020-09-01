@@ -213,7 +213,7 @@ EXPORT _Search:=MODULE
       dAirportReplacement:=BIPV2.fn_translate_city(stringlib.StringToUpperCase(LEFT.city));
 			sTmpCity:=IF(LENGTH(TRIM(LEFT.city))=3,IF(COUNT(dAirportReplacement)=0,LEFT.city,dAirportReplacement[1]),LEFT.city);
 			sTmpState:=IF(LENGTH(TRIM(LEFT.city))=3,IF(COUNT(dAirportReplacement)=0,LEFT.st,dAirportReplacement[2]),LEFT.st);
-      dZips:=BIPV2.fn_get_zips_2(SELF.city,sTmpState,TRIM(LEFT.zip_cases[1].zip),LEFT.zip_radius);
+      dZips:=BIPV2.fn_get_zips_2(sTmpCity,sTmpState,TRIM(LEFT.zip_cases[1].zip),LEFT.zip_radius);
       Input_zip_radius:=LEFT.zip_radius;
       SELF.zip_cases:=MAP(
         ~bZipExtrapolate AND TRIM(LEFT.zip_cases[1].zip)='' => DATASET([],BizLinkFull.Process_Biz_Layouts.layout_zip_cases),
