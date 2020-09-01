@@ -1,6 +1,6 @@
 ﻿import _Control,STD,FraudGovPlatform_Validation;
 
-Every_Five_Minutes:='*/10 * * * *';
+Every_Nine_Minutes:='*/9 * * * *';
 
 ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.hthor_Dev,	FraudGovPlatform_Validation.Constants.hthor_Prod);
 
@@ -30,10 +30,11 @@ ECL :=
 #WORKUNIT('protect',true);
 #WORKUNIT('name', 'FraudGov Prod Dashboards Version Refresh Schedule');
 
+SkipJob := FraudGovPlatform.Files().Flags.SkipModules[1].SkipDashboardVersion;
 RunJob := FraudGovPlatform.Files().Flags.RefreshProdDashVersion[1].refreshversion;
-Run_ECL := if(RunJob=true,ECL, 'output(\'Refresh Prod Dashboards Version Skipped\');\n' );
+Run_ECL := if(RunJob=true and SkipJob =false,ECL, 'output(\'Refresh Prod Dashboards Version Skipped\');\n' );
 
-_Control.fSubmitNewWorkunit(Run_ECL,ThorName):WHEN(CRON(Every_Five_Minutes))
+_Control.fSubmitNewWorkunit(Run_ECL,ThorName):WHEN(CRON(Every_Nine_Minutes))
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
 			,'FraudGov Prod Dashboards Version Refresh Schedule failure'
 			,FraudGovPlatform_Validation.Constants.NOC_MSG

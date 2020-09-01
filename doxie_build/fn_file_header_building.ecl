@@ -1,4 +1,4 @@
-﻿import doxie_build, header, header_services,ut, yellowpages, AID, suppress, DriversV2;
+﻿import doxie_build, header, header_services,ut, yellowpages, AID, suppress, DriversV2, mdr;
 
 export fn_file_header_building(dataset(recordof(header.Layout_Header)) in_hdr0) := 
 function
@@ -10,7 +10,13 @@ yes_from_raw := in_hdr1(~(src in ['TS','TU','LT']));
 
 header.macGetCleanAddr(not_from_raw, RawAID, true, not_from_raw_recleaned);
 
-in_hdr2 := yes_from_raw + not_from_raw_recleaned;
+not_from_raw_recleaned_TS     := not_from_raw_recleaned(src = 'TS');
+not_from_raw_recleaned_not_TS := not_from_raw_recleaned(src <> 'TS');
+
+//rollup to remove duplicate TS records after address cleaning
+Header.Mac_dedup_header(not_from_raw_recleaned_TS, not_from_raw_recleaned_uniq_TS, '_TS');
+
+in_hdr2 := yes_from_raw + not_from_raw_recleaned_uniq_TS + not_from_raw_recleaned_not_TS;
 
 in_hdr3 := project(in_hdr2,transform(recordof(in_hdr2)
 									,self.name_suffix:=if(left.name_suffix[1..2]='UN','',left.name_suffix)
@@ -48,14 +54,14 @@ header_services.Supplemental_Data.mac_verify('didaddress_sup.txt',Suppression_La
  
 Suppression_In := supp_ds_func();
 
-dSuppressedIn := project(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
+dSuppressedIn_tmp := project(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
 
 header.layout_header tSuppress(full_ShortSuppress l) := transform
  self := l;
 end;
 // dSuppressedIn substituted below with full_LongSuppress
 
-full_out_suppress := join(full_ShortSuppress, dSuppressedIn,
+full_out_suppress := join(full_ShortSuppress, dSuppressedIn_tmp,
                           left.hval_address=right.hval,
 													tSuppress(left),
 													left only,lookup);
@@ -157,36 +163,7 @@ Base_File_Append := project(Base_File_Append_In, reformat_header(left)); //REMOV
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-layout_ff := Record
-     data16 hval_did ;
-     data16 hval_ssn ;
-		 string1 nl := '\n' ;
-END ;
-
-header_services.Supplemental_Data.mac_verify('ff_sup.txt',layout_ff, ff_sup_attr); // 
- 
-Base_ff_sup := ff_sup_attr();
-
-
-ff_base := JOIN(fix_name_suffix, Base_ff_sup,
-                    hashmd5((string9)left.ssn) = right.hval_ssn 
-                    AND
-						  hashmd5(intformat(left.did,15,1)) != right.hval_did,
-						  TRANSFORM(LEFT),
-						  LEFT ONLY, ALL) ;
-
-///
-
-header_services.Supplemental_Data.mac_verify('ridrec_sup.txt',Suppression_Layout, base_sup_attr); // 
- 
-Base_rid_sup_in := base_sup_attr() ;
-
-base_rid_sup := PROJECT(Base_rid_sup_in ,header_services.Supplemental_Data.in_to_out(left));
-
-rid_base := JOIN(ff_base, base_rid_sup,
-                 hashmd5(intformat((unsigned6)left.rid,15,1)) = right.hval,                    
-						     TRANSFORM(LEFT),
-						    LEFT ONLY, ALL) ;
+rid_base :=  Header.Prep_Build.applyRidRecSup(fix_name_suffix);						  	
 						  
 base_file_inj := 	rid_base ;					   
 

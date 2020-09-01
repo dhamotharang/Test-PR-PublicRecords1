@@ -48,6 +48,7 @@ module
 	// -- JIRA - DF-23018 - Consumer Dispute - Paw Record to be removed
 	// -- JIRA - DF-24482 - People at Work detail needs to be removed from individual
 	// -- JIRA - DF-24522 - Consumer Dispute - Unlink to PAW - zoom record
+	// -- JIRA - BH-918 - Possible overlink on Zoom documents
 	shared Bad_zoom_vend_ids := [	'1901732652   C23201883',
 																'1793702174   C355227920',
 																'1793716775   C355227920',
@@ -78,7 +79,8 @@ module
 																'1281160320    C26201112',
 																'1346792667C92292992',				// JIRA - DF-23018
 																'1580842040C59082544',				// JIRA - DF-24482
-																'1924843383   C77627406'			// JIRA - DF-24522
+																'1924843383   C77627406',			// JIRA - DF-24522
+																'1959863597   C124634019'     // JIRA - BH-918
 															 ];
 	
 	export Input :=
@@ -171,6 +173,8 @@ module
 				or	(regexfind('PETER KIRN|PETERKIRN', pInput.company_name, nocase))
 				// -- JIRA# DF-26483 - Flush the Internet Domain (Whois) records as per Jason.
 				or	(MDR.sourceTools.SourceIsWhois_domains(pInput.source))
+				// -- JIRA# DF-28031 - Remove TMSID DF204043915806782546018877941 from D&B FEIN
+				or	(MDR.sourceTools.SourceIsDunn_Bradstreet_Fein(pInput.source) and trim(pInput.vendor_id,left,right) = '018877941')
 				; 		
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -704,6 +708,8 @@ module
 				or (MDR.sourceTools.sourceIsMA_Corporations(pInput.source) and trim(pInput.vendor_id) = '25-FW1GV5')
 				// -- JIRA# DF-26483 - Flush the Internet Domain (Whois) records as per Jason.
 				or	(MDR.sourceTools.SourceIsWhois_domains(pInput.source))
+				// -- JIRA# DF-28031 - Remove TMSID DF204043915806782546018877941 from D&B FEIN
+				or	(MDR.sourceTools.SourceIsDunn_Bradstreet_Fein(pInput.source) and trim(pInput.vendor_id,left,right) = '018877941')
 				;
 
 			boolean lFullFilter 		:= if(pFilterOut

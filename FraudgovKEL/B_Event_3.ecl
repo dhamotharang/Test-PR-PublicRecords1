@@ -3117,7 +3117,7 @@ EXPORT B_Event_3 := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE605399 := JOIN(__EE605397,__EE582627,__JC605398(LEFT,RIGHT),__JT605398(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __EE605399 := JOIN(__EE605397,__EE582627,__JC605398(LEFT,RIGHT),__JT605398(LEFT,RIGHT),LEFT OUTER,SMART);
   SHARED __EE582607 := __ENH_Person_4;
   SHARED __ST599434_Layout := RECORD
     KEL.typ.nuid UID;
@@ -4769,5 +4769,5 @@ EXPORT B_Event_3 := MODULE
     SELF.T___Inp_Cln_Last_Nm_Echo_ := MAP(__T(__OR(__OP2(__PP604551.Last_Name_,=,__CN('')),__NT(__PP604551.Last_Name_)))=>__ECAST(KEL.typ.nstr,__CAST(KEL.typ.str,__CN(-99999))),__ECAST(KEL.typ.nstr,__PP604551.Last_Name_));
     SELF := __PP604551;
   END;
-  EXPORT __ENH_Event_3 := PROJECT(__EE605403,__ND609539__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_3',EXPIRE(7));
+  EXPORT __ENH_Event_3 := PROJECT(__EE605403,__ND609539__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Event::Annotated_3',EXPIRE(7));
 END;

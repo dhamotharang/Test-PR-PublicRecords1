@@ -29,6 +29,16 @@
   unsigned4 vehicle_src_cnt;
   unsigned4 dl_src_cnt;
   unsigned4 voter_src_cnt;
+	unsigned4 src_cnt_total;
+  unsigned4 insurance_src_cnt_total;
+  unsigned4 bureau_src_cnt_total;
+  unsigned4 property_src_cnt_total;
+  unsigned4 utility_src_cnt_total;
+  unsigned4 vehicle_src_cnt_total;
+  unsigned4 dl_src_cnt_total;
+  unsigned4 voter_src_cnt_total;
   string5   addressstatus;
   string3   addresstype;
+	unsigned8 locid;
+	unsigned8 permissions;
  END;

@@ -784,5 +784,5 @@ EXPORT B_Event_6 := MODULE
     SELF.T___In_Agency_Flag_ := MAP(__T(__OP2(__PP135287._r_Source_Customer_,<>,__PP135287._r_Customer_))=>0,1);
     SELF := __PP135287;
   END;
-  EXPORT __ENH_Event_6 := PROJECT(__EE133243,__ND136009__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_6',EXPIRE(7));
+  EXPORT __ENH_Event_6 := PROJECT(__EE133243,__ND136009__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Event::Annotated_6',EXPIRE(7));
 END;

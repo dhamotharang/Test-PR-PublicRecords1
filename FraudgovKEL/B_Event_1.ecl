@@ -23469,7 +23469,7 @@ EXPORT B_Event_1 := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE1863864 := JOIN(__EE1862783,__EE1568045,__JC1862789(LEFT,RIGHT),__JT1862789(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __EE1863864 := JOIN(__EE1862783,__EE1568045,__JC1862789(LEFT,RIGHT),__JT1862789(LEFT,RIGHT),LEFT OUTER,SMART);
   EXPORT __ST78136_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
@@ -24378,5 +24378,5 @@ EXPORT B_Event_1 := MODULE
     SELF.T___Src_Agency_Uid_ := __PP1863865.Customer_Id_;
     SELF := __PP1863865;
   END;
-  EXPORT __ENH_Event_1 := PROJECT(__EE1863864,__ND1863869__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_1',EXPIRE(7));
+  EXPORT __ENH_Event_1 := PROJECT(__EE1863864,__ND1863869__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Event::Annotated_1',EXPIRE(7));
 END;

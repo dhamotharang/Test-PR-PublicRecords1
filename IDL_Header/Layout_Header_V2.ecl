@@ -1,4 +1,4 @@
-EXPORT Layout_Header_v2 := RECORD
+﻿EXPORT Layout_Header_v2 := RECORD
 	UNSIGNED8 	RID;
 	UNSIGNED8 	DID;
 	STRING9			SRC;// Contains product abbreiviation and ambest
@@ -21,6 +21,9 @@ EXPORT Layout_Header_v2 := RECORD
 	STRING2			ADDR_IND;		// 1=Current, 2=Former1, 3=Former2, ....
 	STRING1			BEST_ADDR_IND;
 	STRING1     PHONE_IND;
+	STRING1			PHONE_TYPE;	//DF-28025
+	STRING2			EMAIL_IND;	//DF-28025
+	STRING1			EMAIL_TYPE; //DF-28025
 
 	STRING10		PHONE;
 	STRING9			SSN;
@@ -53,5 +56,6 @@ EXPORT Layout_Header_v2 := RECORD
 	STRING3			AddressType;
 	UNSIGNED INTEGER6 BOCA_DID;
 	STRING18    VENDOR_ID;
+	STRING60		Email; //DF-28025
 END;
 
