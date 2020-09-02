@@ -1,5 +1,4 @@
-﻿IMPORT ut;
-IMPORT Data_Services; 
+﻿IMPORT ut, Data_Services, FLAccidents_Ecrash; 
 
 EXPORT fn_FL_Fiers_Removal := FUNCTION
 
@@ -23,140 +22,139 @@ EXPORT fn_FL_Fiers_Removal := FUNCTION
 	  UNSIGNED8 total_citations_after_delete;
 	END;
 
- //Incident
-
-	ds_incident_fiers := DATASET('~thor_data400::in::ecrash::incident_raw::flremoval'
+  //Incident
+  ds_incident_fiers := DATASET('~thor_data400::in::ecrash::incident_raw::flremoval'
 															 ,FLAccidents_Ecrash.Layout_Infiles.incident_new
-															 ,csv(terminator('\n'), separator('|'),quote('"'),maxlength(10000)))(Incident_ID != 'Incident_ID');                    
+															 ,CSV(TERMINATOR('\n'), SEPARATOR('|\t|'), QUOTE('"'), MAXLENGTH(60000)))(Incident_ID != 'Incident_ID');                    
 
   ds_incident := DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::incidnt_raw_new'
-															,FLAccidents_Ecrash.Layout_Infiles.incident_new
-															,csv(terminator('\n'), separator(','),quote('"'),maxlength(60000)))(Incident_ID != 'Incident_ID');                  
+												 ,FLAccidents_Ecrash.Layout_Infiles.incident_new
+												 ,CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"'), MAXLENGTH(60000)))(Incident_ID != 'Incident_ID');                  
 
-	d_incident_fiers := DISTRIBUTE(ds_incident_fiers, HASH32(incident_id));
-	d_incident := DISTRIBUTE(ds_incident, HASH32(incident_id));
+	d_incident_fiers := DISTRIBUTE(ds_incident_fiers, HASH32(incident_id)):INDEPENDENT;
+	d_incident := DISTRIBUTE(ds_incident, HASH32(incident_id)):INDEPENDENT;
 	
   fl_fiers_incident := JOIN(d_incident, d_incident_fiers,
-														TRIM(LEFT.incident_id, ALL) = TRIM(RIGHT.incident_id,ALL),
+														TRIM(LEFT.incident_id, LEFT, RIGHT) = TRIM(RIGHT.incident_id, LEFT, RIGHT),
 														TRANSFORM(LEFT), LOCAL);
 									 
   //Incident fiers fl data deletion
   fl_fiers_incident_deletion := JOIN(d_incident, d_incident_fiers,
-																		 TRIM(LEFT.incident_id, ALL) = TRIM(RIGHT.incident_id,ALL),
+																		 TRIM(LEFT.incident_id, LEFT, RIGHT) = TRIM(RIGHT.incident_id, LEFT, RIGHT),
 																		 TRANSFORM(LEFT), LEFT ONLY, LOCAL):INDEPENDENT;
 					
-	 OUTPUT(fl_fiers_incident_deletion,,'~thor_data400::in::ecrash::fl_fiers_data_removal_incident_'+WORKUNIT,overwrite, __compressed__,
-					csv(terminator('\n'), separator(','),quote('"'),maxlength(60000)));
+	out_inc := OUTPUT(fl_fiers_incident_deletion,,'~thor_data400::in::ecrash::fl_fiers_data_removal_incident_'+WORKUNIT,overwrite, __compressed__,
+					          CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"'), MAXLENGTH(60000)));
 
 	inc_all :=  SEQUENTIAL(
-		FileServices.StartSuperFileTransaction(),
-		FileServices.ClearSuperFile('~thor_data400::in::ecrash::incidnt_raw_new', FALSE),
-		FileServices.AddSuperFile('~thor_data400::in::ecrash::incidnt_raw_new','~thor_data400::in::ecrash::fl_fiers_data_removal_incident_'+WORKUNIT),
-		FileServices.FinishSuperFileTransaction()
-	);
-	
-	
-  //Person
+												 out_inc, 
+												 FileServices.StartSuperFileTransaction(),
+												 FileServices.ClearSuperFile('~thor_data400::in::ecrash::incidnt_raw_new', FALSE),
+												 FileServices.AddSuperFile('~thor_data400::in::ecrash::incidnt_raw_new','~thor_data400::in::ecrash::fl_fiers_data_removal_incident_'+WORKUNIT),
+												 FileServices.FinishSuperFileTransaction()
+												);
 
-	ds_person_fiers :=	DATASET('~thor_data400::in::ecrash::person_raw::flremoval'
-												    	,FLAccidents_Ecrash.Layout_Infiles.persn_new
-													    ,csv(terminator('\n'), separator('|'),quote('"'),escape('\r'),maxlength(3000000)))(Person_ID != 'Person_ID');
+  //Person
+  ds_person_fiers :=	DATASET('~thor_data400::in::ecrash::person_raw::flremoval'
+												     ,FLAccidents_Ecrash.Layout_Infiles.persn_new
+													   ,CSV(TERMINATOR('\n'), SEPARATOR('|\t|'), QUOTE('"'), MAXLENGTH(3000000)))(Person_ID != 'Person_ID');
                     
   ds_person := DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::persn_raw'
 											,FLAccidents_Ecrash.Layout_Infiles.persn_new
-											,csv(terminator('\n'), separator(','),quote('"'),escape('\r'),maxlength(3000000)))(Person_ID != 'Person_ID');
+											,CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"'), ESCAPE('\r'), MAXLENGTH(3000000)))(Person_ID != 'Person_ID');
                     
-	d_person_fiers := DISTRIBUTE(ds_person_fiers, HASH32(person_id, incident_id));
-	d_person := DISTRIBUTE(ds_person, HASH32(person_id, incident_id));
+	d_person_fiers := DISTRIBUTE(ds_person_fiers, HASH32(person_id, incident_id)):INDEPENDENT;
+	d_person := DISTRIBUTE(ds_person, HASH32(person_id, incident_id)):INDEPENDENT;
 	
   fl_fiers_person := JOIN(d_person, d_person_fiers,
-													TRIM(left.person_id, ALL) = TRIM(right.person_id, ALL) AND
-													TRIM(LEFT.incident_id, ALL) = TRIM(RIGHT.incident_id,ALL),
+												  TRIM(LEFT.person_id, LEFT, RIGHT) = TRIM(RIGHT.person_id, LEFT, RIGHT) AND
+													TRIM(LEFT.incident_id, LEFT, RIGHT) = TRIM(RIGHT.incident_id, LEFT, RIGHT),
 													TRANSFORM(LEFT), LOCAL);
 									 
   //Person fiers fl data deletion
   fl_fiers_person_deletion := JOIN(d_person, d_person_fiers,
-																	 TRIM(LEFT.person_id, ALL) = TRIM(RIGHT.person_id, ALL) AND
-																	 TRIM(LEFT.incident_id, ALL) = TRIM(RIGHT.incident_id,ALL),
-																	 TRANSFORM(LEFT), LEFT ONLY, LOCAL);
+																	 TRIM(LEFT.person_id, LEFT, RIGHT) = TRIM(RIGHT.person_id, LEFT, RIGHT) AND
+																	 TRIM(LEFT.incident_id, LEFT, RIGHT) = TRIM(RIGHT.incident_id, LEFT, RIGHT),
+																	 TRANSFORM(LEFT), LEFT ONLY, LOCAL):INDEPENDENT;
 																		 
-	 OUTPUT(fl_fiers_person_deletion,,'~thor_data400::in::ecrash::fl_fiers_data_removal_person_'+WORKUNIT,overwrite, __compressed__,
-					csv(terminator('\n'), separator(','),quote('"'),maxlength(60000)));
+	out_per := OUTPUT(fl_fiers_person_deletion,,'~thor_data400::in::ecrash::fl_fiers_data_removal_person_'+WORKUNIT,OVERWRITE, __COMPRESSED__,
+					          CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"'), MAXLENGTH(3000000)));
 
 	per_all :=  SEQUENTIAL(
-		FileServices.StartSuperFileTransaction(),
-		FileServices.ClearSuperFile('~thor_data400::in::ecrash::persn_raw', FALSE),
-		FileServices.AddSuperFile('~thor_data400::in::ecrash::persn_raw','~thor_data400::in::ecrash::fl_fiers_data_removal_person_'+WORKUNIT),
-		FileServices.FinishSuperFileTransaction()
-	);
+												 out_per,
+												 FileServices.StartSuperFileTransaction(),
+												 FileServices.ClearSuperFile('~thor_data400::in::ecrash::persn_raw', FALSE),
+												 FileServices.AddSuperFile('~thor_data400::in::ecrash::persn_raw','~thor_data400::in::ecrash::fl_fiers_data_removal_person_'+WORKUNIT),
+												 FileServices.FinishSuperFileTransaction()
+												);
 	
 	//Vehicle
-
-	ds_vehicle_fiers := DATASET('~thor_data400::in::ecrash::vehicle_raw::flremoval'
+  ds_vehicle_fiers := DATASET('~thor_data400::in::ecrash::vehicle_raw::flremoval'
 													    ,FLAccidents_Ecrash.Layout_Infiles.vehicl_new
-													    ,csv(terminator('\n'), separator('|'),quote('"'),maxlength(50000)))(Vehicle_ID != 'Vehicle_ID');
+													    ,CSV(TERMINATOR('\n'), SEPARATOR('|\t|'), QUOTE('"'), MAXLENGTH(50000)))(Vehicle_ID != 'Vehicle_ID');
 
   ds_vehicle := DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::vehicl_raw'
 											  ,FLAccidents_Ecrash.Layout_Infiles.vehicl_new
-												,csv(terminator('\n'), separator(','),quote('"'),maxlength(50000)))(Vehicle_ID != 'Vehicle_ID');
+												,CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"'), MAXLENGTH(50000)))(Vehicle_ID != 'Vehicle_ID');
    
-	d_vehicle_fiers := DISTRIBUTE(ds_vehicle_fiers, HASH32(vehicle_id, incident_id));
-	d_vehicle := DISTRIBUTE(ds_vehicle, HASH32(vehicle_id, incident_id));
+	d_vehicle_fiers := DISTRIBUTE(ds_vehicle_fiers, HASH32(vehicle_id, incident_id)):INDEPENDENT;
+	d_vehicle := DISTRIBUTE(ds_vehicle, HASH32(vehicle_id, incident_id)):INDEPENDENT;
 	
   fl_fiers_vehicle := JOIN(d_vehicle, d_vehicle_fiers,
-													 TRIM(LEFT.vehicle_id, ALL) = TRIM(RIGHT.vehicle_id, ALL) AND
-													 TRIM(LEFT.incident_id, ALL) = TRIM(RIGHT.incident_id,ALL),
+													 TRIM(LEFT.vehicle_id, LEFT, RIGHT) = TRIM(RIGHT.vehicle_id, LEFT, RIGHT) AND
+													 TRIM(LEFT.incident_id, LEFT, RIGHT) = TRIM(RIGHT.incident_id, LEFT, RIGHT),
 													 TRANSFORM(LEFT), LOCAL);
 									 
   //Vehicle fiers fl data deletion
   fl_fiers_vehicle_deletion := JOIN(d_vehicle, d_vehicle_fiers,
-													          TRIM(LEFT.vehicle_id, ALL) = TRIM(RIGHT.vehicle_id, ALL) AND
-													          TRIM(LEFT.incident_id, ALL) = TRIM(RIGHT.incident_id,ALL),
-													          TRANSFORM(LEFT), LEFT ONLY, LOCAL);
+													          TRIM(LEFT.vehicle_id, LEFT, RIGHT) = TRIM(RIGHT.vehicle_id, LEFT, RIGHT) AND
+													          TRIM(LEFT.incident_id, LEFT, RIGHT) = TRIM(RIGHT.incident_id, LEFT, RIGHT),
+													          TRANSFORM(LEFT), LEFT ONLY, LOCAL):INDEPENDENT;
 					
-	 OUTPUT(fl_fiers_vehicle_deletion,,'~thor_data400::in::ecrash::fl_fiers_data_removal_vehicle_'+WORKUNIT,overwrite, __compressed__,
-					csv(terminator('\n'), separator(','),quote('"'),maxlength(60000)));
+	 out_veh := OUTPUT(fl_fiers_vehicle_deletion,,'~thor_data400::in::ecrash::fl_fiers_data_removal_vehicle_'+WORKUNIT, OVERWRITE, __COMPRESSED__,
+					           CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"'), MAXLENGTH(50000)));
 
-	veh_all :=  SEQUENTIAL(
-		FileServices.StartSuperFileTransaction(),
-		FileServices.ClearSuperFile('~thor_data400::in::ecrash::vehicl_raw', FALSE),
-		FileServices.AddSuperFile('~thor_data400::in::ecrash::vehicl_raw','~thor_data400::in::ecrash::fl_fiers_data_removal_vehicle_'+WORKUNIT),
-		FileServices.FinishSuperFileTransaction()
-	);
+	 veh_all :=  SEQUENTIAL(
+													 out_veh,
+													 FileServices.StartSuperFileTransaction(),
+													 FileServices.ClearSuperFile('~thor_data400::in::ecrash::vehicl_raw', FALSE),
+													 FileServices.AddSuperFile('~thor_data400::in::ecrash::vehicl_raw','~thor_data400::in::ecrash::fl_fiers_data_removal_vehicle_'+WORKUNIT),
+													 FileServices.FinishSuperFileTransaction()
+												  );
 		
 	//Citation
-
-	ds_citation_fiers := DATASET('~thor_data400::in::ecrash::citatn_raw::flremoval'
-													     ,FLAccidents_Ecrash.Layout_Infiles.citation
-													     ,csv(terminator('\n'), separator('|'),quote('"')))(Citation_ID != 'Citation_ID'); 												
+  ds_citation_fiers := DATASET('~thor_data400::in::ecrash::citation_raw::flremoval'
+													    ,FLAccidents_Ecrash.Layout_Infiles.citation
+													    ,CSV(TERMINATOR('\n'), SEPARATOR('|\t|'), QUOTE('"')))(Citation_ID != 'Citation_ID'); 												
 																
-  ds_citation := DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::citation_raw'
-												 ,FLAccidents_Ecrash.Layout_Infiles.citation
-												 ,csv(terminator('\n'), separator(','),quote('"')))(Citation_ID != 'Citation_ID'); 												
+  ds_citation := DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::citatn_raw'
+							          ,FLAccidents_Ecrash.Layout_Infiles.citation
+							          ,CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"')))(Citation_ID != 'Citation_ID'); 										
 																
-	d_citation_fiers := DISTRIBUTE(ds_citation_fiers, HASH32(citation_id, incident_id));
-	d_citation := DISTRIBUTE(ds_citation, HASH32(citation_id, incident_id));
+	d_citation_fiers := DISTRIBUTE(ds_citation_fiers, HASH32(citation_id, incident_id)):INDEPENDENT;
+	d_citation := DISTRIBUTE(ds_citation, HASH32(citation_id, incident_id)):INDEPENDENT;
 	
   fl_fiers_citation := JOIN(d_citation, d_citation_fiers,
-													 TRIM(LEFT.citation_id, ALL) = TRIM(RIGHT.citation_id, ALL) AND
-													 TRIM(LEFT.incident_id, ALL) = TRIM(RIGHT.incident_id,ALL),
-													 TRANSFORM(LEFT), LOCAL);
+													  TRIM(LEFT.citation_id, LEFT, RIGHT) = TRIM(RIGHT.citation_id, LEFT, RIGHT) AND
+													  TRIM(LEFT.incident_id, LEFT, RIGHT) = TRIM(RIGHT.incident_id, LEFT, RIGHT),
+													  TRANSFORM(LEFT), LOCAL);
 									 
   //Citation fiers fl data deletion
   fl_fiers_citation_deletion := JOIN(d_citation, d_citation_fiers,
-													          TRIM(LEFT.citation_id, ALL) = TRIM(RIGHT.citation_id, ALL) AND
-													          TRIM(LEFT.incident_id, ALL) = TRIM(RIGHT.incident_id,ALL),
-													          TRANSFORM(LEFT), LEFT ONLY, LOCAL);
+													           TRIM(LEFT.citation_id, LEFT, RIGHT) = TRIM(RIGHT.citation_id, LEFT, RIGHT) AND
+													           TRIM(LEFT.incident_id, LEFT, RIGHT) = TRIM(RIGHT.incident_id, LEFT, RIGHT),
+													           TRANSFORM(LEFT), LEFT ONLY, LOCAL):INDEPENDENT;
 					
-	 OUTPUT(fl_fiers_citation_deletion,,'~thor_data400::in::ecrash::fl_fiers_data_removal_citation_'+WORKUNIT,overwrite, __compressed__,
-					csv(terminator('\n'), separator(','),quote('"'),maxlength(60000)));
+	 out_cit := OUTPUT(fl_fiers_citation_deletion,,'~thor_data400::in::ecrash::fl_fiers_data_removal_citation_'+WORKUNIT, OVERWRITE, __COMPRESSED__,
+					           CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"')));
 
 	cit_all :=  SEQUENTIAL(
-		FileServices.StartSuperFileTransaction(),
-		FileServices.ClearSuperFile('~thor_data400::in::ecrash::citatn_raw', FALSE),
-		FileServices.AddSuperFile('~thor_data400::in::ecrash::citatn_raw','~thor_data400::in::ecrash::fl_fiers_data_removal_citation_'+WORKUNIT),
-		FileServices.FinishSuperFileTransaction()
-	);
+												 out_cit,
+												 FileServices.StartSuperFileTransaction(),
+												 FileServices.ClearSuperFile('~thor_data400::in::ecrash::citatn_raw', FALSE),
+												 FileServices.AddSuperFile('~thor_data400::in::ecrash::citatn_raw','~thor_data400::in::ecrash::fl_fiers_data_removal_citation_'+WORKUNIT),
+												 FileServices.FinishSuperFileTransaction()
+												);
 		
 	//Calculating stats
   ds_pre_delete := DATASET([{'PRE_DELETE', COUNT(ds_incident_fiers), COUNT(ds_incident), COUNT(fl_fiers_incident), 0, COUNT(ds_person_fiers), COUNT(ds_person), COUNT(fl_fiers_person), 0, COUNT(ds_vehicle_fiers), COUNT(ds_vehicle), COUNT(fl_fiers_vehicle), 0, COUNT(ds_citation_fiers), COUNT(ds_citation), COUNT(fl_fiers_citation), 0}], lay_fl_fiers_removal_stats);

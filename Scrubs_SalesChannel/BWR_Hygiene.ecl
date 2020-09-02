@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_SalesChannel.BWR_Hygiene - Hygiene & Stats - SALT V3.11.9');
+#workunit('name','Scrubs_SalesChannel.BWR_Hygiene - Hygiene & Stats - SALT V3.11.11');
 IMPORT Scrubs_SalesChannel,SALT311;
 // First create an instantiated hygiene module
   infile := Scrubs_SalesChannel.In_SalesChannel;

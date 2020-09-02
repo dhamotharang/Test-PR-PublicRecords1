@@ -17,8 +17,10 @@ SHARED linking_keys := dataset ( [  //12 keys
                             {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::ssn4',''},
                             {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::zip_pr',''},
                             {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::relative',''},
-                            {'thor_data400::key::insuranceheader_xlink::<<version>>::did::sup::rid',''}
-                            
+                            {'thor_data400::key::insuranceheader_xlink::<<version>>::did::sup::rid',''},
+                            {'thor_data400::key::insuranceheader_xlink::<<version>>::header_vin',''},
+                            {'thor_data400::key::insuranceheader_xlink::<<version>>::header_relative',''},
+                            {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::vin',''}                            
                          ] , {string nm,string src_name});
                          
 SHARED base_relative := dataset ([
@@ -56,7 +58,7 @@ SHARED copy_files(string nm, string src_name, string dest_clstr,string src_alpha
     target_filename := ver(nm,filedate,agmntName); // update the version number
     
     return sequential(output(dataset([{'~'+source_filename,dest_clstr,'~'+target_filename}],{string src,string d_clstr, string trgt}),named('cp_copy'),extend)
-                      ,if(~std.file.FileExists('~'+target_filename), std.file.copy('~'+source_filename,dest_clstr,'~'+target_filename,replicate:=true,compress:=true,allowoverwrite:=true))
+                      ,if(~std.file.FileExists('~'+target_filename), std.file.copy('~'+source_filename,dest_clstr,'~'+target_filename,,,,400,TRUE,,TRUE,TRUE,,10000000))
                      );
 
 end;

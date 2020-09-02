@@ -7,8 +7,8 @@ import ut, std;
 EXPORT proc_merge_hdr(dataset(Cortera.Layout_Header_Out) allcurrent, dataset(Cortera.Layout_Header_Out) allprevious, string8 version) := FUNCTION
 	current := DISTRIBUTE(allcurrent,link_id);			// now current
 	previous := DISTRIBUTE(allprevious(current=true),link_id);			// previously current
-	curr := DISTRIBUTE(PROJECT(current, cortera.Layout_Header),link_id);
-	prev := DISTRIBUTE(PROJECT(previous, cortera.Layout_Header),link_id);
+	curr := DISTRIBUTE(PROJECT(current, cortera.Layout_Header-first_seen),link_id);
+	prev := DISTRIBUTE(PROJECT(previous, cortera.Layout_Header-first_seen),link_id);
 	not_curr := allprevious(NOT current);
 
 	// find new, lost, changed

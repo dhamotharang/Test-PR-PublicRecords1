@@ -1,4 +1,4 @@
-import ut,lib_fileservices;
+﻿import ut,lib_fileservices;
 export Infiles_Iyetek := module 
 
 vIncident_tf  := if ( nothor (fileservices.FindSuperFileSubName('~thor_data400::in::iyetek::incident_raw','~thor_data400::in::iyetek::incident_raw_'+workunit)) = 0 ,
@@ -46,8 +46,7 @@ export vehicl     := dataset(ut.foreign_prod+'~thor_data400::in::iyetek::vehicle
 
 export tcitation  := project(citation, transform(FLAccidents_Ecrash.Layout_metadata.citation_fixed
 													,self := left));	
-//Filter out TM nassau. 													
-export tincident  := project(incident(mbs_agency_id <> '1603437'),transform(FLAccidents_Ecrash.Layout_metadata.incident_fixed
+export tincident  := project(incident,transform(FLAccidents_Ecrash.Layout_metadata.incident_fixed
 													,self:= left));														
 export tpersn     := project(persn, transform(FLAccidents_Ecrash.Layout_metadata.person_fixed
 													,self:= left));												

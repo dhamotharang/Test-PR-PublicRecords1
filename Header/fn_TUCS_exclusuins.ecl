@@ -65,9 +65,10 @@ export fn_TUCS_exclusuins(	dataset(recordof(Header.Layout_New_Records))	TUCS_fil
 	TUCS_recs  := join(distribute(TUCS_file,hash(uid)),distribute(TUCS_recs3,hash(uid))
 						,left.uid=right.uid
 						,transform({Header.Layout_New_Records}
-									,self.dt_first_seen:= right.dt_first_seen
-									,self.dt_last_seen:=right.dt_last_seen
-									,self:=left)
+                                    ,self.dt_first_seen:= if(right.dt_last_seen=0 ,0,right.dt_first_seen);
+									,self.dt_last_seen:=  if(right.dt_first_seen=0,0,right.dt_last_seen );
+
+                                    ,self:=left)
 						,local);
 	return TUCS_recs;
 end;

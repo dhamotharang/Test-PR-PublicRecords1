@@ -300,7 +300,8 @@ EXPORT Functions :=  MODULE
 											 customer_program = 'M' => 1024,
 											 customer_program = 'U' => 1029,
 											 customer_program = 'N' => 1312,
-											 customer_program = 'D' => 1049,											 
+											 customer_program = 'D' => 1049,	
+											 customer_program = 'X' => 1127,										 
 											 0
 											);
 		RETURN ind_type_prod_v;
@@ -314,6 +315,7 @@ EXPORT Functions :=  MODULE
 											 ind_type = 1029 => 'U',
 											 ind_type = 1312 => 'N',
 											 ind_type = 1049 => 'D',
+											 ind_type = 1127 => 'X',
 											 ''
 											);
 		RETURN customer_program;
@@ -322,7 +324,7 @@ EXPORT Functions :=  MODULE
 
 	Current_Build := IF(_Flags.FileExists.Base.Main, FraudShared.Files().Base.Main.Built, DATASET([], FraudShared.Layouts.Base.Main));
 	
-	EXPORT LastRinID := MAX(Current_Build(DID >= FraudGovPlatform.Constants().FirstRinID), DID):independent;
+	EXPORT LastRinID := MAX(Current_Build(DID >= FraudGovPlatform.Constants().FirstRinID), DID);
 
 END; 
 			

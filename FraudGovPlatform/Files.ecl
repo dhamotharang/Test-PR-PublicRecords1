@@ -133,11 +133,16 @@ module
 	export CustomerDashboard1_1 := dataset(Filenames().CustomerDashboard1_1,Layouts.DashboardResponse,thor,opt);
 	export ClusterDetails := dataset(Filenames().ClusterDetails,Layouts.DashboardResponse,thor,opt);
 	export ProdDashboardVersion := dataset(Filenames().ProdDashboardVersion,Layouts.ProdDashboardVersion,thor,opt);
+	export FindLeads 				:= dataset(Filenames().FindLeads,Layouts.DashboardResponse,thor,opt);
+	export Dashboard 				:= dataset(Filenames().Dashboard,Layouts.DashboardResponse,thor,opt);
+	export LinksChart 			:= dataset(Filenames().LinksChart,Layouts.DashboardResponse,thor,opt);
+	export DetailsReport 		:= dataset(Filenames().DetailsReport,Layouts.DashboardResponse,thor,opt);
 
 	export Flags := module
 		export FraudgovInfoFile	:= dataset(Filenames().Flags.FraudgovInfoFn,Layouts.Flags.FraudgovInfoRec,thor,opt);
 		export SkipModules	:= dataset(Filenames().Flags.SkipModules,Layouts.Flags.SkipModules,thor,opt); 
 		export RefreshProdDashVersion	:= dataset(Filenames().Flags.RefreshProdDashVersion,Layouts.Flags.RefreshProdDashVersion,thor,opt); 
+		export CustomerActiveSprays := dataset(Filenames().Flags.CustomerActiveSprays,Layouts.Flags.CustomerActiveSprays,thor,opt);
 	end;
 
 	
