@@ -335,6 +335,7 @@ MODULE
 	export src_NPPES                     := 'NP';  // US National Provider & Plan Enumeration System
 	export src_OIG                       := 'ZO';  // US Office of Inspector General
 	export src_One_Click_Data            := 'OC';	
+	export src_One_Key                   := 'Y7';  // New supplier of data for SKA (src_SKA), from IQVIA
 	export src_OPM                       := '33';  // Office Of Personnel Management
 	export src_OSHAIR                    := 'OS';  // US Occupational Safety & Health Administration, incident reports
 	export src_OutwardMedia 						 						:= 'OM';
@@ -591,7 +592,8 @@ MODULE
 		,src_Liens_v2                  ,src_CA_Liquor_Licenses        ,src_CT_Liquor_Licenses        ,src_IN_Liquor_Licenses        
 		,src_LA_Liquor_Licenses        ,src_OH_Liquor_Licenses        ,src_PA_Liquor_Licenses        ,src_TX_Liquor_Licenses        
 		,src_LnPropV2_Fares_Asrs       ,src_LnPropV2_Fares_Deeds      ,src_LnPropV2_Lexis_Asrs       ,src_LnPropV2_Lexis_Deeds_Mtgs 
-		,src_Lobbyists                 ,src_MartinDale_Hubbell        ,src_Miscellaneous             ,src_Phones_Plus               
+		,src_Lobbyists                 ,src_MartinDale_Hubbell        ,src_Miscellaneous             ,src_One_Key
+		,src_Phones_Plus               
 		,src_Professional_License      ,src_Redbooks                  ,src_CA_Sales_Tax              ,src_IA_Sales_Tax              
 		,src_SDA                       ,src_SDAA                      ,src_SEC_Broker_Dealer         ,src_Sheila_Greco              
 		,src_SKA                       ,src_Spoke                     ,src_Targus_White_pages        ,src_Tax_practitioner          
@@ -664,7 +666,8 @@ MODULE
 		,src_Liens_and_Judgments       ,src_Liens_v2                  ,src_CA_Liquor_Licenses        ,src_CT_Liquor_Licenses        
 		,src_IN_Liquor_Licenses        ,src_LA_Liquor_Licenses        ,src_OH_Liquor_Licenses        ,src_PA_Liquor_Licenses        
 		,src_TX_Liquor_Licenses        ,src_LnPropV2_Fares_Asrs       ,src_LnPropV2_Fares_Deeds      ,src_LnPropV2_Lexis_Asrs       
-		,src_LnPropV2_Lexis_Deeds_Mtgs ,src_Lobbyists                 ,src_MartinDale_Hubbell        ,src_OSHAIR                    
+		,src_LnPropV2_Lexis_Deeds_Mtgs ,src_Lobbyists                 ,src_MartinDale_Hubbell        ,src_One_Key
+		,src_OSHAIR                    
 		,src_Professional_License      ,src_Redbooks                  ,src_CA_Sales_Tax              ,src_IA_Sales_Tax              
 		,src_SDA                       ,src_SDAA                      ,src_SEC_Broker_Dealer         ,src_Sheila_Greco              
 		,src_SKA                       ,src_Spoke                     ,src_Tax_practitioner          ,src_TXBUS                     
@@ -749,8 +752,9 @@ MODULE
 	];
 
     //DF-24277 - Remove source "NC" from DMV restricted sources
+	//DF-27961 - Remove source "SC" from DMV restricted sources used in Header DMV Restricted Key
 	export set_DMV_restricted             := [
-		 src_CT_DL ,src_FL_DL ,src_LA_DL ,src_MI_DL ,src_MO_DL ,src_OH_DL ,src_TX_DL ,src_WV_DL ,/*src_NC_DL , */src_SC_Experian_DL   
+		 src_CT_DL ,src_FL_DL ,src_LA_DL ,src_MI_DL ,src_MO_DL ,src_OH_DL ,src_TX_DL ,src_WV_DL /*,src_NC_DL , src_SC_Experian_DL*/ 
 		,src_FL_Veh ,src_MO_Veh ,src_OH_Veh ,src_TX_Veh ,src_SC_Experian_Veh //, src_WV_Veh
 	];
 
@@ -1300,7 +1304,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_CA_Liquor_Licenses        ,src_CT_Liquor_Licenses        ,src_IN_Liquor_Licenses        ,src_LA_Liquor_Licenses        
 		,src_OH_Liquor_Licenses        ,src_PA_Liquor_Licenses        ,src_TX_Liquor_Licenses        ,src_LnPropV2_Fares_Asrs       
 		,src_LnPropV2_Fares_Deeds      ,src_LnPropV2_Lexis_Asrs       ,src_LnPropV2_Lexis_Deeds_Mtgs ,src_Lobbyists                 
-		,src_MartinDale_Hubbell        ,src_Miscellaneous             ,src_Phones_Plus               ,src_Professional_License      
+		,src_MartinDale_Hubbell        ,src_Miscellaneous             ,src_One_Key                   ,src_Phones_Plus
+		,src_Professional_License      
 		,src_Redbooks                  ,src_CA_Sales_Tax              ,src_IA_Sales_Tax              ,src_SDA                       
 		,src_SDAA                      ,src_SEC_Broker_Dealer         ,src_Sheila_Greco              ,src_SKA                       
 		,src_Spoke                     ,src_Targus_White_pages        ,src_Tax_practitioner          ,src_TUCS_Ptrack               
@@ -1420,7 +1425,9 @@ export set_NonDerog_FCRA_sources_v50 := [
       src_TN_Watercraft,						src_TX_Watercraft,            	src_US_Coastguard,       src_US_Coastguard,
       src_UT_Watercraft,						src_VA_Watercraft,            	src_Voters_v2,           src_WI_Watercraft,
       src_WV_Watercraft,            src_WY_Watercraft,              src_OR_Watercraft,			 src_Death_Restricted,
-			src_AK_Fishing_boats,					src_AlloyMedia_student_list, src_Experian_Credit_Header,    src_MA_Census		/*,
+	  src_AK_Fishing_boats,					src_AlloyMedia_student_list, src_Experian_Credit_Header,    src_MA_Census
+	  //,src_OKC_Students_List
+	  /*,
 			src_Death_CA, 								src_Death_CT, 									src_Death_FL,							src_Death_GA,
 			src_Death_KY, 								src_Death_MA, 									src_Death_ME, 						src_Death_MI,
 			src_Death_MN, 								src_Death_MT, 									src_Death_NC, 						src_Death_NV,
@@ -1525,7 +1532,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_IRS_5500                  ,src_IRS_Non_Profit
     ,src_Liens_v2                  //other src_liens_v2_***???    //,src_Liens_and_Judgments???
     //LN propertyv2 (see below)
-    ,src_OSHAIR                    
+    ,src_One_Key                   ,src_OSHAIR                    
 		,src_Professional_License      ,src_SKA                       ,src_TXBUS
 		//,src_UCC??? 
     ,src_UCCV2                     //,src_UCCV2_WA_Hist???
@@ -1903,6 +1910,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_NPPES                     := [src_NPPES                     ];
 	export set_OIG                       := [src_OIG                       ];
 	export set_One_Click_Data            := [src_One_Click_Data            ];
+	export set_One_Key                   := [src_One_Key                   ];
 	export set_OPM                       := [src_OPM                       ];
 	export set_OSHAIR                    := [src_OSHAIR                    ];
 	export set_OutwardMedia		           	:= [src_OutwardMedia			         ];
@@ -2450,6 +2458,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsOIG                        (string  sr) := sr               in set_OIG           	           ;
   export SourceIsOKC_Probate                (string  sr) := sr               in set_OKC_Probate		             ;	
 	export SourceIsOne_Click_Data             (string  sr) := sr               in set_One_Click_Data	           ;
+	export SourceIsOne_Key                    (string  sr) := sr               in set_One_Key       	           ;
 	export SourceIsOKC_Student_List           (string  sr) := sr               in set_OKC_Student_List           ;
 	export SourceIsOPM                        (string  sr) := sr               in set_OPM                        ;
 	#if(_Control.ThisEnvironment.IsPlatformThor = true)
@@ -2983,6 +2992,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_One_Click_Data            ,'One Click Data'                                            }
     ,{src_OKC_Probate               ,'OKC Probate'                                               }
 		,{src_OKC_Student_List          ,'OKC Student List'                                          }
+		,{src_One_Key                   ,'OneKey - IQVIA'                                            }
 		,{src_OPM			                  ,'OPM'   		                     														 }
 		,{src_OSHAIR                    ,'OSHAIR'                                                    }
 		,{src_OutwardMedia			        ,'Outward Media Email'                                       }
@@ -3507,6 +3517,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_One_Click_Data            => 'One Click Data'                                       
     ,src_OKC_Probate               => 'OKC Probate' 
 		,src_OKC_Student_List					 => 'OKC Student List'
+		,src_One_Key                   => 'OneKey - IQVIA'
 		,src_OPM			                 => 'Office of Personnel Management'
 		,src_OSHAIR                    => 'OSHAIR'                                               
 		,src_OutwardMedia			         => 'Outward Media Email'                                  

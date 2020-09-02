@@ -33,20 +33,13 @@ despray_bk_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::t
 																	  //charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																	 ,,,,true);
 
-SEQUENTIAL(
-					 output(sort(tbl_Key_BKv3_FCRA_2010_filings, filing_period,filing_jurisdiction, orig_chapter,filing_status,filer_type, skew(1.0)),,
-					'~thor_data400::data_insight::data_metrics::tbl_Key_BKV3_FCRA_2010_filings_by_Chapter_'+ filedate +'.csv', csv(heading(single), 
-					separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,despray_bk_tbl)
-: WHEN(CRON('01 05 01 * *'));
-
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
 					output(tbl_Key_BKv3_FCRA_2010_filings,,'~thor_data400::data_insight::data_metrics::tbl_Key_BKV3_FCRA_2010_filings_by_Chapter_'+ filedate +'.csv'
 					,csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
 					,despray_bk_tbl):
-					Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA_Bankruptcy Build Succeeded', workunit + ': Build complete.' + filedate)),
-					Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA_Bankruptcy Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
+					Success(FileServices.SendEmail(pContact, 'FCRA Group: FCRA_Bankruptcy Build Succeeded', workunit + ': Build complete.' + filedate)),
+					Failure(FileServices.SendEmail(pContact, 'FCRA Group: FCRA_Bankruptcy Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
 													);
 return email_alert;
 

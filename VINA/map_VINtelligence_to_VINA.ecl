@@ -1,4 +1,4 @@
-IMPORT ut;
+﻿IMPORT ut, STD;
 #option('multiplePersistInstances',false);
 
 EXPORT 	map_VINtelligence_to_VINA := FUNCTION
@@ -27,7 +27,7 @@ EXPORT 	map_VINtelligence_to_VINA := FUNCTION
 		temp_trans_cd								:= ut.CleanSpacesAndUpper(trans_cd);
 		temp_trans_overdrv_ind			:= ut.CleanSpacesAndUpper(trans_overdrv_ind);
 		temp_trans_speed_cd					:= ut.CleanSpacesAndUpper(trans_speed_cd);
-		//F,E,D,Jâ€¦,TRANS_CD - A,M,E,U TRANS_DESC - Automatic,Manual,ECVT,â€¦ TRANS_OVERDRV_IND - Y,N,U TRANS_SPEED_CD -6,5,4,7â€¦.
+		//F,E,D,JÃ¢â‚¬Â¦,TRANS_CD - A,M,E,U TRANS_DESC - Automatic,Manual,ECVT,Ã¢â‚¬Â¦ TRANS_OVERDRV_IND - Y,N,U TRANS_SPEED_CD -6,5,4,7Ã¢â‚¬Â¦.
 		transmission								:= MAP(temp_trans_cd='E'  => 'L',
 																			 temp_trans_cd='M' AND temp_trans_speed_cd='3' => 'A',
 																			 temp_trans_cd='M' AND temp_trans_speed_cd='4' AND temp_trans_overdrv_ind='Y' => 'C',
@@ -619,7 +619,8 @@ EXPORT 	map_VINtelligence_to_VINA := FUNCTION
 																			 REGEXFIND('^(WORKHORSE) CUSTOM CHASSIS$',temp_mak_nm) => REGEXFIND('^(WORKHORSE) CUSTOM CHASSIS$',temp_mak_nm,1),
 																			 temp_mak_nm);
 		temp_vina_series_abbr_cd		:= L.VINA_SERIES_ABBR_CD;
-		SELF.series_name						:= CASE(temp_nci_mak_abbr_cd,																						//8		
+		//DF-26744 - if the mdl_desc is contained in the nvpp_series_name, then remove mdl_desc from the nvpp_series_name																				
+		temp2_series_name				:= CASE(temp_nci_mak_abbr_cd,																						//8		
 																				'ACUR' => MAP(
 																				    temp_vina_series_abbr_cd='22C' => '2.2 CL',
 																				    temp_vina_series_abbr_cd='23C' => '2.3 CL',
@@ -4089,6 +4090,10 @@ EXPORT 	map_VINtelligence_to_VINA := FUNCTION
 																						temp_series_name)
 																				 );
 
+		temp3_series_name				:= TRIM(REGEXREPLACE(trim(L.MDL_DESC,LEFT,RIGHT),temp2_series_name,''),LEFT,RIGHT);
+		temp4_series_name				:= REGEXREPLACE('^(/|-)',temp3_series_name,'');
+		SELF.series_name				:= TRIM(temp4_series_name,LEFT,RIGHT);				// 8
+
 		//Body type. Following mapping logic is derived from 20141205 (VINA) and 20141212 (VINtelligence) files.
 		temp_make_model 						:= temp_nci_mak_abbr_cd + ' ' + temp_mdl_desc + ' ' + temp_trim_desc;
 
@@ -4214,7 +4219,7 @@ EXPORT 	map_VINtelligence_to_VINA := FUNCTION
 																				 TRIM(L.ENG_FUEL_CD)='E' and temp_eng_cbrt_typ_cd IN ['U','X'] => '',		//BUG 200811 - Electric car should not have carburetion set
 																				 temp_eng_cbrt_typ_cd), //temp_eng_cbrt_brls);
 																				 '');
-		//15	Blank for Passengers. GVW for Trucks The manufacturerâ€™s GVW rating.
+		//15	Blank for Passengers. GVW for Trucks The manufacturerÃ¢â‚¬â„¢s GVW rating.
 		SELF.gvw										:= IF(L.ENG_CYCL_CNT<>'',																								//15
 		                                  TRIM(L.ENG_CYCL_CNT),TRIM(L.TRK_GRSS_VEH_WGHT_RATG_CD));
 		temp_whl_bas_lngst_inches		:= TRIM(L.WHL_BAS_LNGST_INCHS);
@@ -4240,7 +4245,7 @@ EXPORT 	map_VINtelligence_to_VINA := FUNCTION
 		//19	Shipping weight for the shortest wheelbase of the model.	
 		//    It was 0000 and changed to blank per query team request
 		SELF.base_shipping_weight		:= IF(L.SHIP_WGHT_LBS<>'',TRIM(L.SHIP_WGHT_LBS),'');										//19
-		//20  variance_weight - 0,1,2â€¦,11,14,â€¦â€¦â€¦â€¦â€¦. SHIP_WGHT_VAR_LBS - 159,100,172,125,222,â€¦..		
+		//20  variance_weight - 0,1,2Ã¢â‚¬Â¦,11,14,Ã¢â‚¬Â¦Ã¢â‚¬Â¦Ã¢â‚¬Â¦Ã¢â‚¬Â¦Ã¢â‚¬Â¦. SHIP_WGHT_VAR_LBS - 159,100,172,125,222,Ã¢â‚¬Â¦..		
 		temp_ship_wght_var					:= IF(L.SHIP_WGHT_VAR_LBS='', 0,ROUND((real) L.SHIP_WGHT_VAR_LBS/100));
 		temp_variance_weight				:= IF(temp_ship_wght_var<10,																						//20
 		                                  '0'+(STRING)temp_ship_wght_var,
@@ -4317,7 +4322,7 @@ EXPORT 	map_VINtelligence_to_VINA := FUNCTION
 		//23	No longer supported.  VINtel uses Turbo and Super charger fields, however, does not provide information on carb type
 		SELF.high_performance_code	:= '';																																	//23
 		//BUG 199228 - driving_wheels is set to '' when the vehicle is rear wheel drive
-		//24  driving_wheels - F,4,A â€¦ DRV_TYP_CD - RWE,RWD,4RD,AWDâ€¦ DRV_TYP_DESC - Rear Wheel Drive â€¦..
+		//24  driving_wheels - F,4,A Ã¢â‚¬Â¦ DRV_TYP_CD - RWE,RWD,4RD,AWDÃ¢â‚¬Â¦ DRV_TYP_DESC - Rear Wheel Drive Ã¢â‚¬Â¦..
 		// SELF.driving_wheels					:= CASE(temp_drv_typ_cd,																								//24	
 																				// '4FD' => '4',																										//4 = 4x4
 																				// '4RD' => '4',																										//4 = 4x4
@@ -4387,8 +4392,8 @@ EXPORT 	map_VINtelligence_to_VINA := FUNCTION
 		                                   temp_optional_radio2+temp_optional_radio3='' AND temp_optional_radio4<>''
 																			 => temp_optional_radio4,
 																			 '');
-		//38  transmission - F,E,D,Jâ€¦,TRANS_CD - A,M,E,U TRANS_DESC - Automatic,Manual,ECVT,â€¦ TRANS_OVERDRV_IND - Y,N,U
-		//    TRANS_SPEED_CD -6,5,4,7â€¦.
+		//38  transmission - F,E,D,JÃ¢â‚¬Â¦,TRANS_CD - A,M,E,U TRANS_DESC - Automatic,Manual,ECVT,Ã¢â‚¬Â¦ TRANS_OVERDRV_IND - Y,N,U
+		//    TRANS_SPEED_CD -6,5,4,7Ã¢â‚¬Â¦.
 		SELF.transmission						:= get_transmission(L.TRANS_CD,L.TRANS_OVERDRV_IND,L.TRANS_SPEED_CD,L.ENG_FUEL_CD);		//38
 		SELF.optional_transmission1	:= get_transmission(L.TRANS_OPT1_CD,L.TRANS_OPT1_OVERDRV_IND,L.TRANS_OPT1_SPEED_CD,L.ENG_FUEL_CD); //39  
 		temp_transmission2					:= get_transmission(L.TRANS_OPT2_CD,L.TRANS_OPT2_OVERDRV_IND,L.TRANS_OPT2_SPEED_CD,L.ENG_FUEL_CD);
@@ -4505,7 +4510,7 @@ EXPORT 	map_VINtelligence_to_VINA := FUNCTION
 		SELF.series_abbreviation		:= '';																																	//58	Series Code no longer used, per VINtelligence mapping document. THOTHO,CONFLD,VGA,CONT80,ADVADV,ATN... 
 		SELF.vin_pattern						:= cleanDesc(L.VEH_VIN_POS_DESC);																				//59
 		//60  ncic_data - INTL999, FRHT999, PTRB999,KW 999, FORD999,MACK999, GMC SRA,..
-		//    NCI_MAK_ABBR_CD - WANC,VSVC,HEIL,CNMI,MANA,CHEV,EAST,FORDâ€¦
+		//    NCI_MAK_ABBR_CD - WANC,VSVC,HEIL,CNMI,MANA,CHEV,EAST,FORDÃ¢â‚¬Â¦
 		SELF.ncic_data							:= CASE(temp_nci_mak_abbr_cd,																						//60																																	
 																				'ACUR' => MAP(temp_mdl_desc='TL' => 'ACURA' + temp_mdl_desc[1..2],
 																										 temp_nci_mak_abbr_cd + temp_mdl_desc[1..3]),
@@ -4809,7 +4814,7 @@ EXPORT 	map_VINtelligence_to_VINA := FUNCTION
 		SELF.nvpp_make_code					:= '';																																	//62
 		SELF.nvpp_make_abbreviation	:= '';  //TRIM(SELF.match_make);																				//63
 		SELF.nvpp_series_model			:= '';																																	//64
-		SELF.nvpp_series_name				:= SELF.series_name;	//DF-25834																																//65																	
+		SELF.nvpp_series_name			:= SELF.series_name;	//DF-25834																																//65																	
 		SELF.segmentation_code			:= cleanDesc(L.SEGMENTATION_CD);																				//66
 		// SELF.segmentation_code			:= IF(temp_veh_typ_cd IN ['C','M'] or SELF.proactive_vin='Y','',cleanDesc(L.SEGMENTATION_CD));																				//66
 		SELF.country_of_origin			:= MAP(cleanDesc(L.PLNT_CNTRY_NM) IN ['','UNKNOWN'] 	            			//67
@@ -4899,427 +4904,13 @@ EXPORT 	map_VINtelligence_to_VINA := FUNCTION
 																																																				//87	transmission_filler3
 		SELF.transmission_speed_code:= IF(isDigit(L.TRANS_SPEED_CD),																				//88	transmission_speed_code-4,5,6,3,0,7,8	
 																			TRIM(L.TRANS_SPEED_CD),'');																				//		TRANS_SPEED_CD-6,5,4,7,V,U...	
-		// SELF.base_model							:= ut.CleanSpacesAndUpper(L.MDL_DESC);																					//89
-				// temp_mdl_desc								:= ut.CleanSpacesAndUpper(L.MDL_DESC);
-		// temp_trim_desc							:= ut.CleanSpacesAndUpper(L.TRIM_DESC);
-		// temp_mak_nm									:= ut.CleanSpacesAndUpper(L.MAK_NM);
-		// temp_veh_typ_cd							:= ut.CleanSpacesAndUpper(L.VEH_TYP_CD);
-		// temp_body_style_cd					:= ut.CleanSpacesAndUpper(L.BODY_STYLE_CD);
-		// temp_trk_cab_cofg_cd				:= ut.CleanSpacesAndUpper(L.TRK_CAB_CNFG_CD);
-		SELF.base_model							:= MAP(
-			temp_nci_mak_abbr_cd='AMER'
-			=> MAP(temp_mdl_desc='EAGLE' AND temp_trim_desc[1..2] IN ['30','50'] => temp_mdl_desc+'-'+temp_trim_desc[1..2],
-			       temp_mdl_desc='EAGLE' AND temp_trim_desc[1..5]='DL-50' => temp_mdl_desc+' '+temp_trim_desc[1..5],
-			       temp_mdl_desc='GRAND WAGONEER' => 'WAGONEER',
-			       temp_mdl_desc='JEEP TRUCK' AND temp_sale_cntry_cd='C' => temp_mdl_desc+' '+'(CAN)',
-						 addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			temp_nci_mak_abbr_cd='AMGN' AND temp_mdl_desc='H1' => 'HUMMER',
-			temp_nci_mak_abbr_cd='APRI' => TRIM(temp_mdl_desc+' '+temp_trim_desc,LEFT,RIGHT),
-			temp_nci_mak_abbr_cd='ASUN' => TRIM(temp_mdl_desc+' '+temp_trim_desc,LEFT,RIGHT),
-			temp_nci_mak_abbr_cd='ASTO' => IF(temp_mdl_desc='V8' AND temp_trim_desc[1..7]='VANTAGE','V8 VANTAGE',temp_mdl_desc),
-			temp_nci_mak_abbr_cd='ATK' => TRIM(temp_mdl_desc+' '+temp_trim_desc,LEFT,RIGHT),
-			temp_nci_mak_abbr_cd='AUDI'
-			=> MAP(temp_mdl_desc='A4 ALLROAD'  AND temp_sale_cntry_cd='C'=> 'A4ALLROAD (CAN)',
-						 temp_mdl_desc='A4 ALLROAD' => 'A4ALLROAD',
-						 REGEXFIND('^A[1-9]{1}',temp_mdl_desc) AND REGEXFIND('^(S\\-LINE)',temp_trim_desc) => temp_mdl_desc + ' S-LINE',
-						 temp_mdl_desc='NEW S4' => 'S4 NEW S4',
-						 temp_sale_cntry_cd='C'=> temp_mdl_desc + ' (CANADA)',
-						 addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
- 			temp_nci_mak_abbr_cd='BLUB' AND temp_mdl_desc='SCHOOL BUS / TRANSIT BUS' => 'BLUE BIRD',
-			temp_nci_mak_abbr_cd='BMW'
-			=> MAP(temp_mdl_desc IN ['550','650','740'] => temp_mdl_desc + 'I',
-						 REGEXFIND('^([0-9]{3})$',temp_mdl_desc) AND REGEXFIND('^([A-Z]{1,})( |$)',temp_trim_desc)
-						 => temp_mdl_desc + REGEXFIND('^([A-Z]{1,})( |$)',temp_trim_desc,1) + IF(temp_sale_cntry_cd='C',' (CANADA)',''),
-						 temp_mdl_desc='R100' => temp_mdl_desc + temp_trim_desc + IF(temp_sale_cntry_cd='C',' (CANADA)',''),
-						 REGEXFIND('^([C|F|K|R])([0-9]{2,4})$',temp_mdl_desc) AND REGEXFIND('^([A-Z]{1,2})$',temp_trim_desc)
-						 => TRIM(temp_mdl_desc+temp_trim_desc,ALL) + IF(temp_sale_cntry_cd='C',' (CANADA)',''),
-						 REGEXFIND('^X([0-9]{2})$',temp_mdl_desc)
-						 => temp_mdl_desc + IF(temp_sale_cntry_cd='C',' (CANADA)',''),
-						 temp_mdl_desc IN ['Z3','Z4'] => temp_mdl_desc + ' ' + temp_trim_desc + ' (U.S.)',
-						 addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			temp_nci_mak_abbr_cd='BUEL'
-			 => MAP(temp_mdl_desc='ULYSSES' AND temp_trim_desc IN ['XB12XP','XB12XT'] => temp_trim_desc+temp_mdl_desc,
-							temp_mdl_desc='ULYSSES' AND temp_trim_desc='XB12X' => 'XB12XULYSSES 49ST',
-							temp_mdl_desc='LIGHTNING' AND temp_trim_desc='XB12SS' => 'XB12SSLIGHTNLONG',
-							temp_mdl_desc='LIGHTNING' AND temp_trim_desc='XB9SX CITY YX' => 'XB9SX WORLD',
-							temp_mdl_desc='LIGHTNING' AND temp_trim_desc='XB12SCG' => 'XB12SCG',
-							temp_mdl_desc='FIREBOLT' AND temp_trim_desc='XB12R' => 'XB12RFIREBOLT 12',
-							temp_mdl_desc='1125' AND temp_trim_desc IN ['R','CR'] => temp_mdl_desc+temp_trim_desc,
-							addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='BUIC' 
-			 => IF(REGEXFIND('ALLURE', temp_mdl_desc),'ALLURE (CANADA)',addCountry(temp_mdl_desc,temp_sale_cntry_cd)),																			 
-			 temp_nci_mak_abbr_cd='CANA' 
-			 => MAP(REGEXFIND('COMMANDER MAX',temp_mdl_desc) => REGEXREPLACE('COMMANDER MAX',temp_mdl_desc+' '+temp_trim_desc,'COMMMAX'),
-							REGEXFIND('OUTLANDER MAX',temp_mdl_desc) => REGEXREPLACE('OUTLANDER MAX',temp_mdl_desc+' '+temp_trim_desc,'OUT MAX'),
-							REGEXFIND('SPYDER ROADSTER',temp_series_name) => REGEXREPLACE('SPYDER ROADSTER',temp_series_name,'SPYDER'),
-							//temp_mdl_desc+' '+temp_trim_desc),
-							addCountry(concat_str(temp_mdl_desc,temp_trim_desc,' '),temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='CADI'
-			 => MAP(temp_mdl_desc='CTS-V' => 'CTS',
-							temp_mdl_desc IN ['XLR','XLR-V'] => 'XLRROADSTER',
-							temp_mdl_desc='COMMERCIAL CHASSIS' => 'COMMERCIAL CHASS',
-							temp_mdl_desc='PROFESSIONAL CHASSIS' => 'PROFESSIONAL CHA',
-							// CASE(temp_sale_cntry_cd,'C'=>temp_mdl_desc+' (CANADA)','M'=>temp_mdl_desc+' (MEX)','P'=>temp_mdl_desc+' (PR)',temp_mdl_desc)),
-							addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='CAPT' => 'CAPACITY OF TEXAS',
-			 temp_nci_mak_abbr_cd='CCC' => 'CRANE CARRIER',
-			 temp_nci_mak_abbr_cd='CCMH' => 'COUNTRY COACH',
-			 temp_nci_mak_abbr_cd='CHEV'
-			 => MAP(temp_mdl_desc='BLAZER' => IF(temp_trim_desc='',temp_mdl_desc,temp_trim_desc),
-							temp_mdl_desc='CITY EXPRESS'  => TRIM(temp_mdl_desc,ALL),
-							temp_mdl_desc='CRUZE LIMITED' AND  temp_sale_cntry_cd='C' => 'CRUZE LMTD(CAN)',
-							temp_mdl_desc='G-P' => 'G/P',
-							temp_mdl_desc[1..7]='EXPRESS' AND  temp_trk_cab_cofg_cd='VAN' AND temp_trim_desc IN ['3LT','4LT'] => 'EXPRESS RV',
-							temp_mdl_desc[1..7]='EXPRESS' AND  temp_trk_cab_cofg_cd='VAN' => 'EXPRESS VAN',
-							temp_mdl_desc[1..7]='EXPRESS' AND  temp_trk_cab_cofg_cd='CUT' => 'EXPRESS CUTAWAY',
-							temp_mdl_desc='ORLANDO' => 'ORLANDO',
-							temp_mdl_desc IN ['R10','R20','R30','V10','V20','V30'] => temp_mdl_desc + ' CONV',
-							temp_mdl_desc='SAVANA' AND  temp_trk_cab_cofg_cd='CUT' => 'SAVANA CUTAWAY',
-							temp_mdl_desc='S TRUCK' AND temp_sale_cntry_cd='C' => '\'S\'TRUCK(CANADA)',
-							temp_mdl_desc='S TRUCK' => '\'S\'TRUCK',
-							//temp_mdl_desc='SAVANA' AND  temp_trk_cab_cofg_cd='VAN' => 'SAVANA RV',
-							temp_mdl_desc='SAVANA' AND REGEXFIND('(^RV )',temp_trim_desc) AND temp_trk_cab_cofg_cd='VAN' => 'SAVANA RV',
-							temp_mdl_desc='SAVANA' AND  temp_trk_cab_cofg_cd='VAN' => 'SAVANA RV',
-							temp_mdl_desc='SUBURBAN' AND REGEXFIND('^([A-Z]{1}[0-9]{4})( |$)',temp_trim_desc) => REGEXFIND('^([A-Z]{1}[0-9]{4})( |$)',temp_trim_desc,1),						
-							temp_series_name='TAHOE C1500 LT' => 'TAHOE LT',                
-							temp_series_name='TAHOE C1500 LTZ' => 'TAHOE LTZ',                
-							temp_series_name='TAHOE HYBRID' AND temp_drv_typ_cd='RWD'	=> 'TAHOE C1500',       
-							temp_series_name='TAHOE HYBRID' AND temp_drv_typ_cd='4RD'	=> 'TAHOE K1500',       
-							temp_series_name='TAHOE POLICE' => 'TAHOE C1500',       
-							temp_series_name='TAHOE SPECIAL' => 'TAHOE K1500',    
-							temp_mdl_desc='TAHOE' AND REGEXFIND('(^[C|K][0-9]{4})',temp_trim_desc)
-							=> temp_mdl_desc + ' ' + REGEXFIND('(^[C|K][0-9]{4})',temp_trim_desc,1),
-							temp_series_name='TILT MASTER W35042' => '3500',    
-							REGEXFIND('^TILT MASTER W(4|5|6|7)(R|S|T)',temp_mdl_desc) 
-							=> REGEXFIND('^TILT MASTER W(4|5|6|7)(R|S|T)',temp_mdl_desc,1)+'000',            
-							temp_series_name='VAN' AND temp_trim_desc IN ['G10','G20','G30','G3500'] => 'TVAN (CHEVY TRK)',    
-							addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='CHRY' 
-			 => MAP(temp_mdl_desc='300C' => '300',
-							temp_mdl_desc='FIFTH AVENUE' AND temp_sale_cntry_cd='C' => temp_mdl_desc+'(CAN)',
-							temp_mdl_desc='GRAND VOYAGER' => 'VOYAGER',
-							temp_mdl_desc IN ['INTREPID','NEON'] AND temp_sale_cntry_cd='C' => temp_mdl_desc+'(CANADA)',
-							temp_mdl_desc='NEW YORKER' AND temp_trim_desc<>'' => temp_mdl_desc+'-'+temp_trim_desc,
-							addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='CRWN' => 'CROWN COACH',
-			 temp_nci_mak_abbr_cd='DODG'
-			 => MAP(temp_mdl_desc='GRAND CARAVAN' => TRIM(addCountry('CARAVAN',temp_sale_cntry_cd),ALL),
-							temp_mdl_desc='D-SERIES' => addCountry(temp_trim_desc,temp_sale_cntry_cd),
-							temp_mdl_desc IN ['RAM 1500','RAM 2500','RAM 3500','RAM 4500','RAM 5500'] => 'RAM TRUCK',
-							temp_mdl_desc='RAM WAGON' AND temp_sale_cntry_cd='C' => 'RAM WAGON (CAN)',
-							temp_mdl_desc='W-SERIES' AND temp_opt1_trim_desc<>'' => temp_trim_desc+'/'+temp_opt1_trim_desc,
-							temp_mdl_desc='W-SERIES' => addCountry(temp_trim_desc,temp_sale_cntry_cd),
-							addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='DUCA'
-			 => MAP(temp_trim_desc='BASE / S' => temp_mdl_desc + '/' + temp_mdl_desc + ' S',
-							temp_trim_desc='BASE' => temp_mdl_desc + '/' + temp_mdl_desc + IF(L.OPT1_TRIM_DESC<>'',' '+temp_opt1_trim_desc,''),
-							temp_mdl_desc='STREETFIGHTER' => 'STREETFIGHTER/S',
-							addCountry(temp_mdl_desc+IF(temp_trim_desc<>'',' '+temp_trim_desc,''),temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='EAGI' => 'EAGLE',
-			 temp_nci_mak_abbr_cd='EGIL'
-			 => MAP(temp_mdl_desc='PREMIER' => temp_mdl_desc,
-							temp_mdl_desc='TALON' => temp_mdl_desc,
-							temp_mdl_desc='VISION' => temp_mdl_desc + ' ' + temp_trim_desc,
-							addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='ELDO'
-			 => MAP(REGEXFIND('^E-Z RIDER',temp_mdl_desc) => 'E-Z RIDER',
-			        REGEXFIND('^TRANSMARK',temp_mdl_desc) => 'TRANSIT BUS',
-							addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='ETON' => IF(temp_mdl_desc='SIERRA UTILITY',temp_mdl_desc,TRIM(temp_mdl_desc,ALL)),
-			 temp_nci_mak_abbr_cd='FORD'
-			 => MAP(temp_mdl_desc='BUS CHASSIS' => 'BUS CHASSIS COWLS',
-							temp_mdl_desc='C-SERIES' => 'LOW TILT \'C\'',
-							temp_mdl_desc='C-MAX' => 'CMAX',
-							temp_mdl_desc='CL-SERIES' => 'HIGH TILT \'CL\'',
-							REGEXFIND('(CUTAWAY VAN)',temp_trim_desc) AND temp_mdl_desc='ECONOLINE' => 'CUTAWAY VAN',
-							temp_mdl_desc='ECONOLINE' AND  temp_trk_cab_cofg_cd='STR' AND temp_sale_cntry_cd='C' => 'COMM STR CH(CAN)',
-							temp_mdl_desc='ECONOLINE' AND  temp_trk_cab_cofg_cd='STR' => 'COMM STRIP CHASS',
-							temp_mdl_desc='ECONOLINE' AND  REGEXFIND('^(E100|E150|E250|E350)$',temp_trim_desc) AND temp_sale_cntry_cd='C' => 'CLUB WAGON (CAN)',
-							temp_mdl_desc='ECONOLINE' AND  REGEXFIND('^(E100|E150|E250|E350)$',temp_trim_desc) => 'CLUB WAGON',
-							temp_mdl_desc='ECONOLINE' AND  REGEXFIND('MOTOR HOME CHASSIS$',temp_trim_desc) => 'ECONOLN MTR HOME',
-							temp_mdl_desc='ECONOLINE' AND  REGEXFIND('^E.*SUPER DUTY$',temp_trim_desc) AND temp_sale_cntry_cd='C' => 'CLUB WG SUP(CAN)',
-							temp_mdl_desc='ECONOLINE' AND  REGEXFIND('^E.*SUPER DUTY$',temp_trim_desc) => 'CLUB WAGON SUPER',
-							temp_mdl_desc='ECONOLINE' AND  REGEXFIND('SUPER DUTY CHASSIS',temp_trim_desc) => 'ECONOLINE CHASS',
-							temp_mdl_desc='ECONOLINE' AND  REGEXFIND('SUPER DUTY VAN',temp_trim_desc) AND temp_sale_cntry_cd='C' => 'ECON VAN SUP(CAN)',
-							temp_mdl_desc='ECONOLINE' AND  REGEXFIND('SUPER DUTY VAN',temp_trim_desc) => 'ECONOLN VAN SUPR',
-							temp_mdl_desc='ECONOLINE' AND  REGEXFIND('^E.*VAN$',temp_trim_desc) AND temp_sale_cntry_cd='C' => 'ECONOLINE VN(CAN)',
-							temp_mdl_desc='ECONOLINE' AND  REGEXFIND('WAGON',temp_trim_desc) => 'ECONOLINE WAGON',
-							temp_mdl_desc='ECONOLINE' AND  temp_trk_cab_cofg_cd='VAN' => 'ECONOLINE VAN',
-							temp_mdl_desc='ECONOLINE' AND  temp_trk_cab_cofg_cd='CUT' => 'CUTAWAY VAN',
-							REGEXFIND('^EXPLORER',temp_mdl_desc) => 'EXPLORER',
-							temp_mdl_desc='F' => 'LGT CONVTNL \'F\'',
-							temp_mdl_desc='F250' AND temp_trim_desc='SUPER DUTY' => 'SRW SUPER DUTY',
-							temp_mdl_desc='F250' AND temp_trim_desc<>'SUPER DUTY' => 'LGT CONVTNL \'F\'',
-							temp_mdl_desc='F350' AND temp_trim_desc='SRW SUPER DUTY' => temp_trim_desc,
-							temp_mdl_desc='F350' => temp_trim_desc,	    //F350 is mapped to SRW and DRW
-							temp_mdl_desc IN ['F53','F450','F550','F59'] => 'DRW SUPER DUTY',
-							temp_mdl_desc IN ['F100','F150','F-150 HERITAGE','F590','F650','F750'] AND temp_sale_cntry_cd='C' => 'LGT CONV \'F\'(CAN)',
-							temp_mdl_desc IN ['F100','F150','F-150 HERITAGE','F590','F650','F750'] => 'LGT CONVTNL \'F\'',
-							temp_mdl_desc IN ['F600','F6000','F700','F7000','F800','F8000','P600','P800F'] => 'MED.HVY.CONVNTNL',
-							REGEXFIND('FREESTAR',temp_mdl_desc) => temp_mdl_desc,
-							REGEXFIND('H-SERIES',temp_mdl_desc) => 'CONVENTIONAL \'H\'',
-							REGEXFIND('L-SERIES',temp_mdl_desc) => 'CONVENTIONAL \'L\'',
-							temp_mdl_desc='LOW TILT CARGO' => 'CARGO LOW TILT',
-							REGEXFIND('N-SERIES',temp_mdl_desc) => 'CONVENTIONAL \'N\'',
-							REGEXFIND('THINK NEIGHBOR',temp_mdl_desc) => 'NEIGHBOR',
-							REGEXFIND('TRANSIT CONNECT',temp_mdl_desc) AND temp_sale_cntry_cd='C' => 'TRNST CNNECT(CAN)',
-							REGEXFIND('WINDSTAR',temp_mdl_desc)  AND temp_sale_cntry_cd='C' => 'WINDSTAR (CAN)',
-							addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='FRHT'
-			 => MAP(temp_mdl_desc[1..8]='CASCADIA' => 'CASCADIA',
-							temp_mdl_desc='COLUMBIA' => 'CONVENTIONAL',
-							temp_mdl_desc='MEDIUM CONVENTIONAL' => 'MED CONVENTIONAL',
-							addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='FTRV' AND temp_mdl_desc='MOTORHOME' AND  temp_trk_cab_cofg_cd='STR' => 'FORETRAVEL',
-			 temp_nci_mak_abbr_cd='GEO'
-			 => MAP(temp_mdl_desc='METRO' AND temp_trim_desc='SPRINT' => 'METRO/SPRINT',
-							temp_mdl_desc='METRO' AND temp_opt1_trim_desc='SPRINT' => 'METRO/SPRINT',
-							temp_mdl_desc='SPECTRUM' AND temp_sale_cntry_cd='C' => 'SPEC ENTRY (CAN)',
-							temp_mdl_desc='SPECTRUM' => 'SPECTRUM ENTRY',
-							addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='GIL' => IF(temp_mdl_desc IN ['SHUTTLE BUS','SUBURBAN BUS','TRANSIT BUS'],'BUS','GILLIG'),
-			 temp_nci_mak_abbr_cd='GMBH' => 'SETRAHDH',
-			 temp_nci_mak_abbr_cd='GMC'
-			 => MAP(
-							temp_mdl_desc IN ['C5000','C6000','S6000'] AND temp_trim_desc<>'' => temp_mdl_desc+' ('+temp_trim_desc[1..3]+')',
-							temp_mdl_desc='C7000' AND temp_trim_desc<>'' => 'C6500 ('+temp_trim_desc[1..3]+')',
-							temp_mdl_desc='FORWARD CONTROL CHASSIS' => 'FORWRD CNTRL CHS',
-							temp_mdl_desc='G-P' => 'G/P',
-							temp_mdl_desc='JIMMY' AND temp_sale_cntry_cd='C' => 'JIMMY (CANADA)',
-							temp_mdl_desc='JIMMY' AND REGEXFIND('^(C|K)([0-9]{4})$',temp_trim_desc) => temp_trim_desc,
-							temp_mdl_desc='JIMMY' AND temp_trim_desc='V15' => 'V15 CONV',
-							temp_mdl_desc='JIMMY / ENVOY' => 'JIMMY/ENVOY',
-							temp_mdl_desc='MOTOR HOME CHASSIS' => 'MOTOR HOME CHAS',
-							REGEXFIND('^(R15|R25|R35|V15|V25|V35) CONVENTIONAL',temp_mdl_desc) => REGEXREPLACE('CONVENTIONAL',temp_mdl_desc,'CONV'),
-							temp_mdl_desc='RALLY WAGON' AND temp_sale_cntry_cd='C' => 'RALLY WAGON(CAN)',
-							temp_mdl_desc='RALLY WAGON / VAN' AND temp_sale_cntry_cd='C' => 'RALLY WGN/VN(CAN)',
-							temp_mdl_desc='RALLY WAGON / VAN' => 'RALLY WAGON/VAN',
-							temp_mdl_desc='S TRUCK' => '\'S\'TRUCK',
-							temp_mdl_desc='SAVANA' AND  temp_trk_cab_cofg_cd='CUT' => 'SAVANA CUTAWAY',
-							temp_mdl_desc='SAVANA' AND REGEXFIND('(^RV )',temp_trim_desc) AND temp_trk_cab_cofg_cd='VAN' => 'SAVANA RV',
-							temp_mdl_desc='SUBURBAN' AND temp_trim_desc<>'' => REGEXREPLACE('CONVENTIONAL',temp_trim_desc,'CONV'),
-							REGEXFIND('YUKON',temp_mdl_desc) => 'YUKON',
-							temp_mdl_desc='ENVOY' AND temp_trim_desc='DENALI' => temp_mdl_desc+temp_trim_desc,
-							temp_mdl_desc='NEW SIERRA' => 'SIERRA',
-							addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='GWM' 
-			 => MAP(temp_mdl_desc='FIRE CAB CHASSIS' => 'OFC',
-							temp_mdl_desc='YT' => 'OTTAWA',
-							addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='HD'
-			 => MAP(temp_mdl_desc IN ['FLD'] AND temp_sale_cntry_cd='C' => temp_mdl_desc + ' (CAN)',
-							temp_mdl_desc='FLD' => temp_mdl_desc,
-							temp_mdl_desc IN ['FLH80'] => TRIM(temp_mdl_desc+ ' ' + temp_trim_desc,LEFT,RIGHT),
-							temp_mdl_desc='FLHP' AND temp_sale_cntry_cd='C' => 'FLHP POLICE (CAN)',
-							temp_mdl_desc='FLHP' => 'FLHP POLICE',
-							temp_mdl_desc='FLHPE' => 'FLHPE POLICE ESC',
-							temp_mdl_desc='FLHPI' => temp_mdl_desc + ' (FI)',
-							// temp_mdl_desc IN['FLHR','FLHRC','FLHRCI'] AND REGEXFIND('ANNIVERSARY',L.OPT1_TRIM_DESC) AND temp_sale_cntry_cd='C' => 'FLHR ANNIV (CAN)',
-							REGEXFIND('ANNIVERSARY',temp_trim_desc+temp_opt1_trim_desc) AND temp_sale_cntry_cd='C' => temp_mdl_desc + ' ANNIV (CAN)',
-							// temp_mdl_desc IN['FLHR','FLHRC','FLHRCI','FLHRSE4'] AND REGEXFIND('ANNIVERSARY',L.OPT1_TRIM_DESC) => temp_mdl_desc + ' ANNIV',
-							REGEXFIND('ANNIVERSARY',temp_trim_desc+temp_opt1_trim_desc)  => temp_mdl_desc + ' ANNIV',
-							temp_mdl_desc IN ['FLHR','FLHTCU','FLSTF']  AND temp_trim_desc='SHRINE' AND temp_sale_cntry_cd='C' => temp_mdl_desc + ' ' + temp_trim_desc + ' (CAN)',
-							temp_mdl_desc IN ['FLHR','FLHTCU','FLSTF','FLHRI']  AND temp_trim_desc='SHRINE' => temp_mdl_desc + ' ' + temp_trim_desc,
-							temp_mdl_desc='FLHR' AND temp_trim_desc='FIRE' AND temp_opt1_trim_desc='POLICE' => 'FLHR FIRE/PO',
-							temp_mdl_desc='FLHR' AND temp_trim_desc='ROAD KING' AND temp_sale_cntry_cd='C' => 'FLHR (CAN)',
-							temp_mdl_desc='FLHRC' AND temp_trim_desc='ROAD KING CLASSIC' AND temp_sale_cntry_cd='C' => 'FLHRC RKING (CAN)',
-							temp_mdl_desc IN ['FLHRS','FLHT'] => temp_mdl_desc + IF(temp_trim_desc<>'',' '+temp_trim_desc,''),
-							temp_mdl_desc='FLHRSE4' AND temp_sale_cntry_cd='C' => 'FLHRSE (CAN)',
-							temp_mdl_desc='FLHRSE4' => 'FLHRSE',
-							temp_mdl_desc IN ['FLHR','FLHRC','FLHRCI','FLHRI'] => temp_mdl_desc,
-							temp_mdl_desc='FLSTC'  AND temp_trim_desc='SHRINE' => temp_mdl_desc + ' ' + 'SHRINER',
-							temp_mdl_desc='FLHTCUSE5' => temp_mdl_desc + ' ' + temp_trim_desc,
-							//temp_mdl_desc='FLHTC' => 'FLHT CLASSIC',    
-							//temp_mdl_desc='FLHTCU' => 'FLHTCU SHRINE',
-							temp_mdl_desc='FXD' => 'FXDG',            
-							//temp_mdl_desc='FXDC' => 'FXDC DYNA CUSTOM',
-							//temp_mdl_desc='FLHTCU' AND temp_trim_desc='SHRINE' => temp_mdl_desc + ' ' + temp_trim_desc,
-							addCountry(concat_str(temp_mdl_desc,temp_trim_desc,''),temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='HEND' => 'HENDRICKSON',
-			 temp_nci_mak_abbr_cd='HINO' 
-			 => IF(REGEXFIND('^([A-Z]{2})$',temp_mdl_desc), 
-			       temp_mdl_desc+' MODEL'+IF(temp_sale_cntry_cd='C', ' (CANADA)',''),
-						 'HIN'+IF(temp_sale_cntry_cd='C', ' (CANADA)','')), 
-			 temp_nci_mak_abbr_cd='HOND'
-			 => MAP(temp_mdl_desc='FCX CLARITY' => 'FCX',
-							temp_trim_desc='RR-ABS' => temp_mdl_desc + 'RR ABS',
-							REGEXFIND('^(ATC|CB|CH|CM|CR[A-Z0-9]+|CT|CX|FL|FSC|GL|N|PCX|Q|RVF|S[A-Z]+|TRX|'+
-							          'VF1000|VF1100|VF500|VF700|VF750|VFR|VT|XL|XR|Z)',temp_mdl_desc) 
-							=> addCountry(temp_mdl_desc+temp_trim_desc,temp_sale_cntry_cd),
-							addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='HUSA' 
-			 => concat_str(temp_mdl_desc,temp_trim_desc,'') + IF(temp_opt1_trim_desc<>'','/'+temp_mdl_desc+temp_opt1_trim_desc,''),
-			 temp_nci_mak_abbr_cd='HUMM' => 'HUMMER',
-			 temp_nci_mak_abbr_cd='HUSQ' => concat_str(temp_mdl_desc,temp_trim_desc,' '),
-			 temp_nci_mak_abbr_cd='ICRP' => temp_mdl_desc + ' SERIES',
-			 temp_nci_mak_abbr_cd='INTL' 
-			 => MAP(REGEXFIND('([0-9]{4})',temp_mdl_desc) AND temp_mdl_desc NOT IN ['5500','5600','5900','9400','9900']
-							=> temp_mdl_desc + ' SERIES',
-							temp_mdl_desc='PROSTAR LMTD' => 'PROSTAR',
-							temp_mdl_desc='PROSTAR PREMIUM' => 'PROSTAR',
-							temp_mdl_desc='CF' => 'CF SERIES',
-							temp_mdl_desc='S-SERIES' => 'S SERIES',
-							temp_mdl_desc='PAYSTAR' => 'PAY STAR',
-							addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='JEEP' AND temp_mdl_desc='WRANGLER UNLIMITED' => 'WRANGLERUNLIMITED',
-			 temp_nci_mak_abbr_cd='KALM' AND temp_mdl_desc[1..6]='OTTAWA' => 'OTTAWA',
-			 temp_nci_mak_abbr_cd='KAWK' 
-			 => MAP(REGEXFIND('KRF-',temp_mdl_desc) => concat_str(REGEXREPLACE('-',temp_mdl_desc,''),temp_trim_desc,'-'),
-			        REGEXFIND('^(^VN1600|^VN2000|^VN900|^ZG1400|^ZX1200|^ZX1400)',temp_mdl_desc) => concat_str(temp_mdl_desc,temp_trim_desc,''),
-							addCountry(concat_str(temp_mdl_desc,temp_trim_desc,'-'),temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='KTM' => addCountry(concat_str(TRIM(temp_mdl_desc,ALL),temp_trim_desc,''),temp_sale_cntry_cd),
-			 temp_nci_mak_abbr_cd='KVCH' AND temp_mdl_desc='FIRETRUCK' => 'FIRE TRUCK',
-			 temp_nci_mak_abbr_cd='LAFR' => 'FIRETRUCK',
-			 temp_nci_mak_abbr_cd='LEXS'
-			 => MAP(temp_mdl_desc='IS' AND temp_trim_desc='F' =>'IS-F', 
-							temp_mdl_desc='CT' AND temp_trim_desc='200' =>'CT200H',
-							temp_mdl_desc='GX' AND temp_trim_desc IN ['BASE','PREMIUM'] =>'GX460',
-							temp_mdl_desc='RX' AND temp_trim_desc IN ['450'] =>temp_mdl_desc+temp_trim_desc+'H',
-							addCountry(concat_str(temp_mdl_desc, temp_trim_desc, ''),temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='MCIN' => 'MTC',
-			 temp_nci_mak_abbr_cd='MERC'
-			 => IF(temp_mdl_desc='GRAND MARQUIS','MARQUIS',addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='MERZ'
-			 => MAP(temp_mdl_desc IN ['C','E','G','R','S','CL','CLK','CLS','GL','GLK','ML','SL','SLK','SLS'] AND REGEXFIND('([0-9]{3})([ ]+4[ ]*MATIC|[ ]+BLUETEC|[ ]+HYBRID|$)',temp_trim_desc)
-							=> temp_mdl_desc + REGEXFIND('([0-9]{3})([ ]+4[ ]*MATIC|[ ]+BLUETEC|[ ]+HYBRID|$)',temp_trim_desc,1),
-							temp_mdl_desc='SLS' AND temp_trim_desc='AMG'
-							=> temp_mdl_desc + ' ' + TRIM(temp_trim_desc,ALL),
-							temp_mdl_desc IN ['C','E','G','R','S','CL','CLK','CLS','GL','GLK','ML','SL','SLK','SLS'] AND REGEXFIND('([0-9]{2,}) (CDI|AMG)',temp_trim_desc)
-							=> temp_mdl_desc + TRIM(temp_trim_desc,ALL),
-							addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='NFLY' AND temp_mdl_desc IN ['SCHOOL BUS','TRANSIT BUS'] => 'NEW FLYER',
-			 temp_nci_mak_abbr_cd='NOVB' => 'NOVABUS',
-			 temp_nci_mak_abbr_cd='OLDS' AND temp_mdl_desc IN ['CUTLASS CALAIS','CUTLASS CIERA','CUTLASS SUPREME'] => 'CUTLASS',
-			 temp_nci_mak_abbr_cd='ONTR' AND temp_mdl_desc='ORION VII' => 'ORION',
-			 temp_nci_mak_abbr_cd='OSHK' AND temp_mdl_desc='S SERIES' => temp_mdl_desc + ' S',
-			 temp_nci_mak_abbr_cd='POLS'
-			 => MAP(temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='400 H.O.' => 'SPORTSMAN 400 HO',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='400' => 'SPORTSMAN 400 HO',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='500 H.O.' AND temp_opt1_trim_desc='TOURING' => 'SPTMN500 HO TOUR',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='500' AND temp_opt1_trim_desc='TOURING' => 'SPTMN500',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='500 H.O.' => 'SPORTSMAN 500 HO',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='500-EFI' AND temp_opt1_trim_desc='TOURING' => 'SPTMN500 EFI TOUR',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='500 EFI' => 'SPTMN500 EFI',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='500 EFI-X2' => 'SPTMN500 EFI X2',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='550 EFI-X2' => 'SPTMN550 EFI X2',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='550 EFI X2' => 'SPTMN550 EFI X2',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='550 XP-EPS' => 'SPTMN550EFI XPEPS',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='800 EFI' AND temp_opt1_trim_desc='TOURING' => 'SPTMN800 EFI TOUR',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='800 EFI' => 'SPORTSMAN 800EFI',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='800 EFI-X2' => 'SPTMN800 EFI X2',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='550 EFI X2' => 'SPTMN550 EFI X2',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='550 EFI XP' => 'SPTMN550 EFI XP',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='850 EFI X2' => 'SPTMN850 EFI X2',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='850' AND temp_opt1_trim_desc='X2 LE' => 'SPORTSMAN 4X4',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='850 XP-EPS' => 'SPTMN850 XP EPS',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='850' AND temp_opt1_trim_desc='XP-EPS' => 'SPTMN850 XP EPS',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='850 XP-LE' => 'SPTMN850 XP LE',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='850 EFI XP' => 'SPTMN850 EFI XP',
-							temp_mdl_desc='SPORTSMAN' AND temp_trim_desc='850' AND temp_opt1_trim_desc='XP' => 'SPTMN850 EFI XP',
-							temp_mdl_desc='SCRAMBLER' AND temp_trim_desc='500' => 'SCRAMBLER 500 4X4',
-							temp_mdl_desc='RANGER' AND temp_trim_desc='500 H.O.' => 'RANGER 500 HO',
-							temp_mdl_desc='RANGER' AND temp_trim_desc='800' AND temp_opt1_trim_desc='XP' => 'RANGER XP800 EFI',
-							temp_mdl_desc='RANGER' AND temp_trim_desc='800' AND temp_opt1_trim_desc='XP-EPS' => 'RANGER XP800 EPS',
-							temp_mdl_desc='RANGER' AND temp_trim_desc='RZR 170' => 'RANGER RZR170',
-							temp_mdl_desc='RANGER' AND temp_trim_desc='RZR 800S' => 'RANGER RZR S 800',
-							temp_mdl_desc='RANGER' AND temp_trim_desc='RZR S' => 'RANGER RZR-S',
-							temp_mdl_desc='RANGER' AND temp_trim_desc='800 CREW' => 'RANGER CREW800EFI',
-							temp_mdl_desc='RANGER' AND temp_trim_desc='800 CREW EPS' => 'RANGER CREW800EPS',
-							temp_mdl_desc='OUTLAW' AND temp_trim_desc='450-MXR' => 'OUTLAW 450MXR',
-							temp_mdl_desc='OUTLAW' AND temp_trim_desc='525-IRS' => 'OUTLAW 525IRS',
-							addCountry(concat_str(temp_mdl_desc, temp_trim_desc, ' '),temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='PONT'
-			 => MAP(temp_mdl_desc IN ['G3 WAVE','G5'] AND temp_trim_desc<>'GT'=> temp_mdl_desc+' (CANADA)',
-							temp_mdl_desc IN ['MONTANA'] => temp_mdl_desc+' (CAN)',
-							addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='PTRB'
-			 => IF(temp_mdl_desc IN ['210','220','320','362'],'COE','CONVENTIONAL'),
-			 temp_nci_mak_abbr_cd='RAM'
-			 => MAP(temp_mdl_desc IN ['1500','2500','3500'] => 'TRUCK',
-							temp_mdl_desc IN ['4500','5500'] => 'CHASSIS',
-							REGEXFIND('^PROMASTER [0-9]+',temp_mdl_desc) => 'PROMASTER',
-							addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='ROAR'=> 'MASTER',
-			 temp_nci_mak_abbr_cd='SAA' 
-			 => MAP(temp_mdl_desc IN ['9-2','9-3','9-7X'] => addCountry(REGEXREPLACE('-',temp_mdl_desc,''),temp_sale_cntry_cd),
-							temp_mdl_desc IN ['9-5'] => addCountry(REGEXREPLACE('-',temp_mdl_desc,'/'),temp_sale_cntry_cd),
-							addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='SPTN' /*AND temp_mdl_desc='MOTORHOME'*/ => 'SPARTAN MOTORS',
-			 temp_nci_mak_abbr_cd='STRG'=> 'STERLING',
-			 temp_nci_mak_abbr_cd='SUTP'=> 'SUTPHEN',
-			 temp_nci_mak_abbr_cd='SUZI' 
-			 => MAP(temp_mdl_desc IN ['AERIO','EQUATOR','FORENZA','FORZA','JIMNY','KIZASHI','SX4','GRAND VITARA','RENO','SAMURAI',
-			        'SIDEKICK','SWIFT','VERONA','VITARA','VZR1800','XL7']
-			        => addCountry(temp_mdl_desc,temp_sale_cntry_cd),
-							temp_mdl_desc='LTF400' AND temp_trim_desc='F' => 'LT-F400F',
-							temp_mdl_desc='GSX750' => 'GSX-R750',
-							temp_mdl_desc='DL100' => 'DL1000',			//ISUZU do not have a model DL100
-							addCountry(concat_str(temp_mdl_desc, temp_trim_desc, ''),temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='THMS' AND temp_mdl_desc IN ['SCHOOL BUS','TRANSIT BUS'] => 'THOMAS',
-			 temp_nci_mak_abbr_cd='TMC'=> 'TMC',
-			 temp_nci_mak_abbr_cd='TOYT'
-			 => MAP(temp_mdl_desc='CAMRY NEW GENERATION' => 'CAMRY',
-							temp_mdl_desc='COROLLA MATRIX' => temp_mdl_desc,
-							temp_mdl_desc='LAND CRUISER' AND temp_sale_cntry_cd='C' => 'LANDCRUISER (CAN)',
-							temp_mdl_desc='LAND CRUISER' => 'LANDCRUISER S/W',
-							temp_mdl_desc='PICKUP' 
-							=> MAP(REGEXFIND('^CAB CHASSIS',temp_trim_desc) => 'CAB/CHASSIS',
-										 REGEXFIND('^LONG BED DIESEL',temp_trim_desc) => 'LONG BED DIESEL',
-										 REGEXFIND('^[RN|TURBO]',temp_trim_desc) => 'PICKUP 4 X 4',
-										 temp_trim_desc='SHORT BED VN63 SR5' => 'SHORT BED SR5',
-										 temp_trim_desc='SHORT BED VN63' => 'SHORT BED STD',
-										 REGEXFIND('^SHORT BED XTRA CAB.*( DLX| SR5)',temp_trim_desc) => 'SHRT BD XTRCB'+REGEXFIND('^SHORT BED XTRA CAB.*( DLX| SR5)',temp_trim_desc,1),
-										 REGEXFIND('^XTRACAB (LN5|RN5|RN7|SR5)',temp_trim_desc) => 'XTRACAB',
-										 REGEXFIND('^XTRACAB (CLX|LN6|RN6)',temp_trim_desc) AND temp_sale_cntry_cd='C' => 'XTRACAB 4X4 (CAN)',
-										 REGEXFIND('^XTRACAB (CLX|DLX|LN6|RN6)',temp_trim_desc) => 'XTRACAB 4 X 4',
-										 REGEXFIND('^1/2 TON',temp_trim_desc) AND temp_sale_cntry_cd='C' => 'HLFTN PKUP (CAN)',
-										 REGEXFIND('^1/2 TON',temp_trim_desc) => 'HALFTON PICKUP',
-										 REGEXFIND('^1/2 TON',temp_trim_desc) => 'HALFTON PICKUP',
-										 REGEXFIND('^3/4 TON LONG BED',temp_trim_desc) => 'LONG BED 3/4 TN',
-										 REGEXFIND('^1 TON LONG BED',temp_trim_desc) => 'LONG BED 1 TON',
-										 addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-							temp_mdl_desc='PICKUP / CAB CHASSIS' => 'PICKUP/CAB CHASIS',
-							temp_mdl_desc='PICKUP COMMERCIAL / CAMPER' => 'COMM/CAMPER',
-							temp_mdl_desc='RAV4' AND temp_trim_desc='SPORT' => 'RAV4 NEWGENER',
-							temp_mdl_desc='SCION' AND  temp_trim_desc='XB' => temp_mdl_desc + ' ' + temp_trim_desc,
-							REGEXFIND('^SCION',temp_mdl_desc) => 'SCION',
-							temp_mdl_desc='4RUNNER' => addCountry('4 RUNNER',temp_sale_cntry_cd),
-							addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='TRUM' 
-			 => MAP(temp_mdl_desc='SPEED' AND temp_trim_desc='MASTER' => 'SPEEDMASTER',
-							temp_mdl_desc='SPEED TRIPLE' AND temp_trim_desc='R ABS' => 'SPEED TRIPLE RABS',
-							temp_mdl_desc='THUNDERBIRD' AND temp_trim_desc='STORM ABS' => 'THNDRBRD STORMABS',
-							temp_mdl_desc='THUNDERBIRD' AND temp_trim_desc='COMMANDER' => 'THUNDERBIRDCMANDR',
-			        addCountry(concat_str(temp_mdl_desc, temp_trim_desc, ' '),temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='UMOG'=> 'UNIMOG',
-			 temp_nci_mak_abbr_cd='VNHL'=> 'TRANSIT BUS',
-			 temp_nci_mak_abbr_cd='VOLK' 
-			 => MAP(temp_mdl_desc='E-GOLF' => 'EGOLF',
-							temp_mdl_desc='NEW GTI' => 'NEWGTI',
-							temp_mdl_desc='NEW JETTA' => 'NEWJETTA',
-			        addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='VOLV' 
-			 => IF(temp_mdl_desc='9700','BUS',addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 // temp_nci_mak_abbr_cd='VOLV' 
-			 // => IF(temp_mdl_desc='9700','BUS',CASE(temp_sale_cntry_cd,'C'=>temp_mdl_desc+' (CANADA)','M'=>temp_mdl_desc+' (MEX)','P'=>temp_mdl_desc+' (PR)',temp_mdl_desc)),
-			 temp_nci_mak_abbr_cd='WRKH' 
-			 => MAP(temp_mdl_desc='BUS CHASSIS' => 'BUS CHAS',
-							temp_mdl_desc='COMMERCIAL CHASSIS' => 'COMMERCIAL CHAS',
-							temp_mdl_desc='FORWARD CONTROL CHASSIS' => 'FORWRD CNTRL CHS',
-							temp_mdl_desc IN ['MOTORHOME CHASSIS','R26 - UFO'] => 'MOTOR HOME CHAS',
-							temp_mdl_desc='STEP VAN' => 'MOTOR STEP VAN',
-			        addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 temp_nci_mak_abbr_cd='YAMA' 
-			 => MAP(temp_mdl_desc='FJR1300' => concat_str(temp_mdl_desc, temp_trim_desc, '') + IF(temp_sale_cntry_cd='C',' (CAN)',''),
-							temp_mdl_desc IN ['FZ1','FZ6','FZ8'] => addCountry(concat_str(temp_mdl_desc, temp_trim_desc, '-'),temp_sale_cntry_cd),
-							REGEXFIND('^[FZ07|FZ09|FZR600|FZR750|GTS1000|SRX600|TTR50|VMX|WR|X|Y]',temp_mdl_desc)
-							=> addCountry(concat_str(temp_mdl_desc, temp_trim_desc, ''),temp_sale_cntry_cd),
-			        addCountry(temp_mdl_desc,temp_sale_cntry_cd)),
-			 addCountry(temp_mdl_desc,temp_sale_cntry_cd));
-		SELF.complete_prefix_file_id				:= '';																													//90	
-		SELF.series_name_full_spelling			:= temp_series_name;																						//91	series_name_full_spelling-all blank	   
-		SELF.vis_theft_code					:= cleanDesc(L.VRG_VIS_THEFT);																					//92														
-		SELF.base_list_price_expanded	      := INTFORMAT((INTEGER) TRIM(L.MFG_BAS_MSRP),7,1);             	//93
+
+		//DF-26744 change  - populate the base_model with what is contained in mdl_desc	 
+		SELF.base_model					:= STD.Str.ToUpperCase(STD.Str.CleanSpaces(L.MDL_DESC));	 
+		SELF.complete_prefix_file_id	:= '';																													//90	
+		SELF.series_name_full_spelling	:= temp_series_name;																						//91	series_name_full_spelling-all blank	   
+		SELF.vis_theft_code				:= cleanDesc(L.VRG_VIS_THEFT);																					//92														
+		SELF.base_list_price_expanded	:= INTFORMAT((INTEGER) TRIM(L.MFG_BAS_MSRP),7,1);             	//93
 		SELF.default_nada_vehicle_id:= IF(REGEXFIND('([A-Z\\(\\[]+)',L.NADA_ID1),'',TRIM(L.NADA_ID1)); 			//94
 		SELF.default_nada_model			:= cleanDesc(L.NADA_SERIES1);						//95
 		SELF.default_nada_body_style:= cleanDesc(L.NADA_BODY1);		 				  //96
@@ -5407,17 +4998,18 @@ EXPORT 	map_VINtelligence_to_VINA := FUNCTION
 																			 ut.CleanSpacesAndUpper(L.ENG_ASP_VVTL_CD)='YES'
 																			 => 'Y',
 																			 '');
-		SELF.iso_liability					:= MAP(ut.CleanSpacesAndUpper(L.LPM_PIP_MED_PAY_SYMBOL) IN ['N','NO'] 					//157 iso_liability-Y,N		
+		//DF-27656
+		SELF.iso_liability					:= MAP(ut.CleanSpacesAndUpper(L.LPM_PIP_MED_PAY_SYMBOL_2018) IN ['N','NO'] 					//157 iso_liability-Y,N		
 																			 => 'N  ',	
-																			 ut.CleanSpacesAndUpper(L.LPM_PIP_MED_PAY_SYMBOL) IN ['Y','YES'] 
+																			 ut.CleanSpacesAndUpper(L.LPM_PIP_MED_PAY_SYMBOL_2018) IN ['Y','YES'] 
 																			 => 'Y  ',
-																			 stringlib.stringtouppercase(L.LPM_PIP_MED_PAY_SYMBOL)) +
-																	 MAP(ut.CleanSpacesAndUpper(L.LPM_LIABILITY_SYMBOL) IN ['N','NO']	
+																			 stringlib.stringtouppercase(L.LPM_PIP_MED_PAY_SYMBOL_2018)) +
+																	 MAP(ut.CleanSpacesAndUpper(L.LPM_LIABILITY_SYMBOL_2018) IN ['N','NO']	
 																			 => 'N  ',	
-																			 ut.CleanSpacesAndUpper(L.LPM_LIABILITY_SYMBOL) IN ['Y','YES'] 
+																			 ut.CleanSpacesAndUpper(L.LPM_LIABILITY_SYMBOL_2018) IN ['Y','YES'] 
 																			 => 'Y  ',
-																			 stringlib.stringtouppercase(L.LPM_LIABILITY_SYMBOL)) +
-																	 IF(ut.CleanSpacesAndUpper(L.LPM_ROLL_IND)='Y','R','');
+																			 stringlib.stringtouppercase(L.LPM_LIABILITY_SYMBOL_2018)) +
+																	 IF(ut.CleanSpacesAndUpper(L.LPM_ROLL_IND_2018)='Y','R','');
 		SELF.series_name_condensed	:= temp_series_name;																										//158 series_name_condensed
 		SELF.aces_data							:= stringlib.stringtouppercase(L.ACES_VEHICLE_ID) +																	//159 aces_data-all blank
 																	 stringlib.stringtouppercase(L.ACES_BASE_VEHICLE)  +															//    ACES_VEHICLE_ID(235)

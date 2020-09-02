@@ -1,4 +1,4 @@
-import std, ut;
+﻿import std, ut;
 
 rgxGender := U'\\bsex: *(male|female|M|F)\\b';
 // sample		Age-Race-Sex: 60-White-M
@@ -62,7 +62,7 @@ EXPORT ProcessFile(DATASET(Layouts.rEntity) infile, boolean useLexId = false) :=
 	// add akas
 	withaka := JOIN(basis, AllAkas, LEFT.id=Right.id,
 					TRANSFORM(Layout_XG.routp,
-						self.aka_list.AKA := RIGHT.AKA;
+						self.aka_list.AKA := CHOOSEN(RIGHT.AKA,254); 
 						self := LEFT;
 					), LEFT OUTER, LOCAL);
 					

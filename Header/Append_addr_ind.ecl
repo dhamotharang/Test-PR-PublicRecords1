@@ -1,4 +1,4 @@
-﻿import doxie,header_quick;
+﻿import doxie,header_quick,dx_header,MDR,IDL_Header;
 
 r:=doxie.layout_references;
 
@@ -14,21 +14,31 @@ export Append_addr_ind(dataset(r) in_ds,
 
 import ut;
 
-hdr:=IF(isFCRA, doxie.Key_fcra_Header,doxie.Key_Header);
+FCRAUse := IF(isFCRA,1,0);
+
+hdr:= dx_header.key_header(FCRAUse);
 
 qh := IF(isFCRA, header_quick.Key_Did_FCRA, header_quick.key_did);
 
-tu_srcs := ['TU','TS','LT','TN'];
-bureau_srcs := ['EQ','EN','QH'] + tu_srcs;
+tu_srcs := MDR.SourceTools.set_Transunion + ['TS'];
+bureau_srcs := [MDR.SourceTools.set_Equifax,MDR.SourceTools.set_Transunion, MDR.SourceTools.src_Experian_Credit_Header];
+ins_srcs := IDL_Header.SourceTools.set_insurance_sources;
+prop_srcs := MDR.SourceTools.set_Property;
+utility_srcs := MDR.SourceTools.set_Utility_sources;
+veh_srcs := MDR.SourceTools.set_Vehicles;
+dl_srcs := MDR.SourceTools.set_DL;
+voter_srcs := MDR.SourceTools.src_Voters_v2;
 
 rec := Layout_addr_ind;
 rec_full := Layout_addr_ind_full;
 newrec := record
   rec_full;
+	unsigned6 rid;
 	string1 isTU;
 	string1 isQH;
 	string2 src;
 	unsigned8 rawaid;
+	unsigned4 global_sid;
 end;
 
 outrec := record
@@ -40,7 +50,7 @@ end;
  
 mindate (unsigned3 dt1, unsigned3 dt2) := MAP(dt1 = 0 => dt2, dt2 = 0 => dt1, min(dt1,dt2));
 
-ua_Key      := Key_Addr_Unique_Expanded(isFCRA);
+ua_Key      := dx_Header.Key_Addr_Unique_Expanded(FCRAUse);
 get_ua      := join(in_ds,ua_Key,Keyed(left.did = right.did),transform(newrec,self:=right,self:=[]),limit(10000));
 
 high_inds   := dedup(sort(get_ua(addr_ind NOT BETWEEN '91' AND '99'),did,-(integer) addr_ind),did,addr_ind);
@@ -69,16 +79,32 @@ bhdr         := join(in_ds,hdr,keyed(left.did = right.s_did),
 														  self.best_addr_rank := '1';
 															self.addr_ind       := '1';
 															self.src_cnt        := 1;
-															self.bureau_src_cnt := 1;
+															self.insurance_src_cnt := IF(right.src IN ins_srcs,1,0);
+															self.bureau_src_cnt := IF(right.src IN bureau_srcs,1,0);
+															self.property_src_cnt := IF(right.src IN prop_srcs,1,0);
+															self.utility_src_cnt := IF(right.src IN utility_srcs,1,0);
+															self.vehicle_src_cnt := IF(right.src IN veh_srcs,1,0);
+															self.dl_src_cnt := IF(right.src IN dl_srcs,1,0);
+															self.voter_src_cnt := IF(right.src = voter_srcs,1,0);
+															self.src_cnt_total := 1;
+															self.insurance_src_cnt_total := IF(right.src IN ins_srcs,1,0);
+															self.bureau_src_cnt_total := IF(right.src IN bureau_srcs,1,0);
+															self.property_src_cnt_total := IF(right.src IN prop_srcs,1,0);
+															self.utility_src_cnt_total := IF(right.src IN utility_srcs,1,0);
+															self.vehicle_src_cnt_total := IF(right.src IN veh_srcs,1,0);
+															self.dl_src_cnt_total := IF(right.src IN dl_srcs,1,0);
+															self.voter_src_cnt_total := IF(right.src = voter_srcs,1,0);
 															self.dt_first_seen_pr := right.dt_first_seen;
 															self.dt_last_seen_pr := right.dt_last_seen;
 															self.dt_vendor_first_reported_pr := right.dt_vendor_first_reported;
 															self.dt_vendor_last_reported_pr := right.dt_vendor_last_reported;
 														  self:=right,self:=[]),limit(10000));
 
-bhdr_tu      := bhdr(src IN tu_srcs);
+//TODO: Add address permissions for TU Data
+// bhdr_tu      := addAddressPerms(bhdr(src IN tu_srcs),src,dt_first_seen,rid,st,global_sid,permissions,FALSE,FCRAUse);
+bhdr_tu := bhdr(src IN tu_srcs);
 
-qhdr         := join(in_ds,qh,keyed(left.did = right.did),
+qhdr0         := join(in_ds,qh,keyed(left.did = right.did),
                     transform(newrec,
 														  self.addr_suffix := right.suffix,
 														  self.city        := right.city_name,
@@ -87,13 +113,32 @@ qhdr         := join(in_ds,qh,keyed(left.did = right.did),
 														  self.best_addr_rank := '1';
 															self.addr_ind       := '1';
 															self.src_cnt        := 1;
+															self.insurance_src_cnt := IF(right.src IN ins_srcs,1,0);
 															self.bureau_src_cnt := IF(right.src IN bureau_srcs,1,0);
+															self.property_src_cnt := IF(right.src IN prop_srcs,1,0);
+															self.utility_src_cnt := IF(right.src IN utility_srcs,1,0);
+															self.vehicle_src_cnt := IF(right.src IN veh_srcs,1,0);
+															self.dl_src_cnt := IF(right.src IN dl_srcs,1,0);
+															self.voter_src_cnt := IF(right.src = voter_srcs,1,0);
+															self.src_cnt_total := 1;
+															self.insurance_src_cnt_total := IF(right.src IN ins_srcs,1,0);
+															self.bureau_src_cnt_total := IF(right.src IN bureau_srcs,1,0);
+															self.property_src_cnt_total := IF(right.src IN prop_srcs,1,0);
+															self.utility_src_cnt_total := IF(right.src IN utility_srcs,1,0);
+															self.vehicle_src_cnt_total := IF(right.src IN veh_srcs,1,0);
+															self.dl_src_cnt_total := IF(right.src IN dl_srcs,1,0);
+															self.voter_src_cnt_total := IF(right.src = voter_srcs,1,0);
 															self.isTU						:= IF(right.src IN tu_srcs,'Y','');
 															self.dt_first_seen_pr := right.dt_first_seen;
 															self.dt_last_seen_pr := right.dt_last_seen;
 															self.dt_vendor_first_reported_pr := right.dt_vendor_first_reported;
 															self.dt_vendor_last_reported_pr := right.dt_vendor_last_reported;
 														  self:=right,self:=[]),limit(10000));
+															
+//TODO: Add address perms to QH data
+// wh_removed := IF(Doxie.DataRestriction.WH,qhdr0(~mdr.sourceTools.sourceisWeeklyHeader(src)),qhdr0);
+// qhdr := addAddressPerms(wh_removed,src,dt_first_seen,rid,st,global_sid,permissions,FALSE,FCRAUse);
+qhdr := qhdr0;
 
 qhdr_tu      := qhdr(src IN tu_srcs);
 qhdr_nontu	 := qhdr(src NOT IN tu_srcs);
@@ -119,9 +164,39 @@ roll_qh := rollup(sort(qhdr_nontu,did,prim_range,predir,prim_name,addr_suffix,po
 															  self.dt_vendor_last_reported   := max(left.dt_vendor_last_reported,right.dt_vendor_last_reported),
 															  self.dt_vendor_last_reported_pr   := max(left.dt_vendor_last_reported_pr,right.dt_vendor_last_reported_pr),
 																self.src_cnt        := if(left.src<>right.src,left.src_cnt + right.src_cnt,left.src_cnt),
-																self.bureau_src_cnt := if(left.src<>right.src,left.bureau_src_cnt + right.bureau_src_cnt,left.bureau_src_cnt),
+																self.insurance_src_cnt := if(left.src<>right.src AND right.src IN ins_srcs,left.insurance_src_cnt + right.insurance_src_cnt,left.insurance_src_cnt),
+																self.bureau_src_cnt := if(left.src<>right.src AND right.src IN bureau_srcs,left.bureau_src_cnt + right.bureau_src_cnt,left.bureau_src_cnt),
+																self.property_src_cnt := if(left.src<>right.src AND right.src IN prop_srcs,left.property_src_cnt + right.property_src_cnt,left.property_src_cnt),
+																self.utility_src_cnt := if(left.src<>right.src AND right.src IN utility_srcs,left.utility_src_cnt + right.utility_src_cnt,left.utility_src_cnt),
+																self.vehicle_src_cnt := if(left.src<>right.src AND right.src IN veh_srcs,left.vehicle_src_cnt + right.vehicle_src_cnt,left.vehicle_src_cnt),
+																self.dl_src_cnt := if(left.src<>right.src AND right.src IN dl_srcs,left.dl_src_cnt + right.dl_src_cnt,left.dl_src_cnt),
+																self.voter_src_cnt := if(left.src<>right.src AND right.src = voter_srcs,left.voter_src_cnt + right.voter_src_cnt,left.voter_src_cnt),
+																self.src_cnt_total := if(left.src<>right.src,left.src_cnt_total + right.src_cnt_total,left.src_cnt_total),
+																self.insurance_src_cnt_total := if(left.src<>right.src AND right.src IN ins_srcs,left.insurance_src_cnt_total + right.insurance_src_cnt_total,left.insurance_src_cnt_total),
+																self.bureau_src_cnt_total := if(left.src<>right.src AND right.src IN bureau_srcs,left.bureau_src_cnt_total + right.bureau_src_cnt_total,left.bureau_src_cnt_total),
+																self.property_src_cnt_total := if(left.src<>right.src AND right.src IN prop_srcs,left.property_src_cnt_total + right.property_src_cnt_total,left.property_src_cnt_total),
+																self.utility_src_cnt_total := if(left.src<>right.src AND right.src IN utility_srcs,left.utility_src_cnt_total + right.utility_src_cnt_total,left.utility_src_cnt_total),
+																self.vehicle_src_cnt_total := if(left.src<>right.src AND right.src IN veh_srcs,left.vehicle_src_cnt_total + right.vehicle_src_cnt_total,left.vehicle_src_cnt_total),
+																self.dl_src_cnt_total := if(left.src<>right.src AND right.src IN dl_srcs,left.dl_src_cnt_total + right.dl_src_cnt_total,left.dl_src_cnt_total),
+																self.voter_src_cnt_total := if(left.src<>right.src AND right.src = voter_srcs,left.voter_src_cnt_total + right.voter_src_cnt_total,left.voter_src_cnt_total),
+																self.permissions := left.permissions | right.permissions,
 															  self := right,
 															  self := left));
+
+qh_perms_updated := join(get_ua,roll_qh,
+													left.did						= right.did AND
+													left.prim_range			= right.prim_range AND
+													left.predir					=	right.predir AND
+													left.prim_name			= right.prim_name AND
+													left.addr_suffix		= right.addr_suffix AND
+													left.postdir				= right.postdir AND
+													left.sec_range			=	right.sec_range AND
+													left.city						= right.city AND
+													left.st							= right.st AND
+													left.zip						= right.zip,
+													transform(newrec,
+																		self.permissions := IF(right.did>0,left.permissions | right.permissions,left.permissions),
+																		self := left),left outer);
 
 qh_only := dedup(sort(get_ua + roll_qh,
                        did,prim_range,predir,prim_name,addr_suffix,postdir,sec_range,city,st,zip,isQH),
@@ -139,8 +214,14 @@ qh_matches := join(qh_only,get_ua,
 										transform(newrec,
 										          self.addr_ind      := right.addr_ind,
 															self.apt_cnt       := right.apt_cnt,
-															// self.dt_first_seen := right.dt_first_seen,
-															// self.dt_last_seen  := right.dt_last_seen,
+															self.src_cnt_total := right.src_cnt_total,
+															self.insurance_src_cnt_total := right.insurance_src_cnt_total,
+															self.bureau_src_cnt_total := right.bureau_src_cnt_total,
+															self.property_src_cnt_total := right.property_src_cnt_total,
+															self.utility_src_cnt_total := right.utility_src_cnt_total,
+															self.vehicle_src_cnt_total := right.vehicle_src_cnt_total,
+															self.dl_src_cnt_total := right.dl_src_cnt_total,
+															self.voter_src_cnt_total := right.voter_src_cnt_total,
 															self.best_addr_ind := [],
 															self := left));
 															
@@ -154,9 +235,15 @@ qh_blanksec := join(qh_only,get_ua,
 												left.st          = right.st,
 												transform(newrec,
 										          self.addr_ind      := right.addr_ind,
-															// self.dt_first_seen := right.dt_first_seen,
-															// self.dt_last_seen  := right.dt_last_seen,
 															self.apt_cnt       := right.apt_cnt,
+															self.src_cnt_total := right.src_cnt_total,
+															self.insurance_src_cnt_total := right.insurance_src_cnt_total,
+															self.bureau_src_cnt_total := right.bureau_src_cnt_total,
+															self.property_src_cnt_total := right.property_src_cnt_total,
+															self.utility_src_cnt_total := right.utility_src_cnt_total,
+															self.vehicle_src_cnt_total := right.vehicle_src_cnt_total,
+															self.dl_src_cnt_total := right.dl_src_cnt_total,
+															self.voter_src_cnt_total := right.voter_src_cnt_total,
 															self.best_addr_ind  := [],
 															self := left));
 
@@ -172,9 +259,15 @@ qh_nonblanksec  := join(qh_only,ua_blankrec,
 												left.st         = right.st,
 												transform(newrec,
 										          self.addr_ind      := right.addr_ind,
-															// self.dt_first_seen := right.dt_first_seen,
-															// self.dt_last_seen  := right.dt_last_seen,
 															self.apt_cnt       := right.apt_cnt,
+															self.src_cnt_total := right.src_cnt_total,
+															self.insurance_src_cnt_total := right.insurance_src_cnt_total,
+															self.bureau_src_cnt_total := right.bureau_src_cnt_total,
+															self.property_src_cnt_total := right.property_src_cnt_total,
+															self.utility_src_cnt_total := right.utility_src_cnt_total,
+															self.vehicle_src_cnt_total := right.vehicle_src_cnt_total,
+															self.dl_src_cnt_total := right.dl_src_cnt_total,
+															self.voter_src_cnt_total := right.voter_src_cnt_total,
 															self.best_addr_ind  := [],
 															self := left));
 
@@ -297,7 +390,7 @@ qh_matches_updated := join(qh_reordered(isQH = ''),get_ua + qh_matches_all,
 																				self.addr_ind := left.addr_ind_new,
 																				self:=right));
 
-qh_all :=  IF(bypassQH,get_ua,qh_mismatches_updated + qh_matches_updated + get_ua(addr_ind BETWEEN '91' AND '99'));
+qh_all :=  IF(bypassQH,get_ua,qh_mismatches_updated + qh_matches_updated + qh_perms_updated(addr_ind BETWEEN '91' AND '99'));
 												
 roll_tu := rollup(sort(IF(bypassQH,bhdr_tu,bhdr_tu+qhdr_tu),did,prim_range,predir,prim_name,addr_suffix,postdir,sec_range,city,st,zip,src),
                       left.did         = right.did AND
@@ -320,11 +413,41 @@ roll_tu := rollup(sort(IF(bypassQH,bhdr_tu,bhdr_tu+qhdr_tu),did,prim_range,predi
 															  self.dt_vendor_last_reported   := max(left.dt_vendor_last_reported,right.dt_vendor_last_reported),
 															  self.dt_vendor_last_reported_pr   := max(left.dt_vendor_last_reported_pr,right.dt_vendor_last_reported_pr),
 																self.src_cnt        := if(left.src<>right.src,left.src_cnt + right.src_cnt,left.src_cnt),
-																self.bureau_src_cnt := if(left.src<>right.src,left.bureau_src_cnt + right.bureau_src_cnt,left.bureau_src_cnt),
+																self.insurance_src_cnt := if(left.src<>right.src AND right.src IN ins_srcs,left.insurance_src_cnt + right.insurance_src_cnt,left.insurance_src_cnt),
+																self.bureau_src_cnt := if(left.src<>right.src AND right.src IN bureau_srcs,left.bureau_src_cnt + right.bureau_src_cnt,left.bureau_src_cnt),
+																self.property_src_cnt := if(left.src<>right.src AND right.src IN prop_srcs,left.property_src_cnt + right.property_src_cnt,left.property_src_cnt),
+																self.utility_src_cnt := if(left.src<>right.src AND right.src IN utility_srcs,left.utility_src_cnt + right.utility_src_cnt,left.utility_src_cnt),
+																self.vehicle_src_cnt := if(left.src<>right.src AND right.src IN veh_srcs,left.vehicle_src_cnt + right.vehicle_src_cnt,left.vehicle_src_cnt),
+																self.dl_src_cnt := if(left.src<>right.src AND right.src IN dl_srcs,left.dl_src_cnt + right.dl_src_cnt,left.dl_src_cnt),
+																self.voter_src_cnt := if(left.src<>right.src AND right.src = voter_srcs,left.voter_src_cnt + right.voter_src_cnt,left.voter_src_cnt),
+																self.src_cnt_total := if(left.src<>right.src,left.src_cnt_total + right.src_cnt_total,left.src_cnt_total),
+																self.insurance_src_cnt_total := if(left.src<>right.src AND right.src IN ins_srcs,left.insurance_src_cnt_total + right.insurance_src_cnt_total,left.insurance_src_cnt_total),
+																self.bureau_src_cnt_total := if(left.src<>right.src AND right.src IN bureau_srcs,left.bureau_src_cnt_total + right.bureau_src_cnt_total,left.bureau_src_cnt_total),
+																self.property_src_cnt_total := if(left.src<>right.src AND right.src IN prop_srcs,left.property_src_cnt_total + right.property_src_cnt_total,left.property_src_cnt_total),
+																self.utility_src_cnt_total := if(left.src<>right.src AND right.src IN utility_srcs,left.utility_src_cnt_total + right.utility_src_cnt_total,left.utility_src_cnt_total),
+																self.vehicle_src_cnt_total := if(left.src<>right.src AND right.src IN veh_srcs,left.vehicle_src_cnt_total + right.vehicle_src_cnt_total,left.vehicle_src_cnt_total),
+																self.dl_src_cnt_total := if(left.src<>right.src AND right.src IN dl_srcs,left.dl_src_cnt_total + right.dl_src_cnt_total,left.dl_src_cnt_total),
+																self.voter_src_cnt_total := if(left.src<>right.src AND right.src = voter_srcs,left.voter_src_cnt_total + right.voter_src_cnt_total,left.voter_src_cnt_total),
+																self.permissions := left.permissions | right.permissions,
 															  self := right,
 															  self := left));
-											
-//Drop TU records that are already in unique Address Key
+																
+tu_perms_updated := join(qh_perms_updated,roll_tu,
+													left.did						= right.did AND
+													left.prim_range			= right.prim_range AND
+													left.predir					=	right.predir AND
+													left.prim_name			= right.prim_name AND
+													left.addr_suffix		= right.addr_suffix AND
+													left.postdir				= right.postdir AND
+													left.sec_range			=	right.sec_range AND
+													left.city						= right.city AND
+													left.st							= right.st AND
+													left.zip						= right.zip,
+													transform(newrec,
+																		self.permissions := IF(right.did > 0,left.permissions | right.permissions,left.permissions),
+																		self := left),left outer);
+
+//Drop TU records that are already in unique Address Key							 
 tu_only := dedup(sort(qh_all + roll_tu,
                        did,prim_range,predir,prim_name,addr_suffix,postdir,sec_range,city,st,zip,isTU),
 											 did,prim_range,predir,prim_name,addr_suffix,postdir,sec_range,city,st,zip)(isTU='Y');
@@ -339,8 +462,14 @@ tu_matches := join(tu_only,qh_all,
 										transform(newrec,
 										          self.addr_ind      := right.addr_ind,
 															self.apt_cnt       := right.apt_cnt,
-															// self.dt_first_seen := right.dt_first_seen,
-															// self.dt_last_seen  := right.dt_last_seen,
+															self.src_cnt_total := right.src_cnt_total,
+															self.insurance_src_cnt_total := right.insurance_src_cnt_total,
+															self.bureau_src_cnt_total := right.bureau_src_cnt_total,
+															self.property_src_cnt_total := right.property_src_cnt_total,
+															self.utility_src_cnt_total := right.utility_src_cnt_total,
+															self.vehicle_src_cnt_total := right.vehicle_src_cnt_total,
+															self.dl_src_cnt_total := right.dl_src_cnt_total,
+															self.voter_src_cnt_total := right.voter_src_cnt_total,
 															self.best_addr_ind := [],
 															self := left));
 															
@@ -354,9 +483,15 @@ tu_blanksec := join(tu_only,qh_all,
 												left.st          = right.st,
 												transform(newrec,
 										          self.addr_ind      := right.addr_ind,
-															// self.dt_first_seen := right.dt_first_seen,
-															// self.dt_last_seen  := right.dt_last_seen,
 															self.apt_cnt       := right.apt_cnt,
+															self.src_cnt_total := right.src_cnt_total,
+															self.insurance_src_cnt_total := right.insurance_src_cnt_total,
+															self.bureau_src_cnt_total := right.bureau_src_cnt_total,
+															self.property_src_cnt_total := right.property_src_cnt_total,
+															self.utility_src_cnt_total := right.utility_src_cnt_total,
+															self.vehicle_src_cnt_total := right.vehicle_src_cnt_total,
+															self.dl_src_cnt_total := right.dl_src_cnt_total,
+															self.voter_src_cnt_total := right.voter_src_cnt_total,
 															self.best_addr_ind  := [],
 															self := left));
 
@@ -372,9 +507,15 @@ tu_nonblanksec  := join(tu_only,qh_blankrec,
 												left.st         = right.st,
 												transform(newrec,
 										          self.addr_ind      := right.addr_ind,
-															// self.dt_first_seen := right.dt_first_seen,
-															// self.dt_last_seen  := right.dt_last_seen,
 															self.apt_cnt       := right.apt_cnt,
+															self.src_cnt_total := right.src_cnt_total,
+															self.insurance_src_cnt_total := right.insurance_src_cnt_total,
+															self.bureau_src_cnt_total := right.bureau_src_cnt_total,
+															self.property_src_cnt_total := right.property_src_cnt_total,
+															self.utility_src_cnt_total := right.utility_src_cnt_total,
+															self.vehicle_src_cnt_total := right.vehicle_src_cnt_total,
+															self.dl_src_cnt_total := right.dl_src_cnt_total,
+															self.voter_src_cnt_total := right.voter_src_cnt_total,
 															self.best_addr_ind  := [],
 															self := left));
 
@@ -450,7 +591,7 @@ tu_mismatches_dated  := join(tu_mismatches_nbrd,tu_mismatches_rolled,
 																			 self.dt_vendor_last_reported_pr  := right.dt_vendor_last_reported_pr,
 																			 self := left));
 
-stdAptCnt := iterate(sort(qh_all + tu_matches_all + tu_mismatches_dated,
+stdAptCnt := iterate(sort(tu_perms_updated + tu_matches_all + tu_mismatches_dated,
                           did,(integer) addr_ind,-apt_cnt),
 													transform(newrec,
 													self.apt_cnt := IF(left.did=right.did AND left.addr_ind=right.addr_ind,

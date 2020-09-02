@@ -16,10 +16,6 @@ DI_Metrics.FCRA_ASL_Students(pHostname, pTarget, pContact)
 
 ,DI_Metrics.FCRA_EDA_GONG(pHostname, pTarget, pContact)
 
-//,DI_Metrics.FCRA_Emails(pHostname, pTarget, pContact) //FCRA_Emails is a completely different type of process at this point and does NOT need to be included (yet)
-
-,DI_Metrics.FCRA_Criminal(pHostname, pTarget, pContact)
-
 ,DI_Metrics.FCRA_Liens_Judgments_Evictions(pHostname, pTarget, pContact)
 
 ,DI_Metrics.FCRA_PAW(pHostname, pTarget, pContact)
@@ -31,6 +27,32 @@ DI_Metrics.FCRA_ASL_Students(pHostname, pTarget, pContact)
 ,DI_Metrics.FCRA_Property_By_LandUse(pHostname, pTarget, pContact)
 
 ,DI_Metrics.FCRA_Watercraft(pHostname, pTarget, pContact)
+
+,DI_Metrics.NonFCRA_ASL_Students(pHostname, pTarget, pContact)
+
+,DI_Metrics.NonFCRA_Bankruptcy(pHostname, pTarget, pContact)
+
+,DI_Metrics.NonFCRA_BIP_Corps(pHostname, pTarget, pContact)
+
+,DI_Metrics.NonFCRA_Criminal(pHostname, pTarget, pContact)
+
+,DI_Metrics.NonFCRA_EDA_Gong(pHostname, pTarget, pContact)
+
+,DI_Metrics.NonFCRA_Liens_Judgments(pHostname, pTarget, pContact)
+
+,DI_Metrics.NonFCRA_LiensV2_Evictions(pHostname, pTarget, pContact)
+
+,DI_Metrics.NonFCRA_PAW(pHostname, pTarget, pContact)
+
+,DI_Metrics.NonFCRA_PeopleHeader_and_Prof_Licenses(pHostname, pTarget, pContact)
+
+,DI_Metrics.NonFCRA_Property_Deeds_By_DocType(pHostname, pTarget, pContact)
+
+,DI_Metrics.NonFCRA_Property_Tax_By_LandUse(pHostname, pTarget, pContact)
+
+,DI_Metrics.NonFCRA_QueryHeaderStatsWatchdogHdr(pHostname, pTarget, pContact)
+
+,DI_Metrics.NonFCRA_Watercraft(pHostname, pTarget, pContact)
 
 );
 

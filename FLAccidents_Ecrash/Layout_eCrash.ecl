@@ -1,13 +1,12 @@
 ﻿IMPORT BIPV2;
 
-EXPORT Layout_eCrash := MODULE
- 
+EXPORT Layout_eCrash := MODULE 
 
   EXPORT Consolidation_AgencyOri := RECORD
 		BIPV2.IDlayouts.l_xlink_ids;	//Added for BIP project   
 		STRING8 dt_first_seen;
 		STRING8 dt_last_seen;
-		STRING2 report_code;
+		STRING4 report_code;
 		STRING25 report_category;
 		STRING65 report_code_desc;
 		STRING14 vehicle_incident_id;
@@ -160,8 +159,13 @@ EXPORT Layout_eCrash := MODULE
 		STRING2   motorcycle_cylinder_coding;
 		STRING60 next_street;
 		STRING40 addl_report_number;
+		STRING11 agency_id;
 		STRING9 agency_ori;		
 	  STRING11 orig_agency_ori;
+				
+		//PR Recon COPPR-49
+		BOOLEAN is_Terminated_Agency;
+		
 		STRING100 Insurance_Company_Standardized ;
 		STRING1 is_available_for_public;
 		STRING20 report_status ;
@@ -247,6 +251,10 @@ EXPORT Layout_eCrash := MODULE
 		STRING7 Citation_Issued;
 		STRING7 Citation_Type;
 		STRING100 Citation_Detail1;
+		
+		//CR-1237
+		STRING64 Citation_Status; 
+		
 		STRING60 Violation_Code1;
 		STRING60 Violation_Code2;
 		STRING60 Violation_Code3;
@@ -281,15 +289,302 @@ EXPORT Layout_eCrash := MODULE
 		STRING Pedestrian_Actions_At_Time_Of_Crash;
 		STRING Pedalcyclist_Actions_At_Time_Of_Crash;
 		STRING Passenger_Actions_At_Time_Of_Crash;
+		
+		//PRtcc CR-1237		
+		STRING Marijuana_Use_Suspected;
+				
+		//PRtcc CR-1262 
+    STRING Direction_Of_Impact;
+	  STRING Event_Sequence;
   END;
 
   EXPORT Consolidation := RECORD
-    Consolidation_AgencyOri AND NOT [orig_agency_ori, vehicle_incident_id];
-	  STRING11 vehicle_incident_id;
-  END;
+		BIPV2.IDlayouts.l_xlink_ids;   //Added for BIP project   
+    Consolidation_AgencyOri.dt_first_seen;
+    Consolidation_AgencyOri.dt_last_seen;
+    STRING2 report_code;
+    Consolidation_AgencyOri.report_category;
+    Consolidation_AgencyOri.report_code_desc;
+    STRING11 vehicle_incident_id;
+    Consolidation_AgencyOri.vehicle_status;
+    Consolidation_AgencyOri.accident_location;
+    Consolidation_AgencyOri.accident_street;
+    Consolidation_AgencyOri.accident_cross_street;
+    Consolidation_AgencyOri.jurisdiction;
+    Consolidation_AgencyOri.jurisdiction_state;
+    Consolidation_AgencyOri.jurisdiction_nbr;
+    Consolidation_AgencyOri.image_hash;
+    Consolidation_AgencyOri.airbags_deploy;
+    Consolidation_AgencyOri.did;
+    Consolidation_AgencyOri.accident_nbr;
+    Consolidation_AgencyOri.accident_date;
+    Consolidation_AgencyOri.title;
+    Consolidation_AgencyOri.fname;
+    Consolidation_AgencyOri.mname;
+    Consolidation_AgencyOri.lname;
+    Consolidation_AgencyOri.name_suffix;
+    Consolidation_AgencyOri.b_did;
+    Consolidation_AgencyOri.cname;
+    Consolidation_AgencyOri.prim_range;
+    Consolidation_AgencyOri.predir;
+    Consolidation_AgencyOri.prim_name;
+    Consolidation_AgencyOri.addr_suffix;
+    Consolidation_AgencyOri.postdir;
+    Consolidation_AgencyOri.unit_desig;
+    Consolidation_AgencyOri.sec_range;
+    Consolidation_AgencyOri.v_city_name;
+    Consolidation_AgencyOri.st;
+    Consolidation_AgencyOri.zip;
+    Consolidation_AgencyOri.zip4;
+    Consolidation_AgencyOri.record_type;
+    Consolidation_AgencyOri.driver_license_nbr;
+    Consolidation_AgencyOri.dlnbr_st;
+    Consolidation_AgencyOri.vin;
+    Consolidation_AgencyOri.tag_nbr;
+    Consolidation_AgencyOri.tagnbr_st;
+    Consolidation_AgencyOri.dob;
+    Consolidation_AgencyOri.vehicle_incident_city;
+    Consolidation_AgencyOri.vehicle_incident_st;
+    Consolidation_AgencyOri.carrier_name;
+    Consolidation_AgencyOri.client_type_id;
+    Consolidation_AgencyOri.policy_num;
+    Consolidation_AgencyOri.policy_effective_date;
+    Consolidation_AgencyOri.policy_expiration_date;
+    Consolidation_AgencyOri.report_has_coversheet;
+    Consolidation_AgencyOri.other_vin_indicator;
+    Consolidation_AgencyOri.vehicle_unit_number;
+    Consolidation_AgencyOri.towed;
+    Consolidation_AgencyOri.impact_location;
+    Consolidation_AgencyOri.vehicle_owner_driver_code;
+    Consolidation_AgencyOri.vehicle_driver_action;
+    Consolidation_AgencyOri.vehicle_year;
+    Consolidation_AgencyOri.vehicle_make;
+    Consolidation_AgencyOri.vehicle_type;
+    Consolidation_AgencyOri.vehicle_travel_on;
+    Consolidation_AgencyOri.direction_travel;
+    Consolidation_AgencyOri.est_vehicle_speed;
+    Consolidation_AgencyOri.posted_speed;
+    Consolidation_AgencyOri.est_vehicle_damage;
+    Consolidation_AgencyOri.damage_type;
+    Consolidation_AgencyOri.vehicle_removed_by;
+    Consolidation_AgencyOri.how_removed_code;
+    Consolidation_AgencyOri.point_of_impact;
+    Consolidation_AgencyOri.vehicle_movement;
+    Consolidation_AgencyOri.vehicle_function;
+    Consolidation_AgencyOri.vehs_first_defect;
+    Consolidation_AgencyOri.vehs_second_defect;
+    Consolidation_AgencyOri.vehicle_modified;
+    Consolidation_AgencyOri.vehicle_roadway_loc;
+    Consolidation_AgencyOri.hazard_material_transport;
+    Consolidation_AgencyOri.total_occu_vehicle;
+    Consolidation_AgencyOri.total_occu_saf_equip;
+    Consolidation_AgencyOri.moving_violation;
+    Consolidation_AgencyOri.vehicle_insur_code;
+    Consolidation_AgencyOri.vehicle_fault_code;
+    Consolidation_AgencyOri.vehicle_cap_code;
+    Consolidation_AgencyOri.vehicle_fr_code;
+    Consolidation_AgencyOri.vehicle_use;
+    Consolidation_AgencyOri.placarded;
+    Consolidation_AgencyOri.dhsmv_vehicle_ind;
+    Consolidation_AgencyOri.vehicle_seg;
+    Consolidation_AgencyOri.vehicle_seg_type;
+    Consolidation_AgencyOri.match_code;
+    Consolidation_AgencyOri.model_year;
+    Consolidation_AgencyOri.manufacturer_corporation;
+    Consolidation_AgencyOri.division_code;
+    Consolidation_AgencyOri.vehicle_group_code;
+    Consolidation_AgencyOri.vehicle_subgroup_code;
+    Consolidation_AgencyOri.vehicle_series_code;
+    Consolidation_AgencyOri.body_style_code;
+    Consolidation_AgencyOri.vehicle_abbreviation;
+    Consolidation_AgencyOri.assembly_country;
+    Consolidation_AgencyOri.headquarter_country;
+    Consolidation_AgencyOri.number_of_doors;
+    Consolidation_AgencyOri.seating_capacity;
+    Consolidation_AgencyOri.number_of_cylinders;
+    Consolidation_AgencyOri.engine_size;
+    Consolidation_AgencyOri.fuel_code;
+    Consolidation_AgencyOri.carburetion_type;
+    Consolidation_AgencyOri.number_of_barrels;
+    Consolidation_AgencyOri.price_class_code;
+    Consolidation_AgencyOri.body_size_code;
+    Consolidation_AgencyOri.number_of_wheels_on_road;
+    Consolidation_AgencyOri.number_of_driving_wheels;
+    Consolidation_AgencyOri.drive_type;
+    Consolidation_AgencyOri.steering_type;
+    Consolidation_AgencyOri.gvw_code;
+    Consolidation_AgencyOri.load_capacity_code;
+    Consolidation_AgencyOri.cab_type_code;
+    Consolidation_AgencyOri.bed_length;
+    Consolidation_AgencyOri.rim_size;
+    Consolidation_AgencyOri.manufacture_body_style;
+    Consolidation_AgencyOri.vehicle_type_code;
+    Consolidation_AgencyOri.car_line_code;
+    Consolidation_AgencyOri.car_series_code;
+    Consolidation_AgencyOri.car_body_style_code;
+    Consolidation_AgencyOri.engine_cylinder_code;
+    Consolidation_AgencyOri.truck_make_abbreviation;
+    Consolidation_AgencyOri.truck_body_style_abbreviation;
+    Consolidation_AgencyOri.motorcycle_make_abbreviation;
+    Consolidation_AgencyOri.vina_series;
+    Consolidation_AgencyOri.vina_model;
+    Consolidation_AgencyOri.reference_number;
+    Consolidation_AgencyOri.vina_make;
+    Consolidation_AgencyOri.vina_body_style;
+    Consolidation_AgencyOri.make_description;
+    Consolidation_AgencyOri.model_description;
+    Consolidation_AgencyOri.series_description;
+    Consolidation_AgencyOri.car_series;
+    Consolidation_AgencyOri.car_body_style;
+    Consolidation_AgencyOri.car_cid;
+    Consolidation_AgencyOri.car_cylinders;
+    Consolidation_AgencyOri.car_carburetion;
+    Consolidation_AgencyOri.car_fuel_code;
+    Consolidation_AgencyOri.truck_chassis_body_style;
+    Consolidation_AgencyOri.truck_wheels_driving_wheels;
+    Consolidation_AgencyOri.truck_cid;
+    Consolidation_AgencyOri.truck_cylinders;
+    Consolidation_AgencyOri.truck_fuel_code;
+    Consolidation_AgencyOri.truck_manufacturers_gvw_code;
+    Consolidation_AgencyOri.truck_ton_rating_code;
+    Consolidation_AgencyOri.truck_series;
+    Consolidation_AgencyOri.truck_model;
+    Consolidation_AgencyOri.motorcycle_model;
+    Consolidation_AgencyOri.motorcycle_engine_displacement;
+    Consolidation_AgencyOri.motorcycle_type_of_bike;
+    Consolidation_AgencyOri.motorcycle_cylinder_coding;
+    Consolidation_AgencyOri.next_street;
+    Consolidation_AgencyOri.addl_report_number;
+    Consolidation_AgencyOri.agency_ori;
+    Consolidation_AgencyOri.insurance_company_standardized;
+    Consolidation_AgencyOri.is_available_for_public;
+    Consolidation_AgencyOri.report_status;
+    Consolidation_AgencyOri.work_type_id;
+    Consolidation_AgencyOri.orig_full_name;
+    Consolidation_AgencyOri.orig_fname;
+    Consolidation_AgencyOri.orig_lname;
+    Consolidation_AgencyOri.orig_mname;
+    Consolidation_AgencyOri.ssn;
+    Consolidation_AgencyOri.cru_order_id;
+    Consolidation_AgencyOri.cru_sequence_nbr;
+    Consolidation_AgencyOri.date_vendor_last_reported;
+    Consolidation_AgencyOri.report_type_id;
+    Consolidation_AgencyOri.creation_date;
+    Consolidation_AgencyOri.tif_image_hash;
+
+    // Admin analytics
+    Consolidation_AgencyOri.precinct;
+    Consolidation_AgencyOri.beat;
+    Consolidation_AgencyOri.crash_time;
+    Consolidation_AgencyOri.vendor_code;
+    Consolidation_AgencyOri.report_property_damage;
+
+    // CRU2eCrash integration 
+    Consolidation_AgencyOri.cru_jurisdiction;
+    Consolidation_AgencyOri.cru_jurisdiction_nbr;
+    Consolidation_AgencyOri.crash_county;
+    Consolidation_AgencyOri.vehicle_color;
+    Consolidation_AgencyOri.orig_accnbr;
+    Consolidation_AgencyOri.scrub_addl_report_number;
+    Consolidation_AgencyOri.acct_nbr;
+
+    // Enumaration fields 
+    Consolidation_AgencyOri.report_collision_type;
+    Consolidation_AgencyOri.report_first_harmful_event;
+    Consolidation_AgencyOri.report_light_condition;
+
+    Consolidation_AgencyOri.report_weather_condition;
+    Consolidation_AgencyOri.report_road_condition;
+    Consolidation_AgencyOri.report_injury_status;
+
+    //PRtcc datatype update for code and description
+    Consolidation_AgencyOri.report_damage_extent;
+    Consolidation_AgencyOri.report_vehicle_type;
+    Consolidation_AgencyOri.report_traffic_control_device_type;
+
+    //PRtcc datatype update for code and description
+    Consolidation_AgencyOri.report_contributing_circumstances_v;
+
+    Consolidation_AgencyOri.report_vehicle_maneuver_action_prior;
+    Consolidation_AgencyOri.report_vehicle_body_type;
+    Consolidation_AgencyOri.cru_inq_name_type;
+    Consolidation_AgencyOri.vendor_report_id;
+    Consolidation_AgencyOri.reason_id;
+    Consolidation_AgencyOri.report_id;
+    Consolidation_AgencyOri.super_report_id;
+    Consolidation_AgencyOri.reportlinkid;
+    Consolidation_AgencyOri.idfield;
+    Consolidation_AgencyOri.page_count;
+    Consolidation_AgencyOri.supplemental_report;
+
+    // New fields for Police RECORDs
+    Consolidation_AgencyOri.fatality_involved;
+    Consolidation_AgencyOri.latitude;
+    Consolidation_AgencyOri.longitude;
+    Consolidation_AgencyOri.address1;
+    Consolidation_AgencyOri.address2;
+    Consolidation_AgencyOri.state;
+    Consolidation_AgencyOri.home_phone;
+
+    //Buycrash project KY integration
+    Consolidation_AgencyOri.contrib_source;
+
+    //Buycrash Release 4
+    Consolidation_AgencyOri.officer_id;
+
+    //Appriss Integration
+    Consolidation_AgencyOri.releasable;
+
+    //BuyCrash Release 6
+    Consolidation_AgencyOri.date_report_submitted;
+
+    //PRtCC new fields
+    Consolidation_AgencyOri.citation_issued;
+    Consolidation_AgencyOri.citation_type;
+    Consolidation_AgencyOri.citation_detail1;
+    Consolidation_AgencyOri.violation_code1;
+    Consolidation_AgencyOri.violation_code2;
+    Consolidation_AgencyOri.violation_code3;
+    Consolidation_AgencyOri.violation_code4;
+    Consolidation_AgencyOri.photographs_taken;
+    Consolidation_AgencyOri.photographed_by;
+    Consolidation_AgencyOri.photograph_type;
+    Consolidation_AgencyOri.posted_satutory_speed_limit;
+    Consolidation_AgencyOri.safety_equipment_available_or_used;
+    Consolidation_AgencyOri.ejection;
+    Consolidation_AgencyOri.safety_equipment_helmet;
+    Consolidation_AgencyOri.transported_to;
+    Consolidation_AgencyOri.dispatch_time;
+    Consolidation_AgencyOri.ready_to_sell_data;
+
+    //PRtcc new Enum fields
+    Consolidation_AgencyOri.alcohol_drug_use;
+    Consolidation_AgencyOri.alcohol_drug_test_given;
+    Consolidation_AgencyOri.alcohol_test_status;
+    Consolidation_AgencyOri.alcohol_test_type;
+    Consolidation_AgencyOri.alcohol_drug_test_type;
+    Consolidation_AgencyOri.drug_test_type;
+    Consolidation_AgencyOri.driver_distracted_by;
+    Consolidation_AgencyOri.safety_equipment_restraint1;
+    Consolidation_AgencyOri.condition_at_time_of_crash;
+    Consolidation_AgencyOri.drug_use_suspected;
+    Consolidation_AgencyOri.alcohol_use_suspected;
+    Consolidation_AgencyOri.drug_test_status;
+    Consolidation_AgencyOri.report_contributing_circumstances_p;
+    Consolidation_AgencyOri.driver_actions_at_time_of_crash;
+    Consolidation_AgencyOri.prior_nonmotorist_action;
+    Consolidation_AgencyOri.non_motorist_actions_at_time_of_crash;
+    Consolidation_AgencyOri.pedestrian_actions_at_time_of_crash;
+    Consolidation_AgencyOri.pedalcyclist_actions_at_time_of_crash;
+    Consolidation_AgencyOri.passenger_actions_at_time_of_crash;
+		
+		//PRtcc CR-1262 
+    Consolidation_AgencyOri.Direction_Of_Impact;
+	  Consolidation_AgencyOri.Event_Sequence;
+	END;
 
   EXPORT Accidents_Alpha := RECORD
-    Consolidation_AgencyOri AND NOT [orig_agency_ori];
+    Consolidation_AgencyOri AND NOT [orig_agency_ori, Direction_Of_Impact, Event_Sequence];
   END;
 
 END;

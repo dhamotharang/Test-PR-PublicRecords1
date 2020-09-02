@@ -96,7 +96,7 @@ module
 	
 	tools.mac_WriteFile(Filenames().Input.ByPassed_KnownFraud.New(pversion),
 		distribute(f1_bypass_dedup,hash(source_rec_id)),
-		Build_Bypass_Records,
+		Build_Bypass_KnownFraud,
 		pCompress := true,
 		pHeading := false,
 		pOverwrite := true);
@@ -112,8 +112,7 @@ module
 		LOOKUP);
 																															
 	dappendName := Standardize_Entity.Clean_Name(Valid_Recs);	
-	dAppendPhone := Standardize_Entity.Clean_Phone (dappendName);
-	dCleanInputFields := Standardize_Entity.Clean_InputFields (dAppendPhone);	
+	dCleanInputFields := Standardize_Entity.Clean_InputFields (dappendName);	
 
 	input_file_1 := fn_dedup(KnownFraud_Sprayed  + project(dCleanInputFields,Layouts.Input.KnownFraud));
 
@@ -121,7 +120,7 @@ module
 	tools.mac_WriteFile(
 		Filenames(pversion).Input.KnownFraud.New(pversion),
 		distribute(input_file_1,hash(source_rec_id)),
-		Build_Input_File,
+		Build_KnownFraud,
 		pCompress	:= true,
 		pHeading := false,
 		pOverwrite := true);
@@ -129,8 +128,8 @@ module
 // Return
 	export build_prepped := 
 		sequential(
-			 Build_Input_File
-			,Build_Bypass_Records);
+			 Build_KnownFraud
+			,Build_Bypass_KnownFraud);
 		
 	export All :=
 	if(tools.fun_IsValidVersion(pversion)

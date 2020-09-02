@@ -1,6 +1,6 @@
 ﻿//Student Lists: data does not count well when trying to get it as source in Person Header by date first/last seen; see FCRA_AlloyKeys and FCRA_AmericanStudentKeys
 //Prod W20200325-145314
-
+ 
 IMPORT _Control, American_student_list, alloymedia_student_list, data_services, STD, ut;
 
 export FCRA_ASL_Students(string pHostname, string pTarget, string pContact ='\' \'') := function
@@ -43,18 +43,13 @@ despray_fcra_student_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_
 																						 //charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
 																						 ,,,,true);
 
-SEQUENTIAL(
-					output(srt_tbl_FCRA_Students_College_LexID,,'~thor_data400::data_insight::data_metrics::tbl_FCRA_Students_College_LexID_'+ filedate +'.csv'
-					,csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,despray_fcra_student_tbl);
-
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
 					output(srt_tbl_FCRA_Students_College_LexID,,'~thor_data400::data_insight::data_metrics::tbl_FCRA_Students_College_LexID_'+ filedate +'.csv'
 					,csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
 					,despray_fcra_student_tbl):
-					Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA_ASL_Students Build Succeeded', workunit + ': Build complete.' + filedate)),
-					Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA_ASL_Students Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
+					Success(FileServices.SendEmail(pContact, 'FCRA Group: FCRA_ASL_Students Build Succeeded', workunit + ': Build complete.' + filedate)),
+					Failure(FileServices.SendEmail(pContact, 'FCRA Group:  FCRA_ASL_Students Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
 													);
 return email_alert;
 

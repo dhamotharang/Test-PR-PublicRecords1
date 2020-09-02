@@ -1,7 +1,6 @@
 ﻿import AutoStandardI;
 import BIPV2;
 import BIPV2_Best;
-import BIPV2_Build;
 import BIPV2_Company_Names;
 import BIPV2_Contacts;
 import doxie;
@@ -11,7 +10,7 @@ export IdAppendLocal := module
 
 	shared defaultDataAccess := MODULE(doxie.IDataAccess) END;
 
-	export AppendBest(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend, string fetchLevel
+	export AppendBest(dataset(BIPV2.IdAppendLayouts.IdsOnlyDebug) withAppend, string fetchLevel
 	                  ,boolean allBest, boolean isMarketing = false
 					  ,Doxie.IDataAccess mod_access = defaultDataAccess) := function
 		isSeleBest := fetchLevel = BIPV2.IdConstants.fetch_level_seleid;
@@ -79,7 +78,7 @@ export IdAppendLocal := module
 				keep(1), left outer);
 
 		preContact := preBest;
-		getContact := bipv2_build.key_contact_title_linkids().kfetch2(preContact, fetchlevel, mod_access := mod_access);
+		getContact := BipV2_Contacts.KeyRead_Contact_Title().kfetch2(preContact, fetchlevel, mod_access := mod_access);
 
 		withContact :=
 			join(withBType, getContact,
@@ -110,7 +109,8 @@ export IdAppendLocal := module
 
 	end;
 
-	export FetchRecords(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend
+#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
+	export FetchRecords(dataset(BIPV2.IdAppendLayouts.IdsOnlyDebug) withAppend
 	                    ,string fetchLevel = BIPV2.IdConstants.fetch_level_proxid
 	                    ,boolean dnbFullRemove = false
 						,Doxie.IDataAccess mod_access = defaultDataAccess) := function
@@ -145,5 +145,6 @@ export IdAppendLocal := module
 		return postHeader;
 
 	end;
+#END // if USE_LOCAL_KEYS
 
 end;

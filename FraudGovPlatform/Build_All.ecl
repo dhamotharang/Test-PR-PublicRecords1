@@ -19,6 +19,7 @@ Build_Kel_Ecl :=
 +'#CONSTANT(\'Platform\',\'FraudGov\');\n'
 +'#OPTION(\'multiplePersistInstances\',FALSE);\n'
 +'#OPTION(\'defaultSkewError\', 1);\n'
++'#OPTION(\'resourceMaxHeavy\', 2);\n'
 +'wuname := \'FraudGov Kel Build\';\n'
 +'#WORKUNIT(\'protect\', true);\n'
 +'#WORKUNIT(\'name\', wuname);\n'
@@ -39,7 +40,6 @@ Build_Kel_Ecl :=
 +'		,FraudGovPlatform.Build_Kel(\''+version+'\').All\n'
 +'	):failure(email(\'FraudGov Kel Build failed\'));\n'
 ;
-
 	export build_all := sequential(
 		FraudGovPlatform.Build_Input(version).ALL,
 		FraudGovPlatform.Build_Base(version).ALL,
@@ -48,7 +48,6 @@ Build_Kel_Ecl :=
 					FraudGovPlatform.Promote(version).promote_base,
 					FraudGovPlatform.promote(version).promote_sprayed_files,
 					FraudShared.Build_Keys(version).All,
-					FraudGovPlatform.Append_DemoData(version),
 					FraudShared.Build_AutoKeys(version),
 					FraudGovPlatform.Promote().Clear_DemoData,
 					FraudGovPlatform.Build_Base_Pii(version).All,

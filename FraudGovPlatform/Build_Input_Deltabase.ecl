@@ -41,28 +41,8 @@ module
 	max_uid := max(Deltabase_Sprayed, Deltabase_Sprayed.source_rec_id) + 1;
 
 	MAC_Sequence_Records( f1, source_rec_id, f1_source_rec_id, max_uid);
-	
-	f1_did := f1_source_rec_id(rawlinkid>0 and rawlinkid <firstrinid);
-	f1_rinid := f1_source_rec_id(rawlinkid>=firstrinid);
-	f1_rawlinkid_zero:= f1_source_rec_id(rawlinkid=0);
-	
-//validate did with PR
-	validate_did := IDLExternalLinking.did_getAllRecs_batch(f1_did,rawlinkid,source_rec_id);
-	j_did := Join(f1_did,validate_did,left.source_rec_id=right.source_rec_id and right.did>0
-							,Transform(recordof(left)
-							,self.rawlinkid :=if(right.did>0,left.rawlinkid,0)
-							,self:=left),left outer,keep(1));
-							
-//validate rinid's with RIN system						
-	j_rinid :=Join(f1_rinid,Fraudshared.key_did('FraudGov'),
-								left.rawlinkid =right.did
-								,Transform(recordof(left)
-								,self.rawlinkid :=if(left.rawlinkid=right.did,left.rawlinkid,0)
-								,self:=left),left outer,keep(1));
-								
-	final_rawlinkid := 	f1_rawlinkid_zero+j_did+j_rinid;						
-		
-	shared d_source_rec_id := distribute(final_rawlinkid);
+
+	shared d_source_rec_id := distribute(f1_source_rec_id);
 	
 	shared append_source := join(
 		d_source_rec_id,
@@ -72,6 +52,7 @@ module
 
 	shared f1_errors:=append_source
 		(	InqLog_ID = 0 
+			or InqLog_ID in [206041,206171,206141,206031, 207231 ,207211,207241]
 			or (_Validate.Date.fIsValid(STD.Str.FindReplace( STD.Str.FindReplace( reported_date,':',''),'-','')[1..8]) = false  
 			or (unsigned)STD.Str.FindReplace( STD.Str.FindReplace( reported_date,':',''),'-','')[1..8] > (unsigned)(STRING8)Std.Date.Today())
 			or reported_by = ''
@@ -104,7 +85,7 @@ module
 	
 	tools.mac_WriteFile(Filenames().Input.ByPassed_Deltabase.New(pversion),
 		distribute(f1_bypass_dedup,hash(source_rec_id)),
-		Build_Bypass_Records,
+		Build_Bypass_Deltabase,
 		pCompress := true,
 		pHeading := false,
 		pOverwrite := true);
@@ -118,15 +99,14 @@ module
 		LEFT ONLY,
 		LOOKUP);
 
-	dappendName := Standardize_Entity.Clean_Name(Valid_Recs);	
-	dAppendPhone := Standardize_Entity.Clean_Phone (dappendName);
-	dCleanInputFields := Standardize_Entity.Clean_InputFields (dAppendPhone);	
+	dappendName := Standardize_Entity.Clean_Name(Valid_Recs);		
+	dCleanInputFields := Standardize_Entity.Clean_InputFields (dappendName);	
 	
 	input_file_1 := fn_dedup(Deltabase_Sprayed  + project(dCleanInputFields,Layouts.Input.Deltabase)); 
 
 	tools.mac_WriteFile(Filenames(pversion).Input.Deltabase.New(pversion),
 		distribute(input_file_1,hash(source_rec_id)),
-		Build_Input_File,
+		Build_Deltabase,
 		pCompress := true,
 		pHeading := false,
 		pOverwrite := true);
@@ -134,8 +114,8 @@ module
 // Return
 	export build_prepped := 
 			 sequential(
-			   Build_Input_File
-				,Build_Bypass_Records 
+			   Build_Deltabase
+				,Build_Bypass_Deltabase 
 		);
 		
 	export All :=

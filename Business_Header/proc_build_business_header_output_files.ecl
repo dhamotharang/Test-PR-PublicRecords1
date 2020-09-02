@@ -1,4 +1,4 @@
-IMPORT Business_Header, ut, versioncontrol, lib_fileservices, header_services,mdr;
+﻿IMPORT Business_Header, ut, versioncontrol, lib_fileservices, header_services,mdr;
 
 export proc_build_business_header_output_files(
 
@@ -13,119 +13,16 @@ module
 
 	shared bh1 := pBH_Base;
 
-	//CNG W20070816-171946 dat//////////////////////////////////
-
-	Drop_Header_Layout := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
-	Record
-	 string15 rcid;
-	 string15 bdid; 
-	 string2 source; 
-	 string34 source_group; 
-	 string3 pflag; 
-	 string15 group1_id; 
-	 string34 vendor_id; 
-	 string10 dt_first_seen; 
-	 string10 dt_last_seen; 
-	 string10 dt_vendor_first_reported;
-	 string10 dt_vendor_last_reported;
-	 string120 company_name;
-	 string10 prim_range;
-	 string2 predir;
-	 string28 prim_name;
-	 string4 addr_suffix;
-	 string2 postdir;
-	 string5 unit_desig;
-	 string8 sec_range;
-	 string25 city;
-	 string2 state;
-	 string8 zip;
-	 string5 zip4;
-	 string3 county;
-	 string4 msa;
-	 string10 geo_lat;
-	 string11 geo_long;
-	 string15 phone;
-	 string5 phone_score; 
-	 string10 fein; 
-	 string1 current; 
-	 string1 dppa; 
-	 string81 match_company_name;
-	 string20 match_branch_unit;
-	 string25 match_geo_city := '';
-	 string2 eor := '';
-	end; 
-
-header_services.Supplemental_Data.mac_verify('file_business_header_inj.txt', Drop_Header_Layout, attr);
-
-Base_File_Append_In := attr();
-	 
-	business_header.Layout_Business_Header_Base reformat_header(Base_File_Append_In L) := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
-	 transform
-		self.rcid := (unsigned6) L.rcid;
-		self.bdid := (unsigned6) L.bdid;
-		self.group1_id := (unsigned6) L.group1_id;
-		self.dt_first_seen := (unsigned4) L.dt_first_seen;
-		self.dt_last_seen := (unsigned4) L.dt_last_seen;
-		self.dt_vendor_first_reported := (unsigned4) L.dt_vendor_first_reported;
-		self.dt_vendor_last_reported := (unsigned4) L.dt_vendor_last_reported;	
-		self.zip := (unsigned3) L.zip;
-		self.zip4 := (unsigned2) L.zip4;
-		self.phone := (unsigned6) L.phone;
-		self.phone_score := (unsigned2) L.phone_score;
-		self.fein := (unsigned4) L.fein;
-		self.current := (boolean) L.current;
-			self.dppa := (boolean) L.dppa;
-		self.match_geo_city := L.match_geo_city;
-		self := L;
-	 end;
-	 
-	 
-	shared Base_File_Append := project(Base_File_Append_In, reformat_header(left)); //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
-
-	/////////////////////////////////////////////////////
-
 	shared in_hdr2 := bh1;// + header.transunion_did;
 
-	// Start of code to suppress data based on an MD5 Hash of DID+Address
-Suppression_Layout := header_services.Supplemental_Data.layout_in;
-
-header_services.Supplemental_Data.mac_verify('didaddressbusiness_sup.txt',Suppression_Layout,supp_ds_func);
- 
-Suppression_In := supp_ds_func();
-
-shared dSuppressedIn := project(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
-
-shared rHashDIDAddress2 := header_services.Supplemental_Data.layout_out;
-
-	rFullOut_HashDIDAddress2 := record
-	 business_header.Layout_Business_Header_Base;
-	 rHashDIDAddress2;
-	end;
-
-	rFullOut_HashDIDAddress2 tHashDIDAddress2(business_header.Layout_Business_Header_Base l) := transform                            
-	 self.hval := hashmd5(intformat(l.bdid,12,1),(string)l.state,(string)l.zip,(string)l.city,
-										(string)l.prim_name,(string)l.prim_range,(string)l.predir,(string)l.addr_suffix,(string)l.postdir,(string)l.sec_range);
-	 self := l;
-	end;
-
-	dHeader_withMD52 := project(in_hdr2, tHashDIDAddress2(left));
-
-	business_header.Layout_Business_Header_Base tSuppress2(dHeader_withMD52 l, dSuppressedIn r) := transform
-	 self := l;
-	end;
-
-	full_out_suppress2 := join(dHeader_withMD52,dSuppressedIn,
-														left.hval = right.hval,
-								tSuppress2(left,right),
-								left only,lookup);
-
+	full_out_suppress2 := project(Business_Header.Prep_Build.applyDidAddressBusiness_sup2(in_hdr2), Business_Header.Layout_Business_Header_Base);
 
 	/////////////////////////////////////////////////////////////////////////
 	// -- Start of moxie
 	/////////////////////////////////////////////////////////////////////////
 
-	bh := full_out_suppress2 + Base_File_Append;
-
+	bh := Business_Header.Prep_Build.applyBusinessHeaderInj(full_out_suppress2);
+	
 	bh_Filtered := filters.outs.business_headers(bh);
 
 	Business_Header.Layout_Business_Header_Base fixbhdates(bh L) := transform
@@ -524,81 +421,8 @@ shared rHashDIDAddress2 := header_services.Supplemental_Data.layout_out;
 	// Remove relatives with name relationship only
 	br := pBH_Relatives;
 
-	Drop_Header_Layout := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
-	Record
-		string15 bdid1;
-		string15 bdid2;
-		string1 corp_charter_number;
-		string1 business_registration;
-		string1 bankruptcy_filing;
-		string1 duns_number;
-		string1 duns_tree;  // might point to a group
-		string1 edgar_cik;
-		string1 name;  // might point to a group
-		string1 name_address;
-		string1 name_phone;
-		string1 gong_group;
-		string1 ucc_filing;
-		string1 fbn_filing;
-		string1 fein;
-		string1 phone;
-		string1 addr;
-		string1 mail_addr;
-		string1 dca_company_number;  // Directory of Corporate Affilications Company Number (Root and Sub)
-		string1 dca_hierarchy;
-		string1 abi_number;     // InfoUSA - American Business ID Company Number
-		string1 abi_hierarchy;
-		string1 lien_properties;
-		string1 liens_v2;
-		//string1 shared_contacts;
-		string1 rel_group;
-		string2 EOR;
-	end; 
-
-	header_services.Supplemental_Data.mac_verify('file_businessrelatives_inj.txt', Drop_Header_Layout, attr);
-
-	Base_File_Append_In := attr();
-
-	business_header.Layout_Business_Relative reformat_header(Base_File_Append_In L) := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
-	 transform
-		self.bdid1 := (unsigned6)L.bdid1;
-		self.bdid2 := (unsigned6) L.bdid2;
-		self.corp_charter_number := (boolean)((unsigned)L.corp_charter_number);
-		self.business_registration := (boolean)((unsigned)L.business_registration);
-		self.bankruptcy_filing := (boolean)((unsigned)L.bankruptcy_filing);
-		self.duns_number := (boolean)((unsigned)L.duns_number);
-		self.duns_tree := (boolean)((unsigned)L.duns_tree);
-		self.edgar_cik := (boolean)((unsigned)L.edgar_cik);
-		self.name := (boolean)((unsigned)L.name);
-		self.name_address := (boolean)((unsigned)L.name_address);
-		self.name_phone := (boolean)((unsigned)L.name_phone);
-		self.gong_group := (boolean)((unsigned)L.gong_group);
-		self.ucc_filing := (boolean)((unsigned)L.ucc_filing);
-		self.fbn_filing := (boolean)((unsigned)L.fbn_filing);
-		self.fein := (boolean)((unsigned)L.fein);
-		self.phone := (boolean)((unsigned)L.phone);
-		self.addr := (boolean)((unsigned)L.addr);
-		self.mail_addr := (boolean)((unsigned)L.mail_addr);
-		self.dca_company_number := (boolean)((unsigned)L.dca_company_number);
-		self.dca_hierarchy := (boolean)((unsigned)L.dca_hierarchy);
-		self.abi_number := (boolean)((unsigned)L.abi_number);
-		self.abi_hierarchy := (boolean)((unsigned)L.abi_hierarchy);
-		self.lien_properties := (boolean)((unsigned)L.lien_properties);
-		self.liens_v2 := (boolean)((unsigned)L.liens_v2);
-		self.rel_group := (boolean)((unsigned)L.rel_group);
-	 end;
-
-	Relatives_Base_File_Append1 := project(Base_File_Append_In, reformat_header(left)); //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
-
-	business_header.Layout_Business_Relative add_reverse(business_header.Layout_Business_Relative L) := transform
-  	self.bdid1 := (unsigned6)L.bdid2;
-  	self.bdid2 := (unsigned6)L.bdid1;  
-    self := L;
-  end;
-
-  Base_File_Append2 := project(relatives_Base_File_Append1, add_reverse(left)); 
-
-  relatives_base_file_append := relatives_base_file_append1 + base_file_append2;
+	emptyBusinessRelatives := DATASET([], business_header.Layout_Business_Relative);
+  relatives_base_file_append := Business_Header.Prep_Build.applyBusinessRelativesInj(emptyBusinessRelatives); 
 
   Suppression_Layout := header_services.Supplemental_Data.layout_in;
 
@@ -606,9 +430,9 @@ shared rHashDIDAddress2 := header_services.Supplemental_Data.layout_out;
 
 	Suppression_In := supp_ds_func();
 
-	dRelativesSuppressedIn := project(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
+	dRelativesSuppressedIn := project(Suppression_In, Suppress.applyRegulatory.in_to_out(left));
 
-	rHashBDID := header_services.Supplemental_Data.layout_out;
+	rHashBDID := Suppress.applyRegulatory.layout_out;
 
 	rFullOut_HashBDID := record
 	 business_header.Layout_Business_Relative;
@@ -748,43 +572,7 @@ shared rHashDIDAddress2 := header_services.Supplemental_Data.layout_out;
 
 	rDataSet := f_bbs + Base_File_Append2;
 	/////////////////////////////////////////////////////
-
-	// Start of code to suppress data based on an MD5 Hash of DID+Address
-	Suppression_Layout := header_services.Supplemental_Data.layout_in;
-
-	header_services.Supplemental_Data.mac_verify('didaddressbusiness_sup.txt',Suppression_Layout,supp_ds_func);
-	 
-	Suppression_In := supp_ds_func();
-
-	dBestSuppressedIn := project(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
-
-	rHashDIDAddress := header_services.Supplemental_Data.layout_out;
-
-	rFullOut_HashDIDAddress := record
-		business_header.Layout_BH_Best;
-		rHashDIDAddress;
-		data16 hval1;
-	end;
-
-	rFullOut_HashDIDAddress tHashDIDAddress(business_header.Layout_BH_Best l) := transform                            
-		self.hval := hashmd5(intformat(l.bdid,12,1),(string)l.state,(string)l.zip,(string)l.city,
-									(string)l.prim_name,(string)l.prim_range,(string)l.predir,(string)l.addr_suffix,(string)l.postdir,(string)l.sec_range);
-		self.hval1 := hashmd5(intformat(l.bdid,12,1));
-		self := l;
-	end;
-
-	dBestHeader_withMD5 := project(rDataSet, tHashDIDAddress(left));
-
-	business_header.Layout_BH_Best tSuppress(dBestHeader_withMD5 l) := transform
-	 self := l;
-	end;
-
-	best_full_out_suppress := join(dBestHeader_withMD5,
-														dBestSuppressedIn,
-														left.hval = right.hval,
-														tSuppress(left),
-														left only,
-														lookup);
+	best_full_out_suppress := project(Business_Header.Prep_Build.applyDidAddressBusiness_sup2(rDataSet), Business_Header.Layout_BH_Best);
 
 	bhb := best_full_out_suppress;
 

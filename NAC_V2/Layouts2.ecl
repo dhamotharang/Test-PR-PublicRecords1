@@ -2,6 +2,11 @@
 
 EXPORT Layouts2 := MODULE
 
+export rRawFile := RECORD				// raw incoming file prior to processing
+		string	text;
+		string	filename{ VIRTUAL( logicalfilename ) };
+END;
+
 // Address Record – AD01
 export rAddress := RECORD
 	string4			RecordCode;
@@ -139,10 +144,14 @@ export rCommonEx := RECORD
 		DATASET($.ValidationCodes.rError)	dsErrs;
 		string4						OrigGroupId := '';
 		string32					filename := '';
+		unsigned4					seqnum := 0;
+		unsigned4   			textLength;
+		boolean 					invalidLength;
 END;
 
 // extended records
 	export rAddressEx := RECORD
+
 		rAddress;
 
 		rCommonEx;
@@ -204,9 +213,7 @@ END;
 	
 	export rCaseEx := RECORD
 		rCase;
-
-		rCommonEx;
-
+		rCommonEx;		
 	END;
 
 	export rStateContactEx := RECORD
@@ -263,6 +270,13 @@ EXPORT rExceptionRecord := RECORD
 		unsigned4 	updated;
 		unsigned4 	replaced;
 		string32		filename := '';
-END;		
+END;	
+
+EXPORT rItemSummary := RECORD
+	STRING10		itemcode;
+	UNSIGNED4   counts;
+END;
 
 END;
+
+

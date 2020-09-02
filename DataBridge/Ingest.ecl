@@ -98,6 +98,8 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
     SELF.p_city_name := ri.p_city_name; // Derived(NEW)
     SELF.v_city_name := ri.v_city_name; // Derived(NEW)
     SELF.st := ri.st; // Derived(NEW)
+    SELF.zip := ri.zip; // Derived(NEW)
+    SELF.zip4 := ri.zip4; // Derived(NEW)
     SELF.cart := ri.cart; // Derived(NEW)
     SELF.cr_sort_sz := ri.cr_sort_sz; // Derived(NEW)
     SELF.lot := ri.lot; // Derived(NEW)
@@ -128,19 +130,19 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
  
   // Ingest Files: Rollup to get unique new records
   DistIngest0 := DISTRIBUTE(FilesToIngest0, HASH32(name,company,address,address2,city
-             ,state,scf,zip,zip4,mail_score,area_code,telephone_number,name_gender,name_prefix,name_first
+             ,state,scf,zip_code5,zip_code4,mail_score,area_code,telephone_number,name_gender,name_prefix,name_first
              ,name_middle_initial,name_last,suffix,title_code_1,title_code_2,title_code_3,title_code_4,web_address,sic8_1,sic8_2
              ,sic8_3,sic8_4,sic6_1,sic6_2,sic6_3,sic6_4,sic6_5,email,email_present_flag,site_source1
              ,site_source2,site_source3,site_source4,site_source5,site_source6,site_source7,site_source8,site_source9,site_source10,individual_source1
              ,individual_source2,individual_source3,individual_source4,individual_source5,individual_source6,individual_source7,individual_source8,individual_source9,individual_source10,email_status));
   SortIngest0 := SORT(DistIngest0,name,company,address,address2,city
-             ,state,scf,zip,zip4,mail_score,area_code,telephone_number,name_gender,name_prefix,name_first
+             ,state,scf,zip_code5,zip_code4,mail_score,area_code,telephone_number,name_gender,name_prefix,name_first
              ,name_middle_initial,name_last,suffix,title_code_1,title_code_2,title_code_3,title_code_4,web_address,sic8_1,sic8_2
              ,sic8_3,sic8_4,sic6_1,sic6_2,sic6_3,sic6_4,sic6_5,email,email_present_flag,site_source1
              ,site_source2,site_source3,site_source4,site_source5,site_source6,site_source7,site_source8,site_source9,site_source10,individual_source1
              ,individual_source2,individual_source3,individual_source4,individual_source5,individual_source6,individual_source7,individual_source8,individual_source9,individual_source10,email_status, __Tpe, record_sid, LOCAL);
   GroupIngest0 := GROUP(SortIngest0,name,company,address,address2,city
-             ,state,scf,zip,zip4,mail_score,area_code,telephone_number,name_gender,name_prefix,name_first
+             ,state,scf,zip_code5,zip_code4,mail_score,area_code,telephone_number,name_gender,name_prefix,name_first
              ,name_middle_initial,name_last,suffix,title_code_1,title_code_2,title_code_3,title_code_4,web_address,sic8_1,sic8_2
              ,sic8_3,sic8_4,sic6_1,sic6_2,sic6_3,sic6_4,sic6_5,email,email_present_flag,site_source1
              ,site_source2,site_source3,site_source4,site_source5,site_source6,site_source7,site_source8,site_source9,site_source10,individual_source1
@@ -149,19 +151,19 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
  
   // Existing Base: combine delta with base file
   DistBase0 := DISTRIBUTE(Base0+Delta0, HASH32(name,company,address,address2,city
-             ,state,scf,zip,zip4,mail_score,area_code,telephone_number,name_gender,name_prefix,name_first
+             ,state,scf,zip_code5,zip_code4,mail_score,area_code,telephone_number,name_gender,name_prefix,name_first
              ,name_middle_initial,name_last,suffix,title_code_1,title_code_2,title_code_3,title_code_4,web_address,sic8_1,sic8_2
              ,sic8_3,sic8_4,sic6_1,sic6_2,sic6_3,sic6_4,sic6_5,email,email_present_flag,site_source1
              ,site_source2,site_source3,site_source4,site_source5,site_source6,site_source7,site_source8,site_source9,site_source10,individual_source1
              ,individual_source2,individual_source3,individual_source4,individual_source5,individual_source6,individual_source7,individual_source8,individual_source9,individual_source10,email_status));
   SortBase0 := SORT(DistBase0,name,company,address,address2,city
-             ,state,scf,zip,zip4,mail_score,area_code,telephone_number,name_gender,name_prefix,name_first
+             ,state,scf,zip_code5,zip_code4,mail_score,area_code,telephone_number,name_gender,name_prefix,name_first
              ,name_middle_initial,name_last,suffix,title_code_1,title_code_2,title_code_3,title_code_4,web_address,sic8_1,sic8_2
              ,sic8_3,sic8_4,sic6_1,sic6_2,sic6_3,sic6_4,sic6_5,email,email_present_flag,site_source1
              ,site_source2,site_source3,site_source4,site_source5,site_source6,site_source7,site_source8,site_source9,site_source10,individual_source1
              ,individual_source2,individual_source3,individual_source4,individual_source5,individual_source6,individual_source7,individual_source8,individual_source9,individual_source10,email_status, __Tpe, record_sid, LOCAL);
   GroupBase0 := GROUP(SortBase0,name,company,address,address2,city
-             ,state,scf,zip,zip4,mail_score,area_code,telephone_number,name_gender,name_prefix,name_first
+             ,state,scf,zip_code5,zip_code4,mail_score,area_code,telephone_number,name_gender,name_prefix,name_first
              ,name_middle_initial,name_last,suffix,title_code_1,title_code_2,title_code_3,title_code_4,web_address,sic8_1,sic8_2
              ,sic8_3,sic8_4,sic6_1,sic6_2,sic6_3,sic6_4,sic6_5,email,email_present_flag,site_source1
              ,site_source2,site_source3,site_source4,site_source5,site_source6,site_source7,site_source8,site_source9,site_source10,individual_source1
@@ -170,13 +172,13 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
  
   // Everything: combine ingest and base recs
   Sort0 := SORT(AllBaseRecs0+AllIngestRecs0,name,company,address,address2,city
-             ,state,scf,zip,zip4,mail_score,area_code,telephone_number,name_gender,name_prefix,name_first
+             ,state,scf,zip_code5,zip_code4,mail_score,area_code,telephone_number,name_gender,name_prefix,name_first
              ,name_middle_initial,name_last,suffix,title_code_1,title_code_2,title_code_3,title_code_4,web_address,sic8_1,sic8_2
              ,sic8_3,sic8_4,sic6_1,sic6_2,sic6_3,sic6_4,sic6_5,email,email_present_flag,site_source1
              ,site_source2,site_source3,site_source4,site_source5,site_source6,site_source7,site_source8,site_source9,site_source10,individual_source1
              ,individual_source2,individual_source3,individual_source4,individual_source5,individual_source6,individual_source7,individual_source8,individual_source9,individual_source10,email_status, __Tpe,record_sid,LOCAL);
   Group0 := GROUP(Sort0,name,company,address,address2,city
-             ,state,scf,zip,zip4,mail_score,area_code,telephone_number,name_gender,name_prefix,name_first
+             ,state,scf,zip_code5,zip_code4,mail_score,area_code,telephone_number,name_gender,name_prefix,name_first
              ,name_middle_initial,name_last,suffix,title_code_1,title_code_2,title_code_3,title_code_4,web_address,sic8_1,sic8_2
              ,sic8_3,sic8_4,sic6_1,sic6_2,sic6_3,sic6_4,sic6_5,email,email_present_flag,site_source1
              ,site_source2,site_source3,site_source4,site_source5,site_source6,site_source7,site_source8,site_source9,site_source10,individual_source1

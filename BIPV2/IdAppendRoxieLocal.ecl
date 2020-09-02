@@ -120,7 +120,7 @@ topIds :=
 			or results_ultid[1].ultid > 0)), //filter not necessary here, but might save some work,
 	1, // trying to keep code mostly in sync with thor side. Changing to PROJECT
 		// would mean replacing "counter" in this transform to [1]
-	transform(BIPV2.IdAppendLayouts.IdsOnly,
+	transform(BIPV2.IdAppendLayouts.IdsOnlyDebug,
 		isProxResolved := left.results[counter].score >= (integer)scoreThreshold 
 			and left.results[counter].weight >= (integer)weightThreshold;
 		isSeleResolved := left.results_seleid[counter].score >= (integer)scoreThreshold 
@@ -280,6 +280,8 @@ topIds :=
 			isProxResolved => left.results[counter].ultimate_proxid,
 			isSeleResolved and not isSeleWrong => left.results_seleid[counter].ultimate_proxid,
 			0);
+		self.keys_used := left.results[counter].keys_used;
+		self.keys_failed := left.results[counter].keys_failed;
 		)
 	)((proxscore >= (integer)scoreThreshold 
 			or selescore >= (integer)scoreThreshold 
@@ -290,7 +292,7 @@ topIds :=
 	preSuppression := 
 		join(inputDsZip, topIds,
 		left.request_id = right.request_id,
-		transform(BIPV2.IdAppendLayouts.IdsOnly,
+		transform(BIPV2.IdAppendLayouts.IdsOnlyDebug,
 			self.request_id := left.request_id,
 			self := right),
 		left outer);

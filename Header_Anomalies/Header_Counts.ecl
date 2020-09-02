@@ -1,8 +1,3 @@
-/* 
-please start working on a module with exports. 
-Each export should populate one of these tables, and additional exports to provide drill down on the top values in these summary tables. 
-Please ignor 1.c (business names). The deliverable here is a code module that we will add to the header folder which we can call to generate these tables and drill down
-*/ 
 
 
 Import STD, AID;
@@ -39,37 +34,44 @@ header := Dedup(sdt, did, fname, lname,
 
 
 Export Header_Counts := Module 
+
 // 1. NAMES
 // A. Most common names accross all records
 
+// Filter out blanks in fnames and lnames, shared for reusability
+Shared fname_filter := header( Not fname = '');
+Shared lname_filter := header( Not lname = '');
+
+
 // Most common first names
 layout_fname := Record
-    fname := header.fname;
-    Integer fname_count := Count(Group);
+    fname_filter.fname;
+    fname_count := Count(Group);
 End;
-table_fname := Table(header, layout_fname, fname );
+table_fname := Table(fname_filter, layout_fname, fname );
 Export fnames_across_file := Sort(table_fname, -fname_count );
 
 
 
 // Most common last names
 layout_lname := Record
-    lname := header.lname;
-    Integer lname_count := Count(Group);
+    lname_filter.lname;
+    lname_count := Count(Group);
 End;
-table_lname := Table(header, layout_lname, lname );
+table_lname := Table(lname_filter, layout_lname, lname );
 Export lanmes_across_file := Sort(table_lname, -lname_count );
 
 
 
 // B. Most common names across diffeent lexids 
+
 // Most common first names accross lexids 
 layout_fnamelexid := Record
-    header.did;
-    header.fname;
+    fname_filter.did;
+    fname_filter.fname;
 End;
 
-c_fname2 := Table(header, layout_fnamelexid, did, fname );
+c_fname2 := Table(fname_filter, layout_fnamelexid, did, fname );
 dc_fname2 := Distribute(c_fname2, Hash(did, fname ));
 sdc_fname2 := Sort(dc_fname2, did, fname, Local );
 dsdc_fname2 := Dedup(sdc_fname2, did, fname, Local );
@@ -86,11 +88,11 @@ Export fnames_across_lexid := Sort(out_crosstab_fname, -fnamecnt_across_lexid );
 
 // Most common last names accross lexids
 layout_lnamelexid := Record
-    header.lname;
-    header.did;
+    lname_filter.lname;
+    lname_filter.did;
 End;
 
-c_lname2 := Table(header, layout_lnamelexid, did, lname );
+c_lname2 := Table(lname_filter, layout_lnamelexid, did, lname );
 dc_lname2 := Distribute(c_lname2, Hash(did, lname ));
 sdc_lname2 := Sort(dc_lname2, did, lname, Local );
 dsdc_lname2 := Dedup(sdc_lname2, did, lname, Local );
@@ -107,34 +109,34 @@ Export lnames_across_lexid := Sort(out_crosstab_lname, -lnamecnt_across_lexid );
 
 // 2. SSN
 // A. Most common SSN accross ALL records( non blank); 
-filteredssn := header( NOT ssn = ''); // non blank
+filteredssn := header( Not ssn = '' ); // non blank
 
 t_ssn := Record
-    ssn := filteredssn.ssn;
-    Integer ssn_count := Count(Group);
+    filteredssn.ssn;
+    ssn_count := Count(Group);
 End;
+
 c_ssn := Table(filteredssn, t_ssn, ssn);
 Export ssn_across_file := Sort(c_ssn, -ssn_count );
 
 
-
 // SSN with top count of Different lexids (no blank SSN nor blank lexids)
-filteredssn := header( NOT ssn = '' AND Not did = 0); // non blank ssn nor did
+filteredssn1 := header( Not ssn = '' and Not did = 0 and Not did  < 100 ); // non blank ssn nor did, not less than 100 dids
 
 t_ssn2 := Record
-    filteredssn.did;
-    filteredssn.ssn;
+    filteredssn1.did;
+    filteredssn1.ssn;
 End;
 
-c_ssn2 := Table(filteredssn, t_ssn2, did, ssn );
+c_ssn2 := Table(filteredssn1, t_ssn2, did, ssn );
 dc_ssn2 := Distribute(c_ssn2, Hash(did, ssn ));
 sdc_ssn2 := Sort(dc_ssn2, did, ssn, Local );
 Shared dsdc_ssn2 := Dedup(sdc_ssn2, did, ssn, Local );
 
 // Layouts for parent and child record 
 layout_lexidperssn := Record
- Qstring ssn;
- Integer did;
+ dsdc_ssn2.ssn;
+ dsdc_ssn2.did;
 End;
 
 Shared parent_recordssn := Project(dsdc_ssn2, layout_lexidperssn );
@@ -149,9 +151,6 @@ Export lexids_per_ssn := Sort(t2_ssn, -lexidcnt_per_ssn );
 
 // 3. Address
 //    A. Addresses with the highest count of (Different) LexIds 
-
-// list of all src 
-// 
 
 // Get the multiples of addresses per lexids
 layout_address := Record
@@ -198,15 +197,17 @@ Export lexids_per_address := Sort(t2_address, -lexidcnt_per_address );
 
 //  4. Date of Birth
 //  A. Most common DOB accross all records
+filter_dob := header( Not dob = 0 );
+
 layout_dob := Record
-    header.dob;
+    filter_dob.dob;
     dob_count := Count(Group);
 End;
 
-t_crosstab_Dob := Table(header, layout_dob, dob);
-Export dob_across_file := Sort(t_crosstab_Dob, -dob_count );
+t_crosstab_Dob := Table(filter_dob, layout_dob, dob );
+Export dob_across_file := Sort(t_crosstab_dob, -dob_count );
 
-
+//alidDob :=(Unsigned)STD.Date.IsValidDate(Le.dob)
 
 // Filters dobs from header to dobs without trailing zeros
 // From here we filter to partial dob filtering
@@ -248,7 +249,7 @@ End;
 
 // Validate full dobs 
 layout_lexiddob FilterDates( input_dob_perlexid  Le ) := Transform
-  Self.validDob :=(Unsigned)STD.Date.IsValidDate(Le.dob);
+  Self.validDob := (Unsigned)STD.Date.IsValidDate(Le.dob);
   Self.dob := Le.dob;
   Self.did := Le.did;
 End;
@@ -379,12 +380,13 @@ filteredFullDobLexid := filter_fulldob( Not dob = 0 And Not did = 0);
 
 normaldist := Record
     Integer   did;
-    Unsigned  dob_mmdd;
+    String    dob_mmdd;
 End;
 
 normaldist distSlim( filteredFullDobLexid Le ) := Transform
   Self.did := Le.did;
-  Self.dob_mmdd := (Unsigned)Le.dob[5..8];
+  dob := formating_tools.date_format(Le.dob);
+  Self.dob_mmdd := dob[5..9];
 End;
 
 result_normdist := Project(filteredFullDobLexid, distSlim(Left));
@@ -393,6 +395,6 @@ t1_dob := Table(result_normdist, {dob_mmdd, did}, dob_mmdd, did);
 
 t2_dob := Table(t1_dob, {dob_mmdd, lexid_count := Count(Group)}, dob_mmdd );
 
-Export normal_distribution := Sort(t2_dob, -lexid_count );
+Export normal_distribution := Sort(t2_dob, dob_mmdd );
 
-End; // Do not delete 
+End; 

@@ -1,27 +1,28 @@
-﻿EXPORT BuildData(string version) := FUNCTION
+﻿import tools;
 
-		hdrin := cortera.Files.File_Header_In;
+EXPORT BuildData(string pversion) := FUNCTION
 
-		ds := Cortera.proc_processHeader(hdrin, version) : INDEPENDENT;
-		exec := Cortera.proc_createExecutives(ds) : INDEPENDENT;
-		attr := Cortera.proc_processAttributes(ds, Cortera.Files.File_Attributes_In, version);
+		In_Hdr  := Cortera.Files().Input.In_Hdr.using;
+		In_Attr := Cortera.Files().Input.In_stats.using;
 
-		lfnHdr := Cortera.Constants.sfCorteraHdr + '::' + version;
-		lfnexecutives := Cortera.Constants.sfExecutives + '::' + version;
-		lfnAttributes := Cortera.Constants.sfAttributes + '::' + version;
+		NewHdrBase 				:= Cortera.proc_processHeader(In_Hdr, pversion) : INDEPENDENT;
+		NewExecBase 			:= Cortera.proc_createExecLinkID(NewHdrBase) : INDEPENDENT;
+		NewAttrBase 			:= Cortera.proc_processAttributes(NewHdrBase, In_Attr, pversion);
 
-		return SEQUENTIAL(
-			PARALLEL(
-				OUTPUT(ds,,lfnHdr, COMPRESSED, OVERWRITE),				
-				OUTPUT(exec,,lfnexecutives, COMPRESSED, OVERWRITE),
-				OUTPUT(attr,,lfnAttributes, COMPRESSED, OVERWRITE)
-			)
-			,
-			PARALLEL(
-				Cortera.Promote().CorteraHeader(lfnHdr),
-				Cortera.Promote().Executives(lfnexecutives),
-				Cortera.Promote().Attributes(lfnAttributes)
-			)
-		);
-	
+		tools.mac_WriteFile(Filenames(pversion).base.Header.new			,NewHdrBase					,Build_Hdr_Base_File				,pShouldExport := false);
+		tools.mac_WriteFile(Filenames(pversion).base.Executives.new	,NewExecBase				,Build_Exec_Base_File				,pShouldExport := false);
+		tools.mac_WriteFile(Filenames(pversion).base.Attributes.new	,NewAttrBase				,Build_Attr_Base_File				,pShouldExport := false);
+
+		return if(tools.fun_IsValidVersion(pversion)
+							,sequential(
+													Cortera.Promote().Inputfiles.Sprayed2Using,
+													Build_Hdr_Base_File,
+													parallel(
+														Build_Exec_Base_File,
+														Build_Attr_Base_File
+														),
+													Promote(pversion,'base').buildfiles.New2Built;													
+												)
+							,output('No Valid version parameter passed, skipping Cortera.BuildData atribute') 
+					 );
 END;

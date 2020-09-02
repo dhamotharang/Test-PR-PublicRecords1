@@ -49,11 +49,6 @@ despray_gong_ls_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metri
 																			  pTarget + '/tbl_Key_GongEDA_FCRA_DIDs_LastSeen_'+ filedate +'.csv'
 																			  ,,,,true);
 
-SEQUENTIAL(
-					output(sort(tbl_src_dates_first_seen, src, -first_seen, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_GongEDA_FCRA_DIDs_FirstSeen_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(sort(tbl_src_dates_last_seen, src, -last_seen, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_GongEDA_FCRA_DIDs_LastSeen_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,despray_gong_fs_tbl
-					,despray_gong_ls_tbl);
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
@@ -61,8 +56,8 @@ email_alert := SEQUENTIAL(
 					,output(sort(tbl_src_dates_last_seen, src, -last_seen, skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_Key_GongEDA_FCRA_DIDs_LastSeen_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
 					,despray_gong_fs_tbl
 					,despray_gong_ls_tbl):
-					Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA_EDA_GONG Build Succeeded', workunit + ': Build complete.' + filedate)),
-					Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA_EDA_GONG Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
+					Success(FileServices.SendEmail(pContact, 'FCRA Group: FCRA_EDA_GONG Build Succeeded', workunit + ': Build complete.' + filedate)),
+					Failure(FileServices.SendEmail(pContact, 'FCRA Group: FCRA_EDA_GONG Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
 													);
 return email_alert;
 

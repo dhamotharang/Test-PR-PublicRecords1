@@ -3,7 +3,7 @@ IMPORT SALT311;
 EXPORT Source_Level_Base_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.11.9';
+  EXPORT salt_VERSION := 'V3.11.11';
   EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
@@ -22,7 +22,7 @@ EXPORT Source_Level_Base_GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'Source_Level_Base';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:record_sid';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,cellphoneidkey,source,household_flag,cellphone,npa,phone7,phone7_did_key,pdid,did,did_score,datefirstseen,datelastseen,datevendorfirstreported,datevendorlastreported,dt_nonglb_last_seen,glb_dppa_flag,did_type,origname,address1,address2,origcity,origstate,origzip,orig_phone,orig_carrier_name,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,state,zip5,zip4,cart,cr_sort_sz,lot,lot_order,dpbc,chk_digit,rec_type,ace_fips_st,ace_fips_county,geo_lat,geo_long,msa,geo_blk,geo_match,err_stat,title,fname,mname,lname,name_suffix,name_score,rawaid,cleanaid,current_rec,first_build_date,last_build_date,ingest_tpe,verified,cord_cutter,activity_status,prepaid,global_sid,record_sid';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,cellphoneidkey,source,src_bitmap,household_flag,rules,cellphone,npa,phone7,phone7_did_key,pdid,did,did_score,datefirstseen,datelastseen,datevendorfirstreported,datevendorlastreported,dt_nonglb_last_seen,glb_dppa_flag,did_type,origname,address1,address2,origcity,origstate,origzip,orig_phone,orig_carrier_name,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,state,zip5,zip4,cart,cr_sort_sz,lot,lot_order,dpbc,chk_digit,rec_type,ace_fips_st,ace_fips_county,geo_lat,geo_long,msa,geo_blk,geo_match,err_stat,title,fname,mname,lname,name_suffix,name_score,dob,rawaid,cleanaid,current_rec,first_build_date,last_build_date,ingest_tpe,verified,cord_cutter,activity_status,prepaid,global_sid,record_sid';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := FALSE;
@@ -46,6 +46,8 @@ EXPORT Source_Level_Base_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'RIDFIELD:record_sid\n'
     + 'SOURCEFIELD:source\n'
     + '\n'
+    + '//DF-27472 update rules field on detail records\n'
+    + '\n'
     + '// Uncomment up to NINES for internal or external adl\n'
     + '// IDFIELD:EXISTS:<NameOfIDField>\n'
     + '// RIDFIELD:<NameOfRidField>\n'
@@ -60,10 +62,11 @@ EXPORT Source_Level_Base_GenerationMod := MODULE(SALT311.iGenerationMod)
     + '// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.\n'
     + '// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running\n'
     + '// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.\n'
-    + '\n'
     + 'FIELD:cellphoneidkey:TYPE(DATA16):0,0\n'
     + 'FIELD:source:TYPE(STRING2):0,0\n'
+    + 'FIELD:src_bitmap:TYPE(UNSIGNED8):0,0\n'
     + 'FIELD:household_flag:TYPE(BOOLEAN):0,0\n'
+    + 'FIELD:rules:TYPE(UNSIGNED8):0,0\n'
     + 'FIELD:cellphone:TYPE(STRING10):0,0\n'
     + 'FIELD:npa:TYPE(STRING3):0,0\n'
     + 'FIELD:phone7:TYPE(STRING7):0,0\n'
@@ -119,6 +122,7 @@ EXPORT Source_Level_Base_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:lname:TYPE(STRING20):0,0\n'
     + 'FIELD:name_suffix:TYPE(STRING5):0,0\n'
     + 'FIELD:name_score:TYPE(STRING3):0,0\n'
+    + 'FIELD:dob:TYPE(STRING8):0,0\n'
     + 'FIELD:rawaid:TYPE(UNSIGNED8):0,0\n'
     + 'FIELD:cleanaid:TYPE(UNSIGNED8):0,0\n'
     + 'FIELD:current_rec:TYPE(BOOLEAN):0,0\n'
@@ -131,9 +135,10 @@ EXPORT Source_Level_Base_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:prepaid:TYPE(STRING1):0,0\n'
     + 'FIELD:global_sid:TYPE(UNSIGNED4):0,0\n'
     + 'FIELD:record_sid:TYPE(UNSIGNED8):0,0\n'
-    + '\n'
     + '// CONCEPT statements should be used to group together interellated fields; such as address\n'
     + '// RELATIONSHIP is used to find non-obvious relationships between the clusters\n'
+    + '// SOURCEFIELD is used if a field of the file denotes a source of the records in that file\n'
+    + '// LINKPATH is used to define access paths for external linking'
     ;
  
   // Structured values

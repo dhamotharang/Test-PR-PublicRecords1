@@ -20,6 +20,8 @@ module
 	export workunit_history       := tools.mod_FilenamesBuild(lwkhistprefix + 'workunit_history' ,pversion);
 	export contact_linkids        := tools.mod_FilenamesBuild(lprefix + 'thor_data400::base::bipv2::business_header::@version@::contact_linkids'            ,pversion    );
 	export contact_title_linkids  := tools.mod_FilenamesBuild(lprefix + 'thor_data400::base::bipv2::business_header::@version@::contact_title_linkids'      ,pversion    );
+
+	export Active_Status_work(string pID)     := tools.mod_FilenamesBuild(lfileprefix + trim(pID) + '_Active_Status_work'	     ,pversion);
 // bipv2_build::qa::workunit_history
 // ~thor_data400::base::BIPV2_Build::qa::workunit_history
 // ~BIPV2_Build::qa::workunit_history
@@ -31,6 +33,8 @@ module
     + BIP_Owners            .dall_filenames
     + contact_linkids       .dall_filenames
     + contact_title_linkids .dall_filenames
+    + Active_Status_work('Seleid')    .dall_filenames
+    + Active_Status_work('Proxid')    .dall_filenames
     + BIPV2.Filenames            (pversion,pUseOtherEnvironment).dall_filenames
     + bipv2_proxid.filenames     (pversion,pUseOtherEnvironment).dall_filenames
     + bipv2_proxid_mj6._filenames(pversion,pUseOtherEnvironment).dall_filenames

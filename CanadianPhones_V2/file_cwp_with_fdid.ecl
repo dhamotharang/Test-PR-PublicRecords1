@@ -1,7 +1,7 @@
 ﻿import _Control, Autokey, MDR, Std, ut;
 
 //populate only updating source for keys
-canadianWP := file_CanadianWhitePagesBase(vendor='AX');
+canadianWP := file_CanadianWhitePagesBase(vendor IN ['I7','AX']);
 
 slim_canadianWP := RECORD
   string8 Date_first_reported;
@@ -109,6 +109,9 @@ slim_canadianWP := RECORD
 	//Added for CCPA-90
 	UNSIGNED4 global_sid;
 	UNSIGNED8 record_sid;
+	//Added for CCPA-1030
+  UNSIGNED6 did := 0;
+  INTEGER3  DID_Score := 0;
 END;
 
 slim_canadianWP xpand_canadianWP(canadianWP le,integer cntr) :=  TRANSFORM 

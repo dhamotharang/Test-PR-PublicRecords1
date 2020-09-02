@@ -22,10 +22,10 @@
   unsigned2 ultweight;
   string8 dt_first_seen;
   string8 dt_last_seen;
-  string2 report_code;
+  string4 report_code;
   string25 report_category;
   string65 report_code_desc;
-  string11 vehicle_incident_id;
+  string14 vehicle_incident_id;
   string1 vehicle_status;
   string100 accident_location;
   string100 accident_street;
@@ -175,6 +175,7 @@
   string2 motorcycle_cylinder_coding;
   string60 next_street;
   string40 addl_report_number;
+  string11 agency_id;
   string9 agency_ori;
   string100 insurance_company_standardized;
   string1 is_available_for_public;
@@ -238,6 +239,7 @@
   string7 citation_issued;
   string7 citation_type;
   string100 citation_detail1;
+  string64 citation_status;
   string60 violation_code1;
   string60 violation_code2;
   string60 violation_code3;
@@ -271,4 +273,5 @@
   string pedestrian_actions_at_time_of_crash;
   string pedalcyclist_actions_at_time_of_crash;
   string passenger_actions_at_time_of_crash;
+  string marijuana_use_suspected;
  END;

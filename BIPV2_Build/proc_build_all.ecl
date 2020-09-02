@@ -104,7 +104,7 @@ export proc_build_all(
 ) := 
 functionmacro
     
-    import BIPV2_Build, BIPV2_DotID, BIPV2_ProxID, BIPV2_Entity, bipv2, ut,BizLinkFull,tools,Marketing_List;    
+    import BIPV2_Build, BIPV2_DotID, BIPV2_ProxID, BIPV2_Entity, bipv2, ut,BizLinkFull,tools,Marketing_List,wk_ut;    
 
     // -- Cleanup the previous build -- this needs to expand to more files
     // notdeleteversion  := regexfind('[[:digit:]]+',pversion,0,nocase);  //do this so we don't delete any files from a rebuild--may want to keep those until the next build for research purposes.
@@ -148,6 +148,9 @@ functionmacro
 
     Wait4PostProcessThreads   := if(DotSpecsWuid != '' or SeleidRelativeSpecsWuid != '' ,wk_ut.Wait4Workunits([DotSpecsWuid,SeleidRelativeSpecsWuid],'1',pversion,'Wait4PostProcessWuids',,BIPV2_Build.mod_email.emailList));
 
+    kick_copy2_storage_thor_fathercommonbase  := BIPV2_Tools.Copy2_Storage_Thor('~' + nothor(std.file.superfilecontents(BIPV2.CommonBase.FILE_BASE)[1].name)  ,pversion ,'Copy_father_common_base_To_Storage_Thor');
+    copyFatherCommonBase2StorageThor          := if(not wk_ut._constants.IsDev ,output(kick_copy2_storage_thor_fathercommonbase ,named('copy2_Storage_Thor_father_commonbase__html')));  //copy orig file to storage thor
+
 		doit := sequential(
 
        output(pversion, named('Build_Date'))
@@ -164,7 +167,7 @@ functionmacro
       ,if(pSkipProxPost         = false ,BIPV2_Build.proc_proxid                               ( '' ,pProxPostNumIterations ,pversion     ,'bipv2_proxid_mj6._files().out.built',,pInputFilenameForProxPost ,,false             ,,,'ProxidPost'               ,,,pCompileTest ))
       ,if(pSkipProxidUnderlinks = false ,BIPV2_Build.proc_proxid_underlinks    (pversion                                                                                                                                ,,,pCompileTest  ))
       ,if(pSkipHierarchy        = false ,BIPV2_Build.proc_hrchy                (pversion                                                                                                                                                 ))
-      ,if(pSkipLgid3            = false ,BIPV2_Build.proc_lgid3                ().MultIter_run (pLgid3StartIteration   ,pLgid3NumIterations  ,pdoLgid3Init  ,pdoLgid3Specs   ,pdoLgid3Iters  ,pdoLgid3Post ,pversion     ,,pCompileTest  ))
+      ,if(pSkipLgid3            = false ,BIPV2_Build.proc_lgid3                                (pLgid3StartIteration   ,pLgid3NumIterations  ,pdoLgid3Init  ,pdoLgid3Specs   ,pdoLgid3Iters  ,pdoLgid3Post ,pversion   ,,,,pCompileTest  ))
       ,if(pSkipPowDown          = false ,BIPV2_Build.proc_powid_down           ().MultIter_run (pPowDownStartIteration ,pPowDownNumIterations,pdoPowDownInit,pdoPowDownSpecs                                         ,,,,,,pCompileTest  )) 
       ,if(pSkipPow              = false ,BIPV2_Build.proc_powid                ().MultIter_run (pPowStartIteration     ,pPowNumIterations    ,pdoPowInit    ,pdoPowSpecs     ,pdoPowIters    ,pdoPowPost              ,,,,,pCompileTest  ))
       ,if(pSkipEmpDown          = false ,BIPV2_Build.proc_empid_down           ().MultIter_run (pEmpDownStartIteration ,pEmpDownNumIterations,pdoEmpDownInit                                                       ,,,,,,,,pCompileTest  ))
@@ -190,6 +193,7 @@ functionmacro
       ,UpdateBIPV2FullKeysDops  
       ,if(pSkipVerifyKeys    = false ,BIPV2_Build.BIPV2WeeklyKeys_Package     (keyversion).outputpackage                                                                                     )
       ,UpdateBIPV2WeeklyKeysDops
+      ,copyFatherCommonBase2StorageThor
       ,Wait4PostProcessThreads
       // ,if(pSkipDOTSpecsPost     = false ,BIPV2_Build.proc_dotid().runSpecs())
       // ,if(pSkipSeleRelSpecsPost = false ,BIPV2_Build.proc_Seleid_relatives     (pversion,true,false,false       ))

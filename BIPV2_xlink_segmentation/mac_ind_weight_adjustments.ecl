@@ -1,7 +1,7 @@
 ﻿EXPORT mac_ind_weight_adjustments(trimRes, isKeyedJoin) := FUNCTIONMACRO;
 IMPORT BIPV2_Segmentation,BIPV2_xlink_segmentation;
   #UNIQUENAME(seg)
-	%seg% 		:= BIPV2_Segmentation.Key_LinkIds(,false).Key;
+	%seg% 		:= BIPV2_Segmentation.KeyRead(,false).Key;
 	
 	#UNIQUENAME(trimResNorm)
 	%trimResNorm% := NORMALIZE(trimRes,LEFT.results_seleid,TRANSFORM({unsigned id; recordof(LEFT.results_seleid) res;}, SELF.id := LEFT.reference_biz; SELF.res := RIGHT;));

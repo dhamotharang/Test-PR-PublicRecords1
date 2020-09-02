@@ -132,6 +132,7 @@ EXPORT Sanction_Code_Lookup := MODULE
 									{'SNC_MOF1' ,'MO','Department of Social Services',																									'Medicaid Board',																		'Medicaid',	'Full refresh'},
 									{'SNC_MOF2' ,'MO','Division of Professional Registration',																					'Pharmacy Board',																		'State',				'Full refresh'},
 									{'SNC_MSF1' ,'MS','Division of Medicaid',																														'Medicaid Board',																		'Medicaid',	'Full refresh'},
+									{'SNC_MSF3' ,'MS','Mississippi Board of Pharmacy',																									'Pharmacy Board',																		'State',		'Cumulative'},
 									{'SNC_MTF2' ,'MT','Department of Public Health and Human Services',																	'Medicaid Board',																		'Medicaid',	'Full refresh'},
 									{'SNC_NCF1' ,'NC','License Board',																																	'Pharmacy Board',																		'State',				'Cumulative'},														
 									{'SNC_NCF2' ,'NC','Division of Health Service Regulation',																					'Adult Care Board',																	'State',				'Full refresh'},
@@ -141,6 +142,7 @@ EXPORT Sanction_Code_Lookup := MODULE
 									{'SNC_NDF1' ,'ND','Department of Human Services',																										'Medicaid Board',																		'Medicaid',	'Full refresh'},
 									{'SNC_NEF1' ,'NE','Department of Health and Human Services',																				'Medicaid Board',																		'Medicaid',	'Full refresh'},
 									{'SNC_NEF2'	,'NE','Department of Health and Human Services',																				'Health Regulation Administration',									'State',		'Cumulative'},
+									{'SNC_NEF3' ,'NE','Department of Health and Human Services',																				'Health Regulation Administration',									'State',		'Full refresh'},
 									{'SNC_NHF2' ,'NH','Board of Pharmacy',																															'Pharmacy Board',																		'State',				'Full refresh'},
 									{'SNC_NHF3' ,'NH','Department of Health and Human Services',																				'Medicaid Board',																		'Medicaid', 'Full refresh'},
 									{'SNC_NJF1' ,'NJ','Division of Revenue and Enterprise Services',																		'Medicaid Board',																		'Medicaid',	'Full refresh including reinstatements'},
@@ -174,11 +176,13 @@ EXPORT Sanction_Code_Lookup := MODULE
 									{'SNC_VTF2' ,'VT','Department of Vermont Health Access Agency of Human Services',										'Medicaid Board',																		'Medicaid',	'Cumulative'},
 									{'SNC_VTF3' ,'VT','Vermont Secretary of State',																											'State Conduct Decisions',													'State',		'Cumulative'},
 									{'SNC_WAF1' ,'WA','State Medicaid',																																	'Medicaid Board',																		'Medicaid',	'Full refresh'},
-									{'SNC_WIF1' ,'WI','Department of Safety and Professional Services',																	'License Board',																		'State',				'Cumulative'},
+									{'SNC_WAF5' ,'WA','Washington State Department of Health Pharmacy Commission',											'License Board',																		'State',		'Cumulative'},
+									{'SNC_WIF1' ,'WI','Department of Safety and Professional Services',																	'License Board',																		'State',		'Cumulative'},
 									{'SNC_WVF1' ,'WV','Medicaid Management Information System',																					'Medicaid Board',																		'Medicaid',	'Full refresh'},
 									{'SNC_WVF2' ,'WV','State Medicaid',																																	'Medicaid Board',																		'Medicaid',	'Full refresh'},
 									{'SNC_WVF3' ,'WV','State Medicaid',																																	'Medicaid Board',																		'Medicaid',	'Full refresh'},
-									{'SNC_WYF1' ,'WY','Department of Health',																														'Medicaid Board',																		'Medicaid',	'Cumulative'}
+									{'SNC_WYF1' ,'WY','Department of Health',																														'Medicaid Board',																		'Medicaid',	'Cumulative'},
+									{'SNC_WYF2' ,'WY','Board of Pharmacy',																															'License Board',																		'State',		'Full refresh'}
 								],BoardLookupTable);
 
 END;

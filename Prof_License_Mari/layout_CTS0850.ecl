@@ -1,4 +1,4 @@
-// CTS0850 / Connecticut Dept of Consumer Protection / Multiple Professions //
+﻿// CTS0850 / Connecticut Dept of Consumer Protection / Multiple Professions //
 export layout_CTS0850 := MODULE
 	EXPORT layout_appraiser := 
 	RECORD
@@ -12,8 +12,8 @@ export layout_CTS0850 := MODULE
 		STRING30   LIC_STATUS,
 		STRING30   LIC_EFFECTIVE_DATE,
 		STRING30   LIC_EXPIRATION,
-		STRING100	 SUPERVISOR,
-		STRING30	 SUPERVISOR_NUM
+		// STRING100	 SUPERVISOR,
+		// STRING30	 SUPERVISOR_NUM
 	END;
 
 	EXPORT layout_salesperson := 

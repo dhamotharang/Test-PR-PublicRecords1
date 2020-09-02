@@ -1,4 +1,4 @@
-import ut,STRATA,PromoteSupers;
+﻿import ut,STRATA,PromoteSupers,VotersV2,std;
 
 export proc_build_base(string version_date) := function
 
@@ -22,11 +22,37 @@ export proc_build_base(string version_date) := function
 	// Bring to orig base layout with the AID fields
 	dHuntCCW	:=	emerges.file_hvccw_in;
 
-	// Append sequence number to normalize records so as to pass to the AddressID macro
-	ut.MAC_Sequence_Records(dHuntCCW, Append_SeqNum, dHuntCCW_AppendSeqNum);
+  // Added for DF-27895 - Emerges Opt Out - This will filter out Hunt/Fish/CCW records that are found in the Emerges Opt Out file.  
+ 	OptOut :=	dedup(sort(distribute(VotersV2.File_OptOut_Cleaned,hash(dob)),dob,last_name,first_name,state,local),dob,last_name,first_name,state,local)(dob <> '' and last_name <> '' and first_name <> '' and state <> '');
 
-	dHuntCCW_AppendSeqNum_Dist	:=	distribute(dHuntCCW_AppendSeqNum, hash(Append_SeqNum));
-	
+	joinLayout := record
+		 emerges.layout_hunt_ccw.rHuntCCWCleanAddr_layout;	
+		 string optout_flag;
+	end;
+				
+	joinTo_OptOut := join(dHuntCCW, OptOut,
+											 std.str.touppercase(std.str.cleanspaces(left.dob_str_in)) = right.dob and
+											 std.str.touppercase(std.str.cleanspaces(left.lname_in))   = right.last_name and 
+											 std.str.touppercase(std.str.cleanspaces(left.fname_in))   = right.first_name and 
+											 (std.str.touppercase(std.str.cleanspaces(left.res_state)) = right.state or std.str.touppercase(std.str.cleanspaces(left.mail_state)) = right.state),
+											 transform(joinLayout,
+																 self.optout_flag := if( std.str.touppercase(std.str.cleanspaces(left.dob_str_in)) = right.dob and right.dob <> '' and 
+																												 std.str.touppercase(std.str.cleanspaces(left.lname_in))   = right.last_name and right.last_name <> '' and
+																												 std.str.touppercase(std.str.cleanspaces(left.fname_in))   = right.first_name and right.first_name <> '' and
+																												 (std.str.touppercase(std.str.cleanspaces(left.res_state)) = right.state or std.str.touppercase(std.str.cleanspaces(left.mail_state)) = right.state  and right.state <> '')
+																												 ,'O' ,'');	
+																 self 				  := left;
+																 self  				  := [];),
+															 left outer, lookup);
+															 
+	base_minusOptOuts	:= project(joinTo_OptOut(optOut_flag <> 'O'),transform(emerges.layout_hunt_ccw.rHuntCCWCleanAddr_layout,self := left));
+	// End of Emerges Opt Out process for DF-27895
+
+	// Append sequence number to normalize records so as to pass to the AddressID macro
+	ut.MAC_Sequence_Records(base_minusOptOuts, Append_SeqNum, dHuntCCW_AppendSeqNum);
+
+  dHuntCCW_AppendSeqNum_Dist	:=	distribute(dHuntCCW_AppendSeqNum, hash(Append_SeqNum));
+
 	// Clean data, append DID and SSN
 	dHuntCCW_DID			:=	emerges.hvccw_did(dHuntCCW_AppendSeqNum_Dist);
 	

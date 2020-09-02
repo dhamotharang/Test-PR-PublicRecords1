@@ -90,7 +90,7 @@ EXPORT proc_quickHdr_build_all (
 			bld_prepped,
 			output(Header.Mod_CreditBureau_address.stats,named('nlr_counts')),
 			bld_key,
-			_control.fSubmitNewWorkunit('#workunit(\'name\',\'Scrubs_Equifax_Monthly\');\r\n'+'Scrubs_Equifax_Monthly.proc_generate_report();','thor400_60')
+			_control.fSubmitNewWorkunit('#workunit(\'name\',\'Scrubs_Equifax_Monthly\');\r\n'+'Scrubs_Equifax_Monthly.proc_generate_report();','thor400_44_eclcc')
 		),
 		output('No Monthly Files available')
 	);
@@ -102,7 +102,7 @@ EXPORT proc_quickHdr_build_all (
 	Source_Check_rep := header_quick.Proc_source_check_report();
 
 	RETURN SEQUENTIAL(
-		check_superfiles_are_in_sync,
+		// check_superfiles_are_in_sync,
 		header_quick._config(sourceIP, sourcePathMonthly).set_v_version(overwriteMonthlyFileDate),
 		header_quick._config(sourceIP, sourcePathWeekly).set_v_eq_as_of_date(overwriteWeeklyFileDate),
 		Header.mac_runIfNotCompleted ('QuickHeader',filedate, doWeekly,200),

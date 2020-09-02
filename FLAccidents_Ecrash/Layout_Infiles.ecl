@@ -473,6 +473,11 @@
 		STRING Dispatch_Date;
 		STRING Drug_Involvement;
 		STRING Alcohol_Involved;
+		//Data Ingestion CR-1273
+		STRING Geo_Coded_Latitude;
+		STRING Geo_Coded_Longitude;
+		//PRtCC CR-1262 
+    STRING Direction_Of_Impact;
 	END;
 
 	EXPORT persn_NEW := RECORD ,MAXLENGTH(20000)
@@ -645,6 +650,8 @@
 		//Data Ingestion New fields
 		STRING Dui_Suspected;
 		STRING Drug_Test_Result;
+		//PRtCC CR-1237
+    STRING Marijuana_Use_Suspected;
 	END;
 
 	EXPORT vehicl_NEW := RECORD,MAXLENGTH(20000)
@@ -870,6 +877,8 @@
 		STRING Report_Vehicle_Body_Type;
 		//PRtCC new fields
 		STRING Report_Road_Condition;
+		//Data Ingestion CR-1262 
+    STRING Event_Sequence;
 	END;
 
 	EXPORT property_damage := RECORD
@@ -888,6 +897,19 @@
 		STRING property_owner_zip_code;
 		STRING property_owner_notified;
 	END; 
+	
+	EXPORT Document := RECORD
+    STRING document_id;
+    STRING incident_id;
+    STRING document_hash_key;
+    STRING date_created;
+    STRING is_deleted;
+    STRING report_type;
+    STRING page_count;
+    STRING extension;
+		//COPPR-69 New field
+    STRING report_source;
+	END;
 
 	EXPORT layoutNahdbBatch := RECORD
 		STRING EVENT_ID;
@@ -914,12 +936,12 @@
 		STRING suffix; 
 		STRING clean_dob; 
 		STRING clean_DATE_OF_INCIDENT; 
-		STRING acc_dol,
-		STRING acc_city,	
-		STRING acc_st	,
-		STRING acc_county,	
-		STRING acc_vin,
-		STRING order_id	,
+		STRING acc_dol;
+		STRING acc_city;	
+		STRING acc_st	;
+		STRING acc_county;	
+		STRING acc_vin;
+		STRING order_id	;
 		STRING sequence_nbr,	
 		STRING acct_nbr	,
 		STRING vehicle_incident_id,	

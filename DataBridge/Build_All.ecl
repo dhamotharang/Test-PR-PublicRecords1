@@ -18,14 +18,18 @@ function
 		 Create_Supers
 		,Spray (pversion,pServerIP,pDirectory,pFilename,pGroupName,pIsTesting,pOverwrite)    
 		,Build_Base (pversion,pIsTesting,pSprayedFile,pBaseFile)
-		,Build_Keys (pversion).all   
 		,Scrubs.ScrubsPlus('DataBridge','Scrubs_DataBridge','Scrubs_DataBridge', 'Base', pversion,Email_Notification_Lists(pIsTesting).BuildFailure,false)
-		,Build_Strata(pversion,pOverwrite,,,pIsTesting)
-		,Promote().Inputfiles.using2used
-		,Promote().Buildfiles.Built2QA
-		,QA_Records()
-	  ,dops.updateversion('DataBridgeKeys',pversion,DataBridge.Email_Notification_Lists().BuildSuccess,,'N')
-		,Orbit3.proc_Orbit3_CreateBuild('DataBridge',pversion,'N')
+    ,if(Scrubs.mac_ScrubsFailureTest('DataBridgeKeys',pversion)
+		    ,sequential(Build_Keys(pversion).all   
+		               ,Build_Strata(pversion,pOverwrite,,,pIsTesting)
+		               ,Promote().Inputfiles.using2used
+		               ,Promote().Buildfiles.Built2QA
+		               ,QA_Records()
+	                 ,dops.updateversion('DataBridgeKeys',pversion,DataBridge.Email_Notification_Lists().BuildSuccess,,'N')
+		               ,Orbit3.proc_Orbit3_CreateBuild('DataBridge',pversion,'N')
+									 )
+				,OUTPUT('Scrubs Failed',NAMED('Scrubs_Failure'))
+				)
 	) : success(Send_Emails(pversion,,not pIsTesting).Roxie), 
 	    failure(Send_Emails(pversion,,not pIsTesting).buildfailure);
 	

@@ -1,11 +1,11 @@
-IMPORT SALT32,Scrubs,Data_Services,zz_gmarcan;
+IMPORT SALT32,Scrubs,Data_Services;
 IMPORT Scrubs_TUCS as S;
 F := S.In_File: independent;		  // input file
 o := 'Scrubs_TUCS';		// orbit profile name
 m := 'TUCS';
 
 loc := data_services.Data_location.Prefix('PersonHeader');
-v_tc := regexfind('w201.*-',nothor(fileservices.SuperFileContents(loc+'thor400::base::transunion_PTrak'))[1].name,0)[2..9];
+v_tc := regexfind('w20.*-',nothor(fileservices.SuperFileContents(loc+'thor400::base::transunion_PTrak'))[1].name,0)[2..9];
 
 
 N := S.Scrubs.FromNone(F);
