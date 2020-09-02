@@ -32,5 +32,5 @@ deduped_clean_file  := dedup(sort(dis_clean_norm_file, lname, name_suffix, fname
 															
 export Cleaned_Voters_Names := deduped_clean_file 
 //uncomment for testing purposes
-// : persist(VotersV2.Cluster+'persist::Cleaned_Voters_Names', SINGLE)
+: persist(VotersV2.Cluster+'persist::Cleaned_Voters_Names', SINGLE)
 ;

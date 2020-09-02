@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_Cortera.Executives_BWR_Scrubs - Checking field validity in a file - SALT V3.11.4');
+#workunit('name','Scrubs_Cortera.Executives_BWR_Scrubs - Checking field validity in a file - SALT V3.11.11');
 IMPORT Scrubs_Cortera,SALT311;
 infile := Scrubs_Cortera.Executives_In_Cortera;
 mod_scrubs := Scrubs_Cortera.Executives_Scrubs;

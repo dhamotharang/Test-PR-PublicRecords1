@@ -140,5 +140,5 @@ Rollup_Voters := rollup(Sort_Cleaned_Patched_file,rollupXform(LEFT,RIGHT),RECORD
 
 export Translate_Voters_Codes := Rollup_Voters 
 //uncomment for testing purposes
-// : persist(VotersV2.Cluster+ 'persist::Transulate_Voters_Codes', SINGLE)
+: persist(VotersV2.Cluster+ 'persist::Transulate_Voters_Codes', SINGLE)
 ;

@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, RoxieKeyBuild, AutoKeyB2, PRTE2, PRTE, _control, autokeyb, Business_Header_SS, business_header, ut, corp2, doxie, address, corp2_services, Orbit3, PRTE2_Common;
+﻿IMPORT BIPV2, RoxieKeyBuild, AutoKeyB2, PRTE2, PRTE, _control, autokeyb, Business_Header_SS, business_header, ut, corp2, doxie, address, corp2_services, Orbit3, PRTE2_Common, dops;
 
 EXPORT proc_build_keys(string filedate) := FUNCTION
 
@@ -63,6 +63,9 @@ RoxieKeyBuild.MAC_SK_Move_v2(constants.key_prefix + '@version@::linkids',
   PerformUpdateOrNot := IF(is_running_in_prod, updatedops, NoUpdate);
   orbit_update       := Orbit3.proc_Orbit3_CreateBuild ('PRTE - Cortera',filedate);
 
+ key_validations :=  output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation'));
+                 
+
  RETURN     SEQUENTIAL(
                        //Build Keys
                        parallel(
@@ -88,6 +91,7 @@ RoxieKeyBuild.MAC_SK_Move_v2(constants.key_prefix + '@version@::linkids',
                        
                        //Update DOPs         
                                PerformUpdateOrNot,
+															 key_validations,
                                orbit_update
 															 );
 

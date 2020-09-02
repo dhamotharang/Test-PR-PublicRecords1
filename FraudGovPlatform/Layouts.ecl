@@ -447,6 +447,8 @@ EXPORT Layouts := MODULE
 			boolean SkipMBS;
 			boolean SkipDeltabase;
 			boolean SkipRDP;
+			boolean SkipDashboards;
+			boolean SkipDashboardVersion;
 		END;
 
 		export SkipValidationByGCID	 := RECORD
@@ -899,6 +901,14 @@ EXPORT Drivers_Batch := MODULE
     unsigned4	max_process_date := 0;
     unsigned4	record_count := 1;				
   END;
+	
+	EXPORT BankNames :=RECORD
+		string50 bank_name;
+	END;
+	
+	EXPORT IspNames :=RECORD
+		string75 isp_name;
+	END;
 	
 	EXPORT AgencyActivityDate := RECORD
 		string8		reported_date;

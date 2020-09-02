@@ -247,7 +247,7 @@ export proc_deathmaster_buildfile(string	filedate)	:= function
 															(le.state						=	''	and	self.state						!=	'') OR
 															(le.st_country_code	=	''	and	self.st_country_code	!=	'') OR
 															(le.fipscounty			=	''	and	self.fipscounty				!=	''),
-															'Y',
+															ri.glb_flag,
 															le.glb_flag
 														);
 		self							:=	le;

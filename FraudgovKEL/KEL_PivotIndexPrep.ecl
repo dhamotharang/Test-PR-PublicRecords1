@@ -80,7 +80,11 @@ EXPORT KEL_PivotIndexPrep := MODULE
 															{'driverslicenseentitycontextuid', (STRING)LEFT.driverslicenseentitycontextuid},
 															{'t_inagencyflag', (STRING)LEFT.t_inagencyflag},
 															{'t_inpclnmiddlenmecho',(STRING)LEFT.t_inpclnmiddlenmecho},
-															{'aotidactcntev', (STRING)LEFT.aotidactcntev}
+															{'aotidactcntev', (STRING)LEFT.aotidactcntev},
+															{'t9_addrpoboxmultcurridflagev', (STRING)LEFT.t9_addrpoboxmultcurridflagev},
+															{'t15_ssnmultcurridflagev', (STRING)LEFT.t15_ssnmultcurridflagev},
+															{'t20_dlmultcurridflagev', (STRING)LEFT.t20_dlmultcurridflagev},
+															{'t19_bnkacctmultcurridflagev', (STRING)LEFT.t19_bnkacctmultcurridflagev}
 														 ], NvpRec),
 														 SELF := LEFT));
 

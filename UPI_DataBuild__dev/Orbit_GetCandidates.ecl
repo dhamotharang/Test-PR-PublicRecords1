@@ -1,8 +1,10 @@
 ﻿EXPORT Orbit_GetCandidates ( 		STRING BuildName
 												, STRING BuildVersion
 												, STRING TOKEN
+												, STRING OrbitEnv
 											) := FUNCTION
-	IMPORT UPI_DataBuild__dev.Orbit_Tracking as config;
+	IMPORT UPI_DataBuild__dev.Orbit_Tracking as configQA;
+	IMPORT UPI_DataBuild__dev.Orbit_TrackingPROD as configPROD;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	STRING sService := 'GetCandidates'	;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
@@ -62,26 +64,40 @@
 		rBuildsR		BuildsComponents					{ XPATH('BuildComponents'					)	}	;
 	END;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
-	OrbitCall	:=	SOAPCALL(		config.TargetURL
-													,	config.SOAPService(sService)
+	OrbitCallQA	:=	SOAPCALL(		configQA.TargetURL
+													,	configQA.SOAPService(sService)
 													,	rRequest
 													,	rResponse
-													,	XPATH(config.OrbitRR(sService)	)
-													,	NAMESPACE(config.Namespace_D)
+													,	XPATH(configQA.OrbitRR(sService)	)
+													,	NAMESPACE(configQA.Namespace_D)
 													,	LITERAL
-													,	SOAPACTION(config.SoapPath(sService) )
+													,	SOAPACTION(configQA.SoapPath(sService) )
 													, LOG
 												)	;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
-	AllCandidates := 	OrbitCall.BuildsComponents.BuildData.CandidatesR.outDS;
+	OrbitCallPROD	:=	SOAPCALL(		configPROD.TargetURL
+													,	configPROD.SOAPService(sService)
+													,	rRequest
+													,	rResponse
+													,	XPATH(configPROD.OrbitRR(sService)	)
+													,	NAMESPACE(configPROD.Namespace_D)
+													,	LITERAL
+													,	SOAPACTION(configPROD.SoapPath(sService) )
+													, LOG
+												)	;
+	//-----------------------------------------------------------------------------------------------------------------------------------------
+	AllCandidatesQA := 	OrbitCallQA.BuildsComponents.BuildData.CandidatesR.outDS;
+	AllCandidatesPROD := 	OrbitCallPROD.BuildsComponents.BuildData.CandidatesR.outDS;
 	// BuiltOnly := AllCandidates(BuildStatus = 'Built');
 	// SprayedOnly := AllCandidates(BuildStatus = 'Sprayed');
-	LoadedOnly := AllCandidates(BuildStatus = 'Loaded');
-	AvailableOnly := AllCandidates(BuildStatus = 'BuildAvailableForUse');
+	LoadedOnlyQA := AllCandidatesQA(BuildStatus = 'Loaded');
+	LoadedOnlyPROD := AllCandidatesPROD(BuildStatus = 'Loaded');
+	AvailableOnlyQA := AllCandidatesQA(BuildStatus = 'BuildAvailableForUse');
+	AvailableOnlyPROD := AllCandidatesPROD(BuildStatus = 'BuildAvailableForUse');
 	
 	// RETURN AvailableOnly;	
 	// RETURN AllCandidates;	
-	RETURN LoadedOnly;	
+	RETURN IF(OrbitEnv = 'QA', LoadedOnlyQA, LoadedOnlyPROD);	
 	// RETURN SprayedOnly;	
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 END	;	

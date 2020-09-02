@@ -172,5 +172,5 @@ clean_cache_addr_file := project(dwithAID
 // export Cleaned_Addr_Cache_Base :=  full_norm_file
 export Cleaned_Addr_Cache_Base :=  clean_cache_addr_file
 //uncomment for testing purposes
-// : persist(VotersV2.Cluster+'persist::voters::Cleaned_Addr_Cache_Base',SINGLE)
+: persist(VotersV2.Cluster+'persist::voters::Cleaned_Addr_Cache_Base',SINGLE)
 ;

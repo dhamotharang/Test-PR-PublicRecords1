@@ -44,11 +44,11 @@ EXPORT  filedate := getFileVersion(ut.foreign_aprod+'thor_data400::key::insuranc
 
 SHARED fc(string f1, string f2):= sequential(
     output(dataset([{f1,'thor400_44',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
-    if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_44',f2,,,,,true,true,,true))));
+    if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_44',f2,,,,400,TRUE,,TRUE,TRUE,,10000000))));
 
 SHARED fc8(string f1, string f2):= sequential(
     output(dataset([{f1,'thor400_36',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
-    if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_36',f2,,,,,true,true,,true))));
+    if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_36',f2,,,,400,TRUE,,TRUE,TRUE,,10000000))));
 
 EXPORT copy_addr_uniq_keys_from_alpha(string filedt) := function
   

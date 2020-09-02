@@ -1,8 +1,8 @@
 ﻿IMPORT FraudShared;
 EXPORT Mac_TestRecordID(   
 	string pversion
-	,dataset(FraudShared.Layouts.Base.Main)	pBaseMainFile =	FraudGovPlatform.Files().Base.Main_Orig.Built
-	,dataset(FraudShared.Layouts.Base.Main) pPreviousMain = if(_Flags.FileExists.Base.MainOrigQA,FraudGovPlatform.Files().Base.Main_Orig.QA,DATASET([], FraudShared.Layouts.Base.Main)) 
+	,dataset(FraudShared.Layouts.Base.Main)	pBaseMainFile =	FraudShared.Files().Base.Main.Built
+	,dataset(FraudShared.Layouts.Base.Main) pPreviousMain = FraudShared.Files().Base.Main.QA
 ) := 
 FUNCTION
 	

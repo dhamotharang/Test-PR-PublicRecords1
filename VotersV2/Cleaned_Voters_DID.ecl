@@ -68,5 +68,5 @@ did_add.MAC_Add_SSN_By_DID(Ds_Voters_WithDID, did, ssn, Out_Voters_WithDidSsn)
 
 export Cleaned_Voters_DID := Out_Voters_WithDidSsn 
 //uncomment for testing purposes
-// : persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID', SINGLE)
+: persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID', SINGLE)
 ;

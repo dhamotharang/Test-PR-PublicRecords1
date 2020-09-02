@@ -317,13 +317,13 @@ self := L;
 
 end;
 
-/*jrecs4 := join(distribute(jrecs3,hash(incident_id)),distribute(tcitation(incident_id!='' and person_id not in ['','NULL']),hash(incident_id)),
+jrecs4 := join(distribute(jrecs3,hash(incident_id)),distribute(tcitation(incident_id!='' and person_id not in ['','NULL']),hash(incident_id)),
 							left.incident_id = right.incident_id and
 							left.person_id =right.person_id, 
-							trecs4(left,right),left outer,local);	*/
-jrecs4 := join(distribute(jrecs3,hash(incident_id)),tcitation(incident_id!=''),
-							left.incident_id = right.incident_id,
 							trecs4(left,right),left outer,local);	
+/*jrecs4 := join(distribute(jrecs3,hash(incident_id)),tcitation(incident_id!=''),
+							left.incident_id = right.incident_id,
+							trecs4(left,right),left outer,local);	*/
 //------------------------------------------------------------------------------------------------------------------										
 
 // Property OWNER 
@@ -362,7 +362,7 @@ FLAccidents_Ecrash.macRemoveNulls(updtdCombined,outrecs);
 export cmbnd := dedup(sort(outrecs,record,local),record,local)(trim(agency_id,left,right) not in ['5','6','7']):persist('~thor_data400::persist::ecrash_cmbnd');
 
 //Agency cmbnd file for agency key in Buycrash KY Integration
-FLAccidents_Ecrash.Layout_Infiles_Fixed.agency_cmbnd jagency0(uAgency le, uBillingagencies ri) := transform
+FLAccidents_Ecrash.Layouts.agency_cmbnd jagency0(uAgency le, uBillingagencies ri) := transform
 																																		self.Agency_ori := le.Agency_ori;
 																																		self.Agency_State_abbr := STD.Str.ToUpperCase(trim(le.Agency_State_abbr,left,right));
 																																		self.Agency_Name := STD.Str.ToUpperCase(trim(le.Agency_Name,left,right));

@@ -48,15 +48,15 @@ export proc_build_all(string filedate) := function
 	          sequential(
 						           build_base,
                        build_census,
-                       Scrubs.ScrubsPlus('Voters','Scrubs_Voters','Scrubs_Voters_Base_History','Base_History',filedate,mailTarget),
-                       Scrubs.ScrubsPlus('Voters','Scrubs_Voters','Scrubs_Voters_Base_Reg' ,'Base_Reg' ,filedate,mailTarget),
-										   build_keys,
-										   build_gender,
-										   parallel(update_dops,build_stats),
-										   SampleRecs,
-										   orbit_update,
-										   send_mail('Emerges Voters Build','Base files, keys & stats completed successfully!'),
-											 getretval
+                       // Scrubs.ScrubsPlus('Voters','Scrubs_Voters','Scrubs_Voters_Base_History','Base_History',filedate,mailTarget),
+                       // Scrubs.ScrubsPlus('Voters','Scrubs_Voters','Scrubs_Voters_Base_Reg' ,'Base_Reg' ,filedate,mailTarget),
+										   // build_keys,
+										   // build_gender,
+										   // parallel(update_dops,build_stats),
+										   // SampleRecs,
+										   // orbit_update,
+										   // send_mail('Emerges Voters Build','Base files, keys & stats completed successfully!'),
+											 // getretval
 										   ),
 					 sequential(
 							send_mail('STOP IMMEDIATELY - Emerges Voters Build',

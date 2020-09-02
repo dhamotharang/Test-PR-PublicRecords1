@@ -1,0 +1,88 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_BKMortgage_Release
+FILENAME:BKMortgage_Release
+
+FIELDTYPE:invalid_number:ALLOW(0123456789):
+FIELDTYPE:invalid_alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'):SPACES( <>{}[]-^=!+&,()#.;/)
+FIELDTYPE:invalid_AlphaNum:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'):SPACES( -()#.,/%:&)
+FIELDTYPE:invalid_apn:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789):SPACES( -&,;.:()#*_/+)
+FIELDTYPE:invalid_zip:ALLOW(0123456789):SPACES( _-):LENGTHS(0,4,5)
+FIELDTYPE:invalid_date:ALLOW(0123456789):LENGTHS(0,4,8,10)
+FIELDTYPE:invalid_mers:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789):SPACES( .-) 
+FIELDTYPE:invalid_state:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):LENGTHS(0,2) 
+FIELDTYPE:invalid_name:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'):SPACES( _-&,.():'`#+;"\/*@[]{}%$!|)
+FIELDTYPE:Invalid_RecType:ENUM(P|Q|)
+FIELDTYPE:Invalid_DocType:ENUM(RM|FL|SB|ML|LM|AM|MS|PT|PN|CR|RR|OR|PP|SO|)
+
+FIELD:ln_filedate:LIKE(invalid_date):0,0
+FIELD:bk_infile_type:TYPE(STRING30):0,0
+FIELD:rectype:LIKE(Invalid_RecType):0,0
+FIELD:documenttype:LIKE(Invalid_DocType):0,0
+FIELD:fipscode:LIKE(invalid_number):0,0
+FIELD:mainaddendum:TYPE(STRING1):0,0
+FIELD:releaserecdate:LIKE(invalid_date):0,0
+FIELD:releaseeffecdate:LIKE(invalid_date):0,0
+FIELD:mortgagepayoffdate:LIKE(invalid_date):0,0
+FIELD:releasedoc:TYPE(STRING20):0,0
+FIELD:releasebk:TYPE(STRING10):0,0
+FIELD:releasepg:TYPE(STRING10):0,0
+FIELD:multiplepageimage:TYPE(STRING1):0,0
+FIELD:bkfsimageid:TYPE(STRING50):0,0
+FIELD:origdotrecdate:LIKE(invalid_date):0,0
+FIELD:origdotcontractdate:LIKE(invalid_date):0,0
+FIELD:origdotdoc:TYPE(STRING20):0,0
+FIELD:origdotbk:TYPE(STRING10):0,0
+FIELD:origdotpg:TYPE(STRING10):0,0
+FIELD:origlenderben:LIKE(invalid_name):0,0
+FIELD:origloanamnt:TYPE(STRING10):0,0
+FIELD:loannumber:TYPE(STRING30):0,0
+FIELD:currentlenderben:LIKE(invalid_name):0,0
+FIELD:mers:LIKE(invalid_mers):0,0
+FIELD:mersvalidation:TYPE(STRING1):0,0
+FIELD:mspsvrloan:TYPE(STRING22):0,0
+FIELD:currentlenderpool:TYPE(STRING25):0,0
+FIELD:borrowername:LIKE(invalid_name):0,0
+FIELD:borrmailfulladdress:LIKE(invalid_AlphaNum):0,0
+FIELD:borrmailunit:TYPE(STRING6):0,0
+FIELD:borrmailcity:LIKE(invalid_AlphaNum):0,0
+FIELD:borrmailstate:LIKE(invalid_state):0,0
+FIELD:borrmailzip:LIKE(invalid_zip):0,0
+FIELD:borrmailzip4:LIKE(invalid_zip):0,0
+FIELD:apn:LIKE(invalid_apn):0,0
+FIELD:multiapncode:TYPE(STRING1):0,0
+FIELD:taxacctid:TYPE(STRING45):0,0
+FIELD:propertyfulladd:LIKE(invalid_AlphaNum):0,0
+FIELD:propertyunit:TYPE(STRING16):0,0
+FIELD:propertycity:LIKE(invalid_AlphaNum):0,0
+FIELD:propertystate:LIKE(invalid_state):0,0
+FIELD:propertyzip:LIKE(invalid_zip):0,0
+FIELD:propertyzip4:LIKE(invalid_zip):0,0
+FIELD:dataentrydate:TYPE(STRING8):0,0
+FIELD:dataentryopercode:TYPE(STRING4):0,0
+FIELD:vendorsourcecode:TYPE(STRING3):0,0
+FIELD:hids_recordingflag:TYPE(STRING1):0,0
+FIELD:hids_docnumber:TYPE(STRING9):0,0
+FIELD:transfercertificateoftitle:TYPE(STRING8):0,0
+FIELD:hi_condo_cpr_hpr:TYPE(STRING4):0,0
+FIELD:hi_situs_unit_number:TYPE(STRING10):0,0
+FIELD:hids_previous_docnumber:TYPE(STRING9):0,0
+FIELD:prevtransfercertificateoftitle:TYPE(STRING8):0,0
+FIELD:pid:TYPE(STRING9):0,0
+FIELD:matchedororphan:TYPE(STRING1):0,0
+FIELD:deed_pid:TYPE(STRING9):0,0
+FIELD:sam_pid:TYPE(STRING9):0,0
+FIELD:assessorparcelnumber_matched:TYPE(STRING37):0,0
+FIELD:assessorpropertyfulladd:LIKE(invalid_AlphaNum):0,0
+FIELD:assessorpropertyunittype:TYPE(STRING4):0,0
+FIELD:assessorpropertyunit:TYPE(STRING6):0,0
+FIELD:assessorpropertycity:LIKE(invalid_AlphaNum):0,0
+FIELD:assessorpropertystate:LIKE(invalid_state):0,0
+FIELD:assessorpropertyzip:LIKE(invalid_zip):0,0
+FIELD:assessorpropertyzip4:LIKE(invalid_zip):0,0
+FIELD:assessorpropertyaddrsource:TYPE(STRING1):0,0
+FIELD:raw_file_name:TYPE(STRING100):0,0
+
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

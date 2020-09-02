@@ -3,7 +3,7 @@
 IMPORT std,VotersV2,_Control, tools;
 
 //Date format needs to be YYYYMMDD
-pVersion := '20200619';
+pVersion := '20200902';
 
 #workunit('name','Voters Build '+pVersion);
 #option('multiplePersistInstances',FALSE);
@@ -17,8 +17,8 @@ clear_main := sequential(FileServices.StartSuperFileTransaction(),
 spray_main := VotersV2.fSprayAndPromoteVoters(pVersion);
 					 
 full_build := sequential(           
-           clear_main,
-           spray_main,
+           // clear_main,
+           // spray_main,
 					 VotersV2.proc_build_all(pVersion)
 					 );		
 					 
