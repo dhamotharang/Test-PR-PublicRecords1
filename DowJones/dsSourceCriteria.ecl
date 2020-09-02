@@ -1925,7 +1925,10 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2020/1195 Central African Republic List','1912'},
 {'EC 2020/1130 Libya List','1913'},
 {'EC 2020/1194 Central African Republic List','1914'},
-{'New York State DOCCS Most Wanted','1915'}
+{'New York State DOCCS Most Wanted','1915'},
+{'UN Security Council Vessels Subject to Prohibited Entry into Ports - North Korea List','1916'},
+{'Vessels - EC (CFSP) 2018/293 Democratic People\'s Republic of Korea List Prohibited Entry into Ports,','1917'},
+{'Vessels - EC 2018/286 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1918'}
 
 ],r);
 
