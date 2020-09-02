@@ -1,12 +1,12 @@
 ﻿ 
-EXPORT MAC_PopulationStatistics(infile,Ref='',SRC='',Input_SNAME = '',Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_DERIVED_GENDER = '',Input_PRIM_RANGE = '',Input_PRIM_NAME = '',Input_SEC_RANGE = '',Input_CITY = '',Input_ST = '',Input_ZIP = '',Input_SSN5 = '',Input_SSN4 = '',Input_DOB = '',Input_PHONE = '',Input_DL_STATE = '',Input_DL_NBR = '',Input_SRC = '',Input_SOURCE_RID = '',Input_DT_FIRST_SEEN = '',Input_DT_LAST_SEEN = '',Input_DT_EFFECTIVE_FIRST = '',Input_DT_EFFECTIVE_LAST = '',Input_MAINNAME = '',Input_FULLNAME = '',Input_ADDR1 = '',Input_LOCALE = '',Input_ADDRESS = '',Input_fname2 = '',Input_lname2 = '',OutFile) := MACRO
-  IMPORT SALT37,InsuranceHeader_xLink;
+EXPORT MAC_PopulationStatistics(infile,Ref='',SRC='',Input_SNAME = '',Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_DERIVED_GENDER = '',Input_PRIM_RANGE = '',Input_PRIM_NAME = '',Input_SEC_RANGE = '',Input_CITY = '',Input_ST = '',Input_ZIP = '',Input_SSN5 = '',Input_SSN4 = '',Input_DOB = '',Input_PHONE = '',Input_DL_STATE = '',Input_DL_NBR = '',Input_SRC = '',Input_SOURCE_RID = '',Input_DT_FIRST_SEEN = '',Input_DT_LAST_SEEN = '',Input_DT_EFFECTIVE_FIRST = '',Input_DT_EFFECTIVE_LAST = '',Input_MAINNAME = '',Input_FULLNAME = '',Input_ADDR1 = '',Input_LOCALE = '',Input_ADDRESS = '',Input_fname2 = '',Input_lname2 = '',Input_VIN = '',OutFile) := MACRO
+  IMPORT SALT311,InsuranceHeader_xLink;
   #uniquename(of)
   %of% := RECORD
     #IF (#TEXT(SRC)<>'')
-    SALT37.StrType source;
+    SALT311.StrType source;
     #END
-    SALT37.Str512Type fields;
+    SALT311.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM
@@ -74,7 +74,7 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',SRC='',Input_SNAME = '',Input_FNAM
 +    #IF( #TEXT(Input_ZIP)='' )
       '' 
     #ELSE
-        IF( le.Input_ZIP = (TYPEOF(le.Input_ZIP))'','',':ZIP')
+        IF( NOT EXISTS(le.Input_ZIP(ZIP<>(TYPEOF(le.Input_ZIP.ZIP))'')),'',':ZIP')
     #END
  
 +    #IF( #TEXT(Input_SSN5)='' )
@@ -92,7 +92,7 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',SRC='',Input_SNAME = '',Input_FNAM
 +    #IF( #TEXT(Input_DOB)='' )
       '' 
     #ELSE
-        IF( (unsigned)le.Input_DOB = 0,'', ':DOB(' + SALT37.fn_date_valid_as_text((unsigned)le.Input_DOB) + ')' )
+        IF( (unsigned)le.Input_DOB = 0,'', ':DOB(' + SALT311.fn_date_valid_as_text((unsigned)le.Input_DOB) + ')' )
     #END
  
 +    #IF( #TEXT(Input_PHONE)='' )
@@ -189,6 +189,12 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',SRC='',Input_SNAME = '',Input_FNAM
       '' 
     #ELSE
         IF( le.Input_lname2 = (TYPEOF(le.Input_lname2))'','',':lname2')
+    #END
+ 
++    #IF( #TEXT(Input_VIN)='' )
+      '' 
+    #ELSE
+        IF( le.Input_VIN = (TYPEOF(le.Input_VIN))'','',':VIN')
     #END
 ;
     #IF (#TEXT(SRC)<>'')

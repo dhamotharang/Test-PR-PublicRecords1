@@ -2,10 +2,36 @@
 EXPORT modWsTopology(
 									string p_esp = ''
 									,string p_port = '8010'
+									
 												) := module
 	
 	export vWebService := 'WsTopology';
-
+	
+	// if pythonversion is set to 2
+	// use python2 code else use python3
+	// to allow backward compatibility in code
+	#IF (dops.constants.pythonversion = 2)
+	import Python;
+	export integer fIsNodeUp(STRING ip) := EMBED(Python)
+	import socket
+	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	sock.settimeout(1)
+	result = sock.connect_ex((ip, 7100))
+	sock.close()
+	return result
+	ENDEMBED;
+	#ELSE
+	import Python3;
+	export integer fIsNodeUp(STRING ip) := EMBED(Python3)
+	import socket
+	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	sock.settimeout(1)
+	result = sock.connect_ex((ip, 7100))
+	sock.close()
+	return result
+	ENDEMBED;
+	#END
+	
 	export fTpTargetClusterQuery(
 												string p_type = '' // roxie or thor
 												,string p_targetcluster = '') := function
@@ -80,6 +106,7 @@ EXPORT modWsTopology(
 		end;
 		
 		rParts := record
+			boolean isNodeUp := true;
 			rPartsWithDataset - [dTpTargetClusters, dTpClusterInfo, dTpMachineInfo];
 		end;
 		
@@ -109,7 +136,14 @@ EXPORT modWsTopology(
 		
 		dParts := normalize(dClusterInfo,left.dTpMachineInfo,xMachineInfo(left,right));
 		
-		return dParts;
+		rParts xCheckNodes(dParts l) := transform
+			self.isNodeUp := if (fisNodeUp(l.NetAddress) = 0, true, false);
+			self := l;
+		end;
+		
+		dCheckNodes := project(dParts,xCheckNodes(left));
+		
+		return dCheckNodes;
 		
 	end;
 end;

@@ -1,1074 +1,1059 @@
-﻿IMPORT SALT37;
+﻿IMPORT SALT311;
 EXPORT Fields := MODULE
  
-EXPORT SALT37.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','dt_effective_first','dt_effective_last','process_date','dotid','dotscore','dotweight','empid','empscore','empweight','powid','powscore','powweight','proxid','proxscore','proxweight','selescore','seleweight','orgid','orgscore','orgweight','ultid','ultscore','ultweight','record_type','EFX_ID','EFX_NAME','EFX_LEGAL_NAME','EFX_ADDRESS','EFX_CITY','EFX_STATE','EFX_STATEC','EFX_ZIPCODE','EFX_ZIP4','EFX_LAT','EFX_LON','EFX_GEOPREC','EFX_REGION','EFX_CTRYISOCD','EFX_CTRYNUM','EFX_CTRYNAME','EFX_COUNTYNM','EFX_COUNTY','EFX_CMSA','EFX_CMSADESC','EFX_SOHO','EFX_BIZ','EFX_RES','EFX_CMRA','EFX_CONGRESS','EFX_SECADR','EFX_SECCTY','EFX_SECSTAT','EFX_STATEC2','EFX_SECZIP','EFX_SECZIP4','EFX_SECLAT','EFX_SECLON','EFX_SECGEOPREC','EFX_SECREGION','EFX_SECCTRYISOCD','EFX_SECCTRYNUM','EFX_SECCTRYNAME','EFX_CTRYTELCD','EFX_PHONE','EFX_FAXPHONE','EFX_BUSSTAT','EFX_BUSSTATCD','EFX_WEB','EFX_YREST','EFX_CORPEMPCNT','EFX_LOCEMPCNT','EFX_CORPEMPCD','EFX_LOCEMPCD','EFX_CORPAMOUNT','EFX_CORPAMOUNTCD','EFX_CORPAMOUNTTP','EFX_CORPAMOUNTPREC','EFX_LOCAMOUNT','EFX_LOCAMOUNTCD','EFX_LOCAMOUNTTP','EFX_LOCAMOUNTPREC','EFX_PUBLIC','EFX_STKEXC','EFX_TCKSYM','EFX_PRIMSIC','EFX_SECSIC1','EFX_SECSIC2','EFX_SECSIC3','EFX_SECSIC4','EFX_PRIMSICDESC','EFX_SECSICDESC1','EFX_SECSICDESC2','EFX_SECSICDESC3','EFX_SECSICDESC4','EFX_PRIMNAICSCODE','EFX_SECNAICS1','EFX_SECNAICS2','EFX_SECNAICS3','EFX_SECNAICS4','EFX_PRIMNAICSDESC','EFX_SECNAICSDESC1','EFX_SECNAICSDESC2','EFX_SECNAICSDESC3','EFX_SECNAICSDESC4','EFX_DEAD','EFX_DEADDT','EFX_MRKT_TELEVER','EFX_MRKT_TELESCORE','EFX_MRKT_TOTALSCORE','EFX_MRKT_TOTALIND','EFX_MRKT_VACANT','EFX_MRKT_SEASONAL','EFX_MBE','EFX_WBE','EFX_MWBE','EFX_SDB','EFX_HUBZONE','EFX_DBE','EFX_VET','EFX_DVET','EFX_8a','EFX_8aEXPDT','EFX_DIS','EFX_SBE','EFX_BUSSIZE','EFX_LBE','EFX_GOV','EFX_FGOV','EFX_GOV1057','EFX_NONPROFIT','EFX_MERCTYPE','EFX_HBCU','EFX_GAYLESBIAN','EFX_WSBE','EFX_VSBE','EFX_DVSBE','EFX_MWBESTATUS','EFX_NMSDC','EFX_WBENC','EFX_CA_PUC','EFX_TX_HUB','EFX_TX_HUBCERTNUM','EFX_GSAX','EFX_CALTRANS','EFX_EDU','EFX_MI','EFX_ANC','AT_CERT1','AT_CERT2','AT_CERT3','AT_CERT4','AT_CERT5','AT_CERT6','AT_CERT7','AT_CERT8','AT_CERT9','AT_CERT10','AT_CERTDESC1','AT_CERTDESC2','AT_CERTDESC3','AT_CERTDESC4','AT_CERTDESC5','AT_CERTDESC6','AT_CERTDESC7','AT_CERTDESC8','AT_CERTDESC9','AT_CERTDESC10','AT_CERTSRC1','AT_CERTSRC2','AT_CERTSRC3','AT_CERTSRC4','AT_CERTSRC5','AT_CERTSRC6','AT_CERTSRC7','AT_CERTSRC8','AT_CERTSRC9','AT_CERTSRC10','AT_CERTLEV1','AT_CERTLEV2','AT_CERTLEV3','AT_CERTLEV4','AT_CERTLEV5','AT_CERTLEV6','AT_CERTLEV7','AT_CERTLEV8','AT_CERTLEV9','AT_CERTLEV10','AT_CERTNUM1','AT_CERTNUM2','AT_CERTNUM3','AT_CERTNUM4','AT_CERTNUM5','AT_CERTNUM6','AT_CERTNUM7','AT_CERTNUM8','AT_CERTNUM9','AT_CERTNUM10','AT_CERTEXP1','AT_CERTEXP2','AT_CERTEXP3','AT_CERTEXP4','AT_CERTEXP5','AT_CERTEXP6','AT_CERTEXP7','AT_CERTEXP8','AT_CERTEXP9','AT_CERTEXP10','EFX_EXTRACT_DATE','EFX_MERCHANT_ID','EFX_PROJECT_ID','EFX_FOREIGN','Record_Update_Refresh_Date','EFX_DATE_CREATED','normCompany_Name','normCompany_Type','Norm_Geo_Precision','Exploded_Desc_Corporate_Amount_Precision','Exploded_Desc_Location_Amount_Precision','Exploded_Desc_Public_Co_Indicator','Exploded_Desc_Stock_Exchange','Exploded_Desc_Telemarketablity_Score','Exploded_Desc_Telemarketablity_Total_Indicator','Exploded_Desc_Telemarketablity_Total_Score','Exploded_Desc_Government1057_Entity','Exploded_Desc_Merchant_Type','Exploded_Desc_Busstatcd','Exploded_Desc_CMSA','Exploded_Desc_Corpamountcd','Exploded_Desc_Corpamountprec','Exploded_Desc_Corpamounttp','Exploded_Desc_Corpempcd','Exploded_Desc_Ctrytelcd','NormAddress_Type','Norm_Address','Norm_City','Norm_State','Norm_StateC2','Norm_Zip','Norm_Zip4','Norm_Lat','Norm_Lon','Norm_Geoprec','Norm_Region','Norm_Ctryisocd','Norm_Ctrynum','Norm_Ctryname','clean_company_name','clean_phone','clean_secondary_phone','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','cart','cr_sort_sz');
-EXPORT FieldNum(SALT37.StrType fn) := CASE(fn,'dt_first_seen' => 0,'dt_last_seen' => 1,'dt_vendor_first_reported' => 2,'dt_vendor_last_reported' => 3,'dt_effective_first' => 4,'dt_effective_last' => 5,'process_date' => 6,'dotid' => 7,'dotscore' => 8,'dotweight' => 9,'empid' => 10,'empscore' => 11,'empweight' => 12,'powid' => 13,'powscore' => 14,'powweight' => 15,'proxid' => 16,'proxscore' => 17,'proxweight' => 18,'selescore' => 19,'seleweight' => 20,'orgid' => 21,'orgscore' => 22,'orgweight' => 23,'ultid' => 24,'ultscore' => 25,'ultweight' => 26,'record_type' => 27,'EFX_ID' => 28,'EFX_NAME' => 29,'EFX_LEGAL_NAME' => 30,'EFX_ADDRESS' => 31,'EFX_CITY' => 32,'EFX_STATE' => 33,'EFX_STATEC' => 34,'EFX_ZIPCODE' => 35,'EFX_ZIP4' => 36,'EFX_LAT' => 37,'EFX_LON' => 38,'EFX_GEOPREC' => 39,'EFX_REGION' => 40,'EFX_CTRYISOCD' => 41,'EFX_CTRYNUM' => 42,'EFX_CTRYNAME' => 43,'EFX_COUNTYNM' => 44,'EFX_COUNTY' => 45,'EFX_CMSA' => 46,'EFX_CMSADESC' => 47,'EFX_SOHO' => 48,'EFX_BIZ' => 49,'EFX_RES' => 50,'EFX_CMRA' => 51,'EFX_CONGRESS' => 52,'EFX_SECADR' => 53,'EFX_SECCTY' => 54,'EFX_SECSTAT' => 55,'EFX_STATEC2' => 56,'EFX_SECZIP' => 57,'EFX_SECZIP4' => 58,'EFX_SECLAT' => 59,'EFX_SECLON' => 60,'EFX_SECGEOPREC' => 61,'EFX_SECREGION' => 62,'EFX_SECCTRYISOCD' => 63,'EFX_SECCTRYNUM' => 64,'EFX_SECCTRYNAME' => 65,'EFX_CTRYTELCD' => 66,'EFX_PHONE' => 67,'EFX_FAXPHONE' => 68,'EFX_BUSSTAT' => 69,'EFX_BUSSTATCD' => 70,'EFX_WEB' => 71,'EFX_YREST' => 72,'EFX_CORPEMPCNT' => 73,'EFX_LOCEMPCNT' => 74,'EFX_CORPEMPCD' => 75,'EFX_LOCEMPCD' => 76,'EFX_CORPAMOUNT' => 77,'EFX_CORPAMOUNTCD' => 78,'EFX_CORPAMOUNTTP' => 79,'EFX_CORPAMOUNTPREC' => 80,'EFX_LOCAMOUNT' => 81,'EFX_LOCAMOUNTCD' => 82,'EFX_LOCAMOUNTTP' => 83,'EFX_LOCAMOUNTPREC' => 84,'EFX_PUBLIC' => 85,'EFX_STKEXC' => 86,'EFX_TCKSYM' => 87,'EFX_PRIMSIC' => 88,'EFX_SECSIC1' => 89,'EFX_SECSIC2' => 90,'EFX_SECSIC3' => 91,'EFX_SECSIC4' => 92,'EFX_PRIMSICDESC' => 93,'EFX_SECSICDESC1' => 94,'EFX_SECSICDESC2' => 95,'EFX_SECSICDESC3' => 96,'EFX_SECSICDESC4' => 97,'EFX_PRIMNAICSCODE' => 98,'EFX_SECNAICS1' => 99,'EFX_SECNAICS2' => 100,'EFX_SECNAICS3' => 101,'EFX_SECNAICS4' => 102,'EFX_PRIMNAICSDESC' => 103,'EFX_SECNAICSDESC1' => 104,'EFX_SECNAICSDESC2' => 105,'EFX_SECNAICSDESC3' => 106,'EFX_SECNAICSDESC4' => 107,'EFX_DEAD' => 108,'EFX_DEADDT' => 109,'EFX_MRKT_TELEVER' => 110,'EFX_MRKT_TELESCORE' => 111,'EFX_MRKT_TOTALSCORE' => 112,'EFX_MRKT_TOTALIND' => 113,'EFX_MRKT_VACANT' => 114,'EFX_MRKT_SEASONAL' => 115,'EFX_MBE' => 116,'EFX_WBE' => 117,'EFX_MWBE' => 118,'EFX_SDB' => 119,'EFX_HUBZONE' => 120,'EFX_DBE' => 121,'EFX_VET' => 122,'EFX_DVET' => 123,'EFX_8a' => 124,'EFX_8aEXPDT' => 125,'EFX_DIS' => 126,'EFX_SBE' => 127,'EFX_BUSSIZE' => 128,'EFX_LBE' => 129,'EFX_GOV' => 130,'EFX_FGOV' => 131,'EFX_GOV1057' => 132,'EFX_NONPROFIT' => 133,'EFX_MERCTYPE' => 134,'EFX_HBCU' => 135,'EFX_GAYLESBIAN' => 136,'EFX_WSBE' => 137,'EFX_VSBE' => 138,'EFX_DVSBE' => 139,'EFX_MWBESTATUS' => 140,'EFX_NMSDC' => 141,'EFX_WBENC' => 142,'EFX_CA_PUC' => 143,'EFX_TX_HUB' => 144,'EFX_TX_HUBCERTNUM' => 145,'EFX_GSAX' => 146,'EFX_CALTRANS' => 147,'EFX_EDU' => 148,'EFX_MI' => 149,'EFX_ANC' => 150,'AT_CERT1' => 151,'AT_CERT2' => 152,'AT_CERT3' => 153,'AT_CERT4' => 154,'AT_CERT5' => 155,'AT_CERT6' => 156,'AT_CERT7' => 157,'AT_CERT8' => 158,'AT_CERT9' => 159,'AT_CERT10' => 160,'AT_CERTDESC1' => 161,'AT_CERTDESC2' => 162,'AT_CERTDESC3' => 163,'AT_CERTDESC4' => 164,'AT_CERTDESC5' => 165,'AT_CERTDESC6' => 166,'AT_CERTDESC7' => 167,'AT_CERTDESC8' => 168,'AT_CERTDESC9' => 169,'AT_CERTDESC10' => 170,'AT_CERTSRC1' => 171,'AT_CERTSRC2' => 172,'AT_CERTSRC3' => 173,'AT_CERTSRC4' => 174,'AT_CERTSRC5' => 175,'AT_CERTSRC6' => 176,'AT_CERTSRC7' => 177,'AT_CERTSRC8' => 178,'AT_CERTSRC9' => 179,'AT_CERTSRC10' => 180,'AT_CERTLEV1' => 181,'AT_CERTLEV2' => 182,'AT_CERTLEV3' => 183,'AT_CERTLEV4' => 184,'AT_CERTLEV5' => 185,'AT_CERTLEV6' => 186,'AT_CERTLEV7' => 187,'AT_CERTLEV8' => 188,'AT_CERTLEV9' => 189,'AT_CERTLEV10' => 190,'AT_CERTNUM1' => 191,'AT_CERTNUM2' => 192,'AT_CERTNUM3' => 193,'AT_CERTNUM4' => 194,'AT_CERTNUM5' => 195,'AT_CERTNUM6' => 196,'AT_CERTNUM7' => 197,'AT_CERTNUM8' => 198,'AT_CERTNUM9' => 199,'AT_CERTNUM10' => 200,'AT_CERTEXP1' => 201,'AT_CERTEXP2' => 202,'AT_CERTEXP3' => 203,'AT_CERTEXP4' => 204,'AT_CERTEXP5' => 205,'AT_CERTEXP6' => 206,'AT_CERTEXP7' => 207,'AT_CERTEXP8' => 208,'AT_CERTEXP9' => 209,'AT_CERTEXP10' => 210,'EFX_EXTRACT_DATE' => 211,'EFX_MERCHANT_ID' => 212,'EFX_PROJECT_ID' => 213,'EFX_FOREIGN' => 214,'Record_Update_Refresh_Date' => 215,'EFX_DATE_CREATED' => 216,'normCompany_Name' => 217,'normCompany_Type' => 218,'Norm_Geo_Precision' => 219,'Exploded_Desc_Corporate_Amount_Precision' => 220,'Exploded_Desc_Location_Amount_Precision' => 221,'Exploded_Desc_Public_Co_Indicator' => 222,'Exploded_Desc_Stock_Exchange' => 223,'Exploded_Desc_Telemarketablity_Score' => 224,'Exploded_Desc_Telemarketablity_Total_Indicator' => 225,'Exploded_Desc_Telemarketablity_Total_Score' => 226,'Exploded_Desc_Government1057_Entity' => 227,'Exploded_Desc_Merchant_Type' => 228,'Exploded_Desc_Busstatcd' => 229,'Exploded_Desc_CMSA' => 230,'Exploded_Desc_Corpamountcd' => 231,'Exploded_Desc_Corpamountprec' => 232,'Exploded_Desc_Corpamounttp' => 233,'Exploded_Desc_Corpempcd' => 234,'Exploded_Desc_Ctrytelcd' => 235,'NormAddress_Type' => 236,'Norm_Address' => 237,'Norm_City' => 238,'Norm_State' => 239,'Norm_StateC2' => 240,'Norm_Zip' => 241,'Norm_Zip4' => 242,'Norm_Lat' => 243,'Norm_Lon' => 244,'Norm_Geoprec' => 245,'Norm_Region' => 246,'Norm_Ctryisocd' => 247,'Norm_Ctrynum' => 248,'Norm_Ctryname' => 249,'clean_company_name' => 250,'clean_phone' => 251,'clean_secondary_phone' => 252,'prim_range' => 253,'predir' => 254,'prim_name' => 255,'addr_suffix' => 256,'postdir' => 257,'unit_desig' => 258,'sec_range' => 259,'p_city_name' => 260,'v_city_name' => 261,'st' => 262,'cart' => 263,'cr_sort_sz' => 264,0);
+EXPORT NumFields := 260;
+ 
+EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','dt_effective_first','dt_effective_last','process_date','dotid','dotscore','dotweight','empid','empscore','empweight','powid','powscore','powweight','proxid','proxscore','proxweight','selescore','seleweight','orgid','orgscore','orgweight','ultid','ultscore','ultweight','record_type','EFX_ID','EFX_NAME','EFX_LEGAL_NAME','EFX_ADDRESS','EFX_CITY','EFX_STATE','EFX_STATEC','EFX_ZIPCODE','EFX_ZIP4','EFX_LAT','EFX_LON','EFX_GEOPREC','EFX_REGION','EFX_CTRYISOCD','EFX_CTRYNUM','EFX_CTRYNAME','EFX_COUNTYNM','EFX_COUNTY','EFX_CMSA','EFX_CMSADESC','EFX_SOHO','EFX_BIZ','EFX_RES','EFX_CMRA','EFX_CONGRESS','EFX_SECADR','EFX_SECCTY','EFX_SECSTAT','EFX_STATEC2','EFX_SECZIP','EFX_SECZIP4','EFX_SECLAT','EFX_SECLON','EFX_SECGEOPREC','EFX_SECREGION','EFX_SECCTRYISOCD','EFX_SECCTRYNUM','EFX_SECCTRYNAME','EFX_CTRYTELCD','EFX_PHONE','EFX_FAXPHONE','EFX_BUSSTAT','EFX_BUSSTATCD','EFX_WEB','EFX_YREST','EFX_CORPEMPCNT','EFX_LOCEMPCNT','EFX_CORPEMPCD','EFX_LOCEMPCD','EFX_CORPAMOUNT','EFX_CORPAMOUNTCD','EFX_CORPAMOUNTTP','EFX_CORPAMOUNTPREC','EFX_LOCAMOUNT','EFX_LOCAMOUNTCD','EFX_LOCAMOUNTTP','EFX_LOCAMOUNTPREC','EFX_PUBLIC','EFX_STKEXC','EFX_TCKSYM','EFX_PRIMSIC','EFX_SECSIC1','EFX_SECSIC2','EFX_SECSIC3','EFX_SECSIC4','EFX_PRIMSICDESC','EFX_SECSICDESC1','EFX_SECSICDESC2','EFX_SECSICDESC3','EFX_SECSICDESC4','EFX_PRIMNAICSCODE','EFX_SECNAICS1','EFX_SECNAICS2','EFX_SECNAICS3','EFX_SECNAICS4','EFX_PRIMNAICSDESC','EFX_SECNAICSDESC1','EFX_SECNAICSDESC2','EFX_SECNAICSDESC3','EFX_SECNAICSDESC4','EFX_DEAD','EFX_DEADDT','EFX_MRKT_TELEVER','EFX_MRKT_TELESCORE','EFX_MRKT_TOTALSCORE','EFX_MRKT_TOTALIND','EFX_MRKT_VACANT','EFX_MRKT_SEASONAL','EFX_MBE','EFX_WBE','EFX_MWBE','EFX_SDB','EFX_HUBZONE','EFX_DBE','EFX_VET','EFX_DVET','EFX_8a','EFX_8aEXPDT','EFX_DIS','EFX_SBE','EFX_BUSSIZE','EFX_LBE','EFX_GOV','EFX_FGOV','EFX_GOV1057','EFX_NONPROFIT','EFX_MERCTYPE','EFX_HBCU','EFX_GAYLESBIAN','EFX_WSBE','EFX_VSBE','EFX_DVSBE','EFX_MWBESTATUS','EFX_NMSDC','EFX_WBENC','EFX_CA_PUC','EFX_TX_HUB','EFX_TX_HUBCERTNUM','EFX_GSAX','EFX_CALTRANS','EFX_EDU','EFX_MI','EFX_ANC','AT_CERT1','AT_CERT2','AT_CERT3','AT_CERT4','AT_CERT5','AT_CERT6','AT_CERT7','AT_CERT8','AT_CERT9','AT_CERT10','AT_CERTDESC1','AT_CERTDESC2','AT_CERTDESC3','AT_CERTDESC4','AT_CERTDESC5','AT_CERTDESC6','AT_CERTDESC7','AT_CERTDESC8','AT_CERTDESC9','AT_CERTDESC10','AT_CERTSRC1','AT_CERTSRC2','AT_CERTSRC3','AT_CERTSRC4','AT_CERTSRC5','AT_CERTSRC6','AT_CERTSRC7','AT_CERTSRC8','AT_CERTSRC9','AT_CERTSRC10','AT_CERTLEV1','AT_CERTLEV2','AT_CERTLEV3','AT_CERTLEV4','AT_CERTLEV5','AT_CERTLEV6','AT_CERTLEV7','AT_CERTLEV8','AT_CERTLEV9','AT_CERTLEV10','AT_CERTNUM1','AT_CERTNUM2','AT_CERTNUM3','AT_CERTNUM4','AT_CERTNUM5','AT_CERTNUM6','AT_CERTNUM7','AT_CERTNUM8','AT_CERTNUM9','AT_CERTNUM10','AT_CERTEXP1','AT_CERTEXP2','AT_CERTEXP3','AT_CERTEXP4','AT_CERTEXP5','AT_CERTEXP6','AT_CERTEXP7','AT_CERTEXP8','AT_CERTEXP9','AT_CERTEXP10','EFX_FOREIGN','normCompany_Name','normCompany_Type','Norm_Geo_Precision','Exploded_Desc_Corporate_Amount_Precision','Exploded_Desc_Location_Amount_Precision','Exploded_Desc_Public_Co_Indicator','Exploded_Desc_Stock_Exchange','Exploded_Desc_Telemarketablity_Score','Exploded_Desc_Telemarketablity_Total_Indicator','Exploded_Desc_Telemarketablity_Total_Score','Exploded_Desc_Government1057_Entity','Exploded_Desc_Merchant_Type','Exploded_Desc_Busstatcd','Exploded_Desc_CMSA','Exploded_Desc_Corpamountcd','Exploded_Desc_Corpamountprec','Exploded_Desc_Corpamounttp','Exploded_Desc_Corpempcd','Exploded_Desc_Ctrytelcd','NormAddress_Type','Norm_Address','Norm_City','Norm_State','Norm_StateC2','Norm_Zip','Norm_Zip4','Norm_Lat','Norm_Lon','Norm_Geoprec','Norm_Region','Norm_Ctryisocd','Norm_Ctrynum','Norm_Ctryname','clean_company_name','clean_phone','clean_secondary_phone','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','cart','cr_sort_sz');
+EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','dt_effective_first','dt_effective_last','process_date','dotid','dotscore','dotweight','empid','empscore','empweight','powid','powscore','powweight','proxid','proxscore','proxweight','selescore','seleweight','orgid','orgscore','orgweight','ultid','ultscore','ultweight','record_type','EFX_ID','EFX_NAME','EFX_LEGAL_NAME','EFX_ADDRESS','EFX_CITY','EFX_STATE','EFX_STATEC','EFX_ZIPCODE','EFX_ZIP4','EFX_LAT','EFX_LON','EFX_GEOPREC','EFX_REGION','EFX_CTRYISOCD','EFX_CTRYNUM','EFX_CTRYNAME','EFX_COUNTYNM','EFX_COUNTY','EFX_CMSA','EFX_CMSADESC','EFX_SOHO','EFX_BIZ','EFX_RES','EFX_CMRA','EFX_CONGRESS','EFX_SECADR','EFX_SECCTY','EFX_SECSTAT','EFX_STATEC2','EFX_SECZIP','EFX_SECZIP4','EFX_SECLAT','EFX_SECLON','EFX_SECGEOPREC','EFX_SECREGION','EFX_SECCTRYISOCD','EFX_SECCTRYNUM','EFX_SECCTRYNAME','EFX_CTRYTELCD','EFX_PHONE','EFX_FAXPHONE','EFX_BUSSTAT','EFX_BUSSTATCD','EFX_WEB','EFX_YREST','EFX_CORPEMPCNT','EFX_LOCEMPCNT','EFX_CORPEMPCD','EFX_LOCEMPCD','EFX_CORPAMOUNT','EFX_CORPAMOUNTCD','EFX_CORPAMOUNTTP','EFX_CORPAMOUNTPREC','EFX_LOCAMOUNT','EFX_LOCAMOUNTCD','EFX_LOCAMOUNTTP','EFX_LOCAMOUNTPREC','EFX_PUBLIC','EFX_STKEXC','EFX_TCKSYM','EFX_PRIMSIC','EFX_SECSIC1','EFX_SECSIC2','EFX_SECSIC3','EFX_SECSIC4','EFX_PRIMSICDESC','EFX_SECSICDESC1','EFX_SECSICDESC2','EFX_SECSICDESC3','EFX_SECSICDESC4','EFX_PRIMNAICSCODE','EFX_SECNAICS1','EFX_SECNAICS2','EFX_SECNAICS3','EFX_SECNAICS4','EFX_PRIMNAICSDESC','EFX_SECNAICSDESC1','EFX_SECNAICSDESC2','EFX_SECNAICSDESC3','EFX_SECNAICSDESC4','EFX_DEAD','EFX_DEADDT','EFX_MRKT_TELEVER','EFX_MRKT_TELESCORE','EFX_MRKT_TOTALSCORE','EFX_MRKT_TOTALIND','EFX_MRKT_VACANT','EFX_MRKT_SEASONAL','EFX_MBE','EFX_WBE','EFX_MWBE','EFX_SDB','EFX_HUBZONE','EFX_DBE','EFX_VET','EFX_DVET','EFX_8a','EFX_8aEXPDT','EFX_DIS','EFX_SBE','EFX_BUSSIZE','EFX_LBE','EFX_GOV','EFX_FGOV','EFX_GOV1057','EFX_NONPROFIT','EFX_MERCTYPE','EFX_HBCU','EFX_GAYLESBIAN','EFX_WSBE','EFX_VSBE','EFX_DVSBE','EFX_MWBESTATUS','EFX_NMSDC','EFX_WBENC','EFX_CA_PUC','EFX_TX_HUB','EFX_TX_HUBCERTNUM','EFX_GSAX','EFX_CALTRANS','EFX_EDU','EFX_MI','EFX_ANC','AT_CERT1','AT_CERT2','AT_CERT3','AT_CERT4','AT_CERT5','AT_CERT6','AT_CERT7','AT_CERT8','AT_CERT9','AT_CERT10','AT_CERTDESC1','AT_CERTDESC2','AT_CERTDESC3','AT_CERTDESC4','AT_CERTDESC5','AT_CERTDESC6','AT_CERTDESC7','AT_CERTDESC8','AT_CERTDESC9','AT_CERTDESC10','AT_CERTSRC1','AT_CERTSRC2','AT_CERTSRC3','AT_CERTSRC4','AT_CERTSRC5','AT_CERTSRC6','AT_CERTSRC7','AT_CERTSRC8','AT_CERTSRC9','AT_CERTSRC10','AT_CERTLEV1','AT_CERTLEV2','AT_CERTLEV3','AT_CERTLEV4','AT_CERTLEV5','AT_CERTLEV6','AT_CERTLEV7','AT_CERTLEV8','AT_CERTLEV9','AT_CERTLEV10','AT_CERTNUM1','AT_CERTNUM2','AT_CERTNUM3','AT_CERTNUM4','AT_CERTNUM5','AT_CERTNUM6','AT_CERTNUM7','AT_CERTNUM8','AT_CERTNUM9','AT_CERTNUM10','AT_CERTEXP1','AT_CERTEXP2','AT_CERTEXP3','AT_CERTEXP4','AT_CERTEXP5','AT_CERTEXP6','AT_CERTEXP7','AT_CERTEXP8','AT_CERTEXP9','AT_CERTEXP10','EFX_FOREIGN','normCompany_Name','normCompany_Type','Norm_Geo_Precision','Exploded_Desc_Corporate_Amount_Precision','Exploded_Desc_Location_Amount_Precision','Exploded_Desc_Public_Co_Indicator','Exploded_Desc_Stock_Exchange','Exploded_Desc_Telemarketablity_Score','Exploded_Desc_Telemarketablity_Total_Indicator','Exploded_Desc_Telemarketablity_Total_Score','Exploded_Desc_Government1057_Entity','Exploded_Desc_Merchant_Type','Exploded_Desc_Busstatcd','Exploded_Desc_CMSA','Exploded_Desc_Corpamountcd','Exploded_Desc_Corpamountprec','Exploded_Desc_Corpamounttp','Exploded_Desc_Corpempcd','Exploded_Desc_Ctrytelcd','NormAddress_Type','Norm_Address','Norm_City','Norm_State','Norm_StateC2','Norm_Zip','Norm_Zip4','Norm_Lat','Norm_Lon','Norm_Geoprec','Norm_Region','Norm_Ctryisocd','Norm_Ctrynum','Norm_Ctryname','clean_company_name','clean_phone','clean_secondary_phone','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','cart','cr_sort_sz');
+EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'dt_first_seen' => 0,'dt_last_seen' => 1,'dt_vendor_first_reported' => 2,'dt_vendor_last_reported' => 3,'dt_effective_first' => 4,'dt_effective_last' => 5,'process_date' => 6,'dotid' => 7,'dotscore' => 8,'dotweight' => 9,'empid' => 10,'empscore' => 11,'empweight' => 12,'powid' => 13,'powscore' => 14,'powweight' => 15,'proxid' => 16,'proxscore' => 17,'proxweight' => 18,'selescore' => 19,'seleweight' => 20,'orgid' => 21,'orgscore' => 22,'orgweight' => 23,'ultid' => 24,'ultscore' => 25,'ultweight' => 26,'record_type' => 27,'EFX_ID' => 28,'EFX_NAME' => 29,'EFX_LEGAL_NAME' => 30,'EFX_ADDRESS' => 31,'EFX_CITY' => 32,'EFX_STATE' => 33,'EFX_STATEC' => 34,'EFX_ZIPCODE' => 35,'EFX_ZIP4' => 36,'EFX_LAT' => 37,'EFX_LON' => 38,'EFX_GEOPREC' => 39,'EFX_REGION' => 40,'EFX_CTRYISOCD' => 41,'EFX_CTRYNUM' => 42,'EFX_CTRYNAME' => 43,'EFX_COUNTYNM' => 44,'EFX_COUNTY' => 45,'EFX_CMSA' => 46,'EFX_CMSADESC' => 47,'EFX_SOHO' => 48,'EFX_BIZ' => 49,'EFX_RES' => 50,'EFX_CMRA' => 51,'EFX_CONGRESS' => 52,'EFX_SECADR' => 53,'EFX_SECCTY' => 54,'EFX_SECSTAT' => 55,'EFX_STATEC2' => 56,'EFX_SECZIP' => 57,'EFX_SECZIP4' => 58,'EFX_SECLAT' => 59,'EFX_SECLON' => 60,'EFX_SECGEOPREC' => 61,'EFX_SECREGION' => 62,'EFX_SECCTRYISOCD' => 63,'EFX_SECCTRYNUM' => 64,'EFX_SECCTRYNAME' => 65,'EFX_CTRYTELCD' => 66,'EFX_PHONE' => 67,'EFX_FAXPHONE' => 68,'EFX_BUSSTAT' => 69,'EFX_BUSSTATCD' => 70,'EFX_WEB' => 71,'EFX_YREST' => 72,'EFX_CORPEMPCNT' => 73,'EFX_LOCEMPCNT' => 74,'EFX_CORPEMPCD' => 75,'EFX_LOCEMPCD' => 76,'EFX_CORPAMOUNT' => 77,'EFX_CORPAMOUNTCD' => 78,'EFX_CORPAMOUNTTP' => 79,'EFX_CORPAMOUNTPREC' => 80,'EFX_LOCAMOUNT' => 81,'EFX_LOCAMOUNTCD' => 82,'EFX_LOCAMOUNTTP' => 83,'EFX_LOCAMOUNTPREC' => 84,'EFX_PUBLIC' => 85,'EFX_STKEXC' => 86,'EFX_TCKSYM' => 87,'EFX_PRIMSIC' => 88,'EFX_SECSIC1' => 89,'EFX_SECSIC2' => 90,'EFX_SECSIC3' => 91,'EFX_SECSIC4' => 92,'EFX_PRIMSICDESC' => 93,'EFX_SECSICDESC1' => 94,'EFX_SECSICDESC2' => 95,'EFX_SECSICDESC3' => 96,'EFX_SECSICDESC4' => 97,'EFX_PRIMNAICSCODE' => 98,'EFX_SECNAICS1' => 99,'EFX_SECNAICS2' => 100,'EFX_SECNAICS3' => 101,'EFX_SECNAICS4' => 102,'EFX_PRIMNAICSDESC' => 103,'EFX_SECNAICSDESC1' => 104,'EFX_SECNAICSDESC2' => 105,'EFX_SECNAICSDESC3' => 106,'EFX_SECNAICSDESC4' => 107,'EFX_DEAD' => 108,'EFX_DEADDT' => 109,'EFX_MRKT_TELEVER' => 110,'EFX_MRKT_TELESCORE' => 111,'EFX_MRKT_TOTALSCORE' => 112,'EFX_MRKT_TOTALIND' => 113,'EFX_MRKT_VACANT' => 114,'EFX_MRKT_SEASONAL' => 115,'EFX_MBE' => 116,'EFX_WBE' => 117,'EFX_MWBE' => 118,'EFX_SDB' => 119,'EFX_HUBZONE' => 120,'EFX_DBE' => 121,'EFX_VET' => 122,'EFX_DVET' => 123,'EFX_8a' => 124,'EFX_8aEXPDT' => 125,'EFX_DIS' => 126,'EFX_SBE' => 127,'EFX_BUSSIZE' => 128,'EFX_LBE' => 129,'EFX_GOV' => 130,'EFX_FGOV' => 131,'EFX_GOV1057' => 132,'EFX_NONPROFIT' => 133,'EFX_MERCTYPE' => 134,'EFX_HBCU' => 135,'EFX_GAYLESBIAN' => 136,'EFX_WSBE' => 137,'EFX_VSBE' => 138,'EFX_DVSBE' => 139,'EFX_MWBESTATUS' => 140,'EFX_NMSDC' => 141,'EFX_WBENC' => 142,'EFX_CA_PUC' => 143,'EFX_TX_HUB' => 144,'EFX_TX_HUBCERTNUM' => 145,'EFX_GSAX' => 146,'EFX_CALTRANS' => 147,'EFX_EDU' => 148,'EFX_MI' => 149,'EFX_ANC' => 150,'AT_CERT1' => 151,'AT_CERT2' => 152,'AT_CERT3' => 153,'AT_CERT4' => 154,'AT_CERT5' => 155,'AT_CERT6' => 156,'AT_CERT7' => 157,'AT_CERT8' => 158,'AT_CERT9' => 159,'AT_CERT10' => 160,'AT_CERTDESC1' => 161,'AT_CERTDESC2' => 162,'AT_CERTDESC3' => 163,'AT_CERTDESC4' => 164,'AT_CERTDESC5' => 165,'AT_CERTDESC6' => 166,'AT_CERTDESC7' => 167,'AT_CERTDESC8' => 168,'AT_CERTDESC9' => 169,'AT_CERTDESC10' => 170,'AT_CERTSRC1' => 171,'AT_CERTSRC2' => 172,'AT_CERTSRC3' => 173,'AT_CERTSRC4' => 174,'AT_CERTSRC5' => 175,'AT_CERTSRC6' => 176,'AT_CERTSRC7' => 177,'AT_CERTSRC8' => 178,'AT_CERTSRC9' => 179,'AT_CERTSRC10' => 180,'AT_CERTLEV1' => 181,'AT_CERTLEV2' => 182,'AT_CERTLEV3' => 183,'AT_CERTLEV4' => 184,'AT_CERTLEV5' => 185,'AT_CERTLEV6' => 186,'AT_CERTLEV7' => 187,'AT_CERTLEV8' => 188,'AT_CERTLEV9' => 189,'AT_CERTLEV10' => 190,'AT_CERTNUM1' => 191,'AT_CERTNUM2' => 192,'AT_CERTNUM3' => 193,'AT_CERTNUM4' => 194,'AT_CERTNUM5' => 195,'AT_CERTNUM6' => 196,'AT_CERTNUM7' => 197,'AT_CERTNUM8' => 198,'AT_CERTNUM9' => 199,'AT_CERTNUM10' => 200,'AT_CERTEXP1' => 201,'AT_CERTEXP2' => 202,'AT_CERTEXP3' => 203,'AT_CERTEXP4' => 204,'AT_CERTEXP5' => 205,'AT_CERTEXP6' => 206,'AT_CERTEXP7' => 207,'AT_CERTEXP8' => 208,'AT_CERTEXP9' => 209,'AT_CERTEXP10' => 210,'EFX_FOREIGN' => 211,'normCompany_Name' => 212,'normCompany_Type' => 213,'Norm_Geo_Precision' => 214,'Exploded_Desc_Corporate_Amount_Precision' => 215,'Exploded_Desc_Location_Amount_Precision' => 216,'Exploded_Desc_Public_Co_Indicator' => 217,'Exploded_Desc_Stock_Exchange' => 218,'Exploded_Desc_Telemarketablity_Score' => 219,'Exploded_Desc_Telemarketablity_Total_Indicator' => 220,'Exploded_Desc_Telemarketablity_Total_Score' => 221,'Exploded_Desc_Government1057_Entity' => 222,'Exploded_Desc_Merchant_Type' => 223,'Exploded_Desc_Busstatcd' => 224,'Exploded_Desc_CMSA' => 225,'Exploded_Desc_Corpamountcd' => 226,'Exploded_Desc_Corpamountprec' => 227,'Exploded_Desc_Corpamounttp' => 228,'Exploded_Desc_Corpempcd' => 229,'Exploded_Desc_Ctrytelcd' => 230,'NormAddress_Type' => 231,'Norm_Address' => 232,'Norm_City' => 233,'Norm_State' => 234,'Norm_StateC2' => 235,'Norm_Zip' => 236,'Norm_Zip4' => 237,'Norm_Lat' => 238,'Norm_Lon' => 239,'Norm_Geoprec' => 240,'Norm_Region' => 241,'Norm_Ctryisocd' => 242,'Norm_Ctrynum' => 243,'Norm_Ctryname' => 244,'clean_company_name' => 245,'clean_phone' => 246,'clean_secondary_phone' => 247,'prim_range' => 248,'predir' => 249,'prim_name' => 250,'addr_suffix' => 251,'postdir' => 252,'unit_desig' => 253,'sec_range' => 254,'p_city_name' => 255,'v_city_name' => 256,'st' => 257,'cart' => 258,'cr_sort_sz' => 259,0);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
  
-EXPORT Make_dt_first_seen(SALT37.StrType s0) := s0;
-EXPORT InValid_dt_first_seen(SALT37.StrType s) := 0;
+EXPORT Make_dt_first_seen(SALT311.StrType s0) := s0;
+EXPORT InValid_dt_first_seen(SALT311.StrType s) := 0;
 EXPORT InValidMessage_dt_first_seen(UNSIGNED1 wh) := '';
  
-EXPORT Make_dt_last_seen(SALT37.StrType s0) := s0;
-EXPORT InValid_dt_last_seen(SALT37.StrType s) := 0;
+EXPORT Make_dt_last_seen(SALT311.StrType s0) := s0;
+EXPORT InValid_dt_last_seen(SALT311.StrType s) := 0;
 EXPORT InValidMessage_dt_last_seen(UNSIGNED1 wh) := '';
  
-EXPORT Make_dt_vendor_first_reported(SALT37.StrType s0) := s0;
-EXPORT InValid_dt_vendor_first_reported(SALT37.StrType s) := 0;
+EXPORT Make_dt_vendor_first_reported(SALT311.StrType s0) := s0;
+EXPORT InValid_dt_vendor_first_reported(SALT311.StrType s) := 0;
 EXPORT InValidMessage_dt_vendor_first_reported(UNSIGNED1 wh) := '';
  
-EXPORT Make_dt_vendor_last_reported(SALT37.StrType s0) := s0;
-EXPORT InValid_dt_vendor_last_reported(SALT37.StrType s) := 0;
+EXPORT Make_dt_vendor_last_reported(SALT311.StrType s0) := s0;
+EXPORT InValid_dt_vendor_last_reported(SALT311.StrType s) := 0;
 EXPORT InValidMessage_dt_vendor_last_reported(UNSIGNED1 wh) := '';
  
-EXPORT Make_dt_effective_first(SALT37.StrType s0) := s0;
-EXPORT InValid_dt_effective_first(SALT37.StrType s) := 0;
+EXPORT Make_dt_effective_first(SALT311.StrType s0) := s0;
+EXPORT InValid_dt_effective_first(SALT311.StrType s) := 0;
 EXPORT InValidMessage_dt_effective_first(UNSIGNED1 wh) := '';
  
-EXPORT Make_dt_effective_last(SALT37.StrType s0) := s0;
-EXPORT InValid_dt_effective_last(SALT37.StrType s) := 0;
+EXPORT Make_dt_effective_last(SALT311.StrType s0) := s0;
+EXPORT InValid_dt_effective_last(SALT311.StrType s) := 0;
 EXPORT InValidMessage_dt_effective_last(UNSIGNED1 wh) := '';
  
-EXPORT Make_process_date(SALT37.StrType s0) := s0;
-EXPORT InValid_process_date(SALT37.StrType s) := 0;
+EXPORT Make_process_date(SALT311.StrType s0) := s0;
+EXPORT InValid_process_date(SALT311.StrType s) := 0;
 EXPORT InValidMessage_process_date(UNSIGNED1 wh) := '';
  
-EXPORT Make_dotid(SALT37.StrType s0) := s0;
-EXPORT InValid_dotid(SALT37.StrType s) := 0;
+EXPORT Make_dotid(SALT311.StrType s0) := s0;
+EXPORT InValid_dotid(SALT311.StrType s) := 0;
 EXPORT InValidMessage_dotid(UNSIGNED1 wh) := '';
  
-EXPORT Make_dotscore(SALT37.StrType s0) := s0;
-EXPORT InValid_dotscore(SALT37.StrType s) := 0;
+EXPORT Make_dotscore(SALT311.StrType s0) := s0;
+EXPORT InValid_dotscore(SALT311.StrType s) := 0;
 EXPORT InValidMessage_dotscore(UNSIGNED1 wh) := '';
  
-EXPORT Make_dotweight(SALT37.StrType s0) := s0;
-EXPORT InValid_dotweight(SALT37.StrType s) := 0;
+EXPORT Make_dotweight(SALT311.StrType s0) := s0;
+EXPORT InValid_dotweight(SALT311.StrType s) := 0;
 EXPORT InValidMessage_dotweight(UNSIGNED1 wh) := '';
  
-EXPORT Make_empid(SALT37.StrType s0) := s0;
-EXPORT InValid_empid(SALT37.StrType s) := 0;
+EXPORT Make_empid(SALT311.StrType s0) := s0;
+EXPORT InValid_empid(SALT311.StrType s) := 0;
 EXPORT InValidMessage_empid(UNSIGNED1 wh) := '';
  
-EXPORT Make_empscore(SALT37.StrType s0) := s0;
-EXPORT InValid_empscore(SALT37.StrType s) := 0;
+EXPORT Make_empscore(SALT311.StrType s0) := s0;
+EXPORT InValid_empscore(SALT311.StrType s) := 0;
 EXPORT InValidMessage_empscore(UNSIGNED1 wh) := '';
  
-EXPORT Make_empweight(SALT37.StrType s0) := s0;
-EXPORT InValid_empweight(SALT37.StrType s) := 0;
+EXPORT Make_empweight(SALT311.StrType s0) := s0;
+EXPORT InValid_empweight(SALT311.StrType s) := 0;
 EXPORT InValidMessage_empweight(UNSIGNED1 wh) := '';
  
-EXPORT Make_powid(SALT37.StrType s0) := s0;
-EXPORT InValid_powid(SALT37.StrType s) := 0;
+EXPORT Make_powid(SALT311.StrType s0) := s0;
+EXPORT InValid_powid(SALT311.StrType s) := 0;
 EXPORT InValidMessage_powid(UNSIGNED1 wh) := '';
  
-EXPORT Make_powscore(SALT37.StrType s0) := s0;
-EXPORT InValid_powscore(SALT37.StrType s) := 0;
+EXPORT Make_powscore(SALT311.StrType s0) := s0;
+EXPORT InValid_powscore(SALT311.StrType s) := 0;
 EXPORT InValidMessage_powscore(UNSIGNED1 wh) := '';
  
-EXPORT Make_powweight(SALT37.StrType s0) := s0;
-EXPORT InValid_powweight(SALT37.StrType s) := 0;
+EXPORT Make_powweight(SALT311.StrType s0) := s0;
+EXPORT InValid_powweight(SALT311.StrType s) := 0;
 EXPORT InValidMessage_powweight(UNSIGNED1 wh) := '';
  
-EXPORT Make_proxid(SALT37.StrType s0) := s0;
-EXPORT InValid_proxid(SALT37.StrType s) := 0;
+EXPORT Make_proxid(SALT311.StrType s0) := s0;
+EXPORT InValid_proxid(SALT311.StrType s) := 0;
 EXPORT InValidMessage_proxid(UNSIGNED1 wh) := '';
  
-EXPORT Make_proxscore(SALT37.StrType s0) := s0;
-EXPORT InValid_proxscore(SALT37.StrType s) := 0;
+EXPORT Make_proxscore(SALT311.StrType s0) := s0;
+EXPORT InValid_proxscore(SALT311.StrType s) := 0;
 EXPORT InValidMessage_proxscore(UNSIGNED1 wh) := '';
  
-EXPORT Make_proxweight(SALT37.StrType s0) := s0;
-EXPORT InValid_proxweight(SALT37.StrType s) := 0;
+EXPORT Make_proxweight(SALT311.StrType s0) := s0;
+EXPORT InValid_proxweight(SALT311.StrType s) := 0;
 EXPORT InValidMessage_proxweight(UNSIGNED1 wh) := '';
  
-EXPORT Make_selescore(SALT37.StrType s0) := s0;
-EXPORT InValid_selescore(SALT37.StrType s) := 0;
+EXPORT Make_selescore(SALT311.StrType s0) := s0;
+EXPORT InValid_selescore(SALT311.StrType s) := 0;
 EXPORT InValidMessage_selescore(UNSIGNED1 wh) := '';
  
-EXPORT Make_seleweight(SALT37.StrType s0) := s0;
-EXPORT InValid_seleweight(SALT37.StrType s) := 0;
+EXPORT Make_seleweight(SALT311.StrType s0) := s0;
+EXPORT InValid_seleweight(SALT311.StrType s) := 0;
 EXPORT InValidMessage_seleweight(UNSIGNED1 wh) := '';
  
-EXPORT Make_orgid(SALT37.StrType s0) := s0;
-EXPORT InValid_orgid(SALT37.StrType s) := 0;
+EXPORT Make_orgid(SALT311.StrType s0) := s0;
+EXPORT InValid_orgid(SALT311.StrType s) := 0;
 EXPORT InValidMessage_orgid(UNSIGNED1 wh) := '';
  
-EXPORT Make_orgscore(SALT37.StrType s0) := s0;
-EXPORT InValid_orgscore(SALT37.StrType s) := 0;
+EXPORT Make_orgscore(SALT311.StrType s0) := s0;
+EXPORT InValid_orgscore(SALT311.StrType s) := 0;
 EXPORT InValidMessage_orgscore(UNSIGNED1 wh) := '';
  
-EXPORT Make_orgweight(SALT37.StrType s0) := s0;
-EXPORT InValid_orgweight(SALT37.StrType s) := 0;
+EXPORT Make_orgweight(SALT311.StrType s0) := s0;
+EXPORT InValid_orgweight(SALT311.StrType s) := 0;
 EXPORT InValidMessage_orgweight(UNSIGNED1 wh) := '';
  
-EXPORT Make_ultid(SALT37.StrType s0) := s0;
-EXPORT InValid_ultid(SALT37.StrType s) := 0;
+EXPORT Make_ultid(SALT311.StrType s0) := s0;
+EXPORT InValid_ultid(SALT311.StrType s) := 0;
 EXPORT InValidMessage_ultid(UNSIGNED1 wh) := '';
  
-EXPORT Make_ultscore(SALT37.StrType s0) := s0;
-EXPORT InValid_ultscore(SALT37.StrType s) := 0;
+EXPORT Make_ultscore(SALT311.StrType s0) := s0;
+EXPORT InValid_ultscore(SALT311.StrType s) := 0;
 EXPORT InValidMessage_ultscore(UNSIGNED1 wh) := '';
  
-EXPORT Make_ultweight(SALT37.StrType s0) := s0;
-EXPORT InValid_ultweight(SALT37.StrType s) := 0;
+EXPORT Make_ultweight(SALT311.StrType s0) := s0;
+EXPORT InValid_ultweight(SALT311.StrType s) := 0;
 EXPORT InValidMessage_ultweight(UNSIGNED1 wh) := '';
  
-EXPORT Make_record_type(SALT37.StrType s0) := s0;
-EXPORT InValid_record_type(SALT37.StrType s) := 0;
+EXPORT Make_record_type(SALT311.StrType s0) := s0;
+EXPORT InValid_record_type(SALT311.StrType s) := 0;
 EXPORT InValidMessage_record_type(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_ID(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_ID(SALT37.StrType s) := 0;
+EXPORT Make_EFX_ID(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_ID(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_ID(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_NAME(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_NAME(SALT37.StrType s) := 0;
+EXPORT Make_EFX_NAME(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_NAME(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_NAME(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_LEGAL_NAME(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_LEGAL_NAME(SALT37.StrType s) := 0;
+EXPORT Make_EFX_LEGAL_NAME(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_LEGAL_NAME(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_LEGAL_NAME(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_ADDRESS(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_ADDRESS(SALT37.StrType s) := 0;
+EXPORT Make_EFX_ADDRESS(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_ADDRESS(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_ADDRESS(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_CITY(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_CITY(SALT37.StrType s) := 0;
+EXPORT Make_EFX_CITY(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_CITY(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_CITY(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_STATE(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_STATE(SALT37.StrType s) := 0;
+EXPORT Make_EFX_STATE(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_STATE(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_STATE(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_STATEC(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_STATEC(SALT37.StrType s) := 0;
+EXPORT Make_EFX_STATEC(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_STATEC(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_STATEC(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_ZIPCODE(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_ZIPCODE(SALT37.StrType s) := 0;
+EXPORT Make_EFX_ZIPCODE(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_ZIPCODE(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_ZIPCODE(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_ZIP4(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_ZIP4(SALT37.StrType s) := 0;
+EXPORT Make_EFX_ZIP4(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_ZIP4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_ZIP4(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_LAT(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_LAT(SALT37.StrType s) := 0;
+EXPORT Make_EFX_LAT(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_LAT(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_LAT(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_LON(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_LON(SALT37.StrType s) := 0;
+EXPORT Make_EFX_LON(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_LON(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_LON(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_GEOPREC(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_GEOPREC(SALT37.StrType s) := 0;
+EXPORT Make_EFX_GEOPREC(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_GEOPREC(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_GEOPREC(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_REGION(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_REGION(SALT37.StrType s) := 0;
+EXPORT Make_EFX_REGION(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_REGION(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_REGION(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_CTRYISOCD(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_CTRYISOCD(SALT37.StrType s) := 0;
+EXPORT Make_EFX_CTRYISOCD(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_CTRYISOCD(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_CTRYISOCD(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_CTRYNUM(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_CTRYNUM(SALT37.StrType s) := 0;
+EXPORT Make_EFX_CTRYNUM(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_CTRYNUM(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_CTRYNUM(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_CTRYNAME(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_CTRYNAME(SALT37.StrType s) := 0;
+EXPORT Make_EFX_CTRYNAME(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_CTRYNAME(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_CTRYNAME(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_COUNTYNM(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_COUNTYNM(SALT37.StrType s) := 0;
+EXPORT Make_EFX_COUNTYNM(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_COUNTYNM(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_COUNTYNM(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_COUNTY(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_COUNTY(SALT37.StrType s) := 0;
+EXPORT Make_EFX_COUNTY(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_COUNTY(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_COUNTY(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_CMSA(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_CMSA(SALT37.StrType s) := 0;
+EXPORT Make_EFX_CMSA(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_CMSA(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_CMSA(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_CMSADESC(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_CMSADESC(SALT37.StrType s) := 0;
+EXPORT Make_EFX_CMSADESC(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_CMSADESC(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_CMSADESC(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SOHO(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SOHO(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SOHO(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SOHO(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SOHO(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_BIZ(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_BIZ(SALT37.StrType s) := 0;
+EXPORT Make_EFX_BIZ(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_BIZ(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_BIZ(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_RES(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_RES(SALT37.StrType s) := 0;
+EXPORT Make_EFX_RES(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_RES(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_RES(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_CMRA(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_CMRA(SALT37.StrType s) := 0;
+EXPORT Make_EFX_CMRA(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_CMRA(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_CMRA(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_CONGRESS(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_CONGRESS(SALT37.StrType s) := 0;
+EXPORT Make_EFX_CONGRESS(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_CONGRESS(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_CONGRESS(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECADR(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECADR(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECADR(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECADR(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECADR(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECCTY(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECCTY(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECCTY(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECCTY(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECCTY(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECSTAT(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECSTAT(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECSTAT(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECSTAT(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECSTAT(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_STATEC2(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_STATEC2(SALT37.StrType s) := 0;
+EXPORT Make_EFX_STATEC2(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_STATEC2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_STATEC2(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECZIP(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECZIP(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECZIP(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECZIP(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECZIP(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECZIP4(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECZIP4(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECZIP4(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECZIP4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECZIP4(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECLAT(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECLAT(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECLAT(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECLAT(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECLAT(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECLON(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECLON(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECLON(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECLON(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECLON(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECGEOPREC(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECGEOPREC(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECGEOPREC(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECGEOPREC(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECGEOPREC(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECREGION(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECREGION(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECREGION(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECREGION(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECREGION(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECCTRYISOCD(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECCTRYISOCD(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECCTRYISOCD(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECCTRYISOCD(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECCTRYISOCD(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECCTRYNUM(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECCTRYNUM(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECCTRYNUM(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECCTRYNUM(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECCTRYNUM(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECCTRYNAME(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECCTRYNAME(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECCTRYNAME(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECCTRYNAME(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECCTRYNAME(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_CTRYTELCD(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_CTRYTELCD(SALT37.StrType s) := 0;
+EXPORT Make_EFX_CTRYTELCD(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_CTRYTELCD(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_CTRYTELCD(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_PHONE(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_PHONE(SALT37.StrType s) := 0;
+EXPORT Make_EFX_PHONE(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_PHONE(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_PHONE(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_FAXPHONE(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_FAXPHONE(SALT37.StrType s) := 0;
+EXPORT Make_EFX_FAXPHONE(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_FAXPHONE(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_FAXPHONE(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_BUSSTAT(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_BUSSTAT(SALT37.StrType s) := 0;
+EXPORT Make_EFX_BUSSTAT(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_BUSSTAT(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_BUSSTAT(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_BUSSTATCD(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_BUSSTATCD(SALT37.StrType s) := 0;
+EXPORT Make_EFX_BUSSTATCD(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_BUSSTATCD(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_BUSSTATCD(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_WEB(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_WEB(SALT37.StrType s) := 0;
+EXPORT Make_EFX_WEB(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_WEB(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_WEB(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_YREST(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_YREST(SALT37.StrType s) := 0;
+EXPORT Make_EFX_YREST(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_YREST(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_YREST(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_CORPEMPCNT(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_CORPEMPCNT(SALT37.StrType s) := 0;
+EXPORT Make_EFX_CORPEMPCNT(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_CORPEMPCNT(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_CORPEMPCNT(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_LOCEMPCNT(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_LOCEMPCNT(SALT37.StrType s) := 0;
+EXPORT Make_EFX_LOCEMPCNT(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_LOCEMPCNT(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_LOCEMPCNT(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_CORPEMPCD(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_CORPEMPCD(SALT37.StrType s) := 0;
+EXPORT Make_EFX_CORPEMPCD(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_CORPEMPCD(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_CORPEMPCD(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_LOCEMPCD(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_LOCEMPCD(SALT37.StrType s) := 0;
+EXPORT Make_EFX_LOCEMPCD(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_LOCEMPCD(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_LOCEMPCD(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_CORPAMOUNT(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_CORPAMOUNT(SALT37.StrType s) := 0;
+EXPORT Make_EFX_CORPAMOUNT(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_CORPAMOUNT(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_CORPAMOUNT(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_CORPAMOUNTCD(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_CORPAMOUNTCD(SALT37.StrType s) := 0;
+EXPORT Make_EFX_CORPAMOUNTCD(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_CORPAMOUNTCD(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_CORPAMOUNTCD(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_CORPAMOUNTTP(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_CORPAMOUNTTP(SALT37.StrType s) := 0;
+EXPORT Make_EFX_CORPAMOUNTTP(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_CORPAMOUNTTP(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_CORPAMOUNTTP(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_CORPAMOUNTPREC(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_CORPAMOUNTPREC(SALT37.StrType s) := 0;
+EXPORT Make_EFX_CORPAMOUNTPREC(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_CORPAMOUNTPREC(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_CORPAMOUNTPREC(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_LOCAMOUNT(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_LOCAMOUNT(SALT37.StrType s) := 0;
+EXPORT Make_EFX_LOCAMOUNT(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_LOCAMOUNT(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_LOCAMOUNT(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_LOCAMOUNTCD(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_LOCAMOUNTCD(SALT37.StrType s) := 0;
+EXPORT Make_EFX_LOCAMOUNTCD(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_LOCAMOUNTCD(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_LOCAMOUNTCD(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_LOCAMOUNTTP(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_LOCAMOUNTTP(SALT37.StrType s) := 0;
+EXPORT Make_EFX_LOCAMOUNTTP(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_LOCAMOUNTTP(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_LOCAMOUNTTP(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_LOCAMOUNTPREC(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_LOCAMOUNTPREC(SALT37.StrType s) := 0;
+EXPORT Make_EFX_LOCAMOUNTPREC(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_LOCAMOUNTPREC(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_LOCAMOUNTPREC(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_PUBLIC(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_PUBLIC(SALT37.StrType s) := 0;
+EXPORT Make_EFX_PUBLIC(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_PUBLIC(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_PUBLIC(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_STKEXC(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_STKEXC(SALT37.StrType s) := 0;
+EXPORT Make_EFX_STKEXC(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_STKEXC(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_STKEXC(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_TCKSYM(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_TCKSYM(SALT37.StrType s) := 0;
+EXPORT Make_EFX_TCKSYM(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_TCKSYM(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_TCKSYM(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_PRIMSIC(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_PRIMSIC(SALT37.StrType s) := 0;
+EXPORT Make_EFX_PRIMSIC(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_PRIMSIC(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_PRIMSIC(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECSIC1(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECSIC1(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECSIC1(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECSIC1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECSIC1(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECSIC2(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECSIC2(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECSIC2(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECSIC2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECSIC2(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECSIC3(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECSIC3(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECSIC3(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECSIC3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECSIC3(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECSIC4(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECSIC4(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECSIC4(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECSIC4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECSIC4(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_PRIMSICDESC(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_PRIMSICDESC(SALT37.StrType s) := 0;
+EXPORT Make_EFX_PRIMSICDESC(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_PRIMSICDESC(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_PRIMSICDESC(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECSICDESC1(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECSICDESC1(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECSICDESC1(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECSICDESC1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECSICDESC1(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECSICDESC2(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECSICDESC2(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECSICDESC2(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECSICDESC2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECSICDESC2(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECSICDESC3(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECSICDESC3(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECSICDESC3(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECSICDESC3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECSICDESC3(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECSICDESC4(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECSICDESC4(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECSICDESC4(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECSICDESC4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECSICDESC4(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_PRIMNAICSCODE(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_PRIMNAICSCODE(SALT37.StrType s) := 0;
+EXPORT Make_EFX_PRIMNAICSCODE(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_PRIMNAICSCODE(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_PRIMNAICSCODE(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECNAICS1(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECNAICS1(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECNAICS1(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECNAICS1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECNAICS1(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECNAICS2(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECNAICS2(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECNAICS2(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECNAICS2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECNAICS2(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECNAICS3(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECNAICS3(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECNAICS3(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECNAICS3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECNAICS3(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECNAICS4(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECNAICS4(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECNAICS4(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECNAICS4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECNAICS4(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_PRIMNAICSDESC(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_PRIMNAICSDESC(SALT37.StrType s) := 0;
+EXPORT Make_EFX_PRIMNAICSDESC(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_PRIMNAICSDESC(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_PRIMNAICSDESC(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECNAICSDESC1(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECNAICSDESC1(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECNAICSDESC1(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECNAICSDESC1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECNAICSDESC1(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECNAICSDESC2(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECNAICSDESC2(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECNAICSDESC2(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECNAICSDESC2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECNAICSDESC2(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECNAICSDESC3(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECNAICSDESC3(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECNAICSDESC3(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECNAICSDESC3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECNAICSDESC3(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECNAICSDESC4(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECNAICSDESC4(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECNAICSDESC4(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECNAICSDESC4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECNAICSDESC4(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_DEAD(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_DEAD(SALT37.StrType s) := 0;
+EXPORT Make_EFX_DEAD(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_DEAD(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_DEAD(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_DEADDT(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_DEADDT(SALT37.StrType s) := 0;
+EXPORT Make_EFX_DEADDT(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_DEADDT(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_DEADDT(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_MRKT_TELEVER(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_MRKT_TELEVER(SALT37.StrType s) := 0;
+EXPORT Make_EFX_MRKT_TELEVER(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_MRKT_TELEVER(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_MRKT_TELEVER(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_MRKT_TELESCORE(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_MRKT_TELESCORE(SALT37.StrType s) := 0;
+EXPORT Make_EFX_MRKT_TELESCORE(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_MRKT_TELESCORE(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_MRKT_TELESCORE(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_MRKT_TOTALSCORE(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_MRKT_TOTALSCORE(SALT37.StrType s) := 0;
+EXPORT Make_EFX_MRKT_TOTALSCORE(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_MRKT_TOTALSCORE(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_MRKT_TOTALSCORE(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_MRKT_TOTALIND(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_MRKT_TOTALIND(SALT37.StrType s) := 0;
+EXPORT Make_EFX_MRKT_TOTALIND(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_MRKT_TOTALIND(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_MRKT_TOTALIND(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_MRKT_VACANT(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_MRKT_VACANT(SALT37.StrType s) := 0;
+EXPORT Make_EFX_MRKT_VACANT(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_MRKT_VACANT(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_MRKT_VACANT(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_MRKT_SEASONAL(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_MRKT_SEASONAL(SALT37.StrType s) := 0;
+EXPORT Make_EFX_MRKT_SEASONAL(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_MRKT_SEASONAL(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_MRKT_SEASONAL(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_MBE(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_MBE(SALT37.StrType s) := 0;
+EXPORT Make_EFX_MBE(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_MBE(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_MBE(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_WBE(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_WBE(SALT37.StrType s) := 0;
+EXPORT Make_EFX_WBE(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_WBE(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_WBE(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_MWBE(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_MWBE(SALT37.StrType s) := 0;
+EXPORT Make_EFX_MWBE(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_MWBE(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_MWBE(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SDB(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SDB(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SDB(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SDB(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SDB(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_HUBZONE(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_HUBZONE(SALT37.StrType s) := 0;
+EXPORT Make_EFX_HUBZONE(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_HUBZONE(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_HUBZONE(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_DBE(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_DBE(SALT37.StrType s) := 0;
+EXPORT Make_EFX_DBE(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_DBE(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_DBE(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_VET(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_VET(SALT37.StrType s) := 0;
+EXPORT Make_EFX_VET(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_VET(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_VET(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_DVET(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_DVET(SALT37.StrType s) := 0;
+EXPORT Make_EFX_DVET(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_DVET(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_DVET(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_8a(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_8a(SALT37.StrType s) := 0;
+EXPORT Make_EFX_8a(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_8a(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_8a(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_8aEXPDT(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_8aEXPDT(SALT37.StrType s) := 0;
+EXPORT Make_EFX_8aEXPDT(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_8aEXPDT(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_8aEXPDT(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_DIS(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_DIS(SALT37.StrType s) := 0;
+EXPORT Make_EFX_DIS(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_DIS(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_DIS(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SBE(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SBE(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SBE(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SBE(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SBE(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_BUSSIZE(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_BUSSIZE(SALT37.StrType s) := 0;
+EXPORT Make_EFX_BUSSIZE(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_BUSSIZE(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_BUSSIZE(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_LBE(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_LBE(SALT37.StrType s) := 0;
+EXPORT Make_EFX_LBE(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_LBE(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_LBE(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_GOV(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_GOV(SALT37.StrType s) := 0;
+EXPORT Make_EFX_GOV(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_GOV(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_GOV(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_FGOV(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_FGOV(SALT37.StrType s) := 0;
+EXPORT Make_EFX_FGOV(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_FGOV(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_FGOV(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_GOV1057(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_GOV1057(SALT37.StrType s) := 0;
+EXPORT Make_EFX_GOV1057(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_GOV1057(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_GOV1057(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_NONPROFIT(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_NONPROFIT(SALT37.StrType s) := 0;
+EXPORT Make_EFX_NONPROFIT(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_NONPROFIT(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_NONPROFIT(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_MERCTYPE(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_MERCTYPE(SALT37.StrType s) := 0;
+EXPORT Make_EFX_MERCTYPE(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_MERCTYPE(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_MERCTYPE(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_HBCU(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_HBCU(SALT37.StrType s) := 0;
+EXPORT Make_EFX_HBCU(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_HBCU(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_HBCU(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_GAYLESBIAN(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_GAYLESBIAN(SALT37.StrType s) := 0;
+EXPORT Make_EFX_GAYLESBIAN(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_GAYLESBIAN(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_GAYLESBIAN(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_WSBE(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_WSBE(SALT37.StrType s) := 0;
+EXPORT Make_EFX_WSBE(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_WSBE(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_WSBE(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_VSBE(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_VSBE(SALT37.StrType s) := 0;
+EXPORT Make_EFX_VSBE(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_VSBE(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_VSBE(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_DVSBE(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_DVSBE(SALT37.StrType s) := 0;
+EXPORT Make_EFX_DVSBE(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_DVSBE(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_DVSBE(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_MWBESTATUS(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_MWBESTATUS(SALT37.StrType s) := 0;
+EXPORT Make_EFX_MWBESTATUS(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_MWBESTATUS(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_MWBESTATUS(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_NMSDC(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_NMSDC(SALT37.StrType s) := 0;
+EXPORT Make_EFX_NMSDC(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_NMSDC(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_NMSDC(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_WBENC(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_WBENC(SALT37.StrType s) := 0;
+EXPORT Make_EFX_WBENC(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_WBENC(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_WBENC(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_CA_PUC(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_CA_PUC(SALT37.StrType s) := 0;
+EXPORT Make_EFX_CA_PUC(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_CA_PUC(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_CA_PUC(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_TX_HUB(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_TX_HUB(SALT37.StrType s) := 0;
+EXPORT Make_EFX_TX_HUB(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_TX_HUB(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_TX_HUB(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_TX_HUBCERTNUM(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_TX_HUBCERTNUM(SALT37.StrType s) := 0;
+EXPORT Make_EFX_TX_HUBCERTNUM(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_TX_HUBCERTNUM(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_TX_HUBCERTNUM(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_GSAX(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_GSAX(SALT37.StrType s) := 0;
+EXPORT Make_EFX_GSAX(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_GSAX(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_GSAX(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_CALTRANS(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_CALTRANS(SALT37.StrType s) := 0;
+EXPORT Make_EFX_CALTRANS(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_CALTRANS(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_CALTRANS(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_EDU(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_EDU(SALT37.StrType s) := 0;
+EXPORT Make_EFX_EDU(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_EDU(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_EDU(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_MI(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_MI(SALT37.StrType s) := 0;
+EXPORT Make_EFX_MI(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_MI(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_MI(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_ANC(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_ANC(SALT37.StrType s) := 0;
+EXPORT Make_EFX_ANC(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_ANC(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_ANC(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERT1(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERT1(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERT1(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERT1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERT1(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERT2(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERT2(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERT2(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERT2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERT2(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERT3(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERT3(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERT3(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERT3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERT3(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERT4(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERT4(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERT4(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERT4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERT4(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERT5(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERT5(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERT5(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERT5(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERT5(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERT6(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERT6(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERT6(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERT6(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERT6(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERT7(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERT7(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERT7(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERT7(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERT7(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERT8(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERT8(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERT8(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERT8(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERT8(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERT9(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERT9(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERT9(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERT9(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERT9(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERT10(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERT10(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERT10(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERT10(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERT10(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTDESC1(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTDESC1(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTDESC1(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTDESC1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTDESC1(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTDESC2(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTDESC2(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTDESC2(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTDESC2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTDESC2(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTDESC3(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTDESC3(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTDESC3(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTDESC3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTDESC3(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTDESC4(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTDESC4(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTDESC4(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTDESC4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTDESC4(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTDESC5(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTDESC5(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTDESC5(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTDESC5(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTDESC5(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTDESC6(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTDESC6(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTDESC6(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTDESC6(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTDESC6(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTDESC7(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTDESC7(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTDESC7(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTDESC7(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTDESC7(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTDESC8(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTDESC8(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTDESC8(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTDESC8(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTDESC8(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTDESC9(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTDESC9(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTDESC9(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTDESC9(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTDESC9(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTDESC10(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTDESC10(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTDESC10(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTDESC10(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTDESC10(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTSRC1(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTSRC1(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTSRC1(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTSRC1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTSRC1(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTSRC2(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTSRC2(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTSRC2(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTSRC2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTSRC2(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTSRC3(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTSRC3(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTSRC3(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTSRC3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTSRC3(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTSRC4(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTSRC4(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTSRC4(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTSRC4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTSRC4(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTSRC5(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTSRC5(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTSRC5(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTSRC5(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTSRC5(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTSRC6(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTSRC6(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTSRC6(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTSRC6(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTSRC6(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTSRC7(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTSRC7(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTSRC7(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTSRC7(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTSRC7(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTSRC8(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTSRC8(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTSRC8(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTSRC8(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTSRC8(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTSRC9(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTSRC9(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTSRC9(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTSRC9(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTSRC9(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTSRC10(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTSRC10(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTSRC10(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTSRC10(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTSRC10(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTLEV1(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTLEV1(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTLEV1(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTLEV1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTLEV1(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTLEV2(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTLEV2(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTLEV2(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTLEV2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTLEV2(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTLEV3(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTLEV3(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTLEV3(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTLEV3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTLEV3(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTLEV4(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTLEV4(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTLEV4(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTLEV4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTLEV4(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTLEV5(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTLEV5(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTLEV5(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTLEV5(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTLEV5(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTLEV6(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTLEV6(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTLEV6(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTLEV6(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTLEV6(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTLEV7(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTLEV7(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTLEV7(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTLEV7(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTLEV7(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTLEV8(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTLEV8(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTLEV8(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTLEV8(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTLEV8(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTLEV9(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTLEV9(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTLEV9(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTLEV9(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTLEV9(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTLEV10(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTLEV10(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTLEV10(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTLEV10(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTLEV10(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTNUM1(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTNUM1(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTNUM1(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTNUM1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTNUM1(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTNUM2(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTNUM2(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTNUM2(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTNUM2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTNUM2(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTNUM3(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTNUM3(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTNUM3(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTNUM3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTNUM3(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTNUM4(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTNUM4(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTNUM4(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTNUM4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTNUM4(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTNUM5(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTNUM5(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTNUM5(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTNUM5(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTNUM5(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTNUM6(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTNUM6(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTNUM6(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTNUM6(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTNUM6(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTNUM7(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTNUM7(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTNUM7(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTNUM7(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTNUM7(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTNUM8(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTNUM8(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTNUM8(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTNUM8(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTNUM8(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTNUM9(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTNUM9(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTNUM9(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTNUM9(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTNUM9(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTNUM10(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTNUM10(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTNUM10(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTNUM10(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTNUM10(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTEXP1(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTEXP1(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTEXP1(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTEXP1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTEXP1(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTEXP2(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTEXP2(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTEXP2(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTEXP2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTEXP2(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTEXP3(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTEXP3(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTEXP3(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTEXP3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTEXP3(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTEXP4(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTEXP4(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTEXP4(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTEXP4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTEXP4(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTEXP5(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTEXP5(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTEXP5(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTEXP5(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTEXP5(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTEXP6(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTEXP6(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTEXP6(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTEXP6(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTEXP6(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTEXP7(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTEXP7(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTEXP7(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTEXP7(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTEXP7(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTEXP8(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTEXP8(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTEXP8(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTEXP8(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTEXP8(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTEXP9(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTEXP9(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTEXP9(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTEXP9(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTEXP9(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTEXP10(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTEXP10(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTEXP10(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTEXP10(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTEXP10(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_EXTRACT_DATE(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_EXTRACT_DATE(SALT37.StrType s) := 0;
-EXPORT InValidMessage_EFX_EXTRACT_DATE(UNSIGNED1 wh) := '';
- 
-EXPORT Make_EFX_MERCHANT_ID(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_MERCHANT_ID(SALT37.StrType s) := 0;
-EXPORT InValidMessage_EFX_MERCHANT_ID(UNSIGNED1 wh) := '';
- 
-EXPORT Make_EFX_PROJECT_ID(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_PROJECT_ID(SALT37.StrType s) := 0;
-EXPORT InValidMessage_EFX_PROJECT_ID(UNSIGNED1 wh) := '';
- 
-EXPORT Make_EFX_FOREIGN(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_FOREIGN(SALT37.StrType s) := 0;
+EXPORT Make_EFX_FOREIGN(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_FOREIGN(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_FOREIGN(UNSIGNED1 wh) := '';
  
-EXPORT Make_Record_Update_Refresh_Date(SALT37.StrType s0) := s0;
-EXPORT InValid_Record_Update_Refresh_Date(SALT37.StrType s) := 0;
-EXPORT InValidMessage_Record_Update_Refresh_Date(UNSIGNED1 wh) := '';
- 
-EXPORT Make_EFX_DATE_CREATED(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_DATE_CREATED(SALT37.StrType s) := 0;
-EXPORT InValidMessage_EFX_DATE_CREATED(UNSIGNED1 wh) := '';
- 
-EXPORT Make_normCompany_Name(SALT37.StrType s0) := s0;
-EXPORT InValid_normCompany_Name(SALT37.StrType s) := 0;
+EXPORT Make_normCompany_Name(SALT311.StrType s0) := s0;
+EXPORT InValid_normCompany_Name(SALT311.StrType s) := 0;
 EXPORT InValidMessage_normCompany_Name(UNSIGNED1 wh) := '';
  
-EXPORT Make_normCompany_Type(SALT37.StrType s0) := s0;
-EXPORT InValid_normCompany_Type(SALT37.StrType s) := 0;
+EXPORT Make_normCompany_Type(SALT311.StrType s0) := s0;
+EXPORT InValid_normCompany_Type(SALT311.StrType s) := 0;
 EXPORT InValidMessage_normCompany_Type(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_Geo_Precision(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_Geo_Precision(SALT37.StrType s) := 0;
+EXPORT Make_Norm_Geo_Precision(SALT311.StrType s0) := s0;
+EXPORT InValid_Norm_Geo_Precision(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Norm_Geo_Precision(UNSIGNED1 wh) := '';
  
-EXPORT Make_Exploded_Desc_Corporate_Amount_Precision(SALT37.StrType s0) := s0;
-EXPORT InValid_Exploded_Desc_Corporate_Amount_Precision(SALT37.StrType s) := 0;
+EXPORT Make_Exploded_Desc_Corporate_Amount_Precision(SALT311.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Corporate_Amount_Precision(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Exploded_Desc_Corporate_Amount_Precision(UNSIGNED1 wh) := '';
  
-EXPORT Make_Exploded_Desc_Location_Amount_Precision(SALT37.StrType s0) := s0;
-EXPORT InValid_Exploded_Desc_Location_Amount_Precision(SALT37.StrType s) := 0;
+EXPORT Make_Exploded_Desc_Location_Amount_Precision(SALT311.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Location_Amount_Precision(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Exploded_Desc_Location_Amount_Precision(UNSIGNED1 wh) := '';
  
-EXPORT Make_Exploded_Desc_Public_Co_Indicator(SALT37.StrType s0) := s0;
-EXPORT InValid_Exploded_Desc_Public_Co_Indicator(SALT37.StrType s) := 0;
+EXPORT Make_Exploded_Desc_Public_Co_Indicator(SALT311.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Public_Co_Indicator(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Exploded_Desc_Public_Co_Indicator(UNSIGNED1 wh) := '';
  
-EXPORT Make_Exploded_Desc_Stock_Exchange(SALT37.StrType s0) := s0;
-EXPORT InValid_Exploded_Desc_Stock_Exchange(SALT37.StrType s) := 0;
+EXPORT Make_Exploded_Desc_Stock_Exchange(SALT311.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Stock_Exchange(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Exploded_Desc_Stock_Exchange(UNSIGNED1 wh) := '';
  
-EXPORT Make_Exploded_Desc_Telemarketablity_Score(SALT37.StrType s0) := s0;
-EXPORT InValid_Exploded_Desc_Telemarketablity_Score(SALT37.StrType s) := 0;
+EXPORT Make_Exploded_Desc_Telemarketablity_Score(SALT311.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Telemarketablity_Score(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Exploded_Desc_Telemarketablity_Score(UNSIGNED1 wh) := '';
  
-EXPORT Make_Exploded_Desc_Telemarketablity_Total_Indicator(SALT37.StrType s0) := s0;
-EXPORT InValid_Exploded_Desc_Telemarketablity_Total_Indicator(SALT37.StrType s) := 0;
+EXPORT Make_Exploded_Desc_Telemarketablity_Total_Indicator(SALT311.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Telemarketablity_Total_Indicator(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Exploded_Desc_Telemarketablity_Total_Indicator(UNSIGNED1 wh) := '';
  
-EXPORT Make_Exploded_Desc_Telemarketablity_Total_Score(SALT37.StrType s0) := s0;
-EXPORT InValid_Exploded_Desc_Telemarketablity_Total_Score(SALT37.StrType s) := 0;
+EXPORT Make_Exploded_Desc_Telemarketablity_Total_Score(SALT311.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Telemarketablity_Total_Score(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Exploded_Desc_Telemarketablity_Total_Score(UNSIGNED1 wh) := '';
  
-EXPORT Make_Exploded_Desc_Government1057_Entity(SALT37.StrType s0) := s0;
-EXPORT InValid_Exploded_Desc_Government1057_Entity(SALT37.StrType s) := 0;
+EXPORT Make_Exploded_Desc_Government1057_Entity(SALT311.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Government1057_Entity(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Exploded_Desc_Government1057_Entity(UNSIGNED1 wh) := '';
  
-EXPORT Make_Exploded_Desc_Merchant_Type(SALT37.StrType s0) := s0;
-EXPORT InValid_Exploded_Desc_Merchant_Type(SALT37.StrType s) := 0;
+EXPORT Make_Exploded_Desc_Merchant_Type(SALT311.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Merchant_Type(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Exploded_Desc_Merchant_Type(UNSIGNED1 wh) := '';
  
-EXPORT Make_Exploded_Desc_Busstatcd(SALT37.StrType s0) := s0;
-EXPORT InValid_Exploded_Desc_Busstatcd(SALT37.StrType s) := 0;
+EXPORT Make_Exploded_Desc_Busstatcd(SALT311.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Busstatcd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Exploded_Desc_Busstatcd(UNSIGNED1 wh) := '';
  
-EXPORT Make_Exploded_Desc_CMSA(SALT37.StrType s0) := s0;
-EXPORT InValid_Exploded_Desc_CMSA(SALT37.StrType s) := 0;
+EXPORT Make_Exploded_Desc_CMSA(SALT311.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_CMSA(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Exploded_Desc_CMSA(UNSIGNED1 wh) := '';
  
-EXPORT Make_Exploded_Desc_Corpamountcd(SALT37.StrType s0) := s0;
-EXPORT InValid_Exploded_Desc_Corpamountcd(SALT37.StrType s) := 0;
+EXPORT Make_Exploded_Desc_Corpamountcd(SALT311.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Corpamountcd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Exploded_Desc_Corpamountcd(UNSIGNED1 wh) := '';
  
-EXPORT Make_Exploded_Desc_Corpamountprec(SALT37.StrType s0) := s0;
-EXPORT InValid_Exploded_Desc_Corpamountprec(SALT37.StrType s) := 0;
+EXPORT Make_Exploded_Desc_Corpamountprec(SALT311.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Corpamountprec(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Exploded_Desc_Corpamountprec(UNSIGNED1 wh) := '';
  
-EXPORT Make_Exploded_Desc_Corpamounttp(SALT37.StrType s0) := s0;
-EXPORT InValid_Exploded_Desc_Corpamounttp(SALT37.StrType s) := 0;
+EXPORT Make_Exploded_Desc_Corpamounttp(SALT311.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Corpamounttp(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Exploded_Desc_Corpamounttp(UNSIGNED1 wh) := '';
  
-EXPORT Make_Exploded_Desc_Corpempcd(SALT37.StrType s0) := s0;
-EXPORT InValid_Exploded_Desc_Corpempcd(SALT37.StrType s) := 0;
+EXPORT Make_Exploded_Desc_Corpempcd(SALT311.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Corpempcd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Exploded_Desc_Corpempcd(UNSIGNED1 wh) := '';
  
-EXPORT Make_Exploded_Desc_Ctrytelcd(SALT37.StrType s0) := s0;
-EXPORT InValid_Exploded_Desc_Ctrytelcd(SALT37.StrType s) := 0;
+EXPORT Make_Exploded_Desc_Ctrytelcd(SALT311.StrType s0) := s0;
+EXPORT InValid_Exploded_Desc_Ctrytelcd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Exploded_Desc_Ctrytelcd(UNSIGNED1 wh) := '';
  
-EXPORT Make_NormAddress_Type(SALT37.StrType s0) := s0;
-EXPORT InValid_NormAddress_Type(SALT37.StrType s) := 0;
+EXPORT Make_NormAddress_Type(SALT311.StrType s0) := s0;
+EXPORT InValid_NormAddress_Type(SALT311.StrType s) := 0;
 EXPORT InValidMessage_NormAddress_Type(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_Address(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_Address(SALT37.StrType s) := 0;
+EXPORT Make_Norm_Address(SALT311.StrType s0) := s0;
+EXPORT InValid_Norm_Address(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Norm_Address(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_City(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_City(SALT37.StrType s) := 0;
+EXPORT Make_Norm_City(SALT311.StrType s0) := s0;
+EXPORT InValid_Norm_City(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Norm_City(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_State(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_State(SALT37.StrType s) := 0;
+EXPORT Make_Norm_State(SALT311.StrType s0) := s0;
+EXPORT InValid_Norm_State(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Norm_State(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_StateC2(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_StateC2(SALT37.StrType s) := 0;
+EXPORT Make_Norm_StateC2(SALT311.StrType s0) := s0;
+EXPORT InValid_Norm_StateC2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Norm_StateC2(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_Zip(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_Zip(SALT37.StrType s) := 0;
+EXPORT Make_Norm_Zip(SALT311.StrType s0) := s0;
+EXPORT InValid_Norm_Zip(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Norm_Zip(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_Zip4(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_Zip4(SALT37.StrType s) := 0;
+EXPORT Make_Norm_Zip4(SALT311.StrType s0) := s0;
+EXPORT InValid_Norm_Zip4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Norm_Zip4(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_Lat(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_Lat(SALT37.StrType s) := 0;
+EXPORT Make_Norm_Lat(SALT311.StrType s0) := s0;
+EXPORT InValid_Norm_Lat(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Norm_Lat(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_Lon(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_Lon(SALT37.StrType s) := 0;
+EXPORT Make_Norm_Lon(SALT311.StrType s0) := s0;
+EXPORT InValid_Norm_Lon(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Norm_Lon(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_Geoprec(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_Geoprec(SALT37.StrType s) := 0;
+EXPORT Make_Norm_Geoprec(SALT311.StrType s0) := s0;
+EXPORT InValid_Norm_Geoprec(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Norm_Geoprec(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_Region(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_Region(SALT37.StrType s) := 0;
+EXPORT Make_Norm_Region(SALT311.StrType s0) := s0;
+EXPORT InValid_Norm_Region(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Norm_Region(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_Ctryisocd(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_Ctryisocd(SALT37.StrType s) := 0;
+EXPORT Make_Norm_Ctryisocd(SALT311.StrType s0) := s0;
+EXPORT InValid_Norm_Ctryisocd(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Norm_Ctryisocd(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_Ctrynum(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_Ctrynum(SALT37.StrType s) := 0;
+EXPORT Make_Norm_Ctrynum(SALT311.StrType s0) := s0;
+EXPORT InValid_Norm_Ctrynum(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Norm_Ctrynum(UNSIGNED1 wh) := '';
  
-EXPORT Make_Norm_Ctryname(SALT37.StrType s0) := s0;
-EXPORT InValid_Norm_Ctryname(SALT37.StrType s) := 0;
+EXPORT Make_Norm_Ctryname(SALT311.StrType s0) := s0;
+EXPORT InValid_Norm_Ctryname(SALT311.StrType s) := 0;
 EXPORT InValidMessage_Norm_Ctryname(UNSIGNED1 wh) := '';
  
-EXPORT Make_clean_company_name(SALT37.StrType s0) := s0;
-EXPORT InValid_clean_company_name(SALT37.StrType s) := 0;
+EXPORT Make_clean_company_name(SALT311.StrType s0) := s0;
+EXPORT InValid_clean_company_name(SALT311.StrType s) := 0;
 EXPORT InValidMessage_clean_company_name(UNSIGNED1 wh) := '';
  
-EXPORT Make_clean_phone(SALT37.StrType s0) := s0;
-EXPORT InValid_clean_phone(SALT37.StrType s) := 0;
+EXPORT Make_clean_phone(SALT311.StrType s0) := s0;
+EXPORT InValid_clean_phone(SALT311.StrType s) := 0;
 EXPORT InValidMessage_clean_phone(UNSIGNED1 wh) := '';
  
-EXPORT Make_clean_secondary_phone(SALT37.StrType s0) := s0;
-EXPORT InValid_clean_secondary_phone(SALT37.StrType s) := 0;
+EXPORT Make_clean_secondary_phone(SALT311.StrType s0) := s0;
+EXPORT InValid_clean_secondary_phone(SALT311.StrType s) := 0;
 EXPORT InValidMessage_clean_secondary_phone(UNSIGNED1 wh) := '';
  
-EXPORT Make_prim_range(SALT37.StrType s0) := s0;
-EXPORT InValid_prim_range(SALT37.StrType s) := 0;
+EXPORT Make_prim_range(SALT311.StrType s0) := s0;
+EXPORT InValid_prim_range(SALT311.StrType s) := 0;
 EXPORT InValidMessage_prim_range(UNSIGNED1 wh) := '';
  
-EXPORT Make_predir(SALT37.StrType s0) := s0;
-EXPORT InValid_predir(SALT37.StrType s) := 0;
+EXPORT Make_predir(SALT311.StrType s0) := s0;
+EXPORT InValid_predir(SALT311.StrType s) := 0;
 EXPORT InValidMessage_predir(UNSIGNED1 wh) := '';
  
-EXPORT Make_prim_name(SALT37.StrType s0) := s0;
-EXPORT InValid_prim_name(SALT37.StrType s) := 0;
+EXPORT Make_prim_name(SALT311.StrType s0) := s0;
+EXPORT InValid_prim_name(SALT311.StrType s) := 0;
 EXPORT InValidMessage_prim_name(UNSIGNED1 wh) := '';
  
-EXPORT Make_addr_suffix(SALT37.StrType s0) := s0;
-EXPORT InValid_addr_suffix(SALT37.StrType s) := 0;
+EXPORT Make_addr_suffix(SALT311.StrType s0) := s0;
+EXPORT InValid_addr_suffix(SALT311.StrType s) := 0;
 EXPORT InValidMessage_addr_suffix(UNSIGNED1 wh) := '';
  
-EXPORT Make_postdir(SALT37.StrType s0) := s0;
-EXPORT InValid_postdir(SALT37.StrType s) := 0;
+EXPORT Make_postdir(SALT311.StrType s0) := s0;
+EXPORT InValid_postdir(SALT311.StrType s) := 0;
 EXPORT InValidMessage_postdir(UNSIGNED1 wh) := '';
  
-EXPORT Make_unit_desig(SALT37.StrType s0) := s0;
-EXPORT InValid_unit_desig(SALT37.StrType s) := 0;
+EXPORT Make_unit_desig(SALT311.StrType s0) := s0;
+EXPORT InValid_unit_desig(SALT311.StrType s) := 0;
 EXPORT InValidMessage_unit_desig(UNSIGNED1 wh) := '';
  
-EXPORT Make_sec_range(SALT37.StrType s0) := s0;
-EXPORT InValid_sec_range(SALT37.StrType s) := 0;
+EXPORT Make_sec_range(SALT311.StrType s0) := s0;
+EXPORT InValid_sec_range(SALT311.StrType s) := 0;
 EXPORT InValidMessage_sec_range(UNSIGNED1 wh) := '';
  
-EXPORT Make_p_city_name(SALT37.StrType s0) := s0;
-EXPORT InValid_p_city_name(SALT37.StrType s) := 0;
+EXPORT Make_p_city_name(SALT311.StrType s0) := s0;
+EXPORT InValid_p_city_name(SALT311.StrType s) := 0;
 EXPORT InValidMessage_p_city_name(UNSIGNED1 wh) := '';
  
-EXPORT Make_v_city_name(SALT37.StrType s0) := s0;
-EXPORT InValid_v_city_name(SALT37.StrType s) := 0;
+EXPORT Make_v_city_name(SALT311.StrType s0) := s0;
+EXPORT InValid_v_city_name(SALT311.StrType s) := 0;
 EXPORT InValidMessage_v_city_name(UNSIGNED1 wh) := '';
  
-EXPORT Make_st(SALT37.StrType s0) := s0;
-EXPORT InValid_st(SALT37.StrType s) := 0;
+EXPORT Make_st(SALT311.StrType s0) := s0;
+EXPORT InValid_st(SALT311.StrType s) := 0;
 EXPORT InValidMessage_st(UNSIGNED1 wh) := '';
  
-EXPORT Make_cart(SALT37.StrType s0) := s0;
-EXPORT InValid_cart(SALT37.StrType s) := 0;
+EXPORT Make_cart(SALT311.StrType s0) := s0;
+EXPORT InValid_cart(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cart(UNSIGNED1 wh) := '';
  
-EXPORT Make_cr_sort_sz(SALT37.StrType s0) := s0;
-EXPORT InValid_cr_sort_sz(SALT37.StrType s) := 0;
+EXPORT Make_cr_sort_sz(SALT311.StrType s0) := s0;
+EXPORT InValid_cr_sort_sz(SALT311.StrType s) := 0;
 EXPORT InValidMessage_cr_sort_sz(UNSIGNED1 wh) := '';
  
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
-  IMPORT SALT37,Equifax_Business_Data;
+  IMPORT SALT311,Equifax_Business_Data;
 //Find those highly occuring pivot values to remove them from consideration
 #uniquename(tr)
   %tr% := table(in_left+in_right,{ val := pivot_exp; });
@@ -1298,12 +1283,7 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_AT_CERTEXP8;
     BOOLEAN Diff_AT_CERTEXP9;
     BOOLEAN Diff_AT_CERTEXP10;
-    BOOLEAN Diff_EFX_EXTRACT_DATE;
-    BOOLEAN Diff_EFX_MERCHANT_ID;
-    BOOLEAN Diff_EFX_PROJECT_ID;
     BOOLEAN Diff_EFX_FOREIGN;
-    BOOLEAN Diff_Record_Update_Refresh_Date;
-    BOOLEAN Diff_EFX_DATE_CREATED;
     BOOLEAN Diff_normCompany_Name;
     BOOLEAN Diff_normCompany_Type;
     BOOLEAN Diff_Norm_Geo_Precision;
@@ -1352,9 +1332,9 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_st;
     BOOLEAN Diff_cart;
     BOOLEAN Diff_cr_sort_sz;
-    SALT37.StrType SourceField {MAXLENGTH(30)};
+    SALT311.StrType SourceField {MAXLENGTH(30)};
     UNSIGNED Num_Diffs;
-    SALT37.StrType Val {MAXLENGTH(1024)};
+    SALT311.StrType Val {MAXLENGTH(1024)};
   END;
 #uniquename(fd)
   %dl% %fd%(in_left le,in_right ri) := TRANSFORM
@@ -1569,12 +1549,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_AT_CERTEXP8 := le.AT_CERTEXP8 <> ri.AT_CERTEXP8;
     SELF.Diff_AT_CERTEXP9 := le.AT_CERTEXP9 <> ri.AT_CERTEXP9;
     SELF.Diff_AT_CERTEXP10 := le.AT_CERTEXP10 <> ri.AT_CERTEXP10;
-    SELF.Diff_EFX_EXTRACT_DATE := le.EFX_EXTRACT_DATE <> ri.EFX_EXTRACT_DATE;
-    SELF.Diff_EFX_MERCHANT_ID := le.EFX_MERCHANT_ID <> ri.EFX_MERCHANT_ID;
-    SELF.Diff_EFX_PROJECT_ID := le.EFX_PROJECT_ID <> ri.EFX_PROJECT_ID;
     SELF.Diff_EFX_FOREIGN := le.EFX_FOREIGN <> ri.EFX_FOREIGN;
-    SELF.Diff_Record_Update_Refresh_Date := le.Record_Update_Refresh_Date <> ri.Record_Update_Refresh_Date;
-    SELF.Diff_EFX_DATE_CREATED := le.EFX_DATE_CREATED <> ri.EFX_DATE_CREATED;
     SELF.Diff_normCompany_Name := le.normCompany_Name <> ri.normCompany_Name;
     SELF.Diff_normCompany_Type := le.normCompany_Type <> ri.normCompany_Type;
     SELF.Diff_Norm_Geo_Precision := le.Norm_Geo_Precision <> ri.Norm_Geo_Precision;
@@ -1623,9 +1598,9 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_st := le.st <> ri.st;
     SELF.Diff_cart := le.cart <> ri.cart;
     SELF.Diff_cr_sort_sz := le.cr_sort_sz <> ri.cr_sort_sz;
-    SELF.Val := (SALT37.StrType)evaluate(le,pivot_exp);
+    SELF.Val := (SALT311.StrType)evaluate(le,pivot_exp);
     SELF.SourceField := le.source;
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_process_date,1,0)+ IF( SELF.Diff_dotid,1,0)+ IF( SELF.Diff_dotscore,1,0)+ IF( SELF.Diff_dotweight,1,0)+ IF( SELF.Diff_empid,1,0)+ IF( SELF.Diff_empscore,1,0)+ IF( SELF.Diff_empweight,1,0)+ IF( SELF.Diff_powid,1,0)+ IF( SELF.Diff_powscore,1,0)+ IF( SELF.Diff_powweight,1,0)+ IF( SELF.Diff_proxid,1,0)+ IF( SELF.Diff_proxscore,1,0)+ IF( SELF.Diff_proxweight,1,0)+ IF( SELF.Diff_selescore,1,0)+ IF( SELF.Diff_seleweight,1,0)+ IF( SELF.Diff_orgid,1,0)+ IF( SELF.Diff_orgscore,1,0)+ IF( SELF.Diff_orgweight,1,0)+ IF( SELF.Diff_ultid,1,0)+ IF( SELF.Diff_ultscore,1,0)+ IF( SELF.Diff_ultweight,1,0)+ IF( SELF.Diff_record_type,1,0)+ IF( SELF.Diff_EFX_ID,1,0)+ IF( SELF.Diff_EFX_NAME,1,0)+ IF( SELF.Diff_EFX_LEGAL_NAME,1,0)+ IF( SELF.Diff_EFX_ADDRESS,1,0)+ IF( SELF.Diff_EFX_CITY,1,0)+ IF( SELF.Diff_EFX_STATE,1,0)+ IF( SELF.Diff_EFX_STATEC,1,0)+ IF( SELF.Diff_EFX_ZIPCODE,1,0)+ IF( SELF.Diff_EFX_ZIP4,1,0)+ IF( SELF.Diff_EFX_LAT,1,0)+ IF( SELF.Diff_EFX_LON,1,0)+ IF( SELF.Diff_EFX_GEOPREC,1,0)+ IF( SELF.Diff_EFX_REGION,1,0)+ IF( SELF.Diff_EFX_CTRYISOCD,1,0)+ IF( SELF.Diff_EFX_CTRYNUM,1,0)+ IF( SELF.Diff_EFX_CTRYNAME,1,0)+ IF( SELF.Diff_EFX_COUNTYNM,1,0)+ IF( SELF.Diff_EFX_COUNTY,1,0)+ IF( SELF.Diff_EFX_CMSA,1,0)+ IF( SELF.Diff_EFX_CMSADESC,1,0)+ IF( SELF.Diff_EFX_SOHO,1,0)+ IF( SELF.Diff_EFX_BIZ,1,0)+ IF( SELF.Diff_EFX_RES,1,0)+ IF( SELF.Diff_EFX_CMRA,1,0)+ IF( SELF.Diff_EFX_CONGRESS,1,0)+ IF( SELF.Diff_EFX_SECADR,1,0)+ IF( SELF.Diff_EFX_SECCTY,1,0)+ IF( SELF.Diff_EFX_SECSTAT,1,0)+ IF( SELF.Diff_EFX_STATEC2,1,0)+ IF( SELF.Diff_EFX_SECZIP,1,0)+ IF( SELF.Diff_EFX_SECZIP4,1,0)+ IF( SELF.Diff_EFX_SECLAT,1,0)+ IF( SELF.Diff_EFX_SECLON,1,0)+ IF( SELF.Diff_EFX_SECGEOPREC,1,0)+ IF( SELF.Diff_EFX_SECREGION,1,0)+ IF( SELF.Diff_EFX_SECCTRYISOCD,1,0)+ IF( SELF.Diff_EFX_SECCTRYNUM,1,0)+ IF( SELF.Diff_EFX_SECCTRYNAME,1,0)+ IF( SELF.Diff_EFX_CTRYTELCD,1,0)+ IF( SELF.Diff_EFX_PHONE,1,0)+ IF( SELF.Diff_EFX_FAXPHONE,1,0)+ IF( SELF.Diff_EFX_BUSSTAT,1,0)+ IF( SELF.Diff_EFX_BUSSTATCD,1,0)+ IF( SELF.Diff_EFX_WEB,1,0)+ IF( SELF.Diff_EFX_YREST,1,0)+ IF( SELF.Diff_EFX_CORPEMPCNT,1,0)+ IF( SELF.Diff_EFX_LOCEMPCNT,1,0)+ IF( SELF.Diff_EFX_CORPEMPCD,1,0)+ IF( SELF.Diff_EFX_LOCEMPCD,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNT,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNTCD,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNTTP,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNTPREC,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNT,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNTCD,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNTTP,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNTPREC,1,0)+ IF( SELF.Diff_EFX_PUBLIC,1,0)+ IF( SELF.Diff_EFX_STKEXC,1,0)+ IF( SELF.Diff_EFX_TCKSYM,1,0)+ IF( SELF.Diff_EFX_PRIMSIC,1,0)+ IF( SELF.Diff_EFX_SECSIC1,1,0)+ IF( SELF.Diff_EFX_SECSIC2,1,0)+ IF( SELF.Diff_EFX_SECSIC3,1,0)+ IF( SELF.Diff_EFX_SECSIC4,1,0)+ IF( SELF.Diff_EFX_PRIMSICDESC,1,0)+ IF( SELF.Diff_EFX_SECSICDESC1,1,0)+ IF( SELF.Diff_EFX_SECSICDESC2,1,0)+ IF( SELF.Diff_EFX_SECSICDESC3,1,0)+ IF( SELF.Diff_EFX_SECSICDESC4,1,0)+ IF( SELF.Diff_EFX_PRIMNAICSCODE,1,0)+ IF( SELF.Diff_EFX_SECNAICS1,1,0)+ IF( SELF.Diff_EFX_SECNAICS2,1,0)+ IF( SELF.Diff_EFX_SECNAICS3,1,0)+ IF( SELF.Diff_EFX_SECNAICS4,1,0)+ IF( SELF.Diff_EFX_PRIMNAICSDESC,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC1,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC2,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC3,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC4,1,0)+ IF( SELF.Diff_EFX_DEAD,1,0)+ IF( SELF.Diff_EFX_DEADDT,1,0)+ IF( SELF.Diff_EFX_MRKT_TELEVER,1,0)+ IF( SELF.Diff_EFX_MRKT_TELESCORE,1,0)+ IF( SELF.Diff_EFX_MRKT_TOTALSCORE,1,0)+ IF( SELF.Diff_EFX_MRKT_TOTALIND,1,0)+ IF( SELF.Diff_EFX_MRKT_VACANT,1,0)+ IF( SELF.Diff_EFX_MRKT_SEASONAL,1,0)+ IF( SELF.Diff_EFX_MBE,1,0)+ IF( SELF.Diff_EFX_WBE,1,0)+ IF( SELF.Diff_EFX_MWBE,1,0)+ IF( SELF.Diff_EFX_SDB,1,0)+ IF( SELF.Diff_EFX_HUBZONE,1,0)+ IF( SELF.Diff_EFX_DBE,1,0)+ IF( SELF.Diff_EFX_VET,1,0)+ IF( SELF.Diff_EFX_DVET,1,0)+ IF( SELF.Diff_EFX_8a,1,0)+ IF( SELF.Diff_EFX_8aEXPDT,1,0)+ IF( SELF.Diff_EFX_DIS,1,0)+ IF( SELF.Diff_EFX_SBE,1,0)+ IF( SELF.Diff_EFX_BUSSIZE,1,0)+ IF( SELF.Diff_EFX_LBE,1,0)+ IF( SELF.Diff_EFX_GOV,1,0)+ IF( SELF.Diff_EFX_FGOV,1,0)+ IF( SELF.Diff_EFX_GOV1057,1,0)+ IF( SELF.Diff_EFX_NONPROFIT,1,0)+ IF( SELF.Diff_EFX_MERCTYPE,1,0)+ IF( SELF.Diff_EFX_HBCU,1,0)+ IF( SELF.Diff_EFX_GAYLESBIAN,1,0)+ IF( SELF.Diff_EFX_WSBE,1,0)+ IF( SELF.Diff_EFX_VSBE,1,0)+ IF( SELF.Diff_EFX_DVSBE,1,0)+ IF( SELF.Diff_EFX_MWBESTATUS,1,0)+ IF( SELF.Diff_EFX_NMSDC,1,0)+ IF( SELF.Diff_EFX_WBENC,1,0)+ IF( SELF.Diff_EFX_CA_PUC,1,0)+ IF( SELF.Diff_EFX_TX_HUB,1,0)+ IF( SELF.Diff_EFX_TX_HUBCERTNUM,1,0)+ IF( SELF.Diff_EFX_GSAX,1,0)+ IF( SELF.Diff_EFX_CALTRANS,1,0)+ IF( SELF.Diff_EFX_EDU,1,0)+ IF( SELF.Diff_EFX_MI,1,0)+ IF( SELF.Diff_EFX_ANC,1,0)+ IF( SELF.Diff_AT_CERT1,1,0)+ IF( SELF.Diff_AT_CERT2,1,0)+ IF( SELF.Diff_AT_CERT3,1,0)+ IF( SELF.Diff_AT_CERT4,1,0)+ IF( SELF.Diff_AT_CERT5,1,0)+ IF( SELF.Diff_AT_CERT6,1,0)+ IF( SELF.Diff_AT_CERT7,1,0)+ IF( SELF.Diff_AT_CERT8,1,0)+ IF( SELF.Diff_AT_CERT9,1,0)+ IF( SELF.Diff_AT_CERT10,1,0)+ IF( SELF.Diff_AT_CERTDESC1,1,0)+ IF( SELF.Diff_AT_CERTDESC2,1,0)+ IF( SELF.Diff_AT_CERTDESC3,1,0)+ IF( SELF.Diff_AT_CERTDESC4,1,0)+ IF( SELF.Diff_AT_CERTDESC5,1,0)+ IF( SELF.Diff_AT_CERTDESC6,1,0)+ IF( SELF.Diff_AT_CERTDESC7,1,0)+ IF( SELF.Diff_AT_CERTDESC8,1,0)+ IF( SELF.Diff_AT_CERTDESC9,1,0)+ IF( SELF.Diff_AT_CERTDESC10,1,0)+ IF( SELF.Diff_AT_CERTSRC1,1,0)+ IF( SELF.Diff_AT_CERTSRC2,1,0)+ IF( SELF.Diff_AT_CERTSRC3,1,0)+ IF( SELF.Diff_AT_CERTSRC4,1,0)+ IF( SELF.Diff_AT_CERTSRC5,1,0)+ IF( SELF.Diff_AT_CERTSRC6,1,0)+ IF( SELF.Diff_AT_CERTSRC7,1,0)+ IF( SELF.Diff_AT_CERTSRC8,1,0)+ IF( SELF.Diff_AT_CERTSRC9,1,0)+ IF( SELF.Diff_AT_CERTSRC10,1,0)+ IF( SELF.Diff_AT_CERTLEV1,1,0)+ IF( SELF.Diff_AT_CERTLEV2,1,0)+ IF( SELF.Diff_AT_CERTLEV3,1,0)+ IF( SELF.Diff_AT_CERTLEV4,1,0)+ IF( SELF.Diff_AT_CERTLEV5,1,0)+ IF( SELF.Diff_AT_CERTLEV6,1,0)+ IF( SELF.Diff_AT_CERTLEV7,1,0)+ IF( SELF.Diff_AT_CERTLEV8,1,0)+ IF( SELF.Diff_AT_CERTLEV9,1,0)+ IF( SELF.Diff_AT_CERTLEV10,1,0)+ IF( SELF.Diff_AT_CERTNUM1,1,0)+ IF( SELF.Diff_AT_CERTNUM2,1,0)+ IF( SELF.Diff_AT_CERTNUM3,1,0)+ IF( SELF.Diff_AT_CERTNUM4,1,0)+ IF( SELF.Diff_AT_CERTNUM5,1,0)+ IF( SELF.Diff_AT_CERTNUM6,1,0)+ IF( SELF.Diff_AT_CERTNUM7,1,0)+ IF( SELF.Diff_AT_CERTNUM8,1,0)+ IF( SELF.Diff_AT_CERTNUM9,1,0)+ IF( SELF.Diff_AT_CERTNUM10,1,0)+ IF( SELF.Diff_AT_CERTEXP1,1,0)+ IF( SELF.Diff_AT_CERTEXP2,1,0)+ IF( SELF.Diff_AT_CERTEXP3,1,0)+ IF( SELF.Diff_AT_CERTEXP4,1,0)+ IF( SELF.Diff_AT_CERTEXP5,1,0)+ IF( SELF.Diff_AT_CERTEXP6,1,0)+ IF( SELF.Diff_AT_CERTEXP7,1,0)+ IF( SELF.Diff_AT_CERTEXP8,1,0)+ IF( SELF.Diff_AT_CERTEXP9,1,0)+ IF( SELF.Diff_AT_CERTEXP10,1,0)+ IF( SELF.Diff_EFX_EXTRACT_DATE,1,0)+ IF( SELF.Diff_EFX_MERCHANT_ID,1,0)+ IF( SELF.Diff_EFX_PROJECT_ID,1,0)+ IF( SELF.Diff_EFX_FOREIGN,1,0)+ IF( SELF.Diff_Record_Update_Refresh_Date,1,0)+ IF( SELF.Diff_EFX_DATE_CREATED,1,0)+ IF( SELF.Diff_normCompany_Name,1,0)+ IF( SELF.Diff_normCompany_Type,1,0)+ IF( SELF.Diff_Norm_Geo_Precision,1,0)+ IF( SELF.Diff_Exploded_Desc_Corporate_Amount_Precision,1,0)+ IF( SELF.Diff_Exploded_Desc_Location_Amount_Precision,1,0)+ IF( SELF.Diff_Exploded_Desc_Public_Co_Indicator,1,0)+ IF( SELF.Diff_Exploded_Desc_Stock_Exchange,1,0)+ IF( SELF.Diff_Exploded_Desc_Telemarketablity_Score,1,0)+ IF( SELF.Diff_Exploded_Desc_Telemarketablity_Total_Indicator,1,0)+ IF( SELF.Diff_Exploded_Desc_Telemarketablity_Total_Score,1,0)+ IF( SELF.Diff_Exploded_Desc_Government1057_Entity,1,0)+ IF( SELF.Diff_Exploded_Desc_Merchant_Type,1,0)+ IF( SELF.Diff_Exploded_Desc_Busstatcd,1,0)+ IF( SELF.Diff_Exploded_Desc_CMSA,1,0)+ IF( SELF.Diff_Exploded_Desc_Corpamountcd,1,0)+ IF( SELF.Diff_Exploded_Desc_Corpamountprec,1,0)+ IF( SELF.Diff_Exploded_Desc_Corpamounttp,1,0)+ IF( SELF.Diff_Exploded_Desc_Corpempcd,1,0)+ IF( SELF.Diff_Exploded_Desc_Ctrytelcd,1,0)+ IF( SELF.Diff_NormAddress_Type,1,0)+ IF( SELF.Diff_Norm_Address,1,0)+ IF( SELF.Diff_Norm_City,1,0)+ IF( SELF.Diff_Norm_State,1,0)+ IF( SELF.Diff_Norm_StateC2,1,0)+ IF( SELF.Diff_Norm_Zip,1,0)+ IF( SELF.Diff_Norm_Zip4,1,0)+ IF( SELF.Diff_Norm_Lat,1,0)+ IF( SELF.Diff_Norm_Lon,1,0)+ IF( SELF.Diff_Norm_Geoprec,1,0)+ IF( SELF.Diff_Norm_Region,1,0)+ IF( SELF.Diff_Norm_Ctryisocd,1,0)+ IF( SELF.Diff_Norm_Ctrynum,1,0)+ IF( SELF.Diff_Norm_Ctryname,1,0)+ IF( SELF.Diff_clean_company_name,1,0)+ IF( SELF.Diff_clean_phone,1,0)+ IF( SELF.Diff_clean_secondary_phone,1,0)+ IF( SELF.Diff_prim_range,1,0)+ IF( SELF.Diff_predir,1,0)+ IF( SELF.Diff_prim_name,1,0)+ IF( SELF.Diff_addr_suffix,1,0)+ IF( SELF.Diff_postdir,1,0)+ IF( SELF.Diff_unit_desig,1,0)+ IF( SELF.Diff_sec_range,1,0)+ IF( SELF.Diff_p_city_name,1,0)+ IF( SELF.Diff_v_city_name,1,0)+ IF( SELF.Diff_st,1,0)+ IF( SELF.Diff_cart,1,0)+ IF( SELF.Diff_cr_sort_sz,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_process_date,1,0)+ IF( SELF.Diff_dotid,1,0)+ IF( SELF.Diff_dotscore,1,0)+ IF( SELF.Diff_dotweight,1,0)+ IF( SELF.Diff_empid,1,0)+ IF( SELF.Diff_empscore,1,0)+ IF( SELF.Diff_empweight,1,0)+ IF( SELF.Diff_powid,1,0)+ IF( SELF.Diff_powscore,1,0)+ IF( SELF.Diff_powweight,1,0)+ IF( SELF.Diff_proxid,1,0)+ IF( SELF.Diff_proxscore,1,0)+ IF( SELF.Diff_proxweight,1,0)+ IF( SELF.Diff_selescore,1,0)+ IF( SELF.Diff_seleweight,1,0)+ IF( SELF.Diff_orgid,1,0)+ IF( SELF.Diff_orgscore,1,0)+ IF( SELF.Diff_orgweight,1,0)+ IF( SELF.Diff_ultid,1,0)+ IF( SELF.Diff_ultscore,1,0)+ IF( SELF.Diff_ultweight,1,0)+ IF( SELF.Diff_record_type,1,0)+ IF( SELF.Diff_EFX_ID,1,0)+ IF( SELF.Diff_EFX_NAME,1,0)+ IF( SELF.Diff_EFX_LEGAL_NAME,1,0)+ IF( SELF.Diff_EFX_ADDRESS,1,0)+ IF( SELF.Diff_EFX_CITY,1,0)+ IF( SELF.Diff_EFX_STATE,1,0)+ IF( SELF.Diff_EFX_STATEC,1,0)+ IF( SELF.Diff_EFX_ZIPCODE,1,0)+ IF( SELF.Diff_EFX_ZIP4,1,0)+ IF( SELF.Diff_EFX_LAT,1,0)+ IF( SELF.Diff_EFX_LON,1,0)+ IF( SELF.Diff_EFX_GEOPREC,1,0)+ IF( SELF.Diff_EFX_REGION,1,0)+ IF( SELF.Diff_EFX_CTRYISOCD,1,0)+ IF( SELF.Diff_EFX_CTRYNUM,1,0)+ IF( SELF.Diff_EFX_CTRYNAME,1,0)+ IF( SELF.Diff_EFX_COUNTYNM,1,0)+ IF( SELF.Diff_EFX_COUNTY,1,0)+ IF( SELF.Diff_EFX_CMSA,1,0)+ IF( SELF.Diff_EFX_CMSADESC,1,0)+ IF( SELF.Diff_EFX_SOHO,1,0)+ IF( SELF.Diff_EFX_BIZ,1,0)+ IF( SELF.Diff_EFX_RES,1,0)+ IF( SELF.Diff_EFX_CMRA,1,0)+ IF( SELF.Diff_EFX_CONGRESS,1,0)+ IF( SELF.Diff_EFX_SECADR,1,0)+ IF( SELF.Diff_EFX_SECCTY,1,0)+ IF( SELF.Diff_EFX_SECSTAT,1,0)+ IF( SELF.Diff_EFX_STATEC2,1,0)+ IF( SELF.Diff_EFX_SECZIP,1,0)+ IF( SELF.Diff_EFX_SECZIP4,1,0)+ IF( SELF.Diff_EFX_SECLAT,1,0)+ IF( SELF.Diff_EFX_SECLON,1,0)+ IF( SELF.Diff_EFX_SECGEOPREC,1,0)+ IF( SELF.Diff_EFX_SECREGION,1,0)+ IF( SELF.Diff_EFX_SECCTRYISOCD,1,0)+ IF( SELF.Diff_EFX_SECCTRYNUM,1,0)+ IF( SELF.Diff_EFX_SECCTRYNAME,1,0)+ IF( SELF.Diff_EFX_CTRYTELCD,1,0)+ IF( SELF.Diff_EFX_PHONE,1,0)+ IF( SELF.Diff_EFX_FAXPHONE,1,0)+ IF( SELF.Diff_EFX_BUSSTAT,1,0)+ IF( SELF.Diff_EFX_BUSSTATCD,1,0)+ IF( SELF.Diff_EFX_WEB,1,0)+ IF( SELF.Diff_EFX_YREST,1,0)+ IF( SELF.Diff_EFX_CORPEMPCNT,1,0)+ IF( SELF.Diff_EFX_LOCEMPCNT,1,0)+ IF( SELF.Diff_EFX_CORPEMPCD,1,0)+ IF( SELF.Diff_EFX_LOCEMPCD,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNT,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNTCD,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNTTP,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNTPREC,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNT,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNTCD,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNTTP,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNTPREC,1,0)+ IF( SELF.Diff_EFX_PUBLIC,1,0)+ IF( SELF.Diff_EFX_STKEXC,1,0)+ IF( SELF.Diff_EFX_TCKSYM,1,0)+ IF( SELF.Diff_EFX_PRIMSIC,1,0)+ IF( SELF.Diff_EFX_SECSIC1,1,0)+ IF( SELF.Diff_EFX_SECSIC2,1,0)+ IF( SELF.Diff_EFX_SECSIC3,1,0)+ IF( SELF.Diff_EFX_SECSIC4,1,0)+ IF( SELF.Diff_EFX_PRIMSICDESC,1,0)+ IF( SELF.Diff_EFX_SECSICDESC1,1,0)+ IF( SELF.Diff_EFX_SECSICDESC2,1,0)+ IF( SELF.Diff_EFX_SECSICDESC3,1,0)+ IF( SELF.Diff_EFX_SECSICDESC4,1,0)+ IF( SELF.Diff_EFX_PRIMNAICSCODE,1,0)+ IF( SELF.Diff_EFX_SECNAICS1,1,0)+ IF( SELF.Diff_EFX_SECNAICS2,1,0)+ IF( SELF.Diff_EFX_SECNAICS3,1,0)+ IF( SELF.Diff_EFX_SECNAICS4,1,0)+ IF( SELF.Diff_EFX_PRIMNAICSDESC,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC1,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC2,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC3,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC4,1,0)+ IF( SELF.Diff_EFX_DEAD,1,0)+ IF( SELF.Diff_EFX_DEADDT,1,0)+ IF( SELF.Diff_EFX_MRKT_TELEVER,1,0)+ IF( SELF.Diff_EFX_MRKT_TELESCORE,1,0)+ IF( SELF.Diff_EFX_MRKT_TOTALSCORE,1,0)+ IF( SELF.Diff_EFX_MRKT_TOTALIND,1,0)+ IF( SELF.Diff_EFX_MRKT_VACANT,1,0)+ IF( SELF.Diff_EFX_MRKT_SEASONAL,1,0)+ IF( SELF.Diff_EFX_MBE,1,0)+ IF( SELF.Diff_EFX_WBE,1,0)+ IF( SELF.Diff_EFX_MWBE,1,0)+ IF( SELF.Diff_EFX_SDB,1,0)+ IF( SELF.Diff_EFX_HUBZONE,1,0)+ IF( SELF.Diff_EFX_DBE,1,0)+ IF( SELF.Diff_EFX_VET,1,0)+ IF( SELF.Diff_EFX_DVET,1,0)+ IF( SELF.Diff_EFX_8a,1,0)+ IF( SELF.Diff_EFX_8aEXPDT,1,0)+ IF( SELF.Diff_EFX_DIS,1,0)+ IF( SELF.Diff_EFX_SBE,1,0)+ IF( SELF.Diff_EFX_BUSSIZE,1,0)+ IF( SELF.Diff_EFX_LBE,1,0)+ IF( SELF.Diff_EFX_GOV,1,0)+ IF( SELF.Diff_EFX_FGOV,1,0)+ IF( SELF.Diff_EFX_GOV1057,1,0)+ IF( SELF.Diff_EFX_NONPROFIT,1,0)+ IF( SELF.Diff_EFX_MERCTYPE,1,0)+ IF( SELF.Diff_EFX_HBCU,1,0)+ IF( SELF.Diff_EFX_GAYLESBIAN,1,0)+ IF( SELF.Diff_EFX_WSBE,1,0)+ IF( SELF.Diff_EFX_VSBE,1,0)+ IF( SELF.Diff_EFX_DVSBE,1,0)+ IF( SELF.Diff_EFX_MWBESTATUS,1,0)+ IF( SELF.Diff_EFX_NMSDC,1,0)+ IF( SELF.Diff_EFX_WBENC,1,0)+ IF( SELF.Diff_EFX_CA_PUC,1,0)+ IF( SELF.Diff_EFX_TX_HUB,1,0)+ IF( SELF.Diff_EFX_TX_HUBCERTNUM,1,0)+ IF( SELF.Diff_EFX_GSAX,1,0)+ IF( SELF.Diff_EFX_CALTRANS,1,0)+ IF( SELF.Diff_EFX_EDU,1,0)+ IF( SELF.Diff_EFX_MI,1,0)+ IF( SELF.Diff_EFX_ANC,1,0)+ IF( SELF.Diff_AT_CERT1,1,0)+ IF( SELF.Diff_AT_CERT2,1,0)+ IF( SELF.Diff_AT_CERT3,1,0)+ IF( SELF.Diff_AT_CERT4,1,0)+ IF( SELF.Diff_AT_CERT5,1,0)+ IF( SELF.Diff_AT_CERT6,1,0)+ IF( SELF.Diff_AT_CERT7,1,0)+ IF( SELF.Diff_AT_CERT8,1,0)+ IF( SELF.Diff_AT_CERT9,1,0)+ IF( SELF.Diff_AT_CERT10,1,0)+ IF( SELF.Diff_AT_CERTDESC1,1,0)+ IF( SELF.Diff_AT_CERTDESC2,1,0)+ IF( SELF.Diff_AT_CERTDESC3,1,0)+ IF( SELF.Diff_AT_CERTDESC4,1,0)+ IF( SELF.Diff_AT_CERTDESC5,1,0)+ IF( SELF.Diff_AT_CERTDESC6,1,0)+ IF( SELF.Diff_AT_CERTDESC7,1,0)+ IF( SELF.Diff_AT_CERTDESC8,1,0)+ IF( SELF.Diff_AT_CERTDESC9,1,0)+ IF( SELF.Diff_AT_CERTDESC10,1,0)+ IF( SELF.Diff_AT_CERTSRC1,1,0)+ IF( SELF.Diff_AT_CERTSRC2,1,0)+ IF( SELF.Diff_AT_CERTSRC3,1,0)+ IF( SELF.Diff_AT_CERTSRC4,1,0)+ IF( SELF.Diff_AT_CERTSRC5,1,0)+ IF( SELF.Diff_AT_CERTSRC6,1,0)+ IF( SELF.Diff_AT_CERTSRC7,1,0)+ IF( SELF.Diff_AT_CERTSRC8,1,0)+ IF( SELF.Diff_AT_CERTSRC9,1,0)+ IF( SELF.Diff_AT_CERTSRC10,1,0)+ IF( SELF.Diff_AT_CERTLEV1,1,0)+ IF( SELF.Diff_AT_CERTLEV2,1,0)+ IF( SELF.Diff_AT_CERTLEV3,1,0)+ IF( SELF.Diff_AT_CERTLEV4,1,0)+ IF( SELF.Diff_AT_CERTLEV5,1,0)+ IF( SELF.Diff_AT_CERTLEV6,1,0)+ IF( SELF.Diff_AT_CERTLEV7,1,0)+ IF( SELF.Diff_AT_CERTLEV8,1,0)+ IF( SELF.Diff_AT_CERTLEV9,1,0)+ IF( SELF.Diff_AT_CERTLEV10,1,0)+ IF( SELF.Diff_AT_CERTNUM1,1,0)+ IF( SELF.Diff_AT_CERTNUM2,1,0)+ IF( SELF.Diff_AT_CERTNUM3,1,0)+ IF( SELF.Diff_AT_CERTNUM4,1,0)+ IF( SELF.Diff_AT_CERTNUM5,1,0)+ IF( SELF.Diff_AT_CERTNUM6,1,0)+ IF( SELF.Diff_AT_CERTNUM7,1,0)+ IF( SELF.Diff_AT_CERTNUM8,1,0)+ IF( SELF.Diff_AT_CERTNUM9,1,0)+ IF( SELF.Diff_AT_CERTNUM10,1,0)+ IF( SELF.Diff_AT_CERTEXP1,1,0)+ IF( SELF.Diff_AT_CERTEXP2,1,0)+ IF( SELF.Diff_AT_CERTEXP3,1,0)+ IF( SELF.Diff_AT_CERTEXP4,1,0)+ IF( SELF.Diff_AT_CERTEXP5,1,0)+ IF( SELF.Diff_AT_CERTEXP6,1,0)+ IF( SELF.Diff_AT_CERTEXP7,1,0)+ IF( SELF.Diff_AT_CERTEXP8,1,0)+ IF( SELF.Diff_AT_CERTEXP9,1,0)+ IF( SELF.Diff_AT_CERTEXP10,1,0)+ IF( SELF.Diff_EFX_FOREIGN,1,0)+ IF( SELF.Diff_normCompany_Name,1,0)+ IF( SELF.Diff_normCompany_Type,1,0)+ IF( SELF.Diff_Norm_Geo_Precision,1,0)+ IF( SELF.Diff_Exploded_Desc_Corporate_Amount_Precision,1,0)+ IF( SELF.Diff_Exploded_Desc_Location_Amount_Precision,1,0)+ IF( SELF.Diff_Exploded_Desc_Public_Co_Indicator,1,0)+ IF( SELF.Diff_Exploded_Desc_Stock_Exchange,1,0)+ IF( SELF.Diff_Exploded_Desc_Telemarketablity_Score,1,0)+ IF( SELF.Diff_Exploded_Desc_Telemarketablity_Total_Indicator,1,0)+ IF( SELF.Diff_Exploded_Desc_Telemarketablity_Total_Score,1,0)+ IF( SELF.Diff_Exploded_Desc_Government1057_Entity,1,0)+ IF( SELF.Diff_Exploded_Desc_Merchant_Type,1,0)+ IF( SELF.Diff_Exploded_Desc_Busstatcd,1,0)+ IF( SELF.Diff_Exploded_Desc_CMSA,1,0)+ IF( SELF.Diff_Exploded_Desc_Corpamountcd,1,0)+ IF( SELF.Diff_Exploded_Desc_Corpamountprec,1,0)+ IF( SELF.Diff_Exploded_Desc_Corpamounttp,1,0)+ IF( SELF.Diff_Exploded_Desc_Corpempcd,1,0)+ IF( SELF.Diff_Exploded_Desc_Ctrytelcd,1,0)+ IF( SELF.Diff_NormAddress_Type,1,0)+ IF( SELF.Diff_Norm_Address,1,0)+ IF( SELF.Diff_Norm_City,1,0)+ IF( SELF.Diff_Norm_State,1,0)+ IF( SELF.Diff_Norm_StateC2,1,0)+ IF( SELF.Diff_Norm_Zip,1,0)+ IF( SELF.Diff_Norm_Zip4,1,0)+ IF( SELF.Diff_Norm_Lat,1,0)+ IF( SELF.Diff_Norm_Lon,1,0)+ IF( SELF.Diff_Norm_Geoprec,1,0)+ IF( SELF.Diff_Norm_Region,1,0)+ IF( SELF.Diff_Norm_Ctryisocd,1,0)+ IF( SELF.Diff_Norm_Ctrynum,1,0)+ IF( SELF.Diff_Norm_Ctryname,1,0)+ IF( SELF.Diff_clean_company_name,1,0)+ IF( SELF.Diff_clean_phone,1,0)+ IF( SELF.Diff_clean_secondary_phone,1,0)+ IF( SELF.Diff_prim_range,1,0)+ IF( SELF.Diff_predir,1,0)+ IF( SELF.Diff_prim_name,1,0)+ IF( SELF.Diff_addr_suffix,1,0)+ IF( SELF.Diff_postdir,1,0)+ IF( SELF.Diff_unit_desig,1,0)+ IF( SELF.Diff_sec_range,1,0)+ IF( SELF.Diff_p_city_name,1,0)+ IF( SELF.Diff_v_city_name,1,0)+ IF( SELF.Diff_st,1,0)+ IF( SELF.Diff_cart,1,0)+ IF( SELF.Diff_cr_sort_sz,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -1849,12 +1824,7 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_AT_CERTEXP8 := COUNT(GROUP,%Closest%.Diff_AT_CERTEXP8);
     Count_Diff_AT_CERTEXP9 := COUNT(GROUP,%Closest%.Diff_AT_CERTEXP9);
     Count_Diff_AT_CERTEXP10 := COUNT(GROUP,%Closest%.Diff_AT_CERTEXP10);
-    Count_Diff_EFX_EXTRACT_DATE := COUNT(GROUP,%Closest%.Diff_EFX_EXTRACT_DATE);
-    Count_Diff_EFX_MERCHANT_ID := COUNT(GROUP,%Closest%.Diff_EFX_MERCHANT_ID);
-    Count_Diff_EFX_PROJECT_ID := COUNT(GROUP,%Closest%.Diff_EFX_PROJECT_ID);
     Count_Diff_EFX_FOREIGN := COUNT(GROUP,%Closest%.Diff_EFX_FOREIGN);
-    Count_Diff_Record_Update_Refresh_Date := COUNT(GROUP,%Closest%.Diff_Record_Update_Refresh_Date);
-    Count_Diff_EFX_DATE_CREATED := COUNT(GROUP,%Closest%.Diff_EFX_DATE_CREATED);
     Count_Diff_normCompany_Name := COUNT(GROUP,%Closest%.Diff_normCompany_Name);
     Count_Diff_normCompany_Type := COUNT(GROUP,%Closest%.Diff_normCompany_Type);
     Count_Diff_Norm_Geo_Precision := COUNT(GROUP,%Closest%.Diff_Norm_Geo_Precision);
@@ -1909,6 +1879,7 @@ Bad_Pivots := %t2%(Cnt>100);
 ENDMACRO;
 // Now determine the consistency of the identifiers
 EXPORT UIDConsistency(infile) := FUNCTIONMACRO
+  IMPORT Equifax_Business_Data,SALT311;
   f := TABLE(infile,{rcid,seleid}) : GLOBAL; // Consistent type independent of input
   m := MODULE
     r := RECORD
@@ -1917,25 +1888,25 @@ EXPORT UIDConsistency(infile) := FUNCTIONMACRO
       UNSIGNED rcid_atparent := COUNT(GROUP,(UNSIGNED)f.seleid=(UNSIGNED)f.rcid);
       UNSIGNED seleid_null0 := COUNT(GROUP,(UNSIGNED)f.seleid=0);
     END;
-  EXPORT Basic0 := TABLE(f,r);
-  EXPORT rcid_Clusters := SALT37.MOD_ClusterStats.Counts(f,rcid);
-  EXPORT seleid_Clusters := SALT37.MOD_ClusterStats.Counts(f,seleid);
-  EXPORT IdCounts := DATASET([{'rcid_Cnt', SUM(rcid_Clusters,NumberOfClusters)},{'seleid_Cnt', SUM(seleid_Clusters,NumberOfClusters)}],{STRING10 Count_Type, UNSIGNED Cnt}); // The counts of each ID
- // For deeper debugging; provide the unbased parents
+    EXPORT Basic0 := TABLE(f,r);
+    EXPORT rcid_Clusters := SALT311.MOD_ClusterStats.Counts(f,rcid);
+    EXPORT seleid_Clusters := SALT311.MOD_ClusterStats.Counts(f,seleid);
+    EXPORT IdCounts := DATASET([{'rcid_Cnt', SUM(rcid_Clusters,NumberOfClusters)},{'seleid_Cnt', SUM(seleid_Clusters,NumberOfClusters)}],{STRING10 Count_Type, UNSIGNED Cnt}); // The counts of each ID
+    // For deeper debugging; provide the unbased parents
     bases := f((UNSIGNED)seleid=(UNSIGNED)rcid); // Get the bases
-  EXPORT seleid_Unbased := JOIN(f(seleid<>0),bases,LEFT.seleid=RIGHT.seleid,TRANSFORM(LEFT),LEFT ONLY,HASH);
- // Children with two parents
+    EXPORT seleid_Unbased := JOIN(f(seleid<>0),bases,LEFT.seleid=RIGHT.seleid,TRANSFORM(LEFT),LEFT ONLY,HASH);
+    // Children with two parents
     f_thin := TABLE(f(rcid<>0,seleid<>0),{rcid,seleid},rcid,seleid,MERGE);
-  EXPORT rcid_Twoparents := DEDUP(JOIN(f_thin,f_thin,LEFT.rcid=RIGHT.rcid AND LEFT.seleid>RIGHT.seleid,TRANSFORM({SALT37.UIDType seleid1,SALT37.UIDType rcid,SALT37.UIDType seleid2},SELF.seleid1:=LEFT.seleid,SELF.seleid2:=RIGHT.seleid,SELF.rcid:=LEFT.rcid),HASH),WHOLE RECORD,ALL);
- // Now compute the more involved consistency checks
+    EXPORT rcid_Twoparents := DEDUP(JOIN(f_thin,f_thin,LEFT.rcid=RIGHT.rcid AND LEFT.seleid>RIGHT.seleid,TRANSFORM({SALT311.UIDType seleid1,SALT311.UIDType rcid,SALT311.UIDType seleid2},SELF.seleid1:=LEFT.seleid,SELF.seleid2:=RIGHT.seleid,SELF.rcid:=LEFT.rcid),HASH),WHOLE RECORD,ALL);
+    // Now compute the more involved consistency checks
     r := RECORD
       {Basic0} AND NOT [rcid_atparent];
       INTEGER seleid_unbased0 := IdCounts[2].Cnt-Basic0.rcid_atparent-IF(Basic0.seleid_null0>0,1,0);
       INTEGER rcid_Twoparents0 := COUNT(rcid_Twoparents);
     END;
-  Advanced00 := TABLE(Basic0,r);
-  Advanced0Layout := {STRING label, INTEGER null0, INTEGER belowparent0, INTEGER unbased0, INTEGER Twoparents0};
-  EXPORT Advanced0 := SORT(SALT37.MAC_Pivot(Advanced00,Advanced0Layout), MAP(label='rcid'=>0,1));
+    Advanced00 := TABLE(Basic0,r);
+    Advanced0Layout := {STRING label, INTEGER null0, INTEGER belowparent0, INTEGER unbased0, INTEGER Twoparents0};
+    EXPORT Advanced0 := SORT(SALT311.MAC_Pivot(Advanced00,Advanced0Layout), MAP(label='rcid'=>0,1));
   END;
   RETURN m;
 ENDMACRO;

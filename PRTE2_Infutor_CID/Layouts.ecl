@@ -1,12 +1,16 @@
-﻿IMPORT PRTE2_infutor_cid, Phonesplus_v2, Phonesplus, PRTE2_Common, PRTE_CSV, PRTE2_Phonesplus;
+﻿IMPORT PRTE2_infutor_cid, InfutorCID, Phonesplus_v2, Phonesplus, PRTE2_Common, PRTE_CSV, PRTE2_Phonesplus;
 
 EXPORT Layouts := MODULE
 
-         EXPORT Layout_Phonesplus_Base := Phonesplus_v2.Layout_Phonesplus_Base;
-         EXPORT Alpha_CSV_Layout := PRTE2_Phonesplus.Layouts.Alpha_CSV_Layout;
-         EXPORT Base_in := PRTE2_Phonesplus.Layouts.Base_in;         
-         EXPORT Base_common := PRTE2_Phonesplus.Layouts.Base_common;
-         EXPORT Base_ext := PRTE2_Phonesplus.Layouts.Base_ext;
+         EXPORT Infutor_Base := InfutorCID.Layout_InfutorCID_Base;
+
+         EXPORT phones_base := RECORD
+           Phonesplus_v2.Layout_Phonesplus_Base;
+           STRING20 cust_name;
+           STRING10 bug_num;
+           STRING9 link_ssn;
+           STRING8 link_dob;
+         END;
                   
          EXPORT DID_key := RECORD
            unsigned6 did;

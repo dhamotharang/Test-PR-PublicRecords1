@@ -2,11 +2,11 @@
 IMPORT Scrubs_DataBridge; // Import modules for FieldTypes attribute definitions
 EXPORT Base_Fields := MODULE
  
-EXPORT NumFields := 47;
+EXPORT NumFields := 48;
  
 // Processing for each FieldType
-EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_mandatory','invalid_generaldate','invalid_pastdate','invalid_record_type','invalid_numeric','invalid_st','invalid_zip5','invalid_phone','invalid_sic','invalid_url','invalid_email','invalid_mail_score','invalid_gender_code','invalid_email_present_flag','invalid_source_code','invalid_email_status');
-EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'invalid_mandatory' => 1,'invalid_generaldate' => 2,'invalid_pastdate' => 3,'invalid_record_type' => 4,'invalid_numeric' => 5,'invalid_st' => 6,'invalid_zip5' => 7,'invalid_phone' => 8,'invalid_sic' => 9,'invalid_url' => 10,'invalid_email' => 11,'invalid_mail_score' => 12,'invalid_gender_code' => 13,'invalid_email_present_flag' => 14,'invalid_source_code' => 15,'invalid_email_status' => 16,0);
+EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_mandatory','invalid_generaldate','invalid_pastdate','invalid_trans_date','invalid_record_type','invalid_numeric','invalid_st','invalid_zip5','invalid_phone','invalid_sic','invalid_url','invalid_email','invalid_mail_score','invalid_gender_code','invalid_email_present_flag','invalid_source_code','invalid_email_status');
+EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'invalid_mandatory' => 1,'invalid_generaldate' => 2,'invalid_pastdate' => 3,'invalid_trans_date' => 4,'invalid_record_type' => 5,'invalid_numeric' => 6,'invalid_st' => 7,'invalid_zip5' => 8,'invalid_phone' => 9,'invalid_sic' => 10,'invalid_url' => 11,'invalid_email' => 12,'invalid_mail_score' => 13,'invalid_gender_code' => 14,'invalid_email_present_flag' => 15,'invalid_source_code' => 16,'invalid_email_status' => 17,0);
  
 EXPORT MakeFT_invalid_mandatory(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -25,6 +25,12 @@ EXPORT MakeFT_invalid_pastdate(SALT311.StrType s0) := FUNCTION
 END;
 EXPORT InValidFT_invalid_pastdate(SALT311.StrType s) := WHICH(~Scrubs_DataBridge.Functions.fn_past_yyyymmdd(s)>0);
 EXPORT InValidMessageFT_invalid_pastdate(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_DataBridge.Functions.fn_past_yyyymmdd'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_trans_date(SALT311.StrType s0) := FUNCTION
+  RETURN  s0;
+END;
+EXPORT InValidFT_invalid_trans_date(SALT311.StrType s) := WHICH(~Scrubs_DataBridge.Functions.fn_trans_date(s)>0);
+EXPORT InValidMessageFT_invalid_trans_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_DataBridge.Functions.fn_trans_date'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_record_type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -105,11 +111,11 @@ END;
 EXPORT InValidFT_invalid_email_status(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['VALID','INVALID','UNKNOWN','']);
 EXPORT InValidMessageFT_invalid_email_status(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('VALID|INVALID|UNKNOWN|'),SALT311.HygieneErrors.Good);
  
-EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','process_date','record_type','clean_company_name','clean_telephone_num','state','zip_code5','mail_score','name_gender','web_address','sic8_1','sic8_2','sic8_3','sic8_4','sic6_1','sic6_2','sic6_3','sic6_4','sic6_5','database_site_id','database_individual_id','email','email_present_flag','site_source1','site_source2','site_source3','site_source4','site_source5','site_source6','site_source7','site_source8','site_source9','site_source10','individual_source1','individual_source2','individual_source3','individual_source4','individual_source5','individual_source6','individual_source7','individual_source8','individual_source9','individual_source10','email_status');
-EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','process_date','record_type','clean_company_name','clean_telephone_num','state','zip_code5','mail_score','name_gender','web_address','sic8_1','sic8_2','sic8_3','sic8_4','sic6_1','sic6_2','sic6_3','sic6_4','sic6_5','database_site_id','database_individual_id','email','email_present_flag','site_source1','site_source2','site_source3','site_source4','site_source5','site_source6','site_source7','site_source8','site_source9','site_source10','individual_source1','individual_source2','individual_source3','individual_source4','individual_source5','individual_source6','individual_source7','individual_source8','individual_source9','individual_source10','email_status');
-EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'dt_first_seen' => 0,'dt_last_seen' => 1,'dt_vendor_first_reported' => 2,'dt_vendor_last_reported' => 3,'process_date' => 4,'record_type' => 5,'clean_company_name' => 6,'clean_telephone_num' => 7,'state' => 8,'zip_code5' => 9,'mail_score' => 10,'name_gender' => 11,'web_address' => 12,'sic8_1' => 13,'sic8_2' => 14,'sic8_3' => 15,'sic8_4' => 16,'sic6_1' => 17,'sic6_2' => 18,'sic6_3' => 19,'sic6_4' => 20,'sic6_5' => 21,'database_site_id' => 22,'database_individual_id' => 23,'email' => 24,'email_present_flag' => 25,'site_source1' => 26,'site_source2' => 27,'site_source3' => 28,'site_source4' => 29,'site_source5' => 30,'site_source6' => 31,'site_source7' => 32,'site_source8' => 33,'site_source9' => 34,'site_source10' => 35,'individual_source1' => 36,'individual_source2' => 37,'individual_source3' => 38,'individual_source4' => 39,'individual_source5' => 40,'individual_source6' => 41,'individual_source7' => 42,'individual_source8' => 43,'individual_source9' => 44,'individual_source10' => 45,'email_status' => 46,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ENUM'],['LENGTHS'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ENUM'],['ENUM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],[]);
-EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
+EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','process_date','record_type','clean_company_name','clean_telephone_num','state','zip_code5','mail_score','name_gender','web_address','sic8_1','sic8_2','sic8_3','sic8_4','sic6_1','sic6_2','sic6_3','sic6_4','sic6_5','transaction_date','database_site_id','database_individual_id','email','email_present_flag','site_source1','site_source2','site_source3','site_source4','site_source5','site_source6','site_source7','site_source8','site_source9','site_source10','individual_source1','individual_source2','individual_source3','individual_source4','individual_source5','individual_source6','individual_source7','individual_source8','individual_source9','individual_source10','email_status');
+EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','process_date','record_type','clean_company_name','clean_telephone_num','state','zip_code5','mail_score','name_gender','web_address','sic8_1','sic8_2','sic8_3','sic8_4','sic6_1','sic6_2','sic6_3','sic6_4','sic6_5','transaction_date','database_site_id','database_individual_id','email','email_present_flag','site_source1','site_source2','site_source3','site_source4','site_source5','site_source6','site_source7','site_source8','site_source9','site_source10','individual_source1','individual_source2','individual_source3','individual_source4','individual_source5','individual_source6','individual_source7','individual_source8','individual_source9','individual_source10','email_status');
+EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'dt_first_seen' => 0,'dt_last_seen' => 1,'dt_vendor_first_reported' => 2,'dt_vendor_last_reported' => 3,'process_date' => 4,'record_type' => 5,'clean_company_name' => 6,'clean_telephone_num' => 7,'state' => 8,'zip_code5' => 9,'mail_score' => 10,'name_gender' => 11,'web_address' => 12,'sic8_1' => 13,'sic8_2' => 14,'sic8_3' => 15,'sic8_4' => 16,'sic6_1' => 17,'sic6_2' => 18,'sic6_3' => 19,'sic6_4' => 20,'sic6_5' => 21,'transaction_date' => 22,'database_site_id' => 23,'database_individual_id' => 24,'email' => 25,'email_present_flag' => 26,'site_source1' => 27,'site_source2' => 28,'site_source3' => 29,'site_source4' => 30,'site_source5' => 31,'site_source6' => 32,'site_source7' => 33,'site_source8' => 34,'site_source9' => 35,'site_source10' => 36,'individual_source1' => 37,'individual_source2' => 38,'individual_source3' => 39,'individual_source4' => 40,'individual_source5' => 41,'individual_source6' => 42,'individual_source7' => 43,'individual_source8' => 44,'individual_source9' => 45,'individual_source10' => 46,'email_status' => 47,0);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ENUM'],['LENGTHS'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ENUM'],['ENUM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
  
@@ -200,6 +206,10 @@ EXPORT InValidMessage_sic6_4(UNSIGNED1 wh) := InValidMessageFT_invalid_sic(wh);
 EXPORT Make_sic6_5(SALT311.StrType s0) := MakeFT_invalid_sic(s0);
 EXPORT InValid_sic6_5(SALT311.StrType s) := InValidFT_invalid_sic(s);
 EXPORT InValidMessage_sic6_5(UNSIGNED1 wh) := InValidMessageFT_invalid_sic(wh);
+ 
+EXPORT Make_transaction_date(SALT311.StrType s0) := MakeFT_invalid_trans_date(s0);
+EXPORT InValid_transaction_date(SALT311.StrType s) := InValidFT_invalid_trans_date(s);
+EXPORT InValidMessage_transaction_date(UNSIGNED1 wh) := InValidMessageFT_invalid_trans_date(wh);
  
 EXPORT Make_database_site_id(SALT311.StrType s0) := MakeFT_invalid_numeric(s0);
 EXPORT InValid_database_site_id(SALT311.StrType s) := InValidFT_invalid_numeric(s);
@@ -344,6 +354,7 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_sic6_3;
     BOOLEAN Diff_sic6_4;
     BOOLEAN Diff_sic6_5;
+    BOOLEAN Diff_transaction_date;
     BOOLEAN Diff_database_site_id;
     BOOLEAN Diff_database_individual_id;
     BOOLEAN Diff_email;
@@ -396,6 +407,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_sic6_3 := le.sic6_3 <> ri.sic6_3;
     SELF.Diff_sic6_4 := le.sic6_4 <> ri.sic6_4;
     SELF.Diff_sic6_5 := le.sic6_5 <> ri.sic6_5;
+    SELF.Diff_transaction_date := le.transaction_date <> ri.transaction_date;
     SELF.Diff_database_site_id := le.database_site_id <> ri.database_site_id;
     SELF.Diff_database_individual_id := le.database_individual_id <> ri.database_individual_id;
     SELF.Diff_email := le.email <> ri.email;
@@ -422,7 +434,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_individual_source10 := le.individual_source10 <> ri.individual_source10;
     SELF.Diff_email_status := le.email_status <> ri.email_status;
     SELF.Val := (SALT311.StrType)evaluate(le,pivot_exp);
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_dt_first_seen,1,0)+ IF( SELF.Diff_dt_last_seen,1,0)+ IF( SELF.Diff_dt_vendor_first_reported,1,0)+ IF( SELF.Diff_dt_vendor_last_reported,1,0)+ IF( SELF.Diff_process_date,1,0)+ IF( SELF.Diff_record_type,1,0)+ IF( SELF.Diff_clean_company_name,1,0)+ IF( SELF.Diff_clean_telephone_num,1,0)+ IF( SELF.Diff_state,1,0)+ IF( SELF.Diff_zip_code5,1,0)+ IF( SELF.Diff_mail_score,1,0)+ IF( SELF.Diff_name_gender,1,0)+ IF( SELF.Diff_web_address,1,0)+ IF( SELF.Diff_sic8_1,1,0)+ IF( SELF.Diff_sic8_2,1,0)+ IF( SELF.Diff_sic8_3,1,0)+ IF( SELF.Diff_sic8_4,1,0)+ IF( SELF.Diff_sic6_1,1,0)+ IF( SELF.Diff_sic6_2,1,0)+ IF( SELF.Diff_sic6_3,1,0)+ IF( SELF.Diff_sic6_4,1,0)+ IF( SELF.Diff_sic6_5,1,0)+ IF( SELF.Diff_database_site_id,1,0)+ IF( SELF.Diff_database_individual_id,1,0)+ IF( SELF.Diff_email,1,0)+ IF( SELF.Diff_email_present_flag,1,0)+ IF( SELF.Diff_site_source1,1,0)+ IF( SELF.Diff_site_source2,1,0)+ IF( SELF.Diff_site_source3,1,0)+ IF( SELF.Diff_site_source4,1,0)+ IF( SELF.Diff_site_source5,1,0)+ IF( SELF.Diff_site_source6,1,0)+ IF( SELF.Diff_site_source7,1,0)+ IF( SELF.Diff_site_source8,1,0)+ IF( SELF.Diff_site_source9,1,0)+ IF( SELF.Diff_site_source10,1,0)+ IF( SELF.Diff_individual_source1,1,0)+ IF( SELF.Diff_individual_source2,1,0)+ IF( SELF.Diff_individual_source3,1,0)+ IF( SELF.Diff_individual_source4,1,0)+ IF( SELF.Diff_individual_source5,1,0)+ IF( SELF.Diff_individual_source6,1,0)+ IF( SELF.Diff_individual_source7,1,0)+ IF( SELF.Diff_individual_source8,1,0)+ IF( SELF.Diff_individual_source9,1,0)+ IF( SELF.Diff_individual_source10,1,0)+ IF( SELF.Diff_email_status,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_dt_first_seen,1,0)+ IF( SELF.Diff_dt_last_seen,1,0)+ IF( SELF.Diff_dt_vendor_first_reported,1,0)+ IF( SELF.Diff_dt_vendor_last_reported,1,0)+ IF( SELF.Diff_process_date,1,0)+ IF( SELF.Diff_record_type,1,0)+ IF( SELF.Diff_clean_company_name,1,0)+ IF( SELF.Diff_clean_telephone_num,1,0)+ IF( SELF.Diff_state,1,0)+ IF( SELF.Diff_zip_code5,1,0)+ IF( SELF.Diff_mail_score,1,0)+ IF( SELF.Diff_name_gender,1,0)+ IF( SELF.Diff_web_address,1,0)+ IF( SELF.Diff_sic8_1,1,0)+ IF( SELF.Diff_sic8_2,1,0)+ IF( SELF.Diff_sic8_3,1,0)+ IF( SELF.Diff_sic8_4,1,0)+ IF( SELF.Diff_sic6_1,1,0)+ IF( SELF.Diff_sic6_2,1,0)+ IF( SELF.Diff_sic6_3,1,0)+ IF( SELF.Diff_sic6_4,1,0)+ IF( SELF.Diff_sic6_5,1,0)+ IF( SELF.Diff_transaction_date,1,0)+ IF( SELF.Diff_database_site_id,1,0)+ IF( SELF.Diff_database_individual_id,1,0)+ IF( SELF.Diff_email,1,0)+ IF( SELF.Diff_email_present_flag,1,0)+ IF( SELF.Diff_site_source1,1,0)+ IF( SELF.Diff_site_source2,1,0)+ IF( SELF.Diff_site_source3,1,0)+ IF( SELF.Diff_site_source4,1,0)+ IF( SELF.Diff_site_source5,1,0)+ IF( SELF.Diff_site_source6,1,0)+ IF( SELF.Diff_site_source7,1,0)+ IF( SELF.Diff_site_source8,1,0)+ IF( SELF.Diff_site_source9,1,0)+ IF( SELF.Diff_site_source10,1,0)+ IF( SELF.Diff_individual_source1,1,0)+ IF( SELF.Diff_individual_source2,1,0)+ IF( SELF.Diff_individual_source3,1,0)+ IF( SELF.Diff_individual_source4,1,0)+ IF( SELF.Diff_individual_source5,1,0)+ IF( SELF.Diff_individual_source6,1,0)+ IF( SELF.Diff_individual_source7,1,0)+ IF( SELF.Diff_individual_source8,1,0)+ IF( SELF.Diff_individual_source9,1,0)+ IF( SELF.Diff_individual_source10,1,0)+ IF( SELF.Diff_email_status,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -457,6 +469,7 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_sic6_3 := COUNT(GROUP,%Closest%.Diff_sic6_3);
     Count_Diff_sic6_4 := COUNT(GROUP,%Closest%.Diff_sic6_4);
     Count_Diff_sic6_5 := COUNT(GROUP,%Closest%.Diff_sic6_5);
+    Count_Diff_transaction_date := COUNT(GROUP,%Closest%.Diff_transaction_date);
     Count_Diff_database_site_id := COUNT(GROUP,%Closest%.Diff_database_site_id);
     Count_Diff_database_individual_id := COUNT(GROUP,%Closest%.Diff_database_individual_id);
     Count_Diff_email := COUNT(GROUP,%Closest%.Diff_email);

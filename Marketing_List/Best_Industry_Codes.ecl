@@ -150,11 +150,13 @@ function
     self.SIC3               := ds_sics_nonblank [3].sic;
     self.SIC4               := ds_sics_nonblank [4].sic;
     self.SIC5               := ds_sics_nonblank [5].sic;
+    self.src_sics           := left.source             ;
     self.NAICS_Primary      := ds_naics_nonblank[1].naics;
     self.NAICS2             := ds_naics_nonblank[2].naics;
     self.NAICS3             := ds_naics_nonblank[3].naics;
     self.NAICS4             := ds_naics_nonblank[4].naics;
     self.NAICS5             := ds_naics_nonblank[5].naics;
+    self.src_naics          := left.source               ;
 
     self                    := left;
     self                    := []

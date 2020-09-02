@@ -1,38 +1,31 @@
 ﻿import FraudShared, Anonymizer, Address,Std,tools;
 export Build_Base_Anonymized (
-   string pversion,
-   dataset(FraudShared.Layouts.Base.Main)  pBaseFile   = FraudShared.Files().Base.Main.Built
+     string pversion
+    ,dataset(FraudShared.Layouts.Base.Main) pBaseFile   = $.Files().Base.Main_Orig.Built
+    ,dataset(FraudShared.Layouts.Base.Main) Previous_Build = FraudShared.Files().Base.Main.QA
 ) := 
 module 
 
 	nodes := thorlib.nodes();	
-
 	CustomerSettings := Files().CustomerSettings;
 
-	empty := dataset([], FraudShared.Layouts.Base.Main);
-
-	QA_Data := if(nothor(STD.File.GetSuperFileSubCount( FraudGovPlatform.Filenames().Base.Main_Anon.QA )) > 0, FraudGovPlatform.Files().Base.Main_Anon.QA,empty);
-	Demo_Data	:= if(nothor(STD.File.GetSuperFileSubCount( Filenames().Input.DemoData.Sprayed )) > 0, Files().Input.DemoData.Sprayed,empty);
-
-	QABaseAndDemo := if(_Flags.UseDemoData, QA_Data + Demo_Data, QA_Data);
-	
-	anonymize_Records_Never_Anonymized_Before 
+	New_Recs 
 		:= join (	distribute(pBaseFile,hash32(record_id)),
-					distribute(QABaseAndDemo,hash32(record_id)),
+					distribute(Previous_Build,hash32(record_id)),
 					left.record_id = right.record_id,
-					transform(FraudShared.Layouts.Base.Main, self := left;),
+					transform(FraudShared.Layouts.Base.Main, self := left),
 					left only,
 					local);
 
-	anonymize_Only_Anonimized_Sources 
-		:= join (	anonymize_Records_Never_Anonymized_Before,
+	Sources_Anonymized
+		:= join (	New_Recs,
 					CustomerSettings(Anonymize_Data = true),
 					(unsigned2)left.classification_Permissible_use_access.fdn_file_info_id = (unsigned2)right.fdn_file_info_id, 
 					transform(FraudShared.Layouts.Base.Main, self := left;),
 					inner,
 					LOOKUP);
-	
-	anonymizePerson :=Anonymizer.mac_AnonymizePerson(anonymize_Only_Anonimized_Sources,raw_first_name,raw_last_name,,,,raw_full_name);
+
+	anonymizePerson :=Anonymizer.mac_AnonymizePerson(Sources_Anonymized,raw_first_name,raw_last_name,,,,raw_full_name);
 	anonymizePerson1 :=Anonymizer.mac_AnonymizePerson(anonymizePerson,,,,ssn,dob,,clean_phones.cell_phone);
 	anonymizePerson2 :=Anonymizer.mac_AnonymizePerson(anonymizePerson1,cleaned_name.fname,cleaned_name.lname);
 	anonymizePerson3 :=Anonymizer.mac_AnonymizePerson(anonymizePerson2,,,,clean_ssn,clean_dob,,clean_phones.phone_number, Email_Address);
@@ -86,34 +79,36 @@ module
 											end;
 
 	New_Records_Anonymized	:= Project(anonymizeAddress2,TrAddress(left), local);
-	
-	New_Records_Not_Anonimized 
-		:= join(	distribute(pBaseFile,hash32(record_id)),
-					anonymize_Only_Anonimized_Sources,
+
+	New_Records_Not_Anonymized 
+		:= join(	New_Recs,
+					Sources_Anonymized,
 					left.record_id = right.record_id,
 					transform(FraudShared.Layouts.Base.Main, self := left;),
 					left only,
 					local);
-										
-	Original_QA 
-		:= join(	distribute(QA_Data,hash32(record_id)), // Discard Demo Data here, since it will append later and can cause duplicates
-					distribute(pBaseFile,hash32(record_id)),
-					left.record_id = right.record_id,
-					transform(FraudShared.Layouts.Base.Main, self := left;),
-					left only,
-					local);	
-										
-	Shared new_base := Original_QA + New_Records_Anonymized + New_Records_Not_Anonimized;
-	
-	Shared final_rec := join(pBaseFile, new_base, left.record_id = right.record_id, transform(FraudShared.Layouts.Base.Main, self := right));
 
-	tools.mac_WriteFile(Filenames(pversion).Base.Main_Anon.New,final_rec,Build_Base_File_Anonymized);
+	Old_Recs
+		:= join (	distribute(pBaseFile,hash32(record_id)),
+					distribute(Previous_Build,hash32(record_id)),
+					left.record_id = right.record_id,
+					transform(FraudShared.Layouts.Base.Main, self := right),
+					inner,
+					local);
+
+	//Add demo data GRP-5144, 5276
+	Demo_main := FraudGovPlatform.fn_demodata_refresh(pVersion);
+	
+	MergeRecs := FraudGovPlatform.fn_dedup_main( Old_Recs + New_Records_Anonymized + New_Records_Not_Anonymized + Demo_main );
+
+	tools.mac_WriteFile(FraudShared.Filenames(pversion).Base.Main.New,MergeRecs,Build_Base_File_Anonymized);
 
 	export All :=
 	if(tools.fun_IsValidVersion(pversion)
 		,sequential(
 				Build_Base_File_Anonymized,
-				Promote(pversion).buildfiles.New2Built)
+				FraudGovPlatform.Promote(pversion).buildfiles.New2Built,
+				Fraudshared.Promote(pversion).buildfiles.New2Built)
 		,output('No Valid version parameter passed, skipping Build_Base_Anonymized atribute')
 	);
 end;

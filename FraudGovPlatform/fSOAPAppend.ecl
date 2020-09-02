@@ -3,8 +3,8 @@ gateway,riskprocessing,_control,Autokey_batch,DriversV2_Services;
 
 EXPORT fSOAPAppend(boolean	UpdatePii   = _Flags.Update.Pii)	:= MODULE
 
-	Shared nodes				:= thorlib.nodes();
-	Shared threads			:= 2;
+	Shared nodes				:= 150;//The data to be distributed on 150 nodes before sending to soapcall. 
+	Shared threads			:= 1;
 
 	//PII Input Process Begin
 
@@ -54,7 +54,7 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 
 	shared Advo_Base				:= Files().base.Advo.qa;
 
-	shared DLHistory_Base		:= if(STD.File.GetSuperFileSubCount(FraudGovPlatform.Filenames().base.DLHistory.qa) = 0, dataset([], FraudGovPlatform.Layouts.DLHistory ),Files().base.DLHistory.qa);
+	shared DLHistory_Base		:= Files().base.DLHistory.qa;
 	
 	shared BestInfo_Base		:= Files().base.BestInfo.qa;
 	
@@ -860,7 +860,7 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 	
 	 EXPORT BocaShell	:= Module
    	
-   unsigned1 parallel_calls :=if(_control.ThisEnvironment.Name <> 'Prod_Thor',2,30);  
+   unsigned1 parallel_calls :=threads;  
    boolean FraudPointMode := true;
    boolean RemoveFares := false;	
    boolean LeadIntegrityMode := false; 
@@ -969,8 +969,8 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
     SELF := [];
    END;
    p_f := PROJECT (ds_input, assignAccount (LEFT,COUNTER));
-   s := Risk_Indicators.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
-                                                  bs_service, roxieIP, parallel_calls);
+   s := BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
+                                                  bs_service, roxieIP, parallel_calls,nodes);
 																									
 
 		riskprocessing.layouts.layout_internal_shell getold(s le, l ri) :=	TRANSFORM
@@ -987,7 +987,7 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 	 Base_Map := Join(Shell_Out,Pii_Input,left.record_id=right.record_id
 											,Transform(recordof(left),self.fdn_file_info_id:=right.fdn_file_info_id,self:=left));
 	 
-	 Export All := dedup(Base_Map,all);
+	 Export All := If(UpdatePii, dedup((Base_Map + BocaShell_Base),all) , dedup(Base_Map,all));
    END;
 
 END;

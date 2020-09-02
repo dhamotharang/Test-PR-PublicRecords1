@@ -6,10 +6,10 @@ EXPORT Build_Input (
 module
 
 	// Modules
-	export Run_IdentityData := Build_Input_IdentityData(pversion, MBS_Sprayed).All:independent;
-	export Run_KnownFraud :=  Build_Input_KnownFraud(pversion, MBS_Sprayed).All:independent;
-	export Run_Deltabase := Build_Input_Deltabase(pversion, MBS_Sprayed).All:independent;
-	export Promote_Inputs := Promote(pversion).promote_inputs;
+	export Run_IdentityData := $.Build_Input_IdentityData(pversion, MBS_Sprayed).All:independent;
+	export Run_KnownFraud :=  $.Build_Input_KnownFraud(pversion, MBS_Sprayed).All:independent;
+	export Run_Deltabase := $.Build_Input_Deltabase(pversion, MBS_Sprayed).All:independent;
+	export Promote_Inputs := $.Promote(pversion).promote_inputs;
 
 	export All :=
 	if(tools.fun_IsValidVersion(pversion)
