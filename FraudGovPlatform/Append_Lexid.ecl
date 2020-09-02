@@ -21,8 +21,8 @@ FUNCTIONMACRO
 			SELF.zip5		 			:= l.clean_address.zip;
 			SELF.state				:= l.clean_address.st;
 			SELF.phone				:= choose(cnt,l.clean_phones.phone_number,l.clean_phones.cell_phone);
-			SELF.ssn					:= l.ssn;
-			SELF.dob					:= l.dob;
+			SELF.ssn					:= l.clean_ssn;
+			SELF.dob					:= l.clean_dob;
 			SELF.did					:= 0;
 			SELF.did_score		:= 0;
 			SELF		 	    		:= l;
