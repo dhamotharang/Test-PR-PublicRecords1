@@ -2,8 +2,6 @@
 
 EXPORT fn_individual_orderid_removal := FUNCTION
 
-order_list := ['42756444', '66060901'];
-
  //OrderVersion input file 
  ds_ordervs := DATASET(data_services.foreign_prod +'thor_data400::in::flcrash::alpharetta::order_version_new'
 						           ,flaccidents.Layout_NtlAccidents_Alpharetta.order_vs
@@ -34,7 +32,7 @@ order_list := ['42756444', '66060901'];
  result_delete := ds_result(order_id IN order_list); 
  result_after_deletion := ds_result(order_id NOT IN order_list); 
  out_result := OUTPUT(result_after_deletion,,'~thor_data400::in::ntl::data_removal_result_'+WORKUNIT,OVERWRITE, __COMPRESSED__,
-					              CSV(TERMINATOR('\n'), SEPARATOR(',')));
+					              CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"')));
 
  result_all :=  SEQUENTIAL(
 													  OUTPUT(COUNT(ds_result), NAMED('cnt_result_prod')),
@@ -52,7 +50,7 @@ order_list := ['42756444', '66060901'];
 	//Incident input file
   ds_incident := DATASET(data_services.foreign_prod + 'thor_data400::in::flcrash::alpharetta::vehicle_incident_new'
 										    ,flaccidents.Layout_NtlAccidents_Alpharetta.incident
-										    ,CSV(TERMINATOR('\n'), SEPARATOR(',')));
+										    ,CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"')));
 	
   incident_delete := ds_incident(order_id IN order_list); 
   incident_after_deletion := ds_incident(order_id NOT IN order_list); 							 
