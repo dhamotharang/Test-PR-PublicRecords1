@@ -1,11 +1,11 @@
-﻿IMPORT data_services, dx_PhoneFinderReportDelta;
+﻿IMPORT dx_PhoneFinderReportDelta;
 
 EXPORT File_PhoneFinder := MODULE
 
-		export Identities_Raw					:= dataset('~thor_data400::in::phonefinderreportdelta::identities_daily', 			PhoneFinderReportDelta.Layout_PhoneFinder.Identities_Raw, csv(heading(single), terminator('\n'), separator('|\t|')));
-		export OtherPhones_Raw				:= dataset('~thor_data400::in::phonefinderreportdelta::otherphones_daily', 			PhoneFinderReportDelta.Layout_PhoneFinder.OtherPhones_Raw, csv(heading(single), terminator('\n'), separator('|\t|')));	
-		export RiskIndicators_Raw			:= dataset('~thor_data400::in::phonefinderreportdelta::riskindicators_daily', 	PhoneFinderReportDelta.Layout_PhoneFinder.RiskIndicators_Raw, csv(heading(single), terminator('\n'), separator('|\t|')));
-		export Transactions_Raw 			:= dataset('~thor_data400::in::phonefinderreportdelta::transaction_daily', 			PhoneFinderReportDelta.Layout_PhoneFinder.Transactions_Raw, csv(heading(single), terminator('\n'), separator('|\t|')));
+		export Identities_Raw					:= dataset('~thor_data400::in::phonefinderreportdelta::identities_daily', 			PhoneFinderReportDelta.Layout_PhoneFinder.Identities_Raw, csv(heading(1), terminator('\n'), separator('|\t|')));
+		export OtherPhones_Raw				:= dataset('~thor_data400::in::phonefinderreportdelta::otherphones_daily', 			PhoneFinderReportDelta.Layout_PhoneFinder.OtherPhones_Raw, csv(heading(1), terminator('\n'), separator('|\t|')));	
+		export RiskIndicators_Raw			:= dataset('~thor_data400::in::phonefinderreportdelta::riskindicators_daily', 	PhoneFinderReportDelta.Layout_PhoneFinder.RiskIndicators_Raw, csv(heading(1), terminator('\n'), separator('|\t|')));
+		export Transactions_Raw 			:= dataset('~thor_data400::in::phonefinderreportdelta::transaction_daily', 			PhoneFinderReportDelta.Layout_PhoneFinder.Transactions_Raw, csv(heading(1), terminator('\n'), separator('|\t|')));
 		
 		export Identities_History			:= dataset('~thor_data400::in::phonefinderreportdelta::identities_history', 		PhoneFinderReportDelta.Layout_PhoneFinder.Identities_History, flat);
 		export OtherPhones_History		:= dataset('~thor_data400::in::phonefinderreportdelta::otherphones_history', 		PhoneFinderReportDelta.Layout_PhoneFinder.OtherPhones_History, flat);
