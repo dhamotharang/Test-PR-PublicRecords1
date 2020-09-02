@@ -24,8 +24,8 @@ EXPORT PhoneAttributes_BatchRecords(
 
 	Layout_BatchOut tMostRecentRecord(Layout_BatchRaw L) := TRANSFORM
 		allrows_rec := dPortedLineSortPhones(acctno = L.acctno and phoneno = L.phoneno and event_date < L.event_date);
-		SELF.disconnect_date :=	MAX(L.disconnect_date, MAX(allrows_rec, allrows_rec.disconnect_date)
-			,MAX(allrows_rec,allrows_rec.swapped_phone_number_date)); // swaps also produces a disconnected phone
+		SELF.disconnect_date :=	IF(L.is_deact IN ['Y', 'N'], MAX(L.disconnect_date, MAX(allrows_rec, allrows_rec.disconnect_date)
+			,MAX(allrows_rec,allrows_rec.swapped_phone_number_date)),0); // swaps also produces a disconnected phone
 		SELF.ported_date :=	MAX(L.ported_date, MAX(allrows_rec, allrows_rec.ported_date));
 		SELF.line_type_last_seen :=	MAX(L.line_type_last_seen, MAX(allrows_rec, allrows_rec.line_type_last_seen));
 
