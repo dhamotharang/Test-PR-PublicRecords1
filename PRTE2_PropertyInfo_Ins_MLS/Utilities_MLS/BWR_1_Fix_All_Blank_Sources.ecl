@@ -5,9 +5,9 @@ Basically 3 steps to fix the data we have had over the years to the new data.
 3. Rebuild F records from all the others again - that way we avoid MLS values for attributes that it s/n have.
 ********************************************************************************************************** */
 
-IMPORT PRTE2_PropertyInfo_Ins_MLS_X,PRTE2_Common,PRTE2_PropertyInfo_Ins_PreMLS;
+IMPORT PRTE2_PropertyInfo_Ins_MLS,PRTE2_Common,PRTE2_PropertyInfo_Ins_PreMLS;
 
-DS_Prop := SORT(PRTE2_PropertyInfo_Ins_MLS_X.Files.PII_ALPHA_BASE_SF_DS_Prod,property_rid);
+DS_Prop := SORT(PRTE2_PropertyInfo_Ins_MLS.Files.PII_ALPHA_BASE_SF_DS_Prod,property_rid);
 Keep_asis := DS_Prop(vendor_source = 'F');
 PropInfo := DS_Prop(vendor_source <> 'F');
 
@@ -136,7 +136,7 @@ TempCSV2		:= PRTE2_PropertyInfo_Ins_PreMLS.Files.Alpha_Spray_Name+'_2';
 PRTE2_Common.DesprayCSV(EXPORT_DS, TempCSV, LandingZoneIP, lzFilePathFile);
 PRTE2_Common.DesprayCSV(EXPORT_DS2, TempCSV2, LandingZoneIP, lzFilePathFile2);
 
-Files := PRTE2_PropertyInfo_Ins_MLS_X.Files;
+Files := PRTE2_PropertyInfo_Ins_MLS.Files;
 NewDataDS := DISTRIBUTE(EXPORT_DS,HASH(fares_unformatted_apn,property_rid));
 buildPIIBase := PRTE2_Common.Promote_Supers.mac_SFBuildProcess(NewDataDS, Files.PII_ALPHA_BASE_SF);
 SEQUENTIAL(buildPIIBase);

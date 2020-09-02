@@ -1,5 +1,5 @@
 ﻿/* ************************************************************************************************************************
-PRTE2_PropertyInfo_Ins_MLS_X.Utilities_MLS.fn_add_Type_F
+PRTE2_PropertyInfo_Ins_MLS.Utilities_MLS.fn_add_Type_G
 
 **********************************************************************************************
 ***** MLS CONVERSION NOTES:
@@ -8,13 +8,13 @@ Pass in recordset with all other types as well.
 Receive recordset with "F" records.
 **********************************************************************************************
 ************************************************************************************************************************ */
-IMPORT PRTE2_PropertyInfo_Ins_MLS_X, PRTE2_Common_DevOnly;
+IMPORT PRTE2_PropertyInfo_Ins_MLS, PRTE2_Common_DevOnly;
 
-BaseLayout := PRTE2_PropertyInfo_Ins_MLS_X.Layouts.AlphaPropertyCSVRec_MLS;
+BaseLayout := PRTE2_PropertyInfo_Ins_MLS.Layouts.AlphaPropertyCSVRec_MLS;
 
-EXPORT fn_add_Type_F(DATASET(BaseLayout) CloneableDS, DATASET(BaseLayout) DS_Prop) := FUNCTION
+EXPORT fn_add_Type_G(DATASET(BaseLayout) CloneableDS, DATASET(BaseLayout) DS_Prop) := FUNCTION
 
-    // DS_Prop := PRTE2_PropertyInfo_Ins_MLS_X.Files.PII_ALPHA_BASE_SF_DS;
+    // DS_Prop := PRTE2_PropertyInfo_Ins_MLS.Files.PII_ALPHA_BASE_SF_DS;
     EnhanceableDS1A := DS_Prop(vendor_source='A');
     EnhanceableDS1B := DS_Prop(vendor_source='B');
     EnhanceableDS1C := DS_Prop(vendor_source='C');
@@ -53,7 +53,7 @@ EXPORT fn_add_Type_F(DATASET(BaseLayout) CloneableDS, DATASET(BaseLayout) DS_Pro
                     LEFT.fares_unformatted_apn = RIGHT.fares_unformatted_apn,
                     GROUP,
                     TRANSFORM({CloneableDS_D},
-                            SELF.vendor_source := 'F';
+                            SELF.vendor_source := 'G';
                             rowsIn := SORT(ROWS(RIGHT),RND_NUM);
                             // rowsIn2 := SORT(ROWS(RIGHT),-RND_NUM);      // trying to get some randomness within the record.
                             Boolean recFound := COUNT(rowsIn)>0;

@@ -1,17 +1,17 @@
 ﻿/* ************************************************************************************************************************
-PRTE2_PropertyInfo_Ins_MLS_X.Utilities.BWR_Get_Payload_Base_All_6_Sources
+PRTE2_PropertyInfo_Ins_MLS.Utilities.BWR_4_Get_Payload_Base_All_6_Sources
 
 **********************************************************************************************
 ***** MLS CONVERSION NOTES:
 This is a one time fix to despray all 4 record sources instead of the old 2 record sources.
-After this PRTE2_PropertyInfo_Ins_MLS_X.Get_Payload will change quite a bit with less to do.
+After this PRTE2_PropertyInfo_Ins_MLS.Get_Payload will change quite a bit with less to do.
 Also while I'm doing this create logic to add "E" and "F" records, then despray all 6 record types
 **********************************************************************************************
 ************************************************************************************************************************ */
 
 IMPORT PRTE2_Common, ut;
 IMPORT PRTE2_PropertyInfo_Ins_PreMLS;
-IMPORT PRTE2_PropertyInfo_Ins_MLS_X;
+IMPORT PRTE2_PropertyInfo_Ins_MLS;
 
 #workunit('name', 'ALPHA PRCT PropertyInfo Despray');
 
@@ -22,7 +22,7 @@ appendIfCSZ 	:= PRTE2_Common.Functions.appendIfCSZ;
 
 //----------- Prepare the Alpharetta Export_DS desired ----------------
 desprayName 	:= 'PropertyInfo_MLS_Prod_'+dateString+'.csv';
-PropInfo_ABCD_0 		:= SORT(PRTE2_PropertyInfo_Ins_MLS_X.Utilities_MLS.proc_Get_Payload_CSV_Layout.All_Expanded,property_street_address,property_city_state_zip,vendor_source);
+PropInfo_ABCD_0 		:= SORT(PRTE2_PropertyInfo_Ins_MLS.Utilities_MLS.proc_Get_Payload_CSV_Layout.All_Expanded,property_street_address,property_city_state_zip,vendor_source);
 //---------------------------------------------------------------------
 // NOTE: The following is temporary - BC2.1 Data3 will give better fields to fill.
 //---------------------------------------------------------------------
@@ -34,15 +34,15 @@ PropInfo_ABCD := PROJECT(PropInfo_ABCD_0, TRANSFORM({PropInfo_ABCD_0},
 																SELF := LEFT;
 																));
 //---------------------------------------------------------------------
-PropInfo_E := PRTE2_PropertyInfo_Ins_MLS_X.Utilities_MLS.fn_add_Type_E(PropInfo_ABCD(vendor_source='D'));
+PropInfo_E := PRTE2_PropertyInfo_Ins_MLS.Utilities_MLS.fn_add_Type_E(PropInfo_ABCD(vendor_source='D'));
 //---------------------------------------------------------------------
-PropInfo_F := PRTE2_PropertyInfo_Ins_MLS_X.Utilities_MLS.fn_add_Type_F(PropInfo_E, PropInfo_ABCD);
+PropInfo_F := PRTE2_PropertyInfo_Ins_MLS.Utilities_MLS.fn_add_Type_F(PropInfo_E, PropInfo_ABCD);
 
 //---------------------------------------------------------------------
 PropInfo_ABCDEF_1 := PropInfo_ABCD+PropInfo_E+PropInfo_F;
 // ----- Renumber RIDs after all is done ------------------------------ 
 PropInfo_ABCDEF_1  Resequence_Rids (PropInfo_ABCDEF_1 L, Integer C) := TRANSFORM
-		self.property_rid   := (unsigned) PRTE2_PropertyInfo_Ins_MLS_X.Constants.ALPHA_RID_CONSTANT + C;
+		self.property_rid   := (unsigned) PRTE2_PropertyInfo_Ins_MLS.Constants.ALPHA_RID_CONSTANT + C;
 		SELF := L;
 		SELF := [];
 END;		

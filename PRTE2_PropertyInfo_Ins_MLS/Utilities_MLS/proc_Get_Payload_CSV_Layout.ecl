@@ -6,7 +6,7 @@
 ************************************************************************************************************************ */
 
 IMPORT PRTE2_Common,PRTE_CSV,PRTE, ut,NID,Doxie,address,_control,PRTE,iesp,ut,Doxie,address,STD,NID,AutoKeyB2,autokey,AutoKeyI;
-IMPORT PRTE2_PropertyInfo_Ins_MLS_X;
+IMPORT PRTE2_PropertyInfo_Ins_MLS;
 
 EXPORT proc_Get_Payload_CSV_Layout := MODULE
 
@@ -15,8 +15,8 @@ EXPORT proc_Get_Payload_CSV_Layout := MODULE
 
 //* Create new payload from Customer Test data	
 	EXPORT All_Expanded := FUNCTION
-			Files := PRTE2_PropertyInfo_Ins_MLS_X.Files;
-			Constants := PRTE2_PropertyInfo_Ins_MLS_X.Constants;
+			Files := PRTE2_PropertyInfo_Ins_MLS.Files;
+			Constants := PRTE2_PropertyInfo_Ins_MLS.Constants;
 			AlphaTempExpandedName := Files.NewAlphaExpandedName;
 			// This should now be in the new layout AlphaPropertyCSVRec ********* USE PROD BASE FILE FOR THIS ONE TIME FIX *********
 			AlphaDS := Files.PII_ALPHA_BASE_SF_DS_Prod;

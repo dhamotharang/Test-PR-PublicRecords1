@@ -1,12 +1,12 @@
-IMPORT PRTE2_PropertyInfo_Ins_MLS_X, PRTE2_Common_DevOnly,PRTE2_Common,PRTE2_PropertyInfo_Ins_PreMLS;
+IMPORT PRTE2_PropertyInfo_Ins_MLS, PRTE2_Common_DevOnly,PRTE2_Common,PRTE2_PropertyInfo_Ins_PreMLS;
 
-BaseLayout := PRTE2_PropertyInfo_Ins_MLS_X.Layouts.AlphaPropertyCSVRec_MLS;
+BaseLayout := PRTE2_PropertyInfo_Ins_MLS.Layouts.AlphaPropertyCSVRec_MLS;
 
-DS_Prop := SORT(PRTE2_PropertyInfo_Ins_MLS_X.Files.PII_ALPHA_BASE_SF_DS,property_rid);
+DS_Prop := SORT(PRTE2_PropertyInfo_Ins_MLS.Files.PII_ALPHA_BASE_SF_DS,property_rid);
 // CloneableDS := CHOOSEN(DS_Prop(vendor_source = 'E'),100);
 CloneableDS := DS_Prop(vendor_source = 'E');
 
-    // DS_Prop := PRTE2_PropertyInfo_Ins_MLS_X.Files.PII_ALPHA_BASE_SF_DS;
+    // DS_Prop := PRTE2_PropertyInfo_Ins_MLS.Files.PII_ALPHA_BASE_SF_DS;
     EnhanceableDS1A := DS_Prop(vendor_source='A');
     EnhanceableDS1B := DS_Prop(vendor_source='B');
     EnhanceableDS1C := DS_Prop(vendor_source='C');
