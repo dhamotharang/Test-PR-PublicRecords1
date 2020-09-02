@@ -120,6 +120,7 @@
 			integer1 	verified_carrier;
 			string20 	date_added;
 			integer5	identity_count;
+			string30	carrier;
 	end;
 	
 	export OtherPhones_Raw := record
@@ -128,6 +129,7 @@
 	end;
 	
 	//DF-27818: Add "identity_count" field to OtherPhones & Transactions Base Files
+	//DF-28194: Add "carrier" field to OtherPhones Base File
 	export OtherPhones_Main_Temp := record
 			string8		date_file_loaded;
 			string16	transaction_id;
@@ -145,6 +147,7 @@
 			string8		date_added;
 			string6		time_added;
 			integer5	identity_count;
+			string30	carrier;
 	end;
 	
 	export OtherPhones_History := record
