@@ -17,7 +17,7 @@ EXPORT ExtractRecords(string ilfn) := MODULE
 		string	  filename;
 		unsigned4	seqnum;
 		Nac_V2.Layouts2.rNac2;
-		STRING left_text;   //  rada remove
+		STRING left_text; 
 		UNSIGNED4 textLength;
 	END;	
 
@@ -159,6 +159,7 @@ EXPORT nacin := UNGROUP(PROJECT(ds1, xform2(left)));
 		export types := 
 			TABLE(nacin, {nacin.RecordCode, n := COUNT(GROUP)}, RecordCode, few);			
 		
+
 		export filenames := 
 			TABLE(nacin, {nacin.filename, n := COUNT(GROUP)}, filename, few);
 

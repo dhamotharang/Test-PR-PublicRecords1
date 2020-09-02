@@ -115,7 +115,6 @@ EXPORT Print := MODULE
 																				DATASET(NAC_V2.Layouts2.rItemSummary) types
 																				) := FUNCTION
 
-	nac2 := nac_v2.PreprocessNCF2(lfn);
 
   d_prog := programs(itemcode = 'D');  // DSNAP
 	UNSIGNED4	d_count :=  d_prog[1].counts;  
@@ -132,17 +131,32 @@ EXPORT Print := MODULE
 	p_prog := programs(itemcode = 'P');  // CHIP
 	UNSIGNED4 p_count := p_prog[1].counts;
 	i_prog := programs(itemcode = 'I');  // WIC
-  UNSIGNED4 i_count := i_prog[1].counts;               
+  UNSIGNED4 i_count := i_prog[1].counts;      
 
-	ds_programs_label := DATASET([{0, 'RECORD COUNTS BY PROGRAM:'}] , {UNSIGNED4 id, string130 text});
-	ds_programs_dsnap := DATASET([{1, 'DSNAP         \t' + INTFORMAT(d_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
-	ds_programs_snap  := DATASET([{2, 'SNAP          \t' + INTFORMAT(s_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
-	ds_programs_tanf  := DATASET([{3, 'TANF          \t' + INTFORMAT(t_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
-	ds_programs_med   := DATASET([{4, 'Medicaid      \t' + INTFORMAT(m_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
-	ds_programs_cc    := DATASET([{5, 'Child Care    \t' + INTFORMAT(c_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
-	ds_programs_cn    := DATASET([{6, 'Child Nutr.   \t' + INTFORMAT(n_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
-	ds_programs_chip  := DATASET([{7, 'CHIP          \t' + INTFORMAT(p_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
-	ds_programs_wic   := DATASET([{8, 'WIC           \t' + INTFORMAT(i_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
+	h_prog := programs(itemcode = 'H');  // Public Housing
+	UNSIGNED4 h_count := h_prog[1].counts;   
+	u_prog := programs(itemcode = 'U');  // Unemployment Insurance
+	UNSIGNED4 u_count := u_prog[1].counts;   
+	w_prog := programs(itemcode = 'W');  // Workers Compensation
+	UNSIGNED4 w_count := w_prog[1].counts;  
+	v_prog := programs(itemcode = 'V');  // Drivers License   
+	UNSIGNED4 v_count := v_prog[1].counts;  
+
+
+
+	ds_programs_label 				:= DATASET([{ 0, 'RECORD COUNTS BY PROGRAM:'}] , {UNSIGNED4 id, string130 text});
+	ds_programs_dsnap 				:= DATASET([{ 1, 'DSNAP           \t' + INTFORMAT(d_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
+	ds_programs_snap  				:= DATASET([{ 2, 'SNAP            \t' + INTFORMAT(s_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
+	ds_programs_tanf  				:= DATASET([{ 3, 'TANF            \t' + INTFORMAT(t_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
+	ds_programs_med   				:= DATASET([{ 4, 'Medicaid        \t' + INTFORMAT(m_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
+	ds_programs_cc    				:= DATASET([{ 5, 'Child Care      \t' + INTFORMAT(c_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
+	ds_programs_cn    				:= DATASET([{ 6, 'Child Nutr.     \t' + INTFORMAT(n_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
+	ds_programs_chip  				:= DATASET([{ 7, 'CHIP            \t' + INTFORMAT(p_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
+	ds_programs_wic   				:= DATASET([{ 8, 'WIC             \t' + INTFORMAT(i_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
+	ds_programs_publichousing := DATASET([{ 9, 'Public Housing  \t' + INTFORMAT(h_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
+	ds_programs_unemployment  := DATASET([{10, 'Unemployment    \t' + INTFORMAT(u_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
+	ds_programs_workerscomp   := DATASET([{11, 'Workers Comp.   \t' + INTFORMAT(w_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
+	ds_programs_driverslic    := DATASET([{12, 'Drivers License \t' + INTFORMAT(v_count , 12, 0)}] , {UNSIGNED4 id, string130 text});
   ds_programs_endspace := DATASET([{999, ''}] , {UNSIGNED4 id, string130 text}); 
 
 	ds_programs_all_01 :=  
@@ -155,6 +169,10 @@ EXPORT Print := MODULE
 		IF(c_count>0 , ds_programs_cc) +
 		IF(i_count>0 , ds_programs_wic) +
 		IF(n_count>0 , ds_programs_cn) +
+		IF(h_count>0 , ds_programs_publichousing) +
+		IF(u_count>0 , ds_programs_unemployment) +
+		IF(w_count>0 , ds_programs_workerscomp) +
+		IF(v_count>0 , ds_programs_driverslic) +
 		ds_programs_endspace; 
 
 		ds_programs_all := PROJECT(SORT(ds_programs_all_01, id, LOCAL), drow); 
@@ -171,7 +189,7 @@ EXPORT Print := MODULE
 		UNSIGNED4 EX01_count := EX01_type[1].counts; 
 
 
-				ds := DATASET([{lfn}], dRow)
+				ds := DATASET([{lfn}], dRow) 
 							& NCR_Header
 							& PROJECT(SORT(NCR_Samples(errs, nTotal, st),textValue), TRANSFORM(dRow,
 										self.text := (string6)left.state + (string6)left.RecordCode +
@@ -224,6 +242,8 @@ EXPORT Print := MODULE
 		toText		:=	rollup(ds, true, tText(left, right));
 		return toText[1].Text;
 	END;
+
+
 
 
 	export	rNCD	:=
