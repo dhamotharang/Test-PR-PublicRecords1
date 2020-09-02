@@ -1251,6 +1251,7 @@
 		export string KEYWORD_PHDENR								:= '937';
 		export string KEYWORD_THAMLO_SANC						:= '938';
 		export string KEYWORD_ITIVASS								:= '939';
+		export string KEYWORD_VIPD									:= '940';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
