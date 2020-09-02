@@ -60,17 +60,13 @@ EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string ilfn) := function
 
 
 
-	addresses_programcodes := TABLE(addresses, {addresses.programcode, cnt:= COUNT(GROUP)}, programcode);
-	cases_programcodes := TABLE(cases, {cases.programcode, cnt:= COUNT(GROUP)}, programcode);
-	clients_programcodes := TABLE(clients, {clients.programcode, cnt:= COUNT(GROUP)}, programcode);
-	all_programs := SORT(addresses_programcodes + cases_programcodes + clients_programcodes, programcode, LOCAL);
-	tbl_programs := TABLE(all_programs, {all_programs.programcode, sumprogs:= SUM(GROUP, all_programs.cnt)}, programcode );
+  clients_programcodes := TABLE(clients, {clients.programcode, sumprogs:= COUNT(GROUP)}, programcode);
 
-	NAC_V2.Layouts2.rItemSummary transform_programs(RECORDOF(tbl_programs) l) := TRANSFORM
+	NAC_V2.Layouts2.rItemSummary transform_programs(RECORDOF(clients_programcodes) l) := TRANSFORM
 		SELF.itemcode := l.programcode;
 		SELF.counts :=  l.sumprogs;
 	END;
-	ds_programs01 := PROJECT(tbl_programs, transform_programs(LEFT));
+	ds_programs01 := PROJECT(clients_programcodes, transform_programs(LEFT));
 
 
  		programs := SORT(ds_programs01 , itemcode, LOCAL);
@@ -85,11 +81,12 @@ EXPORT GetReports(DATASET($.Layouts2.rNac2Ex) nac2, string ilfn) := function
 	types := PROJECT(types01, transform_types(LEFT));
 
 
-		ncr := nac_v2.Print.NCR2_Report(fn, errs, total, nErrors, nWarnings, 'XX', ExcessiveInvalidRecordsFound, programs, types);
+		ncr := nac_v2.Print.NCR2_Report(fn, errs, total, nErrors, nWarnings, 'XX', ExcessiveInvalidRecordsFound, programs, types); 
 
 		ncd := nac_v2.Print.NCD2_Report(fn, errs, total, nErrors, nWarnings, nWarned, nRejected, 'XX', ExcessiveInvalidRecordsFound);
 
 		ncx := Nac_v2.Print.NCX2_Report(cases, clients, addresses, contacts, exceptions, badRecords); 
+
 
 
 		return MODULE
