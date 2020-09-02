@@ -80,7 +80,7 @@ mail_data convertToString(rec2 L) := TRANSFORM
    attachment := textDs[1].mail_text;
 
 export sentemail := if ( count(dInstats5 ( missed_flag = 'Y')) > 0 or count(dInstats5 ( count_ = 0)) > 1, 
-                                           FileServices.SendEmail ( 'bipin.jha@lexisnexisrisk.com ; Sai.Nagula@lexisnexis.com ;sudhir.kasavajjala@lexisnexis.com',
+                                           FileServices.SendEmail ( 'DataDevelopment-InsRiskeCrash@lexisnexisrisk.com; bipin.jha@lexisnexisrisk.com ; Sai.Nagula@lexisnexis.com ;sudhir.kasavajjala@lexisnexis.com',
                                                                         'MISSING ECRASH FILES PROCESSED '+ut.getDateOffset(-1,mod_Utilities.StrSysDate),
 																																				'Previous 8 sent date time file counts for '+ut.getDateOffset(-1,mod_Utilities.StrSysDate) + '.Please look into it' +'\n\n'+ textDs[1].mail_text
 																																		),	
