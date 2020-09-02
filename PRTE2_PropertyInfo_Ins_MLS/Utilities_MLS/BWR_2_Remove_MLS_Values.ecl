@@ -1,10 +1,10 @@
 /* **********************************************************************************************************
 We have been told that none of the fields being blanked out here should have any MLS values.
 ********************************************************************************************************** */
-IMPORT PRTE2_PropertyInfo_Ins_MLS_X,PRTE2_Common,PRTE2_PropertyInfo_Ins_PreMLS;
+IMPORT PRTE2_PropertyInfo_Ins_MLS,PRTE2_Common,PRTE2_PropertyInfo_Ins_PreMLS;
 
 // READ THE DEV BASE FILE SINCE WE SAVED STEP 1 there.
-DS_Prop := SORT(PRTE2_PropertyInfo_Ins_MLS_X.Files.PII_ALPHA_BASE_SF_DS,property_rid);
+DS_Prop := SORT(PRTE2_PropertyInfo_Ins_MLS.Files.PII_ALPHA_BASE_SF_DS,property_rid);
 Keep_asis := DS_Prop(vendor_source <> 'E');
 PropInfo_E := DS_Prop(vendor_source = 'E');
 
@@ -179,7 +179,7 @@ TempCSV			:= PRTE2_PropertyInfo_Ins_PreMLS.Files.Alpha_Spray_Name;
 
 PRTE2_Common.DesprayCSV(EXPORT_DS, TempCSV, LandingZoneIP, lzFilePathFile);
 
-Files := PRTE2_PropertyInfo_Ins_MLS_X.Files;
+Files := PRTE2_PropertyInfo_Ins_MLS.Files;
 NewDataDS := DISTRIBUTE(EXPORT_DS,HASH(fares_unformatted_apn,property_rid));
 buildPIIBase := PRTE2_Common.Promote_Supers.mac_SFBuildProcess(NewDataDS, Files.PII_ALPHA_BASE_SF);
 SEQUENTIAL(buildPIIBase);

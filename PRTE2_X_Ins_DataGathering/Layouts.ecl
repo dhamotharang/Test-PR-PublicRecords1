@@ -18,6 +18,16 @@ NOTE: After deduping there are always fewer... so added a dedup here prior to th
 
 EXPORT Layouts := MODULE
 
+		EXPORT MiniVIN_V2_Layout := RECORD
+      	STRING	Orig_VIN;
+			STRING	best_make_code;
+			STRING	best_model_code;
+			STRING	best_model_year;
+         STRING   orig_year;
+         STRING   orig_Make_code;
+         STRING   orig_Model_code;
+         STRING   vina_veh_type;
+      END;
 		EXPORT UsableVINLayout := RECORD
 			unsigned8 hashvalue;
 			string30 vehicle_key;

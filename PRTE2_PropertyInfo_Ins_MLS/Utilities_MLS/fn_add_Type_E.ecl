@@ -1,5 +1,5 @@
 ﻿/* ************************************************************************************************************************
-PRTE2_PropertyInfo_Ins_MLS_X.Utilities_MLS.fn_add_Type_E
+PRTE2_PropertyInfo_Ins_MLS.Utilities_MLS.fn_add_Type_E
 
 **********************************************************************************************
 ***** MLS CONVERSION NOTES:
@@ -7,9 +7,9 @@ Pass in "D" Records
 Receive recordset with "E" records.
 **********************************************************************************************
 ************************************************************************************************************************ */
-IMPORT PRTE2_PropertyInfo_Ins_MLS_X, PropertyCharacteristics;
+IMPORT PRTE2_PropertyInfo_Ins_MLS, PropertyCharacteristics;
 
-BaseLayout := PRTE2_PropertyInfo_Ins_MLS_X.Layouts.AlphaPropertyCSVRec_MLS;
+BaseLayout := PRTE2_PropertyInfo_Ins_MLS.Layouts.AlphaPropertyCSVRec_MLS;
 
 cleanValue(STRING someValue) := PropertyCharacteristics.Functions.fn_remove_zeroes(someValue);
 isEMPTY(STRING s1) := cleanValue(s1)='';
