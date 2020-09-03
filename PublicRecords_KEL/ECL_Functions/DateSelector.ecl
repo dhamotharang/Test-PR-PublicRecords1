@@ -35,6 +35,7 @@ EXPORT DateSelector(InData,checkchildDatasets = FALSE, AppendNotPopulate = TRUE)
 		STRING inspection_opening_date;
 		STRING ActiveDate;
 		STRING fares_mortgage_date;
+		STRING dt_first_reported;
 		/*
 						Insert other random Dates
 		*/
@@ -47,7 +48,7 @@ EXPORT DateSelector(InData,checkchildDatasets = FALSE, AppendNotPopulate = TRUE)
 	// Need to track the list of date field names to look for when generating the PROJECT statement further down
 	SetOfDateFieldNames := ['date_first_seen', 'dt_first_seen', 'datefirstseen', //date first seen
 															'vendordatefirstreported','date_vendor_first_reported','dt_vendor_first_reported', //vendor dates
-															'pub_date','dt_first_seen_contact','orig_filing_date','corp_ra_dt_first_seen', 'fcra_date','dateofinquiry','addr_dt_first_seen','rel_dt_first_seen','event_dt','earliest_offense_date','dt_first_seen_company_address','form_plan_year_begin_date','inspection_opening_date','ActiveDate','fares_mortgage_date',
+															'pub_date','dt_first_seen_contact','orig_filing_date','corp_ra_dt_first_seen', 'fcra_date','dateofinquiry','addr_dt_first_seen','rel_dt_first_seen','event_dt','earliest_offense_date','dt_first_seen_company_address','form_plan_year_begin_date','inspection_opening_date','ActiveDate','fares_mortgage_date','dt_first_reported',
 															'loaddate']; // load dates
 	
 	cleanDate(STRING DateValue) := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(DateValue)[1];     
@@ -127,6 +128,7 @@ EXPORT DateSelector(InData,checkchildDatasets = FALSE, AppendNotPopulate = TRUE)
 			LEFT.inspection_opening_date NOT IN ['', '0'] AND cleanDate((STRING)cleanDate(LEFT.inspection_opening_date).ValidPortion_01).DateValid => (STRING)cleanDate(LEFT.inspection_opening_date).ValidPortion_01,						
 			LEFT.ActiveDate NOT IN ['', '0'] AND cleanDate((STRING)cleanDate(LEFT.ActiveDate).ValidPortion_01).DateValid => (STRING)cleanDate(LEFT.ActiveDate).ValidPortion_01,						
 			LEFT.fares_mortgage_date NOT IN ['', '0'] AND cleanDate((STRING)cleanDate(LEFT.fares_mortgage_date).ValidPortion_01).DateValid => (STRING)cleanDate(LEFT.fares_mortgage_date).ValidPortion_01,						
+			LEFT.dt_first_reported NOT IN ['', '0'] AND cleanDate((STRING)cleanDate(LEFT.dt_first_reported).ValidPortion_01).DateValid => (STRING)cleanDate(LEFT.dt_first_reported).ValidPortion_01,						
 			//Check other random dates
 			LEFT.LoadDate NOT IN ['', '0'] AND cleanDate(LEFT.LoadDate).DateValid => (STRING)cleanDate(LEFT.LoadDate).ValidPortion_01,
 			//check other load dates
@@ -161,6 +163,7 @@ EXPORT DateSelector(InData,checkchildDatasets = FALSE, AppendNotPopulate = TRUE)
 			LEFT.inspection_opening_date NOT IN ['', '0'] AND cleanDate((STRING)cleanDate(LEFT.inspection_opening_date).ValidPortion_01).DateValid => (STRING)cleanDate(LEFT.inspection_opening_date).ValidPortion_01,						
 			LEFT.ActiveDate NOT IN ['', '0'] AND cleanDate((STRING)cleanDate(LEFT.ActiveDate).ValidPortion_01).DateValid => (STRING)cleanDate(LEFT.ActiveDate).ValidPortion_01,						
 			LEFT.fares_mortgage_date NOT IN ['', '0'] AND cleanDate((STRING)cleanDate(LEFT.fares_mortgage_date).ValidPortion_01).DateValid => (STRING)cleanDate(LEFT.fares_mortgage_date).ValidPortion_01,//Check other random dates
+			LEFT.dt_first_reported NOT IN ['', '0'] AND cleanDate((STRING)cleanDate(LEFT.dt_first_reported).ValidPortion_01).DateValid => (STRING)cleanDate(LEFT.dt_first_reported).ValidPortion_01,//Check other random dates
 			
 			LEFT.LoadDate NOT IN ['', '0'] AND cleanDate(LEFT.LoadDate).DateValid => (STRING)cleanDate(LEFT.LoadDate).ValidPortion_01,
 			//check other load dates

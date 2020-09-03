@@ -1,28 +1,25 @@
 ﻿IMPORT mdr, VehicleV2, driversv2, doxie, ut, suppress, Census_Data, VehicleV2_services, codes,
        doxie_Raw, doxie_build, CriminalRecords_Services, Address;
 
-  doxie.MAC_Header_Field_Declare ();
-  
-  layout_w_keys := RECORD
-    VehicleV2_Services.Layouts.flat_vehicle;
-    UNSIGNED2 party_penalty := 0;
-    //adding the plate type desc for the wildcard_search service
-    STRING65 license_plate_desc := '';
-  END;
+layout_w_keys := RECORD
+  VehicleV2_Services.Layouts.flat_vehicle;
+  UNSIGNED2 party_penalty := 0;
+  //adding the plate type desc for the wildcard_search service
+  STRING65 license_plate_desc := '';
+END;
 
 EXPORT Fn_Find(
   GROUPED DATASET(doxie_Raw.Layout_VehRawBatchInput.input_w_keys) in_veh_keys,
+  doxie.IDataAccess mod_access,
   BOOLEAN report_mode = TRUE,
   BOOLEAN ExcludeLessors= FALSE,
   BOOLEAN alternate_route = FALSE,
   BOOLEAN includeCriminalIndicators=FALSE,
   BOOLEAN include_non_regulated_data = FALSE)
-  := MODULE
-  global_mod := AutoStandardI.GlobalModule();
-  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (global_mod);
+  := FUNCTION
 
-  isCNSMR := ut.IndustryClass.is_Knowx;
-  includeNonRegulatedData := include_non_regulated_data AND ~doxie.DataRestriction.InfutorMV;
+  isCNSMR := mod_access.isConsumer();
+  includeNonRegulatedData := include_non_regulated_data AND ~mod_access.isInfutorMVRestricted();
 
   layout_w_keys makeVehReport(in_veh_keys l, VehicleV2.Key_Vehicle_Main_Key r) := TRANSFORM
     SELF.vehicle_numberxbg1 := r.vehicle_key[1..20];
@@ -90,7 +87,7 @@ EXPORT Fn_Find(
     SELF := l;
     SELF.history_flag := ''; // SELF := [];
   END;
-  
+
   // Probably this code do not always work as it was intended:
   // there are more than 1,000 records matching by vehicle-key,
   // and ~200 by vehicle- and iteration-key.
@@ -102,16 +99,16 @@ EXPORT Fn_Find(
     (includeNonRegulatedData OR RIGHT.source_code NOT IN MDR.sourceTools.set_infutor_all_veh),
     makeVehReport(LEFT, RIGHT),
     KEEP (VehicleV2_services.Constant.VEHICLE_PER_KEY), LIMIT (10000));
-                  
-                
+
+
  veh_recs0 := IF(~isCNSMR, veh_recs0_mainkeyinfo);
-  
+
   // for moxie queries this filtering is now done in runall
   veh_recs := IF(alternate_route,
                   veh_recs0,
-                  veh_recs0(ut.PermissionTools.dppa.state_ok(state_origin,dppa_purpose,,source_code)OR
-                            (source_code IN MDR.sourceTools.set_infutor_all_veh AND ut.PermissionTools.dppa.ok(dppa_purpose))));
-  
+                  veh_recs0(mod_access.isValidDppaState(state_origin,,source_code)OR
+                            (source_code IN MDR.sourceTools.set_infutor_all_veh AND mod_access.isValidDppa())));
+
   // Similar issue: 3,000,000 by vehicle-key, ~4,500 by vehicle-, iteration-, sequence-key.
   owner_recs0_info_pre :=JOIN(in_veh_keys, vehiclev2.Key_Vehicle_Party_Key,
                   KEYED(LEFT.vehicle_key=RIGHT.vehicle_key[1..LENGTH(TRIM(LEFT.vehicle_key))]) AND
@@ -121,17 +118,17 @@ EXPORT Fn_Find(
                   TRANSFORM (vehiclev2.Layout_Base_Party, SELF := RIGHT),
                   // TODO: should rather be PARTIES_PER_VEHICLE
                   KEEP(VehicleV2_services.Constant.VEHICLE_PER_KEY), LIMIT (10000));
-  
+
   owner_recs0_info := suppress.MAC_SuppressSource(owner_recs0_info_pre,mod_access,append_did);
   owner_recs0 := IF(~isCNSMR, owner_recs0_info);
-                  
+
   vehiclev2.Layout_Base_Party get_dob_sex(owner_recs0 l, driversv2.Key_DL_DID r) := TRANSFORM
     SELF.orig_dob := IF(((UNSIGNED) l.orig_dob) <> 0,l.orig_dob,(STRING8) r.dob);
     SELF.orig_sex := IF(l.orig_sex <>'',l.orig_sex,r.sex_flag);
     SELF.orig_dl_number := IF(l.orig_dl_number <>'',l.orig_dl_number,r.dl_number);
     SELF := l;
   END;
-  
+
   // latest DL recs by expire date by did
   latest_dl_recs := PROJECT(DEDUP(SORT(
     JOIN(owner_recs0,Driversv2.Key_DL_DID,
@@ -141,19 +138,19 @@ EXPORT Fn_Find(
 
   owner_recs1 := JOIN(owner_recs0,latest_dl_recs,LEFT.append_did=RIGHT.did,
       get_dob_sex(LEFT,RIGHT),KEEP(1),LEFT OUTER);
-  
+
   rec_base_w_ssn := RECORD (vehiclev2.Layout_Base_Party)
     STRING9 use_ssn;
     STRING18 county_name;
     BOOLEAN hasCriminalConviction;
     BOOLEAN isSexualOffender;
   END;
-  
+
   rec_base_w_ssn is_ofage( vehiclev2.Layout_Base_Party l):=TRANSFORM
-    ofage := ut.PermissionTools.glb.minorOk(IF(l.orig_dob ='',0, ut.age((INTEGER) l.orig_dob)));
-    
+    ofage := doxie.compliance.minor_ok(IF(l.orig_dob ='',0, ut.age((INTEGER) l.orig_dob)), mod_access.show_minors);
+
     underage := 'UNDERAGE INDIVIDUAL';
-    
+
     SELF.vehicle_key := l.vehicle_key;
     SELF.iteration_key := l.iteration_key;
     SELF.sequence_key := l.sequence_key;
@@ -163,24 +160,24 @@ EXPORT Fn_Find(
     SELF := IF(ofage,l);
     SELF := [];
   END;
-        
+
   owner_recs := PROJECT(owner_recs1,is_ofage(LEFT));
-  
+
   doxie.MAC_PruneOldSSNs(owner_recs,pruned_owner_recs,use_ssn,append_did);
-  
+
   rec_base_w_ssn get_county(pruned_owner_recs l,census_data.Key_Fips2County r):=TRANSFORM
     SELF.county_name := r.county_name;
     SELF := l;
   END;
-  
+
   owner_recs_w_county := JOIN(pruned_owner_recs,Census_Data.Key_Fips2County,KEYED(LEFT.Append_Clean_Address.st = RIGHT.state_code) AND
       KEYED(LEFT.Append_Clean_Address.fips_county=RIGHT.county_fips),get_county(LEFT,RIGHT),KEEP(1),LEFT OUTER);
-  
+
   dup_own_recs := DEDUP(SORT(owner_recs_w_county,-date_last_seen,-reg_latest_effective_date, history, RECORD,EXCEPT Source_Code,State_Bitmap_Flag,Latest_Vehicle_Flag,Latest_Vehicle_Iteration_Flag,History,Date_First_Seen,Date_Last_Seen,Date_Vendor_First_Reported,
     Date_Vendor_Last_Reported,Orig_Party_Type,Orig_Conjunction),
     RECORD,EXCEPT Source_Code,State_Bitmap_Flag,Latest_Vehicle_Flag,Latest_Vehicle_Iteration_Flag,History,Date_First_Seen,Date_Last_Seen,Date_Vendor_First_Reported,
     Date_Vendor_Last_Reported,Orig_Party_Type,Orig_Conjunction);
-    
+
   // add crim indicators
   recsIn := PROJECT(dup_own_recs,TRANSFORM({rec_base_w_ssn,STRING12 UniqueId},SELF.UniqueId:=(STRING)LEFT.append_did,SELF:=LEFT));
   CriminalRecords_Services.MAC_Indicators(recsIn,recsOut);
@@ -189,7 +186,7 @@ EXPORT Fn_Find(
   layout_w_keys get_own(veh_recs l, dup_owner_recs r,INTEGER C):=TRANSFORM,skip(r.orig_name_type NOT IN ['1','2','4','5','7'] OR (r.orig_name_type in ['1','2'] AND l.owner_2_customer_type<>'') OR (r.orig_name_type in ['4','5'] AND l.registrant_2_customer_type<>'') OR (r.orig_name_type='7' AND l.lein_holder_3_customer_type <>'') OR
       (r.orig_name_type = '2' AND ExcludeLessors = TRUE))
 
-      
+
       name_type := MAP(r.orig_name_type IN ['4','5'] AND l.registrant_1_customer_typexbg5=''=>'reg1',
                      r.orig_name_type IN ['4','5'] AND l.registrant_2_customer_type=''=>'reg2',
                      r.orig_name_type IN ['1','2'] AND l.owner_1_customer_typexbg3 = '' => 'own1',
@@ -197,12 +194,12 @@ EXPORT Fn_Find(
                      r.orig_name_type = '7' AND l.lein_holder_1_customer_type = '' => 'lh1',
                      r.orig_name_type = '7' AND l.lein_holder_2_customer_type = '' => 'lh2',
                       'lh3');
-                      
-                      
+
+
     // county_from_key := choosen(Census_Data.Key_Fips2County(KEYED(state_code = r.Append_Clean_Address.st) and
     // KEYED(county_fips = r.Append_Clean_Address.fips_county)),1)[1].county_name;
-      
-      
+
+
       STRING company := IF(r.Orig_Party_Type='I','',TRIM(r.Orig_Name));
       raw_penalty := IF(report_mode OR alternate_route,0, doxie.FN_Tra_Penalty_DID((STRING)r.Append_did) +
             doxie.FN_Tra_Penalty_SSN(r.use_ssn) +
@@ -315,7 +312,7 @@ EXPORT Fn_Find(
     SELF.own_2_zip4 := IF(name_type='own2',r.Append_Clean_Address.Zip4,l.own_2_zip4);
     SELF.own_2_county := IF(name_type='own2',r.Append_Clean_Address.fips_county,l.own_2_county);
     SELF.own_2_residence_county := IF(name_type='own2',r.Append_Clean_Address.fips_county,l.own_2_residence_county);
-    
+
     SELF.own_2_bdid := IF(name_type='own2',r.Append_bdid,l.own_2_bdid);
     SELF.OWN_2_CUSTOMER_NUMBER := '';
     SELF.own_2_county_name := IF(name_type='own2',r.county_name,l.own_2_county_name);
@@ -468,7 +465,7 @@ EXPORT Fn_Find(
     SELF.lh_2_zip5 := IF(name_type= 'lh2',r.Append_Clean_Address.Zip5,l.lh_2_zip5);
     SELF.lh_2_zip4 := IF(name_type='lh2',r.Append_Clean_Address.Zip4,l.lh_2_zip4);
 
-    
+
     SELF.lein_holder_3_customer_type := IF(name_type='lh3',
             IF(r.Append_Clean_CName <> '','B','I'),l.lein_holder_3_customer_type);
     SELF.lh_3_feid_ssn :=IF(name_type= 'lh3',r.use_ssn,l.lh_3_feid_ssn) ; // party
@@ -489,10 +486,10 @@ EXPORT Fn_Find(
     SELF.lh_3_county_name := IF(name_type='lh3',r.county_name,l.lh_3_county_name);
     SELF.lh_3_zip5 := IF(name_type= 'lh3',r.Append_Clean_Address.Zip5,l.lh_3_zip5);
     SELF.lh_3_zip4 := IF(name_type='lh3',r.Append_Clean_Address.Zip4,l.lh_3_zip4);
-    
+
     SELF.license_plate_numberxbg4 := IF(l.license_plate_numberxbg4<>'',l.license_plate_numberxbg4, r.Reg_License_Plate); //party
     SELF.true_license_plste_number := IF(l.true_license_plste_number<>'',l.true_license_plste_number, r.Reg_License_Plate);
-    
+
     SELF.registration_effective_date :=IF(l.registration_effective_date<>'',l.registration_effective_date, r.Reg_Latest_Effective_Date);
     SELF.registration_expiration_date :=IF(l.registration_expiration_date<>'',l.registration_expiration_date, r.Reg_Latest_Expiration_Date);
     SELF.decal_number := IF(l.decal_number<>'',l.decal_number, r.Reg_Decal_Number); // party
@@ -507,9 +504,9 @@ EXPORT Fn_Find(
     SELF.history_flag := IF(C=1 OR r.history='' OR (r.history='E' AND l.history_flag='H'), r.history,l.history_flag);
 
     date_last_seen := IF(r.date_last_seen > l.dt_last_seen, r.date_last_seen,l.dt_last_seen);
-    
-    SELF.dt_last_seen := IF(l.input.dateVal > 0 AND date_last_seen > l.input.dateVal,
-        l.input.dateVal, date_last_seen);
+
+    SELF.dt_last_seen := IF(mod_access.date_threshold > 0 AND date_last_seen > mod_access.date_threshold,
+        mod_access.date_threshold, date_last_seen);
     SELF.dt_vendor_last_reported := IF(r.date_vendor_last_reported > l.dt_vendor_last_reported,
       r.date_vendor_last_reported,l.dt_vendor_last_reported);
     SELF.dt_first_seen := IF((r.date_first_seen < l.dt_first_seen AND r.date_first_seen <> 0) OR C=1, r.date_first_seen,
@@ -545,19 +542,20 @@ EXPORT Fn_Find(
     (owner_1_customer_typexbg3 <> '' OR registrant_1_customer_typexbg5 <> '' OR
     lein_holder_1_customer_type <> '');
 
+  ssn_mask_value := mod_access.ssn_mask;
   Suppress.MAC_Mask(veh_w_owners0, veh_w_owners1, own_1_feid_ssn, null, TRUE, FALSE);
   Suppress.MAC_Mask(veh_w_owners1, veh_w_owners2, own_2_feid_ssn, null, TRUE, FALSE);
   Suppress.MAC_Mask(veh_w_owners2, veh_w_owners3, reg_1_feid_ssn, null, TRUE, FALSE);
   Suppress.MAC_Mask(veh_w_owners3, veh_w_owners4, reg_2_feid_ssn, null, TRUE, FALSE);
   Suppress.MAC_Mask(veh_w_owners4, veh_w_owners5, lh_1_feid_ssn, null, TRUE, FALSE);
   Suppress.MAC_Mask(veh_w_owners5, veh_w_owners6, lh_2_feid_ssn, null, TRUE, FALSE);
-  Suppress.MAC_Mask(veh_w_owners6, SHARED gr_veh_w_owners, lh_3_feid_ssn, null, TRUE, FALSE);
-      
-  SHARED veh_w_owners := UNGROUP(gr_veh_w_owners);
-  
-  
-  SHARED veh_w_owners_allowed := veh_w_owners((ln_branded_value OR source_code NOT IN mdr.Source_is_lnOnly) AND
-            (dateVal=0 OR dt_first_seen <= dateVal));
+  Suppress.MAC_Mask(veh_w_owners6, gr_veh_w_owners, lh_3_feid_ssn, null, TRUE, FALSE);
+
+  veh_w_owners := UNGROUP(gr_veh_w_owners);
+
+
+  veh_w_owners_allowed := veh_w_owners((mod_access.ln_branded OR source_code NOT IN mdr.Source_is_lnOnly) AND
+            (mod_access.date_threshold=0 OR dt_first_seen <= mod_access.date_threshold));
 
 
   cdk := codes.Key_Codes_V3;
@@ -665,7 +663,7 @@ o14 := JOIN(o13,cdk,
         KEYED (RIGHT.field_name= (STRING50)'STATE_LONG') AND
         (STRING15)LEFT.state_origin = RIGHT.code,
       getDecode(LEFT,RIGHT,'state_origin_name'),LEFT OUTER, KEEP(1), LIMIT(0));
-      
+
   out_layout := RECORD
     doxie_Raw.Layout_VehRawBatchInput.input_layout input;
     doxie.Layout_VehicleSearch_wCrimInd;
@@ -679,11 +677,7 @@ o14 := JOIN(o13,cdk,
   END;
 
   o15 := UNGROUP(PROJECT(o14,map_lein_holder_county_names(LEFT)));
-  
-  EXPORT v1_ret := o15;
+
+  RETURN o15;
 
 END;
-
-
-
-

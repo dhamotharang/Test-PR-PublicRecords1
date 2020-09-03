@@ -107,8 +107,10 @@ EXPORT GetOverrideFlags(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutIn
 	SELF.water_correct_RECORD_ID        := SET(flagrecs(file_id = FCRA.FILE_ID.WATERCRAFT),record_id)+ le.water_correct_RECORD_ID;		
 	
 	SELF.thrive_correct_ffid             := SET(flagrecs(file_id = FCRA.FILE_ID.THRIVE),flag_file_id)  ;
-	SELF.thrive_correct_record_id        := SET(flagrecs(file_id = FCRA.FILE_ID.THRIVE),record_id)+ le.thrive_correct_record_id;	
+	SELF.thrive_correct_record_id        := SET(flagrecs(file_id = FCRA.FILE_ID.THRIVE),record_id)+ le.thrive_correct_record_id;		
 	
+	SELF.SexOffender_correct_ffid             := SET(flagrecs(file_id = FCRA.FILE_ID.so_offenses),flag_file_id)  ;
+	SELF.SexOffender_correct_record_id        := SET(flagrecs(file_id = FCRA.FILE_ID.so_offenses),record_id)+ le.SexOffender_correct_record_id;	
 	
 	//the below are not used in mas but keeping them here just in case since they were already coded in the boca shell
 	// SELF.impulse_correct_ffid           := SET(flagrecs(file_id = FCRA.FILE_ID.IMPULSE),flag_file_id);
@@ -390,28 +392,30 @@ SOCourtlay := RECORD
 		INTEGER P_lexid;
 		string20 flag_file_id;
 		recordof(SexOffender.key_SexOffender_SPK(TRUE));
-		PublicRecords_KEL.ECL_Functions.Layout_Overrides.crim_correct_ofk;
-		PublicRecords_KEL.ECL_Functions.Layout_Overrides.crim_correct_ffid;
+		PublicRecords_KEL.ECL_Functions.Layout_Overrides.SexOffender_correct_ffid;
+		PublicRecords_KEL.ECL_Functions.Layout_Overrides.SexOffender_correct_record_id;
   end;
  
 
  //see Risk_Indicators.Boca_Shell_SO_FCRA for rest of exclusion logic when added so keys to FDC code
 	SO_corr_Court := join(shell, fcra.key_override_sexoffender.so_main,//this key is empty
-											keyed(right.flag_file_id IN left.crim_correct_ffid),
+											keyed(right.flag_file_id IN left.SexOffender_correct_ffid),
 														TRANSFORM(SOCourtlay,
 															SELF := right,
 															SELF := left,
 															SELF := []), 
 														atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM));	
 	
-	//will need to modify this once/if we have so data in FDC to correct layouts and transforms
-	// SO_corr_Court_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(SO_corr_Court, transform(Layouts_FDC...,
-					// SELF.Src := 
-					// SELF.DPMBitmap := SetDPMBitmap( ),
-					// SELF := left,
-					// SELF := [])), false, false);		
+	SO_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(SO_corr_Court, transform(Layouts_FDC.Layout_SexOffender__Key_SexOffender_SPK,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.P_LexID := LEFT.P_LexID,						
+					SELF.Src := MDR.sourceTools.src_sexoffender;
+					SELF.DPMBitmap := SetDPMBitmap( Source := SELF.Src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					SELF := left,
+					SELF := [])), false, false);		
 						
-	return 0;	
+	return SO_data_clean;	
 	
 end;
 

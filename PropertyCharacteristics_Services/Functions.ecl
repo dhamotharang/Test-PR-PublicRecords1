@@ -7,7 +7,7 @@ module
 	export	string	fnClean2Upper(string	pStr)	:=	stringlib.stringtouppercase(stringlib.stringcleanspaces(pStr));
 
 	// Remove default data from the property data section
-	string	searchPattern1	:=	'^(property_rid|dt_vendor_first_reported|dt_vendor_last_reported|tax_sortby_date|deed_sortby_date|vendor_source|';
+	string	searchPattern1	:=	'^(property_rid|global_sid|record_sid|dt_vendor_first_reported|dt_vendor_last_reported|tax_sortby_date|deed_sortby_date|vendor_source|';
 	string	searchPattern2	:=	'fares_unformatted_apn|property_street_address|property_city_state_zip|property_raw_aid|';
 	string	searchPattern3	:=	'prim_range|predir|prim_name|addr_suffix|postdir|unit_desig|sec_range|p_city_name|v_city_name|';
 	string	searchPattern4	:=	'st|zip|zip4|cart|cr_sort_sz|lot|lot_order|dbpc|chk_digit|rec_type|county|geo_lat|geo_long|msa|geo_blk|geo_match|err_stat)';

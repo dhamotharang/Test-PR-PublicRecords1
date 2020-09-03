@@ -1,4 +1,4 @@
-export Fake_Address_Info := DATASET(
+EXPORT Fake_Address_Info := DATASET(
 [
 {1,'AK','ALTON','35015'},
 {2,'AK','ANDALUSIA','36420'},
@@ -1002,9 +1002,9 @@ export Fake_Address_Info := DATASET(
 {1000,'TX','GILMAN','15904'}
 ],
 {
-	integer4 id,
-  string2 state,
-  string40 city_name,
-  string5	zip
+  INTEGER4 id,
+  STRING2 state,
+  STRING40 city_name,
+  STRING5 zip
   }
 );

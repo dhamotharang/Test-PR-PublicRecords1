@@ -3079,5 +3079,10 @@ EXPORT Layouts := MODULE
 		STRING9   FEIN;
 		STRING10  Phone10;		
 	END;
+
+  EXPORT DenormalizedAuthRepWatchlist := Record
+    INTEGER Seq ;
+    DATASET(Risk_Indicators.Layouts.layout_watchlists_plus_seq) repInfo;
+  END;
 	
 END;

@@ -172,8 +172,8 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
       self.account_key := l.account_key;
       self._segment := l._segment;
       self.provider_cnt := 1;
-      self.avg_balance := if(r_cnt > 0, round(t_balance / r_cnt), 0);
-      self.avg_dbt := if(t_balance > 0, round(ptot_sum / t_balance), 0);
+      self.avg_balance := if(r_cnt > 0, t_balance / r_cnt, 0);
+      self.avg_dbt := if(t_balance > 0, ptot_sum / t_balance, 0);
       self.max_balance := max(recs, (integer)total_ar);
     end;
 
@@ -198,8 +198,8 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
       self.account_key := '';
       self._segment := l._segment;
       self.provider_cnt := r_cnt;
-      self.avg_balance := if(r_cnt > 0, round(t_avg_balance / r_cnt), 0);
-      self.avg_dbt := if(r_cnt > 0, round(t_avg_dbt / r_cnt), 0);
+      self.avg_balance := if(r_cnt > 0, t_avg_balance / r_cnt, 0);
+      self.avg_dbt := if(r_cnt > 0, t_avg_dbt / r_cnt, 0);
       self.max_balance := max(recs, max_balance);
     end;
 

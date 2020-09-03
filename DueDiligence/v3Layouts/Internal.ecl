@@ -90,6 +90,13 @@ EXPORT Internal := MODULE
       DATASET(beoTitles) titles;
       BOOLEAN isOwnershipProng;
       BOOLEAN isControlProng;
+      UNSIGNED6 numProperties;
+      UNSIGNED8 totalTaxAssessedVal; 	
+      UNSIGNED6 numWatercraft;
+      UNSIGNED6 maxWatercraftLengthRaw;
+      UNSIGNED6 numVehicles;
+      UNSIGNED8 maxBaseVehicleVal;
+      UNSIGNED6 numAircraft;	
     END;
     
     

@@ -428,8 +428,5 @@ EXPORT InstantID20_Batch_Service() := MACRO
 		OUTPUT(total_royalties, NAMED('RoyaltySet'));
 		
 		// DEBUGs:
-		// OUTPUT( ds_BIID_results, NAMED('BIID_Results') );
-		
 		OUTPUT( results_batch, NAMED('Results') );
-
 ENDMACRO;

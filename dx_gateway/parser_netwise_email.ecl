@@ -305,4 +305,75 @@ EXPORT parser_netwise_email := MODULE
 
   END;
 
+/* 
+    fn_CleanResponse_LexID is essentially the same code as fn_CleanResponse but with an intermediate layout to append LexID
+    so that callers can avoid deconstructing the netwise response to LexID (if required) all over again.
+
+    The layouts below are exported in case the callers need to reference them.
+  */
+
+  EXPORT NetwiseResults_LexID := RECORD(iesp.net_wise_share.t_NetWiseResult)
+    doxie.layout_references;
+  END;
+
+  EXPORT NetwiseResponse_LexID := RECORD
+    iesp.net_wise.t_NetWiseQueryResponse - Results;
+    dataset(NetwiseResults_LexID) Results;
+  END;
+
+  EXPORT NetwiseResponseEx_LexID := RECORD
+    NetwiseResponse_LexID Response;
+  END;
+
+  EXPORT fn_CleanResponse_LexID(DATASET(iesp.net_wise.t_NetWiseQueryResponseEx) ds_response_in,
+                          doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+
+    rec_results_wseq tf_add_results_seq(iesp.net_wise_share.t_NetWiseResult L, INTEGER C) := TRANSFORM
+      SELF.results_seq := C;
+      SELF             := L;
+    END;
+
+    rec_response_wseq tf_add_resp_seq(iesp.net_wise.t_NetWiseQueryResponseEx L, INTEGER C) := TRANSFORM
+      SELF.response_seq     := C;
+      SELF.response.Results := PROJECT(L.response.Results, tf_add_results_seq(LEFT,COUNTER));
+      SELF                  := L;
+    END;
+
+    ds_resp_in_wseq := PROJECT(ds_response_in, tf_add_resp_seq(LEFT,COUNTER));
+
+    ds_resp_in_parsed := fn_parseResponse(ds_resp_in_wseq);
+
+    dx_gateway.mac_append_did(ds_resp_in_parsed, ds_resp_did_append, mod_access, $.Constants.DID_APPEND_LOCAL);
+
+    ds_resp_did_app_dedup := DEDUP(SORT(ds_resp_did_append, seq, section_id, did),
+                                        seq, section_id, did);
+  
+    dx_gateway.mac_flag_optout(ds_resp_did_app_dedup, ds_resp_did_optout, mod_access);
+  
+    ds_resp_did_optout_dedup := DEDUP(SORT(ds_resp_did_optout, seq, section_id, -is_suppressed, -did),
+                                      seq, section_id);
+
+    NetwiseResults_LexID tf_results_final(rec_results_wseq L, UNSIGNED1 resp_seq) := TRANSFORM
+                                                                                
+      BOOLEAN IS_SUPPRESSED := ds_resp_did_optout_dedup(seq = resp_seq AND section_id = L.results_seq)[1].is_suppressed;
+      UNSIGNED6 LexID := ds_resp_did_optout_dedup(seq = resp_seq AND section_id = L.results_seq)[1].did;
+
+      SELF.did := IF(~IS_SUPPRESSED, LexID, 0);
+      SELF := IF(~IS_SUPPRESSED, L);
+      SELF := [];
+
+    END;
+
+    ds_resp_clean := PROJECT(ds_resp_in_wseq, 
+                             TRANSFORM(NetwiseResponseEx_LexID,
+                               temp_response_seq := LEFT.response_seq;
+                               SELF.response.Results := PROJECT(LEFT.response.Results, 
+                                                                tf_results_final(LEFT, temp_response_seq));
+                               SELF := LEFT;
+                            ));
+
+    RETURN ds_resp_clean;
+
+  END;
+
 END;

@@ -2,6 +2,14 @@ IMPORT PersonContext, iesp, doxie, FCRA;
 
 EXPORT Layouts := MODULE
 
+  EXPORT PersonContextResponseRec := RECORD
+    STRING100 RecId1;
+    PersonContext.Layouts.Layout_PCResponseRec.RecID2;
+    PersonContext.Layouts.Layout_PCResponseRec.RecId3;
+    PersonContext.Layouts.Layout_PCResponseRec.RecId4;
+    PersonContext.Layouts.Layout_PCResponseRec - [RecId1, RecId2, RecId3, RecId4];
+  END;
+
   EXPORT StatementIdRec := RECORD(iesp.share_fcra.t_StatementIdRec)
     STRING5			RecordType {xpath('StatementType')} := ''; // needed to distinguish ids for header, xpath statement type to be consistent with iesp.share_fcra.t_ConsumerStatement.
   END;
@@ -50,7 +58,7 @@ EXPORT Layouts := MODULE
     STRING20 acctno;  //for batch input
     BOOLEAN suppress_for_legal_hold := FALSE; // indicator whether all data has to be suppressed if Legal Hold alert is set
     SecurityFreezeSuppression security_freeze_suppression;
-    PersonContext.Layouts.Layout_PCResponseRec;
+    PersonContextResponseRec;
   END;
 
   EXPORT PersonContextBatchResponse := RECORD
@@ -66,9 +74,9 @@ EXPORT Layouts := MODULE
 
   // StatementID and RecordType should be added to the not list.
   EXPORT PersonContextBatchSlim := RECORD(CommonRawRecordElements)
-    STRING20 acctno;
-    PersonContext.Layouts.Layout_PCResponseRec AND NOT [StatementID, RecordType, SearchStatus, CD_Id, DataTypeVersion,
-                                                        DateAdded, EventType, SourceSystem, StatementSequence, Content];
+    STRING20 acctno;	
+    PersonContextResponseRec AND NOT [StatementID, RecordType, SearchStatus, CD_Id, DataTypeVersion,
+                                      DateAdded, EventType, SourceSystem, StatementSequence, Content];
   END;
 
 

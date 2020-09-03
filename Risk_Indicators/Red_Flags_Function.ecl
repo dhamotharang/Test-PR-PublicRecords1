@@ -1,6 +1,6 @@
-﻿import riskwise, fcra;
+﻿import riskwise, fcra, Risk_Indicators;
 
-export Red_Flags_Function(GROUPED DATASET (Layout_output) iid, DATASET(riskwise.layouts.reasoncode_settings) rc_settings=DATASET([],riskwise.layouts.reasoncode_settings)) := function
+export Red_Flags_Function(GROUPED DATASET (Risk_Indicators.Layout_output) iid, DATASET(riskwise.layouts.reasoncode_settings) rc_settings=DATASET([],riskwise.layouts.reasoncode_settings)) := function
 
 addr_discrepancy_alerts(layout, cnt) := MACRO
 CHOOSEN(

@@ -127,11 +127,6 @@ MODULE(DidVille.MaxScores.IMax)
     export unsigned2 maxScoreFromPhone := checkInputMax(^.maxScoreFromPhone);
 END;
 
-rec := record
-  unsigned1 seq;
-end;
-d := dataset([{1}],rec);
-
 a2_val := if (addr2_val != '', addr2_val,city_val + ' ' + state_val + ' ' + zip_value);
 
 dedup_these := ~AllPos_l;// IN ['1','on'];
@@ -150,9 +145,9 @@ and addr1_val = '' and addr2_val = '' and fname_val = '' and lname_val = '' and 
 and suffix_val = '' and state_val = '' and city_val = '' and zip_value = '' and phone_value = '' and prange_value = ''
 and sec_range_value = '' and pname_value = '' and name_value_clean = '';
 
-didville.Layout_Did_OutBatch into(rec l) := transform
+didville.Layout_Did_OutBatch into() := transform
   self.did := if(DidOnlySearch,(unsigned6) did_value, 0);
-  self.seq := l.seq;
+  self.seq := 1;
   self.ssn := STD.STR.Filter(ssn_value,'0123456789');
   self.dob := dob_value;
   self.phone10 := phone_value;
@@ -175,7 +170,7 @@ didville.Layout_Did_OutBatch into(rec l) := transform
   self.email := STD.STR.ToUpperCase(email_val);
 end;
 
-precs := project(d,into(left));
+precs := DATASET([into()]);
 
 // Bug: 53541=> for this service, we are using the nonblank key to ensure the largest
 // majority of first and last names are populated during record retreival

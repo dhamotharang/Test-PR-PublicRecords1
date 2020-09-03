@@ -42,7 +42,7 @@ EXPORT SearchService() := MACRO
                    searchBy.MACAddress <> '' OR
                    searchBy.DeviceId <> '' OR
                    searchBy.IPAddress <> '' OR
-                   (iesp.ECL2ESP.t_DateToString8(searchBy.TransactionStartDate)  <> '' AND iesp.ECL2ESP.t_DateToString8(searchBy.TransactionEndDate) <> '' AND isValidDate) OR
+                   ((iesp.ECL2ESP.t_DateToString8(searchBy.TransactionStartDate)  <> '' OR iesp.ECL2ESP.t_DateToString8(searchBy.TransactionEndDate) <> '') AND isValidDate) OR
                    ((searchBy.Address.StreetAddress1 <> '' OR searchBy.Address.StreetName <> '') AND
                    ((searchBy.Address.City <> '' AND searchBy.Address.State <> '') OR searchBy.Address.Zip5 <> '')) OR
                    ValidAmount;
