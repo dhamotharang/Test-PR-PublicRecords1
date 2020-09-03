@@ -9,9 +9,7 @@ EXPORT	key_tradeline(STRING pVersion	=	(STRING8)Std.Date.Today(),
 		string ln_delinquency_date;
 		STRING3		DBT;
 		string		DBT_V5;
-		string DBT_V5_NoFuture;
-		string DBT_V5_NoDelinquencyDt;
-	END;
+		END;
 	//AdjustedArchiveDate:=Std.Date.AdjustCalendar(L.dt_vendor_last_reported,0,0,1);
 	Loadfile:=project(Business_Credit.fn_GetSegments.accountBase(active),transform(rTradelines,
 		SELF.Version					:=	left.process_date;
