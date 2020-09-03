@@ -1,4 +1,4 @@
-export AddRecords(FullData,NewData,MatchFields,DistSet):=functionmacro
+export AddRecords(FullData,NewData,MatchFields,DistSet,isLookup=false):=functionmacro
 
 #Declare(CommandString);
 	#declare(CommaString);
