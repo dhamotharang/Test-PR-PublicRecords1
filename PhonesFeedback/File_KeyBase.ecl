@@ -8,9 +8,9 @@ export File_KeyBase(string filedate, string1 BuildType) := module
 										);
 					 
 
-	export PhoneBase := base(phone_number <> '0' and phone_number <> ' ');	
+	export PhoneBase := base((integer)phone_number <> 0);	
 	
-	AddrBase := base(trim(phone_number) NOT IN ['0', ''] AND trim(phone_number)[1..3] <> '000' AND 
+	AddrBase := base((integer)phone_number <> 0 AND (integer)trim(phone_number)[1..3] <> 0 AND 
 									(unsigned)street_number <> 0 AND trim(street_name) <> '' AND trim(zip5) <> '');	
 									
 	phonesFeedback.Layouts_PhonesFeedback.layoutPhonesFeedbackAddress cleanAddrBase(AddrBase le) := TRANSFORM
