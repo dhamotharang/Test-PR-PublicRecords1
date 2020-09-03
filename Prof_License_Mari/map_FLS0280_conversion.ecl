@@ -179,7 +179,6 @@ EXPORT map_FLS0280_conversion(STRING pVersion) := FUNCTION
 			preAddr5_9 := REGEXREPLACE('APARTMENT[ ]*[#]?[ ]*:[ ]*', preAddr5_8, 'APARTMENT ');
 			preAddr5_10 := REGEXREPLACE('P 0 ', preAddr5_9, 'PO ');
 			preAddr5_11 := REGEXREPLACE('AKA .* ST$', preAddr5_10, '');  //REMOVE AKA 54 ST FROM  THE ADDRESS FIELD
-			preAddr5_12	:= REGEXREPLACE('AVENUE .* COLLINS$', preAddr5_11, '');		//REMOVE AVENUE 9601 COLLINS FROM THE ADDRESS FIELD
 			//strip .
 			preAddr6 := StringLib.StringFindReplace(preAddr5_11,'.',' ');
 			//Replace P O B by POB
