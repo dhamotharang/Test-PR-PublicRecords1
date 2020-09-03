@@ -35,11 +35,14 @@ function
 	
 	updateDops	:=	RoxieKeyBuild.updateversion('PropertyInformationKeys',pVersion,'terri.hardy-george@lexisnexis.com',,'N');
 	
+	//Update idops -- DF-28209
+    updateiDops	:=	 RoxieKeyBuild.updateversion('PropertyInformationKeys',pVersion,'terri.hardy-george@lexisnexis.com',,'N',,,'A');
 	return	ordered(	
 											parallel(key1,key2),
 											parallel(mv_built1,mv_built2),
 											parallel(mv_qa1,mv_qa2),
-											updateDops
+											updateDops,
+											updateiDops
 										);
 	
 end;

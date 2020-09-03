@@ -65,7 +65,7 @@ function
 			self.Contact_job_title_derived			:= BIPV2.BL_Tables.ContactTitle           (l.Contact_job_title_raw      );
 			self.Contact_status_derived					:= BIPV2.BL_Tables.ContactStatus          (l.Contact_status_raw         );
 			//*** Blank out wrong length FEIN's (Valid length of FEINs is 9), as per bug# 151785
-			self.company_fein										:= if (length(stringlib.stringcleanspaces(l.company_fein)) = 9, stringlib.stringcleanspaces(l.company_fein), '');   //*** Bug: 151785 - TIN format not correct for specific example
+			self.company_fein										:= if (length(stringlib.stringcleanspaces(l.company_fein)) = 9 and trim(l.company_fein) not in ['999999999'], stringlib.stringcleanspaces(l.company_fein), '');   //*** Bug: 151785 - TIN format not correct for specific example
 			self.company_sic_code1							:= if (trim(l.company_sic_code1  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code1  ) = 1 and isgoodsic   (l.company_sic_code1    ) = true, trim(l.company_sic_code1   )   ,'');
 			self.company_sic_code2							:= if (trim(l.company_sic_code2  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code2  ) = 1 and isgoodsic   (l.company_sic_code2    ) = true, trim(l.company_sic_code2   )   ,'');
 			self.company_sic_code3							:= if (trim(l.company_sic_code3  ) != '' and ut.fn_valid_SICCode  (l.company_sic_code3  ) = 1 and isgoodsic   (l.company_sic_code3    ) = true, trim(l.company_sic_code3   )   ,'');
