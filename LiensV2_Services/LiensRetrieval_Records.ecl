@@ -84,7 +84,7 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
   OKC_gateway_success := ~input.DeferredTaskRequest AND search_recs[1].IsOKCSuccess;
   // gateway_failed includes g/w network failures and exceptions returned from gateway and 
   // excludes did not found and no recs found
-  gateway_failed      := search_recs[1].error_code <> '' AND search_recs[1].error_code NOT IN [$.constants.LIENS_RETRIEVAL.NO_RECS_FOUND_CODE,
+  gateway_failed      := (UNSIGNED)search_recs[1].error_code <> 0 AND search_recs[1].error_code NOT IN [$.constants.LIENS_RETRIEVAL.NO_RECS_FOUND_CODE,
                                                           FCRA.Constants.ALERT_CODE.NO_DID_FOUND];
   // do not show CS for okc submission request & do not show CS if dte gateway request fails
   BOOLEAN showConsumerStatements     := FFD.FFDMask.isShowConsumerStatements(input.FFDOptionsMask) AND  dte_gateway_success;
@@ -170,14 +170,14 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
 															     $.Constants.LIENS_RETRIEVAL.NO_RECS_FOUND_EXCEPTION}], iesp.share.t_WsException);
 
       // OKC exceptions
-      OKC_task_exceptions := search_recs[1].error_code <> '' AND search_recs[1].error_code IN [$.constants.LIENS_RETRIEVAL.OKC_TASK_ERRORS];
+      OKC_task_exceptions := search_recs[1].error_code <> '0' AND search_recs[1].error_code IN [$.constants.LIENS_RETRIEVAL.OKC_TASK_ERRORS];
       ds_task_exceptions := DATASET([{$.Constants.LIENS_RETRIEVAL.ERRORSOURCE,
 															       search_recs[1].error_code,
 															       '',
 															       search_recs[1].error_desc}], iesp.share.t_WsException); 
    
       // considering n/w errors excluding okc exceptions, no did found, no records found exception
-      gateway_network_failures := search_recs[1].error_code <> '' AND search_recs[1].error_code NOT IN [$.constants.LIENS_RETRIEVAL.OKC_TASK_ERRORS,
+      gateway_network_failures := (UNSIGNED)search_recs[1].error_code <> 0 AND search_recs[1].error_code NOT IN [$.constants.LIENS_RETRIEVAL.OKC_TASK_ERRORS,
                                                                     $.constants.LIENS_RETRIEVAL.NO_RECS_FOUND_CODE,
                                                                     FCRA.Constants.ALERT_CODE.NO_DID_FOUND];
                                                                     
