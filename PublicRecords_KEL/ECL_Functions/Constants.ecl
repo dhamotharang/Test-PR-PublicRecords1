@@ -744,7 +744,7 @@ EXPORT Constants := MODULE
 		{MDR.SourceTools.src_SDA},
 		{MDR.SourceTools.src_SDAA},
 		// {MDR.SourceTools.src_SEC_Broker_Dealer},
-		// {MDR.SourceTools.src_sexoffender},
+		{MDR.SourceTools.src_sexoffender},
 		// {MDR.SourceTools.src_Sheila_Greco},
 		// {MDR.SourceTools.src_SKA},
 		// {MDR.SourceTools.src_FL_SO},
@@ -1369,6 +1369,7 @@ EXPORT Constants := MODULE
 		{Watchdog_NonEN_FCRA},
 		{MDR.SourceTools.src_Entiera},
 		{CityStateZip},
-		{PersonContext}
+		{PersonContext},
+		{MDR.SourceTools.src_sexoffender}
 	], Layout_Allowed_Sources);
 END;

@@ -50,9 +50,9 @@
   <part name="IncludeNonRegulatedVehicleSources" type='xsd:boolean'/>
 
   <part name="gateways" type="tns:XmlDataSet" cols="100" rows="6"/>
-  
+
   <part name="MotorVehicleRegistrationSearchRequest" type="tns:XmlDataSet" cols="80" rows="20" />
-  
+
 </message>
 */
 /*--INFO-- This service combines the results of the regular MVR search and searches across
@@ -64,7 +64,7 @@ EXPORT VehicleRegSearchService() := MACRO
   #CONSTANT('SearchIgnoresAddressOnly',TRUE);
   #CONSTANT('getBdidsbyExecutive',FALSE);
   #CONSTANT('DisplayMatchedParty',TRUE);
-  
+
   ds_in := DATASET ([], iesp.motorvehicleRegistration.t_MotorVehicleRegistrationSearchRequest) : STORED ('MotorVehicleRegistrationSearchRequest', FEW);
   first_row := ds_in[1] : INDEPENDENT;
   iesp.ECL2ESP.SetInputBaseRequest(first_row);
@@ -80,18 +80,18 @@ EXPORT VehicleRegSearchService() := MACRO
   BOOLEAN raw_records := FALSE : STORED('Raw');
 
   BOOLEAN returnIesp := COUNT(ds_in) > 0;
-  
+
   getVehRegRecs := VehicleV2_Services.Get_VehicleReg_records(tempMod,returnIESP,raw_records);
-  
+
   RegVeh := getVehRegRecs.RegVehRecsWildCardRegSearch;
   // project out boolean flag unacceptableInput (signaling bad input for mvr wildcard Search)
   // not needed in final RETURN results
   finalRegVeh := PROJECT(RegVeh, TRANSFORM(iesp.MotorVehicle.t_MotorVehicleSearch2Record,
                           SELF := LEFT));
-  
+
   // this is with MVR WildCard search recs added to regular MVR search results
   iesp.ECL2ESP.Marshall.MAC_Marshall_Results(FinalRegVeh, iespOutput, iesp.motorvehicleRegistration.t_MotorVehicleRegistrationSearchResponse);
-  
+
   Royalty.RoyaltyVehicles.MAC_SearchSet(iespOutput.Records, ds_iesp_royalties, datasource);
   royalties := ds_iesp_royalties;
 
@@ -106,107 +106,8 @@ EXPORT VehicleRegSearchService() := MACRO
   // ******************
   //
   // this is the regVeh combined results after projecting out the unacceptableInput Flag
-    
+
   OUTPUT(iespOutput, NAMED('Results'));
   OUTPUT(royalties, NAMED('RoyaltySet'));
 
 ENDMACRO;
-/*
-<MotorVehicleRegistrationSearchRequest>
-   <User>
-    <GLBPurpose/>
-    <DLPurpose/>
-    <SSNMask/>
-    <DOBMask/>
-    <ExcludeDMVPII>0</ExcludeDMVPII>
-    <DLMask>0</DLMask>
-    <DataRestrictionMask/>
-    <DataPermissionMask/>
-    <DeathMasterPurpose/>
-    <SourceCode/>
-    <ApplicationType/>
-    <SSNMaskingOn>0</SSNMaskingOn>
-    <DLMaskingOn>0</DLMaskingOn>
-    <LnBranded>0</LnBranded>
-    <EndUser>
-     <CompanyName/>
-     <StreetAddress1/>
-     <City/>
-     <State/>
-     <Zip5/>
-    </EndUser>
-   </User>
-   <RemoteLocations>
-    <Item/>
-   </RemoteLocations>
-   <ServiceLocations>
-    <ServiceLocation/>
-   </ServiceLocations>
-   <SearchBy>
-    <VIN/>
-    <YearMake>0</YearMake>
-    <YearMakeMax>0</YearMakeMax>
-    <Makes>
-     <Make/>
-    </Makes>
-    <Models>
-     <Model/>
-    </Models>
-    <Colors>
-     <Color/>
-    </Colors>
-    <MinorColors>
-     <MinorColor/>
-    </MinorColors>
-    <TagNumber/>
-    <CompanyName/>
-    <Name>
-     <Full/>
-     <First/>
-     <Middle/>
-     <Last/>
-     <Suffix/>
-     <Prefix/>
-    </Name>
-    <Address>
-     <StreetNumber/>
-     <StreetPreDirection/>
-     <StreetName/>
-     <StreetSuffix/>
-     <StreetPostDirection/>
-     <UnitDesignation/>
-     <UnitNumber/>
-     <StreetAddress1/>
-     <StreetAddress2/>
-     <City/>
-     <State/>
-     <Zip5/>
-     <Zip4/>
-     <County/>
-     <PostalCode/>
-     <StateCityZip/>
-    </Address>
-    <Radius>0.000000</Radius>
-    <SSN/>
-    <DriverLicenseNumber/>
-    <UniqueId/>
-    <Age>0</Age>
-    <AgeMax>0</AgeMax>
-    <Gender>All</Gender>
-    <RegistrationStatus>All</RegistrationStatus>
-   </SearchBy>
-   <Options>
-    <MaxResults>0</MaxResults>
-    <ReturnCount>10</ReturnCount>
-    <StartingRecord>1</StartingRecord>
-    <UsePhonetics>0</UsePhonetics>
-    <UseNicknames>0</UseNicknames>
-    <DoContainsSearch>0</DoContainsSearch>
-    <UseTagBlur>0</UseTagBlur>
-    <IncludeCriminalIndicators>0</IncludeCriminalIndicators>
-    <IncludeNonRegulatedVehicleSources>0</IncludeNonRegulatedVehicleSources>
-    <DataSource>All</DataSource>
-    <RealTimePermissibleUse>GOVERNMENT</RealTimePermissableUse>
-   </Options>
-  </MotorVehicleRegistrationSearchRequest>
-*/

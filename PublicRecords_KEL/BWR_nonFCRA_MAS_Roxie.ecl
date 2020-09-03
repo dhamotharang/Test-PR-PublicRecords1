@@ -30,6 +30,8 @@ DPPA := 1;
 DataPermissionMask := '0000000001101';  
 DataRestrictionMask := '0000000000000000000000000000000000000000000000000'; 
 Include_Minors := TRUE;
+Retain_Input_Lexid := false;//keep what we have on input
+Append_PII := false;//keep what we have on input
 // CCPA Options;
 LexIdSourceOptout := 1;
 TransactionId := '';
@@ -120,6 +122,8 @@ soapLayout := RECORD
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
   UNSIGNED1 LexIdSourceOptout;
+	BOOLEAN RetainInputLexid;
+	BOOLEAN appendpii;
   STRING _TransactionId;
   STRING _BatchUID;
   UNSIGNED6 _GCID;
@@ -137,6 +141,8 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT UNSIGNED DPPAPurpose := DPPA;
 	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
 	EXPORT BOOLEAN IncludeMinors := Include_Minors;
+	EXPORT BOOLEAN RetainInputLexid := Retain_Input_Lexid;
+	EXPORT BOOLEAN BestPIIAppend := Append_PII; //do not append best pii for running
 END;
 
 	// Options := MODULE(PublicRecords_KEL.Interface_Options)
@@ -186,6 +192,8 @@ soapLayout trans (pp le):= TRANSFORM
 	SELF.DPPAPurpose := Settings.DPPAPurpose;
 	SELF.IncludeMinors := Settings.IncludeMinors;
 	SELF.IsMarketing := FALSE;
+	self.RetainInputLexid := Settings.RetainInputLexid;
+	self.appendpii := Settings.BestPIIAppend; //do not append best pii for running
 	SELF.AllowedSourcesDataset := AllowedSourcesDataset;
 	SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;
 	SELF.OutputMasterResults := Output_Master_Results;

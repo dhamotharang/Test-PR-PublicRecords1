@@ -67,7 +67,7 @@
 			export boolean rpt_IncludePhone := false;
 
 			//MP Enhancements
-
+      EXPORT STRING Emailv2serviceBasic := 'basic';
 			EXPORT STRING5 IndustryClass := '';
 			EXPORT BOOLEAN ReturnDetailedRoyalties := TRUE;
 			EXPORT BOOLEAN AllowNickNames:= FALSE;
@@ -201,6 +201,10 @@
 		Export MemberGender_Rej_Message := 'INVALID OR BLANK GENDER';
 		Export INTEGER SSN_Rej_Code := 128;
 		Export SSN_Rej_Message := 'INVALID OR BLANK SSN';
+
+   export emailv2search:=MODULE
+		Export Searchtype:='EAA';
+	 end;	
 
 		//Star rate, intended to replace phones confidence score (High, Middle, Low)
 		EXPORT ConfidenceStarRateMod:= MODULE

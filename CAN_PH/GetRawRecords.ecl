@@ -1,4 +1,4 @@
-import canadianphones_v2,canadianphones, doxie, Suppress; 
+﻿import canadianphones_v2,canadianphones, doxie, Suppress; 
 
 // Helper Macro
 	MAC_GetRecords (ids,key,raw_recs, mod_access)  :=macro
@@ -9,6 +9,7 @@ import canadianphones_v2,canadianphones, doxie, Suppress;
 			can_ph.layout_cwp_out;
 			UNSIGNED4 global_sid;
 			UNSIGNED8 record_sid;
+			UNSIGNED6 did;
 		END;
 
 		%layout_cwp_out_ccpa% %get_out_recs%(key r) := transform
@@ -24,10 +25,7 @@ import canadianphones_v2,canadianphones, doxie, Suppress;
 						keyed (Left.id = Right.fdid),
 						%get_out_recs% (Right),
 						KEEP (1));
-
-		// CanadianPhonesV1Keys and CanadianPhonesV1Keys are out of scope for CCPA phase-I, when DID field is added to these keys 
-		// FDID should be changed to valid DID and Source suppression can be uncommented				
-		// raw_recs := Suppress.MAC_SuppressSource(%raw_recs_all%, mod_access, fdid); 							 
+							 
 	endmacro;
 
 // Main Attribute
@@ -48,7 +46,8 @@ EXPORT GetRawRecords(boolean isV2) := function
 		MAC_GetRecords(ids, canadianphones_V2.key_fdids,raw_recs2, mod_access);
 		
 		// get the right version raw records
-		raw_recs := if(isV2,raw_recs2,raw_recs1);							 
-		// doxie.compliance.logSoldToSources (raw_recs, mod_access, fdid);
-   return raw_recs;
+		raw_recs := if(isV2,raw_recs2,raw_recs1);
+		raw_recs_suppressed := Suppress.MAC_SuppressSource(raw_recs, mod_access, did);
+		
+   return raw_recs_suppressed;
 end;

@@ -57,6 +57,8 @@ export ReportService := macro
     export string12 unique_id := '' : stored('UniqueID');
     export boolean include_sos := false : stored('IncludeSecretaryOfStateInfo');
     export boolean is_spouse := false : stored('IsSpouse'); // defaults to OFF
+    export boolean IncludeNetwise := false : stored('IncludeNetwise');
+    export boolean CachedResponseOnly  := true : stored('CachedResponseOnly');
     export string excluded_sources := '' : stored('ExcludedSources');
   end;
 

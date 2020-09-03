@@ -279,12 +279,13 @@ shared infile_hidden_key := dataset([],layout_key);
 		,boolean                                dnbFullRemove               = false // optionally clobber all DNB data; by default we apply masking
 		,boolean                                bypassContactSuppression    = false // Optionally skip BIPV2_Suppression.mac_contacts - only use this if you are 100% certain you aren't using contact information
 		,unsigned1                              JoinType                    = BIPV2.IDconstants.JoinTypes.KeepJoin
-    ,boolean                                pApplyMarketingSuppression  = false                                 // Apply marketing suppression?
-          ,doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
+        ,boolean                                pApplyMarketingSuppression  = false                                 // Apply marketing suppression?
+        ,doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
+        ,DATASET(BIPV2.IDlayouts.l_filter_record) dFilter                   = DATASET([],BIPV2.IDlayouts.l_filter_record)   
+
   ) :=
   function   
-		BIPV2.IDmacros.mac_IndexFetch2     (inputs, Key, ds_fetched , Level, JoinLimit, JoinType);
-		    
+        BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, ds_fetched , Level, JoinLimit, JoinType, dFilter);		    
 		ds_restricted := ds_fetched(BIPV2.mod_sources.isPermitted(in_mod,not dnbFullRemove).bySource(source,vl_id,dt_first_seen));
 		ds_masked     := if(dnbFullRemove, ds_restricted, BIPV2.mod_sources.applyMasking(ds_restricted,in_mod));
     

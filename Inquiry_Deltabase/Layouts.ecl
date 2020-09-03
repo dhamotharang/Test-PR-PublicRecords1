@@ -1,4 +1,4 @@
-﻿IMPORT iesp, Inquiry_AccLogs, Risk_Indicators, RiskWise, Inquiry_Deltabase;
+﻿IMPORT Inquiry_AccLogs;
 
 EXPORT Layouts := MODULE
 	// Deltabase Input Layouts
@@ -17,6 +17,7 @@ EXPORT Layouts := MODULE
 	EXPORT Deltabase_Record := RECORD
 		STRING20 Seq {XPATH('Seq')};
 		STRING50 Transaction_ID {XPATH('Transaction_ID')};
+    STRING20 Company_ID {XPATH('Company_ID')};
 		STRING22 DateTime {XPATH('DateTime')};
 		STRING30 Industry {XPATH('Industry')};
 		STRING25 Vertical {XPATH('Vertical')};

@@ -1,13 +1,12 @@
-IMPORT iesp, Std;
+IMPORT $, iesp, Std;
 
-EXPORT Get_Reporting_Records(DATASET($.Layouts.log_PhoneFinderSearchRecord) pF_Records,
-								     PhoneFinder_Services.iParam.SearchParams    inMod,
-									 iesp.phonefinder.t_PhoneFinderSearchBy      pSearchBy,
-									 DATASET(PhoneFinder_Services.Layouts.PhoneFinder.final)   dFinalResults
-									 ) := FUNCTION
+EXPORT GetReportingRecords(DATASET($.Layouts.log_PhoneFinderSearchRecord) pF_Records,
+                                   $.iParam.SearchParams    inMod,
+                                   iesp.phonefinder.t_PhoneFinderSearchBy      pSearchBy
+									        ) := FUNCTION
 
 	 transaction_rec_with_alerts := RECORD
-        PhoneFinder_Services.Layouts.delta_phones_rpt_transaction;
+        $.Layouts.delta_phones_rpt_transaction;
         DATASET(iesp.phonefinder.t_PhoneFinderAlertIndicator) alerts;
 	 END;
 
@@ -26,7 +25,7 @@ EXPORT Get_Reporting_Records(DATASET($.Layouts.log_PhoneFinderSearchRecord) pF_R
                          (STRING1)(INTEGER)inMod.NameAddressInfo + (STRING1)(INTEGER)inMod.AccountInfo +  (STRING1)(INTEGER)inMod.CallHandlingInfo +
                          (STRING1)(INTEGER)inMod.DeviceHistory + (STRING1)(INTEGER)inMod.DeviceInfo + (STRING1)(INTEGER)inMod.DeviceChangeInfo;
 
-  transaction_rec_with_alerts xfm_Transaction($.Layouts.log_PhoneFinderSearchRecord R, INTEGER C) := TRANSFORM
+  transaction_rec_with_alerts xfm_Transaction($.Layouts.log_PhoneFinderSearchRecord R) := TRANSFORM
 	 SELF.transaction_id    	  := inMod.TransactionId;
 	 SELF.transaction_date      := (STRING)Date +' '+ (STRING)Time;
 	 SELF.User_Id            	  := IF(inMod.CompanyId <> '', inMod.BillingCode, inMod._Loginid);
@@ -63,46 +62,47 @@ EXPORT Get_Reporting_Records(DATASET($.Layouts.log_PhoneFinderSearchRecord) pF_R
 	 SELF.Identity_Count         := R.PrimaryPhoneDetails.identity_count;
  END;
 
-  Transaction_Rec := PROJECT (pF_Records,  xfm_Transaction(LEFT, COUNTER));
+  Transaction_Rec := PROJECT (pF_Records,  xfm_Transaction(LEFT));
 
 	 OtherPhones_with_alerts := RECORD
-		PhoneFinder_Services.Layouts.delta_phones_rpt_otherphones;
+		$.Layouts.delta_phones_rpt_otherphones;
 		DATASET(iesp.phonefinder.t_PhoneFinderAlertIndicator) alerts;
 	 END;
 
  	OtherPhones_with_alerts xfm_OtherPhones($.Layouts.log_other R, INTEGER C) := TRANSFORM
          SELF.transaction_id    	 := inMod.TransactionId;
-      	 SELF.sequence_number      := C;
-      	 SELF.phone_id             := C;
-      	 SELF.PhoneNumber          := R.Number;
-   		   SELF.Risk_Indicator       := R.PhoneRiskIndicator;
-      	 SELF.phone_type           := R._Type;
-      	 SELF.phone_status         := R.PhoneStatus;
+         SELF.sequence_number      := C;
+         SELF.phone_id             := R.phone_id;
+         SELF.PhoneNumber          := R.Number;
+         SELF.Risk_Indicator       := R.PhoneRiskIndicator;
+         SELF.phone_type           := R._Type;
+         SELF.carrier              := R.carrier;
+         SELF.phone_status         := R.PhoneStatus;
          SELF.identity_Count       := R.identity_count;
-      	 SELF.listing_name         := R.ListingName;
-      	 SELF.porting_code         := R.PortingCode;
-      	 SELF.phone_forwarded      := R.CallForwardingIndicator;
-      	 SELF.verified_carrier     := (INTEGER)R.PhoneOwnershipIndicator;
-		     SELF.Alerts 			         := R.AlertIndicators;
+         SELF.listing_name         := R.ListingName;
+         SELF.porting_code         := R.PortingCode;
+         SELF.phone_forwarded      := R.CallForwardingIndicator;
+         SELF.verified_carrier     := (INTEGER)R.PhoneOwnershipIndicator;
+         SELF.Alerts 			         := R.AlertIndicators;
    END;
 
    OtherPhones_Rec := NORMALIZE(pF_Records, LEFT.OtherPhones, xfm_OtherPhones(RIGHT, COUNTER));
 
-   PhoneFinder_Services.Layouts.delta_phones_rpt_identities xfm_Identities(iesp.phonefinder.t_PhoneIdentityInfo R, INTEGER C) := TRANSFORM
-       SELF.transaction_id    	:= inMod.TransactionId;
-       SELF.sequence_number     := C;
-   	   SELF.lexid         		  := R.UniqueId;
+   $.Layouts.delta_phones_rpt_identities xfm_Identities($.layouts.log_identities R, INTEGER C) := TRANSFORM
+       SELF.transaction_id      := inMod.TransactionId;
+       SELF.sequence_number     := R.identity_id;
+   	   SELF.lexid               := R.UniqueId;
        SELF.Full_name           := R.Name.Full;
        SELF.Full_Address        := R.RecentAddress.StreetAddress1;
-       SELF.City         		    := R.RecentAddress.City;
-       SELF.State         	   	:= R.RecentAddress.State;
-       SELF.Zip         		    := R.RecentAddress.Zip5;
-       SELF.verified_carrier   	:= (INTEGER)R.PhoneOwnershipIndicator;
+       SELF.City                := R.RecentAddress.City;
+       SELF.State               := R.RecentAddress.State;
+       SELF.Zip                 := R.RecentAddress.Zip5;
+       SELF.verified_carrier    := (INTEGER)R.PhoneOwnershipIndicator;
    END;
 
   Identity_Recs := NORMALIZE(pF_Records, LEFT.Identities, xfm_Identities(RIGHT, COUNTER));
 
-  PhoneFinder_Services.Layouts.delta_phones_rpt_riskindicators xfm_PRiskInc(iesp.phonefinder.t_PhoneFinderAlertIndicator L, INTEGER C) := TRANSFORM
+  $.Layouts.delta_phones_rpt_riskindicators xfm_PRiskInc(iesp.phonefinder.t_PhoneFinderAlertIndicator L, INTEGER C) := TRANSFORM
     SELF.transaction_id    		 := inMod.TransactionId,
 	  SELF.Phone_Id 				     := 0,
 	  SELF.sequence_number    	 := C,
@@ -115,7 +115,7 @@ EXPORT Get_Reporting_Records(DATASET($.Layouts.log_PhoneFinderSearchRecord) pF_R
 
   PrimaryPhone_Alerts := NORMALIZE(Transaction_Rec, LEFT.Alerts,	xfm_PRiskInc(RIGHT, COUNTER));
 
-  PhoneFinder_Services.Layouts.delta_phones_rpt_riskindicators xfm_OpRiskInc(RECORDOF(OtherPhones_Rec) L, iesp.phonefinder.t_PhoneFinderAlertIndicator R, INTEGER C) := TRANSFORM
+  $.Layouts.delta_phones_rpt_riskindicators xfm_OpRiskInc(RECORDOF(OtherPhones_Rec) L, iesp.phonefinder.t_PhoneFinderAlertIndicator R, INTEGER C) := TRANSFORM
     SELF.transaction_id    		:= inMod.TransactionId,
     SELF.Phone_Id 			      := L.phone_id,
     SELF.sequence_number    	:= C,
@@ -128,34 +128,17 @@ EXPORT Get_Reporting_Records(DATASET($.Layouts.log_PhoneFinderSearchRecord) pF_R
 
   OtherPhones_Alerts := NORMALIZE(OtherPhones_Rec, LEFT.Alerts,	xfm_OpRiskInc(LEFT, RIGHT, COUNTER));
 
- //Sourcing Deltabase
-
-  //In a PIISearch sourcedetails are reported in OtherPhones and PrimaryPhone.
-   dsFinalSrcRecs := IF(~inMod.isPrimarySearchPII, dFinalResults(fname != '' OR lname != '' OR listed_name != ''),
-                                                   dFinalResults(isPrimaryPhone AND isPrimaryIdentity) & dFinalResults(~isPrimaryPhone AND ~isPrimaryIdentity AND phone != ''));
-
-   PhoneFinder_Services.Layouts.delta_phones_rpt_sources xfm_src(PhoneFinder_Services.Layouts.PhoneFinder.Final l,  $.Layouts.PhoneFinder.Src_Rec r) := TRANSFORM
-       SELF.transaction_id    	:= inMod.TransactionId;
-       SELF.lexid         		  := l.did;
-       SELF.totalsourcecount    := l.totalsourcecount;
-       SELF.Category            := $.Constants.MapCategoryDCT(r.Src);
-       SELF._Type               := $.Constants.MapSourceTypeDCT(r.src);
-       SELF.phonenumber         := l.phone;
-       SELF.Source              := r.src;
-   END;
-
-  Src_Recs := NORMALIZE(dsFinalSrcRecs, LEFT.phn_src_all, xfm_src(LEFT, RIGHT));
-
   Final_RiskIndicators := PrimaryPhone_Alerts + OtherPhones_Alerts;
-   PhoneFinder_Services.Layouts.delta_phones_rpt_Usage_records tFormat2PhoneFinderReport() :=		TRANSFORM
+
+   $.Layouts.delta_phones_rpt_Usage_records tFormat2PhoneFinderReport() :=		TRANSFORM
      SELF.delta_phones_rpt_transaction     := PROJECT(Transaction_Rec, PhoneFinder_Services.Layouts.delta_phones_rpt_transaction);
      SELF.delta_phones_rpt_otherphones     := PROJECT(OtherPhones_Rec, PhoneFinder_Services.Layouts.delta_phones_rpt_otherphones);
      SELF.delta_phones_rpt_identities      := Identity_Recs;
      SELF.delta_phones_rpt_riskindicators  := Final_RiskIndicators;
-     SELF.delta_phones_rpt_sources         := []; //Blanking out sources table here as temporary fix to the logging issue in DBA
+     SELF.delta_phones_rpt_sources         := pF_Records.log_source; 
    END;
 
- dFormat2PhoneFinderReport := DATASET([tFormat2PhoneFinderReport()]);
+   dFormat2PhoneFinderReport := DATASET([tFormat2PhoneFinderReport()]);
 
   return dFormat2PhoneFinderReport;
 

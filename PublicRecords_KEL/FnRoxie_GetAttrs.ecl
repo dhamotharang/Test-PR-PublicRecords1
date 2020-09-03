@@ -17,12 +17,15 @@ EXPORT FnRoxie_GetAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) In
 
 	FDCDatasetMini := PublicRecords_KEL.Fn_MAS_FDC( VerifiedInputPII, OptionsMini);		
 
-	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(VerifiedInputPII, FDCDatasetMini, OptionsMini); 
+	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(VerifiedInputPII, FDCDatasetMini, OptionsMini, options.BestPIIAppend); 
 
 	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( MiniAttributes, Options , DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII) ,FDCDatasetMini);
 
+	InputChooser := if(options.BestPIIAppend, MiniAttributes, VerifiedInputPII);
+
+
   // Get Attributes - cleans the attributes after KEL is done 
-  InputPIIAttributes := PublicRecords_KEL.FnRoxie_GetInputPIIAttributes(VerifiedInputPII, Options);
+  InputPIIAttributes := PublicRecords_KEL.FnRoxie_GetInputPIIAttributes(InputChooser, Options);
 	
 	PersonAttributes := PublicRecords_KEL.FnRoxie_GetPersonAttributes(MiniAttributes, FDCDataset, Options); 
 

@@ -2,7 +2,7 @@
 		Cortera, Cortera_Tradeline, Data_Services, DCAV2, Death_Master,  Doxie, Doxie_Files, DriversV2, DMA, dx_BestRecords, dx_ConsumerFinancialProtectionBureau, dx_DataBridge, DX_Email, 
 		dx_Equifax_Business_Data, dx_Gong, dx_Header, dx_Infutor_NARB, dx_Relatives_v3, EBR, Email_Data, emerges, Experian_CRDB, FAA, FBNv2, FLAccidents_Ecrash, Fraudpoint3, Gong, 
 		GovData, Header, Header_Quick, InfoUSA, IRS5500, InfutorCID, Inquiry_AccLogs, LiensV2, LN_PropertyV2, MDR, OSHAIR, Phonesplus_v2, PublicRecords_KEL, Prof_License_Mari, 
-		Prof_LicenseV2, Relationship, Risk_Indicators, RiskView, RiskWise, SAM, STD, Suppress, Targus, thrive, USPIS_HotList, Utilfile, ut,
+		Prof_LicenseV2, Relationship, Risk_Indicators, RiskView, RiskWise, SAM, SexOffender, STD, Suppress, Targus, thrive, USPIS_HotList, Utilfile, ut,
 		VehicleV2, Watercraft, Watchdog, UCCV2, YellowPages;	
 	
 	EXPORT Layouts_FDC(PublicRecords_KEL.Interface_Options Options = PublicRecords_KEL.Interface_Options) := MODULE 
@@ -1768,6 +1768,27 @@ SHARED Inquiry_AccLogs__Inquiry_Table_Email := Inquiry_AccLogs.Key_Inquiry_Email
 		dpmtype;
 		STRING Archive_Date;
 	END;	
+
+SHARED SexOffender__Key_SexOffender_DID :=  IF( Options.isFCRA, SexOffender.Key_SexOffender_DID(TRUE), SexOffender.Key_SexOffender_DID(FALSE) );
+	EXPORT Layout_SexOffender__Key_SexOffender_DID := RECORD
+		LayoutIDs;
+		RECORDOF(SexOffender__Key_SexOffender_DID);
+				PublicRecords_KEL.ECL_Functions.Layout_Overrides.SexOffender_correct_ffid;
+		PublicRecords_KEL.ECL_Functions.Layout_Overrides.SexOffender_correct_record_id;
+	END;		
+
+			//This is a very wide key and we only use a handful of fields
+	SHARED SexOffender__Key_SexOffender_SPK :=   IF( Options.isFCRA, SexOffender.Key_SexOffender_SPK(TRUE), SexOffender.Key_SexOffender_SPK(FALSE) );
+	EXPORT Layout_SexOffender__Key_SexOffender_SPK := RECORD
+		LayoutIDs;
+		RECORDOF(SexOffender__Key_SexOffender_SPK);
+		dpmtype;
+		STRING2 src;
+		STRING Archive_Date;
+				PublicRecords_KEL.ECL_Functions.Layout_Overrides.SexOffender_correct_ffid;
+		PublicRecords_KEL.ECL_Functions.Layout_Overrides.SexOffender_correct_record_id;
+	END;		
+		
 	
 	
 	// ===================[ Composite Layout ]===================
@@ -1958,8 +1979,11 @@ SHARED Inquiry_AccLogs__Inquiry_Table_Email := Inquiry_AccLogs.Key_Inquiry_Email
 		DATASET(Layout_Inquiry_AccLogs__Inquiry_Table_LinkIDs) Dataset_Inquiry_AccLogs__Inquiry_Table_LinkIDs;		
 		DATASET(Layout_Inquiry_AccLogs__Inquiry_Table_Phone) Dataset_Inquiry_AccLogs__Inquiry_Table_Phone;		
 		DATASET(Layout_Inquiry_AccLogs__Inquiry_Table_SSN) Dataset_Inquiry_AccLogs__Inquiry_Table_SSN;		
-		
+
+		dataset(Layout_SexOffender__Key_SexOffender_SPK) Dataset_SexOffender__Key_SexOffender_SPK;
+	
 		dataset(Layout_ConsumerStatementFlags) Dataset_ConsumerStatementFlags;
+
 
 		//please leave this at the bottom of the layout
 	END;

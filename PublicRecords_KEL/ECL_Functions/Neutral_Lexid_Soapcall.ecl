@@ -1,16 +1,18 @@
-﻿IMPORT PublicRecords_KEL, Gateway, risk_indicators, riskwisefcra, Doxie;
+﻿IMPORT PublicRecords_KEL, Gateway, risk_indicators, riskwisefcra, Doxie, didville;
 
 EXPORT Neutral_Lexid_Soapcall(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) inputNoLexid,
 		PublicRecords_KEL.Interface_Options Options) := FUNCTION
 								
 inrec := RECORD, MAXLENGTH(500000)
 	DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) In_Layout;
+	BOOLEAN Retain_Input_Lexid; 
 	INTEGER	Score_Threshold;
 	INTEGER G_ProcUID := 0;
 END;
 		
 LexidInput := DATASET([{PROJECT(inputNoLexid, 
 	TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII, SELF := LEFT)), 
+		Options.RetainInputLexid,
 		Options.ScoreThreshold
 		}], inrec);
 

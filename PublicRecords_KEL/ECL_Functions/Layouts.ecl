@@ -79,6 +79,7 @@ EXPORT Layouts := MODULE
 		STRING InsuranceSource;		
 		BOOLEAN InsuranceDLDataUsed;	
 		Boolean PI_InpDOBAgeIsMinorFlag;
+		Boolean BestDataAppended;
 	END;
 	
 EXPORT LayoutAppendedAddresses := RECORD
@@ -90,7 +91,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6 CurrentAddrPostDir;
 		STRING10 CurrentAddrUnitDesig;
 		STRING8 CurrentAddrSecRng;
-		// STRING25 CurrentAddrCity;
+		STRING25 CurrentAddrCity;
 		STRING6 CurrentAddrState;
 		STRING6 CurrentAddrZip5;
 		// STRING6 CurrentAddrZip4;
@@ -142,6 +143,13 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING7 EmergingAddrGeo;
 		// STRING6 EmergingAddrType;
 		// STRING6 EmergingAddrStatus;
+		
+		STRING20 BestNameFirst;
+		STRING20 BestNameMid;
+		STRING20 BestNameLast;
+		STRING10 BestSSN;
+		STRING10 BestDOB;		
+		
 	END;	
 			
 	EXPORT LayoutInputPII := RECORD
@@ -269,6 +277,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6 PI_InpAddrOWGMFlag;
 		STRING6 PI_InpAddrIsMultiUnitFlag;
 		STRING6 PI_InpAddrIsAptFlag;
+		Boolean BestDataAppended;
 	END;
 	
 	SHARED LayoutInputBIIBusinessEchoInternal := RECORD

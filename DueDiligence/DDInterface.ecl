@@ -83,7 +83,7 @@ EXPORT DDInterface := MODULE
       EXPORT BOOLEAN includeOffenseType := FALSE;
       EXPORT BOOLEAN includeBEOProfLicense := FALSE;
       EXPORT BOOLEAN includeBEOUSResidency := FALSE;
-      EXPORT BOOLEAN includeBEOAccessToFundsProperty := FALSE; //not yet implemented
+      EXPORT BOOLEAN includeBEOAccessToFundsProperty := FALSE; 
       EXPORT BOOLEAN includeLinkedBusinesses := FALSE; //not yet implemented      
       EXPORT BOOLEAN includeAll := FALSE;
     END;

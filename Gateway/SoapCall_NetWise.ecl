@@ -40,9 +40,12 @@ EXPORT SoapCall_NetWise(DATASET(iesp.net_wise.t_NetWiseQueryRequest) ds_recs_in,
     SELF.GatewayParams.MakeVendorGatewayCall  := makeGatewayCall;
 
     SELF.Options.Blind := Gateway.Configuration.GetBlindOption(gateway_cfg);
+    SELF.Options.CachedResponseOnly := in_mod.CachedResponseOnly;
 
     // Need to fill in the correct AppId info ESP is expecting
     SELF.SearchBy.AppId := in_mod.AppId; 
+    SELF.SearchBy.Mode := in_mod.SearchMode;
+    SELF.SearchBy.Limit := in_mod.ResultLimit;
    
     SELF := L;
   END;

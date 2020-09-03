@@ -155,24 +155,24 @@ EXPORT Layout_BRM_NonFCRA := Module
 	END;
 	
 	EXPORT Layout_BII := RECORD	
-	STRING65 B_InpAcct;
-	INTEGER7 B_LexIDUlt;
-	INTEGER7 B_LexIDOrg;
-	INTEGER7 B_LexIDLegal;
-	INTEGER7 B_LexIDSite;
-	INTEGER7 B_LexIDLoc;
-	INTEGER3 B_LexIDLegalScore;
-	STRING120 B_InpClnName;
-	STRING120 B_InpClnAltName;
-	STRING25 B_InpClnAddrCity;
-	STRING6	B_InpClnAddrState;
-	STRING6	B_InpClnAddrZip5;
-	STRING6	B_InpClnAddrZip4;
-	STRING B_InpClnAddrSt;
-	STRING10 B_InpClnPhone;
-	STRING10 B_InpClnTIN;
-	STRING54 B_InpClnEmail;
-	END;
+ STRING65 B_InpAcct;
+ STRING120 B_InpClnName;
+ STRING120 B_InpClnAltName;
+ STRING B_InpClnAddrSt;
+ STRING25 B_InpClnAddrCity;
+ STRING6	B_InpClnAddrState;
+ STRING6	B_InpClnAddrZip5;
+ STRING6	B_InpClnAddrZip4;
+ STRING10 B_InpClnTIN;
+ STRING10 B_InpClnPhone;
+ STRING54 B_InpClnEmail;
+ INTEGER7 B_LexIDUlt;
+ INTEGER7 B_LexIDOrg;
+ INTEGER7 B_LexIDLegal;
+ INTEGER7 B_LexIDSite;
+ INTEGER7 B_LexIDLoc;
+ INTEGER3 B_LexIDLegalScore;
+ END;
 	
 	EXPORT Layout_BusinessProx := RECORD	
 	STRING120 BP_BestName;
@@ -185,9 +185,9 @@ EXPORT Layout_BRM_NonFCRA := Module
 	END;
 		
 	EXPORT Batch_In_Layout := RECORD
-	STRING AcctNo := '';
-	UNSIGNED3 HistoryDateYYYYMM :=999999;
-	UNSIGNED6 HistoryDate := 999999;
+	STRING AcctNo;
+	UNSIGNED3 HistoryDateYYYYMM;
+	UNSIGNED6 HistoryDate;
 	STRING CompanyName;
 	STRING AlternateCompanyName;
 	STRING StreetAddressLine1;
