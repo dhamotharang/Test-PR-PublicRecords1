@@ -25,7 +25,9 @@
 		E122 = 122,				// Missing Related Client Record
 		E123 = 123,				// Missing Related Case Record
 		E124 = 124,				// Invalid/Missing Matched Group Id
-		E125 = 125				// Missing Contact Information
+		E125 = 125,				// Missing Contact Information
+		E126 = 126,       //Invalid/ Matched Program Code
+		E127 = 127       // Invalid/Extraneous Trailing Data
 	);
 
 
@@ -79,8 +81,12 @@
 		{errcodes.E122,'E122','R','3004','Missing Related Client Record'},
 		{errcodes.E123,'E123','R','3003','Missing Related Case Record'},
 		{errcodes.E124,'E124','F','2052','Invalid/Missing Matched Group Id'},
-		{errcodes.E125,'E125','F','2043','Missing Contact Information'}
+		{errcodes.E125,'E125','F','2043','Missing Contact Information'},
+		{errcodes.E126,'E126','F','2053','Invalid/Matched Program Code'}, 
+		{errcodes.E127,'E127','R','3006','Invalid/Extraneous Trailing Data'} 
 	], rCodeTable);
+
+
 
 	EXPORT warningcodes := ENUM(
 			W101 = 101,				// Invalid/Missing Race Value, Set to "U"
@@ -184,10 +190,14 @@
 		{'3002',	'Invalid Update Type'},
 		{'3003',	'Missing Related Case Record'},
 		{'3004',	'Missing Related Client Record'},
-		{'3005',	'Postal Address'}
+		{'3005',	'Postal Address'},
+		{'3006',	'Invalid Record Length'}
+		
 		
 	], {string4 FieldCode, string32 FieldName});
 	
+
+
 	EXPORT addr_errors(string4 err_stat) := '{' + TRIM(CASE(err_stat,
 			'E101'	=> 'Last line is bad or missing',
 			'E212'	=> 'No city and bad ZIP code',
@@ -197,7 +207,7 @@
 			'E302'	=> 'No primary address line',
 			'E412'	=> 'Street name not found', 
 			'E413'	=> 'Possible street-name matches',
-			'E420'	=> 'Primary range is missing', 
+			'E420'	=> 'Primary range is missing',  
 			'E421'	=> 'Primary range is invalid',
 			'E422'	=> 'Predirectional is wrong or missing',
 			'E423'	=> 'Suffix needed is wrong or missing',
@@ -232,3 +242,8 @@
 	export dFieldCodeToName :=  DICTIONARY(dsFieldNames, {FieldCode=>FieldName});
 	export GetFieldName(string code) := dFieldCodeToName[code].FieldName;
 END;
+
+
+
+
+

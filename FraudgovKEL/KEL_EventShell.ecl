@@ -86,7 +86,15 @@ EXPORT KEL_EventShell := MODULE
         'p1_aotactcntev,p1_aotsrc1actcntev,p1_aotsrc1actonlyflag,p9_aotactcntev,p9_aotsrc1actcntev,p9_aotsrc1actonlyflag,' +
         'p15_aotactcntev,p15_aotsrc1actcntev,p15_aotsrc1actonlyflag,p20_aotactcntev,p20_aotsrc1actcntev,p20_aotsrc1actonlyflag,' +
         'p16_aotactcntev,p16_aotsrc1actcntev,p16_aotsrc1actonlyflag,p17_aotactcntev,p17_aotsrc1actcntev,p17_aotsrc1actonlyflag,' +
-        'p18_aotactcntev,p18_aotsrc1actcntev,p18_aotsrc1actonlyflag,p19_aotactcntev,p19_aotsrc1actcntev,p19_aotsrc1actonlyflag';
+        'p18_aotactcntev,p18_aotsrc1actcntev,p18_aotsrc1actonlyflag,p19_aotactcntev,p19_aotsrc1actcntev,p19_aotsrc1actonlyflag,' +
+        'p1_aotidkractinagcycntev,p1_aotidkractinagcyflagev,p1_aotidkractinagcyolddtev,p1_aotidkractinagcynewdtev,p1_aotidkrappfrdactinagcycntev,p1_aotidkrappfrdactinagcyflagev,' +
+        'p1_aotidkrappfrdactinagcyolddtev,p1_aotidkrappfrdactinagcynewdtev,p1_aotidkrgenfrdactinagcycntev,p1_aotidkrgenfrdactinagcyflagev,p1_aotidkrgenfrdactinagcyolddtev,p1_aotidkrgenfrdactinagcynewdtev,' +
+        'p1_aotidkrothfrdactinagcycntev,p1_aotidkrothfrdactinagcyflagev,p1_aotidkrothfrdactinagcyolddtev,p1_aotidkrothfrdactinagcynewdtev,p1_aotidkrstolidactinagcycntev,p1_aotidkrstolidactinagcyflagev,' +
+        'p1_aotidkrstolidactinagcyolddtev,p1_aotidkrstolidactinagcynewdtev,p9_aotaddrkractinagcycntev,p9_aotaddrkractinagcyflagev,p9_aotaddrkractinagcyolddtev,p9_aotaddrkractinagcynewdtev,' +
+        'p15_aotssnkractinagcycntev,p15_aotssnkractinagcyflagev,p15_aotssnkractinagcyolddtev,p15_aotssnkractinagcynewdtev,p16_aotphnkractinagcycntev,p16_aotphnkractinagcyflagev,' +
+        'p16_aotphnkractinagcyolddtev,p16_aotphnkractinagcynewdtev,p17_aotemailkractinagcycntev,p17_aotemailkractinagcyflagev,p17_aotemailkractinagcyolddtev,p17_aotemailkractinagcynewdtev,' +
+        'p18_aotipaddrkractinagcycntev,p18_aotipaddrkractinagcyflagev,p18_aotipaddrkractinagcyolddtev,p18_aotipaddrkractinagcynewdtev,p19_aotbnkacctkractinagcycntev,p19_aotbnkacctkractinagcyflagev,' +
+        'p19_aotbnkacctkractinagcyolddtev,p19_aotbnkacctkractinagcynewdtev,p20_aotdlkractinagcycntev,p20_aotdlkractinagcyflagev,p20_aotdlkractinagcyolddtev,p20_aotdlkractinagcynewdtev';
 
     EXPORT ModelingAttr := 'personentitycontextuid,addressentitycontextuid,ssnentitycontextuid,phoneentitycontextuid,emailentitycontextuid,ipentitycontextuid,bankaccountentitycontextuid,driverslicenseentitycontextuid,agencyuid,' +
         'agencyprogtype,agencyprogdesc,agencyprogjurst,t_actdtecho,t_acttmecho,t_srcagencyuid,t_srcagencyprogtype,t_inagencyflag,t_srctype,t_srcdesc,t_srcclasstype,t_personuidecho,' +
@@ -126,7 +134,16 @@ EXPORT KEL_EventShell := MODULE
         'p19_aotbkacnewkraftaddactcntev,p19_aotbkacnewkraftnonstactcntev,p20_aotactcntev,p20_aotidactcntev,p20_aotidactcnt30d,p20_idactolddt,p20_aotaddactcntev,p20_aotaddactcnt30d,p20_aotnonstactcntev,p20_aotnonstactcnt30d,p20_aotdlnewkraftidactcntev,p20_aotdlnewkraftaddactcntev,p20_aotdlnewkraftnonstactcntev,' +
         'p9_aotidcurrprofusngaddrcntev,p15_aotidcurrprofusngssncntev,p16_aotidcurrprofusngphncntev,p17_aotidcurrprofusngemlcntev,p18_aotidcurrprofusngipcntev,p19_aotidcurrprofusngbkaccntev,p20_aotidcurrprofusngdlcntev,p9_aotidhistprofusngaddrcntev,p15_aotidhistprofusngssncntev,p16_aotidhistprofusngphncntev,p17_aotidhistprofusngemlcntev,p18_aotidhistprofusngipcntev,p19_aotidhistprofusngbkaccntev,' +
         'p20_aotidhistprofusngdlcntev,p9_aotidusngaddrcntev,p15_aotidusngssncntev,p16_aotidusngphncntev,p17_aotidusngemailcntev,p18_aotidusngipaddrcntev,p19_aotidusngbnkacctcntev,p20_aotidusngdlcntev,' +
-        'p1_idriskunscrbleflag,p9_addrriskunscrbleflag,p15_ssnriskunscrbleflag,p16_phnriskunscrbleflag,p17_emailriskunscrbleflag,p18_ipaddrriskunscrbleflag,p19_bnkacctriskunscrbleflag,p20_dlriskunscrbleflag';
+        'p1_idriskunscrbleflag,p9_addrriskunscrbleflag,p15_ssnriskunscrbleflag,p16_phnriskunscrbleflag,p17_emailriskunscrbleflag,p18_ipaddrriskunscrbleflag,p19_bnkacctriskunscrbleflag,p20_dlriskunscrbleflag,' +
+        'p1_aotidkractinagcycntev,p1_aotidkractinagcyflagev,p1_aotidkractinagcyolddtev,p1_aotidkractinagcynewdtev,p1_aotidkrappfrdactinagcycntev,p1_aotidkrappfrdactinagcyflagev,' +
+        'p1_aotidkrappfrdactinagcyolddtev,p1_aotidkrappfrdactinagcynewdtev,p1_aotidkrgenfrdactinagcycntev,p1_aotidkrgenfrdactinagcyflagev,p1_aotidkrgenfrdactinagcyolddtev,p1_aotidkrgenfrdactinagcynewdtev,' +
+        'p1_aotidkrothfrdactinagcycntev,p1_aotidkrothfrdactinagcyflagev,p1_aotidkrothfrdactinagcyolddtev,p1_aotidkrothfrdactinagcynewdtev,p1_aotidkrstolidactinagcycntev,p1_aotidkrstolidactinagcyflagev,' +
+        'p1_aotidkrstolidactinagcyolddtev,p1_aotidkrstolidactinagcynewdtev,p9_aotaddrkractinagcycntev,p9_aotaddrkractinagcyflagev,p9_aotaddrkractinagcyolddtev,p9_aotaddrkractinagcynewdtev,' +
+        'p15_aotssnkractinagcycntev,p15_aotssnkractinagcyflagev,p15_aotssnkractinagcyolddtev,p15_aotssnkractinagcynewdtev,p16_aotphnkractinagcycntev,p16_aotphnkractinagcyflagev,' +
+        'p16_aotphnkractinagcyolddtev,p16_aotphnkractinagcynewdtev,p17_aotemailkractinagcycntev,p17_aotemailkractinagcyflagev,p17_aotemailkractinagcyolddtev,p17_aotemailkractinagcynewdtev,' +
+        'p18_aotipaddrkractinagcycntev,p18_aotipaddrkractinagcyflagev,p18_aotipaddrkractinagcyolddtev,p18_aotipaddrkractinagcynewdtev,p19_aotbnkacctkractinagcycntev,p19_aotbnkacctkractinagcyflagev,' +
+        'p19_aotbnkacctkractinagcyolddtev,p19_aotbnkacctkractinagcynewdtev,p20_aotdlkractinagcycntev,p20_aotdlkractinagcyflagev,p20_aotdlkractinagcyolddtev,p20_aotdlkractinagcynewdtev';
+
 
     EXPORT UIStats := hipie_ecl.macSlimDataset(CleanEventShell, 'industrytype,customerid,entitycontextuid', 
         'recordid,caseid,eventdate,' +
@@ -135,7 +152,7 @@ EXPORT KEL_EventShell := MODULE
         NicoleAttr
         );
 
-    EXPORT ModelingStats := hipie_ecl.macSlimDataset(CleanEventShell(/*T_SrcClassType = 3 (hash(personentitycontextuid) % 2 = 0 OR currentlyincarceratedflag =1 OR deceasedpriortoevent=1) AND */ industrytype = 1029 and customerid = 20995239), 'entitycontextuid,t_actuid', 
+    EXPORT ModelingStats := hipie_ecl.macSlimDataset(CleanEventShell((T_SrcClassType = 3 /*hash(personentitycontextuid) % 2 = 0 OR */ OR currentlyincarceratedflag =1 OR deceasedpriortoevent=1) OR (industrytype = 1029 and customerid = 20995239)), 'entitycontextuid,t_actuid', 
         ModelingAttr
         );
 

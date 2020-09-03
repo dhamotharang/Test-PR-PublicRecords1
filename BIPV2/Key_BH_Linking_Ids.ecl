@@ -216,6 +216,8 @@ MODULE
    unsigned4            global_sid                                                                  ;
    unsigned8            record_sid                                                                  ;
    unsigned6            locid                                                                       ;
+   unsigned1            seleid_status_private_score                                                 ;
+   unsigned1            seleid_status_public_score                                                  ;
 end;
 
 		    	
