@@ -1,11 +1,37 @@
 ﻿//ECrash Morning deployments
 // The following flags to be set to Y
+//Morning = Auto Pckg deployment
 // isprodready is set to Y and Autopkg is set to Y only on Sunday.
+// FLAccidents_Ecrash.proc_Build_all('20200830','no','Y'); //Sunday Morning
+// FLAccidents_Ecrash.proc_Build_all('20200830b','yes','N'); //Sunday Evening
+// FLAccidents_Ecrash.proc_Build_all('20200829','no','N'); //Saturday Morning
+// FLAccidents_Ecrash.proc_Build_all('20200829b','yes','Y'); //Saturday Evening
+// FLAccidents_Ecrash.proc_Build_all('20200902','no','N');//Weekday Morning
+// FLAccidents_Ecrash.proc_Build_all('20200902b','yes','N'); //Weekday Evening
 import ut,orbit_report,Orbit3,Orbit3Insurance,dops;
 export Proc_Build_all(string filedate,string morning = 'no',string issunday = 'N'):= function 
-updatedops := map(morning = 'yes' and issunday = 'N' => dops.updateversion('EcrashV2Keys',filedate,'skasavajjala@seisint.com, DataDevelopment-InsRiskeCrash@lexisnexisrisk.com',,'N',,'Y'),
-                   morning = 'yes' and issunday = 'Y' => dops.updateversion('EcrashV2Keys',filedate,'skasavajjala@seisint.com, BocaRoxiePackageTeam@lexisnexis.com, DataDevelopment-InsRiskeCrash@lexisnexisrisk.com','Y','N',,'Y'),
-									 Sequential(dops.updateversion('EcrashV2Keys',filedate,'skasavajjala@seisint.com, DataDevelopment-InsRiskeCrash@lexisnexisrisk.com',,'N'),dops.updateversion('EcrashCruDeltaKeys',filedate,'skasavajjala@seisint.com, DataDevelopment-InsRiskeCrash@lexisnexisrisk.com',,'N',,,'A')));
+
+//Ecrash Auto pckg deployment
+prEmailList := 'Sudhir.Kasavajjala@lexisnexis.com, DataDevelopment-InsRiskeCrash@lexisnexisrisk.com'; 
+//Ecrash(Bankruptcy packages) Auto pckg deployment
+prSundayEmailList := 'Sudhir.Kasavajjala@lexisnexis.com, BocaRoxiePackageTeam@lexisnexis.com,  DataDevelopment-InsRiskeCrash@lexisnexisrisk.com';
+//Insurance Auto pckg deployment 
+insEmailList := 'Sudhir.Kasavajjala@lexisnexis.com, alp-qadata.team@lexisnexis.com, InsDataOps@risk.lexisnexis.com, DataDevelopment-InsRiskeCrash@lexisnexisrisk.com';
+
+prAutoProdEcrashV2DopsUpd := dops.updateversion('EcrashV2Keys',filedate,prEmailList,,'N',,'Y');
+prAutoSundayProdEcrashV2DopsUpd := dops.updateversion('EcrashV2Keys',filedate,prSundayEmailList,'Y','N',,'Y');
+prProdEcrashV2DopsUpd := dops.updateversion('EcrashV2Keys',filedate,prEmailList,,'N');
+									 
+insProdEcrashCruDeltaDopsUpd := dops.updateversion('EcrashCruDeltaKeys',filedate,insEmailList,,'N',,,'A'); 
+
+//Insurance EcrashV2Keys will be auto prod early October 2020
+//From now to October 2020 it will regular Prod package
+//insAutoProdEcrashV2DopsUpd := dops.updateversion('EcrashV2Keys',filedate,insEmailList,,'N',,'Y','A');
+insProdEcrashV2DopsUpd := dops.updateversion('EcrashV2Keys',filedate,insEmailList,,'N',,,'A');
+		
+updatedops := map(morning = 'yes' and issunday = 'N' => sequential(prAutoProdEcrashV2DopsUpd, insProdEcrashV2DopsUpd),
+                  morning = 'yes' and issunday = 'Y' => sequential(prAutoSundayProdEcrashV2DopsUpd, insProdEcrashV2DopsUpd),
+									Sequential(prProdEcrashV2DopsUpd, insProdEcrashV2DopsUpd, insProdEcrashCruDeltaDopsUpd));
 
 
 
