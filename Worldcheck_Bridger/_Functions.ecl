@@ -1354,6 +1354,7 @@
 				trim(kword, left, right) = 'THAMLO-SANC' =>SubGroup_Constants.numKeywordsID.KEYWORD_THAMLO_SANC,
 				trim(kword, left, right) = 'ITIVASS' =>SubGroup_Constants.numKeywordsID.KEYWORD_ITIVASS,
 				trim(kword, left, right) = 'VIPD' =>SubGroup_Constants.numKeywordsID.KEYWORD_VIPD,
+				trim(kword, left, right) = 'USDOD-1237' =>SubGroup_Constants.numKeywordsID.KEYWORD_USDOD_1237,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
