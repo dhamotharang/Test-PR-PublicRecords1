@@ -48,12 +48,20 @@ EXPORT proc2Prep(string	prepDate, boolean isFast) :=  FUNCTION
 				
 		iRfrA		:= iRfrAr + iRfrAp;
 		
-		
+		unsigned	FindmaxLNMortgageFaresID	:=	max(
+																		max(		ln_propertyv2.Files.Prep.LNMortgage(ln_fares_id[1..2]	=	'OM')
+																			+	ln_propertyv2.Files.Prep.LNMortgageRepl(ln_fares_id[1..2]	=	'OM'),
+																			(unsigned)ln_fares_id[3..]),
+																		max(   LN_PropertyV2_Fast.Files.prep.deed_mortg(ln_fares_id[1..2]	=	'OM'),
+																			(unsigned)ln_fares_id[3..]
+																			 )
+																		)	:	independent;
+    maxLNMortgageFaresID := FindmaxLNMortgageFaresID : global;
 		
 		// Splt, map and save OKC prep files
 		prepOkcAssessment	:= LN_PropertyV2_Fast.Map_OKC_Raw_Assessment_Base(prepDate,iRokAn,iRokAr).assessment.dNew;
 		prepOkcDeed 			:= LN_PropertyV2_Fast.Map_OKC_Raw_Deed_Base(prepDate,iRokDn,iRokDr).deed.dNew;
-		prepOkcMortgage 	:= LN_PropertyV2_Fast.Map_OKC_Raw_Mortgage_Base(prepDate,iRokMn,iRokMr).mortgage.dNew;
+		prepOkcMortgage 	:= LN_PropertyV2_Fast.Map_OKC_Raw_Mortgage_Base(prepDate,iRokMn,iRokMr,maxLNMortgageFaresID).mortgage.dNew;
 		
 		prepAddlNames			:= LN_PropertyV2_Fast.Map_OKC_Raw_Assessment_Base(prepDate,iRokAn,iRokAr).addlNames.dNew
 												+LN_PropertyV2_Fast.Map_OKC_Raw_Deed_Base(prepDate,iRokDn,iRokDr).addlNames.dNew
@@ -67,7 +75,7 @@ EXPORT proc2Prep(string	prepDate, boolean isFast) :=  FUNCTION
 												+LN_PropertyV2_Fast.Map_OKC_Raw_Mortgage_Base(prepDate,iRokMn,iRokMr).search.dNew;
 												
 		//Split, map and save Black Knight Assignment/Release files;
-		prepBKMortgage			:= LN_PropertyV2_Fast.Map_BK_AssignRelease_Base(prepDate,iRbkAs,iRbkRl).mortgage.dNew;
+		prepBKMortgage			:= LN_PropertyV2_Fast.Map_BK_AssignRelease_Base(prepDate,iRbkAs,iRbkRl,maxLNMortgageFaresID).mortgage.dNew;
 		prepBKAddlNameInfo	:= LN_PropertyV2_Fast.Map_BK_AssignRelease_Base(prepDate,iRbkAs,iRbkRl).AddlNameInfo.dNew;
 		prepBKAddlNames			:= LN_PropertyV2_Fast.Map_BK_AssignRelease_Base(prepDate,iRbkAs,iRbkRl).addlNames.dNew;
 		prepBKSearch				:= LN_PropertyV2_Fast.Map_BK_AssignRelease_Base(prepDate,iRbkAs,iRbkRl).search.dNew;
