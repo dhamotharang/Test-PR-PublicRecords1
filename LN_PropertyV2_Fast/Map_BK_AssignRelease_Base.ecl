@@ -62,7 +62,7 @@ EXPORT Map_BK_AssignRelease_Base (STRING	pVersionDate
 	common.layout_prep_temp_deed tMap2Common(RECORDOF(PrepDataSet.dMortgageRawCombined)	pInput,integer	cnt)	:=
 		TRANSFORM
 			// Temporary variables
-			UNSIGNED	vFaresID					:=	maxLNDeedFaresID	+	cnt + 1000000;
+			UNSIGNED	vFaresID					:=	maxLNDeedFaresID	+	cnt;
 			STRING    vCleanBorrower1		:=  LN_Propertyv2.Functions.fCleanName(pInput.BorrowerName1);
 			STRING    vCleanBorrower2		:=  LN_Propertyv2.Functions.fCleanName(pInput.BorrowerName2);
 			
