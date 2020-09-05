@@ -1010,13 +1010,14 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 		END;
 
 	 res := JOIN (distribute(s,hash(seq))
-						,distribute(p_f,hash(accountnumber)),LEFT.seq=(unsigned)RIGHT.accountnumber,getold(LEFT,RIGHT));	
+						,distribute(p_f,hash((unsigned)accountnumber)),LEFT.seq=(unsigned)RIGHT.accountnumber,getold(LEFT,RIGHT),local);	
 						
    isFCRA := false;
    Shell_Out := FraudGovPlatform.fn_BocaShell_ToRin(res, isFCRA, DataRestrictionMask, IntendedPurpose);
 	 
-	 Base_Map := Join(Shell_Out,Pii_Input,left.record_id=right.record_id
-											,Transform(recordof(left),self.fdn_file_info_id:=right.fdn_file_info_id,self:=left));
+	 Base_Map := Join(distribute(Shell_Out,hash(record_id)),
+										distribute(Pii_Input,hash(record_id)),left.record_id=right.record_id
+											,Transform(recordof(left),self.fdn_file_info_id:=right.fdn_file_info_id,self:=left),local);
 	 
 	 Export All := If(UpdatePii, dedup((Base_Map + BocaShell_Base),all) , dedup(Base_Map,all));
    END;
