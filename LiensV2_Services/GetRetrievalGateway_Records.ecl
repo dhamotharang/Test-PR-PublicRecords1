@@ -208,10 +208,10 @@ EXPORT GetRetrievalGateway_Records := MODULE
 
     $.layout_liens_Retrieval.final_rec ErrorOut(RECORDOF(dte_out) L) := TRANSFORM
 
-         SELF.error_code := MAP(L.ErrorCode <> '' => L.ErrorCode,
+         SELF.error_code := MAP(L.ErrorCode <> '0' => L.ErrorCode,
                                 invalid_dte_party => $.constants.LIENS_RETRIEVAL.NO_RECS_FOUND_CODE,
                                 resolved_to_none => FCRA.Constants.ALERT_CODE.NO_DID_FOUND,
-                                '');
+                                '0');
 
          SELF.error_desc := IF(L.ErrorMessage <> '', L.ErrorMessage, '');
                               
