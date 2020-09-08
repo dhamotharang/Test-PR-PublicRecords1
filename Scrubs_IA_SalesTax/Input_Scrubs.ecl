@@ -22,6 +22,41 @@ EXPORT Input_Scrubs := MODULE
   EXPORT  Bitmap_Layout := RECORD(Input_Layout_IA_SalesTax)
     UNSIGNED8 ScrubsBits1;
   END;
+  EXPORT Rule_Layout := RECORD(Input_Layout_IA_SalesTax)
+    STRING Rules {MAXLENGTH(1000)};
+  END;
+  SHARED toRuleDesc(UNSIGNED c) := CHOOSE(c
+          ,'permit_nbr:invalid_permit_nbr:CUSTOM'
+          ,'issue_date:invalid_issue_date:CUSTOM'
+          ,'owner_name:invalid_owner_name:CUSTOM'
+          ,'business_name:invalid_business_name:CUSTOM'
+          ,'state_mailing_address:invalid_state:CUSTOM'
+          ,'mailing_zip_code:invalid_zip:CUSTOM'
+          ,'state_of_location:invalid_state:CUSTOM'
+          ,'location_zip_code:invalid_zip:CUSTOM'
+          ,'field:Number_Errored_Fields:SUMMARY'
+          ,'field:Number_Perfect_Fields:SUMMARY'
+          ,'rule:Number_Errored_Rules:SUMMARY'
+          ,'rule:Number_Perfect_Rules:SUMMARY'
+          ,'rule:Number_OnFail_Rules:SUMMARY'
+          ,'record:Number_Errored_Records:SUMMARY'
+          ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
+  SHARED toErrorMessage(UNSIGNED c) := CHOOSE(c
+          ,Input_Fields.InvalidMessage_permit_nbr(1)
+          ,Input_Fields.InvalidMessage_issue_date(1)
+          ,Input_Fields.InvalidMessage_owner_name(1)
+          ,Input_Fields.InvalidMessage_business_name(1)
+          ,Input_Fields.InvalidMessage_state_mailing_address(1)
+          ,Input_Fields.InvalidMessage_mailing_zip_code(1)
+          ,Input_Fields.InvalidMessage_state_of_location(1)
+          ,Input_Fields.InvalidMessage_location_zip_code(1)
+          ,'Fields with errors'
+          ,'Fields without errors'
+          ,'Rules with errors'
+          ,'Rules without errors'
+          ,'Rules with possible edits'
+          ,'Records with at least one error'
+          ,'Records without errors','UNKNOWN');
 EXPORT FromNone(DATASET(Input_Layout_IA_SalesTax) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
     SELF.permit_nbr_Invalid := Input_Fields.InValid_permit_nbr((SALT311.StrType)le.permit_nbr);
@@ -41,6 +76,19 @@ EXPORT FromNone(DATASET(Input_Layout_IA_SalesTax) h) := MODULE
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
+  STRING escQuotes(STRING s) := STD.Str.FindReplace(s,'\'','\\\'');
+  Rule_Layout IntoRule(BitmapInfile le, UNSIGNED c) := TRANSFORM
+    mask := 1<<(c-1);
+    hasError := (mask&le.ScrubsBits1)>0;
+    SELF.Rules := IF(hasError,TRIM(toRuleDesc(c))+':\''+escQuotes(TRIM(toErrorMessage(c)))+'\'',IF(le.ScrubsBits1=0 AND c=1,'',SKIP));
+    SELF := le;
+  END;
+  unrolled := NORMALIZE(BitmapInfile,NumRules,IntoRule(LEFT,COUNTER));
+  Rule_Layout toRoll(Rule_Layout le,Rule_Layout ri) := TRANSFORM
+    SELF.Rules := TRIM(le.Rules) + IF(LENGTH(TRIM(le.Rules))>0 AND LENGTH(TRIM(ri.Rules))>0,',','') + TRIM(ri.Rules);
+    SELF := le;
+  END;
+  EXPORT RulesInfile := ROLLUP(unrolled,toRoll(LEFT,RIGHT),EXCEPT Rules);
 END;
 // Module to use if you already have a scrubs bitmap you wish to expand or compare
 EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
@@ -120,38 +168,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
-      SELF.ruledesc := CHOOSE(c
-          ,'permit_nbr:invalid_permit_nbr:CUSTOM'
-          ,'issue_date:invalid_issue_date:CUSTOM'
-          ,'owner_name:invalid_owner_name:CUSTOM'
-          ,'business_name:invalid_business_name:CUSTOM'
-          ,'state_mailing_address:invalid_state:CUSTOM'
-          ,'mailing_zip_code:invalid_zip:CUSTOM'
-          ,'state_of_location:invalid_state:CUSTOM'
-          ,'location_zip_code:invalid_zip:CUSTOM'
-          ,'field:Number_Errored_Fields:SUMMARY'
-          ,'field:Number_Perfect_Fields:SUMMARY'
-          ,'rule:Number_Errored_Rules:SUMMARY'
-          ,'rule:Number_Perfect_Rules:SUMMARY'
-          ,'rule:Number_OnFail_Rules:SUMMARY'
-          ,'record:Number_Errored_Records:SUMMARY'
-          ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
-      SELF.ErrorMessage := CHOOSE(c
-          ,Input_Fields.InvalidMessage_permit_nbr(1)
-          ,Input_Fields.InvalidMessage_issue_date(1)
-          ,Input_Fields.InvalidMessage_owner_name(1)
-          ,Input_Fields.InvalidMessage_business_name(1)
-          ,Input_Fields.InvalidMessage_state_mailing_address(1)
-          ,Input_Fields.InvalidMessage_mailing_zip_code(1)
-          ,Input_Fields.InvalidMessage_state_of_location(1)
-          ,Input_Fields.InvalidMessage_location_zip_code(1)
-          ,'Fields with errors'
-          ,'Fields without errors'
-          ,'Rules with errors'
-          ,'Rules without errors'
-          ,'Rules with possible edits'
-          ,'Records with at least one error'
-          ,'Records without errors','UNKNOWN');
+      SELF.ruledesc := toRuleDesc(c);
+      SELF.ErrorMessage := toErrorMessage(c);
       SELF.rulecnt := CHOOSE(c
           ,le.permit_nbr_CUSTOM_ErrorCount
           ,le.issue_date_CUSTOM_ErrorCount

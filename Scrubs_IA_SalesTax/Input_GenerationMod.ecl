@@ -3,7 +3,7 @@ IMPORT SALT311;
 EXPORT Input_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.11.8';
+  EXPORT salt_VERSION := 'V3.11.11';
   EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
@@ -46,7 +46,7 @@ EXPORT Input_GenerationMod := MODULE(SALT311.iGenerationMod)
     + '//FIELDTYPE DEFINITIONS\n'
     + '//-------------------------\n'
     + 'FIELDTYPE:invalid_permit_nbr:CUSTOM(Scrubs.Functions.fn_numeric>0,9)\n'
-    + 'FIELDTYPE:invalid_issue_date:CUSTOM(Scrubs.Functions.fn_valid_pastDate>0)\n'
+    + 'FIELDTYPE:invalid_issue_date:CUSTOM(Scrubs_IA_SalesTax.Functions.fn_valid_Date>0)\n'
     + 'FIELDTYPE:invalid_owner_name:CUSTOM(Scrubs_IA_SalesTax.Functions.fn_valid_name>0)\n'
     + 'FIELDTYPE:invalid_business_name:CUSTOM(Scrubs_IA_SalesTax.Functions.fn_valid_name>0)\n'
     + 'FIELDTYPE:invalid_state:CUSTOM(Scrubs.Functions.fn_verify_state>0)\n'

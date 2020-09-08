@@ -6,7 +6,7 @@ NAMESCOPE:Input
 //FIELDTYPE DEFINITIONS
 //-------------------------
 FIELDTYPE:invalid_permit_nbr:CUSTOM(Scrubs.Functions.fn_numeric>0,9)
-FIELDTYPE:invalid_issue_date:CUSTOM(Scrubs.Functions.fn_valid_pastDate>0)
+FIELDTYPE:invalid_issue_date:CUSTOM(Scrubs_IA_SalesTax.Functions.fn_valid_Date>0)
 FIELDTYPE:invalid_owner_name:CUSTOM(Scrubs_IA_SalesTax.Functions.fn_valid_name>0)
 FIELDTYPE:invalid_business_name:CUSTOM(Scrubs_IA_SalesTax.Functions.fn_valid_name>0)
 FIELDTYPE:invalid_state:CUSTOM(Scrubs.Functions.fn_verify_state>0)

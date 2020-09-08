@@ -17,8 +17,8 @@ EXPORT InValidMessageFT_invalid_permit_nbr(UNSIGNED1 wh) := CHOOSE(wh,SALT311.Hy
 EXPORT MakeFT_invalid_issue_date(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_issue_date(SALT311.StrType s) := WHICH(~Scrubs.Functions.fn_valid_pastDate(s)>0);
-EXPORT InValidMessageFT_invalid_issue_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.Functions.fn_valid_pastDate'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_issue_date(SALT311.StrType s) := WHICH(~Scrubs_IA_SalesTax.Functions.fn_valid_Date(s)>0);
+EXPORT InValidMessageFT_invalid_issue_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_IA_SalesTax.Functions.fn_valid_Date'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_owner_name(SALT311.StrType s0) := FUNCTION
   RETURN  s0;

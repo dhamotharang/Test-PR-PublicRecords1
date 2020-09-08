@@ -34,9 +34,9 @@ strata_counts := govdata.Strata_Population_Stats.IA_Sales_pop;
 
 retval := SEQUENTIAL(sprayfile, 
                      scrub_input,
+										 superfile_transac,
 										 IF(Scrubs.Mac_ScrubsFailureTest('Scrubs_IA_SalesTax',pfiledate),
-										   SEQUENTIAL(superfile_transac,                     
-																  make_bdid,
+										   SEQUENTIAL(make_bdid,
 																  strata_counts),
 											 OUTPUT('Scrubs failed.  Keys not built.',NAMED('Scrubs_Failure'))
 											 )

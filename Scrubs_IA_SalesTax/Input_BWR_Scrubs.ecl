@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_IA_SalesTax.Input_BWR_Scrubs - Checking field validity in a file - SALT V3.11.8');
+#workunit('name','Scrubs_IA_SalesTax.Input_BWR_Scrubs - Checking field validity in a file - SALT V3.11.11');
 IMPORT Scrubs_IA_SalesTax,SALT311;
 infile := Scrubs_IA_SalesTax.Input_In_IA_SalesTax;
 mod_scrubs := Scrubs_IA_SalesTax.Input_Scrubs;
