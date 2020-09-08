@@ -1,5 +1,5 @@
 ﻿import dx_FirstData,Orbit3,RoxieKeyBuild,FirstData;
-EXPORT proc_build_keys (STRING	pVersion, boolean Daily):=function
+EXPORT proc_build_keys (STRING	pVersion, boolean isDelta):=function
 
 	FCRAprefix := '~thor_data400::key::FirstData::FCRA::' + pVersion + '::';
 	prefix := '~thor_data400::key::FirstData::' + pVersion + '::';
@@ -16,14 +16,17 @@ EXPORT proc_build_keys (STRING	pVersion, boolean Daily):=function
 
 	
 	build_keys := sequential(
-																fcra_first_data_key,
-																first_data_driverslicense_key,
-                                                                if(daily, 
+																parallel(
+                                                                    fcra_first_data_key,
+                                                                    first_data_driverslicense_key),
+                                                                //isDelta is false on mondays and means that a full build is necessary,
+                                                                    //on all other days keys are simply added to superfile
+                                                                if(isDelta, 
                                                                     parallel(
                                                                         fileservices.addsuperfile(dx_FirstData.names().i_did_FCRA,	name_did),
                                                                         fileservices.addsuperfile(dx_FirstData.names().i_driverslicense, name_driverslicense)
                                                                         ),
-                                                                    sequential(
+                                                                    parallel(
                                                                         ma_fcra_first_data_key_to_qa,
                                                                         ma_first_data_driverslicense_key_to_qa
                                                                         )

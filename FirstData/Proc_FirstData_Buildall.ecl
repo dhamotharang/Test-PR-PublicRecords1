@@ -10,7 +10,9 @@ EXPORT Proc_FirstData_buildall(
 	BOOLEAN pIsTesting = FALSE,
 	BOOLEAN pOverwrite = FALSE
 ) := MODULE
-    shared day_of_week := ut.Weekday((integer)pversion);
+    //isDelta = D for delta build and F for Full build
+    day_of_week := ut.Weekday((integer)pversion);
+    shared isDelta := if( day_of_week = 'MONDAY', 'F', 'D');
 	// Spray Files.
 	EXPORT SprayFiles := IF(pDirectory != '',FirstData.fSprayFiles(
 			pVersion,
@@ -22,10 +24,9 @@ EXPORT Proc_FirstData_buildall(
 			pOverwrite
 		)
 	);
-    isDelta := if( day_of_week = 'MONDAY', 'F', 'D');
-	shared dops_update := SEQUENTIAL(
-		dops.updateversion('FirstDataKeys', pVersion, pContacts,,'N',,,,, isDelta),
-		dops.updateversion('FCRA_FirstDataKeys', pVersion, pContacts,,'F',,,,, isDelta)
+	shared dops_update := parallel(
+		dops.updateversion('FirstDataKeys', pVersion, pContacts,,'N',,,,,, isDelta),
+		dops.updateversion('FCRA_FirstDataKeys', pVersion, pContacts,,'F',,,,,, isDelta)
 	);
 	
 	// All filenames associated with this Dataset
@@ -38,19 +39,19 @@ EXPORT Proc_FirstData_buildall(
 		SprayFiles,
 		BuildLogger.PrepEnd(false),
 		BuildLogger.BaseStart(False),
-		FirstData.Build_BaseFile(pversion, day_of_week).ALL,
+		FirstData.Build_BaseFile(pversion, isDelta = 'D').ALL,
 		BuildLogger.BaseEnd(False),
 		BuildLogger.KeyStart(false),
-		FirstData.proc_build_keys(pVersion, day_of_week != 'MONDAY'),
+		FirstData.proc_build_keys(pVersion, isDelta = 'D'),
 		BuildLogger.KeyEnd(false),
-		 BuildLogger.PostStart(False),
+		BuildLogger.PostStart(False),
 		FirstData.QA_Records(),
  		dops_update,
 		FirstData.Strata_Population_Stats(pversion,pIsTesting).All,
 		Scrubs_FirstData.fn_RunScrubs(pversion,''),
 		BuildLogger.PostEnd(False), 
 		BuildLogger.BuildEnd(false) 
-	) : 
+	): 
  	SUCCESS(
 		Send_Emails(
 			pversion,,,,
@@ -64,7 +65,7 @@ EXPORT Proc_FirstData_buildall(
 			pContacts,
 			RoxieKeyBuild.Email_Notification_List + ';' + pContacts
 		).BuildFailure
-	)  ;
+	);
 	EXPORT All :=
 	IF(VersionControl.IsValidVersion(pversion)
 		,full_build

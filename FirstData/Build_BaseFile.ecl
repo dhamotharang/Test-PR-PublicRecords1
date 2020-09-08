@@ -1,12 +1,11 @@
 ﻿IMPORT FirstData, header, ut, PromoteSupers,VersionControl, address, STD;
 
-EXPORT Build_BaseFile(STRING	pVersion	=	(STRING)STD.Date.Today(), string day_of_week = ut.Weekday((integer)pversion)) := MODULE
-    shared daily := if( day_of_week = 'MONDAY', false, true);
+EXPORT Build_BaseFile(STRING	pVersion	=	(STRING)STD.Date.Today(), boolean isdelta = true) := MODULE
 
 	//FirstData input file 
 	ds_firstdata_in := FirstData.Files().file_in;
 	
-  file_name	:=	FirstData.Filenames().Input.Raw.Using;
+    file_name	:=	FirstData.Filenames().Input.Raw.Using;
 	file_date := IF(VersionControl.fGetFilenameVersion(file_name)>0,
 															(STRING)VersionControl.fGetFilenameVersion(file_name)
 														,pVersion
@@ -28,10 +27,9 @@ EXPORT Build_BaseFile(STRING	pVersion	=	(STRING)STD.Date.Today(), string day_of_
 	EXPORT dsClean				:=	project(ds_firstdata_in,xformToCommon(left));
 
 	ds_firstdata_base_in := Firstdata.Files().file_base;
-	//ds_firstdata_base	   := ds_firstdata_base_in + dsClean;
-    ds_firstdata_base	   :=  if(daily, dsClean, ds_firstdata_base_in + dsClean);
+    ds_firstdata_base	   :=  if(isdelta, dsClean, ds_firstdata_base_in + dsClean);
     VersionControl.macBuildNewLogicalFile(Filenames(pVersion).base.firstdata.new, ds_firstdata_base, Build_FirstDataBase_File		,TRUE);
-
+    //The Daily build is used on every day other than mondays
 	EXPORT	daily_build	:=
 				SEQUENTIAL(
 					Promote(pversion).inputfiles.Sprayed2Using
@@ -39,6 +37,7 @@ EXPORT Build_BaseFile(STRING	pVersion	=	(STRING)STD.Date.Today(), string day_of_
 					,Promote(pversion).Inputfiles.Using2Used
                     ,fileservices.addsuperfile(FirstData.Filenames().Base.firstdata.QA, Filenames(pVersion).base.firstdata.new)
 				);
+    //Used on mondays
     export full_build :=
                 SEQUENTIAL(
 					Promote(pversion).inputfiles.Sprayed2Using
@@ -53,7 +52,7 @@ EXPORT Build_BaseFile(STRING	pVersion	=	(STRING)STD.Date.Today(), string day_of_
     
 	EXPORT	ALL	:=
 	IF(VersionControl.IsValidVersion(pversion)
-		, if(daily, daily_build, full_build)
+		, if(isdelta, daily_build, full_build)
 		,output('No Valid version parameter passed, skipping FirstData.Build_Basefiles().All attribute')
 	);
 
