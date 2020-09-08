@@ -134,19 +134,29 @@ end;
 
 wvalidSSN := join(wADL_ind, bValidSSN, left.did = right.did and left.ssn = right.ssn,
 			 getvalidssn(left, right), left outer, local);
+
+
 			 
-			 
+// distributed by did 
+distributedWvalidSSN := distribute(wvalidSSN, did);
+
 bdob := DISTRIBUTE(watchdog.BestDob, did);
+
 
 //getdob
 lbest getdob(wvalidSSN l, bdob r) := transform
-	self.did := IF(r.dob = 0 or ut.Age(r.dob) >= 21, l.did, SKIP);
-	//self.dob := r.dob;	// suppress dob
+	// it is not necessary to filter out minors here
+	// self.did := IF(r.dob = 0 or ut.Age(r.dob) >= 21, l.did, SKIP);
+
+	// need to set dob 
+	self.dob := r.dob;	
 	self := l;
 end;
 
-result_wdob_ := join(wvalidSSN, bdob, left.did = right.did,
-			 getdob(left, right), left outer, local);					 
+
+result_wdob_ := join(distributedWvalidSSN, bdob, left.did = right.did,
+			 getdob(left, right), left outer, local);	
+
 
 //exclude the minors from watchdog GLB
 wdob := distribute(Watchdog.file_best, did);
@@ -157,8 +167,10 @@ lbest exclude_minors(result_wdob_ l, wdob r) := transform
 	self := l;
 end;
 
+
 result_wdob := join(distribute(result_wdob_,did), wdob, left.did = right.did,
-			 exclude_minors(left, right), left outer, local);								
-			 
+			 exclude_minors(left, right), left outer, local);
+
+
 return result_wdob ; 
 end; 
