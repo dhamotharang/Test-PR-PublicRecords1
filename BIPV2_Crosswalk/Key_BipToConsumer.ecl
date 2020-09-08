@@ -5,8 +5,7 @@ import doxie;
 
 export Key_BipToConsumer := module
      export Key := BIPV2_Crosswalk.Keys().BipToConsumerKey();
-     export Keyvs(string pversion = '',boolean pUseOtherEnvironment = false) := BIPV2_Crosswalk.Keys(pversion,pUseOtherEnvironment).bipToConsumer;
-     
+
      shared restrict(ds, in_mod, permits, ds_src='', dnbWillMask=false, isDateFirstSeenExists=false) := functionmacro
           ds_filt := ds(BIPV2.mod_sources.isPermitted(in_mod,dnbWillMask).byBmap(permits));
           #IF(#TEXT(ds_src)='')
@@ -128,8 +127,7 @@ export Key_BipToConsumer := module
                     set of string sourcesToInclude = ALL,
                     set of string sourceGroupsToInclude = ALL,
                     boolean applyMarketingRestrictions = false,
-                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END,
-										boolean execsOnly = true
+                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
      ) := function
            remove_restricted := kfetch(inputs, level, in_mod, JoinLimit, JoinType, applyMarketingRestrictions, mod_access);
            
@@ -195,10 +193,10 @@ export Key_BipToConsumer := module
                                                                                        right.dt_first_seen_at_business, left.dt_first_seen_at_business);
                                                   self.dt_last_seen_at_business  := if(right.dt_last_seen_at_business > left.dt_last_seen_at_business,
                                                                                        right.dt_last_seen_at_business, left.dt_last_seen_at_business);
-                                                  newJobTitle     := if(right.job_title1 in [left.job_title1, left.job_title2, left.job_title3] or (execsOnly and right.executive_ind_order=0),
+                                                  newJobTitle     := if(right.job_title1 in [left.job_title1, left.job_title2, left.job_title3],
                                                                         '',right.job_title1);
-                                                  self.job_title1 := if(left.job_title1='' or (execsOnly and left.executive_ind_order=0),newJobTitle,left.job_title1);
-                                                  self.job_title2 := if(left.job_title2='' and self.job_title1!=newJobTitle and self.job_title1!='',newJobTitle, left.job_title2),
+                                                  self.job_title1 := left.job_title1,
+                                                  self.job_title2 := if(left.job_title2='',newJobTitle, left.job_title2),
                                                   self.job_title3 := if(left.job_title3='' and left.job_title2!='',newJobTitle, left.job_title3),
                                                   self            := left));
                                                   
@@ -259,17 +257,14 @@ export Key_BipToConsumer := module
      end;
 					
      export kFetch_thor(
-         string1                    Level                       = BIPV2.IDconstants.Fetch_Level_ProxID 
-        ,BIPV2.mod_sources.iParams  in_mod                      = PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt)
-        ,boolean                    applyMarketingRestrictions  = false
-        ,doxie.IDataAccess          mod_access                  = MODULE (doxie.IDataAccess) END
-        ,string                     pKeyVersion                 = 'qa'
-        ,boolean                    pUseOtherEnvironment        = false
-     ) := function
+                    string1 Level = BIPV2.IDconstants.Fetch_Level_ProxID, 
+                    BIPV2.mod_sources.iParams in_mod=PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt),
+                    boolean applyMarketingRestrictions = false,
+                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
 
-          keyversion := Keyvs(pKeyVersion,pUseOtherEnvironment).logical;
-          
-					bip2Consumer  := pull(keyversion);
+     ) := function
+					
+					bip2Consumer  := pull(Key);
           allowCodeBmap := BIPV2.mod_Sources.code2bmap(BIPV2.mod_Sources.code.MARKETING_UNRESTRICTED);
 
           bip2Consumer apply_restrict(bip2Consumer L) := transform
