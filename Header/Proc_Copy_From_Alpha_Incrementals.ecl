@@ -40,7 +40,7 @@ SHARED getFileVersion(string sf,boolean alp=false) := FUNCTION
 
 END;
 
-EXPORT  filedate := getFileVersion(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::inc_boca::did::refs::relative',true):INDEPENDENT ;
+EXPORT  filedate := '20200901';//getFileVersion(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::inc_boca::did::refs::relative',true):INDEPENDENT ;
 
 SHARED fc(string f1, string f2):= sequential(
     output(dataset([{f1,'thor400_44',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
@@ -61,8 +61,11 @@ EXPORT copy_addr_uniq_keys_from_alpha(string filedt) := function
   AddrLFKeyName(boolean fcra)  := '~thor_data400::key::' + if(fcra, 'fcra::', '') + 'header::' + filedt + '::addr_unique_expanded';
 
   copyKeys := sequential(
-     fc(get_alogical('thor_data400::key::insuranceheader_incremental::fcra::qa::addr_unique_expanded'), AddrLFKeyName(true))
-    ,fc(get_alogical('thor_data400::key::insuranceheader_incremental::qa::addr_unique_expanded'), AddrLFKeyName(false))
+    //  fc(get_alogical('thor_data400::key::insuranceheader_incremental::fcra::qa::addr_unique_expanded'), AddrLFKeyName(true))
+     fc('foreign::10.194.112.105::thor_data400::key::insuranceheader_incremental::fcra::20200901::addr_unique_expanded', AddrLFKeyName(true))
+,fc('foreign::10.194.112.105::thor_data400::key::insuranceheader_incremental::20200901::addr_unique_expanded',AddrLFKeyName(false))
+
+    // ,fc('get_alogical('thor_data400::key::insuranceheader_incremental::qa::addr_unique_expanded''), AddrLFKeyName(false))
     );
     
   moveKeys := sequential(    
@@ -124,7 +127,8 @@ EXPORT copy_from_alpha(string filedt) := function
 
     // Copy foreign keys to local thor
     copy_incremental_keys := sequential(
-     fc(get_alogical('thor_data400::key::insuranceheader_segmentation::did_ind_qa'),'~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind')
+     //fc(get_alogical('thor_data400::key::insuranceheader_segmentation::did_ind_qa'),'~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind')
+     fc(get_alogical('foreign::10.194.112.105::thor_data400::key::insuranceheader_segmentation::20200901::did_ind'),'~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind')
     ,fc(get_alogical(aPrefLoc + 'locid_qa')      ,'~' + aPrefLoc + filedt + '::locid')  
     ,fc(get_alogical(aPref+'did::refs::address') ,fName(filedt, '::did::refs::address'))
     ,fc(get_alogical(aPref+'did::refs::dln')     ,fName(filedt, '::did::refs::dln'))
