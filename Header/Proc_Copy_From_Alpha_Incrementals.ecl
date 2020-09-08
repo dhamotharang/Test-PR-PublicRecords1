@@ -128,7 +128,7 @@ EXPORT copy_from_alpha(string filedt) := function
     // Copy foreign keys to local thor
     copy_incremental_keys := sequential(
      //fc(get_alogical('thor_data400::key::insuranceheader_segmentation::did_ind_qa'),'~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind')
-     fc(get_alogical('foreign::10.194.112.105::thor_data400::key::insuranceheader_segmentation::20200901::did_ind'),'~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind')
+     fc('foreign::10.194.112.105::thor_data400::key::insuranceheader_segmentation::20200901::did_ind','~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind')
     ,fc(get_alogical(aPrefLoc + 'locid_qa')      ,'~' + aPrefLoc + filedt + '::locid')  
     ,fc(get_alogical(aPref+'did::refs::address') ,fName(filedt, '::did::refs::address'))
     ,fc(get_alogical(aPref+'did::refs::dln')     ,fName(filedt, '::did::refs::dln'))
