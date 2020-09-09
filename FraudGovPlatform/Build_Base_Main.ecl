@@ -91,8 +91,14 @@ module
 	// Append Values from Previous Build
 	EXPORT NewBasePreviousValues := $.Append_PreviousValues(NewBaseRID,pBaseMainFile):independent;
 
+	//Clean names
+	$.Standardize_Name(NewBasePreviousValues, raw_first_name, raw_middle_name, raw_last_name, raw_Orig_Suffix  ,NewBaseCleanedName);
+
+	//Clean other Fields: SSN, DOB, IP, ZIP, DL 
+	dCleanInputFields := $.Standardize_Entity.Clean_InputFields (NewBaseCleanedName):independent;
+
 	// Append Clean Phones
-	NewBaseCleanPhones := $.Standardize_Entity.Clean_Phone (NewBasePreviousValues):independent;
+	NewBaseCleanPhones := $.Standardize_Entity.Clean_Phone (dCleanInputFields):independent;
 
 	// Append Clean Address
 	EXPORT NewBaseCleanAddress := $.Append_CleanAddress(NewBaseCleanPhones):independent;
