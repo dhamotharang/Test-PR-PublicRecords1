@@ -1,5 +1,5 @@
 ﻿import ut,Orbit3,_Control;
-export Proc_Orbit3_CreateBuild_sp(string buildname,string Buildvs,string Envmt = 'N', string email_list = '',boolean skipcreatebuild = false,boolean skipupdatebuild = false,boolean runcreatebuild = true,string wuid) := function
+export Proc_Orbit3_CreateBuild_sp(string buildname,string Buildvs,string Envmt = 'N', string email_list = '',boolean skipcreatebuild = false,boolean skipupdatebuild = false,boolean runcreatebuild = true,boolean is_npf = false, string wuid) := function
 
 	tokenval := orbit3.GetToken();
 
@@ -14,13 +14,20 @@ export Proc_Orbit3_CreateBuild_sp(string buildname,string Buildvs,string Envmt =
 									tokenval,		
 									).retcode;
 									
-	Update_build := Orbit3.UpdateBuildInstance(buildname,
-									Buildvs,
-									tokenval,
-									'BUILD_AVAILABLE_FOR_USE',
-									Orbit3.Constants(Envmt).platform_upd
+	Update_build := if ( is_npf = true , Orbit3.UpdateBuildInstance(buildname,
+									                                Buildvs,
+									                                  tokenval,
+									                             'BUILD_AVAILABLE_FOR_USE'
 						                                  
-									).retcode;
+									                             ).retcode,
+										  Orbit3.UpdateBuildInstance(buildname,
+									                                Buildvs,
+									                                  tokenval,
+									                             'BUILD_AVAILABLE_FOR_USE',
+																 Orbit3.Constants(Envmt).platform_upd
+						                                  
+									                             ).retcode
+	                        );
 																
 sendemail(string keyword = '',string status = '') := function 
 		
