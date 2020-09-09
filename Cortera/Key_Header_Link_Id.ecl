@@ -1,6 +1,6 @@
 ﻿IMPORT doxie,data_services;
 
-hdr_all := Cortera.Files.Hdr_Out(link_id<>0);
+hdr_all := Cortera.Files().Base.Header.Built(link_id<>0);
 hdr := 
 DEDUP(
   SORT(

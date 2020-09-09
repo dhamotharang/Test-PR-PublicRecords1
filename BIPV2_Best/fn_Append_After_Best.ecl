@@ -26,6 +26,9 @@ best_company_address_l := RECORD
   string18 county_name := '';
   string2 state_fips:= '';
   string3 county_fips:= '';
+  unsigned6 locid:= 0;
+  unsigned4 address_dt_first_seen;
+  unsigned4 address_dt_last_seen;
  END;
  best_company_phone_l := RECORD
   unsigned6 linkid;
@@ -89,8 +92,18 @@ norm_phone   := BIPV2_Best.MAC_Normalize_Child(best_child_ds_ded,company_phone_c
 norm_fein    := BIPV2_Best.MAC_Normalize_Child(best_child_ds_ded,company_fein_cases,best_company_fein_l);
 norm_url     := BIPV2_Best.MAC_Normalize_Child(best_child_ds_ded,company_url_cases,best_company_url_l);
 norm_duns    := BIPV2_Best.MAC_Normalize_Child(best_child_ds_ded,duns_number_cases,best_duns_number_l);
-norm_sic     := BIPV2_Best.MAC_Normalize_Child(best_child_ds_ded,company_sic_code1_cases,best_sic_l);
-norm_naics   := BIPV2_Best.MAC_Normalize_Child(best_child_ds_ded,company_naics_code1_cases,best_naics_l);
+norm_sic     := BIPV2_Best.fn_best_industry_code(pHrchyBase,linkid, company_sic_code1,company_sic_code2, 
+																			           company_sic_code3, company_sic_code4,company_sic_code5,
+																			           BIPV2_Best.SourceHierarchy.sic_sources,
+																				         company_sic_code1_data_permits,company_sic_code1_method);
+																								
+norm_naics   := BIPV2_Best.fn_best_industry_code(pHrchyBase,linkid, company_naics_code1,company_naics_code2, 
+																			           company_naics_code3, company_naics_code4,company_naics_code5,
+																			           BIPV2_Best.SourceHierarchy.naics_sources,
+																					       company_naics_code1_data_permits,company_naics_code1_method);
+
+norm_employee_count := BIPV2_Best.fn_best_employee_count(pHrchyBase, linkid, employee_count_method, employee_count_data_permits);																			
+norm_sales          := BIPV2_Best.fn_best_sales(pHrchyBase, linkid, sales_method, sales_data_permits);																			
 //APPEND ADDITIONAL DATA
 slim_layout:=RECORD
   UNSIGNED6 linkid;
@@ -211,11 +224,11 @@ company_fein_flat := join(
   ),local,left outer
 );
 //--------append county data
-fips :=  dedup(sort(distribute(project(bip_business_header, {unsigned6 linkid,string10  prim_range,string2    predir, string28  prim_name, string4    addr_suffix, string2    postdir, string10 unit_desig, string8   sec_range, string5    zip, string4    zip4,  string25 p_city_name, string v_city_name, string2 fips_state,  string3 fips_county}), hash(linkid)),
-                                                                   linkid, prim_range, predir,prim_name,addr_suffix, postdir,unit_desig, sec_range, zip, -zip4, -p_city_name, -v_city_name,  -fips_state, -fips_county, local),
+fips :=  dedup(sort(distribute(project(bip_business_header, {unsigned6 linkid,string10  prim_range,string2    predir, string28  prim_name, string4    addr_suffix, string2    postdir, string10 unit_desig, string8   sec_range, string5    zip, string4    zip4,  string25 p_city_name, string v_city_name, string2 fips_state,  string3 fips_county, unsigned6 locid}), hash(linkid)),
+                                                                   linkid, prim_range, predir,prim_name,addr_suffix, postdir,unit_desig, sec_range, zip, -zip4, -p_city_name, -v_city_name,  -fips_state, -fips_county, locid, local),
                                                                          linkid, prim_range, predir,prim_name,addr_suffix, postdir,unit_desig, sec_range, zip, local);
 append_fips := join(
-  norm_address,
+  distribute(norm_address, hash(linkid)),
   fips,
   left.linkid = right.linkid and
   left.address_prim_range = right.prim_range and
@@ -233,11 +246,37 @@ append_fips := join(
     self.address_zip4 := right.zip4;
     self.state_fips:= right.fips_state;
     self.county_fips := right.fips_county;
+		self.locid := right.locid;
     self := left
-  ),left outer
+  ), keep(1), left outer, local
 );
-company_address_flat := join(
+  
+seen_dates := group(sort(distribute(table(bip_business_header(linkid > 0 ), { linkid, prim_range, prim_name, st, zip, dt_last_seen, dt_first_seen}), hash(linkid)),
+                                                                              linkid, prim_range, prim_name, st, zip,-dt_last_seen, dt_first_seen, local),
+                                                                              linkid, prim_range, prim_name, st, zip, local);
+seen_dates_minmax := rollup(seen_dates, group, transform(recordof(seen_dates),
+                                                         self.dt_last_seen := left.dt_last_seen;
+                                                         row_ds := ROWS(left);
+                                                         self.dt_first_seen := Min(row_ds(dt_first_seen<>0), dt_first_seen);
+                                                         self := left));
+append_dates := join(
   append_fips,
+  seen_dates_minmax,
+  left.linkid = right.linkid and
+  left.address_prim_range = right.prim_range and
+  left.address_prim_name = right.prim_name and
+  left.address_st = right.st and
+  left.address_zip = right.zip,
+  transform(
+    best_company_address_l,
+    self.address_dt_last_seen  :=right.dt_last_seen;
+    self.address_dt_first_seen := right.dt_first_seen;
+    self := left
+  ), keep(1), left outer, local
+);
+                                                         
+company_address_flat := join(
+  append_dates,
   pFips2County,
   left.state_fips = right.state_fips and left.county_fips = right.county_fips,
   transform(
@@ -299,6 +338,8 @@ company_incorporation_date_base := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.
 company_duns_number_base        := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.duns_number_case_layout) duns_number;};
 sic_code_base                   := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.sic_code_case_layout) sic_code;};
 naics_code_base                 := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.naics_code_case_layout) naics_code;};
+employee_count_base             := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.employee_count_case_layout) employee_count;};
+sales_base                      := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.sales_case_layout) sales;};
 dba_base                        := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.dba_name_case_layout) dba_name;};
 //****************Denormalize name
 company_name_flat_ded := DEDUP(SORT(DISTRIBUTE(company_name_flat,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
@@ -344,8 +385,11 @@ company_address_base t_address_denorm(company_address_grp le,DATASET(RECORDOF(co
     SELF.company_st := TRIM(le.address_st,LEFT,RIGHT);
     SELF.company_zip5 := TRIM(le.address_zip,LEFT,RIGHT);
     SELF.company_zip4 := TRIM(le.address_zip4,LEFT,RIGHT);
+    SELF.company_locid := le.locid;
     SELF.company_address_data_permits  := le.address_data_permits;
     SELF.company_address_method := le.address_method;
+    SELF.address_dt_first_seen := le.address_dt_first_seen;
+    SELF.address_dt_last_seen := le.address_dt_last_seen;
     SELF := le;
   end;
   self.company_address := sort(dedup(sort(denormalize(ri,ri,left.address_prim_range=right.address_prim_range and
@@ -437,7 +481,7 @@ sic_code_base t_sic_denorm(sic_code_grp le,DATASET(RECORDOF(sic_code_grp)) ri) :
   BIPV2_Best.Layouts.sic_code_case_layout t_sic(sic_code_grp le,DATASET(RECORDOF(sic_code_grp)) ri) := TRANSFORM
     SELF := le;
   END;
-  SELF.sic_code := SORT(DEDUP(SORT(DENORMALIZE(ri,ri,LEFT.company_sic_code1=RIGHT.company_sic_code1,GROUP,t_sic(LEFT, ROWS(RIGHT))),RECORD),ALL),company_sic_code1_method)(company_sic_code1_method>0);
+  SELF.sic_code := SORT(DEDUP(SORT(DENORMALIZE(ri,ri,LEFT.company_sic_code1=RIGHT.company_sic_code1,GROUP,t_sic(LEFT, ROWS(RIGHT))),RECORD),ALL),company_sic_code1_method)(company_sic_code1_method>0)[1..20];
   SELF := le;
 end;
 sic_denorm := DENORMALIZE(sic_code_flat_ded,sic_code_grp,LEFT.linkid=RIGHT.linkid,GROUP,t_sic_denorm(LEFT,ROWS(RIGHT)),LOCAL);
@@ -448,10 +492,32 @@ naics_code_base t_naics_denorm(naics_code_grp le,DATASET(RECORDOF(naics_code_grp
   BIPV2_Best.Layouts.naics_code_case_layout t_naics(naics_code_grp le,DATASET(RECORDOF(naics_code_grp)) ri) := TRANSFORM
     SELF := le;
   END;
-  SELF.naics_code := SORT(DEDUP(SORT(DENORMALIZE(ri,ri,LEFT.company_naics_code1=RIGHT.company_naics_code1,GROUP,t_naics(LEFT, ROWS(RIGHT))),RECORD),ALL),company_naics_code1_method)(company_naics_code1_method>0);
+  SELF.naics_code := SORT(DEDUP(SORT(DENORMALIZE(ri,ri,LEFT.company_naics_code1=RIGHT.company_naics_code1,GROUP,t_naics(LEFT, ROWS(RIGHT))),RECORD),ALL),company_naics_code1_method)(company_naics_code1_method>0)[1..20];
   SELF := le;
 end;
 naics_denorm := DENORMALIZE(naics_code_flat_ded,naics_code_grp,LEFT.linkid=RIGHT.linkid,GROUP,t_naics_denorm(LEFT,ROWS(RIGHT)),LOCAL);
+//****************Denormalize Employee Count
+employee_count_flat_ded := DEDUP(SORT(DISTRIBUTE(norm_employee_count,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
+employee_count_grp      := SORT(DISTRIBUTE(norm_employee_count,HASH(linkid)),linkid,LOCAL);
+employee_count_base t_employee_cnt_denorm(employee_count_grp le,DATASET(RECORDOF(employee_count_grp)) ri) := TRANSFORM
+  BIPV2_Best.Layouts.employee_count_case_layout t_employee_count(employee_count_grp le,DATASET(RECORDOF(employee_count_grp)) ri) := TRANSFORM
+    SELF := le;
+  END;
+  SELF.employee_count := SORT(DEDUP(SORT(DENORMALIZE(ri,ri,LEFT.employee_count=RIGHT.employee_count,GROUP,t_employee_count(LEFT, ROWS(RIGHT))),RECORD),ALL),employee_count_method)(employee_count_method>0);
+  SELF := le;
+end;
+employee_count_denorm := DENORMALIZE(employee_count_flat_ded,employee_count_grp,LEFT.linkid=RIGHT.linkid,GROUP,t_employee_cnt_denorm(LEFT,ROWS(RIGHT)),LOCAL);
+//****************Denormalize Sales
+sales_flat_ded := DEDUP(SORT(DISTRIBUTE(norm_sales,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
+sales_grp      := SORT(DISTRIBUTE(norm_sales,HASH(linkid)),linkid,LOCAL);
+sales_base t_sales_denorm(sales_grp le,DATASET(RECORDOF(sales_grp)) ri) := TRANSFORM
+  BIPV2_Best.Layouts.sales_case_layout t_sales(sales_grp le,DATASET(RECORDOF(sales_grp)) ri) := TRANSFORM
+    SELF := le;
+  END;
+  SELF.sales := SORT(DEDUP(SORT(DENORMALIZE(ri,ri,LEFT.sales=RIGHT.sales,GROUP,t_sales(LEFT, ROWS(RIGHT))),RECORD),ALL),sales_method)(sales_method>0);
+  SELF := le;
+end;
+sales_denorm := DENORMALIZE(sales_flat_ded,sales_grp,LEFT.linkid=RIGHT.linkid,GROUP,t_sales_denorm(LEFT,ROWS(RIGHT)),LOCAL);
 //---------Join all componets to base layout
 linkids := project(bip_business_header, {BIPV2_Best.Layouts.linkids, unsigned6 company_bdid});
 linkids_unq := dedup(sort(distribute(linkids, hash(linkid)), linkid, local), linkid, local);
@@ -464,7 +530,9 @@ nm_addr_ph_fein_url_dunn:= join(nm_addr_ph_fein_url, duns_denorm,left.linkid = r
 nm_with_sic:=JOIN(nm_addr_ph_fein_url_dunn,sic_denorm,left.linkid = right.linkid,left outer,local);
 nm_with_naics:=JOIN(nm_with_sic,naics_denorm,left.linkid = right.linkid,left outer,local);
 nm_with_dba:=join(nm_with_naics,dba_denorm,left.linkid = right.linkid,left outer,local);
-final_base := join(nm_with_dba, inc_date_denorm,left.linkid = right.linkid,transform(BIPV2_Best.Layouts.base,self := left,self := right;SELF:=[];),left outer,local);
+nm_with_ecount := join(nm_with_dba,employee_count_denorm,left.linkid = right.linkid,left outer,local);
+nm_with_sales  := join(nm_with_ecount,sales_denorm,left.linkid = right.linkid,left outer,local);
+final_base := join(nm_with_sales, inc_date_denorm,left.linkid = right.linkid,transform(BIPV2_Best.Layouts.base,self := left,self := right;SELF:=[];),left outer,local);
 
 return final_base;
 endmacro;

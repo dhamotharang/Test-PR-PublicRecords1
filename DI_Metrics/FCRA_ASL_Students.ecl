@@ -48,8 +48,8 @@ email_alert := SEQUENTIAL(
 					output(srt_tbl_FCRA_Students_College_LexID,,'~thor_data400::data_insight::data_metrics::tbl_FCRA_Students_College_LexID_'+ filedate +'.csv'
 					,csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
 					,despray_fcra_student_tbl):
-					Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA Group: FCRA_ASL_Students Build Succeeded', workunit + ': Build complete.' + filedate)),
-					Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA Group:  FCRA_ASL_Students Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
+					Success(FileServices.SendEmail(pContact, 'FCRA Group: FCRA_ASL_Students Build Succeeded', workunit + ': Build complete.' + filedate)),
+					Failure(FileServices.SendEmail(pContact, 'FCRA Group:  FCRA_ASL_Students Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
 													);
 return email_alert;
 

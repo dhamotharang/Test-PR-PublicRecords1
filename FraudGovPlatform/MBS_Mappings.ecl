@@ -14,4 +14,4 @@ transform({unsigned6 fdn_file_info_id, string20 contribution_source, string cont
         self.Customer_Program                   := functions.customer_program_fn(left.ind_type);
         self.file_type                          := left.file_type
 ));
-EXPORT MBS_Mappings := J_Mappings:independent;
+EXPORT MBS_Mappings := J_Mappings;

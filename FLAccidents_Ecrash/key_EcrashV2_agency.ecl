@@ -1,9 +1,7 @@
-﻿IMPORT Data_Services, doxie;   
+﻿AgencyBase :=  PROJECT(Files.Base.AgencyCmbd, TRANSFORM(Layout_Keys_eCrash.Agency, SELF := LEFT; SELF := [];));
 
-agency :=  PROJECT(Files.Base.AgencyCmbd, TRANSFORM(Layout_Keys_eCrash.Agency, SELF := LEFT;));
-
-EXPORT key_EcrashV2_agency := INDEX(agency
-																		,{Agency_State_Abbr,Agency_Name,Agency_ori}
-																		,{agency}
-																		,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_agency_' + doxie.Version_SuperKey);		
+EXPORT key_EcrashV2_agency := INDEX(AgencyBase,
+																	  {Agency_State_Abbr, Agency_Name, Agency_Ori},
+																		{AgencyBase},
+																		Files_eCrash.FILE_KEY_AGENCY_SF);		
 																		

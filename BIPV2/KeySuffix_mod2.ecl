@@ -94,7 +94,8 @@ end;
 // export constant_ThisBuild_versionDate := '20200501'; // S82 BH-759
 // export constant_ThisBuild_versionDate := '20200601'; // S83 BH-760
 // export constant_ThisBuild_versionDate := '20200701'; // S84 BH-761
-export constant_ThisBuild_versionDate := '20200729'; // S85 BH-762
+// export constant_ThisBuild_versionDate := '20200729'; // S85 BH-762
+export constant_ThisBuild_versionDate := '20200902'; // S86 BH-763
 
 
 export ds :=
@@ -197,6 +198,7 @@ dataset([
 ,{  83, '' ,  '20200601',  '20200601', '', '',         '',         'Ingested S82 base , BH-823 -- Fix Data Fill Rates of DataCard Report , BH-760 -- BIP Build 83 - June 2020'}
 ,{  84, '' ,  '20200701',  '20200701', '', '',         '',         'Ingested S83 base , applied BH-813,LNK-4505. BH-856,BH-857,BH-821,DF-27533.   BH-761 -- BIP Build 84 - July 2020'}
 ,{  85, '' ,  '20200729',  '20200729', '', '',         '',         'Ingested S84 base , applied BH-846,LNK-4530 patches. BH-762 -- BIP Build 85 - August 2020'}
+,{  86, '' ,  '20200902',  '20200902', '', '',         '',         'Ingested S85 base , BH-911, BH-912,BH-930,BH-924. BH-763 -- BIP Build 86 - September 2020'}
 
 
 //						version,			ingest			ToThor			ToCertRox		ToProdRox		//these are not exact field names.  they just help w read and update.

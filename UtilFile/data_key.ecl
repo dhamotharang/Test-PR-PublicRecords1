@@ -2,7 +2,7 @@
 
 EXPORT data_key(STRING filedate = (STRING8)Std.Date.Today(), BOOLEAN pIsDeltaBuild = FALSE) := MODULE
 
-daily_DID := DATASET(Data_Services.Data_Location.Prefix('Utility') + 'thor_data400::in::utility::'+filedate+'::daily_did', $.Layout_DID_Out, thor);
+daily_DID := DATASET(Data_Services.Data_Location.Prefix('Utility') + 'thor_data400::in::utility::'+filedate[1..8]+'::daily_did', $.Layout_DID_Out, thor);
 
 //If this is delta build then only create a key with today's records, otherwise create a key with full date file
 
@@ -59,12 +59,12 @@ SHARED append_fdid := PROJECT(PhSuppressed2_daily, t_fdid(LEFT, COUNTER)):persis
 EXPORT i_DID := PROJECT(PhSuppressed2((unsigned6)did<>0),transform(dx_utility.layouts.i_did, 
 self.ssn := '', self.s_did := (unsigned6)left.did, self := left));
 
-EXPORT i_address := PROJECT(PhSuppressed2(trim(prim_name)<>''),transform(dx_utility.layouts.i_address, self.ssn := '', self.did := '', self := left));
+EXPORT i_address := PROJECT(PhSuppressed2(trim(prim_name)<>''),transform(dx_utility.layouts.i_address, self.ssn := '', self := left));
 
 //for daily did key
 
 EXPORT i_DID_daily := PROJECT(append_fdid((unsigned6)did<>0),transform(dx_utility.layouts.i_did_daily, 
-self.ssn := '', self.s_did := (unsigned6)left.did, self.fdid := 0, self := left));
+self.ssn := '', self.s_did := (unsigned6)left.did, self := left));
 
 //for daily fdid key
 EXPORT i_fdid_daily := PROJECT(append_fdid,transform(dx_utility.layouts.i_fdid_daily, self.ssn := '', self := left));
@@ -209,7 +209,7 @@ EXPORT i_auto_ZipPRLName := k_zipPRLName;
 //**** Filtered Daily Business Utility records from the Utility Business Base file.
 bus_base := $.file_util_bus.full_base_for_index;
 
-Base		:=	IF(pIsDeltaBuild,bus_base(record_date = filedate), bus_base);
+Base		:=	IF(pIsDeltaBuild,bus_base(record_date = filedate[1..8]), bus_base);
 
   BIPV2.IDmacros.xf_xLinkIDsToKeyIDs(Base, BasePlusIds);
 	

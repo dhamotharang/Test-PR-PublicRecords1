@@ -927,6 +927,7 @@ PersonPerson := ASSOCIATION(FLAT(
 
     ));
 
+
 USE FraudgovKEL.fraudgovshared(FLAT,
   Event(FILTER((UNSIGNED)record_id > 0), 
     LexId = did,

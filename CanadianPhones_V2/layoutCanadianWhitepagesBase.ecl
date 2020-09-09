@@ -112,4 +112,7 @@ EXPORT layoutCanadianWhitepagesBase :=
 	//Added for CCPA-90
 	unsigned4 global_sid;
 	unsigned8 record_sid;
+	//Added for CCPA-1030
+  UNSIGNED6 did := 0;
+  INTEGER3  DID_Score := 0;
 END;
