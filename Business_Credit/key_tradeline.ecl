@@ -123,7 +123,7 @@ EXPORT	key_tradeline(STRING pVersion	=	(STRING8)Std.Date.Today(),
 													),''
 												);
 		self.DBT_V5:=if(trim(pinput.ln_delinquency_date,left,right) in ['','-1','-2','-3','-4'],'',
-					 if(length(pinput.ln_delinquency_date)=6,(String)STD.Date.DaysBetween((unsigned4)(pinput.ln_delinquency_date+'15'),(unsigned4)pinput.cycle_end_date,),
+					 if(length(pinput.ln_delinquency_date)=6,(String)STD.Date.DaysBetween((unsigned4)(pinput.ln_delinquency_date+'15'),(unsigned4)pinput.cycle_end_date),
 					 (String)STD.Date.DaysBetween((unsigned4)pinput.ln_delinquency_date,(unsigned4)(pinput.cycle_end_date))));
 		
 		SELF					:=	pInput;
