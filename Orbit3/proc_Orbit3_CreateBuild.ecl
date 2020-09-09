@@ -2,7 +2,7 @@
 
 */
 import std,ut,Orbit3,_Control;
-export Proc_Orbit3_CreateBuild(string buildname,string Buildvs,string Envmt = 'N', boolean skipcreatebuild = false,boolean skipupdatebuild = false,boolean runcreatebuild = true, string email_list = '',boolean is_npf = true) := function
+export Proc_Orbit3_CreateBuild(string buildname,string Buildvs,string Envmt = 'N', boolean skipcreatebuild = false,boolean skipupdatebuild = false,boolean runcreatebuild = true, string email_list = '',boolean is_npf = false) := function
 
 string wuid := workunit;
 
