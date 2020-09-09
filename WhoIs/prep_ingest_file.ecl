@@ -170,7 +170,7 @@ END;
 		self.date_last_seen							:= IF(vDatestamp, StdDatestamp, '');
 		self.Date_Vendor_First_Reported := version;
 		self.Date_Vendor_Last_Reported 	:= version;
-		self.persistent_record_id    		:= 0;
+		// self.persistent_record_id    		:= 0;
 		SELF.current_rec 	:= TRUE;
 		SELF							:= le;
 		SELF							:= [];

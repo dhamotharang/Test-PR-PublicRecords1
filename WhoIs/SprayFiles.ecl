@@ -7,7 +7,7 @@ EXPORT SprayFiles(
 																										// _control.IPAddress.bctlpedata12,
 																										// _control.IPAddress.bctlpedata11),
   STRING	pServerIP			= _control.IPAddress.bctlpedata12,																									
-  STRING	pDirectory		= '/data/temp/reederkx/repository/build_library/builds/whois_data/data/processing/'+pVersionDate,
+  STRING	pDirectory		= '/data/temp/reederkx/repository/build_library/builds/whois_data/data/processing/20200601/',
 	// STRING	pGroupName		=	_Constants().groupname,							
 	STRING	pGroupName		=	'thor400_dev01',
 	BOOLEAN	pIsTesting		=	FALSE,

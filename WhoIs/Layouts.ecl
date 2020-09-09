@@ -161,8 +161,8 @@ EXPORT layouts := MODULE
 		
 		UNSIGNED6 rcid; //Used for Ingest process
 	  CleanFields;
-		UNSIGNED8	persistent_record_id := 0;	//unique record identifier
-		UNSIGNED8 uniq_email_id := 0;   //unique email identifier		
+		// UNSIGNED8	persistent_record_id := 0;	//unique record identifier
+		// UNSIGNED8 uniq_email_id := 0;   //unique email identifier		
 		END;
 		
 END;	

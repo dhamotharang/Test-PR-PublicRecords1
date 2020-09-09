@@ -14,15 +14,15 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_PROCLAYOUTS := 'Process__Layouts';
   EXPORT spc_IDNAME := ''; // cluster id (input)
   EXPORT spc_IDFIELD := ''; // cluster id (output)
-  EXPORT spc_RIDFIELD := ''; // record id
+  EXPORT spc_RIDFIELD := 'RCID'; // record id
   EXPORT spc_CONFIG := 'Config';
   EXPORT spc_CONFIGPARAM := FALSE;
   EXPORT spc_SOURCEFIELD := '';
   EXPORT spc_FILEPREFIX := 'In_';
   EXPORT spc_FILENAME := 'WhoIs';
   EXPORT spc_INGESTSTATUS := '';
-  EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,rcid,domainname,registrarname,contactemail,whoisserver,nameservers,createddate,updateddate,expiresdate,standardregcreateddate,standardregupdateddate,standardregexpiresdate,status,audit_auditupdateddate,registrant_rawtext,registrant_email,registrant_name,registrant_organization,registrant_street1,registrant_street2,registrant_street3,registrant_street4,registrant_city,registrant_state,registrant_postalcode,registrant_country,registrant_fax,registrant_faxext,registrant_phone,registrant_phoneext,administrativecontact_rawtext,administrativecontact_email,administrativecontact_name,administrativecontact_organization,administrativecontact_street1,administrativecontact_street2,administrativecontact_street3,administrativecontact_street4,administrativecontact_city,administrativecontact_state,administrativecontact_postalcode,administrativecontact_country,administrativecontact_fax,administrativecontact_faxext,administrativecontact_phone,administrativecontact_phoneext,billingcontact_rawtext,billingcontact_email,billingcontact_name,billingcontact_organization,billingcontact_street1,billingcontact_street2,billingcontact_street3,billingcontact_street4,billingcontact_city,billingcontact_state,billingcontact_postalcode,billingcontact_country,billingcontact_fax,billingcontact_faxext,billingcontact_phone,billingcontact_phoneext,technicalcontact_rawtext,technicalcontact_email,technicalcontact_name,technicalcontact_organization,technicalcontact_street1,technicalcontact_street2,technicalcontact_street3,technicalcontact_street4,technicalcontact_city,technicalcontact_state,technicalcontact_postalcode,technicalcontact_country,technicalcontact_fax,technicalcontact_faxext,technicalcontact_phone,technicalcontact_phoneext,zonecontact_rawtext,zonecontact_email,zonecontact_name,zonecontact_organization,zonecontact_street1,zonecontact_street2,zonecontact_street3,zonecontact_street4,zonecontact_city,zonecontact_state,zonecontact_postalcode,zonecontact_country,zonecontact_fax,zonecontact_faxext,zonecontact_phone,zonecontact_phoneext,emailtype,rawtext,email,name,organization,street1,street2,street3,street4,city,state,postalcode,country,fax,faxext,phone,phoneext,uniq_record_id,uniq_email_id,did,did_score,clean_title,clean_fname,clean_mname,clean_lname,clean_name_suffix,clean_name_score,rawaid,append_prep_address_situs,append_prep_address_last_situs,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,zip,zip4,cart,cr_sort_sz,lot,lot_order,dbpc,chk_digit,rec_type,county,geo_lat,geo_long,msa,geo_blk,geo_match,err_stat,process_date,date_first_seen,date_last_seen,date_vendor_first_reported,date_vendor_last_reported,clean_cname,current_rec,dotid,dotscore,dotweight,empid,empscore,empweight,powid,powscore,powweight,proxid,proxscore,proxweight,seleid,selescore,seleweight,orgid,orgscore,orgweight,ultid,ultscore,ultweight';
+  EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:RCID';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,domainname,registrarname,contactemail,whoisserver,nameservers,createddate,updateddate,expiresdate,standardregcreateddate,standardregupdateddate,standardregexpiresdate,status,audit_auditupdateddate,registrant_rawtext,registrant_email,registrant_name,registrant_organization,registrant_street1,registrant_street2,registrant_street3,registrant_street4,registrant_city,registrant_state,registrant_postalcode,registrant_country,registrant_fax,registrant_faxext,registrant_phone,registrant_phoneext,administrativecontact_rawtext,administrativecontact_email,administrativecontact_name,administrativecontact_organization,administrativecontact_street1,administrativecontact_street2,administrativecontact_street3,administrativecontact_street4,administrativecontact_city,administrativecontact_state,administrativecontact_postalcode,administrativecontact_country,administrativecontact_fax,administrativecontact_faxext,administrativecontact_phone,administrativecontact_phoneext,billingcontact_rawtext,billingcontact_email,billingcontact_name,billingcontact_organization,billingcontact_street1,billingcontact_street2,billingcontact_street3,billingcontact_street4,billingcontact_city,billingcontact_state,billingcontact_postalcode,billingcontact_country,billingcontact_fax,billingcontact_faxext,billingcontact_phone,billingcontact_phoneext,technicalcontact_rawtext,technicalcontact_email,technicalcontact_name,technicalcontact_organization,technicalcontact_street1,technicalcontact_street2,technicalcontact_street3,technicalcontact_street4,technicalcontact_city,technicalcontact_state,technicalcontact_postalcode,technicalcontact_country,technicalcontact_fax,technicalcontact_faxext,technicalcontact_phone,technicalcontact_phoneext,zonecontact_rawtext,zonecontact_email,zonecontact_name,zonecontact_organization,zonecontact_street1,zonecontact_street2,zonecontact_street3,zonecontact_street4,zonecontact_city,zonecontact_state,zonecontact_postalcode,zonecontact_country,zonecontact_fax,zonecontact_faxext,zonecontact_phone,zonecontact_phoneext,emailtype,rawtext,email,name,organization,street1,street2,street3,street4,city,state,postalcode,country,fax,faxext,phone,phoneext,uniq_record_id,uniq_email_id,did,did_score,clean_title,clean_fname,clean_mname,clean_lname,clean_name_suffix,clean_name_score,rawaid,append_prep_address_situs,append_prep_address_last_situs,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,zip,zip4,cart,cr_sort_sz,lot,lot_order,dbpc,chk_digit,rec_type,county,geo_lat,geo_long,msa,geo_blk,geo_match,err_stat,process_date,date_first_seen,date_last_seen,date_vendor_first_reported,date_vendor_last_reported,clean_cname,current_rec,dotid,dotscore,dotweight,empid,empscore,empweight,powid,powscore,powweight,proxid,proxscore,proxweight,seleid,selescore,seleweight,orgid,orgscore,orgweight,ultid,ultscore,ultweight';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := FALSE;
@@ -41,21 +41,10 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     'OPTIONS:-gh\n'
     + 'MODULE:WhoIs\n'
     + 'FILENAME:WhoIs\n'
-    + '// Uncomment up to NINES for internal or external adl\n'
-    + '// IDFIELD:EXISTS:<NameOfIDField>\n'
-    + '// RIDFIELD:<NameOfRidField>\n'
-    + '// RECORDS:<NumberOfRecordsInDataFile>\n'
-    + '// POPULATION:<ExpectedNumberOfEntitiesInDataFile>\n'
-    + '// NINES:<Precision required 3 = 99.9%, 2 = 99% etc>\n'
-    + '// Uncomment Process if doing external adl\n'
-    + '// PROCESS:<ProcessName>\n'
-    + '// FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields\n'
-    + '// BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking\n'
-    + '// FUZZY can be used to create new types of FUZZY linking\n'
-    + '// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.\n'
-    + '// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running\n'
-    + '// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.\n'
-    + 'FIELD:rcid:TYPE(UNSIGNED6):0,0\n'
+    + '\n'
+    + 'RIDFIELD:RCID:GENERATE\n'
+    + 'INGESTFILE:WhoIs_update:NAMED(WhoIs.prep_ingest)\n'
+    + '\n'
     + 'FIELD:domainname:TYPE(STRING):0,0\n'
     + 'FIELD:registrarname:TYPE(STRING):0,0\n'
     + 'FIELD:contactemail:TYPE(STRING):0,0\n'

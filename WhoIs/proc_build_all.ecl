@@ -2,7 +2,7 @@
 
 //Version = input filedate
 EXPORT proc_build_all(STRING version) := FUNCTION
-  #workunit('name', 'Yogurt: WhoIs email build');
+  #workunit('name', 'WhoIs email build');
 	
 	//Run Spray
 	spray_all := WhoIs.SprayFiles(version);
@@ -12,7 +12,7 @@ EXPORT proc_build_all(STRING version) := FUNCTION
 	
 RETURN If(EXISTS(FileServices.RemoteDirectory(IF(_control.thisenvironment.name='Dataland',
 																																																	_control.IPAddress.bctlpedata12,
-																																																	_control.IPAddress.bctlpedata11),'/data/temp/reederkx/repository/build_library/builds/WhoIs_Data/data/'+ version,'*.csv')),
+																																																	_control.IPAddress.bctlpedata11),'/data/temp/reederkx/repository/build_library/builds/whois_data/data/processing/20200601/','*.csv')),
 						SEQUENTIAL(spray_all
 																//,Scrubs_WhoIs.PreBuildScrubs(version)
 																,base_f

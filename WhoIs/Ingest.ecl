@@ -21,7 +21,6 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   SHARED Base0 := PROJECT(dsBase,TRANSFORM(WithRT,SELF.__Tpe:=RecordType.Old,SELF:=LEFT));
  
   SHARED WithRT MergeData(WithRT le, WithRT ri) := TRANSFORM // Pick the data for the new record
-    SELF.persistent_record_id := ri.persistent_record_id; // Derived(NEW)
     SELF.did := ri.did; // Derived(NEW)
     SELF.did_score := ri.did_score; // Derived(NEW)
     SELF.clean_title := ri.clean_title; // Derived(NEW)
