@@ -102,7 +102,7 @@ EXPORT proc_quickHdr_build_all (
 	Source_Check_rep := header_quick.Proc_source_check_report();
 
 	RETURN SEQUENTIAL(
-		check_superfiles_are_in_sync,
+		// check_superfiles_are_in_sync,
 		header_quick._config(sourceIP, sourcePathMonthly).set_v_version(overwriteMonthlyFileDate),
 		header_quick._config(sourceIP, sourcePathWeekly).set_v_eq_as_of_date(overwriteWeeklyFileDate),
 		Header.mac_runIfNotCompleted ('QuickHeader',filedate, doWeekly,200),
