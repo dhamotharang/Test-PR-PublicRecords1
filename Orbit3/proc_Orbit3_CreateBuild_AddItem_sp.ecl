@@ -1,5 +1,5 @@
 ﻿import ut,Orbit3,_Control;
-export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string Envmt = 'N',  string email_list = '', boolean skipcreatebuild = false,boolean skipupdatebuild = false, boolean skipaddcomponents = false, boolean runcreatebuild = true, boolean runaddcomponentsonly = false,string wuid) := function
+export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string Envmt = 'N',  string email_list = '', boolean skipcreatebuild = false,boolean skipupdatebuild = false, boolean skipaddcomponents = false, boolean runcreatebuild = true, boolean runaddcomponentsonly = false,boolean is_npf = false, string wuid) := function
 
 	tokenval := orbit3.GetToken() : independent;
 
@@ -22,14 +22,24 @@ export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string
 									Orbit3.Constants(Envmt,'BUILD_IN_PROGRESS').platform_upd
 						                                  
 									).retcode;
+
+	//Verify if build is platform depenedent
+
 									
-	Update_build := Orbit3.UpdateBuildInstance(buildname,
-									Buildvs,
-									tokenval,
-									'BUILD_AVAILABLE_FOR_USE',
-									Orbit3.Constants(Envmt).platform_upd
+	Update_build := if ( is_npf = true , Orbit3.UpdateBuildInstance(buildname,
+									                                Buildvs,
+									                                  tokenval,
+									                             'BUILD_AVAILABLE_FOR_USE'
 						                                  
-									).retcode;
+									                             ).retcode,
+										  Orbit3.UpdateBuildInstance(buildname,
+									                                Buildvs,
+									                                  tokenval,
+									                             'BUILD_AVAILABLE_FOR_USE',
+																 Orbit3.Constants(Envmt).platform_upd
+						                                  
+									                             ).retcode
+	                        );
 									
 		get_build_candidates := 	Orbit3.GetBuildCandidates(buildname,
 									Buildvs,
