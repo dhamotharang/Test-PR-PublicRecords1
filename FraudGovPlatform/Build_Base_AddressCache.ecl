@@ -1,8 +1,8 @@
 ﻿Import FraudShared,tools; 
 EXPORT Build_Base_AddressCache (
    string pversion	
-	,dataset(FraudShared.Layouts.Base.Main) FileBase = FraudShared.Files().Base.Main.Built 
-    ,dataset(FraudShared.Layouts.Base.Main) Previous_Build = FraudShared.Files().Base.Main.QA
+	,dataset(FraudShared.Layouts.Base.Main) FileBase = $.Files().Base.Main_Orig.Built
+    ,dataset(FraudShared.Layouts.Base.Main) Previous_Build =  $.Files().Base.Main_Orig.QA
     ,dataset($.Layouts.Base.AddressCache) Previous_AddressCache = $.Files().Base.AddressCache.QA
 ) := 
 module 
@@ -32,6 +32,8 @@ module
             SELF.zip := LEFT.additional_address.zip,
             SELF.clean_address := LEFT.additional_address.clean_address,
             SELF.address_cleaned := LEFT.process_date,
+            SELF.address_1 := LEFT.additional_address.address_1,
+            SELF.address_2 := LEFT.additional_address.address_2,
             SELF := LEFT ),
         LOCAL );
 

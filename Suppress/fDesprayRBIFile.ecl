@@ -30,7 +30,7 @@ EXPORT fDesprayRBIFile(String pVersion, string pHostname, string pTarget, string
     lzFileName      := pTarget+'/'+$.Constants.OptOut(pVersion).FileNameForRBI;
  
     // Create RBI output file on THOR
-    out_rbi_file    := OUTPUT(rbi_file_srt,,thorFileName,CSV(HEADING(1), SEPARATOR('|'), QUOTE('')),OVERWRITE,COMPRESSED);
+    out_rbi_file    := OUTPUT(rbi_file_srt,,thorFileName,CSV(HEADING(single), SEPARATOR('|'), QUOTE('')),OVERWRITE,COMPRESSED);
 
 	despray_rbi_file := fileservices.Despray(thorFileName, pHostname, lzFileName,,,,TRUE);		
 

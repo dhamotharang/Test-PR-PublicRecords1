@@ -132,6 +132,7 @@ EXPORT Sanction_Code_Lookup := MODULE
 									{'SNC_MOF1' ,'MO','Department of Social Services',																									'Medicaid Board',																		'Medicaid',	'Full refresh'},
 									{'SNC_MOF2' ,'MO','Division of Professional Registration',																					'Pharmacy Board',																		'State',				'Full refresh'},
 									{'SNC_MSF1' ,'MS','Division of Medicaid',																														'Medicaid Board',																		'Medicaid',	'Full refresh'},
+									{'SNC_MSF3' ,'MS','Mississippi Board of Pharmacy',																									'Pharmacy Board',																		'State',		'Cumulative'},
 									{'SNC_MTF2' ,'MT','Department of Public Health and Human Services',																	'Medicaid Board',																		'Medicaid',	'Full refresh'},
 									{'SNC_NCF1' ,'NC','License Board',																																	'Pharmacy Board',																		'State',				'Cumulative'},														
 									{'SNC_NCF2' ,'NC','Division of Health Service Regulation',																					'Adult Care Board',																	'State',				'Full refresh'},

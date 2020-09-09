@@ -1,0 +1,88 @@
+﻿IMPORT ut,strata, BKMortgage;
+
+EXPORT Strata_Population_Stats_Assignment(STRING filedate) := FUNCTION
+basefile_assign := BKMortgage.Files().fAssign;
+rPopulationStats := RECORD
+      basefile_assign.FIPSCode;
+      CountGroup     := COUNT(GROUP);
+			record_id_CountNonBlank         	:= SUM(GROUP,IF(basefile_assign.record_id<>0,1,0));   
+	    date_first_seen_CountNonBlank   	:= SUM(GROUP,IF(basefile_assign.date_first_seen<>'',1,0));   
+	    date_last_seen_CountNonBlank    	:= SUM(GROUP,IF(basefile_assign.date_last_seen<>'',1,0));  
+	    date_vendor_first_reported_CountNonBlank   := SUM(GROUP,IF(basefile_assign.date_vendor_first_reported<>'',1,0));   
+	    date_vendor_last_reported_CountNonBlank    := SUM(GROUP,IF(basefile_assign.date_vendor_last_reported<>'',1,0));   
+	    process_date_CountNonBlank      	:= SUM(GROUP,IF(basefile_assign.process_date<>'',1,0));   
+      source_CountNonBlank              := SUM(GROUP,IF(basefile_assign.source<>'',1,0));
+			ln_filedate_CountNonBlank					:= SUM(GROUP,IF(basefile_assign.ln_filedate<>'',1,0));
+			bk_infile_type_CountNonBlank			:= SUM(GROUP,IF(basefile_assign.bk_infile_type<>'',1,0));
+	    RecType_CountNonBlank         		:= SUM(GROUP,IF(basefile_assign.RecType<>'',1,0));
+			DocumentType_CountNonBlank				:= SUM(GROUP,IF(basefile_assign.DocumentType<>'',1,0));
+			MERSIndicator_CountNonBlank       := SUM(GROUP,IF(basefile_assign.MERSIndicator<>'',1,0));
+	    MainAddendum_CountNonBlank      	:= SUM(GROUP,IF(basefile_assign.MainAddendum<>'',1,0));	
+	    AssigRecDate_CountNonBlank        := SUM(GROUP,IF(basefile_assign.AssigRecDate<>'',1,0));
+	    AssigEffecDate_CountNonBlank      := SUM(GROUP,IF(basefile_assign.AssigEffecDate<>'',1,0));
+	    AssigDoc_CountNonBlank            := SUM(GROUP,IF(basefile_assign.AssigDoc<>'',1,0));
+	    Assigbk_CountNonBlank        			:= SUM(GROUP,IF(basefile_assign.Assigbk<>'',1,0));
+	    Assigpg_CountNonBlank   					:= SUM(GROUP,IF(basefile_assign.Assigpg<>'',1,0));
+	    MultiplePageImage_CountNonBlank   := SUM(GROUP,IF(basefile_assign.MultiplePageImage<>'',1,0));
+	    BKFSImageID_CountNonBlank         := SUM(GROUP,IF(basefile_assign.BKFSImageID<>'',1,0));
+	    OrigDOTRecDate_CountNonBlank      := SUM(GROUP,IF(basefile_assign.OrigDOTRecDate<>'',1,0));
+	    OrigDOTContractDate_CountNonBlank := SUM(GROUP,IF(basefile_assign.OrigDOTContractDate<>'',1,0));
+	    OrigDOTDoc_CountNonBlank         	:= SUM(GROUP,IF(basefile_assign.OrigDOTDoc<>'',1,0));
+	    OrigDOTBk_CountNonBlank  					:= SUM(GROUP,IF(basefile_assign.OrigDOTBk<>'',1,0));
+	    OrigDOTPg_CountNonBlank      			:= SUM(GROUP,IF(basefile_assign.OrigDOTPg<>'',1,0));
+	    Origlenderben_CountNonBlank       := SUM(GROUP,IF(basefile_assign.Origlenderben<>'',1,0));
+	    OrigLoanAmnt_CountNonBlank        := SUM(GROUP,IF(basefile_assign.OrigLoanAmnt<>'',1,0));
+	    AssignorName_CountNonBlank       	:= SUM(GROUP,IF(basefile_assign.AssignorName<>'',1,0));
+	    LoanNumber_CountNonBlank       		:= SUM(GROUP,IF(basefile_assign.LoanNumber<>'',1,0));
+	    Assignee_CountNonBlank        		:= SUM(GROUP,IF(basefile_assign.Assignee<>'',1,0));
+	    MERS_CountNonBlank   							:= SUM(GROUP,IF(basefile_assign.MERS<>'',1,0));
+	    MERSValidation_CountNonBlank   		:= SUM(GROUP,IF(basefile_assign.MERSValidation<>'',1,0));
+	    AssigneePool_CountNonBlank   			:= SUM(GROUP,IF(basefile_assign.AssigneePool<>'',1,0));
+	    MSPSvcrLoan_CountNonBlank  				:= SUM(GROUP,IF(basefile_assign.MSPSvcrLoan<>'',1,0));
+	    BorrowerName_CountNonBlank   			:= SUM(GROUP,IF(basefile_assign.BorrowerName<>'',1,0));
+	    APN_CountNonBlank   							:= SUM(GROUP,IF(basefile_assign.APN<>'',1,0));
+	    MultiAPNCode_CountNonBlank   			:= SUM(GROUP,IF(basefile_assign.MultiAPNCode<>'',1,0));
+	    TaxAcctid_CountNonBlank           := SUM(GROUP,IF(basefile_assign.TaxAcctid<>'',1,0));
+	    PropertyFullAdd_CountNonBlank     := SUM(GROUP,IF(basefile_assign.PropertyFullAdd<>'',1,0));
+	    PropertyUnit_CountNonBlank       	:= SUM(GROUP,IF(basefile_assign.PropertyUnit<>'',1,0));
+	    PropertyCity_CountNonBlank   			:= SUM(GROUP,IF(basefile_assign.PropertyCity<>'',1,0));
+	    PropertyState_CountNonBlank   		:= SUM(GROUP,IF(basefile_assign.PropertyState<>'',1,0));
+	    PropertyZip_CountNonBlank   			:= SUM(GROUP,IF(basefile_assign.PropertyZip<>'',1,0));
+	    PropertyZip4_CountNonBlank  			:= SUM(GROUP,IF(basefile_assign.PropertyZip4<>'',1,0));
+	    DataentryDate_CountNonBlank   		:= SUM(GROUP,IF(basefile_assign.DataentryDate<>'',1,0));
+	    DataEntryOpercode_CountNonBlank   := SUM(GROUP,IF(basefile_assign.DataEntryOpercode<>'',1,0));
+	    VendorSourceCode_CountNonBlank   	:= SUM(GROUP,IF(basefile_assign.VendorSourceCode<>'',1,0));
+	    HIDS_RecordingFlag_CountNonBlank  := SUM(GROUP,IF(basefile_assign.HIDS_RecordingFlag<>'',1,0));
+	    HIDS_DocNumber_CountNonBlank     	:= SUM(GROUP,IF(basefile_assign.HIDS_DocNumber<>'',1,0));
+	    TransferCertificateOfTitle_CountNonBlank  := SUM(GROUP,IF(basefile_assign.TransferCertificateOfTitle<>'',1,0));
+	    HI_Condo_CPR_HPR_CountNonBlank    := SUM(GROUP,IF(basefile_assign.HI_Condo_CPR_HPR<>'',1,0));
+	    HI_Situs_Unit_Number_CountNonBlank:= SUM(GROUP,IF(basefile_assign.HI_Situs_Unit_Number<>'',1,0));
+	    HIDS_Previous_DocNumber_CountNonBlank    			:= SUM(GROUP,IF(basefile_assign.HIDS_Previous_DocNumber<>'',1,0));
+	    PrevTransferCertificateOfTitle_CountNonBlank	:= SUM(GROUP,IF(basefile_assign.PrevTransferCertificateOfTitle<>'',1,0));
+	    PID_CountNonBlank    							:= SUM(GROUP,IF(basefile_assign.PID<>'',1,0));
+	    MatchedOrOrphan_CountNonBlank    	:= SUM(GROUP,IF(basefile_assign.MatchedOrOrphan<>'',1,0));
+	    AssessorParcelNumber_Matched_CountNonBlank  	:= SUM(GROUP,IF(basefile_assign.AssessorParcelNumber_Matched<>'',1,0));
+	    AssessorPropertyFullAdd_CountNonBlank      		:= SUM(GROUP,IF(basefile_assign.AssessorPropertyFullAdd<>'',1,0));
+	    AssessorPropertyUnitType_CountNonBlank 				:= SUM(GROUP,IF(basefile_assign.AssessorPropertyUnitType<>'',1,0));
+	    AssessorPropertyUnit_CountNonBlank        		:= SUM(GROUP,IF(basefile_assign.AssessorPropertyUnit<>'',1,0));
+	    AssessorPropertyCity_CountNonBlank           	:= SUM(GROUP,IF(basefile_assign.AssessorPropertyCity<>'',1,0));
+	    AssessorPropertyState_CountNonBlank           := SUM(GROUP,IF(basefile_assign.AssessorPropertyState<>'',1,0));
+	    AssessorPropertyZip_CountNonBlank       			:= SUM(GROUP,IF(basefile_assign.AssessorPropertyZip<>'',1,0));
+	    AssessorPropertyZip4_CountNonBlank       			:= SUM(GROUP,IF(basefile_assign.AssessorPropertyZip4<>'',1,0));
+	    AssessorPropertyAddrSource_CountNonBlank      := SUM(GROUP,IF(basefile_assign.AssessorPropertyAddrSource<>'',1,0));
+	    ClnOriglenderben_CountNonBlank   	:= SUM(GROUP,IF(basefile_assign.ClnOriglenderben<>'',1,0));
+	    ClnAssignorName_CountNonBlank    	:= SUM(GROUP,IF(basefile_assign.ClnAssignorName<>'',1,0));
+	    ClnAssignee_CountNonBlank        	:= SUM(GROUP,IF(basefile_assign.ClnAssignee<>'',1,0));
+	    DBAOrigLenderBen_CountNonBlank    := SUM(GROUP,IF(basefile_assign.DBAOrigLenderBen<>'',1,0));
+	    DBAAssignor_CountNonBlank    			:= SUM(GROUP,IF(basefile_assign.DBAAssignor<>'',1,0));
+	    DBAAssignee_CountNonBlank 				:= SUM(GROUP,IF(basefile_assign.DBAAssignee<>'',1,0));
+	    raw_file_name_CountNonBlank       := SUM(GROUP,IF(basefile_assign.raw_file_name<>'',1,0));
+END;
+
+  
+	basestrata := SORT(TABLE(basefile_assign,rPopulationStats,FIPSCode,few),FIPSCode);
+
+	strata.createXMLStats(basestrata,'BKMortgage_Assignments','data',filedate,'',strataResults);
+	
+RETURN strataresults;
+END;							 

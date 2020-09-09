@@ -20,9 +20,13 @@ export GetHistoricalKeyInfo(string datasetname
 	end;
 	
 	rResponse := record
+		string datasetname {xpath('datasetname')};
+		string clusterflag {xpath('clusterflag')};
+		string whenlive {xpath('whenlive')};
+		string buildversion {xpath('buildversion')};
 		string superkey {xpath('superkey')};
 		string logicalkey {xpath('logicalkey')};
-		string buildversion {xpath('buildversion')};
+		
 		string size {xpath('size')};
 		string recordcount {xpath('recordcount')};
 		string updateflag {xpath('updateflag')};

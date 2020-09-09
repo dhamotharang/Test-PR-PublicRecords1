@@ -927,6 +927,7 @@ PersonPerson := ASSOCIATION(FLAT(
 
     ));
 
+
 USE FraudgovKEL.fraudgovshared(FLAT,
   Event(FILTER((UNSIGNED)record_id > 0), 
     LexId = did,
@@ -3684,7 +3685,7 @@ Event: => DlIsLastEventId := MAP(rDriversLicense.LastRecordId = RecordId => 1, 0
 
 Event: => PersonLabel := TRIM(LastName) + ', ' + TRIM(FirstName) + TRIM(' ' + SUBSTR(MiddleName,1, 1));
 Event: => EmailLabel := EmailAddress;
-Event: => AddressLabel := CleanSpaces(TRIM(TRIM(PrimaryRange) + ' ' + TRIM(TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(TRIM(Suffix) + ' ' + TRIM(TRIM(Postdirectional) + ' ' + TRIM(TRIM(UnitDesignation) + ' ' + TRIM(TRIM(SecondaryRange)) + ', ' + TRIM(TRIM(VanityCity) + ', ' + TRIM(State)) + ' ' + TRIM(Zip)))))))));
+Event: => AddressLabel := CleanSpaces(TRIM(TRIM(TRIM(PrimaryRange) + ' ' + TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(Suffix) + ' ' + TRIM(Postdirectional) + ' ' + TRIM(UnitDesignation) + ' ' + TRIM(SecondaryRange)) + ', ' + TRIM(TRIM(VanityCity) + ', ' + TRIM(State)) + ' ' + TRIM(Zip))));
 Event: => IpLabel := IpAddress;
 Event: => SsnLabel := SsnFormatted;
 Event: => PhoneLabel := PhoneFormatted;

@@ -10,8 +10,8 @@ EXPORT fOneKey_As_Business_Contact(DATASET(OneKey.Layouts.Base) pBaseFile = OneK
     SELF.did                           := 0;  // DID from Headers
     SELF.contact_score                 := IF(TRIM(pInput.fname + pInput.mname + pInput.lname, ALL) = '', 0, 1); 
     SELF.vendor_id                     := pInput.ska_id;  // Vendor key
-    SELF.dt_first_seen                 := (UNSIGNED4)Stringlib.GetDateYYYYMMDD();  // Historically this has been populated with process date
-    SELF.dt_last_seen                  := IF(pInput.cleaned_deactv_dt != '', (UNSIGNED4)pInput.cleaned_deactv_dt, (UNSIGNED4)Stringlib.GetDateYYYYMMDD());
+    SELF.dt_first_seen                 := pInput.dt_vendor_first_reported;  // Historically this was populated with process date
+    SELF.dt_last_seen                  := IF(pInput.cleaned_deactv_dt != '', (UNSIGNED4)pInput.cleaned_deactv_dt, pInput.dt_vendor_last_reported);
     SELF.source                        := pInput.source;  // Source file type
     SELF.record_type                   := 'C';  // Historically this has been populated as 'C'urrent
     SELF.from_hdr                      := 'N';  // 'Y' if contact is from address match with person headers.
@@ -19,7 +19,7 @@ EXPORT fOneKey_As_Business_Contact(DATASET(OneKey.Layouts.Base) pBaseFile = OneK
     SELF.dppa                          := FALSE;  // DPPA restricted record
     SELF.company_title                 := pInput.titl_typ_desc;  // Title of Contact at Company if available
     SELF.company_department            := pInput.prim_prfsn_desc;
-    SELF.title                         := '';
+    SELF.title                         := pInput.title;
     SELF.fname                         := pInput.fname;
     SELF.mname                         := pInput.mname;
     SELF.lname                         := pInput.lname;
@@ -132,7 +132,8 @@ EXPORT fOneKey_As_Business_Contact(DATASET(OneKey.Layouts.Base) pBaseFile = OneK
     SELF                             := L;
 	END;
   
-  dOneKey_Clean_Dist_Sort := SORT(DISTRIBUTE(dOneKeyAsContactHdr, HASH(vl_id)), vl_id, -dt_last_seen, LOCAL);
+  dOneKey_Clean_Dist_Sort := SORT(DISTRIBUTE(dOneKeyAsContactHdr, HASH(vl_id)),
+                                  vl_id, vendor_id, company_name, company_phone, RawAID, -dt_last_seen, LOCAL);
 
   dOneKey_Rollup := ROLLUP(dOneKey_Clean_Dist_Sort,
                            LEFT.vl_id = RIGHT.vl_id AND

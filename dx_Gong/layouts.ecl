@@ -283,6 +283,7 @@
     $.layout_prepped_for_keys;
     unsigned4 global_sid;
     unsigned8 record_sid;
+    unsigned6 did;      //CCPA-1067 Add lexid field to thor_data400::key::gong_hhid_qa key
   END;
 
   EXPORT i_phone10 := RECORD (raw)

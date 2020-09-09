@@ -33,7 +33,7 @@ rUpdateBuildRequest	:= RECORD
 	END;
 	
 	 rBuildrequest := RECORD
-	 #IF(STD.System.Util.PlatformVersionCheck('7.8')) 
+      #IF(STD.System.Util.PlatformVersionCheck('7.8')) 
 	 Orbit3.Layouts.AdditionalNamespacesLayout;
 	 #END
 		rUpdateBuildRequest	request	{XPATH('request') };
@@ -76,18 +76,15 @@ rFault  :=	record
 		rAddBuildInstanceComponentRslt		AddBuildInstanceComponentResponse		{xpath('AddBuildInstanceComponentResponse'), 		maxlength(300000)};
        rFault		FaultRecord													{xpath('Fault')};
 end;
+
+
 ///////////////////////////////////////////////////////////////////////////////
 	lResponse	:=  SOAPCALL (         
 			Orbit3.EnvironmentVariables.serviceurl,
 		'AddBuildInstanceComponent',
 		rBuildrequest,
 		rStatus,
-		#IF(STD.System.Util.PlatformVersionCheck('7.8'))  
-		                                                              NAMESPACE($.EnvironmentVariables.NameSpace),
-		#ELSE
-		                                                               ,NAMESPACE($.EnvironmentVariables.NameSpace + ' xmlns:orb="http://lexisnexis.com/Orbit/" xmlns:arr="http://schemas.microsoft.com/2003/10/Serialization/Arrays"  xmlns:i="http://www.w3.org/2001/XMLSchema-instance');
-		#END
-		//NAMESPACE(Orbit3.EnvironmentVariables.namespace ),
+     	NAMESPACE(Orbit3.EnvironmentVariables.namespace ),
 		LITERAL,
 		SOAPACTION(Orbit3.EnvironmentVariables.soapactionprefix + 'PR/AddBuildInstanceComponent'),
 		LOG
