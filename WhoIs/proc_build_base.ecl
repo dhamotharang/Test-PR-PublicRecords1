@@ -4,7 +4,7 @@
 EXPORT proc_build_base(STRING8 version) := FUNCTION
 
 	dsBase			:= WhoIs.Files.Base;
-	IngestPrep	:= WhoIs.prep_ingest_file(country = 'UNITED STATES' and Domainname[1] = 'A');
+	IngestPrep	:= WhoIs.prep_ingest_file;
 
 	ingestMod		:= WhoIs.Ingest(,,dsBase,IngestPrep);
 	new_base		:= ingestMod.AllRecords;
