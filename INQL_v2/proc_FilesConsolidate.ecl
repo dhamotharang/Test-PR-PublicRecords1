@@ -53,12 +53,17 @@ rawFilesToConsolidate_ECL  := 'rawFilesToConsolidate'+source+':='+ STD.STr.Remov
 lastRawFileToConsolidate   := Max(tr_rawFilesToConsolidate,(unsigned8)std.str.splitwords(name,'::')[3][1..8]);
 
 
-PULL_INDEX_ECL        := 'fileConsolidated'+source+':= PULL(INDEX({INQL_v2.layouts.rConsolidate.filedate,INQL_v2.layouts.rConsolidate.orig_transaction_id},{INQL_v2.layouts.rConsolidate},' +
-													'\'~thor_data::key::inql::'+sfcra+'::consolidate::'+ source+'\',opt));\n';
+PULL_INDEX_ECL        := 'fileConsolidated'+source+':= PULL(DISTRIBUTE(INDEX({INQL_v2.layouts.rConsolidate.filedate,INQL_v2.layouts.rConsolidate.orig_transaction_id},{INQL_v2.layouts.rConsolidate},' +
+													'\'~thor_data::key::inql::'+sfcra+'::consolidate::'+ source+'\',opt)));\n';
+
+Dist := 'Dist_'+source+':=DISTRIBUTE(rawFilesToConsolidate'+source+');\n';
 													
-APPEND_FIELDS_ECL   	:= 'INQL_V2.Mac_Append_Fields(rawFilesToConsolidate'+source+',filestoConsolidate'+source+','+separators+',,INQL_v2.layouts.rConsolidate,'+transaction_id+');\n';
+	
+											
+APPEND_FIELDS_ECL   	:= 'INQL_V2.Mac_Append_Fields(Dist_'+source+',filestoConsolidate'+source+','+separators+',,INQL_v2.layouts.rConsolidate,'+transaction_id+');\n';
 
 ECL := rawFilesToConsolidate_ECL + 
+       Dist +
        APPEND_FIELDS_ECL + 
 			 PULL_INDEX_ECL +
 			 'DS'+source+':= filestoConsolidate'+source+' + fileConsolidated'+source+';\n' +
