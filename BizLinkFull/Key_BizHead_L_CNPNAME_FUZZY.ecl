@@ -1,6 +1,4 @@
-﻿IMPORT SALT311,std;
-
-EXPORT Key_BizHead_L_CNPNAME_FUZZY := MODULE
+﻿IMPORT SALT311,std;EXPORT Key_BizHead_L_CNPNAME_FUZZY := MODULE
  
 //company_name_prefix:?:cnp_name:st:zip:+:city:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag
 EXPORT KeyName := BizLinkFull.Filename_keys.L_CNPNAME_FUZZY; /*HACK07*/
@@ -118,7 +116,7 @@ EXPORT RawFetch_server(TYPEOF(h.company_name_prefix) param_company_name_prefix =
       AND ((param_cnp_name = (TYPEOF(cnp_name))'' OR cnp_name = (TYPEOF(cnp_name))'') OR (SALT311.MatchBagOfWords(cnp_name,param_cnp_name,3177747,1) > Config_BIP.cnp_name_Force * 100))
       AND KEYED((param_st = (TYPEOF(st))'' OR st = (TYPEOF(st))'') OR (st = param_st))
       AND KEYED((~EXISTS(param_zip) OR zip = (TYPEOF(zip))'') OR (zip IN SET(param_zip,zip)))
-      AND ( param_efr_bitmap=0 OR (EFR_BMap & param_efr_bitmap)>0 )),Config_BIP.L_CNPNAME_FUZZY_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),ultid,orgid,seleid,proxid);
+            AND ( param_efr_bitmap=0 OR (EFR_BMap & param_efr_bitmap)>0 )),Config_BIP.L_CNPNAME_FUZZY_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),ultid,orgid,seleid,proxid);
  
 EXPORT RawFetch(TYPEOF(h.company_name_prefix) param_company_name_prefix = (TYPEOF(h.company_name_prefix))'',TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',UNSIGNED4 param_efr_bitmap = 0) := FUNCTION
 // Why not LOOP? - Because I am expecting FIRST one to win 99+ percent of the time - and don't want to impact it
@@ -162,7 +160,7 @@ EXPORT ScoredproxidFetch(TYPEOF(h.company_name_prefix) param_company_name_prefix
            match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),FALSE));
     SELF.zipWeight := (50+MAP (
            SELF.zip_match_code = SALT311.MatchCode.OneSideNull => 0,
-           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100 * param_zip(zip=le.zip)[1].weight/100.0,
+           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
     SELF.city_match_code := MAP(
