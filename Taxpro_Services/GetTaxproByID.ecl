@@ -6,7 +6,7 @@
 // The output layout is shared among subreport and search views (it's a little larger than any one of those)
 // =========================================================================================================
 
-IMPORT TAXPRO, ut, doxie, codes, suppress, census_data, standard;
+IMPORT TAXPRO, ut, doxie, codes, census_data, STD, TAXPRO_Services;
 
 OUT_REC := TAXPRO_Services.layouts.Layout_Common;
  
@@ -15,8 +15,8 @@ EXPORT out_rec GetTaxproByID (GROUPED DATASET (TAXPRO_Services.layouts.id) in_id
   doxie.MAC_Header_Field_Declare (); // unfortunately: only to get input city name! Should be gone after interfaces are done
 
   // choose best match (for penalties) between postal/vicinity cities
-  GetBestCity (string25 vcity, string25 pcity) := MAP (
-    vcity = '' => pcity, 
+  GetBestCity (STRING25 vcity, STRING25 pcity) := MAP (
+    vcity = '' => pcity,
     pcity = '' => vcity,
     ut.StringSimilar (vcity, city_value) <= ut.StringSimilar (pcity, city_value) => vcity, pcity
   );
@@ -26,18 +26,19 @@ EXPORT out_rec GetTaxproByID (GROUPED DATASET (TAXPRO_Services.layouts.id) in_id
     SELF.tmsid := L.tmsid;
 
     // note: input Country is not penalized
-    SELF.penalt := doxie.FN_Tra_Penalty_Name (L.name.fname, L.name.mname, L.name.lname) + 
-                   doxie.FN_Tra_Penalty_Addr (L.addr.predir, L.addr.prim_range, L.addr.prim_name, L.addr.addr_suffix,
-                                              L.addr.postdir, L.addr.sec_range, 
-                                              GetBestCity (L.addr.v_city_name, L.addr.p_city_name),
-                                              L.addr.st, L.addr.zip5) +
-                   doxie.FN_Tra_Penalty_CName (L.company);
+    SELF.penalt := 
+      doxie.FN_Tra_Penalty_Name (L.name.fname, L.name.mname, L.name.lname) +
+      doxie.FN_Tra_Penalty_Addr (L.addr.predir, L.addr.prim_range, L.addr.prim_name, L.addr.addr_suffix,
+                                L.addr.postdir, L.addr.sec_range,
+                                GetBestCity (L.addr.v_city_name, L.addr.p_city_name),
+                                L.addr.st, L.addr.zip5) +
+      doxie.FN_Tra_Penalty_CName (L.company);
 
     // see if address is a foreign one, in which case cleaned address is not valid.
     // assumptions: US has state field always populated, Canada at least sometimes, others - don't.
-    cntry := trim (L.country);
-    stt := trim (L.state);
-    boolean IsForeign := ((cntry != '') AND (cntry != 'UNITED STATES')) OR (stt = '');
+    cntry := TRIM (L.country);
+    stt := TRIM (L.state);
+    BOOLEAN IsForeign := ((cntry != '') AND (cntry != 'UNITED STATES')) OR (stt = '');
     SELF.is_foreign := IsForeign;
 
     SELF.address := IF (~IsForeign, L.addr);
@@ -48,23 +49,22 @@ EXPORT out_rec GetTaxproByID (GROUPED DATASET (TAXPRO_Services.layouts.id) in_id
     SELF.address.county := '';
 
     // clean owner name
-	  SELF.name := L.name;
+    SELF.name := L.name;
 
     SELF := L;
   END;
 
   fetched := JOIN (in_ids, TAXPRO.Key_tmsid,
-                   keyed (Left.tmsid = Right.tmsid),
-                   GetCommonInfo (Right),
-                   KEEP (1)); // 1:1 relation
+    KEYED (LEFT.tmsid = RIGHT.tmsid),
+    GetCommonInfo (RIGHT),
+    KEEP (1)); // 1:1 relation
 
   // add county name
   census_data.MAC_Fips2County_Keyed (fetched, address.st, address.fips_county, address.county, ds_cnty);
 
-
   // filter by input country name (can be done in join above, but easier to read here, and join is 1:1)
-  string30 country_val := '' : stored('Country');
-  string30 country_value := stringlib.stringtouppercase (country_val);
+  STRING30 country_val := '' : STORED('Country');
+  STRING30 country_value := STD.STR.ToUpperCase (country_val);
 
   res := ds_cnty ((country_value = '') OR (country = country_value));
 

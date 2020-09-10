@@ -88,15 +88,20 @@ MACRO
 ENDMACRO;
 
 
-
-
 //THIS DOES A KEYED JOIN BASED ON KEYIDS
-export mac_IndexFetch2(infileWithIDs0, inKey, outfile, Level, JoinLimit=25000, JoinType=BIPV2.IDconstants.JoinTypes.KeepJoin) := 
+export mac_IndexFetch2(infileWithIDs0, inKey, outfile, Level, JoinLimit=25000, JoinType=BIPV2.IDconstants.JoinTypes.KeepJoin, dFilter_In='') := 
 MACRO
 
 	import BizLinkFull, AutoKeyI;
-  IMPORT BIPV2_Suppression;
-	
+    IMPORT BIPV2_Suppression;
+	#uniquename(dfilter);
+
+    #if(#TEXT(dFilter_In) != '')
+        %dfilter% := dFilter_In;
+    #ELSE   
+        %dfilter% := DATASET([],BIPV2.IDlayouts.l_filter_record);
+    #end
+
 	infileWithIDs1 :=
 	project(
 		infileWithIDs0,
@@ -104,14 +109,12 @@ MACRO
 			BizLinkFull.Process_Biz_Layouts.id_stream_layout,
 			self := left,
 			self.weight := 0,
-			self := [] // JA 20190511 changes to id_stream_layout associated with SALT 3.11 upgrade
+			self := []
 		)
 	);	
-	
 	infileWithIDs := BizLinkFull.Process_Biz_Layouts.id_stream_complete(infileWithIDs1);
-	
 	infileWithIDsLeveled :=  //there is a better way to do this i am sure.  at least get the magic contants out of here.
-	project(
+    project(
 		infileWithIDs,	
 		transform(
 			BIPV2.IDlayouts.l_xlink_ids2,
@@ -128,11 +131,18 @@ MACRO
 
 	#uniquename(infileWithIDsLeveled2)
 	%infileWithIDsLeveled2% :=
-		dedup(sort(infileWithIDsLeveled, 
-		           ultid, orgid, seleid, proxid, powid, empid, uniqueId),
-		      ultid, orgid, seleid, proxid, powid, empid, uniqueId);
+		dedup(sort(distribute(infileWithIDsLeveled, hash32(ultid)), 
+		           ultid, orgid, seleid, proxid, powid, empid, uniqueId,local),
+		      ultid, orgid, seleid, proxid, powid, empid, uniqueId,local);
 
-	IDsReadyForKeyedJoin := dedup(%infileWithIDsLeveled2%, ultid, orgid, seleid, proxid, powid, empid);
+	IDsReadyForKeyedJoin01 := dedup(%infileWithIDsLeveled2%, ultid, orgid, seleid, proxid, powid, empid, local);
+    IDsReadyForKeyedJoin := distribute(JOIN(IDsReadyForKeyedJoin01,%dfilter%,LEFT.UniqueID=RIGHT.UniqueID,TRANSFORM(
+        {RECORDOF(IDsReadyForKeyedJoin01) OR BIPV2.IDlayouts.l_filter_record}, 
+        SELF.uniqueID := LEFT.uniqueID,          
+        SELF := RIGHT,
+        SELF := LEFT),
+        LEFT OUTER, HASH
+        ), hash32(ultid));
 
 	outrec := record	
 		unsigned2 fetch_error_code;
@@ -152,27 +162,47 @@ MACRO
 		self := [];
 	end;
 
+
+	#uniquename(joinCondition0);
+    #uniquename(joinCondition1);
+    #uniquename(joinCondition);
+
+     %joinCondition0% := 'keyed(left.ultID = right.UltID) and ' +
+		'keyed(left.OrgID = right.OrgID or left.OrgID = 0, OPT) and ' +			
+		'keyed(left.SELEID = right.SELEID or left.SELEID = 0, OPT) and ' + 			
+		'keyed(left.ProxID = right.ProxID or left.ProxID = 0, OPT)';
+
+    #if(#TEXT(dFilter_In) != '')
+        %joinCondition% := %joinCondition0% + ' and ' + 
+        '(left.company_fein = \'\' or TRIM(left.company_fein) = TRIM(RIGHT.company_fein)) and ' +
+        '(left.company_phone = \'\' or TRIM(left.company_phone) = TRIM(RIGHT.company_phone)) and ' +
+        '(left.prim_range = \'\' or TRIM(left.prim_range) = TRIM(RIGHT.prim_range)) and ' +
+        '(left.prim_name = \'\' or TRIM(left.prim_name) = TRIM(RIGHT.prim_name)) and ' +
+        '(left.sec_range = \'\' or TRIM(left.sec_range) = TRIM(RIGHT.sec_range)) and ' +
+        '(left.zip = \'\' or TRIM(left.zip) = TRIM(RIGHT.zip))';	
+    #ELSE  
+        %joinCondition% := %joinCondition0%;
+    #END
+
+
+
+
 	outfile_Keep := 	//identical to outfile_1 except for last line (and should probably stay that way)
 	join(
 		IDsReadyForKeyedJoin,
 		inKey,
-		keyed(left.ultID = right.UltID) and
-		keyed(left.OrgID = right.OrgID or left.OrgID = 0, OPT) and			
-		keyed(left.SELEID = right.SELEID or left.SELEID = 0, OPT) and			
-		keyed(left.ProxID = right.ProxID or left.ProxID = 0, OPT)
+        #EXPAND(%joinCondition%)
 		,
 		xf(left, right),
-		KEEP(JoinLimit)
+		KEEP(JoinLimit),
+        LIMIT(0)//This limit exists because we could have non keyed parts to the join condition, the compiler defaults to limit 10k, which can cause errorss, so this protects us.
 	);
 	
 	outfile_LimitTransform :=	//identical to outfile_0 except for last line (and should probably stay that way)
 	join(
 		IDsReadyForKeyedJoin,
 		inKey,
-		keyed(left.ultID = right.UltID) and
-		keyed(left.OrgID = right.OrgID or left.OrgID = 0, OPT) and			
-		keyed(left.SELEID = right.SELEID or left.SELEID = 0, OPT) and			
-		keyed(left.ProxID = right.ProxID or left.ProxID = 0, OPT)
+		#EXPAND(%joinCondition%)
 		,
 		xf(left, right),
 		limit(JoinLimit, xfail(left, right, AutoKeyI.errorcodes._codes.TOO_MANY_SUBJECTS))
@@ -195,7 +225,7 @@ MACRO
 		       (left.ProxID = right.ProxID or left.ProxID = 0),
 		     transform(recordof(right),
 		       self.uniqueId := left.uniqueID,
-		       self := right));
+		       self := right), hash);
            
   outfile:=BIPV2_Suppression.macSuppress(%outfile1%);
 

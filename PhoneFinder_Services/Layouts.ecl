@@ -282,6 +282,8 @@
       DATASET(iesp.phonefinder.t_PhoneFinderSourceIndicator) SourceInfo;
       BOOLEAN                                               SelfReportedSourcesOnly;
       UNSIGNED                                              TotalSourceCount;
+      UNSIGNED                                              identity_id;
+      UNSIGNED                                              phone_id;
     END;
 
     EXPORT ExcludePhones :=
@@ -859,17 +861,36 @@
 
   EXPORT log_other := RECORD(iesp.phonefinder.t_PhoneFinderInfo)
     INTEGER identity_count;
+    UNSIGNED phone_id;
   END;
 
   EXPORT  log_primary := RECORD(iesp.phonefinder.t_PhoneFinderDetailedInfo)
     INTEGER identity_count;
   END;
 
+   EXPORT  log_identities := RECORD(iesp.phonefinder.t_PhoneIdentityInfo)
+    INTEGER identity_id;
+  END;
+
+  EXPORT delta_phones_rpt_sources:= RECORD
+     STRING16 transaction_id;
+     STRING15 phonenumber;
+     UNSIGNED lexid;
+     UNSIGNED phone_id;
+     UNSIGNED identity_id;
+     UNSIGNED sequence_number;
+     STRING category;
+     UNSIGNED totalsourcecount;
+     STRING60 source_type;
+     STRING3  Source;
+    END;
+
   EXPORT log_PhoneFinderSearchRecord := RECORD
-    DATASET(iesp.phonefinder.t_PhoneIdentityInfo) Identities {xpath('Identities/Identity'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxIdentities)};
+    DATASET(log_identities) Identities {xpath('Identities/Identity'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxIdentities)};
     DATASET(log_other) OtherPhones {xpath('OtherPhones/Phone'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxOtherPhones)};
     DATASET(iesp.phonefinder.t_PhoneFinderHistory) PhonesHistory {xpath('PhonesHistory/Phone'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxPhoneHistory)};
     log_primary PrimaryPhoneDetails {xpath('PrimaryPhoneDetails')};
+    DATASET(delta_phones_rpt_sources) log_source;
   END;
 
   //	DeltaPhones
@@ -917,6 +938,7 @@
     STRING15 phonenumber;
     STRING16 risk_indicator;
     STRING32 phone_type;
+    STRING30 carrier;
     STRING32 phone_status;
     INTEGER identity_count;
     STRING64 listing_name;
@@ -945,16 +967,6 @@
     INTEGER risk_indicator_id;
     STRING16 risk_indicator_level;
     STRING32 risk_indicator_category;
-    END;
-
-    EXPORT delta_phones_rpt_sources:= RECORD
-     STRING16 transaction_id;
-     STRING15 phonenumber;
-     UNSIGNED lexid;
-     STRING category;
-     UNSIGNED totalsourcecount;
-     STRING60 _type;
-     STRING3  Source;
     END;
 
   EXPORT delta_phones_rpt_Usage_RECORDs := RECORD

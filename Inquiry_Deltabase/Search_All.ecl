@@ -46,7 +46,7 @@ EXPORT Inquiry_Deltabase.Layouts.Inquiry_All Search_All (DATASET(Inquiry_Deltaba
     Valid_Query_TransactionID := Transaction_ID != '';
 		SQLSelectFields := '(SELECT \'' + (STRING)le.Seq + '\' AS Seq, ' + // Force Seq into the response for each SELECT statement, this allows for us to use this in batch
                         // Generate the Response Layout.  NOTE: If you alter anything in this section you MUST update Inquiry_Deltabase.Layouts.Deltabase_Record
-                        'i.Transaction_ID, i.Date_Added AS DateTime, i.Industry, i.Vertical, i.Function_Description, i.Sub_Market, ' +
+                        'i.Transaction_ID, i.Company_ID, i.Date_Added AS DateTime, i.Industry, i.Vertical, i.Function_Description, i.Sub_Market, ' +
                         'i.Product_ID AS Product_Code, i.Use, i.GLB_Purpose, i.DPPA_Purpose, i.Transaction_Type, i.First_Name AS FName, i.Middle_Name AS MName, i.Last_Name AS LName, ' +
                         'i.Suffix_Name AS SName, i.Address, i.City, i.State, i.Zip, i.Phone AS Phone10, i.Work_Phone, i.DOB, i.DL, i.DL_State, i.EMail, i.SSN, i.Response_LexID, ' + 
                         'i.IPAddr, i.Clean_Predir, i.Clean_Prim_Range, i.Clean_Prim_Name, i.Clean_Addr_Suffix, i.Clean_PostDir, i.Clean_Unit_Desig, i.Clean_Sec_Range, i.Clean_V_City_Name, i.Clean_St, ' + 

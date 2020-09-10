@@ -1,5 +1,5 @@
 /*--SOAP--
-<message name="Did_Batch_Service">
+<message name="AddressCleaning_Batch_Service">
   <part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 </message>
 */

@@ -45,9 +45,12 @@ EXPORT GetPhoneTransactions(DATASET(Phones.Layouts.rec_phoneLayout) subjectInfo)
     SELF.deact_code := IF(isDESU, R.transaction_code, '');
 
 
-    SELF.is_deact := IF(is_disconnected AND R.transaction_code != Phones.Constants.TransactionCodes.SWAP_ACTIVATION
-              AND R.transaction_end_dt = 0, 'Y', 'N' );
-    SELF.is_react := IF((isRE AND R.transaction_end_dt = 0), 'Y', 'N');
+    SELF.is_deact := MAP(is_disconnected AND R.transaction_code != Phones.Constants.TransactionCodes.SWAP_ACTIVATION AND R.transaction_end_dt = 0 => 'Y',
+                        R.source IN [Phones.Constants.Sources.GONG_DISCONNECT_SRC, Phones.Constants.Sources.DISCONNECT_SRC] => 'N',
+                        '' );
+    SELF.is_react := MAP((isRE AND R.transaction_end_dt = 0) => 'Y',
+                         R.source IN [Phones.Constants.Sources.GONG_DISCONNECT_SRC, Phones.Constants.Sources.DISCONNECT_SRC] => 'N',
+                         '');
     SELF.is_ported := (isPA	AND R.transaction_end_dt = 0);
 
     SELF.dt_first_reported := IF(is_AS, R.transaction_start_dt,0);
@@ -150,11 +153,13 @@ EXPORT GetPhoneTransactions(DATASET(Phones.Layouts.rec_phoneLayout) subjectInfo)
     deacDtMatch_1_5 	:= (L.deact_start_dt<>0 AND R.port_start_dt<>0 AND dcDaysApt between Phones.Constants.PhoneAttributes.PORT_LOWER_THRESHOLD and Phones.Constants.PhoneAttributes.PORT_UPPER_THRESHOLD);
     swapDtMatch_1_5		:= (L.swap_start_dt<>0 AND R.port_start_dt<>0 AND swDaysApt between Phones.Constants.PhoneAttributes.PORT_LOWER_THRESHOLD and Phones.Constants.PhoneAttributes.PORT_UPPER_THRESHOLD);
     deacDtMatch_6_30    := (L.deact_start_dt<>0 AND R.port_start_dt<>0 AND dcDaysApt between Phones.Constants.PhoneAttributes.DISCONNECT_LOWER_THRESHOLD AND Phones.Constants.PhoneAttributes.DISCONNECT_UPPER_THRESHOLD AND
-                  TRIM(R.carrier_name, left, right)<>'' and TRIM(R.operator_fullname, left, right)<>'' AND
-                  TRIM(R.carrier_name, left, right)<>PhonesInfo._Functions.fn_keyCarrier(TRIM(R.operator_fullname, left, right)));
+                  TRIM(L.carrier_name, left, right)<>'' and TRIM(R.operator_fullname, left, right)<>'' AND
+                  TRIM(L.carrier_name, left, right)<>PhonesInfo._Functions.fn_keyCarrier(TRIM(R.operator_fullname, left, right)));
+
     swapDtMatch_6_30	:= (L.swap_start_dt<>0 AND R.port_start_dt<>0 AND swDaysApt between Phones.Constants.PhoneAttributes.DISCONNECT_LOWER_THRESHOLD AND Phones.Constants.PhoneAttributes.DISCONNECT_UPPER_THRESHOLD AND
-                  TRIM(R.carrier_name, left, right)<>'' AND TRIM(R.operator_fullname, left, right)<>'' AND
-                  TRIM(R.carrier_name, left, right)<>PhonesInfo._Functions.fn_keyCarrier(TRIM(R.operator_fullname, left, right)));
+                  TRIM(L.carrier_name, left, right)<>'' AND TRIM(R.operator_fullname, left, right)<>'' AND
+                  TRIM(L.carrier_name, left, right)<>PhonesInfo._Functions.fn_keyCarrier(TRIM(R.operator_fullname, left, right)));
+
     SELF.is_deact := MAP((deacDtMatch_1_5 AND L.deact_code in [Phones.Constants.TransactionCodes.DISCONNECTED_CODE, Phones.Constants.TransactionCodes.SUSPENDED_CODE]) => Phones.Constants.PhoneAttributes.PORTED,
                   (swapDtMatch_1_5 AND L.swap_start_dt<>0) => Phones.Constants.PhoneAttributes.PORTED,
                  (deacDtMatch_6_30 AND L.deact_code in [Phones.Constants.TransactionCodes.DISCONNECTED_CODE, Phones.Constants.TransactionCodes.SUSPENDED_CODE]) => Phones.Constants.PhoneAttributes.PORTED,
@@ -185,9 +190,8 @@ EXPORT GetPhoneTransactions(DATASET(Phones.Layouts.rec_phoneLayout) subjectInfo)
 
   dPhones_combined :=	dPhones_combined_info + dPhonesType(source != Phones.Constants.Sources.ICONECTIV_SRC);
 
-  dPhone_out :=  DEDUP(SORT(dPhones_combined, phone, source, account_owner, -event_date, -vendor_last_reported_dt, vendor_first_reported_dt),
-                phone, source, account_owner, event_date, vendor_last_reported_dt, vendor_first_reported_dt);
-
+  dPhone_out :=  DEDUP(SORT(dPhones_combined, phone, source, account_owner, -event_date, -vendor_last_reported_dt, vendor_first_reported_dt, is_deact, is_react),
+                phone, source, account_owner, event_date, vendor_last_reported_dt, vendor_first_reported_dt, is_deact, is_react);
   RETURN dPhone_out;
     END;
 

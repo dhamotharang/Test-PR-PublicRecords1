@@ -89,20 +89,20 @@ zipCdRecs := project(zip_dataset,transform(zipCd,
  self.code:=ut.St2Code(ziplib.ZipToState2(left.zip))
  ));
 set of unsigned1 state_use := set(dedup(sort(zipCdRec(code!=0)+zipCdRecs,code),code),code) : STORED('state_use');
-  
+
 string2 regState := '' : stored('registerState');
-unsigned1 regState_use := IF(regState = '', -1, 
+unsigned1 regState_use := IF(regState = '', -1,
   ut.St2Code(stringlib.stringtouppercase(regState))) : STORED('regstate_use');
 
 set of string4 _make := [] : stored('make');
 make_use := vehicle_wildcard.Make2Code(_make) : stored('make_use');
 
 set of string3 _majorColor := [] : stored('majorColor');
-vehicle_wildcard.MAC_SetConvert(_majorColor, vehicle_wildcard.Color2Code, 
+vehicle_wildcard.MAC_SetConvert(_majorColor, vehicle_wildcard.Color2Code,
  majorColor_use, 'majorColor_use')
 
 set of string3 _minorColor := [] : stored('minorColor');
-vehicle_wildcard.MAC_SetConvert(_minorColor, vehicle_wildcard.Color2Code, 
+vehicle_wildcard.MAC_SetConvert(_minorColor, vehicle_wildcard.Color2Code,
  minorColor_use, 'minorColor_use')
 
 set of string36 _model := [] : stored('model');
@@ -131,7 +131,7 @@ STRING8 _modelYearEnd    := '' : stored('modelYearEnd');
 integer modelYearEnd_use := (INTEGER)_modelYearEnd : STORED('modelYearEnd_use');
 
 STRING8 _ageRangeStart := '' : stored('AgeLower');
-integer ageRangeStart_ := IF(LENGTH(TRIM(_ageRangeStart)) < 4, 
+integer ageRangeStart_ := IF(LENGTH(TRIM(_ageRangeStart)) < 4,
  (INTEGER)_ageRangeStart,
  (INTEGER)ut.Age((UNSIGNED4)_ageRangeStart));
 
@@ -140,15 +140,13 @@ integer ageRangeEnd_ := IF(LENGTH(TRIM(_ageRangeEnd)) < 4,
  (INTEGER)_ageRangeEnd,
  (INTEGER)ut.Age((UNSIGNED)_ageRangeEnd));
 
-integer ageRangeStart_use := IF(ageRangeStart_ < ageRangeEnd_, ageRangeStart_, ageRangeEnd_) : stored('ageRangeStart_use'); 
+integer ageRangeStart_use := IF(ageRangeStart_ < ageRangeEnd_, ageRangeStart_, ageRangeEnd_) : stored('ageRangeStart_use');
 integer ageRangeEnd_use   := IF(ageRangeStart_ < ageRangeEnd_, ageRangeEnd_, ageRangeStart_) : stored('ageRangeEnd_use');
 
 STRING1 _sex := '' : stored('sex');
 STRING8 sex_use := stringlib.stringtouppercase(_sex) : stored('sex_use');
 STRING5 _filterLimit := '' : stored('filterLimit');
 integer filterLimit_use := IF ((unsigned4 )_filterLimit=0, 500, (unsigned4)_filterLimit);
-
-unsigned8 pre_MaxResultsThisTime_val := 2000 : stored('MaxResultsThisTime');
 
 set of string256 _neighbor_service_ip := [] : stored('NeighborService');
 

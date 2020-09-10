@@ -17,7 +17,7 @@ MODULE
   FUNCTION
 
     globalMod := AutoStandardI.GlobalModule();
-    timeoutSecs := 5; // gateway timeout
+    timeoutSecs := $.Constants.GatewayMaxTimeout.QSENT_RequestTimeout; // gateway timeout
     today := (string) STD.Date.Today();
 
     // Keep only one record per acctno
@@ -91,7 +91,7 @@ MODULE
 
     globalMod := AutoStandardI.GlobalModule();
     mod_access := project(inMod, doxie.IDataAccess);
-    timeoutSecs  := 5; // gateway timeout
+    timeoutSecs  := $.Constants.GatewayMaxTimeout.QSENT_RequestTimeout; // gateway timeout
     today := (string) STD.Date.Today();
 
     // Temporary layout

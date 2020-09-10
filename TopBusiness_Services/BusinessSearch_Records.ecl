@@ -196,12 +196,10 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
                                                  self.AlsoFound.properties := false;
                                                  self.AlsoFound.MVRs := false;
                                                  self.AlsoFound.Contacts := false;
-
                                                  self.AddressInfo.Location := [];
-
                          self := left;
                          self := [];
-                                                 ));
+                    ));
 
 
 
@@ -318,15 +316,15 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
             string1 disconnected;
             string8 from_date;
             string8 to_date;
+            string8 from_dateNotCurrent;
+            string8 to_dateNotCurrent;
             string120 listed_name;},
             self.disconnected := if(not exists(rows(left)(current_flag)),'Y','N'),
-
-            self.active_EDA := if(exists(rows(left)(current_flag
-                                                        )),'Y','N'),
-            self.from_date := min(rows(left)(current_flag
-                                                                      ),dt_first_seen),
-            self.to_date := max(rows(left)(current_flag
-                                          ),dt_last_seen),
+            self.active_EDA := if(exists(rows(left)(current_flag)),'Y','N'),
+            self.from_date := min(rows(left)(current_flag),dt_first_seen),
+            self.to_date := max(rows(left)(current_flag),dt_last_seen),
+            self.from_dateNotCurrent := min(rows(left),dt_first_seen),
+            self.to_dateNotCurrent := max(rows(left),dt_last_seen),                                          
             self.listing_type := map(
                 exists(rows(left)(current_flag and listing_type_gov != '')) => max(rows(left)(current_flag and listing_type_gov != ''),listing_type_gov),
                 exists(rows(left)(current_flag and listing_type_bus != '')) => max(rows(left)(current_flag and listing_type_bus != ''),listing_type_bus),
@@ -408,16 +406,15 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
             string1 disconnected;
             string8 from_date;
             string8 to_date;
+            string8 from_dateNotCurrent;
+            string8 to_dateNotCurrent;
             string120 listed_name;},
             self.disconnected := if(not exists(rows(left)(current_flag)),'Y','N'),
-
-            self.active_EDA := if(exists(rows(left)(current_flag
-                                                        )),'Y','N'),
-            self.from_date := min(rows(left)(current_flag
-
-                                                                      ),dt_first_seen),
-            self.to_date := max(rows(left)(current_flag
-                                          ),dt_last_seen),
+            self.active_EDA := if(exists(rows(left)(current_flag)),'Y','N'),
+            self.from_date := min(rows(left)(current_flag),dt_first_seen),
+            self.to_date := max(rows(left)(current_flag),dt_last_seen),
+            self.from_dateNotCurrent := min(rows(left),dt_first_seen),
+            self.to_dateNotCurrent := max(rows(left),dt_last_seen),                                            
             self.listing_type := map(
                 exists(rows(left)(current_flag and listing_type_gov != '')) => max(rows(left)(current_flag and listing_type_gov != ''),listing_type_gov),
                 exists(rows(left)(current_flag and listing_type_bus != '')) => max(rows(left)(current_flag and listing_type_bus != ''),listing_type_bus),
@@ -521,12 +518,12 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
               self.Best.TinInfo.TinInfoMatch := left.match_company_fein = 2; // 		2 is from salt
 
               tmpUrl := trim(left.company_url,left,right);
-              SlashPosition := stringlib.stringfind(tmpurl,'/',1);
+              SlashPosition := std.str.find(tmpurl,'/',1);
               cleanedUrl := if (tmpurl <> '' and SlashPosition > 1,  tmpUrl[1..slashPosition-1],
                 tmpUrl);
               self.Best.URLInfo.URL := cleanedUrl;
               self.Best.UrlInfo.UrlInfoMatch := trim(InputSearch[1].url,left,right) <> '' and
-                trim(InputSearch[1].url,left, right) = stringlib.stringtoUppercase(cleanedUrl); //
+                trim(InputSearch[1].url,left, right) = std.str.toUppercase(cleanedUrl); //
                 // uppercase it cause salt is not doing this now.
                 // salt calculation broken add this back in when fixed
                 // left.match_company_url = 2;
@@ -665,7 +662,7 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
               self.match.TinInfo.TinSource := tmpTinSource;
               tmpEmailInfoMatch := right.match_contact_email = 2 and (not(isDNBDMIrow));
               self.match.EmailINfo.emailInfoMatch := tmpEmailInfoMatch;
-              tmpEmail := if (not isDNBDMIrow,stringlib.stringToUpperCase(trim(right.contact_email_domain, left, right)),
+              tmpEmail := if (not isDNBDMIrow,std.str.toUppercase(trim(right.contact_email_domain, left, right)),
                 '');
 
               self.match.EmailInfo.Email := tmpEmail;
@@ -1152,9 +1149,10 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
                      tmp_disconnected := map( right.disconnected = 'Y' => true,
                                             right.disconnected = 'N' => false,
                                                                             false);
-
-                     tmpFromDate := iesp.ECL2ESP.toDate((unsigned)right.from_date);
-                     tmpToDate := iesp.ECL2ESP.toDate((unsigned)right.to_date);
+                               
+                 tmpFromDate := if (right.from_date <> '', right.from_date, right.from_dateNotCurrent);
+                 tmpToDate := if (right.to_date <> '', right.to_date, right.to_dateNotCurrent);
+                 
            tmpSelfMatches := project(left.matches, TopBusiness_Services.BusinessSearch_Layouts.matchRecScored);
                          tmpMatches := project(tmpSelfMatches, transform(TopBusiness_Services.BusinessSearch_Layouts.matchRecScored,
                              self.phoneInfo.ListingName := tmp_listed_name;
@@ -1165,8 +1163,8 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
                              // need to account for wireless telephones being in our files but
                              // listed in GONG has not having a current record.
                self.Disconnected  := tmp_disconnected;
-                             self.FromDate := tmpFromDate;
-                           self.ToDate := tmpToDate;
+                             self.FromDate := iesp.ECL2ESP.toDate((unsigned) tmpFromDate);
+                           self.ToDate := iesp.ECL2ESP.toDate((unsigned) tmpTodate);
 
                              // override the header data with phone data if we have it for defunct
                              // only if particular row on header has an active phone and that phone is a companyPhone  will this override take place
@@ -1210,8 +1208,10 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
          self.Best.Disconnected := map( right.disconnected = 'Y' => true,
                                             right.disconnected = 'N' => false,
                                                                             false);
-               self.Best.FromDate := iesp.ECL2ESP.toDate((unsigned)right.from_date),
-               self.Best.ToDate := iesp.ECL2ESP.toDate((unsigned)right.to_date),
+                 tmpFromDate := if (right.from_date <> '', right.from_date, right.from_dateNotCurrent);
+                 tmpToDate := if (right.to_date <> '', right.to_date, right.to_dateNotCurrent);                                                                            
+               self.Best.FromDate := iesp.ECL2ESP.toDate((unsigned) tmpFromDate),
+               self.Best.ToDate := iesp.ECL2ESP.toDate((unsigned) tmpToDate),
                // 2 additional overides from phone data
                //   to the isActive and isDefunct fields set from SELEID best.
                //

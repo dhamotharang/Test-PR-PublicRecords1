@@ -25,7 +25,7 @@ EXPORT mac_run_regression(
   %test_cases_ddp% := DEDUP(SORT(test_cases, query), query) : INDEPENDENT;
 
   #uniquename(soap_req)
-  %soap_req% := project(testcases, TRANSFORM(input_layout,
+  %soap_req% := project(test_cases, TRANSFORM(input_layout,
     SELF := FROMXML(input_layout, dev_regression.utils.wrapXML(LEFT.request_xml));
   ));
 
@@ -36,14 +36,14 @@ EXPORT mac_run_regression(
   %soap_resp_b% := dev_regression.SOAPCallRoxieQuery(soap_config.url_b, soap_config.query_b, %soap_req%, output_layout, soap_config.xp) : INDEPENDENT;
 
   #uniquename(compare_results)
-  dev_regression.mac_compare_results(testcases, %soap_resp_a%, %soap_resp_b%, %compare_results%);
+  dev_regression.mac_compare_results(test_cases, %soap_resp_a%, %soap_resp_b%, %compare_results%);
 
   #uniquename(results)
   %results% := %compare_results% : INDEPENDENT; // needed, or else we may call it multiple times
 
   #uniquename(result_summary)
   %result_summary% := DATASET([
-    {'1. nbr of testcases executed', (STRING) COUNT(testcases)},
+    {'1. nbr of testcases executed', (STRING) COUNT(test_cases)},
     {'2. successful testcases', (STRING) COUNT(%results%(result=1))},
     {'3. failed testcases', (STRING) COUNT(%results%(result<>1))},
     {'4. exceptions thrown by query', (STRING) COUNT(%results%(result = -2))},

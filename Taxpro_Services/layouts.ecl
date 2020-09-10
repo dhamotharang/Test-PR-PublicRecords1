@@ -3,49 +3,49 @@ IMPORT TAXPRO, standard, ut;
 EXPORT layouts := MODULE
 
   EXPORT id := RECORD
-    string10 tmsid;
-    string30 acctno := ''; //for batch purposes
+    STRING10 tmsid;
+    STRING30 acctno := ''; //for batch purposes
   END;
 
   EXPORT search_ids := RECORD (id)
-    boolean isDeepDive := false;
+    BOOLEAN isDeepDive := FALSE;
   END;
 
-  shared AddressTranslated := RECORD
+  SHARED AddressTranslated := RECORD
     standard.L_Address.base;
     standard.L_Address.translated;
     // those are copies rfom vendors' addresses, not cleaned!
-    // string7  FOREIGN_ZIP;
+    // string7 FOREIGN_ZIP;
     // string35 FOREIGN_COUNTRY_NAME;
-  end;
+  END;
 
-	EXPORT Layout_Common := record 
-    unsigned2 penalt := 0; // not calculated in report
-//    string10 tmsid;
+  EXPORT Layout_Common := RECORD
+    UNSIGNED2 penalt := 0; // NOT calculated in report
+// string10 tmsid;
     TAXPRO.Layout.Taxpro_Standard_Base AND NOT [name, addr];
 
     //cleaned fields
     AddressTranslated address;
-    boolean is_foreign;
+    BOOLEAN is_foreign;
     standard.Name name;
-  end;
+  END;
   
   // Full layout is relatively small, so there will be same output layout for all services
 
-  // output for SEARCH service 
+  // output for SEARCH service
   EXPORT SearchOutput := RECORD (Layout_Common)
-  END; 
+  END;
 
   // SUBREPORT (as part of CRS, for instanse)
   EXPORT EmbeddedOutput := RECORD (Layout_Common)
-  END; 
+  END;
 
   EXPORT SourceOutput := RECORD (Layout_Common)
-  END; 
+  END;
 
   // most complete and close to original
   EXPORT DataOutput := RECORD (Layout_Common)
-  END; 
+  END;
 
 END;
 
