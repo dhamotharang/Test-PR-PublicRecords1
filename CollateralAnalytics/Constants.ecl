@@ -7,7 +7,7 @@ MODULE
 	
 	//	Server IP to Spray from
 	EXPORT	serverIP	:=	IF(	_control.thisenvironment.name='Dataland',
-														'bctlpedata11.risk.regn.net',
+														'bctlpedata12.risk.regn.net',
 														'bctlpedata11.risk.regn.net');
 	
 	//	Directory to Spray from
