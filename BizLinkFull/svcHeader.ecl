@@ -6,7 +6,7 @@ IMPORT lib_ziplib;
 IMPORT lib_stringlib;
 IMPORT RiskWise;
 THISMODULE:=BizLinkFull;
-//�
+//
   UNSIGNED e_proxid := 0 : STORED('proxid',FORMAT(SEQUENCE(1)));
   SALT311.StrType Input_company_name := '' : STORED('company_name',FORMAT(SEQUENCE(2)));
   SALT311.StrType Input_prim_range := '' : STORED('prim_range',FORMAT(FIELDWIDTH(10),SEQUENCE(3)));
@@ -42,7 +42,7 @@ THISMODULE:=BizLinkFull;
   UNSIGNED InputMaxIds0 := 0 : STORED('MaxIds',FORMAT(SEQUENCE(35)));
   BOOLEAN FullMatch := FALSE : STORED('MatchAllInOneRecord',FORMAT(SEQUENCE(36)));
   BOOLEAN RecordsOnly := FALSE: STORED('RecordsOnly',FORMAT(SEQUENCE(37)));
-//�
+//
   UNSIGNED e_seleid := 0 : STORED('seleid',FORMAT(SEQUENCE(38)));
   UNSIGNED e_orgid := 0 : STORED('orgid',FORMAT(SEQUENCE(39)));
   UNSIGNED e_ultid := 0 : STORED('ultid',FORMAT(SEQUENCE(40)));
@@ -78,9 +78,9 @@ sNewState:=IF(sNewState_<>'',sNewState_,IF(sNewCity='','',address.Key_CityStChan
 // Derive the list of zip codes to use based on the radius
 //---------------------------------------------------------------------------
 dZips:=BIPV2.fn_get_zips_2(sNewCity,sNewState,Input_zip,Input_zip_radius);
-dZipWeights:=IF(dZips[1].zip='',DATASET([],THISMODULE.Process_Biz_Layouts.layout_zip_cases),PROJECT(dZips,TRANSFORM(THISMODULE.Process_Biz_Layouts.layout_zip_cases,SELF.weight:=100-((LEFT.radius/Input_zip_radius)*50);SELF:=LEFT;)));
-sCity:=dZips[1].city;
-sState:=dZips[1].state;
+dZipWeights:=IF(dZips[1].zip='',DATASET([],THISMODULE.Process_Biz_Layouts.layout_zip_cases),PROJECT(dZips,TRANSFORM(THISMODULE.Process_Biz_Layouts.layout_zip_cases,SELF.weight:=100-((LEFT.radius/Input_zip_radius)*80);SELF:=LEFT;)));
+sCity:=if(dZips[1].city='', Input_city, dZips[1].city);
+sState:=if(dZips[1].state='', Input_st, dZips[1].state);
 //---------------------------------------------------------------------------
 // Derive phone parts
 //---------------------------------------------------------------------------
@@ -96,7 +96,7 @@ sFNamePreferred:=THISMODULE.fn_PreferredName(Input_fname);
 //---------------------------------------------------------------------------
 sSortFlag:=IF(bHSort,'T','_');
 Template := dataset([],THISMODULE.Process_Biz_Layouts.InputLayout);
-//�
+//
 Input_Data := DATASET([{(TYPEOF(Template.UniqueID))Input_UniqueID,Input_MaxIds,Input_LeadThreshold,TRUE,TRUE,0
   ,(TYPEOF(Template.parent_proxid))Input_parent_proxid
   ,(TYPEOF(Template.sele_proxid))Input_sele_proxid
@@ -144,7 +144,7 @@ Input_Data := DATASET([{(TYPEOF(Template.UniqueID))Input_UniqueID,Input_MaxIds,I
   ,(TYPEOF(Template.CONTACTNAME))(THISMODULE.Fields.Make_fname((SALT311.StrType)Input_fname)+' '+THISMODULE.Fields.Make_mname((SALT311.StrType)Input_mname)+' '+THISMODULE.Fields.Make_lname((SALT311.StrType)Input_lname))
   ,(TYPEOF(Template.STREETADDRESS))(TRIM(Input_prim_range)+' '+THISMODULE.Fields.Make_prim_name((SALT311.StrType)Input_prim_name)+' '+THISMODULE.Fields.Make_sec_range((SALT311.StrType)Input_sec_range))
   ,RecordsOnly,FullMatch,e_rcid,e_proxid,e_seleid,e_orgid,e_ultid,e_powid}],THISMODULE.Process_Biz_Layouts.InputLayout);
-//�
+//
 dResults:=THISMODULE.MEOW_Biz(Input_Data).Data_;
 dProxids:=SORT(TABLE(dResults,{proxid;weight;KeysUsed;KeysFailed;UNSIGNED proxid_count:=COUNT(GROUP);},proxid,KeysFailed),-weight,proxid,KeysFailed);
 dNamesAddresses:=TABLE(dResults,{company_name;prim_range;prim_name;city;st;zip;},company_name,prim_range,prim_name,city,st,zip);
