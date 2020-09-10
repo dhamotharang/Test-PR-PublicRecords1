@@ -3,7 +3,7 @@
 EXPORT Map_BK_AssignRelease_Base (STRING	pVersionDate
 																	,DATASET(RECORDOF(BKMortgage.Layouts.AssignBase)) dsAssignBK
 																	,DATASET(RECORDOF(BKMortgage.Layouts.ReleaseBase)) dsReleaseBK
-																	,unsigned maxLNDeedFaresID = 0
+																	,DATASET(RECORDOF(LN_PropertyV2_Fast.Layout_prep_deed_mortg)) dBKMortgage
 																	) := MODULE
 		SHARED common := MODULE
 				EXPORT layout_prep_temp_deed := 
@@ -28,8 +28,8 @@ EXPORT Map_BK_AssignRelease_Base (STRING	pVersionDate
 		// Adjust layout for replacement records		
 		iBkM_L		:=	{STRING1	ReplInd, RECORDOF(iCombined)};
 		iBkM_L tRepl(iCombined L) := TRANSFORM
-			//SELF.ReplInd := IF(REGEXFIND('REFRESH',L.bk_infile_type),'Y','N');
-			SELF.ReplInd := 'N'; //For first run only.  Will uncomment above line after first run.
+			SELF.ReplInd := IF(REGEXFIND('REFRESH',L.bk_infile_type),'Y','N');
+			//SELF.ReplInd := 'N'; //For first run only.  Will uncomment above line after first run.
 			SELF:=L;
 		END;
 	EXPORT	dMortgageRawCombined :=	PROJECT(iCombined, tRepl(LEFT));
@@ -42,16 +42,15 @@ EXPORT Map_BK_AssignRelease_Base (STRING	pVersionDate
 	EXPORT mortgage := MODULE
 		// Get max value for fares id
 
-/*
 		maxLNDeedFaresID			:=MAX(	
-																MAX( ln_propertyv2.Files.Prep.LNMortgage(ln_fares_id[1..2]	=	'OM')
-																			+	ln_propertyv2.Files.Prep.LNMortgageRepl(ln_fares_id[1..2]	=	'OM'),
-																			(unsigned)ln_fares_id[3..]),
-																MAX(LN_PropertyV2_Fast.Files.prep.deed_mortg (ln_fares_id[1..2]	=	'OM'),
-																		(UNSIGNED)ln_fares_id[3..]
-																	  )
+																MAX(     ln_propertyv2.Files.Prep.LNMortgage(ln_fares_id[1..2] = 'OM')
+																	+	 ln_propertyv2.Files.Prep.LNMortgageRepl(ln_fares_id[1..2] = 'OM'),
+																		(UNSIGNED)ln_fares_id[3..]),
+																MAX(LN_PropertyV2_Fast.Files.prep.deed_mortg(ln_fares_id[1..2] = 'OM'),
+																		(UNSIGNED)ln_fares_id[3..]),
+																MAX(                             dBKMortgage(ln_fares_id[1..2] = 'OM'),
+																		(UNSIGNED)ln_fares_id[3..])
 																)	:	GLOBAL;
-*/
 																
 	code_lkp := Address.County_Names;
 	StateCodes_dict	:= DICTIONARY(code_lkp, {state_code => state_alpha});
