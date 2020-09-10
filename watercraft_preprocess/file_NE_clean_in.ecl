@@ -1,9 +1,9 @@
-import watercraft, watercraft_preprocess, ut, lib_StringLib;
+﻿import watercraft, watercraft_preprocess, ut, lib_StringLib;
 
 fIn_raw := watercraft_preprocess.Files_raw.NE;
 
 //Trim and uppercase all fields prior to mapping
-Watercraft.layout_ne CleanTrimRaw(fIn_raw L) := TRANSFORM
+Watercraft.layout_ne_20q1_new CleanTrimRaw(fIn_raw L) := TRANSFORM
 	self.STATEABREV	:= ut.CleanSpacesAndUpper(L.STATEABREV);
 	self.REG_NUM		:= ut.CleanSpacesAndUpper(IF(REGEXFIND('^[^A-Z0-9_]',L.REG_NUM), REGEXREPLACE('^[^A-Z0-9_]',L.REG_NUM,''), L.REG_NUM));
 	self.HULL_ID 		:= ut.CleanSpacesAndUpper(IF(REGEXFIND('^[^A-Z0-9_]',L.HULL_ID), REGEXREPLACE('^[^A-Z0-9_]',L.HULL_ID,''), L.HULL_ID));
@@ -20,6 +20,8 @@ Watercraft.layout_ne CleanTrimRaw(fIn_raw L) := TRANSFORM
 	self.STATE			:= ut.CleanSpacesAndUpper(StringLib.StringFindReplace(L.STATE, '?',''));
 	self.ZIP				:= ut.CleanSpacesAndUpper(StringLib.StringFindReplace(L.ZIP, '?',''));
 	self.COUNTY			:= ut.CleanSpacesAndUpper(StringLib.StringFindReplace(L.COUNTY, '?',''));
+	self.MODEL_DESC	:= ut.CleanSpacesAndUpper(L.MODEL_DESC);
+	self.TITLE_TYPE	:= ut.CleanSpacesAndUpper(L.TITLE_TYPE);
 	self.PREVIOUS_TITLE_ZIP	:= ut.CleanSpacesAndUpper(StringLib.StringFindReplace(L.PREVIOUS_TITLE_ZIP, '?',''));
 	self.TITLE_STATE				:= ut.CleanSpacesAndUpper(StringLib.StringFindReplace(L.TITLE_STATE, '?',''));
 	self.OWNER_TYPE					:= ut.CleanSpacesAndUpper(L.OWNER_TYPE);
@@ -29,8 +31,8 @@ Watercraft.layout_ne CleanTrimRaw(fIn_raw L) := TRANSFORM
 	self.PREVIOUS_TITLE_CITY	:= ut.CleanSpacesAndUpper(StringLib.StringFindReplace(L.PREVIOUS_TITLE_CITY, '?',''));
 	SELF.TITLE_NUMBER					:= ut.CleanSpacesAndUpper(StringLib.StringFindReplace(L.TITLE_NUMBER, '?',''));
 	SELF.PREVIOUS_TITLE_STATE	:= ut.CleanSpacesAndUpper(StringLib.StringFindReplace(L.PREVIOUS_TITLE_STATE, '?',''));
-	self.DUPLICATE_TITLE		:= ut.CleanSpacesAndUpper(StringLib.StringFindReplace(L.DUPLICATE_TITLE, '?',''));
-	self.PREVIOUS_OWNER_STATE	:= ut.CleanSpacesAndUpper(StringLib.StringFindReplace(L.PREVIOUS_OWNER_STATE, '?',''));
+	//self.DUPLICATE_TITLE		:= ut.CleanSpacesAndUpper(StringLib.StringFindReplace(L.DUPLICATE_TITLE, '?',''));
+	//self.PREVIOUS_OWNER_STATE	:= ut.CleanSpacesAndUpper(StringLib.StringFindReplace(L.PREVIOUS_OWNER_STATE, '?',''));
 	self	:= L;
 END;
 
