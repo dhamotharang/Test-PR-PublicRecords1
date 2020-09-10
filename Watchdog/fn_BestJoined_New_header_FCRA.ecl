@@ -145,11 +145,19 @@ bdob := DISTRIBUTE(watchdog.BestDob, did);
 
 //getdob
 lbest getdob(wvalidSSN l, bdob r) := transform
-	// it is not necessary to filter out minors here
-	// self.did := IF(r.dob = 0 or ut.Age(r.dob) >= 21, l.did, SKIP);
+	// sets dob and filters out minors
+	  self.did := IF(r.dob = 0 or ut.Age(r.dob) >= 21, l.did, SKIP);
 
-	// need to set dob 
+	// sets dob 
 	self.dob := r.dob;	
+	self := l;
+end;
+
+// sets dob and does not flter out minors 
+lbest getdob1(wvalidSSN l, bdob r) := transform
+	 // self.did := IF(r.dob = 0 or ut.Age(r.dob) >= 21, l.did, SKIP);
+	// sets dob
+		self.dob := r.dob;	
 	self := l;
 end;
 
@@ -157,8 +165,7 @@ end;
 result_wdob_ := join(distributedWvalidSSN, bdob, left.did = right.did,
 			 getdob(left, right), left outer, local);	
 
-
-//exclude the minors from watchdog GLB
+//excludes minors from watchdog GLB
 wdob := distribute(Watchdog.file_best, did);
  
 lbest exclude_minors(result_wdob_ l, wdob r) := transform
@@ -171,12 +178,17 @@ end;
 result_wdob := join(distribute(result_wdob_,did), wdob, left.did = right.did,
 			 exclude_minors(left, right), left outer, local);
 
+// dataset where minors aren't excluded 
+
+result_wdob_1 := join(distributedWvalidSSN, bdob, left.did = right.did,
+			 getdob1(left, right), left outer, local);
+
+
 
 //  if var1 is fcra_best_append, then return a dataset that excludes minors and has non-blank dob's
 // else, return a dataset, result_wdob_, that does not exclude minors and has non-blank dob's
 result_final  := map(var1 = 'fcra_best_append' => 
-		result_wdob,result_wdob_);
-
+		result_wdob,result_wdob_1);
 
 return result_final ; 
 end; 
