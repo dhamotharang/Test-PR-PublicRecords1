@@ -137,7 +137,7 @@ wvalidSSN := join(wADL_ind, bValidSSN, left.did = right.did and left.ssn = right
 
 
 			 
-// distributed by did 
+// if this is not present, dob is not populated correctly 
 distributedWvalidSSN := distribute(wvalidSSN, did);
 
 bdob := DISTRIBUTE(watchdog.BestDob, did);
@@ -172,5 +172,11 @@ result_wdob := join(distribute(result_wdob_,did), wdob, left.did = right.did,
 			 exclude_minors(left, right), left outer, local);
 
 
-return result_wdob ; 
+//  if var1 is fcra_best_append, then return a dataset that excludes minors and has non-blank dob's
+// else, return a dataset, result_wdob_, that does not exclude minors and has non-blank dob's
+result_final  := map(var1 = 'fcra_best_append' => 
+		result_wdob,result_wdob_);
+
+
+return result_final ; 
 end; 
