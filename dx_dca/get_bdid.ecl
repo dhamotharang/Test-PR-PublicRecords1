@@ -7,7 +7,7 @@
 IMPORT doxie;
 
 EXPORT get_bdid(ds_in, mod_access = MODULE (doxie.IDataAccess) END,
-  bdid_field = 'bdid', add_contacts = FALSE) := FUNCTIONMACRO
+  bdid_field = 'bdid', add_contacts = FALSE, contact_did_filter = 0) := FUNCTIONMACRO
 
 IMPORT DCA, DCAV2, Suppress, ut;
 
@@ -28,7 +28,8 @@ IMPORT DCA, DCAV2, Suppress, ut;
 
   ds_contacts_raw := JOIN(dd_ds_bdid_enterprise_num, DCAV2.Keys().ContactBdid.QA,
     KEYED(LEFT.bdid = RIGHT.bdid) AND
-    LEFT.enterprise_num = RIGHT.rawfields.enterprise_num,
+    LEFT.enterprise_num = RIGHT.rawfields.enterprise_num AND
+    (contact_did_filter = 0 OR contact_did_filter = RIGHT.did),
     TRANSFORM(RIGHT), KEEP(ut.limits.MAX_DCA_CHILDREN_PER_LEVEL), LIMIT(0));
 
   ds_contacts_suppressed := Suppress.MAC_SuppressSource(ds_contacts_raw, mod_access);
@@ -61,13 +62,6 @@ IMPORT DCA, DCAV2, Suppress, ut;
   ds_bdid_final := PROJECT(IF(add_contacts,
     ds_bdid_w_contacts_rolled, ds_bdid_no_contacts),
     dx_dca.Transforms.flatten_contacts(LEFT));
-
-  // OUTPUT(dd_ds_in, NAMED('dd_ds_in'));
-  // OUTPUT(ds_bdid_no_contacts, NAMED('ds_bdid_no_contacts'));
-  // OUTPUT(dd_contacts, NAMED('dd_contacts'));
-  // OUTPUT(bdid_w_contacts_raw, NAMED('bdid_w_contacts_raw'));
-  // OUTPUT(ds_bdid_w_contacts_rolled, NAMED('ds_bdid_w_contacts_rolled'));
-
 
   RETURN ds_bdid_final;
 
