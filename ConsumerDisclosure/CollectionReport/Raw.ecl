@@ -1,5 +1,5 @@
-IMPORT bipv2, bizlinkfull, Business_Header, doxie, domains, dx_email, experian_crdb, FBNV2, 
-  midex_services, paw, patriot, sanctn, vehiclev2;
+IMPORT bipv2, bizlinkfull, Business_Header, canadianphones_v2, cortera, doxie, domains, dx_email, experian_crdb, FBNV2, 
+  midex_services, paw, patriot, sanctn, vehiclev2, STD;
 
 EXPORT Raw := MODULE
   EXPORT GetEmailRecs(DATASET(doxie.layout_references) dids) := FUNCTION
@@ -20,9 +20,12 @@ EXPORT Raw := MODULE
     link_ids := PROJECT(bus_ids, TRANSFORM(BIPV2.IDlayouts.l_xlink_ids, SELF := LEFT;));
     RETURN link_ids;
   END;
-  EXPORT GetExperianCRDBRecs(DATASET(BIPV2.IDlayouts.l_xlink_ids) link_ids) := FUNCTION 
+  EXPORT GetExperianCRDBRecs(DATASET(BIPV2.IDlayouts.l_xlink_ids) link_ids, unsigned6 in_did) := FUNCTION 
     // -- ExperianCRDBKeys
-    exp_recs := Experian_CRDB.Key_LinkIDs.kFetch(link_ids,, BIPV2.IDconstants.Fetch_Level_SELEID);
+    exp_recs_all := Experian_CRDB.Key_LinkIDs.kFetch(link_ids,, BIPV2.IDconstants.Fetch_Level_ProxID);
+    exp_recs_did := exp_recs_all(in_did > 0 AND did = in_did);
+    exp_recs := DEDUP(SORT(exp_recs_did, ultid, orgid, seleid, proxid, powid, -dt_vendor_last_reported),
+      ultid, orgid, seleid, proxid, powid);
     RETURN exp_recs;
   END;
   EXPORT GetSanctionRecs(DATASET(doxie.layout_references) dids) := FUNCTION 
@@ -128,5 +131,59 @@ EXPORT Raw := MODULE
       TRANSFORM(RIGHT),
       ATMOST(1000), KEEP(1000));
     RETURN recs;
+  END;
+  EXPORT GetCanadianPhonesRecs(DATASET(doxie.layout_references) dids) := FUNCTION
+    fdids := JOIN(dids, canadianphones_v2.key_did,
+      KEYED(LEFT.did = RIGHT.did),
+      TRANSFORM(RIGHT),
+      ATMOST(1000), KEEP(1000));
+    fdids_unique := DEDUP(SORT(fdids, fdid), fdid);
+    recs := JOIN(fdids_unique, canadianphones_v2.key_fdids,
+      KEYED(LEFT.fdid = RIGHT.fdid),
+      TRANSFORM(RIGHT),
+      KEEP(1), LIMIT(0));
+    RETURN recs;
+  END;
+  EXPORT GetCorteraRecs(
+    DATASET(BIPV2.IDlayouts.l_xlink_ids2) link_ids, 
+    doxie.IDataAccess mod_access, 
+    UNSIGNED6 inlexID) 
+  := FUNCTION
+    key_link_id := cortera.Key_LinkIds.Key;
+    key_exec_link_id := cortera.Key_Executive_Link_Id;
+    l_cortera := RECORD
+      key_link_id;
+      key_exec_link_id.did;
+      key_exec_link_id.global_sid;
+      key_exec_link_id.record_sid;
+    END;
+    mac_blank_exec(cnt) := MACRO
+      SELF.#EXPAND('executive_name' + cnt) := '';
+      SELF.#EXPAND('title' + cnt) := '';
+    ENDMACRO;
+    // don't want to go through cortera.keyfetch2 to avoid mac_append_contact.
+    BIPV2.IDmacros.mac_IndexFetch2(link_ids, key_link_id, cortera_brecs, 
+      BIPV2.IDconstants.Fetch_Level_ProxID, 25000, BIPV2.IDconstants.JoinTypes.KeepJoin);
+    cortera_recs := JOIN(cortera_brecs, key_exec_link_id,
+      KEYED(LEFT.link_id = RIGHT.link_id AND LEFT.Persistent_record_id = RIGHT.Persistent_record_id)
+      AND (RIGHT.did = inlexID),
+    TRANSFORM(l_cortera,
+      SELF.did := RIGHT.did;
+      SELF.global_sid := RIGHT.global_sid;
+      SELF.record_sid := RIGHT.record_sid;
+      SELF.executive_name1 := STD.STR.CleanSpaces(RIGHT.title + RIGHT.fname + RIGHT.mname + RIGHT.lname + RIGHT.name_suffix);
+      SELF.title1 := RIGHT.executive_title;
+      mac_blank_exec(2);
+      mac_blank_exec(3);
+      mac_blank_exec(4);
+      mac_blank_exec(5);
+      mac_blank_exec(6);
+      mac_blank_exec(7);
+      mac_blank_exec(8);
+      mac_blank_exec(9);
+      mac_blank_exec(10);
+      SELF := LEFT),
+    ATMOST(1000), KEEP(100));
+    RETURN cortera_recs;
   END;
 END;
