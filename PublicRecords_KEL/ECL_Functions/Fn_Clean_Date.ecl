@@ -13,7 +13,7 @@ EXPORT Fn_Clean_Date (STRING InDate,
 											BOOLEAN SetDefault = FALSE
 											) := FUNCTION
 
-	InDateWithDefault := IF(SetDefault AND TRIM(InDate) = '', ut.now('%Y%m%d%T', TRUE), InDate);
+	InDateWithDefault := IF(SetDefault AND TRIM(InDate) = '', ut.now('%Y%m%d%T', FALSE), InDate);
 	FullInDateinNums := STD.Str.Filter(InDateWithDefault, '0123456789');
 	InDateinNums := (STRING8)FullInDateinNums[1..8];
 	
