@@ -1,22 +1,17 @@
 // NOTE: This is intended to be a replacement for doxie.dl_Search_Records
 IMPORT doxie;
 
-export dataset(layouts.result_wide) DLEmbed_records(
-	dataset (doxie.layout_references) dids
-) := function
+EXPORT DATASET(layouts.result_wide) DLEmbed_records(
+  DATASET (doxie.layout_references) dids
+) := FUNCTION
 
 // retrieve results
 rsrt := DLRaw.wide_view.by_did(dids);
 
 // slim to final output format (preserving sort)
-final_fmt	:= project(rsrt, layouts.result_wide);
-final_d		:= dedup(final_fmt, except dl_seq);
+final_fmt := PROJECT(rsrt, layouts.result_wide);
+final_d := DEDUP(final_fmt, EXCEPT dl_seq);
 
-// output(ids,	named('ids'));	// DEBUG
-// output(seqs,	named('seqs'));	// DEBUG
-// output(rpen,	named('rpen'));	// DEBUG
-// output(rsrt,	named('rsrt'));	// DEBUG
+RETURN final_d;
 
-return final_d;
-
-end;
+END;
