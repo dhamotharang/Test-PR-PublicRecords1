@@ -74,5 +74,5 @@ EXPORT FCRA_compliance_MAC (isFCRA,in_file,outfile) := MACRO
 						 
 												)),recordof(in_file));
 												
-						 outfile := if(isFCRA,%transformed%(ln_fares_id[1] !='R'),in_file);
+						 outfile := if(isFCRA,%transformed%(ln_fares_id[1] !='R' AND ln_fares_id[1..2] !='OM'),in_file);
 ENDMACRO;
