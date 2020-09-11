@@ -906,6 +906,25 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
       SELF.Meta_Count_OTP_30 := le.Phone_Shell.Metadata.Meta_Count_OTP_30;
       SELF.Meta_Count_OTP_60 := le.Phone_Shell.Metadata.Meta_Count_OTP_60;
       SELF.Meta_Phone_Status := le.Phone_Shell.Metadata.Meta_Phone_Status;
+      SELF.Meta_Prepaid := le.Phone_Shell.Metadata.Meta_Prepaid;
+      SELF.Meta_Dt_Last_Reported := le.Phone_Shell.Metadata.Meta_Dt_Last_Reported;
+      SELF.Meta_Carrier_City  := le.Phone_Shell.Metadata.Meta_Carrier_City;
+      SELF.Meta_Carrier_State := le.Phone_Shell.Metadata.Meta_Carrier_State;
+      SELF.Meta_Carrier_Route := le.Phone_Shell.Metadata.Meta_Carrier_Route;
+      SELF.Meta_Carrier_Route_Zonecode := le.Phone_Shell.Metadata.Meta_Carrier_Route_Zonecode;
+      SELF.Meta_Operator_ID := le.Phone_Shell.Metadata.Meta_Operator_ID;
+      SELF.Meta_Carrier_ID  := le.Phone_Shell.Metadata.Meta_Carrier_ID;
+      SELF.Meta_OCN_Abbr_Name := le.Phone_Shell.Metadata.Meta_OCN_Abbr_Name;
+      SELF.Meta_Affiliated_To := le.Phone_Shell.Metadata.Meta_Affiliated_To;
+      SELF.Meta_Contact_Name  := le.Phone_Shell.Metadata.Meta_Contact_Name;
+      SELF.Meta_Contact_Address1 := le.Phone_Shell.Metadata.Meta_Contact_Address1;
+      SELF.Meta_Contact_Address2 := le.Phone_Shell.Metadata.Meta_Contact_Address2;
+      SELF.Meta_Contact_City  := le.Phone_Shell.Metadata.Meta_Contact_City;
+      SELF.Meta_Contact_State := le.Phone_Shell.Metadata.Meta_Contact_State;
+      SELF.Meta_Contact_Zip   := le.Phone_Shell.Metadata.Meta_Contact_Zip;
+      SELF.Meta_Contact_Email := le.Phone_Shell.Metadata.Meta_Contact_Email;
+      SELF.Meta_Contact_Phone := le.Phone_Shell.Metadata.Meta_Contact_Phone;
+      SELF.Meta_Contact_Fax   := le.Phone_Shell.Metadata.Meta_Contact_Fax;
       // calculate serv-line type. This mirrors but does not exactly replicate PhoneFinder's method, since this will be available to all products.
       // (primarily, instead of using PhoneFinder's constants which are longer and all-caps, we are using these from PHZONE-192 for more readability)
       SELF.Meta_ServLine_Type := map(m_serv = '0' and m_line in ['0',''] => Progressive_Phone.Constants.ServLine_Types.Landline,

@@ -1,4 +1,4 @@
-﻿IMPORT IESP, Phone_Shell, Progressive_Phone, Risk_Indicators, RiskWise, UT;
+﻿IMPORT Risk_Indicators;
 
 EXPORT Layout_Phone_Shell := MODULE
 
@@ -363,6 +363,25 @@ EXPORT Layout_Metadata := RECORD
  STRING32 Meta_Phone_Status := '';
  STRING2  Meta_High_Risk_Indicator := '';
  STRING2  Meta_Prepaid := '';
+ 
+ STRING8  Meta_Dt_Last_Reported := '';
+ STRING30 Meta_Carrier_City  := '';
+ STRING2  Meta_Carrier_State := '';
+ STRING4  Meta_Carrier_Route := '';
+ STRING1  Meta_Carrier_Route_Zonecode := '';
+ STRING   Meta_Operator_ID := '';
+ STRING   Meta_Carrier_ID  := '';
+ STRING25 Meta_OCN_Abbr_Name := '';
+ STRING80 Meta_Affiliated_To := '';
+ STRING60 Meta_Contact_Name  := '';
+ STRING30 Meta_Contact_Address1 := '';
+ STRING30 Meta_Contact_Address2 := '';
+ STRING30 Meta_Contact_City  := '';
+ STRING2  Meta_Contact_State := '';
+ STRING9  Meta_Contact_Zip   := '';
+ STRING60 Meta_Contact_Email := '';
+ STRING10 Meta_Contact_Phone := '';
+ STRING10 Meta_Contact_Fax   := '';
 END;
 
 EXPORT Layout_Phone_Shell_Plus := RECORD
