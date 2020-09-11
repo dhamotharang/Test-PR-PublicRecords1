@@ -1,6 +1,6 @@
 IMPORT CanadianPhones, CanadianPhones_V2, Data_Services, doxie;
 
-dcwpwfdid := CanadianPhones_V2.file_cwp_with_fdid;
+dcwpwfdid := CanadianPhones_V2.file_cwp_with_fdid(did<>0);
 
 lcwpdid := RECORD
   UNSIGNED6 did;

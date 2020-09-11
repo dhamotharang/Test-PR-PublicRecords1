@@ -8,6 +8,7 @@ EXPORT Map_OtherPhones(string8 version) := FUNCTION
 	//DF-23286: Update Keys
 	
 	//DF-27818: Add "identity_count" field to OtherPhones & Transactions Base Files
+	//DF-28194: Add "carrier" field to OtherPhones Base File
 	//dx_PhoneFinderReportDelta.Layout_PhoneFinder.OtherPhones_Main trOPh(inFile l):= transform
 	PhoneFinderReportDelta.Layout_PhoneFinder.OtherPhones_Main_Temp trOPh(inFile l):= transform
 		self.date_file_loaded := version;

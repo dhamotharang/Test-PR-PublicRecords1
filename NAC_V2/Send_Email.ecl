@@ -4,12 +4,6 @@ EXPORT Send_Email(string filedate='',string fn='', string groupid='') := MODULE
 	
 	
  
-
-
-//SHARED NotificationList := NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('File Input Notifications', groupid);
- 
- 
- 
 	 
 	SHARED SendMail(string sendto, string subject, string body) := 
 						STD.System.Email.SendEmail(sendto, subject, body);
@@ -71,13 +65,14 @@ EXPORT Send_Email(string filedate='',string fn='', string groupid='') := MODULE
 								,'File not found -> '+fn
 							);
 
-	EXPORT FileValidationReport
-						:= SendMail(
-								NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('File Input Notifications', groupid)
-								,'NCF2 Contributory File Validation Report'
-								,$.Print.NCR2_to_Text(fn)
-							);
 
+	EXPORT FileValidationReport
+						:=  
+						   SendMail(
+								NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('File Input Notifications', groupid)
+								,'NCF2 Contributory File Validation Report' 
+								,  NAC_V2.Print.NCR2_to_Text(NAC_V2.GetReports(NAC_V2.PreprocessNCF2(fn), fn).dsNcr2)  
+							);
 
 END; 
 

@@ -84,8 +84,8 @@ email_alert := SEQUENTIAL(
 						,despray_bip_proxid_tbl
 						,despray_corp_fseen_tbl
 						,despray_corp_lseen_tbl):
-					Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'NonFCRA Group: NonFCRA_BIP_Corps Build Succeeded', workunit + ': Build complete.' + filedate)),
-					Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'NonFCRA Group: NonFCRA_BIP_Corps Build Failed', workunit + filedate + '\n' + FAILMESSAGE));
+					Success(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_BIP_Corps Build Succeeded', workunit + ': Build complete.' + filedate)),
+					Failure(FileServices.SendEmail(pContact, 'NonFCRA Group: NonFCRA_BIP_Corps Build Failed', workunit + filedate + '\n' + FAILMESSAGE));
 return email_alert;
 
 end;

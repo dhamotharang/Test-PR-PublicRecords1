@@ -96,8 +96,8 @@ module
 					inner,
 					local);
 
-	//Add demo data GRP-5144
-	Demo_main := dataset('~fraudgov::base::main_demo_anon',fraudshared.Layouts.base.main,thor);
+	//Add demo data GRP-5144, 5276
+	Demo_main := FraudGovPlatform.fn_demodata_refresh(pVersion);
 	
 	MergeRecs := FraudGovPlatform.fn_dedup_main( Old_Recs + New_Records_Anonymized + New_Records_Not_Anonymized + Demo_main );
 

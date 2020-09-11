@@ -1,0 +1,1 @@
+﻿export Email_List := 'shannon.skumanich@lexisnexis.com';

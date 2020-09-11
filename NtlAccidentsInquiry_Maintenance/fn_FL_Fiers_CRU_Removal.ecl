@@ -32,7 +32,7 @@ lay_fl_fiers_removal_stats := RECORD
                STRING order_id; 
 						  END;
 						 
- dsOrder := DATASET('~thor_data400::CRU::All::FLData::OrderID_07072020', lay_order, csv(SEPARATOR([',','\t']), TERMINATOR(['\n','\r\n','\n\r']),quote('"')))(order_id != 'ORDER_ID');
+ dsOrder := DATASET('~thor_data400::CRU::All::FLData::OrderID', lay_order, csv(SEPARATOR([',','\t']), TERMINATOR(['\n','\r\n','\n\r']),quote('"')))(order_id != 'ORDER_ID');
  ddsOrder := DEDUP(dsOrder(TRIM(order_id, LEFT, RIGHT) <> ''), order_id); 
 
  //OrderVersion input file 
@@ -90,7 +90,7 @@ lay_fl_fiers_removal_stats := RECORD
 																	 TRANSFORM(LEFT), LEFT ONLY, LOCAL):INDEPENDENT;
 					
 	 out_result := OUTPUT(fl_fiers_result_deletion,,'~thor_data400::in::ntl::fl_fiers_data_removal_result_'+WORKUNIT,OVERWRITE, __COMPRESSED__,
-					              CSV(TERMINATOR('\n'), SEPARATOR(',')));
+					              CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"')));
 
 	 result_all :=  SEQUENTIAL(
 														 out_result,
@@ -116,7 +116,7 @@ lay_fl_fiers_removal_stats := RECORD
 																	   TRANSFORM(LEFT), LEFT ONLY, LOCAL):INDEPENDENT;
 									 
   out_inc := OUTPUT(fl_fiers_incident_deletion,,'~thor_data400::in::ntl::fl_fiers_data_removal_incident_'+WORKUNIT,OVERWRITE, __COMPRESSED__,
-				            CSV(TERMINATOR('\n'), SEPARATOR(',')));
+				            CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"')));
 
 	incident_all :=  SEQUENTIAL(
 															out_inc,
@@ -147,7 +147,7 @@ lay_fl_fiers_removal_stats := RECORD
 																	 TRANSFORM(LEFT), LEFT ONLY, LOCAL):INDEPENDENT;
 									 	
 	 out_client := OUTPUT(fl_fiers_client_deletion,,'~thor_data400::in::ntl::fl_fiers_data_removal_client_'+WORKUNIT,OVERWRITE, __COMPRESSED__,
-					              CSV(TERMINATOR('\n'), SEPARATOR(',')));
+					              CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"')));
 
 	 client_all :=  SEQUENTIAL(
 														 out_client,
@@ -241,7 +241,7 @@ lay_fl_fiers_removal_stats := RECORD
 								                  TRANSFORM(LEFT), LEFT ONLY, LOCAL):INDEPENDENT;
 									 	
 	 out_party := OUTPUT(fl_fiers_party_deletion,,'~thor_data400::in::ntl::fl_fiers_data_removal_party_'+WORKUNIT,OVERWRITE, __COMPRESSED__,
-					             CSV(TERMINATOR('\n'), SEPARATOR(',')));
+					             CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"')));
 
 	 party_all :=  SEQUENTIAL(
 														out_party,

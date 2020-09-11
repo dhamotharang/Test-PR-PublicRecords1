@@ -91,7 +91,18 @@ export string_gong_layout := {
 				    return baseIn + gong_in ;
 		endmacro ;	
 	
-	export applyGong(baseIn) := functionmacro
+	
+		export applyGongNeustarSup(baseIn) := 
+				functionmacro
+						import suppress;
+	
+						local phone_hash(recordof(baseIn) L) := hashmd5(TRIM(l.phone10[1..10], left, right));
+						local phone_Suppress := suppress.applyregulatory.simple_sup(baseIn,'gong_sup.txt', phone_hash);
+						
+						return phone_Suppress;
+				endmacro;
+				
+		export applyGongNeustarInj(baseIn) := functionmacro
 	
       import Suppress , Gong_Neustar ;
 			      local gong_append_in := Suppress.applyRegulatory.getFile('file_gong_inj.txt', Gong_Neustar.Regulatory.string_gong_layout);
@@ -102,20 +113,8 @@ export string_gong_layout := {
 									self := left;
 									self := [] ;));
 									
-				    return baseIn + gong_in ;
-		endmacro ;	
-	
-	
-		export applyGongNeustarSup(baseIn) := 
-				functionmacro
-						import suppress;
-
-						local phone_hash(recordof(baseIn) L) := hashmd5(l.phone10[4..10] + l.phone10[1..3]);
-						local phone_Suppress := suppress.applyregulatory.simple_sup(baseIn,'gong_sup.txt', phone_hash);
-						
-						return phone_Suppress;
-				endmacro;
-				
+				   return baseIn + gong_in ;
+		endmacro ;			
 //
 // perform get functions using applyRegulatory
 //

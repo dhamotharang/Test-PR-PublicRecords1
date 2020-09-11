@@ -15,9 +15,8 @@
 		  gong_Neustar.Promotions.Base(gong_Neustar.Constants.lfnBase + current),
 			proc_build_history_keys(current+version),
 			proc_build_full_keys(current+version),
-			// CCPA-1067: temp disable update DOPS and ORBIT
-			// Gong_Neustar.UpdateDops(current+version),
-			// Gong_Neustar.UpdateOrbit(current+version),
+			UpdateDops(current+version),
+			UpdateOrbit(current+version),
 			proc_reports(current),
 			UpdateHeaderVersion
 		) :
