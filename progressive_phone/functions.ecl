@@ -651,12 +651,12 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
     // in order to pass the correct Phone Shell Version parameter to the Phone_Shell_Function
     BOOLEAN isProgressiveBatch := modelName[1..5] = 'PSV1_'; // see if this is coming from progressive_phone_batch_service
     UNSIGNED2 PhoneShellVersion := IF(isProgressiveBatch, 10, 30); // if yes, use phone shell 1.0, else use phone shell 3.0 (current default/latest)
-	
+
 	   mod_access := MODULE(Doxie.IDataAccess)
 		   EXPORT glb := GLB_Purpose;
 		   EXPORT dppa := DPPA_Purpose;
 	   END;
-	
+
     // Returns the Phone data without the score.
     phones_with_attrs := Phone_Shell.Phone_Shell_Function(
         phone_shell_withphones_in,
@@ -895,7 +895,7 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
       ds_src_other       := DATASET([rSource.source_code], {STRING3 src});
 
       SELF.phn_src_all   := DEDUP(SORT(ds_src_all + ds_src_eq + ds_src_lastresort + IF(ph_shell_bit = 0 AND ~EXISTS(ds_src_eq) AND ~EXISTS(ds_src_lastresort), ds_src_other, empty), src), src);
-      
+
       // additional Metadata attributes from the Phone Shell
       m_line := le.Phone_Shell.Metadata.Meta_Line;
       m_serv := le.Phone_Shell.Metadata.Meta_Serv;
@@ -985,7 +985,7 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
 		// output(phones_out1_Gr,named('phones_out1_Gr'));
 		// output(phones_out_temp,named('phones_out_temp'));
 		// output(phones_out1_TN,named('phones_out1_TN'));
-    
+
   //  output(choosen( PROJECT(phones_out1_TN, progressive_phone.layout_progressive_phone_common) , 100),named('getphonesv3_output'));
 
 		RETURN PROJECT(phones_out1_TN, progressive_phone.layout_progressive_phone_common);
@@ -1015,5 +1015,27 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
       RETURN PROJECT(rsUnblankedPhone10, xformBlankOutByLineType(LEFT));
 
   ENDMACRO;
+
+  EXPORT UpdateWithMetadata (DATASET(progressive_phone.layout_progressive_phone_common) ds_in)
+   := FUNCTION
+
+    Progressive_Phone.Layout_Progressive_phones.common_with_meta_rec xformMeta(progressive_phone.layout_progressive_phone_common ll) := TRANSFORM
+      // we update switch type to be in sync with phone_line_type_desc
+      SELF.switch_type := CASE(ll.Meta_Serv,
+                               '0' => $.Constants.Switch_Type.Landline,
+                               '1' => $.Constants.Switch_Type.Wireless,
+                               '2' => $.Constants.Switch_Type.VoIP,
+                               '3' => $.Constants.Switch_Type.Unknown,
+                                $.Constants.Switch_Type.Unknown);
+
+      SELF.phone_line_type_desc := ll.Meta_ServLine_Type;
+      SELF.phpl_phone_carrier := ll.Meta_Carrier_Name;
+      SELF.phpl_carrier_city := ll.Meta_Carrier_City;
+      SELF.phpl_carrier_state := ll.Meta_Carrier_State;
+      SELF := ll;
+    END;
+
+    RETURN  PROJECT(ds_in, xformMeta(LEFT));
+  END;
 
 END;
