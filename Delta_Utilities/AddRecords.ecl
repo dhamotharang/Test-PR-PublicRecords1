@@ -1,11 +1,14 @@
-export AddRecords(FullData,NewData,MatchFields,DistSet,isLookup=false):=functionmacro
+export AddRecords(FullData,NewData,recref,MatchFields,DistSet='',isDist=false,isLookup=false):=functionmacro
 
 #Declare(CommandString);
 	#declare(CommaString);
+	#declare(MatchString);
 	#Declare(numField);
 	#Set(CommandString,'');
 	#Set(CommaString,'');
+	#set(MatchString,'');
 	#Set(numField,1);
+	#if(isdist)
 	#loop
 		#IF(%numField%> Count(DistSet))
 			#BREAK 
@@ -17,8 +20,20 @@ export AddRecords(FullData,NewData,MatchFields,DistSet,isLookup=false):=function
 		#end
 		#SET(numField, %numField% + 1);
 	#end
-
-    #if(count(distset)<>0)
+	#Set(numField,1);
+	#end;
+	#loop
+		#IF(%numField%> Count(MatchFields))
+			#BREAK 
+		#ELSE
+			#append(MatchString,'Left.'+MatchFields[%numField%]+' = Right.'+MatchFields[%numField%]);
+			#if(%numField%!=Count(MatchFields))
+				#append(MatchString,' AND ');
+			#end
+		#end
+		#SET(numField, %numField% + 1);
+	#end
+    #if(isdist=false or isLookup)
         dFullData:=fulldata;
         dNewData:=newData;
     #Else
@@ -26,41 +41,42 @@ export AddRecords(FullData,NewData,MatchFields,DistSet,isLookup=false):=function
         dNewData:=distribute(newData,hash(%CommaString%));
     #end;
 
-    RecordLayout:=recordof(FullData);
+    RecordLayout:=#expand(recref);
 
     #APPEND(CommandString,'dAddRecords:=join(dFullData,dNewData,');
-	#Set(numField,1);
-	#loop
-		#IF(%numField%> Count(PersistentFields))
-			#BREAK 
-		#ELSE
-			#append(CommandString,'Left.'+PersistentFields[%numField%]+' = Right.'+PersistentFields[%numField%]);
-			#if(%numField%!=Count(PersistentFields))
-				#append(CommandString,' AND ');
-			#end
-		#end
-		#SET(numField, %numField% + 1);
+	#append(CommandString,%'MatchString'%);
+	#APPEND(CommandString,',transform(right)');
+	#if(isLookup=false)
+	#APPEND(CommandString,',right only');
 	#end
-	#APPEND(CommandString,',transform(right),right only');
-    #if(count(distset)=0)
+	#if(isdist=false or islookup)
     #append(CommandString,');\n');
     #else
-    #append(CommandString,',local)\n');
+    #append(CommandString,',local);\n');
     #end
     //#append(CommandString,'');
-    #append(CommandString,'PrevBase := MAX(distcurr,Record_Sid);\n');
+	#if(islookup)
+	#APPEND(CommandString,'dAddRecordsFinal:=join(dAddRecords,dNewData,');
+	#append(CommandString,%'MatchString'%);
+	#APPEND(CommandString,',transform(right),right only);\n');
+	#else
+	#APPEND(CommandString,'dAddRecordsFinal:=dAddRecords;\n');
+	#end
+	
+    #append(CommandString,'PrevBase := MAX(dFullData,Record_Sid);\n');
 
     #append(CommandString,'RecordLayout tCreateAdds(RecordLayout L, RecordLayout R):=TRANSFORM\n');
     #append(CommandString,'SELF.Record_Sid:=IF (l.Record_Sid=0, PrevBase+1, l.Record_Sid+thorlib.nodes());\n');
     #append(CommandString,'self.delta_ind:=1;\n');
     #append(CommandString,'self:=R;\n');
-    #append(CommandString,'end;');
+    #append(CommandString,'end;\n');
 
-    #append(CommandString,'FinalAdds:=iterate(dAddRecords,tCreateAdds(left,right));\n');
+    #append(CommandString,'FinalAdds:=iterate(dAddRecordsFinal,tCreateAdds(left,right));\n');
 
-    %CommandString%;
+    //%CommandString%;
 
-    return FinalAdds
-END;
+    //return FinalAdds;
+	return %'CommandString'%;
+
 
 endmacro;
