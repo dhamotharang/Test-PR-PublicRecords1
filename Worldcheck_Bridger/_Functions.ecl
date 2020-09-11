@@ -1355,6 +1355,8 @@
 				trim(kword, left, right) = 'ITIVASS' =>SubGroup_Constants.numKeywordsID.KEYWORD_ITIVASS,
 				trim(kword, left, right) = 'VIPD' =>SubGroup_Constants.numKeywordsID.KEYWORD_VIPD,
 				trim(kword, left, right) = 'USDOD-1237' =>SubGroup_Constants.numKeywordsID.KEYWORD_USDOD_1237,
+				trim(kword, left, right) = 'OFAC-ICCP' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_ICCP,
+				trim(kword, left, right) = 'IDRESKRIMUM' =>SubGroup_Constants.numKeywordsID.KEYWORD_IDRESKRIMUM,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

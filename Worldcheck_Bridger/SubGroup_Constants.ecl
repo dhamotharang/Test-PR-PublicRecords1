@@ -1253,6 +1253,8 @@
 		export string KEYWORD_ITIVASS								:= '939';
 		export string KEYWORD_VIPD									:= '940';
 		export string KEYWORD_USDOD_1237						:= '941';
+		export string KEYWORD_OFAC_ICCP							:= '942';
+		export string KEYWORD_IDRESKRIMUM						:= '943';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

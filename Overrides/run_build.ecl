@@ -63,9 +63,8 @@ EXPORT run_build(string infiledate
 													,move_keys
 													//DF-22458 Show non-blank/no-zero record counts of deprecated fields in override keys
 													,overrides.Verify_Deprecated_Keys
-													// temp disable update DOPS and ORBIT
-													// ,dops_update
-													// ,orbit_update
+													,dops_update
+													,orbit_update
 													,if (~isprte
 														, sequential(
 																	comparecount
