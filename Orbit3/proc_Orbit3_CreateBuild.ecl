@@ -5,15 +5,15 @@ import std,ut,Orbit3,_Control;
 export Proc_Orbit3_CreateBuild(string buildname,string Buildvs,string Envmt = 'N', boolean skipcreatebuild = false,boolean skipupdatebuild = false,boolean runcreatebuild = true, string email_list = '',boolean is_npf = false) := function
 
 string wuid := workunit;
-/*
- boolean skipcreatebuild_sp := (>boolean<) skipcreatebuild;
-boolean skipupdatebuild_sp := (>boolean<) skipupdatebuild;
-boolean runcreatebuild_sp := (>boolean<) runcreatebuild;
-boolean is_npf_sp := (>boolean<) is_npf;*/
+
+ boolean skipcreatebuild_sp := TRANSFER(skipcreatebuild,boolean);
+boolean skipupdatebuild_sp := TRANSFER(skipupdatebuild,boolean);
+boolean runcreatebuild_sp := TRANSFER(runcreatebuild,boolean);
+boolean is_npf_sp := TRANSFER(is_npf,boolean);
 
 
 ECL1 := '#workunit(\'name\',\'Orbit Create Build Instance -- '+ buildname + '-- '+Buildvs+'\');\r\n'+
-		 'Orbit3.proc_Orbit3_CreateBuild_sp( \''+buildname+'\',  \''+Buildvs+'\', \''+Envmt+'\', \''+email_list+'\',  +skipcreatebuild+  ,   +skipupdatebuild+ ,   +runcreatebuild+ ,   +is_npf+  , \''+wuid+'\') \n' 
+		 'Orbit3.proc_Orbit3_CreateBuild_sp( \''+buildname+'\',  \''+Buildvs+'\', \''+Envmt+'\', \''+email_list+'\',  '+skipcreatebuild_sp+'  ,   '+skipupdatebuild_sp+' ,   '+runcreatebuild_sp+' ,  '+is_npf_sp+'  , \''+wuid+'\') \n' 
 		+'	  : success(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_success)\n'
           +'	, failure(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_failure)\n'
            +'	;\n';
