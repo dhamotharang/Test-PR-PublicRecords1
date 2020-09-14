@@ -1,5 +1,7 @@
 ﻿IMPORT Overrides;
 
+EXPORT  GetTrueOrphans(STRING filedate) := FUNCTION
+
 	OverrideBase := overrides.GetOverrideBase;
 
 	output(TABLE(OverrideBase, {Datagroup, cnt := COUNT(GROUP)}, Datagroup, MERGE), NAMED('DsLexid_override_base'));
@@ -15,20 +17,20 @@
 	dsOut_C := DEDUP(dsOut_candidates(IsOverride and ~IsOverwritten), all);
 	
 	//GONG
-	GongTrueOrphans := Overrides.Gong_Override_Findings(dsOut_C(datagroup = 'GONG'));
+	GongTrueOrphans := Overrides.Gong_Override_Findings(dsOut_C(datagroup = 'GONG'), filedate);
 		
 	GongTrueOrphans;	
-//Overrides.Gong_Override_Findings(dsOutNorm(datagroup = 'Gong'), GongTrueOrphans);	
 	
 	// PAW
 	
 	// ALLOY
-	/*
+	
 	BaseTrueOrphans := (
 					GongTrueOrphans
 					//+ Paw
 	): PERSIST('~thor_data400::persist::override_trueorphans');
 	
-
-	EXPORT GetTrueOrphans := BaseTrueOrphans;
-  */
+	RETURN BaseTrueOrphans;
+	
+END;	 
+	 

@@ -3,8 +3,8 @@
 
 //OverrideBase(DataGroup = 'GONG');
 
-orphan_file_gong := Proc_Build_Override_Orphans('20200305');
+orphan_file_gong := Proc_Build_Override_Orphans('20200501');
 
-orphan_file_gong;
+//orphan_file_gong;
 
-//output(orphan_file_gong, named('gong_orphans'));
+output(orphan_file_gong, named('gong_orphans_end'));

@@ -1,15 +1,9 @@
 ﻿IMPORT iesp, std, fcra;
-EXPORT Gong_Override_Findings(DATASET(Override_Layouts.Layout_Get_Orphans) orphansIn) :=  FUNCTION
+EXPORT Gong_Override_Findings(DATASET(Override_Layouts.Layout_Get_Orphans) orphansIn, STRING filedate) :=  FUNCTION
 	
-	
-   OUTPUT(SORT(orphansIn, did), NAMED('orphans_ds'));
+   //OUTPUT(SORT(orphansIn, did), NAMED('orphans_ds'));
 
 	orphans_ds := orphansIn;
-
-	// evaluate
-	//overrides.mac_orphans_evaluate(gong,'gong',orphans_ds,dsout_gong,,did,persistent_record_id,,,,name_first,name_last,prim_range, prim_name, z5);
-	
-	//OUTPUT(SORT(dsout_gong(recid != '0'),did), NAMED('evaluate'));	
 
 	// get the did and recid from orphan_ds
 	orphan_did_set := SET(orphans_ds(recid != '0'), (UNSIGNED)did);
@@ -189,19 +183,29 @@ EXPORT Gong_Override_Findings(DATASET(Override_Layouts.Layout_Get_Orphans) orpha
 
 	total_orphans_checked := PROJECT(total_orphans, PayloadCheck(LEFT));
    
-	OUTPUT(total_orphans_checked, NAMED('total_gong_orphans_checked'));	
+	//OUTPUT(total_orphans_checked, NAMED('total_gong_orphans_checked'));	
 	 
-	 
+	// current run 
 	GongTrueOrphans := total_orphans_checked(found_in_payload = FALSE);
 	
-	OUTPUT(GongTrueOrphans, NAMED('true_orphans'));														 
-	// test one true orphan check by name
+	OUTPUT(GongTrueOrphans, NAMED('gong_true_orphans'));														 
+	
+	// call growth check
+	GongOrphans_GrowthCheck_ds := PROJECT(GongTrueOrphans, TRANSFORM(overrides.File_Override_Orphans.orphan_rec,
+														SELF.datagroup := Constants.GONG, SELF.did := (STRING) LEFT.did, SELF := LEFT));
+		
+    build_stats := GrowthCheck(filedate, Constants.GONG, GongOrphans_GrowthCheck_ds).BuildStats; 
+	
+	build_stats;
+  	
+	BOOLEAN stats_alerts := GrowthCheck(filedate, Constants.GONG, GongOrphans_GrowthCheck_ds).StatsAlerts;
 
-
-	//OUTPUT(overrides.payload_keys.gong(did IN [754179542, 929495453487]), NAMED('Payload_Keys_Gong_DID_754179542'));
-	//OUTPUT(overrides.payload_keys.gong(persistent_record_id IN [754179542, 929495453487]), NAMED('Payload_Keys_Gong_RECID_754179542'));
-
-	RETURN GongTrueOrphans;
+	sent_email := IF (stats_alerts, FileServices.sendemail(EmailNotification.orphan_alert_list,'Gong Override True Orphans COUNT is higher than threshold count 50  :WU#: '+ workunit, failmessage));
+ 	
+   result_orphans := IF(~stats_alerts,GongTrueOrphans);
+	
+	
+	RETURN result_orphans;
 
 END;	
 

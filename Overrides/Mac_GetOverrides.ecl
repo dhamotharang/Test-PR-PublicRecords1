@@ -185,29 +185,6 @@ IMPORT _Control,iesp,ConsumerDisclosure;
 
 		dNorm1:=dNorm(~ComplianceFlags.IsPropagatedCorrection, ComplianceFlags.IsSuppressed  or ComplianceFlags.IsOverride  or ComplianceFlags.IsOverwritten);
 
-		dNorm1;
-
-		// Layout_SoapResponse out_xform(dNorm1 L):=TRANSFORM
-			// SELF.datagroup		 := L.Metadata.Datagroup; 
-			// SELF.did					 := L.Metadata.lexid;
-			// SELF.RECID 				 := trim(L.Metadata.RecID.RecID1)
-														// + trim(L.Metadata.RecID.RecID2)
-														// +	trim(L.Metadata.RecID.RecID3)
-														// +	trim(L.Metadata.RecID.RecID4);
-													
-			// SELF.IsSuppressed  := L.Metadata.ComplianceFlags.IsSuppressed;
-			
-			// SELF.IsOverride    := L.Metadata.ComplianceFlags.IsOverride;
-			
-			// SELF.IsOverwritten := L.Metadata.ComplianceFlags.IsOverwritten;
-				
-			// SELF.Rawdata := L.Rawdata;
-
-		// END;
-			
-		// dsOut := project(dNorm1, out_xform(LEFT));
-
-
 		dsOut_1 :=table(dNorm1 , {Datagroup
 					,lexid
 					,RecID_:=trim(RecID.RecID1)
@@ -227,11 +204,8 @@ IMPORT _Control,iesp,ConsumerDisclosure;
 			SELF.datagroup		 := L.Datagroup; 
 			SELF.did					 := L.lexid;
 			SELF.RECID 				 := trim(L.RecID_);
-													
 			SELF.IsSuppressed  := L.IsSuppressed_;
-			
 			SELF.IsOverride    := L.IsOverride_;
-			
 			SELF.IsOverwritten := L.IsOverwritten_;
 		END;
  
