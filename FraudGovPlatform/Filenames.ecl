@@ -141,7 +141,9 @@ module
 		export PrepaidPhone	:= tools.mod_FilenamesBuild(Template('PrepaidPhone'),pversion);
 		export BocaShell		:= tools.mod_FilenamesBuild(Template('BocaShell'),pversion);
 		export AgencyActivityDate		:= tools.mod_FilenamesBuild(Template('AgencyActivityDate'),pversion);
-		
+		export BaseUnitTests		:= tools.mod_FilenamesBuild(Template('BaseUnitTests'),pversion);
+		export KeysUnitTests		:= tools.mod_FilenamesBuild(Template('KeysUnitTests'),pversion);
+
 		//Kel Files
 		export kel_customeraddress	:= tools.mod_FilenamesBuild(Template('kel::customeraddress'),pversion);
 		export kel_personstats			:= tools.mod_FilenamesBuild(Template('kel::personstats'),pversion);
@@ -223,6 +225,8 @@ module
 			PrepaidPhone.dAll_filenames +
 			BocaShell.dAll_filenames +
 			AgencyActivityDate.dAll_filenames +
+			BaseUnitTests.dAll_filenames +
+			KeysUnitTests.dAll_filenames +
 			//kel base
 			kel_customeraddress.dAll_filenames +
 			kel_personstats.dAll_filenames +
