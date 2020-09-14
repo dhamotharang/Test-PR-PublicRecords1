@@ -77,7 +77,7 @@ end;
 
 export StatusRefresh_error_desc := 'Error occurred in status refresh.';
 
-export DTE_error_desc := 'The requested public record was not available.';
+export DTE_error_desc := 'The record is no longer reporting and may not be used in an FCRA decision.';
 
 export Deferred_request_desc := 'Request has been Deferred';
 

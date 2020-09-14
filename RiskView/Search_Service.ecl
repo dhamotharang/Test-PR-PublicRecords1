@@ -424,7 +424,7 @@ search_results_temp := ungroup(
 	
 	valid_riskview_xml_response := project(search_results,
 		transform(iesp.riskview2.t_RiskView2Response,
-                suppress_condition := IF(STD.Str.ToLowerCase(LEFT.Message) = STD.Str.ToLowerCase(Riskview.Constants.Deferred_request_desc) AND (REAL)InterfaceVersion > 2.5 AND ExcludeStatusRefresh = FALSE, TRUE, FALSE);
+                suppress_condition := IF((STD.Str.ToLowerCase(LEFT.Message) = STD.Str.ToLowerCase(Riskview.Constants.Deferred_request_desc) OR STD.Str.ToLowerCase(LEFT.Exception_Code) = STD.Str.ToLowerCase('-1')) AND (REAL)InterfaceVersion > 2.5 AND ExcludeStatusRefresh = FALSE, TRUE, FALSE);
 				self.Result.UniqueId := IF(~suppress_condition, LEFT.LexID, '');
 				self.Result.InputEcho := search;
 				self.Result.Models := IF(~suppress_condition, modelResults);
@@ -466,7 +466,7 @@ search_results_temp := ungroup(
                                                              '', 									
                                                              RiskView.Constants.StatusRefresh_error_desc}], iesp.share.t_WsException); 
                ds_excep_DTE := DATASET([{'Roxie', 
-                                                             left.Exception_code,  
+                                                             IF(left.Exception_code = '-1', '41', left.Exception_code),
                                                              '', 									
                                                              RiskView.Constants.DTE_error_desc}], iesp.share.t_WsException);
 
@@ -474,7 +474,7 @@ search_results_temp := ungroup(
 																			  custom3_model_name = 'mla1608_0' or custom4_model_name = 'mla1608_0' or 
 																			  custom5_model_name = 'mla1608_0') and left.Exception_code <> '' => ds_excep,
                                         STD.Str.ToLowerCase(AttributesVersionRequest) = RiskView.Constants.checking_indicators_attribute_request and left.Exception_code <> '' => ds_excep_Checking_Indicators,
-                                        IncludeStatusRefreshChecks = TRUE AND LEFT.Exception_Code <> '' => ds_excep_status_refresh,
+                                        IncludeStatusRefreshChecks = TRUE AND COUNT(DeferredTransactionIDs) = 0 AND LEFT.Exception_Code <> '' => ds_excep_status_refresh,
                                         IncludeStatusRefreshChecks = TRUE AND COUNT(DeferredTransactionIDs) <> 0 AND LEFT.Exception_Code <> '' => ds_excep_DTE,
 																			  ds_excep_blank);
               SELF.result.fdcheckingindicator := left.FDGatewayCalled;
@@ -576,7 +576,7 @@ Deltabase_Logging_prep := project(riskview_xml, transform(Risk_Reporting.Layouts
 Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
 // #stored('Deltabase_Log', Deltabase_Logging);
 
-suppress_condition := IF(STD.Str.ToLowerCase(riskview_xml[1]._Header.Message) = STD.Str.ToLowerCase(Riskview.Constants.Deferred_request_desc) AND (REAL)InterfaceVersion > 2.5 AND ExcludeStatusRefresh = FALSE, TRUE, FALSE);
+suppress_condition := IF(riskview_xml[1].Result.Consumer.Inquiry = ROW([], iesp.share_fcra.t_FcraConsumerInquiry) AND (REAL)InterfaceVersion > 2.5 AND ExcludeStatusRefresh = FALSE, TRUE, FALSE);
 //Improved Scout Logging
 IF(~DisableOutcomeTracking and ~TestDataEnabled AND ~suppress_condition, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs__fcra_transaction__log__scout')));
 
