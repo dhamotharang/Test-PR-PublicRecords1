@@ -1,6 +1,6 @@
-import		address, BIPV2;
+﻿import		address, BIPV2;
 EXPORT Layout_Header_Out := RECORD
-	Cortera.Layout_Header;
+	Cortera.Layout_Header - First_Seen; //Excluding for keys
 	// ***
 		unsigned4	processDate;
 		string8		version;

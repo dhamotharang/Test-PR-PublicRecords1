@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT Base_MAC_PopulationStatistics(infile,Ref='',Input_dt_first_seen = '',Input_dt_last_seen = '',Input_dt_vendor_first_reported = '',Input_dt_vendor_last_reported = '',Input_process_date = '',Input_record_type = '',Input_clean_company_name = '',Input_clean_telephone_num = '',Input_state = '',Input_zip_code5 = '',Input_mail_score = '',Input_name_gender = '',Input_web_address = '',Input_sic8_1 = '',Input_sic8_2 = '',Input_sic8_3 = '',Input_sic8_4 = '',Input_sic6_1 = '',Input_sic6_2 = '',Input_sic6_3 = '',Input_sic6_4 = '',Input_sic6_5 = '',Input_database_site_id = '',Input_database_individual_id = '',Input_email = '',Input_email_present_flag = '',Input_site_source1 = '',Input_site_source2 = '',Input_site_source3 = '',Input_site_source4 = '',Input_site_source5 = '',Input_site_source6 = '',Input_site_source7 = '',Input_site_source8 = '',Input_site_source9 = '',Input_site_source10 = '',Input_individual_source1 = '',Input_individual_source2 = '',Input_individual_source3 = '',Input_individual_source4 = '',Input_individual_source5 = '',Input_individual_source6 = '',Input_individual_source7 = '',Input_individual_source8 = '',Input_individual_source9 = '',Input_individual_source10 = '',Input_email_status = '',OutFile) := MACRO
+EXPORT Base_MAC_PopulationStatistics(infile,Ref='',Input_dt_first_seen = '',Input_dt_last_seen = '',Input_dt_vendor_first_reported = '',Input_dt_vendor_last_reported = '',Input_process_date = '',Input_record_type = '',Input_clean_company_name = '',Input_clean_telephone_num = '',Input_state = '',Input_zip_code5 = '',Input_mail_score = '',Input_name_gender = '',Input_web_address = '',Input_sic8_1 = '',Input_sic8_2 = '',Input_sic8_3 = '',Input_sic8_4 = '',Input_sic6_1 = '',Input_sic6_2 = '',Input_sic6_3 = '',Input_sic6_4 = '',Input_sic6_5 = '',Input_transaction_date = '',Input_database_site_id = '',Input_database_individual_id = '',Input_email = '',Input_email_present_flag = '',Input_site_source1 = '',Input_site_source2 = '',Input_site_source3 = '',Input_site_source4 = '',Input_site_source5 = '',Input_site_source6 = '',Input_site_source7 = '',Input_site_source8 = '',Input_site_source9 = '',Input_site_source10 = '',Input_individual_source1 = '',Input_individual_source2 = '',Input_individual_source3 = '',Input_individual_source4 = '',Input_individual_source5 = '',Input_individual_source6 = '',Input_individual_source7 = '',Input_individual_source8 = '',Input_individual_source9 = '',Input_individual_source10 = '',Input_email_status = '',OutFile) := MACRO
   IMPORT SALT311,Scrubs_DataBridge;
   #uniquename(of)
   %of% := RECORD
@@ -138,6 +138,12 @@ EXPORT Base_MAC_PopulationStatistics(infile,Ref='',Input_dt_first_seen = '',Inpu
       '' 
     #ELSE
         IF( le.Input_sic6_5 = (TYPEOF(le.Input_sic6_5))'','',':sic6_5')
+    #END
+ 
++    #IF( #TEXT(Input_transaction_date)='' )
+      '' 
+    #ELSE
+        IF( le.Input_transaction_date = (TYPEOF(le.Input_transaction_date))'','',':transaction_date')
     #END
  
 +    #IF( #TEXT(Input_database_site_id)='' )

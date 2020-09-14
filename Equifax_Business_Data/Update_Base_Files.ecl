@@ -61,7 +61,9 @@ function
 		self.clean_company_address.zip		 			:= r.zip				;
 		self.clean_company_address.st   		    := r.st					;		    
 		self.clean_company_address.p_city_name 	:= r.p_city_name;
-		self.efx_email                          := l.efx_email; 	  				;	
+		self.raw_aid                            := r.raw_aid;
+		self.ace_aid                            := r.ace_aid;
+		self.efx_email                          := l.efx_email; 	  				
 		self := l;		
 		self := [];
 	end;

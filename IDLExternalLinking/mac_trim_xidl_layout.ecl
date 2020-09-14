@@ -48,6 +48,9 @@ export mac_trim_xidl_layout(inDataset, outDataset, inReference_field = 'referenc
 		INTEGER1 source_rid_match_code,
 		INTEGER1 rid_match_code,
 		INTEGER1 mainname_match_code,
+    INTEGER1 fname2_match_code,
+    INTEGER1 lname2_match_code,
+    INTEGER1 vin_match_code,
 		UNSIGNED4 keys_used,		
 		STRING30 matches := '',
 		string5 ssn5 := '',
@@ -68,7 +71,7 @@ export mac_trim_xidl_layout(inDataset, outDataset, inReference_field = 'referenc
 		UNSIGNED6 reference;		
 	end;
 	
-	outDataset := PROJECT(inDataset, 
+	outDataset := PROJECT(inDataset,
 				TRANSFORM(%OutputLayout_Base%, 
 					SELF.resolved := LEFT.resolved, 
 					SELF.reference := LEFT.inReference_field,																	
@@ -80,8 +83,8 @@ export mac_trim_xidl_layout(inDataset, outDataset, inReference_field = 'referenc
 													+ LEFT.DOBWeight_month
 													+ LEFT.DOBWeight_day;
 									ssnweight := left.ssn5weight + left.ssn4weight;
-									SELF.did := IF ( (InsuranceHeader_xLink.Environment.isCurrentBoca 
-											AND LEFT.did > IDLExternalLinking.Constants.INSURANCE_LEXID) 
+									SELF.did := IF ( (InsuranceHeader_xLink.Environment.isCurrentBoca
+											AND LEFT.did > IDLExternalLinking.Constants.INSURANCE_LEXID)
 											OR (
 													((LEFT.stweight > 7 and LEFT.stweight <=12 and ~(SELF.DOBweight>=15 or SSNweight >=20)) 
 														OR (LEFT.stweight>12))

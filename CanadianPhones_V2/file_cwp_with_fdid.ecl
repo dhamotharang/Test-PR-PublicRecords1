@@ -109,6 +109,9 @@ slim_canadianWP := RECORD
 	//Added for CCPA-90
 	UNSIGNED4 global_sid;
 	UNSIGNED8 record_sid;
+	//Added for CCPA-1030
+  UNSIGNED6 did := 0;
+  INTEGER3  DID_Score := 0;
 END;
 
 slim_canadianWP xpand_canadianWP(canadianWP le,integer cntr) :=  TRANSFORM 

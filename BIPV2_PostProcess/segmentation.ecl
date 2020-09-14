@@ -1,4 +1,4 @@
-import BIPV2_Files, ut, BIPV2_PROX_SALT_int_fullfile,BIPv2_HRCHY,BIPV2,BIPV2_Tools;
+﻿import BIPV2_Files, ut, BIPV2_PROX_SALT_int_fullfile,BIPv2_HRCHY,BIPV2,BIPV2_Tools;
 EXPORT segmentation(
    // dataset(BIPv2_HRCHY.Layouts.HrchyBase ) pInfile  = project(bipv2.CommonBase.DS_CLEAN,BIPv2_HRCHY.Layouts.HrchyBase)
    dataset(BIPV2.CommonBase.layout )  pInfile  = BIPV2.CommonBase.DS_CLEAN
@@ -13,22 +13,30 @@ EXPORT segmentation(
 	shared integer sixMonths := 180;
 	shared activeStatus := ['ACTIVE'];
 ///////	
-ds_slim_status := project(pInfile, transform({unsigned6 id,string1 inactive}, self.id := 
-                                                                               map(idName = 'PROXID' => left.proxid, 
-																																									 idName = 'SELEID' 	=> left.seleid, 
-																																									 idName = 'ORGID' 	=> left.orgid, 
-																																									 idName = 'ULTID' 	=> left.ultid, 
-																																									 idName = 'POWID' 	=> left.POWID, 
-																																										left.proxid)
-                                                                            , self.inactive := 
-                                                                               map(idName = 'PROXID' => left.proxid_status_private, 
-																																									 idName = 'SELEID' 	=> left.seleid_status_private, 
-																																									 idName = 'ORGID' 	=> left.orgid_status_private, 
-																																									 idName = 'ULTID' 	=> left.ultid_status_private, 
-																																									 idName = 'POWID' 	=> left.POWID_status_private, 
-																																										left.proxid_status_private)
-                                                                                    ));
-shared ds_set_status_dedup := table(ds_slim_status  ,{id,inactive},id,inactive,merge);
+ds_slim_status := project(pInfile, transform({unsigned6 id,string1 inactive,string1 status_score}
+  ,self.id        :=   map(  idName = 'PROXID'  => left.proxid 
+                            ,idName = 'SELEID'  => left.seleid 
+                            ,idName = 'ORGID'   => left.orgid 
+                            ,idName = 'ULTID' 	=> left.ultid 
+                            ,idName = 'POWID' 	=> left.POWID 
+                            ,                      left.proxid
+                       )
+
+        
+  ,self.inactive  :=  map(  idName = 'PROXID' => left.proxid_status_private 
+                           ,idName = 'SELEID' => left.seleid_status_private
+                           ,idName = 'ORGID' 	=> left.orgid_status_private
+                           ,idName = 'ULTID' 	=> left.ultid_status_private
+                           ,idName = 'POWID' 	=> left.POWID_status_private
+                           ,                     left.proxid_status_private
+                      )
+   
+  ,self.status_score :=  if(   idName = 'SELEID'  ,(string1)left.seleid_status_private_score 
+                              ,                    ''
+                        )
+  ));
+  
+shared ds_set_status_dedup := table(ds_slim_status  ,{id,inactive,status_score},id,inactive,status_score,merge);
 /////////
 	shared proxFile := project(pinfile, BIPV2_PostProcess.layouts.slim_layout_v1) : 
 	// persist('~thor::persist::BIPV2_PostProcess::segmentation.proxFile');
@@ -102,6 +110,7 @@ withECore := join(withCore, ecore_t1, left.id = right.id, xform_ecore(left, righ
 // end;
 seg_layout xform_inactive(withECore l, ds_set_status_dedup r) := transform
 	self.inactive			:= r.inactive;
+  self.status_score := r.status_score;
 	self := l;
 end;
 export withInactive := join(withEcore, ds_set_status_dedup, left.id = right.id, xform_inactive(left, right), left outer,keep(1)); 

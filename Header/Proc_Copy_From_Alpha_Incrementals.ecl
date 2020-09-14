@@ -40,15 +40,15 @@ SHARED getFileVersion(string sf,boolean alp=false) := FUNCTION
 
 END;
 
-EXPORT  filedate := getFileVersion(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::inc_boca::did::refs::relative',true):INDEPENDENT ;
+EXPORT  filedate := '20200901';//getFileVersion(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::inc_boca::did::refs::relative',true):INDEPENDENT ;
 
 SHARED fc(string f1, string f2):= sequential(
     output(dataset([{f1,'thor400_44',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
-    if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_44',f2,,,,,true,true,,true))));
+    if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_44',f2,,,,400,TRUE,,TRUE,TRUE,,10000000))));
 
 SHARED fc8(string f1, string f2):= sequential(
     output(dataset([{f1,'thor400_36',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
-    if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_36',f2,,,,,true,true,,true))));
+    if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_36',f2,,,,400,TRUE,,TRUE,TRUE,,10000000))));
 
 EXPORT copy_addr_uniq_keys_from_alpha(string filedt) := function
   
@@ -61,8 +61,11 @@ EXPORT copy_addr_uniq_keys_from_alpha(string filedt) := function
   AddrLFKeyName(boolean fcra)  := '~thor_data400::key::' + if(fcra, 'fcra::', '') + 'header::' + filedt + '::addr_unique_expanded';
 
   copyKeys := sequential(
-     fc(get_alogical('thor_data400::key::insuranceheader_incremental::fcra::qa::addr_unique_expanded'), AddrLFKeyName(true))
-    ,fc(get_alogical('thor_data400::key::insuranceheader_incremental::qa::addr_unique_expanded'), AddrLFKeyName(false))
+    //  fc(get_alogical('thor_data400::key::insuranceheader_incremental::fcra::qa::addr_unique_expanded'), AddrLFKeyName(true))
+     fc('foreign::10.194.112.105::thor_data400::key::insuranceheader_incremental::fcra::20200901::addr_unique_expanded', AddrLFKeyName(true))
+,fc('foreign::10.194.112.105::thor_data400::key::insuranceheader_incremental::20200901::addr_unique_expanded',AddrLFKeyName(false))
+
+    // ,fc('get_alogical('thor_data400::key::insuranceheader_incremental::qa::addr_unique_expanded''), AddrLFKeyName(false))
     );
     
   moveKeys := sequential(    
@@ -124,7 +127,8 @@ EXPORT copy_from_alpha(string filedt) := function
 
     // Copy foreign keys to local thor
     copy_incremental_keys := sequential(
-     fc(get_alogical('thor_data400::key::insuranceheader_segmentation::did_ind_qa'),'~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind')
+     //fc(get_alogical('thor_data400::key::insuranceheader_segmentation::did_ind_qa'),'~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind')
+     fc('foreign::10.194.112.105::thor_data400::key::insuranceheader_segmentation::20200901::did_ind','~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind')
     ,fc(get_alogical(aPrefLoc + 'locid_qa')      ,'~' + aPrefLoc + filedt + '::locid')  
     ,fc(get_alogical(aPref+'did::refs::address') ,fName(filedt, '::did::refs::address'))
     ,fc(get_alogical(aPref+'did::refs::dln')     ,fName(filedt, '::did::refs::dln'))
@@ -139,6 +143,9 @@ EXPORT copy_from_alpha(string filedt) := function
     ,fc(get_alogical(aPref+'did::refs::zip_pr')  ,fName(filedt, '::did::refs::zip_pr'))
     ,fc(get_alogical(aPref+'did::sup::rid')      ,fName(filedt, '::did::sup::rid'))
     ,fc(get_alogical(aPref+'header')             ,fName(filedt, '::idl'))
+    ,fc(get_alogical(aPref+'header_vin')         ,fName(filedt, '::idl_vin'))
+    ,fc(get_alogical(aPref+'header_relative')    ,fName(filedt, '::idl_relative'))
+    ,fc(get_alogical(aPref+'did::refs::vin')     ,fName(filedt, '::did::refs::vin'))
        
     //copy to cluster - thor400_36
     ,fc8('~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind' ,'~thor400_36::key::insuranceheader_segmentation::' + filedt + '::did_ind')
@@ -155,6 +162,9 @@ EXPORT copy_from_alpha(string filedt) := function
     ,fc8(fName(filedt, '::did::refs::zip_pr')  ,fName8(filedt, '::did::refs::zip_pr'))
     ,fc8(fName(filedt, '::did::sup::rid')      ,fName8(filedt, '::did::sup::rid'))
     ,fc8(fName(filedt, '::idl')                ,fName8(filedt, '::idl'))
+    ,fc8(fName(filedt, '::idl_vin')            ,fName8(filedt, '::idl_vin'))
+    ,fc8(fName(filedt, '::idl_relative')       ,fName8(filedt, '::idl_relative'))
+    ,fc8(fName(filedt, '::did::refs::vin')     ,fName8(filedt, '::did::refs::vin'))
     );
 
     return copy_incremental_keys;
@@ -217,8 +227,11 @@ EXPORT update_inc_superfiles(boolean skipIncSFupdate=false, string filedt) := fu
     ,updateSupers('::did::refs::ssn',skipIncSFupdate, ,filedt)
     ,updateSupers('::did::refs::ssn4',skipIncSFupdate, ,filedt)
     ,updateSupers('::did::refs::zip_pr',skipIncSFupdate, ,filedt)
-    ,updateSupers('::did::sup::rid',skipIncSFupdate, ,filedt)
-    ,updateSupers('::did'          ,skipIncSFupdate, ,filedt)    
+    ,updateSupers('::did::sup::rid' ,skipIncSFupdate, ,filedt)
+    ,updateSupers('::did'           ,skipIncSFupdate, ,filedt)
+    ,updateSupers('::did::refs::vin',skipIncSFupdate, ,filedt)    
+    ,updateSupers('::header_vin'       ,skipIncSFupdate, '::idl_vin', filedt)  
+    ,updateSupers('::header_relative'  ,skipIncSFupdate, '::idl_relative', filedt)
     );
 END;
 
@@ -270,7 +283,7 @@ END;
 // run on hthor
 EXPORT Refresh_copy(string filedt) :=  FUNCTION
 
-    ok_LAB_to_copy := filedt <>'' AND ~test_copy AND (~std.file.fileexists('~thor_data400::key::insuranceheader_xlink::'+filedt+'::did::refs::idl'));
+    ok_LAB_to_copy := filedt <>'' AND ~test_copy AND (~std.file.fileexists('~thor_data400::key::insuranceheader_xlink::'+filedt+'::idl'));
     cpLab := if(ok_LAB_to_copy
              ,copy_from_alpha(filedt)
              ,output('No LAB copy. see outputs')             

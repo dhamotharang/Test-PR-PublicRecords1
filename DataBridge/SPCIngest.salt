@@ -58,8 +58,8 @@ FIELD:address2:0,0
 FIELD:city:0,0
 FIELD:state:0,0
 FIELD:scf:0,0
-FIELD:zip:0,0
-FIELD:zip4:0,0
+FIELD:zip_code5:0,0
+FIELD:zip_code4:0,0
 FIELD:mail_score:0,0
 FIELD:area_code:0,0
 FIELD:telephone_number:0,0
@@ -121,6 +121,8 @@ FIELD:sec_range:DERIVED:0,0
 FIELD:p_city_name:DERIVED:0,0
 FIELD:v_city_name:DERIVED:0,0
 FIELD:st:DERIVED:0,0
+FIELD:zip:DERIVED:0,0
+FIELD:zip4:DERIVED:0,0
 FIELD:cart:DERIVED:0,0
 FIELD:cr_sort_sz:DERIVED:0,0
 FIELD:lot:DERIVED:0,0

@@ -124,7 +124,8 @@ import std, AID_Support;
 	// These need adjusted for CRK (copied from Sharecare for example)
 	EXPORT STRING OrbitUser 							:= 	'svc_orbithc_crk@mbs';
 	// EXPORT STRING OrbitPasswordProd				:=  'i2jk518A4Y'						; 
-	EXPORT STRING OrbitPasswordDev				:=  'i2jk518A4Y'						; // QA (prod too?)
+	EXPORT STRING OrbitPasswordDev				:=  'i2jk518A4Y'						; // QA
+	EXPORT STRING OrbitPasswordProd				:=  '7bB3Ubom73'						; // Prod
 	EXPORT STRING SOAPService	(STRING s) 	:= 	'lex:' + s													;
 	EXPORT STRING OrbitRR			(STRING s)	:= 	s + 'Response/' + s + 'Result'			;
 	EXPORT STRING Domain 									:= 	'HC'												;
@@ -139,6 +140,7 @@ import std, AID_Support;
 	// EXPORT STRING	devOrbit 								:= 	'https://qa.orbit3.risk.regn.net/Orbit3/Orbit3Services/OrbitServiceGeneric.svc';
 	EXPORT STRING	devOrbit 								:= 	'https://orbitqa-hc.noam.lnrm.net/Orbit4Services/OrbitServiceGeneric.svc';
 	// EXPORT STRING	prodOrbit 							:= 	'https://orbit3.risk.regn.net/Orbit3/Orbit3Services/OrbitServiceGeneric.svc?Wsdl';
+	// EXPORT STRING	prodOrbit 							:= 	'https://orbithc.noam.lnrm.net/Orbit4Services/OrbitServiceGeneric.svc?wsdl';
 
 	// EXPORT STRING	RoxieServiceName 				:= 	'healthcare_sharecare_eligibility.eligibility_service_v3';
 	// EXPORT STRING	certRoxie_url 					:= 	'http://10.176.68.135:9876/';
@@ -257,23 +259,24 @@ import std, AID_Support;
 	//----------------------------------------------------------------------------------------------
 	// The following will cause dev to skip Orbit interactions.  Sandbox to test in Dev
 	// EXPORT boolean UseOrbit               := IF(WhereAmI = daliDev, false, true);
-	EXPORT boolean UseOrbit               := IF(WhereAmI = daliDev, false, false);   // no orbit yet
+	EXPORT boolean UseOrbit               := true; //IF(WhereAmI = daliDev, false, false);   // no orbit yet
 	
-	EXPORT STRING targetURL	 							:= TRIM	(
-																									CASE	( 	WhereAmI
-																													, daliProd 	=> devOrbit // prodOrbit
-																													,	daliDev 	=> devOrbit
+	EXPORT STRING targetURL	 							:= devOrbit;
+																							// TRIM	(
+																									// CASE	( 	WhereAmI
+																													// , daliProd 	=> devOrbit // prodOrbit
+																													// ,	daliDev 	=> devOrbit
+																													// ,	devOrbit
+																												// )
+																								// )	;
+	EXPORT STRING OrbitPassword 	 				:= OrbitPasswordDev;
+																						// TRIM	(
+																									// CASE	( 	WhereAmI
+																													// , daliProd 	=> OrbitPasswordDev // OrbitPasswordProd
+																													// ,	daliDev 	=> OrbitPasswordDev
 																													// ,	'Unknown' 
-																													,	devOrbit
-																												)
-																								)	;
-	EXPORT STRING OrbitPassword 	 				:= TRIM	(
-																									CASE	( 	WhereAmI
-																													, daliProd 	=> OrbitPasswordDev // OrbitPasswordProd
-																													,	daliDev 	=> OrbitPasswordDev
-																													,	'Unknown' 
-																												)
-																								)	;	
+																												// )
+																								// )	;	
 	
 	EXPORT vStatus	(		BOOLEAN status
 										, STRING oStatus
