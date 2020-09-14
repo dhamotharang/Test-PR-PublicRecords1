@@ -8,6 +8,6 @@ EXPORT Email_Notification_Lists(
 		 _Control.MyInfo.EmailAddressNotify	
 	  ,_Control.MyInfo.EmailAddressNotify  
 	  ,_Control.MyInfo.EmailAddressNotify  
-	  ,_Control.MyInfo.EmailAddressNotify + ';' + roxiekeybuild.Email_Notification_List
+	  ,_Control.MyInfo.EmailAddressNotify + ';Lindsey.Decot@lexisnexisrisk.com;Rosemary.Murphy@lexisnexisrisk.com;' + roxiekeybuild.Email_Notification_List
 	  ,pIsTesting
 	 );

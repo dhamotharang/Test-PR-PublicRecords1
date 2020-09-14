@@ -1,5 +1,5 @@
 ﻿import versioncontrol, _control, ut, tools, UPI_DataBuild__dev, HealthcareNoMatchHeader_InternalLinking, HealthcareNoMatchHeader_Ingest, Workman;
-export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_name, pBatch_jobID, pAppendOption, pReceivingID) := functionmacro
+export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_name, pBatch_jobID, pAppendOption, pReceivingID, crk_suffix, pOrbEnv) := functionmacro
 	return module
 	export check_supers	:= function
 		superFile_frombatch 						:= if(pHistMode = 'A',FileServices.SuperFileExists('~ushc::crk::from_batch::' + gcid),
@@ -163,48 +163,80 @@ export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_n
 		
 	export pVersion_unique			:= pVersion + '_' + trim(pBatch_jobID);
 	
-	export pMasterBuild					:= 'G' + gcid + '_CRK003';
-	export Orbit_token					:= UPI_DataBuild__dev.Orbit_Login();
+	export pMasterBuild					:= 'G' + gcid + '_' + crk_suffix;
+	export Orbit_token					:= if(pOrbEnv = 'QA', UPI_DataBuild__dev.Orbit_Login(), UPI_DataBuild__dev.Orbit_LoginPROD());
 	
-	export createNewBuild				:= 	UPI_DataBuild__dev.Orbit_CreateBuild(
+	export createNewBuildQA			:= 	UPI_DataBuild__dev.Orbit_CreateBuild(
 																						pMasterBuild
 																					 ,UPI_DataBuild__dev.Orbit_Tracking.OrbitBuildInProgress
 																					 ,pVersion_unique
 																					 ,''
 																					 ,pMasterBuild
-																					 ,orbit_token):independent;
+																					 ,orbit_token
+																					 ,pOrbEnv):independent;
+	
+	export createNewBuildPROD		:= 	UPI_DataBuild__dev.Orbit_CreateBuild(
+																						pMasterBuild
+																					 ,UPI_DataBuild__dev.Orbit_TrackingPROD.OrbitBuildInProgress
+																					 ,pVersion_unique
+																					 ,''
+																					 ,pMasterBuild
+																					 ,orbit_token
+																					 ,pOrbEnv):independent;
 																					 
 	export addComponent					:= UPI_DataBuild__dev.Orbit_AddComponentsToABuild ( 		
 																						pMasterBuild
 																					 ,pVersion_unique
 																					 ,pReceivingID
-																					 ,orbit_token):independent;
+																					 ,orbit_token
+																					 ,pOrbEnv):independent;
 																					 
-	export changeBuildStatus		:= UPI_DataBuild__dev.Orbit_UpdateBuildStatus (		
+	export changeBuildStatusQA	:= UPI_DataBuild__dev.Orbit_UpdateBuildStatus (		
 																						pMasterBuild
 																					 ,UPI_DataBuild__dev.Orbit_Tracking.OrbitBuilt
 																					 ,pVersion_unique
 																					 ,orbit_token
 																					 ,//comment
+																					 ,pOrbEnv
 																					 ):independent;
 																					 
-	export changeRecdItemStatusSprayed	:= UPI_DataBuild__dev.Orbit_UpdateReceiveItem (
+	export changeBuildStatusPROD:= UPI_DataBuild__dev.Orbit_UpdateBuildStatus (		
+																						pMasterBuild
+																					 ,UPI_DataBuild__dev.Orbit_TrackingPROD.OrbitBuilt
+																					 ,pVersion_unique
+																					 ,orbit_token
+																					 ,//comment
+																					 ,pOrbEnv
+																					 ):independent;
+																					 
+	export changeRecdItemStatusSprayedQA	:= UPI_DataBuild__dev.Orbit_UpdateReceiveItem (
 																					 pReceivingID
 																					,UPI_DataBuild__dev.Orbit_Tracking.OrbitSprayed
-																					,orbit_token):independent;
+																					,orbit_token
+																					,pOrbEnv):independent;
+
+	export changeRecdItemStatusSprayedPROD	:= UPI_DataBuild__dev.Orbit_UpdateReceiveItem (
+																					 pReceivingID
+																					,UPI_DataBuild__dev.Orbit_TrackingPROD.OrbitSprayed
+																					,orbit_token
+																					,pOrbEnv):independent;
 																					
-	export changeRecdItemStatusBuilt	:= UPI_DataBuild__dev.Orbit_UpdateReceiveItem (
+	export changeRecdItemStatusBuiltQA	:= UPI_DataBuild__dev.Orbit_UpdateReceiveItem (
 																					 pReceivingID
 																					,UPI_DataBuild__dev.Orbit_Tracking.OrbitBuilt
-																					,orbit_token):independent;
+																					,orbit_token
+																					,pOrbEnv):independent;
+																					
+	export changeRecdItemStatusBuiltPROD	:= UPI_DataBuild__dev.Orbit_UpdateReceiveItem (
+																					 pReceivingID
+																					,UPI_DataBuild__dev.Orbit_TrackingPROD.OrbitBuilt
+																					,orbit_token
+																					,pOrbEnv):independent;
 
-																					 
-
-												
 	export step1 := sequential(
 			check_supers
-			,ChangeRecdItemStatusSprayed
-			,CreateNewBuild
+			// ,if(pOrbEnv = 'QA', ChangeRecdItemStatusSprayedQA, ChangeRecdItemStatusSprayedPROD)
+			,if(pOrbEnv = 'QA', CreateNewBuildQA, CreateNewBuildPROD)
 			,AddComponent			
 			,FileServices.ClearSuperFile(UPI_DataBuild__dev.Filenames_V2(pVersion_unique,pUseProd,gcid,pHistMode).batch_lInputTemplate) // if processing new input - clear out anything that might still be in the *in* superfile
 			,FileServices.AddSuperFile(UPI_DataBuild__dev.Filenames_V2(pVersion_unique,pUseProd,gcid,pHistMode).batch_lInputTemplate,UPI_DataBuild__dev._Dataset(pUseProd).thor_cluster_files + 'from_batch::' + gcid + '::' + trim(pBatch_jobID,all) + '::' + pVersion)
@@ -259,8 +291,7 @@ export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_n
 
 			,FileServices.FinishSuperFileTransaction() 
 			
-			,ChangeRecdItemStatusBuilt
-			,ChangeBuildStatus
+			,if(pOrbEnv = 'QA', ChangeBuildStatusQA, ChangeBuildStatusPROD)
 
 ); 
 end;

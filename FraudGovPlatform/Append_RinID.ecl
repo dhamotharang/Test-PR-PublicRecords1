@@ -2,7 +2,7 @@
 //1.Send main dataset to append lexid
 EXPORT Append_RinID(
 	dataset(FraudShared.Layouts.Base.Main) FileBase
-    ,dataset(FraudShared.Layouts.Base.Main) Previous_Build = IF(_Flags.FileExists.Base.MainOrigQA, FraudGovPlatform.Files().Base.Main_Orig.QA, DATASET([], FraudShared.Layouts.Base.Main))
+    ,dataset(FraudShared.Layouts.Base.Main) Previous_Build = $.Files().Base.Main_Orig.QA
 ) := FUNCTION
 
 	FirstRinID := FraudGovPlatform.Constants().FirstRinID;

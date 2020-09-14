@@ -3,14 +3,19 @@ import FraudGovPlatform_Analytics;
 IMPORT KEL12 AS KEL;
 IMPORT Std;
 
-#option('multiplePersistInstances', false);
+//#option('multiplePersistInstances', false);
 #option('defaultSkewError', 1);
 #option('resourceMaxHeavy', 2);
 //#option('freezepersists', true);
-
+#OPTION('expandSelectCreateRow', TRUE)
 
 Set_entitycontextuid:=['_1814789556728917185197','_1817705727575360173926','_1813477488177115018873'];
 
+//FraudGovKEL.b_event.__EE3557558_1(T___Act_Uid_.v = 105889499);
+//Aot_Id_Act_Cnt30_D__7_
+// p9___aotidactcnt30d);
+
+//p9___aot_id_act_cnt30_d
 /*
 t1 := TABLE(FraudGovKEL.KEL_EventShell.CleanEventShell(customerid=20995239 and industrytype = 1029), {t1_napsummary, reccount := COUNT(GROUP)}, t1_napsummary, MERGE);
 TOPN(t1, 100, -reccount); 
@@ -29,11 +34,11 @@ TOPN(t3, 100, -reccount);
 
 
 //OUTPUT(COUNT(Std.Str.SplitWords(KEL_EventShell.NicoleAttr, ',')), named('AttributeCount'));
-/*
-ModelingOutput := FraudgovKEL.KEL_EventShell.ModelingStats;
-output(ModelingOutput,,'~fraudgov::deleteme_nd', overwrite);	
-output(ModelingOutput,,'~fraudgov::deleteme_nd_csv', CSV(QUOTE('"')), overwrite);
-*/
+
+//ModelingOutput := FraudgovKEL.KEL_EventShell.ModelingStats;
+//output(ModelingOutput,,'~fraudgov::deleteme_nd', overwrite);	
+//output(ModelingOutput,,'~fraudgov::deleteme_nd_csv', CSV(QUOTE('"')), overwrite);
+
 /*
 ScoringOutput := FraudgovKEL.KEL_EventPivot.InputWithRules(industrytype = 1029 and customerid = 20995239);
 output(ScoringOutput,,'~fraudgov::deleteme_rules_nd_csv', CSV(QUOTE('"')), overwrite);	
@@ -41,7 +46,7 @@ output(ScoringOutput,,'~fraudgov::deleteme_rules_nd_csv', CSV(QUOTE('"')), overw
 
 output(FraudgovKEL.KEL_EventPivot.EventPivotShell,,'~fraudgov::eventpivot', overwrite, compressed);
 output(FraudgovKEL.KEL_EventPivot.EntityProfileRules,,'~fraudgov::entityrules', overwrite, compressed);
-output(FraudgovKEL.KEL_EntityStats,, '~fraudgov::pivotentitystatsfilter', overwrite, compressed);
+output(FraudgovKEL.KEL_EntityStats,, 'fraudg~fraudgov::pivotentitystatsfilter', overwrite, compressed);
 output(FraudgovKEL.KEL_GraphPrep.Edges,,'~fraudgov::rin2::graphedges', overwrite);
 output(FraudgovKEL.KEL_GraphPrep.Vertices,,'~fraudgov::rin2::graphpvertices', overwrite);
 

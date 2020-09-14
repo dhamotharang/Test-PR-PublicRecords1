@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////
 // Attribute 	: HOGAN_DID
 
 // DEPENDENT ON : liensV2.Mapping_Hogan_party,
@@ -139,7 +139,7 @@ Business_Header_SS.MAC_Add_BDID_FLEX(preBDID_src,myset,
 						,mname										// mname
 						,lname										// lname
 						,													// Contact_SSN
-						,source										// Source Â– MDR.sourceTools
+						,source										// Source Ã‚â€“ MDR.sourceTools
 						,persistent_record_id			//Source_Record_Id
 						,true											//Src_Matching_is_priorty
 						);
@@ -235,9 +235,15 @@ hogan_party_update := project(file_party_fein_adds,tremovetempDID(left));
 daily_plus_full := distribute((Full_hogan_remove_Delete  + hogan_party_update),hash(tmsid));
 
 // Sort and Dedup locally
-
-full_sort := sort(daily_plus_full,record,except Date_First_Seen, Date_Last_Seen,
-			   Date_Vendor_First_Reported, Date_Vendor_Last_Reported,name_type, orig_rmsid,local);
+//DF-27482
+full_sort := sort(daily_plus_full,tmsid,rmsid,bCBFlag, eviction,orig_full_debtorname, orig_name ,orig_lname,orig_fname,orig_mname,orig_suffix,DOB,
+tax_id,ssn,title,fname,mname,lname,name_suffix,name_score,cname,orig_address1,orig_address2 ,orig_city ,orig_state ,orig_zip5 ,orig_zip4,orig_county,orig_country,
+prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,phone,DID,BDID,persistent_record_id, TMSID_old,RMSID_old,global_sid,record_sid,app_SSN ,app_tax_id,DotID,DotScore,DotWeight,
+EmpID,EmpScore,EmpWeight,POWID,POWScore,POWWeight,ProxID,ProxScore,ProxWeight,SELEID,SELEScore,SELEWeight,OrgID,OrgScore,OrgWeight,UltID,UltScore,
+UltWeight,xadl2_keys_used,xadl2_keys_desc,xadl2_weight,xadl2_Score,xadl2_distance,xadl2_matches,xadl2_matches_desc,-Date_Vendor_Last_Reported,-orig_rmsid,local);
+//DF-27482
+// full_sort := sort(daily_plus_full,record,except Date_First_Seen, Date_Last_Seen, 
+			   // Date_Vendor_First_Reported, Date_Vendor_Last_Reported,name_type, orig_rmsid,local);
 
 /*cng change output file with orig_rmids not deduped*/
 output(full_sort,,'~thor_data400::base::liens::party::Hogan_full_temp', overwrite);

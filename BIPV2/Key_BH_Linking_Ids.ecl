@@ -8,7 +8,7 @@ MODULE
 	shared superfile_name         := BIPV2_Build.keynames(, pUseOtherEnvironment:= tools._Constants.IsDataland).linkids.qa        ;
 	shared superfile_name_hidden  := BIPV2_Build.keynames(, pUseOtherEnvironment:= tools._Constants.IsDataland).linkids_hidden.qa ;
 	
-	shared infile         := BIPV2.CommonBase.DS_PROD_CLEAN;
+	shared infile         := BIPV2.CommonBase.DS_CLEAN;
   shared Infile_hidden  := join(BIPV2.CommonBase.DS_BUILT,infile, left.rcid=right.rcid  ,transform({BIPV2.CommonBase.DS_BASE}  ,self:=left), left only,hash); //Add hash because RHS skewed, based on distribution of LHS partition points
 	
 	shared infile_rec := record
@@ -216,6 +216,8 @@ MODULE
    unsigned4            global_sid                                                                  ;
    unsigned8            record_sid                                                                  ;
    unsigned6            locid                                                                       ;
+   unsigned1            seleid_status_private_score                                                 ;
+   unsigned1            seleid_status_public_score                                                  ;
 end;
 
 		    	
@@ -280,11 +282,12 @@ end;
 		,boolean                                dnbFullRemove               = false // optionally clobber all DNB data; by default we apply masking
 		,boolean                                bypassContactSuppression    = false // Optionally skip BIPV2_Suppression.mac_contacts - only use this if you are 100% certain you aren't using contact information
 		,unsigned1                              JoinType                    = BIPV2.IDconstants.JoinTypes.KeepJoin
-    ,boolean                                pApplyMarketingSuppression  = false                                 // Apply marketing suppression?
-          ,doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
+        ,boolean                                pApplyMarketingSuppression  = false                                 // Apply marketing suppression?
+        ,doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
+        ,DATASET(BIPV2.IDlayouts.l_filter_record) dFilter                   = DATASET([],BIPV2.IDlayouts.l_filter_record)   
   ) :=
   function   
-		BIPV2.IDmacros.mac_IndexFetch2     (inputs, Key, ds_fetched , Level, JoinLimit, JoinType);
+        BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, ds_fetched , Level, JoinLimit, JoinType, dFilter);		    
 		    
 		ds_restricted := ds_fetched(BIPV2.mod_sources.isPermitted(in_mod,not dnbFullRemove).bySource(source,vl_id,dt_first_seen));
 		ds_masked     := if(dnbFullRemove, ds_restricted, BIPV2.mod_sources.applyMasking(ds_restricted,in_mod));

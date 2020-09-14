@@ -608,9 +608,11 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
     
 		isDunns(string src) := (MDR.sourcetools.sourceisDunn_Bradstreet(src) or 
                             MDR.sourcetools.SourceIsDunn_Bradstreet_Fein(src));
-															
-    ds_updates_with_fein    := pDs_Fein(company_fein != '');
-    ds_updates_without_fein := pDs_Fein(company_fein  = '');
+		
+    Ds_Fein_fix := project(pDs_Fein ,transform(recordof(left),self.company_fein := if(trim(left.company_fein) not in ['999999999']  ,left.company_fein,''),self := left));
+    
+    ds_updates_with_fein    := Ds_Fein_fix(company_fein != '');
+    ds_updates_without_fein := Ds_Fein_fix(company_fein  = '');
 		
     ds_base_with_deleted_fein    := pDs_Base(deleted_fein != '' and isDunns(source));
 

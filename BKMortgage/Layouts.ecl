@@ -75,6 +75,12 @@ EXPORT Layouts := MODULE
 		STRING30 bk_infile_type := '';
 		Assign_Raw_in;
 	END;
+	
+	//Adding raw_file_name for Property mapping
+	EXPORT Assign_Raw_out_ext := RECORD
+		Assign_Raw_out;
+		STRING100 raw_file_name { virtual(logicalfilename)};
+	END;
 
 	EXPORT AssignBase  := RECORD
 		UNSIGNED6 record_id;
@@ -85,11 +91,10 @@ EXPORT Layouts := MODULE
 		STRING8 process_date;
 		STRING2 source;
 		Assign_Raw_out;
-	//Name without extra information such as Trustee, AKA, DBA, Husband and Wife, etc
+	//Name parsed, if can be parsed, and without extra information such as AKA, DBA, etc
 		STRING	ClnOriglenderben;
 		STRING	ClnAssignorName;
 		STRING	ClnAssignee;
-		STRING	ClnBorrowerName;
 //DBA name for lendor names only. No DBA field for borrower in Mortgage layout
 		STRING	DBAOrigLenderBen;
 		STRING	DBAAssignor;
@@ -98,7 +103,7 @@ EXPORT Layouts := MODULE
 		BOOLEAN	new_record; //Used to determine what records to pass to property
 	END;
 	
-		EXPORT Release_Raw_in	:= RECORD
+	EXPORT Release_Raw_in	:= RECORD
 		STRING1		RecType;
 		STRING2		DocumentType;
 		STRING5		FIPSCode;
@@ -163,12 +168,18 @@ EXPORT Layouts := MODULE
 		STRING5		AssessorPropertyZip;
 		STRING4		AssessorPropertyZip4;
 		STRING1		AssessorPropertyAddrSource;
-END;
+	END;
 
 	EXPORT Release_Raw_out	:= RECORD
 		STRING8 ln_filedate := ''; 
 		STRING30 bk_infile_type := '';
 		Release_Raw_in;		
+	END;
+	
+	//Adding raw_file_name for Property mapping
+	EXPORT Release_Raw_out_ext := RECORD
+		Release_Raw_out;
+		STRING100 raw_file_name { virtual(logicalfilename)};
 	END;
 	
 	EXPORT ReleaseBase  := RECORD 
@@ -180,10 +191,9 @@ END;
 		STRING8 process_date;
 		STRING2 source;
 		Release_Raw_out;
-	//Name without extra information such as Trustee, AKA, DBA, Husband and Wife, etc
+	//Name parsed, if can be parsed, and without extra information such as AKA, DBA, etc
 		STRING	ClnLenderBen;	
 		STRING	ClnCurrentLenderBen;
-		STRING	ClnBorrowerName;
 	//DBA name for lendor names only. No DBA field for borrower in Mortgage layout
 		STRING	DBALenderBen;
 		STRING	DBACurrentLenderBen;
@@ -248,7 +258,9 @@ END;
 		STRING8		PrevTransferCertificateOfTitle;
 		STRING8		MortgagePayoffDate;
 		STRING		Clnlenderben;
-		STRING		ClnBorrowerName;
+		STRING		BorrowerName1;
+		STRING		BorrowerName2;
+		STRING		OtherBorrowerName; //Contains additional borrower names if multiple names can be parsed
 		STRING		DBALenderBen;
 		STRING100 raw_file_name;
 		BOOLEAN		new_record; //Used to determine what records to pass to property

@@ -1,12 +1,28 @@
 ﻿EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,inputFile,MemailList)	:=	FUNCTIONMACRO
-	import FraudShared,FraudGovPlatform,Salt35,Scrubs,tools,STD;
+	import FraudShared,FraudGovPlatform,Salt35,Scrubs,tools,STD,ut;
 	folder := #EXPAND(myFolder);
 	inFile := inputFile;
-	datasetName	:=	'FraudGov';
-	scrubs_name := IF(TRIM(scopename,ALL)<>'',TRIM(scopename,ALL)+'_Scrubs','Scrubs');
-	scope_datasetName := IF(TRIM(scopename,ALL)<>'',scopename+'_'+datasetName,datasetName);
+	datasetName	:= 'FraudGov';
+	scrubs_name :=TRIM(scopename,ALL)+'_SCRUBS';
+	scope_datasetName := TRIM(scopename,ALL)+'_' + DatasetName	;
 	profilename := 'Scrubs_FraudGov_'+scopename;
-		
+
+	Filename := '~'+map(
+			scopename = 'InquiryLogs' => STD.File.GetSuperFileSubName(FraudGovPlatform.Filenames(BuildDate).Sprayed.InquiryLogs,1),
+			scopename = 'NAC' => STD.File.GetSuperFileSubName(FraudGovPlatform.Filenames(BuildDate).Sprayed.NAC,1),
+			scopename = 'RDP' => STD.File.GetSuperFileSubName(FraudGovPlatform.Filenames(BuildDate).Sprayed.RDP,1),
+			scopename = 'Deltabase' => STD.File.GetSuperFileSubName(FraudGovPlatform.Filenames(BuildDate).Sprayed.Deltabase,1),
+			''
+			);
+	process_date := BuildDate;
+	file_date := map(
+			scopename = 'InquiryLogs' => '',
+			scopename = 'NAC' => STD.Str.SplitWords(Filename, '_', FALSE)[6],
+			scopename = 'RDP' => STD.Str.SplitWords(Filename, '_', FALSE)[6],
+			scopename = 'Deltabase' => (STD.Str.SplitWords(Filename, '_', FALSE)[2])[1..8],
+			STD.Str.SplitWords(Filename, '::', FALSE)[3]
+		);
+
 		// F := inFile(process_date=filedate); //	Records to scrub
 	F := inFile; //	Records to scrub
 	S := folder.#EXPAND(scrubs_name); //	My scrubs module
@@ -93,16 +109,19 @@
 	EmailReport:=if(MemailList <>'', fileservices.sendEmail(MemailList,
 		'Scrubs Plus Reporting '+ProfileName,
 		'Scrubs Plus Reporting\n\n'+
-		'DatasetName:'+DatasetName+'\n'+
-		'ProfileName:'+ProfileName+'\n'+
-		'ScopeName:'+scopename+'\n'+
-		'FileDate:'+BuildDate+'\n'+
-		'Total Number of Records:'+TotalRecs+'\n'+
-		'Total Number of Rules:'+NumRules+'\n'+
-		'Total Number of Failed Rules:'+NumFailedRules+'\n'+
-		'Total Number of Errored Records:'+ErroredRecords+'\n'+
-		'Percent Errored Records:'+PcntErroredRec+'\n'+
-		'Total Number of Removed Recs:'+TotalRemovedRecs+'\n'+
+		'DatasetName: '+DatasetName+'\n'+
+		'ProfileName :'+ProfileName+'\n'+
+		'ScopeName: '+scopename+'\n'+
+		'Process Date : '+process_date+'\n'+
+		'FileDate : '+file_date+'\n'+
+		'Filename : '+TRIM(STD.Str.ToLowerCase(Filename),ALL )+'\n'+
+		'\n'+
+		'Total Number of Records :'+TotalRecs+'\n'+
+		'Total Number of Rules :'+NumRules+'\n'+
+		'Total Number of Failed Rules :'+NumFailedRules+'\n'+
+		'Total Number of Errored Records :'+ErroredRecords+'\n'+
+		'Percent Errored Records :'+PcntErroredRec+'\n'+
+		'Total Number of Removed Recs :'+TotalRemovedRecs+'\n'+
 		'Workunit:'+tools.fun_GetWUBrowserString()+'\n'));
 
 	SubmitStats :=	Scrubs.OrbitProfileStats(profilename,'ScrubsAlerts',prj_Orbit_stats,BuildDate,profilename).SubmitStats;
