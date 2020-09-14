@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT Source_Level_Base_MAC_PopulationStatistics(infile,Ref='',source='',Input_cellphoneidkey = '',Input_source = '',Input_household_flag = '',Input_cellphone = '',Input_npa = '',Input_phone7 = '',Input_phone7_did_key = '',Input_pdid = '',Input_did = '',Input_did_score = '',Input_datefirstseen = '',Input_datelastseen = '',Input_datevendorfirstreported = '',Input_datevendorlastreported = '',Input_dt_nonglb_last_seen = '',Input_glb_dppa_flag = '',Input_did_type = '',Input_origname = '',Input_address1 = '',Input_address2 = '',Input_origcity = '',Input_origstate = '',Input_origzip = '',Input_orig_phone = '',Input_orig_carrier_name = '',Input_prim_range = '',Input_predir = '',Input_prim_name = '',Input_addr_suffix = '',Input_postdir = '',Input_unit_desig = '',Input_sec_range = '',Input_p_city_name = '',Input_v_city_name = '',Input_state = '',Input_zip5 = '',Input_zip4 = '',Input_cart = '',Input_cr_sort_sz = '',Input_lot = '',Input_lot_order = '',Input_dpbc = '',Input_chk_digit = '',Input_rec_type = '',Input_ace_fips_st = '',Input_ace_fips_county = '',Input_geo_lat = '',Input_geo_long = '',Input_msa = '',Input_geo_blk = '',Input_geo_match = '',Input_err_stat = '',Input_title = '',Input_fname = '',Input_mname = '',Input_lname = '',Input_name_suffix = '',Input_name_score = '',Input_rawaid = '',Input_cleanaid = '',Input_current_rec = '',Input_first_build_date = '',Input_last_build_date = '',Input_ingest_tpe = '',Input_verified = '',Input_cord_cutter = '',Input_activity_status = '',Input_prepaid = '',Input_global_sid = '',Input_record_sid = '',OutFile) := MACRO
+EXPORT Source_Level_Base_MAC_PopulationStatistics(infile,Ref='',source='',Input_cellphoneidkey = '',Input_source = '',Input_src_bitmap = '',Input_household_flag = '',Input_rules = '',Input_cellphone = '',Input_npa = '',Input_phone7 = '',Input_phone7_did_key = '',Input_pdid = '',Input_did = '',Input_did_score = '',Input_datefirstseen = '',Input_datelastseen = '',Input_datevendorfirstreported = '',Input_datevendorlastreported = '',Input_dt_nonglb_last_seen = '',Input_glb_dppa_flag = '',Input_did_type = '',Input_origname = '',Input_address1 = '',Input_address2 = '',Input_origcity = '',Input_origstate = '',Input_origzip = '',Input_orig_phone = '',Input_orig_carrier_name = '',Input_prim_range = '',Input_predir = '',Input_prim_name = '',Input_addr_suffix = '',Input_postdir = '',Input_unit_desig = '',Input_sec_range = '',Input_p_city_name = '',Input_v_city_name = '',Input_state = '',Input_zip5 = '',Input_zip4 = '',Input_cart = '',Input_cr_sort_sz = '',Input_lot = '',Input_lot_order = '',Input_dpbc = '',Input_chk_digit = '',Input_rec_type = '',Input_ace_fips_st = '',Input_ace_fips_county = '',Input_geo_lat = '',Input_geo_long = '',Input_msa = '',Input_geo_blk = '',Input_geo_match = '',Input_err_stat = '',Input_title = '',Input_fname = '',Input_mname = '',Input_lname = '',Input_name_suffix = '',Input_name_score = '',Input_dob = '',Input_rawaid = '',Input_cleanaid = '',Input_current_rec = '',Input_first_build_date = '',Input_last_build_date = '',Input_ingest_tpe = '',Input_verified = '',Input_cord_cutter = '',Input_activity_status = '',Input_prepaid = '',Input_global_sid = '',Input_record_sid = '',OutFile) := MACRO
   IMPORT SALT311,PhonesPlus_V2;
   #uniquename(of)
   %of% := RECORD
@@ -23,10 +23,22 @@ EXPORT Source_Level_Base_MAC_PopulationStatistics(infile,Ref='',source='',Input_
         IF( le.Input_source = (TYPEOF(le.Input_source))'','',':source')
     #END
  
++    #IF( #TEXT(Input_src_bitmap)='' )
+      '' 
+    #ELSE
+        IF( le.Input_src_bitmap = (TYPEOF(le.Input_src_bitmap))'','',':src_bitmap')
+    #END
+ 
 +    #IF( #TEXT(Input_household_flag)='' )
       '' 
     #ELSE
         IF( le.Input_household_flag = (TYPEOF(le.Input_household_flag))'','',':household_flag')
+    #END
+ 
++    #IF( #TEXT(Input_rules)='' )
+      '' 
+    #ELSE
+        IF( le.Input_rules = (TYPEOF(le.Input_rules))'','',':rules')
     #END
  
 +    #IF( #TEXT(Input_cellphone)='' )
@@ -357,6 +369,12 @@ EXPORT Source_Level_Base_MAC_PopulationStatistics(infile,Ref='',source='',Input_
       '' 
     #ELSE
         IF( le.Input_name_score = (TYPEOF(le.Input_name_score))'','',':name_score')
+    #END
+ 
++    #IF( #TEXT(Input_dob)='' )
+      '' 
+    #ELSE
+        IF( le.Input_dob = (TYPEOF(le.Input_dob))'','',':dob')
     #END
  
 +    #IF( #TEXT(Input_rawaid)='' )
