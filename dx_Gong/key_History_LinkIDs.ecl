@@ -1,4 +1,4 @@
-//former: Gong_Neustar.Key_History_LinkIds
+﻿//former: Gong_Neustar.Key_History_LinkIds
 IMPORT BIPV2, doxie, $;
 
 EXPORT Key_History_LinkIds := MODULE
@@ -29,7 +29,7 @@ EXPORT Key_History_LinkIds := MODULE
     ) :=
   FUNCTION
 
-    BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, fetched, Level);
+		BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, fetched, Level, joinlimit, jointype);
     $.mac_check_access(fetched, out, mod_access);   // Jira# CCPA-98, Function created for CCPA suppressions at key fetches.
     RETURN out;
 
