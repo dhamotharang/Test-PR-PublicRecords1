@@ -61,6 +61,8 @@ EXPORT getExec(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) inData,
                     TRANSFORM(DueDiligence.v3Layouts.InternalBusinessExec.ExecDetails,
                               SELF.stateLegalEvents := RIGHT.stateLegalEvents;
                               SELF.stateLegalEventsFlag := RIGHT.stateLegalEventsFlag;
+                              SELF.offenseType := RIGHT.offenseType;
+                              SELF.offenseTypeFlag := RIGHT.offenseTypeFlag;
                               SELF := LEFT;),
                     LEFT OUTER,
                     ATMOST(1));
@@ -108,7 +110,7 @@ EXPORT getExec(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) inData,
           
    
 
-    finalBEOs := JOIN(inData, rollAllBEOData,
+    updateBEOs := JOIN(inData, rollAllBEOData,
                       LEFT.seq = RIGHT.seq AND
                       LEFT.inquiredBusiness.ultID = RIGHT.ultID AND
                       LEFT.inquiredBusiness.orgID = RIGHT.orgID AND
@@ -120,6 +122,18 @@ EXPORT getExec(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) inData,
                       ATMOST(1));
 
 
+    //add criminal data
+    finalBEOs := JOIN(updateBEOs, execCrim,
+                      LEFT.seq = RIGHT.seq AND
+                      LEFT.inquiredBusiness.ultID = RIGHT.inquiredBusiness.ultID AND
+                      LEFT.inquiredBusiness.orgID = RIGHT.inquiredBusiness.orgID AND
+                      LEFT.inquiredBusiness.seleID = RIGHT.inquiredBusiness.seleID,
+                      TRANSFORM(DueDiligence.v3Layouts.Internal.BusinessTemp,
+                                SELF.beoCrimReport := RIGHT.beoCrimReport;
+                                SELF := LEFT;),
+                      LEFT OUTER,
+                      ATMOST(1));
+                      
 
       
     
@@ -137,6 +151,7 @@ EXPORT getExec(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) inData,
     
     // OUTPUT(transAllBEOData, NAMED('transAllBEOData'));
     // OUTPUT(rollAllBEOData, NAMED('rollAllBEOData'));
+    // OUTPUT(updateBEOs, NAMED('updateBEOs'));
     // OUTPUT(finalBEOs, NAMED('finalBEOs'));
 
 
