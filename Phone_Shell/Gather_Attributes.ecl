@@ -25,14 +25,17 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Attributes 
 	
 	 PhoneFeedback := Phone_Shell.Get_Attributes_Phone_Feedback(Input, mod_access);
 	
-	 PhonesPlus := Phone_Shell.Get_Attributes_Phones_Plus(Input, GLBPurpose, DPPAPurpose, IndustryClass, DataRestrictionMask, mod_access);
+	 PhonesPlus := IFF(PhoneShellVersion >= 31,
+                    Phone_Shell.Get_Attributes_Phones_Plus_v31(Input, GLBPurpose, DPPAPurpose, IndustryClass, DataRestrictionMask, mod_access),
+                    Phone_Shell.Get_Attributes_Phones_Plus(Input, GLBPurpose, DPPAPurpose, IndustryClass, DataRestrictionMask, mod_access)
+                   );
 	
 	 RawPhone := Phone_Shell.Get_Attributes_Raw_Phone(Input, mod_access);
 	
 	 SubjectLevel := Phone_Shell.Get_Attributes_Subject_Level(Input);
   
   // Metadata only is included in Phone Shell version 3.0 or higher
-  Metadata := iff(PhoneShellVersion >= 30, Phone_Shell.Get_Attributes_Metadata(Input));
+  Metadata := IFF(PhoneShellVersion >= 30, Phone_Shell.Get_Attributes_Metadata(Input));
 	
 	 /* ***************************************************************
 		 * 				Merge all of the attributes back together           						*
