@@ -27,10 +27,10 @@ EXPORT SmallBusiness_BIP_Function (
 											DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw),
 											BOOLEAN AppendBestsFromLexIDs = FALSE, 
 											BOOLEAN DisableSBFE = FALSE,
-											unsigned1 LexIdSourceOptout = 1,
-											string TransactionID = '',
-											string BatchUID = '',
-											unsigned6 GlobalCompanyId = 0
+											UNSIGNED1 LexIdSourceOptout = 1,
+											STRING TransactionID = '',
+											STRING BatchUID = '',
+											UNSIGNED6 GlobalCompanyId = 0
 											) := FUNCTION
 
 	RESTRICTED_SET := ['0', ''];
@@ -224,10 +224,10 @@ EXPORT SmallBusiness_BIP_Function (
 	Shell_Input := PROJECT(SeqInput, convertToBusinessShellInput(LEFT));
   
     OverrideExperianRestriction := IF(EXISTS(ModelsRequested(ModelName IN [BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM,
-                                                                          BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BOFM,
-                                                                          BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM_NSBFEWITHEXP
-                                                                          ])
-                                             ), TRUE, FALSE);
+                                           BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BOFM,
+                                           BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM_NSBFEWITHEXP
+                                    ])
+                                 ), TRUE, FALSE);
 
    
 /* ************************************************************************
@@ -335,13 +335,13 @@ EXPORT SmallBusiness_BIP_Function (
 	Nugen               := TRUE;
 	Include_DL_Verification := TRUE;
 	UNSIGNED1 AppendBest := 1;		// search best file
-	UNSIGNED3 LastSeenThreshold := Risk_Indicators.iid_constants.max_unsigned3;
+	UNSIGNED3 LastSeenThreshold := Risk_Indicators.iid_constants.max_UNSIGNED3;
 	UNSIGNED8 BSOptions := Risk_Indicators.iid_constants.BSOptions.IncludeFraudVelocity +
 												 Risk_Indicators.iid_constants.BSOptions.RetainInputDID;
 
 /* Need this used if want same results as a separate boca shell
-boolean RetainInputDID := false;
-unsigned8 BSOptions := 
+	BOOLEAN RetainInputDID := FALSE;
+	UNSIGNED8 BSOptions := 
 	if(Include_DL_Verification, risk_indicators.iid_constants.BSOptions.IncludeDoNotMail +
 										 risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity,
 											0) +
@@ -375,11 +375,11 @@ unsigned8 BSOptions :=
 		cleaned_name := Address.CleanPerson73(le.Rep_FullName);
 		BOOLEAN valid_cleaned := le.Rep_FullName <> '';
 		
-		SELF.fname  := STD.Str.ToUpperCase(if(le.Rep_FirstName=''   AND valid_cleaned, cleaned_name[6..25], le.Rep_FirstName));
-		SELF.lname  := STD.Str.ToUpperCase(if(le.Rep_LastName=''    AND valid_cleaned, cleaned_name[46..65], le.Rep_LastName));
-		SELF.mname  := STD.Str.ToUpperCase(if(le.Rep_MiddleName=''  AND valid_cleaned, cleaned_name[26..45], le.Rep_MiddleName));
-		SELF.suffix := STD.Str.ToUpperCase(if(le.Rep_NameSuffix ='' AND valid_cleaned, cleaned_name[66..70], le.Rep_NameSuffix));	
-		SELF.title  := STD.Str.ToUpperCase(if(valid_cleaned, cleaned_name[1..5],''));
+		SELF.fname  := STD.Str.ToUpperCase(IF(le.Rep_FirstName = ''  AND valid_cleaned, cleaned_name[6..25], le.Rep_FirstName));
+		SELF.lname  := STD.Str.ToUpperCase(IF(le.Rep_LastName = ''   AND valid_cleaned, cleaned_name[46..65], le.Rep_LastName));
+		SELF.mname  := STD.Str.ToUpperCase(IF(le.Rep_MiddleName = '' AND valid_cleaned, cleaned_name[26..45], le.Rep_MiddleName));
+		SELF.suffix := STD.Str.ToUpperCase(IF(le.Rep_NameSuffix =' ' AND valid_cleaned, cleaned_name[66..70], le.Rep_NameSuffix));	
+		SELF.title  := STD.Str.ToUpperCase(IF(valid_cleaned, cleaned_name[1..5],''));
 
 		Street_Address := risk_indicators.MOD_AddressClean.street_address(le.Rep_StreetAddress1);
 		clean_a2 := risk_indicators.MOD_AddressClean.clean_addr(Street_Address, le.Rep_City, le.Rep_State, le.Rep_Zip ) ;											
@@ -455,7 +455,7 @@ unsigned8 BSOptions :=
 	 ************************************************************************ */	 
 	shell_res_grpd := GROUP(SORT(Shell_Results,seq),seq);
 	
-	#if(Models.LIB_BusinessRisk_Models().TurnOnValidation = FALSE)
+	#IF(Models.LIB_BusinessRisk_Models().TurnOnValidation = FALSE)
 
 	
 	Layout_ModelOut_Plus := RECORD
@@ -612,7 +612,7 @@ unsigned8 BSOptions :=
    ************************************** */
 	productID := Risk_Reporting.ProductID.LNSmallBusiness__SmallBusiness_Service;
 	intermediate_Log := IF(DisableIntermediateShellLogging = TRUE, DATASET([], Risk_Reporting.Layouts.LOG_Business_Shell), Risk_Reporting.To_LOG_Business_Shell(Shell_Results_plus_Scores, productID, BusShellVersion, Risk_Reporting.ProcessType.Internal, rw_options));
-	#stored('Intermediate_Log', intermediate_log);
+	#STORED('Intermediate_Log', intermediate_log);
  /* ************ End Logging ************/
 		
 /* ************************************************************************
@@ -731,9 +731,9 @@ unsigned8 BSOptions :=
 	
 	RETURN Final_plus_MatchWeight;
 	
-#else // Else, output the model results directly
+#ELSE // Else, output the model results directly
 
 	// return Models.LIB_BusinessRisk_Models(shell_res_grpd,,boca_shell_grouped,iid,,DPPA_Purpose,GLBA_Purpose,DataRestrictionMask_in,DataPermissionMask,appType).ValidatingModel;
  return Models.LIB_BusinessRisk_Models(shell_res_grpd , bocaShell := boca_shell_grouped).ValidatingModel; 
-#end
+#END
 END;
