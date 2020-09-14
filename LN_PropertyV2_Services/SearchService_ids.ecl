@@ -1,4 +1,4 @@
-IMPORT doxie, business_header, AutoStandardI, AutoHeaderI, TopBusiness_Services;
+﻿IMPORT doxie, business_header, AutoStandardI, AutoHeaderI, TopBusiness_Services;
 
 it 							:= AutoStandardI.InterfaceTranslator;
 gm 							:= input.gm();
@@ -29,7 +29,7 @@ inner_id_search (inner_params2 in_mod,
 
 		// autokeys
 		
-		by_auto	:= autokey_ids(workHard,,not input.incDeepDive,in_mod);
+		by_auto	:= LN_PropertyV2_Services.autokey_ids(workHard,,not input.incDeepDive,in_mod);
 
 		// deep dids
 		tempmod2 := module(project(in_mod,AutoheaderI.LIBIN.FetchI_Hdr_Indv.full,opt))
@@ -37,17 +37,17 @@ inner_id_search (inner_params2 in_mod,
 				export noFail := not isAssetRpt;
 			end;
 			
-		deep_dids	:= limit( AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(tempmod2), consts.max_deepDIDs, skip);
+		deep_dids	:= limit( AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(tempmod2), LN_PropertyV2_Services.consts.max_deepDIDs, skip);
 
 
 
-		by_deep 	:= if(input.incDeepDive and not input.paSearch, Raw.get_fids_from_dids(deep_dids));
+		by_deep 	:= if(input.incDeepDive and not input.paSearch, LN_PropertyV2_Services.Raw.get_fids_from_dids(deep_dids));
 
 		// project bdid supergroup into correct layout
-		supergroup_bdids := if(not input.paSearch, in_bdids + project(business_header.bdidDataset,layouts.search_bdid));
+		supergroup_bdids := if(not input.paSearch, in_bdids + project(business_header.bdidDataset,LN_PropertyV2_Services.layouts.search_bdid));
 
 		// lookup by direct key
-		by_key := ReportService_ids(input.did, input.bdid, input.parcelID, input.faresId, in_dids, supergroup_bdids);
+		by_key := LN_PropertyV2_Services.ReportService_ids(input.did, input.bdid, input.parcelID, input.faresId, in_dids, supergroup_bdids);
 
 		// if this is an APN search, we need to filter by location info
 		by_key_loc := if(
@@ -65,13 +65,13 @@ inner_id_search (inner_params2 in_mod,
 		);
 		
 		// lookup by DID
-		dids := dataset([{input.did}], layouts.search_did);
+		dids := dataset([{input.did}], LN_PropertyV2_Services.layouts.search_did);
 
-		by_did := Raw.get_fids_from_dids(dids);
+		by_did := LN_PropertyV2_Services.Raw.get_fids_from_dids(dids);
 		
 		// lookup by input business ids
 		in_bids := TopBusiness_Services.Functions.create_business_ids_dataset(in_mod);
-		by_bids := Raw.get_fids_from_bids(in_bids,in_mod.BusinessIDFetchLevel);
+		by_bids := LN_PropertyV2_Services.Raw.get_fids_from_bids(in_bids,in_mod.BusinessIDFetchLevel);
 
 		// output(by_auto, 		named('by_auto'));		// DEBUG
 		// output(deep_dids, 	named('deep_dids'));	// DEBUG
@@ -85,9 +85,9 @@ inner_id_search (inner_params2 in_mod,
 		// ========================================
 
 		// ...adding the deep dive flag 
-		addFlag(dataset(layouts.fid) ds, boolean flag) := project(
+		addFlag(dataset(LN_PropertyV2_Services.layouts.fid) ds, boolean flag) := project(
 			ds,
-			transform(layouts.search_fid, self.isDeepDive := flag, self := left)
+			transform(LN_PropertyV2_Services.layouts.search_fid, self.isDeepDive := flag, self := left)
 		);
 
 		fids_all := map(
@@ -105,11 +105,11 @@ inner_id_search (inner_params2 in_mod,
 		return fids;		
 end;
 
-export dataset(layouts.search_fid) SearchService_ids(
+export dataset(LN_PropertyV2_Services.layouts.search_fid) SearchService_ids(
 	boolean isAssetRpt = false,
 	boolean didOnly = false,
-	dataset(layouts.search_did)		in_dids		= dataset([], layouts.search_did),
-	dataset(layouts.search_bdid)	in_bdids	= dataset([], layouts.search_bdid)
+	dataset(LN_PropertyV2_Services.layouts.search_did)		in_dids		= dataset([], LN_PropertyV2_Services.layouts.search_did),
+	dataset(LN_PropertyV2_Services.layouts.search_bdid)	in_bdids	= dataset([], LN_PropertyV2_Services.layouts.search_bdid)
 	) := function
 	
 temp_mod_one := module(project(gm,inner_params2,opt))
