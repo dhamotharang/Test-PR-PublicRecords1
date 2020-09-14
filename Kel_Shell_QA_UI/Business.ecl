@@ -1,33 +1,39 @@
-﻿EXPORT Business(   Query_Environment,
-                                     InputFile_LogicalName, 
-																		 Records_to_Run,
-																		 GLBA, 
-																		 DPPA,
-																		 DataPermissionMask,
-																		 DataRestrictionMask,
-																		 LexIdSourceOptout,
-																		 TransactionId,
-																		 BatchUID,
-																		 GCID, 
-																		 historyDate,
-																		 Score_threshold,
-																		 BIPAppend_Score_Threshold, 
-																		 BIPAppend_Weight_Threshold,
-																		 BIPAppend_PrimForce, 
-																		 BIPAppend_ReAppend, 
-																		 BIPAppend_Include_AuthRep,
-																		 Output_Master_Results,
-																		 Output_SALT_Profile,
-																		 Exclude_Consumer_Attributes,
-																		 AllowedSources,
-																		 OverrideExperianRestriction) := FUNCTIONMACRO
+﻿EXPORT Business( Query_Environment,
+								 InputFile_LogicalName,
+								 logical_file_type,
+								 InputFile_Dali,
+								 Records_to_Run,
+								 GLBA, 
+								 DPPA,
+								 DataPermissionMask,
+								 DataRestrictionMask,
+								 LexIdSourceOptout,
+								 TransactionId,
+								 BatchUID,
+								 GCID, 
+								 historyDate,
+								 Score_threshold,
+								 BIPAppend_Score_Threshold, 
+								 BIPAppend_Weight_Threshold,
+								 BIPAppend_PrimForce, 
+								 BIPAppend_ReAppend, 
+								 BIPAppend_Include_AuthRep,
+								 Output_Master_Results,
+								 Output_SALT_Profile,
+								 Exclude_Consumer_Attributes,
+								 AllowedSources,
+								 OverrideExperianRestriction,
+								 AllowedSourcesDataset_List,
+								 ExcludeSourcesDataset_List,
+								 IsMarketing,
+								 email_list) := FUNCTIONMACRO
 
 
 Threads := 1;
 
 RoxieIP :=Query_Environment;
 
-InputFile := InputFile_LogicalName;
+// InputFile := InputFile_LogicalName;
 
 
 RecordsToRun := Records_to_Run;
@@ -156,9 +162,22 @@ prii_layout := RECORD
 	STRING pf_approved_not_funded;
 END;
 
-inData := DATASET(InputFile, prii_layout, CSV(QUOTE('"'), HEADING(SINGLE)));
+// inData := DATASET(InputFile, prii_layout, CSV(QUOTE('"'), HEADING(SINGLE)));
+
 //OUTPUT(CHOOSEN(inData, eyeball), NAMED('inData'));
-inDataRecs := IF (RecordsToRun = 0, inData, CHOOSEN (inData, RecordsToRun));
+// inDataRecs := IF (RecordsToRun = 0, inData, CHOOSEN (inData, RecordsToRun));
+
+
+sample_size:=Records_to_Run;
+
+inData:=IF(logical_file_type ='THOR',DATASET('~foreign::' + InputFile_Dali + InputFile_LogicalName,prii_layout,THOR),
+																DATASET('~foreign::' + InputFile_Dali + InputFile_LogicalName,prii_layout,CSV(HEADING(single), QUOTE('"')))
+							 );
+																 
+inDataRecs:= if(sample_size=0, choosen(inData,all),choosen(inData,sample_size) );
+
+
+
 // inDataReady := PROJECT(inDataRecs(AccountNumber NOT IN ['Account', 'SBFEExtract2016_0013010111WBD0101_3439841667_003']), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout,
 inDataReady := PROJECT(inDataRecs(AccountNumber != 'Account'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout, 
 	SELF.ArchiveDate := IF(historyDate = '0', LEFT.ArchiveDate, (STRING)HistoryDate);
@@ -191,6 +210,9 @@ soapLayout := RECORD
   STRING _TransactionId;
   STRING _BatchUID;
   UNSIGNED6 _GCID;
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET(AllowedSourcesDataset_List, PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET(ExcludeSourcesDataset_List, PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+
 end;
 
 Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
@@ -198,7 +220,7 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT STRING VersionName := 'Version 1.0';
 	EXPORT BOOLEAN isFCRA := FALSE;
 	EXPORT STRING ArchiveDate := historyDate;
-	EXPORT STRING InputFileName := InputFile;
+	EXPORT STRING InputFileName := InputFile_LogicalName;
 	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
 	EXPORT STRING Data_Permission_Mask := DataPermissionMask;
 	EXPORT UNSIGNED GLBAPurpose := GLBA;
@@ -238,7 +260,7 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 	SELF.GLBPurpose := Settings.GLBAPurpose;
 	SELF.DPPAPurpose := Settings.DPPAPurpose;
 	SELF.OverrideExperianRestriction := Settings.Override_Experian_Restriction;
-	SELF.IsMarketing := FALSE;
+	SELF.IsMarketing := IsMarketing;
 	SELF.OutputMasterResults := Output_Master_Results;
 	SELF.ExcludeConsumerAttributes := Exclude_Consumer_Attributes;
 	SELF.BIPAppendScoreThreshold := Settings.BusinessLexIDThreshold;
@@ -324,8 +346,21 @@ Passed_Business :=
 			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),
 		INNER, KEEP(1));
-       
+      
+result1:=STD.System.Email.SendEmail(email_list, 'KEL SHELL QA UI run job',  'Your WUID ' + workunit + ' has just kicked-off!');
 
-RETURN Passed_Business;
+result2:=output(Passed_Business);
+
+unique_id:='p_inpacct';
+
+result3:=Kel_Shell_QA_UI.Output_Distribution_Report_Module(unique_id, Passed_Business);
+
+result4:=Kel_Shell_QA.descriptive_Stats_Report(unique_id, Passed_Business);
+
+result5:=STD.System.Email.SendEmail(email_list, 'KEL SHELL QA UI run job',  'Your WUID ' + workunit + ' has completed!');
+
+seq:=sequential(result1, result2, result3, result4, result5);
+
+RETURN seq;
 
 ENDMACRO;
