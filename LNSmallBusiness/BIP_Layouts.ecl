@@ -2960,30 +2960,8 @@ EXPORT BIP_Layouts := MODULE
 		UNSIGNED3 HistoryDateYYYYMM;
 		UNSIGNED6 HistoryDate;
 		STRING120 Bus_Company_Name;
-		Version1Attributes;
-		SBFEAttributes;
-		BatchScoreData;
-		Company_IDs;
-	END;
-  
-  EXPORT BatchOutput_v20 := RECORD
-		STRING30 AcctNo;
-		STRING1 BillingHit;
-		UNSIGNED3 HistoryDateYYYYMM;
-		UNSIGNED6 HistoryDate;
-		STRING120 Bus_Company_Name;
+		Version1Attributes;    
 		Version2Attributes AND NOT SourceIndex;
-		SBFEAttributes;
-		BatchScoreData;
-		Company_IDs;
-	END;
-
-  EXPORT BatchOutput_v21 := RECORD
-		STRING30 AcctNo;
-		STRING1 BillingHit;
-		UNSIGNED3 HistoryDateYYYYMM;
-		UNSIGNED6 HistoryDate;
-		STRING120 Bus_Company_Name;
 		Version21Attributes;
 		SBFEAttributes;
 		BatchScoreData;
