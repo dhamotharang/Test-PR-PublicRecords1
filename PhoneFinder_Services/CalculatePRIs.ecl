@@ -131,7 +131,7 @@ FUNCTION
                                           le.ThresholdB = 'Three Months' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Fraud - Three Months')),
                                            FALSE),
                                 40 => EXISTS(pInput.ReasonCodes(value = 'AssociatedDigitalID - Trust Score below Zero')),
-                                41 => EXISTS((pInput.TmxVariables(Name = 'timesincephonefirstseen' AND (INTEGER)Value <= MonthstoMinutes))),
+                                41 => EXISTS((pInput.TmxVariables(Name = 'timesincephonefirstseen' AND (INTEGER)Value <> 0 AND (INTEGER)Value <= MonthstoMinutes))),
                                 42 => EXISTS((pInput.TmxVariables(Name = 'countdeviceseenwithphone_month' AND (INTEGER)Value >= le.Threshold))),
                                 43 => EXISTS((pInput.TmxVariables(Name = 'countemailsseenwithphone_month' AND (INTEGER)Value >= le.Threshold))),
                                 44 => EXISTS((pInput.TmxVariables(Name = 'phoneseenmultiplecountry_month' AND (INTEGER)Value >= le.Threshold))),
