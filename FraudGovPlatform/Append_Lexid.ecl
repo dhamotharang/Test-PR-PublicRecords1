@@ -2,12 +2,10 @@
 FUNCTIONMACRO
 		import DID_Add,_Validate, Std;
 		FirstRinID := FraudGovPlatform.Constants().FirstRinID;
-		
-		dFileBase 		:= distribute	(pull(pBaseFile),record_id	);
-		without_did 	:= dFileBase(DID=0);
-		with_did			:= dFileBase(DID>0);
 
-		with_pii := without_did
+		dFileBase 		:= distribute	(pull(pBaseFile),record_id	);
+		
+		with_pii := dFileBase
 		(   
 			(cleaned_name.fname !='' and cleaned_name.lname !='' and 
 				(length(STD.Str.CleanSpaces(clean_ssn))=9 and regexfind('^[0-9]*$',STD.Str.CleanSpaces(clean_ssn)) =true ))
@@ -29,7 +27,7 @@ FUNCTIONMACRO
 
 		without_pii 
 		:= join(
-				without_did,
+				dFileBase,
 				with_pii,
 				left.record_id = right.record_id,
 				only left,
@@ -59,9 +57,9 @@ FUNCTIONMACRO
 		END;
 			
 		dSlimForDiding	:= normalize(with_pii
-																,if(left.clean_phones.phone_number <>'' and left.clean_phones.cell_phone <> '',2,1)
-																,tSlimForDiding(left,counter)
-																);
+			,if(left.clean_phones.phone_number <>'' and left.clean_phones.cell_phone <> '',2,1)
+			,tSlimForDiding(left,counter)
+		);
 																
 		// Match to Headers by Contact Name and Address and phone
 		Did_Matchset := ['D','S','P','A'];
@@ -94,7 +92,7 @@ FUNCTIONMACRO
 		dDidOut_sort			:= sort				(dDidOut_dist,record_id, -did_score	,local);
 		dDidOut_dedup			:= dedup			(dDidOut_sort,record_id ,local);
 		
-		dAssignDids := join( without_did
+		dAssignDids := join( with_pii
 												,dDidOut_dedup
 												,left.record_id = RIGHT.record_id
 												,Transform(recordof(left)
@@ -105,7 +103,6 @@ FUNCTIONMACRO
 												,local
 											 );
 											 
-		//RETURN without_pii + with_did+ dDidOut_dedup;
-		RETURN with_did + without_pii + dAssignDids;
+		RETURN without_pii + dAssignDids;
 	
 ENDMACRO;
