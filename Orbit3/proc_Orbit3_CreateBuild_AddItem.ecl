@@ -3,15 +3,16 @@ export proc_Orbit3_CreateBuild_AddItem(string buildname,string Buildvs,string En
 
 string wuid := workunit;
 
-boolean skipcreatebuild_sp := skipcreatebuild;
+ boolean skipcreatebuild_sp := skipcreatebuild;
 boolean skipupdatebuild_sp := skipupdatebuild;
-boolean runcreatebuild_sp :=  runcreatebuild;
-boolean runaddcomponentsonly_sp :=  runaddcomponentsonly;
-boolean skipaddcomponents_sp :=  skipaddcomponents;
-boolean is_npf_sp :=  is_npf;
+boolean skipaddcomponents_sp := skipaddcomponents;
+boolean runcreatebuild_sp := runcreatebuild;
+boolean runaddcomponentsonly_sp := runaddcomponentsonly;
+boolean is_npf_sp := is_npf;
+
 
 ECL1 := '#workunit(\'name\',\'Orbit4 Create Build Instance and Add Items -- '+ buildname + '-- '+Buildvs+'\');\r\n'+
-		   'Orbit3.proc_Orbit3_CreateBuild_AddItem_sp( \''+buildname+'\',  \''+Buildvs+'\', \''+Envmt+'\',\''+email_list+'\', '+skipcreatebuild_sp+', '+skipupdatebuild_sp+', '+skipaddcomponents_sp+', '+runcreatebuild_sp+', '+runaddcomponentsonly_sp+', '+is_npf_sp+', \''+wuid+'\')\n' 
+		   'Orbit3.proc_Orbit3_CreateBuild_AddItem_sp( \''+buildname+'\',  \''+Buildvs+'\', \''+Envmt+'\',\''+email_list+'\', '+skipcreatebuild_sp+',  '+skipupdatebuild_sp+' , '+skipaddcomponents_sp+' , '+runcreatebuild_sp+' , '+runaddcomponentsonly_sp+' ,'+is_npf_sp+'  ,  \''+wuid+'\')\n' 
 		+'	  : success(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_success)\n'
           +'	, failure(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_failure)\n'
            +'	;\n';																															  
