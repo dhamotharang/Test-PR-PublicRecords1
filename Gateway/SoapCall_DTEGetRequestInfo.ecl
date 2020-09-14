@@ -27,7 +27,7 @@ EXPORT Soapcall_DTEGetRequestInfo(DATASET(IESP.DTE_GetRequestInfo.t_DTEGetReques
     dataset(DTEGetRequestInfoResponseWithErrorHandling),
     XPATH('DTEGetRequestInfoResponseEx'),
     ONFAIL(onError(left)), timeout(pWaitTime), retry(pRetries)));
-
+    
     ParsedJson := DeferredTask.Functions.ParseGetRequestInfo(d_recs_out);
  
     rec := RECORD
@@ -51,7 +51,7 @@ EXPORT Soapcall_DTEGetRequestInfo(DATASET(IESP.DTE_GetRequestInfo.t_DTEGetReques
     STRING10 Orig_RMSID{xpath('Orig_RMSID')},
     STRING XMLErrorCode,
     STRING XMLErrorMessage},
-    out := FROMXML(rec, LEFT.RequestOpaqueContent, ONFAIL(createFailure()));
+    out := IF(LEFT.ErrorMessage = '', FROMXML(rec, LEFT.RequestOpaqueContent, ONFAIL(createFailure())));
     SELF.RMSID := out.RMSID;
     SELF.TMSID := out.TMSID;
     SELF.Orig_RMSID := out.Orig_RMSID;
@@ -67,13 +67,14 @@ EXPORT Soapcall_DTEGetRequestInfo(DATASET(IESP.DTE_GetRequestInfo.t_DTEGetReques
                                                 LEFT.XMLErrorCode <> '' => '45',
                                                 LEFT.ErrorCode <> '' => LEFT.ErrorCode,
                                                 '0');
-    SELF.ErrorMessage := MAP(LEFT.TaskErrorDescription <> '' => LEFT.TaskErrorDescription,
+    SELF.ErrorMessage := MAP(LEFT.TaskErrorCode = '1' OR LEFT.TaskErrorCode = '3' => 'The record is no longer reporting and may not be used in an FCRA decision.',
+                                                       LEFT.TaskErrorDescription <> '' => LEFT.TaskErrorDescription,
                                                        LEFT.ResponseJSON[1].ErrorCode <> '' => 'Error processing the requested public record',
                                                        LEFT.XMLErrorMessage <> '' => 'Error processing the requested public record',
                                                        LEFT.ErrorMessage <> '' => LEFT.ErrorMessage,
                                                        '');
     SELF := LEFT;));
-    
+     
     RETURN RollupErrorCodes;
 
 END;
