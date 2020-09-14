@@ -10,9 +10,9 @@ EXPORT Proc_FirstData_buildall(
 	BOOLEAN pIsTesting = FALSE,
 	BOOLEAN pOverwrite = FALSE
 ) := MODULE
-    //isDelta = D for delta build and F for Full build
+    //updateType = D for delta build and F for Full build
     day_of_week := ut.Weekday((integer)pversion);
-    shared isDelta := if( day_of_week = 'MONDAY', 'F', 'D');
+    shared updateType := if( day_of_week = 'MONDAY', 'F', 'D');
 	// Spray Files.
 	EXPORT SprayFiles := IF(pDirectory != '',FirstData.fSprayFiles(
 			pVersion,
@@ -25,8 +25,8 @@ EXPORT Proc_FirstData_buildall(
 		)
 	);
 	shared dops_update := parallel(
-		dops.updateversion('FirstDataKeys', pVersion, pContacts,,'N',,,,,, isDelta),
-		dops.updateversion('FCRA_FirstDataKeys', pVersion, pContacts,,'F',,,,,, isDelta)
+		dops.updateversion('FirstDataKeys', pVersion, pContacts,,'N',,,,,, updateType),
+		dops.updateversion('FCRA_FirstDataKeys', pVersion, pContacts,,'F',,,,,, updateType)
 	);
 	
 	// All filenames associated with this Dataset
@@ -39,10 +39,10 @@ EXPORT Proc_FirstData_buildall(
 		SprayFiles,
 		BuildLogger.PrepEnd(false),
 		BuildLogger.BaseStart(False),
-		FirstData.Build_BaseFile(pversion, isDelta = 'D').ALL,
+		FirstData.Build_BaseFile(pversion, updateType = 'D').ALL,
 		BuildLogger.BaseEnd(False),
 		BuildLogger.KeyStart(false),
-		FirstData.proc_build_keys(pVersion, isDelta = 'D'),
+		FirstData.proc_build_keys(pVersion, updateType = 'D'),
 		BuildLogger.KeyEnd(false),
 		BuildLogger.PostStart(False),
 		FirstData.QA_Records(),
