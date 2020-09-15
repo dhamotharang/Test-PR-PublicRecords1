@@ -145,44 +145,34 @@ lbest getdob(wvalidSSN l, bdob r) := transform
 	self := l;
 end;
 
-result_wdob_ := join(wvalidSSN, bdob, left.did = right.did,
-			 getdob(left, right), left outer, local);	
-
 // sets dob 
 lbest getdob_set(wvalidSSN l, bdob r) := transform
 	self.did := IF(r.dob = 0 or ut.Age(r.dob) >= 21, l.did, SKIP);
 	self.dob := r.dob;	// sets dob
 	self := l;
 end;
-
-// distributes wvalidSSN by did to improve results
-non_blank_dobs_ := join(distribute(wvalidSSN, did), bdob, left.did = right.did,
-			 getdob_set(left, right), left outer, local);	
+ 
+// if var1 = fcra_best_append, distribute wvalidSSN by did to improve results and then return a dataset that excludes minors and has blank dob's
+// else, return a dataset that excludes minors and has non-blank dob's	 
+result_new := if(var1 = 'fcra_best_append', 
+	join(wvalidSSN, bdob, left.did = right.did, getdob(left, right), left outer, local), 
+	join(distribute(wvalidSSN, did), bdob, left.did = right.did, getdob_set(left, right), left outer, local));
 
 
 //exclude the minors from watchdog GLB
 wdob := distribute(Watchdog.file_best, did);
  
-lbest exclude_minors(result_wdob_ l, wdob r) := transform
+lbest exclude_minors(result_new l, wdob r) := transform
 	self.did := IF(r.dob = 0 or ut.Age(r.dob) >= 21, l.did, SKIP);
 	//self.dob := r.dob;	// suppress dob
 	self := l;
 end;
 
 // excludes minors and has blank dob's
-result_wdob := join(distribute(result_wdob_,did), wdob, left.did = right.did,
+result_wdob := join(distribute(result_new,did), wdob, left.did = right.did,
 			 exclude_minors(left, right), left outer, local);
 
-//excludes minors and has non-blank dob's
-non_blank_dobs := join(distribute(non_blank_dobs_,did), wdob, left.did = right.did,
-			 exclude_minors(left, right), left outer, local);
-
-//  if var1 = fcra_best_append, then return a dataset that excludes minors and has blank dob's
-// else, return a dataset that excludes minors and has non-blank dob's	
-result_final := map(var1 = 'fcra_best_append' =>
-	result_wdob, non_blank_dobs);
-
-					
+				
 			 
 return result_wdob ; 
 end; 
