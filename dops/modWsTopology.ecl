@@ -1,11 +1,17 @@
-﻿import STD, UT, Python;
+﻿import STD, UT;
 EXPORT modWsTopology(
 									string p_esp = ''
 									,string p_port = '8010'
+									
 												) := module
 	
 	export vWebService := 'WsTopology';
 	
+	// if pythonversion is set to 2
+	// use python2 code else use python3
+	// to allow backward compatibility in code
+	#IF (dops.constants.pythonversion = 2)
+	import Python;
 	export integer fIsNodeUp(STRING ip) := EMBED(Python)
 	import socket
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -14,7 +20,18 @@ EXPORT modWsTopology(
 	sock.close()
 	return result
 	ENDEMBED;
-
+	#ELSE
+	import Python3;
+	export integer fIsNodeUp(STRING ip) := EMBED(Python3)
+	import socket
+	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	sock.settimeout(1)
+	result = sock.connect_ex((ip, 7100))
+	sock.close()
+	return result
+	ENDEMBED;
+	#END
+	
 	export fTpTargetClusterQuery(
 												string p_type = '' // roxie or thor
 												,string p_targetcluster = '') := function

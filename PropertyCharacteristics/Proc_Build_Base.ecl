@@ -35,10 +35,17 @@ function
 																				)
 														);
 	
-	// Add the Fares and Fidelity records to the rolled up MLS&Fidelity file
-	dAll	:=	dCombinedRollup	+	dOKCMLSFilter	+	PropertyCharacteristics.LNProperty2Base;
 
 	
+	//Generate Source E
+	dCollateralAnalyticsOnly:=PropertyCharacteristics.fnGenerateCollateralAnalytics;
+
+//Generate Source F (Default Data inclusion is inside function)
+	dBestofAll:=PropertyCharacteristics.fnGenerateBestofAll(dCollateralAnalyticsOnly,dLNMLS(vendor_source = 'C'),dLNMLS(vendor_source = 'D'));
+
+	// Add the Fares and Fidelity records to the rolled up MLS&amp;Fidelity file
+	dAll	:=	dCombinedRollup	+	dOKCMLSFilter	+	PropertyCharacteristics.LNProperty2Base + dCollateralAnalyticsOnly + dBestofAll;
+
 	// Create unique id and reformat to base layout
 	ut.MAC_Sequence_Records(dAll,property_rid,dPropSeqNum);
 	
@@ -57,7 +64,8 @@ dOKCTY_srt := sort(distribute(dOKCTY_sfr,hash(prim_range, prim_name, sec_range, 
 
 PropertyCharacteristics.Populate_Default_Data.Mac_Populate_Attribute_Default_Data(dOKCTY_srt,dPropAttributeDefaultData);
 
-// combine_base := dOthers + dOKCTY + dPropAttributeDefaultData;
+//DF-23789 Adding Source E (MLS/Collateral Analytics only) and Source F (Best of all with Default Data)
+
 dPropAttrDefaultData	:=	
 														project( dOthers + dOKCTY + dPropAttributeDefaultData,
 																			transform(	PropertyCharacteristics.Layouts.TempBase,

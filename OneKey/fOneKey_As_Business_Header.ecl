@@ -13,8 +13,8 @@ EXPORT fOneKey_As_Business_Header(DATASET(OneKey.Layouts.base) pBaseFile = OneKe
     SELF.pflag                         := '';  // Internal processing flags
     SELF.group1_id                     := 0;  // Group identifier (temporary) for matching groups of records pre-linked
     SELF.vendor_id                     := pInput.ska_id;  // Vendor key
-    SELF.dt_first_seen                 := (UNSIGNED4)Stringlib.GetDateYYYYMMDD();  // Historically this has been populated with process date
-    SELF.dt_last_seen                  := IF(pInput.cleaned_deactv_dt != '', (UNSIGNED4)pInput.cleaned_deactv_dt, (UNSIGNED4)Stringlib.GetDateYYYYMMDD());
+    SELF.dt_first_seen                 := pInput.dt_vendor_first_reported;  // Historically this has been populated with process date
+    SELF.dt_last_seen                  := IF(pInput.cleaned_deactv_dt != '', (UNSIGNED4)pInput.cleaned_deactv_dt,  pInput.dt_vendor_last_reported);
     SELF.dt_vendor_last_reported       := pInput.dt_vendor_last_reported;
     SELF.dt_vendor_first_reported      := pInput.dt_vendor_first_reported;
     SELF.company_name                  := CHOOSE(CTR, pInput.bus_nm, pInput.dba_nm);
@@ -33,7 +33,7 @@ EXPORT fOneKey_As_Business_Header(DATASET(OneKey.Layouts.base) pBaseFile = OneKe
     SELF.msa                           := pInput.msa;
     SELF.geo_lat                       := pInput.geo_lat;
     SELF.geo_long                      := pInput.geo_long;
-    SELF.phone                         := (UNSIGNED6)pInput.telephn_nbr;
+    SELF.phone                         := (UNSIGNED6)pInput.Clean_Phone;
     SELF.phone_score                   := IF(SELF.phone = 0, 0, 1);
     SELF.fein                          := 0;
     SELF.current                       := IF(pInput.record_type = 'C', TRUE, FALSE);
@@ -88,7 +88,8 @@ EXPORT fOneKey_As_Business_Header(DATASET(OneKey.Layouts.base) pBaseFile = OneKe
     SELF                             := L;
 	END;
   
-  dOneKey_Clean_Dist_Sort := SORT(DISTRIBUTE(dOneKeyAsBusHdr, HASH(vl_id)), vl_id, -dt_vendor_last_reported, LOCAL);
+  dOneKey_Clean_Dist_Sort := SORT(DISTRIBUTE(dOneKeyAsBusHdr, HASH(vl_id)), 
+                                  vl_id, vendor_id, company_name, phone, RawAID, -dt_vendor_last_reported, LOCAL);
 
   dOneKey_Rollup := ROLLUP(dOneKey_Clean_Dist_Sort,
                            LEFT.vl_id = RIGHT.vl_id AND
