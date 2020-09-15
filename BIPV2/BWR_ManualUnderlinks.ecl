@@ -11,3 +11,13 @@ BIPV2_LGID3.ManualUnderLinks.addCandidates(newCandidates);
 //Remove Underlink LGIDs
 // BIPV2_LGID3.ManualUnderLinks.removeCandidates(1);
 
+/*************************************************************/
+/**NOTE: This will force Proxids together                     */
+/**ONLY USE IF YOU ARE SURE THE Proxids ARE UNDERLINKED!!!!!!!*/
+/*************************************************************/
+//Add Underlink Proxid
+// newCandidates := dataset([{49004037,1},{114008550185,1}], BIPV2_Proxid.ManualUnderLinks.recLayout);
+// BIPV2_Proxid.ManualUnderLinks.addCandidates(newCandidates);
+
+//Remove Underlink Proxid
+// BIPV2_Proxid.ManualUnderLinks.removeCandidates(1);
