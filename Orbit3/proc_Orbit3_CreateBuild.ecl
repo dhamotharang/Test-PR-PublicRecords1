@@ -6,17 +6,17 @@ export Proc_Orbit3_CreateBuild(string buildname,string Buildvs,string Envmt = 'N
 
 string wuid := workunit;
 
- boolean skipcreatebuild_sp := skipcreatebuild;
-boolean skipupdatebuild_sp := skipupdatebuild;
-boolean runcreatebuild_sp := runcreatebuild;
-boolean is_npf_sp := is_npf;
+
 
 
 ECL1 := '#workunit(\'name\',\'Orbit Create Build Instance -- '+ buildname + '-- '+Buildvs+'\');\r\n'+
-		 'Orbit3.proc_Orbit3_CreateBuild_sp( \''+buildname+'\',  \''+Buildvs+'\', \''+Envmt+'\', \''+email_list+'\',  '+skipcreatebuild_sp+'  ,   '+skipupdatebuild_sp+' ,   '+runcreatebuild_sp+' ,  '+is_npf_sp+'  , \''+wuid+'\') \n'
-		+'	  : success(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_success)\n'
-          +'	, failure(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_failure)\n'
-           +'	;\n';
+'Orbit3.proc_Orbit3_CreateBuild_sp( \''+buildname+'\', \''+Buildvs+'\', \''+Envmt+'\', \''+email_list+'\', '+if (skipcreatebuild , 'true','false')+ ','
++ if (skipupdatebuild , 'true','false')+','
++if (runcreatebuild, 'true','false') +','
++if (is_npf,'true','false')+' , \''+wuid+'\') \n'
++' : success(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_success)\n'
++' , failure(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_failure)\n'
++' ;\n';
 
 	tgtcluster := STD.System.Job.Target();
 
