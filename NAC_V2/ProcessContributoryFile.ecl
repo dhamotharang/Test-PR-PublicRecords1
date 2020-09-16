@@ -4,6 +4,11 @@ ModifyFileName(string ilfn, string rpt) := Std.Str.FindReplace(ilfn, 'ncf2', rpt
 ExtractFileName(string ilfn) := Std.Str.SplitWords(ilfn, '::')[4];
 Archive(varstring ilfn) := NOTHOR(IF(STD.File.FindSuperFileSubName($.Superfile_List.sfNCF2,ilfn)=0,
 													STD.File.AddSuperFile($.Superfile_List.sfNCF2,ilfn)));
+
+Lower(string s) := Std.Str.ToLowerCase(s);
+
+boolean IsOnboarding(string gid) := NAC_V2.dNAC2Config(GroupID=gid)[1].Onboarding in ['y','Y'];
+													
 /**
   dataDir			has incoming and ougoing subdirectories
 	maintenance	has spraying, done, error subdirectories
@@ -16,7 +21,8 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 		spraying := maintenance+'spraying/';
 		outgoing := dataDir+'outgoing/';
 		
-		
+		gid := Lower(lfn[6..9]);
+		onboarding := IsOnboarding(gid);			// If onboarding, send reports but do not process file
 		
 		ilfn := '~nac::uber::in::'+lfn;
 
@@ -45,7 +51,7 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 		treshld_  := $.Mod_Sets.threshld;
 		
 		processed := $.PreprocessNCF2(ilfn);
-		base2 := $.fn_constructBase2FromNCFEx(processed, version);				
+		//base2 := $.fn_constructBase2FromNCFEx(processed, version);				
 		reports := $.GetReports(processed, ilfn);
 		ExcessiveInvalidRecordsFound :=	reports.RejectFile;
 		

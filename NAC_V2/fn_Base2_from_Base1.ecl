@@ -9,7 +9,8 @@ export fn_Base2_from_Base1(string version) := FUNCTION
 	base2 := IFF(EXISTS(newdata),
 							NAC_V2.fn_MergeWithBase(newdata, rawbase2) , // update base2
 							rawbase2) : INDEPENDENT;
-	// convert base1 to baes2
+	// Filter out base1 records that may be in base2, and then
+	//  convert base1 to baes2 format
 	base1 := nac_v2.fn_Base1ToBase2(NAC_V2.fn_filterBase1(nac_V2.Files.Base, base2)) : INDEPENDENT;
 	newbase := base1 + base2;
 	

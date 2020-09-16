@@ -20,6 +20,7 @@ EXPORT Superfile_List := module
 	export sfClientRecords := '~nac::in::clients';
 	
 	export sfNCF2 := '~nac::in::ncf2';
+	export sfArchive := '~nac::in::archive';
 	export sfPayload := '~nac::out::payload';
 	export sfBase2 := '~nac::out::base2';
 	export sfBase1 := '~nac::in::base1';
