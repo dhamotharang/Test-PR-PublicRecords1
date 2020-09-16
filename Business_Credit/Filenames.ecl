@@ -44,6 +44,8 @@ EXPORT	Filenames(STRING	pversion	=	'',
 			+	masterAccount.dAll_filenames
 			+	memberSpecific.dAll_filenames
 			+ releasedate.dAll_filenames
+			+ digitalfootprint.dAll_filenames
+			+ merchantprocessing.dAll_filenames
 		;
 	END;
 
