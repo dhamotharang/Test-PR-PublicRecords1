@@ -11,7 +11,8 @@ r := Orbit3.Layouts.rPlatformStatus;
 														   Env = 'PN'  and _Control.ThisEnvironment.Name = 'Prod_Thor' => dataset([{'PRTE NonFCRA',platform_status}],r),
 	                                                                        Env = 'PF'  and _Control.ThisEnvironment.Name <> 'Prod_Thor' => dataset([{'FCRA PRCT',platform_status}],r),
 														  Env = 'PF'  and _Control.ThisEnvironment.Name = 'Prod_Thor' => dataset([{'PRTE FCRA',platform_status}],r),
-															dataset([{'NonFCRA',platform_status}],r)
+														Env = '' and _Control.ThisEnvironment.Name = 'Prod_Thor' => dataset([{' ',platform_status}],r),
+														dataset([{'NonFCRA',platform_status}],r)
 																		);
 																		
 	export which_env := map ( Env = 'N|B|F' or STD.Str.Find(Env,'|',2) <> 0 => 'NonFCRA, Boolean and FCRA',
@@ -20,6 +21,7 @@ r := Orbit3.Layouts.rPlatformStatus;
 										Env = 'B' => 'Boolean',
 										Env = 'PN' => 'PRTE NonFCRA',
 										Env = 'PF' => 'PRTE  FCRA',
+										Env = '' => 'No Platform',
 										'NonFCRA'
 												);
    
