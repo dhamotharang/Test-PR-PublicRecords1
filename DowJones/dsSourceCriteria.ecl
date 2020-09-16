@@ -1930,7 +1930,9 @@ EXPORT dsSourceCriteria := DATASET([
 {'Vessels - EC (CFSP) 2018/293 Democratic People\'s Republic of Korea List Prohibited Entry into Ports,','1917'},
 {'Vessels - EC 2018/286 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1918'},
 {'OFAC - International Criminal Court Prosecutor\'s List','1919'},
-{'Vessels - EC (CFSP) 2018/293 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1920'}
+{'Vessels - EC (CFSP) 2018/293 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1920'},
+{'EC (CFSP) 2020/1269 Ukraine List','1921'},
+{'EC 2020/1267 Ukraine List','1922'}
 
 ],r);
 
