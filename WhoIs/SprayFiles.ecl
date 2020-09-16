@@ -1,18 +1,14 @@
-﻿IMPORT tools, _control;
+﻿IMPORT tools, _control, STD;
 
 EXPORT SprayFiles(
-	STRING	pVersionDate	=	'',
-	BOOLEAN	pPromote			= FALSE,
-	// STRING	pServerIP			= IF(_control.thisenvironment.name='Dataland',
-																										// _control.IPAddress.bctlpedata12,
-																										// _control.IPAddress.bctlpedata11),
-  STRING	pServerIP			= _control.IPAddress.bctlpedata12,																									
-  STRING	pDirectory		= '/data/temp/reederkx/repository/build_library/builds/whois_data/data/processing/20200601/',
-	// STRING	pGroupName		=	_Constants().groupname,							
-	STRING	pGroupName		=	'thor400_dev01',
+	STRING	pVersionDate	=	(STRING)STD.Date.Today(),
+  STRING	pServerIP			= Constants(pVersionDate).serverIP,																									
+  STRING	pDirectory		= Constants(pVersionDate).Directory + pVersionDate + '/',		
+	STRING  pFilename     = '*.csv',	
+	STRING	pGroupName		=	_Dataset().pGroupname,
 	BOOLEAN	pIsTesting		=	FALSE,
 	BOOLEAN	pOverwrite		=	TRUE,
-	STRING	pNameOutput		=	_Constants().Name + ' Spray Info'
+	STRING	pNameOutput		=	'WhoIs Spray Info'
 ) :=
 FUNCTION
 
@@ -20,7 +16,7 @@ FUNCTION
 
 			{pServerIP																// SourceIP
 			,pDirectory															// SourceDirectory
-			,'*.csv'						 										// directory_filter
+			,pFilename					 										// directory_filter
 			,0																			// record_size
 			,WhoIs.thor_cluster+'in::email::WhoIs_Data::@version@'	// Thor_filename_template
 			,[{WhoIs.thor_cluster+'in::email::WhoIs_Data'}]				// dSuperfilenames
@@ -29,7 +25,7 @@ FUNCTION
 			,'[0-9]{8}' 														// date_regex
 			,'VARIABLE' 														// file_type
 			,''																			// sourceRowTagXML
-			,_Constants().max_record_size 					// sourceMaxRecordSize
+			,_Dataset().pMaxRecordSize    					// sourceMaxRecordSize
 			,','																		// sourceCsvSeparate
 			,'\\n,\\r\\n' 													// sourceCsvTerminate
 			,'' 																		// sourceCsvQuote
