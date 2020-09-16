@@ -102,7 +102,7 @@ export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string
 												'Build Workunit:'+wuid);
 												
 		verifystatus := if ( status not in [  'FAIL' , 'ABORT' ] , emailtoall , Sequential ( emailtoall,
-									                                                                             FAIL( 'Orbit Build Instance Update Aborted .Build Name :'+buildname+ ' Build Version: '+Buildvs+' Reason:'+description )
+									                                                                             Output( 'Orbit Build Instance Update failed .Build Name :'+buildname+ ' Build Version: '+Buildvs+' Reason:'+description )
 																					          )
 							);
 							
