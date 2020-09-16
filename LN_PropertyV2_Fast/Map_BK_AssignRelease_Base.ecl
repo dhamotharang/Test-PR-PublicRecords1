@@ -21,28 +21,28 @@ EXPORT Map_BK_AssignRelease_Base (STRING	pVersionDate
 							STRING8 dt_vendor_last_reported};
 		END;
 
-	SHARED PrepDataSet := MODULE
+	SHARED ARPrepDataSet := MODULE
 		//Combine Assignment and Release data into a common normalized layout
 		iCombined	:= BKMortgage.Fn_Map_BK2Mortgage(dsAssignBK, dsReleaseBK);
 	
 		// Adjust layout for replacement records		
 		iBkM_L		:=	{STRING1	ReplInd, RECORDOF(iCombined)};
 		iBkM_L tRepl(iCombined L) := TRANSFORM
-			SELF.ReplInd := IF(REGEXFIND('REFRESH',L.bk_infile_type),'Y','N');
-			//SELF.ReplInd := 'N'; //For first run only.  Will uncomment above line after first run.
+			//SELF.ReplInd := IF(REGEXFIND('REFRESH',L.bk_infile_type),'Y','N');
+			SELF.ReplInd := 'N'; //For first run only.  Will uncomment above line after first run.
 			SELF:=L;
 		END;
-	EXPORT	dMortgageRawCombined :=	PROJECT(iCombined, tRepl(LEFT));
+		EXPORT dARMortgageRawCombined :=	PROJECT(iCombined, tRepl(LEFT));
 		
 	END;
 		
 	// ---------------------------------------------------------------------------------------------------------
 	// Mortgage
 	// ---------------------------------------------------------------------------------------------------------
-	EXPORT mortgage := MODULE
+	EXPORT armortgage := MODULE
 		// Get max value for fares id
 
-		maxLNDeedFaresID			:=MAX(	
+		maxLNFaresID			:=MAX(	
 																MAX(     ln_propertyv2.Files.Prep.LNMortgage(ln_fares_id[1..2] = 'OM')
 																	+	 ln_propertyv2.Files.Prep.LNMortgageRepl(ln_fares_id[1..2] = 'OM'),
 																		(UNSIGNED)ln_fares_id[3..]),
@@ -58,10 +58,10 @@ EXPORT Map_BK_AssignRelease_Base (STRING	pVersionDate
   StCodeLkp(STRING code ) := StateCodes_dict[code].state_alpha;
 	CntyCodeLkp(STRING code ) := CountyCodes_dict[code].county_name;
 	
-	common.layout_prep_temp_deed tMap2Common(RECORDOF(PrepDataSet.dMortgageRawCombined)	pInput,integer	cnt)	:=
+	common.layout_prep_temp_deed tMap2Common(RECORDOF(ARPrepDataSet.dARMortgageRawCombined)	pInput,integer	cnt)	:=
 		TRANSFORM
 			// Temporary variables
-			UNSIGNED	vFaresID					:=	maxLNDeedFaresID	+	cnt;
+			UNSIGNED	vFaresID					:=	maxLNFaresID	+	cnt;
 			STRING    vCleanBorrower1		:=  LN_Propertyv2.Functions.fCleanName(pInput.BorrowerName1);
 			STRING    vCleanBorrower2		:=  LN_Propertyv2.Functions.fCleanName(pInput.BorrowerName2);
 			
@@ -150,12 +150,12 @@ EXPORT Map_BK_AssignRelease_Base (STRING	pVersionDate
 			SELF.dt_vendor_last_reported								:=	pInput.date_vendor_last_reported;
 			SELF																				:=	pInput;
 			SELF																				:=	[];
-		end;
+		END;
 
-		EXPORT dMortgage2Common	:=	PROJECT(PrepDataSet.dMortgageRawCombined,tMap2Common(LEFT,COUNTER)) :INDEPENDENT;
+		EXPORT dARMortgage2Common	:=	PROJECT(ARPrepDataSet.dARMortgageRawCombined,tMap2Common(LEFT,COUNTER)) :INDEPENDENT;
 		
 		// Reformat to bring to base file layouts
-		pMortgage				:=	PROJECT(dMortgage2Common,LN_PropertyV2_Fast.Layout_prep_deed_mortg);
+		pMortgage				:=	PROJECT(dARMortgage2Common,LN_PropertyV2_Fast.Layout_prep_deed_mortg);
 		EXPORT dNew			:=	DEDUP(SORT(pMortgage,ln_fares_id,apnt_or_pin_number),RECORD,ALL);
 			
 	END;
@@ -173,7 +173,7 @@ EXPORT Map_BK_AssignRelease_Base (STRING	pVersionDate
 		END;
 
 		//Limit to only records that exceed the lender/borrower name length
-		filterAddlNames := mortgage.dMortgage2Common(LENGTH(TRIM(orig_borrower_name)) > 80 OR LENGTH(TRIM(orig_lender_name)) > 40);
+		filterAddlNames := armortgage.dARMortgage2Common(LENGTH(TRIM(orig_borrower_name)) > 80 OR LENGTH(TRIM(orig_lender_name)) > 40);
 		
 		EXPORT dAddlNamesPrep	:=	PROJECT(filterAddlNames,tAddlNames(LEFT));
 		
@@ -187,7 +187,7 @@ EXPORT Map_BK_AssignRelease_Base (STRING	pVersionDate
 	// ---------------------------------------------------------------------------------------------------------
 	EXPORT addlNames 	:= MODULE
 		//Addl Borrower Names
-		dAddlBorrower := mortgage.dMortgage2Common(TRIM(OtherBorrowerName) <> '');
+		dAddlBorrower := armortgage.dARMortgage2Common(TRIM(OtherBorrowerName) <> '');
 		// Addl buyer clean
 		LN_Propertyv2.Functions.CleanFields(dAddlBorrower,dAddlBorrowerClean);
 	
@@ -287,7 +287,7 @@ EXPORT Map_BK_AssignRelease_Base (STRING	pVersionDate
 			SELF													:=	[];
 		END;
 		
-		dMortgageNormName	:=	normalize(mortgage.dMortgage2Common,2,tMortgageName(left,counter));	
+		dMortgageNormName	:=	normalize(armortgage.dARMortgage2Common,2,tMortgageName(left,counter));	
 		
 		// Normalize the Mortgage search file by address
 		LN_Propertyv2.Layout_Prep.Temp.SearchTemp	tMortgageNormAddr(LN_Propertyv2.Layout_Prep.Temp.SearchTemp	pInput,integer	cnt)	:=

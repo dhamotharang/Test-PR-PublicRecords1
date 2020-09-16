@@ -65,7 +65,7 @@ EXPORT proc2Prep(string	prepDate, boolean isFast) :=  FUNCTION
 												+LN_PropertyV2_Fast.Map_OKC_Raw_Mortgage_Base(prepDate,iRokMn,iRokMr).search.dNew;
 												
 		//Split, map and save Black Knight Assignment/Release files;
-		prepBKMortgage			:= LN_PropertyV2_Fast.Map_BK_AssignRelease_Base(prepDate,iRbkAs,iRbkRl,prepOkcMortgage).mortgage.dNew;
+		prepBKMortgage			:= LN_PropertyV2_Fast.Map_BK_AssignRelease_Base(prepDate,iRbkAs,iRbkRl,prepOkcMortgage).armortgage.dNew;
 		prepBKAddlNameInfo	:= LN_PropertyV2_Fast.Map_BK_AssignRelease_Base(prepDate,iRbkAs,iRbkRl,prepOkcMortgage).AddlNameInfo.dNew;
 		prepBKAddlNames			:= LN_PropertyV2_Fast.Map_BK_AssignRelease_Base(prepDate,iRbkAs,iRbkRl,prepOkcMortgage).addlNames.dNew;
 		prepBKSearch				:= LN_PropertyV2_Fast.Map_BK_AssignRelease_Base(prepDate,iRbkAs,iRbkRl,prepOkcMortgage).search.dNew;
