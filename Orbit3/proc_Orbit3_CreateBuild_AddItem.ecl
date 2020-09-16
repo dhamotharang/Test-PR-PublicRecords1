@@ -25,12 +25,12 @@ spcluster := map  ( regexfind('_eclcc',tgtcluster)  and _Control.ThisEnvironment
 							 'hthor'									 );
 
 fswu :=   _control.fSubmitNewWorkunit(ECL1 ,trim(spcluster)) :   SUCCESS(fileservices.sendemail(Send_Email(Buildvs,email_list).emaillist
-																			                                                                                                     ,'Orbit4 submit WU to spawn status'+ workunit
-																			                                                                                                      ,'Orbit4 submit WU to spawn success -- '+ workunit
+																			                                                                                                     ,'Orbit3 submit WU to spawn status'+ workunit
+																			                                                                                                      ,'Orbit3 submit WU to spawn success -- '+ workunit
 																			                                                                                                       )),
 		                                                                                                                                                                                      FAILURE(fileservices.sendemail(Send_Email(Buildvs,email_list).emaillist
-																			                                                                                                     ,'Orbit4 submit WU to spawn status'+ workunit
-																			                                                                                                      ,'Orbit4 submit WU to spawn failed -- '+ workunit
+																			                                                                                                     ,'Orbit3 submit WU to spawn status'+ workunit
+																			                                                                                                      ,'Orbit3 submit WU to spawn failed -- '+ workunit
 																			                                                                                                       ));
 																																																																						 
 																																																											
