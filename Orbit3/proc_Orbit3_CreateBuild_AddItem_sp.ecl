@@ -1,5 +1,5 @@
 ﻿import ut,Orbit3,_Control;
-export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string Envmt = 'N',  string email_list = '', boolean skipcreatebuild = false,boolean skipupdatebuild = false, boolean skipaddcomponents = false, boolean runcreatebuild = true, boolean runaddcomponentsonly = false,boolean is_npf = false, string wuid) := function
+export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string Envmt = 'N',  string BuildStatus = 'BUILD_AVAILABLE_FOR_USE', string email_list = '', boolean skipcreatebuild = false,boolean skipupdatebuild = false, boolean skipaddcomponents = false, boolean runcreatebuild = true, boolean runaddcomponentsonly = false,boolean is_npf = false, string wuid) := function
 
 	string Envmt_isnpf  := if ( is_npf = true, '',Envmt);
 	
@@ -32,13 +32,13 @@ export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string
 	Update_build := if ( is_npf = true , Orbit3.UpdateBuildInstance(buildname,
 									                                Buildvs,
 									                                  tokenval,
-									                             'BUILD_AVAILABLE_FOR_USE'
+									                             BuildStatus
 						                                  
 									                             ).retcode,
 										  Orbit3.UpdateBuildInstance(buildname,
 									                                Buildvs,
 									                                  tokenval,
-									                             'BUILD_AVAILABLE_FOR_USE',
+									                             BuildStatus,
 																 Orbit3.Constants(Envmt_isnpf).platform_upd
 						                                  
 									                             ).retcode
