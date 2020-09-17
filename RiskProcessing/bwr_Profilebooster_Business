@@ -1,4 +1,4 @@
-﻿#workunit('name','bwr_Business_Marketing_Attributes_Batch_Service');
+﻿#workunit('name','Profilebooster_Business');
 #option ('hthorMemoryLimit', 1000);
 
 IMPORT PublicRecords_KEL,BRM_Marketing_attributes,RiskWise,Data_Services; 
@@ -18,10 +18,10 @@ threads      := 30;
 
 RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;      // Production
 
-inputFile := '~tfuerstenberg::in::amex_9834_gcp_sba_in.csv';
-OutputFile := '~kandsu01::BRM_test_100K_roxie_'+ ThorLib.wuid();
+inputFile := '~tfuerstenberg::in::profilebooster_bus_in.csv';
+OutputFile := '~tfuerstenberg::out::profilebooster_bus_test_'+ ThorLib.wuid();
 
-		// Configure options:
+	// Configure options:
 	Options := MODULE(PublicRecords_KEL.Interface_Options)
 		EXPORT INTEGER ScoreThreshold := 80;
 		EXPORT STRING100 Data_Restriction_Mask := '0000010001001100000000000';
@@ -103,7 +103,7 @@ END;
 				CHOOSEN (DATASET(InputFile, prii_layout, CSV(QUOTE('"'))), recordsToRun));
  OUTPUT (choosen(p,eyeball), NAMED ('original_input'));
  
- //append G_ProcBusUID to the input.
+//append G_ProcBusUID to the input.
 with_G_ProcBusUID_layout := RECORD
 prii_layout;
 string30 G_ProcBusUID;
@@ -335,18 +335,17 @@ finalResults := sort(join(result_SOAPCALL, with_G_ProcBusUID,
 
 // Records that completed having a MinInputErrorCode shall be kept in the "Passed"
 // dataset. However, we still need to display them.
-	Passed := finalResults(TRIM(ErrorCode) = '');
-	records_having_MinInputErrorCode := Passed(Error_msg='minimum input criteria not met');
+Passed := finalResults(TRIM(ErrorCode) = '' AND TRIM(Acctno)<> '');
   
-	OUTPUT( records_having_MinInputErrorCode, NAMED('MinimumInputErrorCode_recs') );
+records_having_MinInputErrorCode := Passed(Error_msg='minimum input criteria not met'); 
+OUTPUT( records_having_MinInputErrorCode, NAMED('MinimumInputErrorCode_recs') );
 
 // ----------[ FAILED RECORDS ]----------
 // Records that have an ErrorCode besides MinInputErrorCode will be put 
 // in the "Failed" dataset. Display these too. Transform them into original input
 // ("_as_input") so they can be rerun.
-records_having_other_ErrorCode := 
-	finalResults(TRIM(ErrorCode)<>'');
 
+records_having_other_ErrorCode := finalResults(TRIM(ErrorCode)<>''OR TRIM(Acctno) = '');
 OUTPUT( records_having_other_ErrorCode, NAMED('OtherErrorCode_recs') );
 
 ds_input_dist := DISTRIBUTE(with_G_ProcBusUID, HASH32(AccountNumber)) : INDEPENDENT;
@@ -371,13 +370,6 @@ dropped_records_as_input :=
 OUTPUT( COUNT(dropped_records_as_input), NAMED('COUNT_dropped_records') );
 
 Failed := records_having_other_ErrorCode_as_input + dropped_records_as_input;
-
-finalLayout getFile_Ind1(Failed le, with_G_ProcBusUID ri) := TRANSFORM
-		SELF.G_ProcBusUID := (integer)ri.accountnumber;
-		SELF.AcctNo := ri.G_ProcBusUID;
-		SELF	 := le;
-   SELF :=[];
-END;
 					
 with_G_ProcBusUID_layout UID_Acc_switch (Failed le):= TRANSFORM
 SELF.G_ProcBusUID := le.accountnumber;
