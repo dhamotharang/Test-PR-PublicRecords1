@@ -177,6 +177,7 @@
   string40 addl_report_number;
   string11 agency_id;
   string9 agency_ori;
+  boolean is_terminated_agency;
   string100 insurance_company_standardized;
   string1 is_available_for_public;
   string20 report_status;

@@ -936,4 +936,6 @@
 	//PRtCC CR-1262 
   STRING Direction_Of_Impact;
 	STRING Event_Sequence;
+	DATASET(Layout_Infiles_Fixed.Citations_ChildRec) Citation_Details {MAXCOUNT(Constants.Max_Citations_ChildRec_Count)};
+
 END;
