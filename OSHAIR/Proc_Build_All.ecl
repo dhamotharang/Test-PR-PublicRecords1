@@ -1,4 +1,4 @@
-﻿import _Control, RoxieKeyBuild, orbit_report, _validate, Orbit3, dops, scrubs, DOPSGrowthCheck, Scrubs_OSHAIR;
+﻿import _Control, RoxieKeyBuild, orbit_report, _validate, Orbit3, dops, scrubs, Scrubs_OSHAIR;
 
 export Proc_Build_All(string filedate, string version) := function
 
@@ -27,10 +27,7 @@ export Proc_Build_All(string filedate, string version) := function
 																					,do_strata);
 
 	//Update DOPS
-	dops_update 		:= if(scrubs.mac_ScrubsFailureTest('Scrubs_OSHAIR_Accidents,Scrubs_OSHAIR_AccidentAbstract,Scrubs_OSHAIR_AccidentInjury,Scrubs_OSHAIR_GenDutyStd,Scrubs_OSHAIR_Inspection,Scrubs_OSHAIR_OptionalInfo,Scrubs_OSHAIR_RelatedActivity,Scrubs_OSHAIR_StrategicCodes,Scrubs_OSHAIR_Violation',filedate),
-													dops.updateversion('OshairKeys', version, _Control.MyInfo.EmailAddressNotify + ';darren.knowles@lexisnexisrisk.com',,'N|B'),
-													output('Scrubs has failed!',NAMED('Scrubs_Failure'))
-												);
+	dops_update 		:=	dops.updateversion('OshairKeys', version, _Control.MyInfo.EmailAddressNotify + ';darren.knowles@lexisnexisrisk.com',,'N|B');
 										
 	//Update ORBIT MAG
 	// Changed from CreateBuild to use CreateBuild_AddItem so that it adds the item at build time
@@ -39,7 +36,11 @@ export Proc_Build_All(string filedate, string version) := function
 	return sequential(process_date, 
 										spray_files,
 										oshair.promote(filedate).Inputfiles.Sprayed2Using,
-										Scrubs_OSHAIR.fn_RunScrubs(filedate),
+										Scrubs_OSHAIR.fn_RunScrubs(filedate, _Control.MyInfo.EmailAddressNotify + ';darren.knowles@lexisnexisrisk.com'),
+										if(scrubs.mac_ScrubsFailureTest('Scrubs_OSHAIR_Accidents,Scrubs_OSHAIR_AccidentAbstract,Scrubs_OSHAIR_AccidentInjury,Scrubs_OSHAIR_GenDutyStd,Scrubs_OSHAIR_Inspection,Scrubs_OSHAIR_OptionalInfo,Scrubs_OSHAIR_RelatedActivity,Scrubs_OSHAIR_StrategicCodes,Scrubs_OSHAIR_Violation',filedate)
+													,OUTPUT('Scrubs passed.  Continuing to the Build_Base step.')				
+													,FAIL('Scrubs failed.  Base and keys not built.  Processing stopped.')
+											),
 										clean_data,
 										oshair.normalize_child_datasets(version, process_date),
 										oshair.promote(version).buildfiles.new2built,

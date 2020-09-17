@@ -1,5 +1,5 @@
 ﻿IMPORT SALT311;
-IMPORT Scrubs_Oshair; // Import modules for FieldTypes attribute definitions
+IMPORT Scrubs,Scrubs_OSHAIR; // Import modules for FieldTypes attribute definitions
 EXPORT AccidentInjury_Raw_Fields := MODULE
  
 EXPORT NumFields := 20;
@@ -11,14 +11,14 @@ EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'invalid_numeric' => 1,'inval
 EXPORT MakeFT_invalid_numeric(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_numeric(SALT311.StrType s) := WHICH(~Scrubs_Oshair.Functions.fn_numeric(s)>0);
-EXPORT InValidMessageFT_invalid_numeric(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Oshair.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_numeric(SALT311.StrType s) := WHICH(~Scrubs.Functions.fn_numeric(s)>0);
+EXPORT InValidMessageFT_invalid_numeric(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_numeric_blank(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_numeric_blank(SALT311.StrType s) := WHICH(~Scrubs_Oshair.Functions.fn_numeric_or_blank(s)>0);
-EXPORT InValidMessageFT_invalid_numeric_blank(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Oshair.Functions.fn_numeric_or_blank'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_numeric_blank(SALT311.StrType s) := WHICH(~Scrubs_OSHAIR.Functions.fn_numeric_or_blank(s)>0);
+EXPORT InValidMessageFT_invalid_numeric_blank(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_OSHAIR.Functions.fn_numeric_or_blank'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_date_time(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -47,8 +47,8 @@ EXPORT InValidMessageFT_invalid_task_assigned(UNSIGNED1 wh) := CHOOSE(wh,SALT311
 EXPORT MakeFT_invalid_alpha_numeric(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_alpha_numeric(SALT311.StrType s) := WHICH(~Scrubs_Oshair.Functions.fn_alpha_numeric(s)>0);
-EXPORT InValidMessageFT_invalid_alpha_numeric(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Oshair.Functions.fn_alpha_numeric'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_alpha_numeric(SALT311.StrType s) := WHICH(~Scrubs.Functions.fn_alphaNum_or_blank(s)>0);
+EXPORT InValidMessageFT_invalid_alpha_numeric(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.Functions.fn_alphaNum_or_blank'),SALT311.HygieneErrors.Good);
  
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'summary_nr','rel_insp_nr','age','sex','nature_of_inj','part_of_body','src_of_injury','event_type','evn_factor','hum_factor','occ_code','degree_of_inj','task_assigned','hazsub','const_op','const_op_cause','fat_cause','fall_distance','fall_ht','injury_line_nr');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'summary_nr','rel_insp_nr','age','sex','nature_of_inj','part_of_body','src_of_injury','event_type','evn_factor','hum_factor','occ_code','degree_of_inj','task_assigned','hazsub','const_op','const_op_cause','fat_cause','fall_distance','fall_ht','injury_line_nr');

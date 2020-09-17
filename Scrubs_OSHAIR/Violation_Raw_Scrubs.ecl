@@ -1,5 +1,5 @@
 ﻿IMPORT SALT311,STD;
-IMPORT Scrubs_Oshair; // Import modules for FieldTypes attribute definitions
+IMPORT Scrubs,Scrubs_Oshair; // Import modules for FieldTypes attribute definitions
 EXPORT Violation_Raw_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
@@ -197,7 +197,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.hazsub4_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.hazsub5_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'activity_nr','citation_id','delete_flag','viol_type','issuance_date','abate_date','current_penalty','initial_penalty','contest_date','final_order_date','nr_instances','nr_exposed','rec','gravity','emphasis','hazcat','fta_insp_nr','fta_issuance_date','fta_penalty','fta_contest_date','fta_final_order_date','hazsub1','hazsub2','hazsub3','hazsub4','hazsub5','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_numeric','invalid_alpha_numeric','Invalid_X','Invalid_viol_type','invalid_date_time','invalid_date_future','invalid_numeric_or_period','invalid_numeric_or_period','invalid_date_time','invalid_date_future','invalid_numeric_blank','invalid_numeric_blank','Invalid_rec','invalid_numeric_blank','Invalid_X','invalid_alpha_blank','invalid_numeric_blank','invalid_date_time','invalid_numeric_or_period','invalid_date_ccyymm','invalid_date_ccyymm','invalid_alpha_numeric','invalid_alpha_numeric','invalid_alpha_numeric','invalid_alpha_numeric','invalid_alpha_numeric','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'invalid_numeric','invalid_alpha_numeric','Invalid_X','Invalid_viol_type','invalid_date_ccyymm','invalid_date_future','invalid_numeric_or_period','invalid_numeric_or_period','invalid_date_ccyymm','invalid_date_future','invalid_numeric_blank','invalid_numeric_blank','Invalid_rec','invalid_numeric_blank','Invalid_X','invalid_alpha_blank','invalid_numeric_blank','invalid_date_ccyymm','invalid_numeric_or_period','invalid_date_ccyymm','invalid_date_ccyymm','Invalid_alpha_Numeric_blank','Invalid_alpha_Numeric_blank','Invalid_alpha_Numeric_blank','Invalid_alpha_Numeric_blank','Invalid_alpha_Numeric_blank','UNKNOWN');
     SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.activity_nr,(SALT311.StrType)le.citation_id,(SALT311.StrType)le.delete_flag,(SALT311.StrType)le.viol_type,(SALT311.StrType)le.issuance_date,(SALT311.StrType)le.abate_date,(SALT311.StrType)le.current_penalty,(SALT311.StrType)le.initial_penalty,(SALT311.StrType)le.contest_date,(SALT311.StrType)le.final_order_date,(SALT311.StrType)le.nr_instances,(SALT311.StrType)le.nr_exposed,(SALT311.StrType)le.rec,(SALT311.StrType)le.gravity,(SALT311.StrType)le.emphasis,(SALT311.StrType)le.hazcat,(SALT311.StrType)le.fta_insp_nr,(SALT311.StrType)le.fta_issuance_date,(SALT311.StrType)le.fta_penalty,(SALT311.StrType)le.fta_contest_date,(SALT311.StrType)le.fta_final_order_date,(SALT311.StrType)le.hazsub1,(SALT311.StrType)le.hazsub2,(SALT311.StrType)le.hazsub3,(SALT311.StrType)le.hazsub4,(SALT311.StrType)le.hazsub5,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,26,Into(LEFT,COUNTER));
@@ -215,11 +215,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'citation_id:invalid_alpha_numeric:CUSTOM'
           ,'delete_flag:Invalid_X:ENUM'
           ,'viol_type:Invalid_viol_type:ENUM'
-          ,'issuance_date:invalid_date_time:CUSTOM'
+          ,'issuance_date:invalid_date_ccyymm:CUSTOM'
           ,'abate_date:invalid_date_future:CUSTOM'
           ,'current_penalty:invalid_numeric_or_period:CUSTOM'
           ,'initial_penalty:invalid_numeric_or_period:CUSTOM'
-          ,'contest_date:invalid_date_time:CUSTOM'
+          ,'contest_date:invalid_date_ccyymm:CUSTOM'
           ,'final_order_date:invalid_date_future:CUSTOM'
           ,'nr_instances:invalid_numeric_blank:CUSTOM'
           ,'nr_exposed:invalid_numeric_blank:CUSTOM'
@@ -228,15 +228,15 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'emphasis:Invalid_X:ENUM'
           ,'hazcat:invalid_alpha_blank:CUSTOM'
           ,'fta_insp_nr:invalid_numeric_blank:CUSTOM'
-          ,'fta_issuance_date:invalid_date_time:CUSTOM'
+          ,'fta_issuance_date:invalid_date_ccyymm:CUSTOM'
           ,'fta_penalty:invalid_numeric_or_period:CUSTOM'
           ,'fta_contest_date:invalid_date_ccyymm:CUSTOM'
           ,'fta_final_order_date:invalid_date_ccyymm:CUSTOM'
-          ,'hazsub1:invalid_alpha_numeric:CUSTOM'
-          ,'hazsub2:invalid_alpha_numeric:CUSTOM'
-          ,'hazsub3:invalid_alpha_numeric:CUSTOM'
-          ,'hazsub4:invalid_alpha_numeric:CUSTOM'
-          ,'hazsub5:invalid_alpha_numeric:CUSTOM'
+          ,'hazsub1:Invalid_alpha_Numeric_blank:CUSTOM'
+          ,'hazsub2:Invalid_alpha_Numeric_blank:CUSTOM'
+          ,'hazsub3:Invalid_alpha_Numeric_blank:CUSTOM'
+          ,'hazsub4:Invalid_alpha_Numeric_blank:CUSTOM'
+          ,'hazsub5:Invalid_alpha_Numeric_blank:CUSTOM'
           ,'field:Number_Errored_Fields:SUMMARY'
           ,'field:Number_Perfect_Fields:SUMMARY'
           ,'rule:Number_Errored_Rules:SUMMARY'

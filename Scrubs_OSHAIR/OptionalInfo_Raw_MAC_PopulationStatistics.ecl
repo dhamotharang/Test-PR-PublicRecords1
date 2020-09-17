@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT OptionalInfo_Raw_MAC_PopulationStatistics(infile,Ref='',Input_activity_nr = '',Input_opt_type = '',Input_opt_id = '',Input_opt_info_id = '',OutFile) := MACRO
+EXPORT OptionalInfo_Raw_MAC_PopulationStatistics(infile,Ref='',Input_activity_nr = '',Input_opt_type = '',Input_opt_id = '',OutFile) := MACRO
   IMPORT SALT311,Scrubs_OSHAIR;
   #uniquename(of)
   %of% := RECORD
@@ -24,12 +24,6 @@ EXPORT OptionalInfo_Raw_MAC_PopulationStatistics(infile,Ref='',Input_activity_nr
       '' 
     #ELSE
         IF( le.Input_opt_id = (TYPEOF(le.Input_opt_id))'','',':opt_id')
-    #END
- 
-+    #IF( #TEXT(Input_opt_info_id)='' )
-      '' 
-    #ELSE
-        IF( le.Input_opt_info_id = (TYPEOF(le.Input_opt_info_id))'','',':opt_info_id')
     #END
 ;
   END;

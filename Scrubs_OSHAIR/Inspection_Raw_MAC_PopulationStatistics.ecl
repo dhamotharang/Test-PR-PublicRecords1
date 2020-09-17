@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT Inspection_Raw_MAC_PopulationStatistics(infile,Ref='',Input_activity_nr = '',Input_reporting_id = '',Input_state_flag = '',Input_site_state = '',Input_site_zip = '',Input_owner_type = '',Input_owner_code = '',Input_adv_notice = '',Input_safety_hlth = '',Input_sic_code = '',Input_naics_code = '',Input_insp_type = '',Input_insp_scope = '',Input_why_no_insp = '',Input_union_status = '',Input_safety_manuf = '',Input_safety_const = '',Input_safety_marit = '',Input_health_manuf = '',Input_health_const = '',Input_health_marit = '',Input_migrant = '',Input_mail_state = '',Input_mail_zip = '',Input_host_est_key = '',Input_nr_in_estab = '',Input_open_date = '',Input_case_mod_date = '',Input_close_conf_date = '',Input_close_case_date = '',Input_open_year = '',Input_case_mod_year = '',Input_close_conf_year = '',Input_close_case_year = '',OutFile) := MACRO
+EXPORT Inspection_Raw_MAC_PopulationStatistics(infile,Ref='',Input_activity_nr = '',Input_reporting_id = '',Input_state_flag = '',Input_site_state = '',Input_site_zip = '',Input_owner_type = '',Input_owner_code = '',Input_adv_notice = '',Input_safety_hlth = '',Input_sic_code = '',Input_naics_code = '',Input_insp_type = '',Input_insp_scope = '',Input_why_no_insp = '',Input_union_status = '',Input_safety_manuf = '',Input_safety_const = '',Input_safety_marit = '',Input_health_manuf = '',Input_health_const = '',Input_health_marit = '',Input_migrant = '',Input_mail_state = '',Input_mail_zip = '',Input_host_est_key = '',Input_nr_in_estab = '',Input_open_date = '',Input_case_mod_date = '',Input_close_conf_date = '',Input_close_case_date = '',Input_open_year = '',Input_case_mod_year = '',Input_close_conf_year = '',Input_close_case_year = '',Input_estab_name = '',OutFile) := MACRO
   IMPORT SALT311,Scrubs_OSHAIR;
   #uniquename(of)
   %of% := RECORD
@@ -210,6 +210,12 @@ EXPORT Inspection_Raw_MAC_PopulationStatistics(infile,Ref='',Input_activity_nr =
       '' 
     #ELSE
         IF( le.Input_close_case_year = (TYPEOF(le.Input_close_case_year))'','',':close_case_year')
+    #END
+ 
++    #IF( #TEXT(Input_estab_name)='' )
+      '' 
+    #ELSE
+        IF( le.Input_estab_name = (TYPEOF(le.Input_estab_name))'','',':estab_name')
     #END
 ;
   END;

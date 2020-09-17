@@ -1,5 +1,5 @@
 ﻿IMPORT SALT311,STD;
-EXPORT StrategicCodes_Raw_hygiene(dataset(StrategicCodes_Raw_Layout) h) := MODULE
+EXPORT StrategicCodes_Raw_hygiene(dataset(Scrubs_OSHAIR.StrategicCodes_Raw_Layout) h) := MODULE
  
 //A simple summary record
 EXPORT Summary(SALT311.Str30Type  txt) := FUNCTION

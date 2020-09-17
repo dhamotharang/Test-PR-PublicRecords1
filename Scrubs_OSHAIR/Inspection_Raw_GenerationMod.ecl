@@ -22,7 +22,7 @@ EXPORT Inspection_Raw_GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'Inspection_Raw_In_OSHAIR';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,activity_nr,reporting_id,state_flag,site_state,site_zip,owner_type,owner_code,adv_notice,safety_hlth,sic_code,naics_code,insp_type,insp_scope,why_no_insp,union_status,safety_manuf,safety_const,safety_marit,health_manuf,health_const,health_marit,migrant,mail_state,mail_zip,host_est_key,nr_in_estab,open_date,case_mod_date,close_conf_date,close_case_date,open_year,case_mod_year,close_conf_year,close_case_year';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,activity_nr,reporting_id,state_flag,site_state,site_zip,owner_type,owner_code,adv_notice,safety_hlth,sic_code,naics_code,insp_type,insp_scope,why_no_insp,union_status,safety_manuf,safety_const,safety_marit,health_manuf,health_const,health_marit,migrant,mail_state,mail_zip,host_est_key,nr_in_estab,open_date,case_mod_date,close_conf_date,close_case_date,open_year,case_mod_year,close_conf_year,close_case_year,estab_name';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := TRUE;
@@ -43,14 +43,10 @@ EXPORT Inspection_Raw_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FILENAME:Inspection_Raw_In_OSHAIR\n'
     + 'NAMESCOPE:Inspection_Raw\n'
     + '\n'
-    + 'FIELDTYPE:invalid_numeric:CUSTOM(Scrubs_Oshair.Functions.fn_numeric > 0)\n'
-    + 'FIELDTYPE:invalid_numeric_blank:CUSTOM(Scrubs_Oshair.Functions.fn_numeric_or_blank > 0)\n'
+    + 'FIELDTYPE:invalid_numeric:CUSTOM(Scrubs.Functions.fn_numeric > 0)\n'
+    + 'FIELDTYPE:invalid_numeric_blank:CUSTOM(Scrubs.Functions.fn_numeric_optional > 0)\n'
     + 'FIELDTYPE:invalid_state:CUSTOM(Scrubs_Oshair.Functions.fn_verify_state > 0)\n'
     + 'FIELDTYPE:invalid_state_flag:CUSTOM(Scrubs_Oshair.Functions.fn_state_flag > 0)\n'
-    + 'FIELDTYPE:invalid_project_cost:CUSTOM(Scrubs_Oshair.Functions.fn_project_cost > 0)\n'
-    + 'FIELDTYPE:invalid_project_type:CUSTOM(Scrubs_Oshair.Functions.fn_project_type > 0)\n'
-    + 'FIELDTYPE:invalid_sic_list:CUSTOM(Scrubs_Oshair.Functions.fn_numeric_or_comma > 0)\n'
-    + 'FIELDTYPE:invalid_fatality:CUSTOM(Scrubs_Oshair.Functions.fn_fatality > 0)\n'
     + 'FIELDTYPE:invalid_owner_type:CUSTOM(Scrubs_Oshair.Functions.fn_owner_type > 0)\n'
     + 'FIELDTYPE:invalid_adv_notice:CUSTOM(Scrubs_Oshair.Functions.fn_adv_notice > 0)\n'
     + 'FIELDTYPE:invalid_safety_hlth:CUSTOM(Scrubs_Oshair.Functions.fn_safety_hlth > 0)\n'
@@ -62,6 +58,9 @@ EXPORT Inspection_Raw_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:invalid_host_est_key:CUSTOM(Scrubs_Oshair.Functions.fn_host_est_key > 0)\n'
     + 'FIELDTYPE:invalid_date_dashes:CUSTOM(Scrubs_Oshair.Functions.fn_date_time > 0, \'FUTURE\')\n'
     + 'FIELDTYPE:invalid_year:CUSTOM(Scrubs_Oshair.Functions.fn_dt_yy > 0)\n'
+    + 'FIELDTYPE:invalid_mandatory:CUSTOM(Scrubs.Functions.fn_populated_strings>0)\n'
+    + 'FIELDTYPE:invalid_sic:CUSTOM(Scrubs.Functions.fn_valid_SicCode>0)\n'
+    + 'FIELDTYPE:invalid_naics:CUSTOM(Scrubs.Functions.fn_validate_NAICSCode>0)\n'
     + '\n'
     + 'FIELD:activity_nr:TYPE(STRING9):LIKE(invalid_numeric):0,0\n'
     + 'FIELD:reporting_id:TYPE(STRING7):LIKE(invalid_numeric):0,0\n'
@@ -72,8 +71,8 @@ EXPORT Inspection_Raw_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:owner_code:TYPE(STRING4):LIKE(invalid_numeric_blank):0,0\n'
     + 'FIELD:adv_notice:TYPE(STRING1):LIKE(invalid_adv_notice):0,0\n'
     + 'FIELD:safety_hlth:TYPE(STRING1):LIKE(invalid_safety_hlth):0,0\n'
-    + 'FIELD:sic_code:TYPE(STRING4):LIKE(invalid_numeric_blank):0,0\n'
-    + 'FIELD:naics_code:TYPE(STRING6):LIKE(invalid_numeric_blank):0,0\n'
+    + 'FIELD:sic_code:TYPE(STRING4):LIKE(invalid_sic):0,0\n'
+    + 'FIELD:naics_code:TYPE(STRING6):LIKE(invalid_naics):0,0\n'
     + 'FIELD:insp_type:TYPE(STRING1):LIKE(invalid_insp_type):0,0\n'
     + 'FIELD:insp_scope:TYPE(STRING1):LIKE(invalid_insp_scope):0,0\n'
     + 'FIELD:why_no_insp:TYPE(STRING1):LIKE(invalid_why_no_insp):0,0\n'
@@ -96,7 +95,8 @@ EXPORT Inspection_Raw_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:open_year:TYPE(STRING4):LIKE(invalid_year):0,0\n'
     + 'FIELD:case_mod_year:TYPE(STRING4):LIKE(invalid_year):0,0\n'
     + 'FIELD:close_conf_year:TYPE(STRING4):LIKE(invalid_year):0,0\n'
-    + 'FIELD:close_case_year:TYPE(STRING4):LIKE(invalid_year):0,0'
+    + 'FIELD:close_case_year:TYPE(STRING4):LIKE(invalid_year):0,0\n'
+    + 'FIELD:estab_name:TYPE(STRING50):LIKE(invalid_mandatory):0,0\n'
     ;
  
   // Structured values

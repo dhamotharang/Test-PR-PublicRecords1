@@ -1,5 +1,5 @@
 ﻿IMPORT SALT311,STD;
-IMPORT Scrubs_Oshair; // Import modules for FieldTypes attribute definitions
+IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT StrategicCodes_Raw_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
@@ -9,21 +9,21 @@ EXPORT StrategicCodes_Raw_Scrubs := MODULE
   EXPORT NumFieldsWithRules := 2;
   EXPORT NumFieldsWithPossibleEdits := 0;
   EXPORT NumRulesWithPossibleEdits := 0;
-  EXPORT Expanded_Layout := RECORD(StrategicCodes_Raw_Layout)
+  EXPORT Expanded_Layout := RECORD(Scrubs_OSHAIR.StrategicCodes_Raw_Layout)
     UNSIGNED1 activity_nr_Invalid;
     UNSIGNED1 prog_type_Invalid;
   END;
-  EXPORT  Bitmap_Layout := RECORD(StrategicCodes_Raw_Layout)
+  EXPORT  Bitmap_Layout := RECORD(Scrubs_OSHAIR.StrategicCodes_Raw_Layout)
     UNSIGNED8 ScrubsBits1;
   END;
-EXPORT FromNone(DATASET(StrategicCodes_Raw_Layout) h) := MODULE
+EXPORT FromNone(DATASET(Scrubs_OSHAIR.StrategicCodes_Raw_Layout) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
     SELF.activity_nr_Invalid := StrategicCodes_Raw_Fields.InValid_activity_nr((SALT311.StrType)le.activity_nr);
     SELF.prog_type_Invalid := StrategicCodes_Raw_Fields.InValid_prog_type((SALT311.StrType)le.prog_type);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
-  EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),StrategicCodes_Raw_Layout);
+  EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Scrubs_OSHAIR.StrategicCodes_Raw_Layout);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
     SELF.ScrubsBits1 := ( le.activity_nr_Invalid << 0 ) + ( le.prog_type_Invalid << 1 );
     SELF := le;
@@ -32,7 +32,7 @@ EXPORT FromNone(DATASET(StrategicCodes_Raw_Layout) h) := MODULE
 END;
 // Module to use if you already have a scrubs bitmap you wish to expand or compare
 EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
-  EXPORT Infile := PROJECT(h,StrategicCodes_Raw_Layout);
+  EXPORT Infile := PROJECT(h,Scrubs_OSHAIR.StrategicCodes_Raw_Layout);
   Expanded_Layout into(h le) := TRANSFORM
     SELF.activity_nr_Invalid := (le.ScrubsBits1 >> 0) & 1;
     SELF.prog_type_Invalid := (le.ScrubsBits1 >> 1) & 1;
@@ -84,7 +84,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
-  EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(StrategicCodes_Raw_Layout) prevDS = DATASET([], StrategicCodes_Raw_Layout), STRING10 Src='UNK'):= FUNCTION
+  EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(Scrubs_OSHAIR.StrategicCodes_Raw_Layout) prevDS = DATASET([], Scrubs_OSHAIR.StrategicCodes_Raw_Layout), STRING10 Src='UNK'):= FUNCTION
   // field error stats
     SALT311.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
@@ -150,7 +150,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     FieldErrorStats := IF(examples>0,j,SummaryInfo);
  
     // field population stats
-    mod_hygiene := StrategicCodes_Raw_hygiene(PROJECT(h, StrategicCodes_Raw_Layout));
+    mod_hygiene := StrategicCodes_Raw_hygiene(PROJECT(h, Scrubs_OSHAIR.StrategicCodes_Raw_Layout));
     hygiene_summaryStats := mod_hygiene.Summary('');
     getFieldTypeText(infield) := FUNCTIONMACRO
       isNumField := (STRING)((TYPEOF(infield))'') = '0';
@@ -185,7 +185,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     END;
     TotalRecsStats := PROJECT(hygiene_summaryStats, xTotalRecs(LEFT, 'records:total_records:POP'));
  
-    mod_Delta := StrategicCodes_Raw_Delta(prevDS, PROJECT(h, StrategicCodes_Raw_Layout));
+    mod_Delta := StrategicCodes_Raw_Delta(prevDS, PROJECT(h, Scrubs_OSHAIR.StrategicCodes_Raw_Layout));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
     DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),2,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
     deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
@@ -198,7 +198,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
 END;
  
-EXPORT StandardStats(DATASET(StrategicCodes_Raw_Layout) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
+EXPORT StandardStats(DATASET(Scrubs_OSHAIR.StrategicCodes_Raw_Layout) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
   myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   expandedFile := FromNone(inFile).ExpandedInfile;
   mod_fromexpandedOverall := FromExpanded(expandedFile);

@@ -3,7 +3,7 @@ MODULE:Scrubs_OSHAIR
 FILENAME:StrategicCodes_Raw_In_OSHAIR
 NAMESCOPE:StrategicCodes_Raw
 
-FIELDTYPE:invalid_numeric:CUSTOM(Scrubs_Oshair.Functions.fn_numeric > 0)
+FIELDTYPE:invalid_numeric:CUSTOM(Scrubs.Functions.fn_numeric > 0)
 FIELDTYPE:Invalid_prog_type:ENUM(L|N|P|S)
 
 FIELD:activity_nr:TYPE(STRING9):LIKE(invalid_numeric):0,0

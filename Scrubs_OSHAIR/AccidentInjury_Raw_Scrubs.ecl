@@ -1,5 +1,5 @@
 ﻿IMPORT SALT311,STD;
-IMPORT Scrubs_Oshair; // Import modules for FieldTypes attribute definitions
+IMPORT Scrubs,Scrubs_OSHAIR; // Import modules for FieldTypes attribute definitions
 EXPORT AccidentInjury_Raw_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist

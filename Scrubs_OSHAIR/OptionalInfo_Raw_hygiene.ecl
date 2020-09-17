@@ -18,14 +18,10 @@ EXPORT Summary(SALT311.Str30Type  txt) := FUNCTION
     populated_opt_id_pcnt := AVE(GROUP,IF(h.opt_id = (TYPEOF(h.opt_id))'',0,100));
     maxlength_opt_id := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.opt_id)));
     avelength_opt_id := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.opt_id)),h.opt_id<>(typeof(h.opt_id))'');
-    populated_opt_info_id_cnt := COUNT(GROUP,h.opt_info_id <> (TYPEOF(h.opt_info_id))'');
-    populated_opt_info_id_pcnt := AVE(GROUP,IF(h.opt_info_id = (TYPEOF(h.opt_info_id))'',0,100));
-    maxlength_opt_info_id := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.opt_info_id)));
-    avelength_opt_info_id := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.opt_info_id)),h.opt_info_id<>(typeof(h.opt_info_id))'');
   END;
     T := TABLE(h,SummaryLayout);
   R1 := RECORD
-    UNSIGNED LinkingPotential :=  + T.Populated_activity_nr_pcnt *   0.00 / 100 + T.Populated_opt_type_pcnt *   0.00 / 100 + T.Populated_opt_id_pcnt *   0.00 / 100 + T.Populated_opt_info_id_pcnt *   0.00 / 100;
+    UNSIGNED LinkingPotential :=  + T.Populated_activity_nr_pcnt *   0.00 / 100 + T.Populated_opt_type_pcnt *   0.00 / 100 + T.Populated_opt_id_pcnt *   0.00 / 100;
     T;
   END;
   RETURN TABLE(T,R1);
@@ -43,31 +39,30 @@ END;
 invRec invert(summary0 le, INTEGER C) := TRANSFORM
   SELF.FldNo := C;
   SELF.NumberOfRecords := le.NumberOfRecords;
-  SELF.FieldName := CHOOSE(C,'activity_nr','opt_type','opt_id','opt_info_id');
-  SELF.populated_pcnt := CHOOSE(C,le.populated_activity_nr_pcnt,le.populated_opt_type_pcnt,le.populated_opt_id_pcnt,le.populated_opt_info_id_pcnt);
-  SELF.maxlength := CHOOSE(C,le.maxlength_activity_nr,le.maxlength_opt_type,le.maxlength_opt_id,le.maxlength_opt_info_id);
-  SELF.avelength := CHOOSE(C,le.avelength_activity_nr,le.avelength_opt_type,le.avelength_opt_id,le.avelength_opt_info_id);
+  SELF.FieldName := CHOOSE(C,'activity_nr','opt_type','opt_id');
+  SELF.populated_pcnt := CHOOSE(C,le.populated_activity_nr_pcnt,le.populated_opt_type_pcnt,le.populated_opt_id_pcnt);
+  SELF.maxlength := CHOOSE(C,le.maxlength_activity_nr,le.maxlength_opt_type,le.maxlength_opt_id);
+  SELF.avelength := CHOOSE(C,le.avelength_activity_nr,le.avelength_opt_type,le.avelength_opt_id);
 END;
-EXPORT invSummary := NORMALIZE(summary0, 4, invert(LEFT,COUNTER));
+EXPORT invSummary := NORMALIZE(summary0, 3, invert(LEFT,COUNTER));
 // The character counts
 // Move everything into 'inverted list' form so processing can be done 'in library'
 SALT311.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
-  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT311.StrType)le.activity_nr),TRIM((SALT311.StrType)le.opt_type),TRIM((SALT311.StrType)le.opt_id),TRIM((SALT311.StrType)le.opt_info_id)));
+  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT311.StrType)le.activity_nr),TRIM((SALT311.StrType)le.opt_type),TRIM((SALT311.StrType)le.opt_id)));
   SELF.FldNo := C;
 END;
-SHARED FldInv0 := NORMALIZE(h,4,Into(LEFT,COUNTER));
+SHARED FldInv0 := NORMALIZE(h,3,Into(LEFT,COUNTER));
 // Move everything into 'pairs' form so processing can be done 'in library'
 SALT311.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
-  SELF.FldNo1 := 1 + (C / 4);
-  SELF.FldNo2 := 1 + (C % 4);
-  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT311.StrType)le.activity_nr),TRIM((SALT311.StrType)le.opt_type),TRIM((SALT311.StrType)le.opt_id),TRIM((SALT311.StrType)le.opt_info_id)));
-  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT311.StrType)le.activity_nr),TRIM((SALT311.StrType)le.opt_type),TRIM((SALT311.StrType)le.opt_id),TRIM((SALT311.StrType)le.opt_info_id)));
+  SELF.FldNo1 := 1 + (C / 3);
+  SELF.FldNo2 := 1 + (C % 3);
+  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT311.StrType)le.activity_nr),TRIM((SALT311.StrType)le.opt_type),TRIM((SALT311.StrType)le.opt_id)));
+  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT311.StrType)le.activity_nr),TRIM((SALT311.StrType)le.opt_type),TRIM((SALT311.StrType)le.opt_id)));
   END;
-SHARED Pairs0 := NORMALIZE(ENTH(h,Config.CorrelateSampleSize),4*4,IntoP(LEFT,COUNTER))(FldNo1<FldNo2);
+SHARED Pairs0 := NORMALIZE(ENTH(h,Config.CorrelateSampleSize),3*3,IntoP(LEFT,COUNTER))(FldNo1<FldNo2);
 SHARED FldIds := DATASET([{1,'activity_nr'}
       ,{2,'opt_type'}
-      ,{3,'opt_id'}
-      ,{4,'opt_info_id'}],SALT311.MAC_Character_Counts.Field_Identification);
+      ,{3,'opt_id'}],SALT311.MAC_Character_Counts.Field_Identification);
 EXPORT AllProfiles := SALT311.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
  
 EXPORT SrcProfiles := SALT311.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
@@ -83,11 +78,10 @@ ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
     OptionalInfo_Raw_Fields.InValid_activity_nr((SALT311.StrType)le.activity_nr),
     OptionalInfo_Raw_Fields.InValid_opt_type((SALT311.StrType)le.opt_type),
     OptionalInfo_Raw_Fields.InValid_opt_id((SALT311.StrType)le.opt_id),
-    OptionalInfo_Raw_Fields.InValid_opt_info_id((SALT311.StrType)le.opt_info_id),
     0);
   SELF.FieldNum := IF(SELF.ErrorNum=0,SKIP,c); // Bail early to avoid creating record
 END;
-Errors := NORMALIZE(h,4,NoteErrors(LEFT,COUNTER));
+Errors := NORMALIZE(h,3,NoteErrors(LEFT,COUNTER));
 ErrorRecordsTotals := RECORD
   Errors.FieldNum;
   Errors.ErrorNum;
@@ -96,8 +90,8 @@ END;
 TotalErrors := TABLE(Errors,ErrorRecordsTotals,FieldNum,ErrorNum,FEW);
 PrettyErrorTotals := RECORD
   FieldNme := OptionalInfo_Raw_Fields.FieldName(TotalErrors.FieldNum);
-  FieldType := CHOOSE(TotalErrors.FieldNum,'invalid_numeric','Invalid_opt_type','invalid_numeric','Invalid_opt_info_id');
-  ErrorMessage := CHOOSE(TotalErrors.FieldNum,OptionalInfo_Raw_Fields.InValidMessage_activity_nr(TotalErrors.ErrorNum),OptionalInfo_Raw_Fields.InValidMessage_opt_type(TotalErrors.ErrorNum),OptionalInfo_Raw_Fields.InValidMessage_opt_id(TotalErrors.ErrorNum),OptionalInfo_Raw_Fields.InValidMessage_opt_info_id(TotalErrors.ErrorNum));
+  FieldType := CHOOSE(TotalErrors.FieldNum,'invalid_numeric','Invalid_opt_type','invalid_numeric');
+  ErrorMessage := CHOOSE(TotalErrors.FieldNum,OptionalInfo_Raw_Fields.InValidMessage_activity_nr(TotalErrors.ErrorNum),OptionalInfo_Raw_Fields.InValidMessage_opt_type(TotalErrors.ErrorNum),OptionalInfo_Raw_Fields.InValidMessage_opt_id(TotalErrors.ErrorNum));
   TotalErrors.Cnt;
 END;
 ValErr := TABLE(TotalErrors,PrettyErrorTotals);

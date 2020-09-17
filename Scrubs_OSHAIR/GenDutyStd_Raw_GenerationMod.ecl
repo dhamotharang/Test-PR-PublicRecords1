@@ -43,12 +43,12 @@ EXPORT GenDutyStd_Raw_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FILENAME:GenDutyStd_Raw_In_OSHAIR\n'
     + 'NAMESCOPE:GenDutyStd_Raw\n'
     + '\n'
-    + 'FIELDTYPE:invalid_numeric:CUSTOM(Scrubs_Oshair.Functions.fn_numeric > 0)\n'
-    + 'FIELDTYPE:invalid_alpha_numeric:CUSTOM(Scrubs_Oshair.Functions.fn_alpha_numeric > 0)\n'
+    + 'FIELDTYPE:invalid_numeric:CUSTOM(Scrubs.Functions.fn_numeric > 0)\n'
+    + 'FIELDTYPE:invalid_alpha_numeric:CUSTOM(Scrubs.Functions.fn_alphanum > 0)\n'
     + '\n'
     + 'FIELD:activity_nr:TYPE(STRING9):LIKE(invalid_numeric):0,0\n'
     + 'FIELD:citation_id:TYPE(STRING7):LIKE(invalid_alpha_numeric):0,0\n'
-    + 'FIELD:line_nr:TYPE(STRING6):LIKE(invalid_numeric):0,0\n'
+    + 'FIELD:line_nr:TYPE(STRING6):LIKE(invalid_numeric):0,0'
     ;
  
   // Structured values

@@ -22,7 +22,7 @@ EXPORT OptionalInfo_Raw_GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'OptionalInfo_Raw_In_OSHAIR';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,activity_nr,opt_type,opt_id,opt_info_id';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,activity_nr,opt_type,opt_id';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := TRUE;
@@ -43,14 +43,12 @@ EXPORT OptionalInfo_Raw_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FILENAME:OptionalInfo_Raw_In_OSHAIR\n'
     + 'NAMESCOPE:OptionalInfo_Raw\n'
     + '\n'
-    + 'FIELDTYPE:invalid_numeric:CUSTOM(Scrubs_Oshair.Functions.fn_numeric > 0)\n'
+    + 'FIELDTYPE:invalid_numeric:CUSTOM(Scrubs.Functions.fn_numeric > 0)\n'
     + 'FIELDTYPE:Invalid_opt_type:ENUM(N|)\n'
-    + 'FIELDTYPE:Invalid_opt_info_id:ALLOW(_dfinopt)\n'
     + '\n'
     + 'FIELD:activity_nr:TYPE(STRING9):LIKE(invalid_numeric):0,0\n'
     + 'FIELD:opt_type:TYPE(STRING1):LIKE(Invalid_opt_type):0,0\n'
-    + 'FIELD:opt_id:TYPE(STRING2):LIKE(invalid_numeric):0,0\n'
-    + 'FIELD:opt_info_id:TYPE(STRING28):LIKE(Invalid_opt_info_id):0,0\n'
+    + 'FIELD:opt_id:TYPE(STRING2):LIKE(invalid_numeric):0,0'
     ;
  
   // Structured values

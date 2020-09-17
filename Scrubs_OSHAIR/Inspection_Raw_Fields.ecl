@@ -1,24 +1,24 @@
 ﻿IMPORT SALT311;
-IMPORT Scrubs_Oshair; // Import modules for FieldTypes attribute definitions
+IMPORT Scrubs,Scrubs_Oshair; // Import modules for FieldTypes attribute definitions
 EXPORT Inspection_Raw_Fields := MODULE
  
-EXPORT NumFields := 34;
+EXPORT NumFields := 35;
  
 // Processing for each FieldType
-EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_numeric','invalid_numeric_blank','invalid_state','invalid_state_flag','invalid_project_cost','invalid_project_type','invalid_sic_list','invalid_fatality','invalid_owner_type','invalid_adv_notice','invalid_safety_hlth','invalid_insp_type','invalid_insp_scope','invalid_why_no_insp','invalid_union_status','invalid_X_blank','invalid_host_est_key','invalid_date_dashes','invalid_year');
-EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'invalid_numeric' => 1,'invalid_numeric_blank' => 2,'invalid_state' => 3,'invalid_state_flag' => 4,'invalid_project_cost' => 5,'invalid_project_type' => 6,'invalid_sic_list' => 7,'invalid_fatality' => 8,'invalid_owner_type' => 9,'invalid_adv_notice' => 10,'invalid_safety_hlth' => 11,'invalid_insp_type' => 12,'invalid_insp_scope' => 13,'invalid_why_no_insp' => 14,'invalid_union_status' => 15,'invalid_X_blank' => 16,'invalid_host_est_key' => 17,'invalid_date_dashes' => 18,'invalid_year' => 19,0);
+EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_numeric','invalid_numeric_blank','invalid_state','invalid_state_flag','invalid_owner_type','invalid_adv_notice','invalid_safety_hlth','invalid_insp_type','invalid_insp_scope','invalid_why_no_insp','invalid_union_status','invalid_X_blank','invalid_host_est_key','invalid_date_dashes','invalid_year','invalid_mandatory','invalid_sic','invalid_naics');
+EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'invalid_numeric' => 1,'invalid_numeric_blank' => 2,'invalid_state' => 3,'invalid_state_flag' => 4,'invalid_owner_type' => 5,'invalid_adv_notice' => 6,'invalid_safety_hlth' => 7,'invalid_insp_type' => 8,'invalid_insp_scope' => 9,'invalid_why_no_insp' => 10,'invalid_union_status' => 11,'invalid_X_blank' => 12,'invalid_host_est_key' => 13,'invalid_date_dashes' => 14,'invalid_year' => 15,'invalid_mandatory' => 16,'invalid_sic' => 17,'invalid_naics' => 18,0);
  
 EXPORT MakeFT_invalid_numeric(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_numeric(SALT311.StrType s) := WHICH(~Scrubs_Oshair.Functions.fn_numeric(s)>0);
-EXPORT InValidMessageFT_invalid_numeric(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Oshair.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_numeric(SALT311.StrType s) := WHICH(~Scrubs.Functions.fn_numeric(s)>0);
+EXPORT InValidMessageFT_invalid_numeric(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_numeric_blank(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_numeric_blank(SALT311.StrType s) := WHICH(~Scrubs_Oshair.Functions.fn_numeric_or_blank(s)>0);
-EXPORT InValidMessageFT_invalid_numeric_blank(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Oshair.Functions.fn_numeric_or_blank'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_numeric_blank(SALT311.StrType s) := WHICH(~Scrubs.Functions.fn_numeric_optional(s)>0);
+EXPORT InValidMessageFT_invalid_numeric_blank(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.Functions.fn_numeric_optional'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_state(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -31,30 +31,6 @@ EXPORT MakeFT_invalid_state_flag(SALT311.StrType s0) := FUNCTION
 END;
 EXPORT InValidFT_invalid_state_flag(SALT311.StrType s) := WHICH(~Scrubs_Oshair.Functions.fn_state_flag(s)>0);
 EXPORT InValidMessageFT_invalid_state_flag(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Oshair.Functions.fn_state_flag'),SALT311.HygieneErrors.Good);
- 
-EXPORT MakeFT_invalid_project_cost(SALT311.StrType s0) := FUNCTION
-  RETURN  s0;
-END;
-EXPORT InValidFT_invalid_project_cost(SALT311.StrType s) := WHICH(~Scrubs_Oshair.Functions.fn_project_cost(s)>0);
-EXPORT InValidMessageFT_invalid_project_cost(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Oshair.Functions.fn_project_cost'),SALT311.HygieneErrors.Good);
- 
-EXPORT MakeFT_invalid_project_type(SALT311.StrType s0) := FUNCTION
-  RETURN  s0;
-END;
-EXPORT InValidFT_invalid_project_type(SALT311.StrType s) := WHICH(~Scrubs_Oshair.Functions.fn_project_type(s)>0);
-EXPORT InValidMessageFT_invalid_project_type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Oshair.Functions.fn_project_type'),SALT311.HygieneErrors.Good);
- 
-EXPORT MakeFT_invalid_sic_list(SALT311.StrType s0) := FUNCTION
-  RETURN  s0;
-END;
-EXPORT InValidFT_invalid_sic_list(SALT311.StrType s) := WHICH(~Scrubs_Oshair.Functions.fn_numeric_or_comma(s)>0);
-EXPORT InValidMessageFT_invalid_sic_list(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Oshair.Functions.fn_numeric_or_comma'),SALT311.HygieneErrors.Good);
- 
-EXPORT MakeFT_invalid_fatality(SALT311.StrType s0) := FUNCTION
-  RETURN  s0;
-END;
-EXPORT InValidFT_invalid_fatality(SALT311.StrType s) := WHICH(~Scrubs_Oshair.Functions.fn_fatality(s)>0);
-EXPORT InValidMessageFT_invalid_fatality(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Oshair.Functions.fn_fatality'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_owner_type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -122,11 +98,29 @@ END;
 EXPORT InValidFT_invalid_year(SALT311.StrType s) := WHICH(~Scrubs_Oshair.Functions.fn_dt_yy(s)>0);
 EXPORT InValidMessageFT_invalid_year(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Oshair.Functions.fn_dt_yy'),SALT311.HygieneErrors.Good);
  
-EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'activity_nr','reporting_id','state_flag','site_state','site_zip','owner_type','owner_code','adv_notice','safety_hlth','sic_code','naics_code','insp_type','insp_scope','why_no_insp','union_status','safety_manuf','safety_const','safety_marit','health_manuf','health_const','health_marit','migrant','mail_state','mail_zip','host_est_key','nr_in_estab','open_date','case_mod_date','close_conf_date','close_case_date','open_year','case_mod_year','close_conf_year','close_case_year');
-EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'activity_nr','reporting_id','state_flag','site_state','site_zip','owner_type','owner_code','adv_notice','safety_hlth','sic_code','naics_code','insp_type','insp_scope','why_no_insp','union_status','safety_manuf','safety_const','safety_marit','health_manuf','health_const','health_marit','migrant','mail_state','mail_zip','host_est_key','nr_in_estab','open_date','case_mod_date','close_conf_date','close_case_date','open_year','case_mod_year','close_conf_year','close_case_year');
-EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'activity_nr' => 0,'reporting_id' => 1,'state_flag' => 2,'site_state' => 3,'site_zip' => 4,'owner_type' => 5,'owner_code' => 6,'adv_notice' => 7,'safety_hlth' => 8,'sic_code' => 9,'naics_code' => 10,'insp_type' => 11,'insp_scope' => 12,'why_no_insp' => 13,'union_status' => 14,'safety_manuf' => 15,'safety_const' => 16,'safety_marit' => 17,'health_manuf' => 18,'health_const' => 19,'health_marit' => 20,'migrant' => 21,'mail_state' => 22,'mail_zip' => 23,'host_est_key' => 24,'nr_in_estab' => 25,'open_date' => 26,'case_mod_date' => 27,'close_conf_date' => 28,'close_case_date' => 29,'open_year' => 30,'case_mod_year' => 31,'close_conf_year' => 32,'close_case_year' => 33,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[]);
-EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
+EXPORT MakeFT_invalid_mandatory(SALT311.StrType s0) := FUNCTION
+  RETURN  s0;
+END;
+EXPORT InValidFT_invalid_mandatory(SALT311.StrType s) := WHICH(~Scrubs.Functions.fn_populated_strings(s)>0);
+EXPORT InValidMessageFT_invalid_mandatory(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.Functions.fn_populated_strings'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_sic(SALT311.StrType s0) := FUNCTION
+  RETURN  s0;
+END;
+EXPORT InValidFT_invalid_sic(SALT311.StrType s) := WHICH(~Scrubs.Functions.fn_valid_SicCode(s)>0);
+EXPORT InValidMessageFT_invalid_sic(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.Functions.fn_valid_SicCode'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_naics(SALT311.StrType s0) := FUNCTION
+  RETURN  s0;
+END;
+EXPORT InValidFT_invalid_naics(SALT311.StrType s) := WHICH(~Scrubs.Functions.fn_validate_NAICSCode(s)>0);
+EXPORT InValidMessageFT_invalid_naics(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.Functions.fn_validate_NAICSCode'),SALT311.HygieneErrors.Good);
+ 
+EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'activity_nr','reporting_id','state_flag','site_state','site_zip','owner_type','owner_code','adv_notice','safety_hlth','sic_code','naics_code','insp_type','insp_scope','why_no_insp','union_status','safety_manuf','safety_const','safety_marit','health_manuf','health_const','health_marit','migrant','mail_state','mail_zip','host_est_key','nr_in_estab','open_date','case_mod_date','close_conf_date','close_case_date','open_year','case_mod_year','close_conf_year','close_case_year','estab_name');
+EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'activity_nr','reporting_id','state_flag','site_state','site_zip','owner_type','owner_code','adv_notice','safety_hlth','sic_code','naics_code','insp_type','insp_scope','why_no_insp','union_status','safety_manuf','safety_const','safety_marit','health_manuf','health_const','health_marit','migrant','mail_state','mail_zip','host_est_key','nr_in_estab','open_date','case_mod_date','close_conf_date','close_case_date','open_year','case_mod_year','close_conf_year','close_case_year','estab_name');
+EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'activity_nr' => 0,'reporting_id' => 1,'state_flag' => 2,'site_state' => 3,'site_zip' => 4,'owner_type' => 5,'owner_code' => 6,'adv_notice' => 7,'safety_hlth' => 8,'sic_code' => 9,'naics_code' => 10,'insp_type' => 11,'insp_scope' => 12,'why_no_insp' => 13,'union_status' => 14,'safety_manuf' => 15,'safety_const' => 16,'safety_marit' => 17,'health_manuf' => 18,'health_const' => 19,'health_marit' => 20,'migrant' => 21,'mail_state' => 22,'mail_zip' => 23,'host_est_key' => 24,'nr_in_estab' => 25,'open_date' => 26,'case_mod_date' => 27,'close_conf_date' => 28,'close_case_date' => 29,'open_year' => 30,'case_mod_year' => 31,'close_conf_year' => 32,'close_case_year' => 33,'estab_name' => 34,0);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
  
@@ -166,13 +160,13 @@ EXPORT Make_safety_hlth(SALT311.StrType s0) := MakeFT_invalid_safety_hlth(s0);
 EXPORT InValid_safety_hlth(SALT311.StrType s) := InValidFT_invalid_safety_hlth(s);
 EXPORT InValidMessage_safety_hlth(UNSIGNED1 wh) := InValidMessageFT_invalid_safety_hlth(wh);
  
-EXPORT Make_sic_code(SALT311.StrType s0) := MakeFT_invalid_numeric_blank(s0);
-EXPORT InValid_sic_code(SALT311.StrType s) := InValidFT_invalid_numeric_blank(s);
-EXPORT InValidMessage_sic_code(UNSIGNED1 wh) := InValidMessageFT_invalid_numeric_blank(wh);
+EXPORT Make_sic_code(SALT311.StrType s0) := MakeFT_invalid_sic(s0);
+EXPORT InValid_sic_code(SALT311.StrType s) := InValidFT_invalid_sic(s);
+EXPORT InValidMessage_sic_code(UNSIGNED1 wh) := InValidMessageFT_invalid_sic(wh);
  
-EXPORT Make_naics_code(SALT311.StrType s0) := MakeFT_invalid_numeric_blank(s0);
-EXPORT InValid_naics_code(SALT311.StrType s) := InValidFT_invalid_numeric_blank(s);
-EXPORT InValidMessage_naics_code(UNSIGNED1 wh) := InValidMessageFT_invalid_numeric_blank(wh);
+EXPORT Make_naics_code(SALT311.StrType s0) := MakeFT_invalid_naics(s0);
+EXPORT InValid_naics_code(SALT311.StrType s) := InValidFT_invalid_naics(s);
+EXPORT InValidMessage_naics_code(UNSIGNED1 wh) := InValidMessageFT_invalid_naics(wh);
  
 EXPORT Make_insp_type(SALT311.StrType s0) := MakeFT_invalid_insp_type(s0);
 EXPORT InValid_insp_type(SALT311.StrType s) := InValidFT_invalid_insp_type(s);
@@ -266,6 +260,10 @@ EXPORT Make_close_case_year(SALT311.StrType s0) := MakeFT_invalid_year(s0);
 EXPORT InValid_close_case_year(SALT311.StrType s) := InValidFT_invalid_year(s);
 EXPORT InValidMessage_close_case_year(UNSIGNED1 wh) := InValidMessageFT_invalid_year(wh);
  
+EXPORT Make_estab_name(SALT311.StrType s0) := MakeFT_invalid_mandatory(s0);
+EXPORT InValid_estab_name(SALT311.StrType s) := InValidFT_invalid_mandatory(s);
+EXPORT InValidMessage_estab_name(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
+ 
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
   IMPORT SALT311,Scrubs_OSHAIR;
@@ -321,6 +319,7 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_case_mod_year;
     BOOLEAN Diff_close_conf_year;
     BOOLEAN Diff_close_case_year;
+    BOOLEAN Diff_estab_name;
     UNSIGNED Num_Diffs;
     SALT311.StrType Val {MAXLENGTH(1024)};
   END;
@@ -360,8 +359,9 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_case_mod_year := le.case_mod_year <> ri.case_mod_year;
     SELF.Diff_close_conf_year := le.close_conf_year <> ri.close_conf_year;
     SELF.Diff_close_case_year := le.close_case_year <> ri.close_case_year;
+    SELF.Diff_estab_name := le.estab_name <> ri.estab_name;
     SELF.Val := (SALT311.StrType)evaluate(le,pivot_exp);
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_activity_nr,1,0)+ IF( SELF.Diff_reporting_id,1,0)+ IF( SELF.Diff_state_flag,1,0)+ IF( SELF.Diff_site_state,1,0)+ IF( SELF.Diff_site_zip,1,0)+ IF( SELF.Diff_owner_type,1,0)+ IF( SELF.Diff_owner_code,1,0)+ IF( SELF.Diff_adv_notice,1,0)+ IF( SELF.Diff_safety_hlth,1,0)+ IF( SELF.Diff_sic_code,1,0)+ IF( SELF.Diff_naics_code,1,0)+ IF( SELF.Diff_insp_type,1,0)+ IF( SELF.Diff_insp_scope,1,0)+ IF( SELF.Diff_why_no_insp,1,0)+ IF( SELF.Diff_union_status,1,0)+ IF( SELF.Diff_safety_manuf,1,0)+ IF( SELF.Diff_safety_const,1,0)+ IF( SELF.Diff_safety_marit,1,0)+ IF( SELF.Diff_health_manuf,1,0)+ IF( SELF.Diff_health_const,1,0)+ IF( SELF.Diff_health_marit,1,0)+ IF( SELF.Diff_migrant,1,0)+ IF( SELF.Diff_mail_state,1,0)+ IF( SELF.Diff_mail_zip,1,0)+ IF( SELF.Diff_host_est_key,1,0)+ IF( SELF.Diff_nr_in_estab,1,0)+ IF( SELF.Diff_open_date,1,0)+ IF( SELF.Diff_case_mod_date,1,0)+ IF( SELF.Diff_close_conf_date,1,0)+ IF( SELF.Diff_close_case_date,1,0)+ IF( SELF.Diff_open_year,1,0)+ IF( SELF.Diff_case_mod_year,1,0)+ IF( SELF.Diff_close_conf_year,1,0)+ IF( SELF.Diff_close_case_year,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_activity_nr,1,0)+ IF( SELF.Diff_reporting_id,1,0)+ IF( SELF.Diff_state_flag,1,0)+ IF( SELF.Diff_site_state,1,0)+ IF( SELF.Diff_site_zip,1,0)+ IF( SELF.Diff_owner_type,1,0)+ IF( SELF.Diff_owner_code,1,0)+ IF( SELF.Diff_adv_notice,1,0)+ IF( SELF.Diff_safety_hlth,1,0)+ IF( SELF.Diff_sic_code,1,0)+ IF( SELF.Diff_naics_code,1,0)+ IF( SELF.Diff_insp_type,1,0)+ IF( SELF.Diff_insp_scope,1,0)+ IF( SELF.Diff_why_no_insp,1,0)+ IF( SELF.Diff_union_status,1,0)+ IF( SELF.Diff_safety_manuf,1,0)+ IF( SELF.Diff_safety_const,1,0)+ IF( SELF.Diff_safety_marit,1,0)+ IF( SELF.Diff_health_manuf,1,0)+ IF( SELF.Diff_health_const,1,0)+ IF( SELF.Diff_health_marit,1,0)+ IF( SELF.Diff_migrant,1,0)+ IF( SELF.Diff_mail_state,1,0)+ IF( SELF.Diff_mail_zip,1,0)+ IF( SELF.Diff_host_est_key,1,0)+ IF( SELF.Diff_nr_in_estab,1,0)+ IF( SELF.Diff_open_date,1,0)+ IF( SELF.Diff_case_mod_date,1,0)+ IF( SELF.Diff_close_conf_date,1,0)+ IF( SELF.Diff_close_case_date,1,0)+ IF( SELF.Diff_open_year,1,0)+ IF( SELF.Diff_case_mod_year,1,0)+ IF( SELF.Diff_close_conf_year,1,0)+ IF( SELF.Diff_close_case_year,1,0)+ IF( SELF.Diff_estab_name,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -408,6 +408,7 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_case_mod_year := COUNT(GROUP,%Closest%.Diff_case_mod_year);
     Count_Diff_close_conf_year := COUNT(GROUP,%Closest%.Diff_close_conf_year);
     Count_Diff_close_case_year := COUNT(GROUP,%Closest%.Diff_close_case_year);
+    Count_Diff_estab_name := COUNT(GROUP,%Closest%.Diff_estab_name);
   END;
   out_counts := table(%Closest%,%AggRec%,true);
 ENDMACRO;

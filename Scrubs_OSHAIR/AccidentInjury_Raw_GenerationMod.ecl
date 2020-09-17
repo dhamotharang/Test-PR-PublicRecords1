@@ -43,13 +43,13 @@ EXPORT AccidentInjury_Raw_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FILENAME:AccidentInjury_Raw_in_OSHAIR\n'
     + 'NAMESCOPE:AccidentInjury_Raw\n'
     + '\n'
-    + 'FIELDTYPE:invalid_numeric:CUSTOM(Scrubs_Oshair.Functions.fn_numeric > 0)\n'
-    + 'FIELDTYPE:invalid_numeric_blank:CUSTOM(Scrubs_Oshair.Functions.fn_numeric_or_blank > 0)\n'
+    + 'FIELDTYPE:invalid_numeric:CUSTOM(Scrubs.Functions.fn_numeric > 0)\n'
+    + 'FIELDTYPE:invalid_numeric_blank:CUSTOM(Scrubs_OSHAIR.Functions.fn_numeric_or_blank > 0)\n'
     + 'FIELDTYPE:invalid_date_time:CUSTOM(Scrubs_Oshair.Functions.fn_date_time > 0)\n'
     + 'FIELDTYPE:invalid_sex:CUSTOM(Scrubs_Oshair.Functions.fn_sex_code > 0)\n'
     + 'FIELDTYPE:invalid_degree_of_inj:CUSTOM(Scrubs_Oshair.Functions.fn_degree_inj > 0)\n'
     + 'FIELDTYPE:invalid_task_assigned:CUSTOM(Scrubs_Oshair.Functions.fn_task_assigned > 0)\n'
-    + 'FIELDTYPE:invalid_alpha_numeric:CUSTOM(Scrubs_Oshair.Functions.fn_alpha_numeric > 0)\n'
+    + 'FIELDTYPE:invalid_alpha_numeric:CUSTOM(Scrubs.Functions.fn_alphaNum_or_blank > 0)\n'
     + '\n'
     + 'FIELD:summary_nr:TYPE(STRING9):LIKE(invalid_numeric):0,0\n'
     + 'FIELD:rel_insp_nr:TYPE(STRING9):LIKE(invalid_numeric):0,0\n'
@@ -70,7 +70,7 @@ EXPORT AccidentInjury_Raw_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:fat_cause:TYPE(STRING2):LIKE(invalid_numeric_blank):0,0\n'
     + 'FIELD:fall_distance:TYPE(STRING4):LIKE(invalid_numeric_blank):0,0\n'
     + 'FIELD:fall_ht:TYPE(STRING4):LIKE(invalid_numeric_blank):0,0\n'
-    + 'FIELD:injury_line_nr:TYPE(STRING250):LIKE(invalid_numeric):0,0\n'
+    + 'FIELD:injury_line_nr:TYPE(STRING250):LIKE(invalid_numeric):0,0'
     ;
  
   // Structured values

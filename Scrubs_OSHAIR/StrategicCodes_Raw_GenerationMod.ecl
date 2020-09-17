@@ -43,11 +43,11 @@ EXPORT StrategicCodes_Raw_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FILENAME:StrategicCodes_Raw_In_OSHAIR\n'
     + 'NAMESCOPE:StrategicCodes_Raw\n'
     + '\n'
-    + 'FIELDTYPE:invalid_numeric:CUSTOM(Scrubs_Oshair.Functions.fn_numeric > 0)\n'
+    + 'FIELDTYPE:invalid_numeric:CUSTOM(Scrubs.Functions.fn_numeric > 0)\n'
     + 'FIELDTYPE:Invalid_prog_type:ENUM(L|N|P|S)\n'
     + '\n'
     + 'FIELD:activity_nr:TYPE(STRING9):LIKE(invalid_numeric):0,0\n'
-    + 'FIELD:prog_type:TYPE(STRING1):LIKE(Invalid_prog_type):0,0\n'
+    + 'FIELD:prog_type:TYPE(STRING1):LIKE(Invalid_prog_type):0,0'
     ;
  
   // Structured values

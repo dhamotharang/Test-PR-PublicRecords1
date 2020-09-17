@@ -43,7 +43,7 @@ EXPORT RelatedActivity_Raw_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FILENAME:RelatedActivity_Raw_In_OSHAIR\n'
     + 'NAMESCOPE:RelatedActivity_Raw\n'
     + '\n'
-    + 'FIELDTYPE:invalid_numeric:CUSTOM(Scrubs_Oshair.Functions.fn_numeric > 0)\n'
+    + 'FIELDTYPE:invalid_numeric:CUSTOM(Scrubs.Functions.fn_numeric > 0)\n'
     + 'FIELDTYPE:Invalid_X:ENUM(X|)\n'
     + '\n'
     + 'FIELD:activity_nr:TYPE(STRING9):LIKE(invalid_numeric):0,0\n'

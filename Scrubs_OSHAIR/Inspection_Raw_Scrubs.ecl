@@ -1,12 +1,12 @@
 ﻿IMPORT SALT311,STD;
-IMPORT Scrubs_Oshair; // Import modules for FieldTypes attribute definitions
+IMPORT Scrubs,Scrubs_Oshair; // Import modules for FieldTypes attribute definitions
 EXPORT Inspection_Raw_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 34;
-  EXPORT NumRulesFromFieldType := 34;
+  EXPORT NumRules := 35;
+  EXPORT NumRulesFromFieldType := 35;
   EXPORT NumRulesFromRecordType := 0;
-  EXPORT NumFieldsWithRules := 34;
+  EXPORT NumFieldsWithRules := 35;
   EXPORT NumFieldsWithPossibleEdits := 0;
   EXPORT NumRulesWithPossibleEdits := 0;
   EXPORT Expanded_Layout := RECORD(Inspection_Raw_Layout)
@@ -44,6 +44,7 @@ EXPORT Inspection_Raw_Scrubs := MODULE
     UNSIGNED1 case_mod_year_Invalid;
     UNSIGNED1 close_conf_year_Invalid;
     UNSIGNED1 close_case_year_Invalid;
+    UNSIGNED1 estab_name_Invalid;
   END;
   EXPORT  Bitmap_Layout := RECORD(Inspection_Raw_Layout)
     UNSIGNED8 ScrubsBits1;
@@ -84,12 +85,13 @@ EXPORT FromNone(DATASET(Inspection_Raw_Layout) h) := MODULE
     SELF.case_mod_year_Invalid := Inspection_Raw_Fields.InValid_case_mod_year((SALT311.StrType)le.case_mod_year);
     SELF.close_conf_year_Invalid := Inspection_Raw_Fields.InValid_close_conf_year((SALT311.StrType)le.close_conf_year);
     SELF.close_case_year_Invalid := Inspection_Raw_Fields.InValid_close_case_year((SALT311.StrType)le.close_case_year);
+    SELF.estab_name_Invalid := Inspection_Raw_Fields.InValid_estab_name((SALT311.StrType)le.estab_name);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Inspection_Raw_Layout);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.activity_nr_Invalid << 0 ) + ( le.reporting_id_Invalid << 1 ) + ( le.state_flag_Invalid << 2 ) + ( le.site_state_Invalid << 3 ) + ( le.site_zip_Invalid << 4 ) + ( le.owner_type_Invalid << 5 ) + ( le.owner_code_Invalid << 6 ) + ( le.adv_notice_Invalid << 7 ) + ( le.safety_hlth_Invalid << 8 ) + ( le.sic_code_Invalid << 9 ) + ( le.naics_code_Invalid << 10 ) + ( le.insp_type_Invalid << 11 ) + ( le.insp_scope_Invalid << 12 ) + ( le.why_no_insp_Invalid << 13 ) + ( le.union_status_Invalid << 14 ) + ( le.safety_manuf_Invalid << 15 ) + ( le.safety_const_Invalid << 16 ) + ( le.safety_marit_Invalid << 17 ) + ( le.health_manuf_Invalid << 18 ) + ( le.health_const_Invalid << 19 ) + ( le.health_marit_Invalid << 20 ) + ( le.migrant_Invalid << 21 ) + ( le.mail_state_Invalid << 22 ) + ( le.mail_zip_Invalid << 23 ) + ( le.host_est_key_Invalid << 24 ) + ( le.nr_in_estab_Invalid << 25 ) + ( le.open_date_Invalid << 26 ) + ( le.case_mod_date_Invalid << 27 ) + ( le.close_conf_date_Invalid << 28 ) + ( le.close_case_date_Invalid << 29 ) + ( le.open_year_Invalid << 30 ) + ( le.case_mod_year_Invalid << 31 ) + ( le.close_conf_year_Invalid << 32 ) + ( le.close_case_year_Invalid << 33 );
+    SELF.ScrubsBits1 := ( le.activity_nr_Invalid << 0 ) + ( le.reporting_id_Invalid << 1 ) + ( le.state_flag_Invalid << 2 ) + ( le.site_state_Invalid << 3 ) + ( le.site_zip_Invalid << 4 ) + ( le.owner_type_Invalid << 5 ) + ( le.owner_code_Invalid << 6 ) + ( le.adv_notice_Invalid << 7 ) + ( le.safety_hlth_Invalid << 8 ) + ( le.sic_code_Invalid << 9 ) + ( le.naics_code_Invalid << 10 ) + ( le.insp_type_Invalid << 11 ) + ( le.insp_scope_Invalid << 12 ) + ( le.why_no_insp_Invalid << 13 ) + ( le.union_status_Invalid << 14 ) + ( le.safety_manuf_Invalid << 15 ) + ( le.safety_const_Invalid << 16 ) + ( le.safety_marit_Invalid << 17 ) + ( le.health_manuf_Invalid << 18 ) + ( le.health_const_Invalid << 19 ) + ( le.health_marit_Invalid << 20 ) + ( le.migrant_Invalid << 21 ) + ( le.mail_state_Invalid << 22 ) + ( le.mail_zip_Invalid << 23 ) + ( le.host_est_key_Invalid << 24 ) + ( le.nr_in_estab_Invalid << 25 ) + ( le.open_date_Invalid << 26 ) + ( le.case_mod_date_Invalid << 27 ) + ( le.close_conf_date_Invalid << 28 ) + ( le.close_case_date_Invalid << 29 ) + ( le.open_year_Invalid << 30 ) + ( le.case_mod_year_Invalid << 31 ) + ( le.close_conf_year_Invalid << 32 ) + ( le.close_case_year_Invalid << 33 ) + ( le.estab_name_Invalid << 34 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -132,6 +134,7 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.case_mod_year_Invalid := (le.ScrubsBits1 >> 31) & 1;
     SELF.close_conf_year_Invalid := (le.ScrubsBits1 >> 32) & 1;
     SELF.close_case_year_Invalid := (le.ScrubsBits1 >> 33) & 1;
+    SELF.estab_name_Invalid := (le.ScrubsBits1 >> 34) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -174,7 +177,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     case_mod_year_CUSTOM_ErrorCount := COUNT(GROUP,h.case_mod_year_Invalid=1);
     close_conf_year_CUSTOM_ErrorCount := COUNT(GROUP,h.close_conf_year_Invalid=1);
     close_case_year_CUSTOM_ErrorCount := COUNT(GROUP,h.close_case_year_Invalid=1);
-    AnyRule_WithErrorsCount := COUNT(GROUP, h.activity_nr_Invalid > 0 OR h.reporting_id_Invalid > 0 OR h.state_flag_Invalid > 0 OR h.site_state_Invalid > 0 OR h.site_zip_Invalid > 0 OR h.owner_type_Invalid > 0 OR h.owner_code_Invalid > 0 OR h.adv_notice_Invalid > 0 OR h.safety_hlth_Invalid > 0 OR h.sic_code_Invalid > 0 OR h.naics_code_Invalid > 0 OR h.insp_type_Invalid > 0 OR h.insp_scope_Invalid > 0 OR h.why_no_insp_Invalid > 0 OR h.union_status_Invalid > 0 OR h.safety_manuf_Invalid > 0 OR h.safety_const_Invalid > 0 OR h.safety_marit_Invalid > 0 OR h.health_manuf_Invalid > 0 OR h.health_const_Invalid > 0 OR h.health_marit_Invalid > 0 OR h.migrant_Invalid > 0 OR h.mail_state_Invalid > 0 OR h.mail_zip_Invalid > 0 OR h.host_est_key_Invalid > 0 OR h.nr_in_estab_Invalid > 0 OR h.open_date_Invalid > 0 OR h.case_mod_date_Invalid > 0 OR h.close_conf_date_Invalid > 0 OR h.close_case_date_Invalid > 0 OR h.open_year_Invalid > 0 OR h.case_mod_year_Invalid > 0 OR h.close_conf_year_Invalid > 0 OR h.close_case_year_Invalid > 0);
+    estab_name_CUSTOM_ErrorCount := COUNT(GROUP,h.estab_name_Invalid=1);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.activity_nr_Invalid > 0 OR h.reporting_id_Invalid > 0 OR h.state_flag_Invalid > 0 OR h.site_state_Invalid > 0 OR h.site_zip_Invalid > 0 OR h.owner_type_Invalid > 0 OR h.owner_code_Invalid > 0 OR h.adv_notice_Invalid > 0 OR h.safety_hlth_Invalid > 0 OR h.sic_code_Invalid > 0 OR h.naics_code_Invalid > 0 OR h.insp_type_Invalid > 0 OR h.insp_scope_Invalid > 0 OR h.why_no_insp_Invalid > 0 OR h.union_status_Invalid > 0 OR h.safety_manuf_Invalid > 0 OR h.safety_const_Invalid > 0 OR h.safety_marit_Invalid > 0 OR h.health_manuf_Invalid > 0 OR h.health_const_Invalid > 0 OR h.health_marit_Invalid > 0 OR h.migrant_Invalid > 0 OR h.mail_state_Invalid > 0 OR h.mail_zip_Invalid > 0 OR h.host_est_key_Invalid > 0 OR h.nr_in_estab_Invalid > 0 OR h.open_date_Invalid > 0 OR h.case_mod_date_Invalid > 0 OR h.close_conf_date_Invalid > 0 OR h.close_case_date_Invalid > 0 OR h.open_year_Invalid > 0 OR h.case_mod_year_Invalid > 0 OR h.close_conf_year_Invalid > 0 OR h.close_case_year_Invalid > 0 OR h.estab_name_Invalid > 0);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
     Rules_WithErrors := 0;
@@ -182,9 +186,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.activity_nr_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.reporting_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.state_flag_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.site_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.site_zip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.owner_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.owner_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.adv_notice_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.safety_hlth_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naics_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.insp_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.insp_scope_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.why_no_insp_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.union_status_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.safety_manuf_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.safety_const_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.safety_marit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.health_manuf_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.health_const_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.health_marit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.migrant_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mail_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mail_zip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.host_est_key_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.nr_in_estab_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.open_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.case_mod_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.close_conf_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.close_case_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.open_year_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.case_mod_year_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.close_conf_year_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.close_case_year_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.activity_nr_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.reporting_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.state_flag_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.site_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.site_zip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.owner_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.owner_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.adv_notice_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.safety_hlth_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naics_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.insp_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.insp_scope_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.why_no_insp_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.union_status_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.safety_manuf_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.safety_const_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.safety_marit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.health_manuf_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.health_const_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.health_marit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.migrant_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mail_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mail_zip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.host_est_key_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.nr_in_estab_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.open_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.case_mod_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.close_conf_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.close_case_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.open_year_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.case_mod_year_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.close_conf_year_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.close_case_year_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.estab_name_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.activity_nr_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.reporting_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.state_flag_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.site_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.site_zip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.owner_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.owner_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.adv_notice_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.safety_hlth_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naics_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.insp_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.insp_scope_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.why_no_insp_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.union_status_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.safety_manuf_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.safety_const_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.safety_marit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.health_manuf_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.health_const_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.health_marit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.migrant_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mail_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mail_zip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.host_est_key_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.nr_in_estab_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.open_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.case_mod_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.close_conf_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.close_case_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.open_year_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.case_mod_year_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.close_conf_year_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.close_case_year_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.activity_nr_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.reporting_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.state_flag_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.site_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.site_zip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.owner_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.owner_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.adv_notice_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.safety_hlth_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.sic_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.naics_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.insp_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.insp_scope_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.why_no_insp_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.union_status_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.safety_manuf_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.safety_const_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.safety_marit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.health_manuf_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.health_const_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.health_marit_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.migrant_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mail_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mail_zip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.host_est_key_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.nr_in_estab_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.open_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.case_mod_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.close_conf_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.close_case_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.open_year_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.case_mod_year_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.close_conf_year_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.close_case_year_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.estab_name_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -199,8 +203,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.activity_nr_Invalid,le.reporting_id_Invalid,le.state_flag_Invalid,le.site_state_Invalid,le.site_zip_Invalid,le.owner_type_Invalid,le.owner_code_Invalid,le.adv_notice_Invalid,le.safety_hlth_Invalid,le.sic_code_Invalid,le.naics_code_Invalid,le.insp_type_Invalid,le.insp_scope_Invalid,le.why_no_insp_Invalid,le.union_status_Invalid,le.safety_manuf_Invalid,le.safety_const_Invalid,le.safety_marit_Invalid,le.health_manuf_Invalid,le.health_const_Invalid,le.health_marit_Invalid,le.migrant_Invalid,le.mail_state_Invalid,le.mail_zip_Invalid,le.host_est_key_Invalid,le.nr_in_estab_Invalid,le.open_date_Invalid,le.case_mod_date_Invalid,le.close_conf_date_Invalid,le.close_case_date_Invalid,le.open_year_Invalid,le.case_mod_year_Invalid,le.close_conf_year_Invalid,le.close_case_year_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Inspection_Raw_Fields.InvalidMessage_activity_nr(le.activity_nr_Invalid),Inspection_Raw_Fields.InvalidMessage_reporting_id(le.reporting_id_Invalid),Inspection_Raw_Fields.InvalidMessage_state_flag(le.state_flag_Invalid),Inspection_Raw_Fields.InvalidMessage_site_state(le.site_state_Invalid),Inspection_Raw_Fields.InvalidMessage_site_zip(le.site_zip_Invalid),Inspection_Raw_Fields.InvalidMessage_owner_type(le.owner_type_Invalid),Inspection_Raw_Fields.InvalidMessage_owner_code(le.owner_code_Invalid),Inspection_Raw_Fields.InvalidMessage_adv_notice(le.adv_notice_Invalid),Inspection_Raw_Fields.InvalidMessage_safety_hlth(le.safety_hlth_Invalid),Inspection_Raw_Fields.InvalidMessage_sic_code(le.sic_code_Invalid),Inspection_Raw_Fields.InvalidMessage_naics_code(le.naics_code_Invalid),Inspection_Raw_Fields.InvalidMessage_insp_type(le.insp_type_Invalid),Inspection_Raw_Fields.InvalidMessage_insp_scope(le.insp_scope_Invalid),Inspection_Raw_Fields.InvalidMessage_why_no_insp(le.why_no_insp_Invalid),Inspection_Raw_Fields.InvalidMessage_union_status(le.union_status_Invalid),Inspection_Raw_Fields.InvalidMessage_safety_manuf(le.safety_manuf_Invalid),Inspection_Raw_Fields.InvalidMessage_safety_const(le.safety_const_Invalid),Inspection_Raw_Fields.InvalidMessage_safety_marit(le.safety_marit_Invalid),Inspection_Raw_Fields.InvalidMessage_health_manuf(le.health_manuf_Invalid),Inspection_Raw_Fields.InvalidMessage_health_const(le.health_const_Invalid),Inspection_Raw_Fields.InvalidMessage_health_marit(le.health_marit_Invalid),Inspection_Raw_Fields.InvalidMessage_migrant(le.migrant_Invalid),Inspection_Raw_Fields.InvalidMessage_mail_state(le.mail_state_Invalid),Inspection_Raw_Fields.InvalidMessage_mail_zip(le.mail_zip_Invalid),Inspection_Raw_Fields.InvalidMessage_host_est_key(le.host_est_key_Invalid),Inspection_Raw_Fields.InvalidMessage_nr_in_estab(le.nr_in_estab_Invalid),Inspection_Raw_Fields.InvalidMessage_open_date(le.open_date_Invalid),Inspection_Raw_Fields.InvalidMessage_case_mod_date(le.case_mod_date_Invalid),Inspection_Raw_Fields.InvalidMessage_close_conf_date(le.close_conf_date_Invalid),Inspection_Raw_Fields.InvalidMessage_close_case_date(le.close_case_date_Invalid),Inspection_Raw_Fields.InvalidMessage_open_year(le.open_year_Invalid),Inspection_Raw_Fields.InvalidMessage_case_mod_year(le.case_mod_year_Invalid),Inspection_Raw_Fields.InvalidMessage_close_conf_year(le.close_conf_year_Invalid),Inspection_Raw_Fields.InvalidMessage_close_case_year(le.close_case_year_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.activity_nr_Invalid,le.reporting_id_Invalid,le.state_flag_Invalid,le.site_state_Invalid,le.site_zip_Invalid,le.owner_type_Invalid,le.owner_code_Invalid,le.adv_notice_Invalid,le.safety_hlth_Invalid,le.sic_code_Invalid,le.naics_code_Invalid,le.insp_type_Invalid,le.insp_scope_Invalid,le.why_no_insp_Invalid,le.union_status_Invalid,le.safety_manuf_Invalid,le.safety_const_Invalid,le.safety_marit_Invalid,le.health_manuf_Invalid,le.health_const_Invalid,le.health_marit_Invalid,le.migrant_Invalid,le.mail_state_Invalid,le.mail_zip_Invalid,le.host_est_key_Invalid,le.nr_in_estab_Invalid,le.open_date_Invalid,le.case_mod_date_Invalid,le.close_conf_date_Invalid,le.close_case_date_Invalid,le.open_year_Invalid,le.case_mod_year_Invalid,le.close_conf_year_Invalid,le.close_case_year_Invalid,le.estab_name_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Inspection_Raw_Fields.InvalidMessage_activity_nr(le.activity_nr_Invalid),Inspection_Raw_Fields.InvalidMessage_reporting_id(le.reporting_id_Invalid),Inspection_Raw_Fields.InvalidMessage_state_flag(le.state_flag_Invalid),Inspection_Raw_Fields.InvalidMessage_site_state(le.site_state_Invalid),Inspection_Raw_Fields.InvalidMessage_site_zip(le.site_zip_Invalid),Inspection_Raw_Fields.InvalidMessage_owner_type(le.owner_type_Invalid),Inspection_Raw_Fields.InvalidMessage_owner_code(le.owner_code_Invalid),Inspection_Raw_Fields.InvalidMessage_adv_notice(le.adv_notice_Invalid),Inspection_Raw_Fields.InvalidMessage_safety_hlth(le.safety_hlth_Invalid),Inspection_Raw_Fields.InvalidMessage_sic_code(le.sic_code_Invalid),Inspection_Raw_Fields.InvalidMessage_naics_code(le.naics_code_Invalid),Inspection_Raw_Fields.InvalidMessage_insp_type(le.insp_type_Invalid),Inspection_Raw_Fields.InvalidMessage_insp_scope(le.insp_scope_Invalid),Inspection_Raw_Fields.InvalidMessage_why_no_insp(le.why_no_insp_Invalid),Inspection_Raw_Fields.InvalidMessage_union_status(le.union_status_Invalid),Inspection_Raw_Fields.InvalidMessage_safety_manuf(le.safety_manuf_Invalid),Inspection_Raw_Fields.InvalidMessage_safety_const(le.safety_const_Invalid),Inspection_Raw_Fields.InvalidMessage_safety_marit(le.safety_marit_Invalid),Inspection_Raw_Fields.InvalidMessage_health_manuf(le.health_manuf_Invalid),Inspection_Raw_Fields.InvalidMessage_health_const(le.health_const_Invalid),Inspection_Raw_Fields.InvalidMessage_health_marit(le.health_marit_Invalid),Inspection_Raw_Fields.InvalidMessage_migrant(le.migrant_Invalid),Inspection_Raw_Fields.InvalidMessage_mail_state(le.mail_state_Invalid),Inspection_Raw_Fields.InvalidMessage_mail_zip(le.mail_zip_Invalid),Inspection_Raw_Fields.InvalidMessage_host_est_key(le.host_est_key_Invalid),Inspection_Raw_Fields.InvalidMessage_nr_in_estab(le.nr_in_estab_Invalid),Inspection_Raw_Fields.InvalidMessage_open_date(le.open_date_Invalid),Inspection_Raw_Fields.InvalidMessage_case_mod_date(le.case_mod_date_Invalid),Inspection_Raw_Fields.InvalidMessage_close_conf_date(le.close_conf_date_Invalid),Inspection_Raw_Fields.InvalidMessage_close_case_date(le.close_case_date_Invalid),Inspection_Raw_Fields.InvalidMessage_open_year(le.open_year_Invalid),Inspection_Raw_Fields.InvalidMessage_case_mod_year(le.case_mod_year_Invalid),Inspection_Raw_Fields.InvalidMessage_close_conf_year(le.close_conf_year_Invalid),Inspection_Raw_Fields.InvalidMessage_close_case_year(le.close_case_year_Invalid),Inspection_Raw_Fields.InvalidMessage_estab_name(le.estab_name_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.activity_nr_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.reporting_id_Invalid,'CUSTOM','UNKNOWN')
@@ -235,12 +239,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.open_year_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.case_mod_year_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.close_conf_year_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.close_case_year_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'activity_nr','reporting_id','state_flag','site_state','site_zip','owner_type','owner_code','adv_notice','safety_hlth','sic_code','naics_code','insp_type','insp_scope','why_no_insp','union_status','safety_manuf','safety_const','safety_marit','health_manuf','health_const','health_marit','migrant','mail_state','mail_zip','host_est_key','nr_in_estab','open_date','case_mod_date','close_conf_date','close_case_date','open_year','case_mod_year','close_conf_year','close_case_year','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_numeric','invalid_numeric','invalid_state_flag','invalid_state','invalid_numeric_blank','invalid_owner_type','invalid_numeric_blank','invalid_adv_notice','invalid_safety_hlth','invalid_numeric_blank','invalid_numeric_blank','invalid_insp_type','invalid_insp_scope','invalid_why_no_insp','invalid_union_status','invalid_X_blank','invalid_X_blank','invalid_X_blank','invalid_X_blank','invalid_X_blank','invalid_X_blank','invalid_X_blank','invalid_state','invalid_numeric_blank','invalid_host_est_key','invalid_numeric_blank','invalid_date_dashes','invalid_date_dashes','invalid_date_dashes','invalid_date_dashes','invalid_year','invalid_year','invalid_year','invalid_year','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.activity_nr,(SALT311.StrType)le.reporting_id,(SALT311.StrType)le.state_flag,(SALT311.StrType)le.site_state,(SALT311.StrType)le.site_zip,(SALT311.StrType)le.owner_type,(SALT311.StrType)le.owner_code,(SALT311.StrType)le.adv_notice,(SALT311.StrType)le.safety_hlth,(SALT311.StrType)le.sic_code,(SALT311.StrType)le.naics_code,(SALT311.StrType)le.insp_type,(SALT311.StrType)le.insp_scope,(SALT311.StrType)le.why_no_insp,(SALT311.StrType)le.union_status,(SALT311.StrType)le.safety_manuf,(SALT311.StrType)le.safety_const,(SALT311.StrType)le.safety_marit,(SALT311.StrType)le.health_manuf,(SALT311.StrType)le.health_const,(SALT311.StrType)le.health_marit,(SALT311.StrType)le.migrant,(SALT311.StrType)le.mail_state,(SALT311.StrType)le.mail_zip,(SALT311.StrType)le.host_est_key,(SALT311.StrType)le.nr_in_estab,(SALT311.StrType)le.open_date,(SALT311.StrType)le.case_mod_date,(SALT311.StrType)le.close_conf_date,(SALT311.StrType)le.close_case_date,(SALT311.StrType)le.open_year,(SALT311.StrType)le.case_mod_year,(SALT311.StrType)le.close_conf_year,(SALT311.StrType)le.close_case_year,'***SALTBUG***');
+          ,CHOOSE(le.close_case_year_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.estab_name_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
+    SELF.FieldName := CHOOSE(c,'activity_nr','reporting_id','state_flag','site_state','site_zip','owner_type','owner_code','adv_notice','safety_hlth','sic_code','naics_code','insp_type','insp_scope','why_no_insp','union_status','safety_manuf','safety_const','safety_marit','health_manuf','health_const','health_marit','migrant','mail_state','mail_zip','host_est_key','nr_in_estab','open_date','case_mod_date','close_conf_date','close_case_date','open_year','case_mod_year','close_conf_year','close_case_year','estab_name','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'invalid_numeric','invalid_numeric','invalid_state_flag','invalid_state','invalid_numeric_blank','invalid_owner_type','invalid_numeric_blank','invalid_adv_notice','invalid_safety_hlth','invalid_sic','invalid_naics','invalid_insp_type','invalid_insp_scope','invalid_why_no_insp','invalid_union_status','invalid_X_blank','invalid_X_blank','invalid_X_blank','invalid_X_blank','invalid_X_blank','invalid_X_blank','invalid_X_blank','invalid_state','invalid_numeric_blank','invalid_host_est_key','invalid_numeric_blank','invalid_date_dashes','invalid_date_dashes','invalid_date_dashes','invalid_date_dashes','invalid_year','invalid_year','invalid_year','invalid_year','invalid_mandatory','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.activity_nr,(SALT311.StrType)le.reporting_id,(SALT311.StrType)le.state_flag,(SALT311.StrType)le.site_state,(SALT311.StrType)le.site_zip,(SALT311.StrType)le.owner_type,(SALT311.StrType)le.owner_code,(SALT311.StrType)le.adv_notice,(SALT311.StrType)le.safety_hlth,(SALT311.StrType)le.sic_code,(SALT311.StrType)le.naics_code,(SALT311.StrType)le.insp_type,(SALT311.StrType)le.insp_scope,(SALT311.StrType)le.why_no_insp,(SALT311.StrType)le.union_status,(SALT311.StrType)le.safety_manuf,(SALT311.StrType)le.safety_const,(SALT311.StrType)le.safety_marit,(SALT311.StrType)le.health_manuf,(SALT311.StrType)le.health_const,(SALT311.StrType)le.health_marit,(SALT311.StrType)le.migrant,(SALT311.StrType)le.mail_state,(SALT311.StrType)le.mail_zip,(SALT311.StrType)le.host_est_key,(SALT311.StrType)le.nr_in_estab,(SALT311.StrType)le.open_date,(SALT311.StrType)le.case_mod_date,(SALT311.StrType)le.close_conf_date,(SALT311.StrType)le.close_case_date,(SALT311.StrType)le.open_year,(SALT311.StrType)le.case_mod_year,(SALT311.StrType)le.close_conf_year,(SALT311.StrType)le.close_case_year,(SALT311.StrType)le.estab_name,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,34,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,35,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
@@ -260,8 +265,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'owner_code:invalid_numeric_blank:CUSTOM'
           ,'adv_notice:invalid_adv_notice:CUSTOM'
           ,'safety_hlth:invalid_safety_hlth:CUSTOM'
-          ,'sic_code:invalid_numeric_blank:CUSTOM'
-          ,'naics_code:invalid_numeric_blank:CUSTOM'
+          ,'sic_code:invalid_sic:CUSTOM'
+          ,'naics_code:invalid_naics:CUSTOM'
           ,'insp_type:invalid_insp_type:CUSTOM'
           ,'insp_scope:invalid_insp_scope:CUSTOM'
           ,'why_no_insp:invalid_why_no_insp:CUSTOM'
@@ -285,6 +290,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'case_mod_year:invalid_year:CUSTOM'
           ,'close_conf_year:invalid_year:CUSTOM'
           ,'close_case_year:invalid_year:CUSTOM'
+          ,'estab_name:invalid_mandatory:CUSTOM'
           ,'field:Number_Errored_Fields:SUMMARY'
           ,'field:Number_Perfect_Fields:SUMMARY'
           ,'rule:Number_Errored_Rules:SUMMARY'
@@ -327,6 +333,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,Inspection_Raw_Fields.InvalidMessage_case_mod_year(1)
           ,Inspection_Raw_Fields.InvalidMessage_close_conf_year(1)
           ,Inspection_Raw_Fields.InvalidMessage_close_case_year(1)
+          ,Inspection_Raw_Fields.InvalidMessage_estab_name(1)
           ,'Fields with errors'
           ,'Fields without errors'
           ,'Rules with errors'
@@ -369,6 +376,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.case_mod_year_CUSTOM_ErrorCount
           ,le.close_conf_year_CUSTOM_ErrorCount
           ,le.close_case_year_CUSTOM_ErrorCount
+          ,le.estab_name_CUSTOM_ErrorCount
           ,le.FieldsChecked_WithErrors
           ,le.FieldsChecked_NoErrors
           ,le.Rules_WithErrors
@@ -410,7 +418,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.open_year_CUSTOM_ErrorCount
           ,le.case_mod_year_CUSTOM_ErrorCount
           ,le.close_conf_year_CUSTOM_ErrorCount
-          ,le.close_case_year_CUSTOM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
+          ,le.close_case_year_CUSTOM_ErrorCount
+          ,le.estab_name_CUSTOM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)
@@ -482,7 +491,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'open_year:' + getFieldTypeText(h.open_year) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'case_mod_year:' + getFieldTypeText(h.case_mod_year) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'close_conf_year:' + getFieldTypeText(h.close_conf_year) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'close_case_year:' + getFieldTypeText(h.close_case_year) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix,'UNKNOWN');
+          ,'close_case_year:' + getFieldTypeText(h.close_case_year) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'estab_name:' + getFieldTypeText(h.estab_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix,'UNKNOWN');
       SELF.rulecnt := CHOOSE(c
           ,le.populated_activity_nr_cnt
           ,le.populated_reporting_id_cnt
@@ -517,7 +527,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_open_year_cnt
           ,le.populated_case_mod_year_cnt
           ,le.populated_close_conf_year_cnt
-          ,le.populated_close_case_year_cnt,0);
+          ,le.populated_close_case_year_cnt
+          ,le.populated_estab_name_cnt,0);
       SELF.rulepcnt := CHOOSE(c
           ,le.populated_activity_nr_pcnt
           ,le.populated_reporting_id_pcnt
@@ -552,10 +563,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_open_year_pcnt
           ,le.populated_case_mod_year_pcnt
           ,le.populated_close_conf_year_pcnt
-          ,le.populated_close_case_year_pcnt,0);
+          ,le.populated_close_case_year_pcnt
+          ,le.populated_estab_name_pcnt,0);
       SELF.ErrorMessage := '';
     END;
-    FieldPopStats := NORMALIZE(hygiene_summaryStats,34,xNormHygieneStats(LEFT,COUNTER,'POP'));
+    FieldPopStats := NORMALIZE(hygiene_summaryStats,35,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
     SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
@@ -571,7 +583,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
  
     mod_Delta := Inspection_Raw_Delta(prevDS, PROJECT(h, Inspection_Raw_Layout));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
-    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),34,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
+    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),35,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
     deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
                                       'Updates:count_Updates:DELTA',
                                       TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');

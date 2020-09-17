@@ -1,5 +1,5 @@
 ﻿IMPORT SALT311;
-IMPORT Scrubs_Oshair; // Import modules for FieldTypes attribute definitions
+IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT RelatedActivity_Raw_Fields := MODULE
  
 EXPORT NumFields := 4;
@@ -11,8 +11,8 @@ EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'invalid_numeric' => 1,'Inval
 EXPORT MakeFT_invalid_numeric(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_numeric(SALT311.StrType s) := WHICH(~Scrubs_Oshair.Functions.fn_numeric(s)>0);
-EXPORT InValidMessageFT_invalid_numeric(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Oshair.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_numeric(SALT311.StrType s) := WHICH(~Scrubs.Functions.fn_numeric(s)>0);
+EXPORT InValidMessageFT_invalid_numeric(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_X(SALT311.StrType s0) := FUNCTION
   RETURN  s0;

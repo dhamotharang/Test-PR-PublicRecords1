@@ -1,19 +1,18 @@
 ﻿IMPORT SALT311,STD;
-IMPORT Scrubs_Oshair; // Import modules for FieldTypes attribute definitions
+IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT OptionalInfo_Raw_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 4;
-  EXPORT NumRulesFromFieldType := 4;
+  EXPORT NumRules := 3;
+  EXPORT NumRulesFromFieldType := 3;
   EXPORT NumRulesFromRecordType := 0;
-  EXPORT NumFieldsWithRules := 4;
+  EXPORT NumFieldsWithRules := 3;
   EXPORT NumFieldsWithPossibleEdits := 0;
   EXPORT NumRulesWithPossibleEdits := 0;
   EXPORT Expanded_Layout := RECORD(OptionalInfo_Raw_Layout)
     UNSIGNED1 activity_nr_Invalid;
     UNSIGNED1 opt_type_Invalid;
     UNSIGNED1 opt_id_Invalid;
-    UNSIGNED1 opt_info_id_Invalid;
   END;
   EXPORT  Bitmap_Layout := RECORD(OptionalInfo_Raw_Layout)
     UNSIGNED8 ScrubsBits1;
@@ -23,13 +22,12 @@ EXPORT FromNone(DATASET(OptionalInfo_Raw_Layout) h) := MODULE
     SELF.activity_nr_Invalid := OptionalInfo_Raw_Fields.InValid_activity_nr((SALT311.StrType)le.activity_nr);
     SELF.opt_type_Invalid := OptionalInfo_Raw_Fields.InValid_opt_type((SALT311.StrType)le.opt_type);
     SELF.opt_id_Invalid := OptionalInfo_Raw_Fields.InValid_opt_id((SALT311.StrType)le.opt_id);
-    SELF.opt_info_id_Invalid := OptionalInfo_Raw_Fields.InValid_opt_info_id((SALT311.StrType)le.opt_info_id);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),OptionalInfo_Raw_Layout);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.activity_nr_Invalid << 0 ) + ( le.opt_type_Invalid << 1 ) + ( le.opt_id_Invalid << 2 ) + ( le.opt_info_id_Invalid << 3 );
+    SELF.ScrubsBits1 := ( le.activity_nr_Invalid << 0 ) + ( le.opt_type_Invalid << 1 ) + ( le.opt_id_Invalid << 2 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -41,7 +39,6 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.activity_nr_Invalid := (le.ScrubsBits1 >> 0) & 1;
     SELF.opt_type_Invalid := (le.ScrubsBits1 >> 1) & 1;
     SELF.opt_id_Invalid := (le.ScrubsBits1 >> 2) & 1;
-    SELF.opt_info_id_Invalid := (le.ScrubsBits1 >> 3) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -53,8 +50,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     activity_nr_CUSTOM_ErrorCount := COUNT(GROUP,h.activity_nr_Invalid=1);
     opt_type_ENUM_ErrorCount := COUNT(GROUP,h.opt_type_Invalid=1);
     opt_id_CUSTOM_ErrorCount := COUNT(GROUP,h.opt_id_Invalid=1);
-    opt_info_id_ALLOW_ErrorCount := COUNT(GROUP,h.opt_info_id_Invalid=1);
-    AnyRule_WithErrorsCount := COUNT(GROUP, h.activity_nr_Invalid > 0 OR h.opt_type_Invalid > 0 OR h.opt_id_Invalid > 0 OR h.opt_info_id_Invalid > 0);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.activity_nr_Invalid > 0 OR h.opt_type_Invalid > 0 OR h.opt_id_Invalid > 0);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
     Rules_WithErrors := 0;
@@ -62,9 +58,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.activity_nr_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.opt_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.opt_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.opt_info_id_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.activity_nr_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.opt_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.opt_id_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.activity_nr_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.opt_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.opt_id_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.opt_info_id_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.activity_nr_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.opt_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.opt_id_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -79,18 +75,17 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.activity_nr_Invalid,le.opt_type_Invalid,le.opt_id_Invalid,le.opt_info_id_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,OptionalInfo_Raw_Fields.InvalidMessage_activity_nr(le.activity_nr_Invalid),OptionalInfo_Raw_Fields.InvalidMessage_opt_type(le.opt_type_Invalid),OptionalInfo_Raw_Fields.InvalidMessage_opt_id(le.opt_id_Invalid),OptionalInfo_Raw_Fields.InvalidMessage_opt_info_id(le.opt_info_id_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.activity_nr_Invalid,le.opt_type_Invalid,le.opt_id_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,OptionalInfo_Raw_Fields.InvalidMessage_activity_nr(le.activity_nr_Invalid),OptionalInfo_Raw_Fields.InvalidMessage_opt_type(le.opt_type_Invalid),OptionalInfo_Raw_Fields.InvalidMessage_opt_id(le.opt_id_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.activity_nr_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.opt_type_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.opt_id_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.opt_info_id_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'activity_nr','opt_type','opt_id','opt_info_id','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_numeric','Invalid_opt_type','invalid_numeric','Invalid_opt_info_id','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.activity_nr,(SALT311.StrType)le.opt_type,(SALT311.StrType)le.opt_id,(SALT311.StrType)le.opt_info_id,'***SALTBUG***');
+          ,CHOOSE(le.opt_id_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
+    SELF.FieldName := CHOOSE(c,'activity_nr','opt_type','opt_id','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'invalid_numeric','Invalid_opt_type','invalid_numeric','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.activity_nr,(SALT311.StrType)le.opt_type,(SALT311.StrType)le.opt_id,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,4,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,3,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
@@ -104,7 +99,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'activity_nr:invalid_numeric:CUSTOM'
           ,'opt_type:Invalid_opt_type:ENUM'
           ,'opt_id:invalid_numeric:CUSTOM'
-          ,'opt_info_id:Invalid_opt_info_id:ALLOW'
           ,'field:Number_Errored_Fields:SUMMARY'
           ,'field:Number_Perfect_Fields:SUMMARY'
           ,'rule:Number_Errored_Rules:SUMMARY'
@@ -116,7 +110,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,OptionalInfo_Raw_Fields.InvalidMessage_activity_nr(1)
           ,OptionalInfo_Raw_Fields.InvalidMessage_opt_type(1)
           ,OptionalInfo_Raw_Fields.InvalidMessage_opt_id(1)
-          ,OptionalInfo_Raw_Fields.InvalidMessage_opt_info_id(1)
           ,'Fields with errors'
           ,'Fields without errors'
           ,'Rules with errors'
@@ -128,7 +121,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.activity_nr_CUSTOM_ErrorCount
           ,le.opt_type_ENUM_ErrorCount
           ,le.opt_id_CUSTOM_ErrorCount
-          ,le.opt_info_id_ALLOW_ErrorCount
           ,le.FieldsChecked_WithErrors
           ,le.FieldsChecked_NoErrors
           ,le.Rules_WithErrors
@@ -139,8 +131,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.rulepcnt := IF(c <= NumRules, 100 * CHOOSE(c
           ,le.activity_nr_CUSTOM_ErrorCount
           ,le.opt_type_ENUM_ErrorCount
-          ,le.opt_id_CUSTOM_ErrorCount
-          ,le.opt_info_id_ALLOW_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
+          ,le.opt_id_CUSTOM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)
@@ -181,21 +172,18 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.ruledesc := CHOOSE(c
           ,'activity_nr:' + getFieldTypeText(h.activity_nr) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'opt_type:' + getFieldTypeText(h.opt_type) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'opt_id:' + getFieldTypeText(h.opt_id) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'opt_info_id:' + getFieldTypeText(h.opt_info_id) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix,'UNKNOWN');
+          ,'opt_id:' + getFieldTypeText(h.opt_id) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix,'UNKNOWN');
       SELF.rulecnt := CHOOSE(c
           ,le.populated_activity_nr_cnt
           ,le.populated_opt_type_cnt
-          ,le.populated_opt_id_cnt
-          ,le.populated_opt_info_id_cnt,0);
+          ,le.populated_opt_id_cnt,0);
       SELF.rulepcnt := CHOOSE(c
           ,le.populated_activity_nr_pcnt
           ,le.populated_opt_type_pcnt
-          ,le.populated_opt_id_pcnt
-          ,le.populated_opt_info_id_pcnt,0);
+          ,le.populated_opt_id_pcnt,0);
       SELF.ErrorMessage := '';
     END;
-    FieldPopStats := NORMALIZE(hygiene_summaryStats,4,xNormHygieneStats(LEFT,COUNTER,'POP'));
+    FieldPopStats := NORMALIZE(hygiene_summaryStats,3,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
     SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
@@ -211,7 +199,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
  
     mod_Delta := OptionalInfo_Raw_Delta(prevDS, PROJECT(h, OptionalInfo_Raw_Layout));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
-    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),4,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
+    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),3,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
     deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
                                       'Updates:count_Updates:DELTA',
                                       TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');

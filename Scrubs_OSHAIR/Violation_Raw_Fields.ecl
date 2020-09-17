@@ -1,18 +1,18 @@
 ﻿IMPORT SALT311;
-IMPORT Scrubs_Oshair; // Import modules for FieldTypes attribute definitions
+IMPORT Scrubs,Scrubs_Oshair; // Import modules for FieldTypes attribute definitions
 EXPORT Violation_Raw_Fields := MODULE
  
 EXPORT NumFields := 26;
  
 // Processing for each FieldType
-EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_numeric','invalid_numeric_blank','Invalid_rec','Invalid_viol_type','Invalid_X','invalid_alpha_numeric','invalid_date_time','invalid_numeric_or_period','invalid_alpha_blank','invalid_date_future','invalid_date_ccyymm');
-EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'invalid_numeric' => 1,'invalid_numeric_blank' => 2,'Invalid_rec' => 3,'Invalid_viol_type' => 4,'Invalid_X' => 5,'invalid_alpha_numeric' => 6,'invalid_date_time' => 7,'invalid_numeric_or_period' => 8,'invalid_alpha_blank' => 9,'invalid_date_future' => 10,'invalid_date_ccyymm' => 11,0);
+EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_numeric','invalid_numeric_blank','Invalid_rec','Invalid_viol_type','Invalid_X','invalid_alpha_numeric','Invalid_alpha_Numeric_blank','invalid_numeric_or_period','invalid_alpha_blank','invalid_date_future','invalid_date_ccyymm');
+EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'invalid_numeric' => 1,'invalid_numeric_blank' => 2,'Invalid_rec' => 3,'Invalid_viol_type' => 4,'Invalid_X' => 5,'invalid_alpha_numeric' => 6,'Invalid_alpha_Numeric_blank' => 7,'invalid_numeric_or_period' => 8,'invalid_alpha_blank' => 9,'invalid_date_future' => 10,'invalid_date_ccyymm' => 11,0);
  
 EXPORT MakeFT_invalid_numeric(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_numeric(SALT311.StrType s) := WHICH(~Scrubs_Oshair.Functions.fn_numeric(s)>0);
-EXPORT InValidMessageFT_invalid_numeric(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Oshair.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_numeric(SALT311.StrType s) := WHICH(~Scrubs.Functions.fn_numeric(s)>0);
+EXPORT InValidMessageFT_invalid_numeric(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_numeric_blank(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -41,14 +41,14 @@ EXPORT InValidMessageFT_Invalid_X(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErro
 EXPORT MakeFT_invalid_alpha_numeric(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_alpha_numeric(SALT311.StrType s) := WHICH(~Scrubs_Oshair.Functions.fn_alpha_numeric(s)>0);
-EXPORT InValidMessageFT_invalid_alpha_numeric(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Oshair.Functions.fn_alpha_numeric'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_alpha_numeric(SALT311.StrType s) := WHICH(~Scrubs.Functions.fn_alphanum(s)>0);
+EXPORT InValidMessageFT_invalid_alpha_numeric(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.Functions.fn_alphanum'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_date_time(SALT311.StrType s0) := FUNCTION
+EXPORT MakeFT_Invalid_alpha_Numeric_blank(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_date_time(SALT311.StrType s) := WHICH(~Scrubs_Oshair.Functions.fn_date_time(s)>0);
-EXPORT InValidMessageFT_invalid_date_time(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Oshair.Functions.fn_date_time'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_alpha_Numeric_blank(SALT311.StrType s) := WHICH(~Scrubs.Functions.fn_alphaNum_or_blank(s)>0);
+EXPORT InValidMessageFT_Invalid_alpha_Numeric_blank(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.Functions.fn_alphaNum_or_blank'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_numeric_or_period(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -98,9 +98,9 @@ EXPORT Make_viol_type(SALT311.StrType s0) := MakeFT_Invalid_viol_type(s0);
 EXPORT InValid_viol_type(SALT311.StrType s) := InValidFT_Invalid_viol_type(s);
 EXPORT InValidMessage_viol_type(UNSIGNED1 wh) := InValidMessageFT_Invalid_viol_type(wh);
  
-EXPORT Make_issuance_date(SALT311.StrType s0) := MakeFT_invalid_date_time(s0);
-EXPORT InValid_issuance_date(SALT311.StrType s) := InValidFT_invalid_date_time(s);
-EXPORT InValidMessage_issuance_date(UNSIGNED1 wh) := InValidMessageFT_invalid_date_time(wh);
+EXPORT Make_issuance_date(SALT311.StrType s0) := MakeFT_invalid_date_ccyymm(s0);
+EXPORT InValid_issuance_date(SALT311.StrType s) := InValidFT_invalid_date_ccyymm(s);
+EXPORT InValidMessage_issuance_date(UNSIGNED1 wh) := InValidMessageFT_invalid_date_ccyymm(wh);
  
 EXPORT Make_abate_date(SALT311.StrType s0) := MakeFT_invalid_date_future(s0);
 EXPORT InValid_abate_date(SALT311.StrType s) := InValidFT_invalid_date_future(s);
@@ -114,9 +114,9 @@ EXPORT Make_initial_penalty(SALT311.StrType s0) := MakeFT_invalid_numeric_or_per
 EXPORT InValid_initial_penalty(SALT311.StrType s) := InValidFT_invalid_numeric_or_period(s);
 EXPORT InValidMessage_initial_penalty(UNSIGNED1 wh) := InValidMessageFT_invalid_numeric_or_period(wh);
  
-EXPORT Make_contest_date(SALT311.StrType s0) := MakeFT_invalid_date_time(s0);
-EXPORT InValid_contest_date(SALT311.StrType s) := InValidFT_invalid_date_time(s);
-EXPORT InValidMessage_contest_date(UNSIGNED1 wh) := InValidMessageFT_invalid_date_time(wh);
+EXPORT Make_contest_date(SALT311.StrType s0) := MakeFT_invalid_date_ccyymm(s0);
+EXPORT InValid_contest_date(SALT311.StrType s) := InValidFT_invalid_date_ccyymm(s);
+EXPORT InValidMessage_contest_date(UNSIGNED1 wh) := InValidMessageFT_invalid_date_ccyymm(wh);
  
 EXPORT Make_final_order_date(SALT311.StrType s0) := MakeFT_invalid_date_future(s0);
 EXPORT InValid_final_order_date(SALT311.StrType s) := InValidFT_invalid_date_future(s);
@@ -150,9 +150,9 @@ EXPORT Make_fta_insp_nr(SALT311.StrType s0) := MakeFT_invalid_numeric_blank(s0);
 EXPORT InValid_fta_insp_nr(SALT311.StrType s) := InValidFT_invalid_numeric_blank(s);
 EXPORT InValidMessage_fta_insp_nr(UNSIGNED1 wh) := InValidMessageFT_invalid_numeric_blank(wh);
  
-EXPORT Make_fta_issuance_date(SALT311.StrType s0) := MakeFT_invalid_date_time(s0);
-EXPORT InValid_fta_issuance_date(SALT311.StrType s) := InValidFT_invalid_date_time(s);
-EXPORT InValidMessage_fta_issuance_date(UNSIGNED1 wh) := InValidMessageFT_invalid_date_time(wh);
+EXPORT Make_fta_issuance_date(SALT311.StrType s0) := MakeFT_invalid_date_ccyymm(s0);
+EXPORT InValid_fta_issuance_date(SALT311.StrType s) := InValidFT_invalid_date_ccyymm(s);
+EXPORT InValidMessage_fta_issuance_date(UNSIGNED1 wh) := InValidMessageFT_invalid_date_ccyymm(wh);
  
 EXPORT Make_fta_penalty(SALT311.StrType s0) := MakeFT_invalid_numeric_or_period(s0);
 EXPORT InValid_fta_penalty(SALT311.StrType s) := InValidFT_invalid_numeric_or_period(s);
@@ -166,25 +166,25 @@ EXPORT Make_fta_final_order_date(SALT311.StrType s0) := MakeFT_invalid_date_ccyy
 EXPORT InValid_fta_final_order_date(SALT311.StrType s) := InValidFT_invalid_date_ccyymm(s);
 EXPORT InValidMessage_fta_final_order_date(UNSIGNED1 wh) := InValidMessageFT_invalid_date_ccyymm(wh);
  
-EXPORT Make_hazsub1(SALT311.StrType s0) := MakeFT_invalid_alpha_numeric(s0);
-EXPORT InValid_hazsub1(SALT311.StrType s) := InValidFT_invalid_alpha_numeric(s);
-EXPORT InValidMessage_hazsub1(UNSIGNED1 wh) := InValidMessageFT_invalid_alpha_numeric(wh);
+EXPORT Make_hazsub1(SALT311.StrType s0) := MakeFT_Invalid_alpha_Numeric_blank(s0);
+EXPORT InValid_hazsub1(SALT311.StrType s) := InValidFT_Invalid_alpha_Numeric_blank(s);
+EXPORT InValidMessage_hazsub1(UNSIGNED1 wh) := InValidMessageFT_Invalid_alpha_Numeric_blank(wh);
  
-EXPORT Make_hazsub2(SALT311.StrType s0) := MakeFT_invalid_alpha_numeric(s0);
-EXPORT InValid_hazsub2(SALT311.StrType s) := InValidFT_invalid_alpha_numeric(s);
-EXPORT InValidMessage_hazsub2(UNSIGNED1 wh) := InValidMessageFT_invalid_alpha_numeric(wh);
+EXPORT Make_hazsub2(SALT311.StrType s0) := MakeFT_Invalid_alpha_Numeric_blank(s0);
+EXPORT InValid_hazsub2(SALT311.StrType s) := InValidFT_Invalid_alpha_Numeric_blank(s);
+EXPORT InValidMessage_hazsub2(UNSIGNED1 wh) := InValidMessageFT_Invalid_alpha_Numeric_blank(wh);
  
-EXPORT Make_hazsub3(SALT311.StrType s0) := MakeFT_invalid_alpha_numeric(s0);
-EXPORT InValid_hazsub3(SALT311.StrType s) := InValidFT_invalid_alpha_numeric(s);
-EXPORT InValidMessage_hazsub3(UNSIGNED1 wh) := InValidMessageFT_invalid_alpha_numeric(wh);
+EXPORT Make_hazsub3(SALT311.StrType s0) := MakeFT_Invalid_alpha_Numeric_blank(s0);
+EXPORT InValid_hazsub3(SALT311.StrType s) := InValidFT_Invalid_alpha_Numeric_blank(s);
+EXPORT InValidMessage_hazsub3(UNSIGNED1 wh) := InValidMessageFT_Invalid_alpha_Numeric_blank(wh);
  
-EXPORT Make_hazsub4(SALT311.StrType s0) := MakeFT_invalid_alpha_numeric(s0);
-EXPORT InValid_hazsub4(SALT311.StrType s) := InValidFT_invalid_alpha_numeric(s);
-EXPORT InValidMessage_hazsub4(UNSIGNED1 wh) := InValidMessageFT_invalid_alpha_numeric(wh);
+EXPORT Make_hazsub4(SALT311.StrType s0) := MakeFT_Invalid_alpha_Numeric_blank(s0);
+EXPORT InValid_hazsub4(SALT311.StrType s) := InValidFT_Invalid_alpha_Numeric_blank(s);
+EXPORT InValidMessage_hazsub4(UNSIGNED1 wh) := InValidMessageFT_Invalid_alpha_Numeric_blank(wh);
  
-EXPORT Make_hazsub5(SALT311.StrType s0) := MakeFT_invalid_alpha_numeric(s0);
-EXPORT InValid_hazsub5(SALT311.StrType s) := InValidFT_invalid_alpha_numeric(s);
-EXPORT InValidMessage_hazsub5(UNSIGNED1 wh) := InValidMessageFT_invalid_alpha_numeric(wh);
+EXPORT Make_hazsub5(SALT311.StrType s0) := MakeFT_Invalid_alpha_Numeric_blank(s0);
+EXPORT InValid_hazsub5(SALT311.StrType s) := InValidFT_Invalid_alpha_Numeric_blank(s);
+EXPORT InValidMessage_hazsub5(UNSIGNED1 wh) := InValidMessageFT_Invalid_alpha_Numeric_blank(wh);
  
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO

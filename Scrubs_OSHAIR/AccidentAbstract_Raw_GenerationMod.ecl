@@ -43,10 +43,10 @@ EXPORT AccidentAbstract_Raw_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FILENAME:AccidentAbstract_Raw_in_OSHAIR\n'
     + 'NAMESCOPE:AccidentAbstract_Raw\n'
     + '\n'
-    + 'FIELDTYPE:invalid_numeric:CUSTOM(Scrubs_Oshair.Functions.fn_numeric > 0)\n'
+    + 'FIELDTYPE:invalid_numeric:CUSTOM(Scrubs.Functions.fn_numeric > 0)\n'
     + '\n'
     + 'FIELD:summary_nr:TYPE(STRING9):LIKE(invalid_numeric):0,0\n'
-    + 'FIELD:line_nr:TYPE(STRING4):LIKE(invalid_numeric):0,0\n'
+    + 'FIELD:line_nr:TYPE(STRING4):LIKE(invalid_numeric):0,0'
     ;
  
   // Structured values
