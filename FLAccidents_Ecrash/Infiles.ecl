@@ -149,7 +149,7 @@ export tproperty := project(jProperty_damage, transform(FLAccidents_Ecrash.Layou
 													,self:= left));	
 													
 export tcommercial:= project(commercl, transform(FLAccidents_Ecrash.Layout_Infiles_Fixed.commercl
-													,self := left));													
+													,self := left));																									
 //Keep latest incident
 
 dincident_EA :=	dedup(sort(distribute(
@@ -226,12 +226,12 @@ jrecs1 := join(jrecs0,
 							trecs1(left,right),left outer,local);
 
 											
-d_person :=		dedup(
-									sort(
-										tpersn(incident_id!=''),
-												incident_id,vehicle_unit_number,last_name,first_name,date_of_birth,address,city,state,zip_code,home_phone,map(regexfind('DRIVER|VEHICLE DRIVER|VEHICLEDRIVER' , person_type) => 3
-                                                                                                                                      ,regexfind('OWNER|VEHICLE OWNER|VEHICLEOWNER' , person_type) => 2,1),creation_date,person_id,local)
-								       ,incident_id,vehicle_unit_number,last_name,first_name,date_of_birth,address,city,state,zip_code,home_phone,right,local); 
+d_person :=		dedup(sort(tpersn(incident_id!=''),
+												 incident_id,vehicle_unit_number,last_name,first_name,date_of_birth,address,city,state,zip_code,home_phone,
+												 map(regexfind('DRIVER|VEHICLE DRIVER|VEHICLEDRIVER', person_type) => 3,
+												     regexfind('OWNER|VEHICLE OWNER|VEHICLEOWNER', person_type) => 2,
+														           1),creation_date,person_id,local),
+								    incident_id,vehicle_unit_number,last_name,first_name,date_of_birth,address,city,state,zip_code,home_phone,right,local); 
 											 
 //------------------------------------------------------------------------------------------------------------------
 FLAccidents_Ecrash.Layout_Infiles_Fixed.cmbnd  trecs2(jrecs1 L, tpersn R) := transform
@@ -262,8 +262,7 @@ self := [];
 end;
 
 
-jrecs2 := join(jrecs1(Unit_Number != '0' and Unit_Number != ''),
-											
+jrecs2 := join(jrecs1(Unit_Number != '0' and Unit_Number != ''),											
 									d_person,
 														left.incident_id = right.incident_id and 
 							              (unsigned)left.Unit_Number = (unsigned)right.vehicle_Unit_Number ,
@@ -302,10 +301,20 @@ jrecs3 := join(distribute(allrecs,hash(vehicle_id))
 							,dedup(sort(distribute(tcommercial(vehicle_id!=''),hash(vehicle_id)),vehicle_id,creation_date,local),vehicle_id,right,local),
 							left.vehicle_id = right.vehicle_id,
 							trecs3(left,right),left outer,local);
+							
+//Citations with ChildRecords
+gcitations := group(sort(distribute(tcitation(incident_id!='' and person_id not in ['','NULL']),hash(incident_id)), 
+                     incident_id, person_id, -citation_id, local), 
+                incident_id, person_id, local);
 
+Layout_Infiles_Fixed.Citations_WithChildRec doRollupCitations(gcitations l, dataset(Layout_Infiles_Fixed.Citation) gcitations) := transform
+  self.Citation_Details := project(gcitations, transform(Layout_Infiles_Fixed.Citations_ChildRec, self := left));
+  self := L;
+end;
+CitaionsWithChildRec := ungroup(rollup(gcitations, group, doRollupCitations(left, rows(left))));
 
 //------------------------------------------------------------------------------------------------------------------								
-FLAccidents_Ecrash.Layout_Infiles_Fixed.cmbnd  trecs4(jrecs3 L, tcitation R) := transform
+FLAccidents_Ecrash.Layout_Infiles_Fixed.cmbnd  trecs4(jrecs3 L, CitaionsWithChildRec R) := transform
 self.incident_id := L.incident_id;
 self.agency_id           := L.agency_id;
 self.agency_name         := L.agency_name;
@@ -314,16 +323,12 @@ self.creation_date := L.creation_date;
 self.person_id := l.person_id ; 
 self := R;
 self := L;
-
 end;
 
-jrecs4 := join(distribute(jrecs3,hash(incident_id)),distribute(tcitation(incident_id!='' and person_id not in ['','NULL']),hash(incident_id)),
-							left.incident_id = right.incident_id and
-							left.person_id =right.person_id, 
-							trecs4(left,right),left outer,local);	
-/*jrecs4 := join(distribute(jrecs3,hash(incident_id)),tcitation(incident_id!=''),
-							left.incident_id = right.incident_id,
-							trecs4(left,right),left outer,local);	*/
+jrecs4 := join(distribute(jrecs3,hash(incident_id)), CitaionsWithChildRec,
+							 left.incident_id = right.incident_id and
+							 left.person_id =right.person_id, 
+							 trecs4(left,right),left outer,local);
 //------------------------------------------------------------------------------------------------------------------										
 
 // Property OWNER 
