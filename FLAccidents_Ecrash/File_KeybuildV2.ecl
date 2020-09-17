@@ -61,6 +61,7 @@ Layout_eCrash.Consolidation_AgencyOri xpndrecs(flc_ss L, FLAccidents.basefile_fl
 		//self.IdField 								:=	R.IdField;
 		//Appriss Integration
 		self.Releasable                     := '1'; 	
+		self.Citation_Details := row([], Layout_Infiles_Fixed.Citations_ChildRec);
 		self 								:= L;
 		self 								:= R;
 		self                := []; 
@@ -81,6 +82,7 @@ Layout_eCrash.Consolidation_AgencyOri xpndrecs1(pflc_ss L,FLAccidents.BaseFile_F
 	//self.IdField 			:=	R.IdField;
 	//Appriss Integration
 	self.Releasable                     := '1'; 	
+	self.Citation_Details := row([], Layout_Infiles_Fixed.Citations_ChildRec);
 	self 							:= L;
 end;
 
@@ -99,6 +101,7 @@ Layout_eCrash.Consolidation_AgencyOri xpndrecs2(pflc_ss1 L,FLAccidents.basefile_
 	self.vehicle_incident_city			:= STD.Str.ToUpperCase(if(L.accident_nbr= R.accident_nbr,R.city_town_name,''));
 	//Appriss Integration
 	self.Releasable                     := '1'; 	
+	self.Citation_Details := row([], Layout_Infiles_Fixed.Citations_ChildRec); 	
 	self 														:= L;
 end;
 
@@ -184,7 +187,8 @@ Layout_eCrash.Consolidation_AgencyOri slimrec(ntlFile L) := transform
 */
 		//Appriss Integration
 		self.Releasable               := '1'; 	
-		self.agency_id                := l.agency_id;	 	
+		self.agency_id                := l.agency_id; 	
+	  self.Citation_Details := row([], Layout_Infiles_Fixed.Citations_ChildRec);	 	
 		self						              := l;
 		self						              := [];
 end;
@@ -295,7 +299,8 @@ Layout_eCrash.Consolidation_AgencyOri slimrec2(inqFile L ,unsigned1 cnt) := tran
   				
 		//Appriss Integration
 		self.Releasable               := '1'; 	
-		self.agency_id                := l.agency_id;	
+		self.agency_id                := l.agency_id; 	
+	  self.Citation_Details := row([], Layout_Infiles_Fixed.Citations_ChildRec);	
 		self						              := l;
 		self						              := [];
 end;
