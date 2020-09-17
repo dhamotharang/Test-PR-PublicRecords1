@@ -49,7 +49,6 @@ Build_Kel_Ecl :=
 					FraudGovPlatform.promote(version).promote_sprayed_files,
 					FraudShared.Build_Keys(version).All,
 					FraudShared.Build_AutoKeys(version),
-					FraudGovPlatform.Promote().Clear_DemoData,
 					FraudGovPlatform.Build_Base_Pii(version).All,
 					_Control.fSubmitNewWorkunit(Build_Kel_Ecl,ECLThorName)
 				),

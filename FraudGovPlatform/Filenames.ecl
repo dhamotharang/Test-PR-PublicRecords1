@@ -129,10 +129,8 @@ module
 		//Otto Files
 		export AddressCache	:= tools.mod_FilenamesBuild(Template('AddressCache'),pversion);
 		export Pii					:= tools.mod_FilenamesBuild(Template('Pii'),pversion);
-		export CIID					:= tools.mod_FilenamesBuild(Template('CIID'),pversion);
 		export Crim					:= tools.mod_FilenamesBuild(Template('Crim'),pversion);
 		export Death				:= tools.mod_FilenamesBuild(Template('Death'),pversion);
-		export FraudPoint		:= tools.mod_FilenamesBuild(Template('FraudPoint'),pversion);
 		export IPMetaData		:= tools.mod_FilenamesBuild(Template('IPMetaData'),pversion);
 		export Advo					:= tools.mod_FilenamesBuild(Template('Advo'),pversion);
 		export DLHistory			:= tools.mod_FilenamesBuild(Template('DLHistory'),pversion);
@@ -199,26 +197,21 @@ module
 
 		//	soap appends original
 		
-		export CIID_Orig				:= tools.mod_FilenamesBuild(Template('CIID_Orig'),pversion);
 		export Crim_Orig				:= tools.mod_FilenamesBuild(Template('Crim_Orig'),pversion);
 		export Death_Orig				:= tools.mod_FilenamesBuild(Template('Death_Orig'),pversion);
 			
 		// DemoData Files - SOAP Appends
 		export Pii_Demo					:= tools.mod_FilenamesBuild(Template('Pii_Demo'),pversion);
-		export CIID_Demo				:= tools.mod_FilenamesBuild(Template('CIID_Demo'),pversion);
 		export Crim_Demo				:= tools.mod_FilenamesBuild(Template('Crim_Demo'),pversion);
 		export Death_Demo				:= tools.mod_FilenamesBuild(Template('Death_Demo'),pversion);
-		export FraudPoint_Demo	:= tools.mod_FilenamesBuild(Template('FraudPoint_Demo'),pversion);
 		export IpMetaData_Demo	:= tools.mod_FilenamesBuild(Template('IpMetaData_Demo'),pversion);
 		export Advo_Demo				:= tools.mod_FilenamesBuild(Template('Advo_Demo'),pversion);
 			
 		export dAll_filenames :=
 			AddressCache.dAll_filenames +
 			Pii.dAll_filenames +
-			CIID.dAll_filenames +
 			Crim.dAll_filenames +
 			Death.dAll_filenames +
-			FraudPoint.dAll_filenames +
 			DLHistory.dAll_filenames +
 			BestInfo.dAll_filenames +
 			CoverageDates.dAll_filenames +
@@ -278,12 +271,9 @@ module
  			Main_Orig.dAll_filenames + 
 			Main_Anon.dAll_filenames + 
 			Pii_Demo.dAll_filenames + 
-			CIID_Demo.dAll_filenames + 
 			Crim_Demo.dAll_filenames + 
 			Death_Demo.dAll_filenames + 
-			FraudPoint_Demo.dAll_filenames + 
 			IpMetaData_Demo.dAll_filenames + 
-			CIID_Orig.dAll_filenames +
 			Crim_Orig.dAll_filenames +
 			Death_Orig.dAll_filenames +
 			IPMetaData.dAll_filenames + 
