@@ -81,7 +81,7 @@ EXPORT Build_Keys(string infiledate, boolean isprte = false) := function
 	build_key(american_student_new,'student_new',infiledate,'fcra','ffid',american_student_newretval, flag_file_id);
 	//build_key(ibehavior_consumer,'ibehavior_consumer',infiledate,'fcra','ffid',ibehavior_consumerretval, flag_file_id);
 	//build_key(ibehavior_purchase,'ibehavior_purchase',infiledate,'fcra','ffid',ibehavior_purchaseretval, flag_file_id);
-	build_key(aircrafts,'aircrafts',infiledate,'fcra','ffid',aircraftsretval, flag_file_id);
+	//build_key(aircrafts,'aircrafts',infiledate,'fcra','ffid',aircraftsretval, flag_file_id);
 	build_key(aircraft_details,'aircraft_details',infiledate,'fcra','ffid',aircraft_detailsretval, flag_file_id);
 	build_key(aircraft_engine,'aircraft_engine',infiledate,'fcra','ffid',aircraft_engineretval, flag_file_id);
 	build_key(pilot_registration,'pilot_registration',infiledate,'fcra','ffid',pilot_registrationretval, flag_file_id);
@@ -97,8 +97,8 @@ EXPORT Build_Keys(string infiledate, boolean isprte = false) := function
 	build_key(property.deed,'property_deed',infiledate,'fcra','ffid',property_deedretval, flag_file_id);
 	build_key(property.property_search,'property_search',infiledate,'fcra','ffid',property_searchretval, flag_file_id);
 	build_key(property.ownership,'property_ownership',infiledate,'fcra','did',property_ownershipretval, did);
-	build_key(ucc_main,'ucc_main',infiledate,'fcra','ffid',ucc_mainretval, flag_file_id);
-	build_key(ucc_party,'ucc_party',infiledate,'fcra','ffid',ucc_partyretval, flag_file_id);
+	//build_key(ucc_main,'ucc_main',infiledate,'fcra','ffid',ucc_mainretval, flag_file_id);
+	//build_key(ucc_party,'ucc_party',infiledate,'fcra','ffid',ucc_partyretval, flag_file_id);
 	build_key(consumerstatement_lexid,'consumerstatement',infiledate,'fcra','lexid',cons_lexidretval, lexid);
 	build_key(consumerstatement_ssn,'consumerstatement',infiledate,'fcra','ssn',cons_ssnretval, ssn);
 	build_key(proflic_mari,'proflic_mari',infiledate,'fcra','ffid',proflic_mariretval, flag_file_id);
@@ -166,7 +166,7 @@ EXPORT Build_Keys(string infiledate, boolean isprte = false) := function
 			,studentretval
 		//	,ibehavior_consumerretval
 		//	,ibehavior_purchaseretval
-			,aircraftsretval
+		//	,aircraftsretval
 			,aircraft_detailsretval
 			,aircraft_engineretval
 			,pilot_registrationretval
@@ -182,8 +182,8 @@ EXPORT Build_Keys(string infiledate, boolean isprte = false) := function
 			,property_deedretval
 			,property_searchretval
 			,property_ownershipretval
-			,ucc_mainretval
-			,ucc_partyretval
+			//,ucc_mainretval
+			//,ucc_partyretval
 			,cons_lexidretval
 			,cons_ssnretval
 			,proflic_mariretval
