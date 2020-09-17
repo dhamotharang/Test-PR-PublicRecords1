@@ -1,5 +1,7 @@
 ﻿EXPORT FCRA_Consumer( Query_Environment,
 											InputFile_LogicalName,
+											logical_file_type,
+											InputFile_Dali,
 											Records_to_Run,
 											GLBA,
 											DPPA,
@@ -9,7 +11,10 @@
 											histDate,
 											Score_threshold,
 											Output_Master_Results,
-											Output_SALT_Profile) := FUNCTIONMACRO
+											Output_SALT_Profile,
+											AllowedSourcesDataset_List,
+											ExcludeSourcesDataset_List,
+											email_list) := FUNCTIONMACRO
 
 ﻿/* PublicRecords_KEL.BWR_FCRA_MAS_Roxie */
 #workunit('name','MAS FCRA Consumer dev156 1 thread');
@@ -19,7 +24,7 @@ threads := 1;
 RoxieIP :=Query_Environment;
 NeutralRoxieIP:= Query_Environment;
 
-InputFile := InputFile_LogicalName;
+// InputFile := InputFile_LogicalName;
 //InputFile := '~mas::uatsamples::consumer_fcra_1m_07092019.csv';
 // InputFile := '~mas::uatsamples::consumer_nonfcra_iptest_04232020.csv'; //Samesample as NonFCRA only testing IP validation
 
@@ -56,7 +61,19 @@ prii_layout := RECORD
     STRING Perf;
     STRING Proj;
 END;
-p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"'), HEADING(SINGLE)));
+//p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"'), HEADING(SINGLE)));
+
+
+sample_size:=Records_to_Run;
+
+input_file:=IF(logical_file_type ='THOR',DATASET('~foreign::' + InputFile_Dali + InputFile_LogicalName,prii_layout,THOR),
+																DATASET('~foreign::' + InputFile_Dali + InputFile_LogicalName,prii_layout,CSV(HEADING(single), QUOTE('"')))
+							 );
+																 
+p_in:= if(sample_size=0, choosen(input_file,all),choosen(input_file,sample_size) );
+
+
+
 // P_IN1 := p_in( ACCOUNT IN ['AAAA7833-122054', 'TMOBJUN7088-84991']);
 p := IF (RecordsToRun = 0, P_IN, CHOOSEN (P_IN, RecordsToRun));
 //p2 := p_in;
@@ -76,6 +93,8 @@ soapLayout := RECORD
 	BOOLEAN OutputMasterResults;
 	BOOLEAN IsMarketing;
 	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET(AllowedSourcesDataset_List, PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET(ExcludeSourcesDataset_List, PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 end;
 
 Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
@@ -83,7 +102,7 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT STRING VersionName := 'Version 1.0';
 	EXPORT BOOLEAN isFCRA := TRUE;
 	EXPORT STRING ArchiveDate := histDate;
-	EXPORT STRING InputFileName := InputFile;
+	EXPORT STRING InputFileName := InputFile_LogicalName;
 	EXPORT STRING PermissiblePurpose := Intended_Purpose; // FCRA only
 	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
 	EXPORT STRING Data_Permission_Mask := DataPermissionMask;
@@ -103,6 +122,7 @@ soapLayout trans (pp le):= TRANSFORM
 				SELF.ServiceName := 'neutralroxie'; 
 				SELF.URL := NeutralRoxieIP; 
 				SELF := []));
+		
 	SELF.ScoreThreshold := Settings.LexIDThreshold;
 	SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
 	SELF.DataPermissionMask := Settings.Data_Permission_Mask;
@@ -140,7 +160,8 @@ END;
 bwr_results := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'publicrecords_kel.MAS_FCRA_Service', 
+				// 'publicrecords_kel.MAS_FCRA_Service',
+				'publicrecords_kel.mas_fcra_service.161',
 				{soap_in}, 
 				DATASET(layout_MAS_Test_Service_output),
 				XPATH('*'),
@@ -189,13 +210,26 @@ Passed_Person :=
 	JOIN(p, Passed, LEFT.Account = RIGHT.Results.P_InpAcct, 
 		TRANSFORM(Layout_Person,
 			SELF := RIGHT.Results, //fields from passed
-            SELF.time_ms := RIGHT.time_ms,
+      SELF.time_ms := RIGHT.time_ms,
 			SELF := LEFT, //input performance fields
 			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),
 		INNER, KEEP(1));
       
+result1:=STD.System.Email.SendEmail(email_list, 'KEL SHELL QA UI run job',  'Your WUID ' + workunit + ' has just kicked-off!');
 
-RETURN Passed_Person;
+result2:=output(Passed_Person);
+
+unique_id:='p_inpacct';
+
+result3:=Kel_Shell_QA_UI.Output_Distribution_Report_Module(unique_id, Passed_Person);
+
+result4:=Kel_Shell_QA.descriptive_Stats_Report(unique_id, Passed_Person);
+
+result5:=STD.System.Email.SendEmail(email_list, 'KEL SHELL QA UI run job',  'Your WUID ' + workunit + ' has completed!');
+
+seq:=sequential(result1, result2, result3, result4, result5);
+
+RETURN seq;
 
 ENDMACRO;

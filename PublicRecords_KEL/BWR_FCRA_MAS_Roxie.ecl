@@ -10,6 +10,7 @@ NeutralRoxieIP:= RiskWise.Shortcuts.Dev156;
 // PCG_Cert := 'http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on PROD servers DO NOT USE THIS UNLESS YOU NEED TO				
 
 InputFile := '~mas::uatsamples::consumer_fcra_100k_07102019.csv';
+//InputFile := '~bbraaten::in::personfcra_lexids_w20200811-114047.csv';//lexids appended from FCRA vault file aug 2020
 // InputFile := '~mas::uat::mas_fcra_10k_sample_20200707.csv';
 // InputFile := '~mas::uatsamples::consumer_fcra_1m_07092019.csv';
 // InputFile := '~mas::uatsamples::consumer_nonfcra_iptest_04232020.csv'; //Samesample as NonFCRA only testing IP validation
@@ -32,6 +33,9 @@ DPPA := 0; // FCRA isn't DPPA restricted
 DataPermissionMask := '0000000000000';  
 DataRestrictionMask := '1000010000000100000000000000000000000000000000000'; 
 Include_Minors := TRUE;
+Retain_Input_Lexid := FALSE;//keep what we have on input
+Append_PII := FALSE;//keep what we have on input
+
 // Inteded Purpose for FCRA. Stubbing this out for now so it can be used in the settings output for now.
 Intended_Purpose := ''; 
 // Intended_Purpose := 'PRESCREENING'; 
@@ -111,6 +115,8 @@ soapLayout := RECORD
 	BOOLEAN OutputMasterResults;
 	BOOLEAN IsMarketing;
 	BOOLEAN IncludeMinors;
+	BOOLEAN RetainInputLexid;
+	BOOLEAN appendpii;
 	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
@@ -129,7 +135,8 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT UNSIGNED DPPAPurpose := DPPA;
 	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
 	EXPORT BOOLEAN IncludeMinors := Include_Minors;
-
+	EXPORT BOOLEAN RetainInputLexid := Retain_Input_Lexid;
+	EXPORT BOOLEAN BestPIIAppend := Append_PII; //do not append best pii for running
 END;
 
 
@@ -152,6 +159,8 @@ soapLayout trans (pp le):= TRANSFORM
     SELF.OutputMasterResults := Output_Master_Results;
 		SELF.AllowedSourcesDataset := AllowedSourcesDataset;
 		SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;
+		self.RetainInputLexid := Settings.RetainInputLexid;
+		self.appendpii := Settings.BestPIIAppend; //do not append best pii for running
 END;
 
 soap_in := PROJECT(pp, trans(LEFT));

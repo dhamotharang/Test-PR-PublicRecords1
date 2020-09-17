@@ -1,6 +1,6 @@
 //HPCC Systems KEL Compiler Version 1.3.0
 IMPORT KEL13 AS KEL;
-IMPORT CFG_Compile,E_Address,E_Business_Org,E_Business_Sele,E_Business_Ult,E_Geo_Link,E_Input_B_I_I,E_Input_P_I_I,E_Person,E_Property,E_Surname,E_Zip_Code FROM PublicRecords_KEL;
+IMPORT CFG_Compile,E_Address,E_Business_Org,E_Business_Sele,E_Business_Ult,E_Geo_Link,E_Input_B_I_I,E_Input_P_I_I,E_Person,E_Property,E_Social_Security_Number,E_Surname,E_Zip_Code FROM PublicRecords_KEL;
 IMPORT * FROM KEL13.Null;
 EXPORT E_Input_B_I_I_Input_P_I_I(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;

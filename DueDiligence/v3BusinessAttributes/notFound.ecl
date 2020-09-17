@@ -26,6 +26,9 @@ EXPORT notFound(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) inData,
                                               SELF.busStateLegalEvent := IF(attributesRequested.includeAll OR attributesRequested.includeStateLegalEvent, INVALID_BUSINESS_SCORE, DueDiligence.Constants.EMPTY);;
                                               SELF.busStateLegalEvent_Flag := IF(attributesRequested.includeAll OR attributesRequested.includeStateLegalEvent, INVALID_BUSINESS_FLAGS, DueDiligence.Constants.EMPTY);
                                               
+                                              SELF.busBEOAccessToFundsProperty := IF(attributesRequested.includeAll OR attributesRequested.includeBEOAccessToFundsProperty, INVALID_BUSINESS_SCORE, DueDiligence.Constants.EMPTY);;
+                                              SELF.busBEOAccessToFundsProperty_Flag := IF(attributesRequested.includeAll OR attributesRequested.includeBEOAccessToFundsProperty, INVALID_BUSINESS_FLAGS, DueDiligence.Constants.EMPTY);
+                                              
                                               SELF := [];));
 
     RETURN noDataFound;

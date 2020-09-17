@@ -3,7 +3,7 @@ EXPORT FnRoxie_GetInputPIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Lay
             PublicRecords_KEL.Interface_Options Options) := FUNCTION
             		
     
-	InputPIIAttributesResults := PublicRecords_KEL.Q_Input_Attributes_V1(RepInput, (INTEGER) RepInput[1].P_InpClnArchDt[1..8], Options.KEL_Permissions_Mask).Res0;
+	InputPIIAttributesResults := PublicRecords_KEL.Q_Input_Attributes_V1(RepInput, (INTEGER) RepInput[1].P_InpClnArchDt[1..8], Options.KEL_Permissions_Mask,Options.isFCRA).Res0;
 	InputPIIAttributes := KEL.Clean(InputPIIAttributesResults, TRUE, TRUE, TRUE);		
 		
 		ds_changedatatype :=
@@ -52,9 +52,10 @@ EXPORT FnRoxie_GetInputPIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Lay
 																		SELF.PI_InpAddrOWGMFlag := (STRING)LEFT.PI_InpAddrOWGMFlag,
 																		SELF.PI_InpAddrIsMultiUnitFlag := (STRING)LEFT.PI_InpAddrIsMultiUnitFlag,
 																		SELF.PI_InpAddrIsAptFlag := (STRING)LEFT.PI_InpAddrIsAptFlag,
+																		SELF.BestDataAppended := Options.BestPIIAppend,
 																		SELF := LEFT,
 																		SELF := []));
 
-		
+
 		RETURN ds_changedatatype;
 END;

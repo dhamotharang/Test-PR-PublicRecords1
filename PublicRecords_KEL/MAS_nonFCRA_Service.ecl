@@ -9,6 +9,8 @@
 	<part name="GLBPurpose" type="xsd:integer"/>
 	<part name="DPPAPurpose" type="xsd:integer"/>
 	<part name="IsMarketing" type="xsd:boolean"/>
+	<part name="RetainInputLexid" type="xsd:boolean"/>
+	<part name="AppendPII" type="xsd:boolean"/>
 	<part name="IndustryClass" type="xsd:string"/>
 	<part name="AllowedSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
 	<part name="ExcludeSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
@@ -40,6 +42,8 @@ EXPORT MAS_nonFCRA_Service() := MACRO
 		'AllowedSourcesDataset',
 		'ExcludeSourcesDataset',
 		'LexIdSourceOptout',
+		'RetainInputLexid',
+		'AppendPII',
     '_TransactionId',
     '_BatchUID',
     '_GCID'
@@ -68,6 +72,9 @@ STRING100 Default_data_permission_mask := '';
 	STRING _TransactionId := '' : STORED ('_TransactionId');
 	STRING _BatchUID := '' : STORED('_BatchUID');
 	UNSIGNED6 _GCID := 0 : STORED('_GCID');
+	
+	BOOLEAN Retain_Input_Lexid := FALSE : STORED('RetainInputLexid');//keep what we have on input
+	BOOLEAN Append_PII := FALSE : STORED('AppendPII');//keep what we have on input	
 	
 	gateways_in := Gateway.Configuration.Get();
 	Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
@@ -115,6 +122,9 @@ STRING100 Default_data_permission_mask := '';
 		
 		EXPORT DATASET(Gateway.Layouts.Config) Gateways := GatewaysClean;
 		
+		EXPORT BOOLEAN RetainInputLexid := Retain_Input_Lexid;
+		EXPORT BOOLEAN BestPIIAppend := Append_PII; //do not append best pii for running		
+		
 		// Override Include* Entity/Association options here if certain entities can be turned off to speed up processing.
 		// This will bypass uneccesary key JOINS in PublicRecords_KEL.Fn_MAS_FCRA_FDC if the keys don't contribute to any 
 		// ENTITIES/ASSOCIATIONS being used by the query.
@@ -158,6 +168,9 @@ STRING100 Default_data_permission_mask := '';
 
 	END;	
 	
+	IF(options.RetainInputLexid = FALSE AND options.BestPIIAppend = TRUE, FAIL('Insufficient Input'));
+
+
 	ResultSet := PublicRecords_KEL.FnRoxie_GetAttrs(ds_input, Options);		
 		
 	FinalResults := PROJECT(ResultSet, 

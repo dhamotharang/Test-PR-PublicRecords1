@@ -1,4 +1,4 @@
-﻿IMPORT BatchShare, MemberPoint, Std, progressive_phone;
+﻿ IMPORT BatchShare, MemberPoint, Std, progressive_phone;
 
 	MPD:= MemberPoint.Constants.Defaults;
 
@@ -22,6 +22,7 @@
 			export boolean UseDOBDeathMatch := MPD.UseDOBDeathMatch;
 
 			//MP Enhancements
+			
 			EXPORT BOOLEAN AllowNickNames:= MPD.AllowNickNames;
 			EXPORT BOOLEAN Match_City:= MPD.Match_City;
 			EXPORT BOOLEAN Match_DOB:= MPD.Match_DOB;

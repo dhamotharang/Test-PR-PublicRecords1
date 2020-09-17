@@ -124,7 +124,7 @@ PersonContext_transformed := project(dsResponseRecords(searchStatus=personContex
 											PersonContext.constants.datagroups.LIEN_PARTY ], 
 											[TRIM(left.RecID1, left, right)], 
 											[]);
-		ConsumerStatements1 := project(Risk_Indicators.iid_constants.ds_Record, 
+		ConsumerStatements1 := DATASET([
 				transform(Risk_Indicators.Layouts.tmp_Consumer_Statements, 		
 																									self.uniqueID := LexID;
 																									self.statementID := statementID;
@@ -139,13 +139,13 @@ PersonContext_transformed := project(dsResponseRecords(searchStatus=personContex
 																									self.timestamp.minute := (integer)ts_minute;
 																									self.timestamp.second := (integer)ts_second;
 																									self.RecIdForStId := RecIdForStId;
-																									self := []));		
+																									self := [])]);		
 		self.consumerStatements := sort(ConsumerStatements1, statementID);  // in case of multiple statements, always sort by StatementID to get them in same order each transaction
     
 		SELF.crim_correct_ofk := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.OFFENDERS, 
 																															PersonContext.constants.datagroups.OFFENDERS_PLUS,
 																															PersonContext.constants.datagroups.OFFENSES	], 
-													[TRIM(left.RecID1, left, right)], 
+													[TRIM((left.RecID1+left.RecID2), left, right)], 
 													[]);    
 		SELF.prop_correct_lnfare := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.ASSESSMENT, 
 																																			PersonContext.constants.datagroups.DEED,

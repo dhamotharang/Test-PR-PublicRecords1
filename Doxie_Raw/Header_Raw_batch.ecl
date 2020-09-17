@@ -19,7 +19,7 @@ kh := IF(is_knowx,Infutor.Key_Header_Infutor_Knowx,Doxie.Key_Header);
 midrec := record
   outrec.input input;
   kh;
-  doxie_raw.Layout_Filters.seq;
+  outrec.input.seq;
   string9 ssn_unmasked := '';
 end;
 

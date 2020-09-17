@@ -1,11 +1,11 @@
 //HPCC Systems KEL Compiler Version 1.3.0
 IMPORT KEL13 AS KEL;
-IMPORT CFG_Compile,E_Address,E_Geo_Link,E_Input_P_I_I,E_Person,E_Property,E_Surname,E_Zip_Code FROM PublicRecords_KEL;
+IMPORT CFG_Compile,E_Address,E_Geo_Link,E_Input_P_I_I,E_Person,E_Property,E_Social_Security_Number,E_Surname,E_Zip_Code FROM PublicRecords_KEL;
 IMPORT * FROM KEL13.Null;
 EXPORT B_Input_P_I_I_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Input_P_I_I(__in,__cfg).__Result) __E_Input_P_I_I := E_Input_P_I_I(__in,__cfg).__Result;
-  SHARED __EE275059 := __E_Input_P_I_I;
-  EXPORT __ST206744_Layout := RECORD
+  SHARED __EE278602 := __E_Input_P_I_I;
+  EXPORT __ST209478_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -69,6 +69,7 @@ EXPORT B_Input_P_I_I_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr P___Inp_Cln_D_L_State_;
     KEL.typ.nkdate P___Inp_Cln_D_O_B_;
     KEL.typ.nstr P___Inp_Cln_S_S_N_;
+    KEL.typ.ntyp(E_Social_Security_Number().Typ) Input_Clean_S_S_N_;
     KEL.typ.nint P___Inp_Cln_Arch_Dt_;
     KEL.typ.nint G___Proc_Bus_U_I_D_;
     KEL.typ.nstr Phone_Verification_Bureau_;
@@ -91,9 +92,9 @@ EXPORT B_Input_P_I_I_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST206744_Layout __ND3503131__Project(E_Input_P_I_I(__in,__cfg).Layout __PP274664) := TRANSFORM
-    SELF.P___Inp_Addr_ := __OP2(IF(__T(__NT(__PP274664.P___Inp_Addr_Line1_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__PP274664.P___Inp_Addr_Line1_,+,__CN(' ')))),+,IF(__T(__NT(__PP274664.P___Inp_Addr_Line2_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__PP274664.P___Inp_Addr_Line2_)));
-    SELF := __PP274664;
+  SHARED __ST209478_Layout __ND3514738__Project(E_Input_P_I_I(__in,__cfg).Layout __PP278202) := TRANSFORM
+    SELF.P___Inp_Addr_ := __OP2(IF(__T(__NT(__PP278202.P___Inp_Addr_Line1_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__PP278202.P___Inp_Addr_Line1_,+,__CN(' ')))),+,IF(__T(__NT(__PP278202.P___Inp_Addr_Line2_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__PP278202.P___Inp_Addr_Line2_)));
+    SELF := __PP278202;
   END;
-  EXPORT __ENH_Input_P_I_I_9 := PROJECT(__EE275059,__ND3503131__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I_9 := PROJECT(__EE278602,__ND3514738__Project(LEFT));
 END;

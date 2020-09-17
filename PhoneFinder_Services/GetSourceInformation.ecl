@@ -30,8 +30,10 @@ EXPORT GetSourceInformation (DATASET($.Layouts.PhoneFinder.Final) inRecs
 
   END;
 
+  srt_inRecs := SORT(inRecs, ~(isPrimaryPhone AND isPrimaryIdentity), (~isPrimaryIdentity AND isPrimaryPhone AND (fname != '' OR lname != '')));
+ 
   //Assign SourceInfo back to the final layout with actual categories.
-  $.Layouts.PhoneFinder.Final getCategory(PhoneFinder_Services.Layouts.PhoneFinder.Final l) := TRANSFORM
+  $.Layouts.PhoneFinder.Final getCategory(PhoneFinder_Services.Layouts.PhoneFinder.Final l, INTEGER C) := TRANSFORM
 
     dDedupSrc := DEDUP(SORT(l.phn_src_all, src), src);
     Src_Func := dGetCtgSources(dDedupSrc);
@@ -44,11 +46,13 @@ EXPORT GetSourceInformation (DATASET($.Layouts.PhoneFinder.Final) inRecs
      SELF.SourceInfo           := dGrpSrc;
      SELF.TotalSourceCount     := COUNT(dDedupSrc);
      SELF.SelfReportedSourcesOnly := ~(EXISTS(Src_Func(_Type = $.Constants.PFSourceType.Account)));
+     SELF.phone_id             := IF(l.isprimaryphone and l.isprimaryidentity, 0, C - 1 ); //counter -1 here to account for primary phone which is phone id 0
+     SELF.identity_id          := C;
      SELF.phn_src_all          := dDedupSrc;
      SELF := l;
   END;
 
-   ds_ctg := PROJECT(inRecs, getCategory(LEFT));
+   ds_ctg := PROJECT(srt_inRecs, getCategory(LEFT, COUNTER));
 
   return ds_ctg;
 END;

@@ -47,8 +47,8 @@ SHARED SearchInputc:=PROJECT(SearchInput,TRANSFORM({SearchInput;UNSIGNED6 cntr;S
   dZips:=BIPV2.fn_get_zips_2(sNewCity,sNewState,LEFT.zip5,LEFT.zip_radius_miles);
   Input_zip_radius:=LEFT.zip_radius_miles;
   SELF.zip_cases:=IF(dZips[1].zip='',DATASET([],THISMODULE.Process_Biz_Layouts.layout_zip_cases),PROJECT(dZips,TRANSFORM(THISMODULE.Process_Biz_Layouts.layout_zip_cases,SELF.weight:=100-((LEFT.radius/Input_zip_radius)*80);SELF:=LEFT;)));
-  SELF.city:=dZips[1].city;
-  SELF.state:=dZips[1].state;
+  SELF.city:=if(dZips[1].city='', left.city, dZips[1].city);
+  SELF.state:=if(dZips[1].state='', left.state, dZips[1].state);
   SELF.company_phone_3:=IF(LENGTH(TRIM(LEFT.phone10))=10,LEFT.phone10[..3],'');
   SELF.company_phone_7:=IF(LENGTH(TRIM(LEFT.phone10))=10,LEFT.phone10[4..10],IF(LENGTH(TRIM(LEFT.phone10))=7,TRIM(LEFT.phone10),''));
   SELF.company_name_prefix:='';//LEFT.company_name[..5];
@@ -117,6 +117,7 @@ EXPORT SALTOutput2 := PROJECT(SALTOutput2_before_is_truncated,
 	SELF.is_truncated:= LEFT.istruncated; // JA 20190505 - SALT field named isTruncated, but some queries reference older hacked field is_truncated
 	SELF:=LEFT;
 ));
+
 EXPORT raw_data := THISMODULE.MEOW_Biz(SALTInput2).raw_data;  //For now, this just supports SeleBest work below
 
 SHARED outrec2:=RECORD

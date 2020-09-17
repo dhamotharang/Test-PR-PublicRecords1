@@ -104,7 +104,9 @@ EXPORT E_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
   SHARED __d3_Trim := PROJECT(__d3_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.prim_range) + '|' + TRIM((STRING)LEFT.predir) + '|' + TRIM((STRING)LEFT.prim_name) + '|' + TRIM((STRING)LEFT.addr_suffix) + '|' + TRIM((STRING)LEFT.postdir) + '|' + TRIM((STRING)LEFT.zip) + '|' + TRIM((STRING)LEFT.sec_range)));
   SHARED __d4_KELfiltered := __in.Dataset_Doxie__Key_Header_Address((STRING28)prim_name != '' AND (UNSIGNED3)zip != 0);
   SHARED __d4_Trim := PROJECT(__d4_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.prim_range) + '|' + TRIM((STRING)LEFT.predir) + '|' + TRIM((STRING)LEFT.prim_name) + '|' + TRIM((STRING)LEFT.suffix) + '|' + TRIM((STRING)LEFT.postdir) + '|' + TRIM((STRING)LEFT.zip) + '|' + TRIM((STRING)LEFT.sec_range)));
-  EXPORT __All_Trim := __d0_Trim + __d1_Trim + __d2_Trim + __d3_Trim + __d4_Trim;
+  SHARED __d5_KELfiltered := __in.Dataset_BIPV2_Best__Key_LinkIds((STRING28)prim_name != '' AND (UNSIGNED3)zip != 0);
+  SHARED __d5_Trim := PROJECT(__d5_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.prim_range) + '|' + TRIM((STRING)LEFT.predir) + '|' + TRIM((STRING)LEFT.prim_name) + '|' + TRIM((STRING)LEFT.addr_suffix) + '|' + TRIM((STRING)LEFT.postdir) + '|' + TRIM((STRING)LEFT.zip) + '|' + TRIM((STRING)LEFT.sec_range)));
+  EXPORT __All_Trim := __d0_Trim + __d1_Trim + __d2_Trim + __d3_Trim + __d4_Trim + __d5_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
     __All_Trim.KeyVal;
     UNSIGNED4 Cnt := COUNT(GROUP);
@@ -211,7 +213,23 @@ EXPORT E_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
   EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Address_Invalid := __d4_Geo_Link_I_D__Mapped(UID = 0);
   SHARED __d4_Prefiltered := __d4_Geo_Link_I_D__Mapped(UID <> 0);
   SHARED __d4 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d4_Prefiltered,InLayout,__Mapping4,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'),__Mapping4_Transform(LEFT)));
-  EXPORT InData := __d0 + __d1 + __d2 + __d3 + __d4;
+  SHARED __Mapping5 := 'UID(DEFAULT:UID),prim_range(OVERRIDE:Primary_Range_),predir(OVERRIDE:Predirectional_),prim_name(OVERRIDE:Primary_Name_),addr_suffix(OVERRIDE:Suffix_),postdir(OVERRIDE:Postdirectional_),unitdesignation(DEFAULT:Unit_Designation_),sec_range(OVERRIDE:Secondary_Range_),postalcity(DEFAULT:Postal_City_),vanitycity(DEFAULT:Vanity_City_),state(DEFAULT:State_),zip(OVERRIDE:Z_I_P5_:0),zip4(DEFAULT:Z_I_P4_),appendrawaid(DEFAULT:Append_Raw_A_I_D_:0),carrierroutenumber(DEFAULT:Carrier_Route_Number_),carrierroutesortationatzip(DEFAULT:Carrier_Route_Sortation_At_Z_I_P_),lineoftravel(DEFAULT:Line_Of_Travel_),lineoftravelorder(DEFAULT:Line_Of_Travel_Order_),deliverypointbarcode(DEFAULT:Delivery_Point_Barcode_),deliverypointbarcodecheckdigit(DEFAULT:Delivery_Point_Barcode_Check_Digit_),typecode(DEFAULT:Type_Code_),statecode(DEFAULT:State_Code_),county(DEFAULT:County_),latitude(DEFAULT:Latitude_),longitude(DEFAULT:Longitude_),metropolitanstatisticalarea(DEFAULT:Metropolitan_Statistical_Area_),geoblock(DEFAULT:Geo_Block_),geomatch(DEFAULT:Geo_Match_),Geo_Link_I_D_(DEFAULT:Geo_Link_I_D_:0),acecleanererrorcode(DEFAULT:A_C_E_Cleaner_Error_Code_),advodatefirstseen(DEFAULT:A_D_V_O_Date_First_Seen_:DATE),advodatelastseen(DEFAULT:A_D_V_O_Date_Last_Seen_:DATE),advodatevendorfirstreported(DEFAULT:A_D_V_O_Date_Vendor_First_Reported_:DATE),advodatevendorlastreported(DEFAULT:A_D_V_O_Date_Vendor_Last_Reported_:DATE),vacancyindicator(DEFAULT:Vacancy_Indicator_),throwbackindicator(DEFAULT:Throw_Back_Indicator_),seasonaldeliveryindicator(DEFAULT:Seasonal_Delivery_Indicator_),seasonalstartsuppressiondate(DEFAULT:Seasonal_Start_Suppression_Date_),seasonalendsuppressiondate(DEFAULT:Seasonal_End_Suppression_Date_),donotdeliverindicator(DEFAULT:Do_Not_Deliver_Indicator_),donotmailindicator(DEFAULT:Do_Not_Mail_Indicator_),deadcoindicator(DEFAULT:Dead_C_O_Indicator_),hotlistindicator(DEFAULT:Hot_List_Indicator_),collegeindicator(DEFAULT:College_Indicator_),collegestartsuppressiondate(DEFAULT:College_Start_Suppression_Date_),collegeendsuppressiondate(DEFAULT:College_End_Suppression_Date_),stylecode(DEFAULT:Style_Code_),simplifycount(DEFAULT:Simplify_Count_),dropindicator(DEFAULT:Drop_Indicator_),residentialorbusinessindicator(DEFAULT:Residential_Or_Business_Indicator_),onlywaytogetmailindicator(DEFAULT:Only_Way_To_Get_Mail_Indicator_),recordtypecode(DEFAULT:Record_Type_Code_),addresstypecode(DEFAULT:Address_Type_Code_),mixedusagecode(DEFAULT:Mixed_Usage_Code_),vacationbegindate(DEFAULT:Vacation_Begin_Date_:DATE),vacationenddate(DEFAULT:Vacation_End_Date_:DATE),numberofcurrentvacationmonths(DEFAULT:Number_Of_Current_Vacation_Months_),maxvacationmonths(DEFAULT:Max_Vacation_Months_),vacationperiodscount(DEFAULT:Vacation_Periods_Count_),companyaddresstyperaw(DEFAULT:Company_Address_Type_Raw_:\'\'),companyaddresstypederived(DEFAULT:Company_Address_Type_Derived_:\'\'),addresstypederived(DEFAULT:Address_Type_Derived_:\'\'),addressmethod(DEFAULT:Address_Method_:\'\'),isactive(DEFAULT:Is_Active_:\'\'),isdefunct(DEFAULT:Is_Defunct_:\'\'),address_type(DEFAULT:Address___Type_:\'\'),address_desc(DEFAULT:Address___Desc_:\'\'),headerhitflag(DEFAULT:Header_Hit_Flag_),fdnindicator(DEFAULT:F_D_N_Indicator_),highrisksic(DEFAULT:High_Risk_S_I_C_:0),highrisknaics(DEFAULT:High_Risk_N_A_I_C_S_:0),src(OVERRIDE:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),datevendorfirstreported(DEFAULT:Date_Vendor_First_Reported_:EPOCH),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatefirstseen(DEFAULT:Vault_Date_First_Seen_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __d5_Norm := NORMALIZE(__in,LEFT.Dataset_BIPV2_Best__Key_LinkIds,TRANSFORM(RECORDOF(__in.Dataset_BIPV2_Best__Key_LinkIds),SELF:=RIGHT));
+  SHARED __d5_Out := RECORD
+    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_BIPV2_Best__Key_LinkIds);
+    KEL.typ.uid UID := 0;
+  END;
+  SHARED __d5_UID_Mapped := JOIN(__d5_KELfiltered,Lookup,TRIM((STRING)LEFT.prim_range) + '|' + TRIM((STRING)LEFT.predir) + '|' + TRIM((STRING)LEFT.prim_name) + '|' + TRIM((STRING)LEFT.addr_suffix) + '|' + TRIM((STRING)LEFT.postdir) + '|' + TRIM((STRING)LEFT.zip) + '|' + TRIM((STRING)LEFT.sec_range) = RIGHT.KeyVal,TRANSFORM(__d5_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),SMART);
+  SHARED __d5_Geo_Link_I_D__Layout := RECORD
+    RECORDOF(__d5_UID_Mapped);
+    KEL.typ.uid Geo_Link_I_D_;
+  END;
+  SHARED __d5_Missing_Geo_Link_I_D__UIDComponents := KEL.Intake.ConstructMissingFieldList(__d5_UID_Mapped,'GeoLinkID','__in');
+  SHARED __d5_Geo_Link_I_D__Mapped := IF(__d5_Missing_Geo_Link_I_D__UIDComponents = 'GeoLinkID',PROJECT(__d5_UID_Mapped,TRANSFORM(__d5_Geo_Link_I_D__Layout,SELF.Geo_Link_I_D_:=0,SELF:=LEFT)),JOIN(KEL.Intake.AppendFields(__d5_UID_Mapped,__d5_Missing_Geo_Link_I_D__UIDComponents),E_Geo_Link(__in,__cfg).Lookup,TRIM((STRING)LEFT.GeoLinkID) = RIGHT.KeyVal,TRANSFORM(__d5_Geo_Link_I_D__Layout,SELF.Geo_Link_I_D_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART));
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2_Best__Key_LinkIds_Invalid := __d5_Geo_Link_I_D__Mapped(UID = 0);
+  SHARED __d5_Prefiltered := __d5_Geo_Link_I_D__Mapped(UID <> 0);
+  SHARED __d5 := __SourceFilter(KEL.FromFlat.Convert(__d5_Prefiltered,InLayout,__Mapping5,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
+  EXPORT InData := __d0 + __d1 + __d2 + __d3 + __d4 + __d5;
   EXPORT Address_Components_Layout := RECORD
     KEL.typ.nstr Unit_Designation_;
     KEL.typ.nstr Postal_City_;
@@ -690,7 +708,7 @@ EXPORT E_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
   EXPORT Secondary_Range__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,Secondary_Range_);
   EXPORT Z_I_P5__Orphan := JOIN(InData(__NN(Z_I_P5_)),E_Zip_Code(__in,__cfg).__Result,__EEQP(LEFT.Z_I_P5_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Geo_Link_I_D__Orphan := JOIN(InData(__NN(Geo_Link_I_D_)),E_Geo_Link(__in,__cfg).__Result,__EEQP(LEFT.Geo_Link_I_D_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT SanityCheck := DATASET([{COUNT(Z_I_P5__Orphan),COUNT(Geo_Link_I_D__Orphan),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_ADVO__Key_Addr1_History_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DMA__Key_DNM_Name_Address_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Fraudpoint3__Key_Address_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_USPIS_HotList__key_addr_search_zip_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Address_Invalid),COUNT(Primary_Range__SingleValue_Invalid),COUNT(Predirectional__SingleValue_Invalid),COUNT(Primary_Name__SingleValue_Invalid),COUNT(Suffix__SingleValue_Invalid),COUNT(Postdirectional__SingleValue_Invalid),COUNT(Z_I_P5__SingleValue_Invalid),COUNT(Secondary_Range__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int Z_I_P5__Orphan,KEL.typ.int Geo_Link_I_D__Orphan,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_ADVO__Key_Addr1_History_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DMA__Key_DNM_Name_Address_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Fraudpoint3__Key_Address_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_USPIS_HotList__key_addr_search_zip_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Address_Invalid,KEL.typ.int Primary_Range__SingleValue_Invalid,KEL.typ.int Predirectional__SingleValue_Invalid,KEL.typ.int Primary_Name__SingleValue_Invalid,KEL.typ.int Suffix__SingleValue_Invalid,KEL.typ.int Postdirectional__SingleValue_Invalid,KEL.typ.int Z_I_P5__SingleValue_Invalid,KEL.typ.int Secondary_Range__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
+  EXPORT SanityCheck := DATASET([{COUNT(Z_I_P5__Orphan),COUNT(Geo_Link_I_D__Orphan),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_ADVO__Key_Addr1_History_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DMA__Key_DNM_Name_Address_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Fraudpoint3__Key_Address_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_USPIS_HotList__key_addr_search_zip_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Address_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2_Best__Key_LinkIds_Invalid),COUNT(Primary_Range__SingleValue_Invalid),COUNT(Predirectional__SingleValue_Invalid),COUNT(Primary_Name__SingleValue_Invalid),COUNT(Suffix__SingleValue_Invalid),COUNT(Postdirectional__SingleValue_Invalid),COUNT(Z_I_P5__SingleValue_Invalid),COUNT(Secondary_Range__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int Z_I_P5__Orphan,KEL.typ.int Geo_Link_I_D__Orphan,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_ADVO__Key_Addr1_History_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_DMA__Key_DNM_Name_Address_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Fraudpoint3__Key_Address_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_USPIS_HotList__key_addr_search_zip_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Address_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2_Best__Key_LinkIds_Invalid,KEL.typ.int Primary_Range__SingleValue_Invalid,KEL.typ.int Predirectional__SingleValue_Invalid,KEL.typ.int Primary_Name__SingleValue_Invalid,KEL.typ.int Suffix__SingleValue_Invalid,KEL.typ.int Postdirectional__SingleValue_Invalid,KEL.typ.int Z_I_P5__SingleValue_Invalid,KEL.typ.int Secondary_Range__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_ADVO__Key_Addr1_History_Invalid),COUNT(__d0)},
     {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','prim_range',COUNT(__d0(__NL(Primary_Range_))),COUNT(__d0(__NN(Primary_Range_)))},
@@ -1087,6 +1105,86 @@ EXPORT E_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorLastReported',COUNT(__d4(Date_Vendor_Last_Reported_=0)),COUNT(__d4(Date_Vendor_Last_Reported_!=0))},
     {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d4(Hybrid_Archive_Date_=0)),COUNT(__d4(Hybrid_Archive_Date_!=0))},
     {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateFirstSeen',COUNT(__d4(Vault_Date_First_Seen_=0)),COUNT(__d4(Vault_Date_First_Seen_!=0))},
-    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d4(Vault_Date_Last_Seen_=0)),COUNT(__d4(Vault_Date_Last_Seen_!=0))}]
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d4(Vault_Date_Last_Seen_=0)),COUNT(__d4(Vault_Date_Last_Seen_!=0))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_BIPV2_Best__Key_LinkIds_Invalid),COUNT(__d5)},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','prim_range',COUNT(__d5(__NL(Primary_Range_))),COUNT(__d5(__NN(Primary_Range_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','predir',COUNT(__d5(__NL(Predirectional_))),COUNT(__d5(__NN(Predirectional_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','prim_name',COUNT(__d5(__NL(Primary_Name_))),COUNT(__d5(__NN(Primary_Name_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','addr_suffix',COUNT(__d5(__NL(Suffix_))),COUNT(__d5(__NN(Suffix_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','postdir',COUNT(__d5(__NL(Postdirectional_))),COUNT(__d5(__NN(Postdirectional_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UnitDesignation',COUNT(__d5(__NL(Unit_Designation_))),COUNT(__d5(__NN(Unit_Designation_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','sec_range',COUNT(__d5(__NL(Secondary_Range_))),COUNT(__d5(__NN(Secondary_Range_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','PostalCity',COUNT(__d5(__NL(Postal_City_))),COUNT(__d5(__NN(Postal_City_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VanityCity',COUNT(__d5(__NL(Vanity_City_))),COUNT(__d5(__NN(Vanity_City_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','State',COUNT(__d5(__NL(State_))),COUNT(__d5(__NN(State_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','zip',COUNT(__d5(__NL(Z_I_P5_))),COUNT(__d5(__NN(Z_I_P5_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ZIP4',COUNT(__d5(__NL(Z_I_P4_))),COUNT(__d5(__NN(Z_I_P4_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','AppendRawAID',COUNT(__d5(__NL(Append_Raw_A_I_D_))),COUNT(__d5(__NN(Append_Raw_A_I_D_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CarrierRouteNumber',COUNT(__d5(__NL(Carrier_Route_Number_))),COUNT(__d5(__NN(Carrier_Route_Number_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CarrierRouteSortationAtZIP',COUNT(__d5(__NL(Carrier_Route_Sortation_At_Z_I_P_))),COUNT(__d5(__NN(Carrier_Route_Sortation_At_Z_I_P_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LineOfTravel',COUNT(__d5(__NL(Line_Of_Travel_))),COUNT(__d5(__NN(Line_Of_Travel_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LineOfTravelOrder',COUNT(__d5(__NL(Line_Of_Travel_Order_))),COUNT(__d5(__NN(Line_Of_Travel_Order_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DeliveryPointBarcode',COUNT(__d5(__NL(Delivery_Point_Barcode_))),COUNT(__d5(__NN(Delivery_Point_Barcode_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DeliveryPointBarcodeCheckDigit',COUNT(__d5(__NL(Delivery_Point_Barcode_Check_Digit_))),COUNT(__d5(__NN(Delivery_Point_Barcode_Check_Digit_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TypeCode',COUNT(__d5(__NL(Type_Code_))),COUNT(__d5(__NN(Type_Code_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','StateCode',COUNT(__d5(__NL(State_Code_))),COUNT(__d5(__NN(State_Code_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','County',COUNT(__d5(__NL(County_))),COUNT(__d5(__NN(County_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Latitude',COUNT(__d5(__NL(Latitude_))),COUNT(__d5(__NN(Latitude_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Longitude',COUNT(__d5(__NL(Longitude_))),COUNT(__d5(__NN(Longitude_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','MetropolitanStatisticalArea',COUNT(__d5(__NL(Metropolitan_Statistical_Area_))),COUNT(__d5(__NN(Metropolitan_Statistical_Area_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','GeoBlock',COUNT(__d5(__NL(Geo_Block_))),COUNT(__d5(__NN(Geo_Block_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','GeoMatch',COUNT(__d5(__NL(Geo_Match_))),COUNT(__d5(__NN(Geo_Match_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','GeoLinkID',COUNT(__d5(__NL(Geo_Link_I_D_))),COUNT(__d5(__NN(Geo_Link_I_D_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ACECleanerErrorCode',COUNT(__d5(__NL(A_C_E_Cleaner_Error_Code_))),COUNT(__d5(__NN(A_C_E_Cleaner_Error_Code_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ADVODateFirstSeen',COUNT(__d5(__NL(A_D_V_O_Date_First_Seen_))),COUNT(__d5(__NN(A_D_V_O_Date_First_Seen_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ADVODateLastSeen',COUNT(__d5(__NL(A_D_V_O_Date_Last_Seen_))),COUNT(__d5(__NN(A_D_V_O_Date_Last_Seen_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ADVODateVendorFirstReported',COUNT(__d5(__NL(A_D_V_O_Date_Vendor_First_Reported_))),COUNT(__d5(__NN(A_D_V_O_Date_Vendor_First_Reported_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ADVODateVendorLastReported',COUNT(__d5(__NL(A_D_V_O_Date_Vendor_Last_Reported_))),COUNT(__d5(__NN(A_D_V_O_Date_Vendor_Last_Reported_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VacancyIndicator',COUNT(__d5(__NL(Vacancy_Indicator_))),COUNT(__d5(__NN(Vacancy_Indicator_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ThrowBackIndicator',COUNT(__d5(__NL(Throw_Back_Indicator_))),COUNT(__d5(__NN(Throw_Back_Indicator_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SeasonalDeliveryIndicator',COUNT(__d5(__NL(Seasonal_Delivery_Indicator_))),COUNT(__d5(__NN(Seasonal_Delivery_Indicator_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SeasonalStartSuppressionDate',COUNT(__d5(__NL(Seasonal_Start_Suppression_Date_))),COUNT(__d5(__NN(Seasonal_Start_Suppression_Date_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SeasonalEndSuppressionDate',COUNT(__d5(__NL(Seasonal_End_Suppression_Date_))),COUNT(__d5(__NN(Seasonal_End_Suppression_Date_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DoNotDeliverIndicator',COUNT(__d5(__NL(Do_Not_Deliver_Indicator_))),COUNT(__d5(__NN(Do_Not_Deliver_Indicator_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DoNotMailIndicator',COUNT(__d5(__NL(Do_Not_Mail_Indicator_))),COUNT(__d5(__NN(Do_Not_Mail_Indicator_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DeadCOIndicator',COUNT(__d5(__NL(Dead_C_O_Indicator_))),COUNT(__d5(__NN(Dead_C_O_Indicator_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HotListIndicator',COUNT(__d5(__NL(Hot_List_Indicator_))),COUNT(__d5(__NN(Hot_List_Indicator_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CollegeIndicator',COUNT(__d5(__NL(College_Indicator_))),COUNT(__d5(__NN(College_Indicator_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CollegeStartSuppressionDate',COUNT(__d5(__NL(College_Start_Suppression_Date_))),COUNT(__d5(__NN(College_Start_Suppression_Date_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CollegeEndSuppressionDate',COUNT(__d5(__NL(College_End_Suppression_Date_))),COUNT(__d5(__NN(College_End_Suppression_Date_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','StyleCode',COUNT(__d5(__NL(Style_Code_))),COUNT(__d5(__NN(Style_Code_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SimplifyCount',COUNT(__d5(__NL(Simplify_Count_))),COUNT(__d5(__NN(Simplify_Count_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DropIndicator',COUNT(__d5(__NL(Drop_Indicator_))),COUNT(__d5(__NN(Drop_Indicator_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ResidentialOrBusinessIndicator',COUNT(__d5(__NL(Residential_Or_Business_Indicator_))),COUNT(__d5(__NN(Residential_Or_Business_Indicator_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OnlyWayToGetMailIndicator',COUNT(__d5(__NL(Only_Way_To_Get_Mail_Indicator_))),COUNT(__d5(__NN(Only_Way_To_Get_Mail_Indicator_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RecordTypeCode',COUNT(__d5(__NL(Record_Type_Code_))),COUNT(__d5(__NN(Record_Type_Code_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','AddressTypeCode',COUNT(__d5(__NL(Address_Type_Code_))),COUNT(__d5(__NN(Address_Type_Code_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','MixedUsageCode',COUNT(__d5(__NL(Mixed_Usage_Code_))),COUNT(__d5(__NN(Mixed_Usage_Code_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VacationBeginDate',COUNT(__d5(__NL(Vacation_Begin_Date_))),COUNT(__d5(__NN(Vacation_Begin_Date_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VacationEndDate',COUNT(__d5(__NL(Vacation_End_Date_))),COUNT(__d5(__NN(Vacation_End_Date_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NumberOfCurrentVacationMonths',COUNT(__d5(__NL(Number_Of_Current_Vacation_Months_))),COUNT(__d5(__NN(Number_Of_Current_Vacation_Months_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','MaxVacationMonths',COUNT(__d5(__NL(Max_Vacation_Months_))),COUNT(__d5(__NN(Max_Vacation_Months_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VacationPeriodsCount',COUNT(__d5(__NL(Vacation_Periods_Count_))),COUNT(__d5(__NN(Vacation_Periods_Count_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CompanyAddressTypeRaw',COUNT(__d5(__NL(Company_Address_Type_Raw_))),COUNT(__d5(__NN(Company_Address_Type_Raw_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CompanyAddressTypeDerived',COUNT(__d5(__NL(Company_Address_Type_Derived_))),COUNT(__d5(__NN(Company_Address_Type_Derived_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','AddressTypeDerived',COUNT(__d5(__NL(Address_Type_Derived_))),COUNT(__d5(__NN(Address_Type_Derived_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','AddressMethod',COUNT(__d5(__NL(Address_Method_))),COUNT(__d5(__NN(Address_Method_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','IsActive',COUNT(__d5(__NL(Is_Active_))),COUNT(__d5(__NN(Is_Active_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','IsDefunct',COUNT(__d5(__NL(Is_Defunct_))),COUNT(__d5(__NN(Is_Defunct_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Address_Type',COUNT(__d5(__NL(Address___Type_))),COUNT(__d5(__NN(Address___Type_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Address_Desc',COUNT(__d5(__NL(Address___Desc_))),COUNT(__d5(__NN(Address___Desc_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HeaderHitFlag',COUNT(__d5(__NL(Header_Hit_Flag_))),COUNT(__d5(__NN(Header_Hit_Flag_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','FDNIndicator',COUNT(__d5(__NL(F_D_N_Indicator_))),COUNT(__d5(__NN(F_D_N_Indicator_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HighRiskSIC',COUNT(__d5(__NL(High_Risk_S_I_C_))),COUNT(__d5(__NN(High_Risk_S_I_C_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HighRiskNAICS',COUNT(__d5(__NL(High_Risk_N_A_I_C_S_))),COUNT(__d5(__NN(High_Risk_N_A_I_C_S_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d5(__NL(Source_))),COUNT(__d5(__NN(Source_)))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d5(Archive___Date_=0)),COUNT(__d5(Archive___Date_!=0))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d5(Date_First_Seen_=0)),COUNT(__d5(Date_First_Seen_!=0))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d5(Date_Last_Seen_=0)),COUNT(__d5(Date_Last_Seen_!=0))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorFirstReported',COUNT(__d5(Date_Vendor_First_Reported_=0)),COUNT(__d5(Date_Vendor_First_Reported_!=0))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorLastReported',COUNT(__d5(Date_Vendor_Last_Reported_=0)),COUNT(__d5(Date_Vendor_Last_Reported_!=0))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d5(Hybrid_Archive_Date_=0)),COUNT(__d5(Hybrid_Archive_Date_!=0))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateFirstSeen',COUNT(__d5(Vault_Date_First_Seen_=0)),COUNT(__d5(Vault_Date_First_Seen_!=0))},
+    {'Address','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d5(Vault_Date_Last_Seen_=0)),COUNT(__d5(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;
