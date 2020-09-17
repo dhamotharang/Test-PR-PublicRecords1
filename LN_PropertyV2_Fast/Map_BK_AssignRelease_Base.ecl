@@ -28,8 +28,8 @@ EXPORT Map_BK_AssignRelease_Base (STRING	pVersionDate
 		// Adjust layout for replacement records		
 		iBkM_L		:=	{STRING1	ReplInd, RECORDOF(iCombined)};
 		iBkM_L tRepl(iCombined L) := TRANSFORM
-			//SELF.ReplInd := IF(REGEXFIND('REFRESH',L.bk_infile_type),'Y','N');
-			SELF.ReplInd := 'N'; //For first run only.  Will uncomment above line after first run.
+			SELF.ReplInd := IF(REGEXFIND('REFRESH',L.bk_infile_type),'Y','N');
+			//SELF.ReplInd := 'N'; //For first run only.  Will uncomment above line after first run.
 			SELF:=L;
 		END;
 		EXPORT dARMortgageRawCombined :=	PROJECT(iCombined, tRepl(LEFT));
