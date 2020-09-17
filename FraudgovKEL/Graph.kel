@@ -2626,7 +2626,7 @@ Event: => T1_MinorWLexIDFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR
 																		 T1_IdAge < 18 AND T1L_IdIsBcShllHitFlag=1 AND T1_LexIdPopFlag=1 => 1,0);
 Event: => T1_SsnPriorDOBFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR T15_SsnPopFlag=0 OR T_DobPopFlag=0 => -99999,
                                      T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
-																		 socsdobflag='' OR INTEGER(socsdobflag) > 1 => -99997,
+																		 socsdobflag:Null OR socsdobflag='' OR INTEGER(socsdobflag) > 1 => -99997,
 																		 socsdobflag);
 Event: => T1_FirstNmNotVerFlag := MAP((T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0) OR T_FirstNmPopFlag=0 => -99999,
                                        T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
@@ -3431,11 +3431,11 @@ Event: => P1_AotIdKrAppFrdActInAgcyFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdP
 Event: => P1_AotIdKrAppFrdActInAgcyOldDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                   T_SrcClassType <2 OR P1_AotIdKrAppFrdActInAgcyFlagEv=0 => -99998,
 																									ALL(PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
-																									MIN(PersonEvent.Transaction(T1_IdIsKrAppFrdFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
+																									MIN(Subject.PersonEvent.Transaction(T1_IdIsKrAppFrdFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P1_AotIdKrAppFrdActInAgcyNewDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                   T_SrcClassType <2 OR P1_AotIdKrAppFrdActInAgcyFlagEv=0 => -99998,
 																									ALL(PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
-																									MAX(PersonEvent.Transaction(T1_IdIsKrAppFrdFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
+																									MAX(Subject.PersonEvent.Transaction(T1_IdIsKrAppFrdFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P1_AotIdKrGenFrdActInAgcyCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                 T_SrcClassType <2 => -99998,
 																								ALL(PersonEvent.Transaction,T1_IdIsKrGenFrdFlag=-99997) => -99997,
@@ -3445,11 +3445,11 @@ Event: => P1_AotIdKrGenFrdActInAgcyFlagEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdP
 																								 P1_AotIdKrGenFrdActInAgcyCntEv=-99997 => -99997,
 																								 P1_AotIdKrGenFrdActInAgcyCntEv>0 => 1, 0);
 Event: => P1_AotIdKrGenFrdActInAgcyOldDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
-                                                  T_SrcClassType <2 OR P1_AotIdKrGenFrdActFlagEv=0 => -99998,
+                                                  T_SrcClassType <2 OR P1_AotIdKrGenFrdActInAgcyFlagEv=0 => -99998,
 																									ALL(PersonEvent.Transaction,T1_IdIsKrGenFrdFlag=-99997) => -99997,
 																									MIN(Subject.PersonEvent.Transaction(T1_IdIsKrGenFrdFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P1_AotIdKrGenFrdActInAgcyNewDtEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
-                                                  T_SrcClassType <2 OR P1_AotIdKrGenFrdActFlagEv=0 => -99998,
+                                                  T_SrcClassType <2 OR P1_AotIdKrGenFrdActInAgcyFlagEv=0 => -99998,
 																									ALL(PersonEvent.Transaction,T1_IdIsKrGenFrdFlag=-99997) => -99997,
 																									MAX(Subject.PersonEvent.Transaction(T1_IdIsKrGenFrdFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
 Event: => P1_AotIdKrOthFrdActInAgcyCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
