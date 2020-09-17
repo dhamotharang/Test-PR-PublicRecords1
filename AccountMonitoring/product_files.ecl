@@ -1343,51 +1343,33 @@ EXPORT product_files := MODULE
 		END;
 		
 		EXPORT inquiry := MODULE
-	
-			EXPORT inquiry_build_version := TRIM(did_add.get_EnvVariable('inquiry_build_version')):INDEPENDENT;
+      // Linkid key
+      EXPORT inquiryLinkid_Roxie_SuperFile := 'thor_data400::key::inquiry_table::LinkIds_' + doxie.Version_SuperKey;
+      EXPORT inquiryLinkid_superkey_monitor := 'monitor::inquiry::linkids';
+      EXPORT inquiryLinkid_superkey     := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + inquiryLinkid_superkey_monitor + '_qa';
+
+      SHARED inquiryLinkid_key_undist := INDEX(
+																							Inquiry_AccLogs.Key_Inquiry_LinkIds.key,  
+																							inquiryLinkid_superkey
+																							);
+
+      EXPORT inquiryLinkid_key_monitor := DISTRIBUTE(inquiryLinkid_key_undist, 
+                                             HASH64(seleid)
+                                            ): INDEPENDENT; //PERSIST('acctmon::inquiry::key_linkid');
+      // Update Linkid key
+      EXPORT inquiryUpdLinkid_Roxie_SuperFile := 'thor_data400::key::inquiry_table::' + doxie.version_superkey  + '::linkids_update';
+      EXPORT inquiryUpdLinkid_superkey_monitor := 'monitor::inquiry_table::linkids_update' ;
+      EXPORT inquiryUpdLinkid_superkey     := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + inquiryUpdLinkid_superkey_monitor + '_qa';
 			
-			// Linkid key
-			EXPORT inquiryLinkid_keyname_raw := 'thor_data400::key::inquiry::' + inquiry_build_version + '::linkids';
-			EXPORT inquiryLinkid_keyname     := AccountMonitoring.constants.DATA_LOCATION + inquiryLinkid_keyname_raw;
-			
-			EXPORT inquiryLinkid_superkeyname_raw  := 'thor_data400::key::inquiry_table::linkids_' + doxie.Version_SuperKey;
-			EXPORT inquiryLinkid_superkeyname     	:= AccountMonitoring.constants.DATA_LOCATION + inquiryLinkid_superkeyname_raw;
+      SHARED inquiryUpdLinkid_key_undist := INDEX(
+																									Inquiry_AccLogs.Key_Inquiry_LinkIds_Update.key,  
+																									inquiryUpdLinkid_superkey
+																									);
 
-			SHARED inquiryLinkid_key_undist := 
-				INDEX(
-					Inquiry_AccLogs.Key_Inquiry_LinkIds.key,  
-					inquiryLinkid_keyname
-				);
-
-			EXPORT inquiryLinkid_key :=
-				DISTRIBUTE(
-					inquiryLinkid_key_undist, 
-					HASH64(seleid)
-					): INDEPENDENT; //PERSIST('acctmon::inquiry_table::key_linkid');
-							
-			// Update Linkid key
-				
-			EXPORT inquiry_update_version := TRIM(did_add.get_EnvVariable('inquiry_update_build_version')):INDEPENDENT;
-	
-			EXPORT inquiryUpdLinkid_keyname_raw := 'thor_data400::key::inquiry::' + inquiry_update_version + '::linkids_update';
-			EXPORT inquiryUpdLinkid_keyname     := AccountMonitoring.constants.DATA_LOCATION + inquiryUpdLinkid_keyname_raw;
-			
-			EXPORT inquiryUpdLinkid_superkeyname_raw  := 'thor_data400::key::inquiry_table::' + doxie.Version_SuperKey + '::linkids_update';
-			EXPORT inquiryUpdLinkid_superkeyname     	:= AccountMonitoring.constants.DATA_LOCATION + inquiryUpdLinkid_superkeyname_raw;
-
-			SHARED inquiryUpdLinkid_key_undist := 
-				INDEX(
-					Inquiry_AccLogs.Key_Inquiry_LinkIds_Update.key,  
-					inquiryUpdLinkid_keyname
-				);
-
-			EXPORT inquiryUpdLinkid_key :=
-				DISTRIBUTE(
-					inquiryUpdLinkid_key_undist, 
-					HASH64(seleid)
-					): INDEPENDENT; //PERSIST('acctmon::inquiry_table::key_linkid_update');
-					
-		END;
+      EXPORT inquiryUpdLinkid_key_monitor := DISTRIBUTE(inquiryUpdLinkid_key_undist, 
+	                                              HASH64(seleid)
+                                               ): INDEPENDENT; //PERSIST('acctmon::inquiry_table::key_linkid_update');
+    END;
 		
 		EXPORT corp := MODULE
 	
