@@ -102,9 +102,9 @@ EXPORT rComments Reason_listed(dataset(Layouts.rEntity) infile) := FUNCTION
 			Z := DEDUP(SORT(UNGROUP(Y), Ent_id, cmts, local), ent_id, cmts, local);
 			W := SORT(DISTRIBUTE(GetReasons(infile) & Z, Ent_id), ent_id, sorter, local);
 
-//			items := DEDUP(SORT(Distribute(W, Ent_id), ent_id, sorter, local), 
-//								Ent_id,cmts, local);
-				items := GetReasons(infile);
+			items := DEDUP(SORT(Distribute(W, Ent_id), ent_id, sorter, local), 
+			Ent_id,cmts, local);
+//				items := GetReasons(infile);
 
 			
 		rComments RollRecs(rComments L, rComments R) := TRANSFORM
