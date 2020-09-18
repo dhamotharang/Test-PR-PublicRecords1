@@ -1,8 +1,9 @@
 ﻿IMPORT Business_Credit, ut, Address;
-AcctOpenStartDate	:=	'20110101';
-AcctOpenEndDate		:=	'20121231';
+AcctOpenStartDate	:=	'20180101';
+AcctOpenEndDate		:=	'20191231';
 // All Active Records
-dActive			:=	Business_Credit.Files().Active(active);
+// dActive			:=	Business_Credit.Files().Active(active);
+dActive			:=	Business_Credit.Files().ActiveLookupSBFE;
 // Sort/Distribute our input records
 dActiveDist	:=	SORT(DISTRIBUTE(dActive,
 									HASH(	portfolioHeader.Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported)),
