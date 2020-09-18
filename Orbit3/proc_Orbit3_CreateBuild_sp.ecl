@@ -1,6 +1,9 @@
 ﻿import ut,Orbit3,_Control;
-export Proc_Orbit3_CreateBuild_sp(string buildname,string Buildvs,string Envmt = 'N', string email_list = '',boolean skipcreatebuild = false,boolean skipupdatebuild = false,boolean runcreatebuild = true,boolean is_npf = false, string wuid) := function
+export Proc_Orbit3_CreateBuild_sp(string buildname,string Buildvs,string Envmt = 'N', string BuildStatus = 'BUILD_AVAILABLE_FOR_USE', string email_list = '',boolean skipcreatebuild = false,boolean skipupdatebuild = false,boolean runcreatebuild = true,boolean is_npf = false, string wuid) := function
 
+  	string Envmt_isnpf  := if ( is_npf = true, '',Envmt);
+
+	
 	tokenval := orbit3.GetToken();
 
 	create_build := orbit3.CreateBuild(buildname,
@@ -17,14 +20,14 @@ export Proc_Orbit3_CreateBuild_sp(string buildname,string Buildvs,string Envmt =
 	Update_build := if ( is_npf = true , Orbit3.UpdateBuildInstance(buildname,
 									                                Buildvs,
 									                                  tokenval,
-									                             'BUILD_AVAILABLE_FOR_USE'
+									                             BuildStatus
 						                                  
 									                             ).retcode,
 										  Orbit3.UpdateBuildInstance(buildname,
 									                                Buildvs,
 									                                  tokenval,
-									                             'BUILD_AVAILABLE_FOR_USE',
-																 Orbit3.Constants(Envmt).platform_upd
+									                             BuildStatus,
+																 Orbit3.Constants(Envmt_isnpf).platform_upd
 						                                  
 									                             ).retcode
 	                        );
@@ -41,7 +44,7 @@ sendemail(string keyword = '',string status = '') := function
 												 );
 	   	 emailtoall :=  fileservices.sendemail(
 												Send_Email(Buildvs,email_list).emaillist,
-												' Orbit for Build : '+buildname+',version: '+Buildvs+',Env : '+Orbit3.Constants(Envmt).which_env,
+												' Orbit for Build : '+buildname+',version: '+Buildvs+',Env : '+Orbit3.Constants(Envmt_isnpf).which_env,
 												'BuildName:'+buildname+'\n'+
 												'---------------------'+'\n'+
 												'Buildversion:'+Buildvs+'\n'+

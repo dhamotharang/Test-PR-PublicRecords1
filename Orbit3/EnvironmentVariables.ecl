@@ -8,7 +8,7 @@ export EnvironmentVariables := module
 			'https://orbit3.risk.regn.net/Orbit3/Orbit3Services/OrbitServicePR.svc',
 			'https://stg.orbit3.risk.regn.net/Orbit3/Orbit3Services/OrbitServicePR.svc'
 		);
-	export serviceurlprod := 'https://orbit3.risk.regn.net/Orbit3/Orbit3Services/OrbitServicePR.svc';
+	export serviceurlprod := 'https://orbit3.risk.regn.net/Orbit3/Orbit3Services/OrbitService.svc';
 	export soapactionprefix := 'http://lexisnexis.com/Orbit/IOrbitService';
 		export  namespace :=   IF( STD.System.Util.PlatformVersionCheck('7.8') ,
 		                                                   'http://lexisnexis.com/Orbit/',

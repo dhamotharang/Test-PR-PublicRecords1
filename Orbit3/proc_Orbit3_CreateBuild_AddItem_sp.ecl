@@ -1,6 +1,8 @@
 ﻿import ut,Orbit3,_Control;
-export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string Envmt = 'N',  string email_list = '', boolean skipcreatebuild = false,boolean skipupdatebuild = false, boolean skipaddcomponents = false, boolean runcreatebuild = true, boolean runaddcomponentsonly = false,boolean is_npf = false, string wuid) := function
+export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string Envmt = 'N',  string BuildStatus = 'BUILD_AVAILABLE_FOR_USE', string email_list = '', boolean skipcreatebuild = false,boolean skipupdatebuild = false, boolean skipaddcomponents = false, boolean runcreatebuild = true, boolean runaddcomponentsonly = false,boolean is_npf = false, string wuid) := function
 
+	string Envmt_isnpf  := if ( is_npf = true, '',Envmt);
+	
 	tokenval := orbit3.GetToken() : independent;
 
 	create_build := orbit3.CreateBuild(buildname,
@@ -15,13 +17,14 @@ export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string
 									
 	
 									
-	Update_build_1 := Orbit3.UpdateBuildInstance(buildname,
-									Buildvs,
-									tokenval,
-									'BUILD_IN_PROGRESS',
-									Orbit3.Constants(Envmt,'BUILD_IN_PROGRESS').platform_upd
+	Update_build_1 :=  if ( is_npf = false , Orbit3.UpdateBuildInstance(buildname,
+									                                                                            Buildvs,
+									                                                                            tokenval,
+									                                                                            'BUILD_IN_PROGRESS',
+									                                                                            Orbit3.Constants(Envmt_isnpf,'BUILD_IN_PROGRESS').platform_upd
 						                                  
-									).retcode;
+									                                                                              ).retcode
+									);
 
 	//Verify if build is platform depenedent
 
@@ -29,14 +32,14 @@ export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string
 	Update_build := if ( is_npf = true , Orbit3.UpdateBuildInstance(buildname,
 									                                Buildvs,
 									                                  tokenval,
-									                             'BUILD_AVAILABLE_FOR_USE'
+									                             BuildStatus
 						                                  
 									                             ).retcode,
 										  Orbit3.UpdateBuildInstance(buildname,
 									                                Buildvs,
 									                                  tokenval,
-									                             'BUILD_AVAILABLE_FOR_USE',
-																 Orbit3.Constants(Envmt).platform_upd
+									                             BuildStatus,
+																 Orbit3.Constants(Envmt_isnpf).platform_upd
 						                                  
 									                             ).retcode
 	                        );
@@ -86,7 +89,7 @@ export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string
 												 );
 	   	 emailtoall :=  fileservices.sendemail(
 												 Send_Email(Buildvs,email_list).emaillist,
-												' Orbit for Build : '+buildname+',version: '+Buildvs+',Env : '+Orbit3.Constants(Envmt).which_env,
+												' Orbit for Build : '+buildname+',version: '+Buildvs+',Env : '+Orbit3.Constants(Envmt_isnpf).which_env,
 												'BuildName:'+buildname+'\n'+
 												'---------------------'+'\n'+
 												'Buildversion:'+Buildvs+'\n'+
