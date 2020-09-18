@@ -233,9 +233,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		SHARED inquiry_documentid_record := RECORD
-			AccountMonitoring.product_files.inquiry.inquiryLinkid_key_monitor.search_info.transaction_id;
-			AccountMonitoring.product_files.inquiry.inquiryLinkid_key_monitor.search_info.sequence_number;
-			AccountMonitoring.product_files.inquiry.inquiryLinkid_key_monitor.search_info.datetime;
+			AccountMonitoring.product_files.inquiry.inquiryLinkid_key.search_info.transaction_id;
+			AccountMonitoring.product_files.inquiry.inquiryLinkid_key.search_info.sequence_number;
+			AccountMonitoring.product_files.inquiry.inquiryLinkid_key.search_info.datetime;
 		END;
 		
 		SHARED corp_documentid_record := RECORD
