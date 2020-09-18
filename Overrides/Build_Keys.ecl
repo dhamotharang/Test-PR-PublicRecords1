@@ -53,7 +53,7 @@ EXPORT Build_Keys(string infiledate, boolean isprte = false) := function
 	// build_key(property_search_v2,'property_search_v2',infiledate,'fcra','ffid',property_search_v2retval, flag_file_id);
 	build_key(pii.ssn,'pii',infiledate,'fcra','ssn',piissnretval, ssn,true);
 	build_key(pii.did,'pii',infiledate,'fcra','did',piididretval, s_did,true);
-	build_key(aircraft,'aircraft',infiledate,'fcra','ffid',aircraftretval, flag_file_id);
+	//build_key(aircraft,'aircraft',infiledate,'fcra','ffid',aircraftretval, flag_file_id);
 	build_key(watercraft_old,'watercraft',infiledate,'fcra','ffid',watercraftretval, flag_file_id);
 	build_key(watercraft,'watercraft',infiledate,'fcra','watercraft_sid',watercraft_sidretval, flag_file_id);
 	build_key(watercraft_cguard,'watercraft',infiledate,'fcra','watercraft_cid',watercraft_cguardretval, flag_file_id);
@@ -81,7 +81,7 @@ EXPORT Build_Keys(string infiledate, boolean isprte = false) := function
 	build_key(american_student_new,'student_new',infiledate,'fcra','ffid',american_student_newretval, flag_file_id);
 	//build_key(ibehavior_consumer,'ibehavior_consumer',infiledate,'fcra','ffid',ibehavior_consumerretval, flag_file_id);
 	//build_key(ibehavior_purchase,'ibehavior_purchase',infiledate,'fcra','ffid',ibehavior_purchaseretval, flag_file_id);
-	//build_key(aircrafts,'aircrafts',infiledate,'fcra','ffid',aircraftsretval, flag_file_id);
+	build_key(aircrafts,'aircrafts',infiledate,'fcra','ffid',aircraftsretval, flag_file_id);
 	build_key(aircraft_details,'aircraft_details',infiledate,'fcra','ffid',aircraft_detailsretval, flag_file_id);
 	build_key(aircraft_engine,'aircraft_engine',infiledate,'fcra','ffid',aircraft_engineretval, flag_file_id);
 	build_key(pilot_registration,'pilot_registration',infiledate,'fcra','ffid',pilot_registrationretval, flag_file_id);
@@ -135,7 +135,7 @@ EXPORT Build_Keys(string infiledate, boolean isprte = false) := function
 			parallel(
 			piissnretval
 			,piididretval
-			,aircraftretval
+			//,aircraftretval
 			,watercraftretval
 			,watercraft_sidretval
 			,watercraft_cguardretval
@@ -166,7 +166,7 @@ EXPORT Build_Keys(string infiledate, boolean isprte = false) := function
 			,studentretval
 		//	,ibehavior_consumerretval
 		//	,ibehavior_purchaseretval
-		//	,aircraftsretval
+			,aircraftsretval
 			,aircraft_detailsretval
 			,aircraft_engineretval
 			,pilot_registrationretval
