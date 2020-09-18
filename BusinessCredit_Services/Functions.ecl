@@ -321,13 +321,17 @@ EXPORT Functions := MODULE
 
 	EXPORT fn_AccountClosureReason (STRING ClosureReasonCode) := FUNCTION
 		ClosureReason := CASE(ClosureReasonCode,
-													'V' => 'Voluntarily Closed By Account Holder',
-													'P' => 'Involuntarily Closed Due to Poor Payment History',
-													'X' => 'Involuntarily Closed By Creditor',
-													'O' => 'Other Involuntary Closure By Creditor',
-													'F' => 'Involuntarily Closed By Creditor Due to Fraud',
-													'B' => 'Involuntarily Closed - Business Filed for Bankruptcy',
-													'');
+                          'V' => 'Voluntarily Closed By Account Holder',
+                          'P' => 'Involuntarily Closed Due to Poor Payment History',
+                          'X' => 'Involuntarily Closed By Creditor',
+                          'O' => 'Other Involuntary Closure By Creditor',  
+                          'F' => 'Involuntarily Closed By Creditor Due to Fraud',
+                          'B' => 'Involuntarily Closed - Business Filed for Bankruptcy',
+                          'R' => 'Voluntarily Closed and reissued',
+                          'S' => 'Voluntarily Closed due to account sale',
+                          'T' => 'Voluntarily Closed due to account transfer-internal',
+                          'U' => 'Voluntarily Closed due to account transfer - External/Unknown',
+                          '');
 		RETURN ClosureReason;
 	END; // END of function AccountClosureReason
 
@@ -428,15 +432,15 @@ EXPORT Functions := MODULE
                               Account_Status_2 IN BusinessCredit_Services.Constants.Closed_Account_Status_Codes;
 		stat := BusinessCredit_Services.Constants.ACCT_STATUS;
     status_whenAccClosed := MAP(
-      isAccountClosed AND  Account_Status_1 = '008' 
+      isAccountClosed AND  (Account_Status_1 = '008' OR Account_Status_1 = '027' OR Account_Status_1 = '028' OR Account_Status_1 = '029')
         => stat.Bankruptcy,
-      isAccountClosed AND  (Account_Status_1 = '009' OR Account_Status_1 = '011') 
+      isAccountClosed AND  (Account_Status_1 = '009' OR Account_Status_1 = '011' OR Account_Status_1 = '032') 
         => stat.ChargeOff,
       isAccountClosed AND  (Account_Status_1 = '006' OR Account_Status_1 = '015' OR Account_Status_1 = '018') 
         => stat.Foreclosure,
       isAccountClosed AND  Account_Status_1 = '010' 
         => stat.NonAccrual,
-      isAccountClosed AND  Account_Status_1 = '017' 
+      isAccountClosed AND  (Account_Status_1 = '017' OR Account_Status_1 = '023') 
         => stat.Collection,
       stat.None
     );
