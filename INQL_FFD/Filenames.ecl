@@ -16,6 +16,8 @@ export Filenames(boolean isUpdate = true, boolean isFCRA = true, string pVersion
 	export InputBuilt		      := Input + '::built';		
 	export InputHistory	      := Input + '::history';
 	
+	export PPC_Mapping        := data_services.foreign_fcra_logs + Inql_ffd._Constants.THOR_ROOT + '::' + dx_InquiryHistory.Constants.dataset_name + fcra 
+	                             + '::in::permission_code_table';
 	
   	
 end;
