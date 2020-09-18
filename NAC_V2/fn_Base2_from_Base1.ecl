@@ -4,10 +4,13 @@ IMPORT NAC,std,ut,dops;
 
 export fn_Base2_from_Base1(string version) := FUNCTION
 	rawbase2 := Nac_V2.Files2.dsNCF2Base;
-	newdata := Nac_V2.Files2.dsProcessing;
 
-	base2 := IFF(EXISTS(newdata),
-							NAC_V2.fn_MergeWithBase(newdata, rawbase2) , // update base2
+	contacts := nac_v2.fn_ProcessContactRecord(Nac_V2.Files2.dsProcessing);
+	exceptions := nac_v2.fn_ProcessExceptionRecord(Nac_V2.Files2.dsProcessing);
+	newdata := nac_v2.fn_constructBase2FromNCFEx(Nac_V2.Files2.dsProcessing, version);
+	
+	base2 := IF(EXISTS(newdata),
+							NAC_V2.fn_MergeWithBase(newdata, rawbase2, true) , // update base2
 							rawbase2) : INDEPENDENT;
 	// Filter out base1 records that may be in base2, and then
 	//  convert base1 to baes2 format
@@ -30,7 +33,10 @@ export fn_Base2_from_Base1(string version) := FUNCTION
 	doit := SEQUENTIAL(
 		OUTPUT(IF(version=version1, 'Versions Match', 'Outdated Base1: ' + version1)),
 		nac_v2.Superfile_List.MoveReadyToProcessing,
-		OUTPUT(nac_v2.files2.dsProcessing, named('new_samples')),
+		
+		exceptions,
+		contacts,			// process contacts before building base
+		IF(EXISTS(newdata), OUTPUT(CHOOSEN(newdata,200), named('new_samples'))),
 		
 		OUTPUT(newbase,,lfn_base, COMPRESSED),
 		nac_V2.Promote_Superfiles(Nac_V2.Superfile_List.sfBase2, lfn_base),
