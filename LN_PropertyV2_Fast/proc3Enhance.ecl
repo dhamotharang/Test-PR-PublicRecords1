@@ -333,6 +333,24 @@ EXPORT proc3Enhance( string versionDate, boolean isFast = FALSE, string8 forceDe
 	PromoteSupers.MAC_SF_BuildProcess(assesswBitmap_c,					 asm,bld_propertyv2_Assesor,2,,true,versionDate);
 	PromoteSupers.MAC_SF_BuildProcess(deedswbitmap_c,						 ade,bld_propertyv2_Deed,2,,true,versionDate);		
 
+	PromoteBaseDelta := FUNCTION
+		bdalg := LN_PropertyV2_Fast.FileNames.base.addl_legal;
+	  bdafa := LN_PropertyV2_Fast.FileNames.base.addl_frs_a;
+  	bdafd := LN_PropertyV2_Fast.FileNames.base.addl_frs_d;
+	  bdaln := LN_PropertyV2_Fast.FileNames.base.addl_names;
+    bdasr := LN_PropertyV2_Fast.FileNames.base.search_prp;
+    bdasm := LN_PropertyV2_Fast.FileNames.base.assessment;
+    bdade := LN_PropertyV2_Fast.FileNames.base.deed_mortg;
+		a := STD.File.PromoteSuperFileList([bdalg,bdalg+'_father'],deltail:=true);
+		b := STD.File.PromoteSuperFileList([bdafa,bdafa+'_father'],deltail:=true);
+		c := STD.File.PromoteSuperFileList([bdafd,bdafd+'_father'],deltail:=true);
+		d := STD.File.PromoteSuperFileList([bdaln,bdaln+'_father'],deltail:=true);
+		e := STD.File.PromoteSuperFileList([bdasr,bdasr+'_father'],deltail:=true);
+		f := STD.File.PromoteSuperFileList([bdasm,bdasm+'_father'],deltail:=true);
+		g := STD.File.PromoteSuperFileList([bdade,bdade+'_father'],deltail:=true);
+		return sequential(a,b,c,d,e,f,g);
+	END;
+
 // ** End lines to implement true delta **
 
 /* 
@@ -364,6 +382,7 @@ EXPORT proc3Enhance( string versionDate, boolean isFast = FALSE, string8 forceDe
 											if(isFast,bld_propertyv2_search_f,bld_propertyv2_search),
 											if(isFast,bld_propertyv2_Assesor_f,bld_propertyv2_Assesor),
 											if(isFast,bld_propertyv2_Deed_f,bld_propertyv2_Deed),
+											if(not(isfast),PromoteBaseDelta),
 											LN_PropertyV2_Fast.BuildLogger.update(versionDate,'base_build_end_date',(STRING8)Std.Date.Today()),
 											);	
 END;
