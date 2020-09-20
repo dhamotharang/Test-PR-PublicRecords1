@@ -219,7 +219,7 @@ EXPORT rComments AllComments(dataset(Layouts.rEntity) infile) := FUNCTION
 								//& Allreasons
 								& GetRelComments(infile) & GetRelExcessive &
 								GetModifiedDates(infile) & GetNotes(infile),Ent_id),
-								Ent_Id, sorter, LOCAL);
+								Ent_Id, sorter,cmts,  LOCAL);
 
 			
 		rComments RollRecs(rComments L, rComments R) := TRANSFORM

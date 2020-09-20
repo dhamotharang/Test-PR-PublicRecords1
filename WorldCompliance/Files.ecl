@@ -156,8 +156,8 @@ export dsMasters := dsMasters_base + dsMult;
 
 export dsWCOCategories := dsMainCats + FMdsWCOCategories;
 //export dsWCOCategories := dsMainCats + MdsWCOCategories;
-export srcAdverseMedia := dedup(dsMasters(EntryCategory in Filters.fAdverseMedia),Ent_ID,ALL);
-export srcGlobalEnforcement := dedup(dsMasters(EntryCategory in Filters.fEnforcement),Ent_ID,ALL);
+export srcAdverseMedia := dedup(SORT(dsMasters(EntryCategory in Filters.fAdverseMedia),Ent_ID,Entrycategory,EntrySubcategory,LOCAL),Ent_ID,ALL);
+export srcGlobalEnforcement := dedup(SORT(dsMasters(EntryCategory in Filters.fEnforcement),Ent_ID,Entrycategory,EntrySubcategory,LOCAL),Ent_ID,ALL);
 
 //Bug: 149009 - WCo: Add new records to WorldCompliance - Expanded Due Diligence file
 //srcGlobalEdd1 := dsMasters(EntryCategory in Filters.fEdd1 and Watch = true); //OLD 20160805
@@ -167,7 +167,7 @@ srcGlobalEdd1a := dsMasters(EntryCategory in Filters.fEdd1 AND Watch = true);
 srcGlobalEdd1b := dsMasters(EntryCategory in ['Enforcement'] and Namesource IN ['US-EPLS','US-HHS-EIE','US-SAM'] and 
 								EntrySubcategory NOT IN ['Excluded Party','End Use Control']);
 								
-srcGlobalEdd1		:= dedup(srcGlobalEdd1a + srcGlobalEdd1b, Ent_ID, ALL);
+srcGlobalEdd1		:= (srcGlobalEdd1a + srcGlobalEdd1b);
 
 //Bug: 196854 - WCo - Bridger: Change to logic for WorldCompliance Expanded Due Diligence
 srcGlobalEdd2 := dsMasters(EntryCategory in Filters.fEdd1 and NameSource NOT IN ['WebSite', 'Website', 'Newspaper','Magazine','Broadcast', 'CO-RNDEC', 'AR-LPEPBC']);
@@ -175,9 +175,9 @@ srcGlobalEdd3 := dsMasters(EntryCategory in Filters.fEdd2);
 
 //Bug: 196854 - WCo - Bridger: Change to logic for WorldCompliance Expanded Due Diligence
 //export srcGlobalEdd := srcGlobalEdd3 + dedup(sort(srcGlobalEdd1 + srcGlobalEdd2, Ent_ID, local), Ent_ID, local); // OLD 20160805
-srcGlobalEdd4 :=  dedup(srcGlobalEdd3 + srcGlobalEdd1 + srcGlobalEdd2, Ent_ID, ALL); 
+srcGlobalEdd4 :=  (srcGlobalEdd3 + srcGlobalEdd1 + srcGlobalEdd2); 
 
-export srcGlobalEdd := project(srcGlobalEdd4, transform(Layouts.rEntity, 
+srcGlobalEdd5 := project(srcGlobalEdd4, transform(Layouts.rEntity, 
 		self.EntryTypeId := if(left.NameSource = 'US-EPLS',752, 
 				if(left.NameSource = 'US-HHS-EIE',848, 
 				if(left.NameSource = 'US-SAM' ,10447, left.EntryTypeId)));
@@ -186,15 +186,16 @@ export srcGlobalEdd := project(srcGlobalEdd4, transform(Layouts.rEntity,
 				if(left.NameSource = 'US-SAM' , 'JPMC Custom - SAM', left.NameSource)));
 		 self := left;));
 
+export srcGlobalEdd								:= dedup(SORT(srcGlobalEdd5,Ent_ID,Entrycategory,EntrySubcategory,LOCAL),Ent_ID,ALL);
+//export srcGlobalEdd								:= dedup(srcGlobalEdd5,Ent_ID,ALL);
 
-
-export srcGlobalStateOwned 				:= dedup(dsMasters(EntryCategory in Filters.fStateOwned),Ent_ID,ALL);
-export srcPep 										:= dedup(dsMasters(EntryCategory in Filters.fPep),Ent_ID,ALL);
-export srcSanctionsAndEnforcement := dedup(dsMasters(EntryCategory in Filters.fSanctionsAndEnforcement),Ent_ID,ALL);
-export srcSanctions 							:= dedup(dsMasters(EntryCategory in Filters.fSanctions),Ent_ID,ALL);
+export srcGlobalStateOwned 				:= dedup(SORT(dsMasters(EntryCategory in Filters.fStateOwned),Ent_ID,Entrycategory,EntrySubcategory,LOCAL),Ent_ID,ALL);
+export srcPep 										:= dedup(SORT(dsMasters(EntryCategory in Filters.fPep),Ent_ID,Entrycategory,EntrySubcategory,LOCAL),Ent_ID,ALL);
+export srcSanctionsAndEnforcement := dedup(SORT(dsMasters(EntryCategory in Filters.fSanctionsAndEnforcement),Ent_ID,Entrycategory,EntrySubcategory,LOCAL),Ent_ID,ALL);
+export srcSanctions 							:= dedup(SORT(dsMasters(EntryCategory in Filters.fSanctions),Ent_ID,Entrycategory,EntrySubcategory,LOCAL),Ent_ID,ALL);
 export srcFull 										:= dsMasters_base(EntryCategory in Filters.fFull);
-export srcRegistrations := dedup(project(dsMasters(EntryCategory in Filters.fRegistrations),
-															transform(Layouts.rEntity, self.EntryCategory := if(left.EntryCategory = 'High Risk', 'Registrations', left.EntryCategory); self := left;)),Ent_ID,ALL);
+export srcRegistrations := dedup(SORT(project(dsMasters(EntryCategory in Filters.fRegistrations),
+															transform(Layouts.rEntity, self.EntryCategory := if(left.EntryCategory = 'High Risk', 'Registrations', left.EntryCategory); self := left;)),Ent_ID,Entrycategory,EntrySubcategory,LOCAL),Ent_ID,ALL);
 				
 				
 END;
