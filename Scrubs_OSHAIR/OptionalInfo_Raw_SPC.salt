@@ -1,0 +1,11 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_OSHAIR
+FILENAME:OptionalInfo_Raw_In_OSHAIR
+NAMESCOPE:OptionalInfo_Raw
+
+FIELDTYPE:invalid_numeric:CUSTOM(Scrubs.Functions.fn_numeric > 0)
+FIELDTYPE:Invalid_opt_type:ENUM(N|)
+
+FIELD:activity_nr:TYPE(STRING9):LIKE(invalid_numeric):0,0
+FIELD:opt_type:TYPE(STRING1):LIKE(Invalid_opt_type):0,0
+FIELD:opt_id:TYPE(STRING2):LIKE(invalid_numeric):0,0
