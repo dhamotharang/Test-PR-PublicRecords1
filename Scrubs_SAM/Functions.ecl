@@ -56,10 +56,11 @@ EXPORT Functions := MODULE
 
   //****************************************************************************
   //fn_verify_zip59:  returns true or false based upon whether or not there is
-  //                  a 5-digit, 9-digit, or empty value.
+  //                  a 5-digit, 9-digit, or empty value. Removed hyphens.
   //****************************************************************************
-  EXPORT fn_verify_zip059(STRING zip059) := FUNCTION    
-    RETURN IF(zip059 = '' OR Scrubs.Functions.fn_verify_zip59(zip059) = 1, 1, 0);
+  EXPORT fn_verify_zip059(STRING zip059) := FUNCTION
+    zip059_clean := TRIM(Stringlib.StringFilterOut(zip059, '-'), WHITESPACE);
+    RETURN IF(zip059_clean = '' OR Scrubs.Functions.fn_verify_zip59(zip059_clean) = 1, 1, 0);
   END;
  
   //****************************************************************************
