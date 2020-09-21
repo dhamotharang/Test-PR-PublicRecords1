@@ -1,6 +1,6 @@
 ﻿// Process to build the PhonesFeedback files
 import Lib_FileServices, STRATA, PromoteSupers, dops,Scrubs_PhonesFeedback, ut, std,tools;
-string filedate,string onlinefilename) := function
+export BWR_Build_PhonesFeedback(string filedate,string onlinefilename) := function
 
 version := filedate;
 
@@ -14,11 +14,10 @@ BuildType			:=	If (ut.Weekday((integer)(STRING8)Std.Date.Today()) = 'MONDAY',
 											);
 											
 GetBase		:=	phonesFeedback.proc_build_base(buildType) : independent;
-NonFCRA		:=	GetBase;
-
+NonFcra		:=	GetBase
 
 tools.mac_WriteFile(phonesFeedback.Cluster + 'base::PhonesFeedback_fcra_'+version	,GetBase	,PhonesFeedbackBase_fcra	,pShouldExport := false);
-tools.mac_WriteFile(phonesFeedback.Cluster + 'base::PhonesFeedback_'+version	,NonFCRA	,PhonesFeedbackBase	,pShouldExport := false);
+tools.mac_WriteFile(phonesFeedback.Cluster + 'base::PhonesFeedback_'+version	,NonFcra	,PhonesFeedbackBase	,pShouldExport := false);
 
 build_base  := sequential(
 														PhonesFeedbackBase_fcra,
@@ -47,7 +46,7 @@ dops_update 	:= dops.updateversion('PhoneFeedbackKeys',version,'kevin.reeder@lex
 
 build_all 		:=
 sequential (	
-							// fSprayFilesOnline(version,onlinefilename),
+							fSprayFilesOnline(version,onlinefilename),
 							build_base,
 							build_keys,
 							build_stats,

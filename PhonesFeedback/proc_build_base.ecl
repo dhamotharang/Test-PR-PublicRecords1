@@ -118,7 +118,6 @@ BaseTemp_Lay	popCleanAddr(dwithAID l) := transform
 	self        								:= l;		 
 end;
 
-
 //***********************************************************************************
 //* Add back the filtered blank address records to the rest of the file
 //***********************************************************************************
