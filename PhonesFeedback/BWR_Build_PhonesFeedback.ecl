@@ -1,6 +1,8 @@
 ﻿// Process to build the PhonesFeedback files
 import Lib_FileServices, STRATA, PromoteSupers, dops,Scrubs_PhonesFeedback, ut, std,tools;
 export BWR_Build_PhonesFeedback(string filedate,string onlinefilename) := function
+#workunit('name','Yogurt: PhonesFeedback Daily Build - ' + filedate);
+#workunit('priority','high');
 
 version := filedate;
 
