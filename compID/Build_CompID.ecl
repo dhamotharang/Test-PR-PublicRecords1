@@ -1,4 +1,4 @@
-import ut,watchdog,RoxieKeyBuild;
+﻿import ut,watchdog,RoxieKeyBuild;
 
 list_out	:='~thor_data400::out::compid::id_list';
 delta_out	:= '~thor_data400::delta::best_compid';
@@ -35,8 +35,8 @@ DeSpry		:= DeSpray_compID();
 								,changes:=sum(group,if(new_cid_adl<>'' and original_cid_adl<>'',1,0))
 								,total:=count(group)
 										},'dummy',few),named('Monthly_stats'));
-	bld_key		:= Build_key(Version);
-	updatedops := RoxieKeyBuild.updateversion('CompIDKeys',Version,'skasavajjala@seisint.com',,'N');
+	//bld_key		:= Build_key(Version);
+	//updatedops := RoxieKeyBuild.updateversion('CompIDKeys',Version,'skasavajjala@seisint.com',,'N');
 	split		:= Build_all(file_out,Version,true).split_;
 	move2SF		:= Build_all(file_out,Version,true).promote_();
   outstrata := compID.out_strata_population(Version);
@@ -48,8 +48,8 @@ DeSpry		:= DeSpray_compID();
 					,listOUT_monthly
 					,samples
 					,stats
-					,bld_key
-					,updatedops
+					//,bld_key
+					//,updatedops
 					,split
 					,move2SF
 					,outstrata

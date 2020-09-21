@@ -386,6 +386,9 @@ EXPORT Update_Base_V2 (
 					SELF.source_rid								:= last_built_base.source_rid;
 					SELF.prev_crk									:= last_built_base.prev_crk;
 					SELF.prev_lexid								:= last_built_base.prev_lexid;
+					SELF.dt_first_seen						:= last_built_base.dt_first_seen;
+					SELF.dt_vendor_first_reported	:= last_built_base.dt_vendor_first_reported;
+					SELF.startdate								:= last_built_base.startdate;
 					SELF 													:= new_update;
 					SELF													:= [];
 				END;
@@ -406,6 +409,9 @@ EXPORT Update_Base_V2 (
 					SELF.batch_seq_number					:= new_update.batch_seq_number;
 					SELF.prev_crk									:= last_built_base.prev_crk;
 					SELF.prev_lexid								:= last_built_base.prev_lexid;
+					SELF.dt_first_seen						:= last_built_base.dt_first_seen;
+					SELF.dt_vendor_first_reported	:= last_built_base.dt_vendor_first_reported;
+					SELF.startdate								:= last_built_base.startdate;
 					SELF 													:= new_update;
 					SELF													:= [];
 				END;

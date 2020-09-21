@@ -8,7 +8,7 @@ build_full_key := sequential  (
 																Build_Keys(false, isFCRA, pVersion).all; // build full keys - new
 																dops.updateversion('FCRA_InquiryHistoryKeys',pVersion,INQL_FFD.Email_Notification_Lists.DopsUpdate,,'F');
 																INQL_FFD.FN_Update_Orbit(pVersion).run;
-																INQL_FFD.proc_KeyDiff;
+																//INQL_FFD.proc_KeyDiff;
 															);
 
 build_delta_key := Sequential (
