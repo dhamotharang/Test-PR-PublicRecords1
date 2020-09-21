@@ -2,11 +2,8 @@
 
 EXPORT BuildPhotoFile := MODULE
 
-photo := DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::document_raw'
-								 ,Layout_Infiles.Document
-								 ,CSV(HEADING(1),TERMINATOR('\n'), SEPARATOR(','),QUOTE('"')),OPT)(Document_ID != 'Document_ID');
-																	
-dPhoto := DISTRIBUTE(photo, HASH32(Incident_id));
+Photo := Infiles.Document;																
+dPhoto := DISTRIBUTE(Photo, HASH32(Incident_id));
 
 ds_incidents_delete := Infiles.incidents_todelete;
 ds_photos_sup := JOIN(dPhoto, ds_incidents_delete,
