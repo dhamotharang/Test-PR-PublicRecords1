@@ -4,7 +4,9 @@ Merge new file with existing base file
 **/
 IMPORT Std;
 
-EXPORT fn_MergeWithBase(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base = $.Files2.dsNCF2Base, boolean bypasslink = false) := FUNCTION
+EXPORT fn_MergeWithBase(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base = $.Files2.dsNCF2Base, 
+														DATASET($.Layouts2.rStateContactEx) contacts = $.Files2.dsContactRecords,
+														boolean bypasslink = false) := FUNCTION
 
 	duped := Nac_V2.fn_removeDupes(newbase);
 	linked := IF(bypasslink, duped, $.proc_link(duped));
@@ -12,7 +14,7 @@ EXPORT fn_MergeWithBase(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2)
 	f1 := $.fn_MergeCases(newrecs(clientid=''), base);
 	f2 := $.fn_MergeClients(newrecs(clientid<>''), f1);
 	f3 := $.fn_MergeAddresses(newrecs, f2);
-	f4 := $.fn_AddContacts(f3);
+	f4 := $.fn_AddContacts(f3, contacts);
 
 	return f4(clientid<>'');
 
