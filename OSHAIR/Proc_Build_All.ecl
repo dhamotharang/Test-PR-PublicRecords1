@@ -1,4 +1,4 @@
-﻿import _Control, RoxieKeyBuild, orbit_report, _validate, Orbit3, dops;
+﻿import _Control, RoxieKeyBuild, orbit_report, _validate, Orbit3, dops, scrubs, Scrubs_OSHAIR;
 
 export Proc_Build_All(string filedate, string version) := function
 
@@ -27,8 +27,8 @@ export Proc_Build_All(string filedate, string version) := function
 																					,do_strata);
 
 	//Update DOPS
-	dops_update :=dops.updateversion('OshairKeys', version, _Control.MyInfo.EmailAddressNotify + ';michael.gould@lexisnexisrisk.com;darren.knowles@lexisnexisrisk.com',,'N|B'); 
-
+	dops_update 		:=	dops.updateversion('OshairKeys', version, _Control.MyInfo.EmailAddressNotify + ';darren.knowles@lexisnexisrisk.com',,'N|B');
+										
 	//Update ORBIT MAG
 	// Changed from CreateBuild to use CreateBuild_AddItem so that it adds the item at build time
 	// Changed to use the version date instead of filedate so that both dops and orbit use the same version - 12/3/2018
@@ -36,8 +36,12 @@ export Proc_Build_All(string filedate, string version) := function
 	return sequential(process_date, 
 										spray_files,
 										oshair.promote(filedate).Inputfiles.Sprayed2Using,
+										Scrubs_OSHAIR.fn_RunScrubs(filedate, _Control.MyInfo.EmailAddressNotify + ';darren.knowles@lexisnexisrisk.com'),
+										if(scrubs.mac_ScrubsFailureTest('Scrubs_OSHAIR_Accidents,Scrubs_OSHAIR_AccidentAbstract,Scrubs_OSHAIR_AccidentInjury,Scrubs_OSHAIR_GenDutyStd,Scrubs_OSHAIR_Inspection,Scrubs_OSHAIR_OptionalInfo,Scrubs_OSHAIR_RelatedActivity,Scrubs_OSHAIR_StrategicCodes,Scrubs_OSHAIR_Violation',filedate)
+													,OUTPUT('Scrubs passed.  Continuing to the Build_Base step.')				
+													,FAIL('Scrubs failed.  Base and keys not built.  Processing stopped.')
+											),
 										clean_data,
-										// Generate the other OSHA base files 
 										oshair.normalize_child_datasets(version, process_date),
 										oshair.promote(version).buildfiles.new2built,
 										build_keys,

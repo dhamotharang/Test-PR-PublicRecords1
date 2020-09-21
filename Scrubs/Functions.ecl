@@ -60,6 +60,13 @@ EXPORT Functions := MODULE
     RETURN IF(IF(size = 0, LENGTH(TRIM(alpha, ALL)) > 0, LENGTH(TRIM(alpha, ALL)) = size) AND
               Stringlib.StringFilterOut(alpha, 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz') = '',1,0);
   END;
+	
+	//****************************************************************************
+  //fn_alphaNum_or_blank: 	returns true if only populated with letters, numbers or blank
+  //****************************************************************************
+  EXPORT fn_alphaNum_or_blank(STRING s) := FUNCTION
+    RETURN IF(Stringlib.StringFilterOut(s, ' 1234567890AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz') = '',1,0);
+  END;
   
   //****************************************************************************
   //fn_alpha_optional: 	returns true if only populated with letters or empty
