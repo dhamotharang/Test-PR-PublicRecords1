@@ -17,8 +17,8 @@ EXPORT InValidMessageFT_invalid_numeric(UNSIGNED1 wh) := CHOOSE(wh,SALT311.Hygie
 EXPORT MakeFT_invalid_numeric_blank(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_numeric_blank(SALT311.StrType s) := WHICH(~Scrubs.Functions.fn_numeric_optional(s)>0);
-EXPORT InValidMessageFT_invalid_numeric_blank(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.Functions.fn_numeric_optional'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_numeric_blank(SALT311.StrType s) := WHICH(~Scrubs_Oshair.Functions.fn_numeric_or_blank(s)>0);
+EXPORT InValidMessageFT_invalid_numeric_blank(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Oshair.Functions.fn_numeric_or_blank'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_state(SALT311.StrType s0) := FUNCTION
   RETURN  s0;

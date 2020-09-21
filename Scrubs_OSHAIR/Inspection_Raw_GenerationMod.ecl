@@ -44,7 +44,7 @@ EXPORT Inspection_Raw_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'NAMESCOPE:Inspection_Raw\n'
     + '\n'
     + 'FIELDTYPE:invalid_numeric:CUSTOM(Scrubs.Functions.fn_numeric > 0)\n'
-    + 'FIELDTYPE:invalid_numeric_blank:CUSTOM(Scrubs.Functions.fn_numeric_optional > 0)\n'
+    + 'FIELDTYPE:invalid_numeric_blank:CUSTOM(Scrubs_Oshair.Functions.fn_numeric_or_blank > 0)\n'
     + 'FIELDTYPE:invalid_state:CUSTOM(Scrubs_Oshair.Functions.fn_verify_state > 0)\n'
     + 'FIELDTYPE:invalid_state_flag:CUSTOM(Scrubs_Oshair.Functions.fn_state_flag > 0)\n'
     + 'FIELDTYPE:invalid_owner_type:CUSTOM(Scrubs_Oshair.Functions.fn_owner_type > 0)\n'
