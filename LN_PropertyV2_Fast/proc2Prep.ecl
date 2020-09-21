@@ -48,12 +48,10 @@ EXPORT proc2Prep(string	prepDate, boolean isFast) :=  FUNCTION
 				
 		iRfrA		:= iRfrAr + iRfrAp;
 		
-		
-		
 		// Splt, map and save OKC prep files
 		prepOkcAssessment	:= LN_PropertyV2_Fast.Map_OKC_Raw_Assessment_Base(prepDate,iRokAn,iRokAr).assessment.dNew;
 		prepOkcDeed 			:= LN_PropertyV2_Fast.Map_OKC_Raw_Deed_Base(prepDate,iRokDn,iRokDr).deed.dNew;
-		prepOkcMortgage 	:= LN_PropertyV2_Fast.Map_OKC_Raw_Mortgage_Base(prepDate,iRokMn,iRokMr).mortgage.dNew;
+		prepOkcMortgage 	:= LN_PropertyV2_Fast.Map_OKC_Raw_Mortgage_Base(prepDate,iRokMn,iRokMr).mortgage.dNew : independent;
 		
 		prepAddlNames			:= LN_PropertyV2_Fast.Map_OKC_Raw_Assessment_Base(prepDate,iRokAn,iRokAr).addlNames.dNew
 												+LN_PropertyV2_Fast.Map_OKC_Raw_Deed_Base(prepDate,iRokDn,iRokDr).addlNames.dNew
@@ -67,10 +65,10 @@ EXPORT proc2Prep(string	prepDate, boolean isFast) :=  FUNCTION
 												+LN_PropertyV2_Fast.Map_OKC_Raw_Mortgage_Base(prepDate,iRokMn,iRokMr).search.dNew;
 												
 		//Split, map and save Black Knight Assignment/Release files;
-		prepBKMortgage			:= LN_PropertyV2_Fast.Map_BK_AssignRelease_Base(prepDate,iRbkAs,iRbkRl).mortgage.dNew;
-		prepBKAddlNameInfo	:= LN_PropertyV2_Fast.Map_BK_AssignRelease_Base(prepDate,iRbkAs,iRbkRl).AddlNameInfo.dNew;
-		prepBKAddlNames			:= LN_PropertyV2_Fast.Map_BK_AssignRelease_Base(prepDate,iRbkAs,iRbkRl).addlNames.dNew;
-		prepBKSearch				:= LN_PropertyV2_Fast.Map_BK_AssignRelease_Base(prepDate,iRbkAs,iRbkRl).search.dNew;
+		prepBKMortgage			:= LN_PropertyV2_Fast.Map_BK_AssignRelease_Base(prepDate,iRbkAs,iRbkRl,prepOkcMortgage).armortgage.dNew;
+		prepBKAddlNameInfo	:= LN_PropertyV2_Fast.Map_BK_AssignRelease_Base(prepDate,iRbkAs,iRbkRl,prepOkcMortgage).AddlNameInfo.dNew;
+		prepBKAddlNames			:= LN_PropertyV2_Fast.Map_BK_AssignRelease_Base(prepDate,iRbkAs,iRbkRl,prepOkcMortgage).addlNames.dNew;
+		prepBKSearch				:= LN_PropertyV2_Fast.Map_BK_AssignRelease_Base(prepDate,iRbkAs,iRbkRl,prepOkcMortgage).search.dNew;
 		
 		// Split, map and and save Fares prep files;
 		prepFrsAssessment	:= LN_PropertyV2_Fast.prep_frs(prepDate,iRfrD,iRfrA,isfast).assessment;
@@ -98,7 +96,7 @@ EXPORT proc2Prep(string	prepDate, boolean isFast) :=  FUNCTION
 		combinedPrepAssessment		:=	prepOkcAssessment	
 			+ dedup(sort(LN_PropertyV2_Fast.fn_get_frs_assessment_cert_date(prepFrsAssessment),record),record)
 			+ project(LN_PropertyV2.irs_dummy_recs_assessor,tReformatToCommon(LEFT));
-		combinedPrepDeedMortgage	:= 	prepOkcDeed   + prepOkcMortgage + prepFrsDeed + prepBKMortgage
+		combinedPrepDeedMortgage	:= 	prepOkcDeed   + prepFrsDeed + prepOkcMortgage + prepBKMortgage
 			+ project(LN_PropertyV2.irs_dummy_recs_deed,tReformatDeedToCommon(LEFT));
 		combinedPrepSearch_no_sri	:= 	prepOkcSearch + prepFrsSearch + prepBKSearch;
 		combinedPrepAddlLegal			:=	prepAddlLegal + prepFrsAddlLegal;

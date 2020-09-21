@@ -53,7 +53,7 @@ EXPORT Build_Keys(string infiledate, boolean isprte = false) := function
 	// build_key(property_search_v2,'property_search_v2',infiledate,'fcra','ffid',property_search_v2retval, flag_file_id);
 	build_key(pii.ssn,'pii',infiledate,'fcra','ssn',piissnretval, ssn,true);
 	build_key(pii.did,'pii',infiledate,'fcra','did',piididretval, s_did,true);
-	build_key(aircraft,'aircraft',infiledate,'fcra','ffid',aircraftretval, flag_file_id);
+	//build_key(aircraft,'aircraft',infiledate,'fcra','ffid',aircraftretval, flag_file_id);
 	build_key(watercraft_old,'watercraft',infiledate,'fcra','ffid',watercraftretval, flag_file_id);
 	build_key(watercraft,'watercraft',infiledate,'fcra','watercraft_sid',watercraft_sidretval, flag_file_id);
 	build_key(watercraft_cguard,'watercraft',infiledate,'fcra','watercraft_cid',watercraft_cguardretval, flag_file_id);
@@ -97,8 +97,8 @@ EXPORT Build_Keys(string infiledate, boolean isprte = false) := function
 	build_key(property.deed,'property_deed',infiledate,'fcra','ffid',property_deedretval, flag_file_id);
 	build_key(property.property_search,'property_search',infiledate,'fcra','ffid',property_searchretval, flag_file_id);
 	build_key(property.ownership,'property_ownership',infiledate,'fcra','did',property_ownershipretval, did);
-	build_key(ucc_main,'ucc_main',infiledate,'fcra','ffid',ucc_mainretval, flag_file_id);
-	build_key(ucc_party,'ucc_party',infiledate,'fcra','ffid',ucc_partyretval, flag_file_id);
+	//build_key(ucc_main,'ucc_main',infiledate,'fcra','ffid',ucc_mainretval, flag_file_id);
+	//build_key(ucc_party,'ucc_party',infiledate,'fcra','ffid',ucc_partyretval, flag_file_id);
 	build_key(consumerstatement_lexid,'consumerstatement',infiledate,'fcra','lexid',cons_lexidretval, lexid);
 	build_key(consumerstatement_ssn,'consumerstatement',infiledate,'fcra','ssn',cons_ssnretval, ssn);
 	build_key(proflic_mari,'proflic_mari',infiledate,'fcra','ffid',proflic_mariretval, flag_file_id);
@@ -135,7 +135,7 @@ EXPORT Build_Keys(string infiledate, boolean isprte = false) := function
 			parallel(
 			piissnretval
 			,piididretval
-			,aircraftretval
+			//,aircraftretval
 			,watercraftretval
 			,watercraft_sidretval
 			,watercraft_cguardretval
@@ -182,8 +182,8 @@ EXPORT Build_Keys(string infiledate, boolean isprte = false) := function
 			,property_deedretval
 			,property_searchretval
 			,property_ownershipretval
-			,ucc_mainretval
-			,ucc_partyretval
+			//,ucc_mainretval
+			//,ucc_partyretval
 			,cons_lexidretval
 			,cons_ssnretval
 			,proflic_mariretval

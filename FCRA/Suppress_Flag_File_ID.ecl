@@ -184,7 +184,25 @@
 '15455771',    //CC-3444  Dempsey correction removal 9/15
 '15455781',    //CC-3444  Dempsey correction removal 9/15
 '15460111',    //CC-3447  Dempsey correction removal 9/15
-'15417391'  //CC-3398  Dempsey correction removal 9/15
+'15417391',  //CC-3398  Dempsey correction removal 9/15
+'15454301',  //CC-3444  Dempsey correction removal 9/17
+'15454311',   //CC-3444  Dempsey correction removal 9/17
+'15465411',  //CC-3453 Dempsey correction removal 9/17
+'15465401',  //CC-3453 Dempsey correction removal 9/17
+'15467611',  //CC-3455  Dempsey correction removal 9/17
+'15462911',  //CC-3460 Dempsey correction removal 9/17
+'15478181',  //CC-3476 Dempsey correction removal 9/17
+'15478201',  //CC-3476 Dempsey correction removal 9/17
+'15478171',  //CC-3476 Dempsey correction removal 9/17
+'15478141',  //CC-3476 Dempsey correction removal 9/17
+'15478161',  //CC-3476 Dempsey correction removal 9/17
+'15478111',  //CC-3476 Dempsey correction removal 9/17
+'15478131',  //CC-3476 Dempsey correction removal 9/17
+'8627551',  //CC-3474  Dempsey correction removal 9/18
+'8627561',  //CC-3474  Dempsey correction removal 9/18
+'8627571',  //CC-3474  Dempsey correction removal 9/18
+'8643721'  //CC-3474  Dempsey correction removal 9/18
+
 ]; 
 
 
