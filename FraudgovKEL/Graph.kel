@@ -1751,6 +1751,8 @@ Event: => T_InpClnAddrLongEcho := MAP(Longitude:Null OR Longitude=0 => -99999, L
 Event: => T_InpClnAddrCountyEcho := MAP(fips_county='' OR fips_county:Null OR fips_state='' OR fips_state:Null => -99999, fips_state+fips_county);
 Event: => T_InpClnAddrGeoBlkEcho := MAP(GeoBlock = '' OR GeoBlock:Null OR GeoBlock=0 => -99999, GeoBlock);
 
+Event: => T_InpClnAddrGeoMatchEcho := MAP(MailingGeoMatch='' OR MailingGeoMatch:Null => -99999, MailingGeoMatch);
+
 Event: => T_InpClnSsnEcho := MAP(Ssn = '' OR Ssn:Null OR Ssn = '000000000' => -99999, TRIM(Ssn));
 Event: => T_InpClnDobEcho := MAP(DateOfBirth:Null => -99999, INTEGER(DateOfBirth));
 Event: => T_InpClnDlEcho := MAP(LicenseNumber = '' OR rDriversLicense.LicenseNumber:Null => -99999, rDriversLicense.LicenseNumber);
