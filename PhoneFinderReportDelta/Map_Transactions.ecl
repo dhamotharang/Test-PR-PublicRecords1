@@ -54,7 +54,8 @@ EXPORT Map_Transactions(string8 version) := FUNCTION
 	
 	mapTranMain 		:= project(inFile, trT(left));
 	concatFile			:= mapTranMain + PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main;		//DF-23286
-	ddConcat 				:= dedup(sort(distribute(concatFile(transaction_date<>''), hash(transaction_id)), transaction_id, company_id, -(date_added+time_added), local), transaction_id, company_id, local); //Dedup Records & Filter for Transaction_Date<>''
+  //DF-27859 keep the earliest records for delta update changes
+	ddConcat 				:= dedup(sort(distribute(concatFile(transaction_date<>''), hash(transaction_id)), transaction_id, company_id, date_file_loaded,date_added,time_added, local), transaction_id, company_id, local); //Dedup Records & Filter for Transaction_Date<>''
 	
 	return ddConcat;  
 	
