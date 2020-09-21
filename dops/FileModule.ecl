@@ -215,7 +215,7 @@ EXPORT FileModule(string esp = ''
       self.dFParts := dParts;
     END;
     
-		dGetNodesAndParts := project(dTopology, xform(left,COUNTER));
+		dGetNodesAndParts := project(dTopology(isNodeUp), xform(left,COUNTER));
 		rParts - dFParts xNormPath(dGetNodesAndParts l, STD.File.FsFilenameRecord r) := transform
       self.partname := r.name;
       self := l;
@@ -294,11 +294,13 @@ END;
 		
 		rCopyStatusWithParts xGetTotalFilePartFromDali(dPendingFiles l) := transform
 				l_tokens := STD.Str.SplitWords(l.subfile,'::');
-			
+				filenametouse := if (l_roxiedali <> '','~foreign::'+l_roxiedali+'::','~')+l.subfile;
                 wordcount := STD.Str.CountWords(l.subfile,'::');
                 getlasttoken := STD.Str.GetNthWord(regexreplace('::',l.subfile,' '),wordcount);
                 abspath := l_roxiepathprefix+regexreplace(getlasttoken+'$',regexreplace('::',l.subfile,'/'),'');
-                self.expectedfileparts := (unsigned4)STD.File.GetLogicalFileAttribute(if (l_roxiedali <> '','~foreign::'+l_roxiedali+'::','~')+l.subfile,'numparts');
+                self.expectedfileparts := if(STD.File.FileExists(filenametouse)
+																							,(unsigned4)STD.File.GetLogicalFileAttribute(filenametouse,'numparts')
+																							,0);
 								self.filemask := getlasttoken;
                 self.directory := abspath;
                 //self.dAllParts := dGetParts;

@@ -1,8 +1,8 @@
 ﻿import FraudShared, Anonymizer, Address,Std,tools;
 export Build_Base_Anonymized (
-    string pversion,
-    dataset(FraudShared.Layouts.Base.Main) pBaseFile   = FraudShared.Files().Base.Main.Built,
-    dataset(FraudShared.Layouts.Base.Main) Previous_Build = FraudShared.Files().Base.Main.QA
+     string pversion
+    ,dataset(FraudShared.Layouts.Base.Main) pBaseFile   = $.Files().Base.Main_Orig.Built
+    ,dataset(FraudShared.Layouts.Base.Main) Previous_Build = FraudShared.Files().Base.Main.QA
 ) := 
 module 
 
@@ -96,18 +96,19 @@ module
 					inner,
 					local);
 
-	//Add demo data GRP-5144
-	Demo_main := dataset('~fraudgov::base::main_demo_anon',fraudshared.Layouts.base.main,thor);
+	//Add demo data GRP-5144, 5276
+	Demo_main := FraudGovPlatform.fn_demodata_refresh(pVersion);
 	
 	MergeRecs := FraudGovPlatform.fn_dedup_main( Old_Recs + New_Records_Anonymized + New_Records_Not_Anonymized + Demo_main );
 
-	tools.mac_WriteFile(Filenames(pversion).Base.Main_Anon.New,MergeRecs,Build_Base_File_Anonymized);
+	tools.mac_WriteFile(FraudShared.Filenames(pversion).Base.Main.New,MergeRecs,Build_Base_File_Anonymized);
 
 	export All :=
 	if(tools.fun_IsValidVersion(pversion)
 		,sequential(
 				Build_Base_File_Anonymized,
-				Promote(pversion).buildfiles.New2Built)
+				FraudGovPlatform.Promote(pversion).buildfiles.New2Built,
+				Fraudshared.Promote(pversion).buildfiles.New2Built)
 		,output('No Valid version parameter passed, skipping Build_Base_Anonymized atribute')
 	);
 end;

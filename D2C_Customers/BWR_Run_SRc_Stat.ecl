@@ -1,6 +1,6 @@
-import Vendor_Src,Phonesplus_v2, header, mdr, UCCV2, liensv2;
+﻿import dx_Vendor_Src,Phonesplus_v2, header, mdr, UCCV2, liensv2;
 
-vendors := dedup(table(Vendor_Src.Key_DID, {source_code, display_name}), record, all);
+vendors := dedup(table(dx_Vendor_Src.Key_Vendor_Src(TRUE), {source_code, display_name}), record, all);
 GetVendorSrc(string code) := vendors(source_code = code)[1].display_name;
 
 MAC_SRC_STAT(infile, src_fld, filename, isMdrSrc) := MACRO

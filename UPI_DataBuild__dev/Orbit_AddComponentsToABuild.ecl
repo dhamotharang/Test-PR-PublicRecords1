@@ -4,8 +4,10 @@
 																// , STRING BuildVersion2
 																// , STRING MasterBuildId
 																, STRING Token
+																, STRING OrbitEnv
 															) := FUNCTION
-IMPORT UPI_DataBuild__dev.Orbit_Tracking as config;
+IMPORT UPI_DataBuild__dev.Orbit_Tracking as configQA;
+IMPORT UPI_DataBuild__dev.Orbit_TrackingPROD as configPROD;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	STRING sService := 'AddComponentsToABuild'	;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
@@ -75,19 +77,33 @@ IMPORT UPI_DataBuild__dev.Orbit_Tracking as config;
 		STRING 			OriginalRequest							{	XPATH('OriginalRequest'						)	}										;
 	END;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
-	OrbitCall	:=	SOAPCALL(		config.targetURL
-													,	config.SOAPService(sService)
+	OrbitCallQA	:=	SOAPCALL(		configQA.targetURL
+													,	configQA.SOAPService(sService)
 													,	rRequest
 													,	rResponse
-													,	XPATH(config.OrbitRR(sService)	)
-													,	NAMESPACE(config.Namespace_D)
+													,	XPATH(configQA.OrbitRR(sService)	)
+													,	NAMESPACE(configQA.Namespace_D)
 													,	LITERAL
-													,	SOAPACTION(config.SoapPath(sService))
+													,	SOAPACTION(configQA.SoapPath(sService))
 													, RETRY(2)
 													, LOG
 												)	;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
-	RETURN	(UNSIGNED4)OrbitCall.BuildsResponse.InstanceToAdd.Status;
+	OrbitCallPROD	:=	SOAPCALL(		configPROD.targetURL
+													,	configPROD.SOAPService(sService)
+													,	rRequest
+													,	rResponse
+													,	XPATH(configPROD.OrbitRR(sService)	)
+													,	NAMESPACE(configPROD.Namespace_D)
+													,	LITERAL
+													,	SOAPACTION(configPROD.SoapPath(sService))
+													, RETRY(2)
+													, LOG
+												)	;
+	//-----------------------------------------------------------------------------------------------------------------------------------------
+	RETURN	IF(OrbitEnv = 'QA',(UNSIGNED4)OrbitCallQA.BuildsResponse.InstanceToAdd.Status,
+														 (UNSIGNED4)OrbitCallPROD.BuildsResponse.InstanceToAdd.Status);
+	// RETURN	(UNSIGNED4)OrbitCall.BuildsResponse.InstanceToAdd.Status;
 	// RETURN OrbitCall.OrbitStatus.OrbitStatusDescription;
 	// RETURN	OrbitCall;
 	//-----------------------------------------------------------------------------------------------------------------------------------------

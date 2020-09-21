@@ -31,7 +31,9 @@ EXPORT fn_FL_Fiers_Removal := FUNCTION
 												 ,FLAccidents_Ecrash.Layout_Infiles.incident_new
 												 ,CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"'), MAXLENGTH(60000)))(Incident_ID != 'Incident_ID');                  
 
-	d_incident_fiers := DISTRIBUTE(ds_incident_fiers, HASH32(incident_id)):INDEPENDENT;
+	d_incident_fiers := DEDUP(SORT(DISTRIBUTE(ds_incident_fiers, HASH32(incident_id)), 
+	                               incident_id, LOCAL), 
+													  incident_id, LOCAL):INDEPENDENT;
 	d_incident := DISTRIBUTE(ds_incident, HASH32(incident_id)):INDEPENDENT;
 	
   fl_fiers_incident := JOIN(d_incident, d_incident_fiers,
@@ -63,7 +65,9 @@ EXPORT fn_FL_Fiers_Removal := FUNCTION
 											,FLAccidents_Ecrash.Layout_Infiles.persn_new
 											,CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"'), ESCAPE('\r'), MAXLENGTH(3000000)))(Person_ID != 'Person_ID');
                     
-	d_person_fiers := DISTRIBUTE(ds_person_fiers, HASH32(person_id, incident_id)):INDEPENDENT;
+	d_person_fiers := DEDUP(SORT(DISTRIBUTE(ds_person_fiers, HASH32(person_id, incident_id)), 
+	                             person_id, incident_id, LOCAL), 
+													person_id, incident_id, LOCAL):INDEPENDENT;
 	d_person := DISTRIBUTE(ds_person, HASH32(person_id, incident_id)):INDEPENDENT;
 	
   fl_fiers_person := JOIN(d_person, d_person_fiers,
@@ -97,7 +101,9 @@ EXPORT fn_FL_Fiers_Removal := FUNCTION
 											  ,FLAccidents_Ecrash.Layout_Infiles.vehicl_new
 												,CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"'), MAXLENGTH(50000)))(Vehicle_ID != 'Vehicle_ID');
    
-	d_vehicle_fiers := DISTRIBUTE(ds_vehicle_fiers, HASH32(vehicle_id, incident_id)):INDEPENDENT;
+	d_vehicle_fiers := DEDUP(SORT(DISTRIBUTE(ds_vehicle_fiers, HASH32(vehicle_id, incident_id)), 
+	                              vehicle_id, incident_id, LOCAL), 
+														vehicle_id, incident_id, LOCAL):INDEPENDENT;
 	d_vehicle := DISTRIBUTE(ds_vehicle, HASH32(vehicle_id, incident_id)):INDEPENDENT;
 	
   fl_fiers_vehicle := JOIN(d_vehicle, d_vehicle_fiers,
@@ -131,7 +137,9 @@ EXPORT fn_FL_Fiers_Removal := FUNCTION
 							          ,FLAccidents_Ecrash.Layout_Infiles.citation
 							          ,CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"')))(Citation_ID != 'Citation_ID'); 										
 																
-	d_citation_fiers := DISTRIBUTE(ds_citation_fiers, HASH32(citation_id, incident_id)):INDEPENDENT;
+	d_citation_fiers := DEDUP(SORT(DISTRIBUTE(ds_citation_fiers, HASH32(citation_id, incident_id)), 
+	                               citation_id, incident_id, LOCAL), 
+														citation_id, incident_id, LOCAL):INDEPENDENT;
 	d_citation := DISTRIBUTE(ds_citation, HASH32(citation_id, incident_id)):INDEPENDENT;
 	
   fl_fiers_citation := JOIN(d_citation, d_citation_fiers,

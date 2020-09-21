@@ -1,5 +1,5 @@
 //NOTE:  For the question on number of entities use the CORE result provided in the segmentation stats
-import header, ut, utilfile;
+import header, ut, utilfile, relationship;
 
 fn_rollup_on_did(dataset(recordof(header.Layout_Header)) file_in) :=
 function
@@ -91,7 +91,7 @@ fn_AddStat(count(ds(did_ct>1)),                  '04) Header Unique identities(A
 fn_AddStat(segmentation_core[1].cnt,               '05) Header Unique identities'),
 fn_AddStat(count((j1)((integer)ssn<>0)),                              '06) Header Total SSN Count'),
 fn_AddStat(count((j1)(length(trim(ssn))=9 and ssn[1]='9' and ssn[4] in ['7','8'])),           '07) Header Total ITIN Count'),
-fn_AddStat(count(header.File_Relatives),                              '08) Relatives & Associates Count')
+fn_AddStat(count(relationship.File_Relative),                              '08) Relatives & Associates Count')
 
 );
 

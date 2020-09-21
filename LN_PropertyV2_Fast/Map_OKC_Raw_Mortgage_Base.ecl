@@ -1,4 +1,4 @@
-/*2014-07-11T21:47:48Z (Gabriel Marcan_prod)
+﻿/*2014-07-11T21:47:48Z (Gabriel Marcan_prod)
 updated to latest dev version
 */
 IMPORT ln_propertyv2,Tools,ut,Address,Census_Data,nid;
@@ -43,14 +43,15 @@ EXPORT Map_OKC_Raw_Mortgage_Base(string	pVersionDate,
 	// ---------------------------------------------------------------------------------------------------------
 	EXPORT mortgage := MODULE
 		// Get max value for fares id
-		maxLNMortgageFaresID			:=	max(
-																		max(		ln_propertyv2.Files.Prep.LNMortgage(ln_fares_id[1..2]	=	'OM')
-																			+	ln_propertyv2.Files.Prep.LNMortgageRepl(ln_fares_id[1..2]	=	'OM'),
-																			(unsigned)ln_fares_id[3..]),
-																		max(   LN_PropertyV2_Fast.Files.prep.deed_mortg(ln_fares_id[1..2]	=	'OM'),
-																			(unsigned)ln_fares_id[3..]
-																			 )
+		
+		maxLNMortgageFaresID			:=	MAX(
+																		MAX(     ln_propertyv2.Files.Prep.LNMortgage(ln_fares_id[1..2]	=	'OM')
+																			+  ln_propertyv2.Files.Prep.LNMortgageRepl(ln_fares_id[1..2]	=	'OM'),
+																			(UNSIGNED)ln_fares_id[3..]),
+																		MAX(LN_PropertyV2_Fast.Files.prep.deed_mortg(ln_fares_id[1..2]	=	'OM'),
+																			(UNSIGNED)ln_fares_id[3..])
 																		)	:	global;
+		
 	
 		// Remove names with start with SG and map to common layout
 		common.layout_prep_temp_deed	tMap2Common(PrepDataSet.reformatted.dMortgageRef	pInput,integer	cnt)	:=

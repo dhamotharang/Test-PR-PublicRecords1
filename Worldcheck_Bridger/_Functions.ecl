@@ -1346,6 +1346,17 @@
 				trim(kword, left, right) = 'NOGA' =>SubGroup_Constants.numKeywordsID.KEYWORD_NOGA,
 				trim(kword, left, right) = 'IUUVES' =>SubGroup_Constants.numKeywordsID.KEYWORD_IUUVES,
 				trim(kword, left, right) = 'TWMOJ-INT' =>SubGroup_Constants.numKeywordsID.KEYWORD_TWMOJ_INT,
+				trim(kword, left, right) = 'UZDCEC-INT' =>SubGroup_Constants.numKeywordsID.KEYWORD_UZDCEC_INT,
+				trim(kword, left, right) = 'OFAC-HK-EO13936' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_HK_EO13936,
+				trim(kword, left, right) = 'NOKT' =>SubGroup_Constants.numKeywordsID.KEYWORD_NOKT,
+				trim(kword, left, right) = 'UZDCEC-NAT' =>SubGroup_Constants.numKeywordsID.KEYWORD_UZDCEC_NAT,
+				trim(kword, left, right) = 'PHDENR' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHDENR,
+				trim(kword, left, right) = 'THAMLO-SANC' =>SubGroup_Constants.numKeywordsID.KEYWORD_THAMLO_SANC,
+				trim(kword, left, right) = 'ITIVASS' =>SubGroup_Constants.numKeywordsID.KEYWORD_ITIVASS,
+				trim(kword, left, right) = 'VIPD' =>SubGroup_Constants.numKeywordsID.KEYWORD_VIPD,
+				trim(kword, left, right) = 'USDOD-1237' =>SubGroup_Constants.numKeywordsID.KEYWORD_USDOD_1237,
+				trim(kword, left, right) = 'OFAC-ICCP' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_ICCP,
+				trim(kword, left, right) = 'IDRESKRIMUM' =>SubGroup_Constants.numKeywordsID.KEYWORD_IDRESKRIMUM,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

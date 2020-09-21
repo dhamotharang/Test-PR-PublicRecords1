@@ -1,4 +1,4 @@
-﻿import STD, PRTE2, _control, PRTE; 
+﻿import STD, PRTE2, _control, PRTE, Orbit3; 
 
 skipDOPS:=false;
 string emailTo:='';
@@ -88,9 +88,14 @@ prte2.constants.prefix + 'key::canadianwp_v2::' + pversion + '::autokey::zipprln
 	notifyEmail					:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
 	NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it'); 
 	updatedops					:=	PRTE.UpdateVersion(dops_name, pversion, notifyEmail,'B','N','N');
+	
+	updateOrbit:=Orbit3.proc_Orbit3_CreateBuild('PRTE - Canadian Phones v2', pversion, 'PN', false, false, true, _control.MyInfo.EmailAddressNormal);
+  NoOrbitUpdate 						:= OUTPUT('Skipping Orbit because it was requested to not do it'); 
 
 	PerformUpdateOrNot	:= IF(not skipDops,updatedops,NoUpdate);
-
+	PerformOrbitOrNot:=    IF(not skipDops,updateOrbit,NoOrbitUpdate);
+  
+	
 
  BUILD(fdidKey);
  BUILD(addressKey);
@@ -108,7 +113,8 @@ prte2.constants.prefix + 'key::canadianwp_v2::' + pversion + '::autokey::zipprln
  BUILD(zipb2key);
  BUILD(zipprlnamekey);
  
-PerformUpdateOrNot;
+ PerformUpdateOrNot;
+ PerformOrbitOrNot;
 
 output ('successful');
 

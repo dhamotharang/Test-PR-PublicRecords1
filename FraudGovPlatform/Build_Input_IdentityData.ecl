@@ -106,7 +106,7 @@ module
 	tools.mac_WriteFile(
 		Filenames().Input.ByPassed_IdentityData.New(pversion),
 		f1_bypass_dedup,
-		Build_Bypass_Records,
+		Build_Bypass_IdentityData,
 		pCompress := true,
 		pHeading := false,
 		pOverwrite := true);
@@ -129,7 +129,7 @@ module
 	tools.mac_WriteFile(
 		Filenames(pversion).Input.IdentityData.New(pversion),
 		input_file_1,
-		Build_Input_File,
+		Build_IdentityData,
 		pCompress := true,
 		pHeading := false,
 		pOverwrite := true);
@@ -137,8 +137,8 @@ module
 // Return
 	export build_prepped := 
 		sequential(
-			 Build_Input_File
-			,Build_Bypass_Records 
+			 Build_IdentityData
+			,Build_Bypass_IdentityData 
 		);
 		
 	export All :=

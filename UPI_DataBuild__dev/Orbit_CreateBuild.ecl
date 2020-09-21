@@ -1,15 +1,16 @@
-﻿IMPORT UPI_DataBuild__dev.Orbit_Tracking as config;
-
-EXPORT Orbit_CreateBuild ( 		STRING BuildName
+﻿EXPORT Orbit_CreateBuild ( 		STRING BuildName
 											, STRING BuildStatus
 											, STRING BuildVersion
 											, STRING HpccWorkUnit
 											, STRING MasterBuild
 											, STRING TOKEN
-										) := FUNCTION
+											, STRING OrbitEnv
+										) := FUNCTION										
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	STRING sService := 'CreateBuild'	;
 	IMPORT ut;
+	IMPORT UPI_DataBuild__dev.Orbit_Tracking as configQA;
+	IMPORT UPI_DataBuild__dev.Orbit_TrackingPROD as configPROD;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	// - REQUEST
 	rBuild		:= 	RECORD
@@ -53,19 +54,32 @@ EXPORT Orbit_CreateBuild ( 		STRING BuildName
 		STRING 			OriginalRequest							{	XPATH('OriginalRequest'						)	}										;
 	END;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
-	OrbitCall	:=	SOAPCALL(		config.targetURL
-													,	config.SOAPService(sService)
+	OrbitCallQA	:=	SOAPCALL(		configQA.targetURL
+													,	configQA.SOAPService(sService)
 													,	rRequest
 													,	rResponse
-													,	XPATH(config.OrbitRR(sService)	)
-													,	NAMESPACE(config.Namespace_B)
+													,	XPATH(configQA.OrbitRR(sService)	)
+													,	NAMESPACE(configQA.Namespace_B)
 													,	LITERAL
-													,	SOAPACTION(config.SoapPath(sService) )
+													,	SOAPACTION(configQA.SoapPath(sService) )
+													, RETRY(2)
+													, LOG
+												)	;
+	//-----------------------------------------------------------------------------------------------------------------------------------------
+	OrbitCallPROD	:=	SOAPCALL(		configPROD.targetURL
+													,	configPROD.SOAPService(sService)
+													,	rRequest
+													,	rResponse
+													,	XPATH(configPROD.OrbitRR(sService)	)
+													,	NAMESPACE(configPROD.Namespace_B)
+													,	LITERAL
+													,	SOAPACTION(configPROD.SoapPath(sService) )
 													, RETRY(2)
 													, LOG
 												)	;
 	// -----------------------------------------------------------------------------------------------------------------------------------------
-	RETURN	(UNSIGNED4)OrbitCall.Builds2Response.Build2.BuildId	;
+	// RETURN	(UNSIGNED4)OrbitCall.Builds2Response.Build2.BuildId	;
 	// RETURN	OrbitCall	;
+	RETURN	IF(OrbitEnv = 'QA', OrbitCallQA.Builds2Response.Build2.BuildId, OrbitCallPROD.Builds2Response.Build2.BuildId)	;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 END	;	// End CreateBuild Function	

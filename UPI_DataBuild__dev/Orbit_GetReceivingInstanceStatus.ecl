@@ -1,7 +1,9 @@
 ﻿EXPORT Orbit_GetReceivingInstanceStatus (		STRING InstanceID
 											, STRING TokenID
+											, STRING OrbitEnv
 										)	:= FUNCTION
-IMPORT UPI_DataBuild__dev.Orbit_Tracking as config;
+IMPORT UPI_DataBuild__dev.Orbit_Tracking as configQA;
+IMPORT UPI_DataBuild__dev.Orbit_TrackingPROD as configPROD;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	STRING sService := 'GetReceivingDetailsByInstance'	;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
@@ -45,20 +47,33 @@ IMPORT UPI_DataBuild__dev.Orbit_Tracking as config;
 		STRING 				OriginalRequest							{	XPATH('OriginalRequest'						)	}																			;
 	END	;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
-	OrbitCall	:=	SOAPCALL(		config.targetURL
-													,	config.SOAPService(sService)
+	OrbitCallQA	:=	SOAPCALL(		configQA.targetURL
+													,	configQA.SOAPService(sService)
 													,	rRequest
 													,	rResponse
-													,	XPATH(config.OrbitRR(sService)	)
-													,	NAMESPACE(config.Namespace_C)
+													,	XPATH(configQA.OrbitRR(sService)	)
+													,	NAMESPACE(configQA.Namespace_C)
 													,	LITERAL
-													,	SOAPACTION(config.SoapPath(sService) )
+													,	SOAPACTION(configQA.SoapPath(sService) )
+													, RETRY(2)
+													, LOG
+												)	;
+	//-----------------------------------------------------------------------------------------------------------------------------------------
+	OrbitCallPROD	:=	SOAPCALL(		configPROD.targetURL
+													,	configPROD.SOAPService(sService)
+													,	rRequest
+													,	rResponse
+													,	XPATH(configPROD.OrbitRR(sService)	)
+													,	NAMESPACE(configPROD.Namespace_C)
+													,	LITERAL
+													,	SOAPACTION(configPROD.SoapPath(sService) )
 													, RETRY(2)
 													, LOG
 												)	;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	// RETURN	OrbitCall.Instances.InstanceR.ReceivingStatus	; // Returns "Receiving Status" only
-	RETURN	OrbitCall.Instances.InstanceR	; // Returns "Receiving Status" only
+	// RETURN	OrbitCall.Instances.InstanceR	; // Returns "Receiving Status" only
+	RETURN	IF(OrbitEnv = 'QA', OrbitCallQA.Instances.InstanceR, OrbitCallPROD.Instances.InstanceR)	; // Returns "Receiving Status" only
 	// RETURN	OrbitCall;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 END ; // End VerifyStatusFunction
