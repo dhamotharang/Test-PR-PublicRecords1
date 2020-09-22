@@ -744,10 +744,11 @@ EXPORT map_FLS0280_conversion(STRING pVersion) := FUNCTION
 		self.OFF_LICENSE_NBR 	:= pInput.office_lic_numr;
 		
 		// Reformatting dates from MM/DD/YYYY to YYYYMMDD
-		SELF.CURR_ISSUE_DTE		:= IF(pInput.EFFC_DATE<>'',Prof_License_Mari.DateCleaner.ToYYYYMMDD(pInput.EFFC_DATE),'17530101');
-		tempIssueDte        	:= IF(pInput.orig_lic_date != '',Prof_License_Mari.DateCleaner.norm_date3(pInput.orig_lic_date),
-																'');
-		SELF.ORIG_ISSUE_DTE		:= IF(tempIssueDte != '',Prof_License_Mari.DateCleaner.ToYYYYMMDD(tempIssueDte),'17530101');	
+		SELF.CURR_ISSUE_DTE				:= IF(pInput.EFFC_DATE<>'',Prof_License_Mari.DateCleaner.ToYYYYMMDD(pInput.EFFC_DATE),'17530101');
+		// tempIssueDte        		:= IF(pInput.orig_lic_date != '',Prof_License_Mari.DateCleaner.norm_date3(pInput.orig_lic_date),
+																// '');														
+		// SELF.ORIG_ISSUE_DTE		:= IF(tempIssueDte != '',Prof_License_Mari.DateCleaner.ToYYYYMMDD(tempIssueDte),'17530101');	
+		SELF.ORIG_ISSUE_DTE				:= IF(pInput.ORIG_LIC_DATE <>'',Prof_License_Mari.DateCleaner.ToYYYYMMDD(pInput.ORIG_LIC_DATE),'17530101');
 		// SELF.EXPIRE_DTE				:= IF(pInput.EXP_DATE != '',Prof_License_Mari.DateCleaner.ToYYYYMMDD(pInput.EXP_DATE),'17530101');
 		tmpExpireDate 						:= Prof_License_Mari.DateCleaner.ToYYYYMMDD(pInput.EXP_DATE);
 		SELF.EXPIRE_DTE 					:= IF(tmpExpireDate < '20000101','20' + tmpExpireDate[3..],tmpExpireDate);
