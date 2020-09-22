@@ -283,14 +283,14 @@ def dCnpNameFuzzyFallbackValueChanges():
 ##---------------------------------------------------------------------------		
 def dChangeConfigLimits():
     return[
-        ('Config', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKSIZE:=10000;', 'HACK27a', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKSIZE:=250000; // Increased limit to 250K from 10K /*HACK27a*/', 'Increased limit to 250K from 10K'),
-        ('Config', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKLIMIT:=10000;', 'HACK27b', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27b*/', 'Increased limit to 250K from 10K'),
-        ('Config', 'EXPORT L_CNPNAME_ST_MAXBLOCKSIZE:=10000;', 'HACK27c', 'EXPORT L_CNPNAME_ST_MAXBLOCKSIZE:=250000; // Increased limit to 250K from 10K /*HACK27c*/', 'Increased limit to 250K from 10K'),
-        ('Config', 'EXPORT L_CNPNAME_ST_MAXBLOCKLIMIT:=10000;', 'HACK27d', 'EXPORT L_CNPNAME_ST_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27d*/', 'Increased limit to 250K from 10K'),
-        ('Config', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKSIZE:=10000;', 'HACK27e', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKSIZE:=250000; // Increased limit to 250K from 10K /*HACK27e*/', 'Increased limit to 250K from 10K'),
-        ('Config', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKLIMIT:=10000;', 'HACK27f', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27f*/', 'Increased limit to 250K from 10K'),
-        ('Config', 'EXPORT L_CNPNAME_MAXBLOCKSIZE:=10000;', 'HACK27g', 'EXPORT L_CNPNAME_MAXBLOCKSIZE:=250000; // Increased limit to 250K from 10K /*HACK27g*/', 'Increased limit to 250K from 10K'),
-        ('Config', 'EXPORT L_CNPNAME_MAXBLOCKLIMIT:=10000;', 'HACK27h', 'EXPORT L_CNPNAME_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27h*/', 'Increased limit to 250K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKSIZE:=10000;', 'HACK27a', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKSIZE:=50000; // Increased limit to 50K from 10K /*HACK27a*/', 'Increased limit to 50K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKLIMIT:=10000;', 'HACK27b', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKLIMIT:=50000; // Increased limit to 50K from 10K /*HACK27b*/', 'Increased limit to 50K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_ST_MAXBLOCKSIZE:=10000;', 'HACK27c', 'EXPORT L_CNPNAME_ST_MAXBLOCKSIZE:=50000; // Increased limit to 50K from 10K /*HACK27c*/', 'Increased limit to 50K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_ST_MAXBLOCKLIMIT:=10000;', 'HACK27d', 'EXPORT L_CNPNAME_ST_MAXBLOCKLIMIT:=50000; // Increased limit to 50K from 10K /*HACK27d*/', 'Increased limit to 50K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKSIZE:=10000;', 'HACK27e', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKSIZE:=50000; // Increased limit to 50K from 10K /*HACK27e*/', 'Increased limit to 50K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKLIMIT:=10000;', 'HACK27f', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKLIMIT:=50000; // Increased limit to 50K from 10K /*HACK27f*/', 'Increased limit to 50K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_MAXBLOCKSIZE:=10000;', 'HACK27g', 'EXPORT L_CNPNAME_MAXBLOCKSIZE:=50000; // Increased limit to 50K from 10K /*HACK27g*/', 'Increased limit to 50K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_MAXBLOCKLIMIT:=10000;', 'HACK27h', 'EXPORT L_CNPNAME_MAXBLOCKLIMIT:=50000; // Increased limit to 50K from 10K /*HACK27h*/', 'Increased limit to 50K from 10K'),
 		('Config', 'EXPORT L_CONTACT_MAXBLOCKSIZE:=10000;', 'HACK27i', 'EXPORT L_CONTACT_MAXBLOCKSIZE:=100000; // Increased limit to 100K from 10K /*HACK27i*/', 'Increased limit to 100K from 10K'),
         ('Config', 'EXPORT L_CONTACT_MAXBLOCKLIMIT:=10000;', 'HACK27j', 'EXPORT L_CONTACT_MAXBLOCKLIMIT:=100000; // Increased limit to 100K from 10K /*HACK27j*/', 'Increased limit to 100K from 10K')
     ]
