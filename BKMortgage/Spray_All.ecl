@@ -1,6 +1,6 @@
-﻿IMPORT $, STD; 
+﻿IMPORT $, STD,_control; 
 
-EXPORT Spray_All(STRING filedate) := MODULE
+EXPORT Spray_All(STRING filedate, STRING	pServerIP	= _control.IPAddress.bctlpedata12) := MODULE
 
 
 //Clear all superfiles. Input files are large so previous logical input files need to be deleted each build
@@ -22,9 +22,9 @@ Clear_Supers	:=
 
 Spray_Files := 
   PARALLEL(
-	         BKMortgage.Spray_UpdateFile(filedate).SprayFile,
+	         BKMortgage.Spray_UpdateFile(filedate,pServerIP).SprayFile,
            //BKMortgage.Spray_deleteFile(filedate).SprayFile, //Property build does not process deletes
-           BKMortgage.Spray_RefreshFile(filedate).SprayFile
+           BKMortgage.Spray_RefreshFile(filedate,pServerIP).SprayFile
 					 );				 
 
 EXPORT spray_file  := SEQUENTIAL(Clear_Supers, Spray_Files);
