@@ -61,7 +61,13 @@ EXPORT ReturnToBatch (string pVersion, boolean pUseProd = false, string gcid, da
 																							,L.append_option = '3' => L.lexid_changed
 																							,L.append_option = '4' => ''
 																							,''); 
-			self.prev_lexid										:= if((string)L.dt_first_seen = pVersion[1..8], 0, L.prev_lexid); 
+			// self.prev_lexid										:= if((string)L.dt_first_seen = pVersion[1..8], 0, L.prev_lexid); 
+			self.prev_lexid										:= map((string)L.dt_first_seen = pVersion[1..8] => 0
+																							,L.append_option = '1' => L.prev_lexid
+																							,L.append_option = '2' => L.prev_lexid
+																							,L.append_option = '3' => L.prev_lexid
+																							,L.append_option = '4' => 0
+																							,0); 
 			self.crk													:= map(L.append_option = '1' => L.crk,
 																							 L.append_option = '2' AND self.lexid = 0 => L.crk,
 																							 L.append_option = '2' AND self.lexid > 0 => '',
@@ -75,7 +81,14 @@ EXPORT ReturnToBatch (string pVersion, boolean pUseProd = false, string gcid, da
 																							,L.append_option = '3' => ''
 																							,L.append_option = '4' => L.crk_changed
 																							,'');
-			self.prev_crk											:= if((string)L.dt_first_seen = pVersion[1..8], '', L.prev_crk);
+			// self.prev_crk											:= if((string)L.dt_first_seen = pVersion[1..8], '', L.prev_crk);
+			self.prev_crk											:= map((string)L.dt_first_seen = pVersion[1..8] => ''
+																							,L.append_option = '1' => L.prev_crk
+																							,L.append_option = '2' AND self.lexid = 0 => L.prev_crk
+																							,L.append_option = '2' AND self.lexid > 0 => ''
+																							,L.append_option = '3' => ''
+																							,L.append_option = '4' => L.prev_crk
+																							,'');
 			SELF  :=  L;	
 			SELF  :=  [];
 		END;
