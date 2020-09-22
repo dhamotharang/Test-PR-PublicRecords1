@@ -63,6 +63,16 @@ Export Append_CleanName (
             LEFT OUTER
         );
 
-		RETURN( CleanedRecs );
+		CleanedRecs15 := PROJECT(
+            CleanedRecs,
+            TRANSFORM(FraudShared.Layouts.Base.Main, 
+				SELF.cleaned_name.title       := IF (ut.CleanSpacesAndUpper(LEFT.cleaned_name.fname+LEFT.cleaned_name.mname+LEFT.cleaned_name.lname) = '' and ut.CleanSpacesAndUpper(LEFT.raw_first_name+LEFT.raw_middle_name+LEFT.raw_middle_name) != '', LEFT.raw_title, LEFT.cleaned_name.title);
+				SELF.cleaned_name.fname       := IF (ut.CleanSpacesAndUpper(LEFT.cleaned_name.fname+LEFT.cleaned_name.mname+LEFT.cleaned_name.lname) = '' and ut.CleanSpacesAndUpper(LEFT.raw_first_name+LEFT.raw_middle_name+LEFT.raw_middle_name) != '', LEFT.raw_first_name, LEFT.cleaned_name.fname);
+				SELF.cleaned_name.mname       := IF (ut.CleanSpacesAndUpper(LEFT.cleaned_name.fname+LEFT.cleaned_name.mname+LEFT.cleaned_name.lname) = '' and ut.CleanSpacesAndUpper(LEFT.raw_first_name+LEFT.raw_middle_name+LEFT.raw_middle_name) != '', LEFT.raw_middle_name, LEFT.cleaned_name.mname);
+				SELF.cleaned_name.lname       := IF (ut.CleanSpacesAndUpper(LEFT.cleaned_name.fname+LEFT.cleaned_name.mname+LEFT.cleaned_name.lname) = '' and ut.CleanSpacesAndUpper(LEFT.raw_first_name+LEFT.raw_middle_name+LEFT.raw_middle_name) != '', LEFT.raw_last_name, LEFT.cleaned_name.lname);
+				SELF.cleaned_name.name_suffix := IF (ut.CleanSpacesAndUpper(LEFT.cleaned_name.fname+LEFT.cleaned_name.mname+LEFT.cleaned_name.lname) = '' and ut.CleanSpacesAndUpper(LEFT.raw_first_name+LEFT.raw_middle_name+LEFT.raw_middle_name) != '', LEFT.raw_Orig_Suffix, LEFT.cleaned_name.name_suffix);
+				Self.cleaned_name.name_score  := IF (ut.CleanSpacesAndUpper(LEFT.cleaned_name.fname+LEFT.cleaned_name.mname+LEFT.cleaned_name.lname) = '' and ut.CleanSpacesAndUpper(LEFT.raw_first_name+LEFT.raw_middle_name+LEFT.raw_middle_name) != '', '15', LEFT.cleaned_name.name_score);
+                SELF := LEFT));		
 
+		RETURN( CleanedRecs15 );
 ENDMACRO;

@@ -435,7 +435,7 @@ ds:= dataset([
 								,{'Zip',count(Zip_Current),count(Zip_Previous)}											
 								]
 						,{string keyname,unsigned Current,unsigned Previous});
-	res_tbl := table(ds,{keyname,Current,Previous,difference:=if(Previous>Current,Previous-Current,Current-Previous)},few);
+	res_tbl := table(ds,{keyname,Current,Previous,difference:=(Unsigned6)Current-Previous},few);
 
 	myReport := RECORD
 		string unittest;
@@ -450,8 +450,8 @@ ds:= dataset([
 		self.unittest := left.keyname,
 		self.beforec := left.Previous,
 		self.afterc := left.Current,
-		self.result := if ( (DECIMAL5_2)(( left.difference / left.Previous) * 100) BETWEEN -1 AND 1 ,'Passed', 'Failed'),
-		self.value := (string)left.difference + ' (' + (string)(DECIMAL5_2)(Round(( left.difference / left.Previous) * 100,2)) + '% )',
+		self.result := if ( (DECIMAL5_2)(( left.difference / left.Previous) * 100) BETWEEN 0 AND 5 ,'Passed', if(left.difference < 0 , 'Failed', 'Review')),
+		self.value := (string)left.difference + ' (' + (string)(DECIMAL5_2)(Round(( left.difference / left.Previous) * 100,2)) + '% '+if(left.difference >= 0, 'Up','Down')+')',
 		self := left;));
 
 
