@@ -63,7 +63,7 @@ EXPORT GetSearchCriteriaEx(dataset(Layouts.rEntity) infile, boolean IncludeSanct
 															
 		MakeGroupHeader(SORT(CountryCriteria(infile),name), 1, 'Country')
 		+MakeGroupHeader(dsRegion, 2, 'Regional Level')
-		+MakeGroupHeader(CategoryCriteria(Files.dsMasters_base), 3, 'Category')
+		+MakeGroupHeader(CategoryCriteria(Files.dsMasters), 3, 'Category')
 		+MakeGroupHeader(dsDeceased, 4, 'Deceased State')
 		+MakeGroupHeader(SourceCriteria(infile), 5, 'Source')
 		+IF(IncludeSanctionsCriteria, 
