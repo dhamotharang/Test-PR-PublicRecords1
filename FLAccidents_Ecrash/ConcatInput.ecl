@@ -5,8 +5,7 @@ ECrash_commercl := FLAccidents_Ecrash.Infiles.commercl;
 ECrash_persn := FLAccidents_Ecrash.Infiles.persn;
 ECrash_vehicl := FLAccidents_Ecrash.Infiles.vehicl;
 ECrash_Property_damage := FLAccidents_Ecrash.Infiles.Property_damage;
-ECrash_Document := DATASET('~thor_data400::in::ecrash::document_raw', FLAccidents_Ecrash.Layout_Infiles.Document
-								           ,CSV(HEADING(1),TERMINATOR('\n'), SEPARATOR(','),QUOTE('"')),OPT)(Document_ID != 'Document_ID');
+ECrash_Document := FLAccidents_Ecrash.Infiles.Document;
 
 
 time := mod_Utilities.StrSysSeconds : independent; 
