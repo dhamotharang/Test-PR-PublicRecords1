@@ -1,5 +1,11 @@
 ﻿Import prte2;
 EXPORT Layouts := MODULE
+Export did_layout:=record
+  unsigned6 did;
+  unsigned6 fdid;
+  unsigned4 global_sid;
+  unsigned8 record_sid;
+ END;
 
 Export zipprlname := RECORD
   string6 zip;
