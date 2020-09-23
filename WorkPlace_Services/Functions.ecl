@@ -1031,8 +1031,9 @@ export Functions := module
 
     mod_params := Gateway.NetwiseSearch.IParams.GetParams_PersonSearch(CachedResponseOnly);  // Search Params for gateway  
 
+    makeGatewayCall := mod_params.gateways(Gateway.Configuration.IsNetWise(servicename))[1].url <> '';
     dsNetwiseReqClean := dx_gateway.parser_netwise_email.fn_CleanRequest(dsNetwiseReq);
-    dsNetwiseResp := Gateway.SoapCall_NetWise(dsNetwiseReqClean, mod_params, , , true, false);
+    dsNetwiseResp := Gateway.SoapCall_NetWise(dsNetwiseReqClean, mod_params, , , makeGatewayCall, false);
     dsNetwiseRespClean := dx_gateway.parser_netwise_email.fn_CleanResponse_LexID(dsNetwiseResp);
 
     $.Layouts.poe_didkey_plus XformPOE(dx_gateway.parser_netwise_email.NetwiseResults_LexID l, iesp.net_wise_share.t_NetWiseWork r) := transform,
