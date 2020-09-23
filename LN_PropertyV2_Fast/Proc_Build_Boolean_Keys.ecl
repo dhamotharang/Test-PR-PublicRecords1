@@ -78,7 +78,7 @@ EXPORT Proc_Build_Boolean_Keys(string filedate, boolean isFast) := FUNCTION
 	
 	kwd  := Text_Search.KeywordingFunc(info);
 	bld := Text_Search.Build_From_Inversion(info, posting, kwd, FALSE, FALSE, TRUE, segList,externalKeys);
-
+/* DF-28307 - key deprecated
 	inlkeyname := '~thor_data400::key::'+superKeyPrefix+'::assessment::'+filedate+'::doc.fares_id';
 	inskeyname := '~thor_data400::key::'+superKeyPrefix+'::assessment::qa::doc.fares_id';
 	
@@ -88,11 +88,11 @@ EXPORT Proc_Build_Boolean_Keys(string filedate, boolean isFast) := FUNCTION
 												inlkeyname,
 												build_key
 												);
-												
+*/
 	retval := sequential(
-									bld,
-									build_key,
-									Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname)
+									bld//,
+									//build_key,
+									//Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname)
 									);
 	return retval;
 	
