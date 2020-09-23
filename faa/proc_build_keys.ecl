@@ -44,7 +44,7 @@ export proc_build_keys(string version_date) := function
 			output('BASE = BUILT, Nothing done for aircraft.'),
 			sequential(pre2,
 				proc_build_keys_bdid(version_date).b_key,
-				proc_build_keys_bdid(version_date).b1_key,
+				//proc_build_keys_bdid(version_date).b1_key, //Deprecated key
 				proc_build_keys_bdid(version_date).b2_key,
 				proc_build_keys_bdid(version_date).b3_key,
 				proc_build_keys_bdid(version_date).b4_key,
@@ -55,7 +55,7 @@ export proc_build_keys(string version_date) := function
 				proc_build_keys_bdid(version_date).b4,
 				proc_build_keys_bdid(version_date).d,
 				// FCRA 
-				proc_build_keys_bdid(version_date).b1,
+				//proc_build_keys_bdid(version_date).b1,
 				proc_build_keys_bdid(version_date).FCRA_did_key,
 				proc_build_keys_bdid(version_date).FCRA_reg_nm_key,
 				proc_build_keys_bdid(version_date).fcra_b4_key, 

@@ -1,14 +1,14 @@
 import FraudShared, STD, data_services, ut,tools; 
 EXPORT Build_Base_Main  (
 	 string pversion
-	,dataset(FraudShared.Layouts.Base.Main) pBaseMainFile = IF($._Flags.FileExists.Base.MainOrigQA, $.Files().Base.Main_Orig.QA, DATASET([], FraudShared.Layouts.Base.Main))
-	,dataset($.Layouts.Input.IdentityData) inIdentityData = $.Files().Input.IdentityData.Sprayed
-	,dataset($.Layouts.Input.KnownFraud) inKnownFraud = $.Files().Input.KnownFraud.Sprayed
-	,dataset($.Layouts.Input.Deltabase) inDeltabase = $.Files().Input.Deltabase.Sprayed
+	,dataset(FraudShared.Layouts.Base.Main) pBaseMainFile = IF(fraudgovplatform._Flags.FileExists.Base.MainOrigQA, fraudgovplatform.Files().Base.Main_Orig.QA, DATASET([], FraudShared.Layouts.Base.Main))
+	,dataset(fraudgovplatform.Layouts.Input.IdentityData) inIdentityData = fraudgovplatform.Files().Input.IdentityData.Sprayed
+	,dataset(fraudgovplatform.Layouts.Input.KnownFraud) inKnownFraud = fraudgovplatform.Files().Input.KnownFraud.Sprayed
+	,dataset(fraudgovplatform.Layouts.Input.Deltabase) inDeltabase = fraudgovplatform.Files().Input.Deltabase.Sprayed
 ) :=
 module  
- 
-    dedup_IdentityData := $.fn_dedup_identitydata(inIdentityData); // remove duplicate records with different transaction_id
+	
+    dedup_IdentityData := fraudgovplatform.fn_dedup_identitydata(inIdentityData); // remove duplicate records with different transaction_id
 
 	Export IdentityData := project (dedup_IdentityData , transform(FraudShared.Layouts.Base.Main , 
 		self.ln_report_date := left.Date_of_Transaction;
@@ -29,7 +29,7 @@ module
 		self:= [];
 	)); 
 
-	dedup_KnownFraud := $.fn_dedup_KnownFraud(inKnownFraud); // remove duplicate records with different customer_event_id
+	dedup_KnownFraud := fraudgovplatform.fn_dedup_KnownFraud(inKnownFraud); // remove duplicate records with different customer_event_id
  
 	Export KnownFraud := project (dedup_KnownFraud , transform(FraudShared.Layouts.Base.Main , 
 		self.ln_report_date := left.reported_date;
@@ -50,7 +50,7 @@ module
 	)); 
 
 
-	dedup_deltabase := $.fn_dedup_delta(inDeltabase); // remove records submitted by same user/date
+	dedup_deltabase := fraudgovplatform.fn_dedup_delta(inDeltabase); // remove records submitted by same user/date
 
 	Export Deltabase := project (dedup_deltabase, transform(FraudShared.Layouts.Base.Main , 
 		v_datetime := STD.Str.FindReplace( STD.Str.FindReplace( left.reported_date,':',''),'-','');
@@ -83,34 +83,34 @@ module
 	)); 
 
 	// Apply MBS classification and Sharing Rules
-	CombinedClassification := $.Functions.Classification(IdentityData + KnownFraud + Deltabase):independent;
+	CombinedClassification := fraudgovplatform.Functions.Classification(IdentityData + KnownFraud + Deltabase):independent;
 
 	// Append RID
-	EXPORT NewBaseRID := $.Append_RID (CombinedClassification,pBaseMainFile):independent;
+	SHARED NewBaseRID := fraudgovplatform.Append_RID (CombinedClassification,pBaseMainFile):independent;
 
-	// Append Values from Previous Build
-	EXPORT NewBasePreviousValues := $.Append_PreviousValues(NewBaseRID,pBaseMainFile):independent;
+	SHARED NewFile := distribute(pull(NewBaseRID),hash32(record_id));
+	SHARED OldFile := distribute(pull(pBaseMainFile),hash32(record_id));
 
-	// Append Clean Phones
-	NewBaseCleanPhones := $.Standardize_Entity.Clean_Phone (NewBasePreviousValues):independent;
+	SHARED NewRecords := JOIN(NewFile, OldFile,left.record_id = right.record_id, LEFT ONLY, LOCAL);
+	SHARED OldRecords := JOIN(NewFile, OldFile,left.record_id = right.record_id, INNER, LOCAL); 
 
-	// Append Clean Address
-	EXPORT NewBaseCleanAddress := $.Append_CleanAddress(NewBaseCleanPhones):independent;
+	// Appends
+	AppendCleanName := fraudgovplatform.Append_CleanName(NewRecords):independent;
+	AppendCleanFields := fraudgovplatform.Standardize_Entity.Clean_InputFields (AppendCleanName):independent;
+	AppendCleanPhones := fraudgovplatform.Standardize_Entity.Clean_Phone (AppendCleanFields):independent;
+	AppendCleanAddress := fraudgovplatform.Append_CleanAddress(AppendCleanPhones):independent;
+	AppendCleanAdditionalAddress := fraudgovplatform.Append_CleanAdditionalAddress(AppendCleanAddress):independent;
+	AppendLexid := fraudgovplatform.Append_Lexid (AppendCleanAdditionalAddress):independent;
+	AppendSourceLabel := fraudgovplatform.Append_RinSource(AppendLexid):independent;
+	Appends := AppendSourceLabel;
 
-	// Append Clean Additional Address
-	EXPORT Append_CleanAdditionalAddress := $.Append_CleanAdditionalAddress(NewBaseCleanAddress):independent;
-	
-	// Append Lexid
-	EXPORT NewBaseLexid := $.Append_Lexid (Append_CleanAdditionalAddress):independent;
+	SHARED NewBaseWithAppends := OldRecords + Appends;
 
-	// Append RinID
-	EXPORT NewBaseRinID := $.Append_RinID (NewBaseLexid):independent;
-	
-	//Label RIN Source
-	EXPORT AppendRinSourceLabel := $.Append_RinSource(NewBaseRinID):independent;
+	// Append RinID	to Whole
+	SHARED NewBaseRinID := fraudgovplatform.Append_RinID ( NewBaseWithAppends, pBaseMainFile ):independent;
 
 	// Rollup Main Base 
-	pDataset_sort := sort(AppendRinSourceLabel , record, -dt_last_seen,-process_date);
+	pDataset_sort := sort(NewBaseRinID , record, -dt_last_seen,-process_date);
 			
 	pDataset_sort RollupBase(pDataset_sort l, pDataset_sort r) := 
 	transform
@@ -141,12 +141,12 @@ module
 			self := left), left outer , lookup ); 
 																							 
 	
-	tools.mac_WriteFile($.Filenames(pversion).Base.Main_Orig.New,Combined,Build_Base_File);
+	tools.mac_WriteFile(fraudgovplatform.Filenames(pversion).Base.Main_Orig.New,Combined,Build_Base_File);
 
 	export full_build :=
 		 sequential(
 			 Build_Base_File
-			,$.Promote(pversion).buildfiles.New2Built
+			,fraudgovplatform.Promote(pversion).buildfiles.New2Built
 
 		);
 		
