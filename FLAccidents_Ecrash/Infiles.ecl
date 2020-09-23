@@ -34,8 +34,7 @@ export agency0 := dedup(CleanAgency, all);
 
 shared agencyInput := project(agency0, transform(Layout_Infiles_Fixed.agency, 
                             self.agency_id := IF(trim(Left.agency_id,left,right) <>'', Left.agency_id,ERROR('agency file bad')),
-														agency_name := IF(trim(Left.agency_name,left,right) <>'', Left.agency_name,ERROR('agency file bad'));
-														self.agency_name := agency_name;
+														self.agency_name := left.agency_name;
 														self.source_id := left.source_id;
 														self.agency_state_abbr := left.agency_state_abbr;
 														self.agency_ori := left.agency_ori;

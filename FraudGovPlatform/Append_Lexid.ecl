@@ -1,11 +1,39 @@
 ﻿EXPORT Append_Lexid( pBaseFile ) := 
 FUNCTIONMACRO
-		import DID_Add;
+		import DID_Add,_Validate, Std;
 		FirstRinID := FraudGovPlatform.Constants().FirstRinID;
-		
+
 		dFileBase 		:= distribute	(pull(pBaseFile),record_id	);
-		without_did 	:= dFileBase(DID=0);
-		with_did			:= dFileBase(DID>0);
+		
+		with_pii := dFileBase
+		(   
+			(cleaned_name.fname !='' and cleaned_name.lname !='' and 
+				(length(STD.Str.CleanSpaces(clean_ssn))=9 and regexfind('^[0-9]*$',STD.Str.CleanSpaces(clean_ssn)) =true ))
+			or
+			(cleaned_name.fname !='' and cleaned_name.lname !='' and  
+				_Validate.Date.fIsValid(clean_dob) and (unsigned)clean_dob <= (unsigned)(STRING8)Std.Date.Today() and	clean_dob != '' and clean_dob != '00000000' and 
+				( clean_phones.phone_number <> '' or clean_phones.cell_phone <> '' ) ) 
+			or
+			(
+				(cleaned_name.fname !='' and cleaned_name.lname !='' and
+					clean_address.prim_range != '' and clean_address.prim_name != '') and 
+					(
+						(clean_address.v_city_name != '' and clean_address.st != '')
+						or
+						(clean_address.zip != '')
+					)
+			)
+		);
+
+		without_pii 
+		:= join(
+				dFileBase,
+				with_pii,
+				left.record_id = right.record_id,
+				only left,
+				local
+		);
+
 		//////////////////////////////////////////////////////////////////////////////////////
 		// -- Slim record for Diding
 		//////////////////////////////////////////////////////////////////////////////////////
@@ -21,17 +49,17 @@ FUNCTIONMACRO
 			SELF.zip5		 			:= l.clean_address.zip;
 			SELF.state				:= l.clean_address.st;
 			SELF.phone				:= choose(cnt,l.clean_phones.phone_number,l.clean_phones.cell_phone);
-			SELF.ssn					:= l.ssn;
-			SELF.dob					:= l.dob;
+			SELF.ssn					:= l.clean_ssn;
+			SELF.dob					:= l.clean_dob;
 			SELF.did					:= 0;
 			SELF.did_score		:= 0;
 			SELF		 	    		:= l;
 		END;
 			
-		dSlimForDiding	:= normalize(without_did
-																,if(left.clean_phones.phone_number <>'' and left.clean_phones.cell_phone <> '',2,1)
-																,tSlimForDiding(left,counter)
-																);
+		dSlimForDiding	:= normalize(with_pii
+			,if(left.clean_phones.phone_number <>'' and left.clean_phones.cell_phone <> '',2,1)
+			,tSlimForDiding(left,counter)
+		);
 																
 		// Match to Headers by Contact Name and Address and phone
 		Did_Matchset := ['D','S','P','A'];
@@ -64,7 +92,7 @@ FUNCTIONMACRO
 		dDidOut_sort			:= sort				(dDidOut_dist,record_id, -did_score	,local);
 		dDidOut_dedup			:= dedup			(dDidOut_sort,record_id ,local);
 		
-		dAssignDids := join( without_did
+		dAssignDids := join( with_pii
 												,dDidOut_dedup
 												,left.record_id = RIGHT.record_id
 												,Transform(recordof(left)
@@ -75,6 +103,6 @@ FUNCTIONMACRO
 												,local
 											 );
 											 
-		RETURN with_did + dAssignDids;
+		RETURN without_pii + dAssignDids;
 	
 ENDMACRO;

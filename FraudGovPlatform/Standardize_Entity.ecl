@@ -5,7 +5,9 @@ EXPORT Clean_Name(pInputFile) :=
 FUNCTIONMACRO
 	import address, ut;
 	pInputFile tr(pInputFile l) := TRANSFORM
-			full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
+			full_name := if(ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name)='', 
+				l.raw_full_name, 
+				ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name) );
 			cleanperson73 := Address.cleanperson73(full_name);
 			clean_full_name := ut.CleanSpacesAndUpper(cleanperson73[6..25] + ' ' + cleanperson73[26..45] + ' ' + cleanperson73[46..65]);
 			SELF.cleaned_name.fname				:= if( clean_full_name !='', ut.CleanSpacesAndUpper(cleanperson73[6..25])	, l.raw_first_name);
