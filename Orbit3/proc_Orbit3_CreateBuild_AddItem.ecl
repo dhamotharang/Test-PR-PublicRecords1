@@ -26,11 +26,11 @@ spcluster := map  ( regexfind('_eclcc',tgtcluster)  and _Control.ThisEnvironment
 
 fswu :=   _control.fSubmitNewWorkunit(ECL1 ,trim(spcluster)) :   SUCCESS(fileservices.sendemail(Send_Email(Buildvs,email_list).emaillist
 																			                                                                                                     ,'Orbit3 submit WU to spawn status'+ workunit
-																			                                                                                                      ,'Orbit3 submit WU to spawn success -- '+ workunit
+																			                                                                                                      ,'Orbit3 submit WU to spawn success -- '+ workunit + 'Build Name :' +buildname + 'Build vs :'+Buildvs
 																			                                                                                                       )),
 		                                                                                                                                                                                      FAILURE(fileservices.sendemail(Send_Email(Buildvs,email_list).emaillist
 																			                                                                                                     ,'Orbit3 submit WU to spawn status'+ workunit
-																			                                                                                                      ,'Orbit3 submit WU to spawn failed -- '+ workunit
+																			                                                                                                      ,'Orbit3 submit WU to spawn failed -- '+ workunit + 'Build Name :' +buildname + 'Build vs :'+Buildvs
 																			                                                                                                       ));
 																																																																						 
 																																																											
