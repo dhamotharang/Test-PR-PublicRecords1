@@ -4,6 +4,7 @@
 
 in_file := VotersV2.Cleaned_Voters_Names;
 
+//DF-27577 Using vendor names for cleaned name fields
 // ut.mac_flipnames(in_file,fname,mname,lname, base_FlipNames)
 
 dist_In_Base_File := distribute(in_file, hash64(source_state, lname, name_suffix, fname, mname, 
@@ -11,13 +12,17 @@ dist_In_Base_File := distribute(in_file, hash64(source_state, lname, name_suffix
 																unit_desig, sec_range, p_city_name, st, zip));
 																
 // sorting and deduping the records 																
-ded_In_base_file  := dedup(sort(dist_In_Base_File, vtid, -process_date,
+sort_In_base_file  := sort(dist_In_Base_File, vtid, -process_date,
                                 lname, name_suffix, fname, mname, dob, 
 																prim_range, prim_name, predir, addr_suffix, postdir, unit_desig, sec_range,
 																p_city_name, st, zip, political_party, phone, work_phone, clean_maiden_pri,
                                 mail_prim_range, mail_prim_name, mail_predir, mail_addr_suffix, mail_postdir,
 													  		mail_unit_desig, mail_sec_range, mail_p_city_name, mail_st,	mail_ace_zip, 
-																local), 
+																local)
+													 //uncomment for testing
+													 // :persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID_Sorted', SINGLE)
+													 ; 																
+ded_In_base_file  := dedup(sort_In_base_file,
 													 vtid, 
 													 lname, name_suffix, fname, mname, dob, prim_range, prim_name, predir, addr_suffix, postdir,
 													 unit_desig, sec_range, p_city_name, st, zip, political_party, phone, work_phone, clean_maiden_pri,
@@ -25,7 +30,7 @@ ded_In_base_file  := dedup(sort(dist_In_Base_File, vtid, -process_date,
 													 mail_sec_range, mail_p_city_name, mail_st, mail_ace_zip, 
 													 local)
 													 //uncomment for testing
-													 // :persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID_Sorted_Deduped', SINGLE)
+													 // :persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID_Deduped', SINGLE)
 													 ;
 
 //#stored('did_add_force','roxi'); // remove or set to 'thor' to put recs through thor
@@ -68,5 +73,5 @@ did_add.MAC_Add_SSN_By_DID(Ds_Voters_WithDID, did, ssn, Out_Voters_WithDidSsn)
 
 export Cleaned_Voters_DID := Out_Voters_WithDidSsn 
 //uncomment for testing purposes
-: persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID', SINGLE)
+// : persist(VotersV2.Cluster + 'Persist::Cleaned_Voters_DID', SINGLE)
 ;
