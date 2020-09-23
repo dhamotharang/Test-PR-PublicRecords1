@@ -4,13 +4,13 @@
 //rvp1003_0 8/15 deprecated depmsey
 
 
-file1:= dataset(route + scoring_project_pip.Output_Sample_Names.RV_Scores_V3_XML_Generic_outfile + previous_dt, Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_Generic_allflagships_V3_Global_Layout,
+file1:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.RV_Scores_V3_XML_Generic_outfile + previous_dt, Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_Generic_allflagships_V3_Global_Layout,
 
-thor);
-file2:= dataset(route + scoring_project_pip.Output_Sample_Names.RV_Scores_V3_XML_Generic_outfile + current_dt, Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_Generic_allflagships_V3_Global_Layout,
+thor),(integer)acctno);
+file2:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.RV_Scores_V3_XML_Generic_outfile + current_dt, Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_Generic_allflagships_V3_Global_Layout,
 
 
-thor);
+thor),(integer)acctno);
  
  
 aa1:=join(file1,file2,left.acctno=right.acctno,inner);

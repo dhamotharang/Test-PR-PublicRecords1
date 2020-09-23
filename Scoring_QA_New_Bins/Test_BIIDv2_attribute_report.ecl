@@ -1,8 +1,8 @@
 ﻿EXPORT Test_BIIDv2_attribute_report(route,current_dt,previous_dt) := functionmacro
 
- file1_2:= dataset(route + scoring_project_pip.Output_Sample_Names.BIIDv2_Scores_XML_Generic_outfile + previous_dt,Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_BusinessInstantIdv2_Layout, thor);
+ file1_2:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.BIIDv2_Scores_XML_Generic_outfile + previous_dt,Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_BusinessInstantIdv2_Layout, thor),(integer)acctno);
 
- file2_2:= dataset(route + scoring_project_pip.Output_Sample_Names.BIIDv2_Scores_XML_Generic_outfile + current_dt, Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_BusinessInstantIdv2_Layout, thor);
+ file2_2:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.BIIDv2_Scores_XML_Generic_outfile + current_dt, Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_BusinessInstantIdv2_Layout, thor),(integer)acctno);
 
 file1 := file1_2(errorcode='');
 file2 := file2_2(errorcode='');
