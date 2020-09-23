@@ -55,7 +55,7 @@ END;
 
 LNJRow := PROJECT(UNGROUP(clam), LNJAppendUID(LEFT,COUNTER));
 
-StatusRefreshModule := RiskView.InitiateStatusRefresh(LNJRow, gateways, 5, 0, true, StatusRefreshWaitPeriod, InvokeStatusRefresh);
+StatusRefreshModule := RiskView.InitiateStatusRefresh(LNJRow, gateways, 5, 0, true, StatusRefreshWaitPeriod, InvokeStatusRefresh, ExcludeStatusRefresh);
 StatusRefreshResults := StatusRefreshModule.StatusRefresh;
 StatusRefreshRecommendGWError := StatusRefreshModule.RefreshRecommendedGatewayError;
 StatusRefreshGWError := StatusRefreshModule.RefreshGatewayError;
@@ -86,18 +86,18 @@ SELF := LEFT;))));
 riskview_final_results_with_deferred := IF(COUNT(StatusRefreshResults) > 0,
                                                                     PROJECT(riskview5_final_results, 
                                                                     TRANSFORM(RECORDOF(LEFT), 
-                                                                    SELF.Status_Code := Riskview.Constants.Deferred_request_code; 
-                                                                    SELF.Message := Riskview.Constants.Deferred_request_desc;
-                                                                    SELF.TransactionID := StatusRefreshResults[1].response._Header.TransactionID;
+                                                                    SELF.Status_Code := IF(ExcludeStatusRefresh, '', Riskview.Constants.Deferred_request_code); 
+                                                                    SELF.Message :=  IF(ExcludeStatusRefresh, '', Riskview.Constants.Deferred_request_desc);
+                                                                    SELF.TransactionID :=  IF(ExcludeStatusRefresh, '', StatusRefreshResults[1].response._Header.TransactionID);
                                                                     SELF := LEFT;)),
                                                                     riskview5_final_results);
                                                                     
 riskview5_suppressed_with_deferred := IF(COUNT(StatusRefreshResults) > 0,
                                                                     PROJECT(riskview5_suppressed, 
                                                                     TRANSFORM(RECORDOF(LEFT), 
-                                                                    SELF.Status_Code := Riskview.Constants.Deferred_request_code;
-                                                                    SELF.Message := Riskview.Constants.Deferred_request_desc;
-                                                                    SELF.TransactionID := StatusRefreshResults[1].response._Header.TransactionID;
+                                                                    SELF.Status_Code :=  IF(ExcludeStatusRefresh, '', Riskview.Constants.Deferred_request_code);
+                                                                    SELF.Message :=  IF(ExcludeStatusRefresh, '', Riskview.Constants.Deferred_request_desc);
+                                                                    SELF.TransactionID :=  IF(ExcludeStatusRefresh, '', StatusRefreshResults[1].response._Header.TransactionID);
                                                                     SELF := LEFT;)),
                                                                     riskview5_suppressed);
                                                                     
