@@ -6,7 +6,8 @@ string wuid := workunit;
 
 
 
-ECL1 := '#workunit(\'name\',\'Orbit Create Build Instance and Add Items -- '+ buildname + '-- '+Buildvs+'\');\r\n'+
+ECL1 := 'import Orbit4;\r\n'+
+ '#workunit(\'name\',\'Orbit Create Build Instance and Add Items -- '+ buildname + '-- '+Buildvs+'\');\r\n'+
 'Orbit4.proc_Orbit4_CreateBuild_AddItem_sp( \''+buildname+'\', \''+Buildvs+'\', \''+Envmt+'\', \''+BuildStatus+'\', \''+email_list+'\', '+if (skipcreatebuild , 'true','false')+ ','
 + if (skipupdatebuild , 'true','false')+','
 + if (skipaddcomponents , 'true','false')+','
