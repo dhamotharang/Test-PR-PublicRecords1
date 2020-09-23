@@ -46,19 +46,20 @@ export AddRecords(FullData,NewData,recref,MatchFields,DistSet='',isDist=false,is
     #APPEND(CommandString,'dAddRecords:=join(dFullData,dNewData,');
 	#append(CommandString,%'MatchString'%);
 	#APPEND(CommandString,',transform(right)');
-	#if(isLookup=false)
-	#APPEND(CommandString,',right only');
-	#end
-	#if(isdist=false or islookup)
-    #append(CommandString,');\n');
-    #else
-    #append(CommandString,',local);\n');
+	#if(isLookup=false and isdist=false)
+	#APPEND(CommandString,',right only);\n');
+	
+	#elseif(islookup)
+	#append(CommandString,',lookup);\n');
+	
+	#else
+    #append(CommandString,',right only,local);\n');
     #end
     //#append(CommandString,'');
 	#if(islookup)
 	#APPEND(CommandString,'dAddRecordsFinal:=join(dAddRecords,dNewData,');
 	#append(CommandString,%'MatchString'%);
-	#APPEND(CommandString,',transform(right),right only);\n');
+	#APPEND(CommandString,',transform(right),right only,lookup);\n');
 	#else
 	#APPEND(CommandString,'dAddRecordsFinal:=dAddRecords;\n');
 	#end
@@ -73,10 +74,10 @@ export AddRecords(FullData,NewData,recref,MatchFields,DistSet='',isDist=false,is
 
     #append(CommandString,'FinalAdds:=iterate(dAddRecordsFinal,tCreateAdds(left,right));\n');
 
-    //%CommandString%;
+    %CommandString%;
 
-    //return FinalAdds;
-	return %'CommandString'%;
+    return FinalAdds;
+	//return %'CommandString'%;
 
 
 endmacro;

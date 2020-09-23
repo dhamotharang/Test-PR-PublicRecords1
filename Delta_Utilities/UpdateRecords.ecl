@@ -1,4 +1,4 @@
-export DeleteRecords(FullData,NewData,recref,MatchFields,DistSet='',process_date,isDist=false,isLookup=false):=functionmacro
+export UpdateRecords(FullData,NewData,recref,MatchFields,DistSet='',process_date,isDist=false,isLookup=false):=functionmacro
 #Declare(CommandString);
 	#declare(CommaString);
 	#declare(MatchString);
@@ -42,33 +42,37 @@ export DeleteRecords(FullData,NewData,recref,MatchFields,DistSet='',process_date
 
     RecordLayout:=#expand(recref);
 
-    #APPEND(CommandString,'dDeleteRecords:=join(dFullData,dNewData,');
-	#append(CommandString,%'MatchString'%);
-	#APPEND(CommandString,',transform(left)');
-	#if(isLookup=false and isdist=false)
-	#APPEND(CommandString,',left only);\n');
-	
-	#elseif(islookup)
-	#append(CommandString,',left only,lookup);\n');
-	
-	#else
-    #append(CommandString,',left only,local);\n');
-    #end
-    //#append(CommandString,'');
-	
-    effectivedate:=process_date;
-	#append(CommandString,'RecordLayout tCreateDeletes(RecordLayout L):=TRANSFORM\n');
-    #append(CommandString,'self.dt_effective_last:=(UNSIGNED4)effectivedate;\n');
-    #append(CommandString,'self.dt_effective_first:=(UNSIGNED4)effectivedate;\n');
-	#append(CommandString,'self.delta_ind:=1;\n');
-    #append(CommandString,'self:=L;\n');
+    #append(CommandString,'RecordLayout tCreateUpdates(RecordLayout L, RecordLayout R):=TRANSFORM\n');
+    #append(CommandString,'self.record_sid:=L.record_sid\n');
+    #append(CommandString,'self:=R;\n');
     #append(CommandString,'end;\n');
 
-    #append(CommandString,'FinalDeletes:=project(dDeleteRecords,tCreateDeletes(left));\n');
+    #APPEND(CommandString,'dUpdateRecords:=join(dFullData,dNewData,');
+	#append(CommandString,%'MatchString'%);
+	#APPEND(CommandString,',tCreateUpdates(left,right)');
+	#if(isLookup=false and isdist=false)
+	#append(CommandString,');\n');
+	#end
+	#if(islookup)
+    #append(CommandString,'lookup);\n');
+    #else
+    #append(CommandString,',local);\n');
+    #end
+    //#append(CommandString,'');
+	#if(islookup)
+	#APPEND(CommandString,'dUpdateRecordsFinal:=join(dDeleteRecords,dNewData,');
+	#append(CommandString,%'MatchString'%);
+	#APPEND(CommandString,',transform(left),left only);\n');
+	#else
+	#APPEND(CommandString,'dDeleteRecordsFinal:=dDeleteRecords;\n');
+	#end
+	
 
-    //%CommandString%;
+    #append(CommandString,'FinalDeletes:=project(dDeleteRecordsFinal,tCreateDeletes(left));\n');
 
-    //return FinalDeletes;
-	return %'CommandString'%;
+    %CommandString%;
+
+    return FinalDeletes;
+	//return %'CommandString'%;
 
 endmacro;
