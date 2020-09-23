@@ -2,16 +2,16 @@
 
 import ut,STD, Scoring_Project_Macros, Scoring_Project_DailyTracking;
 
-  // dt := ut.getdate;
- dt := '20200821';
+  dt := ut.getdate;
+ // dt := '20150428';
 decimal19_2 thresh := 1.25;
 fn_LastTwoMonths(string10 date_inp,integer offset) := function
 res  := GLOBAL(ut.DateFrom_DaysSince1900(ut.DaysSince1900(date_inp[1..4], date_inp[5..6], date_inp[7..8]) - offset));
 return res[1..8];
 end;
 
-// b:=fn_LastTwoMonths(dt,1);
-b:='20200820';
+b:=fn_LastTwoMonths(dt,1);
+// b:='20180403';
 
 
 
@@ -119,9 +119,9 @@ END;
 		XtabOut := ITERATE(output_full, Xform(LEFT, RIGHT));
   	// OUTPUT(XtabOut, NAMED('XtabOut'));
 
-		// final := FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.general_list_all, 'Runway Scores Tracking Report. MaxDiff: ' + max_diff, XtabOut[COUNT(XtabOut)].line):
-									// FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.fail_list,'Runway Macro Scores Tracking Report CRON job failed','The failed workunit is:' + WORKUNIT + FAILMESSAGE));
-final := FileServices.SendEmail('crayton.hudspeth@lexisnexisrisk.com', 'Runway Scores Tracking Report. MaxDiff: ' + max_diff, XtabOut[COUNT(XtabOut)].line);
+		final := FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.general_list_all, 'Runway Scores Tracking Report. MaxDiff: ' + max_diff, XtabOut[COUNT(XtabOut)].line):
+									FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.fail_list,'Runway Macro Scores Tracking Report CRON job failed','The failed workunit is:' + WORKUNIT + FAILMESSAGE));
+
 
 return final;
 
