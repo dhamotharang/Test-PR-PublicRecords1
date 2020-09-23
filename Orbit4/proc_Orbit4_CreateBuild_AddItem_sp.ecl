@@ -28,22 +28,17 @@ export proc_Orbit4_CreateBuild_AddItem_sp(string buildname,
 									
 	
 									
-
-
-	//Verify if build is platform depenedent
-
-									
 	Update_build :=  Orbit4.UpdateBuildInstance(buildname,
 									            Buildvs,
 									            tokenval,
 									            BuildStatus					                                  
-									            ).retcode;
+									            ).retcode : independent;
 	                        
 									
 		get_build_candidates := 	Orbit4.GetBuildCandidates(buildname,
 									Buildvs,
 									tokenval,
-									get_buildinst.BuildId) ; //( Name = 'OFAC*' and version = Buildvs[5..6]+'-'+Buildvs[7..8]+'-'+Buildvs[1..4]);
+									get_buildinst.BuildId): independent ; //( Name = 'OFAC*' and version = Buildvs[5..6]+'-'+Buildvs[7..8]+'-'+Buildvs[1..4]);
 									
 		 
 		 get_build_candidates_ofac :=  get_build_candidates (  Name = 'OFAC*' and version = Buildvs[5..6]+'-'+Buildvs[7..8]+'-'+Buildvs[1..4] );
@@ -140,24 +135,24 @@ export proc_Orbit4_CreateBuild_AddItem_sp(string buildname,
 															),
 														
 													if ( skipupdatebuild ,
-																				Sequential(sendemail('UPDATE','SKIP'),
+																				sendemail('UPDATE','SKIP'),
 												
-													                     if ( get_buildinst.Status =  'Success' and get_buildinst.BuildInstanceStatus = 'BUILD_IN_PROGRESS', 
-																				                                                                                    if ( Update_build.Status = 'Success', 
-													                                                                                                                     sendemail('UPDATE','SUCCESS'),
-																					                                                                                     sendemail('UPDATE','FAIL')
-																																										)
-																		    ) 
+													                     
+																				if ( Update_build.Status = 'Success', 
+													                                                                sendemail('UPDATE','SUCCESS'),
+																					                                sendemail('UPDATE','FAIL')
+																					)
+														),
 																																										
 															
-														),
+														
 													 if ( skipaddcomponents,	
 										                        Sequential( Output('Skipping_Add_Components'),output(choosen(get_new_build_candidates,all) , named('List_of_Build_Items_to_add_'+buildname),EXTEND),sendemail('SKIP_ADD_ITEMS','SUCCESS')),
 														     
 										                                   run_additem
 																																
 															)
-						                 ))),
+						                 )),
 											 
 													       
 							Output('Run_Create_build_is_false')
