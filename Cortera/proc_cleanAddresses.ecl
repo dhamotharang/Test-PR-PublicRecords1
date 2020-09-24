@@ -1,4 +1,4 @@
-import aid, address, Std;
+﻿import aid, address, Std;
 
 rAddress := RECORD
 		string70			prepped_addr1;
@@ -10,16 +10,20 @@ IsSpecified(string addr) := IF(addr='(UNSPECIFIED)', '', addr);
 
 EXPORT proc_cleanAddresses(dataset(Cortera.Layout_Header_Out) basein) := FUNCTION
 
-	ds := PROJECT(basein(country='US'), TRANSFORM(rAddress,
-							self.prepped_addr1 := std.Str.CleanSpaces(IsSpecified(Std.Str.ToUpperCase(left.ADDRESS)) + ' ' + Std.Str.ToUpperCase(left.ADDRESS2));
-							self.prepped_addr2 := std.Str.CleanSpaces(STD.Str.CleanSpaces(
-														trim(Std.Str.ToUpperCase(left.city)) + if(left.city <> '',',','')
-															+ ' '+ Std.Str.ToUpperCase(left.State)
-															+ ' '+ left.POSTALCODE[1..5]));		// note: do not pass zip4 to AID
-							self := left;
-							));
+	basein_us_addr_recs 		:= basein(country='US');
+	basein_non_us_addr_recs := basein(country<>'US');
+	
+	ds := PROJECT(basein_us_addr_recs, TRANSFORM(rAddress,
+																								self.prepped_addr1 := std.Str.CleanSpaces(IsSpecified(Std.Str.ToUpperCase(left.ADDRESS)) + ' ' + Std.Str.ToUpperCase(left.ADDRESS2));
+																								self.prepped_addr2 := std.Str.CleanSpaces(STD.Str.CleanSpaces(
+																																			trim(Std.Str.ToUpperCase(left.city)) + if(left.city <> '',',','')
+																																				+ ' '+ Std.Str.ToUpperCase(left.State)
+																																				+ ' '+ left.POSTALCODE[1..5]));		// note: do not pass zip4 to AID
+																								self 							 := left;
+																							 )
+							 );
 
-	ok := ds(prepped_addr1<>'',prepped_addr2<>'');
+	ok := ds(prepped_addr2<>'');
 	aid.common.xflags laidappendflags := aid.common.eReturnValues.rawaid | aid.common.eReturnValues.ACECacheRecords;
 	aid.MacAppendFromRaw_2Line(ok, prepped_addr1, prepped_addr2, rawaid , precln, laidappendflags);
 
@@ -56,7 +60,7 @@ EXPORT proc_cleanAddresses(dataset(Cortera.Layout_Header_Out) basein) := FUNCTIO
 								self := left;
 				));	
 	
-		result := clean + PROJECT(ds(prepped_addr1='' OR prepped_addr2 = ''),Cortera.Layout_Header_Out) + basein(country<>'US'); 
+		result := clean + PROJECT(ds(prepped_addr2 = ''),Cortera.Layout_Header_Out) + basein_non_us_addr_recs; 
 
 
 	return result;

@@ -44,7 +44,7 @@ srcCSVquote					:=	'"';
 #uniquename(basefile)
 #uniquename(baseout)
 
-#workunit('name','Yogurt:banko Spray ' + filedate);
+//#workunit('name','Yogurt:banko Spray ' + filedate);
 
 %sprayIP% := map(sourceIP = 'bctlpedata10' => _control.IPAddress.bctlpedata10,
 								 sourceIP);
@@ -67,8 +67,8 @@ srcCSVquote					:=	'"';
 				FileServices.ClearSuperFile('~thor_data400::in::bankoadditionalevents_delete',true));*/
 
 sequential(%spray_banko%,%super_banko%/*,notify('BK EVENT SPRAY COMPLETE','*')*/)
- : success(FileServices.sendemail(if(email_target<>' ',email_target,'Christopher.Brodeur@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com'),'banko Spray Succeeded','banko Spray Succeeded')),
-   failure(FileServices.sendemail(if(email_target<>' ',email_target,'Christopher.Brodeur@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com'),'banko Spray Failure','banko Spray Failure'))
+ : success(FileServices.sendemail(if(email_target<>' ',email_target,'Christopher.Brodeur@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com'),'banko Spray Succeeded','banko Spray Succeeded')),
+   failure(FileServices.sendemail(if(email_target<>' ',email_target,'Christopher.Brodeur@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com'),'banko Spray Failure','banko Spray Failure'))
  ;
 
 endmacro;

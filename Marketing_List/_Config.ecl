@@ -62,4 +62,7 @@ module(
   export set_valid_lexid_segs := ['CORE'  ,'C_MERGE' ,'NO_SSN' ,'AMBIG'];
   
   export business_terms_regex := '\\b(EXT|INC|FAX|CELL|FX|LLC|COMPANY|BUSINESS|BUSINESSES|EXTENSION|NEW|USE|CARRYOUT|TRUSTEE|BOTH|TAX)\\b';
+
+  export Add_Extra_Source_Fields := false;                    // -- add the extra source fields for sic,naics,employees,contact name. also executive ind & age for contacts.
+  
 end;

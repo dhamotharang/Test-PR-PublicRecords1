@@ -49,7 +49,9 @@ EXPORT Input := RECORD
 		STRING20  customer_id;
 		STRING20  company_id;
 		STRING20  global_company_id;
-		STRING   phone_nbr;
+		STRING    phone_nbr;
+		STRING    report_options:='';
+    string    filename{VIRTUAL(logicalfilename)};
 	
 END; 
 
@@ -95,7 +97,7 @@ END;
 // Base layout 
 EXPORT Base    := record
 
-		Input;
+		Input - filename;
 
 		STANDARD.NAME;				
   	STANDARD.ADDR;
@@ -110,5 +112,34 @@ EXPORT Base    := record
 		unsigned4 filedate  		:= 0;
 		
 end;
+
+export ppc_mapping := record
+	string FCRA_Product;
+	string Legacy_FCRA_Purpose_Code;
+	string Sunset;
+	string FCRA_Permissible_Purpose_Current_Name;
+	string Logging_Type;
+	string New_Code;
+	string FCRA_Permissible_Purpose_New_Name;
+	string Disclosure_Period;
+	boolean isAny:=false;
+	boolean isEquifax:=false;
+	boolean isGov:=false;
+	boolean isCollection:=false;
+	boolean isRiskview:=false;
+end;
+
+export Input_PPC_Xlated :=record
+		Input_Formatted;
+		string  newppc      		:= 'No xlated PPC Found';
+		boolean isNewCode				:= false;
+		boolean isAny    				:= false;
+		boolean isEquifax				:= false;
+		boolean isGov    				:= false;
+		boolean isCollection		:= false;
+		boolean isRiskview			:= false;
+end;
+
+
 
 end;

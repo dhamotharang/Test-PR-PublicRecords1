@@ -16,20 +16,23 @@ Function
   lfilename   := filename : independent;  //stop this from being reevaluated if necessary.
   
   // -- Setup DFU command
-  lTempname   := if(tempname = '' ,lfilename + %'tempcopyname'% ,tempname)    ;
-  serv        := 'server=http://' + pEclserver + ':8010 '                          ;
-  nsplit      := ' nosplit=1 '                                                ;
-  dstcluster  := 'dstcluster=thor400_24_store '                               ;
-  over        := 'overwrite=1 '                                               ;
-  repl        := 'replicate=1 '                                               ;
-  comp        := 'compress=1 ';//if (ut.isCompressed(lfilename),'compress=1 ','compressed=0 '); 
-  action      := 'action=copy '                                               ;
-  wrap        := 'wrap=1 '                                                    ;
-  srcname     := 'srcname='+lfilename + ' '                                   ;
-  dstname     := 'dstname='+lTempname + ' '                                   ;
-  srcdali     := 'srcdali=' + pSourceDali                                     ;
+  lTempname           := if(tempname = '' ,lfilename + %'tempcopyname'% ,tempname)    ;
+  serv                := 'server=http://' + pEclserver + ':8010 '                          ;
+  nsplit              := ' nosplit=1 '                                                ;
+  dstcluster          := 'dstcluster=thor400_24_store '                               ;
+  over                := 'overwrite=1 '                                               ;
+  repl                := 'replicate=1 '                                               ;
+  comp                := 'compress=1 ';//if (ut.isCompressed(lfilename),'compress=1 ','compressed=0 '); 
+  action              := 'action=copy '                                               ;
+  wrap                := 'wrap=1 '                                                    ;
+  srcname             := 'srcname='+lfilename + ' '                                   ;
+  dstname             := 'dstname='+lTempname + ' '                                   ;
+  transferbuffersize  := 'transferbuffersize=10000000  '                              ;
+  connect             := 'connect=400 '                                               ;
+  noCommon            := 'noCommon=true '                                               ;
+  srcdali             := 'srcdali=' + pSourceDali                                     ;
   
-  copyfilecmd := serv + over + repl + action + dstcluster + dstname + srcname + nsplit + wrap + comp + srcdali;
+  copyfilecmd := serv + over + repl + action + dstcluster + dstname + srcname + nsplit + wrap + comp + transferbuffersize + connect + noCommon + srcdali;
                     
   getorigcreatewuid := WsDFU.GetFileCreationWuid(lfilename);
   copywuid          := workunit                         ;

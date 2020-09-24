@@ -16,7 +16,7 @@ EXPORT E_Internet_Protocol_Event := MODULE
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'associatedcustomerfileinfo(_r_Customer_:0),Ip_(Ip_:0),eventdate(Event_Date_:DATE),Transaction_(Transaction_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED __Mapping0 := 'associatedcustomerfileinfo(_r_Customer_:0),Ip_(Ip_:0),event_date(Event_Date_:DATE),Transaction_(Transaction_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
-  EXPORT __d0_KELfiltered := FraudgovKEL.fraudgovshared(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND TRIM(ip_address) != '' AND ip_address NOT IN ['0.0.0.0','10.121.146.247','10.121.146.90','10.121.146.15','10.121.146.159','10.121.146.249','10.121.146.34','10.121.146.231','10.121.146.235','10.121.146.232']);
+  EXPORT __d0_KELfiltered := FraudgovKEL.fraudgovshared(AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0 AND TRIM(ip_address) != '' AND ip_address NOT IN ['0.0.0.0']);
   SHARED __d0_Ip__Layout := RECORD
     RECORDOF(__d0_KELfiltered);
     KEL.typ.uid Ip_;
@@ -40,7 +40,7 @@ EXPORT E_Internet_Protocol_Event := MODULE
     KEL.typ.int __RecordCount := 0;
   END;
   EXPORT __PreResult := PROJECT(TABLE(InData,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),_r_Customer_,Ip_,Event_Date_,Transaction_},_r_Customer_,Ip_,Event_Date_,Transaction_,MERGE),Layout);
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::FraudgovKEL::Internet_Protocol_Event::Result',EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Internet_Protocol_Event::Result',EXPIRE(7));
   EXPORT Result := __UNWRAP(__Result);
   EXPORT _r_Customer__Orphan := JOIN(InData(__NN(_r_Customer_)),E_Customer.__Result,__EEQP(LEFT._r_Customer_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Ip__Orphan := JOIN(InData(__NN(Ip_)),E_Internet_Protocol.__Result,__EEQP(LEFT.Ip_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);

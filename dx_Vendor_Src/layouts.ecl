@@ -53,9 +53,8 @@
   string nschenrollverify;
   string nschdegreeverify;
   string phoneverify;
-  string contacname;
+  string contactname;
   string contactphone;
-  unsigned8 __internal_fpos__;
  END;
 
 end;

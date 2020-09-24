@@ -8,7 +8,7 @@
 import BIPV2;
 EXPORT Layouts := MODULE
 EXPORT In_Base_with_flags := record
-recordof(BIPV2.Files.business_header_building);
+BIPV2.CommonBase_mod.Layout;
 string49 source_for_votes := '';
 string1 company_name_flag := '';
 string1 company_fein_flag := '';
@@ -83,6 +83,9 @@ EXPORT company_address_case_layout := RECORD
   string2 state_fips;
   string3 county_fips;
   string18 county_name;
+	unsigned6 company_locid;
+	unsigned4 address_dt_first_seen;
+	unsigned4 address_dt_last_seen;
   unsigned2 company_address_data_permits;
   unsigned1 company_address_method; // This value could come from multiple BESTTYPE; track which one
   unsigned1 score := 0 ;
@@ -154,6 +157,24 @@ EXPORT naics_code_case_layout:=RECORD
   naics_code;
   UNSIGNED score := 0;
 END;
+EXPORT employee_count:=RECORD
+  unsigned6 employee_count;
+  UNSIGNED2 employee_count_data_permits;
+  UNSIGNED1 employee_count_method;
+END;
+EXPORT sales:=RECORD
+  unsigned6 sales;
+  UNSIGNED2 sales_data_permits;
+  UNSIGNED1 sales_method;
+END;
+EXPORT employee_count_case_layout:=RECORD
+  employee_count;
+  UNSIGNED score := 0;
+END;
+EXPORT sales_case_layout:=RECORD
+  sales;
+  UNSIGNED score := 0;
+END;
 export base := RECORD
     linkids;
     unsigned6 company_bdid;
@@ -167,6 +188,8 @@ export base := RECORD
     DATASET(sic_code_case_layout) sic_code;
     DATASET(naics_code_case_layout) naics_code;
     DATASET(dba_name_case_layout) dba_name;
+		DATASET(employee_count_case_layout) employee_count;
+	  DATASET(sales_case_layout) sales;
     unsigned4 global_sid;
     unsigned8 record_sid;
   END;
@@ -174,6 +197,7 @@ EXPORT key := RECORD
     BIPV2.IDlayouts.l_xlink_ids;
     boolean isActive ; //seleid level
     boolean isDefunct; //seleid level   
+    unsigned1 seleid_status_private_score; //seleid level
     unsigned6 company_bdid;
     DATASET(company_name_case_layout and not score) company_name;
     DATASET(company_address_case_layout  and not [score, state_fips, county_fips]) company_address;
@@ -185,6 +209,8 @@ EXPORT key := RECORD
     DATASET(sic_code_case_layout and not score) sic_code;
     DATASET(naics_code_case_layout and not score) naics_code;
     DATASET(dba_name_case_layout and not score) dba_name;
+		DATASET(employee_count_case_layout and not score) employee_count;
+	  DATASET(sales_case_layout and not score) sales;
     unsigned4 global_sid;
     unsigned8 record_sid;
 END;
@@ -192,6 +218,7 @@ EXPORT key_static := RECORD
     BIPV2.IDlayouts.l_xlink_ids;
     boolean isActive ; //seleid level
     boolean isDefunct; //seleid level   
+    unsigned1 seleid_status_private_score; //seleid level
     unsigned6 company_bdid;
     DATASET(company_name_case_layout and not score) company_name;
     DATASET(company_address_case_layout  and not [score, state_fips, county_fips]) company_address;
@@ -202,7 +229,9 @@ EXPORT key_static := RECORD
     DATASET(duns_number_case_layout and not score) duns_number;
     DATASET(sic_code_case_layout and not score) sic_code;
     DATASET(naics_code_case_layout and not score) naics_code;
-	  	DATASET(dba_name_case_layout and not score) dba_name;
+	  DATASET(dba_name_case_layout and not score) dba_name;
+	  DATASET(employee_count_case_layout and not score) employee_count;
+	  DATASET(sales_case_layout and not score) sales;
     unsigned4 global_sid;
     unsigned8 record_sid;
 END;

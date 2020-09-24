@@ -87,7 +87,7 @@ l_xlink_ids :=  Suppress.Layout_regulatory.LZ_l_xlink_ids ;
 				string3   dead_flag:= '000';
 				string10  company_status:=''; 
 				
-				l_xlink_ids	linkIDs;			 
+    l_xlink_ids	linkIDs  ;			 
 		
 				string2		eor;	
 		end;
@@ -136,8 +136,7 @@ l_xlink_ids :=  Suppress.Layout_regulatory.LZ_l_xlink_ids ;
 				self.source_count		:= 1;
 				self.dead_flag 			:= (unsigned6)l.dead_flag;
 				self.company_status := '';
-				self.seleid 				:= l.linkIDs.SELEID ;
-				self	 							:= L;
+				self	 							       := L;
 				self                := [];
 		end;
 

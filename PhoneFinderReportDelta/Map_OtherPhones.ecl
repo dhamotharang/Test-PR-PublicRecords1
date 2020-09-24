@@ -8,6 +8,7 @@ EXPORT Map_OtherPhones(string8 version) := FUNCTION
 	//DF-23286: Update Keys
 	
 	//DF-27818: Add "identity_count" field to OtherPhones & Transactions Base Files
+	//DF-28194: Add "carrier" field to OtherPhones Base File
 	//dx_PhoneFinderReportDelta.Layout_PhoneFinder.OtherPhones_Main trOPh(inFile l):= transform
 	PhoneFinderReportDelta.Layout_PhoneFinder.OtherPhones_Main_Temp trOPh(inFile l):= transform
 		self.date_file_loaded := version;
@@ -26,7 +27,8 @@ EXPORT Map_OtherPhones(string8 version) := FUNCTION
 	
 	mapOPhMain 	:= project(inFile, trOPh(left));
 	concatFile	:= mapOPhMain + PhoneFinderReportDelta.File_PhoneFinder.OtherPhones_Main;	//DF-23286	
-	ddConcat 		:= dedup(sort(distribute(concatFile, hash(transaction_id)), transaction_id, sequence_number, -(date_added+time_added), local), transaction_id, sequence_number, local);
+  //DF-27859 keep the earliest records for delta update changes
+	ddConcat 		:= dedup(sort(distribute(concatFile, hash(transaction_id)), transaction_id, sequence_number, date_file_loaded,date_added,time_added, local), transaction_id, sequence_number, local);
 	
 	return ddConcat; 
 

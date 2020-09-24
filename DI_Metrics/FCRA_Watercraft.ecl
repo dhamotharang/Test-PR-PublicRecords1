@@ -30,8 +30,8 @@ despray_boat_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metrics:
 email_alert := SEQUENTIAL(
 					output(sort(tbl_Key_Boats_FCRA_wid_2010_IDs, -first_registration, state_origin, watercraft_class_description,  skew(1.0)),,'~thor_data400::data_insight::data_metrics::tbl_FCRA_Boats_wid_2010_IDs_FirstSeen_'+ filedate +'.csv', csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
 					,despray_boat_tbl):
-					Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA Group: FCRA_Watercraft Build Succeeded', workunit + ': Build complete.' + filedate)),
-					Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'FCRA Group: FCRA_Watercraft Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
+					Success(FileServices.SendEmail(pContact, 'FCRA Group: FCRA_Watercraft Build Succeeded', workunit + ': Build complete.' + filedate)),
+					Failure(FileServices.SendEmail(pContact, 'FCRA Group: FCRA_Watercraft Build Failed', workunit + filedate + '\n' + FAILMESSAGE)
 													);
 return email_alert;
 

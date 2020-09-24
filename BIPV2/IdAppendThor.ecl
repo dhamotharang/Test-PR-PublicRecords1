@@ -3,8 +3,8 @@
 export IdAppendThor(
 		dataset(BIPV2.IdAppendLayouts.AppendInput) inputDs
 		,unsigned scoreThreshold = 75
-		,unsigned weightThreshold = 0
-		,boolean primForce = true
+		,unsigned weightThreshold = IdConstants.APPEND_WEIGHT_THRESHOLD_THOR
+		,boolean primForce = false
 		,boolean reAppend = true
 		,boolean allowInvalidResults = false
 		,boolean mimicRoxie = false // This is for ease of testing and can cause slower performance
@@ -21,7 +21,7 @@ export IdAppendThor(
 		,unsigned keepCount = 1
 	) := module
 
-	#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
+	#IF(BIPV2.IdConstants.USE_LOCAL_KEYS or BIPV2.IdConstants.USE_LOCAL_THOR_SALT_KEYS)
 	shared localAppend := BIPV2.IdAppendThorLocal(
 		inputDs
 		,['A','F','P'] // matchset
@@ -74,9 +74,28 @@ export IdAppendThor(
 			,allowHighErrorRate := allowHighErrorRate
 			);
 
+	shared remoteNoIds(dataset(BIPV2.IdAppendLayouts.AppendInput) remoteIn) := 
+		BIPV2.IdAppendThorRemote(
+			remoteIn
+			,scoreThreshold := scoreThreshold
+			,weightThreshold := weightThreshold
+			,disableSaltForce := not primForce
+			,useFuzzy := useFuzzy
+			,doZipExpansion := doZipExpansion
+			,reAppend := false
+			,mimicRoxie := mimicRoxie
+			,svcAppendUrl := svcAppendUrl
+			,segmentation := segmentation
+			,soapTimeout := soapTimeout
+			,soapTimeLimit := soapTimeLimit
+			,soapRetries := soapRetries
+			,remoteBatchSize := remoteBatchSize
+			,allowHighErrorRate := allowHighErrorRate
+			);
+
 	export IdsOnly() := function
 		resRemote := project(remoteAppend.IdsOnly(), BIPV2.IdAppendLayouts.IdsOnlyOutput);
-		#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
+		#IF(BIPV2.IdConstants.USE_LOCAL_KEYS or BIPV2.IdConstants.USE_LOCAL_THOR_SALT_KEYS)
 			resLocal := project(localAppend, transform(BIPV2.IdAppendLayouts.IdsOnlyOutput, self := left, self := []));
 			res := if(mimicRoxie, resRemote, resLocal);
 		#ELSE
@@ -90,7 +109,7 @@ export IdAppendThor(
 
 	export WithBest(string fetchLevel = BIPV2.IdConstants.fetch_level_proxid, boolean allBest = false) := function
 		resRemote := remoteAppend.WithBest(fetchLevel := fetchLevel, allBest := allBest);
-		#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
+		#IF(BIPV2.IdConstants.USE_LOCAL_KEYS or (BIPV2.IdConstants.USE_LOCAL_THOR_BEST_KEYS and BIPV2.IdConstants.USE_LOCAL_THOR_SALT_KEYS))
 			res0 := BIPV2.IdAppendLocal.AppendBest(localAppend, fetchLevel := fetchLevel, allBest := allBest);
 			resLocal := project(res0, transform(BIPV2.IdAppendLayouts.AppendOutput, self := left, self := []));
 			res := if(mimicRoxie, resRemote, resLocal);

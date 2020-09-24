@@ -19,25 +19,207 @@ MODULE
 	end;	
 	
 	shared layout_key := record
-		infile_rec - global_sid        - record_sid            - employee_count_org_raw   - employee_count_org_derived
-		           - revenue_org_raw   - revenue_org_derived   - employee_count_local_raw - employee_count_local_derived 
-							 - revenue_local_raw - revenue_local_derived - locid;
-		BIPV2.IDlayouts.l_xlink_ids.DotScore;
-		BIPV2.IDlayouts.l_xlink_ids.DotWeight;
-		BIPV2.IDlayouts.l_xlink_ids.EmpScore;
-		BIPV2.IDlayouts.l_xlink_ids.EmpWeight;
-		BIPV2.IDlayouts.l_xlink_ids.POWScore;
-		BIPV2.IDlayouts.l_xlink_ids.POWWeight;
-		BIPV2.IDlayouts.l_xlink_ids.ProxScore;
-		BIPV2.IDlayouts.l_xlink_ids.ProxWeight;
-		BIPV2.IDlayouts.l_xlink_ids.OrgScore;
-		BIPV2.IDlayouts.l_xlink_ids.OrgWeight;
-		BIPV2.IDlayouts.l_xlink_ids.UltScore;
-		BIPV2.IDlayouts.l_xlink_ids.UltWeight;
-    unsigned4 global_sid;
-    unsigned8 record_sid;
-		unsigned6 locid;
-	end;
+   unsigned6            rcid                                                                        ;
+   string2              source                                                                      ;
+   string9              ingest_status                                                               ;
+   unsigned6            dotid                                                                       ;
+   unsigned6            empid                                                                       ;
+   unsigned6            powid                                                                       ;
+   unsigned6            proxid                                                                      ;
+   unsigned6            seleid                                                                      ;
+   unsigned6            lgid3                                                                       ;
+   unsigned6            orgid                                                                       ;
+   unsigned6            ultid                                                                       ;
+   unsigned6            vanity_owner_did                                                            ;
+   unsigned8            cnt_rcid_per_dotid                                                          ;
+   unsigned8            cnt_dot_per_proxid                                                          ;
+   unsigned8            cnt_prox_per_lgid3                                                          ;
+   unsigned8            cnt_prox_per_powid                                                          ;
+   unsigned8            cnt_dot_per_empid                                                           ;
+   boolean              has_lgid                                                                    ;
+   boolean              is_sele_level                                                               ;
+   boolean              is_org_level                                                                ;
+   boolean              is_ult_level                                                                ;
+   unsigned6            parent_proxid                                                               ;
+   unsigned6            sele_proxid                                                                 ;
+   unsigned6            org_proxid                                                                  ;
+   unsigned6            ultimate_proxid                                                             ;
+   unsigned2            levels_from_top                                                             ;
+   unsigned3            nodes_below                                                                 ;
+   unsigned3            nodes_total                                                                 ;
+   string1              sele_gold                                                                   ;
+   string1              ult_seg                                                                     ;
+   string1              org_seg                                                                     ;
+   string1              sele_seg                                                                    ;
+   string1              prox_seg                                                                    ;
+   string1              pow_seg                                                                     ;
+   string1              ult_prob                                                                    ;
+   string1              org_prob                                                                    ;
+   string1              sele_prob                                                                   ;
+   string1              prox_prob                                                                   ;
+   string1              pow_prob                                                                    ;
+   string1              iscontact                                                                   ;
+   string5              title                                                                       ;
+   string20             fname                                                                       ;
+   string20             mname                                                                       ;
+   string20             lname                                                                       ;
+   string5              name_suffix                                                                 ;
+   string3              name_score                                                                  ;
+   string1              iscorp                                                                      ;
+   string120            company_name                                                                ;
+   string50             company_name_type_raw                                                       ;
+   string50             company_name_type_derived                                                   ;
+   string1              cnp_hasnumber                                                               ;
+   string250            cnp_name                                                                    ;
+   string30             cnp_number                                                                  ;
+   string10             cnp_store_number                                                            ;
+   string10             cnp_btype                                                                   ;
+   string1              cnp_component_code                                                          ;
+   string20             cnp_lowv                                                                    ;
+   boolean              cnp_translated                                                              ;
+   integer4             cnp_classid                                                                 ;
+   unsigned8            company_rawaid                                                              ;
+   unsigned8            company_aceaid                                                              ;
+   string10             prim_range                                                                  ;
+   string10             prim_range_derived                                                          ;
+   string2              predir                                                                      ;
+   string28             prim_name                                                                   ;
+   string28             prim_name_derived                                                           ;
+   string4              addr_suffix                                                                 ;
+   string2              postdir                                                                     ;
+   string10             unit_desig                                                                  ;
+   string8              sec_range                                                                   ;
+   string25             p_city_name                                                                 ;
+   string25             v_city_name                                                                 ;
+   string2              st                                                                          ;
+   string5              zip                                                                         ;
+   string4              zip4                                                                        ;
+   string4              cart                                                                        ;
+   string1              cr_sort_sz                                                                  ;
+   string4              lot                                                                         ;
+   string1              lot_order                                                                   ;
+   string2              dbpc                                                                        ;
+   string1              chk_digit                                                                   ;
+   string2              rec_type                                                                    ;
+   string2              fips_state                                                                  ;
+   string3              fips_county                                                                 ;
+   string10             geo_lat                                                                     ;
+   string11             geo_long                                                                    ;
+   string4              msa                                                                         ;
+   string7              geo_blk                                                                     ;
+   string1              geo_match                                                                   ;
+   string4              err_stat                                                                    ;
+   string250            corp_legal_name                                                             ;
+   string250            dba_name                                                                    ;
+   string9              active_duns_number                                                          ;
+   string9              hist_duns_number                                                            ;
+   string9              deleted_key                                                                 ;
+   string9              deleted_fein                                                                ;
+   string9              active_enterprise_number                                                    ;
+   string9              hist_enterprise_number                                                      ;
+   string9              ebr_file_number                                                             ;
+   string30             active_domestic_corp_key                                                    ;
+   string30             hist_domestic_corp_key                                                      ;
+   string30             foreign_corp_key                                                            ;
+   string30             unk_corp_key                                                                ;
+   unsigned4            dt_first_seen                                                               ;
+   unsigned4            dt_last_seen                                                                ;
+   unsigned4            dt_vendor_first_reported                                                    ;
+   unsigned4            dt_vendor_last_reported                                                     ;
+   unsigned6            company_bdid                                                                ;
+   string50             company_address_type_raw                                                    ;
+   string9              company_fein                                                                ;
+   string1              best_fein_indicator                                                         ;
+   string10             company_phone                                                               ;
+   string1              phone_type                                                                  ;
+   string60             company_org_structure_raw                                                   ;
+   unsigned4            company_incorporation_date                                                  ;
+   string8              company_sic_code1                                                           ;
+   string8              company_sic_code2                                                           ;
+   string8              company_sic_code3                                                           ;
+   string8              company_sic_code4                                                           ;
+   string8              company_sic_code5                                                           ;
+   string6              company_naics_code1                                                         ;
+   string6              company_naics_code2                                                         ;
+   string6              company_naics_code3                                                         ;
+   string6              company_naics_code4                                                         ;
+   string6              company_naics_code5                                                         ;
+   string6              company_ticker                                                              ;
+   string6              company_ticker_exchange                                                     ;
+   string1              company_foreign_domestic                                                    ;
+   string80             company_url                                                                 ;
+   string2              company_inc_state                                                           ;
+   string32             company_charter_number                                                      ;
+   unsigned4            company_filing_date                                                         ;
+   unsigned4            company_status_date                                                         ;
+   unsigned4            company_foreign_date                                                        ;
+   unsigned4            event_filing_date                                                           ;
+   string50             company_name_status_raw                                                     ;
+   string50             company_status_raw                                                          ;
+   unsigned4            dt_first_seen_company_name                                                  ;
+   unsigned4            dt_last_seen_company_name                                                   ;
+   unsigned4            dt_first_seen_company_address                                               ;
+   unsigned4            dt_last_seen_company_address                                                ;
+   string34             vl_id                                                                       ;
+   boolean              current                                                                     ;
+   unsigned8            source_record_id                                                            ;
+   unsigned2            phone_score                                                                 ;
+   string9              duns_number                                                                 ;
+   string100            source_docid                                                                ;
+   unsigned4            dt_first_seen_contact                                                       ;
+   unsigned4            dt_last_seen_contact                                                        ;
+   unsigned6            contact_did                                                                 ;
+   string50             contact_type_raw                                                            ;
+   string50             contact_job_title_raw                                                       ;
+   string9              contact_ssn                                                                 ;
+   unsigned4            contact_dob                                                                 ;
+   string30             contact_status_raw                                                          ;
+   string60             contact_email                                                               ;
+   string30             contact_email_username                                                      ;
+   string30             contact_email_domain                                                        ;
+   string10             contact_phone                                                               ;
+   string1              from_hdr                                                                    ;
+   string35             company_department                                                          ;
+   string50             company_address_type_derived                                                ;
+   string60             company_org_structure_derived                                               ;
+   string50             company_name_status_derived                                                 ;
+   string50             company_status_derived                                                      ;
+   string1              proxid_status_private                                                       ;
+   string1              powid_status_private                                                        ;
+   string1              seleid_status_private                                                       ;
+   string1              orgid_status_private                                                        ;
+   string1              ultid_status_private                                                        ;
+   string1              proxid_status_public                                                        ;
+   string1              powid_status_public                                                         ;
+   string1              seleid_status_public                                                        ;
+   string1              orgid_status_public                                                         ;
+   string1              ultid_status_public                                                         ;
+   string50             contact_type_derived                                                        ;
+   string50             contact_job_title_derived                                                   ;
+   string30             contact_status_derived                                                      ;
+   string1              address_type_derived                                                        ;
+   boolean              is_vanity_name_derived                                                      ;
+   unsigned2            selescore                                                                   ;
+   unsigned2            seleweight                                                                  ;
+   unsigned2            dotscore                                                                    ;
+   unsigned2            dotweight                                                                   ;
+   unsigned2            empscore                                                                    ;
+   unsigned2            empweight                                                                   ;
+   unsigned2            powscore                                                                    ;
+   unsigned2            powweight                                                                   ;
+   unsigned2            proxscore                                                                   ;
+   unsigned2            proxweight                                                                  ;
+   unsigned2            orgscore                                                                    ;
+   unsigned2            orgweight                                                                   ;
+   unsigned2            ultscore                                                                    ;
+   unsigned2            ultweight                                                                   ;
+   unsigned4            global_sid                                                                  ;
+   unsigned8            record_sid                                                                  ;
+   unsigned6            locid                                                                       ;
+   unsigned1            seleid_status_private_score                                                 ;
+   unsigned1            seleid_status_public_score                                                  ;
+end;
+
 		    	
 	shared infile_key := project(infile, transform(layout_key,  
 																											self.DotScore   := 100,
@@ -100,11 +282,12 @@ MODULE
 		,boolean                                dnbFullRemove               = false // optionally clobber all DNB data; by default we apply masking
 		,boolean                                bypassContactSuppression    = false // Optionally skip BIPV2_Suppression.mac_contacts - only use this if you are 100% certain you aren't using contact information
 		,unsigned1                              JoinType                    = BIPV2.IDconstants.JoinTypes.KeepJoin
-    ,boolean                                pApplyMarketingSuppression  = false                                 // Apply marketing suppression?
-          ,doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
+        ,boolean                                pApplyMarketingSuppression  = false                                 // Apply marketing suppression?
+        ,doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
+        ,DATASET(BIPV2.IDlayouts.l_filter_record) dFilter                   = DATASET([],BIPV2.IDlayouts.l_filter_record)   
   ) :=
   function   
-		BIPV2.IDmacros.mac_IndexFetch2     (inputs, Key, ds_fetched , Level, JoinLimit, JoinType);
+        BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, ds_fetched , Level, JoinLimit, JoinType, dFilter);		    
 		    
 		ds_restricted := ds_fetched(BIPV2.mod_sources.isPermitted(in_mod,not dnbFullRemove).bySource(source,vl_id,dt_first_seen));
 		ds_masked     := if(dnbFullRemove, ds_restricted, BIPV2.mod_sources.applyMasking(ds_restricted,in_mod));
@@ -168,11 +351,12 @@ MODULE
     ,boolean                    pApplyMarketingSuppression  = false // Apply Marketing suppression to the key
     ,boolean                    pReturnFullKey              = false // Return the Full Key unrestricted.  Overrides all other suppression parameters
     ,string                     pKeyversion                 = 'qa'  // which version of the key to pull?  makes it easy to test other key versions without sandboxing
-    ,doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END 
+    ,doxie.IDataAccess          mod_access                  = MODULE (doxie.IDataAccess) END 
+    ,boolean                    pUseOtherEnvironment        = false
   ) :=
   function
     
-          ds_fetched    := pull(keyversions(pKeyversion).logical);
+          ds_fetched    := pull(keyversions(pKeyversion,pUseOtherEnvironment).logical);
 
           ds_restricted := BIPV2.mod_sources.isPermitted_Thor(in_mod, ds_fetched, not dnbFullRemove);
 		ds_masked     := if(dnbFullRemove, ds_restricted, BIPV2.mod_sources.applyMasking(ds_restricted,in_mod));

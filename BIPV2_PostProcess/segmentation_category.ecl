@@ -11,11 +11,14 @@ EXPORT segmentation_category := module
   end;
  
   export subCategory := module
-    export Valid   := 'V';
-    export C_Merge := 'C';
-    export H_Merge := 'H';
-    export Noise   := 'N';
-    export None    := ' ';
+    export High_Valid   := '3';
+    export Medium_Valid := '2';
+    export Low_Valid    := '1';
+    export Valid        := 'V';
+    export C_Merge      := 'C';
+    export H_Merge      := 'H';
+    export Noise        := 'N';
+    export None         := ' ';
   end;
  
   export	segCategoryLayout := {
@@ -24,8 +27,14 @@ EXPORT segmentation_category := module
         string1 subCategory
         };
 
- export perSeleid(dataset(BIPV2.CommonBase.Layout) header_clean, String pToday) := function
-    header_clean_gold := header_clean(sele_gold='G') ;
+ export perSeleid(
+   dataset(BIPV2.CommonBase.Layout) header_clean
+  ,String                           pToday
+  ,boolean                          pNewWay       = false
+ ) := 
+ function
+ 
+    header_clean_gold     := header_clean(sele_gold ='G') ;
     header_clean_non_gold := header_clean(sele_gold<>'G') ;
  
     hasValidId(BIPV2.CommonBase.Layout rec) := function
@@ -53,7 +62,7 @@ EXPORT segmentation_category := module
         self := rec;
     end;
 				
-    // The independent was added because the work to genreate for the next 2 joins was done in multiple graphs because segmentation below will be done in multiple graphs
+    // The independent was added because the work to generate for the next 2 joins was done in multiple graphs because segmentation below will be done in multiple graphs
     clean_id_address_seleids := table(project(header_clean, validAddressFilt(left)) + project(header_clean, validIdFilt(left)), {seleid}, seleid) : independent;
  
     clean_non_gold_good_addr_id := join(header_clean_non_gold, clean_id_address_seleids, left.seleid=right.seleid, transform(left), keep(1), local);
@@ -69,17 +78,23 @@ EXPORT segmentation_category := module
         active   := l.inactive='';
         inactive := l.inactive='I';
         defunct  := l.inactive='D';
-        valid    := l.core in ['2','3','T'];							
+        valid         := l.core in ['2','3','T'];							
+        high_valid    := l.core in ['2','3','T'] and l.status_score = '3' and active;							
+        medium_valid  := l.core in ['2','3','T'] and l.status_score = '2' and active;							
+        low_valid     := l.core in ['2','3','T'] and l.status_score = '1' and active;							
         self.category  := map(active  => category.Active,
                               defunct => category.Defunct,
                               inactive => category.Inactive,
                               category.Unknown);
 																															
-        self.subCategory := map(defunct                              => subCategory.None,
-                                 valid                               => subCategory.Valid,
-                                 not valid and goodAddr and active   => subCategory.C_Merge,
-                                 not valid and goodAddr and inactive => subCategory.H_Merge,
-                                 not valid and not goodAddr          => subCategory.Noise,
+        self.subCategory := map(defunct                              => subCategory.None        ,
+                                 pNewWay and high_valid              => subCategory.High_Valid  ,
+                                 pNewWay and medium_valid            => subCategory.Medium_Valid,
+                                 pNewWay and low_valid               => subCategory.Low_Valid   ,
+                                 valid                               => subCategory.Valid       ,
+                                 not valid and goodAddr and active   => subCategory.C_Merge     ,
+                                 not valid and goodAddr and inactive => subCategory.H_Merge     ,
+                                 not valid and not goodAddr          => subCategory.Noise       ,
                                  subCategory.None);
         self.seleid:=l.id;
     end;

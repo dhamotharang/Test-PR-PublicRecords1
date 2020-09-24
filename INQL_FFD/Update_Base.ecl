@@ -35,22 +35,23 @@ EXPORT Update_Base (boolean isDaily = true, boolean isFCRA = true, string pVersi
 
 																self.formatted_phone_nbr           		:= if(ut.CleanPhone(left.phone_nbr) [1] not in ['0','1'],ut.CleanPhone(Left.phone_nbr), '');     
 																self.formatted_eu_phone_nbr           := if(ut.CleanPhone(left.eu_phone_nbr) [1] not in ['0','1'],ut.CleanPhone(Left.eu_phone_nbr), '');     
-																self.ppc                    					:= Inql_ffd._Functions.Convert_PPC(left.ppc);
 																self                        					:= left;
 																self                     							:= [];)
 												);
 
-	parsedNames 					:= Inql_FFD._Functions.Parse_STD_Names(formatted);								
-	parsedNamesAddresses 	:= Inql_FFD._Functions.Parse_STD_Addresses(parsedNames);
-	appended_did_ssn    	:= Inql_FFD._Functions.Append_DID_SSN(parsedNamesAddresses);
-
-	appended_base       	:=  project(appended_did_ssn, transform(INQL_FFD.Layouts.Base,
-
+	parsedNames 									:= Inql_FFD._Functions.Parse_STD_Names(formatted);								
+	parsedNamesAddresses 					:= Inql_FFD._Functions.Parse_STD_Addresses(parsedNames);
+	appended_did_ssn    					:= Inql_FFD._Functions.Append_DID_SSN(parsedNamesAddresses);
+	appended_did_ssn_PPC_EXCLUDE 	:= appended_did_ssn(ppc not in _Constants.FCRA_PPC_EXCLUDE);
+	
+  xlated_ppc         					  := Inql_FFD.FN_Convert_PPC(appended_did_ssn_PPC_EXCLUDE).xlated_ppc;
+  
+	appended_base       					:=  project(xlated_ppc, transform(INQL_FFD.Layouts.Base,
 						self.datetime             := left.formatted_date_added,
 						self.dob                  := left.formatted_dob,
 						self.phone_nbr            := left.formatted_phone_nbr,
 						self.eu_phone_nbr         := left.formatted_eu_phone_nbr,
-						self.appended_did         := left.appendadl,
+						self.appended_did         := if(left.appendadl=0,(unsigned)left.lex_id,left.appendadl);
 						self.appended_ssn         := left.appendssn,
 						self.filedate 						:= (unsigned)Inql_FFD.Fn_Get_Current_Version.fcra_input,
 						self.version              := pVersion,
@@ -63,7 +64,7 @@ EXPORT Update_Base (boolean isDaily = true, boolean isFCRA = true, string pVersi
 	                                      Files(isDaily, isFCRA, pVersion).base.qa
 																				);
 	
-  daily_base_updated  				  := appended_base + prev_daily_base;
+  daily_base_updated 				    := appended_base + prev_daily_base;
  	
   filtered_daily_base        		:= daily_base_updated
 																			(
@@ -71,9 +72,7 @@ EXPORT Update_Base (boolean isDaily = true, boolean isFCRA = true, string pVersi
 							                    or 	((ppc not in _Constants.FCRA_PPC) and datetime[1..8] between _Flags(pVersion).dt1yearago and pVersion)
 																			);
 																			
-  excluded_filtered_daily_base 	:= 	filtered_daily_base (ppc not in _Constants.FCRA_PPC_EXCLUDE);
-	
-	remediated_base          			:= INQL_FFD.FN_Apply_FCRA_Remediation_Soft_Inquiry(excluded_filtered_daily_base).base_remediation;
+ 	remediated_base          			:= INQL_FFD.FN_Apply_FCRA_Remediation_Soft_Inquiry(filtered_daily_base).base_remediation;
   
 	daily_base  				  				:= dedup(distribute(remediated_base,hash(lex_id)),record, all);
 

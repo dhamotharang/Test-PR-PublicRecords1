@@ -1,4 +1,4 @@
-﻿import ut, CanadianPhones, PromoteSupers;
+﻿import ut, CanadianPhones, PromoteSupers, did_add, doxie, Suppress;
 
 CanadianPhones_V2.layoutCanadianWhitepagesBase fnRollupNewUpdates(CanadianPhones_V2.layoutCanadianWhitepagesBase L, CanadianPhones_V2.layoutCanadianWhitepagesBase R) := TRANSFORM
 
@@ -80,8 +80,13 @@ EXPORT proc_build_base := FUNCTION
 															Record_use_indicator,
 															LOCAL);
 	
+	//CCPA-1030
+	matchset := ['A', 'Z'];
+	did_add.MAC_Match_Flex(canadianwp_rollup, matchset, '', '', fname, mname, lname, name_suffix, 
+  prim_range, prim_name, sec_range, zip, state, '' , did, CanadianPhones_V2.layoutCanadianWhitepagesBase, TRUE, DID_Score,75, dCanadianPhonesWDID);
+
 	//DF-16788
-	PromoteSupers.MAC_SF_BuildProcess(canadianwp_rollup,
+	PromoteSupers.MAC_SF_BuildProcess(dCanadianPhonesWDID,
 													CanadianPhones.thor_cluster + 'base::canadianwp_v2',
 													bld_base,
 													2,,true

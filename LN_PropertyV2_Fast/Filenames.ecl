@@ -35,6 +35,12 @@ EXPORT FileNames := MODULE
 				EXPORT assessment_ptu		:= rawCluster + prefix + 'assessment_ptu';
 				EXPORT deed							:= rawCluster + prefix + 'deed';
 			END;
+	//Black Knight Assignments and Release		
+			EXPORT BK_AR	:= MODULE
+				EXPORT prefix						:= 'thor_data400::base::BKMortgage::';
+				EXPORT assignment				:= rawCluster + prefix + 'Assignment';
+				EXPORT release					:= rawCluster + prefix + 'Release';
+			END;
 	END;
 	EXPORT prep := MODULE
 			EXPORT prefix 		:= 'prep::property_fast::';
@@ -81,6 +87,7 @@ EXPORT FileNames := MODULE
 			EXPORT addl_names	:= exprtCluster + prefix+ 'addl_names';
 			EXPORT addl_legal	:= exprtCluster + prefix+ 'addl_legal';
 			EXPORT search_prp	:= exprtCluster + prefix+ 'search';
+			EXPORT addl_name_info	:= exprtCluster + prefix+ 'addl_name_info';
 	END;
 	EXPORT basedelta := MODULE // These are the QA / latest delta base files. See below "baseFull"
 			EXPORT prefix			:= 'base::property_fast::';

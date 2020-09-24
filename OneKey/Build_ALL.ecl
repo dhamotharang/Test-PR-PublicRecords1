@@ -14,7 +14,7 @@ EXPORT Build_ALL(
   full_build :=
     SEQUENTIAL(
       OneKey.Create_Supers
-     ,OneKey.Spray(pversion)
+     ,OneKey.Spray(pversion,,,,,,,,,pGroupName,pIsTesting,pOverwrite)
      ,OneKey.Promote().Inputfiles.Sprayed2Using
      ,Scrubs.ScrubsPlus('OneKey', 'Scrubs_OneKey', 'Scrubs_OneKey_InputA', 'InputA', pversion, OneKey.Email_Notification_Lists(pIsTesting).BuildFailure, FALSE)
      ,Scrubs.ScrubsPlus('OneKey', 'Scrubs_OneKey', 'Scrubs_OneKey_InputB', 'InputB', pversion, OneKey.Email_Notification_Lists(pIsTesting).BuildFailure, FALSE)

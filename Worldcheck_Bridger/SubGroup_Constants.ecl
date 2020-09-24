@@ -1226,6 +1226,38 @@
 		export string KEYWORD_UNOPS									:= '912';
 		export string KEYWORD_SECO_NIC							:= '913';
 		export string KEYWORD_BEGC									:= '914';
+		export string KEYWORD_NLGA									:= '915';
+		export string KEYWORD_AUATO									:= '916';
+		export string KEYWORD_MXSAT_DEF							:= '917';
+		export string KEYWORD_DKGA									:= '918';
+		export string KEYWORD_AUEPA									:= '919';
+		export string KEYWORD_SEGA									:= '920';
+		export string KEYWORD_GRHGC									:= '921';
+		export string KEYWORD_ILNBCTF_SO						:= '922';
+		export string KEYWORD_PRCSR_WC							:= '923';
+		export string KEYWORD_GERS									:= '924';
+		export string KEYWORD_DKKFST								:= '925';
+		export string KEYWORD_MDBNM									:= '926';
+		export string KEYWORD_EU_CYBER							:= '927';
+		export string KEYWORD_CHESBK								:= '928';
+		export string KEYWORD_FIKKV									:= '929';
+		export string KEYWORD_NOGA									:= '930';
+		export string KEYWORD_IUUVES								:= '931';
+		export string KEYWORD_TWMOJ_INT							:= '932';
+		export string KEYWORD_UZDCEC_INT						:= '933';
+		export string KEYWORD_OFAC_HK_EO13936				:= '934';
+		export string KEYWORD_NOKT									:= '935';
+		export string KEYWORD_UZDCEC_NAT						:= '936';
+		export string KEYWORD_PHDENR								:= '937';
+		export string KEYWORD_THAMLO_SANC						:= '938';
+		export string KEYWORD_ITIVASS								:= '939';
+		export string KEYWORD_VIPD									:= '940';
+		export string KEYWORD_USDOD_1237						:= '941';
+		export string KEYWORD_OFAC_ICCP							:= '942';
+		export string KEYWORD_IDRESKRIMUM						:= '943';
+		export string KEYWORD_CATMX									:= '944';
+		export string KEYWORD_OFAC_ICAAE						:= '945';
+		export string KEYWORD_FFICIJ_WC							:= '946';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

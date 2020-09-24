@@ -71,7 +71,7 @@ module
     and isperm.bySource(contacts_fields.source, contacts_fields.vl_id)
     );
     
-    BIPV2_build.mac_check_access(ds_restricted, ds_restricted_out, mod_access, false);
+    BIPV2_build.mac_check_access(ds_restricted, ds_restricted_out, mod_access, false, contact_fields.contact_did);
     
     return ds_restricted_out;
 									

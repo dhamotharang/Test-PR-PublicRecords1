@@ -1,10 +1,12 @@
-﻿import STD, PRTE2, _control, PRTE; 
+﻿import STD, PRTE2, _control, PRTE, Orbit3, dops; 
 
 skipDOPS:=false;
 string emailTo:='';
 dops_name := 'CanadianPhonesV2Keys';
 
 pversion:=(string8)STD.Date.CurrentDate(True);
+
+didBuild :=         DATASET([ ],Layouts.did_layout);
 
 fdidBuild :=         DATASET([ ],Layouts.fdid);
 addressBuild :=      DATASET([ ],Layouts.address);
@@ -21,6 +23,10 @@ stnameb2build :=     DATASET([ ],Layouts.stnameb2);
 zipbuild :=          DATASET([ ],Layouts.zip);
 zipb2build :=        DATASET([ ],Layouts.zipb2);
 zipprlnamebuild :=   DATASET([ ],Layouts.zipprlname);
+
+didKey := INDEX(didBuild,
+{did},{didbuild},
+prte2.constants.prefix + 'key::canadianwp_v2::' + pversion + '::did'); 
 
 fdidKey := INDEX(fdidBuild,
 {fdid},{fdidbuild},
@@ -87,11 +93,19 @@ prte2.constants.prefix + 'key::canadianwp_v2::' + pversion + '::autokey::zipprln
 //---------- making DOPS optional -------------------------------
 	notifyEmail					:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
 	NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it'); 
-	updatedops					:=	PRTE.UpdateVersion(dops_name, pversion, notifyEmail,'B','N','N');
+	updatedops          := PRTE.UpdateVersion(dops_name, pversion, _control.MyInfo.EmailAddressNormal, l_inloc:='B', l_inenvment:='N', l_includeboolean := 'N');
+	
+  Key_Validation     := output(dops.ValidatePRCTFileLayout(pversion, /*Dataland IP*/ '10.173.14.204', /*Prod IP*/ prte2.constants.ipaddr_prod, dops_name, 'N'));	
+	
+	updateOrbit         := Orbit3.proc_Orbit3_CreateBuild('PRTE - Canadian Phones v2', pversion, 'PN', email_list:= _control.MyInfo.EmailAddressNormal);
+  NoOrbitUpdate 			:= OUTPUT('Skipping Orbit because it was requested to not do it'); 
 
 	PerformUpdateOrNot	:= IF(not skipDops,updatedops,NoUpdate);
+	PerformOrbitOrNot:=    IF(not skipDops,updateOrbit,NoOrbitUpdate);
+  
+	
 
-
+ BUILD(didKey);
  BUILD(fdidKey);
  BUILD(addressKey);
  BUILD(addressb2Key);
@@ -108,7 +122,10 @@ prte2.constants.prefix + 'key::canadianwp_v2::' + pversion + '::autokey::zipprln
  BUILD(zipb2key);
  BUILD(zipprlnamekey);
  
-PerformUpdateOrNot;
+ //key_Validation;
+ 
+ //PerformUpdateOrNot;
+ //PerformOrbitOrNot;
 
 output ('successful');
 
