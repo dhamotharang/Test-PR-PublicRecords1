@@ -9,11 +9,11 @@ KeyName_fcra  := 'thor_data400::key::'+keyPrefix+'::fcra::';
 
 //Appeend Linkids to existing key layout
 file_search_bld_Bip0	:= LN_PropertyV2_Fast.file_search_building_Bip(LN_PropertyV2.File_Search_DID,false);
-file_search_bld_Bip1	:= LN_PropertyV2_Fast.file_search_building_Bip(LN_PropertyV2_Fast.Files.base.search_prp,true);
+file_search_bld_Bip1	:= LN_PropertyV2_Fast.file_search_building_Bip(LN_PropertyV2_Fast.Files.basedelta.search_prp,true);
 file_search_bld_Bip2	:= if(isFast,file_search_bld_Bip1,file_search_bld_Bip0);
 
 file_search_bld0	:= LN_PropertyV2_Fast.CleanSearch(false);
-file_search_bld1	:= LN_PropertyV2_Fast.CleanSearch(true);
+file_search_bld1	:= LN_PropertyV2_Fast.CleanSearch(true, true);
 file_search_bld	:= if(isFast,file_search_bld1,file_search_bld0);
 
 

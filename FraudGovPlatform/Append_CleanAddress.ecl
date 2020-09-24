@@ -1,33 +1,14 @@
 ﻿IMPORT FraudShared;
 EXPORT Append_CleanAddress ( 
-    dataset(FraudShared.Layouts.Base.Main) FileBase,
-    dataset(FraudShared.Layouts.Base.Main) Previous_Build = $.Files().Base.Main_Orig.QA
-) := FUNCTION
-    dFileBase := DISTRIBUTE(FileBase, hash32(record_id));
-    dPrevious_Build	:= DISTRIBUTE(Previous_Build, HASH32(record_id));
-    // New inputs
-    New_Inputs := 
-        JOIN(
-            dFileBase, 
-            dPrevious_Build,
-            left.record_id = right.record_id, 
-            LEFT ONLY,
-            LOCAL);       
-
-    Old_Inputs := 
-        JOIN(
-            dFileBase, 
-            dPrevious_Build,
-            left.record_id = right.record_id, 
-            RIGHT OUTER,
-            LOCAL); 
+    dataset(FraudShared.Layouts.Base.Main) FileBase ) 
+:= FUNCTION
             
-    slim_in := Project( New_Inputs, TRANSFORM( $.Layouts.Base.AddressCache, SELF := LEFT, SELF := [] ), LOCAL );
+    slim_in := Project( FileBase, TRANSFORM( fraudgovplatform.Layouts.Base.AddressCache, SELF := LEFT, SELF := [] ) );
 
-    CleanedAddresses :=  $.mac_Append_CleanAddresses(slim_in);  
+    CleanedAddresses :=  fraudgovplatform.mac_Append_CleanAddresses(slim_in);  
 
     CleanedRecs := join(
-            New_Inputs, 
+            FileBase, 
             CleanedAddresses, 
                 LEFT.street_1 = RIGHT.street_1 and 
                 LEFT.street_2 = RIGHT.street_2  and 
@@ -47,9 +28,7 @@ EXPORT Append_CleanAddress (
                 SELF := LEFT),
             KEEP(1),LEFT OUTER
         );
-
-    MergeRecs := FraudGovPlatform.fn_dedup_main( Old_Inputs + CleanedRecs );
     
-    return( MergeRecs );
+    return( CleanedRecs );
 
 END;

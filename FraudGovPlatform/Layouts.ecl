@@ -302,17 +302,10 @@ EXPORT Layouts := MODULE
 			string			Customer_Agency_Vertical_Type;
 			string1			Customer_Program;
 			unsigned8		source_rec_id;
-			Address.Layout_Clean_Name				cleaned_name;
-			clean_phones	clean_phones;
-			string9			clean_SSN;
-			string9			clean_Zip;
-			string25		clean_IP_Address;
-			string25		clean_dob;
 			unsigned3		file_type;
 			unsigned6		ind_type;
 			string100 	source := '';
 			Provenance;
-      		clean_Drivers_License clean_Drivers_License;		
 		END;
 		EXPORT KnownFraud := RECORD
 			Sprayed.KnownFraud;
@@ -321,32 +314,18 @@ EXPORT Layouts := MODULE
 			string			customer_agency_vertical_type;
 			string1			customer_program_fn; // use this one
 			unsigned8		source_rec_id ;
-			Address.Layout_Clean_Name				cleaned_name;
-			clean_phones	clean_phones;
-			string10		clean_SSN;
-			string10		clean_Zip;
-			string25		clean_IP_Address;
-			string10		clean_dob;
 			unsigned3		file_type;
 			unsigned6		ind_type;
 			string100 	source := '';
 			Provenance;
-      		clean_Drivers_License clean_Drivers_License;
 		END;
 		EXPORT Deltabase := RECORD
 			Sprayed.Deltabase;
 			unsigned8		source_rec_id ;
-			Address.Layout_Clean_Name				cleaned_name;
-			clean_phones	clean_phones;
-			string10		clean_SSN;
-			string10		clean_Zip;
-			string25		clean_IP_Address;
-			string10		clean_dob;
 			unsigned6		ind_type;
 			string12		cell_phone := '';
 			string100 	source := '';
 			Provenance;
-      		clean_Drivers_License clean_Drivers_License;
 		END;
 		
 		EXPORT ConfigRiskLevel	:= RECORD

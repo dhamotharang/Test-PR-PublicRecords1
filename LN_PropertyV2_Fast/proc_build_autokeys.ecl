@@ -55,7 +55,7 @@ outaction := parallel(proc_build_payload_key_AKB, AutokeyB2.Fn_Build.Do(mod_AKB,
  
 AutoKeyB2.MAC_AcceptSK_to_QA(ak_keyname, mymove)
 
-retval := sequential(outaction,mymove);
+retval := sequential(outaction,if(NOT(isFast),mymove));
  
 return retval;
 

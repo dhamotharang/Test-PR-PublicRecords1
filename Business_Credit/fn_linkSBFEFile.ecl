@@ -134,6 +134,19 @@ EXPORT	fn_linkSBFEFile(STRING	pVersion,
 		SELF															:=	[];
 	END;
 
+	preBaseLayout	tGetDigitalFootPrintEmail(preBaseLayout L,	UNSIGNED cnt)	:=	TRANSFORM
+		DFRecs														:=	SORT(L.DigitalFootprint,file_sequence_number);
+		SELF.E_Mail_Address						:=	if(L.E_Mail_Address='',DFRecs[cnt].InformationValue,L.E_Mail_Address);
+		SELF															:=	L;
+		SELF															:=	[];
+	END;
+	preBaseLayout	tGetDigitalFootPrintWebsite(preBaseLayout L,	UNSIGNED cnt)	:=	TRANSFORM
+		DFRecs														:=	SORT(L.DigitalFootprint,file_sequence_number);
+		SELF.Company_Website						:=	if(L.Company_Website='',DFRecs[cnt].InformationValue,L.Company_Website);
+		SELF.DigitalFootPrint												:=	[];
+		SELF															:=	L;
+		SELF															:=	[];
+	END;
 	baseLayout	tSBFEAccounts(preBaseLayout L)	:=	TRANSFORM
 		SELF.timestamp												:=	(STRING8)Std.Date.Today()+Std.Date.SecondsToString(Std.date.CurrentSeconds(true), '%H%M%S');
 		SELF.Extracted_Date										:=	L.Extracted_Date;
@@ -152,7 +165,11 @@ EXPORT	fn_linkSBFEFile(STRING	pVersion,
 	dHasPhone					:=	NORMALIZE(dHasAddress(COUNT(phone)>0)+dNoAddress(COUNT(phone)>0),COUNT(LEFT.phone),tGetPhone(LEFT,COUNTER));
 	dNoTaxID					:=	dHasPhone(COUNT(taxID)=0)+dNoPhone(COUNT(taxID)=0);
 	dHasTaxID					:=	NORMALIZE(dHasPhone(COUNT(taxID)>0)+dNoPhone(COUNT(taxID)>0),COUNT(LEFT.taxID),tGetTaxID(LEFT,COUNTER));
-	SBFE_Accounts			:=	PROJECT(dHasTaxID+dNoTaxID,tSBFEAccounts(LEFT));
+	dNoEmail					:=	dHasTaxID(COUNT(DigitalFootprint(InformationTypeDescription='EMAIL'))=0)+dNoTaxID(COUNT(DigitalFootprint(InformationTypeDescription='EMAIL'))=0);
+	dHasEmail					:=	NORMALIZE(dHasTaxID(COUNT(DigitalFootprint(InformationTypeDescription='EMAIL'))>0)+dNoTaxID(COUNT(DigitalFootprint(InformationTypeDescription='EMAIL'))>0),COUNT(LEFT.DigitalFootprint(InformationTypeDescription='EMAIL')),tGetDigitalFootPrintEmail(LEFT,COUNTER));
+	dNoWebsite					:=	dHasEmail(COUNT(DigitalFootprint(InformationTypeDescription='WEBSITE'))=0)+dNoEmail(COUNT(DigitalFootprint(InformationTypeDescription='WEBSITE'))=0);
+	dHasWebsite					:=	NORMALIZE(dHasEmail(COUNT(DigitalFootprint(InformationTypeDescription='WEBSITE'))>0)+dNoEmail(COUNT(DigitalFootprint(InformationTypeDescription='WEBSITE'))>0),COUNT(LEFT.DigitalFootprint(InformationTypeDescription='WEBSITE')),tGetDigitalFootPrintWebsite(LEFT,COUNTER));
+	SBFE_Accounts			:=	PROJECT(dHasWebsite+dNoWebsite,tSBFEAccounts(LEFT));
 	dCleanName				:=	Business_Credit.fn_cleanName(SBFE_Accounts):PERSIST(PersistNames.cleannames);
 	dCleanAddress			:=	Business_Credit.fn_cleanAddressUsingCache(dCleanName):PERSIST(PersistNames.cleanaddresses);
 

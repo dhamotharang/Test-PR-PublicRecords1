@@ -1,4 +1,4 @@
-import ut,Std;
+﻿import ut,Std;
 
 in_md := marriage_divorce_v2.file_mar_div_base(filing_type in ['3','7']);
 
@@ -184,7 +184,10 @@ end;
 
 
 //previous good file
-prev_build_ds := dataset('~thor_data400::base::mar_div::base_father',layout_mar_div_base,flat);
+prev_build_ds1 := dataset('~thor_data400::base::mar_div::intermediate_father',layout_mar_div_intermediate,flat);
+prev_build_ds  := project(prev_build_ds1
+													,transform(marriage_divorce_v2.layout_mar_div_base
+													,self := left));
 
 //current file
 final_build_ds:= j_final;

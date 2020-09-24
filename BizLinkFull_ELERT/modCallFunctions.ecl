@@ -334,9 +334,8 @@ Business_Header_SS.MAC_Match_Flex
 ,/* 28: source = ''                                                    */  source
 ,/* 29: source_record_id = ''                                          */  source_record_id
 ,/* 30: src_matching_is_priority  = FALSE                              */
-,/* 31: setofstrings = '[\'NA\',\'NA\',\'NA\']'                        */
-,/* 32: bScoreParents = TRUE                                           */  
-// ,/* 33: bSegmentation = TRUE                                           */  bSegmentation  // NEEDS TO BE ADDED BACK ONCE MMF IS PLUMBED FOR SEGMENTATION
+,/* 31: setofstrings = '[\'NA\',\'NA\',\'NA\']'                        */ 
+// ,/* 32: bSegmentation = TRUE                                           */  bSegmentation  // NEEDS TO BE ADDED BACK ONCE MMF IS PLUMBED FOR SEGMENTATION
 );
 
 RETURN JOIN(dOutput, dInData, left.acctNo=right.uniqueid, TRANSFORM(modLayouts.lSampleLayout,

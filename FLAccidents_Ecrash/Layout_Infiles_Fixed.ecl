@@ -926,6 +926,17 @@
     STRING Event_Sequence;
 	END;
 
+	EXPORT Citations_ChildRec := RECORD
+		STRING7 Citation_Issued;
+		STRING7 Citation_Type;
+		STRING100 Citation_Detail1;
+		STRING64 Citation_Status;
+		STRING60 Violation_Code1;
+		STRING60 Violation_Code2;
+		STRING60 Violation_Code3;
+		STRING60 Violation_Code4;
+	END;
+
 	EXPORT cmbnd := RECORD 
 		STRING11 Citation_ID;
 		STRING19 Creation_Date;
@@ -1783,8 +1794,14 @@
 		//PRtCC CR-1262 
     STRING Direction_Of_Impact;
 		STRING Event_Sequence;
+	  DATASET(Citations_ChildRec) Citation_Details {MAXCOUNT(Constants.Max_Citations_ChildRec_Count)};
 	END;
 	
+	EXPORT Citations_WithChildRec := RECORD
+    Citation;
+	  DATASET(Citations_ChildRec) Citation_Details {MAXCOUNT(Constants.Max_Citations_ChildRec_Count)};
+	END;
+		
 	EXPORT property_damage := RECORD
 		STRING11 Property_Damage_ID;
 		STRING11 Incident_ID;
