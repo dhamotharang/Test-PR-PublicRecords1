@@ -79,6 +79,7 @@ export t_ECrashDocument := record
 	string Id {xpath('Id')};
 	string Extension {xpath('Extension')};
 	integer Pages {xpath('Pages')};
+	string ReportSource {xpath('ReportSource')};
 end;
 		
 export t_ECrashSearchRecordData := record (t_ECrashSearchShared)

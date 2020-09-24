@@ -95,8 +95,8 @@ export dataset(l_out) fn_get_report(
 	// NOTE: When input.currentVend is true, we delay marshalling both because code below
 	//       would break it and because it would offer no improvement in efficiency.
 	forceDelay		:= LN_PropertyV2_Services.input.currentVend or LN_PropertyV2_Services.input.RobustnessScoreSorting;
-	paged1				:= Marshall.page(deeds_curOK, assess_curOK, parties, skipPenaltyFilter, forceDelay);
-	paged2				:= Marshall.page(deeds_curOK, assess_curOK, parties, skipPenaltyFilter, forceDelay, inMaxProperties, inMaxProperties);
+	paged1				:= LN_PropertyV2_Services.Marshall.page(deeds_curOK, assess_curOK, parties, skipPenaltyFilter, forceDelay);
+	paged2				:= LN_PropertyV2_Services.Marshall.page(deeds_curOK, assess_curOK, parties, skipPenaltyFilter, forceDelay, inMaxProperties, inMaxProperties);
 	deeds_paged		:= if(inMaxProperties = 0,paged1.deeds,paged2.deeds);
 	assess_paged	:= if(inMaxProperties = 0,paged1.assess,paged2.assess);
 	num_recs			:= if(inMaxProperties = 0,paged1.numRecs,paged2.numRecs);
@@ -111,10 +111,10 @@ export dataset(l_out) fn_get_report(
 	// --------------------------------------------------------------------------------
 	
 	// process the results
-	deeds		:= fn_get_deeds(deeds_paged);
+	deeds		:= LN_PropertyV2_Services.fn_get_deeds(deeds_paged);
 	// output(deeds,named('deeds2'));
 
-assess	:= fn_get_assessments(assess_paged);
+assess	:= LN_PropertyV2_Services.fn_get_assessments(assess_paged);
 
 	// assimilate deeds & assessments
 	l_out fromDeed(deeds L) := transform
@@ -322,7 +322,7 @@ assess	:= fn_get_assessments(assess_paged);
 	names_filled := PROJECT(detailed, fill_names(LEFT));
 
 	// final sort
-	results := Raw.final_sort(names_filled);
+	results := LN_PropertyV2_Services.Raw.final_sort(names_filled);
 	
 	//Re Sort results based on Scoring method
 	results_final := if(LN_PropertyV2_Services.input.RobustnessScoreSorting,fn_robustness_scoring(results),results);

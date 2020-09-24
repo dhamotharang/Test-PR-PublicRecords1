@@ -12,25 +12,31 @@ makeDTEGatewayCall := GetRequestInfoGW.URL <> '' AND InvokeDTE = TRUE;
 
 GetRequestInfo := Gateway.Soapcall_DTEGetRequestInfo(RecsToDTE, GetRequestInfoGW, pMakeGatewayCall := makeDTEGatewayCall);
 
+ErrorInXMLorJSON := GetRequestInfo[1].ErrorCode = '44' OR GetRequestInfo[1].ErrorCode = '45' OR (INTEGER)GetRequestInfo[1].ErrorCode < 0;
+
 LiensAppendSuppressFlag := JOIN(GetRequestInfo, clam[1].LnJ_datasets.lnjliens, 
 LEFT.RMSID = RIGHT.RMSID AND LEFT.TMSID = RIGHT.TMSID, 
-TRANSFORM(RECORDOF(RIGHT), 
-SELF.SuppressRecord := IF(LEFT.TaskStatus <> '0' OR LEFT.ErrorMessage <> '', TRUE, FALSE);
+TRANSFORM({RECORDOF(RIGHT), BOOLEAN HasError}, 
+SELF.SuppressRecord := IF(LEFT.TaskStatus <> '0' OR LEFT.ErrorMessage <> '' OR ErrorInXMLorJSON, TRUE, FALSE);
+SELF.HasError := IF(ErrorInXMLorJSON, TRUE, FALSE);
 SELF := RIGHT;
 ));
 
 JudgmentsAppendSuppressFlag := JOIN(GetRequestInfo, clam[1].LnJ_datasets.lnjjudgments, 
 LEFT.RMSID = RIGHT.RMSID AND LEFT.TMSID = RIGHT.TMSID, 
-TRANSFORM(RECORDOF(RIGHT),
-SELF.SuppressRecord := IF(LEFT.TaskStatus <> '0' OR LEFT.ErrorMessage <> '', TRUE, FALSE);
+TRANSFORM({RECORDOF(RIGHT), BOOLEAN HasError},
+SELF.SuppressRecord := IF(LEFT.TaskStatus <> '0' OR LEFT.ErrorMessage <> '' OR ErrorInXMLorJSON, TRUE, FALSE);
+SELF.HasError := IF(ErrorInXMLorJSON, TRUE, FALSE);
 SELF := RIGHT;
 ));
 
+JudgmentsANDLiensHasErrorRecords := (COUNT(LiensAppendSuppressFlag(HasError = TRUE)) + COUNT(JudgmentsAppendSuppressFlag(HasError = TRUE))) > 0;
+
 riskview5_suppressed := PROJECT(riskview5_final_results, 
 TRANSFORM(RECORDOF(LEFT),
-SELF.Exception_Code := '41';
-SELF.LnJLiens := LiensAppendSuppressFlag(SuppressRecord = FALSE);
-SELF.LnJJudgments := JudgmentsAppendSuppressFlag(SuppressRecord = FALSE);
+SELF.Exception_Code := IF(JudgmentsANDLiensHasErrorRecords, '-1', '');
+SELF.LnJLiens := PROJECT(LiensAppendSuppressFlag(SuppressRecord = FALSE), TRANSFORM(RECORDOF(clam[1].LnJ_datasets.lnjliens), SELF := LEFT));
+SELF.LnJJudgments := PROJECT(JudgmentsAppendSuppressFlag(SuppressRecord = FALSE), TRANSFORM(RECORDOF(clam[1].LnJ_datasets.lnjjudgments), SELF := LEFT));
 SELF := LEFT;));
 
 RETURN riskview5_suppressed;
@@ -62,6 +68,9 @@ SELF.Exception_Code := '22OKC';
 SELF := LEFT;
 )));
 
+IsHighRiskLiens := COUNT(Suppressed_Liens(HighRiskCheck = TRUE)) > 0;
+IsHighRiskJudgments := COUNT(Suppressed_Judgments(HighRiskCheck = TRUE)) > 0;
+
 riskview5_suppressed := IF(~StatusRefreshRecommendGWError OR ~StatusRefreshGWError,
 IF(ExcludeStatusRefresh = TRUE, PROJECT(riskview5_final_results, 
 TRANSFORM(RECORDOF(LEFT), 
@@ -70,8 +79,8 @@ SELF.LnJJudgments := Suppressed_Judgments(HighRiskCheck = FALSE);
 SELF := LEFT;)),
 PROJECT(riskview5_final_results, 
 TRANSFORM(RECORDOF(LEFT), 
-SELF.LnJLiens := [];
-SELF.LnJJudgments := [];
+SELF.LnJLiens := IF(IsHighRiskLiens OR IsHighRiskJudgments, DATASET([], RECORDOF(Suppressed_Liens)), Suppressed_Liens);
+SELF.LnJJudgments :=  IF(IsHighRiskLiens OR IsHighRiskJudgments, DATASET([], RECORDOF(Suppressed_Judgments)), Suppressed_Judgments);
 SELF := LEFT;))));
 
 riskview_final_results_with_deferred := IF(COUNT(StatusRefreshResults) > 0,

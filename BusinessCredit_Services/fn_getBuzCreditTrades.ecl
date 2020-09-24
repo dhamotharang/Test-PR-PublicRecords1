@@ -1,45 +1,68 @@
-﻿IMPORT BIPV2, Business_Credit, Business_Credit_Scoring, BusinessCredit_Services, Codes,  
+﻿IMPORT $,Business_Credit, Business_Credit_Scoring, BusinessCredit_Services, Codes,  
        iesp, LNSmallBusiness, STD, ut;
 
 EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod, 
 															DATASET(BusinessCredit_Services.Layouts.buzCredit_AccNo_Slim)	buzCreditHeader_recs,																														
-															string8 bestCode								
+															STRING8 bestCode								
 														  ) := MODULE
 
 	SHARED todaysDate := std.Date.Today();
   // calculate the date one year  
   SHARED unsigned_DateOneYearAgo := todaysDate - 10000;
   
-	  SHARED BuzCreditScoringRecs := Business_Credit_Scoring.Key_ScoringIndex().kFetch2(inmod.BusinessIds, inmod.FetchLevel,,inmod.DataPermissionMask, BusinessCredit_Services.Constants.JOIN_LIMIT);
+	SHARED BuzCreditScoringRecs := Business_Credit_Scoring.Key_ScoringIndex().kFetch2(inmod.BusinessIds, inmod.FetchLevel,,inmod.DataPermissionMask, BusinessCredit_Services.Constants.JOIN_LIMIT);
 	
 	// credit util 1.2.8/1.3.6
-	SHARED TradeRecs_Raw 		:=	JOIN(	buzCreditHeader_recs, Business_Credit.key_tradeline(), 
-																BusinessCredit_Services.Macros.mac_JoinBusAccounts(),
-																TRANSFORM(RIGHT), 
-																LIMIT(BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT, SKIP));
-	
+	// expand the layout to allow for the new calculations for Open accounts and account status
+  SHARED TradeRecs_Raw 		:=	
+	  JOIN(	buzCreditHeader_recs, Business_Credit.key_tradeline(), 
+		      BusinessCredit_Services.Macros.mac_JoinBusAccounts(),
+      TRANSFORM(BusinessCredit_Services.Layouts.rec_tradelineExpandedLayout,
+        // See JIRA RR-19879 - SBFE changed the definition of their seven Past Due Aging Amount Buckets from 
+			  // days past due to payments past due the call to convertBucketsToV5 conversion 
+        // will be moved to the data layer and this can be pulled back out.
+        mod := $.ConvertPastDueAmounts();
+				needConversion := mod.checkConversionNeeded(RIGHT, $.Constants.SBFE_V5_LAYOUT_CHANGE_DATE);
+        nonblank_status := TRIM(RIGHT.Account_Status_1) <> '' OR TRIM(RIGHT.Account_Status_2) <> '';
+        is_suspend := RIGHT.Account_Status_1 = BusinessCredit_Services.Constants.Disaster_Suspend_Status OR 
+                      RIGHT.Account_Status_2 = BusinessCredit_Services.Constants.Disaster_Suspend_Status;
+        SELF.isRemain_Bal_Changed  := (UNSIGNED)RIGHT.Cycle_End_Date > unsigned_DateOneYearAgo,
+        SELF.isRecent_Pmt_Not_Zero := (UNSIGNED)RIGHT.recent_payment_amount != 0 AND (UNSIGNED)RIGHT.Cycle_End_Date > unsigned_DateOneYearAgo,
+        SELF.Disaster_Impact := RIGHT.Account_Status_1 = BusinessCredit_Services.Constants.Disaster_Impact_Status OR 
+                                RIGHT.Account_Status_2 = BusinessCredit_Services.Constants.Disaster_Impact_Status;
+        SELF.most_recent_status_dt := IF(nonblank_status, (UNSIGNED)RIGHT.Cycle_End_Date, 0);
+        SELF.most_recent_suspend_dt := IF(is_suspend, (UNSIGNED)RIGHT.Cycle_End_Date, 0);
+			  SELF.Past_Due_Aging_Amount_Bucket_1 := IF(needConversion,
+				                                          mod.convertBucket1(RIGHT), 
+																									RIGHT.Past_Due_Aging_Amount_Bucket_1);
+        SELF.Past_Due_Aging_Amount_Bucket_2 := IF(needConversion,
+				                                          mod.convertBucket2(RIGHT), 
+																									RIGHT.Past_Due_Aging_Amount_Bucket_2);
+        SELF.Past_Due_Aging_Amount_Bucket_3 := IF(needConversion,
+				                                          mod.convertBucket3(RIGHT), 
+																									RIGHT.Past_Due_Aging_Amount_Bucket_3);
+        SELF.Past_Due_Aging_Amount_Bucket_4 := IF(needConversion,
+				                                          mod.convertBucket4(RIGHT), 
+																									RIGHT.Past_Due_Aging_Amount_Bucket_4);
+        SELF.Past_Due_Aging_Amount_Bucket_5 := IF(needConversion,
+				                                          mod.convertBucket5(RIGHT), 
+																									RIGHT.Past_Due_Aging_Amount_Bucket_5);
+        SELF.Past_Due_Aging_Amount_Bucket_6 := IF(needConversion,
+				                                          mod.convertBucket6(RIGHT), 
+																									RIGHT.Past_Due_Aging_Amount_Bucket_6);
+        SELF.Past_Due_Aging_Amount_Bucket_7 := IF(needConversion,
+				                                          mod.convertBucket7(RIGHT), 
+																									RIGHT.Past_Due_Aging_Amount_Bucket_7);
+        SELF := RIGHT), 
+			LIMIT(BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT, SKIP));
+
   // Sort latest Record in each account to the top 
   TradeRecs_sorted := SORT(TradeRecs_Raw, #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()), -cycle_end_date); 
-     
-  // expand the layout to allow for the new calculations for Open accounts and account status
-  TradeRecs_expandedLayout := PROJECT(TradeRecs_sorted,
-    TRANSFORM(BusinessCredit_Services.Layouts.rec_tradelineExpandedLayout,
-      nonblank_status := TRIM(LEFT.Account_Status_1) <> '' OR TRIM(LEFT.Account_Status_2) <> '';
-      is_suspend := LEFT.Account_Status_1 = BusinessCredit_Services.Constants.Disaster_Suspend_Status OR 
-        LEFT.Account_Status_2 = BusinessCredit_Services.Constants.Disaster_Suspend_Status;
-
-      SELF.isRemain_Bal_Changed  := (UNSIGNED)LEFT.Cycle_End_Date > unsigned_DateOneYearAgo,
-      SELF.isRecent_Pmt_Not_Zero := (UNSIGNED)LEFT.recent_payment_amount != 0 AND (UNSIGNED)LEFT.Cycle_End_Date > unsigned_DateOneYearAgo,
-      SELF.Disaster_Impact := LEFT.Account_Status_1 = BusinessCredit_Services.Constants.Disaster_Impact_Status OR 
-        LEFT.Account_Status_2 = BusinessCredit_Services.Constants.Disaster_Impact_Status;
-      SELF.most_recent_status_dt := IF(nonblank_status, (UNSIGNED)LEFT.Cycle_End_Date, 0);
-      SELF.most_recent_suspend_dt := IF(is_suspend, (UNSIGNED)LEFT.Cycle_End_Date, 0);
-      SELF := LEFT));
   
   // The rollup needs to end up with only one record for each account as if deduped, 
   // with the two new calculated fields based on the last 12 months.
   SHARED TradeRecs_dedup	 := 
-    ROLLUP(TradeRecs_expandedLayout, 
+    ROLLUP(TradeRecs_sorted, 
            LEFT.Sbfe_Contributor_Number  = RIGHT.Sbfe_Contributor_Number AND
 				   LEFT.Contract_Account_Number  = RIGHT.Contract_Account_Number AND
 				   LEFT.Account_Type_Reported 	 = RIGHT.Account_Type_Reported,
@@ -102,7 +125,7 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
   // in the most recent record for any of the accounts
   most_severe_status := BusinessCredit_Services.Functions.fn_appendDisasterStatus(
     TradeRecs_Raw_with_Status_Sort[1].worst_status, 
-    EXISTS(TradeRecs_dedup(disaster_impact)), false);
+    EXISTS(TradeRecs_dedup(disaster_impact)), FALSE);
 	
 	AvgOpenBalance 		:= ROUND(Total_Current_Exposure / open_accounts, 2);
   
@@ -186,29 +209,29 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 															
 	EXPORT CreditUtil_recs_combined := SORTED(CreditUtil_recs_curr + CreditUtil_recs_hist_1, -(CurrentPriorFlag = 'C'), -ScoreCalculatedDate);
 
-	SHARED previousYear 		 := (integer)((STRING)todaysDate[1..4]) - 1;
-	SHARED prevYearStartDate := (string)(previousYear) + '0101';
-	SHARED prevYearEndDate 	 := (string)(previousYear) + '1231';
+	SHARED previousYear 		 := (INTEGER)((STRING)todaysDate[1..4]) - 1;
+	SHARED prevYearStartDate := (STRING)(previousYear) + '0101';
+	SHARED prevYearEndDate 	 := (STRING)(previousYear) + '1231';
 
 	// Requirement 1.2.10
 	TradeRecs_dbt 		:=	TradeRecs_Active(DBT <> '');
-	prevYearDBT_AVG 	:= 	ROUND(AVE(BuzCreditScoringRecs(version >= prevYearStartDate and version <= prevYearEndDate), (integer)BuzCreditScoringRecs.DBT),2);
+	prevYearDBT_AVG 	:= 	ROUND(AVE(BuzCreditScoringRecs(version >= prevYearStartDate AND version <= prevYearEndDate), (INTEGER)BuzCreditScoringRecs.DBT),2);
 	
 	industryCode              := bestCode;
-	SIC_Desc					:=	Codes.Key_SIC4(keyed(SIC4_Code = IndustryCode))[1].sic4_description;
-	NAICS_Desc				:= 	Codes.Key_NAICS(keyed(naics_code = IndustryCode))[1].naics_description;
+	SIC_Desc					:=	Codes.Key_SIC4(KEYED(SIC4_Code = IndustryCode))[1].sic4_description;
+	NAICS_Desc				:= 	Codes.Key_NAICS(KEYED(naics_code = IndustryCode))[1].naics_description;
 	IndustryDesc			:=	IF(SIC_Desc <> '' , SIC_Desc , NAICS_Desc);
 
 	iesp.businesscreditreport.t_BusinessCreditDBT	trans_curr_dbt() := TRANSFORM
 		SELF.DBTCalculatedDate					:= iesp.ECL2ESP.toDate(todaysDate);
 		SELF.DBTMinRange								:= BusinessCredit_Services.Constants.DBT_MIN_RANGE;
 		SELF.DBTMaxRange								:= BusinessCredit_Services.Constants.DBT_MAX_RANGE;
-		SELF.DBT												:= (string) ROUND(AVE(TradeRecs_dbt , (integer)TradeRecs_dbt.dbt));
+		SELF.DBT												:= (STRING) ROUND(AVE(TradeRecs_dbt , (INTEGER)TradeRecs_dbt.dbt));
 		SELF.CurrentPriorFlag						:= LNSmallBusiness.Constants.CURRENT_FLAG;
 		SELF.PrimaryIndustryCode				:= IndustryCode;
 		SELF.PrimaryIndustryDescription	:= IndustryDesc;
-		SELF.PriorYear									:= (string) previousYear;
-		SELF.PriorYearDBTAverage				:= (string) prevYearDBT_AVG;
+		SELF.PriorYear									:= (STRING) previousYear;
+		SELF.PriorYearDBTAverage				:= (STRING) prevYearDBT_AVG;
 		SELF.IndustryDBTAverage					:= ''; // Industry DBT Avg not to be calculated for current record.
 		SELF														:= [];
 	END;												
@@ -238,7 +261,7 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 		PastDueAgingAmount91PlusPercent	:= ROUND((SUM(TradeRecs_Active_AC_Open,(INTEGER)TradeRecs_Active_AC_Open.Past_Due_Aging_Amount_Bucket_4)
 																							+ SUM(TradeRecs_Active_AC_Open,(INTEGER)TradeRecs_Active_AC_Open.Past_Due_Aging_Amount_Bucket_5) 
 																							+ SUM(TradeRecs_Active_AC_Open,(INTEGER)TradeRecs_Active_AC_Open.Past_Due_Aging_Amount_Bucket_6) 
-																							+ SUM(TradeRecs_Active_AC_Open,(INTEGER)TradeRecs_Active_AC_Open.Past_Due_Aging_Amount_Bucket_7) 
+										 													+ SUM(TradeRecs_Active_AC_Open,(INTEGER)TradeRecs_Active_AC_Open.Past_Due_Aging_Amount_Bucket_7) 
 																							)*100/Total_Current_Exposure);
 		
 		SELF.TotalCurrentExposure 						:= (STRING)Total_Current_Exposure;
@@ -379,12 +402,12 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 	
 	// start new code #2
 	
-	rolledYearlyCreditUtils := record
-	dataset(iesp.businesscreditreport.t_BusinessYearlyCreditUtilized) tmpYearlyCreditUtils;
-	string30 BusinessContributorNumber;
-	string50 BusinessAccountNumber;
-	 string3 AccountTypeReportedCode; 
-	 end;
+	rolledYearlyCreditUtils := RECORD
+	  DATASET(iesp.businesscreditreport.t_BusinessYearlyCreditUtilized) tmpYearlyCreditUtils;
+	  STRING30 BusinessContributorNumber;
+	  STRING50 BusinessAccountNumber;
+	  STRING3 AccountTypeReportedCode; 
+	 END;
 	 
 	 rolledYearlyCreditUtils   FillYearlyCreditUtils(  recordof(past_7_year_creditutil_tab_sortSlim) Le,
 	                                                                                       dataset(RECORDOF(past_7_year_creditutil_tab_sortSlim)) allrows ) := TRANSFORM
@@ -394,7 +417,7 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 		SELF.BusinessAccountNumber 				:= 	Le.contract_account_number;
 		SELF.AccountTypeReportedCode 			:= 	Le.account_type_reported;
 		
-		self.tmpYearlyCreditUtils :=  CHOOSEN(PROJECT(allrows,  iesp.businesscreditreport.t_BusinessYearlyCreditUtilized), BusinessCredit_Services.Constants.MAX_YEARLY_CREDIT_UTIL);
+		SELF.tmpYearlyCreditUtils :=  CHOOSEN(PROJECT(allrows,  iesp.businesscreditreport.t_BusinessYearlyCreditUtilized), BusinessCredit_Services.Constants.MAX_YEARLY_CREDIT_UTIL);
 		
 		END;
 		
@@ -518,36 +541,5 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
                                                           CHOOSEN(SORT(ChargeOffsRecsToPutOnEnd, -AccountReportedDate),		NumChargeOffsToPutOnEnd)																												
 														);
 																												
-
-
-             // c_AccDetail_recsChargedOff := count(AccDetail_recsChargedOff);
-		   // c_AccDetail_recsNoChargedOff := count(AccDetail_recsNoChargedOff);
-            // output(MoreThanTenChargeOffs, named('MoreThanTenChargeOffs'));											
-						// output(AccDetail_recsNumNoChargedOffToKeep, named('AccDetail_recsNumNoChargedOffToKeep'));
-						// output(NumChargeOffsToPutOnEnd ,named('NumChargeOffsToPutOnEnd'));
-						// output(c_AccDetail_recsChargedOff, named('c_AccDetail_recsChargedOff'));
-						// output(c_AccDetail_recsNoChargedOff, named('count_AccDetail_recsNoChargedOff'));
-		// output(count(PaymentHistoryRecsBig), named('PaymentHistoryRecsBig_count'));
-		// output(count(paymentHistoryRecs), named('paymentHistoryRecs_count'));
-           // output(CHOOSEN(AccDetail_recsChargedOff,50), named('first3'));
-		// output(CHOOSEN(AccDetail_recsChargedOff,2), named('first2')); 		
-		// output(ChargeOffsRecsToPutOnEnd, named('ChargeOffsRecsToPutOnEnd'));
-	 // added coding for pushing chargeoff recs to top of heap..
-	 //output(past_7_year_creditutil_tab_sort, named('past_7_year_creditutil_tab_sort'));
-   // output(tempAccDetail_Recs, named('tempAccDetail_Recs'));
-   // output(past_7_year_creditutil_tab_sort, named('past_7_year_creditutil_tab_sort'));
-	 // output(past_7_year_creditutil_tab_sortSlim, named('past_7_year_creditutil_tab_sortSlim'));
-
-   // output(TEMP2AccDetail_YearCreditUtils, named('TEMP2AccDetail_YearCreditUtils'));
-   // output(tempAcctDetail_RecsYearlyCreditUtils, named('tempAcctDetail_RecsYearlyCreditUtils'));
-   // output(TEMP2AccDetail_Recs, named('TEMP2AccDetail_Recs'));
-   // output(AccDetail_Recs, named('AccDetail_Recs'));
-
-  // output(TradeRecs_Raw, named('fn_getBuzCreditTrades__TradeRecs_Raw'));
-  // output(TradeRecs_dedup, named('fn_getBuzCreditTrades__TradeRecs_dedup'));
-  // output(TradeRecs_Raw_with_Status_Sort, named('fn_getBuzCreditTrades__TradeRecs_Raw_with_Status_Sort'));
-  // output(TradeRecs_with_Status_Rolled, named('fn_getBuzCreditTrades__TradeRecs_with_Status_Rolled'));
-  // output(most_severe_status, named('fn_getBuzCreditTrades__most_severe_status'));
-
 	EXPORT   AccDetail_Recs_Combined :=   CHOOSEN( FinalAccDetail_recs,  iesp.Constants.BusinessCredit.MaxTradelines);							            
 END;

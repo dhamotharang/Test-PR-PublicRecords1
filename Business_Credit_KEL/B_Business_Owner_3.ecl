@@ -4,8 +4,8 @@ IMPORT CFG_graph,E_Business_Owner FROM Business_Credit_KEL;
 IMPORT * FROM KEL12.Null;
 EXPORT B_Business_Owner_3(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __cfg = CFG_graph) := MODULE
   SHARED VIRTUAL TYPEOF(E_Business_Owner(__in,__cfg).__Result) __E_Business_Owner := E_Business_Owner(__in,__cfg).__Result;
-  SHARED __EE466924 := __E_Business_Owner;
-  EXPORT __ST234826_Layout := RECORD
+  SHARED __EE537563 := __E_Business_Owner;
+  EXPORT __ST242401_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr _sbfe__contributor__number_;
     KEL.typ.nstr _contract__account__number_;
@@ -25,9 +25,9 @@ EXPORT B_Business_Owner_3(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_
     KEL.typ.nstr Name_;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST234826_Layout __ND466922__Project(E_Business_Owner(__in,__cfg).Layout __PP466830) := TRANSFORM
-    SELF.Name_ := __FN1(TRIM,__PP466830._business__name_);
-    SELF := __PP466830;
+  SHARED __ST242401_Layout __ND537561__Project(E_Business_Owner(__in,__cfg).Layout __PP537469) := TRANSFORM
+    SELF.Name_ := __FN1(TRIM,__PP537469._business__name_);
+    SELF := __PP537469;
   END;
-  EXPORT __ENH_Business_Owner_3 := PROJECT(__EE466924,__ND466922__Project(LEFT));
+  EXPORT __ENH_Business_Owner_3 := PROJECT(__EE537563,__ND537561__Project(LEFT));
 END;

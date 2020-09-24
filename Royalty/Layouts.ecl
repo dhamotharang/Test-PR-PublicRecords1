@@ -1,4 +1,4 @@
-EXPORT Layouts := module
+﻿EXPORT Layouts := module
 
  // the standard royalty dataset layout
  export Royalty := record
@@ -16,7 +16,7 @@ EXPORT Layouts := module
 		string20 	royalty_type; 
    	unsigned2	royalty_count;
 		unsigned2	non_royalty_count;
-		string20	count_entity := '';
+		string50	count_entity := ''; //20200922 RR-19924, change length to store values longer than 20. i.e. ip_address for the GeoTriangulation_Services.BatchService
 		string1		source_type := ''; // 'I' - inhouse; 'G' - gateway
  end;
  
