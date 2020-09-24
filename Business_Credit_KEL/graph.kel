@@ -72,6 +72,8 @@ Tradeline := ENTITY(FLAT(
 							reporting_indicator_length,
 							STRING payment_interval=NULL(''),
 							STRING payment_status_category=NULL(''),
+              INTEGER DBT_V5=NULL(''), 
+              STRING ln_delinquency_date=NULL(''), 
 							term_of_account_in_months,
 							DATE first_payment_due_date=NULL(''),
 							DATE final_pyament_due_date=NULL(''),
@@ -226,7 +228,7 @@ Business: => BusinessNotOnFile := NOT EXISTS(BusinessAccount.acc);
 // $$$$$ which has the same value for each row.
 Business: NOT_ON_FILE := -99;
 Business: NO_DATA_AVAILABLE := -98;
-Business: UNKNOWN_DATA := -97; Account: UNKNOWN_DATA := -97; Tradeline: UNKNOWN_DATA := -97;
+Business: UNKNOWN_DATA := -97; Account: UNKNOWN_DATA := -97; Tradeline: UNKNOWN_DATA := -97; Tradeline: CUTOFF_DATE := 20201001; Account: CUTOFF_DATE := 20201001;
 
 //SBFE shell attributes
 Business: => DateFirstCycleAll := BusinessAccount.acc.AccountTradeline.trade.cycle_end_date$Min;
@@ -262,7 +264,7 @@ Account: => OpenedLast60Month := MONTHSBETWEEN(DateAccountOpened, CURRENTDATE())
 Account: => OpenedLast84Month := MONTHSBETWEEN(DateAccountOpened, CURRENTDATE()) < 84;
 
 // $$$$$ Pull out common sub-expressions into their own properties
-Business: => NoOpenAccounts := ALL(BusinessAccount.acc, DateAccountOpened:Null);
+Business: => NoOpenAccounts := ALL(BusinessAccount.acc, DateAccountOpened:Null); 
 
 Business : => Sbfeopencount03m := MAP(BusinessNotOnFile => NOT_ON_FILE, 
 																					NoOpenAccounts 		=> UNKNOWN_DATA, 
@@ -304,8 +306,28 @@ Account: => DateClosed := MAX(AccountTradeline.trade(load_date = Account.MostRec
 Account: => DateClosedEstimated := IF(NOT DateClosed:Null, DateClosed, MIN(AccountTradeline.trade(IsClosed), cycle_end_date));
 //Account: => IsInvalidAccountCloseDate := ALL(Tradeline, DateClosed:Null OR DateClosed > CURRENTDATE());
 
-Tradeline: SET_CHARGEOFF_STATUS := ['009','011'];
-Tradeline: SET_CLOSED_STATUS := ['002','003','004','005','008','009','011','016','017','018','022'];
+/* 
+** As of October 1st 2020, the new SBFE Layout (V5), goes live where new fields are being included, 
+** and others are having their names and interpretations altered. Some of the new logic was done on the Data side. (e.g. DBT_V5 calculation)
+** Some new logic is being put in place here also to handle the changes with purpose of having minimal impacts on the results 
+** produced by the attributes. 
+*/
+
+/* Introducing new account status codes (which will start to be seen on/after October 1st) to the sets below 
+** Status codes added:
+** 023 => Collateral Repossession
+** 027 => Discharged in Bankruptcy - Chapter 7
+** 028 => Discharged in Bankruptcy - Chapter 11
+** 029 => Discharged in Bankruptcy - Chapter 13
+** 030 => Account Paid in Full - As Agreed 
+** 032 => Charge-off partial balance
+** Note:  Code tested without 017 and 023 -  
+** 1% of the records came back with closed account changes. 
+** Product decided to keep 017 and include 023 based on their definitions.
+*/
+
+Tradeline: SET_CHARGEOFF_STATUS := ['009','011','032'];
+Tradeline: SET_CLOSED_STATUS := ['002','003','004','005','008','009','011','016','017','018','022','023','024','025','027','028','029','030','032']; 
 
 Tradeline: => IsChargeoff := (NOT date_account_was_charged_off:Null AND date_account_was_charged_off <= CURRENTDATE()) OR //if chargeoff date is in the future, don't count as closed.
                               amount_charged_off_by_creditor > 0 OR
@@ -315,6 +337,7 @@ Tradeline: => IsChargeoff := (NOT date_account_was_charged_off:Null AND date_acc
                               account_status_2 IN SET_CHARGEOFF_STATUS;
 
 Account: => IsChargeoff := EXISTS(AccountTradeline.trade(IsChargeoff));
+
 Tradeline: => IsClosed := NOT date_account_closed:Null OR
                           account_closure_basis != ''   OR
                           account_status_1 IN SET_CLOSED_STATUS OR
@@ -331,8 +354,8 @@ Account: => HasClosed60Month := NOT OpenedLast60Month AND HasClosed AND MONTHSBE
 Account: => HasClosed84Month := NOT OpenedLast84Month AND HasClosed AND MONTHSBETWEEN(DateClosedEstimated, CURRENTDATE()) >= 84; 
 
 Tradeline: => IsClosedInvoluntary := account_closure_basis IN ['X','F','P','O'] OR
-                                     account_status_1 IN ['017'] OR
-                                     account_status_2 IN ['017'] OR
+                                     account_status_1 IN ['017','023'] OR
+                                     account_status_2 IN ['017','023'] OR 
                                      IsChargeoff;
 Account: => IsInvoluntaryClosure := EXISTS(AccountTradeline.trade(IsClosedInvoluntary));
 
@@ -2012,7 +2035,7 @@ Business: => Sbfebalanceclosedcount24m := MAP(BusinessNotOnFile => NOT_ON_FILE,
 
 Tradeline: => OriginalCreditLimit := IF(EXISTS(AccountTradeline.acc(IsLoan)),
 																		 IF(original_credit_limit > 0, original_credit_limit,
-																		 IF(highest_credit_used > 0, highest_credit_used,
+																		 IF(highest_credit_used > 0, highest_credit_used, 
 																	   IF(current_credit_limit > 0, current_credit_limit,
 																	   original_credit_limit))), original_credit_limit);
 																		 //use waterfall for loans, use original_credit_limit for lease and letter
@@ -2203,18 +2226,18 @@ Business: => Sbfelimitoelineamt84m := MAP(BusinessNotOnFile => NOT_ON_FILE,
 																					
 
 Account: => MostRecentPaymentIntervalDate := MAX(AccountTradeline.trade(NOT payment_interval:Null), load_date);
-Tradeline: => MonthsBetweenPayment := MAP(payment_interval = 'A' 		=> 12,		// Annual
-																					payment_interval = 'BM'		=> 2,   	// Bi-monthly
-																					payment_interval = 'BW'		=> 0.5, 	// Bi-weekly
-																					payment_interval = 'D'		=> 1/30, 	// Daily
-																					payment_interval = 'M' 		=> 1,    	// Monthly
-																					payment_interval = 'Q'		=> 3,    	// Quarterly
-																					payment_interval = 'S'		=> 3,    	// Seasonal
-																					payment_interval = 'SA'		=> 6,   	// Semi-annual
-																					payment_interval = 'SM' 	=> 0.5, 	// Semi-monthly
-																					payment_interval = 'SP' 	=> 1,   	// Single payment
-																					payment_interval = 'W'		=> 0.25, 	// Weekly
-																																			 1);
+Tradeline: => MonthsBetweenPayment := MAP(payment_interval = 'A'            => 12,		// Annual
+																					payment_interval = 'BM'           => 2,   	// Bi-monthly
+																					payment_interval = 'BW'           => 0.5, 	// Bi-weekly
+																					payment_interval = 'D'            => 1/30, 	// Daily
+																					payment_interval = 'M'            => 1,    	// Monthly
+																					payment_interval = 'Q'            => 3,    	// Quarterly
+																					payment_interval IN ['S','SF']    => 3,     // Seasonal
+																					payment_interval = 'SA'           => 6,   	// Semi-annual
+																					payment_interval = 'SM'           => 0.5, 	// Semi-monthly
+																					payment_interval = 'SP'           => 1,   	// Single payment
+																					payment_interval = 'W'            => 0.25, 	// Weekly
+                                                                               1);
 Account: => MonthsBetweenPayment := MAX(AccountTradeline(trade.load_date = acc.MostRecentPaymentIntervalDate), trade.MonthsBetweenPayment);
 Account: => MostRecentScheduledDate := MAX(AccountTradeline.trade(NOT payment_amount_scheduled:Null), load_date); //check 0 okay, null isn't
 
@@ -2565,12 +2588,28 @@ Business: => Sbfeutilization30oline := MAP(BusinessNotOnFile => NOT_ON_FILE,
 																					COUNT(BusinessAccount.acc(IsOpen AND IsOLine)) = 0 => NO_DATA_AVAILABLE,
 																					CannotCalculateUtilizationOLine => UNKNOWN_DATA,
 																					COUNT(BusinessAccount.acc(IsOpen AND IsOLine AND AccountUtilization >= 30)));
-																					
-Account: => HighestCreditUsed := MAX(AccountTradeline.trade, highest_credit_used);
+                                          
+/*
+** The field highest_credit_used is being deprecated.
+** So original_credit_limit and current_credit_limit will be used to infer highest_credit_used. 
+** Note: Potentially add filter on after the cutoff date as SBFE contribute will like to begin
+** providing more accurate original_credit_limit (e.g. 9,999,999).
+*/
+Account: => MaximumOriginalLimit := MAX(AccountTradeline.trade, original_credit_limit);
+Account: => MaximumCurrrentLimit := MAX(AccountTradeline.trade, current_credit_limit);
+Account: => MaximumCreditUsed := MAX(AccountTradeline.trade, highest_credit_used);
+
+Account: => HighestCreditUtilized := MAX(MaximumOriginalLimit, MaximumCurrrentLimit, MaximumCreditUsed);
+
+Account: => MostRecentTradelineLoadDate := MAX(AccountTradeline.trade, load_date);
+Account: => HighestCreditUsed := IF(INTEGERFROMDATE(MostRecentTradelineLoadDate) < CUTOFF_DATE, MaximumCreditUsed, HighestCreditUtilized);
+
+
 Account: => HighestBalance := MAX(AccountTradeline.trade, remaining_balance);
 Account: => HighestUtilizedAmount := IF(HighestCreditUsed > HighestBalance,
 																		 IF(HighestCreditUsed > 0, HighestCreditUsed, 0),
 																		 IF(HighestBalance > 0, HighestBalance, 0));
+                                     
 Account: => UnknownHighUtilization := HighestBalance:Null AND HighestCreditUsed:Null;
 
 Business: => Sbfeutilizationhighrevolving := MAP(BusinessNotOnFile => NOT_ON_FILE,
@@ -2880,6 +2919,13 @@ Business: => Sbfeutilizationaveeveroline :=  MAP(BusinessNotOnFile => NOT_ON_FIL
 				// 9 = Charge Off
 /////////////////////////////////////////////
 
+/* Handling change from days past due (V4) to payments past due (V5)
+** New logic to infer DBT_V5 (Days Beyond Term) was implemented at the data level (decided by Product)
+** and will be used to help with the calculation of payment status, which is used to calculate several other
+** SBFE delinquency related attributes. Note: There are a couple of edge cases with the DBT calculation that could not be
+** captured at the data level. Thus, this calculation is subject to change in the future.
+*/
+
 Tradeline: => PastDueAmount := ABS(past_due_amount);
 
 Tradeline: =>PastDueAmountStatus := MAP(PastDueAmount = ABS(past_due_aging_amount_bucket_1)		=> 2,
@@ -2912,18 +2958,34 @@ Tradeline: =>PastDueAmountStatus := MAP(PastDueAmount = ABS(past_due_aging_amoun
 																												ABS(past_due_aging_amount_bucket_7) =>	8,
 																																																1);
 
-Tradeline: => PaymentStatus := MAP(IsChargeoff 																				=> 9,
-																	payment_status_category:Null AND PastDueAmount > 0 	=> PastDueAmountStatus,
-																	payment_status_category:Null AND PastDueAmount=0 		=> 0,
-																	payment_status_category = '000' 										=> 0,
-																	payment_status_category = '001' 										=> 2,
-																	payment_status_category = '002' 										=> 3,
-																	payment_status_category = '003' 										=> 4,
-																	payment_status_category = '004' 										=> 5,
-																	payment_status_category = '005' 										=> 6,
-																	payment_status_category = '006' 										=> 7,
-																	payment_status_category = '007' 										=> 8,
+Tradeline: => PaymentStatusV4 := MAP(IsChargeoff 												      				  => 9,
+                                     payment_status_category:Null AND PastDueAmount > 0 => PastDueAmountStatus,
+                                     payment_status_category:Null AND PastDueAmount=0 	=> 0,
+                                     payment_status_category = '000' 										=> 0,
+                                     payment_status_category = '001' 										=> 2,
+                                     payment_status_category = '002' 										=> 3,
+                                     payment_status_category = '003' 										=> 4,
+                                     payment_status_category = '004' 										=> 5,
+                                     payment_status_category = '005' 										=> 6,
+                                     payment_status_category = '006' 										=> 7,
+                                     payment_status_category = '007' 										=> 8,
+                                                                                           UNKNOWN_DATA);
+/* Check ln_delinquency_date to see whether it is an exceptional value (e.g.-1,-2,-3,-4)
+** If so, we map it to 1 : unknown time frame. Decided by Product
+*/                                                                                         
+Tradeline: => PaymentStatusV5 := MAP(IsChargeoff 																			=> 9,
+                                     ln_delinquency_date:Null                         => 0,
+                                     ln_delinquency_date IN ['-1','-2','-3','-4']     => 1, 
+                                     DBT_V5 >= 0 AND DBT_V5 <= 30                     => 2,
+                                     DBT_V5 > 30 AND DBT_V5 <= 60                     => 3,
+                                     DBT_V5 > 60 AND DBT_V5 <= 90                     => 4,
+                                     DBT_V5 > 90 AND DBT_V5 <= 120                    => 5,
+                                     DBT_V5 > 120 AND DBT_V5 <= 150                   => 6,
+                                     DBT_V5 > 150 AND DBT_V5 <= 180                   => 7,
+                                     DBT_V5 > 180                                     => 8,
 																																												 UNKNOWN_DATA);
+                                                                                
+Tradeline: => PaymentStatus := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE OR MonthsBetweenPayment = 1, PaymentStatusV4, PaymentStatusV5);
 
 
 Account: => MostRecentPaymentStatusDate := MAX(AccountTradeline.trade, load_date);
@@ -6285,6 +6347,9 @@ Business: => Sbfedpd121occurcountotherever := MAP(BusinessNotOnFile => NOT_ON_FI
 																 ALL(BusinessAccount.acc(IsOther).AccountTradeline.trade(NOT AccountClosed), PaymentStatus=UNKNOWN_DATA) => UNKNOWN_DATA,
 																 COUNT(BusinessAccount.acc(IsOther).AccountTradeline.trade(NOT AccountClosed AND PaymentStatus=6)));																 
 
+
+
+
 Tradeline: => PastDueAmountBucket1 := IF(past_due_aging_amount_bucket_1:Null, 0, ABS(past_due_aging_amount_bucket_1));
 Tradeline: => PastDueAmountBucket2 := IF(past_due_aging_amount_bucket_2:Null, 0, ABS(past_due_aging_amount_bucket_2));
 Tradeline: => PastDueAmountBucket3 := IF(past_due_aging_amount_bucket_3:Null, 0, ABS(past_due_aging_amount_bucket_3));
@@ -6293,31 +6358,261 @@ Tradeline: => PastDueAmountBucket5 := IF(past_due_aging_amount_bucket_5:Null, 0,
 Tradeline: => PastDueAmountBucket6 := IF(past_due_aging_amount_bucket_6:Null, 0, ABS(past_due_aging_amount_bucket_6));
 Tradeline: => PastDueAmountBucket7 := IF(past_due_aging_amount_bucket_7:Null, 0, ABS(past_due_aging_amount_bucket_7));
 
-Tradeline: => DPD01Amount :=  PastDueAmountBucket1 +
-															PastDueAmountBucket2 +
-															PastDueAmountBucket3 +
-															PastDueAmountBucket4 +
-															PastDueAmountBucket5 +
-															PastDueAmountBucket6 +
-															PastDueAmountBucket7;
-Tradeline: => DPD31Amount :=  PastDueAmountBucket2 +
-															PastDueAmountBucket3 +
-															PastDueAmountBucket4 +
-															PastDueAmountBucket5 +
-															PastDueAmountBucket6 +
-															PastDueAmountBucket7;
-Tradeline: => DPD61Amount :=  PastDueAmountBucket3 +
-															PastDueAmountBucket4 +
-															PastDueAmountBucket5 +
-															PastDueAmountBucket6 +
-															PastDueAmountBucket7;
-Tradeline: => DPD91Amount :=  PastDueAmountBucket4 +
-															PastDueAmountBucket5 +
-															PastDueAmountBucket6 +
-															PastDueAmountBucket7;
-Tradeline: => DPD121Amount := PastDueAmountBucket5 +
-															PastDueAmountBucket6 +
-															PastDueAmountBucket7;
+
+
+Tradeline: => DPD01AmountV4 := PastDueAmountBucket1 +
+															 PastDueAmountBucket2 +
+															 PastDueAmountBucket3 +
+															 PastDueAmountBucket4 +
+															 PastDueAmountBucket5 +
+															 PastDueAmountBucket6 +
+															 PastDueAmountBucket7;
+                              
+Tradeline: => DPD31AmountV4 := PastDueAmountBucket2 +
+															 PastDueAmountBucket3 +
+															 PastDueAmountBucket4 +
+															 PastDueAmountBucket5 +
+															 PastDueAmountBucket6 +
+															 PastDueAmountBucket7;
+                              
+Tradeline: => DPD61AmountV4 := PastDueAmountBucket3 +
+															 PastDueAmountBucket4 +
+															 PastDueAmountBucket5 +
+															 PastDueAmountBucket6 +
+															 PastDueAmountBucket7;
+                              
+Tradeline: => DPD91AmountV4 := PastDueAmountBucket4 +
+															 PastDueAmountBucket5 +
+															 PastDueAmountBucket6 +
+															 PastDueAmountBucket7;
+                              
+Tradeline: => DPD121AmountV4 := PastDueAmountBucket5 +
+															  PastDueAmountBucket6 +
+															  PastDueAmountBucket7;
+                              
+/* 
+** Set of DPD Amount for when the payment interval/frequency is Daily
+*/
+Tradeline: => DPD01AmountDailyV5 := PastDueAmountBucket1 +
+                                     PastDueAmountBucket2 +
+                                     PastDueAmountBucket3 +
+                                     PastDueAmountBucket4 +
+                                     PastDueAmountBucket5 +
+                                     PastDueAmountBucket6 +
+                                     PastDueAmountBucket7;
+                                     
+Tradeline: => DPDOtherAmountDailyV5 := PastDueAmountBucket7;
+
+
+/* 
+** Set of DPD Amounts for when the payment interval/frequency is Weekly
+*/
+Tradeline: => DPD01AmountWeeklyV5 := PastDueAmountBucket1 +
+                                     PastDueAmountBucket2 +
+                                     PastDueAmountBucket3 +
+                                     PastDueAmountBucket4 +
+                                     PastDueAmountBucket5 +
+                                     PastDueAmountBucket6 +
+                                     PastDueAmountBucket7;
+                                     
+Tradeline: => DPD31AmountWeeklyV5 := PastDueAmountBucket5 +
+                                     PastDueAmountBucket6 +
+                                     PastDueAmountBucket7;
+                                                                         
+Tradeline: => DPDOtherAmountWeeklyV5 := PastDueAmountBucket7;
+                                      
+
+/* 
+** Set of DPD Amounts for when the payment interval/frequency Bi-Weekly / Semi monthly
+*/
+Tradeline: => DPD01AmountBiWeeklyV5 := PastDueAmountBucket1 +
+                                       PastDueAmountBucket2 +
+                                       PastDueAmountBucket3 +
+                                       PastDueAmountBucket4 +
+                                       PastDueAmountBucket5 +
+                                       PastDueAmountBucket6 +
+                                       PastDueAmountBucket7;
+                                     
+Tradeline: => DPD31AmountBiWeeklyV5 := PastDueAmountBucket3 +
+                                       PastDueAmountBucket4 +
+                                       PastDueAmountBucket5 +
+                                       PastDueAmountBucket6 +
+                                       PastDueAmountBucket7;
+                                       
+Tradeline: => DPD61AmountBiWeeklyV5 := PastDueAmountBucket5 +
+                                       PastDueAmountBucket6 +
+                                       PastDueAmountBucket7;                                  
+                                                                         
+Tradeline: => DPDOtherAmountBiWeeklyV5 := PastDueAmountBucket7; 
+
+/* 
+** Set of DPD Amounts for when the payment interval/frequency Bi-monthly
+*/                                  
+Tradeline: => DPD01AmountBiMonthlyV5 := PastDueAmountBucket1 +
+                                       PastDueAmountBucket2 +
+                                       PastDueAmountBucket3 +
+                                       PastDueAmountBucket4 +
+                                       PastDueAmountBucket5 +
+                                       PastDueAmountBucket6 +
+                                       PastDueAmountBucket7;
+                                     
+                                       
+Tradeline: => DPD61AmountBiMonthlyV5 :=  PastDueAmountBucket2 +
+                                       PastDueAmountBucket3 +
+                                       PastDueAmountBucket4 +
+                                       PastDueAmountBucket5 +
+                                       PastDueAmountBucket6 +
+                                       PastDueAmountBucket7;    
+                                                                             
+Tradeline: => DPD121AmountBiMonthlyV5 :=  PastDueAmountBucket3 +
+                                       PastDueAmountBucket4 +
+                                       PastDueAmountBucket5 +
+                                       PastDueAmountBucket6 +
+                                       PastDueAmountBucket7;                                       
+                                                                         
+
+/* 
+** Set of DPD Amounts for when the payment interval/frequency Quarterly/Seasonal
+*/
+Tradeline: => DPD01AmountQSV5 := PastDueAmountBucket1 +
+                                 PastDueAmountBucket2 +
+                                 PastDueAmountBucket3 +
+                                 PastDueAmountBucket4 +
+                                 PastDueAmountBucket5 +
+                                 PastDueAmountBucket6 +
+                                 PastDueAmountBucket7;
+                                     
+Tradeline: => DPD91AmountQSV5 := PastDueAmountBucket2 +
+                                  PastDueAmountBucket3 +
+                                  PastDueAmountBucket4 +
+                                  PastDueAmountBucket5 +
+                                  PastDueAmountBucket6 +
+                                  PastDueAmountBucket7;
+
+Tradeline: => DPDOtherAmountQSV5 :=  PastDueAmountBucket3 +
+                                    PastDueAmountBucket4 +
+                                    PastDueAmountBucket5 +
+                                    PastDueAmountBucket6 +
+                                    PastDueAmountBucket7;
+
+/* 
+** Set of DPD Amounts for when the payment interval/frequency Semi anual
+*/
+Tradeline: => DPD01AmountSemiAnualV5 := PastDueAmountBucket1 +
+                                       PastDueAmountBucket2 +
+                                       PastDueAmountBucket3 +
+                                       PastDueAmountBucket4 +
+                                       PastDueAmountBucket5 +
+                                       PastDueAmountBucket6 +
+                                       PastDueAmountBucket7;
+                                       
+Tradeline: => DPDOtherAmountSemiAnualV5 := 
+                                       PastDueAmountBucket2 +
+                                       PastDueAmountBucket3 +
+                                       PastDueAmountBucket4 +
+                                       PastDueAmountBucket5 +
+                                       PastDueAmountBucket6 +
+                                       PastDueAmountBucket7;                                      
+                                     
+
+/* 
+** Set of DPD Amounts for when the payment interval/frequency anual
+*/
+Tradeline: => DPD01AmountAnualV5 := PastDueAmountBucket1 +
+                                       PastDueAmountBucket2 +
+                                       PastDueAmountBucket3 +
+                                       PastDueAmountBucket4 +
+                                       PastDueAmountBucket5 +
+                                       PastDueAmountBucket6 +
+                                       PastDueAmountBucket7;
+                                       
+Tradeline: => DPDOtherAmountAnualV5 := 
+                                       PastDueAmountBucket2 +
+                                       PastDueAmountBucket3 +
+                                       PastDueAmountBucket4 +
+                                       PastDueAmountBucket5 +
+                                       PastDueAmountBucket6 +
+                                       PastDueAmountBucket7;                                        
+
+/*Starting logic*/                      
+Tradeline: => DPD01AmountV5  := MAP(MonthsBetweenPayment = 1/30 => DPD01AmountDailyV5,
+                                    MonthsBetweenPayment = 0.25 => DPD01AmountWeeklyV5,
+                                    MonthsBetweenPayment = 0.5 => DPD01AmountBiWeeklyV5,
+                                    MonthsBetweenPayment = 2   => DPD01AmountBiMonthlyV5,
+                                    MonthsBetweenPayment = 3   => DPD01AmountQSV5,
+                                    MonthsBetweenPayment = 6   => DPD01AmountSemiAnualV5,
+                                    MonthsBetweenPayment = 12   => DPD01AmountAnualV5,
+                                    DPD01AmountV4);
+
+
+Tradeline: => DPD31AmountV5  := MAP(MonthsBetweenPayment = 1/30 AND DBT_V5 > 30 => DPDOtherAmountDailyV5,
+                                    MonthsBetweenPayment = 1/30 AND DBT_V5 <= 30 => 0,
+                                    MonthsBetweenPayment = 0.25 => DPD31AmountWeeklyV5,
+                                    MonthsBetweenPayment = 0.5 => DPD31AmountBiWeeklyV5,
+                                    MonthsBetweenPayment = 2 AND DBT_V5 > 30 => DPD01AmountBiMonthlyV5, 
+                                    MonthsBetweenPayment = 2 AND DBT_V5 <= 30 => DPD61AmountBiMonthlyV5, 
+                                    MonthsBetweenPayment = 3 AND DBT_V5 > 30 => DPD01AmountQSV5,
+                                    MonthsBetweenPayment = 3 AND DBT_V5 <= 30 => DPD91AmountQSV5,
+                                    MonthsBetweenPayment = 6 AND DBT_V5 > 30 => DPD01AmountSemiAnualV5,
+                                    MonthsBetweenPayment = 6 AND DBT_V5 <= 30 => DPDOtherAmountSemiAnualV5,
+                                    MonthsBetweenPayment = 12 AND DBT_V5 > 30 => DPD01AmountAnualV5,
+                                    MonthsBetweenPayment = 12 AND DBT_V5 <= 30 => DPDOtherAmountAnualV5,
+                                    DPD31AmountV4);
+
+                                   
+Tradeline: => DPD61AmountV5  := MAP(MonthsBetweenPayment = 1/30 AND DBT_V5 > 60 => DPDOtherAmountDailyV5,
+                                    MonthsBetweenPayment = 1/30 AND DBT_V5 <= 60 => 0,
+                                    MonthsBetweenPayment = 0.25 AND DBT_V5 > 60 => DPDOtherAmountWeeklyV5,
+                                    MonthsBetweenPayment = 0.25 AND DBT_V5 <= 60 => 0,
+                                    MonthsBetweenPayment = 0.5 => DPD61AmountBiWeeklyV5,
+                                    MonthsBetweenPayment = 2 => DPD61AmountBiMonthlyV5,
+                                    MonthsBetweenPayment = 3 AND DBT_V5 > 60 => DPD01AmountQSV5,
+                                    MonthsBetweenPayment = 3 AND DBT_V5 <= 60 => DPD91AmountQSV5,
+                                    MonthsBetweenPayment = 6 AND DBT_V5 > 60 => DPD01AmountSemiAnualV5,
+                                    MonthsBetweenPayment = 6 AND DBT_V5 <= 60 => DPDOtherAmountSemiAnualV5,
+                                    MonthsBetweenPayment = 12 AND DBT_V5 > 60 => DPD01AmountAnualV5,
+                                    MonthsBetweenPayment = 12 AND DBT_V5 <= 60 => DPDOtherAmountAnualV5,
+                                    DPD61AmountV4);
+
+                                                                                                      
+Tradeline: => DPD91AmountV5  := MAP(MonthsBetweenPayment = 1/30 AND DBT_V5 > 90 => DPDOtherAmountDailyV5,
+                                    MonthsBetweenPayment = 1/30 AND DBT_V5 <= 90 => 0,
+                                    MonthsBetweenPayment = 0.25 AND DBT_V5 > 90 => DPDOtherAmountWeeklyV5,
+                                    MonthsBetweenPayment = 0.25 AND DBT_V5 <= 90 => 0,
+                                    MonthsBetweenPayment = 0.5 AND DBT_V5 > 90 => DPDOtherAmountBiWeeklyV5,
+                                    MonthsBetweenPayment = 0.5 AND DBT_V5 <= 90 => 0,
+                                    MonthsBetweenPayment = 2 AND DBT_V5 > 90 => DPD61AmountBiMonthlyV5,
+                                    MonthsBetweenPayment = 2 AND DBT_V5 <= 90 => DPD121AmountBiMonthlyV5,
+                                    MonthsBetweenPayment = 3  => DPD91AmountQSV5,
+                                    MonthsBetweenPayment = 6 AND DBT_V5 > 90 => DPD01AmountSemiAnualV5,
+                                    MonthsBetweenPayment = 6 AND DBT_V5 <= 90 => DPDOtherAmountSemiAnualV5,
+                                    MonthsBetweenPayment = 12 AND DBT_V5 > 90 => DPD01AmountAnualV5,
+                                    MonthsBetweenPayment = 12 AND DBT_V5 <= 90 => DPDOtherAmountAnualV5,
+                                    DPD91AmountV4);
+                                    
+                                    
+Tradeline: => DPD121AmountV5  := MAP(MonthsBetweenPayment = 1/30 AND DBT_V5 > 120 => DPDOtherAmountDailyV5,
+                                     MonthsBetweenPayment = 1/30 AND DBT_V5 <= 120 => 0,
+                                    MonthsBetweenPayment = 0.25 AND DBT_V5 > 120 => DPDOtherAmountWeeklyV5,
+                                    MonthsBetweenPayment = 0.25 AND DBT_V5 <= 120 => 0,
+                                    MonthsBetweenPayment = 0.5 AND DBT_V5 > 120 => DPDOtherAmountBiWeeklyV5,
+                                    MonthsBetweenPayment = 0.5 AND DBT_V5 <= 120 => 0,
+                                    MonthsBetweenPayment = 2 => DPD121AmountBiMonthlyV5,
+                                    MonthsBetweenPayment = 3 AND DBT_V5 > 120 => DPD91AmountQSV5,
+                                    MonthsBetweenPayment = 3 AND DBT_V5 <= 120 => DPDOtherAmountQSV5,
+                                    MonthsBetweenPayment = 6 AND DBT_V5 > 120 => DPD01AmountSemiAnualV5,
+                                    MonthsBetweenPayment = 6 AND DBT_V5 <= 120 => DPDOtherAmountSemiAnualV5,
+                                    MonthsBetweenPayment = 12 AND DBT_V5 > 120 => DPD01AmountAnualV5,
+                                    MonthsBetweenPayment = 12 AND DBT_V5 <= 120 => DPDOtherAmountAnualV5,
+                                    DPD121AmountV4);                                    
+                                    
+Tradeline: => DPD01Amount := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE, DPD01AmountV4, DPD01AmountV5);
+Tradeline: => DPD31Amount := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE, DPD31AmountV4, DPD31AmountV5);
+Tradeline: => DPD61Amount := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE, DPD61AmountV4, DPD61AmountV5);
+Tradeline: => DPD91Amount := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE, DPD91AmountV4, DPD91AmountV5);
+Tradeline: => DPD121Amount := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE, DPD121AmountV4, DPD121AmountV5);
+                            
+                              
 /*
 Account: => DPD01AmountAccount := MostRecentTradeline.DPD01Amount;
 Account: => DPD31AmountAccount := MostRecentTradeline.DPD31Amount;
@@ -6332,31 +6627,268 @@ Account: => DPD61AmountAccount := MAX(AccountTradeline.trade(load_date = Account
 Account: => DPD91AmountAccount := MAX(AccountTradeline.trade(load_date = Account.MostRecentTradelineDate), DPD91Amount);
 Account: => DPD121AmountAccount := MAX(AccountTradeline.trade(load_date = Account.MostRecentTradelineDate), DPD121Amount);
 
-Tradeline: => UnknownDPD01Amount := past_due_aging_amount_bucket_1:Null AND
-																		past_due_aging_amount_bucket_2:Null AND
-																		past_due_aging_amount_bucket_3:Null AND
-																		past_due_aging_amount_bucket_4:Null AND
-																		past_due_aging_amount_bucket_5:Null AND
-																		past_due_aging_amount_bucket_6:Null AND
-																		past_due_aging_amount_bucket_7:Null;
-Tradeline: => UnknownDPD31Amount := past_due_aging_amount_bucket_2:Null AND
-																		past_due_aging_amount_bucket_3:Null AND
-																		past_due_aging_amount_bucket_4:Null AND
-																		past_due_aging_amount_bucket_5:Null AND
-																		past_due_aging_amount_bucket_6:Null AND
-																		past_due_aging_amount_bucket_7:Null;
-Tradeline: => UnknownDPD61Amount := past_due_aging_amount_bucket_3:Null AND
-																		past_due_aging_amount_bucket_4:Null AND
-																		past_due_aging_amount_bucket_5:Null AND
-																		past_due_aging_amount_bucket_6:Null AND
-																		past_due_aging_amount_bucket_7:Null;
-Tradeline: => UnknownDPD91Amount := past_due_aging_amount_bucket_4:Null AND
-																		past_due_aging_amount_bucket_5:Null AND
-																		past_due_aging_amount_bucket_6:Null AND
-																		past_due_aging_amount_bucket_7:Null;
-Tradeline: => UnknownDPD121Amount := past_due_aging_amount_bucket_5:Null AND
-																		past_due_aging_amount_bucket_6:Null AND
-																		past_due_aging_amount_bucket_7:Null;
+Tradeline: => UnknownDPD01AmountV4 := past_due_aging_amount_bucket_1:Null AND
+																		  past_due_aging_amount_bucket_2:Null AND
+																		  past_due_aging_amount_bucket_3:Null AND
+																		  past_due_aging_amount_bucket_4:Null AND
+																		  past_due_aging_amount_bucket_5:Null AND
+																		  past_due_aging_amount_bucket_6:Null AND
+																		  past_due_aging_amount_bucket_7:Null;
+                                    
+Tradeline: => UnknownDPD31AmountV4 := past_due_aging_amount_bucket_2:Null AND
+																		  past_due_aging_amount_bucket_3:Null AND
+																		  past_due_aging_amount_bucket_4:Null AND
+																		  past_due_aging_amount_bucket_5:Null AND
+																		  past_due_aging_amount_bucket_6:Null AND
+																		  past_due_aging_amount_bucket_7:Null;
+                                    
+Tradeline: => UnknownDPD61AmountV4 := past_due_aging_amount_bucket_3:Null AND
+																		  past_due_aging_amount_bucket_4:Null AND
+																		  past_due_aging_amount_bucket_5:Null AND
+																		  past_due_aging_amount_bucket_6:Null AND
+																		  past_due_aging_amount_bucket_7:Null;
+                                    
+Tradeline: => UnknownDPD91AmountV4 := past_due_aging_amount_bucket_4:Null AND
+																		  past_due_aging_amount_bucket_5:Null AND
+																		  past_due_aging_amount_bucket_6:Null AND
+																		  past_due_aging_amount_bucket_7:Null;
+                                    
+Tradeline: => UnknownDPD121AmountV4 := past_due_aging_amount_bucket_5:Null AND
+																		   past_due_aging_amount_bucket_6:Null AND
+																		   past_due_aging_amount_bucket_7:Null;
+
+                                     
+
+/* 
+** Set of Unknown DPD Amount for when the payment interval/frequency is Daily
+*/
+Tradeline: => UnknownDPD01AmountDailyV5 := past_due_aging_amount_bucket_1:Null AND
+                                     past_due_aging_amount_bucket_2:Null AND
+                                     past_due_aging_amount_bucket_3:Null AND
+                                     past_due_aging_amount_bucket_4:Null AND
+                                     past_due_aging_amount_bucket_5:Null AND
+                                     past_due_aging_amount_bucket_6:Null AND
+                                     past_due_aging_amount_bucket_7:Null;
+                                     
+Tradeline: => UnknownDPDOtherAmountDailyV5 := past_due_aging_amount_bucket_7:Null;
+
+
+/* 
+** Set of Unknown DPD Amounts for when the payment interval/frequency is Weekly
+*/
+Tradeline: => UnknownDPD01AmountWeeklyV5 := past_due_aging_amount_bucket_1:Null AND
+                                     past_due_aging_amount_bucket_2:Null AND
+                                     past_due_aging_amount_bucket_3:Null AND
+                                     past_due_aging_amount_bucket_4:Null AND
+                                     past_due_aging_amount_bucket_5:Null AND
+                                     past_due_aging_amount_bucket_6:Null AND
+                                     past_due_aging_amount_bucket_7:Null;
+                                     
+Tradeline: => UnknownDPD31AmountWeeklyV5 := past_due_aging_amount_bucket_5:Null AND
+                                     past_due_aging_amount_bucket_6:Null AND
+                                     past_due_aging_amount_bucket_7:Null;
+                                                                         
+Tradeline: => UnknownDPDOtherAmountWeeklyV5 := past_due_aging_amount_bucket_7:Null;
+                                      
+
+/* 
+** Set of Unknown DPD Amounts for when the payment interval/frequency Bi-Weekly / Semi monthly
+*/
+Tradeline: => UnknownDPD01AmountBiWeeklyV5 := past_due_aging_amount_bucket_1:Null AND
+                                       past_due_aging_amount_bucket_2:Null AND
+                                       past_due_aging_amount_bucket_3:Null AND
+                                       past_due_aging_amount_bucket_4:Null AND
+                                       past_due_aging_amount_bucket_5:Null AND
+                                       past_due_aging_amount_bucket_6:Null AND
+                                       past_due_aging_amount_bucket_7:Null;
+                                     
+Tradeline: => UnknownDPD31AmountBiWeeklyV5 := past_due_aging_amount_bucket_3:Null AND
+                                       past_due_aging_amount_bucket_4:Null AND
+                                       past_due_aging_amount_bucket_5:Null AND
+                                       past_due_aging_amount_bucket_6:Null AND
+                                       past_due_aging_amount_bucket_7:Null;
+                                       
+Tradeline: => UnknownDPD61AmountBiWeeklyV5 := past_due_aging_amount_bucket_5:Null AND
+                                       past_due_aging_amount_bucket_6:Null AND
+                                       past_due_aging_amount_bucket_7:Null;                                  
+                                                                         
+Tradeline: => UnknownDPDOtherAmountBiWeeklyV5 := past_due_aging_amount_bucket_7:Null; 
+
+/* 
+** Set of Unknown DPD Amounts for when the payment interval/frequency Bi-monthly
+*/                                  
+Tradeline: => UnknownDPD01AmountBiMonthlyV5 := past_due_aging_amount_bucket_1:Null AND
+                                       past_due_aging_amount_bucket_2:Null AND
+                                       past_due_aging_amount_bucket_3:Null AND
+                                       past_due_aging_amount_bucket_4:Null AND
+                                       past_due_aging_amount_bucket_5:Null AND
+                                       past_due_aging_amount_bucket_6:Null AND
+                                       past_due_aging_amount_bucket_7:Null;
+                                     
+                                       
+Tradeline: => UnknownDPD61AmountBiMonthlyV5 :=  past_due_aging_amount_bucket_2:Null AND
+                                       past_due_aging_amount_bucket_3:Null AND
+                                       past_due_aging_amount_bucket_4:Null AND
+                                       past_due_aging_amount_bucket_5:Null AND
+                                       past_due_aging_amount_bucket_6:Null AND
+                                       past_due_aging_amount_bucket_7:Null;    
+                                                                             
+Tradeline: => UnknownDPD121AmountBiMonthlyV5 :=  past_due_aging_amount_bucket_3:Null AND
+                                       past_due_aging_amount_bucket_4:Null AND
+                                       past_due_aging_amount_bucket_5:Null AND
+                                       past_due_aging_amount_bucket_6:Null AND
+                                       past_due_aging_amount_bucket_7:Null;                                       
+                                                                         
+
+/* 
+** Set of Unknown DPD Amounts for when the payment interval/frequency Quarterly/Seasonal
+*/
+Tradeline: => UnknownDPD01AmountQSV5 := past_due_aging_amount_bucket_1:Null AND
+                                 past_due_aging_amount_bucket_2:Null AND
+                                 past_due_aging_amount_bucket_3:Null AND
+                                 past_due_aging_amount_bucket_4:Null AND
+                                 past_due_aging_amount_bucket_5:Null AND
+                                 past_due_aging_amount_bucket_6:Null AND
+                                 past_due_aging_amount_bucket_7:Null;
+                                     
+Tradeline: => UnknownDPD91AmountQSV5 := past_due_aging_amount_bucket_2:Null AND
+                                  past_due_aging_amount_bucket_3:Null AND
+                                  past_due_aging_amount_bucket_4:Null AND
+                                  past_due_aging_amount_bucket_5:Null AND
+                                  past_due_aging_amount_bucket_6:Null AND
+                                  past_due_aging_amount_bucket_7:Null;
+
+Tradeline: => UnknownDPDOtherAmountQSV5 :=  past_due_aging_amount_bucket_3:Null AND
+                                    past_due_aging_amount_bucket_4:Null AND
+                                    past_due_aging_amount_bucket_5:Null AND
+                                    past_due_aging_amount_bucket_6:Null AND
+                                    past_due_aging_amount_bucket_7:Null;
+
+/* 
+** Set of Unknown DPD Amounts for when the payment interval/frequency Semi anual
+*/
+Tradeline: => UnknownDPD01AmountSemiAnualV5 := past_due_aging_amount_bucket_1:Null AND
+                                       past_due_aging_amount_bucket_2:Null AND
+                                       past_due_aging_amount_bucket_3:Null AND
+                                       past_due_aging_amount_bucket_4:Null AND
+                                       past_due_aging_amount_bucket_5:Null AND
+                                       past_due_aging_amount_bucket_6:Null AND
+                                       past_due_aging_amount_bucket_7:Null;
+                                       
+Tradeline: => UnknownDPDOtherAmountSemiAnualV5 := 
+                                       past_due_aging_amount_bucket_2:Null AND
+                                       past_due_aging_amount_bucket_3:Null AND
+                                       past_due_aging_amount_bucket_4:Null AND
+                                       past_due_aging_amount_bucket_5:Null AND
+                                       past_due_aging_amount_bucket_6:Null AND
+                                       past_due_aging_amount_bucket_7:Null;                                      
+                                     
+
+/* 
+** Set of Unknown DPD Amounts for when the payment interval/frequency anual
+*/
+Tradeline: => UnknownDPD01AmountAnualV5 := past_due_aging_amount_bucket_1:Null AND
+                                       past_due_aging_amount_bucket_2:Null AND
+                                       past_due_aging_amount_bucket_3:Null AND
+                                       past_due_aging_amount_bucket_4:Null AND
+                                       past_due_aging_amount_bucket_5:Null AND
+                                       past_due_aging_amount_bucket_6:Null AND
+                                       past_due_aging_amount_bucket_7:Null;
+                                       
+Tradeline: => UnknownDPDOtherAmountAnualV5 := 
+                                       past_due_aging_amount_bucket_2:Null AND
+                                       past_due_aging_amount_bucket_3:Null AND
+                                       past_due_aging_amount_bucket_4:Null AND
+                                       past_due_aging_amount_bucket_5:Null AND
+                                       past_due_aging_amount_bucket_6:Null AND
+                                       past_due_aging_amount_bucket_7:Null;
+
+  
+
+/*Starting logic*/                      
+Tradeline: => UnknownDPD01AmountV5  := MAP(MonthsBetweenPayment = 1/30 => UnknownDPD01AmountDailyV5,
+                                    MonthsBetweenPayment = 0.25 => UnknownDPD01AmountWeeklyV5,
+                                    MonthsBetweenPayment = 0.5 => UnknownDPD01AmountBiWeeklyV5,
+                                    MonthsBetweenPayment = 2   => UnknownDPD01AmountBiMonthlyV5,
+                                    MonthsBetweenPayment = 3   => UnknownDPD01AmountQSV5,
+                                    MonthsBetweenPayment = 6   => UnknownDPD01AmountSemiAnualV5,
+                                    MonthsBetweenPayment = 12   => UnknownDPD01AmountAnualV5,
+                                    UnknownDPD01AmountV4);
+
+
+Tradeline: => UnknownDPD31AmountV5  := MAP(MonthsBetweenPayment = 1/30 AND DBT_V5 > 30 => UnknownDPDOtherAmountDailyV5,
+                                    MonthsBetweenPayment = 1/30 AND DBT_V5 <= 30 => FALSE,
+                                    MonthsBetweenPayment = 0.25 => UnknownDPD31AmountWeeklyV5,
+                                    MonthsBetweenPayment = 0.5 => UnknownDPD31AmountBiWeeklyV5,
+                                    MonthsBetweenPayment = 2 AND DBT_V5 > 30 => UnknownDPD01AmountBiMonthlyV5, 
+                                    MonthsBetweenPayment = 2 AND DBT_V5 <= 30 => UnknownDPD61AmountBiMonthlyV5, 
+                                    MonthsBetweenPayment = 3 AND DBT_V5 > 30 => UnknownDPD01AmountQSV5,
+                                    MonthsBetweenPayment = 3 AND DBT_V5 <= 30 => UnknownDPD91AmountQSV5,
+                                    MonthsBetweenPayment = 6 AND DBT_V5 > 30 => UnknownDPD01AmountSemiAnualV5,
+                                    MonthsBetweenPayment = 6 AND DBT_V5 <= 30 => UnknownDPDOtherAmountSemiAnualV5,
+                                    MonthsBetweenPayment = 12 AND DBT_V5 > 30 => UnknownDPD01AmountAnualV5,
+                                    MonthsBetweenPayment = 12 AND DBT_V5 <= 30 => UnknownDPDOtherAmountAnualV5,
+                                    UnknownDPD31AmountV4);
+
+                                   
+Tradeline: => UnknownDPD61AmountV5  := MAP(MonthsBetweenPayment = 1/30 AND DBT_V5 > 60 => UnknownDPDOtherAmountDailyV5,
+                                    MonthsBetweenPayment = 1/30 AND DBT_V5 <= 60 => FALSE,
+                                    MonthsBetweenPayment = 0.25 AND DBT_V5 > 60 => UnknownDPDOtherAmountWeeklyV5,
+                                    MonthsBetweenPayment = 0.25 AND DBT_V5 <= 60 => FALSE,
+                                    MonthsBetweenPayment = 0.5 => UnknownDPD61AmountBiWeeklyV5,
+                                    MonthsBetweenPayment = 2 => UnknownDPD61AmountBiMonthlyV5,
+                                    MonthsBetweenPayment = 3 AND DBT_V5 > 60 => UnknownDPD01AmountQSV5,
+                                    MonthsBetweenPayment = 3 AND DBT_V5 <= 60 => UnknownDPD91AmountQSV5,
+                                    MonthsBetweenPayment = 6 AND DBT_V5 > 60 => UnknownDPD01AmountSemiAnualV5,
+                                    MonthsBetweenPayment = 6 AND DBT_V5 <= 60 => UnknownDPDOtherAmountSemiAnualV5,
+                                    MonthsBetweenPayment = 12 AND DBT_V5 > 60 => UnknownDPD01AmountAnualV5,
+                                    MonthsBetweenPayment = 12 AND DBT_V5 <= 60 => UnknownDPDOtherAmountAnualV5,
+                                    UnknownDPD61AmountV4);
+
+                                                                                                      
+Tradeline: => UnknownDPD91AmountV5  := MAP(MonthsBetweenPayment = 1/30 AND DBT_V5 > 90 => UnknownDPDOtherAmountDailyV5,
+                                    MonthsBetweenPayment = 1/30 AND DBT_V5 <= 90 => FALSE,
+                                    MonthsBetweenPayment = 0.25 AND DBT_V5 > 90 => UnknownDPDOtherAmountWeeklyV5,
+                                    MonthsBetweenPayment = 0.25 AND DBT_V5 <= 90 => FALSE,
+                                    MonthsBetweenPayment = 0.5 AND DBT_V5 > 90 => UnknownDPDOtherAmountBiWeeklyV5,
+                                    MonthsBetweenPayment = 0.5 AND DBT_V5 <= 90 => FALSE,
+                                    MonthsBetweenPayment = 2 AND DBT_V5 > 90 => UnknownDPD61AmountBiMonthlyV5,
+                                    MonthsBetweenPayment = 2 AND DBT_V5 <= 90 => UnknownDPD121AmountBiMonthlyV5,
+                                    MonthsBetweenPayment = 3  => UnknownDPD91AmountQSV5,
+                                    MonthsBetweenPayment = 6 AND DBT_V5 > 90 => UnknownDPD01AmountSemiAnualV5,
+                                    MonthsBetweenPayment = 6 AND DBT_V5 <= 90 => UnknownDPDOtherAmountSemiAnualV5,
+                                    MonthsBetweenPayment = 12 AND DBT_V5 > 90 => UnknownDPD01AmountAnualV5,
+                                    MonthsBetweenPayment = 12 AND DBT_V5 <= 90 => UnknownDPDOtherAmountAnualV5,
+                                    UnknownDPD91AmountV4);
+                                    
+                                    
+Tradeline: => UnknownDPD121AmountV5  := MAP(MonthsBetweenPayment = 1/30 AND DBT_V5 > 120 => UnknownDPDOtherAmountDailyV5,
+                                     MonthsBetweenPayment = 1/30 AND DBT_V5 <= 120 => FALSE,
+                                    MonthsBetweenPayment = 0.25 AND DBT_V5 > 120 => UnknownDPDOtherAmountWeeklyV5,
+                                    MonthsBetweenPayment = 0.25 AND DBT_V5 <= 120 => FALSE,
+                                    MonthsBetweenPayment = 0.5 AND DBT_V5 > 120 => UnknownDPDOtherAmountBiWeeklyV5,
+                                    MonthsBetweenPayment = 0.5 AND DBT_V5 <= 120 => FALSE,
+                                    MonthsBetweenPayment = 2 => UnknownDPD121AmountBiMonthlyV5,
+                                    MonthsBetweenPayment = 3 AND DBT_V5 > 120 => UnknownDPD91AmountQSV5,
+                                    MonthsBetweenPayment = 3 AND DBT_V5 <= 120 => UnknownDPDOtherAmountQSV5,
+                                    MonthsBetweenPayment = 6 AND DBT_V5 > 120 => UnknownDPD01AmountSemiAnualV5,
+                                    MonthsBetweenPayment = 6 AND DBT_V5 <= 120 => UnknownDPDOtherAmountSemiAnualV5,
+                                    MonthsBetweenPayment = 12 AND DBT_V5 > 120 => UnknownDPD01AmountAnualV5,
+                                    MonthsBetweenPayment = 12 AND DBT_V5 <= 120 => UnknownDPDOtherAmountAnualV5,
+                                    UnknownDPD121AmountV4); 
+
+
+
+Tradeline: => UnknownDPD01Amount := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE, UnknownDPD01AmountV4, UnknownDPD01AmountV5);
+
+Tradeline: => UnknownDPD31Amount := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE, UnknownDPD31AmountV4, UnknownDPD31AmountV5);
+
+Tradeline: => UnknownDPD61Amount := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE, UnknownDPD61AmountV4, UnknownDPD61AmountV5);
+
+Tradeline: => UnknownDPD91Amount := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE, UnknownDPD91AmountV4, UnknownDPD91AmountV5);
+
+Tradeline: => UnknownDPD121Amount := IF(INTEGERFROMDATE(load_date) < CUTOFF_DATE, UnknownDPD121AmountV4, UnknownDPD121AmountV5);
+
 
 
 Account: => UnknownDPD01AmountAccount := ALL(AccountTradeline.trade(load_date = Account.MostRecentTradelineDate), UnknownDPD01Amount);
