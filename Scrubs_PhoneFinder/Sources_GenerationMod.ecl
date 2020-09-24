@@ -1,6 +1,6 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
 IMPORT SALT311;
-EXPORT Identities_GenerationMod := MODULE(SALT311.iGenerationMod)
+EXPORT Sources_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
   EXPORT salt_VERSION := 'V3.11.11';
@@ -9,7 +9,7 @@ EXPORT Identities_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // Core module configuration values
   EXPORT spc_MODULE := 'Scrubs_PhoneFinder';
-  EXPORT spc_NAMESCOPE := 'Identities';
+  EXPORT spc_NAMESCOPE := 'Sources';
   EXPORT spc_PROCESS := '';
   EXPORT spc_PROCLAYOUTS := 'Process__Layouts';
   EXPORT spc_IDNAME := ''; // cluster id (input)
@@ -22,7 +22,7 @@ EXPORT Identities_GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'PhoneFinder';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,transaction_id,sequence_number,lexid,full_name,full_address,city,state,zip,verified_carrier,date_added,filename';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,auto_id,transaction_id,phonenumber,lexid,phone_id,identity_id,sequence_number,totalsourcecount,date_added,filename';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := TRUE;
@@ -41,29 +41,24 @@ EXPORT Identities_GenerationMod := MODULE(SALT311.iGenerationMod)
     'OPTIONS:-gh\n'
     + 'MODULE:Scrubs_PhoneFinder\n'
     + 'FILENAME:PhoneFinder\n'
-    + 'NAMESCOPE:Identities\n'
-    + '\n'
+    + 'NAMESCOPE:Sources\n'
     + '\n'
     + 'FIELDTYPE:Invalid_No:ALLOW(0123456789\\\\N)\n'
     + 'FIELDTYPE:Invalid_ID:ALLOW(0123456789R\\\\N)\n'
-    + 'FIELDTYPE:Invalid_State:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ\\\\ ):LENGTHS(0,2)\n'
-    + 'FIELDTYPE:Invalid_AlphaChar:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ&\\| .,/-\\\\\')\n'
-    + 'FIELDTYPE:Invalid_AlphaNumChar:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ&#\\| .,/-\\\\\')\n'
-    + 'FIELDTYPE:Invalid_Zip:LIKE(Invalid_No):LENGTHS(0,2,5)\n'
     + 'FIELDTYPE:Invalid_Date:CUSTOM(Scrubs_PhoneFinder.Functions.Split_Date > 0)\n'
     + 'FIELDTYPE:Invalid_File:CUSTOM(Scrubs_PhoneFinder.Functions.Check_File > 0)\n'
+    + 'FIELDTYPE:Invalid_Phone:LIKE(Invalid_No):LENGTHS(0,2,9,10)\n'
     + '\n'
-    + 'FIELD:transaction_id:TYPE(STRING16):LIKE(Invalid_ID):0,0R\n'
-    + 'FIELD:sequence_number:TYPE(INTEGER5):LIKE(Invalid_No):0,0\n'
+    + 'FIELD:auto_id:TYPE(UNSIGNED8):LIKE(Invalid_No):0,0\n'
+    + 'FIELD:transaction_id:TYPE(STRING16):LIKE(Invalid_ID):0,0\n'
+    + 'FIELD:phonenumber:TYPE(STRING15):LIKE(Invalid_Phone):0,0\n'
     + 'FIELD:lexid:TYPE(STRING32):LIKE(Invalid_No):0,0\n'
-    + 'FIELD:full_name:TYPE(STRING128):LIKE(Invalid_AlphaChar):0,0\n'
-    + 'FIELD:full_address:TYPE(STRING128):LIKE(Invalid_AlphaNumChar):0,0\n'
-    + 'FIELD:city:TYPE(STRING64):LIKE(Invalid_AlphaChar):0,0\n'
-    + 'FIELD:state:TYPE(STRING16):LIKE(Invalid_State):0,0\n'
-    + 'FIELD:zip:TYPE(STRING10):LIKE(Invalid_Zip):0,0\n'
-    + 'FIELD:verified_carrier:TYPE(INTEGER1):LIKE(Invalid_No):0,0\n'
+    + 'FIELD:phone_id:TYPE(INTEGER5):LIKE(Invalid_No):0,0\n'
+    + 'FIELD:identity_id:TYPE(INTEGER5):LIKE(Invalid_No):0,0\n'
+    + 'FIELD:sequence_number:TYPE(INTEGER5):LIKE(Invalid_No):0,0\n'
+    + 'FIELD:totalsourcecount:TYPE(INTEGER5):LIKE(Invalid_No):0,0\n'
     + 'FIELD:date_added:TYPE(STRING20):LIKE(Invalid_Date):0,0\n'
-    + 'FIELD:filename:TYPE(STRING255):LIKE(Invalid_File):0,0\n'
+    + 'FIELD:filename:TYPE(STRING255):LIKE(Invalid_File):0,0'
     ;
  
   // Structured values

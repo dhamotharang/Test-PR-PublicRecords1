@@ -3,7 +3,7 @@ IMPORT SALT311;
 EXPORT Transactions_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.11.9';
+  EXPORT salt_VERSION := 'V3.11.11';
   EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
@@ -46,11 +46,11 @@ EXPORT Transactions_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:Invalid_Binary:ALLOW(01\\\\N)\n'
     + 'FIELDTYPE:Invalid_No:ALLOW(0123456789\\\\N)\n'
     + 'FIELDTYPE:Invalid_ID:ALLOW(0123456789R\\\\N)\n'
-    + 'FIELDTYPE:Invalid_Code:ALLOW(0123456789 -\\\\N)\n'
-    + 'FIELDTYPE:Invalid_Alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ\\\\ )\n'
-    + 'FIELDTYPE:Invalid_AlphaChar:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz .,/-&\\\\\')\n'
+    + 'FIELDTYPE:Invalid_Code:ALLOW(0123456789\\(\\). -\\\\N)\n'
+    + 'FIELDTYPE:Invalid_Alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\\\\ )\n'
+    + 'FIELDTYPE:Invalid_AlphaChar:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\\(\\)_ .,:#/-&\\\\\')\n'
     + 'FIELDTYPE:Invalid_Risk:ENUM(PASS|FAIL|WARN|\\\\N|)\n'
-    + 'FIELDTYPE:Invalid_Phone_Type:ENUM(POSSIBLE WIRELESS|LANDLINE|POSSIBLE VOIP|OTHER UNKNOWN|PAGER|\\\\N|)\n'
+    + 'FIELDTYPE:Invalid_Phone_Type:ENUM(POSSIBLE WIRELESS|LANDLINE|POSSIBLE VOIP|OTHER UNKNOWN|PAGER|CABLE|OTHER/UNKNOWN|\\\\N|)\n'
     + 'FIELDTYPE:Invalid_Phone_Status:ENUM(ACTIVE|INACTIVE|NOT AVAILABLE|\\\\N|)\n'
     + 'FIELDTYPE:Invalid_Forward:ENUM(FORWARDED|NOT FORWARDED|\\\\N|)\n'
     + 'FIELDTYPE:Invalid_State:LIKE(Invalid_Alpha):LENGTHS(0,2)\n'
@@ -68,7 +68,7 @@ EXPORT Transactions_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:batch_job_id:TYPE(STRING20):LIKE(Invalid_Code):0,0\n'
     + 'FIELD:batch_acctno:TYPE(INTEGER5):LIKE(Invalid_No):0,0\n'
     + 'FIELD:response_time:TYPE(INTEGER5):LIKE(Invalid_No):0,0\n'
-    + 'FIELD:reference_code:TYPE(STRING60):LIKE(Invalid_Code):0,0\n'
+    + 'FIELD:reference_code:TYPE(STRING60):LIKE(Invalid_AlphaChar):0,0\n'
     + 'FIELD:phonefinder_type:TYPE(STRING32):LIKE(Invalid_Alpha):0,0\n'
     + 'FIELD:submitted_lexid:TYPE(STRING32):LIKE(Invalid_Code):0,0\n'
     + 'FIELD:submitted_phonenumber:TYPE(STRING15):LIKE(Invalid_Code):0,0\n'
