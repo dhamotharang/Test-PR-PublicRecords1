@@ -9,13 +9,13 @@ EXPORT GetRetrievalGateway_Records := MODULE
 
     iesp.okc_courtrunner_request.t_OkcCourtRunnerRequest setRequest($.layout_liens_retrieval.search_recs L) := TRANSFORM
 
-
-        LJType := MAP(L.filing_type_desc in risk_indicators.iid_constants.setSuitsFCRA => '',
+        ftd := TRIM(STD.Str.ToUpperCase(L.filing_type_desc));
+        LJType := MAP(ftd in risk_indicators.iid_constants.setSuitsFCRA => '',
                 L.rmsid = '' => '',
-                L.filing_type_desc in risk_indicators.iid_constants.setPRJudgment => risk_indicators.iid_constants.JudgmentText,
-                L.filing_type_desc in risk_indicators.iid_constants.setPREviction => risk_indicators.iid_constants.EvictionText,
-                L.filing_type_desc in risk_indicators.iid_constants.setPRLien => risk_indicators.iid_constants.LienText,
-                L.filing_type_desc NOT in risk_indicators.iid_constants.setPROther => risk_indicators.iid_constants.OtherText,
+                ftd in risk_indicators.iid_constants.setPRJudgment => risk_indicators.iid_constants.JudgmentText,
+                ftd in risk_indicators.iid_constants.setPREviction => risk_indicators.iid_constants.EvictionText,
+                ftd in risk_indicators.iid_constants.setPRLien => risk_indicators.iid_constants.LienText,
+                ftd NOT in risk_indicators.iid_constants.setPROther => risk_indicators.iid_constants.OtherText,
                 '');
          is_Lien := LJType = risk_indicators.iid_constants.LienText;
          is_Jgmt := LJType IN [
