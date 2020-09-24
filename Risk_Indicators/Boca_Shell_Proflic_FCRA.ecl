@@ -13,6 +13,7 @@ PL_Plus_temp := record
 	string license_number;
 	string license_number_cleaned;
 	RiskWise.Layouts.Layout_Professional_License_Plus;
+  SET OF STRING100 proflic_correct_record_id {maxlength(10100)} := [];
 	unsigned tmp_MostRecent; //as need to perserve the date in the data for output
 end;
 
@@ -124,7 +125,9 @@ license_recs1_roxie := join(PL_correct, key_did,
 											left.did!=0 and left.prolic_key<>right.prolic_key and left.date_first_seen<>right.date_first_seen and
 											keyed(right.did = left.did) AND
 											(isDirectToConsumerPurpose = false or (
-											 isDirectToConsumerPurpose = true and StringLib.StringToUpperCase(trim(right.vendor)) != trim(RiskView.Constants.directToConsumerPL_sources))),
+											 isDirectToConsumerPurpose = true and StringLib.StringToUpperCase(trim(right.vendor)) != trim(RiskView.Constants.directToConsumerPL_sources))) 
+                      AND
+                      right.prolic_key not in left.proflic_correct_record_id , 
 											PL_FCRA(left,right), left outer, atmost(right.did = left.did, riskwise.max_atmost));
 
 license_recs1_thor_did := join(distribute(PL_correct(did!=0), hash64(did)), 
@@ -132,7 +135,9 @@ license_recs1_thor_did := join(distribute(PL_correct(did!=0), hash64(did)),
 											left.prolic_key<>right.prolic_key and left.date_first_seen<>right.date_first_seen and
 											(right.did = left.did) AND
 											(isDirectToConsumerPurpose = false or (
-											 isDirectToConsumerPurpose = true and StringLib.StringToUpperCase(trim(right.vendor)) != trim(RiskView.Constants.directToConsumerPL_sources))),
+											 isDirectToConsumerPurpose = true and StringLib.StringToUpperCase(trim(right.vendor)) != trim(RiskView.Constants.directToConsumerPL_sources)))
+                       AND
+                      right.prolic_key not in left.proflic_correct_record_id , 
 											PL_FCRA(left,right), left outer, atmost(right.did = left.did, riskwise.max_atmost), LOCAL);
 		
 license_recs1_thor := license_recs1_thor_did + PL_correct(did=0);
@@ -289,7 +294,7 @@ end;
 rolled_licenses2 := rollup(group(sort(ungroup(rolled_licenses), seq, -tmp_MostRecent, -PLCategory, prolic_key), seq), true, roll_licenses2(left,right));
 
 rolled_licenses_final := project(rolled_licenses2, transform(RiskWise.Layouts.Layout_Professional_License_Plus, self := left));
-// output(license_recs1, named('license_recs1'));
+ //output(license_recs1_roxie, named('license_recs1_roxie'));
 // output(PL_correct, named('PL_correct'));
 // output(license_recs,NAMED('license_recs'));
 // output(rolled_licenses_pre,NAMED('rolled_licenses_pre'));

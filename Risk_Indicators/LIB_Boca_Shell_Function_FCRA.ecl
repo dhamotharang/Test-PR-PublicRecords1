@@ -80,7 +80,7 @@ EXPORT LIB_Boca_Shell_Function_FCRA (
 
   dppa_ok := dppa > 0 and dppa < 8;
   //NB: DL is not used in FCRA-dependent scoring
-  per_prop := Risk_Indicators.getAllBocaShellData (iid, group(sort(project(ids_wide, transform(layout_bocashell_neutral, self.age := 0, self := left, self := [])),seq),seq), p,
+  per_prop := Risk_Indicators.getAllBocaShellData (iid, group(sort(project(ids_wide, transform(Risk_Indicators.layout_bocashell_neutral, self.age := 0, self := left, self := [])),seq),seq), p,
                                    TRUE, isLN, dppa, dppa_ok,
                                    includeRelativeInfo, /*includeDLInfo*/ FALSE, includeVehInfo, includeDerogInfo,
 							IN_BSversion, IN_IsPreScreen, IN_doScore,
