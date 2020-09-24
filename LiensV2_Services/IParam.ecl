@@ -63,6 +63,8 @@ EXPORT IParam := MODULE
         EXPORT BOOLEAN  DeferredTaskRequest := FALSE;
         EXPORT BOOLEAN  InputOk := FALSE;
         EXPORT BOOLEAN  Invalid_FilingtypeID := FALSE;
+        EXPORT BOOLEAN TestDataEnabled  := FALSE;
+        EXPORT STRING32 TestDataTableName := '';
     END;
 
 	EXPORT GetLiensRetrievalParams(iesp.riskview_publicrecordretrieval.t_PublicRecordRetrievalRequest request) := FUNCTION
@@ -113,6 +115,8 @@ EXPORT IParam := MODULE
          EXPORT BOOLEAN InputOk             := input_ok;
          EXPORT BOOLEAN Invalid_FilingtypeID  := search_by.FilingTypeID <> '' AND 
                                                  search_by.FilingTypeID NOT IN $.Constants.LIENS_RETRIEVAL.Valid_FilingtypeID;
+         EXPORT BOOLEAN TestDataEnabled       := request.User.TestDataEnabled;
+         EXPORT STRING32 TestDataTableName    := request.User.TestDataTableName;
          END;
          RETURN params;
 	END;
