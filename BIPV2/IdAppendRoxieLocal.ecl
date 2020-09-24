@@ -120,7 +120,7 @@ topIds :=
 			or results_ultid[1].ultid > 0)), //filter not necessary here, but might save some work,
 	1, // trying to keep code mostly in sync with thor side. Changing to PROJECT
 		// would mean replacing "counter" in this transform to [1]
-	transform(BIPV2.IdAppendLayouts.IdsOnly,
+	transform(BIPV2.IdAppendLayouts.IdsOnlyDebug,
 		isProxResolved := left.results[counter].score >= (integer)scoreThreshold 
 			and left.results[counter].weight >= (integer)weightThreshold;
 		isSeleResolved := left.results_seleid[counter].score >= (integer)scoreThreshold 
@@ -280,6 +280,8 @@ topIds :=
 			isProxResolved => left.results[counter].ultimate_proxid,
 			isSeleResolved and not isSeleWrong => left.results_seleid[counter].ultimate_proxid,
 			0);
+		self.keys_used := left.results[counter].keys_used;
+		self.keys_failed := left.results[counter].keys_failed;
 		)
 	)((proxscore >= (integer)scoreThreshold 
 			or selescore >= (integer)scoreThreshold 
@@ -290,21 +292,30 @@ topIds :=
 	preSuppression := 
 		join(inputDsZip, topIds,
 		left.request_id = right.request_id,
-		transform(BIPV2.IdAppendLayouts.IdsOnly,
+		transform(BIPV2.IdAppendLayouts.IdsOnlyDebug,
 			self.request_id := left.request_id,
 			self := right),
 		left outer);
 			
 
-	passThru0 := project(inputDs(proxid != 0 or seleid != 0),
+	passThruIn := project(inputDs(proxid != 0 or seleid != 0),
 		transform(BizLinkFull.Process_Biz_Layouts.id_stream_layout,
 			self.uniqueId := left.request_id,
 			self.proxid := left.proxid,
 			self.seleid := if(left.proxid != 0, 0, left.seleid);
 			self := left;
 			self := []));
-	passThru := if(reAppend, dataset([], recordof(passThru0)),
-	               BizLinkFull.Process_Biz_Layouts.id_stream_complete(passThru0));
+	passThruIds := if(reAppend, dataset([], recordof(passThruIn)),
+	                  BizLinkFull.Process_Biz_Layouts.id_stream_complete(passThruIn));
+	passThruMissingIds := passThruIds(ultid = 0 and (seleid != 0 or proxid != 0));
+	passThruHistoric := BizLinkFull.Process_Biz_Layouts.id_stream_historic(passThruMissingIds);
+	passThruRenew :=
+		join(passThruMissingIds, passThruHistoric,
+			left.uniqueid = right.uniqueid,
+			transform(recordof(left),
+				self := if(right.ultid != 0, right, left)),
+			keep(1), left outer);
+	passThru := passThruIds(not (ultid = 0 and (seleid != 0 or proxid != 0))) + passThruRenew;
 
 	passThruPreSuppress := project(passThru, transform(recordof(preSuppression),
 		self.request_id := left.uniqueid,
