@@ -21,10 +21,7 @@ export Proc_Orbit4_CreateBuild_sp(string buildname,
 									).retcode;
 									
 	
-	get_build   := Orbit4.GetBuildInstance(buildname,
-									Buildvs,
-									tokenval,		
-									).retcode;
+	
 									
 	Update_build :=  Orbit4.UpdateBuildInstance(buildname,
 									            Buildvs,
@@ -86,17 +83,16 @@ sendemail(string keyword = '',string status = '') := function
 											if ( skipupdatebuild ,
 																				sendemail('UPDATE','SKIP')	,
 												
-													              if (  get_build.Status =  'Success' and 
-													                    get_build.BuildInstanceStatus = 'BUILD_IN_PROGRESS',
+													    
 
                                                                                if ( Update_build.Status = 'Success', 
                                                                                     sendemail('UPDATE','SUCCESS'),
                                                                                      sendemail('UPDATE','FAIL')      
 													                                                                           
-													                               ),
+													                               )
 
-													                       sendemail('UPDATE','ABORT')
-																  )
+													                      
+																  
 												)
 														
 
