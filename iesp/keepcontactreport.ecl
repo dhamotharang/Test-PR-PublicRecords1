@@ -71,6 +71,17 @@ export t_KeepContactPossibleNewAddress := record
 	iesp.share.t_Date DateFirstSeen {xpath('DateFirstSeen')};
 	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
 end;
+
+export t_KeepContactEmail := record
+ string EmailAddress {xpath('EmailAddress')};
+ iesp.share.t_Date DateFirstSeen {xpath('DateFirstSeen')};
+ iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
+ string Status {xpath('Status')}; //values['valid','invalid','accept all','unknown','']
+ string StatusReason {xpath('StatusReason')}; //values['email_account_invalid','email_domain_invalid','email_address_invalid','']
+ string70 AdditionalStatusInfo {xpath('AdditionalStatusInfo')};
+end;
+
+
 		
 export t_KeepContactPhoneInfo := record
 	string8 MatchCode {xpath('MatchCode')};
@@ -94,14 +105,15 @@ export t_KeepContactResult := record
 	string16 UniqueId {xpath('UniqueId')};
 	string3 UniqueIdConfidenceScore {xpath('UniqueIdConfidenceScore')};
 	string1 Gender {xpath('Gender')};
-        string3 calculatedage {xpath('calculatedage')} ;
+  string3 calculatedage {xpath('calculatedage')} ;
 	t_KeepContactBest BestInfo {xpath('BestInfo')};
 	t_KeepContactPossibleNewAddress PossibleNewAddress {xpath('PossibleNewAddress')};
 	dataset(iesp.share.t_StringArrayItem) AddressDescriptionCodes {xpath('AddressDescriptionCodes/AddressDescriptionCode'), MAXCOUNT(iesp.constants.KeepContact.MAX_EMAILS)};
 	dataset(t_KeepContactPhoneInfo) Phones {xpath('Phones/Phone'), MAXCOUNT(iesp.constants.KeepContact.MAX_PHONES)};
 	iesp.share.t_Date DOD {xpath('DOD')};
 	string30 DeceasedMatchCodes {xpath('DeceasedMatchCodes')};
-	dataset(iesp.share.t_StringArrayItem) Emails {xpath('Emails/Email'), MAXCOUNT(iesp.constants.KeepContact.MAX_EMAILS)};
+	dataset(t_KeepContactEmail) Emails {xpath('Emails/Email'), MAXCOUNT(iesp.constants.KeepContact.MAX_EMAILS)};
+	
 end;
 		
 export t_KeepContactReportResponse := record
