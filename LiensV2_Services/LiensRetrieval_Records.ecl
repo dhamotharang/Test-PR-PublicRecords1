@@ -201,7 +201,10 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
       SELF.Records := ds_liens;
       SELF.Alerts := IF(NoshowAlerts, DATASET([], iesp.riskview2.t_RiskView2Alert), SORT(get_alerts(), Code));
       SELF.ConsumerStatements := IF(showConsumerStatements, consumer_statements);
-      SELF.Consumer := FFD.MAC.PrepareConsumerRecord(IF(NoInquiryLogging, 0, resolved_did), TRUE, srchby);
+      SELF.Consumer := IF(input.DeferredTaskRequest,
+                          FFD.MAC.PrepareConsumerRecord(IF(NoInquiryLogging, 0, resolved_did), TRUE, srchby),
+                          ROW([],iesp.share_fcra.t_FcraConsumer)
+                         );
 
    END;
 
