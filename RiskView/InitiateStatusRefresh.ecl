@@ -6,7 +6,8 @@ EXPORT InitiateStatusRefresh(DATASET({Risk_Indicators.Layouts_Derog_Info.LJ_Data
 											pRetries = 0, 
 											BOOLEAN TestOKCStatusRefresh = FALSE,
                                             string5 StatusRefreshWaitPeriod = '',
-                                            boolean IncludeStatusRefreshChecks = FALSE
+                                            boolean IncludeStatusRefreshChecks = FALSE,
+                                            boolean ExcludeStatusRefresh = FALSE
 											) := MODULE
 											
 SHARED HighRisk_Layout_In := RECORD
@@ -86,7 +87,7 @@ EXPORT RefreshRecommendedGatewayError := COUNT(StatusRefreshRecommended(response
 ******************************************************************/
 SHARED StatusRefreshGatewayCfg := gateways(STD.Str.ToLowerCase(ServiceName)='okcstatusrefresh')[1];
 	
-SHARED makeStatusRefreshGatewayCall := StatusRefreshGatewayCfg.url!=''  AND IncludeStatusRefreshChecks = TRUE;
+SHARED makeStatusRefreshGatewayCall := StatusRefreshGatewayCfg.url!=''  AND IncludeStatusRefreshChecks = TRUE AND ExcludeStatusRefresh = FALSE;
 					
 SHARED status_refresh_gw_input := JOIN(StatusRefreshRecommended, cleaned_gw_input, 
                                                                   LEFT.Response._Header.QueryId = RIGHT.UID AND
@@ -112,12 +113,13 @@ SuppressRecordsLayout := RECORD
     Risk_Indicators.Layouts_Derog_Info.Judgments;
 END;
 
-RecsToSuppress := JOIN(StatusRefreshRecommended, projected_judgments, 
-    LEFT.Response._Header.QueryId = RIGHT.UID,
+RecsToSuppress := JOIN(projected_judgments, StatusRefreshRecommended, 
+    LEFT.UID = RIGHT.Response._Header.QueryId,
     TRANSFORM(SuppressRecordsLayout, 
-    SELF.HighRiskCheck := LEFT.Response.Result.IsRefreshRecommended;
-    SELF := RIGHT));
-
+    SELF.HighRiskCheck := RIGHT.Response.Result.IsRefreshRecommended;
+    SELF := LEFT),
+    LEFT OUTER);
+    
 RETURN RecsToSuppress;
 END;
 
@@ -127,11 +129,12 @@ SuppressRecordsLayout := RECORD
     Risk_Indicators.Layouts_Derog_Info.Liens;
 END;
 
-RecsToSuppress := JOIN(StatusRefreshRecommended, projected_liens, 
-    LEFT.Response._Header.QueryId = RIGHT.UID,
+RecsToSuppress := JOIN(projected_liens, StatusRefreshRecommended, 
+    LEFT.UID = RIGHT.Response._Header.QueryId,
     TRANSFORM(SuppressRecordsLayout, 
-    SELF.HighRiskCheck := LEFT.Response.Result.IsRefreshRecommended;
-    SELF := RIGHT));
+    SELF.HighRiskCheck := RIGHT.Response.Result.IsRefreshRecommended;
+    SELF := LEFT),
+    LEFT OUTER);
 
 RETURN RecsToSuppress;
 END;
