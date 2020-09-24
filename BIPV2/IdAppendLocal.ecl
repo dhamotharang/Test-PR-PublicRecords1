@@ -1,7 +1,6 @@
 ﻿import AutoStandardI;
 import BIPV2;
 import BIPV2_Best;
-import BIPV2_Build;
 import BIPV2_Company_Names;
 import BIPV2_Contacts;
 import doxie;
@@ -11,13 +10,11 @@ export IdAppendLocal := module
 
 	shared defaultDataAccess := MODULE(doxie.IDataAccess) END;
 
-	export AppendBest(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend, string fetchLevel
+	export AppendBest(dataset(BIPV2.IdAppendLayouts.IdsOnlyDebug) withAppend, string fetchLevel
 	                  ,boolean allBest, boolean isMarketing = false
 					  ,Doxie.IDataAccess mod_access = defaultDataAccess) := function
-                    
 		isSeleBest := fetchLevel = BIPV2.IdConstants.fetch_level_seleid;
-    
-    preBest :=
+		preBest :=
 			project(withAppend(proxid != 0 or (isSeleBest and seleid != 0)),
 				transform(BIPV2.IdLayouts.l_xlink_ids2,
 					self.uniqueid := left.request_id,
@@ -25,7 +22,6 @@ export IdAppendLocal := module
 
 		withBest0 := if(isMarketing, BIPV2_Best.Key_linkIds.kfetch2Marketing(preBest, fetchlevel),
 		                BIPV2_Best.Key_LinkIds.kfetch2(preBest, fetchLevel));
-
 		withBest := dedup(withBest0, seleid, proxid, uniqueid, all);
 
 		postBest := 
@@ -82,9 +78,8 @@ export IdAppendLocal := module
 				keep(1), left outer);
 
 		preContact := preBest;
-		getContact := bipv2_build.key_contact_title_linkids().kfetch2(preContact, fetchlevel, mod_access := mod_access);
+		getContact := BipV2_Contacts.KeyRead_Contact_Title().kfetch2(preContact, fetchlevel, mod_access := mod_access);
 
-    
 		withContact :=
 			join(withBType, getContact,
 				left.request_id = right.uniqueid
@@ -99,7 +94,6 @@ export IdAppendLocal := module
 		// use did to get contact names from person header
 		gm := AutoStandardI.GlobalModule();												 
 		doxie.mac_best_records(withContact, contact_did, getNames, ut.dppa_ok(gm.DPPAPurpose), ut.glb_ok(gm.GLBPurpose), , doxie.DataRestriction.fixed_DRM);
-    
 		withNames :=
 			join(withContact(contact_did != 0), getNames,
 				left.contact_did = right.did,
@@ -110,16 +104,13 @@ export IdAppendLocal := module
 					self := left),
 				left outer, keep(1))
 			 + withContact(contact_did = 0);
-      
-    // OUTPUT(withBest,NAMED('Best_99999'),OVERWRITE);
-    // OUTPUT(postBest,NAMED('postBest'),OVERWRITE);
-    // OUTPUT(postBestWithId,NAMED('postBestWithId'),OVERWRITE);
-    
+
 		return withNames;
 
 	end;
 
-	export FetchRecords(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend
+#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
+	export FetchRecords(dataset(BIPV2.IdAppendLayouts.IdsOnlyDebug) withAppend
 	                    ,string fetchLevel = BIPV2.IdConstants.fetch_level_proxid
 	                    ,boolean dnbFullRemove = false
 						,Doxie.IDataAccess mod_access = defaultDataAccess) := function
@@ -147,11 +138,13 @@ export IdAppendLocal := module
 					self.powWeight := if(isProxLevel or left.powid = right.powid, left.powWeight, 0),
 					self.parent_proxid := right.parent_proxid,
 					self := left,
-					self := right),
+					self := right,
+					self := []),
 				left outer);
-    
+
 		return postHeader;
 
 	end;
+#END // if USE_LOCAL_KEYS
 
 end;
