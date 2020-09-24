@@ -2,7 +2,8 @@
 /*
 These jobs are scheduled via chron
 
-NAC_V2.BWR_InputPrepSchedule					// monitor new files
+NAC_V2.BWR_input_nac2_prod 					  // monitor new incoming SNAP NCF2files
+NAC_V2.BWR_input_ppa_prod 					  // monitor new incoming PPA NCF2files
 NAC_V2.BWR_SatContributoryBuild				// Saturday key build
 NAC_V2.BWR_S_K_ContributoryBuild			// Sunday - Thursday key build
 
