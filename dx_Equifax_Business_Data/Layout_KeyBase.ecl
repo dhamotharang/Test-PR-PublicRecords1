@@ -264,7 +264,37 @@ EXPORT Layout_KeyBase := RECORD
     UNSIGNED8 record_sid := 0; //this is a source specific unique and persistent record id.  
 															 // Same as the persistent record id we have in some datasets.  
 															 // In new development using the ingest process, it will be the record id from SALT.  
-															 // For CCPA, this field is not required to be populated.  
-
+															 // For CCPA, this field is not required to be populated.  				
+    STRING10  contact_efx_id;	  
+		UNSIGNED6	contact_rcid;
+		UNSIGNED6	contact_did;
+		UNSIGNED1	contact_did_score;	
+		UNSIGNED6	contact_SELEID		:= 0;
+	  UNSIGNED2 contact_SELEScore	:= 0;
+	  UNSIGNED2 contact_SELEWeight:= 0;	
+	  UNSIGNED4 contact_dt_first_seen							;
+		UNSIGNED4 contact_dt_last_seen							;
+		UNSIGNED4 contact_dt_vendor_first_reported	;
+		UNSIGNED4 contact_dt_vendor_last_reported		;
+		STRING1  	contact_record_type					 := ''; 
+		UNSIGNED4 contact_process_date          := 0;
+	  STRING5   contact_title					;
+	  STRING20  contact_fname					;
+	  STRING20  contact_mname					;
+	  STRING20  contact_lname					;
+	  STRING5   contact_name_suffix		;
+	  STRING3   contact_name_score			;
+		UNSIGNED8 contact_raw_aid							 :=  0;
+		UNSIGNED8	contact_ace_aid							 :=  0;
+	  STRING130 EFX_CONTCT;
+	  STRING2   EFX_TITLECD;
+	  STRING50  EFX_TITLEDESC;
+	  STRING75  EFX_LASTNAM;
+	  STRING50  EFX_FSTNAM;
+	  STRING100 EFX_EMAIL;
+	  STRING10  EFX_DATE;	
+		STRING50  Exploded_Title_Description := '';
+		UNSIGNED4 contact_global_sid :=  0;   
+    UNSIGNED8 contact_record_sid :=  0; 		
 END;	
  		
