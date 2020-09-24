@@ -448,11 +448,11 @@ Current_Address_Consumer_recs_Contacts := Current_Address_Consumer_recs_pre((INT
                                                                                         SELF := RIGHT),
                                                                                         LEFT OUTER);
                                                                                         
-     Lookup_And_Input_LinkIDs := DEDUP(SORT(Lookup_And_Input_LinkIDs_Combined, UIDAppend, B_LexIDUlt, B_LexIDOrg, B_LexIDLegal, B_LexIDSite, B_LexIDLoc), UIDAppend, B_LexIDUlt, B_LexIDOrg, B_LexIDLegal, B_LexIDSite, B_LexIDLoc);
-				
+	Lookup_And_Input_LinkIDs := DEDUP(SORT(Lookup_And_Input_LinkIDs_Combined, UIDAppend, B_LexIDUlt, B_LexIDOrg, B_LexIDLegal), UIDAppend, B_LexIDUlt, B_LexIDOrg, B_LexIDLegal);	
+  
 	//lets not run more records than we need to
-	Unique_Raw_Lexid_Matches := DEDUP(SORT(Lookup_LinkIDs, UIDAppend, B_LexIDUlt, B_LexIDOrg, B_LexIDLegal, B_LexIDLoc, B_LexIDSite, P_LexID),	UIDAppend, B_LexIDUlt, B_LexIDOrg, B_LexIDLegal, B_LexIDLoc, B_LexIDSite, P_LexID);
-
+	Unique_Raw_Lexid_Matches := DEDUP(SORT(Lookup_LinkIDs, UIDAppend, B_LexIDUlt, B_LexIDOrg, B_LexIDLegal, B_LexIDLoc, B_LexIDSite),	UIDAppend, B_LexIDUlt, B_LexIDOrg, B_LexIDLegal, B_LexIDLoc, B_LexIDSite);
+	
 	// Don't run a second search of the contact key by the input business, only search by LinkIDs that haven't already been searched.
 	Unique_Raw_Lexid_Matches_Filtered := JOIN(Unique_Raw_Lexid_Matches, Input_FDC, 
 								LEFT.UIDAppend = RIGHT.UIDAppend AND 
@@ -2563,10 +2563,12 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
 					SELF := LEFT,
 					SELF := []));
 
+  UCC_LinkIds_Records_Deduped := DEDUP(SORT(UCC_LinkIds_Records, UniqueID, TMSID), UniqueID, TMSID);
+
  // UCC Party RMSID
   
 	UCC_Party_RMSID_Records := 
-		PublicRecords_KEL.ecl_functions.DateSelector(Join(UCC_LinkIds_Records, UCCV2.Key_Rmsid_Party(),
+		PublicRecords_KEL.ecl_functions.DateSelector(Join(UCC_LinkIds_Records_Deduped, UCCV2.Key_Rmsid_Party(),
 			Common.DoFDCJoin_UCC_Files__Party_RMSID = TRUE AND
 				KEYED(LEFT.tmsid = RIGHT.tmsid),
 				TRANSFORM(Layouts_FDC.Layout_UCC__Key_RMSID_Party,
@@ -2602,7 +2604,7 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
 // UCC Main RMSID Data 
   
 	UCC_RMSID_Main_Records := 
-		PublicRecords_KEL.ecl_functions.DateSelector(Join(UCC_LinkIds_Records, UCCV2.Key_rmsid_main(),
+		PublicRecords_KEL.ecl_functions.DateSelector(Join(UCC_LinkIds_Records_Deduped, UCCV2.Key_rmsid_main(),
 			Common.DoFDCJoin_UCC_Files__Main_RMSID = TRUE AND
 				KEYED(LEFT.tmsid = RIGHT.tmsid),
 				TRANSFORM(Layouts_FDC.Layout_UCC__Key_RMSID_Main,
