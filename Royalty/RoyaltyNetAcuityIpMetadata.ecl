@@ -1,9 +1,8 @@
 ﻿EXPORT RoyaltyNetAcuityIpMetadata := MODULE
 
   EXPORT GetBatchRoyaltiesByAcctno(ds_in) := FUNCTIONMACRO
-      //Royalty.Layouts.RoyaltyForBatch // needed for the near future, (Sept 2020)
-      // for initial release ---v.  Replace with above (---^) when Royalty.Layouts.RoyaltyForBatch.count_entity is revised
-      Royalty.Layouts_GeoTri.RoyaltyForBatch tf_PrepForRoyalty(RECORDOF(ds_in) L) := TRANSFORM
+
+    Royalty.Layouts.RoyaltyForBatch tf_PrepForRoyalty(RECORDOF(ds_in) L) := TRANSFORM
       SELF.acctno            := L.orig_acctno;
       SELF.royalty_type_code := Royalty.Constants.RoyaltyCode.NETACUITY_IPM;
       SELF.royalty_type      := Royalty.Constants.RoyaltyType.NETACUITY_IPM;

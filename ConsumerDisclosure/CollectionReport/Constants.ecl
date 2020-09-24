@@ -9,6 +9,9 @@ EXPORT Constants := MODULE
     EXPORT STRING ASL := 'AmericanstudentKeys'; 
     EXPORT STRING BIP := 'BipV2FullKeys'; 
     EXPORT STRING BUSINESS_HEADER := 'BusinessHeaderKeys'; 
+    EXPORT STRING CANADIAN_PHONES := 'CanadianPhonesV2Keys'; 
+    EXPORT STRING CORTERA := 'CorteraKeys'; 
+    EXPORT STRING DCA := 'DCAKeys'; 
     EXPORT STRING DEATH_MASTER := 'DeathMasterSsaKeys'; 
     EXPORT STRING EMAIL := 'EmailV2Keys'; 
     EXPORT STRING EXPERIAN_CRDB := 'ExperianCRDBKeys'; 
@@ -48,6 +51,5 @@ EXPORT Constants := MODULE
     EXPORT STRING WHOIS_INTERNET := 'WhoisKeysInternetServices'; 
     EXPORT STRING ZOOM := 'ZoomKeys'; 
   END;
-
 
 END;

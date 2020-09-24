@@ -3,8 +3,8 @@ IMPORT KEL12 AS KEL;
 IMPORT B_Business,B_Business_1,CFG_graph,E_Business FROM Business_Credit_KEL;
 IMPORT * FROM KEL12.Null;
 EXPORT RQ_S_B_F_E___Shell := MODULE
-  SHARED __EE9642973 := B_Business().IDX_Business_UID_Wrapped;
-  SHARED __ST9631737_Layout := RECORD
+  SHARED __EE10636795 := B_Business().IDX_Business_UID_Wrapped;
+  SHARED __ST10625559_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Sbfedatefirstcycleall_;
     KEL.typ.nint Sbfetimeoldestcycle_;
@@ -1867,5 +1867,5 @@ EXPORT RQ_S_B_F_E___Shell := MODULE
     KEL.typ.nint Sbfeprincipalmaxcount_;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE9642973,__ST9631737_Layout));
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE10636795,__ST10625559_Layout));
 END;

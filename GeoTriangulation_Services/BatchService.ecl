@@ -44,18 +44,10 @@ EXPORT BatchService := MACRO
   
   // Next determine the Digital Envoy NetAcuity ip_metadata royalties for each acctno/ip_address
   ds_royalties_ip   := Royalty.RoyaltyNetAcuityIpMetadata.GetBatchRoyaltiesByAcctno(ds_batch_records);
-  ds_royalty_ip_set := //Royalty.GetBatchRoyalties( // will be needed in the near future (Sept 2020)
-  // for initial release ---v.  Replace with above (---^) when Royalty.Layouts.RoyaltyForBatch.count_entity is revised
-                      Royalty.GetBatchRoyalties_GeoTri(ds_royalties_ip,FALSE); //FALSE=do not ReturnDetailedRoyalties
-
-  // Temp need to project ds_royalty_br_set onto same layout as ds_royalty_ip_set until Sept 2020 when 
-  // a permanent change is made to Royalty.Layouts.RoyaltyForBatch.count_entity length
-  ds_royalty_br_set_proj := PROJECT(ds_royalty_br_set, Royalty.Layouts_GeoTri.RoyaltyForBatch);
+  ds_royalty_ip_set := Royalty.GetBatchRoyalties(ds_royalties_ip,FALSE); //FALSE=do not ReturnDetailedRoyalties
 
   // Combine the 2 individual royalty sets for just 1 standard output 'RoyaltySet' ds
-  ds_royalty_set := //ds_royalty_br_set + ... // will be needed in the near future (Sept 2020)
-  // for initial release ---v.  Replace with above (---^) when Royalty.Layouts.RoyaltyForBatch.count_entity is revised
-                    ds_royalty_br_set_proj + ds_royalty_ip_set;
+  ds_royalty_set := ds_royalty_br_set + ds_royalty_ip_set;
 
   IF(NOT use_AccuityBankData,FAIL(CNST.ErrCode.CONFIG_ERR, CNST.ErrMsg.CONFIG_ERR));
 

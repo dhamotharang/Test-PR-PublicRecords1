@@ -86,6 +86,8 @@ IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._current__credit__limit
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._reporting__indicator__length__SingleValue_Invalid,NAMED('E_Tradeline__reporting__indicator__length__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._payment__interval__SingleValue_Invalid,NAMED('E_Tradeline__payment__interval__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._payment__status__category__SingleValue_Invalid,NAMED('E_Tradeline__payment__status__category__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline().D_B_T___V5__SingleValue_Invalid,NAMED('E_Tradeline_D_B_T___V5__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._ln__delinquency__date__SingleValue_Invalid,NAMED('E_Tradeline__ln__delinquency__date__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._term__of__account__in__months__SingleValue_Invalid,NAMED('E_Tradeline__term__of__account__in__months__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._first__payment__due__date__SingleValue_Invalid,NAMED('E_Tradeline__first__payment__due__date__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Tradeline()._final__pyament__due__date__SingleValue_Invalid,NAMED('E_Tradeline__final__pyament__due__date__SingleValue_Invalid')));

@@ -27,14 +27,21 @@ EXPORT Constants := MODULE;
 		EXPORT Subject := ['SUBJECT', 'SUBJECT AT HOUSEHOLD'];
 		EXPORT Neighbor := ['NEIGHBOR'];
 	END;
-  
+
  // Used in progressive_phone.functions.GetPhonesV3 for the new Meta_ServLine_Type field
  EXPORT ServLine_Types := MODULE
    EXPORT Landline := 'Landline';
    EXPORT Cable    := 'Cable';
-   EXPORT Wireless := 'Wireless';
-   EXPORT VoIP     := 'VoIP';
-   EXPORT Unknown  := 'Unknown';
+   EXPORT Wireless := 'Possible Wireless';
+   EXPORT VoIP     := 'Possible VoIP';
+   EXPORT Unknown  := 'Other/Unknown';
+ END;
+
+ EXPORT Switch_Type := MODULE
+   EXPORT Landline := 'P'; // aka POTS
+   EXPORT Wireless := 'C';
+   EXPORT VoIP     := 'V';
+   EXPORT Unknown  := 'U';
  END;
 
 	EXPORT Associate_Cat := 'ASSOCIATE';

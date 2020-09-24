@@ -54,7 +54,7 @@ EXPORT Functions := MODULE;
         END;
 
         ParsedJSON := PROJECT(NormedDTERecs, TRANSFORM(OutLayout, 
-        SELF.ResponseJSON := ParseResponseOpaqueContent(LEFT.ResponseOpaqueContent);
+        SELF.ResponseJSON := IF(LEFT.ErrorMessage = '', ParseResponseOpaqueContent(LEFT.ResponseOpaqueContent));
         SELF := LEFT;
         SELF := []));
         

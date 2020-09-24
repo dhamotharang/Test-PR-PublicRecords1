@@ -9,7 +9,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 																																						 	UNSIGNED1 PhoneRestrictionMaskTemp = Phone_Shell.Constants.PRM.AllPhones,
 																																						 	UNSIGNED3 MaxPhones = Phone_Shell.Constants.Default_MaxPhones,
 																																						 	UNSIGNED3 InsuranceVerificationAgeLimit = Phone_Shell.Constants.Default_InsuranceVerificationAgeLimit,
-																																							 UNSIGNED2 PhoneShellVersion = 21, // use 2-digit notation (10 = phone shell version 1.0)
+																																							 UNSIGNED2 PhoneShellVersion = 31, // use 2-digit notation (10 = phone shell version 1.0)
 																																						 	STRING2 SPIIAccessLevel = Phone_Shell.Constants.Default_SPIIAccessLevel, // 5A or 5B - used in TransUnion Gateway
 																																						 	STRING30 VerticalMarket = '', // Example: 'Receivables Management' restricts certain Gateways
 																																						 	STRING30 IndustryClass = '', // Example: 'UTILI' restricts the Utility Data Search
@@ -239,17 +239,17 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 
  // As of Phone Shell version 3.0+, we have removed the Boca/Consumer shell from the Phone Shell in order to improve performance times
  // the 'iff' makes sure that consumer shell is not still run in the background when running Phone Shell 3.0+
-	BocaShell := iff(PhoneShellVersion >= 30, 
+	BocaShell := IFF(PhoneShellVersion >= 30, 
                   // without running the Boca Shell Function we still need to get the InstantID results into Risk_Indicators.Layout_Boca_Shell
                   // looking at how the Boca Shell Function works, this should do it
-                  project(InstantID, transform(Risk_Indicators.Layout_Boca_Shell, 
-                        self.seq := left.seq, 
-                        self.shell_input.seq := left.seq, 
-                        self.shell_input := left,
-                        self.iid.swappednames := (integer)left.swappednames,
-                        self.iid := left,
-                        self := LEFT,
-                        self := [])),
+                  PROJECT(InstantID, TRANSFORM(Risk_Indicators.Layout_Boca_Shell, 
+                        SELF.seq := LEFT.seq, 
+                        SELF.shell_input.seq := LEFT.seq, 
+                        SELF.shell_input := LEFT,
+                        SELF.iid.swappednames := (integer)LEFT.swappednames,
+                        SELF.iid := LEFT,
+                        SELF := LEFT,
+                        SELF := [])),
                   Risk_Indicators.Boca_Shell_Function(InstantID, BocaShellGateways, DPPAPurpose, GLBPurpose, isUtility, ln_branded, includeRel, includeDL, includeVeh, includeDerog, BocaShellVersion, 
 																						  doScore, nugen, 
                         DataRestriction := DataRestrictionMask, 

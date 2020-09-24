@@ -49,7 +49,7 @@ EXPORT Search_Function(
 
 boolean   isPreScreenPurpose := STD.Str.ToUpperCase(intended_purpose) = 'PRESCREENING';
 boolean   isCollectionsPurpose := STD.Str.ToUpperCase(intended_purpose) = 'COLLECTIONS';
-boolean   isDirectToConsumerPurpose := STD.Str.ToUpperCase(intended_purpose) = Constants.directToConsumer;
+boolean   isDirectToConsumerPurpose := STD.Str.ToUpperCase(intended_purpose) = Riskview.Constants.directToConsumer;
 boolean   FilterLiens := if(DataRestriction[risk_indicators.iid_constants.posLiensJudgRestriction]='1', true, false ); //DRM says don't run lnj or include is false so don't run lnj
 
 // cleaning for batch and XML done the same for both
@@ -313,7 +313,6 @@ Report_output := if(RiskviewReportRequest OR IncludeLnJ, RiskView.Search_RptFunc
 				ungroup(clam), bsversion, 
 				DataRestriction, intended_purpose, SSNMask, DOBMask, DLMask, isDirectToConsumerPurpose),
 				dataset([], returnedReportLayout));
-
 
 // join the original input to the clam to set the shell_input.did field to be the actual DID the user provided for setting the InputProvidedLexID attribute correctly
 attributes_clam := group(
