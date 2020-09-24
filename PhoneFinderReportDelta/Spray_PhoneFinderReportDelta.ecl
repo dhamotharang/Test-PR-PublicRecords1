@@ -2,7 +2,7 @@ import std, _control;
 
 EXPORT Spray_PhoneFinderReportDelta(string version, const varstring eclsourceip, string dtype):= FUNCTION
 
-	srcdir 		:= '/data/data_999/phones/phonefinderreportdelta_/';
+	srcdir 		:= '/data/data_999/phones/phonefinderreportdelta/';
 	root			:= '~thor_data400::in::phonefinderreportdelta::';
 	suffix		:= '_daily';
 	filename	:= if(dtype='identities',
