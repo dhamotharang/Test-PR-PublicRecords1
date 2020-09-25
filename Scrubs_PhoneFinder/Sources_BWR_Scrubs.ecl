@@ -1,9 +1,9 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_PhoneFinder.Transactions_BWR_Scrubs - Checking field validity in a file - SALT V3.11.11');
+#workunit('name','Scrubs_PhoneFinder.Sources_BWR_Scrubs - Checking field validity in a file - SALT V3.11.11');
 IMPORT Scrubs_PhoneFinder,SALT311;
-infile := Scrubs_PhoneFinder.Transactions_In_PhoneFinder;
-mod_scrubs := Scrubs_PhoneFinder.Transactions_Scrubs;
+infile := Scrubs_PhoneFinder.Sources_In_PhoneFinder;
+mod_scrubs := Scrubs_PhoneFinder.Sources_Scrubs;
 expandedfile := mod_scrubs.FromNone(infile).ExpandedInfile;
 fromexpandedGlobal := mod_scrubs.FromExpanded(expandedfile);
 // Summary of errors found across all sources

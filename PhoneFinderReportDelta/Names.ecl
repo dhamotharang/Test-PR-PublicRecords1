@@ -9,6 +9,8 @@ EXPORT Names(STRING pversion	=	(STRING8)Std.Date.Today())	:=	MODULE
 	EXPORT i_otherphones      := prefix + 'otherphones';
 	EXPORT i_riskindicators   := prefix + 'riskindicators';
   EXPORT i_transactions     := prefix + 'transactions';
+	EXPORT i_sources     			:= prefix + 'sources';
+	
 	EXPORT i_transactions_companyid        := prefix + 'transactions_companyid';
   EXPORT i_transactions_companyrefcode   := prefix + 'transactions_companyrefcode';
 	EXPORT i_transactions_date             := prefix + 'transactions_date';

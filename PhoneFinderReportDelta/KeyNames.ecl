@@ -14,19 +14,20 @@ EXPORT Keynames(STRING version	=	(STRING8)Std.Date.Today())	:=	MODULE
 	EXPORT	transactions_phone				      :=	VersionControl.mBuildFilenameVersions($.names('').i_transactions_phone,version,$.names().i_transactions_phone);
 	EXPORT	transactions_refcode			      :=	VersionControl.mBuildFilenameVersions($.names('').i_transactions_refcode,version,$.names().i_transactions_refcode);
 	EXPORT  transactions_userid		          :=	VersionControl.mBuildFilenameVersions($.names('').i_transactions_userid,version,$.names().i_transactions_userid);
+	EXPORT  sources		          						:=	VersionControl.mBuildFilenameVersions($.names('').i_sources,version,$.names().i_sources);
 	
-	EXPORT	dAll_filenames				:=
-		identities.dAll_filenames +
-		identities_lexid.dAll_filenames +
-    otherphones.dAll_filenames +
-		riskindicators.dAll_filenames +
-    transactions.dAll_filenames +
-    transactions_companyid.dAll_filenames +
-    transactions_companyrefcode.dAll_filenames +
-		transactions_date.dAll_filenames +
-    transactions_phone.dAll_filenames +
-		transactions_refcode.dAll_filenames +
-    transactions_userid.dAll_filenames;
+	EXPORT	dAll_filenames									:=	identities.dAll_filenames +
+																							identities_lexid.dAll_filenames +
+																							otherphones.dAll_filenames +
+																							riskindicators.dAll_filenames +
+																							transactions.dAll_filenames +
+																							transactions_companyid.dAll_filenames +
+																							transactions_companyrefcode.dAll_filenames +
+																							transactions_date.dAll_filenames +
+																							transactions_phone.dAll_filenames +
+																							transactions_refcode.dAll_filenames +
+																							transactions_userid.dAll_filenames +
+																							sources.dAll_filenames;
 		
 END;	
 	
