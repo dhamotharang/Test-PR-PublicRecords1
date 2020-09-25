@@ -1,4 +1,4 @@
-import txbus,text_search,RoxieKeybuild;
+﻿import txbus,text_search,RoxieKeybuild;
 
 export BWR_Build_Txbus_Boolean(string filedate) := function
 
@@ -19,8 +19,8 @@ Roxiekeybuild.Mac_SK_BuildProcess_v2_local(
 
 retval := sequential(
 									Text_Search.Build_From_DocSeg_Records(ret,info),
-									build_key,
-									Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname),
+									//build_key, //DF-28348
+									//Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname),
 									fileservices.deletelogicalfile('~thor_data400::persist::txbus::boolean')
 									
 									);
