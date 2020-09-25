@@ -452,12 +452,12 @@ EXPORT Get_Dataset_Versions(
 					LEFT.name,1,NOCASE)));
 		
 		// Phones Feedback
-		PhoneFeedback := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phonefeedback.phonefeedback_filename),
+		PhoneFeedback := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phonefeedback.PhonesFeedback_superkey),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PHONEFEEDBACK',
 				SELF.subfile := '',
 				SELF.version := REGEXFIND(
-					AccountMonitoring.product_files.phonefeedback.phonefeedback_filename_raw + '_(.*)$',
+					'thor_data400::key::phonesFeedback::(.*)::phone$',
 					LEFT.name,1,NOCASE)));
 
 		// Foreclosure
