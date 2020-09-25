@@ -1,4 +1,4 @@
-﻿import tools;
+﻿import $, tools;
 
 export Keynames(
 
@@ -8,7 +8,7 @@ export Keynames(
 ) :=
 module
 
-	shared lkeyTemplate       := _Constants(pUseOtherEnvironment).keyTemplate;
+	shared lkeyTemplate       := $._Constants(pUseOtherEnvironment).keyTemplate;
 
 	export LinkIds            := tools.mod_FilenamesBuild(lkeyTemplate    + 'linkIds'         ,pversion);
 	export Hdr_Link_Id        := tools.mod_FilenamesBuild(lkeyTemplate    + 'hdr_linkid'      ,pversion);			
