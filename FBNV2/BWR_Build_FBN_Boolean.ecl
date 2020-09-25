@@ -1,4 +1,4 @@
-import FBNV2,ut;
+﻿import FBNV2,ut;
 import text_search;
 export BWR_Build_FBN_Boolean(string filename) :=
 
@@ -125,8 +125,8 @@ build_key := buildindex(fbn_key_translation,{doc,tmsid,rmsid,__filepos},
 
 stuff := sequential(
 									Text_Search.Build_From_DocSeg_Records(all_docs(content <> ''),info),
-									build_key,
-									Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname),
+									//build_key, //DF-28344
+									//Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname),
 									fileservices.deletelogicalfile('~thor_data400::persist::fbn::boolean')
 									
 									);
