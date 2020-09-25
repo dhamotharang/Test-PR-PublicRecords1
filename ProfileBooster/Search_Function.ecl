@@ -183,7 +183,11 @@ Risk_Indicators.Layout_Input prep_for_thor(my_dataset_with_address_cache l) := T
 // ********************************************************************
 // Get the DID and Append the Input Account Number
 // ********************************************************************
-	with_DID := JOIN(distribute(PB_In, seq), distribute(did_prepped_output, seq), 
+	//pick the DID with the highest score, 
+	//in the event that multiple have the same score, choose the lowest value DID to make this deterministic
+	sortDIDs := SORT(UNGROUP(did_prepped_output), seq, -score, did);
+	highestDIDScore := DEDUP(sortDIDs, seq);
+	with_DID := JOIN(distribute(PB_In, seq), distribute(highestDIDScore, seq), 
 									LEFT.seq = RIGHT.seq, TRANSFORM(Risk_Indicators.Layout_Output, SELF.Account := LEFT.AcctNo; SELF := RIGHT), local);
 
 
