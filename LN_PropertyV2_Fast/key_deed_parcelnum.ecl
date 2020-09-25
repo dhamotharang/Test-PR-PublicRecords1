@@ -3,7 +3,7 @@ Import Data_Services, doxie, LN_Property,ut,LN_PropertyV2,LN_PropertyV2_Fast;
 export Key_Deed_ParcelNum(boolean isFast = false) := FUNCTION
 
 deed0 := LN_PropertyV2_Fast.CleanDeed(LN_PropertyV2.File_deed,false);
-deed1	:= LN_PropertyV2_Fast.CleanDeed(LN_PropertyV2_Fast.Files.base.deed_mortg,true);
+deed1	:= LN_PropertyV2_Fast.CleanDeed(LN_PropertyV2_Fast.Files.basedelta.deed_mortg,true);
 
 ds := if (isFast,deed1, deed0);
 

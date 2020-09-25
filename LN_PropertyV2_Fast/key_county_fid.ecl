@@ -8,7 +8,7 @@ KeyName 			:= 'thor_data400::key::'+keyPrefix+'::';
 KeyName_fcra  := 'thor_data400::key::'+keyPrefix+'::fcra::';
 
 d0	:=	LN_PropertyV2_Fast.CleanSearch(false);
-d1	:=	LN_PropertyV2_Fast.CleanSearch(true);
+d1	:=	LN_PropertyV2_Fast.CleanSearch(true, true);
 
 d2	:= if(isFast,d1,d0);
 
