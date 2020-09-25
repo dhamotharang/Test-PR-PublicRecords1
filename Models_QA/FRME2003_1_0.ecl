@@ -35420,7 +35420,7 @@ frme2003_1_0 := if(bv_ver_src_id_mth_since_ls > 48 or bv_ver_src_id_mth_since_ls
   #else
 
     // SELF.seq := le.input_echo.seleid;
-    SELF.seq := le.input_echo.seq;
+    SELF.seq := (Integer)le.Input_Echo.AcctNo;
     SELF.score := (STRING)FRME2003_1_0;
     SELF.ri := [];
   
