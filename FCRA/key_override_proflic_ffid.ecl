@@ -1,6 +1,8 @@
-﻿import fcra, ut;
+﻿﻿IMPORT fcra, ut;
 
-kf := dedup(sort(dataset('~thor_data400::base::override::fcra::qa::proflic',fcra.layout_override_proflic,csv(separator('\t'),quote('\"'),terminator('\r\n'))),-flag_file_id),except flag_file_id,keep(1));
+//CCPA-1042 - Add CCPA fields to override ProfLic key
+kf0 := dedup(sort(dataset('~thor_data400::base::override::fcra::qa::proflic',fcra.layout_override_proflic_in,csv(separator('\t'),quote('\"'),terminator('\r\n'))),-flag_file_id),except flag_file_id,keep(1));
+kf  := PROJECT(kf0, fcra.layout_override_proflic);
 
 fields_to_clear := 'ace_fips_st,action_case_number,action_cds,action_complaint_violation_cds,action_complaint_violation_desc,action_complaint_violation_dt,'
 	                   + 'action_desc,action_effective_dt,action_final_order_no,action_original_filename_or_url,action_posting_status_dt,action_record_type,'
@@ -13,5 +15,5 @@ fields_to_clear := 'ace_fips_st,action_case_number,action_cds,action_complaint_v
                        + 'previous_license_number,previous_license_type,record_type,sex,status_other_agency,status_renewal_desc,status_status_cds,title';
 ut.MAC_CLEAR_FIELDS(kf, kf_cleared, fields_to_clear);
  
-export key_override_proflic_ffid := index(kf_cleared,{flag_file_id}, {kf_cleared},
-  '~thor_data400::key::override::fcra::proflic::qa::ffid');
+EXPORT key_override_proflic_ffid := index(kf_cleared,{flag_file_id}, {kf_cleared},
+                                          '~thor_data400::key::override::fcra::proflic::qa::ffid');

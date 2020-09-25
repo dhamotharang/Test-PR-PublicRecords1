@@ -120,6 +120,7 @@
 			integer1 	verified_carrier;
 			string20 	date_added;
 			integer5	identity_count;
+			string30	carrier;
 	end;
 	
 	export OtherPhones_Raw := record
@@ -128,6 +129,7 @@
 	end;
 	
 	//DF-27818: Add "identity_count" field to OtherPhones & Transactions Base Files
+	//DF-28194: Add "carrier" field to OtherPhones Base File
 	export OtherPhones_Main_Temp := record
 			string8		date_file_loaded;
 			string16	transaction_id;
@@ -145,6 +147,7 @@
 			string8		date_added;
 			string6		time_added;
 			integer5	identity_count;
+			string30	carrier;
 	end;
 	
 	export OtherPhones_History := record
@@ -201,5 +204,34 @@
 			RiskIndicators_In;
 			string255 filename;
 	end;
+	
+	///////////////////////////////////
+	//Sources//////////////////////////
+	///////////////////////////////////
+	
+	export Sources_In := record
+		unsigned8 auto_id;
+		string16  transaction_id;
+		string15  phonenumber;
+		string32  lexid;
+		integer5  phone_id;
+		integer5  identity_id;
+		integer5  sequence_number;
+		string60  source_type;
+		string60	category;
+		integer5  totalsourcecount;
+		string3		source;
+		string20 	date_added;
+	end;
+	
+	export Sources_Raw := record
+			Sources_In;	
+			string255 filename{virtual (logicalfilename)};
+	end;
+	
+	export Sources_History := record
+			Sources_In;
+			string255 filename;
+	end;	
 	
 END;

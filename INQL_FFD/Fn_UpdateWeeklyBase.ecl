@@ -17,7 +17,7 @@ EXPORT Fn_UpdateWeeklyBase (string pVersion = '') := function
 																, self.formatted_dob        						:= left.dob;
 																, self.formatted_phone_nbr           		:= left.phone_nbr;     
 																, self.formatted_eu_phone_nbr           := left.eu_phone_nbr;
-																, self.ppc                              := INQL_FFD._Functions.Convert_PPC(left.ppc);
+																//, self.ppc                              := INQL_FFD._Functions.Convert_PPC(left.ppc);
 																, self.name_score                       := '';
 																,	self                        					:= left;
 																,	self                     							:= [];)

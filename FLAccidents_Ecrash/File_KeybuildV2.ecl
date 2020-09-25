@@ -61,13 +61,14 @@ Layout_eCrash.Consolidation_AgencyOri xpndrecs(flc_ss L, FLAccidents.basefile_fl
 		//self.IdField 								:=	R.IdField;
 		//Appriss Integration
 		self.Releasable                     := '1'; 	
+		self.Citation_Details := row([], Layout_Infiles_Fixed.Citations_ChildRec);
 		self 								:= L;
 		self 								:= R;
 		self                := []; 
 end;
 
-	pflc_ss := join(distribute(flc_ss,hash(accident_nbr,vin)),
-									distribute(FLAccidents.basefile_flcrash2v,hash(accident_nbr,vehicle_id_nbr)),
+	pflc_ss := join(distribute(flc_ss,hash32(accident_nbr,vin)),
+									distribute(FLAccidents.basefile_flcrash2v,hash32(accident_nbr,vehicle_id_nbr)),
 															left.accident_nbr = right.accident_nbr and 
 															left.vin = right.vehicle_id_nbr,
 															xpndrecs(left,right),left outer, local);
@@ -81,11 +82,12 @@ Layout_eCrash.Consolidation_AgencyOri xpndrecs1(pflc_ss L,FLAccidents.BaseFile_F
 	//self.IdField 			:=	R.IdField;
 	//Appriss Integration
 	self.Releasable                     := '1'; 	
+	self.Citation_Details := row([], Layout_Infiles_Fixed.Citations_ChildRec);
 	self 							:= L;
 end;
 
-pflc_ss1 := dedup(distribute(join(distribute(pflc_ss,hash(accident_nbr))
-			  ,distribute(FLAccidents.BaseFile_FLCrash4(accident_nbr != ''),hash(accident_nbr))
+pflc_ss1 := dedup(distribute(join(distribute(pflc_ss,hash32(accident_nbr))
+			  ,distribute(FLAccidents.BaseFile_FLCrash4(accident_nbr != ''),hash32(accident_nbr))
 															,left.accident_nbr = right.accident_nbr and 
 															trim(left.record_type,left,right) in[ 'Vehicle Driver' ,'Driver']and  
 															ut.nneq(trim(left.driver_license_nbr,left,right) ,trim(right.driver_dl_nbr,left,right)) and 
@@ -99,11 +101,12 @@ Layout_eCrash.Consolidation_AgencyOri xpndrecs2(pflc_ss1 L,FLAccidents.basefile_
 	self.vehicle_incident_city			:= STD.Str.ToUpperCase(if(L.accident_nbr= R.accident_nbr,R.city_town_name,''));
 	//Appriss Integration
 	self.Releasable                     := '1'; 	
+	self.Citation_Details := row([], Layout_Infiles_Fixed.Citations_ChildRec); 	
 	self 														:= L;
 end;
 
-pflc_ss2 := distribute(join(distribute(pflc_ss1,hash(accident_nbr))
-						,distribute(FLAccidents.basefile_flcrash0(accident_nbr != ''),hash(accident_nbr))
+pflc_ss2 := distribute(join(distribute(pflc_ss1,hash32(accident_nbr))
+						,distribute(FLAccidents.basefile_flcrash0(accident_nbr != ''),hash32(accident_nbr))
 						,left.accident_nbr = right.accident_nbr,
 						xpndrecs2(left,right),left outer,local),random());
 				 
@@ -184,7 +187,8 @@ Layout_eCrash.Consolidation_AgencyOri slimrec(ntlFile L) := transform
 */
 		//Appriss Integration
 		self.Releasable               := '1'; 	
-		self.agency_id                := l.agency_id;	 	
+		self.agency_id                := l.agency_id; 	
+	  self.Citation_Details := row([], Layout_Infiles_Fixed.Citations_ChildRec);	 	
 		self						              := l;
 		self						              := [];
 end;
@@ -295,7 +299,8 @@ Layout_eCrash.Consolidation_AgencyOri slimrec2(inqFile L ,unsigned1 cnt) := tran
   				
 		//Appriss Integration
 		self.Releasable               := '1'; 	
-		self.agency_id                := l.agency_id;	
+		self.agency_id                := l.agency_id; 	
+	  self.Citation_Details := row([], Layout_Infiles_Fixed.Citations_ChildRec);	
 		self						              := l;
 		self						              := [];
 end;
@@ -305,8 +310,8 @@ end;
 
 // Drop metadata if matches with full report
 
-IyetekFull := distribute(FLAccidents_Ecrash.BaseFile(source_id ='TF'),hash(State_Report_Number));
-IyetekMeta := distribute(FLAccidents_Ecrash.BaseFile(source_id ='TM') ,hash(state_report_number));
+IyetekFull := distribute(FLAccidents_Ecrash.BaseFile(source_id ='TF'),hash32(State_Report_Number));
+IyetekMeta := distribute(FLAccidents_Ecrash.BaseFile(source_id ='TM') ,hash32(state_report_number));
 
 jdropMetadata := join( IyetekMeta,IyetekFull, left.state_report_number = right.State_Report_Number and 
                                         left.ORI_Number = right.ORI_Number and 
@@ -436,7 +441,7 @@ getMvrDid := FLAccidents_Ecrash.Fn_Mvr_DID(uprecsNodid);
 
 total := uprecsDID+ getMvrDid; 
 
-ddrecs := dedup(sort(distribute(total,hash(accident_nbr))
+ddrecs := dedup(sort(distribute(total,hash32(accident_nbr))
 															,accident_date,accident_nbr,jurisdiction_state,vin,tag_nbr,lname,fname,mname,did,record_type,prim_name,dob,report_code,report_type_id,map (work_type_id in ['1','0'] => 2, 1), date_vendor_last_reported,creation_date,length(trim(carrier_name,left,right))!=0,length(trim(driver_license_nbr,left,right)) !=0,vehicle_incident_id,local) // give preference to ecrash work type 1's over 2,3
 															,accident_date,accident_nbr,jurisdiction_state,vin,tag_nbr,lname,fname,mname,did,record_type,prim_name,dob,report_code,report_type_id,right,local) ;
 															
@@ -481,6 +486,6 @@ shared EcrashAgencyExclusion := EcrashAgencyExclusionAgencyOri(STD.Str.ToUpperCa
 export prout := project(EcrashAgencyExclusion, transform(Layout_eCrash.Consolidation, self := left;));
 
 shared searchRecs := out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and (trim(report_type_id,all) in ['A','DE'] or STD.str.ToUpperCase(trim(vendor_code,left,right)) = 'CMPD'));
-export eCrashSearchRecs := distribute(project(searchRecs, Layouts.key_search_layout), hash64(accident_nbr)):independent;
+export eCrashSearchRecs := distribute(project(searchRecs, Layouts.key_search_layout), hash32(accident_nbr)):independent;
 
 end; 

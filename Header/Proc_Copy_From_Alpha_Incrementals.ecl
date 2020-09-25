@@ -61,8 +61,8 @@ EXPORT copy_addr_uniq_keys_from_alpha(string filedt) := function
   AddrLFKeyName(boolean fcra)  := '~thor_data400::key::' + if(fcra, 'fcra::', '') + 'header::' + filedt + '::addr_unique_expanded';
 
   copyKeys := sequential(
-     fc(get_alogical('thor_data400::key::insuranceheader_incremental::fcra::qa::addr_unique_expanded'), AddrLFKeyName(true))
-    ,fc(get_alogical('thor_data400::key::insuranceheader_incremental::qa::addr_unique_expanded'), AddrLFKeyName(false))
+      fc(get_alogical('thor_data400::key::insuranceheader_incremental::fcra::qa::addr_unique_expanded'), AddrLFKeyName(true))     
+     ,fc(get_alogical('thor_data400::key::insuranceheader_incremental::qa::addr_unique_expanded'), AddrLFKeyName(false))
     );
     
   moveKeys := sequential(    
@@ -139,6 +139,9 @@ EXPORT copy_from_alpha(string filedt) := function
     ,fc(get_alogical(aPref+'did::refs::zip_pr')  ,fName(filedt, '::did::refs::zip_pr'))
     ,fc(get_alogical(aPref+'did::sup::rid')      ,fName(filedt, '::did::sup::rid'))
     ,fc(get_alogical(aPref+'header')             ,fName(filedt, '::idl'))
+    ,fc(get_alogical(aPref+'header_vin')         ,fName(filedt, '::idl_vin'))
+    ,fc(get_alogical(aPref+'header_relative')    ,fName(filedt, '::idl_relative'))
+    ,fc(get_alogical(aPref+'did::refs::vin')     ,fName(filedt, '::did::refs::vin'))
        
     //copy to cluster - thor400_36
     ,fc8('~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind' ,'~thor400_36::key::insuranceheader_segmentation::' + filedt + '::did_ind')
@@ -155,6 +158,9 @@ EXPORT copy_from_alpha(string filedt) := function
     ,fc8(fName(filedt, '::did::refs::zip_pr')  ,fName8(filedt, '::did::refs::zip_pr'))
     ,fc8(fName(filedt, '::did::sup::rid')      ,fName8(filedt, '::did::sup::rid'))
     ,fc8(fName(filedt, '::idl')                ,fName8(filedt, '::idl'))
+    ,fc8(fName(filedt, '::idl_vin')            ,fName8(filedt, '::idl_vin'))
+    ,fc8(fName(filedt, '::idl_relative')       ,fName8(filedt, '::idl_relative'))
+    ,fc8(fName(filedt, '::did::refs::vin')     ,fName8(filedt, '::did::refs::vin'))
     );
 
     return copy_incremental_keys;
@@ -217,8 +223,11 @@ EXPORT update_inc_superfiles(boolean skipIncSFupdate=false, string filedt) := fu
     ,updateSupers('::did::refs::ssn',skipIncSFupdate, ,filedt)
     ,updateSupers('::did::refs::ssn4',skipIncSFupdate, ,filedt)
     ,updateSupers('::did::refs::zip_pr',skipIncSFupdate, ,filedt)
-    ,updateSupers('::did::sup::rid',skipIncSFupdate, ,filedt)
-    ,updateSupers('::did'          ,skipIncSFupdate, ,filedt)    
+    ,updateSupers('::did::sup::rid' ,skipIncSFupdate, ,filedt)
+    ,updateSupers('::did'           ,skipIncSFupdate, ,filedt)
+    ,updateSupers('::did::refs::vin',skipIncSFupdate, ,filedt)    
+    ,updateSupers('::header_vin'       ,skipIncSFupdate, '::idl_vin', filedt)  
+    ,updateSupers('::header_relative'  ,skipIncSFupdate, '::idl_relative', filedt)
     );
 END;
 
@@ -270,7 +279,7 @@ END;
 // run on hthor
 EXPORT Refresh_copy(string filedt) :=  FUNCTION
 
-    ok_LAB_to_copy := filedt <>'' AND ~test_copy AND (~std.file.fileexists('~thor_data400::key::insuranceheader_xlink::'+filedt+'::did::refs::idl'));
+    ok_LAB_to_copy := filedt <>'' AND ~test_copy AND (~std.file.fileexists('~thor_data400::key::insuranceheader_xlink::'+filedt+'::idl'));
     cpLab := if(ok_LAB_to_copy
              ,copy_from_alpha(filedt)
              ,output('No LAB copy. see outputs')             
@@ -335,11 +344,12 @@ qa     := aPrefLoc + 'qa::locid';
 EXPORT movetoQA(string filedt) := sequential(
     // The following can only copy after the key is built in Boca
     fc8(fName(filedt, '::did'), fName8(filedt, '::did')),
-    update_inc_superfiles(,filedt),        
+    update_inc_superfiles(,filedt),
     update_segmentation_supers(ver(nm,'father','thor400_44'), ver(nm,'qa','thor400_44')),
     update_segmentation_supers(ver(nm,'qa','thor400_44'), ver(nm,filedt,'thor_data400')),
     update_segmentation_supers(ver(nm,'qa','thor400_36'), ver(nm,filedt,'thor400_36')),
-    update_segmentation_supers( ver(nm,'qa','thor_data400'), ver(nm,filedt,'thor_data400')),
+    update_segmentation_supers(ver(nm,'qa','thor_data400'), ver(nm,filedt,'thor_data400')),
+    update_segmentation_supers(ver(nm,'built','thor400_44'), ver(nm,filedt,'thor_data400')),
     STD.File.StartSuperFileTransaction(),
     STD.File.ClearSuperFile(father, true),
     STD.File.AddSuperFile(father,qa, addcontents := true),

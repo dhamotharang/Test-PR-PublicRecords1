@@ -1,4 +1,4 @@
-IMPORT corp2, corp2_raw_sc;
+﻿IMPORT corp2, corp2_raw_sc;
 	
 EXPORT Functions := MODULE
 
@@ -53,6 +53,7 @@ EXPORT Functions := MODULE
 														  'MER'									=> true,
 														  'MSC'									=> true,
 														  'NAG'									=> true,
+															'NAL'									=> true,
 															'NEW'									=> true, 
 														  'PSC'									=> true,
 														  'PSD'									=> true,

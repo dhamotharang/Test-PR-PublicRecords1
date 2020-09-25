@@ -1,4 +1,4 @@
-import VehLic;
+﻿import VehLic;
 
 export append_vin_info(dataset( VehLic.Layout_VINA) infile) :=
 function
@@ -70,8 +70,13 @@ function
 		self.vina_model										:=	if(l.vina_model != '',l.vina_model,'');
 		self.vina_body_style							:=	if(r.body_type != '',r.body_type,l.vina_body_style);
 		self.make_description							:=	if(r.make_name != '',r.make_name,l.make_description);
-		self.model_description						:=	if(r.series_name != '',r.series_name,l.model_description);
-		self.series_description						:=	if(l.series_description != '',l.series_description,'');
+
+		// DF-28271 - use base model , instead of series_name, for model_description
+		self.model_description						:=	if(r.base_model != '',r.base_model,l.model_description);
+		// self.series_description						:=	if(l.series_description != '',l.series_description,'');
+		self.series_description						:=	if(l.series_description != '',l.series_description,
+														  if(r.series_name != '',r.series_name,
+														     ''));
 		self.body_style_description				:=	if(r.full_body_style_name != '',r.full_body_style_name,l.body_style_description);
 		self.number_of_cylinders					:=	if(r.engine_information_cylinders != '',r.engine_information_cylinders,l.number_of_cylinders);
 		self.engine_size									:=	if(r.displacement != '',r.displacement,l.engine_size); ////////  ?????

@@ -31,17 +31,17 @@ EXPORT Append_RinID(
 	with_lexid 		:= J_previous_did(DID > 0 and DID < FirstRinID);
 	with_rinid 	:= J_previous_did(DID >= FirstRinID);
 
-	shared with_pii := without_did
+	with_pii := without_did
 		(   
-			(raw_first_name !='' and raw_last_name !='' and 
-				_Validate.Date.fIsValid(dob) and (unsigned)dob <= (unsigned)(STRING8)Std.Date.Today() and	dob != '' and dob != '00000000' and
-				(length(STD.Str.CleanSpaces(ssn))=9 and regexfind('^[0-9]*$',STD.Str.CleanSpaces(ssn)) =true ))
+			(cleaned_name.fname !='' and cleaned_name.lname !='' and 
+				_Validate.Date.fIsValid(clean_dob) and (unsigned)clean_dob <= (unsigned)(STRING8)Std.Date.Today() and	clean_dob != '' and clean_dob != '00000000' and
+				(length(STD.Str.CleanSpaces(clean_ssn))=9 and regexfind('^[0-9]*$',STD.Str.CleanSpaces(clean_ssn)) =true ))
 				
 			or
 
 		(
-			(raw_first_name !='' and raw_last_name !='' and
-				_Validate.Date.fIsValid(dob) and (unsigned)dob <= (unsigned)(STRING8)Std.Date.Today() and	dob != '' and dob != '00000000' and clean_address.prim_range != '' and clean_address.prim_name != '') and 
+			(cleaned_name.fname !='' and cleaned_name.lname !='' and
+				_Validate.Date.fIsValid(clean_dob) and (unsigned)clean_dob <= (unsigned)(STRING8)Std.Date.Today() and	clean_dob != '' and clean_dob != '00000000' and clean_address.prim_range != '' and clean_address.prim_name != '') and 
 				(
 					(clean_address.v_city_name != '' and clean_address.st != '')
 					or

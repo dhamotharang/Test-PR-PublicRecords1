@@ -403,7 +403,7 @@ function
 			pServerIP 															// SourceIP
 			,pDirectory + pFolderDate 							// SourceDirectory
 			,'NE*'+pInfolinkQtr+'.txt' 							// directory_filter
-			,706 																		// record_size
+			,1038 																		// record_size
 			,'~thor_data400::in::watercraft_ne_'+pFolderDate+'_raw' // Thor_filename_template
 			,[ {'~thor_data400::in::watercraft_raw_ne'}	]	// dSuperfilenames
 			,pGroupName 														// fun_Groupname

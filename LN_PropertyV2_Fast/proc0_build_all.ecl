@@ -128,7 +128,7 @@ run_all := sequential(  LN_PropertyV2_Fast.fn_reset_raw_files,
 													 ),
 												// When full build finishes it needs to clear deltas already added to the full and rebuild delat keys, it runs until file available to clear
 												//submit the keybuild job first so it has time to compile and go into waiting mode for the notify event that SubmitClearBase raises
-												if(NOT(isFast),sequential(SubmitDeltaKeyBuild, SubmitClearBase,  SubmitSpecificty)), //DF-22825 separated clear files and keybuild steps
+												if(NOT(isFast),sequential(/*SubmitDeltaKeyBuild, SubmitClearBase, delta not running in parallel to full build anymore*/ SubmitSpecificty)), //DF-22825 separated clear files and keybuild steps
 												//ppr extract build process -- 20170310
 												if(isFast , sequential(ppr_extract , LN_PropertyV2_Fast.JobInfo.updateViaEmail ( 'PPR Extract file built success') )),
 												if(isFast, LN_PropertyV2_Fast.JobInfo.updateViaEmail('Key diff not needed for delta'), 

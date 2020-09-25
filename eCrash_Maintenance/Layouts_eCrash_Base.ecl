@@ -374,7 +374,7 @@
   string50 law_enforcement_suspects_alcohol_use;
   string alcohol_test_status;
   string alcohol_test_type;
-  string25 alcohol_test_result;
+  string alcohol_test_result;
   string7 law_enforcement_suspects_drug_use;
   string20 drug_test_given;
   string100 non_motorist_actions_prior_to_crash1;
@@ -870,7 +870,7 @@
   string10 dispatch_date;
   string10 drug_involvement;
   string7 alcohol_involved;
-  string10 dui_suspected;
+  string dui_suspected;
   string drug_test_result;
   string64 geo_coded_latitude;
   string64 geo_coded_longitude;

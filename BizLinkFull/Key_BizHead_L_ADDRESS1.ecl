@@ -115,7 +115,7 @@ EXPORT RawFetch_server(TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name
       AND KEYED((city = param_city))
       AND KEYED((st = param_st))
       AND ((param_prim_range = (TYPEOF(prim_range))'' OR prim_range = (TYPEOF(prim_range))'') OR (prim_range = param_prim_range) OR ((Config_BIP.WithinEditN(prim_range,prim_range_len,param_prim_range,param_prim_range_len,1, 0)) ))
-      AND ((param_cnp_name = (TYPEOF(cnp_name))'' OR cnp_name = (TYPEOF(cnp_name))'') OR (SALT311.MatchBagOfWords(cnp_name,param_cnp_name,3177747,1)+400/*HACK08*/ > Config_BIP.cnp_name_Force * 100))
+      AND ((param_cnp_name = (TYPEOF(cnp_name))'' OR cnp_name = (TYPEOF(cnp_name))'') OR (SALT311.MatchBagOfWords(cnp_name,param_cnp_name,3177747,1)+400/*HACK08_a*/ > Config_BIP.cnp_name_Force * 100))
       AND KEYED(fallback_value >= param_fallback_value)
       AND ( param_efr_bitmap=0 OR (EFR_BMap & param_efr_bitmap)>0 )),Config_BIP.L_ADDRESS1_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),ultid,orgid,seleid,proxid);
  
@@ -173,7 +173,7 @@ EXPORT ScoredproxidFetch(TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_na
            match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),FALSE));
     SELF.zipWeight := (50+MAP (
            SELF.zip_match_code = SALT311.MatchCode.OneSideNull => 0,
-           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100 * param_zip(zip=le.zip)[1].weight/100.0,
+           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
     SELF.company_sic_code1_match_code := MAP(
@@ -435,7 +435,7 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex, BOOLEA
      AND ((RIGHT.city = LEFT.city))
      AND ((RIGHT.st = LEFT.st))
      AND ((LEFT.prim_range = (TYPEOF(RIGHT.prim_range))'' OR RIGHT.prim_range = (TYPEOF(RIGHT.prim_range))'') OR (RIGHT.prim_range = LEFT.prim_range) OR ((Config_BIP.WithinEditN(RIGHT.prim_range,RIGHT.prim_range_len,LEFT.prim_range,LEFT.prim_range_len,1, 0)) ))
-     AND ((LEFT.cnp_name = (TYPEOF(RIGHT.cnp_name))'' OR RIGHT.cnp_name = (TYPEOF(RIGHT.cnp_name))'') OR (SALT311.MatchBagOfWords(RIGHT.cnp_name,LEFT.cnp_name,3177747,1) > BizLinkFull.Config_BIP.cnp_name_Force * 100)),Score_Batch(RIGHT,LEFT),
+     AND ((LEFT.cnp_name = (TYPEOF(RIGHT.cnp_name))'' OR RIGHT.cnp_name = (TYPEOF(RIGHT.cnp_name))'') OR (SALT311.MatchBagOfWords(RIGHT.cnp_name,LEFT.cnp_name,3177747,1)+400/*HACK08_b*/ > BizLinkFull.Config_BIP.cnp_name_Force * 100)),Score_Batch(RIGHT,LEFT),
     ATMOST(((RIGHT.prim_name = LEFT.prim_name))
      AND ((RIGHT.city = LEFT.city))
      AND ((RIGHT.st = LEFT.st)),Config_BIP.L_ADDRESS1_MAXBLOCKSIZE)); // Use indexed join (used for smaller batches
@@ -443,7 +443,7 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex, BOOLEA
      AND ((RIGHT.city = LEFT.city))
      AND ((RIGHT.st = LEFT.st))
      AND ((LEFT.prim_range = (TYPEOF(RIGHT.prim_range))'' OR RIGHT.prim_range = (TYPEOF(RIGHT.prim_range))'') OR (RIGHT.prim_range = LEFT.prim_range) OR ((Config_BIP.WithinEditN(RIGHT.prim_range,RIGHT.prim_range_len,LEFT.prim_range,LEFT.prim_range_len,1, 0)) ))
-     AND ((LEFT.cnp_name = (TYPEOF(RIGHT.cnp_name))'' OR RIGHT.cnp_name = (TYPEOF(RIGHT.cnp_name))'') OR (SALT311.MatchBagOfWords(RIGHT.cnp_name,LEFT.cnp_name,3177747,1) > BizLinkFull.Config_BIP.cnp_name_Force * 100)),Score_Batch(RIGHT,LEFT),
+     AND ((LEFT.cnp_name = (TYPEOF(RIGHT.cnp_name))'' OR RIGHT.cnp_name = (TYPEOF(RIGHT.cnp_name))'') OR (SALT311.MatchBagOfWords(RIGHT.cnp_name,LEFT.cnp_name,3177747,1)+400/*HACK08_c*/ > BizLinkFull.Config_BIP.cnp_name_Force * 100)),Score_Batch(RIGHT,LEFT),
     ATMOST(((RIGHT.prim_name = LEFT.prim_name))
      AND ((RIGHT.city = LEFT.city))
      AND ((RIGHT.st = LEFT.st)),Config_BIP.L_ADDRESS1_MAXBLOCKSIZE),HASH,UNORDERED); // PULL used to cause non-indexed join
