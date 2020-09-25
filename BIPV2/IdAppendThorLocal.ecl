@@ -346,24 +346,15 @@ export IdAppendThorLocal(
 		left outer
   );
 
-	passThruIn := project(infile(proxid != 0 or seleid != 0),
+	passThru0 := project(infile(proxid != 0 or seleid != 0),
 		transform(BizLinkFull.Process_Biz_Layouts.id_stream_layout,
 			self.uniqueId := left.request_id,
 			self.proxid := left.proxid,
 			self.seleid := if(left.proxid != 0, 0, left.seleid);
 			self := left;
 			self := []));
-	passThruIds := if(reAppend, dataset([], recordof(passThruIn)),
-	               BizLinkFull.Process_Biz_Layouts.id_stream_complete(passThruIn));
-	passThruMissingIds := passThruIds(ultid = 0 and (seleid != 0 or proxid != 0));
-	passThruHistoric := BizLinkFull.Process_Biz_Layouts.id_stream_historic(passThruMissingIds);
-	passThruRenew :=
-		join(passThruMissingIds, passThruHistoric,
-			left.uniqueid = right.uniqueid,
-			transform(recordof(left),
-				self := if(right.ultid != 0, right, left)),
-			keep(1), left outer);
-	passThru := passThruIds(not (ultid = 0 and (seleid != 0 or proxid != 0))) + passThruRenew;
+	passThru := if(reAppend, dataset([], recordof(passThru0)),
+	               BizLinkFull.Process_Biz_Layouts.id_stream_complete(passThru0));
 
 	postPassThru := project(passThru, transform(recordof(%outfile20%),
 		self.request_id := left.uniqueid,
