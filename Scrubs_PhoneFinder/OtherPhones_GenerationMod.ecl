@@ -3,7 +3,7 @@ IMPORT SALT311;
 EXPORT OtherPhones_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.11.9';
+  EXPORT salt_VERSION := 'V3.11.11';
   EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
@@ -46,10 +46,10 @@ EXPORT OtherPhones_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:Invalid_No:ALLOW(0123456789\\\\N)\n'
     + 'FIELDTYPE:Invalid_ID:ALLOW(0123456789R\\\\N)\n'
     + 'FIELDTYPE:Invalid_Risk:ENUM(PASS|FAIL|WARN|\\\\N|)\n'
-    + 'FIELDTYPE:Invalid_Type:ENUM(LANDLINE|POSSIBLE WIRELESS|PAGER|POSSIBLE VOIP|WIRELESS|VOIP|OTHER/UNKNOWN|\\\\N|)\n'
+    + 'FIELDTYPE:Invalid_Type:ENUM(LANDLINE|POSSIBLE WIRELESS|PAGER|POSSIBLE VOIP|WIRELESS|VOIP|OTHER/UNKNOWN|CABLE|\\\\N|)\n'
     + 'FIELDTYPE:Invalid_Status:ENUM(ACTIVE|NOT AVAILABLE|INACTIVE|\\\\N|)\n'
     + 'FIELDTYPE:Invalid_Port:ENUM(Not Ported|Ported|\\\\N|)\n'
-    + 'FIELDTYPE:Invalid_AlphaChar:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ .,/-&|\\\\\')\n'
+    + 'FIELDTYPE:Invalid_AlphaChar:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,/-&|\\\\\')\n'
     + 'FIELDTYPE:Invalid_Phone:LIKE(Invalid_No):LENGTHS(0,9,10)\n'
     + 'FIELDTYPE:Invalid_Date:CUSTOM(Scrubs_PhoneFinder.Functions.Split_Date > 0)\n'
     + 'FIELDTYPE:Invalid_File:CUSTOM(Scrubs_PhoneFinder.Functions.Check_File > 0)\n'
