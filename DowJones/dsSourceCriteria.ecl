@@ -1932,7 +1932,10 @@ EXPORT dsSourceCriteria := DATASET([
 {'OFAC - International Criminal Court Prosecutor\'s List','1919'},
 {'Vessels - EC (CFSP) 2018/293 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1920'},
 {'EC (CFSP) 2020/1269 Ukraine List','1921'},
-{'EC 2020/1267 Ukraine List','1922'}
+{'EC 2020/1267 Ukraine List','1922'},
+{'EC (CFSP) 2020/1310 Libya List','1923'},
+{'EC 2020/1297 ISIL (Da\'esh) and Al-Qaida List','1924'},
+{'EC 2020/1309 Libya List','1925'}
 
 ],r);
 
