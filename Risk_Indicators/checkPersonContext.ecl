@@ -115,10 +115,12 @@ PersonContext_transformed := project(dsResponseRecords(searchStatus=personContex
 // this list will grow as we add more types of alerts to person context that we need to suppress data for
 		alert_needs_suppression := record_level_statement or isDispute or securityfraudalert or legal_hold_alert or (id_theft_flag and bsversion<50) or suppression_record;
 
-		SELF.bankrupt_correct_cccn := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.BANKRUPTCY_MAIN, 
-																																		PersonContext.constants.datagroups.BANKRUPTCY_SEARCH ], 
-																[Trim(TRIM(TRIM(left.RecID1, left, right)+TRIM(left.RecID2, left, right)+TRIM(left.RecID3, left, right),left,right)+TRIM(left.RecID4, left, right),left,right)], 
-																[]);    
+		SELF.bankrupt_correct_cccn := map(
+                                      alert_needs_suppression and left.dataGroup in [ PersonContext.constants.datagroups.BANKRUPTCY_SEARCH ] => [TRIM(TRIM(left.RecID1)+TRIM(left.RecID2)+TRIM(left.RecID3)+TRIM(left.RecID4))],
+                                      alert_needs_suppression and left.dataGroup in [ PersonContext.constants.datagroups.BANKRUPTCY_MAIN ] and left.recid1[1..2]<>'BK' => [TRIM(TRIM(left.RecID1)+TRIM(left.RecID2)+TRIM(left.RecID3)+TRIM(left.RecID4))],
+                                      // For old cases where the TMSID starting with BK is in recid1, just concatenate the court code and case number from recid2 + recid3
+                                      alert_needs_suppression and left.dataGroup in [ PersonContext.constants.datagroups.BANKRUPTCY_MAIN  ] and left.recid1[1..2]='BK' => [TRIM(TRIM(left.RecID2)+TRIM(left.RecID3))],
+                                      []);    
 		RecIdForStId := TRIM(left.RecID1, left, right);       
 		SELF.lien_correct_tmsid_rmsid := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.LIEN_MAIN, 
 											PersonContext.constants.datagroups.LIEN_PARTY ], 
