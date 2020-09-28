@@ -36,4 +36,3 @@ export Updated_Voters := date_fix
 //uncomment for tesing
  // : persist(VotersV2.Cluster + 'persist::Updated_Voters', SINGLE)
  ;
-

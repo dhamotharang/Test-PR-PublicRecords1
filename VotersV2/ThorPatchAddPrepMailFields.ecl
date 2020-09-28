@@ -121,5 +121,4 @@ output(Base_AddrNotNullPrepFields,,named('Base_AddrNotNullPrepFields'));
 output(COUNT(Base_AddrNotNullPrepFields),named('Cnt_Base_AddrNotNullPrepFields'));
       
                                                                                                                                                                                                                                                                 
-OUTPUT(newPatchedBase,,'~thor_data400::base::voters_reg_father::patched::20200923',overwrite,__compressed__,named('newPatchedBase'));
- 
+OUTPUT(newPatchedBase,,'~thor_data400::base::voters_reg_father::patched::20200923',overwrite,__compressed__,named('newPatchedBase')); 
