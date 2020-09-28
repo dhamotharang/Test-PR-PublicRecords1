@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_PhoneFinder.Transactions_BWR_Hygiene - Hygiene & Stats - SALT V3.11.9');
+#workunit('name','Scrubs_PhoneFinder.Transactions_BWR_Hygiene - Hygiene & Stats - SALT V3.11.11');
 IMPORT Scrubs_PhoneFinder,SALT311;
 // First create an instantiated hygiene module
   infile := Scrubs_PhoneFinder.Transactions_In_PhoneFinder;
