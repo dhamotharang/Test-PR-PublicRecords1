@@ -9,8 +9,8 @@ layout_base := VotersV2.Layouts_Voters.Layout_Voters_Base_new;
 VotersV2.Layouts_Voters.Layout_Voters_base_new tCleanPers(in_file L) := TRANSFORM	                  
   //using the old name cleaner is for title population only	
 	string73 clean_name:= address.CleanPersonFML73(TRIM(TRIM(l.first_name)+' '+TRIM(l.middle_name)+' '+TRIM(l.last_name)));
-	temp_title :=	clean_name[1..5];   
-	self.title :=  if(l.prefix_title = '',temp_title,l.prefix_title);
+	temp_title        := clean_name[1..5];   
+	self.title        := if(l.prefix_title = '',temp_title,l.prefix_title);
 	SELF.fname	      := L.first_name;
 	SELF.mname	      := L.middle_name;
 	temp_last_name    := if(L.name_type = '2',trim(L.clean_maiden_pri,left,right),trim(L.last_name,left,right));

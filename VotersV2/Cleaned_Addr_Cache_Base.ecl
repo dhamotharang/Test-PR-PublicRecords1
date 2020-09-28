@@ -22,11 +22,8 @@ VotersV2.Layouts_Voters.Layout_Voters_base_new trfInFile(in_File l, unsigned c) 
 	temp_mail_addr_line_last := if((trim(l.mail_city,left,right) != '' and trim(l.mail_state,left,right) != '') or (trim(l.mail_zip,left,right) != '')
 																	,Address.Addr2FromComponents(ut.CleanSpacesAndUpper(l.mail_city), ut.CleanSpacesAndUpper(l.mail_state), l.mail_zip[1..5])			
 																	,'');
-	self.prep_addr_line_last := choose(c, temp_res_addr_line_last, temp_mail_addr_line_last); 								                  
-  //using the old name cleaner is for title population only	
-	string73 clean_name:= address.CleanPersonFML73(TRIM(TRIM(l.first_name)+' '+TRIM(l.middle_name)+' '+TRIM(l.last_name)));
-	temp_title :=	clean_name[1..5];   
-	self.title :=  if(l.prefix_title = '',temp_title,l.prefix_title);
+	self.prep_addr_line_last := choose(c, temp_res_addr_line_last, temp_mail_addr_line_last); 								                   
+	self.title := l.prefix_title;
 	self.fname := l.first_name;
 	self.mname := l.middle_name;
 	self.lname := l.last_name;
