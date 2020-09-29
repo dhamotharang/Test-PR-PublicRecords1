@@ -152,11 +152,9 @@ EXPORT LiensRetrieval_TestSeedFunction(iesp.riskview_publicrecordretrieval.t_Pub
   SSN_val     := seedResults[1].ssn;
 
   //boolean checks
-  is_valid_rec_found := EXISTS(seedResults[1].liens(seq <> ''));
-  is_OKCsubmitted := ~DeferredTaskRequest AND is_valid_rec_found;  // if liens data exists in key, assuming request has been submitted
-  dte_gateway_success := DeferredTaskRequest AND is_valid_rec_found;
-  BOOLEAN showConsumerStatements     := FFD.FFDMask.isShowConsumerStatements(FFDOptionsMask) AND  dte_gateway_success;
-  BOOLEAN NoshowAlerts     := is_OKCsubmitted;      
+  is_valid_rec_found := EXISTS(seedResults(ssn <> ''));
+  is_OKCsubmitted := ~DeferredTaskRequest AND is_valid_rec_found;  // if found has match in key, assuming request has been submitted
+  dte_gateway_success := DeferredTaskRequest AND is_valid_rec_found;   
 
   // test seed liens recs
   iesp.riskview_publicrecordretrieval.t_PublicRecordRetrievalRecord toRecords($.layout_liens_Retrieval.layout_testseed_liens L) := TRANSFORM
@@ -197,8 +195,8 @@ EXPORT LiensRetrieval_TestSeedFunction(iesp.riskview_publicrecordretrieval.t_Pub
       SELF.RecordCount := COUNT(ds_liens_seeds);
       SELF.InputEcho := srchby;
       SELF.Records := ds_liens_seeds;
-      SELF.Alerts := IF(NoshowAlerts, DATASET([], iesp.riskview2.t_RiskView2Alert), SORT(nameValuePairsAlerts, Code));
-      SELF.ConsumerStatements := IF(showConsumerStatements, seedResults[1].ConsumerStatements);
+      SELF.Alerts :=  nameValuePairsAlerts;
+      SELF.ConsumerStatements := seedResults[1].ConsumerStatements;
       SELF.Consumer := FFD.MAC.PrepareConsumerRecord(UniqueId, TRUE, srchby);
 
    END;

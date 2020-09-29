@@ -13,8 +13,5 @@ module
 													,true		
 													,false	
 											);
-	export IsAlpha_dev := if(regexfind('Alpha_Dev', _Control.ThisEnvironment.Name, nocase)
-													,true		
-													,false	
-											);
+
 end;
