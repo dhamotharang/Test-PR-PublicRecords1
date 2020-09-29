@@ -146,7 +146,7 @@ end;
 		tag12 := 'flas_';
 
 
-input_file_count_ds:=DATASET([ 
+input_file_count_ds:= distribute(DATASET([ 
 													     {RV_Attributes_V3_XML_Experian_outfile+ dt,file_count_function(RV_Attributes_V3_XML_Experian_infile)},
 													     {RV_Attributes_V3_BATCH_Experian_outfile+ dt,file_count_function(RV_Attributes_V3_BATCH_Experian_infile)}, 
 												       // {RV_Attributes_V3_BATCH_CapOne_outfile+ dt,file_count_function(RV_Attributes_V3_BATCH_CapOne_infile)},
@@ -207,7 +207,7 @@ input_file_count_ds:=DATASET([
 																{FP_V3_XML_Generic_FP31505_0_outfile+ tag12 + dt, file_count_function(FP_V3_Generic_FP31505_0_infile)					 
 															 															 }
 															 
-                             ],input_file_count_ds_rec);
+                             ],input_file_count_ds_rec),hash(file_name));
 														 
 														 // input_file_count_ds;
 												

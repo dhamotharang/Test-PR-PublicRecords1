@@ -2,15 +2,15 @@
 
 
 
- file1_2:= dataset(route + scoring_project_pip.Output_Sample_Names.BC10_Scores_BATCH_Chase_BNK4_outfile + previous_dt, Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_Chase_BNK4_Global_Layout,
+ file1_2:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.BC10_Scores_BATCH_Chase_BNK4_outfile + previous_dt, Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_Chase_BNK4_Global_Layout,
 
 
-thor);
+thor),(integer)acctno);
  
- file2_2:= dataset(route + scoring_project_pip.Output_Sample_Names.BC10_Scores_BATCH_Chase_BNK4_outfile + current_dt, Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_Chase_BNK4_Global_Layout,
+ file2_2:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.BC10_Scores_BATCH_Chase_BNK4_outfile + current_dt, Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_Chase_BNK4_Global_Layout,
 
 
-thor);
+thor),(integer)acctno);
 
 	   file1 := file1_2(errorcode='');
 file2 := file2_2(errorcode='');
