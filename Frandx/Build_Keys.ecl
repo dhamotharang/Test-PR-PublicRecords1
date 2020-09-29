@@ -1,4 +1,4 @@
-import doxie, Tools, BIPV2, VersionControl;
+﻿import doxie, Tools, BIPV2, VersionControl;
 
 export Build_Keys(string pversion) :=
 module
@@ -7,14 +7,14 @@ module
 	
 	VersionControl.macBuildNewLogicalKeyWithName(Frandx.Key_LinkIds.Key,	frandx.keynames(pversion,false).LinkIds.New, BuildLinkIdsKey);
 
-	VersionControl.macBuildNewLogicalKeyWithName(Frandx.Key_SourceRecId,	frandx.keynames(pversion,false).Source_Rec_ID.New, BuildSourceRecIdKey);
+	//Depriciated Key
+	//VersionControl.macBuildNewLogicalKeyWithName(Frandx.Key_SourceRecId,	frandx.keynames(pversion,false).Source_Rec_ID.New, BuildSourceRecIdKey);
 	
 	export full_build :=
 	sequential(
 		 parallel(
 			 BuildBdidKey
 			,BuildLinkIdsKey
-			,BuildSourceRecIdKey
 		 )
 		,Promote(pversion).BuildFiles.New2Built
 	);
