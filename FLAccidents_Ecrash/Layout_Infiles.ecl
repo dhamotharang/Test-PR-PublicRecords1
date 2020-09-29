@@ -478,6 +478,7 @@
 		STRING Geo_Coded_Longitude;
 		//PRtCC CR-1262 
     STRING Direction_Of_Impact;
+		STRING is_Suppressed;
 	END;
 
 	EXPORT persn_NEW := RECORD ,MAXLENGTH(20000)
