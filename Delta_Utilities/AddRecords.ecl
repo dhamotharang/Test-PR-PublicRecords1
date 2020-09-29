@@ -59,7 +59,7 @@ export AddRecords(FullData,NewData,recref,MatchFields,DistSet='',isDist=false,is
 	#if(islookup)
 	#APPEND(CommandString,'dAddRecordsFinal:=join(dAddRecords,dNewData,');
 	#append(CommandString,%'MatchString'%);
-	#APPEND(CommandString,',transform(right),right only,lookup);\n');
+	#APPEND(CommandString,',transform(right),right only);\n');
 	#else
 	#APPEND(CommandString,'dAddRecordsFinal:=dAddRecords;\n');
 	#end

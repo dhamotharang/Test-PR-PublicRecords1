@@ -66,9 +66,9 @@ export DeleteRecords(FullData,NewData,recref,MatchFields,DistSet='',process_date
 
     #append(CommandString,'FinalDeletes:=project(dDeleteRecords,tCreateDeletes(left));\n');
 
-    //%CommandString%;
+    %CommandString%;
 
-    //return FinalDeletes;
-	return %'CommandString'%;
+    return FinalDeletes;
+	//return %'CommandString'%;
 
 endmacro;

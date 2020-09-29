@@ -1,11 +1,13 @@
-export UpdateRecords(FullData,NewData,recref,MatchFields,DistSet='',process_date,isDist=false,isLookup=false):=functionmacro
+export UpdateRecords(FullData,NewData,recref,MatchFields,UpdateFields,DistSet='',isDist=false,isLookup=false):=functionmacro
 #Declare(CommandString);
 	#declare(CommaString);
 	#declare(MatchString);
+	#declare(UpdateString);
 	#Declare(numField);
 	#Set(CommandString,'');
 	#Set(CommaString,'');
 	#set(MatchString,'');
+	
 	#Set(numField,1);
 	#if(isdist)
 	#loop
@@ -32,6 +34,18 @@ export UpdateRecords(FullData,NewData,recref,MatchFields,DistSet='',process_date
 		#end
 		#SET(numField, %numField% + 1);
 	#end
+	#Set(numField,1);
+	#set(UpdateString,'self.updated:=map(');
+
+	#loop
+		#IF(%numField%> Count(UpdateFields))
+			#BREAK 
+		#ELSE
+			#append(UpdateString,'L.'+UpdateFields[%numField%]+' <> R.'+UpdateFields[%numField%]+'=>TRUE,\n');
+		#end
+		#SET(numField, %numField% + 1);
+	#end
+	#append(UpdateString,'FALSE);\n')
     #if(isdist=false or isLookup)
         dFullData:=fulldata;
         dNewData:=newData;
@@ -39,40 +53,34 @@ export UpdateRecords(FullData,NewData,recref,MatchFields,DistSet='',process_date
         dFullData:=distribute(fulldata,hash(%CommaString%));
         dNewData:=distribute(newData,hash(%CommaString%));
     #end;
+	RecordLayout:=#expand(recref);;
+    RecordLayoutTemp:=RECORD
+		RecordLayout;
+		boolean updated;
+	END;
 
-    RecordLayout:=#expand(recref);
-
-    #append(CommandString,'RecordLayout tCreateUpdates(RecordLayout L, RecordLayout R):=TRANSFORM\n');
-    #append(CommandString,'self.record_sid:=L.record_sid\n');
+    #append(CommandString,'RecordLayoutTemp tCreateUpdates(RecordLayout L, RecordLayout R):=TRANSFORM\n');
+    #append(CommandString,'self.record_sid:=L.record_sid;\n');
+	#append(CommandString,%'UpdateString'%);
     #append(CommandString,'self:=R;\n');
     #append(CommandString,'end;\n');
 
-    #APPEND(CommandString,'dUpdateRecords:=join(dFullData,dNewData,');
+    #APPEND(CommandString,'dUpdateRecordsTemp:=join(dFullData,dNewData,');
 	#append(CommandString,%'MatchString'%);
 	#APPEND(CommandString,',tCreateUpdates(left,right)');
 	#if(isLookup=false and isdist=false)
 	#append(CommandString,');\n');
-	#end
-	#if(islookup)
-    #append(CommandString,'lookup);\n');
+	
+	#elseif(islookup)
+    #append(CommandString,',lookup);\n');
     #else
     #append(CommandString,',local);\n');
     #end
     //#append(CommandString,'');
-	#if(islookup)
-	#APPEND(CommandString,'dUpdateRecordsFinal:=join(dDeleteRecords,dNewData,');
-	#append(CommandString,%'MatchString'%);
-	#APPEND(CommandString,',transform(left),left only);\n');
-	#else
-	#APPEND(CommandString,'dDeleteRecordsFinal:=dDeleteRecords;\n');
-	#end
-	
-
-    #append(CommandString,'FinalDeletes:=project(dDeleteRecordsFinal,tCreateDeletes(left));\n');
-
+	#append(CommandString,'dUpdateRecords:=project(dUpdateRecordsTemp(updated),transform(RecordLayout,self:=Left;));\n')
     %CommandString%;
 
-    return FinalDeletes;
+    return dUpdateRecords;
 	//return %'CommandString'%;
 
 endmacro;
