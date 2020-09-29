@@ -147,7 +147,7 @@ end;
 
 // sets dob 
 lbest getdob_set(wvalidSSN l, bdob r) := transform
-	self.did := IF(r.dob = 0 or ut.Age(r.dob) >= 21, l.did, SKIP);
+	// self.did := IF(r.dob = 0 or ut.Age(r.dob) >= 21, l.did, SKIP); //does not exclude minors 
 	self.dob := r.dob;	// sets dob
 	self := l;
 end;
