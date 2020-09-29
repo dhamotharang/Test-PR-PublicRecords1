@@ -29,6 +29,7 @@ export fn_Base2_from_Base1(string version) := FUNCTION
 	alertList := MOD_InternalEmailsList.fn_GetInternalRecipients('Alert','');
 
 	version1 := NAC_V2.fn_Base1_Version;
+	newcol := DATASET('~nac::v2::newcollisions::' + version, $.Layout_Collisions2.Layout_Collisions, thor);
 
 	doit := SEQUENTIAL(
 		OUTPUT(IF(version=version1, 'Versions Match', 'Outdated Base1: ' + version1)),
@@ -59,7 +60,8 @@ export fn_Base2_from_Base1(string version) := FUNCTION
 				),
 		if (ut.Weekday((integer)version[1..8]) <> 'SATURDAY',
 								Nac_v2.CreateOrbitEntry(version)),
-		Nac.fn_Strata(version)
+		Nac.fn_Strata(version),
+		ProcessCollisions(newcol, version)
 	);
 
 	return doit;
