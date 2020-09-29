@@ -349,7 +349,7 @@ Passed_Business :=
       
 result1:=STD.System.Email.SendEmail(email_list, 'KEL SHELL QA UI run job',  'Your WUID ' + workunit + ' has just kicked-off!');
 
-result2:=output(Passed_Business);
+result2:=output(Passed_Business,named('Filtered_output'));
 
 unique_id:='p_inpacct';
 
