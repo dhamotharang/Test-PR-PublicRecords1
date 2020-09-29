@@ -127,9 +127,9 @@ IMPORT InsuranceHeader_xLink, ut;
 	InsuranceHeader_xLink.MAC_MEOW_xIDL_Batch(%pr%, UniqueId, ,SNAME, fname, mname, lname, derived_gender, 
 																prim_range, prim_name, SEC_RANGE, CITY, ST, ZIP_cases,
 																SSN5, SSN4, DOB, PHONE, DL_STATE, DL_NBR,
-																SRC, SOURCE_RID, , , %res_out%, true);
-
-	#UNIQUENAME(result_trim)
+																SRC, SOURCE_RID, , , , %res_out%, true);
+	
+  #UNIQUENAME(result_trim)
 	IDLExternalLinking.mac_trim_xidl_layout(%res_out%, %result_trim%, reference);
 
 	// select a DID base only on distance and make sure the score is 75 or greater	
