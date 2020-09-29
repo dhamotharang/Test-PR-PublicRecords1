@@ -14,29 +14,16 @@ export Cleaned_Voters(string filedate) := function
 		VotersV2.Layouts_Voters.Layout_Voters_Common_new;
 	end;
 
-	Layout_Clean_Voters getCleanVoters(In_Voters_File l) := transform
-	  the_first_name         := ut.fnTrim2Upper(l.first_name);
-		the_middle_name        := ut.fnTrim2Upper(l.middle_name);
-		the_last_name          := ut.fnTrim2Upper(l.last_name);
-		the_name_suffix        := ut.fnTrim2Upper(l.name_suffix);
-		the_maiden_prior       := ut.fnTrim2Upper(l.maiden_prior);
-		the_res_Addr1          := ut.fnTrim2Upper(l.res_Addr1);
-		the_res_Addr2          := ut.fnTrim2Upper(l.res_Addr2);
-		the_res_city           := ut.fnTrim2Upper(l.res_city);
+//DF-27577 Cleaned up this transform
+	Layout_Clean_Voters getCleanVoters(In_Voters_File l) := transform		
 		the_res_state          := ut.fnTrim2Upper(l.res_state);
-		the_res_zip            := StringLib.StringFilter(l.res_zip, '0123456789');
-		the_mail_addr1         := ut.fnTrim2Upper(l.mail_addr1);
-		the_mail_addr2         := ut.fnTrim2Upper(l.mail_addr2);
-		the_mail_city          := ut.fnTrim2Upper(l.mail_city);
-		the_mail_state         := ut.fnTrim2Upper(l.mail_state);
-		the_mail_zip           := StringLib.StringFilter(l.mail_zip, '0123456789');
 		the_state_code         := ut.fnTrim2Upper(l.state_code);
-		
 		the_file_acquired_date := if(_Validate.Date.fIsValid(l.file_acquired_date) and
 		                                _Validate.Date.fIsValid(l.file_acquired_date, _Validate.Date.Rules.DateInPast),
 		                             l.file_acquired_date,
 																 '');
 		the_gender             := ut.fnTrim2Upper(l.gender);
+		
 		self.vtid                  := 0;
 		self.file_acquired_date    := the_file_acquired_date;
 		self.process_date		       := the_file_acquired_date;
@@ -45,17 +32,15 @@ export Cleaned_Voters(string filedate) := function
 		self.source                := 'EMERGES';
 		self.file_id               := 'VOTE'; 
 		self.vendor_id             := trim(l.EMID_number,left,right);
-		
-		self.source_state          := if(the_state_code = '', the_res_state,
-										                 the_state_code);																		 
+																			 
 													
 		self.source_code           := ut.fnTrim2Upper(l.source_code);
 		self.prefix_title          := ut.fnTrim2Upper(l.prefix_title);
-		self.last_name             := the_last_name;
-		self.first_name            := the_first_name;
-		self.middle_name           := the_middle_name;
-		self.maiden_prior          := the_maiden_prior;
-		self.name_suffix_in        := the_name_suffix;
+		self.last_name             := ut.fnTrim2Upper(l.last_name);
+		self.first_name            := ut.fnTrim2Upper(l.first_name);
+		self.middle_name           := ut.fnTrim2Upper(l.middle_name);
+		self.maiden_prior          := ut.fnTrim2Upper(l.maiden_prior);
+		self.name_suffix_in        := ut.fnTrim2Upper(l.name_suffix);
 		self.voterfiller           := ''; // old
 		self.source_voterId        := ut.fnTrim2Upper(l.source_voterId);
 		// Allows 00 in MM and DD, but YYYY00DD is invalid, according to the utility
@@ -90,23 +75,27 @@ export Cleaned_Voters(string filedate) := function
 		self.active_other          := ''; // old
 		self.voter_status  		     := ut.fnTrim2Upper(l.voter_status);
 		self.voter_status_exp      := '';
-		self.res_Addr1             := the_res_Addr1;
-		self.res_Addr2             := the_res_Addr2;
-		self.res_city              := the_res_city;
-		self.res_state             := the_res_state;
-		self.res_zip               := the_res_zip;
+		self.res_Addr1             := ut.fnTrim2Upper(l.res_Addr1);
+		self.res_Addr2             := ut.fnTrim2Upper(l.res_Addr2);
+		self.res_city              := ut.fnTrim2Upper(l.res_city);
+		self.res_state             := ut.fnTrim2Upper(l.res_state);
+		self.res_zip               := StringLib.StringFilter(l.res_zip, '0123456789');
 		self.res_county            := ut.fnTrim2Upper(l.res_county);
-		self.mail_addr1            := the_mail_addr1;
-		self.mail_addr2            := the_mail_addr2;
-		self.mail_city             := the_mail_city;
-		self.mail_state            := the_mail_state;
-		self.mail_zip              := the_mail_zip;
+		self.mail_addr1            := ut.fnTrim2Upper(l.mail_Addr1);
+		self.mail_addr2            := ut.fnTrim2Upper(l.mail_Addr2);
+		self.mail_city             := ut.fnTrim2Upper(l.mail_city);
+		self.mail_state            := ut.fnTrim2Upper(l.mail_state);
+		self.mail_zip              := StringLib.StringFilter(l.mail_zip, '0123456789');
 		self.mail_county           := ut.fnTrim2Upper(l.mail_county);
 		self.addr_filler1          := ''; // old
 		self.addr_filler2          := ''; // old
 		self.city_filler           := ''; // old
 		self.state_filler          := ''; // old
-		self.zip_filler            := ''; // old
+		self.zip_filler            := ''; // old		
+		
+		self.source_state          := if(the_state_code = '', the_res_state,
+										                 the_state_code);	
+																		 
 		self.TimeZoneTbl           := ut.fnTrim2Upper(l.TimeZoneTbl);
 		self.towncode              := ut.fnTrim2Upper(l.towncode);
 		self.distcode              := ut.fnTrim2Upper(l.distcode);
