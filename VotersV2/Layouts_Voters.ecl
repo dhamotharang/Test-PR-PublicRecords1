@@ -388,6 +388,7 @@ export Layouts_Voters := MODULE
 	end;
 	
 //Added AID Fields	
+//DF-27577 Added prep address fields
 	Export Layout_Voters_base_new := record
 		unsigned6  rid;
 		unsigned6  did;
@@ -397,7 +398,9 @@ export Layouts_Voters := MODULE
 		string1    name_type;
 		string1    addr_type;
 	  unsigned8	 raw_aid := 0;
-	  unsigned8	 ace_aid := 0;
+	  unsigned8	 ace_aid := 0;	
+	  string100	 prep_addr_line1 := '';
+	  string50	 prep_addr_line_last := '';	
 	end;
 	
 	Export Layout_Voters_Autokeys := record

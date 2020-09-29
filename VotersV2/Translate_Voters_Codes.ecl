@@ -1,10 +1,12 @@
 ﻿import VotersV2, Codes, ut;
+//DF-27577 Moved DID after AID and Name processes
+//DF-27577 Moved Rollup from Updated_Voters to Transulate_Voters_Codes
+//DF-27577 Moved Name process to between AID and DID processes
+//DF-27577 Renamed Transulate_Voters_Codes to Translate_Voters_Codes
 
-Cleaned_Norm_vbase := VotersV2.Norm_Voters_Cleaned_Base;
+Cleaned_Voters_DID_Base := VotersV2.Cleaned_Voters_DID;
 
 Layout_outfile := VotersV2.Layouts_Voters.Layout_Voters_base_new;
-
-CleanedNormVbaseAndBase := Cleaned_Norm_vbase;
 
 //*** Code to explode the description values for Race Ethnicity, Active Status, 
 //*** Age Category, Political Party, Voter Status
@@ -13,7 +15,7 @@ Layout_outfile  getRaceEthnicity(Layout_outfile L, codes.File_Codes_V3_In R) := 
 	self          := L;
 end;
 
-Clean_file_Race_Exp := join(CleanedNormVbaseAndBase,
+Clean_file_Race_Exp := join(Cleaned_Voters_DID_Base,
 		                    codes.File_Codes_V3_In(trim(file_name, left, right) = 'EMERGES_HVC',trim(field_name, left, right) = 'RACEETHNICITY'),
 		                    trim(left.race, left, right) = trim(right.code, left, right),
 		                    getRaceEthnicity(LEFT,RIGHT),left outer, lookup);
@@ -56,9 +58,7 @@ end;
 Clean_file_Voter_Status_exp := join(Clean_file_PoliticalParty_exp,
 		                            codes.File_Codes_V3_In(trim(file_name, left, right) = 'EMERGES_HVC',trim(field_name, left, right) = 'VOTERSTATUS'),
 		                            trim(left.voter_status, left, right) = trim(right.code, left, right),
-		                            getVoterStatus(LEFT,RIGHT),left outer, lookup):
-                                persist('~thor_data400::perist::voters::Clean_file_Voter_Status_exp',SINGLE)
-																;
+		                            getVoterStatus(LEFT,RIGHT),left outer, lookup);
 																
 //*** End of code transulations.
 
@@ -67,11 +67,8 @@ Clean_file_Voter_Status_exp := join(Clean_file_PoliticalParty_exp,
 
 //Moved Base File to earlier in process to Add AID/NID and to refresh DIDs
 ds_Clean_file_Voter_Status_exp := VotersV2.Filters.Base(Clean_file_Voter_Status_exp);
-
-// generating a sequence number for "vtid"
-ut.MAC_Sequence_Records(ds_Clean_file_Voter_Status_exp,vtid,vtidCleanedVotersBase);
 					 
-dist_vtidCleanedVotersBase := distribute(vtidCleanedVotersBase, hash64(source_state, lname, name_suffix, fname, mname, 
+dist_vtidCleanedVotersBase := distribute(ds_Clean_file_Voter_Status_exp, hash64(source_state, lname, name_suffix, fname, mname, 
 														 prim_range, prim_name, predir, addr_suffix, postdir,
 														 unit_desig, sec_range, p_city_name, st, zip,
 														 mail_prim_range, mail_prim_name, mail_predir, mail_addr_suffix,
@@ -124,7 +121,28 @@ Layout_outfile patchRecs(dist_vtidCleanedVotersBase l, dist_vtidCleanedVotersBas
    self      := r;
 end;
 
+Clean_patched_vtid_dob_file := iterate(Srt_dist_vtidCleanedVotersBase, patchRecs(left,right),local);	
 
-Clean_patched_vtid_dob_file := iterate(Srt_dist_vtidCleanedVotersBase, patchRecs(left,right),local);						  
+Sort_Cleaned_Patched_file := sort(Clean_patched_vtid_dob_file,RECORD,
+								  EXCEPT vtid, vendor_id, Process_Date, Date_First_Seen, Date_Last_Seen,
+								  file_acquired_date,local) 
+									// : persist(VotersV2.Cluster+ 'persist::Transulate_Voters_Sort', SINGLE)
+									;
 
-export Transulate_Voters_Codes := Clean_patched_vtid_dob_file: persist(VotersV2.Cluster+ 'persist::Cleaned_Voter_base',SINGLE);
+Layout_outfile  rollupXform(Layout_outfile l, Layout_outfile r) := transform
+	self.Process_Date    := if(l.Process_Date > r.Process_Date, l.Process_Date, r.Process_Date);
+	self.Date_First_Seen := if(l.Date_First_Seen > r.Date_First_Seen, r.Date_First_Seen, l.Date_First_Seen);
+	self.Date_Last_Seen  := if(l.Date_Last_Seen  < r.Date_Last_Seen,  r.Date_Last_Seen,  l.Date_Last_Seen);
+	self := l;
+end;
+
+Rollup_Voters := rollup(Sort_Cleaned_Patched_file,rollupXform(LEFT,RIGHT),RECORD,
+								EXCEPT vtid, vendor_id, Process_Date, Date_First_Seen, Date_Last_Seen,
+								file_acquired_date, local)
+								// : persist(VotersV2.Cluster+ 'persist::Transulate_Voters_Rollup', SINGLE)
+								;					  
+
+export Translate_Voters_Codes := Rollup_Voters 
+//uncomment for testing purposes
+// : persist(VotersV2.Cluster+ 'persist::Translate_Voters_Codes', SINGLE)
+;
