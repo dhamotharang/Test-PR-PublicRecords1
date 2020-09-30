@@ -6,6 +6,9 @@ IMPORT Std;
 #option('multiplePersistInstances', false);
 #option('defaultSkewError', 1);
 //#option('freezepersists', true);
+#option('resourceMaxHeavy', 2);
+//#option('freezepersists', true);
+#OPTION('expandSelectCreateRow', TRUE);
 
 EntityAssessment := FraudgovKEL.KEL_EventPivot.EntityAssessment;
 MyRules := FraudgovKEL.KEL_EventPivot.MyRules(rulename != 'rulename');

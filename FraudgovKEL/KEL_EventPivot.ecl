@@ -45,7 +45,7 @@ SHARED UIStats := PROJECT(UIStats1,
 	}, 
  
 	SELF.t_inpdvciprovecho := '', // jp temp needs to come out 
-	SELF.t_inpclnbnkacct2rtg2echo := LEFT.routingnumber2, // jp temp needs to come out
+	SELF.t_inpclnbnkacct2rtg2echo := '';//LEFT.routingnumber2, // jp temp needs to come out
 	
   SELF.t_evttype1statusdesc := dictEvtType1[(STRING)LEFT.t_evttype1statuscodeecho].uidescription;
   SELF.t_evttype2statusdesc := dictEvtType2[(STRING)LEFT.t_evttype2statuscodeecho].uidescription;
@@ -91,8 +91,9 @@ SHARED EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(UIStatsCl
 't1_manipidflag,t1l_curraddrnotinagcyjurstflag,t1l_bestdlnotinagcyjurstflag,t9_addrisvacantflag,t9_addrisinvalidflag,t9_addriscmraflag,t15_ssnisinvalidflag,t20_dlisinvalidflag,t16_phnisinvalidflag,t16_phnprepdflag,' +
 't18_ipaddrhostedflag,t18_ipaddrvpnflag,t18_ipaddrtornodeflag,t18_ipaddrlocnonusflag,t18_ipaddrlocmiamiflag,t17_emaildomaindispflag,t19_bnkaccthrprepdrtgflag,t9_addrpoboxmultcurridflagev,t15_ssnmultcurridflagev,t20_dlmultcurridflagev,' +
 't19_bnkacctmultcurridflagev,p1_aotidkrappfrdactflagev,p1_aotidkrgenfrdactflagev,p1_aotidkrothfrdactflagev,p1_aotidkrstolidactflagev,p9_aotaddrkractflagev,p15_aotssnkractflagev,p16_aotphnkractflagev,p17_aotemailkractflagev,p18_aotipaddrkractflagev,' +
-'p19_aotbnkacctkractflagev,p20_aotdlkractflagev,p1_idriskunscrbleflag,p9_addrriskunscrbleflag,p15_ssnriskunscrbleflag,p16_phnriskunscrbleflag,p17_emailriskunscrbleflag,p18_ipaddrriskunscrbleflag,p19_bnkacctriskunscrbleflag,p20_dlriskunscrbleflag'
-
+'p19_aotbnkacctkractflagev,p20_aotdlkractflagev,p1_idriskunscrbleflag,p9_addrriskunscrbleflag,p15_ssnriskunscrbleflag,p16_phnriskunscrbleflag,p17_emailriskunscrbleflag,p18_ipaddrriskunscrbleflag,p19_bnkacctriskunscrbleflag,p20_dlriskunscrbleflag,' +
+'t_inpclnaddrgeomatchecho,p1_aotidkrstolidactinagcyflagev,p1_aotidkrgenfrdactinagcyflagev,p1_aotidkrappfrdactinagcyflagev,p1_aotidkrothfrdactinagcyflagev,p9_aotaddrkractinagcyflagev,p15_aotssnkractinagcyflagev,p16_aotphnkractinagcyflagev,p17_aotemailkractinagcyflagev,' +
+'p18_aotipaddrkractinagcyflagev,p19_aotbnkacctkractinagcyflagev,p20_aotdlkractinagcyflagev'
 );
 
 RulesResult := JOIN(EventStatsPrep(Value != ''), SORT(MyRules, field, -customerid), 
