@@ -75,9 +75,10 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 		
 		queueFileForProcessing := ORDERED(
 					OUTPUT(processed,,ModifyFileName(ilfn, 'ncfx'), COMPRESSED, OVERWRITE),
-					NOTHOR(Std.File.AddSuperFile(
-									IF(Onboarding, $.Superfile_List.sfOnboarding, $.Superfile_List.sfReady), 
-										ModifyFileName(ilfn, 'ncfx')))
+					IF(Onboarding,
+							NOTHOR(Std.File.AddSuperFile(NAC_V2.Superfile_List.sfOnboarding, ModifyFileName(ilfn, 'ncfx'))),
+							NOTHOR(Std.File.AddSuperFile(NAC_V2.Superfile_List.sfReady, ModifyFileName(ilfn, 'ncfx')))
+					)
 				);
 		
 		doit := sequential(
