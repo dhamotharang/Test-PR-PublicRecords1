@@ -3,7 +3,7 @@ IMPORT SALT311;
 EXPORT RiskIndicators_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.11.9';
+  EXPORT salt_VERSION := 'V3.11.11';
   EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
@@ -43,7 +43,7 @@ EXPORT RiskIndicators_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FILENAME:PhoneFinder\n'
     + 'NAMESCOPE:RiskIndicators\n'
     + '\n'
-    + 'FIELDTYPE:Invalid_No:ALLOW(0123456789\\\\N)\n'
+    + 'FIELDTYPE:Invalid_No:ALLOW(0123456789-\\\\N)\n'
     + 'FIELDTYPE:Invalid_ID:ALLOW(0123456789R\\\\N)\n'
     + 'FIELDTYPE:Invalid_Alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ\\\\ )\n'
     + 'FIELDTYPE:Invalid_AlphaChar:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ .,/-\\\\\')\n'

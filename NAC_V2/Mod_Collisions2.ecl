@@ -1,4 +1,4 @@
-import ut, header, Std;
+﻿import ut, header, Std;
 
 EXPORT Mod_Collisions2(dataset(Layout_Base2) Base) := MODULE
 
@@ -14,6 +14,26 @@ SHARED threashold:=enum(unsigned1,Low,Medium,High);
 SHARED score_threashold:=threashold;
 SHARED ssn_threashold:=threashold;
 SHARED dob_threashold:=threashold;
+
+/*
+Best Match
+// L             LexId
+Exact Matches
+// N             Name: last name, first or preferred first
+// S             Full SSN
+// D             DOB
+Address Matches
+// A             Street: prim range & prim name
+// C             City/State 
+// Z             Zip 
+Fuzzy Matches
+// P             Probable SSN
+// B             Probable DOB
+// V             Last Name + Partial First
+// W             Last Name only
+Future Use
+// H             Phone
+*/
 
 //////////////////////////////////
 matchset:=['N','S','D'];

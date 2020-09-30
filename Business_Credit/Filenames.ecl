@@ -30,6 +30,8 @@ EXPORT	Filenames(STRING	pversion	=	'',
 		EXPORT	masterAccount			:=	versioncontrol.mBuildFilenameVersions(lOutTemplate	+	'masterAccount'		,pversion);
 		EXPORT	memberSpecific		:=	versioncontrol.mBuildFilenameVersions(lOutTemplate	+	'memberSpecific'	,pversion);
 		EXPORT	releasedate				:=	versioncontrol.mBuildFilenameVersions(lOutTemplate	+	'releasedate'	,pversion);
+		EXPORT	digitalfootprint				:=	versioncontrol.mBuildFilenameVersions(lOutTemplate	+	'digitalfootprint'	,pversion);
+		EXPORT	merchantprocessing				:=	versioncontrol.mBuildFilenameVersions(lOutTemplate	+	'merchantprocessing'	,pversion);
 		
 		EXPORT	dAll_filenames	:=
 			active.dAll_filenames
@@ -42,6 +44,8 @@ EXPORT	Filenames(STRING	pversion	=	'',
 			+	masterAccount.dAll_filenames
 			+	memberSpecific.dAll_filenames
 			+ releasedate.dAll_filenames
+			+ digitalfootprint.dAll_filenames
+			+ merchantprocessing.dAll_filenames
 		;
 	END;
 

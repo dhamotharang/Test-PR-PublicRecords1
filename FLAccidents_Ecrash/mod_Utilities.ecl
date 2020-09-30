@@ -1,8 +1,10 @@
 ﻿//mod_Utilities
 
-IMPORT STD, Ecrash_Common;
+IMPORT STD, Ecrash_Common, _control;
 
 EXPORT mod_Utilities := MODULE
+
+	 EXPORT EnvName := _control.ThisEnvironment.Name;
 
    //CurrentDate in Local   
 	 EXPORT SysDate := Std.Date.CurrentDate(TRUE):INDEPENDENT;
@@ -12,6 +14,9 @@ EXPORT mod_Utilities := MODULE
 	 
 	 //CurrentTime(MMSS) in Local
 	 EXPORT SysTime := Std.Date.CurrentTime(TRUE):INDEPENDENT;
+	 
+	 EXPORT CurrentDateTimeStamp := Std.Date.SecondsToString(STD.Date.CurrentSeconds(TRUE), '%Y%m%d%H%M%S'):INDEPENDENT;
+	 EXPORT strCurrentDateTimeStamp := (STRING14) CurrentDateTimeStamp;
 	 
  	 EXPORT StrSysSeconds := Std.Date.SecondsToString(Std.date.CurrentSeconds(TRUE), '%H%M%S');
 	 
@@ -35,6 +40,34 @@ EXPORT mod_Utilities := MODULE
 	 
 	 EXPORT DaysBetween(UNSIGNED4 FromDate, UNSIGNED4 ToDate) := STD.Date.DaysBetween(FromDate, ToDate);
 	 
-	 EXPORT CurrentDateUTC := STD.Date.CurrentDate(FALSE):INDEPENDENT;  
+	 EXPORT CurrentDateUTC := STD.Date.CurrentDate(FALSE):INDEPENDENT;  	
+	 
+	 EXPORT BOOLEAN fn_isFileExists(STRING SuperFile) := FUNCTION
+		RETURN STD.File.FileExists(SuperFile);
+	 END;
+	
+	 // 0 <-  Doesnt Exists
+	 // <> 0 <-  Exists
+	 EXPORT BOOLEAN fn_isSuperFileSubNameExists(STRING SuperFile, STRING LogicalFile) := FUNCTION
+	  isReadyToAddFile := STD.File.FindSuperFileSubName(SuperFile, LogicalFile) <> 0;
+	  RETURN isReadyToAddFile;
+	 END;
+	
+	 EXPORT fn_CreateSuperFile(STRING SuperFile) := FUNCTION
+	  RETURN IF (~fn_isFileExists(SuperFile), STD.File.CreateSuperFile(SuperFile));
+   END;
+	
+	 EXPORT fn_AddSuperFile(STRING SuperFile, STRING LogicalFile) := FUNCTION
+    isReadyToAddFile := fn_isSuperFileSubNameExists(SuperFile, LogicalFile);
+		AddSF := STD.File.AddSuperFile(SuperFile, LogicalFile);	
+    RETURN IF (~isReadyToAddFile, AddSF);
+   END;
+	 
+	 EXPORT fn_ClearSuperFile(STRING SuperFile) := FUNCTION
+		ClearSF := SEQUENTIAL(FileServices.StartSuperFileTransaction(),
+                          FileServices.ClearSuperFile(SuperFile, FALSE),
+                          FileServices.FinishSuperFileTransaction());
+		RETURN IF(fn_isFileExists(SuperFile), ClearSF);											
+	 END;
 																								
 END;

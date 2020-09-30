@@ -34,7 +34,7 @@ EXPORT fn_MergeCases(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) ba
 								
 								self.Created := LEFT.Created;
 								self.Updated := IF(RIGHT.ProgramState='',LEFT.Updated,Std.Date.Today());
-								self.FileName := IF(RIGHT.FileName='',LEFT.FileName, right.FileName);
+								self.FileName := IF(LEFT.FileName<>'',LEFT.FileName, right.FileName);	// keep original filename
 								self.NCF_FileDate := IF(RIGHT.NCF_FileDate=0,LEFT.NCF_FileDate, right.NCF_FileDate);
 								self.NCF_FileTime := IF(RIGHT.NCF_FileTime='',LEFT.NCF_FileTime, right.NCF_FileTime);
 								//self.GroupId := IF(RIGHT.GroupId='',LEFT.GroupId,RIGHT.GroupId);

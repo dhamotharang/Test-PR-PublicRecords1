@@ -1,4 +1,23 @@
-﻿EXPORT NewCollisions(DATASET(layout_Collisions2.Layout_Collisions) cnew, DATASET(layout_Collisions2.Layout_Collisions) cprev)
+﻿
+NormalizeExceptions := FUNCTION
+	ex := $.Files2.dsExceptionRecords;
+	exout := ex(sourcegroupid <> matchedgroupid ); // interstate exceptions
+	exin := ex(sourcegroupid = matchedgroupid);			// intrastate exceptions
+	mirror := project(exin, TRANSFORM(recordof(ex),	
+						self.sourceprogramstate := left.matchedstate;
+						self.sourceprogramcode := left.matchedprogramcode;
+						self.sourceclientid := left.matchedclientid;
+						self.matchedstate := left.sourceprogramstate;
+						self.matchedprogramcode := left.sourceprogramcode;
+						self.matchedclientid := left.sourceclientid;
+						self := left;));
+	raw := exout + exin + mirror;
+	unique := DEDUP(raw, sourcegroupid, sourceprogramstate, SourceProgramCode, SourceClientId,
+                      matchedgroupid, matchedstate, matchedprogramcode, matchedclientid, all);
+	return unique;
+END;
+
+EXPORT NewCollisions(DATASET(layout_Collisions2.Layout_Collisions) cnew, DATASET(layout_Collisions2.Layout_Collisions) cprev)
 				:= FUNCTION
 		raw := join(distribute(cnew,
 											hash32(BenefitState,SearchBenefitType,SearchCaseID))
@@ -34,7 +53,7 @@
 								
 		j := DISTRIBUTE(j1, hash32(searchgroupid, searchbenefittype, searchclientid));
 
-		ex := DISTRIBUTE($.Files2.dsExceptionRecords, hash32(sourcegroupid, SourceProgramCode, SourceClientId));
+		ex := DISTRIBUTE(NormalizeExceptions, hash32(sourcegroupid, SourceProgramCode, SourceClientId));
 
 		j2 := JOIN(j, ex, left.searchgroupid=right.sourcegroupid AND left.searchbenefittype=right.SourceProgramCode
 												AND left.searchclientid=right.SourceClientId

@@ -1,6 +1,6 @@
 ﻿IMPORT Equifax_Business_Data, _control;
 
-pversion 	:= '20191231C'								 ;		// modify to current date
+pversion 	:= '20200820'								 ;		// modify to current date
 /////////////////////////////////////////////////////////////
 // -- Quick Documentation
 // -- 	1. Put the Build Date in the pversion attribute above
