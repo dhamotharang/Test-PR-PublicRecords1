@@ -1,11 +1,17 @@
 ﻿EXPORT Append_Lexid( pBaseFile ) := 
 FUNCTIONMACRO
-		import DID_Add,_Validate, Std;
+		import FraudShared,DID_Add,_Validate, Std;
 		FirstRinID := FraudGovPlatform.Constants().FirstRinID;
 
 		dFileBase 		:= distribute	(pull(pBaseFile),record_id	);
 		
-		with_pii := dFileBase
+		with_rawlinkid := dFileBase(rawlinkid > 0);
+
+		with_lexid := project(with_rawlinkid, transform( FraudShared.Layouts.Base.Main , self.did := left.rawlinkid, self:=left));
+
+		without_rawlinkid := dFileBase(rawlinkid = 0);
+
+		with_pii := without_rawlinkid
 		(   
 			(cleaned_name.fname !='' and cleaned_name.lname !='' and 
 				(length(STD.Str.CleanSpaces(clean_ssn))=9 and regexfind('^[0-9]*$',STD.Str.CleanSpaces(clean_ssn)) =true ))
@@ -103,6 +109,6 @@ FUNCTIONMACRO
 												,local
 											 );
 											 
-		RETURN without_pii + dAssignDids;
+		RETURN with_lexid + without_pii + dAssignDids;
 	
 ENDMACRO;
