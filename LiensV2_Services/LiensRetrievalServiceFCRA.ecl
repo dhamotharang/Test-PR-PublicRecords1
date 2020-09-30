@@ -119,6 +119,6 @@ EXPORT LiensRetrievalServiceFCRA := MACRO
     Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
     
     //Improved Scout Logging
-    IF(~DisableOutcomeTracking AND ~TestDataEnabled AND params.DeferredTaskRequest, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs__fcra_transaction__log__scout')));
+    IF(~DisableOutcomeTracking AND ~TestDataEnabled AND response[1].Consumer.Inquiry != ROW([], iesp.share_fcra.t_FcraConsumerInquiry), OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs__fcra_transaction__log__scout')));
 
  ENDMACRO;
