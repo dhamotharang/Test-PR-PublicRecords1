@@ -40,7 +40,9 @@ EXPORT getInputBasedSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 					// Check history date
 					((UNSIGNED)RIGHT.date_first_seen < (UNSIGNED)Risk_Indicators.iid_constants.full_history_date(LEFT.Clean_Input.HistoryDate)) AND
 					// Check DRM for Advo restriction					
-					Options.DataRestrictionMask[Risk_indicators.iid_constants.posADVORestriction] <> '1', 
+					Options.DataRestrictionMask[Risk_indicators.iid_constants.posADVORestriction] <> '1' and
+					// ADVO not allowed in marketing mode
+					Options.MarketingMode = 0, 
 					TRANSFORM(tempAddrZipTypeLayout,
 											SELF.Seq := LEFT.Seq,
 											SELF.InputAddrType   := RIGHT.Residential_or_Business_Ind ,

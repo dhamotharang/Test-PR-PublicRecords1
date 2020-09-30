@@ -9,7 +9,8 @@ Threads := 30;
 RecordsToRun := 0; // Set to 0 to run all, otherwise set to the number of records from the inputFile you wish to run
 
 //Business Shell 2.1 accepts YYYYMM, YYYYMMDD, and YYYYMMDDTTTT dates. HistDate can be in any of these forms.
-histDate := 201709;
+histDate := 0; // Set to 0 to use the HistoryDateYYYYMM that is on the inputFile, set to anything other than 0 to use 
+							//  that history date for every record overwriting what was on the inputFile, use 999999 to use today's date
 
 // This set's what level to run the Business Shell at.  Options are:
 link_Search_Level := Business_Risk_BIP.Constants.LinkSearch.Default; // Searches at the default level (SeleID)
@@ -23,15 +24,14 @@ BIPBestAppend := Business_Risk_BIP.Constants.BIPBestAppend.Default; // Append No
 // BIPBestAppend := Business_Risk_BIP.Constants.BIPBestAppend.AllBlankFields; // Append any missing BII with our "best" company information
 // BIPBestAppend := Business_Risk_BIP.Constants.BIPBestAppend.OverwriteWithBest; // Overwrite any input BII with our "best" company information
 
-//Marketing_Mode := 0; // This product is not being run for marketing, allow all normal sources
- Marketing_Mode := 1; // This product IS being run for marketing, disable sources not allowed for marketing
+Marketing_Mode := 0; // This product is not being run for marketing, allow all normal sources
+ // Marketing_Mode := 1; // This product IS being run for marketing, disable sources not allowed for marketing
 
-DPPApurpose := 1;
+DPPApurpose := 3;
 GLBApurpose := 1;
 
 DataRestrictionMask := '0000000000000000000000000';
-dataPermissionMask := '0000000000000'; // Default - does not allow SBFE data
-// dataPermissionMask := '000000000001'; // Allow SBFE data
+dataPermissionMask := '00000000000100000000';
 
 IncludeExperian := FALSE; // By default, Experian data is not allowed
 // IncludeExperian := TRUE; // Override the Experian data restriction and include Experian in results 
@@ -46,17 +46,24 @@ RoxieIP := RiskWise.shortcuts.prod_batch_neutral;
 
 BusShellVersion := 31; //this version is required to run this process
 
-inputFileName := '~mmarshik::in::seleidset.csv';
+inputFileName := '~mmarshik::in::seleidsetupdated.csv';
 // inputFileName := '~khuls::out::business_shell_manipulated_inputs_w20200113-065517';// manipulatted inputs 
 
 outputFileName := '~mmarshik::out::';
 
 in_file := RECORD
-String seleid;	
+String accountnumber;
+String seleid;
+Integer historydate;
 end;
 
-blahInputFile := IF(RecordsToRun <= 0, DATASET(inputFileName, in_file, csv(quote('"'))),
-																	 CHOOSEN(DATASET(inputFileName, in_file, csv(quote('"'))), RecordsToRun));
+// Use this if the input file doesn't have a header row
+blahInputFile := IF(RecordsToRun <= 0, DATASET(inputFileName, in_file, CSV(QUOTE('"'))),
+																	 CHOOSEN(DATASET(inputFileName, in_file, CSV(QUOTE('"'))), RecordsToRun));
+																	 
+// Use this if the input file has a header row																	 
+// blahInputFile := IF(RecordsToRun <= 0, DATASET(inputFileName, in_file, csv(HEADING(1), quote('"'))),
+																	 // CHOOSEN(DATASET(inputFileName, in_file, csv(HEADING(1), quote('"'))), RecordsToRun));
 
 OUTPUT(CHOOSEN(blahInputFile, eyeball), NAMED('Sample_Raw_BlahInput'));
 OUTPUT(COUNT(blahInputFile), NAMED('Total_Raw_BlahInput_Records'));	
@@ -146,13 +153,13 @@ SOAPLayout := RECORD
 	BOOLEAN IncludeAuthRepInBIPAppend;
 END;
 
-SOAPLayout intoSOAP(blahInputFile le, integer c) := TRANSFORM
-	SELF.seq					:= c;
+SOAPLayout intoSOAP(blahInputFile le) := TRANSFORM
+	SELF.AcctNo := le.AccountNumber;
 	SELF.DPPA_Purpose := DPPApurpose;
 	SELF.GLBA_Purpose := GLBApurpose;
 	SELF.Data_Restriction_Mask := DataRestrictionMask;
 	SELF.Data_Permission_Mask := dataPermissionMask;
-	SELF.HistoryDate := histDate;
+	SELF.HistoryDate := IF(histDate <= 0, le.HistoryDate, histDate);
 	SELF.MarketingMode := Marketing_Mode;
 	SELF.LinkSearchLevel := link_Search_Level;
 	SELF.BIPBestAppend := BIPBestAppend;
@@ -164,7 +171,7 @@ SOAPLayout intoSOAP(blahInputFile le, integer c) := TRANSFORM
 	SELF := [];
 END;
 
-InputBusShell := DISTRIBUTE(PROJECT(blahInputFile, intoSOAP(LEFT, COUNTER)), RANDOM());
+InputBusShell := DISTRIBUTE(PROJECT(blahInputFile, intoSOAP(LEFT)), RANDOM());
 
 OUTPUT(CHOOSEN(InputBusShell, eyeball), NAMED('Sample_InputBusShell'));
 
@@ -188,7 +195,7 @@ SOAPBusShell := SOAPCALL(InputBusShell,
 												RETRY(3), TIMEOUT(300),
 												onFail(myFail(LEFT)));
 
-BusShell := SOAPBusShell (errorcode = '' and input_echo.seleid <> 0);
+BusShell := SOAPBusShell (errorcode = '' and Input_Echo.AcctNo <> '0');
 BusShellErr := SOAPBusShell (errorcode <> '');
 OUTPUT(CHOOSEN(BusShellErr, eyeball), NAMED('Sample_BusShellErr'));
 // OUTPUT (BusShellErr,, outputFileName + 'BusShellErrors.csv' + ThorLib.wuid(), CSV(HEADING(single), QUOTE('"')));
@@ -207,7 +214,9 @@ OUTPUT(CHOOSEN (model_FRMI2003_1_0, eyeball), NAMED('FRMI2003_1_0'));
 
 Final_Result := RECORD
 
+Integer AccountNumber;
 Unsigned6 SeleID;
+Integer HistoryDate;
 Integer LNRS_Modeled_Marketing_Revenue;
 String2 LNRS_Modeled_Marketing_Revenue_Code;
 Integer LNRS_Modeled_Marketing_Employee_Count;
@@ -218,7 +227,9 @@ String70 LNRS_Modeled_Marketing_Industry_Code_Description;
 END;
 
 First_Join := join(model_FRMS2003_1_0, model_FRME2003_1_0, (left.seq = right.seq), 
-                    transform (Final_result, self.SeleID := right.seq;
+                    transform (Final_result, self.AccountNumber := right.seq;
+                                             self.seleid := 0, 
+                                             self.historydate := 0, 
                                              self.LNRS_Modeled_Marketing_Revenue := (Integer)left.score, 
                                              self.LNRS_Modeled_Marketing_Revenue_Code := map(
 																						 (integer)left.score >= 1 and (integer)left.score < 100000  => '10',
@@ -247,7 +258,7 @@ First_Join := join(model_FRMS2003_1_0, model_FRME2003_1_0, (left.seq = right.seq
                     
 OUTPUT(CHOOSEN(First_Join, eyeball), NAMED('First_Join'));
                     
-Second_Join := join(First_Join, model_FRMI2003_1_0, (left.SeleID = right.seq), 
+Second_Join := join(First_Join, model_FRMI2003_1_0, (left.Accountnumber = right.seq), 
                     transform (Final_result, self.LNRS_Modeled_Marketing_Industry := right.score; 
 										self.LNRS_Modeled_Marketing_Industry_Code_Description := map(  
 										(integer)right.score = 10  => 'Agriculture, Forestry, Mining And Fishing',
@@ -266,9 +277,10 @@ Second_Join := join(First_Join, model_FRMI2003_1_0, (left.SeleID = right.seq),
                     
 OUTPUT(CHOOSEN(Second_Join, eyeball), NAMED('Second_Join'));
 
-Final_Join := join(Second_Join, InputBusShell, (left.SeleID = right.seq), 
-                    transform (Final_result, 
-                      self.SeleID := right.SeleID; 
+Final_Join := join(Second_Join, InputBusShell, ((string)left.Accountnumber = right.AcctNo), 
+                    transform (Final_result,
+                      self.SeleID := right.SeleID;
+											self.HistoryDate := right.HistoryDate;
                       self := left;),
                       left outer, atmost(1000));
                     

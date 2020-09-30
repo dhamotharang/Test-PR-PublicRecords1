@@ -411,6 +411,7 @@ export Functions := MODULE
 				self.id := l.documentId;
 				self.extension := l.extension;
 				self.pages := (integer)l.pageCount;
+				self.reportsource := l.reportsource;
 			END;
 			
 			self.Documents := project(RawDocIn.GetReportDocuments(l.superreportid),xform_Documents(left));

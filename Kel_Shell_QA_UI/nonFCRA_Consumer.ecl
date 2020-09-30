@@ -165,7 +165,8 @@ END;
 bwr_results := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'publicrecords_kel.MAS_nonFCRA_Service', 
+				// 'publicrecords_kel.MAS_nonFCRA_Service', 
+				'publicrecords_kel.mas_nonfcra_service.27',
 				{soap_in}, 
 				DATASET(layout_MAS_Test_Service_output),
 				XPATH('*'),
@@ -222,7 +223,7 @@ Passed_Person :=
       
 result1:=STD.System.Email.SendEmail(email_list, 'KEL SHELL QA UI run job',  'Your WUID ' + workunit + ' has just kicked-off!');
 
-result2:=output(Passed_Person);
+result2:=output(Passed_Person,named('Filtered_output'));
 
 unique_id:='p_inpacct';
 

@@ -1,4 +1,4 @@
-IMPORT $, alloymedia_student_list, american_student_list, daybatchpcnsr, doxie, dx_email, dx_header, experian_crdb,
+IMPORT $, alloymedia_student_list, american_student_list, canadianphones_v2, daybatchpcnsr, doxie, dx_email, dx_header, experian_crdb,
   dx_gong, header_quick, impulse_email, infutor, infutorcid, one_click_data, patriot, paw,
   phonemart, phonesplus, phonesplus_v2, phonesfeedback, poe, poesfromemails, prof_licensev2, prof_license_mari, profilebooster,
   saleschannel, sanctn, spoke, targus, thrive, vehiclev2, zoom;
@@ -12,17 +12,19 @@ EXPORT Records(UNSIGNED6 lexid, $.IParam.IReportParam in_mod) := FUNCTION
   email_recs := $.Raw.GetEmailRecs(dids);
   paw_recs := $.Raw.GetPawRecs(dids);
   link_ids := $.Raw.GetLinkIds(dids);
-  exp_recs := $.Raw.GetExperianCRDBRecs(link_ids)(did = lexid);
+  exp_recs := $.Raw.GetExperianCRDBRecs(link_ids, lexid);
   patriot_recs := $.Raw.GetPatriotRecs(dids); //-- special considerations (?)
   sanct_recs := $.Raw.GetSanctionRecs(dids);
   vehicle_ids := $.Raw.GetVehicleIds(dids);
   vehicle_parties := $.Raw.GetVehiclePartyRecs(vehicle_ids);
   vehicle_main := $.Raw.GetVehicleMainRecs(vehicle_ids);
+  can_recs := $.Raw.GetCanadianPhonesRecs(dids);
 
   // get collections for all in-scope datasets
   recs :=
       $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.ALLOY, AlloyMedia_student_list.Key_DID, did, date_last_seen)
     + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.ASL, American_student_list.key_DID, l_did, date_last_seen)
+    + $.MAC.GetCollectionFromRaw(can_recs, in_mod, $.Constants.Collection.CANADIAN_PHONES, canadianphones_v2.key_fdids, did, date_last_reported)
     + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.DEATH_MASTER, doxie.key_death_masterV2_ssa_DID, l_did, filedate)
     + $.MAC.GetCollectionFromRaw(email_recs, in_mod, $.Constants.Collection.EMAIL, dx_Email.Key_email_payload(), email_rec_key, date_last_seen)
     + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.GONG, dx_Gong.key_history_did(), l_did, dt_last_seen)
@@ -55,7 +57,7 @@ EXPORT Records(UNSIGNED6 lexid, $.IParam.IReportParam in_mod) := FUNCTION
     + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.ZOOM, zoom.keys().did.qa, did, dt_vendor_last_reported)
 
     // the following have moved to tier 2 and will be removed from here once CD configuration is complete
-    + $.MAC.GetCollectionFromRaw(exp_recs, in_mod, $.Constants.Collection.EXPERIAN_CRDB, Experian_CRDB.Key_LinkIDs.kFetch(link_ids),, dt_last_seen)
+    + $.MAC.GetCollectionFromRaw(exp_recs, in_mod, $.Constants.Collection.EXPERIAN_CRDB, Experian_CRDB.Key_LinkIDs.kFetch(link_ids),, dt_vendor_last_reported)
     + $.MAC.GetCollectionFromRaw(sanct_recs, in_mod, $.Constants.Collection.SANCTN, SANCTN.key_MIDEX_RPT_NBR, midex_rpt_nbr)
 
   ;

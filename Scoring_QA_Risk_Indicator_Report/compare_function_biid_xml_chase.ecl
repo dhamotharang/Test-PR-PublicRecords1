@@ -3,16 +3,16 @@
 
 
 
-file1:= dataset(route + scoring_project_pip.Output_Sample_Names.BIID_Scores_Batch_Chase_outfile + previous_dt,Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_CHASE_BusinessInstantId_Global_Layout,
+file1:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.BIID_Scores_Batch_Chase_outfile + previous_dt,Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_CHASE_BusinessInstantId_Global_Layout,
 
-thor);
-
-
-
-file2:= dataset(route + scoring_project_pip.Output_Sample_Names.BIID_Scores_Batch_Chase_outfile +current_dt,Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_CHASE_BusinessInstantId_Global_Layout,
+thor),(integer)acctno);
 
 
-thor);
+
+file2:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.BIID_Scores_Batch_Chase_outfile +current_dt,Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_CHASE_BusinessInstantId_Global_Layout,
+
+
+thor),(integer)acctno);
 
 
 

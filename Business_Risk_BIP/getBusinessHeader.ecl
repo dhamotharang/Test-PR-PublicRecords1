@@ -1403,7 +1403,9 @@ END;
 					keyed(left.predir = right.predir) and
 					keyed(left.postdir = right.postdir) and
 					keyed(left.sec_range = right.sec_range)  and
-					((unsigned)RIGHT.date_first_seen < (unsigned)Risk_Indicators.iid_constants.full_history_date(left.historydate)), 
+					((unsigned)RIGHT.date_first_seen < (unsigned)Risk_Indicators.iid_constants.full_history_date(left.historydate)) and
+					// ADVO not allowed in marketing mode
+					Options.MarketingMode = 0, 
 					transform({recordof(left), string2 Residential_or_Business_Ind, STRING2 Address_Vacancy_Ind, integer AdvoDtfirstseen},
 											self.Residential_or_Business_Ind   := right.Residential_or_Business_Ind ,
 											SELF.Address_Vacancy_Ind := RIGHT.Address_Vacancy_Indicator,

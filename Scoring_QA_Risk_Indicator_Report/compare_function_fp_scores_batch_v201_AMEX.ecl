@@ -1,16 +1,16 @@
 ﻿EXPORT compare_function_fp_scores_batch_v201_AMEX(route,current_dt,previous_dt) :=  functionmacro
 
-file1:= dataset(route + scoring_project_pip.Output_Sample_Names.FP_V2_XML_American_Express_FP1109_0_outfile + previous_dt, Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_FraudPoint_V201_AmericanExpress_Global_Layout,
+file1:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.FP_V2_XML_American_Express_FP1109_0_outfile + previous_dt, Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_FraudPoint_V201_AmericanExpress_Global_Layout,
 
 
-thor);
+thor),(integer)acctno);
 
 
 
-file2:= dataset(route + scoring_project_pip.Output_Sample_Names.FP_V2_XML_American_Express_FP1109_0_outfile + current_dt, Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_FraudPoint_V201_AmericanExpress_Global_Layout,
+file2:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.FP_V2_XML_American_Express_FP1109_0_outfile + current_dt, Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_FraudPoint_V201_AmericanExpress_Global_Layout,
 
 
-thor);
+thor),(integer)acctno);
 
 
 

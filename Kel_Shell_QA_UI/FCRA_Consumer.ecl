@@ -218,7 +218,7 @@ Passed_Person :=
       
 result1:=STD.System.Email.SendEmail(email_list, 'KEL SHELL QA UI run job',  'Your WUID ' + workunit + ' has just kicked-off!');
 
-result2:=output(Passed_Person);
+result2:=output(Passed_Person,named('Filtered_output'));
 
 unique_id:='p_inpacct';
 
