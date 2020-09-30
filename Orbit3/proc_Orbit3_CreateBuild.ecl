@@ -14,8 +14,8 @@ ECL1 := '#workunit(\'name\',\'Orbit Create Build Instance -- '+ buildname + '-- 
 + if (skipupdatebuild , 'true','false')+','
 +if (runcreatebuild, 'true','false') +','
 +if (is_npf,'true','false')+' , \''+wuid+'\') \n'
-+' : success(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_success)\n'
-+' , failure(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_failure)\n'
++' : success(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\', \''+buildname+'\', \''+Buildvs+'\' ).build_success)\n'
++' , failure(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\', \''+buildname+'\', \''+Buildvs+'\').build_failure)\n'
 +' ;\n';
 
 	tgtcluster := STD.System.Job.Target();
