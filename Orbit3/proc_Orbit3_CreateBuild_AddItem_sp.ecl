@@ -88,7 +88,7 @@ export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string
 												 'N/A'
 												 );
 	   	 emailtoall :=  fileservices.sendemail(
-												 Send_Email(Buildvs,email_list).emaillist,
+												 Send_Email(Buildvs,email_list,buildname,Buildvs ).emaillist,
 												' Orbit for Build : '+buildname+',version: '+Buildvs+',Env : '+Orbit3.Constants(Envmt_isnpf).which_env,
 												'BuildName:'+buildname+'\n'+
 												'---------------------'+'\n'+
