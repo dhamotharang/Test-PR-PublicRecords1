@@ -33,7 +33,7 @@ END;
 EXPORT fn_Collisions2To1(dataset(NAC_V2.Layout_Collisions2.Layout_Collisions) c2) := FUNCTION
 
 		//c1 := NORMALIZE(c2, dmonth(left.StartDate, left.EndDate), x2To1(left, COUNTER));
-		c1 := PROJECT(c2(StartDate <= day), x2To1(left, 1));
+		c1 := PROJECT(c2, x2To1(left, 1));
 		
 		return c1;
 
