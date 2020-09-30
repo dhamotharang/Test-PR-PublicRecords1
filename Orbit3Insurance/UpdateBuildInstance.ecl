@@ -1,4 +1,5 @@
-﻿EXPORT UpdateBuildInstance(string		pLoginToken,
+﻿import STD;
+EXPORT UpdateBuildInstance(string		pLoginToken,
 															DATASET(Layouts.OrbitUpdateBuildInstanceLayout)	pBuildInfo,						
 															String 	pBuildStatus,
 								dataset(Layouts.OrbitPlatformUpdateLayout) platformupdates = dataset([],Layouts.OrbitPlatformUpdateLayout),
@@ -41,6 +42,10 @@
 	END;
 
 	rRequestCapsule	:= RECORD
+	
+	 #IF(STD.System.Util.PlatformVersionCheck('7.8')) 
+	 Orbit3Insurance.Layouts.AdditionalNamespacesLayout;
+	 #END
 			rOrbitRequest	request								{XPATH('request')};
 	END;
 

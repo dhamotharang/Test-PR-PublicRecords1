@@ -4,7 +4,7 @@ export EnvironmentVariables := module
 	// Testing service url  -  All Data builds are to use the OrbitServicePR. Do use not OrbitServiceInsurance.
 	export serviceurl := if (_control.ThisEnvironment.Name = 'Prod_Thor',
 												'https://orbitinsurance.noam.lnrm.net/Orbit3/Orbit3Services/OrbitServicePR.svc',			//Prod URL
-												'https://qa.orbit3.risk.regn.net/Orbit3/Orbit3Services/OrbitServicePR.svc');	//Dev URL
+												'https://qa.orbit3.risk.regn.net/orbit3/Orbit3Services/OrbitServicePR.svc');	//Dev URL
 
 export  namespace :=   IF( STD.System.Util.PlatformVersionCheck('7.8') ,
 		                                                   'http://lexisnexis.com/Orbit/',
