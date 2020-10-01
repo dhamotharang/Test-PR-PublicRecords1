@@ -1,6 +1,6 @@
 ﻿import std,header,dops,wk_ut;
 
-EXPORT hdr_bld_ingest(string8 build_version, boolean incremental, unsigned2 curr_status) := MODULE
+EXPORT hdr_bld_ingest(string8 build_version, boolean incremental) := MODULE
          
 operatorEmailList := Header.email_list.BocaDevelopersEx;
 
