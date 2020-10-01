@@ -36,7 +36,7 @@ export KeyRead_Contact_Title(string pVersion=(string) STD.Date.Today()) := modul
 
 		BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, ds_fetched, Level, JoinLimit, JoinType);								 
 		Layouts.contactTitle.linkids apply_restrict(ds_fetched L) := transform
-			BIPV2_build.mac_check_access(L.contact_title, contact_title_out, mod_access, true, contact_did);
+			BIPV2_build.mac_check_access(L.contact_title, contact_title_out, mod_access, true, L.contact_did);
 			self.is_suppressed := exists(contact_title_out(is_suppressed)) and not exists(contact_title_out(not is_suppressed));
 			self.contact_title := 
 				project(contact_title_out(not is_suppressed and BIPV2.mod_sources.isPermitted(in_mod,includeDMI).byBmap(data_permits)),
