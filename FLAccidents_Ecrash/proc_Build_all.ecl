@@ -45,20 +45,26 @@ string timestamp := FLAccidents_Ecrash.mod_Utilities.StrSysSeconds : independent
 
 verify_dops := if ( count(Sample_data.agency_data) <> 0, updatedops,Output('No_DopsUpdate_As_EA_Updates_Not_Processed'));
 
+//Orbit Create Build for PR eCrashV2Keys, Insurance EcrashCruDeltaKeys & Insurance eCrashV2Keys
 orbit_date := (integer) filedate[1..8];
-
-create_build := map ( 
-
-                  ut.Weekday(orbit_date)  = 'SUNDAY'   and morning = 'yes' =>  Orbit3.proc_Orbit3_CreateBuild ( 'Accident Reports - ECrashV2 National',filedate),
-									ut.Weekday(orbit_date)  = 'FRIDAY'   and morning = 'no' =>  Orbit3.proc_Orbit3_CreateBuild ( 'Accident Reports - ECrashV2 National',filedate), 
-
-									ut.Weekday(orbit_date)  in [ 'MONDAY','TUESDAY','WEDNESDAY','THURSDAY']  =>  Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'Accident Reports - ECrashV2 National',filedate), 
-									
-
-									Output('No_Orbit_Entry_needed')
-								);
-
-create_build_ins := if ( ut.Weekday(orbit_date) not in ['SATURDAY','SUNDAY'] and   morning = 'no' , Orbit3Insurance.Proc_Orbit3I_CreateBuild ('eCrashCRUAcidentsDelta', filedate ) ,Output('No_Orbit_Entry_needed') );
+prOrbitCreateBuild := map(ut.Weekday(orbit_date) = 'SUNDAY' and morning = 'yes' =>  Orbit3.proc_Orbit3_CreateBuild ( 'Accident Reports - ECrashV2 National',filedate),
+									        ut.Weekday(orbit_date) = 'FRIDAY' and morning = 'no' =>  Orbit3.proc_Orbit3_CreateBuild ( 'Accident Reports - ECrashV2 National',filedate), 
+									        ut.Weekday(orbit_date)  in [ 'MONDAY','TUESDAY','WEDNESDAY','THURSDAY']  =>  Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'Accident Reports - ECrashV2 National',filedate), 
+									        output('No_Orbit_Entry_needed_PREcrashV2')
+								         );												 
+insOrbitCreateBuildEcrashCruDelta := if(ut.Weekday(orbit_date) not in ['SATURDAY','SUNDAY'] and morning = 'no', 
+                                        Orbit3Insurance.Proc_Orbit3I_CreateBuild ('eCrashCRUAcidentsDelta', filedate),
+																				output('No_Orbit_Entry_needed_InsEcrashCruDelta'));
+insOrbitCreateBuildEcrashV2 := map(
+                                   morning = 'yes' and issunday = 'N' => Orbit3Insurance.Proc_Orbit3I_CreateBuild ('eCrashV2Keys', filedate),
+                                   morning = 'yes' and issunday = 'Y' => Orbit3Insurance.Proc_Orbit3I_CreateBuild ('eCrashV2Keys', filedate),
+                                   Orbit3Insurance.Proc_Orbit3I_CreateBuild ('eCrashV2Keys', filedate)
+																	 );
+OrbitCreateBuild := sequential(
+                               prOrbitCreateBuild,
+															 insOrbitCreateBuildEcrashCruDelta,
+															 insOrbitCreateBuildEcrashV2
+															 );
 
 crudateds := dataset('~thor_data400::out::ecrash_spversion',{string10	processdate},thor);
 
@@ -90,8 +96,7 @@ build_key := sequential(
 			 FLAccidents_Ecrash.fn_Inputstats.sentemail
 			,FLAccidents_Ecrash.proc_build_EcrashV2_keys(filedate)
 			,verify_dops
-			,create_build
-			,create_build_ins
+			,OrbitCreateBuild
 			,FLAccidents_Ecrash.Sample_data.qa
 		  ,FLAccidents_Ecrash.strata(filedate)
 			,FLAccidents_Ecrash.Prod_Superid_Change_extract(filedate) 

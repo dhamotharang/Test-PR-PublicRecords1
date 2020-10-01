@@ -452,12 +452,12 @@ EXPORT Get_Dataset_Versions(
 					LEFT.name,1,NOCASE)));
 		
 		// Phones Feedback
-		PhoneFeedback := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phonefeedback.phonefeedback_filename),
+		PhoneFeedback := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phonefeedback.PhonesFeedback_superkey),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PHONEFEEDBACK',
 				SELF.subfile := '',
 				SELF.version := REGEXFIND(
-					AccountMonitoring.product_files.phonefeedback.phonefeedback_filename_raw + '_(.*)$',
+					'thor_data400::key::phonesFeedback::(.*)::phone$',
 					LEFT.name,1,NOCASE)));
 
 		// Foreclosure
@@ -589,7 +589,7 @@ EXPORT Get_Dataset_Versions(
 		govtDebarred := govtdebarred_Linkid;
 		
 		// Inquiry
-		Inquiry_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.inquiry.inquiryLinkid_superkeyname),
+		Inquiry_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.inquiry.inquiryLinkid_superkey),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'INQUIRY',
 				SELF.subfile := 'LINKID',
@@ -597,7 +597,7 @@ EXPORT Get_Dataset_Versions(
 					'thor_data400::key::inquiry::(.*)::linkids',
 					LEFT.name,1,NOCASE)));
 					
-		InquiryUpdate_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.inquiry.inquiryUpdLinkid_superkeyname),
+		InquiryUpdate_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.inquiry.inquiryUpdLinkid_superkey),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'INQUIRY',
 				SELF.subfile := 'LINKID_UPDATE',

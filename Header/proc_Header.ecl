@@ -1,10 +1,7 @@
 ﻿import header, ut, Strata,std;
 
 export proc_header(string versionBuild, string operatorEmailList, string extraNotifyEmailList) := module
-
-    #stored ('emailList', operatorEmailList);
-    #stored ('version'  , versionBuild); 
-    
+    #stored ('version'  , versionBuild);  
     shared today := (STRING8)Std.Date.Today();
     
     fn:=nothor(fileservices.SuperFileContents('~thor_data400::in::hdr_raw',1)[1].name);
@@ -19,7 +16,7 @@ export proc_header(string versionBuild, string operatorEmailList, string extraNo
        := sequential(
             if(versionBuild = '',fail('Build Version is empty'))
            ,if(~incremental and versionBuild[5..6]<>fn[sub+4..sub+5],fail('Current month Equifax missing'))
-           ,check_eq_monthly_file_version
+           //,check_eq_monthly_file_version
            ,Header.Inputs_Sequence(incremental,versionBuild)
            ,Header.Inputs_List
            ,if(~incremental,header.build_source_key(versionBuild))
@@ -46,7 +43,7 @@ export proc_header(string versionBuild, string operatorEmailList, string extraNo
     step4 := header.Proc_BuildStats;
     step5 := Strata.modOrbitAdaptersForPersonHdrBld.fnGetCrossSourceAction(dataset(workunit('STATS'),ut.layout_stats_extend), versionBuild);
 
-    EXPORT run_Header_Sync := sequential(
+    EXPORT run_Header_Sync := sequential(    
              if(versionBuild = '',fail('Build Version is empty'))
             ,if(versionBuild<>fn[sub..sub+7],fail('Header_raw does not match version'))
             ,if(status<1,sequential(step1,update_status(1)))

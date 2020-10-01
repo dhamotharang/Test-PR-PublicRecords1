@@ -1,4 +1,6 @@
 ﻿import VotersV2, ut, _Validate, emerges, std;
+//DF-27577 Moved DID after AID and Name processes
+//DF-27577 Moved Rollup from Updated_Voters to Translate_Voters_Codes
 
 Clean_In_file  := VotersV2.File_Voters_Cleaned_Super;
 
@@ -28,27 +30,9 @@ end;
 
 Clean_file := project(Clean_In_file, FixDates(left));
 
-emerges.MAC_eMerge_Date_Patch(clean_file,regdate,lastdatevote,regdate,regdate,date_fix);//Extra regdate's don't matter because Voters doesn't use them
+emerges.MAC_eMerge_Date_Patch(clean_file,regdate,lastdatevote,regdate,regdate,date_fix);//Extra regdate's don't matter because Voters doesn't use them	
 
-Sort_Cleaned_Patched_file := sort(date_fix,RECORD,
-								  EXCEPT vtid, vendor_id, Process_Date, Date_First_Seen, Date_Last_Seen,
-								  file_acquired_date,local);
-
-Layout_outfile  rollupXform(Layout_outfile l, Layout_outfile r) := transform
-//Mapped vendor name fields to base name fields
-  self.title := l.prefix_title;
-	self.fname := l.first_name;
-	self.mname := l.middle_name;
-	self.lname := l.last_name;
-	self.name_suffix := l.name_suffix_in;
-	self.Process_Date    := if(l.Process_Date > r.Process_Date, l.Process_Date, r.Process_Date);
-	self.Date_First_Seen := if(l.Date_First_Seen > r.Date_First_Seen, r.Date_First_Seen, l.Date_First_Seen);
-	self.Date_Last_Seen  := if(l.Date_Last_Seen  < r.Date_Last_Seen,  r.Date_Last_Seen,  l.Date_Last_Seen);
-	self := l;
-end;
-
-export Updated_Voters := rollup(Sort_Cleaned_Patched_file,rollupXform(LEFT,RIGHT),RECORD,
-								EXCEPT vtid, vendor_id, Process_Date, Date_First_Seen, Date_Last_Seen,
-								file_acquired_date, local): 
-								persist(VotersV2.Cluster + 'persist::Updated_Voters');
-
+export Updated_Voters := date_fix
+//uncomment for tesing
+ // : persist(VotersV2.Cluster + 'persist::Updated_Voters', SINGLE)
+ ;

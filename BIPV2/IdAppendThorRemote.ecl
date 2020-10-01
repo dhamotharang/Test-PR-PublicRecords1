@@ -4,11 +4,11 @@ import Doxie;
 EXPORT IdAppendThorRemote(
 		dataset(BIPV2.IdAppendLayouts.AppendInput) inputDs
 		,unsigned scoreThreshold = 75
-		,unsigned weightThreshold = IdConstants.APPEND_WEIGHT_THRESHOLD_THOR
+		,unsigned weightThreshold = 0
 		,boolean disableSaltForce = true
 		,boolean primForcePost = false // not being used
-		,boolean useFuzzy = false
-		,boolean doZipExpansion = false
+		,boolean useFuzzy = true
+		,boolean doZipExpansion = true
 		,boolean reAppend = true
 		,boolean mimicRoxie = false // This is for ease of testing and can cause slower performance
 		                            // on thor appends so should not be used for production.

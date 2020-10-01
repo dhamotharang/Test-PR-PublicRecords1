@@ -17,6 +17,8 @@ EXPORT	proc_build_base(STRING	pVersion	,
 	EXPORT	dIndividualOwner	:=	Business_Credit.fn_GetSegments.individualOwner;
 	EXPORT	dMasterAccount		:=	Business_Credit.fn_GetSegments.masterAccount;
 	EXPORT	dMemberSpecific		:=	Business_Credit.fn_GetSegments.memberSpecific;
+	EXPORT	dDigitalFootPrint		:=	Business_Credit.fn_GetSegments.digitalfootprint;
+	EXPORT	dMerchantProcessing		:=	Business_Credit.fn_GetSegments.MerchantProcessing;
 	EXPORT  dReleaseDate			:=	Business_Credit.fn_ReleaseDates(pversion);
 
 	VersionControl.macBuildNewLogicalFile(Filenames(pVersion).Base.denormalized.new			,dDenormalized			,Build_Denormalized_File			,TRUE);
@@ -30,6 +32,8 @@ EXPORT	proc_build_base(STRING	pVersion	,
 	VersionControl.macBuildNewLogicalFile(Filenames(pVersion).out.individualOwner.new		,dIndividualOwner		,Build_IndividualOwner_File		,TRUE);
 	VersionControl.macBuildNewLogicalFile(Filenames(pVersion).out.masterAccount.new			,dMasterAccount			,Build_MasterAccount_File			,TRUE);
 	VersionControl.macBuildNewLogicalFile(Filenames(pVersion).out.memberSpecific.new		,dMemberSpecific		,Build_MemberSpecific_File		,TRUE);
+	VersionControl.macBuildNewLogicalFile(Filenames(pVersion).out.digitalfootprint.new		,dDigitalFootPrint		,Build_digitalfootprint		,TRUE);
+	VersionControl.macBuildNewLogicalFile(Filenames(pVersion).out.MerchantProcessing.new		,dMerchantProcessing		,Build_MerchantProcessing		,TRUE);
   VersionControl.macBuildNewLogicalFile(Filenames(pVersion).out.releasedate.new				,dReleaseDate				,Build_ReleaseDate_File				,TRUE);
 	
 		// SBFE Best Key Base Files
@@ -66,6 +70,8 @@ EXPORT	proc_build_base(STRING	pVersion	,
 					,Build_IndividualOwner_File	
 					,Build_MasterAccount_File
 					,Build_MemberSpecific_File
+					,Build_digitalfootprint
+					,Build_MerchantProcessing
 					,Build_ReleaseDate_File
 					,Promote(pversion, 'out').buildfiles.New2Built
 					,Promote(pversion, 'out').buildfiles.Built2QA

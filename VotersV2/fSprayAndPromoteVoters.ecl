@@ -8,7 +8,7 @@ function
 #option('multiplePersistInstances',FALSE);
 
 wuid := thorlib.wuid();
-sourceIP := 'bctlpedata12';
+sourceIP := 'bctlpedata11';
 sourcePath := '/data/load01/voters/sprays/';
 recSize := 1888;
 groupName := STD.System.Thorlib.Group( );									
@@ -30,8 +30,7 @@ mailTarget := if(VotersV2._Flags.IsTesting
 									 ,_Control.MyInfo.EmailAddressNotify 
 									 + ';Melanie.Jackson@lexisnexisrisk.com');
 
-send_mail (string pSubject, string pBody) := FileServices.sendemail(mailTarget                                                                 , pSubject
-																																		, pBody);
+send_mail (string pSubject, string pBody) := FileServices.sendemail(mailTarget, pSubject, pBody);
 
 sprayIP := map(sourceIP = 'bctlpedata11' => _control.IPAddress.bctlpedata11,
 									sourceIP = 'bctlpedata12' => _control.IPAddress.bctlpedata12,
