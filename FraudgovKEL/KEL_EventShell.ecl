@@ -7,22 +7,16 @@ EXPORT KEL_EventShell := MODULE
     IMPORT HIPIE_ECL;
     EXPORT CleanEventShell := KEL.Clean(FraudgovKEL.Q__show_Customer_Person_Event.Res0, TRUE /*Remove __Flags*/, TRUE /*Remove __recordcounts*/, TRUE /*Remove _ from Field Names*/);
     EXPORT OriginalAttr := 'ottoaddressid,deceaseddate,deceaseddateofbirth,deceasedfirst,deceasedmiddle,deceasedlast,phonenumber,ottoemailid,ottoipaddressid,ottodriverslicenseid,currentlyincarceratedflag,deceased,' +
-        'eventage,contributorsafeflag,' +
-        'safeflag,incustomerpopulation,' +
-        'addressisvacant,addressiscmra,addressispobox,invalidaddress,addressoutofstate,' +
-        'unique_number,mac_address,serial_number,device_type,device_identification_provider,routingnumber2,' +
-        'addreventcount,ssneventcount,personeventcount,phoneeventcount,emaileventcount,ipeventcount,bankaccounteventcount,driverslicenseeventcount,'+
-        'addrevent30count,ssnevent30count,personevent30count,phoneevent30count,emailevent30count,ipevent30count,bankaccountevent30count,driverslicenseevent30count,' +
-        'addrevent365count,ssnevent365count,personevent365count,phoneevent365count,emailevent365count,ipevent365count,bankaccountevent365count,driverslicenseevent365count';
+        'eventage,contributorsafeflag,personeventcount,' +
+        'safeflag';
     EXPORT StructuralAttr := 'rin_sourcelabel,rin_source,' +
-        'addreventafterkrflag,ssneventafterkrflag,personeventafterkrflag,phoneeventafterkrflag,emaileventafterkrflag,ipeventafterkrflag,bankaccounteventafterkrflag,driverslicenseeventafterkrflag,'+
-        'addreventafterkrcount,ssneventafterkrcount,personeventafterkrcount,phoneeventafterkrcount,emaileventafterkrcount,ipeventafterkrcount,bankaccounteventafterkrcount,driverslicenseeventafterkrcount,'+
-        'kreventafterknownrisk,krpersonprofileflag,kremailprofileflag,kraddressprofileflag,kripprofileflag,krssnprofileflag,krphoneprofileflag,krbankaccountprofileflag,krdriverslicenseprofileflag,' +
+        //'addreventafterkrflag,ssneventafterkrflag,personeventafterkrflag,phoneeventafterkrflag,emaileventafterkrflag,ipeventafterkrflag,bankaccounteventafterkrflag,driverslicenseeventafterkrflag,'+
+        //'addreventafterkrcount,ssneventafterkrcount,personeventafterkrcount,phoneeventafterkrcount,emaileventafterkrcount,ipeventafterkrcount,bankaccounteventafterkrcount,driverslicenseeventafterkrcount,'+
+        //'kreventafterknownrisk,krpersonprofileflag,kremailprofileflag,kraddressprofileflag,kripprofileflag,krssnprofileflag,krphoneprofileflag,krbankaccountprofileflag,krdriverslicenseprofileflag,' +
         'idislasteventid,emlislasteventid,addrislasteventid,ipislasteventid,bnkislasteventid,dlislasteventid,ssnislasteventid,phislasteventid,' +
         'personlabel,emaillabel,addresslabel,iplabel,bankaccountlabel,driverslicenselabel,ssnlabel,phonelabel,' +
         'addressentitycontextuid,ssnentitycontextuid,personentitycontextuid,phoneentitycontextuid,emailentitycontextuid,ipentitycontextuid,bankaccountentitycontextuid,driverslicenseentitycontextuid,'+ 
-        'streetaddress,city,state,zip';
-
+        'streetaddress,city,state,zip,incustomerpopulation';
     EXPORT NicoleAttr := 'agencyuid,agencyprogtype,agencyprogdesc,agencyprogjurst,t_srcagencyuid,t_srcagencyprogtype,t_actuid,t_actdtecho,t_srctype,t_srcdesc,t_srcclasstype,t_personuidecho,' +
         't_inpclnaddrstreetecho,t_inpclnmiddlenmecho,t_inpcaseidecho,t_inpdvcidecho,' +
         't_inpclntitleecho,t_inpclnfirstnmecho,t_inpclnlastnmecho,t_inpclnnmsuffixecho,t_inpclnaddrprimrangeecho,t_inpclnaddrpredirecho,t_inpclnaddrprimnmecho,t_inpclnaddrsuffixecho,t_inpclnaddrpostdirecho,t_inpclnaddrunitdesigecho,' +
@@ -94,7 +88,7 @@ EXPORT KEL_EventShell := MODULE
         'p15_aotssnkractinagcycntev,p15_aotssnkractinagcyflagev,p15_aotssnkractinagcyolddtev,p15_aotssnkractinagcynewdtev,p16_aotphnkractinagcycntev,p16_aotphnkractinagcyflagev,' +
         'p16_aotphnkractinagcyolddtev,p16_aotphnkractinagcynewdtev,p17_aotemailkractinagcycntev,p17_aotemailkractinagcyflagev,p17_aotemailkractinagcyolddtev,p17_aotemailkractinagcynewdtev,' +
         'p18_aotipaddrkractinagcycntev,p18_aotipaddrkractinagcyflagev,p18_aotipaddrkractinagcyolddtev,p18_aotipaddrkractinagcynewdtev,p19_aotbnkacctkractinagcycntev,p19_aotbnkacctkractinagcyflagev,' +
-        'p19_aotbnkacctkractinagcyolddtev,p19_aotbnkacctkractinagcynewdtev,p20_aotdlkractinagcycntev,p20_aotdlkractinagcyflagev,p20_aotdlkractinagcyolddtev,p20_aotdlkractinagcynewdtev';
+        'p19_aotbnkacctkractinagcyolddtev,p19_aotbnkacctkractinagcynewdtev,p20_aotdlkractinagcycntev,p20_aotdlkractinagcyflagev,p20_aotdlkractinagcyolddtev,p20_aotdlkractinagcynewdtev,t_inpclnaddrgeomatchecho';
 
     EXPORT ModelingAttr := 'personentitycontextuid,addressentitycontextuid,ssnentitycontextuid,phoneentitycontextuid,emailentitycontextuid,ipentitycontextuid,bankaccountentitycontextuid,driverslicenseentitycontextuid,agencyuid,' +
         'agencyprogtype,agencyprogdesc,agencyprogjurst,t_actdtecho,t_acttmecho,t_srcagencyuid,t_srcagencyprogtype,t_inagencyflag,t_srctype,t_srcdesc,t_srcclasstype,t_personuidecho,' +
@@ -142,7 +136,7 @@ EXPORT KEL_EventShell := MODULE
         'p15_aotssnkractinagcycntev,p15_aotssnkractinagcyflagev,p15_aotssnkractinagcyolddtev,p15_aotssnkractinagcynewdtev,p16_aotphnkractinagcycntev,p16_aotphnkractinagcyflagev,' +
         'p16_aotphnkractinagcyolddtev,p16_aotphnkractinagcynewdtev,p17_aotemailkractinagcycntev,p17_aotemailkractinagcyflagev,p17_aotemailkractinagcyolddtev,p17_aotemailkractinagcynewdtev,' +
         'p18_aotipaddrkractinagcycntev,p18_aotipaddrkractinagcyflagev,p18_aotipaddrkractinagcyolddtev,p18_aotipaddrkractinagcynewdtev,p19_aotbnkacctkractinagcycntev,p19_aotbnkacctkractinagcyflagev,' +
-        'p19_aotbnkacctkractinagcyolddtev,p19_aotbnkacctkractinagcynewdtev,p20_aotdlkractinagcycntev,p20_aotdlkractinagcyflagev,p20_aotdlkractinagcyolddtev,p20_aotdlkractinagcynewdtev';
+        'p19_aotbnkacctkractinagcyolddtev,p19_aotbnkacctkractinagcynewdtev,p20_aotdlkractinagcycntev,p20_aotdlkractinagcyflagev,p20_aotdlkractinagcyolddtev,p20_aotdlkractinagcynewdtev,t_inpclnaddrgeomatchecho';
 
 
     EXPORT UIStats := hipie_ecl.macSlimDataset(CleanEventShell, 'industrytype,customerid,entitycontextuid', 

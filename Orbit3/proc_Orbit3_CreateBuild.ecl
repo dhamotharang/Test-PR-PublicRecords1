@@ -14,8 +14,8 @@ ECL1 := '#workunit(\'name\',\'Orbit Create Build Instance -- '+ buildname + '-- 
 + if (skipupdatebuild , 'true','false')+','
 +if (runcreatebuild, 'true','false') +','
 +if (is_npf,'true','false')+' , \''+wuid+'\') \n'
-+' : success(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_success)\n'
-+' , failure(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_failure)\n'
++' : success(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\', \''+buildname+'\', \''+Buildvs+'\' ).build_success)\n'
++' , failure(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\', \''+buildname+'\', \''+Buildvs+'\').build_failure)\n'
 +' ;\n';
 
 	tgtcluster := STD.System.Job.Target();
@@ -25,13 +25,21 @@ spcluster := map  ( regexfind('_eclcc',tgtcluster)  and _Control.ThisEnvironment
                                    regexfind('_eclcc',tgtcluster)  = false and _Control.ThisEnvironment.Name = 'Dataland'       =>  'hthor_dev',
 							 'hthor'									 );
 
-    fswu :=  _control.fSubmitNewWorkunit(ECL1, trim(spcluster)) :   SUCCESS(fileservices.sendemail(Send_Email(Buildvs,email_list).emaillist
-																			                                                                                                     ,'Orbit3  submit WU to spawn status'+ workunit
-																			                                                                                                      ,'Orbit3 submit WU to spawn success -- '+ workunit + 'Build Name :' +buildname + 'Build vs :'+Buildvs
+    fswu :=  _control.fSubmitNewWorkunit(ECL1, trim(spcluster)) :   SUCCESS(fileservices.sendemail(Send_Email(Buildvs,email_list,buildname,Buildvs ).emaillist
+																			                                                                                                     ,'Orbit3  submit WU to spawn status -- '+ workunit + '  ,  ' +
+																																												   ' Build Name : ' +buildname +  ' , ' +
+																																												   ' Build vs : ' +Buildvs
+																			                                                                                                      ,'Orbit3 submit WU to spawn success -- '+ workunit +  '  ,  ' +
+																																												   ' Build Name : ' +buildname +   ' , ' +
+																																												   ' Build vs : ' +Buildvs
 																			                                                                                                       )),
-		                                                                                                                                                                                      FAILURE(fileservices.sendemail(Send_Email(Buildvs,email_list).emaillist
-																			                                                                                                     ,'Orbit3 submit WU to spawn status'+ workunit
-																			                                                                                                      ,'Orbit3 submit WU to spawn failed -- '+ workunit + 'Build Name :' +buildname + 'Build vs :'+Buildvs
+		                                                                                                                                                                                      FAILURE(fileservices.sendemail(Send_Email(Buildvs,email_list,buildname,Buildvs ).emaillist
+																			                                                                                                     ,'Orbit3 submit WU to spawn status -- '+ workunit +   '  ,  ' +
+																																												 ' Build Name : ' +buildname +  ',' +
+																																												 ' Build vs : ' +Buildvs
+																			                                                                                                      ,'Orbit3 submit WU to spawn failed - - '+ workunit + ' ,  ' +
+																																												  ' Build Name : ' +buildname + ','+
+																																												  ' Build vs : '+Buildvs
 																			                                                                                                       ));
 return    evaluate(fswu);
 end;
