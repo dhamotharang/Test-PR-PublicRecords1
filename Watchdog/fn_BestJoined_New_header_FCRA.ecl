@@ -152,8 +152,9 @@ lbest getdob_set(wvalidSSN l, bdob r) := transform
 	self := l;
 end;
  
-// if var1 = fcra_best_append, distribute wvalidSSN by did to improve results and then return a dataset that excludes minors and has blank dob's
-// else, return a dataset that excludes minors and has non-blank dob's	
+// if var1 = fcra_best_append, distribute wvalidSSN by did to improve results 
+// and then return a dataset that excludes minors and has blank dob's
+// else, return a dataset that does not exclude minors and has non-blank dob's	
 
 wdob_j1 := join(distribute(wvalidSSN, did), bdob, left.did = right.did, getdob(left, right), left outer, local); 
 wdob_j2 := join(distribute(wvalidSSN, did), bdob, left.did = right.did, getdob_set(left, right), left outer, local);
@@ -169,7 +170,7 @@ lbest exclude_minors(result_wdob_ l, wdob r) := transform
 	self := l;
 end;
 
-// excludes minors and has blank dob's
+// excludes minors and has blank dob's for fcra_best_append
 result_wdob := IF(var1 = 'fcra_best_append', join(distribute(result_wdob_,did), wdob, left.did = right.did,
 			 exclude_minors(left, right), left outer, local), result_wdob_);
 
