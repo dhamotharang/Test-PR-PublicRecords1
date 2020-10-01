@@ -14,27 +14,32 @@ ECL1 := 'import Orbit4;\r\n'+
 +if (runcreatebuild, 'true','false') +','
 +if (runaddcomponentsonly, 'true','false') +','
 +if (is_npf,'true','false')+' , \''+wuid+'\') \n'
-+' : success(Orbit4.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_success)\n'
-+' , failure(Orbit4.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_failure)\n'
-+' ;\n';																														  
++' : success(Orbit4.Send_Email(\''+Buildvs+'\', \''+email_list+'\', \''+buildname+'\', \''+Buildvs+'\' ).build_success)\n'
++' , failure(Orbit4.Send_Email(\''+Buildvs+'\', \''+email_list+'\', \''+buildname+'\', \''+Buildvs+'\').build_failure)\n'
++' ;\n';
 
-tgtcluster := STD.System.Job.Target();
+	tgtcluster := STD.System.Job.Target();
 
 spcluster := map  ( regexfind('_eclcc',tgtcluster)  and _Control.ThisEnvironment.Name = 'Dataland'  => 'hthor_dev_eclcc',
                                  regexfind('_eclcc',tgtcluster)  and _Control.ThisEnvironment.Name <> 'Dataland'  => 'hthor_eclcc',
                                    regexfind('_eclcc',tgtcluster)  = false and _Control.ThisEnvironment.Name = 'Dataland'       =>  'hthor_dev',
 							 'hthor'									 );
 
-fswu :=   _control.fSubmitNewWorkunit(ECL1 ,trim(spcluster)) :   SUCCESS(fileservices.sendemail(Send_Email(Buildvs,email_list).emaillist
-																			                                                                                                     ,'Orbit4 submit WU to spawn status'+ workunit
-																			                                                                                                      ,'Orbit4 submit WU to spawn success -- '+ workunit
+    fswu :=  _control.fSubmitNewWorkunit(ECL1, trim(spcluster)) :   SUCCESS(fileservices.sendemail(Orbit4.Send_Email(Buildvs,email_list,buildname,Buildvs ).emaillist
+																			                                                                                                     ,'Orbit4  submit WU to spawn status -- '+ workunit + '  ,  ' +
+																																												   ' Build Name : ' +buildname +  ' , ' +
+																																												   ' Build vs : ' +Buildvs
+																			                                                                                                      ,'Orbit4 submit WU to spawn success -- '+ workunit +  '  ,  ' +
+																																												   ' Build Name : ' +buildname +   ' , ' +
+																																												   ' Build vs : ' +Buildvs
 																			                                                                                                       )),
-		                                                                                                                                                                                      FAILURE(fileservices.sendemail(Send_Email(Buildvs,email_list).emaillist
-																			                                                                                                     ,'Orbit4 submit WU to spawn status'+ workunit
-																			                                                                                                      ,'Orbit4 submit WU to spawn failed -- '+ workunit
+		                                                                                                                                                                                      FAILURE(fileservices.sendemail(Orbit4.Send_Email(Buildvs,email_list,buildname,Buildvs ).emaillist
+																			                                                                                                     ,'Orbit4 submit WU to spawn status -- '+ workunit +   '  ,  ' +
+																																												 ' Build Name : ' +buildname +  ',' +
+																																												 ' Build vs : ' +Buildvs
+																			                                                                                                      ,'Orbit4 submit WU to spawn failed - - '+ workunit + ' ,  ' +
+																																												  ' Build Name : ' +buildname + ','+
+																																												  ' Build vs : '+Buildvs
 																			                                                                                                       ));
-																																																																						 
-																																																											
-return evaluate(fswu);
-	
+return    evaluate(fswu);
 end;
