@@ -1,4 +1,4 @@
-﻿import ut;
+﻿import ut,STD;
 
 EXPORT AddItemtoBuild(string			pLoginToken,
 																	string			pBuildName,
@@ -33,6 +33,9 @@ rUpdateBuildRequest	:= RECORD
 	END;
 	
 	 rBuildrequest := RECORD
+	   #IF(STD.System.Util.PlatformVersionCheck('7.8')) 
+	 Orbit3.Layouts.AdditionalNamespacesLayout;
+	 #END
 		rUpdateBuildRequest	request	{XPATH('request') };
 	END;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
