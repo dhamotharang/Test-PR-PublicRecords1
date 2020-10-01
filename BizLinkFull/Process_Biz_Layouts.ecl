@@ -905,7 +905,7 @@ EXPORT LayoutScoredFetch := RECORD // Nulls required for linkpaths that do not h
 END;
  
 EXPORT LayoutScoredFetch update_forcefailed(LayoutScoredFetch le, BOOLEAN disableForce = FALSE) := TRANSFORM
-  SELF.ForceFailed := IF(disableForce, FALSE, (le.prim_rangeWeight < Config_BIP.prim_range_Force)/*HACK03_a*/ OR le.cnp_nameWeight < 4);
+  SELF.ForceFailed := IF(disableForce, FALSE, (le.prim_rangeWeight < Config_BIP.prim_range_Force));
   SELF := le;
 END;
  
@@ -1120,7 +1120,7 @@ EXPORT LayoutScoredFetch combine_scores(LayoutScoredFetch le,LayoutScoredFetch r
   SELF.powid := IF ( le.powid=ri.powid, le.powid, 0 ); // Zero out if collapsing a parent
   SELF.keys_used := le.keys_used | ri.keys_used;
   SELF.keys_failed := le.keys_failed | ri.keys_failed;
-  SELF.ForceFailed := IF(In_disableForce, FALSE, (SELF.prim_rangeWeight < Config_BIP.prim_range_Force)/*HACK03_b*/ OR SELF.cnp_nameWeight < 4);
+  SELF.ForceFailed := IF(In_disableForce, FALSE, (SELF.prim_rangeWeight < Config_BIP.prim_range_Force)/*HACK03*/ OR SELF.cnp_nameWeight < 4);
   INTEGER2 Weight := MAX(0, SELF.parent_proxidWeight) + MAX(0, SELF.sele_proxidWeight) + MAX(0, SELF.org_proxidWeight) + MAX(0, SELF.ultimate_proxidWeight) + MAX(0, SELF.has_lgidWeight) + MAX(0, SELF.empidWeight) + MAX(0, SELF.sourceWeight) + MAX(0, SELF.source_record_idWeight) + MAX(0, SELF.source_docidWeight) + MAX(0, SELF.company_nameWeight) + MAX(0, SELF.company_name_prefixWeight) + MAX(0, SELF.cnp_nameWeight) + MAX(0, SELF.cnp_numberWeight) + MAX(0, SELF.cnp_btypeWeight) + MAX(0, SELF.cnp_lowvWeight) + MAX(0, SELF.company_phoneWeight) + MAX(0, SELF.company_phone_3Weight) + MAX(0, SELF.company_phone_3_exWeight) + MAX(0, SELF.company_phone_7Weight) + MAX(0, SELF.company_feinWeight) + MAX(0, SELF.company_sic_code1Weight) + MAX(0, SELF.active_duns_numberWeight) + MAX(0, SELF.cityWeight) + MAX(0, SELF.city_cleanWeight) + MAX(0, SELF.stWeight) + MAX(0, SELF.zipWeight) + MAX(0, SELF.company_urlWeight) + MAX(0, SELF.isContactWeight) + MAX(0, SELF.contact_didWeight) + MAX(0, SELF.titleWeight) + MAX(0, SELF.fname_preferredWeight) + MAX(0, SELF.name_suffixWeight) + MAX(0, SELF.contact_ssnWeight) + MAX(0, SELF.contact_emailWeight) + MAX(0, SELF.sele_flagWeight) + MAX(0, SELF.org_flagWeight) + MAX(0, SELF.ult_flagWeight) + MAX(0, SELF.fallback_valueWeight) + (MAX(0, SELF.fnameWeight) + MAX(0, SELF.mnameWeight) + MAX(0, SELF.lnameWeight)) + (MAX(0, SELF.prim_rangeWeight) + MAX(0, SELF.prim_nameWeight) + MAX(0, SELF.sec_rangeWeight));
   SELF.Weight := IF(Weight>0,Weight,MAX(le.Weight,ri.Weight));
   SELF := le;

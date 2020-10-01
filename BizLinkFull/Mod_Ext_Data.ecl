@@ -159,7 +159,7 @@ EXPORT ScoredproxidFetchL_CNPNAME_ZIP(TYPEOF(h.cnp_name) param_cnp_name = (TYPEO
   SELF.cnp_name_gss_cases := DATASET([{le.gss_hash}],SALT311.layout_GSS_cases);
     SELF.zip_match_code := match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),TRUE);
     SELF.zipWeight := (50+MAP (
-           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
+           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100* param_zip(zip=le.zip)[1].weight/100.0,
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
     SELF.prim_name_match_code := MAP(
@@ -409,7 +409,7 @@ EXPORT ScoredproxidFetchL_CNPNAME_ST(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF
            match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),FALSE));
     SELF.zipWeight := (50+MAP (
            SELF.zip_match_code = SALT311.MatchCode.OneSideNull => 0,
-           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
+           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100* param_zip(zip=le.zip)[1].weight/100.0,
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
     SELF.city_match_code := MAP(
@@ -749,7 +749,7 @@ EXPORT ScoredproxidFetchL_CNPNAME(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.
            match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),FALSE));
     SELF.zipWeight := (50+MAP (
            SELF.zip_match_code = SALT311.MatchCode.OneSideNull => 0,
-           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
+           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100* param_zip(zip=le.zip)[1].weight/100.0,
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
     SELF.Weight := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0 AND le.rcid = 0, 1, MAX(0, SELF.cnp_nameWeight) + MAX(0, SELF.prim_nameWeight) + MAX(0, SELF.cityWeight) + MAX(0, SELF.stWeight) + MAX(0, SELF.company_sic_code1Weight) + MAX(0, SELF.cnp_numberWeight) + MAX(0, SELF.cnp_btypeWeight) + MAX(0, SELF.cnp_lowvWeight) + MAX(0, SELF.prim_rangeWeight) + MAX(0, SELF.sec_rangeWeight) + MAX(0, SELF.parent_proxidWeight) + MAX(0, SELF.sele_proxidWeight) + MAX(0, SELF.org_proxidWeight) + MAX(0, SELF.ultimate_proxidWeight) + MAX(0, SELF.sele_flagWeight) + MAX(0, SELF.org_flagWeight) + MAX(0, SELF.ult_flagWeight) + MAX(0, SELF.zipWeight));
@@ -867,7 +867,7 @@ EXPORT ScoredproxidFetchL_CNPNAME_FUZZY(TYPEOF(h.company_name_prefix) param_comp
            match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),FALSE));
     SELF.zipWeight := (50+MAP (
            SELF.zip_match_code = SALT311.MatchCode.OneSideNull => 0,
-           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
+           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100* param_zip(zip=le.zip)[1].weight/100.0,
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
     SELF.city_match_code := MAP(
@@ -1104,7 +1104,7 @@ EXPORT ScoredproxidFetchL_ADDRESS1(TYPEOF(h.prim_name) param_prim_name = (TYPEOF
            match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),FALSE));
     SELF.zipWeight := (50+MAP (
            SELF.zip_match_code = SALT311.MatchCode.OneSideNull => 0,
-           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
+           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100* param_zip(zip=le.zip)[1].weight/100.0,
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
     SELF.company_sic_code1_match_code := MAP(
@@ -1293,7 +1293,7 @@ EXPORT ScoredproxidFetchL_ADDRESS2(TYPEOF(h.prim_name) param_prim_name = (TYPEOF
            -1.000*le.prim_name_weight100))/100; 
     SELF.zip_match_code := match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),TRUE);
     SELF.zipWeight := (50+MAP (
-           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
+           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100* param_zip(zip=le.zip)[1].weight/100.0,
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
     SELF.prim_range_match_code := MAP(
@@ -1519,7 +1519,7 @@ EXPORT ScoredproxidFetchL_ADDRESS3(TYPEOF(h.prim_name) param_prim_name = (TYPEOF
            -1.000*le.prim_range_weight100))/100; 
     SELF.zip_match_code := match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),TRUE);
     SELF.zipWeight := (50+MAP (
-           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
+           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100* param_zip(zip=le.zip)[1].weight/100.0,
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
     SELF.cnp_name_match_code := MAP(
@@ -1789,7 +1789,7 @@ EXPORT ScoredproxidFetchL_PHONE(TYPEOF(h.company_phone_7) param_company_phone_7 
            match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),FALSE));
     SELF.zipWeight := (50+MAP (
            SELF.zip_match_code = SALT311.MatchCode.OneSideNull => 0,
-           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
+           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100* param_zip(zip=le.zip)[1].weight/100.0,
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
     SELF.prim_name_match_code := MAP(
@@ -2021,7 +2021,7 @@ EXPORT ScoredproxidFetchL_FEIN(TYPEOF(h.company_fein) param_company_fein = (TYPE
            match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),FALSE));
     SELF.zipWeight := (50+MAP (
            SELF.zip_match_code = SALT311.MatchCode.OneSideNull => 0,
-           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
+           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100* param_zip(zip=le.zip)[1].weight/100.0,
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
     SELF.prim_name_match_code := MAP(
@@ -2273,7 +2273,7 @@ EXPORT ScoredproxidFetchL_URL(TYPEOF(h.company_url) param_company_url = (TYPEOF(
            match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),FALSE));
     SELF.zipWeight := (50+MAP (
            SELF.zip_match_code = SALT311.MatchCode.OneSideNull => 0,
-           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
+           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100* param_zip(zip=le.zip)[1].weight/100.0,
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
     SELF.prim_name_match_code := MAP(
@@ -2503,7 +2503,7 @@ EXPORT ScoredproxidFetchL_CONTACT(TYPEOF(h.fname_preferred) param_fname_preferre
            match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),FALSE));
     SELF.zipWeight := (50+MAP (
            SELF.zip_match_code = SALT311.MatchCode.OneSideNull => 0,
-           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
+           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100* param_zip(zip=le.zip)[1].weight/100.0,
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
     SELF.st_match_code := MAP(
@@ -2780,7 +2780,7 @@ EXPORT ScoredproxidFetchL_CONTACT_SSN(TYPEOF(h.contact_ssn) param_contact_ssn = 
            match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),FALSE));
     SELF.zipWeight := (50+MAP (
            SELF.zip_match_code = SALT311.MatchCode.OneSideNull => 0,
-           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
+           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100* param_zip(zip=le.zip)[1].weight/100.0,
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
     SELF.prim_name_match_code := MAP(
@@ -3010,7 +3010,7 @@ EXPORT ScoredproxidFetchL_EMAIL(TYPEOF(h.contact_email) param_contact_email = (T
            match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),FALSE));
     SELF.zipWeight := (50+MAP (
            SELF.zip_match_code = SALT311.MatchCode.OneSideNull => 0,
-           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
+           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100* param_zip(zip=le.zip)[1].weight/100.0,
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
     SELF.prim_name_match_code := MAP(
@@ -3167,7 +3167,7 @@ EXPORT ScoredproxidFetchL_SIC(TYPEOF(h.company_sic_code1) param_company_sic_code
            -0.727*le.company_sic_code1_weight100))/100; 
     SELF.zip_match_code := match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),TRUE);
     SELF.zipWeight := (50+MAP (
-           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
+           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100* param_zip(zip=le.zip)[1].weight/100.0,
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
     SELF.cnp_name_match_code := MAP(
@@ -3314,7 +3314,7 @@ EXPORT ScoredproxidFetchL_SOURCE(TYPEOF(h.source_record_id) param_source_record_
            match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),FALSE));
     SELF.zipWeight := (50+MAP (
            SELF.zip_match_code = SALT311.MatchCode.OneSideNull => 0,
-           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
+           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100* param_zip(zip=le.zip)[1].weight/100.0,
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
     SELF.city_match_code := MAP(

@@ -33,6 +33,7 @@ EXPORT MAC_Match_Flex_V2
   ,pSource                 = ''
   ,pSource_record_id       = ''
   ,src_matching_is_priority = FALSE
+  ,bGetAllScores=TRUE
 ) :=
 MACRO
 
@@ -126,8 +127,10 @@ import BIPV2;
 #uniquename(appendMod);
 // run append
 %appendMod% := BIPV2.IdAppendThor(%appendInput%,
-                                  scoreThreshold := score_threshold 
-                                  );
+                                  scoreThreshold := score_threshold, 
+                                  weightThreshold := 0,
+                                  primForce := true,
+                                  reAppend := true);
 #uniquename(withAppend);
 %withAppend% := %appendMod%.IdsOnly();
 

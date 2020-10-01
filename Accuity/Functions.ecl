@@ -57,7 +57,7 @@ export string10 fSlashedMDYtoCYMD(string pDateIn) :=  function
 	
 	return MAP(
 		length(TRIM(pDateIn,LEFT,RIGHT))=4 => pDateIn + '/00/00',
-		FixCentury(ut.ConvertDateMultiple(pDateIn, fmts, fmtout))
+		FixCentury(Std.date.ConvertDateFormatMultiple(pDateIn, fmts, fmtout))
 	);
 	
 END;

@@ -1935,7 +1935,9 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2020/1267 Ukraine List','1922'},
 {'EC (CFSP) 2020/1310 Libya List','1923'},
 {'EC 2020/1297 ISIL (Da\'esh) and Al-Qaida List','1924'},
-{'EC 2020/1309 Libya List','1925'}
+{'EC 2020/1309 Libya List','1925'},
+{'DFATD (Canada) Special Economic Measures (Belarus) Regulations','1926'},
+{'US Department of State Cuba Prohibited Accommodations List','1927'}
 
 ],r);
 
