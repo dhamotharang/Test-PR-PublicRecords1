@@ -10,4 +10,8 @@ EXPORT Layouts := MODULE
     UNSIGNED6 seleid;
   END;
 
+  EXPORT layout_kfetch_locid := RECORD
+    UNSIGNED6 locid;
+  END;
+
 END;
