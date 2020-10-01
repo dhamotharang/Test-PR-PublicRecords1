@@ -12,11 +12,11 @@ import BIPV2_xlink_segmentation;
 export IdAppendRoxieLocal(
 		dataset(BIPV2.IdAppendLayouts.AppendInput) inputDs
 		,unsigned scoreThreshold = 75
-		,unsigned weightThreshold = IdConstants.APPEND_WEIGHT_THRESHOLD_ROXIE
-		,boolean disableSaltForce = true
+		,unsigned weightThreshold = 44
+		,boolean disableSaltForce = false
 		,boolean primForcePost = false 
 		,boolean useFuzzy = true
-		,boolean doZipExpansion = false
+		,boolean doZipExpansion = true
 		,boolean reAppend = true
 		,boolean segmentation = true
 	) := function
@@ -49,8 +49,8 @@ inputDsZip :=
 			map(nozip => dataset([], BizLinkFull.Process_Biz_Layouts.layout_zip_cases),
 		      doZipExpansion => zipCases,
 			    oneZip);
-		self.city := if(doZipExpansion, if(zipsExpanded[1].city='', left.city, zipsExpanded[1].city) , left.city);
-		self.state := if(doZipExpansion, if(zipsExpanded[1].state='', left.state, zipsExpanded[1].state), left.state);
+		self.city := if(doZipExpansion, zipsExpanded[1].city, left.city);
+		self.state := if(doZipExpansion, zipsExpanded[1].state, left.state);
 		lenPhone := length(trim(left.phone10));
 		self.company_phone_3 := if(lenPhone = 10, left.phone10[..3], '');
 		self.company_phone_7 := if(lenPhone = 10, left.phone10[4..10], if(lenPhone = 7, trim(left.phone10), ''));
@@ -298,24 +298,15 @@ topIds :=
 		left outer);
 			
 
-	passThruIn := project(inputDs(proxid != 0 or seleid != 0),
+	passThru0 := project(inputDs(proxid != 0 or seleid != 0),
 		transform(BizLinkFull.Process_Biz_Layouts.id_stream_layout,
 			self.uniqueId := left.request_id,
 			self.proxid := left.proxid,
 			self.seleid := if(left.proxid != 0, 0, left.seleid);
 			self := left;
 			self := []));
-	passThruIds := if(reAppend, dataset([], recordof(passThruIn)),
-	                  BizLinkFull.Process_Biz_Layouts.id_stream_complete(passThruIn));
-	passThruMissingIds := passThruIds(ultid = 0 and (seleid != 0 or proxid != 0));
-	passThruHistoric := BizLinkFull.Process_Biz_Layouts.id_stream_historic(passThruMissingIds);
-	passThruRenew :=
-		join(passThruMissingIds, passThruHistoric,
-			left.uniqueid = right.uniqueid,
-			transform(recordof(left),
-				self := if(right.ultid != 0, right, left)),
-			keep(1), left outer);
-	passThru := passThruIds(not (ultid = 0 and (seleid != 0 or proxid != 0))) + passThruRenew;
+	passThru := if(reAppend, dataset([], recordof(passThru0)),
+	               BizLinkFull.Process_Biz_Layouts.id_stream_complete(passThru0));
 
 	passThruPreSuppress := project(passThru, transform(recordof(preSuppression),
 		self.request_id := left.uniqueid,
