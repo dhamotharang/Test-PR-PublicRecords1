@@ -1258,6 +1258,9 @@
 		export string KEYWORD_CATMX									:= '944';
 		export string KEYWORD_OFAC_ICAAE						:= '945';
 		export string KEYWORD_FFICIJ_WC							:= '946';
+		export string KEYWORD_USCRAL								:= '947';
+		export string KEYWORD_CANSEMBLR							:= '948';
+		export string KEYWORD_ZAFIC									:= '949';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
