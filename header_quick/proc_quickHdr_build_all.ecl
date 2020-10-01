@@ -106,10 +106,10 @@ EXPORT proc_quickHdr_build_all (
 		header_quick._config(sourceIP, sourcePathMonthly).set_v_version(overwriteMonthlyFileDate),
 		header_quick._config(sourceIP, sourcePathWeekly).set_v_eq_as_of_date(overwriteWeeklyFileDate),
 		Header.mac_runIfNotCompleted ('QuickHeader',filedate, doWeekly,200),
-		Header.mac_runIfNotCompleted ('QuickHeader',filedate, doMonthly,300),
-		Header.mac_runIfNotCompleted ('QuickHeader',filedate, notify('Build_Header_Ingest', '*'),400),
-		Header.mac_runIfNotCompleted ('QuickHeader',filedate, header_quick.Inputs_Clear,500),
-		Header.mac_runIfNotCompleted ('QuickHeader',filedate, header_quick.Inputs_Set(filedate),600),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, doMonthly,300),		
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, header_quick.Inputs_Clear,400),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, header_quick.Inputs_Set(filedate),500),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, notify('Build_Header_Ingest', '*'),600),
 		Header.mac_runIfNotCompleted ('QuickHeader',filedate, buildAll, 700),
 		Header.mac_runIfNotCompleted ('QuickHeader',filedate,QA_sample, 800) /*,Source_Check_rep*/
 	);
