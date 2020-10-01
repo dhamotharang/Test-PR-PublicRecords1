@@ -315,7 +315,7 @@ EXPORT ScoredproxidFetch(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name)
            match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),FALSE));
     SELF.zipWeight := (50+MAP (
            SELF.zip_match_code = SALT311.MatchCode.OneSideNull => 0,
-           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
+           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100 * param_zip(zip=le.zip)[1].weight/100.0,
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
     SELF.Weight := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0, 1, MAX(0, SELF.cnp_nameWeight) + MAX(0, SELF.prim_nameWeight) + MAX(0, SELF.cityWeight) + MAX(0, SELF.stWeight) + MAX(0, SELF.company_sic_code1Weight) + MAX(0, SELF.cnp_numberWeight) + MAX(0, SELF.cnp_btypeWeight) + MAX(0, SELF.cnp_lowvWeight) + MAX(0, SELF.prim_rangeWeight) + MAX(0, SELF.sec_rangeWeight) + MAX(0, SELF.parent_proxidWeight) + MAX(0, SELF.sele_proxidWeight) + MAX(0, SELF.org_proxidWeight) + MAX(0, SELF.ultimate_proxidWeight) + MAX(0, SELF.sele_flagWeight) + MAX(0, SELF.org_flagWeight) + MAX(0, SELF.ult_flagWeight) + MAX(0, SELF.zipWeight));

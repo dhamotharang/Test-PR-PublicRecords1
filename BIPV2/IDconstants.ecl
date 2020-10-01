@@ -44,10 +44,7 @@ export Set_Fetch_Level_Above_OrgID		       	:= [Fetch_Level_UltID];
 export USE_LOCAL_KEYS := true; // A true here will override the next USE_LOCAL_*_KEYS attributes
 export USE_LOCAL_THOR_SALT_KEYS := true; // Used if USE_LOCAL_KEYS is false
 export USE_LOCAL_THOR_BEST_KEYS := true; // Used if USE_LOCAL_KEYS is false
-
 export APPEND_WEIGHT_THRESHOLD_ROXIE := 44;
-export APPEND_WEIGHT_THRESHOLD_THOR := 37;
-
 export URL_ROXIE_DEV := 'dev155vip.hpcc.risk.regn.net:9876'; // useful for testing and devlopment
 export URL_ROXIE_CERT := _control.RoxieEnv.boca_certvip; // useful for testing and development
 export URL_ROXIE_PROD := _control.RoxieEnv.boca_prodvip;

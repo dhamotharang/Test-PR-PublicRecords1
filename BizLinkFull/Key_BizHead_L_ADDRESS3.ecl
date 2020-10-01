@@ -114,7 +114,7 @@ EXPORT RawFetch_server(TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name
           KEYED((prim_name = param_prim_name))
       AND KEYED((prim_range = param_prim_range))
       AND KEYED((zip IN SET(param_zip,zip)))
-      AND ((param_cnp_name = (TYPEOF(cnp_name))'' OR cnp_name = (TYPEOF(cnp_name))'') OR (SALT311.MatchBagOfWords(cnp_name,param_cnp_name,3177747,1)+400/*HACK08_a*/ > Config_BIP.cnp_name_Force * 100))
+      AND ((param_cnp_name = (TYPEOF(cnp_name))'' OR cnp_name = (TYPEOF(cnp_name))'') OR (SALT311.MatchBagOfWords(cnp_name,param_cnp_name,3177747,1)+400/*HACK08*/ > Config_BIP.cnp_name_Force * 100))
       AND KEYED((param_st = (TYPEOF(st))'' OR st = (TYPEOF(st))'') OR (st = param_st))
       AND KEYED(fallback_value >= param_fallback_value)
       AND ( param_efr_bitmap=0 OR (EFR_BMap & param_efr_bitmap)>0 )),Config_BIP.L_ADDRESS3_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),ultid,orgid,seleid,proxid);
@@ -148,7 +148,7 @@ EXPORT ScoredproxidFetch(TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_na
            -1.000*le.prim_range_weight100))/100; 
     SELF.zip_match_code := match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),TRUE);
     SELF.zipWeight := (50+MAP (
-           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
+           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100 * param_zip(zip=le.zip)[1].weight/100.0,
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
     SELF.cnp_name_match_code := MAP(
@@ -439,7 +439,7 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex, BOOLEA
   J0 := JOIN(Recs2,Key,((RIGHT.prim_name = LEFT.prim_name))
      AND ((RIGHT.prim_range = LEFT.prim_range))
      AND ((RIGHT.zip = LEFT.zip_cases[1].zip))
-     AND ((LEFT.cnp_name = (TYPEOF(RIGHT.cnp_name))'' OR RIGHT.cnp_name = (TYPEOF(RIGHT.cnp_name))'') OR (SALT311.MatchBagOfWords(RIGHT.cnp_name,LEFT.cnp_name,3177747,1)+400/*HACK08_b*/ > BizLinkFull.Config_BIP.cnp_name_Force * 100))
+     AND ((LEFT.cnp_name = (TYPEOF(RIGHT.cnp_name))'' OR RIGHT.cnp_name = (TYPEOF(RIGHT.cnp_name))'') OR (SALT311.MatchBagOfWords(RIGHT.cnp_name,LEFT.cnp_name,3177747,1) > BizLinkFull.Config_BIP.cnp_name_Force * 100))
      AND ((LEFT.st = (TYPEOF(RIGHT.st))'' OR RIGHT.st = (TYPEOF(RIGHT.st))'') OR (RIGHT.st = LEFT.st)),Score_Batch(RIGHT,LEFT),
     ATMOST(((RIGHT.prim_name = LEFT.prim_name))
      AND ((RIGHT.prim_range = LEFT.prim_range))
@@ -447,7 +447,7 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex, BOOLEA
   J1 := JOIN(Recs2,PULL(Key),((RIGHT.prim_name = LEFT.prim_name))
      AND ((RIGHT.prim_range = LEFT.prim_range))
      AND ((RIGHT.zip = LEFT.zip_cases[1].zip))
-     AND ((LEFT.cnp_name = (TYPEOF(RIGHT.cnp_name))'' OR RIGHT.cnp_name = (TYPEOF(RIGHT.cnp_name))'') OR (SALT311.MatchBagOfWords(RIGHT.cnp_name,LEFT.cnp_name,3177747,1)+400/*HACK08_c*/ > BizLinkFull.Config_BIP.cnp_name_Force * 100))
+     AND ((LEFT.cnp_name = (TYPEOF(RIGHT.cnp_name))'' OR RIGHT.cnp_name = (TYPEOF(RIGHT.cnp_name))'') OR (SALT311.MatchBagOfWords(RIGHT.cnp_name,LEFT.cnp_name,3177747,1) > BizLinkFull.Config_BIP.cnp_name_Force * 100))
      AND ((LEFT.st = (TYPEOF(RIGHT.st))'' OR RIGHT.st = (TYPEOF(RIGHT.st))'') OR (RIGHT.st = LEFT.st)),Score_Batch(RIGHT,LEFT),
     ATMOST(((RIGHT.prim_name = LEFT.prim_name))
      AND ((RIGHT.prim_range = LEFT.prim_range))

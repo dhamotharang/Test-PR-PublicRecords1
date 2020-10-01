@@ -30,8 +30,8 @@ export IdAppendThorLocal(
 		,bGetAllScores = TRUE
 		,useFuzzy = false
 		,primForcePost = false
-		,weightThreshold = IdConstants.APPEND_WEIGHT_THRESHOLD_THOR
-		,disableSaltForce = true
+		,weightThreshold = 0
+		,disableSaltForce = false
 		,segmentation = true
 		,reAppend = true
 	) := functionmacro
