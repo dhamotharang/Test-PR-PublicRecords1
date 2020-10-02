@@ -14,7 +14,7 @@
 import ut,wk_ut,_control,STD, header, dops;
 #WORKUNIT('name', 'PersonHeader: Build_Incremental_Keys');
 
-filedate := '20200901';//Header.Proc_Copy_From_Alpha_Incrementals().filedate;
+filedate := Header.Proc_Copy_From_Alpha_Incrementals().filedate;
 lastestIkbVersionOnThor  := header.Proc_Copy_From_Alpha_Incrementals().lastestIkbVersionOnThor;
 
 valid_state := ['blocked','running','wait','submitted','compiling','compiled'];

@@ -1360,6 +1360,9 @@
 				trim(kword, left, right) = 'CATMX' =>SubGroup_Constants.numKeywordsID.KEYWORD_CATMX,
 				trim(kword, left, right) = 'OFAC-ICAAE' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_ICAAE,
 				trim(kword, left, right) = 'FFICIJ-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_FFICIJ_WC,
+				trim(kword, left, right) = 'USCRAL' =>SubGroup_Constants.numKeywordsID.KEYWORD_USCRAL,
+				trim(kword, left, right) = 'CANSEMBLR' =>SubGroup_Constants.numKeywordsID.KEYWORD_CANSEMBLR,
+				trim(kword, left, right) = 'ZAFIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_ZAFIC,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

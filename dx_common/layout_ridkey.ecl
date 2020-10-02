@@ -1,5 +1,5 @@
 EXPORT layout_ridkey := record
-  UNSIGNED8 record_sid;
-  UNSIGNED4 dt_effective_first;
-  UNSIGNED4 dt_effective_last;
+  dx_common.layout_metadata.record_sid;
+  dx_common.layout_metadata.dt_effective_first;
+  dx_common.layout_metadata.dt_effective_last;
 END;
