@@ -186,11 +186,41 @@ srcGlobalEdd5 := project(srcGlobalEdd4, transform(Layouts.rEntity,
 				if(left.NameSource = 'US-SAM' , 'JPMC Custom - SAM', left.NameSource)));
 		 self := left;));
 
-export srcGlobalEdd								:= dedup(SORT(srcGlobalEdd5,Ent_ID,Entrycategory,EntrySubcategory,LOCAL),Ent_ID,ALL);
-//export srcGlobalEdd								:= dedup(srcGlobalEdd5,Ent_ID,ALL);
+//export srcGlobalEdd								:= dedup(SORT(srcGlobalEdd5,Ent_ID,Entrycategory,EntrySubcategory,LOCAL),Ent_ID,ALL);
+//Final EDD
+
+eddpeps 														:= srcGlobalEdd5(EntryCategory='PEP');
+eddformer 													:= srcGlobalEdd5(EntrySubcategory='Former PEP');
+eddjustformer0 										:= JOIN(eddformer,eddpeps, left.ent_id=right.ent_id, TRANSFORM(WorldCompliance.layouts.rEntity,
+																		self := left), inner, keep(1), local);
+eddjustformer 											:= DEDUP(SORT(eddjustformer0, ent_id, entrycategory, entrysubcategory, local),
+																		ent_id, local);								
+eddnoformer0 											:= JOIN(eddpeps, eddjustformer, left.ent_id=right.ent_id, TRANSFORM(WorldCompliance.layouts.rEntity,
+																		self := left), left only, local);
+eddnoformer 												:= DEDUP(SORT(eddnoformer0, ent_id, entrycategory, entrysubcategory, local),
+																		ent_id, local);
+eddnopep 													:= Dedup(sort(srcGlobalEdd5(EntryCategory<>'PEP'),ent_id, entrycategory, entrysubcategory, local),ent_id,local);							
+export srcGlobalEdd								:= Dedup(Sort(Distribute(eddnopep + eddjustformer + eddnoformer,Ent_ID),Ent_id,entrycategory, entrysubcategory,local),Ent_Id,ALL);
 
 export srcGlobalStateOwned 				:= dedup(SORT(dsMasters(EntryCategory in Filters.fStateOwned),Ent_ID,Entrycategory,EntrySubcategory,LOCAL),Ent_ID,ALL);
-export srcPep 										:= dedup(SORT(dsMasters(EntryCategory in Filters.fPep),Ent_ID,Entrycategory,EntrySubcategory,LOCAL),Ent_ID,ALL);
+
+// New PEP 
+srcPepA														:= dsMasters(EntryCategory in Filters.fPep);
+dspeps 														:= srcPepA(EntryCategory='PEP');
+dsformer 													:= srcPepA(EntrySubcategory='Former PEP');
+dsjustformer0 										:= JOIN(dsformer,dspeps, left.ent_id=right.ent_id, TRANSFORM(WorldCompliance.layouts.rEntity,
+																		self := left), inner, keep(1), local);
+dsjustformer 											:= DEDUP(SORT(dsjustformer0, ent_id, entrycategory, entrysubcategory, local),
+																		ent_id, local);								
+dsnoformer0 											:= JOIN(dspeps, dsjustformer, left.ent_id=right.ent_id, TRANSFORM(WorldCompliance.layouts.rEntity,
+																		self := left), left only, local);
+dsnoformer 												:= DEDUP(SORT(dsnoformer0, ent_id, entrycategory, entrysubcategory, local),
+																		ent_id, local);
+dsnopep 													:= Dedup(sort(srcPepA(EntryCategory<>'PEP'),ent_id, entrycategory, entrysubcategory, local),ent_id,local);							
+export srcPep											:= Dedup(Sort(Distribute(dsnopep + dsjustformer + dsnoformer,Ent_ID),Ent_id,entrycategory, entrysubcategory,local),Ent_Id,ALL);
+
+//export srcPep 										:= dedup(SORT(dsMasters(EntryCategory in Filters.fPep),Ent_ID,Entrycategory,EntrySubcategory,LOCAL),Ent_ID,ALL);
+
 export srcSanctionsAndEnforcement := dedup(SORT(dsMasters(EntryCategory in Filters.fSanctionsAndEnforcement),Ent_ID,Entrycategory,EntrySubcategory,LOCAL),Ent_ID,ALL);
 export srcSanctions 							:= dedup(SORT(dsMasters(EntryCategory in Filters.fSanctions),Ent_ID,Entrycategory,EntrySubcategory,LOCAL),Ent_ID,ALL);
 export srcFull 										:= dsMasters_base(EntryCategory in Filters.fFull);
