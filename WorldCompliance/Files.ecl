@@ -111,7 +111,8 @@ export dsMainCats := Join(distribute(dsMasters_base, Ent_ID),MdsWcoCategories,Le
 										),Left Outer, local);
 				
 export dsMult :=   Join(distribute(MdsWCOCategories, EntityID),dsMasters_base, Left.EntityID=Right.Ent_ID,	
-									TRANSFORM(Layouts.rEntity,								
+									TRANSFORM(Layouts.rEntity,
+									SKIP(Left.IsActivePEP = 'N'),
 										self.Ent_ID := Left.EntityID;
 										self.Entrycategory := if(left.SegmentType='AdditionalSegments' or left.SegmentType='Sanction',
 											if(left.SubCategoryLabel = 'Associated Entity' or left.SubCategoryLabel ='Ownership Or Control' or left.SubCategoryLabel = 'SWIFT BIC Entity',
@@ -177,7 +178,7 @@ srcGlobalEdd3 := dsMasters(EntryCategory in Filters.fEdd2);
 //export srcGlobalEdd := srcGlobalEdd3 + dedup(sort(srcGlobalEdd1 + srcGlobalEdd2, Ent_ID, local), Ent_ID, local); // OLD 20160805
 srcGlobalEdd4 :=  (srcGlobalEdd3 + srcGlobalEdd1 + srcGlobalEdd2); 
 
-srcGlobalEdd5 := project(srcGlobalEdd4, transform(Layouts.rEntity, 
+export srcGlobalEdd5 := project(srcGlobalEdd4, transform(Layouts.rEntity, 
 		self.EntryTypeId := if(left.NameSource = 'US-EPLS',752, 
 				if(left.NameSource = 'US-HHS-EIE',848, 
 				if(left.NameSource = 'US-SAM' ,10447, left.EntryTypeId)));
@@ -205,7 +206,7 @@ export srcGlobalEdd								:= Dedup(Sort(Distribute(eddnopep + eddjustformer + e
 export srcGlobalStateOwned 				:= dedup(SORT(dsMasters(EntryCategory in Filters.fStateOwned),Ent_ID,Entrycategory,EntrySubcategory,LOCAL),Ent_ID,ALL);
 
 // New PEP 
-srcPepA														:= dsMasters(EntryCategory in Filters.fPep);
+export srcPepA														:= dsMasters(EntryCategory in Filters.fPep);
 dspeps 														:= srcPepA(EntryCategory='PEP');
 dsformer 													:= srcPepA(EntrySubcategory='Former PEP');
 dsjustformer0 										:= JOIN(dsformer,dspeps, left.ent_id=right.ent_id, TRANSFORM(WorldCompliance.layouts.rEntity,
