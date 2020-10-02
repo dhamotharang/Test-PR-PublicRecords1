@@ -1,5 +1,52 @@
-EXPORT fn_ReNormalizeCollisions_2(DATASET(Nac_V2.Layout_Collisions2.Layout_Collisions) c) := FUNCTION
+﻿EXPORT fn_ReNormalizeCollisions_2(DATASET(Nac_V2.Layout_Collisions2.Layout_Collisions) c) := FUNCTION
 
+Layout_Slim := RECORD
+
+	string6 matchset:=''
+	,string10 MatchCodes
+	,unsigned6 LexID:=0
+	,string30 SearchLastName
+	,string25 SearchFirstName
+	,string25 SearchMiddleName
+	//,string5 SearchSuffixName := ''
+	,string30 ClientLastName
+	,string25 ClientFirstName
+	,string25 ClientMiddleName
+	//,string5 ClientSuffixName := ''
+	,string20 SearchClientID
+	,string20 ClientID
+		,string8	StartDate
+		,string8	EndDate
+	,string2 BenefitState
+	,string1 SearchBenefitType
+	,string2 CaseState
+	,string1 CaseBenefitType
+
+	,string9 SearchSSN
+	,string8 SearchDOB
+	,string9 ClientSSN
+	,string8 ClientDOB
+	
+	,string4 SearchGroupID
+	,string4 CaseGroupId
+	,string20 CaseID
+	,string20 SearchCaseID
+	,string8	SearchStartDate
+	,string8	SearchEndDate
+	,string8	CaseStartDate
+	,string8	CaseEndDate
+	,string		addr1
+	,string		addr2
+	,string1  ExceptionReasonCode;
+END;
+
+Layout_Slim xSlim (Nac_V2.Layout_Collisions2.Layout_Collisions c) := TRANSFORM
+	self.Addr1 := StandardizeName(c.SearchAddress1StreetAddress1 + ', ' +
+													c.SearchAddress1City + ', ' + c.SearchAddress1State + ' ' + c.SearchAddress1Zip[1..5]);	
+	self.Addr2 := StandardizeName(c.SearchAddress2StreetAddress1 + ', ' +
+													c.SearchAddress2City + ', ' + c.SearchAddress2State + ' ' + c.SearchAddress2Zip[1..5]);	
+	self := c;
+END;
 
 	Nac_V2.Layout_Collisions2.Layout_Collisions xCollisions(Nac_V2.Layout_Collisions2.Layout_Collisions c, integer n) := TRANSFORM
 	
@@ -63,6 +110,6 @@ EXPORT fn_ReNormalizeCollisions_2(DATASET(Nac_V2.Layout_Collisions2.Layout_Colli
 	
 	fixed := NORMALIZE(same, 2, xCollisions(LEFT, COUNTER));
 
-	return diff + fixed;
+	return PROJECT(diff + fixed, xSlim(LEFT));
 
 END;

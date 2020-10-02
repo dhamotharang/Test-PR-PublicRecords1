@@ -35,7 +35,8 @@ EXPORT NewCollisions(DATASET(layout_Collisions2.Layout_Collisions) cnew, DATASET
 								
 		j := DISTRIBUTE(j1, hash32(searchgroupid, searchbenefittype, searchclientid));
 
-		ex := DISTRIBUTE($.NormalizeExceptions(), hash32(sourcegroupid, SourceProgramCode, SourceClientId));
+		//ex := DISTRIBUTE($.NormalizeExceptions(), hash32(sourcegroupid, SourceProgramCode, SourceClientId));
+		ex := $.NormalizeExceptions();
 
 		j2 := JOIN(j, ex, left.searchgroupid=right.sourcegroupid AND left.searchbenefittype=right.SourceProgramCode
 												AND left.searchclientid=right.SourceClientId
@@ -45,8 +46,7 @@ EXPORT NewCollisions(DATASET(layout_Collisions2.Layout_Collisions) cnew, DATASET
 											self.ExceptionReasonCode := right.ReasonCode;
 											self.ExceptionComments := right.Comments;
 											self := left;),
-								LEFT OUTER, LOCAL);
+								LEFT OUTER, LOOKUP);
 								
 		return j2;
 END;
-								
