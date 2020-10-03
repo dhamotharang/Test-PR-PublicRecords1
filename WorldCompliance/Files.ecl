@@ -96,6 +96,9 @@ export dsRelDefs := DATASET(root+'reldefs', Layouts.rCategories, CSV(separator('
 					
 export dsMasters_base := 			// master entries
 				dsEntities(ParentId=0) + dsWhiteListEntities(ParentId=0);
+		
+
+
 export dsMainCats := Join(distribute(dsMasters_base, Ent_ID),MdsWcoCategories,Left.Ent_ID=Right.EntityID,
 //Export dsMainCats := PROJECT(dsEntities, 
 							Transform(Layouts.rWCOCategories,
@@ -110,7 +113,71 @@ export dsMainCats := Join(distribute(dsMasters_base, Ent_ID),MdsWcoCategories,Le
 											self := right;
 										),Left Outer, local);
 				
-export dsMult :=   Join(distribute(MdsWCOCategories, EntityID),dsMasters_base, Left.EntityID=Right.Ent_ID,	
+export FMdsWCOCategories := Join(distribute(MdsWCOCategories, EntityID),MdsWcoCategories,Left.EntityID=Right.EntityID,
+										Transform(Layouts.rWCOCategories,
+											self.SegmentType := if (left.SegmentType='AdditionalSegments' AND left.SubCategoryLabel = 'IHS OFAC Vessels','Sanction',left.SegmentType);
+											self.SubCategoryLabel := if((left.SegmentType='AdditionalSegments' AND left.SubCategoryLabel = 'IHS OFAC Vessels'),
+																										'Sanction List', 
+																									if(left.SegmentType='SOE',
+																										if((left.SubCategoryLabel = 'Minority' or left.SubCategoryLabel = 'Multiple Minority'), 
+																												'Govt Linked Corp',
+																												if ((left.SubCategoryLabel = 'Majority' or left.SubCategoryLabel = 'Multiple Majority'),'Govt Owned Corp', if ((left.SubCategoryLabel = 'Sanction List'),left.SubCategoryLabel,left.SubCategoryLabel))),
+																												left.SubCategoryLabel));
+											self.SubCategoryDesc := if(left.SubCategoryLabel = 'Primary PEP' or left.SubCategoryLabel = 'Secondary PEP', 
+																								if (left.SubCategoryDesc = 'Judiciary','Courts',
+																									if(left.SubCategoryDesc = 'Legislature' or left.SubCategoryDesc = 'Intelligence' or left.SubCategoryDesc = 'Law Enforce Auth' or left.SubCategoryDesc = 'Traditional Leadership',
+																										'Govt Branch Member',if(left.SubCategoryDesc = 'MSOE','Mgmt Govt Corp',left.SubCategoryDesc))),left.SubCategoryDesc); 
+																									
+											self.IsActivePEP := left.IsActivePEP;
+											self := right;
+										), Inner, local);
+
+//Scurb for PEP:Former PEP set
+
+export Mds_Scrub :=	dsMainCats + FMdsWCOCategories;
+export	Mnewcat := DEDUP(SORT(Mds_Scrub, entityid, segmenttype,subcategorylabel,subcategorydesc, -isactivepep, local),
+														entityid, segmenttype,subcategorylabel,subcategorydesc, isactivepep, local);
+	
+export	peps := Mnewcat(segmenttype='PEP');
+export	former := Mnewcat(subcategorydesc='Former PEP');
+export	NotAct := Mnewcat(isactivepep='N' and segmenttype = 'PEP');
+export	Act := Mnewcat(isactivepep IN ['Y',''] and segmenttype='PEP');
+
+	justformer0 := JOIN(former, peps, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
+											self := left), inner, keep(1), local);
+	export justformer := DEDUP(SORT(justformer0, entityid, segmenttype, subcategorydesc, -isactivepep, local),
+											entityid, segmenttype, subcategorydesc, local);								
+	noformer0 := JOIN(peps, justformer, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
+											self := left), left only, local);
+	noformer := DEDUP(SORT(noformer0, entityid, segmenttype,  subcategorydesc, -isactivepep, local),
+										entityid, segmenttype, subcategorydesc, local);
+
+	NotActive0 := JOIN(NotAct, justformer, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
+										self := left), left only, local);
+	export notActive := DEDUP(SORT(NotActive0, entityid, segmenttype,  subcategorydesc, -isactivepep, local),
+										entityid, segmenttype, subcategorydesc, local);
+	Active0 := JOIN(Act, justformer, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
+										self := left), left only, local);							
+	export Active := DEDUP(SORT(Active0, entityid, segmenttype,  subcategorydesc, -isactivepep, local),
+										entityid, segmenttype, subcategorydesc, local);
+
+	onlyNo0 := JOIN(NotActive, Active, left.entityid=right.entityid, TRANSFORM(WorldCompliance.layouts.rWCOCategories,
+										self := left), left only, local);							
+	onlyNo := DEDUP(SORT(onlyno0, entityid, segmenttype,  subcategorydesc, -isactivepep, local),
+										entityid, segmenttype, subcategorydesc, local);
+       
+// Only Inactive PEP set:
+	export ForceFormer := Join(distribute(onlyno, EntityID),onlyno,Left.EntityID=Right.EntityID,
+		TRANSFORM(Layouts.rWCOCategories,
+				self.SegmentType := 'PEP';
+				self.SubCategoryLabel := 'Primary PEP';
+				self.SubCategoryDesc := 'Former PEP';
+				self.IsActivePEP := 'Y';
+				self := left;));
+			
+	export Scrub_sup := Distribute(Mnewcat(segmenttype<>'PEP') + justformer + Active + ForceFormer,EntityID);
+	
+	export dsMult :=   Join(distribute(Scrub_sup, EntityID),dsMasters_base, Left.EntityID=Right.Ent_ID,	
 									TRANSFORM(Layouts.rEntity,
 									SKIP(Left.IsActivePEP = 'N'),
 										self.Ent_ID := Left.EntityID;
@@ -133,25 +200,6 @@ export dsMult :=   Join(distribute(MdsWCOCategories, EntityID),dsMasters_base, L
 	
 											self := right;
 									),Inner, local);
-
-export FMdsWCOCategories := Join(distribute(MdsWCOCategories, EntityID),MdsWcoCategories,Left.EntityID=Right.EntityID,
-										Transform(Layouts.rWCOCategories,
-											self.SegmentType := if (left.SegmentType='AdditionalSegments' AND left.SubCategoryLabel = 'IHS OFAC Vessels','Sanction',left.SegmentType);
-											self.SubCategoryLabel := if((left.SegmentType='AdditionalSegments' AND left.SubCategoryLabel = 'IHS OFAC Vessels'),
-																										'Sanction List', 
-																									if(left.SegmentType='SOE',
-																										if((left.SubCategoryLabel = 'Minority' or left.SubCategoryLabel = 'Multiple Minority'), 
-																												'Govt Linked Corp',
-																												if ((left.SubCategoryLabel = 'Majority' or left.SubCategoryLabel = 'Multiple Majority'),'Govt Owned Corp', if ((left.SubCategoryLabel = 'Sanction List'),left.SubCategoryLabel,left.SubCategoryLabel))),
-																												left.SubCategoryLabel));
-											self.SubCategoryDesc := if(left.SubCategoryLabel = 'Primary PEP' or left.SubCategoryLabel = 'Secondary PEP', 
-																								if (left.SubCategoryDesc = 'Judiciary','Courts',
-																									if(left.SubCategoryDesc = 'Legislature' or left.SubCategoryDesc = 'Intelligence' or left.SubCategoryDesc = 'Law Enforce Auth' or left.SubCategoryDesc = 'Traditional Leadership',
-																										'Govt Branch Member',if(left.SubCategoryDesc = 'MSOE','Mgmt Govt Corp',left.SubCategoryDesc))),left.SubCategoryDesc); 
-																									
-											self.IsActivePEP := left.IsActivePEP;
-											self := right;
-										), Inner, local);
 
 export dsMasters := dsMasters_base + dsMult;
 
@@ -205,7 +253,7 @@ export srcGlobalEdd								:= Dedup(Sort(Distribute(eddnopep + eddjustformer + e
 
 export srcGlobalStateOwned 				:= dedup(SORT(dsMasters(EntryCategory in Filters.fStateOwned),Ent_ID,Entrycategory,EntrySubcategory,LOCAL),Ent_ID,ALL);
 
-// New PEP 
+// Final PEP 
 export srcPepA														:= dsMasters(EntryCategory in Filters.fPep);
 dspeps 														:= srcPepA(EntryCategory='PEP');
 dsformer 													:= srcPepA(EntrySubcategory='Former PEP');
