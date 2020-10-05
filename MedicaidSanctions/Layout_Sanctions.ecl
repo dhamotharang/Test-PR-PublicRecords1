@@ -32,4 +32,5 @@
   string			specialty_class_type;
   string			board;
   string10		county;
+	string8			Entity_Date;
 END;
