@@ -23,8 +23,8 @@ Layout_Slim := RECORD
 	,string1 CaseBenefitType
 
 	,string9 SearchSSN
-	,string8 SearchDOB
 	,string9 ClientSSN
+	,string8 SearchDOB
 	,string8 ClientDOB
 	
 	,string4 SearchGroupID
@@ -41,10 +41,10 @@ Layout_Slim := RECORD
 END;
 
 Layout_Slim xSlim (Nac_V2.Layout_Collisions2.Layout_Collisions c) := TRANSFORM
-	self.Addr1 := StandardizeName(c.SearchAddress1StreetAddress1 + ', ' +
-													c.SearchAddress1City + ', ' + c.SearchAddress1State + ' ' + c.SearchAddress1Zip[1..5]);	
-	self.Addr2 := StandardizeName(c.SearchAddress2StreetAddress1 + ', ' +
-													c.SearchAddress2City + ', ' + c.SearchAddress2State + ' ' + c.SearchAddress2Zip[1..5]);	
+	self.Addr1 := StandardizeName(TRIM(c.SearchAddress1StreetAddress1) + ', ' +
+													TRIM(c.SearchAddress1City) + ', ' + c.SearchAddress1State + ' ' + c.SearchAddress1Zip[1..5]);	
+	self.Addr2 := StandardizeName(TRIM(c.SearchAddress2StreetAddress1) + ', ' +
+													TRIM(c.SearchAddress2City) + ', ' + c.SearchAddress2State + ' ' + c.SearchAddress2Zip[1..5]);	
 	self := c;
 END;
 
@@ -105,10 +105,11 @@ END;
 						self := c;
 	END;
 
-	diff := c(benefitstate<>casestate);
-	same := c(benefitstate=casestate);
+	diff := c(benefitstate<>casestate OR SearchClientID <= clientid);
+	same := c(benefitstate=casestate, SearchClientID > clientid);
 	
-	fixed := NORMALIZE(same, 2, xCollisions(LEFT, COUNTER));
+	//fixed := NORMALIZE(same, 2, xCollisions(LEFT, COUNTER));
+	fixed := PROJECT(same, xCollisions(LEFT, 2));
 
 	return PROJECT(diff + fixed, xSlim(LEFT));
 
