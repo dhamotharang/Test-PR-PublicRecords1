@@ -7,13 +7,13 @@ export NAC_v2.Layout_Collisions2.Layout_Collisions xCollisions_Ex(NAC_v2.Layout_
 				function
 				return map(l.ProgramState <> r.ProgramState => le
 											,l.GroupId <> l.GroupId => le
-											,l.CaseId > r.CaseId => ri	// intrastate case ids must be different
+											,l.ClientId > r.ClientId => ri	// intrastate case ids must be different
 									 ,le);
 			end;
 			fn_right(string le, string ri) := function
 				return map(l.ProgramState <> r.ProgramState => ri
 										,l.GroupId <> l.GroupId => ri
-										,l.CaseId > r.CaseId => le			
+										,l.ClientId > r.ClientId => le			
 										,ri);
 			end;
 

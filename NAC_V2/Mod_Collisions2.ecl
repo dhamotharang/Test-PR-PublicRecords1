@@ -214,33 +214,27 @@ concat_all :=
 			+ S_col
 			+ L_col
 			;
-concat_all_d := DISTRIBUTE(concat_all, hash32(BenefitState,SearchBenefitType,SearchCaseID));
+concat_all_d := DISTRIBUTE(concat_all, hash32(SearchGroupId,SearchCaseID,SearchClientID));
 concat_srt
 					:=
 							sort(concat_all_d
-									,BenefitState
-										,SearchBenefitType			
-										,SearchGroupId			
+									,SearchGroupId			
 										,SearchCaseID
 										,SearchClientID
+									  ,BenefitState
+										,SearchBenefitType			
 										,SearchEligibilityStatus
-										,SearchLastName
-										,SearchFirstName
-										,SearchMiddleName
 										,SearchSSN
 										,SearchDOB
-									,CaseState
-										,CaseBenefitType			
-										,CaseGroupId			
+									,CaseGroupId			
 										,CaseID
 										,ClientID
+									  ,CaseState
+										,CaseBenefitType			
 										,ClientEligibilityStatus
-										,ClientLastName
-										,ClientFirstName
-										,ClientMiddleName
 										,ClientSSN
 										,ClientDOB
-									,StartDate,EndDate
+									,-StartDate			//,EndDate  Choose match with most recent start date
 										,pri
 										,LexID
 										,OrigSearchSequenceNumber
@@ -250,41 +244,36 @@ concat_srt
 										;
 				d	:=
 							dedup(concat_srt
-									,BenefitState
-										,SearchBenefitType			
-										,SearchGroupId			
+									,SearchGroupId			
 										,SearchCaseID
 										,SearchClientID
+									  ,BenefitState
+										,SearchBenefitType			
 										,SearchEligibilityStatus
-										,SearchLastName
-										,SearchFirstName
-										,SearchMiddleName
 										,SearchSSN
 										,SearchDOB
-									,CaseState
-										,CaseBenefitType			
-										,CaseGroupId			
+									,CaseGroupId			
 										,CaseID
 										,ClientID
+									  ,CaseState
+										,CaseBenefitType			
 										,ClientEligibilityStatus
-										,ClientLastName
-										,ClientFirstName
-										,ClientMiddleName
 										,ClientSSN
 										,ClientDOB
-									,StartDate,EndDate
+									//,StartDate,EndDate
 										,LOCAL
 										)
 										;
-			c := DISTRIBUTE(d, hash32(benefitstate,SearchBenefitType,searchcaseid,searchclientid));
-			c1 := SORT(c, 	benefitstate, SearchBenefitType, searchgroupid, searchcaseid, searchclientid,SearchEligibilityStatus,SearchLastName,
+			c := DISTRIBUTE(d, hash32(SearchGroupId,SearchCaseID,SearchClientID));
+			c1 := SORT(c, 	SearchGroupId,SearchCaseID,SearchClientID,
+											benefitstate, SearchBenefitType, SearchEligibilityStatus,SearchLastName,
 											casestate, CaseBenefitType, CaseGroupId, caseid, clientid,ClientEligibilityStatus,ClientLastName, startdate, LOCAL);
 								
 	c2 := ROLLUP(c1, 
-									left.benefitstate=right.benefitstate AND left.SearchBenefitType=right.SearchBenefitType and
-											left.searchGroupId=right.searchGroupId AND
+										left.searchGroupId=right.searchGroupId AND
 											left.searchcaseid=right.searchcaseid AND
 											left.searchclientid=right.searchclientid AND
+									left.benefitstate=right.benefitstate AND left.SearchBenefitType=right.SearchBenefitType and
 										  left.SearchEligibilityStatus=right.SearchEligibilityStatus AND
 										  left.SearchLastName=right.SearchLastName
 									AND left.casestate=right.casestate AND left.CaseBenefitType=right.CaseBenefitType

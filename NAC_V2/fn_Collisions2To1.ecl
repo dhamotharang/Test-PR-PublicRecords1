@@ -19,10 +19,14 @@ END;
 day := (string8)Std.Date.Today() : INDEPENDENT;
 month := day[1..6];
 
-string6 GetMonth(string6 mon) := MIN(mon, month);
+string6 GetMonth(string6 monStart, string6 monEnd) := 
+				IF(monEnd <= month, monEnd,
+					IF(monStart >= month, monStart,
+						month));
+
 
 nac.Layouts.Collisions x2To1(NAC_V2.Layout_Collisions2.Layout_Collisions c2, integer n) := TRANSFORM
-					self.SearchBenefitMonth := MIN(month, c2.EndDate[1..6]);
+					self.SearchBenefitMonth := GetMonth(c2.StartDate[1..6], c2.EndDate[1..6]);
 					self.CaseBenefitMonth := self.SearchBenefitMonth;
 					self.ClientEligibleStatusIndicator := c2.ClientEligibilityStatus;
 					self := c2;
@@ -33,7 +37,7 @@ END;
 EXPORT fn_Collisions2To1(dataset(NAC_V2.Layout_Collisions2.Layout_Collisions) c2) := FUNCTION
 
 		//c1 := NORMALIZE(c2, dmonth(left.StartDate, left.EndDate), x2To1(left, COUNTER));
-		c1 := PROJECT(c2(StartDate <= day), x2To1(left, 1));
+		c1 := PROJECT(c2, x2To1(left, 1));
 		
 		return c1;
 

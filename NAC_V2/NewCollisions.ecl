@@ -1,41 +1,23 @@
 ﻿
-NormalizeExceptions := FUNCTION
-	ex := $.Files2.dsExceptionRecords;
-	exout := ex(sourcegroupid <> matchedgroupid ); // interstate exceptions
-	exin := ex(sourcegroupid = matchedgroupid);			// intrastate exceptions
-	mirror := project(exin, TRANSFORM(recordof(ex),	
-						self.sourceprogramstate := left.matchedstate;
-						self.sourceprogramcode := left.matchedprogramcode;
-						self.sourceclientid := left.matchedclientid;
-						self.matchedstate := left.sourceprogramstate;
-						self.matchedprogramcode := left.sourceprogramcode;
-						self.matchedclientid := left.sourceclientid;
-						self := left;));
-	raw := exout + exin + mirror;
-	unique := DEDUP(raw, sourcegroupid, sourceprogramstate, SourceProgramCode, SourceClientId,
-                      matchedgroupid, matchedstate, matchedprogramcode, matchedclientid, all);
-	return unique;
-END;
 
 EXPORT NewCollisions(DATASET(layout_Collisions2.Layout_Collisions) cnew, DATASET(layout_Collisions2.Layout_Collisions) cprev)
 				:= FUNCTION
 		raw := join(distribute(cnew,
-											hash32(BenefitState,SearchBenefitType,SearchCaseID))
+											hash32(SearchGroupId,SearchCaseID))
 									,distribute(cprev,
-											hash32(BenefitState,SearchBenefitType,SearchCaseID))
-									,   left.BenefitState=right.BenefitState
-									and left.SearchBenefitType=right.SearchBenefitType
-									and left.SearchCaseID=right.SearchCaseID
+											hash32(SearchGroupId,SearchCaseID))
+											, left.SearchGroupId=right.SearchGroupId
+ 									and left.SearchCaseID=right.SearchCaseID
 									and left.SearchClientID=right.SearchClientID
-									and left.SearchEligibilityStatus=right.SearchEligibilityStatus
-									and left.casestate=right.casestate
-									and left.CaseBenefitType=right.CaseBenefitType
+                  and left.BenefitState=right.BenefitState
+									and left.SearchBenefitType=right.SearchBenefitType
+									and left.caseGroupId=right.caseGroupId
 									and left.caseid=right.caseid
 									and left.clientid=right.clientid
-									and left.ClientEligibilityStatus=right.ClientEligibilityStatus
-									and left.StartDate=right.StartDate
-									and left.EndDate=right.EndDate
-									,left only
+									and left.casestate=right.casestate
+									and left.CaseBenefitType=right.CaseBenefitType
+									and left.StartDate <= right.EndDate
+									,left only 
 									,local);
 		
 		c := DISTRIBUTE(raw, hash32(benefitstate, searchbenefittype, searchclientid));
@@ -53,7 +35,8 @@ EXPORT NewCollisions(DATASET(layout_Collisions2.Layout_Collisions) cnew, DATASET
 								
 		j := DISTRIBUTE(j1, hash32(searchgroupid, searchbenefittype, searchclientid));
 
-		ex := DISTRIBUTE(NormalizeExceptions, hash32(sourcegroupid, SourceProgramCode, SourceClientId));
+		//ex := DISTRIBUTE($.NormalizeExceptions(), hash32(sourcegroupid, SourceProgramCode, SourceClientId));
+		ex := $.NormalizeExceptions();
 
 		j2 := JOIN(j, ex, left.searchgroupid=right.sourcegroupid AND left.searchbenefittype=right.SourceProgramCode
 												AND left.searchclientid=right.SourceClientId
@@ -63,8 +46,7 @@ EXPORT NewCollisions(DATASET(layout_Collisions2.Layout_Collisions) cnew, DATASET
 											self.ExceptionReasonCode := right.ReasonCode;
 											self.ExceptionComments := right.Comments;
 											self := left;),
-								LEFT OUTER, LOCAL);
+								LEFT OUTER, LOOKUP);
 								
 		return j2;
 END;
-								
