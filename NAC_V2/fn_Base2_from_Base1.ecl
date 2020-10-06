@@ -61,7 +61,7 @@ export fn_Base2_from_Base1(string version) := FUNCTION
 		if (ut.Weekday((integer)version[1..8]) <> 'SATURDAY',
 								Nac_v2.CreateOrbitEntry(version)),
 		Nac.fn_Strata(version),
-		ProcessCollisions(newcol, version)
+		NAC_V2.ProcessCollisions(newcol, version)
 	);
 
 	return doit;
