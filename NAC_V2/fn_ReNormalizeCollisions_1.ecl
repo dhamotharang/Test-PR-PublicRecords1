@@ -3,7 +3,8 @@ EXPORT fn_ReNormalizeCollisions_1(DATASET(Nac.Layouts.Collisions) c) := FUNCTION
 
 Layout_Slim := RECORD
 
-	string6 matchset:=''
+	unsigned1 pri:=0
+	,string6 matchset:=''
 	,string10 MatchCodes
 	,unsigned6 LexID:=0
 	,string30 SearchLastName
@@ -32,6 +33,7 @@ Layout_Slim := RECORD
 	,string20 SearchCaseID
 	,string		addr1
 	,string		addr2
+	,string1  ExceptionReasonCode := '';
 END;
 
 Layout_Slim xSlim (Nac.Layouts.Collisions c) := TRANSFORM

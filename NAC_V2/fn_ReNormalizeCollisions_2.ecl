@@ -2,7 +2,8 @@
 
 Layout_Slim := RECORD
 
-	string6 matchset:=''
+	unsigned1 pri:=0
+	,string6 matchset:=''
 	,string10 MatchCodes
 	,unsigned6 LexID:=0
 	,string30 SearchLastName

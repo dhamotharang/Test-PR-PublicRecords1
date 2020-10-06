@@ -43,6 +43,10 @@ export fn_Base2_from_Base1(string version) := FUNCTION
 		nac_V2.Promote_Superfiles(Nac_V2.Superfile_List.sfBase2, lfn_base),
 		OUTPUT(base2,,lfn_base2, COMPRESSED),
 		nac_V2.Promote_Superfiles(Nac_V2.Superfile_List.sfNCF2Base, lfn_base2),
+		OUTPUT(PROJECT(STD.File.SuperFileContents(nac_V2.superfile_list.sfProcessing),
+							TRANSFORM(FsLogicalFileNameRecord,
+								self.name := Std.Str.FindReplace(Std.Str.SplitWords(left.name, '::')[4], 'ncfx', 'ncf2');
+							)), named('processing')),
 		nac_v2.Superfile_List.MoveProcessingToProcessed,
 		
 		nac_V2.BuildPayload(newbase, version),
