@@ -85,7 +85,7 @@ despray(string st):=function
 	prefix:=STD.Str.ToUpperCase(map(st='dbc' => 'xx_dbc_'
 																,st='drq' => 'xx_drq_'
 																,st+'_msh_'));
-	dir:=map(st='dbc' => 'test/dbc1/'
+	dir:=map(st='dbc' => 'test/dbc1/'  
 					,st='drq' => 'drq/'
 					,'msh/');
 	fname:=prefix + suffix;
