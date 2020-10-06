@@ -1217,6 +1217,7 @@ boolean Alerts200 := (le.SubjectDeceased='1' or attr.SubjectDeceased = '1') or (
   self.CheckTimeOldest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
   self.CheckTimeNewest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
   self.CheckNegTimeOldest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckNegTimeNewest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
   self.CheckNegRiskDecTimeNewest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
   self.CheckNegPaidTimeNewest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
   self.CheckCountTotal := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');

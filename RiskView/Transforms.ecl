@@ -4240,12 +4240,13 @@ EXPORT iesp.share.t_NameValuePair intoVersion5(riskview.layouts.layout_riskview5
               c=194	=> 'CheckTimeOldest',
               c=195	=> 'CheckTimeNewest',
               c=196	=> 'CheckNegTimeOldest',
-              c=197	=> 'CheckNegRiskDecTimeNewest',
-              c=198	=> 'CheckNegPaidTimeNewest',
-              c=199	=> 'CheckCountTotal',
-              c=200	=> 'CheckAmountTotal',
-              c=201	=> 'CheckAmountTotalSinceNegPaid',
-              c=202	=> 'CheckAmountTotal03Month',
+              c=197 => 'CheckNegTimeNewest',
+              c=198	=> 'CheckNegRiskDecTimeNewest',
+              c=199	=> 'CheckNegPaidTimeNewest',
+              c=200	=> 'CheckCountTotal',
+              c=201	=> 'CheckAmountTotal',
+              c=202	=> 'CheckAmountTotalSinceNegPaid',
+              c=203	=> 'CheckAmountTotal03Month',
                        ''
               );
 
@@ -4446,12 +4447,13 @@ EXPORT iesp.share.t_NameValuePair intoVersion5(riskview.layouts.layout_riskview5
               c=194	=>  le.CheckTimeOldest,
               c=195	=>  le.CheckTimeNewest,
               c=196	=>  le.CheckNegTimeOldest,
-              c=197	=>  le.CheckNegRiskDecTimeNewest,
-              c=198	=>  le.CheckNegPaidTimeNewest,
-              c=199	=>  le.CheckCountTotal,
-              c=200	=>  le.CheckAmountTotal,
-              c=201	=>  le.CheckAmountTotalSinceNegPaid,
-              c=202	=>  le.CheckAmountTotal03Month,
+              c=197	=>  le.CheckNegTimeNewest,
+              c=198	=>  le.CheckNegRiskDecTimeNewest,
+              c=199	=>  le.CheckNegPaidTimeNewest,
+              c=200	=>  le.CheckCountTotal,
+              c=201	=>  le.CheckAmountTotal,
+              c=202	=>  le.CheckAmountTotalSinceNegPaid,
+              c=203	=>  le.CheckAmountTotal03Month,
                         ''
               );
 END;
