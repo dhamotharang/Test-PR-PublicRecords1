@@ -1,11 +1,18 @@
 ﻿EXPORT Append_Lexid( pBaseFile ) := 
 FUNCTIONMACRO
-		import DID_Add,_Validate, Std;
+		import FraudShared,DID_Add,_Validate, Std;
 		FirstRinID := FraudGovPlatform.Constants().FirstRinID;
 
 		dFileBase 		:= distribute	(pull(pBaseFile),record_id	);
 		
-		with_pii := dFileBase
+		deltabase_recs := dFileBase(rin_source in [4,5,6,7]);
+		deltabase_with_rawlinkid := deltabase_recs(rawlinkid > 0);
+		deltabase_without_rawlinkid := deltabase_recs(rawlinkid = 0);
+		non_deltabase := dFileBase(rin_source not in [4,5,6,7]);
+		with_lexid := project(deltabase_with_rawlinkid, transform( FraudShared.Layouts.Base.Main , self.did := left.rawlinkid, self:=left));
+		without_lexid := deltabase_without_rawlinkid + non_deltabase;
+
+		with_pii := without_lexid
 		(   
 			(cleaned_name.fname !='' and cleaned_name.lname !='' and 
 				(length(STD.Str.CleanSpaces(clean_ssn))=9 and regexfind('^[0-9]*$',STD.Str.CleanSpaces(clean_ssn)) =true ))
@@ -92,17 +99,17 @@ FUNCTIONMACRO
 		dDidOut_sort			:= sort				(dDidOut_dist,record_id, -did_score	,local);
 		dDidOut_dedup			:= dedup			(dDidOut_sort,record_id ,local);
 		
-		dAssignDids := join( with_pii
-												,dDidOut_dedup
-												,left.record_id = RIGHT.record_id
-												,Transform(recordof(left)
-												,self.did := if(right.did<>0,right.did,left.rawlinkid)
-												,self.did_score := if(right.did_score<>0,right.did_score,if(left.rawlinkid >0 and left.rawlinkid <firstrinid,100,0)) 
-												,self:=left)
-												,left outer
-												,local
-											 );
+		dAssignDids 
+			:= join( with_pii
+					,dDidOut_dedup
+					,left.record_id = RIGHT.record_id
+					,Transform(recordof(left)
+					,self.did 		:= if(left.record_id = RIGHT.record_id,right.did,left.did)
+					,self.did_score := if(left.record_id = RIGHT.record_id,right.did_score,left.did_score) 
+					,self:=left)
+					,left outer
+					,local);
 											 
-		RETURN without_pii + dAssignDids;
+		RETURN with_lexid + without_pii + dAssignDids;
 	
 ENDMACRO;
