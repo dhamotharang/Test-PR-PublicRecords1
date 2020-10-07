@@ -1,4 +1,6 @@
-﻿EXPORT WUID_Macro(new_logicalname, old_logicalname, lay):=FUNCTIONMACRO
+﻿EXPORT WUID_Macro(new_Tag, old_Tag, lay):=FUNCTIONMACRO
+
+#workunit('name', 'MAS KAT Run Compare');
 
 Layout_Person_FCRA := RECORD
     unsigned8 time_ms;

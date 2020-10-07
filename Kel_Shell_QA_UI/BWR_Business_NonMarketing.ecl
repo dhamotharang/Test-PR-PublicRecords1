@@ -100,16 +100,11 @@ Business:= Kel_Shell_QA_UI.Business( Query_Environment,
 																		 email_list
 																		);
 																		
-execute_type:= 'executeNow';
+// execute_type:= 'executeNow';
 // execute_type:=  'scheduleCron';
-cron_time :='0 10 19 * *';
+// cron_time :='0 10 19 * *';
 
-IF(execute_type='executeNow',
-                      Business):FAILURE(FileServices.SendEmail(email_list,'KEL SHELL QA UI run job','The failed workunit is:' + workunit + FailMessage));
+Business:FAILURE(FileServices.SendEmail(email_list,'KEL SHELL QA UI run job','The failed workunit is:' + workunit + FailMessage));
 
-IF(execute_type='scheduleCron',Business): WHEN(CRON(cron_time)), 
-FAILURE(FileServices.SendEmail(email_list,'KEL SHELL QA UI run job','The failed workunit is:' + workunit + FailMessage));
-
-																					
-																		
+																	
 EXPORT BWR_Business_NonMarketing := 'todo';

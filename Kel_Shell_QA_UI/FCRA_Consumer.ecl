@@ -17,7 +17,8 @@
 											email_list) := FUNCTIONMACRO
 
 ﻿/* PublicRecords_KEL.BWR_FCRA_MAS_Roxie */
-#workunit('name','MAS FCRA Consumer dev156 1 thread');
+#workunit('name', 'MAS KAT Run Custom');
+
 IMPORT PublicRecords_KEL, RiskWise, STD, Gateway, UT, SALT38, SALTRoutines;
 threads := 1;
 
@@ -169,6 +170,9 @@ bwr_results :=
 				PARALLEL(threads), 
         onFail(myFail(LEFT)));
 
+Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(Settings);
+
+
 Passed := bwr_results(TRIM(G_ProcErrorCode) = '');
 Failed := bwr_results(TRIM(G_ProcErrorCode) <> '');
 
@@ -226,9 +230,16 @@ result3:=Kel_Shell_QA_UI.Output_Distribution_Report_Module(unique_id, Passed_Per
 
 result4:=Kel_Shell_QA.descriptive_Stats_Report(unique_id, Passed_Person);
 
-result5:=STD.System.Email.SendEmail(email_list, 'KEL SHELL QA UI run job',  'Your WUID ' + workunit + ' has completed!');
+Settings_Dataset_updated:= Settings_Dataset +
+                           DATASET([{'AllowedSources: ' + Kel_Shell_QA_UI.SetToString(AllowedSourcesDataset_List)},
+													  {'ExcludeSources: ' + Kel_Shell_QA_UI.SetToString(ExcludeSourcesDataset_List)}
+		                       ],{RECORDOF(Settings_Dataset)});
 
-seq:=sequential(result1, result2, result3, result4, result5);
+result5:=OUTPUT(Settings_Dataset_updated, NAMED('Attributes_Settings'));
+
+result6:=STD.System.Email.SendEmail(email_list, 'KEL SHELL QA UI run job',  'Your WUID ' + workunit + ' has completed!');
+
+seq:=sequential(result1, result2, result3, result4, result5, result6);
 
 RETURN seq;
 
