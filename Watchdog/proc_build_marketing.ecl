@@ -35,10 +35,11 @@ update_wdog := RoxieKeyBuild.updateversion(dops_pkg_wdog,filedate_wd,email_notif
 create_build_wdog := Orbit3.proc_Orbit3_CreateBuild('Watchdog Best',filedate_wd,env_flag_nb);
 
 //keydiff
-
+//DF-28374
+/*
 keydiff_nfcra := Watchdog.fGetIndexAttributes ( dops_pkg_wdog,'B',env_flag_n);
 
-keydiff_marketing := Watchdog.fGetIndexAttributes (dops_pkg_mktg,'B',env_flag_n);
+keydiff_marketing := Watchdog.fGetIndexAttributes (dops_pkg_mktg,'B',env_flag_n);*/
 
 
 out_all := sequential(  
@@ -55,9 +56,9 @@ out_all := sequential(
                         updatedops,
                         update_wdog,
                         create_build,
-                        create_build_wdog,
+                        create_build_wdog/*,
                         keydiff_nfcra,
-                        keydiff_marketing
+                        keydiff_marketing*/
                         
                         ) : FAILURE(send_bad_email);
 
