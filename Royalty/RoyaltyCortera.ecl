@@ -7,14 +7,14 @@
     
   EXPORT InHouse := MODULE
   
-    EXPORT GetOnlineRoyalties(dRecsOut, allowSBA20attrs) := 
+    EXPORT GetOnlineRoyalties(dRecsOut, isTrackingCorteraFromSBA21) := 
       FUNCTIONMACRO	
       
         dTGRoyalOut := 
           DATASET([{
                     Royalty.Constants.RoyaltyCode.CORTERA_FILE,
                     Royalty.Constants.RoyaltyType.CORTERA_FILE,
-                    (UNSIGNED)((INTEGER)( Royalty.RoyaltyCortera.isInhouseCorteraHit(dRecsOut[1].Version2.SourceIndex) AND allowSBA20attrs )),
+                    (UNSIGNED)((INTEGER)( Royalty.RoyaltyCortera.isInhouseCorteraHit(dRecsOut[1].Version21.SourceIndex) AND isTrackingCorteraFromSBA21 )),
                     0
                   }],Royalty.Layouts.Royalty);			
         
@@ -58,7 +58,7 @@
         RETURN dTGRoyalOut;
     ENDMACRO;	
 
-    EXPORT GetBatchRoyaltiesByAcctno(dInF, dRecsOut, fAcctno='acctno', allowSBA20attrs) := 
+    EXPORT GetBatchRoyaltiesByAcctno(dInF, dRecsOut, fAcctno='acctno', isTrackingCorteraFromSBA21) := 
       FUNCTIONMACRO
 
       Royalty.Layouts.RoyaltyForBatch tPrepForRoyalty(RECORDOF(dInF) l, RECORDOF(dRecsOut) r) :=
@@ -66,7 +66,7 @@
           SELF.acctno            := l.acctno;
           SELF.royalty_type_code := Royalty.Constants.RoyaltyCode.CORTERA_FILE;
           SELF.royalty_type      := Royalty.Constants.RoyaltyType.CORTERA_FILE;
-          SELF.royalty_count     := (UNSIGNED)((INTEGER)( Royalty.RoyaltyCortera.isInhouseCorteraHit(r.Version2.SourceIndex) AND allowSBA20attrs )); 
+          SELF.royalty_count     := (UNSIGNED)((INTEGER)( Royalty.RoyaltyCortera.isInhouseCorteraHit(r.Version21.SourceIndex) AND isTrackingCorteraFromSBA21 )); 
           SELF.non_royalty_count := 0;
           SELF.source_type       := Royalty.Constants.SourceType.INHOUSE;
         END;

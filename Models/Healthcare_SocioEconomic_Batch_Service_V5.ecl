@@ -23,7 +23,7 @@ export Healthcare_SocioEconomic_Batch_Service_V5 := MACRO
 	drmFailMsg := IF(DataRestrictionMask_in = _blank, Models.Healthcare_Constants_Core.inv_DataRestriction_msg, _blank);
 	dpmFailMsg := IF(DataPermissionMask_in = _blank, Models.Healthcare_Constants_Core.inv_DataPermission_msg, _blank);
 	dppaFailMsg := IF(DPPAPurpose_in <> Models.Healthcare_Constants_Core.authorized_DPPA, Models.Healthcare_Constants_Core.inv_DPPA_msg, _blank);
-	dmfFailMsg := IF((unsigned1)DMFPurpose_in <> Models.Healthcare_Constants_Core.authorized_DMF, Models.Healthcare_Constants_Core.inv_DMF_msg, _blank);
+	dmfFailMsg := IF(DMFPurpose_in <> Models.Healthcare_Constants_Core.authorized_DMF, Models.Healthcare_Constants_Core.inv_DMF_msg, _blank);
 	fcraFailMsg := IF(FCRAPurpose_in <> Models.Healthcare_Constants_Core.authorized_FCRA, Models.Healthcare_Constants_Core.inv_FCRA_msg, _blank);
 	glbFailMsg := IF((allowAltPermissiblePurpose = 0 AND GLBPurpose_in <> Models.Healthcare_Constants_Core.authorized_GLBA) 
 						OR (allowAltPermissiblePurpose = 1 AND GLBPurpose_in <> Models.Healthcare_Constants_Core.alt_GLBA), 

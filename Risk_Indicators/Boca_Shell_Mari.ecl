@@ -39,8 +39,9 @@ raw_data_roxie_unsuppressed := join (ids_only, key_main,
 		left.did<>0 and
     keyed (left.did = right.s_did) and
 		(unsigned)(((string)right.date_first_seen)[1..6]) < left.historydate and
-		right.std_source_upd not in risk_indicators.iid_constants.restricted_Mari_vendor_set,
-		append_mari(left, right),
+		right.std_source_upd not in risk_indicators.iid_constants.restricted_Mari_vendor_set and
+		(string)right.persistent_record_id not in left.proflic_correct_RECORD_ID,
+    append_mari(left, right),
     atmost(riskwise.max_atmost),
 		keep(100)
   );
@@ -51,7 +52,8 @@ raw_data_thor_unsuppressed := join (
 distribute(ids_only(did<>0), did), 
 distribute(pull(key_main(std_source_upd not in risk_indicators.iid_constants.restricted_Mari_vendor_set)), s_did),
     left.did = right.s_did and
-		(unsigned)(((string)right.date_first_seen)[1..6]) < left.historydate,
+		(unsigned)(((string)right.date_first_seen)[1..6]) < left.historydate and 
+ 		(string)right.persistent_record_id not in left.proflic_correct_RECORD_ID,
 		append_mari(left, right),
     atmost(left.did=right.s_did, riskwise.max_atmost),
 		keep(100), local

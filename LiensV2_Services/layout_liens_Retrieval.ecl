@@ -1,5 +1,5 @@
 
-import $, BatchShare, ffd, liensv2, DeferredTask;
+import $, BatchShare, iesp, ffd, liensv2, DeferredTask;
 
 layout_main_raw  := liensv2.Layout_liens_main_module.layout_liens_main;
 layout_party_raw := liensv2.Layout_liens_party;
@@ -105,7 +105,53 @@ export layout_liens_retrieval := module
   string error_desc := '';
  end;
 
+ // test seed layouts
+export layout_testseed_liens := RECORD
 
+   string30 Seq;
+	 string8 DateFiled ;  
+   string2 LienTypeID;
+   string15 Amount;    
+	 string8 ReleaseDate;    
+   string120 Defendant   ;
+   string10 StreetNumber ;
+   string2 StreetPreDirection ;
+   string28 StreetName ;
+   string4 StreetSuffix ;
+   string2 StreetPostDirection ;
+   string10 UnitDesignation ;
+   string8 UnitNumber;
+   string60 StreetAddress1;
+   string60 StreetAddress2;
+   string25 City;
+   string2 State;
+   string5 Zip5;
+   string4 Zip4;
+   string18 County ;
+   string9 PostalCode ;
+   string50  StateCityZip ;
+   unsigned ConsumerStatementId;
+
+  end;
+
+ export layout_testseed_search := RECORD
+
+  	string12  LexID;
+    string9 SSN;
+    dataset(layout_testseed_liens) Liens;
+    string4 Alert1;
+  	string4 Alert2;
+  	string4 Alert3;
+  	string4 Alert4;
+	  string4 Alert5;
+	  string4 Alert6;
+  	string4 Alert7;
+	  string4 Alert8;
+	  string4 Alert9;
+	  string4 Alert10;
+   	dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements;
+    
+ end;
 
 end;
 

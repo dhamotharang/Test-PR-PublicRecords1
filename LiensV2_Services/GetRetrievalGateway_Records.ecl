@@ -9,13 +9,13 @@ EXPORT GetRetrievalGateway_Records := MODULE
 
     iesp.okc_courtrunner_request.t_OkcCourtRunnerRequest setRequest($.layout_liens_retrieval.search_recs L) := TRANSFORM
 
-
-        LJType := MAP(L.filing_type_desc in risk_indicators.iid_constants.setSuitsFCRA => '',
+        ftd := TRIM(STD.Str.ToUpperCase(L.filing_type_desc));
+        LJType := MAP(ftd in risk_indicators.iid_constants.setSuitsFCRA => '',
                 L.rmsid = '' => '',
-                L.filing_type_desc in risk_indicators.iid_constants.setPRJudgment => risk_indicators.iid_constants.JudgmentText,
-                L.filing_type_desc in risk_indicators.iid_constants.setPREviction => risk_indicators.iid_constants.EvictionText,
-                L.filing_type_desc in risk_indicators.iid_constants.setPRLien => risk_indicators.iid_constants.LienText,
-                L.filing_type_desc NOT in risk_indicators.iid_constants.setPROther => risk_indicators.iid_constants.OtherText,
+                ftd in risk_indicators.iid_constants.setPRJudgment => risk_indicators.iid_constants.JudgmentText,
+                ftd in risk_indicators.iid_constants.setPREviction => risk_indicators.iid_constants.EvictionText,
+                ftd in risk_indicators.iid_constants.setPRLien => risk_indicators.iid_constants.LienText,
+                ftd NOT in risk_indicators.iid_constants.setPROther => risk_indicators.iid_constants.OtherText,
                 '');
          is_Lien := LJType = risk_indicators.iid_constants.LienText;
          is_Jgmt := LJType IN [
@@ -47,7 +47,7 @@ EXPORT GetRetrievalGateway_Records := MODULE
       iesp.okc_courtrunner_request.t_OkcCourtRunnerResponseEx;
       STRING50 RMSID;
       STRING50 TMSID;
-      STRING10 ORIG_RMSID;
+      STRING10 Orig_RMSID;
     END;
 
     okc_w_xmlreq := PROJECT(okc_response, TRANSFORM(rec_w_xmlreq,
@@ -60,7 +60,7 @@ EXPORT GetRetrievalGateway_Records := MODULE
        OUTPUT(PROJECT(okc_w_xmlreq, TRANSFORM(Risk_Reporting.Layouts.LOG_DTE_Layout,
                                   SELF.TaskId            := LEFT.Response.Result.TaskID;
                                   SELF.TaskDescription   := $.Constants.LIENS_RETRIEVAL.OKC_TASK_DESC;
-                                  SELF.Request_XML       := '<Request_XML><RMSID>' + LEFT.RMSID + '</RMSID>' + '<TMSID>' + LEFT.TMSID + '</TMSID>' + '<ORIG_RMSID>' + LEFT.ORIG_RMSID + '</ORIG_RMSID></Request_XML>')),
+                                  SELF.Request_XML       := '<Request_XML><RMSID>' + LEFT.RMSID + '</RMSID>' + '<TMSID>' + LEFT.TMSID + '</TMSID>' + '<Orig_RMSID>' + LEFT.ORIG_RMSID + '</Orig_RMSID></Request_XML>')),
        NAMED('LOG_Deferred_Task_ESP')));
 
   RETURN output_okc;
@@ -213,7 +213,7 @@ EXPORT GetRetrievalGateway_Records := MODULE
                                 resolved_to_none => FCRA.Constants.ALERT_CODE.NO_DID_FOUND,
                                 '0');
 
-         SELF.error_desc := IF(L.ErrorMessage <> '', L.ErrorMessage, '');
+         SELF.error_desc := L.ErrorMessage;
                               
         SELF := [];
     END;

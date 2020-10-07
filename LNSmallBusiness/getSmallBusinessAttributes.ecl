@@ -909,6 +909,7 @@ EXPORT getSmallBusinessAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusSh
 		SELF.Version21.B2BActv31pDpdBalTotGrow1Y := attr.B2BActv31pDpdBalTotGrow1Y;
 		SELF.Version21.B2BActv61pDpdBalTotGrow1Y := attr.B2BActv61pDpdBalTotGrow1Y;
 		SELF.Version21.B2BActv91pDpdBalTotGrow1Y := attr.B2BActv91pDpdBalTotGrow1Y;
+		SELF.Version21.SourceIndex := attr.SourceIndex; 
 
 		// SBFE data
 		SELF.SBFEHitIndex := attr.SBFEHitIndex;
