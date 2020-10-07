@@ -460,7 +460,7 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 				MDR.SourceTools.src_SDA => KELPermissions.Permit_SDA,
 				MDR.SourceTools.src_SDAA => KELPermissions.Permit_SDAA,
 				//MDR.SourceTools.src_SEC_Broker_Dealer => KELPermissions.Permit_SEC_Broker_Dealer,
-				//MDR.SourceTools.src_sexoffender => KELPermissions.Permit_sexoffender,
+				MDR.SourceTools.src_sexoffender => KELPermissions.Permit_sexoffender,
 				//MDR.SourceTools.src_Sheila_Greco => KELPermissions.Permit_Sheila_Greco,
 				//MDR.SourceTools.src_SKA => KELPermissions.Permit_SKA,
 				//MDR.SourceTools.src_FL_SO => KELPermissions.Permit_FL_SO,
@@ -1030,7 +1030,7 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_SDA)), KELPermissions.Permit_SDA, KELPermissions.Permit__NONE),
 			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_SDAA)), KELPermissions.Permit_SDAA, KELPermissions.Permit__NONE),
 			//BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_SEC_Broker_Dealer)), KELPermissions.Permit_SEC_Broker_Dealer, KELPermissions.Permit__NONE),
-			//BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_sexoffender)), KELPermissions.Permit_sexoffender, KELPermissions.Permit__NONE),
+			BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_sexoffender)), KELPermissions.Permit_sexoffender, KELPermissions.Permit__NONE),
 			//BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_Sheila_Greco)), KELPermissions.Permit_Sheila_Greco, KELPermissions.Permit__NONE),
 			//BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_SKA)), KELPermissions.Permit_SKA, KELPermissions.Permit__NONE),
 			//BitOr(IF(EXISTS(AllowedSources(Source = MDR.SourceTools.src_FL_SO)), KELPermissions.Permit_FL_SO, KELPermissions.Permit__NONE),
@@ -1210,7 +1210,7 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 			)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
 			)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
 			)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
-			))))))))))));
+			)))))))))))));
 
 		RETURN(Permissions);
 	END;
@@ -1661,7 +1661,7 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 			{'Permit_SDA', BitAnd(KELDPM, KELPermissions.Permit_SDA) <> KELPermissions.Permit__NONE},
 			{'Permit_SDAA', BitAnd(KELDPM, KELPermissions.Permit_SDAA) <> KELPermissions.Permit__NONE},
 			//{'Permit_SEC_Broker_Dealer', BitAnd(KELDPM, KELPermissions.Permit_SEC_Broker_Dealer) <> KELPermissions.Permit__NONE},
-			//{'Permit_sexoffender', BitAnd(KELDPM, KELPermissions.Permit_sexoffender) <> KELPermissions.Permit__NONE},
+			{'Permit_sexoffender', BitAnd(KELDPM, KELPermissions.Permit_sexoffender) <> KELPermissions.Permit__NONE},
 			//{'Permit_Sheila_Greco', BitAnd(KELDPM, KELPermissions.Permit_Sheila_Greco) <> KELPermissions.Permit__NONE},
 			//{'Permit_SKA', BitAnd(KELDPM, KELPermissions.Permit_SKA) <> KELPermissions.Permit__NONE},
 			//{'Permit_FL_SO', BitAnd(KELDPM, KELPermissions.Permit_FL_SO) <> KELPermissions.Permit__NONE},

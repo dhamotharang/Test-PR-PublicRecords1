@@ -84,7 +84,7 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
   OKC_gateway_success := ~input.DeferredTaskRequest AND search_recs[1].IsOKCSuccess;
   // gateway_failed includes g/w network failures and exceptions returned from gateway and 
   // excludes did not found and no recs found
-  gateway_failed      := search_recs[1].error_code <> '' AND search_recs[1].error_code NOT IN [$.constants.LIENS_RETRIEVAL.NO_RECS_FOUND_CODE,
+  gateway_failed      := (UNSIGNED)search_recs[1].error_code <> 0 AND search_recs[1].error_code NOT IN [$.constants.LIENS_RETRIEVAL.NO_RECS_FOUND_CODE,
                                                           FCRA.Constants.ALERT_CODE.NO_DID_FOUND];
   // do not show CS for okc submission request & do not show CS if dte gateway request fails
   BOOLEAN showConsumerStatements     := FFD.FFDMask.isShowConsumerStatements(input.FFDOptionsMask) AND  dte_gateway_success;
@@ -94,8 +94,11 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
   no_dte_did_resolved     := input.DeferredTaskRequest AND search_recs[1].error_code = FCRA.Constants.ALERT_CODE.NO_DID_FOUND;
   no_didresolved          := resolved_did = 0 OR no_dte_did_resolved;
   BOOLEAN NoShowUniqueID  := no_didresolved OR OKC_gateway_success OR gateway_failed;
-  //do not log Inquiry in case of gateway failure
-  BOOLEAN NoInquiryLogging :=  gateway_failed;                                                                                       
+  // Specific conditions where Inquiry History (IH) logging should not occur.  See RR-20093
+  //  -	There was an error during processing (e.g. a error talking to gateway, or any other error) – we would not be returning anything of value
+  //  -	We could not determine the LexID associated with the PII .. there is nothing meaningful we are returning
+  //  -	We have deferred the request – we are returning nothing meaningful/of-value (yet .. when the resubmission occurs we will be (hopefully) returning something of value, and that is when IH logging should occur)
+  BOOLEAN NoInquiryLogging :=  resolved_did = 0 OR gateway_failed OR OKC_gateway_success;                                                                                       
                                 
   // add deceased flag
   recs_w_deceasedflag := dx_death_master.Get.byDid(ds_did, did, input,,,,Data_Services.data_env.iFCRA);
@@ -170,14 +173,14 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
 															     $.Constants.LIENS_RETRIEVAL.NO_RECS_FOUND_EXCEPTION}], iesp.share.t_WsException);
 
       // OKC exceptions
-      OKC_task_exceptions := search_recs[1].error_code <> '' AND search_recs[1].error_code IN [$.constants.LIENS_RETRIEVAL.OKC_TASK_ERRORS];
+      OKC_task_exceptions := search_recs[1].error_code <> '0' AND search_recs[1].error_code IN [$.constants.LIENS_RETRIEVAL.OKC_TASK_ERRORS];
       ds_task_exceptions := DATASET([{$.Constants.LIENS_RETRIEVAL.ERRORSOURCE,
 															       search_recs[1].error_code,
 															       '',
 															       search_recs[1].error_desc}], iesp.share.t_WsException); 
    
       // considering n/w errors excluding okc exceptions, no did found, no records found exception
-      gateway_network_failures := search_recs[1].error_code <> '' AND search_recs[1].error_code NOT IN [$.constants.LIENS_RETRIEVAL.OKC_TASK_ERRORS,
+      gateway_network_failures := (UNSIGNED)search_recs[1].error_code <> 0 AND search_recs[1].error_code NOT IN [$.constants.LIENS_RETRIEVAL.OKC_TASK_ERRORS,
                                                                     $.constants.LIENS_RETRIEVAL.NO_RECS_FOUND_CODE,
                                                                     FCRA.Constants.ALERT_CODE.NO_DID_FOUND];
                                                                     
@@ -192,16 +195,17 @@ EXPORT LiensRetrieval_Records($.IParam.liensRetrieval_params input,
                                   OKC_task_exceptions => ds_task_exceptions,
                                   DATASET([], iesp.share.t_WsException));
       
-      is_OKCsubmitted := ~input.DeferredTaskRequest AND OKC_gateway_success;
       //returns in case of okc submission success
-      SELF._Header.Message  := IF(is_OKCsubmitted, $.Constants.LIENS_RETRIEVAL.OKC_SUBMISSION_MESSAGE, '');
+      SELF._Header.Message  := IF(OKC_gateway_success, $.Constants.LIENS_RETRIEVAL.OKC_SUBMISSION_MESSAGE, '');
       SELF._Header:= iesp.ECL2ESP.GetHeaderRow();
       SELF.RecordCount := COUNT(ds_liens);
       SELF.InputEcho := srchby;
       SELF.Records := ds_liens;
       SELF.Alerts := IF(NoshowAlerts, DATASET([], iesp.riskview2.t_RiskView2Alert), SORT(get_alerts(), Code));
       SELF.ConsumerStatements := IF(showConsumerStatements, consumer_statements);
-      SELF.Consumer := FFD.MAC.PrepareConsumerRecord(IF(NoInquiryLogging, 0, resolved_did), TRUE, srchby);
+      SELF.Consumer :=  IF(NoInquiryLogging, 
+                           ROW([],iesp.share_fcra.t_FcraConsumer), 
+                           FFD.MAC.PrepareConsumerRecord(resolved_did, TRUE, srchby));
 
    END;
 

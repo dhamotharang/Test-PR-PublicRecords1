@@ -1,6 +1,6 @@
-﻿import Address, Autokey_batch, BatchServices, doxie, dx_Gong, mdr, POE, PSS, ut, Yellowpages, PAW_Services, paw, spoke, zoom,
+import $, Address, Autokey_batch, BatchServices, doxie, dx_Gong, mdr, POE, PSS, ut, Yellowpages, PAW_Services, paw, spoke, zoom,
        corp2, POEsFromEmails, one_click_data, SalesChannel, thrive, Email_Data, DCA, doxie_cbrs, Prof_LicenseV2, suppress, STD,
-       dx_DataBridge, dx_Database_USA;
+       Gateway, iesp, dx_DataBridge, dx_Database_USA, dx_gateway, dx_BestRecords;
 
 // NOTE: Within this module certain BatchServices.Workplace_* attributes are used.
 // This is because the BatchServices.WorkPlace_BatchService was created first,
@@ -1009,6 +1009,93 @@ export Functions := module
 
     RETURN ds_detail_wemail_deduped;
   END; // end of getDetailedWithEmail function
+
+  export GetNetwiseRecords(dataset(BatchServices.WorkPlace_Layouts.POE_lookup) dsSubjectDids, boolean CachedResponseOnly) := function
+
+    // Get best PII for each subject
+    dsBestRecs := dx_BestRecords.append(dsSubjectDids, lookupdid, dx_BestRecords.Constants.perm_type.glb);
+    dsBestReq := dsBestRecs(_best.fname <> '', _best.lname <> '', _best.st <> ''); // Required inputs for vendor gateway
+
+    // Netwise Gateway Request & Response
+    dsNetwiseReq := project(dsBestReq,
+                            transform(iesp.net_wise.t_NetWiseQueryRequest,
+                              self.SearchBy.UniqueID := (string) left.lookupdid,
+                              self.SearchBy.FirstName := left._best.fname,
+                              self.SearchBy.LastName := left._best.lname,
+                              self.SearchBy.City := left._best.city_name,
+                              self.SearchBy.State := left._best.st,
+                              self.SearchBy.Zip := left._best.zip,
+                              self.SearchBy.Age := left._best.age,
+                              self.SearchBy.Phone := (string) left._best.phone,
+                              self := []));
+
+    mod_params := Gateway.NetwiseSearch.IParams.GetParams_PersonSearch(CachedResponseOnly);  // Search Params for gateway  
+
+    makeGatewayCall := mod_params.gateways(Gateway.Configuration.IsNetWise(servicename))[1].url <> '';
+    dsNetwiseReqClean := dx_gateway.parser_netwise_email.fn_CleanRequest(dsNetwiseReq);
+    dsNetwiseResp := Gateway.SoapCall_NetWise(dsNetwiseReqClean, mod_params, , , makeGatewayCall, false);
+    dsNetwiseRespClean := dx_gateway.parser_netwise_email.fn_CleanResponse_LexID(dsNetwiseResp);
+
+    $.Layouts.poe_didkey_plus XformPOE(dx_gateway.parser_netwise_email.NetwiseResults_LexID l, iesp.net_wise_share.t_NetWiseWork r) := transform,
+      // Need a company name and a resolved LexID at the very least
+      skip(l.did = 0 or r.CompanyName = '')
+      // Clean name and address info
+      subject_clean_name := Address.GetCleanNameAddress.CleanPersonName(l.FullName, false);
+      raw_addr := r.Address;
+      temp_addr := iesp.ECL2ESP.SetAddress('', '', '', '', '','', '',
+                                          raw_addr.City, raw_addr.State,
+                                          raw_addr.Zip, '', '', '',
+                                          raw_addr.Address1, raw_addr.Address2, '');
+      clean_addr := Address.GetCleanNameAddress.fnCleanAddress(temp_addr);
+      // Fields sensitive to product requirements
+      self.source := MDR.sourceTools.src_Netwise;
+      self.source_order := BatchServices.WorkPlace_Constants.DEFAULT_SOURCE_ORDER;
+      self.spouse_indicator := 'N';
+      self.did := l.did;
+      self.company_name := STD.Str.ToUpperCase(r.CompanyName);
+      self.company_state := if(ut.valid_st(clean_addr.st), clean_addr.st, skip); // USA records only
+      self.company_phone1 := r.phone;
+      self.email1 := if(checkNonPersonalEmail(r.Email), STD.Str.ToUpperCase(r.Email), '');
+      self.email_src1 := if(self.email1 <> '', MDR.sourceTools.src_Netwise, '');
+      self.dt_last_seen := map(
+        STD.Str.ToUpperCase(r.StartYear) = BatchServices.WorkPlace_Constants.NETWISE_DT_CURRENT => (unsigned) STD.Date.Today(),
+        r.StartYear <> '' => (unsigned) (r.StartYear + '1231'), /* Netwise returns only YYYY */
+        0
+      );
+      // Other relevant POE fields from netwise
+      self.subject_first_name := subject_clean_name.fname;
+      self.subject_last_name := subject_clean_name.lname;
+      self.company_prim_range := clean_addr.prim_range;
+      self.company_predir := clean_addr.predir;
+      self.company_prim_name := clean_addr.prim_name;
+      self.company_addr_suffix := clean_addr.addr_suffix;
+      self.company_postdir := clean_addr.postdir;
+      self.company_unit_desig := clean_addr.unit_desig;
+      self.company_sec_range := clean_addr.sec_range;
+      self.company_zip5 := clean_addr.zip;
+      self.company_zip4 := clean_addr.zip4;
+      self.company_city := clean_addr.p_city_name;
+      self := [];
+    end;
+
+    // Extract relevant POE data from results, modify/filter signficant fields and xform onto POE layout
+    dsNetwiseResults := normalize(dsNetwiseRespClean, left.response.results, transform(right));
+    dsNetwiseWorkRecs := normalize(dsNetwiseResults, left.WorkRecords, XformPOE(left, right));
+    // Ensure that subject DIDs resolved from gateway response are the intended ones, append ssn
+    dsNetwiseWorkRecsSSN := join(dsNetwiseWorkRecs, dsBestRecs,
+                                left.did = right.lookupdid,
+                                transform($.Layouts.poe_didkey_plus,
+                                  self.subject_ssn := right._best.ssn_unmasked,
+                                  self := left));
+
+    // output(dsBestRecs, named('dsBestRecs'));
+    // output(dsNetwiseReqClean, named('dsNetwiseReqClean'));
+    // output(dsNetwiseRespClean, named('dsNetwiseRespClean'));
+    // output(dsNetwiseWorkRecsSSN, named('dsNetwiseWorkRecsSSN'));
+
+    return dsNetwiseWorkRecsSSN;
+
+  end;
 
   EXPORT getParentCompany(DATASET(WorkPlace_Services.Layouts.poe_didkey_plus) ds_recs_in, BOOLEAN IncludeCorp= FALSE) := FUNCTION
 

@@ -3,12 +3,12 @@
 import Scoring_QA_New_Bins, scoring_project_pip, Scoring_Project_Macros;
 
 
-file1_2:= dataset(route + scoring_project_pip.Output_Sample_Names.Profile_Booster_Capone_outfile + previous_dt, Scoring_Project_Macros.Global_Output_Layouts.ProfileBooster_layout,thor);
+file1_2:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.Profile_Booster_Capone_outfile + previous_dt, Scoring_Project_Macros.Global_Output_Layouts.ProfileBooster_layout,thor),(integer)acctno);
 // file1_2:= dataset(route + scoring_project_pip.Output_Sample_Names.Profile_Booster_Capone_outfile + previous_dt, Scoring_QA_New_Bins.FP31505_0_Pii_layout,thor);
 
 
 
-file2_2:= dataset(route + scoring_project_pip.Output_Sample_Names.Profile_Booster_Capone_outfile + current_dt, Scoring_Project_Macros.Global_Output_Layouts.ProfileBooster_layout,thor);
+file2_2:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.Profile_Booster_Capone_outfile + current_dt, Scoring_Project_Macros.Global_Output_Layouts.ProfileBooster_layout,thor),(integer)acctno);
 // file2_2:= dataset(route + scoring_project_pip.Output_Sample_Names.Profile_Booster_Capone_outfile + current_dt, Scoring_QA_New_Bins.FP31505_0_Pii_layout,thor);
 
 

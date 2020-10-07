@@ -6,11 +6,12 @@
 // modified a little to handle batch records.
 EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfoClean) ds_CleanedInput,
 	                                  Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
-                                    BusinessInstantID20_Services.Layouts.OFACAndWatchlistLayoutFlat watchlists,unsigned1 LexIdSourceOptout								  = 1,
-			string TransactionID 												= '',
-			string BatchUID														  = '',
-			unsigned6 GlobalCompanyId 									= 0 ) := 
-	FUNCTION
+                                    DATASET(BusinessInstantID20_Services.Layouts.OFACAndWatchlistLayoutFlat) watchlists,
+                                    unsigned1 LexIdSourceOptout = 1,
+                                    string    TransactionID     = '',
+                                    string    BatchUID          = '',
+                                    unsigned6 GlobalCompanyId   = 0,
+                                    BusinessInstantID20_Services.iOptions TransformOptions) := FUNCTION
 
 			Risk_indicators.MAC_unparsedfullname(title_val,fname_val,mname_val,lname_val,suffix_val,'FirstName','MiddleName','LastName','NameSuffix')
 
@@ -22,6 +23,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			boolean IncludeDOBInCVI                     := false : STORED('IncludeDOBInCVI');
 			boolean IncludeDriverLicenseInCVI           := false : STORED('IncludeDriverLicenseInCVI');
 			boolean DisableInquiriesInCVI               := false : STORED('DisableCustomerNetworkOptionInCVI');
+
 			
 
 			// Per Product Mgmt guidance, turn off Gateway calls to Targus here in CIID.
@@ -386,7 +388,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 															if(uniqueid<>0 and FromID2, Risk_Indicators.iid_constants.BSOptions.RetainInputDID,0) +
 															if(EnableEmergingID, Risk_Indicators.iid_constants.BSOptions.EnableEmergingID,0);
 																														
-			ret := risk_indicators.InstantID_Function(prep, 
+			InstantIDResults := risk_indicators.InstantID_Function(prep, 
 					gateways, 
 					DPPA_Purpose, 
 					GLB_Purpose, 
@@ -429,6 +431,64 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 					 BatchUID := BatchUID, 
 					 GlobalCompanyID := GlobalCompanyID
 					);
+
+      LastNumFunction(unsigned in_num) := 
+      FUNCTION 
+        lastnum := in_num % 10;
+        Return((unsigned1) lastnum);
+      END;
+
+      /* The next 4 lines of code will help us determin the number of loops we will need to complete, as well as the sequence numbers we need to 
+      match.  This nets us 3 gains, 1, it will limit the amount of times we need to build the denormed list, the existing transform that is used in fn_DenormAuthRepWatchlist that builds that list 
+      per rep actually builds all 5 reps but only allows you to assign one rep so its expensive in that reguard.  secondly it will add elasticity/adaptability to the code,  if in the future we decide to add 6 reps for 
+      example, we will not need to address this code. */
+
+      ds_SeqNums := project(ungroup(InstantIDResults), transform({Integer seq}, self.seq := LastNumFunction(left.seq);));
+      SeqSet := SET(ds_SeqNums, seq);
+      SeqDecending := SORT(ds_SeqNums, -seq, few);
+      numOfLoops := SeqDecending[1].seq;
+
+       // taking the flat watchlist and turning it into a denorm DS for to join in required info into ret
+      AuthRepTransForms := BusinessInstantID20_Services.Transforms(TransformOptions);
+      DenormAuthRepRecs := AuthRepTransForms.fn_DenormAuthRepWatchlist(watchlists,numOfLoops,SeqSet);
+
+
+      Risk_Indicators.Layout_Output RetJoinTrans(Risk_Indicators.Layout_Output le, BusinessInstantID20_Services.Layouts.DenormalizedAuthRepWatchlist ri) := TRANSFORM
+                        SELF.Watchlist_Table := ri.repinfo[1].watchlist_table;
+                        SELF.Watchlist_Program :=ri.repinfo[1].watchlist_program;
+                        SELF.Watchlist_Record_Number := ri.repinfo[1].Watchlist_Record_Number;
+                        SELF.Watchlist_fname := ri.repinfo[1].Watchlist_fname;
+                        SELF.Watchlist_lname := ri.repinfo[1].Watchlist_lname;
+                        SELF.Watchlist_address := ri.repinfo[1].Watchlist_address;
+                        // parsed watchlist address
+                        SELF.WatchlistPrimRange := ri.repinfo[1].WatchlistPrimRange;
+                        SELF.WatchlistPreDir := ri.repinfo[1].WatchlistPreDir;
+                        SELF.WatchlistPrimName := ri.repinfo[1].WatchlistPrimName;
+                        SELF.WatchlistAddrSuffix := ri.repinfo[1].WatchlistAddrSuffix;
+                        SELF.WatchlistPostDir := ri.repinfo[1].WatchlistPostDir;
+                        SELF.WatchlistUnitDesignation := ri.repinfo[1].WatchlistUnitDesignation;
+                        SELF.WatchlistSecRange := ri.repinfo[1].WatchlistSecRange;
+                        //
+                        SELF.Watchlist_city := ri.repinfo[1].Watchlist_city;
+                        SELF.Watchlist_state := ri.repinfo[1].Watchlist_state;
+                        SELF.Watchlist_zip := ri.repinfo[1].Watchlist_zip;
+                        SELF.Watchlist_contry := ri.repinfo[1].Watchlist_contry;
+                        SELF.Watchlist_Entity_Name := ri.repinfo[1].Watchlist_Entity_Name;
+                        SELF := LE;
+                    
+      END;
+
+  //Add watchlist info to the ID recs since we dont hit the watchlist.
+      // ret := JOIN(InstantIDResults, DenormAuthRepRecs , 
+      //             LastNumFunction(LEFT.seq) = RIGHT.seq,
+      //                   RetJoinTrans(LEFT,RIGHT), GROUPED           
+      //             );
+
+         ret := JOIN(InstantIDResults, DenormAuthRepRecs , 
+                  LEFT.seq = RIGHT.seq,
+                        RetJoinTrans(LEFT,RIGHT), GROUPED           
+                  );
+
 
 			targus := Royalty.RoyaltyTargus.GetOnlineRoyalties(UNGROUP(ret), src, TargusType, TRUE, FALSE, FALSE, TRUE);
 
@@ -1012,6 +1072,17 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			// OUTPUT( post_dob_masking, NAMED('post_dob_masking') );
       // OUTPUT( InstantID_records_pre, NAMED('InstantID_records_pre') );
       // OUTPUT( InstantID_records_srtd, NAMED('InstantID_records_srtd') );
+        // OUTPUT( DenormAuthRepRecs, NAMED('DenormAuthRepRecs') );
+      //  OUTPUT(ret,NAMED('ret'));
+      //  OUTPUT(ret_temp2,NAMED('ret_temp2'));
+      //  OUTPUT(ret_temp,NAMED('ret_temp'));
+        // OUTPUT(InstantIDResults,NAMED('InstantIDResults'));
+        // OUTPUT(watchlists,NAMED('watchlists'));
+    
+      // OUTPUT(SeqSet,NAMED('SeqSet'));
+      // OUTPUT(SeqDecending,NAMED('SeqDecending'));
+      // OUTPUT(numOfLoops,NAMED('numOfLoops'));
+
 
 		RETURN InstantID_records;
 	END;

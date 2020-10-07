@@ -1,10 +1,10 @@
-﻿import FLAccidents_Ecrash, Risk_Indicators, lib_stringlib, ut, doxie;
+﻿import FLAccidents_Ecrash, ut, doxie,eCrash_Services;
 EXPORT RawDocument(IParam.searchrecords in_mod) := MODULE
 
 EXPORT GetReportDocuments(string RequestReportId, string DocumentType='') := FUNCTION
 
 		DeltaBaseService := eCrash_Services.DeltaBaseSoapCall(in_mod);
-		DeltaBaseSql := RawDeltaBaseSQL(in_mod);	
+		DeltaBaseSql := eCrash_Services.RawDeltaBaseSQL(in_mod);	
 		SuperReportIdToReportId := CHOOSEN(FLAccidents_Ecrash.Key_eCrashV2_ReportId(KEYED(report_id = RequestReportId)), 1);
 		SuperReportId := if(exists(SuperReportIdToReportId),SuperReportIdToReportId[1].Super_report_id,'');
 		//SuperReportId := (string11)SuperReportIdToReportId.Super_report_id;
@@ -88,6 +88,7 @@ EXPORT GetReportDocuments(string RequestReportId, string DocumentType='') := FUN
 			self.reportTypeId := l.Report_type;
 			self.pageCount := l.Page_Count;
 			self.extension := l.extension;
+			self.ReportSource := l.Report_Source;
 			self := [];
 		END;
 		

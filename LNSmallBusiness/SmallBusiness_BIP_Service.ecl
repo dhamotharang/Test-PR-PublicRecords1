@@ -292,12 +292,12 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	string10 DOB_Mask               := IF(users.DOBMask != '', users.DOBMask, outofbanddobmask);
 	BOOLEAN DL_Mask                 := users.DLMask;
 	BOOLEAN ExcludeDMVPII           := users.ExcludeDMVPII;
-	BOOLEAN ArchiveOptIn            := False : STORED('instantidarchivingoptin');
+	BOOLEAN ArchiveOptIn            := FALSE : STORED('instantidarchivingoptin');
 	BOOLEAN DisableIntermediateShellLoggingOutOfBand := FALSE : STORED('OutcomeTrackingOptOut');
 	DisableOutcomeTracking := DisableIntermediateShellLoggingOutOfBand OR users.OutcomeTrackingOptOut;
 
 	//Look up the industry by the company ID.
-	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.LNSmallBusiness__SmallBusiness_BIP_Service);
+	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID AND s_product_id = (STRING)Risk_Reporting.ProductID.LNSmallBusiness__SmallBusiness_BIP_Service);
 /* ************* End Scout Fields **************/
 
 	UNSIGNED1 DPPAPurpose_stored      := Business_Risk_BIP.Constants.Default_DPPA                : STORED('DPPAPurpose');
@@ -307,10 +307,10 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	STRING5 IndustryClass_stored      := Business_Risk_BIP.Constants.Default_IndustryClass       : STORED('IndustryClass');
 
 	//CCPA fields
-	unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
-	string TransactionID := '' : STORED('_TransactionId');
-	string BatchUID := '' : STORED('_BatchUID');
-	unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+	UNSIGNED1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+	STRING TransactionID := '' : STORED('_TransactionId');
+	STRING BatchUID := '' : STORED('_BatchUID');
+	UNSIGNED6 GlobalCompanyId := 0 : STORED('_GCID');
     
 	// Below we'll prefer users.DataRestrictionMask, users.DataPermissionMask, users.industryclass, etc., over
 	// DataRestrictionMask_stored, DataPermissionMask_stored, etc., since they are "internal" or overridden values
@@ -711,7 +711,7 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	// Starts with 'LOG_' (Upper case is important!!)
 	// Middle part is the database name, in this case: 'log__mbs'
 	// Must end with '_intermediate__log'
-	IF(~DisableOutcomeTracking and ~TestDataEnabled, OUTPUT(intermediateLog, NAMED('LOG_log__mbs_intermediate__log')) );
+	IF(~DisableOutcomeTracking AND ~TestDataEnabled, OUTPUT(intermediateLog, NAMED('LOG_log__mbs_intermediate__log')) );
 
 	// Calculate royalties. For SBFE...:
 	SBFE_royalties := IF( TestDataEnabled, Royalty.RoyaltySBFE.GetNoRoyalties(), Royalty.RoyaltySBFE.GetOnlineRoyalties(SBA_Results) );
@@ -734,91 +734,93 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	Targus_PhoneSource := PhoneSources(source = MDR.sourceTools.src_Targus_Gateway);
 	Targus_royalties := Royalty.RoyaltyTargus.GetOnlineRoyalties(Targus_PhoneSource, source, TargusType, TRUE, TRUE, FALSE, FALSE);
 	
-	// ...and for Cortera:
-	allow_SBA20_attrs := AttributesRequested(AttributeGroup[1..18] = LNSmallBusiness.Constants.SMALL_BIZ_ATTR)[1].AttributeGroup[19..] = '2';
-	Cortera_royalties := IF( TestDataEnabled, Royalty.RoyaltyCortera.InHouse.GetNoRoyalties(), Royalty.RoyaltyCortera.InHouse.GetOnlineRoyalties(SBA_Results,allow_SBA20_attrs) );
- 
+	/* ************************************************************************
+	**                    Tracking Cortera Royalties                          *
+	***************************************************************************/
+	isTrackingCorteraFromSBA21 := EXISTS(AttributesRequested(AttributeGroup = Std.Str.ToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_ATTR_V21_NAME)));
+	Cortera_royalties := IF(TestDataEnabled, Royalty.RoyaltyCortera.InHouse.GetNoRoyalties(), Royalty.RoyaltyCortera.InHouse.GetOnlineRoyalties(SBA_Results, isTrackingCorteraFromSBA21));
+
 	// Accumulate all Royalties: 
 	total_royalties := SBFE_royalties + Targus_royalties + Cortera_royalties;
 	
 	OUTPUT(total_royalties, NAMED('RoyaltySet'));
 
 	//Log to Deltabase
-	Deltabase_Logging_prep := PROJECT(Final_Results, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
-																							 self.company_id := (Integer)CompanyID,
-																							 self.login_id := _LoginID,
-																							 self.product_id := Risk_Reporting.ProductID.LNSmallBusiness__SmallBusiness_BIP_Service,
-																							 self.function_name := FunctionName,
-																							 self.esp_method := ESPMethod,
-																							 self.interface_version := InterfaceVersion,
-																							 self.delivery_method := DeliveryMethod,
-																							 self.date_added := (STRING8)Std.Date.Today(),
-																							 self.death_master_purpose := DeathMasterPurpose,
-																							 self.ssn_mask := SSN_Mask,
-																							 self.dob_mask := DOB_Mask,
-																							 self.dl_mask := (String)(Integer)DL_Mask,
-																							 self.exclude_dmv_pii := (String)(Integer)ExcludeDMVPII,
-																							 self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
-																							 self.archive_opt_in := (String)(Integer)ArchiveOptIn,
-                                               self.glb := GLBA_Purpose,
-                                               self.dppa := DPPA_Purpose,
-																							 self.data_restriction_mask := DataRestrictionMask,
-																							 self.data_permission_mask := DataPermissionMask,
-																							 self.industry := Industry_Search[1].Industry,
-																							 self.i_attributes_name := AttributesRequested[1].AttributeGroup,
-																							 self.i_ssn := search.AuthorizedRep1.SSN,
-                                               self.i_dob := Rep_1_DOB,
-                                               self.i_name_full := search.AuthorizedRep1.Name.Full,
-																							 self.i_name_first := search.AuthorizedRep1.Name.First,
-																							 self.i_name_last := search.AuthorizedRep1.Name.Last,
-																							 self.i_lexid := (Integer)search.AuthorizedRep1.UniqueId, 
-																							 self.i_address := IF(TRIM(search.AuthorizedRep1.address.streetaddress1)!='', search.AuthorizedRep1.address.streetaddress1,
-																																				 Address.Addr1FromComponents(search.AuthorizedRep1.address.streetnumber,
-																																				 search.AuthorizedRep1.address.streetpredirection, search.AuthorizedRep1.address.streetname,
-																																				 search.AuthorizedRep1.address.streetsuffix, search.AuthorizedRep1.address.streetpostdirection,
-																																				 search.AuthorizedRep1.address.unitdesignation, search.AuthorizedRep1.address.unitnumber)),
-																							 self.i_city := search.AuthorizedRep1.address.City,
-																							 self.i_state := search.AuthorizedRep1.address.State,
-																							 self.i_zip := search.AuthorizedRep1.address.Zip5,
-																							 self.i_dl := search.AuthorizedRep1.DriverLicenseNumber,
-																							 self.i_dl_state := search.AuthorizedRep1.DriverLicenseState,
-                                               self.i_home_phone := Rep_1_Phone10,
-																							 self.i_tin := search.Company.FEIN,
-																							 self.i_name_first_2 := search.AuthorizedRep2.Name.First,
-																							 self.i_name_last_2 := search.AuthorizedRep2.Name.Last,
-																							 self.i_name_first_3 := search.AuthorizedRep3.Name.First,
-																							 self.i_name_last_3 := search.AuthorizedRep3.Name.Last,
-																							 self.i_bus_name := search.Company.CompanyName,
-                                               self.i_alt_bus_name := search.Company.AlternateCompanyName,
-																							 self.i_bus_address := IF(TRIM(search.Company.address.streetaddress1)!='', search.Company.address.streetaddress1,
-																																						 Address.Addr1FromComponents(search.Company.address.streetnumber,
-																																						 search.Company.address.streetpredirection, search.Company.address.streetname,
-																																						 search.Company.address.streetsuffix, search.Company.address.streetpostdirection,
-																																						 search.Company.address.unitdesignation, search.Company.address.unitnumber)),
-																							 self.i_bus_city := search.Company.address.City,
-																							 self.i_bus_state := search.Company.address.State,
-																							 self.i_bus_zip := search.Company.address.Zip5,
-                                               self.i_bus_phone := search.Company.Phone,
-																							 self.i_model_name_1 := ModelsRequested[1].ModelName,
-																							 self.i_model_name_2 := ModelsRequested[2].ModelName,
-																							 self.o_score_1    := IF(ModelsRequested[1].ModelName != '', (String)left.Result.Models[1].Scores[1].Value, ''),
-																							 self.o_reason_1_1 := left.Result.Models[1].Scores[1].ScoreReasons[1].ReasonCode,
-																							 self.o_reason_1_2 := left.Result.Models[1].Scores[1].ScoreReasons[2].ReasonCode,
-																							 self.o_reason_1_3 := left.Result.Models[1].Scores[1].ScoreReasons[3].ReasonCode,
-																							 self.o_reason_1_4 := left.Result.Models[1].Scores[1].ScoreReasons[4].ReasonCode,
-																							 self.o_reason_1_5 := left.Result.Models[1].Scores[1].ScoreReasons[5].ReasonCode,
-																							 self.o_reason_1_6 := left.Result.Models[1].Scores[1].ScoreReasons[6].ReasonCode,
-																							 self.o_score_2    := IF(ModelsRequested[2].ModelName != '', (String)left.Result.Models[2].Scores[1].Value, '');
-																							 self.o_reason_2_1 := left.Result.Models[2].Scores[1].ScoreReasons[1].ReasonCode,
-																							 self.o_reason_2_2 := left.Result.Models[2].Scores[1].ScoreReasons[2].ReasonCode,
-																							 self.o_reason_2_3 := left.Result.Models[2].Scores[1].ScoreReasons[3].ReasonCode,
-																							 self.o_reason_2_4 := left.Result.Models[2].Scores[1].ScoreReasons[4].ReasonCode,
-																							 self.o_reason_2_5 := left.Result.Models[2].Scores[1].ScoreReasons[5].ReasonCode,
-																							 self.o_reason_2_6 := left.Result.Models[2].Scores[1].ScoreReasons[6].ReasonCode,
-                                               self.o_lexid := SBA_Results[1].Rep_LexID,
-                                               self.o_seleid := left.Result.BusinessID.SeleID,
-																							 self := left,
-																							 self := [] ));
+	Deltabase_Logging_prep := PROJECT(Final_Results, TRANSFORM(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
+                                    SELF.company_id := (INTEGER)CompanyID,
+                                    SELF.login_id := _LoginID,
+                                    SELF.product_id := Risk_Reporting.ProductID.LNSmallBusiness__SmallBusiness_BIP_Service,
+                                    SELF.function_name := FunctionName,
+                                    SELF.esp_method := ESPMethod,
+                                    SELF.interface_version := InterfaceVersion,
+                                    SELF.delivery_method := DeliveryMethod,
+                                    SELF.date_added := (STRING8)Std.Date.Today(),
+                                    SELF.death_master_purpose := DeathMasterPurpose,
+                                    SELF.ssn_mask := SSN_Mask,
+                                    SELF.dob_mask := DOB_Mask,
+                                    SELF.dl_mask := (STRING)(INTEGER)DL_Mask,
+                                    SELF.exclude_dmv_pii := (STRING)(INTEGER)ExcludeDMVPII,
+                                    SELF.scout_opt_out := (STRING)(INTEGER)DisableOutcomeTracking,
+                                    SELF.archive_opt_in := (STRING)(INTEGER)ArchiveOptIn,
+                                    SELF.glb := GLBA_Purpose,
+                                    SELF.dppa := DPPA_Purpose,
+                                    SELF.data_restriction_mask := DataRestrictionMask,
+                                    SELF.data_permission_mask := DataPermissionMask,
+                                    SELF.industry := Industry_Search[1].Industry,
+                                    SELF.i_attributes_name := AttributesRequested[1].AttributeGroup,
+                                    SELF.i_ssn := search.AuthorizedRep1.SSN,
+                                    SELF.i_dob := Rep_1_DOB,
+                                    SELF.i_name_full := search.AuthorizedRep1.Name.Full,
+                                    SELF.i_name_first := search.AuthorizedRep1.Name.First,
+                                    SELF.i_name_last := search.AuthorizedRep1.Name.Last,
+                                    SELF.i_lexid := (Integer)search.AuthorizedRep1.UniqueId, 
+                                    SELF.i_address := IF(TRIM(search.AuthorizedRep1.address.streetaddress1)!='', search.AuthorizedRep1.address.streetaddress1,
+                                                             Address.Addr1FromComponents(search.AuthorizedRep1.address.streetnumber,
+                                                             search.AuthorizedRep1.address.streetpredirection, search.AuthorizedRep1.address.streetname,
+                                                             search.AuthorizedRep1.address.streetsuffix, search.AuthorizedRep1.address.streetpostdirection,
+                                                             search.AuthorizedRep1.address.unitdesignation, search.AuthorizedRep1.address.unitnumber)),
+                                    SELF.i_city := search.AuthorizedRep1.address.City,
+                                    SELF.i_state := search.AuthorizedRep1.address.State,
+                                    SELF.i_zip := search.AuthorizedRep1.address.Zip5,
+                                    SELF.i_dl := search.AuthorizedRep1.DriverLicenseNumber,
+                                    SELF.i_dl_state := search.AuthorizedRep1.DriverLicenseState,
+                                    SELF.i_home_phone := Rep_1_Phone10,
+                                    SELF.i_tin := search.Company.FEIN,
+                                    SELF.i_name_first_2 := search.AuthorizedRep2.Name.First,
+                                    SELF.i_name_last_2 := search.AuthorizedRep2.Name.Last,
+                                    SELF.i_name_first_3 := search.AuthorizedRep3.Name.First,
+                                    SELF.i_name_last_3 := search.AuthorizedRep3.Name.Last,
+                                    SELF.i_bus_name := search.Company.CompanyName,
+                                    SELF.i_alt_bus_name := search.Company.AlternateCompanyName,
+                                    SELF.i_bus_address := IF(TRIM(search.Company.address.streetaddress1)!='', search.Company.address.streetaddress1,
+                                                                 Address.Addr1FromComponents(search.Company.address.streetnumber,
+                                                                 search.Company.address.streetpredirection, search.Company.address.streetname,
+                                                                 search.Company.address.streetsuffix, search.Company.address.streetpostdirection,
+                                                                 search.Company.address.unitdesignation, search.Company.address.unitnumber)),
+                                    SELF.i_bus_city := search.Company.address.City,
+                                    SELF.i_bus_state := search.Company.address.State,
+                                    SELF.i_bus_zip := search.Company.address.Zip5,
+                                    SELF.i_bus_phone := search.Company.Phone,
+                                    SELF.i_model_name_1 := ModelsRequested[1].ModelName,
+                                    SELF.i_model_name_2 := ModelsRequested[2].ModelName,
+                                    SELF.o_score_1    := IF(ModelsRequested[1].ModelName != '', (STRING)LEFT.Result.Models[1].Scores[1].Value, ''),
+                                    SELF.o_reason_1_1 := LEFT.Result.Models[1].Scores[1].ScoreReasons[1].ReasonCode,
+                                    SELF.o_reason_1_2 := LEFT.Result.Models[1].Scores[1].ScoreReasons[2].ReasonCode,
+                                    SELF.o_reason_1_3 := LEFT.Result.Models[1].Scores[1].ScoreReasons[3].ReasonCode,
+                                    SELF.o_reason_1_4 := LEFT.Result.Models[1].Scores[1].ScoreReasons[4].ReasonCode,
+                                    SELF.o_reason_1_5 := LEFT.Result.Models[1].Scores[1].ScoreReasons[5].ReasonCode,
+                                    SELF.o_reason_1_6 := LEFT.Result.Models[1].Scores[1].ScoreReasons[6].ReasonCode,
+                                    SELF.o_score_2    := IF(ModelsRequested[2].ModelName != '', (STRING)LEFT.Result.Models[2].Scores[1].Value, '');
+                                    SELF.o_reason_2_1 := LEFT.Result.Models[2].Scores[1].ScoreReasons[1].ReasonCode,
+                                    SELF.o_reason_2_2 := LEFT.Result.Models[2].Scores[1].ScoreReasons[2].ReasonCode,
+                                    SELF.o_reason_2_3 := LEFT.Result.Models[2].Scores[1].ScoreReasons[3].ReasonCode,
+                                    SELF.o_reason_2_4 := LEFT.Result.Models[2].Scores[1].ScoreReasons[4].ReasonCode,
+                                    SELF.o_reason_2_5 := LEFT.Result.Models[2].Scores[1].ScoreReasons[5].ReasonCode,
+                                    SELF.o_reason_2_6 := LEFT.Result.Models[2].Scores[1].ScoreReasons[6].ReasonCode,
+                                    SELF.o_lexid := SBA_Results[1].Rep_LexID,
+                                    SELF.o_seleid := LEFT.Result.BusinessID.SeleID,
+                                    SELF := LEFT,
+                                    SELF := [] ));
                                                
 	Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
 	// #stored('Deltabase_Log', Deltabase_Logging);

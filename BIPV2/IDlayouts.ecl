@@ -94,6 +94,18 @@ export l_header_ids := record
 	type_id 		OrgID;
 	type_id 		UltID;
 end;
+
+
+    //BH-840 Filter layout
+    EXPORT l_filter_record := RECORD
+        unsigned6 UniqueId;
+        string10 prim_range;
+        string28 prim_name;
+        string8 sec_range;
+        string5 zip;
+        string9 company_fein;
+        string10 company_phone;
+    END;
 /* 
 ***********************
 END - DO NOT EDIT

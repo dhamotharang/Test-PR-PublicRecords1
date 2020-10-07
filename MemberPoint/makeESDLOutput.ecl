@@ -1,4 +1,4 @@
-﻿import iesp, Suppress,std,lib_date;
+﻿ import iesp, Suppress,std,lib_date;
 
 EXPORT iesp.keepcontactreport.t_KeepContactReportResponse makeESDLOutput(dataset(MemberPoint.Layouts.BatchOut) BatchOut,
 																																							iesp.keepcontactreport.t_KeepContactReportBy report_by, 
@@ -6,6 +6,90 @@ EXPORT iesp.keepcontactreport.t_KeepContactReportResponse makeESDLOutput(dataset
 																																							unsigned1 input_dob_mask_value) := function
 
 
+			iesp.keepcontactreport.t_KeepContactEmail normXformEMAILS(MemberPoint.Layouts.BatchOut L,integer c) := transform
+			
+				self.EmailAddress := map(
+																	c = 1 => l.EMAIL1,
+																	c = 2 => l.EMAIL2,
+																	c = 3 => l.EMAIL3,
+																	c = 4 => l.EMAIL4,
+																	c = 5 => l.EMAIL5,
+																	c = 6 => l.EMAIL6,
+																	c = 7 => l.EMAIL7,
+																	c = 8 => l.EMAIL8,
+																	c = 9 => l.EMAIL9,
+																	c = 10=> l.EMAIL10,
+																	''
+																	) ;
+				self.DateFirstSeen := map(
+															c = 1 =>iesp.ECL2ESP.toDatestring8(L.email1_date_first_seen),
+															c = 2 =>iesp.ECL2ESP.toDatestring8(L.email2_date_first_seen),
+															c = 3 =>iesp.ECL2ESP.toDatestring8(L.email3_date_first_seen),
+															c = 4 =>iesp.ECL2ESP.toDatestring8(L.email4_date_first_seen),
+															c = 5 =>iesp.ECL2ESP.toDatestring8(L.email5_date_first_seen),
+															c = 6 =>iesp.ECL2ESP.toDatestring8(L.email6_date_first_seen),
+															c = 7 =>iesp.ECL2ESP.toDatestring8(L.email7_date_first_seen),
+															c = 8 =>iesp.ECL2ESP.toDatestring8(L.email8_date_first_seen),
+															c = 9 =>iesp.ECL2ESP.toDatestring8(L.email9_date_first_seen),
+															c = 10=>iesp.ECL2ESP.toDatestring8(L.email10_date_first_seen)	,
+															        iesp.ECL2ESP.toDatestring8('')															
+														 ) ;
+				self.DateLastSeen := map(
+																	c = 1 =>iesp.ECL2ESP.toDatestring8(L.email1_date_LAST_seen),
+															   c = 2 => iesp.ECL2ESP.toDatestring8(L.email2_date_LAST_seen),
+															   c = 3 => iesp.ECL2ESP.toDatestring8(L.email3_date_LAST_seen),
+															   c = 4 => iesp.ECL2ESP.toDatestring8(L.email4_date_LAST_seen),
+															   c = 5 => iesp.ECL2ESP.toDatestring8(L.email5_date_LAST_seen),
+															   c = 6 => iesp.ECL2ESP.toDatestring8(L.email6_date_LAST_seen),
+															   c = 7 => iesp.ECL2ESP.toDatestring8(L.email7_date_LAST_seen),
+															   c = 8 => iesp.ECL2ESP.toDatestring8(L.email8_date_LAST_seen),
+															   c = 9 => iesp.ECL2ESP.toDatestring8(L.email9_date_LAST_seen),
+																 c = 10 =>iesp.ECL2ESP.toDatestring8(L.email10_date_LAST_seen),
+															            iesp.ECL2ESP.toDatestring8('')
+																	) ;
+															
+				self.status := map(
+																	c = 1 => l.EMAIL1_EMAIL_STATUS,
+																	c = 2 => l.EMAIL2_EMAIL_STATUS,
+																	c = 3 => l.EMAIL3_EMAIL_STATUS,
+																	c = 4 => l.EMAIL4_EMAIL_STATUS,
+																	c = 5 => l.EMAIL5_EMAIL_STATUS,
+																	c = 6 => l.EMAIL6_EMAIL_STATUS,
+																	c = 7 => l.EMAIL7_EMAIL_STATUS,
+																	c = 8 => l.EMAIL8_EMAIL_STATUS,
+																	c = 9 => l.EMAIL9_EMAIL_STATUS,
+																	c = 10 =>l.EMAIL10_EMAIL_STATUS,
+																	''
+																	) ;
+				self.StatusReason := map(
+																	 c = 1 => L.EMAIL1_EMAIL_status_reason,
+																	 c = 2 => L.EMAIL2_EMAIL_status_reason,
+																	 c = 3 => L.EMAIL3_EMAIL_status_reason,
+																	 c = 4 => L.EMAIL4_EMAIL_status_reason,
+																	 c = 5 => L.EMAIL5_EMAIL_status_reason,
+																	 c = 6 => L.EMAIL6_EMAIL_status_reason,
+																	 c = 7 => L.EMAIL7_EMAIL_status_reason,
+																	 c = 8 => L.EMAIL8_EMAIL_status_reason,
+																	 c = 9 => L.EMAIL9_EMAIL_status_reason,
+																	 c = 10 =>L.EMAIL10_EMAIL_status_reason,
+																	 ''
+																	 ) ;
+															
+				self.additionalstatusinfo := map(
+																	c = 1 =>  L.EMAIL1_additional_status_info,
+																	c = 2 =>  L.EMAIL2_additional_status_info,
+																	c = 3 =>  L.EMAIL3_additional_status_info,
+																	c = 4 =>  L.EMAIL4_additional_status_info,
+																	c = 5 =>  L.EMAIL5_additional_status_info,
+																	c = 6 =>  L.EMAIL6_additional_status_info,
+																	c = 7 =>  L.EMAIL7_additional_status_info,
+																	c = 8 =>  L.EMAIL8_additional_status_info,
+																	c = 9 =>  L.EMAIL9_additional_status_info,
+																	c = 10 => L.EMAIL10_additional_status_info,
+																	''
+																	);
+			end;
+			
 			iesp.keepcontactreport.t_KeepContactPhoneInfo normXformPhones(MemberPoint.Layouts.BatchOut L,integer c) := transform
 			
 				self.MatchCode := map(
@@ -80,11 +164,8 @@ EXPORT iesp.keepcontactreport.t_KeepContactReportResponse makeESDLOutput(dataset
 														l.Phone3_Phone_Status);
 			end;
 
-			iesp.share.t_StringArrayItem normXformEmails(MemberPoint.Layouts.BatchOut l,integer c) := transform
-				self.value:= CHOOSE(c, l.email1, l.email2, l.email3, l.email4, l.email5,l.email6, l.email7, l.email8, l.email9, l.email10, '');
-			end;
 
-      iesp.share.t_StringArrayItem normXformAddressDescriptionCodes(MemberPoint.Layouts.BatchOut l,integer c) := transform
+		  iesp.share.t_StringArrayItem normXformAddressDescriptionCodes(MemberPoint.Layouts.BatchOut l,integer c) := transform
 				self.value:= CHOOSE(c, l.addressdescriptioncode1, l.addressdescriptioncode2, l.addressdescriptioncode3, l.addressdescriptioncode4, l.addressdescriptioncode5,l.addressdescriptioncode6, l.addressdescriptioncode7, l.addressdescriptioncode8, l.addressdescriptioncode9, l.addressdescriptioncode10, '');
 			end;
       
@@ -95,7 +176,7 @@ EXPORT iesp.keepcontactreport.t_KeepContactReportResponse makeESDLOutput(dataset
 
 			 iesp.keepcontactreport.t_KeepContactReportResponse xformESDL(BatchOut l) := transform
 			 
-			 self._Header :=  project(header_row, transform(iesp.share.t_ResponseHeader,
+			  self._Header :=  project(header_row, transform(iesp.share.t_ResponseHeader,
 													self.status :=  left.status,
 													self := left));
 				self.InputEcho	:= report_by;
@@ -169,6 +250,5 @@ EXPORT iesp.keepcontactreport.t_KeepContactReportResponse makeESDLOutput(dataset
 				end;
 
 			ESDLOutput := project(BatchOut,xformESDL(left));
-
 return ESDLOutput; 
 end;

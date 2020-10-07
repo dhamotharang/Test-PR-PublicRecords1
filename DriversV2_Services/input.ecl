@@ -1,56 +1,56 @@
-import doxie;
+IMPORT doxie, STD;
 
 doxie.MAC_Header_Field_Declare()
 
-export input := module
+EXPORT input := MODULE
 
-	// DL Keys
-	export unsigned6	dl_seq							:= 0 : stored('DLSeq');
-	export unsigned6	did									:= (unsigned6)did_value;
-	export qstring24	dl_num							:= (qstring24)dl_value;
-	
-	// DL Indicatives
-	export boolean		randomize		:= false : stored('Randomize');
-	export unsigned1	agelow			:= agelow_val;
-	export unsigned1	agehigh			:= agehigh_val;
-	export string1		race				:= race_value;
-	export string1		gender			:= stringlib.stringtouppercase(gender_value);
-	export unsigned		maxResults	:= maxResults_val;
-	
-	//XML Direct
-	shared string1	needToUpperIncludeHistory	:= 'A' : stored('IncludeHistory'); 
-	export string1	IncludeHistory 						:= stringlib.stringtouppercase(needToUpperIncludeHistory); 
-	shared string		needToUpperDLState				:= '' :stored('DLState');
-	export string  	DLState 									:= stringlib.stringtouppercase(needToUpperDLState); 
+  // DL Keys
+  EXPORT UNSIGNED6 dl_seq := 0 : STORED('DLSeq');
+  EXPORT UNSIGNED6 did := (UNSIGNED6)did_value;
+  EXPORT QSTRING24 dl_num := (QSTRING24)dl_value;
+  
+  // DL Indicatives
+  EXPORT BOOLEAN randomize := FALSE : STORED('Randomize');
+  EXPORT UNSIGNED1 agelow := agelow_val;
+  EXPORT UNSIGNED1 agehigh := agehigh_val;
+  EXPORT STRING1 race := race_value;
+  EXPORT STRING1 gender := STD.STR.ToUpperCase(gender_value);
+  EXPORT UNSIGNED maxResults := maxResults_val;
+  
+  //XML Direct
+  SHARED STRING1 needToUpperIncludeHistory := 'A' : STORED('IncludeHistory');
+  EXPORT STRING1 IncludeHistory := STD.STR.ToUpperCase(needToUpperIncludeHistory);
+  SHARED STRING needToUpperDLState := '' :STORED('DLState');
+  EXPORT STRING DLState := STD.STR.ToUpperCase(needToUpperDLState);
 
-	
-	// DL Tuning
-	export unsigned2	pThresh							:= 10 : stored('PenaltThreshold');
-	export boolean		incDeepDive					:= not noDeepDive;
+  
+  // DL Tuning
+  EXPORT UNSIGNED2 pThresh := 10 : STORED('PenaltThreshold');
+  EXPORT BOOLEAN incDeepDive := NOT noDeepDive;
 
-	// Filtering
-	export string			state								:= state_value;
-	export string			county							:= county_value;
-	
-	// Privacy
-	export string6		ssn_mask						:= ssn_mask_value;
-	export boolean		dl_mask							:= dl_mask_value;
-	export unsigned1  edobmask					 	:= dob_mask_value; 
-	export unsigned1	dppa_purpose				:= global(DPPA_Purpose);
-	export unsigned1	glb_purpose					:= global(GLB_Purpose);
-	
-	// Breadth
-	shared boolean		iEverything					:= false : stored('IncludeEverything');
-	shared boolean		iAccidents					:= false : stored('IncludeAccidents');
-	shared boolean		iConvictions				:= false : stored('IncludeConvictions');
-	shared boolean		iDRInfo							:= false : stored('IncludeDRInfo');
-	shared boolean		iFRAInsurance				:= false : stored('IncludeFRAInsurance');
-	shared boolean		iSuspensions				:= false : stored('IncludeSuspensions');
-	export boolean		incAccidents				:= iEverything or iAccidents;
-	export boolean		incConvictions			:= iEverything or iConvictions;
-	export boolean		incDRInfo						:= iEverything or iDRInfo;
-	export boolean		incFRAInsurance			:= iEverything or iFRAInsurance;
-	export boolean		incSuspensions			:= iEverything or iSuspensions;
-	export boolean		incNonDMV						:= false : stored('IncludeNonDMVSources');
+  // Filtering
+  EXPORT STRING state := state_value;
+  EXPORT STRING county := county_value;
+  
+  // Privacy
+  EXPORT STRING6 ssn_mask := ssn_mask_value;
+  EXPORT BOOLEAN dl_mask := dl_mask_value;
+  EXPORT UNSIGNED1 edobmask := dob_mask_value;
+  EXPORT UNSIGNED1 dppa_purpose := GLOBAL(DPPA_Purpose);
+  EXPORT UNSIGNED1 glb_purpose := GLOBAL(GLB_Purpose);
+  
+  // Breadth
+  SHARED BOOLEAN iEverything := FALSE : STORED('IncludeEverything');
+  SHARED BOOLEAN iAccidents := FALSE : STORED('IncludeAccidents');
+  SHARED BOOLEAN iConvictions := FALSE : STORED('IncludeConvictions');
+  SHARED BOOLEAN iDRInfo := FALSE : STORED('IncludeDRInfo');
+  SHARED BOOLEAN iFRAInsurance := FALSE : STORED('IncludeFRAInsurance');
+  SHARED BOOLEAN iSuspensions := FALSE : STORED('IncludeSuspensions');
+  EXPORT BOOLEAN incAccidents := iEverything OR iAccidents;
+  EXPORT BOOLEAN incConvictions := iEverything OR iConvictions;
+  EXPORT BOOLEAN incDRInfo := iEverything OR iDRInfo;
+  EXPORT BOOLEAN incFRAInsurance := iEverything OR iFRAInsurance;
+  EXPORT BOOLEAN incSuspensions := iEverything OR iSuspensions;
+  EXPORT BOOLEAN incNonDMV := FALSE : STORED('IncludeNonDMVSources');
 
-end;
+END;

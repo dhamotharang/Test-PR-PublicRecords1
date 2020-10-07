@@ -56,4 +56,7 @@
 	SET OF STRING20 thrive_correct_ffid {maxlength(2100)} := [];
 	SET OF STRING100 thrive_correct_record_id {maxlength(10100)} := [];
 	
+	SET OF STRING20 SexOffender_correct_ffid {maxlength(2100)} := [];
+	SET OF STRING100 SexOffender_correct_record_id {maxlength(10100)} := [];	
+	
 END;

@@ -133,9 +133,9 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __Value := PublicRecords_KEL.ECL_Functions.Fn_STD_Str_FilterOut_ValidChars(Field);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
-  SHARED __CC10498 := -99999;
+  SHARED __CC10567 := -99999;
   EXPORT KEL.typ.str FN_Validate_Flag(KEL.typ.nstr __PFieldToCheck) := FUNCTION
-    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC10498,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
+    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC10567,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
   END;
   EXPORT KEL.typ.nstr FN__fn_Bogus_Names(KEL.typ.nstr __PsNameFirst, KEL.typ.nstr __PsNameMid, KEL.typ.nstr __PsNameLast) := FUNCTION
     sNameFirst := __T(__PsNameFirst);
@@ -165,6 +165,17 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __IsNull := __NL(__Pfield1) OR __NL(__Preplacement);
     __Value := PublicRecords_KEL.ECL_Functions.Fn_RemoveSpecialChars(field1, replacement);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
+  END;
+  EXPORT KEL.typ.nbool FN__fn_In_Voters_State(KEL.typ.nstr __PState, KEL.typ.nbool __PisFCRA, KEL.typ.nstr __Phistorydate) := FUNCTION
+    State := __T(__PState);
+    isFCRA := __T(__PisFCRA);
+    historydate := __T(__Phistorydate);
+    __IsNull := __NL(__PState) OR __NL(__PisFCRA) OR __NL(__Phistorydate);
+    __Value := PublicRecords_KEL.ECL_Functions.FN_inVotersState(State,isFCRA,historydate);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
+  END;
+  EXPORT KEL.typ.nbool FN__fn_In_Drivers_State(KEL.typ.nstr __PState) := FUNCTION
+    RETURN __OP2(__PState,IN,__CN(['MO','MN','FL','OH','TX','NE','ID','ME','WV','MI','LA','NC','MA','TN','WY','KY','CT','WI']));
   END;
   EXPORT KEL.typ.nstr FN__fn_Naic_Code_Interpreter(KEL.typ.nstr __PNaicCodeInput) := FUNCTION
     NaicCodeInput := __T(__PNaicCodeInput);

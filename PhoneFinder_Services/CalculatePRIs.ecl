@@ -50,6 +50,9 @@ Indicator ID  Risk Alert
 47  Phone returned more than X times in past Y days.
 48  Phone linked to identity by self-reported sources only
 49  Phone Service Type is Other/Unknown
+50  Phone Service Type is Cable
+51  Phone # has been ported in the last X to Y days (2nd date range)
+52  Phone # has been ported in the last X to Y days (3rd date range)
 */
 
 IMPORT $, iesp, MDR, STD;
@@ -128,7 +131,7 @@ FUNCTION
                                           le.ThresholdB = 'Three Months' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Fraud - Three Months')),
                                            FALSE),
                                 40 => EXISTS(pInput.ReasonCodes(value = 'AssociatedDigitalID - Trust Score below Zero')),
-                                41 => EXISTS((pInput.TmxVariables(Name = 'timesincephonefirstseen' AND (INTEGER)Value <= MonthstoMinutes))),
+                                41 => EXISTS((pInput.TmxVariables(Name = 'timesincephonefirstseen' AND (INTEGER)Value <> 0 AND (INTEGER)Value <= MonthstoMinutes))),
                                 42 => EXISTS((pInput.TmxVariables(Name = 'countdeviceseenwithphone_month' AND (INTEGER)Value >= le.Threshold))),
                                 43 => EXISTS((pInput.TmxVariables(Name = 'countemailsseenwithphone_month' AND (INTEGER)Value >= le.Threshold))),
                                 44 => EXISTS((pInput.TmxVariables(Name = 'phoneseenmultiplecountry_month' AND (INTEGER)Value >= le.Threshold))),
@@ -138,6 +141,8 @@ FUNCTION
                                 48 => isSelfReportedSourcesOnly,
                                 49 => Std.Str.ToUpperCase(pInput.coc_description) = $.Constants.PhoneType.Other,
                                 50 => Std.Str.ToUpperCase(pInput.coc_description) = $.Constants.PhoneType.Cable,
+                                51 => STD.Date.DaysBetween(pInput.LastPortedDate, currentDate) BETWEEN le.ThresholdA AND le.Threshold,
+                                52 => STD.Date.DaysBetween(pInput.LastPortedDate, currentDate) BETWEEN le.ThresholdA AND le.Threshold,
                                 FALSE);
 
       SELF.RiskId      := IF(isPRIFail, le.RiskId, SKIP);

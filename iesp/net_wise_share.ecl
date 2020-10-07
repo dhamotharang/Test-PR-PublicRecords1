@@ -7,6 +7,7 @@ import iesp;
 export net_wise_share := MODULE
 			
 export t_NetWiseOptions := record (iesp.share.t_BaseOption)
+	boolean CachedResponseOnly {xpath('CachedResponseOnly')};
 end;
 		
 export t_NetWiseRequestParams := record

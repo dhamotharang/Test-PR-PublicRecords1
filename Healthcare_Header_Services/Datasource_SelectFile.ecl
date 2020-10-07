@@ -87,7 +87,7 @@
 	return baseRecs;
 	end;
 
-	Export appendLicense(dataset(Healthcare_Header_Services.Layouts.CombinedHeaderResults) input, dataset(Layouts.GroupKey) searchby):= function
+	Export appendLicense(dataset(Healthcare_Header_Services.Layouts.CombinedHeaderResults) input, dataset(Healthcare_Header_Services.Layouts.GroupKey) searchby):= function
 			rawdata := join(searchby, Enclarity.Keys(,true).license_group_key.qa,
 											keyed(left.group_key = right.group_key),
 											transform(Healthcare_Header_Services.Layouts.layout_licenseinfo, 
@@ -476,11 +476,11 @@
 																															self.TaxID:=left.userTaxID; self.UPIN:=left.userUPIN;self.NPI:=left.userNPI;
 																															self.DEA:=left.userDEA;self.fein:=left.userfein;self:=left));
 
-			filterRec := Functions.doPenalty(updateSanctions,dedup(sort(getInput,acctno),acctno),10);
-			facilities_final_sorted := sort(filterRec, acctno, SrcId, Src,vendorid);
-			facilities_final_grouped := group(facilities_final_sorted, acctno, SrcId, Src,vendorid);
+			facilities_final_sorted := sort(updateSanctions, acctno, SrcId);//SrcId is lnpid 
+			facilities_final_grouped := group(facilities_final_sorted, acctno, SrcId);//SrcId is lnpid
 			facilities_rolled := rollup(facilities_final_grouped, group, Transforms.doSelectFileFacilitiesBaseRecordSrcIdRollup(left,rows(left)));			
-  		return facilities_rolled;
+			facilities_rolled_Penalty := Healthcare_Header_Services.Functions.doPenalty(facilities_rolled,dedup(sort(getInput,acctno),acctno),10);
+  		return facilities_rolled_Penalty;
 			      
 			
 			
@@ -786,12 +786,12 @@
 	end;
 /* Need good test case to finish up
 	Export getBusSanctionsForResults (dataset(Healthcare_Header_Services.layouts.CombinedHeaderResults) recs,dataset(Healthcare_Header_Services.layouts.common_runtime_config) cfg):= function
-		normName := NORMALIZE(recs,left.Names,transform(Layouts.CombinedHeaderResults, self.Names:= right,self:=left,self:=[]));
-		normAddr := NORMALIZE(normName(),left.Addresses,transform(Layouts.CombinedHeaderResults,self.Addresses:= right,self:=left,self:=[]));
-		normFEIN := NORMALIZE(normAddr(),left.feins,transform(Layouts.CombinedHeaderResults,self.feins:= right,self:=left,self:=[]));
+		normName := NORMALIZE(recs,left.Names,transform(Healthcare_Header_Services.Layouts.CombinedHeaderResults, self.Names:= right,self:=left,self:=[]));
+		normAddr := NORMALIZE(normName(),left.Addresses,transform(Healthcare_Header_Services.Layouts.CombinedHeaderResults,self.Addresses:= right,self:=left,self:=[]));
+		normFEIN := NORMALIZE(normAddr(),left.feins,transform(Healthcare_Header_Services.Layouts.CombinedHeaderResults,self.feins:= right,self:=left,self:=[]));
 		normFilterNoName := normFEIN(Names[1].CompanyName <> '');
 		normFilterNoAddress := normFilterNoName(Addresses[1].prim_range <> '' and Addresses[1].prim_name <> '');
-		input := dedup(project(normFilterNoAddress,transform(Layouts.autokeyInput, self.acctno:=(string)left.lnpid; self.seq:=(integer)left.acctno; 
+		input := dedup(project(normFilterNoAddress,transform(Healthcare_Header_Services.Layouts.autokeyInput, self.acctno:=(string)left.lnpid; self.seq:=(integer)left.acctno; 
 																											self.comp_name:=left.Names[1].CompanyName; 
 																											self.prim_range:=left.Addresses[1].prim_range;
 																											self.predir:=left.Addresses[1].predir;

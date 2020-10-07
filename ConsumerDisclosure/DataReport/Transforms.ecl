@@ -1,4 +1,4 @@
-﻿IMPORT $, iesp;
+﻿IMPORT $, iesp, FFD;
 EXPORT Transforms := MODULE
 
 	//-----Aircraft------------
@@ -267,4 +267,14 @@ EXPORT Transforms := MODULE
 		SELF.GroupBy.sequence_key := l.sequence_key;
 	END;
 	
+	//----------PersonContext-------------
+	EXPORT iesp.fcradataservice.t_FcraDataServicePersonContextRecord xformPersonContextData(
+		FFD.Layouts.PersonContextBatch l) := TRANSFORM
+		// Splitting concatenated RecId1 back to RecId1 & RecId2
+		isOffender := l.DataGroup = FFD.Constants.DataGroups.OFFENDERS;
+		RecId1 := TRIM(l.RecId1, LEFT, RIGHT);
+		SELF.RecId1 := IF(isOffender, RecId1[1..50], l.RecId1);
+		SELF.RecId2 := IF(isOffender, RecId1[51..], l.RecId2);
+		SELF := l;
+	END;
 END;

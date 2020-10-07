@@ -6,10 +6,10 @@ EXPORT B_Business_Prox_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
   SHARED VIRTUAL TYPEOF(B_Business_Prox_3(__in,__cfg).__ENH_Business_Prox_3) __ENH_Business_Prox_3 := B_Business_Prox_3(__in,__cfg).__ENH_Business_Prox_3;
   SHARED VIRTUAL TYPEOF(E_Prox_Phone_Number(__in,__cfg).__Result) __E_Prox_Phone_Number := E_Prox_Phone_Number(__in,__cfg).__Result;
   SHARED VIRTUAL TYPEOF(E_Prox_T_I_N(__in,__cfg).__Result) __E_Prox_T_I_N := E_Prox_T_I_N(__in,__cfg).__Result;
-  SHARED __EE4101815 := __ENH_Business_Prox_3;
-  SHARED __EE4101817 := __E_Prox_Phone_Number;
-  SHARED __EE4101824 := __EE4101817(__NN(__EE4101817.Business_Location_));
-  SHARED __ST962711_Layout := RECORD
+  SHARED __EE4115572 := __ENH_Business_Prox_3;
+  SHARED __EE4115574 := __E_Prox_Phone_Number;
+  SHARED __EE4115581 := __EE4115574(__NN(__EE4115574.Business_Location_));
+  SHARED __ST969640_Layout := RECORD
     KEL.typ.ntyp(E_Business_Prox().Typ) Business_Location_;
     KEL.typ.ntyp(E_Phone().Typ) Phone_Number_;
     KEL.typ.ndataset(E_Prox_Phone_Number(__in,__cfg).Best_Phone_Details_Layout) Best_Phone_Details_;
@@ -30,7 +30,7 @@ EXPORT B_Business_Prox_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __ST962711_Layout __JT4101835(E_Prox_Phone_Number(__in,__cfg).Layout __l, E_Prox_Phone_Number(__in,__cfg).Best_Phone_Details_Layout __r) := TRANSFORM
+  __ST969640_Layout __JT4115592(E_Prox_Phone_Number(__in,__cfg).Layout __l, E_Prox_Phone_Number(__in,__cfg).Best_Phone_Details_Layout __r) := TRANSFORM
     SELF.Archive___Date_ := __r.Archive___Date_;
     SELF.Date_First_Seen_ := __r.Date_First_Seen_;
     SELF.Date_Last_Seen_ := __r.Date_Last_Seen_;
@@ -43,8 +43,8 @@ EXPORT B_Business_Prox_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE4101874 := NORMALIZE(__EE4101824,__T(LEFT.Best_Phone_Details_),__JT4101835(LEFT,RIGHT));
-  SHARED __ST966997_Layout := RECORD
+  SHARED __EE4115631 := NORMALIZE(__EE4115581,__T(LEFT.Best_Phone_Details_),__JT4115592(LEFT,RIGHT));
+  SHARED __ST973926_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
@@ -80,7 +80,7 @@ EXPORT B_Business_Prox_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.ndataset(E_Business_Prox(__in,__cfg).Contacts_Layout) Contacts_;
     KEL.typ.ndataset(E_Business_Prox(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.ndataset(E_Prox_Address(__in,__cfg).Best_Addresses_Layout) Best_Business_Prox_Address_;
-    KEL.typ.ndataset(__ST962711_Layout) Prox_Phone_Number_;
+    KEL.typ.ndataset(__ST969640_Layout) Prox_Phone_Number_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -91,15 +91,15 @@ EXPORT B_Business_Prox_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC4101883(B_Business_Prox_3(__in,__cfg).__ST645194_Layout __EE4101815, __ST962711_Layout __EE4101874) := __EEQP(__EE4101815.UID,__EE4101874.Business_Location_);
-  __ST966997_Layout __Join__ST966997_Layout(B_Business_Prox_3(__in,__cfg).__ST645194_Layout __r, DATASET(__ST962711_Layout) __recs) := TRANSFORM
+  __JC4115640(B_Business_Prox_3(__in,__cfg).__ST650680_Layout __EE4115572, __ST969640_Layout __EE4115631) := __EEQP(__EE4115572.UID,__EE4115631.Business_Location_);
+  __ST973926_Layout __Join__ST973926_Layout(B_Business_Prox_3(__in,__cfg).__ST650680_Layout __r, DATASET(__ST969640_Layout) __recs) := TRANSFORM
     SELF := __r;
     SELF.Prox_Phone_Number_ := __CN(__recs);
   END;
-  SHARED __EE4102111 := DENORMALIZE(DISTRIBUTE(__EE4101815,HASH(UID)),DISTRIBUTE(__EE4101874,HASH(Business_Location_)),__JC4101883(LEFT,RIGHT),GROUP,__Join__ST966997_Layout(LEFT,ROWS(RIGHT)),LOCAL);
-  SHARED __EE4102122 := __E_Prox_T_I_N;
-  SHARED __EE4102129 := __EE4102122(__NN(__EE4102122.Business_Location_));
-  SHARED __ST962392_Layout := RECORD
+  SHARED __EE4115868 := DENORMALIZE(DISTRIBUTE(__EE4115572,HASH(UID)),DISTRIBUTE(__EE4115631,HASH(Business_Location_)),__JC4115640(LEFT,RIGHT),GROUP,__Join__ST973926_Layout(LEFT,ROWS(RIGHT)),LOCAL);
+  SHARED __EE4115879 := __E_Prox_T_I_N;
+  SHARED __EE4115886 := __EE4115879(__NN(__EE4115879.Business_Location_));
+  SHARED __ST969321_Layout := RECORD
     KEL.typ.ntyp(E_Business_Prox().Typ) ____grp___U_I_D_;
     KEL.typ.ntyp(E_Business_Prox().Typ) Business_Location_;
     KEL.typ.ntyp(E_T_I_N().Typ) Tax_I_D_;
@@ -120,10 +120,10 @@ EXPORT B_Business_Prox_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __EE4102181 := PROJECT(__EE4102129,TRANSFORM(__ST962392_Layout,SELF.____grp___U_I_D_ := LEFT.Business_Location_,SELF := LEFT));
-  SHARED __EE4102192 := GROUP(KEL.Routines.SortChildren(__EE4102181,'Data_Sources_'),____grp___U_I_D_,ALL);
-  SHARED __EE4102196 := UNGROUP(TOPN(__EE4102192(__NN(__EE4102192.Best_T_I_N_Rank_)),1,__T(__EE4102192.Best_T_I_N_Rank_),__T(____grp___U_I_D_),__T(Tax_I_D_),__T(Ult_I_D_),__T(Org_I_D_),__T(Sele_I_D_),__T(Prox_I_D_),__T(Best_T_I_N_)));
-  SHARED __ST968293_Layout := RECORD
+  SHARED __EE4115938 := PROJECT(__EE4115886,TRANSFORM(__ST969321_Layout,SELF.____grp___U_I_D_ := LEFT.Business_Location_,SELF := LEFT));
+  SHARED __EE4115949 := GROUP(KEL.Routines.SortChildren(__EE4115938,'Data_Sources_'),____grp___U_I_D_,ALL);
+  SHARED __EE4115953 := UNGROUP(TOPN(__EE4115949(__NN(__EE4115949.Best_T_I_N_Rank_)),1,__T(__EE4115949.Best_T_I_N_Rank_),__T(____grp___U_I_D_),__T(Tax_I_D_),__T(Ult_I_D_),__T(Org_I_D_),__T(Sele_I_D_),__T(Prox_I_D_),__T(Best_T_I_N_)));
+  SHARED __ST975222_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
@@ -159,8 +159,8 @@ EXPORT B_Business_Prox_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.ndataset(E_Business_Prox(__in,__cfg).Contacts_Layout) Contacts_;
     KEL.typ.ndataset(E_Business_Prox(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.ndataset(E_Prox_Address(__in,__cfg).Best_Addresses_Layout) Best_Business_Prox_Address_;
-    KEL.typ.ndataset(__ST962711_Layout) Prox_Phone_Number_;
-    KEL.typ.ndataset(__ST962392_Layout) Exp1_;
+    KEL.typ.ndataset(__ST969640_Layout) Prox_Phone_Number_;
+    KEL.typ.ndataset(__ST969321_Layout) Exp1_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -171,13 +171,13 @@ EXPORT B_Business_Prox_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC4102205(__ST966997_Layout __EE4102111, __ST962392_Layout __EE4102196) := __EEQP(__EE4102111.UID,__EE4102196.____grp___U_I_D_);
-  __ST968293_Layout __Join__ST968293_Layout(__ST966997_Layout __r, DATASET(__ST962392_Layout) __recs) := TRANSFORM
+  __JC4115962(__ST973926_Layout __EE4115868, __ST969321_Layout __EE4115953) := __EEQP(__EE4115868.UID,__EE4115953.____grp___U_I_D_);
+  __ST975222_Layout __Join__ST975222_Layout(__ST973926_Layout __r, DATASET(__ST969321_Layout) __recs) := TRANSFORM
     SELF := __r;
     SELF.Exp1_ := __CN(__recs);
   END;
-  SHARED __EE4102448 := DENORMALIZE(DISTRIBUTE(__EE4102111,HASH(UID)),DISTRIBUTE(__EE4102196,HASH(____grp___U_I_D_)),__JC4102205(LEFT,RIGHT),GROUP,__Join__ST968293_Layout(LEFT,ROWS(RIGHT)),LOCAL);
-  SHARED __ST156880_Layout := RECORD
+  SHARED __EE4116205 := DENORMALIZE(DISTRIBUTE(__EE4115868,HASH(UID)),DISTRIBUTE(__EE4115953,HASH(____grp___U_I_D_)),__JC4115962(LEFT,RIGHT),GROUP,__Join__ST975222_Layout(LEFT,ROWS(RIGHT)),LOCAL);
+  SHARED __ST159163_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
@@ -215,7 +215,7 @@ EXPORT B_Business_Prox_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.ndataset(E_Prox_Address(__in,__cfg).Best_Addresses_Layout) Best_Business_Prox_Address_;
     KEL.typ.ndataset(E_Business_Prox(__in,__cfg).Best_Company_Names_Layout) Best_Business_Prox_Names_Sorted_;
     KEL.typ.ndataset(E_Prox_Phone_Number(__in,__cfg).Best_Phone_Details_Layout) Best_Business_Prox_Phone_;
-    KEL.typ.ndataset(__ST962392_Layout) Best_Business_Prox_Tin_;
+    KEL.typ.ndataset(__ST969321_Layout) Best_Business_Prox_Tin_;
     E_Prox_Address(__in,__cfg).Best_Addresses_Layout Only_Best_Business_Prox_Address_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -227,23 +227,23 @@ EXPORT B_Business_Prox_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST156880_Layout __ND4102459__Project(__ST968293_Layout __PP4102455) := TRANSFORM
-    __EE4102754 := __PP4102455.Best_Company_Names_;
-    __BS4102744 := __T(__EE4102754);
-    __EE4102758 := __BN(TOPN(__BS4102744(__NN(__T(__EE4102754).Best_Company_Name_Rank_)),1,__T(__T(__EE4102754).Best_Company_Name_Rank_),__T(Best_Company_Name_)),__NL(__EE4102754));
-    SELF.Best_Business_Prox_Names_Sorted_ := __EE4102758;
-    __EE4102451 := __PP4102455.Prox_Phone_Number_;
-    __EE4102786 := PROJECT(TABLE(PROJECT(__T(__EE4102451),E_Prox_Phone_Number(__in,__cfg).Best_Phone_Details_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_First_Reported_,MIN,FALSE),KEL.typ.epoch Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_Last_Reported_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,FALSE),Best_Phone_,Best_Phone_Rank_},Best_Phone_,Best_Phone_Rank_,MERGE),E_Prox_Phone_Number(__in,__cfg).Best_Phone_Details_Layout);
-    __EE4102790 := TOPN(__EE4102786(__NN(__EE4102786.Best_Phone_Rank_)),1,__T(__EE4102786.Best_Phone_Rank_),__T(Best_Phone_));
-    SELF.Best_Business_Prox_Phone_ := __CN(__EE4102790(__NN(Best_Phone_) OR __NN(Best_Phone_Rank_)));
-    __EE4102454 := __PP4102455.Exp1_;
-    SELF.Best_Business_Prox_Tin_ := __EE4102454;
-    __EE4102794 := __PP4102455.Best_Business_Prox_Address_;
-    SELF.Only_Best_Business_Prox_Address_ := (__T(__EE4102794))[1];
-    SELF := __PP4102455;
+  SHARED __ST159163_Layout __ND4116216__Project(__ST975222_Layout __PP4116212) := TRANSFORM
+    __EE4116511 := __PP4116212.Best_Company_Names_;
+    __BS4116501 := __T(__EE4116511);
+    __EE4116515 := __BN(TOPN(__BS4116501(__NN(__T(__EE4116511).Best_Company_Name_Rank_)),1,__T(__T(__EE4116511).Best_Company_Name_Rank_),__T(Best_Company_Name_)),__NL(__EE4116511));
+    SELF.Best_Business_Prox_Names_Sorted_ := __EE4116515;
+    __EE4116208 := __PP4116212.Prox_Phone_Number_;
+    __EE4116543 := PROJECT(TABLE(PROJECT(__T(__EE4116208),E_Prox_Phone_Number(__in,__cfg).Best_Phone_Details_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_First_Reported_,MIN,FALSE),KEL.typ.epoch Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_Last_Reported_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,FALSE),Best_Phone_,Best_Phone_Rank_},Best_Phone_,Best_Phone_Rank_,MERGE),E_Prox_Phone_Number(__in,__cfg).Best_Phone_Details_Layout);
+    __EE4116547 := TOPN(__EE4116543(__NN(__EE4116543.Best_Phone_Rank_)),1,__T(__EE4116543.Best_Phone_Rank_),__T(Best_Phone_));
+    SELF.Best_Business_Prox_Phone_ := __CN(__EE4116547(__NN(Best_Phone_) OR __NN(Best_Phone_Rank_)));
+    __EE4116211 := __PP4116212.Exp1_;
+    SELF.Best_Business_Prox_Tin_ := __EE4116211;
+    __EE4116551 := __PP4116212.Best_Business_Prox_Address_;
+    SELF.Only_Best_Business_Prox_Address_ := (__T(__EE4116551))[1];
+    SELF := __PP4116212;
   END;
-  SHARED __EE4103008 := PROJECT(__EE4102448,__ND4102459__Project(LEFT));
-  EXPORT __ST962125_Layout := RECORD
+  SHARED __EE4116765 := PROJECT(__EE4116205,__ND4116216__Project(LEFT));
+  EXPORT __ST969054_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
@@ -293,10 +293,10 @@ EXPORT B_Business_Prox_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST962125_Layout __ND4101265__Project(__ST156880_Layout __PP4101261) := TRANSFORM
-    __EE4103011 := __PP4101261.Best_Business_Prox_Tin_;
-    SELF.Best_Business_Prox_Tin_ := __PROJECT(__EE4103011,E_Prox_T_I_N(__in,__cfg).Layout);
-    SELF := __PP4101261;
+  SHARED __ST969054_Layout __ND4115022__Project(__ST159163_Layout __PP4115018) := TRANSFORM
+    __EE4116768 := __PP4115018.Best_Business_Prox_Tin_;
+    SELF.Best_Business_Prox_Tin_ := __PROJECT(__EE4116768,E_Prox_T_I_N(__in,__cfg).Layout);
+    SELF := __PP4115018;
   END;
-  EXPORT __ENH_Business_Prox_2 := PROJECT(__EE4103008,__ND4101265__Project(LEFT));
+  EXPORT __ENH_Business_Prox_2 := PROJECT(__EE4116765,__ND4115022__Project(LEFT));
 END;

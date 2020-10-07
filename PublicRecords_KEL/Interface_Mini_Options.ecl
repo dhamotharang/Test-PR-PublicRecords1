@@ -63,6 +63,7 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT BOOLEAN IncludeProfessionalLicense := FALSE;
 	EXPORT BOOLEAN IncludeProperty := FALSE;
 	EXPORT BOOLEAN IncludePropertyEvent := FALSE;
+	EXPORT BOOLEAN IncludeSexOffender := FALSE;
 	EXPORT BOOLEAN IncludeSocialSecurityNumber := FALSE;
 	EXPORT BOOLEAN IncludeSurname := FALSE;
 	EXPORT BOOLEAN IncludeTIN := FALSE;
@@ -113,6 +114,7 @@ EXPORT Interface_Mini_Options (PublicRecords_KEL.Interface_Options OptionsRaw) :
 	EXPORT BOOLEAN IncludePersonPhone := IncludePerson AND IncludePhone;
 	EXPORT BOOLEAN IncludePersonProperty := IncludePerson AND IncludeProperty;
 	EXPORT BOOLEAN IncludePersonPropertyEvent := IncludePersonProperty AND IncludePropertyEvent;
+	EXPORT BOOLEAN IncludePersonSexOffender := IncludePerson AND IncludeSexOffender;
 	EXPORT BOOLEAN IncludePersonSSN := IncludePerson AND IncludeSocialSecurityNumber;
 	EXPORT BOOLEAN IncludePersonVehicle := IncludePerson AND IncludeVehicle;
 	EXPORT BOOLEAN IncludePersonUCC := IncludePerson AND IncludeUCC;

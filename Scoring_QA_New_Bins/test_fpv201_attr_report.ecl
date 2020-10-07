@@ -2,16 +2,16 @@
 
 //
 
- file1_2:= dataset(route + scoring_project_pip.Output_Sample_Names.FP_V2_XML_American_Express_FP1109_0_outfile + previous_dt,Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_FraudPoint_V201_AmericanExpress_Global_Layout,
+ file1_2:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.FP_V2_XML_American_Express_FP1109_0_outfile + previous_dt,Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_FraudPoint_V201_AmericanExpress_Global_Layout,
 
 
-thor);
+thor),(integer)acctno);
 
 
 
- file2_2:= dataset(route + scoring_project_pip.Output_Sample_Names.FP_V2_XML_American_Express_FP1109_0_outfile + current_dt, Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_FraudPoint_V201_AmericanExpress_Global_Layout,
+ file2_2:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.FP_V2_XML_American_Express_FP1109_0_outfile + current_dt, Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_FraudPoint_V201_AmericanExpress_Global_Layout,
 
-thor);
+thor),(integer)acctno);
 
 file1 := file1_2(errorcode='');
 file2 := file2_2(errorcode='');

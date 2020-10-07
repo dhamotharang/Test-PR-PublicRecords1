@@ -12,25 +12,31 @@ makeDTEGatewayCall := GetRequestInfoGW.URL <> '' AND InvokeDTE = TRUE;
 
 GetRequestInfo := Gateway.Soapcall_DTEGetRequestInfo(RecsToDTE, GetRequestInfoGW, pMakeGatewayCall := makeDTEGatewayCall);
 
+ErrorInXMLorJSON := GetRequestInfo[1].ErrorCode = '44' OR GetRequestInfo[1].ErrorCode = '45' OR (INTEGER)GetRequestInfo[1].ErrorCode < 0;
+
 LiensAppendSuppressFlag := JOIN(GetRequestInfo, clam[1].LnJ_datasets.lnjliens, 
 LEFT.RMSID = RIGHT.RMSID AND LEFT.TMSID = RIGHT.TMSID, 
-TRANSFORM(RECORDOF(RIGHT), 
-SELF.SuppressRecord := IF(LEFT.TaskStatus <> '0' OR LEFT.ErrorMessage <> '', TRUE, FALSE);
+TRANSFORM({RECORDOF(RIGHT), BOOLEAN HasError}, 
+SELF.SuppressRecord := IF(LEFT.TaskStatus <> '0' OR LEFT.ErrorMessage <> '' OR ErrorInXMLorJSON, TRUE, FALSE);
+SELF.HasError := IF(ErrorInXMLorJSON, TRUE, FALSE);
 SELF := RIGHT;
 ));
 
 JudgmentsAppendSuppressFlag := JOIN(GetRequestInfo, clam[1].LnJ_datasets.lnjjudgments, 
 LEFT.RMSID = RIGHT.RMSID AND LEFT.TMSID = RIGHT.TMSID, 
-TRANSFORM(RECORDOF(RIGHT),
-SELF.SuppressRecord := IF(LEFT.TaskStatus <> '0' OR LEFT.ErrorMessage <> '', TRUE, FALSE);
+TRANSFORM({RECORDOF(RIGHT), BOOLEAN HasError},
+SELF.SuppressRecord := IF(LEFT.TaskStatus <> '0' OR LEFT.ErrorMessage <> '' OR ErrorInXMLorJSON, TRUE, FALSE);
+SELF.HasError := IF(ErrorInXMLorJSON, TRUE, FALSE);
 SELF := RIGHT;
 ));
 
+JudgmentsANDLiensHasErrorRecords := (COUNT(LiensAppendSuppressFlag(HasError = TRUE)) + COUNT(JudgmentsAppendSuppressFlag(HasError = TRUE))) > 0;
+
 riskview5_suppressed := PROJECT(riskview5_final_results, 
 TRANSFORM(RECORDOF(LEFT),
-SELF.Exception_Code := '41';
-SELF.LnJLiens := LiensAppendSuppressFlag(SuppressRecord = FALSE);
-SELF.LnJJudgments := JudgmentsAppendSuppressFlag(SuppressRecord = FALSE);
+SELF.Exception_Code := IF(JudgmentsANDLiensHasErrorRecords, '-1', '');
+SELF.LnJLiens := PROJECT(LiensAppendSuppressFlag(SuppressRecord = FALSE), TRANSFORM(RECORDOF(clam[1].LnJ_datasets.lnjliens), SELF := LEFT));
+SELF.LnJJudgments := PROJECT(JudgmentsAppendSuppressFlag(SuppressRecord = FALSE), TRANSFORM(RECORDOF(clam[1].LnJ_datasets.lnjjudgments), SELF := LEFT));
 SELF := LEFT;));
 
 RETURN riskview5_suppressed;
@@ -49,9 +55,7 @@ END;
 
 LNJRow := PROJECT(UNGROUP(clam), LNJAppendUID(LEFT,COUNTER));
 
-DoRefresh := InvokeStatusRefresh AND ExcludeStatusRefresh = FALSE;
-
-StatusRefreshModule := RiskView.InitiateStatusRefresh(LNJRow, gateways, 5, 0, true, StatusRefreshWaitPeriod, DoRefresh);
+StatusRefreshModule := RiskView.InitiateStatusRefresh(LNJRow, gateways, 5, 0, true, StatusRefreshWaitPeriod, InvokeStatusRefresh, ExcludeStatusRefresh);
 StatusRefreshResults := StatusRefreshModule.StatusRefresh;
 StatusRefreshRecommendGWError := StatusRefreshModule.RefreshRecommendedGatewayError;
 StatusRefreshGWError := StatusRefreshModule.RefreshGatewayError;
@@ -64,6 +68,9 @@ SELF.Exception_Code := '22OKC';
 SELF := LEFT;
 )));
 
+IsHighRiskLiens := COUNT(Suppressed_Liens(HighRiskCheck = TRUE)) > 0;
+IsHighRiskJudgments := COUNT(Suppressed_Judgments(HighRiskCheck = TRUE)) > 0;
+
 riskview5_suppressed := IF(~StatusRefreshRecommendGWError OR ~StatusRefreshGWError,
 IF(ExcludeStatusRefresh = TRUE, PROJECT(riskview5_final_results, 
 TRANSFORM(RECORDOF(LEFT), 
@@ -72,10 +79,28 @@ SELF.LnJJudgments := Suppressed_Judgments(HighRiskCheck = FALSE);
 SELF := LEFT;)),
 PROJECT(riskview5_final_results, 
 TRANSFORM(RECORDOF(LEFT), 
-SELF.LnJLiens := [];
-SELF.LnJJudgments := [];
+SELF.LnJLiens := IF(IsHighRiskLiens OR IsHighRiskJudgments, DATASET([], RECORDOF(Suppressed_Liens)), Suppressed_Liens);
+SELF.LnJJudgments :=  IF(IsHighRiskLiens OR IsHighRiskJudgments, DATASET([], RECORDOF(Suppressed_Judgments)), Suppressed_Judgments);
 SELF := LEFT;))));
 
+riskview_final_results_with_deferred := IF(COUNT(StatusRefreshResults) > 0,
+                                                                    PROJECT(riskview5_final_results, 
+                                                                    TRANSFORM(RECORDOF(LEFT), 
+                                                                    SELF.Status_Code := IF(ExcludeStatusRefresh, '', Riskview.Constants.Deferred_request_code); 
+                                                                    SELF.Message :=  IF(ExcludeStatusRefresh, '', Riskview.Constants.Deferred_request_desc);
+                                                                    SELF.TransactionID :=  IF(ExcludeStatusRefresh, '', StatusRefreshResults[1].response._Header.TransactionID);
+                                                                    SELF := LEFT;)),
+                                                                    riskview5_final_results);
+                                                                    
+riskview5_suppressed_with_deferred := IF(COUNT(StatusRefreshResults) > 0,
+                                                                    PROJECT(riskview5_suppressed, 
+                                                                    TRANSFORM(RECORDOF(LEFT), 
+                                                                    SELF.Status_Code :=  IF(ExcludeStatusRefresh, '', Riskview.Constants.Deferred_request_code);
+                                                                    SELF.Message :=  IF(ExcludeStatusRefresh, '', Riskview.Constants.Deferred_request_desc);
+                                                                    SELF.TransactionID :=  IF(ExcludeStatusRefresh, '', StatusRefreshResults[1].response._Header.TransactionID);
+                                                                    SELF := LEFT;)),
+                                                                    riskview5_suppressed);
+                                                                    
 /* ****************************************************************
 *  Deferred Task ESP (DTE) Logging Functionality  *
 ******************************************************************/
@@ -130,7 +155,7 @@ TRANSFORM({RECORDOF(LEFT), STRING AcctNo},
 SELF.AcctNo := RIGHT.AcctNo;
 SELF := LEFT;));
 
-IF(IsBatch = FALSE AND COUNT(JoinStatusRefreshWithLNJ(Response.Result.TaskID <> '')) > 0 AND InvokeStatusRefresh = TRUE, 
+IF(IsBatch = FALSE AND COUNT(JoinStatusRefreshWithLNJ(Response.Result.TaskID <> '')) > 0 AND InvokeStatusRefresh = TRUE AND ExcludeStatusRefresh = FALSE, 
 OUTPUT(PROJECT(JoinStatusRefreshWithLNJ, 
 TRANSFORM(Risk_Reporting.Layouts.LOG_DTE_Layout,
 SELF.TaskID := LEFT.Response.Result.TaskID;
@@ -138,7 +163,7 @@ SELF.TaskDescription := 'Status Refresh Task';
 SELF.Request_XML := '<Request_XML><RMSID>' + LEFT.RMSID + '</RMSID>' + '<TMSID>' + LEFT.TMSID + '</TMSID></Request_XML>';
 )), NAMED('LOG_Deferred_Task_ESP')));
 
-IF(IsBatch = TRUE AND COUNT(GetAccountNumbers(Response.Result.TaskID <> '')) > 0 AND InvokeStatusRefresh = TRUE, 
+IF(IsBatch = TRUE AND COUNT(GetAccountNumbers(Response.Result.TaskID <> '')) > 0 AND InvokeStatusRefresh = TRUE AND ExcludeStatusRefresh = FALSE, 
 OUTPUT(PROJECT(GetAccountNumbers, 
 TRANSFORM({STRING AcctNo, Risk_Reporting.Layouts.LOG_DTE_Layout},
 SELF.AcctNo := LEFT.AcctNo;
@@ -147,26 +172,8 @@ SELF.TaskDescription := 'Status Refresh Task';
 SELF.Request_XML := '<Request_XML><RMSID>' + LEFT.RMSID + '</RMSID>' + '<TMSID>' + LEFT.TMSID + '</TMSID></Request_XML>';
 )), NAMED('LOG_Deferred_Task_ESP')));
 
-riskview_final_results_with_deferred := IF(COUNT(StatusRefreshResults) > 0,
-                                                                    PROJECT(riskview5_final_results, 
-                                                                    TRANSFORM(RECORDOF(LEFT), 
-                                                                    SELF.Status_Code := '0'; 
-                                                                    SELF.Message := 'Request has been submitted';
-                                                                    SELF.TransactionID := StatusRefreshResults[1].response._Header.TransactionID;
-                                                                    SELF := LEFT;)),
-                                                                    riskview5_final_results);
-                                                                    
-riskview5_suppressed_with_deferred := IF(COUNT(StatusRefreshResults) > 0,
-                                                                    PROJECT(riskview5_suppressed, 
-                                                                    TRANSFORM(RECORDOF(LEFT), 
-                                                                    SELF.Status_Code := '0';
-                                                                    SELF.Message := 'Request has been submitted';
-                                                                    SELF.TransactionID := StatusRefreshResults[1].response._Header.TransactionID;
-                                                                    SELF := LEFT;)),
-                                                                    riskview5_suppressed);
-
 RETURN MAP(StatusRefreshRecommendGWError OR StatusRefreshGWError => riskview5_status_refresh_error,
-                          (REAL)ESPInterfaceVersion >= 2.4 AND (REAL)ESPInterfaceVersion < 2.5 => riskview_final_results_with_deferred,
+                          (REAL)ESPInterfaceVersion <= 2.5 => riskview_final_results_with_deferred,
                           riskview5_suppressed_with_deferred);
 END; // JuLiProcessStatusRefresh END
 

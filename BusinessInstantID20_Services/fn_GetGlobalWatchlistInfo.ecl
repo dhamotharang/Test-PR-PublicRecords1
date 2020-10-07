@@ -1394,7 +1394,14 @@ EXPORT fn_GetGlobalWatchlistInfo( DATASET(BusinessInstantID20_Services.layouts.I
 		// OUTPUT( inForm_AuthReps, NAMED('inForm_AuthReps') );
 		// OUTPUT( inForm_All_pre, NAMED('inForm_All_pre') );
 		// OUTPUT( inForm_Group, NAMED('inForm_Group') );
-		// OUTPUT( patOut, NAMED('patOut') );
+		  //  OUTPUT( patOut, NAMED('patOut') );
+		  //  OUTPUT( patOutSorted, NAMED('patOutSorted') );
+		  //  OUTPUT( patPref_normalized, NAMED('patPref_normalized') );
+		  //  OUTPUT( pat_recs_pre, NAMED('pat_recs_pre') );
+		  //  OUTPUT( ds_input_denormed, NAMED('ds_input_denormed') );
+		  //  OUTPUT( SearchOut_pre, NAMED('SearchOut_pre') );
+		  //  OUTPUT( SearchOut, NAMED('SearchOut') );
+		  //  OUTPUT( ds_businesses_watchlist, NAMED('ds_businesses_watchlist') );
 		// OUTPUT( pat_recs_pre, NAMED('pat_recs_pre') );
 		// OUTPUT( pat_recs, NAMED('pat_recs') );
 		// OUTPUT( SearchOut_pre, NAMED('SearchOut_withWLs') );

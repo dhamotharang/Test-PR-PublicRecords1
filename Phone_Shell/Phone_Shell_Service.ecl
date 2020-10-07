@@ -320,14 +320,15 @@ EXPORT Phone_Shell_Service() := FUNCTION
  mod_access := MODULE(Doxie.IDataAccess)
    EXPORT glb  := glbpurpose;
    EXPORT dppa := dppapurpose;
-   EXPORT DataRestrictionMask := ^.DataRestrictionMask;
+   EXPORT DataRestrictionMask := ^.DataRestrictionMask; // need the ^. because the module variable and the value we're assigning to it have the same name
+   EXPORT industry_class      := IndustryClass;
    EXPORT lexid_source_optout := LexIdSourceOptout;
-   EXPORT transaction_id    := TransactionID;   // esp transaction id or batch uid
-   EXPORT global_company_id := GlobalCompanyId; // mbs gcid
+   EXPORT transaction_id      := TransactionID; // esp transaction id or batch uid
+   EXPORT global_company_id   := GlobalCompanyId; // mbs gcid
  END;
 
- Phone_Score_Model := STD.Str.ToUpperCase(Phone_Score_Model_Temp);
- ModelVersion      := STD.Str.ToUpperCase(ModelVersion_Temp);
+	Phone_Score_Model := Std.Str.ToUpperCase(Phone_Score_Model_Temp);
+ ModelVersion      := Std.Str.ToUpperCase(ModelVersion_Temp);
 
  //ensure that the user selects Equifax(phonemart data) and that the DRM is not set
  allowPremiumSource_A:= UsePremiumSource_A = TRUE AND Phone_Shell.Constants.EquiaxDRMCheck(DataRestrictionMask);

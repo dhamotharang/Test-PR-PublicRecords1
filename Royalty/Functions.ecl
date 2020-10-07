@@ -13,7 +13,7 @@ export Functions := module
 		(unsigned2) Master(file_name='ROYALTY', field_name[1..5]='EMAIL', code=pEmailSrc)[1].field_name2;					
 	export unsigned2 	GetWorkplaceTypeCode(string2 pSrc, boolean spouse=false) := IF(spouse,
 			(unsigned2) Master(pSrc<>'',file_name='ROYALTY', field_name[1..12]='WORKPLACE_SP', code=pSrc)[1].field_name2,
-			(unsigned2) Master(pSrc<>'',file_name='ROYALTY', field_name[1..9]='WORKPLACE', code=pSrc)[1].field_name2);			
+			(unsigned2) Master(pSrc<>'',file_name='ROYALTY', field_name[1..9]='WORKPLACE' or field_name[1..13]='NETWISE_EMAIL', code=pSrc)[1].field_name2);			
 
 	export string20 	GetGDCRoyaltyType(string2 pCountryCode) := function
 		rtype := Master(file_name='ROYALTY', field_name[1..3]='GDC', code=pCountryCode)[1].field_name;

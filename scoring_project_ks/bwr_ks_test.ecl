@@ -47,11 +47,11 @@ result2 := dataset('~ScoringQA::bins::ks::' + curr_date + '_results', results_re
 // result1 := result11(flagship not in ['RiskView_xml_T_mobile_RVT1210_1_v4','RiskView_xml_T_mobile_RVT1212_1_v4']);
 
 
-score_data1 := dataset('~ScoringQA::bins::ks::' + prev_date + '_data', data_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n')));
+score_data1 := distribute(dataset('~ScoringQA::bins::ks::' + prev_date + '_data', data_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n'))),(integer)acctno);
 
 // score_data1 := score_data11(flagship not in ['RiskView_xml_T_mobile_RVT1210_1_v4','RiskView_xml_T_mobile_RVT1212_1_v4']);
 
-score_data2 := dataset('~ScoringQA::bins::ks::' + curr_date + '_data', data_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n')));
+score_data2 := distribute(dataset('~ScoringQA::bins::ks::' + curr_date + '_data', data_rec, CSV(heading(0), SEPARATOR('|'), QUOTE(''), TERMINATOR('\n'))),(integer)acctno);
 
 
 scores_project(ds,rec):=functionmacro

@@ -206,6 +206,10 @@ PersonContext_transformed := project(dsResponseRecords(searchStatus=personContex
 	
 		self.thrive_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.THRIVE ], 
 													[TRIM(left.RecID1, left, right)], 
+													[]);		
+													
+		self.SexOffender_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.SO_MAIN ], 
+													[TRIM(left.RecID1, left, right)], 
 													[]);
 		self := [];
 		
@@ -240,6 +244,7 @@ rolled_personContext := rollup(PersonContext_sorted, left.lexid=right.lexid,
 		SELF.header_correct_record_id       := left.header_correct_record_id  +  right.header_correct_record_id ;
 		SELF.Death_correct_record_id		:= left.Death_correct_record_id  +  right.Death_correct_record_id ;
 		SELF.thrive_correct_record_id		:= left.thrive_correct_record_id  +  right.thrive_correct_record_id ;
+		SELF.SexOffender_correct_record_id		:= left.SexOffender_correct_record_id  +  right.SexOffender_correct_record_id ;
 
 		self := left;
 		));
@@ -280,6 +285,7 @@ with_personContext := join(input_with_DID, rolled_personContext, left.P_lexid=ri
 		SELF.header_correct_record_id       := left.header_correct_record_id  +  right.header_correct_record_id ;
 		SELF.Death_correct_record_id				:= left.Death_correct_record_id  +  right.Death_correct_record_id ;
 		SELF.thrive_correct_record_id				:= left.thrive_correct_record_id  +  right.thrive_correct_record_id ;
+		SELF.SexOffender_correct_record_id				:= left.SexOffender_correct_record_id  +  right.SexOffender_correct_record_id ;
 		
 		self := left,
 		self := []), keep(1), left outer);

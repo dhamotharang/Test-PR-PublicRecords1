@@ -8,11 +8,11 @@ EXPORT B_Industry_3(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph 
   SHARED VIRTUAL TYPEOF(B_Business_4(__in,__cfg).__ENH_Business_4) __ENH_Business_4 := B_Business_4(__in,__cfg).__ENH_Business_4;
   SHARED VIRTUAL TYPEOF(E_Business_Industry(__in,__cfg).__Result) __E_Business_Industry := E_Business_Industry(__in,__cfg).__Result;
   SHARED VIRTUAL TYPEOF(B_Industry_4(__in,__cfg).__ENH_Industry_4) __ENH_Industry_4 := B_Industry_4(__in,__cfg).__ENH_Industry_4;
-  SHARED __EE468627 := __ENH_Industry_4;
-  SHARED __EE470503 := __ENH_Business_4;
-  SHARED __EE470501 := __E_Business_Industry;
-  SHARED __EE472866 := __EE470501(__NN(__EE470501._industry_) AND __NN(__EE470501._bus_));
-  SHARED __ST471443_Layout := RECORD
+  SHARED __EE539290 := __ENH_Industry_4;
+  SHARED __EE541205 := __ENH_Business_4;
+  SHARED __EE541203 := __E_Business_Industry;
+  SHARED __EE543598 := __EE541203(__NN(__EE541203._industry_) AND __NN(__EE541203._bus_));
+  SHARED __ST542160_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.bool Business_Not_On_File_ := FALSE;
     KEL.typ.nint Highest_Frequency_N_A_I_C_S_;
@@ -25,13 +25,13 @@ EXPORT B_Industry_3(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph 
     KEL.typ.ntyp(E_Industry().Typ) _industry_;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC472884(B_Business_4(__in,__cfg).__ST236766_Layout __EE470503, E_Business_Industry(__in,__cfg).Layout __EE472866) := __EEQP(__EE472866._bus_,__EE470503.UID);
-  __ST471443_Layout __JT472884(B_Business_4(__in,__cfg).__ST236766_Layout __l, E_Business_Industry(__in,__cfg).Layout __r) := TRANSFORM
+  __JC543616(B_Business_4(__in,__cfg).__ST245881_Layout __EE541205, E_Business_Industry(__in,__cfg).Layout __EE543598) := __EEQP(__EE543598._bus_,__EE541205.UID);
+  __ST542160_Layout __JT543616(B_Business_4(__in,__cfg).__ST245881_Layout __l, E_Business_Industry(__in,__cfg).Layout __r) := TRANSFORM
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE472885 := JOIN(__EE472866,__EE470503,__JC472884(RIGHT,LEFT),__JT472884(RIGHT,LEFT),INNER,HASH);
-  SHARED __ST470587_Layout := RECORD
+  SHARED __EE543617 := JOIN(__EE543598,__EE541205,__JC543616(RIGHT,LEFT),__JT543616(RIGHT,LEFT),INNER,HASH);
+  SHARED __ST541289_Layout := RECORD
     KEL.typ.ntyp(E_Industry().Typ) UID;
     KEL.typ.ntyp(E_Business().Typ) _bus_;
     KEL.typ.ntyp(E_Industry().Typ) _industry_;
@@ -44,25 +44,25 @@ EXPORT B_Industry_3(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph 
     KEL.typ.bool Use_Primary_N_A_I_C_S_ := FALSE;
     KEL.typ.bool Use_Primary_S_I_C_ := FALSE;
   END;
-  SHARED __ST470587_Layout __ND472901__Project(__ST471443_Layout __PP472886) := TRANSFORM
-    SELF.UID := __PP472886._industry_;
-    SELF.U_I_D__1_ := __PP472886.UID;
-    SELF := __PP472886;
+  SHARED __ST541289_Layout __ND543633__Project(__ST542160_Layout __PP543618) := TRANSFORM
+    SELF.UID := __PP543618._industry_;
+    SELF.U_I_D__1_ := __PP543618.UID;
+    SELF := __PP543618;
   END;
-  SHARED __EE472946 := PROJECT(__EE472885,__ND472901__Project(LEFT));
-  SHARED __ST470626_Layout := RECORD
+  SHARED __EE543678 := PROJECT(__EE543617,__ND543633__Project(LEFT));
+  SHARED __ST541328_Layout := RECORD
     KEL.typ.ntyp(E_Industry().Typ) UID;
     KEL.typ.nkdate Most_Recent_N_A_I_C_S_Date_;
     KEL.typ.nkdate Most_Recent_S_I_C_Date_;
   END;
-  SHARED __EE472964 := PROJECT(__EE472946,__ST470626_Layout);
-  SHARED __ST470646_Layout := RECORD
+  SHARED __EE543696 := PROJECT(__EE543678,__ST541328_Layout);
+  SHARED __ST541348_Layout := RECORD
     KEL.typ.nkdate M_A_X___Most_Recent_N_A_I_C_S_Date_;
     KEL.typ.nkdate M_A_X___Most_Recent_S_I_C_Date_;
     KEL.typ.ntyp(E_Industry().Typ) UID;
   END;
-  SHARED __EE472985 := PROJECT(__CLEANANDDO(__EE472964,TABLE(__EE472964,{KEL.Aggregates.MaxNG(__EE472964.Most_Recent_N_A_I_C_S_Date_) M_A_X___Most_Recent_N_A_I_C_S_Date_,KEL.Aggregates.MaxNG(__EE472964.Most_Recent_S_I_C_Date_) M_A_X___Most_Recent_S_I_C_Date_,UID},UID,MERGE)),__ST470646_Layout);
-  SHARED __ST471517_Layout := RECORD
+  SHARED __EE543717 := PROJECT(__CLEANANDDO(__EE543696,TABLE(__EE543696,{KEL.Aggregates.MaxNG(__EE543696.Most_Recent_N_A_I_C_S_Date_) M_A_X___Most_Recent_N_A_I_C_S_Date_,KEL.Aggregates.MaxNG(__EE543696.Most_Recent_S_I_C_Date_) M_A_X___Most_Recent_S_I_C_Date_,UID},UID,MERGE)),__ST541348_Layout);
+  SHARED __ST542234_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint _record__type_;
     KEL.typ.nstr _sbfe__contributor__number_;
@@ -88,17 +88,17 @@ EXPORT B_Industry_3(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph 
     KEL.typ.ntyp(E_Industry().Typ) U_I_D__1_;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC472991(B_Industry_5(__in,__cfg).__ST238159_Layout __EE468627, __ST470646_Layout __EE472985) := __EEQP(__EE468627.UID,__EE472985.UID);
-  __ST471517_Layout __JT472991(B_Industry_5(__in,__cfg).__ST238159_Layout __l, __ST470646_Layout __r) := TRANSFORM
+  __JC543723(B_Industry_5(__in,__cfg).__ST248893_Layout __EE539290, __ST541348_Layout __EE543717) := __EEQP(__EE539290.UID,__EE543717.UID);
+  __ST542234_Layout __JT543723(B_Industry_5(__in,__cfg).__ST248893_Layout __l, __ST541348_Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE472992 := JOIN(__EE468627,__EE472985,__JC472991(LEFT,RIGHT),__JT472991(LEFT,RIGHT),LEFT OUTER,HASH);
-  SHARED __EE468952 := __ENH_Account_4;
-  SHARED __EE468950 := __E_Account_Industry;
-  SHARED __EE473036 := __EE468950(__NN(__EE468950._industry_) AND __NN(__EE468950._acc_));
-  SHARED __ST470859_Layout := RECORD
+  SHARED __EE543724 := JOIN(__EE539290,__EE543717,__JC543723(LEFT,RIGHT),__JT543723(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __EE539621 := __ENH_Account_4;
+  SHARED __EE539619 := __E_Account_Industry;
+  SHARED __EE543768 := __EE539619(__NN(__EE539619._industry_) AND __NN(__EE539619._acc_));
+  SHARED __ST541561_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nunk _seq_;
     KEL.typ.nunk _ultid_;
@@ -179,6 +179,9 @@ EXPORT B_Industry_3(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph 
     KEL.typ.nbool Is_Stale6_Month_;
     KEL.typ.nbool Is_Stale84_Month_;
     KEL.typ.nkdate Last_Cycle_End_Date_;
+    KEL.typ.nint Maximum_Credit_Used_;
+    KEL.typ.nint Maximum_Currrent_Limit_;
+    KEL.typ.nint Maximum_Original_Limit_;
     KEL.typ.nint Min_Days_From_One_Year_;
     KEL.typ.nint Min_Days_From_Two_Years_;
     KEL.typ.nkdate Most_Recent_Balance_Date_;
@@ -214,13 +217,13 @@ EXPORT B_Industry_3(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph 
     KEL.typ.ntyp(E_Industry().Typ) _industry_;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC473054(B_Account_4(__in,__cfg).__ST236604_Layout __EE468952, E_Account_Industry(__in,__cfg).Layout __EE473036) := __EEQP(__EE473036._acc_,__EE468952.UID);
-  __ST470859_Layout __JT473054(B_Account_4(__in,__cfg).__ST236604_Layout __l, E_Account_Industry(__in,__cfg).Layout __r) := TRANSFORM
+  __JC543786(B_Account_4(__in,__cfg).__ST245716_Layout __EE539621, E_Account_Industry(__in,__cfg).Layout __EE543768) := __EEQP(__EE543768._acc_,__EE539621.UID);
+  __ST541561_Layout __JT543786(B_Account_4(__in,__cfg).__ST245716_Layout __l, E_Account_Industry(__in,__cfg).Layout __r) := TRANSFORM
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE473055 := JOIN(__EE473036,__EE468952,__JC473054(RIGHT,LEFT),__JT473054(RIGHT,LEFT),INNER,HASH);
-  SHARED __ST469768_Layout := RECORD
+  SHARED __EE543787 := JOIN(__EE543768,__EE539621,__JC543786(RIGHT,LEFT),__JT543786(RIGHT,LEFT),INNER,HASH);
+  SHARED __ST540458_Layout := RECORD
     KEL.typ.ntyp(E_Industry().Typ) UID;
     KEL.typ.ntyp(E_Account().Typ) _acc_;
     KEL.typ.ntyp(E_Industry().Typ) _industry_;
@@ -304,6 +307,9 @@ EXPORT B_Industry_3(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph 
     KEL.typ.nbool Is_Stale6_Month_;
     KEL.typ.nbool Is_Stale84_Month_;
     KEL.typ.nkdate Last_Cycle_End_Date_;
+    KEL.typ.nint Maximum_Credit_Used_;
+    KEL.typ.nint Maximum_Currrent_Limit_;
+    KEL.typ.nint Maximum_Original_Limit_;
     KEL.typ.nint Min_Days_From_One_Year_;
     KEL.typ.nint Min_Days_From_Two_Years_;
     KEL.typ.nkdate Most_Recent_Balance_Date_;
@@ -336,23 +342,23 @@ EXPORT B_Industry_3(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph 
     KEL.typ.nkdate Tradeline84_Month_Date_;
     KEL.typ.nkdate Tradeline84_Month_Load_Date_;
   END;
-  SHARED __ST469768_Layout __ND473174__Project(__ST470859_Layout __PP473056) := TRANSFORM
-    SELF.UID := __PP473056._industry_;
-    SELF.U_I_D__1_ := __PP473056.UID;
-    SELF := __PP473056;
+  SHARED __ST540458_Layout __ND543909__Project(__ST541561_Layout __PP543788) := TRANSFORM
+    SELF.UID := __PP543788._industry_;
+    SELF.U_I_D__1_ := __PP543788.UID;
+    SELF := __PP543788;
   END;
-  SHARED __EE473631 := PROJECT(__EE473055,__ND473174__Project(LEFT));
-  SHARED __ST470009_Layout := RECORD
+  SHARED __EE544378 := PROJECT(__EE543787,__ND543909__Project(LEFT));
+  SHARED __ST540705_Layout := RECORD
     KEL.typ.ntyp(E_Industry().Typ) UID;
     KEL.typ.nkdate Date_Account_Opened_;
   END;
-  SHARED __EE473645 := PROJECT(__EE473631,__ST470009_Layout);
-  SHARED __ST470024_Layout := RECORD
+  SHARED __EE544392 := PROJECT(__EE544378,__ST540705_Layout);
+  SHARED __ST540720_Layout := RECORD
     KEL.typ.nkdate M_A_X___Date_Account_Opened_;
     KEL.typ.ntyp(E_Industry().Typ) UID;
   END;
-  SHARED __EE473661 := PROJECT(__CLEANANDDO(__EE473645,TABLE(__EE473645,{KEL.Aggregates.MaxNG(__EE473645.Date_Account_Opened_) M_A_X___Date_Account_Opened_,UID},UID,MERGE)),__ST470024_Layout);
-  SHARED __ST471661_Layout := RECORD
+  SHARED __EE544408 := PROJECT(__CLEANANDDO(__EE544392,TABLE(__EE544392,{KEL.Aggregates.MaxNG(__EE544392.Date_Account_Opened_) M_A_X___Date_Account_Opened_,UID},UID,MERGE)),__ST540720_Layout);
+  SHARED __ST542378_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint _record__type_;
     KEL.typ.nstr _sbfe__contributor__number_;
@@ -380,14 +386,14 @@ EXPORT B_Industry_3(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph 
     KEL.typ.ntyp(E_Industry().Typ) U_I_D__2_;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC473669(__ST471517_Layout __EE472992, __ST470024_Layout __EE473661) := __EEQP(__EE472992.UID,__EE473661.UID);
-  __ST471661_Layout __JT473669(__ST471517_Layout __l, __ST470024_Layout __r) := TRANSFORM
+  __JC544416(__ST542234_Layout __EE543724, __ST540720_Layout __EE544408) := __EEQP(__EE543724.UID,__EE544408.UID);
+  __ST542378_Layout __JT544416(__ST542234_Layout __l, __ST540720_Layout __r) := TRANSFORM
     SELF.U_I_D__2_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE473670 := JOIN(__EE472992,__EE473661,__JC473669(LEFT,RIGHT),__JT473669(LEFT,RIGHT),LEFT OUTER,HASH);
-  EXPORT __ST235030_Layout := RECORD
+  SHARED __EE544417 := JOIN(__EE543724,__EE544408,__JC544416(LEFT,RIGHT),__JT544416(LEFT,RIGHT),LEFT OUTER,HASH);
+  EXPORT __ST242605_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint _record__type_;
     KEL.typ.nstr _sbfe__contributor__number_;
@@ -413,11 +419,11 @@ EXPORT B_Industry_3(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph 
     KEL.typ.nbool Is_Valid_Code_;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST235030_Layout __ND473703__Project(__ST471661_Layout __PP473671) := TRANSFORM
-    SELF.Date_Account_Opened_ := __PP473671.M_A_X___Date_Account_Opened_;
-    SELF.Is_Most_Recent_N_A_I_C_S_ := __AND(__PP473671.Is_Highest_Frequency_N_A_I_C_S_,__OP2(__PP473671._dt__last__seen_,=,__PP473671.M_A_X___Most_Recent_N_A_I_C_S_Date_));
-    SELF.Is_Most_Recent_S_I_C_ := __AND(__PP473671.Is_Highest_Frequency_S_I_C_,__OP2(__PP473671._dt__last__seen_,=,__PP473671.M_A_X___Most_Recent_S_I_C_Date_));
-    SELF := __PP473671;
+  SHARED __ST242605_Layout __ND544450__Project(__ST542378_Layout __PP544418) := TRANSFORM
+    SELF.Date_Account_Opened_ := __PP544418.M_A_X___Date_Account_Opened_;
+    SELF.Is_Most_Recent_N_A_I_C_S_ := __AND(__PP544418.Is_Highest_Frequency_N_A_I_C_S_,__OP2(__PP544418._dt__last__seen_,=,__PP544418.M_A_X___Most_Recent_N_A_I_C_S_Date_));
+    SELF.Is_Most_Recent_S_I_C_ := __AND(__PP544418.Is_Highest_Frequency_S_I_C_,__OP2(__PP544418._dt__last__seen_,=,__PP544418.M_A_X___Most_Recent_S_I_C_Date_));
+    SELF := __PP544418;
   END;
-  EXPORT __ENH_Industry_3 := PROJECT(__EE473670,__ND473703__Project(LEFT));
+  EXPORT __ENH_Industry_3 := PROJECT(__EE544417,__ND544450__Project(LEFT));
 END;

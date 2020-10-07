@@ -1,4 +1,4 @@
-﻿IMPORT FLAccidents_Ecrash,iesp;
+﻿IMPORT FLAccidents_Ecrash,iesp,eCrash_Services;
 
 //** Added the fix for bug 138974
 
@@ -272,6 +272,7 @@ EXPORT Layouts := MODULE
 			string pageCount {xpath('pageCount')};
 			string extension {xpath('extension')};
 			string dateAdded {xpath('dateAdded')};
+			string ReportSource {xpath('ReportSource')};
 		END;
 		
 		EXPORT DeltaBaseDocumentResponse := RECORD 

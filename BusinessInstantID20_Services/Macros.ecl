@@ -1,6 +1,9 @@
 ﻿EXPORT Macros := MODULE
 	
 	EXPORT mac_ReadInputIESP() := MACRO
+		
+		IMPORT Address, iesp;
+		
 		UNSIGNED4  _Seq                :=   1;
 		STRING30   _AcctNo             := users.AccountNumber;
 		
@@ -150,6 +153,9 @@
 	ENDMACRO;
 	
 	EXPORT mac_ReadOptions() := MACRO
+	
+		IMPORT Business_Risk_BIP, BusinessInstantID20_Services, iesp, BusinessInstantID20_Services, LNSmallBusiness;
+		
 		// Can't have duplicate definitions of Stored with different default values, 
 		// so add the default to #stored to eliminate the assignment of a default value.
 		// Fixes "Duplicate definition of STORED('datarestrictionmask') with different type 
@@ -158,12 +164,14 @@
 		#STORED('GLBPurpose',  Business_Risk_BIP.Constants.Default_GLBA);
 		#STORED('DataRestrictionMask',Business_Risk_BIP.Constants.Default_DataRestrictionMask);
 		#STORED('DataPermissionMask' ,Business_Risk_BIP.Constants.Default_DataPermissionMask);
-		
+		#STORED('ofacversion'        ,BusinessInstantID20_Services.Constants.DEFAULT_OFAC_VERSION);
+
 		UNSIGNED1 DPPAPurpose_stored      := Business_Risk_BIP.Constants.Default_DPPA                : STORED('DPPAPurpose');
 		UNSIGNED1 GLBPurpose_stored       := Business_Risk_BIP.Constants.Default_GLBA                : STORED('GLBPurpose');
 		STRING DataRestrictionMask_stored := Business_Risk_BIP.Constants.Default_DataRestrictionMask : STORED('DataRestrictionMask');
 		STRING DataPermissionMask_stored  := Business_Risk_BIP.Constants.Default_DataPermissionMask  : STORED('DataPermissionMask');
 		UNSIGNED BIID20ProductType_stored := BusinessInstantID20_Services.Types.productTypeEnum.BASE : STORED('BIID20ProductType');
+		UNSIGNED1 OFAC_Version_stored     := Business_Risk_BIP.Constants.Default_OFAC_Version        : STORED('ofacversion');
     gateways_in := Gateway.Configuration.Get();
     
     iesp.businessinstantid20.t_BIID20Gateway gw_switch(gateways_in le) := transform
@@ -196,7 +204,9 @@
 		UNSIGNED1	_MarketingMode                   := IF( option.MarketingMode = 0           , Business_Risk_BIP.Constants.Default_MarketingMode      , option.MarketingMode );
 		UNSIGNED1	_BusShellVersion                 := IF( option.BusShellVersion = 0         , Business_Risk_BIP.Constants.BusShellVersion_v22        , option.BusShellVersion );
 		STRING50	_AllowedSources                  := IF( option.AllowedSources = ''         , Business_Risk_BIP.Constants.Default_AllowedSources     , option.AllowedSources );
-		UNSIGNED1 _OFAC_Version                    := IF( option.OFACVersion = 0             , BusinessInstantID20_Services.Constants.DEFAULT_OFAC_VERSION, option.OFACVersion );
+		// Check options first, otherwise use OutOfBand	setting passed from MBS	
+		UNSIGNED1 _OFAC_Version                    := MAP( option.OFACVersion = 0 => IF( OFAC_Version_stored = 0, BusinessInstantID20_Services.Constants.DEFAULT_OFAC_VERSION, OFAC_Version_stored ),
+                                                                                 option.OFACVersion);
 		REAL      _Global_Watchlist_Threshold      := IF( option.GlobalWatchlistThreshold = 0, Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold, option.GlobalWatchlistThreshold );
 		UNSIGNED6	_HistoryDate                     := IF( option.HistoryDate = 0             , 999999, option.HistoryDate );
 		UNSIGNED  _BIID20ProductType               := IF( option.BIID20ProductType = 0       , BIID20ProductType_stored, option.BIID20ProductType );
@@ -207,16 +217,16 @@
 		BOOLEAN   _include_additional_watchlists   := if(_ExcludeWatchlists = TRUE, FALSE, _BIID20ProductType IN [BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE, BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE_PLUS_SBFE]);  
 		DATASET(iesp.share.t_StringArrayItem) _Watchlists_Requested := option.WatchlistsRequested;
 		DATASET(iesp.businessinstantid20.t_BIID20Gateway) _Gateways  := if(exists(Options_Gateway), Options_Gateway, gateways_root);
-		DATASET(LNSmallBusiness.Layouts.AttributeGroupRec) _AttributesRequested := PROJECT(option.AttributesVersionRequest, TRANSFORM(LNSmallBusiness.Layouts.AttributeGroupRec, SELF.AttributeGroup := StringLib.StringToUpperCase(LEFT.Value)));
+		DATASET(LNSmallBusiness.Layouts.AttributeGroupRec) _AttributesRequested := PROJECT(option.AttributesVersionRequest, TRANSFORM(LNSmallBusiness.Layouts.AttributeGroupRec, SELF.AttributeGroup := std.str.ToUpperCase(LEFT.Value)));
 		DATASET(LNSmallBusiness.Layouts.ModelNameRec) _ModelsRequested := 
 				PROJECT(option.IncludeModels.Names, 
 						TRANSFORM(LNSmallBusiness.Layouts.ModelNameRec, 
-										SELF.ModelName := StringLib.StringToUpperCase(LEFT.Value)));
+										SELF.ModelName := std.str.ToUpperCase(LEFT.Value)));
 		DATASET(LNSmallBusiness.Layouts.ModelOptionsRec) _ModelOptions := 
 				PROJECT(option.IncludeModels.ModelOptions,
 						TRANSFORM(LNSmallBusiness.Layouts.ModelOptionsRec, 
-										SELF.OptionName := StringLib.StringToUpperCase(TRIM(LEFT.OptionName, LEFT, RIGHT)), 
-										SELF.OptionValue := StringLib.StringToUpperCase(TRIM(LEFT.OptionValue, LEFT, RIGHT))));
+										SELF.OptionName := std.str.ToUpperCase(TRIM(LEFT.OptionName, LEFT, RIGHT)), 
+										SELF.OptionValue := std.str.ToUpperCase(TRIM(LEFT.OptionValue, LEFT, RIGHT))));
     STRING    _DataPermissionMask := BusinessInstantID20_Services.fn_setSBFEBitInDataPermissionMask(__DataPermissionMask, _BIID20ProductType); 
 				
 		// Per Product Mgmt guidance:
@@ -272,6 +282,8 @@
 	ENDMACRO;
 
 	EXPORT mac_ReadOptionsBatch() := MACRO
+		
+		IMPORT Business_Risk_BIP, BusinessInstantID20_Services, Gateway, iesp, STD;
 		// Can't have duplicate definitions of Stored with different default values, 
 		// so add the default to #stored to eliminate the assignment of a default value.
 		// Fixes "Duplicate definition of STORED('datarestrictionmask') with different type 
@@ -281,7 +293,7 @@
 		#STORED('DPPAPurpose'        ,Business_Risk_BIP.Constants.Default_DPPA);
 		#STORED('GLBPurpose'         ,Business_Risk_BIP.Constants.Default_GLBA);
 		#STORED('IndustryClass'      ,Business_Risk_BIP.Constants.Default_IndustryClass);
-		#STORED('OFAC_Version'       ,BusinessInstantID20_Services.Constants.DEFAULT_OFAC_VERSION);
+		#STORED('ofacversion'        ,BusinessInstantID20_Services.Constants.DEFAULT_OFAC_VERSION);
 		#STORED('Global_Watchlist_Threshold',Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold);
 
 		UNSIGNED1 DPPAPurpose_stored      := Business_Risk_BIP.Constants.Default_DPPA                : STORED('DPPAPurpose');
@@ -290,7 +302,7 @@
 		STRING DataPermissionMask_stored  := Business_Risk_BIP.Constants.Default_DataPermissionMask  : STORED('DataPermissionMask');
 		STRING5 IndustryClass_stored      := Business_Risk_BIP.Constants.Default_IndustryClass       : STORED('IndustryClass');   
 		BOOLEAN ExcludeWatchLists_stored  := BusinessInstantID20_Services.Constants.EXCLUDEWATCHLISTS: STORED('ExcludeWatchLists');
-		UNSIGNED1 OFAC_Version_stored     := Business_Risk_BIP.Constants.Default_OFAC_Version        : STORED('OFAC_Version');
+		UNSIGNED1 OFAC_Version_stored     := Business_Risk_BIP.Constants.Default_OFAC_Version        : STORED('ofacversion');
 		REAL Global_Watchlist_Threshold_stored := Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold : STORED('Global_Watchlist_Threshold');
 
 		gateways_in := Gateway.Configuration.Get();	// Gateways Coded in this Product: Targus and Bridger
@@ -337,6 +349,9 @@
 	ENDMACRO;
 	
 	EXPORT mac_LoadInput() := MACRO
+		
+		IMPORT BusinessInstantID20_Services;
+		
 		BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo xfm_LoadInput := TRANSFORM
 			SELF.Seq            := _Seq;
 			SELF.AcctNo         := _AcctNo;		

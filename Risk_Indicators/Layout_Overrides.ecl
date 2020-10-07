@@ -1,13 +1,13 @@
-export Layout_Overrides :=
+﻿export Layout_Overrides :=
 RECORD
-	SET OF STRING55		veh_correct_vin {maxlength(5600)} := [];
-	SET OF STRING20		veh_correct_ffid {maxlength(2100)} := [];
-	SET OF STRING55		bankrupt_correct_cccn {maxlength(5600)} := [];
-	SET OF STRING20		bankrupt_correct_ffid {maxlength(2100)} := [];
-	SET OF STRING100		lien_correct_tmsid_rmsid {maxlength(20200)} := [];
-	SET OF STRING20		lien_correct_ffid {maxlength(5250)} := [];	
-	SET OF STRING55		crim_correct_ofk {maxlength(33000)} := [];
-	SET OF STRING20		crim_correct_ffid {maxlength(5250)} := [];
+	SET OF STRING55  veh_correct_vin {maxlength(5600)} := [];
+	SET OF STRING20  veh_correct_ffid {maxlength(2100)} := [];
+	SET OF STRING55  bankrupt_correct_cccn {maxlength(5600)} := [];
+	SET OF STRING20  bankrupt_correct_ffid {maxlength(2100)} := [];
+	SET OF STRING100 lien_correct_tmsid_rmsid {maxlength(20200)} := [];
+	SET OF STRING20  lien_correct_ffid {maxlength(5250)} := [];	
+	SET OF STRING100 crim_correct_ofk {maxlength(33000)} := [];
+	SET OF STRING20  crim_correct_ffid {maxlength(5250)} := [];
 
   // type of property record (assess./deeds/mortgage) can be identified by ln_fare_id, if needed.
 	SET OF STRING12 prop_correct_lnfare {maxlength(2600)} := [];
@@ -46,7 +46,11 @@ RECORD
 	SET OF STRING100 inquiries_correct_record_id {maxlength(10100)} := [];
 	
 	SET OF STRING20 ssn_correct_ffid {maxlength(2100)} := [];
-	SET OF STRING100 ssn_correct_record_id {maxlength(10100)} := [];
+	SET OF STRING100 ssn_correct_record_id {maxlength(10100)} := [];	
+
+  SET OF STRING20  death_correct_ffid {maxlength(5250)} := []; // need to verify length
+  SET OF STRING100 death_correct_record_id {maxlength(33000)} := []; //need to verify length
+
 
 	// Allowing for 200 header corrections
 	SET OF STRING100 header_correct_record_id {maxlength(20100)} := [];

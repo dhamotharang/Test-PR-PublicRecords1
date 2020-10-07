@@ -151,8 +151,8 @@ EXPORT fn_GetRawContributedRecs(DATASET(FraudShared_Services.Layouts.BatchInExte
                                      if(in_rec.z5 <> '', clean_address.zip = in_rec.z5, true) AND
                                      if(in_rec.HouseholdId <> '', household_id = in_rec.HouseholdId, true) AND
                                      if(in_rec.CustomerPersonId <> '', customer_person_id = in_rec.CustomerPersonId, true) AND
-                                     if(in_rec.transactionstartdate <> '' AND in_rec.transactionenddate <> '',
-                                        reported_date BETWEEN in_rec.transactionstartdate AND in_rec.transactionenddate , true) AND
+                                     // if(in_rec.transactionstartdate <> '' AND in_rec.transactionenddate <> '',
+                                        // reported_date BETWEEN in_rec.transactionstartdate AND in_rec.transactionenddate , true) AND
                                      if(in_rec.amountmin <> '', amount_paid >= in_rec.amountmin, true) AND
                                      if(in_rec.amountmax <> '', amount_paid <= in_rec.amountmax, true) AND
                                      if(in_rec.bank_routing_number <> '', bank_routing_number_1 = in_rec.bank_routing_number OR
@@ -171,7 +171,8 @@ EXPORT fn_GetRawContributedRecs(DATASET(FraudShared_Services.Layouts.BatchInExte
                                      if(fullemail, email_address = TRIM(in_rec.email_address), true) AND
                                      if(in_rec.dl_number <> '', drivers_license = in_rec.dl_number, true) AND
                                      if(in_rec.dl_state <> '', drivers_license_state = in_rec.dl_state, true) AND
-                                     if(in_rec.ProgramCode <> '', classification_permissible_use_access.ind_type_description	= in_rec.ProgramCode, true)
+                                     if(in_rec.ProgramCode <> '', classification_permissible_use_access.ind_type_description	= in_rec.ProgramCode, true) AND
+                                     if(in_rec.name_middle <> '', trim(cleaned_name.mname, left, right)[1..length(trim(in_rec.name_middle, left, right))] = trim(in_rec.name_middle, left, right), true)
                                    );
 
  //AND filter with BankName , explicit join because we do not have BankName field in the payload.

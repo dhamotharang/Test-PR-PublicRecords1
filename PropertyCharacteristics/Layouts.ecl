@@ -132,6 +132,8 @@ module
 
 	export	TempBase	:=
 	record
+		unsigned4 		global_sid:=0;
+		unsigned8 		record_sid:=0;
 		unsigned6		property_rid;
 		unsigned4		dt_vendor_first_reported;
 		unsigned4		dt_vendor_last_reported;

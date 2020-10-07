@@ -4,8 +4,8 @@ IMPORT B_Property_Event_5,CFG_Compile,E_Property,E_Property_Event,E_Zip_Code FRO
 IMPORT * FROM KEL13.Null;
 EXPORT B_Property_Event_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Property_Event_5(__in,__cfg).__ENH_Property_Event_5) __ENH_Property_Event_5 := B_Property_Event_5(__in,__cfg).__ENH_Property_Event_5;
-  SHARED __EE3706480 := __ENH_Property_Event_5;
-  EXPORT __ST191134_Layout := RECORD
+  SHARED __EE3718856 := __ENH_Property_Event_5;
+  EXPORT __ST193799_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr L_N_Fares_I_D_;
     KEL.typ.nstr Primary_Range_;
@@ -79,9 +79,9 @@ EXPORT B_Property_Event_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST191134_Layout __ND3706485__Project(B_Property_Event_5(__in,__cfg).__ST196623_Layout __PP3706481) := TRANSFORM
-    SELF.Dt_First_Seen_ := KEL.era.ToDate(__PP3706481.Date_First_Seen_);
-    SELF := __PP3706481;
+  SHARED __ST193799_Layout __ND3718861__Project(B_Property_Event_5(__in,__cfg).__ST199300_Layout __PP3718857) := TRANSFORM
+    SELF.Dt_First_Seen_ := KEL.era.ToDate(__PP3718857.Date_First_Seen_);
+    SELF := __PP3718857;
   END;
-  EXPORT __ENH_Property_Event_4 := PROJECT(__EE3706480,__ND3706485__Project(LEFT));
+  EXPORT __ENH_Property_Event_4 := PROJECT(__EE3718856,__ND3718861__Project(LEFT));
 END;

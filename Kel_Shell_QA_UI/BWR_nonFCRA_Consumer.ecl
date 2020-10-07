@@ -1,5 +1,8 @@
 ﻿IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD;
 
+#OPTION('AllowAutoSwitchQueue', true);
+#option('allowedClusters', 'thor50_dev02,thor50_dev');
+
 //settings
 Query_Environment:=Kel_Shell_QA_UI.Constants.BOCA_DEV_ROXIE;
 InputFile_Dali:=Kel_Shell_QA_UI.Constants.Boca_Dataland;
@@ -34,12 +37,22 @@ Output_Master_Results := TRUE;
 // Toggle to include/exclude SALT profile of results file
 // Output_SALT_Profile := FALSE;
 Output_SALT_Profile := TRUE;
+// Use default list of allowed sources
+// AllowedSourcesDataset_List := [];
+// AllowedSourcesDataset_List:=	[MDR.SourceTools.src_Bankruptcy,MDR.SourceTools.src_Accurint_Crim_Court];	
+AllowedSourcesDataset_List:=	[];	
+// Do not exclude any additional sources from allowed sources dataset.
+ExcludeSourcesDataset_List := [];
 
+email_list:='karthik.reddy@lexisnexisrisk.com';
 
-Get_nonFCRA_Consumer_InputFile := Kel_Shell_QA_UI.Get_Input_File(InputFile_LogicalName, InputFile_Dali, File_Type, Records_to_Run);															
+logical_file_type:='CSV';
+// Get_nonFCRA_Consumer_InputFile := Kel_Shell_QA_UI.Get_Input_File(InputFile_LogicalName, InputFile_Dali, File_Type, Records_to_Run);															
 
 nonFCRA_Consumer:= Kel_Shell_QA_UI.nonFCRA_Consumer( Query_Environment,
                                                      InputFile_LogicalName,
+																										 logical_file_type,
+																								     InputFile_Dali,
 																										 Records_to_Run,
 																										 GLBA,
 																										 DPPA,
@@ -52,7 +65,21 @@ nonFCRA_Consumer:= Kel_Shell_QA_UI.nonFCRA_Consumer( Query_Environment,
 																										 histDate,
 																										 Score_threshold,
 																										 Output_Master_Results,
-																										 Output_SALT_Profile
+																										 Output_SALT_Profile,
+																										 AllowedSourcesDataset_List,
+																								     ExcludeSourcesDataset_List,
+																										 email_list
                                                     );
+
+execute_type:= 'executeNow';
+// execute_type:=  'scheduleCron';
+// cron_time :='0 10 19 * *';
+
+// IF(execute_type='executeNow',
+
+nonFCRA_Consumer:FAILURE(FileServices.SendEmail(email_list,'KEL SHELL QA UI run job','The failed workunit is:' + workunit + FailMessage));
+
+// IF(execute_type='scheduleCron',nonFCRA_Consumer): WHEN(CRON(cron_time)), 
+// FAILURE(FileServices.SendEmail(email_list,'KEL SHELL QA UI run job','The failed workunit is:' + workunit + FailMessage));		
 
 EXPORT BWR_nonFCRA_Consumer := 'todo';

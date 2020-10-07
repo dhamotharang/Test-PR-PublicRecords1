@@ -19,7 +19,8 @@ export WorkPlace_Constants := module
                                   MDR.sourceTools.src_Teletrack,
                                   MDR.sourceTools.src_SalesChannel,
                                   MDR.sourceTools.src_Thrive_LT,
-                                  MDR.sourceTools.src_Thrive_PD
+                                  MDR.sourceTools.src_Thrive_PD,
+                                  MDR.sourceTools.src_Netwise
                                  ];
 
   // For use when joining to corp key file Current records.
@@ -127,7 +128,7 @@ export WorkPlace_Constants := module
                                         {'FREEMAIL.COM'}], {STRING domain});
 
   EXPORT PERSONAL_EMAIL_DOMAIN_DCT := DICTIONARY(PERSONAL_EMAIL_DOMAIN_SET,{domain});
-
+  EXPORT STRING7 NETWISE_DT_CURRENT := 'PRESENT'; //Netwise dt_last_seen field indicating if it's current
   EXPORT UNSIGNED1 DEFAULT_SOURCE_ORDER:=255;
   EXPORT STRING7 EMAIL_INVALID := 'INVALID'; //Databridge key field which indicates if the email is valid or not
 

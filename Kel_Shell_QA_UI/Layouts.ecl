@@ -1,6 +1,33 @@
 ﻿EXPORT Layouts := MODULE
-
 EXPORT Input_Lay:=RECORD
+    STRING Account             ;
+    STRING FirstName           ;
+    STRING MiddleName          ;
+    STRING LastName            ;
+    STRING StreetAddressLine1  ;
+    STRING StreetAddressLine2  ;
+    STRING City                ;
+    STRING State               ;
+    STRING Zip                 ;
+    STRING HomePhone           ;
+    STRING SSN                 ;
+    STRING DateOfBirth         ;
+    STRING WorkPhone           ;
+    STRING Income              ;
+    STRING DLNumber            ;
+    STRING DLState             ;
+    STRING Balance             ;
+    STRING ChargeOffD          ;
+    STRING FormerName          ;
+    STRING Email               ;
+    STRING EmployerName        ;
+    STRING historydate;
+    STRING LexID;
+    STRING IPAddress;
+    STRING Perf;
+    STRING Proj;
+END;
+EXPORT Outout_Lay:=RECORD
   integer8 g_procuid;
   string65 p_inpacct;
   integer7 p_inplexid;
