@@ -87,12 +87,15 @@ module
 
 	// Append RID
 	SHARED NewBaseRID := fraudgovplatform.Append_RID (CombinedClassification,pBaseMainFile):independent;
-
-	SHARED NewFile := distribute(pull(NewBaseRID),hash32(record_id));
+	// Append Clean Values from Previous Build
+	EXPORT NewBasePreviousValues := fraudgovplatform.Append_PreviousValues(NewBaseRID,pBaseMainFile):independent;
+	
+	SHARED NewFile := distribute(pull(NewBasePreviousValues),hash32(record_id));
 	SHARED OldFile := distribute(pull(pBaseMainFile),hash32(record_id));
 
 	SHARED NewRecords := JOIN(NewFile, OldFile,left.record_id = right.record_id, LEFT ONLY, LOCAL);
-	SHARED OldRecords := JOIN(NewFile, OldFile,left.record_id = right.record_id, INNER, LOCAL); 
+	SHARED OldRecords := JOIN(OldFile, NewFile, left.record_id = right.record_id, INNER, LOCAL); 
+ 
 
 	// Appends
 	AppendCleanName := fraudgovplatform.Append_CleanName(NewRecords):independent;
