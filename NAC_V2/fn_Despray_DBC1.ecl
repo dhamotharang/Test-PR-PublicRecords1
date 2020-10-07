@@ -17,7 +17,7 @@ END;
         dbcFname := '~nac::v2::xx_dbc_' + suffix;
         dbc := PROJECT(ds_NAC_collissions , xformtoNAC1DBC(LEFT));
         writethorfile := OUTPUT(dbc, , dbcFname, COMPRESSED, OVERWRITE);
-        desprayfilename:='xx_dbc_' + suffix;  
+        desprayfilename:='XX_DBC_' + suffix;  
         destinationfolder := '/data/hds_180/nac/drupal/';             
         pDestinationFile := destinationfolder + trim(desprayfilename) + '.dat';          
         despray := FileServices.Despray(dbcFname, NAC_V2.Constants.LandingZoneServer, pDestinationFile,,,,TRUE);
