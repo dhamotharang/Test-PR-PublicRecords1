@@ -1082,6 +1082,7 @@ EXPORT BIP_Layouts := MODULE
 		STRING10 B2BActv31pDpdBalTotGrow1Y;
 		STRING10 B2BActv61pDpdBalTotGrow1Y;
 		STRING10 B2BActv91pDpdBalTotGrow1Y;
+		STRING2 SourceIndex;
 	END;
 
 	EXPORT SBFEAttributes := RECORD
@@ -2962,7 +2963,7 @@ EXPORT BIP_Layouts := MODULE
 		STRING120 Bus_Company_Name;
 		Version1Attributes;    
 		Version2Attributes AND NOT SourceIndex;
-		Version21Attributes;
+		Version21Attributes AND NOT SourceIndex;
 		SBFEAttributes;
 		BatchScoreData;
 		Company_IDs;

@@ -424,7 +424,7 @@ search_results_temp := ungroup(
 	
 	valid_riskview_xml_response := project(search_results,
 		transform(iesp.riskview2.t_RiskView2Response,
-                suppress_condition := IF((STD.Str.ToLowerCase(LEFT.Message) = STD.Str.ToLowerCase(Riskview.Constants.Deferred_request_desc) OR STD.Str.ToLowerCase(LEFT.Exception_Code) = STD.Str.ToLowerCase('-1')) AND (REAL)InterfaceVersion > 2.5 AND ExcludeStatusRefresh = FALSE, TRUE, FALSE);
+                suppress_condition := IF((STD.Str.ToLowerCase(LEFT.Message) = STD.Str.ToLowerCase(Riskview.Constants.Deferred_request_desc) OR STD.Str.ToLowerCase(LEFT.Exception_Code) = STD.Str.ToLowerCase('-1')) AND (REAL)InterfaceVersion > 2.5 AND ExcludeStatusRefresh = FALSE AND IncludeStatusRefreshChecks = TRUE, TRUE, FALSE);
 				self.Result.UniqueId := IF(~suppress_condition, LEFT.LexID, '');
 				self.Result.InputEcho := search;
 				self.Result.Models := IF(~suppress_condition, modelResults);

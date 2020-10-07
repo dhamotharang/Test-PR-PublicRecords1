@@ -27,5 +27,5 @@ export Layout_BocaShell_Neutral := RECORD
 	Risk_Indicators.Layout_Boca_Shell;
 	AML.Layouts.LayoutAMLShell;
 	unsigned1	errcode;
-	Layout_Overrides;
+	Risk_Indicators.Layout_Overrides;
 END;

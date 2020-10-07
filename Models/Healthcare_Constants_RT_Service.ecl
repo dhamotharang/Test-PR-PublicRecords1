@@ -1,4 +1,4 @@
-EXPORT Healthcare_Constants_RT_Service := MODULE
+﻿EXPORT Healthcare_Constants_RT_Service := MODULE
 	
 	Export CFG_False := false;
 	Export CFG_True := true;
@@ -51,8 +51,8 @@ EXPORT Healthcare_Constants_RT_Service := MODULE
 	Export GLBRequiredFail_Message := 'A VALID GLB PERMISSIBLE PURPOSE IS REQUIRED TO USE THIS PRODUCT.';
 	Export GLBInvalidFail_Message := 'SUPPLIED GLB PURPOSE IS NOT AN APPROVED USAGE VALUE.';
 	Export DPPAInvalidFail_Message := 'THERE IS NO DPPA PERMISSIBLE PURPOSE FOR THIS PRODUCT.';
-	Export DMFInvalidFail_Message := 'AN APPROVED DMF PERMISSIBLE PURPOSE IS REQUIRED TO USE THIS PRODUCT.';
-	Export FCRAInvalidFail_Message := 'AN APPROVED FCRA PERMISSIBLE PURPOSE IS REQUIRED TO USE THIS PRODUCT.';
+	Export DMFInvalidFail_Message := 'THERE IS NO DMF PERMISSIBLE PURPOSE FOR THIS PRODUCT.';
+	Export FCRAInvalidFail_Message := 'THERE IS NO FCRA PERMISSIBLE PURPOSE FOR THIS PRODUCT.';
 
 	Export InvalidAdmitDate_FieldName := 'AdmitDate';
 	Export InvalidAdmitDate_Code := '67108864';

@@ -115,7 +115,8 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 						 (unsigned)(RIGHT.date_filed[1..6]) < left.historydate and
 							if(insurance_fcra_filter and right.chapter in ['7','13'],
 								FCRA.bankrupt_is_ok(Risk_Indicators.iid_constants.myGetDate(left.historydate), right.date_filed, left.insurance_bk_filter, insurance_fcra_filter),
-								FCRA.bankrupt_is_ok(Risk_Indicators.iid_constants.myGetDate(left.historydate), right.date_filed, left.insurance_bk_filter)),
+								FCRA.bankrupt_is_ok(Risk_Indicators.iid_constants.myGetDate(left.historydate), right.date_filed, left.insurance_bk_filter)) AND 
+                TRIM(TRIM(right.tmsid)+TRIM(right.name_type)+TRIM(right.did)) not in left.bankrupt_correct_cccn,
 							get_bankrupt_FCRA (LEFT,RIGHT),
 							LEFT OUTER, ATMOST(Riskwise.max_atmost), keep(100));
 

@@ -119,7 +119,7 @@
 */
 
 #option('expandSelectCreateRow', true);
-IMPORT Business_Risk_BIP, Gateway, IESP, MDR, OFAC_XG5, Phones, Royalty, Std;
+IMPORT Business_Risk_BIP, Gateway, IESP, MDR, OFAC_XG5, Phones, Royalty, Std, LNSmallBusiness;
 
 EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 	/* ************************************************************************
@@ -418,8 +418,18 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 	
 	Targus_royalties_pre := Royalty.RoyaltyTargus.GetBatchRoyaltiesByAcctno(Input, targus_data, source, , acctno, acctno);
 	Targus_royalties := PROJECT( Targus_royalties_pre, TRANSFORM( Royalty.Layouts.RoyaltyForBatch, SELF.source_type := 'G', SELF := LEFT ) ); // 'G' = Gateway source
+
+	/* ************************************************************************
+	**                    Tracking Cortera Royalties                          *
+	***************************************************************************/
+
+	isTrackingCorteraFromSBA21 := IF((NOT allow_SBA_attrs AND NOT allow_SBFE_attrs AND NOT allow_SBA_attrs101 AND NOT allow_SBA_V2_attrs AND allow_SBA_V21_attrs) OR 
+									(NOT allow_SBA_attrs AND allow_SBFE_attrs AND NOT allow_SBA_attrs101 AND NOT allow_SBA_V2_attrs AND allow_SBA_V21_attrs), TRUE, FALSE);
+
+	Cortera_royalties := Royalty.RoyaltyCortera.InHouse.GetBatchRoyaltiesByAcctno(Input, SBA_Results, ,isTrackingCorteraFromSBA21);
 	
-	total_royalties  := SORT( (SBFE_royalties + Targus_royalties), acctno, royalty_type_code );
+	// Accumulate all Royalties: 
+	total_royalties  := SORT( (SBFE_royalties + Targus_royalties + Cortera_royalties), acctno, royalty_type_code );
 	
 	// DEBUGs:
 	// OUTPUT( SBA_Results_with_PhoneSources, NAMED('SBA_Results_with_PhoneSources') );
