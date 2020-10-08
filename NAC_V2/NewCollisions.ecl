@@ -16,7 +16,8 @@ EXPORT NewCollisions(DATASET(layout_Collisions2.Layout_Collisions) cnew, DATASET
 									and left.clientid=right.clientid
 									and left.casestate=right.casestate
 									and left.CaseBenefitType=right.CaseBenefitType
-									and left.StartDate <= right.EndDate
+									and left.EndDate <= right.EndDate				// new collision if end date > previous end date
+									//and left.StartDate <= right.EndDate
 									,left only 
 									,local);
 		

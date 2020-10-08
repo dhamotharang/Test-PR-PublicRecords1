@@ -84,6 +84,7 @@ export NAC_v2.Layout_Collisions2.Layout_Collisions xCollisions_Ex(NAC_v2.Layout_
 			self.SearchLastName := fn_left(l.LastName,r.LastName);
 			self.SearchFirstName := fn_left(l.FirstName,r.FirstName);
 			self.SearchMiddleName := fn_left(l.MiddleName,r.MiddleName);
+			self.SearchSuffixName := fn_left(l.NameSuffix,r.NameSuffix);
 			self.SearchSSN := fn_left(l.SSN,r.SSN);
 			self.SearchDOB := fn_left(l.DOB,r.DOB);
 			
