@@ -8,11 +8,11 @@ EXPORT Append_PreviousValues (
 	previous_base := distribute(pull(Previous_Build), hash32(record_id)) ;
 
 	J_previous_values := join (
-		building_base,
 		previous_base,
+		building_base,
 		left.record_id = right.record_id,
 		transform(FraudShared.Layouts.Base.Main,
-			SELF := if(left.record_id=right.record_id, RIGHT, LEFT )
+			SELF := if(left.record_id=right.record_id,LEFT, RIGHT )
 		),
 		RIGHT OUTER, LOCAL
 	);	
