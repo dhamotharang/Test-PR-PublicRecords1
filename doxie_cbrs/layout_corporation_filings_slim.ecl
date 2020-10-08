@@ -1,5 +1,4 @@
-EXPORT layout_Corporation_Filings_records := RECORD
-  //cfr0.level;
+EXPORT layout_corporation_filings_slim := RECORD // doxie_cbrs_raw.Corporation_Filings().records_slim
   UNSIGNED6 bdid;
   UNSIGNED4 dt_first_seen;
   UNSIGNED4 dt_last_seen;
@@ -26,17 +25,13 @@ EXPORT layout_Corporation_Filings_records := RECORD
   STRING8 corp_inc_date;
   STRING32 corp_fed_tax_id;
   STRING32 corp_state_tax_id;
-  //
   STRING8 corp_sic_code;
   STRING8 corp_orig_bus_type_cd;
   STRING70 corp_orig_bus_type_desc;
-  
   STRING60 corp_orig_org_structure_desc;
-  
   STRING8 corp_term_exist_cd;
   STRING8 corp_term_exist_exp;
   STRING60 corp_term_exist_desc;
-  
   STRING8 corp_address1_type_cd;
   STRING60 corp_address1_type_desc;
   STRING10 corp_addr1_prim_range;
@@ -51,9 +46,7 @@ EXPORT layout_Corporation_Filings_records := RECORD
   STRING2 corp_addr1_state;
   STRING5 corp_addr1_zip5;
   STRING4 corp_addr1_zip4;
-  
   STRING100 corp_ra_name;
-  
   STRING10 corp_ra_prim_range;
   STRING2 corp_ra_predir;
   STRING28 corp_ra_prim_name;
@@ -66,13 +59,10 @@ EXPORT layout_Corporation_Filings_records := RECORD
   STRING2 corp_ra_state;
   STRING5 corp_ra_zip5;
   STRING4 corp_ra_zip4;
-
-  //
   STRING1 corp_for_profit_ind;
   STRING1 corp_foreign_domestic_ind;
   STRING10 corp_ra_fein;
   STRING9 corp_ra_ssn;
-  
   STRING10 corp_phone10;
   STRING10 corp_ra_phone10;
   STRING1 record_type;

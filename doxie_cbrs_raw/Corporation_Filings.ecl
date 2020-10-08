@@ -1,6 +1,5 @@
 
-import corp,corp2;
-import business_header, doxie_cbrs;
+import business_header, corp2, doxie_cbrs;
 export Corporation_Filings(
 	dataset(doxie_cbrs.layout_references) bdids,
 	boolean Include_val = false,
@@ -26,7 +25,7 @@ shared simple_count :=
 	doxie_cbrs.mac_RollStart
 	(bdids, outf1_slim, k,
 	 Max_val * 2,Include_val,bdid,true,bdid,corp_legal_name+corp_inc_date, corp_state_origin+corp_orig_sos_charter_nbr+corp_status_desc,
-	 true, doxie_cbrs.layout_Corporation_Filings_records)
+	 true, doxie_cbrs.layout_corporation_filings_slim)
 	
 	export records_slim := outf1_slim;
 	export record_count(boolean count_only = false) := 

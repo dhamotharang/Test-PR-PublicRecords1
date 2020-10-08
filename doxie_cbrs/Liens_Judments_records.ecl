@@ -1,4 +1,4 @@
-IMPORT doxie, business_header, bankrupt, suppress,doxie_cbrs_raw, census_data;
+IMPORT doxie, doxie_cbrs, doxie_cbrs_raw, census_data;
 doxie_cbrs.MAC_Selection_Declare()
 
 EXPORT Liens_Judments_records(DATASET(doxie_cbrs.layout_references) bdids) := FUNCTION
@@ -20,7 +20,7 @@ mylie := JOIN(lie(name_type = 'D'),bdids,
 j := doxie.Fn_LienBackwards(mylie);
 
 //***** OUTREC
-outrec := Layout_Liens_Judgments_raw;
+outrec := doxie_cbrs.Layout_Liens_Judgments_raw;
 jnd := DEDUP(PROJECT(j, outrec), ALL);
 
 //***** POPULATE COUNTY_NAME AND MASK THE SSNS
