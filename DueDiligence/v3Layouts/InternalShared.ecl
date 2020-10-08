@@ -30,6 +30,18 @@ EXPORT InternalShared := MODULE
       UNSIGNED6 partyLexID; 
     END;
     
+    EXPORT Bankruptcies := RECORD
+      InternalIDs; 
+      UNSIGNED4 historyDate;
+      UNSIGNED4 dateFirstSeen;
+      UNSIGNED4 dateLastSeen;
+      UNSIGNED4 filingDate;
+      STRING35 disposition;
+      BOOLEAN dismissed;
+      STRING50 tmsid;
+      STRING7 caseNumber;
+    END;
+    
     
     //Criminal & Civil Report Sections
     EXPORT ReportSharedLegal := RECORD

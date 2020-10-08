@@ -27,6 +27,7 @@ EXPORT Constants := MODULE
     
     EXPORT MAX_500 := 500;
     EXPORT MAX_1000 := 1000;
+    EXPORT MAX_2000 := 2000;
     EXPORT MAX_5000 := 5000;
     
     
