@@ -1,83 +1,11 @@
 // Get UCC data by tmsid records, and restructure in legacy format
 
-IMPORT uccd, doxie_crs, UCCv2, suppress, Address, Census_data, doxie;
+IMPORT $, uccd, doxie_crs, UCCv2, suppress, Address, Census_data, doxie;
 
 EXPORT Legacy := MODULE
 
-// constants
-SHARED max_raw_filings := 500;
-SHARED max_raw_parties := 500;
-SHARED max_collateral_recs := 15;
-
-// layouts
-EXPORT layout_levelRec := { UNSIGNED1 level; UCCv2_services.layout_tmsid };
-SHARED layout_legacy := doxie_crs.layout_UCC_Records;
-SHARED layout_collateral := { STRING60 collateral_type_desc := '' }; // UCCD.Layout_Collateral_ChildDS
-EXPORT layout_raw := RECORD
-  // ---- These were from UCCD.Key_BDID ----
-  UNSIGNED INTEGER6 bdid;
-  STRING50 ucc_key;
-  UNSIGNED INTEGER6 did;
-  STRING20 debtor_event_key;
-  STRING20 debtor_fname;
-  STRING20 debtor_mname;
-  STRING20 debtor_lname;
-  STRING5 debtor_name_suffix;
-  STRING60 debtor_status_desc;
-  STRING60 debtor_name;
-  STRING10 debtor_prim_range;
-  STRING2 debtor_predir;
-  STRING28 debtor_prim_name;
-  STRING4 debtor_addr_suffix;
-  STRING2 debtor_postdir;
-  STRING10 debtor_unit_desig;
-  STRING8 debtor_sec_range;
-  STRING25 debtor_city_name;
-  STRING18 debtor_county_name;
-  STRING2 debtor_st;
-  STRING5 debtor_zip;
-  STRING4 debtor_zip4;
-  STRING20 secured_event_key;
-  STRING60 secured_status_desc;
-  STRING60 secured_name;
-  STRING10 secured_prim_range;
-  STRING2 secured_predir;
-  STRING28 secured_prim_name;
-  STRING4 secured_addr_suffix;
-  STRING2 secured_postdir;
-  STRING10 secured_unit_desig;
-  STRING8 secured_sec_range;
-  STRING25 secured_city_name;
-  STRING18 secured_county_name;
-  STRING2 secured_st;
-  STRING5 secured_zip;
-  STRING4 secured_zip4;
-  DATASET(layout_collateral) collateral_children {MAXCOUNT (max_collateral_recs)};
-  STRING2 filing_state;
-  STRING4 filing_count;
-  STRING4 document_count;
-  STRING3 debtor_count;
-  STRING3 secured_count;
-  STRING8 ucc_exp_date;
-  STRING60 ucc_filing_type_desc;
-  STRING20 event_key;
-  STRING8 orig_filing_date;
-  STRING32 orig_filing_num;
-  STRING8 filing_date;
-  STRING32 event_document_num;
-  STRING60 filing_type_desc;
-END;
-SHARED layout_rawLevels := RECORD
-  UNSIGNED1 level;
-  layout_raw;
-END;
-SHARED layout_super := RECORD
-  layout_legacy.penalt;
-  layout_rawLevels;
-END;
-
 SHARED fn_getUCC_legacy_super(
-  DATASET(layout_levelRec) in_levels,
+  DATASET($.layout_legacy.level_rec) in_levels,
   STRING in_ssn_mask_type,
   STRING32 appType = Suppress.Constants.ApplicationTypes.Default
 ) := FUNCTION
@@ -87,7 +15,7 @@ SHARED fn_getUCC_legacy_super(
   // keys and layouts
   k_main := UCCV2.Key_Rmsid_Main(FALSE);
   k_party := UCCV2.Key_Rmsid_Party(FALSE);
-  l_out := layout_super;
+  l_out := $.layout_legacy.super_rec;
 
   
   // ======================================================================= Filing data
@@ -98,7 +26,7 @@ SHARED fn_getUCC_legacy_super(
     k_main.rmsid;
     l_out.ucc_key;
       
-    DATASET(layout_collateral) collateral_children {MAXCOUNT (max_collateral_recs)};
+    DATASET($.layout_legacy.collateral_rec) collateral_children {MAXCOUNT ($.Constants.MAX_LEGACY_COLLATERAL_RECS)};
     
     l_out.filing_state;
     l_out.orig_filing_date;
@@ -126,8 +54,8 @@ SHARED fn_getUCC_legacy_super(
     
     SELF.collateral_children := IF(
       R.collateral_desc<>'',
-      DATASET( [{R.collateral_desc}], layout_collateral ),
-      DATASET( [], layout_collateral )
+      DATASET( [{R.collateral_desc}], $.layout_legacy.collateral_rec ),
+      DATASET( [], $.layout_legacy.collateral_rec )
     );
     
     SELF.filing_state := r.filing_jurisdiction;
@@ -156,12 +84,12 @@ SHARED fn_getUCC_legacy_super(
     in_levels_suppress, k_main,
     KEYED(LEFT.tmsid = RIGHT.tmsid),
     toFiling(LEFT,RIGHT),
-    LIMIT(max_raw_filings,SKIP)
+    LIMIT($.Constants.MAX_LEGACY_RAW_FILINGS,SKIP)
   );
   
   // rollup collateral
   filing_raw toRollup(filing_raw l, filing_raw r) := TRANSFORM
-    SELF.collateral_children := CHOOSEN(L.collateral_children & R.collateral_children, max_collateral_recs);
+    SELF.collateral_children := CHOOSEN(L.collateral_children & R.collateral_children, $.Constants.MAX_LEGACY_COLLATERAL_RECS);
     SELF := L;
   END;
   filing_rolled := ROLLUP(
@@ -195,7 +123,7 @@ SHARED fn_getUCC_legacy_super(
     KEYED(LEFT.tmsid = RIGHT.tmsid),
     TRANSFORM(l_pCounty, SELF.county_name:='', SELF:=RIGHT),
     LIMIT(10000,SKIP)
-  )(party_type='D' OR party_type='S'),max_raw_parties);
+  )(party_type='D' OR party_type='S'), $.Constants.MAX_LEGACY_RAW_PARTIES);
   Census_Data.MAC_Fips2County_Keyed(party_raw, st, county, county_name, party_county);
   
   // transform output-style fields
@@ -377,24 +305,24 @@ EXPORT fn_getUCC_legacy_raw(
 ) := FUNCTION
 
   // create a fake level (which we'll strip later anyway)
-  in_levels := PROJECT( in_tmsids, TRANSFORM(layout_levelRec, SELF.level:=0, SELF:=LEFT) );
+  in_levels := PROJECT( in_tmsids, TRANSFORM($.layout_legacy.level_rec, SELF.level:=0, SELF:=LEFT) );
   
   super := fn_getUCC_legacy_super(in_levels, in_ssn_mask_type);
   
-  raw := PROJECT( super, layout_raw );
+  raw := PROJECT( super, $.layout_legacy.raw_rec );
   
   RETURN(raw);
 
 END; // fn_getUCC_legacy_raw
 
 EXPORT fn_getUCC_legacy_rawLevels(
-  DATASET(layout_levelRec) in_levels,
+  DATASET($.layout_legacy.level_rec) in_levels,
   STRING in_ssn_mask_type
 ) := FUNCTION
 
   super := fn_getUCC_legacy_super(in_levels, in_ssn_mask_type);
   
-  raw := PROJECT( super, layout_rawLevels );
+  raw := PROJECT( super, $.layout_legacy.raw_level_rec );
   
   RETURN(raw);
 
@@ -406,13 +334,13 @@ EXPORT fn_getUCC_legacy(
 ) := FUNCTION
 
   // create a fake level (which we'll strip later anyway)
-  in_levels := PROJECT( in_tmsids, TRANSFORM(layout_levelRec, SELF.level:=0, SELF:=LEFT) );
+  in_levels := PROJECT( in_tmsids, TRANSFORM($.layout_legacy.level_rec, SELF.level:=0, SELF:=LEFT) );
   
   // retrieve results (a bit wider than necessary)
   raw := fn_getUCC_legacy_super(in_levels, in_ssn_mask_type);
 
   // narrow to output format
-  outrecs := PROJECT( raw, layout_legacy );
+  outrecs := PROJECT( raw, $.layout_legacy.ucc_rec );
 
   // final sort
   ucc_legacy := SORT(outrecs, orig_filing_date, filing_date, RECORD);

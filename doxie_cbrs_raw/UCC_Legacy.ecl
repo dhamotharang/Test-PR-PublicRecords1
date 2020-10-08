@@ -1,4 +1,4 @@
-import business_header, doxie_cbrs, doxie, UCCv2, UCCv2_Services, doxie_crs;
+import business_header, doxie_cbrs, UCCv2, UCCv2_Services;
 
 export UCC_Legacy(
 	dataset(doxie_cbrs.layout_references) bdids,
@@ -16,7 +16,7 @@ export UCC_Legacy(
 	);
 	
 	
-	ids_withLevel := dedup(project(outf1, UCCv2_Services.Legacy.layout_levelRec), all);
+	ids_withLevel := dedup(project(outf1, UCCv2_Services.layout_legacy.level_rec), all);
 	uccRecs := UCCv2_Services.UCCRaw.legacy_view.raw_with_levels(ids_withLevel, ssn_mask_value);
 	
 	shared out_f := uccRecs;

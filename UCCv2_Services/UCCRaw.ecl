@@ -143,7 +143,7 @@ EXPORT UCCRaw := MODULE
 
     // ...using TMSIDs/Levels as the lookup mechanism.
     EXPORT raw_with_levels(
-      DATASET(UCCv2_services.Legacy.layout_levelRec) in_levels,
+      DATASET(UCCv2_services.layout_legacy.level_rec) in_levels,
       STRING in_ssn_mask_type = ''
     ) := FUNCTION
       RETURN UCCv2_services.Legacy.fn_getUCC_legacy_rawLevels(in_levels, in_ssn_mask_type);

@@ -36,9 +36,10 @@ doxie_cbrs.mac_Selection_Declare()
 #STORED('MaxMSWorkComp',50);
 #STORED('MaxORWorkComp',50);
 
-EXPORT all_base_records_source(DATASET(doxie_cbrs.layout_references) bdids = DATASET([],doxie_cbrs.layout_references),
-                               doxie.IDataAccess mod_access
-                              ) := FUNCTION
+EXPORT all_base_records_source(
+  DATASET(doxie_cbrs.layout_references) bdids, 
+  doxie.IDataAccess mod_access
+  ) := FUNCTION
   
 //***** RECORDSETS
 //
@@ -276,49 +277,11 @@ mac_give_name(r, outr) := MACRO
   outr := PROJECT(r, %renameit%(LEFT));
 ENDMACRO;
 
-
 mac_give_name(bnkr, bnkr_named)
 mac_give_name(idor, idor_named)
 mac_give_name(hdrr, hdrr_named)
 
-temprec := RECORD
-  UNSIGNED3 FINDER,
-  UNSIGNED3 DNB,
-  UNSIGNED3 CORPORATE_FILINGS,
-  UNSIGNED3 CORPORATE_FILINGS_V2,
-  UNSIGNED3 BANKRUPTCY,
-  UNSIGNED3 BANKRUPTCY_V2,
-  UNSIGNED3 UCCS,
-  UNSIGNED3 UCCS_V2,
-  UNSIGNED3 LIENS_JUDGMENTS,
-  UNSIGNED3 LIENS_JUDGMENTS_V2,
-  UNSIGNED3 IRS5500,
-  UNSIGNED3 IRSNONP,
-  UNSIGNED3 FDIC,
-  UNSIGNED3 BBBMember,
-  UNSIGNED3 BBBNonMember,
-  UNSIGNED3 CASalesTax,
-  UNSIGNED3 IASalesTax,
-  UNSIGNED3 MSWorkComp,
-  UNSIGNED3 ORWorkComp,
-  UNSIGNED3 CONTACTS,
-  UNSIGNED3 PROPERTY,
-  UNSIGNED3 PROPERTY_V2,
-  UNSIGNED3 INTERNET,
-  UNSIGNED3 PROFESSIONAL_LICENSES,
-  UNSIGNED3 BUSINESS_REGISTRATIONS,
-  UNSIGNED3 MOTOR_VEHICLES,
-  UNSIGNED3 MOTOR_VEHICLES_V2,
-  UNSIGNED3 WATERCRAFTS,
-  UNSIGNED3 AIRCRAFTS,
-  UNSIGNED3 EXPERIAN_BUSINESS_REPORTS,
-  UNSIGNED3 SUPERIOR_LIENS,
-  UNSIGNED3 NOTICE_OF_DEFAULTS,
-  UNSIGNED3 FORECLOSURES,
-  UNSIGNED3 BUSINESS_SANCTIONS
-END;
-
-srcr := PROJECT(DATASET([{0}],{UNSIGNED _a}),TRANSFORM(temprec,
+srcr := PROJECT(DATASET([{0}],{UNSIGNED _a}),TRANSFORM(doxie_cbrs.layout_source_counts,
   SELF.FINDER := COUNT(hdrr_named),
   SELF.DNB := COUNT(dnbr),
   SELF.CORPORATE_FILINGS := COUNT(crpr),
@@ -340,8 +303,7 @@ srcr := PROJECT(DATASET([{0}],{UNSIGNED _a}),TRANSFORM(temprec,
   SELF.ORWORKCOMP := COUNT(orworkcompr),
   SELF.CONTACTS := COUNT(conr),
   SELF.PROPERTY := COUNT(pror),
-  SELF.PROPERTY_V2 := COUNT(pror_v2_assess) +
-                                       COUNT(pror_v2_deed),
+  SELF.PROPERTY_V2 := COUNT(pror_v2_assess) + COUNT(pror_v2_deed),
   SELF.INTERNET := COUNT(idor_named),
   SELF.PROFESSIONAL_LICENSES := COUNT(plir),
   SELF.BUSINESS_REGISTRATIONS := brer_count , // NEED TO STANDARDIZE
@@ -358,84 +320,9 @@ srcr := PROJECT(DATASET([{0}],{UNSIGNED _a}),TRANSFORM(temprec,
 
 mac_give_name(srcr, srcr_named)
 
-//***** THEIR LAYOUTS
-recsrcr := RECORDOF(srcr_named);
-rechdrr := RECORDOF(hdrr_named);
-recdnbr := RECORDOF(dnbr);
-reccorr := RECORDOF(crpr);
-reccorr_v2 := RECORDOF(crpr_v2);
-recbnkr := RECORDOF(bnkr_named);
-recbnkr_v2 := RECORDOF(bnkr_v2);
-recuccr := RECORDOF(uccr);
-recuccr_v2 := RECORDOF(uccr_v2);
-recljr := RECORDOF(ljr);
-recljr_v2 := RECORDOF(ljr_v2);
-recconr := RECORDOF(conr);
-recpror := RECORDOF(pror);
-recpror_v2_assess := RECORDOF(pror_v2_assess);
-recpror_v2_deed := RECORDOF(pror_v2_deed);
-recnodr := RECORDOF(nodr);
-recforr := RECORDOF(forr);
-recidor := RECORDOF(idor_named);
-recplir := RECORDOF(plir);
-recmvrr := RECORDOF(mvrr);
-recmvrr_v2 := RECORDOF(mvrr_v2);
-recwtcr := RECORDOF(wtcr);
-recairr := RECORDOF(airr);
-recebrr := RECORDOF(ebrr);
-recirs := RECORDOF(irs5500);
-recirsn := RECORDOF(irsnonpr);
-//recsupr := recordof(supr);
-//recbasr := recordof(basr);
-recfdicr := RECORDOF(fdicr);
-recbbbmemberr := RECORDOF(bbbmemberr);
-recbbbnonmemberr := RECORDOF(bbbnonmemberr);
-reccasalestaxr := RECORDOF(casalestaxr);
-reciasalestaxr := RECORDOF(iasalestaxr);
-recmsworkcompr := RECORDOF(msworkcompr);
-recorworkcompr := RECORDOF(orworkcompr);
-
-//***** THE COMBINED LAYOUT
-rec := RECORD, MAXLENGTH(doxie_crs.maxlength_report)
-  DATASET(rechdrr) FINDER;
-  DATASET(recdnbr) DNB;
-  DATASET(reccorr) CORPORATE_FILINGS;
-  DATASET(reccorr_v2) CORPORATE_FILINGS_V2;
-  DATASET(recbnkr) BANKRUPTCY;
-  DATASET(recbnkr_v2) BANKRUPTCY_V2;
-  DATASET(recuccr) UCCS;
-  DATASET(recuccr_v2) UCCS_V2;
-  DATASET(recljr) LIENS_JUDGMENTS;
-  DATASET(recljr_v2) LIENS_JUDGMENTS_V2;
-  DATASET(recconr) CONTACTS;
-  DATASET(recpror) PROPERTY;
-  DATASET(recpror_v2_assess) PROPERTY_V2_ASSESS;
-  DATASET(recpror_v2_deed) PROPERTY_V2_DEED;
-  DATASET(recnodr) NOTICE_OF_DEFAULTS{xpath('NoticesOfDefaults/NoticeOfDefaults')};
-  DATASET(recforr) FORECLOSURES{xpath('ForeclosureDocuments/ForeclosureDocument')};
-  DATASET(recidor) INTERNET;
-  DATASET(recplir) PROFESSIONAL_LICENSES;
-  DATASET(recmvrr) MOTOR_VEHICLES;
-  DATASET(recmvrr_V2) MOTOR_VEHICLES_V2;
-  DATASET(recwtcr) WATERCRAFTS;
-  DATASET(recairr) AIRCRAFTS;
-  DATASET(recebrr) EXPERIAN_BUSINESS_REPORTS;
-  DATASET(recirs) IRS_5500;
-  DATASET(recirsn) IRS_NON_PROFIT;
-  DATASET(recfdicr) FDIC;
-  DATASET(recbbbmemberr) BBBMember;
-  DATASET(recbbbnonmemberr) BBBNonMember;
-  DATASET(reccasalestaxr) CASalesTax;
-  DATASET(reciasalestaxr) IASalesTax;
-  DATASET(recmsworkcompr) MSWorkComp;
-  DATASET(recorworkcompr) ORWorkComp;
-// dataset(recbasr) BUSINESS_ASSOCIATES;
-  DATASET(recsrcr) SOURCE_COUNTS;
-END;
-
 //***** PROJECT THEM IN
 nada := DATASET([0], {UNSIGNED1 a});
-rec getall(nada l) := TRANSFORM
+doxie_cbrs.layout_source getall(nada l) := TRANSFORM
   SELF.FINDER := GLOBAL(hdrr_named);
   SELF.DNB := GLOBAL(dnbr);
   SELF.CORPORATE_FILINGS := GLOBAL(crpr);
