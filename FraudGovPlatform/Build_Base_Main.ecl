@@ -82,20 +82,16 @@ module
 		self:= [];
 	)); 
 
-	// Apply MBS classification and Sharing Rules
-	CombinedClassification := fraudgovplatform.Functions.Classification(IdentityData + KnownFraud + Deltabase):independent;
-
 	// Append RID
-	SHARED NewBaseRID := fraudgovplatform.Append_RID (CombinedClassification,pBaseMainFile):independent;
+	SHARED NewBaseRID := fraudgovplatform.Append_RID (IdentityData + KnownFraud + Deltabase,pBaseMainFile):independent;
 	// Append Clean Values from Previous Build
 	EXPORT NewBasePreviousValues := fraudgovplatform.Append_PreviousValues(NewBaseRID,pBaseMainFile):independent;
-	
+
 	SHARED NewFile := distribute(pull(NewBasePreviousValues),hash32(record_id));
 	SHARED OldFile := distribute(pull(pBaseMainFile),hash32(record_id));
 
-	SHARED NewRecords := JOIN(NewFile, OldFile,left.record_id = right.record_id, LEFT ONLY, LOCAL);
+	SHARED NewRecords := JOIN(NewFile, OldFile, left.record_id = right.record_id, LEFT ONLY, LOCAL);
 	SHARED OldRecords := JOIN(OldFile, NewFile, left.record_id = right.record_id, INNER, LOCAL); 
- 
 
 	// Appends
 	AppendCleanName := fraudgovplatform.Append_CleanName(NewRecords):independent;
@@ -109,8 +105,9 @@ module
 
 	SHARED NewBaseWithAppends := OldRecords + Appends;
 
-	// Append RinID	to Whole
-	SHARED NewBaseRinID := fraudgovplatform.Append_RinID ( NewBaseWithAppends, pBaseMainFile ):independent;
+	// Apply to All
+	SHARED CombinedClassification := fraudgovplatform.Functions.Classification(NewBaseWithAppends):independent;
+	SHARED NewBaseRinID := fraudgovplatform.Append_RinID ( CombinedClassification, pBaseMainFile ):independent;
 
 	// Rollup Main Base 
 	pDataset_sort := sort(NewBaseRinID , record, -dt_last_seen,-process_date);
