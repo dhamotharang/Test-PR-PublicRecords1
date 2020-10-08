@@ -10,5 +10,5 @@ user_changed,
 date_changed,
 //DF-26286
 name_suffix,
-mname,keep(1))(trim(override_flag,left,right) = '1'); //DF-28345
+mname,keep(1))(trim(override_flag,left,right) <> '3'); //DF-28345 Changes reverted due to scorining concerns 9/7
 //DF-26286
