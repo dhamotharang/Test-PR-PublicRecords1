@@ -265,9 +265,9 @@ EXPORT FP_models := MODULE
     model_fp1710_1 := Models.FP1710_1_0( ungroup(FP_mod._clam), 6);
     model_fp1803_1 := Models.FP1803_1_0( ungroup(FP_mod._clam), 6);
     model_fp1902_1 := Models.FP1902_1_0( FP_mod._clam_ip, 6);
-    model_fp1908_1 := Models.fp1908_1_0( FP_mod._clam, 6, FP_mod._FDatributes);		
-    model_fp1909_1 := Models.fp1909_1_0( FP_mod._clam, 6, FP_mod._FDatributes);		
-    model_fp1909_2 := Models.FP1909_2_0( FP_mod._clam, 6, FP_mod._FDatributes);    
+    model_fp1908_1 := Models.fp1908_1_0( FP_mod._clam, 6, FP_mod._FDattributes);		
+    model_fp1909_1 := Models.fp1909_1_0( FP_mod._clam, 6, FP_mod._FDattributes);		
+    model_fp1909_2 := Models.FP1909_2_0( FP_mod._clam, 6, FP_mod._FDattributes);    
     model_di31906_0 := Models.DI31906_0_0( ungroup(FP_mod.IID_ret)); 
     model_fp1907_1 := Models.FP1907_1_0( ungroup(FP_mod._clam_ip), 6);
     model_fp1907_2 := Models.FP1907_2_0( ungroup(FP_mod._clam), 6);
@@ -397,6 +397,10 @@ EXPORT FP_models := MODULE
                            self.ri := right.ri;
                           self.score := right.score;
                           self := right));
+
+    //call wrappers for Combined IDA models
+    model_fibn12010_0 := Models.getLuciModel(FP_mod).FIBN12010_0;
+
 #if(Models.FraudAdvisor_Constants.VALIDATION_MODE)
 		model_info := model_fp1908_1; 
 
@@ -465,6 +469,7 @@ EXPORT FP_models := MODULE
                         'rsn804_1'  => model_rsn804_1,
                         'fp1907_1'  => model_fp1907_1,
                         'fp1907_2'  => model_fp1907_2,
+                        'fibn12010_0'  => model_fibn12010_0,
                                        DATASET([], models.layouts.layout_fp1109) // Return blank dataset if unknown model
                        );
    #END                  
