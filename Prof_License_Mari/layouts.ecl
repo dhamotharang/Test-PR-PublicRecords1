@@ -1,4 +1,4 @@
-﻿import AID,standard,BIPV2;
+﻿import AID,standard,BIPV2, dx_common;
 
 export layouts := MODULE
 	export Mari_in := RECORD
@@ -332,9 +332,8 @@ export base :=  RECORD,maxlength(8000)
 				STRING3			is_Authorized_License,					// Populated by NMLS
 				STRING3			is_Authorized_Conduct,					// Populated by NMLS
 				STRING150		FEDERAL_REGULATOR,							// Populated by NMLS
-				//CCPA-110 Add 2 CCPA fields
-				UNSIGNED4	global_sid;
-				UNSIGNED8	record_sid;
+				//DF-28229 Add Delta build fields
+				dx_common.layout_metadata;				
 				
       END;  
 
@@ -510,13 +509,11 @@ export base :=  RECORD,maxlength(8000)
 				STRING20  	AGENCY_STATUS;								// populated by NMLS- Federal Regulator Status
 				STRING3			is_Authorized_License;				// Populated by NMLS
 				STRING3			is_Authorized_Conduct;				// Populated by NMLS
-				STRING150		FEDERAL_REGULATOR;						// Populated by NMLS
-				
-//BIP Section
+				STRING150		FEDERAL_REGULATOR;						// Populated by NMLS				
+				//BIP Section
 				BIPV2.IDlayouts.l_xlink_ids; 
-				//CCPA-110 Add 2 CCPA fields
-				UNSIGNED4	global_sid;
-				UNSIGNED8	record_sid;
+				//DF-28229 Add Delta build fields
+				dx_common.layout_metadata;								
 			END;  
 			
 	export clean :=	RECORD
@@ -541,7 +538,7 @@ export base :=  RECORD,maxlength(8000)
 		END;
 		
 	export final := RECORD
-				clean -[global_sid,record_sid];
+				clean - dx_common.layout_metadata;
 				string10	BUS_PRIM_RANGE;
 				string2   BUS_PREDIR;
 				string28	BUS_PRIM_NAME;
@@ -598,9 +595,8 @@ export base :=  RECORD,maxlength(8000)
 				string5   MAIL_ERR_STAT;  			// increase length to accommodate Canadian err_stat
 				STRING30	CLN_LICENSE_NBR;
 				STRING1		enh_did_src:='';					//Ehanced did source; M for Mari, S for SANCTN, N for SANCTN Non-public
-				//CCPA-110 Add 2 CCPA fields
-				UNSIGNED4	global_sid;
-				UNSIGNED8	record_sid;
+				//DF-28229 Add Delta build fields
+				dx_common.layout_metadata;				
 			END;  		
 
 	export Srch_DBA  := record
@@ -660,9 +656,8 @@ export base :=  RECORD,maxlength(8000)
 				unsigned8	foreign_nmls_id;
 				STRING150 regulator;
 				STRING150 federal_regulator;
-		 //CCPA-110 Add 2 CCPA fields
-		 UNSIGNED4	global_sid;
-		 UNSIGNED8	record_sid;
+				//DF-28229 Add Delta build fields
+				dx_common.layout_metadata;				
 		end;
 
 // NMLS Supported File
@@ -692,6 +687,12 @@ export base :=  RECORD,maxlength(8000)
 			STRING8		CLN_START_DTE;
 			STRING8		CLN_END_DTE;
 	end;
+
+	//DF-28229 Add Delta build fields
+	export Individual_Reg_Base := record	
+			Individual_Reg;	
+			dx_common.layout_metadata;				
+	end;
 	
 //NMLS Support File	
 	export Regulatory_Action := record
@@ -710,8 +711,13 @@ export base :=  RECORD,maxlength(8000)
 		STRING20	MULTI_STATE_ID,
 		STRING40	DOCKET_NBR,
 		STRING100	URL,
-		STRING8		CLN_ACTION_DTE,
-		
+		STRING8		CLN_ACTION_DTE
+	end;
+
+	//DF-28229 Add Delta build fields
+	export Regulatory_Action_Base := record	
+		Regulatory_Action;
+		dx_common.layout_metadata;						
 	end;
 	
 	export Disciplinary_Action	:= record
@@ -729,7 +735,13 @@ export base :=  RECORD,maxlength(8000)
 		STRING		ACTION_DETAIL,
 		STRING200	URL,
 		UNSIGNED8	STATE_ACTION_ID,
-		STRING8		CLN_ACTION_DTE,
+		STRING8		CLN_ACTION_DTE
+	end;
+
+	//DF-28229 Add Delta build fields
+	export Disciplinary_Action_Base	:= record
+		Disciplinary_Action;
+		dx_common.layout_metadata;				
 	end;
 
 END;

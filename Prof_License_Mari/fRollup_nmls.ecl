@@ -1,15 +1,19 @@
-IMPORT ut;
+﻿IMPORT ut;
 
 EXPORT fRollup_nmls := MODULE
 
 EXPORT Regulatory(DATASET(Prof_License_Mari.layouts.Regulatory_Action) int0) := FUNCTION
-ds_dist	:= DISTRIBUTE(int0, HASH(STD_SOURCE_UPD,STATE_ACTION_ID,NMLS_ID, MULTI_STATE_ID));
+
+// Map input layout to base layout
+ds := PROJECT(int0,TRANSFORM(Prof_License_Mari.layouts.Regulatory_Action_Base,SELF:=LEFT,SELF:=[]));
+
+ds_dist	:= DISTRIBUTE(ds, HASH(STD_SOURCE_UPD,STATE_ACTION_ID,NMLS_ID, MULTI_STATE_ID));
 	 
 ds_sort   := SORT(ds_dist,	STD_SOURCE_UPD, STATE_ACTION_ID, NMLS_ID, MULTI_STATE_ID,AFFIL_TYPE_CD, REGULATOR, ACTION_TYPE,URL, 
                               -DATE_FIRST_SEEN, -DATE_LAST_SEEN, -PROCESS_DATE,LOCAL);
 
 
- Prof_License_Mari.layouts.Regulatory_Action rollupXform(Prof_License_Mari.layouts.Regulatory_Action l, Prof_License_Mari.layouts.Regulatory_Action r) := transform
+ Prof_License_Mari.layouts.Regulatory_Action_Base rollupXform(Prof_License_Mari.layouts.Regulatory_Action_Base l, Prof_License_Mari.layouts.Regulatory_Action_Base r) := transform
 			SELF.date_first_seen    := (STRING)ut.EarliestDate(
                                                    ut.EarliestDate((INTEGER)l.date_first_seen,	(INTEGER)r.date_first_seen)
                                                    ,ut.EarliestDate((INTEGER)l.date_last_seen,	(INTEGER)r.date_last_seen)
@@ -26,7 +30,8 @@ ds_sort   := SORT(ds_dist,	STD_SOURCE_UPD, STATE_ACTION_ID, NMLS_ID, MULTI_STATE
       SELF.docket_nbr   := IF(l.date_vendor_first_reported > r.date_vendor_first_reported, l.docket_nbr, r.docket_nbr);
       SELF.cln_action_dte := IF(l.date_vendor_first_reported > r.date_vendor_first_reported, l.cln_action_dte, r.cln_action_dte);
                                                             
-SELF := l;
+      SELF := l;
+      SELF := [];
    END;
    
    
@@ -50,13 +55,17 @@ END;
      
      
 EXPORT Disciplinary(DATASET(Prof_License_Mari.layouts.Disciplinary_Action) int0) := FUNCTION
-ds_dist_disp	:= DISTRIBUTE(int0, HASH(STD_SOURCE_UPD,INDIVIDUAL_NMLS_ID,STATE_ACTION_ID));
+
+// Map input layout to base layout
+ds := PROJECT(int0,TRANSFORM(Prof_License_Mari.layouts.Disciplinary_Action_Base,SELF:=LEFT,SELF:=[]));
+
+ds_dist_disp	:= DISTRIBUTE(ds, HASH(STD_SOURCE_UPD,INDIVIDUAL_NMLS_ID,STATE_ACTION_ID));
 	 
 ds_sort_disp   := SORT(ds_dist_disp,	STD_SOURCE_UPD, INDIVIDUAL_NMLS_ID, STATE_ACTION_ID, AUTHORITY_TYPE, AUTHORITY_NAME, URL, 
                       -DATE_FIRST_SEEN, -DATE_LAST_SEEN, -PROCESS_DATE,LOCAL);
 
 
- Prof_License_Mari.layouts.Disciplinary_Action rollupXform_discplinary(Prof_License_Mari.layouts.Disciplinary_Action l, Prof_License_Mari.layouts.Disciplinary_Action r) := transform
+ Prof_License_Mari.layouts.Disciplinary_Action_Base rollupXform_discplinary(Prof_License_Mari.layouts.Disciplinary_Action_Base l, Prof_License_Mari.layouts.Disciplinary_Action_Base r) := transform
 			 SELF.date_first_seen      := (STRING)ut.EarliestDate(
                                                    ut.EarliestDate((INTEGER)l.date_first_seen,	(INTEGER)r.date_first_seen)
                                                    ,ut.EarliestDate((INTEGER)l.date_last_seen,	(INTEGER)r.date_last_seen)
@@ -95,13 +104,17 @@ END;
       
       
 EXPORT indv_detail(DATASET(Prof_License_Mari.layouts.Individual_Reg) int0) := FUNCTION
-ds_dist_indv	 := DISTRIBUTE(int0, HASH(STD_SOURCE_UPD,RECORD_TYPE_IND,INDIVIDUAL_NMLS_ID, COMPANY_NMLS_ID,INSTIT_NMLS_ID,LICENSE_ID));
+
+// Map input layout to base layout
+ds := PROJECT(int0,TRANSFORM(Prof_License_Mari.layouts.Individual_Reg_Base,SELF:=LEFT,SELF:=[]));
+
+ds_dist_indv	 := DISTRIBUTE(ds, HASH(STD_SOURCE_UPD,RECORD_TYPE_IND,INDIVIDUAL_NMLS_ID, COMPANY_NMLS_ID,INSTIT_NMLS_ID,LICENSE_ID));
 	 
 ds_sort_indv   := SORT(ds_dist_indv,	STD_SOURCE_UPD,RECORD_TYPE_IND,INDIVIDUAL_NMLS_ID, COMPANY_NMLS_ID,INSTIT_NMLS_ID,LICENSE_ID,RAW_LICENSE_TYPE, 
                               -DATE_FIRST_SEEN, -DATE_LAST_SEEN, -PROCESS_DATE,LOCAL);
 
 
- Prof_License_Mari.layouts.Individual_Reg rollupXform_detail(Prof_License_Mari.layouts.Individual_Reg l, Prof_License_Mari.layouts.Individual_Reg r) := transform
+ Prof_License_Mari.layouts.Individual_Reg_Base rollupXform_detail(Prof_License_Mari.layouts.Individual_Reg_Base l, Prof_License_Mari.layouts.Individual_Reg_Base r) := transform
 			SELF.date_first_seen      := (STRING)ut.EarliestDate(
                                                    ut.EarliestDate((INTEGER)l.date_first_seen,	(INTEGER)r.date_first_seen)
                                                    ,ut.EarliestDate((INTEGER)l.date_last_seen,	(INTEGER)r.date_last_seen)
