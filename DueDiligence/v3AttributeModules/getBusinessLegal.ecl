@@ -10,6 +10,7 @@ EXPORT getBusinessLegal(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) in
     //get legal data for all unique businesses
     uniqueBusinesses := DEDUP(SORT(inData, inquiredBusiness.ultID, inquiredBusiness.orgID, inquiredBusiness.seleID),inquiredBusiness.ultID, inquiredBusiness.orgID, inquiredBusiness.seleID);
     rawCivilResults := DueDiligence.v3BusinessData.getLienJundgementEviction(uniqueBusinesses, regulatoryAccess, ddOptions.ssnMask);
+    rawBankruptcyResults := DueDiligence.v3BusinessData.getBankruptcy(uniqueBusinesses, regulatoryAccess);
     
     
     //based on the legal data - populate requested attributes
@@ -17,7 +18,7 @@ EXPORT getBusinessLegal(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) in
     
     offenseTypeAttributeResults := DueDiligence.v3BusinessAttributes.getOffenseType(inData);
     stateLegalEventAttributeResults := DueDiligence.v3BusinessAttributes.getStateLegalEvent(inData);
-    civilLegalEventAttributeResults := DueDiligence.v3BusinessAttributes.getCivilLegalEvent(inData, rawCivilResults);
+    civilLegalEventAttributeResults := DueDiligence.v3BusinessAttributes.getCivilLegalEvent(inData, rawCivilResults, rawBankruptcyResults);
     
     
     offenseType := IF(attributesRequested.includeAll OR attributesRequested.includeOffenseType, offenseTypeAttributeResults, noAttributeResults);

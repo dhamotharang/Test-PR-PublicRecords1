@@ -14,13 +14,14 @@ EXPORT getPersonLegal(DATASET(DueDiligence.v3Layouts.Internal.PersonTemp) inData
     //get legal data for all unique individuals
     rawLegalResults := DueDiligence.v3SharedData.getCriminalData(unqiuePeople);
     rawCivilResults := DueDiligence.v3PersonData.getLienJundgementEviction(uniqueInquired, regulatoryAccess, ddOptions.ssnMask);
+    rawBankruptcyResults := DueDiligence.v3PersonData.getBankruptcy(uniqueInquired);
     
     //based on the legal data - populate requested attributes
     noAttributeResults := DATASET([], DueDiligence.v3Layouts.InternalPerson.PersonAttributes);
     
     offenseTypeAttributeResults := DueDiligence.v3PersonAttributes.getOffenseType(unqiuePeople, rawLegalResults);
     stateLegalEventAttributeResults := DueDiligence.v3PersonAttributes.getStateLegalEvent(unqiuePeople, rawLegalResults);
-    civilLegalEventAttributeResults := DueDiligence.v3PersonAttributes.getCivilLegalEvent(inData, rawCivilResults);
+    civilLegalEventAttributeResults := DueDiligence.v3PersonAttributes.getCivilLegalEvent(inData, rawCivilResults, rawBankruptcyResults);
     
     
     offenseType := IF(attributesRequested.includeAll OR attributesRequested.includeOffenseType, offenseTypeAttributeResults, noAttributeResults);
