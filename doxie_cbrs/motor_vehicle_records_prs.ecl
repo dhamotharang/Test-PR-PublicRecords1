@@ -1,33 +1,33 @@
-import doxie, doxie_raw, ut, doxie_ln, suppress;
+﻿IMPORT doxie, doxie_cbrs, doxie_raw, suppress;
 
 doxie_cbrs.mac_Selection_Declare()
 
-export motor_vehicle_records_prs(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
+EXPORT motor_vehicle_records_prs(DATASET(doxie_cbrs.layout_references) bdids,
+                                 doxie.IDataAccess mod_access
+                                ) := FUNCTION
 
 //***** Get our target address
-br := doxie_cbrs.best_records_prs_target(bdids)(Include_MotorVehicles_val and doxie_cbrs.stored_ShowPersonalData_value);
+br := doxie_cbrs.best_records_prs_target(bdids,mod_access)(Include_MotorVehicles_val AND doxie_cbrs.stored_ShowPersonalData_value);
 
-doxie_raw.Layout_VehRawBatchInput.out_layout tra(br l) := transform
-	self.input.seq := 1;
-	self.input.zip := (string5)l.zip;
-	self.input.v_city_name := l.city;
-	self.input.st := l.state;
-	self.input.dppa_purpose := dppa_purpose;
-	self.input.glb_purpose := glb_purpose;
-	self.input := l;
-	self.input := [];
-end;
+doxie_raw.Layout_VehRawBatchInput.out_layout tra(br l) := TRANSFORM
+  SELF.input.seq := 1;
+  SELF.input.zip := (string5)l.zip;
+  SELF.input.v_city_name := l.city;
+  SELF.input.st := l.state;
+  SELF.input := l;
+  SELF.input := [];
+END;
 
-brt := dedup(project(br, tra(left)), all);
+brt := DEDUP(PROJECT(br, tra(LEFT)), ALL);
 
 //***** See if any vehicles at that address
-r := ungroup(doxie_raw.Veh_Raw_batch(group(sorted(brt, seq), seq))(VEHICLE_NUMBERxBG1<>''));
+r := UNGROUP(doxie_raw.Veh_Raw_batch(GROUP(SORTED(brt, seq), seq), mod_access)(VEHICLE_NUMBERxBG1<>''));
 
+//dl_mask_value is taken from mac_Selection_Declare call
+suppress.MAC_Mask(r, outf_c, own_1_ssn, OWN_1_DRIVER_LICENSE_NUMBER, TRUE, TRUE, maskVal := mod_access.ssn_mask);
+suppress.MAC_Mask(outf_c, outf_d, own_2_ssn, OWN_2_DRIVER_LICENSE_NUMBER, TRUE, TRUE, maskVal := mod_access.ssn_mask);
+suppress.MAC_Mask(outf_d, outf_e, reg_1_ssn, REG_1_DRIVER_LICENSE_NUMBER, TRUE, TRUE, maskVal := mod_access.ssn_mask);
+suppress.MAC_Mask(outf_e, out_mskd, reg_2_ssn, REG_2_DRIVER_LICENSE_NUMBER, TRUE, TRUE, maskVal := mod_access.ssn_mask);
 
-suppress.MAC_Mask(r, outf_c, own_1_ssn, OWN_1_DRIVER_LICENSE_NUMBER, true, true);
-suppress.MAC_Mask(outf_c, outf_d, own_2_ssn, OWN_2_DRIVER_LICENSE_NUMBER, true, true);
-suppress.MAC_Mask(outf_d, outf_e, reg_1_ssn, REG_1_DRIVER_LICENSE_NUMBER, true, true);
-suppress.MAC_Mask(outf_e, out_mskd, reg_2_ssn, REG_2_DRIVER_LICENSE_NUMBER, true, true);
-
-return project(out_mskd, Doxie.Layout_VehicleSearch);
+RETURN PROJECT(out_mskd, Doxie.Layout_VehicleSearch);
 END;

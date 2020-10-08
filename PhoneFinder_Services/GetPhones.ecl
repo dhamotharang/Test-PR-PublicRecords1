@@ -51,7 +51,7 @@
                 PhoneFinder_Services.GetTargusPhones(dIn, inMod, TRUE, targusGateway));
 
   // Equifax phones data - only use equifax phones for PII searches to calculate RI
-  dEquifaxPhones := IF(inMod.IsPrimarySearchPII and inMod.hasActiveIdentityCountRules and ~doxie.DataRestriction.EquifaxPhoneMart,
+  dEquifaxPhones := IF(inMod.IsPrimarySearchPII and inMod.hasActiveIdentityCountRules,
                         PhoneFinder_Services.GetEquifaxPhones(dIn, inMod));
 
   // Combine all the phone sources

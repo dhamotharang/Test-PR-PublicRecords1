@@ -1,32 +1,32 @@
-﻿import AutoStandardI,Foreclosure_Services,iesp;
+﻿IMPORT AutoStandardI,Foreclosure_Services,iesp;
 
 // defaults to Foreclosure records, pass true for Notice of Defaults records
-export foreclosure_records(dataset(doxie_cbrs.layout_references) bdids, boolean isNodSearch=false) := MODULE
+EXPORT foreclosure_records(DATASET(doxie_cbrs.layout_references) bdids, BOOLEAN isNodSearch=FALSE) := MODULE
 
 gmod := AutoStandardI.GlobalModule();
 nMod := MODULE(Foreclosure_Services.Raw.params);
-  EXPORT string5 industry_class := gmod.IndustryClass;
-  EXPORT string32 application_type := gmod.ApplicationType;
-  EXPORT string ssn_mask := gmod.ssnmask;
+  EXPORT STRING5 industry_class := gmod.IndustryClass;
+  EXPORT STRING32 application_type := gmod.ApplicationType;
+  EXPORT STRING ssn_mask := gmod.ssnmask;
 END;
 
-for := Foreclosure_Services.Raw.report_view.by_bdid(bdids,nMod,false);
-nod := Foreclosure_Services.Raw.report_view.by_bdid(bdids,nMod,true);
+for := Foreclosure_Services.Raw.report_view.by_bdid(bdids,nMod,FALSE);
+nod := Foreclosure_Services.Raw.report_view.by_bdid(bdids,nMod,TRUE);
 
-fids := set(for,ForeclosureId);
+fids := SET(for,ForeclosureId);
 
-nodFlg := record 
-	iesp.foreclosure.t_ForeclosureReportRecord,
-	boolean foreclosed
-end;
+nodFlg := RECORD
+  iesp.foreclosure.t_ForeclosureReportRecord,
+  BOOLEAN foreclosed
+END;
 
-nodFlg assignFlg(iesp.foreclosure.t_ForeclosureReportRecord l) := transform 
-	self := l; 
-	self.foreclosed := if(isNodSearch,self.ForeclosureId in fids,true)
-end;
+nodFlg assignFlg(iesp.foreclosure.t_ForeclosureReportRecord l) := TRANSFORM
+  SELF := l;
+  SELF.foreclosed := IF(isNodSearch,SELF.ForeclosureId IN fids,TRUE)
+END;
 
-export records := if(isNodSearch,project(nod,assignFlg(LEFT)),project(for,assignFlg(LEFT)));
+EXPORT records := IF(isNodSearch,PROJECT(nod,assignFlg(LEFT)),PROJECT(for,assignFlg(LEFT)));
 
-export records_count := count(records);
+EXPORT records_count := COUNT(records);
 
-end;
+END;

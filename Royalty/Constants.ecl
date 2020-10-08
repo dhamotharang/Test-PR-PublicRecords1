@@ -26,6 +26,7 @@ export Constants := module
     export unsigned2 INVIEW_BCIR := 157;
     export unsigned2 GDCVERIFY := 160;
     export unsigned2 NETACUITY := 170;
+    export unsigned2 NETACUITY_IPM := 171;
     export unsigned2 ERC := 180;
     export unsigned2 ATTUS := 190;
     export unsigned2 FARES := 200;
@@ -104,6 +105,7 @@ export Constants := module
     export unsigned2 BRITE_VERIFY_EMAIL := 720;
     export unsigned2 FIRST_DATA := 735;
     export unsigned2 NETWISE_EMAIL := 750;
+    export unsigned2 IDA := 760;
   end;
 
   export RoyaltyType := module
@@ -133,6 +135,7 @@ export Constants := module
     export INVIEW_BCIR := _TYPE(RoyaltyCode.INVIEW_BCIR);
     export GDCVERIFY := _TYPE(RoyaltyCode.GDCVERIFY);
     export NETACUITY := _TYPE(RoyaltyCode.NETACUITY);
+    export NETACUITY_IPM := _TYPE(RoyaltyCode.NETACUITY_IPM);
     export ERC := _TYPE(RoyaltyCode.ERC);
     export ATTUS := _TYPE(RoyaltyCode.ATTUS);
     export FARES := _TYPE(RoyaltyCode.FARES);
@@ -209,6 +212,7 @@ export Constants := module
     export BRITE_VERIFY_EMAIL := _TYPE(RoyaltyCode.BRITE_VERIFY_EMAIL);
     export FIRST_DATA := _TYPE(RoyaltyCode.FIRST_DATA);
     export NETWISE_EMAIL := _TYPE(RoyaltyCode.NETWISE_EMAIL);
+    export IDA := _TYPE(RoyaltyCode.IDA);
   end;
 
   // *** DO NOT USE: TO BE DEPRECATED AND DELETED once batch can handle RoyaltySet dataset.
@@ -225,7 +229,8 @@ export Constants := module
     MDR.sourceTools.src_Teletrack,
     MDR.sourceTools.src_SalesChannel,
     MDR.sourceTools.src_Thrive_LT,
-    MDR.sourceTools.src_Thrive_PD
+    MDR.sourceTools.src_Thrive_PD,
+    MDR.sourceTools.src_Netwise
     ];
 
   // Email Royalties: Ensure that removed providers are absent from FCRA/non-FCRA queries

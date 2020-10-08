@@ -12,6 +12,7 @@ export t_ForeclosureSearchBy := record
 	string12 UniqueId {xpath('UniqueId')};
 	string11 SSN {xpath('SSN')};
 	string60 CompanyName {xpath('CompanyName')};
+	string45 ParcelNumber {xpath('ParcelNumber')};
 end;
 		
 export t_ForeclosureSearchOption := record (iesp.share.t_BaseSearchOptionEx)
@@ -33,6 +34,7 @@ export t_ForeclosureSearchRecord := record
 	integer _Penalty {xpath('Penalty')};//hidden[ecldev]
 	boolean AlsoFound {xpath('AlsoFound')};
 	string70 ForeclosureId {xpath('ForeclosureId')};
+	string45 ParcelNumber {xpath('ParcelNumber')};
 	iesp.share.t_Date RecordingDate {xpath('RecordingDate')};
 	iesp.share.t_Address SiteAddress {xpath('SiteAddress')};
 	iesp.share.t_Address Site2Address {xpath('Site2Address')};

@@ -39,7 +39,11 @@ EXPORT Records(iesp.consumeroptout.t_ConsumerOptoutReportRequest rec_in,
   END;
 
   key_rec := optout_key(KEYED(lexid = (unsigned6)rec_in.ReportBy.LexId))[1];
-  rec_out := ROW(applyOptOut(rec_in, key_rec));
+  rec_suppressed := ROW(applyOptOut(rec_in, key_rec));
+  rec_out := PROJECT(rec_suppressed, TRANSFORM(iesp.consumeroptout.t_ConsumerOptoutReportResponse,
+    SELF._Header := iesp.ECL2ESP.GetHeaderRow(),
+    SELF.Result := LEFT
+  ));
 
   RETURN rec_out;
 

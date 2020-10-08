@@ -1,5 +1,6 @@
-﻿import Address, Autokey_batch, BatchServices, doxie, dx_Gong, mdr, POE, PSS, ut, Yellowpages, PAW_Services, paw, spoke, zoom,
-       corp2, POEsFromEmails, one_click_data, SalesChannel, thrive, Email_Data, DCA, doxie_cbrs, Prof_LicenseV2, suppress, STD;
+import $, Address, Autokey_batch, BatchServices, doxie, dx_Gong, mdr, POE, PSS, ut, Yellowpages, PAW_Services, paw, spoke, zoom,
+       corp2, POEsFromEmails, one_click_data, SalesChannel, thrive, Email_Data, DCA, doxie_cbrs, Prof_LicenseV2, suppress, STD,
+       Gateway, iesp, dx_DataBridge, dx_Database_USA, dx_gateway, dx_BestRecords;
 
 // NOTE: Within this module certain BatchServices.Workplace_* attributes are used.
 // This is because the BatchServices.WorkPlace_BatchService was created first,
@@ -618,7 +619,7 @@ export Functions := module
 
       STRING cap_s1:= std.Str.ToUpperCase(email_in);
       email_domain := Std.Str.SplitWords(cap_s1,'@');
-      BOOLEAN isNonPersonalEmail:= email_domain[2] NOT IN BatchServices.WorkPlace_Constants.PERSONAL_EMAIL_DOMAIN_DCT;
+      BOOLEAN isNonPersonalEmail:= email_domain[2] <> '' AND email_domain[2] NOT IN BatchServices.WorkPlace_Constants.PERSONAL_EMAIL_DOMAIN_DCT;
 
     RETURN isNonPersonalEmail;
   END; // end of checkNonPersonalEmail function
@@ -626,6 +627,8 @@ export Functions := module
   EXPORT getDetailedWithEmail(DATASET(WorkPlace_Services.Layouts.poe_didkey_plus)
                                ds_recs_in, doxie.IDataAccess mod_access) := FUNCTION
 
+    ds_recs_databridge   := ds_recs_in(MDR.sourceTools.SourceIsDataBridge(source));
+    ds_recs_database_USA := ds_recs_in(MDR.sourceTools.SourceIsDatabase_USA(source));
     ds_recs_spoke := ds_recs_in(MDR.sourceTools.SourceIsSpoke(source));
     ds_recs_zoom := ds_recs_in(MDR.sourceTools.SourceIsZoom(source));
     ds_recs_corp := ds_recs_in(MDR.sourceTools.SourceIsCorpV2(source));
@@ -643,9 +646,64 @@ export Functions := module
                                  ~MDR.sourceTools.SourceIsOne_Click_Data(source) AND
                                  ~MDR.sourceTools.SourceIsSalesChannel(source) AND
                                  ~MDR.sourceTools.SourceIsThrive_LT(source) AND
-                                 ~MDR.sourceTools.SourceIsThrive_PD(source)
+                                 ~MDR.sourceTools.SourceIsThrive_PD(source) AND
+                                 ~MDR.sourceTools.SourceIsDataBridge(source) AND
+                                 ~MDR.sourceTools.SourceIsDatabase_USA(source)
                                 );
 
+    ds_detail_databridge_all := dx_DataBridge.Append.byDid(ds_recs_databridge, did, BatchServices.WorkPlace_Constants.Limits.APPEND_LIMIT);
+
+    _ds_detail_databridge := project(ds_detail_databridge_all,
+                                     transform(WorkPlace_Services.Layouts.poe_didkey_plus,
+                                       //Refer dx_Databridge.Append and dx_Databridge.Layout_Keybase
+                                       key_data := left.databridge_data;
+                                       email_filter(string50 email, string7 status) := if(
+                                         checkNonPersonalEmail(email) and status <> BatchServices.WorkPlace_Constants.EMAIL_INVALID,
+                                         email,
+                                       '');
+                                       self.dt_last_seen := if(left.dt_last_seen = key_data.dt_last_seen, left.dt_last_seen, skip);
+                                       self.email1 := email_filter(key_data.email1, key_data.email_status),
+                                       self.email2 := email_filter(key_data.email2, key_data.email_status),
+                                       self.email3 := email_filter(key_data.email3, key_data.email_status),
+                                       self.email_src1 := if(self.email1 <> '', left.source, ''),
+                                       self.email_src2 := if(self.email2 <> '', left.source, ''),
+                                       self.email_src3 := if(self.email3 <> '', left.source, ''),
+                                       self.global_sid := left.global_sid,
+                                       self.record_sid := left.record_sid,
+                                       self := left));
+
+    ds_detail_databridge_flagged := Suppress.MAC_FlagSuppressedSource(_ds_detail_databridge, mod_access);
+
+    ds_detail_databridge := project(ds_detail_databridge_flagged,
+                                    transform($.Layouts.poe_didkey_plus,
+                                      self.email1 := if(left.is_suppressed, '', left.email1),
+                                      self.email2 := if(left.is_suppressed, '', left.email2),
+                                      self.email3 := if(left.is_suppressed, '', left.email3),
+                                      self.email_src1 := if(left.is_suppressed, '', left.email_src1),
+                                      self.email_src2 := if(left.is_suppressed, '', left.email_src2),
+                                      self.email_src3 := if(left.is_suppressed, '', left.email_src3),
+                                      self := left));
+
+    ds_detail_database_usa_all := dx_Database_USA.Append.byDid(ds_recs_database_USA, did, BatchServices.WorkPlace_Constants.Limits.APPEND_LIMIT);
+
+    _ds_detail_database_usa := project(ds_detail_database_usa_all,
+                                       transform(WorkPlace_Services.Layouts.poe_didkey_plus,
+                                         //Refer dx_Database_USA.Append and dx_Database_USA.Layout_Keybase
+                                         key_data := left.dbusa_data;
+                                         self.dt_last_seen := if(left.dt_last_seen = key_data.dt_last_seen, left.dt_last_seen, skip),
+                                         self.email1 := if(checkNonPersonalEmail(key_data.email), key_data.email, ''),
+                                         self.email_src1 := if(self.email1 <> '', left.source, ''),
+                                         self.global_sid := left.global_sid,
+                                         self.record_sid := left.record_sid,
+                                         self := left));
+
+    ds_detail_database_usa_flagged := Suppress.MAC_FlagSuppressedSource(_ds_detail_database_usa, mod_access);
+
+    ds_detail_database_usa := project(ds_detail_database_usa_flagged,
+                                      transform($.Layouts.poe_didkey_plus,
+                                        self.email1 := if(left.is_suppressed, '', left.email1),
+                                        self.email_src1 := if(left.is_suppressed, '', left.email_src1),
+                                        self := left));
 
     ds_detail_spoke_all := JOIN(ds_recs_spoke,spoke.keys().did.qa,
                             KEYED(LEFT.did = RIGHT.did) AND
@@ -842,7 +900,9 @@ export Functions := module
                              );
 
   // Combine all source detail recs into 1 dataset.
-  ds_detail_all := ds_detail_spoke
+  ds_detail_all := ds_detail_databridge
+                   + ds_detail_database_usa
+                   + ds_detail_spoke
                    + ds_detail_zoom
                    + ds_detail_corp
                    + ds_detail_poeemail
@@ -950,6 +1010,93 @@ export Functions := module
     RETURN ds_detail_wemail_deduped;
   END; // end of getDetailedWithEmail function
 
+  export GetNetwiseRecords(dataset(BatchServices.WorkPlace_Layouts.POE_lookup) dsSubjectDids, boolean CachedResponseOnly) := function
+
+    // Get best PII for each subject
+    dsBestRecs := dx_BestRecords.append(dsSubjectDids, lookupdid, dx_BestRecords.Constants.perm_type.glb);
+    dsBestReq := dsBestRecs(_best.fname <> '', _best.lname <> '', _best.st <> ''); // Required inputs for vendor gateway
+
+    // Netwise Gateway Request & Response
+    dsNetwiseReq := project(dsBestReq,
+                            transform(iesp.net_wise.t_NetWiseQueryRequest,
+                              self.SearchBy.UniqueID := (string) left.lookupdid,
+                              self.SearchBy.FirstName := left._best.fname,
+                              self.SearchBy.LastName := left._best.lname,
+                              self.SearchBy.City := left._best.city_name,
+                              self.SearchBy.State := left._best.st,
+                              self.SearchBy.Zip := left._best.zip,
+                              self.SearchBy.Age := left._best.age,
+                              self.SearchBy.Phone := (string) left._best.phone,
+                              self := []));
+
+    mod_params := Gateway.NetwiseSearch.IParams.GetParams_PersonSearch(CachedResponseOnly);  // Search Params for gateway  
+
+    makeGatewayCall := mod_params.gateways(Gateway.Configuration.IsNetWise(servicename))[1].url <> '';
+    dsNetwiseReqClean := dx_gateway.parser_netwise_email.fn_CleanRequest(dsNetwiseReq);
+    dsNetwiseResp := Gateway.SoapCall_NetWise(dsNetwiseReqClean, mod_params, , , makeGatewayCall, false);
+    dsNetwiseRespClean := dx_gateway.parser_netwise_email.fn_CleanResponse_LexID(dsNetwiseResp);
+
+    $.Layouts.poe_didkey_plus XformPOE(dx_gateway.parser_netwise_email.NetwiseResults_LexID l, iesp.net_wise_share.t_NetWiseWork r) := transform,
+      // Need a company name and a resolved LexID at the very least
+      skip(l.did = 0 or r.CompanyName = '')
+      // Clean name and address info
+      subject_clean_name := Address.GetCleanNameAddress.CleanPersonName(l.FullName, false);
+      raw_addr := r.Address;
+      temp_addr := iesp.ECL2ESP.SetAddress('', '', '', '', '','', '',
+                                          raw_addr.City, raw_addr.State,
+                                          raw_addr.Zip, '', '', '',
+                                          raw_addr.Address1, raw_addr.Address2, '');
+      clean_addr := Address.GetCleanNameAddress.fnCleanAddress(temp_addr);
+      // Fields sensitive to product requirements
+      self.source := MDR.sourceTools.src_Netwise;
+      self.source_order := BatchServices.WorkPlace_Constants.DEFAULT_SOURCE_ORDER;
+      self.spouse_indicator := 'N';
+      self.did := l.did;
+      self.company_name := STD.Str.ToUpperCase(r.CompanyName);
+      self.company_state := if(ut.valid_st(clean_addr.st), clean_addr.st, skip); // USA records only
+      self.company_phone1 := r.phone;
+      self.email1 := if(checkNonPersonalEmail(r.Email), STD.Str.ToUpperCase(r.Email), '');
+      self.email_src1 := if(self.email1 <> '', MDR.sourceTools.src_Netwise, '');
+      self.dt_last_seen := map(
+        STD.Str.ToUpperCase(r.StartYear) = BatchServices.WorkPlace_Constants.NETWISE_DT_CURRENT => (unsigned) STD.Date.Today(),
+        r.StartYear <> '' => (unsigned) (r.StartYear + '1231'), /* Netwise returns only YYYY */
+        0
+      );
+      // Other relevant POE fields from netwise
+      self.subject_first_name := subject_clean_name.fname;
+      self.subject_last_name := subject_clean_name.lname;
+      self.company_prim_range := clean_addr.prim_range;
+      self.company_predir := clean_addr.predir;
+      self.company_prim_name := clean_addr.prim_name;
+      self.company_addr_suffix := clean_addr.addr_suffix;
+      self.company_postdir := clean_addr.postdir;
+      self.company_unit_desig := clean_addr.unit_desig;
+      self.company_sec_range := clean_addr.sec_range;
+      self.company_zip5 := clean_addr.zip;
+      self.company_zip4 := clean_addr.zip4;
+      self.company_city := clean_addr.p_city_name;
+      self := [];
+    end;
+
+    // Extract relevant POE data from results, modify/filter signficant fields and xform onto POE layout
+    dsNetwiseResults := normalize(dsNetwiseRespClean, left.response.results, transform(right));
+    dsNetwiseWorkRecs := normalize(dsNetwiseResults, left.WorkRecords, XformPOE(left, right));
+    // Ensure that subject DIDs resolved from gateway response are the intended ones, append ssn
+    dsNetwiseWorkRecsSSN := join(dsNetwiseWorkRecs, dsBestRecs,
+                                left.did = right.lookupdid,
+                                transform($.Layouts.poe_didkey_plus,
+                                  self.subject_ssn := right._best.ssn_unmasked,
+                                  self := left));
+
+    // output(dsBestRecs, named('dsBestRecs'));
+    // output(dsNetwiseReqClean, named('dsNetwiseReqClean'));
+    // output(dsNetwiseRespClean, named('dsNetwiseRespClean'));
+    // output(dsNetwiseWorkRecsSSN, named('dsNetwiseWorkRecsSSN'));
+
+    return dsNetwiseWorkRecsSSN;
+
+  end;
+
   EXPORT getParentCompany(DATASET(WorkPlace_Services.Layouts.poe_didkey_plus) ds_recs_in, BOOLEAN IncludeCorp= FALSE) := FUNCTION
 
       // NOTE: In DCA, the root-sub expression is a compound value:
@@ -1001,7 +1148,7 @@ export Functions := module
                                TRANSFORM(BatchServices.WorkPlace_Layouts.dca_info,
                                  // Get parent company fields from RIGHT file
                                  SELF.parent_company_bdid := IF(RIGHT.bdid<>0,(string) RIGHT.bdid,'');
-                                 SELF.parent_company_name := StringLib.StringToUpperCase(RIGHT.Name),
+                                 SELF.parent_company_name := STD.Str.ToUpperCase(RIGHT.Name),
                                  SELF.parent_company_address := Address.Addr1FromComponents(
                                                                 RIGHT.prim_range,
                                                                 RIGHT.predir,

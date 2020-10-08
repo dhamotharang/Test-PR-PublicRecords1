@@ -1,4 +1,4 @@
-﻿﻿IMPORT _Control, Ut, riskwise, models, easi, doxie, dma, fcra_opt_out, USPIS_HotList, AML, gateway, LN_PropertyV2_Services, riskview, Business_Risk_BIP, BIPV2, MDR, ADVO, risk_indicators, STD, iesp;
+﻿IMPORT _Control, Ut, riskwise, models, easi, doxie, dma, fcra_opt_out, USPIS_HotList, AML, gateway, LN_PropertyV2_Services, riskview, Business_Risk_BIP, BIPV2, MDR, ADVO, risk_indicators, STD, iesp;
 onThor := _Control.Environment.OnThor;
 
 EXPORT getAllBocaShellData (
@@ -502,11 +502,12 @@ RelatRecProp := join(ids_wide,   single_property_relat,
                  seq), seq);
   History_2_Property_added_fis := History_2_Property_Added_1_fis + group(sort(pullid_recs, seq),seq);
 
-  // =============== Vehicles ===============
-  vehicles := Risk_Indicators.Boca_Shell_Vehicles(ids_only, dppa, dppa_ok, includeRelativeInfo, BSversion);
-  vehicles_hist := Risk_Indicators.Boca_Shell_Vehicles_Hist(ids_only, dppa, dppa_ok, includeRelativeInfo, BSversion);
-  vehicles_rolled := if (production_realtime_mode, vehicles, vehicles_hist);
+  vehrecLayout := Risk_Indicators.Layout_Vehicles.VehRec;
 
+// =============== Vehicles ===============
+vehicles := IF(dppa_ok, Risk_Indicators.Boca_Shell_Vehicles(ids_only, dppa, dppa_ok, includeRelativeInfo, BSversion), DATASET([], vehrecLayout));
+vehicles_hist := IF(dppa_ok, Risk_Indicators.Boca_Shell_Vehicles_Hist(ids_only, dppa, dppa_ok, includeRelativeInfo, BSversion), DATASET([], vehrecLayout));
+vehicles_rolled := if (production_realtime_mode, vehicles, vehicles_hist);
 
   // =============== Derogs ===============
 
@@ -524,13 +525,16 @@ RelatRecProp := join(ids_wide,   single_property_relat,
   // doc_rolled_ind := doc_rolled(~isrelat);
 
   // =============== Watercraft ===============
-  watercraft := IF (IsFCRA,
-                      Risk_Indicators.Boca_Shell_Watercraft_FCRA (ids_only(~isrelat), isPreScreen, bsversion),
-                      Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/, mod_access));
-  watercraft_hist := IF (IsFCRA,
-                          Risk_Indicators.Boca_Shell_Watercraft_Hist_FCRA (ids_only(~isrelat), isPreScreen, bsversion),
-                          Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/, mod_access));
-  watercraft_rolled := if (production_realtime_mode, watercraft, watercraft_hist);
+
+  watercraft := IF(IsFCRA,
+									Risk_Indicators.Boca_Shell_Watercraft_FCRA (ids_only(~isrelat), isPreScreen, bsversion),
+									Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/, mod_access));
+
+	watercraft_hist := IF(IsFCRA,
+										Risk_Indicators.Boca_Shell_Watercraft_Hist_FCRA (ids_only(~isrelat), isPreScreen, bsversion),
+										Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/, mod_access));
+										
+	watercraft_rolled := if (production_realtime_mode, watercraft, watercraft_hist);
 
   watercraft_relat := watercraft_rolled(isrelat);
   watercraft_rolled_indv := watercraft_rolled(~isrelat);
@@ -718,7 +722,7 @@ RelatInput :=  join(ssnFlagsPrep, pre_ids_only,
                               self := []));
 
 // AML  address attributes
-relatAddr  := AML.AMLAddrAttrib(ssnFlagsPrep);
+relatAddr  := AML.AMLAddrAttrib(ssnFlagsPrep, mod_access);
 
 
 //  AML  header info
@@ -1564,7 +1568,7 @@ with_email_summary_thor := GROUP(JOIN(DISTRIBUTE(with_inquiries, HASH64(seq)),
 #END
 
 // todo using BH to get Office/agent need to change if we go with PAW
-with_bus_header_summary := if(isFCRA, with_email_summary, risk_indicators.boca_shell_Bus_header(with_email_summary, bsversion)); // won't use business header on FCRA queries
+with_bus_header_summary := if(isFCRA, with_email_summary, risk_indicators.boca_shell_Bus_header(with_email_summary, mod_access, bsversion)); // won't use business header on FCRA queries
 with_address_risk := if(isFCRA, with_bus_header_summary, risk_indicators.Boca_Shell_Address_Risk(with_bus_header_summary, bsversion) );
 
 

@@ -582,7 +582,8 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Address_Risk (DATASE
 																									LEFT.Clean_Input.Postdir = RIGHT.Postdir AND UT.NNEQ(LEFT.Clean_Input.Sec_Range, RIGHT.Sec_Range) AND
 																									(((UNSIGNED)(((STRING)RIGHT.dt_first_seen)[1..6]) <= LEFT.Clean_Input.ArchiveDate AND RIGHT.dt_first_seen <> 0) OR
 																									(RIGHT.dt_first_seen = 0 AND RIGHT.dt_vendor_first_reported <> 0 AND ((UNSIGNED)(((STRING)RIGHT.dt_vendor_first_reported)[1..6])) <= LEFT.Clean_Input.ArchiveDate)) AND
-																									RIGHT.BDID <> 0,
+																									RIGHT.BDID <> 0 AND 
+																									doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 																		GetBusinessHeaderAddress(LEFT, RIGHT), ATMOST(ut.Limits.BHEADER_PER_BDID));
 
 	// Keep the unique DID's associated with the Address

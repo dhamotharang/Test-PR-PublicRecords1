@@ -1,4 +1,4 @@
-﻿IMPORT IDLExternalLinking, InsuranceHeader_xLink, doxie, SALT37, ut, STD;
+﻿IMPORT IDLExternalLinking, InsuranceHeader_xLink, doxie, SALT311, ut, STD;
 // requirements of search:
 // limits and atmost 10K
 // no dobforce 
@@ -89,19 +89,19 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
     outfile2 := IF (isOtherSt1, dedup(sort(join(outfile1(stweight>0 and reference=ds_search[1].seq), outfile1(stweight>0 and reference=ds_search[1].seq+1), left.did=right.did), did, reference), did), outfile1);
     outfile := IF (isOtherSt2, dedup(sort(join(outfile2, outfile1(stweight>0 and reference=ds_search[1].seq+2), left.did=right.did and left.reference<>right.reference), did, reference), did), outfile2);
     
-		result1 := IF(isEditDistance, outfile, outfile(fname_match_code <> SALT37.MatchCode.EditdistanceMatch or (ssn5weight>0 and ssn4weight>0)));
-		result2 := IF(isEditDistance, result1, result1(lname_match_code <> SALT37.MatchCode.EditdistanceMatch or (ssn5weight>0 and ssn4weight>0)));
+		result1 := IF(isEditDistance, outfile, outfile(fname_match_code <> SALT311.MatchCode.EditdistanceMatch or (ssn5weight>0 and ssn4weight>0)));
+		result2 := IF(isEditDistance, result1, result1(lname_match_code <> SALT311.MatchCode.EditdistanceMatch or (ssn5weight>0 and ssn4weight>0)));
 		
-		result3 := IF(isNickname, result2, result2(fname_match_code<>SALT37.MatchCode.CustomFuzzyMatch or (ssn5weight>0 and ssn4weight>0)));
+		result3 := IF(isNickname, result2, result2(fname_match_code<>SALT311.MatchCode.CustomFuzzyMatch or (ssn5weight>0 and ssn4weight>0)));
 		
-		result4 := IF(isPhonetic, result3, result3(fname_match_code <> SALT37.MatchCode.PhoneticMatch or (ssn5weight>0 and ssn4weight>0)));
-		result5 := IF(isPhonetic, result4, result4(lname_match_code<>SALT37.MatchCode.PhoneticMatch or (ssn5weight>0 and ssn4weight>0)));
+		result4 := IF(isPhonetic, result3, result3(fname_match_code <> SALT311.MatchCode.PhoneticMatch or (ssn5weight>0 and ssn4weight>0)));
+		result5 := IF(isPhonetic, result4, result4(lname_match_code<>SALT311.MatchCode.PhoneticMatch or (ssn5weight>0 and ssn4weight>0)));
 		
-		result6 := IF(isWildcard, result5, result5(fname_match_code<>SALT37.MatchCode.WildMatch or (ssn5weight>0 and ssn4weight>0)));
-		result7 := IF(isWildcard, result6, result6(lname_match_code<>SALT37.MatchCode.WildMatch or (ssn5weight>0 and ssn4weight>0)));
-		result8 := IF(isWildcard, result7, result7(prim_name_match_code<>SALT37.MatchCode.WildMatch or (ssn5weight>0 and ssn4weight>0)));
-		result9 := IF(isWildcard, result8, result8(prim_range_match_code<>SALT37.MatchCode.WildMatch or (ssn5weight>0 and ssn4weight>0)));
-		result10 := IF(isAddrSecRangeStrict, result9(sec_range_match_code=SALT37.MatchCode.ExactMatch), result9);
+		result6 := IF(isWildcard, result5, result5(fname_match_code<>SALT311.MatchCode.WildMatch or (ssn5weight>0 and ssn4weight>0)));
+		result7 := IF(isWildcard, result6, result6(lname_match_code<>SALT311.MatchCode.WildMatch or (ssn5weight>0 and ssn4weight>0)));
+		result8 := IF(isWildcard, result7, result7(prim_name_match_code<>SALT311.MatchCode.WildMatch or (ssn5weight>0 and ssn4weight>0)));
+		result9 := IF(isWildcard, result8, result8(prim_range_match_code<>SALT311.MatchCode.WildMatch or (ssn5weight>0 and ssn4weight>0)));
+		result10 := IF(isAddrSecRangeStrict, result9(sec_range_match_code=SALT311.MatchCode.ExactMatch), result9);
 		
 		// remove insurance LexIDs
 		result := result10(DID<IDLExternalLinking.Constants.INSURANCE_LEXID and DID>0);

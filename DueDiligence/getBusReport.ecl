@@ -11,11 +11,9 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) busnData,
     //This section is for masking FEIN and E5 sources - this data is only needed IF a report is requested
     addFeinSource := DueDiligence.getBusFeinSources(busnData, options, linkingOptions, ssnMask);
 
-    //This section is for criminal data on BEOs (Business Executive Officers)
-    addCriminalBEOs  := DueDiligence.reportBusExecCriminal(addFeinSource, ssnMask);
       
     //This section is for Operating Locations
-    addOperatingLocToReport := DueDiligence.reportBusOperLocations(addCriminalBEOs);
+    addOperatingLocToReport := DueDiligence.reportBusOperLocations(addFeinSource);
 
     //This section is for Operating Information
     addOperatingInfoToReport := DueDiligence.reportBusOperatingInformation(addOperatingLocToReport);
@@ -28,12 +26,9 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) busnData,
 
     //This section is for Business Executives 
     addExecutives := DueDiligence.reportBusExecs(addBestData, options, linkingOptions, mod_access);
-
-    //This section will add Business Executives that were not included in Attribute logic due to the DID not being populated in contacts key 
-    addDIDLessExecutives := DueDiligence.reportBusDIDLessExecs(addExecutives);  
-
+    
     //This section is for Shell Shelf Information 
-    addShellShelf := DueDiligence.reportBusShellShelf(addDIDLessExecutives);
+    addShellShelf := DueDiligence.reportBusShellShelf(addExecutives);
 
     //This section is for Property 
     addProperty := DueDiligence.reportBusProperty(addShellShelf);
@@ -47,15 +42,11 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) busnData,
     //This section is for Vehicle
     addVehicle := DueDiligence.reportBusVehicle(addAircraft);
 
-    //This section is for Civil Events
-    addCivil := DueDiligence.reportBusCivilEvents(addVehicle);
-
                                                             
                              
     //DEBUGGING OUTPUTS
       
-    // OUTPUT(addFeinSource, NAMED('addFeinSource'));  
-    // OUTPUT(addCriminalBEOs, NAMED('addCriminalBEOs'));  
+    // OUTPUT(addFeinSource, NAMED('addFeinSource'));   
     // OUTPUT(addOperatingLocToReport, NAMED('addOperatingLocToReport'));  
     // OUTPUT(addOperatingInfoToReport, NAMED('addOperatingInfoToReport'));  
     // OUTPUT(addRegisteredAgents, NAMED('addRegisteredAgents'));  
@@ -66,8 +57,7 @@ EXPORT getBusReport(DATASET(DueDiligence.layouts.Busn_Internal) busnData,
     // OUTPUT(addWatercraft, NAMED('addWatercraft'));  
     // OUTPUT(addAircraft, NAMED('addAircraft'));  
     // OUTPUT(addVehicle, NAMED('addVehicle'));  
-    // OUTPUT(addCivil, NAMED('addCivil'));  
 
 
-    RETURN addCivil;
+    RETURN addVehicle;
 END;

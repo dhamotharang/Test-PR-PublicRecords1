@@ -9,7 +9,7 @@ MODULE
 
   SHARED mod_access := PROJECT(inMod, doxie.IDataAccess);
 
-  SHARED dWirelessPhones := dPhoneRecs(phone <> '' AND isPrimaryPhone AND COC_description = PhoneFinder_Services.Constants.PhoneType.Wireless);
+  SHARED dWirelessPhones := dPhoneRecs(phone <> '' AND (isPrimaryPhone OR inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment) AND COC_description = PhoneFinder_Services.Constants.PhoneType.Wireless);
 
   // sending in best identities name/addr to first wireless phone
   rPfSeardchtype_Layout :=

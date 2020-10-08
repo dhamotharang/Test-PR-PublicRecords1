@@ -1,12 +1,12 @@
-import BIPV2, Doxie;
+IMPORT BIPV2, Doxie;
 
 EXPORT IParam := MODULE
-	export options := interface(Doxie.IDataAccess)
-		export boolean IncludePhonesPlus   			:= false;
-	  export boolean IncludePhonesFeedback 		:= false;
-		export string1 BusinessReportFetchLevel := BIPV2.IDconstants.Fetch_Level_SELEID;
-		export boolean useSupergroup 						:= false;
-		export boolean useLevels     						:= false;
-		export boolean isBIPReport							:= false;
-	end;
+  EXPORT options := INTERFACE(Doxie.IDataAccess)
+    EXPORT BOOLEAN IncludePhonesPlus := false;
+    EXPORT BOOLEAN IncludePhonesFeedback := false;
+    EXPORT STRING1 BusinessReportFetchLevel := BIPV2.IDconstants.Fetch_Level_SELEID;
+    EXPORT BOOLEAN useSupergroup := false;
+    EXPORT BOOLEAN useLevels := false;
+    EXPORT BOOLEAN isBIPReport := false;
+  END;
 END;

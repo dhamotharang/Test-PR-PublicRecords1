@@ -64,14 +64,14 @@ end;
 
 reg_raw_roxie := join (reg_ids, key_ids, 
                  left.aircraft_id != 0 and keyed (left.aircraft_id = right.aircraft_id) and
-                 ((string)right.persistent_record_id not in left.air_correct_ffid),
+                 ((string)right.persistent_record_id not in left.air_correct_record_id),
                  GetRawRegistration (Left, Right),
                  left outer, keep (1), limit (0));
 
 reg_raw_thor_pre := join (distribute(reg_ids(aircraft_id!=0), hash64(aircraft_id)), 
 								 distribute(pull(key_ids), hash64(aircraft_id)), 
                  left.aircraft_id = right.aircraft_id and
-                 ((string)right.persistent_record_id not in left.air_correct_ffid),
+                 ((string)right.persistent_record_id not in left.air_correct_record_id),
                  GetRawRegistration (Left, Right),
                  left outer, keep (1), limit (0), LOCAL);
 reg_raw_thor := group(sort(reg_raw_thor_pre + project(reg_ids(aircraft_id=0), transform(Riskwise.Layouts.Layout_Aircraft_Plus, self := LEFT, self := [])), seq),seq);

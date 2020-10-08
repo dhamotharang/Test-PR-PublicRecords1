@@ -247,6 +247,7 @@ EXPORT Layouts_Derog_Info := MODULE
 		unsigned ConsumerStatementId;
 		string10 orig_rmsid         ;
         /* The below parameters are internal only */
+        string UID;
 		boolean HighRiskCheck;
 		string RMSID;
 		string TMSID;
@@ -298,6 +299,7 @@ EXPORT Layouts_Derog_Info := MODULE
 		unsigned ConsumerStatementId;
 		string10 orig_rmsid   ;
         /* The below parameters are internal only */
+        string UID;
 		boolean HighRiskCheck;
 		string RMSID;
 		string TMSID;

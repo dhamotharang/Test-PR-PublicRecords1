@@ -57,18 +57,24 @@ dGWIn := PhoneFinder_Services.ScoringReport.GetGateways();
 Request_Layout  := RECORD
   DATASET(iesp.phonefinder.t_PhoneFinderSearchRequest) phonefindersearchRequest;
   DATASET(risk_indicators.Layout_Gateways_In) gateways;
+  STRING50 account_number;
 END;
 
 Request_Layout  tRequest(iesp.phonefinder.t_PhoneFinderSearchRequest Inreq) := TRANSFORM
   SELF.phonefindersearchRequest := Inreq;
   SELF.gateways := dGWIn;
+  SELF.account_number := Inreq.User.QueryID;
 END;     
+
 
 dSoapRequest := project(ds_Inreq,tRequest(LEFT));
 
+
 iesp.phonefinder.t_PhoneFinderSearchResponse myFail(Request_Layout l) := TRANSFORM
+  
+  SELF._Header.QueryID := l.account_number;
   SELF._Header.Status := failcode;
-  SELF._Header.Message := if(failcode=0,'success',failmessage);
+  SELF._Header.Message := if(failcode=0,'success',failmessage);	
   SELF          :=  [];
 END; 
        

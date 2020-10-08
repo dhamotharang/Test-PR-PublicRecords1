@@ -1,4 +1,4 @@
-import gong_services, doxie, business_header,
+﻿import gong_services, doxie, business_header,
   autokey, doxie_cbrs, AutoStandardI, CanadianPhones,
   can_ph, Business_Header_SS, fedex, autokeyb2, Suppress;
 
@@ -22,7 +22,7 @@ export FedexNoHit := byak;
 //***** CANADA
 ck := CanadianPhones.key_fdids;
 cids := CAN_PH.Get_IDs(workhard := true, nofail := true);
-export Canada :=
+can_all :=
   join(
     cids,
     ck,
@@ -33,10 +33,8 @@ export Canada :=
     ),
     keep(1)
   );
-// CanadianPhonesV1Keys and CanadianPhonesV1Keys are out of scope for CCPA phase-I, when DID field is added to these keys
-// FDID should be changed to valid DID and Source suppression can be uncommented
-// export Canada := Suppress.MAC_SuppressSource(can_all, mod_access, fdid);
-// doxie.compliance.logSoldToSources (Canada, mod_access, fdid);
+  
+export Canada := Suppress.MAC_SuppressSource(can_all, mod_access, did);
 
 //***** GONG
 results := gong_services.Fetch_Gong_History(,//Dataset(doxie.layout_references) indids = dummydidDS,
@@ -94,7 +92,7 @@ bdids :=
   )
   (score >= fedex_services.Contants.min_BusinessSearchScore);   //filter both result sets
 
-doxie_cbrs.mac_best_records(bdids, bestf)
+doxie_cbrs.mac_best_records(bdids, bestf, mod_access)
 
 
 //** if this company has used the input phone, sub that in for the best phone

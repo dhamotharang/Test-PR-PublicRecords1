@@ -119,7 +119,7 @@
 */
 
 #option('expandSelectCreateRow', true);
-IMPORT Business_Risk_BIP, Gateway, IESP, MDR, OFAC_XG5, Phones, Royalty, Std;
+IMPORT Business_Risk_BIP, Gateway, IESP, MDR, OFAC_XG5, Phones, Royalty, Std, LNSmallBusiness;
 
 EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 	/* ************************************************************************
@@ -269,6 +269,8 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 			SELF.Model_2_RC2       := model_result_2.Scores[1].ScoreReasons[2].ReasonCode;
 			SELF.Model_2_RC3       := model_result_2.Scores[1].ScoreReasons[3].ReasonCode;
 			SELF.Model_2_RC4       := model_result_2.Scores[1].ScoreReasons[4].ReasonCode;
+			SELF := le.Version2;
+			SELF := le.Version21;
 			SELF := le;		
 		END;
 	
@@ -278,17 +280,26 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 	 *   Restrict/allow LN Small Business Attributes and/or SBFE Attributes.  *
 	 ************************************************************************ */
 
-	allow_SBA_attrs     := EXISTS(AttrsRequested(AttributeGroup = Std.Str.ToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_ATTR_V1_NAME)));   // i.e. "LN" Small Business Attributes
-	allow_SBA_attrs101  := EXISTS(AttrsRequested(AttributeGroup = Std.Str.ToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_ATTR_NOFEL)));   // i.e. "LN" Small Business Attributes no felloniew
+	allow_SBA_attrs     := EXISTS(AttrsRequested(AttributeGroup = Std.Str.ToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_ATTR_V1_NAME)));   // i.e. "LN" Small Business Attributes Version 1
+	allow_SBA_V2_attrs  := EXISTS(AttrsRequested(AttributeGroup = Std.Str.ToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_ATTR_V2_NAME)));   // i.e. "LN" Small Business Attributes Version 2
+	allow_SBA_V21_attrs := EXISTS(AttrsRequested(AttributeGroup = Std.Str.ToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_ATTR_V21_NAME)));  // i.e. "LN" Small Business Attributes Version 21
+	allow_SBA_attrs101  := EXISTS(AttrsRequested(AttributeGroup = Std.Str.ToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_ATTR_NOFEL)));     // i.e. "LN" Small Business Attributes no fellonies
 	allow_SBFE_attrs    := EXISTS(AttrsRequested(AttributeGroup IN [Std.Str.ToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_SBFE_ATTR_NAME),Std.Str.ToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_SBFE_V1_ATTR)])); // i.e. "SBFE" Small Business Attributes
-		
+
+  LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_none( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
+      TRANSFORM
+      LNSmallBusiness.Macros.mac_base_attrs()
+      LNSmallBusiness.Macros.mac_scoring_attrs()
+      SELF := [];
+  END;
+    
 	LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_SBA_only( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
 		TRANSFORM
 			LNSmallBusiness.Macros.mac_base_attrs()
 			LNSmallBusiness.Macros.mac_SBA_attrs()
 			LNSmallBusiness.Macros.mac_scoring_attrs()
 			SELF := [];
-		END;
+	END;
 
 	LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_SBFE_only( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
 		TRANSFORM
@@ -296,16 +307,9 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 			LNSmallBusiness.Macros.mac_SBFE_attrs()
 			LNSmallBusiness.Macros.mac_scoring_attrs()
 			SELF := [];
-		END;
-
-	LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_none( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
-		TRANSFORM
-			LNSmallBusiness.Macros.mac_base_attrs()
-			LNSmallBusiness.Macros.mac_scoring_attrs()
-			SELF := [];
-		END;
+	END;
 		
-  
+
 	LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_SBA101_only( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
 		TRANSFORM
 			LNSmallBusiness.Macros.mac_base_attrs()
@@ -313,7 +317,32 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 			LNSmallBusiness.Macros.mac_scoring_attrs()
 			SELF := [];
 		END;
-		
+
+	LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_SBA2_only( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
+		TRANSFORM
+			LNSmallBusiness.Macros.mac_base_attrs()
+			LNSmallBusiness.Macros.mac_SBA_v2_attrs()
+			LNSmallBusiness.Macros.mac_scoring_attrs()
+			SELF := [];
+		END;
+
+	LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_SBA21_only( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
+		TRANSFORM
+			LNSmallBusiness.Macros.mac_base_attrs()
+			LNSmallBusiness.Macros.mac_SBA_v21_attrs()
+			LNSmallBusiness.Macros.mac_scoring_attrs()
+			SELF := [];
+		END;
+
+	LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_SBA1_SBFE_only( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
+		TRANSFORM
+			LNSmallBusiness.Macros.mac_base_attrs()
+			LNSmallBusiness.Macros.mac_SBA_attrs()
+			LNSmallBusiness.Macros.mac_SBFE_attrs()
+			LNSmallBusiness.Macros.mac_scoring_attrs()
+			SELF := [];
+	END;
+  
 	LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_SBA101SBFE_only( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
 		TRANSFORM
 			LNSmallBusiness.Macros.mac_base_attrs()
@@ -321,18 +350,42 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 			LNSmallBusiness.Macros.mac_SBFE_attrs()
 			LNSmallBusiness.Macros.mac_scoring_attrs()
 			SELF := [];
-		END;
+	END;
+  
+	LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_SBA2_SBFE_only( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
+		TRANSFORM
+			LNSmallBusiness.Macros.mac_base_attrs()
+			LNSmallBusiness.Macros.mac_SBA_v2_attrs()
+			LNSmallBusiness.Macros.mac_SBFE_attrs()
+			LNSmallBusiness.Macros.mac_scoring_attrs()
+			SELF := [];
+	END;
+  
+	LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_SBA21_SBFE_only( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
+		TRANSFORM
+			LNSmallBusiness.Macros.mac_base_attrs()
+			LNSmallBusiness.Macros.mac_SBA_v21_attrs()
+			LNSmallBusiness.Macros.mac_SBFE_attrs()
+			LNSmallBusiness.Macros.mac_scoring_attrs()
+			SELF := [];
+	END;
      
 	Final_Results :=
 			MAP(
-				NOT allow_SBA_attrs AND NOT allow_SBFE_attrs AND NOT allow_SBA_attrs101  => PROJECT( Final_Results_pre, xfm_allow_none(LEFT)),
-				allow_SBA_attrs AND NOT allow_SBFE_attrs AND NOT allow_SBA_attrs101      => PROJECT( Final_Results_pre, xfm_allow_SBA_only(LEFT)),
-				NOT allow_SBA_attrs AND allow_SBFE_attrs AND NOT allow_SBA_attrs101      => PROJECT( Final_Results_pre, xfm_allow_SBFE_only(LEFT)),
-				allow_SBA_attrs101 AND not allow_SBFE_attrs AND NOT allow_SBA_attrs      => PROJECT( Final_Results_pre, xfm_allow_SBA101_only(LEFT)),
-				allow_SBA_attrs101 AND  allow_SBFE_attrs AND NOT allow_SBA_attrs      => PROJECT( Final_Results_pre, xfm_allow_SBA101SBFE_only(LEFT)),
-        /* default (allow both attribute groups): */    Final_Results_pre
+				NOT allow_SBA_attrs AND NOT allow_SBFE_attrs AND NOT allow_SBA_attrs101 AND NOT allow_SBA_V2_attrs AND NOT allow_SBA_V21_attrs => PROJECT(Final_Results_pre, xfm_allow_none(LEFT)),            //NONE
+				allow_SBA_attrs AND NOT allow_SBFE_attrs AND NOT allow_SBA_attrs101 AND NOT allow_SBA_V2_attrs AND NOT allow_SBA_V21_attrs     => PROJECT(Final_Results_pre, xfm_allow_SBA_only(LEFT)),        //SBA 1
+				NOT allow_SBA_attrs AND allow_SBFE_attrs AND NOT allow_SBA_attrs101 AND NOT allow_SBA_V2_attrs AND NOT allow_SBA_V21_attrs     => PROJECT(Final_Results_pre, xfm_allow_SBFE_only(LEFT)),       //SBFE 1
+				NOT allow_SBA_attrs AND NOT allow_SBFE_attrs AND allow_SBA_attrs101 AND NOT allow_SBA_V2_attrs AND NOT allow_SBA_V21_attrs     => PROJECT(Final_Results_pre, xfm_allow_SBA101_only(LEFT)),     //SBA 101
+				NOT allow_SBA_attrs AND NOT allow_SBFE_attrs AND NOT allow_SBA_attrs101 AND allow_SBA_V2_attrs AND NOT allow_SBA_V21_attrs     => PROJECT(Final_Results_pre, xfm_allow_SBA2_only(LEFT)),       //SBA 2
+				NOT allow_SBA_attrs AND NOT allow_SBFE_attrs AND NOT allow_SBA_attrs101 AND NOT allow_SBA_V2_attrs AND allow_SBA_V21_attrs     => PROJECT(Final_Results_pre, xfm_allow_SBA21_only(LEFT)),      //SBA 21
+				allow_SBA_attrs AND allow_SBFE_attrs AND NOT allow_SBA_attrs101 AND NOT allow_SBA_V2_attrs AND allow_SBA_V21_attrs             => PROJECT(Final_Results_pre, xfm_allow_SBA1_SBFE_only(LEFT)),  //SBA1 + SBFE 
+				NOT allow_SBA_attrs AND allow_SBA_attrs101 AND allow_SBFE_attrs AND NOT allow_SBA_V2_attrs AND NOT allow_SBA_V21_attrs         => PROJECT(Final_Results_pre, xfm_allow_SBA101SBFE_only(LEFT)), //SBA1010 + SBFE
+				NOT allow_SBA_attrs AND allow_SBFE_attrs AND NOT allow_SBA_attrs101 AND allow_SBA_V2_attrs AND NOT allow_SBA_V21_attrs         => PROJECT(Final_Results_pre, xfm_allow_SBA2_SBFE_only(LEFT)),  //SBA2 + SBFE
+				NOT allow_SBA_attrs AND allow_SBFE_attrs AND NOT allow_SBA_attrs101 AND NOT allow_SBA_V2_attrs AND allow_SBA_V21_attrs         => PROJECT(Final_Results_pre, xfm_allow_SBA21_SBFE_only(LEFT)), //SBA21 + SBFE
+				/* default (allow both SBA1 + SBFE attribute groups): */    Final_Results_pre
 			);
 	
+
 	/* ************************************************************************
 	 *                          Calculate Royalties.                          *
 	 ************************************************************************ */
@@ -365,8 +418,18 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 	
 	Targus_royalties_pre := Royalty.RoyaltyTargus.GetBatchRoyaltiesByAcctno(Input, targus_data, source, , acctno, acctno);
 	Targus_royalties := PROJECT( Targus_royalties_pre, TRANSFORM( Royalty.Layouts.RoyaltyForBatch, SELF.source_type := 'G', SELF := LEFT ) ); // 'G' = Gateway source
+
+	/* ************************************************************************
+	**                    Tracking Cortera Royalties                          *
+	***************************************************************************/
+
+	isTrackingCorteraFromSBA21 := IF((NOT allow_SBA_attrs AND NOT allow_SBFE_attrs AND NOT allow_SBA_attrs101 AND NOT allow_SBA_V2_attrs AND allow_SBA_V21_attrs) OR 
+									(NOT allow_SBA_attrs AND allow_SBFE_attrs AND NOT allow_SBA_attrs101 AND NOT allow_SBA_V2_attrs AND allow_SBA_V21_attrs), TRUE, FALSE);
+
+	Cortera_royalties := Royalty.RoyaltyCortera.InHouse.GetBatchRoyaltiesByAcctno(Input, SBA_Results, ,isTrackingCorteraFromSBA21);
 	
-	total_royalties  := SORT( (SBFE_royalties + Targus_royalties), acctno, royalty_type_code );
+	// Accumulate all Royalties: 
+	total_royalties  := SORT( (SBFE_royalties + Targus_royalties + Cortera_royalties), acctno, royalty_type_code );
 	
 	// DEBUGs:
 	// OUTPUT( SBA_Results_with_PhoneSources, NAMED('SBA_Results_with_PhoneSources') );

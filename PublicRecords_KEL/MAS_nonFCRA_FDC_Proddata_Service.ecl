@@ -1,4 +1,50 @@
-﻿
+﻿/*--SOAP--
+<message name="MAS_Business_nonFCRA_Service">
+	<part name="input" type="tns:XmlDataSet" cols="100" rows="8"/>
+	<part name="DataRestrictionMask" type="xsd:string"/>
+	<part name="DataPermissionMask" type="xsd:string"/>
+	<part name="GLBPurpose" type="xsd:integer"/>
+	<part name="DPPAPurpose" type="xsd:integer"/>
+	<part name="IsMarketing" type="xsd:boolean"/>
+	<part name="AllowedSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
+	<part name="ExcludeSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
+	<part name="LexIdSourceOptout" type="xsd:integer"/>
+	<part name="IncludeAccident,"type=xsd:boolean"/>
+	<part name="IncludeAddress,"type=xsd:boolean"/>
+	<part name="IncludeAircraft,"type=xsd:boolean"/>
+	<part name="IncludeBankruptcy,"type=xsd:boolean"/>
+	<part name="IncludeBusinessSele,"type=xsd:boolean"/>
+	<part name="IncludeBusinessProx,"type=xsd:boolean"/>
+	<part name="IncludeCriminalOffender,"type=xsd:boolean"/>
+	<part name="IncludeCriminalOffense,"type=xsd:boolean"/>
+	<part name="IncludeCriminalPunishment,"type=xsd:boolean"/>
+	<part name="IncludeDriversLicense,"type=xsd:boolean"/>
+	<part name="IncludeEducation,"type=xsd:boolean"/>
+	<part name="IncludeEmail,"type=xsd:boolean"/>
+	<part name="IncludeEmployment,"type=xsd:boolean"/>
+	<part name="IncludeGeolink,"type=xsd:boolean"/>
+	<part name="IncludeHousehold,"type=xsd:boolean"/>
+	<part name="IncludeInquiry,"type=xsd:boolean"/>
+	<part name="IncludeLienJudgment,"type=xsd:boolean"/>
+	<part name="IncludePerson,"type=xsd:boolean"/>
+	<part name="IncludePhone,"type=xsd:boolean"/>
+	<part name="IncludeProfessionalLicense,"type=xsd:boolean"/>
+	<part name="IncludeProperty,"type=xsd:boolean"/>
+	<part name="IncludePropertyEvent,"type=xsd:boolean"/>
+	<part name="IncludeSurname,"type=xsd:boolean"/>
+	<part name="IncludeSocialSecurityNumber,"type=xsd:boolean"/>
+	<part name="IncludeTIN,"type=xsd:boolean"/>
+	<part name="IncludeTradeline,"type=xsd:boolean"/>
+	<part name="IncludeUtility,"type=xsd:boolean"/>
+	<part name="IncludeVehicle,"type=xsd:boolean"/>
+	<part name="IncludeWatercraft,"type=xsd:boolean"/>
+	<part name="IncludeZipCode,"type=xsd:boolean"/>
+	<part name="IncludeUCC,"type=xsd:boolean"/>
+	<part name="IncludeMini"type=xsd:boolean"/>
+
+</message>
+*/
+
 IMPORT Std, PublicRecords_KEL;
 
 export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
@@ -7,13 +53,15 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 	#WEBSERVICE(FIELDS(
     'input',
     'InputArchiveDateClean',
-		'DataRestrictionMask',
+    'DataRestrictionMask',
     'DataPermissionMask',
     'GLBA',
     'DPPA',
-		'PDPM',
+		'AllowedSourcesDataset',
+		'ExcludeSourcesDataset',
 		'LexIdSourceOptout',
-    'ViewFDC',
+		'ViewFDC',
+		'IsMarketing',
 		'IncludeAccident',
 		'IncludeAddress',
 		'IncludeAircraft',
@@ -31,6 +79,7 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		'IncludeHousehold',
 		'IncludeInquiry',
 		'IncludeLienJudgment',
+		'IncludeNameSummary',
 		'IncludePerson',
 		'IncludePhone',
 		'IncludeProfessionalLicense',
@@ -38,6 +87,7 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		'IncludePropertyEvent',
 		'IncludeSurname',
 		'IncludeSocialSecurityNumber',
+		'IncludeSSNSummary',
 		'IncludeTIN',
 		'IncludeTradeline',
 		'IncludeUtility',
@@ -66,29 +116,57 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 
 		is_fcra := FALSE;
 
-		UNSIGNED8 PDPM := 0  : STORED('PDPM');
 		BOOLEAN ViewFDC := FALSE : STORED('ViewFDC');
 		STD.Date.Date_t dtArchiveDate := STD.Date.Today() : STORED('InputArchiveDateClean');
 
+	BOOLEAN IsInsuranceProduct := FALSE : STORED('IsInsuranceProduct');
+	BOOLEAN AllowDNBDMI        := FALSE : STORED('AllowDNBDMI');
+	STRING100 DataRestrictionMask      := Default_data_restriction_mask : STORED('DataRestrictionMask');
+	STRING100 DataPermissionMask       := Default_data_permission_mask : STORED('DataPermissionMask');
+	UNSIGNED GLBA              := 1 : STORED('GLBA');
+	UNSIGNED DPPA              := 2 : STORED('DPPA');
+	BOOLEAN is_Marketing               := FALSE : STORED('IsMarketing');
+	BOOLEAN OverrideExperianRestriction := FALSE : STORED('OverrideExperianRestriction');
+	AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) : STORED('AllowedSourcesDataset');
+	ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) : STORED('ExcludeSourcesDataset');
+	// If allowed sources aren't passed in, use default list of allowed sources
+	SetAllowedSources := IF(COUNT(AllowedSourcesDataset) = 0, PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA, AllowedSourcesDataset);
+	// If a source is on the Exclude list, remove it from the allowed sources list. 
+	FinalAllowedSources := JOIN(SetAllowedSources, ExcludeSourcesDataset, LEFT=RIGHT, TRANSFORM(RECORDOF(LEFT), SELF := LEFT), LEFT ONLY);
+	
 	Options := MODULE(PublicRecords_KEL.Interface_Options)
 		EXPORT STRING100 AttributeSetName           := '';
 		EXPORT STRING100 VersionName                := '';
 		EXPORT BOOLEAN isFCRA                   		 := is_fcra;
 		EXPORT STRING8 ArchiveDate               		 := (STRING)dtArchiveDate;
 		EXPORT STRING250 InputFileName              := '';
-		EXPORT STRING100 PermissiblePurpose         := '';
 		EXPORT STRING IndustryClass        					 := '';
 		EXPORT UNSIGNED1 LexIdSourceOptout := _LexIdSourceOptout;
-		EXPORT STRING100 Data_Restriction_Mask      := Default_data_restriction_mask : STORED('DataRestrictionMask');
-		EXPORT STRING100 Data_Permission_Mask       := Default_data_permission_mask : STORED('DataPermissionMask');
-		EXPORT UNSIGNED GLBAPurpose              := 1 : STORED('GLBA');
-		EXPORT UNSIGNED DPPAPurpose              := 2 : STORED('DPPA');
-		EXPORT BOOLEAN Override_Experian_Restriction := FALSE;
+		EXPORT STRING100 Data_Restriction_Mask      := DataRestrictionMask;
+		EXPORT STRING100 Data_Permission_Mask       := DataPermissionMask;
+		EXPORT UNSIGNED GLBAPurpose              := GLBA;
+		EXPORT UNSIGNED DPPAPurpose              := DPPA;
+		EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
 		EXPORT STRING100 Allowed_Sources            := '';
 		EXPORT INTEGER ScoreThreshold            := 80 : STORED('ScoreThreshold');
 		EXPORT BOOLEAN ExcludeConsumerShell      := FALSE;
-		EXPORT BOOLEAN isMarketing               := FALSE : STORED('IsMarketing');
-		EXPORT UNSIGNED8 KEL_Permissions_Mask    := 0; // Set by PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate()
+		EXPORT BOOLEAN isMarketing               := is_Marketing;
+		EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := FinalAllowedSources;
+		EXPORT DATA57 KEL_Permissions_Mask    := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
+				DataRestrictionMask, 
+				DataPermissionMask, 
+				GLBA, 
+				DPPA, 
+				is_fcra, 
+				is_Marketing, 
+				AllowDNBDMI, 
+				OverrideExperianRestriction, 
+				'', // IntendedPurpose
+				'', // IndustryClass
+				PublicRecords_KEL.CFG_Compile,
+				IsInsuranceProduct,
+				FinalAllowedSources);
+				
 		EXPORT BOOLEAN OutputMasterResults       := FALSE;
 		EXPORT UNSIGNED BIPAppendScoreThreshold  := 75;
 		EXPORT UNSIGNED BIPAppendWeightThreshold := 0;
@@ -113,12 +191,14 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		EXPORT BOOLEAN IncludeHousehold := TRUE: STORED('IncludeHousehold');
 		EXPORT BOOLEAN IncludeInquiry := TRUE: STORED('IncludeInquiry');
 		EXPORT BOOLEAN IncludeLienJudgment := TRUE: STORED('IncludeLienJudgment');
+		EXPORT BOOLEAN IncludeNameSummary := TRUE: STORED('IncludeNameSummary');
 		EXPORT BOOLEAN IncludePerson := TRUE: STORED('IncludePerson');
 		EXPORT BOOLEAN IncludePhone := TRUE: STORED('IncludePhone');
 		EXPORT BOOLEAN IncludeProfessionalLicense := TRUE: STORED('IncludeProfessionalLicense');
 		EXPORT BOOLEAN IncludeProperty := TRUE: STORED('IncludeProperty');
 		EXPORT BOOLEAN IncludePropertyEvent := TRUE: STORED('IncludePropertyEvent');
 		EXPORT BOOLEAN IncludeSocialSecurityNumber := TRUE: STORED('IncludeSocialSecurityNumber');
+		EXPORT BOOLEAN IncludeSSNSummary := TRUE: STORED('IncludeSSNSummary');
 		EXPORT BOOLEAN IncludeSurname := TRUE: STORED('IncludeSurname');
 		EXPORT BOOLEAN IncludeTIN := TRUE: STORED('IncludeTIN');
 		EXPORT BOOLEAN IncludeTradeline := TRUE: STORED('IncludeTradeline');
@@ -129,33 +209,14 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		EXPORT BOOLEAN IncludeUCC := TRUE: STORED('IncludeUCC');
 		EXPORT BOOLEAN IncludeMini := TRUE: STORED('IncludeMini');
 	END;	
-	
-	BOOLEAN IsInsuranceProduct := FALSE : STORED('IsInsuranceProduct');
-	BOOLEAN AllowDNBDMI        := FALSE : STORED('AllowDNBDMI');
 
-	UNSIGNED8 __PDPM_Generated := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
-				Options.Data_Restriction_Mask, 
-				Options.Data_Permission_Mask, 
-				Options.GLBAPurpose, 
-				Options.DPPAPurpose, 
-				Options.isFCRA, 
-				Options.isMarketing, 
-				AllowDNBDMI, 
-				Options.Override_Experian_Restriction, 
-				Options.PermissiblePurpose, 
-				Options.IndustryClass, 
-				PublicRecords_KEL.CFG_Compile,
-				IsInsuranceProduct );
-
-	UNSIGNED8 __PDPM := IF( PDPM != 0, PDPM, __PDPM_Generated );
-			
 	ds_input_bus := 
 		PROJECT(ds_input,
 			TRANSFORM( PublicRecords_KEL.ECL_Functions.Input_UID_Bus_Layout,
 				SELF.G_ProcBusUID := COUNTER,
 				SELF := LEFT;
 				SELF := []));		
-							
+				
 	echoReps := SORT(PublicRecords_KEL.ECL_Functions.Fn_InputEchoBusReps_Roxie( ds_input_bus ), G_ProcBusUID);
 
 	cleanReps := PublicRecords_KEL.ECL_Functions.Fn_CleanInput_Roxie( echoReps );	
@@ -173,9 +234,9 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 	
 	FDCDatasetMini := PublicRecords_KEL.Fn_MAS_FDC( Rep1Input, OptionsMini, withBIPIDs);		
 
-	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(Rep1Input, FDCDatasetMini, OptionsMini); 
+	MiniAttributes := PublicRecords_KEL.FnRoxie_GetMiniFDCAttributes(Rep1Input, FDCDatasetMini, OptionsMini, options.BestPIIAppend); 
 
-	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( Rep1Input, Options,withBIPIDs,FDCDatasetMini );
+	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( MiniAttributes, Options,withBIPIDs,FDCDatasetMini );
 
 	ds_slim := project(FDCDataset, transform(PublicRecords_KEL.ECL_Functions.Layouts_FDC(Options).Layout_FDC, self.UIDAppend := left.UIDAppend, self :=[]));
 

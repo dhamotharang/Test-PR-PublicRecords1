@@ -587,7 +587,7 @@ RelatInput :=  join(ssnFlagsPrepforAddr, pre_ids_only,
                               self := []));
 
 // AML  address attributes
-relatAddr  := AML.AMLAddrAttrib(ssnFlagsPrepforAddr);
+relatAddr  := AML.AMLAddrAttrib(ssnFlagsPrepforAddr, mod_access);
 
 
 //  AML  header info
@@ -1206,7 +1206,7 @@ with_email_summary := JOIN(with_inquiries, email_summary_rolled,
                             self := left),
                   LEFT OUTER, LOOKUP, PARALLEL);
 // todo using BH to get Office/agent need to change if we go with PAW
-with_bus_header_summary := if(isFCRA, with_email_summary, boca_shell_Bus_header(with_email_summary, bsversion)); // won't use business header on FCRA queries
+with_bus_header_summary := if(isFCRA, with_email_summary, boca_shell_Bus_header(with_email_summary, mod_access, bsversion)); // won't use business header on FCRA queries
 with_address_risk := if(isFCRA, with_bus_header_summary, Boca_Shell_Address_Risk(with_bus_header_summary, bsversion));
 
 

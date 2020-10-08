@@ -1,4 +1,4 @@
-IMPORT _Control, Business_Risk_BIP, PublicRecords_KEL, Risk_Indicators;
+﻿IMPORT _Control, Business_Risk_BIP, PublicRecords_KEL, Risk_Indicators;
 IMPORT KEL11 AS KEL;
 
 boolean use_B2B_attributes_library := NOT _Control.LibraryUse.ForceOff_B2B_attributes;
@@ -13,6 +13,7 @@ EXPORT LIB_B2B_attributes (
 #else
   MODULE ($.LIB_B2B_interface (Shell, Options, AllowedSourcesSet))
 #end
+#OPTION('expandSelectCreateRow', TRUE);
 
   BHBuildDate := Risk_Indicators.get_Build_date('bip_build_version');
   allowMarketing := IF(Options.MarketingMode = 1, TRUE, FALSE);
@@ -41,7 +42,8 @@ EXPORT LIB_B2B_attributes (
     EXPORT DPPAPurpose := Options.DPPA_Purpose;
     EXPORT Override_Experian_Restriction := Options.OverrideExperianRestriction;
     AllowedSources := Options.AllowedSources;
-    EXPORT UNSIGNED8 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
+		EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA;
+    EXPORT DATA57 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
             Options.DataRestrictionMask,
             Options.DataPermissionMask,
             Options.GLBA_Purpose,
@@ -50,46 +52,17 @@ EXPORT LIB_B2B_attributes (
             allowMarketing,
             AllowDNBDMI,
             Options.OverrideExperianRestriction,
-            '', /* PermissiblePurpose - For FCRA Products Only */
+            '', /* IntendedPurpose - For FCRA Products Only */
             Options.IndustryClass,
-            PublicRecords_KEL.CFG_Compile);
+            PublicRecords_KEL.CFG_Compile,
+            FALSE, /*IsInsuranceProduct*/
+            PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA);
 
-    EXPORT BOOLEAN IncludeAccident := FALSE;
-    EXPORT BOOLEAN IncludeAddress := FALSE;
-    EXPORT BOOLEAN IncludeAircraft := FALSE;
-    EXPORT BOOLEAN IncludeBankruptcy := FALSE;
-    EXPORT BOOLEAN IncludeBusinessSele := FALSE;
-    EXPORT BOOLEAN IncludeBusinessProx := FALSE;
-    EXPORT BOOLEAN IncludeCriminalOffender := FALSE;
-    EXPORT BOOLEAN IncludeCriminalOffense := FALSE;
-    EXPORT BOOLEAN IncludeCriminalPunishment := FALSE;
-    EXPORT BOOLEAN IncludeDriversLicense := FALSE;
-    EXPORT BOOLEAN IncludeEducation := FALSE;
-    EXPORT BOOLEAN IncludeEmail := FALSE;
-    EXPORT BOOLEAN IncludeEmployment := FALSE;
-    EXPORT BOOLEAN IncludeHousehold := FALSE;
-    EXPORT BOOLEAN IncludeInquiry := FALSE;
-    EXPORT BOOLEAN IncludePerson := FALSE;
-    EXPORT BOOLEAN IncludePhone := FALSE;
-    EXPORT BOOLEAN IncludeProfessionalLicense := FALSE;
-    EXPORT BOOLEAN IncludeProperty := FALSE;
-    EXPORT BOOLEAN IncludePropertyEvent := FALSE;
-    EXPORT BOOLEAN IncludeSocialSecurityNumber := FALSE;
-    EXPORT BOOLEAN IncludeTIN := FALSE;
-    EXPORT BOOLEAN IncludeTradeline := TRUE;
-    EXPORT BOOLEAN IncludeUtility := FALSE;
-    EXPORT BOOLEAN IncludeVehicle := FALSE;
-    EXPORT BOOLEAN IncludeWatercraft := FALSE;
-    EXPORT BOOLEAN IncludeZipCode := FALSE;
-    EXPORT BOOLEAN IncludeUCC := FALSE;
     EXPORT isMarketing := IF(Options.MarketingMode = 1, TRUE, FALSE);
-
-    // these options allows to turn off business contacts searching in KEL B2B attributes:
-    EXPORT BOOLEAN IncludeMini := FALSE;
-    EXPORT BOOLEAN IncludeHouseholdMember := FALSE;
-    EXPORT BOOLEAN IncludeGeolink := FALSE;
-    EXPORT BOOLEAN IncludeLienJudgment := FALSE;
-    EXPORT BOOLEAN IncludeSurname := FALSE;
+		
+		//default options in PublicRecords_KEL.Interface_Options have been changed to FALSE
+    EXPORT BOOLEAN IncludeTradeline := TRUE;
+		
   END;
 
    // BusinessInput := PROJECT(Input,Transform(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII BS Input to ECL_Functions.Layouts.LayoutInputBII - pop seq# and bip IDs.
@@ -110,7 +83,7 @@ EXPORT LIB_B2B_attributes (
 																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII),
 																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII),
 																	0, // ArchiveDate
-																	0).res0); //DPM
+																	PublicRecords_KEL.CFG_Compile.Permit__NONE).res0); //DPM
 
 	BusinessSeleAttributes_Results := PROJECT(BusinessInput, TRANSFORM(
           {INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes},
@@ -131,7 +104,7 @@ EXPORT LIB_B2B_attributes (
 
 	BusinessAttributesWithSeleID := JOIN(RecordsWithSeleID, BusinessSeleIDAttributesRaw,
     LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,
-		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutBusinessSeleID,
+		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutB2B,
 
     	ResultsFound := RIGHT.B_LexIDLegal > 0 AND RIGHT.B_LexIDLegalSeenFlag = '1';
 
@@ -317,7 +290,7 @@ EXPORT LIB_B2B_attributes (
 
 	// Assign special values to records with no SeleID
 	BusinessAttributesWithoutSeleID := PROJECT(RecordsWithoutSeleID,
-		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutBusinessSeleID,
+		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutB2B,
 			SELF.G_BuildB2BDt := Risk_Indicators.get_Build_date('cortera_build_version');
 			SELF.BE_B2BCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.BE_B2BCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
@@ -505,6 +478,6 @@ EXPORT LIB_B2B_attributes (
   // OUTPUT(BusinessInput,NAMED('BusinessInput'));
   // OUTPUT(Shell,NAMED('Shell'));
 
-	EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutBusinessSeleID) Results := BusinessSeleIDAttributes;
+	EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutB2B) Results := BusinessSeleIDAttributes;
 
 END;

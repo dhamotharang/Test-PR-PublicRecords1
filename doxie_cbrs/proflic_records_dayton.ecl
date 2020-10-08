@@ -1,7 +1,7 @@
-﻿import ut, suppress, doxie, business_header,Prof_LicenseV2;
+﻿IMPORT ut, suppress, doxie, business_header,Prof_LicenseV2;
 doxie_cbrs.mac_Selection_Declare()
 
-export proflic_records_dayton(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
+EXPORT proflic_records_dayton(DATASET(doxie_cbrs.layout_references) bdids) := FUNCTION
 
 mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 
@@ -9,41 +9,41 @@ mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI
 subadd := doxie_Cbrs.best_address_full(bdids)(Include_ProfessionalLicenses_val);
 
 // TRANSFORM TO PUT A SEQUENCE NUMBER ON THE ADDRESS-NAME TUPLES
-{subadd,unsigned seq2} projbaf(subadd l, unsigned c) := transform
-  self.seq2 := c;
-	self := l;
-end;
+{subadd,UNSIGNED seq2} projbaf(subadd l, UNSIGNED c) := TRANSFORM
+  SELF.seq2 := c;
+  SELF := l;
+END;
 
 // ADD SEQUENCE NUMBER TO ADDRESS-NAME TUPLES
-baf := project(subadd,projbaf(left,counter));
+baf := PROJECT(subadd,projbaf(LEFT,COUNTER));
 
 // if you are wondering why I did this and didn't reuse the existing proflic_records
 // attribute, see bugzilla 14832.
-boolean companies_match (string l, string r) := IF (ut.CompanySimilar100(l,r) <=30, true, false);
+BOOLEAN companies_match (STRING l, STRING r) := IF (ut.CompanySimilar100(l,r) <=30, TRUE, FALSE);
 
 // TRANSFORM TO CAPTURE THE SEQUENCE NUMBERS OF THOSE ADDRESS-NAME TUPLES DEEMED "CLOSE MATCHES" TO OTHERS
-{unsigned seq2} trimbaf(baf r) := transform
-  self := r;
-end;
+{UNSIGNED seq2} trimbaf(baf r) := TRANSFORM
+  SELF := r;
+END;
 
 // CAPTURE THE SEQUENCE NUMBERS TO ELIMINATE
-baf2 := dedup(sort(join(baf,baf,
-             left.seq2 < right.seq2 and
-             left.prim_name <> '' and
-             left.prim_name = right.prim_name and
-						 left.prim_range = right.prim_range and
-						 left.zip = right.zip and
-						 ut.nneq(left.sec_range,right.sec_range) and
-						 companies_match(left.company_name,right.company_name),
-						 trimbaf(right),left outer),record),record);
+baf2 := DEDUP(SORT(JOIN(baf,baf,
+             LEFT.seq2 < RIGHT.seq2 AND
+             LEFT.prim_name <> '' AND
+             LEFT.prim_name = RIGHT.prim_name AND
+             LEFT.prim_range = RIGHT.prim_range AND
+             LEFT.zip = RIGHT.zip AND
+             ut.nneq(LEFT.sec_range,RIGHT.sec_range) AND
+             companies_match(LEFT.company_name,RIGHT.company_name),
+             trimbaf(RIGHT),LEFT OUTER),RECORD),RECORD);
 
 // TRANSFORM TO CAPTURE THE NON-ELIMINATED ADDRESS-NAME TUPLES
-subadd keepbaf(baf r) := transform
-  self := r;
-end;
+subadd keepbaf(baf r) := TRANSFORM
+  SELF := r;
+END;
 
 // RIGHT OUTER JOIN TO GET ONLY THOSE ADDRESS-NAME TUPLES NOT ELIMINATED
-baf3 := join(baf2,baf,left.seq2=right.seq2,keepbaf(right),right only);
+baf3 := JOIN(baf2,baf,LEFT.seq2=RIGHT.seq2,keepbaf(RIGHT),RIGHT only);
 
 // KEY INTO PROFESSIONAL LICENSES
 kap := Prof_LicenseV2.key_addr_proflic;
@@ -56,20 +56,20 @@ END;
 
 
 // TRANSFORM TO CAPTURE PROLIC RECORDS MATCHING OUR ADDR-NAME TUPLES
-Prof_LicenseV2.Layouts_ProfLic.Layout_Base keepk(kap r) := transform
-	self := r;
-end;
+Prof_LicenseV2.Layouts_ProfLic.Layout_Base keepk(kap r) := TRANSFORM
+  SELF := r;
+END;
 
 // USE ADDR-NAME TO CAPTURE PROFESSIONAL LICENSES
-_sn := join(baf3, kap,
-					 LEFT.prim_name<>'' AND
-					 keyed(left.prim_name = right.prim_name) and
-					 keyed(left.prim_range = right.prim_range) and
-					 keyed(left.zip = right.zip) and
-					 companies_match(left.company_name,right.company_name) and
-					 ut.NNEQ(left.sec_range, right.sec_range),
-					 keepk(right),
-					 limit(50000, SKIP));
+_sn := JOIN(baf3, kap,
+           LEFT.prim_name<>'' AND
+           KEYED(LEFT.prim_name = RIGHT.prim_name) AND
+           KEYED(LEFT.prim_range = RIGHT.prim_range) AND
+           KEYED(LEFT.zip = RIGHT.zip) AND
+           companies_match(LEFT.company_name,RIGHT.company_name) AND
+           ut.NNEQ(LEFT.sec_range, RIGHT.sec_range),
+           keepk(RIGHT),
+           LIMIT(50000, SKIP));
 
 sn_suppressed := Suppress.MAC_SuppressSource(_sn, mod_access);
 Doxie.compliance.logSoldToSources(sn_suppressed, mod_access);
@@ -79,24 +79,24 @@ sn := PROJECT(sn_suppressed, kap_layout);
 doxie_Cbrs.mac_mask_ssn(sn, msk1, best_ssn)
 
 // SORT ON PROLIC IDENTIFIER AND ADDRESS
-srtd := sort(msk1, prolic_key, prim_range, prim_name, zip);
+srtd := SORT(msk1, prolic_key, prim_range, prim_name, zip);
 
 // TRANSFORM TO ROLL UP DATE FIRST SEEN AND DATE LAST SEEN
-srtd rollem(srtd l, srtd r) := transform
-	ut.mac_roll_dfs(date_first_seen)
-	ut.mac_roll_dls(date_last_seen)
-	self := l;
-end;
+srtd rollem(srtd l, srtd r) := TRANSFORM
+  ut.mac_roll_dfs(date_first_seen)
+  ut.mac_roll_dls(date_last_seen)
+  SELF := l;
+END;
 
 // ROLLUP DFS AND DLS ON PROLIC ID AND ADDRESS
-rlld := rollup(srtd,
-							 left.prolic_key = right.prolic_key and
-							 left.prim_range = right.prim_range and
-							 left.prim_name = right.prim_name and
-							 left.zip = right.zip,
-							 rollem(left, right));
+rlld := ROLLUP(srtd,
+               LEFT.prolic_key = RIGHT.prolic_key AND
+               LEFT.prim_range = RIGHT.prim_range AND
+               LEFT.prim_name = RIGHT.prim_name AND
+               LEFT.zip = RIGHT.zip,
+               rollem(LEFT, RIGHT));
 
 
 // PICK THE FIRST N AFTER SORTING BY LICENSEE NAME
-return choosen(sort(rlld, lname, fname, mname),Max_ProfessionalLicenses_val);
+RETURN CHOOSEN(SORT(rlld, lname, fname, mname),Max_ProfessionalLicenses_val);
 END;

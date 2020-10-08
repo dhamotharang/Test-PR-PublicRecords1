@@ -27,7 +27,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
                                        UNSIGNED2 PhoneShellVersion = 10, // use 2-digit notation (10 = Phone Shell Version 1.0, 20 = Version 2.0, etc)
                                        doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
-  IncludeLexIDCounts := if(PhoneShellVersion >= 21, true, false); // include LexID Count/'all' attributes if PhoneShell Version 2.1+
+  IncludeLexIDCounts := IF(PhoneShellVersion >= 21, TRUE, FALSE); // include LexID Count/'all' attributes if PhoneShell Version 2.1+
 
 	/* ******************************************************************************
    ********************************************************************************
@@ -67,7 +67,11 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 
 	 EDA := Phone_Shell.Search_EDA(Input, HeaderAddresses, PhoneRestrictionMask, PhoneShellVersion, mod_access);
 
-	 PhonesPlus := Phone_Shell.Search_PhonesPlus(Input, HeaderAddresses, GLBPurpose, DPPAPurpose, IncludeLastResort, PhoneRestrictionMask, DataPermissionMask, IndustryClass, DataRestrictionMask, PhoneShellVersion, mod_access);
+  // ***** in Phone shell 3.1, we'll have two search_phonesplus functions, use IFF to pick which so only one gets run
+	 PhonesPlus := IFF(PhoneShellVersion >= 31,
+                    Phone_Shell.Search_PhonesPlus_v31(Input, HeaderAddresses, GLBPurpose, DPPAPurpose, IncludeLastResort, PhoneRestrictionMask, DataPermissionMask, IndustryClass, DataRestrictionMask, PhoneShellVersion, mod_access),
+                    Phone_Shell.Search_PhonesPlus(Input, HeaderAddresses, GLBPurpose, DPPAPurpose, IncludeLastResort, PhoneRestrictionMask, DataPermissionMask, IndustryClass, DataRestrictionMask, PhoneShellVersion, mod_access)
+                   );
 
 	 SkipTrace := Phone_Shell.Search_Extended_Skip_Trace(Input, PhoneRestrictionMask, DataRestrictionMask, SX_Match_Restriction_Limit, Strict_APSX, PhoneShellVersion, mod_access);
 
@@ -142,7 +146,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 	 SortedNumbers := SORT(cleanedCombined, Clean_Input.seq, Gathered_Phone, Sources.Source_List);
 
 	 /* ***************************************************************
-		*   Roll up by phone number, we want to count up the sources	  *
+	 	*   Roll up by phone number, we want to count up the sources	  *
 	  *************************************************************** */
 	 Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus combineSources(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus ri) := TRANSFORM
 
@@ -158,50 +162,55 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 			SELF.Sources.Source_Owner_Name_Suffix := TRIM(le.Sources.Source_Owner_Name_Suffix) + ',' + TRIM(ri.Sources.Source_Owner_Name_Suffix);
 			SELF.Sources.Source_Owner_DID := TRIM(le.Sources.Source_Owner_DID) + ',' + TRIM(ri.Sources.Source_Owner_DID);
 
-   SELF.Sources.Source_List_All_Last_Seen := if(IncludeLexIDCounts,TRIM(le.Sources.Source_List_All_Last_Seen) + ',' + TRIM(ri.Sources.Source_List_All_Last_Seen),'');
-			SELF.Sources.Source_Owner_All_DIDs     := if(IncludeLexIDCounts,TRIM(le.Sources.Source_Owner_All_DIDs) + ',' + TRIM(ri.Sources.Source_Owner_All_DIDs),'');
+   SELF.Sources.Source_List_All_Last_Seen := IF(IncludeLexIDCounts,TRIM(le.Sources.Source_List_All_Last_Seen) + ',' + TRIM(ri.Sources.Source_List_All_Last_Seen),'');
+			SELF.Sources.Source_Owner_All_DIDs     := IF(IncludeLexIDCounts,TRIM(le.Sources.Source_Owner_All_DIDs) + ',' + TRIM(ri.Sources.Source_Owner_All_DIDs),'');
 
 			SELF.Raw_Phone_Characteristics.Phone_Subject_Level := MIN(le.Raw_Phone_Characteristics.Phone_Subject_Level, ri.Raw_Phone_Characteristics.Phone_Subject_Level); // Keep whichever was closest to the subject
 
 			// Keep the title which is most descriptive/accurate.
-			subject_title := MAP(TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Subject' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Subject'																								=> 'Subject',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Subject at Household' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Subject at Household'											=> 'Subject at Household',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Husband' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Husband'																								=> 'Husband',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Wife' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Wife'																											=> 'Wife',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Spouse' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Spouse'																									=> 'Spouse',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Father' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Father'																									=> 'Father',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Mother' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Mother'																									=> 'Mother',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Parent' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Parent'																									=> 'Parent',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Brother' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Brother'																								=> 'Brother',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Sister' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Sister'																									=> 'Sister',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Sibling' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Sibling'																								=> 'Sibling',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Son' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Son'																												=> 'Son',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Daughter' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Daughter'																							=> 'Daughter',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Child' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Child'																										=> 'Child',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Grandson' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Grandson'																							=> 'Grandson',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Granddaughter' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Granddaughter'																		=> 'Granddaughter',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Grandchild' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Grandchild'																					=> 'Grandchild',
-																																// Strangely enough, somewhere in our data Grandchild is misspelled - fix those spelling issues
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Gradchild' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Gradchild'																						=> 'Grandchild',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Grandfather' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Grandfather'																				=> 'Grandfather',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Grandmother' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Grandmother'																				=> 'Grandmother',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Grandparent' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Grandparent'																				=> 'Grandparent',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Relative' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Relative'																							=> 'Relative',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Neighbor' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Neighbor'																							=> 'Neighbor',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By SSN' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By SSN'															=> 'Associate By SSN',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By Address' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By Address'											=> 'Associate By Address',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By Business' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By Business'										=> 'Associate By Business',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By Property' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By Property'										=> 'Associate By Property',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By Shared Associates' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By Shared Associates'	=> 'Associate By Shared Associates',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By Vehicle' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By Vehicle'											=> 'Associate By Vehicle',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate'																						=> 'Associate',
-																																TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) <> ''																																																														=> le.Raw_Phone_Characteristics.Phone_Subject_Title,
-																																																																																																																													 ri.Raw_Phone_Characteristics.Phone_Subject_Title);
+			subject_title := MAP(
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Subject' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Subject'                             => 'Subject',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Subject at Household' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Subject at Household'   => 'Subject at Household',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Husband' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Husband'                             => 'Husband',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Wife' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Wife'                                   => 'Wife',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Spouse' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Spouse'                               => 'Spouse',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Father' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Father'                               => 'Father',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Mother' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Mother'                               => 'Mother',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Parent' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Parent'                               => 'Parent',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Brother' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Brother'                             => 'Brother',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Sister' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Sister'                               => 'Sister',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Sibling' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Sibling'                             => 'Sibling',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Son' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Son'                                     => 'Son',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Daughter' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Daughter'                           => 'Daughter',
+	     TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Child' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Child'                                 => 'Child',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Grandson' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Grandson'                           => 'Grandson',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Granddaughter' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Granddaughter'                 => 'Granddaughter',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Grandchild' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Grandchild'                       => 'Grandchild',
+      // Strangely enough, somewhere in our data Grandchild is misspelled - fix those spelling issues
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Gradchild' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Gradchild'                         => 'Grandchild',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Grandfather' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Grandfather'                     => 'Grandfather',
+	     TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Grandmother' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Grandmother'                     => 'Grandmother',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Grandparent' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Grandparent'                     => 'Grandparent',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Relative' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Relative'                           => 'Relative',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Neighbor' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Neighbor'                           => 'Neighbor',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By SSN' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By SSN'           => 'Associate By SSN',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By Address' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By Address'   => 'Associate By Address',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By Business' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By Business' => 'Associate By Business',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By Property' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By Property' => 'Associate By Property',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By Shared Associates' 
+           OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By Shared Associates'                                                                    => 'Associate By Shared Associates',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By Vehicle' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate By Vehicle'   => 'Associate By Vehicle',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate' OR TRIM(ri.Raw_Phone_Characteristics.Phone_Subject_Title) = 'Associate'                         => 'Associate',
+      TRIM(le.Raw_Phone_Characteristics.Phone_Subject_Title) <> ''                                                                                                         => le.Raw_Phone_Characteristics.Phone_Subject_Title,
+                                                                                                                                                                              ri.Raw_Phone_Characteristics.Phone_Subject_Title);
 			SELF.Raw_Phone_Characteristics.Phone_Subject_Title := subject_title;
 
-			SELF.Raw_Phone_Characteristics.Phone_Match_Code := Phone_Shell.Common.CombineMatchcodes(le.Raw_Phone_Characteristics.Phone_Match_Code, ri.Raw_Phone_Characteristics.Phone_Match_Code);
+			// ***** in 3.1 change this to comma delimited list of match codes, don't use combine match codes
+      // except getphonesv3 is expecting a single value - new field? check emails
+   SELF.Raw_Phone_Characteristics.Phone_Match_Code := Phone_Shell.Common.CombineMatchcodes(le.Raw_Phone_Characteristics.Phone_Match_Code, ri.Raw_Phone_Characteristics.Phone_Match_Code);
 
 			// These are populated in Phone_Shell.Search_PhonesPlus.  If a 'PP*' source is included in the Source List, these should be populated
+   // ***** in 3.1, these will *NOT* be populated for PPDID records that were found in the new unrolled key. These recs will have X to signal get-attributes
 			SELF.PhonesPlus_Characteristics.PhonesPlus_Type := IF(TRIM(le.PhonesPlus_Characteristics.PhonesPlus_Type) NOT IN ['', 'U'], le.PhonesPlus_Characteristics.PhonesPlus_Type, IF(TRIM(ri.PhonesPlus_Characteristics.PhonesPlus_Type) <> '', ri.PhonesPlus_Characteristics.PhonesPlus_Type, le.PhonesPlus_Characteristics.PhonesPlus_Type));
 			SELF.PhonesPlus_Characteristics.PhonesPlus_Source := IF(TRIM(le.PhonesPlus_Characteristics.PhonesPlus_Source) <> '', le.PhonesPlus_Characteristics.PhonesPlus_Source, ri.PhonesPlus_Characteristics.PhonesPlus_Source);
 			SELF.PhonesPlus_Characteristics.PhonesPlus_Carrier := IF(TRIM(le.PhonesPlus_Characteristics.PhonesPlus_Carrier) <> '', le.PhonesPlus_Characteristics.PhonesPlus_Carrier, ri.PhonesPlus_Characteristics.PhonesPlus_Carrier);
@@ -237,16 +246,18 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 	 END;
 
 	 combinedNumbers := ROLLUP(SortedNumbers, LEFT.Clean_Input.seq = RIGHT.Clean_Input.seq AND LEFT.Gathered_Phone = RIGHT.Gathered_Phone, combineSources(LEFT, RIGHT));
+  // At this point we should only have 1 record per seq/gathered_phone
 
 	 PhoneRestrictionMaskSet := CASE(PhoneRestrictionMask,
-																		Phone_Shell.Constants.PRM.AllPhones 							=> [Phone_Shell.Constants.Phone_Subject_Level.Subject, Phone_Shell.Constants.Phone_Subject_Level.Household, Phone_Shell.Constants.Phone_Subject_Level.FirstDegreeRelative, Phone_Shell.Constants.Phone_Subject_Level.LeadToSubject],
-																		Phone_Shell.Constants.PRM.SubjectDIDOnly					=> [Phone_Shell.Constants.Phone_Subject_Level.Subject],
-																		Phone_Shell.Constants.PRM.AddressOnly							=> [Phone_Shell.Constants.Phone_Subject_Level.Household],
-																		Phone_Shell.Constants.PRM.FirstDegreeRelativeOnly	=> [Phone_Shell.Constants.Phone_Subject_Level.FirstDegreeRelative],
+     Phone_Shell.Constants.PRM.AllPhones 							       => [Phone_Shell.Constants.Phone_Subject_Level.Subject, Phone_Shell.Constants.Phone_Subject_Level.Household, Phone_Shell.Constants.Phone_Subject_Level.FirstDegreeRelative, Phone_Shell.Constants.Phone_Subject_Level.LeadToSubject],
+     Phone_Shell.Constants.PRM.SubjectDIDOnly				     	=> [Phone_Shell.Constants.Phone_Subject_Level.Subject],
+     Phone_Shell.Constants.PRM.AddressOnly						      	=> [Phone_Shell.Constants.Phone_Subject_Level.Household],
+     Phone_Shell.Constants.PRM.FirstDegreeRelativeOnly	=> [Phone_Shell.Constants.Phone_Subject_Level.FirstDegreeRelative],
 																																																								// All other masks the filtering gets done in each of the Phone_Shell.Search_* attributes
-																																																							 [Phone_Shell.Constants.Phone_Subject_Level.Subject, Phone_Shell.Constants.Phone_Subject_Level.Household, Phone_Shell.Constants.Phone_Subject_Level.FirstDegreeRelative, Phone_Shell.Constants.Phone_Subject_Level.LeadToSubject]);
-	 // Catch all to ensure we only return Subject/Address/First Degree Relative phones and no phones under the full 10 digits
-	 filteredNumbers := combinedNumbers (Raw_Phone_Characteristics.Phone_Subject_Level IN PhoneRestrictionMaskSet AND LENGTH(STD.Str.Filter(Gathered_Phone, '0123456789')) = 10 AND Gathered_Phone[1] <> '0');
+																																																							   [Phone_Shell.Constants.Phone_Subject_Level.Subject, Phone_Shell.Constants.Phone_Subject_Level.Household, Phone_Shell.Constants.Phone_Subject_Level.FirstDegreeRelative, Phone_Shell.Constants.Phone_Subject_Level.LeadToSubject]);
+	 
+  // Catch all to ensure we only return Subject/Address/First Degree Relative phones and no phones under the full 10 digits
+	 filteredNumbers := combinedNumbers(Raw_Phone_Characteristics.Phone_Subject_Level IN PhoneRestrictionMaskSet AND LENGTH(STD.Str.Filter(Gathered_Phone, '0123456789')) = 10 AND Gathered_Phone[1] <> '0');
 
 	 groupedNumbers := GROUP(SORT(filteredNumbers, Clean_Input.seq), Clean_Input.seq);
 
@@ -254,42 +265,40 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 	 keepers := TOPN(groupedNumbers, MaxPhones, Clean_Input.seq, Raw_Phone_Characteristics.Phone_Subject_Level, -LENGTH(TRIM(Raw_Phone_Characteristics.Phone_Match_Code)), -STD.Str.FindCount(Sources.Source_List, ','), -LENGTH(TRIM(Sources.Source_List)), Gathered_Phone);
 
 	 Sequenced := PROJECT(UNGROUP(keepers), TRANSFORM(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus, SELF.Unique_Record_Sequence := COUNTER;
-																																																						// Strangely enough, somewhere in our data Grandchild is misspelled - fix those spelling issues
-																																																						SELF.Raw_Phone_Characteristics.Phone_Subject_Title := IF(LEFT.Raw_Phone_Characteristics.Phone_Subject_Title = 'Gradchild', 'Grandchild', LEFT.Raw_Phone_Characteristics.Phone_Subject_Title);
+     // Strangely enough, somewhere in our data Grandchild is misspelled - fix those spelling issues
+					SELF.Raw_Phone_Characteristics.Phone_Subject_Title := IF(LEFT.Raw_Phone_Characteristics.Phone_Subject_Title = 'Gradchild', 'Grandchild', LEFT.Raw_Phone_Characteristics.Phone_Subject_Title);
 
-                                                      // now that we have all the data populated and filtered from all sources, time to clean up and count the 'all' parameters
-                                                      allNumbers := models.common.zip2(LEFT.Sources.Source_Owner_All_DIDs, LEFT.Sources.Source_List_All_Last_Seen,',',models.common.options.leftouter);
-                                                      // filter out all '0' DIDs as we don't want to show or count them
-                                                      allNumbers_nonZero := allNumbers(str1 != '0');
-                                                      // keep one record per DID (str1), with the most recent (str2 descending) date for each did
-                                                      allNumbersDeduped := dedup(sort(allNumbers_nonZero,str1,-str2),str1);
-                                                      todaysDate := Phone_Shell.Common.parseDate((string) STD.Date.Today(), TRUE);
+     // now that we have all the data populated and filtered from all sources, time to clean up and count the 'all' parameters
+     allNumbers := Models.common.zip2(LEFT.Sources.Source_Owner_All_DIDs, LEFT.Sources.Source_List_All_Last_Seen,',',Models.common.options.leftouter);
+     // filter out all '0' DIDs as we don't want to show or count them
+     allNumbers_nonZero := allNumbers(str1 != '0');
+     // keep one record per DID (str1), with the most recent (str2 descending) date for each did
+     allNumbersDeduped := DEDUP(SORT(allNumbers_nonZero,str1,-str2),str1);
+     todaysDate := Phone_Shell.Common.parseDate((STRING) STD.Date.Today(), TRUE);
 
-                                                      SELF.Sources.Source_Count_All_DIDs := count(allNumbersDeduped);
-                                                      SELF.Sources.Source_Count_DIDs_3yr := count(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=36));
-                                                      SELF.Sources.Source_Count_DIDs_2yr := count(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=24));
-                                                      SELF.Sources.Source_Count_DIDs_18mo := count(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=18));
-                                                      SELF.Sources.Source_Count_DIDs_12mo := count(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=12));
-                                                      SELF.Sources.Source_Count_DIDs_9mo := count(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=9));
-                                                      SELF.Sources.Source_Count_DIDs_6mo := count(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=6));
-                                                      SELF.Sources.Source_Count_DIDs_3mo := count(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=3));
+     SELF.Sources.Source_Count_All_DIDs  := COUNT(allNumbersDeduped);
+     SELF.Sources.Source_Count_DIDs_3yr  := COUNT(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=36));
+     SELF.Sources.Source_Count_DIDs_2yr  := COUNT(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=24));
+     SELF.Sources.Source_Count_DIDs_18mo := COUNT(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=18));
+     SELF.Sources.Source_Count_DIDs_12mo := COUNT(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=12));
+     SELF.Sources.Source_Count_DIDs_9mo  := COUNT(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=9));
+     SELF.Sources.Source_Count_DIDs_6mo  := COUNT(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=6));
+     SELF.Sources.Source_Count_DIDs_3mo  := COUNT(allNumbersDeduped(Std.Date.MonthsBetween((INTEGER)str2, (INTEGER)todaysDate)<=3));
 
-                                                      // prob a denormalize to get allNumbersDeduped back into comma-delimited format for putting it back in.
-                                                      // ref publicrecords_kel.ecl_functions.common_functions.roll_field
-                                                      DIDList := PROJECT(allNumbersDeduped,TRANSFORM({string roll_field}, self.roll_field := (string)left.str1));
-                                                      concatDIDs := ROLLUP(DIDList, TRUE, TRANSFORM({string roll_field},
-			                                                      SELF.roll_field := LEFT.roll_field + ',' + RIGHT.roll_field));
-                                                      SELF.Sources.Source_Owner_All_DIDs := concatDIDs[1].roll_field;
+     // prob a denormalize to get allNumbersDeduped back into comma-delimited format for putting it back in.
+     // ref publicrecords_kel.ecl_functions.common_functions.roll_field
+     DIDList := PROJECT(allNumbersDeduped,TRANSFORM({STRING roll_field}, SELF.roll_field := (STRING)LEFT.str1));
+     concatDIDs := ROLLUP(DIDList, TRUE, TRANSFORM({STRING roll_field}, SELF.roll_field := LEFT.roll_field + ',' + RIGHT.roll_field));
+     SELF.Sources.Source_Owner_All_DIDs := concatDIDs[1].roll_field;
 
-                                                      DateList := PROJECT(allNumbersDeduped,TRANSFORM({string roll_field}, self.roll_field := (string)left.str2));
-                                                      concatDates := ROLLUP(DateList, TRUE, TRANSFORM({string roll_field},
-                                                         SELF.roll_field := left.roll_field + ',' + right.roll_field));
-                                                      SELF.Sources.Source_List_All_Last_Seen := concatDates[1].roll_field;
+     DateList := PROJECT(allNumbersDeduped,TRANSFORM({STRING roll_field}, SELF.roll_field := (STRING)LEFT.str2));
+     concatDates := ROLLUP(DateList, TRUE, TRANSFORM({STRING roll_field}, SELF.roll_field := LEFT.roll_field + ',' + RIGHT.roll_field));
+     SELF.Sources.Source_List_All_Last_Seen := concatDates[1].roll_field;
 
-																																																						SELF := LEFT));
+			  SELF := LEFT));
 
 	 /* ***************************************************************
-		*      DEBUGGING SECTION -- COMMENT OUT FOR PRODUCTION		    	*
+		 *      DEBUGGING SECTION -- COMMENT OUT FOR PRODUCTION		       	*
 	  *************************************************************** */
 	 // OUTPUT(CHOOSEN(Input, MaxPhones), NAMED('Input'));
 	 // OUTPUT(CHOOSEN(HeaderAddresses, MaxPhones), NAMED('HeaderAddresses'));
@@ -298,7 +307,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 	 // OUTPUT(CHOOSEN(Infutor (TRIM(Gathered_Phone) <> ''), MaxPhones), NAMED('Infutor'));
 	 // OUTPUT(CHOOSEN(PeopleAtWork (TRIM(Gathered_Phone) <> ''), MaxPhones), NAMED('PeopleAtWork'));
 	 // OUTPUT(CHOOSEN(PhonesFeedback (TRIM(Gathered_Phone) <> ''), MaxPhones), NAMED('PhonesFeedback'));
-	 // OUTPUT(CHOOSEN(PhonesPlus (TRIM(Gathered_Phone) <> ''), MaxPhones), NAMED('PhonesPlus'));
+	  // OUTPUT(CHOOSEN(PhonesPlus (TRIM(Gathered_Phone) <> ''), MaxPhones), NAMED('PhonesPlus'));
 	  //OUTPUT(CHOOSEN(Relocation (TRIM(Gathered_Phone) <> ''), MaxPhones), NAMED('Relocation'));
 	 // OUTPUT(CHOOSEN(Utility (TRIM(Gathered_Phone) <> ''), MaxPhones), NAMED('Utility'));
 	 // OUTPUT(CHOOSEN(NonSubjectPhones (TRIM(subj_phone10) <> ''), MaxPhones), NAMED('NonSubjectPhones'));
@@ -308,11 +317,11 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 	 // OUTPUT(CHOOSEN(CoResident (TRIM(Gathered_Phone) <> ''), MaxPhones), NAMED('CoResident'));
 	 // OUTPUT(CHOOSEN(Targus (TRIM(Gathered_Phone) <> ''), MaxPhones), NAMED('Targus'));
 	 // OUTPUT(CHOOSEN(TransUnion (TRIM(Gathered_Phone) <> ''), MaxPhones), NAMED('TransUnion'));
-	 // OUTPUT(CHOOSEN(Combined, MaxPhones), NAMED('Combined'));
+	  // OUTPUT(CHOOSEN(Combined, MaxPhones), NAMED('Combined'));
 	 // OUTPUT(CHOOSEN(cleanedCombined, MaxPhones), NAMED('cleanedCombined'));
 	 // OUTPUT(CHOOSEN(SortedNumbers, MaxPhones), NAMED('SortedNumbers'));
-	 // OUTPUT(CHOOSEN(combinedNumbers, MaxPhones), NAMED('combinedNumbers'));
-	 // OUTPUT(CHOOSEN(Sequenced, MaxPhones), NAMED('Sequenced'));
+	  // OUTPUT(CHOOSEN(combinedNumbers, MaxPhones), NAMED('combinedNumbers'));
+	  // OUTPUT(CHOOSEN(Sequenced, MaxPhones), NAMED('Sequenced'));
 	 // OUTPUT(DataRestrictionMask,NAMED('DataRestrictionMask'));
 	 // OUTPUT(UsePremiumSource_A,NAMED('UsePremiumSource_A'));
 	 /* ***************************************************************

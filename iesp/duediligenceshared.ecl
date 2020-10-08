@@ -6,6 +6,10 @@ import iesp;
 
 export duediligenceshared := MODULE
 			
+export t_DDRAttributeModule := record
+	string Name {xpath('Name')};
+end;
+		
 export t_DDRAttributesAdditionalInfo := record
 	iesp.share.t_Date FIAcctOpenDate {xpath('FIAcctOpenDate')};
 	string100 FICRR {xpath('FICRR')};

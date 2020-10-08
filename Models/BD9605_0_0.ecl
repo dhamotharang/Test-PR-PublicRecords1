@@ -1,7 +1,10 @@
-﻿import ut, risk_indicators, Business_Risk, Easi, RiskWise, std;
+﻿import ut, risk_indicators, Business_Risk, Easi, RiskWise, std, AutoStandardI, doxie, Models;
 
 export BD9605_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, dataset(Business_Risk.Layout_Output) biid, dataset(riskwise.Layout_BusReasons_Input) orig_input,  
 			 boolean OFAC, string tribcode='', boolean nugen=false, boolean other_watchlists = false) := FUNCTION
+
+input_params := AutoStandardI.GlobalModule();
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
 
 layout_prs2 := RECORD
 	unsigned4  seq := 0;
@@ -47,7 +50,7 @@ END;
 
 // do multiple transforms to project them together
 clambiid := join(biid, clam, left.seq=right.seq, transform(working_layout, self.seq := left.seq, self.bs := right, self.br := left, self := []), left outer,ATMOST(RiskWise.max_atmost),keep(1));
-withPRS := join(clambiid, Business_Risk.getBDIDTable(biid), left.seq=right.seq, transform(working_layout, self.prs := right, self := left), left outer,ATMOST(RiskWise.max_atmost),keep(1));
+withPRS := join(clambiid, Business_Risk.getBDIDTable(biid, mod_access), left.seq=right.seq, transform(working_layout, self.prs := right, self := left), left outer,ATMOST(RiskWise.max_atmost),keep(1));
 withCensusc := join(withPRS, Easi.Key_Easi_Census,
 			     keyed(right.geolink=left.bs.shell_input.st+left.bs.shell_input.county+left.bs.shell_input.geo_blk),
 			     /*left.bs.shell_input.st+left.bs.shell_input.county+left.bs.shell_input.geo_blk=right.geolink,*/
@@ -728,7 +731,7 @@ END;
 iid_orig := project(with_score, into_iid_orig(left));
 
 
-Layout_ModelOut getReasons(biid le, iid_orig ri) := TRANSFORM
+Models.Layout_ModelOut getReasons(biid le, iid_orig ri) := TRANSFORM
 	// self.ri := RiskWise.Bus_reasonCodes(ri, le, 4, OFAC, tribcode);
 	self.ri := if( ~nugen,
 		RiskWise.Bus_reasonCodes(ri.orig, le, 4, OFAC, tribcode),
@@ -742,7 +745,7 @@ Layout_ModelOut getReasons(biid le, iid_orig ri) := TRANSFORM
 END;
 withReasons := JOIN(biid, iid_orig, left.seq = right.orig.seq, getReasons(left, right), left outer);
 
-Layout_ModelOut scoreandreasons(with_score le, withReasons rt) := transform
+Models.Layout_ModelOut scoreandreasons(with_score le, withReasons rt) := transform
 	SELF.ri := rt.ri;
 	self.score := (string)le.score;
 	

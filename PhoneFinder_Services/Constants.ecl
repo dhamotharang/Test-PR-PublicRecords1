@@ -66,6 +66,7 @@ MODULE
     EXPORT Pager    := 'PAGER';
     EXPORT VoIP     := 'POSSIBLE VOIP';
     EXPORT Other    := 'OTHER/UNKNOWN';
+    EXPORT Cable    := 'CABLE';
   END;
 
   EXPORT serviceType   := ENUM(LandLine = 0,Wireless = 1,VOIP = 2,Unknown = 3);
@@ -275,6 +276,15 @@ MODULE
     EXPORT STRING Spouse := 'SP';
   END;
 
+  EXPORT GatewayMaxTimeout := MODULE
+    
+    EXPORT DECIMAL AccuData_CallerID_RequestTimeout := 1;
+    EXPORT DECIMAL AccuData_OCN_RequestTimeout := 1.7;
+    EXPORT DECIMAL QSENT_RequestTimeout := 3;
+  END;
+
+  
+
   EXPORT CategoryCodes := DATASET([
         {PFSourceCategory.Inquiry, MDR.sourceTools.src_Wired_Assets_Royalty, PFSourceType.SelfReported}, //WR
         {PFSourceCategory.Inquiry, MDR.sourceTools.src_Wired_Assets_Owned, PFSourceType.SelfReported}, //WO
@@ -308,14 +318,14 @@ MODULE
         {PFSourceCategory.MarketingData, MDR.sourceTools.src_Cellphones_traffix, PFSourceType.SelfReported},//02
         {PFSourceCategory.MarketingData, MDR.sourceTools.src_Cellphones_kroll, PFSourceType.SelfReported},//01
         {PFSourceCategory.MNOCarrier, PFSourceCodes.Zumigo, PFSourceType.Account},//MNO
-        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_MO_Veh, PFSourceType.Account},//SV
-        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_NC_Watercraft, PFSourceType.Account},//NW
-        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_Federal_Firearms, PFSourceType.Account},//FF
-        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_Federal_Explosives, PFSourceType.Account},//FE
-        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_EMerge_Master, PFSourceType.Account},//EM
-        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_EMerge_Cens, PFSourceType.Account},//E4
-        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_EMerge_Fish, PFSourceType.Account},//E2
-        {PFSourceCategory.MNOCarrier, MDR.sourceTools.src_EMerge_Hunt, PFSourceType.Account},//E1
+        {PFSourceCategory.NonProfessionalLicense, MDR.sourceTools.src_MO_Veh, PFSourceType.Account},//SV
+        {PFSourceCategory.NonProfessionalLicense, MDR.sourceTools.src_NC_Watercraft, PFSourceType.Account},//NW
+        {PFSourceCategory.NonProfessionalLicense, MDR.sourceTools.src_Federal_Firearms, PFSourceType.Account},//FF
+        {PFSourceCategory.NonProfessionalLicense, MDR.sourceTools.src_Federal_Explosives, PFSourceType.Account},//FE
+        {PFSourceCategory.NonProfessionalLicense, MDR.sourceTools.src_EMerge_Master, PFSourceType.Account},//EM
+        {PFSourceCategory.NonProfessionalLicense, MDR.sourceTools.src_EMerge_Cens, PFSourceType.Account},//E4
+        {PFSourceCategory.NonProfessionalLicense, MDR.sourceTools.src_EMerge_Fish, PFSourceType.Account},//E2
+        {PFSourceCategory.NonProfessionalLicense, MDR.sourceTools.src_EMerge_Hunt, PFSourceType.Account},//E1
         {PFSourceCategory.Other, PFSourceCodes.UNDEFINED, PFSourceType.Account},
         {PFSourceCategory.Other, MDR.sourceTools.src_Miscellaneous, PFSourceType.Account},//PQ
         {PFSourceCategory.EmploymentData, PFSourceCodes.Spouse, PFSourceType.Account},//SP

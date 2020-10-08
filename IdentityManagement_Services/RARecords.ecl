@@ -1,4 +1,4 @@
-﻿﻿/***
+﻿/***
  ** Module to filter/transform Header records into desired format for Relatives and Associates
 ***/
 
@@ -178,10 +178,10 @@ export RARecords (IdentityManagement_Services.IParam._report in_params, dataset 
     addr_ranked_metadata := Header.MAC_Append_Addr_Ind(
                               addr_ranked_metadata_in, addr_ind, /*src*/, did, prim_range ,
                               prim_name, sec_range, city_name, st, zip,
-                             /*predir*/, /*postdir*/, /*addr_suffix */,
-                             /*dt_first_seen*/, /*dt_last_seen*/, /*dt_vendor_first_reported*/,
-                             /*dt_vendor_last_reported*/ , /*isTrusted*/ ,
-                             /*isFCRA*/, /*hitQH*/, /*debug*/);
+                             predir, postdir, suffix ,
+                             dt_first_seen, dt_last_seen, dt_vendor_first_reported,
+                             dt_vendor_last_reported , /*isTrusted*/ ,
+                             false, /*hitQH*/, /*debug*/);
 
     //Get addresses for relatives
     //slim_addr_rec ProjAddr (doxie.Layout_Comp_Addresses L) := transform
@@ -203,10 +203,10 @@ export RARecords (IdentityManagement_Services.IParam._report in_params, dataset 
       Self.filtered := STD.STR.touppercase(L.shared_address) <> 'S' OR L.dt_first_seen = L.dt_last_seen;
       //Self.Best_addr_ind := L.Best_addr_ind;
       Self.AddressHierarchy.BestAddress := (L.Best_addr_rank = '1');
-      Self.AddressHierarchy.DateFirstSeen := iesp.ECL2ESP.toDate(L.dt_first_seen_addr);
-      Self.AddressHierarchy.DateLastSeen := iesp.ECL2ESP.toDate(L.dt_last_seen_addr);
-      Self.AddressHierarchy.DateFirstReported := iesp.ECL2ESP.toDate(L.dt_vendor_first_reported_addr);
-      Self.AddressHierarchy.DateLastReported := iesp.ECL2ESP.toDate(L.dt_vendor_last_reported_addr);
+      Self.AddressHierarchy.DateFirstSeen := iesp.ECL2ESP.toDateYM(L.dt_first_seen_addr);
+      Self.AddressHierarchy.DateLastSeen := iesp.ECL2ESP.toDateYM(L.dt_last_seen_addr);
+      Self.AddressHierarchy.DateFirstReported := iesp.ECL2ESP.toDateYM(L.dt_vendor_first_reported_addr);
+      Self.AddressHierarchy.DateLastReported := iesp.ECL2ESP.toDateYM(L.dt_vendor_last_reported_addr);
       Self.AddressHierarchy.SourceCounts.UnitNumberVariations := L.apt_cnt;
       Self.AddressHierarchy.SourceCounts.UniqueSources := L.src_cnt;
       Self.AddressHierarchy.SourceCounts.Insurance := L.insurance_src_cnt;

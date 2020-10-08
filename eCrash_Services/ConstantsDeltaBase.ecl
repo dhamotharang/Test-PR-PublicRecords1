@@ -1,4 +1,4 @@
-﻿IMPORT FLAccidents_Ecrash, ut, doxie, lib_stringlib;
+﻿IMPORT eCrash_Services;
 
 EXPORT ConstantsDeltaBase := MODULE
 
@@ -60,7 +60,7 @@ EXPORT ConstantsDeltaBase := MODULE
 		'SELECT document_id AS documentId,jurisdiction AS jurisdiction,jurisdiction_state AS jurisdictionState,' +
 		'case_identifier AS caseIdentifier,state_report_number AS stateReportNumber,date_of_loss AS dateOfLoss,' +
 		'hashkey AS hashKey,report_type_id AS reportTypeId,is_deleted AS isDeleted,extension AS extenstion,' +
-		'page_count AS pageCount, date_added AS dateAdded' +
+		'page_count AS pageCount, date_added AS dateAdded' + ', Report_source AS ReportSource' +
 		' FROM delta_ec.delta_document WHERE ';
 
 END;

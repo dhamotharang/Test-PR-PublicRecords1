@@ -26,7 +26,7 @@ GLBA := 1;
 DPPA := 1;
 DataPermissionMask := '0000000001101';  
 DataRestrictionMask := '0000000000000000000000000000000000000000000000000'; 
-
+Include_Minors := TRUE;
 // CCPA Options;
 LexIdSourceOptout := 1;
 TransactionId := '';
@@ -49,6 +49,15 @@ Output_Master_Results := FALSE;
 // Toggle to include/exclude SALT profile of results file
 Output_SALT_Profile := FALSE;
 // Output_SALT_Profile := TRUE;
+
+//lets not get extra inquiries unless we need to
+IncludeDeltaBase := FALSE;
+// IncludeDeltaBase := true;
+
+// Use default list of allowed sources
+AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+// Do not exclude any additional sources from allowed sources dataset.
+ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 
 RecordsToRun := 10;
 eyeball := 120;
@@ -96,12 +105,16 @@ soapLayout := RECORD
   // STRING CustomerId; // This is used only for failed transactions here; it's ignored by the ECL service.
 	DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) input;
 	INTEGER ScoreThreshold;
+	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
 	STRING DataRestrictionMask;
 	STRING DataPermissionMask;
 	UNSIGNED1 GLBPurpose;
 	UNSIGNED1 DPPAPurpose;
 	BOOLEAN OutputMasterResults;
 	BOOLEAN IsMarketing;
+	BOOLEAN IncludeMinors;
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
   UNSIGNED1 LexIdSourceOptout;
   STRING _TransactionId;
   STRING _BatchUID;
@@ -119,6 +132,7 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT UNSIGNED GLBAPurpose := GLBA;
 	EXPORT UNSIGNED DPPAPurpose := DPPA;
 	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
+	EXPORT BOOLEAN IncludeMinors := Include_Minors;
 END;
 
 	// Options := MODULE(PublicRecords_KEL.Interface_Options)
@@ -134,22 +148,42 @@ END;
   // OUTPUT( ResultSet, NAMED('Results') );
 
 layout_MAS_Test_Service_output := RECORD
+    unsigned8 time_ms{xpath('_call_latency_ms')} := 0;  // picks up timing
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster MasterResults {XPATH('Results/Result/Dataset[@name=\'MasterResults\']/Row')};
 	PublicRecords_KEL.ECL_Functions.Layout_Person_NonFCRA Results {XPATH('Results/Result/Dataset[@name=\'Results\']/Row')};
 	STRING G_ProcErrorCode := '';
 END;
+
 
 soapLayout trans (pp le):= TRANSFORM 
 	// SELF.CustomerId := le.CustomerId;
 	SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout,
 		SELF := LEFT;
 		SELF := []));
+	SELF.Gateways := IF(includedeltabase = TRUE, 
+				DATASET([TRANSFORM(Gateway.Layouts.Config,
+			// The inquiry delta base which feeds the 1 day inq attrs is not needed for the input rep 1 at this point. for now we only run this delta base code in the nonFCRA service 
+			
+			//below is the dev delta base for inquiries, this is the default to prevent hammering the production gateway by accident
+				SELF.ServiceName := RiskWise.shortcuts.gw_delta_dev[1].servicename; 
+				SELF.URL := RiskWise.shortcuts.gw_delta_dev[1].url; //dev
+			//below is the production delta base for inquiries.  be careful not to hammer this production gateway with too much traffic
+			// SELF.ServiceName := RiskWise.shortcuts.gw_delta_prod[1].servicename; 
+			// SELF.URL := RiskWise.shortcuts.gw_delta_prod[1].url; 
+				SELF := [])]), 
+				DATASET([TRANSFORM(Gateway.Layouts.Config, 
+				SELF.ServiceName := ''; 
+				SELF.URL := ''; 
+				SELF := [])]));				
 	SELF.ScoreThreshold := Settings.LexIDThreshold;
 	SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
 	SELF.DataPermissionMask := Settings.Data_Permission_Mask;
 	SELF.GLBPurpose := Settings.GLBAPurpose;
 	SELF.DPPAPurpose := Settings.DPPAPurpose;
+	SELF.IncludeMinors := Settings.IncludeMinors;
 	SELF.IsMarketing := FALSE;
+	SELF.AllowedSourcesDataset := AllowedSourcesDataset;
+	SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;
 	SELF.OutputMasterResults := Output_Master_Results;
 	SELF.LexIdSourceOptout := LexIdSourceOptout;
 	SELF._TransactionId := TransactionId;
@@ -187,6 +221,7 @@ OUTPUT( CHOOSEN(Failed,eyeball), NAMED('bwr_results_Failed') );
 OUTPUT( COUNT(Failed), NAMED('Failed_Cnt') );
 
 LayoutMaster_With_Extras := RECORD
+    unsigned8 time_ms;
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster;
 	STRING G_ProcErrorCode;
 	STRING ln_project_id;
@@ -200,6 +235,7 @@ LayoutMaster_With_Extras := RECORD
 END;
 
 Layout_Person := RECORD
+    unsigned8 time_ms;
 	PublicRecords_KEL.ECL_Functions.Layout_Person_NonFCRA;
 	STRING G_ProcErrorCode;
 END;
@@ -208,6 +244,7 @@ Passed_with_Extras :=
 	JOIN(p, Passed, LEFT.Account = RIGHT.MasterResults.P_InpAcct, 
 		TRANSFORM(LayoutMaster_With_Extras,
 			SELF := RIGHT.MasterResults, //fields from passed
+            SELF.time_ms := RIGHT.time_ms,
 			SELF := LEFT, //input performance fields
 			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),
@@ -217,12 +254,13 @@ Passed_Person :=
 	JOIN(p, Passed, LEFT.Account = RIGHT.Results.P_InpAcct, 
 		TRANSFORM(Layout_Person,
 			SELF := RIGHT.Results, //fields from passed
+            SELF.time_ms := RIGHT.time_ms,
 			SELF := LEFT, //input performance fields
 			SELF.G_ProcErrorCode := RIGHT.G_ProcErrorCode,
 			SELF := []),
 		INNER, KEEP(1));
     
-Error_Inputs := JOIN(DISTRIBUTE(p, HASH64(Account)), DISTRIBUTE(Passed_Person, HASH64(P_InpAcct)), LEFT.Account = RIGHT.P_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY); 
+Error_Inputs := JOIN(DISTRIBUTE(p, HASH64(Account)), DISTRIBUTE(Passed_Person, HASH64(P_InpAcct)), LEFT.Account = RIGHT.P_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY, LOCAL); 
 OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE);
 
 	

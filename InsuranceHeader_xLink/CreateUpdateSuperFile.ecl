@@ -8,6 +8,10 @@ EXPORT createUpdateSuperFile(string buildType='') := MODULE
 			// xIDL super files for header
 			IF( NOT fileservices.superfileexists(KeyNames(buildType).header_super), 
 						fileservices.createsuperfile(KeyNames(buildType).header_super)),		
+      IF( NOT fileservices.superfileexists(KeyNames(buildType).header0_super),
+						fileservices.createsuperfile(KeyNames(buildType).header0_super)),
+      IF( NOT fileservices.superfileexists(KeyNames(buildType).header1_super),
+						fileservices.createsuperfile(KeyNames(buildType).header1_super)),
 			IF( NOT fileservices.superfileexists(KeyNames(buildType).id_history_super),
 						fileservices.createsuperfile(KeyNames(buildType).id_history_super)),
 			// xIDL super files for linked path
@@ -35,6 +39,8 @@ EXPORT createUpdateSuperFile(string buildType='') := MODULE
 							fileservices.createsuperfile(KeyNames(buildType).lfz_super)),												
 			IF( NOT fileservices.superfileexists(KeyNames(buildType).relative_super), 
 							fileservices.createsuperfile(KeyNames(buildType).relative_super)),								
+      IF( NOT fileservices.superfileexists(KeyNames(buildType).vin_super),
+							fileservices.createsuperfile(KeyNames(buildType).vin_super)),
 											);	
 		RETURN aSuperFiles;
 	END;
@@ -44,6 +50,10 @@ EXPORT createUpdateSuperFile(string buildType='') := MODULE
 			// xIDL super files for header
 			IF( NOT fileservices.superfileexists(KeyNames().header_father), 
 						fileservices.createsuperfile(KeyNames().header_father)),		
+      IF( NOT fileservices.superfileexists(KeyNames().header0_father),
+						fileservices.createsuperfile(KeyNames().header0_father)),
+      IF( NOT fileservices.superfileexists(KeyNames().header1_father),
+						fileservices.createsuperfile(KeyNames().header1_father)),
 			IF( NOT fileservices.superfileexists(KeyNames().id_history_father),
 							fileservices.createsuperfile(KeyNames().id_history_father)),			
 			// xIDL super files for linked path
@@ -71,6 +81,8 @@ EXPORT createUpdateSuperFile(string buildType='') := MODULE
 							fileservices.createsuperfile(KeyNames().lfz_father)),												
 			IF( NOT fileservices.superfileexists(KeyNames().relative_father), 
 							fileservices.createsuperfile(KeyNames().relative_father)),								
+      IF( NOT fileservices.superfileexists(KeyNames().vin_father),
+							fileservices.createsuperfile(KeyNames().vin_father)),
 											);	
 		RETURN aSuperFiles;
 	END;
@@ -134,7 +146,9 @@ EXPORT createUpdateSuperFile(string buildType='') := MODULE
 										IF(~STD.File.SuperfileExists(KeyNames().res_spc_super),STD.File.CreateSuperfile(KeyNames().res_spc_super)),
 										IF(~STD.File.SuperfileExists(KeyNames().res_spc_father),STD.File.CreateSuperfile(KeyNames().res_spc_father)),
 										IF(~STD.File.SuperfileExists(KeyNames().dt_first_seen_spc_super),STD.File.CreateSuperfile(KeyNames().dt_first_seen_spc_super)),
-										IF(~STD.File.SuperfileExists(KeyNames().dt_last_seen_spc_father),STD.File.CreateSuperfile(KeyNames().dt_last_seen_spc_father))
+										IF(~STD.File.SuperfileExists(KeyNames().dt_last_seen_spc_father),STD.File.CreateSuperfile(KeyNames().dt_last_seen_spc_father)),
+										IF(~STD.File.SuperfileExists(KeyNames().vinattr_spc_super),STD.File.CreateSuperfile(KeyNames().vinattr_spc_super)),
+										IF(~STD.File.SuperfileExists(KeyNames().vinattr_spc_father),STD.File.CreateSuperfile(KeyNames().vinattr_spc_father))
 										);
 	END;
 	
@@ -148,7 +162,7 @@ EXPORT createUpdateSuperFile(string buildType='') := MODULE
 	
 	fullFile := Constants.FULL_BUILD;
 	/*-------------------- updateAllxIDLSuperFiles ----------------------------------------------------*/
-	t1 := updatexIDLSuperFile(KeyNames(fullFile).header_super,			KeyNames(fullFile).header_father,			KeyNames(fullFile).header_logical);	
+	t1 := updatexIDLSuperFile(KeyNames(fullFile).header_super,			KeyNames(fullFile).header_father,			KeyNames(fullFile).header_logical);
 	t2 := updatexIDLSuperFile(KeyNames(fullFile).name_super,				KeyNames(fullFile).name_father,				KeyNames(fullFile).name_logical);
 	t3 := updatexIDLSuperFile(KeyNames(fullFile).address_super,			KeyNames(fullFile).address_father,		KeyNames(fullFile).address_logical);
 	t4 := updatexIDLSuperFile(KeyNames(fullFile).ssn_super,					KeyNames(fullFile).ssn_father,				KeyNames(fullFile).ssn_logical);
@@ -162,10 +176,13 @@ EXPORT createUpdateSuperFile(string buildType='') := MODULE
 	t13:= updatexIDLSuperFile(KeyNames(fullFile).relative_super,		KeyNames(fullFile).relative_father,		KeyNames(fullFile).relative_logical);
 	t15 := updatexIDLSuperFile(KeyNames(fullFile).id_history_super,	KeyNames(fullFile).id_history_father,	KeyNames(fullFile).id_history_logical);	
 	t16 := updatexIDLSuperFile(KeyNames(fullFile).dobf_super,	KeyNames(fullFile).dobf_father,	KeyNames(fullFile).dobf_logical);	
+  t17 := updatexIDLSuperFile(KeyNames(fullFile).header0_super,			KeyNames(fullFile).header0_father,		KeyNames(fullFile).header0_logical);
+	t18 := updatexIDLSuperFile(KeyNames(fullFile).header1_super,			KeyNames(fullFile).header1_father,		KeyNames(fullFile).header1_logical);
+	t19 := updatexIDLSuperFile(KeyNames(fullFile).vin_super,			  KeyNames(fullFile).vin_father,		    KeyNames(fullFile).vin_logical);
 	
 	export updateFullFileSP := sequential( 
 	 t1, t2, t3, t4, t5, t6, t7, t8, t9, 
-	 t11, t12, t13, t15, t16);
+	 t11, t12, t13, t15, t16, t17, t18, t19);
 	
 	incFile := Constants.INCREMENTAL_BUILD;
 	/*---------------------------- add Incremental files to superfiles ----------------------------*/
@@ -183,9 +200,12 @@ EXPORT createUpdateSuperFile(string buildType='') := MODULE
 	a13:= STD.File.AddSuperFile(KeyNames(incFile).relative_super,		KeyNames().relative_logical);	
 	a15 := STD.File.AddSuperFile(KeyNames(incFile).id_history_super,KeyNames().id_history_logical);	
 	a16 := STD.File.AddSuperFile(KeyNames(incFile).dobf_super,KeyNames().dobf_logical);	
+  a17 := STD.File.AddSuperFile(KeyNames(incFile).header0_super,			KeyNames().header0_logical);
+  a18 := STD.File.AddSuperFile(KeyNames(incFile).header1_super,			KeyNames().header1_logical);
+  a19 := STD.File.AddSuperFile(KeyNames(incFile).vin_super,			    KeyNames().vin_logical);
 	
 	export addAllSF := sequential(a1, 
-	a2, a3, a4, a5, a6, a7, a8, a9, a11, a12, a13, a15, a16);
+	a2, a3, a4, a5, a6, a7, a8, a9, a11, a12, a13, a15, a16, a17, a18, a19);
 	
 	EXPORT updateBocaIncSP(String BuidVersion) := FUNCTION
 		inc_Boca := Constants.INCREMENTAL_BOCA;
@@ -203,8 +223,11 @@ EXPORT createUpdateSuperFile(string buildType='') := MODULE
 		t11:= updatexIDLSuperFile(KeyNames(inc_Boca).header_super,		KeyNames(inc_Boca).header_father,		KeyNames(inc_Boca, BuidVersion).header_logical);	
 		t12:= updatexIDLSuperFile(KeyNames(inc_Boca).id_history_super,		KeyNames(inc_Boca).id_history_father,		KeyNames(inc_Boca, BuidVersion).id_history_logical);	
 		t13:= updatexIDLSuperFile(KeyNames(inc_Boca).dobf_super,		KeyNames(inc_Boca).dobf_father,		KeyNames(inc_Boca, BuidVersion).dobf_logical);	
+    t14:= updatexIDLSuperFile(KeyNames(inc_Boca).header0_super,		KeyNames(inc_Boca).header0_father,		KeyNames(inc_Boca, BuidVersion).header0_logical);
+    t15:= updatexIDLSuperFile(KeyNames(inc_Boca).header1_super,		KeyNames(inc_Boca).header1_father,		KeyNames(inc_Boca, BuidVersion).header1_logical);
+    t16:= updatexIDLSuperFile(KeyNames(inc_Boca).vin_super,		    KeyNames(inc_Boca).vin_father,		    KeyNames(inc_Boca, BuidVersion).vin_logical);
 	 RETURN sequential( 
-	 t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13);
+	 t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, 14, 15, 16);
 	END;
 	/*-------------------- updateAllCustTestxIDLSuperFiles ----------------------------------------------------*/
 	export updateAllCustTestSF(STRING fileVersion) := FUNCTION
@@ -216,15 +239,19 @@ EXPORT createUpdateSuperFile(string buildType='') := MODULE
 		c5 := updatexIDLSuperFile(CustKeyNames.ssn4_super,		CustKeyNames.ssn4_father,					CustKeyNames.ssn4_logical);
 		c6 := updatexIDLSuperFile(CustKeyNames.dob_super,			CustKeyNames.dob_father,					CustKeyNames.dob_logical);
 		c7 := updatexIDLSuperFile(CustKeyNames.zip_pr_super,	CustKeyNames.zip_pr_father,				CustKeyNames.zip_pr_logical);
+		c8 := updatexIDLSuperFile(CustKeyNames.src_rid_super,	CustKeyNames.src_rid_father,			CustKeyNames.src_rid_logical);
 		c9 := updatexIDLSuperFile(CustKeyNames.dln_super,			CustKeyNames.dln_father,					CustKeyNames.dln_logical);		
 		c10:= updatexIDLSuperFile(CustKeyNames.ph_super,			CustKeyNames.ph_father,						CustKeyNames.ph_logical);
 		c11:= updatexIDLSuperFile(CustKeyNames.lfz_super,			CustKeyNames.lfz_father,					CustKeyNames.lfz_logical);
 		c12:= updatexIDLSuperFile(CustKeyNames.relative_super,CustKeyNames.relative_father,			CustKeyNames.relative_logical);
-		// c13:= updatexIDLSuperFile(CustKeyNames.id_history_super,CustKeyNames.id_history_father,	CustKeyNames.id_history_logical);
+		c13:= updatexIDLSuperFile(CustKeyNames.id_history_super,CustKeyNames.id_history_father,	CustKeyNames.id_history_logical);
 		c14:= updatexIDLSuperFile(CustKeyNames.dobf_super,CustKeyNames.dobf_father,	CustKeyNames.dobf_logical);
+    c15:= updatexIDLSuperFile(CustKeyNames.header0_super,CustKeyNames.header0_father,			CustKeyNames.header0_logical);
+    c16:= updatexIDLSuperFile(CustKeyNames.header1_super,CustKeyNames.header1_father,			CustKeyNames.header1_logical);
+    c17:= updatexIDLSuperFile(CustKeyNames.vin_super,   CustKeyNames.vin_father,			    CustKeyNames.vin_logical);
 		
 		
-		RETURN sequential(c1, c2, c3, c4, c5, c6, c7, /*c8,*/ c9, c10, c11, c12, /*c13,*/ c14);	
+		RETURN sequential(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17);
 	END;
 	
 	/*-------------------- updateSpecificitiesSuperFiles ----------------------------------------------------*/
@@ -258,9 +285,9 @@ EXPORT createUpdateSuperFile(string buildType='') := MODULE
 	SHARED spc29 := updatexIDLSuperFile(KeyNames().res_spc_super, KeyNames().res_spc_father, KeyNames().res_spc_logical);
 	SHARED spc30 := updatexIDLSuperFile(KeyNames().dt_first_seen_spc_super, KeyNames().dt_first_seen_spc_father, KeyNames().dt_first_seen_spc_logical);
 	SHARED spc31 := updatexIDLSuperFile(KeyNames().dt_last_seen_spc_super, KeyNames().dt_last_seen_spc_father, KeyNames().dt_last_seen_spc_logical);
-	// SHARED spc32 := updatexIDLSuperFile(KeyNames().reporteddate_spc_super, KeyNames().reporteddate_spc_father, KeyNames().reporteddate_spc_logical);
 	SHARED spc33 := updatexIDLSuperFile(KeyNames().dt_effective_first_spc_super, KeyNames().dt_effective_first_spc_father, KeyNames().dt_effective_first_spc_logical);
 	SHARED spc34 := updatexIDLSuperFile(KeyNames().dt_effective_last_spc_super, KeyNames().dt_effective_last_spc_father, KeyNames().dt_effective_last_spc_logical);
+	SHARED spc35 := updatexIDLSuperFile(KeyNames().vinattr_spc_super, KeyNames().vinattr_spc_father, KeyNames().vinattr_spc_logical);
 		
 	EXPORT updateFieldSpecificitiesSuperFiles := SEQUENTIAL(createSpcSuperFiles(),
 																												  STD.File.StartSuperfileTransaction(),
@@ -268,15 +295,15 @@ EXPORT createUpdateSuperFile(string buildType='') := MODULE
 																													 spc1, spc2, spc3, spc4, spc5, spc6, spc7, spc8, spc9, spc10,
 																													 spc11, spc12, spc13, spc14, spc15, spc16, spc17, spc18, spc19, spc20,
 																													 spc21,  
-																												 spc23, spc24, spc25, spc26, spc27, 
-																												spc30, spc31, //spc32, 
-																																	  spc33, spc34
+																												 spc23, spc24, spc25, spc26, spc27,
+																												spc30, spc31,  
+																																	  spc33, spc34, spc35
 																																	 ),
 																												  STD.File.FinishSuperfileTransaction());
 																													
 	EXPORT updateAttrSpecificitiesSuperFiles  := SEQUENTIAL(createSpcSuperFiles(),
 																												  STD.File.StartSuperfileTransaction(),
-																												  PARALLEL(spc29),
+																												  PARALLEL(spc29,spc35),
 																												  STD.File.FinishSuperfileTransaction());
 																													
 	EXPORT updateMainSpecificitiesSuperFiles  := SEQUENTIAL(createSpcSuperFiles(),
@@ -288,8 +315,8 @@ EXPORT createUpdateSuperFile(string buildType='') := MODULE
 																												  STD.File.StartSuperfileTransaction(),
 																												  PARALLEL(spc1, spc2, spc3, spc4, spc5, spc6, spc7, spc8, spc9, spc10,
 																																	 spc11, spc12, spc13, spc14, spc15, spc16, spc17, spc18, spc19, spc20,
-																																	 spc21, spc23, spc24, spc25, spc26, spc27, spc28, spc29,
-																																	 spc30, spc31, /*spc32,*/ spc33, spc34),
+																																	 spc21, spc23, spc24, spc25, spc26, spc28, spc29,
+																																	 spc30, spc31, spc33, spc34),
 																												  STD.File.FinishSuperfileTransaction());
 																													;																													
 																																																							

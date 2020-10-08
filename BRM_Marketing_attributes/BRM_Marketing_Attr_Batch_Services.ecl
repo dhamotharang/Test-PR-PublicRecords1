@@ -23,7 +23,7 @@
 </message>
 */
 
-IMPORT PublicRecords_KEL,Royalty,iesp,STD;
+IMPORT PublicRecords_KEL, Royalty, iesp, STD, BRM_Marketing_attributes;
 EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 
 		#OPTION('expandSelectCreateRow', TRUE);
@@ -51,22 +51,21 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
   ));
 	
 	//  The following stored definations fix error of  "Duplicate definition of STORED('datarestrictionmask') with different type".
-	STRING5 Default_Industry_Class := '';	
-	#stored('IndustryClass',Default_Industry_Class);
-	STRING100 Default_data_permission_mask := '';	
-	#stored('DataPermissionMask',Default_data_permission_mask);
-	UNSIGNED1 Default_GLB_Purpose := 0;
+	STRING100 Default_data_restriction_mask := Business_Risk_BIP.Constants.Default_DataRestrictionMask;	
+	#STORED('DataRestrictionMask',Default_data_restriction_mask);
+	STRING100 Default_data_permission_mask := Business_Risk_BIP.Constants.Default_DataPermissionMask;	
+	#STORED('DataPermissionMask',Default_data_permission_mask);
+	UNSIGNED1 Default_GLB_Purpose := Business_Risk_BIP.Constants.Default_GLBA;
 	#STORED('GLBPurpose', Default_GLB_Purpose);
-	STRING100 Default_Data_Restriction_Mask := '';
-	#STORED('DataRestrictionMask',Default_Data_Restriction_Mask);
+	// #STORED('DPPAPurpose',Business_Risk_BIP.Constants.Default_DPPA);
 
 	//batch input.		
 	DATASET(BRM_Marketing_Attributes.Layout_BRM_NonFCRA.Batch_In_Layout) ds_input := DATASET([], BRM_Marketing_Attributes.Layout_BRM_NonFCRA.Batch_In_Layout) : STORED('Batch_In');
 	INTEGER Score_threshold := 80 : STORED('ScoreThreshold');
-	STRING100 DataRestrictionMask := '' : STORED('DataRestrictionMask');
-	STRING100 DataPermissionMask := '' : STORED('DataPermissionMask');
-	UNSIGNED1 GLBA := 0 : STORED('GLBPurpose');
-	UNSIGNED1 DPPA := 0 : STORED('DPPAPurpose');
+	STRING100 DataRestrictionMask := Business_Risk_BIP.Constants.Default_DataRestrictionMask : STORED('DataRestrictionMask');
+	STRING100 DataPermissionMask :=  Business_Risk_BIP.Constants.Default_DataPermissionMask : STORED('DataPermissionMask');
+	UNSIGNED1 GLBA := Business_Risk_BIP.Constants.Default_GLBA : STORED('GLBPurpose');
+	UNSIGNED1 DPPA := Business_Risk_BIP.Constants.Default_DPPA : STORED('DPPAPurpose');
 	UNSIGNED BIPAppend_Score_Threshold := 75 : STORED('BIPAppendScoreThreshold');
 	UNSIGNED BIPAppend_Weight_Threshold := 0 : STORED('BIPAppendWeightThreshold');
 	BOOLEAN BIPAppend_PrimForce := FALSE : STORED('BIPAppendPrimForce');
@@ -75,8 +74,9 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 	BOOLEAN Is_Marketing := TRUE;
 	BOOLEAN is_FCRA := FALSE;
 	BOOLEAN OverrideExperianRestriction := FALSE : STORED('OverrideExperianRestriction');
-	STRING100 AllowedSources := '' : STORED('AllowedSources');	
-	STRING5 Industry_Class := Default_Industry_Class : STORED('IndustryClass');
+	STRING100 AllowedSources := Business_Risk_BIP.Constants.Default_AllowedSources : STORED('AllowedSources');
+	STRING5	IndustryClass_In := Business_Risk_BIP.Constants.Default_IndustryClass : STORED('IndustryClass');
+	Industry_Class := STD.Str.ToUpperCase(TRIM(IndustryClass_In, LEFT, RIGHT));
 	//CCPA fields
 	UNSIGNED1 _LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
 	STRING _TransactionId := '' : STORED ('_TransactionId');
@@ -105,7 +105,7 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 		EXPORT STRING100 Allowed_Sources := AllowedSources;
 		EXPORT STRING IndustryClass := Industry_Class; // When set to UTILI or DRMKT this restricts Utility data
 		EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
-		EXPORT UNSIGNED8 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
+		EXPORT DATA57 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 			DataRestrictionMask, 
 			DataPermissionMask, 
 			GLBA, 
@@ -113,13 +113,14 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 			FALSE,//isfcra
 			TRUE, //ismarketing
 			0, //Allow_DNBDMI
-			FALSE,//OverrideExperianRestriction
+			Override_Experian_Restriction,//OverrideExperianRestriction
 			'',//PermissiblePurpose - For FCRA Products Only
 			Industry_Class,
 			PublicRecords_KEL.CFG_Compile);
 		
 		// BIP Append Options
-		EXPORT UNSIGNED BIPAppendScoreThreshold := IF(BIPAppend_Score_Threshold = 0, 75, MIN(MAX(51,BIPAppend_Score_Threshold), 100)); // Score threshold must be between 51 and 100 -- default is 75.
+   EXPORT UNSIGNED BIPAppendScoreThreshold := MAP(BIPAppend_No_ReAppend => 0,
+                                                BIPAppend_Score_Threshold = 0 => 75, MIN(MAX(51,BIPAppend_Score_Threshold), 100));		
 		EXPORT UNSIGNED BIPAppendWeightThreshold := BIPAppend_Weight_Threshold;
 		EXPORT BOOLEAN BIPAppendPrimForce := BIPAppend_PrimForce;
 		EXPORT BOOLEAN BIPAppendReAppend := NOT BIPAppend_No_ReAppend;
@@ -129,14 +130,33 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 		EXPORT STRING100 TransactionID := _TransactionId;                                
 		EXPORT STRING100 BatchUID := _BatchUID;
 		EXPORT UNSIGNED6 GlobalCompanyId := _GCID;				
-		END;	
+
+		//default options in PublicRecords_KEL.Interface_Options have been changed to FALSE
+		EXPORT BOOLEAN IncludeAircraft := TRUE;
+		EXPORT BOOLEAN IncludeAddress := TRUE;
+		EXPORT BOOLEAN IncludeBankruptcy := TRUE;
+		EXPORT BOOLEAN IncludeBusinessSele := TRUE;
+		EXPORT BOOLEAN IncludeBusinessProx := TRUE;
+		EXPORT BOOLEAN IncludeCriminalOffender := TRUE;
+		EXPORT BOOLEAN IncludeEducation := TRUE;
+		EXPORT BOOLEAN IncludeEmail := TRUE;
+		EXPORT BOOLEAN IncludeLienJudgment := TRUE;
+		EXPORT BOOLEAN IncludePerson := TRUE;
+		EXPORT BOOLEAN IncludeProperty := TRUE;
+		EXPORT BOOLEAN IncludePropertyEvent := TRUE;
+		EXPORT BOOLEAN IncludeTradeline := TRUE;
+		EXPORT BOOLEAN IncludeVehicle := TRUE;
+		EXPORT BOOLEAN IncludeWatercraft := TRUE;
+		EXPORT BOOLEAN IncludeUCC := TRUE;
+    
+  END;	
 				
 	//For now we have only one version of the attributes V1.There are 2 fields for attributes now just in case we will be having new version sooner.
 	AttrsRequested := DATASET([ {STD.Str.ToUpperCase(AttributeVer1_in)},{STD.Str.ToUpperCase(AttributeVer2_in)} ],BRM_Marketing_Attributes.Layout_BRM_NonFCRA.AttributeGroupRec);
 	allow_MA_attrs_only := EXISTS(AttrsRequested(AttributeGroup = STD.Str.ToUpperCase(BRM_Marketing_Attributes.Constants.Include_MA_attrs)));   
 	
 	BRM_Marketing_Attributes.Layout_BRM_NonFCRA.Batch_Input getInput(BRM_Marketing_Attributes.Layout_BRM_NonFCRA.Batch_In_Layout le, UNSIGNED4 c) := TRANSFORM
-	SELF.G_ProcBusUID := c; 
+	SELF.G_ProcBusUID := c;
 	SELF := le;
 	END;
 	
@@ -225,7 +245,7 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 																			SELF.error_msg := 'minimum input criteria not met';
 																			SELF := LEFT;
 																			self:=[])),Final_output);
-
+							
 	output(Results,named('Results'));
 
  //For Cortera Tradeline Royalty for B2B attributes.

@@ -455,23 +455,23 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 
 				verified := BusinessInstantID20_Services.fn_GetBusinessRecordVerification( le );
 				
-				SELF.VerifiedEcho.bus_ver_name             := IF( verified[COMPANYNAME], ri.CompanyName, '' );
-				SELF.VerifiedEcho.bus_ver_altname          := IF( verified[COMPANYNAME], ri.AltCompanyName, '' );
-				SELF.VerifiedEcho.bus_ver_addr             := IF( verified[COMPANYADDR], ri.StreetAddress, '' );
-				SELF.VerifiedEcho.bus_ver_city             := IF( verified[COMPANYADDR], ri.City, '' );
-				SELF.VerifiedEcho.bus_ver_state            := IF( verified[COMPANYADDR], ri.State, '' );
-				SELF.VerifiedEcho.bus_ver_zip              := IF( verified[COMPANYADDR], ri.Zip5, '' );
-				SELF.VerifiedEcho.bus_ver_phone            := IF( verified[COMPANYPHON], ri.Phone10, '' );
-				SELF.VerifiedEcho.bus_ver_tin              := IF( verified[COMPANYFEIN], ri.FEIN, '' );
+				SELF.VerifiedEcho.bus_ver_name             := IF( verified[COMPANYNAME]=1, ri.CompanyName, '' );
+				SELF.VerifiedEcho.bus_ver_altname          := IF( verified[COMPANYNAME]=1, ri.AltCompanyName, '' );
+				SELF.VerifiedEcho.bus_ver_addr             := IF( verified[COMPANYADDR]=1, ri.StreetAddress, '' );
+				SELF.VerifiedEcho.bus_ver_city             := IF( verified[COMPANYADDR]=1, ri.City, '' );
+				SELF.VerifiedEcho.bus_ver_state            := IF( verified[COMPANYADDR]=1, ri.State, '' );
+				SELF.VerifiedEcho.bus_ver_zip              := IF( verified[COMPANYADDR]=1, ri.Zip5, '' );
+				SELF.VerifiedEcho.bus_ver_phone            := IF( verified[COMPANYPHON]=1, ri.Phone10, '' );
+				SELF.VerifiedEcho.bus_ver_tin              := IF( verified[COMPANYFEIN]=1, ri.FEIN, '' );
 				
-				SELF.Verification.ver_name_indicator       := IF( verified[COMPANYNAME], '1', '0' );
-				SELF.Verification.ver_altname_indicator    := IF( verified[COMPANYNAME], '1', '0' );
-				SELF.Verification.ver_streetaddr_indicator := IF( verified[COMPANYADDR], '1', '0' );
-				SELF.Verification.ver_city_indicator       := IF( verified[COMPANYADDR], '1', '0' );
-				SELF.Verification.ver_state_indicator      := IF( verified[COMPANYADDR], '1', '0' );
-				SELF.Verification.ver_zip_indicator        := IF( verified[COMPANYADDR], '1', '0' );
-				SELF.Verification.ver_phone_indicator      := IF( verified[COMPANYPHON], '1', '0' );
-				SELF.Verification.ver_tin_indicator        := IF( verified[COMPANYFEIN], '1', '0' );
+				SELF.Verification.ver_name_indicator       := IF( verified[COMPANYNAME]=1, '1', '0' );
+				SELF.Verification.ver_altname_indicator    := IF( verified[COMPANYNAME]=1, '1', '0' );
+				SELF.Verification.ver_streetaddr_indicator := IF( verified[COMPANYADDR]=1, '1', '0' );
+				SELF.Verification.ver_city_indicator       := IF( verified[COMPANYADDR]=1, '1', '0' );
+				SELF.Verification.ver_state_indicator      := IF( verified[COMPANYADDR]=1, '1', '0' );
+				SELF.Verification.ver_zip_indicator        := IF( verified[COMPANYADDR]=1, '1', '0' );
+				SELF.Verification.ver_phone_indicator      := IF( verified[COMPANYPHON]=1, '1', '0' );
+				SELF.Verification.ver_tin_indicator        := IF( verified[COMPANYFEIN]=1, '1', '0' );
 
 				SELF := le;
 				SELF := [];
@@ -1815,7 +1815,8 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 				ds_WatchlistsAuthRep3 := DATASET( [xfm_Rec15] ) + DATASET( [xfm_Rec16] ) + DATASET( [xfm_Rec17] ) + DATASET( [xfm_Rec18] ) + DATASET( [xfm_Rec19] ) + DATASET( [xfm_Rec20] ) + DATASET( [xfm_Rec21] );
 				ds_WatchlistsAuthRep4 := DATASET( [xfm_Rec22] ) + DATASET( [xfm_Rec23] ) + DATASET( [xfm_Rec24] ) + DATASET( [xfm_Rec25] ) + DATASET( [xfm_Rec26] ) + DATASET( [xfm_Rec27] ) + DATASET( [xfm_Rec28] );
 				ds_WatchlistsAuthRep5 := DATASET( [xfm_Rec29] ) + DATASET( [xfm_Rec30] ) + DATASET( [xfm_Rec31] ) + DATASET( [xfm_Rec32] ) + DATASET( [xfm_Rec33] ) + DATASET( [xfm_Rec34] ) + DATASET( [xfm_Rec35] );
-				ds_Watchlists := CASE(C,
+				        
+        ds_Watchlists := CASE(C,
 																1 => ds_WatchlistsAuthRep1,
 																2 => ds_WatchlistsAuthRep2,
 																3 => ds_WatchlistsAuthRep3,
@@ -2415,5 +2416,39 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 				SELF := L;
 				SELF := [];
 			END;
+
+       EXPORT BusinessInstantID20_Services.layouts.DenormalizedAuthRepWatchlist fn_DenormAuthRepWatchlist(DATASET(BusinessInstantID20_Services.Layouts.OFACAndWatchlistLayoutFlat) ds_in, numOfLoops, SET OF INTEGER SeqSet) :=
+        
+        FUNCTION
+       //define layouts so that they easier to pass around
+        RecLayout := BusinessInstantID20_Services.layouts.DenormalizedAuthRepWatchlist;
+        WatchListlayout := BusinessInstantID20_Services.Layouts.OFACAndWatchlistLayoutFlat;
+        
+        //Need to start with a empty Dataset
+        emptyWATCH := DATASET([],Risk_Indicators.Layouts.layout_watchlists_plus_seq);
+        dData:=DATASET([{0, emptyWATCH}],RecLayout);
+        //end empty datasets
+
+        Totalwatchlist := COUNT(ds_in);
+
+        watchListProcess(DATASET(RecLayout) d,UNSIGNED watchlistCounter)  := FUNCTION
+
+          fTransformIt(DATASET(RecLayout) d,UNSIGNED loop_counter):=FUNCTION
+            RecLayout dotransform(d L, INTEGER c):= TRANSFORM , SKIP(c > 1 or loop_counter NOT IN SeqSet)
+              SELF.seq:= (INTEGER) ((STRING)watchlistCounter + (STRING)loop_counter);
+              SELF.RepInfo := fn_NormalizeAuthRepWatchlist(ds_in[watchlistCounter],loop_Counter);
+            END;
+            RETURN PROJECT(d,dotransform(LEFT,COUNTER));
+          END;
+
+          looped := LOOP(dData,numOfLoops, ROWS(LEFT) + fTransformIt(ROWS(LEFT),COUNTER));   
+          RETURN looped;
+        END;
+
+        WatchlistLoop :=  LOOP(dData, Totalwatchlist, ROWS(LEFT) + watchListProcess(ROWS(LEFT),COUNTER));
+
+        RETURN WatchlistLoop;
+
+      END;
 
 END;

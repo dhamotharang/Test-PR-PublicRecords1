@@ -4,34 +4,34 @@ EXPORT Liens_Judgments_UCC_records_trimmed_v2(DATASET(doxie_cbrs.layout_referenc
 MODULE
 
 doxie_cbrs.mac_Selection_Declare()
-shared raw_jls := doxie_cbrs.Liens_Judments_records_v2(bdids, SSNMask).report_view(Max_LiensJudgmentsUCC_val)(Include_LiensJudgmentsV2_val or Include_LiensJudgmentsUCCV2_val);
+SHARED raw_jls := doxie_cbrs.Liens_Judments_records_v2(bdids, SSNMask).report_view(Max_LiensJudgmentsUCC_val)(Include_LiensJudgmentsV2_val OR Include_LiensJudgmentsUCCV2_val);
 doxie_cbrs.mac_Selection_Declare()
-shared raw_uccs := doxie_cbrs.UCC_Records_v2(bdids, SSNMask).report_view(Max_UCCFilings_val)(Include_UCCFilingsV2_val or Include_LiensJudgmentsUCCV2_val);
+SHARED raw_uccs := doxie_cbrs.UCC_Records_v2(bdids, SSNMask).report_view(Max_UCCFilings_val)(Include_UCCFilingsV2_val OR Include_LiensJudgmentsUCCV2_val);
 
 doxie_cbrs.mac_Selection_Declare()
-jls := choosen(raw_jls,Max_LiensJudgmentsUCC_val);
-uccs := choosen(raw_uccs,Max_UCCFilings_val);
+jls := CHOOSEN(raw_jls,Max_LiensJudgmentsUCC_val);
+uccs := CHOOSEN(raw_uccs,Max_UCCFilings_val);
 
 jls_trimmed := jls;
 uccs_trimmed := uccs;
 
-recjl := recordof(jls_trimmed);
-recucc := recordof(uccs_trimmed);
+recjl := RECORDOF(jls_trimmed);
+recucc := RECORDOF(uccs_trimmed);
 
 //***** THE COMBINED LAYOUT
-rec := record, maxlength(doxie_crs.maxlength_report)
-	dataset(recjl) Judgment_Liens;
-	dataset(recucc) UCCS;
-end;
+rec := RECORD, MAXLENGTH(doxie_crs.maxlength_report)
+  DATASET(recjl) Judgment_Liens;
+  DATASET(recucc) UCCS;
+END;
 
 //***** PROJECT THEM IN
-nada := dataset([0], {unsigned1 a});
-rec getJL(nada l) := transform
-	self.Judgment_Liens := global(jls_trimmed);
-	self.UCCS := global(uccs_trimmed);
-end;
+nada := DATASET([0], {UNSIGNED1 a});
+rec getJL(nada l) := TRANSFORM
+  SELF.Judgment_Liens := GLOBAL(jls_trimmed);
+  SELF.UCCS := GLOBAL(uccs_trimmed);
+END;
 
-export records := project(nada,getJL(LEFT));
-export records_count := count(raw_jls) + count(raw_uccs);
+EXPORT records := PROJECT(nada,getJL(LEFT));
+EXPORT records_count := COUNT(raw_jls) + COUNT(raw_uccs);
 
 END;

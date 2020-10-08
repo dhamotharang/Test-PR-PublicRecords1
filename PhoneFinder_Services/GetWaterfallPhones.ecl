@@ -154,7 +154,7 @@
   // Since iQ411 service type doesn't return a PV record
   dPrimaryPhones := dWFQSentPrimaryPhone + dWaterfallPrimaryPhone;
 
-  dWFQSentPrimaryPhoneDetail := IF(EXISTS(dPrimaryPhones) AND inMod.UseTransUnionPVS,
+  dWFQSentPrimaryPhoneDetail := IF(EXISTS(dPrimaryPhones) AND inMod.UseTransUnionPVS AND qSentGateway.url != '',
     PhoneFinder_Services.GetQSentPhones.GetQSentPVSData(dPrimaryPhones, inMod, qSentGateway));
   // dPrimaryPhones + dPrimaryPhoneDetail - Primary phones including Qsent if no Waterfall phones found
   // dWFQSentOtherPhones - If no phones found in waterfall, Qsent other phones

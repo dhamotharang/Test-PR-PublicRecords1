@@ -4,7 +4,7 @@
 	EXPORT BOOLEAN isFCRA := FALSE;
 	EXPORT STRING ArchiveDate := '0';
 	EXPORT STRING InputFileName := '';
-	EXPORT STRING PermissiblePurpose := '';
+	EXPORT STRING IntendedPurpose := '';
 	EXPORT STRING Data_Restriction_Mask := '';
 	EXPORT STRING Data_Permission_Mask := '';
 	EXPORT UNSIGNED GLBAPurpose := 0;
@@ -17,4 +17,6 @@
 	EXPORT BOOLEAN BusinessLexIDPrimForce := FALSE;
 	EXPORT BOOLEAN BusinessLexIDReAppend := TRUE;
 	EXPORT BOOLEAN BusinessLexIDIncludeAuthRep := FALSE;
+		EXPORT BOOLEAN RetainInputLexid := False; //keep input lexid
+	EXPORT BOOLEAN BestPIIAppend := False; //do not append best pii for running
 END;	

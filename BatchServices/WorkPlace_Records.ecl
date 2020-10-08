@@ -21,6 +21,7 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 	boolean IncludeSpouseOnly   := false : STORED('IncludeSpouseOnlyIfNoDebtor');
 	boolean IncludeCorp         := false : STORED('IncludeCorpInfo');
 	boolean IncludeSelfRepCompanyName := false : STORED('IncludeSelfRepCompanyName');
+	boolean IncludeNetwise      := false : STORED('IncludeNetwise');
 
  	string in_excluded_sources  := '' : stored('ExcludedSources');
 
@@ -28,7 +29,7 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
   // *** Main processing
 
 	// 0.1 First edit the input ExcludedSources string as needed for processing below.
-  in_excluded_sources_edited := TRIM(Stringlib.StringToUpperCase(in_excluded_sources),
+  in_excluded_sources_edited := TRIM(STD.Str.ToUpperCase(in_excluded_sources),
 	                                   LEFT,RIGHT,ALL);
 
   // 0.2 Next if not empty, parse the input "ExcludedSources" comma de-limited list
@@ -155,9 +156,14 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 	// Bring back to the slimmed PAW layout
 	ds_paw_recs_slimmed:= PROJECT(ds_paw_recs,BatchServices.WorkPlace_Layouts.POE_DIDKey_Slimmed);
 
+  // Get Netwise (Gateway) records and transform to poe slim layout
+  _ds_netwise_recs := WorkPlace_Services.Functions.GetNetwiseRecords(ds_subject_dids, false);
+  ds_netwise_recs := if(IncludeNetwise, _ds_netwise_recs);
+  ds_netwise_recs_slim := PROJECT(ds_netwise_recs, $.WorkPlace_Layouts.POE_DIDKey_Slimmed);
+
   // 7.1 Combine POE, PSS & PAW slimmed recs into 1 dataset here and
-	//     join to POE source_hierarchy key file to assign the source_order.
-	ds_combine_sources	:=	ds_poe_recs_slimmed	+	ds_PSS_Results_Slim + ds_paw_recs_slimmed;
+  //     join to POE source_hierarchy key file to assign the source_order.
+  ds_combine_sources	:=	ds_poe_recs_slimmed	+	ds_PSS_Results_Slim + ds_paw_recs_slimmed + ds_netwise_recs_slim;
 
 	ds_all_recs_slimmed := join(ds_combine_sources,
 	                            POE.Keys().source_hierarchy.qa,
@@ -735,18 +741,18 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
                                   self.in_zip4        := left.zip4;
                                   self.in_ssn         := left.ssn;
 																	// rest of fields from right, converting some
-			                            self.company_name         := stringlib.StringToUpperCase(right.company_name);
-			                            self.parent_company_name  := stringlib.StringToUpperCase(right.parent_company_name);
-                                  self.addl_wpl_comp_name_1 := stringlib.StringToUpperCase(right.addl_wpl_comp_name_1);
-                                  self.addl_wpl_comp_name_2 := stringlib.StringToUpperCase(right.addl_wpl_comp_name_2);
-                                  self.addl_wpl_comp_name_3 := stringlib.StringToUpperCase(right.addl_wpl_comp_name_3);
-                                  self.addl_wpl_comp_name_4 := stringlib.StringToUpperCase(right.addl_wpl_comp_name_4);
-																	self.spouse_company_name         := stringlib.StringToUpperCase(right.spouse_company_name);
-			                            self.spouse_parent_company_name  := stringlib.StringToUpperCase(right.spouse_parent_company_name);
-                                  self.spouse_addl_wpl_comp_name_1 := stringlib.StringToUpperCase(right.spouse_addl_wpl_comp_name_1);
-                                  self.spouse_addl_wpl_comp_name_2 := stringlib.StringToUpperCase(right.spouse_addl_wpl_comp_name_2);
-                                  self.spouse_addl_wpl_comp_name_3 := stringlib.StringToUpperCase(right.spouse_addl_wpl_comp_name_3);
-                                  self.spouse_addl_wpl_comp_name_4 := stringlib.StringToUpperCase(right.spouse_addl_wpl_comp_name_4);
+                                  self.company_name         := STD.Str.ToUpperCase(right.company_name);
+                                  self.parent_company_name  := STD.Str.ToUpperCase(right.parent_company_name);
+                                  self.addl_wpl_comp_name_1 := STD.Str.ToUpperCase(right.addl_wpl_comp_name_1);
+                                  self.addl_wpl_comp_name_2 := STD.Str.ToUpperCase(right.addl_wpl_comp_name_2);
+                                  self.addl_wpl_comp_name_3 := STD.Str.ToUpperCase(right.addl_wpl_comp_name_3);
+                                  self.addl_wpl_comp_name_4 := STD.Str.ToUpperCase(right.addl_wpl_comp_name_4);
+                                  self.spouse_company_name         := STD.Str.ToUpperCase(right.spouse_company_name);
+                                  self.spouse_parent_company_name  := STD.Str.ToUpperCase(right.spouse_parent_company_name);
+                                  self.spouse_addl_wpl_comp_name_1 := STD.Str.ToUpperCase(right.spouse_addl_wpl_comp_name_1);
+                                  self.spouse_addl_wpl_comp_name_2 := STD.Str.ToUpperCase(right.spouse_addl_wpl_comp_name_2);
+                                  self.spouse_addl_wpl_comp_name_3 := STD.Str.ToUpperCase(right.spouse_addl_wpl_comp_name_3);
+                                  self.spouse_addl_wpl_comp_name_4 := STD.Str.ToUpperCase(right.spouse_addl_wpl_comp_name_4);
 																  self                := RIGHT),
 														 inner, // only return input recs that had results
 														 limit(WorkPlace_Constants.Limits.JOIN_LIMIT));

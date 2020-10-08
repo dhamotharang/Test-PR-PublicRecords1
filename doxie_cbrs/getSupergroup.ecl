@@ -1,3 +1,3 @@
-import Business_Header;
+IMPORT Business_Header;
 
-export getSupergroup(unsigned6 thebdid) := business_header.getSupergroup(thebdid);
+EXPORT getSupergroup(UNSIGNED6 thebdid) := business_header.getSupergroup(thebdid);

@@ -168,8 +168,8 @@ seq_map := join( pre_iid1, pre_iid,
 
   fcra_shell_results := per_prop;
 #end
-
 // join the results back to the original input so that every record on input has a response populated
 full_response := join( seq_map, fcra_shell_results, left.deduped_seq=right.seq, transform( Risk_Indicators.Layout_Boca_Shell, self.seq := left.input_seq, self.shell_input.seq := left.input_seq, self := right ), keep(1) );
+//OUTPUT(ids_wide,NAMED('ids_wide'));
 return group(full_response, seq);
 END;

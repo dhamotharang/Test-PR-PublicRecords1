@@ -366,10 +366,15 @@ EXPORT InstantID20_Batch_Service() := MACRO
 		ds_Input := PROJECT( ds_Input_pre, BusinessInstantID20_Services.Transforms(Options).xfm_LoadInput(LEFT,COUNTER) );
 	
 		// 8. Pass all input to BIID 2.0 logic.
-		ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, Options, linkingOptions, ExcludeWatchlists,LexIdSourceOptout := LexIdSourceOptout,
-TransactionID := TransactionID,
-BatchUID := BatchUID,
-GlobalCompanyID := GlobalCompanyID);
+		ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, 
+                                                                        Options, 
+                                                                        linkingOptions, 
+                                                                        ExcludeWatchlists,
+                                                                        LexIdSourceOptout := LexIdSourceOptout,
+                                                                        TransactionID := TransactionID,
+                                                                        BatchUID := BatchUID,
+                                                                        GlobalCompanyID := GlobalCompanyID,
+                                                                        useUpdatedBipAppend := false);
 				
 		// 9. Product output:
 		results_batch := PROJECT( ds_BIID_results, BusinessInstantID20_Services.xfm_ToBatchLayout(LEFT, Options) );
@@ -423,8 +428,5 @@ GlobalCompanyID := GlobalCompanyID);
 		OUTPUT(total_royalties, NAMED('RoyaltySet'));
 		
 		// DEBUGs:
-		// OUTPUT( ds_BIID_results, NAMED('BIID_Results') );
-		
 		OUTPUT( results_batch, NAMED('Results') );
-
 ENDMACRO;

@@ -781,8 +781,8 @@ risk_indicators.Layout_Output combineVerification(temp le) := transform
 	self := combo_address;
 	// do we need to add an option in here for inquiry miskey in row 3?				  
 	combo_hphone := MAP(le.phonever_type IN ['P','I'] AND le.dirsaddr_phonescore>89 and le.dirsaddr_phonescore<100 => le.dirsaddr_phone,	//used phone from diraddr
-						le.phonever_type IN ['P','I'] AND le.utili_phonescore>89 and le.utili_phonescore<100 => le.utiliphone,	//used phone from utility
 						le.phonever_type IN ['P','I'] AND le.dirs_phonescore=100 => le.phone10,
+						le.phonever_type IN ['P','I'] AND le.utili_phonescore>89 and le.utili_phonescore<100 => le.utiliphone,	//used phone from utility
 						le.phonever_type='A' => le.dirsaddr_phone,
 						le.phonever_type='U' => le.utiliphone,
 						le.phonever_type='S' => le.inquiryNAPphone,
@@ -1272,8 +1272,9 @@ withDIDdeceased_nonfcra_thor := PROJECT(withDIDdeceased_nonfcra_thor_flagged, TR
 withDIDdeceased_FCRA_roxie_unformatted := JOIN(with_advo, did_deceased_key, 
 												LEFT.did<>0 AND KEYED(LEFT.did=RIGHT.l_did) AND
 												(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND
-												(right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
-													getDIDdeceased(LEFT,RIGHT),												
+												(right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)) and 
+                        right.state_Death_id not in left.death_correct_record_id, 
+												getDIDdeceased(LEFT,RIGHT),												
 												LEFT OUTER, ATMOST(riskwise.max_atmost), KEEP(100));
 												
 withDIDdeceased_FCRA_roxie := PROJECT(withDIDdeceased_FCRA_roxie_unformatted, TRANSFORM(Risk_Indicators.Layout_Output, SELF := LEFT));
@@ -1282,8 +1283,9 @@ withDIDdeceased_FCRA_thor_unformatted := JOIN(distribute(with_advo, hash64(did))
 												distribute(pull(did_deceased_key), hash64(l_did)), 
 												LEFT.did<>0 AND (LEFT.did=RIGHT.l_did) AND
 												(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND
-												(right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
-													getDIDdeceased(LEFT,RIGHT),												
+												(right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)) AND 
+                         right.state_Death_id not in left.death_correct_record_id, 
+												 getDIDdeceased(LEFT,RIGHT),												
 												LEFT OUTER, ATMOST(LEFT.did=RIGHT.l_did, riskwise.max_atmost), KEEP(100), LOCAL);
 
 withDIDdeceased_FCRA_thor := PROJECT(withDIDdeceased_FCRA_thor_unformatted, TRANSFORM(Risk_Indicators.Layout_Output, SELF := LEFT));
@@ -1318,6 +1320,24 @@ group(with_advo, seq));	// only do the deceased by DID for CIID/FLEXID
  // output(with_hotlist);
  // output(with_advo_temp);
  // OUTPUT(	with_advo_rolled);	
+// outputlayout := RECORD
+//   Dataset(RECORDOF(with_advo)) withadvo;
+//   Dataset(RECORDOF(ssnrecs)) ssnrc;
+//   Dataset(RECORDOF(pphonerecs)) pphonerec;
+  
+// END;
+
+
+//  ds_getallend := project(ut.ds_oneRecord, transform(outputlayout, 
+//  self.withadvo := ungroup(with_advo);
+//  self.ssnrc := ungroup(ssnrecs);
+//  self.pphonerec := ungroup(pphonerecs);
+ 
+ 
+//  ));
+//  output(ds_getallend, named('iid_combine_verification'), extend);
+
+
 return combinedFinal;
 
 end;

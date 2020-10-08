@@ -1,11 +1,12 @@
-﻿﻿﻿/* PublicRecords_KEL.BWR_Business_MAS_Roxie */
-#workunit('name','MAS Busienss dev156 1 thread 100k');
-IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD;
+﻿IMPORT PublicRecords_KEL, RiskWise, STD, Gateway, SALT38, SALTRoutines;
+#workunit('name','MAS Business dev156 1 thread 100k');
+
 Threads := 1;
 
 RoxieIP := RiskWise.shortcuts.Dev156;
 
 InputFile := '~mas::uatsamples::business_nfcra_100k_07102019.csv'; //100k file
+// InputFile := '~mas::uat::mas_brm_regression_10ktestsample.csv';//for weekly regression testing
 // InputFile := '~mas::uatsamples::business_nfcra_1m_07092019.csv'; //1m file
 // InputFile := '~mas::uatsamples::business_nfcra_iptest_04232020.csv'; 
 
@@ -30,7 +31,7 @@ DPPA := 3;
 // Bit counter:         12345678901234567890123456789012345678901234567890
 DataPermissionMask  := '00000000000000000000000000000000000000000000000000'; 
 DataRestrictionMask := '00100000000000000000000000000000000000000000000000'; 
-
+Include_Minors := TRUE;
 // CCPA Options;
 LexIdSourceOptout := 1;
 TransactionId := '';
@@ -38,9 +39,9 @@ BatchUID := '';
 GCID := 0;
 
 // Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
-historyDate := '0';
+// historyDate := '0';
 // historyDate := '20190118';
-// historyDate := (STRING)STD.Date.Today(); // Run with today's date
+historyDate := (STRING)STD.Date.Today(); // Run with today's date
 
 Score_threshold := 80;
 // Score_threshold := 90;
@@ -63,13 +64,18 @@ Output_SALT_Profile := TRUE;
 
 Exclude_Consumer_Attributes := FALSE; //if TRUE, bypasses consumer logic and sets all consumer shell fields to blank/0.
 
+// Use default list of allowed sources
+AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+// Do not exclude any additional sources from allowed sources dataset.
+ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+
 RecordsToRun := 0;
 eyeball := 120;
 
 AllowedSources := ''; // Stubbing this out for use in settings output for now. To be used to turn on DNBDMI by setting to 'DNBDMI'
 OverrideExperianRestriction := FALSE; // Stubbing this out for use in settings output for now. To be used to control whether Experian Business Data (EBR and CRDB) is returned.
 
-OutputFile := '~bbraaten::out::Business_Roxie_100k_Archive_KS-5842_test_errors_'+ ThorLib.wuid();
+OutputFile := '~bbraaten::out::Business_Roxie_100k_Current_Inquiry_Deltabase_'+ ThorLib.wuid();
 
 prii_layout := RECORD
 	STRING AccountNumber;
@@ -191,7 +197,7 @@ prii_layout := RECORD
 	STRING pf_approved_not_funded;
 END;
 
-inData := DATASET(InputFile, prii_layout, CSV(QUOTE('"'), HEADING(SINGLE)));
+inData := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));//with heading last 1 record never runs
 OUTPUT(CHOOSEN(inData, eyeball), NAMED('inData'));
 inDataRecs := IF (RecordsToRun = 0, inData, CHOOSEN (inData, RecordsToRun));
 // inDataReady := PROJECT(inDataRecs(AccountNumber NOT IN ['Account', 'SBFEExtract2016_0013010111WBD0101_3439841667_003']), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout,
@@ -214,11 +220,14 @@ soapLayout := RECORD
 	BOOLEAN OutputMasterResults;
 	BOOLEAN ExcludeConsumerAttributes;
 	BOOLEAN IsMarketing;
+	BOOLEAN IncludeMinors;
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	
 	UNSIGNED BIPAppendScoreThreshold;
 	UNSIGNED BIPAppendWeightThreshold;
 	BOOLEAN BIPAppendPrimForce;
-	BOOLEAN BIPAppendReAppend;
+	BOOLEAN bipappendnoreappend;
 	BOOLEAN BIPAppendIncludeAuthRep;
   BOOLEAN OverrideExperianRestriction;
 	
@@ -246,6 +255,7 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT BOOLEAN BusinessLexIDPrimForce := BIPAppend_PrimForce;
 	EXPORT BOOLEAN BusinessLexIDReAppend := BIPAppend_ReAppend;
 	EXPORT BOOLEAN BusinessLexIDIncludeAuthRep := BIPAppend_Include_AuthRep;
+	EXPORT BOOLEAN IncludeMinors := Include_Minors;
 END;
 
 // Uncomment this code to run as test harness on Thor instead of SOAPCALL to Roxie
@@ -263,6 +273,8 @@ layout_MAS_Business_Service_output := RECORD
 END;
 
 soapLayout trans (inDataReadyDist le):= TRANSFORM 
+	// The inquiry delta base which feeds the 1 day inq attrs is not needed for the input rep 1 at this point. for now we only run this delta base code in the nonFCRA service 
+	
 	// SELF.CustomerId := le.CustomerId;
 	SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout,
 		SELF := LEFT;
@@ -272,14 +284,17 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 	SELF.DataPermissionMask := Settings.Data_Permission_Mask;
 	SELF.GLBPurpose := Settings.GLBAPurpose;
 	SELF.DPPAPurpose := Settings.DPPAPurpose;
+	SELF.IncludeMinors := Settings.IncludeMinors;
 	SELF.OverrideExperianRestriction := Settings.Override_Experian_Restriction;
 	SELF.IsMarketing := FALSE;
 	SELF.OutputMasterResults := Output_Master_Results;
+	SELF.AllowedSourcesDataset := AllowedSourcesDataset;
+	SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;
 	SELF.ExcludeConsumerAttributes := Exclude_Consumer_Attributes;
 	SELF.BIPAppendScoreThreshold := Settings.BusinessLexIDThreshold;
 	SELF.BIPAppendWeightThreshold := Settings.BusinessLexIDWeightThreshold;
 	SELF.BIPAppendPrimForce := Settings.BusinessLexIDPrimForce;
-	SELF.BIPAppendReAppend := Settings.BusinessLexIDReAppend;
+	SELF.bipappendnoreappend := NOT Settings.BusinessLexIDReAppend;
 	SELF.BIPAppendIncludeAuthRep := Settings.BusinessLexIDIncludeAuthRep;
 	SELF.LexIdSourceOptout := LexIdSourceOptout;
 	SELF._TransactionId := TransactionId;
@@ -360,15 +375,15 @@ Passed_Business :=
 			SELF := []),
 		INNER, KEEP(1));
        
-Error_Inputs := JOIN(DISTRIBUTE(inDataRecs, HASH64(AccountNumber)), DISTRIBUTE(Passed_Business, HASH64(B_InpAcct)), LEFT.AccountNumber = RIGHT.B_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY);  
-OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE);
+Error_Inputs := JOIN(DISTRIBUTE(inDataRecs, HASH64(AccountNumber)), DISTRIBUTE(Passed_Business, HASH64(B_InpAcct)), LEFT.AccountNumber = RIGHT.B_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY, LOCAL);  
+OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE, expire(45));
   
   
 IF(Output_Master_Results, OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout')));
 OUTPUT(CHOOSEN(Passed_Business, eyeball), NAMED('Sample_NonFCRA_Layout'));
 
-IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"'))));
-OUTPUT(Passed_Business,,OutputFile + '.csv', CSV(HEADING(single), QUOTE('"')));	
+IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"')), expire(45)));
+OUTPUT(Passed_Business,,OutputFile + '.csv', CSV(HEADING(single), QUOTE('"')), expire(45));	
 
 Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(Settings);
 		

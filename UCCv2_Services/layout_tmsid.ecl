@@ -1,3 +1,3 @@
-export layout_TMSID := record
-	string50 TMSID;
-end;
+EXPORT layout_TMSID := RECORD
+  STRING50 TMSID;
+END;

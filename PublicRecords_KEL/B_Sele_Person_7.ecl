@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.2-dev
-IMPORT KEL12 AS KEL;
+//HPCC Systems KEL Compiler Version 1.3.0
+IMPORT KEL13 AS KEL;
 IMPORT CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Ult,E_Person,E_Sele_Person,E_Surname FROM PublicRecords_KEL;
-IMPORT * FROM KEL12.Null;
+IMPORT * FROM KEL13.Null;
 EXPORT B_Sele_Person_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED VIRTUAL TYPEOF(E_Sele_Person().__Result) __E_Sele_Person := E_Sele_Person(__in,__cfg).__Result;
-  SHARED __EE327185 := __E_Sele_Person;
-  EXPORT __ST167249_Layout := RECORD
+  SHARED VIRTUAL TYPEOF(E_Sele_Person(__in,__cfg).__Result) __E_Sele_Person := E_Sele_Person(__in,__cfg).__Result;
+  SHARED __EE3544201 := __E_Sele_Person;
+  EXPORT __ST206186_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Person().Typ) Contact_;
     KEL.typ.nint Ult_I_D_;
@@ -19,12 +19,15 @@ EXPORT B_Sele_Person_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
     KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST167249_Layout __ND327149__Project(E_Sele_Person(__in,__cfg).Layout __PP326792) := TRANSFORM
-    __EE327144 := __PP326792.Contact_Info_;
-    SELF.Assoc_Date_ := KEL.Aggregates.MaxNN(__EE327144,KEL.era.ToDate(__T(__EE327144).Date_Last_Seen_));
-    SELF := __PP326792;
+  SHARED __ST206186_Layout __ND3544165__Project(E_Sele_Person(__in,__cfg).Layout __PP344255) := TRANSFORM
+    __EE3544160 := __PP344255.Contact_Info_;
+    SELF.Assoc_Date_ := KEL.Aggregates.MaxNN(__EE3544160,KEL.era.ToDate(__T(__EE3544160).Date_Last_Seen_));
+    SELF := __PP344255;
   END;
-  EXPORT __ENH_Sele_Person_7 := PROJECT(__EE327185,__ND327149__Project(LEFT));
+  EXPORT __ENH_Sele_Person_7 := PROJECT(__EE3544201,__ND3544165__Project(LEFT));
 END;

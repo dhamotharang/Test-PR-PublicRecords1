@@ -1,5 +1,5 @@
-﻿IMPORT R, ut, Python;
-EXPORT string Python_range_func(set of string layout_string, Recordof(Kel_Shell_QA.Layouts.AC_Lay) data_row,string cond, string def_par):= embed(Python)
+﻿IMPORT R, ut, python3;
+EXPORT string Python_range_func(set of string layout_string, Recordof(Kel_Shell_QA.Layouts.AC_Lay) data_row,string cond, string def_par):= embed(python3)
 import re
 result =''
 cond_str=cond

@@ -29,7 +29,8 @@ end;
 // append the zip, prim_name and prim_range from the bh_best file
 bdid_best_data := join(biid, business_header.key_bh_best,
 						left.bdid!=0 and
-						  keyed(left.bdid=right.bdid),
+						  keyed(left.bdid=right.bdid) AND 
+							doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 						  append_best(left, right),
 						  ATMOST(keyed(left.bdid=right.bdid), RiskWise.max_atmost), keep(1), left outer);
 
@@ -44,7 +45,8 @@ bh := join(bdid_best_data, business_risk.Key_Business_Header_Address,
 					keyed(right.prim_name=left.prim_name) and
 					keyed(right.prim_range=left.prim_range) and
 					keyed(right.sec_range in ['', left.sec_range]) and
-					(unsigned)((STRING)right.dt_first_seen)[1..6] <= left.historydate,
+					(unsigned)((STRING)right.dt_first_seen)[1..6] <= left.historydate AND 
+					doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 					transform(bh_temp,
 									self := right,
 									self.historydate := left.historydate),

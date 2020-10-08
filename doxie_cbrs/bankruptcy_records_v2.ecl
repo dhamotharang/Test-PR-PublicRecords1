@@ -1,12 +1,12 @@
-import bankruptcyv2_services,doxie;
+IMPORT bankruptcyv2_services,doxie;
 
 doxie_cbrs.mac_Selection_Declare()
 
-export bankruptcy_records_v2(dataset(doxie_cbrs.layout_references) bdids, unsigned in_limit = 0, STRING6 SSNMask='NONE') := module
+EXPORT bankruptcy_records_v2(DATASET(doxie_cbrs.layout_references) bdids, UNSIGNED in_limit = 0, STRING6 SSNMask='NONE') := MODULE
   
-	export all_recs := bankruptcyv2_services.bankruptcy_raw().report_view(in_bdids := bdids,in_limit := in_limit,in_ssn_mask:=SSNMask,in_party_type := 'D');
-  export report_view(unsigned in_limit = 0) := choosen(if(BankruptcyVersion in [0,2],all_recs),in_limit); 
-	export source_view(unsigned in_limit = 0) := if(BankruptcyVersion in [0,2],bankruptcyv2_services.bankruptcy_raw().source_view(in_bdids := bdids,in_limit := in_limit,in_ssn_mask:=SSNMask,in_party_type := 'D'));
-	
-	export report_count(boolean in_display) := count(bankruptcyv2_services.bankruptcy_raw().report_view(in_bdids := bdids,in_party_type := 'D')(in_display AND BankruptcyVersion in [0,2]));																																							
-end;
+  EXPORT all_recs := bankruptcyv2_services.bankruptcy_raw().report_view(in_bdids := bdids,in_limit := in_limit,in_ssn_mask:=SSNMask,in_party_type := 'D');
+  EXPORT report_view(UNSIGNED in_limit = 0) := CHOOSEN(IF(BankruptcyVersion IN [0,2],all_recs),in_limit);
+  EXPORT source_view(UNSIGNED in_limit = 0) := IF(BankruptcyVersion IN [0,2],bankruptcyv2_services.bankruptcy_raw().source_view(in_bdids := bdids,in_limit := in_limit,in_ssn_mask:=SSNMask,in_party_type := 'D'));
+  
+  EXPORT report_count(BOOLEAN in_display) := COUNT(bankruptcyv2_services.bankruptcy_raw().report_view(in_bdids := bdids,in_party_type := 'D')(in_display AND BankruptcyVersion IN [0,2]));
+END;

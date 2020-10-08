@@ -1,7 +1,7 @@
-//HPCC Systems KEL Compiler Version 0.8.2
-IMPORT KEL08a AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
+IMPORT KEL12 AS KEL;
 IMPORT Business_Credit_KEL;
-IMPORT * FROM KEL08a.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT CFG_graph := MODULE, VIRTUAL
   // **** Do not override these definitions - they are used to define the interface to KEL queries ****;
   EXPORT FDCLayout := RECORDOF(Business_Credit_KEL.File_SBFE_temp);

@@ -4,7 +4,7 @@ export Business_Shell_Function(dataset(Business_Risk.Layout_Output) biid, unsign
                                                         unsigned1 LexIdSourceOptout = 1,
                                                         string TransactionID = '',
                                                         string BatchUID = '',
-                                                        unsigned6 GlobalCompanyId = 0, string DataPermission = '') := function
+                                                        unsigned6 GlobalCompanyId = 0, string DataPermission = '', string DataRestriction ) := function
 
 mod_access := MODULE(Doxie.IDataAccess)
 	EXPORT glb := ^.glb;
@@ -12,12 +12,13 @@ mod_access := MODULE(Doxie.IDataAccess)
 	EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
 	EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
   EXPORT String DataPermissionMask := DataPermission;
+  EXPORT String DataRestrictionMask := DataRestriction;
 END;
 
 	// check the first record in the batch to determine if this a realtime transaction or an archive test
 	production_realtime_mode := biid[1].historydate=risk_indicators.iid_constants.default_history_date;
 	
-prof_risk := if(production_realtime_mode, Business_Risk.getBDIDTable(biid), business_risk.getBDIDTable_Hist(biid, glb, mod_access));
+prof_risk := if(production_realtime_mode, Business_Risk.getBDIDTable(biid, mod_access), business_risk.getBDIDTable_Hist(biid, mod_access));
 
 withPRS := join(biid, prof_risk, left.seq=right.seq, 
 				transform(business_risk.Layout_Business_Shell,

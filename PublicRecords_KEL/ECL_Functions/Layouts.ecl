@@ -1,4 +1,4 @@
-﻿IMPORT PublicRecords_KEL;
+﻿IMPORT PublicRecords_KEL, Risk_Indicators, iesp;
 
 EXPORT Layouts := MODULE
 
@@ -76,8 +76,10 @@ EXPORT Layouts := MODULE
 		string4 WirelessIndicator;
 		STRING20 InsuranceDLNumber;		
 		STRING2 InsuranceDLState;		
-		STRING2 InsuranceSource;		
-		BOOLEAN InsuranceDLDataUsed;		
+		STRING InsuranceSource;		
+		BOOLEAN InsuranceDLDataUsed;	
+		Boolean PI_InpDOBAgeIsMinorFlag;
+		Boolean BestDataAppended;
 	END;
 	
 EXPORT LayoutAppendedAddresses := RECORD
@@ -89,7 +91,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6 CurrentAddrPostDir;
 		STRING10 CurrentAddrUnitDesig;
 		STRING8 CurrentAddrSecRng;
-		// STRING25 CurrentAddrCity;
+		STRING25 CurrentAddrCity;
 		STRING6 CurrentAddrState;
 		STRING6 CurrentAddrZip5;
 		// STRING6 CurrentAddrZip4;
@@ -141,9 +143,17 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING7 EmergingAddrGeo;
 		// STRING6 EmergingAddrType;
 		// STRING6 EmergingAddrStatus;
+		
+		STRING20 BestNameFirst;
+		STRING20 BestNameMid;
+		STRING20 BestNameLast;
+		STRING10 BestSSN;
+		STRING10 BestDOB;		
+		
 	END;	
 			
 	EXPORT LayoutInputPII := RECORD
+		INTEGER G_UID;
 		INTEGER G_ProcUID;
 		INTEGER G_ProcBusUID;
 		INTEGER RepNumber;
@@ -238,12 +248,36 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING30 P_InpClnEmailDom;		
 		STRING6 P_InpClnEmailExt;
 		STRING45 P_InpClnIPAddr,
+		STRING6 P_InpValNameInvalidFlag,
+		STRING6 P_InpValAddrStInvalidFlag,
+		STRING6 P_InpValPhoneHomeInvalidFlag,
+		STRING6 P_InpValPhoneWorkInvalidFlag,
+		STRING6 P_InpValSSNInvalidFlag,
+		STRING6 P_InpValDLInvalidFlag,
+		STRING6 P_InpValDLStateInvalidFlag,
+		STRING6 P_InpValDOBInvalidFlag,
+		STRING6 P_InpValEmailInvalidFlag,
+		STRING6 P_InpValArchDtInvalidFlag,
 		// INTEGER4 PI_InpAddrAVMVal;
 		// INTEGER4 PI_InpAddrAVMValA1Y;
 		// DECIMAL7_2 PI_InpAddrAVMRatio1Y;
 		// INTEGER4 PI_InpAddrAVMValA5Y;
 		// DECIMAL7_2 PI_InpAddrAVMRatio5Y;
 		// INTEGER4 PI_InpAddrAVMConfScore;
+		STRING6 PI_InpAddrOnFileFlagEv;
+		STRING6 PI_InpAddrIsVacantFlag;
+		STRING6 PI_InpAddrIsThrowbackFlag;
+		STRING6 PI_InpAddrSeasonalType;
+		STRING6 PI_InpAddrIsDNDFlag;
+		STRING6 PI_InpAddrIsCollegeFlag;
+		STRING6 PI_InpAddrIsCMRAFlag;
+		STRING6 PI_InpAddrIsSimpAddrFlag;
+		STRING6 PI_InpAddrIsDropDeliveryFlag;
+		STRING6 PI_InpAddrIsBusinessFlag;
+		STRING6 PI_InpAddrOWGMFlag;
+		STRING6 PI_InpAddrIsMultiUnitFlag;
+		STRING6 PI_InpAddrIsAptFlag;
+		Boolean BestDataAppended;
 	END;
 	
 	SHARED LayoutInputBIIBusinessEchoInternal := RECORD
@@ -571,6 +605,23 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING50 	B_Rep5InpClnDL;
 		STRING6		B_Rep5InpClnDLState;
 		STRING54 	B_Rep5InpClnEmail;
+		
+		STRING20 B_Rep6InpClnNameFirst;
+		STRING20 B_Rep6InpClnNameMid;
+		STRING30 B_Rep6InpClnNameLast;
+		STRING10 B_Rep6InpClnAddrPrimRng;
+		STRING6 B_Rep6InpClnAddrPreDir;
+		STRING28 B_Rep6InpClnAddrPrimName;
+		STRING6 B_Rep6InpClnAddrSffx;
+		STRING6 B_Rep6InpClnAddrPostDir;
+		STRING10 B_Rep6InpClnAddrUnitDesig;
+		STRING8 B_Rep6InpClnAddrSecRng;
+		STRING25 B_Rep6InpClnAddrCity;
+		STRING6 B_Rep6InpClnAddrState;
+		STRING6 B_Rep6InpClnAddrZip5;
+		STRING6 B_Rep6InpClnAddrZip4;
+		STRING10 B_Rep6InpClnPhone;
+		STRING10 B_Rep6InpClnSSN;
 	END;
 	
 	SHARED LayoutInputBIIInternal := RECORD
@@ -880,12 +931,6 @@ EXPORT LayoutAppendedAddresses := RECORD
 	END;
 	
 	SHARED LayoutPersonInternal := RECORD
-		STRING10 G_BuildDrgCrimDt;
-		STRING10 G_BuildAstVehAutoDt;
-		STRING10 G_BuildAstVehAirDt;
-		STRING10 G_BuildAstVehWtrDt;
-		STRING10 G_BuildAstPropDt;
-		STRING10 G_BuildEduDt;		
 		STRING6	P_LexIDSeenFlag;
 		INTEGER3 PL_AstVehAutoCntEv;
 		STRING	PL_AstVehAutoEmrgDtListEv;
@@ -950,7 +995,6 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER3 PL_DrgCrimNfelOldMsnc7Y;
 		STRING6 PL_DrgCrimSeverityIndx7Y;
 		STRING6 PL_DrgCrimBehaviorIndx7Y;
-		STRING10 G_BuildDrgBkDt ;
 		INTEGER3 PL_DrgBkCnt1Y ;
 		INTEGER3 PL_DrgBkCnt7Y ;
 		INTEGER3 PL_DrgBkCnt10Y ;
@@ -1015,7 +1059,6 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6 PL_DrgBkBusFlag7Y ;
 		STRING6 PL_DrgBkBusFlag10Y ;
 		STRING6 PL_DrgBkSeverityIndx10Y ;
-		STRING10 G_BuildProfLicDt;
 		STRING6 PL_ProfLicFlagEv;
 		STRING500 PL_ProfLicIssueDtListEv;
 		STRING500 PL_ProfLicExpDtListEv;
@@ -1032,7 +1075,17 @@ EXPORT LayoutAppendedAddresses := RECORD
 		// STRING200 PL_CurrAddrLocID;
 		STRING200 PL_PrevAddrFull;
 		// STRING200 PL_PrevAddrLocID;
-		//consumer liens		
+		//Current Address
+		STRING6 PL_CurrAddrIsVacantFlag;
+		STRING6 PL_CurrAddrIsThrowbackFlag;
+		STRING6 PL_CurrAddrSeasonalType;
+		STRING6 PL_CurrAddrIsDNDFlag;
+		STRING6 PL_CurrAddrIsCollegeFlag;
+		STRING6 PL_CurrAddrIsCMRAFlag;
+		STRING6 PL_CurrAddrIsSimpAddrFlag;
+		STRING6 PL_CurrAddrIsDropDeliveryFlag;
+		STRING6 PL_CurrAddrIsBusinessFlag;
+		//consumer liens
 		INTEGER3 PL_DrgJudgCnt7Y;		
 		INTEGER3 PL_DrgLTDCnt7Y;		
 		INTEGER3 PL_DrgLienCnt7Y;		
@@ -1058,7 +1111,6 @@ EXPORT LayoutAppendedAddresses := RECORD
 	SHARED LayoutBusinessSeleIDInternal := RECORD
 		STRING6 B_LexIDLegalSeenFlag;
 		STRING6 B_LexIDLegalRstdOnlyFlag;
-		STRING10 G_BuildBusHdrDt;
 		STRING BE_VerSrcListEv;
 		INTEGER BE_VerSrcCntEv;
 		STRING BE_VerSrcEmrgDtListEv;
@@ -1113,7 +1165,6 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER BE_VerPhoneSrcOldMsncEv;
 		INTEGER BE_VerPhoneSrcNewMsncEv;
 		//Tradeline		
-		STRING10 G_BuildB2BDt;
 		INTEGER3 BE_B2BCntEv;
 		INTEGER3 BE_B2BCnt2Y;
 		INTEGER3 BE_B2BCarrCnt2Y;
@@ -1331,7 +1382,6 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER3 BE_DrgBkCh11Cnt10Y;
 		INTEGER3 BE_DrgBkCh13Cnt10Y;
 		STRING6 BE_DrgBkNewChType10Y;
-		STRING10 G_BuildSOSDt;
 		INTEGER3 BE_SOSCntEv;
 		STRING10 BE_SOSNewDtEv;
 		STRING10 BE_SOSOldDtEv;
@@ -1358,7 +1408,6 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING10 BE_BestAddrZip;
 		STRING10 BE_BestTIN;
 		STRING16 BE_BestPhone;
-		STRING10 G_BuildDrgLnJDt;		
 		STRING6 BE_DrgGovDebarredFlagEv;
 		INTEGER3 BE_DrgLTDCnt1Y;
 		INTEGER3 BE_DrgLTDCnt7Y;
@@ -1369,7 +1418,6 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER3 BE_DrgLTDNewMsnc7Y;
 		INTEGER3 BE_DrgLTDOldMsnc7Y;
 				//UCC
-		STRING10 G_BuildUCCDt;
 		INTEGER3 BE_UCCCntEv;
 		INTEGER3 BE_UCCDebtorCntEv;
 		STRING10 BE_UCCDebtorOldDtEv;
@@ -1620,6 +1668,28 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER G_ProcbusUID;
 		LayoutBusinessproxIDInternal;
 		END;	
+
+	SHARED LayoutBuildDatesInternal := RECORD
+		STRING10 G_BuildDrgCrimDt;
+		STRING10 G_BuildAstVehAutoDt;
+		STRING10 G_BuildAstVehAirDt;
+		STRING10 G_BuildAstVehWtrDt;
+		STRING10 G_BuildAstPropDt;
+		STRING10 G_BuildEduDt;		
+		STRING10 G_BuildDrgBkDt ;
+		STRING10 G_BuildProfLicDt;
+		STRING10 G_BuildDrgLnJDt;
+		STRING10 G_BuildBusHdrDt;
+		STRING10 G_BuildB2BDt;
+		STRING10 G_BuildSOSDt;
+		STRING10 G_BuildUCCDt;
+	END;
+	
+	EXPORT LayoutBuildDates := RECORD
+		INTEGER G_ProcUID;
+		INTEGER G_ProcBusUID;
+		LayoutBuildDatesInternal;
+	END;
 	
 	EXPORT LayoutMaster := RECORD
 		INTEGER G_ProcUID;
@@ -1630,11 +1700,38 @@ EXPORT LayoutAppendedAddresses := RECORD
 		LayoutInputBIIInternal - B_InpAcct;
 		LayoutBusinessSeleIDInternal;
 		LayoutBusinessproxIDInternal;
+		LayoutBuildDatesInternal;
 	END;	
 
 	EXPORT LayoutInputPIIWithExtras := RECORD
-        INTEGER G_ProcUID;
-        LayoutInputPIIInternal;
-        INTEGER G_ProcBusUID;
-    END;
+		INTEGER G_ProcUID;
+		LayoutInputPIIInternal;
+		INTEGER G_ProcBusUID;
+	END;
+
+
+	EXPORT LayoutInputPII_Overrides := RECORD
+		INTEGER G_ProcUID;
+		INTEGER G_ProcBusUID;
+		INTEGER RepNumber;
+		LayoutInputPIIEchoInternal;
+		LayoutInputPIICleanInternal;
+		STRING10 InputIncomeEcho;
+		STRING10 InputBalanceEcho;
+		STRING10 InputChargeoFFdEcho;
+		STRING70 InputFormernameEcho;
+		STRING100 InputEmploymentEcho;
+		PublicRecords_KEL.ECL_Functions.Cleaned_Date_Layout;
+		LayoutExternalFlags;
+		LayoutAppendedAddresses;
+		PublicRecords_KEL.ECL_Functions.Layout_Overrides;
+		risk_indicators.Layout_ConsumerFlags ConsumerFlags;
+		dataset(Risk_Indicators.Layouts.tmp_Consumer_Statements) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
+		END;	
+		
+	EXPORT LayoutB2B := RECORD
+		LayoutBusinessSeleID;
+		STRING10 G_BuildB2BDt;
+	END;
+
 END;

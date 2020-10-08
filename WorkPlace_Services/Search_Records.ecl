@@ -24,6 +24,8 @@ export Search_Records := module
     )
     // Fields passed in from SearchServices via in_mod and used throughout this attribute.
     export boolean include_spouse := false; // default to false per specs
+    export boolean IncludeNetwise := false;
+    export boolean CachedResponseOnly := false;
     export string excluded_sources := ''; // default to null (no excluded sources)
     export boolean includeCriminalIndicators := false;
     export boolean hasTooManyDidsButAvoidFail := false;
@@ -128,9 +130,12 @@ export Search_Records := module
 
     ds_pss_recs_slimmed := WorkPlace_Services.Functions.getPSSRecs(ds_combined_dids_sorted);
 
+    _ds_netwise_recs := WorkPlace_Services.Functions.GetNetwiseRecords(ds_subject_dids, in_mod.CachedResponseOnly);
+    ds_netwise_recs := if(in_mod.IncludeNetwise, _ds_netwise_recs);
+
     // 7.1 Combine POE & PSS slimmed recs into 1 dataset here and
     // join to POE source_hierarchy key file to assign the source_order.
-    ds_all_recs_slimmed := join(ds_poe_recs_slimmed + ds_pss_recs_slimmed,
+    ds_all_recs_slimmed := join(ds_poe_recs_slimmed + ds_pss_recs_slimmed + ds_netwise_recs,
                                 POE.Keys().source_hierarchy.qa,
                                 keyed(left.source = right.source),
                                 transform(WorkPlace_Services.Layouts.poe_didkey_plus,

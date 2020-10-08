@@ -1,4 +1,5 @@
-import MDR;
+﻿IMPORT MDR;
+
 EXPORT Constants := MODULE;
 
 	EXPORT premium := 'PR';
@@ -6,7 +7,7 @@ EXPORT Constants := MODULE;
 	EXPORT phones_plus := ['PP', 'TH', 'INF'];
 	EXPORT phones_feedback := ['PF'];
 	EXPORT util := ['UT'];
-  EXPORT paw := ['WK'];
+ EXPORT paw := ['WK'];
 	EXPORT close_proximity := ['CL', 'CR', 'SP', 'MD'];
 	EXPORT input := ['IN'];  //If 'IN' (INPUT) is the source, the most reliable data for names will be from user-supplied input.
 	EXPORT input_found_inFileOne := 'XX'; //used to identify fake metronet hits where we have the phone internally so we don't hit the Metronet GW see 175166 and 177642
@@ -26,6 +27,22 @@ EXPORT Constants := MODULE;
 		EXPORT Subject := ['SUBJECT', 'SUBJECT AT HOUSEHOLD'];
 		EXPORT Neighbor := ['NEIGHBOR'];
 	END;
+
+ // Used in progressive_phone.functions.GetPhonesV3 for the new Meta_ServLine_Type field
+ EXPORT ServLine_Types := MODULE
+   EXPORT Landline := 'Landline';
+   EXPORT Cable    := 'Cable';
+   EXPORT Wireless := 'Possible Wireless';
+   EXPORT VoIP     := 'Possible VoIP';
+   EXPORT Unknown  := 'Other/Unknown';
+ END;
+
+ EXPORT Switch_Type := MODULE
+   EXPORT Landline := 'P'; // aka POTS
+   EXPORT Wireless := 'C';
+   EXPORT VoIP     := 'V';
+   EXPORT Unknown  := 'U';
+ END;
 
 	EXPORT Associate_Cat := 'ASSOCIATE';
 	EXPORT Associate_Other_Cat := 'ASSOCIATE_OTHER';

@@ -3,17 +3,17 @@
 
 
 
-file1:= dataset(route + scoring_project_pip.Output_Sample_Names.LI_Scores_V4_BATCH_Generic_msn1106_0_outfile + previous_dt,Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_LeadIntegrity_V4_Generic_MSN1210_1_Global_Layout,
+file1:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.LI_Scores_V4_BATCH_Generic_msn1106_0_outfile + previous_dt,Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_LeadIntegrity_V4_Generic_MSN1210_1_Global_Layout,
 
 
-thor);
+thor),(integer)acctno);
 
 
 
-file2:= dataset(route + scoring_project_pip.Output_Sample_Names.LI_Scores_V4_BATCH_Generic_msn1106_0_outfile + current_dt, Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_LeadIntegrity_V4_Generic_MSN1210_1_Global_Layout,
+file2:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.LI_Scores_V4_BATCH_Generic_msn1106_0_outfile + current_dt, Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_LeadIntegrity_V4_Generic_MSN1210_1_Global_Layout,
 
 
- thor);
+ thor),(integer)acctno);
 
 
 

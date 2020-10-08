@@ -8,16 +8,16 @@ If SetDefault is TRUE and no value is passed in for InDate, we will set the date
 IMPORT _Validate, PublicRecords_KEL, STD, ut;
 
 EXPORT Fn_Clean_Date (STRING InDate, 
-											INTEGER LowYear = PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_YEAR_RANGE_LOW_DOB, 
-											INTEGER HighYear = PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_YEAR_RANGE_HIGH_DOB,
+											INTEGER LowYear = PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_DATE_RANGE_LOW_DEFAULT, 
+											INTEGER HighDate = PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_DATE_RANGE_HIGH_DEFAULT,
 											BOOLEAN SetDefault = FALSE
 											) := FUNCTION
 
-	InDateWithDefault := IF(SetDefault AND TRIM(InDate) = '', ut.now('%Y%m%d%T', TRUE), InDate);
+	InDateWithDefault := IF(SetDefault AND TRIM(InDate) = '', ut.now('%Y%m%d%T', FALSE), InDate);
 	FullInDateinNums := STD.Str.Filter(InDateWithDefault, '0123456789');
 	InDateinNums := (STRING8)FullInDateinNums[1..8];
 	
-	Validate_Date := _Validate.date_new(LowYear, HighYear);
+	Validate_Date := PublicRecords_KEL.ECL_Functions.validate_date_mas(LowYear, HighDate);
 
 	UNSIGNED lTestFlags := Validate_Date.Rules.YearValid 
                         |  Validate_Date.Rules.MonthValid 

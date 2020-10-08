@@ -1,5 +1,4 @@
-IMPORT	tools, ut;
-EXPORT Files(	STRING	pFilename	=	'',
+﻿EXPORT Files(	STRING	pFilename	=	'',
 							BOOLEAN	pUseProd	=	FALSE) := INLINE MODULE
 
 	EXPORT	FileHeaderSegment_FA :=  DATASET(pFilename, Business_Credit.Layouts.FileHeaderSegment, CSV(HEADING(0), SEPARATOR(['\t']), QUOTE(''))) (Segment_Identifier= Constants().FA);
@@ -78,6 +77,10 @@ EXPORT Files(	STRING	pFilename	=	'',
 	EXPORT	Active						:=	DATASET(
 																IF(pFilename='',Filenames(,pUseProd).Out.Active.QA,pFilename)
 																,Business_Credit.Layouts.AccountDataLayout,THOR,__compressed__)
+																(portfolioHeader.SBFE_Contributor_Number NOT IN Quarantined_SBFE_Contributor_Number_Set);
+	EXPORT	ActiveLookupSBFE	:=	DATASET(
+																'~thor_data400::out::sbfe::qa::active'
+																,Business_Credit.Layouts.AccountDataLayout,THOR,__compressed__, LOOKUP)
 																(portfolioHeader.SBFE_Contributor_Number NOT IN Quarantined_SBFE_Contributor_Number_Set);
 	EXPORT	LinkIDs						:=	DATASET(
 																IF(pFilename='',Filenames(,pUseProd).Out.LinkIDs.QA,pFilename)

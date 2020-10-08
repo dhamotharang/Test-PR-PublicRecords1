@@ -427,6 +427,7 @@ EXPORT Constants := MODULE
 	//Due Diligence
 	export DDRAttributesConst := MODULE
     export unsigned2 MaxAttributes      				:= 24;
+    export unsigned1 MaxAttributeModules        := 6;
     export unsigned2 MaxReportedAKAs      			:= 500;
     export unsigned2 MaxReportedDOBs      			:= 500;
     export unsigned2 MaxSSNDeviations      			:= 500;
@@ -458,6 +459,7 @@ EXPORT Constants := MODULE
     export unsigned2 MaxBusAssociations   			:= 500;
     export unsigned2 MaxResidence               := 500;
     export unsigned2 MaxPersonAssociations      := 500;
+    export unsigned2 MaxLinkedBusinesses        := 200;
 	end;
 
 	//Digital Mortgage Application Prefill (DMAP)
@@ -617,7 +619,7 @@ EXPORT Constants := MODULE
 
   export RIN := MODULE
     export unsigned2 MAX_COUNT_NVP := 1000;
-    export unsigned2 MAX_COUNT_SEARCH_RECORDS := 2000;
+    export unsigned2 MAX_COUNT_SEARCH_RECORDS := 10000;
     export unsigned2 MAX_COUNT_INDICATOR_ATTRIBUTE := 1000;
   end;
 
@@ -1244,23 +1246,24 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_COUNT_SMARTLINX_BIZ_ASSOCIATED_PEOPLE   := 500;
 	end;
 
-	// Motor Vehicle Registrations (MVR)
-  export MV := MODULE
+    // Motor Vehicle Registrations (MVR)
+    export MV := MODULE
     // ideally, those should refer to VehicleV2_Services.Constant values...
-    export unsigned1 MaxCountGateways := 2;
-    export unsigned1 MaxCountOwners := 10;
-    export unsigned1 MaxCountRegistrants := 10;
-    export unsigned1 MaxCountLienHolders := 10;
-    export unsigned1 MaxCountLessees := 10;
-    export unsigned1 MaxCountLessors := 10;
-		export unsigned1 MaxCountBrands := 5;
-		export UNSIGNED1 MaxCountMakes := 4;
-		export UNSIGNED1 MaxCountModels := 4;
-		export UNSIGNED1 MaxCountMajorColors := 4;
-		export UNSIGNED1 MaxCountMinorColors := 4;
-		export MAX_COUNT_SEARCH_RESPONSE_RECORDS := 2000;
-		export MAX_COUNT_REPORT_RESPONSE_RECORDS := 2000;
-  end;
+        export unsigned1 MaxCountGateways := 2;
+        export unsigned1 MaxCountOwners := 10;
+        export unsigned1 MaxCountRegistrants := 10;
+        export unsigned1 MaxCountLienHolders := 10;
+        export unsigned1 MaxCountLessees := 10;
+        export unsigned1 MaxCountLessors := 10;
+        export unsigned1 MaxCountBrands := 5;
+        export unsigned1 MaxCountMakes := 4;
+        export unsigned1 MaxCountModels := 4;
+        export unsigned1 MaxCountMajorColors := 4;
+        export unsigned1 MaxCountMinorColors := 4;
+        export unsigned2 MAX_COUNT_SEARCH_RESPONSE_RECORDS := 2000;
+        export unsigned2 MAX_COUNT_REPORT_RESPONSE_RECORDS := 2000;
+        export unsigned1 MAX_VEHICLE_TAG_TYPE := 19;
+    end;
 
 	// Natural Disaster Readiness
 	export NATURAL_DISASTER := MODULE

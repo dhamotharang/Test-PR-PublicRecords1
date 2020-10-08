@@ -22,7 +22,7 @@ EXPORT Fn_GetBRM_ProxIDAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layout
 																														DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 
 																														DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII), 		
 																														0, 
-																														0).res0);
+																														PublicRecords_KEL.CFG_Compile.Permit__NONE).res0);
 
 	
  BusinessProxAttributesInput := DENORMALIZE(InputData, RepInput, 

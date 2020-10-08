@@ -303,5 +303,43 @@ MODULE
 		END;
 
 	END;
+  
+ EXPORT SourceLevelAttributes := MODULE // used for Phones.GetSourceLevelPhonesPlus
+ 
+  EXPORT BatchIn := RECORD
+   UNSIGNED8 seq;
+			UNSIGNED8 did;
+			STRING10  phone;
+		END;
+    
+  EXPORT BatchOut := RECORD
+   // identifiers from input   
+   BatchIn;
+   
+   // payload key attributes
+   QSTRING100	source_did_scores; // most recent value per source, comma-delimited
+   QSTRING150 source_codes; // one entry per source, comma-delimited list
+   QSTRING100 source_household_flags; // most recent value per source, comma-delimited list
+   QSTRING100 source_glb_dppa_flags; // most recent populated flag per source, comma-delimited list
+   QSTRING200 source_dt_nonglb_last_seen; // max value within source, comma-delimited list
+   QSTRING200 source_date_first_seen; // min value within source, comma-delimited list
+   QSTRING200 source_date_last_seen; // max value within source, comma-delimited list
+   QSTRING200 source_date_vendor_first_reported; // min value within source, comma-delimited list
+   QSTRING200 source_date_vendor_last_reported; // max value within source, comma-delimited list
+   UNSIGNED8  source_bitmap; // src_all to be built from src_bitmap to be added by Dawn. Might not need to pass it back
+   UNSIGNED8  source_rules; // rules bitmap will also be added by Dawn, and added here if we need to pass it back
+   QSTRING200 source_first_build_date; // min value within source, comma-delimited list
+   QSTRING200 source_last_build_date; // max value within source, comma-delimited list
+    
+   // calculated attributes
+   UNSIGNED3 phone_last_seen_date_same_lexid; // last time the phone was seen on this DID, using datelastseen
+   UNSIGNED3 phone_last_seen_date_diff_lexid; // last time phone was seen on any DID EXCEPT the input DID, using datelastseen 
+   UNSIGNED3 phone_vendor_last_seen_same_lexid; // last time the phone was seen on this DID, using vendorlastreported
+   UNSIGNED3 phone_vendor_last_seen_diff_lexid; // last time phone was seen on any DID EXCEPT the input DID, using vendorlastreported
+   UNSIGNED3 phone_did_count; // counts all unique non-zero DIDs (including the input DID) for this phone
+   // some additional counts and such may be requested by Blake
+  END;
+    
+ END; // End SourceLevelAttributes
 
 END;

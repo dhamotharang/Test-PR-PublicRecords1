@@ -273,6 +273,7 @@ EXPORT SmallBusiness_Marketing_Batch_Service() := FUNCTION
 			SELF.Model_2_RC3       := model_result_2.Scores[1].ScoreReasons[3].ReasonCode;
 			SELF.Model_2_RC4       := model_result_2.Scores[1].ScoreReasons[4].ReasonCode;
 			SELF := le;		
+			SELF := [];		
 		END;
 	
 	Final_Results_pre := PROJECT(SBA_Results, xfm_to_Results(LEFT));

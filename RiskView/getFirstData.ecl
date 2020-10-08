@@ -71,6 +71,7 @@ fd_results_slim := project(fd_results, transform(fd_ln_names,
 FIRST_SEEN_DATE_temp := STD.Str.FilterOut(left.Response.FDCheckingIndicators.Indicator13, 'FIRST_SEEN_DATE=');
 FIRST_SEEN_DATE_TRUE_temp := STD.Str.FilterOut(left.Response.FDCheckingIndicators.Indicator14, 'FIRST_SEEN_DATE_TRUE=');
 LAST_SEEN_DATE_temp := STD.Str.FilterOut(left.Response.FDCheckingIndicators.Indicator15, 'LAST_SEEN_DATE=');
+TimeOutSet := STD.Str.Contains(left.Response._header.message,'timeout' ,false);
 
 self.seq := indata[1].input.seq;
 self.ARCHIVE_DATE := indata[1].input.historyDateTimeStamp[1..6];
@@ -87,7 +88,7 @@ self.NO_NEG_DECL_DAYS := STD.Str.FilterOut(left.Response.FDCheckingIndicators.In
 self.PREV_HOURS := STD.Str.FilterOut(left.Response.FDCheckingIndicators.Indicator26, 'PREV_HOURS=');
 self.RISK_PNC := STD.Str.FilterOut(left.Response.FDCheckingIndicators.Indicator30, 'RISK_PNC=');
 self.FD_Gateway_Pass := left.response._header.message = '';
-self.Exception_Code := '';
+self.Exception_Code := IF(TimeOutSet, RiskView.Constants.FDGatewayTimeout, '');
 
 self := left;));
 
@@ -148,15 +149,16 @@ checknegpaidtimenewest_1 := map(
                              min(84, max(1, round((Integer)left.LTD_DAYS / (365.25 / 12)))));
 
 checkcounttotal_1 := map(
-    left.LTD_QTY_TRUE = '' or left.LTD_AMT_TRUE = '' => -1,
-    (Real)left.LTD_AMT_TRUE <= 0                          => 0,
-                                                  (min(9999, max(0, (integer)left.LTD_QTY_TRUE))));
+                        left.LTD_QTY_TRUE = '' or left.LTD_AMT_TRUE = '' or (Real)left.LTD_AMT_TRUE = 0 or (Integer)left.LTD_QTY_TRUE = 0 => -1,
+                        (Real)left.LTD_AMT_TRUE < 0 => 0,
+                        (min(9999, max(0, (integer)left.LTD_QTY_TRUE))));
 
 checkamounttotal_1 := map(
-    left.LTD_QTY_TRUE = '' or left.LTD_AMT_TRUE = '' => -1,
-    (Integer)left.LTD_QTY_TRUE <= 0                          => 0,
-                                                  (min(9999999, max(1, round((real)left.LTD_AMT_TRUE)))));
+                          left.LTD_QTY_TRUE = '' or left.LTD_AMT_TRUE = '' or (Real)left.LTD_AMT_TRUE = 0 or (Integer)left.LTD_QTY_TRUE = 0 => -1,
+                          (Integer)left.LTD_QTY_TRUE < 0 => 0,
+                          (min(9999999, max(1, round((real)left.LTD_AMT_TRUE)))));
 
+                          
 _first_seen_date := models.common.sas_date((string)(left.FIRST_SEEN_DATE));
 
 mos_snc_first_seen_date := if(not(_first_seen_date = NULL), (string)round((sysdate - (integer)_first_seen_date) / (365.25 / 12)), '');

@@ -73,11 +73,13 @@ EXPORT SearchService := MACRO
   #stored ('CompanyName', search_by.CompanyName);
   #stored ('ExcludeForeclosures',first_row.options.ExcludeForeclosures);
   #stored ('IncludeNoticeOfDefaults',first_row.options.IncludeNoticeOfDefaults);
+	 #stored ('ParcelNumber',search_by.ParcelNumber);
 
   input_params := AutoStandardI.GlobalModule();
   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
 	tempmod := module(project(input_params,Foreclosure_Services.Records.params,opt))  
     export string70 foreclosure_id := '' : stored ('ForeclosureId');
+		  export string45 parcel_num := '' : stored ('ParcelNumber');
   end;
 
   boolean ExcludeForeclosures := false : STORED ('ExcludeForeclosures');

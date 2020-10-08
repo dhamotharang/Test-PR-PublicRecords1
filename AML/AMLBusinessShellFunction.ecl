@@ -58,7 +58,7 @@ END;
 
 
 // append bests
-Business_Header_SS.MAC_BestAppend(bdidAppendAll,appends,verify,bdidbest,true);
+Business_Header_SS.MAC_BestAppend(bdidAppendAll, appends, verify, bdidbest, mod_access.DataPermissionMask, DataRestriction, true);
 
 AML.Layouts.AMLBusnAssocLayout addBDID(bdidAppendAll le, indata ri)  := Transform
   self.bdid      := le.bdid;
@@ -200,7 +200,7 @@ AssocBdidPrep := project(wAssocBusn(assocbusn), transform(Business_Header_SS.Lay
                                   self.bdid := left.assocbdid,
                                   self.seq := left.seq));
 
-Business_Header_SS.MAC_BestAppend(AssocBdidPrep,appends,verify,Assocbdidbest,true);
+Business_Header_SS.MAC_BestAppend(AssocBdidPrep, appends, verify, Assocbdidbest, mod_access.DataPermissionMask, DataRestriction, true);
 
 AML.Layouts.AMLBusnAssocLayout AddAssocBest(wAssocBusn le, Assocbdidbest ri) := TRANSFORM
   clean_bus_addr := Risk_Indicators.MOD_AddressClean.clean_addr(ri.best_addr1, ri.best_city, ri.best_state,ri.best_zip);
@@ -305,7 +305,8 @@ AddBusnBnas  := join(bestrecs_init, rolled_bnas,
 
 BusnHeadRec := join(bestrecs_init(bdid!=0), BusnHeader,
                     Keyed(right.bdid=left.bdid) and
-                    right.dt_first_seen <= left.historydate,
+                    right.dt_first_seen <= left.historydate AND 
+                    doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
                     transform({recordof(BusnHeader), unsigned4 seq, unsigned4  historydate },
                     self.seq:=left.seq,
                     self.historydate := left.historydate,

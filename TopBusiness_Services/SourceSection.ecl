@@ -186,6 +186,7 @@ EXPORT SourceSection := MODULE
 		self.ssn_mask  := AutoStandardI.GlobalModule().ssnmask;
 	 // v--- Addded 02/12/14 due to Keith's SourceService enhancement
    self.fetch_level := in_options.BusinessReportFetchLevel;
+   self.IncludeVendorSourceB := in_options.IncludeVendorSourceB;
 	end;
 	
 	rs_options := row(tf_options());

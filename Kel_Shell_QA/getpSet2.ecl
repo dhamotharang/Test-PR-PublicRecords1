@@ -1,11 +1,11 @@
-﻿IMPORT R, ut, Python;
+﻿IMPORT R, ut, python3;
 Layout_Person := RECORD
   integer PersonID;
   STRING  FirstName;
   STRING  LastName;
 END;
 
-EXPORT string getpSet2(string layout_string, Recordof(Layout_Person) data_row,set of string cond):= embed(Python)
+EXPORT string getpSet2(string layout_string, Recordof(Layout_Person) data_row,set of string cond):= embed(python3)
 import operator
 
 result = ''

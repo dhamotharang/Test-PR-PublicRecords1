@@ -42,7 +42,7 @@ EXPORT SearchService() := MACRO
                    searchBy.MACAddress <> '' OR
                    searchBy.DeviceId <> '' OR
                    searchBy.IPAddress <> '' OR
-                   (iesp.ECL2ESP.t_DateToString8(searchBy.TransactionStartDate)  <> '' AND iesp.ECL2ESP.t_DateToString8(searchBy.TransactionEndDate) <> '' AND isValidDate) OR
+                   ((iesp.ECL2ESP.t_DateToString8(searchBy.TransactionStartDate)  <> '' OR iesp.ECL2ESP.t_DateToString8(searchBy.TransactionEndDate) <> '') AND isValidDate) OR
                    ((searchBy.Address.StreetAddress1 <> '' OR searchBy.Address.StreetName <> '') AND
                    ((searchBy.Address.City <> '' AND searchBy.Address.State <> '') OR searchBy.Address.Zip5 <> '')) OR
                    ValidAmount;
@@ -109,7 +109,7 @@ EXPORT SearchService() := MACRO
   SELF._Header := iesp.ECL2ESP.GetHeaderRow(),
   SELF.RecordCount:= COUNT(ds_searchrecords),
   SELF.InputEcho := SearchBy,
-  SELF.Records := ds_searchrecords
+  SELF.Records := CHOOSEN(ds_searchrecords, iesp.Constants.RIN.MAX_COUNT_SEARCH_RECORDS)
  END;
 
  results := DATASET([final_transform_t_IdentitySearchResponse()]);

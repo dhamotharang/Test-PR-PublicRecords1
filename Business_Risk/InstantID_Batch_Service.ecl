@@ -153,7 +153,7 @@ string  model_name_value := '' : stored('ModelName');
 model_name := STD.Str.toLowerCase(model_name_value);
 boolean IncludeTargus3220 := false : stored('IncludeTargusE3220');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
-string50 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+string DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 
 nugen := true;
 

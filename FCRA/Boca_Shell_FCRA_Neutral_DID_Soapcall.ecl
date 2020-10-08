@@ -100,37 +100,12 @@ ret := risk_indicators.InstantID_Function(iid,
 	outf := if(ADL_Based_Shell, with_adl_based_flags, outf_n);
 
 
-esp_input := project(outf, transform(risk_indicators.layout_input, self.did := left.did, self.ssn := left.shell_input.ssn, self.lname := left.shell_input.lname, self := []));
-
-// mbs_gateway_url := 'http://rw_score_dev:[PASSWORD_REDACTED]@espdev.br.seisint.com:9999/WsDbHandler';
-mbs_gateway_url := gateways(servicename='mbs_dost')[1].url;
-
-esp_response := Gateway.Soapcall_DOST_ConsumerFlags(esp_input, mbs_gateway_url );
-esp_response_failed := trim(esp_response[1].responseheader.errormessage)<>'';
-
 // Add PCR
 layout_pcr := RECORD
 	unsigned4 seq;
 	unsigned6 date_created;
 	risk_indicators.Layout_BocaShell_Neutral.ConsumerFlags ConsumerFlags;
 END;
-
-// for realtime XML customers, use the ESP response instead of the keys on roxie (info needs to be more current than the daily roxie keys)
-esp_response_mapped := join(outf, esp_response, 
-	left.did=(unsigned)right.dbrecords[1].lexid,
-transform(layout_pcr, 
-	self.seq := left.seq;
-	SELF.ConsumerFlags.corrected_flag := right.RecordCount>0;
-	SELF.ConsumerFlags.consumer_statement_flag := (right.dbrecords[1].consumer_statement_flag=1);
-	SELF.ConsumerFlags.dispute_flag := (right.dbrecords[1].dispute_flag=1);
-	SELF.ConsumerFlags.security_freeze := (right.dbrecords[1].security_freeze=1);
-	SELF.ConsumerFlags.security_alert := (right.dbrecords[1].security_fraud_alert=1);
-	SELF.ConsumerFlags.negative_alert := (right.dbrecords[1].negative_alert=1);
-	SELF.ConsumerFlags.id_theft_flag := (right.dbrecords[1].id_theft_flag=1);
-	self.ConsumerFlags.legal_hold_alert := false ; // PCR keys don't have legal hold
-	SELF.date_created := (unsigned)(stringlib.stringfilterout((right.dbrecords[1].date_added[1..10]), '-')) ) );
-
-
 
 layout_pcr add_flags_by_did(risk_indicators.Layout_BocaShell_Neutral le, fcra.Key_Override_PCR_DID ri) := TRANSFORM
 	SELF.ConsumerFlags.corrected_flag := true;
@@ -197,11 +172,7 @@ j2_thor := JOIN (distribute(outf, hash64(Shell_Input.ssn)),
 
 pcr_on_roxie := DEDUP(SORT(GROUP(j1)+GROUP(j2),seq,-(unsigned)date_created),seq);
 
-
-// if the gateway is populated, we know this transaction is from the ESP, use the esp_response_mapped
-// if the gateway isn't populated, we know the transaction is from Batch, use the PCR_on_roxie
-pcr_final := if(trim(mbs_gateway_url)='' or esp_response_failed, pcr_on_roxie, esp_response_mapped);
-
+pcr_final := pcr_on_roxie;  // removed all references to the MBS DOST gateway now.  Using personContext instead
 
 risk_indicators.Layout_BocaShell_Neutral add_flags(risk_indicators.Layout_BocaShell_Neutral le, pcr_final ri) := TRANSFORM
 	SELF.ConsumerFlags.corrected_flag := le.ConsumerFlags.corrected_flag OR ri.ConsumerFlags.corrected_flag;

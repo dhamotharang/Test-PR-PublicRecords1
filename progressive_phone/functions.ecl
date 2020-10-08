@@ -645,53 +645,53 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
                                              addHistPhones(LEFT,ROWS(RIGHT)));
 
     // As a temporary workaround we are getting a custom modelName (scoreModel) value in from progressive_phone_batch_service
-    // so that it can still run on Phone Shell V1 while everything else that comes through here will default to Phone Shell V2
+    // so that it can still run on Phone Shell V1 while everything else that comes through here will default to the latest Phone Shell available to products
     // The custom value from progressive_phone_batch_service is PSV1_ + the original modelName value
     // This function doesn't care what the original modelName was, but we need to determine if this came from progressive_phone_batch_service
     // in order to pass the correct Phone Shell Version parameter to the Phone_Shell_Function
-    boolean isProgressiveBatch := modelName[1..5] = 'PSV1_'; // see if this is coming from progressive_phone_batch_service
-    unsigned2 PhoneShellVersion := if(isProgressiveBatch, 10, 21); // if yes, use phone shell 1.0, else use phone shell 2.1 (current default)
-	
-	mod_access := MODULE(Doxie.IDataAccess)
-		EXPORT glb := GLB_Purpose;
-		EXPORT dppa := DPPA_Purpose;
-	END;
-	
+    BOOLEAN isProgressiveBatch := modelName[1..5] = 'PSV1_'; // see if this is coming from progressive_phone_batch_service
+    UNSIGNED2 PhoneShellVersion := IF(isProgressiveBatch, 10, 30); // if yes, use phone shell 1.0, else use phone shell 3.0 (current default/latest)
+
+	   mod_access := MODULE(Doxie.IDataAccess)
+		   EXPORT glb := GLB_Purpose;
+		   EXPORT dppa := DPPA_Purpose;
+	   END;
+
     // Returns the Phone data without the score.
     phones_with_attrs := Phone_Shell.Phone_Shell_Function(
-                              phone_shell_withphones_in,
-                              gateways_in,
-                              GLB_Purpose,
-                              DPPA_Purpose,
-                              Doxie.DataRestriction.fixed_DRM,
-                              Doxie.DataPermission.permission_mask,
-                              , // phone restriction mask
-                              , // maxphones
-                              , // ins verification age limit
-                              PhoneShellVersion, // phone shell version, default is most current (2.1 as of this coding)
-                              , // spii access level
-                              , // vertical limit
-                              , // industry class
-                              , // relocation max days before
-                              , // relocation max days after
-                              , // relocations target radius
-							 inMod.IncludeLastResort,
-							 IncludePhonesFeedback,
-							 Batch := COUNT(phone_shell_withphones_in) > 1, //if only called by batch products
-							 BlankOutDuplicatePhones := inMod.BlankOutDuplicatePhones,
-							 UsePremiumSource_A := UsePremiumSource_A,
-							 RunRelocation := RunRelocation,
-							 mod_access := mod_access);
+        phone_shell_withphones_in,
+        gateways_in,
+        GLB_Purpose,
+        DPPA_Purpose,
+        Doxie.DataRestriction.fixed_DRM,
+        Doxie.DataPermission.permission_mask,
+        , // phone restriction mask
+        , // maxphones
+        , // ins verification age limit
+        PhoneShellVersion, // phone shell version, default is most current (3.0 as of this coding)
+        , // spii access level
+        , // vertical limit
+        , // industry class
+        , // relocation max days before
+        , // relocation max days after
+        , // relocations target radius
+        inMod.IncludeLastResort,
+        IncludePhonesFeedback,
+        Batch := COUNT(phone_shell_withphones_in) > 1, //if only called by batch products
+        BlankOutDuplicatePhones := inMod.BlankOutDuplicatePhones,
+        UsePremiumSource_A := UsePremiumSource_A,
+        RunRelocation := RunRelocation,
+        mod_access := mod_access);
 
     // SCORE THE PHONES
 
     // For now, since progressive_phone_batch_service still needs to use Phone Shell V1, need to check that and
-    // retain old logic/models for them. Everyone else gets the new Phone Shell V21 model
-    model_results := if(PhoneShellVersion = 10,
-                        if(version = v_enum.CP_V3, // these are the models for Phone Shell v1.0, use the old score threshold too
-                           Phone_Shell.PhoneScore_cp3_v3(phones_with_attrs, 217),
+    // retain old logic/models for them. Everyone else gets the latest product-available Phone Shell model (currently v3.0)
+    model_results := IF(PhoneShellVersion = 10,
+                        IF(version = v_enum.CP_V3, // these are the models for Phone Shell v1.0, use the old score threshold too
+                           Phone_Shell.PhoneScore_cp3_v3(phones_with_attrs, 217),  //v_enum.CP_V3
                            Phone_Shell.PhoneScore_wf8_v3(phones_with_attrs, 217)), //v_enum.WFP_V8
-                        Phone_Shell.PhoneModel_v21_1(phones_with_attrs) // new combined model for Phone Shell v2.1+ , uses common/default score threshold
+                        Phone_Shell.PhoneModel_v30_1(phones_with_attrs) // new combined model for Phone Shell v3.0+ , uses common/default score threshold
                        );
 
     STRING2 map_source_code_phone_shell(STRING10 ph_type) := MAP
@@ -895,6 +895,44 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
       ds_src_other       := DATASET([rSource.source_code], {STRING3 src});
 
       SELF.phn_src_all   := DEDUP(SORT(ds_src_all + ds_src_eq + ds_src_lastresort + IF(ph_shell_bit = 0 AND ~EXISTS(ds_src_eq) AND ~EXISTS(ds_src_lastresort), ds_src_other, empty), src), src);
+
+      // additional Metadata attributes from the Phone Shell
+      m_line := le.Phone_Shell.Metadata.Meta_Line;
+      m_serv := le.Phone_Shell.Metadata.Meta_Serv;
+      SELF.Meta_Line := m_line;
+      SELF.Meta_Serv := m_serv;
+      SELF.Meta_Carrier_Name := le.Phone_Shell.Metadata.Meta_Carrier_Name;
+      SELF.Meta_Most_Recent_OTP_Dt := le.Phone_Shell.Metadata.Meta_Most_Recent_OTP_Dt;
+      SELF.Meta_Count_OTP_30 := le.Phone_Shell.Metadata.Meta_Count_OTP_30;
+      SELF.Meta_Count_OTP_60 := le.Phone_Shell.Metadata.Meta_Count_OTP_60;
+      SELF.Meta_Phone_Status := le.Phone_Shell.Metadata.Meta_Phone_Status;
+      SELF.Meta_Prepaid := le.Phone_Shell.Metadata.Meta_Prepaid;
+      SELF.Meta_Dt_Last_Reported := le.Phone_Shell.Metadata.Meta_Dt_Last_Reported;
+      SELF.Meta_Carrier_City  := le.Phone_Shell.Metadata.Meta_Carrier_City;
+      SELF.Meta_Carrier_State := le.Phone_Shell.Metadata.Meta_Carrier_State;
+      SELF.Meta_Carrier_Route := le.Phone_Shell.Metadata.Meta_Carrier_Route;
+      SELF.Meta_Carrier_Route_Zonecode := le.Phone_Shell.Metadata.Meta_Carrier_Route_Zonecode;
+      SELF.Meta_Operator_ID := le.Phone_Shell.Metadata.Meta_Operator_ID;
+      SELF.Meta_Carrier_ID  := le.Phone_Shell.Metadata.Meta_Carrier_ID;
+      SELF.Meta_OCN_Abbr_Name := le.Phone_Shell.Metadata.Meta_OCN_Abbr_Name;
+      SELF.Meta_Affiliated_To := le.Phone_Shell.Metadata.Meta_Affiliated_To;
+      SELF.Meta_Contact_Name  := le.Phone_Shell.Metadata.Meta_Contact_Name;
+      SELF.Meta_Contact_Address1 := le.Phone_Shell.Metadata.Meta_Contact_Address1;
+      SELF.Meta_Contact_Address2 := le.Phone_Shell.Metadata.Meta_Contact_Address2;
+      SELF.Meta_Contact_City  := le.Phone_Shell.Metadata.Meta_Contact_City;
+      SELF.Meta_Contact_State := le.Phone_Shell.Metadata.Meta_Contact_State;
+      SELF.Meta_Contact_Zip   := le.Phone_Shell.Metadata.Meta_Contact_Zip;
+      SELF.Meta_Contact_Email := le.Phone_Shell.Metadata.Meta_Contact_Email;
+      SELF.Meta_Contact_Phone := le.Phone_Shell.Metadata.Meta_Contact_Phone;
+      SELF.Meta_Contact_Fax   := le.Phone_Shell.Metadata.Meta_Contact_Fax;
+      // calculate serv-line type. This mirrors but does not exactly replicate PhoneFinder's method, since this will be available to all products.
+      // (primarily, instead of using PhoneFinder's constants which are longer and all-caps, we are using these from PHZONE-192 for more readability)
+      SELF.Meta_ServLine_Type := map(m_serv = '0' and m_line in ['0',''] => Progressive_Phone.Constants.ServLine_Types.Landline,
+                                     m_serv = '0' and m_line  =  '2'     => Progressive_Phone.Constants.ServLine_Types.Cable,
+                                     m_serv = '1' and m_line in ['1',''] => Progressive_Phone.Constants.ServLine_Types.Wireless,
+                                     m_serv = '2' and m_line in ['2',''] => Progressive_Phone.Constants.ServLine_Types.VoIP,
+                                     m_serv = '3' and m_line in ['3',''] => Progressive_Phone.Constants.ServLine_Types.Unknown,
+                                                                            Progressive_Phone.Constants.ServLine_Types.Unknown);
      //END
       SELF := [];
     END;
@@ -948,6 +986,8 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
 		// output(phones_out_temp,named('phones_out_temp'));
 		// output(phones_out1_TN,named('phones_out1_TN'));
 
+  //  output(choosen( PROJECT(phones_out1_TN, progressive_phone.layout_progressive_phone_common) , 100),named('getphonesv3_output'));
+
 		RETURN PROJECT(phones_out1_TN, progressive_phone.layout_progressive_phone_common);
 
   END;
@@ -975,5 +1015,27 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
       RETURN PROJECT(rsUnblankedPhone10, xformBlankOutByLineType(LEFT));
 
   ENDMACRO;
+
+  EXPORT UpdateWithMetadata (DATASET(progressive_phone.layout_progressive_phone_common) ds_in)
+   := FUNCTION
+
+    Progressive_Phone.Layout_Progressive_phones.common_with_meta_rec xformMeta(progressive_phone.layout_progressive_phone_common ll) := TRANSFORM
+      // we update switch type to be in sync with phone_line_type_desc
+      SELF.switch_type := CASE(ll.Meta_Serv,
+                               '0' => $.Constants.Switch_Type.Landline,
+                               '1' => $.Constants.Switch_Type.Wireless,
+                               '2' => $.Constants.Switch_Type.VoIP,
+                               '3' => $.Constants.Switch_Type.Unknown,
+                                $.Constants.Switch_Type.Unknown);
+
+      SELF.phone_line_type_desc := ll.Meta_ServLine_Type;
+      SELF.phpl_phone_carrier := ll.Meta_Carrier_Name;
+      SELF.phpl_carrier_city := ll.Meta_Carrier_City;
+      SELF.phpl_carrier_state := ll.Meta_Carrier_State;
+      SELF := ll;
+    END;
+
+    RETURN  PROJECT(ds_in, xformMeta(LEFT));
+  END;
 
 END;

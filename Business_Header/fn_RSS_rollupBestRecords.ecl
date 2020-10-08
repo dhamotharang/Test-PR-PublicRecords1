@@ -1,6 +1,6 @@
-import business_header_ss,ut,AutoStandardI, MDR, Doxie;
+import business_header_ss, MDR, Doxie;
 
-export fn_RSS_rollupBestRecords(grouped dataset(business_header.layout_biz_search.result_dateRange ) display_set, unsigned1 ROLLUP_LIMIT) := function
+export fn_RSS_rollupBestRecords(grouped dataset(business_header.layout_biz_search.result_dateRange ) display_set, doxie.IDataAccess mod_access, unsigned1 ROLLUP_LIMIT) := function
 	
 	// Get just the group IDs for all records
 	temp_group_ids_only := project(dedup(display_set,group_id,bdl),transform(business_header.layout_biz_search.no_group_info,
@@ -196,10 +196,9 @@ export fn_RSS_rollupBestRecords(grouped dataset(business_header.layout_biz_searc
 				self.bdid := right.bdid,
 				self := left),limit(100,skip));
 		// Gather all the associated records
-    glb_purpose:=AutoStandardI.InterfaceTranslator.glb_purpose.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.glb_purpose.params));
 		temp3rd := join(temp2nd,business_header_ss.Key_BH_BDID_pl,left.bdid = right.bdid and
-      ut.PermissionTools.glb.SrcOk(glb_purpose,right.source) and 
-      (right.source <> MDR.sourceTools.src_Dunn_Bradstreet OR Doxie.DataPermission.use_DNB),
+      doxie.compliance.source_ok(mod_access.glb, mod_access.DataRestrictionMask, right.source) AND
+      doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 			transform(left),limit(10000,skip));
 		// Sort and table by Group ID to count how many records are associated
 		temp4th := sort(temp3rd,list_group_id);

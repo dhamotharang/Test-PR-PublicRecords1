@@ -58,7 +58,7 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod,
     // --------------------------------------------------------------------------------------------------------------
     //              Get MIDEX Public Sanctions Data
     // --------------------------------------------------------------------------------------------------------------
-    ds_pubDidRecs  			:= MIDEX_Services.Raw_Public.fn_get_PublicSanctnDidData( in_did );
+ds_pubDidRecs  			:= MIDEX_Services.Raw_Public.fn_get_PublicSanctnDidData( in_did );
     ds_pubBdidRecs 			:= MIDEX_Services.Raw_Public.fn_get_PublicSanctnBdidData( in_bdid );
     ds_pubLinkIdRecs 		:= MIDEX_Services.Raw_Public.fn_get_PublicSanctnLinkIdData( in_linkids, mod_access, FetchLevel);
 		ds_pubBusinessRecs	:= if(MidexReportSearchType = MIDEX_SERVICES.Constants.NEW_BUSINESS_REPORT, ds_pubLinkIdRecs, ds_pubBdidRecs);
@@ -73,7 +73,7 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod,
     //              Get MIDEX License Data
     // --------------------------------------------------------------------------------------------------------------
     // combine pub and nonpub midex report numbers to make one call to the get the license data
-    ds_publicAndNonpublicMidexNumbers := DEDUP( SORT((ds_nonPubMidexReportNumbers + ds_pubMidexReportNumbers + ds_midexReportNumberIn), midex_rpt_nbr), midex_rpt_nbr);
+	 ds_publicAndNonpublicMidexNumbers := DEDUP( SORT((ds_nonPubMidexReportNumbers + ds_pubMidexReportNumbers + ds_midexReportNumberIn), midex_rpt_nbr), midex_rpt_nbr);
     ds_mari_rids := CASE( MidexReportSearchType, MIDEX_SERVICES.Constants.PERSON_REPORT   		=> MIDEX_Services.Raw_ProfessionalLicenses.fn_get_ProfLicMari_DidData  ( in_did ),
                                                  MIDEX_SERVICES.Constants.BUSINESS_REPORT 		=> MIDEX_Services.Raw_ProfessionalLicenses.fn_get_ProfLicMari_BdidData ( in_bdid ), 
                                                  MIDEX_SERVICES.Constants.NEW_BUSINESS_REPORT => MIDEX_Services.Raw_ProfessionalLicenses.fn_get_ProfLicMari_LinkIdData ( in_linkids, mod_access, fetchLevel ), 
@@ -105,13 +105,13 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod,
     // --------------------------------------------------------------------------------------------------------------
     //              Business SmartLinx Data
     // --------------------------------------------------------------------------------------------------------------
-    rec_smartLinxBusinessRecs_raw	:= IF(MidexReportSearchType = MIDEX_SERVICES.Constants.BUSINESS_REPORT, MIDEX_Services.SmartLinx_Business_Sections(in_mod.bdid, include_SourceDocs, mod_access.SSN_Mask)); 
+    rec_smartLinxBusinessRecs_raw	:= IF(MidexReportSearchType = MIDEX_SERVICES.Constants.BUSINESS_REPORT, MIDEX_Services.SmartLinx_Business_Sections(in_mod.bdid, mod_access, include_SourceDocs, in_mod.includeVendorSourceB)); 
     rec_smartLinxBusinessRecs			:= PROJECT( rec_smartLinxBusinessRecs_raw, MIDEX_Services.Functions.xfm_setSmartLinxBusinessFormat( LEFT ));
 
     // --------------------------------------------------------------------------------------------------------------
     //              TopBusiness Data
     // --------------------------------------------------------------------------------------------------------------
-		rec_topBusinessRecs_bip_raw := IF(MidexReportSearchType = MIDEX_SERVICES.Constants.NEW_BUSINESS_REPORT, MIDEX_Services.TopBusiness_Sections(in_linkids, mod_access, in_mod.BusinessIDFetchLevel)); 
+		rec_topBusinessRecs_bip_raw := IF(MidexReportSearchType = MIDEX_SERVICES.Constants.NEW_BUSINESS_REPORT, MIDEX_Services.TopBusiness_Sections(in_linkids, mod_access, in_mod.BusinessIDFetchLevel, in_mod.includeVendorSourceB)); 
     rec_topBusinessRecs 				:= PROJECT(rec_topBusinessRecs_bip_raw, iesp.midexcompreport.t_MIDEXCompTopBusinessRecord)[1];
 
     // --------------------------------------------------------------------------------------------------------------
@@ -120,7 +120,7 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod,
 		smartLinx_pers_options	:= MODULE(PROJECT(in_mod,Midex_Services.Iparam.smartLinxPersonIncludeOptions))	END;
     
 		rec_smartLinxPersonRecs_raw := IF(MidexReportSearchType = MIDEX_SERVICES.Constants.PERSON_REPORT, 
-                                      PROJECT(MIDEX_Services.SmartLinx_Person_Sections(in_mod.did, include_SourceDocs, smartLinx_pers_options), 
+                                      PROJECT(MIDEX_Services.SmartLinx_Person_Sections(in_mod.did, include_SourceDocs, smartLinx_pers_options, in_mod.includeVendorSourceB), 
                                               MIDEX_Services.Layouts.rec_SmartLinxPersonWithSources ));
 
     // since this is a single record coming back, but send only first row to function for layout transform
@@ -231,51 +231,51 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod,
     MIDEX_Services.Layouts.monitor_layout xfm_hashTemp := 
       TRANSFORM
         SELF.report_number                 := reportNumber;
-        SELF.address_hash                  := SmartlinxAlertCalc.address_hash;
-        SELF.all_hash                      := 0;
-        SELF.bankruptcy_hash               := smartlinxAlertCalc.bankruptcy_hash;
-        SELF.criminal_hash                 := smartlinxAlertCalc.criminal_hash;
-        SELF.incident_hash                 := incidentHashCombined;
-        SELF.prev_license_status_hash      := (UNSIGNED8)ds_licenseHashRollup[1].prev_license_status_hash;
-        SELF.license_status_hash           := (UNSIGNED8)ds_licenseHashRollup[1].license_status_hash;
-        SELF.lien_judgment_hash            := smartlinxAlertCalc.lien_judgment_hash;
-        SELF.name_hash                     := smartlinxAlertCalc.name_hash;
-        SELF.nmls_id_hash                  := (UNSIGNED8)ds_licenseHashRollup[1].nmls_id_hash;
-        SELF.Disciplinary_hash             := (UNSIGNED8)ds_licenseHashRollup[1].Disciplinary_hash;
-        SELF.Registration_hash             := (UNSIGNED8)ds_licenseHashRollup[1].Registration_hash;
-        SELF.Represent_hash                := (UNSIGNED8)ds_licenseHashRollup[1].Represent_hash;
-				// SELF.AKA_and_name_variation_hash	 := (UNSIGNED8)ds_licenseHashRollup[1].AKA_and_name_variation_hash;
-        SELF.phone_hash                    := smartlinxAlertCalc.phone_hash;
-				SELF.email_hash										 := smartlinxAlertCalc.email_hash;
-				SELF.property_hash								 := smartlinxAlertCalc.property_hash;
-				SELF.relative_hash								 := smartlinxAlertCalc.relative_hash;
-				SELF.bus_associate_hash						 := smartlinxAlertCalc.bus_associate_hash;
-				SELF.employer_hash								 := smartlinxAlertCalc.employer_hash;
-				SELF.name_variation_hash					 := smartlinxAlertCalc.name_variation_hash;
-				SELF.executive_hash								 := smartlinxAlertCalc.executive_hash;
-				SELF.SOS_hash											 := smartlinxAlertCalc.SOS_hash;
-        SELF.passed_all_hash               := '0';
-        SELF.passed_address_hash           := in_mod.addressHash;
-        SELF.passed_license_hash           := '0';
-        SELF.passed_license_status_hash    := in_mod.licenseStatHash;
-        SELF.passed_name_hash              := in_mod.nameHash;
-        SELF.passed_incident_hash          := in_mod.incidentHash;
-        SELF.passed_phone_hash             := in_mod.phoneHash;  
-        SELF.passed_bankruptcy_hash        := in_mod.bankruptcyHash;
-        SELF.passed_criminal_hash          := in_mod.criminalHash;
-        SELF.passed_lien_judgment_hash     := in_mod.lienJudgmentHash;
-        SELF.passed_nmls_ID_hash           := in_mod.nmlsIdHash;
-        SELF.passed_Represent_hash         := in_mod.RepresentHash;
-        SELF.passed_Registration_hash      := in_mod.RegistrationHash;
-        SELF.passed_Disciplinary_hash      := in_mod.DisciplinaryHash;
-				SELF.passed_email_hash						 := in_mod.EmailHash;
-				SELF.passed_property_hash					 := in_mod.PropertyHash;
-				SELF.passed_relative_hash					 := in_mod.RelativeHash;
-				SELF.passed_bus_associate_hash		 := in_mod.BusAssociateHash;
-				SELF.passed_employer_hash					 := in_mod.EmployerHash;
-				SELF.passed_name_variation_hash		 := in_mod.NameVariationHash;
-				SELF.passed_executive_hash				 := in_mod.ExecutiveHash;
-				SELF.passed_SOS_hash							 := in_mod.SOSHash;
+           SELF.address_hash                  := SmartlinxAlertCalc.address_hash;
+           SELF.all_hash                      := 0;
+           SELF.bankruptcy_hash               := smartlinxAlertCalc.bankruptcy_hash;
+           SELF.criminal_hash                 := smartlinxAlertCalc.criminal_hash;
+           SELF.incident_hash                 := incidentHashCombined;
+           SELF.prev_license_status_hash      := (UNSIGNED8)ds_licenseHashRollup[1].prev_license_status_hash;
+           SELF.license_status_hash           := (UNSIGNED8)ds_licenseHashRollup[1].license_status_hash;
+           SELF.lien_judgment_hash            := smartlinxAlertCalc.lien_judgment_hash;
+           SELF.name_hash                     := smartlinxAlertCalc.name_hash;
+           SELF.nmls_id_hash                  := (UNSIGNED8)ds_licenseHashRollup[1].nmls_id_hash;
+           SELF.Disciplinary_hash             := (UNSIGNED8)ds_licenseHashRollup[1].Disciplinary_hash;
+           SELF.Registration_hash             := (UNSIGNED8)ds_licenseHashRollup[1].Registration_hash;
+           SELF.Represent_hash                := (UNSIGNED8)ds_licenseHashRollup[1].Represent_hash;
+   				// SELF.AKA_and_name_variation_hash	 := (UNSIGNED8)ds_licenseHashRollup[1].AKA_and_name_variation_hash;
+           SELF.phone_hash                    := smartlinxAlertCalc.phone_hash;
+   				SELF.email_hash										 := smartlinxAlertCalc.email_hash;
+   				SELF.property_hash								 := smartlinxAlertCalc.property_hash;
+   				SELF.relative_hash								 := smartlinxAlertCalc.relative_hash;
+   				SELF.bus_associate_hash						 := smartlinxAlertCalc.bus_associate_hash;
+   				SELF.employer_hash								 := smartlinxAlertCalc.employer_hash;
+   				SELF.name_variation_hash					 := smartlinxAlertCalc.name_variation_hash;
+   				SELF.executive_hash								 := smartlinxAlertCalc.executive_hash;
+   				SELF.SOS_hash											 := smartlinxAlertCalc.SOS_hash;
+           SELF.passed_all_hash               := '0';
+           SELF.passed_address_hash           := in_mod.addressHash;
+           SELF.passed_license_hash           := '0';
+           SELF.passed_license_status_hash    := in_mod.licenseStatHash;
+           SELF.passed_name_hash              := in_mod.nameHash;
+           SELF.passed_incident_hash          := in_mod.incidentHash;
+           SELF.passed_phone_hash             := in_mod.phoneHash;  
+           SELF.passed_bankruptcy_hash        := in_mod.bankruptcyHash;
+           SELF.passed_criminal_hash          := in_mod.criminalHash;
+           SELF.passed_lien_judgment_hash     := in_mod.lienJudgmentHash;
+           SELF.passed_nmls_ID_hash           := in_mod.nmlsIdHash;
+           SELF.passed_Represent_hash         := in_mod.RepresentHash;
+           SELF.passed_Registration_hash      := in_mod.RegistrationHash;
+           SELF.passed_Disciplinary_hash      := in_mod.DisciplinaryHash;
+   				SELF.passed_email_hash						 := in_mod.EmailHash;
+   				SELF.passed_property_hash					 := in_mod.PropertyHash;
+   				SELF.passed_relative_hash					 := in_mod.RelativeHash;
+   				SELF.passed_bus_associate_hash		 := in_mod.BusAssociateHash;
+   				SELF.passed_employer_hash					 := in_mod.EmployerHash;
+   				SELF.passed_name_variation_hash		 := in_mod.NameVariationHash;
+   				SELF.passed_executive_hash				 := in_mod.ExecutiveHash;
+   				SELF.passed_SOS_hash							 := in_mod.SOSHash;
         SELF                               := [];    
       END;
                      
@@ -363,14 +363,14 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod,
     ds_blankHash   := DATASET([xfm_formatInto_Monitor_layout(FALSE)]);
     ds_deletedHash := DATASET([xfm_formatInto_Monitor_layout(TRUE)]);
     sanctionsExist := ( EXISTS(ds_MidexPublicResults)     OR 
-                        EXISTS(ds_MidexNonpublicResults)  OR
-                        EXISTS(ds_MidexFreddieMacResults) OR
-                        EXISTS(ds_MidexLicenseResults) );
+                           EXISTS(ds_MidexNonpublicResults)  OR
+                           EXISTS(ds_MidexFreddieMacResults) OR
+                           EXISTS(ds_MidexLicenseResults) );
                        
     ds_hashCalcWithDelete := MAP( in_mod.EnableAlert AND sanctionsExist     => ds_hash_calcs,
-                                  in_mod.EnableAlert AND NOT sanctionsExist => ds_deletedHash,
-                                  ds_blankHash
-                               );                                                                                                                                                                                                            
+                                        in_mod.EnableAlert AND NOT sanctionsExist => ds_deletedHash,
+                                        ds_blankHash
+                                     );                                                                                                                                                                                                            
 
     // If an alert report request is made and the document/report isn't found anymore, then return
     // a record with the record deleted flag set to true.

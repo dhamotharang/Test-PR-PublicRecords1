@@ -87,7 +87,6 @@ MODULE
 		EXPORT BOOLEAN UseTransUnionPVS       := FALSE;
 		EXPORT BOOLEAN IncludeInhousePhones   := FALSE;
 		EXPORT BOOLEAN UseInhousePhones       := FALSE;
-    EXPORT BOOLEAN IncludePortingDetails      := FALSE;
 
     //zumigo options
     EXPORT BOOLEAN NameAddressValidation        := FALSE;
@@ -228,7 +227,7 @@ MODULE
       EXPORT BOOLEAN UseTargus          		 := (TransactionType = $.Constants.TransType.Ultimate OR IncludeTargus) AND ~doxie.compliance.isPhoneFinderTargusRestricted(drm);
 
       EXPORT BOOLEAN IncludeEquifax          := pfOptions.IncludeEquifax;
-      EXPORT BOOLEAN UseEquifax         		 := (TransactionType = $.Constants.TransType.Ultimate OR IncludeEquifax) AND ~doxie.compliance.isPhoneMartRestricted(drm);
+      EXPORT BOOLEAN UseEquifax         		 := (TransactionType = $.Constants.TransType.Ultimate OR IncludeEquifax) AND ~doxie.compliance.isPhoneMartRestricted(drm) AND mod_access.isValidGLB();
 
       EXPORT BOOLEAN IncludeTransUnionIQ411  := pfOptions.IncludeTransUnionIQ411;
       EXPORT BOOLEAN IncludeTransUnionPVS    := pfOptions.IncludeTransUnionPVS;
@@ -291,7 +290,6 @@ MODULE
       EXPORT BOOLEAN hasActivePhoneTransactionCountRule := IncludeRiskIndicators AND EXISTS(RiskIndicators(RiskId = $.Constants.RiskRules.PhoneTransactionCount AND ACTIVE));
       EXPORT BOOLEAN IsGovsearch := application_type in AutoStandardI.Constants.GOV_TYPES;
       EXPORT BOOLEAN SuppressRiskIndicatorWarnStatus            :=  pfOptions.SuppressRiskIndicatorWarnStatus : STORED('SuppressRiskIndicatorWarnStatus'); // Need to read from stored for options defined in MBS for API transactions as they would come under the root tag;
-      EXPORT BOOLEAN IncludePortingDetails            := pfOptions.IncludePortingDetails : STORED('IncludePortingDetails');
     END;
 
     RETURN in_params;
@@ -325,7 +323,7 @@ MODULE
       EXPORT BOOLEAN   UseInHouseQSent     := doxie.compliance.use_QSent(dpm) AND TransactionType <> $.Constants.TransType.PHONERISKASSESSMENT;
       EXPORT BOOLEAN   UseQSent            := ~doxie.compliance.isQSentRestricted(drm) AND TransactionType IN [$.Constants.TransType.Premium,$.Constants.TransType.Ultimate];
       EXPORT BOOLEAN   UseTargus           := ~doxie.compliance.isPhoneFinderTargusRestricted(drm) AND TransactionType = $.Constants.TransType.Ultimate;
-      EXPORT BOOLEAN   UseEquifax          := ~doxie.compliance.isPhoneMartRestricted(drm) AND TransactionType = $.Constants.TransType.Ultimate;
+      EXPORT BOOLEAN   UseEquifax          := ~doxie.compliance.isPhoneMartRestricted(drm) AND TransactionType = $.Constants.TransType.Ultimate AND mod_access.isValidGLB();
       EXPORT BOOLEAN   useWaterfallv6			 := FALSE : STORED('useWaterfallv6');//internal
       EXPORT BOOLEAN   IncludePhoneMetadata:= FALSE : STORED('IncludePhoneMetadata');
 
@@ -407,8 +405,7 @@ MODULE
                                                       IncludeDeviceInfo OR IncludeDeviceChangeInfo;
       EXPORT BOOLEAN UseZumigoIdentity	          := IncludeZumigoOptions AND BillingId <>'' AND doxie.compliance.use_ZumigoIdentity(dpm);
       EXPORT BOOLEAN IsGovsearch := mod_access.application_type in AutoStandardI.Constants.GOV_TYPES;
-      EXPORT BOOLEAN SuppressRiskIndicatorWarnStatus :=  FALSE : STORED('SuppressRiskIndicatorWarnStatus');
-      EXPORT BOOLEAN IncludePortingDetails               := FALSE : STORED('IncludePortingDetails');
+      EXPORT BOOLEAN SuppressRiskIndicatorWarnStatus                 :=  FALSE : STORED('SuppressRiskIndicatorWarnStatus');
     END;
 
     RETURN input_Mod;

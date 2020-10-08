@@ -1,4 +1,4 @@
-﻿﻿export Layout_Fares_Foreclosure := record
+export Layout_Fares_Foreclosure := record
 string70	foreclosure_id;
 string2		state;
 string3		county;

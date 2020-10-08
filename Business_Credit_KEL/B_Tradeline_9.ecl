@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 0.8.2
-IMPORT KEL08a AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
+IMPORT KEL12 AS KEL;
 IMPORT B_Tradeline_10,CFG_graph FROM Business_Credit_KEL;
-IMPORT * FROM KEL08a.Null;
+IMPORT * FROM KEL12.Null;
 EXPORT B_Tradeline_9(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __cfg = CFG_graph) := MODULE
   SHARED VIRTUAL TYPEOF(B_Tradeline_10(__in,__cfg).__ENH_Tradeline_10) __ENH_Tradeline_10 := B_Tradeline_10(__in,__cfg).__ENH_Tradeline_10;
-  SHARED __EE148038 := __ENH_Tradeline_10;
-  EXPORT __ST147852_Layout := RECORD
+  SHARED __EE282218 := __ENH_Tradeline_10;
+  EXPORT __ST252235_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nkdate _load__date_;
     KEL.typ.nstr _sbfe__contributor__number_;
@@ -35,6 +35,8 @@ EXPORT B_Tradeline_9(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph
     KEL.typ.nunk _reporting__indicator__length_;
     KEL.typ.nstr _payment__interval_;
     KEL.typ.nstr _payment__status__category_;
+    KEL.typ.nint D_B_T___V5_;
+    KEL.typ.nstr _ln__delinquency__date_;
     KEL.typ.nunk _term__of__account__in__months_;
     KEL.typ.nkdate _first__payment__due__date_;
     KEL.typ.nkdate _final__pyament__due__date_;
@@ -98,10 +100,10 @@ EXPORT B_Tradeline_9(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph
     KEL.typ.nbool Shows_Closed_Account_;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST147852_Layout __ND148541__Project(B_Tradeline_10(__in,__cfg).__ST141048_Layout __PP148041) := TRANSFORM
-    __CC774 := ['009','011'];
-    SELF.Is_Chargeoff_ := __OR(__OR(__OR(__OR(__OR(__AND(__NOT(__NT(__PP148041._date__account__was__charged__off_)),__OP2(__PP148041._date__account__was__charged__off_,<=,__CN(__cfg.CurrentDate))),__OP2(__PP148041._amount__charged__off__by__creditor_,>,__CN(0))),__NOT(__NT(__PP148041._charge__off__type__indicator_))),__OP2(__PP148041._total__charge__off__recoveries__to__date_,>,__CN(0))),__OP2(__PP148041._account__status__1_,IN,__CN(__CC774))),__OP2(__PP148041._account__status__2_,IN,__CN(__CC774)));
-    SELF := __PP148041;
+  SHARED __ST252235_Layout __ND282329__Project(B_Tradeline_10(__in,__cfg).__ST252469_Layout __PP281723) := TRANSFORM
+    __CC763 := ['009','011','032'];
+    SELF.Is_Chargeoff_ := __OR(__OR(__OR(__OR(__OR(__AND(__NOT(__NT(__PP281723._date__account__was__charged__off_)),__OP2(__PP281723._date__account__was__charged__off_,<=,__CN(__cfg.CurrentDate))),__OP2(__PP281723._amount__charged__off__by__creditor_,>,__CN(0))),__NOT(__NT(__PP281723._charge__off__type__indicator_))),__OP2(__PP281723._total__charge__off__recoveries__to__date_,>,__CN(0))),__OP2(__PP281723._account__status__1_,IN,__CN(__CC763))),__OP2(__PP281723._account__status__2_,IN,__CN(__CC763)));
+    SELF := __PP281723;
   END;
-  EXPORT __ENH_Tradeline_9 := PROJECT(__EE148038,__ND148541__Project(LEFT));
+  EXPORT __ENH_Tradeline_9 := PROJECT(__EE282218,__ND282329__Project(LEFT));
 END;

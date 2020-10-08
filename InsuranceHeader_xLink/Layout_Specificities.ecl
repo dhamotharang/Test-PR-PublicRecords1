@@ -1,4 +1,4 @@
-﻿IMPORT SALT37;
+﻿IMPORT SALT311;
 EXPORT Layout_Specificities := MODULE
 SHARED L := Layout_InsuranceHeader;
 EXPORT SNAME_ChildRec := RECORD
@@ -152,7 +152,12 @@ EXPORT ADDRESS_ChildRec := RECORD
   UNSIGNED4 id;
 END;
 EXPORT RES_ChildRec := RECORD
-  SALT37.StrType Basis;
+  SALT311.StrType Basis;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
+EXPORT VINATTR_ChildRec := RECORD
+  SALT311.StrType Basis;
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
@@ -282,5 +287,9 @@ EXPORT R := RECORD,MAXLENGTH(32000)
   REAL4 RES_switch;
   REAL4 RES_maximum;
   DATASET(RES_ChildRec) nulls_RES {MAXCOUNT(100)};
+  REAL4 VINATTR_specificity;
+  REAL4 VINATTR_switch;
+  REAL4 VINATTR_maximum;
+  DATASET(VINATTR_ChildRec) nulls_VINATTR {MAXCOUNT(100)};
 END;
 END;

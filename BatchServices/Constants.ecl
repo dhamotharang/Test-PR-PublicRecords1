@@ -349,6 +349,8 @@ EXPORT Constants := MODULE
 	 
 	EXPORT set of string classification_Entity_Evidence := ['NONE','SECONDARY'];
 													
+	EXPORT STRING12 V3FDN_FILTER := 'V3FDN_FILTER';
+
 	end;
 													
 	export  Didville := module

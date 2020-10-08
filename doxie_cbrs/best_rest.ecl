@@ -1,55 +1,55 @@
-import Business_Header,doxie_cbrs_raw;
+IMPORT doxie_cbrs, doxie_cbrs_raw;
 doxie_cbrs.mac_Selection_Declare()
 
-export best_rest(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
-
-srcrec := record
-	boolean isRel := false;
-	boolean isOAA := false;
-	boolean isByC := false;
-	boolean isNMV := false;  //name variations
-	doxie_cbrs.Layout_BH_Best_String;
-	unsigned6 did := 0;
-	unsigned2 score := 0;
-	//Business_Header.Layout_BH_Best
-end;
+EXPORT best_rest(DATASET(doxie_cbrs.layout_references) bdids) := FUNCTION
+mod_access := Doxie.compliance.GetGlobalDataAccessModule();
+srcrec := RECORD
+  BOOLEAN isRel := FALSE;
+  BOOLEAN isOAA := FALSE;
+  BOOLEAN isByC := FALSE;
+  BOOLEAN isNMV := FALSE; //name variations
+  doxie_cbrs.Layout_BH_Best_String;
+  UNSIGNED6 did := 0;
+  UNSIGNED2 score := 0;
+  //Business_Header.Layout_BH_Best
+END;
 
 //***** others at address
 relbdids := doxie_cbrs.Associated_Business_bdids();
-srcrec markem1(relbdids l) := transform
-	self.isOAA := true;
-	self.bdid := l.bdid;
-	self := [];
-end;
+srcrec markem1(relbdids l) := TRANSFORM
+  SELF.isOAA := TRUE;
+  SELF.bdid := l.bdid;
+  SELF := [];
+END;
 
-wsource1 := project(relbdids(doxie_Cbrs.is_InOAA(relbdids)), markem1(left));
+wsource1 := PROJECT(relbdids(doxie_Cbrs.is_InOAA(relbdids)), markem1(LEFT));
 
 
 //***** name variations
 nmvbdids := doxie_cbrs_raw.name_variations(Include_NameVariations_val, Max_NameVariations_val).records;
-srcrec marknmv(nmvbdids l) := transform
-	self.isNMV := true;
-	self.bdid := l.bdid;
-	self := [];
-end;
+srcrec marknmv(nmvbdids l) := TRANSFORM
+  SELF.isNMV := TRUE;
+  SELF.bdid := l.bdid;
+  SELF := [];
+END;
 
-wsourcenmv := project(nmvbdids, marknmv(left));
+wsourcenmv := PROJECT(nmvbdids, marknmv(LEFT));
 
 
-//***** contact affiliation 
+//***** contact affiliation
 bycbdids := doxie_cbrs.Associated_Business_byContact_bdids(bdids);
-srcrec markem2(bycbdids l) := transform
-	self.isByC := true;
-	self.bdid := l.bdid;
-	self.did := l.did;
-	self.score := l.score;
-	self := [];
-end;	
+srcrec markem2(bycbdids l) := TRANSFORM
+  SELF.isByC := TRUE;
+  SELF.bdid := l.bdid;
+  SELF.did := l.did;
+  SELF.score := l.score;
+  SELF := [];
+END;
 
-wsource2 := project(bycbdids, markem2(left));
+wsource2 := PROJECT(bycbdids, markem2(LEFT));
 
-wsource := dedup(sort(wsource1 & wsourcenmv & wsource2, bdid, isByC), bdid);	//this drops the ByC where already 
-doxie_cbrs.mac_best_records(wsource, best_info, srcrec)
+wsource := DEDUP(SORT(wsource1 & wsourcenmv & wsource2, bdid, isByC), bdid); //this drops the ByC where already
+doxie_cbrs.mac_best_records(wsource, best_info, mod_access, srcrec)
 
-return best_info;
+RETURN best_info;
 END;

@@ -1,7 +1,10 @@
 ﻿IMPORT codes;
+IMPORT KEL13 AS KEL;
 
 EXPORT DPPA_Permits := MODULE
-
+	
+	EXPORT BitOr(DATA57 a, DATA57 b) := KEL.Permits.BitOr(a, b);
+	
 	// Any states listed in this key are RESTRICTED with the DPPA value indicated in the Code field.
 	// We also need to differentiate whether the source is Experian or not.
 	SHARED DPPACodes := codes.key_codes_v3(KEYED(file_name='GENERAL') AND KEYED(field_name IN ['DL-PURPOSE', 'EXPERIAN-DL-PURPOSE']));
@@ -57,35 +60,36 @@ EXPORT DPPA_Permits := MODULE
 
 	// CheckDPPAPermits takes the an input DPPA value, and sets each KEL DPM DPPAGroup bit to 1 which the given DPPA value should give us access to 
 	// based on the DPPAGroups defined above.
-	EXPORT CheckDPPAPermits(FieldName, isFCRA) := FUNCTIONMACRO
+	EXPORT CheckDPPAPermits(FieldName, isFCRA, KELPermissions) := FUNCTIONMACRO
 		DPPA_Permits :=
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[1].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup1) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[2].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup2) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[3].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup3) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[4].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup4) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[5].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup5) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[6].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup6) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[7].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup7) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[8].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup8) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[9].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup9) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[10].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup10) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[11].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup11) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[12].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup12) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[13].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup13) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[14].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup14) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[15].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup15) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[16].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup16) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[17].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup17) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[18].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup18) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[19].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup19) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[20].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup20) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[21].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup21) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[22].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup22) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[23].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup23) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[24].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup24) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[25].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup25) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[26].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup26) |
-				IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[27].FieldName = TRUE, 0, KELPermissions.Permit_DPPAGroup27);
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[1].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup1) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[2].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup2) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[3].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup3) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[4].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup4) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[5].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup5) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[6].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup6) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[7].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup7) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[8].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup8) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[9].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup9) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[10].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup10) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[11].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup11) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[12].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup12) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[13].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup13) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[14].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup14) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[15].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup15) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[16].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup16) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[17].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup17) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[18].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup18) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[19].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup19) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[20].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup20) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[21].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup21) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[22].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup22) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[23].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup23) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[24].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup24) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[25].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup25) ,
+				BitOr(IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[26].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup26) ,
+							IF(NOT isFCRA AND PublicRecords_KEL.ECL_Functions.DPPA_Permits.DPPAGroups[27].FieldName = TRUE, KELPermissions.Permit__NONE, KELPermissions.Permit_DPPAGroup27)
+							))))))))))))))))))))))))));
 			
 		RETURN DPPA_Permits;	
 	ENDMACRO;

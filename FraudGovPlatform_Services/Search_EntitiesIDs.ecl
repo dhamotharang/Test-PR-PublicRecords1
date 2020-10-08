@@ -261,48 +261,32 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 		RETURN ds_ZipIds;
 	END;
 	
-	EXPORT GetIPRangeIds(unsigned1 octet1, unsigned1 octet2, unsigned1 octet3, unsigned1 octet4, 
-												boolean isIPRange123, boolean isIPRange12, boolean isIPRange1) := FUNCTION
+  EXPORT GetIPRangeIds(string ip_address) := FUNCTION
+      wildchar := FraudGovPlatform_Services.Constants.IP_ADDRESS_ELEMENT.IP_ADDRESS_WILD_CHAR;
 
-		ds_IPRangeIds123 := JOIN(ds_batch_in, FraudShared.Key_IPRange(fraud_platform),
-														KEYED(octet1 = RIGHT.octet1 AND octet2 = RIGHT.octet2 AND octet3 = RIGHT.octet3),
-														 TRANSFORM(FraudShared_Services.Layouts.Recid_rec,
-															SELF.acctno := IF(filterBy_entity_type AND RIGHT.Entity_type_id <> FraudShared_Services.Constants.EntityTypes_Enum.PERSON, 
-																SKIP, 
-																LEFT.acctno),
-															SELF := RIGHT,
-															SELF := LEFT,
-															SELF := []),
-														LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
-														
-		ds_IPRangeIds12  := JOIN(ds_batch_in, FraudShared.Key_IPRange(fraud_platform),
-														KEYED(octet1 = RIGHT.octet1 AND octet2 = RIGHT.octet2),
-														 TRANSFORM(FraudShared_Services.Layouts.Recid_rec,
-															SELF.acctno := IF(filterBy_entity_type AND RIGHT.Entity_type_id <> FraudShared_Services.Constants.EntityTypes_Enum.PERSON, 
-																SKIP, 
-																LEFT.acctno),
-															SELF := RIGHT,
-															SELF := LEFT,
-															SELF := []),
-														LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
-														
-		ds_IPRangeIds1   := JOIN(ds_batch_in, FraudShared.Key_IPRange(fraud_platform),
-														KEYED(octet1 = RIGHT.octet1),
-														 TRANSFORM(FraudShared_Services.Layouts.Recid_rec,
-															SELF.acctno := IF(filterBy_entity_type AND RIGHT.Entity_type_id <> FraudShared_Services.Constants.EntityTypes_Enum.PERSON, 
-																SKIP, 
-																LEFT.acctno),
-															SELF := RIGHT,
-															SELF := LEFT,
-															SELF := []),
-														LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
-		
-		ds_IPRangeIds := MAP (validInput(in_rec.ip_address) AND isIPRange123 => ds_IPRangeIds123,
-													validInput(in_rec.ip_address) AND isIPRange12	=> ds_IPRangeIds12,
-													validInput(in_rec.ip_address) AND isIPRange1 => ds_IPRangeIds1,
-													DATASET([], FraudShared_Services.Layouts.Recid_rec));
-												
-		RETURN ds_IPRangeIds;
+      ds_IPRangeIds := IF(validInput(ip_address),
+                          JOIN(ds_batch_in, FraudShared.Key_IPRange(fraud_platform),
+                             KEYED((unsigned1) ip_address[1] = RIGHT.Digit1 AND
+                                   (unsigned1) ip_address[2] = RIGHT.Digit2 AND
+                                   (unsigned1) ip_address[3] = RIGHT.Digit3 AND
+                                   (unsigned1) ip_address[4] = RIGHT.Digit4 AND
+                                   (unsigned1) ip_address[5] = RIGHT.Digit5 AND
+                                   (unsigned1) ip_address[6] = RIGHT.Digit6 AND
+                                    if(ip_address[7] NOT IN wildchar, (unsigned1) ip_address[7] = RIGHT.Digit7, true) AND     
+                                    if(ip_address[8] NOT IN wildchar, (unsigned1) ip_address[8] = RIGHT.Digit8, true) AND     
+                                    if(ip_address[9] NOT IN wildchar, (unsigned1) ip_address[9] = RIGHT.Digit9, true) AND     
+                                    if(ip_address[10] NOT IN wildchar, (unsigned1) ip_address[10] = RIGHT.Digit10, true) AND     
+                                    if(ip_address[11] NOT IN wildchar, (unsigned1) ip_address[11] = RIGHT.Digit11, true) AND     
+                                    if(ip_address[12] NOT IN wildchar, (unsigned1) ip_address[12] = RIGHT.Digit12, true)),
+                             TRANSFORM(FraudShared_Services.Layouts.Recid_rec,
+                               SELF.acctno := LEFT.acctno,
+                               SELF := RIGHT,
+                               SELF := LEFT,
+                               SELF := []),
+                             LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP)),
+                       dataset([], FraudShared_Services.Layouts.Recid_rec));
+
+														RETURN ds_IPRangeIds;
 	END;
 
 	EXPORT GetDriverLicenses() := FUNCTION

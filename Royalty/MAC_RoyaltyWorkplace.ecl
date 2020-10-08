@@ -9,9 +9,10 @@ export MAC_RoyaltyWorkplace(inf, royal_out, src = 'source') := macro
   string2 SalesChannel_src_code := MDR.sourceTools.src_SalesChannel;
   string2 Thrive_LT_src_code    := MDR.sourceTools.src_Thrive_LT;
   string2 Thrive_PD_src_code    := MDR.sourceTools.src_Thrive_PD;
+  string2 Netwise_src_code      := MDR.sourceTools.src_Netwise;
   
   #uniquename(WP_RoyalSources)
-  %WP_RoyalSources% := [/*OneClick_src_code,*/ TeleTrack_src_code, SalesChannel_src_code, Thrive_LT_src_code, Thrive_PD_src_code];
+  %WP_RoyalSources% := [/*OneClick_src_code,*/ TeleTrack_src_code, SalesChannel_src_code, Thrive_LT_src_code, Thrive_PD_src_code, Netwise_src_code];
 
   #uniquename(WP_NonRoyaltyCount)
   %WP_NonRoyaltyCount% := count(inf(src not in %WP_RoyalSources%));
@@ -40,6 +41,10 @@ export MAC_RoyaltyWorkplace(inf, royal_out, src = 'source') := macro
                             {Royalty.Constants.RoyaltyCode.WORKPLACE_TP,
                             Royalty.Constants.RoyaltyType.WORKPLACE_TP,
                             count(inf(src  = Thrive_PD_src_code)),
+                            %WP_NonRoyaltyCount%},
+                            {Royalty.Constants.RoyaltyCode.NETWISE_EMAIL,
+                            Royalty.Constants.RoyaltyType.NETWISE_EMAIL,
+                            count(inf(src  = Netwise_src_code)),
                             %WP_NonRoyaltyCount%}
                           ], Royalty.Layouts.Royalty));
 endmacro;

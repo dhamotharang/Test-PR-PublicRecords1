@@ -75,6 +75,7 @@ export t_B2BTradeAcctDetail := record
 end;
 		
 export t_B2BTradeData := record
+	iesp.share.t_Date RecentTradeDate {xpath('RecentTradeDate')};
 	iesp.businesscreditreport.t_BusinessCreditTradeSummary TradeSummary {xpath('TradeSummary')};
 	iesp.businesscreditreport.t_BusinessCreditPaymentSummary CurrentPaymentSummary {xpath('CurrentPaymentSummary')};
 	t_DatedPaymentSummaryEx PaymentSummary {xpath('PaymentSummary')};

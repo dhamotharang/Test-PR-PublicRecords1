@@ -1,6 +1,6 @@
-IMPORT autoStandardI, bankruptcyv2_services, business_header, doxie_cbrs, iesp;
+﻿IMPORT business_header, doxie, doxie_cbrs, iesp;
 
-EXPORT SmartLinx_Business_Sections ( STRING12 in_bdid, BOOLEAN include_SourceDocs = FALSE, STRING SSNMask ) :=
+EXPORT SmartLinx_Business_Sections ( STRING12 in_bdid, doxie.IDataAccess mod_access, BOOLEAN include_SourceDocs = FALSE, BOOLEAN includeBlackKnight = FALSE ) :=
   FUNCTION
    
     // NOTE:  The constants, max values declared, and the calls to get the records for each section 
@@ -24,7 +24,7 @@ EXPORT SmartLinx_Business_Sections ( STRING12 in_bdid, BOOLEAN include_SourceDoc
     MaxPhoneVariations        := 100 : STORED( 'MaxPhoneVariations' );
     MaxProperties             := 100 : STORED( 'MaxProperties' );
     
-    Bdids := doxie_cbrs.getBizReportBDIDs().bdids;
+    Bdids := doxie_cbrs.getBizReportBDIDs(mod_access).bdids;
     
     //-----------------------------------------------------------------------------------------------------------
     //----- Address Variations ----------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ EXPORT SmartLinx_Business_Sections ( STRING12 in_bdid, BOOLEAN include_SourceDoc
     //----- Bankruptcy V2 ---------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------------------- 
     
-    bnkr_v2 := doxie_cbrs.bankruptcy_records_trimmed_v2(bdids, SSNMask); 
+    bnkr_v2 := doxie_cbrs.bankruptcy_records_trimmed_v2(bdids, mod_access.SSN_Mask); 
     
     ds_bankruptcyV2 := iesp.transform_bankruptcy_v2(bnkr_v2.records);
 
@@ -136,7 +136,7 @@ EXPORT SmartLinx_Business_Sections ( STRING12 in_bdid, BOOLEAN include_SourceDoc
     //----- Business Associates ---------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------------------- 
 
-    basr := doxie_cbrs.business_associates_records_trimmed(bdids); 
+    basr := doxie_cbrs.business_associates_records_trimmed(bdids, mod_access); 
 
     ds_businessAssociates :=
       PROJECT( GLOBAL(basr.records), 
@@ -173,7 +173,7 @@ EXPORT SmartLinx_Business_Sections ( STRING12 in_bdid, BOOLEAN include_SourceDoc
     //-----------------------------------------------------------------------------------------------------------
     //----- Liens Judgments V2  ---------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------------------- 
-    raw_jls := doxie_cbrs.Liens_Judments_records_v2(bdids, SSNMask).report_view(MIDEX_Services.Constants.MAX_LIENS_JUDGMENTS_val)(TRUE);
+    raw_jls := doxie_cbrs.Liens_Judments_records_v2(bdids, mod_access.SSN_Mask).report_view(MIDEX_Services.Constants.MAX_LIENS_JUDGMENTS_val)(TRUE);
     
     judgmentsAndLiensV2Recs := CHOOSEN(raw_jls,MIDEX_Services.Constants.MAX_LIENS_JUDGMENTS_val);
     countOfJudgmentsAndLiensV2 := COUNT(raw_jls);
@@ -249,7 +249,7 @@ EXPORT SmartLinx_Business_Sections ( STRING12 in_bdid, BOOLEAN include_SourceDoc
     //----- Property V2 -----------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------------------- 
     
-    pror_v2 := doxie_cbrs.property_records_v2(bdids);
+    pror_v2 := doxie_cbrs.property_records_v2(bdids, includeBlackKnight);
     // bug: 146211, per Jiafu the sourcePropertyRecordID needs to be populated with the FaresID.
     ds_propertyV2 :=
       PROJECT( GLOBAL(pror_v2.all_recs), 

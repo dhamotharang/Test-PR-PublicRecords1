@@ -155,6 +155,7 @@ export Search_Service := MACRO
     boolean ExcludeStatusRefresh := option.LiensJudgmentsReportOptions.ExcludeStatusRefresh;
     string32 DeferredTransactionID := option.LiensJudgmentsReportOptions.DeferredTransactionID;
     string5 StatusRefreshWaitPeriod := option.LiensJudgmentsReportOptions.StatusRefreshWaitPeriod;
+    DeferredTransactionIDs := IF(DeferredTransactionID <> '', DATASET([DeferredTransactionID], {STRING32 DeferredTransactionID}), DATASET([], {STRING32 DeferredTransactionID}));
 	
 	// if the boolean flag is true, use the boolean flags
 	// if the boolean flag is not true, then check to ensure the user didn't enter a FilterlienType	
@@ -343,9 +344,10 @@ search_results_temp := ungroup(
       		ExcludeStates := ExcludeStates,
       		ExcludeReportingSources := ExcludeReportingSources,
 			IncludeStatusRefreshChecks := IncludeStatusRefreshChecks,
-            DeferredTransactionID := DeferredTransactionID,
+            DeferredTransactionIDs := DeferredTransactionIDs,
             StatusRefreshWaitPeriod := StatusRefreshWaitPeriod,
-            ESPInterfaceVersion := InterfaceVersion
+            ESPInterfaceVersion := InterfaceVersion,
+            IsBatch := FALSE
       		) 
       	);
   
@@ -422,55 +424,64 @@ search_results_temp := ungroup(
 	
 	valid_riskview_xml_response := project(search_results,
 		transform(iesp.riskview2.t_RiskView2Response,
-				self.Result.UniqueId := LEFT.LexID;
+                suppress_condition := IF((STD.Str.ToLowerCase(LEFT.Message) = STD.Str.ToLowerCase(Riskview.Constants.Deferred_request_desc) OR STD.Str.ToLowerCase(LEFT.Exception_Code) = STD.Str.ToLowerCase('-1')) AND (REAL)InterfaceVersion > 2.5 AND ExcludeStatusRefresh = FALSE AND IncludeStatusRefreshChecks = TRUE, TRUE, FALSE);
+				self.Result.UniqueId := IF(~suppress_condition, LEFT.LexID, '');
 				self.Result.InputEcho := search;
-				self.Result.Models := modelResults;
-			  self.Result.AttributesGroup.name := STD.Str.ToUpperCase(AttributesVersionRequest);
-			  self.Result.AttributesGroup.attributes := Riskviewattrs_namevaluePairs;
+				self.Result.Models := IF(~suppress_condition, modelResults);
+                self.Result.AttributesGroup.name := STD.Str.ToUpperCase(AttributesVersionRequest);
+                self.Result.AttributesGroup.attributes := IF(~suppress_condition, Riskviewattrs_namevaluePairs);
 				self.Result.Alerts := nameValuePairsAlerts;
 				// self.Result.Report.ConsumerStatement := left.ConsumerStatementText;
-				self.Result.LiensJudgmentsReports.Summary := IF(IncludeLNJ AND ~AttributesOnly, left.report.summary);
-				self.Result.Report := IF(run_riskview_report, left.report);
+				self.Result.LiensJudgmentsReports.Summary := IF(IncludeLNJ AND ~AttributesOnly AND ~suppress_condition, left.report.summary);
+				self.Result.Report := IF(run_riskview_report AND ~suppress_condition, left.report);
 				
-				self.Result.ConsumerStatements := if(OutputConsumerStatements, left.ConsumerStatements);
-				self.Result.LiensJudgmentsReports.Liens := IF(~AttributesOnly, LnJ_liens);
-				self.Result.LiensJudgmentsReports.Judgments := IF(~AttributesOnly, LnJ_jdgmts);
-				self.Result.LiensJudgmentsReports.LnJAttributes := LnJReport;
+				self.Result.ConsumerStatements := if(OutputConsumerStatements AND ~suppress_condition, left.ConsumerStatements);
+				self.Result.LiensJudgmentsReports.Liens := IF(~AttributesOnly AND ~suppress_condition, LnJ_liens);
+				self.Result.LiensJudgmentsReports.Judgments := IF(~AttributesOnly AND ~suppress_condition, LnJ_jdgmts);
+				self.Result.LiensJudgmentsReports.LnJAttributes := IF(~suppress_condition, LnJReport);
         // for inquiry logging, populate the consumer section with the DID and input fields
         // don't log the lexid if the person got a noscore
-        self.Result.Consumer.LexID := if(riskview.constants.noScoreAlert in [left.Alert1,left.Alert2,left.Alert3,left.Alert4,left.Alert5,left.Alert6,left.Alert7,left.Alert8,left.Alert9,left.Alert10], '', left.LexID);
-        searchDOB := iesp.ECL2ESP.t_DateToString8(search.DOB);
-		    SELF.Result.Consumer.Inquiry.DOB := IF((UNSIGNED)searchDOB > 0, searchDOB, '');
-        self.Result.Consumer.Inquiry.Phone10 := search.HomePhone;
-        self.Result.Consumer.Inquiry := search;      
+                self.Result.Consumer.LexID := if(riskview.constants.noScoreAlert in [left.Alert1,left.Alert2,left.Alert3,left.Alert4,left.Alert5,left.Alert6,left.Alert7,left.Alert8,left.Alert9,left.Alert10] OR suppress_condition, '', left.LexID);
+                searchDOB := iesp.ECL2ESP.t_DateToString8(search.DOB);
+                SELF.Result.Consumer.Inquiry.DOB := IF((UNSIGNED)searchDOB > 0 AND ~suppress_condition, searchDOB, '');
+                self.Result.Consumer.Inquiry.Phone10 := IF(~suppress_condition, search.HomePhone, '');
+                self.Result.Consumer.Inquiry := IF(~suppress_condition, search);      
 
 				//For MLA, we need to populate the exception area of the result if there was an error flagged in the MLA process.  The
 				//Exception_code field will contain the error code...use it to look up the description and format the exception record.
-				ds_excep_blank := DATASET([], iesp.share.t_WsException); 
+			   ds_excep_blank := DATASET([], iesp.share.t_WsException); 
 				
-				ds_excep := DATASET([{'Roxie', 
+			   ds_excep := DATASET([{'Roxie', 
 															 left.Exception_code,  
 															 '', 									
 															 RiskView.Constants.MLA_error_desc(left.Exception_code)}], iesp.share.t_WsException);
                                
-       ds_excep_Checking_Indicators:= DATASET([{'Roxie', 
+               ds_excep_Checking_Indicators:= DATASET([{'Roxie', 
 															 left.Exception_code,  
 															 '', 									
-															 RiskView.Constants.SubscriberID_error_desc(left.Exception_code)}], iesp.share.t_WsException);
+															 RiskView.Constants.Checking_Indicator_error_desc(left.Exception_code)}], iesp.share.t_WsException);
+                               
                ds_excep_status_refresh := DATASET([{'Roxie', 
-                                                             left.Exception_code,  
+                                                             IF(left.Exception_code = '22OKC', '22', left.Exception_code),
                                                              '', 									
-                                                             RiskView.Constants.StatusRefresh_error_desc(left.Exception_code)}], iesp.share.t_WsException);
+                                                             RiskView.Constants.StatusRefresh_error_desc}], iesp.share.t_WsException); 
+               ds_excep_DTE := DATASET([{'Roxie', 
+                                                             IF(left.Exception_code = '-1', '41', left.Exception_code),
+                                                             '', 									
+                                                             RiskView.Constants.DTE_error_desc}], iesp.share.t_WsException);
 
-				SELF._Header.Exceptions := map((custom_model_name  = 'mla1608_0' or custom2_model_name = 'mla1608_0' or 
+              SELF._Header.Exceptions := map((custom_model_name  = 'mla1608_0' or custom2_model_name = 'mla1608_0' or 
 																			  custom3_model_name = 'mla1608_0' or custom4_model_name = 'mla1608_0' or 
 																			  custom5_model_name = 'mla1608_0') and left.Exception_code <> '' => ds_excep,
-                                        SubscriberId = 0 and STD.Str.ToLowerCase(AttributesVersionRequest) = RiskView.Constants.checking_indicators_attribute_request and left.Exception_code <> '' => ds_excep_Checking_Indicators,
-                                        IncludeStatusRefreshChecks = TRUE AND LEFT.Exception_Code <> '' => ds_excep_status_refresh,
+                                        STD.Str.ToLowerCase(AttributesVersionRequest) = RiskView.Constants.checking_indicators_attribute_request and left.Exception_code <> '' => ds_excep_Checking_Indicators,
+                                        IncludeStatusRefreshChecks = TRUE AND COUNT(DeferredTransactionIDs) = 0 AND LEFT.Exception_Code <> '' => ds_excep_status_refresh,
+                                        IncludeStatusRefreshChecks = TRUE AND COUNT(DeferredTransactionIDs) <> 0 AND LEFT.Exception_Code <> '' => ds_excep_DTE,
 																			  ds_excep_blank);
-        SELF.result.fdcheckingindicator := left.FDGatewayCalled;
-
-				SELF._Header := [];
+              SELF.result.fdcheckingindicator := left.FDGatewayCalled;
+              SELF._Header.Status := (INTEGER)left.Status_Code;
+              SELF._Header.Message := left.Message;
+              SELF._Header.TransactionID := left.TransactionID;
+              SELF._Header := [];
 	));
 
 invalid_input_xml_response := project(search_results,
@@ -565,8 +576,9 @@ Deltabase_Logging_prep := project(riskview_xml, transform(Risk_Reporting.Layouts
 Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
 // #stored('Deltabase_Log', Deltabase_Logging);
 
+suppress_condition := IF(riskview_xml[1].Result.Consumer.Inquiry = ROW([], iesp.share_fcra.t_FcraConsumerInquiry) AND (REAL)InterfaceVersion > 2.5 AND ExcludeStatusRefresh = FALSE, TRUE, FALSE);
 //Improved Scout Logging
-IF(~DisableOutcomeTracking and ~TestDataEnabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs__fcra_transaction__log__scout')));
+IF(~DisableOutcomeTracking and ~TestDataEnabled AND ~suppress_condition, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs__fcra_transaction__log__scout')));
 
 #end
 

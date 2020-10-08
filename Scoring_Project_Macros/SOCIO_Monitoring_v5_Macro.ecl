@@ -41,9 +41,9 @@ END;
 //CHOOSEN(DATASET(inputFile, Layout_SocioEconomic_Batch_In, CSV(HEADING(1),SEPARATOR([',']),TERMINATOR(['\n', '\r\n', '\n\r']))), no_of_records));
 
 
-inputDataset := IF(no_of_recs_to_run <= 0,
+inputDataset := DISTRIBUTE(IF(no_of_recs_to_run <= 0,
 DATASET(SOCIO_Monitoring_v5_infile, Layout_SocioEconomic_Batch_In, THOR),
-CHOOSEN(DATASET(SOCIO_Monitoring_v5_infile, Layout_SocioEconomic_Batch_In, THOR), no_of_recs_to_run));
+CHOOSEN(DATASET(SOCIO_Monitoring_v5_infile, Layout_SocioEconomic_Batch_In, THOR), no_of_recs_to_run)),(integer)acctno);
 
 
 //Number of parallel calls to run in the SOAPCALL to the Roxie Query 

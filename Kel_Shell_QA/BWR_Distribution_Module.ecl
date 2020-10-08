@@ -1403,7 +1403,7 @@ Tag:= regexreplace('~',logical_file_name,'');
 
 sample_size:=0;
    
-input_file := dataset(logical_file_name ,Lay,CSV(HEADING(single), QUOTE('"')));
+input_file := dataset(logical_file_name ,Lay,CSV(HEADING(8), QUOTE('"')));
 // input_file;
 
 input_file_recs:= if(sample_size=0, choosen(input_file,all),choosen(input_file,sample_size) );

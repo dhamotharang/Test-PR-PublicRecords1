@@ -1,6 +1,6 @@
-import Business_Header;
+IMPORT Business_Header;
 rec := doxie_cbrs.layout_references;
-export getGroupRelatives(dataset(rec) thebdids) := 
+EXPORT getGroupRelatives(DATASET(rec) thebdids) :=
 FUNCTION
 
 precs := thebdids;
@@ -10,13 +10,13 @@ bhrl := doxie_cbrs.layout_relatives;
 bhkr := Business_Header.Key_Business_Relatives;
 
 rec tGetRelatives(precs l, bhkr r) := TRANSFORM
-	SELF.bdid := r.bdid2;
+  SELF.bdid := r.bdid2;
 END;
 
 relatives := JOIN(precs, bhkr,
-				keyed(LEFT.bdid = RIGHT.bdid1) and 
-				business_header.mac_isGroupRel(right),
-				tGetRelatives(left, RIGHT), limit(10000, skip), keep(1000));
+        KEYED(LEFT.bdid = RIGHT.bdid1) AND
+        business_header.mac_isGroupRel(RIGHT),
+        tGetRelatives(LEFT, RIGHT), LIMIT(10000, SKIP), KEEP(1000));
 
 RETURN relatives;
 

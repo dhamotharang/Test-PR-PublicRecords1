@@ -1,3 +1,3 @@
-export Layout_Vehicle_FEIN := record
-	string9 FEIN;
-end;
+EXPORT Layout_Vehicle_FEIN := RECORD
+  STRING9 FEIN;
+END;
