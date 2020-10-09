@@ -10,7 +10,7 @@ string wuid := workunit;
 
 
 ECL1 := '#workunit(\'name\',\'Orbit Create Build Instance -- '+ buildname + '-- '+Buildvs+'\');\r\n'+
-'Orbit3.proc_Orbit3_CreateBuild_sp( \''+buildname+'\', \''+Buildvs+'\', \''+Envmt+'\', \''+BuildStatus+'\', \''+email_list+'\', '+if (skipcreatebuild , 'true','false')+ ','
+'Orbit3.proc_Orbit3_CreateBuild_sp( \''+buildname+'\', \''+Buildvs+'\', \''+Envmt+'\',  \''+email_list+'\' , \''+BuildStatus+'\', '+if (skipcreatebuild , 'true','false')+ ','
 + if (skipupdatebuild , 'true','false')+','
 +if (runcreatebuild, 'true','false') +','
 +if (is_npf,'true','false')+' , \''+wuid+'\') \n'
