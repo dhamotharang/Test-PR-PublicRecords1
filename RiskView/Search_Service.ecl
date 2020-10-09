@@ -354,7 +354,7 @@ search_results_temp := ungroup(
 	#if(Models.LIB_RiskView_Models().TurnOnValidation) // If TRUE, output the model results directly
 		output(search_results_temp, named('Results'));
 	#else // Else, this is a normal transaction and should be formatted for output appropriately
-	// search_results := ungroup(search_results_temp);
+	 //search_results := ungroup(search_results_temp);
 	search_results := ungroup(
 		IF(TestDataEnabled, 
 		RiskView.TestSeed_Function(packagedTestseedInput, 

@@ -186,7 +186,7 @@ END; // JuLiProcessStatusRefresh END
 
     emptyNameValuePairs := Dataset([], iesp.share.t_NameValuePair);
 
-    nameValuePairsVersion5 :=  NORMALIZE(Search_results, 202, RiskView.Transforms.intoVersion5(LEFT, COUNTER))(trim(value)<>'');
+    nameValuePairsVersion5 :=  NORMALIZE(Search_results, 203, RiskView.Transforms.intoVersion5(LEFT, COUNTER))(trim(value)<>'');
     nameValuePairsFIS := NORMALIZE(Search_results, 8, RiskView.Transforms.intoFISattrs(LEFT, COUNTER));
     
     //Assign tags to sort the order of the attribute groups
