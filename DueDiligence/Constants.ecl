@@ -28,6 +28,7 @@ EXPORT Constants := MODULE
     EXPORT MAX_500 := 500;
     EXPORT MAX_1000 := 1000;
     EXPORT MAX_5000 := 5000;
+    EXPORT MAX_10000 := 10000;
     
     
     //PERSON
@@ -681,19 +682,19 @@ EXPORT INDUSTRY_GROUP_BEST_SIC := 'BS';
 EXPORT INDUSTRY_GROUP_BEST_NAICS := 'BN';
 EXPORT INDUSTRY_GROUP_HIGHEST_RISK := 'HR';
 
-EXPORT INDUSTRY_CASH_INTENSIVE_BUSINESS_RETAIL := 'CIBR';
-EXPORT INDUSTRY_CASH_INTENSIVE_BUSINESS_NON_RETAIL := 'CIBNR';
-EXPORT INDUSTRY_MONEY_SERVICE_BUSINESS := 'MSB';
-EXPORT INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS := 'NBFI';
-EXPORT INDUSTRY_CASINO_AND_GAMING := 'CAG';
-EXPORT INDUSTRY_LEGAL_ACCOUNTANT_TELEMARKETER_FLIGHT_TRAVEL := 'LEGAL';
-EXPORT INDUSTRY_AUTOMOTIVE := 'AUTO';
-EXPORT INDUSTRY_OTHER := 'OTHER';
+EXPORT INDUSTRY_CASH_INTENSIVE_BUSINESS_RETAIL := DueDiligence.ConstantsIndustry.CASH_INTENSIVE_BUSINESS_RETAIL : DEPRECATED('Use DueDiligence.ConstantsIndustry.CASH_INTENSIVE_BUSINESS_RETAIL');
+EXPORT INDUSTRY_CASH_INTENSIVE_BUSINESS_NON_RETAIL := DueDiligence.ConstantsIndustry.CASH_INTENSIVE_BUSINESS_NON_RETAIL : DEPRECATED('Use DueDiligence.ConstantsIndustry.CASH_INTENSIVE_BUSINESS_NON_RETAIL');
+EXPORT INDUSTRY_MONEY_SERVICE_BUSINESS := DueDiligence.ConstantsIndustry.MONEY_SERVICE_BUSINESS : DEPRECATED('Use DueDiligence.ConstantsIndustry.MONEY_SERVICE_BUSINESS');
+EXPORT INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS := DueDiligence.ConstantsIndustry.NON_BANK_FINANCIAL_INSTITUTIONS : DEPRECATED('Use DueDiligence.ConstantsIndustry.NON_BANK_FINANCIAL_INSTITUTIONS');
+EXPORT INDUSTRY_CASINO_AND_GAMING := DueDiligence.ConstantsIndustry.CASINO_AND_GAMING : DEPRECATED('Use DueDiligence.ConstantsIndustry.CASINO_AND_GAMING');
+EXPORT INDUSTRY_LEGAL_ACCOUNTANT_TELEMARKETER_FLIGHT_TRAVEL := DueDiligence.ConstantsIndustry.LEGAL_ACCOUNTANT_TELEMARKETER_FLIGHT_TRAVEL : DEPRECATED('Use DueDiligence.ConstantsIndustry.LEGAL_ACCOUNTANT_TELEMARKETER_FLIGHT_TRAVEL');
+EXPORT INDUSTRY_AUTOMOTIVE := DueDiligence.ConstantsIndustry.AUTOMOTIVE : DEPRECATED('Use DueDiligence.ConstantsIndustry.AUTOMOTIVE');
+EXPORT INDUSTRY_OTHER := DueDiligence.ConstantsIndustry.OTHER : DEPRECATED('Use DueDiligence.ConstantsIndustry.OTHER');
 
-EXPORT RISK_LEVEL_HIGH := 'HIGH';
-EXPORT RISK_LEVEL_MEDIUM := 'MEDIUM';
-EXPORT RISK_LEVEL_LOW := 'LOW';
-EXPORT RISK_LEVEL_UNKNOWN := 'UNKNOWN';
+EXPORT RISK_LEVEL_HIGH := DueDiligence.ConstantsIndustry.RISK_LEVEL_HIGH : DEPRECATED('Use DueDiligence.ConstantsIndustry.RISK_LEVEL_HIGH');
+EXPORT RISK_LEVEL_MEDIUM := DueDiligence.ConstantsIndustry.RISK_LEVEL_MEDIUM : DEPRECATED('Use DueDiligence.ConstantsIndustry.RISK_LEVEL_MEDIUM');
+EXPORT RISK_LEVEL_LOW := DueDiligence.ConstantsIndustry.RISK_LEVEL_LOW : DEPRECATED('Use DueDiligence.ConstantsIndustry.RISK_LEVEL_LOW');
+EXPORT RISK_LEVEL_UNKNOWN := DueDiligence.ConstantsIndustry.RISK_LEVEL_UNKNOWN : DEPRECATED('Use DueDiligence.ConstantsIndustry.RISK_LEVEL_UNKNOWN');
 
 
 EXPORT NAICS_RISK_HIGH :=  ['42','44','45','48','49'];
@@ -709,97 +710,54 @@ EXPORT NAICS_RISK_HIGH_EXCEP := ['332991', '332992', '332993', '332994', '332996
 																	'813940'];
 
 //Cash Intensive Businesses
-EXPORT CIB_NAICS_RETAIL := ['442110', '442210', '442299', '443111', '443112',
-														'443120', '444110', '444120', '444210', '444220',
-														'445120', '445310', '446110', '447110', '448120',
-														'448150', '448190', '448210', '451110', '451120',
-														'451130', '451140', '451211', '451220', '452111',
-														'452112', '452998', '453110', '453210', '453220',
-														'453310', '453998', '454210'];
-EXPORT CIB_NAICS_NON_RETAIL := ['423930', '424940', '485310', '713120', '713990',
-																'722110', '722211', '722212', '811192', '812112',
-																'812113', '812310', '812930', '812990']; 
+EXPORT CIB_NAICS_RETAIL := DueDiligence.ConstantsIndustry.NAICS_CIB_RETAIL : DEPRECATED('Use DueDiligence.ConstantsIndustry.NAICS_CIB_RETAIL');
+EXPORT CIB_NAICS_NON_RETAIL :=  DueDiligence.ConstantsIndustry.NAICS_CIB_NON_RETAIL : DEPRECATED('Use DueDiligence.ConstantsIndustry.NAICS_CIB_NON_RETAIL'); 
 
 //Money Services Businesses											
-EXPORT MSB_NAICS := ['523130', '522390', '522320', '522291'];
+EXPORT MSB_NAICS :=  DueDiligence.ConstantsIndustry.NAICS_MSB : DEPRECATED('Use DueDiligence.ConstantsIndustry.NAICS_MSB');
 
 //Non-Bank Finaancial Institutions
-EXPORT NBFI_NAICS := ['522298', '522291', '448310', '423940']; 	       
+EXPORT NBFI_NAICS :=  DueDiligence.ConstantsIndustry.NAICS_NBFI : DEPRECATED('Use DueDiligence.ConstantsIndustry.NAICS_NBFI'); 	       
 
 //Casinos & Gaming
-EXPORT CASGAM_NAISC := ['721120', '713290', '713210'];   
+EXPORT CASGAM_NAISC :=  DueDiligence.ConstantsIndustry.NAICS_CASGAM : DEPRECATED('Use DueDiligence.ConstantsIndustry.NAICS_CASGAM');   
 
 //Legal, Accountant, Telemarketer, Flight Training or Travel Agency
-EXPORT LEGTRAV_NAISC := ['611512', '561990', '561510', '561422', '541211', 
-												 '541110'];   
+EXPORT LEGTRAV_NAISC :=  DueDiligence.ConstantsIndustry.NAICS_LEGTRAV : DEPRECATED('Use DueDiligence.ConstantsIndustry.NAICS_LEGTRAV');   
 
 //Automotive
-EXPORT AUTO_NAISC := ['811224', '811121', '811118', '811113', '811111', 
-											'441310', '441229', '441228', '441222', '441210', 
-											'441120', '441110'];	          
+EXPORT AUTO_NAISC :=  DueDiligence.ConstantsIndustry.NAICS_AUTO : DEPRECATED('Use DueDiligence.ConstantsIndustry.NAICS_AUTO');	          
 
 
 
-EXPORT SIC_LENGTH_2_RISK_HIGH	:= ['58'];
+EXPORT SIC_LENGTH_2_RISK_HIGH	:= DueDiligence.ConstantsIndustry.SIC_LENGTH_2_RISK_HIGH : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_LENGTH_2_RISK_HIGH');
+EXPORT SIC_LENGTH_4_RISK_HIGH	:= DueDiligence.ConstantsIndustry.SIC_LENGTH_4_RISK_HIGH : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_LENGTH_4_RISK_HIGH');
+EXPORT SIC_LENGTH_6_RISK_HIGH	:= DueDiligence.ConstantsIndustry.SIC_LENGTH_6_RISK_HIGH : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_LENGTH_6_RISK_HIGH');																	
+EXPORT SIC_LENGTH_8_RISK_HIGH	:= DueDiligence.ConstantsIndustry.SIC_LENGTH_8_RISK_HIGH : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_LENGTH_8_RISK_HIGH');																	
 
-EXPORT SIC_LENGTH_4_RISK_HIGH	:= ['3111', '3151', '3199', '3911', '4724', 
-																	'4725', '4729', '4789', '5094', '5411', 
-																	'5499', '5500', '5511', '5521', '5551', 
-																	'5561', '5571', '5599', '6081', '6082', 
-																	'6211', '6722', '6799', '8111', '8721'];
-																	
-EXPORT SIC_LENGTH_6_RISK_HIGH	:= ['315100', '315199', '608100', '608199', '608200', 
-																	'608299', '609901', '738914', '799913'];																	
-																	
-EXPORT SIC_LENGTH_8_RISK_HIGH	:= ['31510000', '47310101', '47310102', '47310102', '59329904', 
-																	'60810000', '60819901', '60820000', '60990100', '60990101', 
-																	'60990102', '60990103', '60999901', '60999902', '60999903', 
-																	'60999906', '60999908', '60999908', '70110301', '73891005', 
-																	'73891400', '73891402', '79930401', '79930402', '79930403', 
-																	'79990803', '79990804', '79991301', '79991302', '79991303', 
-																	'79991304', '79991305', '79991306'];																	
-
-EXPORT SIC_FIRST_2_STAR_RISK_HIGH := ['58']; //must match on first 2 char
-																	
-EXPORT SIC_FIRST_4_STAR_RISK_HIGH := ['3111', '3199', '3911', '4724', '4725',
-																			'4729', '4789', '5094', '5411', '5499',
-																			'5511', '5521', '5551', '5561', '5571',
-																			'5599', '6211', '6722', '6799', '8111',
-																			'8721']; //must match on first 4 char	
-
-EXPORT SIC_FIRST_6_STAR_RISK_HIGH := ['315199']; //must match on first 6 char															
+EXPORT SIC_FIRST_2_STAR_RISK_HIGH := DueDiligence.ConstantsIndustry.SIC_FIRST_2_STAR_RISK_HIGH : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_FIRST_2_STAR_RISK_HIGH');
+EXPORT SIC_FIRST_4_STAR_RISK_HIGH := DueDiligence.ConstantsIndustry.SIC_FIRST_4_STAR_RISK_HIGH : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_FIRST_4_STAR_RISK_HIGH');
+EXPORT SIC_FIRST_6_STAR_RISK_HIGH := DueDiligence.ConstantsIndustry.SIC_FIRST_6_STAR_RISK_HIGH : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_FIRST_6_STAR_RISK_HIGH');														
 																	
 
 //Cash Intensive Businesses
-EXPORT CIB_SIC_RETAIL := ['5021', '5023', '5031', '5044', '5049', '5083', '5085', '5091', '5092',
-													'5111', '5112', '5113', '5122', '5131', '5136', '5137', '5139', '5153', '5159',
-													'5162', '5181', '5182', '5191', '5192', '5193', '5199', '5231', '5261',
-													'5292', '5311', '5411', '5541', '5611', '5621', '5632', '5661', '5699', '5712',
-													'5713', '5714', '5719', '5736', '5912', '5932', '5941', '5942', '5943', '5945',
-													'5947', '5949', '5962', '5992', '7699'];
-EXPORT CIB_SIC_NON_RETAIL := ['4121', '5093', '5194', '5999', '7215',
-															'7231', '7299', '7521', '7542', '7993']; 
+EXPORT CIB_SIC_RETAIL := DueDiligence.ConstantsIndustry.SIC_CIB_RETAIL : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_CIB_RETAIL');
+EXPORT CIB_SIC_NON_RETAIL := DueDiligence.ConstantsIndustry.SIC_CIB_NON_RETAIL : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_CIB_NON_RETAIL'); 
 											
 //Money Services Businesses											
-EXPORT  MSB_SIC := ['7389', '6799', '6221', '6162', '6153', 
-										'6141', '6099'];		
+EXPORT  MSB_SIC := DueDiligence.ConstantsIndustry.SIC_MSB : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_MSB');		
 											
 //Non-Bank Finaancial Institutions
-EXPORT  NBFI_SIC := ['7631', '6159', '6153', '6141', '6111', 
-											'6082', '6081', '6019', '5944', '5932', 
-											'5094']; 	
+EXPORT  NBFI_SIC := DueDiligence.ConstantsIndustry.SIC_NBFI : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_NBFI'); 	
 
 //Casinos & Gaming
-EXPORT CASGAM_SIC := ['7999', '7993', '7011'];  
+EXPORT CASGAM_SIC := DueDiligence.ConstantsIndustry.SIC_CASGAM : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_CASGAM');  
 
 //Legal, Accountant, Telemarketer, Flight Training or Travel Agency
-EXPORT LEGTRAV_SIC := ['8721', '8299', '8249', '8111', '7389', 
-												'7299', '4724'];
+EXPORT LEGTRAV_SIC := DueDiligence.ConstantsIndustry.SIC_LEGTRAV : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_LEGTRAV');
 
 //Automotive
-EXPORT AUTO_SIC := ['7539', '7538', '7537', '7532', '5731', 
-										'5599', '5571', '5561', '5551', '5531', 
-										'5521', '5511', '5015', '5013'];	          											
+EXPORT AUTO_SIC := DueDiligence.ConstantsIndustry.SIC_AUTO : DEPRECATED('Use DueDiligence.ConstantsIndustry.SIC_AUTO');	          											
 											
 											
  // Vehicle key orig_name_type values
