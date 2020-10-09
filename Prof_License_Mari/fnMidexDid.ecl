@@ -1,10 +1,10 @@
-/***************************************************************************************************************************
+﻿/***************************************************************************************************************************
  *                                                                                                                         *
  *  This module contains 
  *       function to build MIDEX did table from SANCTN, SANCTN_Mari, and MARI base files.                                  *
  *                                                                                                                         *
  ***************************************************************************************************************************/
-IMPORT SANCTN, SANCTN_Mari, ut,bipv2, DID_Add,PromoteSupers;
+IMPORT SANCTN, SANCTN_Mari, ut,bipv2, DID_Add,PromoteSupers, dx_common;
 
 EXPORT fnMidexDid := MODULE
 
@@ -42,6 +42,9 @@ EXPORT fnMidexDid := MODULE
 		STRING  license_nbr;
 		UNSIGNED6 did := 0;
 		UNSIGNED3 did_score := 0;
+		//DF-28229 Add Delta build fields
+		dx_common.layout_metadata;				
+
 		// STRING 	party_name;
 		// integer source_rec_id;   	//from sanctn file
 		// STRING 	incident_num;			//from sanctn np
