@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="IP_Metadata_BatchService">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="30"/>
 </message>
@@ -12,11 +12,10 @@
 	STRING45 IP_address3
 */
 
-IMPORT BatchServices,BatchShare,Std;
+IMPORT BatchServices,BatchShare,Royalty,Std;
 
-EXPORT IP_Metadata_BatchService() := FUNCTION
+EXPORT IP_Metadata_BatchService() := MACRO
 
-	// no restrictions â€“ reserved for future use
 	ds_batch_in_raw := DATASET([],BatchServices.IP_Metadata_Layouts.batch_in_raw) : STORED('batch_in',FEW);
 
 	BatchShare.MAC_SequenceInput(ds_batch_in_raw,ds_batch_in_seq);
@@ -35,6 +34,11 @@ EXPORT IP_Metadata_BatchService() := FUNCTION
 	BatchShare.MAC_RestoreAcctno(ds_batch_in_seq,ds_batch_out_denormalized,ds_batch_out_acctno,,FALSE);
 	Results := PROJECT(ds_batch_out_acctno,BatchServices.IP_Metadata_Layouts.batch_out_flat);
 
-	RETURN OUTPUT(Results,NAMED('Results'));
+  // Determine the Digital Envoy NetAcuity ip_metadata royalties for each acctno/ip_address
+  ds_royalties_ip := Royalty.RoyaltyNetAcuityIpMetadata.GetBatchRoyaltiesByAcctno(ds_child_recs);
+  ds_royalty_set  := Royalty.GetBatchRoyalties(ds_royalties_ip,FALSE); //FALSE=do not ReturnDetailedRoyalties
 
-END;
+ 	OUTPUT(Results,NAMED('Results'));
+  OUTPUT(ds_royalty_set, NAMED('RoyaltySet'));
+
+ENDMACRO;
