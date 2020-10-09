@@ -131,7 +131,7 @@ $.Layout_Base2 xForm($.Layout_Base2 newbase, $.Layout_Base2 base)	 :=	TRANSFORM
 	self.name_suffix		:=	newbase.name_suffix;
 	
 	self.updated := newbase.created;
-	self.filename := newbase.filename;
+	self.filename := base.filename;		// keep original filename
 	self.NCF_FileDate := newbase.NCF_FileDate;
 	self.NCF_FileTime := newbase.NCF_FileTime;
 

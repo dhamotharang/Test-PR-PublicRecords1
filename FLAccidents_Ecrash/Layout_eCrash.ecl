@@ -1,6 +1,6 @@
 ﻿IMPORT BIPV2;
 
-EXPORT Layout_eCrash := MODULE 
+EXPORT Layout_eCrash := MODULE
 
   EXPORT Consolidation_AgencyOri := RECORD
 		BIPV2.IDlayouts.l_xlink_ids;	//Added for BIP project   
@@ -296,7 +296,9 @@ EXPORT Layout_eCrash := MODULE
 		//PRtcc CR-1262 
     STRING Direction_Of_Impact;
 	  STRING Event_Sequence;
-  END;
+		STRING1 is_Suppressed;
+		DATASET(Layout_Infiles_Fixed.Citations_ChildRec) Citation_Details {MAXCOUNT(Constants.Max_Citations_ChildRec_Count)};
+		END;
 
   EXPORT Consolidation := RECORD
 		BIPV2.IDlayouts.l_xlink_ids;   //Added for BIP project   

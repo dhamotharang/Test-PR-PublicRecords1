@@ -4,9 +4,6 @@ build_version:= header.version_build;
 step:=build_version+' Header Sync;Rollup & Stats';
 #WORKUNIT('name', step);
 
-operatorEmailList :=  Header.email_list.BocaDevelopersEx;
-extraNotifyEmailList := '';
-
 dops_datasetname:='PersonHeaderKeys';
 build_component:='BASE BUILD:SYNCROLLUP';
 dlog:=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,build_version,build_component);
@@ -14,7 +11,7 @@ dlog:=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,build_version,build
 sequential(
 		dlog,
 		header._config.setup_build,
-		Header.proc_Header(build_version, operatorEmailList,extraNotifyEmailList).run_Header_Sync
+		Header.proc_Header(build_version).run
 		);
 // syncs header_raw to LAB LexId. Outputs header_raw_syncd and final header base file.
 // Start it after receiving confirmation that iHeader linking has completed
@@ -25,6 +22,12 @@ sequential(
 // *** CONTINUE ONLY AFTER STATS HAVE BEEN SATISFACTORILY REVIEWED ****
 // Estimated THOR time: 24-48hrs
 
+//20200827 W20200914-102752
+//20200721 W20200807-170248
+//20200624 W20200710-083944
+//20200526 W20200614-172725 W20200614-190929
+//20200325 
+//20191226 W20200115-143933 and W20200115-193755
 //20191128 W20191223-183409
 //20191023 W20191113-211207
 //20180821 W20180907-134837 and W20180910-092751

@@ -56,7 +56,7 @@ export proc_build_all(
   ,pSkipProx              = 'false'
   ,pSkipProxMj6           = 'false'
   ,pSkipProxPost          = 'false'
-  ,pSkipProxidUnderlinks  = 'false'
+  ,pSkipProxidUnderlinks  = 'true'
   ,pSkipHierarchy         = 'false'
   ,pSkipLgid3             = 'false'
   ,pSkipPowDown           = 'false'
@@ -73,13 +73,15 @@ export proc_build_all(
   ,pSkipBest              = 'false'
   ,pSkipIndustry          = 'false'
   ,pSkipMisckeys          = 'false'
-  ,pSkipQASamples         = 'false'
+  ,pSkipQASamples         = 'true'
   ,pSkipSegStats          = 'false'
   ,pSkipStrata            = 'false'
   ,pSkipDataCard          = 'false'
   ,pSkipOverlinking       = 'false'
   ,pSkipSeleidRelative    = 'false'
   ,pSkipCrosswalk         = 'false'
+
+  ,pSkipCopyToAlphaProd   = 'false'
   ,pSkipMktgListBuild     = 'false'
   ,pSkipHighRiskKeys      = 'false'
   ,pSkipCDWBuild          = 'false'
@@ -179,7 +181,7 @@ functionmacro
       
       // -- Now do Post process stuff.  All keys have been built so do some housekeeping, copying, renaming, promoting(if requested), verifying, and updating DOPS(if requested)
 
-      
+      ,if(pSkipCopyToAlphaProd  = false ,BIPV2_Build.proc_Copy_Xlink_To_AlphaProd(pversion,,,pCompileTest))
       ,if(pSkipMktgListBuild = false ,Marketing_List.proc_build_all           (pversion                                                                                                     )) // do Build Marketing List in background
       ,if(pSkipCDWBuild      = false ,BIPV2_Build.proc_CDW_Files              (pversion                                                                                                     )) // do Build CDW
       // ,if(pSkipXAppend       = false ,BIPV2_Build.proc_External_Append_Testing(pversion                                                                                                     )) // do external append testing

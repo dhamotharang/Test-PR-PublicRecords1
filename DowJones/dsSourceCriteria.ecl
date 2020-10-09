@@ -1928,7 +1928,20 @@ EXPORT dsSourceCriteria := DATASET([
 {'New York State DOCCS Most Wanted','1915'},
 {'UN Security Council Vessels Subject to Prohibited Entry into Ports - North Korea List','1916'},
 {'Vessels - EC (CFSP) 2018/293 Democratic People\'s Republic of Korea List Prohibited Entry into Ports,','1917'},
-{'Vessels - EC 2018/286 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1918'}
+{'Vessels - EC 2018/286 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1918'},
+{'OFAC - International Criminal Court Prosecutor\'s List','1919'},
+{'Vessels - EC (CFSP) 2018/293 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1920'},
+{'EC (CFSP) 2020/1269 Ukraine List','1921'},
+{'EC 2020/1267 Ukraine List','1922'},
+{'EC (CFSP) 2020/1310 Libya List','1923'},
+{'EC 2020/1297 ISIL (Da\'esh) and Al-Qaida List','1924'},
+{'EC 2020/1309 Libya List','1925'},
+{'DFATD (Canada) Special Economic Measures (Belarus) Regulations','1926'},
+{'US Department of State Cuba Prohibited Accommodations List','1927'},
+{'EC (CFSP) 2020/1368 Ukraine List','1928'},
+{'EC (CFSP) 2020/1388 Belarus List','1929'},
+{'EC 2020/1367 Ukraine List','1930'},
+{'EC 2020/1387 Belarus List','1931'}
 
 ],r);
 

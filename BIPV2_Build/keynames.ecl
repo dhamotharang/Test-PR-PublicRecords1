@@ -40,6 +40,7 @@ module
   export highRiskIndustriesCodes   := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::@version@::high_risk_industries'                        ,pversion    );
   
   export firmographicsScore         := dx_BIPV2.Keynames(pVersion).FirmographicsScore;
+  export locid                      := dx_BIPV2.Keynames(pVersion).Locid;
 
   export BIPV2FullKeys := 
     (
@@ -55,6 +56,7 @@ module
     + highRiskIndustriesAddr  .dall_filenames
     + highRiskIndustriesCodes .dall_filenames
     + firmographicsScore      .dall_filenames
+    + locid                   .dall_filenames
     + BIPv2_HRCHY.keynames            (pversion,pUseOtherEnvironment).dall_filenames
     + BIPV2_Crosswalk.filenames(pversion,pUseOtherEnvironment).dall_keynames
  //   + bipv2_proxid.keynames(pversion).attribute_matches     .dall_filenames

@@ -3,11 +3,15 @@
         string150 offensecharge;
         string category;
         string id;
+			 unsigned8 __internal_fpos__;
     end;
-				
-		export layout_off_desc_1:=record
-		string75	off_desc_1;
-		string cust_name;
-		end;
+		
+	
+Export Key_Layout:=RECORD
+  string150 offensecharge;
+  string category;
+  string id;
+  unsigned8 __internal_fpos__;
+ END;
 
 end;

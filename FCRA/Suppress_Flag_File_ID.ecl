@@ -173,8 +173,37 @@
 '15444641', //CC-3381 Dempsey correction removal 8/26
 '15421721', //CC-3398 Dempsey correction removal 8/26
 '15453601', //CC-3399 Dempsey correction removal 8/26
-'15453611' //CC-3399 Dempsey correction removal 8/26
-];
+'15453611', //CC-3399 Dempsey correction removal 8/26
+'8954761', //CC-3411 Dempsey correction removal 9/4
+'15457551', //CC-3416 Dempsey correction removal 9/4
+'15397491', //CC-3425 Dempsey correction removal 9/4  
+'15453851',  //CC-3430  Dempsey correction removal 9/15
+'15391331',   //CC-3435  Dempsey correction removal 9/15
+'15478001',   //CC-3438  Dempsey correction removal 9/15
+'15441331',   //CC-3442  Dempsey correction removal 9/15
+'15455771',    //CC-3444  Dempsey correction removal 9/15
+'15455781',    //CC-3444  Dempsey correction removal 9/15
+'15460111',    //CC-3447  Dempsey correction removal 9/15
+'15417391',  //CC-3398  Dempsey correction removal 9/15
+'15454301',  //CC-3444  Dempsey correction removal 9/17
+'15454311',   //CC-3444  Dempsey correction removal 9/17
+'15465411',  //CC-3453 Dempsey correction removal 9/17
+'15465401',  //CC-3453 Dempsey correction removal 9/17
+'15467611',  //CC-3455  Dempsey correction removal 9/17
+'15462911',  //CC-3460 Dempsey correction removal 9/17
+'15478181',  //CC-3476 Dempsey correction removal 9/17
+'15478201',  //CC-3476 Dempsey correction removal 9/17
+'15478171',  //CC-3476 Dempsey correction removal 9/17
+'15478141',  //CC-3476 Dempsey correction removal 9/17
+'15478161',  //CC-3476 Dempsey correction removal 9/17
+'15478111',  //CC-3476 Dempsey correction removal 9/17
+'15478131',  //CC-3476 Dempsey correction removal 9/17
+'8627551',  //CC-3474  Dempsey correction removal 9/18
+'8627561',  //CC-3474  Dempsey correction removal 9/18
+'8627571',  //CC-3474  Dempsey correction removal 9/18
+'8643721'  //CC-3474  Dempsey correction removal 9/18
+
+]; 
 
 
 

@@ -4,13 +4,12 @@ EXPORT Build_Base(
 ) :=
 module
 
-	export Run_Main := $.Build_Base_Main(pversion).All:independent;
-	export Run_DataCoverage := $.Build_CoverageDates_Base(pversion).All:independent;
-	export Run_AgencyActivity := $.Build_AgencyActivityDate_Base(pversion).All:independent;
-	export Run_AddressCache := $.Build_Base_AddressCache(pversion).All:independent;
-	export Run_Anonymize := $.Build_Base_Anonymized(pversion).All:independent;
-	export Run_Demo := $.Append_DemoData(pversion);
-	
+	export Run_Main := FraudGovPlatform.Build_Base_Main(pversion).All:independent;
+	export Run_DataCoverage := FraudGovPlatform.Build_CoverageDates_Base(pversion).All:independent;
+	export Run_AgencyActivity := FraudGovPlatform.Build_AgencyActivityDate_Base(pversion).All:independent;
+	export Run_AddressCache := FraudGovPlatform.Build_Base_AddressCache(pversion).All:independent;
+	export Run_Anonymize := FraudGovPlatform.Build_Base_Anonymized(pversion).All:independent;
+		
 	export All :=
 	if(tools.fun_IsValidVersion(pversion)
 		,sequential(
@@ -18,9 +17,8 @@ module
 			Run_DataCoverage,
 			Run_AgencyActivity,
 			Run_AddressCache,
-			Run_Anonymize,
-			Run_Demo
-			)
+			Run_Anonymize
+				)
 		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Base atribute')
 	 );
 		

@@ -84,7 +84,15 @@ EXPORT KEL_PivotIndexPrep := MODULE
 															{'t9_addrpoboxmultcurridflagev', (STRING)LEFT.t9_addrpoboxmultcurridflagev},
 															{'t15_ssnmultcurridflagev', (STRING)LEFT.t15_ssnmultcurridflagev},
 															{'t20_dlmultcurridflagev', (STRING)LEFT.t20_dlmultcurridflagev},
-															{'t19_bnkacctmultcurridflagev', (STRING)LEFT.t19_bnkacctmultcurridflagev}
+															{'t19_bnkacctmultcurridflagev', (STRING)LEFT.t19_bnkacctmultcurridflagev},
+															{'p1_aotidkrappfrdactinagcyflagev', (STRING)LEFT.p1_aotidkrappfrdactinagcyflagev},
+															{'p1_aotidkrgenfrdactinagcyflagev', (STRING)LEFT.p1_aotidkrgenfrdactinagcyflagev},
+															{'p1_aotidkrothfrdactinagcyflagev', (STRING)LEFT.p1_aotidkrothfrdactinagcyflagev},
+															{'p1_aotidkrstolidactinagcyflagev', (STRING)LEFT.p1_aotidkrstolidactinagcyflagev},
+															{'p1_aotidkrappfrdactshrdflagev', (STRING)LEFT.p1_aotidkrappfrdactshrdflagev},
+															{'p1_aotidkrgenfrdactshrdflagev', (STRING)LEFT.p1_aotidkrgenfrdactshrdflagev},
+															{'p1_aotidkrothfrdactshrdflagev', (STRING)LEFT.p1_aotidkrothfrdactshrdflagev},
+															{'p1_aotidkrstolidactshrdflagev', (STRING)LEFT.p1_aotidkrstolidactshrdflagev}
 														 ], NvpRec),
 														 SELF := LEFT));
 

@@ -60,6 +60,13 @@ EXPORT Functions := MODULE
     RETURN IF(IF(size = 0, LENGTH(TRIM(alpha, ALL)) > 0, LENGTH(TRIM(alpha, ALL)) = size) AND
               Stringlib.StringFilterOut(alpha, 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz') = '',1,0);
   END;
+	
+	//****************************************************************************
+  //fn_alphaNum_or_blank: 	returns true if only populated with letters, numbers or blank
+  //****************************************************************************
+  EXPORT fn_alphaNum_or_blank(STRING s) := FUNCTION
+    RETURN IF(Stringlib.StringFilterOut(s, ' 1234567890AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz') = '',1,0);
+  END;
   
   //****************************************************************************
   //fn_alpha_optional: 	returns true if only populated with letters or empty
@@ -384,6 +391,14 @@ EXPORT Functions := MODULE
     //followed by at least 1 digit, followed by decimal (.), and ending
     //with at least 1 digit
     RETURN IF(regexfind('^[-]?\\d+\\.\\d+$', geo_clean) OR geo_clean = '', 1, 0);
+  END;
+
+  //****************************************************************************
+  //fn_Valid_Country3Abbrev: returns true if there is a valid country
+  //                         abbreviation or if the code is empty.
+  //****************************************************************************
+  EXPORT fn_Valid_Country3Abbrev(STRING cntry) := FUNCTION
+    RETURN IF(cntry = '' OR ut.Country_ISO3_To_Name(cntry) != '', 1, 0);
   END;
 
 

@@ -122,7 +122,7 @@ end;
 //* Add back the filtered blank address records to the rest of the file
 //***********************************************************************************
 dAID_Cleaned_Addr := project(dwithAID, popCleanAddr(left)) + 
-                     project(dWithout_address,transform(BaseTemp_Lay, self := left, self := []));
+                     project(dWithout_address,transform(BaseTemp_Lay, self := left, self := [])) : INDEPENDENT;
 //***********************************************************************************
 //* Dedup cleaned records on entire record to remove records that now match.
 //* For example, before cleaning, city names were FT LAUDERDALE and FORT LAUDERDALE
