@@ -29,7 +29,7 @@ export rec := record
 	string10   QPLNAME;
 	string10   QPMNAME;
 	string10   QPJRSR;   
-	//string		 dummy_field;		//extra field is added for  20131017 and 20131118
+	//string		dummy_field;		//extra field is added for  20131017 and 20131118
 	string5    empty_field2;
 	string10   CID;
 	string10   COUNTY_CD;
@@ -50,7 +50,6 @@ export rec := record
 	// string60   OFFICENAME;
 	
 END;
-
 
 export rea := record
   string10   LICTYPE;

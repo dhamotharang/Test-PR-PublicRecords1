@@ -9,8 +9,8 @@ EXPORT spray_MNS0869 := MODULE
 	//  Spray all raw files
 	EXPORT S0869_SprayFiles(string pVersion) := FUNCTION
 	
-		RETURN PARALLEL(Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'REAGTS.txt', 'rea','comma'),
-										Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'RECOS.txt', 'rec','comma')
+		RETURN PARALLEL(Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'REAGTS.TXT', 'rea','tab'),
+										Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'RECOS.TXT', 'rec','tab')
 										);
 	END;
 

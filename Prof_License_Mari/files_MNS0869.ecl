@@ -5,11 +5,11 @@ EXPORT files_MNS0869 := MODULE
 
 	EXPORT rea 		:= dataset(Common_Prof_Lic_Mari.SourcesFolder + 'MNS0869' + '::' + 'using' + '::' + 'rea', 
 													 Prof_License_Mari.layout_MNS0869.rea,
-													 CSV(SEPARATOR(','),heading(0),quote('"'),TERMINATOR(['\n','\r\n','\n\r'])));
+													 CSV(SEPARATOR('\t'),heading(0),quote('"'),TERMINATOR(['\n','\r\n','\n\r'])));
 													 
 	EXPORT rec 		:= dataset(Common_Prof_Lic_Mari.SourcesFolder + 'MNS0869' + '::' + 'using' + '::' + 'rec', 
 													 Prof_License_Mari.layout_MNS0869.rec,
-													 CSV(SEPARATOR(','),heading(0),quote('"'),TERMINATOR(['\n','\r\n','\n\r'])));
+													 CSV(SEPARATOR('\t'),heading(0),quote('"'),TERMINATOR(['\n','\r\n','\n\r'])));
 
 END;
 /*

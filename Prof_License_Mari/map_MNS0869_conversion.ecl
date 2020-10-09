@@ -147,6 +147,7 @@ EXPORT map_MNS0869_conversion(STRING pVersion) := FUNCTION
                                                                  CleanNAME_ORG);														 
 		
 		SELF.NAME_ORG_ORIG		:= tempTrimName;    //Names before we clean it
+		
 		//Terri's review comment(BUG 124107) - 1. Set the name format.
 		SELF.NAME_FORMAT			:= IF(SELF.NAME_ORG_ORIG<>'','F','');
 	
