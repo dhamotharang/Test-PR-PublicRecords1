@@ -73,7 +73,7 @@ sequential(/*parallel(%spray_main%,%spray_search%),parallel(%super_main%,%super_
 	
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//AUTOMATIC DOPS UPDATE PROCESS - DEACTIVATE WHEN RUNNING THE BUILD MANUALLY (i.e. LAYOUT CHANGES)	
-		Roxiekeybuild.updateversion('FCRA_BankruptcyKeys',filedate,'avenkatachalam@seisint.com,christopher.brodeur@lexisnexis.com,manuel.tarectecan@lexisnexis.com,randy.reyes@lexisnexis.com,BocaRoxiePackageTeam@lexisnexis.com,intel357@bellsouth.net','Y','F',,'Y'),
+		Roxiekeybuild.updateversion('FCRA_BankruptcyKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com,BocaRoxiePackageTeam@lexisnexis.com','Y','F',,'Y'),
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		

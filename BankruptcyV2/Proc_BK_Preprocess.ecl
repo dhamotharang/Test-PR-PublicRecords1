@@ -818,7 +818,7 @@ export Proc_BK_Preprocess(string filedate) := function
 	missing_case := if (count(clean_missing_cases) > 0,
 									sequential(
 									output(choosen(clean_missing_cases,10)),
-									fileservices.sendemail('Anantha.Venkatachalam@lexisnexis.com, Christopher.Brodeur@lexisnexis.com, Valerie.Minnis@lexisnexis.com',
+									fileservices.sendemail('Christopher.Brodeur@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com, Valerie.Minnis@lexisnexis.com',
 			'Bankruptcy Missing Cases ' + (STRING8)Std.Date.Today(),
 			'Please check the WU to determine the missing cases and check with Banko.' + WORKUNIT)),
 			output('No missing cases'));
@@ -829,10 +829,10 @@ export Proc_BK_Preprocess(string filedate) := function
 								((totsearchaddresscount / totsearchcount) > .01) or 
 								((totmainaddresscount / totmaincount) > .01)),
 					 sequential(
-					 if(_Control.ThisEnvironment.Name != 'Prod_Thor', fileservices.sendemail('Anantha.Venkatachalam@lexisnexis.com',
+					 if(_Control.ThisEnvironment.Name != 'Prod_Thor', fileservices.sendemail('Christopher.Brodeur@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',
 			'Bankruptcy Process failure:ERROR:' + (STRING8)Std.Date.Today(),
 			'More than 1% of Bankruptcy records have clean names with value ERR\n'),
-					fileservices.sendemail('Joseph.Lezcano@lexisnexis.com,Vesa.Niemela@lexisnexis.com,Lisa.Simmons@lexisnexis.com,Mike.Schumacher@lexisnexis.com,Brian.Dunnam@lexisnexis.com,Victor.tavernini@lexisnexis.com,Jeff.Torres@lexisnexis.com,Anantha.Venkatachalam@lexisnexis.com,afterhourssupport@lexisnexis.com,Christopher.Brodeur@lexisnexis.com,Sayeed.ahmed@lexisnexis.com',
+					fileservices.sendemail('Joseph.Lezcano@lexisnexis.com,Vesa.Niemela@lexisnexis.com,Lisa.Simmons@lexisnexis.com,Mike.Schumacher@lexisnexis.com,Brian.Dunnam@lexisnexis.com,Victor.tavernini@lexisnexis.com,Jeff.Torres@lexisnexis.com,afterhourssupport@lexisnexis.com,Christopher.Brodeur@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com',
 			'Bankruptcy Process failure:ERROR:' + (STRING8)Std.Date.Today(),
 			'More than 1% of Bankruptcy records have clean names or clean_addresses with value ERR or U001\n')),
 					 fail('Process Abort: More than 1% of the records have clean name or clean address with value ERR or U001')),
