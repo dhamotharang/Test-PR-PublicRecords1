@@ -1,4 +1,4 @@
-﻿// MNS0869 / Minnesotas Bookstore /	Real Estate //
+﻿﻿// MNS0869 / Minnesotas Bookstore /	Real Estate //
 
 export layout_MNS0869 := module
 

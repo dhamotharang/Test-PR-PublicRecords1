@@ -138,12 +138,13 @@ EXPORT map_MNS0869_conversion(STRING pVersion) := FUNCTION
 	  // use the right parser for name field
 		SELF.NAME_ORG_PREFX		:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(StdNAME_ORG);
 	
-		//Terri's review comment(BUG 124107) - 3. NAME_ORG is set to last name + first name for MD
-		SELF.NAME_ORG 				:= MAP(mariParse='MD' AND LENGTH(tmpLName)>1=> stringlib.stringcleanspaces(CleanNAME_ORG[46..65]+' '+CleanNAME_ORG[6..25]),
-																 tempTypeCd = 'GR' AND mariParse = 'MD' AND LENGTH(TRIM(tmpCleanNAME_ORG[46..65])) < 2 => StdNAME_ORG,
-																 mariParse='MD' AND LENGTH(tmpLName)<2 AND trimLname != ''=> trimLname + ' ' + trimFname,
-																 REGEXFIND(IPpattern,StdNAME_ORG) => Prof_License_Mari.mod_clean_name_addr.cleanInternetName(CleanNAME_ORG),
-																 CleanNAME_ORG);
+		//Terri's review comment(BUG 124107) - 3. NAME_ORG is set to last name + first name for MD															 
+		SELF.NAME_ORG                 := MAP(StdNAME_ORG = 'THE LLC' => StdNAME_ORG,
+                                     mariParse='MD' AND LENGTH(tmpLName)>1=> stringlib.stringcleanspaces(CleanNAME_ORG[46..65]+' '+CleanNAME_ORG[6..25]),
+                                                                 tempTypeCd = 'GR' AND mariParse = 'MD' AND LENGTH(TRIM(tmpCleanNAME_ORG[46..65])) < 2 => StdNAME_ORG,
+                                                                 mariParse='MD' AND LENGTH(tmpLName)<2 AND trimLname != ''=> trimLname + ' ' + trimFname,
+                                                                 REGEXFIND(IPpattern,StdNAME_ORG) => Prof_License_Mari.mod_clean_name_addr.cleanInternetName(CleanNAME_ORG),
+                                                                 CleanNAME_ORG);														 
 		
 		SELF.NAME_ORG_ORIG		:= tempTrimName;    //Names before we clean it
 		//Terri's review comment(BUG 124107) - 1. Set the name format.
