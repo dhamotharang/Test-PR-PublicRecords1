@@ -66,13 +66,34 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 			
 	withDID := Business_Risk_BIP.fn_DIDAppend(cleanedInput, Options, mod_access);
 	
-	prepBIPAppend := PROJECT(withDID, TRANSFORM(Business_Risk_BIP.Layouts.Input, SELF := LEFT.Clean_Input));
+	// This prevents SeleIDS from going through the BIPappend twice if version 31 of the business shell is being used
+	withDIDwithSeleID := PROJECT(withDID(Options.BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v31 and input_echo.SeleID <> 0), 
+															TRANSFORM(Business_Risk_BIP.Layouts.LinkID_Results,
+															SELF.bipidsourceinput := []; 
+															SELF.powids := []; 
+															SELF.proxids := []; 
+															SELF.seleids := []; 
+															SELF.orgids := []; 
+															SELF.ultids := []; 
+															SELF.companynames := [];
+															//retaining input bipids
+															SELF.PowID	:= ROW({left.input_echo.PowID,		0,		0,	0}, Business_Risk_BIP.Layouts.LinkIDs);
+															SELF.ProxID	:= ROW({left.input_echo.ProxID,	0,	0,	0}, Business_Risk_BIP.Layouts.LinkIDs);
+															SELF.SeleID	:= ROW({left.input_echo.SeleID,	0,	0,	0}, Business_Risk_BIP.Layouts.LinkIDs);
+															SELF.OrgID	:= ROW({left.input_echo.OrgID,		0,		0,	0}, Business_Risk_BIP.Layouts.LinkIDs);
+															SELF.UltID	:= ROW({left.input_echo.UltID,		0,		0,	0}, Business_Risk_BIP.Layouts.LinkIDs);
+															SELF.weight := left.BIP_IDs.weight; // needs to be populated
+															SELF.companyname := ROW({'', 0}, Business_Risk_BIP.Layouts.CompanyNames);
+															SELF := LEFT;));
+	// prepBIPAppend := PROJECT(withDID, TRANSFORM(Business_Risk_BIP.Layouts.Input, SELF := LEFT.Clean_Input));
+	prepBIPAppend := PROJECT(withDID(Options.BusShellVersion <> Business_Risk_BIP.Constants.BusShellVersion_v31 or input_echo.SeleID = 0), TRANSFORM(Business_Risk_BIP.Layouts.Input, SELF := LEFT.Clean_Input));
   
   BIPappend := if(Options.UseUpdatedBipAppend, Business_Risk_BIP.BIP_LinkID_Append_NEW(prepBIPAppend, Options, linkingOptions ),
 							   		 Business_Risk_BIP.BIP_LinkID_Append(prepBIPAppend, , Options.DoNotUseAuthRepInBIPAppend)
-							   		 );
+							   		 );								 
+	BIPAppendCombined := BIPAppend + withDIDwithSeleID;
 	
-  withBIP := JOIN(withDID, BIPAppend, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
+  withBIP := JOIN(withDID, BIPAppendCombined, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
                         SELF.BIP_IDs := RIGHT;
 												SELF.Verification.InputIDMatchConfidence := checkBlank((STRING)RIGHT.Weight, '0');
 												SELF.Verification.InputIDMatchPowID		:= (STRING)RIGHT.PowID.LinkID;
@@ -4686,7 +4707,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 	// *********************
 	//   DEBUGGING OUTPUTS
 	// *********************
-	// OUTPUT(CHOOSEN(InputOrig, 100), NAMED('Sample_InputOrig'));
+// OUTPUT(CHOOSEN(InputOrig, 100), NAMED('Sample_InputOrig'));
 	// OUTPUT(CHOOSEN(Input, 100), NAMED('Sample_Input'));
 	// OUTPUT(CHOOSEN(cleanedInput, 100), NAMED('Sample_cleanedInput'));
 	// OUTPUT(CHOOSEN(prepDIDAppend, 100), NAMED('Sample_prepDIDAppend'));
@@ -4728,7 +4749,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
   
   // OUTPUT(withFinalDelimitedFields, NAMED('withFinalDelimitedFields'));
   // OUTPUT(withBestAddrPhones,NAMED('withBestAddrPhones'));
-
+	
 	RETURN FinalShell_rolled;
 
 END;
