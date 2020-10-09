@@ -1,4 +1,5 @@
-﻿IMPORT  BIPV2, iesp,MDR, UCCV2, STD, Liensv2, Corp2, Cortera_Tradeline, DueDiligence, topbusiness_services;
+﻿IMPORT  BIPV2, iesp,UCCV2, STD, Cortera_Tradeline, DueDiligence, topbusiness_services;
+
   // throughout this code there are some indicators calculated.
   // this is all documented heavily in RR-18637 initial release
   // for the smart linx bus report (aka bip report)
@@ -39,7 +40,7 @@ EXPORT BusinessInsightSection := MODULE
          BOOLEAN  Risk8_ForeclosureNODRecordCount;
          BOOLEAN  Risk9_bankrupctyExists;
          BOOLEAN  Risk10_LiensWithinTwoYearsBack;
-         BOOLEAN  RIsk11_ExecHasDerog;
+         BOOLEAN  RIsk11_ExecHasDerog;      
          DATASET ({STRING8 SicCode;}) Risk12_BusinessInHighRiskIndustrySic;
          DATASET ({STRING8 NaicsCode;}) Risk12_BusinessInHighRiskIndustryNaics;
          BOOLEAN  Risk15_LiensBipLinkidsHighCount;
@@ -195,8 +196,8 @@ EXPORT BusinessInsightSection := MODULE
           ,TopBusiness_Services.BestSection_Layouts.Final bestSectionIn  
           ,BOOLEAN ContactExecHasDerog
           ,BOOLEAN ContactNonExecHasDerog
-          ,STRING15  AnnualSales
-          , BOOLEAN NoRevenue         
+          ,STRING15 AnnualSales
+          ,BOOLEAN NoRevenue                  
           ,DATASET({STRING8 SicCode;}) SicCode
           ,DATASET({STRING8 NaicsCode;}) NaicsCode
           ,INTEGER TotalMVRCount
@@ -234,9 +235,10 @@ EXPORT BusinessInsightSection := MODULE
                                                                                                     
               SELF.Risk10_LiensWithinTwoYearsBack := OrigFilingDateNumeric >= TwoYrsBackDate;  
                                                                                            
-              SELF.RIsk11_ExecHasDerog := ContactExecHasDerog;
+              SELF.RIsk11_ExecHasDerog := ContactExecHasDerog;            
               SELF.Risk12_BusinessInHighRiskIndustrySic := SicCode; 
-              SELF.Risk12_BusinessInHighRiskIndustryNAICS :=  NaicsCode;                      
+              SELF.Risk12_BusinessInHighRiskIndustryNAICS :=  NaicsCode;           
+             
               // fill in later here
               SELF.Risk15_LiensBipLinkidsHighCount := LienCountOver5;
               SELF.Risk16_BusinessHasB2BDelinquency :=  IncludeBizToBizDelinquencyRiskIndicator AND
@@ -484,13 +486,13 @@ EXPORT BusinessInsightSection := MODULE
          BusinessRisk11 := DATASET([{val11,'H', 'Executive has derogatory record on file'}],
                  iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);
                                      
-        //val12 := false;    // Business has a value of 2-9 in the Due Diligence Business Attribute: Business Industry               
-         val12 := topbusiness_services.BusinessInsightFunctions.BusinessInHighRiskIndustry(
+        //val12 := false;    // Business has a value of 6-9 in the Due Diligence Business Attribute: Business Industry                                                
+         val12 := topbusiness_services.BusinessInsightFunctions.BusinessInHighRiskIndustry(                                           
                                              BusRiskIn.Risk12_BusinessInHighRiskIndustrySic,
                                             BusRiskIn.Risk12_BusinessInHighRiskIndustryNAICS);  
         BusinessRisk12 := DATASET([{val12,'M', 'Business is in a high risk industry'}],
                  iesp.topbusinessReport.T_topBusinessBusinessRiskIndicator);
-                                                   
+                 
         // val15 := false;  
         val15 :=  topbusiness_services.BusinessInsightFunctions.LiensBipLinkidsHighCount( BusRiskIn.Risk15_LiensBipLinkidsHighCount);                                      
         BusinessRisk15 := DATASET([{val15,'M', 'High judgment or lien count '}],
@@ -593,7 +595,7 @@ EXPORT BusinessInsightSection := MODULE
                                         
             BusinessRisksAll :=   BusinessRisk7 + BusinessRisk8 
                    + BusinessRisk9 + BusinessRisk10  + BusinessRisk11
-                   + BusinessRisk12+ BusinessRisk15
+                   + BusinessRisk12+  BusinessRisk15
                    + BusinessRisk16 + BusinessRisk17 + BusinessRisk18 + BusinessRisk19
                    + BusinessRisk20 + BusinessRisk21 + BusinessRisk22 + BusinessRisk23
                    + BusinessRisk24 + BusinessRisk25+ BusinessRisk26 + BusinessRisk27
