@@ -9,9 +9,12 @@ export fn_Base2_from_Base1(string version) := FUNCTION
 	exceptions := nac_v2.fn_ProcessExceptionRecord(Nac_V2.Files2.dsProcessing);
 	newdata := nac_v2.fn_constructBase2FromNCFEx(Nac_V2.Files2.dsProcessing, version);
 	
-	base2 := IF(EXISTS(newdata),
-							NAC_V2.fn_MergeWithBase(newdata, rawbase2, true) , // update base2
-							rawbase2) : INDEPENDENT;
+	boolean newhead := NAC_V2.HVersion.NewHeader;
+	base2a := 	IF(EXISTS(newdata),
+									NAC_V2.fn_MergeWithBase(newdata, rawbase2, newhead) , // update base2 (don't like here if new header)
+								rawbase2);
+	base2 := IF(newhead, NAC_V2.proc_link(base2a), base2a) : INDEPENDENT;	// relink entire file
+	
 	// Filter out base1 records that may be in base2, and then
 	//  convert base1 to baes2 format
 	base1 := nac_v2.fn_Base1ToBase2(NAC_V2.fn_filterBase1(nac_V2.Files.Base, base2)) : INDEPENDENT;
@@ -64,6 +67,7 @@ export fn_Base2_from_Base1(string version) := FUNCTION
 				),
 		if (ut.Weekday((integer)version[1..8]) <> 'SATURDAY',
 								Nac_v2.CreateOrbitEntry(version)),
+		IF(newhead, NAC_V2.HVersion.updateVersion),
 		Nac.fn_Strata(version),
 		NAC_V2.ProcessCollisions(newcol, version)
 	);

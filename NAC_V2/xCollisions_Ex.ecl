@@ -148,6 +148,7 @@ export NAC_v2.Layout_Collisions2.Layout_Collisions xCollisions_Ex(NAC_v2.Layout_
 			self.ClientLastName := fn_right(l.LastName,r.LastName);
 			self.ClientFirstName := fn_right(l.FirstName,r.FirstName);
 			self.ClientMiddleName := fn_right(l.MiddleName,r.MiddleName);
+			self.ClientSuffixName := fn_right(l.NameSuffix,r.NameSuffix);
 			self.ClientGender := fn_right(l.Gender,r.Gender);
 			self.ClientRace := fn_right(l.Race,r.Race);
 			self.ClientEthnicity := fn_right(l.Ethnicity,r.Ethnicity);
