@@ -134,6 +134,7 @@ EXPORT Files := MODULE
     EXPORT addl_legal := dataset(LN_PropertyV2_Fast.FileNames.prep.addl_legal,LN_PropertyV2_Fast.Layout_prep_addl_legal, flat);
     EXPORT addl_frs_a := dataset(LN_PropertyV2_Fast.FileNames.prep.addl_frs_a,LN_PropertyV2_Fast.Layout_prep_addl_frs_a, flat);
     EXPORT addl_frs_d := dataset(LN_PropertyV2_Fast.FileNames.prep.addl_frs_d,LN_PropertyV2_Fast.Layout_prep_addl_frs_d, flat);
+		EXPORT addl_name_info := dataset(LN_PropertyV2_Fast.FileNames.prep.addl_name_info,LN_PropertyV2_Fast.Layout_prep_addl_name_info, flat);
 		
 		l:= LN_PropertyV2_Fast.Layout_prep_search_prp; getSuperOrBlank(d,LN_PropertyV2_Fast.FileNames.prep.search_prp,l);
 		EXPORT search_prp := project(d,l);
@@ -154,6 +155,23 @@ EXPORT Files := MODULE
     EXPORT addl_frs_a := dataset(LN_PropertyV2_Fast.FileNames.base.addl_frs_a,LN_PropertyV2.layout_addl_fares_tax, flat);
     EXPORT addl_frs_d := dataset(LN_PropertyV2_Fast.FileNames.base.addl_frs_d,LN_PropertyV2.layout_addl_fares_deed, flat);
     EXPORT search_prp := dataset(LN_PropertyV2_Fast.FileNames.base.search_prp,LN_PropertyV2.Layout_Did_Out, flat);
+		EXPORT addl_name_info := dataset(LN_PropertyV2_Fast.FileNames.base.addl_name_info,LN_PropertyV2.layout_addl_name_info, flat,opt);
+ END;
+
+// DF-27847 basedelta
+ 	EXPORT basedelta := MODULE
+    EXPORT assessment := project(dataset(LN_PropertyV2_Fast.FileNames.basedelta.assessment,
+																				 LN_PropertyV2.Layouts.layout_property_common_model_base_scrubs,flat)
+																				 ,LN_PropertyV2.layout_property_common_model_base);
+    EXPORT deed_mortg := project(dataset(LN_PropertyV2_Fast.FileNames.basedelta.deed_mortg,
+																				 LN_PropertyV2.Layouts.layout_deed_mortgage_common_model_base_scrubs,flat)
+																				 ,LN_PropertyV2.layout_deed_mortgage_common_model_base);
+    EXPORT addl_names := dataset(LN_PropertyV2_Fast.FileNames.basedelta.addl_names,LN_PropertyV2.layout_addl_names, flat);
+    EXPORT addl_legal := dataset(LN_PropertyV2_Fast.FileNames.basedelta.addl_legal,LN_PropertyV2.layout_addl_legal, flat);
+    EXPORT addl_frs_a := dataset(LN_PropertyV2_Fast.FileNames.basedelta.addl_frs_a,LN_PropertyV2.layout_addl_fares_tax, flat);
+    EXPORT addl_frs_d := dataset(LN_PropertyV2_Fast.FileNames.basedelta.addl_frs_d,LN_PropertyV2.layout_addl_fares_deed, flat);
+    EXPORT search_prp := dataset(LN_PropertyV2_Fast.FileNames.basedelta.search_prp,LN_PropertyV2.Layout_Did_Out, flat);
+		EXPORT addl_name_info := dataset(LN_PropertyV2_Fast.FileNames.basedelta.addl_name_info,LN_PropertyV2.layout_addl_name_info, flat,opt);
  END;
 /*
  	EXPORT exprt := MODULE

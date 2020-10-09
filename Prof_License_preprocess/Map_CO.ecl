@@ -199,7 +199,7 @@ Prof_License.Layout_proLic_in map2med( concatin l ) := transform
                                                                                           
                                    'WHO' => 'Wholesaler Out-of-State' , '');   
 
-    self.license_number       := l.LicenseNumber;                                                              
+    self.license_number       :=  regexreplace('=|"',l.LicenseNumber,'');                                                              
     self.status               := l.Status;                                                                       
     self.company_name    := trim(l.Entity_Name);                                        
     self.orig_name            := trim(l.FirstName + ' ' + l.MiddleName + ' ' + l.LastName + ' ' + l.Suffix);              
@@ -210,9 +210,9 @@ Prof_License.Layout_proLic_in map2med( concatin l ) := transform
     self.orig_st              := trim(l.StateCode)[1..2];                                  
     self.orig_zip             := StringLib.Stringfilter(l.ZipCode,'0123456789')[1..9];                      
     self.phone                :=  '';//StringLib.Stringfilter(l.Phone,'0123456789')[1..10];                  
-    self.issue_date           := trim(l.FirstIssueDate);                                        
-    self.expiration_date      := trim(l.ExpirationDate);                                      
-    self.last_renewal_date    := trim(l.LastRenewalDate);                                         
+    self.issue_date           := Prof_License_preprocess.dateconv(trim(l.FirstIssueDate));                                        
+    self.expiration_date      := Prof_License_preprocess.dateconv(trim(l.ExpirationDate));                                      
+    self.last_renewal_date    := Prof_License_preprocess.dateconv(trim(l.LastRenewalDate));                                         
     self.education_1_degree   := trim(l.Degree)[1..15];                    
     self.education_2_degree    := '';//l.Degree1;                                                          
     self.education_3_degree   := '';//l.Degree2;                                                          
@@ -628,7 +628,7 @@ Prof_License.Layout_proLic_in map2all( File_CO.available l ) := transform
 'WHI' => 'Wholesaler In-State' ,
                      
 'WHO' => 'Wholesaler Out-of-State' , '');
-  self.license_number := l.License_Number;
+  self.license_number := regexreplace('=|"',l.License_Number,'');           
   self.status := l.License_Status_Description;
   self.company_name := trim(l.Entity_Name);
   self.orig_name := trim(l.Formatted_Name);
@@ -638,9 +638,9 @@ Prof_License.Layout_proLic_in map2all( File_CO.available l ) := transform
   self.orig_city := l.City;
   self.orig_st := trim(l.State)[1..2];
   self.orig_zip := StringLib.stringfilter(l.Mail_Zip_Code,'0123456789')[1..9];
-  self.issue_date := fSlashedMDYtoCYMD(trim(l.License_First_Issue_Date));
-  self.expiration_date := fSlashedMDYtoCYMD(trim(l.License_Expiration_Date));
-  self.last_renewal_date := fSlashedMDYtoCYMD(trim(l.License_Last_Renewed_Date));
+  self.issue_date := Prof_License_preprocess.dateconv(trim(l.License_First_Issue_Date));
+  self.expiration_date := Prof_License_preprocess.dateconv(trim(l.License_Expiration_Date));
+  self.last_renewal_date := Prof_License_preprocess.dateconv(trim(l.License_Last_Renewed_Date));
   self.education_1_degree := trim(l.Degree)[1..15];
   self.additional_licensing_specifics := l.Specialty;
   self.vendor := 'State of Colorado Division of Licensing';

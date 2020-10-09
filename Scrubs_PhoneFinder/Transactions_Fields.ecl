@@ -30,25 +30,25 @@ EXPORT InValidFT_Invalid_ID(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(
 EXPORT InValidMessageFT_Invalid_ID(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789R\\\\N'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Code(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789 -\\\\N'); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'0123456789(). -\\\\N'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Code(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789 -\\\\N'))));
-EXPORT InValidMessageFT_Invalid_Code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789 -\\\\N'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Code(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789(). -\\\\N'))));
+EXPORT InValidMessageFT_Invalid_Code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789(). -\\\\N'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Alpha(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ\\\\ '); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\\\\ '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Alpha(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ\\\\ '))));
-EXPORT InValidMessageFT_Invalid_Alpha(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ\\\\ '),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Alpha(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\\\\ '))));
+EXPORT InValidMessageFT_Invalid_Alpha(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\\\\ '),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_AlphaChar(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz .,/-&\\\\\''); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789()_ .,:#/-&\\\\\''); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_AlphaChar(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz .,/-&\\\\\''))));
-EXPORT InValidMessageFT_Invalid_AlphaChar(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz .,/-&\\\\\''),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_AlphaChar(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789()_ .,:#/-&\\\\\''))));
+EXPORT InValidMessageFT_Invalid_AlphaChar(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789()_ .,:#/-&\\\\\''),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Risk(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -59,8 +59,8 @@ EXPORT InValidMessageFT_Invalid_Risk(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneE
 EXPORT MakeFT_Invalid_Phone_Type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_Phone_Type(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['POSSIBLE WIRELESS','LANDLINE','POSSIBLE VOIP','OTHER UNKNOWN','PAGER','\\N','']);
-EXPORT InValidMessageFT_Invalid_Phone_Type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('POSSIBLE WIRELESS|LANDLINE|POSSIBLE VOIP|OTHER UNKNOWN|PAGER|\\N|'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Phone_Type(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['POSSIBLE WIRELESS','LANDLINE','POSSIBLE VOIP','OTHER UNKNOWN','PAGER','CABLE','OTHER/UNKNOWN','\\N','']);
+EXPORT InValidMessageFT_Invalid_Phone_Type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('POSSIBLE WIRELESS|LANDLINE|POSSIBLE VOIP|OTHER UNKNOWN|PAGER|CABLE|OTHER/UNKNOWN|\\N|'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Phone_Status(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -75,11 +75,11 @@ EXPORT InValidFT_Invalid_Forward(SALT311.StrType s) := WHICH(((SALT311.StrType) 
 EXPORT InValidMessageFT_Invalid_Forward(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('FORWARDED|NOT FORWARDED|\\N|'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_State(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ\\\\ '); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\\\\ '); // Only allow valid symbols
   RETURN  MakeFT_Invalid_Alpha(s1);
 END;
-EXPORT InValidFT_Invalid_State(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ\\\\ '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2));
-EXPORT InValidMessageFT_Invalid_State(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ\\\\ '),SALT311.HygieneErrors.NotLength('0,2'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_State(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\\\\ '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2));
+EXPORT InValidMessageFT_Invalid_State(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\\\\ '),SALT311.HygieneErrors.NotLength('0,2'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_Zip(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'0123456789\\\\N'); // Only allow valid symbols
@@ -151,9 +151,9 @@ EXPORT Make_response_time(SALT311.StrType s0) := MakeFT_Invalid_No(s0);
 EXPORT InValid_response_time(SALT311.StrType s) := InValidFT_Invalid_No(s);
 EXPORT InValidMessage_response_time(UNSIGNED1 wh) := InValidMessageFT_Invalid_No(wh);
  
-EXPORT Make_reference_code(SALT311.StrType s0) := MakeFT_Invalid_Code(s0);
-EXPORT InValid_reference_code(SALT311.StrType s) := InValidFT_Invalid_Code(s);
-EXPORT InValidMessage_reference_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_Code(wh);
+EXPORT Make_reference_code(SALT311.StrType s0) := MakeFT_Invalid_AlphaChar(s0);
+EXPORT InValid_reference_code(SALT311.StrType s) := InValidFT_Invalid_AlphaChar(s);
+EXPORT InValidMessage_reference_code(UNSIGNED1 wh) := InValidMessageFT_Invalid_AlphaChar(wh);
  
 EXPORT Make_phonefinder_type(SALT311.StrType s0) := MakeFT_Invalid_Alpha(s0);
 EXPORT InValid_phonefinder_type(SALT311.StrType s) := InValidFT_Invalid_Alpha(s);

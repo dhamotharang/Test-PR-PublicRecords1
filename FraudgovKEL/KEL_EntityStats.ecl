@@ -1,7 +1,7 @@
 ﻿
   IMPORT KELOtto, FraudGovPlatform_Analytics, FraudGovPlatform, Data_services, Std;
 
-    EXPORT WeightingChart := DATASET('~fraudgov::in::sprayed::configattributes', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, STRING IndicatorType, STRING IndicatorDescription, INTEGER Weight, STRING UiDescription, UNSIGNED customerid, UNSIGNED industrytype}, CSV(HEADING(1)));    
+    EXPORT WeightingChart := DATASET('~fraudgov::in::sprayed::configattributes2', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, STRING IndicatorType, STRING IndicatorDescription, INTEGER Weight, STRING UiDescription, UNSIGNED customerid, UNSIGNED industrytype}, CSV(HEADING(1)));    
 
 
 // Add a column to tag that have {value} so the str.findreplace is only done for those rows that need it (for speed in the join).
@@ -17,7 +17,9 @@ NicoleAttr := 't17_emaildomaindispflag,t18_ipaddrhostedflag,t18_ipaddrvpnflag,t1
 't18_ipaddrasncompnm,t18_ipaddrasn,t18_ipaddrcompnm,t18_ipaddrorgnm,t19_bnkacctbnknm,p1_aotidkrappfrdactshrdflagev,p1_aotidkrgenfrdactshrdflagev,p1_aotidkrothfrdactshrdflagev,p1_aotidkrstolidactshrdflagev,' + 
 'p9_aotaddrkractshrdflagev,p15_aotssnkractshrdflagev,p16_aotphnkractshrdflagev,p17_aotemailkractshrdflagev,p18_aotipaddrkractshrdflagev,p19_aotbnkacctkractshrdflagev,p20_aotdlkractshrdflagev,' +
 'p9_idactolddt,p15_idactolddt,p16_idactolddt,p17_idactolddt,p18_idactolddt,p19_idactolddt,p20_idactolddt,p9_aotaddrsafeactflagev,p16_aotphnsafeactflagev,p18_aotipaddrsafeactflagev,' +
-'t9_addrisvacantflag,t9_addrisinvalidflag,t9_addriscmraflag,t9_addrpoboxmultcurridflagev,t15_ssnisinvalidflag,t15_ssnmultcurridflagev,t16_phnisinvalidflag,t16_phnprepdflag,t19_bnkacctmultcurridflagev,t20_dlisinvalidflag,t20_dlmultcurridflagev';
+'t9_addrisvacantflag,t9_addrisinvalidflag,t9_addriscmraflag,t9_addrpoboxmultcurridflagev,t15_ssnisinvalidflag,t15_ssnmultcurridflagev,t16_phnisinvalidflag,t16_phnprepdflag,t19_bnkacctmultcurridflagev,t20_dlisinvalidflag,t20_dlmultcurridflagev,' +
+'p1_aotidkrstolidactinagcyflagev,p1_aotidkrgenfrdactinagcyflagev,p1_aotidkrappfrdactinagcyflagev,p1_aotidkrothfrdactinagcyflagev,p9_aotaddrkractinagcyflagev,' +
+'p15_aotssnkractinagcyflagev,p16_aotphnkractinagcyflagev,p17_aotemailkractinagcyflagev,p18_aotipaddrkractinagcyflagev,p19_aotbnkacctkractinagcyflagev,p20_aotdlkractinagcyflagev';
 
   //EntityEventPivot := FraudgovKEL.KEL_EventPivot.EventPivotShell(AotCurrProfFlag=1); // only create entity stats for the last event per element/identity.
   EntityEventPivot := FraudgovKEL.KEL_EventPivot.EventPivotShell(AotCurrProfFlag=1); // only create entity stats for the last event per element/identity.
@@ -28,7 +30,7 @@ NicoleAttr := 't17_emaildomaindispflag,t18_ipaddrhostedflag,t18_ipaddrvpnflag,t1
 
 NicoleAttr
 
-  ) : PERSIST('~temp::deleteme49');
+  ) : PERSIST('~fraudgov::temp::deleteme49');
 
   EntityStatsPrep1 := PROJECT(EventStatsPrep, TRANSFORM({RECORDOF(LEFT) AND NOT [entityhash]}, SELF := LEFT)); 
                                                  
@@ -92,7 +94,7 @@ NicoleAttr
                             SELF.EntityType := MAP(RIGHT.Field != '' => RIGHT.EntityType, LEFT.EntityType),
                             SELF.IndicatorType := MAP(RIGHT.IndicatorType != '' => RIGHT.IndicatorType, LEFT.IndicatorType);
                             SELF.IndicatorDescription := MAP(RIGHT.IndicatorDescription != '' => RIGHT.IndicatorDescription, LEFT.IndicatorDescription);
-                            SELF := LEFT), LOOKUP, LEFT OUTER);// : PERSIST('~temp::deleteme92', EXPIRE(7));
+                            SELF := LEFT), LOOKUP, LEFT OUTER);// : PERSIST('~fraudgov::temp::deleteme92', EXPIRE(7));
 
 EntityStats := WeightedResult(RiskLevel in [0,1,2,3] AND Value != '0') : INDEPENDENT;
 
@@ -107,7 +109,10 @@ SuperSpecialEntityStatsForFilter := JOIN(EntityStats, EntityEventPivot, LEFT.cus
 							RIGHT.t1_adultidnotseenflag,RIGHT.t1_addrnotverflag,RIGHT.t1l_ssnwaltnaverflag,RIGHT.t1_firstnmnotverflag,RIGHT.T1_hiriskcviflag,RIGHT.t1_medriskcviflag,RIGHT.t1_minorwlexidflag,RIGHT.t1_lastnmnotverflag,RIGHT.t1_phnnotverflag,RIGHT.t1l_ssnwaddrnotverflag,RIGHT.t1_ssnpriordobflag,RIGHT.t1l_ssnnotverflag,
 							RIGHT.t1l_curraddrnotinagcyjurstflag,RIGHT.t1l_bestdlnotinagcyjurstflag,RIGHT.t1L_hdrsrccatcntlwflag,RIGHT.t1l_iddeceasedflag,RIGHT.t1l_idcurrincarcflag,RIGHT.t1l_iddtofdeathaftidactflagev,RIGHT.aotidcurrprofusngcntev,
 							RIGHT.t9_addrisvacantflag,RIGHT.t9_addrisinvalidflag,RIGHT.t9_addriscmraflag,RIGHT.t9_addrpoboxmultcurridflagev,RIGHT.t15_ssnisinvalidflag,RIGHT.t15_ssnmultcurridflagev,RIGHT.t16_phnisinvalidflag,RIGHT.t16_phnprepdflag,RIGHT.t19_bnkacctmultcurridflagev,RIGHT.t20_dlisinvalidflag,RIGHT.t20_dlmultcurridflagev,
-							RIGHT.incustomerpopulation,RIGHT.RiskIndx
+							RIGHT.incustomerpopulation,RIGHT.t_inagencyflag,RIGHT.RiskIndx,RIGHT.p1_aotidkrappfrdactshrdflagev,RIGHT.p1_aotidkrgenfrdactshrdflagev,RIGHT.p1_aotidkrothfrdactshrdflagev,RIGHT.p1_aotidkrstolidactshrdflagev,RIGHT.p9_aotaddrkractshrdflagev,RIGHT.p15_aotssnkractshrdflagev,
+							RIGHT.p16_aotphnkractshrdflagev,RIGHT.p17_aotemailkractshrdflagev,RIGHT.p18_aotipaddrkractshrdflagev,RIGHT.p19_aotbnkacctkractshrdflagev,RIGHT.p20_aotdlkractshrdflagev,
+							RIGHT.p1_aotidkrstolidactinagcyflagev,RIGHT.p1_aotidkrgenfrdactinagcyflagev,RIGHT.p1_aotidkrappfrdactinagcyflagev,RIGHT.p1_aotidkrothfrdactinagcyflagev,RIGHT.p9_aotaddrkractinagcyflagev,
+							RIGHT.p15_aotssnkractinagcyflagev,RIGHT.p16_aotphnkractinagcyflagev,RIGHT.p17_aotemailkractinagcyflagev,RIGHT.p18_aotipaddrkractinagcyflagev,RIGHT.p19_aotbnkacctkractinagcyflagev,RIGHT.p20_aotdlkractinagcyflagev
 							},
 							SELF := LEFT, SELF := RIGHT), KEEP(1), HASH);
 

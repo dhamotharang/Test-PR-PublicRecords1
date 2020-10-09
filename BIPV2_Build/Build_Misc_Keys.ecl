@@ -1,4 +1,5 @@
-﻿import BIPV2, tools,riskwise,BIPV2_Company_Names,Address_Attributes, BIPV2_Segmentation,BIPV2_Statuses,BIPV2_PostProcess;
+﻿import BIPV2, tools,riskwise,BIPV2_Company_Names,Address_Attributes, BIPV2_Segmentation,BIPV2_Statuses,BIPV2_PostProcess, BIPV2_Best;
+import dx_BIPV2;
 
 EXPORT build_misc_keys(
 
@@ -28,7 +29,10 @@ module
   export BuildZipCitySt     := tools.macf_writeindex('keys(pversion).zipcityst.new'                                                                        );
   export BuildSegKey        := tools.macf_writeindex('BIPV2_Segmentation.Key_LinkIds(pversion).Key ,seg ,BIPV2_Segmentation.keynames(pversion).seg_linkids.new' );
 
-  shared keyfilt        := 'zipcityst|translations|business_header::.*?::linkids|status|bipv2_aml_addr|segmentation_linkids';  //only promote these keys
+  export BuildFirmoKey      := tools.macf_writeindex('dx_BIPV2.key_FirmographicsScore.Key, BIPV2_Best.In_FirmographicsScore, dx_BIPV2.Keynames(pVersion).FirmographicsScore.new');
+  export BuildLocid         := tools.macf_writeindex('dx_BIPV2.key_Locid.Key, BIPV2.In_Locid(), dx_BIPV2.Keynames(pVersion).Locid.new');
+
+  shared keyfilt        := 'zipcityst|translations|business_header::.*?::linkids|status|bipv2_aml_addr|segmentation_linkids|locid|firmo';  //only promote these keys
 
   export promote2built  := promote(pversion,keyfilt).new2built;
   
@@ -44,6 +48,8 @@ module
       ,BuildStatus      
       ,BuildZipCitySt       
       ,BuildSegKey       
+      ,BuildLocid
+      ,BuildFirmoKey
      )
     ,promote2built
     ,if(pPromote2QA = true  ,Promote(pversion,keyfilt).Built2QA)

@@ -68,6 +68,19 @@ ECL:='FraudGovPlatform._CRON_Base_Schedule';
 Go:=sequential(wk_ut.CreateWuid(ECL,THOR,ESP),email(wuname));
 EXPORT CRON_Base_Schedule:=if(d=0,Go,noGo);
 
+//Every 1 Hour
+wuname:='FraudGov Prod Dashboards Refresh Schedule';
+d:=count(WorkunitServices.WorkunitList('',jobname:=wuname)(state in valid_state));
+ECL:='FraudGovPlatform._CRON_Refresh_PROD_Dashboards';
+Go:=sequential(wk_ut.CreateWuid(ECL,THOR,ESP),email(wuname));
+EXPORT CRON_ProdDashboards_Schedule:=if(d=0,Go,noGo);
+
+//Every 9 minutes
+wuname:='FraudGov Prod Dashboards Version Refresh Schedule';
+d:=count(WorkunitServices.WorkunitList('',jobname:=wuname)(state in valid_state));
+ECL:='FraudGovPlatform._CRON_Refresh_ProdDashVersion';
+Go:=sequential(wk_ut.CreateWuid(ECL,THOR,ESP),email(wuname));
+EXPORT CRON_ProdDashboardVersion_Schedule:=if(d=0,Go,noGo);
 
 Go:=sequential(
 						 CRON_DeltabaseInputPrepSchedule
@@ -77,6 +90,8 @@ Go:=sequential(
 						,CRON_MBSInputPrepSchedule
 						,CRON_NACInputPrepSchedule
 						,CRON_Base_Schedule
+						,CRON_ProdDashboards_Schedule
+						,CRON_ProdDashboardVersion_Schedule
 );
 
 EXPORT all := Go;

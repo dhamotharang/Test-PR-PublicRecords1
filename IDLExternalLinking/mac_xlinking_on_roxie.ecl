@@ -1,13 +1,13 @@
-//*
+﻿//*
 // Returns the LexID for each record in the infile
 // The field names in the infile are passed by parameter in this macro.
 
 export mac_xlinking_on_roxie(infile, IDL ='', Input_SNAME = '', Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_Gender = '', Input_Derived_Gender = '',
 														Input_PRIM_NAME = '',Input_PRIM_RANGE = '',Input_SEC_RANGE = '',Input_CITY = '',Input_ST = '',Input_ZIP = '',Input_SSN = '',
 														Input_DOB = '', Input_Phone= '', Input_DL_STATE = '',Input_DL_NBR = '', 
-														outfile, weight_score = 30, Distance = 3, Segmentation = true, Input_RelFname = '', Input_RelLname = '', DisableDobForce = 'InsuranceHeader_xLink.Config.DOB_NotUseForce') := MACRO
+														outfile, weight_score = 30, Distance = 3, Segmentation = true, Input_RelFname = '', Input_RelLname = '', DisableDobForce = 'InsuranceHeader_xLink.Config.DOB_NotUseForce', Input_Vin = '') := MACRO
 
-IMPORT InsuranceHeader_xLink;
+IMPORT InsuranceHeader_xLink,ut;
 
 #UNIQUENAME(hasUniqueId)
 	ut.hasField(infile, UniqueId, %hasUniqueId%);
@@ -83,9 +83,9 @@ IDLExternalLinking.xIDLConstants.in_new_layout %into%(%infile_seq% le) := transf
     self.ST := (typeof(SELF.ST))'';
   #END
   #IF ( #TEXT(Input_ZIP) <> '' )
-    self.ZIP := (typeof(SELF.ZIP))le.Input_ZIP;
-  #ELSE
-    self.ZIP := (typeof(SELF.ZIP))'';
+      SELF.ZIP_cases := DATASET([{le.Input_ZIP, 100}],InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases); ;
+    #ELSE
+      SELF.ZIP_cases := DATASET([],InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases);
   #END
   #IF ( #TEXT(Input_SSN) <> '' )
     self.SSN5 := InsuranceHeader_xLink.mod_SSNParse(le.Input_SSN).ssn5;
@@ -123,6 +123,11 @@ IDLExternalLinking.xIDLConstants.in_new_layout %into%(%infile_seq% le) := transf
 		self.lname2 := (typeof(SELF.lname2))le.Input_RelLname;
   #ELSE
     self.lname2 := (typeof(SELF.lname2))'';
+  #END	
+	#IF ( #TEXT(Input_VIN) <> '' )
+		self.VIN := (typeof(SELF.VIN))le.VIN;
+  #ELSE
+    self.VIN := (typeof(SELF.VIN))'';
   #END		
   self.SRC := (typeof(SELF.SRC))'';
   self.SOURCE_RID := (typeof(SELF.SOURCE_RID))'';  

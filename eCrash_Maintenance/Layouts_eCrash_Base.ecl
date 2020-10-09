@@ -1,4 +1,15 @@
-﻿EXPORT Layouts_eCrash_Base := RECORD,maxlength(40000)
+﻿citations_childrec := RECORD
+   string7 citation_issued;
+   string7 citation_type;
+   string100 citation_detail1;
+   string64 citation_status;
+   string60 violation_code1;
+   string60 violation_code2;
+   string60 violation_code3;
+   string60 violation_code4;
+  END;
+
+EXPORT Layouts_eCrash_Base := RECORD,maxlength(40000)
   string8 date_vendor_first_reported;
   string8 date_vendor_last_reported;
   string8 dt_first_seen;
@@ -374,7 +385,7 @@
   string50 law_enforcement_suspects_alcohol_use;
   string alcohol_test_status;
   string alcohol_test_type;
-  string25 alcohol_test_result;
+  string alcohol_test_result;
   string7 law_enforcement_suspects_drug_use;
   string20 drug_test_given;
   string100 non_motorist_actions_prior_to_crash1;
@@ -870,11 +881,12 @@
   string10 dispatch_date;
   string10 drug_involvement;
   string7 alcohol_involved;
-  string10 dui_suspected;
+  string dui_suspected;
   string drug_test_result;
   string64 geo_coded_latitude;
   string64 geo_coded_longitude;
   string marijuana_use_suspected;
   string direction_of_impact;
   string event_sequence;
+  DATASET(citations_childrec) citation_details{maxcount(50)};
  END;

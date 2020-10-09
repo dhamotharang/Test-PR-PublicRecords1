@@ -21,7 +21,8 @@ EXPORT Map_Identities(string8 version) := FUNCTION
 	
 	mapIdMain 	:= project(inFile, trId(left));
 	concatFile	:= mapIdMain + PhoneFinderReportDelta.File_PhoneFinder.Identities_Main;//DF-23286
-	ddConcat 		:= dedup(sort(distribute(concatFile, hash(transaction_id)), transaction_id, sequence_number, -(date_added+time_added), local), transaction_id, sequence_number, local);
+	//DF-27859 keep the earliest records for delta update changes
+	ddConcat 		:= dedup(sort(distribute(concatFile, hash(transaction_id)), transaction_id, sequence_number, date_file_loaded,date_added,time_added, local), transaction_id, sequence_number, local);
 	
 	return ddConcat; 
 

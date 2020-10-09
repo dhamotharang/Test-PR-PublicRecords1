@@ -48,6 +48,7 @@ module
 	// -- JIRA - DF-23018 - Consumer Dispute - Paw Record to be removed
 	// -- JIRA - DF-24482 - People at Work detail needs to be removed from individual
 	// -- JIRA - DF-24522 - Consumer Dispute - Unlink to PAW - zoom record
+	// -- JIRA - BH-918 - Possible overlink on Zoom documents
 	shared Bad_zoom_vend_ids := [	'1901732652   C23201883',
 																'1793702174   C355227920',
 																'1793716775   C355227920',
@@ -78,7 +79,8 @@ module
 																'1281160320    C26201112',
 																'1346792667C92292992',				// JIRA - DF-23018
 																'1580842040C59082544',				// JIRA - DF-24482
-																'1924843383   C77627406'			// JIRA - DF-24522
+																'1924843383   C77627406',			// JIRA - DF-24522
+																'1959863597   C124634019'     // JIRA - BH-918
 															 ];
 	
 	export Input :=
@@ -171,6 +173,8 @@ module
 				or	(regexfind('PETER KIRN|PETERKIRN', pInput.company_name, nocase))
 				// -- JIRA# DF-26483 - Flush the Internet Domain (Whois) records as per Jason.
 				or	(MDR.sourceTools.SourceIsWhois_domains(pInput.source))
+				// -- JIRA# DF-28031 - Remove TMSID DF204043915806782546018877941 from D&B FEIN
+				or	(MDR.sourceTools.SourceIsDunn_Bradstreet_Fein(pInput.source) and trim(pInput.vendor_id,left,right) = '018877941')
 				; 		
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -489,6 +493,15 @@ module
 				// -- JIRA - DF-27852 Remove Busreg Contact Information for LexID 2361200281
 				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.lname) = 'SMITH' and 
 						 trim(pInput.company_source_group) in ['2003079497BOLD AND CLASSIC', '32011167163BOLD AND CLASSIE', 'A208015557REEL ADVOCATE', 'A211008586BOLD AND CLASSIE', 'A214003819REAL 2 REEL MEDIA GROUP'])
+				// -- JIRA - DF-28332 FCRA - Possible Overlinking LexID 1924627637 in PAW and Business Contacts
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.lname) = 'PATEL' and trim(pInput.fname) = 'JITENDRA' and
+						 trim(pInput.company_source_group) in ['6547020OM HOSPITALITY INC'])
+				// -- JIRA - DF-28113 Consumer Karen Ruge may be incorrectly associated with A M Electrical
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.lname) = 'RUGE' and trim(pInput.fname) = 'KAREN' and
+						 trim(pInput.company_name) = 'A M ELECTRICAL SERVICES INC')
+				// -- JIRA - BH-915 Incorrect ROBERT HILL, possibly, associated to business
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.company_source_group) in ['1855883 SHATTOS LLC','258208NORTH PARK TRUCK & EQUIPMENT'] and
+						 trim(pInput.lname) = 'HILL' and trim(pInput.prim_name) = 'PO BOX 705')
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -704,6 +717,8 @@ module
 				or (MDR.sourceTools.sourceIsMA_Corporations(pInput.source) and trim(pInput.vendor_id) = '25-FW1GV5')
 				// -- JIRA# DF-26483 - Flush the Internet Domain (Whois) records as per Jason.
 				or	(MDR.sourceTools.SourceIsWhois_domains(pInput.source))
+				// -- JIRA# DF-28031 - Remove TMSID DF204043915806782546018877941 from D&B FEIN
+				or	(MDR.sourceTools.SourceIsDunn_Bradstreet_Fein(pInput.source) and trim(pInput.vendor_id,left,right) = '018877941')
 				;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -1097,6 +1112,15 @@ module
 				// -- JIRA - DF-27852 Remove Busreg Contact Information for LexID 2361200281
 				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.lname) = 'SMITH' and 
 						 trim(pInput.company_source_group) in ['2003079497BOLD AND CLASSIC', '32011167163BOLD AND CLASSIE', 'A208015557REEL ADVOCATE', 'A211008586BOLD AND CLASSIE', 'A214003819REAL 2 REEL MEDIA GROUP'])
+				// -- JIRA - DF-28332 FCRA - Possible Overlinking LexID 1924627637 in PAW and Business Contacts
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.lname) = 'PATEL' and trim(pInput.fname) = 'JITENDRA' and
+						 trim(pInput.company_source_group) in ['6547020OM HOSPITALITY INC'])
+				// -- JIRA - DF-28113 Consumer Karen Ruge may be incorrectly associated with A M Electrical
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.lname) = 'RUGE' and trim(pInput.fname) = 'KAREN' and
+						 trim(pInput.company_name) = 'A M ELECTRICAL SERVICES INC')
+				// -- JIRA - BH-915 Incorrect ROBERT HILL, possibly, associated to business
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.company_source_group) in ['1855883 SHATTOS LLC','258208NORTH PARK TRUCK & EQUIPMENT'] and
+						 trim(pInput.lname) = 'HILL' and trim(pInput.prim_name) = 'PO BOX 705')
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -1611,6 +1635,10 @@ module
 			or
 				(		pInput.did						= 1363114130
 				 and	pInput.bdid						= 14733991
+				)
+			or  //*** Jira# DF-28332 FCRA-Possible Overlinking in PAW and BusConts
+				(		pInput.did						= 1924627637
+				 and	pInput.bdid						= 701373885
 				)
 
 			;

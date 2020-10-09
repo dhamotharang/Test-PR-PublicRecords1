@@ -96,10 +96,10 @@ export rException := RECORD
 	string2			SourceProgramState;
 	string1			SourceProgramCode;
 	string20		SourceClientId;
+	string4			MatchedGroupId;
 	string2			MatchedState;
 	string1			MatchedProgramCode;
 	string20		MatchedClientId;
-	string4			MatchedGroupId;
 	string3			ReasonCode;			// A=Confirmed Multiple birth sibling, B=LexID Overlinking
 	string50		Comments;
 END;
@@ -145,10 +145,13 @@ export rCommonEx := RECORD
 		string4						OrigGroupId := '';
 		string32					filename := '';
 		unsigned4					seqnum := 0;
+		unsigned4   			textLength;
+		boolean 					invalidLength;
 END;
 
 // extended records
 	export rAddressEx := RECORD
+
 		rAddress;
 
 		rCommonEx;
@@ -210,9 +213,7 @@ END;
 	
 	export rCaseEx := RECORD
 		rCase;
-
-		rCommonEx;
-
+		rCommonEx;		
 	END;
 
 	export rStateContactEx := RECORD
@@ -269,6 +270,13 @@ EXPORT rExceptionRecord := RECORD
 		unsigned4 	updated;
 		unsigned4 	replaced;
 		string32		filename := '';
-END;		
+END;	
+
+EXPORT rItemSummary := RECORD
+	STRING10		itemcode;
+	UNSIGNED4   counts;
+END;
 
 END;
+
+

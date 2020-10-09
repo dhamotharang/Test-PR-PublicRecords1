@@ -17,7 +17,11 @@ EXPORT ExtractRecords(string ilfn) := MODULE
 		string	  filename;
 		unsigned4	seqnum;
 		Nac_V2.Layouts2.rNac2;
+		STRING left_text; 
+		UNSIGNED4 textLength;
 	END;	
+
+
 	shared ds := SORT(
 						dataset(ilfn, NAC_V2.Layouts2.rRawFile, CSV)(LENGTH(TRIM(text,left,right)) > 4),
 						GetFileName(filename));
@@ -35,9 +39,39 @@ EXPORT ExtractRecords(string ilfn) := MODULE
 				self.RecordCode := rc;
 				self.filename := GetFileName(left.filename);
 				self.seqnum := COUNTER;
-				));
-				
-		export nacin := UNGROUP(ds1);
+				self.left_text := left.text;
+				self.textLength :=  (LENGTH(left.text) -4);
+	 ));
+
+
+rNac2 := RECORD
+	rNac;
+	UNSIGNED4 	sizeof_rec;
+	BOOLEAN 		invalidLength;
+END;	
+rNac2 xform2(rNac l) := TRANSFORM 
+	self.sizeof_rec := MAP( 
+		l.recordcode = 'CA01' => SIZEOF(l.CaseRec),
+		l.recordcode = 'AD01' => SIZEOF(l.AddressRec),
+		l.recordcode = 'CL01' => SIZEOF(l.ClientRec),
+		l.recordcode = 'SC01' => SIZEOF(l.StateContactRec),
+		l.recordcode = 'EX01' => SIZEOF(l.ExceptionRec),
+		0); 
+		self.invalidLength := IF( (l.textLength-4) >
+			MAP(
+			l.recordcode = 'CA01' => SIZEOF(l.CaseRec),
+			l.recordcode = 'AD01' => SIZEOF(l.AddressRec),
+			l.recordcode = 'CL01' => SIZEOF(l.ClientRec),
+			l.recordcode = 'SC01' => SIZEOF(l.StateContactRec),
+			l.recordcode = 'EX01' => SIZEOF(l.ExceptionRec), 
+			0)
+		 , TRUE, FALSE);
+		self := l;
+END;
+ 
+
+EXPORT nacin := UNGROUP(PROJECT(ds1, xform2(left))); 
+
 
 	export cases := 
 							PROJECT(nacin(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCaseEx,
@@ -45,11 +79,12 @@ EXPORT ExtractRecords(string ilfn) := MODULE
 										self.RecordCode := left.RecordCode;
 										self.GroupId := GetGid(left.filename);
 										self.OrigGroupId := GetGid(left.filename);
-										//self.filename := fname;
 										self.Created := RightNow;
 										self.Updated := RightNow;
 										self.filename := left.filename;
 										self.seqnum := left.seqnum;
+										self.textLength := left.textLength; 
+										self.invalidLength := left.invalidLength; 
 										self := [];
 										));
 
@@ -59,11 +94,12 @@ EXPORT ExtractRecords(string ilfn) := MODULE
 											self.RecordCode := left.RecordCode;
 											self.GroupId := GetGid(left.filename);
 											self.OrigGroupId := GetGid(left.filename);
-											//self.filename := fname;
 											self.Created := RightNow;
 											self.Updated := RightNow;
 											self.filename := left.filename;
 											self.seqnum := left.seqnum;
+											self.textLength := left.textLength; 
+											self.invalidLength := left.invalidLength; 
 											self := [];
 											)
 										);
@@ -74,11 +110,12 @@ EXPORT ExtractRecords(string ilfn) := MODULE
 												self.RecordCode := left.RecordCode;
 												self.GroupId := GetGid(left.filename);
 												self.OrigGroupId := GetGid(left.filename);
-												//self.filename := fname;
 												self.Created := RightNow;
 												self.Updated := RightNow;
 												self.filename := left.filename;
 												self.seqnum := left.seqnum;
+												self.textLength := left.textLength; 
+												self.invalidLength := left.invalidLength; 
 												self := [])
 										);
 										
@@ -88,11 +125,12 @@ EXPORT ExtractRecords(string ilfn) := MODULE
 										self.RecordCode := left.RecordCode;
 										self.GroupId := GetGid(left.filename);
 										self.OrigGroupId := GetGid(left.filename);
-										//self.filename := fname;
 										self.Created := RightNow;
 										self.Updated := RightNow;
 										self.filename := left.filename;
 										self.seqnum := left.seqnum;
+										self.textLength := left.textLength;
+										self.invalidLength := left.invalidLength;
 										self := [];
 										));
 									
@@ -101,10 +139,14 @@ EXPORT ExtractRecords(string ilfn) := MODULE
 										self := LEFT.ExceptionRec;
 										self.RecordCode := left.RecordCode;
 										self.SourceGroupId := GetGid(left.filename);
+										self.GroupId := GetGid(left.filename);
+										self.OrigGroupId := GetGid(left.filename);
 										self.filename := left.filename;
 										self.Created := RightNow;
 										self.Updated := RightNow;
 										self.seqnum := left.seqnum;
+										self.textLength := left.textLength; 
+										self.invalidLength := left.invalidLength; 
 										self := [];
 										));
 										
@@ -117,11 +159,13 @@ EXPORT ExtractRecords(string ilfn) := MODULE
 
 										
 		export types := 
-			TABLE(nacin, {nacin.RecordCode, n := COUNT(GROUP)}, RecordCode, few);
+			TABLE(nacin, {nacin.RecordCode, n := COUNT(GROUP)}, RecordCode, few);			
 		
+
 		export filenames := 
 			TABLE(nacin, {nacin.filename, n := COUNT(GROUP)}, filename, few);
-		
+
 		export RecordCount := COUNT(nacin);
+
 
 END;

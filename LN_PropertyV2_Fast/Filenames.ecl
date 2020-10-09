@@ -35,6 +35,12 @@ EXPORT FileNames := MODULE
 				EXPORT assessment_ptu		:= rawCluster + prefix + 'assessment_ptu';
 				EXPORT deed							:= rawCluster + prefix + 'deed';
 			END;
+	//Black Knight Assignments and Release		
+			EXPORT BK_AR	:= MODULE
+				EXPORT prefix						:= 'thor_data400::base::BKMortgage::';
+				EXPORT assignment				:= rawCluster + prefix + 'Assignment';
+				EXPORT release					:= rawCluster + prefix + 'Release';
+			END;
 	END;
 	EXPORT prep := MODULE
 			EXPORT prefix 		:= 'prep::property_fast::';
@@ -81,9 +87,20 @@ EXPORT FileNames := MODULE
 			EXPORT addl_names	:= exprtCluster + prefix+ 'addl_names';
 			EXPORT addl_legal	:= exprtCluster + prefix+ 'addl_legal';
 			EXPORT search_prp	:= exprtCluster + prefix+ 'search';
+			EXPORT addl_name_info	:= exprtCluster + prefix+ 'addl_name_info';
+	END;
+	EXPORT basedelta := MODULE // These are the QA / latest delta base files. See below "baseFull"
+			EXPORT prefix			:= 'base::property_fast::';
+			EXPORT assessment	:= baseCluster + prefix+ 'assessment::delta';
+			EXPORT deed_mortg	:= baseCluster + prefix+ 'deed_mortgage::delta';
+			EXPORT addl_names	:= baseCluster + prefix+ 'addl::ln_names::delta';
+			EXPORT addl_legal	:= baseCluster + prefix+ 'addl::legal::delta';
+			EXPORT addl_frs_a	:= baseCluster + prefix+ 'addl_frs_assessment::delta';
+			EXPORT addl_frs_d	:= baseCluster + prefix+ 'addl_frs_deed_mortgage::delta';
+			EXPORT search_prp	:= baseCluster + prefix+ 'search::delta';
+			EXPORT addl_name_info	:= baseCluster + prefix+ 'addl::name_info::delta';
 	END;
 END;
-
 //LN_PropertyV2.File_Assessment
 //LN_PropertyV2.File_Deed
 //LN_PropertyV2.File_addl_Fares_tax

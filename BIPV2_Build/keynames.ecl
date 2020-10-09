@@ -1,4 +1,5 @@
 ﻿import tools,bipv2_proxid,bipv2_proxid_mj6,BizLinkFull,BIPV2_Best,BIPV2_Relative,TopBusiness_BIPV2,BIPV2_Seleid_Relative,bipv2_lgid3,BIPv2_HRCHY,BIPV2_Crosswalk,BIPV2_Segmentation,BIPV2_Suppression;
+import dx_BIPV2;
 
 EXPORT keynames(
 
@@ -37,6 +38,9 @@ module
   export highRiskIndustriesPhone   := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::@version@::high_risk_industries_phone'                  ,pversion    );
   export highRiskIndustriesAddr    := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::@version@::high_risk_industries_addr'                   ,pversion    );
   export highRiskIndustriesCodes   := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::@version@::high_risk_industries'                        ,pversion    );
+  
+  export firmographicsScore         := dx_BIPV2.Keynames(pVersion).FirmographicsScore;
+  export locid                      := dx_BIPV2.Keynames(pVersion).Locid;
 
   export BIPV2FullKeys := 
     (
@@ -51,6 +55,8 @@ module
     + highRiskIndustriesPhone .dall_filenames
     + highRiskIndustriesAddr  .dall_filenames
     + highRiskIndustriesCodes .dall_filenames
+    + firmographicsScore      .dall_filenames
+    + locid                   .dall_filenames
     + BIPv2_HRCHY.keynames            (pversion,pUseOtherEnvironment).dall_filenames
     + BIPV2_Crosswalk.filenames(pversion,pUseOtherEnvironment).dall_keynames
  //   + bipv2_proxid.keynames(pversion).attribute_matches     .dall_filenames

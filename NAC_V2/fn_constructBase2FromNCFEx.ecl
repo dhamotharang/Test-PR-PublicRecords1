@@ -99,8 +99,8 @@ JoinAddresses(DATASET($.layout_Base2) base, DATASET($.Layouts2.rAddressEx) addre
 END;
 
 /**
-In order to support superfiles, we no longer deduo here.
-The records are now deduped when the file is processed. Dedupe occurs only within a file.
+In order to support superfiles, we no longer dedup here.
+The records are now deduped when the file is processed. Dedup occurs only within a file.
 
 **/
 
@@ -212,6 +212,12 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) nacin, string8 ver
 					self := left;
 					), LEFT OUTER, LOCAL);
 					
+	
+	ds5 := JoinAddresses(ds2, addresses);
+
+	return ds5;
+
+END;
 	// add head of household as case name
 /*
 	ds3 := JOIN(DISTRIBUTE(ds2(case_last_name=''), HASH32(GroupId, ProgramState,ProgramCode,CaseId)),
@@ -230,9 +236,4 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) nacin, string8 ver
 					), LEFT OUTER, KEEP(1), LOCAL);
 					
 	ds4 := ds2(case_last_name<>'') + ds3;
-*/	
-	ds5 := JoinAddresses(ds2, addresses);
-
-	return ds5;
-
-END;
+*/

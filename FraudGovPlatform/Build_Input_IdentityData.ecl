@@ -106,7 +106,7 @@ module
 	tools.mac_WriteFile(
 		Filenames().Input.ByPassed_IdentityData.New(pversion),
 		f1_bypass_dedup,
-		Build_Bypass_Records,
+		Build_Bypass_IdentityData,
 		pCompress := true,
 		pHeading := false,
 		pOverwrite := true);
@@ -118,18 +118,15 @@ module
 		LEFT.source_rec_id = RIGHT.source_rec_id,
 		TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),
 		LEFT ONLY,
-		LOOKUP);
-
-	dappendName := Standardize_Entity.Clean_Name(Valid_Recs);
-	dCleanInputFields := Standardize_Entity.Clean_InputFields (dappendName);
+		LOOKUP);	
 	
-	input_file_1 := fn_dedup(IdentityData_Sprayed  + project(dCleanInputFields,Layouts.Input.IdentityData)); 
+	input_file_1 := fn_dedup(IdentityData_Sprayed  + project(Valid_Recs,Layouts.Input.IdentityData)); 
 
 
 	tools.mac_WriteFile(
 		Filenames(pversion).Input.IdentityData.New(pversion),
 		input_file_1,
-		Build_Input_File,
+		Build_IdentityData,
 		pCompress := true,
 		pHeading := false,
 		pOverwrite := true);
@@ -137,8 +134,8 @@ module
 // Return
 	export build_prepped := 
 		sequential(
-			 Build_Input_File
-			,Build_Bypass_Records 
+			 Build_IdentityData
+			,Build_Bypass_IdentityData 
 		);
 		
 	export All :=

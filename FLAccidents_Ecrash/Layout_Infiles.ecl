@@ -478,6 +478,7 @@
 		STRING Geo_Coded_Longitude;
 		//PRtCC CR-1262 
     STRING Direction_Of_Impact;
+		STRING is_Suppressed;
 	END;
 
 	EXPORT persn_NEW := RECORD ,MAXLENGTH(20000)
@@ -897,6 +898,19 @@
 		STRING property_owner_zip_code;
 		STRING property_owner_notified;
 	END; 
+	
+	EXPORT Document := RECORD
+    STRING document_id;
+    STRING incident_id;
+    STRING document_hash_key;
+    STRING date_created;
+    STRING is_deleted;
+    STRING report_type;
+    STRING page_count;
+    STRING extension;
+		//COPPR-69 New field
+    STRING report_source;
+	END;
 
 	EXPORT layoutNahdbBatch := RECORD
 		STRING EVENT_ID;
@@ -923,12 +937,12 @@
 		STRING suffix; 
 		STRING clean_dob; 
 		STRING clean_DATE_OF_INCIDENT; 
-		STRING acc_dol,
-		STRING acc_city,	
-		STRING acc_st	,
-		STRING acc_county,	
-		STRING acc_vin,
-		STRING order_id	,
+		STRING acc_dol;
+		STRING acc_city;	
+		STRING acc_st	;
+		STRING acc_county;	
+		STRING acc_vin;
+		STRING order_id	;
 		STRING sequence_nbr,	
 		STRING acct_nbr	,
 		STRING vehicle_incident_id,	

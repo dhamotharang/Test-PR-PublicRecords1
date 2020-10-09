@@ -56,7 +56,7 @@ export proc_build_all(
   ,pSkipProx              = 'false'
   ,pSkipProxMj6           = 'false'
   ,pSkipProxPost          = 'false'
-  ,pSkipProxidUnderlinks  = 'false'
+  ,pSkipProxidUnderlinks  = 'true'
   ,pSkipHierarchy         = 'false'
   ,pSkipLgid3             = 'false'
   ,pSkipPowDown           = 'false'
@@ -73,13 +73,15 @@ export proc_build_all(
   ,pSkipBest              = 'false'
   ,pSkipIndustry          = 'false'
   ,pSkipMisckeys          = 'false'
-  ,pSkipQASamples         = 'false'
+  ,pSkipQASamples         = 'true'
   ,pSkipSegStats          = 'false'
   ,pSkipStrata            = 'false'
   ,pSkipDataCard          = 'false'
   ,pSkipOverlinking       = 'false'
   ,pSkipSeleidRelative    = 'false'
   ,pSkipCrosswalk         = 'false'
+
+  ,pSkipCopyToAlphaProd   = 'false'
   ,pSkipMktgListBuild     = 'false'
   ,pSkipHighRiskKeys      = 'false'
   ,pSkipCDWBuild          = 'false'
@@ -104,7 +106,7 @@ export proc_build_all(
 ) := 
 functionmacro
     
-    import BIPV2_Build, BIPV2_DotID, BIPV2_ProxID, BIPV2_Entity, bipv2, ut,BizLinkFull,tools,Marketing_List;    
+    import BIPV2_Build, BIPV2_DotID, BIPV2_ProxID, BIPV2_Entity, bipv2, ut,BizLinkFull,tools,Marketing_List,wk_ut;    
 
     // -- Cleanup the previous build -- this needs to expand to more files
     // notdeleteversion  := regexfind('[[:digit:]]+',pversion,0,nocase);  //do this so we don't delete any files from a rebuild--may want to keep those until the next build for research purposes.
@@ -148,6 +150,9 @@ functionmacro
 
     Wait4PostProcessThreads   := if(DotSpecsWuid != '' or SeleidRelativeSpecsWuid != '' ,wk_ut.Wait4Workunits([DotSpecsWuid,SeleidRelativeSpecsWuid],'1',pversion,'Wait4PostProcessWuids',,BIPV2_Build.mod_email.emailList));
 
+    kick_copy2_storage_thor_fathercommonbase  := BIPV2_Tools.Copy2_Storage_Thor('~' + nothor(std.file.superfilecontents(BIPV2.CommonBase.FILE_BASE)[1].name)  ,pversion ,'Copy_father_common_base_To_Storage_Thor');
+    copyFatherCommonBase2StorageThor          := if(not wk_ut._constants.IsDev ,output(kick_copy2_storage_thor_fathercommonbase ,named('copy2_Storage_Thor_father_commonbase__html')));  //copy orig file to storage thor
+
 		doit := sequential(
 
        output(pversion, named('Build_Date'))
@@ -176,7 +181,7 @@ functionmacro
       
       // -- Now do Post process stuff.  All keys have been built so do some housekeeping, copying, renaming, promoting(if requested), verifying, and updating DOPS(if requested)
 
-      
+      ,if(pSkipCopyToAlphaProd  = false ,BIPV2_Build.proc_Copy_Xlink_To_AlphaProd(pversion,,,pCompileTest))
       ,if(pSkipMktgListBuild = false ,Marketing_List.proc_build_all           (pversion                                                                                                     )) // do Build Marketing List in background
       ,if(pSkipCDWBuild      = false ,BIPV2_Build.proc_CDW_Files              (pversion                                                                                                     )) // do Build CDW
       // ,if(pSkipXAppend       = false ,BIPV2_Build.proc_External_Append_Testing(pversion                                                                                                     )) // do external append testing
@@ -190,6 +195,7 @@ functionmacro
       ,UpdateBIPV2FullKeysDops  
       ,if(pSkipVerifyKeys    = false ,BIPV2_Build.BIPV2WeeklyKeys_Package     (keyversion).outputpackage                                                                                     )
       ,UpdateBIPV2WeeklyKeysDops
+      ,copyFatherCommonBase2StorageThor
       ,Wait4PostProcessThreads
       // ,if(pSkipDOTSpecsPost     = false ,BIPV2_Build.proc_dotid().runSpecs())
       // ,if(pSkipSeleRelSpecsPost = false ,BIPV2_Build.proc_Seleid_relatives     (pversion,true,false,false       ))

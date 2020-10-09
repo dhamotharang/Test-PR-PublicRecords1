@@ -1,6 +1,7 @@
 ﻿//Compile all keys in this package in one place
 //easy to output this module to see if keys exist/are correct layout/etc
 import bipv2,BIPV2_Company_Names,TopBusiness_BIPV2,BIPV2_ProxID,BIPV2_Best,BIPV2_Relative,BizLinkFull,tools,BIPV2_Seleid_Relative,BIPV2_LGID3,Address_Attributes,BIPv2_HRCHY,tools,BIPV2_Crosswalk,BIPV2_Segmentation;
+import dx_BIPV2;
 
 EXPORT BIPV2FullKeys_Package(
 
@@ -90,6 +91,9 @@ module
   export highRiskIndustriesAddr         := key_high_risk_industries.keyvs_addr(pversion,puseotherenvironment);
   export highRiskIndustriesCode         := key_high_risk_industries.keyvs_code(pversion,puseotherenvironment);
 
+  export firmographicsScore             := tools.macf_FilesIndex('dx_BIPV2.Key_FirmographicsScore.Key', dx_BIPV2.keynames(pversion).FirmographicsScore);
+  export locid                          := tools.macf_FilesIndex('dx_BIPV2.Key_Locid.Key', dx_BIPV2.keynames(pversion).Locid);
+
   export outputpackage := 
   sequential(
      output('______________________________________________________________________________')
@@ -151,6 +155,8 @@ module
     ,if(pKey in [0 ,51] ,sequential(output(51 ,named('KeyNumber'),overwrite) ,output(choosen(highRiskIndustriesPhone      .logical ,100),named('highRiskIndustriesPhone'       ))))
     ,if(pKey in [0 ,52] ,sequential(output(52 ,named('KeyNumber'),overwrite) ,output(choosen(highRiskIndustriesAddr       .logical ,100),named('highRiskIndustriesAddr'        ))))
     ,if(pKey in [0 ,53] ,sequential(output(53 ,named('KeyNumber'),overwrite) ,output(choosen(highRiskIndustriesCode       .logical ,100),named('highRiskIndustriesCode'        ))))
+    ,if(pKey in [0 ,54] ,sequential(output(54 ,named('KeyNumber'),overwrite) ,output(choosen(locid                        .logical ,100),named('locid'                         ))))
+    ,if(pKey in [0 ,55] ,sequential(output(55 ,named('KeyNumber'),overwrite) ,output(choosen(firmographicsScore           .logical ,100),named('firmographicsScore'            ))))
   );       
 /*
   regexfilter := pRegexFieldFilter;

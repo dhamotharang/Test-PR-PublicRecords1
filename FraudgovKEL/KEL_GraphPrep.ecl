@@ -26,15 +26,15 @@ EXPORT KEL_GraphPrep := MODULE
   GraphFinal := JOIN(LinksFinal, EntityEventPivot(aotcurrprofflag=1), LEFT.customerid = RIGHT.customerid AND LEFT.industrytype = RIGHT.industrytype AND LEFT.entitycontextuid = RIGHT.entitycontextuid, 
                   TRANSFORM({LEFT.customerid, LEFT.industrytype, LEFT.treeuid, LEFT.entitycontextuid, RIGHT.t_actdtecho, RIGHT.entitytype, RIGHT.label, 
                     RIGHT.riskindx, RIGHT.aotkractflagev, RIGHT.aotsafeactflagev, RIGHT.personeventcount,
-                    RIGHT.t_inpclndobecho, RIGHT.t1L_iddeceasedflag, RIGHT.aotidactcntev, RIGHT.deceaseddate, RIGHT.T1_MinorIDFlag}, 
+                    RIGHT.t_inpclndobecho, RIGHT.t1L_iddeceasedflag, RIGHT.aotidactcntev, RIGHT.deceaseddate, RIGHT.T1_MinorIDFlag, RIGHT.t_inagencyflag}, 
                     SELF.customerid := LEFT.customerid, SELF.treeuid := LEFT.treeuid, SELF.entitycontextuid := LEFT.entitycontextuid, SELF := RIGHT),
-                 KEEP(1), HASH) : PERSIST('~temp::fraudgov::temp::persist::entities');
+                 KEEP(1), HASH) : PERSIST('~fraudgov::temp::fraudgov::temp::persist::entities');
 
   EXPORT Vertices := GraphFinal;
 
   EdgesFinal := JOIN(LinksFinal, LinksPrep(treeuid[2..3] = '01'), LEFT.customerid = RIGHT.customerid AND LEFT.industrytype = RIGHT.industrytype AND LEFT.entitycontextuid = RIGHT.treeuid,
                 TRANSFORM({LEFT.customerid, LEFT.industrytype, LEFT.treeuid, STRING fromentitycontextuid, STRING toentitycontextuid, RIGHT.t_actdtecho}, 
-                SELF.fromentitycontextuid := RIGHT.treeuid, SELF.toentitycontextuid := RIGHT.entitycontextuid, SELF.t_actdtecho := RIGHT.t_actdtecho, SELF := LEFT), HASH);// : PERSIST('~temp::fraudgov::temp::persist::edges');
+                SELF.fromentitycontextuid := RIGHT.treeuid, SELF.toentitycontextuid := RIGHT.entitycontextuid, SELF.t_actdtecho := RIGHT.t_actdtecho, SELF := LEFT), HASH);// : PERSIST('~fraudgov::temp::fraudgov::temp::persist::edges');
 
   EXPORT Edges := EdgesFinal;	
 

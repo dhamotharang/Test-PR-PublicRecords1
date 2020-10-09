@@ -1,29 +1,7 @@
 ﻿IMPORT Data_Services, STD, FLAccidents_Ecrash;
 
 EXPORT fn_FL_Fiers_Extraction(STRING Pdate = (STRING) STD.Date.CurrentDate(TRUE)) := FUNCTION
-  
-  lay_fl_fiers_data_stats := RECORD
-	  STRING Desc;
-	  UNSIGNED8 total_;
-	  UNSIGNED8 total_unq_incidents;
-	  UNSIGNED8 total_fl_incidents;
-	  UNSIGNED8 total_unq_fl_incidents;
-	  UNSIGNED8 total_incidents_after_delete;
-	  UNSIGNED8 total_fl_incidents_after_delete;
-		UNSIGNED8 total_persons;
-	  UNSIGNED8 total_fl_persons;
-	  UNSIGNED8 total_persons_after_delete;
-	  UNSIGNED8 total_fl_persons_after_delete;
-		UNSIGNED8 total_vehicles;
-	  UNSIGNED8 total_fl_vehicles;
-	  UNSIGNED8 total_vehicles_after_delete;
-	  UNSIGNED8 total_fl_vehicles_after_delete;
-		UNSIGNED8 total_citations;
-	  UNSIGNED8 total_fl_citations;
-	  UNSIGNED8 total_citations_after_delete;
-	  UNSIGNED8 total_fl_citations_after_delete;
-	END;
-
+ 
   SequencingRecSummary := RECORD
 		UNSIGNED recid;
 		STRING line;
@@ -781,6 +759,109 @@ EXPORT fn_FL_Fiers_Extraction(STRING Pdate = (STRING) STD.Date.CurrentDate(TRUE)
 		'Citation_Type,' +
 		'Violation_Code3,' +
 		'Violation_Code4,';
+		
+  CommercialHeader := 'Commercial_ID,' +
+		'Creation_Date,' +
+		'Vehicle_ID,' +
+		'Commercial_Info_Source,' +
+		'Commercial_Vehicle_Type,' +
+		'Motor_Carrier_ID_DOT_Number,' +
+		'Motor_Carrier_ID_State_ID,' +
+		'Motor_Carrier_ID_Carrier_Name,' +
+		'Motor_Carrier_ID_Address,' +
+		'Motor_Carrier_ID_City,' +
+		'Motor_Carrier_ID_State,' +
+		'Motor_Carrier_ID_Zipcode,' +
+		'Motor_Carrier_ID_Commercial_Indicator,' +
+		'Carrier_ID_Type,' +
+		'Carrier_Unit_Number,' +
+		'DOT_Permit_Number,' +
+		'ICCMC_Number,' +
+		'MCS_Vehicle_Inspection,' +
+		'MCS_Form_Number,' +
+		'MCS_Out_of_Service,' +
+		'MCS_Violation_Related,' +
+		'Number_of_Axles,' +
+		'Number_of_Tires,' +
+		'GVW_Over_10K_Pounds,' +
+		'Weight_Rating,' +
+		'Registered_Gross_Vehicle_Weight,' +
+		'Vehicle_Length_Feet,' +
+		'Cargo_Body_Type,' +
+		'Load_Type,' +
+		'Oversize_Load,' +
+		'Vehicle_Configuration,' +
+		'Trailer1_Type,' +
+		'Trailer1_Length_Feet,' +
+		'Trailer1_Width_Feet,' +
+		'Trailer2_Type,' +
+		'Trailer2_Length_Feet,' +
+		'Trailer2_Width_Feet,' +
+		'Federally_Reportable,' +
+		'Vehicle_Inspection_Hazmat,' +
+		'Hazmat_Form_Number,' +
+		'Hazmt_Out_of_Service,' +
+		'Hazmat_Violation_Related,' +
+		'Hazardous_Materials_Placard,' +
+		'Hazardous_Materials_Class_Number1,' +
+		'Hazardous_Materials_Class_Number2,' +
+		'Hazmat_Placard_Name,' +
+		'Hazardous_Materials_Released1,' +
+		'Hazardous_Materials_Released2,' +
+		'Hazardous_Materials_Released3,' +
+		'Hazardous_Materials_Released4,' +
+		'Commercial_Event1,' +
+		'Commercial_Event2,' +
+		'Commercial_Event3,' +
+		'Commercial_Event4,' +
+		'Recommended_Driver_Reexam,' +
+		'Transporting_HazMat,' +
+		'Liquid_HazMat_Volume,' +
+		'Oversize_Vehicle,' +
+		'Overlength_Vehicle,' +
+		'Oversize_Vehicle_Permitted,' +
+		'Overlength_Vehicle_Permitted,' +
+		'Carrier_Phone_Number,' +
+		'Commerce_Type,' +
+		'Citation_Issued_to_Vehicle,' +
+		'CDL_Class,' +
+		'DOT_State,' +
+		'Fire_Hazardous_Materials_Involvement,' +
+		'Commercial_Event_Description,' +
+		'Supplment_Required_Hazmat_Placard,' +
+		'Other_State_Number1,' +
+		'Other_State_Number2,' +
+		'Hazardous_Materials_Hazmat_Placard_Number1,' +
+		'Hazardous_Materials_Hazmat_Placard_Number2,' +
+		'Unit_Type_And_Axles1,' +
+		'Unit_Type_And_Axles2,' +
+		'Unit_Type_And_Axles3,' +
+		'Unit_Type_And_Axles4,';
+		
+	PropertydamageHeader := 'Property_Damage_ID,' +
+		'Incident_ID,' +
+		'damage_description,' +
+		'damage_estimate,' +
+		'property_owner_name,' +
+		'property_owner_phone,' +
+		'property_owner_last_name,' +
+		'property_owner_first_name,' +
+		'property_owner_middle_name,' +
+		'property_owner_address,' +
+		'property_owner_city,' +
+		'property_owner_state,' +
+		'property_owner_zip_code,' +
+		'property_owner_notified,';
+		
+	DocumentHeader := 'document_id,' +
+    'incident_id,' +
+    'document_hash_key,' +
+    'date_created,' +
+    'is_deleted,' +
+    'report_type,' +
+    'page_count,' +
+    'extension,' +
+    'report_source,'; 
 						
   SimpleLine := RECORD
 		STRING line;
@@ -800,18 +881,20 @@ EXPORT fn_FL_Fiers_Extraction(STRING Pdate = (STRING) STD.Date.CurrentDate(TRUE)
 END;
 
 //Incident input file 
- ds_incident_fl   :=	DATASET('~thor_data400::in::ecrash::incident_raw::flremoval'
+  ds_incident_fl   :=	DATASET('~thor_data400::in::ecrash::incident_raw::flremoval'
 									           ,FLAccidents_Ecrash.Layout_Infiles.incident_new
 									           ,CSV(TERMINATOR('\n'), SEPARATOR('|'), QUOTE('"'), MAXLENGTH(10000)))(Incident_ID != 'Incident_ID');                    
-
- ds_incident := DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::incidnt_raw_new'
+  dds_incident_fl := DEDUP(SORT(DISTRIBUTE(ds_incident_fl(TRIM(incident_id, LEFT, RIGHT) <> '')), incident_id, LOCAL), incident_id, LOCAL);
+ 
+  ds_incident := DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::incidnt_raw_new'
 									     ,FLAccidents_Ecrash.Layout_Infiles.incident_new
 									     ,CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"'), MAXLENGTH(60000)))(Incident_ID != 'Incident_ID');                  
-
-	FLAccidents_Ecrash.Layout_Infiles.incident_new updateIncidents(ds_incident L, ds_incident_fl R) := TRANSFORM
+  dds_incident := DISTRIBUTE(ds_incident,HASH32(incident_id));
+	
+	FLAccidents_Ecrash.Layout_Infiles.incident_new updateIncidents(dds_incident L, dds_incident_fl R) := TRANSFORM
 	  SELF := L;
 	END;
-  rm_incidents := JOIN(DISTRIBUTE(ds_incident,HASH32(incident_id)),DISTRIBUTE(ds_incident_fl(TRIM(incident_id, LEFT, RIGHT) <> ''),HASH32(incident_id)),
+  rm_incidents := JOIN(dds_incident, dds_incident_fl,
 			                 left.incident_id = right.incident_id,
 			                 updateIncidents(left,right), inner, LOCAL);
 	
@@ -1156,22 +1239,26 @@ END;
 	FORMATTEDFINALA_inc 		  := BigLineFormatDespray(ExtractData_inc & ExtractHeaderRec_inc, 'FL_Ecrash_Fiv_Incident.csv');
 
 	//COUNTS
-	// OUTPUT(COUNT(ds_incident_fl), named('cnt_ds_incident_fl'));
-	// OUTPUT(COUNT(rm_incidents), named('cnt_rm_incidents'));
+	OUTPUT(COUNT(dds_incident_fl), named('cnt_dds_incident_fl'));
+	OUTPUT(COUNT(rm_incidents), named('cnt_rm_incidents'));
 	
   //Vehicle input file
 	ds_vehicle_fl := DATASET('~thor_data400::in::ecrash::vehicle_raw::flremoval'
 							            ,FLAccidents_Ecrash.Layout_Infiles.vehicl_new
 							            ,CSV(TERMINATOR('\n'), SEPARATOR('|\t|'), QUOTE('"')))(Vehicle_ID != 'Vehicle_ID');
+	dds_vehicle_fl := DEDUP(SORT(DISTRIBUTE(ds_vehicle_fl(TRIM(vehicle_id, LEFT, RIGHT) <> ''),HASH32(vehicle_id, incident_id)), 
+	                             vehicle_id, incident_id, LOCAL), 
+													 vehicle_id, incident_id, LOCAL);
 
   ds_vehicle :=  DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::vehicl_raw'
 							          ,FLAccidents_Ecrash.Layout_Infiles.vehicl_new
 							          ,CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"'), MAXLENGTH(50000)))(Vehicle_ID != 'Vehicle_ID');
-   
-	FLAccidents_Ecrash.Layout_Infiles.vehicl_new updateVehicles(ds_vehicle L, ds_vehicle_fl R) := TRANSFORM
+  dds_vehicle := DISTRIBUTE(ds_vehicle,HASH32(vehicle_id, incident_id));
+	
+	FLAccidents_Ecrash.Layout_Infiles.vehicl_new updateVehicles(dds_vehicle L, dds_vehicle_fl R) := TRANSFORM
 		SELF := L;
 	END;
- rm_vehciles := JOIN(DISTRIBUTE(ds_vehicle,HASH32(vehicle_id, incident_id)),DISTRIBUTE(ds_vehicle_fl(TRIM(vehicle_id, LEFT, RIGHT) <> ''),HASH32(vehicle_id, incident_id)),
+ rm_vehciles := JOIN(dds_vehicle, dds_vehicle_fl,
 			               LEFT.vehicle_id = RIGHT.vehicle_id AND
 		                 LEFT.incident_id = RIGHT.incident_id,
 			               updateVehicles(LEFT,RIGHT), INNER, LOCAL);
@@ -1404,22 +1491,25 @@ END;
 	FORMATTEDFINALA_veh 		  := BigLineFormatDespray(ExtractData_veh & ExtractHeaderRec_veh, 'FL_Ecrash_Fiv_Vehicle.csv');
 	
 	//COUNTS
-	// OUTPUT(COUNT(ds_vehicle_fl), named('cnt_ds_vehicle_fl'));
-	// OUTPUT(COUNT(rm_vehciles), named('cnt_rm_vehciles'));
+	OUTPUT(COUNT(dds_vehicle_fl), named('cnt_dds_vehicle_fl'));
+	OUTPUT(COUNT(rm_vehciles), named('cnt_rm_vehciles'));
 	
 	//Person input file
   ds_person_fl :=	DATASET('~thor_data400::in::ecrash::person_raw::flremoval'
 							           ,FLAccidents_Ecrash.Layout_Infiles.persn_new
 							           ,CSV(TERMINATOR('\n'), SEPARATOR('|\t|'), QUOTE('"')))(Person_ID != 'Person_ID');
+	dds_person_fl := DEDUP(SORT(DISTRIBUTE(ds_person_fl(TRIM(person_id, LEFT, RIGHT) <> ''),HASH32(person_id, incident_id)), 
+	                       person_id, incident_id, LOCAL), person_id, incident_id, LOCAL);
                     
   ds_person := DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::persn_raw'
 							        ,FLAccidents_Ecrash.Layout_Infiles.persn_new
 							        ,csv(terminator('\n'), SEPARATOR(','), QUOTE('"'), ESCAPE('\r'), MAXLENGTH(3000000)))(Person_ID != 'Person_ID');
-                    
-	FLAccidents_Ecrash.Layout_Infiles.persn_new updatePersons(ds_person L, ds_person_fl R) := TRANSFORM
+  dds_person := DISTRIBUTE(ds_person,HASH32(person_id, incident_id));
+	
+	FLAccidents_Ecrash.Layout_Infiles.persn_new updatePersons(dds_person L, dds_person_fl R) := TRANSFORM
 	  SELF := L;
 	END;
-  rm_persons := JOIN(DISTRIBUTE(ds_person,HASH32(person_id, incident_id)),DISTRIBUTE(ds_person_fl(TRIM(person_id, LEFT, RIGHT) <> ''),HASH32(person_id, incident_id)),
+  rm_persons := JOIN(dds_person, dds_person_fl,
 			               LEFT.person_id = RIGHT.person_id AND
 		                 LEFT.incident_id = RIGHT.incident_id,
 			               updatePersons(LEFT,RIGHT), INNER, LOCAL);
@@ -1598,22 +1688,26 @@ END;
 	FORMATTEDFINALA_per 		  := BigLineFormatDespray(ExtractData_per & ExtractHeaderRec_per, 'FL_Ecrash_Fiv_Person.csv');
 
 	//COUNTS
-	// OUTPUT(COUNT(ds_person_fl), named('cnt_ds_person_fl'));
-	// OUTPUT(COUNT(rm_persons), named('cnt_rm_persons'));
+	OUTPUT(COUNT(dds_person_fl), named('cnt_dds_person_fl'));
+	OUTPUT(COUNT(rm_persons), named('cnt_rm_persons'));
 
 	//Citation input file
   ds_citation_fl := DATASET('~thor_data400::in::ecrash::citation_raw::flremoval'
 													 ,FLAccidents_Ecrash.Layout_Infiles.citation
-													 ,CSV(TERMINATOR('\n'), SEPARATOR('|\t|'), QUOTE('"')))(Citation_ID != 'Citation_ID'); 						
+													 ,CSV(TERMINATOR('\n'), SEPARATOR('|\t|'), QUOTE('"')))(Citation_ID != 'Citation_ID');
+	dds_citation_fl := DEDUP(SORT(DISTRIBUTE(ds_citation_fl(TRIM(citation_id, LEFT, RIGHT) <> ''),HASH32(citation_id, incident_id)), 
+	                              citation_id, incident_id, LOCAL), 
+													 citation_id, incident_id, LOCAL);
 								
   ds_citation := DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::citatn_raw'
 							          ,FLAccidents_Ecrash.Layout_Infiles.citation
-							          ,CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"')))(Citation_ID != 'Citation_ID'); 						
+							          ,CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"')))(Citation_ID != 'Citation_ID'); 
+	dds_citation := DISTRIBUTE(ds_citation,HASH32(citation_id, incident_id));
 								
-	FLAccidents_Ecrash.Layout_Infiles.citation updateCitation(ds_citation L, ds_citation_fl R) := TRANSFORM
+	FLAccidents_Ecrash.Layout_Infiles.citation updateCitation(dds_citation L, dds_citation_fl R) := TRANSFORM
 		SELF := L;
 	END;
-  rm_citation := JOIN(DISTRIBUTE(ds_citation,HASH32(citation_id, incident_id)),DISTRIBUTE(ds_citation_fl(TRIM(citation_id, LEFT, RIGHT) <> ''),HASH32(citation_id, incident_id)),
+  rm_citation := JOIN(dds_citation, dds_citation_fl,
 			                LEFT.citation_id = RIGHT.citation_id AND
 		                  LEFT.incident_id = RIGHT.incident_id,
 			                updateCitation(LEFT,RIGHT), INNER, LOCAL);
@@ -1651,11 +1745,206 @@ END;
 	FORMATTEDFINALA_cit 		  := BigLineFormatDespray(ExtractData_cit & ExtractHeaderRec_cit, 'FL_Ecrash_Fiv_Citation.csv');
  
   //COUNTS
-	// OUTPUT(COUNT(ds_citation_fl), named('cnt_ds_citation_fl'));
-	// OUTPUT(COUNT(rm_citation), named('cnt_rm_citation'));
+	OUTPUT(COUNT(dds_citation_fl), named('cnt_dds_citation_fl'));
+	OUTPUT(COUNT(rm_citation), named('cnt_rm_citation'));
+	
+	//Commercial input file
+  ds_commercial_fl := DATASET('~thor_data400::in::ecrash::commercial_raw::flremoval'
+													 ,FLAccidents_Ecrash.Layout_Infiles.commercial
+													 ,CSV(TERMINATOR('\n'), SEPARATOR('|\t|'), QUOTE('"')))(Commercial_ID != 'Commercial_ID');
+	dds_commercial_fl := DEDUP(SORT(DISTRIBUTE(ds_commercial_fl(TRIM(commercial_id, LEFT, RIGHT) <> ''),HASH32(commercial_id, vehicle_id)), 
+	                                commercial_id, vehicle_id, LOCAL), 
+														  commercial_id, vehicle_id, LOCAL);
+								
+  ds_commercial := DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::commercl_raw'
+													,FLAccidents_Ecrash.Layout_Infiles.commercial
+													,CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"')))(Commercial_ID != 'Commercial_ID');
+	dds_commercial := DISTRIBUTE(ds_commercial,HASH32(commercial_id, vehicle_id));
+								
+	FLAccidents_Ecrash.Layout_Infiles.commercial updateCommercial(dds_commercial L, dds_commercial_fl R) := TRANSFORM
+		SELF := L;
+	END;
+  rm_commercial := JOIN(dds_commercial, dds_commercial_fl,
+			                LEFT.commercial_id = RIGHT.commercial_id AND
+		                  LEFT.vehicle_id = RIGHT.vehicle_id,
+			                updateCommercial(LEFT,RIGHT), INNER, LOCAL);
+
+  SequencingRecSummary xformCtr_com(rm_commercial L, INTEGER CTR) := TRANSFORM
+	   SELF.recid            	:= CTR;
+		 SELF.LINE             	:= TRIM('"' + TRIM(L.Commercial_ID , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Creation_Date , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Vehicle_ID , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Commercial_Info_Source , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Commercial_Vehicle_Type , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Motor_Carrier_ID_DOT_Number , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Motor_Carrier_ID_State_ID , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Motor_Carrier_ID_Carrier_Name , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Motor_Carrier_ID_Address , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Motor_Carrier_ID_City , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Motor_Carrier_ID_State , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Motor_Carrier_ID_Zipcode , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Motor_Carrier_ID_Commercial_Indicator , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Carrier_ID_Type , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Carrier_Unit_Number , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.DOT_Permit_Number , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.ICCMC_Number , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.MCS_Vehicle_Inspection , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.MCS_Form_Number , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.MCS_Out_of_Service , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.MCS_Violation_Related , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Number_of_Axles , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Number_of_Tires , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.GVW_Over_10K_Pounds , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Weight_Rating , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Registered_Gross_Vehicle_Weight , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Vehicle_Length_Feet , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Cargo_Body_Type , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Load_Type , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Oversize_Load , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Vehicle_Configuration , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Trailer1_Type , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Trailer1_Length_Feet , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Trailer1_Width_Feet , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Trailer2_Type , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Trailer2_Length_Feet , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Trailer2_Width_Feet , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Federally_Reportable , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Vehicle_Inspection_Hazmat , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Hazmat_Form_Number , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Hazmt_Out_of_Service , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Hazmat_Violation_Related , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Hazardous_Materials_Placard , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Hazardous_Materials_Class_Number1 , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Hazardous_Materials_Class_Number2 , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Hazmat_Placard_Name , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Hazardous_Materials_Released1 , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Hazardous_Materials_Released2 , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Hazardous_Materials_Released3 , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Hazardous_Materials_Released4 , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Commercial_Event1 , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Commercial_Event2 , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Commercial_Event3 , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Commercial_Event4 , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Recommended_Driver_Reexam , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Transporting_HazMat , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Liquid_HazMat_Volume , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Oversize_Vehicle , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Overlength_Vehicle , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Oversize_Vehicle_Permitted , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Overlength_Vehicle_Permitted , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Carrier_Phone_Number , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Commerce_Type , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Citation_Issued_to_Vehicle , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.CDL_Class , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.DOT_State , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Fire_Hazardous_Materials_Involvement , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Commercial_Event_Description , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Supplment_Required_Hazmat_Placard , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Other_State_Number1 , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Other_State_Number2 , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Hazardous_Materials_Hazmat_Placard_Number1 , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Hazardous_Materials_Hazmat_Placard_Number2 , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Unit_Type_And_Axles1 , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Unit_Type_And_Axles2 , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Unit_Type_And_Axles3 , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Unit_Type_And_Axles4 , LEFT, RIGHT) + '"' , LEFT, RIGHT);
+	END;
+	ExtractData_com           := PROJECT(rm_commercial, xformCtr_com(LEFT, COUNTER));
+	ExtractHeaderRec_com  		:= DATASET([{0, CommercialHeader}], SequencingRecSummary);
+	FORMATTEDFINALA_com 		  := BigLineFormatDespray(ExtractData_com & ExtractHeaderRec_com, 'FL_Ecrash_Fiv_Commercial.csv');
+ 
+  //COUNTS
+	OUTPUT(COUNT(dds_commercial_fl), named('dds_commercial_fl'));
+	OUTPUT(COUNT(rm_commercial), named('cnt_rm_commercial'));
+	
+	//Property Damage input file
+  ds_property_fl := DATASET('~thor_data400::in::ecrash::propertydamage_raw::flremoval'
+													 ,FLAccidents_Ecrash.Layout_Infiles.property_damage
+													 ,CSV(TERMINATOR('\n'), SEPARATOR('|\t|'), QUOTE('"')))(Property_Damage_ID != 'Property_Damage_ID');
+	dds_property_fl := DEDUP(SORT(DISTRIBUTE(ds_property_fl(TRIM(property_damage_id, LEFT, RIGHT) <> ''),HASH32(property_damage_id, incident_id)), 
+	                              property_damage_id, incident_id, LOCAL), 
+													 property_damage_id, incident_id, LOCAL);
+								
+  ds_property := DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::propertydamage_raw'
+													,FLAccidents_Ecrash.Layout_Infiles.property_damage
+													,CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"'), MAXLENGTH(50000)))(Property_Damage_ID != 'Property_Damage_ID');
+	dds_property := DISTRIBUTE(ds_property,HASH32(property_damage_id, incident_id));
+								
+	FLAccidents_Ecrash.Layout_Infiles.property_damage updateProperty(dds_property L, dds_property_fl R) := TRANSFORM
+		SELF := L;
+	END;
+  rm_property := JOIN(dds_property, dds_property_fl,
+			                LEFT.property_damage_id = RIGHT.property_damage_id AND
+		                  LEFT.incident_id = RIGHT.incident_id,
+			                updateProperty(LEFT,RIGHT), INNER, LOCAL);
+
+  SequencingRecSummary xformCtr_pro(rm_property L, INTEGER CTR) := TRANSFORM
+	   SELF.recid            	:= CTR;
+		 SELF.LINE             	:= TRIM('"' + TRIM(L.Property_Damage_ID , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.Incident_ID , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.damage_description , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.damage_estimate , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.property_owner_name , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.property_owner_phone , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.property_owner_last_name , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.property_owner_first_name , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.property_owner_middle_name , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.property_owner_address , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.property_owner_city , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.property_owner_state , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.property_owner_zip_code , LEFT, RIGHT) + '"' + ',' +
+		'"' + TRIM(L.property_owner_notified , LEFT, RIGHT) + '"' , LEFT, RIGHT); 
+	END;
+	ExtractData_pro           := PROJECT(rm_property, xformCtr_pro(LEFT, COUNTER));
+	ExtractHeaderRec_pro  		:= DATASET([{0, PropertydamageHeader}], SequencingRecSummary);
+	FORMATTEDFINALA_pro  		  := BigLineFormatDespray(ExtractData_pro & ExtractHeaderRec_pro, 'FL_Ecrash_Fiv_Propertydamage.csv');
+ 
+  //COUNTS
+	OUTPUT(COUNT(dds_property_fl), named('cnt_dds_property_fl'));
+	OUTPUT(COUNT(rm_property), named('cnt_rm_property'));
+	
+	//Document input file
+  ds_document_fl := DATASET('~thor_data400::in::ecrash::document_raw::flremoval'
+													 ,FLAccidents_Ecrash.Layout_Infiles.Document
+													 ,CSV(TERMINATOR('\n'), SEPARATOR('|\t|'), QUOTE('"')))(Document_ID != 'Document_ID');
+	dds_document_fl := DEDUP(SORT(DISTRIBUTE(ds_document_fl(TRIM(document_id, LEFT, RIGHT) <> ''),HASH32(document_id, incident_id)), 
+	                              document_id, incident_id, LOCAL), 
+													 document_id, incident_id, LOCAL);
+								
+  ds_document := DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::document_raw'
+								        ,FLAccidents_Ecrash.Layout_Infiles.Document, CSV(HEADING(1),TERMINATOR('\n'), SEPARATOR(','),QUOTE('"')),OPT)(Document_ID != 'Document_ID');
+	dds_document := DISTRIBUTE(ds_document,HASH32(document_id, incident_id));
+								
+	FLAccidents_Ecrash.Layout_Infiles.Document updateDocument(dds_document L, dds_document_fl R) := TRANSFORM
+		SELF := L;
+	END;
+  rm_document := JOIN(dds_document, dds_document_fl,
+			                LEFT.document_id = RIGHT.document_id AND
+		                  LEFT.incident_id = RIGHT.incident_id,
+			                updateDocument(LEFT,RIGHT), INNER, LOCAL);
+
+  SequencingRecSummary xformCtr_doc(rm_document L, INTEGER CTR) := TRANSFORM
+	   SELF.recid            	:= CTR;
+		 SELF.LINE             	:= TRIM('"' + TRIM(L.document_id , LEFT, RIGHT) + '"' + ',' +
+    '"' + TRIM(L.incident_id , LEFT, RIGHT) + '"' + ',' +
+    '"' + TRIM(L.document_hash_key , LEFT, RIGHT) + '"' + ',' +
+    '"' + TRIM(L.date_created , LEFT, RIGHT) + '"' + ',' +
+    '"' + TRIM(L.is_deleted , LEFT, RIGHT) + '"' + ',' +
+    '"' + TRIM(L.report_type , LEFT, RIGHT) + '"' + ',' +
+    '"' + TRIM(L.page_count , LEFT, RIGHT) + '"' + ',' +
+    '"' + TRIM(L.extension , LEFT, RIGHT) + '"' + ',' +
+    '"' + TRIM(L.report_source , LEFT, RIGHT) + '"' , LEFT, RIGHT);
+	END;
+	ExtractData_doc           := PROJECT(rm_document, xformCtr_doc(LEFT, COUNTER));
+	ExtractHeaderRec_doc  		:= DATASET([{0, DocumentHeader}], SequencingRecSummary);
+	FORMATTEDFINALA_doc  		  := BigLineFormatDespray(ExtractData_doc & ExtractHeaderRec_doc, 'FL_Ecrash_Fiv_Document.csv');
+ 
+  //COUNTS
+	OUTPUT(COUNT(dds_document_fl), named('cnt_dds_document_fl'));
+	OUTPUT(COUNT(rm_document), named('cnt_rm_document'));
 
 	
-	Write_Output_Files := SEQUENTIAL(FORMATTEDFINALA_inc, FORMATTEDFINALA_veh, FORMATTEDFINALA_cit, FORMATTEDFINALA_per); 
+	Write_Output_Files := SEQUENTIAL(FORMATTEDFINALA_inc, FORMATTEDFINALA_veh, FORMATTEDFINALA_cit, FORMATTEDFINALA_per, FORMATTEDFINALA_com, FORMATTEDFINALA_pro, FORMATTEDFINALA_doc); 
 	
  RETURN Write_Output_Files;
 END;

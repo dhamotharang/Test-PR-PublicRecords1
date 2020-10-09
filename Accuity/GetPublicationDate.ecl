@@ -30,7 +30,7 @@ END;
 dsIds := NORMALIZE(dsIdsLine, StringLib.StringFindCount(sIds, ',') + 1, XItem(LEFT,COUNTER));
 dsIssueDates := NORMALIZE(dsIssueDatesLine, StringLib.StringFindCount(slistissuerdate, ',') + 1, XItem(LEFT,COUNTER));
 
-FormatDate(string YYYYMMDDHHMM) := ut.ConvertDate(YYYYMMDDHHMM, '%Y%m%d%H%M', '%Y-%m-%dT%H:%M')+':00.0000000Z';
+FormatDate(string YYYYMMDDHHMM) := Std.Date.ConvertDateFormat(YYYYMMDDHHMM, '%Y%m%d%H%M', '%Y-%m-%dT%H:%M')+':00.0000000Z';
 
 dsPubdates := COMBINE(dsIds, dsIssueDates, TRANSFORM(rpubdate,
 			SELF.listid := TRIM(LEFT.item);

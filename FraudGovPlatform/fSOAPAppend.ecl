@@ -3,8 +3,8 @@ gateway,riskprocessing,_control,Autokey_batch,DriversV2_Services;
 
 EXPORT fSOAPAppend(boolean	UpdatePii   = _Flags.Update.Pii)	:= MODULE
 
-	Shared nodes				:= thorlib.nodes();
-	Shared threads			:= 2;
+	Shared nodes				:= 150;//The data to be distributed on 150 nodes before sending to soapcall. 
+	Shared threads			:= 1;
 
 	//PII Input Process Begin
 
@@ -42,13 +42,9 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 	//PII Input Process End
 
 
-	shared ciid_base				:= Files().base.ciid.qa;
-
 	shared crim_base				:= Files().base.crim.qa;
 
 	shared death_base 			:= Files().base.death.qa;
-
-	shared fraudpoint_base	:= Files().base.fraudpoint.qa;
 
 	shared IpAppend_Base		:= Files().base.IpMetaData.qa;
 
@@ -63,8 +59,6 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 	shared BocaShell_Base		:= Files().base.BocaShell.qa;
 
 	//original soap output files
-
-	shared ciid_orig				:= Files().base.ciid_orig.built;
 
 	shared crim_orig				:= Files().base.crim_orig.built;
 
@@ -110,176 +104,6 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 		 Export All := pdist;
 		 
 	End;
-
-	EXPORT CIID		:= MODULE
-
-			service_name	:= 'risk_indicators.InstantID_batch';
-			serviceURL		:= riskwise.shortcuts.prod_batch_analytics_roxie;
-
-			string DataRestriction := risk_indicators.iid_constants.default_DataRestriction; // byte 6, if 1, restricts experian, byte 8, if 1, restricts equifax, 
-																									// byte 10 restricts Transunion, 12 restricts ADVO, 13 restricts bureau deceased data
-			string pModel := 'FP1109_0' ;
-
-			layout_out:=risk_indicators.Layout_InstantID_NuGen_Denorm;
-
-			in_format := record
-				risk_indicators.Layout_Batch_In;
-				string6 Gender := '';
-				string44 PassportUpperLine := '';
-				string44 PassportLowerLine := '';
-				STRING5 Grade := '';
-				string16 Channel := '';
-				string8 Income := '';
-				string16 OwnOrRent := '';
-				string16 LocationIdentifier := '';
-				string16 OtherApplicationIdentifier := '';
-				string16 OtherApplicationIdentifier2 := '';
-				string16 OtherApplicationIdentifier3 := '';
-				string8 DateofApplication := '';//https://hpccsystems.com/bb/viewforum.php?f=8
-				string8 TimeofApplication := '';
-				string50 email := '';
-			end;
-
-			layoutSoap := record
-					dataset(in_format) batch_in;
-					unsigned1 DPPAPurpose := 1;   //CHANGE ACCORDINGLY
-					unsigned1 GLBPurpose := 5;    //CHANGE ACCORDINGLY
-					STRING5 IndustryClass := '';
-					boolean LnBranded  := false;
-					boolean OfacOnly := false ;
-					unsigned3 HistoryDateYYYYMM := 999999;
-					boolean PoBoxCompliance := false;
-					boolean ExcludeWatchLists := false;
-					unsigned1 OFACversion :=1 ;
-					boolean IncludeAdditionalWatchlists := false;
-					boolean IncludeOfac := false;
-					real GlobalWatchlistThreshold :=.84 ;
-					boolean IncludeFraudScores := true;
-					boolean IncludeRiskIndices := true ;
-					boolean UseDobFilter := false;
-					integer2 DobRadius := 2 ;
-					unsigned1 RedFlag_version := 0 ;
-					boolean RedFlagsOnly := false ;
-					boolean IncludeDLVerification  := true;
-					string Model := pModel;
-					boolean IncludeTargusE3220 := false ;
-					string50 DataRestrictionMask :=  DataRestriction;
-					boolean ExactFirstNameMatch := false;
-					boolean ExactLastNameMatch := false ;
-					boolean ExactAddrMatch := false ;
-					boolean ExactPhoneMatch := false;
-					boolean ExactSSNMatch := false;
-					boolean ExactDOBMatch := false ;
-					boolean ExactDriverLicenseMatch := false;
-					boolean ExactFirstNameMatchAllowNicknames  := false;
-					string10 ExactMatchLevel := risk_indicators.iid_constants.default_ExactMatchLevel;  // default to using the scoring thresholds.
-					boolean   IncludeAllRiskIndicators := true;
-					unsigned1 NumReturnCodes :=  risk_indicators.iid_constants.DefaultNumCodes;
-					string15  DOBMatchType := '';
-					unsigned1 DOBMatchYearRadius := 0	;
-					boolean suppressNearDups := false;
-					boolean require2ele := false;
-					boolean fromBiid := false;
-					boolean isFCRA := false;
-					boolean	nugen := true;
-					boolean	inCalif := false;
-					boolean	fdReasonsWith38 := false;
-					boolean OFAC := true; 
-					boolean Include_ALL_Watchlist:= false ;
-					boolean Include_BES_Watchlist:= false ;
-					boolean Include_CFTC_Watchlist:= false ;
-					boolean Include_DTC_Watchlist:= false;
-					boolean Include_EUDT_Watchlist:= false ;
-					boolean Include_FBI_Watchlist:= false ;
-					boolean Include_FCEN_Watchlist:= false;
-					boolean Include_FAR_Watchlist:= false ;
-					boolean Include_IMW_Watchlist:= false;
-					boolean Include_OFAC_Watchlist:= false ;
-					boolean Include_OCC_Watchlist:= false ;
-					boolean Include_OSFI_Watchlist:= false ;
-					boolean Include_PEP_Watchlist:= false ;
-					boolean Include_SDT_Watchlist:= false;
-					boolean Include_BIS_Watchlist:= false ;
-					boolean Include_UNNT_Watchlist:= false ;
-					boolean Include_WBIF_Watchlist:= false ;
-			End;
-
-			in_format make_batch_in(pii_base le, integer c) := TRANSFORM
-				self.seq := c;
-				self.AcctNo	:= (string)le.record_id;
-				SELF.Name_First := le.fname;
-				SELF.Name_Middle := le.mname;
-				SELF.Name_Last := le.lname;
-				SELF.Name_suffix := le.name_suffix;
-				SELF.prim_name := le.prim_name;
-				SELF.prim_range := le.prim_range;
-				SELF.sec_range := le.sec_range;
-				SELF.St := le.st;
-				SELF.z5 := le.ZIP;
-				SELF.Home_Phone := le.home_phone;
-				SELF.work_Phone := le.work_phone_;
-				SELF.SSN := le.SSN;
-				SELF.DOB := (string)le.dob;
-				SELF.DL_Number := le.drivers_license;
-				SELF.DL_State := le.drivers_license_state;
-				SELF.ip_addr := le.ip_address;
-				SELF := le;
-				SELF := [];
-			END;
-
-			layoutSoap make_rv_in(pii_base le, integer c) := TRANSFORM
-				batch := PROJECT(le, make_batch_in(LEFT, c));
-				SELF.batch_in := batch;
-			END;
-
-			soap_in := DISTRIBUTE(project(pii_base, make_rv_in(LEFT, counter)),RANDOM() % nodes);
-
-			xlayout := RECORD
-				(layout_out)
-				STRING errorcode;
-			END;
-
-			xlayout myFail(soap_in le) := TRANSFORM
-				SELF.errorcode := FAILCODE +'  '+ FAILMESSAGE;
-				SELF := [];
-			END;
-
-			soap_results := soapcall(	soap_in,
-									serviceURL,
-									service_name,
-									{soap_in}, 
-									DATASET(xlayout),
-									PARALLEL(threads), 
-									onFail(myFail(LEFT))
-									)
-									// (errorcode='')
-									;
-
-
-			shared p	:=	dedup(project(soap_results,Transform(Layouts.CIID-[relativeaddressmatch],self.record_id	:= (unsigned8)left.AcctNo,self:=left,self:=[])),record,all);
-
-
-			//Assign record_ids to the ciid appends
-
-			shared ciid_recid_map	:= Join(Pii_Base_norm, p, left.record_id = right.record_id, Transform(Layouts.CIID-[relativeaddressmatch], self.record_id	:=left.record_id_new,self:=right));
-
-			//Get Relative address match flag
-
-			shared ciid_reladdr := AppendRelativesAddressMatch.macAppendRelativesAddressMatch(ciid_recid_map,did,prim_range,prim_name,z5);
-
-			//Assign fdn_file_info_ids
-			shared ciid_base_map	:= Join(pii_input ,ciid_reladdr, left.record_id=right.record_id,Transform(Layouts.Ciid
-																				,self.fdn_file_info_id	:= left.fdn_file_info_id,self.did_orig:=left.did,self:=right)):independent;
-
-			//Anonymize if needed for a specific source
-
-			shared ciid_anon	:= Anonymize.ciid(ciid_base_map).all;
-
-			Export orig	:= if(updatepii,dedup((ciid_base_map + ciid_orig),all),ciid_base_map); //Non Anonymzie file
-
-			Export all		:= if(updatepii,dedup((ciid_anon + ciid_base),all),ciid_anon);
-
-	END;
 
 	EXPORT Crim		:= MODULE
 
@@ -461,115 +285,6 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 
 			Export all	:= if(updatepii,dedup((Death_anon + Death_base),all),Death_anon);	
 					
-	END;
-
-	EXPORT FraudPoint	:= MODULE
-
-			service_name	:= 'Models.FraudAdvisor_Batch_Service';
-			serviceURL		:= riskwise.shortcuts.prod_batch_analytics_roxie;
-
-			string DataRestriction := risk_indicators.iid_constants.default_DataRestriction; // byte 6, if 1, restricts experian, byte 8, if 1, restricts equifax, 
-												// byte 10 restricts Transunion, 12 restricts ADVO, 13 restricts bureau deceased data
-			string pModel := 'FP31505_0' ;
-
-			//===================  options  ==============================================================
-			boolean 	includeV1 			:= true;  //set to 'true' to request version 1 attributes, else set to 'false'
-			boolean   includeV2 			:= true;	//set to 'true' to request version 2 attributes, else set to 'false'
-			unsigned1 redflags 			:= 1;		//set to 1 to request red flags, else set to 0
-			//============================================================================================
-
-			layout_out:= models.Layout_FD_Batch_Out;
-
-			layout_soap_input := RECORD
-				DATASET(Risk_Indicators.Layout_Batch_In) batch_in;
-				DATASET(Risk_Indicators.Layout_Gateways_In) gateways;
-				STRING ModelName;
-				STRING DataRestrictionMask;
-				INTEGER DPPAPurpose;
-				INTEGER GLBPURPOSE;
-				BOOLEAN IncludeVersion1;
-				BOOLEAN IncludeVersion2;
-				UNSIGNED1 RedFlag_version;
-			END;
-
-			Risk_Indicators.Layout_Batch_In make_batch_in(pii_base le, integer c) := TRANSFORM
-				self.seq := c;
-				self.acctno := (string)le.record_id;
-				SELF.Name_First := le.fname;
-				SELF.Name_Middle := le.mname;
-				SELF.Name_Last := le.lname;
-				SELF.Name_suffix := le.name_suffix;
-				SELF.prim_name := le.prim_name;
-				SELF.prim_range := le.prim_range;
-				SELF.sec_range := le.sec_range;
-				SELF.St := le.st;
-				SELF.z5 := le.ZIP;
-				SELF.Home_Phone := le.home_phone;
-				SELF.work_Phone := le.work_phone_;
-				SELF.SSN := le.SSN;
-				SELF.DOB := (string)le.dob;
-				SELF.DL_Number := le.drivers_license;
-				SELF.DL_State := le.drivers_license_state;
-				SELF.ip_addr := le.ip_address;
-				self.historydateyyyymm := 999999;  //to run with current date
-				SELF := le;
-				SELF := [];
-			END;
-
-			layout_soap_input make_fp_in(pii_base le, integer c) := TRANSFORM
-				batch := PROJECT(le, make_batch_in(LEFT, c));
-				SELF.batch_in := batch;
-				SELF.gateways := DATASET([{'FCRA', serviceURL}], risk_indicators.layout_gateways_in);
-				SELF.ModelName := pModel;
-				SELF.DataRestrictionMask := DataRestriction; 
-				SELF.DPPAPurpose := 1;
-				SELF.GLBPURPOSE := 5;
-				SELF.IncludeVersion1 := includeV1;   
-				SELF.IncludeVersion2 := includeV2;		
-				SELF.RedFlag_version := redflags;			
-			END;
-
-			soap_in := DISTRIBUTE(project(pii_base, make_fp_in(LEFT, counter)),RANDOM() % nodes);
-
-			xlayout := RECORD
-				layout_out;
-				STRING errorcode; 
-			END;
-
-			xlayout myFail(soap_in le) := TRANSFORM
-				SELF.errorcode := FAILCODE +'  '+ FAILMESSAGE;
-				SELF := [];
-			END;
-
-			soap_results := soapcall(	soap_in,
-									serviceURL,
-									service_name,
-									{soap_in}, 
-									DATASET(xlayout),
-									PARALLEL(threads), 
-									onFail(myFail(LEFT))
-									)
-									// (errorcode='')
-									;
-									
-			shared fp	:= dedup(project(soap_results	,Transform(Layouts.FraudPoint
-																				,self.record_id	:=(unsigned8)left.acctno
-																				,self:=left,self:=[])),record,all);
-
-			//Assign record_ids to the fraudpoint appends
-
-			shared Fp_recid_map	:= Join(Pii_Base_norm, fP, left.record_id = right.record_id, Transform(Layouts.FraudPoint, self.record_id	:=left.record_id_new,self:=right));
-
-			//Assign fdn_file_info_ids
-
-			shared Fp_base_map	:= Join(pii_input ,Fp_recid_map, left.record_id=right.record_id,Transform(Layouts.FraudPoint,
-																				self.did:=left.did,self.fdn_file_info_id	:= left.fdn_file_info_id,self:=right)):independent;
-																				
-
-			Fp_combine	:= dedup((Fp_base_map + fraudpoint_base),all);
-
-			Export all		:= if(updatepii, Fp_combine,Fp_base_map);	 
-
 	END;
 
 	EXPORT IPMetaData	:= MODULE
@@ -860,7 +575,7 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 	
 	 EXPORT BocaShell	:= Module
    	
-   unsigned1 parallel_calls :=if(_control.ThisEnvironment.Name <> 'Prod_Thor',2,30);  
+   unsigned1 parallel_calls :=threads;  
    boolean FraudPointMode := true;
    boolean RemoveFares := false;	
    boolean LeadIntegrityMode := false; 
@@ -969,8 +684,8 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
     SELF := [];
    END;
    p_f := PROJECT (ds_input, assignAccount (LEFT,COUNTER));
-   s := Risk_Indicators.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
-                                                  bs_service, roxieIP, parallel_calls);
+   s := BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
+                                                  bs_service, roxieIP, parallel_calls,nodes);
 																									
 
 		riskprocessing.layouts.layout_internal_shell getold(s le, l ri) :=	TRANSFORM
@@ -979,15 +694,16 @@ Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent;
 		END;
 
 	 res := JOIN (distribute(s,hash(seq))
-						,distribute(p_f,hash(accountnumber)),LEFT.seq=(unsigned)RIGHT.accountnumber,getold(LEFT,RIGHT));	
+						,distribute(p_f,hash((unsigned)accountnumber)),LEFT.seq=(unsigned)RIGHT.accountnumber,getold(LEFT,RIGHT),local);	
 						
    isFCRA := false;
    Shell_Out := FraudGovPlatform.fn_BocaShell_ToRin(res, isFCRA, DataRestrictionMask, IntendedPurpose);
 	 
-	 Base_Map := Join(Shell_Out,Pii_Input,left.record_id=right.record_id
-											,Transform(recordof(left),self.fdn_file_info_id:=right.fdn_file_info_id,self:=left));
+	 Base_Map := Join(distribute(Shell_Out,hash(record_id)),
+										distribute(Pii_Input,hash(record_id)),left.record_id=right.record_id
+											,Transform(recordof(left),self.fdn_file_info_id:=right.fdn_file_info_id,self:=left),local);
 	 
-	 Export All := dedup(Base_Map,all);
+	 Export All := If(UpdatePii, dedup((Base_Map + BocaShell_Base),all) , dedup(Base_Map,all));
    END;
 
 END;

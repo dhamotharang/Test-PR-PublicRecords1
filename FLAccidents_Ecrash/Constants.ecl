@@ -113,6 +113,10 @@ EXPORT CONSTANTS := MODULE
 	EXPORT STRING POSSIBLE          := 'POSSIBLE';
 	EXPORT STRING UNKNOWN						:= 'UNKNOWN';
 	EXPORT STRING NOINJURY					:= 'NOINJURY';
+	
+//Max Count for Citations Child Records
+  EXPORT Max_Citations_ChildRec_Count := 50;
+
 
 END;
 
