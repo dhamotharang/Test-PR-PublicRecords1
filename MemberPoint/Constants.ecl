@@ -67,7 +67,10 @@
 			export boolean rpt_IncludePhone := false;
 
 			//MP Enhancements
+			EXPORT STRING Standard           := 'STANDARD';
+      EXPORT STRING NoRoyaltySources   := 'NOROYALTY';
       EXPORT STRING Emailv2serviceBasic := 'basic';
+      EXPORT STRING Emailv2servicePremium := 'premium';
 			EXPORT STRING5 IndustryClass := '';
 			EXPORT BOOLEAN ReturnDetailedRoyalties := TRUE;
 			EXPORT BOOLEAN AllowNickNames:= FALSE;

@@ -14,6 +14,7 @@ END;
 Layout_AVM_Plus := RECORD
 	risk_indicators.Layout_Address_Information Address_History_1;
 	risk_indicators.Layout_Address_Information Address_History_2;
+ 	SET OF STRING100 avm_correct_record_id {maxlength(10100)} := [];
 	Layout_AVM AVM;
 END;
 
@@ -37,6 +38,9 @@ avm_corr_thor := join(ids_wide, pull(FCRA.Key_Override_AVM_FFID),
 #ELSE
 	avm_corr := avm_corr_roxie;
 #END
+
+
+
 
 Layout_AVM_Plus add_AVM(ids_wide le, avm_v2.Key_AVM_Address_FCRA ri) := transform
 	full_history_date := risk_indicators.iid_constants.full_history_date(le.historydate);
@@ -65,7 +69,8 @@ Layout_AVM_Plus add_AVM(ids_wide le, avm_v2.Key_AVM_Address_FCRA ri) := transfor
 	SELF.address_history_1 := le.address_verification.address_history_1;
 	SELF.address_history_2 := le.address_verification.address_history_2;
 	SELF.avm.seq := le.seq;
-	self.avm.historydate := le.historydate;
+	SELF.avm.historydate := le.historydate;
+  SELF.avm_correct_RECORD_ID := le.avm_correct_RECORD_ID;
 END;
 avm1_roxie := join(ids_wide, avm_v2.Key_AVM_Address_FCRA,  
 							left.address_verification.input_address_information.prim_name!='' and left.address_verification.input_address_information.zip5!='' and
@@ -75,7 +80,8 @@ avm1_roxie := join(ids_wide, avm_v2.Key_AVM_Address_FCRA,
 							keyed(left.address_verification.input_address_information.prim_range = right.prim_range) and
 							keyed(left.address_verification.input_address_information.sec_range = right.sec_range) and	// NNEQ here?
 							left.address_verification.input_address_information.predir=right.predir and 
-							left.address_verification.input_address_information.postdir=right.postdir,
+							left.address_verification.input_address_information.postdir=right.postdir AND 
+              TRIM(TRIM(right.prim_range,left,right)+TRIM(right.prim_name,left,right)+TRIM(right.sec_range,left,right),left,right) NOT IN left.avm_correct_RECORD_ID,
 						add_AVM(left, right), left outer, 
 								atmost(	left.address_verification.input_address_information.prim_name=right.prim_name and
 												left.address_verification.input_address_information.st=right.st and
@@ -94,7 +100,8 @@ avm1_thor := join(distribute(ids_wide, hash64(address_verification.input_address
 							left.address_verification.input_address_information.prim_range = right.prim_range and
 							left.address_verification.input_address_information.sec_range = right.sec_range and	// NNEQ here?
 							left.address_verification.input_address_information.predir=right.predir and 
-							left.address_verification.input_address_information.postdir=right.postdir,
+							left.address_verification.input_address_information.postdir=right.postdir AND 
+              TRIM(TRIM(right.prim_range,left,right)+TRIM(right.prim_name,left,right)+TRIM(right.sec_range,left,right),left,right) NOT IN left.avm_correct_RECORD_ID,
 						add_AVM(left, right), left outer, 
 								atmost(	left.address_verification.input_address_information.prim_name=right.prim_name and
 												left.address_verification.input_address_information.st=right.st and
@@ -148,7 +155,8 @@ avm2_roxie := join(avms1, avm_v2.Key_AVM_Address_FCRA,
 							keyed(left.address_history_1.prim_range = right.prim_range) and
 							keyed(left.address_history_1.sec_range = right.sec_range) and	// NNEQ here?
 							left.address_history_1.predir=right.predir and 
-							left.address_history_1.postdir=right.postdir,
+							left.address_history_1.postdir=right.postdir AND 
+              TRIM(TRIM(right.prim_range,left,right)+TRIM(right.prim_name,left,right)+TRIM(right.sec_range,left,right),left,right) NOT IN left.avm_correct_RECORD_ID,
 						add_AVM2(left, right), left outer, 
 								atmost(	left.address_history_1.prim_name=right.prim_name and
 												left.address_history_1.st=right.st and
@@ -167,7 +175,8 @@ avm2_thor := join(distribute(avms1, hash64(address_history_1.prim_name,
 							left.address_history_1.prim_range = right.prim_range and
 							left.address_history_1.sec_range = right.sec_range and	// NNEQ here?
 							left.address_history_1.predir=right.predir and 
-							left.address_history_1.postdir=right.postdir,
+							left.address_history_1.postdir=right.postdir AND 
+              TRIM(TRIM(right.prim_range,left,right)+TRIM(right.prim_name,left,right)+TRIM(right.sec_range,left,right),left,right) NOT IN left.avm_correct_RECORD_ID,
 						add_AVM2(left, right), left outer, 
 								atmost(	left.address_history_1.prim_name=right.prim_name and
 												left.address_history_1.st=right.st and
@@ -224,7 +233,8 @@ avm3_roxie := join(avms2, avm_v2.Key_AVM_Address_FCRA,
 							keyed(left.address_history_2.prim_range = right.prim_range) and
 							keyed(left.address_history_2.sec_range = right.sec_range) and	// NNEQ here?
 							left.address_history_2.predir=right.predir and 
-							left.address_history_2.postdir=right.postdir,
+							left.address_history_2.postdir=right.postdir AND 
+              TRIM(TRIM(right.prim_range,left,right)+TRIM(right.prim_name,left,right)+TRIM(right.sec_range,left,right),left,right) NOT IN left.avm_correct_RECORD_ID,
 						add_AVM3(left, right), left outer, 
 								atmost(	left.address_history_2.prim_name=right.prim_name and
 												left.address_history_2.st=right.st and
@@ -243,7 +253,8 @@ avm3_thor := join(distribute(avms2, hash64(address_history_2.prim_name,
 							left.address_history_2.prim_range = right.prim_range and
 							left.address_history_2.sec_range = right.sec_range and	// NNEQ here?
 							left.address_history_2.predir=right.predir and 
-							left.address_history_2.postdir=right.postdir,
+							left.address_history_2.postdir=right.postdir AND 
+              TRIM(TRIM(right.prim_range,left,right)+TRIM(right.prim_name,left,right)+TRIM(right.sec_range,left,right),left,right) NOT IN left.avm_correct_RECORD_ID,
 						add_AVM3(left, right), left outer, 
 								atmost(	left.address_history_2.prim_name=right.prim_name and
 												left.address_history_2.st=right.st and
@@ -286,36 +297,41 @@ layout_fips get_fips(ids_wide le, integer c) := TRANSFORM
 	self.historydate := le.historydate;
 	SELF.whichaddr := (string)c;
 	
-	state := CHOOSE(c,le.Address_Verification.Input_Address_Information.st,
-											le.Address_Verification.Input_Address_Information.st,
-											le.Address_Verification.Input_Address_Information.st,
-											le.Address_Verification.Address_History_1.st,
-											le.Address_Verification.Address_History_1.st,
-											le.Address_Verification.Address_History_1.st,
-											le.Address_Verification.Address_History_2.st,
-											le.Address_Verification.Address_History_2.st,
-											le.Address_Verification.Address_History_2.st);
+//We need to suppress this information if the rec was in Person Context which is carried by the ids_wide.avm_correct_record_id so we will do it with flags 
+InputAddressAllowed := TRIM(TRIM(le.Address_Verification.Input_Address_Information.prim_range,left,right)+TRIM(le.Address_Verification.Input_Address_Information.prim_name,left,right)+TRIM(le.Address_Verification.Input_Address_Information.sec_range,left,right),left,right) NOT IN le.avm_correct_RECORD_ID;
+AddressHistory1AddressAllowed := TRIM(TRIM(le.Address_Verification.Address_History_1.prim_range,left,right)+TRIM(le.Address_Verification.Address_History_1.prim_name,left,right)+TRIM(le.Address_Verification.Address_History_1.sec_range,left,right),left,right) NOT IN le.avm_correct_RECORD_ID;
+AddressHistory2AddressAllowed := TRIM(TRIM(le.Address_Verification.Address_History_2.prim_range,left,right)+TRIM(le.Address_Verification.Address_History_2.prim_name,left,right)+TRIM(le.Address_Verification.Address_History_2.sec_range,left,right),left,right) NOT IN le.avm_correct_RECORD_ID;
+
+	state := CHOOSE(c,  IF(InputAddressAllowed, le.Address_Verification.Input_Address_Information.st,''),
+											IF(InputAddressAllowed, le.Address_Verification.Input_Address_Information.st,''),
+											IF(InputAddressAllowed, le.Address_Verification.Input_Address_Information.st,''),
+											IF(AddressHistory1AddressAllowed, le.Address_Verification.Address_History_1.st,''),
+											IF(AddressHistory1AddressAllowed, le.Address_Verification.Address_History_1.st,''),
+										  IF(AddressHistory1AddressAllowed, le.Address_Verification.Address_History_1.st,''),
+											IF(AddressHistory2AddressAllowed, le.Address_Verification.Address_History_2.st,''),
+											IF(AddressHistory2AddressAllowed, le.Address_Verification.Address_History_2.st,''),
+											IF(AddressHistory2AddressAllowed, le.Address_Verification.Address_History_2.st,''));
 											
 	statefips := codes.st2FipsCode(state);
 	
-	countyfips := CHOOSE(c,le.Address_Verification.Input_Address_Information.county,
-													le.Address_Verification.Input_Address_Information.county,
-													le.Address_Verification.Input_Address_Information.county,
-													le.Address_Verification.Address_History_1.county,
-													le.Address_Verification.Address_History_1.county,
-													le.Address_Verification.Address_History_1.county,
-													le.Address_Verification.Address_History_2.county,
-													le.Address_Verification.Address_History_2.county,
-													le.Address_Verification.Address_History_2.county);
+	countyfips := CHOOSE(c, IF(InputAddressAllowed, le.Address_Verification.Input_Address_Information.county,''),
+                          IF(InputAddressAllowed, le.Address_Verification.Input_Address_Information.county,''),
+                          IF(InputAddressAllowed, le.Address_Verification.Input_Address_Information.county,''),
+													IF(AddressHistory1AddressAllowed, le.Address_Verification.Address_History_1.county,''),
+                          IF(AddressHistory1AddressAllowed, le.Address_Verification.Address_History_1.county,''),
+                          IF(AddressHistory1AddressAllowed, le.Address_Verification.Address_History_1.county,''),
+													IF(AddressHistory2AddressAllowed, le.Address_Verification.Address_History_2.county,''),
+                          IF(AddressHistory2AddressAllowed, le.Address_Verification.Address_History_2.county,''),
+                          IF(AddressHistory2AddressAllowed, le.Address_Verification.Address_History_2.county,''));
 	geoblk := CHOOSE(c,'',
-													 le.Address_Verification.Input_Address_Information.geo_blk[1..6],
-													 le.Address_Verification.Input_Address_Information.geo_blk[1..7],
+													IF(InputAddressAllowed, le.Address_Verification.Input_Address_Information.geo_blk[1..6],''),
+                          IF(InputAddressAllowed, le.Address_Verification.Input_Address_Information.geo_blk[1..7],''),
 													 '',
-													 le.Address_Verification.Address_History_1.geo_blk[1..6],
-													 le.Address_Verification.Address_History_1.geo_blk[1..7],
+													IF(AddressHistory1AddressAllowed,  le.Address_Verification.Address_History_1.geo_blk[1..6],''),
+                          IF(AddressHistory1AddressAllowed,  le.Address_Verification.Address_History_1.geo_blk[1..7],''),
 													 '',
-													 le.Address_Verification.Address_History_2.geo_blk[1..6],
-													 le.Address_Verification.Address_History_2.geo_blk[1..7]);
+													IF(AddressHistory2AddressAllowed, le.Address_Verification.Address_History_2.geo_blk[1..6],''),
+                          IF(AddressHistory2AddressAllowed, le.Address_Verification.Address_History_2.geo_blk[1..7],''));
 	
 	self.fips_code := trim(statefips) + trim(countyfips) + trim(geoblk);
 	SELF.st := state;
@@ -429,6 +445,7 @@ Layout_AVM check_corr(fullavm le, avm_corr ri) := transform
 	self.address_history_2 := if(correction, project(ri.input_address_information, intoblank(le,3)), le.address_history_2);
 end;
 final := join(fullavm, avm_corr, left.seq=right.seq, check_corr(left,right), left outer, lookup);
+
 
 return group(sort(final,seq),seq);
 

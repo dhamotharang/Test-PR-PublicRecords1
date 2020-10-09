@@ -1,10 +1,10 @@
 ﻿EXPORT Healthcare_Constants_Core := MODULE
 	export authorized_DPPA := 0;
 	export inv_DPPA_msg := 'Supplied DPPAPurpose is not an approved usage value. ';
-	export authorized_DMF := 0;
-	export inv_DMF_msg := 'Supplied DMFPurpose is not an approved usage value. ';
+	export authorized_DMF := '00';
+	export inv_DMF_msg := 'THERE IS NO DMF PERMISSIBLE PURPOSE FOR THIS PRODUCT. ';
 	export authorized_FCRA := 0;
-	export inv_FCRA_msg := 'Supplied FCRAPurpose is not an approved usage value. ';
+	export inv_FCRA_msg := 'THERE IS NO FCRA PERMISSIBLE PURPOSE FOR THIS PRODUCT. ';
 	export authorized_GLBA := 6;
 	export inv_GLBA_msg := 'Supplied GLBPurpose is not an approved usage value. ';
 	export alt_GLBA := 1;

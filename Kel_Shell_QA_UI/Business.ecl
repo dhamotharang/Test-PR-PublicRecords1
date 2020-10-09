@@ -29,6 +29,8 @@
 								 email_list) := FUNCTIONMACRO
 
 
+#workunit('name', 'MAS KAT Run Custom');
+
 Threads := 1;
 
 RoxieIP :=Query_Environment;
@@ -299,6 +301,8 @@ ResultSet :=
 //OUTPUT(CHOOSEN(inDataReady, eyeball), NAMED('Raw_input'));
 //OUTPUT( ResultSet, NAMED('Results') );
 
+Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(Settings);
+
 
 Passed := ResultSet(TRIM(Results.B_InpAcct) <> '');
 Failed := ResultSet(TRIM(Results.B_InpAcct) = ''); 
@@ -357,9 +361,16 @@ result3:=Kel_Shell_QA_UI.Output_Distribution_Report_Module(unique_id, Passed_Bus
 
 result4:=Kel_Shell_QA.descriptive_Stats_Report(unique_id, Passed_Business);
 
-result5:=STD.System.Email.SendEmail(email_list, 'KEL SHELL QA UI run job',  'Your WUID ' + workunit + ' has completed!');
+Settings_Dataset_updated:= Settings_Dataset +
+                           DATASET([{'AllowedSources: ' + Kel_Shell_QA_UI.SetToString(AllowedSourcesDataset_List)},
+													  {'ExcludeSources: ' + Kel_Shell_QA_UI.SetToString(ExcludeSourcesDataset_List)}
+		                       ],{RECORDOF(Settings_Dataset)});
 
-seq:=sequential(result1, result2, result3, result4, result5);
+result5:=OUTPUT(Settings_Dataset_updated, NAMED('Attributes_Settings'));
+
+result6:=STD.System.Email.SendEmail(email_list, 'KEL SHELL QA UI run job',  'Your WUID ' + workunit + ' has completed!');
+
+seq:=sequential(result1, result2, result3, result4, result5, result6);
 
 RETURN seq;
 

@@ -29,11 +29,11 @@ END;
  ds := PROJECT(infile, 
    TRANSFORM( extendedLayout, SELF := LEFT, self := []));
 
- RAMPS.mac_xLinking_on_thor_Boca (ds, prefix_Lexid, Input_SNAME, Input_FNAME,Input_MNAME,Input_LNAME,Input_Gender, Input_Derived_Gender,
+ IDLExternalLinking.mac_xlinking_on_thor_Boca(ds, prefix_Lexid, Input_SNAME, Input_FNAME,Input_MNAME,Input_LNAME,Input_Gender, Input_Derived_Gender,
 														Input_PRIM_NAME,Input_PRIM_RANGE,Input_SEC_RANGE,Input_CITY,Input_ST,Input_ZIP,Input_SSN,
 														Input_DOB, Input_Phone, Input_DL_STATE,Input_DL_NBR, 
-														outfile, weight_score, Distance, Segmentation, forceIndex);
-
+														outfile, weight_score, Distance, Segmentation);
+                                 
  xlinkResultsPrep := PROJECT(outfile, TRANSFORM(extendedLayout,
   self.xlink_keys_desc := InsuranceHeader_xLink.Process_xIDL_Layouts().KeysUsedToText(left.xlink_keys);
   self.xlink_matches_desc := InsuranceHeader_xLink.fn_MatchesToText(left.xlink_matches);

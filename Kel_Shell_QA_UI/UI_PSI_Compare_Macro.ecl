@@ -1,5 +1,6 @@
 ﻿EXPORT UI_PSI_Compare_Macro(unique_field, new_input_file_records, old_input_file_records, new_Tag, old_Tag) := FUNCTIONMACRO
 
+
 		aa1:=join(new_input_file_records, old_input_file_records,left.#expand(unique_field)=right.#expand(unique_field),inner);
 
 		aa:=aa1(#expand(unique_field)<>'');

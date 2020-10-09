@@ -46,7 +46,11 @@ RECORD
 	SET OF STRING100 inquiries_correct_record_id {maxlength(10100)} := [];
 	
 	SET OF STRING20 ssn_correct_ffid {maxlength(2100)} := [];
-	SET OF STRING100 ssn_correct_record_id {maxlength(10100)} := [];
+	SET OF STRING100 ssn_correct_record_id {maxlength(10100)} := [];	
+
+  SET OF STRING20  death_correct_ffid {maxlength(5250)} := []; // need to verify length
+  SET OF STRING100 death_correct_record_id {maxlength(33000)} := []; //need to verify length
+
 
 	// Allowing for 200 header corrections
 	SET OF STRING100 header_correct_record_id {maxlength(20100)} := [];
