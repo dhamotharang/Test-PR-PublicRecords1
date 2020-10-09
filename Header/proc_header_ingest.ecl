@@ -26,8 +26,8 @@ export proc_header_ingest(boolean incremental=FALSE, string versionBuild) := MOD
 
     EXPORT run := sequential(
             if(versionBuild = '',fail('Build Version is empty'))
-           ,if(~incremental and versionBuild[5..6]<>fn[sub+4..sub+5],fail('Current month Equifax missing'))
-           ,Header.mac_runIfNotCompleted (ingest_status_fn,versionBuild, step1, 110)
+           //,if(~incremental and versionBuild[5..6]<>fn[sub+4..sub+5],fail('Current month Equifax missing'))
+           //,Header.mac_runIfNotCompleted (ingest_status_fn,versionBuild, step1, 110)
            ,Header.mac_runIfNotCompleted (ingest_status_fn,versionBuild, step2, 120)
            ,Header.mac_runIfNotCompleted (ingest_status_fn,versionBuild, step3, 130)
            ,if(~incremental,Header.mac_runIfNotCompleted (ingest_status_fn,versionBuild, step4, 140))
