@@ -590,33 +590,6 @@ EXPORT Constants := MODULE
   export unsigned2 ROLLUP_MAX_COUNT_HITS       := 10; //estimated, actual still TBD
   end;
 
-	export FraudGov := MODULE
-		export unsigned2 MAX_COUNT_SEARCH_RECORDS := 2000;
-		export unsigned2 MAX_COUNT_PAYLOAD := 1000;
-		export unsigned2 MAX_COUNT_VELOCITY := 1000;
-		export unsigned2 MAX_COUNT_KNOWN_RISK := 1000;
-		export unsigned2 MAX_COUNT_BUSINESS_LINKIDS := 100;
-		export unsigned2 MAX_COUNT_OFFENSES := 6;
-		export unsigned2 MAX_COUNT_CRIMINAL_CASES := 6;
-		export unsigned2 MAX_COUNT_REMARKS := 30;
-		export unsigned2 MAX_COUNT_ADDRESS := 10;
-		export unsigned2 MAX_COUNT_CRIMINAL := 1000;
-		export unsigned2 MAX_COUNT_GLOBAL_WATCHLIST := 1000;
-		export unsigned2 MAX_COUNT_RED_FLAG := 1000;
-		export unsigned2 MAX_ALERT := 4;
-		export unsigned2 MAX_COUNT_IDENTITY_DETAIL := 1000;
-		export unsigned2 MAX_COUNT_ELEMENT_DETAIL := 1000;
-		export unsigned2 MAX_COUNT_ASSOCIATED_ADDRESS := 1000;
-		export unsigned2 MAX_COUNT_SCORE_BREAKDOWN := 1000;
-		export unsigned2 MAX_COUNT_INDICATOR_ATTRIBUTE := 1000;
-		export unsigned2 MAX_COUNT_CLUSTER := 1000;
-		export unsigned2 MAX_COUNT_ASSOCIATED_IDENTITY := 1000;
-		export unsigned2 MAX_COUNT_TIMELINE_DETAILS := 1000;
-		export unsigned2 MAX_COUNT_DELTABASE := 1000;
-		export unsigned2 MAX_COUNT_NVP := 1000;
-		export unsigned2 MAX_TIMELINE_PHONES := 20;
-	end;
-
   export RIN := MODULE
     export unsigned2 MAX_COUNT_NVP := 1000;
     export unsigned2 MAX_COUNT_SEARCH_RECORDS := 10000;
