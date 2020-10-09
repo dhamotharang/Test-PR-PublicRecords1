@@ -29,7 +29,7 @@ EXPORT DueDiligence_BusinessRptService := MACRO
     cleanData := DueDiligence.CommonQuery.GetCleanData(validRequest);
    
     //retrieve options & compliance information
-    regulatoryCompliance := DueDiligence.CommonQuery.mac_GetCompliance(dppa, glba, drm, dpm, userIn.IndustryClass, lexIdSourceOptout, transactionID, batchUID, globalCompanyID);
+    regulatoryCompliance := DueDiligence.CommonQuery.GetCompliance(dppa, glba, drm, dpm, userIn.IndustryClass, lexIdSourceOptout, transactionID, batchUID, globalCompanyID);
 
     //based on what was requested, call the appropriate attributes  
     ddResults := DueDiligence.CommonQueryXML.mac_v3BusinessXML(wseq, cleanData, regulatoryCompliance, DDssnMask, optionsIn.AdditionalInput, 

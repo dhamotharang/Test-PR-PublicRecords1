@@ -1,4 +1,4 @@
-﻿IMPORT DueDiligence;
+﻿IMPORT DueDiligence, iesp;
 
 
 EXPORT getAllBusAttrRpt(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) v3Input,
@@ -115,6 +115,14 @@ EXPORT getAllBusAttrRpt(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) v3
                                                       SELF.economicReportIncluded := ddOptions.includeReportData AND DueDiligence.v3Common.DDBusiness.IsRequestedModuleBeingRequested(DueDiligence.ConstantsQuery.MODULE_ECONOMIC, attributesRequested);
                                                       SELF.operatingReportIncluded := ddOptions.includeReportData AND DueDiligence.v3Common.DDBusiness.IsRequestedModuleBeingRequested(DueDiligence.ConstantsQuery.MODULE_OPERATING, attributesRequested);
                                                       SELF.networkReportIncluded := ddOptions.includeReportData AND DueDiligence.v3Common.DDBusiness.IsRequestedModuleBeingRequested(DueDiligence.ConstantsQuery.MODULE_NETWORK, attributesRequested);
+                                                      
+                                                      
+                                                      
+                                                      //attributes/reports are converted in new modularity logic
+                                                      SELF.busIndustry := '';
+                                                      SELF.busIndustry_Flag := '';
+                                                      SELF.report.businessReport.businessAttributeDetails.operating.businessInformation.SICNAICs := DATASET([], iesp.duediligencebusinessreport.t_DDRSICNAIC);
+                                                      
                                                       
                                                       SELF.report.BusinessReport := LEFT.BusinessReport;
                                                       

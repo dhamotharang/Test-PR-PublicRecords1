@@ -1,64 +1,83 @@
-﻿IMPORT DueDiligence, STD, ut;
+﻿IMPORT DueDiligence, STD;
+
 
 EXPORT getIndKRIBusAssoc(DueDiligence.LayoutsInternal.IndBusAssociations indiv) := FUNCTION
 
-		//PERSON BUSINESSS ASSOCIATIONS 
-    isInquired := indiv.did = indiv.busAssociation.beos[1].did;
-    isBEO := indiv.busAssociation.beos[1].isBEO;
-    isOwnershipProng := indiv.busAssociation.beos[1].isOwnershipProng;
-    isControlProng := indiv.busAssociation.beos[1].isControlProng;
-    isMSBcibNBFIcag := indiv.busAssociation.sicNaicRisk.msbExists OR
-                      indiv.busAssociation.sicNaicRisk.cibRetailExists OR
-                      indiv.busAssociation.sicNaicRisk.cibNonRetailExists OR
-                      indiv.busAssociation.sicNaicRisk.nbfiExists OR
-                      indiv.busAssociation.sicNaicRisk.cagExists;
-    isLATFTa := indiv.busAssociation.sicNaicRisk.legAcctTeleFlightTravExists OR indiv.busAssociation.sicNaicRisk.autoExists;
-    isHighRisk := indiv.busAssociation.sicNaicRisk.otherHighRiskIndustExists;
-    reportedSICorNAICS := indiv.busAssociation.sicNaicRisk.sicCodes <> DueDiligence.Constants.EMPTY OR indiv.busAssociation.sicNaicRisk.naicCodes <> DueDiligence.Constants.EMPTY;
+    //PERSON BUSINESSS ASSOCIATIONS
+    //Inquired information
+    inquiredData := indiv.busAssociation.beos(did = indiv.did);
+
+    isInquired := COUNT(inquiredData) > 0;
+    isBEO := inquiredData[1].isBEO;
+    isOwnershipProng := inquiredData[1].isOwnershipProng;
+    isControlProng := inquiredData[1].isControlProng;
+
+    inquiredBEOOwnControl := isInquired AND isBEO AND (isOwnershipProng OR isControlProng);
+
     businessAssociation := indiv.busAssociation.seleID > 0;
-    
-		busAssocFlag9 := IF(isInquired AND isBEO AND isOwnershipProng AND isMSBcibNBFIcag, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                                            		 
-		busAssocFlag8 := IF(isInquired AND isBEO AND isControlProng AND isMSBcibNBFIcag, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                		 
-		busAssocFlag7 := IF(isInquired AND isBEO AND isOwnershipProng AND isLATFTa, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
-		busAssocFlag6 := IF(isInquired AND isBEO AND isControlProng AND isLATFTa, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
-		busAssocFlag5 := IF(isInquired AND isBEO AND isOwnershipProng AND isHighRisk, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
-		busAssocFlag4 := IF(isInquired AND isBEO AND isControlProng AND isHighRisk, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
-		busAssocFlag3 := IF((isInquired AND isBEO AND (isOwnershipProng OR isControlProng)) AND reportedSICorNAICS = FALSE, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);   
-		busAssocFlag2 := IF((isInquired AND isBEO AND (isOwnershipProng OR isControlProng)) AND 
-                        reportedSICorNAICS = TRUE AND 
-                        isMSBcibNBFIcag = FALSE AND 
-                        isLATFTa = FALSE AND 
-                        isHighRisk = FALSE, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);  
-		busAssocFlag1 := IF(businessAssociation = FALSE OR (businessAssociation AND 
-                                                        busAssocFlag9 = DueDiligence.Constants.F_INDICATOR AND
-                                                        busAssocFlag8 = DueDiligence.Constants.F_INDICATOR AND
-                                                        busAssocFlag7 = DueDiligence.Constants.F_INDICATOR AND
-                                                        busAssocFlag6 = DueDiligence.Constants.F_INDICATOR AND
-                                                        busAssocFlag5 = DueDiligence.Constants.F_INDICATOR AND
-                                                        busAssocFlag4 = DueDiligence.Constants.F_INDICATOR AND
-                                                        busAssocFlag3 = DueDiligence.Constants.F_INDICATOR AND
-                                                        busAssocFlag2 = DueDiligence.Constants.F_INDICATOR), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                               	 
-		
-		busAssocConcat_Final := DueDiligence.Common.calcFinalFlagField(busAssocFlag9,
-                                                                    busAssocFlag8,
-                                                                    busAssocFlag7,
-                                                                    busAssocFlag6,
-                                                                    busAssocFlag5,
-                                                                    busAssocFlag4,
-                                                                    busAssocFlag3,
-                                                                    busAssocFlag2,
-                                                                    busAssocFlag1); 
-
-		perBusAssoc_Flag := busAssocConcat_Final;
-		perBusAssoc := (STRING)(10-STD.Str.Find(busAssocConcat_Final, DueDiligence.Constants.T_INDICATOR, 1)); 
-    
-    
-
-    // OUTPUT(isMSBcibNBFIcag, NAMED('isMSBcibNBFIcag'));
-    // OUTPUT(isLATFTa, NAMED('isLATFTa'));
-    // OUTPUT(isHighRisk, NAMED('isHighRisk'));
-    // OUTPUT(reportedSICorNAICS, NAMED('reportedSICorNAICS'));
 
 
-		RETURN DueDiligence.Common.createNVPair(perBusAssoc, perBusAssoc_Flag);
+    //Industry code information
+    allIndustryCodes := indiv.busAssociation.sicNaicSources;
+
+    bestSicCode := allIndustryCodes(sicCode <> DueDiligence.Constants.EMPTY AND isprimary)[1].riskiestLevel;
+    bestNaicsCode := allIndustryCodes(naicCode <> DueDiligence.Constants.EMPTY AND isprimary)[1].riskiestLevel;
+
+
+    cibCategory := DueDiligence.ConstantsIndustry.CIB_GROUPING;
+    financialCateogry := DueDiligence.ConstantsIndustry.FINANCIAL_GROUPING;
+    miscCategory := DueDiligence.ConstantsIndustry.MISC_CATEGORY_GROUPING;
+    medLowRisk := DueDiligence.ConstantsIndustry.MED_LOW_RISK_GROUPING;                                         
+
+
+
+
+
+    busAssoc9 := IF(inquiredBEOOwnControl AND (bestSicCode IN cibCategory OR bestNaicsCode IN cibCategory), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    busAssoc8 := IF(inquiredBEOOwnControl AND (bestSicCode IN financialCateogry OR bestNaicsCode IN financialCateogry), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    busAssoc7 := IF(inquiredBEOOwnControl AND (bestSicCode IN miscCategory OR bestNaicsCode IN miscCategory), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    busAssoc6 := IF(inquiredBEOOwnControl AND (bestSicCode = DueDiligence.ConstantsIndustry.RISK_LEVEL_ENUM.HIGH OR bestNaicsCode = DueDiligence.ConstantsIndustry.RISK_LEVEL_ENUM.HIGH), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+
+    busAssoc5 := IF(inquiredBEOOwnControl AND COUNT(allIndustryCodes(riskiestLevel IN cibCategory)) > 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    busAssoc4 := IF(inquiredBEOOwnControl AND COUNT(allIndustryCodes(riskiestLevel IN financialCateogry)) > 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    busAssoc3 := IF(inquiredBEOOwnControl AND COUNT(allIndustryCodes(riskiestLevel IN miscCategory)) > 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+    busAssoc2 := IF(inquiredBEOOwnControl AND COUNT(allIndustryCodes(riskiestLevel = DueDiligence.ConstantsIndustry.RISK_LEVEL_ENUM.HIGH)) > 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
+
+    busAssoc1 := IF(businessAssociation = FALSE OR (businessAssociation AND 
+                                                        busAssoc9 = DueDiligence.Constants.F_INDICATOR AND
+                                                        busAssoc8 = DueDiligence.Constants.F_INDICATOR AND
+                                                        busAssoc7 = DueDiligence.Constants.F_INDICATOR AND
+                                                        busAssoc6 = DueDiligence.Constants.F_INDICATOR AND
+                                                        busAssoc5 = DueDiligence.Constants.F_INDICATOR AND
+                                                        busAssoc4 = DueDiligence.Constants.F_INDICATOR AND
+                                                        busAssoc3 = DueDiligence.Constants.F_INDICATOR AND
+                                                        busAssoc2 = DueDiligence.Constants.F_INDICATOR), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+                                                        
+                                                        
+    busAssoc0 := DueDiligence.Constants.EMPTY;
+
+    busAssocFlags := DueDiligence.v3Common.General.GetAttributeFlagDetails(busAssoc9, busAssoc8, busAssoc7,
+                                                                           busAssoc6, busAssoc5, busAssoc4,
+                                                                           busAssoc3, busAssoc2, busAssoc1, busAssoc0);
+                                                                           
+    busAssocScore := (STRING2)(10-STD.Str.Find(busAssocFlags, DueDiligence.Constants.T_INDICATOR, 1)); 
+
+
+
+
+
+    perBusAssoc_Flag := busAssocFlags;
+    perBusAssoc := busAssocScore; 
+
+
+
+    // OUTPUT(inquiredData, NAMED('inquiredData'));
+    // OUTPUT(inquiredBEOOwnControl, NAMED('inquiredBEOOwnControl'));
+
+    // OUTPUT(allIndustryCodes, NAMED('allIndustryCodes'));
+    // OUTPUT(bestSicCode, NAMED('bestSicCode'));
+    // OUTPUT(bestNaicsCode, NAMED('bestNaicsCode'));
+
+
+    RETURN DueDiligence.Common.createNVPair(perBusAssoc, perBusAssoc_Flag);
 END;

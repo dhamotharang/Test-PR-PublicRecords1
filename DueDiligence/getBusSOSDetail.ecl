@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, business_header, STD;
+﻿IMPORT Business_Risk_BIP, DueDiligence;
 
 
 EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
@@ -20,7 +20,6 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
                                 EXPORT BOOLEAN includeIncorporationDate := FALSE;
                                 EXPORT BOOLEAN includeCorporateFilingDate := FALSE;
                                 EXPORT BOOLEAN includeOperatingLocataions := FALSE;
-                                EXPORT BOOLEAN includeSICNAICS := TRUE;
                                 EXPORT BOOLEAN includeFilingStatuses := FALSE;
                                 EXPORT BOOLEAN includeIncorporatedWithLooseLaws := FALSE;
                                 EXPORT BOOLEAN includeRegisteredAgents := TRUE;
@@ -35,12 +34,9 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
     
     //if requesting operating locations
     addBusnLocCnt := IF(sosDataOptions.includeAll OR sosDataOptions.includeOperatingLocataions, DueDiligence.getBusSOSDetailImpl.getOperatingLocations(addEverFiled, corpFilingsFilt), addEverFiled);
-    
-    //if requesting SIC/NAICS
-    addCorpSicNaic := IF(sosDataOptions.includeAll OR sosDataOptions.includeSICNAICS, DueDiligence.getBusSOSDetailImpl.getSICNAICS(addBusnLocCnt, corpFilingsFilt), addBusnLocCnt);
-    
+        
     //if requesting filing statuses
-    addSosStatusDates := IF(sosDataOptions.includeAll OR sosDataOptions.includeFilingStatuses, DueDiligence.getBusSOSDetailImpl.getFilingStatuses(addCorpSicNaic, corpFilingsFilt), addCorpSicNaic);
+    addSosStatusDates := IF(sosDataOptions.includeAll OR sosDataOptions.includeFilingStatuses, DueDiligence.getBusSOSDetailImpl.getFilingStatuses(addBusnLocCnt, corpFilingsFilt), addBusnLocCnt);
     
     //if requesting incorporations with loose laws
     addIncLooseLaws := IF(sosDataOptions.includeAll OR sosDataOptions.includeIncorporatedWithLooseLaws, DueDiligence.CommonBusiness.getIncoprorationWithLooseLaws(addSosStatusDates, corpFilingsFilt, 'corp_inc_state'), addSosStatusDates);
@@ -91,7 +87,6 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
     // OUTPUT(addIncDate, NAMED('addIncDate'));
     // OUTPUT(addEverFiled, NAMED('addEverFiled'));
     // OUTPUT(addBusnLocCnt, NAMED('addBusnLocCnt'));
-    // OUTPUT(addCorpSicNaic, NAMED('addCorpSicNaic'));
     // OUTPUT(addSosStatusDates, NAMED('addSosStatusDates'));
     // OUTPUT(addIncLooseLaws, NAMED('addIncLooseLaws'));
     // OUTPUT(addAgents, NAMED('addAgentsSOS'));
