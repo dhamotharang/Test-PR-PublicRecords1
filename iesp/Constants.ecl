@@ -1529,7 +1529,9 @@ EXPORT Constants := MODULE
 
 	// RetrieveImage
 	export Retrieve_Image := module
+		export MaxSoapErrorSize := 5000;
 		export MaxImageSize := 100000000;
+		export Maxcount_ImageMetadata := 10;
 	end;
 
 		// RetrieveImage
