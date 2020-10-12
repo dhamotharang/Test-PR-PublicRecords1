@@ -223,7 +223,7 @@ Passed_Person :=
 			SELF := []),
 		INNER, KEEP(1));
 		
-Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(Settings);
+Settings_Dataset := Kel_Shell_QA_UI.fn_make_settings_dataset(Settings);
 
      
 result1:=STD.System.Email.SendEmail(email_list, 'KEL SHELL QA UI run job',  'Your WUID ' + workunit + ' has just kicked-off!');
@@ -238,8 +238,8 @@ result4:=Kel_Shell_QA.descriptive_Stats_Report(unique_id, Passed_Person);
 
 
 Settings_Dataset_updated:= Settings_Dataset +
-                           DATASET([{'AllowedSources: ' + Kel_Shell_QA_UI.SetToString(AllowedSourcesDataset_List)},
-													  {'ExcludeSources: ' + Kel_Shell_QA_UI.SetToString(ExcludeSourcesDataset_List)}
+                           DATASET([{'AllowedSources: ' , Kel_Shell_QA_UI.SetToString(AllowedSourcesDataset_List)},
+													  {'ExcludeSources: ' , Kel_Shell_QA_UI.SetToString(ExcludeSourcesDataset_List)}
 		                       ],{RECORDOF(Settings_Dataset)});
 
 result5:=OUTPUT(Settings_Dataset_updated, NAMED('Attributes_Settings'));

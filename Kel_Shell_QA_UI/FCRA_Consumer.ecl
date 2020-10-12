@@ -170,7 +170,7 @@ bwr_results :=
 				PARALLEL(threads), 
         onFail(myFail(LEFT)));
 
-Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(Settings);
+Settings_Dataset := Kel_Shell_QA_UI.fn_make_settings_dataset(Settings);
 
 
 Passed := bwr_results(TRIM(G_ProcErrorCode) = '');
@@ -231,8 +231,8 @@ result3:=Kel_Shell_QA_UI.Output_Distribution_Report_Module(unique_id, Passed_Per
 result4:=Kel_Shell_QA.descriptive_Stats_Report(unique_id, Passed_Person);
 
 Settings_Dataset_updated:= Settings_Dataset +
-                           DATASET([{'AllowedSources: ' + Kel_Shell_QA_UI.SetToString(AllowedSourcesDataset_List)},
-													  {'ExcludeSources: ' + Kel_Shell_QA_UI.SetToString(ExcludeSourcesDataset_List)}
+                           DATASET([{'AllowedSources: ' , Kel_Shell_QA_UI.SetToString(AllowedSourcesDataset_List)},
+													  {'ExcludeSources: ' , Kel_Shell_QA_UI.SetToString(ExcludeSourcesDataset_List)}
 		                       ],{RECORDOF(Settings_Dataset)});
 
 result5:=OUTPUT(Settings_Dataset_updated, NAMED('Attributes_Settings'));
