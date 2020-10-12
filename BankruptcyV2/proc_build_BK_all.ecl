@@ -30,7 +30,7 @@
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//AUTOMATIC DOPS UPDATE PROCESS - DEACTIVATE WHEN RUNNING THE BUILD MANUALLY (i.e. LAYOUT CHANGES)																																//
-		,Roxiekeybuild.updateversion('BankruptcyV2Keys',filedate,'Christopher.Brodeur@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com,BocaRoxiePackageTeam@lexisnexis.com','Y','N',,'Y',,,'N')//
+		,Roxiekeybuild.updateversion('BankruptcyV2Keys',filedate,'Christopher.Brodeur@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com','Y','N',,'Y',,,'N')//
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		,if(ut.Weekday((integer)filedate[1..8]) <> 'SATURDAY' and ut.Weekday((integer)filedate[1..8]) <> 'SUNDAY',

@@ -88,8 +88,13 @@ end;
                       AccountMonitoring.product_files.Email.emailmain_superfile,
                       AccountMonitoring.product_files.Email.emailmain_for_superkey_monitor,
                       AccountMonitoring.types.productMask.email 
+                    },
+                    {
+                      AccountMonitoring.product_files.phonefeedback.phonefeedback_phone_keyname, //(thor_data400::key::phonesFeedback::qa::phone)
+                      AccountMonitoring.product_files.phonefeedback.PhonesFeedback_superkey, //(batchr3::monitor::PhonesFeedback::Phone_qa)
+                      AccountMonitoring.types.productMask.phonefeedback 
                     }
-				            ],AccountMonitoring.layouts.UPDATE_SOURCE.roxie_monitor_superfile_layout);
+                  ],AccountMonitoring.layouts.UPDATE_SOURCE.roxie_monitor_superfile_layout);
                          
                               
    SuperfilesReturn := if(GetAll,Superfiles,Superfiles(AccountMonitoring.types.testPMBits(product_mask_supported, product_mask)));

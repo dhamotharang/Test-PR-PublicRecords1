@@ -11,8 +11,8 @@ EXPORT DATASET(layouts.history) fn_cgm_phonefeedback(
 		// Timestamp (from WUID)		
 		timestamp := thorlib.WUID()[2..9];
 		
-		// Base Files    		
-		base_phonefeedback_file   := product_files.phonefeedback.base_file_phonefeedback;
+		// Monitor Files    		
+        phonefeedback_key_monitor   := product_files.phonefeedback.PhonesFeedback_key_monitor;
 		
 		// Temporary Join Layout
 		temp_layout := RECORD
@@ -30,7 +30,7 @@ EXPORT DATASET(layouts.history) fn_cgm_phonefeedback(
 		// Pivot on did
 		temp_port_dist_1 := DISTRIBUTE(in_portfolio(did != 0),HASH64(did));
 		temp_join_1 := JOIN(
-			DISTRIBUTED(base_phonefeedback_file,HASH64(did)),
+			DISTRIBUTED(phonefeedback_key_monitor, HASH64(did)),
 			temp_port_dist_1,
 			LEFT.did = RIGHT.did AND
 			(RIGHT.phone = LEFT.phone_number OR RIGHT.phone = ''),

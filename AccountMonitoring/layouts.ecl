@@ -180,8 +180,8 @@ EXPORT layouts := MODULE
 			doxie_files.File_Offenders.offender_key;
 		END;
 		SHARED phonefeedback_documentid_record := RECORD
-			PhonesFeedback.Layouts_PhonesFeedback.Layout_PhonesFeedback_base.did;
-			PhonesFeedback.Layouts_PhonesFeedback.Layout_PhonesFeedback_base.phone_number;
+			PhonesFeedback.Key_PhonesFeedback_phone().did;
+			PhonesFeedback.Key_PhonesFeedback_phone().phone_number;
 		END;
 		SHARED foreclosure_documentid_record := RECORD
 			Property.Layout_Fares_Foreclosure.situs1_zip;

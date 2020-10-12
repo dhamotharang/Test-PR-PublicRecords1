@@ -7,7 +7,7 @@ KeyName 			:= 'thor_data400::key::proflic_mari::';
 
 //Blank out default dates
 //DF-28229
-Prof_License_Mari.layouts.Individual_Reg_Base  	xformDetail(Prof_License_Mari.layouts.Individual_Reg L) := transform
+Prof_License_Mari.layouts.Individual_Reg_Base  	xformDetail(Prof_License_Mari.layouts.Individual_Reg_Base L) := transform
 
 	self.CLN_START_DTE 		:= IF(L.CLN_START_DTE = '17530101','',L.CLN_START_DTE);
 	self.CLN_END_DTE			:= IF(L.CLN_END_DTE = '17530101','',L.CLN_END_DTE);
