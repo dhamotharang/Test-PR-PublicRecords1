@@ -86,6 +86,9 @@ EXPORT map_LAS0833_conversion(STRING pVersion) := FUNCTION
 																 tempRawType[1..9]='BROK.CORP' => 'BROKCORP',
 																 tempRawType[1..8]='SALE.ACT' => 'SALEACT',
 																 tempRawType[1..8]='SALE.INA' => 'SALEINACT',
+																 tempRawType='APPRAISER TRAINEE' => 'TA',
+																 tempRawType='CERTIFIED GENERAL APPRAISER LICENSE' => 'CGAL',
+																 tempRawType='CERTIFIED RESIDENTIAL APPRAISER LICENSE' => 'CRAL',
 																 ' ');														 
 		SELF.STD_LICENSE_TYPE := tempStdLicType;
 
