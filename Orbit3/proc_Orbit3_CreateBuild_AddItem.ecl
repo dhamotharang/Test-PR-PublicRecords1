@@ -7,7 +7,7 @@ string wuid := workunit;
 
 
 ECL1 := '#workunit(\'name\',\'Orbit Create Build Instance and Add Items -- '+ buildname + '-- '+Buildvs+'\');\r\n'+
-'Orbit3.proc_Orbit3_CreateBuild_AddItem_sp( \''+buildname+'\', \''+Buildvs+'\', \''+Envmt+'\',  \''+email_list+'\', \''+BuildStatus+'\', '+if (skipcreatebuild , 'true','false')+ ','
+'Orbit3.proc_Orbit3_CreateBuild_AddItem_sp( \''+buildname+'\', \''+Buildvs+'\', \''+Envmt+'\', \''+BuildStatus+'\', \''+email_list+'\', '+if (skipcreatebuild , 'true','false')+ ','
 + if (skipupdatebuild , 'true','false')+','
 + if (skipaddcomponents , 'true','false')+','
 +if (runcreatebuild, 'true','false') +','
@@ -17,7 +17,7 @@ ECL1 := '#workunit(\'name\',\'Orbit Create Build Instance and Add Items -- '+ bu
 +' , failure(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\', \''+buildname+'\', \''+Buildvs+'\').build_failure)\n'
 +' ;\n';
 
-	tgtcluster := STD.System.Job.Target();
+tgtcluster := STD.System.Job.Target();
 
 spcluster := map  ( regexfind('_eclcc',tgtcluster)  and _Control.ThisEnvironment.Name = 'Dataland'  => 'hthor_dev_eclcc',
                                  regexfind('_eclcc',tgtcluster)  and _Control.ThisEnvironment.Name <> 'Dataland'  => 'hthor_eclcc',
@@ -39,6 +39,8 @@ spcluster := map  ( regexfind('_eclcc',tgtcluster)  and _Control.ThisEnvironment
 																			                                                                                                      ,'Orbit3 submit WU to spawn failed - - '+ workunit + ' ,  ' +
 																																												  ' Build Name : ' +buildname + ','+
 																																												  ' Build vs : '+Buildvs
-																			                                                                                                       ));
-return    evaluate(fswu);
+																			                                                                                                       ));															 
+																																																											
+return evaluate(fswu);
+	
 end;
