@@ -3,7 +3,6 @@
 EXPORT AddComponentsToBuild(string			pLoginToken,
 																	string			pBuildName,
 																	string			pBuildVersion,
-																	string			pEmailList,
 																	dataset(Orbit3.Layouts.OrbitBuildInstanceLayout)	pBuildCandidates
 																 ) := function
 
