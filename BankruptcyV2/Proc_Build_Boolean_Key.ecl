@@ -14,7 +14,7 @@ boolean_key := bankruptcyv2.BWR_BKV2_Boolean(filedate) :
 
 retval :=  sequential(mdata
 							,boolean_key
-							,Roxiekeybuild.updateversion('BankruptcyV2Keys',filedate,'Christopher.Brodeur@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com,BocaRoxiePackageTeam@lexisnexis.com','Y','B',,'Y',,,'Y')
+							,Roxiekeybuild.updateversion('BankruptcyV2Keys',filedate,'Christopher.Brodeur@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com','Y','B',,'Y',,,'Y')
 							,notify('BANKRUPTCY BOOLEAN BUILD COMPLETE','*'));
 
 return retval;
