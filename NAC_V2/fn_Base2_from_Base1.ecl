@@ -58,7 +58,7 @@ export fn_Base2_from_Base1(string version) := FUNCTION
 		nac_V2.Promote_Superfiles(Nac_V2.Superfile_List.sfCollisions, lfn_collisions),
 		OUTPUT(Nac_V2.NewCollisions(c2, c1),,'~nac::v2::newcollisions::' + version, COMPRESSED, OVERWRITE,
 											named('new_collisions')),
-		std.file.AddSuperfile(nac_v2.superfile_list.sfNewCollisions, '~nac::v2::newcollisions::' + version),
+		Nac_V2.Promote_Superfiles(Nac_V2.superfile_list.sfNewCollisions, '~nac::v2::newcollisions::' + version),
 		OUTPUT(NAC_V2.GetSampleRecords(version), named('v2_samples')),
 		//RoxieKeybuild.updateversion('Nac2Keys',version,alertList,,'N'),
 		if (ut.Weekday((integer)version[1..8]) = 'SATURDAY'

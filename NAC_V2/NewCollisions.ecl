@@ -17,7 +17,6 @@ EXPORT NewCollisions(DATASET(layout_Collisions2.Layout_Collisions) cnew, DATASET
 									and left.casestate=right.casestate
 									and left.CaseBenefitType=right.CaseBenefitType
 									and left.EndDate <= right.EndDate				// new collision if end date > previous end date
-									//and left.StartDate <= right.EndDate
 									,left only 
 									,local);
 		
@@ -36,7 +35,6 @@ EXPORT NewCollisions(DATASET(layout_Collisions2.Layout_Collisions) cnew, DATASET
 								
 		j := DISTRIBUTE(j1, hash32(searchgroupid, searchbenefittype, searchclientid));
 
-		//ex := DISTRIBUTE($.NormalizeExceptions(), hash32(sourcegroupid, SourceProgramCode, SourceClientId));
 		ex := $.NormalizeExceptions();
 
 		j2 := JOIN(j, ex, left.searchgroupid=right.sourcegroupid AND left.searchbenefittype=right.SourceProgramCode
