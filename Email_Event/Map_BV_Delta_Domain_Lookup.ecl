@@ -1,4 +1,4 @@
-﻿﻿IMPORT email_data, dx_email, ut, STD;
+﻿﻿IMPORT email_data, dx_email, ut, STD, MDR;
 
 EXPORT Map_BV_Delta_Domain_Lookup(STRING version) := FUNCTION
 

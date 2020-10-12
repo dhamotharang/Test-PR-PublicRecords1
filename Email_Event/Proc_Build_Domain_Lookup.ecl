@@ -5,11 +5,12 @@ EXPORT Proc_Build_Domain_Lookup(STRING version) := FUNCTION
 	ds_bv_in       := Email_Event.Files.BV_Domain_in;
 	ds_bv_delta_in := Email_Event.Files.BV_Delta_Domain_in;
 	ds_email_in    := Email_Event.Files.Email_Domain_in;
+	ds_whois_in    := Email_Event.Files.WhoIs_Domain_in;
 	
 	//Append to base file
 	ds_base := Email_Event.Files.Domain_lkp;
 	
-	CombineAll   := ds_base/* + ds_email_in + ds_bv_in*/ + ds_bv_delta_in;
+	CombineAll   := ds_base/* + ds_email_in + ds_bv_in*/ + ds_whois_in + ds_bv_delta_in;
 	ds_sort := SORT(CombineAll,domain_name, -date_last_seen);
 
   // Rollup 
@@ -21,7 +22,7 @@ EXPORT Proc_Build_Domain_Lookup(STRING version) := FUNCTION
 	END;
 	
   dBase_rollup := ROLLUP(ds_sort,
-								  	trim(LEFT.domain_name) = trim(RIGHT.domain_name),
+								  	trim(LEFT.domain_name) = trim(RIGHT.domain_name) and trim(LEFT.source) = trim(RIGHT.source),
 									  Xform(LEFT,RIGHT));
 
 	//Build base file	
@@ -53,13 +54,14 @@ EXPORT Proc_Build_Domain_Lookup(STRING version) := FUNCTION
 
 	RETURN SEQUENTIAL(
 	                  Email_Event.Map_BV_Delta_Domain_Lookup(version)
+										,Email_Event.Map_WhoIs_Domain_Lookup(version)
 	                  // Email_Event.Map_BV_Domain_Lookup,
 										// Email_Event.Map_Email_Domain_Lookup,
 										,build_table
 										,build_key
-										,zDoPopulationStats
-										,dops_update
-										,orbit_update
+										// ,zDoPopulationStats
+										// ,dops_update
+										// ,orbit_update
 										);	
 	
 END;
