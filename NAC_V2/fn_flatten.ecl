@@ -1,17 +1,40 @@
-import ut, STD;
+﻿import ut, STD;
 
+string uc(string s) := Std.Str.ToUpperCase(s);
+
+// convert lower case to upper case
 EXPORT fn_flatten(dataset(Nac_v2.Layouts.base) base1) := FUNCTION
 	b0 := PROJECT(Distribute(base1,HASH32(case_state_abbreviation, case_benefit_type, case_identifier)),
 						TRANSFORM(Nac_v2.Layouts.baseHistorical, 
 						self.StartDate := fn_FirstDayOfMonth(left.case_benefit_month);
 						self.EndDate := fn_LastDayOfMonth(left.case_benefit_month);
 						self.Phys_addr1    := StandardizeName(left.Case_Physical_Address_Street_1 + ' ' + left.Case_Physical_Address_Street_2);
-						SELF.Phys_addr2    := StandardizeName(TRIM(left.Case_Physical_Address_City) + if(left.Case_Physical_Address_City = '' OR Std.Str.EndsWith(TRIM(left.Case_Physical_Address_City),','),'',',') 
+						self.Phys_addr2    := StandardizeName(TRIM(left.Case_Physical_Address_City) + if(left.Case_Physical_Address_City = '' OR Std.Str.EndsWith(TRIM(left.Case_Physical_Address_City),','),'',',') 
 																			+ ' ' + left.Case_Physical_Address_State + ' ' + left.Case_Physical_Address_Zip[1..5]);
 						self.Mail_addr1    := StandardizeName(left.Case_Mailing_Address_Street_1 + ' ' + left.Case_Mailing_Address_Street_2);
-						SELF.Mail_addr2    := StandardizeName(TRIM(left.Case_Mailing_Address_City) + if(left.Case_Mailing_Address_City = '' OR Std.Str.EndsWith(TRIM(left.Case_Mailing_Address_City),','),'',',') 
+						self.Mail_addr2    := StandardizeName(TRIM(left.Case_Mailing_Address_City) + if(left.Case_Mailing_Address_City = '' OR Std.Str.EndsWith(TRIM(left.Case_Mailing_Address_City),','),'',',') 
 																			+ ' ' + left.Case_Mailing_Address_State + ' ' + left.Case_Mailing_Address_Zip[1..5]);
 																			
+						self.Case_Physical_Address_Street_1 := uc(left.Case_Physical_Address_Street_1);
+						self.Case_Physical_Address_Street_2 := uc(left.Case_Physical_Address_Street_2);
+						self.Case_Physical_Address_City := uc(left.Case_Physical_Address_City);
+
+						self.Case_Mailing_Address_Street_1 := uc(left.Case_Mailing_Address_Street_1);
+						self.Case_Mailing_Address_Street_2 := uc(left.Case_Mailing_Address_Street_2);
+						self.Case_Mailing_Address_City := uc(left.Case_Mailing_Address_City);
+
+						self.Prepped_name := uc(left.Prepped_name);
+						self.Prepped_addr1 := uc(left.Prepped_addr1);
+						self.Prepped_addr2 := uc(left.Prepped_addr2);
+						
+						self.Case_Last_Name := uc(left.Case_Last_Name);
+						self.Case_First_Name := uc(left.Case_First_Name);
+						self.Case_Middle_Name := uc(left.Case_Middle_Name);
+						self.Client_Last_Name := uc(left.Client_Last_Name);
+						self.Client_First_Name := uc(left.Client_First_Name);
+						self.Client_Middle_Name := uc(left.Client_Middle_Name);
+																								
+						self.Case_Benefit_Type := IF(left.Case_Benefit_Type='R','S',left.Case_Benefit_Type); // Fix for old AL
 						self.GroupId := left.Case_State_Abbreviation + '01';
 						self.filename := IF(Std.Str.StartsWith(left.filename, 'nac::in::'), left.filename[10..], left.filename);
 						self := LEFT;));

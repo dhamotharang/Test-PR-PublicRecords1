@@ -1,4 +1,4 @@
-import header,ut,Std;
+﻿import header,ut,Std;
 
 // L             LexId
 // N             Name
@@ -244,7 +244,7 @@ EXPORT fn_find_collisions_ex	(
 			OR
 			(left.ProgramState = right.ProgramState and 
 				NAC_V2.GetCollisionCode(left.ProgramCode) = NAC_V2.GetCollisionCode(right.ProgramCode)
-				and left.CaseId <> right.CaseId)
+				and left.ClientId <> right.ClientId)
 			//OR
 			//(left.ProgramState=right.ProgramState and 
 			//	left.ProgramCode<>right.ProgramCode)

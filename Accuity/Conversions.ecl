@@ -351,7 +351,7 @@ case(TRIM(code,ALL),
 
 export unicode GeoSourceCodeToDescr(string code) := 
 case(TRIM(code,ALL),
-	'CEL1082' => 	u'Countries where economic sanctions are imposed. Does not include companies, organizations, or individuals listed under UN resolutions, OSFI, or SEMA. Enhanced by AccuityÃ‚Â® with financial institutions in country and SWIFT/BICs.',
+	'CEL1082' => 	u'Countries where economic sanctions are imposed. Does not include companies, organizations, or individuals listed under UN resolutions, OSFI, or SEMA.',
 	'FDJ1152'  =>	u'Jurisdictions and principal cities subject to FATF counter-measures to protect against money laundering and terrorist financing. Enhanced by AccuityÃ‚Â® with locations and SWIFT/BICs.',
 	'RBL1072'  =>	u'Locations AccuityÃ‚Â® considers to be sanctioned based on OFAC regulations (subsidiaries, designated vessels, members of designated terrorist groups), but not included in OFAC\'s SDN list. Enhanced by AccuityÃ‚Â® with locations and SWIFT/BICs.',
 	'TFP1072'  =>	u'Locations AccuityÃ‚Â® considers to be sanctioned based on OFAC regulations (subsidiaries, designated vessels, members of designated terrorist groups), but not included in OFAC\'s SDN list. Enhanced by AccuityÃ‚Â® with locations and SWIFT/BICs.',

@@ -17,6 +17,7 @@
   ,pMrktg_Approved_Sources      = 'Marketing_List._Config().set_marketing_approved_sources'
   ,pCounty_Names                = 'Address.County_Names'
   ,pQuickTest                   = 'false'                                                       // set to true to only use the seleids contained in the proxids passed in
+  ,pPullFromBest                = 'Marketing_List._Config().Pull_From_Best_File'
 
 ) :=
 functionmacro
@@ -26,6 +27,8 @@ functionmacro
   #UNIQUENAME(ds_best     )
   #UNIQUENAME(ds_base_best)
   
+  Best_Has_Source_Fields  := Marketing_List._Config().Best_Has_Source_Fields        ;
+
   // -- get debug seleids from proxids
   ds_debug_seleids  := table(pDataset_Best(proxid in pSampleProxids )  ,{seleid},seleid,few);
   set_debug_seleids := set(ds_debug_seleids ,seleid);
@@ -39,8 +42,8 @@ functionmacro
     %ds_base_best%  := pDataset_Base  (seleid in set_debug_seleids) : persist('~persist::Marketing_List::Create_Business_Information_File::ds_base_best');
   #END
 
-  ds_mrktg_list_best_proxid  := Marketing_List.Best_From_BIP_Best_Proxid  (%ds_best%        ,%ds_base_best% ,pDebug ,pSampleProxids ,pCounty_Names  );
-  ds_mrktg_list_best_seleid  := Marketing_List.Best_From_BIP_Best_Seleid  (%ds_best%        ,%ds_base_best% ,pDebug ,pSampleProxids ,pCounty_Names  );
+  ds_mrktg_list_best_proxid  := Marketing_List.Best_From_BIP_Best_Proxid  (%ds_best%        ,%ds_base_best% ,pDebug ,pSampleProxids ,pCounty_Names                  );
+  ds_mrktg_list_best_seleid  := Marketing_List.Best_From_BIP_Best_Seleid  (%ds_best%        ,%ds_base_best% ,pDebug ,pSampleProxids ,pCounty_Names  ,pPullFromBest  );
   
   ds_both_best := join(ds_mrktg_list_best_proxid  ,ds_mrktg_list_best_seleid ,left.seleid = right.seleid ,transform(Marketing_List.Layouts.business_information_prep2
 
@@ -65,6 +68,30 @@ functionmacro
     self.seleid_level.county_name        := right.county_name                    ;
     self.seleid_level.business_phone     := right.business_phone                 ;
 
+    ,self.seleid_level.SIC_Primary        := right.SIC_Primary                   ;
+    ,self.seleid_level.SIC2               := right.SIC2                          ;
+    ,self.seleid_level.SIC3               := right.SIC3                          ;
+    ,self.seleid_level.SIC4               := right.SIC4                          ;
+    ,self.seleid_level.SIC5               := right.SIC5                          ;
+    // ,self.seleid_level.src_sics           := right.src_sics                   ;
+    ,self.seleid_level.NAICS_Primary      := right.NAICS_Primary                 ;
+    ,self.seleid_level.NAICS2             := right.NAICS2                        ;
+    ,self.seleid_level.NAICS3             := right.NAICS3                        ;
+    ,self.seleid_level.NAICS4             := right.NAICS4                        ;
+    ,self.seleid_level.NAICS5             := right.NAICS5                        ;
+    // ,self.seleid_level.src_naics          := right.src_naics                    ;
+                                                                                  
+    ,self.seleid_level.number_of_employees  := if(right.seleid != 0 and pPullFromBest = true                                      ,right.number_of_employees  ,-1);
+    ,self.seleid_level.annual_revenue       := if(right.seleid != 0 and pPullFromBest = true                                      ,right.annual_revenue       ,-1);
+    #IF(Best_Has_Source_Fields = true)
+      ,self.seleid_level.src_revenue          := if(right.seleid != 0 and right.annual_revenue      >= 0 and pPullFromBest = true ,right.src_revenue          ,'');
+      ,self.seleid_level.src_employees        := if(right.seleid != 0 and right.number_of_employees >= 0 and pPullFromBest = true ,right.src_employees        ,'');
+    #ELSE
+      ,self.seleid_level.src_revenue          := '';
+      ,self.seleid_level.src_employees        := '';
+    #END
+    // ,self.seleid_level.src_revenue          := if(right.seleid != 0 and right.annual_revenue      >= 0  ,right.src_revenue          ,'');
+    // ,self.seleid_level.src_employees        := if(right.seleid != 0 and right.number_of_employees >= 0  ,right.src_employees        ,'');
     self                                 := left                                 ;
     self                                 := []                                   ;
 
@@ -98,17 +125,17 @@ functionmacro
   ds_industry_codes   := Marketing_List.Best_Industry_Codes (%ds_base_best%   ,ds_mrktg_list_best_seleid  ,pDebug ,pSampleProxids);
 
   ds_both_best_both_base_plus_Industry := join(ds_both_best_both_base ,ds_industry_codes  ,left.seleid = right.seleid ,transform(recordof(left)
-    ,self.seleid_level.SIC_Primary        := right.SIC_Primary       
-    ,self.seleid_level.SIC2               := right.SIC2              
-    ,self.seleid_level.SIC3               := right.SIC3              
-    ,self.seleid_level.SIC4               := right.SIC4              
-    ,self.seleid_level.SIC5               := right.SIC5  
+    // ,self.seleid_level.SIC_Primary        := right.SIC_Primary       
+    // ,self.seleid_level.SIC2               := right.SIC2              
+    // ,self.seleid_level.SIC3               := right.SIC3              
+    // ,self.seleid_level.SIC4               := right.SIC4              
+    // ,self.seleid_level.SIC5               := right.SIC5  
     ,self.seleid_level.src_sics           := right.src_sics
-    ,self.seleid_level.NAICS_Primary      := right.NAICS_Primary     
-    ,self.seleid_level.NAICS2             := right.NAICS2            
-    ,self.seleid_level.NAICS3             := right.NAICS3            
-    ,self.seleid_level.NAICS4             := right.NAICS4            
-    ,self.seleid_level.NAICS5             := right.NAICS5            
+    // ,self.seleid_level.NAICS_Primary      := right.NAICS_Primary     
+    // ,self.seleid_level.NAICS2             := right.NAICS2            
+    // ,self.seleid_level.NAICS3             := right.NAICS3            
+    // ,self.seleid_level.NAICS4             := right.NAICS4            
+    // ,self.seleid_level.NAICS5             := right.NAICS5            
     ,self.seleid_level.src_naics          := right.src_naics
     ,self                                 := left
   ) ,hash ,left outer);
@@ -129,10 +156,10 @@ functionmacro
 
   // -- if no data for emp num or revenue, set to -1.
   ds_return_result_biz := join(ds_both_best_both_base_plus_Industry ,ds_best_emps_sales  ,left.seleid = right.seleid ,transform(recordof(left)
-    ,self.seleid_level.number_of_employees  := if(right.seleid != 0                                     ,right.number_of_employees  ,-1)
-    ,self.seleid_level.annual_revenue       := if(right.seleid != 0                                     ,right.annual_revenue       ,-1)
-    ,self.seleid_level.src_revenue          := if(right.seleid != 0 and right.annual_revenue      >= 0  ,right.src_revenue          ,'')
-    ,self.seleid_level.src_employees        := if(right.seleid != 0 and right.number_of_employees >= 0  ,right.src_employees        ,'')
+    ,self.seleid_level.number_of_employees  := map(right.seleid != 0                                    and pPullFromBest = false => right.number_of_employees  ,pPullFromBest = true => left.seleid_level.number_of_employees  ,-1)
+    ,self.seleid_level.annual_revenue       := map(right.seleid != 0                                    and pPullFromBest = false => right.annual_revenue       ,pPullFromBest = true => left.seleid_level.annual_revenue       ,-1)
+    ,self.seleid_level.src_revenue          := map(right.seleid != 0 and right.annual_revenue      >= 0 and pPullFromBest = false => right.src_revenue          ,pPullFromBest = true => left.seleid_level.src_revenue          ,'')  //PUT BACK UNTIL BEST HAS THIS STUFF!!!
+    ,self.seleid_level.src_employees        := map(right.seleid != 0 and right.number_of_employees >= 0 and pPullFromBest = false => right.src_employees        ,pPullFromBest = true => left.seleid_level.src_employees        ,'')  //PUT BACK UNTIL BEST HAS THIS STUFF!!!
     ,self                                   := left
   ) ,hash ,left outer);
   
