@@ -1,4 +1,4 @@
-﻿IMPORT Advo_Services, CriminalRecords_BatchService, DidVille, dx_PhonesInfo;
+﻿IMPORT Advo_Services, BatchServices, CriminalRecords_BatchService, DidVille, dx_PhonesInfo;
 IMPORT FraudShared_Services, RiskIntelligenceNetwork_Services, risk_indicators;
 
 EXPORT Layouts := MODULE
@@ -13,7 +13,7 @@ EXPORT LayoutInputPII_2 := RECORD
 						dx_PhonesInfo.Layouts.Phones_Type_Main prepaid_phone_appends,
 						RiskIntelligenceNetwork_Services.Layouts.dl_layout dl_appends,
 						risk_indicators.Layout_Boca_Shell boca_shell_appends,
-						RiskIntelligenceNetwork_Services.Layouts.IPMetaData_layout ip_meta_data,
+						BatchServices.IP_Metadata_Layouts.batch_out ip_meta_data,
 			//Note all the below extra fields are needed as KEL input but currently aren't provided to us
 					UNSIGNED event_date,
 					STRING EmailLastDomain,
