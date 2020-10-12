@@ -5,7 +5,7 @@
 /*--INFO--
 This is a test service to facilitate creation of new keys and sub-sequent addition to package file.
 */
-IMPORT suppress;
+IMPORT dx_Cortera_Tradeline;
 EXPORT EchoService := MACRO
-  OUTPUT(CHOOSEN(suppress.Key_OptOutSrc(), 10), named('optout_recs')); // <-- added as a first example. to be removed once we have a first key to push out.
+  OUTPUT(CHOOSEN(dx_Cortera_Tradeline.Key_Delta_Rid, 10), named('cortera_tradeline_delta_rid'));
 ENDMACRO;
