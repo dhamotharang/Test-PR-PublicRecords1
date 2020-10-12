@@ -511,7 +511,7 @@ MODULE
 	export src_MO_Watercraft_LN          := ')W';
 	export src_Infutor_Watercraft				 := 'W1';
 	export src_Whois_domains             := 'W ';
-	export src_Whois_domains_email       := 'W0';
+	export src_Whois_domains_email       := 'W0';   // New WhoIs Email&Domain Info
 	export src_Wired_Assets_Email 			 := 'W@';
 	export src_Wired_Assets_Owned 			 := 'WO';
 	export src_Wired_Assets_Royalty			 := 'WR'; 
