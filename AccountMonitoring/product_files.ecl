@@ -1095,19 +1095,19 @@ EXPORT product_files := MODULE
 	
 	EXPORT phonefeedback := MODULE
 		
-		EXPORT phonefeedback_filename_raw := 'thor_data400::base::PhonesFeedback';
-		EXPORT phonefeedback_filename := AccountMonitoring.constants.DATA_LOCATION + phonefeedback_filename_raw;
-		
-		EXPORT base_file_phonefeedback :=  
-			DISTRIBUTE(
-				DATASET(
-					phonefeedback_filename,
-					PhonesFeedback.Layouts_PhonesFeedback.Layout_PhonesFeedback_base,
-					THOR
-				),
-				HASH64(did)
-			) : INDEPENDENT; //PERSIST('acctmon::phonefeedback::base_file');
-			
+      EXPORT phonefeedback_phone_keyname := 'thor_data400::key::phonesFeedback::'+doxie.Version_SuperKey+'::phone';
+      EXPORT PhonesFeedback_Phone_superkey_monitor := 'monitor::PhonesFeedback::Phone';
+      EXPORT PhonesFeedback_superkey     := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + PhonesFeedback_Phone_superkey_monitor + '_qa';
+
+      SHARED PhonesFeedback_key_undist := INDEX(
+												PhonesFeedback.Key_PhonesFeedback_phone(),  
+												PhonesFeedback_superkey
+												);
+
+      EXPORT PhonesFeedback_key_monitor := DISTRIBUTE(PhonesFeedback_key_undist(did != 0), 
+                                             HASH64(did)
+                                            ): INDEPENDENT; 
+	
 	END;
 
 	EXPORT workplace := MODULE
