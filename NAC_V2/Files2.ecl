@@ -17,7 +17,7 @@
 	export dsProcessed := DATASET($.Superfile_list.sfProcessed, $.Layouts2.rNac2Ex, thor, opt);
 	export dsOnboarding := DATASET($.Superfile_list.sfOnboarding, $.Layouts2.rNac2Ex, thor, opt); // test data
 	
-	export PrevCollisions2  := DATASET(Superfile_List.sfCollisions+'_father', Layout_Collisions2.Layout_Collisions, THOR,opt);
+	export PrevCollisions2  := DATASET(Superfile_List.sfCollisions+'::father', Layout_Collisions2.Layout_Collisions, THOR,opt);
 
 
 END;
