@@ -28,8 +28,7 @@ export fn_Base2_from_Base1(string version) := FUNCTION
 
 	c1 := DATASET('~nac::out::collisions2::father', nac_v2.Layout_Collisions2.Layout_Collisions, thor);
 	c2 :=DATASET(lfn_collisions, nac_v2.Layout_Collisions2.Layout_Collisions, thor);
-	//alertList := NAC_v2.Mailing_List('').Dev2;
-	alertList := MOD_InternalEmailsList.fn_GetInternalRecipients('Alert','');
+	alertList := Nac_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('Alert','');
 
 	version1 := NAC_V2.fn_Base1_Version;
 	newcol := DATASET('~nac::v2::newcollisions::' + version, $.Layout_Collisions2.Layout_Collisions, thor);
@@ -46,7 +45,7 @@ export fn_Base2_from_Base1(string version) := FUNCTION
 		nac_V2.Promote_Superfiles(Nac_V2.Superfile_List.sfBase2, lfn_base),
 		OUTPUT(base2,,lfn_base2, COMPRESSED),
 		nac_V2.Promote_Superfiles(Nac_V2.Superfile_List.sfNCF2Base, lfn_base2),
-		OUTPUT(PROJECT(STD.File.SuperFileContents(nac_V2.superfile_list.sfProcessing),
+		OUTPUT(PROJECT(NOTHOR(STD.File.SuperFileContents(nac_V2.superfile_list.sfProcessing)),
 							TRANSFORM(FsLogicalFileNameRecord,
 								self.name := Std.Str.FindReplace(Std.Str.SplitWords(left.name, '::')[4], 'ncfx', 'ncf2');
 							)), named('ncf2_processed')),
@@ -67,9 +66,9 @@ export fn_Base2_from_Base1(string version) := FUNCTION
 				),
 		if (ut.Weekday((integer)version[1..8]) <> 'SATURDAY',
 								Nac_v2.CreateOrbitEntry(version)),
-		IF(newhead, NAC_V2.HVersion.updateVersion),
 		Nac.fn_Strata(version),
-		NAC_V2.ProcessCollisions(newcol, version)
+		NAC_V2.ProcessCollisions(newcol, version),
+		IF(newhead, NAC_V2.HVersion.updateVersion)
 	);
 
 	return doit;
