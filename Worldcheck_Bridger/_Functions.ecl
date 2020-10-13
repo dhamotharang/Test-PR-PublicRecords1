@@ -1363,7 +1363,11 @@
 				trim(kword, left, right) = 'USCRAL' =>SubGroup_Constants.numKeywordsID.KEYWORD_USCRAL,
 				trim(kword, left, right) = 'CANSEMBLR' =>SubGroup_Constants.numKeywordsID.KEYWORD_CANSEMBLR,
 				trim(kword, left, right) = 'ZAFIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_ZAFIC,
-				
+				trim(kword, left, right) = 'CHCOMLOT' =>SubGroup_Constants.numKeywordsID.KEYWORD_CHCOMLOT,
+				trim(kword, left, right) = 'OFAC-EO13902' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_EO13902,
+				trim(kword, left, right) = 'UGIGG' =>SubGroup_Constants.numKeywordsID.KEYWORD_UGIGG,
+				trim(kword, left, right) = 'UGPPDA' =>SubGroup_Constants.numKeywordsID.KEYWORD_UGPPDA,
+								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

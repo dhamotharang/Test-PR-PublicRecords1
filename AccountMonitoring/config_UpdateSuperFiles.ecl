@@ -1,4 +1,4 @@
-﻿IMPORT AccountMonitoring;
+IMPORT AccountMonitoring;
 
 EXPORT config_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask = 
                                  AccountMonitoring.types.productMask.allProducts,
@@ -102,7 +102,7 @@ end;
                     {
                       AccountMonitoring.product_files.phonefeedback.phonefeedback_phone_keyname, //(thor_data400::key::phonesFeedback::qa::phone)
                       AccountMonitoring.product_files.phonefeedback.PhonesFeedback_superkey, //(batchr3::monitor::PhonesFeedback::Phone_qa)
-                      AccountMonitoring.types.productMask.phonefeedback 
+                      AccountMonitoring.types.productMask.phonefeedback
                     }
 				  ],AccountMonitoring.layouts.UPDATE_SOURCE.roxie_monitor_superfile_layout);
                          

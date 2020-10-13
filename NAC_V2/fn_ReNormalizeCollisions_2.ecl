@@ -2,7 +2,8 @@
 
 Layout_Slim := RECORD
 
-	string6 matchset:=''
+	unsigned1 pri:=0
+	,string6 matchset:=''
 	,string10 MatchCodes
 	,unsigned6 LexID:=0
 	,string30 SearchLastName
@@ -37,14 +38,26 @@ Layout_Slim := RECORD
 	,string8	CaseEndDate
 	,string		addr1
 	,string		addr2
+	,unsigned4 SearchProcessDate
+	,unsigned4 ClientProcessDate
+	,unsigned4 SearchNCFFileDate
+	,unsigned4 ClientNCFFileDate
 	,string1  ExceptionReasonCode;
 END;
 
 Layout_Slim xSlim (Nac_V2.Layout_Collisions2.Layout_Collisions c) := TRANSFORM
-	self.Addr1 := StandardizeName(TRIM(c.SearchAddress1StreetAddress1) + ', ' +
-													TRIM(c.SearchAddress1City) + ', ' + c.SearchAddress1State + ' ' + c.SearchAddress1Zip[1..5]);	
-	self.Addr2 := StandardizeName(TRIM(c.SearchAddress2StreetAddress1) + ', ' +
-													TRIM(c.SearchAddress2City) + ', ' + c.SearchAddress2State + ' ' + c.SearchAddress2Zip[1..5]);	
+	self.Addr1 := IF(c.SearchAddress1StreetAddress1='',
+								StandardizeName(TRIM(c.SearchAddress2StreetAddress1) + ', ' +
+													TRIM(c.SearchAddress2City) + ', ' + c.SearchAddress2State + ' ' + c.SearchAddress2Zip[1..5]),	
+								StandardizeName(TRIM(c.SearchAddress1StreetAddress1) + ', ' +
+													TRIM(c.SearchAddress1City) + ', ' + c.SearchAddress1State + ' ' + c.SearchAddress1Zip[1..5])
+								);	
+	self.Addr2 := IF(c.CasePhysicalStreet1='',
+					StandardizeName(TRIM(c.CasePhysicalStreet1) + ', ' +
+													TRIM(c.CasePhysicalCity) + ', ' + c.CasePhysicalState + ' ' + c.CasePhysicalZip[1..5]),	
+					StandardizeName(TRIM(c.CaseMailStreet1) + ', ' +
+													TRIM(c.CaseMailCity) + ', ' + c.CaseMailState + ' ' + c.CaseMailZip[1..5])
+								);	
 	self := c;
 END;
 
@@ -111,6 +124,7 @@ END;
 	//fixed := NORMALIZE(same, 2, xCollisions(LEFT, COUNTER));
 	fixed := PROJECT(same, xCollisions(LEFT, 2));
 
-	return PROJECT(diff + fixed, xSlim(LEFT));
+	//return PROJECT(diff + fixed, xSlim(LEFT));
+	return PROJECT(c, xSlim(LEFT));
 
 END;
