@@ -4,7 +4,7 @@
 
 import std, _control, PromoteSupers, RoxieKeyBuild, ut;
 
-EXPORT Proc_Build_Ported_Metadata_DeltaFile_Temp(string version, string filename, string newDay, const varstring eclsourceip, string thor_name):= function
+EXPORT Proc_Build_Ported_Metadata_DeltaFile_Temp(string version, string filename, string newDay, const varstring eclsourceip, string thor_name, string contacts):= function
 
 	//Spray Raw Delta Files and Place Into DailyDelta Superfile
 	sprayDailyDelta 		:= PhonesInfo.Spray_Telo_DailyDelta(version, filename, eclsourceip, thor_name);
@@ -67,12 +67,10 @@ EXPORT Proc_Build_Ported_Metadata_DeltaFile_Temp(string version, string filename
 	
 	PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::phones_ported_metadata_delta','Q',mvQAPhonesPortedmetadataDelta,'4');	
 	
-	create_build 			:= PhonesInfo.proc_Orbit3_CreateBuild ('PhonesFinder Deltabase', version);
-	
 	//Run Build & Provide Email on Build Status
-	sendEmail		:= sequential(sprayDailyDelta, buildBaseDelta, desprayBaseDelta, moveComBaseDelta, bkPhonesPortedmetadataDelta, mvBltPhonesPortedmetadataDelta, mvQAPhonesPortedmetadataDelta/*,create_build*/):
-														Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com', 'Prod PhonesInfo Ported & Metadata DeltaBase Key Build Succeeded', workunit + ': Build complete.')),
-														Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com', 'Prod PhonesInfo Ported & Metadata DeltaBaseKey Build Failed', workunit + '\n' + FAILMESSAGE)
+	sendEmail		:= sequential(sprayDailyDelta, buildBaseDelta, desprayBaseDelta, moveComBaseDelta, bkPhonesPortedmetadataDelta, mvBltPhonesPortedmetadataDelta, mvQAPhonesPortedmetadataDelta):
+														Success(FileServices.SendEmail(contacts, 'Prod PhonesInfo Ported & Metadata DeltaBase Key Build Succeeded', workunit + ': Build complete.')),
+														Failure(FileServices.SendEmail(contacts, 'Prod PhonesInfo Ported & Metadata DeltaBaseKey Build Failed', workunit + '\n' + FAILMESSAGE)
 														);
 
 	return sendEmail;
