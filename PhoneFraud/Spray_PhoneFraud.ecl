@@ -19,7 +19,7 @@ EXPORT Spray_PhoneFraud(string version, string dtype):= FUNCTION
 																				'|',
 																				,
 																				'\t',
-																				'thor400_44',
+																				'thor400_sta01',//'thor400_44',
 																				root + suffix + '_' + version, 
 																				,
 																				,
