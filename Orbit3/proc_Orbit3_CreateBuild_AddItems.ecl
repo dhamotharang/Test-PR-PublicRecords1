@@ -7,6 +7,11 @@ export proc_Orbit3_CreateBuild_AddItems(string buildname,string Buildvs,string E
 									Buildvs,
 									tokenval,		
 									).retcode : independent;
+
+	get_buildinst := Orbit3.GetBuildInstance(buildname,
+									Buildvs,
+									tokenval,		
+									).retcode : independent;
 									
 	
 									
@@ -57,18 +62,18 @@ BuildNamefmt := regexreplace(' ',StringLib.StringFilterout(  buildname  ,'&_.;+$
 
 fn_add_components ( string ReceiveID ) := function
 									
-return Orbit3.AddItemtoBuild (tokenval,
+add_item :=  Orbit3.AddItemtoBuild (tokenval,
 																	                             	buildname,
 																	                            		Buildvs,
-																	                             create_build.BuildId,
+																	                             get_buildinst.BuildId,
 																	                               [ReceiveID] //Set(get_new_build_candidates (ReceiveInstanceID <> ''), trim(ReceiveInstanceID))
-																                               ).retcode; 							
+																                               ).retcode; 	
+
+ return if ( add_item.Status = 'Success', sendemail('ADD_ITEMS','SUCCESS'),sendemail('NO_ITEMS_FOUND','FAIL') );						
 		end;									
 	
-		add_components := apply(global(get_new_build_candidates,few),Sequential( if ( fn_add_components(trim(ReceiveInstanceID)) = 'Success', sendemail('ADD_ITEMS','SUCCESS'),sendemail('NO_ITEMS_FOUND','FAIL')
-																																													                                     )
-																																		                                        )
-																											);
+		add_components := apply(global(get_new_build_candidates,few), fn_add_components(trim(ReceiveInstanceID)) 
+								);
 		
 		
 		
