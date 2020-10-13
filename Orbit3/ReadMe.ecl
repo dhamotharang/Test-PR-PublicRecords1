@@ -7,3 +7,8 @@
  // 2.Create and Update Receive Item and add the item to the build -- all in one go
  // Orbit3.proc_CreateBuild_Item_AddItem
  // -- Usage -->  This will create item ,create build instance and add the item to the build instance
+
+ //Get Receive Instance
+   //Orbit3.proc_GetReceiveInstance ( 'Accident Reports - ECrashV2 National', '20201001' ,  '\\\\tapeload.risk.regn.net\\K\\accident_reports\\ecrash_(ei)\\mbs\\20201001\\mbs_ecrash_v_agency_hpcc_export.txt'  );
+
+   //Orbit3.proc_Orbit3_CreateBuild_AddItems ( 'Accident Reports - ECrashV2 National', '20201001');

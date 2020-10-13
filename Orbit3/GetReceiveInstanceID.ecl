@@ -11,6 +11,7 @@ EXPORT GetReceiveInstanceID (
 
 Inputrec := record
 string FilePathName { xpath('FilePathName')} := FilePathName ;
+string StencilName { xpath('StencilName')} := 'Public Records' ;
 
 
 end;
