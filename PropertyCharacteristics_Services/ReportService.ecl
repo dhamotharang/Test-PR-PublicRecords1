@@ -106,6 +106,7 @@ export ReportService() := macro
 
 	output(RecordsMod.IntermediateLog,named('LOG_log__mbsi_intermediate__log'));
 	output(RecordsMod.TransactionLog,named('LOG_log__mbsi_transaction__log'));
+	output(RecordsMod.TransactionLogExtension,named('LOG_log__mbsi_transaction__log__extension'));
 endmacro;
 
 // ReportService();

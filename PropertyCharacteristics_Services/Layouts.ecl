@@ -113,6 +113,23 @@ module
 		dataset(TransactionLog)	Rec	{xpath('Records/Rec'),maxcount(3)};
 	end;
 	
+	// Transaction log extesnion layout
+	export	TransactionLogExtension	:=
+	record
+		string20		transaction_id;							//No PK of the entry. Generate by Roxie
+		string10		date_added;									//Date the record was added
+		integer2 		sequence;
+		integer5 		extension_type;
+		string100 	value;
+	end;
+	
+	// Transaction log extension layout for mbsi
+	export	TransactionLogExtensionRec	:=
+	record
+		dataset(TransactionLogExtension)	Rec	{xpath('Records/Rec'),maxcount(3)};
+	end;
+	
+
 	// PropertyCharacteristics payload base layout
 	export	Payload	:= PropertyCharacteristics.Layouts.Base;
 

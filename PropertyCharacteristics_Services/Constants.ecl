@@ -90,5 +90,8 @@ module
 	EXPORT Selected_Source_Plus_Option  := 'SSP';
 	
 	EXPORT MSL_Src  							:= 'MLS';
+	
+	EXPORT CCPA_Global_SourceID		:= 27621;
+	EXPORT log_extension_type			:= 52;
 
 end;

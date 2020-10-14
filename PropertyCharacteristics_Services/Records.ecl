@@ -29,13 +29,22 @@ module
   // if address was successfully cleaned, get inhouse data
   shared dPropPayload := GetPropertyData (dataset ([CreateBatchRecord()]) (is_cleaned));
 	
+	//Obtain Lexid
+	SHARED Lexid				:= Get_HeaderData(pRequest.ReportBy.Name, pRequest.ReportBy.dob, pRequest.ReportBy.ssn, pRequest.ReportBy.DLNumber, pRequest.ReportBy.DLState, clean_addr);
+
+	//Determine if opted out under ccpa
+	SHARED IsOptedOut		:= IF(Lexid <> 0, Get_OptOutData(Lexid), FALSE);
+	   
   // Replicated the batch functionallity.  QB 5501
   dLNPropResultsFiltered := dPropPayload(
     ((pInMod.ReportType = 'I') AND (pInMod.ResultOption IN [Constants.Default_Option, Constants.Default_Plus_Option]) AND (vendor_source = 'A')) OR 
     ((pInMod.ReportType = 'P') AND pInMod.ResultOption = Constants.Default_Option AND (vendor_source IN ['B', 'D']) ) OR 
-    ((pInMod.ReportType = 'P') AND pInMod.ResultOption = Constants.Default_Plus_Option AND (vendor_source IN ['B', 'D', 'E']) ) OR 
-    ((pInMod.ResultOption = Constants.Selected_Source_Option) AND (vendor_source = 'F')) OR
-		((pInMod.ResultOption = Constants.Selected_Source_Plus_Option) AND (vendor_source IN ['F', 'E', 'D', 'C'])));	
+    ((pInMod.ReportType = 'P') AND pInMod.ResultOption = Constants.Default_Plus_Option AND ~IsOptedOut AND (vendor_source IN ['B', 'D', 'E']) ) OR 
+    ((pInMod.ReportType = 'P') AND pInMod.ResultOption = Constants.Default_Plus_Option AND IsOptedOut AND (vendor_source IN ['B', 'D']) ) OR 
+    ((pInMod.ResultOption = Constants.Selected_Source_Option) AND ~IsOptedOut AND (vendor_source = 'F')) OR
+    ((pInMod.ResultOption = Constants.Selected_Source_Option) AND IsOptedOut AND (vendor_source = 'G')) OR
+    ((pInMod.ResultOption = Constants.Selected_Source_Plus_Option) AND ~IsOptedOut AND (vendor_source IN ['F', 'E', 'D', 'C'])) OR	
+    ((pInMod.ResultOption = Constants.Selected_Source_Plus_Option) AND IsOptedOut AND (vendor_source IN ['G', 'D', 'C'])));	
 	
 	// back to original layout: "payload" without cleaned address and batch-acctno
 	shared inhouse_results := project (dLNPropResultsFiltered, layouts.Payload);
@@ -87,12 +96,12 @@ module
 	// Rollup source B records where you have move than one value for a field.
 	export dsRollB := rollup(dsJoinBA, TRUE, PropertyCharacteristics_Services.Functions.xRollUpB_Rec(LEFT, RIGHT));
 
-	// Combine source A and B (and MLS E + best of all F) records
-	export dsSourceAll := dsRollB + dsFilterOthers + PROJECT (inhouse_results(vendor_source = 'F'), TRANSFORM(layouts.inhouse_layout, SELF.acctno := '', SELF := LEFT));
+	// Combine source A and B (and MLS E + best of all F or G) records
+	export dsSourceAll := dsRollB + dsFilterOthers + PROJECT (inhouse_results(vendor_source in ['F', 'G']), TRANSFORM(layouts.inhouse_layout, SELF.acctno := '', SELF := LEFT));
 
 	//For Default Plus Option, combine B OKCITY and E MLS records, MLS has higher priority
 	shared DPO_BandE := JOIN(dsSourceAll(vendor_source = 'E'), dsSourceAll(vendor_source = 'B'), TRUE, PropertyCharacteristics_Services.Functions.DPOJOin (LEFT, RIGHT), LEFT OUTER, ALL);
-	SHARED ds_DPO := dsSourceAll(vendor_source = 'D') + DPO_BandE;
+	SHARED ds_DPO := dsSourceAll(vendor_source = 'D') + IF(EXISTS(dsSourceAll(vendor_source = 'E')), DPO_BandE, dsSourceAll(vendor_source = 'B'));
 	SHARED FinaldsSourceAll := IF (pInMod.ResultOption = Constants.Default_Plus_Option, ds_DPO, dsSourceAll);
 	shared ds_noacctno := project (FinaldsSourceAll, layouts.Payload);
 	
@@ -100,7 +109,7 @@ module
 	shared ModPropInfo	:=	PropertyCharacteristics_Services.Convert2IESP(pInMod,pRequest);
 	
 	// Build report dataset.
-	export dsReport := sort(project (ds_noacctno, ModPropInfo.Convert2PropDataItem(left)), Functions.DataSource_SortOrder(DataSource)); 
+	export dsReport := sort(project (ds_noacctno, ModPropInfo.Convert2PropDataItem(left, IsOptedOut)), Functions.DataSource_SortOrder(DataSource)); 
 
 	iesp.property_info.t_PropertyInformation	tCombineReportSections()	:= transform
 		self._Header													:=	row({0,'',pRequest.User.QueryId,pInsContext.Common.TransactionId,[],[]},iesp.share.t_ResponseHeader);
@@ -110,6 +119,7 @@ module
 																																			,combined_err
 																																			,exists (inhouse_results)
 																																			,pInMod.isHomegateway
+																																			,IsOptedOut
 																																			);
 		self.Report.Messages									:=	dCombinedErrorsSorted;
 		
@@ -131,5 +141,12 @@ module
 																																										// ,dPropGatewayResponse
 																																										,pInMod
 																																										);
+																																										
+		// Transaction Logging
+	export	TransactionLogExtension	:=	IF(Lexid <> 0 AND EXISTS(ds_noacctno), 
+																				PropertyCharacteristics_Services.Get_Transaction_Log_Extension(pInsContext.Common.TransactionId
+																																										,Lexid
+																																										,ds_noacctno
+																																										));
 
 end;

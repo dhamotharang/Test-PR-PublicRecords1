@@ -1638,11 +1638,14 @@ LOADXML('<xml/>');
 										'A' => 1,
 										'B' => 2,
 										'B DEFAULT PLUS' => 3,
-										'F SELECTED SOURCE' => 4,
-										'F SELECTED SOURCE PLUS' => 5,
-										'D PUBLIC RECORD SOURCE A' => 6,
-										'C PUBLIC RECORD SOURCE B' => 7,
-										'E HOME LISTING DATA' => 8,
-										9);
+										'B DEFAULT PLUS NO HLD' => 4,
+										'F SELECTED SOURCE' => 5,
+										'G SELECTED SRCE NO HLD' => 6,
+										'F SELECTED SOURCE PLUS' => 7,
+										'G SEL SRCE PLUS NO HLD' => 8,
+										'D PUBLIC RECORD SOURCE A' => 9,
+										'C PUBLIC RECORD SOURCE B' => 10,
+										'E HOME LISTING DATA' => 11,
+										12);
 										
 end;
