@@ -146,14 +146,14 @@ roxiekeybuild.Mac_SK_Move_V3('~thor_data400::key::banko::fcra::@version@::courtc
 updatedops :=  
 							if( dops.GetBuildVersion('BankruptcyV2Keys','B','N','T')[1..8] <> filedate[1..8] and dops.GetBuildVersion('FCRA_BankruptcyKeys','B','F','T')[1..8] <> filedate[1..8],
 							sequential(
-									dops.updateversion('BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com, intel357@bellsouth.net',,'N',,'Y'),
-									dops.updateversion('FCRA_BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com, intel357@bellsouth.net',,'F',,'Y'),
+									dops.updateversion('BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',,'N',,'Y'),
+									dops.updateversion('FCRA_BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',,'F',,'Y'),
 									Banko.Manage_Input_Files(true)
 										),
 							if (~(ut.Weekday((integer)filedate[1..8]) = 'SATURDAY' or ut.Weekday((integer)filedate[1..8]) = 'SUNDAY'),
 								sequential(
-									dops.updateversion('BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',,'N'),
-									dops.updateversion('FCRA_BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',,'F'),
+									dops.updateversion('BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',,'N'),
+									dops.updateversion('FCRA_BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',,'F'),
 									Banko.Manage_Input_Files(true)
 										)
 										
@@ -190,7 +190,7 @@ We send of an email once the job is completed, with any courtID misses.
 file_in := Banko.Banko_FileDataset;	
 counted := (string)count(file_in(_CourtID = ''));
 
-leMailTarget := 'kevin.reeder@lexisnexisrisk.com, christopher.brodeur@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com';
+leMailTarget := 'Christopher.Brodeur@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com';
 //,Joseph.Lezcano@lexisnexisrisk.com';
 
 fSendMail(string pSubject,string pBody)

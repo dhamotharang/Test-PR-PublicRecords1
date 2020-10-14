@@ -5,18 +5,18 @@ import Doxie;
 export IdAppendRoxieRemote(
 		dataset(BIPV2.IdAppendLayouts.AppendInput) inputDs
 		,unsigned scoreThreshold = 75
-		,unsigned weightThreshold = IdConstants.APPEND_WEIGHT_THRESHOLD_ROXIE
+		,unsigned weightThreshold = 0
 		,boolean primForce = false
 		,boolean reAppend = true
 		,boolean primForcePost = false 
 		,boolean useFuzzy = true
-		,boolean doZipExpansion = false
+		,boolean doZipExpansion = true
 		,string svcAppendUrl = ''
 		,string svcName = ''
-    ,unsigned soapTimeout = 30
-    ,unsigned soapTimeLimit = 0
-    ,unsigned soapRetries = 3
-		,boolean segmentation = true
+        ,unsigned soapTimeout = 30
+        ,unsigned soapTimeLimit = 0
+        ,unsigned soapRetries = 3
+				,boolean segmentation = true
 	) := module
 
 	shared disableSaltForce := not primForce;

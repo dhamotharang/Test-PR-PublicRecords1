@@ -493,6 +493,7 @@
 		STRING64 Geo_Coded_Longitude;
 		//PRtCC CR-1262 
     STRING Direction_Of_Impact;
+		STRING1 is_Suppressed;
 	END;
 	
 	EXPORT incident_ori := RECORD
@@ -1794,6 +1795,7 @@
 		//PRtCC CR-1262 
     STRING Direction_Of_Impact;
 		STRING Event_Sequence;
+		STRING1 is_Suppressed;
 	  DATASET(Citations_ChildRec) Citation_Details {MAXCOUNT(Constants.Max_Citations_ChildRec_Count)};
 	END;
 	

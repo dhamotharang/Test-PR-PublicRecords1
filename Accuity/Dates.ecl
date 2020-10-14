@@ -1,5 +1,5 @@
-
-import ut;
+﻿
+import ut,std;
 export Dates := MODULE
 
 
@@ -8,19 +8,19 @@ string FixMonth(string s) := FUNCTION
 	outmon := CASE(stringlib.stringtolowercase(inmon),
 		'janvier' => 'January',
 		'fevrier' => 'February',
-		'fÃ©vrier' => 'February',
+		'fÃƒÂ©vrier' => 'February',
 		'mars' => 'March',
 		'avril' => 'April',
 		'mai' => 'May',
 		'juin' => 'June',
 		'juillet' => 'July',
 		'aout' => 'August',
-		'aoÃ»t' => 'August',
+		'aoÃƒÂ»t' => 'August',
 		'septembre' => 'September',
 		'octobre' => 'October',
 		'novembre' => 'November',
 		'decembre' => 'December',
-		'dÃ©cembre' => 'December',
+		'dÃƒÂ©cembre' => 'December',
 		'');
 
 	return if(outmon='',s,
@@ -81,7 +81,7 @@ export string CvtDate(string s1, varstring fmtout = '%m/%d/%Y', boolean doCheck 
 		REGEXFIND('[0-9]+ +[A-Z.]+ +[0-9]+',s2,NOCASE) =>		// see if date is in French or needs correction
 			FixMonth(s2),
 		s1);
-	dt := ut.ConvertDateMultiple(s, fmts, fmtout);
+	dt := Std.date.ConvertDateFormatMultiple(s, fmts, fmtout);
 	return dt;
 	//return IF(dt='','',
 	//			if(doCheck,SanityCheck(FixSlashCentury(dt)),dt));
@@ -89,7 +89,7 @@ END;
 
 string CvtDateEx(string s, varstring fmtout = '%m/%d/%Y') := FUNCTION
 	dt := CvtDate(s);
-	return IF(dt='','',ut.ConvertDate(dt, '%m/%d/%Y', fmtout, ));
+	return IF(dt='','',Std.Date.ConvertDateFormat(dt, '%m/%d/%Y', fmtout, ));
 END;
 
 
@@ -127,15 +127,14 @@ export string FixBirthday(string birthday) := FUNCTION
 			dob = '' => '',
 			dob[6..10] = '00/00' => dob[1..4] + '0101',
 			dob[9..10] = '00' => dob[1..4] + dob[6..7] + '01',
-			ut.ConvertDate(dob,'%Y/%m/%d','%Y%m%d')
-		);
+			Std.Date.ConvertDateFormat(dob,'%Y/%m/%d','%Y%m%d')
+			);
 END;
 
 
 export string10 fSlashedMDYtoCYMD(string pDateIn) := 
-	ut.ConvertDate(pDateIn, '%Y%m%d', '%Y/%m/%d');
-	
-/*	
+		Std.Date.ConvertDateFormat(pDateIn, '%Y%m%d', '%Y/%m/%d');
+	/*	
 export string10 precleanDate(string pDateIn) := 
 	fSlashedMDYtoCYMD(TRIM(
 		REGEXREPLACE('(Approximately|circa|vers|APROXIMADAMENTE EN|APROXIMADAMENTE|ALREDEDOR DE|en torno a|hacia|est\\.?)',

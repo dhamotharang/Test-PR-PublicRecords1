@@ -66,10 +66,10 @@ Sales_desc = Sales description (27% pop).  Sample values:  revenue, sales, inter
   ds_oshair_prep    := table(ds_oshair_base_filt  ,{source_rec_id,unsigned6 dt_last_seen := (unsigned6)dt_last_seen,                             activity_number         ,pID,Number_In_Establishment }); // not used in sales calculations
 
   ds_cortera_prep   :=  
-                        table(ds_cortera_base_filt  ,{unsigned6 source_rec_id := ((unsigned8)link_id << 32) | HASH32(name                    ,clean_phone  ,EXECUTIVE_NAME,EXEC_TITLE)  ,unsigned6 dt_last_seen := (unsigned6)dt_last_seen,link_id,pID,TOTAL_EMPLOYEES,TOTAL_SALES }) 
-                      + table(ds_cortera_base_filt  ,{unsigned6 source_rec_id := ((unsigned8)link_id << 32) | HASH32(name                    ,clean_fax    ,EXECUTIVE_NAME,EXEC_TITLE)  ,unsigned6 dt_last_seen := (unsigned6)dt_last_seen,link_id,pID,TOTAL_EMPLOYEES,TOTAL_SALES })
-                      + table(ds_cortera_base_filt  ,{unsigned6 source_rec_id := ((unsigned8)link_id << 32) | HASH32(alternate_business_name ,clean_phone  ,EXECUTIVE_NAME,EXEC_TITLE)  ,unsigned6 dt_last_seen := (unsigned6)dt_last_seen,link_id,pID,TOTAL_EMPLOYEES,TOTAL_SALES })
-                      + table(ds_cortera_base_filt  ,{unsigned6 source_rec_id := ((unsigned8)link_id << 32) | HASH32(alternate_business_name ,clean_fax    ,EXECUTIVE_NAME,EXEC_TITLE)  ,unsigned6 dt_last_seen := (unsigned6)dt_last_seen,link_id,pID,TOTAL_EMPLOYEES,TOTAL_SALES })
+                        table(ds_cortera_base_filt  ,{unsigned6 source_rec_id := ((unsigned8)link_id << 32) | HASH32(name                    ,clean_phone  ,EXECUTIVE_NAME,Executive_Title)  ,unsigned6 dt_last_seen := (unsigned6)dt_last_seen,link_id,pID,TOTAL_EMPLOYEES,TOTAL_SALES }) 
+                      + table(ds_cortera_base_filt  ,{unsigned6 source_rec_id := ((unsigned8)link_id << 32) | HASH32(name                    ,clean_fax    ,EXECUTIVE_NAME,Executive_Title)  ,unsigned6 dt_last_seen := (unsigned6)dt_last_seen,link_id,pID,TOTAL_EMPLOYEES,TOTAL_SALES })
+                      + table(ds_cortera_base_filt  ,{unsigned6 source_rec_id := ((unsigned8)link_id << 32) | HASH32(alternate_business_name ,clean_phone  ,EXECUTIVE_NAME,Executive_Title)  ,unsigned6 dt_last_seen := (unsigned6)dt_last_seen,link_id,pID,TOTAL_EMPLOYEES,TOTAL_SALES })
+                      + table(ds_cortera_base_filt  ,{unsigned6 source_rec_id := ((unsigned8)link_id << 32) | HASH32(alternate_business_name ,clean_fax    ,EXECUTIVE_NAME,Executive_Title)  ,unsigned6 dt_last_seen := (unsigned6)dt_last_seen,link_id,pID,TOTAL_EMPLOYEES,TOTAL_SALES })
                       ;
 
   ds_infutor_prep     := table(ds_infutor_base_filt   ,{rcid         ,unsigned6 dt_last_seen := (unsigned6)dt_last_seen,record_id  ,pID,unsigned number_of_employees := mapinfutoremp(trim(employee_code)) }); // not used in sales calculations

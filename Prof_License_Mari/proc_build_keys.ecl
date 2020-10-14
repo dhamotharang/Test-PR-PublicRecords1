@@ -21,10 +21,18 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Prof_License_Mari.key_disciplinary,		
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Prof_License_Mari.key_nmls_id,						SuperKeyName+'nmls_id',								BaseKeyName+'::nmls_id',								key10);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Prof_License_Mari.key_linkIds.key,				SuperKeyName+'linkids',								BaseKeyName+'::linkids',								key11);
 
+//DF-28229 Build Delta_Rid keys for base files
+RoxieKeyBuild.MAC_build_logical(Prof_License_Mari.Key_Regulatory_Actions_Delta_Rid(), Prof_License_Mari.Data_Key_Regulatory_Actions_Delta_Rid, Prof_License_Mari.Names(filedate).i_regulatory_actions_delta_rid_super, Prof_License_Mari.Names(filedate).i_regulatory_actions_delta_rid_logical, bk_regulatory_actions_delta_rid);
+RoxieKeyBuild.MAC_build_logical(Prof_License_Mari.Key_Disciplinary_Actions_Delta_Rid(), Prof_License_Mari.Data_Key_Disciplinary_Actions_Delta_Rid, Prof_License_Mari.Names(filedate).i_disciplinary_actions_delta_rid_super, Prof_License_Mari.Names(filedate).i_disciplinary_actions_delta_rid_logical, bk_disciplinary_actions_delta_rid);
+RoxieKeyBuild.MAC_build_logical(Prof_License_Mari.Key_Individual_Detail_Delta_Rid(), Prof_License_Mari.Data_Key_Individual_Detail_Delta_Rid, Prof_License_Mari.Names(filedate).i_individual_detail_delta_rid_super, Prof_License_Mari.Names(filedate).i_individual_detail_delta_rid_logical, bk_individual_detail_delta_rid);
+RoxieKeyBuild.MAC_build_logical(Prof_License_Mari.Key_Search_Delta_Rid(), Prof_License_Mari.Data_Key_Search_Delta_Rid, Prof_License_Mari.Names(filedate).i_search_delta_rid_super, Prof_License_Mari.Names(filedate).i_search_delta_rid_logical, bk_search_delta_rid);
+
 // Build FCRA Keys
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Prof_License_Mari.key_DID(true),					SuperKeyName_fcra+'did',					BaseKeyName_fcra+'::did',						fcra_key1);
+RoxieKeyBuild.MAC_build_logical(Prof_License_Mari.Key_Search_Delta_Rid(1), Prof_License_Mari.Data_Key_Search_Delta_Rid, Prof_License_Mari.Names(filedate).i_fcra_search_delta_rid_super, Prof_License_Mari.Names(filedate).i_fcra_search_delta_rid_logical, bk_fcra_search_delta_rid);
 
-Keys	:=	parallel(	key1, key2, key3, key4, key5, key6, key7, key8, key9, key10, key11, fcra_key1);
+Keys	:=	parallel(	key1, key2, key3, key4, key5, key6, key7, key8, key9, key10, key11, fcra_key1,
+                        bk_disciplinary_actions_delta_rid,bk_regulatory_actions_delta_rid,bk_individual_detail_delta_rid,bk_search_delta_rid,bk_fcra_search_delta_rid);
 
 
 // -- Move Keys to Built
@@ -39,6 +47,7 @@ RoxieKeyBuild.Mac_SK_Move_To_Built_V2(SuperKeyName+'@version@::regulatory_action
 RoxieKeyBuild.Mac_SK_Move_To_Built_V2(SuperKeyName+'@version@::disciplinary_actions',	BaseKeyName+'::disciplinary_actions',	mv9);
 RoxieKeyBuild.Mac_SK_Move_To_Built_V2(SuperKeyName+'@version@::nmls_id',							BaseKeyName+'::nmls_id',						mv10);
 RoxieKeyBuild.Mac_SK_Move_To_Built_V2(SuperKeyName+'@version@::linkids',							BaseKeyName+'::linkids',						mv11);
+
 
 // -- Move FCRA Keys to Built
 Roxiekeybuild.Mac_SK_Move_to_Built_v2(SuperKeyName_fcra+'@version@::did',				BaseKeyName_fcra+'::did',				mv1_fcra);
@@ -59,10 +68,18 @@ RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::disciplinary_actions','Q',
 RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::nmls_id',							'Q',mv10_qa,2);
 RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::linkids',							'Q',mv11_qa,2);
 
+//DF-28229 Build Delta_Rid keys for base files
+RoxieKeyBuild.Mac_SK_Move_v3(SuperKeyName+'@version@::regulatory_actions::delta_rid','D',mv_regulatory_actions_delta_rid_to_qa,filedate,2);
+RoxieKeyBuild.Mac_SK_Move_v3(SuperKeyName+'@version@::disciplinary_actions::delta_rid','D',mv_disciplinary_actions_delta_rid_to_qa,filedate,2);
+RoxieKeyBuild.Mac_SK_Move_v3(SuperKeyName+'@version@::individual_detail::delta_rid','D',mv_individual_detail_delta_rid_to_qa,filedate,2);
+RoxieKeyBuild.Mac_SK_Move_v3(SuperKeyName+'@version@::search::delta_rid','D',mv_search_delta_rid_to_qa,filedate,2);
+
 //-- Move FCRA Keys to QA
 Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::did',			'Q',mv1_qa_fcra,2);
+RoxieKeyBuild.Mac_SK_Move_v3(SuperKeyName_fcra+'@version@::search::delta_rid','D',mv_search_delta_rid_to_qa_fcra,filedate,2);
 
-To_qa	:=	parallel(mv1_qa, mv2_qa, mv3_qa, mv4_qa, mv5_qa, mv6_qa, mv7_qa, mv8_qa, mv9_qa, mv10_qa, mv11_qa, mv1_qa_fcra);
+To_qa	:=	parallel(mv1_qa, mv2_qa, mv3_qa, mv4_qa, mv5_qa, mv6_qa, mv7_qa, mv8_qa, mv9_qa, mv10_qa, mv11_qa, mv1_qa_fcra,
+                  mv_regulatory_actions_delta_rid_to_qa,mv_disciplinary_actions_delta_rid_to_qa,mv_individual_detail_delta_rid_to_qa,mv_search_delta_rid_to_qa,mv_search_delta_rid_to_qa_fcra);
 
 //DF-21891 Verify followings fields are cleared in thor_data400::key::proflic_mari::fcra::qa::did
 cnt_mari_fcra := OUTPUT(strata.macf_pops(Prof_License_Mari.key_did(true),,,,,,FALSE,

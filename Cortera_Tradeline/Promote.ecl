@@ -1,4 +1,4 @@
-﻿import tools, std;
+﻿import dx_Cortera_Tradeline, tools, std;
 
 lay_builds 	:= tools.Layout_FilenameVersions.builds;
 
@@ -8,7 +8,7 @@ export Promote(
 	,string								pFilter					= 	''
 	,boolean							pDelete					= 	false
 	,boolean							pIsTesting			= 	false
-	,dataset(lay_builds)	pBuildFilenames = 	$.keynames	(pversion).dAll_filenames
+	,dataset(lay_builds)	pBuildFilenames = 	dx_Cortera_Tradeline.keynames	(pversion).dAll_filenames
 ) := module
 	
 	//export inputfiles	:= tools.mod_PromoteInput(pversion,pInputFilenames,pFilter,pDelete,pIsTesting);

@@ -39,7 +39,7 @@ function
 
   dWUCreateAndUpdateResult  :=  
     soapcall(
-        'http://' + pESP + ':' + pESPPort + '/WsWorkunits'
+        'http://' + trim(pESP,left,right) + trim(':',left,right) + trim(pESPPort,left,right) + trim('/WsWorkunits',left,right)
        ,'WUUpdate'
        ,rWUCreateAndUpdateRequest
        ,rWUCreateAndUpdateResponse
@@ -48,7 +48,7 @@ function
 
   dWUCreateAndUpdateResult_remote  :=  
     soapcall(
-        'http://' + pESP + ':' + pESPPort + '/WsWorkunits'
+        'http://' + trim(pESP,left,right) + trim(':',left,right) + trim(pESPPort,left,right) + trim('/WsWorkunits',left,right)
        ,'WUUpdate'
        ,rWUCreateAndUpdateRequest
        ,rWUCreateAndUpdateResponse
