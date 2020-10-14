@@ -564,6 +564,7 @@ export layout_checkingindicators := record
   string3 CheckTimeOldest;
   string3 CheckTimeNewest;
   string2 CheckNegTimeOldest;
+  string2 CheckNegTimeNewest;
   string2 CheckNegRiskDecTimeNewest;
   string2 CheckNegPaidTimeNewest;
   string4 CheckCountTotal;
