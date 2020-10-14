@@ -114,14 +114,13 @@ all_docs := docs_bus + docs_cont + segkeys  : persist('~thor_data400::persist::f
 
 //fileNameDoc := 'boolean_test::jmw::fbn_test';
 //OUTPUT(docs(content <> ''),,fileNameDoc,OVERWRITE);
-
+/* DF-28344
 inlkeyname := '~thor_data400::key::fbn::'+filename+'::docref.docref';
 inskeyname := '~thor_data400::key::fbn::qa::docref.docref';
 
 build_key := buildindex(fbn_key_translation,{doc,tmsid,rmsid,__filepos},
 	inlkeyname, OVERWRITE);
-
-// done :)
+*/
 
 stuff := sequential(
 									Text_Search.Build_From_DocSeg_Records(all_docs(content <> ''),info),
