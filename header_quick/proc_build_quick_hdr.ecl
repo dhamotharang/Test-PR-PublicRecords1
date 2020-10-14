@@ -181,7 +181,7 @@ EXPORT proc_build_quick_hdr(
 		Header.mac_runIfNotCompleted ('QuickHeader',filedate, Header_Quick.Proc_Accept_SRC_toQA(filedate), 630),
 		Header.mac_runIfNotCompleted ('QuickHeader',filedate, Header_Quick.proc_build_ssn_suppression(filedate), 640),
 		Header.mac_runIfNotCompleted ('QuickHeader',filedate, Header_Quick.proc_build_current_wa_residents_file, 650),
-		Header.mac_runIfNotCompleted ('QuickHeader',filedate, SEQUENTIAL(oQH_fcra,oQH_nonfcra,oQH_qhs), 660),
+		//Header.mac_runIfNotCompleted ('QuickHeader',filedate, SEQUENTIAL(oQH_fcra,oQH_nonfcra,oQH_qhs), 660),
 		//,SEQUENTIAL(/*dops_FCRA_QH,dops_QH,*/dops_SS)
 		DeltaCommands
 	);
