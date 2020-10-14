@@ -236,9 +236,8 @@ full1 := 	sequential(	parallel(a1,a2,a3,a4,a5,a7,a9,a10,a11,a12,a13,a14,a15,a16,
 
 //  Build Orbit entry with Build In Progress status
 
-
-   oRiskIndicator       := Orbit3.proc_Orbit3_CreateBuild_AddItem ('Risk Indicator', filedate,'N', ,true,true);  
-	 oFcra_Risk_Indicator := Orbit3.proc_Orbit3_CreateBuild_AddItem ('FCRA_Risk_Indicator',filedate,'F', ,true,true);   
+oRiskIndicator       := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'Risk Indicator',filedate,'N',runaddcomponentsonly := true);
+oFcra_Risk_Indicator := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'FCRA_Risk_Indicator',filedate,'F',runaddcomponentsonly := true);
 
 return sequential(full1,move_qa,Scrubs_Risk_Indicators.fn_GenerateStats(filedate),Scrubs_Risk_Indicators.fn_RunScrubs(filedate,''),oRiskIndicator,oFcra_Risk_Indicator);
 END;				
