@@ -263,10 +263,7 @@ SHARED udops(string3 skipPackage='000') := sequential(
                        ))
 );
 
-SHARED orbit_update_entries(boolean isCreate, string skipPackage='000') := function
-
-    skipcreatebuild := if(isCreate, false, true);
-    skipupdatebuild := if(isCreate, true, false);
+SHARED orbit_update_entries(string skipPackage='000') := function
 
     RETURN sequential(    
       if(skipPackage[1]='0', Orbit3.Proc_Orbit3_CreateBuild('PersonXLAB_Inc', filedate, 'N',email_list := Header.email_list.BocaDevelopers)),
@@ -377,8 +374,7 @@ EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000'
     +'gabriel.marcan@lexisnexisrisk.com\n'
     +'\nThank you,'),          
     
-    orbit_update_entries(true,skipPackage),   //Create
-    orbit_update_entries(false,skipPackage),  //Update
+    orbit_update_entries(skipPackage),   //Create
     udops(skipPackage)
 );
 END;
