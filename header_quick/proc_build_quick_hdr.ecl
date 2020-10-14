@@ -24,11 +24,11 @@ EXPORT proc_build_quick_hdr(
 	dops_SS       := roxiekeybuild.updateversion('QHsourceKeys',filedate,'gregory.rose@lexisnexisrisk.com,jose.bello@lexisnexis.com',,'N');
 
 	// Update Orbit with the correct entries in build in progress mode.
-/*
-	oQH_fcra      := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'FCRA_Quick_Header',filedate,'F', ,true,true);	
-	oQH_nonfcra   := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'Quick Header',filedate,'N', ,true);	
-	oQH_qhs       := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'QHsourceKeys',filedate,'N', ,true);	
-*/
+
+	oQH_fcra      := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'FCRA_Quick_Header',filedate,'F',runaddcomponentsonly := true);	
+	oQH_nonfcra   := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'Quick Header',filedate,'N',runaddcomponentsonly := true);	
+	oQH_qhs       := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'QHsourceKeys',filedate,'N',runaddcomponentsonly := true);	
+
 	EQ_records_in0 := header.fn_preprocess(true);
 
 	ut.MAC_Sequence_Records(EQ_records_in0, rid, seqd);
@@ -181,7 +181,7 @@ EXPORT proc_build_quick_hdr(
 		Header.mac_runIfNotCompleted ('QuickHeader',filedate, Header_Quick.Proc_Accept_SRC_toQA(filedate), 630),
 		Header.mac_runIfNotCompleted ('QuickHeader',filedate, Header_Quick.proc_build_ssn_suppression(filedate), 640),
 		Header.mac_runIfNotCompleted ('QuickHeader',filedate, Header_Quick.proc_build_current_wa_residents_file, 650),
-		//Header.mac_runIfNotCompleted ('QuickHeader',filedate, SEQUENTIAL(oQH_fcra,oQH_nonfcra,oQH_qhs), 660),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, SEQUENTIAL(oQH_fcra,oQH_nonfcra,oQH_qhs), 660),
 		//,SEQUENTIAL(/*dops_FCRA_QH,dops_QH,*/dops_SS)
 		DeltaCommands
 	);
