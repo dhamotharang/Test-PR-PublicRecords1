@@ -24,11 +24,11 @@ EXPORT proc_build_quick_hdr(
 	dops_SS       := roxiekeybuild.updateversion('QHsourceKeys',filedate,'gregory.rose@lexisnexisrisk.com,jose.bello@lexisnexis.com',,'N');
 
 	// Update Orbit with the correct entries in build in progress mode.
-
+/*
 	oQH_fcra      := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'FCRA_Quick_Header',filedate,'F', ,true,true);	
 	oQH_nonfcra   := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'Quick Header',filedate,'N', ,true);	
 	oQH_qhs       := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'QHsourceKeys',filedate,'N', ,true);	
-
+*/
 	EQ_records_in0 := header.fn_preprocess(true);
 
 	ut.MAC_Sequence_Records(EQ_records_in0, rid, seqd);
