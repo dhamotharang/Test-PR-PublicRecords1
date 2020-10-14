@@ -1,11 +1,7 @@
 IMPORT gong,phonesplus, D2C;
 
-dGong_all :=gong.file_history(did<>0);
-dGong_curr:=gong.file_history(current_record_flag='Y' AND did<>0);
-
-dids_w_no_curr := join(distribute(dGong_all, hash(did)), distribute(dGong_curr, hash(did)), left.did = right.did, left only, local);
-dGong := dGong_curr + dids_w_no_curr;
-
+dGong_all_hist :=gong.file_history(did<>0);
+dGong := sort(distribute(dGong_all_hist, hash(did)), did, -current_record_flag, -dt_last_seen, local);
 
 dPhonesPlus:=phonesplus.file_phonesplus_base(activeflag='Y' AND confidencescore>=11 AND did<>0, vendor not in D2C.Constants.PhonesPlusV2RestrictedSources);
 
