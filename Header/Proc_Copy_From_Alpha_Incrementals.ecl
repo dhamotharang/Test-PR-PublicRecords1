@@ -268,11 +268,11 @@ SHARED orbit_update_entries(boolean isCreate, string skipPackage='000') := funct
     skipcreatebuild := if(isCreate, false, true);
     skipupdatebuild := if(isCreate, true, false);
 
-    RETURN sequential(
-                        if(skipPackage[1]='0',Orbit3.Proc_Orbit3_CreateBuild('PersonXLAB_Inc', filedate, 'N', ,skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers)),
-                        if(skipPackage[2]='0',Orbit3.Proc_Orbit3_CreateBuild('FCRA_Header', filedate, 'F', ,skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers)),
-                        if(skipPackage[3]='0',Orbit3.Proc_Orbit3_CreateBuild('Header_IKB', filedate, 'N', ,skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers))
-                      );
+    RETURN sequential(    
+      if(skipPackage[1]='0', Orbit3.Proc_Orbit3_CreateBuild('PersonXLAB_Inc', filedate, 'N',email_list := Header.email_list.BocaDevelopers)),
+      if(skipPackage[2]='0', Orbit3.Proc_Orbit3_CreateBuild('FCRA_Header', filedate, 'F', email_list := Header.email_list.BocaDevelopers)),
+      if(skipPackage[3]='0', Orbit3.Proc_Orbit3_CreateBuild('Header_IKB', filedate, 'N', email_list := Header.email_list.BocaDevelopers))
+    );
 
 END;
 
