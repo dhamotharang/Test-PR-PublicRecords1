@@ -132,8 +132,8 @@ EXPORT Proc_Build_PhoneFraud_Keys(string version, string oType, string sType):= 
 	//Move Common PhoneFraud Keys to Superfiles//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        dmvBltPhoneFraudOTP := fileservices.addsuperfile('~thor_data400::key::phonefraud_otp', '~thor_data400::key::'+version+'::phonefraud_otp');
-        dmvBltPhoneFraudSpoofing := fileservices.addsuperfile('~thor_data400::key::phonefraud_spoofing', '~thor_data400::key::'+version+'::phonefraud_spoofing');
+        dmvBltPhoneFraudOTP := fileservices.addsuperfile('~thor_data400::key::phonefraud_otp_qa', '~thor_data400::key::'+version+'::phonefraud_otp');
+        dmvBltPhoneFraudSpoofing := fileservices.addsuperfile('~thor_data400::key::phonefraud_spoofing_qa', '~thor_data400::key::'+version+'::phonefraud_spoofing');
 
 
 		Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::phonefraud_otp'
@@ -176,7 +176,7 @@ EXPORT Proc_Build_PhoneFraud_Keys(string version, string oType, string sType):= 
 	//Run Build & Provide Email on Build Status//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		sendEmail				:= sequential(//sprayOTP, spraySpoof,
+		sendEmail				:= sequential(sprayOTP, spraySpoof,
 																	bldOTPBase,
                                                                     if(updateType = 'D',
                                                                         deltaUpdateOTPBase,
@@ -189,11 +189,8 @@ EXPORT Proc_Build_PhoneFraud_Keys(string version, string oType, string sType):= 
                                                                         ),
 																	catOTPHistory, mvOTPHistory,
 																	catSpoofHistory, mvSpoofHistory,
-                                                                    output('bk1'),
 																	bkPhoneFraudOTP,
-                                                                    output('bk2'),
 																	bkPhoneFraudSpoofing,  
-                                                                    output('mvblt'),
                                                                     if(updateType = 'D',
                                                                         parallel(
                                                                             dmvBltPhoneFraudOTP,
@@ -203,17 +200,16 @@ EXPORT Proc_Build_PhoneFraud_Keys(string version, string oType, string sType):= 
                                                                             mvBltPhoneFraudOTP,
                                                                             mvBltPhoneFraudSpoofing
                                                                             )
-                                                                        ), 			
-                                                                    output('mvqa'),														
+                                                                        ), 																
 																	mvQAPhoneFraudOTP, 
 																	mvQAPhoneFraudSpoofing,
-														/* 			dopsUpdate,
+														 			dopsUpdate,
 																	create_phonefraud_build,
 																	buildStrata,
 																	Scrubs_PhoneFraud.fn_RunScrubs(version,'Judy.Tao@lexisnexis.com')):
 																	Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com;christopher.brodeur@lexisnexisrisk.com;charles.pettola@lexisnexisrisk.com;intel357@bellsouth.net', 'PhoneFraud Key Build Succeeded', workunit + ': Build completed.')),
 																	Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com;christopher.brodeur@lexisnexisrisk.com;charles.pettola@lexisnexisrisk.com;intel357@bellsouth.net', 'PhoneFraud Key Build Failed', workunit + '\n' + FAILMESSAGE)
-																	 */);
+																	 );
 
 	RETURN sendEmail;
 
