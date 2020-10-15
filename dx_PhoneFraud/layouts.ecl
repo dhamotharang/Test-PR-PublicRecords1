@@ -1,4 +1,4 @@
-export layouts := module
+EXPORT layouts := MODULE
     EXPORT OTP_payload := RECORD
 		string20 	transaction_id;
 		string8 	event_date;
@@ -51,4 +51,4 @@ export layouts := module
 		string8  date_added;						
 		string6  time_added;	
 	END;
-end;
+END;

@@ -1,4 +1,4 @@
-import dx_PhoneFraud;
+IMPORT dx_PhoneFraud;
 key := RECORD
     string10 phone;
 END;

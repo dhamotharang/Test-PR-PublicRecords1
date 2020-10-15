@@ -1,9 +1,9 @@
 ﻿IMPORT data_services, doxie, STD;
 
-string common := data_services.foreign_prod + 'thor_data400::key';
-EXPORT names := module
+string common := data_services.data_location.prefix('PhoneFraud')  + 'thor_data400::key';
+EXPORT names := MODULE
 
-		export otp := common + '::phonefraud_otp_qa';
+		EXPORT otp := common + '::phonefraud_otp_qa';
 		
-		export spoofing := common + '::phonefraud_spoofing_qa';	
-end;
+		EXPORT spoofing := common + '::phonefraud_spoofing_qa';	
+END;
