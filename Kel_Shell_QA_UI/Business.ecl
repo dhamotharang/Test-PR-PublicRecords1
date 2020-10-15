@@ -22,7 +22,7 @@
 								 Output_SALT_Profile,
 								 Exclude_Consumer_Attributes,
 								 AllowedSources,
-								 OverrideExperianRestriction,
+								 OverrideExperianRestriction_par,
 								 AllowedSourcesDataset_List,
 								 ExcludeSourcesDataset_List,
 								 IsMarketing,
@@ -227,7 +227,7 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT STRING Data_Permission_Mask := DPM;
 	EXPORT UNSIGNED GLBAPurpose := GLBA;
 	EXPORT UNSIGNED DPPAPurpose := DPPA;
-	EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
+	EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction_par;
 	EXPORT STRING Allowed_Sources := AllowedSources; // Controls inclusion of DNBDMI data
 	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
 	EXPORT UNSIGNED BusinessLexIDThreshold := BIPAppend_Score_Threshold;
