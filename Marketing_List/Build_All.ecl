@@ -51,8 +51,13 @@ functionmacro
   ds_business_contact     := Marketing_List.Create_Business_Contact_File(pversion,pDataset_Crosswalk ,pMrktg_BitMap,,pWatchdog_best_Key,pHeader_Segs_Key,pCounty_Names,pCity_Names,pDebug,pSampleProxids);
   
   // -- reformat to output layout(above files have some extra fields for research)
-  ds_business_info_out    := project(ds_business_info     ,Marketing_List.Layouts.business_information);
-  ds_business_contact_out := project(ds_business_contact  ,Marketing_List.Layouts.business_contact    );
+  #IF(Marketing_List._Config().Add_Extra_Source_Fields = true)
+    ds_business_info_out    := project(ds_business_info     ,Marketing_List.Layouts.business_information_prep2);
+    ds_business_contact_out := project(ds_business_contact  ,Marketing_List.Layouts.business_contact_prep     );
+  #ELSE
+    ds_business_info_out    := project(ds_business_info     ,Marketing_List.Layouts.business_information      );
+    ds_business_contact_out := project(ds_business_contact  ,Marketing_List.Layouts.business_contact          );
+  #END
   
   // -- Write out both files to disk
   output_business_info    := tools.macf_WriteFile(Marketing_List.Filenames(pversion).business_information.logical ,ds_business_info_out     ,pOverwrite := true);

@@ -195,8 +195,27 @@ ver1_MergeClients(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base)
 	return result;
 END;
 
+/**
+	set the case name from the HOH indicator
+**/
+SetCaseName(DATASET(nac_V2.Layout_Base2) base) := FUNCTION
+	hoh := DISTRIBUTE(base(hoh_indicator='Y'),hash32(groupid,caseid));
+	nothoh := DISTRIBUTE(base(hoh_indicator<>'Y'),hash32(groupid,caseid));
+
+	j := JOIN(nothoh, hoh, left.groupid=right.groupid AND left.caseid=right.caseid AND left.programcode=right.programcode AND
+							left.startdate=right.startdate and left.enddate=right.enddate,
+						TRANSFORM(nac_V2.Layout_Base2,
+							self.case_Last_Name := right.LastName;
+							self.case_First_Name := right.FirstName;
+							self.case_Middle_Name := right.MiddleName;
+							self.case_Name_Suffix := right.NameSuffix;
+							self := left;),
+							LEFT OUTER, KEEP(1), LOCAL);
+		return hoh + j;
+END;
+
 EXPORT fn_MergeClients(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base) := FUNCTION
-	clients := DISTRIBUTE(newbase, HASH32(ClientId)); 
+	clients := DISTRIBUTE(SetCaseName(newbase), HASH32(ClientId)); 
 	
 	current := DISTRIBUTE(base(clientid<>''),HASH32(ClientId));
 	

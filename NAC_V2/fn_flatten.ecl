@@ -33,9 +33,8 @@ EXPORT fn_flatten(dataset(Nac_v2.Layouts.base) base1) := FUNCTION
 						self.Client_Last_Name := uc(left.Client_Last_Name);
 						self.Client_First_Name := uc(left.Client_First_Name);
 						self.Client_Middle_Name := uc(left.Client_Middle_Name);
-						
-						
-																			
+																								
+						self.Case_Benefit_Type := IF(left.Case_Benefit_Type='R','S',left.Case_Benefit_Type); // Fix for old AL
 						self.GroupId := left.Case_State_Abbreviation + '01';
 						self.filename := IF(Std.Str.StartsWith(left.filename, 'nac::in::'), left.filename[10..], left.filename);
 						self := LEFT;));

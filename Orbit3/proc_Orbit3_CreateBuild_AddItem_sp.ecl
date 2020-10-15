@@ -2,6 +2,7 @@
 export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string Envmt = 'N',  string BuildStatus = 'BUILD_AVAILABLE_FOR_USE', string email_list = '', boolean skipcreatebuild = false,boolean skipupdatebuild = false, boolean skipaddcomponents = false, boolean runcreatebuild = true, boolean runaddcomponentsonly = false,boolean is_npf = false, string wuid) := function
 
 	string Envmt_isnpf  := if ( is_npf = true, '',Envmt);
+
 	
 	tokenval := orbit3.GetToken() : independent;
 
@@ -64,7 +65,6 @@ export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string
 	return Orbit3.AddComponentstoBuild(tokenval,
 	                            buildname,
 									            Buildvs,
-									            _Control.MyInfo.EmailAddressNotify,
 						                  dataset([{ComponentType,DataType,Family,Id,Name,Status,Version}],Orbit3.Layouts.OrbitBuildInstanceLayout) 
 															);
 															

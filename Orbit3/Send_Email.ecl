@@ -8,7 +8,7 @@ export Send_Email(string filedate='',string email='',string buildname , string b
 	
 	
 					
-   export emaillist := if ( email = '', _Control.MyInfo.EmailAddressNotify+','+myemail , email + ',' + myemail );
+   export emaillist := if ( email = '', myemail , email + ',' + myemail );
 				
 
 	export build_success
