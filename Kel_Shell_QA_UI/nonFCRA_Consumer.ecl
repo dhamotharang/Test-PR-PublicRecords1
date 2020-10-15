@@ -5,9 +5,9 @@
 												 Records_to_Run,
 												 GLBA,
 												 DPPA,
-												 DataPermissionMask,
-												 DataRestrictionMask,
-												 LexIdSourceOptout,
+												 DPM,
+												 DRM,
+												 LexIdSO,
 												 TransactionId,
 												 BatchUID,
 												 GCID,
@@ -108,8 +108,8 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT BOOLEAN isFCRA := FALSE;
 	EXPORT STRING ArchiveDate := histDate;
 	EXPORT STRING InputFileName := InputFile_LogicalName;
-	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
-	EXPORT STRING Data_Permission_Mask := DataPermissionMask;
+	EXPORT STRING Data_Restriction_Mask := DRM;
+	EXPORT STRING Data_Permission_Mask := DPM;
 	EXPORT UNSIGNED GLBAPurpose := GLBA;
 	EXPORT UNSIGNED DPPAPurpose := DPPA;
 	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
@@ -147,7 +147,7 @@ soapLayout trans (pp le):= TRANSFORM
 	SELF.DPPAPurpose := Settings.DPPAPurpose;
 	SELF.IsMarketing := FALSE;
 	SELF.OutputMasterResults := Output_Master_Results;
-	SELF.LexIdSourceOptout := LexIdSourceOptout;
+	SELF.LexIdSourceOptout := LexIdSO;
 	SELF._TransactionId := TransactionId;
 	SELF._BatchUID := BatchUID;
 	SELF._GCID := GCID;
@@ -167,8 +167,8 @@ END;
 bwr_results := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				// 'publicrecords_kel.MAS_nonFCRA_Service', 
-				'publicrecords_kel.mas_nonfcra_service.27',
+				'publicrecords_kel.MAS_nonFCRA_Service', 
+				// 'publicrecords_kel.mas_nonfcra_service.27',
 				{soap_in}, 
 				DATASET(layout_MAS_Test_Service_output),
 				XPATH('*'),

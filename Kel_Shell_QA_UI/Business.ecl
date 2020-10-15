@@ -5,9 +5,9 @@
 								 Records_to_Run,
 								 GLBA, 
 								 DPPA,
-								 DataPermissionMask,
-								 DataRestrictionMask,
-								 LexIdSourceOptout,
+								 DPM,
+								 DRM,
+								 LexIdSO,
 								 TransactionId,
 								 BatchUID,
 								 GCID, 
@@ -223,8 +223,8 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT BOOLEAN isFCRA := FALSE;
 	EXPORT STRING ArchiveDate := historyDate;
 	EXPORT STRING InputFileName := InputFile_LogicalName;
-	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
-	EXPORT STRING Data_Permission_Mask := DataPermissionMask;
+	EXPORT STRING Data_Restriction_Mask := DRM;
+	EXPORT STRING Data_Permission_Mask := DPM;
 	EXPORT UNSIGNED GLBAPurpose := GLBA;
 	EXPORT UNSIGNED DPPAPurpose := DPPA;
 	EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
@@ -270,7 +270,7 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 	SELF.BIPAppendPrimForce := Settings.BusinessLexIDPrimForce;
 	SELF.BIPAppendReAppend := Settings.BusinessLexIDReAppend;
 	SELF.BIPAppendIncludeAuthRep := Settings.BusinessLexIDIncludeAuthRep;
-	SELF.LexIdSourceOptout := LexIdSourceOptout;
+	SELF.LexIdSourceOptout := LexIdSO;
 	SELF._TransactionId := TransactionId;
 	SELF._BatchUID := BatchUID;
 	SELF._GCID := GCID;	

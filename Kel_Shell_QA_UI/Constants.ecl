@@ -3,9 +3,22 @@ IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD;
 //*************  Environments  ************* 
 
 EXPORT BOCA_DEV_ROXIE:= RiskWise.shortcuts.Dev156;
-// EXPORT BOCA_CERT_ROXIE:= ;
-// EXPORT BOCA_PROD_ROXIE:= ;
-// EXPORT VAULT:=;
+
+//nonFCRA cert
+EXPORT QA_neutral_roxieIP := 'http://certqavip.hpcc.risk.regn.net:9876';
+
+EXPORT staging_neutral_roxieIP := 'http://certqavip.hpcc.risk.regn.net:9876';
+//I think both of these are pointed to the cert VIP
+
+// FCRA cert
+EXPORT staging_fcra_roxieIP :='http://certfcraroxievip.hpcc.risk.regn.net:9876';
+
+// nonFCRA prod VIP
+EXPORT prod_batch_neutral := 'http://roxiethorvip.hpcc.risk.regn.net:9856';
+
+// FCRA prod VIP
+EXPORT prod_batch_fcra := 'http://fcrathorvip.hpcc.risk.regn.net:9876';
+
 
 //************* DALI ****************
 
