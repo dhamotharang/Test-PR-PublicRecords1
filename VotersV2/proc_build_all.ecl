@@ -45,11 +45,14 @@ export proc_build_all(string filedate) := function
 																	Orbit3.proc_Orbit3_CreateBuild_AddItem('FCRA Voter Registrations',filedate,'F')
 																);
 	return if(thorlib.wuid()[2..5] <= VotersV2._Flags.stop_year,
-	          sequential(
+	          sequential(						           
+                       Scrubs.ScrubsPlus('Voters','Scrubs_Voters','Scrubs_Voters_In_Reg','In_Reg',filedate,mailTarget),	
+ 		                   if(scrubs.mac_ScrubsFailureTest('Scrubs_Voters_In_Reg',filedate) AND scrubs.mac_ScrubsFailureTest('Scrubs_Voters_In_Reg',filedate)
+													,OUTPUT('Scrubs passed.  Continuing to the Build_Base step.')				
+													,FAIL('Scrubs failed.  Base and keys not built.  Processing stopped.')
+													),			
 						           build_base,
                        build_census,
-                       Scrubs.ScrubsPlus('Voters','Scrubs_Voters','Scrubs_Voters_Base_History','Base_History',filedate,mailTarget),
-                       Scrubs.ScrubsPlus('Voters','Scrubs_Voters','Scrubs_Voters_Base_Reg' ,'Base_Reg' ,filedate,mailTarget),
 										   build_keys,
 										   build_gender,
 										   parallel(update_dops,build_stats),
