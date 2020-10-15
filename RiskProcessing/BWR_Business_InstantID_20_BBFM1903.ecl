@@ -2,7 +2,7 @@
 #OPTION ('hthorMemoryLimit', 1000);
 #OPTION('OUTPUTLIMIT', 2000); 
 
-IMPORT IESP, Risk_Indicators, RiskWise, UT;
+IMPORT Data_Services, IESP, Risk_Indicators, RiskWise, UT;
 
 /* ********************************************************************
  *                               OPTIONS                              *
@@ -21,7 +21,7 @@ roxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;  // Roxie Batch Produc
 // roxieIP := RiskWise.shortcuts.prod_batch_neutral;       // Production
 // roxieIP := RiskWise.shortcuts.Dev156;                   // Development Roxie 156
 
-inputFile := ut.foreign_prod + 'rbao::in::huntington_8778_415_bus_r1_in.csv';
+inputFile := Data_Services.foreign_prod + 'rbao::in::huntington_8778_415_bus_r1_in.csv';
 outputFile := '~rbao::out::htt_BIID2_BBFM1903_905_cur_' + ThorLib.wuid();
 
 includeSBFE := FALSE;		// Just return SBA attributes without SBFE attributes	
@@ -175,123 +175,123 @@ soapLayout := RECORD
 END;
 
 soapLayout TRANSFORM_input_request(f le, UNSIGNED8 ctr) := TRANSFORM
-  u := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_User, 
+  u := DATASET([TRANSFORM(iesp.share.t_User, 
       SELF.AccountNumber := le.accountnumber; 
       SELF.DLPurpose := DPPAPurpose_val; 
       SELF.GLBPurpose := GLBPurpose_val; 
       SELF.DataRestrictionMask := dataRestrictionMask_val; 
       SELF.DataPermissionMask := dataPermissionMask_val; 
-      SELF := []));
-  o := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.businessinstantid20.t_BIID20Options, 
+      SELF := [])]);
+  o := DATASET([TRANSFORM(iesp.businessinstantid20.t_BIID20Options, 
       SELF.OverrideExperianRestriction := includeExperian;
       SELF.AttributesVersionRequest := AttributesRequested; 
       SELF.IncludeModels.Names := ModelsRequested; 
             SELF.HistoryDate := IF(histDate = 0, le.HistoryDate, histDate);
-      SELF := []));
-  c := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.businessinstantid20.t_BIID20Company, 
+      SELF := [])]);
+  c := DATASET([TRANSFORM(iesp.businessinstantid20.t_BIID20Company, 
       SELF.CompanyName := le.CompanyName; 
       SELF.AlternateCompanyName := le.AlternateCompanyName; 
-      SELF.Address := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Address, 
+      SELF.Address := DATASET([TRANSFORM(iesp.share.t_Address, 
             SELF.StreetAddress1 := le.Addr;
             SELF.StreetAddress2 := le.accountnumber;
             SELF.City := le.City; 
             SELF.State := le.State; 
             SELF.Zip5 := le.Zip[1..5]; 
             SELF.Zip4 := le.Zip[6..9]; 
-            SELF := []))[1];
+            SELF := [])])[1];
       SELF.Phone := le.BusinessPhone;
       SELF.FEIN := le.TaxIdNumber;
-      SELF := []));
+      SELF := [])]);
       
-  a1 := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.businessinstantid20.t_BIID20AuthRep, 
-      SELF.Name := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Name, 
+  a1 := DATASET([TRANSFORM(iesp.businessinstantid20.t_BIID20AuthRep, 
+      SELF.Name := DATASET([TRANSFORM(iesp.share.t_Name, 
             SELF.First := le.Representativefirstname; 
             SELF.Middle := le.RepresentativeMiddleName; 
             SELF.Last := le.Representativelastname; 
             SELF.Suffix := le.RepresentativeNameSuffix; 
-            SELF := []))[1]; 
+            SELF := [])])[1]; 
       SELF.FormerLastName := le.RepresentativeFormerLastName; 
-      SELF.Address := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Address, 
+      SELF.Address := DATASET([TRANSFORM(iesp.share.t_Address, 
             SELF.StreetAddress1 := le.RepresentativeAddr; 
             SELF.City := le.RepresentativeCity; 
             SELF.State := le.RepresentativeState; 
             SELF.Zip5 := le.RepresentativeZip[1..5]; 
             SELF.Zip4 := le.RepresentativeZip[6..9]; 
-            SELF := []))[1];
-      SELF.DOB := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Date, 
+            SELF := [])])[1];
+      SELF.DOB := DATASET([TRANSFORM(iesp.share.t_Date, 
             SELF.Year := (INTEGER)le.RepresentativeDOB[1..4];
             SELF.Month := (INTEGER)le.RepresentativeDOB[5..6];
             SELF.Day := (INTEGER)le.RepresentativeDOB[7..8];
-            SELF := []))[1]; 
+            SELF := [])])[1]; 
       SELF.Age := le.RepresentativeAge; 
       SELF.SSN := le.RepresentativeSSN; 
       SELF.Phone := le.RepresentativeHomePhone; 
       SELF.DriverLicenseNumber := le.RepresentativeDLNumber; 
       SELF.DriverLicenseState := le.RepresentativeDLState; 
-      SELF := []));
+      SELF := [])]);
       
-  a2 := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.businessinstantid20.t_BIID20AuthRep, 
-      SELF.Name := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Name, 
+  a2 := DATASET([TRANSFORM(iesp.businessinstantid20.t_BIID20AuthRep, 
+      SELF.Name := DATASET([TRANSFORM(iesp.share.t_Name, 
             SELF.First := ''; 
             SELF.Middle := ''; 
             SELF.Last := ''; 
             SELF.Suffix := ''; 
-            SELF := []))[1]; 
+            SELF := [])])[1]; 
       SELF.FormerLastName := ''; 
-      SELF.Address := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Address, 
+      SELF.Address := DATASET([TRANSFORM(iesp.share.t_Address, 
             SELF.StreetAddress1 := ''; 
             SELF.City := ''; 
             SELF.State := ''; 
             SELF.Zip5 := ''; 
             SELF.Zip4 := ''; 
-            SELF := []))[1];
-      SELF.DOB := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Date, 
+            SELF := [])])[1];
+      SELF.DOB := DATASET([TRANSFORM(iesp.share.t_Date, 
             SELF.Year := (INTEGER)'';
             SELF.Month := (INTEGER)'';
             SELF.Day := (INTEGER)'';
-            SELF := []))[1]; 
+            SELF := [])])[1]; 
       SELF.Age := ''; 
       SELF.SSN := ''; 
       SELF.Phone := ''; 
       SELF.DriverLicenseNumber := ''; 
       SELF.DriverLicenseState := ''; 
-      SELF := []));
-  a3 := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.businessinstantid20.t_BIID20AuthRep, 
-      SELF.Name := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Name, 
+      SELF := [])]);
+  a3 := DATASET([TRANSFORM(iesp.businessinstantid20.t_BIID20AuthRep, 
+      SELF.Name := DATASET([TRANSFORM(iesp.share.t_Name, 
             SELF.First := ''; 
             SELF.Middle := ''; 
             SELF.Last := ''; 
             SELF.Suffix := ''; 
-            SELF := []))[1]; 
+            SELF := [])])[1]; 
       SELF.FormerLastName := ''; 
-      SELF.Address := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Address, 
+      SELF.Address := DATASET([TRANSFORM(iesp.share.t_Address, 
             SELF.StreetAddress1 := ''; 
             SELF.City := ''; 
             SELF.State := ''; 
             SELF.Zip5 := ''; 
             SELF.Zip4 := ''; 
-            SELF := []))[1]; 
-      SELF.DOB := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Date, 
+            SELF := [])])[1]; 
+      SELF.DOB := DATASET([TRANSFORM(iesp.share.t_Date, 
             SELF.Year := (INTEGER)'';
             SELF.Month := (INTEGER)'';
             SELF.Day := (INTEGER)'';
-            SELF := []))[1]; 
+            SELF := [])])[1]; 
       SELF.Age := ''; 
       SELF.SSN := ''; 
       SELF.Phone := ''; 
       SELF.DriverLicenseNumber := ''; 
       SELF.DriverLicenseState := ''; 
-      SELF := []));
-  s := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.businessinstantid20.t_BIID20SearchBy, SELF.Sequence:= (STRING)ctr; 
+      SELF := [])]);
+  s := DATASET([TRANSFORM(iesp.businessinstantid20.t_BIID20SearchBy, SELF.Sequence:= (STRING)ctr; 
                                                                                      SELF.Company := c[1]; 
                                                                                      SELF.AuthorizedRep1 := a1[1]; 
                                                                                      SELF.AuthorizedRep2 := a2[1]; 
                                                                                      SELF.AuthorizedRep3 := a3[1]; 
-                                                                                     SELF := []));
-  r := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.businessinstantid20.t_BusinessInstantID20Request, SELF.User := u[1]; SELF.Options := o[1]; SELF.SearchBy := s[1]; SELF := []));
+                                                                                     SELF := [])]);
+  r := DATASET([TRANSFORM(iesp.businessinstantid20.t_BusinessInstantID20Request, SELF.User := u[1]; SELF.Options := o[1]; SELF.SearchBy := s[1]; SELF := [])]);
   SELF.BusinessInstantID20Request := r[1];
 
-  SELF.HistoryDateYYYYMM := IF(histDateYYYYMM = 0, (INTEGER)(STRING)le.historydate[1..6], histDateYYYYMM);
+  SELF.HistoryDateYYYYMM := IF(histDateYYYYMM = 0, (INTEGER)((STRING)le.historydate)[1..6], histDateYYYYMM);
   SELF.HistoryDate       := IF(histDate       = 0, le.historydate, histDate); // Input file doesn't have any other history date field besides historydateyyyymm.  
 
   SELF.OFAC_Version := 3;
@@ -404,8 +404,8 @@ flatLayout flatten(businessinstantid20AnalyticsOUTPUT le, businessinstantid20Ana
 END;
 
 flattenedResults := JOIN(validResults, businessinstantid20Analytics_input, 
-                  LEFT.Result.InputEcho.Company.address.StreetAddress2 = RIGHT.AccountNumber,
-                  flatten(LEFT, RIGHT));
+                         LEFT.Result.InputEcho.Company.address.StreetAddress2 = RIGHT.AccountNumber,
+                         flatten(LEFT, RIGHT), LOCAL);
                   
 OUTPUT(CHOOSEN(flattenedResults(modelscore != 0), eyeball), NAMED('flattenedResults'));
 OUTPUT(flattenedResults,,outputFile,CSV(HEADING(single), QUOTE('"')), OVERWRITE);
