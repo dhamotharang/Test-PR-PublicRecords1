@@ -66,6 +66,7 @@ EXPORT ReportRecords (DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) 
  ds_in_w_did := JOIN(ds_in, ds_dids_combined_dedup,
                       LEFT.acctno = (STRING) RIGHT.Seq, 
                       TRANSFORM(FraudShared_Services.Layouts.BatchInExtended_rec,
+                        SELF.seq := RIGHT.Seq,
                         SELF.did := MAP(LEFT.did != 0 => LEFT.did,
                                         LEFT.did = 0 AND ~multiple_did_resolved => RIGHT.did,
                                         0);
@@ -73,7 +74,17 @@ EXPORT ReportRecords (DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) 
                         LEFT OUTER);                                
                                       
  // Call appends for identities found in order to get risk scores from KEL analytics.
- ds_best_in := PROJECT(ds_dids_combined_dedup, TRANSFORM(DidVille.Layout_Did_OutBatch,SELF := LEFT));
+ ds_best_in := PROJECT(ds_in_w_did, TRANSFORM(DidVille.Layout_Did_OutBatch,
+                                      SELF.fname := LEFT.name_first,
+                                      SELF.mname := LEFT.name_middle,
+                                      SELF.lname := LEFT.name_last,
+                                      SELF.suffix := LEFT.name_suffix,
+                                      SELF.phone10 := LEFT.phoneno,
+                                      SELF.email := LEFT.email_address,
+                                      SELF.dl_nbr := LEFT.dl_number,
+                                      SELF.dl_state := LEFT.dl_state,
+                                      SELF := LEFT,
+                                      SELF := []));
  ds_pr_best := RiskIntelligenceNetwork_Services.Functions.getGovernmentBest(ds_best_in, in_params);
  ds_pr_best_ungrp := UNGROUP(ds_pr_best);
 
@@ -95,7 +106,7 @@ EXPORT ReportRecords (DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) 
                         
  iesp.identityriskreport.t_RINIdentityRiskReportRecord trans_API_Assessment(RiskIntelligenceNetwork_analytics.Layouts.LiveAssessmentScores L) := TRANSFORM
  //Following line Purposely commented and left here for quick debug. 
-//  iesp.identityriskreport.t_RINIdentityRiskReportRecord trans_API_Assessment() := TRANSFORM
+ // iesp.identityriskreport.t_RINIdentityRiskReportRecord trans_API_Assessment() := TRANSFORM
   
   KnownRiskCount := COUNT(L.KrAttributes);
   knrisk_ds := PROJECT(L.KrAttributes, 
@@ -135,32 +146,33 @@ EXPORT ReportRecords (DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) 
  
  result := PROJECT(ds_API_Assessment, trans_API_Assessment(LEFT));
  //Following line Purposely commented and left here for quick debug. 
-//  result := DATASET([trans_API_Assessment()]);
+ // result := DATASET([trans_API_Assessment()]);
  
- //output LOG_Deltabase_Layout_Record
+ // output LOG_Deltabase_Layout_Record
  deltabase_log := RiskIntelligenceNetwork_Services.Functions.GetDeltabaseLogDataSet(ds_in_w_did, in_params);
  OUTPUT(deltabase_log, NAMED('log_delta__fraudgov_delta__identity'));
  
- //Debug Outputs
-//  OUTPUT(ds_in, named('ds_in'));
-//  OUTPUT(Minimum_input_for_rinID, named('Minimum_input_for_rinID'));
-//  OUTPUT(InputDidFoundInPR, named('InputDidFoundInPR'));
-//  OUTPUT(InputDidFoundInCR, named('InputDidFoundInCR'));
-//  OUTPUT(ds_in_without_did, named('ds_in_without_did'));
-//  OUTPUT(ds_input_pii, named('ds_input_pii'));
-//  OUTPUT(ds_pr_did, named('ds_pr_did'));
-//  OUTPUT(ds_pr_did_final, named('ds_pr_did_final'));
-//  OUTPUT(ds_auto_out, named('ds_auto_out'));
-//  OUTPUT(ds_payload_recs, named('ds_payload_recs'));
-//  OUTPUT(ds_payload_recs_filtered, named('ds_payload_recs_filtered'));
-//  OUTPUT(ds_contributory_dids, named('ds_contributory_dids'));
-//  OUTPUT(ds_dids_combined, named('ds_dids_combined'));
-//  OUTPUT(ds_dids_combined_dedup, named('ds_dids_combined_dedup'));
-//  OUTPUT(multiple_did_resolved, named('multiple_did_resolved'));
-//  OUTPUT(ds_in_w_did, named('ds_in_w_did'));
-//  OUTPUT(ds_pr_best_ungrp, named('ds_pr_best_ungrp'));
+ // Debug Outputs
+ // OUTPUT(ds_in, named('ds_in'));
+ // OUTPUT(Minimum_input_for_rinID, named('Minimum_input_for_rinID'));
+ // OUTPUT(InputDidFoundInPR, named('InputDidFoundInPR'));
+ // OUTPUT(InputDidFoundInCR, named('InputDidFoundInCR'));
+ // OUTPUT(ds_in_without_did, named('ds_in_without_did'));
+ // OUTPUT(ds_input_pii, named('ds_input_pii'));
+ // OUTPUT(ds_pr_did, named('ds_pr_did'));
+ // OUTPUT(ds_pr_did_final, named('ds_pr_did_final'));
+ // OUTPUT(ds_auto_out, named('ds_auto_out'));
+ // OUTPUT(ds_payload_recs, named('ds_payload_recs'));
+ // OUTPUT(ds_payload_recs_filtered, named('ds_payload_recs_filtered'));
+ // OUTPUT(ds_contributory_dids, named('ds_contributory_dids'));
+ // OUTPUT(ds_dids_combined, named('ds_dids_combined'));
+ // OUTPUT(ds_dids_combined_dedup, named('ds_dids_combined_dedup'));
+ // OUTPUT(multiple_did_resolved, named('multiple_did_resolved'));
+ // OUTPUT(ds_in_w_did, named('ds_in_w_did'));
+ // OUTPUT(ds_pr_best_ungrp, named('ds_pr_best_ungrp'));
+ // OUTPUT(ds_pr_appends, named('ds_pr_appends'));
  // OUTPUT(ds_API_Assessment, named('ds_API_Assessment')); 
-//  OUTPUT(IdentityResolved, named('IdentityResolved'));
+ // OUTPUT(IdentityResolved, named('IdentityResolved'));
  // OUTPUT(result, named('result'));
  
  RETURN result;

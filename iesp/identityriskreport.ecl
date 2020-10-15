@@ -13,7 +13,7 @@ export t_RINIdentityRiskReportOption := record (iesp.identityreport.t_RINIdentit
 end;
 		
 export t_RINRiskAttributeCount := record
-	string10 RiskAttributeType {xpath('RiskAttributeType')};
+	string25 RiskAttributeType {xpath('RiskAttributeType')};
 	unsigned2 Count {xpath('Count')};
 end;
 		
