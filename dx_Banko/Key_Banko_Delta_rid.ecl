@@ -2,9 +2,9 @@
 
 rec := dx_common.layout_ridkey;
 
-Keyfields := record
+Keyfields := RECORD
 rec.record_sid;
-end;
+END;
 
 EXPORT Key_Banko_Delta_rid (UNSIGNED1 data_env = Data_Services.data_env.iNonFCRA) := 
                                        INDEX(Keyfields, rec - Keyfields, $.names(data_env).i_DeltaRID);
