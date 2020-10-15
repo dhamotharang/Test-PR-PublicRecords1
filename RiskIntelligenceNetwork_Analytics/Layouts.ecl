@@ -80,7 +80,8 @@ EXPORT LayoutInputPII_2 := RECORD
 					STRING dl_number,
 					STRING dl_state,
 					BOOLEAN phonesMetaHit,
-					STRING prepaidPhone
+					STRING prepaidPhone,
+					STRING2 curr_st
 END;
 
 
