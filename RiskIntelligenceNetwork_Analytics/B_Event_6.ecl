@@ -4,8 +4,8 @@ IMPORT B_Event_7,E_Address,E_Bank,E_Bank_Account,E_Customer,E_Drivers_License,E_
 IMPORT * FROM KEL11.Null;
 EXPORT B_Event_6 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_7.__ENH_Event_7) __ENH_Event_7 := B_Event_7.__ENH_Event_7;
-  SHARED __EE29638 := __ENH_Event_7;
-  EXPORT __ST19732_Layout := RECORD
+  SHARED __EE30155 := __ENH_Event_7;
+  EXPORT __ST20165_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date_;
@@ -68,7 +68,7 @@ EXPORT B_Event_6 := MODULE
     KEL.typ.nstr _reason6_;
     KEL.typ.nint _socsvalflag_;
     KEL.typ.nint _drlcvalflag_;
-    KEL.typ.nint _hphonevalflag_;
+    KEL.typ.nstr _hphonevalflag_;
     KEL.typ.nstr _historydatetimestamp_;
     KEL.typ.nkdate _reported__dob_;
     KEL.typ.nkdate _bocashell__addr1__dt__first__seen_;
@@ -258,10 +258,10 @@ EXPORT B_Event_6 := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  SHARED __ST19732_Layout __ND29893__Project(B_Event_7.__ST20297_Layout __PP28369) := TRANSFORM
-    SELF.T1___Lex_Id_Pop_Flag_ := MAP(__T(__OP2(__PP28369.T___Person_Uid_Echo_,=,__CN(-99999)))=> -99999,__PP28369.No_Lex_Id_ = 1=>0,1);
-    SELF.T___Bc_Shll_Lex_Id_Echo_ := MAP(__PP28369.T___Is_Bc_Shll_Hit_Flag_ < 1 OR __PP28369.T___Src_Class_Type_ < 4=>__ECAST(KEL.typ.nint,__CN(-99998)),__T(__OP2(__PP28369.Bocashell_Lex_Id_,=,__CN(0)))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP28369.Bocashell_Lex_Id_));
-    SELF := __PP28369;
+  SHARED __ST20165_Layout __ND30410__Project(B_Event_7.__ST20730_Layout __PP28886) := TRANSFORM
+    SELF.T1___Lex_Id_Pop_Flag_ := MAP(__T(__OP2(__PP28886.T___Person_Uid_Echo_,=,__CN(-99999)))=> -99999,__PP28886.No_Lex_Id_ = 1=>0,1);
+    SELF.T___Bc_Shll_Lex_Id_Echo_ := MAP(__PP28886.T___Is_Bc_Shll_Hit_Flag_ < 1 OR __PP28886.T___Src_Class_Type_ < 4=>__ECAST(KEL.typ.nint,__CN(-99998)),__T(__OP2(__PP28886.Bocashell_Lex_Id_,=,__CN(0)))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP28886.Bocashell_Lex_Id_));
+    SELF := __PP28886;
   END;
-  EXPORT __ENH_Event_6 := PROJECT(__EE29638,__ND29893__Project(LEFT));
+  EXPORT __ENH_Event_6 := PROJECT(__EE30155,__ND30410__Project(LEFT));
 END;
