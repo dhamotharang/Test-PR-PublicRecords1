@@ -26,7 +26,7 @@ EXPORT Mapping_Common_Spoofing(string8 version) := FUNCTION
 		self.date_added						:= _Functions.clNum(l.date_added)[1..8];
 		self.time_added						:= _Functions.clNum(l.date_added)[9..];
 		self         							:= l;
-	end;
+	END;
 	 
 	phoneNorm 	:= normalize(inFile, 3, spoofTr(left,counter))(phone<>'');
 	concatFile	:= phoneNorm + PhoneFraud.File_Spoofing.Base; //-20200921 change to delta update

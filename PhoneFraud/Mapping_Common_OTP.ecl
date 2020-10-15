@@ -44,7 +44,7 @@ inFile := PhoneFraud.File_OTP.Raw(trim(_Functions.rmNull(otp_id), left, right)<>
 		self.date_added 						:= _Functions.clNum(l.date_added)[1..8];
 		self.time_added 						:= _Functions.clNum(l.date_added)[9..];
 		self         								:= l;
-	end;
+	END;
 	
 	cmnMap 			:= project(inFile, fixFields(left));
 	
@@ -54,7 +54,7 @@ inFile := PhoneFraud.File_OTP.Raw(trim(_Functions.rmNull(otp_id), left, right)<>
 	PhoneFraud.Layout_OTP.Base fixFields2(srt_phone l, srt_phone r):= transform
 		self.otp_phone := if(trim(l.otp_phone, left, right)='', trim(r.otp_phone, left, right), l.otp_phone);	
 		self := l;
-	end;
+	END;
 	
 	fixField 		:= join(srt_phone(otp_phone=''), srt_phone(otp_phone<>''),
 											left.otp_id = right.otp_id and
