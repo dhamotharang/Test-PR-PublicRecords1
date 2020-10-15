@@ -405,7 +405,7 @@ END;
 
 flattenedResults := JOIN(validResults, businessinstantid20Analytics_input, 
                          LEFT.Result.InputEcho.Company.address.StreetAddress2 = RIGHT.AccountNumber,
-                         flatten(LEFT, RIGHT), LOCAL);
+                         flatten(LEFT, RIGHT));
                   
 OUTPUT(CHOOSEN(flattenedResults(modelscore != 0), eyeball), NAMED('flattenedResults'));
 OUTPUT(flattenedResults,,outputFile,CSV(HEADING(single), QUOTE('"')), OVERWRITE);
