@@ -4,8 +4,8 @@ IMPORT E_Address,E_Bank,E_Bank_Account,E_Customer,E_Drivers_License,E_Email,E_Ev
 IMPORT * FROM KEL11.Null;
 EXPORT B_Event_8 := MODULE
   SHARED VIRTUAL TYPEOF(E_Event.__Result) __E_Event := E_Event.__Result;
-  SHARED __EE24572 := __E_Event;
-  EXPORT __ST20801_Layout := RECORD
+  SHARED __EE25089 := __E_Event;
+  EXPORT __ST21234_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date_;
@@ -68,7 +68,7 @@ EXPORT B_Event_8 := MODULE
     KEL.typ.nstr _reason6_;
     KEL.typ.nint _socsvalflag_;
     KEL.typ.nint _drlcvalflag_;
-    KEL.typ.nint _hphonevalflag_;
+    KEL.typ.nstr _hphonevalflag_;
     KEL.typ.nstr _historydatetimestamp_;
     KEL.typ.nkdate _reported__dob_;
     KEL.typ.nkdate _bocashell__addr1__dt__first__seen_;
@@ -252,9 +252,9 @@ EXPORT B_Event_8 := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  SHARED __ST20801_Layout __ND24825__Project(E_Event.Layout __PP23341) := TRANSFORM
-    SELF.T___Src_Type_ := MAP(__T(__OR(__OP2(__PP23341._rin__source_,<=,__CN(0)),__OP2(__PP23341._rin__source_,>,__CN(15))))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP23341._rin__source_));
-    SELF := __PP23341;
+  SHARED __ST21234_Layout __ND25342__Project(E_Event.Layout __PP23858) := TRANSFORM
+    SELF.T___Src_Type_ := MAP(__T(__OR(__OP2(__PP23858._rin__source_,<=,__CN(0)),__OP2(__PP23858._rin__source_,>,__CN(15))))=>__ECAST(KEL.typ.nint,__CN(-99997)),__ECAST(KEL.typ.nint,__PP23858._rin__source_));
+    SELF := __PP23858;
   END;
-  EXPORT __ENH_Event_8 := PROJECT(__EE24572,__ND24825__Project(LEFT));
+  EXPORT __ENH_Event_8 := PROJECT(__EE25089,__ND25342__Project(LEFT));
 END;

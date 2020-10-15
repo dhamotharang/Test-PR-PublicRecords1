@@ -143,10 +143,10 @@ EXPORT GetIndustryBipLinkids(DATASET(BIPV2.IDlayouts.l_xlink_ids)  bipLinkids,
                                                                                                   
   ds_TheBestNaicsCode := IF (in_options.BestNaicsCode[1].NaicsCode != '', DATASET([{in_options.BestNaicsCode[1].naicsCode}], {STRING8 NaicsCode}));
                                                                                                                                                           
-   ds_Slim_ds_indusrecs_sic_wdescs := ds_Tmpds_indusrecs_sic_wdescs(siccode !=  TRIM(ds_TheBestSicCode[1].sicCode,LEFT,RIGHT));
+   ds_Slim_ds_indusrecs_sic_wdescs := ds_Tmpds_indusrecs_sic_wdescs(siccode !=  TRIM(ds_TheBestSicCode[1].sicCode[1..4],LEFT,RIGHT));
    ds_Slim_ds_indusrecs_naics_wdesc := ds_Tmpds_indusrecs_naics_wdescs(naics != TRIM(ds_TheBestNaicsCode[1].naicsCode,LEFT,RIGHT));
    
-   ds_BestSlim_ds_indusrecs_sic_wdescs := ds_Tmpds_indusrecs_sic_wdescs(siccode = TRIM(ds_TheBestSicCode[1].sicCode,LEFT,RIGHT));
+   ds_BestSlim_ds_indusrecs_sic_wdescs := ds_Tmpds_indusrecs_sic_wdescs(siccode = TRIM(ds_TheBestSicCode[1].sicCode[1..4],LEFT,RIGHT));
    ds_BestSlim_ds_indusrecs_naics_wdesc  := ds_Tmpds_indusrecs_naics_wdescs(naics = TRIM(ds_TheBestNaicsCode[1].naicsCode,LEFT,RIGHT));
    // if sic does not exist  result of the filter above then add it to the top of list of sics.
    // and if it does exist (2nd part of if statement) then use the filtered sic/naics from industry key list as it has a description along with it

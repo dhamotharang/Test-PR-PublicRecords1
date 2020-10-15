@@ -353,7 +353,7 @@ Event := ENTITY(QUERY(UID(record_id),
     STRING reason6,
     INTEGER socsvalflag,
     INTEGER drlcvalflag,
-    INTEGER hphonevalflag,
+    STRING hphonevalflag,
 
     BOOLEAN truedid = truedid,
     STRING best_fname   = best_flags.fname,
@@ -934,6 +934,15 @@ Event: => T19_BnkAcctIsKrFlag := MAP(T19_BnkAcctPopFlag = 0 => -99999,
                                                                  T_SrcClassType !=3 => -99998,
                                                                  T_BnkAcctStatusCodeEcho = -99997 => 0,
                                                                  T_BnkAcctStatusCodeEcho IN ['800','801','802','890','891','892','893'] => 1, -99997);
+																																 
+Event: => T1_HiRiskCviFlag :=  MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999, 
+                                    T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																		T1_NapSummary < 1 AND T1L_NasSummary < 1 => -99997,
+																		T1_Cvi <= 20 => 1, 0);
+Event: => T1_MedRiskCviFlag := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
+                                    T_IsBcShllHitFlag < 1 OR T_SrcClassType < 4 => -99998,
+																		T1_NapSummary < 1 AND T1L_NasSummary < 1 => -99997,
+																		T1_Cvi IN [30,40] => 1, 0);
 
 Event: => T1_IdIsKrGenFrdFlag := MAP(T1_LexIdPopFlag = 0 AND T1_RinIdPopFlag = 0 => -99999,
                                                                  T_SrcClassType != 3 => -99998,
@@ -1291,6 +1300,13 @@ Event: => T18_isanispecho := isanisp;
 
 QUERY: InputRin(DATASET OF RiskIntelligenceNetwork_Analytics.Layouts.KelInputLayout InputPIIDataset) <= Event 
          {
+								T20_DlPopFlag,
+								T20_DlValType,
+								T16_PhnValType,
+								T1L_IdIsBcShllHitFlag,
+								T1L_LexIdSeenFlag,
+								T1L_BcShllLexIdMatchesInpFlag,
+								T_BcShllLexIdEcho,
                  T1L_IdCurrIncarcFlag,
                   T1L_IdCrimFlSdMatchFlag,
 									T18_isanispecho,
@@ -1343,6 +1359,7 @@ T_InpClnAddrGeoBlkEcho,
 T_InpClnSsnEcho,
 T_InpClnDobEcho,
 T_InpClnDlStEcho,
+T_InpClnDlEcho,
 T_InpClnEmailEcho,
 T_InpClnBnkAcctEcho,
 T_InpClnBnkAcctRtgEcho,
@@ -1783,7 +1800,7 @@ T16_PhnPrePdFlag
                             add_curr_unit_desig = boca_shell_appends.address_verification.input_address_information.unit_desig,
                             add_curr_sec_range = boca_shell_appends.address_verification.input_address_information.sec_range,
                             add_curr_city_name = boca_shell_appends.address_verification.input_address_information.city_name,
-                            add_curr_st = boca_shell_appends.address_verification.input_address_information.st,
+                            add_curr_st = curr_st,
                             add_curr_zip5 = boca_shell_appends.address_verification.input_address_information.zip5,
                             add_curr_county = boca_shell_appends.address_verification.input_address_information.county,
                             add_curr_geo_blk = boca_shell_appends.address_verification.input_address_information.geo_blk,

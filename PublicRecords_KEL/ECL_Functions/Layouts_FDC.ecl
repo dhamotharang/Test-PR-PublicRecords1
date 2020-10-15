@@ -257,10 +257,9 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 
 	// --------------------[ Tradeline ]--------------------
 
-	SHARED Cortera_Tradeline__Key_LinkIds__key := dx_Cortera_Tradeline.Key_LinkIds.kFetch;
 	EXPORT Layout_Cortera_Tradeline__Key_LinkIds := RECORD
 		LayoutIDs;
-		RECORDOF(Cortera_Tradeline__Key_LinkIds__key);
+		dx_Cortera_Tradeline.Layouts.Layout_Tradeline_Key;
 		dpmtype;
 		STRING Archive_Date;
 	END;
