@@ -5,4 +5,4 @@ inFile := project(PhoneFraud.File_OTP.Base, PhoneFraud.Layout_OTP.Base-date_file
 EXPORT Key_OTP := index(inFile
 												,{otp_phone}
 												,{inFile}
-												,Data_Services.Data_location.Prefix('PhoneFraud')+'thor_data400::key::phonefraud_otp_'+doxie.Version_SuperKey);
+												,/*Data_Services.Data_location.Prefix('NONAMEGIVEN')+*/'~thor_data400::key::phonefraud_otp_'+doxie.Version_SuperKey);
