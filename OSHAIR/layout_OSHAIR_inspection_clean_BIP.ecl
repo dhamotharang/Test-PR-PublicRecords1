@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2;
+﻿IMPORT BIPV2; 
 
 EXPORT layout_OSHAIR_inspection_clean_BIP := RECORD
   unsigned4 dt_first_seen						 := 0;
@@ -10,4 +10,10 @@ EXPORT layout_OSHAIR_inspection_clean_BIP := RECORD
 	layout_OSHAIR_inspection_clean		 ;
 	unsigned8	raw_aid									 := 0;  //Added for AID
 	unsigned8	ace_aid									 := 0; //Added for AID
+	//Added for Cloud Project ~ DF-28288
+	unsigned8 record_sid := 0;
+  unsigned4 global_sid := 0;
+  unsigned4 dt_effective_first := 0;
+  unsigned4 dt_effective_last := 0;
+  unsigned1 delta_ind := 0; // 0 - main record, 1 - incremental  
 END;

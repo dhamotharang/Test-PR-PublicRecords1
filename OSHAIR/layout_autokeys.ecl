@@ -1,4 +1,4 @@
-IMPORT standard;
+﻿IMPORT standard; 
 
 // slimmed down version of OSHAIR.layout_OSHAIR_inspection_clean
 EXPORT layout_autokeys := RECORD
@@ -36,4 +36,10 @@ EXPORT layout_autokeys := RECORD
   unsigned2            BDID_score := 0;
   string9              FEIN_append  := '';
   standard.L_Address.base addr;
+	//Added for Cloud Project ~ DF-28288
+	unsigned8 record_sid := 0;
+  unsigned4 global_sid := 0;
+  unsigned4 dt_effective_first := 0;
+  unsigned4 dt_effective_last := 0;
+  unsigned1 delta_ind := 0; // 0 - main record, 1 - incremental  
 END;
