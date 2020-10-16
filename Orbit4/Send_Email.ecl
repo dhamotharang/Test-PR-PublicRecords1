@@ -1,5 +1,5 @@
 ﻿import _Control;
-export Send_Email(string filedate='',string email='',string buildname , string buildvs ):= module
+export Send_Email(string filedate='',string email=''):= module
 
 	shared myemail:='Sudhir.Kasavajjala@lexisnexisrisk.com';
 	
@@ -14,7 +14,7 @@ export Send_Email(string filedate='',string email='',string buildname , string b
 	export build_success
 						:= fileservices.sendemail(
 								emaillist
-								,'Orbit3 Spawn WU Succeeded ' + filedate + ', Build Name : '+buildname + ', Build Version : ' + buildvs
+								,'Orbit3 Spawn WU Succeeded ' + filedate
 								,'WUID:' + workunit
 							
 								);
@@ -22,7 +22,7 @@ export Send_Email(string filedate='',string email='',string buildname , string b
 	export build_failure
 						:= fileservices.sendemail(
 								emaillist
-								,'Orbit3 Spawn WU failed ' + filedate + ', Build Name : '+buildname + ', Build Version : ' + buildvs
+								,'Orbit3 Spawn WU failed ' + filedate
 								,'WUID:' + workunit+ ' ' + FAILMESSAGE
 								);
 end;
