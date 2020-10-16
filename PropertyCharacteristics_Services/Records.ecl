@@ -30,10 +30,10 @@ module
   shared dPropPayload := GetPropertyData (dataset ([CreateBatchRecord()]) (is_cleaned));
 	
 	//Obtain Lexid
-	SHARED Lexid				:= Get_HeaderData(pRequest.ReportBy.Name, pRequest.ReportBy.dob, pRequest.ReportBy.ssn, pRequest.ReportBy.DLNumber, pRequest.ReportBy.DLState, clean_addr);
+	SHARED Lexid				:= Get_Lexid(pRequest.ReportBy.Name, pRequest.ReportBy.dob, pRequest.ReportBy.ssn, pRequest.ReportBy.DLNumber, pRequest.ReportBy.DLState, clean_addr);
 
 	//Determine if opted out under ccpa
-	SHARED IsOptedOut		:= IF(Lexid <> 0, Get_OptOutData(Lexid), FALSE);
+	SHARED IsOptedOut		:= IF(Lexid <> 0, isOptOut(Lexid), FALSE);
 	   
   // Replicated the batch functionallity.  QB 5501
   dLNPropResultsFiltered := dPropPayload(

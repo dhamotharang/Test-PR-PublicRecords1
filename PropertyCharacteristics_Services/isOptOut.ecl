@@ -1,6 +1,6 @@
 ﻿IMPORT Doxie, Suppress;
 
-EXPORT Get_OptOutData ( UNSIGNED8 Lexid) := FUNCTION
+EXPORT isOptOut ( UNSIGNED8 Lexid) := FUNCTION
 	mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 	MAC_Suppress_In_Layout := RECORD
 		UNSIGNED6 did;

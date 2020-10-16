@@ -91,7 +91,7 @@ module
 	
 	EXPORT MSL_Src  							:= 'MLS';
 	
-	EXPORT CCPA_Global_SourceID		:= 27621;
-	EXPORT log_extension_type			:= 52;
-
+	EXPORT CCPA_Global_SourceID	:= 27621;
+	EXPORT log_extension_type		:= 52;
+	EXPORT DID_SCORE_THRESHOLD	:= 80;
 end;

@@ -1,12 +1,13 @@
-﻿IMPORT iesp, Address, dx_gateway, didville;
+﻿IMPORT iesp, Address, didville;
 
-EXPORT Get_HeaderData (	iesp.share.t_Name Name, 
+EXPORT Get_Lexid (	iesp.share.t_Name Name, 
 												iesp.share.t_date dob,
 												STRING9 SSN,
 												STRING25 DLNumber,
 												STRING2 DLState,
 												Address.ICleanAddress	clean_addr) := FUNCTION
-	dx_gateway.Layouts.common_optout create_request() := TRANSFORM
+	{DidVille.Layout_did_inbatch, unsigned6 did} create_request() := TRANSFORM
+		SELF.seq 					:= 1;
 		SELF.dob 					:= iesp.ECL2ESP.DateToString(DOB);
     SELF.prim_range 	:= clean_addr.prim_range;
     SELF.predir 			:= clean_addr.predir;
@@ -27,25 +28,11 @@ EXPORT Get_HeaderData (	iesp.share.t_Name Name,
 		SELF.ssn 					:= SSN;
 		SELF.dl_nbr 			:= DLNumber;
 		SELF.dl_state 		:= DLState;
-     
-		SELF.global_sid 	:= Constants.CCPA_Global_SourceID;
-    SELF.record_sid 	:= 0;
-    SELF.did 					:= 0;
-    SELF.seq 					:= 1;
-    SELF.transaction_id := '';
 		SELF 							:= [];
 	END;
 	ds_in_nodids 				:= DATASET([create_request()]);
 
   didville.MAC_DidAppend(ds_in_nodids, ds_in_append_local, TRUE, ''); 
-  rec_in_append 			:= JOIN(ds_in_nodids, ds_in_append_local, 
-													LEFT.seq		 = RIGHT.seq AND
-													RIGHT.score >= dx_gateway.Constants.DID_SCORE_THRESHOLD, 
-													TRANSFORM(dx_gateway.Layouts.common_optout, 
-														SELF.did 	:= if(RIGHT.did > 0, RIGHT.did, LEFT.did);
-														SELF 			:= LEFT), 
-													LEFT OUTER, KEEP(1), LIMIT(0)); 
-	
-  resolved_lexid 			:= rec_in_append[1].did;
+  resolved_lexid 			:= ds_in_append_local(did > 0 AND score >= Constants.DID_SCORE_THRESHOLD)[1].did;
 	RETURN resolved_lexid;
 END;
