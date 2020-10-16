@@ -7,4 +7,4 @@ fname (integer typ) := IF (typ = data_services.data_env.iFCRA,
                            $.names().i_search_delta_rid_super);
 
 
-EXPORT Key_Search_Delta_Rid(integer typ=0) := INDEX ({rec.record_sid}, rec, fname(typ),OPT);
+EXPORT key_search_delta_rid(integer typ=0) := INDEX ({rec.record_sid}, rec, fname(typ),OPT);
