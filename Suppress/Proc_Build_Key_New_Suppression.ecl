@@ -18,7 +18,7 @@ RoxieKeyBuild.Mac_SK_Move_V2('~thor_data400::key::new_suppression::fcra::@versio
 
 //New Name
     RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(Suppress.Key_New_Suppression(),'','~thor_data400::key::suppression::'+pversion+'::link_type_link_id',bld_key2,true);
-
+    //RoxieKeyBuild.MAC_build_logical(dx_Suppression.key_suppression(), , '','~thor_data400::key::suppression::'+pversion+'::link_type_link_id',bld_key2,true)
     //FCRA Key
     RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(Suppress.Key_New_Suppression(true),'','~thor_data400::key::suppression::fcra::'+pversion+'::link_type_link_id',bld_key_fcra2,true);
 
