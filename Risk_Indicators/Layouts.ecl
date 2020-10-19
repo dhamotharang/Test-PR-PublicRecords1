@@ -1481,6 +1481,7 @@ EXPORT layout_IDAFraud_in := RECORD
   String ProductID;
   String App_ID;
   String ESPTransactionId;
+  String Channel;
 END;
 
 EXPORT layout_IDAFraud_out := RECORD
