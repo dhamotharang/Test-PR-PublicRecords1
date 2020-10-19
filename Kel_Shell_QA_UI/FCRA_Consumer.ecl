@@ -237,7 +237,7 @@ Settings_Dataset_updated:= Settings_Dataset +
 
 result5:=OUTPUT(Settings_Dataset_updated, NAMED('Attributes_Settings'));
 
-result6:=STD.System.Email.SendEmail(email_list, 'KEL SHELL QA UI run job',  'Your WUID ' + workunit + ' has completed!');
+result6:=STD.System.Email.SendEmail(email_list, 'KEL SHELL QA UI run job',  'Your WUID ' + workunit + ' has completed!' + '\n You can see the results here. \n http://localhost/KAT/ ');
 
 seq:=sequential(result1, result2, result3, result4, result5, result6);
 
