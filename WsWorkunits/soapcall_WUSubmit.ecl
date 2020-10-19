@@ -33,7 +33,7 @@ function
 
   dWUSubmitResult  :=  
     soapcall(
-       'http://' + pESP + ':' + pESPPort + '/WsWorkunits'
+       'http://' + trim(pESP,left,right) + trim(':',left,right) + trim(pESPPort,left,right) + trim('/WsWorkunits',left,right)
       ,'WUSubmit'
       ,rWUSubmitRequest
       ,rWUSubmitResponse
@@ -42,7 +42,7 @@ function
 
   dWUSubmitResult_remote  :=  
     soapcall(
-       'http://' + pESP + ':' + pESPPort + '/WsWorkunits'
+       'http://' + trim(pESP,left,right) + trim(':',left,right) + trim(pESPPort,left,right) + trim('/WsWorkunits',left,right)
       ,'WUSubmit'
       ,rWUSubmitRequest
       ,rWUSubmitResponse
