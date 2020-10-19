@@ -1,4 +1,4 @@
-﻿IMPORT email_data, dx_email, WhoIs, ut, STD, MDR;
+﻿﻿IMPORT email_data, dx_email, WhoIs, ut, STD, MDR;
 
 EXPORT Map_WhoIs_Domain_Lookup(STRING version) := FUNCTION
 	
@@ -40,8 +40,6 @@ EXPORT Map_WhoIs_Domain_Lookup(STRING version) := FUNCTION
 														REGEXFIND(active_pattern, email_status) => 'ACTIVE',
 														''); 
 	  SELF.domain_status := tmpDomain_status;
-		SELF.domain_status_detail := ut.CleanSpacesAndUpper(L.status);
-	  // SELF.verifies_account := IF(email_status = 'ACCEPT_ALL','FALSE', '');
 		SELF.verifies_account := '';
 		SELF.source  := MDR.sourceTools.src_Whois_domains;
 	  SELF.process_date  := thorlib.wuid()[2..9];
@@ -54,12 +52,12 @@ EXPORT Map_WhoIs_Domain_Lookup(STRING version) := FUNCTION
   // Adding to Superfile
 	d_final := OUTPUT(pWhoIs_out,,'~thor_data400::in::email_dataV2::WhoIs_domain_lkp::' + version,__COMPRESSED__,OVERWRITE);
 
-  // Add_superfile := SEQUENTIAL(FileServices.StartSuperFileTransaction();
-										           // IF(NOT FileServices.FileExists(superfile_name),FileServices.CreateSuperFile(superfile_name));
-                               // FileServices.ClearSuperFile(superfile_name);						
-															 // FileServices.AddSuperFile(superfile_name, subfile_name);
-															 // FileServices.FinishSuperFileTransaction());
-	
-	RETURN  pWhoIs_out;
+  Add_superfile := SEQUENTIAL(FileServices.StartSuperFileTransaction();
+										           IF(NOT FileServices.FileExists(superfile_name),FileServices.CreateSuperFile(superfile_name));
+															 FileServices.ClearSuperFile(superfile_name);
+															 FileServices.AddSuperFile(superfile_name, subfile_name);
+															 FileServices.FinishSuperFileTransaction());
+
+  RETURN  SEQUENTIAL(d_final,Add_superfile);
 
 END;

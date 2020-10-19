@@ -1,4 +1,4 @@
-﻿IMPORT Email_DataV2, dx_Email, STD, PromoteSupers, RoxieKeyBuild, MDR,dops, Orbit3,ut;
+﻿﻿IMPORT Email_DataV2, dx_Email, STD, PromoteSupers, RoxieKeyBuild, MDR,dops, Orbit3,ut;
 
 EXPORT Proc_Build_Domain_Lookup(STRING version) := FUNCTION
 	
@@ -59,9 +59,9 @@ EXPORT Proc_Build_Domain_Lookup(STRING version) := FUNCTION
 										// Email_Event.Map_Email_Domain_Lookup,
 										,build_table
 										,build_key
-										// ,zDoPopulationStats
-										// ,dops_update
-										// ,orbit_update
+										,zDoPopulationStats
+										,dops_update
+										,orbit_update
 										);	
 	
 END;
