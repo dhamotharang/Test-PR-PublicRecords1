@@ -56,8 +56,7 @@ module
 	// Persistence/Growth check
 	GetDops          := dops.GetDeployedDatasets('P', 'B', 'N');
   OnlyEquifax_Business_Data := GetDops(datasetname='EquifaxBusDataKeys');
-  // father_version   := OnlyEquifax_Business_Data[1].buildversion;
-	father_version := '20200218';
+  father_version   := OnlyEquifax_Business_Data[1].buildversion;
 	
 	new_file         := '~thor_data400::key::Equifax_Business_Data::'+pversion+'::linkids';
 	father_file      := '~thor_data400::key::Equifax_Business_Data::'+father_version+'::linkids';
