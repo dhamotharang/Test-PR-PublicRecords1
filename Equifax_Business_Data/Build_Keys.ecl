@@ -10,19 +10,11 @@ module
 			
 	dx_Equifax_Business_Data.Layout_KeyBase AppendCompanyInfo(Layouts.Base l, Layouts.Base_contacts r) :=
 	transform
-	  self.contact_efx_id                     := r.efx_id;
-	  self.contact_rcid                       := r.rcid;
-		self.contact_did											  := r.did;  
-		self.contact_did_score								  := r.did_score;  
-		self.contact_seleid                     := r.seleid;
-		self.contact_selescore                  := r.selescore;
-		self.contact_seleweight                 := r.seleweight;
 	  self.contact_dt_first_seen							:= r.dt_first_seen;
 		self.contact_dt_last_seen							  := r.dt_last_seen;
 		self.contact_dt_vendor_first_reported	  := r.dt_vendor_first_reported;
 		self.contact_dt_vendor_last_reported		:= r.dt_vendor_last_reported;
 		self.contact_record_type					      := r.record_type; 
-		self.contact_process_date               := r.process_date;
 	  self.contact_title					            := r.clean_name.title;
 	  self.contact_fname					            := r.clean_name.fname;
 	  self.contact_mname					            := r.clean_name.mname;
@@ -50,11 +42,9 @@ module
 														,sortContacts
 														,left.efx_id = right.efx_id 
 														,AppendCompanyInfo(left,right)
-														,full outer
+														,left outer
 														,local
-											      )
-														: persist('~thor_data400::persist::equifax_business_data::company_contact_join',SINGLE)
-														;
+											      );
 
   // Build New Key file
 	RoxieKeyBuild.Mac_SK_BuildProcess_v3_local( dx_Equifax_Business_Data.Key_LinkIds.Key
@@ -66,7 +56,8 @@ module
 	// Persistence/Growth check
 	GetDops          := dops.GetDeployedDatasets('P', 'B', 'N');
   OnlyEquifax_Business_Data := GetDops(datasetname='EquifaxBusDataKeys');
-  father_version   := OnlyEquifax_Business_Data[1].buildversion;
+  // father_version   := OnlyEquifax_Business_Data[1].buildversion;
+	father_version := '20200218';
 	
 	new_file         := '~thor_data400::key::Equifax_Business_Data::'+pversion+'::linkids';
 	father_file      := '~thor_data400::key::Equifax_Business_Data::'+father_version+'::linkids';
