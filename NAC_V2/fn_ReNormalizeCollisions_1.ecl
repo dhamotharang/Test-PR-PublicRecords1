@@ -1,5 +1,7 @@
-﻿IMPORT NAC;
+﻿IMPORT NAC, Std;
 EXPORT fn_ReNormalizeCollisions_1(DATASET(Nac.Layouts.Collisions) c) := FUNCTION
+
+string uc(string s) := Std.Str.ToUpperCase(s);
 
 Layout_Slim := RECORD
 
@@ -53,6 +55,12 @@ Layout_Slim xSlim (Nac.Layouts.Collisions c) := TRANSFORM
 					StandardizeName(TRIM(c.CaseMailStreet1) + ', ' +
 													TRIM(c.CaseMailCity) + ', ' + c.CaseMailState + ' ' + c.CaseMailZip[1..5])
 								);	
+	self.SearchLastName := uc(c.SearchLastName);
+	self.SearchFirstName := uc(c.SearchFirstName);
+	self.SearchMiddleName := uc(c.SearchMiddleName);
+	self.ClientLastName := uc(c.ClientLastName);
+	self.ClientFirstName := uc(c.ClientFirstName);
+	self.ClientMiddleName := uc(c.ClientMiddleName);
 	self := c;
 END;
 
