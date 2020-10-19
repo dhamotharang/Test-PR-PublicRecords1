@@ -880,6 +880,7 @@ IDA_input := PROJECT(iid, Transform(Risk_Indicators.layouts.layout_IDAFraud_in,
                       SELF.dl_number := drlc_value;
                       SELF.dl_state := drlcstate_value;
                       SELF.email_address := email_value;
+                      SELF.ip_address := ip_value;
                       SELF.historydate := IF(historyDateTimeStamp <> '', (UNSIGNED)historyDateTimeStamp[1..6], history_date);
                       SELF.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp(historydateTimeStamp, history_date);
                       
@@ -893,6 +894,7 @@ IDA_input := PROJECT(iid, Transform(Risk_Indicators.layouts.layout_IDAFraud_in,
                       SELF.ProductID := ''; //Populated per model
                       SELF.App_ID := Trim(OtherApplicationIdentifier3);
                       SELF.ESPTransactionId := TransactionID;
+                      SELF.Channel := Channel;
                       SELF := [];
 
                      ));
