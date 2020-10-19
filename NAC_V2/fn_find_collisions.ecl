@@ -236,7 +236,8 @@ EXPORT fn_find_collisions	(
 			(left.ProgramState = right.ProgramState and 
 				//left.ProgramCode = right.ProgramCode
 				nac_v2.GetCollisionCode(left.ProgramCode) = nac_v2.GetCollisionCode(right.ProgramCode)
-				and left.ClientId <> right.ClientId)
+				and left.ClientId <> right.ClientId
+				and left.CaseId <> right.CaseId)
 			//OR
 			//(left.ProgramState=right.ProgramState and 
 			//	left.ProgramCode<>right.ProgramCode)
