@@ -53,10 +53,9 @@ export proc_Orbit4_CreateBuild_AddItem_sp(string buildname,
 	fn_add_components ( string ComponentType,string DataType,string Family,string Id,string Name,string Status,string Version ) := function
 	
 	return Orbit4.AddComponentsToBuild(tokenval,
-	                            buildname,
-									            Buildvs,
-									            _Control.MyInfo.EmailAddressNotify,
-						                  dataset([{ComponentType,DataType,Family,Id,Name,Status,Version}],Orbit4.Layouts.OrbitBuildInstanceLayout) 
+	                                                                     buildname,
+						                                            Buildvs,					
+						                                       dataset([{ComponentType,DataType,Family,Id,Name,Status,Version}],Orbit4.Layouts.OrbitBuildInstanceLayout) 
 															);
 															
 	
@@ -79,7 +78,7 @@ export proc_Orbit4_CreateBuild_AddItem_sp(string buildname,
 												 'N/A'
 												 );
 	   	 emailtoall :=  fileservices.sendemail(
-												 Send_Email(Buildvs,email_list).emaillist,
+												 Send_Email(Buildvs,email_list,buildname,Buildvs ).emaillist,
 												' Orbit for Build : '+buildname+',version: '+Buildvs+',Env : '+Orbit4.Constants(Envmt_isnpf).which_env,
 												'BuildName:'+buildname+'\n'+
 												'---------------------'+'\n'+

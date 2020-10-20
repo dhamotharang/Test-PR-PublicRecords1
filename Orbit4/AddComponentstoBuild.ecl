@@ -3,7 +3,6 @@
 EXPORT AddComponentsToBuild(string			pLoginToken,
 																	string			pBuildName,
 																	string			pBuildVersion,
-																	string			pEmailList,
 																	dataset(Orbit4.Layouts.OrbitBuildInstanceLayout)	pBuildCandidates
 																 ) := function
 
@@ -94,5 +93,6 @@ xmlds := dataset([rBuildrequest.request.OrbRequest.RecordRequestAddBuildInstance
 	
 return lResponse.AddBuildInstanceComponentResponse.AddBuildInstanceComponentResult.Status;
 
+END;
+
 	
-end;	
