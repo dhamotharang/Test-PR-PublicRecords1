@@ -1,5 +1,5 @@
 ﻿import tools;
-export _Constants(
+export Constants(
   boolean pUseOtherEnvironment  = false
 ) :=
 tools.Constants(

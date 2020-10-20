@@ -53,10 +53,10 @@ Layout_Slim xSlim (Nac_V2.Layout_Collisions2.Layout_Collisions c) := TRANSFORM
 													TRIM(c.SearchAddress1City) + ', ' + c.SearchAddress1State + ' ' + c.SearchAddress1Zip[1..5])
 								);	
 	self.Addr2 := IF(c.CasePhysicalStreet1='',
-					StandardizeName(TRIM(c.CasePhysicalStreet1) + ', ' +
-													TRIM(c.CasePhysicalCity) + ', ' + c.CasePhysicalState + ' ' + c.CasePhysicalZip[1..5]),	
 					StandardizeName(TRIM(c.CaseMailStreet1) + ', ' +
-													TRIM(c.CaseMailCity) + ', ' + c.CaseMailState + ' ' + c.CaseMailZip[1..5])
+													TRIM(c.CaseMailCity) + ', ' + c.CaseMailState + ' ' + c.CaseMailZip[1..5]),
+					StandardizeName(TRIM(c.CasePhysicalStreet1) + ', ' +
+													TRIM(c.CasePhysicalCity) + ', ' + c.CasePhysicalState + ' ' + c.CasePhysicalZip[1..5])	
 								);	
 	self := c;
 END;

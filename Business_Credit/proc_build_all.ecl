@@ -1,4 +1,4 @@
-IMPORT	Business_Credit,	Scrubs_Business_Credit,	BIPV2_Best_SBFE,	Orbit3, ut,
+﻿IMPORT	Business_Credit,	Scrubs_Business_Credit,	BIPV2_Best_SBFE,	Orbit3, ut,
 				versioncontrol,	RoxieKeyBuild,	_control, STD,	BuildLogger;
 
 EXPORT	proc_Build_All(
@@ -27,7 +27,7 @@ EXPORT	proc_Build_All(
 	
 	//	DOPS Flags and Command
 	EXPORT	pUpdateFlag		:=	IF(pBuildType	= Constants().buildType.Daily,'D','F');
-	EXPORT	dops_update		:=	RoxieKeyBuild.updateversion('SbfeCvKeys', pVersion, _Control.MyInfo.EmailAddressNotify+';Christopher.Brodeur@lexisnexis.com', , 'N',isprodready:=pIsProdReady,updateflag:=pUpdateFlag); 															
+	EXPORT	dops_update		:=	RoxieKeyBuild.updateversion('SbfeCvKeys', pVersion, 'Christopher.Brodeur@lexisnexis.com, Sudhir.Kasavajjala@lexisnexisrisk.com', , 'N',isprodready:=pIsProdReady,updateflag:=pUpdateFlag); 															
 	
 	//	All filenames associated with this Dataset
 	SHARED	dAll_filenames	:=	Filenames().dAll_filenames									+	
