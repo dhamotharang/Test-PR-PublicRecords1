@@ -1,17 +1,17 @@
+﻿
 
 
+IMPORT BANKO, Data_services;
 
-IMPORT BANKO;
-
-export fRemoveDeletes(DATASET(Banko.BankoJoinRecord) ds) := 
+export fRemoveDeletes(DATASET(banko.Layout_Banko_Base) ds) := 
 function
 
 layout_deletefile := Record
 QSTRING1  	DRActivityTypeCode;
 STRING10000 	DocketEntryID;
 end; 
-
-Banko_DeleteRecords := dataset('~thor_data400::in::bankoadditionalevents',layout_deletefile,
+// thor_data400::in::bankoadditionalevents
+Banko_DeleteRecords := dataset(Data_services.foreign_prod+'thor_data400::in::bankoadditionalevents',layout_deletefile,
 					CSV(HEADING(0),SEPARATOR('|~|'), TERMINATOR(['\n', '\r\n']), QUOTE('"'),MAXLENGTH(100000)))(DRActivityTypeCode='D');
 
 //Layout_BankoFile_FixedRec_EventSort := SORT(Banko_DeleteRecords,DocketEntryID);
@@ -20,7 +20,7 @@ Banko_DeleteRecords := dataset('~thor_data400::in::bankoadditionalevents',layout
 //Banko_Additional_EventSort := SORT(ds,docketentryid);
 //Banko_Additional_EventDist := DISTRIBUTE(Banko_Additional_EventSort,HASH32(docketentryid));
 
-typeof(Banko.BankoJoinRecord) CourtID_C3CourtID_Rec(Banko.BankoJoinRecord L
+banko.Layout_Banko_Base CourtID_C3CourtID_Rec(banko.Layout_Banko_Base L
 										,layout_deletefile R) := TRANSFORM
    	
 	SELF := L;

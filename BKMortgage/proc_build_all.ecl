@@ -37,7 +37,7 @@ EXPORT proc_build_all(string filedate, BOOLEAN	pUseProd	=	FALSE) := FUNCTION
 																output('No Release Files Found'))
 															);
 														
-	orbit_update := sequential(Orbit3.Proc_Orbit3_CreateBuild_npf('Black Knight Mortgage',filedate));
+	orbit_update := sequential(Orbit3.Proc_Orbit3_CreateBuild('Black Knight Mortgage',filedate,is_npf := true));
 	
 	BuildAll	:= SEQUENTIAL(AssignBuild, ReleaseBuild, orbit_update);
 	
