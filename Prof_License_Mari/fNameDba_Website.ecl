@@ -1,4 +1,4 @@
-IMPORT Prof_License_Mari, ut;
+﻿IMPORT Prof_License_Mari, ut;
 
 EXPORT fNameDba_Website(DATASET(recordof(Prof_License_Mari.layouts.intermediate)) pDataset) := FUNCTION 
 
@@ -17,8 +17,8 @@ EXPORT fNameDba_Website(DATASET(recordof(Prof_License_Mari.layouts.intermediate)
 															or (regexfind(website_pattern_1, TRIM(NAME_DBA)) and regexfind('(^DBA )', trim(NAME_DBA)))
 																	or (regexfind(website_pattern_2, trim(NAME_DBA)))
 															);
-
-	dedupBase := dedup(sort(dsBase_web_1 + dsBase_web_2,mari_rid), record, all);
+	//DF-28229 - mari_rid is not populated at this point yet
+	dedupBase := dedup(sort(distribute(dsBase_web_1 + dsBase_web_2,hash(primary_key)),primary_key,local), record, local);
 	
 																	
 //Remove Records with Websites Names 
