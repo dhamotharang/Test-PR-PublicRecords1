@@ -3,7 +3,8 @@
 EXPORT Prep_IDA_fraud(DATASET(Risk_Indicators.layouts.layout_IDAFraud_in) indata, 
                       DATASET(Gateway.Layouts.Config) gateways,
                       DATASET(Models.Layouts.Layout_Model_Request_In) Model_requests,
-                      BOOLEAN Testing = FALSE
+                      BOOLEAN Testing = FALSE,
+                      BOOLEAN On_thor = FALSE
                      ) := FUNCTION
 
   //Check to see how we should be running the IDA call
@@ -62,7 +63,7 @@ EXPORT Prep_IDA_fraud(DATASET(Risk_Indicators.layouts.layout_IDAFraud_in) indata
   //IDA and they don't want the transaction to fail, will need to modify this logic
   IDA_gateway_check := (FromIDA[1].response._Header.Status != 0) OR 
                        (FromIDA[1].response.ErrorRecord.Code != '' AND FromIDA[1].response.ErrorRecord.Message != '');
-  IF(IDA_gateway_check, FAIL('503 Service Unavailable The service was unavailable due to temporary overload or maintenance.'));
+  IF(IDA_gateway_check and ~On_thor, FAIL('503 Service Unavailable The service was unavailable due to temporary overload or maintenance.'));
   
   //Drop everything except the seq, AppID, and attributes
   Final := JOIN(indata, FromIDA,

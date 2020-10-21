@@ -35,21 +35,11 @@ EXPORT getIDAFraud(DATASET(Risk_Indicators.layouts.layout_IDAFraud_in) indata,
     
     //Origination section
     SELF.ReportBy.Origination.RequestType := 'N'; 
-    
-    //going to use HistoryDateTimeStamp as the source of truth for date
-    tempAppDate := Map(le.historyDateTimeStamp = '999999'  => to_IDA_date((STRING)STD.Date.Today(), (STRING)STD.Date.CurrentTime()),
-                       length(le.historyDateTimeStamp) = 6 => to_IDA_date(le.historyDateTimeStamp + '01', (STRING)STD.Date.CurrentTime()),
-                       length(le.historyDateTimeStamp) = 8 => to_IDA_date(le.historyDateTimeStamp, (STRING)STD.Date.CurrentTime()),
-                                                              to_IDA_date((STRING)STD.Date.Today(), (STRING)STD.Date.CurrentTime()) //fallthrough condition, use Current date/time
-                      );
-    
-    SELF.ReportBy.Origination.ApplicationDate := tempAppDate; //Format is YYYY-MM-DDTHH:MM:SS 
+    SELF.ReportBy.Origination.ApplicationDate := to_IDA_date((STRING)STD.Date.Today(), (STRING)STD.Date.CurrentTime()); //Format is YYYY-MM-DDTHH:MM:SS 
     SELF.ReportBy.Origination.AppID := TRIM(le.App_ID); 
-    SELF.ReportBy.Origination.Designation := 'A1';  //hard coded? passed to us?
-    SELF.ReportBy.Origination.EventType := 'XXX';   //hard coded
-    SELF.ReportBy.Origination.IndustryType := 'XX'; //hard coded
-    // Was going to pass seq here to have something besides AppID to join back to the input but AppID will have to work for now
-    // SELF.ReportBy.Origination.PassThru1 := (STRING)le.seq; 
+    SELF.ReportBy.Origination.Designation := 'A1';
+    SELF.ReportBy.Origination.EventType := '';
+    SELF.ReportBy.Origination.IndustryType := '';
     
     //Identity section
     SELF.ReportBy.Identity.FirstName := TRIM(le.fname); 
@@ -68,7 +58,19 @@ EXPORT getIDAFraud(DATASET(Risk_Indicators.layouts.layout_IDAFraud_in) indata,
     SELF.ReportBy.Identity.IDOrigin := TRIM(le.dl_state);
     SELF.ReportBy.Identity.IDNumber := TRIM(le.dl_number);
 
-    SELF.ReportBy.Application.Channel := '12'; //hard coded?
+    //Application section
+    SELF.ReportBy.Application.Channel := CASE(TRIM(STD.STR.ToLowerCase(le.Channel)),
+                                              ''            => TRIM(''),
+                                              'mail'        => TRIM('1'),
+                                              'pointofsale' => TRIM('2'),
+                                              'kiosk'       => TRIM('3'),
+                                              'internet'    => TRIM('4'),
+                                              'branch'      => TRIM('5'),
+                                              'telephonic'  => TRIM('6'),
+                                              'other'       => TRIM('99'),
+                                                               TRIM('99')
+                                              );
+    SELF.ReportBy.Application.SourceIP := TRIM(le.ip_address);
     SELF.ReportBy.Application.LexID := (STRING)le.Did;
     SELF.ReportBy.Application.LNTransactionID := le.ESPTransactionId;
 

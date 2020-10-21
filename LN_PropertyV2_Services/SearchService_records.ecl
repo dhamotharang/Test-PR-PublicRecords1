@@ -3,7 +3,8 @@
 EXPORT SearchService_records (unsigned6 search_did=0,integer1
                                 nonSS = Suppress.Constants.NonSubjectSuppression.doNothing,
                                 boolean isFCRA = false,
-                                FCRA.iRules in_params = module(FCRA.iRules) end ) :=
+                                FCRA.iRules in_params = module(FCRA.iRules) end,
+                                boolean includeBlackKnight = false ) :=
   FUNCTION
 
     boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(in_params.FFDOptionsMask);
@@ -34,9 +35,6 @@ EXPORT SearchService_records (unsigned6 search_did=0,integer1
 
     alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_params.FCRAPurpose, in_params.FFDOptionsMask)[1];
     suppress_results_due_alerts := isFCRA and alert_indicators.suppress_records;
-    
-    //This boolean is used in Property Report and Search Services to show Deeds, Assessments and A&R data when LooupType is blank
-    boolean includeBlackKnight := Ln_PropertyV2_Services.input.lookupVal = Ln_PropertyV2_Services.consts.LOOKUP_TYPE.EVERYTHING;
 
     results_0 := LN_PropertyV2_Services.resultFmt.narrow_view.get_by_sid(ids_1,nonSS,isFCRA,slim_pc_recs,in_params.FFDOptionsMask, ds_flags, includeBlackKnight);
 
