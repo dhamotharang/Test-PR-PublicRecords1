@@ -1,7 +1,7 @@
-﻿import $, AutoKeyI, iesp, BIPV2, BusinessCredit_Services, Cortera_Tradeline, Std, ut;
+﻿import $, AutoKeyI, iesp, BIPV2, BusinessCredit_Services, dx_Cortera_Tradeline, Std, ut;
 
 // Note - currently only single inputs (ie records with only 1 uniqueid value) are supported
-// most functions support multiple uniqueid values, but some future work is still required to fully 
+// most functions support multiple uniqueid values, but some future work is still required to fully
 // support inputs with multiple uniqueid values
 export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := module
 
@@ -16,14 +16,14 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
   end;
 
   shared segment_map(integer id) := map(
-      id in $.Constants.IndustrySegment.Set_Material => $.Constants.IndustrySegment.Material, 
-      id in $.Constants.IndustrySegment.Set_Operations => $.Constants.IndustrySegment.Operations, 
-      id in $.Constants.IndustrySegment.Set_Carrier => $.Constants.IndustrySegment.Carrier, 
-      id in $.Constants.IndustrySegment.Set_Fleet => $.Constants.IndustrySegment.Fleet, 
+      id in $.Constants.IndustrySegment.Set_Material => $.Constants.IndustrySegment.Material,
+      id in $.Constants.IndustrySegment.Set_Operations => $.Constants.IndustrySegment.Operations,
+      id in $.Constants.IndustrySegment.Set_Carrier => $.Constants.IndustrySegment.Carrier,
+      id in $.Constants.IndustrySegment.Set_Fleet => $.Constants.IndustrySegment.Fleet,
       $.Constants.IndustrySegment.Other
   );
 
-  shared rawTradelineRecs := Cortera_Tradeline.Key_LinkIds.kFetch2(ids, BIPV2.IDconstants.Fetch_Level_SELEID);
+  shared rawTradelineRecs := dx_Cortera_Tradeline.Key_LinkIds.kFetch2(ids, BIPV2.IDconstants.Fetch_Level_SELEID);
 
   shared layout_ex := record(recordof(rawTradelineRecs))
     string _segment;
@@ -49,10 +49,10 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
   end;
 
   // add the age in days to the raw tradeline recs
-  shared tradelineRecsEx := project(rawTradelineRecs, 
-    transform(layout_ex, 
+  shared tradelineRecsEx := project(rawTradelineRecs,
+    transform(layout_ex,
       self._segment := '',
-      self._age_days := Std.Date.DaysBetween((unsigned)left.ar_date, current_date), 
+      self._age_days := Std.Date.DaysBetween((unsigned)left.ar_date, current_date),
       self := left));
 
   // sort within each account with most recent recs on top
@@ -60,19 +60,19 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
   shared acct_recs := dedup(tradelineRecsSorted_tmp, uniqueid, account_key);
 
   // stores info for each unique account including the segment and the mapped account_id value
-  shared acct_info := project(acct_recs, 
-    transform(layout_acct_info, 
-      self.account_id := translate_key(left.account_key), 
-      self._segment := segment_map((integer)left.segment_id), 
+  shared acct_info := project(acct_recs,
+    transform(layout_acct_info,
+      self.account_id := translate_key(left.account_key),
+      self._segment := segment_map((integer)left.segment_id),
       self := left
     )
   );
 
   // add the segment name from acct_info
-  shared tradelineRecsSorted := join(tradelineRecsSorted_tmp, acct_info, 
-    left.uniqueid = right.uniqueid and left.account_key = right.account_key, 
-    transform(layout_ex, 
-      self._segment := right._segment, 
+  shared tradelineRecsSorted := join(tradelineRecsSorted_tmp, acct_info,
+    left.uniqueid = right.uniqueid and left.account_key = right.account_key,
+    transform(layout_ex,
+      self._segment := right._segment,
       self := left
     )
   );
@@ -193,7 +193,7 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
       r_cnt := count(recs);
       t_avg_balance := sum(recs, avg_balance);
       t_avg_dbt := sum(recs, avg_dbt);
-      
+
       self.uniqueid := l.uniqueid;
       self.account_key := '';
       self._segment := l._segment;
@@ -237,9 +237,9 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
     end;
 
     // add the relevant payment summary info to the combined segment values
-    recs_out := join(recs_c, recs_psum, 
-      left.uniqueid = right.uniqueid and left._segment = right._segment, 
-      combine_trans(left, right), 
+    recs_out := join(recs_c, recs_psum,
+      left.uniqueid = right.uniqueid and left._segment = right._segment,
+      combine_trans(left, right),
       keep(1), limit(0)
     );
 
@@ -256,8 +256,8 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
 
     // sort order based on status (current, overdue, inactive)
     status_order(string stat) := map(
-      stat = $.Constants.B2BAccountStatus.Current => 1, 
-      stat = $.Constants.B2BAccountStatus.Overdue => 2, 
+      stat = $.Constants.B2BAccountStatus.Current => 1,
+      stat = $.Constants.B2BAccountStatus.Overdue => 2,
       3
     );
 
@@ -278,8 +278,8 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
 
       self.AccountNo := l.account_key;
       self.Status := map(
-        not is_active => $.Constants.B2BAccountStatus.Inactive, 
-        amt_out > 0 => $.Constants.B2BAccountStatus.Overdue, 
+        not is_active => $.Constants.B2BAccountStatus.Inactive,
+        amt_out > 0 => $.Constants.B2BAccountStatus.Overdue,
         $.Constants.B2BAccountStatus.Current
       );
       self.IndustrySegment := l._segment;
@@ -288,21 +288,21 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
       self.PaymentHistory := project(pmt_recs, history_trans(left));
     end;
 
-    // currently we only use the top element in each account (and the below could be done with dedup), 
+    // currently we only use the top element in each account (and the below could be done with dedup),
     // this may eventually incorporate data from multiple records, so leaving as grouped rollup
     recs_grp := group(recs_in, uniqueid, account_key);
     recs_rolled := rollup(recs_grp, group, roll_trans(left, rows(left)));
 
     // the original account_key is seemingly already a hashed value, but to be on the safe side
     // use the 'further hashed' matching account_id value to ensure no acctual account data is relayed
-    recs_trans := join(recs_rolled, acct_info, 
-      left.AccountNo = right.account_key, 
-      transform(iesp.smallbusinessbipcombinedreport.t_B2BTradeAcctDetail, 
-        self.AccountNo := right.account_id, 
+    recs_trans := join(recs_rolled, acct_info,
+      left.AccountNo = right.account_key,
+      transform(iesp.smallbusinessbipcombinedreport.t_B2BTradeAcctDetail,
+        self.AccountNo := right.account_id,
         self := left
       )
     );
-    recs_srtd := sort(recs_trans, status_order(Status), IndustrySegment, DateReported.Year, 
+    recs_srtd := sort(recs_trans, status_order(Status), IndustrySegment, DateReported.Year,
       DateReported.Month, DateReported.Day);
 
     return recs_srtd;
@@ -316,7 +316,7 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
     recs_all := tradelineRecsSorted;
     recs_lim := daysLimitedRecs(active_age);
     recs_recent := dedup(recs_lim, uniqueid, account_key);
-    
+
     num_act := count(recs_recent);
     oldest_date := min(recs_all(ar_date <> ''), (integer)ar_date);
     t_balance := sum(recs_recent, (integer)total_ar);
@@ -330,10 +330,10 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
     max_3 := max(recs_recent, (integer)aging_61to90);
     max_4 := max(recs_recent, (integer)aging_91plus);
     stat := map(
-      max_4 > 0 => 'OVERDUE 90PLUS', 
-      max_3 > 0 => 'OVERDUE 60', 
-      max_2 > 0 => 'OVERDUE 30', 
-      max_1 > 0 => 'OVERDUE', 
+      max_4 > 0 => 'OVERDUE 90PLUS',
+      max_3 > 0 => 'OVERDUE 60',
+      max_2 > 0 => 'OVERDUE 30',
+      max_1 > 0 => 'OVERDUE',
       'WITHIN TERMS'
     );
 
@@ -423,7 +423,7 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
     // used to get the most recent trade date in any account
     recent_trade_recs := sort(acct_recs, _age_days);
 
-    // note that the uniqueid in the inputs is not supported in this function, 
+    // note that the uniqueid in the inputs is not supported in this function,
     // therefore the first uniqueid is implicity used for the results
     iesp.smallbusinessbipcombinedreport.t_B2BTradeData trans() := transform
       self.RecentTradeDate := iesp.ECL2ESP.toDatestring8(recent_trade_recs[1].ar_date);
@@ -438,7 +438,7 @@ export LN_Tradeline_Functions(dataset(BIPV2.IDlayouts.l_xlink_ids2) ids) := modu
     end;
 
     b2b_match := dataset([trans()]);
-    b2b_nomatch := compose_b2b_trade_data_nohit((string)AutoKeyI.errorcodes._codes.NO_RECORDS, 
+    b2b_nomatch := compose_b2b_trade_data_nohit((string)AutoKeyI.errorcodes._codes.NO_RECORDS,
       'No Tradeline Data Available');
 
     // if no tradeline data exists in the key for the input, ensure a status of NO_RECORDS is returned

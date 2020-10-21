@@ -6,6 +6,8 @@ EXPORT fn_getBaseRecs(
   BOOLEAN append_goup_id = TRUE
 ) :=
 FUNCTION
+  outrec := doxie_cbrs.layout_base_rec;
+
   doxie_cbrs.mac_Selection_Declare()
   mod_access := Doxie.compliance.GetGlobalDataAccessModule();
   bhk2 := business_header_ss.Key_BH_BDID_pl;
@@ -81,21 +83,8 @@ FUNCTION
   END;
 
   base_BH_recs_id := PROJECT(GROUP(SORT(base_BH_recs, group_id,RECORD),group_id),project_ids(LEFT,COUNTER));
-
-
-  br_msa_county := RECORD
-    doxie_cbrs.Layout_BH;
-    STRING60 msaDesc := '';
-    STRING18 county_name := '';
-    STRING120 company_clean := '';
-    UNSIGNED2 name_source_id := 0;
-    UNSIGNED2 addr_source_id := 0;
-    UNSIGNED2 phone_source_id := 0;
-    UNSIGNED2 fein_source_id := 0;
-    UNSIGNED6 group_id := 0;
-  END;
           
-  br_msa_county add_msa_county(base_BH_recs_id L, Census_Data.Key_Fips2County R) := TRANSFORM
+  outrec add_msa_county(base_BH_recs_id L, Census_Data.Key_Fips2County R) := TRANSFORM
     SELF.msaDesc := IF(L.msa <> '' AND L.msa <> '0000', ziplib.MSAToCityState(L.msa), '');
     SELF.county_name := IF (L.county <> '', R.county_name, '');
     // SELF.phone := if(L.phone > 0, (string)L.phone, '');
@@ -114,7 +103,7 @@ FUNCTION
                        LEFT.county = RIGHT.county_fips),
                        add_msa_county(LEFT,RIGHT), LEFT OUTER, KEEP (1), LIMIT (0));
   
-  br_msa_county project_clean(tempBaseRecs l) := TRANSFORM
+  outrec project_clean(tempBaseRecs l) := TRANSFORM
     SELF.company_clean := doxie_cbrs.cleancompany(l.company_name);
     SELF := l;
   END;
@@ -150,12 +139,12 @@ FUNCTION
   END;
   
   tempfilt := DEDUP(JOIN(temproll(longclean <> ''),tempded,LEFT.group_id = RIGHT.group_id AND LEFT.longclean = RIGHT.company_clean,xform_jointemp(LEFT)));
-  br_msa_county xform_join2(br_msa_county l, tempfilt r) := TRANSFORM
+  outrec xform_join2(outrec l, tempfilt r) := TRANSFORM
     SELF.company_clean := IF(r.longclean <> '',r.longclean,l.company_clean);
     SELF := l;
   END;
   reduced_names := JOIN(sortbyname,tempfilt,LEFT.group_id = RIGHT.group_id AND LEFT.company_clean = RIGHT.shortclean,xform_join2(LEFT,RIGHT),LEFT OUTER);
-  br_msa_county xform_remove(br_msa_county l) := TRANSFORM
+  outrec xform_remove(outrec l) := TRANSFORM
     SELF.company_clean := doxie_cbrs.stripcompany(l.company_clean);
     SELF := l;
   END;
@@ -163,7 +152,7 @@ FUNCTION
 
   //////////////////////
 
-  br_msa_county iterbyname(br_msa_county l, br_msa_county r, UNSIGNED c) := TRANSFORM
+  outrec iterbyname(outrec l, outrec r, UNSIGNED c) := TRANSFORM
     SELF.name_source_id := IF(c != 1 AND l.company_clean = r.company_clean,l.name_source_id,r.name_source_id);
     SELF := r;
   END;
@@ -172,7 +161,7 @@ FUNCTION
 
   sortbyaddr := SORT(rollbyname,state,zip,prim_name,prim_range,sec_range,addr_source_id);
 
-  br_msa_county iterbyaddr(br_msa_county l, br_msa_county r) := TRANSFORM
+  outrec iterbyaddr(outrec l, outrec r) := TRANSFORM
     SELF.addr_source_id := IF(l.state = r.state AND
                               l.zip = r.zip AND
                               l.prim_name = r.prim_name AND
@@ -185,7 +174,7 @@ FUNCTION
 
   sortbyphone := SORT(rollbyaddr,phone,phone_source_id);
 
-  br_msa_county iterbyphone(br_msa_county l, br_msa_county r) := TRANSFORM
+  outrec iterbyphone(outrec l, outrec r) := TRANSFORM
     SELF.phone_source_id := IF(l.phone = r.phone,l.phone_source_id,r.phone_source_id);
     SELF := r;
   END;
@@ -194,7 +183,7 @@ FUNCTION
   
   sortbyfein := SORT(rollbyphone,fein,fein_source_id);
   
-  br_msa_county iterbyfein(br_msa_county l, br_msa_county r) := TRANSFORM
+  outrec iterbyfein(outrec l, outrec r) := TRANSFORM
     SELF.fein_source_id := IF(l.fein = r.fein,l.fein_source_id,r.fein_source_id);
     SELF := r;
   END;

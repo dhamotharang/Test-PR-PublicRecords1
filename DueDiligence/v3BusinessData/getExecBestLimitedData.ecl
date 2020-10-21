@@ -1,6 +1,9 @@
 ﻿IMPORT BIPV2_Build, Business_Risk_BIP, DueDiligence, iesp, STD, ut;
 
-
+/*
+	Following Keys being used:
+			BIPV2_Build.key_contact_linkids.kFetch
+*/
 EXPORT getExecBestLimitedData(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) inData,
                               DueDiligence.DDInterface.iDDRegulatoryCompliance regulatoryAccess) := FUNCTION
     

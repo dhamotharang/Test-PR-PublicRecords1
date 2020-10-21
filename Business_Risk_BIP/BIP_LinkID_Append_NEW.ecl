@@ -1,4 +1,4 @@
-﻿IMPORT Business_Risk_BIP, BIPV2, SALT28, Address, Risk_Indicators;
+﻿IMPORT Business_Risk_BIP, BIPV2, SALT28;
 
 // This function takes in a dataset of Layouts.Input and appends the various BIP Link ID's
 // NOTE: This function will NOT take only a SeleID as input and process it successfully.
@@ -93,12 +93,12 @@ EXPORT BIP_LinkID_Append_NEW(DATASET(Business_Risk_BIP.Layouts.Input) Input,
 	// Attempt to pick the "Best" ID's.  This is done by keeping the record which hits on the first of these rules:
 	Business_Risk_BIP.Layouts.LinkID_Results setBestIDs(Business_Risk_BIP.Layouts.Input le, tempLinkingRecord ri) := TRANSFORM
     SELF.seq := le.seq;
-		SELF.PowID	:= ROW({ri.PowID,		ri.PowIDWeight,		ri.PowIDScore,	0}, Business_Risk_BIP.Layouts.LinkIDs);
-		SELF.ProxID	:= ROW({ri.ProxID,	ri.ProxIDWeight,	ri.ProxIDScore,	0}, Business_Risk_BIP.Layouts.LinkIDs);
-		SELF.SeleID	:= ROW({ri.SeleID,	ri.SeleIDWeight,	ri.SeleIDScore,	0}, Business_Risk_BIP.Layouts.LinkIDs);
-		SELF.OrgID	:= ROW({ri.OrgID,		ri.OrgIDWeight,		ri.OrgIDScore,	0}, Business_Risk_BIP.Layouts.LinkIDs);
-		SELF.UltID	:= ROW({ri.UltID,		ri.UltIDWeight,		ri.UltIDScore,	0}, Business_Risk_BIP.Layouts.LinkIDs);
-		SELF.Weight := ri.Weight;
+		SELF.PowID	:= if( ri.SeleID = 0, ROW({0,		0,		0,	0}, Business_Risk_BIP.Layouts.LinkIDs) ,ROW({ri.PowID,		ri.PowIDWeight,		ri.PowIDScore,	0}, Business_Risk_BIP.Layouts.LinkIDs));
+		SELF.ProxID	:= if( ri.SeleID = 0, ROW({0,		0,		0,	0}, Business_Risk_BIP.Layouts.LinkIDs) ,ROW({ri.ProxID,		ri.ProxIDWeight,		ri.ProxIDScore,	0}, Business_Risk_BIP.Layouts.LinkIDs));
+		SELF.SeleID	:= if( ri.SeleID = 0, ROW({0,		0,		0,	0}, Business_Risk_BIP.Layouts.LinkIDs) ,ROW({ri.SeleID,		ri.SeleIDWeight,		ri.SeleIDScore,	0}, Business_Risk_BIP.Layouts.LinkIDs));
+		SELF.OrgID	:= if( ri.SeleID = 0, ROW({0,		0,		0,	0}, Business_Risk_BIP.Layouts.LinkIDs) ,ROW({ri.OrgID,		ri.OrgIDWeight,		ri.OrgIDScore,	0}, Business_Risk_BIP.Layouts.LinkIDs));
+		SELF.UltID	:= if( ri.SeleID = 0, ROW({0,		0,		0,	0}, Business_Risk_BIP.Layouts.LinkIDs) ,ROW({ri.UltID,		ri.UltIDWeight,		ri.UltIDScore,	0}, Business_Risk_BIP.Layouts.LinkIDs));
+		SELF.Weight := if( ri.SeleID = 0, 0, ri.Weight);
     SELF := [];
 	END;
 	

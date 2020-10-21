@@ -86,7 +86,6 @@ EXPORT LayoutsInternal := MODULE
   EXPORT SicNaicUniqueIndustryLayout := RECORD
     InternalSeqAndIdentifiersLayout;
     DueDiligence.Layouts.LayoutSICNAIC;
-    DueDiligence.Layouts.SicNaicRiskLayout;
   END;
 
   EXPORT SlimSicNaicLayout := RECORD

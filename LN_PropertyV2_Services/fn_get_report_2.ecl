@@ -1,4 +1,4 @@
-﻿IMPORT _Control, doxie, LN_PropertyV2, suppress, fcra, LN_propertyV2_Services, STD;
+﻿IMPORT _Control, LN_PropertyV2, suppress, fcra, LN_propertyV2_Services, STD;
 onThor := _Control.Environment.OnThor;
 
 l_sid		:= LN_PropertyV2_Services.layouts.search_fid;
@@ -15,17 +15,12 @@ export dataset(l_out) fn_get_report_2(
 	boolean inTrimBySortBy = false,
 	integer1 nonSS = suppress.constants.NonSubjectSuppression.doNothing,
 	boolean isFCRA = false,
-	LN_PropertyV2_Services.interfaces.Iinput_report in_mod
+	LN_PropertyV2_Services.interfaces.Iinput_report in_mod,
+	dataset(fcra.Layout_override_flag) ds_flags  // accept this from the calling function instead of searching flag file again
 ) := function
  
 
 	// ---------- Main ----------
-	
- 	did_rec := if(isFCRA, project(in_fids, transform(doxie.layout_best, self.did:=left.search_did,self:=left,self:=[])));
-	// adding a dedup of the DID and SSN so we don't end up with so many records coming out of GetFlagFile for same person
-	did_rec_deduped := if(isFCRA, dedup(sort(did_rec, did, ssn), did, ssn));
-	ds_flags := if (IsFCRA and ~OnThor, FCRA.GetFlagFile(did_rec_deduped), fcra.compliance.blank_flagfile);
-
 	// Apply FaresID-based restrictions
 	fids1_orig := in_fids(ln_fares_id[1] not in in_mod.srcRestrict);	// blacklist FARES, Fidelity, or LnBranded as needed
 	fids1 := dedup(sort(fids1_orig, ln_fares_id, search_did, isdeepdive), ln_fares_id, search_did, isdeepdive);  // added this dedup to handle cases where search_did exists more than once in the same batch of relatives

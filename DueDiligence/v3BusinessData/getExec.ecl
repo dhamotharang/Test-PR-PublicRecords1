@@ -1,9 +1,6 @@
 ﻿IMPORT DueDiligence;
 
-/*
-	Following Keys being used:
-			BIPV2_Build.key_contact_linkids.kFetch
-*/
+
 EXPORT getExec(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) inData,
                DueDiligence.DDInterface.iDDv3BusinessAttributes attributesRequested,
                DueDiligence.DDInterface.iDDRegulatoryCompliance regulatoryAccess,

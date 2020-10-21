@@ -48,7 +48,7 @@ EXPORT getLiens(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 STRING6 DateVendorLastSeen  := Business_Risk_BIP.Common.groupMaxDate6(date_vendor_last_reported, HistoryDate),
 			 UNSIGNED4 RecordCount := COUNT(GROUP)
 			 },
-			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID)
+			 Seq, TMSID, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID)
 			 );
 
 	// Rollup the dates first/last seen into child datasets by Seq, and add Sources to Shell layout.
@@ -84,6 +84,7 @@ EXPORT getLiens(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			LEFT.Seq = RIGHT.Seq,
 			TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 				SELF.Sources := RIGHT.Sources;
+				SELF.seq := left.seq;
 				SELF := RIGHT,
 				SELF := LEFT),
 				LEFT OUTER, KEEP(1), ATMOST(100), FEW);	

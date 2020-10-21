@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
+﻿IMPORT DueDiligence;
 
 
 EXPORT getInputBestData(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) inData,
@@ -69,7 +69,8 @@ EXPORT getInputBestData(DATASET(DueDiligence.v3Layouts.Internal.BusinessTemp) in
                                                       SELF.geo_blk := LEFT.inquiredBusiness.geo_blk;
                                                       SELF.county := LEFT.inquiredBusiness.county;
                                                       SELF.countyName := LEFT.inquiredBusiness.countyName;
-                                                      SELF := [];));                     
+                                                      SELF := [];));  
+                                                      
         bestAddress := PROJECT(bestData, TRANSFORM(DueDiligence.v3Layouts.Internal.Address,
                                                     SELF.streetAddress1 := LEFT.streetAddress1;
                                                     SELF.streetAddress2 := LEFT.streetAddress2;
