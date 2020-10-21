@@ -154,7 +154,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     last_name_CUSTOM_ErrorCount := COUNT(GROUP,h.last_name_Invalid=1);
     marriedappend_ENUM_ErrorCount := COUNT(GROUP,h.marriedappend_Invalid=1);
     middle_name_ALLOW_ErrorCount := COUNT(GROUP,h.middle_name_Invalid=1);
-    political_party_CUSTOM_ErrorCount := COUNT(GROUP,h.political_party_Invalid=1);
+    political_party_ALLOW_ErrorCount := COUNT(GROUP,h.political_party_Invalid=1);
     race_CUSTOM_ErrorCount := COUNT(GROUP,h.race_Invalid=1);
     regdate_CUSTOM_ErrorCount := COUNT(GROUP,h.regdate_Invalid=1);
     res_addr1_CUSTOM_ErrorCount := COUNT(GROUP,h.res_addr1_Invalid=1);
@@ -178,9 +178,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.active_status_ALLOW_ErrorCount > 0, 1, 0) + IF(le.agecat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.changedate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.countycode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.distcode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dob_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.EMID_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.file_acquired_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.first_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.gender_ENUM_ErrorCount > 0, 1, 0) + IF(le.gendersurnamguess_ALLOW_ErrorCount > 0, 1, 0) + IF(le.home_phone_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.idcode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.lastdatevote_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.last_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.marriedappend_ENUM_ErrorCount > 0, 1, 0) + IF(le.middle_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.political_party_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.race_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.regdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.res_addr1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.res_city_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.res_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.res_zip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.schoolcode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.source_voterid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.statehouse_ALLOW_ErrorCount > 0, 1, 0) + IF(le.statesenate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.timezonetbl_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ushouse_ALLOW_ErrorCount > 0, 1, 0) + IF(le.voter_status_ALLOW_ErrorCount > 0, 1, 0) + IF(le.work_phone_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.active_status_ALLOW_ErrorCount > 0, 1, 0) + IF(le.agecat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.changedate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.countycode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.distcode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dob_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.EMID_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.file_acquired_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.first_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.gender_ENUM_ErrorCount > 0, 1, 0) + IF(le.gendersurnamguess_ALLOW_ErrorCount > 0, 1, 0) + IF(le.home_phone_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.idcode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.lastdatevote_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.last_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.marriedappend_ENUM_ErrorCount > 0, 1, 0) + IF(le.middle_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.political_party_ALLOW_ErrorCount > 0, 1, 0) + IF(le.race_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.regdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.res_addr1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.res_city_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.res_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.res_zip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.schoolcode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.source_voterid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.statehouse_ALLOW_ErrorCount > 0, 1, 0) + IF(le.statesenate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.timezonetbl_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ushouse_ALLOW_ErrorCount > 0, 1, 0) + IF(le.voter_status_ALLOW_ErrorCount > 0, 1, 0) + IF(le.work_phone_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.active_status_ALLOW_ErrorCount > 0, 1, 0) + IF(le.agecat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.changedate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.countycode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.distcode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dob_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.EMID_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.file_acquired_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.first_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.gender_ENUM_ErrorCount > 0, 1, 0) + IF(le.gendersurnamguess_ALLOW_ErrorCount > 0, 1, 0) + IF(le.home_phone_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.idcode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.lastdatevote_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.last_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.marriedappend_ENUM_ErrorCount > 0, 1, 0) + IF(le.middle_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.political_party_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.race_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.regdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.res_addr1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.res_city_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.res_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.res_zip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.schoolcode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.source_voterid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.statehouse_ALLOW_ErrorCount > 0, 1, 0) + IF(le.statesenate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.timezonetbl_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ushouse_ALLOW_ErrorCount > 0, 1, 0) + IF(le.voter_status_ALLOW_ErrorCount > 0, 1, 0) + IF(le.work_phone_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.active_status_ALLOW_ErrorCount > 0, 1, 0) + IF(le.agecat_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.changedate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.countycode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.distcode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dob_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.EMID_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.file_acquired_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.first_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.gender_ENUM_ErrorCount > 0, 1, 0) + IF(le.gendersurnamguess_ALLOW_ErrorCount > 0, 1, 0) + IF(le.home_phone_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.idcode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.lastdatevote_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.last_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.marriedappend_ENUM_ErrorCount > 0, 1, 0) + IF(le.middle_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.political_party_ALLOW_ErrorCount > 0, 1, 0) + IF(le.race_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.regdate_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.res_addr1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.res_city_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.res_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.res_zip_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.schoolcode_ALLOW_ErrorCount > 0, 1, 0) + IF(le.source_voterid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.statehouse_ALLOW_ErrorCount > 0, 1, 0) + IF(le.statesenate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_code_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.timezonetbl_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ushouse_ALLOW_ErrorCount > 0, 1, 0) + IF(le.voter_status_ALLOW_ErrorCount > 0, 1, 0) + IF(le.work_phone_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -215,7 +215,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.last_name_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.marriedappend_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.middle_name_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.political_party_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.political_party_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.race_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.regdate_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.res_addr1_Invalid,'CUSTOM','UNKNOWN')
@@ -232,7 +232,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.voter_status_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.work_phone_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'active_status','agecat','changedate','countycode','distcode','dob','EMID_number','file_acquired_date','first_name','gender','gendersurnamguess','home_phone','idcode','lastdatevote','last_name','marriedappend','middle_name','political_party','race','regdate','res_addr1','res_city','res_state','res_zip','schoolcode','source_voterid','statehouse','statesenate','state_code','timezonetbl','ushouse','voter_status','work_phone','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_alphanum_empty','invalid_agecat','invalid_changedate','invalid_alphanum_empty','invalid_alphanum_empty','invalid_dob','invalid_alphanum','invalid_pastdate8','invalid_alphanum_specials','invalid_gender','invalid_alphanum_empty','invalid_phone','invalid_alphanum_empty','invalid_lastdatevote','invalid_last_name','invalid_boolean_yn_empty','invalid_alphanum_empty_specials','invalid_numeric','invalid_race','invalid_regdate','invalid_mandatory','invalid_mandatory','invalid_st','invalid_mandatory','invalid_alphanum_empty','invalid_alphanum','invalid_alphanum_empty','invalid_alphanumquot_empty','invalid_source_state','invalid_nums_empty','invalid_alphanum_empty','invalid_alphanum_empty','invalid_phone','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'invalid_alphanum_empty','invalid_agecat','invalid_changedate','invalid_alphanum_empty','invalid_alphanum_empty','invalid_dob','invalid_alphanum','invalid_pastdate8','invalid_alphanum_specials','invalid_gender','invalid_alphanum_empty','invalid_phone','invalid_alphanum_empty','invalid_lastdatevote','invalid_last_name','invalid_boolean_yn_empty','invalid_alphanum_empty_specials','invalid_nums_empty','invalid_race','invalid_regdate','invalid_mandatory','invalid_mandatory','invalid_st','invalid_mandatory','invalid_alphanum_empty','invalid_alphanum','invalid_alphanum_empty','invalid_alphanumquot_empty','invalid_source_state','invalid_nums_empty','invalid_alphanum_empty','invalid_alphanum_empty','invalid_phone','UNKNOWN');
     SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.active_status,(SALT311.StrType)le.agecat,(SALT311.StrType)le.changedate,(SALT311.StrType)le.countycode,(SALT311.StrType)le.distcode,(SALT311.StrType)le.dob,(SALT311.StrType)le.EMID_number,(SALT311.StrType)le.file_acquired_date,(SALT311.StrType)le.first_name,(SALT311.StrType)le.gender,(SALT311.StrType)le.gendersurnamguess,(SALT311.StrType)le.home_phone,(SALT311.StrType)le.idcode,(SALT311.StrType)le.lastdatevote,(SALT311.StrType)le.last_name,(SALT311.StrType)le.marriedappend,(SALT311.StrType)le.middle_name,(SALT311.StrType)le.political_party,(SALT311.StrType)le.race,(SALT311.StrType)le.regdate,(SALT311.StrType)le.res_addr1,(SALT311.StrType)le.res_city,(SALT311.StrType)le.res_state,(SALT311.StrType)le.res_zip,(SALT311.StrType)le.schoolcode,(SALT311.StrType)le.source_voterid,(SALT311.StrType)le.statehouse,(SALT311.StrType)le.statesenate,(SALT311.StrType)le.state_code,(SALT311.StrType)le.timezonetbl,(SALT311.StrType)le.ushouse,(SALT311.StrType)le.voter_status,(SALT311.StrType)le.work_phone,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,33,Into(LEFT,COUNTER));
@@ -263,7 +263,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'last_name:invalid_last_name:CUSTOM'
           ,'marriedappend:invalid_boolean_yn_empty:ENUM'
           ,'middle_name:invalid_alphanum_empty_specials:ALLOW'
-          ,'political_party:invalid_numeric:CUSTOM'
+          ,'political_party:invalid_nums_empty:ALLOW'
           ,'race:invalid_race:CUSTOM'
           ,'regdate:invalid_regdate:CUSTOM'
           ,'res_addr1:invalid_mandatory:CUSTOM'
@@ -345,7 +345,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.last_name_CUSTOM_ErrorCount
           ,le.marriedappend_ENUM_ErrorCount
           ,le.middle_name_ALLOW_ErrorCount
-          ,le.political_party_CUSTOM_ErrorCount
+          ,le.political_party_ALLOW_ErrorCount
           ,le.race_CUSTOM_ErrorCount
           ,le.regdate_CUSTOM_ErrorCount
           ,le.res_addr1_CUSTOM_ErrorCount
@@ -386,7 +386,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.last_name_CUSTOM_ErrorCount
           ,le.marriedappend_ENUM_ErrorCount
           ,le.middle_name_ALLOW_ErrorCount
-          ,le.political_party_CUSTOM_ErrorCount
+          ,le.political_party_ALLOW_ErrorCount
           ,le.race_CUSTOM_ErrorCount
           ,le.regdate_CUSTOM_ErrorCount
           ,le.res_addr1_CUSTOM_ErrorCount

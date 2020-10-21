@@ -40,7 +40,7 @@ EXPORT Functions := MODULE
   //****************************************************************************
   EXPORT fn_non_empty_alphanum(STRING nmbr, UNSIGNED1 size = 0) := FUNCTION
     RETURN IF(IF(size = 0, LENGTH(TRIM(nmbr, ALL)) > 0, LENGTH(TRIM(nmbr, ALL)) = size) AND
-              Stringlib.StringFilterOut(ut.CleanSpacesAndUpper(nmbr), '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz') = '',1,0);
+              Stringlib.StringFilterOut(ut.CleanSpacesAndUpper(nmbr), '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') = '',1,0);
   END;
 	
 	//****************************************************************************
@@ -48,7 +48,7 @@ EXPORT Functions := MODULE
   //****************************************************************************
   EXPORT fn_non_empty_alphanum_specials(STRING nmbr, UNSIGNED1 size = 0) := FUNCTION
     RETURN IF(IF(size = 0, LENGTH(TRIM(nmbr, ALL)) > 0, LENGTH(TRIM(nmbr, ALL)) = size) AND
-              Stringlib.StringFilterOut(ut.CleanSpacesAndUpper(nmbr), '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@#-:./,`&\'ãñèóéàÂáÔíöËú ') = '',1,0);
+              Stringlib.StringFilterOut(ut.CleanSpacesAndUpper(nmbr), '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ()@#-:./,`&\'ãñèóéàÂáÔíöËú ') = '',1,0);
     END;
 		
   //*******************************************************************************

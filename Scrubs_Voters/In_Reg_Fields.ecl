@@ -28,11 +28,11 @@ EXPORT InValidFT_invalid_alphanum_empty(SALT311.StrType s) := WHICH(LENGTH(TRIM(
 EXPORT InValidMessageFT_invalid_alphanum_empty(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz '),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_alphanum_empty_specials(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@#-:./,`&\'Ã£Ã±Ã¨Ã³Ã©Ã Ã‚Ã¡Ã”Ã­Ã¶Ã‹Ãº '); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz()@#-:./,`&\'Ã£Ã±Ã¨Ã³Ã©Ã Ã‚Ã¡Ã”Ã­Ã¶Ã‹Ãº '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_alphanum_empty_specials(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@#-:./,`&\'Ã£Ã±Ã¨Ã³Ã©Ã Ã‚Ã¡Ã”Ã­Ã¶Ã‹Ãº '))));
-EXPORT InValidMessageFT_invalid_alphanum_empty_specials(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@#-:./,`&\'Ã£Ã±Ã¨Ã³Ã©Ã Ã‚Ã¡Ã”Ã­Ã¶Ã‹Ãº '),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_alphanum_empty_specials(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz()@#-:./,`&\'Ã£Ã±Ã¨Ã³Ã©Ã Ã‚Ã¡Ã”Ã­Ã¶Ã‹Ãº '))));
+EXPORT InValidMessageFT_invalid_alphanum_empty_specials(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz()@#-:./,`&\'Ã£Ã±Ã¨Ã³Ã©Ã Ã‚Ã¡Ã”Ã­Ã¶Ã‹Ãº '),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_alphanum_specials(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -68,8 +68,8 @@ EXPORT InValidMessageFT_invalid_dob(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneEr
 EXPORT MakeFT_invalid_gender(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_gender(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['F','M','U','']);
-EXPORT InValidMessageFT_invalid_gender(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('F|M|U|'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_gender(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['F','M','U','N','']);
+EXPORT InValidMessageFT_invalid_gender(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('F|M|U|N|'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_lastdatevote(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -147,7 +147,7 @@ EXPORT InValidMessageFT_invalid_st(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErr
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'active_status','agecat','changedate','countycode','distcode','dob','EMID_number','file_acquired_date','first_name','gender','gendersurnamguess','home_phone','idcode','lastdatevote','last_name','marriedappend','middle_name','political_party','race','regdate','res_addr1','res_city','res_state','res_zip','schoolcode','source_voterid','statehouse','statesenate','state_code','timezonetbl','ushouse','voter_status','work_phone');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'active_status','agecat','changedate','countycode','distcode','dob','EMID_number','file_acquired_date','first_name','gender','gendersurnamguess','home_phone','idcode','lastdatevote','last_name','marriedappend','middle_name','political_party','race','regdate','res_addr1','res_city','res_state','res_zip','schoolcode','source_voterid','statehouse','statesenate','state_code','timezonetbl','ushouse','voter_status','work_phone');
 EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'active_status' => 0,'agecat' => 1,'changedate' => 2,'countycode' => 3,'distcode' => 4,'dob' => 5,'EMID_number' => 6,'file_acquired_date' => 7,'first_name' => 8,'gender' => 9,'gendersurnamguess' => 10,'home_phone' => 11,'idcode' => 12,'lastdatevote' => 13,'last_name' => 14,'marriedappend' => 15,'middle_name' => 16,'political_party' => 17,'race' => 18,'regdate' => 19,'res_addr1' => 20,'res_city' => 21,'res_state' => 22,'res_zip' => 23,'schoolcode' => 24,'source_voterid' => 25,'statehouse' => 26,'statesenate' => 27,'state_code' => 28,'timezonetbl' => 29,'ushouse' => 30,'voter_status' => 31,'work_phone' => 32,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ENUM'],['ALLOW'],['CUSTOM'],['ALLOW'],['CUSTOM'],['CUSTOM'],['ENUM'],['ALLOW'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ALLOW'],['CUSTOM'],['ALLOW'],['ALLOW'],['CUSTOM'],['ALLOW'],['ALLOW'],['ALLOW'],['CUSTOM'],[]);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ENUM'],['ALLOW'],['CUSTOM'],['ALLOW'],['CUSTOM'],['CUSTOM'],['ENUM'],['ALLOW'],['ALLOW'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ALLOW'],['CUSTOM'],['ALLOW'],['ALLOW'],['CUSTOM'],['ALLOW'],['ALLOW'],['ALLOW'],['CUSTOM'],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
@@ -220,9 +220,9 @@ EXPORT Make_middle_name(SALT311.StrType s0) := MakeFT_invalid_alphanum_empty_spe
 EXPORT InValid_middle_name(SALT311.StrType s) := InValidFT_invalid_alphanum_empty_specials(s);
 EXPORT InValidMessage_middle_name(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanum_empty_specials(wh);
  
-EXPORT Make_political_party(SALT311.StrType s0) := MakeFT_invalid_numeric(s0);
-EXPORT InValid_political_party(SALT311.StrType s) := InValidFT_invalid_numeric(s);
-EXPORT InValidMessage_political_party(UNSIGNED1 wh) := InValidMessageFT_invalid_numeric(wh);
+EXPORT Make_political_party(SALT311.StrType s0) := MakeFT_invalid_nums_empty(s0);
+EXPORT InValid_political_party(SALT311.StrType s) := InValidFT_invalid_nums_empty(s);
+EXPORT InValidMessage_political_party(UNSIGNED1 wh) := InValidMessageFT_invalid_nums_empty(wh);
  
 EXPORT Make_race(SALT311.StrType s0) := MakeFT_invalid_race(s0);
 EXPORT InValid_race(SALT311.StrType s) := InValidFT_invalid_race(s);
