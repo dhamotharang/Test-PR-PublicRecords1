@@ -23,13 +23,13 @@ function
     INTEGER  FileSizeFrom          {xpath('FileSizeFrom'         )} := -1;
     INTEGER  FileSizeTo            {xpath('FileSizeTo'           )} := -1;
     INTEGER  FirstN                {xpath('FirstN'               )} := pFirstN;
-    UNSIGNED PageSize              {xpath('PageSize'             )} := 0;
+    integer PageSize              {xpath('PageSize'             )} := -1;
     UNSIGNED PageStartFrom         {xpath('PageStartFrom'        )} := 0;
     STRING   Sortby                {xpath('Sortby'               )} := '';
     BOOLEAN  Descending            {xpath('Descending'           )} := false;
     BOOLEAN  OneLevelDirFileReturn {xpath('OneLevelDirFileReturn')} := false;
     UNSIGNED CacheHint             {xpath('CacheHint'            )} := 0;
-    UNSIGNED MaxNumberOfFiles      {xpath('MaxNumberOfFiles'     )} := 0;
+    integer MaxNumberOfFiles      {xpath('MaxNumberOfFiles'     )} := -1;
     BOOLEAN  IncludeSuperOwner     {xpath('IncludeSuperOwner'    )} := false;
   END;
 	
