@@ -1,7 +1,7 @@
 ﻿import doxie;
 // ---------------------------------------------------------------
 // For delta rollup logic (dx_common.mac_incremental_rollup) use:
-//  $.key_patriot_delta_rid
+// $.key_patriot_delta_rid
 // ---------------------------------------------------------------
 
 layout_pat_keybuild := record
