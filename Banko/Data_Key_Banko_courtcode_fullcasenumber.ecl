@@ -1,8 +1,5 @@
-IMPORT	STD;
-EXPORT	Key_Banko_courtcode_fullcasenumber(BOOLEAN	isFCRA	=	FALSE)	:=	FUNCTION
-
-	//	Get the Key Name
-key_name	:=	Banko.BuildFullKeyName(isFCRA);
+﻿IMPORT	dx_Banko;
+EXPORT	data_Key_Banko_courtcode_fullcasenumber(BOOLEAN	isFCRA	=	FALSE)	:=	FUNCTION
 
 	//	Create a slim version of Banko.Key_Banko_courtcode_casenumber 
 rSlimFileBankoFixedJoinRec	:=	RECORD
@@ -15,8 +12,7 @@ END;
 dSlimFileBankoFixedJoinRec			:=	PROJECT(File_Banko_FixedJoinRec(isFCRA),rSlimFileBankoFixedJoinRec);
 dSlimFileBankoFixedJoinRecDedup	:=	DEDUP(SORT(DISTRIBUTE(dSlimFileBankoFixedJoinRec),RECORD,LOCAL),RECORD,LOCAL);
 
-RETURN INDEX(dSlimFileBankoFixedJoinRecDedup,
-					{court_code,BKCaseNumber,CaseID},
-					{dSlimFileBankoFixedJoinRec},
-					key_name);									
+RETURN PROJECT(dSlimFileBankoFixedJoinRecDedup, dx_Banko.layouts.i_Layout_Key_Banko_CourtCode_FullCaseNumber);
+								
 END;
+

@@ -446,9 +446,30 @@ STRING64		VIN_SIGNI_PATTRN_MASK;						//1       1-64                  VIN_SIGNI_
 	STRING250		ENG_ASP_TRBL_CHGR_DESC;						//229     18121-18370           ENG_ASP_TRBL_CHGR_DESC                The description of the Polk assigned code which identifies the vehicle carburetion type.   For example Carburator, Fuel Injection, Unknown or Electric n/a. 
 	STRING20		ENG_ASP_VVTL_CD;									//230     18372-18391           ENG_ASP_VVTL_CD                       The type of fuel injection used by a vehicle.  For example, Direct, Throttlebody 
 	STRING250		ENG_ASP_VVTL_DESC;								//231     18393-18642           ENG_ASP_VVTL_DESC                     The description of the Polk assigned code that indicates the availability of Power Brakes.  For example Not Available, Optional, etc. 
-	STRING3			LPM_LIABILITY_SYMBOL;							//232     18644-18646           LPM_LIABILITY_SYMBOL                  ISO three position Liability Symbol 
-	STRING3			LPM_PIP_MED_PAY_SYMBOL;						//233     18648-18650           LPM_PIP_MED_PAY_SYMBOL                ISO three position PIP / Medical Symbol 
-	STRING1			LPM_ROLL_IND;											//234     18652-18652           LPM_ROLL_IND                          It is common insurance industry practice to Ãƒâ€šÃ‚Â¿roll overÃƒâ€šÃ‚Â¿ insurance symbols from the previous model year into the new model year. An Ãƒâ€šÃ‚Â¿RÃƒâ€šÃ‚Â¿ is placed in this field to indicate that the ISO symbol for an existing series / model has been continued into the new model year and is not yet in the ISO country-wide book for the new model year. These symbols are phased out via normal software updates as the ISO symbols are updated and published.  This code is provided as a service to users, and use of the associated symbol is optional 
+	//DF-27656 - following 3 field names are modified from XXXX to XXXX_2018
+	STRING3			LPM_LIABILITY_SYMBOL_2018;							//232     18644-18646           LPM_LIABILITY_SYMBOL                  ISO three position Liability Symbol 
+	STRING3			LPM_PIP_MED_PAY_SYMBOL_2018;						//233     18648-18650           LPM_PIP_MED_PAY_SYMBOL                ISO three position PIP / Medical Symbol 
+	STRING1			LPM_ROLL_IND_2018;									//234     18652-18652           LPM_ROLL_IND                          It is common insurance industry practice to Ãƒâ€šÃ‚Â¿roll overÃƒâ€šÃ‚Â¿ insurance symbols from the previous model year into the new model year. An Ãƒâ€šÃ‚Â¿RÃƒâ€šÃ‚Â¿ is placed in this field to indicate that the ISO symbol for an existing series / model has been continued into the new model year and is not yet in the ISO country-wide book for the new model year. These symbols are phased out via normal software updates as the ISO symbols are updated and published.  This code is provided as a service to users, and use of the associated symbol is optional 
+	STRING6			ACES_VEHICLE_ID;									//235     18654-18659           ACES_VEHICLE_ID                        
+	STRING6			ACES_BASE_VEHICLE;								//236     18661-18666           ACES_BASE_VEHICLE                      
+	STRING5			ACES_MAKE_ID;											//237     18668-18672           ACES_MAKE_ID                           
+	STRING5			ACES_MDL_ID;											//238     18674-18678           ACES_MDL_ID                            
+	STRING5			ACES_SUB_MDL_ID;									//239     18680-18684           ACES_SUB_MDL_ID                        
+	STRING2			ACES_VEH_TYP_ID;									//240     18686-18687           ACES_VEH_TYP_ID                        
+	STRING4			ACES_YEAR_ID;											//241     18689-18692           ACES_YEAR_ID                           
+	STRING2			ACES_FUEL;												//242     18694-18695           ACES_FUEL                              
+	STRING2			ACES_FUEL_DELIVERY;								//243     18697-18698           ACES_FUEL_DELIVERY                     
+	STRING3			ACES_ENG_VIN_ID;									//244     18700-18702           ACES_ENG_VIN_ID                        
+	STRING2			ACES_ASP_ID;											//245     18704-18705           ACES_ASP_ID                            
+	STRING2			ACES_DRIVE_ID;										//246     18707-18708           ACES_DRIVE_ID                          
+	STRING2			ACES_BODY_NMBR_DR;								//247     18710-18711           ACES_BODY_NMBR_DR                      
+	STRING2			ACES_BODY_TYPE;										//248     18713-18714           ACES_BODY_TYPE                         
+	STRING2			ACES_REGION_ID;										//249     18716-18717           ACES_REGION_ID                         
+	STRING4			ACES_LITERS;											//250     18719-18722           ACES_LITERS                            
+	STRING5			ACES_CC_DISPLACEMENT;							//251     18724-18728           ACES_CC_DISPLACEMENT                   
+	STRING4			ACES_CI_DISPLACEMENT;							//252     18730-18733           ACES_CI_DISPLACEMENT                   
+	STRING2			ACES_CYLINDERS;										//253     18735-18736           ACES_CYLINDERS                         
+	STRING1			ACES_RESERVED;										//254     18738-18738           ACES_RESERVED                          
 	STRING3			VRG_RESERVED;											//255     18740-18743           VRG_RESERVED                           
 	STRING2			VRG_LIABILITY;										//256     18745-18746           VRG_LIABILITY                          
 	STRING2			VRG_PIP_MED_PAY;									//257     18748-18749           VRG_PIP_MED_PAY                        
@@ -458,15 +479,16 @@ STRING64		VIN_SIGNI_PATTRN_MASK;						//1       1-64                  VIN_SIGNI_
 	STRING64		VIN_PATRN;												//261     18759-18822           VIN_PATRN                             Contains the pattern of a VIN established by the Original Equipment Manufacturer (OEM) that is used to identify the characteristics of a given class of vehicle as they were defined by the OEM.  It does not generally identify a specific instance of a vehicle 
 	STRING3			MOTR_CYCL_USAG_CD;								//262     18824-18826           MOTR_CYCL_USAG_CD                     A further breakdown of body style for motorcycles to indicate if is it On-Road or Off-Road. 
 	STRING50		MOTR_CYCL_USAG_DESC;							//263     18828-19077           MOTR_CYCL_USAG_DESC                   A further breakdown of body style for motorcycles to indicate if is it On-Road or Off-Road. 
-	STRING3			LPM_PIP_MED_PAY_SYMBOL_2008;			//264     19079-19081           LPM_PIP_MED_PAY_SYMBOL_2008           ISO three position PIP / Medical Symbol 
-	STRING3			LPM_LIABILITY_SYMBOL_2008;				//265     19083-19085           LPM_LIABILITY_SYMBOL_2008							ISO three position Liability Symbol
-	STRING1			LPM_ROLL_IND_2008;								//266     19087-19087           LPM_ROLL_IND_2008 										It is common insurance industry practice to Ãƒâ€šÃ‚Â¿roll overÃƒâ€šÃ‚Â¿ insurance symbols from the previous model year into the new model year. An Ãƒâ€šÃ‚Â¿RÃƒâ€šÃ‚Â¿ is placed in this field to indicate that the ISO symbol for an existing series / model has been continued into the new model year and is not yet in the ISO country-wide book for the new model year. These symbols are phased out via normal software updates as the ISO symbols are updated and published.  This code is provided as a service to users, and use of the associated symbol is optional
-	STRING3			LPM_PIP_MED_PAY_SYMBOL_2010;			//267     19089-19091           LPM_PIP_MED_PAY_SYMBOL_2010						ISO three position PIP / Medical Symbol
-	STRING3			LPM_LIABILITY_SYMBOL_2010;				//268     19093-19095           LPM_LIABILITY_SYMBOL_2010							ISO three position Liability Symbol
-	STRING1			LPM_ROLL_IND_2010;								//269     19097-19097           LPM_ROLL_IND_2010   									It is common insurance industry practice to Ãƒâ€šÃ‚Â¿roll overÃƒâ€šÃ‚Â¿ insurance symbols from the previous model year into the new model year. An Ãƒâ€šÃ‚Â¿RÃƒâ€šÃ‚Â¿ is placed in this field to indicate that the ISO symbol for an existing series / model has been continued into the new model year and is not yet in the ISO country-wide book for the new model year. These symbols are phased out via normal software updates as the ISO symbols are updated and published.  This code is provided as a service to users, and use of the associated symbol is optional
-	STRING3			LPM_PIP_MED_PAY_SYMBOL_2012;			//270     19099-19101           LPM_PIP_MED_PAY_SYMBOL_2012 					ISO three position PIP / Medical Symbol
-	STRING3			LPM_LIABILITY_SYMBOL_2012;				//271     19103-19105           LPM_LIABILITY_SYMBOL_2012 						ISO three position Liability Symbol
-	STRING1			LPM_ROLL_IND_2012;								//272     19107-19107           LPM_ROLL_IND_2012											It is common insurance industry practice to Ãƒâ€šÃ‚Â¿roll overÃƒâ€šÃ‚Â¿ insurance symbols from the previous model year into the new model year. An Ãƒâ€šÃ‚Â¿RÃƒâ€šÃ‚Â¿ is placed in this field to indicate that the ISO symbol for an existing series / model has been continued into the new model year and is not yet in the ISO country-wide book for the new model year. These symbols are phased out via normal software updates as the ISO symbols are updated and published.  This code is provided as a service to users, and use of the associated symbol is optional
+	//DF-27656 - following 9 field names are modified from XXXX_2008 to XXXX_2020, XXXX_2010 to XXXX_2022, and XXXX_2012 to XXXX_2024.
+	STRING3			LPM_PIP_MED_PAY_SYMBOL_2020;					//264     19079-19081           LPM_PIP_MED_PAY_SYMBOL_2008           ISO three position PIP / Medical Symbol 
+	STRING3			LPM_LIABILITY_SYMBOL_2020;						//265     19083-19085           LPM_LIABILITY_SYMBOL_2008							ISO three position Liability Symbol
+	STRING1			LPM_ROLL_IND_2020;								//266     19087-19087           LPM_ROLL_IND_2008 										It is common insurance industry practice to Ãƒâ€šÃ‚Â¿roll overÃƒâ€šÃ‚Â¿ insurance symbols from the previous model year into the new model year. An Ãƒâ€šÃ‚Â¿RÃƒâ€šÃ‚Â¿ is placed in this field to indicate that the ISO symbol for an existing series / model has been continued into the new model year and is not yet in the ISO country-wide book for the new model year. These symbols are phased out via normal software updates as the ISO symbols are updated and published.  This code is provided as a service to users, and use of the associated symbol is optional
+	STRING3			LPM_PIP_MED_PAY_SYMBOL_2022;					//267     19089-19091           LPM_PIP_MED_PAY_SYMBOL_2010						ISO three position PIP / Medical Symbol
+	STRING3			LPM_LIABILITY_SYMBOL_2022;						//268     19093-19095           LPM_LIABILITY_SYMBOL_2010							ISO three position Liability Symbol
+	STRING1			LPM_ROLL_IND_2022;								//269     19097-19097           LPM_ROLL_IND_2010   									It is common insurance industry practice to Ãƒâ€šÃ‚Â¿roll overÃƒâ€šÃ‚Â¿ insurance symbols from the previous model year into the new model year. An Ãƒâ€šÃ‚Â¿RÃƒâ€šÃ‚Â¿ is placed in this field to indicate that the ISO symbol for an existing series / model has been continued into the new model year and is not yet in the ISO country-wide book for the new model year. These symbols are phased out via normal software updates as the ISO symbols are updated and published.  This code is provided as a service to users, and use of the associated symbol is optional
+	STRING3			LPM_PIP_MED_PAY_SYMBOL_2024;					//270     19099-19101           LPM_PIP_MED_PAY_SYMBOL_2012 					ISO three position PIP / Medical Symbol
+	STRING3			LPM_LIABILITY_SYMBOL_2024;						//271     19103-19105           LPM_LIABILITY_SYMBOL_2012 						ISO three position Liability Symbol
+	STRING1			LPM_ROLL_IND_2024;								//272     19107-19107           LPM_ROLL_IND_2012											It is common insurance industry practice to Ãƒâ€šÃ‚Â¿roll overÃƒâ€šÃ‚Â¿ insurance symbols from the previous model year into the new model year. An Ãƒâ€šÃ‚Â¿RÃƒâ€šÃ‚Â¿ is placed in this field to indicate that the ISO symbol for an existing series / model has been continued into the new model year and is not yet in the ISO country-wide book for the new model year. These symbols are phased out via normal software updates as the ISO symbols are updated and published.  This code is provided as a service to users, and use of the associated symbol is optional
 	STRING3			LPM_PIP_MED_PAY_SYMBOL_2014;			//273     19109-19111           LPM_PIP_MED_PAY_SYMBOL_2014						ISO three position PIP / Medical Symbol
 	STRING3			LPM_LIABILITY_SYMBOL_2014;				//274     19113-19115           LPM_LIABILITY_SYMBOL_2014							ISO three position Liability Symbol
 	STRING1			LPM_ROLL_IND_2014;								//275     19117-19117           LPM_ROLL_IND_2014 										It is common insurance industry practice to Ãƒâ€šÃ‚Â¿roll overÃƒâ€šÃ‚Â¿ insurance symbols from the previous model year into the new model year. An Ãƒâ€šÃ‚Â¿RÃƒâ€šÃ‚Â¿ is placed in this field to indicate that the ISO symbol for an existing series / model has been continued into the new model year and is not yet in the ISO country-wide book for the new model year. These symbols are phased out via normal software updates as the ISO symbols are updated and published.  This code is provided as a service to users, and use of the associated symbol is optional
@@ -526,7 +548,7 @@ STRING64		VIN_SIGNI_PATTRN_MASK;						//1       1-64                  VIN_SIGNI_
 	STRING10		RP_DISC_DAYTIME_LIGHT;						//328     19977-19986						RP_DISC_DAYTIME_LIGHT									Risk AnalyzerÃƒâ€šÃ‚Â® Discount for Daytime Running Lights
 	STRING1			RP_PERFORMANCE_IND;								//329     19988-19988						RP_PERFORMANCE_IND										Risk AnalyzerÃƒâ€šÃ‚Â® Physical Damage Performance Indicator
 	STRING1			RP_ROLL_IND;											//330     19990-19990						RP_ROLL_IND														Risk AnalyzerÃƒâ€šÃ‚Â® Physical Damage Symbol Rolled
-
+	
 
 end;
 
