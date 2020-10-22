@@ -1,11 +1,10 @@
-﻿﻿import Inquiry_AccLogs;
+﻿import Inquiry_AccLogs;
 
 EXPORT fspray_fcra_daily_files := module
 
 export _spray := Inquiry_AccLogs.fspray_fcra_daily_files._spray;
 
 end;
-
 
 // import Versioncontrol, std;
 
