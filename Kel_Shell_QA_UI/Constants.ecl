@@ -19,6 +19,9 @@ EXPORT prod_batch_neutral := 'http://roxiethorvip.hpcc.risk.regn.net:9856';
 // FCRA prod VIP
 EXPORT prod_batch_fcra := 'http://fcrathorvip.hpcc.risk.regn.net:9876';
 
+// Bridgett comments on Vault Roxie 10/14/2020
+// yes, the boca shell for example has been restructured where it can run on thor and all of the keyed joins have been modified for that and they would use roxiedev or roxieprod code I think. for MAS we use the vault repo and the code in the vault repo is structured different than MAS on roxie.
+
 
 //************* DALI ****************
 
