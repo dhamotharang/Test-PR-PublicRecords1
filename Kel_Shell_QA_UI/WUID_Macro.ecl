@@ -1,4 +1,4 @@
-﻿EXPORT WUID_Macro(new_Tag, old_Tag, cond):=FUNCTIONMACRO
+﻿EXPORT WUID_Macro(new_Tag, old_Tag, cond, email_list):=FUNCTIONMACRO
 
 EXPORT Layout_Person_FCRA := RECORD
     unsigned8 time_ms;
@@ -36,19 +36,22 @@ Person_NonFCRA_Distribution_comparison_report:=Kel_Shell_QA_UI.UI_PSI_Compare_Ma
 																																										Person_NonFCRA_dset1,
 																																										Person_NonFCRA_dset2,
 																																										new_Tag,
-																																										old_Tag);
+																																										old_Tag,
+																																										email_list);
 
 Person_FCRA_Distribution_comparison_report:=Kel_Shell_QA_UI.UI_PSI_Compare_Macro(unique_id,
 																																										Person_FCRA_dset1,
 																																										Person_FCRA_dset2,
 																																										new_Tag,
-																																										old_Tag);
+																																										old_Tag,
+																																										email_list);
 																																										
 Business_Distribution_comparison_report:=Kel_Shell_QA_UI.UI_PSI_Compare_Macro(unique_id,
 																																										Business_dset1,
 																																										Business_dset2,
 																																										new_Tag,
-																																										old_Tag);
+																																										old_Tag,
+																																										email_list);
 																																										
 RETURN MAP(cond='Person_NonFCRA' =>Person_NonFCRA_Distribution_comparison_report,
     cond='Person_FCRA' => Person_FCRA_Distribution_comparison_report,

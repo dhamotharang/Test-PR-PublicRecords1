@@ -226,7 +226,7 @@ Passed_Person :=
 Settings_Dataset := Kel_Shell_QA_UI.fn_make_settings_dataset(Settings);
 
      
-result1:=STD.System.Email.SendEmail(email_list, 'KEL SHELL QA UI run job',  'Your WUID ' + workunit + ' has just kicked-off!');
+result1:=STD.System.Email.SendEmail(email_list, 'KAT Notification',  'Your job has kicked-off. Your WUID is ' + workunit + '.');
 
 result2:=output(Passed_Person,named('Filtered_output'));
 
@@ -244,7 +244,7 @@ Settings_Dataset_updated:= Settings_Dataset +
 
 result5:=OUTPUT(Settings_Dataset_updated, NAMED('Attributes_Settings'));
 
-result6:=STD.System.Email.SendEmail(email_list, 'KEL SHELL QA UI run job',  'Your WUID ' + workunit + ' has completed!' + '\n You can see the results here. \n http://localhost/KAT/ ');
+result6:=STD.System.Email.SendEmail(email_list, 'KAT Notification',  'Your job has completed. Your WUID is ' + workunit + ' .' + '\n You can see the results here. \n http://alawqpnc018.risk.regn.net/KAT/ ');
 
 seq:=sequential(result1, result2, result3, result4, result5, result6);
 
