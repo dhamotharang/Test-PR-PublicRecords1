@@ -12,7 +12,7 @@
 */
 /*--INFO-- Contains RiskView Alerts, Scores, Attributes, Report version 5.0 and higher */
 
-IMPORT Risk_Reporting, iesp, gateway, risk_indicators, std, Inquiry_AccLogs, RiskView, Royalty;
+IMPORT Risk_Reporting, iesp, gateway, risk_indicators, std, Inquiry_AccLogs, RiskView, Royalty, Address, Models;
 
 export Search_Service := MACRO
 
@@ -346,7 +346,6 @@ search_results_temp := ungroup(
 			IncludeStatusRefreshChecks := IncludeStatusRefreshChecks,
             DeferredTransactionIDs := DeferredTransactionIDs,
             StatusRefreshWaitPeriod := StatusRefreshWaitPeriod,
-            ESPInterfaceVersion := InterfaceVersion,
             IsBatch := FALSE
       		) 
       	);
@@ -354,7 +353,7 @@ search_results_temp := ungroup(
 	#if(Models.LIB_RiskView_Models().TurnOnValidation) // If TRUE, output the model results directly
 		output(search_results_temp, named('Results'));
 	#else // Else, this is a normal transaction and should be formatted for output appropriately
-	// search_results := ungroup(search_results_temp);
+	 //search_results := ungroup(search_results_temp);
 	search_results := ungroup(
 		IF(TestDataEnabled, 
 		RiskView.TestSeed_Function(packagedTestseedInput, 
@@ -424,7 +423,7 @@ search_results_temp := ungroup(
 	
 	valid_riskview_xml_response := project(search_results,
 		transform(iesp.riskview2.t_RiskView2Response,
-                suppress_condition := IF((STD.Str.ToLowerCase(LEFT.Message) = STD.Str.ToLowerCase(Riskview.Constants.Deferred_request_desc) OR STD.Str.ToLowerCase(LEFT.Exception_Code) = STD.Str.ToLowerCase('-1')) AND (REAL)InterfaceVersion > 2.5 AND ExcludeStatusRefresh = FALSE AND IncludeStatusRefreshChecks = TRUE, TRUE, FALSE);
+                suppress_condition := IF((STD.Str.ToLowerCase(LEFT.Message) = STD.Str.ToLowerCase(Riskview.Constants.Deferred_request_desc) OR STD.Str.ToLowerCase(LEFT.Exception_Code) = STD.Str.ToLowerCase(Riskview.Constants.DTEError) OR STD.Str.ToLowerCase(LEFT.Exception_Code) = STD.Str.ToLowerCase(Riskview.Constants.OKCError)) AND ExcludeStatusRefresh = FALSE AND IncludeStatusRefreshChecks = TRUE, TRUE, FALSE);
 				self.Result.UniqueId := IF(~suppress_condition, LEFT.LexID, '');
 				self.Result.InputEcho := search;
 				self.Result.Models := IF(~suppress_condition, modelResults);
@@ -462,11 +461,11 @@ search_results_temp := ungroup(
 															 RiskView.Constants.Checking_Indicator_error_desc(left.Exception_code)}], iesp.share.t_WsException);
                                
                ds_excep_status_refresh := DATASET([{'Roxie', 
-                                                             IF(left.Exception_code = '22OKC', '22', left.Exception_code),
+                                                             IF(left.Exception_code = Riskview.Constants.OKCError, '22', left.Exception_code),
                                                              '', 									
                                                              RiskView.Constants.StatusRefresh_error_desc}], iesp.share.t_WsException); 
                ds_excep_DTE := DATASET([{'Roxie', 
-                                                             IF(left.Exception_code = '-1', '41', left.Exception_code),
+                                                             IF(left.Exception_code = Riskview.Constants.DTEError, '41', left.Exception_code),
                                                              '', 									
                                                              RiskView.Constants.DTE_error_desc}], iesp.share.t_WsException);
 
@@ -576,7 +575,7 @@ Deltabase_Logging_prep := project(riskview_xml, transform(Risk_Reporting.Layouts
 Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
 // #stored('Deltabase_Log', Deltabase_Logging);
 
-suppress_condition := IF(riskview_xml[1].Result.Consumer.Inquiry = ROW([], iesp.share_fcra.t_FcraConsumerInquiry) AND (REAL)InterfaceVersion > 2.5 AND ExcludeStatusRefresh = FALSE, TRUE, FALSE);
+suppress_condition := IF(riskview_xml[1].Result.Consumer.Inquiry = ROW([], iesp.share_fcra.t_FcraConsumerInquiry) AND ExcludeStatusRefresh = FALSE AND IncludeStatusRefreshChecks = TRUE, TRUE, FALSE);
 //Improved Scout Logging
 IF(~DisableOutcomeTracking and ~TestDataEnabled AND ~suppress_condition, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs__fcra_transaction__log__scout')));
 

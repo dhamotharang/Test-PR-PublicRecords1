@@ -156,7 +156,8 @@ f_with_seq_Filtered := f_with_seq_nonFiltered(
 
 // f_with_seq_Filtered_Rep has valid fname and last OR everything is empty; in either case we keep those records				 
 f_with_seq_Filtered_Rep := f_with_seq_Filtered(
-						(TRIM(Representativefirstname) <> '' AND TRIM(Representativelastname) <> '') 
+						(TRIM(Representativefirstname) <> '' AND TRIM(Representativelastname) <> '') and
+						((TRIM(RepresentativeSSN) <> '') or (TRIM(RepresentativeAddr) <> '' and TRIM(RepresentativeZip) <> '') or TRIM(RepresentativeAddr) <> '' and TRIM(RepresentativeCity) <> '' and TRIM(RepresentativeState) <> '')
 						OR 
 						(
 							TRIM(Representativefirstname) = '' AND 

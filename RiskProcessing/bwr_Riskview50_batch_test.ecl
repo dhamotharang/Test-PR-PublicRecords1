@@ -189,9 +189,30 @@ end;
 soap_input := project(ds_input_distributed, t_f(left, counter));
 output(choosen(soap_input,eyeball), named('soap_input'));
 
+layout_checkingindicators_FIS_temp := record
+  string2 CheckProfileIndex;
+  string3 CheckTimeOldest;
+  string3 CheckTimeNewest;
+  string2 CheckNegTimeOldest;
+  string2 CheckNegRiskDecTimeNewest;
+  string2 CheckNegPaidTimeNewest;
+  string4 CheckCountTotal;
+  string7 CheckAmountTotal;
+  string7 CheckAmountTotalSinceNegPaid;
+  string7 CheckAmountTotal03Month;
+	STRING1 rv3ConfirmationSubjectFound;
+  STRING3 rv3AddrChangeCount60Month;
+  STRING3 rv3AddrChangeCount12Month;
+  STRING3 rv3AddrInputTimeOldest;
+  STRING3 rv3SourceNonDerogCount;
+  STRING3 rv3AssetPropCurrentCount;
+  STRING2 rv3SSNDeceased;
+  STRING2 rv3AssetIndex;
+end;
+
 roxie_output_layout := record
 	unsigned8 time_ms{xpath('_call_latency_ms')} := 0;  // picks up timing
-	riskview.layouts.layout_riskview5_batch_response;
+	riskview.layouts.layout_riskview5_batch_response -layout_checkingindicators_FIS_temp;// -layout_FIS_custom_attributes;
 	STRING errorcode;
 END;
 
@@ -262,15 +283,18 @@ NoiBehavior := project(rv50, transform(roxie_output_layout,
 //LNJReport is the Juli name as this contains Juli/LNR report info in output WITH OUT the Juli Details - Liens and Judgments datasets included
 roxie_output_layout_noDetails := record
 	unsigned8 time_ms{xpath('_call_latency_ms')} := 0;  // picks up timing
-	riskview.layouts.layout_riskview5_batch_response -riskview.layouts.layout_riskview_lnj_batch;
+	riskview.layouts.layout_riskview5_batch_response -riskview.layouts.layout_riskview_lnj_batch - layout_checkingindicators_FIS_temp;
 	STRING errorcode;
 END;
+
+
+
 NoiBehavior_noLnJDetails := project(NoiBehavior, transform(roxie_output_layout_noDetails, self := left, self :=[]));
 output(NoiBehavior_noLnJDetails(errorcode in valid_error_codes),,outfile_name+'_withLNJRreport', CSV(heading(single), quote('"')), named('file_LNJRreport'));
 output(choosen(NoiBehavior_noLnJDetails, eyeball), named('LNJRreport'));
 
 //no Juli output will be the standard output name 
-noJuli := project(NoiBehavior, transform(RiskProcessing.bwr_LayoutsJuli.layout_riskview5_batch_responseNoJuli, self := left));
+noJuli := project(NoiBehavior, transform(RiskProcessing.bwr_LayoutsJuli.layout_riskview5_batch_responseNoJuli -layout_checkingindicators_FIS_temp, self := left));
 output(noJuli(errorcode in valid_error_codes),,outfile_name, CSV(heading(single), quote('"')), named('file_RV50'));
 output(choosen(noJuli, eyeball), named('RV50'));
 

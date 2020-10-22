@@ -1,24 +1,24 @@
-﻿EXPORT WUID_Macro(new_Tag, old_Tag, lay):=FUNCTIONMACRO
+﻿EXPORT WUID_Macro(new_Tag, old_Tag, cond):=FUNCTIONMACRO
 
-#workunit('name', 'MAS KAT Run Compare');
-
-Layout_Person_FCRA := RECORD
+EXPORT Layout_Person_FCRA := RECORD
     unsigned8 time_ms;
 	PublicRecords_KEL.ECL_Functions.Layout_Person_FCRA;
 	STRING G_ProcErrorCode;
 END;
 
-Layout_Person_NonFCRA := RECORD
+EXPORT Layout_Person_NonFCRA := RECORD
     unsigned8 time_ms;
 	PublicRecords_KEL.ECL_Functions.Layout_Person_NonFCRA;
 	STRING G_ProcErrorCode;
 END;
 
-Layout_Business_NonFCRA := RECORD
+EXPORT Layout_Business_NonFCRA := RECORD
     unsigned8 time_ms;
 	PublicRecords_KEL.ECL_Functions.Layout_Business_NonFCRA;
 	STRING G_ProcErrorCode;
 END;
+
+#workunit('name', 'MAS KAT Run Compare');
 
 unique_id:='p_inpacct';
 

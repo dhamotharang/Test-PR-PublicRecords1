@@ -113,6 +113,7 @@ export Configuration := module
   export IsAvm(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.Avm);
   export IsOKCcourtrunner(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = STD.Str.ToLowerCase(Gateway.Constants.ServiceName.OKCcourtrunner);
   export IsDTEGetRequestInfo(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = STD.Str.ToLowerCase(Gateway.Constants.ServiceName.GetRequestInfo);
+  export IsIDAFraud(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = STD.Str.ToLowerCase(Gateway.Constants.ServiceName.IDAFraud);
   // ************************************************************************
   // Use functions below to retrieve gateway configuration properties.
   //

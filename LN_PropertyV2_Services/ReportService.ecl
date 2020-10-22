@@ -37,7 +37,11 @@ export ReportService() := macro
 
   // compute results
   #CONSTANT('usePropMarshall', true);
-  raw := LN_PropertyV2_Services.ReportService_records(false).Records;
+  
+  //This boolean is used in Property Report and Search Services to show Deeds, Assessments and A&R data when LooupType is blank
+  boolean includeBlackKnight := Ln_PropertyV2_Services.input.lookupVal = Ln_PropertyV2_Services.consts.LOOKUP_TYPE.EVERYTHING;
+  
+  raw := LN_PropertyV2_Services.ReportService_records(false,,,includeBlackKnight).Records;
 
   // standard record counts & limits
   doxie.MAC_Header_Field_Declare()
