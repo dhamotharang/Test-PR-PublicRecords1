@@ -1,7 +1,7 @@
-﻿// Take actual names, with 'badguy' names hooked and use hook to get badguy
+// Take actual names, with 'badguy' names hooked and use hook to get badguy
 // scores from annotated_badguys
 
-//DF-28226 - 
+//DF-28226
 $.KeyType_BadNames take_score(names_with_namehook le,annotated_badguys ri) := transform
   self.cnt := ri.cnt;
   self := le;

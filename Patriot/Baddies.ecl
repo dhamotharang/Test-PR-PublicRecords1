@@ -9,7 +9,7 @@ res_type1 := record
 	STRING20 mname;
 	STRING20 lname;
 	unsigned8 dummy := 0;
-  //DF-28226 - fields defined for delta build
+  // DF-28226 - fields defined for delta build
 	dx_common.layout_metadata;
   end;
 
