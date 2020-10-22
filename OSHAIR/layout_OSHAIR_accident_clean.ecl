@@ -1,4 +1,4 @@
-﻿export layout_OSHAIR_accident_clean := record
+﻿export layout_OSHAIR_accident_clean := record 
   unsigned4 dt_first_seen						 := 0;
 	unsigned4 dt_last_seen						 := 0;
 	unsigned4 dt_vendor_first_reported := 0;

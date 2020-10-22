@@ -1,4 +1,4 @@
-﻿IMPORT $, tools; 
+﻿IMPORT tools; 
   
 EXPORT Names(
   STRING  pversion       = ''
@@ -6,7 +6,7 @@ EXPORT Names(
 ) :=
 MODULE
 
- SHARED lkeyTemplate                       := $.constants(pUseOtherEnvironment).oldkeyTemplate;
+ SHARED lkeyTemplate                       := constants(pUseOtherEnvironment).oldkeyTemplate;
  
  EXPORT bdid                               := lkeyTemplate + '::bdid_qa';
  EXPORT linkids                            := lkeyTemplate + '::linkids_qa';

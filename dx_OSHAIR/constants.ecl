@@ -1,4 +1,4 @@
-﻿IMPORT tools; 
+﻿IMPORT tools;
 EXPORT constants(
 
  BOOLEAN pUseOtherEnvironment = FALSE
