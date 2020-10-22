@@ -1,6 +1,6 @@
 ﻿// ---------------------------------------------------------------
 // For delta rollup logic (dx_common.mac_incremental_rollup) use:
-// $.key_patriot_delta_rid
+// $.key_baddids_delta_rid
 // ---------------------------------------------------------------
 import doxie;
 
