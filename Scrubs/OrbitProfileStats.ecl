@@ -1,4 +1,4 @@
-﻿import Salt35, Orbit3SOA, ut,_control,std,salt311;
+﻿import Salt35, Orbit3SOA, ut,_control,std,salt311,wk_ut,INQL_v2,data_services;
 EXPORT OrbitProfileStats (string pProfileName = '', string pProfileType = 'ScrubsAlerts', dataset(Salt35.ScrubsOrbitLayout)ScrubsStats = dataset([], Salt35.ScrubsOrbitLayout), string versionDate = '', string FileType = '', string CustomTag = '', string maxThreshold = '10' , string minThreshold = '-10'):= module
 	ut.CleanFields(ScrubsStats,ScrubsStatsClean);
 	Commonlayout:=project(ScrubsStatsClean,transform(salt311.ScrubsOrbitLayout,Self.rulepcnt:=(decimal5_2) (((real)left.Rulecnt/(real)left.RecordsTotal) * 100.00);self:=left;));
@@ -69,6 +69,16 @@ output(RemoveBlankRules),
 																																		 'CalculateWarnings:=Scrubs.OrbitProfileStatsPost310(\''+pProfileName+'\',\'ScrubsAlerts\',Submission,\''+versionDate+'\',\''+pProfileName+'\').CompareToProfile_for_Orbit;\r\n'+
 																																		 'Scrubs.StatSubmit(Submission,CalculateWarnings,\''+pProfileName+'\',\''+CustomTag+'\',\''+pProfileType+'\',\''+versionDate+'\',\''+FileType+'\',\''+workunit+'\');'
 																																		 ,std.system.job.target())));
+																																		 
+EXPORT RemoteSubmitStats(boolean fcra) :=  sequential(output(CleanStats,,'~thor_data400::Scrubs::FileToSubmit_'+pProfileName+'_'+workunit+'_'+versionDate,thor,all,expire(2)),
+output(RemoveBlankRules),
+																	output(wk_ut.CreateWuid('#workunit(\'name\',\''+PulledName+' Build Scrubs - '+pProfileName+'\');\r\n'+
+																																		 'Submission:=dataset(\''+IF(fcra=true,data_services.foreign_fcra_logs,data_services.foreign_logs)+'thor_data400::Scrubs::FileToSubmit_'+pProfileName+'_'+workunit+'_'+versionDate+'\',SALT311.ScrubsOrbitLayout,thor);\r\n'+
+																																		 'CalculateWarnings:=Scrubs.OrbitProfileStatsPost310(\''+pProfileName+'\',\'ScrubsAlerts\',Submission,\''+versionDate+'\',\''+pProfileName+'\').CompareToProfile_for_Orbit;\r\n'+
+																																		 'Scrubs.StatSubmit(Submission,CalculateWarnings,\''+pProfileName+'\',\''+CustomTag+'\',\''+pProfileType+'\',\''+versionDate+'\',\''+FileType+'\',\''+workunit+'\');'
+																																		 ,'thor400_44',INQL_v2._Constants.PROD_ESP)));
+																																		 
+																																		 
 																																		 
 
 shared CalculateWarnings:=Scrubs.OrbitProfileStatsPost310(pProfileName,'ScrubsAlerts',CleanStats,versionDate,pProfileName).CompareToProfile_for_Orbit;

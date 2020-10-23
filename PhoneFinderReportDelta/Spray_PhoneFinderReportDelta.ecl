@@ -13,9 +13,11 @@ EXPORT Spray_PhoneFinderReportDelta(string version, const varstring eclsourceip,
 										'delta_phonefinder_delta_phones_rpt_' + dtype + '_' + version[1..8] + '*.txt',	
 									if(dtype='transaction',
 										'delta_phonefinder_delta_phones_rpt_' + dtype + '_' + version[1..8] + '*.txt',	
-										'error')))); 
+									if(dtype='sources',
+										'delta_phonefinder_delta_phones_rpt_' + dtype + '_' + version[1..8] + '*.txt',		
+										'error'))))); 
 	
-	//Identities
+	//Spray Daily Files
 	sprayFile := std.File.SprayVariable(eclsourceip,
 																			srcdir + version[1..8] + '/' + '*' + filename,
 																			,

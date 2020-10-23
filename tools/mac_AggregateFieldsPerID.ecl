@@ -1,4 +1,4 @@
-/*
+﻿/*
 	-----------------------------------------------------------------------------------------
 	-- mac_AggregateFieldsPerID
 	-- This macro aggregates fields per id to give you a representation of what data comprises each id.  
@@ -127,7 +127,7 @@ functionmacro
 
     #IF(pFew = false)
       // #APPEND(dtable		,%'dtableField'% + ' := project(group(sort(table(' + #TEXT(pDataset) + '(' + %'lfield'% + '	!= (typeof(' + %'lfield'% + '))\'\'),{' + #TEXT(pIdField) + '	,' + %'lfield'% + '	' + %'tablecnt'% + '},' + #TEXT(pIdField) + ',' + %'lfield'% + ',merge),' + #TEXT(pIdField) + %'dpreptotalcnt'% + '),' + #TEXT(pIdField) + '),transform({recordof(left),unsigned sortcnt},self := left,self.sortcnt := counter))(sortcnt <= ' + #TEXT(pLimitChildDatasts) + ');\n')
-      #APPEND(dtable		,%'dtableField'% + '_raw := project(group(sort(table(' + #TEXT(pDataset) + '(' + %'lfield'% + '	!= (typeof(' + %'lfield'% + '))\'\'),{' + #TEXT(pIdField) + '	,' + %'lfield'% + '	' + %'tablecnt'% + '},' + #TEXT(pIdField) + ',' + %'lfield'% + ',merge),' + #TEXT(pIdField) + %'dpreptotalcnt'% + '),' + #TEXT(pIdField) + '),transform({recordof(left),unsigned sortcnt},self := left,self.sortcnt := counter));\n')
+      #APPEND(dtable		,%'dtableField'% + '_raw := project(group(sort(table(' + #TEXT(pDataset) + '(' + %'lfield'% + '	!= (typeof(' + %'lfield'% + '))\'\'),{' + #TEXT(pIdField) + '	,' + %'lfield'% + '	' + %'tablecnt'% + '},' + #TEXT(pIdField) + ',' + %'lfield'% + ',merge),' + #TEXT(pIdField) + %'dpreptotalcnt'% + ',skew(0.3)),' + #TEXT(pIdField) + '),transform({recordof(left),unsigned sortcnt},self := left,self.sortcnt := counter));\n')
       #APPEND(dtable		,%'dtableField'% + '_max := table(group(' + %'dtableField'% + '_raw) ,{' + #TEXT(pIdField) + ',unsigned8 max_cnt := count(group)} ,' + #TEXT(pIdField) + ' ,merge);\n')
       #APPEND(dtable		,%'dtableField'% + ':= join(group(' + %'dtableField'% + '_raw) ,' + %'dtableField'% + '_max ,left.' + #TEXT(pIdField) + ' = right.' + #TEXT(pIdField) + '  ,transform({recordof(left),unsigned8 count_' + %'lfields'% + '}\n')
       #APPEND(dtable		,'  ,self.count_' + %'lfields'% + ' := right.max_cnt,self := left),hash)\n')      

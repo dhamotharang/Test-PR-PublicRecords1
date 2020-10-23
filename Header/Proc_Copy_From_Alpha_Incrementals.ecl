@@ -40,7 +40,7 @@ SHARED getFileVersion(string sf,boolean alp=false) := FUNCTION
 
 END;
 
-EXPORT  filedate := '20200901';//getFileVersion(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::inc_boca::did::refs::relative',true):INDEPENDENT ;
+EXPORT  filedate := getFileVersion(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::inc_boca::did::refs::relative',true):INDEPENDENT ;
 
 SHARED fc(string f1, string f2):= sequential(
     output(dataset([{f1,'thor400_44',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
@@ -61,11 +61,8 @@ EXPORT copy_addr_uniq_keys_from_alpha(string filedt) := function
   AddrLFKeyName(boolean fcra)  := '~thor_data400::key::' + if(fcra, 'fcra::', '') + 'header::' + filedt + '::addr_unique_expanded';
 
   copyKeys := sequential(
-    //  fc(get_alogical('thor_data400::key::insuranceheader_incremental::fcra::qa::addr_unique_expanded'), AddrLFKeyName(true))
-     fc('foreign::10.194.112.105::thor_data400::key::insuranceheader_incremental::fcra::20200901::addr_unique_expanded', AddrLFKeyName(true))
-,fc('foreign::10.194.112.105::thor_data400::key::insuranceheader_incremental::20200901::addr_unique_expanded',AddrLFKeyName(false))
-
-    // ,fc('get_alogical('thor_data400::key::insuranceheader_incremental::qa::addr_unique_expanded''), AddrLFKeyName(false))
+      fc(get_alogical('thor_data400::key::insuranceheader_incremental::fcra::qa::addr_unique_expanded'), AddrLFKeyName(true))     
+     ,fc(get_alogical('thor_data400::key::insuranceheader_incremental::qa::addr_unique_expanded'), AddrLFKeyName(false))
     );
     
   moveKeys := sequential(    
@@ -127,8 +124,7 @@ EXPORT copy_from_alpha(string filedt) := function
 
     // Copy foreign keys to local thor
     copy_incremental_keys := sequential(
-     //fc(get_alogical('thor_data400::key::insuranceheader_segmentation::did_ind_qa'),'~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind')
-     fc('foreign::10.194.112.105::thor_data400::key::insuranceheader_segmentation::20200901::did_ind','~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind')
+     fc(get_alogical('thor_data400::key::insuranceheader_segmentation::did_ind_qa'),'~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind')
     ,fc(get_alogical(aPrefLoc + 'locid_qa')      ,'~' + aPrefLoc + filedt + '::locid')  
     ,fc(get_alogical(aPref+'did::refs::address') ,fName(filedt, '::did::refs::address'))
     ,fc(get_alogical(aPref+'did::refs::dln')     ,fName(filedt, '::did::refs::dln'))
@@ -267,16 +263,13 @@ SHARED udops(string3 skipPackage='000') := sequential(
                        ))
 );
 
-SHARED orbit_update_entries(boolean isCreate, string skipPackage='000') := function
+SHARED orbit_update_entries(string skipPackage='000') := function
 
-    skipcreatebuild := if(isCreate, false, true);
-    skipupdatebuild := if(isCreate, true, false);
-
-    RETURN sequential(
-                        if(skipPackage[1]='0',Orbit3.Proc_Orbit3_CreateBuild('PersonXLAB_Inc', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers)),
-                        if(skipPackage[2]='0',Orbit3.Proc_Orbit3_CreateBuild('FCRA_Header', filedate, 'F', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers)),
-                        if(skipPackage[3]='0',Orbit3.Proc_Orbit3_CreateBuild('Header_IKB', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers))
-                      );
+    RETURN sequential(    
+      if(skipPackage[1]='0', Orbit3.Proc_Orbit3_CreateBuild('PersonXLAB_Inc', filedate, 'N',email_list := Header.email_list.BocaDevelopers)),
+      if(skipPackage[2]='0', Orbit3.Proc_Orbit3_CreateBuild('FCRA_Header', filedate, 'F', email_list := Header.email_list.BocaDevelopers)),
+      if(skipPackage[3]='0', Orbit3.Proc_Orbit3_CreateBuild('Header_IKB', filedate, 'N', email_list := Header.email_list.BocaDevelopers))
+    );
 
 END;
 
@@ -348,11 +341,12 @@ qa     := aPrefLoc + 'qa::locid';
 EXPORT movetoQA(string filedt) := sequential(
     // The following can only copy after the key is built in Boca
     fc8(fName(filedt, '::did'), fName8(filedt, '::did')),
-    update_inc_superfiles(,filedt),        
+    update_inc_superfiles(,filedt),
     update_segmentation_supers(ver(nm,'father','thor400_44'), ver(nm,'qa','thor400_44')),
     update_segmentation_supers(ver(nm,'qa','thor400_44'), ver(nm,filedt,'thor_data400')),
     update_segmentation_supers(ver(nm,'qa','thor400_36'), ver(nm,filedt,'thor400_36')),
-    update_segmentation_supers( ver(nm,'qa','thor_data400'), ver(nm,filedt,'thor_data400')),
+    update_segmentation_supers(ver(nm,'qa','thor_data400'), ver(nm,filedt,'thor_data400')),
+    update_segmentation_supers(ver(nm,'built','thor400_44'), ver(nm,filedt,'thor_data400')),
     STD.File.StartSuperFileTransaction(),
     STD.File.ClearSuperFile(father, true),
     STD.File.AddSuperFile(father,qa, addcontents := true),
@@ -380,8 +374,7 @@ EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000'
     +'gabriel.marcan@lexisnexisrisk.com\n'
     +'\nThank you,'),          
     
-    orbit_update_entries(true,skipPackage),   //Create
-    orbit_update_entries(false,skipPackage),  //Update
+    orbit_update_entries(skipPackage),   //Create
     udops(skipPackage)
 );
 END;

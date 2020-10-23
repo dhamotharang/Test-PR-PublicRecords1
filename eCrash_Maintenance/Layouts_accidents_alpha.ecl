@@ -1,4 +1,15 @@
-﻿EXPORT Layouts_accidents_alpha := RECORD
+﻿citations_childrec := RECORD
+   string7 citation_issued;
+   string7 citation_type;
+   string100 citation_detail1;
+   string64 citation_status;
+   string60 violation_code1;
+   string60 violation_code2;
+   string60 violation_code3;
+   string60 violation_code4;
+  END;
+
+EXPORT Layouts_accidents_alpha := RECORD
   unsigned6 dotid;
   unsigned2 dotscore;
   unsigned2 dotweight;
@@ -177,6 +188,7 @@
   string40 addl_report_number;
   string11 agency_id;
   string9 agency_ori;
+  boolean is_terminated_agency;
   string100 insurance_company_standardized;
   string1 is_available_for_public;
   string20 report_status;
@@ -274,4 +286,6 @@
   string pedalcyclist_actions_at_time_of_crash;
   string passenger_actions_at_time_of_crash;
   string marijuana_use_suspected;
+  DATASET(citations_childrec) citation_details{maxcount(50)};
  END;
+

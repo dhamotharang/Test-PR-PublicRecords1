@@ -1930,7 +1930,29 @@ EXPORT dsSourceCriteria := DATASET([
 {'Vessels - EC (CFSP) 2018/293 Democratic People\'s Republic of Korea List Prohibited Entry into Ports,','1917'},
 {'Vessels - EC 2018/286 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1918'},
 {'OFAC - International Criminal Court Prosecutor\'s List','1919'},
-{'Vessels - EC (CFSP) 2018/293 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1920'}
+{'Vessels - EC (CFSP) 2018/293 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1920'},
+{'EC (CFSP) 2020/1269 Ukraine List','1921'},
+{'EC 2020/1267 Ukraine List','1922'},
+{'EC (CFSP) 2020/1310 Libya List','1923'},
+{'EC 2020/1297 ISIL (Da\'esh) and Al-Qaida List','1924'},
+{'EC 2020/1309 Libya List','1925'},
+{'DFATD (Canada) Special Economic Measures (Belarus) Regulations','1926'},
+{'US Department of State Cuba Prohibited Accommodations List','1927'},
+{'EC (CFSP) 2020/1368 Ukraine List','1928'},
+{'EC (CFSP) 2020/1388 Belarus List','1929'},
+{'EC 2020/1367 Ukraine List','1930'},
+{'EC 2020/1387 Belarus List','1931'},
+{'EC 2020/1473 ISIL (Da\'esh) and Al-Qaida List','1932'},
+{'EC (CFSP) 2020/1466 Proliferation and Use of Chemical Weapons List','1933'},
+{'EC (CFSP) 2020/1482 Proliferation and Use of Chemical Weapons List','1934'},
+{'EC (CFSP) 2020/1483 Libya List','1935'},
+{'EC (CFSP) 2020/1506 Syria List','1936'},
+{'EC (CFSP) 2020/1509 Democratic Republic of the Congo List','1937'},
+{'EC 2020/1463 Proliferation and Use of Chemical Weapons List','1938'},
+{'EC 2020/1480 Proliferation and Use of Chemical Weapons List','1939'},
+{'EC 2020/1481 Libya List','1940'},
+{'EC 2020/1505 Syria List','1941'},
+{'EC 2020/1507 Democratic Republic of the Congo List','1942'}
 
 ],r);
 

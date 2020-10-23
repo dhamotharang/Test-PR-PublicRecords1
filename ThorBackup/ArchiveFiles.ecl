@@ -236,7 +236,8 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 		return 	apply(GetActualFileListToCopy(),
 														sequential(
 																output( 'Copying file ' + (string) l_cnt),
-																STD.File.DfuPlusExec(cmd)
+																if (STD.File.FileExists('~foreign::'+_Control.Config.prod_dali+'::'+files)
+																	,STD.File.DfuPlusExec(cmd))
 																)
 														 );
 	end;

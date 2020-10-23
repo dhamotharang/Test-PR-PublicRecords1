@@ -3,8 +3,8 @@
 export IdAppendThor(
 		dataset(BIPV2.IdAppendLayouts.AppendInput) inputDs
 		,unsigned scoreThreshold = 75
-		,unsigned weightThreshold = IdConstants.APPEND_WEIGHT_THRESHOLD_THOR
-		,boolean primForce = false
+		,unsigned weightThreshold = 0
+		,boolean primForce = true
 		,boolean reAppend = true
 		,boolean allowInvalidResults = false
 		,boolean mimicRoxie = false // This is for ease of testing and can cause slower performance

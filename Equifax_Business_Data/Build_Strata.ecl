@@ -21,10 +21,10 @@ EXPORT Build_Strata(
 	Strata.mac_CreateXMLStats(dUpdate.dUniqueNoGrouping					,Equifax_Business_Data._Constants().Name	,'base_file' ,pversion	,Equifax_Business_Data.email_notification_lists().buildsuccess	,BuildUniqueNoGrouping_Strata					,'View'				,'Uniques'		,,pIsTesting,pOverwrite);
 	Strata.mac_CreateXMLStats(dUpdate.dUniqueCleanAddressState	,Equifax_Business_Data._Constants().Name	,'base_file' ,pversion	,Equifax_Business_Data.email_notification_lists().buildsuccess	,BuildUniqueCleanAddressState_Strata	,'Clean_State'	,'Uniques'		,,pIsTesting,pOverwrite);
 	
-	Strata.mac_CreateXMLStats(dUpdate.dContactsNoGrouping					  ,Equifax_Business_Data._Constants().Name	,'Input'	   ,pversion	,Equifax_Business_Data.email_notification_lists().buildsuccess	,BuildContactsNoGrouping_Strata					,'View'				,'Population'	,,pIsTesting,pOverwrite);
-	Strata.mac_CreateXMLStats(dUpdate.dContactsUniqueNoGrouping		,Equifax_Business_Data._Constants().Name	,'Input'	   ,pversion	,Equifax_Business_Data.email_notification_lists().buildsuccess	,BuildContactsUniqueNoGrouping_Strata		,'View'				,'Uniques'		,,pIsTesting,pOverwrite);
-	Strata.mac_CreateXMLStats(dUpdate.dBaseContactsNoGrouping				,Equifax_Business_Data._Constants().Name	,'base_file' ,pversion	,Equifax_Business_Data.email_notification_lists().buildsuccess	,BuildContactsBaseNoGrouping_Strata								,'View'				,'Population'	,,pIsTesting,pOverwrite);
-	Strata.mac_CreateXMLStats(dUpdate.dBaseContactsUniqueNoGrouping	,Equifax_Business_Data._Constants().Name	,'base_file' ,pversion	,Equifax_Business_Data.email_notification_lists().buildsuccess	,BuildContactsBaseUniqueNoGrouping_Strata					,'View'				,'Uniques'		,,pIsTesting,pOverwrite);
+	Strata.mac_CreateXMLStats(dUpdate.dContactsNoGrouping					  ,Equifax_Business_Data._Constants().Name	,'Contacts Input'	   ,pversion	,Equifax_Business_Data.email_notification_lists().buildsuccess	,BuildContactsNoGrouping_Strata					,'View'				,'Population'	,,pIsTesting,pOverwrite);
+	Strata.mac_CreateXMLStats(dUpdate.dContactsUniqueNoGrouping		,Equifax_Business_Data._Constants().Name	,'Contacts Input'	   ,pversion	,Equifax_Business_Data.email_notification_lists().buildsuccess	,BuildContactsUniqueNoGrouping_Strata		,'View'				,'Uniques'		,,pIsTesting,pOverwrite);
+	Strata.mac_CreateXMLStats(dUpdate.dBaseContactsNoGrouping				,Equifax_Business_Data._Constants().Name	,'Contacts base_file' ,pversion	,Equifax_Business_Data.email_notification_lists().buildsuccess	,BuildContactsBaseNoGrouping_Strata								,'View'				,'Population'	,,pIsTesting,pOverwrite);
+	Strata.mac_CreateXMLStats(dUpdate.dBaseContactsUniqueNoGrouping	,Equifax_Business_Data._Constants().Name	,'Contacts base_file' ,pversion	,Equifax_Business_Data.email_notification_lists().buildsuccess	,BuildContactsBaseUniqueNoGrouping_Strata					,'View'				,'Uniques'		,,pIsTesting,pOverwrite);
 		
 	full_build := PARALLEL(
 		 BuildInputNoGrouping_Strata			

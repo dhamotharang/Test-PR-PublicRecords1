@@ -1,4 +1,4 @@
-﻿Import bipv2;
+﻿Import bipv2; 
 EXPORT Layouts_input := module
 
 export Accident	:=	record
@@ -182,6 +182,12 @@ export cleaned_inspection := record
 	unsigned8	ace_aid										 	:= 0; //Added for AID 
 	string100	prep_addr_line1						 	:=''; //Added for AID 
 	string50	prep_addr_line_last				 	:=''; //Added for AID 
+	//Added for Cloud Project ~ DF-28288
+	unsigned8 record_sid := 0;
+  unsigned4 global_sid := 0;
+  unsigned4 dt_effective_first := 0;
+  unsigned4 dt_effective_last := 0;
+  unsigned1 delta_ind := 0; // 0 - main record, 1 - incremental                  
 end; 
 
 end;

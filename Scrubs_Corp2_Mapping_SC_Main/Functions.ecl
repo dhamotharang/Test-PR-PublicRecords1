@@ -1,4 +1,4 @@
-IMPORT corp2, corp2_raw_sc;
+﻿IMPORT corp2, corp2_raw_sc;
 	
 EXPORT Functions := MODULE
 
@@ -79,6 +79,7 @@ EXPORT Functions := MODULE
 														uc_s in ['CORPORATION FOR PROFIT','ELEEMOSYNARY NONPROFIT']			=> true,
 														uc_s in ['ELEEMOSYNARY FOR PROFIT','LIMITED LIABILITY COMPANY']	=> true,
 														uc_s in ['LIMITED LIABILITY PARTNERSHIP','LIMITED PARTNERSHIP']	=> true,
+														uc_s in ['GENERAL PARTNERSHIP']	                                => true,
 														false
 													 ),
 												true //For contact records, corp_ln_name_type_desc doesn't have to exist
@@ -95,7 +96,7 @@ EXPORT Functions := MODULE
 
 			 uc_s 		:= corp2.t2u(s);
 					 
-			isValidCD := map(uc_s in ['','CNV','DIS','EXP','FOR','GDS','INT','MER','NAG','NOAFFECT','REG','REI','RES']	=> true,
+			isValidCD := map(uc_s in ['','CNV','DIS','EXP','FOR','GDS','INT','MER','NAG','NAL','NOAFFECT','REG','REI','RES']	=> true,
 											 false
 										  );
 

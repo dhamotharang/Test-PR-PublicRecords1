@@ -124,7 +124,7 @@ Prof_License.Layout_proLic_in  map2common( Files_IA.Medical l ) := transform
                           
   self.name_order := 'FML';                                                                  
   self.orig_addr_1 := l.AddressLine1;                                                       
-  self.orig_addr_2 := l.AddressLine2;                                                       
+ // self.orig_addr_2 := l.AddressLine2;                                                       
   self.status :=  trim(l.LicenseStatus);                                            
   self.orig_zip := StringLib.Stringfilter(l.Zipcode, '0123456789')[1..9];          
   self.orig_city := l.City;                                                                 

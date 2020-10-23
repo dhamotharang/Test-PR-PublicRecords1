@@ -7,13 +7,13 @@ export NAC_v2.Layout_Collisions2.Layout_Collisions xCollisions(NAC_v2.Layout_Bas
 				function
 				return map(l.ProgramState <> r.ProgramState => le
 											,l.GroupId <> l.GroupId => le
-											,l.CaseId > r.CaseId => ri	// intrastate case ids must be different
+											,l.ClientId > r.ClientId => ri	// intrastate client ids must be different
 									 ,le);
 			end;
 			fn_right(string le, string ri) := function
 				return map(l.ProgramState <> r.ProgramState => ri
 											,l.GroupId <> l.GroupId => ri
-									 ,l.CaseId > r.CaseId => le			
+									 ,l.ClientId > r.ClientId => le			
 									 ,ri);
 			end;
 
@@ -84,6 +84,7 @@ export NAC_v2.Layout_Collisions2.Layout_Collisions xCollisions(NAC_v2.Layout_Bas
 			self.SearchLastName := fn_left(l.LastName,r.LastName);
 			self.SearchFirstName := fn_left(l.FirstName,r.FirstName);
 			self.SearchMiddleName := fn_left(l.MiddleName,r.MiddleName);
+			self.SearchSuffixName := fn_left(l.NameSuffix,r.NameSuffix);
 			self.SearchSSN := fn_left(l.SSN,r.SSN);
 			self.SearchDOB := fn_left(l.DOB,r.DOB);
 			
@@ -147,6 +148,7 @@ export NAC_v2.Layout_Collisions2.Layout_Collisions xCollisions(NAC_v2.Layout_Bas
 			self.ClientLastName := fn_right(l.LastName,r.LastName);
 			self.ClientFirstName := fn_right(l.FirstName,r.FirstName);
 			self.ClientMiddleName := fn_right(l.MiddleName,r.MiddleName);
+			self.ClientSuffixName := fn_right(l.NameSuffix,r.NameSuffix);
 			self.ClientGender := fn_right(l.Gender,r.Gender);
 			self.ClientRace := fn_right(l.Race,r.Race);
 			self.ClientEthnicity := fn_right(l.Ethnicity,r.Ethnicity);

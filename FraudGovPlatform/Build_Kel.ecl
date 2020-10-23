@@ -61,19 +61,12 @@ BuildStatusReport :=
 
 			
 	Export	All := Sequential(
-//GRP-5211 keeping the code for future use.
-/* 										 Build_Keys(pVersion).Delta_All
-   										,Build_Base_Kel(pVersion).Delta_All
-   										,Promote(pversion).buildfiles.New2Built
-   										,Promote(pversion).buildfiles.Built2QA
-   										,
-*/
 										Build_Keys(pVersion).All
 										,Build_Base_Kel(pVersion).All
 										,Promote(pversion).buildfiles.New2Built
 										,Promote(pversion).buildfiles.Built2QA
 										,FraudGovPlatform.Promote(pversion).promote_keys
-										,FraudGovPlatform.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion)
+										,Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion)
 										,_Control.fSubmitNewWorkunit(GenerateDashboards,ThorName)
 										,_Control.fSubmitNewWorkunit(BuildStatusReport,ECLThorName)
 										,_Control.fSubmitNewWorkunit(BuildCoverageDates,ThorName)

@@ -180,8 +180,8 @@ EXPORT layouts := MODULE
 			doxie_files.File_Offenders.offender_key;
 		END;
 		SHARED phonefeedback_documentid_record := RECORD
-			PhonesFeedback.Layouts_PhonesFeedback.Layout_PhonesFeedback_base.did;
-			PhonesFeedback.Layouts_PhonesFeedback.Layout_PhonesFeedback_base.phone_number;
+			PhonesFeedback.Key_PhonesFeedback_phone().did;
+			PhonesFeedback.Key_PhonesFeedback_phone().phone_number;
 		END;
 		SHARED foreclosure_documentid_record := RECORD
 			Property.Layout_Fares_Foreclosure.situs1_zip;
@@ -233,9 +233,9 @@ EXPORT layouts := MODULE
 		END;
 		
 		SHARED inquiry_documentid_record := RECORD
-			AccountMonitoring.product_files.inquiry.inquiryLinkid_key.search_info.transaction_id;
-			AccountMonitoring.product_files.inquiry.inquiryLinkid_key.search_info.sequence_number;
-			AccountMonitoring.product_files.inquiry.inquiryLinkid_key.search_info.datetime;
+			AccountMonitoring.product_files.inquiry.inquiryLinkid_key_monitor.search_info.transaction_id;
+			AccountMonitoring.product_files.inquiry.inquiryLinkid_key_monitor.search_info.sequence_number;
+			AccountMonitoring.product_files.inquiry.inquiryLinkid_key_monitor.search_info.datetime;
 		END;
 		
 		SHARED corp_documentid_record := RECORD

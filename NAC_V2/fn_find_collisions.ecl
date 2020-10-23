@@ -1,4 +1,4 @@
-import header,ut;
+﻿import header,ut;
 
 // L             LexId
 // N             Name
@@ -227,7 +227,7 @@ EXPORT fn_find_collisions	(
 		/***
 			collision options:
 				1) inter state: state1 <> state2
-				2) intra state: state1=state2 and benefit1=benefit2 and caseid1<>caseid2
+				2) intra state: state1=state2 and benefit1=benefit2 and ClientId<>ClientId
 				3) informational: state1=state2 and beneft1<>benefit2: NOT IMPLEMENTED YET
 		***/
 		
@@ -236,6 +236,7 @@ EXPORT fn_find_collisions	(
 			(left.ProgramState = right.ProgramState and 
 				//left.ProgramCode = right.ProgramCode
 				nac_v2.GetCollisionCode(left.ProgramCode) = nac_v2.GetCollisionCode(right.ProgramCode)
+				and left.ClientId <> right.ClientId
 				and left.CaseId <> right.CaseId)
 			//OR
 			//(left.ProgramState=right.ProgramState and 

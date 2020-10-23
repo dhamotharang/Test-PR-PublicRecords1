@@ -23,19 +23,19 @@ record
 end;
 
 SHARED	SlimBase := project(FileBase, 
-												transform(DidSlim, 
-														SELF.fname:=LEFT.raw_first_name;
-														SELF.lname:=LEFT.raw_last_name;
-														SELF.name_suffix:= LEFT.raw_Orig_Suffix; 
-														SELF.ssn := LEFT.ssn; 
-														SELF.dob := (unsigned)LEFT.dob; 
-														SELF.prim_range := LEFT.clean_address.prim_range; 
-														SELF.prim_name := LEFT.clean_address.prim_name; 
-														SELF.v_city_name := LEFT.clean_address.v_city_name; 
-														SELF.st := LEFT.clean_address.st; 
-														SELF.zip := LEFT.clean_address.zip; 
-														SELF := LEFT; 
-														SELF := []));
+	transform(DidSlim, 
+			SELF.fname:=LEFT.cleaned_name.fname;
+			SELF.lname:=LEFT.cleaned_name.lname;
+			SELF.name_suffix:= LEFT.cleaned_name.name_suffix; 
+			SELF.ssn := LEFT.clean_ssn; 
+			SELF.dob := (unsigned)LEFT.clean_dob; 
+			SELF.prim_range := LEFT.clean_address.prim_range; 
+			SELF.prim_name := LEFT.clean_address.prim_name; 
+			SELF.v_city_name := LEFT.clean_address.v_city_name; 
+			SELF.st := LEFT.clean_address.st; 
+			SELF.zip := LEFT.clean_address.zip; 
+			SELF := LEFT; 
+			SELF := []));
 //////////////////////////////////
 // 'NSD'=> 1             //LASTNAME & FIRSTNAME    & SSN      & DOB
 matchset:=['N','S','D'];

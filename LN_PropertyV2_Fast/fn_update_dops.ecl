@@ -1,6 +1,6 @@
 IMPORT RoxieKeyBuild;
 EXPORT fn_update_dops(string8 process_date,boolean isFast, boolean includeBoolean = true) :=	FUNCTION
-				uFlag := if(isFast,'DR','F');
+				uFlag := if(isFast,'D','F'); // DF-27847 to include only current delta and append logical file to superfle
 				emails := LN_PropertyV2_Fast.JobInfo.getEmailsToNotify();
 				update_dops := parallel (  
 					// FULL KEYS

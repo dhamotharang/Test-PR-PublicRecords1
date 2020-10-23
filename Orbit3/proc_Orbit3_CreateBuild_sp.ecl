@@ -1,6 +1,9 @@
 ﻿import ut,Orbit3,_Control;
-export Proc_Orbit3_CreateBuild_sp(string buildname,string Buildvs,string Envmt = 'N', string email_list = '',boolean skipcreatebuild = false,boolean skipupdatebuild = false,boolean runcreatebuild = true,string wuid) := function
+export Proc_Orbit3_CreateBuild_sp(string buildname,string Buildvs,string Envmt = 'N', string BuildStatus = 'BUILD_AVAILABLE_FOR_USE', string email_list = '',boolean skipcreatebuild = false,boolean skipupdatebuild = false,boolean runcreatebuild = true,boolean is_npf = false, string wuid) := function
 
+  	string Envmt_isnpf  := if ( is_npf = true, '',Envmt);
+
+	
 	tokenval := orbit3.GetToken();
 
 	create_build := orbit3.CreateBuild(buildname,
@@ -14,13 +17,20 @@ export Proc_Orbit3_CreateBuild_sp(string buildname,string Buildvs,string Envmt =
 									tokenval,		
 									).retcode;
 									
-	Update_build := Orbit3.UpdateBuildInstance(buildname,
-									Buildvs,
-									tokenval,
-									'BUILD_AVAILABLE_FOR_USE',
-									Orbit3.Constants(Envmt).platform_upd
+	Update_build := if ( is_npf = true , Orbit3.UpdateBuildInstance(buildname,
+									                                Buildvs,
+									                                  tokenval,
+									                             BuildStatus
 						                                  
-									).retcode;
+									                             ).retcode,
+										  Orbit3.UpdateBuildInstance(buildname,
+									                                Buildvs,
+									                                  tokenval,
+									                             BuildStatus,
+																 Orbit3.Constants(Envmt_isnpf).platform_upd
+						                                  
+									                             ).retcode
+	                        );
 																
 sendemail(string keyword = '',string status = '') := function 
 		
@@ -33,8 +43,8 @@ sendemail(string keyword = '',string status = '') := function
 												 'N/A'
 												 );
 	   	 emailtoall :=  fileservices.sendemail(
-												Send_Email(Buildvs,email_list).emaillist,
-												' Orbit for Build : '+buildname+',version: '+Buildvs+',Env : '+Orbit3.Constants(Envmt).which_env,
+												Send_Email(Buildvs,email_list,buildname,Buildvs ).emaillist,
+												' Orbit for Build : '+buildname+',version: '+Buildvs+',Env : '+Orbit3.Constants(Envmt_isnpf).which_env,
 												'BuildName:'+buildname+'\n'+
 												'---------------------'+'\n'+
 												'Buildversion:'+Buildvs+'\n'+
@@ -50,7 +60,7 @@ sendemail(string keyword = '',string status = '') := function
 												'Build Workunit:'+wuid);
 												
 		verifystatus := if ( status not in [  'FAIL' , 'ABORT' ] , emailtoall , Sequential ( emailtoall,
-									                                                                             FAIL( 'Orbit Build Instance Update Aborted .Build Name :'+buildname+ ' Build Version: '+Buildvs+' Reason:'+description )
+									                                                                             Output( 'Orbit Build Instance Update failed .Build Name :'+buildname+ ' Build Version: '+Buildvs+' Reason:'+description )
 																					          )
 							);
 							

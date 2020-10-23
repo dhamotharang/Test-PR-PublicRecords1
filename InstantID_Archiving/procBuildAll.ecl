@@ -43,10 +43,10 @@ RETURN SEQUENTIAL(
 						InstantID_Archiving.procBuildAutoKeys(filedate);
 						//Samples;
 						InstantID_Archiving.Updated_Samples;
-						RoxieKeyBuild.updateversion('InstantIDArchiveKeys', FileDate, 'cecelie.reid@lexisnexis.com, wenhong.ma@lexisnexis.com, christopher.brodeur@lexisnexis.com, intel357@bellsouth.net, manuel.tarectecan@lexisnexis.com, randy.reyes@lexisnexis.com', , 'N');
+						RoxieKeyBuild.updateversion('InstantIDArchiveKeys', FileDate, 'Christopher.Brodeur@lexisnexis.com, Manuel.Tarectecan@lexisnexis.com', , 'N');
 						if(ut.Weekday((integer)filedate) <> 'SATURDAY' and ut.Weekday((integer)filedate) <> 'SUNDAY',
 					  create_orbit_build,
 					  output('No Orbit Entries Needed for weekend builds'));
-						fileservices.sendemail('wenhong.ma@lexisnexis.com, christopher.brodeur@lexisnexis.com, cecelie.reid@lexisnexis.com, intel357@bellsouth.net, manuel.tarectecan@lexisnexis.com, randy.reyes@lexisnexis.com', 'InstantID Archiving Build Complete ' + WORKUNIT,WORKUNIT);
+						fileservices.sendemail('Christopher.Brodeur@lexisnexis.com, Manuel.Tarectecan@lexisnexis.com', 'InstantID Archiving Build Complete ' + WORKUNIT,WORKUNIT);
 						);
 END;

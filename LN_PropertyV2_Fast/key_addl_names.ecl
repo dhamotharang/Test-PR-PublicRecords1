@@ -7,7 +7,7 @@ keyPrefix			:= if(isFast,'property_fast','ln_propertyv2');
 KeyName 			:= 'thor_data400::key::'+keyPrefix+'::';
 KeyName_fcra  := 'thor_data400::key::'+keyPrefix+'::fcra::';
 
-file_in0	:=	if(isFast,LN_PropertyV2_Fast.Files.base.addl_names ,ln_propertyv2.file_ln_deed_addlnames);
+file_in0	:=	if(isFast,LN_PropertyV2_Fast.Files.basedelta.addl_names ,ln_propertyv2.file_ln_deed_addlnames);
 
 file_in := file_in0(ln_fares_id not in LN_PropertyV2.Suppress_LNFaresID);
 
