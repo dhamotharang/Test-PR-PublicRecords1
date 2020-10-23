@@ -1942,7 +1942,17 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2020/1388 Belarus List','1929'},
 {'EC 2020/1367 Ukraine List','1930'},
 {'EC 2020/1387 Belarus List','1931'},
-{'EC 2020/1473 ISIL (Da\'esh) and Al-Qaida List','1932'}
+{'EC 2020/1473 ISIL (Da\'esh) and Al-Qaida List','1932'},
+{'EC (CFSP) 2020/1466 Proliferation and Use of Chemical Weapons List','1933'},
+{'EC (CFSP) 2020/1482 Proliferation and Use of Chemical Weapons List','1934'},
+{'EC (CFSP) 2020/1483 Libya List','1935'},
+{'EC (CFSP) 2020/1506 Syria List','1936'},
+{'EC (CFSP) 2020/1509 Democratic Republic of the Congo List','1937'},
+{'EC 2020/1463 Proliferation and Use of Chemical Weapons List','1938'},
+{'EC 2020/1480 Proliferation and Use of Chemical Weapons List','1939'},
+{'EC 2020/1481 Libya List','1940'},
+{'EC 2020/1505 Syria List','1941'},
+{'EC 2020/1507 Democratic Republic of the Congo List','1942'}
 
 ],r);
 
