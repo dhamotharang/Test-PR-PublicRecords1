@@ -330,6 +330,11 @@ EXPORT Layouts := MODULE
     PerAttributes;
     BusAttributes;
     DueDiligence.Citizenship.Layouts.LayoutScoreAndIndicators;
+    
+    STRING2 PerCivilLegalEventFilingAmt;
+    STRING10 PerCivilLegalEventFilingAmt_Flag;
+    STRING2 BusCivilLegalEventFilingAmt;
+    STRING10 BusCivilLegalEventFilingAmt_Flag;
   END;
 
 
