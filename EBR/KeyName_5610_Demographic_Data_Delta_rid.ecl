@@ -1,0 +1,1 @@
+﻿EXPORT KeyName_5610_Demographic_Data_Delta_rid := trim(GetSegmentKeyName_Delta_RID('5610'));
