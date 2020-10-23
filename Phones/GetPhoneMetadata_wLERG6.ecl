@@ -318,6 +318,21 @@ EXPORT GetPhoneMetadata_wLERG6(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) d
     is_recent_OTP := L.source = phones.Constants.sources.PHONEFRAUD_OTP and  R.operator_id <> '';
     // populate phone status information for all records
     SELF.phone_status :=  R.phone_status;
+    //Iconnective restrictions
+    SELF.port_start_dt := IF(in_mod.AllowPortingData, L.port_start_dt, 0);
+    SELF.port_start_time := IF(in_mod.AllowPortingData, L.port_start_time, '');
+    SELF.port_end_dt := IF(in_mod.AllowPortingData, L.port_end_dt, 0);
+    SELF.port_end_time := IF(in_mod.AllowPortingData, L.port_end_time, '');
+    SELF.porting_dt := IF(in_mod.AllowPortingData, L.porting_dt, 0);
+    SELF.porting_time := IF(in_mod.AllowPortingData, L.porting_time, '');
+    SELF.ported_date := IF(in_mod.AllowPortingData, L.ported_date, 0);
+    SELF.remove_port_dt := IF(in_mod.AllowPortingData, L.remove_port_dt, 0);
+    SELF.spid := MAP(in_mod.AllowPortingData AND is_recent_OTP => R.spid,
+                     in_mod.AllowPortingData => L.spid,
+                     '');
+    SELF.operator_id := MAP(in_mod.AllowPortingData AND is_recent_OTP => R.operator_id,
+                     in_mod.AllowPortingData => L.operator_id,
+                     '');
     // populate carrier fields for OTP records from previous rollup
     SELF := if(is_recent_OTP,R,ROW(L,Layout_carrier_w_phone_status));
     SELF := L;
