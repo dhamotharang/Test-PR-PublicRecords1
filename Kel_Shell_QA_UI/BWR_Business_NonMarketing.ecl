@@ -110,7 +110,7 @@ dfuStatus:='finished';
 
 if(trim(sprayMessage,left,right) <> '', Kel_Shell_QA_UI.File_spray_notification_macro(email_list, dfuWUID, dfuStatus));
 
-if(trim(sprayMessage,left,right) = '', Business):FAILURE(FileServices.SendEmail(email_list,'KEL SHELL QA UI run job','The failed workunit is:' + workunit + FailMessage));
+if(trim(sprayMessage,left,right) = '', Business):FAILURE(FileServices.SendEmail(email_list,'KAT Notification','Your job has failed. The failed workunit is:' + workunit + FailMessage));
 
 																	
 EXPORT BWR_Business_NonMarketing := 'todo';

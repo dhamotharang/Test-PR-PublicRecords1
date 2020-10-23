@@ -83,7 +83,7 @@ dfuStatus:='finished';
 
 if(trim(sprayMessage,left,right) <> '', Kel_Shell_QA_UI.File_spray_notification_macro(email_list, dfuWUID, dfuStatus));
 
-if(trim(sprayMessage,left,right) = '', nonFCRA_Consumer):FAILURE(FileServices.SendEmail(email_list,'KEL SHELL QA UI run job','The failed workunit is:' + workunit + FailMessage));
+if(trim(sprayMessage,left,right) = '', nonFCRA_Consumer):FAILURE(FileServices.SendEmail(email_list,'KAT Notification','Your job has failed. The failed workunit is:' + workunit + FailMessage));
 
 
 // IF(execute_type='scheduleCron',nonFCRA_Consumer): WHEN(CRON(cron_time)), 
