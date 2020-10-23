@@ -284,7 +284,7 @@ search_Results := riskview.Search_Function(valid_inputs,
 
 
 Results := join(batchin_with_seq, search_results, left.seq=right.seq,
-			RiskView.Transforms.FormatBatch(left, right),
+			RiskView.Transforms.FormatBatch(left, right, IncludeStatusRefreshChecks, ExcludeStatusRefresh),
 			left outer);
 
 AttributesOnlyResults := PROJECT(Results, RiskView.Transforms.AttributesOnlyBatch(LEFT));

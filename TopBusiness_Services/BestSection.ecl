@@ -2,7 +2,11 @@
   TopBusiness_Services, ut, dx_Gong, std;
 
 export BestSection := MODULE
-
+  EXPORT  GetBestBipLinkids(dataset(BIPV2.IDlayouts.l_xlink_ids)   ds_in_unique_ids_only, 
+                     string1 FETCH_LEVEL, unsigned4 FETCH_LIMIT 	= 25000) 
+                     := BIPV2_Best.Key_LinkIds.KFetch(ds_in_unique_ids_only,FETCH_LEVEL, , , ,
+      FETCH_LIMIT)(proxid = 0);    
+  
   export fn_fullView(
 		dataset(TopBusiness_Services.Layouts.rec_input_ids) ds_in_ids,
 		TopBusiness_Services.BestSection_Layouts.rec_optionsLayout in_options,
@@ -259,11 +263,10 @@ export BestSection := MODULE
 
        // now start getting the best information
        // get information from the best key.
-
-       // ** NOTE this filter is only correct if BEST SECTION is doing a SELEID based level fetch
-      //  which is the default FETCH LEVEL set at upper most roxie service level ** //
-      ds_initial_best := BIPV2_Best.Key_LinkIds.KFetch(ds_in_unique_ids_only,FETCH_LEVEL,,,,
-      TopBusiness_Services.Constants.BusHeaderKfetchMaxLimit)(proxid = 0);
+  
+     ds_initial_best := GetBestBipLinkids(ds_in_unique_ids_only
+                                                                       ,FETCH_LEVEL                                                                       
+                                                                       ,TopBusiness_Services.Constants.BusHeaderKfetchMaxLimit);
 
     rec_yearStarted := record
     integer year_started;

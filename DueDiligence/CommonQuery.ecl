@@ -231,7 +231,7 @@ EXPORT CommonQuery := MODULE
     END;
         
     
-    EXPORT mac_GetCompliance(UNSIGNED3 dppaIn, UNSIGNED3 glbaIn, STRING drmIn, STRING dpmIn, STRING10 industryIn, 
+    EXPORT GetCompliance(UNSIGNED3 dppaIn, UNSIGNED3 glbaIn, STRING drmIn, STRING dpmIn, STRING10 industryIn, 
                              UNSIGNED1 lexIDSrcOptOutIn, STRING transIDIn, STRING batchUIDIn, UNSIGNED6 globalCoIDIn) := FUNCTION
       
         compliance := MODULE(DueDiligence.DDInterface.iDDRegulatoryCompliance)

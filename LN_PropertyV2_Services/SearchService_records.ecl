@@ -3,7 +3,8 @@
 EXPORT SearchService_records (unsigned6 search_did=0,integer1
                                 nonSS = Suppress.Constants.NonSubjectSuppression.doNothing,
                                 boolean isFCRA = false,
-                                FCRA.iRules in_params = module(FCRA.iRules) end ) :=
+                                FCRA.iRules in_params = module(FCRA.iRules) end,
+                                boolean includeBlackKnight = false ) :=
   FUNCTION
 
     boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(in_params.FFDOptionsMask);
@@ -35,7 +36,7 @@ EXPORT SearchService_records (unsigned6 search_did=0,integer1
     alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_params.FCRAPurpose, in_params.FFDOptionsMask)[1];
     suppress_results_due_alerts := isFCRA and alert_indicators.suppress_records;
 
-    results_0 := LN_PropertyV2_Services.resultFmt.narrow_view.get_by_sid(ids_1,nonSS,isFCRA,slim_pc_recs,in_params.FFDOptionsMask, ds_flags);
+    results_0 := LN_PropertyV2_Services.resultFmt.narrow_view.get_by_sid(ids_1,nonSS,isFCRA,slim_pc_recs,in_params.FFDOptionsMask, ds_flags, includeBlackKnight);
 
     // Robustness Score Sorting
     results_srt := if(LN_PropertyV2_Services.input.RobustnessScoreSorting,sort(results_0,-key_robustness_score,-total_robustness_score),results_0);

@@ -1,82 +1,79 @@
-﻿/* This function gets Full File Disclosure records for BK FCRA search and report services. */
+﻿/* This FUNCTION gets Full File Disclosure records for BK FCRA search AND report services. */
 
-import bankruptcyv3, FFD, BankruptcyV3_Services;
+IMPORT bankruptcyv3, FFD, BankruptcyV3_Services;
 
-export fn_fcra_ffd(dataset(BankruptcyV3_Services.layouts.layout_rollup) ds_recs, 
-									 dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
-			             integer8 inFFDOptionsMask) := function
-									 
-  boolean showDisputedRecords := FFD.FFDMask.isShowDisputedBankruptcies(inFFDOptionsMask);
-	boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
+EXPORT fn_fcra_ffd(DATASET(BankruptcyV3_Services.layouts.layout_rollup) ds_recs,
+                   DATASET (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
+                   INTEGER8 inFFDOptionsMask) := FUNCTION
+                   
+  BOOLEAN showDisputedRecords := FFD.FFDMask.isShowDisputedBankruptcies(inFFDOptionsMask);
+  BOOLEAN ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
 
-	rec_w_tms := record
-	 string50   	TMSID ;
-	 BankruptcyV3_Services.layouts.layout_party;
-	end;
-	
-	debtors_norm	:= 	normalize(ds_recs, left.debtors, transform(rec_w_tms, self.tmsid := left.tmsid, self := right));
-	
-	// ffd for debtor records for matched party did
-  rec_w_tms xformStatements( rec_w_tms l, FFD.Layouts.PersonContextBatchSlim r ) := transform,
-   			skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
-   					self.StatementIds := r.StatementIDs;
-   					self.IsDisputed   := r.isDisputed;
-   					self := l;
-  end;
+  rec_w_tms := RECORD
+   STRING50 TMSID ;
+   BankruptcyV3_Services.layouts.layout_party;
+  END;
+  
+  debtors_norm := NORMALIZE(ds_recs, LEFT.debtors, TRANSFORM(rec_w_tms, SELF.tmsid := LEFT.tmsid, SELF := RIGHT));
+  
+  // ffd for debtor records for matched party did
+  rec_w_tms xformStatements( rec_w_tms l, FFD.Layouts.PersonContextBatchSlim r ) := TRANSFORM,
+    SKIP((~ShowDisputedRecords AND r.isDisputed) OR (~ShowConsumerStatements AND EXISTS(r.StatementIDs)))
+      SELF.StatementIds := r.StatementIDs;
+      SELF.IsDisputed := r.isDisputed;
+      SELF := l;
+  END;
 
-  recs_fcra_debtors := join(debtors_norm, slim_pc_recs,
-   														left.tmsid = right.RecID1 and
-															BankruptcyV3_Services.consts.NAME_TYPES.DEBTOR = right.RecID2 and  // FFD compliance for debtors
-   														(unsigned6)left.did  =  (unsigned6) right.RecId3 and 
-   														(right.acctno = FFD.Constants.SingleSearchAcctno) and 
-   												    right.DataGroup = FFD.Constants.DataGroups.BANKRUPTCY_SEARCH,
-   														xformStatements(left,right), 
-   														left outer,
-   														keep(1),
-   														limit(0));
-																 
-	BankruptcyV3_Services.layouts.layout_rollup denorm_deb(BankruptcyV3_Services.layouts.layout_rollup l, 
-	                                                            dataset(rec_w_tms) r) := transform
-																														
-	   self.debtors := project(r, BankruptcyV3_Services.layouts.layout_party);
-	   self := l;
-	end;
+  recs_fcra_debtors := JOIN(debtors_norm, slim_pc_recs,
+    LEFT.tmsid = RIGHT.RecID1 AND
+    BankruptcyV3_Services.consts.NAME_TYPES.DEBTOR = RIGHT.RecID2 AND // FFD compliance for debtors
+    (UNSIGNED6)LEFT.did = (UNSIGNED6) RIGHT.RecId3 AND
+    (RIGHT.acctno = FFD.Constants.SingleSearchAcctno) AND
+    RIGHT.DataGroup = FFD.Constants.DataGroups.BANKRUPTCY_SEARCH,
+      xformStatements(LEFT,RIGHT),
+    LEFT OUTER,
+    KEEP(1), LIMIT(0));
+                                 
+  BankruptcyV3_Services.layouts.layout_rollup denorm_deb(BankruptcyV3_Services.layouts.layout_rollup l,
+                                                              DATASET(rec_w_tms) r) := TRANSFORM
+                                                            
+    SELF.debtors := PROJECT(r, BankruptcyV3_Services.layouts.layout_party);
+    SELF := l;
+  END;
 
-	denorm_ds := denormalize(ds_recs, recs_fcra_debtors,
-		                     left.tmsid = right.tmsid,
-				                 group,
-										     denorm_deb(left,rows(right)));
-	
-	layout_w_did := record
-	
-	BankruptcyV3_Services.layouts.layout_rollup;
-	unsigned6 matched_did;
-	
-	end;
-	
-	main_w_did := project(denorm_ds, 
-	                  transform(layout_w_did, 
-										self.matched_did := (unsigned6)left.matched_party.did, 
-										self := left));
-	
-	// ffd for main records for matched party did
-	BankruptcyV3_Services.layouts.layout_rollup xmainStatements( layout_w_did l, FFD.Layouts.PersonContextBatchSlim r ) := transform,
-		skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
-					self.StatementIds := r.StatementIDs;
-					self.IsDisputed   := r.isDisputed;
-					self := l;
-			end;
-			
-	recs_fcra_ds := join(main_w_did, slim_pc_recs,
-											left.court_code = right.RecID1 and left.case_number = right.RecID2 and
-											left.matched_did  =  (unsigned6) right.lexid and 
-											(right.acctno = FFD.Constants.SingleSearchAcctno) and 
-											right.DataGroup = FFD.Constants.DataGroups.BANKRUPTCY_MAIN,
-											xmainStatements(left,right), 
-											left outer,
-											keep(1),
-											limit(0));
-											
-	return recs_fcra_ds;
-	
-end;
+  denorm_ds := DENORMALIZE(ds_recs, recs_fcra_debtors,
+    LEFT.tmsid = RIGHT.tmsid,
+    GROUP,
+    denorm_deb(LEFT,ROWS(RIGHT)));
+  
+  layout_w_did := RECORD
+    BankruptcyV3_Services.layouts.layout_rollup;
+    UNSIGNED6 matched_did;
+  END;
+  
+  main_w_did := PROJECT(denorm_ds,
+    TRANSFORM(layout_w_did,
+    SELF.matched_did := (UNSIGNED6)LEFT.matched_party.did,
+    SELF := LEFT));
+  
+  // ffd for main records for matched party did
+  BankruptcyV3_Services.layouts.layout_rollup xmainStatements( layout_w_did l, FFD.Layouts.PersonContextBatchSlim r ) := TRANSFORM,
+    SKIP((~ShowDisputedRecords AND r.isDisputed) OR (~ShowConsumerStatements AND EXISTS(r.StatementIDs)))
+      SELF.StatementIds := r.StatementIDs;
+      SELF.IsDisputed := r.isDisputed;
+      SELF := l;
+    END;
+      
+  recs_fcra_ds := JOIN(main_w_did, slim_pc_recs,
+    LEFT.court_code = RIGHT.RecID1 AND LEFT.case_number = RIGHT.RecID2 AND
+    LEFT.matched_did = (UNSIGNED6) RIGHT.lexid AND
+    (RIGHT.acctno = FFD.Constants.SingleSearchAcctno) AND
+    RIGHT.DataGroup = FFD.Constants.DataGroups.BANKRUPTCY_MAIN,
+    xmainStatements(LEFT,RIGHT),
+    LEFT OUTER,
+    KEEP(1),
+    LIMIT(0));
+                      
+  RETURN recs_fcra_ds;
+  
+END;

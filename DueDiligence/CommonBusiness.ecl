@@ -66,137 +66,11 @@ EXPORT CommonBusiness := MODULE
 		RETURN joinResult;										
 	ENDMACRO : DEPRECATED('Use DueDiligence.v3Common.DDBusiness.AppendSeq');
 	
-		
-	EXPORT rollSicNaicBySeqAndBIP(inquiredBusiness, inputDataset) := FUNCTIONMACRO
-		//grab existing SIC and NAIC codes from the inquired business
-		normSicNaics := NORMALIZE(inquiredBusiness, LEFT.SicNaicSources, TRANSFORM({UNSIGNED4 seq, UNSIGNED6 ultID, UNSIGNED6 orgID, UNSIGNED6 seleID, UNSIGNED4 DateFirstSeen,
-																																														UNSIGNED4 DateLastSeen, STRING10 NAICCode, STRING10 SICCode, BOOLEAN IsPrimary, STRING3 source},
-																																								SELF.seq := LEFT.seq;
-																																								SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
-																																								SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
-																																								SELF.seleID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
-																																								SELF := RIGHT;
-																																								SELF := LEFT;
-																																								SELF := [];));		
-																																								
-		//Add those already retrieved with those that we just found
-		allCodes := normSicNaics + inputDataset;	
-		
-		//sort and grab combined info and remove duplictes
-		sortedTempOutput := SORT(allCodes, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), SICCode, NAICCode, DateFirstSeen);
-		rollTempOutput := ROLLUP(sortedTempOutput,
-															LEFT.seq = RIGHT.seq AND
-															LEFT.ultID = RIGHT.ultID AND
-															LEFT.orgID = RIGHT.orgID AND
-															LEFT.seleID = RIGHT.seleID AND
-															LEFT.SICCode = RIGHT.SICCode AND
-															LEFT.NAICCode = RIGHT.NAICCode AND
-															LEFT.source = RIGHT.source,
-															TRANSFORM({RECORDOF(LEFT)},
-																				SELF.DateFirstSeen := IF(LEFT.DateFirstSeen = 0, RIGHT.DateFirstSeen, MIN(LEFT.DateFirstSeen, RIGHT.DateFirstSeen));
-																				SELF.DateLastSeen := MAX(LEFT.DateLastSeen, RIGHT.DateLastSeen);
-																				SELF.IsPrimary := LEFT.IsPrimary OR RIGHT.IsPrimary;
-																				SELF := LEFT;));
-
-		sortTemp := SORT(rollTempOutput, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -isPrimary, SICCode, NAICCode);
-		groupSort := GROUP(sortTemp, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
-																				
-																				
-		DueDiligence.LayoutsInternal.SicNaicLayout getMaxSicNaics(groupSort rto, INTEGER c) := TRANSFORM, SKIP(c > DueDiligence.Constants.MAX_SIC_NAIC)
-			SELF.sources := PROJECT(rto, TRANSFORM(DueDiligence.Layouts.LayoutSICNAIC,
-			
-																							sic := TRIM(LEFT.SICCode, ALL);
-																							lengthOfSic := LENGTH(sic);
-																							
-																							SELF.SICIndustry := MAP(sic = DueDiligence.Constants.EMPTY => sic,
-																																			sic IN DueDiligence.Constants.CIB_SIC_RETAIL => DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_RETAIL,
-																																			sic IN DueDiligence.Constants.CIB_SIC_NON_RETAIL => DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_NON_RETAIL,
-																																			sic IN DueDiligence.Constants.MSB_SIC => DueDiligence.Constants.INDUSTRY_MONEY_SERVICE_BUSINESS,
-																																			sic IN DueDiligence.Constants.NBFI_SIC => DueDiligence.Constants.INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS,
-																																			sic IN DueDiligence.Constants.CASGAM_SIC => DueDiligence.Constants.INDUSTRY_CASINO_AND_GAMING,
-																																			sic IN DueDiligence.Constants.LEGTRAV_SIC => DueDiligence.Constants.INDUSTRY_LEGAL_ACCOUNTANT_TELEMARKETER_FLIGHT_TRAVEL,
-																																			sic IN DueDiligence.Constants.AUTO_SIC => DueDiligence.Constants.INDUSTRY_AUTOMOTIVE,
-																																			DueDiligence.Constants.INDUSTRY_OTHER);
-																																																																							
-																							SELF.SICRiskLevel := MAP(sic = DueDiligence.Constants.EMPTY => sic,
-																																				lengthOfSic = 2 AND sic IN DueDiligence.Constants.SIC_LENGTH_2_RISK_HIGH => DueDiligence.Constants.RISK_LEVEL_HIGH,
-																																				lengthOfSic = 4 AND (sic IN DueDiligence.Constants.SIC_LENGTH_4_RISK_HIGH OR 
-																																															sic[1..2] IN DueDiligence.Constants.SIC_FIRST_2_STAR_RISK_HIGH) => DueDiligence.Constants.RISK_LEVEL_HIGH,
-																																				lengthOfSic = 6 AND (sic IN DueDiligence.Constants.SIC_LENGTH_6_RISK_HIGH OR 
-																																															sic[1..2] IN DueDiligence.Constants.SIC_FIRST_2_STAR_RISK_HIGH OR
-																																															sic[1..4] IN DueDiligence.Constants.SIC_FIRST_4_STAR_RISK_HIGH) => DueDiligence.Constants.RISK_LEVEL_HIGH,
-																																				lengthOfSic = 8 AND (sic IN DueDiligence.Constants.SIC_LENGTH_8_RISK_HIGH OR
-																																															sic[1..2] IN DueDiligence.Constants.SIC_FIRST_2_STAR_RISK_HIGH OR
-																																															sic[1..4] IN DueDiligence.Constants.SIC_FIRST_4_STAR_RISK_HIGH OR
-																																															sic[1..6] IN DueDiligence.Constants.SIC_FIRST_6_STAR_RISK_HIGH) => DueDiligence.Constants.RISK_LEVEL_HIGH,
-																																				DueDiligence.Constants.RISK_LEVEL_LOW);
-																																			
-																							naic := TRIM(LEFT.NAICCode, ALL);
-																							naic2 := naic[1..2];
-																							
-																							SELF.NAICIndustry := MAP(naic = DueDiligence.Constants.EMPTY => naic,
-																																			naic IN DueDiligence.Constants.CIB_NAICS_RETAIL => DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_RETAIL,
-																																			naic IN DueDiligence.Constants.CIB_NAICS_NON_RETAIL => DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_NON_RETAIL,
-																																			naic IN DueDiligence.Constants.MSB_NAICS => DueDiligence.Constants.INDUSTRY_MONEY_SERVICE_BUSINESS,
-																																			naic IN DueDiligence.Constants.NBFI_NAICS => DueDiligence.Constants.INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS,
-																																			naic IN DueDiligence.Constants.CASGAM_NAISC => DueDiligence.Constants.INDUSTRY_CASINO_AND_GAMING,
-																																			naic IN DueDiligence.Constants.LEGTRAV_NAISC => DueDiligence.Constants.INDUSTRY_LEGAL_ACCOUNTANT_TELEMARKETER_FLIGHT_TRAVEL,
-																																			naic IN DueDiligence.Constants.AUTO_NAISC => DueDiligence.Constants.INDUSTRY_AUTOMOTIVE,
-																																			DueDiligence.Constants.INDUSTRY_OTHER);
-																																			
-																							SELF.NAICRiskLevel := MAP(naic = DueDiligence.Constants.EMPTY => naic,
-																																				naic2 IN DueDiligence.Constants.NAICS_RISK_HIGH OR
-																																				naic IN DueDiligence.Constants.NAICS_RISK_HIGH_EXCEP => DueDiligence.Constants.RISK_LEVEL_HIGH,
-																																				naic2 IN DueDiligence.Constants.NAICS_RISK_MED => DueDiligence.Constants.RISK_LEVEL_MEDIUM,
-																																				naic2 IN DueDiligence.Constants.NAICS_RISK_LOW => DueDiligence.Constants.RISK_LEVEL_LOW,
-																																				DueDiligence.Constants.RISK_LEVEL_UNKNOWN);
-																							SELF := LEFT;
-																							SELF :=[];));
-			SELF := rto;
-			SELF := [];
-		END;
 
 
-		projectSources := PROJECT(groupSort, getMaxSicNaics(LEFT, COUNTER));
-																																																					
-		sortSources := SORT(projectSources, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
-		finalRoll := ROLLUP(sortSources,
-												LEFT.seq = RIGHT.seq AND
-												LEFT.ultID = RIGHT.ultID AND
-												LEFT.orgID = RIGHT.orgID AND
-												LEFT.seleID = RIGHT.seleID,
-												TRANSFORM(DueDiligence.LayoutsInternal.SicNaicLayout,
-																	SELF.sources := LEFT.sources + RIGHT.sources;
-																	SELF := LEFT;));
-	
-		RETURN finalRoll;
-
-	ENDMACRO;
-	
-	//either sourceFieldName or sourceName field should be populated
-	EXPORT getSicNaicCodes(InDataset, SourceFieldName, SourceName, SicNaicsField, IsSicField, PrimaryField, DateFirstSeenName, DateLastSeenName) := FUNCTIONMACRO
-	
-		temp := TABLE(InDataset,{seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()),
-														 UNSIGNED4 DateFirstSeen := MIN(GROUP, DateFirstSeenName),
-														 UNSIGNED4 DateLastSeen := MAX(GROUP, DateLastSeenName),
-														 STRING10 NAICCode := IF(IsSicField, DueDiligence.Constants.EMPTY, (STRING)SicNaicsField),
-														 STRING10 SICCode := IF(IsSicField, (STRING)SicNaicsField, DueDiligence.Constants.EMPTY),
-														 BOOLEAN IsPrimary := PrimaryField,
-														 STRING3 Source := IF(SourceName = DueDiligence.Constants.EMPTY, SourceFieldName, SourceName)},
-                  #if(SourceName = DueDiligence.Constants.EMPTY)
-                    seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), (STRING)SicNaicsField, SourceFieldName);
-                  #else           
-                    seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), (STRING)SicNaicsField);
-                  #end
-													 
-		filterSic := temp(SICCode <> DueDiligence.Constants.EMPTY);
-		filterNaic := temp(NAICCode <> DueDiligence.Constants.EMPTY);
-		
-		results := IF(IsSicField, filterSic, filterNaic);
-
-		RETURN results;
-	
-	ENDMACRO;
+  
+  
+  
 	
 	EXPORT GetCleanBIPShell(DATASET(DueDiligence.Layouts.CleanedData) cleanInput) := FUNCTION
 
@@ -630,6 +504,10 @@ EXPORT CommonBusiness := MODULE
 
   
   EXPORT GetSOSStatuses(sosRecord) := FUNCTIONMACRO
+    
+     IMPORT business_header, DueDiligence, STD;
+        
+        
      corpStatusDescUC := STD.Str.ToUpperCase(sosRecord.corp_status_desc);
      filingStatus := MAP(business_header.is_ActiveCorp(sosRecord.record_type, sosRecord.corp_status_cd, sosRecord.corp_status_desc) => DueDiligence.Constants.CORP_STATUS_ACTIVE,
                           STD.Str.Find(CorpStatusDescUC, 'GOOD STANDING', 1) != DueDiligence.Constants.NUMERIC_ZERO => DueDiligence.Constants.CORP_STATUS_ACTIVE,
@@ -737,58 +615,9 @@ EXPORT CommonBusiness := MODULE
 		RETURN rollSources;
 	ENDMACRO;  
 	
-	
-	//calculate best sic and naics - taken from Business_Risk_BIP.Business_Shell_Function
-  EXPORT getBestSicOrNaic(ds, sicNaicFieldName) := FUNCTIONMACRO
-    
-    sortSources := SORT(ds, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), source, sicNaicFieldName, -isPrimary, -dateLastSeen, -dateFirstSeen);
-    rollCodes := ROLLUP(sortSources,
-                        #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
-                        LEFT.source = RIGHT.source AND
-                        LEFT.sicNaicFieldName = RIGHT.sicNaicFieldName,
-                        TRANSFORM(RECORDOF(LEFT),
-                                  SELF.dateFirstSeen := IF(LEFT.dateFirstSeen > 0 AND RIGHT.dateFirstSeen > 0, MIN(LEFT.dateFirstSeen, RIGHT.dateFirstSeen), MAX(LEFT.dateFirstSeen, RIGHT.dateFirstSeen));
-                                  SELF.dateLastSeen := MAX(LEFT.dateLastSeen, RIGHT.dateLastSeen);
-                                  SELF := LEFT;));
-                                
-    prepBestSicNaic := SORT(rollCodes(isPrimary), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -(source = 'DF'), -(source = 'ER'), -(source = 'Y'), -(source = 'OS'), -(source = 'BR'), -(source = 'FH'), -(source = 'C#'), -(source = 'DN'), -dateLastSeen, -dateFirstSeen);
-    
-    //grab the 1st row for each inquired business - for which we determined best sic/naic
-    bestSicNaic := DEDUP(prepBestSicNaic, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
-    
-    RETURN bestSicNaic;
-  ENDMACRO;  
+	 
   
-  EXPORT getRiskiestSicOrNaic(ds, sicNaicFieldName, sicNaicIndustryFieldName, sicNaicRiskLevelFieldName) := FUNCTIONMACRO
-    
-    sortSources := SORT(ds, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), source, sicNaicFieldName, -isPrimary, -dateLastSeen, -dateFirstSeen);
-    rollCodes := ROLLUP(sortSources,
-                        #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
-                        LEFT.source = RIGHT.source AND
-                        LEFT.sicNaicFieldName = RIGHT.sicNaicFieldName,
-                        TRANSFORM(RECORDOF(LEFT),
-                                  SELF.dateFirstSeen := IF(LEFT.dateFirstSeen > 0 AND RIGHT.dateFirstSeen > 0, MIN(LEFT.dateFirstSeen, RIGHT.dateFirstSeen), MAX(LEFT.dateFirstSeen, RIGHT.dateFirstSeen));
-                                  SELF.dateLastSeen := MAX(LEFT.dateLastSeen, RIGHT.dateLastSeen);
-                                  SELF := LEFT;));
-                                
-    prepRiskySicNaic := SORT(rollCodes(isPrimary), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), 
-                              -(sicNaicIndustryFieldName = DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_RETAIL), 
-                              -(sicNaicIndustryFieldName = DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_NON_RETAIL), 
-                              -(sicNaicIndustryFieldName = DueDiligence.Constants.INDUSTRY_MONEY_SERVICE_BUSINESS), 
-                              -(sicNaicIndustryFieldName = DueDiligence.Constants.INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS), 
-                              -(sicNaicIndustryFieldName = DueDiligence.Constants.INDUSTRY_CASINO_AND_GAMING),
-                              -(sicNaicIndustryFieldName = DueDiligence.Constants.INDUSTRY_LEGAL_ACCOUNTANT_TELEMARKETER_FLIGHT_TRAVEL), 
-                              -(sicNaicIndustryFieldName = DueDiligence.Constants.INDUSTRY_AUTOMOTIVE), 
-                              -(sicNaicRiskLevelFieldName = DueDiligence.Constants.RISK_LEVEL_HIGH), 
-                              -(sicNaicRiskLevelFieldName = DueDiligence.Constants.RISK_LEVEL_MEDIUM), 
-                              -(sicNaicRiskLevelFieldName = DueDiligence.Constants.RISK_LEVEL_LOW), 
-                              -sicNaicFieldName, -dateLastSeen, -dateFirstSeen);
-    
-    //grab the 1st row for each inquired business - for which we determined best sic/naic
-    riskySicNaic := DEDUP(prepRiskySicNaic, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
-    
-    RETURN riskySicNaic;
-  ENDMACRO;
+  
 	
 	EXPORT getIncoprorationWithLooseLaws(inBusiness, filteredData, filteredCompanyIncState) := FUNCTIONMACRO
 			  projectLooseLaws := PROJECT(filteredData, TRANSFORM({RECORDOF(LEFT), BOOLEAN looseLawState, STRING2 CompanyIncorpSt}, 

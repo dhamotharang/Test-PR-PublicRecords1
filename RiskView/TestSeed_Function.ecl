@@ -363,6 +363,7 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
     self.CheckProfileIndex := if(CheckingIndicatorsRequest, ri.CheckProfileIndex	, '');
     self.CheckTimeOldest := if(CheckingIndicatorsRequest, ri.CheckTimeOldest	, '');
     self.CheckTimeNewest := if(CheckingIndicatorsRequest, ri.CheckTimeNewest	, '');
+    self.CheckNegTimeNewest := if(CheckingIndicatorsRequest, ri.CheckNegTimeNewest	, '');
     self.CheckNegTimeOldest := if(CheckingIndicatorsRequest, ri.CheckNegTimeOldest	, '');
     self.CheckNegRiskDecTimeNewest := if(CheckingIndicatorsRequest, ri.CheckNegRiskDecTimeNewest	, '');
     self.CheckNegPaidTimeNewest := if(CheckingIndicatorsRequest, ri.CheckNegPaidTimeNewest	, '');
