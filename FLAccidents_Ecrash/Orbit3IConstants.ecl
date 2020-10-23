@@ -1,77 +1,92 @@
 ﻿IMPORT  _Control,Orbit3Insurance,STD;
-EXPORT Orbit3IConstants(string product,string emailme = '') := module
-	export datasetname := case(
-															product, 															
+EXPORT Orbit3IConstants(STRING product, STRING emailme = '') := MODULE
+	
+// ###########################################################################
+//                    File Tracking & Receiving Instance
+// ###########################################################################	
+	EXPORT datasetname := CASE(product, 															
 															'ecrashCRU_Delta'  =>'eCrashCRUAcidentsDelta',
-															'NA'
-														);
-	export sourcename := case(
-															product, 
-															'ecrashCRU_Delta' => 'eCrashCRUAcidentsDelta',//CC Attributes Delta Log History
-															'NA'	
-														);
+															'eCrash_MBSAgency' => 'ecrash MBS',
+															'NA');
+														 
+	EXPORT sourcename := CASE(product, 
+															'ecrashCRU_Delta' => 'eCrashCRUAcidentsDelta',//CC Attributes Delta Log History																
+															'eCrash_MBSAgency' => 'LexisNexis/Boca',
+															'NA');
 
-	export media 			:= case(
-															product, 
+	EXPORT media 			:= CASE(product, 
 															'ecrashCRU_Delta' => 'SFTP',
-															'NA'	
-														);
-	export updatetype := case(
-															product,
+															'eCrash_MBSAgency' => 'SFTP',
+															'NA');
+														
+	EXPORT updatetype := CASE(product,
 															'ecrashCRU_Delta' => 'Update-Append',
-															'NA'	
-														);
-	export orbitreceivedate(string pdate) := pdate[1..4] + '-' + pdate[5..6] + '-' + pdate[7..8]+'T00:00:00Z'; 
-	
-	export platform := case(
-															product, 
-															'ecrashCRU_Delta' => 'Non FCRA Roxie',
-														'NA'
-														);	
+															'eCrash_MBSAgency' => 'Update-Append',
+															'NA');
 														
-	export platformstatus := case(
-																product,
-																'ecrashCRU_Delta' => 'On Development',
-																'NA'
-														);
+	EXPORT orbitreceivedate(STRING pdate) := pdate[1..4] + '-' + pdate[5..6] + '-' + pdate[7..8] + 'T00:00:00Z'; 
+	EXPORT orbitreceivedatetime(STRING pdate) := pdate[1..4] + '-' + pdate[5..6] + '-' + pdate[7..8]+'T' + pdate[9..10] + ':' + pdate[11..12] + ':' + pdate[13..14] + 'Z'; 
 
-	export buildstatus				:= 'BUILD_AVAILABLE_FOR_USE';
+// ###########################################################################
+//                        Create & Update Build
+// ###########################################################################	
+	EXPORT buildstatus_B := 'BUILD_IN_PROGRESS';	
+	EXPORT buildstatus := 'BUILD_AVAILABLE_FOR_USE';	
 	
-	export buildname := case(
-															product, 
-															'ecrashCRU_Delta' => 'eCrashCRUAcidentsDelta', //FCRA CCAttrDeltaKeys
-															'NA'	
-														);
-	export masterbuildname := case(
-															product, 
-															'ecrashCRU_Delta' => 'eCrashCRUAcidentsDelta', //FCRA CCAttrDeltaKeys
-															'NA'	
-														);
-	export orbitfilename := case(
-															product, 
-															'ecrashCRU_Delta' => 'delta_attribute_log.txt',
-															'NA'	
-														);
-	export orbitpathname(string pdate) := case(
-															product, 
-															'ecrashCRU_Delta' => Orbit3Insurance.EnvironmentVariables.orbitpathprefix + 'delta_cc_attributes\\process\\' + pdate + '\\',
-															'NA'	
-														);
-	export componentfilename(string pdate) := case(
-															product, 
-															'ecrashCRU_Delta' => Orbit3Insurance.EnvironmentVariables.orbitcomponentpathprefix + 'delta_cc_attributes\\\\process\\\\' + pdate + '\\\\' + STD.Str.ToLowerCase(orbitfilename),
-															'NA'	
-														);
+	EXPORT buildname := CASE(product, 
+													 'ecrashCRU_Delta' => 'eCrashCRUAcidentsDelta', //FCRA CCAttrDeltaKeys
+													 'eCrash_MBSAgency' => 'eCrash MBS Agency Build',
+													 'NA');
 														
+	EXPORT masterbuildname := CASE(product, 
+																 'ecrashCRU_Delta' => 'eCrashCRUAcidentsDelta', //FCRA CCAttrDeltaKeys
+																 'eCrash_MBSAgency' => 'eCrash MBS Agency Build',
+																 'NA');
+														
+	EXPORT orbitfilename := CASE(product, 
+																'ecrashCRU_Delta' => 'delta_attribute_log.txt',
+																'eCrash_MBSAgency' => 'mbs_ecrash_v_agency_hpcc_export.txt',
+																'NA');
+															
+	EXPORT orbitpathname(STRING pdate) := CASE(product, 
+																						 'ecrashCRU_Delta' => Orbit3Insurance.EnvironmentVariables.orbitpathprefix + 'delta_cc_attributes\\process\\' + pdate + '\\',
+																						 'NA');
+																												
+	EXPORT componentfilename(STRING pdate) := CASE(product, 
+																								 'ecrashCRU_Delta' => Orbit3Insurance.EnvironmentVariables.orbitcomponentpathprefix + 'delta_cc_attributes\\\\process\\\\' + pdate + '\\\\' + STD.Str.ToLowerCase(orbitfilename),
+																								 'eCrash_MBSAgency' => '\\\\tapeload.risk.regn.net\\K\\accident_reports\\ecrash_(ei)\\mbs\\' + pDate + '\\' + STD.Str.ToLowerCase(orbitfilename),
+																								 'NA');
+														
+	EXPORT platform := CASE(product, 
+													'ecrashCRU_Delta' => 'Non FCRA Roxie',
+													'eCrash_MBSAgency' => 'Non FCRA Roxie',
+													'NA');	
+														
+	EXPORT platformstatus := CASE(product,
+																'ecrashCRU_Delta' => 'On Development',
+																'eCrash_MBSAgency' => 'On Development',
+																'NA');														
 												
-  export dev_email_target     := 'DataDevelopment-Ins@lexisnexis.com';
-  export data_qa_email        := 'alp-qadata.team@lexisnexis.com';
-  export ins_data_ops_email   := 'InsDataOps@lexisnexis.com, Sudhir.Kasavajjala@lexisnexis.com';
-  export prod_email_target    := 'DataDevelopment-Ins@lexisnexis.com' + ', ' + ins_data_ops_email;
+// ###########################################################################
+//                           Orbit Email Targets
+// ###########################################################################													
+  EXPORT dev_email_target := 'DataDevelopment-InsRiskeCrash@lexisnexisrisk.com';
+  EXPORT data_qa_email := 'alp-qadata.team@lexisnexis.com';
+  EXPORT ins_data_ops_email := 'InsDataOps@lexisnexis.com, Sudhir.Kasavajjala@lexisnexis.com';
+  EXPORT prod_email_target := 'DataDevelopment-InsRiskeCrash@lexisnexisrisk.com' + ', ' + ins_data_ops_email;
 												
-  export orbit_createBuild_email := if(_Control.ThisEnvironment.Name = 'Prod_Thor', data_qa_email,
+  EXPORT orbit_createBuild_email := IF(_Control.ThisEnvironment.Name = 'Prod_Thor', data_qa_email,
                                        dev_email_target);
-  export orbit_creBuildErr_email := if(_Control.ThisEnvironment.Name = 'Prod_Thor', 
+																			 
+  EXPORT orbit_creBuildErr_email := IF(_Control.ThisEnvironment.Name = 'Prod_Thor', 
                                         data_qa_email + ', ' + prod_email_target,
                                        dev_email_target);
+																			 
+  EXPORT orbit_recload_err_email := IF(_Control.ThisEnvironment.Name = 'Prod_Thor', 
+                                       data_qa_email + ', ' + prod_email_target,
+                                       dev_email_target);
+																			 
+  EXPORT orbit_receiveload_email := IF(_Control.ThisEnvironment.Name = 'Prod_Thor', data_qa_email,
+                                       dev_email_target);
+																 
 end;
