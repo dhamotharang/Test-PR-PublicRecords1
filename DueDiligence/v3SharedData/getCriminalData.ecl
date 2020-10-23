@@ -455,7 +455,7 @@ EXPORT getCriminalData(DATASET(DueDiligence.v3Layouts.InternalPerson.SlimPersonD
                                                       SELF.offenseStatute := LEFT.offenseStatute;
                                                       SELF.offenseDDFirstReportedActivity := (UNSIGNED)IF(LEFT.additionalCalcDetails.offenseDate = DueDiligence.Constants.EMPTY, (STRING8)LEFT.additionalCalcDetails.calcdFirstSeen, LEFT.additionalCalcDetails.offenseDate);
                                                       SELF.offenseDDLastReportedActivity := LEFT.offenseDDLastReportedActivity;
-                                                      SELF.offenseDDLastCourtDispDate := LEFT.offenseDDLastCourtDispDate;
+                                                      SELF.offenseDDLastCourtDispDate := LEFT.det.courtDispDate;
                                                       SELF.offenseCharge := LEFT.det.charge;
                                                       SELF.offenseDDChargeLevelCalculated := chargeLevelCalculated;
                                                       SELF.offenseConviction := LEFT.det.conviction;
