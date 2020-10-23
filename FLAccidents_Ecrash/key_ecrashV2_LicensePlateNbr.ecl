@@ -1,11 +1,11 @@
-﻿import Data_Services, Doxie;
-
-	dsSlimFile := project(FLAccidents_Ecrash.File_KeybuildV2.eCrashSearchRecs(tag_nbr <> ''), FLAccidents_Ecrash.Layouts.key_slim_layout); 
-	dsDedupFile := dedup(sort(distributed(dsSlimFile, hash64(accident_nbr)), 
-	                          accident_nbr,tag_nbr,tagnbr_st,report_code,jurisdiction_state,jurisdiction,accident_date,report_type_id, local), 
-											 accident_nbr,tag_nbr,tagnbr_st,report_code,jurisdiction_state,jurisdiction,accident_date,report_type_id, local);
+﻿dsSlimeCrashSearch := PROJECT(File_KeybuildV2.eCrashSearchRecs(tag_nbr <> ''), TRANSFORM(Layouts.key_slim_layout, SELF := LEFT)); 
+dSlimeCrashSearch := DISTRIBUTED(dsSlimeCrashSearch, HASH32(accident_nbr)); 
+sSlimeCrashSearch := SORT(dSlimeCrashSearch, accident_nbr, tag_nbr, tagnbr_st, report_code, jurisdiction_state, jurisdiction,
+                          accident_date, report_type_id, LOCAL);
+uSlimeCrashSearch := DEDUP(sSlimeCrashSearch, accident_nbr, tag_nbr, tagnbr_st, report_code, jurisdiction_state, jurisdiction,
+                           accident_date, report_type_id, LOCAL); 
 											 
-	EXPORT	key_ecrashV2_LicensePlateNbr :=	INDEX(dsDedupFile
-																							  ,{tag_nbr,tagnbr_st,jurisdiction_state,jurisdiction}
-																							  ,{dsDedupFile}
-																							  ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::eCrashV2_LicensePlateNbr_' + doxie.Version_SuperKey);
+EXPORT Key_eCrashV2_LicensePlateNbr := INDEX(uSlimeCrashSearch,
+																						 {tag_nbr, tagnbr_st, jurisdiction_state, jurisdiction},
+																						 {uSlimeCrashSearch},
+																						 Files_eCrash.FILE_KEY_LICENSE_PLATE_NBR_SF);
