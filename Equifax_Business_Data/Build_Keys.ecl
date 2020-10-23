@@ -31,8 +31,6 @@ module
 		self.efx_email                          := r.efx_email;
 		self.efx_date                           := r.efx_date;
 		self.exploded_title_description         := r.exploded_title_description;
-		self.source                             := 'Z1';
-		self.global_sid                         := 28781;
 		self := l;
 		self := [];
 	end;		
