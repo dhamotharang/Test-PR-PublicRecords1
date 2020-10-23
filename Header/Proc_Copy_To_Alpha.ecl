@@ -35,11 +35,12 @@ EXPORT Proc_Copy_To_Alpha(string pversion='') := MODULE
 
                                  copy_to_alpha(dataset([
                 
-                    {'thor_data400::base::hhid_'+pversion                     ,''},
-                    {'thor_data400::key::header::hhid::'+pversion+'::did.ver' ,''},
-                    {'thor_data400::key::header::hhid::'+pversion+'::hhid.ver',''},
-                    {'thor400_44::base::hss_household_'+pversion              ,''},
-                    {'thor_data400::key::header::'+pversion+'::hhid'          ,''}
+                    {'thor_data400::base::hhid_'+pversion                                  ,''},
+                    {'thor_data400::key::header::hhid::'+pversion+'::did.ver'              ,''},
+                    {'thor_data400::key::header::hhid::'+pversion+'::hhid.ver'             ,''},
+                    {'thor400_44::base::hss_household_'+pversion                           ,''},
+                    {'thor_data400::key::header::'+pversion+'::hhid'                       ,''},
+                    {'thor_data400::key::header::'+pversion+'::city_name.st.percent_chance',''}
 
                     ],DOPS.Layout_filelist)),
                     

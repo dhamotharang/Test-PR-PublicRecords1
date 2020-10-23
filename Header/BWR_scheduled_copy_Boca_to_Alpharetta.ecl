@@ -66,11 +66,12 @@ checkFilesForUpdates :=
 
 ORDERED(
             IF(
-            updateSuperInNewFileFound('~thor_data400::BASE::HHID'         ,'thor_data400::base::hhid_*'                   )
-         OR updateSuperInNewFileFound('~thor_data400::key::did_hhid_qa'   ,'thor_data400::key::header::hhid::*::did.ver'  )
-         OR updateSuperInNewFileFound('~thor_data400::key::hhid_did_qa'   ,'thor_data400::key::header::hhid::*::hhid.ver' )
-         OR updateSuperInNewFileFound('~thor_data400::key::hhid_qa'       ,'thor_data400::key::header::*::hhid'           )
-         OR updateSuperInNewFileFound('~thor_data400::base::hss_household','thor400*::base::hss_household_*'            )
+            updateSuperInNewFileFound('~thor_data400::BASE::HHID'                              ,'thor_data400::base::hhid_*'                               )
+         OR updateSuperInNewFileFound('~thor_data400::key::did_hhid_qa'                        ,'thor_data400::key::header::hhid::*::did.ver'              )
+         OR updateSuperInNewFileFound('~thor_data400::key::hhid_did_qa'                        ,'thor_data400::key::header::hhid::*::hhid.ver'             )
+         OR updateSuperInNewFileFound('~thor_data400::key::hhid_qa'                            ,'thor_data400::key::header::*::hhid'                       )
+         OR updateSuperInNewFileFound('~thor_data400::base::hss_household'                     ,'thor400*::base::hss_household_*'                          )
+         OR updateSuperInNewFileFound{'~thor_data400::key::hdr_city_name.st.percent_chance_qa' ,'thor_data400::key::header::*::city_name.st.percent_chance')
             ,SendEmail('PersonHeader HHID')),
 
             IF(
