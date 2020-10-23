@@ -23,8 +23,6 @@ module
 	  self.contact_name_score			            := r.clean_name.name_score;
 		self.contact_raw_aid							      := r.raw_aid;
 		self.contact_ace_aid							      := r.ace_aid;
-		self.contact_global_sid                 := r.global_sid;   
-    self.contact_record_sid                 := r.record_sid; 	
 		self.efx_contct                         := r.efx_contct;
 		self.efx_titlecd                        := r.efx_titlecd;
 		self.efx_titledesc                      := r.efx_titledesc;
@@ -33,7 +31,10 @@ module
 		self.efx_email                          := r.efx_email;
 		self.efx_date                           := r.efx_date;
 		self.exploded_title_description         := r.exploded_title_description;
+		self.source                             := 'Z1';
+		self.global_sid                         := 28781;
 		self := l;
+		self := [];
 	end;		
 	
 	// Get all company records that are in the valid date range window, then select best one after join
