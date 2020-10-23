@@ -54,7 +54,7 @@ DI_Metrics.FCRA_ASL_Students(pHostname, pTarget, pContact)
 
 ,DI_Metrics.NonFCRA_Watercraft(pHostname, pTarget, pContact)
 
-DI_Metrics.ChartsGeoMaps_AccidentReports(pHostname, pTarget, pContact)
+,DI_Metrics.ChartsGeoMaps_AccidentReports(pHostname, pTarget, pContact)
 
 ,DI_Metrics.ChartsGeoMaps_Criminal(pHostname, pTarget, pContact)
 
