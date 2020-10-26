@@ -1,4 +1,9 @@
-import doxie,Data_Services;
+// ---------------------------------------------------------------
+// For delta rollup logic (dx_common.mac_incremental_rollup) use:
+// $.key_patriot_delta_rid
+// ---------------------------------------------------------------
+
+import doxie;
 
 typeof(patriot.file_patriot_keybuild) upper(patriot.file_patriot_keybuild le) :=
 TRANSFORM
@@ -33,4 +38,4 @@ sec_range,
 p_city_name,
 v_city_name,
 st,
-zip},{p},Data_Services.Data_location.Prefix()+'thor_data400::key::patriot_File_Full_' + doxie.Version_SuperKey);
+zip},{p},'~thor_Data400::key::patriot_File_Full_' + doxie.Version_SuperKey);
