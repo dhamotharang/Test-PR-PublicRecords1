@@ -286,6 +286,4 @@ EXPORT Layout_KeyBase := RECORD
 	STRING100                     EFX_EMAIL;
      STRING10                      EFX_DATE;
      STRING50                      Exploded_Title_Description  := '';
-     UNSIGNED4                   contact_global_sid :=  0;
-     UNSIGNED8                   contact_record_sid :=  0;
 END;	
