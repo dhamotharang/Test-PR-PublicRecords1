@@ -1,4 +1,4 @@
-﻿IMPORT _Control, Business_Risk_BIP, PublicRecords_KEL, Risk_Indicators;
+﻿IMPORT _Control, Business_Risk_BIP, PublicRecords_KEL, PublicRecords_KEL_Queries, Risk_Indicators;
 IMPORT KEL11 AS KEL;
 
 boolean use_B2B_attributes_library := NOT _Control.LibraryUse.ForceOff_B2B_attributes;
@@ -9,9 +9,9 @@ EXPORT LIB_B2B_attributes (
             // BIPV2.mod_sources.iParams linkingOptions,
             SET OF STRING2 AllowedSourcesSet) :=
 #if(use_B2B_attributes_library)
-  MODULE, LIBRARY ($.LIB_B2B_interface)
+  MODULE, LIBRARY (Business_Risk_BIP.LIB_B2B_interface)
 #else
-  MODULE ($.LIB_B2B_interface (Shell, Options, AllowedSourcesSet))
+  MODULE (Business_Risk_BIP.LIB_B2B_interface (Shell, Options, AllowedSourcesSet))
 #end
 #OPTION('expandSelectCreateRow', TRUE);
 
@@ -76,7 +76,7 @@ EXPORT LIB_B2B_attributes (
 	RecordsWithSeleID := BusinessInput(B_LexIDLegal > 0);
 	RecordsWithoutSeleID := BusinessInput(B_LexIDLegal <= 0);
 
-	LayoutBusinessSeleIDAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1(
+	LayoutBusinessSeleIDAttributes := RECORDOF(PublicRecords_KEL_Queries.B2B_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1(
 																	0, // UltID
 																	0, // OrgID
 																	0, // SeleID
@@ -88,7 +88,7 @@ EXPORT LIB_B2B_attributes (
 	BusinessSeleAttributes_Results := PROJECT(BusinessInput, TRANSFORM(
           {INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes},
           SELF.G_ProcBusUID := LEFT.G_ProcBusUID;
-          NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1(
+          NonFCRABusinessSeleIDResults := PublicRecords_KEL_Queries.B2B_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1(
             LEFT.B_LexIDUlt,
             LEFT.B_LexIDOrg,
             LEFT.B_LexIDLegal,
