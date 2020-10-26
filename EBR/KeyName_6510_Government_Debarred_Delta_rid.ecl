@@ -1,0 +1,1 @@
+﻿EXPORT KeyName_6510_Government_Debarred_Delta_rid := trim(GetSegmentKeyName_Delta_RID('6510'));
