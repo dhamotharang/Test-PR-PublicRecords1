@@ -5,7 +5,7 @@
 /*--INFO--
 This is a test service to facilitate creation of new keys and sub-sequent addition to package file.
 */
-IMPORT Data_Services, dx_Banko, dx_Cortera_Tradeline, Patriot, Prof_License_Mari;
+IMPORT Data_Services, dx_Banko, dx_Cortera_Tradeline, dx_EBR, Patriot, Prof_License_Mari;
 EXPORT EchoService := MACRO
   OUTPUT(CHOOSEN(dx_Cortera_Tradeline.Key_Delta_Rid, 10), named('cortera_tradeline_delta_rid'));
   OUTPUT(CHOOSEN(Prof_License_Mari.Key_Search_Delta_Rid(), 10), named('Prof_License_Mari_Key_Search_Delta_Rid'));
@@ -21,5 +21,23 @@ EXPORT EchoService := MACRO
   OUTPUT(CHOOSEN(dx_OSHAIR.keys_delta_rid.Hazardous_Substance, 10), NAMED('dx_OSHAIR_Hazardous_Substance_Delta_RID'));
   OUTPUT(CHOOSEN(dx_OSHAIR.keys_delta_rid.Inspection, 10), NAMED('dx_OSHAIR_Inspection_Delta_RID'));
   OUTPUT(CHOOSEN(dx_OSHAIR.keys_delta_rid.Program, 10), NAMED('dx_OSHAIR_Program_Delta_RID'));
-  OUTPUT(CHOOSEN(dx_OSHAIR.keys_delta_rid.Violations, 10), NAMED('dx_OSHAIR_Violations_Delta_RID'));
+  OUTPUT(CHOOSEN(dx_OSHAIR.keys_delta_rid.Violations, 10), NAMED('dx_OSHAIR_Violations_Delta_RID'));  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_0010_delta_rid, 10), named('dx_ebr_key_0010_delta_rid'));
+  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_1000_delta_rid, 10), named('dx_ebr_key_1000_delta_rid'));
+  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_2000_delta_rid, 10), named('dx_ebr_key_2000_delta_rid'));
+  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_2015_delta_rid, 10), named('dx_ebr_key_2015_delta_rid'));
+  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_2020_delta_rid, 10), named('dx_ebr_key_2020_delta_rid'));
+  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_2025_delta_rid, 10), named('dx_ebr_key_2025_delta_rid'));
+  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_4010_delta_rid, 10), named('dx_ebr_key_4010_delta_rid'));
+  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_4020_delta_rid, 10), named('dx_ebr_key_4020_delta_rid'));
+  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_4030_delta_rid, 10), named('dx_ebr_key_4030_delta_rid'));
+  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_4500_delta_rid, 10), named('dx_ebr_key_4500_delta_rid'));
+  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_4510_delta_rid, 10), named('dx_ebr_key_4510_delta_rid'));
+  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_5000_delta_rid, 10), named('dx_ebr_key_5000_delta_rid'));
+  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_5600_delta_rid, 10), named('dx_ebr_key_5600_delta_rid'));
+  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_5610_delta_rid, 10), named('dx_ebr_key_5610_delta_rid'));
+  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_6000_delta_rid, 10), named('dx_ebr_key_6000_delta_rid'));
+  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_6500_delta_rid, 10), named('dx_ebr_key_6500_delta_rid'));
+  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_6510_delta_rid, 10), named('dx_ebr_key_6510_delta_rid'));
+  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_7010_delta_rid, 10), named('dx_ebr_key_7010_delta_rid'));
+  OUTPUT(CHOOSEN(dx_ebr.mod_delta_rid.key_autokey_payload_delta_rid, 10), named('dx_ebr_key_autokey_payload_delta_rid'));
 ENDMACRO;
