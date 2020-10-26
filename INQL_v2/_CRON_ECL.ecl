@@ -1,4 +1,4 @@
-﻿import wk_ut,_Control,std;
+﻿﻿import wk_ut,_Control,std;
 
 EXPORT _CRON_ECL(string pProcessName = '', boolean isFCRA = false, boolean pDaily = true, string pVersion='')  := Module
 
@@ -35,6 +35,7 @@ KEYS_BUILD_ECL 								:= 'INQL_V2.proc_BuildKeys(,'+ sFCRA + ',' + sDaily + ',t
 STATS_REPORTS_ECL      				:= if(isFCRA,'Inquiry_AccLogs._SCH_FCRAComprehensiveStats;\n'
                                   				,'Inquiry_AccLogs._SCH_NonFCRAComprehensiveStats;\n');
 FILES_CONSOLIDATE_ECL         := INQL_v2.proc_FilesConsolidate(false).ecl;
+FIDO_REPORT_ECL               := 'do:=SEQUENTIAL(\nINQL_V2.FIDO_Change_Report.SendFIDOchangesRep;\n);\n';
 
 PROCESS_ECL 				:= Case(pProcessName, 
 														'PRODR3 EXTRACT' 						=> PRODR3_EXTRACT_ECL, 			
@@ -48,10 +49,12 @@ PROCESS_ECL 				:= Case(pProcessName,
 														'BASE DIDVILLE SLIM BUILD' 	=> BASE_DIDVILLE_SLIM_BUILD_ECL,														
 														'KEYS BUILD' 								=> KEYS_BUILD_ECL,
 														'STATS REPORTS' 						=> STATS_REPORTS_ECL,
-														'FILES CONSOLIDATE'         => FILES_CONSOLIDATE_ECL,'');
+														'FILES CONSOLIDATE'         => FILES_CONSOLIDATE_ECL,
+														'FIDO CHANGE REPORT'        => FIDO_REPORT_ECL,'');
 
 DO_SEQUENTIAL_ECL   := Case(pProcessName,
                             'FILES CONSOLIDATE'         => PROCESS_ECL,
+														'FIDO CHANGE REPORT'        => PROCESS_ECL,
 														'DO:= SEQUENTIAL(\n'+PROCESS_ECL+');\n');
 
 Export WU := 
