@@ -1,4 +1,4 @@
-﻿export Send_Email(string filedate='',string st='',string fn='', string ut='', string build_status='', string rid_status='', string rinid_status='', string ce='oscar.barrientos@lexisnexisrisk.com'):= module
+﻿export Send_Email(string filedate='',string st='',string fn='', string ut='', string build_status='', string rid_status='', string rinid_status='', string ce='oscar.barrientos@lexisnexisrisk.com', boolean pIsError=false):= module
 
 	shared UpSt:=stringlib.stringtouppercase(st);
 	shared UpType:=stringlib.stringtouppercase(ut);
@@ -41,7 +41,7 @@
 	export FraudGov_Input_Prep_failure
 						:= fileservices.sendemail(
 								Mailing_List(UpSt,UpType,ce).Alert
-								,'*** ALERT **** FraudGov Contributory File Prep FAILURE'
+								,'*** FAILURE *** ATTENTION ***  FraudGov Contributory File Validation Report'
 								,'File will not be processed.  Please review and re-submit -> '+fn+'\n'
 								+'\n\n'
 								+FAILMESSAGE
@@ -57,7 +57,7 @@
 	export FileEmptyErrorAlert
 						:= fileservices.sendemail(
 								Mailing_List(UpSt,UpType,ce).Alert
-								,'*** ALERT **** FraudGov Contributory File Validation FAILURE'
+								,'*** FAILURE *** ATTENTION ***  FraudGov Contributory File Validation Report'
 								,'File will not be processed.  Please review and re-submit -> '+fn+'\n'
 								+'********   FILE IS EMPTY   **********   FILE IS EMPTY   **********   FILE IS EMPTY   **********\n'
 								+'********   FILE IS EMPTY   **********   FILE IS EMPTY   **********   FILE IS EMPTY   **********\n'
@@ -71,7 +71,7 @@
 	export FileRecorLengthErrorAlert
 						:= fileservices.sendemail(
 								Mailing_List(UpSt,UpType,ce).Alert
-								,'*** ALERT **** FraudGov Contributory File Validation FAILURE'
+								,'*** FAILURE *** ATTENTION ***  FraudGov Contributory File Validation Report'
 								,'File will not be processed.  Please review and re-submit -> '+fn+'\n'
 								+'********   FILE CONTAINS RECORDS OF INVALID LENGTH   ********** \n'
 								+'********   FILE CONTAINS RECORDS OF INVALID LENGTH   ********** \n'
@@ -85,7 +85,7 @@
 	export FileErrorAlert
 						:= fileservices.sendemail(
 								Mailing_List(UpSt,UpType,ce).Alert
-								,'*** ALERT **** FraudGov Contributory File Validation FAILURE'
+								,'*** FAILURE *** ATTENTION ***  FraudGov Contributory File Validation Report'
 								,'File not found -> '+fn
 								,
 								,
@@ -95,7 +95,7 @@
 	export FileValidationReport(string pSeparator, string pTerminator)
 						:= fileservices.sendemail(
 								Mailing_List(UpSt,UpType,ce).Validation
-								,'FraudGov Contributory File Validation Report'
+								,IF(pIsError = true, '*** FAILURE *** ATTENTION ***','') + 'FraudGov Contributory File Validation Report'
 								,InputFileValidationReport(fn,pSeparator,pTerminator).BODY
 								,
 								,
@@ -105,7 +105,7 @@
 	export InvalidDelimiterError(string pSeparator, string pTerminator)
 						:= fileservices.sendemail(
 								Mailing_List(UpSt,UpType,ce).Validation
-								,'FraudGov Contributory File Validation Report'
+								,'*** FAILURE *** ATTENTION *** FraudGov Contributory File Validation Report'
 								,InvalidDelimiterErrorReport(fn,pSeparator,pTerminator).BODY
 								,
 								,
@@ -115,7 +115,7 @@
 	export InvalidNumberOfColumns(string pSeparator, string pTerminator)
 						:= fileservices.sendemail(
 								Mailing_List(UpSt,UpType,ce).Validation
-								,'FraudGov Contributory File Validation Report'
+								,'*** FAILURE *** ATTENTION *** FraudGov Contributory File Validation Report'
 								,InvalidNumberOfColumnsReport(fn,pSeparator,pTerminator).BODY
 								,
 								,
