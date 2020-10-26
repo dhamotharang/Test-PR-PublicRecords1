@@ -1,4 +1,9 @@
-import doxie;
+﻿import doxie;
+
+// ---------------------------------------------------------------
+// For delta rollup logic (dx_common.mac_incremental_rollup) use:
+//  $.mod_delta_rid.key_4500_delta_rid
+// ---------------------------------------------------------------
 
 f := File_4500_Collateral_Accounts_Base_bdid(FILE_NUMBER <> '');
 

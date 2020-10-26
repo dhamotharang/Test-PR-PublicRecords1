@@ -1,5 +1,10 @@
 ﻿IMPORT BIPV2, Doxie;
 
+// ---------------------------------------------------------------
+// For delta rollup logic (dx_common.mac_incremental_rollup) use:
+//  $.mod_delta_rid.key_5610_delta_rid
+// ---------------------------------------------------------------
+
 EXPORT Key_5610_Demographic_Data_linkids := MODULE
 
   // DEFINE THE INDEX
