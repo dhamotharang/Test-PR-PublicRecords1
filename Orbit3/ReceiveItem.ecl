@@ -5,7 +5,7 @@
 									 STRING ReceiveDate,
 									 STRING MediaType = 'SFTP',
 									 STRING ReceivingType = 'Contribution', 
-									 STRING ServerInfo = 'Test-Env') := MODULE
+									 STRING ServerInfo = EnvironmentVariables.orbitServerInfo) := MODULE
 
 	//SOAP Request Format
 	Inputrec := RECORD
