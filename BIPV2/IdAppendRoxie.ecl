@@ -15,7 +15,7 @@ export IdAppendRoxie(
 		,boolean segmentation = true
 	) := module
 
-	#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
+	#IF(BIPV2.IdConstants.USE_LOCAL_KEYS or BIPV2.IdConstants.USE_LOCAL_ROXIE_SALT_KEYS)
 	shared localAppend :=
 		BIPV2.IdAppendRoxieLocal(
 			inputDs
@@ -40,7 +40,7 @@ export IdAppendRoxie(
 			);
 
 	export IdsOnly() := function
-		#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
+		#IF(BIPV2.IdConstants.USE_LOCAL_KEYS or BIPV2.IdConstants.USE_LOCAL_ROXIE_SALT_KEYS)
 			res := project(localAppend, transform(BIPV2.IdAppendLayouts.IdsOnlyOutput, self := left, self := []));
 		#ELSE
 			res := project(remoteAppend.IdsOnly(), BIPV2.IdAppendLayouts.IdsOnlyOutput);
@@ -55,7 +55,7 @@ export IdAppendRoxie(
 	export WithBest(string fetchLevel = BIPV2.IdConstants.fetch_level_proxid, boolean allBest = false
 	                ,boolean isMarketing = false
 					,Doxie.IDataAccess mod_access = defaultDataAccess) := function
-		#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
+		#IF(BIPV2.IdConstants.USE_LOCAL_KEYS or (BIPV2.IdConstants.USE_LOCAL_ROXIE_BEST_KEYS and BIPV2.IdConstants.USE_LOCAL_ROXIE_SALT_KEYS))
 			res0 := BIPV2.IdAppendLocal.AppendBest(localAppend, fetchLevel := fetchLevel, allBest := allBest
 			                                       ,isMarketing := isMarketing
 												   ,mod_access := mod_access);
