@@ -22,13 +22,8 @@ input_zip										:= inp.input_zip;
 ssn4_value									:= inp.ssn4_value;
 ssn5_value									:= inp.ssn5_value;
 ssn_value										:= inp.ssn_value;
-dppa_purpose								:= mod_access.dppa;
-glb_purpose									:= mod_access.glb;
 maxresults_val 							:= inp.maxresults_val;
-ssn_mask_value 							:= mod_access.ssn_mask;
 AllowMultipleResults_value 	:= inp.AllowMultipleResults_value;
-glb_ok											:= mod_access.isValidGLB ();
-dppa_ok											:= mod_access.isValidDPPA ();
 thresh_value								:= inp.thresh_value;
 
 
@@ -360,7 +355,7 @@ END;
 j0_unfil := JOIN(key_res,br_permission_check,LEFT.did=RIGHT.did,append_best(LEFT,RIGHT), LEFT OUTER);
 j0 := j0_unfil(score >= thresh_value);
 
-Suppress.MAC_Mask(j0, j, best_ssn, null, true, false);
+Suppress.MAC_Mask(j0, j, best_ssn, null, true, false, maskVal := mod_access.ssn_mask);
 
 Didville.Layout_Did_Numeric_Out.Out_Rec append_best_addr(j li,best_addr_rec_for_display ri):=TRANSFORM
   SELF.best_addr1 :=
