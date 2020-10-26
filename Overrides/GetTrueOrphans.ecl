@@ -18,8 +18,6 @@ EXPORT  GetTrueOrphans(STRING filedate) := FUNCTION
 	
 	//GONG
 	GongTrueOrphans := Overrides.Gong_Override_Findings(dsOut_C(datagroup = 'GONG'), filedate);
-		
-	GongTrueOrphans;	
 	
 	// PAW
 	

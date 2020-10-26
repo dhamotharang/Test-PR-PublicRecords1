@@ -186,9 +186,6 @@ EXPORT Constants := MODULE
 		RETURN threshold_limit;	
 	END;
 
-//datagroup with flag_file_id link multiple records  
-//EXPORT datagroup_m_set := [BANKRUPTCY_MAIN, BANKRUPTCY_SEARCH, 
-//LIEN_MAIN, LIEN_PARTY];
 	EXPORT datagroup_m_set := [BANKRUPTCY_SEARCH];
 	EXPORT file_id_m_set := [FCRA.FILE_ID.BANKRUPTCY];		
 END;

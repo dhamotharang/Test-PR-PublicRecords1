@@ -194,18 +194,19 @@ EXPORT Gong_Override_Findings(DATASET(Override_Layouts.Layout_Get_Orphans) orpha
 	GongOrphans_GrowthCheck_ds := PROJECT(GongTrueOrphans, TRANSFORM(overrides.File_Override_Orphans.orphan_rec,
 														SELF.datagroup := Constants.GONG, SELF.did := (STRING) LEFT.did, SELF := LEFT));
 		
-    build_stats := GrowthCheck(filedate, Constants.GONG, GongOrphans_GrowthCheck_ds).BuildStats; 
+	   
+	call_gc :=  GrowthCheck(filedate, Constants.GONG, GongOrphans_GrowthCheck_ds);
+   
 	
-	build_stats;
-  	
-	BOOLEAN stats_alerts := GrowthCheck(filedate, Constants.GONG, GongOrphans_GrowthCheck_ds).StatsAlerts;
-
-	sent_email := IF (stats_alerts, FileServices.sendemail(EmailNotification.orphan_alert_list,'Gong Override True Orphans COUNT is higher than threshold count 50  :WU#: '+ workunit, failmessage));
- 	
+	build_stats := call_gc.BuildStats;
+	
+   stats_alerts := call_gc.StatsAlerts;
+			
+	sent_email := IF (stats_alerts, FileServices.sendemail(EmailNotification.orphan_alert_list,'Gong Override True Orphans 			 COUNT is higher than threshold count 50  :WU#: '+ workunit, failmessage));
+ 		
    result_orphans := IF(~stats_alerts,GongTrueOrphans);
+		
+	RETURN WHEN (result_orphans, sent_email);
 	
-	
-	RETURN result_orphans;
-
 END;	
 
