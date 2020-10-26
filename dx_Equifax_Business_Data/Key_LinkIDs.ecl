@@ -1,4 +1,5 @@
-﻿IMPORT BIPV2, $;
+﻿//Changes kfetch2 changes made per Don Lingle request
+IMPORT BIPV2, $;
   
 EXPORT Key_LinkIds := MODULE
 
