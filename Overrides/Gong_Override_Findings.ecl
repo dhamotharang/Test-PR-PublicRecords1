@@ -202,7 +202,9 @@ EXPORT Gong_Override_Findings(DATASET(Override_Layouts.Layout_Get_Orphans) orpha
 	
    stats_alerts := call_gc.StatsAlerts;
 			
-	sent_email := IF (stats_alerts, FileServices.sendemail(EmailNotification.orphan_alert_list,'Gong Override True Orphans 			 COUNT is higher than threshold count 50  :WU#: '+ workunit, failmessage));
+	sent_email := IF (stats_alerts, FileServices.sendemail(EmailNotification.orphan_alert_list
+												, 'Gong Override True Orphans COUNT is higher than threshold count ' +  overrides.Constants.GetStatsThreshold(Constants.GONG) 
+												, 'WU#: '+ workunit + '-' + failmessage));
  		
    result_orphans := IF(~stats_alerts,GongTrueOrphans);
 		
