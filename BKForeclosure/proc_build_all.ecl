@@ -31,7 +31,7 @@ EXPORT proc_build_all (STRING filedate)	:= FUNCTION
 													,ReoPopulationStats
 													);												
 
-	orbit_update := sequential(Orbit3.Proc_Orbit3_CreateBuild_npf('Black Knight Foreclosures',filedate)
+	orbit_update := sequential(Orbit3.Proc_Orbit3_CreateBuild('Black Knight Foreclosures',filedate,is_npf := true)
 														);
 
 	BuildAll	:= SEQUENTIAL(Nodbuilt, Reobuilt, orbit_update);

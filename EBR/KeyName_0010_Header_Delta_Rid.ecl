@@ -1,0 +1,1 @@
+﻿EXPORT KeyName_0010_Header_Delta_Rid := trim(GetSegmentKeyName_Delta_RID('0010'));

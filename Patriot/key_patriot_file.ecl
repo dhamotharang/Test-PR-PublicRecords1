@@ -1,3 +1,8 @@
+// ---------------------------------------------------------------
+// For delta rollup logic (dx_common.mac_incremental_rollup) use:
+// $.key_patriot_delta_rid
+// ---------------------------------------------------------------
+
 import doxie;
 
 typeof(patriot.file_patriot_keybuild) upper(patriot.file_patriot_keybuild le) :=
