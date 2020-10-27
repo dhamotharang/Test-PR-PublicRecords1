@@ -30,8 +30,9 @@ module
   shared dPropPayload := GetPropertyData (dataset ([CreateBatchRecord()]) (is_cleaned));
 	
 	//Obtain Lexid
-	SHARED Lexid				:= Get_Lexid(pRequest.ReportBy.Name, pRequest.ReportBy.dob, pRequest.ReportBy.ssn, pRequest.ReportBy.DLNumber, pRequest.ReportBy.DLState, clean_addr);
-
+	SHARED Lexid				:= IF(pInMod.ResultOption <> Constants.Default_Option,
+                          Get_Lexid(pRequest.ReportBy.Name, pRequest.ReportBy.dob, pRequest.ReportBy.ssn, pRequest.ReportBy.DLNumber, pRequest.ReportBy.DLState, clean_addr),
+                          0);
 	//Determine if opted out under ccpa
 	SHARED IsOptedOut		:= IF(Lexid <> 0, isOptOut(Lexid), FALSE);
 	   
