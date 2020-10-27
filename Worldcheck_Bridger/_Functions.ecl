@@ -201,6 +201,7 @@
 				trim(cname, left, right) in ['Nigeria','NIGERIA'] =>SubGroup_Constants.numCountryID.NIGERIA ,
 				trim(cname, left, right) in ['Niue','NIUE'] =>SubGroup_Constants.numCountryID.NIUE ,
 				trim(cname, left, right) in ['Norfolk Island','NORFOLK ISLAND'] =>SubGroup_Constants.numCountryID.NORFOLK_ISLAND ,
+				trim(cname, left, right) in ['North Macedonia','NORTH MACEDONIA'] =>SubGroup_Constants.numCountryID.NORTH_MACEDONIA ,
 				trim(cname, left, right) in ['Norway','NORWAY'] =>SubGroup_Constants.numCountryID.NORWAY ,
 				trim(cname, left, right) in ['Oman','OMAN'] =>SubGroup_Constants.numCountryID.OMAN ,
 				trim(cname, left, right) in ['Pakistan','PAKISTAN'] =>SubGroup_Constants.numCountryID.PAKISTAN ,

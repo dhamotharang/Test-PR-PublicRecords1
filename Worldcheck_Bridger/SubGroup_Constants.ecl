@@ -160,6 +160,7 @@
 		export string NIGERIA 						:= '157';
 		export string NIUE 							:= '158';
 		export string NORFOLK_ISLAND 				:= '159';
+		export string NORTH_MACEDONIA 					:= '244';
 		export string NORWAY 						:= '160';
 		export string OMAN 							:= '161';
 		export string PAKISTAN 						:= '162';
@@ -245,6 +246,7 @@
 		export string COCOS_KEELING_IS 				:= '240';
 		export string SINT_MAARTEN 					:= '241';
 		export string CURACAO 						:= '242';//special character CURAÇAO
+		
 	end;
 	
 	export numCategoryID := module
