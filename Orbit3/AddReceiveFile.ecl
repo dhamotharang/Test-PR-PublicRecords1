@@ -1,7 +1,7 @@
 ﻿EXPORT AddReceiveFile(STRING ptoken,							
 											STRING ReceivingId, 
 											STRING FilePathName = '',
-											STRING ServerInfo = 'Test-Env') := MODULE
+											STRING ServerInfo = EnvironmentVariables.orbitServerInfo) := MODULE
 
 	//SOAP Request Format
 	Inputrec := RECORD
