@@ -72,6 +72,7 @@ ProdProcesses      		:= Sequential(
 																	 ,_process('KEYS BUILD', false,false) // NFCRA Weekly Keys 
 																	 ,_process('STATS REPORTS', false,false) // NFCRA Weekly Stats 																	 
 																	 ,_process('STATS REPORTS', true,false)  // FCRA Weekly Stats		
+																	 ,_process('FIDO CHANGE REPORT', false,true) // FIDO Change Daily Report
 																	 );
 
 Controller        		:= Case(_Control.ThisEnvironment.ThisDaliIp 
