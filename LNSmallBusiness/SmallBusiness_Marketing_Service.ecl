@@ -81,9 +81,9 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 		string10 InterfaceVersion       := '' : STORED('_ESPClientInterfaceVersion');
 		string5 DeliveryMethod          := '' : STORED('_DeliveryMethod');
 		string5 DeathMasterPurpose      := '' : STORED('__deathmasterpurpose');
-		outofbandssnmask                := 'NONE' : STORED('SSNMask'); //same as in "global module"
+		string6 outofbandssnmask        := 'NONE' : STORED('SSNMask'); //same as in "global module"
 		string10 SSN_Mask               := if(users.SSNMask != '', users.SSNMask, outofbandssnmask);
-		outofbanddobmask                := 'NONE' : STORED('DOBMask'); //same as in "global module"
+		string6 outofbanddobmask        := 'NONE' : STORED('DOBMask'); //same as in "global module"
 		string10 DOB_Mask               := if(users.DOBMask != '', users.DOBMask, outofbanddobmask);
 		BOOLEAN DL_Mask                 := users.DLMask;
 		BOOLEAN ExcludeDMVPII           := users.ExcludeDMVPII;
