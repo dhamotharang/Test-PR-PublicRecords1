@@ -1,7 +1,7 @@
 ﻿import ut, STD;
 
 	string uc(string s) := Std.Str.ToUpperCase(s);
-  string fix(string s) := Std.Str.CleanSpaces(uc(Std.Str.FindReplace(s,'.','')));
+  string fix(string s) := Std.Str.CleanSpaces(uc(Std.Str.FindReplace(s,'.',' ')));
 	rgxSfx := '^([A-Z]+)[, ]+(JR|SR|III)';
 
 // convert lower case to upper case
@@ -31,14 +31,14 @@ EXPORT fn_flatten(dataset(Nac_v2.Layouts.base) base1) := FUNCTION
 						
 						casename := fix(left.Case_Last_Name);
 						self.Case_Last_Name := IF(REGEXFIND(rgxSfx, casename), REGEXFIND(rgxSfx, casename, 1), casename);
-						self.Case_First_Name := uc(left.Case_First_Name);
-						self.Case_Middle_Name := uc(left.Case_Middle_Name);
+						self.Case_First_Name := fix(left.Case_First_Name);
+						self.Case_Middle_Name := fix(left.Case_Middle_Name);
 						self.Case_Name_Suffix := IF(REGEXFIND(rgxSfx, casename), REGEXFIND(rgxSfx, casename, 2), '');
 						
 						clientname := fix(left.Client_Last_Name);
 						self.Client_Last_Name := IF(REGEXFIND(rgxSfx, clientname), REGEXFIND(rgxSfx, clientname, 1), clientname);
-						self.Client_First_Name := uc(left.Client_First_Name);
-						self.Client_Middle_Name := uc(left.Client_Middle_Name);
+						self.Client_First_Name := fix(left.Client_First_Name);
+						self.Client_Middle_Name := fix(left.Client_Middle_Name);
 						self.Client_Name_Suffix := IF(REGEXFIND(rgxSfx, clientname), REGEXFIND(rgxSfx, clientname, 2), '');
 						self.name_suffix := self.Client_Name_Suffix;
 																								
