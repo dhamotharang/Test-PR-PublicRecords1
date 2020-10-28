@@ -1,4 +1,6 @@
-﻿export Layout_2025_Trade_Quarterly_Averages_Base := 
+﻿import dx_common;
+
+export Layout_2025_Trade_Quarterly_Averages_Base := 
 record
   Layout_Base;
   string8   process_date;
@@ -15,7 +17,5 @@ record
   string3   DEBT_31_60_PERCENT;
   string3   DEBT_61_90_PERCENT;
   string3   DEBT_91_PLUS_PERCENT;
-  unsigned4 dt_effective_first  := 0;
-  unsigned4 dt_effective_last   := 0;
-  unsigned1 delta_ind           := 0;
+  dx_common.layout_metadata - [global_sid, record_sid];
 end;
