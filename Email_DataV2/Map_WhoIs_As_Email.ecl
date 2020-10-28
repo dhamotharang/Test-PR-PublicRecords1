@@ -10,7 +10,7 @@ emailservice.mac_append_domain_flags(with_email,domain_d,Email);
 			
 //************Transform to a common email layout
 Email_DataV2.Layouts.Base_BIP t_map_to_common (domain_d input) := TRANSFORM
-	SELF.email_src        					:= 'W '; //mdr.sourceTools.src_WhoIs_Domain;
+	SELF.email_src        					:= mdr.sourceTools.src_Whois_domains;
 	SELF.current_rec      					:= input.current_rec;
 	SELF.activecode     						:= '';
 	SELF.did_type         					:= '';
