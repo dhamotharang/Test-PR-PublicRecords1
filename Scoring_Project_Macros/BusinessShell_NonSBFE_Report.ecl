@@ -69,16 +69,16 @@ layout := RECORD
  END;
 					 
 
-dset_curr1 := dataset('~scoring_project::businessshell_NONSBFE_stats_' + dt1_1, layout, thor);
-dset_prev1 := dataset('~scoring_project::businessshell_NONSBFE_stats_' + dt2_1, layout, thor);
+dset_curr1 := distribute(dataset('~scoring_project::businessshell_NONSBFE_stats_' + dt1_1, layout, thor),hash(field_name));
+dset_prev1 := distribute(dataset('~scoring_project::businessshell_NONSBFE_stats_' + dt2_1, layout, thor),hash(field_name));
  
  lay := RECORD
 	 Scoring_Project_Macros.Global_Output_Layouts.BusinessShell_Attributes_V2_XML_Generic_Global_Layout;
 END;
 
 
-nick_current_file := dataset( '~' + c_file_name1, lay, thor);
-nick_previous_file := dataset( '~' + p_file_name1, lay, thor);
+nick_current_file := distribute(dataset( '~' + c_file_name1, lay, thor),(integer)acctno);
+nick_previous_file := distribute(dataset( '~' + p_file_name1, lay, thor),(integer)acctno);
 
 // nick_previous_file((integer)accountnumber>=50000);
 // count(nick_previous_file);
