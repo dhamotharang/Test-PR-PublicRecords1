@@ -13,7 +13,7 @@ export Proc_build_base(string filedate,boolean newCatEvent = false) := function
 	Requirements:   N/A
 */
 //filedate := Banko.version;
-typeof(Banko.BankoJoinRecord) CourtID_C3CourtID_Rec(recordof(Banko.Layout_BankoFile_FixedRec) L
+Layout_Banko_Base CourtID_C3CourtID_Rec(recordof(Banko.Layout_BankoFile_FixedRec) L
 										,recordof(bankruptcyv3.file_bankruptcyv3_courts) R) := TRANSFORM
 
 	SELF.court_code :=R.moxie_court;
@@ -23,6 +23,7 @@ typeof(Banko.BankoJoinRecord) CourtID_C3CourtID_Rec(recordof(Banko.Layout_BankoF
 	SELF.CatEvent_Category := ' ';
 	SELF.EnteredDate := filedate; // filedate is now datetime
 	SELF := L;
+	self := [];
 	
 END;
 
@@ -32,7 +33,7 @@ CourtID_C3CourtID_RecJoin := JOIN(Banko.Layout_BankoFile_FixedRec,
 					CourtID_C3CourtID_Rec(LEFT,RIGHT),LOOKUP);
 					
 
-typeof(Banko.BankoJoinRecord) Add_CatEvent_Rec(recordof(Banko.BankoJoinRecord) L
+Layout_Banko_Base Add_CatEvent_Rec(CourtID_C3CourtID_RecJoin L
 										,recordof(Banko.File_CategoryEvent) R) := TRANSFORM
 
 	SELF.CatEvent_Description := R.Description;
@@ -63,7 +64,7 @@ FCRA_Banko_Additional_EventSortRec := SORT(NonFCRA_Banko_Additional_EventSortRec
 FCRA_Banko_Additional_EventDist := DISTRIBUTE(FCRA_Banko_Additional_EventSortRec,HASH32(CaseKey));
 
 
-typeof(Banko.BankoJoinRecord) FCRA_Banko_Additional_EventRec(recordof(FCRA_Banko_Additional_EventDist) L
+Layout_Banko_Base FCRA_Banko_Additional_EventRec(recordof(FCRA_Banko_Additional_EventDist) L
 										,recordof(FCRA_BankruptcyV2Dist) R) := TRANSFORM
 	SELF := L;
 	
@@ -85,7 +86,6 @@ FCRA_FINAL_Banko_Additional_EventSortRec := JOIN(FCRA_Banko_Additional_EventDist
 
 // ***************************
 // Base files
-// RemovedDeletes := Banko.fRemoveDeletes(banko.File_Banko_Base('nonfcra'));
 
 output_nonfcra := output(NonFCRA_Banko_Additional_EventSortRec,,'~thor::base::banko::nonfcra::'+filedate+'::additionalevents',overwrite,__compressed__);
 
@@ -124,36 +124,21 @@ Roxiekeybuild.Mac_SF_BuildProcess_V2(
 
 // Roxie keys	
 //	abbreviated case number keys				
-roxiekeybuild.mac_sk_buildprocess_v2_local(banko.Key_Banko_courtcode_casenumber(),'foo',
-						'~thor_data400::key::banko::' + filedate + '::courtcode.casenumber.caseId.payload',nonfcrakey);
-roxiekeybuild.Mac_SK_Move_V3('~thor_data400::key::banko::@version@::courtcode.casenumber.caseId.payload','D',mvnonfcra,filedate);
-
-roxiekeybuild.mac_sk_buildprocess_v2_local(banko.Key_Banko_courtcode_casenumber(true),'foo',
-						'~thor_data400::key::banko::fcra::' + filedate + '::courtcode.casenumber.caseId.payload',fcrakey);
-roxiekeybuild.Mac_SK_Move_V3('~thor_data400::key::banko::fcra::@version@::courtcode.casenumber.caseId.payload','D',mvfcra,filedate);
-//	full case number keys				
-roxiekeybuild.mac_sk_buildprocess_v2_local(banko.Key_Banko_courtcode_fullcasenumber(),'foo',
-						'~thor_data400::key::banko::' + filedate + '::courtcode.fullcasenumber.caseId.payload',nonfcrafullkey);
-roxiekeybuild.Mac_SK_Move_V3('~thor_data400::key::banko::@version@::courtcode.fullcasenumber.caseId.payload','D',mvnonfcrafull,filedate);
-
-roxiekeybuild.mac_sk_buildprocess_v2_local(banko.Key_Banko_courtcode_fullcasenumber(true),'foo',
-						'~thor_data400::key::banko::fcra::' + filedate + '::courtcode.fullcasenumber.caseId.payload',fcrafullkey);
-roxiekeybuild.Mac_SK_Move_V3('~thor_data400::key::banko::fcra::@version@::courtcode.fullcasenumber.caseId.payload','D',mvfcrafull,filedate);
-
+BuildKeys :=  Proc_build_keys(filedate);
 /* Alert records with low pacer date counts */
 //pdatealert :=		Banko.proc_BKevents_stats(filedate).out_all ;
 
 updatedops :=  
 							if( dops.GetBuildVersion('BankruptcyV2Keys','B','N','T')[1..8] <> filedate[1..8] and dops.GetBuildVersion('FCRA_BankruptcyKeys','B','F','T')[1..8] <> filedate[1..8],
 							sequential(
-									dops.updateversion('BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com, intel357@bellsouth.net',,'N',,'Y'),
-									dops.updateversion('FCRA_BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com, intel357@bellsouth.net',,'F',,'Y'),
+									dops.updateversion('BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',,'N',,'Y'),
+									dops.updateversion('FCRA_BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',,'F',,'Y'),
 									Banko.Manage_Input_Files(true)
 										),
 							if (~(ut.Weekday((integer)filedate[1..8]) = 'SATURDAY' or ut.Weekday((integer)filedate[1..8]) = 'SUNDAY'),
 								sequential(
-									dops.updateversion('BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',,'N'),
-									dops.updateversion('FCRA_BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',,'F'),
+									dops.updateversion('BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',,'N'),
+									dops.updateversion('FCRA_BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',,'F'),
 									Banko.Manage_Input_Files(true)
 										)
 										
@@ -163,7 +148,7 @@ updatedops :=
 create_build := sequential(Orbit3.proc_Orbit3_CreateBuild('Bankruptcy Additional Events',filedate,'N'),
                 Orbit3.proc_Orbit3_CreateBuild('FCRA Bankruptcy Additional Events',filedate,'F'));
 
-df:=dataset('~thor::banko::filter::qa::additionalevents',Banko.BankoJoinRecord,thor);
+df:=dataset('~thor::banko::filter::qa::additionalevents',Banko.Layout_Banko_Base,thor);
 samples:= output(choosen(df(entereddate [1..8] = todaysdate),100),named('BK_Events_Samples'));
 
 retval := sequential(//if(newCatEvent,Banko.Spray_CatEventLookupTable('edata12','/hds_2/bkevents/archive/process/*CATEVENTDESC',filedate),output('No New CatEvent File')), //If no new cateven file, no spray
@@ -171,8 +156,7 @@ retval := sequential(//if(newCatEvent,Banko.Spray_CatEventLookupTable('edata12',
 							parallel(output_nonfcra,output_fcra),
 							parallel(nonfcrabase,fcrabase),Banko.fCheckNewCatEventClasses(filedate)),
 					 parallel(FilterBase,FilterFcraBase),notify('BK EVENT FILTER BASE COMPLETE','*'),
-					 parallel(nonfcrakey,fcrakey,nonfcrafullkey,fcrafullkey),updatedops,
-					 mvnonfcra,mvfcra,mvnonfcrafull,mvfcrafull,samples,
+					 BuildKeys,	updatedops, samples,
 					 if(ut.Weekday((integer)filedate[1..8]) <> 'SATURDAY' and ut.Weekday((integer)filedate[1..8]) <> 'SUNDAY',
 					 create_build,
 					 output('No Orbit Entries Needed for weekend builds'))
@@ -190,7 +174,7 @@ We send of an email once the job is completed, with any courtID misses.
 file_in := Banko.Banko_FileDataset;	
 counted := (string)count(file_in(_CourtID = ''));
 
-leMailTarget := 'kevin.reeder@lexisnexisrisk.com, christopher.brodeur@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com';
+leMailTarget := 'Christopher.Brodeur@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com';
 //,Joseph.Lezcano@lexisnexisrisk.com';
 
 fSendMail(string pSubject,string pBody)

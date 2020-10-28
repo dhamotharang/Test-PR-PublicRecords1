@@ -1,3 +1,4 @@
+import dx_common;
 b1 := dids_with_namehook;
 res_type1 := record
   unsigned6 did;
@@ -8,6 +9,8 @@ res_type1 := record
 	STRING20 mname;
 	STRING20 lname;
 	unsigned8 dummy := 0;
+  // DF-28226 - fields defined for delta build
+	dx_common.layout_metadata;
   end;
 
 res_type1 take_ocount(b1 le,annotated_badguys ri) := transform

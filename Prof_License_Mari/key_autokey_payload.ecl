@@ -1,7 +1,12 @@
-﻿import autokeyb2, doxie,Data_Services;
+﻿import doxie, Data_Services, dx_common;
+
+// ---------------------------------------------------------------
+// For delta rollup logic (dx_common.mac_incremental_rollup) use:
+//  $.key_search_delta_rid
+// ---------------------------------------------------------------
 
 rec := RECORD
-   unsigned6 fakeid;
+  unsigned6 fakeid;
   unsigned6 mari_rid;
   string19 create_dte;
   string19 last_upd_dte;
@@ -52,11 +57,9 @@ rec := RECORD
   unsigned8 foreign_nmls_id;
   string150 regulator;
   string150 federal_regulator;
-	 //CCPA-110 Add 2 CCPA fields
-	 UNSIGNED4	global_sid;
-	 UNSIGNED8	record_sid;
+  //DF-28229 Add Delta build fields
+  dx_common.layout_metadata;
  END;
-
 
 d := dataset([],rec);
 // filter_recs := d(addr_ind != '' and company != '' and (fname != '' and mname != '' and lname != ''));
@@ -64,9 +67,9 @@ KeyName 			:= 'thor_data400::key::proflic_mari::autokey::';
 
 export key_autokey_payload := index(d,
                                  {fakeid}
-																 ,{d}
-																 ,Data_Services.Data_location.Prefix('mari')+ KeyName + doxie.Version_SuperKey + '::payload');
-																 
-																 
-																 
-																 
+                                 ,{d}
+                                 ,Data_Services.Data_location.Prefix('mari')+ KeyName + doxie.Version_SuperKey + '::payload');
+                                 
+                                 
+                                 
+                                 

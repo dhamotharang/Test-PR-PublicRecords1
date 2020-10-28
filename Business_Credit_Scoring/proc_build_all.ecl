@@ -10,7 +10,7 @@ EXPORT	proc_Build_All(	STRING	pVersion		=	(STRING8)Std.Date.Today(),
 	//	DOPS Flags and Command
 	EXPORT	pUpdateFlag		:=	'F';	//	Always a Full Build
 	EXPORT	pIsProdReady	:=	'N';	//	Must be QA'd First
-	EXPORT	dops_update		:=	dops.updateversion('SbfeCvScoringKeys', pVersion, _Control.MyInfo.EmailAddressNotify+';Christopher.Brodeur@lexisnexis.com', , 'N',l_isprodready:=pIsProdReady,l_updateflag:=pUpdateFlag); 															
+	EXPORT	dops_update		:=	dops.updateversion('SbfeCvScoringKeys', pVersion, 'Christopher.Brodeur@lexisnexis.com, Sudhir.Kasavajjala@lexisnexisrisk.com', , 'N',l_isprodready:=pIsProdReady,l_updateflag:=pUpdateFlag); 															
 
 	// Create Orbit Entry
 	EXPORT	orbit_entry		:=	Orbit3.proc_Orbit3_CreateBuild('SBFECV Scoring Index',pVersion,'N');

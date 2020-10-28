@@ -243,5 +243,6 @@
 	{'240','Cocos (Keeling) Island','2','','1'},
 	{'241','Sint Maarten','5','','1'},
 	{'242','Curaçao','5','','1'},
-	{'243','South Sudan','1','','1'}],
+	{'243','South Sudan','1','','1'},
+	{'244','North Macedonia','3','','1'}],
 	{string5 Country_id, String50 Country, String1 Region_id, String1 x, String5 Group_id});

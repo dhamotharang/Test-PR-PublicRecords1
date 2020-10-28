@@ -160,6 +160,7 @@
 		export string NIGERIA 						:= '157';
 		export string NIUE 							:= '158';
 		export string NORFOLK_ISLAND 				:= '159';
+		export string NORTH_MACEDONIA 					:= '244';
 		export string NORWAY 						:= '160';
 		export string OMAN 							:= '161';
 		export string PAKISTAN 						:= '162';
@@ -245,6 +246,7 @@
 		export string COCOS_KEELING_IS 				:= '240';
 		export string SINT_MAARTEN 					:= '241';
 		export string CURACAO 						:= '242';//special character CURAÇAO
+		
 	end;
 	
 	export numCategoryID := module
@@ -1261,6 +1263,12 @@
 		export string KEYWORD_USCRAL								:= '947';
 		export string KEYWORD_CANSEMBLR							:= '948';
 		export string KEYWORD_ZAFIC									:= '949';
+		export string KEYWORD_CHCOMLOT							:= '950';
+		export string KEYWORD_OFAC_EO13902					:= '951';
+		export string KEYWORD_UGIGG									:= '952';
+		export string KEYWORD_UGPPDA								:= '953';
+		export string KEYWORD_NAMFISA								:= '954';
+		export string KEYWORD_RWOMBUD								:= '955';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

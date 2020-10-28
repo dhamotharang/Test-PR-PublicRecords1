@@ -13,7 +13,8 @@ Layout_1000_Executive_Summary_Base Convert2Base(File_in l) :=
 transform
 	self.date_first_seen		:= ''; // no relevant date on record
 	self.date_last_seen 		:= self.date_first_seen;
-	self 					:= l;
+	self 					:= 	l;
+	self					:=	[];
 end;
 
 File_in2base := project(File_in, Convert2Base(left));

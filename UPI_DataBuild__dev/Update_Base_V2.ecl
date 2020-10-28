@@ -102,14 +102,16 @@ EXPORT Update_Base_V2 (
 		match_flag := IF(
 				trim(stringlib.stringtouppercase(left.input_first_name),left,right) 								=
 				trim(stringlib.stringtouppercase(right.input_first_name),left,right) 							AND
-				trim(stringlib.stringtouppercase(left.input_middle_initial),left,right) 							=
-				trim(stringlib.stringtouppercase(right.input_middle_initial),left,right) 							AND
+				if(left.input_middle_initial <> '' and right.input_middle_initial <> '',
+					trim(stringlib.stringtouppercase(left.input_middle_initial),left,right) 							=
+					trim(stringlib.stringtouppercase(right.input_middle_initial),left,right),true) 							AND
 				trim(stringlib.stringtouppercase(left.input_last_name),left,right) 							=
 				trim(stringlib.stringtouppercase(right.input_last_name),left,right) 							AND
-				trim(stringlib.stringtouppercase(left.input_suffix),left,right) 							=
-				trim(stringlib.stringtouppercase(right.input_suffix),left,right) 							AND
-				trim(stringlib.stringtouppercase(left.input_full_name),left,right) 							=
-				trim(stringlib.stringtouppercase(right.input_full_name),left,right) 						AND
+				if(left.input_suffix <> '' and right.input_suffix <> '',
+					trim(stringlib.stringtouppercase(left.input_suffix),left,right) 							=
+					trim(stringlib.stringtouppercase(right.input_suffix),left,right),true) 							AND
+				// trim(stringlib.stringtouppercase(left.input_full_name),left,right) 							=
+				// trim(stringlib.stringtouppercase(right.input_full_name),left,right) 						AND
 				trim(stringlib.stringtouppercase(left.input_guardian_first_name),left,right) 						=
 				trim(stringlib.stringtouppercase(right.input_guardian_first_name),left,right) 						AND
 				trim(stringlib.stringtouppercase(left.input_guardian_last_name),left,right) 							=
@@ -647,6 +649,13 @@ EXPORT Update_Base_V2 (
 				crk_results				:= HealthcareNoMatchHeader_Ingest.Files(gcid).CRK;
 								
 				linked_input_file	:= UPI_DataBuild__dev.Files_V2(pVersion,pUseProd,gcid,pHistMode).processed_input.new;
+				
+				previously_seen		:= IF(NOTHOR(FileServices.GetSuperFileSubCount(UPI_DataBuild__dev.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).member_lBaseTemplate_built)) = 0
+														OR pHistMode = 'N'
+														,dataset([],UPI_DataBuild__dev.Layouts_V2.input_processing)
+														,mark_old(project(UPI_DataBuild__dev.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.qa, 
+																				transform(UPI_DataBuild__dev.Layouts_V2.Input_processing, self := left, self := []))));
+
 								
 				linked_input_wCRK		:= linked_input_file(prev_crk <> '');
 				linked_input_noCRK	:= linked_input_file(prev_crk =  '');
@@ -694,12 +703,14 @@ EXPORT Update_Base_V2 (
 				
 				first_seen	:= sort(distribute(update_current_batch(dt_first_seen = (unsigned)pversion[1..8]), hash(crk)), crk, local);
 				
-				already_seen	:= sort(distribute(update_current_batch(dt_first_seen < (unsigned)pversion[1..8]), hash(prev_crk)), prev_crk, local);
+				updated_already_seen	:= update_current_batch(dt_first_seen < (unsigned)pversion[1..8]);
+				
+				already_seen					:= sort(distribute(previously_seen + updated_already_seen, hash(prev_crk)), prev_crk, dt_first_seen, local);
 				
 				check_for_new_rec_same_person	:= join(first_seen, already_seen,
 																								left.crk = right.prev_crk, 
 																								transform({update_current_batch},
-																									self.dt_first_seen := right.dt_first_seen,
+																									self.dt_first_seen := if(left.crk = right.prev_crk, right.dt_first_seen, left.dt_first_seen),
 																									self.prev_lexid		 := right.prev_lexid,
 																									self.prev_crk			 := right.prev_crk,
 																									self.crk_changed	 := right.crk_changed,
@@ -707,7 +718,7 @@ EXPORT Update_Base_V2 (
 																									self							 := left),
 																								left outer, keep(1), local);
 																								
-			all_updated	:= already_seen + check_for_new_rec_same_person;
+			all_updated	:= updated_already_seen + check_for_new_rec_same_person;
 																													
    		RETURN sort(all_updated, source_rid);
    	END; 

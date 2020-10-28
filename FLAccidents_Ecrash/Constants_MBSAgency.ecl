@@ -4,7 +4,7 @@ EXPORT Constants_MBSAgency := MODULE
 
 	EXPORT EmailTarget := '':STORED('EmailTarget');
 	
-	EXPORT AgencyBuildName := 'MBSAgency';
+	EXPORT AgencyBuildName := 'eCrash MBSAgency';
 
 // ###########################################################################
 // Landing Zone and Thor Settings
@@ -37,8 +37,8 @@ EXPORT Constants_MBSAgency := MODULE
 //@BuildEmailTarget     : Insurance Ecrash Data Build, data_ops_email_target
 //###########################################################################
   EXPORT DataOpsEmailTarget := IF (EmailTarget = '', 'Sudhir.Kasavajjala@lexisnexisrisk.com', EmailTarget);
-  EXPORT DevEmailTarget := IF (EmailTarget = '', 'DataDevelopment-InsRiskDL@lexisnexisrisk.com', EmailTarget);
-  EXPORT ProdEmailTarget := IF (EmailTarget = '', 'DataDevelopment-InsRiskDL@lexisnexisrisk.com' + ', ' + DataOpsEmailTarget, EmailTarget);
+  EXPORT DevEmailTarget := IF (EmailTarget = '', 'DataDevelopment-InsRiskeCrash@lexisnexisrisk.com', EmailTarget);	
+  EXPORT ProdEmailTarget := IF (EmailTarget = '', 'DataDevelopment-InsRiskeCrash@lexisnexisrisk.com' + ', ' + DataOpsEmailTarget, EmailTarget);
   EXPORT BuildEmailTarget := IF (_control.ThisEnvironment.Name <> 'Prod', DevEmailTarget, ProdEmailTarget);
 
 

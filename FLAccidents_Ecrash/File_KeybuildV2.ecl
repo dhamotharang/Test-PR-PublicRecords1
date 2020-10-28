@@ -1,491 +1,496 @@
-﻿/////////////////////////////////////////////////////////////////
-//Expand Florida file 
-/////////////////////////////////////////////////////////////////
-import FLAccidents,ut, STD;
+﻿IMPORT FLAccidents, ut, STD;
 
-export File_KeybuildV2 := module 
+EXPORT File_KeybuildV2 := MODULE
 
-flc_ss 	:= FLAccidents.basefile_flcrash_ss(lname+cname+prim_name<>'');
-
-Layout_eCrash.Consolidation_AgencyOri xpndrecs(flc_ss L, FLAccidents.basefile_flcrash2v R) := transform
-		self.ultid                := L.ultid;
-		self.orgid                := L.orgid;
-		self.seleid               := L.seleid;
-		self.proxid               := L.proxid;
-		self.powid                := L.powid;
-		self.empid                := L.empid;
-		self.dotid                := L.dotid;
-		self.ultscore             := L.ultscore;
-		self.orgscore             := L.orgscore;
-		self.selescore            := L.selescore;
-		self.proxscore            := L.proxscore;
-		self.powscore             := L.powscore;
-		self.empscore             := L.empscore;
-		self.dotscore             := L.dotscore;
-		self.ultweight            := L.ultweight;
-		self.orgweight            := L.orgweight;
-		self.seleweight           := L.seleweight;
-		self.proxweight           := L.proxweight;
-		self.powweight            := L.powweight;
-		self.empweight            := L.empweight;
-		self.dotweight            := L.dotweight;
-		self.dt_first_seen				:= L.accident_date;
-		self.dt_last_seen					:= L.accident_date;
-		self.report_code					:= 'FA';
-		self.report_category			:= 'Auto Report';
-		self.report_code_desc			:= 'Auto Accident';
-		self.vehicle_incident_id	:= '';
-		self.vehicle_status				:= map(L.accident_nbr = R.accident_nbr and 
-																			L.vin = R. vehicle_id_nbr and 
-																			R.vina_series+R.vina_model+R.reference_number+R.vina_make+R.vina_body_style+R.series_description
-																			+R.car_series+R.car_body_style+R.car_cid+R.car_cylinders<>''=>'V','');
-		self.accident_location		 	:= '';
-		self.accident_street				:= '';
-		self.accident_cross_street	:= '';
-		self.jurisdiction						:= 'FLORIDA HP';
-		self.jurisdiction_state			:= 'FL';
-		self.jurisdiction_nbr				:= '';
-		self.IMAGE_HASH							:= '';
-		self.AIRBAGS_DEPLOY					:= '';
-		self.dob 										:= '';
-		self.driver_license_nbr 		:= if(regexfind('[0-9]',L.driver_license_nbr),L.driver_license_nbr,'');
-		self.carrier_name 					:= R.ins_company_name;
-		self.client_type_id 				:= '';
-		self.vehicle_incident_city	:= '';
-		self.vehicle_incident_st		:= 'FL';
-		self.Policy_num							:= R.ins_policy_nbr;  
-		self.Policy_Effective_Date	:= ''; 
-		self.Policy_Expiration_Date	:= '';
-		self.Report_Has_Coversheet		:= '0';
-		self.date_vendor_last_reported := L.accident_date; // need to create date field...
-		//self.IdField 								:=	R.IdField;
-		//Appriss Integration
-		self.Releasable                     := '1'; 	
-		self.Citation_Details := row([], Layout_Infiles_Fixed.Citations_ChildRec);
-		self 								:= L;
-		self 								:= R;
-		self                := []; 
-end;
-
-	pflc_ss := join(distribute(flc_ss,hash32(accident_nbr,vin)),
-									distribute(FLAccidents.basefile_flcrash2v,hash32(accident_nbr,vehicle_id_nbr)),
-															left.accident_nbr = right.accident_nbr and 
-															left.vin = right.vehicle_id_nbr,
-															xpndrecs(left,right),left outer, local);
-				
-// get Carrier_info from driver file 98385
-
-Layout_eCrash.Consolidation_AgencyOri xpndrecs1(pflc_ss L,FLAccidents.BaseFile_FLCrash4 R) := transform
-
-	self.carrier_name := if(l.carrier_name <> '', l.carrier_name,  R.ins_company_name);
-	self.Policy_num   := if(l.Policy_num <>'',l.Policy_num, R.ins_policy_nbr); 
-	//self.IdField 			:=	R.IdField;
-	//Appriss Integration
-	self.Releasable                     := '1'; 	
-	self.Citation_Details := row([], Layout_Infiles_Fixed.Citations_ChildRec);
-	self 							:= L;
-end;
-
-pflc_ss1 := dedup(distribute(join(distribute(pflc_ss,hash32(accident_nbr))
-			  ,distribute(FLAccidents.BaseFile_FLCrash4(accident_nbr != ''),hash32(accident_nbr))
-															,left.accident_nbr = right.accident_nbr and 
-															trim(left.record_type,left,right) in[ 'Vehicle Driver' ,'Driver']and  
-															ut.nneq(trim(left.driver_license_nbr,left,right) ,trim(right.driver_dl_nbr,left,right)) and 
-															left.fname = right.fname and 
-															left.lname = right.lname ,	      
-															xpndrecs1(left,right),left outer,local)),all,local);
-				 
-/////////////////////////////////////////////////////////////////
-Layout_eCrash.Consolidation_AgencyOri xpndrecs2(pflc_ss1 L,FLAccidents.basefile_flcrash0 R) := transform
-
-	self.vehicle_incident_city			:= STD.Str.ToUpperCase(if(L.accident_nbr= R.accident_nbr,R.city_town_name,''));
-	//Appriss Integration
-	self.Releasable                     := '1'; 	
-	self.Citation_Details := row([], Layout_Infiles_Fixed.Citations_ChildRec); 	
-	self 														:= L;
-end;
-
-pflc_ss2 := distribute(join(distribute(pflc_ss1,hash32(accident_nbr))
-						,distribute(FLAccidents.basefile_flcrash0(accident_nbr != ''),hash32(accident_nbr))
-						,left.accident_nbr = right.accident_nbr,
-						xpndrecs2(left,right),left outer,local),random());
-				 
-
-/////////////////////////////////////////////////////////////////
-//Slim National file 
-///////////////////////////////////////////////////////////////// 
-ntlFile := FLAccidents.BaseFile_NtlAccidents_Alpharetta;
-
-Layout_eCrash.Consolidation_AgencyOri slimrec(ntlFile L) := transform
-
-		string8     fSlashedMDYtoCYMD(string pDateIn) :=
-								intformat((integer2)regexreplace('.*/.*/([0-9]+)',pDateIn,'$1'),4,1) 
-					+     intformat((integer1)regexreplace('([0-9]+)/.*/.*',pDateIn,'$1'),2,1)
-					+     intformat((integer1)regexreplace('.*/([0-9]+)/.*',pDateIn,'$1'),2,1);
-
-		self.did											:= if(L.did = 0,'000000000000',intformat(L.did,12,1));	
-		self.accident_nbr 						:= (string40)((unsigned6)L.vehicle_incident_id+10000000000);
-		self.accident_date						:= fSlashedMDYtoCYMD(L.loss_date[1..10]);
-		self.b_did										:= if(L.bdid = 0,'',intformat(L.bdid,12,1)); 
-		self.cname										:= STD.Str.ToUpperCase(L.business_name);
-		self.addr_suffix 							:= L.suffix;
-		self.zip											:= L.zip5;
-		self.record_type							:= CASE(STD.Str.ToUpperCase(trim(L.party_type,left,right))
-																							,'OWNER'=>'Property Owner'
-																							,'DRIVER'=>'Vehicle Driver'
-																							,'VEHICLE OWNER'=>'Property Owner' 
-																							,'VEHICLE DRIVER'=>'Vehicle Driver'
-																					,'');
-		self.driver_license_nbr				:= if(regexfind('[0-9]',L.pty_drivers_license),L.pty_drivers_license,'');
-		self.dlnbr_st									:= L.pty_drivers_license_st;
-		self.tag_nbr									:= if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.tag,'');	
-		self.tagnbr_st								:= if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.tag_state,'');
-		self.vin											:= L.vehvin;
-		self.accident_location				:= map(L.cross_street!='' and L.cross_street!= 'N/A' => L.street+' & '+L.cross_street,L.street);
-		self.accident_street					:= L.street;
-		self.accident_cross_street		:= map(L.cross_street!= 'N/A' => L.cross_street,'');
-		self.jurisdiction							:= trim(L.edit_agency_name,left,right);
-		self.jurisdiction_state				:= L.STATE_ABBR;
-		self.st												:= if(l.st = '',self.jurisdiction_state,l.st);
-		self.jurisdiction_nbr					:= L.AGENCY_ID;
-		self.IMAGE_HASH								:= L.PDF_IMAGE_HASH;
-		self.AIRBAGS_DEPLOY						:= L.AIRBAGS_DEPLOY;
-		self.DOB											:= L.DOB;
-		self.Policy_num								:= L.POLICY_NBR;  
-		self.Policy_Effective_Date		:= ''; 
-		self.Policy_Expiration_Date		:= '';
-		self.Report_Has_Coversheet		:= if(L.PDF_IMAGE_HASH !='' or L.tif_image_hash !='','1','0');
-		self.other_vin_indicator			:= '';
-		self.vehicle_year							:=L.vehYear;	
-		self.vehicle_make							:=L.vehMake;
-		self.make_description					:= if(L.make_description != '',L.make_description,L.vehMake);
-		self.model_description				:= if(L.model_description != '',L.model_description,L.vehModel);
-		self.vehicle_incident_city	  := STD.Str.ToUpperCase(L.inc_city);
-		self.vehicle_incident_st			:= STD.Str.ToUpperCase(L.state_abbr);
-		self.point_of_impact					:= L.impact_location;
-		self.towed				      			:= L.Car_Towed;
-		self.Impact_Location    			:= L.Impact_Location ;
-		self.carrier_name							:= L.legal_name;
-		self.client_type_id     			:= L.client_type_id;
-		self.vehicle_unit_number 			:= '';
-		self.next_street 							:= '';
-		self.work_type_id 						:= ''; 
-		self.ssn											:=''; 
-		self.cru_order_id							:=l.order_id; 
-		self.cru_sequence_nbr					:=l.sequence_nbr; 
-		self.date_vendor_last_reported := L.last_changed;
-		self.creation_date 						:= ''; 
-		self.report_type_id 					:= L.service_id ;
-		self.tif_image_hash 					:= l.tif_image_hash; 
-		self.acct_nbr 								:= l.acct_nbr ; 
-		self.addl_report_number 			:= l.REPORT_NBR ; 
-/* 		unsigned6 prefix              := MAP(l.report_code[1] = 'I' and l.vehicle_incident_id[1..3] = 'OID'    => 1000000000000,  // inquiry 
-   																				l.report_code[1] = 'I' and l.vehicle_incident_id[1..3] <> 'OID' => 2000000000000, // inquiry 
-   																	      l.report_code = 'FA' => 6000000000000, // For FL accidents there is no incident id so use accident number 
-                                           7000000000000 );  // national accidents 
-       SELF.idfield                  := prefix + (unsigned6) if(trim(L.vehicle_incident_id,all) <> '', L.vehicle_incident_id, '0');
-*/
-		//Appriss Integration
-		self.Releasable               := '1'; 	
-		self.agency_id                := l.agency_id; 	
-	  self.Citation_Details := row([], Layout_Infiles_Fixed.Citations_ChildRec);	 	
-		self						              := l;
-		self						              := [];
-end;
-
-pntl := project(ntlFile,slimrec(left));
-
-/////////////////////////////////////////////////////////////////
-//Slim National inquiry file 
-///////////////////////////////////////////////////////////////// 
-inqFile := FLAccidents_Ecrash.File_CRU_inquiries;
-
-Layout_eCrash.Consolidation_AgencyOri slimrec2(inqFile L ,unsigned1 cnt) := transform
-
-    string8     fSlashedMDYtoCYMD(string pDateIn) :=
-								intformat((integer2)regexreplace('.*/.*/([0-9]+)',pDateIn,'$1'),4,1) 
-					+     intformat((integer1)regexreplace('([0-9]+)/.*/.*',pDateIn,'$1'),2,1)
-					+     intformat((integer1)regexreplace('.*/([0-9]+)/.*',pDateIn,'$1'),2,1);
-
-	  self.report_code					  := 'I'+ L.report_code;
-		self.report_category				:= L.report_category;
-		self.report_code_desc				:= L.report_code_desc;
-		self.accident_nbr 					:= if(L.vehicle_incident_id[1..3] = 'OID',
-																			(string40)((unsigned6)L.vehicle_incident_id[4..]+100000000000),
-																			(string40)((unsigned6)L.vehicle_incident_id+10000000000));
-		self.accident_date					:= fSlashedMDYtoCYMD(L.loss_date[1..10]);
-		self.accident_location			:= map(L.cross_street!='' and L.cross_street!= 'N/A' => L.street+' & '+L.cross_street,L.street);
-		self.accident_street				:= L.street;
-		self.accident_cross_street	:= map(L.cross_street!= 'N/A' => L.cross_street,'');
-		self.jurisdiction						:= STD.Str.ToUpperCase(trim(L.EDIT_AGENCY_NAME,left,right));
-		self.jurisdiction_state			:= STD.Str.ToUpperCase(L.State);
-		self.st											:= if(l.st = '',self.jurisdiction_state,l.st);
-		self.jurisdiction_nbr				:= L.AGENCY_ID;
-		self.cru_jurisdiction       := STD.Str.ToUpperCase(trim(L.EDIT_AGENCY_NAME,left,right));
-		self.cru_jurisdiction_nbr   := L.AGENCY_ID + '_'+L.STATE_NBR ; 
-		self.vehicle_incident_city	:= STD.Str.ToUpperCase(L.city);
-		self.vehicle_incident_st		:= STD.Str.ToUpperCase(L.state);
-		self.did										:= 	choose(cnt ,if(L.did = 0,'000000000000',intformat(L.did,12,1)),'000000000000','000000000000');	
-		self.prim_range   					:=  choose(cnt ,L.prim_range,'',''); 
-		self.predir       					:=  choose(cnt ,l.predir,'','');
-		self.prim_name    					:=  choose(cnt ,l.prim_name,'','');
-		self.postdir      					:=  choose(cnt ,l.postdir,'','');
-		self.unit_desig   					:=  choose(cnt ,l.unit_desig,'','');
-		self.sec_range    					:=  choose(cnt ,l.sec_range,'','');
-		self.v_city_name  					:=  choose(cnt ,l.v_city_name,'','');
-		self.zip4         					:=  choose(cnt ,l.zip4,'','');
-		self.addr_suffix 						:=  choose(cnt ,L.suffix,'','');
-		self.zip										:=  choose(cnt ,L.zip5,'','');
-		self.record_type						:=	choose(cnt , 'Vehicle Driver','','');
-		self.driver_license_nbr			:= 	choose(cnt ,if(regexfind('[0-9]',L.drivers_license),L.drivers_license,''),'','');
-		self.dlnbr_st								:= 	choose(cnt ,L.drivers_license_st,'','');
-		self.tag_nbr								:= 	choose(cnt ,L.otag,'','');
-		self.tagnbr_st							:=  choose(cnt ,L.otag_state,'','');
-		self.vin										:=	choose(cnt , L.vin,'','');
-		self.title 									:= 	choose(cnt ,l.title,l.title2, l.title3); 
-		self.name_suffix 						:= 	choose(cnt ,l.name_suffix,l.name_suffix2, l.name_suffix3); 
-		self.fname 									:=	choose(cnt ,l.fname,l.fname2, l.fname3); 
-		self.lname 									:= 	choose(cnt ,l.lname,l.lname2, l.lname3); 
-		self.mname 									:=	choose(cnt ,l.mname,l.mname2, l.mname3); 
-		
-		t_orig_fname2 							:= if(trim(l.orig_fname2 , left,right)in ['UNK' , 'UNKNOWN' , 'UNK MALE' ], '',l.orig_fname2);  
-		t_orig_lname2 							:= if(trim(l.orig_lname2 , left,right)in ['UNK' , 'UNKNOWN' , 'UNK MALE' ], '',l.orig_lname2);
-		f_orig_lname2               := if(REGEXFIND('[0-9]',t_orig_lname2) = true, '', t_orig_lname2); 
-		t_orig_fname3 							:= if(trim(l.orig_fname3 , left,right)in ['UNK' , 'UNKNOWN' , 'UNK MALE' ], '',l.orig_fname3);  
-		t_orig_lname3 							:= if(trim(l.orig_lname3 , left,right)in ['UNK' , 'UNKNOWN' , 'UNK MALE' ], '',l.orig_lname3);  
-    f_orig_lname3               := if(REGEXFIND('[0-9]',t_orig_lname3) = true, '', t_orig_lname3); 
-		
-	  self.orig_fname 						:=	choose(cnt ,l.orig_fname,if(trim(t_orig_fname2,left,right) ='' and trim(f_orig_lname2,left,right) ='',skip,t_orig_fname2), if(trim(t_orig_fname3,left,right) ='' and trim(f_orig_lname3,left,right) ='',skip,t_orig_fname3)); 
-		self.orig_lname 						:=	choose(cnt ,l.orig_lname,f_orig_lname2, f_orig_lname3); 
-		self.orig_mname 						:= 	choose(cnt ,l.orig_mname,l.orig_mname2, l.orig_mname3); 
-		self.DOB										:=	choose(cnt , L.DOB_1,'','');
-		self.vehicle_year						:= 	choose(cnt ,L.Year,'','');
-		self.vehicle_make						:=  choose(cnt ,L.make,'','');
-		self.make_description				:= 	choose(cnt ,if(L.make_description != '',L.make_description,L.Make),'','');
-		self.model_description			:= 	choose(cnt ,if(L.model_description != '',L.model_description,L.Model),'','');
-		self.carrier_name     			:=  choose(cnt ,L.legal_name,'','');
-		self.ssn										:=	choose(cnt ,l.ssn_1,'','');
-		self.vehicle_status					:= 	choose(cnt ,L.vehicle_status,'','');
-		self.vehicle_seg						:= 	choose(cnt ,L.vehicle_seg,'','');
-		self.vehicle_seg_type				:= 	choose(cnt ,L.vehicle_seg_type,'','');
-		self.model_year							:= 	choose(cnt ,L.model_year,'','');
-		self.body_style_code				:= choose(cnt ,L.body_style_code,'','');
-		self.engine_size						:= choose(cnt ,L.engine_size,'','');
-		self.fuel_code							:= choose(cnt ,L.fuel_code,'','');
-		self.number_of_driving_wheels:= choose(cnt ,L.number_of_driving_wheels,'','');
-		self.steering_type						:= choose(cnt ,L.steering_type,'','');
-		self.vina_series							:= choose(cnt ,L.vina_series,'','');
-		self.vina_model								:= choose(cnt ,L.vina_model,'','');
-		self.vina_make								:= choose(cnt ,L.vina_make,'','');
-		self.vina_body_style					:= choose(cnt ,L.vina_body_style,'','');
-		self.series_description				:= choose(cnt ,L.series_description,'','');
-		self.car_cylinders						:= choose(cnt ,L.car_cylinders,'','');
-		self.Report_Has_Coversheet		:= '0';
-		self.cru_order_id							:=l.order_id; 
-		self.cru_sequence_nbr					:=l.sequence_nbr; 
-		self.date_vendor_last_reported := L.last_changed;
-		self.creation_date 						:= ''; 
-		self.report_type_id 					:= L.service_id ;
-		self.addl_report_number 			:= l.REPORT_NBR ;
-		self.acct_nbr 								:= l.acct_nbr ; 
-		self.CRU_inq_name_type 				:=  choose(cnt ,'1','2','3');
-		self.reason_id                := l.reason_id; 
-/* 		unsigned6 prefix              := MAP(l.report_code[1] = 'I' and l.vehicle_incident_id[1..3] = 'OID'    => 1000000000000,  // inquiry 
-   																				l.report_code[1] = 'I' and l.vehicle_incident_id[1..3] <> 'OID' => 2000000000000, // inquiry 
-   																	      l.report_code = 'FA' => 6000000000000, // For FL accidents there is no incident id so use accident number 
-                                           7000000000000 );  // national accidents 
-       self.idfield                  := prefix + (unsigned6) if(trim(L.vehicle_incident_id,all) <> '', L.vehicle_incident_id, '0');
-*/ 
-  				
-		//Appriss Integration
-		self.Releasable               := '1'; 	
-		self.agency_id                := l.agency_id; 	
-	  self.Citation_Details := row([], Layout_Infiles_Fixed.Citations_ChildRec);	
-		self						              := l;
-		self						              := [];
-end;
-	pinq:=  normalize(inqFile,3,slimrec2(left,counter));
+// ###########################################################################
+//                        FL Crash Accidents
+//                        Join FLCrash_ss & FLCrash2v
+// ###########################################################################
+	dFLCrashSS := DISTRIBUTE(FLAccidents.basefile_flcrash_ss(lname + cname + prim_name <> ''), HASH32(accident_nbr, vin));
+	dFLCrash2v := DISTRIBUTE(FLAccidents.basefile_flcrash2v, HASH32(accident_nbr, vehicle_id_nbr));
 	
-//Iyetek 
+  Layout_eCrash.Consolidation_AgencyOri tFLCrashSS2v(dFLCrashSS L, dFLCrash2v R) := TRANSFORM
+		SELF.ultid := L.ultid;
+		SELF.orgid := L.orgid;
+		SELF.seleid := L.seleid;
+		SELF.proxid := L.proxid;
+		SELF.powid := L.powid;
+		SELF.empid := L.empid;
+		SELF.dotid := L.dotid;
+		SELF.ultscore := L.ultscore;
+		SELF.orgscore := L.orgscore;
+		SELF.selescore := L.selescore;
+		SELF.proxscore := L.proxscore;
+		SELF.powscore := L.powscore;
+		SELF.empscore := L.empscore;
+		SELF.dotscore := L.dotscore;
+		SELF.ultweight := L.ultweight;
+		SELF.orgweight := L.orgweight;
+		SELF.seleweight := L.seleweight;
+		SELF.proxweight := L.proxweight;
+		SELF.powweight := L.powweight;
+		SELF.empweight := L.empweight;
+		SELF.dotweight := L.dotweight;
+		SELF.dt_first_seen := L.accident_date;
+		SELF.dt_last_seen := L.accident_date;
+		SELF.report_code := 'FA';
+		SELF.report_category := 'Auto Report';
+		SELF.report_code_desc := 'Auto Accident';
+		SELF.vehicle_incident_id	:= '';
+		SELF.vehicle_status	:= MAP(L.accident_nbr = R.accident_nbr AND 
+															 L.vin = R. vehicle_id_nbr AND 
+															 R.vina_series + R.vina_model + R.reference_number +
+															 R.vina_make + R.vina_body_style + R.series_description +
+															 R.car_series + R.car_body_style + R.car_cid + R.car_cylinders <> '' => 'V',
+															 '');
+		SELF.accident_location := '';
+		SELF.accident_street := '';
+		SELF.accident_cross_street	:= '';
+		SELF.jurisdiction := 'FLORIDA HP';
+		SELF.jurisdiction_state := 'FL';
+		SELF.jurisdiction_nbr := '';
+		SELF.image_hash := '';
+		SELF.airbags_deploy := '';
+		SELF.dob := '';
+		SELF.driver_license_nbr := IF(REGEXFIND('[0-9]', L.driver_license_nbr), L.driver_license_nbr, '');
+		SELF.carrier_name := R.ins_company_name;
+		SELF.client_type_id := '';
+		SELF.vehicle_incident_city	:= '';
+		SELF.vehicle_incident_st := 'FL';
+		SELF.Policy_num := R.ins_policy_nbr; 
+		SELF.Policy_Effective_Date := ''; 
+		SELF.Policy_Expiration_Date	:= '';
+		SELF.Report_Has_Coversheet := '0';
+		SELF.date_vendor_last_reported := L.accident_date;
+		//SELF.IdField :=	R.IdField;
+		//Appriss Integration
+		SELF.Releasable := '1'; 	
+		SELF.is_Suppressed := '0'; 	
+		SELF.Citation_Details := ROW([], Layout_Infiles_Fixed.Citations_ChildRec);
+		SELF := L;
+		SELF := R;
+		SELF := []; 
+  END;
+	jFLCrashSS_2v := JOIN(dFLCrashSS, dFLCrash2v,
+									      LEFT.accident_nbr = RIGHT.accident_nbr AND 
+									      LEFT.vin = RIGHT.vehicle_id_nbr,
+									      tFLCrashSS2v(LEFT, RIGHT), LEFT OUTER, LOCAL);
 
-// Drop metadata if matches with full report
-
-IyetekFull := distribute(FLAccidents_Ecrash.BaseFile(source_id ='TF'),hash32(State_Report_Number));
-IyetekMeta := distribute(FLAccidents_Ecrash.BaseFile(source_id ='TM') ,hash32(state_report_number));
-
-jdropMetadata := join( IyetekMeta,IyetekFull, left.state_report_number = right.State_Report_Number and 
-                                        left.ORI_Number = right.ORI_Number and 
-																				left.loss_state_abbr = right.loss_state_abbr and
-																				left.report_type_id = right.report_type_id, 
-																				transform(FLAccidents_Ecrash.Layout_Basefile, self := left),left only  , local);
+// ###########################################################################
+//                        FL Crash Accidents
+//             Join FLCrash_ss, FLCrash2v with FLCrash4
+// ###########################################################################				
+	//Get Carrier_info from driver file 98385
+	dFLCrashSS2v := DISTRIBUTE(jFLCrashSS_2v, HASH32(accident_nbr));
+	dFLCrash4 := DISTRIBUTE(FLAccidents.BaseFile_FLCrash4(accident_nbr <> ''), HASH32(accident_nbr));
 	
-/////////////////////////////////////////////////////////////////
-//Slim Ecrash file 
-///////////////////////////////////////////////////////////////// 
-eFile := FLAccidents_Ecrash.BaseFile(source_id <>'TM') + jdropMetadata ; //contains EA , TF, TM
+	Layout_eCrash.Consolidation_AgencyOri tFLCrashSS2v4(dFLCrashSS2v L, dFLCrash4 R) := TRANSFORM
+		SELF.carrier_name := IF(l.carrier_name <> '', l.carrier_name, R.ins_company_name);
+		SELF.Policy_num := IF(l.Policy_num <> '', l.Policy_num, R.ins_policy_nbr);
+		//Appriss Integration
+		SELF.Releasable := '1'; 	
+		SELF.is_Suppressed := '0'; 	
+		SELF.Citation_Details := ROW([], Layout_Infiles_Fixed.Citations_ChildRec);
+		SELF := L;
+	END;
+	jFLCrashSS2v_4 := JOIN(dFLCrashSS2v, dFLCrash4,
+												 LEFT.accident_nbr = RIGHT.accident_nbr AND 
+												 TRIM(LEFT.record_type, LEFT, RIGHT) IN ['Vehicle Driver', 'Driver'] AND 
+												 ut.nneq(TRIM(LEFT.driver_license_nbr, LEFT, RIGHT), TRIM(RIGHT.driver_dl_nbr, LEFT, RIGHT)) AND 
+												 LEFT.fname = RIGHT.fname AND 
+												 LEFT.lname = RIGHT.lname,
+												 tFLCrashSS2v4(LEFT, RIGHT), LEFT OUTER, LOCAL);	
+	dFLCrashSS2v4 := DISTRIBUTE(jFLCrashSS2v_4);		 
+	uFLCrashSS2v4	:= DEDUP(dFLCrashSS2v4, ALL, LOCAL);
 
-Layout_eCrash.Consolidation_AgencyOri slimrec3(eFile L, unsigned1 cnt) := transform
-		self.accident_nbr 					        := if(l.source_id in ['TM','TF'],L.state_report_number, L.case_identifier);
-		self.accident_date					        := if(L.incident_id[1..9] ='188188188','20100901',L.crash_date);
-		self.b_did									        := if(L.bdid = 0,'',intformat(L.bdid,12,1)); 
-		self.cname									        := l.cname;
-		self.name_suffix 						        := L.suffix;
-		self.did										        := if(L.did = 0,'000000000000',intformat(L.did,12,1));	
-		self.zip										        := L.z5;
-		self.zip4										        := L.z4;
-		self.record_type						        := L.person_type;
-		self.driver_license_nbr			        := if(regexfind('[0-9]',L.drivers_license_number),L.drivers_license_number,'');
-		self.dlnbr_st								        := L.drivers_license_jurisdiction; 
-		self.tag_nbr								        := if(L.Other_Unit_VIN !='',choose(cnt,L.License_Plate,L.Other_Unit_License_Plate),L.License_Plate);
-		self.tagnbr_st							        := if(L.Other_Unit_VIN !='',choose(cnt,L.Registration_State,L.Other_Unit_Registration_State),L.Registration_State);
-		self.vin										        := if(L.Other_Unit_VIN !='',choose(cnt,L.vin,L.Other_Unit_VIN),L.vin);
-		self.accident_location			        := map(trim(L.loss_cross_street,left,right)!='' and trim(L.loss_cross_street,left,right)!= 'N/A' => trim(L.loss_street,left,right)+' & '+trim(L.loss_cross_street,left,right),L.loss_street);
-		self.accident_street				        := L.loss_street;
-		self.accident_cross_street	        := map(L.loss_cross_street!= 'N/A' => L.loss_cross_street,'');
-		self.jurisdiction						        := if(L.incident_id[1..9]='188188188' ,'LN Test PD',trim(L.agency_name,left,right));
-		self.jurisdiction_state			        := if(L.case_identifier = '11030001','GA',L.Loss_state_Abbr);
-		self.st											        := if(l.st = '',self.jurisdiction_state,l.st);
-		self.jurisdiction_nbr				        := if(L.incident_id[1..9]='188188188','1536035',L.AGENCY_ID);
-		self.IMAGE_HASH							        := L.HASH_Key;
-		self.AIRBAGS_DEPLOY					        := L.Airbags_Deployed_Derived;
-		self.vehicle_incident_id		        := L.incident_id;
-		self.vehicle_status					        := if(L.Other_Unit_VIN !='',choose(cnt,l.vin_status,l.other_unit_vin_status),l.vin_status);
-		self.DOB														:= map(L.incident_id[1..9] ='188188188' and L.lname = 'DOE' => '19690201'
-																								,L.incident_id[1..9] ='188188188' and L.lname = 'SMITH' => '19500405'
-																								,L.Date_of_Birth);
-//------------------------------------------------------------													
-		year					              				:= trim(if(L.Other_Unit_VIN !='',choose(cnt,if(L.model_year != '',L.model_year,L.model_yr),
+// ###########################################################################
+//                        FL Crash Accidents
+//             Join FLCrash_ss, FLCrash2v, FLCrash4 with FLCrash0
+// ###########################################################################		
+	distFLCrashSS2v4 := DISTRIBUTE(uFLCrashSS2v4, HASH32(accident_nbr));
+	dFLCrash0 := DISTRIBUTE(FLAccidents.basefile_flcrash0(accident_nbr <> ''), HASH32(accident_nbr));
+	
+	Layout_eCrash.Consolidation_AgencyOri tFLCrashSS2v40(uFLCrashSS2v4 L, dFLCrash0 R) := TRANSFORM
+		SELF.vehicle_incident_city := STD.Str.ToUpperCase(IF(L.accident_nbr = R.accident_nbr, R.city_town_name, ''));
+		//Appriss Integration
+		SELF.Releasable := '1'; 	
+		SELF.is_Suppressed := '0'; 	
+		SELF.Citation_Details := ROW([], Layout_Infiles_Fixed.Citations_ChildRec); 	
+		SELF := L;
+	END;
+	jFLCrashSS2v4_0 := JOIN(distFLCrashSS2v4, dFLCrash0,
+	                        LEFT.accident_nbr = RIGHT.accident_nbr,
+							            tFLCrashSS2v40(LEFT, RIGHT), LEFT OUTER, LOCAL);
+	dFLCrash := DISTRIBUTE(jFLCrashSS2v4_0, RANDOM());
+
+//###########################################################################
+//                       National Accidents
+// ########################################################################### 
+	NtlAccidents := FLAccidents.BaseFile_NtlAccidents_Alpharetta;
+
+	Layout_eCrash.Consolidation_AgencyOri tNtlAccidents(NtlAccidents L) := TRANSFORM
+		SELF.did := IF(L.did = 0, '000000000000', INTFORMAT(L.did, 12, 1));	
+		SELF.accident_nbr := (STRING40)((UNSIGNED6)L.vehicle_incident_id + 10000000000);
+		SELF.accident_date := mod_Utilities.ConvertSlashedMDYtoCYMD(L.loss_date[1..10]);
+		SELF.b_did := IF(L.bdid = 0, '', INTFORMAT(L.bdid, 12, 1)); 
+		SELF.cname := STD.Str.ToUpperCase(L.business_name);
+		SELF.addr_suffix := L.suffix;
+		SELF.zip := L.zip5;
+		SELF.record_type := CASE(STD.Str.ToUpperCase(TRIM(L.party_type, LEFT, RIGHT)),
+														 'OWNER' => 'Property Owner',
+														 'DRIVER' => 'Vehicle Driver',
+														 'VEHICLE OWNER' => 'Property Owner',
+                             'VEHICLE DRIVER' => 'Vehicle Driver',
+                             '');
+		SELF.driver_license_nbr := IF(REGEXFIND('[0-9]', L.pty_drivers_license), L.pty_drivers_license, '');
+		SELF.dlnbr_st := L.pty_drivers_license_st;
+		SELF.tag_nbr := IF(L.LAST_NAME + L.FIRST_NAME = L.LAST_NAME_1 + L.FIRST_NAME_1, L.tag, '');	
+		SELF.tagnbr_st := IF(L.LAST_NAME + L.FIRST_NAME = L.LAST_NAME_1 + L.FIRST_NAME_1, L.tag_state, '');
+		SELF.vin := L.vehvin;
+		SELF.accident_location := MAP(L.cross_street <> '' AND L.cross_street <> 'N/A' => L.street + ' & ' + L.cross_street, L.street);
+		SELF.accident_street := L.street;
+		SELF.accident_cross_street := MAP(L.cross_street <> 'N/A' => L.cross_street, '');
+		SELF.jurisdiction := TRIM(L.edit_agency_name, LEFT, RIGHT);
+		SELF.jurisdiction_state := L.state_abbr;
+		SELF.st := IF(l.st = '', SELF.jurisdiction_state, l.st);
+		SELF.jurisdiction_nbr := L.agency_id;
+		SELF.image_hash := L.pdf_image_hash;
+		SELF.airbags_deploy := L.airbags_deploy;
+		SELF.dob := L.dob;
+		SELF.Policy_num := L.policy_nbr; 
+		SELF.Policy_Effective_Date := ''; 
+		SELF.Policy_Expiration_Date := '';
+		SELF.Report_Has_Coversheet := IF(L.PDF_IMAGE_HASH <> '' OR L.tif_image_hash <> '', '1', '0');
+		SELF.other_vin_indicator := '';
+		SELF.vehicle_year := L.vehYear;	
+		SELF.vehicle_make := L.vehMake;
+		SELF.make_description := IF(L.make_description <> '', L.make_description, L.vehMake);
+		SELF.model_description := IF(L.model_description <> '', L.model_description, L.vehModel);
+		SELF.vehicle_incident_city := STD.Str.ToUpperCase(L.inc_city);
+		SELF.vehicle_incident_st := STD.Str.ToUpperCase(L.state_abbr);
+		SELF.point_of_impact := L.impact_location;
+		SELF.towed := L.Car_Towed;
+		SELF.Impact_Location := L.Impact_Location;
+		SELF.carrier_name := L.legal_name;
+		SELF.client_type_id := L.client_type_id;
+		SELF.vehicle_unit_number := '';
+		SELF.next_street := '';
+		SELF.work_type_id := ''; 
+		SELF.ssn := ''; 
+		SELF.cru_order_id := L.order_id; 
+		SELF.cru_sequence_nbr :=L.sequence_nbr; 
+		SELF.date_vendor_last_reported := L.last_changed;
+		SELF.creation_date := ''; 
+		SELF.report_type_id := L.service_id;
+		SELF.tif_image_hash := L.tif_image_hash; 
+		SELF.acct_nbr := L.acct_nbr; 
+		SELF.addl_report_number := L.REPORT_NBR;
+		//Appriss Integration
+		SELF.Releasable := '1'; 	
+		SELF.is_Suppressed := '0'; 	
+		SELF.agency_id := L.agency_id; 	
+		SELF.Citation_Details := ROW([], Layout_Infiles_Fixed.Citations_ChildRec);	 	
+		SELF := L;
+		SELF := [];
+	END;
+	pNtlAccidents := PROJECT(NtlAccidents, tNtlAccidents(LEFT));
+
+// ###########################################################################
+//                National Accidents Inquiries (CRU Inquiries)
+// ###########################################################################
+	NtlAccidentsInquiry := File_CRU_inquiries;
+	
+	Layout_eCrash.Consolidation_AgencyOri tNtlAccidentsInquiry(NtlAccidentsInquiry L, UNSIGNED1 cnt) := TRANSFORM
+		SELF.report_code := 'I'+ L.report_code;
+		SELF.report_category := L.report_category;
+		SELF.report_code_desc := L.report_code_desc;
+		SELF.accident_nbr := IF(L.vehicle_incident_id[1..3] = 'OID',
+														(STRING40)((UNSIGNED6)L.vehicle_incident_id[4..] + 100000000000),
+														(STRING40)((UNSIGNED6)L.vehicle_incident_id + 10000000000));
+		SELF.accident_date := mod_Utilities.ConvertSlashedMDYtoCYMD(L.loss_date[1..10]);
+		SELF.accident_location := MAP(L.cross_street <> '' AND L.cross_street <> 'N/A' => L.street + ' & ' + L.cross_street, L.street);
+		SELF.accident_street := L.street;
+		SELF.accident_cross_street := MAP(L.cross_street <> 'N/A' => L.cross_street, '');
+		SELF.jurisdiction := STD.Str.ToUpperCase(TRIM(L.EDIT_AGENCY_NAME, LEFT, RIGHT));
+		SELF.jurisdiction_state := STD.Str.ToUpperCase(L.State);
+		SELF.st := IF(L.st = '', SELF.jurisdiction_state, L.st);
+		SELF.jurisdiction_nbr := L.AGENCY_ID;
+		SELF.cru_jurisdiction := STD.Str.ToUpperCase(TRIM(L.EDIT_AGENCY_NAME, LEFT, RIGHT));
+		SELF.cru_jurisdiction_nbr := L.AGENCY_ID + '_' + L.STATE_NBR; 
+		SELF.vehicle_incident_city := STD.Str.ToUpperCase(L.city);
+		SELF.vehicle_incident_st := STD.Str.ToUpperCase(L.state);
+		SELF.did := CHOOSE(cnt, IF(L.did = 0, '000000000000', INTFORMAT(L.did, 12, 1)), '000000000000', '000000000000');	
+		SELF.prim_range := CHOOSE(cnt, L.prim_range, '', ''); 
+		SELF.predir := CHOOSE(cnt, L.predir, '', '');
+		SELF.prim_name := CHOOSE(cnt, L.prim_name, '', '');
+		SELF.postdir := CHOOSE(cnt, L.postdir, '', '');
+		SELF.unit_desig := CHOOSE(cnt, L.unit_desig, '', '');
+		SELF.sec_range := CHOOSE(cnt, L.sec_range, '', '');
+		SELF.v_city_name := CHOOSE(cnt, L.v_city_name, '', '');
+		SELF.zip4 := CHOOSE(cnt, L.zip4, '', '');
+		SELF.addr_suffix := CHOOSE(cnt, L.suffix, '', '');
+		SELF.zip := CHOOSE(cnt, L.zip5, '', '');
+		SELF.record_type :=	CHOOSE(cnt, 'Vehicle Driver', '', '');
+		SELF.driver_license_nbr := CHOOSE(cnt, IF(REGEXFIND('[0-9]', L.drivers_license), L.drivers_license, ''), '', '');
+		SELF.dlnbr_st := CHOOSE(cnt, L.drivers_license_st, '', '');
+		SELF.tag_nbr := CHOOSE(cnt, L.otag, '', '');
+		SELF.tagnbr_st := CHOOSE(cnt, L.otag_state, '', '');
+		SELF.vin :=	CHOOSE(cnt, L.vin, '', '');
+		SELF.title := CHOOSE(cnt, L.title, L.title2, L.title3); 
+		SELF.name_suffix := CHOOSE(cnt, L.name_suffix, L.name_suffix2, L.name_suffix3); 
+		SELF.fname :=	CHOOSE(cnt, L.fname, L.fname2, L.fname3); 
+		SELF.lname := CHOOSE(cnt, L.lname, L.lname2, L.lname3); 
+		SELF.mname :=	CHOOSE(cnt, L.mname, L.mname2, L.mname3);
+		t_orig_fname2 := IF(TRIM(L.orig_fname2 , LEFT, RIGHT)IN ['UNK' , 'UNKNOWN' , 'UNK MALE' ], '', L.orig_fname2); 
+		t_orig_lname2 := IF(TRIM(L.orig_lname2 , LEFT, RIGHT)IN ['UNK' , 'UNKNOWN' , 'UNK MALE' ], '', L.orig_lname2);
+		f_orig_lname2 := IF(REGEXFIND('[0-9]', t_orig_lname2) = true, '', t_orig_lname2); 
+		t_orig_fname3 := IF(TRIM(L.orig_fname3 , LEFT, RIGHT)IN ['UNK' , 'UNKNOWN' , 'UNK MALE' ], '', L.orig_fname3); 
+		t_orig_lname3 := IF(TRIM(L.orig_lname3 , LEFT, RIGHT)IN ['UNK' , 'UNKNOWN' , 'UNK MALE' ], '', L.orig_lname3); 
+		f_orig_lname3 := IF(REGEXFIND('[0-9]', t_orig_lname3) = TRUE, '', t_orig_lname3);
+		SELF.orig_fname := CHOOSE(cnt, L.orig_fname, IF(TRIM(t_orig_fname2, LEFT, RIGHT) = '' AND TRIM(f_orig_lname2, LEFT, RIGHT) = '', SKIP, t_orig_fname2), IF(TRIM(t_orig_fname3, LEFT, RIGHT) ='' AND TRIM(f_orig_lname3, LEFT, RIGHT) ='',SKIP,t_orig_fname3)); 
+		SELF.orig_lname := CHOOSE(cnt,L.orig_lname,f_orig_lname2, f_orig_lname3); 
+		SELF.orig_mname := CHOOSE(cnt,L.orig_mname,L.orig_mname2, L.orig_mname3); 
+		SELF.DOB :=	CHOOSE(cnt, L.DOB_1, '', '');
+		SELF.vehicle_year := CHOOSE(cnt, L.Year, '', '');
+		SELF.vehicle_make := CHOOSE(cnt, L.make, '', '');
+		SELF.make_description := CHOOSE(cnt, IF(L.make_description <> '', L.make_description, L.Make), '', '');
+		SELF.model_description := CHOOSE(cnt, IF(L.model_description <> '', L.model_description, L.Model), '', '');
+		SELF.carrier_name := CHOOSE(cnt, L.legal_name, '', '');
+		SELF.ssn :=	CHOOSE(cnt, L.ssn_1, '', '');
+		SELF.vehicle_status := CHOOSE(cnt, L.vehicle_status, '', '');
+		SELF.vehicle_seg := CHOOSE(cnt, L.vehicle_seg, '', '');
+		SELF.vehicle_seg_type := CHOOSE(cnt, L.vehicle_seg_type, '', '');
+		SELF.model_year := CHOOSE(cnt, L.model_year, '', '');
+		SELF.body_style_code := CHOOSE(cnt, L.body_style_code, '', '');
+		SELF.engine_size := CHOOSE(cnt, L.engine_size, '', '');
+		SELF.fuel_code := CHOOSE(cnt, L.fuel_code, '', '');
+		SELF.number_of_driving_wheels := CHOOSE(cnt, L.number_of_driving_wheels, '', '');
+		SELF.steering_type := CHOOSE(cnt, L.steering_type, '', '');
+		SELF.vina_series := CHOOSE(cnt, L.vina_series, '', '');
+		SELF.vina_model := CHOOSE(cnt, L.vina_model, '', '');
+		SELF.vina_make := CHOOSE(cnt, L.vina_make, '', '');
+		SELF.vina_body_style := CHOOSE(cnt, L.vina_body_style, '', '');
+		SELF.series_description := CHOOSE(cnt, L.series_description, '', '');
+		SELF.car_cylinders := CHOOSE(cnt, L.car_cylinders, '', '');
+		SELF.Report_Has_Coversheet := '0';
+		SELF.cru_order_id := L.order_id; 
+		SELF.cru_sequence_nbr := L.sequence_nbr; 
+		SELF.date_vendor_last_reported := L.last_changed;
+		SELF.creation_date := ''; 
+		SELF.report_type_id := L.service_id;
+		SELF.addl_report_number := L.REPORT_NBR;
+		SELF.acct_nbr := L.acct_nbr; 
+		SELF.CRU_inq_name_type := CHOOSE(cnt, '1', '2', '3');
+		SELF.reason_id := L.reason_id; 
+	  //Appriss Integration
+		SELF.Releasable := '1'; 	
+		SELF.is_Suppressed := '0'; 	
+		SELF.agency_id := L.agency_id; 	
+		SELF.Citation_Details := ROW([], Layout_Infiles_Fixed.Citations_ChildRec);	
+		SELF := L;
+		SELF := [];
+	END;
+  normNtlAccidentsInquiry := NORMALIZE(NtlAccidentsInquiry, 3, tNtlAccidentsInquiry(LEFT, COUNTER));
+
+// ###########################################################################
+//                    eCrash Accidents
+// ###########################################################################
+  //Drop Iyetek metadata IF matches with full report
+	IyetekFull := DISTRIBUTE(BaseFile(source_id = 'TF'), HASH32(State_Report_Number));
+	IyetekMeta := DISTRIBUTE(BaseFile(source_id = 'TM'), HASH32(state_report_number));
+
+	jdropIyetekMetadata := JOIN(IyetekMeta, IyetekFull, 
+	                            LEFT.state_report_number = RIGHT.State_Report_Number AND 
+															LEFT.ORI_Number = RIGHT.ORI_Number AND 
+															LEFT.loss_state_abbr = RIGHT.loss_state_abbr AND
+															LEFT.report_type_id = RIGHT.report_type_id, 
+															TRANSFORM(Layout_Basefile, SELF := LEFT),
+															LEFT ONLY, LOCAL);
+	eCrashAccidents := BaseFile(source_id <> 'TM') + jdropIyetekMetadata; //contains EA , TF, TM
+
+	Layout_eCrash.Consolidation_AgencyOri teCrashAccidents(eCrashAccidents L, UNSIGNED1 cnt) := TRANSFORM
+		SELF.accident_nbr := IF(L.source_id IN ['TM', 'TF'], L.state_report_number, L.case_identifier);
+		SELF.accident_date := IF(L.incident_id[1..9] = '188188188', '20100901', L.crash_date);
+		SELF.b_did := IF(L.bdid = 0, '', INTFORMAT(L.bdid, 12, 1)); 
+		SELF.cname := L.cname;
+		SELF.name_suffix := L.suffix;
+		SELF.did := IF(L.did = 0, '000000000000', INTFORMAT(L.did, 12, 1));	
+		SELF.zip := L.z5;
+		SELF.zip4 := L.z4;
+		SELF.record_type := L.person_type;
+		SELF.driver_license_nbr := IF(REGEXFIND('[0-9]', L.drivers_license_number), L.drivers_license_number, '');
+		SELF.dlnbr_st := L.drivers_license_jurisdiction; 
+		SELF.tag_nbr := IF(L.Other_Unit_VIN <> '', CHOOSE(cnt, L.License_Plate, L.Other_Unit_License_Plate), L.License_Plate);
+		SELF.tagnbr_st := IF(L.Other_Unit_VIN <> '', CHOOSE(cnt, L.Registration_State, L.Other_Unit_Registration_State), L.Registration_State);
+		SELF.vin := IF(L.Other_Unit_VIN <> '', CHOOSE(cnt, L.vin, L.Other_Unit_VIN), L.vin);
+		SELF.accident_location := MAP(TRIM(L.loss_cross_street, LEFT, RIGHT) <> '' AND 
+		                              TRIM(L.loss_cross_street, LEFT, RIGHT) <> 'N/A' => TRIM(L.loss_street, LEFT, RIGHT) + ' & ' + TRIM(L.loss_cross_street, LEFT, RIGHT),
+																	L.loss_street);
+		SELF.accident_street := L.loss_street;
+		SELF.accident_cross_street := MAP(L.loss_cross_street <> 'N/A' => L.loss_cross_street, '');
+		SELF.jurisdiction := IF(L.incident_id[1..9] = '188188188', 'LN Test PD', TRIM(L.agency_name, LEFT, RIGHT));
+		SELF.jurisdiction_state := IF(L.case_identifier = '11030001', 'GA', L.Loss_state_Abbr);
+		SELF.st := IF(L.st = '', SELF.jurisdiction_state, L.st);
+		SELF.jurisdiction_nbr := IF(L.incident_id[1..9] = '188188188', '1536035', L.AGENCY_ID);
+		SELF.image_hash := L.hash_key;
+		SELF.airbags_deploy := L.Airbags_Deployed_Derived;
+		SELF.vehicle_incident_id := L.incident_id;
+		SELF.vehicle_status := IF(L.other_unit_vin <> '', CHOOSE(cnt, L.vin_status, L.other_unit_vin_status), L.vin_status);
+		SELF.dob := MAP(L.incident_id[1..9] = '188188188' AND L.lname = 'DOE' => '19690201',
+										L.incident_id[1..9] = '188188188' AND L.lname = 'SMITH' => '19500405',
+										L.date_of_birth);										
+		year := TRIM(IF(L.Other_Unit_VIN <> '', CHOOSE(cnt, IF(L.model_year <> '', L.model_year, L.model_yr),
 																														L.other_model_year),
-																														if(L.model_year != '',L.model_year,L.model_yr)),left,right);																														
-		self.vehicle_year										:= map(length(year) = 2 and year>'50' => '19'+ year,
-																							length(year) = 2 and year<='50' => '20'+ year,year);
-		self.model_year 										:= map(length(year) = 2 and year>'50' => '19'+ year,
-																								length(year) = 2 and year<='50' => '20'+ year,year);
-//------------------------------------------------------------	
-		self.vehicle_make					  				:= if(L.Other_Unit_VIN !='',choose(cnt,if(L.make_description != '',L.make_description,L.make),
-																														if(L.other_make_description != '',L.other_make_description,L.Other_Unit_Make)),
-																														if(L.make_description != '',L.make_description,L.make));
-		self.make_description								:= if(L.Other_Unit_VIN !='',choose(cnt,if(L.make_description != '',L.make_description,L.make),
-																														if(L.other_make_description != '',L.other_make_description,L.Other_Unit_Make)),
-																														if(L.make_description != '',L.make_description,L.make));
-		self.model_description							:= if(L.Other_Unit_VIN !='',choose(cnt,if(L.model_description != '',L.model_description,L.model),
-																														if(L.other_model_description != '',L.other_model_description,L.other_unit_model)),
-																														if(L.model_description != '',L.model_description,L.model));
-		self.vehicle_incident_city					:= STD.Str.ToUpperCase(L.Crash_City);
-		self.vehicle_incident_st						:= STD.Str.ToUpperCase(L.Loss_State_Abbr);
-		self.towed				   								:= L.Vehicle_Towed_Derived;
-		
-		self.impact_location 								:= if (l.report_code ='TM' ,
-		
-                                           if(L.initial_point_of_contact[1..25] !='','Damaged_Area_1: ' + L.initial_point_of_contact[1..25],'')
-																		        + if(L.initial_point_of_contact[25..] !='','Damaged_Area_2: ' + L.initial_point_of_contact[25..],''),
-																						
-																						if(L.Damaged_Areas_Derived1 !='','Damaged_Area_1: ' + L.Damaged_Areas_Derived1,'')
-																						+ if(L.Damaged_Areas_Derived2 !='','Damaged_Area_2: ' + L.Damaged_Areas_Derived2,''));
-																						
-		self.Policy_num			 								:= L.Insurance_Policy_Number;  
-		self.Policy_Effective_Date					:= trim(L.Insurance_Effective_Date,left,right); 
-		self.Policy_Expiration_Date					:= L.Insurance_Expiration_Date; //''; check
-		self.carrier_name     							:= L.Insurance_Company;
-		self.client_type_id 								:= '';
-		self.Report_Has_Coversheet					:= if(L.Report_Has_Coversheet = '1', '1','0');
-		self.other_vin_indicator						:= if(L.Other_Unit_VIN !='',choose(cnt,'1','2'),'');
-		self.vehicle_unit_number 						:= L.unit_number;
-		self.next_street 										:= l.next_street;
-		self.addl_report_number							:= if(l.source_id in ['TF','TM'],L.case_identifier,L.state_report_number);
-		self.agency_id											:= l.agency_id;
-		self.agency_ori											:= l.ori_number;
-		self.orig_agency_ori								:= l.agency_ori;
-		self.Insurance_Company_Standardized := l.Insurance_Company_Standardized;
-		self.is_available_for_public				:= if(l.report_code in ['TF','EA'],'1',l.is_available_for_public);
-		self.report_status 									:= l.report_status;
-		self.date_vendor_last_reported 			:= L.date_vendor_last_reported;
-		self.creation_date 									:= l.creation_date; 
-		self.report_type_id 								:= L.report_type_id ;
-		self.ssn 													  := l.ssn; 
-		self.cru_jurisdiction 							:= l.cru_agency_name; 
-		self.cru_jurisdiction_nbr 				  := l.cru_agency_id;
-		//Policy records Addition
-		self.fatality_involved							:= L.fatality_involved;
-		self.latitude												:= L.lattitude;
-		self.longitude											:= L.Longitude;
-		self.address1												:= L.address;
-		self.address2												:= L.address2;
-		self.state													:= L.State;
-		self.home_phone										  := L.home_phone;
-	//End of Police Record/Claims Process
-	  
-		// BuyCrash
-		self.officer_id                     := L.officer_id;
-		
+																														IF(L.model_year <> '', L.model_year, L.model_yr)), LEFT, RIGHT);																														
+		SELF.vehicle_year := MAP(LENGTH(year) = 2 AND year > '50' => '19' + year,
+                             LENGTH(year) = 2 AND year <= '50' => '20' + year,
+														 year);
+		SELF.model_year := MAP(LENGTH(year) = 2 AND year > '50' => '19' + year,
+                           LENGTH(year) = 2 AND year <= '50' => '20' + year,
+													 year);
+		SELF.vehicle_make := IF(L.Other_Unit_VIN <> '', CHOOSE(cnt, IF(L.make_description <> '', L.make_description, L.make),
+																														IF(L.other_make_description <> '', L.other_make_description, L.Other_Unit_Make)),
+																														IF(L.make_description <> '', L.make_description, L.make));
+		SELF.make_description := IF(L.Other_Unit_VIN <> '', CHOOSE(cnt, IF(L.make_description <> '', L.make_description, L.make),
+																														IF(L.other_make_description <> '', L.other_make_description, L.Other_Unit_Make)),
+																														IF(L.make_description <> '', L.make_description, L.make));
+		SELF.model_description := IF(L.Other_Unit_VIN <> '', CHOOSE(cnt, IF(L.model_description <> '', L.model_description, L.model),
+																														IF(L.other_model_description <> '', L.other_model_description, L.other_unit_model)),
+																														IF(L.model_description <> '', L.model_description, L.model));
+		SELF.vehicle_incident_city := STD.Str.ToUpperCase(L.Crash_City);
+		SELF.vehicle_incident_st := STD.Str.ToUpperCase(L.Loss_State_Abbr);
+		SELF.towed := L.Vehicle_Towed_Derived;		
+		SELF.impact_location := IF(L.report_code = 'TM',
+															 IF(L.initial_point_of_contact[1..25] <> '', 'Damaged_Area_1: ' + L.initial_point_of_contact[1..25], '') +
+															 IF(L.initial_point_of_contact[25..] <> '', 'Damaged_Area_2: ' + L.initial_point_of_contact[25..], ''),																						
+															IF(L.Damaged_Areas_Derived1 <> '', 'Damaged_Area_1: ' + L.Damaged_Areas_Derived1, '') + 
+															IF(L.Damaged_Areas_Derived2 <> '', 'Damaged_Area_2: ' + L.Damaged_Areas_Derived2, '')
+														 );					
+		SELF.Policy_num := L.Insurance_Policy_Number; 
+		SELF.Policy_Effective_Date := TRIM(L.Insurance_Effective_Date, LEFT, RIGHT); 
+		SELF.Policy_Expiration_Date := L.Insurance_Expiration_Date;
+		SELF.carrier_name := L.Insurance_Company;
+		SELF.client_type_id := '';
+		SELF.Report_Has_Coversheet := IF(L.Report_Has_Coversheet = '1', '1','0');
+		SELF.other_vin_indicator := IF(L.Other_Unit_VIN <> '', CHOOSE(cnt, '1', '2'), '');
+		SELF.vehicle_unit_number := L.unit_number;
+		SELF.next_street := L.next_street;
+		SELF.addl_report_number := IF(L.source_id IN ['TF', 'TM'], L.case_identifier, L.state_report_number);
+		SELF.agency_id := L.agency_id;
+		SELF.agency_ori := L.ori_number;
+		SELF.orig_agency_ori := L.agency_ori;
+		SELF.Insurance_Company_Standardized := L.Insurance_Company_Standardized;
+		SELF.is_available_for_public := IF(L.report_code IN ['TF', 'EA'], '1', L.is_available_for_public);
+		SELF.report_status := L.report_status;
+		SELF.date_vendor_last_reported := L.date_vendor_last_reported;
+		SELF.creation_date := L.creation_date; 
+		SELF.report_type_id := L.report_type_id;
+		SELF.ssn := L.ssn; 
+		SELF.cru_jurisdiction := L.cru_agency_name; 
+		SELF.cru_jurisdiction_nbr := L.cru_agency_id;
+    //Policy records Addition
+		SELF.fatality_involved := L.fatality_involved;
+		SELF.latitude := L.lattitude;
+		SELF.longitude := L.Longitude;
+		SELF.address1 := L.address;
+		SELF.address2 := L.address2;
+		SELF.state := L.State;
+		SELF.home_phone := L.home_phone;
+    //End of Police Record/Claims Process		
+		//BuyCrash
+		SELF.officer_id := L.officer_id;		
 		//Appriss Integration
-		self.Releasable                     := IF(TRIM(L.Releasable,left,right) IN ['\\N', 'NULL', ''],  '1', L.Releasable); 			
-		self								                := L;
-		self                                := [];   
-end;
-pec := normalize(eFile,2,slimrec3(left,counter));
+		SELF.Releasable := IF(TRIM(L.Releasable, LEFT, RIGHT) IN ['\\N', 'NULL', ''], '1', L.Releasable); 			
+		SELF := L;
+		SELF := []; 
+	END;
+	normeCrashAccidents := NORMALIZE(eCrashAccidents, 2, teCrashAccidents(LEFT, COUNTER));
 
-allrecs := pntl+pflc_ss2+pinq+pec;
+// ###########################################################################
+// Combine FL Crash, Ntl Accidents, Ntl Inquiries & eCrash Data
+// ###########################################################################
+	CombineAccidents := dFLCrash + pNtlAccidents + normNtlAccidentsInquiry + normeCrashAccidents;
+	
+  //Perform Convertion to UpperCase
+	UpCaseCombineAccidents := Fn_Upcase(CombineAccidents); 
+	CombineAccidentsDID := UpCaseCombineAccidents(~(fname <> '' AND lname <> '' AND vin <> '' AND (UNSIGNED) did = 0)); 
+	CombineAccidentsNoDID := UpCaseCombineAccidents(fname <> '' AND lname <> '' AND vin <> '' AND (UNSIGNED) did = 0);
+	
+  //Get DID from Vehicle file by name AND vin
+	getMVRDID := Fn_Mvr_DID(CombineAccidentsNoDID);
+	
+	CleanAllAccidents := CombineAccidentsDID + getMVRDID;
+	dAllAccidents := DISTRIBUTE(CleanAllAccidents, HASH32(accident_nbr));
+	sAllAccidents := SORT(dAllAccidents, accident_date, accident_nbr, jurisdiction_state, vin, tag_nbr, lname, fname, mname, did, record_type, 
+	                                     prim_name, dob, report_code, report_type_id, MAP(work_type_id IN ['1', '0'] => 2, 1), 
+																			 date_vendor_last_reported, creation_date, LENGTH(TRIM(carrier_name, LEFT, RIGHT)) <> 0, 
+																			 LENGTH(TRIM(driver_license_nbr, LEFT, RIGHT)) <> 0, vehicle_incident_id, LOCAL); // give preference to ecrash work type 1's over 2, 3
+	uAllAccidents := DEDUP(sAllAccidents, accident_date, accident_nbr, jurisdiction_state, vin, tag_nbr, lname, fname, mname, did, record_type, 
+	                                      prim_name, dob, report_code, report_type_id, RIGHT, LOCAL);
+																				
+	//scrub the accident number AND UNK issue
+	Layout_eCrash.Consolidation_AgencyOri tAllAccidents(uAllAccidents L) := TRANSFORM
+		t_scrub := STD.Str.Filter(L.accident_nbr, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+		SELF.accident_nbr := IF(t_scrub IN ['UNK', 'UNKNOWN'], 'UNK' + L.vehicle_incident_id, t_scrub); 
+		SELF.orig_accnbr := L.accident_nbr; 
+		SELF.addl_report_number := IF(STD.Str.FilterOut(TRIM(L.addl_report_number, LEFT, RIGHT), '0') <>'', L.addl_report_number, '');
+		SELF.scrub_addl_report_number := STD.Str.Filter(SELF.addl_report_number, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+		SELF.policy_effective_date := MAP(TRIM(L.policy_effective_date)[1] = '0' => '',
+																			TRIM(L.policy_effective_date)[8] = '-' => TRIM(L.policy_effective_date)[1..7],
+                                      TRIM(L.policy_effective_date));
+		SELF := L;
+	END;
+	SHARED AllAccidents := PROJECT(uAllAccidents, tAllAccidents(LEFT)): PERSIST('~thor_data400::persist::ecrash_ssV2');
 
-///////////////////////////////////////////////
-//UPcase all field values
-///////////////////////////////////////////////
+// ###########################################################################
+// Accident data for Insurance eCrash CRU Keys / Queries
+// ###########################################################################
+	SHARED InteractiveReports := ['I0', 'I1', 'I2', 'I3', 'I4', 'I5', 'I6', 'I7', 'I8', 'I9'];
+	SHARED AlphaIA := AllAccidents (report_code[1] = 'I' AND report_code NOT IN InteractiveReports); 
+	SHARED AlphaOther := AllAccidents (report_code[1] <> 'I');
+	SHARED AlphaCmbnd := AlphaOther + AlphaIA (reason_id IN ['HOLD', 'AFYI', 'ASSI', 'AUTO', 'CALL', 'PRAC', 'SEAR', 'SECR', 'WAIT', 'PRAI']);
+	SHARED AlphaOtherVendors := AlphaCmbnd(TRIM(vendor_code, LEFT, RIGHT) <> 'COPLOGIC');
+	SHARED AlphaCoplogic := AlphaCmbnd(TRIM(vendor_code, LEFT, RIGHT) = 'COPLOGIC' AND 
+	                                   ((TRIM(supplemental_report, LEFT, RIGHT) = '1' AND TRIM(super_report_id, LEFT, RIGHT) <> TRIM(report_id, LEFT, RIGHT)) OR 
+																		  (TRIM(supplemental_report, LEFT, RIGHT) = '0' AND TRIM(super_report_id, LEFT, RIGHT) = TRIM(report_id, LEFT, RIGHT)) OR 
+																		  (TRIM(supplemental_report, LEFT, RIGHT) = '' AND TRIM(super_report_id, LEFT, RIGHT) = TRIM(report_id, LEFT, RIGHT) )
+																		 )
+																		);
+	SHARED ALLAlphaAccidents := AlphaOtherVendors + AlphaCoplogic;																
+	SHARED fAlphaAccidents := ALLAlphaAccidents(STD.Str.ToUpperCase(TRIM(orig_agency_ori, ALL)) NOT IN Agency_exclusion.CRU_Agency_ori_list AND
+																							STD.Str.ToUpperCase(TRIM(agency_ori, ALL)) NOT IN Agency_exclusion.CRU_Agency_ori_list);
+	SHARED ActiveAlphaAccidents := PROJECT(fAlphaAccidents, TRANSFORM(Layout_eCrash.Accidents_Alpha, SELF := LEFT;));
+	EXPORT Alpha := ActiveAlphaAccidents;	
 
-uprecs := FLAccidents_Ecrash.Fn_Upcase(allrecs);
- 
-// get DID from vehcile file by name and vin 
-uprecsNodid :=uprecs(fname <>'' and lname <>'' and vin <>'' and (unsigned) did = 0); 
-uprecsDID := uprecs(~(fname <>'' and lname <>'' and vin <>'' and (unsigned) did = 0));
+// ###########################################################################
+//  ALL Accidents report data
+// ###########################################################################
+	SHARED eCrashAccidents := AllAccidents(CRU_inq_name_type NOT IN ['2', '3'] AND 
+	                                report_code NOT IN InteractiveReports AND 
+																	TRIM(vendor_code, LEFT, RIGHT) <> 'COPLOGIC');
 
-getMvrDid := FLAccidents_Ecrash.Fn_Mvr_DID(uprecsNodid);
+// ###########################################################################
+//  ALL Accidents report data for eCrash Keys / Queries
+// ###########################################################################																	
+	EXPORT out := PROJECT(eCrashAccidents, TRANSFORM(Layout_eCrash.Consolidation, SELF := LEFT;));
 
-total := uprecsDID+ getMvrDid; 
+// ###########################################################################
+//  ALL Accidents report data for PR Keys / Queries
+// ###########################################################################													 
+	SHARED EcrashAgencyExclusionAgencyOri := eCrashAccidents(STD.Str.ToUpperCase(TRIM(orig_agency_ori, ALL)) NOT IN Agency_exclusion.Agency_ori_list AND
+																										 STD.Str.ToUpperCase(TRIM(orig_agency_ori, ALL))[1..2] NOT IN Agency_exclusion.Agency_ori_jurisdiction_list
+																										 );																																						
+	SHARED EcrashAgencyExclusion := EcrashAgencyExclusionAgencyOri(STD.Str.ToUpperCase(TRIM(agency_ori, ALL)) NOT IN Agency_exclusion.Agency_ori_list AND
+																																 STD.Str.ToUpperCase(TRIM(agency_ori, ALL))[1..2] NOT IN Agency_exclusion.Agency_ori_jurisdiction_list
+																																 );
+	EXPORT prout := PROJECT(EcrashAgencyExclusion, TRANSFORM(Layout_eCrash.Consolidation, SELF := LEFT;));
 
-ddrecs := dedup(sort(distribute(total,hash32(accident_nbr))
-															,accident_date,accident_nbr,jurisdiction_state,vin,tag_nbr,lname,fname,mname,did,record_type,prim_name,dob,report_code,report_type_id,map (work_type_id in ['1','0'] => 2, 1), date_vendor_last_reported,creation_date,length(trim(carrier_name,left,right))!=0,length(trim(driver_license_nbr,left,right)) !=0,vehicle_incident_id,local) // give preference to ecrash work type 1's over 2,3
-															,accident_date,accident_nbr,jurisdiction_state,vin,tag_nbr,lname,fname,mname,did,record_type,prim_name,dob,report_code,report_type_id,right,local) ;
-															
+// ###########################################################################
+//  ALL Accidents report data for eCrash Search Records
+// ###########################################################################
+	SHARED SearchRecs := out(report_code IN ['EA', 'TM', 'TF'] AND 
+	                         work_type_id NOT IN ['2', '3'] AND 
+												   (TRIM(report_type_id, ALL) IN ['A', 'DE'] OR STD.str.ToUpperCase(TRIM(vendor_code, LEFT, RIGHT)) = 'CMPD'));
+	EXPORT eCrashSearchRecs := DISTRIBUTE(PROJECT(SearchRecs, Layouts.key_search_layout), HASH32(accident_nbr)):INDEPENDENT;
 
-//scrub the accident number and UNK issue   
-
-Layout_eCrash.Consolidation_AgencyOri slimrecs(ddrecs L) := transform
-
-     t_scrub := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-     self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub);  
-     self.orig_accnbr := l.accident_nbr; 
-		 self.addl_report_number :=  if(STD.Str.FilterOut(trim(l.addl_report_number ,left,right),'0') <>'',l.addl_report_number,'') ;
-		 self.scrub_addl_report_number := STD.Str.Filter(self.addl_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-		 self.policy_effective_date := map ( trim(l.policy_effective_date)[1] = '0' =>  '',
-		                                     trim(l.policy_effective_date)[8] = '-' =>  trim(l.policy_effective_date)[1..7],
-																					                                            trim(l.policy_effective_date)
-																				);
-		 
-     self := l;
-end;
-shared outrecs0  := project(ddrecs,slimrecs(left)): persist('~thor_data400::persist::ecrash_ssV2');
-
-//ALpha files only need records with below reason ID's for IA
-shared InteractiveReports :=  ['I0','I1','I2','I3','I4','I5','I6','I7','I8','I9'];
-shared AlphaIA     := outrecs0 (report_code[1] = 'I' and report_code not in InteractiveReports); 
-shared AlphaOther  := outrecs0 (report_code[1] <>'I');
-shared AlphaCmbnd := AlphaOther +  AlphaIA (reason_id in ['HOLD','AFYI','ASSI','AUTO','CALL','PRAC','SEAR','SECR','WAIT','PRAI']);
-shared AlphaOtherVendors := AlphaCmbnd(trim(vendor_code, left,right) <> 'COPLOGIC');
-shared AlphaCoplogic := AlphaCmbnd(trim(vendor_code, left,right) = 'COPLOGIC' and ((trim(supplemental_report,left,right) ='1' and trim(super_report_id, left, right) <> trim(report_id, left, right))or (trim(supplemental_report,left,right) ='0' and trim(super_report_id, left, right) = trim(report_id, left, right)) or (trim(supplemental_report,left,right) ='' and trim(super_report_id, left, right) = trim(report_id, left, right) )) );
-export Alpha  :=  project(AlphaOtherVendors + AlphaCoplogic, transform(Layout_eCrash.Accidents_Alpha, self := left;));
-
-shared foutrecs0 := outrecs0(CRU_inq_name_type not in ['2','3'] and report_code not in InteractiveReports and trim(vendor_code, left,right) <> 'COPLOGIC');
-export out    := project(foutrecs0, transform(Layout_eCrash.Consolidation, self := left;));
-												 
-shared EcrashAgencyExclusionAgencyOri := foutrecs0(STD.Str.ToUpperCase(TRIM(orig_agency_ori, ALL)) NOT IN Agency_exclusion.Agency_ori_list AND
-                                                   STD.Str.ToUpperCase(TRIM(orig_agency_ori, ALL))[1..2] NOT IN Agency_exclusion.Agency_ori_jurisdiction_list
-																					         );
-																																					
-shared EcrashAgencyExclusion := EcrashAgencyExclusionAgencyOri(STD.Str.ToUpperCase(TRIM(agency_ori, ALL)) NOT IN Agency_exclusion.Agency_ori_list AND
-                                                               STD.Str.ToUpperCase(TRIM(agency_ori, ALL))[1..2] NOT IN Agency_exclusion.Agency_ori_jurisdiction_list
-																				                       );
-export prout := project(EcrashAgencyExclusion, transform(Layout_eCrash.Consolidation, self := left;));
-
-shared searchRecs := out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and (trim(report_type_id,all) in ['A','DE'] or STD.str.ToUpperCase(trim(vendor_code,left,right)) = 'CMPD'));
-export eCrashSearchRecs := distribute(project(searchRecs, Layouts.key_search_layout), hash32(accident_nbr)):independent;
-
-end; 
+END; 
