@@ -1,6 +1,8 @@
 ﻿import ut, STD;
 
-string uc(string s) := Std.Str.ToUpperCase(s);
+	string uc(string s) := Std.Str.ToUpperCase(s);
+  string fix(string s) := Std.Str.CleanSpaces(uc(Std.Str.FindReplace(s,'.','')));
+	rgxSfx := '^([A-Z]+)[, ]+(JR|SR|III)';
 
 // convert lower case to upper case
 EXPORT fn_flatten(dataset(Nac_v2.Layouts.base) base1) := FUNCTION
@@ -27,12 +29,18 @@ EXPORT fn_flatten(dataset(Nac_v2.Layouts.base) base1) := FUNCTION
 						self.Prepped_addr1 := uc(left.Prepped_addr1);
 						self.Prepped_addr2 := uc(left.Prepped_addr2);
 						
-						self.Case_Last_Name := uc(left.Case_Last_Name);
+						casename := fix(left.Case_Last_Name);
+						self.Case_Last_Name := IF(REGEXFIND(rgxSfx, casename), REGEXFIND(rgxSfx, casename, 1), casename);
 						self.Case_First_Name := uc(left.Case_First_Name);
 						self.Case_Middle_Name := uc(left.Case_Middle_Name);
-						self.Client_Last_Name := uc(left.Client_Last_Name);
+						self.Case_Name_Suffix := IF(REGEXFIND(rgxSfx, casename), REGEXFIND(rgxSfx, casename, 2), '');
+						
+						clientname := fix(left.Client_Last_Name);
+						self.Client_Last_Name := IF(REGEXFIND(rgxSfx, clientname), REGEXFIND(rgxSfx, clientname, 1), clientname);
 						self.Client_First_Name := uc(left.Client_First_Name);
 						self.Client_Middle_Name := uc(left.Client_Middle_Name);
+						self.Client_Name_Suffix := IF(REGEXFIND(rgxSfx, clientname), REGEXFIND(rgxSfx, clientname, 2), '');
+						self.name_suffix := self.Client_Name_Suffix;
 																								
 						self.Case_Benefit_Type := IF(left.Case_Benefit_Type='R','S',left.Case_Benefit_Type); // Fix for old AL
 						self.GroupId := left.Case_State_Abbreviation + '01';
