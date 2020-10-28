@@ -78,7 +78,7 @@ functionmacro
   ds_active_proxids     := table(ds_biz_info  ,{proxid} ,proxid ,merge );
   ds_get_active_proxids := join(ds_crosswalk  ,ds_active_proxids  ,left.proxid = right.proxid ,transform({recordof(left) - contactSSNs - contactDOBs - contactPhones},self.jobtitles := project(left.jobtitles,transform(recordof(left),self.executive_ind_order := bipv2.bl_tables.Rank_ExecutiveTitles(left.job_title),self := left)),self := left)  ,hash);
  
-  ds_prep := project(ds_get_active_proxids  ,transform(Marketing_List.Layouts.business_contact_prep,
+  ds_prep := project(ds_get_active_proxids  ,transform(Marketing_List.Layouts.business_contact,
     best_contact_name := topn(left.contactnames((contact_name_permits & mktg_bmap) != 0) ,1                                                                                                     ,-dt_last_seen_at_business);
     job_titles        := topn(left.jobtitles   ((job_title_permits    & mktg_bmap) != 0) ,5 ,map(executive_ind_order = 0 and trim(job_title) = '' => 9999 ,executive_ind_order = 0 => 99  ,executive_ind_order + 1) ,-dt_title_last_seen      );
 
@@ -154,7 +154,7 @@ functionmacro
   ));
   
   // for contacts that do not have a title, set the person hierarchy to zero.
-  ds_fix_hierarchy := project(ds_iterate  ,transform(Marketing_List.Layouts.business_contact_prep,self.person_hierarchy := if(trim(left.title) != '' ,left.person_hierarchy  ,0) ,self := left ));
+  ds_fix_hierarchy := project(ds_iterate  ,transform(Marketing_List.Layouts.business_contact,self.person_hierarchy := if(trim(left.title) != '' ,left.person_hierarchy  ,0) ,self := left ));
 */
   ds_fix_hierarchy_with_lexid     := ds_dedup(lexid != 0);
   ds_fix_hierarchy_without_lexid  := ds_dedup(lexid  = 0);
@@ -191,9 +191,9 @@ functionmacro
 
   // blank out address fields if needed
 
-  ds_concat_address := project(ds_append_county_info2  ,Marketing_List.Layouts.business_contact_prep) + project(ds_fix_hierarchy_without_address ,Marketing_List.Layouts.business_contact_prep);
+  ds_concat_address := project(ds_append_county_info2  ,Marketing_List.Layouts.business_contact) + project(ds_fix_hierarchy_without_address ,Marketing_List.Layouts.business_contact);
 
-  ds_blank_address_fields := project(ds_concat_address  ,transform(Marketing_List.Layouts.business_contact_prep,
+  ds_blank_address_fields := project(ds_concat_address  ,transform(Marketing_List.Layouts.business_contact,
     is_any_address_field_blank_or_not_valid := 
       if(   trim(left.contact_address) = '' or trim(left.city) = '' or trim(left.state) = '' or trim(left.zip5) = '' 
         or ~Marketing_List.Validate_Address(left.contact_address ,left.city  ,left.state ,left.zip5)
@@ -213,11 +213,7 @@ functionmacro
   // -- set hiearchy at end after all fields have been set properly because set hiearchy uses the address fields
   ds_set_hierarchy := Marketing_List.Set_Hierarchy(ds_blank_address_fields);
   
-  #IF(Marketing_List._Config().Add_Extra_Source_Fields = true)
-    ds_result := project(ds_set_hierarchy ,Marketing_List.Layouts.business_contact_prep );
-  #ELSE
-    ds_result := project(ds_set_hierarchy ,Marketing_List.Layouts.business_contact      );
-  #END
+  ds_result := project(ds_set_hierarchy ,Marketing_List.Layouts.business_contact );
   
   ds_stats := dataset([
     {'ds_crosswalk                    ' ,ut.fIntWithCommas(count(ds_crosswalk                     ))}
