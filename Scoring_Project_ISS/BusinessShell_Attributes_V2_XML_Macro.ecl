@@ -53,8 +53,8 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, UT, RiskProcessing, Scoring, Gat
 		layout_input := Scoring_Project_Macros.Regression.Business_shell_PII;
 
 
-    ds_raw_input := IF(no_of_records > 0, CHOOSEN(DATASET( infile_name, layout_input,thor), no_of_records),
-                            DATASET( infile_name, layout_input, thor));
+    ds_raw_input := distribute(IF(no_of_records > 0, CHOOSEN(DATASET( infile_name, layout_input,thor), no_of_records),
+                            DATASET( infile_name, layout_input, thor)),(integer)acctno);
 
 		//*********** BusinessShell SETUP AND SOAPCALL ******************
 
