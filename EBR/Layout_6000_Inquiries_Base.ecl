@@ -1,4 +1,6 @@
-﻿export Layout_6000_Inquiries_Base := 
+﻿import dx_common;
+
+export Layout_6000_Inquiries_Base := 
 record
    Layout_Base;
    string8   process_date;
@@ -10,7 +12,5 @@ record
    string2   INQ_MM;
    string2   INQ_YY;
    string3   INQ_COUNT;
-   unsigned4 dt_effective_first  := 0;
-   unsigned4 dt_effective_last   := 0;
-   unsigned1 delta_ind           := 0;
+  dx_common.layout_metadata - [global_sid, record_sid];
 end;
