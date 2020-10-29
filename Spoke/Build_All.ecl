@@ -38,7 +38,7 @@ module
 		 Create_Supers
 		,spray_files
 		,Scrubs.ScrubsPlus('Spoke','Scrubs_Spoke','Scrubs_Spoke', 'Input', pversion,Email_Notification_Lists(pIsTesting).BuildFailure,false)
-		,if(Scrubs.mac_ScrubsFailureTest('SpokeKeys',pversion)
+		,if(Scrubs.mac_ScrubsFailureTest('Scrubs_Spoke',pversion)
 		    ,sequential(Build_Base(pversion,pDelimiter,pUpdateFile,pBaseFile).all
 									,Build_keys(pversion).all
 									,Promote().buildfiles.Built2QA
