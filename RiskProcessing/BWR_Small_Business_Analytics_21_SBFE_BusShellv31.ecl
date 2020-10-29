@@ -2898,7 +2898,7 @@ Error_Inputs_seq := SORT(JOIN(DISTRIBUTE(f_with_seq, HASH64((UNSIGNED)seq)),
 	LEFT ONLY, LOCAL), seq); 
 Error_Inputs := PROJECT(Error_Inputs_Seq, TRANSFORM({RECORDOF(LEFT) - seq}, SELF := LEFT));
 
-Error_Inputs_Flattened := project(Error_Inputs, transform(layout_flat_v1,
+Error_Inputs_Flattened := project(Error_Inputs, transform(layout_flat_v21,
 SELF.AccountNumber := left.AccountNumber;
 SELF.bus_company_name := left.CompanyName;
 SELF.HistoryDateYYYYMM := left.HistoryDate;
