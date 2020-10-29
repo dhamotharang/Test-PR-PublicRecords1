@@ -1,4 +1,4 @@
-﻿IMPORT ALC, tools;
+IMPORT ALC, tools;
 
 EXPORT Filenames(STRING  pversion = '',
                  BOOLEAN pUseProd = FALSE) := MODULE
@@ -28,8 +28,7 @@ EXPORT Filenames(STRING  pversion = '',
 	EXPORT Nurses3_lInputTemplate 		:= InText + '::Nurses3';
 	EXPORT Nurses3_lInputHistTemplate := InText + '::Nurses3::history';
 
-	EXPORT Nurses4_lInputTemplate 		:= InText + '::Nurses4';
-	EXPORT Nurses4_lInputHistTemplate	:= InText + '::Nurses4::history';
+	EXPORT Nurses_Suppression := '~thor_data400::alc::nurses_suppression';
 	
 	EXPORT Pharmacists_lInputTemplate 		:= InText + '::Pharmacists';
 	EXPORT Pharmacists_lInputHistTemplate := InText + '::Pharmacists::history';

@@ -15,9 +15,7 @@ EXPORT fSpray(STRING	pVersion              				= '',
 							STRING	pPharmacistsFilename					= '*394d*',
 							STRING	pNurses1Filename							= '*394e1*',
 							STRING	pNurses2Filename							= '*394e2*',
-							STRING	pNurses3Filename							= '*394e3*',
-							STRING	pNurses4Filename							= '*394e4*'
-							
+							STRING	pNurses3Filename							= '*394e3*'
 ) :=
   DATASET([
 					 {pServerIP
@@ -198,22 +196,5 @@ EXPORT fSpray(STRING	pVersion              				= '',
 					 ,''
 					 ,ALC._Dataset().max_record_size
 					 ,
-					 },
-
-						{pServerIP
-					 ,pDirectory
-					 ,pNurses4Filename
-					 ,0
-					 ,ALC.Filenames(pVersion).Nurses4_lInputTemplate
-					 ,[{ALC.Filenames().Nurses4_lInputTemplate}]
-					 ,ALC._Dataset().groupname
-					 ,pVersion
-					 ,''
-					 ,'VARIABLE'
-					 ,''
-					 ,ALC._Dataset().max_record_size
-					 ,
 					 }
-
-
 	        ], VersionControl.Layout_Sprays.Info);
