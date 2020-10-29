@@ -132,23 +132,23 @@ MoveToReject:=sequential(
 ReportExcessiveInvalidRecords := 
 	sequential (
 		MoveToReject
-		,Send_Email(st:=UpSt,fn:=fname,ut:=UpType,ce:=Customer_Email).FileValidationReport(mod_sets.validDelimiter, mod_sets.validTerminators));
+		,Send_Email(st:=UpSt,fn:=fname,ut:=UpType,ce:=Customer_Email,pIsError:=true).FileValidationReport(mod_sets.validDelimiter, mod_sets.validTerminators));
 
 ReportInvalidDelimiter := 
 	sequential (
 		 MoveToReject
-		,Send_Email(st:=UpSt,fn:=fname,ut:=UpType,ce:=Customer_Email).InvalidDelimiterError(mod_sets.validDelimiter, mod_sets.validTerminators));
+		,Send_Email(st:=UpSt,fn:=fname,ut:=UpType,ce:=Customer_Email,pIsError:=true).InvalidDelimiterError(mod_sets.validDelimiter, mod_sets.validTerminators));
 
 ReportInvalidNumberOfColumns := 
 	sequential (				
 		 MoveToReject
-		,Send_Email(st:=UpSt,fn:=fname,ut:=UpType,ce:=Customer_Email).InvalidNumberOfColumns(mod_sets.validDelimiter, mod_sets.validTerminators));
+		,Send_Email(st:=UpSt,fn:=fname,ut:=UpType,ce:=Customer_Email,pIsError:=true).InvalidNumberOfColumns(mod_sets.validDelimiter, mod_sets.validTerminators));
 
 ReportEmptyFile := 
 	sequential (
 		 output('File '+ip+ready+fname+' empty',named('Contributory_File_empty'))
 		,MoveReadyToError
-		,Send_Email(st:=UpSt,fn:=FileSprayed,ut:=UpType,ce:=Customer_Email).FileEmptyErrorAlert
+		,Send_Email(st:=UpSt,fn:=FileSprayed,ut:=UpType,ce:=Customer_Email,pIsError:=true).FileEmptyErrorAlert
 		);
 
 ThorName:=IF(_control.ThisEnvironment.Name <> 'Prod_Thor',Constants.ThorName_Dev,Constants.ThorName_Prod);
