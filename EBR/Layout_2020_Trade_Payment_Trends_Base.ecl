@@ -1,4 +1,6 @@
-﻿export Layout_2020_Trade_Payment_Trends_Base := 
+﻿import dx_common;
+
+export Layout_2020_Trade_Payment_Trends_Base := 
 record
   Layout_Base;
   string8   process_date;
@@ -15,7 +17,5 @@ record
   string3   DBT_31_60_PCT;
   string3   DBT_61_90_PCT;
   string3   DBT_91_PLUS_PCT;
-  unsigned4 dt_effective_first  := 0;
-  unsigned4 dt_effective_last   := 0;
-  unsigned1 delta_ind           := 0;
+  dx_common.layout_metadata - [global_sid, record_sid];
 end;
