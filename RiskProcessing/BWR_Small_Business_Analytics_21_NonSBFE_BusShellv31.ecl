@@ -115,7 +115,7 @@ END;
 f_orig := CHOOSEN(DATASET(inputFile, bus_in, CSV(QUOTE('"'))), RecordsToRun);
 													
 OUTPUT(COUNT(f_orig), NAMED('Total_Input_Cnt')); 
-//output(choosen(f_orig,eyeball),NAMED('Input_Before_CompanyName'));
+output(choosen(f_orig,eyeball),NAMED('Input_Before_CompanyName'));
 
 
 // In the case where a rerun (for whatever reason) is not helping, modeling wants to be able to blank out the CompanyName
@@ -137,7 +137,7 @@ f_with_seq_Filtered := f_with_seq_nonFiltered(
 
 // f_with_seq_Filtered_Rep has valid fname and last OR everything is empty; in either case we keep those records				 
 f_with_seq_Filtered_Rep := f_with_seq_Filtered(
-						(TRIM(Representativefirstname) <> '' AND TRIM(Representativelastname) <> '') and
+						(TRIM(Representativefirstname) <> '' AND TRIM(Representativelastname) <> '') and 
 						((TRIM(RepresentativeSSN) <> '') or (TRIM(RepresentativeAddr) <> '' and TRIM(RepresentativeZip) <> '') or TRIM(RepresentativeAddr) <> '' and TRIM(RepresentativeCity) <> '' and TRIM(RepresentativeState) <> '')
 						OR 
 						(
@@ -385,6 +385,7 @@ Passed := SmallBusinessAnalytics_attributes(TRIM(ErrorCode) = '');
 Insufficient_input_Failed := SmallBusinessAnalytics_attributes(STD.Str.Find(ErrorCode, MinimumInputErrorCode, 1) > 0) + inSufficientInput;
 Other_Failed := SmallBusinessAnalytics_attributes(TRIM(ErrorCode) <> '' AND STD.Str.Find(ErrorCode, MinimumInputErrorCode, 1) = 0);
 
+OUTPUT(CHOOSEN(SmallBusinessAnalytics_attributes, eyeball), NAMED('SmallBusinessAnalytics_attributes'));
 OUTPUT(CHOOSEN(Passed, eyeball), NAMED('SmallBusinessAnalytics_Results_Passed'));
 OUTPUT(CHOOSEN(Insufficient_input_Failed, eyeball), NAMED('SmallBusinessAnalytics_Insufficient_Input_Errors'));
 OUTPUT(CHOOSEN(Other_Failed, eyeball), NAMED('SmallBusinessAnalytics_Other_Errors'));
@@ -404,7 +405,7 @@ layout_flat_v1 := RECORD
 		UNSIGNED6 OrgID;
 		UNSIGNED6 UltID;
 		// #IF(includeLN)
-		LNSmallBusiness.BIP_Layouts.Version21Attributes;
+		LNSmallBusiness.BIP_Layouts.Version21Attributes - sourceIndex;
 		// #END
 		// SBA Supports up to a max of 10 model scores
 		STRING50 Model1Name;
@@ -1034,11 +1035,31 @@ Error_Inputs_seq := SORT(JOIN(DISTRIBUTE(f_with_seq, HASH64((UNSIGNED)seq)),
 		seq); 
 Error_Inputs := PROJECT(Error_Inputs_Seq, TRANSFORM({RECORDOF(LEFT) - seq}, SELF := LEFT));
 
-OUTPUT(CHOOSEN(flatResults, eyeball), NAMED('Sample_Final_Results'));
-OUTPUT(CHOOSEN(failureResults, eyeball), NAMED('Sample_Failed_Results'));
-OUTPUT(CHOOSEN(Error_Inputs, eyeball), NAMED('Sample_Failed_Inputs'));
+Error_Inputs_Flattened := project(Error_Inputs, transform(layout_flat_v1,
+SELF.AccountNumber := left.AccountNumber;
+SELF.bus_company_name := left.CompanyName;
+SELF.HistoryDateYYYYMM := left.HistoryDate;
+SELF.ErrorCode :=  'Error: Query Error Resulted In No Data Returned';
+	self := left;
+	self := []));
+
+OUTPUT(CHOOSEN(flatResults, eyeball), NAMED('Sample_Final_Results')); // output shows all good results
+OUTPUT(CHOOSEN(failureResults, eyeball), NAMED('Sample_Failed_Results')); // output shows records that fell into the Other_Failed criteria
+OUTPUT(CHOOSEN(Error_Inputs, eyeball), NAMED('Sample_Failed_Inputs')); // output shows dropped records in the input file layout
+OUTPUT(CHOOSEN(Error_Inputs_Flattened, eyeball), NAMED('Sample_Failed_Inputs_Flattened')); // output shows dropped records in the output layout
 
 OUTPUT(COUNT(flatResults), NAMED('Total_Final_Results_Passed'));
+
+// This file is the results that do not need to be retried.
 OUTPUT(flatResults,, outputFile, CSV(HEADING(single), QUOTE('"')), OVERWRITE, NAMED('Final_Results_Succeeded'));
+
+// This file gives you the results of the records that fell into the Other_Failed criteria.
 OUTPUT(failureResults,,outputFile+'_Errors', CSV(HEADING(single), QUOTE('"')), OVERWRITE, NAMED('Final_Results_Errors'));
+
+// This file will give you the dropped records in the input file layout. Use this file to rerun records to see if another try will
+// will make results return for them.
 OUTPUT(Error_Inputs,,outputFile+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE, NAMED('FinalResults_DroppedRerun'));
+
+// This file will give you the dropped records in the flat layout that matches the good results. Use this when you believe the 
+// records remaining here will never return results. You will combine this file with any good results files that were created.
+OUTPUT(Error_Inputs_Flattened,,outputFile+'_Error_Inputs_Flattened', CSV(QUOTE('"')), OVERWRITE, NAMED('FinalResults_Errors_Flattened'));
