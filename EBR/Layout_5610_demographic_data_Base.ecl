@@ -1,4 +1,5 @@
-﻿import address;
+﻿import address, dx_common;
+
 export Layout_5610_demographic_data_Base := 
 record
    Layout_Base;
@@ -32,7 +33,5 @@ record
    string1    OFFICER_M_I;
    string20   OFFICER_LAST_NAME;
    address.Layout_Clean_Name clean_officer_name;
-   unsigned4  dt_effective_first  := 0;
-   unsigned4  dt_effective_last   := 0;
-   unsigned1  delta_ind           := 0;
+   dx_common.layout_metadata - [global_sid, record_sid];
 end;

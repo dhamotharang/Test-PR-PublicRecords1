@@ -193,34 +193,34 @@ tDates_fips_L := tDates_fips_category(deed_category = 'L');
 tDates_fips_U := tDates_fips_category(deed_category = 'U');
 
 //Despray CSV to bctlpedata12 (one thor file and one csv file). FTP to \\Risk\inf\Data_Factory\DI_Landingzone
-despray_tbl_all_by_state := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_all_by_state'+ '.csv',
+despray_tbl_all_by_state := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_all_by_state_'+ filedate +'.csv',
 																			 pHostname, 
-																			 pTarget + '/tbl_ChartsGeoMaps_all_by_state'+ '.csv'
+																			 pTarget + '/tbl_ChartsGeoMaps_all_by_state_'+ filedate +'.csv'
 																			 ,,,,true);
 
-despray_tbl_doct_typ := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_doct_typ'+ '.csv',
+despray_tbl_doct_typ := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_doct_typ_'+ filedate +'.csv',
 																			  pHostname, 
-																			  pTarget+ '/tbl_ChartsGeoMaps_doct_typ'+ '.csv'
+																			  pTarget+ '/tbl_ChartsGeoMaps_doct_typ_'+ filedate +'.csv'
 																			  ,,,,true);
 
-despray_tbl_deed_cat := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_deed_cat'+ '.csv',
+despray_tbl_deed_cat := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_deed_cat_'+ filedate +'.csv',
 																			  pHostname, 
-																			  pTarget+ '/tbl_ChartsGeoMaps_deed_cat'+ '.csv'
+																			  pTarget+ '/tbl_ChartsGeoMaps_deed_cat_'+ filedate +'.csv'
 																			  ,,,,true);
 
-despray_LisPendens_by_Fips_And_Year := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_LisPendens_by_Fips_And_Year'+ '.csv',
+despray_LisPendens_by_Fips_And_Year := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_LisPendens_by_Fips_And_Year_'+ filedate +'.csv',
 																			   pHostname, 
-																			   pTarget+ '/tbl_ChartsGeoMaps_LisPendens_by_Fips_And_Year'+ '.csv'
+																			   pTarget+ '/tbl_ChartsGeoMaps_LisPendens_by_Fips_And_Year_'+ filedate +'.csv'
 																			   ,,,,true);
 
-despray_NODs_by_Fips_And_Year := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_NODs_by_Fips_And_Year'+ '.csv',
+despray_NODs_by_Fips_And_Year := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_NODs_by_Fips_And_Year_'+ filedate +'.csv',
 																			 pHostname, 
-																			 pTarget+ '/tbl_ChartsGeoMaps_NODs_by_Fips_And_Year'+ '.csv'
+																			 pTarget+ '/tbl_ChartsGeoMaps_NODs_by_Fips_And_Year_'+ filedate +'.csv'
 																			 ,,,,true);
 
-despray_Foreclosure_by_Fips_And_Year := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_Foreclosure_by_Fips_And_Year'+ '.csv',
+despray_Foreclosure_by_Fips_And_Year := STD.File.DeSpray('~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_Foreclosure_by_Fips_And_Year_'+ filedate +'.csv',
 																			   pHostname, 
-																			   pTarget+ '/tbl_ChartsGeoMaps_Foreclosure_by_Fips_And_Year'+ '.csv'
+																			   pTarget+ '/tbl_ChartsGeoMaps_Foreclosure_by_Fips_And_Year_'+ filedate +'.csv'
 																			   ,,,,true);																			   
 
 /* -------- Final WUIDs from Jessica to update DMP reports -------- //
@@ -235,12 +235,12 @@ NODs, LisPendens, Foreclosures by state & Year, Lis Pendens by state & Year, For
 
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
-					 output(tbl_all_by_state,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_all_by_state'+ '.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
-					,output(tbl_doct_typ,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_doct_typ'+ '.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)					
-					,output(tbl_deed_cat,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_deed_cat'+ '.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)										
-					,output(sort(tDates_fips_L, fips, deed_category),,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_LisPendens_by_Fips_And_Year'+ '.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)					
-					,output(sort(tDates_fips_N, fips, deed_category),,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_NODs_by_Fips_And_Year'+ '.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)										
-					,output(sort(tDates_fips_U, deed_category),,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_Foreclosure_by_Fips_And_Year'+ '.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)										
+					 output(tbl_all_by_state,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_all_by_state_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					,output(tbl_doct_typ,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_doct_typ_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)					
+					,output(tbl_deed_cat,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_deed_cat_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)										
+					,output(sort(tDates_fips_L, fips, deed_category),,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_LisPendens_by_Fips_And_Year_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)					
+					,output(sort(tDates_fips_N, fips, deed_category),,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_NODs_by_Fips_And_Year_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)										
+					,output(sort(tDates_fips_U, deed_category),,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_Foreclosure_by_Fips_And_Year_'+ filedate +'.csv', CSV(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)										
 					,despray_tbl_all_by_state 
 					,despray_tbl_doct_typ 
 					,despray_tbl_deed_cat 

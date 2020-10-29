@@ -1267,6 +1267,8 @@
 		export string KEYWORD_OFAC_EO13902					:= '951';
 		export string KEYWORD_UGIGG									:= '952';
 		export string KEYWORD_UGPPDA								:= '953';
+		export string KEYWORD_NAMFISA								:= '954';
+		export string KEYWORD_RWOMBUD								:= '955';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
