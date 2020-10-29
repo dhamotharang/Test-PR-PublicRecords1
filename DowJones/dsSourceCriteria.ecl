@@ -1952,7 +1952,9 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2020/1480 Proliferation and Use of Chemical Weapons List','1939'},
 {'EC 2020/1481 Libya List','1940'},
 {'EC 2020/1505 Syria List','1941'},
-{'EC 2020/1507 Democratic Republic of the Congo List','1942'}
+{'EC 2020/1507 Democratic Republic of the Congo List','1942'},
+{'EC (CFSP) 2020/1537 Cyber-Attacks List','1943'},
+{'EC 2020/1536 Cyber-Attacks List','1944'}
 
 ],r);
 
