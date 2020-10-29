@@ -431,15 +431,41 @@ EXPORT Standardize_Input(STRING pversion, BOOLEAN pUseProd = FALSE) := MODULE
   // Nurses need normalization on nurse_type (basically license type) and specialty (they are
 	//   connected to each other).
 	EXPORT Nurses := FUNCTION
-    input               := ALC.Files(, pUseProd).Input.Nurses1 +
-		                          ALC.Files(, pUseProd).Input.Nurses2 +
-								              ALC.Files(, pUseProd).Input.Nurses3;
+			input               := ALC.Files(, pUseProd).Input.Nurses1 +
+																ALC.Files(, pUseProd).Input.Nurses2 +
+																ALC.Files(, pUseProd).Input.Nurses3;
 
-		suppressed_licenses := ALC.Files(, pUseProd).Input.Nurses_Suppression;
+			nurses4 := ALC.Files(, pUseProd).Input.Nurses4; 
+	
 
-		input2 := JOIN(input, suppressed_licenses, LEFT.license_no = RIGHT.license_no, LEFT ONLY);
+			nurses4_slim := PROJECT(nurses4, {LEFT.custno, LEFT.lic_no, LEFT.licstate});
 
-		input_initial_clean := Apply_Common_Xform(input2, ALC.Layouts.Input.Nurses);
+			full_state_join := JOIN(input, nurses4_slim, LEFT.custno = RIGHT.custno AND LEFT.license_no = RIGHT.lic_no, FULL OUTER);
+
+			RECORDOF(full_state_join) xLicState(RECORDOF(full_state_join) l) := TRANSFORM
+				SELF.reg_state := IF(l.licstate <> '', l.licstate, l.reg_state);
+				SELF := l;
+			END;
+
+			corrected_input := PROJECT(full_state_join, xLicState(LEFT));
+
+			ambiguous_states :=  DEDUP(JOIN(corrected_input, corrected_input, 
+						LEFT.custno = RIGHT.custno AND LEFT.license_no = RIGHT.license_no AND LEFT.reg_state <> RIGHT.reg_state, INNER, LOCAL));
+					OUTPUT(COUNT(ambiguous_states), NAMED('cnt_ambiguous'));         
+
+
+			ambiguous_fixed_with_licstate := DEDUP(JOIN(corrected_input, corrected_input, 
+						LEFT.custno = RIGHT.custno AND LEFT.license_no = RIGHT.license_no AND LEFT.reg_state <> RIGHT.reg_state, INNER, LOCAL)  (reg_state = licstate));
+					OUTPUT(COUNT(ambiguous_fixed_with_licstate), NAMED('cnt_ambiguous_fixed_with_licstate'));         
+
+
+			fix_ambig_step1 := corrected_input - ambiguous_states;
+			fix_ambig_step2 := PROJECT((fix_ambig_step1 + ambiguous_fixed_with_licstate), ALC.Layouts.Input.Nurses) ;
+
+
+
+
+		input_initial_clean := Apply_Common_Xform(fix_ambig_step2, ALC.Layouts.Input.Nurses);
 
 		ALC.Layouts.Base_Plus clean_input(ALC.Layouts.Base L) := TRANSFORM
 		  the_orig_date := Convert_Date(L.orig_date);
@@ -583,6 +609,10 @@ EXPORT Standardize_Input(STRING pversion, BOOLEAN pUseProd = FALSE) := MODULE
 
     RETURN PROJECT(input_blanks_reg_state, ALC.Layouts.Base) + input_reg_state_norm;
   END;
+
+
+
+
 
   // Pharmacists need normalization on license_type.
 	EXPORT Pharmacists := FUNCTION

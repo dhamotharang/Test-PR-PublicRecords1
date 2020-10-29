@@ -31,6 +31,7 @@ EXPORT Build_All(
 										 ALC._Flags().FileExists.Input.Nurses1 AND
 										 ALC._Flags().FileExists.Input.Nurses2 AND
 										 ALC._Flags().FileExists.Input.Nurses3 AND
+										 ALC._Flags().FileExists.Input.Nurses4 AND
 										 ALC._Flags().FileExists.Input.Pharmacists AND
 										 ALC._Flags().FileExists.Input.Pilots AND
 										 ALC._Flags().FileExists.Input.Professionals1 AND
@@ -51,7 +52,7 @@ EXPORT Build_All(
 																		 pBaseBuilt).All),
 								  SEQUENTIAL(
 									  send_mail('STOP IMMEDIATELY - ALC',
-										  'There should be 12 input files for this product.  There was not 12 files ' +
+										  'There should be 13 input files for this product.  There were not 13 files ' +
 												 'sprayed to the THOR.  Contact Data Receiving to see about the missing ' +
 												 'file(s).  Workunit of failed build is ' + thorlib.wuid()),
 									  FAIL('CONTACT DATA RECEIVING IMMEDIATELY')))
