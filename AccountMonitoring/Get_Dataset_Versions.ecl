@@ -190,24 +190,24 @@ EXPORT Get_Dataset_Versions(
 				SELF.product := 'PHONE',
 				SELF.subfile := 'Phones_type',
 				SELF.version := REGEXFIND(
-					'thor_data400::key::(.*)::Phones_type',
-					LEFT.name,1,NOCASE)));
+				'thor_data400::key::(.*)::phones_type',
+				LEFT.name,1,NOCASE)));
 
 		Phones_Lerg6 := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phone.phones_lerg6_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PHONE',
 				SELF.subfile := 'phones_lerg6',
 				SELF.version := REGEXFIND(
-					'thor_data400::key::(.*)::phones_lerg6',
-					LEFT.name,1,NOCASE)));					
+				'thor_data400::key::(.*)::phones_lerg6',
+				LEFT.name,1,NOCASE)));					
 
 		carrier_reference := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phone.carrier_reference_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PHONE',
 				SELF.subfile := 'carrier_reference',
 				SELF.version := REGEXFIND(
-					'thor_data400::key::(.*)::phonesmetadata::carrier_reference',
-					LEFT.name,1,NOCASE)));
+				'thor_data400::key::(.*)::phonesmetadata::carrier_reference',
+				LEFT.name,1,NOCASE)));
 
 		Phone :=
 			Phone_Gong +
@@ -217,7 +217,9 @@ EXPORT Get_Dataset_Versions(
 			Phone_Daily_Utility +
 			Phone_Person_Best +
 			Phone_PAW +
-			Phone_Neustar;
+			Phones_Type+
+			Phones_Lerg6+
+			carrier_reference;
 		
 		// Liens
 
