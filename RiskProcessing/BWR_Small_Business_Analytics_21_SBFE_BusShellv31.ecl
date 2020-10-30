@@ -3,7 +3,7 @@
 #workunit('name','Small Business Analytics SBFE v21 BusShell v31');
 #option ('hthorMemoryLimit', 1000);
 
-IMPORT Business_Risk_BIP, Data_Services, LNSmallBusiness, Models, iESP, Risk_Indicators, RiskWise, STD;
+IMPORT Data_Services, LNSmallBusiness, iESP, Risk_Indicators, RiskWise, STD;
 
 /* ********************************************************************
  *                               OPTIONS                              *
@@ -216,31 +216,31 @@ layout_soap := RECORD
 END;
 
 layout_soap transform_input_request(f_with_seq le) := TRANSFORM
-	u := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_User, 
+	u := Dataset([TRANSFORM(iesp.share.t_User, 
 			SELF.AccountNumber := le.accountnumber; 
 			SELF.DLPurpose := DPPA; 
 			SELF.GLBPurpose := GLBA; 
 			SELF.DataRestrictionMask := dataRestrictionMask_val; 
 			SELF.DataPermissionMask := dataPermissionMask_val; 
-			SELF := []));
-	o := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.smallbusinessanalytics.t_SBAOptions, 
+			SELF := [])]);
+	o := Dataset([TRANSFORM(iesp.smallbusinessanalytics.t_SBAOptions, 
 			SELF.AttributesVersionRequest := AttributesRequested; 
       // To minimize errors, don't use blended model if the minimum input requirements aren't met.   
       AuthRepMinInputMet := (TRIM(le.Representativefirstname) <> '' AND TRIM(le.Representativelastname) <> '' AND TRIM(le.RepresentativeAddr) <> '' AND TRIM(le.RepresentativeCity) <> '' AND TRIM(le.RepresentativeState) <> '') OR 
               (TRIM(le.Representativefirstname) <> '' AND TRIM(le.Representativelastname) <> '' AND TRIM(le.RepresentativeAddr) <> '' AND TRIM(le.RepresentativeZip) <> '') OR 
               (TRIM(le.Representativefirstname) <> '' AND TRIM(le.Representativelastname) <> '' AND TRIM(le.RepresentativeSSN) <> '');
 			SELF.IncludeModels.Names := BusinessModelRequested + IF(AuthRepMinInputMet, BlendedModelRequested);
-			SELF := []));
-	c := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.smallbusinessanalytics.t_SBACompany, 
+			SELF := [])]);
+	c := Dataset([TRANSFORM(iesp.smallbusinessanalytics.t_SBACompany, 
 			SELF.CompanyName := le.CompanyName; 
 			SELF.AlternateCompanyName := le.AlternateCompanyName; 
-			SELF.Address := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Address, 
+			SELF.Address := Dataset([TRANSFORM(iesp.share.t_Address, 
 						SELF.StreetAddress1 := le.Addr; 
 						SELF.City := le.City; 
 						SELF.State := le.State; 
 						SELF.Zip5 := le.Zip[1..5]; 
 						SELF.Zip4 := le.Zip[6..9]; 
-						SELF := []))[1];
+						SELF := [])])[1];
 			SELF.Phone := le.BusinessPhone;
 			SELF.FaxNumber := '';
 			SELF.FEIN := le.TaxIdNumber;
@@ -248,110 +248,110 @@ layout_soap transform_input_request(f_with_seq le) := TRANSFORM
 			SELF.NAICCode := le.NAICCode;
 			SELF.BusinessStructure := '';
 			SELF.YearsInBusiness := '';
-			SELF.BusinessStartDate := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Date,
+			SELF.BusinessStartDate := Dataset([TRANSFORM(iesp.share.t_Date,
 						SELF.Year := (INTEGER)'';
 						SELF.Month := (INTEGER)'';
 						SELF.Day := (INTEGER)'';
-						SELF := []))[1]; 
+						SELF := [])])[1]; 
 			SELF.YearlyRevenue := '';
-			SELF := []));
-	a1 := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.smallbusinessanalytics.t_SBAAuthRep, 
-			SELF.Name := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Name, 
+			SELF := [])]);
+	a1 := Dataset([TRANSFORM(iesp.smallbusinessanalytics.t_SBAAuthRep, 
+			SELF.Name := Dataset([TRANSFORM(iesp.share.t_Name, 
 						SELF.First := le.Representativefirstname; 
 						SELF.Middle := le.RepresentativeMiddleName; 
 						SELF.Last := le.Representativelastname; 
 						SELF.Suffix := le.RepresentativeNameSuffix; 
-						SELF := []))[1]; 
+						SELF := [])])[1]; 
 			SELF.FormerLastName := le.RepresentativeFormerLastName; 
-			SELF.Address := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Address,
+			SELF.Address := Dataset([TRANSFORM(iesp.share.t_Address,
 						SELF.StreetAddress1 := le.RepresentativeAddr; 
 						SELF.City := le.RepresentativeCity; 
 						SELF.State := le.RepresentativeState; 
 						SELF.Zip5 := le.RepresentativeZip[1..5]; 
 						SELF.Zip4 := le.RepresentativeZip[6..9]; 
-						SELF := []))[1];
-			SELF.DOB := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Date, 
+						SELF := [])])[1];
+			SELF.DOB := Dataset([TRANSFORM(iesp.share.t_Date, 
 						SELF.Year := (INTEGER)le.RepresentativeDOB[1..4];
 						SELF.Month := (INTEGER)le.RepresentativeDOB[5..6];
 						SELF.Day := (INTEGER)le.RepresentativeDOB[7..8];
-						SELF := []))[1]; 
+						SELF := [])])[1]; 
 			SELF.Age := le.RepresentativeAge; 
 			SELF.SSN := le.RepresentativeSSN; 
 			SELF.Phone := le.RepresentativeHomePhone; 
 			SELF.DriverLicenseNumber := le.RepresentativeDLNumber; 
 			SELF.DriverLicenseState := le.RepresentativeDLState; 
 			SELF.BusinessTitle := ''; 
-			SELF := []));
-	a2 := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.smallbusinessanalytics.t_SBAAuthRep, 
-			SELF.Name := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Name, 
+			SELF := [])]);
+	a2 := Dataset([TRANSFORM(iesp.smallbusinessanalytics.t_SBAAuthRep, 
+			SELF.Name := Dataset([TRANSFORM(iesp.share.t_Name, 
 						SELF.First := ''; 
 						SELF.Middle := ''; 
 						SELF.Last := ''; 
 						SELF.Suffix := ''; 
-						SELF := []))[1]; 
+						SELF := [])])[1]; 
 			SELF.FormerLastName := ''; 
-			SELF.Address := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Address, 
+			SELF.Address := Dataset([TRANSFORM(iesp.share.t_Address, 
 						SELF.StreetAddress1 := ''; 
 						SELF.City := ''; 
 						SELF.State := ''; 
 						SELF.Zip5 := ''; 
 						SELF.Zip4 := ''; 
-						SELF := []))[1];
-			SELF.DOB := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Date, 
+						SELF := [])])[1];
+			SELF.DOB := Dataset([TRANSFORM(iesp.share.t_Date, 
 						SELF.Year := (INTEGER)'';
 						SELF.Month := (INTEGER)'';
 						SELF.Day := (INTEGER)'';
-						SELF := []))[1]; 
+						SELF := [])])[1]; 
 			SELF.Age := ''; 
 			SELF.SSN := ''; 
 			SELF.Phone := ''; 
 			SELF.DriverLicenseNumber := ''; 
 			SELF.DriverLicenseState := ''; 
 			SELF.BusinessTitle := ''; 
-			SELF := []));
-	a3 := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.smallbusinessanalytics.t_SBAAuthRep, 
-			SELF.Name := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Name, 
+			SELF := [])]);
+	a3 := Dataset([TRANSFORM(iesp.smallbusinessanalytics.t_SBAAuthRep, 
+			SELF.Name := Dataset([TRANSFORM(iesp.share.t_Name, 
 						SELF.First := ''; 
 						SELF.Middle := ''; 
 						SELF.Last := ''; 
 						SELF.Suffix := ''; 
-						SELF := []))[1]; 
+						SELF := [])])[1]; 
 			SELF.FormerLastName := ''; 
-			SELF.Address := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Address,  
+			SELF.Address := Dataset([TRANSFORM(iesp.share.t_Address,  
 						SELF.StreetAddress1 := ''; 
 						SELF.City := ''; 
 						SELF.State := ''; 
 						SELF.Zip5 := ''; 
 						SELF.Zip4 := ''; 
-						SELF := []))[1]; 
-			SELF.DOB := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Date, 
+						SELF := [])])[1]; 
+			SELF.DOB := Dataset([TRANSFORM(iesp.share.t_Date, 
 						SELF.Year := (INTEGER)'';
 						SELF.Month := (INTEGER)'';
 						SELF.Day := (INTEGER)'';
-						SELF := []))[1]; 
+						SELF := [])])[1]; 
 			SELF.Age := ''; 
 			SELF.SSN := ''; 
 			SELF.Phone := ''; 
 			SELF.DriverLicenseNumber := ''; 
 			SELF.DriverLicenseState := ''; 
 			SELF.BusinessTitle := ''; 
-			SELF := []));
-	s := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.smallbusinessanalytics.t_SBASearchBy, 
+			SELF := [])]);
+	s := Dataset([TRANSFORM(iesp.smallbusinessanalytics.t_SBASearchBy, 
 			SELF.Seq := (STRING)le.seq; 
 			SELF.Company := c[1]; 
 			SELF.AuthorizedRep1 := a1[1]; 
 			SELF.AuthorizedRep2 := a2[1]; 
 			SELF.AuthorizedRep3 := a3[1]; 
-			SELF := []));
-	r := PROJECT(risk_indicators.iid_constants.ds_Record, TRANSFORM(iesp.smallbusinessanalytics.t_SmallBusinessAnalyticsRequest, 
+			SELF := [])]);
+	r := Dataset([TRANSFORM(iesp.smallbusinessanalytics.t_SmallBusinessAnalyticsRequest, 
 			SELF.User := u[1]; 
 			SELF.Options := o[1]; 
 			SELF.SearchBy := s[1]; 
-			SELF := []));
+			SELF := [])]);
 	
 	SELF.SmallBusinessAnalyticsRequest := r[1];
 
-	SELF.HistoryDateYYYYMM := IF(histDateYYYYMM = 0, (INTEGER)(STRING)le.historydate[1..6], histDateYYYYMM);
+	SELF.HistoryDateYYYYMM := IF(histDateYYYYMM = 0, (INTEGER)((STRING)le.historydate)[1..6], histDateYYYYMM);
 	SELF.HistoryDate       := IF(histDate       = 0, le.historydate, histDate); // Input file doesn't have any other history date field besides historydateyyyymm.
 	
 	SELF.OFAC_Version := 3;

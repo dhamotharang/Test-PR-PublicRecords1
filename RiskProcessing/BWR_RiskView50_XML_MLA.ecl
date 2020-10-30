@@ -1,6 +1,6 @@
-﻿#workunit('name', 'RiskView_V5 with AML');
+﻿#workunit('name', 'RiskView_V5 with MLA');
 
-IMPORT IESP, Models, Risk_Indicators, RiskWise, RiskProcessing, RiskView, ut, gateway;
+IMPORT IESP, Models, Risk_Indicators, RiskWise, RiskView, gateway;
 
 eyeball := 25;
 recordsToRun := 25; // Set to 0 or -1 to run ALL records in the file
@@ -13,7 +13,7 @@ NeutralRoxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie;
 // inputFile :=  '~foreign::' + _control.IPAddress.prod_thor_dali + '::' +'jpyon::in::sec_9618_sf_2020glo_ln_mlaappend_fs.csv';
 inputFile :=  '~jpyon::in::sec_9618_sf_2020glo_ln_mlaappend_fs.csv';
 	
-outfile_name := '~khuls::out::riskview_v5_AML_' + thorlib.wuid();
+outfile_name := '~khuls::out::riskview_v5_MLA_' + thorlib.wuid();
 
 model1 := 'MLA1608_0'; // Populate this first, if only 1 model is being requested this will be the only model field populated
 model2 := ''; // Populate this second
@@ -80,24 +80,24 @@ END;
 soapLayout intoSOAP(inputDataSeq le, UNSIGNED4 c) := TRANSFORM
 	self.filterLiens := false;  
 	
-	name := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Name,
+	name := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Name,
 						SELF.First := le.FirstName;
 						SELF.Middle := le.MiddleName;
 						SELF.Last := le.LastName;
 						SELF := []))[1];
-	address := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Address,
+	address := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Address,
 						SELF.StreetAddress1 := le.StreetAddress;
 						SELF.City := le.City;
 						SELF.State := le.State;
 						SELF.Zip5 := le.Zip;
 						SELF := []))[1];
-	dob := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Date,
+	dob := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Date,
 						SELF.Year := (integer)le.DateOfBirth[1..4];
 						SELF.Month := (integer)le.DateOfBirth[5..6];
 						SELF.Day := (integer)le.DateOfBirth[7..8];
 						SELF := []))[1];
 	
-	search := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.riskview2.t_RiskView2SearchBy,
+	search := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(iesp.riskview2.t_RiskView2SearchBy,
 						// self.seq := le.AccountNumber;
 						self.seq := (string)le.in_seq;
 						SELF.Name := name;
@@ -110,7 +110,7 @@ soapLayout intoSOAP(inputDataSeq le, UNSIGNED4 c) := TRANSFORM
 						SELF.WorkPhone := le.WorkPhone;
 						SELF := []));
 	
-	models := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.riskview2.t_RiskView2Models,
+	models := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(iesp.riskview2.t_RiskView2Models,
 						SELF.Names := IF(model1 <> '', DATASET([{model1}], iesp.share.t_StringArrayItem), DATASET([], iesp.share.t_StringArrayItem)) + 
 													IF(model2 <> '', DATASET([{model2}], iesp.share.t_StringArrayItem), DATASET([], iesp.share.t_StringArrayItem)) +
 													IF(model3 <> '', DATASET([{model3}], iesp.share.t_StringArrayItem), DATASET([], iesp.share.t_StringArrayItem)) +
@@ -118,27 +118,27 @@ soapLayout intoSOAP(inputDataSeq le, UNSIGNED4 c) := TRANSFORM
 													IF(model5 <> '', DATASET([{model5}], iesp.share.t_StringArrayItem), DATASET([], iesp.share.t_StringArrayItem));
 						SELF.ModelOptions := DATASET([], iesp.riskview_share.t_ModelOptionRV);
 						SELF := []));
-	option := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.riskview2.t_RiskView2Options,
+	option := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(iesp.riskview2.t_RiskView2Options,
 						SELF.IncludeModels := models[1];
 						SELF.AttributesVersionRequest := attributesVersion;
 						SELF.IncludeReport := FALSE; // Never request the Report
 						SELF.IntendedPurpose := intendedPurpose;
 						SELF := []));
 	
-	users := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_User,
+	users := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_User,
 						SELF.DataRestrictionMask := '';
 						SELF.AccountNumber := IF(le.AccountNumber <> '', le.AccountNumber, (STRING)c);
 						SELF.TestDataEnabled := FALSE;
 						SELF.OutcomeTrackingOptOut := TRUE;
 						SELF := []));
             
-  TransactionContext := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.riskview2.t_Rv2TransactionContext,
+  TransactionContext := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(iesp.riskview2.t_Rv2TransactionContext,
 						SELF.MLAGatewayInfo.CustomerNumber := '373ZB00142';
 						SELF.MLAGatewayInfo.SecurityCode := '37X';
 						SELF.MLAGatewayInfo.EndUserCompanyName := 'LEXISNEXID-DEV';
 						SELF := []));
 	
-	SELF.RiskView2Request := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.riskview2.t_RiskView2Request, 
+	SELF.RiskView2Request := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(iesp.riskview2.t_RiskView2Request, 
 						SELF.SearchBy := search[1];
 						SELF.TransactionContext := TransactionContext[1];
 						SELF.Options := option[1];
@@ -154,8 +154,8 @@ soapLayout intoSOAP(inputDataSeq le, UNSIGNED4 c) := TRANSFORM
 	 );
   // self.HistoryDateTimeStamp := ''; // force timestamp to blank, query will populate it with the current date
 
-	GatewayFCRA := PROJECT(ut.ds_oneRecord, TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := 'FCRA'; SELF.URL := 'http://certqavip.hpcc.risk.regn.net:9876'; SELF := []));
-	GatewayMLA  := PROJECT(ut.ds_oneRecord, TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := 'EquifaxSTS'; SELF.URL := 'HTTPS://xmlrsk_prod_gw_roxie:g0h3%40t2x@espprodvip.risk.regn.net:8726/WsGatewayEx?ver_=1.95'; SELF := []));
+	GatewayFCRA := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := 'FCRA'; SELF.URL := 'http://certqavip.hpcc.risk.regn.net:9876'; SELF := []));
+	GatewayMLA  := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := 'EquifaxSTS'; SELF.URL := 'HTTPS://xmlrsk_prod_gw_roxie:g0h3%40t2x@espprodvip.risk.regn.net:8726/WsGatewayEx?ver_=1.95'; SELF := []));
 	SELF.Gateways := GatewayFCRA + GatewayMLA;
 END;
 
@@ -181,7 +181,7 @@ soapResults_raw := SOAPCALL(soapInput,
         RETRY(5), TIMEOUT(500),
         // XPATH('riskview.search_serviceResponse/Results/Result/Dataset[@name=\'Results\']/Row'),
 				PARALLEL(threads), onFail(myFail(LEFT)));
-OUTPUT(CHOOSEN(soapResults_raw, 100), NAMED('Sample_soapResults_raw'));
+OUTPUT(CHOOSEN(soapResults_raw, eyeball), NAMED('Sample_soapResults_raw'));
 
 soapResults := soapResults_raw(Result.inputEcho.seq<>'');  // filter out the intermediate logging rows from the response
 				
@@ -222,7 +222,7 @@ END;
 dropped_records_to_rerun := JOIN (soapResults, inputDataSeq, LEFT.result.inputecho.seq = (string)RIGHT.in_seq, 
                                   TRANSFORM(prii_layout, SELF := RIGHT), RIGHT ONLY);
 output(choosen(dropped_records_to_rerun, eyeball), named('dropped_records_to_rerun'));
-output(dropped_records_to_rerun,,outfile_name + '_records_to_rerun', CSV(heading(single), quote('"'))); //pass this dataset into the script again to rerun the dropped records
+output(dropped_records_to_rerun,,outfile_name + '_records_to_rerun', CSV(quote('"'))); //pass this dataset into the script again to rerun the dropped records
 
 //This captures records that were dropped by the query and not desired to be re-run.  They are transformed into the flat layout so they can simply be appended to the good records.
 dropped_records_to_append := JOIN (soapResults, inputDataSeq, LEFT.result.inputecho.seq = (string)RIGHT.in_seq, 
@@ -231,7 +231,7 @@ dropped_records_to_append := JOIN (soapResults, inputDataSeq, LEFT.result.inpute
                                     self.Exception_message := 'Record failed within the query and could not return a valid result';
                                     SELF := []), RIGHT ONLY);
 output(choosen(dropped_records_to_append, eyeball), named('dropped_records_to_append'));
-output(dropped_records_to_append,,outfile_name + '_records_to_append', CSV(heading(single), quote('"'))); //append this dataset to the good records dataset below to add them back in
+output(dropped_records_to_append,,outfile_name + '_records_to_append', CSV(quote('"'))); //Note to Analyst: if you are not going to rerun these records, than manually append this dataset to the good records dataset below to add them back in
 
 roxie_output_layout flatten(soapResults le, inputDataSeq ri) :=	TRANSFORM
   SELF.acctno := (string)ri.AccountNumber;
@@ -254,7 +254,7 @@ roxie_output_layout flatten(soapResults le, inputDataSeq ri) :=	TRANSFORM
 	self := le;
 END;
 
-//This takes the records that were successfully processed and transforms them into a flat layout.	
+//This takes the records that were returned from the SOAP call and transforms them into a flat layout.	
 good_records := JOIN (soapResults, inputDataSeq, LEFT.result.inputecho.seq = (string)RIGHT.in_seq, flatten(LEFT,RIGHT));
 output(choosen(good_records, eyeball), named('good_records'));
 output(good_records,,outfile_name, CSV(heading(single), quote('"')));
