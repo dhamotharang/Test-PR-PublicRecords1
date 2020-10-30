@@ -235,6 +235,7 @@ export Build_all_V2(pVersion, pUseProd, gcid, pLexidThreshold, pHistMode, gcid_n
 
 	export step1 := sequential(
 			check_supers
+			// orbit has been fixed but needs to be tested end to end again
 			// ,if(pOrbEnv = 'QA', ChangeRecdItemStatusSprayedQA, ChangeRecdItemStatusSprayedPROD)
 			// ,if(pOrbEnv = 'QA', CreateNewBuildQA, CreateNewBuildPROD)
 			// ,AddComponent			
