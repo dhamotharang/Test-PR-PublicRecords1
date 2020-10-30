@@ -1,6 +1,6 @@
 ﻿//Compile all keys in this package in one place
 //easy to output this module to see if keys exist/are correct layout/etc
-import BizLinkFull,tools,BIPV2_Segmentation,BIPV2_Suppression,BIPV2_Best,BIPV2_Build;
+import BizLinkFull,tools,BIPV2_Segmentation,BIPV2_Suppression,BIPV2_Best,BIPV2_Build,BIPV2_Company_Names;
 
 EXPORT AlphaProdKeys_Package(
 
@@ -25,6 +25,7 @@ module
 
   
   //key definitions
+  export strnbr                         := BIPV2_Company_Names.files.StrNbr_SF_DS;  //file, not key, but it is in the package file
   export Xlinkmeow                      := tools.macf_FilesIndex('BizLinkFull.Process_Biz_Layouts.Key            ' ,bizknames.meow                    );  
   export Xlinkrefs_l_cnpname            := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CNPNAME.Key          ' ,bizknames.refs_l_cnpname          );  
   export Xlinkrefs_l_cnpname_slim       := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CNPNAME.SlimKey      ' ,bizknames.refs_l_cnpname_slim     );  
@@ -53,9 +54,10 @@ module
   export Xlinkrefs_l_sic                := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_SIC.Key              ' ,bizknames.refs_l_sic              );  
   
   export seg_linkids                    := tools.macf_FilesIndex('BIPV2_Segmentation.Key_LinkIds().key           ' ,segnames.seg_linkids              );  
-  export seleprox_suppress              := BIPV2_Suppression.modSuppression.kSeleProx(pversion);  
+  export seleprox_suppress              := BIPV2_Suppression.modSuppression.kSeleProx(pversionSuppress);  
   export best_linkids                   := tools.macf_FilesIndex('BIPV2_Best.Key_LinkIds.key                     ' ,bestknames.LinkIds                );
   export contact_title_linkids          := tools.macf_FilesIndex('BIPV2_Build.key_contact_title_linkids().key    ' ,knames.contact_title_linkids      );
+  export ZipCitySt                      := BIPV2_Build.keys     (pversion,puseotherenvironment).ZipCitySt               ;
   
   
                                                                                                                                                           
@@ -95,6 +97,8 @@ module
     ,if(pKey in [0 ,28] ,sequential(output(28 ,named('KeyNumber'),overwrite) ,output(choosen(seleprox_suppress                     ,100),named('seleprox_suppress'             ))))
     ,if(pKey in [0 ,29] ,sequential(output(29 ,named('KeyNumber'),overwrite) ,output(choosen(best_linkids                 .logical ,100),named('best_linkids'                  ))))
     ,if(pKey in [0 ,30] ,sequential(output(30 ,named('KeyNumber'),overwrite) ,output(choosen(contact_title_linkids        .logical ,100),named('contact_title_linkids'         ))))
+    ,if(pKey in [0 ,31] ,sequential(output(31 ,named('KeyNumber'),overwrite) ,output(choosen(strnbr                                ,100),named('strnbr'                        ))))
+    ,if(pKey in [0 ,32] ,sequential(output(32 ,named('KeyNumber'),overwrite) ,output(choosen(ZipCitySt                    .logical ,100),named('ZipCitySt'                     ))))
   );       
 
 end;
