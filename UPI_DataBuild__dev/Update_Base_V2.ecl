@@ -109,13 +109,15 @@ EXPORT Update_Base_V2 (
 				trim(stringlib.stringtouppercase(right.input_last_name),left,right) 							AND
 				if(left.input_suffix <> '' and right.input_suffix <> '',
 					trim(stringlib.stringtouppercase(left.input_suffix),left,right) 							=
-					trim(stringlib.stringtouppercase(right.input_suffix),left,right),true) 							AND
+					trim(stringlib.stringtouppercase(right.input_suffix),left,right),true),// 							AND
 				// trim(stringlib.stringtouppercase(left.input_full_name),left,right) 							=
 				// trim(stringlib.stringtouppercase(right.input_full_name),left,right) 						AND
-				trim(stringlib.stringtouppercase(left.input_guardian_first_name),left,right) 						=
-				trim(stringlib.stringtouppercase(right.input_guardian_first_name),left,right) 						AND
-				trim(stringlib.stringtouppercase(left.input_guardian_last_name),left,right) 							=
-				trim(stringlib.stringtouppercase(right.input_guardian_last_name),left,right),
+				// if(left.input_guardian_first_name <> '' and right.input_guardian_first_name <> '',
+					// trim(stringlib.stringtouppercase(left.input_guardian_first_name),left,right) 							=
+					// trim(stringlib.stringtouppercase(right.input_guardian_first_name),left,right),true) 							AND
+				// if(left.input_guardian_last_name <> '' and right.input_guardian_last_name <> '',
+					// trim(stringlib.stringtouppercase(left.input_guardian_last_name),left,right) 							=
+					// trim(stringlib.stringtouppercase(right.input_guardian_last_name),left,right),true),
 			true, false);
 
 		RETURN match_flag;
@@ -149,13 +151,13 @@ EXPORT Update_Base_V2 (
 	
 		match_flag := IF(
 				trim(left.input_dob, all) = trim(right.input_dob, all)										AND	
-				trim(left.input_guardian_dob, all) = trim(right.input_guardian_dob, all)										AND	
+				// trim(left.input_guardian_dob, all) = trim(right.input_guardian_dob, all)										AND	
 				trim(stringlib.stringtouppercase(left.input_gender),left,right)						=
 				trim(stringlib.stringtouppercase(right.input_gender),left,right)						AND
 				trim(stringlib.stringtouppercase(left.input_ssn),left,right)						=
 				trim(stringlib.stringtouppercase(right.input_ssn),left,right)						AND
-				trim(stringlib.stringtouppercase(left.input_guardian_ssn),left,right)				=
-				trim(stringlib.stringtouppercase(right.input_guardian_ssn),left,right)			AND
+				// trim(stringlib.stringtouppercase(left.input_guardian_ssn),left,right)				=
+				// trim(stringlib.stringtouppercase(right.input_guardian_ssn),left,right)			AND
 				left.rid				= right.rid AND
 				left.nomatch_id	= right.nomatch_id,
 				// left.member_id					=	right.member_id				AND
@@ -181,13 +183,13 @@ EXPORT Update_Base_V2 (
 	
 		match_flag := IF(
 				trim(left.input_dob, all) = trim(right.input_dob, all)										AND	
-				trim(left.input_guardian_dob, all) = trim(right.input_guardian_dob, all)										AND	
+				// trim(left.input_guardian_dob, all) = trim(right.input_guardian_dob, all)										AND	
 				trim(stringlib.stringtouppercase(left.input_gender),left,right)						=
 				trim(stringlib.stringtouppercase(right.input_gender),left,right)						AND
 				trim(stringlib.stringtouppercase(left.input_ssn),left,right)						=
-				trim(stringlib.stringtouppercase(right.input_ssn),left,right)						AND
-				trim(stringlib.stringtouppercase(left.input_guardian_ssn),left,right)				=
-				trim(stringlib.stringtouppercase(right.input_guardian_ssn),left,right),//			AND
+				trim(stringlib.stringtouppercase(right.input_ssn),left,right),					//	AND
+				// trim(stringlib.stringtouppercase(left.input_guardian_ssn),left,right)				=
+				// trim(stringlib.stringtouppercase(right.input_guardian_ssn),left,right),//			AND
 				// left.rid				= right.rid AND
 				// left.nomatch_id	= right.nomatch_id,
 				// left.member_id					=	right.member_id				AND
