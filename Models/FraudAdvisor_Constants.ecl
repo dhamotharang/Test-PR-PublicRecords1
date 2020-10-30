@@ -35,7 +35,8 @@ EXPORT bill_to_ship_to_models := ['fp1409_2', 'fp1509_2'];
 EXPORT Paro_models := ['msn1803_1', 'rsn804_1'];	
 
 //Set of Fraud Intelligence models (IDA combined models)
-EXPORT IDA_models_set := ['fibn12010_0'];																	 
+EXPORT IDA_models_set := ['fibn12010_0'];	
+EXPORT IDA_services := ['idareport', 'idareport_uat','idareport_retro'];															 															 
 																		 
 //The ‘custom_models’ set are all possible models and so add any new model name to this set.  
 //The model requested must be in this set or the query will return an “Invalid model” error. 
