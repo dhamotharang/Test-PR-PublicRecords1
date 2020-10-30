@@ -1,6 +1,6 @@
 ﻿#workunit('name', 'RiskView_V5 with MLA');
 
-IMPORT IESP, Models, Risk_Indicators, RiskWise, RiskView, gateway;
+IMPORT IESP, Risk_Indicators, RiskWise, RiskView, gateway;
 
 eyeball := 25;
 recordsToRun := 25; // Set to 0 or -1 to run ALL records in the file
@@ -79,71 +79,79 @@ END;
 
 soapLayout intoSOAP(inputDataSeq le, UNSIGNED4 c) := TRANSFORM
 	self.filterLiens := false;  
+
+// u := Dataset([TRANSFORM(iesp.share.t_User,
+            // SELF.AccountNumber := le.accountnumber;
+            // SELF.DLPurpose := DPPA;
+            // SELF.GLBPurpose := GLBA;
+            // SELF.DataRestrictionMask := dataRestrictionMask_val;
+            // SELF.DataPermissionMask := dataPermissionMask_val;
+            // SELF := [])]);
 	
-	name := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Name,
+	name :=   DATASET([TRANSFORM(iesp.share.t_Name,
 						SELF.First := le.FirstName;
 						SELF.Middle := le.MiddleName;
 						SELF.Last := le.LastName;
-						SELF := []))[1];
-	address := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Address,
+						SELF := [])]);
+	address := DATASET([TRANSFORM(iesp.share.t_Address,
 						SELF.StreetAddress1 := le.StreetAddress;
 						SELF.City := le.City;
 						SELF.State := le.State;
 						SELF.Zip5 := le.Zip;
-						SELF := []))[1];
-	dob := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_Date,
+						SELF := [])]);
+	dob :=    DATASET([TRANSFORM(iesp.share.t_Date,
 						SELF.Year := (integer)le.DateOfBirth[1..4];
 						SELF.Month := (integer)le.DateOfBirth[5..6];
 						SELF.Day := (integer)le.DateOfBirth[7..8];
-						SELF := []))[1];
+						SELF := [])]);
 	
-	search := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(iesp.riskview2.t_RiskView2SearchBy,
+	search := DATASET([TRANSFORM(iesp.riskview2.t_RiskView2SearchBy,
 						// self.seq := le.AccountNumber;
 						self.seq := (string)le.in_seq;
-						SELF.Name := name;
-						SELF.Address := address;
-						SELF.DOB := dob;
+						SELF.Name := name[1];
+						SELF.Address := address[1];
+						SELF.DOB := dob[1];
 						SELF.SSN := le.SSN;
 						SELF.DriverLicenseNumber := le.DLNumber;
 						SELF.DriverLicenseState := le.DLState;
 						SELF.HomePhone := le.HomePhone;
 						SELF.WorkPhone := le.WorkPhone;
-						SELF := []));
+						SELF := [])]);
 	
-	models := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(iesp.riskview2.t_RiskView2Models,
+	models := DATASET([TRANSFORM(iesp.riskview2.t_RiskView2Models,
 						SELF.Names := IF(model1 <> '', DATASET([{model1}], iesp.share.t_StringArrayItem), DATASET([], iesp.share.t_StringArrayItem)) + 
 													IF(model2 <> '', DATASET([{model2}], iesp.share.t_StringArrayItem), DATASET([], iesp.share.t_StringArrayItem)) +
 													IF(model3 <> '', DATASET([{model3}], iesp.share.t_StringArrayItem), DATASET([], iesp.share.t_StringArrayItem)) +
 													IF(model4 <> '', DATASET([{model4}], iesp.share.t_StringArrayItem), DATASET([], iesp.share.t_StringArrayItem)) +
 													IF(model5 <> '', DATASET([{model5}], iesp.share.t_StringArrayItem), DATASET([], iesp.share.t_StringArrayItem));
 						SELF.ModelOptions := DATASET([], iesp.riskview_share.t_ModelOptionRV);
-						SELF := []));
-	option := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(iesp.riskview2.t_RiskView2Options,
+						SELF := [])]);
+	option := DATASET([TRANSFORM(iesp.riskview2.t_RiskView2Options,
 						SELF.IncludeModels := models[1];
 						SELF.AttributesVersionRequest := attributesVersion;
 						SELF.IncludeReport := FALSE; // Never request the Report
 						SELF.IntendedPurpose := intendedPurpose;
-						SELF := []));
+						SELF := [])]);
 	
-	users := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(iesp.share.t_User,
+	users := DATASET([TRANSFORM(iesp.share.t_User,
 						SELF.DataRestrictionMask := '';
 						SELF.AccountNumber := IF(le.AccountNumber <> '', le.AccountNumber, (STRING)c);
 						SELF.TestDataEnabled := FALSE;
 						SELF.OutcomeTrackingOptOut := TRUE;
-						SELF := []));
+						SELF := [])]);
             
-  TransactionContext := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(iesp.riskview2.t_Rv2TransactionContext,
+  TransactionContext := DATASET([TRANSFORM(iesp.riskview2.t_Rv2TransactionContext,
 						SELF.MLAGatewayInfo.CustomerNumber := '373ZB00142';
 						SELF.MLAGatewayInfo.SecurityCode := '37X';
 						SELF.MLAGatewayInfo.EndUserCompanyName := 'LEXISNEXID-DEV';
-						SELF := []));
+						SELF := [])]);
 	
-	SELF.RiskView2Request := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(iesp.riskview2.t_RiskView2Request, 
+	SELF.RiskView2Request := DATASET([TRANSFORM(iesp.riskview2.t_RiskView2Request, 
 						SELF.SearchBy := search[1];
 						SELF.TransactionContext := TransactionContext[1];
 						SELF.Options := option[1];
 						SELF.User := users[1];
-						SELF := []));
+						SELF := [])]);
 	
   SELF.historyDateTimeStamp := map(
        le.historydate in ['', '999999']           => '',                                // leave timestamp blank, query will populate it with the current date   	
@@ -154,8 +162,8 @@ soapLayout intoSOAP(inputDataSeq le, UNSIGNED4 c) := TRANSFORM
 	 );
   // self.HistoryDateTimeStamp := ''; // force timestamp to blank, query will populate it with the current date
 
-	GatewayFCRA := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := 'FCRA'; SELF.URL := 'http://certqavip.hpcc.risk.regn.net:9876'; SELF := []));
-	GatewayMLA  := PROJECT(Risk_Indicators.iid_constants.ds_Record, TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := 'EquifaxSTS'; SELF.URL := 'HTTPS://xmlrsk_prod_gw_roxie:g0h3%40t2x@espprodvip.risk.regn.net:8726/WsGatewayEx?ver_=1.95'; SELF := []));
+	GatewayFCRA := DATASET([TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := 'FCRA'; SELF.URL := 'http://certqavip.hpcc.risk.regn.net:9876'; SELF := [])]);
+	GatewayMLA  := DATASET([TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := 'EquifaxSTS'; SELF.URL := 'HTTPS://xmlrsk_prod_gw_roxie:g0h3%40t2x@espprodvip.risk.regn.net:8726/WsGatewayEx?ver_=1.95'; SELF := [])]);
 	SELF.Gateways := GatewayFCRA + GatewayMLA;
 END;
 
@@ -173,19 +181,17 @@ xlayout myFail(soapInput le) := TRANSFORM
 	SELF := [];
 END;
 
-soapResults_raw := SOAPCALL(soapInput, 
+soapResults := SOAPCALL(soapInput, 
 				FCRARoxieIP,
 				'RiskView.Search_Service', 
 				{soapInput}, 
 				DATASET(xlayout),
         RETRY(5), TIMEOUT(500),
-        // XPATH('riskview.search_serviceResponse/Results/Result/Dataset[@name=\'Results\']/Row'),
+        XPATH('*/Results/Result/Dataset[@name=\'Results\']/Row'),
 				PARALLEL(threads), onFail(myFail(LEFT)));
-OUTPUT(CHOOSEN(soapResults_raw, eyeball), NAMED('Sample_soapResults_raw'));
 
-soapResults := soapResults_raw(Result.inputEcho.seq<>'');  // filter out the intermediate logging rows from the response
-				
-OUTPUT(CHOOSEN(soapResults, eyeball), NAMED('Sample_SOAP_Results'));
+OUTPUT(CHOOSEN(soapResults, eyeball), NAMED('Sample_soapResults'));
+
 validResults := soapResults (errorcode = '');
 failedResults := soapResults (errorcode <> '');
 
