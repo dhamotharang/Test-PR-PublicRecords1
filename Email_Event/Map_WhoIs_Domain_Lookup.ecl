@@ -8,8 +8,6 @@ EXPORT Map_WhoIs_Domain_Lookup(STRING version) := FUNCTION
 	// Input file WhoIs Delta
 	ds_delta_in := WhoIs.files.base(current_rec);
 	
-	// fmtsin	:= ['%Y-%m-%d'];
-	// fmtout	:= '%Y%m%d';
 
 	// Transform WhoIs to domain lookup layout
 	dx_email.Layouts.i_Domain_lkp Xform_Delta(WhoIs.Layouts.base L) := TRANSFORM
@@ -17,20 +15,15 @@ EXPORT Map_WhoIs_Domain_Lookup(STRING version) := FUNCTION
 		SELF.domain_name := TRIM(ut.fn_KeepPrintableChars(tmpdomain_name),LEFT,RIGHT);
 	  SELF.create_date := '';
 	  SELF.expire_date := '';
-		// StdDatestamp		 := STD.Date.ConvertDateFormatMultiple(L.date_added,fmtsin,fmtout);
 	  SELF.date_first_seen := L.date_first_seen; //date_added
 	  SELF.date_last_seen  := L.date_last_seen; //date_added
 	  SELF.date_first_verified := thorlib.wuid()[2..9];
 	  SELF.date_last_verified  := thorlib.wuid()[2..9];
 		email_status := ut.CleanSpacesAndUpper(L.status);
 	
-
-
     active_pattern	:= '(ADDPERIOD|AUTORENEWPERIOD|OK|PENDINGRENEW|PENDINGTRANSFER|PENDINGUPDATE|REDEMPTIONPERIOD|'+
-'RENEWPERIOD|SERVERDELETEPROHIBITED|SERVERRENEWPROHIBITED|SERVERTRANSFERPROHIBITED|SERVERUPDATEPROHIBITED|'+
-'TRANSFERPERIOD|CLIENTDELETEPROHIBITED|CLIENTRENEWPROHIBITED|CLIENTTRANSFERPROHIBITED|CLIENTUPDATEPROHIBITED)';
-
-										
+                       'RENEWPERIOD|SERVERDELETEPROHIBITED|SERVERRENEWPROHIBITED|SERVERTRANSFERPROHIBITED|SERVERUPDATEPROHIBITED|'+
+                       'TRANSFERPERIOD|CLIENTDELETEPROHIBITED|CLIENTRENEWPROHIBITED|CLIENTTRANSFERPROHIBITED|CLIENTUPDATEPROHIBITED)';
 										
 		tmpDomain_status := MAP(email_status = '' => 'UNKNOWN',
 		                        REGEXFIND('PENDINGCREATE|PENDINGRESTORE', email_status) => 'UNKNOWN',
