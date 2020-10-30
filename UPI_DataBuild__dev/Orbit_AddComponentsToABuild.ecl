@@ -36,6 +36,7 @@ IMPORT UPI_DataBuild__dev.Orbit_TrackingPROD as configPROD;
 		END	;
 	// -
 	rRequest	:= 	RECORD
+		$.Orbit_Layouts.AdditionalNamespacesLayout;	
 		rLex				lexRequest									{	XPATH('lex:request'								)	}										;
 	END	;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
@@ -82,7 +83,7 @@ IMPORT UPI_DataBuild__dev.Orbit_TrackingPROD as configPROD;
 													,	rRequest
 													,	rResponse
 													,	XPATH(configQA.OrbitRR(sService)	)
-													,	NAMESPACE(configQA.Namespace_D)
+													,	NAMESPACE(configQA.Namespace)
 													,	LITERAL
 													,	SOAPACTION(configQA.SoapPath(sService))
 													, RETRY(2)
@@ -94,7 +95,7 @@ IMPORT UPI_DataBuild__dev.Orbit_TrackingPROD as configPROD;
 													,	rRequest
 													,	rResponse
 													,	XPATH(configPROD.OrbitRR(sService)	)
-													,	NAMESPACE(configPROD.Namespace_D)
+													,	NAMESPACE(configPROD.Namespace)
 													,	LITERAL
 													,	SOAPACTION(configPROD.SoapPath(sService))
 													, RETRY(2)

@@ -10,6 +10,7 @@ EXPORT Orbit_LoginPROD (		STRING UserName  = config.OrbitUser
 	STRING sService := 'LoginSBFE'	;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	rRequest	:= 	RECORD
+			$.Orbit_Layouts.AdditionalNamespacesLayout;	
 			STRING		OrbitDomain			{	XPATH('lex:orbitDomain'												)	}		:=	Domain				;
 			STRING 		OrbitUsername 	{	XPATH('lex:userName'													)	}		:=	UserName			;
 			STRING		OrbitPassword 	{	XPATH('lex:password'													)	}		:=	Password			;								
@@ -23,7 +24,7 @@ EXPORT Orbit_LoginPROD (		STRING UserName  = config.OrbitUser
 													,	sService
 													,	rRequest
 													,	rResponse
-													,	NAMESPACE(config.Namespace_A)
+													,	NAMESPACE(config.Namespace)
 													,	LITERAL
 													,	SOAPACTION(config.SoapPath(sService) )
 													, RETRY(2)
