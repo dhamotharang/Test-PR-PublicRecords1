@@ -146,6 +146,7 @@ EXPORT i_Domain_lkp := RECORD
 	STRING8	  date_first_verified;
 	STRING8	  date_last_verified;
 	STRING50	domain_status;
+	STRING2   source;
 	STRING10	verifies_account;
 	STRING8   process_date;
 	UNSIGNED  email_rec_key;
