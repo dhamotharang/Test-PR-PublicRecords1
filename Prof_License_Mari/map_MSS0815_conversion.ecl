@@ -289,7 +289,8 @@ rCounty_Names cnty(ds_MS_RealEstate L, county_names R) := TRANSFORM
 		TrimPhone_1             := StringLib.StringFilter(L.PHONE,'0123456789');
 		TrimPhone_Type_1        := MAP(ut.CleanSpacesAndUpper(L.PHONE_TYPE) = 'HOME'=> 'HOME PHONE',
 		                               ut.CleanSpacesAndUpper(L.PHONE_TYPE) = 'BUS'=> 'BUSINESS PHONE',
-																	                ut.CleanSpacesAndUpper(L.PHONE_TYPE) = 'CELL'=> 'CELL PHONE','');
+																	 ut.CleanSpacesAndUpper(L.PHONE_2_TYPE) = 'WORK'=> 'BUSINESS PHONE',
+																	 ut.CleanSpacesAndUpper(L.PHONE_TYPE) = 'CELL'=> 'CELL PHONE','');
 		SELF.PHN_MARI_1				  := IF(TrimPhone_1 = '0000000000', '', ut.CleanPhone(TrimPhone_1)); //Business Phone
 		SELF.PHN_PHONE_1        := SELF.PHN_MARI_1;
 		
@@ -297,6 +298,7 @@ rCounty_Names cnty(ds_MS_RealEstate L, county_names R) := TRANSFORM
 		TrimPhone_2             := StringLib.StringFilter(L.PHONE_2,'0123456789');
 		TrimPhone_Type_2        := MAP(ut.CleanSpacesAndUpper(L.PHONE_2_TYPE) = 'HOME'=> 'HOME PHONE',
 		                               ut.CleanSpacesAndUpper(L.PHONE_2_TYPE) = 'BUS'=> 'BUSINESS PHONE',
+																	 ut.CleanSpacesAndUpper(L.PHONE_2_TYPE) = 'WORK'=> 'BUSINESS PHONE',
 																	 ut.CleanSpacesAndUpper(L.PHONE_2_TYPE) = 'CELL'=> 'CELL PHONE','');
 		SELF.PHN_MARI_2				  := IF(TrimPhone_2 = '0000000000', '', ut.CleanPhone(TrimPhone_2)); //Business Phone
 		SELF.PHN_PHONE_2        := SELF.PHN_MARI_2;		
