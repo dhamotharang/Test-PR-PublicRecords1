@@ -1,4 +1,4 @@
-﻿// MNS0869 / Minnesotas Bookstore /	Real Estate // raw data to common layout for MARI and PL use
+﻿﻿// MNS0869 / Minnesotas Bookstore /	Real Estate // raw data to common layout for MARI and PL use
 #workunit('name','Yogurt: map_MNS0869_conversion'); 
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
 
@@ -363,7 +363,8 @@ EXPORT map_MNS0869_conversion(STRING pVersion) := FUNCTION
 		SELF.ADDR_STATE_1		  := IF(TRIM(clnAddrAddr1[115..116])<>'',TRIM(clnAddrAddr1[115..116]),trimState);
 		SELF.ADDR_ZIP5_1		  := IF(TRIM(clnAddrAddr1[117..121])<>'',TRIM(clnAddrAddr1[117..121]),tmpZip[1..5]);
 		SELF.ADDR_ZIP4_1		  := clnAddrAddr1[122..125];
-		SELF.addr_CNTY_1      := ut.CleanSpacesAndUpper(pInput.COUNTY);
+		trimCNTY							:= ut.CleanSpacesAndUpper(pInput.COUNTY);
+		SELF.addr_CNTY_1      := IF(trimCNTY='NULL','',trimCNTY);
 		SELF.ADDR_ADDR1_2			:= '';
 		SELF.ADDR_ADDR2_2			:= '';
 		SELF.ADDR_ADDR3_2			:= '';
