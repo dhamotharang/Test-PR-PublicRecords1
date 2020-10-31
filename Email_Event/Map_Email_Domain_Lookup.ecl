@@ -27,6 +27,7 @@ EXPORT Map_Email_Domain_Lookup := FUNCTION
 														'UNKNOWN');
 	  SELF.domain_status := tmpDomain_status;
 	  SELF.verifies_account := '';
+		SELF.source  := '';
 	  SELF.process_date  := thorlib.wuid()[2..9];
 	  SELF.email_rec_key := 0;
 	  SELF := L;

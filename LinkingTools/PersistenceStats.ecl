@@ -1,4 +1,4 @@
-/*
+﻿/*
 base_in := Base (or current) version of dataset
 father_in := Father (or previous) version of dataset
 rec_id := record id field in both datasets
@@ -9,8 +9,8 @@ EXPORT PersistenceStats(base,father,rec_id,cluster_id,output_name = '',pDoOutput
 	
 	#IF(#TEXT(output_name) <> '')local op_name := '_'+(STRING)output_name; #ELSE local op_name := ''; #END
 	
-	local base_ded := DEDUP(SORT(DISTRIBUTE(base,rec_id),rec_id,LOCAL),rec_id,LOCAL);
-	local father_ded := DEDUP(SORT(DISTRIBUTE(father,rec_id),rec_id,LOCAL),rec_id,LOCAL);
+	local base_ded := DEDUP(SORT(DISTRIBUTE(table(base  ,{rec_id,cluster_id}),rec_id),rec_id,LOCAL),rec_id,LOCAL);
+	local father_ded := DEDUP(SORT(DISTRIBUTE(table(father,{rec_id,cluster_id}),rec_id),rec_id,LOCAL),rec_id,LOCAL);
 
 	local cnt_new_recs_tot := COUNT(base_ded);
 	local cnt_old_recs_tot := COUNT(father_ded);

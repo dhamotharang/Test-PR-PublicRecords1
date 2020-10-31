@@ -1,4 +1,4 @@
-﻿import bipv2,bipv2_files,tools,bipv2_tools,wk_ut,std,mdr,BIPV2_Strata,strata, linkingtools;
+﻿import bipv2,bipv2_files,tools,bipv2_tools,wk_ut,std,mdr,BIPV2_Strata,strata, linkingtools,BIPV2_ForceLink;
 
 l_common  := BIPV2.CommonBase.Layout;
 l_base    := BIPV2_Files.files_lgid3.Layout_LGID3;
@@ -40,7 +40,11 @@ function
   END;
 		
   ds_init           := BIPV2_Tools.initParentID(ds_hrchy, proxid, lgid3);
-  preprocessResult  := PROJECT(ds_init,toBase(LEFT));	
+
+  // -- patch lgid3 underlinks outside of salt
+  ds_patch_Underlinks := BIPV2_ForceLink.mac_ForceLink_Lgid3 (ds_init);
+
+  preprocessResult  := PROJECT(ds_patch_Underlinks,toBase(LEFT));	
   
   kick_copy2_storage_thor  := BIPV2_Tools.Copy2_Storage_Thor('~' + nothor(std.file.superfilecontents(pFilename)[1].name) ,pversion ,'lgid3_preprocess');
   copy2StorageThor         := if(pCopy2StorageThor = true ,output(kick_copy2_storage_thor ,named('copy2_Storage_Thor__html')));  //copy orig file to storage thor
