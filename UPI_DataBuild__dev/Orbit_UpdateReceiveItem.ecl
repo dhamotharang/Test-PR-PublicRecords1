@@ -24,6 +24,7 @@
 	END	;
 	// -
 	rRequest	:= 	RECORD
+		$.Orbit_Layouts.AdditionalNamespacesLayout;		
 		rLex 				lexRequest										{	XPATH('lex:request'											)	}											;
 	END	;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
@@ -43,7 +44,7 @@
 													,	rRequest
 													,	rResponse
 													,	XPATH(configQA.OrbitRR(sService)	)
-													,	NAMESPACE(configQA.Namespace_D)
+													,	NAMESPACE(configQA.Namespace)
 													,	LITERAL
 													,	SOAPACTION(configQA.SoapPath(sService) )
 													, RETRY(2)
@@ -55,7 +56,7 @@
 													,	rRequest
 													,	rResponse
 													,	XPATH(configPROD.OrbitRR(sService)	)
-													,	NAMESPACE(configPROD.Namespace_D)
+													,	NAMESPACE(configPROD.Namespace)
 													,	LITERAL
 													,	SOAPACTION(configPROD.SoapPath(sService) )
 													, RETRY(2)

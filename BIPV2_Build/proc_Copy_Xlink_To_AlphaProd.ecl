@@ -22,7 +22,7 @@ functionmacro
   
   ecl_text :=   '#workunit(\'name\',\'BIPV2_Build.Copy_Xlink_to_Alpha_Prod @version@\');\n\n'
               + '#workunit(\'priority\',\'high\');\n'
-              + 'BIPV2_Build.Copy_Xlink_to_Alpha_Prod(\'' + trim(suppressversion) + '\'  ,\'@version@\',false,true,false,\'(bizlinkfull|segmentation_linkids|seleprox|bipv2_best|contact_title_linkids)\');'
+              + 'BIPV2_Build.Copy_Xlink_to_Alpha_Prod(\'' + trim(suppressversion) + '\'  ,\'@version@\',false,true,false,\'(bizlinkfull|segmentation_linkids|seleprox|bipv2_best|contact_title_linkids|zipcityst|strnbrname)\');'
               ;
                      
   import Workman,tools,BIPV2,BIPV2_Build;

@@ -45,7 +45,7 @@ functionmacro
   ds_mrktg_list_best_proxid  := Marketing_List.Best_From_BIP_Best_Proxid  (%ds_best%        ,%ds_base_best% ,pDebug ,pSampleProxids ,pCounty_Names                  );
   ds_mrktg_list_best_seleid  := Marketing_List.Best_From_BIP_Best_Seleid  (%ds_best%        ,%ds_base_best% ,pDebug ,pSampleProxids ,pCounty_Names  ,pPullFromBest  );
   
-  ds_both_best := join(ds_mrktg_list_best_proxid  ,ds_mrktg_list_best_seleid ,left.seleid = right.seleid ,transform(Marketing_List.Layouts.business_information_prep2
+  ds_both_best := join(ds_mrktg_list_best_proxid  ,ds_mrktg_list_best_seleid ,left.seleid = right.seleid ,transform(Marketing_List.Layouts.business_information
 
     ,proxid_level_address := Address.Addr1FromComponents(left.prim_range  ,left.predir  ,left.prim_name   ,left.addr_suffix   ,left.postdir   ,left.unit_desig  ,left.sec_range )  ;
      seleid_level_address := Address.Addr1FromComponents(right.prim_range ,right.predir ,right.prim_name  ,right.addr_suffix  ,right.postdir  ,right.unit_desig ,right.sec_range)  ;
@@ -168,12 +168,7 @@ functionmacro
     ,Marketing_List.Validate_Address(seleid_level.business_address,seleid_level.city,seleid_level.state,seleid_level.zip5)
   );
 
-  #IF(Marketing_List._Config().Add_Extra_Source_Fields = true)
-    ds_return_result := project(ds_return_result_validate_address ,Marketing_List.Layouts.business_information_prep2);
-  #ELSE
-    ds_return_result := project(ds_return_result_validate_address ,Marketing_List.Layouts.business_information      );  
-  #END
-  
+  ds_return_result := project(ds_return_result_validate_address ,Marketing_List.Layouts.business_information);  
   
   ds_filtered_out_recs := join(ds_return_result_biz ,ds_return_result ,left.proxid = right.proxid ,transform(left)  ,left only,hash);
 
