@@ -1,6 +1,6 @@
 ﻿#workunit('name', 'RiskView_V5 with MLA');
 
-IMPORT IESP, Risk_Indicators, RiskWise, RiskView, gateway;
+IMPORT IESP, RiskWise, RiskView, gateway;
 
 eyeball := 25;
 recordsToRun := 25; // Set to 0 or -1 to run ALL records in the file
