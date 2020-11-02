@@ -1,4 +1,4 @@
-﻿﻿IMPORT email_data, dx_email, ut, STD;
+﻿﻿﻿IMPORT email_data, dx_email, ut, STD, MDR;
 
 EXPORT Map_BV_Delta_Domain_Lookup(STRING version) := FUNCTION
 
@@ -34,6 +34,7 @@ EXPORT Map_BV_Delta_Domain_Lookup(STRING version) := FUNCTION
 														'UNKNOWN'); 
 	  SELF.domain_status := tmpDomain_status;
 	  SELF.verifies_account := IF(email_status = 'ACCEPT_ALL','FALSE', '');
+		SELF.source  := MDR.sourceTools.src_BrightVerify_email;
 	  SELF.process_date  := thorlib.wuid()[2..9];
 	  SELF.email_rec_key := 0;
 	  SELF := L;
