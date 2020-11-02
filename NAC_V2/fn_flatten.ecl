@@ -2,7 +2,7 @@
 
 	string uc(string s) := Std.Str.ToUpperCase(s);
   string fix(string s) := Std.Str.CleanSpaces(uc(Std.Str.FindReplace(s,'.',' ')));
-	rgxSfx := '^([A-Z]+)[, ]+(JR|SR|III)';
+	rgxSfx := '^([A-Z]+)[, ]+(JR|SR|III|IV)';
 
 // convert lower case to upper case
 EXPORT fn_flatten(dataset(Nac_v2.Layouts.base) base1) := FUNCTION
