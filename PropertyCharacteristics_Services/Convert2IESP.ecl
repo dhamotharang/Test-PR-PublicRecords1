@@ -92,7 +92,7 @@ module
 			                                          valid_account												=>	'4',
 																								pInMod.ReportType	not in	['I','K','P']	=>	'7',
 																								insufficient_address								=>	'5',
-																								pLNPropResultsExists AND IsOptedOut =>	'9',
+																								pLNPropResultsExists AND IsOptedOut =>	'6',
 																								pLNPropResultsExists								=>	'1',
 																								'2'
 																							);
