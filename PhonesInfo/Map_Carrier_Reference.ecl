@@ -1,12 +1,12 @@
 ﻿#OPTION('multiplePersistInstances',FALSE);
-
 IMPORT aid, aid_support, dx_phonesinfo, std, ut;
+
+//DF-28036: Convert 6-Digit Spids to 4-Character Spids
 
 /*
 	REGULAR BUILD PROCESS:
 	======================
-	STEP 1: Join the cleaned results to the latest comp_code base file (is_current = TRUE and filter countries) by ocn and operator full name.  
-					Matched records will have the spid, operator_fullname, and code (data_type) dervived from the comp_code file.
+	STEP 1: Remap cleaned results to prep layout.
 	STEP 2: Join the carrier records (override_type='A') to the contact records (override_type='B') by ocn.  
 					Matched current (is_current=TRUE) records will use the city/state values from the carrier file.
 	STEP 3: Concat the carrier, contact, and other record results together.
@@ -29,42 +29,20 @@ EXPORT Map_Carrier_Reference(string version) := FUNCTION
 		
 		//Pull Lerg1Prep Clean Address Results
 		cleanAddr					:= PhonesInfo.File_Lerg.Lerg1PrepClean;
-		srtCleanAddr			:= sort(distribute(cleanAddr, hash(ocn, name)), ocn, name, local);	
-		
-		//Pull Records Only From Canada & US States/Territories in the Comp_Code File
-		//Clean Up OCN/Name Fields for Join
-		dsCC							:= project(PhonesInfo.File_Comp_Code.Main((country in ['CA','AS','FM','GU','MH','MP','PR','PW','US','VI']) and is_current = TRUE),
-																transform(PhonesInfo.Layout_Comp_Code.CompCode_temp,
-																self.ocn		:= PhonesInfo._Functions.fn_standardName(left.ocn);
-																self.name  	:= PhonesInfo._Functions.fn_standardName(left.name);
-																self 				:= left));
-																
-		srtCC							:= sort(distribute(dsCC, hash(ocn, name)), ocn, name, local);
-		
-		//Combine LergComb + Comp_Code Mapping; Force Non-US Carriers to be Incomplete
-		PhonesInfo.Layout_Lerg.LergPrep combTr(srtCleanAddr l, srtCC r):= transform
+			
+		//Combine LergComb
+		PhonesInfo.Layout_Lerg.LergPrep combTr(cleanAddr l):= transform
 			self.dt_first_reported			:= version;
 			self.dt_last_reported				:= version;
 			self.dt_end									:= if(l.dt_end='', '0', l.dt_end);		
-			//Append OCN/Spid Information////////////////////////////////////////////////////////////////
-			self.ocn										:= PhonesInfo._Functions.fn_standardName(if(r.ocn<>'', r.ocn, l.ocn));
-			self.spid										:= r.spid;
-			self.operator_full_name			:= r.operator_fullname;
-			self.opname									:= PhonesInfo._Functions.fn_standardName(r.operator_fullname);
-			self.data_type							:= r.code;
-			self.country								:= if(r.country<>'', r.country, l.country);
-	    //////////////////////////////////////////////////////////////////////////////////////////// 
+			self.ocn										:= PhonesInfo._Functions.fn_standardName(l.ocn);	
+			self.name										:= PhonesInfo._Functions.fn_standardName(l.name);
 			self.is_current							:= TRUE;
 			self.rec_update							:= '';
 			self 												:= l;
 		end;
 
-		joinComb 					:= join(srtCleanAddr, srtCC,
-															left.ocn = right.ocn and
-															left.name = right.name,
-															combTr(left, right), left outer, local);
-		
-		ddAddSPID					:= dedup(sort(distributed(joinComb, hash(ocn)), record, local), record, local);
+		updLergPrep				:= project(cleanAddr, combTr(left));
 		
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//STEP 2: POPULATE SPECIFIC CARRIER INFO FIELDS TO THE CONTACT FILE////////////////////////////////////////
@@ -76,9 +54,9 @@ EXPORT Map_Carrier_Reference(string version) := FUNCTION
 				//A = Carrier Record
 				//B = Contact Record
 			
-		srtCarrier 				:= sort(distribute(ddAddSPID(override_file='A'), hash(ocn)), ocn, local);		//Carrier Records - Lerg1 File
-		srtContact				:= sort(distribute(ddAddSPID(override_file='B'), hash(ocn)), ocn, local);		//Contact Records - Lerg1Con
-		dsOther						:= ddAddSPID(override_file not in ['A','B']);																//Previous Carrier Reference Records																															
+		srtCarrier 				:= sort(distribute(updLergPrep(override_file='A'), hash(ocn)), ocn, local);		//Carrier Records - Lerg1 File
+		srtContact				:= sort(distribute(updLergPrep(override_file='B'), hash(ocn)), ocn, local);		//Contact Records - Lerg1Con
+		dsOther						:= updLergPrep(override_file not in ['A','B']);																//Previous Carrier Reference Records																															
 		
 		PhonesInfo.Layout_Lerg.LergPrep addCarrInfo(srtContact l, srtCarrier r):= transform
 			self.data_type							:= l.data_type;
@@ -100,14 +78,12 @@ EXPORT Map_Carrier_Reference(string version) := FUNCTION
 	
 		//Combine Lerg Files + Existing Carrier Reference Tables
 		appRec						:= srtCarrier + ddUpdContact + dsOther;		
-		srtComb						:= sort(distribute(appRec, hash(ocn, spid, opname)), ocn, spid, opname, override_file, local);	
+		srtComb						:= sort(distribute(appRec, hash(ocn, name)), ocn, name, override_file, local);	
 		
 		//Reformat Existing Carrier Reference to Lerg Prep Layout	
 		PhonesInfo.Layout_Lerg.LergPrep addF2(dx_PhonesInfo.Layouts.sourceRefBase l):= transform
 		  self.ocn										:= PhonesInfo._Functions.fn_standardName(l.ocn);
 			self.name										:= PhonesInfo._Functions.fn_standardName(l.name);
-			self.spid										:= PhonesInfo._Functions.fn_standardName(l.spid);
-			self.opname 								:= PhonesInfo._Functions.fn_standardName(l.operator_full_name);
 			self.is_new									:= '';
 			self.rec_update							:= '';
 			self.address1								:= '';
@@ -117,11 +93,14 @@ EXPORT Map_Carrier_Reference(string version) := FUNCTION
 																			if(PhonesInfo._Functions.fn_isCanTerr(l.ocn_state),
 																				'CA',
 																				l.ocn_state));
+			self.opname									:= PhonesInfo._Functions.fn_standardName(l.name);
 			self 												:= l;
 		end;
 			
-		carrRef						:= project(PhonesInfo.File_Source_Reference.Main(is_current=TRUE and override_file <>'Y'), addF2(left)); 
-		dsCarrRef					:= sort(distribute(carrRef, hash(ocn, spid, name)), ocn, spid, name, serv, line, local); //Active Carrier Reference Records
+		carrR							:= project(PhonesInfo.File_Source_Reference.Main, addF2(left)); 
+		carrRef						:= carrR(is_current=TRUE and override_file <>'Y'); 	
+		
+		dsCarrRef					:= sort(distribute(carrRef, hash(ocn, name)), ocn, name, serv, line, local); //Active Carrier Reference Records
 		
 		//Append Reference Table Info (Excluding Overrides) to CURRENT Records
 		
@@ -152,102 +131,39 @@ EXPORT Map_Carrier_Reference(string version) := FUNCTION
 		
 		joinCurr 					:= join(srtComb, dsCarrRef,
 															left.ocn = right.ocn and
-															left.spid = right.spid and
-															left.opname = right.name,
+															left.name = right.name,
 															combRefTr(left, right), left outer, local);
 		
 		//Separate Current Records by Complete and Incomplete Results
 		currComp					:= joinCurr(serv<>'' and line<>'');
 		currIncomp				:= joinCurr(serv='' and line='');
-		
-		//////////////////////////////////////////////////////////////////////////////
-		//Match by Operator Name//////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////
-		srtCurrIncomp			:= sort(distribute(currIncomp, hash(ocn, spid, opname)), ocn, spid, opname, serv, line, override_file, local); 
-		srtCarrRef				:= dedup(sort(distribute(carrRef, hash(ocn, spid, opname)), ocn, spid, opname, serv, line, override_file, -dt_last_reported, local), ocn, spid, opname, serv, line, override_file, local); //Keep Latest Carrier Reference Record For Append
-			
-		//Append Reference Table Info (Excluding Overrides) to CURRENT Records
-		PhonesInfo.Layout_Lerg.LergPrep combRefTr2(PhonesInfo.Layout_Lerg.LergPrep l, PhonesInfo.Layout_Lerg.LergPrep r):= transform
-			self.ocn 										:= if(trim(l.ocn, left, right)<>'', l.ocn, r.ocn);	
-			self.name										:= PhonesInfo._Functions.fn_standardName(if(l.name<>'', l.name, r.name));
-			self.dt_first_reported 			:= if(l.opname = r.name,
-																				(string)ut.min2((unsigned)l.dt_first_reported,(unsigned)r.dt_first_reported),
-																				l.dt_first_reported);
-			self.dt_last_reported				:= if(l.opname = r.name,
-																				(string)MAX((unsigned)l.dt_last_reported,(unsigned)r.dt_last_reported),
-																				l.dt_last_reported);
-			self.dt_start								:= if(l.opname = r.name,
-																				(string)ut.min2((unsigned)l.dt_start,(unsigned)r.dt_start),
-																				l.dt_start);
-			self.dt_end									:= if(l.opname = r.name,
-																				(string)MAX((unsigned)l.dt_end,(unsigned)r.dt_end),
-																				l.dt_end);
-			//Use Original Carrier Reference Values
-			self.serv										:= if(l.serv<>'', l.serv, r.serv);												
-			self.line										:= if(l.line<>'', l.line, r.line);												
-			self.is_new									:= if(r.serv='' or r.line='', 'Y', '');								//Records With Missing Serv/Line Types are Flagged "New"
-			self.prepaid								:= if(l.prepaid not in ['','0'], l.prepaid, r.prepaid);	
-			self.high_risk_indicator		:= if(l.high_risk_indicator not in ['','0'], l.high_risk_indicator, r.high_risk_indicator); 
-			self.activation_dt					:= r.activation_dt;
-			self.number_in_service			:= r.number_in_service;
-			////////////////////////////////////////////////////////////////////////////////////////////
-			self.spid										:= if(l.spid<>'', l.spid, r.spid);
-			self.operator_full_name			:= l.operator_full_name;
-			self.is_current							:= l.is_current;
-			self												:= l;
-		end;
-		
-		joinCurr2 				:= join(srtCurrIncomp, srtCarrRef,
-															left.ocn = right.ocn and
-															left.spid = right.spid and
-															left.opname = right.opname,
-															combRefTr2(left, right), left outer, local);
-														
-		//Separate Current Records by Complete and Incomplete Results
-		currComp2					:= joinCurr2(serv<>'' and line<>'');
-		currIncomp2				:= joinCurr2(serv='' and line='');
 														
 		//////////////////////////////////////////////////////////////////////////////												
-		//Match by OCN & SPID/////////////////////////////////////////////////////////
+		//Match by OCN////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////////	
 		
-		srtCurrIncomp3		:= sort(distribute(currIncomp2, hash(ocn, spid)), ocn, spid, serv, line, local); 
-		srtCarrRef3				:= dedup(sort(distribute(carrRef, hash(ocn, spid)), ocn, spid, serv, line, -dt_last_reported, local), ocn, spid, serv, line, local); //Keep Latest Carrier Reference Record For Append
+		srtCurrIncomp2		:= sort(distribute(currIncomp, hash(ocn)), ocn, serv, line, local); 
+		srtCarrRef2				:= dedup(sort(distribute(carrRef, hash(ocn)), ocn, serv, line, -dt_last_reported, local), ocn, serv, line, local); //Keep Latest Carrier Reference Record For Append
 		
-		joinCurr3 				:= join(srtCurrIncomp3, srtCarrRef3,
-															left.ocn = right.ocn and
-															left.spid = right.spid,
-															combRefTr2(left, right), left outer, local);
-															
+		joinCurr2 				:= join(srtCurrIncomp2, srtCarrRef2,
+															left.ocn = right.ocn,
+															combRefTr(left, right), left outer, local);
+											
 		//Concat CURRENT Results
-		concatCurr				:= currComp + joinCurr2 + joinCurr3;
-		currRec						:= dedup(sort(distribute(concatCurr, hash(ocn, spid, opname)), ocn, spid, opname, serv, line, local), record, local);			
+		concatCurr				:= currComp + joinCurr2;
+		currRec						:= dedup(sort(distribute(concatCurr, hash(ocn, name)), ocn, name, serv, line, local), record, local);			
 		
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//STEP 5: SPLIT RECORDS BY CURRENT/NONCURRENT & COMPLETE/INCOMPLETE////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-		//Find CURRENT + Exception Records 
-		exceptList				:= project(PhonesInfo.File_Source_Reference.MainException(is_current=TRUE),
-																	transform({PhonesInfo.Layout_Lerg.LergPrep},
-																						self.ocn 				:= PhonesInfo._Functions.fn_standardName(left.ocn);
-																						self.name 			:= PhonesInfo._Functions.fn_standardName(left.name);
-																						self.spid				:= PhonesInfo._Functions.fn_standardName(left.spid);
-																						self.address1 	:= '';
-																						self.address2 	:= '';
-																						self.opname 		:= '';
-																						self.country 		:= '';
-																						self.is_new 		:= '';
-																						self.rec_update := '';																				
-																						self						:= left))(~(serv='' or line='' or spid=''));	//COMPLETE Exception List																		
-		
+				
 		currCompRec				:= currRec(~(serv='' or line='' or spid=''));																				//COMPLETE Current Records
 		currIncompRec			:= currRec(serv='' or line='' or spid='' or is_new='Y');														//INCOMPLETE or New Current Records
 		
-		srtCurrCompRec		:= sort(distribute(currCompRec + exceptList, hash(ocn, spid, name)), ocn, spid, name, opname, serv, line, local);
+		srtCurrCompRec		:= sort(distribute(currCompRec, hash(ocn, name)), ocn, name, serv, line, local);
 		
 		//Find NONCURRENT Records
-		PhonesInfo.Layout_Lerg.LergPrep combRefTr3(PhonesInfo.Layout_Lerg.LergPrep l, PhonesInfo.Layout_Lerg.LergPrep r):= transform
+		PhonesInfo.Layout_Lerg.LergPrep combRefTr2(PhonesInfo.Layout_Lerg.LergPrep l, PhonesInfo.Layout_Lerg.LergPrep r):= transform
 			self.dt_end									:= if(PhonesInfo._Functions.fn_maxHistFileDt(trim(r.override_file, left, right))<>'',
 																				PhonesInfo._Functions.fn_maxHistFileDt(trim(r.override_file, left, right)),
 																				version);	//Set dt_end to last filedate (Lerg1 or Lerg1ConOverride)
@@ -259,14 +175,12 @@ EXPORT Map_Carrier_Reference(string version) := FUNCTION
 		//Find NONCURRENT Records by Operator Name				
 		joinNonCurr 			:= join(srtCurrCompRec, dsCarrRef,
 															left.ocn = right.ocn and
-															left.spid = right.spid and
-															(left.opname = right.name or
-															left.name = right.name) and
+															left.name = right.name and
 															left.serv = right.serv and
 															left.line = right.line,
-															combRefTr3(left, right), right only, local);		
+															combRefTr2(left, right), right only, local);		
 		
-		nonCurrRec				:= dedup(sort(distributed(joinNonCurr + carrRef(is_current=FALSE), hash(ocn, spid, name, carrier_address1, contact_function)), record, local), record, local); //NonActive Carrier Reference Records
+		nonCurrRec				:= dedup(sort(distributed(joinNonCurr + carrR(is_current=FALSE), hash(ocn, spid, name, carrier_address1, contact_function)), record, local), record, local); //NonActive Carrier Reference Records
 		
 		nonCurrCompRec		:= nonCurrRec(~(serv='' or line='' or spid=''));	//COMPLETE NonCurrent Records		
 		nonCurrIncompRec	:= nonCurrRec(serv='' or line='' or spid='');			//INCOMPLETE NonCurrent Records
@@ -276,7 +190,7 @@ EXPORT Map_Carrier_Reference(string version) := FUNCTION
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		//Pull COMPLETE CURRENT/NONCURRENT Records for Base 
-		concatAll 				:= project(currCompRec + nonCurrCompRec + exceptList, dx_PhonesInfo.Layouts.sourceRefBase);
+		concatAll 				:= project(currCompRec + nonCurrCompRec, dx_PhonesInfo.Layouts.sourceRefBase);
 		ddConcatAll				:= dedup(sort(distribute(concatAll, hash(ocn, spid, name)), record, local), record, local);	
 		
 		//Pull INCOMPLETE/MISSING New Records for Review 

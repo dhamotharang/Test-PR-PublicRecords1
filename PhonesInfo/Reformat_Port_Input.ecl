@@ -1,6 +1,7 @@
 ﻿#OPTION('multiplePersistInstances',FALSE);
-
 IMPORT Std;
+
+//DF-28036: Convert 6-Digit Spids to 4-Character Spids
 	
 	tempLayout := record
 		PhonesInfo.Layout_iConectiv.Intermediate;
@@ -41,7 +42,23 @@ IMPORT Std;
 		self 													:= l;
 	end;
 
-	iConectivInput 	:= project(dailyICInput, fixICFile(left, counter));
+	iConectivIn 		:= project(dailyICInput, fixICFile(left, counter));
+	
+	//Append OCN
+	srtCRef 				:= sort(distribute(PhonesInfo.File_Source_Reference.Main_Orig(is_current=TRUE), hash(spid)), spid, local);
+	srtTInput				:= sort(distribute(iConectivIn, hash(spid)), spid, local);
+	
+	tempLayout addOCNTr(srtTInput l, srtCRef r):= transform
+		self.ocn 											:= r.ocn;
+		self.spid											:= r.ocn; //Equate SPID to OCN
+		self 													:= l;
+	end;
+	
+	addTOCN 				:= join(srtTInput, srtCRef,
+													left.spid = right.spid,
+													addOCNTr(left, right), left outer, local, keep(1));
+	
+	iConectivInput	:= dedup(sort(distribute(addTOCN, hash(phone)), record, local), record, local);
 	
 ////////////////////////////////////////////////////////////////////////////////////////////	
 //Reformat Telo Input File//////////////////////////////////////////////////////////////////
@@ -79,8 +96,7 @@ IMPORT Std;
 																				l.operation);
 		self.country_code							:= ''; 
 		self.phone										:= (string)l.tn;		
-		self.dial_type								:= '';		
-		self.spid											:= '';					
+		self.dial_type								:= '';						
 		self.service_type							:= '';	
 		self.routing_code							:= (string)l.lrn;	
 		self.porting_dt								:= f_port_dt;	
@@ -95,25 +111,11 @@ IMPORT Std;
 		self.remove_port_dt						:= if(l.operation='D', f_port_dt, '');
 		self.groupid 									:= c;
 		self.ocn 											:= l.spid;
+		self.spid											:= l.spid;
 		self.uniqueid									:= l.uniqueid;
 	end;
 
-	inputTelo 			:= project(concatDailyTelo, fixTeloFile(left, counter));
-	
-	//Append Spid
-	srtCRef 				:= sort(distribute(PhonesInfo.File_Source_Reference.Main, hash(ocn)), ocn, local);
-	srtTInput				:= sort(distribute(inputTelo, hash(ocn)), ocn, local);
-	
-	tempLayout addSpidTr(srtTInput l, srtCRef r):= transform
-		self.spid 										:= r.spid;	
-		self 													:= l;
-	end;
-	
-	addTSPID 				:= join(srtTInput, srtCRef,
-													left.ocn = right.ocn,
-													addSpidTr(left, right), left outer, local, keep(1));
-	
-	teloInput				:= dedup(sort(distribute(addTSPID, hash(phone)), record, local), record, local);
+	teloInput 			:= project(concatDailyTelo, fixTeloFile(left, counter));
 	
 ////////////////////////////////////////////////////////////////////////////////////////////	
 //Concat Input Files////////////////////////////////////////////////////////////////////////
