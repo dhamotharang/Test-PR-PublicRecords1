@@ -1,4 +1,4 @@
-﻿IMPORT _control, Doxie, PromoteSupers, RoxieKeyBuild, std, ut,Scrubs_PhoneFraud, Orbit3;
+﻿IMPORT _control, Doxie, PromoteSupers, RoxieKeyBuild, std, ut,Scrubs_PhoneFraud, Orbit3, dx_PhoneFraud;
 
 //oType: populate 'otp', if file is available 'Y', else 'N'
 //sType: populate 'spoofing', if file is available 'Y', else 'N'
@@ -115,8 +115,12 @@ EXPORT Proc_Build_PhoneFraud_Keys(string version, string oType, string sType):= 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Build Common PhoneFraud Keys///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(PhoneFraud.BLD_Key_OTP(version)
+        Base_otp := project(dataset('~thor_data400::base::phonefraud_OTP_'+version, PhoneFraud.Layout_OTP.Base,flat), PhoneFraud.Layout_OTP.Base-date_file_loaded);
+        RoxieKeybuild.MAC_build_logical(dx_PhoneFraud.key_otp,Base_otp,dx_PhoneFraud.names.otp,'~thor_data400::key::'+version+'::phonefraud_otp',bkPhoneFraudOTP);
+
+        Base_spoofing := project(dataset('~thor_data400::base::phonefraud_SPOOFING_'+version, PhoneFraud.Layout_Spoofing.Base,flat), PhoneFraud.Layout_Spoofing.Base);
+        RoxieKeybuild.MAC_build_logical(dx_PhoneFraud.key_spoofing,Base_spoofing,dx_PhoneFraud.names.spoofing,'~thor_data400::key::'+version+'::phonefraud_spoofing',bkPhoneFraudSpoofing);
+/* 		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(PhoneFraud.BLD_Key_OTP(version)
 																								,'~thor_data400::key::phonefraud_otp'
 																								,'~thor_data400::key::'+version+'::phonefraud_otp'
 																								,bkPhoneFraudOTP
@@ -126,7 +130,7 @@ EXPORT Proc_Build_PhoneFraud_Keys(string version, string oType, string sType):= 
 																								,'~thor_data400::key::phonefraud_spoofing'
 																								,'~thor_data400::key::'+version+'::phonefraud_spoofing'
 																								,bkPhoneFraudSpoofing
-																								);	
+																								);	 */
 																								
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Move Common PhoneFraud Keys to Superfiles//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -209,7 +213,7 @@ EXPORT Proc_Build_PhoneFraud_Keys(string version, string oType, string sType):= 
 																	Scrubs_PhoneFraud.fn_RunScrubs(version,'Judy.Tao@lexisnexis.com')):
 																	Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com;christopher.brodeur@lexisnexisrisk.com;charles.pettola@lexisnexisrisk.com;intel357@bellsouth.net', 'PhoneFraud Key Build Succeeded', workunit + ': Build completed.')),
 																	Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com;christopher.brodeur@lexisnexisrisk.com;charles.pettola@lexisnexisrisk.com;intel357@bellsouth.net', 'PhoneFraud Key Build Failed', workunit + '\n' + FAILMESSAGE)
-																	 );
+ 																 );
 
 	RETURN sendEmail;
 
