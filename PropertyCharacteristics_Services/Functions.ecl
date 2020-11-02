@@ -1299,7 +1299,8 @@ LOADXML('<xml/>');
 		self := L;
 	END;	
 	
-	EXPORT PropertyCharacteristics_Services.Layouts.inhouse_layout DPOJOin(PropertyCharacteristics_Services.Layouts.inhouse_layout L, PropertyCharacteristics_Services.Layouts.inhouse_layout R) := TRANSFORM
+	EXPORT PropertyCharacteristics_Services.Layouts.inhouse_layout CreateDPO(PropertyCharacteristics_Services.Layouts.inhouse_layout L, PropertyCharacteristics_Services.Layouts.inhouse_layout R) := FUNCTION
+    PropertyCharacteristics_Services.Layouts.inhouse_layout	CreateDPO_ds()	:= TRANSFORM
 		self.src_building_square_footage 			:= IF(L.src_building_square_footage = Constants.MSL_Src, L.src_building_square_footage, R.src_building_square_footage);
 		self.building_square_footage					:= IF(L.src_building_square_footage = Constants.MSL_Src, L.building_square_footage, R.building_square_footage);
 		self.tax_dt_building_square_footage		:= IF(L.src_building_square_footage = Constants.MSL_Src, L.tax_dt_building_square_footage, R.tax_dt_building_square_footage);
@@ -1631,6 +1632,8 @@ LOADXML('<xml/>');
 		self.rec_dt_interest_rate_type_code     := IF(L.src_interest_rate_type_code = Constants.MSL_Src, L.rec_dt_interest_rate_type_code, R.rec_dt_interest_rate_type_code);
 
 		SELF := L;
+		END;
+    RETURN ROW(CreateDPO_ds());
 	END;
 	
 	EXPORT	UNSIGNED1	DataSource_SortOrder(STRING25	DataSource)	:=

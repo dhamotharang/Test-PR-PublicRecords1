@@ -37,6 +37,12 @@ module
 	SHARED IsOptedOut		:= IF(Lexid <> 0, isOptOut(Lexid), FALSE);
 	   
   // Replicated the batch functionallity.  QB 5501
+  /*Default Option (report type P) - Corelogic (D) and Blacknight (B)
+	Default Option (report type I) - Best of Corelogic and Blacknight (A)
+	Default Plus Option (report type P) - Corelogic (D) + best of Blacknight (B) and mls(E)
+	Default Plus Option (report type I) -  Best of Corelogic and Blacknight (A)
+	Selected Source - best of all sources (F)
+	Selected Source Plus – best of all sources (F) and all underlying source data -Corelogic (D), Blacknight (B) and mls(E)*/
   dLNPropResultsFiltered := dPropPayload(
     ((pInMod.ReportType = 'I') AND (pInMod.ResultOption IN [Constants.Default_Option, Constants.Default_Plus_Option]) AND (vendor_source = 'A')) OR 
     ((pInMod.ReportType = 'P') AND pInMod.ResultOption = Constants.Default_Option AND (vendor_source IN ['B', 'D']) ) OR 
@@ -101,8 +107,7 @@ module
 	export dsSourceAll := dsRollB + dsFilterOthers + PROJECT (inhouse_results(vendor_source in ['F', 'G']), TRANSFORM(layouts.inhouse_layout, SELF.acctno := '', SELF := LEFT));
 
 	//For Default Plus Option, combine B OKCITY and E MLS records, MLS has higher priority
-	shared DPO_BandE := JOIN(dsSourceAll(vendor_source = 'E'), dsSourceAll(vendor_source = 'B'), TRUE, PropertyCharacteristics_Services.Functions.DPOJOin (LEFT, RIGHT), LEFT OUTER, ALL);
-	SHARED ds_DPO := dsSourceAll(vendor_source = 'D') + IF(EXISTS(dsSourceAll(vendor_source = 'E')), DPO_BandE, dsSourceAll(vendor_source = 'B'));
+	SHARED ds_DPO := dsSourceAll(vendor_source = 'D') +  PropertyCharacteristics_Services.Functions.CreateDPO(dsSourceAll(vendor_source = 'E')[1],dsSourceAll(vendor_source = 'B')[1]);
 	SHARED FinaldsSourceAll := IF (pInMod.ResultOption = Constants.Default_Plus_Option, ds_DPO, dsSourceAll);
 	shared ds_noacctno := project (FinaldsSourceAll, layouts.Payload);
 	
