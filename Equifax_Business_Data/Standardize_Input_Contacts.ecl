@@ -23,11 +23,10 @@ EXPORT fPreProcess(DATASET(Equifax_Business_Data.Layouts.Sprayed_Input_Contacts)
 					self.efx_email := ut.CleanSpacesAndUpper(l.efx_email);
 					self.efx_date := ut.CleanSpacesAndUpper(l.efx_date);
 					SELF.process_date                 := STD.Date.CurrentDate(TRUE);
- 		 	    self.dt_first_seen								:= IF(_validate.date.fIsValid(date_first_seen) and _validate.date.fIsValid(date_first_seen,_validate.date.rules.DateInPast)	,(UNSIGNED4)date_first_seen, 0);
-			    self.dt_last_seen									:= IF(_validate.date.fIsValid(date_first_seen) and _validate.date.fIsValid(date_first_seen,_validate.date.rules.DateInPast)	,(UNSIGNED4)date_first_seen, 0);
-          temp_date                         := REGEXREPLACE('-',self.efx_date,'');
-					self.dt_vendor_first_reported	    := IF(_validate.date.fIsValid(temp_date), (UNSIGNED4)temp_date[1..8], 0);
-					self.dt_vendor_last_reported		  := IF(_validate.date.fIsValid(temp_date), (UNSIGNED4)temp_date[1..8], 0);
+ 		 	    self.dt_first_seen								:= 0;
+			    self.dt_last_seen									:= 0;
+					self.dt_vendor_first_reported	    := IF(_validate.date.fIsValid(date_first_seen), (UNSIGNED4)date_first_seen[1..8], 0);
+					self.dt_vendor_last_reported		  := IF(_validate.date.fIsValid(date_first_seen), (UNSIGNED4)date_first_seen[1..8], 0);
 					self.record_type                  := 'C';
 					SELF.Exploded_Title_Description := ut.CleanSpacesAndUpper(EFX_TITLE_TABLE.TITLE(L.EFX_TITLECD));
 					self															:= l;
