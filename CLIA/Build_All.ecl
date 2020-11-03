@@ -3,7 +3,7 @@
 EXPORT Build_All(
   STRING								pversion,
   BOOLEAN               pUseAltLayout 					= FALSE,
-	STRING								pDirectory							= '/data/data_build_4/CLIA/data',
+	STRING								pDirectory							= '/data/Builds/builds/clia/data/processing',
 	STRING								pServerIP								= _Control.IPAddress.bctlpedata11,
 	BOOLEAN								pIsTesting							= FALSE,
 	BOOLEAN								pOverwrite							= FALSE,

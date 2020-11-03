@@ -2,7 +2,7 @@
 
 //Version = input filedate
 EXPORT proc_build_all(STRING version) := FUNCTION
-  #workunit('name', 'Yogurt: RealSource email build');
+  //#workunit('name', 'Yogurt: RealSource email build');
 	
 	//Run Spray
 	spray_all := RealSource.SprayFiles(version);
