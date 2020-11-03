@@ -243,7 +243,7 @@ END;
 OutRec NormIt(InputWithRules L, INTEGER C) := TRANSFORM
     SELF.entitytype := CHOOSE(C, 1, 9, 15, 16, 17, 18, 19, 20);
     SELF.Label := CHOOSE(C, L.personlabel, L.addresslabel, L.ssnlabel, L.phonelabel, L.emaillabel,  L.iplabel, L.bankaccountlabel, L.driverslicenselabel);
-    SELF.customerProgramDescription := L.agencyprogjurst + '-' + L.AgencyProgDesc;
+    SELF.customerProgramDescription := L.T_SrcAgencyDesc;
 // jp add all these entity context uids to event output
     SELF.EntityContextUID := CHOOSE(C, 
                               L.personentitycontextuid,

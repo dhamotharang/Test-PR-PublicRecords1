@@ -82,7 +82,11 @@ HighRiskCounts := TABLE(HighRiskCountsPrep,
                      customerid, industrytype, t_actuid, MERGE);        
 
 // JOIN High Risk Counts to Modeling Output
-ModelingAttributeOutput := FraudgovKEL.KEL_EventShell.ModelingStats;
+//ModelingAttributeOutput := FraudgovKEL.KEL_EventShell.ModelingStats;
+
+ModelingAttributeOutput := JOIN(FraudgovKEL.KEL_EventShell.ModelingStats, FraudgovKEL.KEL_ModelingValidationSample,
+                       LEFT.personentitycontextuid=RIGHT.personentitycontextuid, 
+                       TRANSFORM(RECORDOF(LEFT), SELF := LEFT), LOOKUP, HASH);
 
 ModelingWithHRICounts := JOIN(ModelingAttributeOutput, HighRiskCounts, LEFT.agencyuid = RIGHT.customerid AND LEFT.agencyprogtype=RIGHT.industrytype AND LEFT.t_actuid=RIGHT.t_actuid, HASH);
                     
@@ -92,4 +96,4 @@ ModelingWithScoringDebug := PROJECT(JOIN(ModelingWithHRICounts, RulesFlagFinal, 
                               TRANSFORM({RECORDOF(LEFT) AND NOT [customerid, industrytype]}, SELF := LEFT));
 
 output(ModelingWithScoringDebug,,'~fraudgov::deleteme_nd_full_' + Std.Date.CurrentDate(), overwrite);	
-output(ModelingWithScoringDebug,,'~fraudgov::RIN2_ScoringOutput_' + Std.Date.CurrentDate() + '_csv', CSV(QUOTE('"')), overwrite);
+output(ModelingWithScoringDebug,,'~fraudgov::RIN2_ScoringOutput_sample_' + Std.Date.CurrentDate() + '_csv', CSV(QUOTE('"')), overwrite);
