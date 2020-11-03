@@ -1,7 +1,6 @@
-﻿IMPORT MemberPoint, Phones, progressive_phone;
+﻿IMPORT MemberPoint, Phones, progressive_phone,BatchShare;
 
 	EXPORT ConnectedPhones := MODULE
-	
 		// Internal: Return/filter set of disconnected phones (member point)
 		SHARED SET OF STRING10 getDisconnectedPhones(DATASET(Phones.Layouts.PhoneAttributes.BatchIn)recsIn, MemberPoint.IParam.BatchParams optsIn):= FUNCTION
 			opts := MODULE(PROJECT(optsIn, Phones.IParam.BatchParams, OPT))
@@ -24,17 +23,10 @@
 			disconnectedPhones:= getDisconnectedPhones(filterIn, optsIn);
 			connectedRecs:= recsIn(PhoneNumber NOT IN disconnectedPhones);
 			RETURN connectedRecs;
-		END;
-		
+		END;	
 		// Return/filter connected phones for Waterfall phones (layout_progressive_phone_common)
 		EXPORT progressive_phone.layout_progressive_phone_common getConnectedWaterfall(DATASET(progressive_phone.layout_progressive_phone_common)recsIn, MemberPoint.IParam.BatchParams optsIn):= FUNCTION
-			Phones.Layouts.PhoneAttributes.BatchIn buildFilterIn(progressive_phone.layout_progressive_phone_common lft, INTEGER indx):= TRANSFORM
-				SELF.acctno:= (STRING20)indx;
-				SELF.phoneno:= lft.subj_phone10;
-			END;
-			filterIn:= PROJECT(recsIn, buildFilterIn(LEFT, COUNTER));
-			disconnectedPhones:= getDisconnectedPhones(filterIn, optsIn);
-			connectedRecs:= recsIn(subj_phone10 NOT IN disconnectedPhones);
+			connectedRecs:= recsIn(Meta_Phone_Status <>Phones.Constants.PhoneStatus.Inactive);
 			RETURN connectedRecs;
 		END;
 		
