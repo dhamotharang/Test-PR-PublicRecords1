@@ -11,7 +11,8 @@ EXPORT fPreProcess(DATASET(Equifax_Business_Data.Layouts.Sprayed_Input_Contacts)
 	  
 		Equifax_Business_Data.Layouts.Base_Contacts standardizeContactInputXrf(Layouts.Sprayed_Input_Contacts L) := TRANSFORM
 					date_first_seen := pversion;
-					self.rcid                         := 0;
+					self.rcid                         := 0;					
+			    self.source := MDR.sourceTools.src_Equifax_Business_Data;
 					self.efx_id := ut.CleanSpacesAndUpper(l.efx_id);
 					self.efx_contct := ut.CleanSpacesAndUpper(l.efx_contct);
 					temp_titlecd := ut.CleanSpacesAndUpper(l.efx_titlecd);
