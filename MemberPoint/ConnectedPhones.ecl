@@ -6,6 +6,7 @@
 			opts := MODULE(PROJECT(optsIn, Phones.IParam.BatchParams, OPT))
 				EXPORT BOOLEAN return_current:= TRUE;
 				EXPORT BOOLEAN include_temp_susp_reactivate:= FALSE;
+				EXPORT BOOLEAN AllowPortingData := TRUE;
 			END;
       phonesStatus:= Phones.PhoneAttributes_BatchRecords(recsIn, opts);
 			filteredPhones:= phonesStatus(event_type = 'D' AND disconnect_date <> 0);
