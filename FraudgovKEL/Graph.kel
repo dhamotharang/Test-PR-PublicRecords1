@@ -1393,7 +1393,7 @@ USE FraudgovKEL.SharingRules(FLAT,
   Customer(FILTER((UNSIGNED)fdn_ind_type_gc_id_inclusion>0),
     CustomerId=inclusion_id,
     IndustryType=Ind_type,
-		ind_type_description = classification_permissible_use_access.ind_type_description)
+		ind_type_description = ind_type_description)
 );
 
 /*
@@ -3616,105 +3616,130 @@ Event: => P20_AotDlKrActInAgcyNewDtEv := MAP(T20_DlPopFlag=0 => -99999,
                                              T_SrcClassType <2 OR P20_AotDlKrActInAgcyFlagEv=0 => -99998,
 																						 ALL(DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
 																						 MAX(rDriversLicense.DriversLicenseEvent.Transaction(T20_DlIsKrFlag=1 AND T_InAgencyFlag=1),INTEGER(T_ActDtEcho)));
-
 //KR shared agency attributes
+Event: => InAgengyIdIsKr := Subject.PersonEvent.Transaction(T1_IdIsKrFlag=1 AND T_InAgencyFlag=0){T_ActDtEcho,T_SrcAgencyDesc};
+
 Event: => P1_AotIdKrActShrdSrcAgencyCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
-																						 T_SrcClassType < 2 OR P1_AotIdKrActShrdFlagEv < 1 => -99998,
-																						 ALL(PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
-																						 COUNT(Subject.PersonEvent.Transaction(T_InAgencyFlag=0 AND T1_IdIsKrFlag=1){T_SrcAgencyDesc}));
+                                                           T_SrcClassType < 2 OR P1_AotIdKrActShrdFlagEv < 1 => -99998,
+                                                           ALL(PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
+                                                           COUNT(InAgengyIdIsKr{T_SrcAgencyDesc}));
+
 Event: => P1_AotIdKrActShrdNewSrcAgencyDescEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
-                                                     T_SrcClassType < 2 OR P1_AotIdKrActShrdFlagEv < 1 => -99998,
-																										 ALL(PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
-																										 TOPN(Subject.PersonEvent.Transaction(T1_IdIsKrFlag=1 AND T_InAgencyFlag=0){T_ActDtEcho,T_SrcAgencyDesc},1,-T_ActDtEcho).T_SrcAgencyDesc);
+                                                           T_SrcClassType < 2 OR P1_AotIdKrActShrdFlagEv < 1 => -99998,
+                                                           ALL(PersonEvent.Transaction,T1_IdIsKrFlag=-99997) => -99997,
+                                                           ONLY(TOPN(InAgengyIdIsKr,1,-T_ActDtEcho)).T_SrcAgencyDesc);
+
+Event: => NotInAgengyIdIsKrGenFrd := Subject.PersonEvent.Transaction(T_InAgencyFlag=0 AND T1_IdIsKrGenFrdFlag=1){T_ActDtEcho,T_SrcAgencyDesc};
+                                                     
 Event: => P1_AotIdKrGenFrdActShrdSrcAgencyCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
-																											 T_SrcClassType < 2 OR P1_AotIdKrGenFrdActShrdFlagEv < 1 => -99998,
-																											 ALL(PersonEvent.Transaction,T1_IdIsKrGenFrdFlag=-99997) => -99997,
-																											 COUNT(Subject.PersonEvent.Transaction(T_InAgencyFlag=0 AND T1_IdIsKrGenFrdFlag=1){T_SrcAgencyDesc}));
+                                                           T_SrcClassType < 2 OR P1_AotIdKrGenFrdActShrdFlagEv < 1 => -99998,
+                                                           ALL(PersonEvent.Transaction,T1_IdIsKrGenFrdFlag=-99997) => -99997,
+                                                           COUNT(NotInAgengyIdIsKrGenFrd{T_SrcAgencyDesc}));
+
 Event: => P1_AotIdKrGenFrdActShrdNewSrcAgencyDescEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P1_AotIdKrGenFrdActShrdFlagEv < 1 => -99998,
 																													 ALL(PersonEvent.Transaction,T1_IdIsKrGenFrdFlag=-99997) => -99997,
-																													 TOPN(Subject.PersonEvent.Transaction(T1_IdIsKrGenFrdFlag=1 AND T_InAgencyFlag=0){T_ActDtEcho,T_SrcAgencyDesc},1,-T_ActDtEcho).T_SrcAgencyDesc);
+                                                           ONLY(TOPN(NotInAgengyIdIsKrGenFrd,1,-T_ActDtEcho)).T_SrcAgencyDesc);
+
+Event: => NotInAgengyIdIsKrStolId := Subject.PersonEvent.Transaction(T_InAgencyFlag=0 AND T1_IdIsKrStolIdFlag=1){T_ActDtEcho,T_SrcAgencyDesc};          
 Event: => P1_AotIdKrStolIdActShrdSrcAgencyCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
-                                                       T_SrcClassType < 2 OR P1_AotIdKrStolIdActShrdFlagEv < 1 => -99998,
-																											 ALL(PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
-																											 COUNT(Subject.PersonEvent.Transaction(T_InAgencyFlag=0 AND T1_IdIsKrStolIdFlag=1){T_SrcAgencyDesc}));
+                                                           T_SrcClassType < 2 OR P1_AotIdKrStolIdActShrdFlagEv < 1 => -99998,
+                                                           ALL(PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
+                                                           COUNT(NotInAgengyIdIsKrStolId{T_SrcAgencyDesc}));
 Event: => P1_AotIdKrStolIdActShrdNewSrcAgencyDescEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P1_AotIdKrStolIdActShrdFlagEv < 1 => -99998,
 																													 ALL(PersonEvent.Transaction,T1_IdIsKrStolIdFlag=-99997) => -99997,
-																													 TOPN(Subject.PersonEvent.Transaction(T1_IdIsKrStolIdFlag=1 AND T_InAgencyFlag=0){T_ActDtEcho,T_SrcAgencyDesc},1,-T_ActDtEcho).T_SrcAgencyDesc);
+                                                           ONLY(TOPN(NotInAgengyIdIsKrStolId,1,-T_ActDtEcho)).T_SrcAgencyDesc);
+                                                          
+Event: => NotInAgengyIdIsKrAppFrdFlag := Subject.PersonEvent.Transaction(T_InAgencyFlag=0 AND T1_IdIsKrAppFrdFlag=1){T_ActDtEcho,T_SrcAgencyDesc};          
 Event: => P1_AotIdKrAppFrdActShrdSrcAgencyCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
-                                                       T_SrcClassType < 2 OR P1_AotIdKrAppFrdActShrdFlagEv < 1 => -99998,
-																											 ALL(PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
-																											 COUNT(Subject.PersonEvent.Transaction(T_InAgencyFlag=0 AND T1_IdIsKrAppFrdFlag=1){T_SrcAgencyDesc}));
+                                                           T_SrcClassType < 2 OR P1_AotIdKrAppFrdActShrdFlagEv < 1 => -99998,
+                                                           ALL(PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
+                                                           COUNT(NotInAgengyIdIsKrAppFrdFlag{T_SrcAgencyDesc}));
 Event: => P1_AotIdKrAppFrdActShrdNewSrcAgencyDescEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
                                                            T_SrcClassType < 2 OR P1_AotIdKrAppFrdActShrdFlagEv < 1 => -99998,
 																													 ALL(PersonEvent.Transaction,T1_IdIsKrAppFrdFlag=-99997) => -99997,
-																													 TOPN(Subject.PersonEvent.Transaction(T1_IdIsKrAppFrdFlag=1 AND T_InAgencyFlag=0){T_ActDtEcho,T_SrcAgencyDesc},1,-T_ActDtEcho).T_SrcAgencyDesc);
+                                                           ONLY(TOPN(NotInAgengyIdIsKrAppFrdFlag,1,-T_ActDtEcho)).T_SrcAgencyDesc);
+                                                           
+Event: => NotInAgengyIdIsKrOthFrdFlag := Subject.PersonEvent.Transaction(T_InAgencyFlag=0 AND T1_IdIsKrOthFrdFlag=1){T_ActDtEcho,T_SrcAgencyDesc};                                                           
 Event: => P1_AotIdKrOthFrdActShrdSrcAgencyCntEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
-                                                       T_SrcClassType < 2 OR P1_AotIdKrOthFrdActShrdFlagEv < 1 => -99998,
-																											 ALL(PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
-																											 COUNT(Subject.PersonEvent.Transaction(T_InAgencyFlag=0 AND T1_IdIsKrOthFrdFlag=1){T_SrcAgencyDesc}));
+                                                           T_SrcClassType < 2 OR P1_AotIdKrOthFrdActShrdFlagEv < 1 => -99998,
+                                                           ALL(PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
+                                                           COUNT(NotInAgengyIdIsKrOthFrdFlag{T_SrcAgencyDesc}));
 Event: => P1_AotIdKrOthFrdActShrdNewSrcAgencyDescEv := MAP(T1_LexIdPopFlag=0 AND T1_RinIdPopFlag=0 => -99999,
-                                                       T_SrcClassType < 2 OR P1_AotIdKrOthFrdActShrdFlagEv < 1 => -99998,
-																											 ALL(PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
-																											 TOPN(Subject.PersonEvent.Transaction(T1_IdIsKrOthFrdFlag=1 AND T_InAgencyFlag=0){T_ActDtEcho,T_SrcAgencyDesc},1,-T_ActDtEcho).T_SrcAgencyDesc);
-Event: => P9_AotAddrKrActShrdSrcAgencyCntEv := MAP(T9_AddrPopFlag=0 => -99999,
-                                                   T_SrcClassType < 2 OR P9_AotAddrKrActShrdFlagEv < 1 => -99998,
-																									 ALL(AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
-																									 COUNT(Location.AddressEvent.Transaction(T_InAgencyFlag=0 AND T9_AddrIsKrFlag=1){T_SrcAgencyDesc}));
-Event: => P9_AotAddrKrActShrdNewSrcAgencyDescEv := MAP(T9_AddrPopFlag=0 => -99999,
-                                                   T_SrcClassType < 2 OR P9_AotAddrKrActShrdFlagEv < 1 => -99998,
-																									 ALL(AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
-																									 TOPN(Location.AddressEvent.Transaction(T9_AddrIsKrFlag=1 AND T_InAgencyFlag=0){T_ActDtEcho,T_SrcAgencyDesc},1,-T_ActDtEcho).T_SrcAgencyDesc);
-Event: => P15_AotSsnKrActShrdSrcAgencyCntEv := MAP(T15_SsnPopFlag=0 => -99999,
-                                                   T_SrcClassType < 2 OR P15_AotSsnKrActShrdFlagEv < 1 => -99998,
-																									 ALL(SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
-																									 COUNT(rSsn.SsnEvent.Transaction(T_InAgencyFlag=0 AND T15_SsnIsKrFlag=1){T_SrcAgencyDesc}));
-Event: => P15_AotSsnKrActShrdNewSrcAgencyDescEv := MAP(T15_SsnPopFlag=0 => -99999,
-                                                   T_SrcClassType < 2 OR P15_AotSsnKrActShrdFlagEv < 1 => -99998,
-																									 ALL(SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
-																									 TOPN(rSsn.SsnEvent.Transaction(T15_SsnIsKrFlag=1 AND T_InAgencyFlag=0){T_ActDtEcho,T_SrcAgencyDesc},1,-T_ActDtEcho).T_SrcAgencyDesc);
-Event: => P16_AotPhnKrActShrdSrcAgencyCntEv := MAP(T16_PhnPopFlag=0 => -99999,
-                                                   T_SrcClassType < 2 OR P16_AotPhnKrActShrdFlagEv < 1 => -99998,
-																									 ALL(PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
-																									 COUNT(rPhone.PhoneEvent.Transaction(T_InAgencyFlag=0 AND T16_PhnIsKrFlag=1){T_SrcAgencyDesc}));
-Event: => P16_AotPhnKrActShrdNewSrcAgencyDescEv := MAP(T16_PhnPopFlag=0 => -99999,
-                                                   T_SrcClassType < 2 OR P16_AotPhnKrActShrdFlagEv < 1 => -99998,
-																									 ALL(PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
-																									 TOPN(rPhone.PhoneEvent.Transaction(T16_PhnIsKrFlag=1 AND T_InAgencyFlag=0){T_ActDtEcho,T_SrcAgencyDesc},1,-T_ActDtEcho).T_SrcAgencyDesc);
-Event: => P17_AoTEmailKRActShrdSrcAgencyCntEv := MAP(T17_EmailPopFlag=0 => -99999,
-                                                     T_SrcClassType < 2 OR P17_AotEmailKrActShrdFlagEv < 1 => -99998,
-																										 ALL(EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
-																										 COUNT(rEmail.EmailEvent.Transaction(T_InAgencyFlag=0 AND T17_EmailIsKrFlag=1){T_SrcAgencyDesc}));
-Event: => P17_AoTEmailKRActShrdNewSrcAgencyDescEv := MAP(T17_EmailPopFlag=0 => -99999,
-                                                     T_SrcClassType < 2 OR P17_AotEmailKrActShrdFlagEv < 1 => -99998,
-																										 ALL(EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
-																										 TOPN(rEmail.EmailEvent.Transaction(T17_EmailIsKrFlag=1 AND T_InAgencyFlag=0){T_ActDtEcho,T_SrcAgencyDesc},1,-T_ActDtEcho).T_SrcAgencyDesc);
-Event: => P18_AoTIPAddrKRActShrdSrcAgencyCntEv := MAP(T18_IpAddrPopFlag=0 => -99999,
-                                                      T_SrcClassType < 2 OR P18_AotIpAddrKrActShrdFlagEv < 1 => -99998,
-																											ALL(InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
-																											COUNT(rInternetProtocol.InternetProtocolEvent.Transaction(T_InAgencyFlag=0 AND T18_IpAddrIsKrFlag=1){T_SrcAgencyDesc}));
-Event: => P18_AoTIPAddrKRActShrdNewSrcAgencyDescEv := MAP(T18_IpAddrPopFlag=0 => -99999,
-                                                      T_SrcClassType < 2 OR P18_AotIpAddrKrActShrdFlagEv < 1 => -99998,
-																											ALL(InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
-																											TOPN(rInternetProtocol.InternetProtocolEvent.Transaction(T18_IpAddrIsKrFlag=1 AND T_InAgencyFlag=0){T_ActDtEcho,T_SrcAgencyDesc},1,-T_ActDtEcho).T_SrcAgencyDesc);
-Event: => P19_AoTBnkAcctKRActShrdSrcAgencyCntEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
-                                                       T_SrcClassType < 2 OR P19_AotBnkAcctKrActShrdFlagEv < 1 => -99998,
-																											 ALL(BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
-																											 COUNT(rBankAccount.BankAccountEvent.Transaction(T_InAgencyFlag=0 AND T19_BnkAcctIsKrFlag=1){T_SrcAgencyDesc}));
-Event: => P19_AoTBnkAcctKRActShrdNewSrcAgencyDescEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
-                                                       T_SrcClassType < 2 OR P19_AotBnkAcctKrActShrdFlagEv < 1 => -99998,
-																											 ALL(BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
-																											 TOPN(rBankAccount.BankAccountEvent.Transaction(T19_BnkAcctIsKrFlag=1 AND T_InAgencyFlag=0){T_ActDtEcho,T_SrcAgencyDesc},1,-T_ActDtEcho).T_SrcAgencyDesc);
-Event: => P20_AoTDLKRActShrdSrcAgencyCntEv := MAP(T20_DlPopFlag=0 => -99999,
-                                                  T_SrcClassType < 2 OR P20_AotDlKrActShrdFlagEv < 1 => -99998,
-																									ALL(DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
-																									COUNT(rDriversLicense.DriversLicenseEvent.Transaction(T_InAgencyFlag=0 AND T20_DlIsKrFlag=1){T_SrcAgencyDesc}));
-Event: => P20_AoTDLKRActShrdNewSrcAgencyDescEv := MAP(T20_DlPopFlag=0 => -99999,
-                                                  T_SrcClassType < 2 OR P20_AotDlKrActShrdFlagEv < 1 => -99998,
-																									ALL(DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
-																									TOPN(rDriversLicense.DriversLicenseEvent.Transaction(T20_DlIsKrFlag=1 AND T_InAgencyFlag=0){T_ActDtEcho,T_SrcAgencyDesc},1,-T_ActDtEcho).T_SrcAgencyDesc);
+                                                           T_SrcClassType < 2 OR P1_AotIdKrOthFrdActShrdFlagEv < 1 => -99998,
+                                                           ALL(PersonEvent.Transaction,T1_IdIsKrOthFrdFlag=-99997) => -99997,
+                                                           ONLY(TOPN(NotInAgengyIdIsKrAppFrdFlag,1,-T_ActDtEcho)).T_SrcAgencyDesc);
 
+Event: => NotInAgengyAddrIsKrFlag := Subject.PersonEvent.Transaction(T9_AddrIsKrFlag=1 AND T_InAgencyFlag=0){T_ActDtEcho,T_SrcAgencyDesc};                                                           
+Event: => P9_AotAddrKrActShrdSrcAgencyCntEv := MAP(T9_AddrPopFlag=0 => -99999,
+                                                           T_SrcClassType < 2 OR P9_AotAddrKrActShrdFlagEv < 1 => -99998,
+                                                           ALL(AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
+                                                           COUNT(NotInAgengyAddrIsKrFlag{T_SrcAgencyDesc}));
+Event: => P9_AotAddrKrActShrdNewSrcAgencyDescEv := MAP(T9_AddrPopFlag=0 => -99999,
+                                                           T_SrcClassType < 2 OR P9_AotAddrKrActShrdFlagEv < 1 => -99998,
+                                                           ALL(AddressEvent.Transaction,T9_AddrIsKrFlag=-99997) => -99997,
+                                                           ONLY(TOPN(NotInAgengyIdIsKrAppFrdFlag,1,-T_ActDtEcho)).T_SrcAgencyDesc);
+                                                   
+Event: => NotInAgengySsnIsKrFlag := Subject.PersonEvent.Transaction(T_InAgencyFlag=0 AND T15_SsnIsKrFlag=1){T_ActDtEcho,T_SrcAgencyDesc};                                                           
+Event: => P15_AotSsnKrActShrdSrcAgencyCntEv := MAP(T15_SsnPopFlag=0 => -99999,
+                                                           T_SrcClassType < 2 OR P15_AotSsnKrActShrdFlagEv < 1 => -99998,
+                                                           ALL(SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
+                                                           COUNT(NotInAgengySsnIsKrFlag{T_SrcAgencyDesc}));
+Event: => P15_AotSsnKrActShrdNewSrcAgencyDescEv := MAP(T15_SsnPopFlag=0 => -99999,
+                                                           T_SrcClassType < 2 OR P15_AotSsnKrActShrdFlagEv < 1 => -99998,
+                                                           ALL(SsnEvent.Transaction,T15_SsnIsKrFlag=-99997) => -99997,
+                                                           ONLY(TOPN(NotInAgengySsnIsKrFlag,1,-T_ActDtEcho)).T_SrcAgencyDesc);
+
+Event: => NotInAgengyPhnIsKrFlag := Subject.PersonEvent.Transaction(T16_PhnIsKrFlag=1 AND T_InAgencyFlag=0){T_ActDtEcho,T_SrcAgencyDesc};                                                           
+Event: => P16_AotPhnKrActShrdSrcAgencyCntEv := MAP(T16_PhnPopFlag=0 => -99999,
+                                                           T_SrcClassType < 2 OR P16_AotPhnKrActShrdFlagEv < 1 => -99998,
+                                                           ALL(PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
+                                                           COUNT(NotInAgengyPhnIsKrFlag{T_SrcAgencyDesc}));
+Event: => P16_AotPhnKrActShrdNewSrcAgencyDescEv := MAP(T16_PhnPopFlag=0 => -99999,
+                                                           T_SrcClassType < 2 OR P16_AotPhnKrActShrdFlagEv < 1 => -99998,
+                                                           ALL(PhoneEvent.Transaction,T16_PhnIsKrFlag=-99997) => -99997,
+                                                           ONLY(TOPN(NotInAgengyPhnIsKrFlag,1,-T_ActDtEcho)).T_SrcAgencyDesc);
+
+Event: => NotInAgengyEmailIsKrFlag := Subject.PersonEvent.Transaction(T_InAgencyFlag=0 AND T17_EmailIsKrFlag=1){T_ActDtEcho,T_SrcAgencyDesc};                                                           
+Event: => P17_AoTEmailKRActShrdSrcAgencyCntEv := MAP(T17_EmailPopFlag=0 => -99999,
+                                                           T_SrcClassType < 2 OR P17_AotEmailKrActShrdFlagEv < 1 => -99998,
+                                                           ALL(EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
+                                                           COUNT(NotInAgengyEmailIsKrFlag{T_SrcAgencyDesc}));
+Event: => P17_AoTEmailKRActShrdNewSrcAgencyDescEv := MAP(T17_EmailPopFlag=0 => -99999,
+                                                           T_SrcClassType < 2 OR P17_AotEmailKrActShrdFlagEv < 1 => -99998,
+                                                           ALL(EmailEvent.Transaction,T17_EmailIsKrFlag=-99997) => -99997,
+                                                           ONLY(TOPN(NotInAgengyEmailIsKrFlag,1,-T_ActDtEcho)).T_SrcAgencyDesc);
+
+Event: => NotInAgengyIpAddrIsKrFlag := Subject.PersonEvent.Transaction(T_InAgencyFlag=0 AND T18_IpAddrIsKrFlag=1){T_ActDtEcho,T_SrcAgencyDesc};                                                           
+Event: => P18_AoTIPAddrKRActShrdSrcAgencyCntEv := MAP(T18_IpAddrPopFlag=0 => -99999,
+                                                           T_SrcClassType < 2 OR P18_AotIpAddrKrActShrdFlagEv < 1 => -99998,
+                                                           ALL(InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
+                                                           COUNT(NotInAgengyIpAddrIsKrFlag{T_SrcAgencyDesc}));
+Event: => P18_AoTIPAddrKRActShrdNewSrcAgencyDescEv := MAP(T18_IpAddrPopFlag=0 => -99999,
+                                                           T_SrcClassType < 2 OR P18_AotIpAddrKrActShrdFlagEv < 1 => -99998,
+                                                           ALL(InternetProtocolEvent.Transaction,T18_IpAddrIsKrFlag=-99997) => -99997,
+                                                           ONLY(TOPN(NotInAgengyIpAddrIsKrFlag,1,-T_ActDtEcho)).T_SrcAgencyDesc);
+
+Event: => NotInAgengyBnkAcctIsKrFlag := Subject.PersonEvent.Transaction(T_InAgencyFlag=0 AND T19_BnkAcctIsKrFlag=1){T_ActDtEcho,T_SrcAgencyDesc};                                                           
+Event: => P19_AoTBnkAcctKRActShrdSrcAgencyCntEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
+                                                           T_SrcClassType < 2 OR P19_AotBnkAcctKrActShrdFlagEv < 1 => -99998,
+                                                           ALL(BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
+                                                           COUNT(NotInAgengyBnkAcctIsKrFlag{T_SrcAgencyDesc}));
+Event: => P19_AoTBnkAcctKRActShrdNewSrcAgencyDescEv := MAP(T19_BnkAcctPopFlag=0 => -99999,
+                                                           T_SrcClassType < 2 OR P19_AotBnkAcctKrActShrdFlagEv < 1 => -99998,
+                                                           ALL(BankAccountEvent.Transaction,T19_BnkAcctIsKrFlag=-99997) => -99997,
+                                                           ONLY(TOPN(NotInAgengyBnkAcctIsKrFlag,1,-T_ActDtEcho)).T_SrcAgencyDesc);
+                                                           
+Event: => NotInAgengyDlIsKrFlag := Subject.PersonEvent.Transaction(T_InAgencyFlag=0 AND T20_DlIsKrFlag=1){T_ActDtEcho,T_SrcAgencyDesc};                                                           
+Event: => P20_AoTDLKRActShrdSrcAgencyCntEv := MAP(T20_DlPopFlag=0 => -99999,
+                                                           T_SrcClassType < 2 OR P20_AotDlKrActShrdFlagEv < 1 => -99998,
+                                                           ALL(DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
+                                                           COUNT(NotInAgengyDlIsKrFlag{T_SrcAgencyDesc}));
+Event: => P20_AoTDLKRActShrdNewSrcAgencyDescEv := MAP(T20_DlPopFlag=0 => -99999,
+                                                           T_SrcClassType < 2 OR P20_AotDlKrActShrdFlagEv < 1 => -99998,
+                                                           ALL(DriversLicenseEvent.Transaction,T20_DlIsKrFlag=-99997) => -99997,
+                                                           ONLY(TOPN(NotInAgengyDlIsKrFlag,1,-T_ActDtEcho)).T_SrcAgencyDesc);
 
 //DL Attributes
 DriversLicense: => AotActCntEv := COUNT(DriversLicenseEvent.Transaction);
