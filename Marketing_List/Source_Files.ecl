@@ -3,7 +3,7 @@
 EXPORT Source_Files(
 
    string   pversionBIP           = 'built'                     // use built superfiles for BIP files because this will run in the BIP build before the BIP files are promoted to the qa supers
-  ,string   pversionSourceFiles   = 'qa'                        // use QA superfiles for source files.  Cortera is the exception.
+  ,string   pversionSourceFiles   = 'qa'                        // use QA superfiles for source files.
   ,boolean  pUseOtherEnviron      = tools._Constants.IsDataland // if dataland, pull from prod, if on prod pull from prod by default
   
 ) :=
@@ -20,10 +20,10 @@ module
   export dca          := dcav2                .files(pversionSourceFiles,pUseOtherEnviron).base.companies  .logical ;
   export oshair       := OSHAIR               .Files(pversionSourceFiles,pUseOtherEnviron).base.Inspection .logical ;
   export accutrend    := BusReg               .files(pversionSourceFiles,pUseOtherEnviron).base.aid        .logical ;
-  export infutor      := Infutor_NARB         .files(pversionSourceFiles,pUseOtherEnviron).base            .logical ;
-  export eq_biz       := Equifax_Business_Data.files(pversionSourceFiles,pUseOtherEnviron).base            .logical ;
+  export infutor      := Infutor_NARB.files(pversionSourceFiles,pUseOtherEnviron).base            .logical ;
+  export eq_biz       := Equifax_Business_Data.files(pversionSourceFiles,pUseOtherEnviron).base.companies  .logical ;
   export DataBridge   := DataBridge           .files(pversionSourceFiles,pUseOtherEnviron).base            .logical ;        
-  export cortera      := Cortera              .Files.Executives                                                     ; // will pull the prod file on dataland automatically
+  export cortera      := Cortera              .Files(pversionSourceFiles,pUseOtherEnviron).base.Executives .logical ;                                                   ; // will pull the prod file on dataland automatically
 
   // -- lookup files
   export county_names := Address.County_Names ;

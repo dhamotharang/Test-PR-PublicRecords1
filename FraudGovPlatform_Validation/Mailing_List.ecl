@@ -7,7 +7,11 @@ EXPORT Mailing_List(string st = '', string ut = '', string Customer_list = '') :
 										+	';Greg.Whitaker@lexisnexisrisk.com'
 										;
 
-	shared Data_QA_list := 'John.Santos@lexisnexisrisk.com'
+	shared Data_QA_list := 'John.Santos@lexisnexisrisk.com';
+							
+	shared TN_UNEMPLOYMENT := 'Jeremy.Riley@lexisnexisrisk.com'
+										+	';'+Data_QA_list
+										+	';'+Dev_list
 										;
 
 	shared Batch_list	:=	Dev_list
@@ -32,7 +36,9 @@ EXPORT Mailing_List(string st = '', string ut = '', string Customer_list = '') :
 
 	shared fn_mail_recipiant(string recipiant) := function
 		return		map(
-									 recipiant='Validation' => if(_control.ThisEnvironment.Name = 'Prod_Thor',Dev_list,Dev_list)
+									 recipiant='Validation' => if(_control.ThisEnvironment.Name = 'Prod_Thor',
+										map(st = 'TN' => TN_UNEMPLOYMENT, Dev_list),
+										map(st = 'TN' => TN_UNEMPLOYMENT, Dev_list))
 									,recipiant='Alert'			=> if(_control.ThisEnvironment.Name = 'Prod_Thor',Dev_list,Dev_list)
 									,recipiant='Roxie' 			=> if(_control.ThisEnvironment.Name = 'Prod_Thor',Roxie_list,Dev_list)
 									,recipiant='RinNetwork'	=> if(_control.ThisEnvironment.Name = 'Prod_Thor',RinNetwork_list,Dev_list)

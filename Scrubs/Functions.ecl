@@ -393,6 +393,14 @@ EXPORT Functions := MODULE
     RETURN IF(regexfind('^[-]?\\d+\\.\\d+$', geo_clean) OR geo_clean = '', 1, 0);
   END;
 
+  //****************************************************************************
+  //fn_Valid_Country3Abbrev: returns true if there is a valid country
+  //                         abbreviation or if the code is empty.
+  //****************************************************************************
+  EXPORT fn_Valid_Country3Abbrev(STRING cntry) := FUNCTION
+    RETURN IF(cntry = '' OR ut.Country_ISO3_To_Name(cntry) != '', 1, 0);
+  END;
+
 
     
 

@@ -368,7 +368,7 @@
 	STRING40 safety_equipment_restraint2;
 	STRING40 safety_equipment_helmet;
 	STRING100 air_bag_deployed;
-	STRING20 ejection;
+	STRING100 ejection;
 	STRING30 drivers_license_jurisdiction;
 	STRING30 dl_number_class;
 	STRING3 dl_number_cdl;
@@ -936,6 +936,6 @@
 	//PRtCC CR-1262 
   STRING Direction_Of_Impact;
 	STRING Event_Sequence;
+  STRING1 is_Suppressed;
 	DATASET(Layout_Infiles_Fixed.Citations_ChildRec) Citation_Details {MAXCOUNT(Constants.Max_Citations_ChildRec_Count)};
-
 END;

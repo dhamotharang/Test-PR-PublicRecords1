@@ -1,15 +1,25 @@
 ﻿IMPORT data_services;
 
-EXPORT File_Override_Orphans := module
+EXPORT File_Override_Orphans := MODULE
 
-export orphan_rec := record
-string20 datagroup;
-string20 flag_file_ID;
-string12 DID;
-string100 recID;
-end;
+	EXPORT orphan_rec := RECORD
+		STRING20 datagroup;
+		STRING20 flag_file_ID;
+		STRING12 DID;
+		STRING100 recID;
+	END;
+    
+	EXPORT orphan_file_name := '~thor_data400::lookup::override::orphans';
 
-export orphan_file := dataset('~thor_data400::lookup::override::orphans', orphan_rec, flat,opt);
+	EXPORT orphan_file := DATASET(orphan_file_name, orphan_rec, FLAT, OPT);
 
+	EXPORT orphan_skip_datagroup_rec := RECORD
+		STRING20 datagroup;
+		BOOLEAN  skipFlag;
+	END;
+	
+	EXPORT skip_datagroup_file_name := '~thor_data400::datagroup_lookup::override::orphans';
 
-end;
+   EXPORT datagroup_lookup_filter_file := DATASET(skip_datagroup_file_name, orphan_skip_datagroup_rec, FLAT, OPT);
+
+END;

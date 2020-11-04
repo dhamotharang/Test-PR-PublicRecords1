@@ -201,6 +201,7 @@
 				trim(cname, left, right) in ['Nigeria','NIGERIA'] =>SubGroup_Constants.numCountryID.NIGERIA ,
 				trim(cname, left, right) in ['Niue','NIUE'] =>SubGroup_Constants.numCountryID.NIUE ,
 				trim(cname, left, right) in ['Norfolk Island','NORFOLK ISLAND'] =>SubGroup_Constants.numCountryID.NORFOLK_ISLAND ,
+				trim(cname, left, right) in ['North Macedonia','NORTH MACEDONIA'] =>SubGroup_Constants.numCountryID.NORTH_MACEDONIA ,
 				trim(cname, left, right) in ['Norway','NORWAY'] =>SubGroup_Constants.numCountryID.NORWAY ,
 				trim(cname, left, right) in ['Oman','OMAN'] =>SubGroup_Constants.numCountryID.OMAN ,
 				trim(cname, left, right) in ['Pakistan','PAKISTAN'] =>SubGroup_Constants.numCountryID.PAKISTAN ,
@@ -1360,7 +1361,16 @@
 				trim(kword, left, right) = 'CATMX' =>SubGroup_Constants.numKeywordsID.KEYWORD_CATMX,
 				trim(kword, left, right) = 'OFAC-ICAAE' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_ICAAE,
 				trim(kword, left, right) = 'FFICIJ-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_FFICIJ_WC,
-				
+				trim(kword, left, right) = 'USCRAL' =>SubGroup_Constants.numKeywordsID.KEYWORD_USCRAL,
+				trim(kword, left, right) = 'CANSEMBLR' =>SubGroup_Constants.numKeywordsID.KEYWORD_CANSEMBLR,
+				trim(kword, left, right) = 'ZAFIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_ZAFIC,
+				trim(kword, left, right) = 'CHCOMLOT' =>SubGroup_Constants.numKeywordsID.KEYWORD_CHCOMLOT,
+				trim(kword, left, right) = 'OFAC-EO13902' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_EO13902,
+				trim(kword, left, right) = 'UGIGG' =>SubGroup_Constants.numKeywordsID.KEYWORD_UGIGG,
+				trim(kword, left, right) = 'UGPPDA' =>SubGroup_Constants.numKeywordsID.KEYWORD_UGPPDA,
+				trim(kword, left, right) = 'NAMFISA' =>SubGroup_Constants.numKeywordsID.KEYWORD_NAMFISA,
+				trim(kword, left, right) = 'RWOMBUD' =>SubGroup_Constants.numKeywordsID.KEYWORD_RWOMBUD,
+								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

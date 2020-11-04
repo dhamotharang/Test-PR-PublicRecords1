@@ -1,4 +1,4 @@
-﻿import _Control;
+﻿import _Control, Scrubs, Scrubs_SAM;
 
 vxml := PROJECT(File_Sam, sam.XForm(LEFT, COUNTER));
 
@@ -39,13 +39,18 @@ fileservices.Despray(logicalname,
 	allowoverwrite := true);
 	
 EXPORT MakeSam(string version) := SEQUENTIAL(
-SpraySam(version),
-//OUTPUT(File_Sam,named('sam')),																// sample records						
-//OUTPUT(COUNT(File_Sam),named('n_sam')),												// total records
-//OUTPUT(COUNT(File_Sam(SAMNumber<>'')),named('n_parent')),			// parent records
-//OUTPUT(COUNT(File_Sam(SAMNumber='')),named('n_child')),				// child records
-oxml,
-//OUTPUT(COUNT(File_Converted),named('n_result')),							// should equl n_parent
-//OUTPUT(TABLE(Sam.File_Converted, {Sam.File_Converted.type, n := COUNT(GROUP)}, type)),	// sanity check
-Despray('~thor::out::sam::results', _Control.IPAddress.bctlpedata10,'/data/hds_3/sam/output/sam.xml')
+   SpraySam(version),
+   //OUTPUT(File_Sam,named('sam')),																// sample records						
+   //OUTPUT(COUNT(File_Sam),named('n_sam')),												// total records
+   //OUTPUT(COUNT(File_Sam(SAMNumber<>'')),named('n_parent')),			// parent records
+   //OUTPUT(COUNT(File_Sam(SAMNumber='')),named('n_child')),				// child records
+   Scrubs_Sam.fn_RunScrubs(version,'wenhong.ma@lexisnexis.com, Melanie.Jackson@lexisnexis.com, jason.allerdings@lexisnexis.com'),
+   IF(Scrubs.mac_ScrubsFailureTest('Scrubs_SAM', version)
+		,OUTPUT('Scrubs passed.  Continuing to build XML for Bridger.')				
+		,FAIL('Scrubs failed.  XML for Bridger not built.  Processing stopped.  Resolve scrubs issues before you run again.')
+   ),
+   oxml,
+   //OUTPUT(COUNT(File_Converted),named('n_result')),							// should equl n_parent
+   //OUTPUT(TABLE(Sam.File_Converted, {Sam.File_Converted.type, n := COUNT(GROUP)}, type)),	// sanity check
+   Despray('~thor::out::sam::results', _Control.IPAddress.bctlpedata10,'/data/hds_3/sam/output/sam.xml')
 );

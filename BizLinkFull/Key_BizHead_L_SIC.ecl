@@ -80,7 +80,7 @@ EXPORT ScoredproxidFetch(TYPEOF(h.company_sic_code1) param_company_sic_code1 = (
            -0.727*le.company_sic_code1_weight100))/100; 
     SELF.zip_match_code := match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),TRUE);
     SELF.zipWeight := (50+MAP (
-           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
+           SELF.zip_match_code = SALT311.MatchCode.ExactMatch => /*HACK16 le.zip_weight100 */ 1100 * param_zip(zip=le.zip)[1].weight/100.0,
            -0.995*le.zip_weight100))/100; 
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
     SELF.cnp_name_match_code := MAP(

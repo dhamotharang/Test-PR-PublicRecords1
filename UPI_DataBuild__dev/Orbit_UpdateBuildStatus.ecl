@@ -28,6 +28,7 @@
 		END	;
 	// -
 	rRequest	:= 	RECORD
+		$.Orbit_Layouts.AdditionalNamespacesLayout;	
 		rLex				lexRequest									{	XPATH('lex:request'								)	}										;
 	END	;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
@@ -66,7 +67,7 @@
 													,	rRequest
 													,	rResponse
 													,	XPATH(UPI_DataBuild__dev.Orbit_Tracking.OrbitRR(sService)	)
-													,	NAMESPACE(UPI_DataBuild__dev.Orbit_Tracking.Namespace_B)
+													,	NAMESPACE(UPI_DataBuild__dev.Orbit_Tracking.Namespace)
 													,	LITERAL
 													,	SOAPACTION(UPI_DataBuild__dev.Orbit_Tracking.SoapPath(sService) )
 													, RETRY(2)
@@ -78,7 +79,7 @@
 													,	rRequest
 													,	rResponse
 													,	XPATH(UPI_DataBuild__dev.Orbit_TrackingPROD.OrbitRR(sService)	)
-													,	NAMESPACE(UPI_DataBuild__dev.Orbit_TrackingPROD.Namespace_B)
+													,	NAMESPACE(UPI_DataBuild__dev.Orbit_TrackingPROD.Namespace)
 													,	LITERAL
 													,	SOAPACTION(UPI_DataBuild__dev.Orbit_TrackingPROD.SoapPath(sService) )
 													, RETRY(2)

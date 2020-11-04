@@ -1,4 +1,15 @@
-﻿EXPORT Layouts_eCrash_Base := RECORD,maxlength(40000)
+﻿citations_childrec := RECORD
+   string7 citation_issued;
+   string7 citation_type;
+   string100 citation_detail1;
+   string64 citation_status;
+   string60 violation_code1;
+   string60 violation_code2;
+   string60 violation_code3;
+   string60 violation_code4;
+  END;
+
+EXPORT Layouts_eCrash_Base := RECORD,maxlength(40000)
   string8 date_vendor_first_reported;
   string8 date_vendor_last_reported;
   string8 dt_first_seen;
@@ -877,4 +888,6 @@
   string marijuana_use_suspected;
   string direction_of_impact;
   string event_sequence;
+  string1 is_suppressed;
+  DATASET(citations_childrec) citation_details{maxcount(50)};
  END;

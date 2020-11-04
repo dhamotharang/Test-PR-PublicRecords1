@@ -493,6 +493,7 @@
 		STRING64 Geo_Coded_Longitude;
 		//PRtCC CR-1262 
     STRING Direction_Of_Impact;
+		STRING1 is_Suppressed;
 	END;
 	
 	EXPORT incident_ori := RECORD
@@ -516,7 +517,7 @@
 		STRING40 Safety_Equipment_Restraint2;
 		STRING40 Safety_Equipment_Helmet;
 		STRING100 Air_Bag_Deployed;
-		STRING20 Ejection;
+		STRING100 Ejection;
 		STRING30 Drivers_License_Jurisdiction;
 		STRING30 DL_Number_Class;
 		STRING3 DL_Number_CDL;
@@ -1317,7 +1318,7 @@
 		STRING40 Safety_Equipment_Restraint2;
 		STRING40 Safety_Equipment_Helmet;
 		STRING100 Air_Bag_Deployed;
-		STRING20 Ejection;
+		STRING100 Ejection;
 		STRING30 Drivers_License_Jurisdiction;
 		STRING30 DL_Number_Class;
 		STRING3 DL_Number_CDL;
@@ -1794,6 +1795,7 @@
 		//PRtCC CR-1262 
     STRING Direction_Of_Impact;
 		STRING Event_Sequence;
+		STRING1 is_Suppressed;
 	  DATASET(Citations_ChildRec) Citation_Details {MAXCOUNT(Constants.Max_Citations_ChildRec_Count)};
 	END;
 	

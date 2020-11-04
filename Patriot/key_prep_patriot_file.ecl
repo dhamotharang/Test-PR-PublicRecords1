@@ -1,4 +1,4 @@
-export key_prep_patriot_file := index(patriot.File_Patriot_keybuild,
+﻿export key_prep_patriot_file := index(patriot.File_Patriot_keybuild,
 {
 pty_key,
 source,

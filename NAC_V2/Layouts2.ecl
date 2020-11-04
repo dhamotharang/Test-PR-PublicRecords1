@@ -96,10 +96,10 @@ export rException := RECORD
 	string2			SourceProgramState;
 	string1			SourceProgramCode;
 	string20		SourceClientId;
+	string4			MatchedGroupId;
 	string2			MatchedState;
 	string1			MatchedProgramCode;
 	string20		MatchedClientId;
-	string4			MatchedGroupId;
 	string3			ReasonCode;			// A=Confirmed Multiple birth sibling, B=LexID Overlinking
 	string50		Comments;
 END;

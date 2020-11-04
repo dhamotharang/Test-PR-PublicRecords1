@@ -10,5 +10,5 @@ user_changed,
 date_changed,
 //DF-26286
 name_suffix,
-mname,keep(1))(trim(override_flag,left,right) <> '3');
+mname,keep(1))(trim(override_flag,left,right) = '1'); //DF-28345 Flag file suppression removed 10/22
 //DF-26286
