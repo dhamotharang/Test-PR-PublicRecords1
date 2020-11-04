@@ -114,15 +114,14 @@ EXPORT MakeGeographyList(
 
 	ParseStateCountyValues:=	project(dsStateCounty, trfParseStateCountyValues(left));
 	
-	// GetCountyCode					:=	ExtractCountyCode(ParseStateCountyValues);
-
 	Marketing_Suite_List_Gen.Layouts.Layout_TempBus trfMakeStateCountyList(Marketing_Suite_List_Gen.Layouts.Layout_TempBus l, GeoLayout r)	:=	transform
 		self								:=	l;
 	end;
 	
 	StateCountyCheck			:=	Join(	inSlimFile,
-																	ExtractCountyCode(ParseStateCountyValues),
-																	left.County=	right.CountyCode,
+																	ParseStateCountyValues,
+																	ut.CleanSpacesAndUpper(left.County_Name)=	ut.CleanSpacesAndUpper(right.CountyValue) and
+																	ut.CleanSpacesAndUpper(left.State)=	ut.CleanSpacesAndUpper(right.StateValue),																	
 																	trfMakeStateCountyList(left,right),ALL
 																);	
 
@@ -148,9 +147,9 @@ EXPORT MakeGeographyList(
 	end;
 	
 	StateCityCountyCheck	:=	Join(	inSlimFile,
-																	ExtractCountyCode(ParseStateCityCountyValues),
-																	left.County=	right.CountyCode and 
-																	left.city=right.CityValue,
+																	ParseStateCityCountyValues,
+																	ut.CleanSpacesAndUpper(left.County_Name)=	ut.CleanSpacesAndUpper(right.CountyValue) and
+																	ut.CleanSpacesAndUpper(left.city)=	ut.CleanSpacesAndUpper(right.CityValue),																	
 																	trfMakeStateCityCountyList(left,right),ALL
 																);																	
 																
@@ -177,9 +176,9 @@ EXPORT MakeGeographyList(
 	end;
 	
 	StateCityCountyZipCheck		:=	Join(	inSlimFile,
-																			ExtractCountyCode(ParseStateCityCountyZipValues),
-																			left.County =	right.CountyCode and 
-																			left.city = right.CityValue and
+																			ParseStateCityCountyZipValues,
+																			ut.CleanSpacesAndUpper(left.County_Name) =	ut.CleanSpacesAndUpper(right.CountyValue) and
+																			ut.CleanSpacesAndUpper(left.City) =	ut.CleanSpacesAndUpper(right.CityValue) and																			
 																			left.zip_code = right.ZipCodeValue,
 																			trfMakeStateCityCountyZipList(left,right),ALL
 																		);		
@@ -258,8 +257,9 @@ EXPORT MakeGeographyList(
 	end;
 	
 	StateCountyZipCheck		:=	Join(	inSlimFile,
-																	ExtractCountyCode(ParseStateCountyZipValues),
-																	left.County=	right.CountyCode and 
+																	ParseStateCountyZipValues,
+																	ut.CleanSpacesAndUpper(left.County_Name)=	ut.CleanSpacesAndUpper(right.CountyValue) and
+																	ut.CleanSpacesAndUpper(left.State)=	ut.CleanSpacesAndUpper(right.StateValue) and																
 																	left.zip_code=right.ZipCodeValue,
 																	trfMakeStateCountyZipList(left,right),ALL
 																);		

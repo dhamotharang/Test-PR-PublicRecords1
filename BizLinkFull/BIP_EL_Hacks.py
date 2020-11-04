@@ -7,8 +7,7 @@
 ##---------------------------------------------------------------------------
 def dAppendForce(): 
 	return [
-		('Process_Biz_Layouts','(update_forcefailed[^;]+SELF.ForceFailed :=[^;]+)\);','HACK03_a','\g<1>/*HACK03_a*/ OR le.cnp_nameWeight < 4);','Additional FORCE for Append'),
-		('Process_Biz_Layouts','(combine_scores.+SELF.ForceFailed :=[^;]+)\);','HACK03_b','\g<1>/*HACK03_b*/ OR SELF.cnp_nameWeight < 4);','Additional FORCE for Append')
+		('Process_Biz_Layouts','(combine_scores.+SELF.ForceFailed :=[^;]+)\);','HACK03','\g<1>/*HACK03*/ OR SELF.cnp_nameWeight < 4);','Additional FORCE for Append')
 	]
 
 ##---------------------------------------------------------------------------
@@ -53,20 +52,13 @@ def dUpdateKeynames():
 ##---------------------------------------------------------------------------
 ##HACK08
 ##Loosen up the scoring on cnp_name in the address linkpaths to add extra
-##emphasis on the cnp_name weight. April 2020 Hack08 extended to Thor code - 
-## note that there is no equivalent to J0/J1 in mod_ext_data
+##emphasis on the cnp_name weight.
 ##---------------------------------------------------------------------------
 def dAdjustCNPScore():
 	return [
-		('Key_BizHead_L_ADDRESS1','(EXPORT RawFetch[^;]+MatchBagOfWords[^)]+[)])','HACK08_a','\g<1>+400/*HACK08_a*/','Loosen cnp_name score in address linkpaths'),
-		('Key_BizHead_L_ADDRESS1','(J0[^;]+MatchBagOfWords[^)]+[)])','HACK08_b','\g<1>+400/*HACK08_b*/','Loosen cnp_name score in address linkpaths'),
-		('Key_BizHead_L_ADDRESS1','(J1[^;]+MatchBagOfWords[^)]+[)])','HACK08_c','\g<1>+400/*HACK08_c*/','Loosen cnp_name score in address linkpaths'),
-		('Key_BizHead_L_ADDRESS2','(EXPORT RawFetch[^;]+MatchBagOfWords[^)]+[)])','HACK08_a','\g<1>+400/*HACK08_a*/','Loosen cnp_name score in address linkpaths'),
-		('Key_BizHead_L_ADDRESS2','(J0[^;]+MatchBagOfWords[^)]+[)])','HACK08_b','\g<1>+400/*HACK08_b*/','Loosen cnp_name score in address linkpaths'),
-		('Key_BizHead_L_ADDRESS2','(J1[^;]+MatchBagOfWords[^)]+[)])','HACK08_c','\g<1>+400/*HACK08_c*/','Loosen cnp_name score in address linkpaths'),
-		('Key_BizHead_L_ADDRESS3','(EXPORT RawFetch[^;]+MatchBagOfWords[^)]+[)])','HACK08_a','\g<1>+400/*HACK08_a*/','Loosen cnp_name score in address linkpaths'),
-		('Key_BizHead_L_ADDRESS3','(J0[^;]+MatchBagOfWords[^)]+[)])','HACK08_b','\g<1>+400/*HACK08_b*/','Loosen cnp_name score in address linkpaths'),
-		('Key_BizHead_L_ADDRESS3','(J1[^;]+MatchBagOfWords[^)]+[)])','HACK08_c','\g<1>+400/*HACK08_c*/','Loosen cnp_name score in address linkpaths'),
+		('Key_BizHead_L_ADDRESS1','(EXPORT RawFetch[^;]+MatchBagOfWords[^)]+[)])','HACK08','\g<1>+400/*HACK08*/','Loosen cnp_name score in address linkpaths'),
+		('Key_BizHead_L_ADDRESS2','(EXPORT RawFetch[^;]+MatchBagOfWords[^)]+[)])','HACK08','\g<1>+400/*HACK08*/','Loosen cnp_name score in address linkpaths'),
+		('Key_BizHead_L_ADDRESS3','(EXPORT RawFetch[^;]+MatchBagOfWords[^)]+[)])','HACK08','\g<1>+400/*HACK08*/','Loosen cnp_name score in address linkpaths'),
 		('Mod_Ext_Data','(EXPORT RawFetchL_ADDRESS1[^;]+MatchBagOfWords[^)]+[)])','HACK08_a','\g<1>+400/*HACK08_a*/','Loosen cnp_name score in address linkpaths'),
 		('Mod_Ext_Data','(EXPORT RawFetchL_ADDRESS2[^;]+MatchBagOfWords[^)]+[)])','HACK08_b','\g<1>+400/*HACK08_b*/','Loosen cnp_name score in address linkpaths'),
 		('Mod_Ext_Data','(EXPORT RawFetchL_ADDRESS3[^;]+MatchBagOfWords[^)]+[)])','HACK08_c','\g<1>+400/*HACK08_c*/','Loosen cnp_name score in address linkpaths')
@@ -141,22 +133,22 @@ def dPayloadRestriction():
 ##---------------------------------------------------------------------------
 def dZipSpecificity():
 	return [
-		('Key_BizHead_L_ADDRESS1',     '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)(le.zip_weight100 \* param_zip\(zip=le\.zip\)\[1\]\.weight\/100\.0\,)','HACK16','\g<1> /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_ADDRESS2',     '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)(le.zip_weight100 \* param_zip\(zip=le\.zip\)\[1\]\.weight\/100\.0\,)','HACK16','\g<1> /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_ADDRESS3',     '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)(le.zip_weight100 \* param_zip\(zip=le\.zip\)\[1\]\.weight\/100\.0\,)','HACK16','\g<1> /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_CNPNAME',      '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)(le.zip_weight100 \* param_zip\(zip=le\.zip\)\[1\]\.weight\/100\.0\,)','HACK16','\g<1> /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_CNPNAME_FUZZY','(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)(le.zip_weight100 \* param_zip\(zip=le\.zip\)\[1\]\.weight\/100\.0\,)','HACK16','\g<1> /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_CNPNAME_ST',   '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)(le.zip_weight100 \* param_zip\(zip=le\.zip\)\[1\]\.weight\/100\.0\,)','HACK16','\g<1> /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_CNPNAME_ZIP',  '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)(le.zip_weight100 \* param_zip\(zip=le\.zip\)\[1\]\.weight\/100\.0\,)','HACK16','\g<1> /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_CONTACT',      '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)(le.zip_weight100 \* param_zip\(zip=le\.zip\)\[1\]\.weight\/100\.0\,)','HACK16','\g<1> /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_CONTACT_SSN',  '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)(le.zip_weight100 \* param_zip\(zip=le\.zip\)\[1\]\.weight\/100\.0\,)','HACK16','\g<1> /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_EMAIL',        '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)(le.zip_weight100 \* param_zip\(zip=le\.zip\)\[1\]\.weight\/100\.0\,)','HACK16','\g<1> /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_FEIN',         '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)(le.zip_weight100 \* param_zip\(zip=le\.zip\)\[1\]\.weight\/100\.0\,)','HACK16','\g<1> /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_PHONE',        '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)(le.zip_weight100 \* param_zip\(zip=le\.zip\)\[1\]\.weight\/100\.0\,)','HACK16','\g<1> /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_SIC',          '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)(le.zip_weight100 \* param_zip\(zip=le\.zip\)\[1\]\.weight\/100\.0\,)','HACK16','\g<1> /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_SOURCE',       '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)(le.zip_weight100 \* param_zip\(zip=le\.zip\)\[1\]\.weight\/100\.0\,)','HACK16','\g<1> /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),','Disregard zip specificity when calculating weight'),
-		('Key_BizHead_L_URL',          '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)(le.zip_weight100 \* param_zip\(zip=le\.zip\)\[1\]\.weight\/100\.0\,)','HACK16','\g<1> /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),','Disregard zip specificity when calculating weight'),
-		('Mod_Ext_Data',               '(SELF.zipWeight :=.*?SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)(le.zip_weight100 \* param_zip\(zip=le\.zip\)\[1\]\.weight\/100\.0\,)','HACK16','\g<1> /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),','Disregard zip specificity when calculating weight')
+		('Key_BizHead_L_ADDRESS1',     '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_ADDRESS2',     '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_ADDRESS3',     '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_CNPNAME',      '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_CNPNAME_FUZZY','(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_CNPNAME_ST',   '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_CNPNAME_ZIP',  '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_CONTACT',      '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_CONTACT_SSN',  '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_EMAIL',        '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_FEIN',         '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_PHONE',        '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_SIC',          '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_SOURCE',       '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Key_BizHead_L_URL',          '(SELF.zipWeight :=.*SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)(.+EXPORT ScoredFetch_Batch)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100 \g<3>','Disregard zip specificity when calculating weight'),
+		('Mod_Ext_Data',               '(SELF.zipWeight :=.*?SELF.zip_match_code = SALT311.MatchCode.ExactMatch =>)([^*]+)','HACK16','\g<1> /*HACK16 \g<2>*/ 1100','Disregard zip specificity when calculating weight')
 		]
 
 ##---------------------------------------------------------------------------
@@ -232,7 +224,7 @@ def dCnpNameOptimizations():
                                                                       AND Keyed(fallback_value >= param_fallback_value)
                                                                       
                                                                   ),
-                                                                  Config_BIP.L_CNPNAME_MAXBLOCKLIMIT,
+                                                                  Config_BIP.L_CNPNAME_FUZZY_MAXBLOCKLIMIT,
                                                                   ONFAIL(TRANSFORM(SlimKeyRec, 
                                                                                    SELF := ROW([],SlimKeyRec))),
                                                                   keyed),
@@ -283,16 +275,14 @@ def dCnpNameFuzzyFallbackValueChanges():
 ##---------------------------------------------------------------------------		
 def dChangeConfigLimits():
     return[
-        ('Config', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKSIZE:=10000;', 'HACK27a', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKSIZE:=250000; // Increased limit to 250K from 10K /*HACK27a*/', 'Increased limit to 250K from 10K'),
-        ('Config', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKLIMIT:=10000;', 'HACK27b', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27b*/', 'Increased limit to 250K from 10K'),
-        ('Config', 'EXPORT L_CNPNAME_ST_MAXBLOCKSIZE:=10000;', 'HACK27c', 'EXPORT L_CNPNAME_ST_MAXBLOCKSIZE:=250000; // Increased limit to 250K from 10K /*HACK27c*/', 'Increased limit to 250K from 10K'),
-        ('Config', 'EXPORT L_CNPNAME_ST_MAXBLOCKLIMIT:=10000;', 'HACK27d', 'EXPORT L_CNPNAME_ST_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27d*/', 'Increased limit to 250K from 10K'),
-        ('Config', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKSIZE:=10000;', 'HACK27e', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKSIZE:=250000; // Increased limit to 250K from 10K /*HACK27e*/', 'Increased limit to 250K from 10K'),
-        ('Config', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKLIMIT:=10000;', 'HACK27f', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27f*/', 'Increased limit to 250K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKSIZE:=10000;', 'HACK27a', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKSIZE:=250000; // Increased limit to 250K from 10K /*HACK27a*/', 'Increased limit to 100K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKLIMIT:=10000;', 'HACK27b', 'EXPORT L_CNPNAME_ZIP_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27b*/', 'Increased limit to 100K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_ST_MAXBLOCKSIZE:=10000;', 'HACK27c', 'EXPORT L_CNPNAME_ST_MAXBLOCKSIZE:=250000; // Increased limit to 250K from 10K /*HACK27c*/', 'Increased limit to 100K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_ST_MAXBLOCKLIMIT:=10000;', 'HACK27d', 'EXPORT L_CNPNAME_ST_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27d*/', 'Increased limit to 100K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKSIZE:=10000;', 'HACK27e', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKSIZE:=250000; // Increased limit to 250K from 10K /*HACK27e*/', 'Increased limit to 100K from 10K'),
+        ('Config', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKLIMIT:=10000;', 'HACK27f', 'EXPORT L_CNPNAME_FUZZY_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27f*/', 'Increased limit to 100K from 10K'),
         ('Config', 'EXPORT L_CNPNAME_MAXBLOCKSIZE:=10000;', 'HACK27g', 'EXPORT L_CNPNAME_MAXBLOCKSIZE:=250000; // Increased limit to 250K from 10K /*HACK27g*/', 'Increased limit to 250K from 10K'),
-        ('Config', 'EXPORT L_CNPNAME_MAXBLOCKLIMIT:=10000;', 'HACK27h', 'EXPORT L_CNPNAME_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27h*/', 'Increased limit to 250K from 10K'),
-		('Config', 'EXPORT L_CONTACT_MAXBLOCKSIZE:=10000;', 'HACK27i', 'EXPORT L_CONTACT_MAXBLOCKSIZE:=100000; // Increased limit to 100K from 10K /*HACK27i*/', 'Increased limit to 100K from 10K'),
-        ('Config', 'EXPORT L_CONTACT_MAXBLOCKLIMIT:=10000;', 'HACK27j', 'EXPORT L_CONTACT_MAXBLOCKLIMIT:=100000; // Increased limit to 100K from 10K /*HACK27j*/', 'Increased limit to 100K from 10K')
+        ('Config', 'EXPORT L_CNPNAME_MAXBLOCKLIMIT:=10000;', 'HACK27h', 'EXPORT L_CNPNAME_MAXBLOCKLIMIT:=250000; // Increased limit to 250K from 10K /*HACK27h*/', 'Increased limit to 250K from 10K')
     ]
 
 ##---------------------------------------------------------------------------
@@ -325,3 +315,5 @@ getHacks = 	dAppendForce() + \
 			dCnpNameFuzzyFallbackValueChanges() + \
             dChangeConfigLimits() + \
             dAddLimitsForBOW()
+			
+

@@ -493,6 +493,15 @@ module
 				// -- JIRA - DF-27852 Remove Busreg Contact Information for LexID 2361200281
 				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.lname) = 'SMITH' and 
 						 trim(pInput.company_source_group) in ['2003079497BOLD AND CLASSIC', '32011167163BOLD AND CLASSIE', 'A208015557REEL ADVOCATE', 'A211008586BOLD AND CLASSIE', 'A214003819REAL 2 REEL MEDIA GROUP'])
+				// -- JIRA - DF-28332 FCRA - Possible Overlinking LexID 1924627637 in PAW and Business Contacts
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.lname) = 'PATEL' and trim(pInput.fname) = 'JITENDRA' and
+						 trim(pInput.company_source_group) in ['6547020OM HOSPITALITY INC'])
+				// -- JIRA - DF-28113 Consumer Karen Ruge may be incorrectly associated with A M Electrical
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.lname) = 'RUGE' and trim(pInput.fname) = 'KAREN' and
+						 trim(pInput.company_name) = 'A M ELECTRICAL SERVICES INC')
+				// -- JIRA - BH-915 Incorrect ROBERT HILL, possibly, associated to business
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.company_source_group) in ['1855883 SHATTOS LLC','258208NORTH PARK TRUCK & EQUIPMENT'] and
+						 trim(pInput.lname) = 'HILL' and trim(pInput.prim_name) = 'PO BOX 705')
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -710,6 +719,8 @@ module
 				or	(MDR.sourceTools.SourceIsWhois_domains(pInput.source))
 				// -- JIRA# DF-28031 - Remove TMSID DF204043915806782546018877941 from D&B FEIN
 				or	(MDR.sourceTools.SourceIsDunn_Bradstreet_Fein(pInput.source) and trim(pInput.vendor_id,left,right) = '018877941')
+				// -- JIRA# DF-26195 - Flush-n-fill the old historical SKA records from the basefiles and re-introduce them as new records again. Remove this code in the next run.
+				or	(MDR.sourceTools.SourceIsSKA(pInput.source))
 				;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -1103,6 +1114,17 @@ module
 				// -- JIRA - DF-27852 Remove Busreg Contact Information for LexID 2361200281
 				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.lname) = 'SMITH' and 
 						 trim(pInput.company_source_group) in ['2003079497BOLD AND CLASSIC', '32011167163BOLD AND CLASSIE', 'A208015557REEL ADVOCATE', 'A211008586BOLD AND CLASSIE', 'A214003819REAL 2 REEL MEDIA GROUP'])
+				// -- JIRA - DF-28332 FCRA - Possible Overlinking LexID 1924627637 in PAW and Business Contacts
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.lname) = 'PATEL' and trim(pInput.fname) = 'JITENDRA' and
+						 trim(pInput.company_source_group) in ['6547020OM HOSPITALITY INC'])
+				// -- JIRA - DF-28113 Consumer Karen Ruge may be incorrectly associated with A M Electrical
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.lname) = 'RUGE' and trim(pInput.fname) = 'KAREN' and
+						 trim(pInput.company_name) = 'A M ELECTRICAL SERVICES INC')
+				// -- JIRA - BH-915 Incorrect ROBERT HILL, possibly, associated to business
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.company_source_group) in ['1855883 SHATTOS LLC','258208NORTH PARK TRUCK & EQUIPMENT'] and
+						 trim(pInput.lname) = 'HILL' and trim(pInput.prim_name) = 'PO BOX 705')
+				// -- JIRA# DF-26195 - Flush-n-fill the old historical SKA records from the basefiles and re-introduce them as new records again. Remove this code in the next run.
+				or	(MDR.sourceTools.SourceIsSKA(pInput.source))
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -1223,6 +1245,10 @@ module
 				filterbugDF27867 := trimids(l.vendor_id) = '48-0010563006' and l.did = 843964814
 														and l.bdid = 742157080 and trim(l.lname) = 'FOWLER' and trim(l.fname) = 'WILLIAM';
 														
+				// -- JIRA - DF-28296 Bus Association - Sharese N. Brown may be confused with Sharese Lynette Brown
+				filterbugDF28296 := trimids(l.company_source_group) = 'F10000000471ALL YOU CAN BE ENTERTA' and l.did = 303538718
+														and l.bdid = 2462145988 and trim(l.lname) = 'SHARESE' and trim(l.fname) = 'BROWN';
+														
 				phone 				:= (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.phone));  // Zero the phone if more than 10-digits
 				company_phone := (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.company_phone));  // Zero the companyphone if more than 10-digits
 				
@@ -1247,10 +1273,12 @@ module
 				self.company_source_group	:= trimids(l.company_source_group);
 				self.DID									:= if(filterbug30402 or filterbug114192 or filterbugLNK563 or filterbugLNK1267 or
 																				filterbugDF22318 or filterbugDF23078 or filterbugLNK1501 or filterbugDF23926 or
-																				filterbugDF23188 or filterbugDF23549 or filterbugDF26722 or filterbugDF27867, 0, l.did);
+																				filterbugDF23188 or filterbugDF23549 or filterbugDF26722 or filterbugDF27867 or
+																				filterbugDF28296, 0, l.did);
 				self.ssn									:= if(filterbug30402 or filterbug114192 or filterbugLNK563 or filterbugLNK1267 or  
 																				filterbugDF22318 or filterbugDF23078 or filterbugLNK1501 or filterbugDF23926 or
-																				filterbugDF23188 or filterbugDF23549 or filterbugDF26722 or filterbugDF27867, 0, l.ssn);
+																				filterbugDF23188 or filterbugDF23549 or filterbugDF26722 or filterbugDF27867 or
+																				filterbugDF28296, 0, l.ssn);
 				//for bug 30494 & 30519.  20080424
 				self.dt_first_seen				:= (unsigned4)validatedate((string8)l.dt_first_seen						,if(length(trim((string8)l.dt_first_seen						)) = 8,0,1));
 				self.dt_last_seen					:= (unsigned4)validatedate((string8)l.dt_last_seen						,if(length(trim((string8)l.dt_last_seen							)) = 8,0,1));
@@ -1482,6 +1510,9 @@ module
 				// -- JIRA - DF-27867, Business/emp records appended to the wrong consumer
 				filterbugDF27867 := trimids(l.vendor_id) = '48-0010563006' and l.did = 843964814
 														and l.bdid = 742157080 and trim(l.lname) = 'FOWLER' and trim(l.fname) = 'WILLIAM';
+				// -- JIRA - DF-28296 Bus Association - Sharese N. Brown may be confused with Sharese Lynette Brown
+				filterbugDF28296 := trimids(l.company_source_group) = 'F10000000471ALL YOU CAN BE ENTERTA' and l.did = 303538718
+														and l.bdid = 2462145988 and trim(l.lname) = 'SHARESE' and trim(l.fname) = 'BROWN';
 				// --- Bug#35653 -  For the "Eq_employer" source first & last seen dates are set to zero/blank as the 
 				// dates coming in from the base file are harded coded.
 				ZeroEq_EmployerDate :=  (MDR.sourceTools.SourceIsEq_Employer(l.source));
@@ -1497,11 +1528,11 @@ module
 				self.DID									:= if(filterbug30402 or filterbugLNK563 or filterbugLNK1267 or 
 																				filterbugDF22318 or filterbugDF23078 or filterbugLNK1501 or
 																				filterbugDF23926 or filterbugDF23188 or filterbugDF23549 or 
-																				filterbugDF26722 or filterbugDF27867, 0, l.did)	;
+																				filterbugDF26722 or filterbugDF27867 or filterbugDF28296, 0, l.did)	;
 				self.ssn									:= if(filterbug30402 or filterbugLNK563 or filterbugLNK1267 or 
 																				filterbugDF22318 or filterbugDF23078 or filterbugLNK1501 or
 																				filterbugDF23926 or filterbugDF23188 or filterbugDF23549 or
-																				filterbugDF26722 or filterbugDF27867, 0, l.ssn)	;
+																				filterbugDF26722 or filterbugDF27867 or filterbugDF28296, 0, l.ssn)	;
 				self											:= l														;                              
 			end;
 			
@@ -1617,6 +1648,10 @@ module
 			or
 				(		pInput.did						= 1363114130
 				 and	pInput.bdid						= 14733991
+				)
+			or  //*** Jira# DF-28332 FCRA-Possible Overlinking in PAW and BusConts
+				(		pInput.did						= 1924627637
+				 and	pInput.bdid						= 701373885
 				)
 
 			;

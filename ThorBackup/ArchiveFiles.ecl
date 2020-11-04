@@ -1,4 +1,4 @@
-﻿import STD,lib_fileservices,ut;
+﻿import STD,lib_fileservices,ut,_Control;
 export ArchiveFiles(string location, string environment, integer noofpartitions = 0, integer whichpartition = 0) := module
 	
 	export rundatetime := ut.GetTimeDate() : independent;
@@ -236,7 +236,8 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 		return 	apply(GetActualFileListToCopy(),
 														sequential(
 																output( 'Copying file ' + (string) l_cnt),
-																STD.File.DfuPlusExec(cmd)
+																if (STD.File.FileExists('~foreign::'+_Control.Config.prod_dali+'::'+files)
+																	,STD.File.DfuPlusExec(cmd))
 																)
 														 );
 	end;

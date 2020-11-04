@@ -133,7 +133,7 @@
 		STRING100 photograph_type;
 		STRING10 posted_satutory_speed_limit;
 		STRING25 safety_equipment_available_or_used;
-		STRING20 ejection;
+		STRING100 ejection;
 		STRING40 safety_equipment_helmet;
 		STRING60 transported_to;
 		STRING20 dispatch_time;

@@ -1,4 +1,4 @@
-import Address,doxie_files, ut, doxie, autokey,SANCTN, RoxieKeyBuild;
+﻿import Address,doxie_files, ut, doxie, autokey,SANCTN, RoxieKeyBuild;
 
 export proc_build_SANCTN_keys(string filedate) := FUNCTION
 
@@ -104,7 +104,6 @@ build_boolean_keys := SANCTN.Proc_Build_Boolean_Keys(filedate);
 
 // emailN := fileservices.sendemail('ehamel@seisint.com'),
 
-update_dops	:=	RoxieKeyBuild.updateversion('SanctnKeys', filedate, 'terri.hardy-george@lexisnexis.com',,'N|B');
 emailN := fileservices.sendemail('roxiebuilds@seisint.com;ehamel@seisint.com;tgibson@seisint.com',
 								 
 								'sanctn: BUILD SUCCESS '+ filedate ,
@@ -140,7 +139,6 @@ buildKey	:=	sequential(
 												,to_qa_orig
 												,build_autokeys
 												,build_boolean_keys
-												,update_dops
 												,emailN
 	 											);	
 

@@ -31,7 +31,7 @@ export proc_Build_Bases := sequential(
 	PerformUpdateOrNot	:= IF(pShouldUpdateDOPS,PARALLEL(updatedops),NoUpdate);
 //---------------------------------------------------------------------------------------
 
- updateorbit		:= Orbit3.proc_Orbit3_CreateBuild('PRTE2- BusinessHeader', pversion, 'N', true, true, false, _control.MyInfo.EmailAddressNormal);  
+updateorbit:= orbit3.proc_Orbit3_CreateBuild('PRTE2- BusinessHeader', pversion, 'PN', _control.Myinfo.EmailAddressNormal);
 
 
 key_validation :=  output(dops.ValidatePRCTFileLayout(pversion, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation'));

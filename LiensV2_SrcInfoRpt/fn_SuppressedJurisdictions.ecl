@@ -1,6 +1,6 @@
 ﻿IMPORT	LiensV2_SrcInfoRpt,	ut,	STD;
 EXPORT	fn_SuppressedJurisdictions(STRING	filename)	:=	FUNCTION
-
+// filename := ' ';
 	//	Get Sprayed Source Information Report
 	dSourceInformationReport	:=	LiensV2_SrcInfoRpt.Files(filename).SourceInformationReport;
 
@@ -20,12 +20,16 @@ EXPORT	fn_SuppressedJurisdictions(STRING	filename)	:=	FUNCTION
 		SELF.MatchKey						:=	ut.CleanSpacesAndUpper(pInput.MatchKey);
 		SELF.CollectionCoverage	:=	ut.CleanSpacesAndUpper(pInput.CollectionCoverage);
 		SELF.VisitInterval			:=	ut.CleanSpacesAndUpper(pInput.VisitInterval);
-		SELF.CourtLatency				:=	ut.CleanSpacesAndUpper(pInput.CourtLatency);
-		SELF.DispositionScore		:=	ut.CleanSpacesAndUpper(pInput.DispositionScore);
+		SELF.CourtLatency				:=	MAP(ut.CleanSpacesAndUpper(pInput.CourtLatency) ='UNKNOWN' => ut.CleanSpacesAndUpper(pInput.CourtLatency), //DF-27756
+                                    (string)round((real)ut.CleanSpacesAndUpper(pInput.CourtLatency)));
+		SELF.DispositionScore		:=	MAP(ut.CleanSpacesAndUpper(pInput.DispositionScore) ='TBD' => ut.CleanSpacesAndUpper(pInput.DispositionScore),  //DF-27756
+                                    (string)round((real)ut.CleanSpacesAndUpper(pInput.DispositionScore)));
+
 		SELF.SevenYrVolume			:=	ut.CleanSpacesAndUpper(pInput.SevenYrVolume);
 		fmtsin := [
 			'%m/%d/%Y',
-			'%m/%d/%y'
+			
+			'%m-%d-%y'
 		];
 		fmtout:='%Y%m%d';
 		SELF.MaxCollectDate			:=	IF(
@@ -35,28 +39,30 @@ EXPORT	fn_SuppressedJurisdictions(STRING	filename)	:=	FUNCTION
 																);
 		SELF.VisitWithin90			:=	ut.CleanSpacesAndUpper(pInput.VisitWithin90);
 		SELF.IsActive						:=	pInput.IsActive;
-		SELF.FileTypeID					:=	pInput.MatchKey[8..9];
+		SELF.FileTypeID					:=	MAP(pInput.MatchKey[8..9] IN ['LT','CJ'] =>'CP',  //DF-27756
+                                    pInput.MatchKey[8..9]);
 	END;
 
 	dSourceInformationReportClean	:=	PROJECT(dSourceInformationReport,CleanSourceInformationReport(LEFT));
+  
 	//	DEDUP on FileTypeID because we have multiple entries to account for spelling differences in filing_type_desc
-	dFCRAActionGroupFilter				:=	DEDUP(SORT(LiensV2_SrcInfoRpt.FCRAActionGroupFilter,FileTypeID),FileTypeID);
+	// dFCRAActionGroupFilter				:=	DEDUP(SORT(LiensV2_SrcInfoRpt.FCRAActionGroupFilter,FileTypeID),FileTypeID); //DF-27756 VC Not needed anymore
 
-	//	Remove Jurisdictions based on FileTypeID
-	dActionGroupFilter	:=	JOIN(
-														dSourceInformationReportClean,
-														dFCRAActionGroupFilter,
-															LEFT.FileTypeID	=	RIGHT.FileTypeID,
-														TRANSFORM(LEFT)
-													);
+	//	Remove Jurisdictions based on FileTypeID //DF-27756 VC - Commented as this will prevent suppression of certain courts.
+	// dActionGroupFilter	:=	JOIN(
+														// dSourceInformationReportClean,
+														// dFCRAActionGroupFilter,
+															// LEFT.FileTypeID	=	RIGHT.FileTypeID,
+														// TRANSFORM(LEFT)
+													// );
 
 
 	//	Remove Juristdictions based on information within the record
-	dSuppressedJurisdictions	:=	dActionGroupFilter(
-																	VisitInterval	IN	['OVER 90','OVER 120','OVER 180', '> 90','> 120','> 180']	AND
-																	VisitWithin90	IN	['NO']
+	dSuppressedJurisdictions	:=	dSourceInformationReportClean(VisitInterval	IN	['OVER 90','OVER 120','OVER 180', '> 90','> 120','> 180']	
+                                  OR VisitWithin90	IN	['NO']
 																);
 																
 	RETURN dSuppressedJurisdictions;
 	
 END;
+

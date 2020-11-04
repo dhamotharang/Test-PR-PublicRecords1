@@ -42,6 +42,8 @@ export Set_Fetch_Level_Above_SELEID    				:= [Fetch_Level_OrgID,Fetch_Level_Ult
 export Set_Fetch_Level_Above_OrgID		       	:= [Fetch_Level_UltID];
 
 export USE_LOCAL_KEYS := true; // A true here will override the next USE_LOCAL_*_KEYS attributes
+export USE_LOCAL_ROXIE_SALT_KEYS := true; // Used if USE_LOCAL_KEYS is false
+export USE_LOCAL_ROXIE_BEST_KEYS := true; // Used if USE_LOCAL_KEYS is false
 export USE_LOCAL_THOR_SALT_KEYS := true; // Used if USE_LOCAL_KEYS is false
 export USE_LOCAL_THOR_BEST_KEYS := true; // Used if USE_LOCAL_KEYS is false
 

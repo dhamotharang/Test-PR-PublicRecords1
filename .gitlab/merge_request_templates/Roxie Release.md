@@ -2,6 +2,12 @@
 
 <!--Replace this comment with a description-->
 
+<p id="l">
+
+- [ ] Has Data Layout Change
+<!-- checkbox on [x] | checkbox off [ ]  -->
+</p>
+
 <p>
 <details>
 <summary>Query Deploy List</summary>

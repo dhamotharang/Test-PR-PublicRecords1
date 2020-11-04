@@ -61,10 +61,10 @@ suppress_obscene := Sync_Npa (cellphone not in $.Set_Supress.phone and
 
 
 //DF-25784 
-source_level_detail := $.Fn_Apply_Opt_Out(suppress_obscene):persist('~thor_data400::persist::Phonesplus::source_level_detail'); 	
+source_level := $.Fn_Apply_Opt_Out(suppress_obscene):persist('~thor_data400::persist::Phonesplus::source_level_detail'); 	
 	
 //-------Rollup records to have one record per combination of name, address, phoneL7--------
-Rollup_Phplus 	 := $.Fn_Rollup_as_Phonesplus(source_level_detail)
+Rollup_Phplus 	 := $.Fn_Rollup_as_Phonesplus(source_level)
 :persist('~thor_data400::persist::Phonesplus::Rollup_Phplus');
 
 //-----Sync Phone Type
@@ -129,6 +129,7 @@ Map_v1_Fields := $.Fn_Map_v1_Fields(Add_Header_Household);
 
 //DF-27472 update rules field for detail records
 //non-royalty records only, add household record to detail
+source_level_detail				:= $.Fn_Sync_Phone_Type(source_level); //DF-28420: Sync Source Level Base Phone Fields
 source_level_non_royalty 	:= source_level_detail(source <> mdr.sourceTools.src_wired_assets_royalty) 
 														+ Map_v1_Fields(household_flag = true and ~$.Translation_Codes.fFlagIsOn(src_all, $.Translation_Codes.source_bitmap_code(mdr.sourceTools.src_wired_assets_royalty)));
 											 
