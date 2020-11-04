@@ -286,6 +286,6 @@ EXPORT Layouts_accidents_alpha := RECORD
   string pedalcyclist_actions_at_time_of_crash;
   string passenger_actions_at_time_of_crash;
   string marijuana_use_suspected;
+  string1 is_suppressed;
   DATASET(citations_childrec) citation_details{maxcount(50)};
  END;
-
