@@ -5,7 +5,7 @@
 EXPORT fSpray_CollateralAnalytics( 
 	STRING		pVersionDate		=	'',
 	STRING		pServerIP				= Constants().serverIP,
-	STRING		pDirectory			= Constants().Directory,
+	STRING		pDirectory			= Constants().Directory.Main,
 	STRING		pFilename				=	'*',
 	STRING		pGroupName			=	_Dataset().groupname,
 	BOOLEAN		pIsTesting			=	FALSE,
@@ -18,7 +18,7 @@ FilesToSpray := DATASET([
 		//	
 		{
 			pServerIP, 																//	SourceIP
-			pDirectory,//+'/',							//	SourceDirectory
+			pDirectory+pVersionDate,//+'/',							//	SourceDirectory
 			//pFilename,																//	directory_filter
 			pFilename,
 			0, 																				//	record_size

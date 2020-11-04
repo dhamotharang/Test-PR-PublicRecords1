@@ -99,10 +99,7 @@ module
 		LEFT ONLY,
 		LOOKUP);
 
-	dappendName := Standardize_Entity.Clean_Name(Valid_Recs);		
-	dCleanInputFields := Standardize_Entity.Clean_InputFields (dappendName);	
-	
-	input_file_1 := fn_dedup(Deltabase_Sprayed  + project(dCleanInputFields,Layouts.Input.Deltabase)); 
+	input_file_1 := fn_dedup(Deltabase_Sprayed  + project(Valid_Recs,Layouts.Input.Deltabase)); 
 
 	tools.mac_WriteFile(Filenames(pversion).Input.Deltabase.New(pversion),
 		distribute(input_file_1,hash(source_rec_id)),

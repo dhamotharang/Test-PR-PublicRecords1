@@ -1,0 +1,33 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_IA_SalesTax
+FILENAME:IA_SalesTax
+NAMESCOPE:Input
+//-------------------------
+//FIELDTYPE DEFINITIONS
+//-------------------------
+FIELDTYPE:invalid_permit_nbr:CUSTOM(Scrubs.Functions.fn_numeric>0,9)
+FIELDTYPE:invalid_issue_date:CUSTOM(Scrubs_IA_SalesTax.Functions.fn_valid_Date>0)
+FIELDTYPE:invalid_owner_name:CUSTOM(Scrubs_IA_SalesTax.Functions.fn_valid_name>0)
+FIELDTYPE:invalid_business_name:CUSTOM(Scrubs_IA_SalesTax.Functions.fn_valid_name>0)
+FIELDTYPE:invalid_state:CUSTOM(Scrubs.Functions.fn_verify_state>0)
+FIELDTYPE:invalid_zip:CUSTOM(Scrubs.Functions.fn_verify_zip59 >0)
+
+//--------------------------------------------------------------- 
+//FIELDS TO SCRUB 
+//---------------------------------------------------------------
+FIELD:permit_nbr:TYPE(STRING9):LIKE(invalid_permit_nbr):0,0
+FIELD:issue_date:TYPE(STRING10):LIKE(invalid_issue_date):0,0
+FIELD:owner_name:TYPE(STRING40):LIKE(invalid_owner_name):0,0
+FIELD:business_name:TYPE(STRING40):LIKE(invalid_business_name):0,0
+FIELD:city_mailing_address:TYPE(STRING20):0,0
+FIELD:mailing_address:TYPE(STRING50):0,0
+FIELD:state_mailing_address:TYPE(STRING2):LIKE(invalid_state):0,0
+FIELD:mailing_zip_code:TYPE(STRING5):LIKE(invalid_zip):0,0
+FIELD:location_address:TYPE(STRING50):0,0
+FIELD:city_of_location:TYPE(STRING20):0,0
+FIELD:state_of_location:TYPE(STRING2):LIKE(invalid_state):0,0
+FIELD:location_zip_code:TYPE(STRING5):LIKE(invalid_zip):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

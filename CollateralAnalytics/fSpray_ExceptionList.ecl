@@ -5,7 +5,7 @@ import versioncontrol, tools, _control, OKC_Student_List;
 EXPORT fSpray_ExceptionList( 
 	STRING		pVersionDate		=	'',
 	STRING		pServerIP				= Constants().serverIP,
-	STRING		pDirectory			= Constants().Directory,
+	STRING		pDirectory			= Constants().Directory.Exception,
 	STRING		pFilename				=	'*',
 	STRING		pGroupName			=	_Dataset().groupname,
 	BOOLEAN		pIsTesting			=	FALSE,
@@ -18,7 +18,7 @@ FilesToSpray := DATASET([
 		//	
 		{
 			pServerIP, 																//	SourceIP
-			pDirectory,//+'/',							//	SourceDirectory
+			pDirectory+pVersionDate,//+'/',							//	SourceDirectory
 			//pFilename,																//	directory_filter
 			pFilename,
 			0, 																				//	record_size

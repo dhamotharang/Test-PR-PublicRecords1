@@ -1,11 +1,11 @@
 ﻿IMPORT FirstData, header, ut, PromoteSupers,VersionControl, address, STD;
 
-EXPORT Build_BaseFile(STRING	pVersion	=	(STRING)STD.Date.Today()) := MODULE
+EXPORT Build_BaseFile(STRING	pVersion	=	(STRING)STD.Date.Today(), boolean isdelta = true) := MODULE
 
 	//FirstData input file 
 	ds_firstdata_in := FirstData.Files().file_in;
 	
-  file_name	:=	FirstData.Filenames().Input.Raw.Using;
+    file_name	:=	FirstData.Filenames().Input.Raw.Using;
 	file_date := IF(VersionControl.fGetFilenameVersion(file_name)>0,
 															(STRING)VersionControl.fGetFilenameVersion(file_name)
 														,pVersion
@@ -27,22 +27,32 @@ EXPORT Build_BaseFile(STRING	pVersion	=	(STRING)STD.Date.Today()) := MODULE
 	EXPORT dsClean				:=	project(ds_firstdata_in,xformToCommon(left));
 
 	ds_firstdata_base_in := Firstdata.Files().file_base;
-	ds_firstdata_base	   := ds_firstdata_base_in + dsClean;
-
-  VersionControl.macBuildNewLogicalFile(Filenames(pVersion).base.firstdata.new, ds_firstdata_base, Build_FirstDataBase_File		,TRUE);
-
-	EXPORT	full_build	:=
+    ds_firstdata_base	   :=  if(isdelta, dsClean, ds_firstdata_base_in + dsClean);
+    VersionControl.macBuildNewLogicalFile(Filenames(pVersion).base.firstdata.new, ds_firstdata_base, Build_FirstDataBase_File		,TRUE);
+    //The Daily build is used on every day other than mondays
+	EXPORT	daily_build	:=
 				SEQUENTIAL(
 					Promote(pversion).inputfiles.Sprayed2Using
 					,Build_FirstDataBase_File
 					,Promote(pversion).Inputfiles.Using2Used
-					,Promote(pversion, 'base').buildfiles.New2Built
-					,Promote(pversion, 'base').buildfiles.Built2QA	
+                    ,fileservices.addsuperfile(FirstData.Filenames().Base.firstdata.QA, Filenames(pVersion).base.firstdata.new)
 				);
-				
+    //Used on mondays
+    export full_build :=
+                SEQUENTIAL(
+					Promote(pversion).inputfiles.Sprayed2Using
+					,Build_FirstDataBase_File
+					,Promote(pversion).Inputfiles.Using2Used
+                    ,Promote(pversion, 'base').buildfiles.New2Built
+					,Promote(pversion, 'base').buildfiles.Built2QA	
+                    ,FileServices.RemoveOwnedSubFiles(FirstData.Filenames().Base.firstdata.QA)
+                    ,FileServices.ClearSuperFile(FirstData.Filenames().Base.firstdata.QA)
+                    ,Fileservices.addsuperfile(FirstData.Filenames().Base.firstdata.QA, Filenames(pVersion).base.firstdata.new)
+                );
+    
 	EXPORT	ALL	:=
 	IF(VersionControl.IsValidVersion(pversion)
-		, full_build
+		, if(isdelta, daily_build, full_build)
 		,output('No Valid version parameter passed, skipping FirstData.Build_Basefiles().All attribute')
 	);
 
