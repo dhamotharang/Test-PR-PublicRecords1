@@ -109,5 +109,5 @@ EXPORT layouts := MODULE
 		string8  date_added;						
 		string6  time_added;	
 	END;
-    EXPORT Spoofing_payload := Base_spoofing;
+    EXPORT Spoofing_payload := Base_spoofing - date_file_loaded;
 END;
