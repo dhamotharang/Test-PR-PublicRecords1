@@ -38,7 +38,7 @@ dDelta_rid  := dataset([], dx_Property.Layouts.i_Delta_Rid);
 
 RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_Property.Key_Foreclosure_Delta_Rid,
 																						dDelta_rid,
-																						'~thor_Data400::key::forclosure::@version@::delta_rid',
+																						'~thor_Data400::key::foreclosure::@version@::delta_rid',
 																						'~thor_data400::key::foreclosure::' + filedate +'::delta_rid',
 																						do11);
 RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_Property.Key_Normalized_Delta_Rid,
