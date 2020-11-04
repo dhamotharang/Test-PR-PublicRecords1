@@ -1,2 +1,2 @@
 ﻿IMPORT Data_Services, dx_Property;
-export File_Foreclosure_Normalized := dataset(/*Data_Services.foreign_prod+*/'~thor_data400::base::foreclosure_normalized',dx_Property.Layout_Foreclosure_Base_Normalized,thor);
+export File_Foreclosure_Normalized := dataset(/*Data_Services.foreign_prod+*/'~thor_data400::base::foreclosure_normalized',Property.Layout_Foreclosure_Base_Normalized,thor);
