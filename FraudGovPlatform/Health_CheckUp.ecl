@@ -26,6 +26,8 @@ export All:=PARALLEL(
 	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::sprayed::configattributes')>0,'Unit Test Failed on ~fraudgov::in::sprayed::configattributes',FAIL);
 	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::sprayed::configrules')>0,'Unit Test Failed on ~fraudgov::in::sprayed::configrules',FAIL);
 	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::sprayed::configrisklevel')>0,'Unit Test Failed on ~fraudgov::in::sprayed::configrisklevel',FAIL);
+	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::base::qa::main')>0,'Unit Test Failed on ~fraudgov::base::qa::main',FAIL);
+	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::base::qa::main_orig')>0,'Unit Test Failed on ~fraudgov::base::qa::main_orig',FAIL);
 	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::base::main_demo_anon')>0,'Unit Test Failed on ~fraudgov::base::main_demo_anon',FAIL);
 	ASSERT(STD.File.GetSuperFileSubCount('~nac::base::consortium')>0,'Unit Test Failed on ~nac::base::consortium',FAIL);
 	ASSERT(STD.File.GetSuperFileSubCount('~thor::base::nid::repository::current')>0,'Unit Test Failed on ~thor::base::nid::repository::current',FAIL);
