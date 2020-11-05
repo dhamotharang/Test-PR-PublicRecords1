@@ -12,6 +12,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Met
  Metadata_Mod := MODULE(Phones.IParam.BatchParams)
   EXPORT UNSIGNED max_age_days := Phones.Constants.PhoneAttributes.LastActivityThreshold; // LERG6 last activity threshold
   EXPORT BOOLEAN  include_temp_susp_reactivate := FALSE;
+  EXPORT BOOLEAN AllowPortingData := TRUE;
  END;
  
  Metadata_Raw := Phones.GetPhoneMetadata_wLERG6(Metadata_Input, Metadata_Mod);

@@ -45,10 +45,10 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                                                        
                                                                        
                                                                        
-                                                                      nonFelonies := [DueDiligence.Constants.MISDEMEANOR, DueDiligence.Constants.INFRACTION, 
-                                                                                      DueDiligence.Constants.TRAFFIC, DueDiligence.Constants.UNKNOWN, DueDiligence.Constants.EMPTY];
+                                                                      nonFelonies := [DueDiligence.ConstantsLegal.MISDEMEANOR, DueDiligence.ConstantsLegal.INFRACTION, 
+                                                                                      DueDiligence.ConstantsLegal.TRAFFIC, DueDiligence.Constants.UNKNOWN, DueDiligence.Constants.EMPTY];
                                                                       
-                                                                      convictedFelony := LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.FELONY AND LEFT.offenseConviction = DueDiligence.Constants.YES;
+                                                                      convictedFelony := LEFT.offenseDDChargeLevelCalculated = DueDiligence.ConstantsLegal.FELONY AND LEFT.offenseConviction = DueDiligence.Constants.YES;
                                                                       convictedNonFelony := LEFT.offenseDDChargeLevelCalculated IN nonFelonies AND LEFT.offenseConviction = DueDiligence.Constants.YES;
                                                                                                   
                                                                                                    
@@ -58,7 +58,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                                                       SELF.attr_stateLegalEvent5 := convictedNonFelony AND reportedLast3Yrs;
                                                                       SELF.attr_stateLegalEvent4 := convictedNonFelony AND reportedOver3YrsOrCannotCalcDate;
                                                                       
-                                                                      SELF.attr_stateLegalEvent3 := LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.FELONY AND LEFT.offenseConviction <> DueDiligence.Constants.YES;
+                                                                      SELF.attr_stateLegalEvent3 := LEFT.offenseDDChargeLevelCalculated = DueDiligence.ConstantsLegal.FELONY AND LEFT.offenseConviction <> DueDiligence.Constants.YES;
                                                                       SELF.attr_stateLegalEvent2 := LEFT.offenseDDChargeLevelCalculated IN nonFelonies AND LEFT.offenseConviction <> DueDiligence.Constants.YES;
                                                                       
                                                                       
@@ -82,7 +82,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                                                       
                                                                       SELF.trafficOffenseFound := isTrafficOffense;
                                                                       SELF.otherOffenseFound := isTrafficOffense = FALSE;
-                                                                      SELF.felonyPast3Years := LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.FELONY AND reportedLast3Yrs;
+                                                                      SELF.felonyPast3Years := LEFT.offenseDDChargeLevelCalculated = DueDiligence.ConstantsLegal.FELONY AND reportedLast3Yrs;
                                                                        
                                                                                                        
                                                                       SELF := LEFT;));

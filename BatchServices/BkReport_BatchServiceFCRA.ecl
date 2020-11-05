@@ -35,7 +35,7 @@ export BkReport_BatchServiceFCRA(useCannedRecs = 'false') :=
     #OPTION('optimizeProjects', TRUE);
 
     #CONSTANT('isFCRA', true);
-    #CONSTANT('noDeepDive', true)
+    #CONSTANT('noDeepDive', true);
 
     STRING7 in_ssn_mask    := 'NONE' : STORED('SSNMask');
 

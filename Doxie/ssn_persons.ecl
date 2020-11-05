@@ -2,8 +2,6 @@
 
 export ssn_persons ( boolean checkRNA = false ) := function
 mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
-glb_ok := mod_access.isValidGLB();
-dppa_ok := mod_access.isValidDPPA();
 
 keepOldSsns := doxie.keep_old_ssns_val;
 
@@ -11,7 +9,7 @@ dids_ssns := record
   string9 ssn;
   unsigned6 did;
   end;
-		
+
 csa := doxie.Comp_Subject_Addresses_wrap.raw;
 recs := dedup (sort(csa, did,ssn), did, ssn);
 
@@ -21,7 +19,7 @@ trecs := recs((integer)ssn>1000000 and (integer)ssn not in ut.Set_IntBadSSN);
 trecs_pruned := join(trecs, dx_header.key_DID_SSN_date (), left.did = right.did and
                       left.ssn = right.ssn, TRANSFORM(LEFT),
 											LEFT ONLY);
-										
+
 keep_trecs := IF(keepOldSsns, trecs, trecs_pruned);
 use_trecs := project(keep_trecs, dids_ssns);
 
@@ -45,7 +43,7 @@ others_pruned := join(others, dx_header.key_DID_SSN_date (), left.did = right.di
 											LEFT ONLY);
 
 use_others := IF(keepOldSsns, others, others_pruned);
-											
+
 the_set := dedup(use_others,did,ssn,all);
 
 ssn_people := record
@@ -61,7 +59,7 @@ ssn_people := record
   unsigned4 dt_last_seen;
   boolean dead;
   end;
-		
+
 ssn_people_plus := record //some extra fields to allow us to use mac_glbclean and MAC_Filter_DMV_Info
 	ssn_people;
 	string1 	 pflag1;		//for original pflag purposes
@@ -91,7 +89,7 @@ ssn_people_plus := record //some extra fields to allow us to use mac_glbclean an
 	qstring5     cbsa;
 	string1      tnt;
 	string1	   valid_SSN;
-	string1	   jflag1;  
+	string1	   jflag1;
 	string1      jflag2;
 	string1	   jflag3;
 	string1 valid_dob := '';
@@ -109,21 +107,21 @@ ssn_people_plus get_people(index_header le) := transform
   self.dt_last_seen := MAP(le.dt_last_seen<>0 => le.dt_last_seen,le.dt_first_seen);
   self := le;
 end;
-	
+
 jdirty := join(the_set,index_header,
-							 keyed(left.did=right.s_did) and 
+							 keyed(left.did=right.s_did) and
 							 (left.ssn = right.ssn or keepOldSsns),
 							 get_people(right), LIMIT (ut.limits.DID_PER_PERSON, SKIP));
 
 // if any DID/ssn pairs existed in keep_trecs but were not found in Key_Header_SSN (i.e., from the dailies)
 // they need to be preserved
 daily_ssns := join(keep_trecs, jdirty, left.did=right.did and left.ssn = right.ssn,
-									 transform(ssn_people_plus, 
-														 self.date_ob := left.dob, 
+									 transform(ssn_people_plus,
+														 self.date_ob := left.dob,
 														 self.dead := left.tnt = 'D',
 														 self.global_sid:= right.global_sid,
 														 self.record_sid:= right.record_sid,
-														 self := left), 
+														 self := left),
 									 left only);
 combined := jdirty+daily_ssns;
 header.MAC_GlbClean_Header(combined,j_preRNA, , ,mod_access);

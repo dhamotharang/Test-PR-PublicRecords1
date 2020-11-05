@@ -6,11 +6,6 @@ EXPORT fn_getAdditionalPersons(DATASET(HomesteadExemptionV2_Services.Layouts.pro
   mod_access := MODULE (PROJECT (in_mod, doxie.IDataAccess))
   END;
 
-	// REQUIRED FOR MAC_GlbClean_Header()
-	BOOLEAN checkRNA:=TRUE;
-	BOOLEAN glb_ok:=mod_access.isValidGLB(checkRNA);
-	BOOLEAN dppa_ok:=mod_access.isValidDPPA(checkRNA);
-
 	AutoheaderV2.layouts.search srchRec(ds_srch_recs L) := TRANSFORM
 		SELF.taddress.prim_range          := L.prim_range;
 		SELF.taddress.prim_name           := ut.StripOrdinal(L.prim_name);
@@ -45,7 +40,7 @@ EXPORT fn_getAdditionalPersons(DATASET(HomesteadExemptionV2_Services.Layouts.pro
 			LIMIT(ut.limits.HEADER_PER_DID,SKIP));
 
 		// APPLY DPPA AND GLB RESTRICTIONS AND DID SUPPRESSION
-		header.MAC_GlbClean_Header(ds_hdr_addr_dt,ds_hdr_glb_cln, , , mod_access);
+		header.MAC_GlbClean_Header(ds_hdr_addr_dt,ds_hdr_glb_cln, , , mod_access, _rna := TRUE);
 		header.MAC_GLB_DPPA_Clean_RNA(ds_hdr_glb_cln,ds_hdr_rna_cln, mod_access);
 
 		ds_hdr_sort:=SORT(ds_hdr_rna_cln,did,-dt_last_seen,-dt_first_seen);

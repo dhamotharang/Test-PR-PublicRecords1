@@ -1,7 +1,7 @@
 ﻿IMPORT Address, AutoStandardI, bankruptcyV3, BIPV2, BIPV2_Best, BIPV2_Company_Names, BIPV2_Contacts,
        Business_Risk, Business_Risk_BIP, BusinessBatch_BIP, Codes, Corp2, DCAV2,
-       diversity_certification, Doxie, FAA, dx_Gong, LaborActions_WHD, LiensV2, LN_PropertyV2,
-       MDR, TopBusiness_Services, OSHAIR, Risk_Indicators, SAM, STD, Suppress,
+       diversity_certification, Doxie, FAA, dx_OSHAIR, dx_Gong, LaborActions_WHD, LiensV2, LN_PropertyV2,
+       MDR, TopBusiness_Services, Risk_Indicators, SAM, STD, Suppress,
        UCCV2, UCCV2_Services, ut, VehicleV2, Watercraft;
 
 // These are general functions which for the most part go against the *linkids* kfetch routines
@@ -336,7 +336,7 @@ EXPORT GetCorps(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWit
                                                 left.corp_state_origin,
                                                 left.corp_orig_bus_type_desc,
                                                 left.corp_name_comment);
-                                                                      
+
         temp_business_type := BIPV2.BL_Tables.CompanyOrgStructure(temp_company_org_structure_raw);
 
         corp_filing_desc := if(temp_business_type !='',
@@ -1498,7 +1498,7 @@ END;
                     DATASET(BIPV2.IDlayouts.l_xlink_ids)                 dLinkIds) :=
   FUNCTION
 
-    dOSHAInfo := OSHAIR.Key_OSHAIR_LinkIds.kFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID,,
+    dOSHAInfo := dx_OSHAIR.Key_LinkIds.kFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID,,
                                                   BusinessBatch_BIP.Constants.Limits.MAXOshair);
 
     dOSHAInfoSlim := DEDUP(SORT(dOSHAInfo,activity_number, -last_activity_date),activity_number);
