@@ -1,4 +1,4 @@
-﻿import BIPV2; dx_Property;
+﻿import BIPV2;
 
 file_in := Property.File_Foreclosure_Normalized(trim(deed_category)IN Category_filter.NOD);
 
