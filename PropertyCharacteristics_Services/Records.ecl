@@ -107,7 +107,9 @@ module
 	export dsSourceAll := dsRollB + dsFilterOthers + PROJECT (inhouse_results(vendor_source in ['F', 'G']), TRANSFORM(layouts.inhouse_layout, SELF.acctno := '', SELF := LEFT));
 
 	//For Default Plus Option, combine B OKCITY and E MLS records, MLS has higher priority
-	SHARED ds_DPO := dsSourceAll(vendor_source = 'D') +  PropertyCharacteristics_Services.Functions.CreateDPO(dsSourceAll(vendor_source = 'E')[1],dsSourceAll(vendor_source = 'B')[1]);
+  shared DPO_BandE := ROLLUP(dsSourceAll(vendor_source in ['E', 'B']), TRUE, PropertyCharacteristics_Services.Functions.DPOJOin (LEFT, RIGHT));
+	SHARED ds_DPO := dsSourceAll(vendor_source = 'D') + DPO_BandE;
+
 	SHARED FinaldsSourceAll := IF (pInMod.ResultOption = Constants.Default_Plus_Option, ds_DPO, dsSourceAll);
 	shared ds_noacctno := project (FinaldsSourceAll, layouts.Payload);
 	
