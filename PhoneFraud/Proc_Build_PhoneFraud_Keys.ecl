@@ -191,18 +191,22 @@ EXPORT Proc_Build_PhoneFraud_Keys(string version, string oType, string sType):= 
                                                                             dmvBltPhoneFraudSpoofing
                                                                             ),
 																	    parallel(
-                                                                            mvBltPhoneFraudOTP,
-                                                                            mvBltPhoneFraudSpoofing
+                                                                            sequential(
+                                                                                mvBltPhoneFraudOTP,
+                                                                                mvQAPhoneFraudOTP
+                                                                                ),
+                                                                            sequential(
+                                                                                mvBltPhoneFraudSpoofing,
+                                                                                mvQAPhoneFraudSpoofing
+                                                                                )    
                                                                             )
                                                                         ), 																
-																	mvQAPhoneFraudOTP, 
-																	mvQAPhoneFraudSpoofing,
-														 			/*dopsUpdate,
+														 			dopsUpdate,
 																	create_phonefraud_build,
 																	buildStrata,
 																	Scrubs_PhoneFraud.fn_RunScrubs(version,'Judy.Tao@lexisnexis.com')):
 																	Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com;christopher.brodeur@lexisnexisrisk.com;charles.pettola@lexisnexisrisk.com;intel357@bellsouth.net', 'PhoneFraud Key Build Succeeded', workunit + ': Build completed.')),
-																	Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com;christopher.brodeur@lexisnexisrisk.com;charles.pettola@lexisnexisrisk.com;intel357@bellsouth.net', 'PhoneFraud Key Build Failed', workunit + '\n' + FAILMESSAGE) */
+																	Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com;christopher.brodeur@lexisnexisrisk.com;charles.pettola@lexisnexisrisk.com;intel357@bellsouth.net', 'PhoneFraud Key Build Failed', workunit + '\n' + FAILMESSAGE)
  																 );
 
 	RETURN sendEmail;
