@@ -22,8 +22,8 @@ END;
 
 export DATASET(cnRec) nbr_records_cn(
   DATASET(targetRec) targetHR,
-  unsigned1 proximity_radius = 10, 
-  boolean checkRNA = true,  
+  unsigned1 proximity_radius = 10,
+  boolean checkRNA = true,
   string1 mode, // or part of results for the subject.
   unsigned1 Neighbor_Recency,
   doxie.IDataAccess mod_access
@@ -84,11 +84,11 @@ export DATASET(cnRec) nbr_records_cn(
     limit(20000, skip),
     keep(keep_recs)
   );
-  
+
   // Suppression below is applied against neighbor's did, not the subject (base_sid)
   cn2:= Suppress.MAC_SuppressSource(cn2_all, mod_access, did);
 
-  //filter out the historical neighbors so that we do not look up the header records 
+  //filter out the historical neighbors so that we do not look up the header records
 
   widenedCN := doxie.nbr_records_affinity(
     PROJECT(cn2, doxie.layout_nbr_records_cn),
@@ -100,57 +100,54 @@ export DATASET(cnRec) nbr_records_cn(
 
   cn3 := project(widenedCN,cnRec);
 
-  headerNbrForAddr := join(cn3, dx_header.key_header(), 
+  headerNbrForAddr := join(cn3, dx_header.key_header(),
     keyed(left.did = right.s_did)
     and left.prim_name = right.prim_name
     and left.prim_range = right.prim_range
     and left.sec_range = right.sec_range
-    and left.zip = right.zip, 
+    and left.zip = right.zip,
     transform(dx_header.layout_key_header, self := right),
     LIMIT(ut.limits.DID_PER_PERSON, SKIP));
-                          
+
   // add the other components of the address
-  // should we go to the best file to get the best name for the neighbors ?													
-  // clean the records when it still have the src and dates 
-  //TODO: why _ok are recalculated again here?	
-  glb_ok  := mod_access.isValidGLB (checkRNA);
-  dppa_ok := mod_access.isValidDPPA (checkRNA);
-  header.MAC_GlbClean_Header(headerNbrForAddr, headerNbrForAddr_clean, , ,mod_access);
-      
-  // rollup records 
+  // should we go to the best file to get the best name for the neighbors ?
+  // clean the records when it still have the src and dates
+  header.MAC_GlbClean_Header(headerNbrForAddr, headerNbrForAddr_clean, , , mod_access, checkRNA);
+
+  // rollup records
   df3:= group(
     sort(headerNbrForAddr_clean , zip, prim_name, suffix, predir, postdir,
       (unsigned5)prim_range, prim_range, sec_range, did, doxie.tnt_score(tnt),  -dt_last_seen
     ),
     zip, prim_name, suffix, predir, postdir // group
     ); //dt_first_seen,
-    
+
   df3 roll_dates(df3 L, df3 R) := transform
     ut.mac_roll_DFS(dt_first_seen);
     ut.mac_roll_DLS(dt_last_seen);
     self := l;
   end;
-   
+
   df4 := rollup(df3,
     LEFT.prim_range = RIGHT.prim_range AND
     LEFT.sec_range = RIGHT.sec_range AND
     LEFT.did = RIGHT.did,
     roll_dates(LEFT,RIGHT)
   );
-   
+
   cn3 jtrans(cn3 l, df4 r) := transform
     self.dt_first_seen := r.dt_first_seen;
     self.dt_last_seen := r.dt_last_seen;
     self:=l;
   end;
-   
+
   df5:= join(cn3,df4,
-    left.did = right.did 
-    and left.prim_range = right.prim_range 
+    left.did = right.did
+    and left.prim_range = right.prim_range
     and left.sec_range = right.sec_range,
     jtrans(left,right),
     keep(1), limit (0));
 
   RETURN(df5);
-    
+
 END;

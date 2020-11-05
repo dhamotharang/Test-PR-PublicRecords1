@@ -1,4 +1,4 @@
-IMPORT bankruptcyv3, doxie, doxie_cbrs,address, banko, BIPV2, FFD;
+IMPORT bankruptcyv3, doxie, doxie_cbrs, address, dx_banko, BIPV2, FFD;
 EXPORT layouts :=
   MODULE
   
@@ -292,17 +292,17 @@ EXPORT layouts :=
       // LAYOUT TO HOLD DOCKET DATA
       EXPORT layout_docket :=
         RECORD
-          banko.Layout_BankoFile_FixedRec.DocketText;
-          banko.Layout_BankoFile_FixedRec.FiledDate;
-          banko.Layout_BankoFile_FixedRec.Pacer_EnteredDate;
-          banko.Layout_BankoFile_FixedRec.PacerCaseID;
-          banko.Layout_BankoFile_FixedRec.AttachmentURL;
-          banko.Layout_BankoFile_FixedRec.EntryNumber;
-          banko.Layout_BankoFile_FixedRec.DocketEntryID;
-          banko.Layout_BankoFile_FixedRec.DRCategoryEventID;
-          banko.Layout_BankoFile_FixedRec.EnteredDate;
-          Banko.BankoJoinRecord.CatEvent_Description;
-          Banko.BankoJoinRecord.CatEvent_Category;
+          dx_banko.layouts.i_Layout_Key_Banko_CourtCode_CaseNumber.DocketText;
+          dx_banko.layouts.i_Layout_Key_Banko_CourtCode_CaseNumber.FiledDate;
+          dx_banko.layouts.i_Layout_Key_Banko_CourtCode_CaseNumber.Pacer_EnteredDate;
+          dx_banko.layouts.i_Layout_Key_Banko_CourtCode_CaseNumber.PacerCaseID;
+          dx_banko.layouts.i_Layout_Key_Banko_CourtCode_CaseNumber.AttachmentURL;
+          dx_banko.layouts.i_Layout_Key_Banko_CourtCode_CaseNumber.EntryNumber;
+          dx_banko.layouts.i_Layout_Key_Banko_CourtCode_CaseNumber.DocketEntryID;
+          dx_banko.layouts.i_Layout_Key_Banko_CourtCode_CaseNumber.DRCategoryEventID;
+          dx_banko.layouts.i_Layout_Key_Banko_CourtCode_CaseNumber.EnteredDate;
+          dx_banko.layouts.i_Layout_Key_Banko_CourtCode_CaseNumber.CatEvent_Description;
+          dx_banko.layouts.i_Layout_Key_Banko_CourtCode_CaseNumber.CatEvent_Category;
         END;
       EXPORT layout_docket_ext :=
         RECORD

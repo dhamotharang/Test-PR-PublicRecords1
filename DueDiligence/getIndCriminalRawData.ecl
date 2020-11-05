@@ -90,10 +90,10 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
     
 
       
-      released := inmateStatus IN DueDiligence.Constants.SET_INMATE_STATUS_DISCHARGED OR paroleStatus IN DueDiligence.Constants.SET_INMATE_STATUS_DISCHARGED;
-      paroled := inmateStatus IN DueDiligence.Constants.SET_INMATE_STATUS_PAROLE OR paroleStatus IN DueDiligence.Constants.SET_INMATE_STATUS_PAROLE;
-      probation := inmateStatus IN DueDiligence.Constants.SET_INMATE_STATUS_PROBATION OR paroleStatus IN DueDiligence.Constants.SET_INMATE_STATUS_PROBATION;
-      prevIncar := inmateStatus IN DueDiligence.Constants.SET_INMATE_STATUS_PREVIOUSLY_INCARCERATED OR paroleStatus IN DueDiligence.Constants.SET_INMATE_STATUS_PREVIOUSLY_INCARCERATED;
+      released := inmateStatus IN DueDiligence.ConstantsLegal.SET_INMATE_STATUS_DISCHARGED OR paroleStatus IN DueDiligence.ConstantsLegal.SET_INMATE_STATUS_DISCHARGED;
+      paroled := inmateStatus IN DueDiligence.ConstantsLegal.SET_INMATE_STATUS_PAROLE OR paroleStatus IN DueDiligence.ConstantsLegal.SET_INMATE_STATUS_PAROLE;
+      probation := inmateStatus IN DueDiligence.ConstantsLegal.SET_INMATE_STATUS_PROBATION OR paroleStatus IN DueDiligence.ConstantsLegal.SET_INMATE_STATUS_PROBATION;
+      prevIncar := inmateStatus IN DueDiligence.ConstantsLegal.SET_INMATE_STATUS_PREVIOUSLY_INCARCERATED OR paroleStatus IN DueDiligence.ConstantsLegal.SET_INMATE_STATUS_PREVIOUSLY_INCARCERATED;
 
       
       RETURN MAP(curIncarFlag AND curParoleFlag = FALSE AND curProbFlag = FALSE => TYPE_INCARCERATION,
@@ -127,7 +127,7 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                  probationEndDate > 0 AND probationEndDate >= historyDate => TYPE_PROBATION,
                  sentEnd > 0 AND sentEnd >= historyDate => TYPE_INCARCERATION,
                  
-                 inmateStatus IN DueDiligence.Constants.SET_INMATE_STATUS_UNKNOWN => TYPE_UNKNOWN,
+                 inmateStatus IN DueDiligence.ConstantsLegal.SET_INMATE_STATUS_UNKNOWN => TYPE_UNKNOWN,
                  TYPE_PREV_INCARCERATION);
                              
     END;
@@ -175,8 +175,8 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                         SELF.caseNumber := STD.Str.FilterOut(RIGHT.case_num, '-');
                                         
                                         SELF := [];),
-                            ATMOST(DueDiligence.Constants.MAX_ATMOST_5000), 
-                            KEEP(DueDiligence.Constants.MAX_KEEP));
+                            ATMOST(DueDiligence.Constants.MAX_5000), 
+                            KEEP(DueDiligence.Constants.MAX_1000));
      
     dedupOffenders := DEDUP(getOffenderData, ALL); 
     
@@ -221,8 +221,8 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                           SELF.caseNumber := STD.Str.FilterOut(RIGHT.case_num, '-');
                                           
                                           SELF := [];),
-                              ATMOST(DueDiligence.Constants.MAX_ATMOST_5000), 
-                              KEEP(DueDiligence.Constants.MAX_KEEP));    
+                              ATMOST(DueDiligence.Constants.MAX_5000), 
+                              KEEP(DueDiligence.Constants.MAX_1000));    
                               
      dedupOffenderRisk := DEDUP(getOffenderRiskData, ALL);                          
                               
@@ -242,8 +242,8 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                     SELF.conviction := RIGHT.conviction;
                                     SELF.caseNumber := RIGHT.caseNumber;
                                     SELF := LEFT;),
-                          ATMOST(DueDiligence.Constants.MAX_ATMOST_5000), 
-                          KEEP(DueDiligence.Constants.MAX_KEEP),
+                          ATMOST(DueDiligence.Constants.MAX_5000), 
+                          KEEP(DueDiligence.Constants.MAX_1000),
                           LEFT OUTER);
                           
     dedupOffenderData := DEDUP(offenderData, ALL);                  
@@ -297,8 +297,8 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                       SELF.temp_courtOffLevel := RIGHT.court_off_lev;
                                       
                                       SELF := LEFT;),
-                          ATMOST(DueDiligence.Constants.MAX_ATMOST_5000), 
-                          KEEP(DueDiligence.Constants.MAX_KEEP));                                 
+                          ATMOST(DueDiligence.Constants.MAX_5000), 
+                          KEEP(DueDiligence.Constants.MAX_1000));                                 
   
   
     addDOCDataOffense := JOIN(dedupOffenderData, doxie_files.Key_Offenses(),
@@ -356,8 +356,8 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                         SELF.temp_offenseScore := IF(RIGHT.off_typ <> DueDiligence.Constants.EMPTY, RIGHT.off_typ, LEFT.temp_offenseScore);
 
                                         SELF := LEFT;),
-                              ATMOST(DueDiligence.Constants.MAX_ATMOST_5000), 
-                              KEEP(DueDiligence.Constants.MAX_KEEP));
+                              ATMOST(DueDiligence.Constants.MAX_5000), 
+                              KEEP(DueDiligence.Constants.MAX_1000));
                               
                               
     dedupDOCOffenses := DEDUP(addDOCDataOffense, ALL);
@@ -411,16 +411,16 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                             SELF.docCurrentKnownInmateStatus := inmateStatusDesc;
                                             SELF.docCurrentLocationSecurity := RIGHT.cur_loc_sec;
                                                                                         
-                                            SELF.offenseIncarcerationProbationParole := STD.Str.ToUpperCase(MAP(incarParoleProbIndicator = TYPE_INCARCERATION => DueDiligence.Constants.INCARCERATION_TEXT,
-                                                                                                                incarParoleProbIndicator = TYPE_PAROLE => DueDiligence.Constants.PAROLE_TEXT,
-                                                                                                                incarParoleProbIndicator = TYPE_PROBATION => DueDiligence.Constants.PROBATION_TEXT,
-                                                                                                                incarParoleProbIndicator = TYPE_PREV_INCARCERATION => DueDiligence.Constants.PREVIOUSLY_INCARCERATED_TEXT,
+                                            SELF.offenseIncarcerationProbationParole := STD.Str.ToUpperCase(MAP(incarParoleProbIndicator = TYPE_INCARCERATION => DueDiligence.ConstantsLegal.INCARCERATION_TEXT,
+                                                                                                                incarParoleProbIndicator = TYPE_PAROLE => DueDiligence.ConstantsLegal.PAROLE_TEXT,
+                                                                                                                incarParoleProbIndicator = TYPE_PROBATION => DueDiligence.ConstantsLegal.PROBATION_TEXT,
+                                                                                                                incarParoleProbIndicator = TYPE_PREV_INCARCERATION => DueDiligence.ConstantsLegal.PREVIOUSLY_INCARCERATED_TEXT,
                                                                                                                 incarParoleProbIndicator = TYPE_RELEASED => RELEASED_DISCHARGE,
                                                                                                                 incarParoleProbIndicator = TYPE_UNKNOWN => UNKNOWN,
                                                                                                                 DueDiligence.Constants.EMPTY));
                                             
-                                            paroleCurrentStatusDescription := MAP(parCurStatDesc = 'INMATE' => DueDiligence.Constants.INCARCERATION_TEXT,
-																																									parCurStatDesc = 'DISCHARGE' => DueDiligence.Constants.PREVIOUSLY_INCARCERATED_TEXT, 
+                                            paroleCurrentStatusDescription := MAP(parCurStatDesc = 'INMATE' => DueDiligence.ConstantsLegal.INCARCERATION_TEXT,
+																																									parCurStatDesc = 'DISCHARGE' => DueDiligence.ConstantsLegal.PREVIOUSLY_INCARCERATED_TEXT, 
 																																									DueDiligence.Constants.EMPTY);
                                                                                   
                                             SELF.docParoleStatus := paroleCurrentStatusDescription;
@@ -432,8 +432,8 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
     
                                             
                                             SELF := LEFT;),
-                                  ATMOST(DueDiligence.Constants.MAX_ATMOST_5000), 
-                                  KEEP(DueDiligence.Constants.MAX_KEEP),
+                                  ATMOST(DueDiligence.Constants.MAX_5000), 
+                                  KEEP(DueDiligence.Constants.MAX_1000),
                                   LEFT OUTER); 
                                   
                                   
@@ -577,24 +577,24 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                           TRANSFORM(DueDiligence.LayoutsInternal.IndCrimLayoutFinal,
 
                                     //grab top level - first populated value or greatest value
-                                    SELF.state := DueDiligence.Common.firstPopulatedString(state);
-                                    SELF.source := DueDiligence.Common.firstPopulatedString(source);
-                                    SELF.caseNumber := DueDiligence.Common.firstPopulatedString(caseNumber);
-                                    SELF.offenseStatute := DueDiligence.Common.firstPopulatedString(offenseStatute);
+                                    SELF.state := DueDiligence.v3Common.General.firstPopulatedString(state);
+                                    SELF.source := DueDiligence.v3Common.General.firstPopulatedString(source);
+                                    SELF.caseNumber := DueDiligence.v3Common.General.firstPopulatedString(caseNumber);
+                                    SELF.offenseStatute := DueDiligence.v3Common.General.firstPopulatedString(offenseStatute);
                                     SELF.offenseDDFirstReportedActivity := IF(LEFT.offenseDDFirstReportedActivity = 0, RIGHT.offenseDDFirstReportedActivity, LEFT.offenseDDFirstReportedActivity);
                                     SELF.offenseDDLastReportedActivity := MAX(LEFT.offenseDDLastReportedActivity, RIGHT.offenseDDLastReportedActivity);
                                     SELF.offenseDDLastCourtDispDate := MAX(LEFT.offenseDDLastCourtDispDate, RIGHT.offenseDDLastCourtDispDate);
                                     SELF.offenseCharge := IF(STD.Str.ToUpperCase(TRIM(LEFT.offenseCharge)) IN ['', 'NOT SPECIFIED', 'OTHER'], RIGHT.offenseCharge, LEFT.offenseCharge);
 
-                                    SELF.offenseDDChargeLevelCalculated := MAP(LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.FELONY OR RIGHT.offenseDDChargeLevelCalculated = DueDiligence.Constants.FELONY => DueDiligence.Constants.FELONY,
-                                                                               LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.MISDEMEANOR OR RIGHT.offenseDDChargeLevelCalculated = DueDiligence.Constants.MISDEMEANOR => DueDiligence.Constants.MISDEMEANOR,
-                                                                               LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.TRAFFIC OR RIGHT.offenseDDChargeLevelCalculated = DueDiligence.Constants.TRAFFIC => DueDiligence.Constants.TRAFFIC,
-                                                                               LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.INFRACTION OR RIGHT.offenseDDChargeLevelCalculated = DueDiligence.Constants.INFRACTION => DueDiligence.Constants.INFRACTION,
+                                    SELF.offenseDDChargeLevelCalculated := MAP(LEFT.offenseDDChargeLevelCalculated = DueDiligence.ConstantsLegal.FELONY OR RIGHT.offenseDDChargeLevelCalculated = DueDiligence.ConstantsLegal.FELONY => DueDiligence.ConstantsLegal.FELONY,
+                                                                               LEFT.offenseDDChargeLevelCalculated = DueDiligence.ConstantsLegal.MISDEMEANOR OR RIGHT.offenseDDChargeLevelCalculated = DueDiligence.ConstantsLegal.MISDEMEANOR => DueDiligence.ConstantsLegal.MISDEMEANOR,
+                                                                               LEFT.offenseDDChargeLevelCalculated = DueDiligence.ConstantsLegal.TRAFFIC OR RIGHT.offenseDDChargeLevelCalculated = DueDiligence.ConstantsLegal.TRAFFIC => DueDiligence.ConstantsLegal.TRAFFIC,
+                                                                               LEFT.offenseDDChargeLevelCalculated = DueDiligence.ConstantsLegal.INFRACTION OR RIGHT.offenseDDChargeLevelCalculated = DueDiligence.ConstantsLegal.INFRACTION => DueDiligence.ConstantsLegal.INFRACTION,
                                                                                LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.UNKNOWN OR RIGHT.offenseDDChargeLevelCalculated = DueDiligence.Constants.UNKNOWN => DueDiligence.Constants.UNKNOWN,
                                                                                DueDiligence.Constants.EMPTY);
                                                               
                                                                                                  
-                                    SELF.offenseChargeLevelReported := DueDiligence.Common.firstPopulatedString(offenseChargeLevelReported);
+                                    SELF.offenseChargeLevelReported := DueDiligence.v3Common.General.firstPopulatedString(offenseChargeLevelReported);
                                     SELF.offenseConviction := IF(LEFT.offenseConviction = DueDiligence.Constants.Yes, LEFT.offenseConviction, RIGHT.offenseConviction);
                                     SELF.offenseTrafficRelated := MAP(LEFT.offenseTrafficRelated = DueDiligence.Constants.YES OR RIGHT.offenseTrafficRelated = DueDiligence.Constants.YES => DueDiligence.Constants.YES,
                                                                       LEFT.offenseTrafficRelated = DueDiligence.Constants.EMPTY => RIGHT.offenseTrafficRelated,
@@ -603,16 +603,16 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
 
 
                                     //grab additional details - first populated value
-                                    SELF.county := DueDiligence.Common.firstPopulatedString(county); 
-                                    SELF.countyCourt := DueDiligence.Common.firstPopulatedString(countyCourt); 
-                                    SELF.city := DueDiligence.Common.firstPopulatedString(city); 
-                                    SELF.agency := DueDiligence.Common.firstPopulatedString(agency); 
-                                    SELF.race := DueDiligence.Common.firstPopulatedString(race); 
-                                    SELF.sex := DueDiligence.Common.firstPopulatedString(sex); 
-                                    SELF.hairColor := DueDiligence.Common.firstPopulatedString(hairColor); 
-                                    SELF.eyeColor := DueDiligence.Common.firstPopulatedString(eyeColor); 
-                                    SELF.height := DueDiligence.Common.firstPopulatedString(height); 
-                                    SELF.weight := DueDiligence.Common.firstPopulatedString(weight);
+                                    SELF.county := DueDiligence.v3Common.General.firstPopulatedString(county); 
+                                    SELF.countyCourt := DueDiligence.v3Common.General.firstPopulatedString(countyCourt); 
+                                    SELF.city := DueDiligence.v3Common.General.firstPopulatedString(city); 
+                                    SELF.agency := DueDiligence.v3Common.General.firstPopulatedString(agency); 
+                                    SELF.race := DueDiligence.v3Common.General.firstPopulatedString(race); 
+                                    SELF.sex := DueDiligence.v3Common.General.firstPopulatedString(sex); 
+                                    SELF.hairColor := DueDiligence.v3Common.General.firstPopulatedString(hairColor); 
+                                    SELF.eyeColor := DueDiligence.v3Common.General.firstPopulatedString(eyeColor); 
+                                    SELF.height := DueDiligence.v3Common.General.firstPopulatedString(height); 
+                                    SELF.weight := DueDiligence.v3Common.General.firstPopulatedString(weight);
 
 
                                     //roll attribute logic per the sources
@@ -632,10 +632,10 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                     SELF.attr_stateLegalEvent9 := incarcerated;  //v6
                                     SELF.attr_stateLegalEvent6 := prevIncarceration OR paroled OR probation;  //v6
 
-                                    SELF.offenseIncarcerationProbationParole := MAP(incarcerated AND NOT (paroled OR probation OR prevIncarceration) => DueDiligence.Constants.INCARCERATION_TEXT,
-                                                                                    paroled AND NOT probation => DueDiligence.Constants.PAROLE_TEXT,
-                                                                                    probation => DueDiligence.Constants.PROBATION_TEXT,
-                                                                                    prevIncarceration OR (incarcerated AND (paroled OR probation)) => DueDiligence.Constants.PREVIOUSLY_INCARCERATED_TEXT,
+                                    SELF.offenseIncarcerationProbationParole := MAP(incarcerated AND NOT (paroled OR probation OR prevIncarceration) => DueDiligence.ConstantsLegal.INCARCERATION_TEXT,
+                                                                                    paroled AND NOT probation => DueDiligence.ConstantsLegal.PAROLE_TEXT,
+                                                                                    probation => DueDiligence.ConstantsLegal.PROBATION_TEXT,
+                                                                                    prevIncarceration OR (incarcerated AND (paroled OR probation)) => DueDiligence.ConstantsLegal.PREVIOUSLY_INCARCERATED_TEXT,
                                                                                     LEFT.offenseIncarcerationProbationParole = DueDiligence.Constants.EMPTY => RIGHT.offenseIncarcerationProbationParole,
                                                                                     LEFT.offenseIncarcerationProbationParole);
 

@@ -124,7 +124,9 @@ with_phone_disconnect_hist := IF (production_realtime_mode, if(BSversion >= 50, 
 
 
 MAC_phtrans (trans_name, key_phonetable) := MACRO
-risk_indicators.layout_output trans_name (risk_indicators.layout_output le, key_phonetable ri, INTEGER i) := transform
+{risk_indicators.layout_output, UNSIGNED4 global_sid, BOOLEAN is_suppressed} trans_name (risk_indicators.layout_output le, key_phonetable ri, INTEGER i) := transform
+    SELF.global_sid := ri.global_sid;
+    SELF.is_suppressed := FALSE;
 	boolean diss_flag_old := IF (i=1, if(ri.phone10='' and le.phonedissflag, FALSE, le.phonedissflag), if(ri.phone10='' and le.wphonedissflag, FALSE, le.wphonedissflag));
 	boolean pot_Disconnect_old := IF(le.historydate=risk_indicators.iid_constants.default_history_date, ri.potDisconnect, IF(diss_flag_old, true, false));
 
@@ -197,7 +199,31 @@ Key_FCRA_Business_Header_Phone_Table_Filtered_V2 := dx_Gong.key_phone_table(iTyp
 MAC_phtrans (phtrans_nonFCRA, risk_indicators.key_phone_table_v2);
 MAC_phtrans (phtrans_FCRA, Key_FCRA_Business_Header_Phone_Table_Filtered_V2);
 
-jphonerecs_roxie := if (isFCRA,
+risk_indicators.layout_output jphonerecs_xform({risk_indicators.layout_output, UNSIGNED4 global_sid, BOOLEAN is_suppressed} L) := TRANSFORM
+	SELF.nxx_type := IF(L.is_suppressed, Suppress.OptOutMessage('STRING'), L.nxx_type);
+	SELF.hriskphoneflag := IF(L.is_suppressed, Suppress.OptOutMessage('STRING'), L.hriskphoneflag);
+	SELF.hphonetypeflag := IF(L.is_suppressed, Suppress.OptOutMessage('STRING'), L.hphonetypeflag);
+	SELF.phonevalflag := IF(L.is_suppressed, Suppress.OptOutMessage('STRING'), L.phonevalflag);
+	SELF.hphonevalflag := IF(L.is_suppressed, Suppress.OptOutMessage('STRING'), L.hphonevalflag);
+	SELF.isPOTS :=IF(L.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), L.isPOTS);
+	SELF.phonedissflag := IF(L.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), L.phonedissflag);
+	SELF.phonezipflag := IF(L.is_suppressed, Suppress.OptOutMessage('STRING'), L.phonezipflag);
+	SELF.PWphonezipflag := IF(L.is_suppressed, Suppress.OptOutMessage('STRING'), L.PWphonezipflag);
+	SELF.hriskcmpyphone := IF(L.is_suppressed, Suppress.OptOutMessage('STRING'), L.hriskcmpyphone);
+	SELF.hrisksicphone := IF(L.is_suppressed, Suppress.OptOutMessage('STRING'), L.hrisksicphone);
+	SELF.hriskphonephone := IF(L.is_suppressed, Suppress.OptOutMessage('STRING'), L.hriskphonephone);
+	SELF.hriskaddrphone := IF(L.is_suppressed, Suppress.OptOutMessage('STRING'), L.hriskaddrphone);
+	SELF.hriskcityphone := IF(L.is_suppressed, Suppress.OptOutMessage('STRING'), L.hriskcityphone);
+	SELF.hriskstatephone := IF(L.is_suppressed, Suppress.OptOutMessage('STRING'), L.hriskstatephone);
+	SELF.hriskzipphone := IF(L.is_suppressed, Suppress.OptOutMessage('STRING'), L.hriskzipphone);
+	SELF.nxx_type2 := IF(L.is_suppressed, Suppress.OptOutMessage('STRING'), L.nxx_type2);
+	SELF.wphonedissflag := IF(L.is_suppressed, (BOOLEAN)Suppress.OptOutMessage('BOOLEAN'), L.wphonedissflag);
+	SELF.wphonetypeflag := IF(L.is_suppressed, Suppress.OptOutMessage('STRING'), L.wphonetypeflag);
+	SELF.wphonevalflag := IF(L.is_suppressed, Suppress.OptOutMessage('STRING'), L.wphonevalflag);
+    SELF := L;
+END;
+
+jphonerecs_roxie_unsuppressed := if (isFCRA,
 				join(with_phone_disconnect_hist, Key_FCRA_Business_Header_Phone_Table_Filtered_V2,
 					(integer)left.phone10 != 0 and
 					keyed(left.phone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
@@ -209,7 +235,11 @@ jphonerecs_roxie := if (isFCRA,
 					phtrans_nonFCRA(left,right,1),left outer,
 					ATMOST( keyed(left.phone10=right.phone10), RiskWise.max_atmost), keep(100)));
 
-jphonerecs_thor_pre := if (isFCRA,
+jphonerecs_roxie_flagged := Suppress.MAC_FlagSuppressedSource(jphonerecs_roxie_unsuppressed, mod_access, data_env := iType);
+
+jphonerecs_roxie := PROJECT(jphonerecs_roxie_flagged, jphonerecs_xform(LEFT));
+
+jphonerecs_thor_pre_unsuppressed := if (isFCRA,
 				join(distribute(with_phone_disconnect_hist(phone10 != ''), hash64(phone10)),
 					distribute(pull(Key_FCRA_Business_Header_Phone_Table_Filtered_V2((integer)phone10 != 0)), hash64(phone10)),
 					(integer)left.phone10 != 0 and
@@ -222,6 +252,10 @@ jphonerecs_thor_pre := if (isFCRA,
 					(left.phone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
 					phtrans_nonFCRA(left,right,1),left outer,
 					ATMOST( (left.phone10=right.phone10), RiskWise.max_atmost), keep(100), LOCAL));
+
+jphonerecs_thor_pre_flagged := Suppress.MAC_FlagSuppressedSource(jphonerecs_thor_pre_unsuppressed, mod_access, use_distributed := TRUE, data_env := iType);
+
+jphonerecs_thor_pre := PROJECT(jphonerecs_thor_pre_flagged, jphonerecs_xform(LEFT));
 
 jphonerecs_thor_nophone := PROJECT(with_phone_disconnect_hist(phone10 = ''), TRANSFORM(risk_indicators.layout_output,
 																		self.hriskphoneflag := '7';
@@ -271,7 +305,7 @@ END;
 jphonerecsrolled := rollup(jphonerecs,true,flagroll(LEFT,RIGHT));
 
 
-jphonerecs2_roxie := if (isFCRA,
+jphonerecs2_roxie_unsuppressed := if (isFCRA,
 				join(jphonerecsrolled, Key_FCRA_Business_Header_Phone_Table_Filtered_V2,
 					(integer)left.wphone10 != 0 and
 					keyed(left.wphone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
@@ -284,7 +318,11 @@ jphonerecs2_roxie := if (isFCRA,
 					phtrans_nonFCRA(left,right,2),left outer,
 					ATMOST( keyed(left.wphone10=right.phone10), RiskWise.max_atmost), keep(100)));
 
-jphonerecs2_thor_pre := if (isFCRA,
+jphonerecs2_roxie_flagged := Suppress.MAC_FlagSuppressedSource(jphonerecs2_roxie_unsuppressed, mod_access, data_env := iType);
+
+jphonerecs2_roxie := PROJECT(jphonerecs2_roxie_flagged, jphonerecs_xform(LEFT));
+
+jphonerecs2_thor_pre_unsuppressed := if (isFCRA,
 				join(distribute(jphonerecsrolled(wphone10 != ''), hash64(wphone10)),
 				distribute(pull(Key_FCRA_Business_Header_Phone_Table_Filtered_V2((integer)phone10!=0)), hash64(phone10)),
 					(integer)left.wphone10 != 0 and
@@ -297,6 +335,10 @@ jphonerecs2_thor_pre := if (isFCRA,
 					(left.wphone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
 					phtrans_nonFCRA(left,right,2),left outer,
 					ATMOST( (left.wphone10=right.phone10), RiskWise.max_atmost), keep(100), LOCAL));
+
+jphonerecs2_thor_pre_flagged := Suppress.MAC_FlagSuppressedSource(jphonerecs2_thor_pre_unsuppressed, mod_access, use_distributed := TRUE, data_env := iType);
+
+jphonerecs2_thor_pre := PROJECT(jphonerecs_thor_pre_flagged, jphonerecs_xform(LEFT));
 
 jphonerecs2_thor_nowphone := PROJECT(jphonerecsrolled(wphone10 = ''), TRANSFORM(risk_indicators.layout_output,
 					self.wphonevalflag := '6';

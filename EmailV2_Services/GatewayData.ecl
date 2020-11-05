@@ -16,12 +16,18 @@ EXPORT GatewayData := MODULE
                                TRANSFORM($.Layouts.email_final_rec,
                                          // we populate status only if domain is invalid
                                          invalid_domain := $.Constants.isUndeliverableEmail(RIGHT.domain_status);
+                                         inactive_domain := RIGHT.domain_status=$.Constants.DomainInactive;
                                          accept_all_domain := RIGHT.accept_all;
-                                         _email_status     := MAP(invalid_domain => RIGHT.domain_status,
+                                         _email_status     := MAP(invalid_domain OR inactive_domain => $.Constants.StatusInvalid,
                                                                   accept_all_domain => $.Constants.DomainAcceptAll,
                                                                    '');
                                          SELF.email_status := _email_status,
-                                         SELF.email_status_reason := IF(invalid_domain,$.Constants.GatewayValues.get_error_desc($.Constants.GatewayValues.EMAIL_DOMAIN_INVALID), ''),
+                                         SELF.email_status_reason := MAP(
+                                                    invalid_domain =>
+                                                     $.Constants.GatewayValues.get_error_desc($.Constants.GatewayValues.EMAIL_DOMAIN_INVALID),
+                                                    inactive_domain =>
+                                                     $.Constants.GatewayValues.get_error_desc($.Constants.GatewayValues.DOMAIN_INACTIVE),
+                                                    ''),
                                          SELF.date_last_verified := IF(_email_status<>'', RIGHT.date_last_verified,''),
                                          SELF:=LEFT),
                                LEFT OUTER, KEEP(1), LIMIT(0));

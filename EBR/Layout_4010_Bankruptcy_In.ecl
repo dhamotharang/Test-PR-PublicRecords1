@@ -15,5 +15,5 @@ record
    string1 DISPUTE_IND;
    string2 DISPUTE_CODE;
    string8 date_filed;
-   string1 lf;
+   string1 lf := '';
 end;
