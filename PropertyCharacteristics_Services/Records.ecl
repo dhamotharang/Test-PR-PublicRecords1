@@ -125,7 +125,7 @@ module
 		self.Report.ReportIdSection						:=	ModPropInfo.SetReportID(pInsContext
 																																			// ,dPropGatewayResponse
 																																			,combined_err
-																																			,exists (inhouse_results)
+																																			,exists (inhouse_results) OR (IsOptedOut AND COUNT(dPropPayload) = 2)
 																																			,pInMod.isHomegateway
 																																			,IsOptedOut
 																																			);
