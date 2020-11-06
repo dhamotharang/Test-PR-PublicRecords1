@@ -1,6 +1,6 @@
-#workunit('name', 'Business_Shell_V31');
+﻿#workunit('name', 'Business_Shell_V31');
 
-IMPORT Business_Risk_BIP, Cortera, Data_Services, RiskProcessing, Risk_Indicators, RiskWise, UT; 
+IMPORT Business_Risk_BIP, Cortera, Data_Services, RiskWise; 
 
 eyeball := 10;
 
@@ -25,8 +25,8 @@ BIPBestAppend := Business_Risk_BIP.Constants.BIPBestAppend.Default; // Append No
 Marketing_Mode := 0; // This product is not being run for marketing, allow all normal sources
 // Marketing_Mode := 1; // This product IS being run for marketing, disable sources not allowed for marketing
 
-// dataPermissionMask := '00000000000000000000'; // Default - does not allow SBFE data
-dataPermissionMask := '00000000000100000000'; // Allow SBFE data
+dataPermissionMask := '00000000000000000000'; // Default - does not allow SBFE data
+// dataPermissionMask := '00000000000100000000'; // Allow SBFE data
 
 IncludeExperian := FALSE; // By default, Experian data is not allowed
 // IncludeExperian := TRUE; // Override the Experian data restriction and include Experian in results 
