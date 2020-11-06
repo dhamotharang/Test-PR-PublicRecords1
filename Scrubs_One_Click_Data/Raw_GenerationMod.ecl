@@ -38,7 +38,7 @@ EXPORT Raw_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // The entire spec file
   EXPORT spcString :=
-    'OPTIONS:-gh\n'
+    ' OPTIONS:-gh\n'
     + 'MODULE:Scrubs_One_Click_Data\n'
     + 'FILENAME:One_Click_Data\n'
     + 'NAMESCOPE:Raw \n'
@@ -57,7 +57,7 @@ EXPORT Raw_GenerationMod := MODULE(SALT311.iGenerationMod)
     + '// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running\n'
     + '// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.\n'
     + '\n'
-    + 'FIELDTYPE:Invalid_SSN:CUSTOM(Scrubs.functions.fn_numeric>0)\n'
+    + 'FIELDTYPE:Invalid_SSN:CUSTOM(Scrubs_One_Click_Data.functions.fn_numeric>0)\n'
     + 'FIELDTYPE:Invalid_fName:CUSTOM(Scrubs.functions.fn_populated_strings>0,lastname)\n'
     + 'FIELDTYPE:Invalid_Dob:CUSTOM(Scrubs.functions.fn_dob>0)\n'
     + 'FIELDTYPE:Invalid_mandatory_Alpha:CUSTOM(Scrubs.functions.fn_ASCII_printable>0):LENGTHS(1..)\n'
@@ -76,7 +76,7 @@ EXPORT Raw_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:homestate:TYPE(STRING):LIKE(Invalid_State):0,0\t\n'
     + 'FIELD:homezip:TYPE(STRING):LIKE(Invalid_Zip):0,0\n'
     + 'FIELD:homephone:TYPE(STRING):LIKE(Invalid_Phone):0,0\t\n'
-    + 'FIELD:mobilephone:TYPE(STRING):0,0\t\n'
+    + 'FIELD:mobilephone:TYPE(STRING):LIKE(Invalid_Phone):0,0\n'
     + 'FIELD:emailaddress:TYPE(STRING):0,0\n'
     + 'FIELD:workname:TYPE(STRING):LIKE(Invalid_mandatory_Alpha):0,0\t\n'
     + 'FIELD:workaddress:TYPE(STRING):0,0\n'

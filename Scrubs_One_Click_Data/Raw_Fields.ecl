@@ -1,5 +1,5 @@
 ﻿IMPORT SALT311;
-IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
+IMPORT Scrubs_One_Click_Data,Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Raw_Fields := MODULE
  
 EXPORT NumFields := 22;
@@ -11,8 +11,8 @@ EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'Invalid_SSN' => 1,'Invalid_f
 EXPORT MakeFT_Invalid_SSN(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_SSN(SALT311.StrType s) := WHICH(~Scrubs.functions.fn_numeric(s)>0);
-EXPORT InValidMessageFT_Invalid_SSN(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.functions.fn_numeric'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_SSN(SALT311.StrType s) := WHICH(~Scrubs_One_Click_Data.functions.fn_numeric(s)>0);
+EXPORT InValidMessageFT_Invalid_SSN(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_One_Click_Data.functions.fn_numeric'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_fName(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -65,7 +65,7 @@ EXPORT InValidMessageFT_Invalid_pastDate(UNSIGNED1 wh) := CHOOSE(wh,SALT311.Hygi
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'ssn','firstname','lastname','dob','homeaddress','homecity','homestate','homezip','homephone','mobilephone','emailaddress','workname','workaddress','workcity','workstate','workzip','workphone','ref1firstname','ref1lastname','ref1phone','lastinquirydate','ip');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'ssn','firstname','lastname','dob','homeaddress','homecity','homestate','homezip','homephone','mobilephone','emailaddress','workname','workaddress','workcity','workstate','workzip','workphone','ref1firstname','ref1lastname','ref1phone','lastinquirydate','ip');
 EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'ssn' => 0,'firstname' => 1,'lastname' => 2,'dob' => 3,'homeaddress' => 4,'homecity' => 5,'homestate' => 6,'homezip' => 7,'homephone' => 8,'mobilephone' => 9,'emailaddress' => 10,'workname' => 11,'workaddress' => 12,'workcity' => 13,'workstate' => 14,'workzip' => 15,'workphone' => 16,'ref1firstname' => 17,'ref1lastname' => 18,'ref1phone' => 19,'lastinquirydate' => 20,'ip' => 21,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['CUSTOM'],[],['CUSTOM'],['CUSTOM','LENGTHS'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[],[],['CUSTOM','LENGTHS'],[],[],[],[],['CUSTOM'],[],[],['CUSTOM'],['CUSTOM'],[],[]);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['CUSTOM'],[],['CUSTOM'],['CUSTOM','LENGTHS'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[],['CUSTOM','LENGTHS'],[],[],[],[],['CUSTOM'],[],[],['CUSTOM'],['CUSTOM'],[],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
@@ -106,9 +106,9 @@ EXPORT Make_homephone(SALT311.StrType s0) := MakeFT_Invalid_Phone(s0);
 EXPORT InValid_homephone(SALT311.StrType s) := InValidFT_Invalid_Phone(s);
 EXPORT InValidMessage_homephone(UNSIGNED1 wh) := InValidMessageFT_Invalid_Phone(wh);
  
-EXPORT Make_mobilephone(SALT311.StrType s0) := s0;
-EXPORT InValid_mobilephone(SALT311.StrType s) := 0;
-EXPORT InValidMessage_mobilephone(UNSIGNED1 wh) := '';
+EXPORT Make_mobilephone(SALT311.StrType s0) := MakeFT_Invalid_Phone(s0);
+EXPORT InValid_mobilephone(SALT311.StrType s) := InValidFT_Invalid_Phone(s);
+EXPORT InValidMessage_mobilephone(UNSIGNED1 wh) := InValidMessageFT_Invalid_Phone(wh);
  
 EXPORT Make_emailaddress(SALT311.StrType s0) := s0;
 EXPORT InValid_emailaddress(SALT311.StrType s) := 0;

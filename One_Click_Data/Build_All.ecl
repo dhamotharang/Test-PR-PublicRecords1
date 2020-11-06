@@ -32,22 +32,22 @@ function
 				)
 	);
 	
-  RunScrubs  :=scrubs.ScrubsPlus('One_Click_Data', 'Scrubs_One_Click_Data', 'Scrubs_One_Click_Data_Raw', 'raw', pversion, One_Click_Data.Email_Notification_Lists.Stats, false);
+RunScrubs  :=scrubs.ScrubsPlus('One_Click_Data', 'Scrubs_One_Click_Data', 'Scrubs_One_Click_Data_Raw', 'raw', pversion, One_Click_Data.Email_Notification_Lists.Stats, false);
 
-	full_build :=
-	sequential( create_supers
-							,spray_files
-							,RunScrubs
-              ,if(Scrubs.mac_ScrubsFailureTest('Scrubs_One_Click_Data', pversion)
-   									,sequential(Build_Base		(pversion,pIsTesting,pSprayedFile,pBaseFile	).All
-   															,Build_Keys		(pversion																		).all
-   															,Build_Strata	(pversion																		)
-   															,Promote().buildfiles.Built2QA
-   															,Orbit3.proc_Orbit3_CreateBuild_AddItem('One Click Data',pversion,'N')
-   														 ) 
-   									,FAIL('Raw data scrubs failed.  Build processing stopped.  Resolve scrubs issues before you run again.')
-   								 )
-			      ): success(Send_Email(pversion,,not pIsTesting).Roxie), failure(send_email(pversion,,not pIsTesting).buildfailure);
+full_build :=
+	sequential(
+		 create_supers
+		,spray_files
+		,RunScrubs
+    ,if(Scrubs.mac_ScrubsFailureTest('Scrubs_One_Click_Data', pversion)
+   			,sequential( Build_Base		(pversion,pIsTesting,pSprayedFile,pBaseFile	).All
+									  ,Build_Keys		(pversion																		).all
+										,Build_Strata	(pversion																		)
+										,Promote().buildfiles.Built2QA
+										,Orbit3.proc_Orbit3_CreateBuild_AddItem('One Click Data',pversion,'N'); 
+									 ) 	
+   			,fail('Raw data scrubs failed.  Build processing stopped.  Resolve scrubs issues before you run again.')
+   		 )): success(Send_Email(pversion,,not pIsTesting).Roxie), failure(send_email(pversion,,not pIsTesting).buildfailure);
 
 	return
 	if(VersionControl.IsValidVersion(pversion)
