@@ -362,7 +362,7 @@ EXPORT product_files := MODULE
 		// ===================================================================	
 		EXPORT base_filename_raw := 'thor_data400::base::foreclosure';
 		EXPORT base_filename := AccountMonitoring.constants.DATA_LOCATION + base_filename_raw;
-		EXPORT base_file_raw := DATASET(base_filename, Property.Layout_Fares_Foreclosure_v2, THOR);
+		EXPORT base_file_raw := DATASET(base_filename, dx_Property.Layout_Fares_Foreclosure_v2, THOR);
 		EXPORT base_file     := PROJECT(base_file_raw, Property.Layout_Fares_Foreclosure);
 		
 		EXPORT Layout_Base_Header_file_slim := RECORD

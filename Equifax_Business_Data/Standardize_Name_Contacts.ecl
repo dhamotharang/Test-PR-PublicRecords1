@@ -10,6 +10,7 @@ EXPORT Standardize_Name_Contacts := MODULE
 			
 		// -- Mapping Clean contact name 
 		Equifax_Business_Data.Layouts.Base_Contacts tMapCleanContactName(pPreProcessInput L) := TRANSFORM
+      SELF.global_sid := 28781;			
 			SELF.clean_name.fname := L.efx_fstnam;
 			SELF.clean_name.lname := L.efx_lastnam;
 			SELF								  := L;			
