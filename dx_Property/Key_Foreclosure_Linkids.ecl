@@ -21,4 +21,21 @@ EXPORT Key_Foreclosure_Linkids := MODULE
     RETURN out;
   END;
 	
+	//DEFINE THE INDEX ACCESS
+	export kFetch(
+		dataset(BIPV2.IDlayouts.l_xlink_ids) inputs, 
+		string1 Level = BIPV2.IDconstants.Fetch_Level_DotID,	//The lowest level you'd like to pay attention to.  If U, then all the records for the UltID will be returned.
+																								//Values:  D is for Dot.  E is for Emp.  W is for POW.  P is for Prox.  O is for Org.  U is for Ult.
+																								//Should be enumerated or something?  at least need constants defined somewhere if you keep string1
+		unsigned2 ScoreThreshold = 0,								//Applied at lowest leve of ID
+		Joinlimit = 25000
+		) :=
+	FUNCTION
+	
+	  inputs_for2 := project(inputs, BIPV2.IDlayouts.l_xlink_ids2);
+		f2 := kFetch2(inputs_for2, Level, ScoreThreshold, JoinLimit);		
+		return project(f2, recordof(Key));
+
+	END;
+	
 END;
