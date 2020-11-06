@@ -210,7 +210,11 @@ dSBFEContributorAccounts	:=	IF(COUNT(dContributorAccounts)>0,
 																DATASET([],rSBFEAccounts)
 															);
 
-dSBFEAccounts :=	dSBFEBIPAccounts+dSBFEContributorAccounts;
+dSBFEAccounts1 :=	dSBFEBIPAccounts+dSBFEContributorAccounts;
+dSBFEAccounts :=	dedup(sort(dSBFEAccounts1, accountnumber, SBFE_Contributor_Number, contract_account_number, account_type_reported, powid, proxid, seleid, orgid, ultid),
+                              accountnumber, SBFE_Contributor_Number, contract_account_number, account_type_reported, powid, proxid, seleid, orgid, ultid);
+                              
+
 
 OUTPUT(CHOOSEN(dSBFEAccounts, pEyeball), NAMED('dSBFEAccounts'));
 /**********************************/
@@ -341,7 +345,7 @@ END;
 
 dGetOriginalRecords	:=	PROJECT(dOriginalRecords,TRANSFORM(rNewLayout,SELF:=LEFT;SELF:=[]));
 OUTPUT(CHOOSEN(SORT(dGetOriginalRecords,accountnumber),pEyeball),NAMED('dGetOriginalRecords'));
-dGetSBFEAccounts	:=	JOIN(
+dGetSBFEAccounts1	:=	JOIN(
 												DISTRIBUTE(dGetOriginalRecords,HASH(accountnumber)),
 												DISTRIBUTE(dSBFEAccounts,HASH(accountnumber)),
 													LEFT.accountnumber	=	RIGHT.accountnumber AND
@@ -355,8 +359,12 @@ dGetSBFEAccounts	:=	JOIN(
 												LOCAL,
 												LEFT OUTER
 											);
+
+// get rid of the garbage                      
+dGetSBFEAccounts := dGetSBFEAccounts1(accountnumber<>'');
 OUTPUT(CHOOSEN(SORT(dGetSBFEAccounts,accountnumber),pEyeball),NAMED('dGetSBFEAccounts'));
-dGetTradelines	:=	JOIN(
+
+dGetTradelines1	:=	JOIN(
 											DISTRIBUTE(dTradelines,HASH(AccountNumber, Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported)),
 											DISTRIBUTE(dGetSBFEAccounts,HASH(AccountNumber, Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported)),
 												LEFT.AccountNumber						=		RIGHT.AccountNumber AND
@@ -375,6 +383,10 @@ dGetTradelines	:=	JOIN(
 											LOCAL,
 											RIGHT OUTER
 										)(Cycle_End_Date <> '');
+
+// get these to be unique before joining back to doriginaldateaccountopened
+dGetTradelines := DEDUP(SORT(dGetTradelines1, AccountNumber, SBFE_Contributor_Number, Contract_account_number, account_type_reported, cycle_end_date, -version), 
+                                              AccountNumber, SBFE_Contributor_Number, Contract_Account_Number, account_type_reported, cycle_end_date);
 										
 dGetOriginalDateAccountOpened	:=	
 										JOIN(
