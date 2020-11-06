@@ -1,4 +1,4 @@
-﻿IMPORT RoxieKeyBuild;
+﻿IMPORT RoxieKeyBuild, Scrubs_eCrash_MBSAgency;
 #OPTION('multiplePersistInstances',FALSE);
 
 EXPORT Proc_Build_MBSAgency_Base(STRING Build_DateTime = mod_Utilities.strCurrentDateTimeStamp,
@@ -39,12 +39,17 @@ EXPORT Proc_Build_MBSAgency_Base(STRING Build_DateTime = mod_Utilities.strCurren
 	OrbitReceiveLoad := fn_Orbit_ReceiveInstance(PID, Build_DateTime);										 	
   OrbitCreateBuild := fn_Orbit_CreateOrUpdateBuildInstance(Build_DateTime, PID, Orbit3IConstants(PID).buildstatus_B, TRUE, TRUE, TRIM(Orbit3IConstants(PID).componentfilename(Build_DateTime), LEFT, RIGHT));		
   OrbitUpdateBuild := fn_Orbit_CreateOrUpdateBuildInstance(Build_DateTime, PID, Orbit3IConstants(PID).buildstatus, FALSE, FALSE);		
+
+// ###########################################################################
+//                        Scrubs
+// ###########################################################################	
+	RunSaltScrubs := Scrubs_eCrash_MBSAgency.PostBuildScrubs_eCrash_MBSAgency(Build_DateTime, Constants_MBSAgency.BuildEmailTarget);
 	
 // ###########################################################################
 //                        BuildBase
 // ###########################################################################
 	AgencyBase := mod_BuildMBSAgency.BaseAgency;																						
-	RoxieKeyBuild.Mac_SF_BuildProcess_V2(AgencyBase, Files_MBSAgency.BASE_PREFIX, Files_MBSAgency.SUFFIX, Build_DateTime, NewBase, 3, TRUE, TRUE); 																							
+	RoxieKeyBuild.Mac_SF_BuildProcess_V2(AgencyBase, Files_MBSAgency.BASE_PREFIX, Files_MBSAgency.SUFFIX, Build_DateTime, NewBase, 3, FALSE, TRUE); 																							
 	BuildBase := SEQUENTIAL(NewBase);																					
 
 // ###########################################################################
@@ -74,7 +79,7 @@ EXPORT Proc_Build_MBSAgency_Base(STRING Build_DateTime = mod_Utilities.strCurren
 // ###########################################################################
 //                         RunBaseBuild 
 // ###########################################################################	
-	RunBaseBuild := SEQUENTIAL(PreBuild, SprayAgency, OrbitReceiveLoad, BuildBase, OrbitCreateBuild);																							
+	RunBaseBuild := SEQUENTIAL(PreBuild, SprayAgency, RunSaltScrubs, OrbitReceiveLoad, BuildBase, OrbitCreateBuild);																							
 																							 
 	BuildAgencyBase := IF(isSprayAndBaseBuild, 
 												IF(isSprayFileExists,
