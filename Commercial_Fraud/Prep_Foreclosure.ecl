@@ -1,8 +1,8 @@
-import property,address,aid;
+﻿import property,address,aid,dx_property;
 // should be only recent foreclosure, up till 6 months ago
 export Prep_Foreclosure(
 
-	 dataset(property.Layout_Fares_Foreclosure_v2) pForeclosure			= Property.file_foreclosure
+	 dataset(dx_property.Layout_Fares_Foreclosure_v2) pForeclosure			= Property.file_foreclosure
 	,boolean																		pShouldRecaculatePersist	= _Dataset().ShouldRecaculatePersist
 ) := 
 function
@@ -22,7 +22,7 @@ function
 		unsigned8 unique_id;
 	end;
 	
-	temp_lay tPreProcessForeclosure(property.Layout_Fares_Foreclosure_v2 l, unsigned8 cnt) :=
+	temp_lay tPreProcessForeclosure(dx_property.Layout_Fares_Foreclosure_v2 l, unsigned8 cnt) :=
 	transform
 
 		//////////////////////////////////////////////////////////////////////////////////////
