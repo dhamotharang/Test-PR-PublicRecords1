@@ -1,21 +1,21 @@
 ﻿/*--SOAP--
 
 <message name="BCD_SmallBizCombinedReport" wuTimeout="300000">
-	<part name="SmallBizCombinedReportRequest" type="tns:XmlDataSet" cols="110" rows="75"/>
-  <!-- Option Fields -->
-	<part name="DPPAPurpose" type="xsd:integer"/>
-	<part name="GLBPurpose" type="xsd:integer"/>
-	<part name="DataRestrictionMask" type="xsd:string"/>
-	<part name="DataPermissionMask" type="xsd:string"/>
-	<part name="SSNMask" type="xsd:string"/>
-	<part name="DOBMask" type="xsd:string"/>
-	<part name="DLMask" type="xsd:boolean"/>
+  <part name="SmallBizCombinedReportRequest" type="tns:XmlDataSet" cols="110" rows="75"/>
+  <!-- Option Fields --> 
+  <part name="DPPAPurpose" type="xsd:integer"/>
+  <part name="GLBPurpose" type="xsd:integer"/>
+  <part name="DataRestrictionMask" type="xsd:string"/>
+  <part name="DataPermissionMask" type="xsd:string"/>
+  <part name="SSNMask" type="xsd:string"/>
+  <part name="DOBMask" type="xsd:string"/>
+  <part name="DLMask" type="xsd:boolean"/>
   <part name="ApplicationType" type="xsd:string"/>
-	<part name="IndustryClass" type="xsd:string"/>
-	<part name="Gateways" type="tns:XmlDataSet" cols="100" rows="8"/>
-	<part name="ReturnDetailedRoyalties" type="xsd:boolean"/>
+  <part name="IndustryClass" type="xsd:string"/>
+  <part name="Gateways" type="tns:XmlDataSet" cols="100" rows="8"/>
+  <part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
   <part name="HistoryDateYYYYMM" type="xsd:integer"/>
-	<part name="HistoryDate" type="xsd:integer"/>
+  <part name="HistoryDate" type="xsd:integer"/>
   <part name="Watchlists_Requested" type="tns:XmlDataSet" cols="100" rows="8"/>
   <part name="OFAC_Version" type="xsd:integer"/>
   <part name="LinkSearchLevel" type="xsd:integer"/>
@@ -23,131 +23,133 @@
   <part name="AllowedSources" type="xsd:string"/>
   <part name="Global_Watchlist_Threshold" type="xsd:real"/>
   <part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
-	<part name="IncludeTargusGateway" type="xsd:boolean"/>
-	<part name="RunTargusGatewayAnywayForTesting" type="xsd:boolean"/>
-  <part name="TestDataEnabled" type="xsd:boolean"/>
-  <part name="TestDataTableName" type="xsd:string"/>
+  <part name="IncludeTargusGateway" type="xsd:boolean"/>
+  <part name="RunTargusGatewayAnywayForTesting" type="xsd:boolean"/>
+  <part name="TestDataEnabled" type="xsd:boolean"/> 
+  <part name="TestDataTableName" type="xsd:string"/> 
 </message>
 */
-/*--INFO-- BCD Small Business Combined Report Service - This service returns
-           combinations of the Small Business Scores and the SBFE
+/*--INFO-- BCD Small Business Combined Report Service - This service returns 
+           combinations of the Small Business Scores and the SBFE 
            Credit Report for Capital One's Business Credit Disclosure (BCD) service*/
 
 // #OPTION('expandSelectCreateRow', TRUE);
-IMPORT Address, AutoStandardI, BIPV2, Business_Risk_BIP, BusinessCredit_Services,
-       Gateway, IESP, Inquiry_AccLogs, MDR, Phones, Risk_Reporting, Royalty, STD,
-       UT, WSInput;
+IMPORT Address, AutoStandardI, BIPV2, Business_Risk_BIP, BusinessCredit_Services, 
+       Gateway, IESP, Inquiry_AccLogs, LNSmallBusiness, MDR, Phones, Risk_Reporting,  
+       Royalty, STD, UT, WSInput;
 
-// This service was created for Capital One who has requested a new service they
-// will have the ability to specialize to their specific needs. At the time of creating the
+// This service was created for Capital One who has requested a new service they 
+// will have the ability to specialize to their specific needs. At the time of creating the 
 // service it was replica of the LNSmallBusiness.SmallBusiness_BIP_Combined_Service, with only
-// the top level records created for the new service. Subject to change depending upon the
+// the top level records created for the new service. Subject to change depending upon the 
 // changes requested by Capital One.
-// Capital One has committed to 60,000 transactions per month by 2019.
+// Capital One has committed to 60,000 transactions per month by 2019. 
 // For performance and the ability to quickly make unforeseeable major changes this new service
 // shares all underlying code.
 
-EXPORT BCD_SmallBizCombinedReport :=
-  MACRO
+EXPORT BCD_SmallBizCombinedReport := 
+  MACRO 
 	#OPTION('embeddedWarningsAsErrors', 0);
-
+	
   // #option ('optimizelevel', 0);  // NEVER RELEASE THIS LINE OF CODE TO PROD
-                                    // this is for deploying to a 100-way as
+                                    // this is for deploying to a 100-way as 
                                     // the service is large.
                                     // This service won't run on a 1-way.
     /* ************************************************************************
      * The following macro defines the field sequence on WsECL page of query. *
      ************************************************************************ */
     WSInput.MAC_BusinessCredit_Services_BCD_SmallBizCombinedReport();
-
+      
     /* ************************************************************************
      *                          Grab service inputs                           *
      ************************************************************************ */
-
+                                                                 
     requestIn := DATASET([], iesp.bcdsmallbusinesscombinedreport.t_BcdSmallBusinessCombinedReportRequest) : STORED('BcdSmallBusinessCombinedReportRequest', FEW);
     firstRow  := requestIn[1] : INDEPENDENT; // Since this is realtime and not batch, should only have one row on input.
     search    := GLOBAL(firstRow.SearchBy);
     option    := GLOBAL(firstRow.Options);
-    users     := GLOBAL(firstRow.User);
-
-    // Some of the top business code is using the global mod instead
+    users     := GLOBAL(firstRow.User); 
+    
+    // Some of the top business code is using the global mod instead 
     // of using the interface module
     iesp.ECL2ESP.SetInputBaseRequest (firstRow);
     global_mod := AutoStandardI.GlobalModule();
-
+		
 		/* **********************************************
 			 *  Fields needed for improved Scout Logging  *
 			 **********************************************/
-			STRING32 _LoginID               := ''	: STORED('_LoginID');
-			outofbandCompanyID							:= '' : STORED('_CompanyID');
-			STRING20 CompanyID              := IF(users.CompanyId != '', users.CompanyId, outofbandCompanyID);
-			STRING20 FunctionName           := '' : STORED('_LogFunctionName');
-			STRING50 ESPMethod              := '' : STORED('_ESPMethodName');
-			STRING10 InterfaceVersion       := '' : STORED('_ESPClientInterfaceVersion');
-			STRING5 DeliveryMethod          := '' : STORED('_DeliveryMethod');
-			STRING5 DeathMasterPurpose      := '' : STORED('__deathmasterpurpose');
-			STRING10 SSN_Mask               := IF(users.SSNMask != '', users.SSNMask, global_mod.ssnmask);
-			STRING10 DOB_Mask               := IF(users.DOBMask != '', users.DOBMask, global_mod.dobmask);
-			BOOLEAN DL_Mask                 := users.DLMask;
-			BOOLEAN ExcludeDMVPII           := users.ExcludeDMVPII;
-			BOOLEAN ArchiveOptIn            := FALSE : STORED('instantidarchivingoptin');
-			BOOLEAN DisableIntermediateShellLoggingOutOfBand := FALSE    : STORED('OutcomeTrackingOptOut');
-			DisableOutcomeTracking  := DisableIntermediateShellLoggingOutOfBand OR users.OutcomeTrackingOptOut;
+    STRING32 _LoginID               := ''	: STORED('_LoginID');
+    outofbandCompanyID							:= '' : STORED('_CompanyID');
+    STRING20 CompanyID              := IF(users.CompanyId != '', users.CompanyId, outofbandCompanyID);
+    STRING20 FunctionName           := '' : STORED('_LogFunctionName');
+    STRING50 ESPMethod              := '' : STORED('_ESPMethodName');
+    STRING10 InterfaceVersion       := '' : STORED('_ESPClientInterfaceVersion');
+    STRING5 DeliveryMethod          := '' : STORED('_DeliveryMethod');
+    STRING5 DeathMasterPurpose      := '' : STORED('__deathmasterpurpose');
+    outofbandssnmask                := '' : STORED('SSNMask');
+    STRING10 SSN_Mask               := IF(users.SSNMask != '', users.SSNMask, outofbandssnmask);
+    outofbanddobmask                := '' : STORED('DOBMask');
+    STRING10 DOB_Mask               := IF(users.DOBMask != '', users.DOBMask, outofbanddobmask);			
+    BOOLEAN DL_Mask                 := users.DLMask;
+    BOOLEAN ExcludeDMVPII           := users.ExcludeDMVPII;
+    BOOLEAN ArchiveOptIn            := FALSE : STORED('instantidarchivingoptin');
+    BOOLEAN DisableIntermediateShellLoggingOutOfBand := FALSE    : STORED('OutcomeTrackingOptOut');
+    DisableOutcomeTracking  := DisableIntermediateShellLoggingOutOfBand OR users.OutcomeTrackingOptOut;
 
 			//Look up the industry by the company ID.
 			Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID AND s_product_id = (STRING)Risk_Reporting.ProductID.BusinessCredit_Services__BCD_SmallBizCombinedReport);
 		/* ************* End Scout Fields **************/
-
+   
     // Below we'll prefer users.DataRestrictionMask, users.DataPermissionMask, users.industryclass, etc., over
     // DataRestrictionMask_stored, DataPermissionMask_stored, etc., since they are "internal" or overridden values
     // populated for Development/QA purposes, etc.
-    STRING120 Bus_Street_Address1 := IF(search.Company.Address.StreetAddress1 = '',
-                                        Address.Addr1FromComponents(search.Company.Address.StreetNumber,
-                                                                    search.Company.Address.StreetPreDirection,
-                                                                    search.Company.Address.StreetName,
-                                                                    search.Company.Address.StreetSuffix,
-                                                                    search.Company.Address.StreetPostDirection,
-                                                                    search.Company.Address.UnitDesignation,
+    STRING120 Bus_Street_Address1 := IF(search.Company.Address.StreetAddress1 = '', 
+                                        Address.Addr1FromComponents(search.Company.Address.StreetNumber, 
+                                                                    search.Company.Address.StreetPreDirection, 
+                                                                    search.Company.Address.StreetName, 
+                                                                    search.Company.Address.StreetSuffix, 
+                                                                    search.Company.Address.StreetPostDirection, 
+                                                                    search.Company.Address.UnitDesignation, 
                                                                     search.Company.Address.UnitNumber),
                                         search.Company.Address.StreetAddress1);
     // Authorized Representative 1 Input Information
     STRING8   Rep_1_DOB := iesp.ECL2ESP.t_DateToString8(search.AuthorizedRep1.DOB);
-    STRING120 Rep_1_Street_Address1 := IF(search.AuthorizedRep1.Address.StreetAddress1 = '',
-                                          Address.Addr1FromComponents(search.AuthorizedRep1.Address.StreetNumber,
-                                                                      search.AuthorizedRep1.Address.StreetPreDirection,
-                                                                      search.AuthorizedRep1.Address.StreetName,
-                                                                      search.AuthorizedRep1.Address.StreetSuffix,
-                                                                      search.AuthorizedRep1.Address.StreetPostDirection,
-                                                                      search.AuthorizedRep1.Address.UnitDesignation,
+    STRING120 Rep_1_Street_Address1 := IF(search.AuthorizedRep1.Address.StreetAddress1 = '', 
+                                          Address.Addr1FromComponents(search.AuthorizedRep1.Address.StreetNumber, 
+                                                                      search.AuthorizedRep1.Address.StreetPreDirection, 
+                                                                      search.AuthorizedRep1.Address.StreetName, 
+                                                                      search.AuthorizedRep1.Address.StreetSuffix, 
+                                                                      search.AuthorizedRep1.Address.StreetPostDirection, 
+                                                                      search.AuthorizedRep1.Address.UnitDesignation, 
                                                                       search.AuthorizedRep1.Address.UnitNumber),
                                           search.AuthorizedRep1.Address.StreetAddress1);
     // Authorized Representative 2 Input Information
     STRING8   Rep_2_DOB := iesp.ECL2ESP.t_DateToString8(search.AuthorizedRep2.DOB);
-    STRING120 Rep_2_Street_Address1 := IF( search.AuthorizedRep2.Address.StreetAddress1 = '',
-                                           Address.Addr1FromComponents(search.AuthorizedRep2.Address.StreetNumber,
-                                                                       search.AuthorizedRep2.Address.StreetPreDirection,
-                                                                       search.AuthorizedRep2.Address.StreetName,
-                                                                       search.AuthorizedRep2.Address.StreetSuffix,
-                                                                       search.AuthorizedRep2.Address.StreetPostDirection,
-                                                                       search.AuthorizedRep2.Address.UnitDesignation,
+    STRING120 Rep_2_Street_Address1 := IF( search.AuthorizedRep2.Address.StreetAddress1 = '', 
+                                           Address.Addr1FromComponents(search.AuthorizedRep2.Address.StreetNumber, 
+                                                                       search.AuthorizedRep2.Address.StreetPreDirection, 
+                                                                       search.AuthorizedRep2.Address.StreetName, 
+                                                                       search.AuthorizedRep2.Address.StreetSuffix, 
+                                                                       search.AuthorizedRep2.Address.StreetPostDirection, 
+                                                                       search.AuthorizedRep2.Address.UnitDesignation, 
                                                                        search.AuthorizedRep2.Address.UnitNumber),
                                            search.AuthorizedRep2.Address.StreetAddress1 );
     // Authorized Representative 3 Input Information
     STRING8   Rep_3_DOB := iesp.ECL2ESP.t_DateToString8(search.AuthorizedRep3.DOB);
-    STRING120 Rep_3_Street_Address1 := IF(search.AuthorizedRep3.Address.StreetAddress1 = '',
-                                          Address.Addr1FromComponents(search.AuthorizedRep3.Address.StreetNumber,
-                                                                      search.AuthorizedRep3.Address.StreetPreDirection,
-                                                                      search.AuthorizedRep3.Address.StreetName,
-                                                                      search.AuthorizedRep3.Address.StreetSuffix,
-                                                                      search.AuthorizedRep3.Address.StreetPostDirection,
-                                                                      search.AuthorizedRep3.Address.UnitDesignation,
+    STRING120 Rep_3_Street_Address1 := IF(search.AuthorizedRep3.Address.StreetAddress1 = '', 
+                                          Address.Addr1FromComponents(search.AuthorizedRep3.Address.StreetNumber, 
+                                                                      search.AuthorizedRep3.Address.StreetPreDirection, 
+                                                                      search.AuthorizedRep3.Address.StreetName, 
+                                                                      search.AuthorizedRep3.Address.StreetSuffix, 
+                                                                      search.AuthorizedRep3.Address.StreetPostDirection, 
+                                                                      search.AuthorizedRep3.Address.UnitDesignation, 
                                                                       search.AuthorizedRep3.Address.UnitNumber),
                                           search.AuthorizedRep3.Address.StreetAddress1);
 
     // Option Fields
 	#STORED('LimitPaymentHistory24Months',Option.LimitPaymentHistory24Months); //  busines credit	report w SBFE data project additions
     BOOLEAN LimitPaymentHistory24MonthsVal := FALSE : STORED('LimitPaymentHistory24Months');   // bus credit report w SBFE additions.
-    STRING  ContributorIds := '' : STORED('SBFEContributorIds');  	  // bus credit report w SBFE additions.
+    STRING  ContributorIds := '' : STORED('SBFEContributorIds');  	  // bus credit report w SBFE additions.	  
     UNSIGNED3 HistoryDateYYYYMM		    := (INTEGER)Business_Risk_BIP.Constants.NinesDate     : STORED('HistoryDateYYYYMM');
     UNSIGNED6 HistoryDate             := (INTEGER)Business_Risk_BIP.Constants.NinesDateTime : STORED('HistoryDate');
     UNSIGNED1	Link_Search_Level       := Business_Risk_BIP.Constants.LinkSearch.Default     : STORED('LinkSearchLevel');
@@ -164,26 +166,26 @@ EXPORT BCD_SmallBizCombinedReport :=
     /* ****************************************************************************
      *                        Prepare input Data                                  *
      ******************************************************************************/
-
+     
     // SmallBusinessAttrV1 (etc) is a valid input
     // Attributes will not be part of Capital One's first cut of the service.
-    Attributes_Requested :=
-      PROJECT(option.AttributesVersionRequest,
-              TRANSFORM(LNSmallBusiness.Layouts.AttributeGroupRec,
+    Attributes_Requested := 
+      PROJECT(option.AttributesVersionRequest, 
+              TRANSFORM(LNSmallBusiness.Layouts.AttributeGroupRec, 
                          SELF.AttributeGroup := '')); //StringLib.StringToUpperCase(LEFT.Value)));
-    Models_Requested :=
-      PROJECT(option.IncludeModels.Names,
-              TRANSFORM(LNSmallBusiness.Layouts.ModelNameRec,
+    Models_Requested := 
+      PROJECT(option.IncludeModels.Names, 
+              TRANSFORM(LNSmallBusiness.Layouts.ModelNameRec, 
                          SELF.ModelName := StringLib.StringToUpperCase(LEFT.Value)));
-    Model_Options :=
-      PROJECT(option.IncludeModels.ModelOptions,
-              TRANSFORM(LNSmallBusiness.Layouts.ModelOptionsRec,
+    Model_Options := 
+      PROJECT(option.IncludeModels.ModelOptions, 
+              TRANSFORM(LNSmallBusiness.Layouts.ModelOptionsRec, 
                          SELF.OptionName  := StringLib.StringToUpperCase(TRIM(LEFT.OptionName, LEFT, RIGHT));
                          SELF.OptionValue := LEFT.OptionValue));
-
+    
     Gateways_ := Gateway.Configuration.Get();	// Gateways Coded in this Product: Targus
-
-    LNSmallBusiness.BIP_Layouts.Input xfm_intoSBA_InputLayout() :=
+    
+    LNSmallBusiness.BIP_Layouts.Input xfm_intoSBA_InputLayout() := 
       TRANSFORM
         SELF.AcctNo                 := users.AccountNumber;
         SELF.HistoryDateYYYYMM      := HistoryDateYYYYMM;
@@ -274,16 +276,16 @@ EXPORT BCD_SmallBizCombinedReport :=
     /* ****************************************************************************
      *         Validate minimum SBA Combined Service Input:                       *
      ******************************************************************************/
-
+     
     MinimumInputMetForOption1 := search.Company.CompanyName != '' AND Bus_Street_Address1 != '' AND search.Company.Address.Zip5 != '';
     MinimumInputMetForOption2 := search.Company.CompanyName != '' AND Bus_Street_Address1 != '' AND search.Company.Address.City != '' AND search.Company.Address.State != '';
     MinimumInputMetForOption3 := search.Company.BusinessIds.seleID != 0;
-
+    
     MinimumInputMetForAuthorizedRepPopulated := LNSmallBusiness.fn_isSmallBiz_Combined_MinAuthRepInput_Met( search.AuthorizedRep1,
                                                                                                             search.AuthorizedRep2,
                                                                                                             search.AuthorizedRep3 );
-    // Authorized Rep information is not required on input,
-    // however if any information is provided:
+    // Authorized Rep information is not required on input, 
+    // however if any information is provided: 
     // at a MINIMUM First and Last Name PLUS one of the following MUST also be populated
     //   - Auth Rep, Street Address and Zip
     //   - Auth Rep SSN
@@ -296,18 +298,18 @@ EXPORT BCD_SmallBizCombinedReport :=
                                  search.AuthorizedRep3.SSN = '' AND Rep_3_DOB = '' AND Rep_3_Street_Address1 = '' AND search.AuthorizedRep3.Address.City = '' AND search.AuthorizedRep3.Address.State = '' AND search.AuthorizedRep3.Address.Zip5 = '' AND search.AuthorizedRep3.Phone = '' AND (STRING25)search.AuthorizedRep3.DriverLicenseNumber = '' ;
 
     AuthorizedRepValidOrBlank := MinimumInputMetForAuthorizedRepPopulated OR AuthorizedRepNotPopulated;
-
+    
     IF((MinimumInputMetForOption1 = FALSE AND MinimumInputMetForOption2 = FALSE AND MinimumInputMetForOption3 = FALSE) OR // Minimum Business Inputs not met
        ((MinimumInputMetForOption1 OR MinimumInputMetForOption2 OR MinimumInputMetForOption3 ) AND AuthorizedRepValidOrBlank = FALSE), // Minimum Business Inputs met, but minimum Authorized Rep Inputs not met
       FAIL('Please input the minimum required fields:\nOption 1: Company Name, Street Address, Zip\nOR\nOption 2: Company Name, Street Address, City, State. \n If Authorized Rep data is entered: The First and Last name must be entered plus one of the following: \n1) SSN \n2) Street Address and zip \n3) Street Address, City and State.'));
 	 /* ************************************************************************
 	  *                 Create Input module                                    *
 	  **************************************************************************/
-
-   SmallBizCombined_inmod :=
+    
+   SmallBizCombined_inmod := 
      MODULE (PROJECT(global_mod ,LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IParams, OPT));
        EXPORT DATASET(LNSmallBusiness.BIP_Layouts.Input) ds_SBA_Input := SBA_Input;
-       EXPORT UNSIGNED1 DPPAPurpose         := global_mod.DPPApurpose;
+       EXPORT UNSIGNED1 DPPAPurpose         := global_mod.DPPApurpose; 
        EXPORT UNSIGNED1 GLBAPurpose         := global_mod.GLBPurpose;
        EXPORT STRING    DataRestrictionMask := global_mod.DataRestrictionMask;
        EXPORT STRING    DataPermissionMask	:= global_mod.DataPermissionMask;
@@ -329,14 +331,14 @@ EXPORT BCD_SmallBizCombinedReport :=
        EXPORT BOOLEAN   IncludeTargusGateway            := Include_TargusGateway;
        EXPORT BOOLEAN   RunTargusGateway                := Run_TargusGateway;
        EXPORT BOOLEAN   TestDataEnabled			            := TestData_Enabled;
-	     EXPORT STRING    TestDataTableName	              := TestData_TableName;
+       EXPORT STRING    TestDataTableName	              := TestData_TableName;
        EXPORT STRING6   DOBMask                         := global_mod.DOBMask;
        EXPORT STRING32  ApplicationType                 := global_mod.ApplicationType;
        EXPORT STRING1   FetchLevel 					            := BIPV2.IDconstants.Fetch_Level_SELEID;
-       EXPORT BOOLEAN   IncludeCreditReport             := option.IncludeCreditReport;
-	  EXPORT BOOLEAN   LimitPaymentHistory24Months := LimitPaymentHistory24MonthsVal; // bus credit report w SBFE additions.
-	  EXPORT STRING       SBFEContributorIds := ContributorIds; // bus credit report w SBFE additions project
-	 EXPORT STRING1     BusinessCreditReportType := BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport; // default option to run Bus Credit report with SBFE data
+       EXPORT BOOLEAN   IncludeCreditReport             := option.IncludeCreditReport;  
+       EXPORT BOOLEAN   LimitPaymentHistory24Months := LimitPaymentHistory24MonthsVal; // bus credit report w SBFE additions.	 
+       EXPORT STRING    SBFEContributorIds := ContributorIds; // bus credit report w SBFE additions project
+       EXPORT STRING1   BusinessCreditReportType := BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport; // default option to run Bus Credit report with SBFE data
        EXPORT BOOLEAN   MinInputMetForAuthRepPopulated  := MinimumInputMetForAuthorizedRepPopulated;
        EXPORT DATASET(iesp.Share.t_StringArrayItem) Watchlists_Requested := Watchlists_Requested_;
        EXPORT DATASET(Gateway.Layouts.Config) Gateways  := Gateways_;
@@ -345,26 +347,34 @@ EXPORT BCD_SmallBizCombinedReport :=
        EXPORT DATASET(LNSmallBusiness.Layouts.ModelOptionsRec) ModelOptions := Model_Options;
 			 EXPORT BOOLEAN   UseInputDataAsIs                := TRUE;
       END;
-
+    
   ds_Results_withSmBizSBFEroyalty := LNSmallBusiness.SmallBusiness_BIP_Combined_Service_Records(SmallBizCombined_inmod);
-  ds_Results :=
-    PROJECT(ds_Results_withSmBizSBFEroyalty,
-      TRANSFORM(iesp.bcdsmallbusinesscombinedreport.t_BcdSmallBusinessCombinedReportResponse,
+  
+  ds_Final_SmallBizAnaResults := 
+    LNSmallBusiness.SmallBusiness_intoIESP_layouts.fn_SmallBiz_intoESDL(ds_Results_withSmBizSBFEroyalty[1].SBA_Results,
+                                                                        SmallBizCombined_inmod.AttributesRequested,
+                                                                        ds_Results_withSmBizSBFEroyalty[1].LNSmallBizModelsType,
+                                                                        ds_Results_withSmBizSBFEroyalty[1].NewLNSmallBizModelsType
+                                                                       );
+  ds_Results := 
+    PROJECT(ds_Results_withSmBizSBFEroyalty, 
+      TRANSFORM(iesp.smallbusinessbipcombinedreport.t_BcdSmallBusinessCombinedReportResponse, 
         SELF.InputEcho := search; // Grab the exact input from the "search" ESDL near the top
-        SELF           := LEFT;
+        SELF.SmallBusinessAnalyticsResults := ds_Final_SmallBizAnaResults;
+        SELF := LEFT;
       ));
 
    /* ************************************************************************
     *                  Calculate Royalties                                   *
     **************************************************************************
     *                    SBFE Royalties                                      *
-    **************************************************************************/
+    **************************************************************************/   
     // determine if there are any SBFE data returned in the LN Small Biz Analytics or Credit Report
-	  SBFE_RoyalCount := IF(ds_Results[1].CreditReportRecords[1].BestInformation.BusinessCreditIndicator = BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.BUSINESS_CREDIT_ONLY OR
+	  SBFE_RoyalCount := IF(ds_Results[1].CreditReportRecords[1].BestInformation.BusinessCreditIndicator = BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.BUSINESS_CREDIT_ONLY OR 
                           ds_Results[1].CreditReportRecords[1].BestInformation.BusinessCreditIndicator = BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.BOTH OR
                           ds_Results_withSmBizSBFEroyalty[1].SmallBiz_SBFE_Royalty, 1, 0);
-
-    ds_SBFE_CountRoyalLayout := DATASET([{SBFE_RoyalCount}], {INTEGER SBFEAccountCount});
+                          
+    ds_SBFE_CountRoyalLayout := DATASET([{SBFE_RoyalCount}], {INTEGER SBFEAccountCount});                                           
     ds_combinedSBFE_royalties := IF( TestData_Enabled, Royalty.RoyaltySBFE.GetNoRoyalties(), Royalty.RoyaltySBFE.GetOnlineRoyalties(ds_SBFE_CountRoyalLayout) );
 
    /* ************************************************************************
@@ -380,13 +390,13 @@ EXPORT BCD_SmallBizCombinedReport :=
     *                    Cortera Royalties                                    *
     **************************************************************************/
     ds_Cortera_royalties := IF( TestData_Enabled, Royalty.RoyaltyCortera.InHouse.GetNoRoyalties(), Royalty.RoyaltyCortera.InHouse.GetCombinedServiceRoyalties(ds_Results) );
-
-    // Combine Royalties
-    ds_Royalties := DATASET([], Royalty.Layouts.Royalty) +
-                    ds_combinedSBFE_royalties +
+    
+    // Combine Royalties  
+    ds_Royalties := DATASET([], Royalty.Layouts.Royalty) + 
+                    ds_combinedSBFE_royalties + 
                     ds_Targus_royalties +
                     ds_Cortera_royalties;
-
+    
 		//Log to Deltabase
 		Deltabase_Logging_prep := PROJECT(ds_Results, TRANSFORM(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
 																										 SELF.company_id := (INTEGER)CompanyID,
@@ -467,25 +477,11 @@ EXPORT BCD_SmallBizCombinedReport :=
                                                      SELF := LEFT,
 																										 SELF := [] ));
 		Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
-		// #stored('Deltabase_Log', Deltabase_Logging);
 
 		//Improved Scout Logging
 		IF(~DisableOutcomeTracking and ~TestData_Enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
-
-    // OUTPUT(SmallBizCombined_inmod);
-    // OUTPUT(DPPAPurpose_stored, NAMED('DPPAPurpose_stored'));
-    // OUTPUT(GLBPurpose_stored, NAMED('GLBPurpose_stored'));
-    // OUTPUT(DataRestrictionMask_stored, NAMED('DataRestrictionMask_stored'));
-    // OUTPUT(DataPermissionMask_stored, NAMED('DataPermissionMask_stored'));
-    // OUTPUT(IndustryClass_stored, NAMED('IndustryClass_stored'));
-    // OUTPUT(SBA_Input, NAMED('SBA_Input'));
-    // OUTPUT(ds_Results.CreditReportRecords[1].PhoneSources, NAMED('Cred_Rpt_PhoneSources'));
-    // OUTPUT(ds_Results.CreditReportRecords[1].TopBusinessRecord, NAMED('TopBiz'));
-    // OUTPUT(ds_Results.CreditReportRecords[1].TopBusinessRecord.MotorVehicleSection,   NAMED('MotorVehicleSection'));
-    // OUTPUT(ds_Results.CreditReportRecords[1].TopBusinessRecord.AircraftSection,     NAMED('AircraftSection'));
-    // OUTPUT(ds_Results.CreditReportRecords[1].AdditionalInfo.CompanyNameVariations,  NAMED('CompanyNameVariations'));
-
-    OUTPUT(ds_Results,   NAMED('Results'));
+		
+    OUTPUT(ds_Results,   NAMED('Results')); 
     OUTPUT(ds_Royalties, NAMED('RoyaltySet'));
-
+    
 ENDMACRO;
