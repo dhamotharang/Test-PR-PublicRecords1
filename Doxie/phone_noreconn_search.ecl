@@ -87,6 +87,7 @@ EXPORT phone_noreconn_search := MACRO
   boolean SuppressNewPorting := excludeLandlines : stored('SuppressNewPorting');
   boolean SuppressBlankNameAddress := false : stored('SuppressBlankNameAddress');
   boolean GetSSNBest := false : stored('GetSSNBest');
+
   string32 ApplicationType := '' : stored('ApplicationType');
 
   doxie.MAC_Header_Field_Declare();
@@ -409,6 +410,7 @@ EXPORT phone_noreconn_search := MACRO
 
   in_mod := MODULE(Phones.IParam.BatchParams)
     EXPORT UNSIGNED	max_age_days := Phones.Constants.PhoneAttributes.LastActivityThreshold;
+    EXPORT BOOLEAN AllowPortingData := TRUE;
   END;
   ds_ported_metadata := Phones.GetPhoneMetadata_wLERG6(phoneInfo,in_mod);
 
@@ -428,7 +430,7 @@ EXPORT phone_noreconn_search := MACRO
 
   ds_ported_dt_match := join(cmp_res_out, ds_ppmd_key_recs,
     left.phone = right.phone and
-    // from key recs, only use the 2 sources (PJ & PK) that have ported info
+    // from key recs, only use source (PK) that has ported info
     right.source in MDR.sourceTools.set_PhonesPorted and
     // check person/phone dates vs ported key port dates
     (unsigned) ut.date_math(left.dt_first_seen, -doxie.phone_noreconn_constants.PortingMarginOfError)
