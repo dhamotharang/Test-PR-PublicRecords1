@@ -4,9 +4,6 @@ export Health_CheckUp(string pVersion) := module
 export All:=PARALLEL(
 	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::config::customermappings')>0,'Unit Test Failed on ~fraudgov::config::customermappings',FAIL);
 	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::config::customersettings')>0,'Unit Test Failed on ~fraudgov::config::customersettings',FAIL);
-	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::passed::deltabase')>0,'Unit Test Failed on ~fraudgov::in::passed::deltabase',FAIL);
-	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::passed::nac')>0,'Unit Test Failed on ~fraudgov::in::passed::nac',FAIL);
-	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::passed::rdp')>0,'Unit Test Failed on ~fraudgov::in::passed::rdp',FAIL);
 	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::sprayed::bypassed_deltabase')>0,'Unit Test Failed on ~fraudgov::in::sprayed::bypassed_deltabase',FAIL);
 	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::sprayed::bypassed_identitydata')>0,'Unit Test Failed on ~fraudgov::in::sprayed::bypassed_identitydata',FAIL);
 	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::sprayed::bypassed_knownfraud')>0,'Unit Test Failed on ~fraudgov::in::sprayed::bypassed_knownfraud',FAIL);
@@ -26,6 +23,8 @@ export All:=PARALLEL(
 	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::sprayed::configattributes')>0,'Unit Test Failed on ~fraudgov::in::sprayed::configattributes',FAIL);
 	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::sprayed::configrules')>0,'Unit Test Failed on ~fraudgov::in::sprayed::configrules',FAIL);
 	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::sprayed::configrisklevel')>0,'Unit Test Failed on ~fraudgov::in::sprayed::configrisklevel',FAIL);
+	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::base::qa::main')>0,'Unit Test Failed on ~fraudgov::base::qa::main',FAIL);
+	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::base::qa::main_orig')>0,'Unit Test Failed on ~fraudgov::base::qa::main_orig',FAIL);
 	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::base::main_demo_anon')>0,'Unit Test Failed on ~fraudgov::base::main_demo_anon',FAIL);
 	ASSERT(STD.File.GetSuperFileSubCount('~nac::base::consortium')>0,'Unit Test Failed on ~nac::base::consortium',FAIL);
 	ASSERT(STD.File.GetSuperFileSubCount('~thor::base::nid::repository::current')>0,'Unit Test Failed on ~thor::base::nid::repository::current',FAIL);
@@ -40,6 +39,10 @@ export All:=PARALLEL(
 	// ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::passed::identitydata')>0,'Unit Test Failed on ~fraudgov::in::passed::identitydata');
 	// ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::passed::knownfraud')>0,'Unit Test Failed on ~fraudgov::in::passed::knownfraud');
 	// ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::passed::inquirylogs')>0,'Unit Test Failed on ~fraudgov::in::passed::inquirylogs');
+	// ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::passed::deltabase')>0,'Unit Test Failed on ~fraudgov::in::passed::deltabase',FAIL);
+	// ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::passed::nac')>0,'Unit Test Failed on ~fraudgov::in::passed::nac',FAIL);
+	// ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::passed::rdp')>0,'Unit Test Failed on ~fraudgov::in::passed::rdp',FAIL);
+
 );
 
 
