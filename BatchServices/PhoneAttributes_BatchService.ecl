@@ -21,8 +21,11 @@ IMPORT BatchShare,Phones,ut;
 
 EXPORT PhoneAttributes_BatchService(useCannedRecs = 'false') := 
 	MACRO
+	
+        batch_params := MODULE(Phones.IParam.getBatchParams())	
+        EXPORT BOOLEAN AllowPortingData := Phones.Constants.PhoneAttributes.AllowPortingData;
+        END;
 
-		batch_params		:= Phones.IParam.getBatchParams();	
 		// Grab the input XML and throw into a dataset.	
 		ds_xml_in_raw  	:= DATASET([], Phones.Layouts.PhoneAttributes.BatchIn) : STORED('batch_in', FEW);
 		ds_xml_in 			:= IF( useCannedRecs, Phones.BatchCannedInput.PhonesAttribute, ds_xml_in_raw);	

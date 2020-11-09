@@ -229,6 +229,7 @@ MODULE
 		EXPORT ACTIVE_VERIFICATION := 'A'; // event type : phone source is OTP or any other AS source
 		EXPORT DEFAULT_BLOCK_ID:= 'A';
 		EXPORT PORTED := 'P';  //phone number is ported
+		EXPORT AllowPortingData := TRUE;  //Iconnectivedata
 
 	END;
 END;
