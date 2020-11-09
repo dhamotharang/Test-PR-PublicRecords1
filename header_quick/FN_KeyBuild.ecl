@@ -20,65 +20,7 @@ full_ShortSuppress := DriversV2.Regulatory.applyDriversLicenseSup_DIDVend(full_o
 
 j1 := DriversV2.Regulatory.applyDriversLicenseAllSup_DIDVendDOBSSN(full_ShortSuppress);
 
-string_header_layout := {
-			string15  did;
-			string15  rid;
-			string1   pflag1;
-			string1   pflag2;
-			string1   pflag3;
-			string2   src;
-			string8   dt_first_seen;
-			string8   dt_last_seen;
-			string8   dt_vendor_last_reported;
-			string8   dt_vendor_first_reported;
-			string8   dt_nonglb_last_seen;
-			string1   rec_type;
-			string18  vendor_id;
-			string10  phone;
-			string9   ssn;
-			string10  dob;
-			string5   title;
-			string20  fname;
-			string20  mname;
-			string20  lname;
-			string5   name_suffix;
-			string10  prim_range;
-			string2   predir;
-			string28  prim_name;
-			string4   suffix;
-			string2   postdir;
-			string10  unit_desig;
-			string8   sec_range;
-			string25  city_name;
-			string2   st;
-			string5   zip;
-			string4   zip4;
-			string3   county;
-			string7   geo_blk;
-			string5   cbsa;
-			string1   tnt;
-			string1   valid_SSN;
-			string1   jflag1;
-			string1   jflag2;
-			string1   jflag3;	
-			string2   eor;
-	};
-	
-header_services.Supplemental_Data.mac_verify('file_qh_inj.txt',string_header_layout,supplementalData);
-
-header.layout_header  ReformatInput(string_header_layout l) := TRANSFORM
-	SELF.did := (unsigned6) l.did;
-	SELF.rid := (unsigned6) l.rid;
-	SELF.dt_first_seen := (unsigned3) l.dt_first_seen;
-	SELF.dt_last_seen := (unsigned3) l.dt_last_seen;
-	SELF.dt_vendor_last_reported := (unsigned3) l.dt_vendor_last_reported;
-	SELF.dt_vendor_first_reported := (unsigned3) l.dt_vendor_first_reported;
-	SELF.dt_nonglb_last_seen := (unsigned3) l.dt_nonglb_last_seen;
-	SELF.dob := (integer4) l.dob;
-	SELF := l;
-END;
-
-dsModified := PROJECT(supplementalData(), ReformatInput(LEFT));
+dsmodified := Header_Quick.Prep_Build.applyQH();
 
 //// this is full dataset as of full_LongSuppress := j1 + dsModified;
 full_LongSuppress_pre := j1 + dsModified;
