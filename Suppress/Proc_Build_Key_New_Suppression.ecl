@@ -41,8 +41,12 @@ validate_recs:= Suppress.fn_validate;
 
 													
 RETURN Sequential(parallel(bld_key,bld_key_fcra,bld_key2,bld_key_fcra2),
-																		parallel(mv_built, mv_built_fcra,mv_built2, mv_built_fcra2),
-																		parallel(mv_qa2, mv_qa_fcra2),
+																		parallel(
+                                                                                mv_built, mv_built_fcra,
+                                                                                mv_built2, mv_built_fcra2),
+																		parallel(
+                                                                                mv_qa, mv_qa_fcra, 
+                                                                                mv_qa2, mv_qa_fcra2),
 																		if(ut.Weekday((integer)pVersion[1..8]) <> 'SATURDAY' and ut.Weekday((integer)pVersion[1..8]) <> 'SUNDAY',
 																		        parallel(update_dops, update_dops_fcra),
 																            output('No need to update since its Saturday or Sunday')),
