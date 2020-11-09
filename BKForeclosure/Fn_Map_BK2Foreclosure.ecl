@@ -1,4 +1,4 @@
-﻿IMPORT Address,BKForeclosure,codes,Property,STD,ut;
+﻿IMPORT Address,BKForeclosure,codes,Property,STD,ut,dx_Property;
 #option('multiplePersistInstances',FALSE);
 
 EXPORT Fn_Map_BK2Foreclosure  := FUNCTION
@@ -14,7 +14,7 @@ EXPORT Fn_Map_BK2Foreclosure  := FUNCTION
   // StCodeLkp(STRING code ) := StateCodes_dict[code].state_alpha;
 	// CntyCodeLkp(STRING code ) := CountyCodes_dict[code].county_name;
 
-  Property.Layout_Fares_Foreclosure_V2 tMapForeclosure(RECORDOF(DReoBaseFile ) lreo, RECORDOF(DNodBaseFile ) lnod, UNSIGNED uReoNod ) := TRANSFORM
+  dx_Property.Layout_Fares_Foreclosure_V2 tMapForeclosure(RECORDOF(DReoBaseFile ) lreo, RECORDOF(DNodBaseFile ) lnod, UNSIGNED uReoNod ) := TRANSFORM
     SELF.foreclosure_id := CHOOSE(uReoNod, lreo.foreclosure_id, lnod.foreclosure_id );
     SELF.State := CHOOSE(uReoNod, lreo.fips_cd[1..2], lnod.fips_cd[1..2] );
     SELF.County := CHOOSE(uReoNod, lreo.fips_cd[3..5], lnod.fips_cd[3..5] );

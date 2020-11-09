@@ -317,10 +317,12 @@
 				trim(catname, left, right) in ['Political Individual','POLITICAL INDIVIDUAL'] =>SubGroup_Constants.numCategoryID.POLITICAL_INDIVIDUAL,
 				trim(catname, left, right) in ['Political Party','POLITICAL PARTY'] => SubGroup_Constants.numCategoryID.POLITICAL_PARTY,
 				trim(catname, left, right) in ['Religion','RELIGION'] => SubGroup_Constants.numCategoryID.RELIGION,
+				trim(catname, left, right) in ['Special Jurisdiction','SPECIAL JURISDICTION'] =>SubGroup_Constants.numCategoryID.SPECIAL_JURISDICTION,
 				trim(catname, left, right) in ['Terrorism','TERRORISM'] =>SubGroup_Constants.numCategoryID.TERRORISM,
 				trim(catname, left, right) in ['Trade Union','TRADE UNION'] =>SubGroup_Constants.numCategoryID.TRADE_UNION,
 				trim(catname, left, right) in ['Port','PORT'] =>SubGroup_Constants.numCategoryID.PORT,
 				trim(catname, left, right) in ['Vessel','VESSEL'] =>SubGroup_Constants.numCategoryID.VESSEL,
+				trim(catname, left, right) in ['Website','WEBSITE'] =>SubGroup_Constants.numCategoryID.WEBSITE,
 				'');
 		
 		return category_id;

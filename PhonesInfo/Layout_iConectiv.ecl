@@ -1,4 +1,4 @@
-EXPORT Layout_iConectiv := MODULE
+﻿EXPORT Layout_iConectiv := MODULE
 
 	EXPORT Daily := RECORD
 		string1   action_code;		//A-Add for incremental, bulk
@@ -10,21 +10,21 @@ EXPORT Layout_iConectiv := MODULE
 		string12  phone;					//Dial Code (nationally significant TN or NDC), excludes CC, variable length up to 12 digits
 		
 		string1   dial_type;			//Dial Code Type (DCT)
-															//For Country Code CC = â€œ1â€:
+															//For Country Code CC = Ã¢â‚¬Å“1Ã¢â‚¬Â:
 															//T, a North American 1+10-digit TN.
 															//B, a North American 1+7-digit 1000s Block code.
 															//N, a North American 1+6-digit NPA-NXX code.
 														
-															//For Country Code (CC) other than â€œ1â€:
+															//For Country Code (CC) other than Ã¢â‚¬Å“1Ã¢â‚¬Â:
 															//E, an international TN, CC+NN, variable length up to 15 digits.
 															//C, an international NDC, CC+NDC, variable length, typically 4-7 digits.
 														
 		string6   spid;						//Telecordia Mobile Id Provider Id for the company serving the queried TN
 		
 		string1   service_type;		//Type of Service (TOS)
-															//G â€“ Geographic (or fixed line)
-															//M â€“ Mobile
-															//O â€“ Other
+															//G Ã¢â‚¬â€œ Geographic (or fixed line)
+															//M Ã¢â‚¬â€œ Mobile
+															//O Ã¢â‚¬â€œ Other
 															//U - Unknown
 														
 		string10  routing_code;		//Routing Prefix - if available; otherwise empty field, variable length, typically up to 8 digits, for U.S. and Canada, the Routing Code is the LRN of 10 digits.
@@ -55,6 +55,12 @@ EXPORT Layout_iConectiv := MODULE
 		string	 	port_end_dt;									//Port End Date (Last Update)
 		string 		remove_port_dt;								//Disconnect Date
 		boolean		is_ported := false;
+	END;
+	
+	EXPORT Intermediate_Temp := RECORD
+		Intermediate;
+		integer uniqueid;
+		string ocn;
 	END;
 	
 	EXPORT Main := RECORD
