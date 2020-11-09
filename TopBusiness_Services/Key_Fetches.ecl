@@ -143,7 +143,8 @@ EXPORT Key_Fetches(dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_linkids
                                                                   FETCH_LEVEL,,FETCH_LIMIT);
 
   // *** Key fetch to get OHSAIR linkids key records
-  EXPORT ds_osha_linkidskey_recs := dx_OSHAIR.Key_LinkIds.kFetch(ds_in_linkids,FETCH_LEVEL,,FETCH_LIMIT);
+  EXPORT ds_osha_linkidskey_recs := dx_OSHAIR.Key_LinkIds.kFetch2(PROJECT(ds_in_linkids,BIPV2.IDlayouts.l_xlink_ids2)
+    ,FETCH_LEVEL,,FETCH_LIMIT);
 
   // *** Key fetch to get Professional License linkids key records
   EXPORT ds_pl_linkidskey_recs := Prof_LicenseV2.Key_Proflic_Linkids.KeyFetch(ds_in_linkids, mod_access,
