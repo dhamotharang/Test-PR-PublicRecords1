@@ -99,7 +99,21 @@ SHARED SALTInput2_:=PROJECT(SearchInputcnp,TRANSFORM({THISMODULE.Process_Biz_Lay
   SELF := [];
 ));
 EXPORT SALTInput2:=PROJECT(SALTInput2_,THISMODULE.Process_Biz_Layouts.InputLayout);
-EXPORT uid_results := BIPV2_Suppression.macSuppress(THISMODULE.MEOW_Biz(SALTInput2).uid_results);  //Added this for BIPV2_xLink.fn_bdid_append (for BIPV2_xLink.MAC_BDID_Append for BIID and others)
+
+meowBizUidResults := THISMODULE.MEOW_Biz(SALTInput2).uid_results;
+// only seleid is in the input record
+passThruMissingIds := meowBizUidResults(ultid = 0 and seleid != 0);
+passThruRenew := THISMODULE.Process_Biz_Layouts.id_stream_historic(passThruMissingIds);
+passThru :=
+	join(passThruMissingIds, passThruRenew,
+		left.uniqueid = right.uniqueid,
+		transform(recordof(left),
+			self := if(right.ultid != 0, right, left)),
+		keep(1), left outer);
+currentIds := meowBizUidResults(not (ultid = 0 and seleid != 0)) + passThru;
+
+EXPORT uid_results := BIPV2_Suppression.macSuppress(currentIds);  //Added this for BIPV2_xLink.fn_bdid_append (for BIPV2_xLink.MAC_BDID_Append for BIID and others)
+
 EXPORT uid_results_w_acct:=JOIN(uid_results,SearchInputc,LEFT.uniqueid=RIGHT.cntr,TRANSFORM({RECORDOF(LEFT);TYPEOF(RIGHT.acctno) acctno;},SELF.acctno:=RIGHT.acctno;SELF:=LEFT;));
 // EXPORT Raw_Results2 := THISMODULE.MEOW_Biz(SALTInput2).Raw_Results;  //Added this for BIPV2_xLink.fn_bdid_append (for BIPV2_xLink.MAC_BDID_Append for BIID and others)
 //EXPORT Data_Tmp := THISMODULE.MEOW_Biz(SALTInput2).Data_Tmp;  //This is where the magic happens
