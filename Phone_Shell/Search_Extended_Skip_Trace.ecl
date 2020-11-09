@@ -41,8 +41,6 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Extended_Sk
 	/* ***************************************************************
 		* 						        	Get Blue Records						      			*
 	  *************************************************************** */
- glb_ok := mod_access.isValidGLB();
- dppa_ok := mod_access.isValidDPPA();
 
 	Progressive_Phone.Mac_Get_Blue(prepInput, blueRecords, FALSE, FALSE, FALSE, mod_access);
 

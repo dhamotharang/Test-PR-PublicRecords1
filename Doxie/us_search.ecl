@@ -3,7 +3,7 @@ import ut, header, mdr, census_data, Infutor, doxie;
 export us_search :=
 FUNCTION
 
-doxie.mac_header_field_declare();
+doxie.mac_header_field_declare(); //reduced_data_value, score_threshold_value, etc.
 mod_access := doxie.compliance.GetGlobalDataAccessModule ();
 
 d := IF(reduced_data_value,GROUP(header_references(false), did));
@@ -17,7 +17,7 @@ doxie.layout_header_records %take%(d le, key_hp ri) := transform
 					doxie.FN_Tra_Penalty_Addr(ri.predir,ri.prim_range,ri.prim_name,ri.suffix,ri.postdir,ri.sec_range,
 																		ri.city_name,ri.st,'',false)+
 					doxie.FN_Tra_Penalty_DOB((string)ri.dob);
-	
+
 	// bug 51421 -- account for Dial_Record_Match override of penalty threshold filter
 	// same test as applied in doxie_header_records_byDID
 	self.penalt := if (pen < score_threshold_value or Dial_RecordMatch_value > 3, pen, skip);
@@ -27,7 +27,7 @@ doxie.layout_header_records %take%(d le, key_hp ri) := transform
 	// for efficiency, we know only non_glb
   pre_glb := mod_access.isHeaderPreGLB ((unsigned3)ri.dt_nonglb_last_seen, (unsigned3)ri.dt_first_seen, ri.src);
 	self.did := IF(pre_glb,ri.did,SKIP);
-	
+
 	SELF.dt_first_seen := ri.dt_first_seen;
 	SELF.dt_last_seen := ri.dt_last_seen;
 	SELF.dt_vendor_first_reported := ri.dt_vendor_first_reported;
@@ -39,22 +39,22 @@ doxie.layout_header_records %take%(d le, key_hp ri) := transform
 	SELF.mname := ri.mname;
 	SELF.lname := ri.lname;
 	SELF.name_suffix := ri.name_suffix;
-	
+
 	SELF.city_name := ri.city_name;
 	SELF.st := ri.st;
 	SELF.zip := ri.zip; /* to add zip5 in results display*/
 	SELF.zip4 := ri.zip4;
 	SELF.county := ri.county;
 	SELF.geo_blk := ri.geo_blk;
-	
+
 	SELF.dob := ri.dob;
 	SELF.ssn := ri.ssn;
-	
+
 	self := [];
   end;
-  
+
 // get header records
-	hp_out := join(d, key_hp, left.did=right.s_did, %take%(left,right), LIMIT(ut.limits .DID_PER_PERSON, SKIP));							 							 
+	hp_out := join(d, key_hp, left.did=right.s_did, %take%(left,right), LIMIT(ut.limits .DID_PER_PERSON, SKIP));
 
 ENDMACRO;
 
@@ -77,8 +77,8 @@ unsigned addrLim := IF(al > 99, 99, al);
 Layout_HeaderFileSearch trans(presRecs le) :=
 TRANSFORM
 	SELF.did := IF(le.did=0,'',INTFORMAT(le.did,12,1));
-	SELF.rid := MAP(le.src='PH'	=>	SELF.did+'PH'+(STRING)le.phone, 
-					le.src in MDR.sourceTools.set_Daily_Utility_sources	=>	SELF.did+'UT'+(STRING)le.rid, 
+	SELF.rid := MAP(le.src='PH'	=>	SELF.did+'PH'+(STRING)le.phone,
+					le.src in MDR.sourceTools.set_Daily_Utility_sources	=>	SELF.did+'UT'+(STRING)le.rid,
 					le.src='QH'	=>	SELF.did+'QH'+(STRING)le.rid,
 									(STRING)le.rid);
 // note that although daily utilities are split into good and bad, method for 'rid' above is the same for both.
@@ -112,13 +112,13 @@ END;
 
 j := JOIN(addresses, census_data.Key_Smart_Jury,
 										 left.a.county = right.county and
-										 left.a.geo_blk[1..6] = right.tract and 
+										 left.a.geo_blk[1..6] = right.tract and
 										 left.a.geo_blk[7] =right.blkgrp, appendCensus(LEFT,RIGHT), keep(1), LEFT OUTER);
 
 // keep the highest rid to provide deterministic result order
 maxrids := DEDUP(SORT(ta3,-(unsigned6)rid), true, keep(1));
 
-// ******************** Pull components into the parent and keep first N ********************* 
+// ******************** Pull components into the parent and keep first N *********************
 doxie.Layout_Rollup.KeyRec seedDids(maxrids l) := TRANSFORM
 	SELF.did := l.did;
 	SELF.penalt := high_penalt;
@@ -149,7 +149,7 @@ KeyRecs := PROJECT(maxrids, seedDids(LEFT));
 doxie.Layout_Rollup.KeyRec denormNames(doxie.Layout_Rollup.KeyRec L, doxie.Layout_Rollup.NameRecDid R) := TRANSFORM
 	SELF.nameRecs := L.nameRecs + R.n;
 	SELF.penalt := MIN(L.penalt, R.penalt);
-	SELF.num_compares := 0;	
+	SELF.num_compares := 0;
 	SELF := L;
 END;
 
@@ -157,7 +157,7 @@ doxie.Layout_Rollup.KeyRec denormAddrs(doxie.Layout_Rollup.KeyRec L, doxie.Layou
   SELF.addrs_suppressed := L.addrs_suppressed OR i > addrLim;
   SELF.addrRecs := L.addrRecs + IF(~SELF.addrs_suppressed,DATASET(R.a));
 	SELF.penalt := MIN(L.penalt, R.penalt);
-	SELF.num_compares := 0;	
+	SELF.num_compares := 0;
 	SELF.bestSrchedAddrTntScore := IF(L.bestSrchedAddrTntScore < R.bestSrchedAddrTntScore, L.bestSrchedAddrTntScore, R.bestSrchedAddrTntScore);
 	SELF.bestSrchedAddrDate := MAX(L.bestSrchedAddrDate, R.bestSrchedAddrDate);
 	SELF.bestTntScore := IF(L.bestTntScore < R.bestTntScore, L.bestTntScore, R.bestTntScore);
@@ -167,7 +167,7 @@ END;
 doxie.Layout_Rollup.KeyRec denormDobs(doxie.Layout_Rollup.KeyRec L, doxie.Layout_Rollup.DobRecDid R) := TRANSFORM
 	SELF.dobRecs := L.dobRecs + R.d;
 	SELF.penalt := MIN(L.penalt, R.penalt);
-	SELF.num_compares := 0;	
+	SELF.num_compares := 0;
 	SELF := L;
 END;
 

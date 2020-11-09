@@ -1,7 +1,7 @@
 ﻿IMPORT AID_Build, ADVO, AlloyMedia_student_list,  American_student_list, AutoKey, AVM_V2, BankruptcyV3, BBB2, BIPV2, BIPV2_Best, BIPV2_Build, Business_Risk_BIP, BusReg, CalBus, CellPhone, Certegy, Corp2,
 		Cortera, dx_Cortera_Tradeline, Data_Services, DCAV2, Death_Master,  Doxie, Doxie_Files, DriversV2, DMA, dx_BestRecords, dx_ConsumerFinancialProtectionBureau, dx_DataBridge, DX_Email,
-		dx_Equifax_Business_Data, dx_Gong, dx_Header, dx_Infutor_NARB, dx_Relatives_v3, EBR, Email_Data, emerges, Experian_CRDB, FAA, FBNv2, FLAccidents_Ecrash, Fraudpoint3, Gong,
-		GovData, Header, Header_Quick, InfoUSA, IRS5500, InfutorCID, Inquiry_AccLogs, LiensV2, LN_PropertyV2, MDR, OSHAIR, Phonesplus_v2, PublicRecords_KEL, Prof_License_Mari,
+		dx_Equifax_Business_Data, dx_Gong, dx_Header, dx_Infutor_NARB, dx_OSHAIR, dx_Relatives_v3, EBR, Email_Data, emerges, Experian_CRDB, FAA, FBNv2, FLAccidents_Ecrash, Fraudpoint3, Gong,
+		GovData, Header, Header_Quick, InfoUSA, IRS5500, InfutorCID, Inquiry_AccLogs, LiensV2, LN_PropertyV2, MDR, Phonesplus_v2, PublicRecords_KEL, Prof_License_Mari,
 		Prof_LicenseV2, Relationship, Risk_Indicators, RiskView, RiskWise, SAM, SexOffender, STD, Suppress, Targus, thrive, USPIS_HotList, Utilfile, ut,
 		VehicleV2, Watercraft, Watchdog, UCCV2, YellowPages;
 
@@ -771,7 +771,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		dpmtype;
 	END;
 
-	SHARED OSHAIR__kfetch_OSHAIR_LinkIds := OSHAIR.Key_OSHAIR_LinkIds.Kfetch2;
+	SHARED OSHAIR__kfetch_OSHAIR_LinkIds := dx_OSHAIR.Key_LinkIds.Kfetch2;
 	EXPORT Layout_OSHAIR__kfetch_OSHAIR_LinkIds := RECORD
 		LayoutIDs;
 		RECORDOF(OSHAIR__kfetch_OSHAIR_LinkIds);

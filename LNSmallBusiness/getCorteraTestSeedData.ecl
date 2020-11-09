@@ -168,7 +168,7 @@ FUNCTION
   iesp.smallbusinessbipcombinedreport.t_B2BTradeData getB2BTradeData:= 
   TRANSFORM
     // temp pending test seed update
-    SELF.RecentTradeDate := ROW([], iesp.share.t_Date);
+    SELF.RecentTradeDate := iesp.ECL2ESP.toDatestring8(ds_corteraResults[1].recenttradedate);
     SELF.TradeSummary := ds_tradeSummary;
     SELF.CurrentPaymentSummary := ds_corteraCurPmtSummary;
     SELF.PaymentSummary := ds_corteraPmtSummaryEx;
@@ -195,7 +195,7 @@ FUNCTION
   ds_B2BTradeData := IF(~EXISTS(ds_corteraResults) OR TRIM(ds_corteraResults[1].statuscode, LEFT, RIGHT) = '301',
                          DATASET([getBlankTradesData]),
                          DATASET([getB2BTradeData]));
-
+ 
   RETURN ds_B2BTradeData;
 
 END;

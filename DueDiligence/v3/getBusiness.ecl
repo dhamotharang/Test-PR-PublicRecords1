@@ -187,6 +187,8 @@ EXPORT getBusiness(DATASET(DueDiligence.v3Layouts.DDInput.BusinessSearch) inData
                                     //attributes - legal
                                     SELF.busCivilLegalEvent := DueDiligence.v3Common.General.FirstPopulatedString(busCivilLegalEvent);
                                     SELF.busCivilLegalEvent_Flag := DueDiligence.v3Common.General.FirstPopulatedString(busCivilLegalEvent_Flag);
+                                    SELF.busCivilLegalEventFilingAmt := DueDiligence.v3Common.General.FirstPopulatedString(busCivilLegalEventFilingAmt);
+                                    SELF.busCivilLegalEventFilingAmt_Flag := DueDiligence.v3Common.General.FirstPopulatedString(busCivilLegalEventFilingAmt_Flag);
                                     SELF.busOffenseType := DueDiligence.v3Common.General.FirstPopulatedString(busOffenseType);
                                     SELF.busOffenseType_Flag := DueDiligence.v3Common.General.FirstPopulatedString(busOffenseType_Flag);
                                     SELF.busStateLegalEvent := DueDiligence.v3Common.General.FirstPopulatedString(busStateLegalEvent);

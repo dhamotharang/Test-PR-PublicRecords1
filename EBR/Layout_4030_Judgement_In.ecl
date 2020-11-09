@@ -16,5 +16,5 @@ record
    string1 Dispute_Indicator;
    string2 Dispute_Code;
    string8 date_filed;
-   string1 lf;
+   string1 lf := '';
 end;

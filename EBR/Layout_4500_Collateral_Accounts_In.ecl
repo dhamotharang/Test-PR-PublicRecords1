@@ -31,5 +31,5 @@ record
    string1 COLL_CODE12;
    string36 COLL_DESC12;
    string1 ADDTNL_COLL_CODES;
-   string1 lf;
+   string1 lf := '';
 end;

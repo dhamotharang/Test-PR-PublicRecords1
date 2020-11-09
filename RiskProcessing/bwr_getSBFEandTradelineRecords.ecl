@@ -4,6 +4,7 @@ IMPORT	ut, STD,	Address, Business_Credit, data_services;
 /**********************************************************************************************************/
 // -- pFilename -	Original Raw Filename.  The file is expected to be sprayed to THOR with a 
 //								name of '~thor::in::sbfe::'+pFilename
+// -- pFilenameout - Specifies the name of the output file 
 // -- pSBFEContributorNumber - A specific SBFE_Contributor_Number to use for this extract.
 // -- pAccountType	-	A pipe delimited "|" string of possible Account Types.  Blank or ANY results in using 
 //										All Account Types. Ex. '001|099'
@@ -32,6 +33,7 @@ IMPORT	ut, STD,	Address, Business_Credit, data_services;
 // -- pFirstSBFELoadDate - Represents the date when SBFE data was first loaded to the Production Roxie. At this time, there was a lot of 
 //                         of historical data. So in order to be able to archive records prior to this date, for any records where the 
 //                         original_version is < than 20151012, the cycle_end_date is used for archive filtering. 
+// -- pRecordLimit - Indicates the number of records to read from the input file where 0 means ALL
 /**********************************************************************************************************/
 /******************************* DEFAULT VALUES ***********************************************************/
 // pFilename								:=	'';
@@ -46,7 +48,9 @@ IMPORT	ut, STD,	Address, Business_Credit, data_services;
 // pUseOtherEnvironment			:=	FALSE;
 // pEyeball									:= 100;
 /**********************************************************************************************************/
-pFilename									:=	'blptemp::blptemp_jpmc_test_fewrecords.csv'; // This file can have history dates in YYYYMMDD or YYYYMM format.
+pFilename								:=	'tfuerstenberg::in::amex_9569_open_cust_file1_apr18_tl_in.csv'; // This file can have history dates in YYYYMMDD or YYYYMM format.
+pFilenameout							:=	'tfuerstenberg::out::amex_9569_open_cust_file1_apr18_tl';      
+pRecordLimit							:= 0;
 pSBFEContributorNumber		:=	'ANY';
 pAccountType							:=	'ANY';
 pOpenDateStart						:=	'';
@@ -90,7 +94,7 @@ pFilenameSuffix	:=	'_'+
 										IF(pTradelineWindowMonthsPrior<>0,'Tp','Xp');
 
 pInputFilename	:=	'~'+pFilename;
-pOutputFilename	:=	'~'+pFilename+pFilenameSuffix;
+pOutputFilename	:=	'~'+pFilenameout+pFilenameSuffix;
 
 /************************/
 /* Declare Build Files	*/
@@ -113,7 +117,11 @@ rOriginalLayout	:=	RECORD
 	STRING50	Contract_Account_Number;
 END;
 
-dOriginalRecords	:= DATASET(pInputFilename,rOriginalLayout,CSV(HEADING(SINGLE),SEPARATOR(','),QUOTE('"')));
+
+// dOriginalRecords	:= DATASET(pInputFilename,rOriginalLayout,CSV(HEADING(SINGLE),SEPARATOR(','),QUOTE('"')));
+dOriginalRecords	:= IF(pRecordLimit = 0,
+                        DATASET(pInputFilename,rOriginalLayout,CSV(HEADING(SINGLE),SEPARATOR(','),QUOTE('"'))),
+                        CHOOSEN(DATASET(pInputFilename,rOriginalLayout,CSV(HEADING(SINGLE),SEPARATOR(','),QUOTE('"'))), pRecordLimit));
 
 OUTPUT(CHOOSEN(SORT(dOriginalRecords,AccountNumber),pEyeball),NAMED('dOriginalRecordsSample'));
 OUTPUT(COUNT(dOriginalRecords),NAMED('OriginalRecordsCount'));
@@ -202,7 +210,11 @@ dSBFEContributorAccounts	:=	IF(COUNT(dContributorAccounts)>0,
 																DATASET([],rSBFEAccounts)
 															);
 
-dSBFEAccounts :=	dSBFEBIPAccounts+dSBFEContributorAccounts;
+dSBFEAccounts1 :=	dSBFEBIPAccounts+dSBFEContributorAccounts;
+dSBFEAccounts :=	dedup(sort(dSBFEAccounts1, accountnumber, SBFE_Contributor_Number, contract_account_number, account_type_reported, powid, proxid, seleid, orgid, ultid),
+                              accountnumber, SBFE_Contributor_Number, contract_account_number, account_type_reported, powid, proxid, seleid, orgid, ultid);
+                              
+
 
 OUTPUT(CHOOSEN(dSBFEAccounts, pEyeball), NAMED('dSBFEAccounts'));
 /**********************************/
@@ -333,7 +345,7 @@ END;
 
 dGetOriginalRecords	:=	PROJECT(dOriginalRecords,TRANSFORM(rNewLayout,SELF:=LEFT;SELF:=[]));
 OUTPUT(CHOOSEN(SORT(dGetOriginalRecords,accountnumber),pEyeball),NAMED('dGetOriginalRecords'));
-dGetSBFEAccounts	:=	JOIN(
+dGetSBFEAccounts1	:=	JOIN(
 												DISTRIBUTE(dGetOriginalRecords,HASH(accountnumber)),
 												DISTRIBUTE(dSBFEAccounts,HASH(accountnumber)),
 													LEFT.accountnumber	=	RIGHT.accountnumber AND
@@ -347,8 +359,12 @@ dGetSBFEAccounts	:=	JOIN(
 												LOCAL,
 												LEFT OUTER
 											);
+
+// get rid of the garbage                      
+dGetSBFEAccounts := dGetSBFEAccounts1(accountnumber<>'');
 OUTPUT(CHOOSEN(SORT(dGetSBFEAccounts,accountnumber),pEyeball),NAMED('dGetSBFEAccounts'));
-dGetTradelines	:=	JOIN(
+
+dGetTradelines1	:=	JOIN(
 											DISTRIBUTE(dTradelines,HASH(AccountNumber, Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported)),
 											DISTRIBUTE(dGetSBFEAccounts,HASH(AccountNumber, Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported)),
 												LEFT.AccountNumber						=		RIGHT.AccountNumber AND
@@ -367,6 +383,10 @@ dGetTradelines	:=	JOIN(
 											LOCAL,
 											RIGHT OUTER
 										)(Cycle_End_Date <> '');
+
+// get these to be unique before joining back to doriginaldateaccountopened
+dGetTradelines := DEDUP(SORT(dGetTradelines1, AccountNumber, SBFE_Contributor_Number, Contract_account_number, account_type_reported, cycle_end_date, -version), 
+                                              AccountNumber, SBFE_Contributor_Number, Contract_Account_Number, account_type_reported, cycle_end_date);
 										
 dGetOriginalDateAccountOpened	:=	
 										JOIN(
@@ -394,6 +414,7 @@ dRecordWithTradelines	:=	SORT(DISTRIBUTE(dGetOriginalDateAccountOpened,
 dedupRecordWithTradelines := DEDUP(SORT(dRecordWithTradelines, AccountNumber, SBFE_Contributor_Number, Contract_account_number, account_type_reported, cycle_end_date, -version), AccountNumber, SBFE_Contributor_Number, Contract_Account_Number, account_type_reported, cycle_end_date);
 
 OUTPUT(CHOOSEN(dedupRecordWithTradelines,pEyeball),NAMED('dRecordWithTradelinesSample'));
+// comment out line 406 if you don't need to write an output file to the cluster.
 OUTPUT(dedupRecordWithTradelines,,pOutputFilename,CSV(HEADING(SINGLE),SEPARATOR(','),TERMINATOR('\r\n'),QUOTE('"'),MAXLENGTH(100000)),OVERWRITE);
 
 OUTPUT(TABLE(dedupRecordWithTradelines,{account_type_reported,COUNT(GROUP)},account_type_reported,FEW),NAMED('AccountTypeTable'));
