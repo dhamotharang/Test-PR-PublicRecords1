@@ -3,7 +3,7 @@ import	Address,AID,PromoteSupers, std, ut;
 export proc_fedex_build_base(string version_date) := function 
 
 // Combine both files
-dFedExIn	:=	FedEx.File_FedEx_In.Main	+	FedEx.File_FedEx_In.Corrections;
+dFedExIn	:=	FedEx.File_FedEx_In.Main;
 
 recordof(FedEx.File_FedEx_In.Main) xform1(FedEx.File_FedEx_In.Main le) := transform 
   //i see evidence of a leading space in some records
@@ -134,7 +134,7 @@ dFedExCleanCAAddr	:=	project(dFedExCAAddresses,tReformat2Base(left));
 
 // Combine US & CA addresses
 dFedExCleanCombined			:=	dFedExAID	+	dFedExCleanCAAddr;
-dFedExCleanCombinedDist	:=	distribute(dFedExCleanCombined,hash32(record_id));
+/*dFedExCleanCombinedDist	:=	distribute(dFedExCleanCombined,hash32(record_id));
 
 // Split out the correction records
 dFedExCleanMain					:=	dFedExCleanCombinedDist(record_type	    in ['','A']);
@@ -228,8 +228,9 @@ dFedExMainCorrections	:=	join(	dFedExMainRemoveDeletes,
 															);
 
 dFedExMainCorrectionsAdds := dFedExMainCorrections;
-
-identify_dupes := fedex.fn_IdentifyDuplicates(dFedExMainCorrectionsAdds);
+*/
+dFedExMainFull:=dFedExCleanCombined+fedex.file_fedex_base;
+identify_dupes := fedex.fn_IdentifyDuplicates(dFedExMainFull);
 
 fedex_dupes   := identify_dupes(record_id>parent_record_id);
 fedex_uniques := identify_dupes(record_id=parent_record_id);
@@ -242,8 +243,8 @@ day_of_week := ut.weekday((integer)today);
 //actually include friday as well because the day we assign in the build (aka the version date)
 //is likely for records being entered the day before.
 //Ex: if we're starting the build at 8am tuesday, tuesday's entries are being assigned the following days date
-new_records := if(day_of_week='MONDAY',dFedExMainCorrectionsAdds(file_date between ut.getdateoffset(-3,today) and today),
-                                       dFedExMainCorrectionsAdds(file_date between ut.getdateoffset(-1,today) and today)
+new_records := if(day_of_week='MONDAY',dFedExMainFull(file_date between ut.getdateoffset(-3,today) and today),
+                                       dFedExMainFull(file_date between ut.getdateoffset(-1,today) and today)
 								 );
 new_dupes :=   if(day_of_week='MONDAY',fedex_dupes(file_date between ut.getdateoffset(-3,today) and today),
                                        fedex_dupes(file_date between ut.getdateoffset(-1,today) and today)
