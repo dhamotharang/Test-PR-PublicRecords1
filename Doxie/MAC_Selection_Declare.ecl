@@ -107,6 +107,9 @@ unsigned6 in_FDN_gcid     := 0 : stored('GlobalCompanyId');
 unsigned2 in_FDN_indtype  := 0 : stored('IndustryType');
 unsigned6 in_FDN_prodcode := 0 : stored('ProductCode');
 
+//*** Address Hierarchy flag, this will be removed at some point. 
+BOOLEAN do_address_hierarchy := FALSE: STORED('UseAddressHierarchy');
+
 //*** BOOLEANS SUBJECT TO SELECTINDIVIDUALLY
 Include_Timeline_val := Include_Them_All or Include_Timeline;
 Include_relatives_val := Include_Them_All or Include_relatives;
