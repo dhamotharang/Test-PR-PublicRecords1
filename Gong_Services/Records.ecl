@@ -34,7 +34,7 @@ EXPORT Records := MODULE
 			ds_gong_raw:=ds_gong_less_overwritten+ds_override_recs;
 
 			// apply suppressions
-			Suppress.MAC_Suppress(ds_gong_raw,ds_dids_pulled,in_mod.application_type,Suppress.Constants.LinkTypes.DID,l_did);
+			Suppress.MAC_Suppress(ds_gong_raw,ds_dids_pulled,in_mod.application_type,Suppress.Constants.LinkTypes.DID,l_did, isFCRA := true);
 
 			// filter raw to disclose only fields restore acctno
 			ds_gong_disclose:=JOIN(ds_work_recs,ds_dids_pulled,

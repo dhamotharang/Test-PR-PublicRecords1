@@ -249,7 +249,7 @@ end;
 preSuppress := dataset ([Format ()]);
 //This is being added here to accomodate the Peoplewise product until such time as all the all the pullssn and pullid
 //changes are made to get everything on the new suppression, then this becomes redundant.
-Suppress.MAC_Suppress(preSuppress,postSuppress,mod_access.application_type,suppress.constants.LinkTypes.DID,best_information_children[1].did);
+Suppress.MAC_Suppress(preSuppress,postSuppress,mod_access.application_type,suppress.constants.LinkTypes.DID,best_information_children[1].did, isFCRA := isFCRA);
 
 // this should be a temporary measure on FCRA side:
 

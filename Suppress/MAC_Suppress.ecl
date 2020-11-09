@@ -11,15 +11,18 @@ Usage: InFile = input file to be checked
 			 demo_cust =  Is this a demo customer (see suppress.DemoPartition)
 */
 
-export MAC_Suppress (inFile, outFile, inApplicationType, inLinkType = '\'\'', inLinkID = '\'\'', 
-										   inDocType = '\'\'', inDocID = '\'\'', batch = false, demo_cust = '\'\'', 
-                     use_acctno = false, retainField ='\'\'') := macro
-	import suppress;
+export MAC_Suppress (inFile, outFile, inApplicationType, inLinkType = '\'\'', inLinkID = '\'\'',
+										   inDocType = '\'\'', inDocID = '\'\'', batch = false, demo_cust = '\'\'',
+                     use_acctno = false, retainField ='\'\'', isFCRA = false) := macro
+	import suppress, dx_Suppression, data_services;
 				#uniquename(tra)
 				#uniquename(suppressFile)
 				#uniquename(validCriteria)
 				#uniquename(outfile1)
-				%suppressFile% := suppress.Key_New_Suppression;
+				#uniquename(env)
+
+				%env% := Data_Services.data_env.GetEnvFCRA(isFCRA);
+				%suppressFile% := dx_Suppression.key_suppression(%env%);
 
 
 				#if(batch)
@@ -29,43 +32,43 @@ export MAC_Suppress (inFile, outFile, inApplicationType, inLinkType = '\'\'', in
 					#else
 						self.seq := l.seq;
 					#end
-/*This is being used for cases where partial suppression is required. We can easily rertain a 
-  unique field and join back outside to do partial suppression outside. 
-*/          
+/*This is being used for cases where partial suppression is required. We can easily rertain a
+  unique field and join back outside to do partial suppression outside.
+*/
          #if(#text(retainField) <> '\'\'')
-         self.retainField := l.retainField; 
+         self.retainField := l.retainField;
          #end
-         
+
 					self := if((inLinkType <> '' and r.Linking_ID = '') or
 										 (inDocType <> '' and r.Document_ID = ''),
 											l);
 				end;
 				#end
-				
+
 				#uniquename (suppress_set)
 				Suppress.MAC_Suppress_Set(inApplicationType,%suppress_set%);
 
 				#uniquename(FormatID)
-				string %FormatID% (string str_ID, string _type) := 
+				string %FormatID% (string str_ID, string _type) :=
 					map (stringlib.StringToUppercase (_type) =  Suppress.Constants.LinkTypes.DID => intformat ((integer) str_ID, 12, 1),
 //							stringlib.StringToUppercase (_type) = Suppress.Constants.LinkTypes.BDID => intformat ((integer) str_ID, 12, 1),
 							stringlib.StringToUppercase (_type) = Suppress.Constants.LinkTypes.SSN => intformat ((integer) str_ID, 9, 1),
 							(string) (integer) str_ID);
 
-				%outFile1% := join(inFile, %suppressFile%, 
+				%outFile1% := join(inFile, %suppressFile%,
 
 											#if(inLinkType <> '')
 													// prevent suppressing records where IDs are blank or contain zeros only
 													((integer) left.inLinkID != 0)
 													and keyed(right.product in %suppress_set%)
 													and keyed(right.linking_type = inLinkType)
-													and keyed(right.Linking_ID = (string)left.inLinkID or 
+													and keyed(right.Linking_ID = (string)left.inLinkID or
 																		right.Linking_ID = %FormatID%((string)left.inLinkID, (string)inLinkType))
 											// else it is a document-type suppression
 											#else
 													keyed(right.product in %suppress_set%)
 													and keyed (right.linking_type='') and keyed (right.Linking_ID='')
-													and keyed(right.document_type = inDocType) 
+													and keyed(right.document_type = inDocType)
 											    and keyed(right.Document_ID = (string)left.inDocID)
 											#end
 											,
@@ -77,8 +80,8 @@ export MAC_Suppress (inFile, outFile, inApplicationType, inLinkType = '\'\'', in
 											 );
 
 				%validCriteria% := inLinkType <> '' or inDocType <> '';
-				
-											 
+
+
 				outFile := if(inLinkType=Suppress.Constants.LinkTypes.DID and ~suppress.DemoPartition(demo_cust).include_all,
                       inFile(suppress.DemoPartition(demo_cust).retainDID((unsigned6)inLinkID)),
                       if (%validCriteria%,%outFile1%,inFile));
