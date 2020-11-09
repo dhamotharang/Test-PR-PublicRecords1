@@ -6,9 +6,10 @@ doxie_cbrs.mac_Selection_Declare()
 // calling this ONE attribute an exception due to this fact and have left the
 // mod_access defaulted here. With future plans of modifying the "record of" references
 // in the various attributes and removing this default also.
-EXPORT all_base_records_prs(DATASET(doxie_cbrs.layout_references) bdids = DATASET([],doxie_cbrs.layout_references),
-                            doxie.IDataAccess mod_access = MODULE(doxie.IDataAccess) END
-                           ) := FUNCTION
+EXPORT all_base_records_prs(
+  DATASET(doxie_cbrs.layout_references) bdids = DATASET([],doxie_cbrs.layout_references),
+  doxie.IDataAccess mod_access = MODULE(doxie.IDataAccess) END
+) := FUNCTION
 
 //
 // SL based limits for a Report, where possible
@@ -46,12 +47,7 @@ SHARED con := doxie_crs.constants;
 //***** MY RECORDSETS
 temp_besr := CHOOSEN(doxie_cbrs.fn_best_information(bdids,FALSE),1);
 
-rec_besr := RECORD
-  temp_besr;
-  UNSIGNED name_source_id;
-  UNSIGNED addr_source_id;
-  UNSIGNED phone_source_id;
-END;
+rec_besr := doxie_cbrs.layouts.best_info_record;
 rec_besr add_bdid(temp_besr l) := TRANSFORM
   SELF.bdid := business_header.stored_bdid_val; //FIX --
   SELF.name_source_id := 0;
@@ -88,23 +84,21 @@ besr := JOIN(JOIN(JOIN(PROJECT(temp_besr,add_bdid(LEFT)),name_table,
 BOOLEAN bdids_Derived := FALSE : STORED('bdidsDerived');
 
 upcr := doxie_cbrs.ultimate_parent_information(bdids)((multibdid OR bdids_Derived) AND (fromDCA));
-
 //Phone summary and company verification from business instant id
 biid := doxie_cbrs.getBizReportBDIDs(mod_access).biid; //Business InstantId Search.
-phone_summary := CHOOSEN(doxie.fn_get_phone_summary(biid),con.max_phone_summary);
-verification := CHOOSEN(doxie.fn_get_company_verification(biid),con.max_verification);
+phonesumr := CHOOSEN(doxie.fn_get_phone_summary(biid),con.max_phone_summary);
+compverr := CHOOSEN(doxie.fn_get_company_verification(biid),con.max_verification);
 nmvr := doxie_cbrs.name_variations_base(bdids);
 advr := doxie_cbrs.address_variations_base(bdids);
 phvr := doxie_cbrs.phone_variations_base(bdids);
 idnr := doxie_cbrs.ID_Number_records_base(bdids);
-
 bnkr := doxie_cbrs.bankruptcy_records_trimmed(bdids);
 bnkr_v2 := doxie_cbrs.bankruptcy_records_trimmed_v2(bdids, mod_access.ssn_mask);
 ljur := doxie_cbrs.Liens_Judgments_UCC_records_trimmed(bdids, mod_access.ssn_mask);
 ljur_v2 := doxie_cbrs.Liens_Judgments_UCC_records_trimmed_v2(bdids,mod_access.ssn_mask);
-
 prfr := doxie_cbrs.profile_records(bdids);
 prfr_v2 := doxie_cbrs.profile_records_v2(bdids);
+
 ragr := doxie_cbrs.registered_agents_records(bdids);
 exer := doxie_cbrs.executives_records(bdids);
 conr := doxie_cbrs.contact_records_prs_trimmed(bdids);
@@ -140,47 +134,8 @@ natdis := doxie_cbrs.natural_disaster_records(bdids);
 lncar := doxie_cbrs.lnca_hierarchy_records(bdids);
 
 // add in the counts for the sections
-layout_plus_sec := RECORD
-  srcr;
-  UNSIGNED3 Name_Variations_Section := 0;
-  UNSIGNED3 Address_Variations_Section := 0;
-  UNSIGNED3 Phone_Variations_Section := 0;
-  UNSIGNED3 Parent_Company_Section := 0;
-  UNSIGNED3 Sales_Section := 0;
-  UNSIGNED3 Industry_Information_Section := 0;
-  UNSIGNED3 ID_Numbers_Section := 0;
-  UNSIGNED3 Bankruptcy_Section := 0;
-  UNSIGNED3 Bankruptcy_Section_v2 := 0;
-  UNSIGNED3 Liens_Judgments_Section := 0;
-  UNSIGNED3 Liens_Judgments_Section_v2 := 0;
-  UNSIGNED3 Profile_Information_Section := 0;
-  UNSIGNED3 Profile_Information_Section_v2 := 0;
-  UNSIGNED3 Business_Registration_Section := 0;
-  UNSIGNED3 Registered_Agents_Section := 0;
-  UNSIGNED3 Contacts_Section := 0;
-  UNSIGNED3 Executives_Section := 0;
-  UNSIGNED3 Property_Section := 0;
-  UNSIGNED3 Property_Section_v2 := 0;
-  UNSIGNED3 MotorVehicle_Section := 0; // GCL - 20051026
-  UNSIGNED3 MotorVehicle_Section_v2 := 0;
-  UNSIGNED3 Watercraft_Section := 0; // GCL - 20051026
-  UNSIGNED3 Aircraft_Section := 0; // GCL - 20051026
-  UNSIGNED3 Internet_Section := 0;
-  UNSIGNED3 Professional_Licenses_Section := 0;
-  UNSIGNED3 Superior_Liens_Section := 0;
-  UNSIGNED3 Business_Associates_Section := 0;
-  UNSIGNED3 Experian_Business_Reports_Section := 0;
-  UNSIGNED3 IRS5500_Section := 0;
-  UNSIGNED3 DNB_Section := 0;
-  UNSIGNED3 DiversityCertification_Section := 0;
-  UNSIGNED3 RiskMetrics_Section := 0;
-  UNSIGNED3 LaborActionWHD_Section := 0;
-  UNSIGNED3 NaturalDisaster_Section := 0;
-  UNSIGNED3 LNCAFirmographics_Section := 0;
-  UNSIGNED3 EquifaxBusinessReport_Section := 0; // a place holder for external callers
-END;
 
-layout_plus_sec add_sect_counts(srcr L) := TRANSFORM
+doxie_cbrs.layout_report_src.source_counts add_sect_counts(doxie_cbrs.layout_source_counts L) := TRANSFORM
   SELF.Name_Variations_Section := nmvr.records_count;
   SELF.Address_Variations_Section := advr.records_count;
   SELF.Phone_Variations_Section := phvr.records_count;
@@ -221,46 +176,7 @@ END;
  
 srcr_plus_sections := PROJECT(srcr,add_sect_counts(LEFT))(Include_SourceCounts_val);
 
-layout_sections_more := RECORD
-  BOOLEAN Name_Variations_Section_more := FALSE;
-  BOOLEAN Address_Variations_Section_more := FALSE;
-  BOOLEAN Phone_Variations_Section_more := FALSE;
-  BOOLEAN Parent_Company_Section_more := FALSE;
-  BOOLEAN Sales_Section_more := FALSE;
-  BOOLEAN Industry_Information_Section_more := FALSE;
-  BOOLEAN ID_Numbers_Section_more := FALSE;
-  BOOLEAN Bankruptcy_Section_more := FALSE;
-  BOOLEAN Bankruptcy_Section_v2_more := FALSE;
-  BOOLEAN Liens_Judgments_Section_more := FALSE;
-  BOOLEAN Liens_Judgments_Section_v2_more := FALSE;
-  BOOLEAN Profile_Information_Section_more := FALSE;
-  BOOLEAN Profile_Information_Section_v2_more := FALSE;
-  BOOLEAN Business_Registration_Section_more := FALSE;
-  BOOLEAN Registered_Agents_Section_more := FALSE;
-  BOOLEAN Contacts_Section_more := FALSE;
-  BOOLEAN Executives_Section_more := FALSE;
-  BOOLEAN Property_Section_more := FALSE;
-  BOOLEAN Property_Section_v2_more := FALSE;
-  BOOLEAN MotorVehicle_Section_more := FALSE;
-  BOOLEAN MotorVehicle_Section_v2_more := FALSE;
-  BOOLEAN Watercraft_Section_more := FALSE;
-  BOOLEAN Aircraft_Section_more := FALSE;
-  BOOLEAN Internet_Section_more := FALSE;
-  BOOLEAN Professional_Licenses_Section_more := FALSE;
-  BOOLEAN Superior_Liens_Section_more := FALSE;
-  BOOLEAN Business_Associates_Section_more := FALSE;
-  BOOLEAN Experian_Business_Reports_Section_more := FALSE;
-  BOOLEAN IRS5500_Section_more := FALSE;
-  BOOLEAN DNB_Section_more := FALSE;
-  BOOLEAN DiversityCertification_Section_more := FALSE;
-  BOOLEAN RiskMetrics_Section_more := FALSE;
-  BOOLEAN LaborActionWHD_Section_more := FALSE;
-  BOOLEAN NaturalDisaster_Section_more := FALSE;
-  BOOLEAN LNCAFirmographics_Section_more := FALSE;
-  BOOLEAN EquifaxBusinessReport_Section_more := FALSE;
-END;
-
-layout_sections_more add_sect_more(srcr L) := TRANSFORM
+doxie_cbrs.layout_report_src.source_counts_more add_sect_more(srcr L) := TRANSFORM
   SELF.Name_Variations_Section_more := nmvr.records_count > Max_NameVariations_val;
   SELF.Address_Variations_Section_more := advr.records_count > Max_AddressVariations_val;
   SELF.Phone_Variations_Section_more := phvr.records_count > Max_PhoneVariations_val;
@@ -297,56 +213,50 @@ layout_sections_more add_sect_more(srcr L) := TRANSFORM
   SELF := L;
 END;
 
-
 srcr_more_section := PROJECT(srcr, add_sect_more(LEFT))(Include_SourceCounts_val);
 
-layout_flag := RECORD
-  STRING field_present;
-END;
-
-layout_flag into_flags(srcr L, INTEGER C) := TRANSFORM
+doxie_cbrs.layout_report_src.source_flags into_flags(srcr L, INTEGER C) := TRANSFORM
   SELF.field_present := CHOOSE(C,
-            IF (L.FINDER != 0,'FINDER', SKIP),
-            IF (L.DNB != 0, 'DNB', SKIP),
-            IF (L.EXPERIAN_BUSINESS_REPORTS != 0 AND NOT is_knowx, 'EXPERIAN_BUSINESS_DATA', SKIP),
-            IF (L.IRS5500 != 0, 'IRS', SKIP),
-            IF (L.CORPORATE_FILINGS != 0, 'CORPORATE_FILINGS', SKIP),
-            IF (L.CORPORATE_FILINGS_V2 != 0, 'CORPORATE_FILINGS_V2', SKIP),
-            IF (L.BANKRUPTCY != 0, 'BANKRUPTCY', SKIP),
-            IF (L.BANKRUPTCY_v2 != 0, 'BANKRUPTCY_V2', SKIP),
-            IF (L.UCCS != 0, 'UCCS', SKIP),
-            IF (L.UCCS_v2 != 0, 'UCCS_V2', SKIP),
-            IF (L.LIENS_JUDGMENTS != 0, 'LIENS_JUDGMENTS', SKIP),
-            IF (L.LIENS_JUDGMENTS_v2 != 0, 'LIENS_JUDGMENTS_V2', SKIP),
-            IF (L.CONTACTS != 0, 'CONTACTS', SKIP),
-            IF (l.PROPERTY != 0, 'PROPERTY', SKIP),
-            IF (l.PROPERTY_V2 != 0, 'PROPERTY_V2', SKIP),
-            IF (L.INTERNET != 0, 'INTERNET', SKIP),
-            IF (L.PROFESSIONAL_LICENSES != 0, 'PROFESSIONAL_LICENSES', SKIP),
-            IF (L.BUSINESS_REGISTRATIONS != 0, 'BUSINESS_REGISTRATIONS', SKIP),
-            IF (L.NOTICE_OF_DEFAULTS != 0, 'NOTICE_OF_DEFAULTS', SKIP),
-            IF (L.FORECLOSURES != 0, 'FORECLOSURES', SKIP),
-            IF (L.BUSINESS_SANCTIONS != 0, 'BUSINESS_SANCTIONS', SKIP),
-            IF (nmvr.records_count > 0, 'NAME_VARIATIONS', SKIP),
-            IF (advr.records_count > 0, 'ADDRESS_VARIATIONS', SKIP),
-            IF (phvr.records_count > 0, 'PHONE_VARIATIONS', SKIP),
-            IF (idnr.records_count > 0, 'ID_NUMBERS', SKIP),
-            IF (ljur.records_count > 0, 'LIENS_JUDGMENTS_UCCS', SKIP),
-            IF (ljur_v2.records_count > 0, 'LIENS_JUDGMENTS_UCCS_V2', SKIP),
-            IF (prfr.records_count > 0, 'PROFILE_INFORMATION', SKIP),
-            IF (prfr_v2.records_count > 0, 'PROFILE_INFORMATION_V2', SKIP),
-            IF (ragr.records_count > 0, 'REGISTERED_AGENTS', SKIP),
-            IF (ragr.records_count > 0, 'REGISTERED_AGENTS_V2', SKIP),
-            IF (mvrr.records_count > 0, 'MOTOR_VEHICLES', SKIP), // GCL - 20051026
-            IF (mvrr_v2.records_count > 0, 'MOTOR_VEHICLES_V2', SKIP),
-            IF (wctr.records_count > 0, 'WATERCRAFTS', SKIP), // GCL - 20051026
-            IF (airr.records_count > 0, 'AIRCRAFTS', SKIP), // GCL - 20051026
-            SKIP);
+    IF (L.FINDER != 0,'FINDER', SKIP),
+    IF (L.DNB != 0, 'DNB', SKIP),
+    IF (L.EXPERIAN_BUSINESS_REPORTS != 0 AND NOT is_knowx, 'EXPERIAN_BUSINESS_DATA', SKIP),
+    IF (L.IRS5500 != 0, 'IRS', SKIP),
+    IF (L.CORPORATE_FILINGS != 0, 'CORPORATE_FILINGS', SKIP),
+    IF (L.CORPORATE_FILINGS_V2 != 0, 'CORPORATE_FILINGS_V2', SKIP),
+    IF (L.BANKRUPTCY != 0, 'BANKRUPTCY', SKIP),
+    IF (L.BANKRUPTCY_v2 != 0, 'BANKRUPTCY_V2', SKIP),
+    IF (L.UCCS != 0, 'UCCS', SKIP),
+    IF (L.UCCS_v2 != 0, 'UCCS_V2', SKIP),
+    IF (L.LIENS_JUDGMENTS != 0, 'LIENS_JUDGMENTS', SKIP),
+    IF (L.LIENS_JUDGMENTS_v2 != 0, 'LIENS_JUDGMENTS_V2', SKIP),
+    IF (L.CONTACTS != 0, 'CONTACTS', SKIP),
+    IF (l.PROPERTY != 0, 'PROPERTY', SKIP),
+    IF (l.PROPERTY_V2 != 0, 'PROPERTY_V2', SKIP),
+    IF (L.INTERNET != 0, 'INTERNET', SKIP),
+    IF (L.PROFESSIONAL_LICENSES != 0, 'PROFESSIONAL_LICENSES', SKIP),
+    IF (L.BUSINESS_REGISTRATIONS != 0, 'BUSINESS_REGISTRATIONS', SKIP),
+    IF (L.NOTICE_OF_DEFAULTS != 0, 'NOTICE_OF_DEFAULTS', SKIP),
+    IF (L.FORECLOSURES != 0, 'FORECLOSURES', SKIP),
+    IF (L.BUSINESS_SANCTIONS != 0, 'BUSINESS_SANCTIONS', SKIP),
+    IF (nmvr.records_count > 0, 'NAME_VARIATIONS', SKIP),
+    IF (advr.records_count > 0, 'ADDRESS_VARIATIONS', SKIP),
+    IF (phvr.records_count > 0, 'PHONE_VARIATIONS', SKIP),
+    IF (idnr.records_count > 0, 'ID_NUMBERS', SKIP),
+    IF (ljur.records_count > 0, 'LIENS_JUDGMENTS_UCCS', SKIP),
+    IF (ljur_v2.records_count > 0, 'LIENS_JUDGMENTS_UCCS_V2', SKIP),
+    IF (prfr.records_count > 0, 'PROFILE_INFORMATION', SKIP),
+    IF (prfr_v2.records_count > 0, 'PROFILE_INFORMATION_V2', SKIP),
+    IF (ragr.records_count > 0, 'REGISTERED_AGENTS', SKIP),
+    IF (ragr.records_count > 0, 'REGISTERED_AGENTS_V2', SKIP),
+    IF (mvrr.records_count > 0, 'MOTOR_VEHICLES', SKIP), // GCL - 20051026
+    IF (mvrr_v2.records_count > 0, 'MOTOR_VEHICLES_V2', SKIP),
+    IF (wctr.records_count > 0, 'WATERCRAFTS', SKIP), // GCL - 20051026
+    IF (airr.records_count > 0, 'AIRCRAFTS', SKIP), // GCL - 20051026
+    SKIP);
 END;
 
 //recflags1 := normalize(srcr,18,into_flags(LEFT,COUNTER));
 recflags1 := NORMALIZE(srcr,35,into_flags(LEFT,COUNTER))(Include_SourceFlags_val); // GCL - 20051026
-
 
 //***** SYNTAX REQUIRES THAT I CREATE A NAME FOR THE LAYOUT OF SOME (CANNOT ASSIGN TABLE OF UNNAMED...)
 mac_give_name(r, outr) := MACRO
@@ -359,7 +269,6 @@ mac_give_name(r, outr) := MACRO
   outr := PROJECT(r, %renameit%(LEFT));
 ENDMACRO;
 
-
 mac_give_name(nmvr.records, nmvr_named)
 mac_give_name(advr.records, advr_named)
 mac_give_name(phvr.records, phvr_named)
@@ -368,7 +277,6 @@ mac_give_name(idor.records, idor_named)
 mac_give_name(srcr_plus_sections, srcr_named)
 mac_give_name(srcr_more_section, srcr_more_section_named)
 //mac_give_name(srcn, srcn_named)
-
 
 //***** THEIR LAYOUTS
 recbesr := RECORDOF(besr);
@@ -475,8 +383,8 @@ END;
 nada := DATASET([0], {UNSIGNED1 a});
 rec getall(nada l) := TRANSFORM
   SELF.Best_Information := GLOBAL(GROUP(besr));
-  SELF.Company_Verification := IF(Include_BusinessRpt_Verification_val, GLOBAL(verification));
-  SELF.Phone_Summary := IF(Include_BusinessRpt_PhoneSummary_val, GLOBAL(phone_summary));
+  SELF.Company_Verification := IF(Include_BusinessRpt_Verification_val, GLOBAL(compverr));
+  SELF.Phone_Summary := IF(Include_BusinessRpt_PhoneSummary_val, GLOBAL(phonesumr));
   SELF.Ultimate_Parent_Information := GLOBAL(upcr);
   SELF.Name_Variations := GLOBAL(nmvr_named);
   SELF.Address_Variations := GLOBAL(advr_named);
@@ -527,4 +435,59 @@ res := PROJECT(nada, getall(LEFT));
 
 RETURN res;
 
-END;
+/*
+  Work in progress, will be deleted later...
+  doxie_cbrs.layout_report.outrec xt() := TRANSFORM
+    SELF.Best_Information := GLOBAL(GROUP(besr));
+    SELF.Company_Verification := IF(Include_BusinessRpt_Verification_val, GLOBAL(compverr));
+    SELF.Phone_Summary := IF(Include_BusinessRpt_PhoneSummary_val, GLOBAL(phonesumr));
+    SELF.Ultimate_Parent_Information := GLOBAL(upcr);
+    SELF.Name_Variations := GLOBAL(nmvr_named);
+    SELF.Address_Variations := GLOBAL(advr_named);
+    SELF.Phone_Variations := GLOBAL(phvr_named);
+    SELF.Parent_Company := GLOBAL(dcar.records);
+    // SELF.Sales := GLOBAL(salr.records);
+    SELF.Industry_Information := GLOBAL(indr.records);
+    SELF.ID_Numbers := GLOBAL(idnr.records);
+    SELF.Bankruptcy := GLOBAL(bnkr_named);
+    SELF.Bankruptcy_v2 := GLOBAL(bnkr_v2.records);
+    SELF.Liens_Judgments := GLOBAL(ljur.records);
+    SELF.Liens_Judgments_v2 := GLOBAL(ljur_v2.records);
+    SELF.Profile_Information := GLOBAL(prfr.records);
+    SELF.Profile_Information_v2 := GLOBAL(prfr_v2.records);
+    // SELF.Business_Registrations := GLOBAL(brer.records);
+    // SELF.Registered_Agents := GLOBAL(ragr.records);
+    // SELF.Contacts := GLOBAL(conr.records);
+    // SELF.Executives := GLOBAL(exer.records);
+    // SELF.Property := GLOBAL(pror);
+    // SELF.Property_v2 := GLOBAL(pror_v2.all_recs);
+    // SELF.NoticeOfDefaults := IF(Include_NoticeOfDefaults_val,GLOBAL(nodr.records));
+    // SELF.Foreclosures := IF(Include_Foreclosures_val,GLOBAL(forr.records));
+    // SELF.Motor_Vehicles := IF(NOT is_knowx,GLOBAL(mvrr.records)); // GCL - 20051026
+    // SELF.Motor_Vehicles_v2 := IF(NOT is_knowx,GLOBAL(UNGROUP(mvrr_v2.records)));
+    // SELF.Watercrafts := IF(NOT is_knowx,GLOBAL(wctr.records)); // GCL - 20051026
+    // SELF.Aircrafts := IF(NOT is_knowx,GLOBAL(airr.records)); // GCL - 20051026
+    // SELF.Internet := GLOBAL(idor_named);
+    // SELF.Professional_Licenses := GLOBAL(plir.records);
+    // SELF.Superior_Liens := DATASET([],liens_superior.Layout_Liens_Superior_LNI);
+    // SELF.Business_Associates := GLOBAL(basr.records);
+    // SELF.Experian_Business_Reports := IF(NOT is_knowx,GLOBAL(ebrr.records));
+    // SELF.IRS5500 := GLOBAL(irsr.records);
+    // SELF.DNB := GLOBAL(dnbr);
+    // SELF.Business_Sanctions := IF(Include_Sanctions_val, GLOBAL(sancr));
+    // SELF.DiversityCertification := IF(Include_DiversityCert_val,GLOBAL(divcert.records));
+    // SELF.RiskMetrics := IF(Include_RiskMetrics_val,GLOBAL(riskmet.records));
+    // SELF.LaborActionWHD := IF(Include_LaborActWHD_val,GLOBAL(laboract.records));
+    // SELF.NaturalDisaster := IF(Include_NatDisReady_val,GLOBAL(natdis.records));
+    // SELF.LNCAFirmographics := IF(Include_LNCA_val,GLOBAL(lncar.records));
+    // SELF.EquifaxBusinessReport := []; // supposed to be filled in by external caller.
+    // SELF.Source_Counts := GLOBAL(srcr_named);
+    // SELF.SOURCE_FLAGS := GLOBAL(recflags1);
+    // SELF.Source_Counts_more := GLOBAL(srcr_more_section_named);
+    SELF := [];
+  END;
+  res := DATASET([xt()]);
+  RETURN res;
+*/
+END;                           
+
