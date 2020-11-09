@@ -43,11 +43,13 @@ EXPORT ReportRecords (DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) 
  ds_auto_out := RiskIntelligenceNetwork_Services.fn_postautokey_joins(ds_in_orig, in_params.FraudPlatform);
 
  ds_payload_recs := RiskIntelligenceNetwork_Services.fn_GetPayloadRecords(ds_auto_out, in_params, fraud_platform := in_params.FraudPlatform);
- ds_payload_recs_filtered := ds_payload_recs((trim(cleaned_name.lname, left, right) = trim(ds_in[1].name_last, left, right) AND
-                                              trim(cleaned_name.fname, left, right)[1..length(trim(ds_in[1].name_first, left, right))] = trim(ds_in[1].name_first, left, right)) AND
-                                             (ssn = ds_in[1].ssn OR 
-                                             (clean_address.prim_range = ds_in[1].prim_range AND clean_address.prim_name = ds_in[1].prim_name AND
-                                              ((clean_address.p_city_name = ds_in[1].p_city_name and clean_address.st = ds_in[1].st) or clean_address.zip = ds_in[1].z5))));
+ ds_payload_recs_filtered := ds_payload_recs(IF(ds_in[1].name_last != '', trim(cleaned_name.lname, left, right) = trim(ds_in[1].name_last, left, right), TRUE) AND
+                                             IF(ds_in[1].name_first != '', trim(cleaned_name.fname, left, right)[1..length(trim(ds_in[1].name_first, left, right))] = trim(ds_in[1].name_first), TRUE) AND
+                                             (IF(ds_in[1].ssn != '', ssn = ds_in[1].ssn, TRUE) OR
+                                              IF(ds_in[1].prim_range != '' OR ds_in[1].prim_name != '',  
+                                                (clean_address.prim_range = ds_in[1].prim_range AND clean_address.prim_name = ds_in[1].prim_name AND
+                                                ((clean_address.p_city_name = ds_in[1].p_city_name and clean_address.st = ds_in[1].st) OR clean_address.zip = ds_in[1].z5)), TRUE)) AND
+                                             IF(ds_in[1].dob != '', dob = ds_in[1].dob, TRUE));
 
  ds_PayloadRecs_w_did := ds_payload_recs_filtered(did > 0);
  ds_contributory_dids := PROJECT(ds_PayloadRecs_w_did,
@@ -106,74 +108,60 @@ EXPORT ReportRecords (DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) 
                         
  iesp.identityriskreport.t_RINIdentityRiskReportRecord trans_API_Assessment(RiskIntelligenceNetwork_analytics.Layouts.LiveAssessmentScores L) := TRANSFORM
  //Following line Purposely commented and left here for quick debug. 
- // iesp.identityriskreport.t_RINIdentityRiskReportRecord trans_API_Assessment() := TRANSFORM
+//  iesp.identityriskreport.t_RINIdentityRiskReportRecord trans_API_Assessment() := TRANSFORM
   
-  KnownRiskCount := COUNT(L.KrAttributes);
-  knrisk_ds := PROJECT(L.KrAttributes, 
-                        TRANSFORM(iesp.identityriskreport.t_RINKnownRisk,
-                          SELF.KnownRiskCount := KnownRiskCount,
-                          SELF.ElementType := RiskIntelligenceNetwork_Services.Functions.GetElementType(LEFT.entitytype),
-                          SELF.RiskLevel := RiskIntelligenceNetwork_Services.Functions.GetRiskLevel(LEFT.risklevel),
-                          SELF.KnownRiskCode := LEFT.indicatortype,
-                          SELF.KnownRiskReason := LEFT.Label,
-                          SELF.KnownRiskAgency := ''));
-  
-  risk_attrib_rec := record
-    RiskAttributeType := RiskIntelligenceNetwork_Services.Functions.GetElementType(L.entitystats.entitytype);
-    CNT := COUNT(GROUP);
-  END;
-
-  risk_attrib_w_count := TABLE(L.entitystats, risk_attrib_rec, entitytype);
-  risk_attrib_ds := PROJECT(L.entitystats, 
-                            TRANSFORM(iesp.identityriskreport.t_RINApiRiskAttribute,
-                              SELF.RiskAttributeCount := CHOOSEN(PROJECT(risk_attrib_w_count, 
-                                                                  TRANSFORM(iesp.identityriskreport.t_RINRiskAttributeCount,
-                                                                    SELF.COUNT := LEFT.CNT,
-                                                                    SELF := LEFT)) ,iesp.Constants.RIN.MAX_RISK_ATTRIBUTE);
-                              SELF.RiskAttributeCode := LEFT.indicatortype,
-                              SELF.RiskAttributeReason := LEFT.label));
-
-  SELF.RiskScore := L.P1_IDRiskIndx,
   SELF.RiskLevel := RiskIntelligenceNetwork_Services.Functions.GetRiskLevel(L.p1_idriskindx),
   SELF.IdentityResolved := IdentityResolved,
   SELF.UniqueId := (STRING)ds_in_w_did[1].did,                                                               
-  SELF.RecentActivityDate := iesp.ECL2ESP.toDate(L.mostrecentactivitydate);
-  SELF.TotalNoOfActivities := L.totalnumberofidactivities;
-  SELF.KnownRisks := CHOOSEN(knrisk_ds, iesp.Constants.RIN.MAX_COUNT_INDICATOR_ATTRIBUTE);
-  SELF.RiskAttributes := CHOOSEN(risk_attrib_ds, iesp.Constants.RIN.MAX_COUNT_INDICATOR_ATTRIBUTE);
-  SELF := [];
+  SELF.MostRecentActivityDate := iesp.ECL2ESP.toDate(L.mostrecentactivitydate);
+  SELF.TotalNumberIdentityActivities := L.totalnumberofidactivities;
+  SELF.RiskAttributeCount := COUNT(L.entitystats);
+  SELF.RiskAttributes := CHOOSEN(PROJECT(L.entitystats, 
+                                  TRANSFORM(iesp.identityriskreport.t_RINApiRiskAttribute, 
+                                    SELF.RiskAttributeCode := LEFT.indicatortype,
+                                    SELF.RiskAttributeReason := LEFT.label)),
+                                iesp.Constants.RIN.MAX_RISK_ATTRIBUTE);
+  SELF.KnownRiskCount := COUNT(L.KrAttributes);
+  SELF.KnownRisks := CHOOSEN(PROJECT(L.KrAttributes, 
+                              TRANSFORM(iesp.identityriskreport.t_RINKnownRisk, 
+                                SELF.ElementType := RiskIntelligenceNetwork_Services.Functions.GetElementType(LEFT.entitytype),
+                                SELF.KnownRiskCode := LEFT.indicatortype,
+                                SELF.KnownRiskReason := LEFT.Label,
+                                SELF.KnownRiskAgency := '')),
+                            iesp.Constants.RIN.MAX_COUNT_INDICATOR_ATTRIBUTE);
+  // SELF := [];
  END;
  
  result := PROJECT(ds_API_Assessment, trans_API_Assessment(LEFT));
  //Following line Purposely commented and left here for quick debug. 
- // result := DATASET([trans_API_Assessment()]);
+//  result := DATASET([trans_API_Assessment()]);
  
  // output LOG_Deltabase_Layout_Record
  deltabase_log := RiskIntelligenceNetwork_Services.Functions.GetDeltabaseLogDataSet(ds_in_w_did, in_params);
  OUTPUT(deltabase_log, NAMED('log_delta__fraudgov_delta__identity'));
  
  // Debug Outputs
- // OUTPUT(ds_in, named('ds_in'));
- // OUTPUT(Minimum_input_for_rinID, named('Minimum_input_for_rinID'));
- // OUTPUT(InputDidFoundInPR, named('InputDidFoundInPR'));
- // OUTPUT(InputDidFoundInCR, named('InputDidFoundInCR'));
- // OUTPUT(ds_in_without_did, named('ds_in_without_did'));
- // OUTPUT(ds_input_pii, named('ds_input_pii'));
- // OUTPUT(ds_pr_did, named('ds_pr_did'));
- // OUTPUT(ds_pr_did_final, named('ds_pr_did_final'));
- // OUTPUT(ds_auto_out, named('ds_auto_out'));
- // OUTPUT(ds_payload_recs, named('ds_payload_recs'));
- // OUTPUT(ds_payload_recs_filtered, named('ds_payload_recs_filtered'));
- // OUTPUT(ds_contributory_dids, named('ds_contributory_dids'));
- // OUTPUT(ds_dids_combined, named('ds_dids_combined'));
- // OUTPUT(ds_dids_combined_dedup, named('ds_dids_combined_dedup'));
- // OUTPUT(multiple_did_resolved, named('multiple_did_resolved'));
- // OUTPUT(ds_in_w_did, named('ds_in_w_did'));
- // OUTPUT(ds_pr_best_ungrp, named('ds_pr_best_ungrp'));
- // OUTPUT(ds_pr_appends, named('ds_pr_appends'));
- // OUTPUT(ds_API_Assessment, named('ds_API_Assessment')); 
- // OUTPUT(IdentityResolved, named('IdentityResolved'));
- // OUTPUT(result, named('result'));
+//  OUTPUT(ds_in, named('ds_in'));
+//  OUTPUT(Minimum_input_for_rinID, named('Minimum_input_for_rinID'));
+//  OUTPUT(InputDidFoundInPR, named('InputDidFoundInPR'));
+//  OUTPUT(InputDidFoundInCR, named('InputDidFoundInCR'));
+//  OUTPUT(ds_in_without_did, named('ds_in_without_did'));
+//  OUTPUT(ds_input_pii, named('ds_input_pii'));
+//  OUTPUT(ds_pr_did, named('ds_pr_did'));
+//  OUTPUT(ds_pr_did_final, named('ds_pr_did_final'));
+//  OUTPUT(ds_auto_out, named('ds_auto_out'));
+//  OUTPUT(ds_payload_recs, named('ds_payload_recs'));
+//  OUTPUT(ds_payload_recs_filtered, named('ds_payload_recs_filtered'));
+//  OUTPUT(ds_contributory_dids, named('ds_contributory_dids'));
+//  OUTPUT(ds_dids_combined, named('ds_dids_combined'));
+//  OUTPUT(ds_dids_combined_dedup, named('ds_dids_combined_dedup'));
+//  OUTPUT(multiple_did_resolved, named('multiple_did_resolved'));
+//  OUTPUT(ds_in_w_did, named('ds_in_w_did'));
+//  OUTPUT(ds_pr_best_ungrp, named('ds_pr_best_ungrp'));
+//  OUTPUT(ds_pr_appends, named('ds_pr_appends'));
+//  OUTPUT(ds_API_Assessment, named('ds_API_Assessment')); 
+//  OUTPUT(IdentityResolved, named('IdentityResolved'));
+//  OUTPUT(result, named('result'));
  
  RETURN result;
  
