@@ -6,7 +6,9 @@ resp_layout := iesp.avm_internal_resp3.t_AVMInternalResponseEx;
 EXPORT SoapCall_Avm(
   req_layout request,
   DATASET(Gateway.layouts.config) gateways,
-  INTEGER waittime=10,
+
+  // Leave waittime at 20, vendor gateway can be slow during testing.
+  INTEGER waittime=20,
   INTEGER retries=0
 ) := FUNCTION
 
