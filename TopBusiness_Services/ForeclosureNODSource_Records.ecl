@@ -2,7 +2,7 @@
 // ======   RETURNS FORECLOSURE/NOD DATA FOR A GIVEN FORECLOSURE_ID          ======
 // ======   IN ESP-COMPLIANT WAY.                                            ======
 // ================================================================================
-IMPORT AutoStandardI, BIPV2, Property, Foreclosure_Services, iesp, topbusiness_services;
+IMPORT AutoStandardI, BIPV2, dx_Property, Foreclosure_Services, iesp, topbusiness_services;
 
 EXPORT ForeclosureNODSource_Records(
   dataset(topbusiness_services.Layouts.rec_input_ids_wSrc) in_docids,
@@ -21,7 +21,7 @@ EXPORT ForeclosureNODSource_Records(
 																																		SELF := LEFT,
 																																		SELF := []));																																		
 	
-       ds_forekeys := if (~(IsNod), PROJECT(Property.Key_Foreclosure_Linkids.kfetch2(in_docs_linkonly2,
+       ds_forekeys := if (~(IsNod), PROJECT(dx_Property.Key_Foreclosure_Linkids.kfetch2(in_docs_linkonly2,
 	      inoptions.fetch_level,,  topbusiness_services.constants.ForeclosureSrcDocsKfetchMaxLimit,
                                bipv2.idconstants.JoinTypes.LimitTransformJoin),                           
 																TRANSFORM(topbusiness_services.Layouts.rec_input_ids_wSrc,
@@ -30,7 +30,7 @@ EXPORT ForeclosureNODSource_Records(
 																					SELF := []))
                                           );
 																					
-       ds_nodkeys := if (isNod, PROJECT(Property.Key_NOD_Linkids.kfetch(in_docs_linkonly,topbusiness_services.Constants.sourceLinkIdLevel, ,                             
+       ds_nodkeys := if (isNod, PROJECT(dx_Property.Key_NOD_Linkids.kfetch(in_docs_linkonly,topbusiness_services.Constants.sourceLinkIdLevel, ,                             
                                 topbusiness_services.constants.NodSrcDocskfetchMaxLimit), 
 																TRANSFORM(topbusiness_services.Layouts.rec_input_ids_wSrc,
 																					SELF.IdValue := LEFT.foreclosure_id,

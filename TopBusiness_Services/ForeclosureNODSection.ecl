@@ -1,4 +1,4 @@
-﻿import TopBusiness_services, iesp, BIPv2, Property, Census_Data, MDR, Foreclosure_Services, std;
+﻿import TopBusiness_services, iesp, BIPv2, dx_Property, Census_Data, MDR, Foreclosure_Services, std;
 
 
 export foreclosureNODSection := module
@@ -36,7 +36,7 @@ export Fn_fullView(
 	    nod_linkids_rawSlim := Dedup(sort(nod_linkids_raw,foreclosure_id), foreclosure_id);												 
 													 
 			 
-     foreclosure_linkids_payload := join(foreclosure_linkids_rawSlim,Property.Key_Foreclosures_FID,		                                        
+     foreclosure_linkids_payload := join(foreclosure_linkids_rawSlim,dx_Property.Key_Foreclosures_FID,		                                        
 		                      keyed(left.foreclosure_id = right.fid) //AND RIGHT.source=MDR.sourceTools.src_Foreclosures,																										
 																								AND right.source IN Foreclosure_Services.Functions.getCodes(IncludeVendorSourceB),
 													transform({iesp.share.t_businessIdentity;recordof(right);},
@@ -51,7 +51,7 @@ export Fn_fullView(
 													),
 													limit(0),keep(iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_FORECLOSURE_NODS));
 				
-    nod_linkids_payload := join(nod_linkids_rawSlim, Property.Key_NOD_FID,
+    nod_linkids_payload := join(nod_linkids_rawSlim, dx_Property.Key_NOD_FID,
 		                        keyed(left.foreclosure_id = right.fid) //AND RIGHT.source=MDR.sourceTools.src_Foreclosures,
 																										AND right.source IN Foreclosure_Services.Functions.getCodes(IncludeVendorSourceB),
 															transform({iesp.share.t_businessIdentity;recordof(right);},
