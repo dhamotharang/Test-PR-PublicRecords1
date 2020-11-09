@@ -2,7 +2,7 @@
        prof_LicenseV2_Services, Prof_License, Address, doxie_raw, ut, NID, BatchServices, fcra, LN_PropertyV2,
        AutoHeaderV2, STD;
 
-SSN_LABEL 				:= PROJECT(AutoStandardI.GlobalModule(), AutoStandardI.LIBIN.PenaltyI_SSN.full, opt);
+SSN_LABEL(boolean isFCRA = false) 				:= PROJECT(AutoStandardI.GlobalModule(isFCRA), AutoStandardI.LIBIN.PenaltyI_SSN.full, opt);
 ADDRESS_LABEL 		:= PROJECT(AutoStandardI.GlobalModule(), AutoStandardI.LIBIN.PenaltyI_Addr.full, opt);
 FULLNAME_LABEL(boolean isFCRA = false) 		:= PROJECT(AutoStandardI.GlobalModule(isFCRA), AutoStandardI.LIBIN.PenaltyI_Indv_Name.full, opt);
 COMPANYNAME_LABEL := PROJECT(AutoStandardI.GlobalModule(),AutoStandardI.LIBIN.PenaltyI_Biz_Name.full,opt);
@@ -397,22 +397,23 @@ EXPORT Functions := MODULE
 		END;
 
 	//SSN Penalty Calculation
-		ssn_to_compare(LN_PropertyV2_Services.layouts.parties.entity L,STRING9 in_ssn) := FUNCTION
+		ssn_to_compare(LN_PropertyV2_Services.layouts.parties.entity L,STRING9 in_ssn, boolean isFCRA = false) := FUNCTION
 			RETURN
-					MODULE(SSN_LABEL)
+					MODULE(SSN_LABEL(isFCRA))
 						EXPORT ssn            	:= in_ssn;
 						EXPORT ssn_field      	:= L.app_ssn;
 						EXPORT allow_wildcard 	:= FALSE;
 					END;			
 			END;
 
-		tmp_penalt_layout clac_ssn_penalt(LN_PropertyV2_Services.layouts.parties.entity L, STRING9 in_ssn) := TRANSFORM
-			SELF.penalt := AutoStandardI.LIBCALL_PenaltyI_SSN.val(ssn_to_compare(L, in_ssn));
+		tmp_penalt_layout clac_ssn_penalt(LN_PropertyV2_Services.layouts.parties.entity L, STRING9 in_ssn, boolean isFCRA = false) := TRANSFORM
+			SELF.penalt := AutoStandardI.LIBCALL_PenaltyI_SSN.val(ssn_to_compare(L, in_ssn, isFCRA));
 		END;
 		
 		EXPORT penalize_ssn(BatchServices.Layouts.LN_Property.rec_input_and_matchcodes l,
-		                    DATASET(LN_PropertyV2_Services.layouts.parties.entity) r) :=	FUNCTION
-					ssn_penalty := PROJECT(R, clac_ssn_penalt(LEFT, l.ssn));
+		                    DATASET(LN_PropertyV2_Services.layouts.parties.entity) r,
+                        boolean isFCRA = false) :=	FUNCTION
+					ssn_penalty := PROJECT(R, clac_ssn_penalt(LEFT, l.ssn, isFCRA));
 			RETURN MIN (ssn_penalty, penalt);
 		END;
 		

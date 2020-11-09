@@ -107,8 +107,8 @@ END;
 #uniquename(Fetch3a)
 #uniquename(Fetch3b)
 
-Suppress.MAC_Suppress(%Fetch3%, %Fetch3a%, modAccess.application_type, Suppress.Constants.LinkTypes.SSN, ssn, , , batch);
-Suppress.MAC_Suppress(%Fetch3a%, %Fetch3b%, modAccess.application_type, Suppress.Constants.LinkTypes.DID, did, , , batch);
+Suppress.MAC_Suppress(%Fetch3%, %Fetch3a%, modAccess.application_type, Suppress.Constants.LinkTypes.SSN, ssn, , , batch,,,,isFCRA);
+Suppress.MAC_Suppress(%Fetch3a%, %Fetch3b%, modAccess.application_type, Suppress.Constants.LinkTypes.DID, did, , , batch,,,,isFCRA);
 
 #uniquename(Fetch3c)
 #uniquename(Fetch3c_minors_cleaned)

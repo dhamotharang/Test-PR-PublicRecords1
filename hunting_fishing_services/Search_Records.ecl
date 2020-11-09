@@ -41,8 +41,8 @@ export Search_Records := module
       self := left));
 
     // ***** DID & SSN pulling and suppression ****
-    Suppress.MAC_Suppress(recs_plus_pen,pull_dids,in_mod.application_type,Suppress.Constants.LinkTypes.DID,did_out);
-    Suppress.MAC_Suppress(pull_dids,pull_ssns,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,best_ssn);
+    Suppress.MAC_Suppress(recs_plus_pen,pull_dids,in_mod.application_type,Suppress.Constants.LinkTypes.DID,did_out, isFCRA := isFCRA);
+    Suppress.MAC_Suppress(pull_dids,pull_ssns,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,best_ssn, isFCRA := isFCRA);
     doxie.MAC_PruneOldSSNs(pull_ssns, recs_pruned, best_ssn, did_out, isFCRA);
 
     suppress.MAC_Mask(recs_pruned, ssns_suppressed, best_ssn, blank, true, false, maskVal := in_mod.ssn_mask);
