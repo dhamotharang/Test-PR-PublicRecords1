@@ -1,4 +1,4 @@
-IMPORT doxie, business_header, STD;
+IMPORT doxie_cbrs, doxie, business_header, STD;
 
 
 EXPORT address_variations_base(DATASET(doxie_cbrs.layout_references) bdids) :=
@@ -36,7 +36,9 @@ MODULE
 
   doxie_cbrs.mac_Selection_Declare();
             
-  EXPORT records := TABLE(CHOOSEN(final_addresses,Max_AddressVariations_val),{prim_range,predir,prim_name,addr_suffix,sec_range,city,state,zip,msaDesc,county_name,msa,addr_source_id,dt_first_seen,dt_last_seen});
+  EXPORT records := PROJECT(
+    CHOOSEN(final_addresses,Max_AddressVariations_val),
+    doxie_cbrs.layouts.addr_variation_record);
 
   EXPORT records_count := COUNT(final_addresses);
 
