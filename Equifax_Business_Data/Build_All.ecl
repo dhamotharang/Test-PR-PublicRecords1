@@ -18,14 +18,14 @@ function
 
 	full_build :=
 	sequential(
-		// Equifax_Business_Data.Create_Supers,
-		// Equifax_Business_Data.Spray(pversion,pServerIP,pDirectory,pFilename,pFilenameContacts,pGroupName,pIsTesting,pOverwrite),
-		// Scrubs.ScrubsPlus('Equifax_Business_Data','Scrubs_Equifax_Business_Data','Scrubs_Equifax_Business_Data_Contacts', 'Contacts', pversion,Equifax_Business_Data.Email_Notification_Lists(pIsTesting).BuildFailure,false),
-		// Scrubs.ScrubsPlus('Equifax_Business_Data','Scrubs_Equifax_Business_Data','Scrubs_Equifax_Business_Data_Input', 'Input', pversion,Equifax_Business_Data.Email_Notification_Lists(pIsTesting).BuildFailure,false),		
- 		// if(scrubs.mac_ScrubsFailureTest('Scrubs_Equifax_Business_Data_Contacts',pversion) AND scrubs.mac_ScrubsFailureTest('Scrubs_Equifax_Business_Data_Input',pversion)
-		 	 // ,OUTPUT('Scrubs passed.  Continuing to the Build_Base step.')				
-			 // ,FAIL('Scrubs failed.  Base and keys not built.  Processing stopped.')
-		   // ),			
+		Equifax_Business_Data.Create_Supers,
+		Equifax_Business_Data.Spray(pversion,pServerIP,pDirectory,pFilename,pFilenameContacts,pGroupName,pIsTesting,pOverwrite),
+		Scrubs.ScrubsPlus('Equifax_Business_Data','Scrubs_Equifax_Business_Data','Scrubs_Equifax_Business_Data_Contacts', 'Contacts', pversion,Equifax_Business_Data.Email_Notification_Lists(pIsTesting).BuildFailure,false),
+		Scrubs.ScrubsPlus('Equifax_Business_Data','Scrubs_Equifax_Business_Data','Scrubs_Equifax_Business_Data_Input', 'Input', pversion,Equifax_Business_Data.Email_Notification_Lists(pIsTesting).BuildFailure,false),		
+ 		if(scrubs.mac_ScrubsFailureTest('Scrubs_Equifax_Business_Data_Contacts',pversion) AND scrubs.mac_ScrubsFailureTest('Scrubs_Equifax_Business_Data_Input',pversion)
+		 	 ,OUTPUT('Scrubs passed.  Continuing to the Build_Base step.')				
+			 ,FAIL('Scrubs failed.  Base and keys not built.  Processing stopped.')
+		   ),			
  		Equifax_Business_Data.Build_Base(pversion,pIsTesting,pSprayedFile,pSprayedContactsFile,pBaseFile,pBaseContactsFile),
 		Equifax_Business_Data.Build_Keys(pversion).all,
 		Equifax_Business_Data.Build_Strata(pversion	,pOverwrite,,,	pIsTesting),

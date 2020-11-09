@@ -1,4 +1,4 @@
-import DNB_FEINV2;
+﻿import DNB_FEINV2;
 import text_search;
 import header;
 
@@ -58,15 +58,16 @@ dist_map := distribute(proj_map,hash(doc));
 sort_map := sort(dist_map,src,doc,local);
 tmsid_map := dedup(sort_map,src,doc,local);
 
+/* DF-28347
 inlkeyname := '~thor_data400::key::feinv2::'+filedate+'::map.key';
 inskeyname := '~thor_data400::key::feinv2::qa::map.key';
 
 build_key := buildindex(tmsid_map,{src,doc,src2,doc2,__filepos},inlkeyname, OVERWRITE);
-
+*/
 retval := sequential(
-									build_key,
+									//build_key, //DF-28347
 									Text_Search.Build_From_DocSeg_Records(docs(content <> ''),info),
-									Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname),
+									//Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname),
 									fileservices.deletelogicalfile('~thor_data400::persist::feinv2::boolean')
 									);
 

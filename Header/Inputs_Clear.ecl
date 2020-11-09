@@ -37,7 +37,7 @@ updt_in(base_status,'DLV2Keys','~thor_data400::BASE::dl2::DLHeader_Building','~t
 ,if(base_status(pk='LNPropertyV2Keys')[1].update,cleanSuper('~thor_data400::BASE::LN_PropV2SrchHeader_Building'))
 ,if(base_status(pk='LNPropertyV2Keys')[1].update,cleanSuper('~thor_data400::BASE::LN_PropV2AddlDeedHeader_Building'))
 ,if(base_status(pk='LNPropertyV2Keys')[1].update,cleanSuper('~thor_data400::BASE::LN_PropV2AddlAssessHeader_Building'))
-,updt_in(base_status,'DeathMasterKeys','~thor_data400::Base::DeathHeader_Building','~thor_data400::base::did_death_masterv2_ssa')
+,updt_in(base_status,'DeathMasterSsaKeys','~thor_data400::Base::DeathHeader_Building','~thor_data400::base::did_death_masterv2_ssa')
 ,if(base_status(pk='gong')[1].update,cleanSuper('~thor_data400::base::gongheader_building'))                            // STALE
 ,if(base_status(pk='ForeclosureKeys')[1].update,cleanSuper('~thor_data400::Base::ForeclosureHeader_Building'))
 ,if(base_status(pk='FAAKeys')[1].update,cleanSuper('~thor_data400::Base::AirmenHeader_Building'))

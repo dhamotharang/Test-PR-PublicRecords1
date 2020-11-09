@@ -1,0 +1,26 @@
+﻿EXPORT File_FileType_to_ActionGroup := 
+DATASET([
+					{'AJ','AJ','JUDGMENT LIEN'	                  ,	'JUDGMENT LIEN'},
+					{'AR','AJ','JUDGMENT LIEN RELEASE'         	  ,	'JUDGMENT LIEN'},
+					{'BN','CP','CIVIL NEW FILING'	                ,	'CIVIL PROCEEDING'         },
+					{'CD','CP','CIVIL DISMISSAL'	                ,	'CIVIL PROCEEDING'         },
+					{'FD','CP','FORCIBLE ENTRY/DETAINER'	        ,	'CIVIL PROCEEDING'         },
+					{'RD','CP','FORCIBLE ENTRY/DETAINER RELEASE'	,	'CIVIL PROCEEDING'         },
+					{'CJ','CP','CIVIL JUDGMENT'	                  ,	'CIVIL PROCEEDING'         },
+					{'CS','CP','CIVIL SPECIAL JUDGMENT'	          ,	'CIVIL PROCEEDING'         },
+					{'RL','CP','CIVIL JUDGMENT RELEASE'         	,	'CIVIL PROCEEDING'         },
+					{'RM','CP','CIVIL SPECIAL JUDGMENT RELEASE'	  ,	'CIVIL PROCEEDING'         },
+					{'RS','CP','SMALL CLAIMS JUDGMENT RELEASE'	  ,	'CIVIL PROCEEDING'         },
+					{'SC','CP','SMALL CLAIMS JUDGMENT'	          ,	'CIVIL PROCEEDING'         },
+					{'VJ','CP','VACATED JUDGMENT'	                ,	'CIVIL PROCEEDING'         },
+          {'CF','FT','CORRECTED FEDERAL TAX LIEN'	      ,	'FEDERAL TAX LIEN'         },
+					{'FE','FT','FILED IN ERROR-FED TAX LIEN'	    ,	'FEDERAL TAX LIEN'         },
+					{'FR','FT','FEDERAL TAX LIEN RELEASE'	        ,	'FEDERAL TAX LIEN'         },
+					{'FT','FT','FEDERAL TAX LIEN'                	,	'FEDERAL TAX LIEN'         },
+					{'SE','ST','FILED IN ERROR-ST TAX LIEN'     	,	'STATE TAX LIEN'           },
+					{'SR','ST','STATE TAX LIEN RELEASE'	          ,	'STATE TAX LIEN'           },
+					{'ST','ST','STATE TAX LIEN'	                  ,	'STATE TAX LIEN'           },
+					{'TW','TW','STATE TAX WARRANT'	              ,	'STATE TAX WARRANT'        },
+					{'WE','TW','FILED IN ERROR-ST TAX WARRANT'	  ,	'STATE TAX WARRANT'        },
+					{'WR','TW','STATE TAX WARRANT RELEASE'	      ,	'STATE TAX WARRANT'        }
+				],LiensV2_SrcInfoRpt.Layouts.rFiletypeToActionGroup);

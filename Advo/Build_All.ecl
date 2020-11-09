@@ -58,6 +58,5 @@ function
 			,Rename_Keys(pversion, false)
 		 )
 		,USPIS_HotList.Build_All(pversion,pUSPISSprayDirectory,pSkipUSPIS := pSkipUSPIS).all
-		,Send_Email(pversion).Roxie.all_packages
 	);
 end;

@@ -1,0 +1,1 @@
+﻿EXPORT KeyName_2020_Trade_Payment_Trends_Delta_rid := trim(GetSegmentKeyName_Delta_RID('2020'));

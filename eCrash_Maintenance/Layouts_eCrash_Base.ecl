@@ -888,5 +888,6 @@ EXPORT Layouts_eCrash_Base := RECORD,maxlength(40000)
   string marijuana_use_suspected;
   string direction_of_impact;
   string event_sequence;
+  string1 is_suppressed;
   DATASET(citations_childrec) citation_details{maxcount(50)};
  END;

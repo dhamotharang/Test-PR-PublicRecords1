@@ -264,7 +264,7 @@ EXPORT Layout_eCrash := MODULE
 		STRING100 Photograph_Type;
 		STRING10 Posted_Satutory_Speed_Limit;
 		STRING25 Safety_Equipment_Available_Or_Used;
-		STRING20 Ejection;
+		STRING100 Ejection;
 		STRING40 Safety_Equipment_Helmet;
 		STRING60 Transported_To;
 		STRING20 Dispatch_Time;

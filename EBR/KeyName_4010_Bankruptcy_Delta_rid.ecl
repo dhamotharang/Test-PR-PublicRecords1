@@ -1,0 +1,1 @@
+﻿﻿EXPORT KeyName_4010_Bankruptcy_Delta_rid := trim(GetSegmentKeyName_Delta_RID('4010'));
