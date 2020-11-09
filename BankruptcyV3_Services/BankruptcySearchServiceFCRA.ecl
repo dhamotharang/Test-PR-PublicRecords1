@@ -1,83 +1,26 @@
-﻿/*--SOAP--
-<message name="BankruptcySearchServiceFCRA">
-  <!-- Indexed Directly -->
-  <part name="TMSID" type="xsd:string"/>
-  <part name="BDID" type="xsd:string"/>
-  <part name="DID" type="xsd:string"/>
-
-  <!-- Indexed by Autokey -->
-  <part name="PartyType" type="xsd:string"/>
-  <part name="CompanyName" type="xsd:string"/>
-  <part name="UnParsedFullName" type="xsd:string"/>
-  <part name="FirstName" type="xsd:string"/>
-  <part name="MiddleName" type="xsd:string"/>
-  <part name="LastName" type="xsd:string"/>
-  <part name="Addr" type="xsd:string"/>
-  <part name="City" type="xsd:string"/>
-  <part name="State" type="xsd:string"/>
-  <part name="Zip" type="xsd:string"/>
-  <part name="County" type="xsd:string"/>
-  <part name='SSN' type='xsd:string'/>
-  <part name='SSNLast4' type='xsd:string'/>
-  <part name="FEIN" type="xsd:string"/>
-  
-  <!-- CaseNumber -->
-  <part name="EnableCaseNumberFilterSearch" type="xsd:boolean"/>
-  <part name="CaseNumber" type="xsd:string"/>
-  <part name="AttorneyName" type="xsd:string"/>
-  <part name="CourtCode" type="xsd:string"/>
-  
-  <part name="FilingJurisdiction" type='xsd:string'/>
-  
-  <part name="PenaltThreshold" type="xsd:unsignedInt"/>
-  
-  <part name="DPPAPurpose" type="xsd:byte"/>
-  <part name="GLBPurpose" type="xsd:byte"/>
-  <part name="SSNMask" type="xsd:string"/>
-  <part name="ApplicationType" type="xsd:string"/>
-  <part name="FCRAPurpose" type="xsd:string"/>
-  
-  <part name="AllowNickNames" type="xsd:boolean"/>
-  <part name="PhoneticMatch" type="xsd:boolean"/>
-  <part name="NoDeepDive" type="xsd:boolean"/>
-  <part name="ZipRadius" type="xsd:unsignedInt"/>
-  <part name="MaxResults" type="xsd:unsignedInt"/>
-  <part name="MaxResultsThisTime" type="xsd:unsignedInt"/>
-  <part name="SkipRecords" type="xsd:unsignedInt"/>
-  <part name="srch_hashvals" type="tns:XmlDataSet" cols="70" rows="3"/>
-  <part name="StrictMatch" type="xsd:boolean"/>
-
-  <part name="StateSort" type="xsd:Int"/>
-  <part name="FileDateSort" type="xsd:Int"/>
-  <part name="CaseSort" type="xsd:Int"/>
-  <part name="LastNameSort" type="xsd:Int"/>
-  <part name="CompanyNameSort" type="xsd:Int"/>
-
-  <part name="gateways" type="tns:XmlDataSet" cols="70" rows="4"/>
-  <part name="NonSubjectSuppression" type="xsd:unsignedInt" default="2"/> <!-- [1,2,3] -->
-  <part name="ApplyNonsubjectRestrictions" type="xsd:boolean"/>
-  <part name="SuppressWithdrawnBankruptcy" type="xsd:boolean"/>
-</message>
-*/
-/*--INFO-- This service searches the Bankruptcyv3 files.*/
-
+﻿// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 IMPORT doxie, Text_Search, FCRA, AutoStandardI, WSInput;
 
 EXPORT BankruptcySearchServiceFCRA(
   ) :=
     MACRO
-    
+
     //The following macro defines the field sequence on WsECL page of query.
     WSInput.MAC_BankruptcyV3_Services_BankruptcySearchServiceFCRA();
-    
+
     doxie.MAC_Header_Field_Declare(TRUE);
     #CONSTANT('SearchIgnoresAddressOnly',TRUE);
     #STORED('ScoreThreshold',10);
     #STORED('PenaltThreshold',10);
     #CONSTANT('DisplayMatchedParty',TRUE);
     #CONSTANT('NoDeepDive', TRUE);
-    
-    
+
+
     /* fetch sorting params */
     INTEGER1 state_sort := 0 : STORED('StateSort');
     INTEGER1 case_sort := 0 : STORED('CaseSort');
@@ -92,7 +35,7 @@ EXPORT BankruptcySearchServiceFCRA(
     STRING court_code := Std.Str.ToUpperCase(court_code_pre);
     STRING state_value_ucase := Std.Str.ToUpperCase(state_val);
     EnableCaseNumFilter := CaseNumber_value != '' AND Enable_CaseNumFilterSrch;
-    
+
     cleanCaseNumber(STRING str) := FUNCTION
         arrayOfWords := STD.Str.SplitWords(str,'-');
         cleanStr := arrayOfWords[1] + arrayOfWords[2];
@@ -100,7 +43,7 @@ EXPORT BankruptcySearchServiceFCRA(
     END;
 
     STRING CaseNumber_value_ucase := Std.Str.ToUpperCase(
-      IF(EnableCaseNumFilter AND attorney_name <> '', cleanCaseNumber(CaseNumber_value), 
+      IF(EnableCaseNumFilter AND attorney_name <> '', cleanCaseNumber(CaseNumber_value),
         CaseNumber_value)
     );
 
@@ -112,23 +55,23 @@ EXPORT BankruptcySearchServiceFCRA(
     STRING party_type_adj := IF (returnByDidOnly, BankruptcyV3_Services.consts.NAME_TYPES.DEBTOR, party_type);
     nss_default := Suppress.Constants.NonSubjectSuppression.doNothing;
     nss := ut.GetNonSubjectSuppression(nss_default);
-    
+
     // for FCRA FFD
     valFFDOptionsMask := FFD.FFDMask.Get(inApplicationType := application_type_value);
     BOOLEAN ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(valFFDOptionsMask);
     INTEGER8 inFCRAPurpose := FCRA.FCRAPurpose.Get();
-  
+
     //------------------------------------------------------------------------------------
     //call gateway only when returnByDidOnly is true
     //if more than one DID is found this call will fail the service with desired error message
     UNSIGNED6 input_did := (UNSIGNED6) did_value;
-    
+
     // gateways := Gateway.Constants.void_gateway : stored ('gateways', few);
     gateways := Gateway.Configuration.Get();
     picklist_res := FCRA.PickListSoapcall.non_esdl(gateways, TRUE, ~EnableCaseNumFilter AND returnByDidOnly AND (input_did = 0));
     UNSIGNED6 subj_did := IF(returnByDidOnly AND (input_did = 0), (UNSIGNED6) picklist_res[1].Records[1].UniqueId, input_did);
     //------------------------------------------------------------------------------------
-    
+
     recs := bankruptcyv3_Services.bankruptcy_raw(TRUE).search_view(
       in_ssn_mask := ssn_mask_value,
       in_party_type := party_type_adj,
@@ -149,33 +92,33 @@ EXPORT BankruptcySearchServiceFCRA(
       bankruptcyv3_services.layouts.layout_rollup,
       Text_Search.Layout_ExternalKey,
     END;
-    
+
     rec_out addExt ( recs l) := TRANSFORM
       SELF := l;
       SELF.ExternalKey := l.TMSID;
     END;
     recs2 := PROJECT(recs, addext(LEFT));
-    
+
     // sort recs (before MAC_Marshall_Results so that SkipRecords and MaxResultsThisTime are sorted
     recs_srt := bankruptcyv3_services.fn_sort_output(recs2, state_sort, case_sort,
       fdate_sort, lname_sort, cname_sort);
-    
+
     recs_filt := recs_srt(~returnByDidOnly OR (UNSIGNED6)matched_party.did = subj_did OR EnableCaseNumFilter );
-    
+
     rec_out xformNonSubject(rec_out L) := TRANSFORM
       debtors_supp := PROJECT(L.debtors((UNSIGNED6)did = subj_did),
         TRANSFORM(BankruptcyV3_Services.layouts.layout_party,
-          SELF.names := 
+          SELF.names :=
             PROJECT(LEFT.names, TRANSFORM(BankruptcyV3_Services.layouts.layout_name,
               SELF.orig_name := '';
               SELF := LEFT;
             ));
           SELF := LEFT;
         ));
-      debtors_restricted := debtors_supp + 
+      debtors_restricted := debtors_supp +
         PROJECT(L.debtors(~((UNSIGNED6)did = subj_did)),
           TRANSFORM(BankruptcyV3_Services.layouts.layout_party,
-            SELF.names := 
+            SELF.names :=
               PROJECT(LEFT.names,
                 TRANSFORM(BankruptcyV3_Services.layouts.layout_name,
                   SELF.lname := FCRA.Constants.FCRA_Restricted;
@@ -191,48 +134,48 @@ EXPORT BankruptcySearchServiceFCRA(
       SELF := L;
     END;
     rsrt_nss := PROJECT(recs_filt, xformNonSubject(LEFT));
-    
+
     rsrt_final := IF(nss <> Suppress.Constants.NonSubjectSuppression.doNothing,
        rsrt_nss, recs_filt);
-                     
+
     //*************FCRA FFD --- getting FFD statements for matched parties only
-  
+
     //projecting to common layout for fn_fcra_ffd call
     temp_rollup := PROJECT(rsrt_final, bankruptcyv3_services.layouts.layout_rollup);
-  
+
     matched_recs := PROJECT(temp_rollup, TRANSFORM(bankruptcyv3_services.layouts.Matched_party_rec, SELF := LEFT.matched_party));
-    
+
     matched_rec_dids := PROJECT(DEDUP(matched_recs, did, ALL),
       TRANSFORM(FFD.Layouts.DidBatch,
       SELF.acctno := FFD.Constants.SingleSearchAcctno;
       SELF.did := (UNSIGNED6) LEFT.did;
     ));
-                              
+
     ds_subj_did := DATASET([{FFD.Constants.SingleSearchAcctno, subj_did}],FFD.Layouts.DidBatch);
-    
+
     // even if no data found we still need to check for alerts and consumer level statements for subject
     dsDIDs := IF(EXISTS(matched_rec_dids(did>0)), matched_rec_dids(did>0), ds_subj_did);
- 
+
     // Call the person context
     pc_recs_prelim := FFD.FetchPersonContext(dsDIDs, gateways, FFD.Constants.DataGroupSet.Bankruptcy, valFFDOptionsMask);
-     
+
     // for record level statement/dispute filter to keep data only if subject is debtor
     pc_recs_rlvl := JOIN(pc_recs_prelim(RecordType IN FFD.Constants.RecordType.RecordLevel),
       matched_recs(party_type IN BankruptcyV3_Services.consts.DEBTOR_TYPES),
       (UNSIGNED6) LEFT.LexId = (UNSIGNED6) RIGHT.did,
       TRANSFORM(LEFT), KEEP(1), LIMIT(0));
-                        
+
     pc_recs := pc_recs_rlvl + pc_recs_prelim(RecordType IN FFD.Constants.RecordType.ConsumerLevel);
-    
+
     // Slim down the PersonContext
     slim_pc_recs := FFD.SlimPersonContext(pc_recs);
-    
+
     // get FFD compliance records
     temp_results_ffd := BankruptcyV3_Services.fn_fcra_ffd(temp_rollup, slim_pc_recs, valFFDOptionsMask);
-    
+
     alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, inFCRAPurpose, valFFDOptionsMask)[1];
     suppress_results_due_alerts := alert_indicators.suppress_records;
-   
+
     // add back to search layout
     all_results := JOIN(rsrt_final, temp_results_ffd,
       LEFT.tmsid = RIGHT.tmsid,
@@ -241,14 +184,14 @@ EXPORT BankruptcySearchServiceFCRA(
       SELF.isDisputed := RIGHT.isDisputed;
       SELF := RIGHT; // to get statementids AND isdisputed for debtors child DATASET
       SELF:= LEFT));
-                    
+
     final := IF(suppress_results_due_alerts, DATASET([], rec_out), all_results);
-        
+
     CaseNumberErrorCode :=
       FCRA.Functions.CheckCaseNumMinInput(CaseNumber_value_ucase, fname_value,
         lname_value,ssn_value,state_value_ucase,(UNSIGNED6)did_value,
           city_value, attorney_name , court_code);
-                                             
+
     IF(EnableCaseNumFilter AND CaseNumberErrorCode != 0,
        FAIL(CaseNumberErrorCode, ut.MapMessageCodes(CaseNumberErrorCode)));
 
@@ -265,15 +208,15 @@ EXPORT BankruptcySearchServiceFCRA(
     consumer_alerts := FFD.ConsumerFlag.prepareAlertMessages(pc_recs, alert_indicators, valFFDOptionsMask);
     matched_party_lexid := dsDIDs[1].did;
     search_lexId := IF(matched_party_lexid > 0 AND ~EXISTS(dsDIDs(did <> matched_party_lexid)), matched_party_lexid, 0);
-                        
+
     // in case if results contain data for more than one matched LexId and no resolved LexId based on input there will be no Consumer data populated
     input_consumer := FFD.MAC.PrepareConsumerRecord(search_lexId, FALSE);
-    
+
     doxie.MAC_Marshall_Results(final, recs_marshalled);
 
     OUTPUT(recs_marshalled, NAMED('Results'));
     OUTPUT (consumer_statements, NAMED ('ConsumerStatements'));
     OUTPUT (consumer_alerts, NAMED ('ConsumerAlerts'));
     OUTPUT (input_consumer, NAMED ('Consumer'));
-    
+
 ENDMACRO;
