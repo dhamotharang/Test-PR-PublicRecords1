@@ -460,5 +460,34 @@ END;
 //*********************************************************//
 //***************END BUSINESS SECTION**********************//
 //*********************************************************//
+
+EXPORT fn_valid_email(string em) := FUNCTION
+
+  cleanEm         := TRIM(em,whitespace);
+  containsAt      := STD.str.Filter(cleanEm,'@') = '@';
+  containsPeriod  := LENGTH(STD.str.Filter(cleanEm,'.')) > 0;
+  minLen          := LENGTH(cleanEm) > 5;
+  isBlank         := LENGTH(cleanEm) = 0;
+
+  return if(
+              (containsAt AND containsPeriod AND minLen) OR isBlank
+              ,1
+              ,0
+            );
+
+END;
+
+EXPORT fn_valid_IP(string ip) := FUNCTION
+  cleanIp      := TRIM(ip,whitespace);
+  isIPV4      := STD.str.filterOut(cleanIp, '0123456789') = '...';
+  isMinLength := LENGTH(cleanIp) > 6;
+  isBlank     := LENGTH(cleanIp) = 0;
+
+  return if(
+            (isIPV4 AND isMinLength) or isBlank
+            ,1
+            ,0
+          );
+END;
     
 END; //End Functions Module
