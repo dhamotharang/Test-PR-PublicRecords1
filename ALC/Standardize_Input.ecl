@@ -431,39 +431,32 @@ EXPORT Standardize_Input(STRING pversion, BOOLEAN pUseProd = FALSE) := MODULE
   // Nurses need normalization on nurse_type (basically license type) and specialty (they are
 	//   connected to each other).
 	EXPORT Nurses := FUNCTION
-			input               := ALC.Files(, pUseProd).Input.Nurses1 +
-																ALC.Files(, pUseProd).Input.Nurses2 +
-																ALC.Files(, pUseProd).Input.Nurses3;
+		input01 := ALC.Files(, pUseProd).Input.Nurses1 +
+								ALC.Files(, pUseProd).Input.Nurses2 +
+								ALC.Files(, pUseProd).Input.Nurses3;
+	  input:=  DEDUP(SORT(DISTRIBUTE(input01(TRIM(fname) <> '' AND TRIM(license_no) <> ''), HASH32(custno, license_no)), custno, license_no, LOCAL));
 
-			nurses4 := ALC.Files(, pUseProd).Input.Nurses4; 
-	
+		nurses4_01 := ALC.Files(, pUseProd).Input.Nurses4; 
+		nurses4:=  DEDUP(SORT(DISTRIBUTE(nurses4_01(TRIM(licstate) <> ''), HASH32(custno, licstate)), custno, licstate, LOCAL));
+		nurses4_slim := PROJECT(nurses4, {LEFT.custno, LEFT.lic_no, LEFT.licstate});
 
-			nurses4_slim := PROJECT(nurses4, {LEFT.custno, LEFT.lic_no, LEFT.licstate});
+		full_state_join := JOIN(input, nurses4_slim, LEFT.custno = RIGHT.custno AND LEFT.license_no = RIGHT.lic_no, FULL OUTER);  
 
-			full_state_join := JOIN(input, nurses4_slim, LEFT.custno = RIGHT.custno AND LEFT.license_no = RIGHT.lic_no, FULL OUTER);
+		RECORDOF(full_state_join) xLicState(RECORDOF(full_state_join) l) := TRANSFORM
+			SELF.reg_state := IF(l.licstate <> '', l.licstate, l.reg_state);
+			SELF := l;
+		END;
 
-			RECORDOF(full_state_join) xLicState(RECORDOF(full_state_join) l) := TRANSFORM
-				SELF.reg_state := IF(l.licstate <> '', l.licstate, l.reg_state);
-				SELF := l;
-			END;
+		correcting_input01 := PROJECT(full_state_join, xLicState(LEFT))(TRIM(fname) <> '' AND TRIM(license_no) <> '');
+		correcting_input := DEDUP(SORT(DISTRIBUTE(correcting_input01, HASH32(custno, license_no)), custno, license_no, LOCAL));
 
-			corrected_input := PROJECT(full_state_join, xLicState(LEFT));
+		ambiguous_states :=  DEDUP(JOIN(correcting_input, correcting_input, 
+					LEFT.custno = RIGHT.custno AND LEFT.license_no = RIGHT.license_no AND LEFT.reg_state <> RIGHT.reg_state, INNER, LOCAL));
+		ambiguous_fixed_with_licstate := DEDUP(JOIN(correcting_input, correcting_input, 
+					LEFT.custno = RIGHT.custno AND LEFT.license_no = RIGHT.license_no AND LEFT.reg_state <> RIGHT.reg_state, INNER, LOCAL)  (std.str.contains(reg_state, state, FALSE)));
 
-			ambiguous_states :=  DEDUP(JOIN(corrected_input, corrected_input, 
-						LEFT.custno = RIGHT.custno AND LEFT.license_no = RIGHT.license_no AND LEFT.reg_state <> RIGHT.reg_state, INNER, LOCAL));
-					OUTPUT(COUNT(ambiguous_states), NAMED('cnt_ambiguous'));         
-
-
-			ambiguous_fixed_with_licstate := DEDUP(JOIN(corrected_input, corrected_input, 
-						LEFT.custno = RIGHT.custno AND LEFT.license_no = RIGHT.license_no AND LEFT.reg_state <> RIGHT.reg_state, INNER, LOCAL)  (reg_state = licstate));
-					OUTPUT(COUNT(ambiguous_fixed_with_licstate), NAMED('cnt_ambiguous_fixed_with_licstate'));         
-
-
-			fix_ambig_step1 := corrected_input - ambiguous_states;
-			fix_ambig_step2 := PROJECT((fix_ambig_step1 + ambiguous_fixed_with_licstate), ALC.Layouts.Input.Nurses) ;
-
-
-
+		fix_ambig_step1 := correcting_input - ambiguous_states;
+		fix_ambig_step2 := PROJECT((fix_ambig_step1(fname<>'') + ambiguous_fixed_with_licstate(fname<>'')), ALC.Layouts.Input.Nurses) ;  //  new filter
 
 		input_initial_clean := Apply_Common_Xform(fix_ambig_step2, ALC.Layouts.Input.Nurses);
 
