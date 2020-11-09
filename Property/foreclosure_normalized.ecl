@@ -11,7 +11,7 @@ foreclosureIn := property.File_Foreclosure_In;
 
 // NORMALIZE: The result of it will be used for DIDing and for building autokeys as well
 // by name (autokeys also will use normalization by company name) 
-Layout_Foreclosure_Base_Normalized normalizeRecords (foreclosureIn l, unsigned1 nameCounter) := transform
+Property.Layout_Foreclosure_Base_Normalized normalizeRecords (foreclosureIn l, unsigned1 nameCounter) := transform
 	self.name_first := choose(nameCounter,l.name1_first,l.name2_first,l.name3_first,l.name4_first,l.name5_first,l.name6_first,l.name7_first,l.name8_first);
 	self.name_middle := choose(nameCounter,l.name1_middle,l.name2_middle,l.name3_middle,l.name4_middle,l.name5_middle,l.name6_middle,l.name7_middle,l.name8_middle);
 	self.name_last := choose(nameCounter,l.name1_last,l.name2_last,l.name3_last,l.name4_last,l.name5_last,l.name6_last,l.name7_last,l.name8_last);
@@ -38,7 +38,7 @@ ds_name_normalized := normalize (foreclosureIn,8,normalizeRecords(left,counter))
 
 
 // by address
-Layout_Foreclosure_Base_Normalized normalize_Addr_Records(Layout_Foreclosure_Base_Normalized l, unsigned1 c) := transform
+Property.Layout_Foreclosure_Base_Normalized normalize_Addr_Records(Property.Layout_Foreclosure_Base_Normalized l, unsigned1 c) := transform
 		self.site_prim_range :=choose(c,l.site_prim_range,l.situs2_prim_range);
 		self.site_predir :=choose(c,l.site_predir,l.situs2_predir);
 		self.site_prim_name :=choose(c,l.site_prim_name,l.situs2_prim_name);
@@ -58,7 +58,7 @@ ds_normalized := normalize(ds_name_normalized(name_first != '' OR name_last != '
 
 src_rec := record
 header_slimsort.Layout_Source;
-Layout_Foreclosure_Base_Normalized;
+Property.Layout_Foreclosure_Base_Normalized;
 end;
 
 DID_Add.Mac_Set_Source_Code (ds_normalized, src_rec, 'FR', foreclosureBaseNormalized_src)
@@ -71,7 +71,7 @@ did_add.MAC_Match_Flex(foreclosureBaseNormalized_src,matchset,
 											 did,src_rec,
 											 true,did_score,75,foreclosureDID_src,true,src);
 //remove src 
-foreclosureDID := project(foreclosureDID_src, transform(Layout_Foreclosure_Base_Normalized, self := left));
+foreclosureDID := project(foreclosureDID_src, transform(Property.Layout_Foreclosure_Base_Normalized, self := left));
 
 matchset_bdid := ['A'];
 
@@ -87,7 +87,7 @@ Business_Header_SS.MAC_Match_Flex(
 			,foo						                    	// phone				              
 			,foo            			           	  	// fein              
 			,bdid										        			// bdid												
-			,Layout_Foreclosure_Base_Normalized		// output layout 
+			,Property.Layout_Foreclosure_Base_Normalized		// output layout 
 			,true                                	// output layout has bdid score field? 																	
 			,bdid_score                     			// bdid_score                 
 			,foreclosureDID_BDID				          // output dataset
@@ -115,7 +115,7 @@ appendSSNSortDist	:=	SORT(DISTRIBUTE(appendSSN, HASH(foreclosure_id)), RECORD, -
 //Normalize BKL file prior to append
 BKforeclosureIn	:= BKForeclosure.Fn_Map_BK2Foreclosure;
 
-Layout_Foreclosure_Base_Normalized normalizeBK(BKforeclosureIn l, unsigned1 nameCounter) := TRANSFORM
+Property.Layout_Foreclosure_Base_Normalized normalizeBK(BKforeclosureIn l, unsigned1 nameCounter) := TRANSFORM
 	self.name_first := choose(nameCounter,l.name1_first,l.name2_first,l.name3_first,l.name4_first,l.name5_first,l.name6_first,l.name7_first,l.name8_first);
 	self.name_middle := choose(nameCounter,l.name1_middle,l.name2_middle,l.name3_middle,l.name4_middle,l.name5_middle,l.name6_middle,l.name7_middle,l.name8_middle);
 	self.name_last := choose(nameCounter,l.name1_last,l.name2_last,l.name3_last,l.name4_last,l.name5_last,l.name6_last,l.name7_last,l.name8_last);

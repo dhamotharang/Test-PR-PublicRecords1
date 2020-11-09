@@ -6,7 +6,7 @@ IMPORT AccountMonitoring,BankruptcyV2, Business_Header, CellPhone, CourtLink, Co
 			 PhonesFeedback, Phonesplus, POE, Property, Risk_Indicators, ut, UtilFile, Watchdog, 
 			 hygenics_crim, business_header_ss, PhonesInfo, BIPV2_Best, 
 			 Business_Credit, Business_Credit_Scoring, UCCV2, SAM, Inquiry_AccLogs, Corp2,
-			 VehicleV2, FAA, Watercraft, Phonesplus_v2;
+			 VehicleV2, FAA, Watercraft, Phonesplus_v2, dx_Property;
 			 
 EXPORT product_files := MODULE
 
@@ -362,7 +362,7 @@ EXPORT product_files := MODULE
 		// ===================================================================	
 		EXPORT base_filename_raw := 'thor_data400::base::foreclosure';
 		EXPORT base_filename := AccountMonitoring.constants.DATA_LOCATION + base_filename_raw;
-		EXPORT base_file_raw := DATASET(base_filename, Property.Layout_Fares_Foreclosure_v2, THOR);
+		EXPORT base_file_raw := DATASET(base_filename, dx_Property.Layout_Fares_Foreclosure_v2, THOR);
 		EXPORT base_file     := PROJECT(base_file_raw, Property.Layout_Fares_Foreclosure);
 		
 		EXPORT Layout_Base_Header_file_slim := RECORD
