@@ -4,9 +4,6 @@ export Health_CheckUp(string pVersion) := module
 export All:=PARALLEL(
 	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::config::customermappings')>0,'Unit Test Failed on ~fraudgov::config::customermappings',FAIL);
 	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::config::customersettings')>0,'Unit Test Failed on ~fraudgov::config::customersettings',FAIL);
-	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::passed::deltabase')>0,'Unit Test Failed on ~fraudgov::in::passed::deltabase',FAIL);
-	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::passed::nac')>0,'Unit Test Failed on ~fraudgov::in::passed::nac',FAIL);
-	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::passed::rdp')>0,'Unit Test Failed on ~fraudgov::in::passed::rdp',FAIL);
 	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::sprayed::bypassed_deltabase')>0,'Unit Test Failed on ~fraudgov::in::sprayed::bypassed_deltabase',FAIL);
 	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::sprayed::bypassed_identitydata')>0,'Unit Test Failed on ~fraudgov::in::sprayed::bypassed_identitydata',FAIL);
 	ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::sprayed::bypassed_knownfraud')>0,'Unit Test Failed on ~fraudgov::in::sprayed::bypassed_knownfraud',FAIL);
@@ -42,6 +39,10 @@ export All:=PARALLEL(
 	// ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::passed::identitydata')>0,'Unit Test Failed on ~fraudgov::in::passed::identitydata');
 	// ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::passed::knownfraud')>0,'Unit Test Failed on ~fraudgov::in::passed::knownfraud');
 	// ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::passed::inquirylogs')>0,'Unit Test Failed on ~fraudgov::in::passed::inquirylogs');
+	// ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::passed::deltabase')>0,'Unit Test Failed on ~fraudgov::in::passed::deltabase',FAIL);
+	// ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::passed::nac')>0,'Unit Test Failed on ~fraudgov::in::passed::nac',FAIL);
+	// ASSERT(STD.File.GetSuperFileSubCount('~fraudgov::in::passed::rdp')>0,'Unit Test Failed on ~fraudgov::in::passed::rdp',FAIL);
+
 );
 
 
