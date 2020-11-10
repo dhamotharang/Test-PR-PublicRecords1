@@ -1,7 +1,7 @@
 ﻿import ut, STD;
 
 	string uc(string s) := Std.Str.ToUpperCase(s);
-  string fix(string s) := Std.Str.CleanSpaces(uc(Std.Str.FindReplace(s,'.',' ')));
+  string fix(string s) := Std.Str.CleanSpaces(uc(Std.Str.SubstituteIncluded(s,'._',' ')));
 	rgxSfx := '^([A-Z]+)[, ]+(JR|SR|III|IV)';
 
 // convert lower case to upper case
@@ -25,7 +25,7 @@ EXPORT fn_flatten(dataset(Nac_v2.Layouts.base) base1) := FUNCTION
 						self.Case_Mailing_Address_Street_2 := uc(left.Case_Mailing_Address_Street_2);
 						self.Case_Mailing_Address_City := uc(left.Case_Mailing_Address_City);
 
-						self.Prepped_name := uc(left.Prepped_name);
+						self.Prepped_name := fix(left.Prepped_name);
 						self.Prepped_addr1 := uc(left.Prepped_addr1);
 						self.Prepped_addr2 := uc(left.Prepped_addr2);
 						
