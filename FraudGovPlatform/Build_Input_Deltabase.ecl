@@ -25,12 +25,12 @@ module
 		self.ind_type 	:= functions.ind_type_fn(l.Customer_Program);
 		self.rawlinkid	:= l.rawlinkid;
 		//https://confluence.rsi.lexisnexis.com/display/GTG/Data+Source+Identification
-		self.RIN_Source := map(	l.file_type = 3  => 4, //identity
-								l.file_type = 1 and l.deceitful_confidence != '3'  => 5, //knownrisk
-								l.file_type = 1 and l.deceitful_confidence = '3'  => 7,  //safelist
-								l.file_type = 5  => 6,  //status update
-								l.RIN_Source); 
-
+		self.RIN_Source := if(l.inquiry_source = 'RIN_API', 13, 
+								map(	l.file_type = 3  => 4, //identity
+									l.file_type = 1 and l.deceitful_confidence != '3'  => 5, //knownrisk
+									l.file_type = 1 and l.deceitful_confidence = '3'  => 7,  //safelist
+									l.file_type = 5  => 6,  //status update
+									l.RIN_Source)); 
 		self:=l;
 		self:=[];
 	end;
