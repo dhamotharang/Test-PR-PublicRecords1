@@ -19,6 +19,7 @@ PRTE2.CleanFields(Files.Email_Domain_In, dsClnDomainEventData);
 domain_event_base:= project(dsClnDomainEventData,
 Transform(Layouts.Base_Domain_Layout,
 SELF:=Left;
+self:=[];
 ));
 
 addGlobal_SID			:= MDR.macGetGlobalSid(email_event_base, 'EmailDataV2', 'source', 'global_sid');	
