@@ -35,13 +35,13 @@ EXPORT Append_RinID(
 		(   
 			(cleaned_name.fname !='' and cleaned_name.lname !='' and 
 				_Validate.Date.fIsValid(clean_dob) and (unsigned)clean_dob <= (unsigned)(STRING8)Std.Date.Today() and	clean_dob != '' and clean_dob != '00000000' and
-				(length(STD.Str.CleanSpaces(clean_ssn))=9 and regexfind('^[0-9]*$',STD.Str.CleanSpaces(clean_ssn)) =true ))
+				(length(STD.Str.CleanSpaces(clean_ssn))=9 and regexfind('^[0-9]*$',STD.Str.CleanSpaces(clean_ssn)) =true and clean_ssn != '000000000'))
 				
 			or
 
 		(
 			(cleaned_name.fname !='' and cleaned_name.lname !='' and
-				_Validate.Date.fIsValid(clean_dob) and (unsigned)clean_dob <= (unsigned)(STRING8)Std.Date.Today() and	clean_dob != '' and clean_dob != '00000000' and clean_address.prim_range != '' and clean_address.prim_name != '') and 
+				_Validate.Date.fIsValid(clean_dob) and (unsigned)clean_dob <= (unsigned)(STRING8)Std.Date.Today() and	clean_dob != '' and clean_dob != '00000000' and regexreplace('0',clean_address.prim_range,'') != '' and clean_address.prim_name != '') and 
 				(
 					(clean_address.v_city_name != '' and clean_address.st != '')
 					or
