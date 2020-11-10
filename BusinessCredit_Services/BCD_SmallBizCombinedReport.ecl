@@ -358,7 +358,7 @@ EXPORT BCD_SmallBizCombinedReport :=
                                                                        );
   ds_Results := 
     PROJECT(ds_Results_withSmBizSBFEroyalty, 
-      TRANSFORM(iesp.smallbusinessbipcombinedreport.t_BcdSmallBusinessCombinedReportResponse, 
+      TRANSFORM(iesp.bcdsmallbusinesscombinedreport.t_BcdSmallBusinessCombinedReportResponse,
         SELF.InputEcho := search; // Grab the exact input from the "search" ESDL near the top
         SELF.SmallBusinessAnalyticsResults := ds_Final_SmallBizAnaResults;
         SELF := LEFT;
