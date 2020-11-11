@@ -17,17 +17,17 @@ EXPORT fn_flatten(dataset(Nac_v2.Layouts.base) base1) := FUNCTION
 						self.Mail_addr2    := StandardizeName(TRIM(left.Case_Mailing_Address_City) + if(left.Case_Mailing_Address_City = '' OR Std.Str.EndsWith(TRIM(left.Case_Mailing_Address_City),','),'',',') 
 																			+ ' ' + left.Case_Mailing_Address_State + ' ' + left.Case_Mailing_Address_Zip[1..5]);
 																			
-						self.Case_Physical_Address_Street_1 := uc(left.Case_Physical_Address_Street_1);
-						self.Case_Physical_Address_Street_2 := uc(left.Case_Physical_Address_Street_2);
-						self.Case_Physical_Address_City := uc(left.Case_Physical_Address_City);
+						self.Case_Physical_Address_Street_1 := fix(left.Case_Physical_Address_Street_1);
+						self.Case_Physical_Address_Street_2 := fix(left.Case_Physical_Address_Street_2);
+						self.Case_Physical_Address_City := fix(left.Case_Physical_Address_City);
 
-						self.Case_Mailing_Address_Street_1 := uc(left.Case_Mailing_Address_Street_1);
-						self.Case_Mailing_Address_Street_2 := uc(left.Case_Mailing_Address_Street_2);
-						self.Case_Mailing_Address_City := uc(left.Case_Mailing_Address_City);
+						self.Case_Mailing_Address_Street_1 := fix(left.Case_Mailing_Address_Street_1);
+						self.Case_Mailing_Address_Street_2 := fix(left.Case_Mailing_Address_Street_2);
+						self.Case_Mailing_Address_City := $.StandardizeName(left.Case_Mailing_Address_City);
 
 						self.Prepped_name := fix(left.Prepped_name);
-						self.Prepped_addr1 := uc(left.Prepped_addr1);
-						self.Prepped_addr2 := uc(left.Prepped_addr2);
+						self.Prepped_addr1 := fix(left.Prepped_addr1);
+						self.Prepped_addr2 := fix(left.Prepped_addr2);
 						
 						casename := fix(left.Case_Last_Name);
 						self.Case_Last_Name := IF(REGEXFIND(rgxSfx, casename), REGEXFIND(rgxSfx, casename, 1), casename);
