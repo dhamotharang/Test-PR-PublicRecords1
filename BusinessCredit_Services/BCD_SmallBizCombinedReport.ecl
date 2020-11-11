@@ -86,10 +86,8 @@ EXPORT BCD_SmallBizCombinedReport :=
     STRING10 InterfaceVersion       := '' : STORED('_ESPClientInterfaceVersion');
     STRING5 DeliveryMethod          := '' : STORED('_DeliveryMethod');
     STRING5 DeathMasterPurpose      := '' : STORED('__deathmasterpurpose');
-    outofbandssnmask                := '' : STORED('SSNMask');
-    STRING10 SSN_Mask               := IF(users.SSNMask != '', users.SSNMask, outofbandssnmask);
-    outofbanddobmask                := '' : STORED('DOBMask');
-    STRING10 DOB_Mask               := IF(users.DOBMask != '', users.DOBMask, outofbanddobmask);			
+    STRING10 SSN_Mask               := IF(users.SSNMask != '', users.SSNMask, global_mod.ssnmask);
+    STRING10 DOB_Mask               := IF(users.DOBMask != '', users.DOBMask, global_mod.dobmask);			
     BOOLEAN DL_Mask                 := users.DLMask;
     BOOLEAN ExcludeDMVPII           := users.ExcludeDMVPII;
     BOOLEAN ArchiveOptIn            := FALSE : STORED('instantidarchivingoptin');
