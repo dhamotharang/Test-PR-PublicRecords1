@@ -2,24 +2,9 @@
 
 export proc_build_keys(string filedate) := function
 
-// RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(fcra_opt_out.key_did
-//                       ,'~thor_data400::key::fcra::optout::did'
-// 										  ,'~thor_data400::key::fcra::optout::'+filedate+'::did'
-// 										  ,build_key_did);
 RoxieKeyBuild.MAC_build_logical(dx_fcra_opt_out.key_did,$.data_key_did,'','~thor_data400::key::fcra::optout::'+filedate+'::did',build_key_did);
-
-// RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(fcra_opt_out.key_ssn
-//                       ,'~thor_data400::key::fcra::optout::ssn'
-// 										  ,'~thor_data400::key::fcra::optout::'+filedate+'::ssn'
-// 										  ,build_key_ssn);
 RoxieKeyBuild.MAC_build_logical(dx_fcra_opt_out.key_ssn,$.data_key_ssn,'','~thor_data400::key::fcra::optout::'+filedate+'::ssn',build_key_ssn);
-									  
-// RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(fcra_opt_out.key_address
-//                       ,'~thor_data400::key::fcra::optout::address'
-// 										  ,'~thor_data400::key::fcra::optout::'+filedate+'::address'
-// 										  ,build_key_address);										  
 RoxieKeyBuild.MAC_build_logical(dx_fcra_opt_out.key_address,$.data_key_address,'','~thor_data400::key::fcra::optout::'+filedate+'::address',build_key_address);
-									  
 
 //DF-28230 Build Delta_Rid key 
 RoxieKeyBuild.MAC_build_logical(dx_fcra_opt_out.key_delta_rid(),$.data_key_delta_rid,'','~thor_data400::key::fcra::optout::'+filedate+'::delta_rid',build_key_optout);
@@ -46,14 +31,10 @@ RoxieKeyBuild.MAC_SK_Move_to_Built_v2('~thor_Data400::key::fcra::optout::delta_r
 // -- Move Keys to QA
 /////////////////////////////////////////////////////////////////////////////////
 
-// ut.mac_sk_move_v2('~thor_data400::key::fcra::optout::did','Q',mv2qa_did);
 promotesupers.Mac_SK_Move_v2('~thor_data400::key::fcra::optout::did','Q',mv2qa_did,2);
-// ut.mac_sk_move_v2('~thor_data400::key::fcra::optout::ssn' ,'Q',mv2qa_ssn);
 promotesupers.Mac_SK_Move_v2('~thor_data400::key::fcra::optout::ssn','Q',mv2qa_ssn);
-// ut.mac_sk_move_v2('~thor_data400::key::fcra::optout::address' ,'Q',mv2qa_address);
 promotesupers.Mac_SK_Move_v2('~thor_data400::key::fcra::optout::address','Q',mv2qa_address);
 promotesupers.Mac_SK_Move_v2('~thor_data400::key::fcra::optout::delta_rid','Q',mv2qa_delta_rid,2);
-
 
 //////////////////////////////
 
