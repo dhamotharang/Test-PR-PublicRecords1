@@ -54,9 +54,8 @@ EXPORT Map_BK_AssignRelease_Base (STRING	pVersionDate
 																
 	code_lkp := Address.County_Names;
 	StateCodes_dict	:= DICTIONARY(code_lkp, {state_code => state_alpha});
-	CountyCodes_dict := DICTIONARY(code_lkp, {county_code => county_name});
   StCodeLkp(STRING code ) := StateCodes_dict[code].state_alpha;
-	CntyCodeLkp(STRING code ) := CountyCodes_dict[code].county_name;
+	CntyCodeLkp(STRING code ) := Address.County_Names(state_code = code[1..2] AND county_code = code[3..5])[1].county_name;
 	
 	common.layout_prep_temp_deed tMap2Common(RECORDOF(ARPrepDataSet.dARMortgageRawCombined)	pInput,integer	cnt)	:=
 		TRANSFORM
@@ -88,7 +87,7 @@ EXPORT Map_BK_AssignRelease_Base (STRING	pVersionDate
 			SELF.from_file														:=	'M';
 			SELF.fips_code														:=	pInput.FIPSCode;
 			SELF.state																:=	StCodeLkp(pInput.FIPSCode[1..2]);
-			SELF.county_name													:=	CntyCodeLkp(pInput.FIPSCode[3..5]);
+			SELF.county_name													:=	CntyCodeLkp(pInput.FIPSCode);
 			SELF.record_type													:=	pInput.RecType;
 			SELF.apnt_or_pin_number										:=	pInput.APNNumber;
 			SELF.multi_apn_flag												:=	pInput.MultiAPNFlag;
@@ -401,11 +400,11 @@ EXPORT Map_BK_AssignRelease_Base (STRING	pVersionDate
 		dSearchCleanNormName := dedup(sort(normalize(dSearchCleanName,2,tNormSearchCleanNames(LEFT,counter)),
 																	record,local),record, EXCEPT conjunctive_name_seq,local);
 		
-		LN_Propertyv2.Append_AID(dSearchCleanNormName,dSearchCleanAddr,false);
-		dSearchAID	:=	dSearchCleanAddr;
+		//LN_Propertyv2.Append_AID(dSearchCleanNormName,dSearchCleanAddr,false); // DF-28245 unify multiple calls to AID into a single call
+		//dSearchAID	:=	dSearchCleanAddr;
 		
 		//Reformat to bring to base file layouts
-		EXPORT dNew	:=	project(dSearchAID(nameasis	!=	''), LN_PropertyV2_Fast.Layout_prep_search_prp);
+		EXPORT dNew	:=	project(dSearchCleanNormName(nameasis	!=	''), LN_PropertyV2_Fast.Layout_prep_search_prp);
 	
 	END;
 END;
