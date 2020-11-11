@@ -1,7 +1,11 @@
 ﻿IMPORT $, dx_common, AID, BIPV2, Header;
 
 EXPORT Layouts := MODULE
+<<<<<<< Updated upstream
   //Layout for LinkID key
+=======
+//Layout for LinkID key
+>>>>>>> Stashed changes
   EXPORT BIP_layout := RECORD
     STRING70 foreclosure_id;
     STRING20 name_first;
