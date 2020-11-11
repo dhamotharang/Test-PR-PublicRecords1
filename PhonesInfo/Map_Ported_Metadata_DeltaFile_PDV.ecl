@@ -50,7 +50,7 @@ EXPORT Map_Ported_Metadata_DeltaFile_PDV(string version):= FUNCTION
 	//Reformat Dates & Add Counter
 	PhonesInfo.Layout_iConectiv.Intermediate_PortData_Validate fixFile(reformFile l, unsigned c):= transform
 			
-			file_dt_time					:= Std.Str.FindReplace(Std.Str.FindReplace(l.filename,'thor_data400::in::phones::iconectiv_', ''),'.json',''); //Pull Date and Timestamp Only from Filename	
+			file_dt_time					:= Std.Str.FindReplace(Std.Str.FindReplace(l.filename,'thor_data400::in::phones::portdata_validate_dailydelta_iconectiv_', ''),'.json',''); //Pull Date and Timestamp Only from Filename	
 			f_port_dt							:= stringlib.stringfilter(l.actTs, '0123456789');	
 			
 		self.action_code									:= map(l.action = 'u' => 'A',
