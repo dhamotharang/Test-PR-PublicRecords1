@@ -39,7 +39,8 @@ EXPORT As_Business_Linking_Contact (
 				SELF.contact_name.name_suffix		 := l.clean_name.name_suffix;
 				SELF.contact_email               := l.efx_email;
 			  SELF.contact_phone               := '';
-				SELF.contact_type_raw            := l.exploded_title_description;
+				SELF.contact_type_raw            := l.efx_titlecd;
+				SELF.contact_job_title_raw       := l.efx_titledesc;
 				SELF 							   						 := l;
 				SELF 							   						 := [];
 		end;
