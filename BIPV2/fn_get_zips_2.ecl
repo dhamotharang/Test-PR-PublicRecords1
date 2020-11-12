@@ -12,7 +12,8 @@ EXPORT fn_get_zips_2(STRING sCity,STRING sState,STRING sZip,UNSIGNED iRadius):=F
   
   // Derive the zip from city/state and add to the entered zip
   lZipList:={STRING zip;};
-  dDerivedZips:=TABLE(BIPV2_Build.keys(, pUseOtherEnvironment:= tools._Constants.IsDataland).ZipCitySt.qa(keyed(city=StringLib.StringToUpperCase(sCity) AND state=sStateChecked)),{STRING zip:=zip5;});
+  useOtherEnv := tools._Constants.IsDataland or tools._Constants.IsAlpha_dev;
+  dDerivedZips:=TABLE(BIPV2_Build.keys(, pUseOtherEnvironment:= useOtherEnv).ZipCitySt.qa(keyed(city=StringLib.StringToUpperCase(sCity) AND state=sStateChecked)),{STRING zip:=zip5;});
   dZipsFromCitySt:=IF(sCity='' OR sStateChecked='',DATASET([],lZipList),PROJECT(dDerivedZips,lZipList));
   dZipList:=DATASET([{sZip}],lZipList)+dZipsFromCitySt;
   
