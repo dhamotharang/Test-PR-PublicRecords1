@@ -10,7 +10,7 @@ EXPORT infile_boca 	:= DATASET(Constants.in_prefix_name + '::boca', layout_boca_
 EXPORT infile_ins 	:= DATASET(Constants.in_prefix_name + '::ins',  Layout_insurance_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"'), maxlength(5200)) );
 
 //New File for BuyCash KY Integration
-EXPORT infile_agencycmbnd		:= dataset(Constants.in_prefix_name + '::agency', FLAccidents_Ecrash.Layout_Infiles_Fixed.agency_cmbnd, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
+EXPORT infile_agencycmbnd		:= dataset(Constants.in_prefix_name + '::agency', Layout_Agency_Ins, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
 
 //New File for Agency Key
 EXPORT dsAgency							:= project(infile_agencycmbnd, transform(layouts.agency, self := left, self:= []));
@@ -26,7 +26,12 @@ end;
 infile_ins_seq := project(infile_ins, AppendRID(left,counter)): persist('~prte::persist::ecrash_cru_juris');
 EXPORT File_eCrashCRU 		:= fix_juris(infile_ins_seq, jurisdiction, rid);
 
-export ecrash_basefile 		:= project(File_eCrashCRU, transform(FLAccidents_Ecrash.Layout_Basefile, self.did := (unsigned)left.did, self := left, self := []));
+export ecrash_basefile 		:= project(File_eCrashCRU, 
+																		 transform(FLAccidents_Ecrash.Layout_Basefile, 
+																							self.did 								  := (unsigned)left.did; 
+																							self.is_terminated_agency := if(left.is_terminated_agency = '0',false,true);
+																							self := left; 
+																							self := []));
 
 EXPORT base_alpharetta    := project(File_eCrashCRU, transform(FLAccidents.Layout_NtlAccidents_Alpharetta.clean, 
 																													 self.did := (integer)left.did, 
@@ -166,9 +171,10 @@ EXPORT ds_ecrash8 :=dedup(pflc8,all);
 
 //Creating Supplemental file 
 shared supplemental:= project(File_eCrashCRU, transform(FLAccidents_Ecrash.Layouts.ReportVersion, 
-															 self.super_report_id := left.report_id;
-															 self.hash_key 				:= left.image_hash;
-															 self.report_code 		:= left.report_code;
+															 self.super_report_id 			:= left.report_id;
+															 self.hash_key 							:= left.image_hash;
+															 self.report_code 					:= left.report_code;
+															 self.is_terminated_agency  := if(left.is_terminated_agency = '0',false,true);
 															 self := left; 
 															 self := [])); 
 

@@ -234,12 +234,12 @@ key_validation :=  output(dops.ValidatePRCTFileLayout(version, prte2.Constants.i
 
 keybuild_process :=  sequential(
 																build_keys
-																// ,Move_Keys 
-																// ,To_QA
+																,Move_Keys 
+																,To_QA
 																,proc_build_keys_addl(version)
 																,retval		
 																,key_validation
-																// ,PerformUpdateOrNot
+																,PerformUpdateOrNot
 																): Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify, 'Ecrash Build Succeeded', workunit + ': Build completed.')),
 																	 Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify, 'Ecrash Build Build Failed', workunit + '\n' + FAILMESSAGE));
 

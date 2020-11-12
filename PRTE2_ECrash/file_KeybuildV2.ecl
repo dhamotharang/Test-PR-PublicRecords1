@@ -166,7 +166,8 @@ FLAccidents_Ecrash.Layout_eCrash.Consolidation_AgencyOri slimrec(ntlFile L) := t
        SELF.idfield                  := prefix + (unsigned6) if(trim(L.vehicle_incident_id,all) <> '', L.vehicle_incident_id, '0');
 */
 		//Appriss Integration
-		self.Releasable := L.Releasable; 	
+		self.Releasable 					:= L.Releasable; 	
+		self.is_terminated_agency := if(l.is_terminated_agency = '0',false,true);
 		self						:= L;
 		self						:= [];
 end;
@@ -224,7 +225,12 @@ AlphaCmbnd := AlphaOther +  AlphaIA (reason_id in ['HOLD','AFYI','ASSI','AUTO','
 
 AlphaOtherVendors := AlphaCmbnd(trim(vendor_code, left,right) <> 'COPLOGIC');
 AlphaCoplogic 		:= AlphaCmbnd(trim(vendor_code, left,right) = 'COPLOGIC' and ((trim(supplemental_report,left,right) ='1' and trim(super_report_id, left, right) <> trim(report_id, left, right))or (trim(supplemental_report,left,right) ='0' and trim(super_report_id, left, right) = trim(report_id, left, right)) or (trim(supplemental_report,left,right) ='' and trim(super_report_id, left, right) = trim(report_id, left, right) )) );
-export Alpha  		:=  project(AlphaOtherVendors + AlphaCoplogic, transform(FLAccidents_Ecrash.Layout_eCrash.Accidents_Alpha, self := left;));
+// export Alpha  		:=  project(AlphaOtherVendors + AlphaCoplogic, 
+															// transform(FLAccidents_Ecrash.Layout_eCrash.Accidents_Alpha,
+																				// self.is_terminated_agency := false;
+																				// self := left;
+																				// self := []);
+															// );
 export out   			:= outrecs0(CRU_inq_name_type not in ['2','3'] and report_code not in InteractiveReports /*and trim(vendor_code, left,right) <> 'COPLOGIC'*/): persist('~prte::persist::ecrash_out');
 
 shared foutrecs0 := outrecs0(CRU_inq_name_type not in ['2','3'] and report_code not in InteractiveReports and trim(vendor_code, left,right) <> 'COPLOGIC');
@@ -238,7 +244,7 @@ shared EcrashAgencyExclusionAgencyOri := foutrecs0(STD.Str.ToUpperCase(TRIM(agen
 shared EcrashAgencyExclusion := EcrashAgencyExclusionAgencyOri(STD.Str.ToUpperCase(TRIM(agency_ori, ALL)) NOT IN constants.Agency_ori_list AND
                                                                STD.Str.ToUpperCase(TRIM(agency_ori, ALL))[1..2] NOT IN constants.Agency_ori_jurisdiction_list
 																				                       );
-export prout := project(EcrashAgencyExclusion, transform(FLAccidents_Ecrash.Layout_eCrash.Consolidation, self := left;));
+export prout := project(EcrashAgencyExclusion, transform(FLAccidents_Ecrash.Layout_eCrash.Consolidation, self := left, self := []));
 
 
 //Excluding WORK_TYPE_ID filter required by CARRIER ID SERVICE

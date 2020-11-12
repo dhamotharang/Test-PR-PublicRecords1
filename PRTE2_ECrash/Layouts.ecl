@@ -1651,8 +1651,8 @@ EXPORT ecrashv2_partialaccnbr := RECORD
  
 EXPORT ecrashv2_photoid := RECORD
   string11 super_report_id;
-	FLAccidents_Ecrash.Layouts.PhotoLayout;
-	string3 report_source;
+	FLAccidents_Ecrash.Layouts.PhotoLayout and not [is_terminated_agency];
+	// string3 report_source;
  END;
  
 EXPORT ecrashv2_prefname_state := RECORD
@@ -2006,27 +2006,28 @@ END;
 
 	EXPORT key_slim_layout := FLAccidents_Ecrash.Layouts.key_slim_layout;
 	// EXPORT slim_rec_reportlinkid := FLAccidents_Ecrash.Layouts.key_slim_layout or {string3 contrib_source};
-	EXPORT slim_rec_reportlinkid := key_slim_layout or {string3 contrib_source};
+	EXPORT slim_rec_reportlinkid := key_slim_layout /*or {string3 contrib_source}*/;
 		
 	EXPORT linkids := FLAccidents_Ecrash.Layout_Keybuild_Linkids;
 	
-	EXPORT key_search_rec := FLAccidents_Ecrash.Layouts.key_search_layout or {string3 contrib_source};
+	EXPORT key_search_rec := FLAccidents_Ecrash.Layouts.key_search_layout/* or {string3 contrib_source}*/;
 	
 	// EXPORT key_slim_rec := FLAccidents_Ecrash.Layouts.key_slim_layout or {string3 contrib_source};
-	EXPORT key_slim_rec := key_slim_layout or {string3 contrib_source};
+	EXPORT key_slim_rec := key_slim_layout/* or {string3 contrib_source}*/;
 	
-	EXPORT agency := record
-		FLAccidents_Ecrash.Layout_Infiles_Fixed.agency_cmbnd - [Source_ID, Append_Overwrite_Flag];
-		string3 source_id;
-		string2 append_overwrite_flag;
-		string10 	source_start_date;
-		string10 	source_end_date;
-		string20 	source_termination_date;
-		string1 	source_resale_allowed;
-		string1 	source_auto_renew;
-		string1 	source_allow_sale_of_component_data;
-		string1 	source_allow_extract_of_vehicle_data;
-	end;
+	EXPORT agency := FLAccidents_Ecrash.layout_Keys_eCrash.Agency;
+	// record
+		// FLAccidents_Ecrash.Layout_Infiles_Fixed.agency_cmbnd - [Source_ID, Append_Overwrite_Flag];
+		// string3 source_id;
+		// string2 append_overwrite_flag;
+		// string10 	source_start_date;
+		// string10 	source_end_date;
+		// string20 	source_termination_date;
+		// string1 	source_resale_allowed;
+		// string1 	source_auto_renew;
+		// string1 	source_allow_sale_of_component_data;
+		// string1 	source_allow_extract_of_vehicle_data;
+	// end;
 
 	EXPORT vin := RECORD
 		string30 l_vin;
