@@ -1373,6 +1373,7 @@
 				trim(kword, left, right) = 'NAMFISA' =>SubGroup_Constants.numKeywordsID.KEYWORD_NAMFISA,
 				trim(kword, left, right) = 'RWOMBUD' =>SubGroup_Constants.numKeywordsID.KEYWORD_RWOMBUD,
 				trim(kword, left, right) = 'DKFOROM' =>SubGroup_Constants.numKeywordsID.KEYWORD_DKFOROM,
+				trim(kword, left, right) = 'AFNPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_AFNPA,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
