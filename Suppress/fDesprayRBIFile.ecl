@@ -27,8 +27,8 @@ EXPORT fDesprayRBIFile(String pVersion, string pHostname, string pTarget, string
     lzFileName      := pTarget+'/'+$.Constants.OptOut(pVersion).FileNameForRBI;
  
     // Create RBI output file on THOR
-    out_rbi_file    := OUTPUT(rbi_file_srt,,thorFileName,
-		                           CSV(HEADING('ENTRY_TYPE|LEXID|PROF_DATA|STATE_ACT|DATE_OF_REQUEST|EMAIL\n',
+    out_rbi_file    := OUTPUT(rbi_file_srt,,thorFileName,	
+		                           CSV(HEADING('ENTRY_TYPE|LEXID|PROF_DATA|STATE_ACT|DATE_OF_REQUEST|VERIFIED_EMAIL\n',
 																												 'ROWCOUNT|'+(STRING)(count(rbi_file_srt))+'||||\n',
 																									      SINGLE),
 																							SEPARATOR('|'), QUOTE('')),OVERWRITE,COMPRESSED);
