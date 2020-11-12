@@ -15,6 +15,7 @@
 	UNSIGNED8 			exemptions;						//Exemption mask used by query
 	STRING10 			act_id;
 	STRING8 			date_added;
+	STRING100			EMAIL;							//DF-28437 - MBS extract adds email address field
 	SET OF UNSIGNED4	global_sids;
 	UNSIGNED8 			rcid;
 	
