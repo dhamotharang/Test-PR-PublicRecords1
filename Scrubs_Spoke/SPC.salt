@@ -1,0 +1,36 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_Spoke
+FILENAME:Spoke
+NAMESCOPE:Input 
+//-------------------------
+//FIELDTYPE DEFINITIONS
+//-------------------------
+FIELDTYPE:invalid_first_name:CUSTOM(Scrubs_Spoke.Functions.fn_valid_name>0)
+FIELDTYPE:invalid_last_name:CUSTOM(Scrubs_Spoke.Functions.fn_valid_name>0)
+FIELDTYPE:invalid_company_name:CUSTOM(Scrubs_Spoke.Functions.fn_valid_name>0)
+FIELDTYPE:invalid_validation_date:CUSTOM(Scrubs_Spoke.Functions.fn_valid_Date>0)
+FIELDTYPE:invalid_owner_name:CUSTOM(Scrubs_Spoke.Functions.fn_valid_name>0)
+FIELDTYPE:invalid_company_state:CUSTOM(Scrubs.Functions.fn_Valid_StateAbbrev>0)
+FIELDTYPE:invalid_postal_code:CUSTOM(Scrubs.Functions.fn_valid_zip >0)
+FIELDTYPE:invalid_phone_number:CUSTOM(Scrubs.Functions.fn_verify_optional_phone>0)
+FIELDTYPE:invalid_annual_revenue:CUSTOM(Scrubs.Functions.fn_numeric>0)
+
+//--------------------------------------------------------------- 
+//FIELDS TO SCRUB 
+//---------------------------------------------------------------
+FIELD:first_name:TYPE(STRING50):LIKE(invalid_first_name):0,0
+FIELD:last_name:TYPE(STRING50):LIKE(invalid_last_name):0,0
+FIELD:job_title:TYPE(STRING125):0,0
+FIELD:company_name:TYPE(STRING255):LIKE(invalid_company_name):0,0
+FIELD:validation_date:TYPE(STRING19):0,0
+FIELD:company_street_address:TYPE(STRING100):0,0
+FIELD:company_city:TYPE(STRING40):0,0
+FIELD:company_state:TYPE(STRING5):LIKE(invalid_company_state):0,0
+FIELD:company_postal_code:TYPE(STRING19):LIKE(invalid_postal_code):0,0
+FIELD:company_phone_number:TYPE(STRING20):LIKE(invalid_phone_number):0,0
+FIELD:company_annual_revenue:TYPE(STRING30):LIKE(invalid_annual_revenue):0,0
+FIELD:company_business_description:TYPE(STRING255):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

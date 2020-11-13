@@ -1,5 +1,5 @@
 ﻿import ut;
-export BWR_Run_Watchdog(string build_type) := function
+export BWR_Run_Watchdog(string build_type,boolean isnewheader = false) := function
 /*Change the second parameter in the stored function to run 
 '' -- Complete file
 'nonglb' -- Nonglb with Utility
@@ -11,7 +11,6 @@ export BWR_Run_Watchdog(string build_type) := function
 'supplemental' -- Supplemental SmartLinx file 
 */
 
-boolean isnewheader := Watchdog.proc_Validate_NewHdr.out;
 
 verify_hdr := output(isnewheader,named('NewHdrcheck'));
 // set this to true/false after running Watchdog.is_new_header

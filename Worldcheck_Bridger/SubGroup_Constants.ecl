@@ -276,6 +276,8 @@
 		export string VESSEL						:= '24';
 		export string CRIME_TERROR				:= '25';
 		export string NONCONVICTION_TERROR				:= '26';
+		export string SPECIAL_JURISDICTION				:= '27';
+		export string WEBSITE				:= '28';
 	end;
 
 	export numSubCategory := module
@@ -1269,6 +1271,8 @@
 		export string KEYWORD_UGPPDA								:= '953';
 		export string KEYWORD_NAMFISA								:= '954';
 		export string KEYWORD_RWOMBUD								:= '955';
+		export string KEYWORD_DKFOROM								:= '956';
+		export string KEYWORD_AFNPA									:= '957';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

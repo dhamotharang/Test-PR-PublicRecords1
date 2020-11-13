@@ -1,8 +1,8 @@
-import History_Analysis,ML_Core;
+import History_Analysis,ML_Core, PromoteSupers;
 
-export MLCoreCalculateStatistics:=function
+export MLCoreCalculateStatistics( String pVersion ):=function
 
-loadfile:=History_Analysis.Files.History_Analysis_SF;
+loadfile:= History_Analysis.Files(pVersion).Counted_Deltas;
 
 WithRecID:=RECORD
     unsigned recid:=0;
@@ -113,8 +113,9 @@ History_Analysis.Layouts.StatisticsRec tCalculate(CombinedRec L, dataset(Combine
 
  CalculateDelta:=rollup(GroupFile,GROUP,tCalculate(left,ROWS(left)));
 
- CreateFile:=output(CalculateDelta,,'~thor_data400::history_analysis::base::Delta_Statistics',thor,__compressed__,overwrite);
 
-return CreateFile;
+PromoteSupers.Mac_SF_BuildProcess(CalculateDelta, History_Analysis.Filenames(pVersion).BaseStatistics, dsResult, 3,, True);
+
+return dsResult;
 
 end;

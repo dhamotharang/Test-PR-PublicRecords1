@@ -1,4 +1,4 @@
-﻿import bipv2,bipv2_files,BIPV2_ProxID,tools,bipv2_tools,wk_ut,std,mdr,corp2,paw;
+﻿import bipv2,bipv2_files,BIPV2_ProxID,tools,bipv2_tools,wk_ut,std,mdr,corp2,paw,BIPV2_ForceLink;
 
 lay_an_corpkeys := recordof(BIPV2_Files.tools_dotid().Solo_Assumed_Name_Corpkeys());
 
@@ -22,9 +22,15 @@ function
   ));
 
   ds_pop_corpkeys := BIPV2_Tools.mac_Populate_Corpkeys(ds_slim);
-    
-  ds_patch_proxids  := BIPV2_Tools.initParentID(ds_pop_corpkeys,dotid,proxid);
-  ds_use            := if(pStrataBuildStep = 'Proxid' ,ds_patch_proxids ,ds_slim);
+  
+  // -- Initialize zero proxids
+  ds_patch_proxids    := BIPV2_Tools.initParentID(ds_pop_corpkeys,dotid,proxid);
+  
+  // -- patch Proxid underlinks outside of salt
+  ds_patch_Underlinks := BIPV2_ForceLink.mac_ForceLink_Proxid(ds_patch_proxids);
+  
+  // -- only intialize zero proxids and patch underlinks once.  when called a second time in the process, skip that part.
+  ds_use            := if(pStrataBuildStep = 'Proxid' ,ds_patch_Underlinks ,ds_slim);
 
   // -- only use match candidates
   // ds_mc             := dataset('~temp::Proxid::BIPV2_ProxID::mc' ,recordof(BIPV2_ProxID.match_candidates(BIPV2_ProxID.in_DOT_Base).Annotated)  ,flat);

@@ -1954,7 +1954,15 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2020/1505 Syria List','1941'},
 {'EC 2020/1507 Democratic Republic of the Congo List','1942'},
 {'EC (CFSP) 2020/1537 Cyber-Attacks List','1943'},
-{'EC 2020/1536 Cyber-Attacks List','1944'}
+{'EC 2020/1536 Cyber-Attacks List','1944'},
+{'EC (CFSP) 2020/1585 Burundi List','1945'},
+{'EC 2020/1578 Burundi List','1946'},
+{'EC (CFSP) 2020/1650 Belarus List','1947'},
+{'EC (CFSP) 2020/1651 Syria List','1948'},
+{'EC (CFSP) 2020/1657 Turkey List','1949'},
+{'EC 2020/1648 Belarus List','1950'},
+{'EC 2020/1649 Syria List','1951'},
+{'EC 2020/1655 Turkey List','1952'}
 
 ],r);
 

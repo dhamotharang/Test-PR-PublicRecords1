@@ -1,17 +1,12 @@
 ﻿#OPTION('multiplePersistInstances',FALSE);
+IMPORT Data_services, Std;
 
-IMPORT Std;
+//DF-28036: Convert 6-Digit Spids to 4-Character Spids
 	
-	tempLayout := record
-		PhonesInfo.Layout_iConectiv.Intermediate;
-		integer uniqueid;
-		string ocn;
-	end;
-
 ////////////////////////////////////////////////////////////////////////////////////////////	
 //Reformat iConectiv Input File/////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
-	
+	/*
 	//Pull Existing iConectiv History w/ Newly Concatenated Daily - LEGACY PORT RECORDS
 	dailyICInput 		:= PhonesInfo.File_iConectiv.In_Port_Daily_History(action_code in ['A','U','D'] and porting_dt<>'');
 
@@ -41,7 +36,27 @@ IMPORT Std;
 		self 													:= l;
 	end;
 
-	iConectivInput 	:= project(dailyICInput, fixICFile(left, counter));
+	iConectivIn 		:= project(dailyICInput, fixICFile(left, counter));
+	
+	//Append OCN
+	srtCRef 				:= sort(distribute(PhonesInfo.File_Source_Reference.Main_Orig(is_current=TRUE), hash(spid)), spid, local);
+	srtTInput				:= sort(distribute(iConectivIn, hash(spid)), spid, local);
+	
+	tempLayout addOCNTr(srtTInput l, srtCRef r):= transform
+		self.ocn 											:= r.ocn;
+		self.spid											:= r.ocn; //Equate SPID to OCN
+		self 													:= l;
+	end;
+	
+	addTOCN 				:= join(srtTInput, srtCRef,
+													left.spid = right.spid,
+													addOCNTr(left, right), left outer, local, keep(1));
+	
+	iConectivInput	:= dedup(sort(distribute(addTOCN, hash(phone)), record, local), record, local);
+	*/
+	
+	//Pull Existing iConectiv History - LEGACY PORT RECORDS
+	iConectivInput  := PhonesInfo.File_iConectiv.In_Port_Daily_History_Translated; //Converted Spid-to-OCN
 	
 ////////////////////////////////////////////////////////////////////////////////////////////	
 //Reformat Telo Input File//////////////////////////////////////////////////////////////////
@@ -56,7 +71,7 @@ IMPORT Std;
 	
 	concatDailyTelo		:= dailyTeloAdd + dailyTeloDelAud + dailyTeloDelOth;	
 	
-	tempLayout fixTeloFile(concatDailyTelo l, unsigned c):= transform
+	PhonesInfo.Layout_iConectiv.Intermediate_Temp fixTeloFile(concatDailyTelo l):= transform
 	
 			fn_timeConvert(integer timestamp) := function
 														
@@ -79,8 +94,7 @@ IMPORT Std;
 																				l.operation);
 		self.country_code							:= ''; 
 		self.phone										:= (string)l.tn;		
-		self.dial_type								:= '';		
-		self.spid											:= '';					
+		self.dial_type								:= '';						
 		self.service_type							:= '';	
 		self.routing_code							:= (string)l.lrn;	
 		self.porting_dt								:= f_port_dt;	
@@ -93,32 +107,26 @@ IMPORT Std;
 		self.port_start_dt						:= f_port_dt;
 		self.port_end_dt							:= f_port_dt;
 		self.remove_port_dt						:= if(l.operation='D', f_port_dt, '');
-		self.groupid 									:= c;
+		self.groupid 									:= 0;
 		self.ocn 											:= l.spid;
+		self.spid											:= l.spid;
 		self.uniqueid									:= l.uniqueid;
 	end;
 
-	inputTelo 			:= project(concatDailyTelo, fixTeloFile(left, counter));
-	
-	//Append Spid
-	srtCRef 				:= sort(distribute(PhonesInfo.File_Source_Reference.Main, hash(ocn)), ocn, local);
-	srtTInput				:= sort(distribute(inputTelo, hash(ocn)), ocn, local);
-	
-	tempLayout addSpidTr(srtTInput l, srtCRef r):= transform
-		self.spid 										:= r.spid;	
-		self 													:= l;
-	end;
-	
-	addTSPID 				:= join(srtTInput, srtCRef,
-													left.ocn = right.ocn,
-													addSpidTr(left, right), left outer, local, keep(1));
-	
-	teloInput				:= dedup(sort(distribute(addTSPID, hash(phone)), record, local), record, local);
+	teloInput 			:= project(concatDailyTelo, fixTeloFile(left));
 	
 ////////////////////////////////////////////////////////////////////////////////////////////	
 //Concat Input Files////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-	concatRec				:= iConectivInput + teloInput : persist('~thor_data400::persist::port::inputFile'); 
+	ccRec						:= iConectivInput + teloInput;
+
+	//Add Counter to Concatenated Files
+	PhonesInfo.Layout_iConectiv.Intermediate_Temp addCtr(ccRec l, unsigned c):= transform
+		self.groupid 	:= c;
+		self 					:= l;
+	end;
+
+	concatRec 			:= project(ccRec, addCtr(left, counter)) : persist('~thor_data400::persist::port::inputFile2'); 
 
 EXPORT Reformat_Port_Input := concatRec : independent;

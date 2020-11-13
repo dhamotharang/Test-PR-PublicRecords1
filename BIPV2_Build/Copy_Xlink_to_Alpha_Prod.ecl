@@ -7,7 +7,7 @@ EXPORT Copy_Xlink_to_Alpha_Prod(
   ,pistesting           = 'false'
   ,pSkipSuperStuff      = 'true'
   ,pOverwrite           = 'false'
-  ,pkeyfilter2AlphaProd = '\'(bizlinkfull|segmentation_linkids|seleprox|bipv2_best|contact_title_linkids)\''              // copy everything in BIPV2FullKeys package
+  ,pkeyfilter2AlphaProd = '\'(bizlinkfull|segmentation_linkids|seleprox|bipv2_best|contact_title_linkids|strnbrname|zipcityst|strnbrname)\''              // copy everything in BIPV2FullKeys package
   ,psuperversions       = '\'built\''         //add them to these supers after copying
   ,pSrcDali             = '\'uspr-prod-thor-dali.risk.regn.net:7070\''
   ,pDestinationThor     = '\'thor400_112\''
@@ -17,12 +17,11 @@ functionmacro
   import BIPV2,tools,BizLinkFull,wk_ut,bipv2_build,BIPV2_Suppression;
 
   // -- keys to copy
-  myfiles :=  BIPV2_Build.keynames(pversion).BIPV2FullKeys 
-            + BIPV2_Build.keynames(pversion).BIPV2WeeklyKeys 
+  myfiles :=  BIPV2_Build.keynames(pversion).BIPV2FullKeys_Alpha
             ;
             
   // -- suppression key to copy.  have to use it separately since it contains a different version.
-  myfiles2 := BIPV2_Suppression.FileNames.key_sele_prox_names(pversionSuppress).dall_filenames;
+  myfiles2 := BIPV2_Build.keynames(pversionSuppress).BIPV2SuppressionKeys_Alpha;
   
   return sequential(
      // -- copy package keys and then in separate call copy the suppression key
