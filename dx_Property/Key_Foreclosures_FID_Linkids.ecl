@@ -1,4 +1,4 @@
-﻿IMPORT $, doxie, Data_Services;
+﻿IMPORT $;
 
 // ---------------------------------------------------------------
 // For delta rollup logic use: $.key_foreclosure_delta_rid

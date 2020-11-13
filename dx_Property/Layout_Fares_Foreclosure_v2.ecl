@@ -1,6 +1,7 @@
 ﻿IMPORT $, AID, BIPV2, dx_common;
 
 EXPORT Layout_Fares_Foreclosure_v2 := RECORD
+
   STRING70 foreclosure_id;
   STRING2 state;
   STRING3 county;

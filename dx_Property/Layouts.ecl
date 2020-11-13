@@ -1,7 +1,8 @@
 ﻿IMPORT $, dx_common, AID, BIPV2, Header;
 
 EXPORT Layouts := MODULE
-  //Layout for LinkID key
+
+//Layout for LinkID key
   EXPORT BIP_layout := RECORD
     STRING70 foreclosure_id;
     STRING20 name_first;
@@ -224,8 +225,8 @@ EXPORT Layouts := MODULE
   END;
   
   EXPORT i_LinkIDs := RECORD
-		BIPV2.IDlayouts.l_key_ids;
-		BIP_layout - BIPV2.IDlayouts.l_xlink_ids;
+    BIPV2.IDlayouts.l_key_ids;
+    BIP_layout - BIPV2.IDlayouts.l_xlink_ids;
   END;
   
   EXPORT i_ParcelNum := RECORD
