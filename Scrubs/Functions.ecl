@@ -1,5 +1,7 @@
 ﻿IMPORT ut, Scrubs, Codes, MDR, _validate, Codes, std;
 
+IMPORT Phonesplus_v2;
+
 EXPORT Functions := MODULE
 
 
@@ -460,17 +462,39 @@ END;
 //*********************************************************//
 //***************END BUSINESS SECTION**********************//
 //*********************************************************//
+EXPORT fn_Valid_Phone(string no) := FUNCTION 
+
+  isPhoneValid := Phonesplus_v2.Fn_Is_Phone_Valid(no,false);
+  isBlank := no = '';
+  RETURN IF(
+    isPhoneValid OR isBlank,
+    1,
+    0
+  );
+END;
+
+EXPORT fn_Valid_DL(string dl) := FUNCTION 
+  trimmedDL := Trim(dl,all);
+  cleanDL := STD.str.filterout(trimmedDL, '-');
+  doesHaveNums := STD.str.filter(cleanDL,'0123456789') <> '';
+  isRightLength := LENGTH(cleanDL) > 3 AND LENGTH(cleanDL) < 13;
+  isBlank := trimmedDL = '';
+  return IF(
+            (doesHaveNums AND isRightLength) OR isBlank
+            ,1
+            ,0
+          );
+END;
 
 EXPORT fn_valid_email(string em) := FUNCTION
 
-  cleanEm         := TRIM(em,whitespace);
-  containsAt      := STD.str.Filter(cleanEm,'@') = '@';
-  containsPeriod  := LENGTH(STD.str.Filter(cleanEm,'.')) > 0;
-  minLen          := LENGTH(cleanEm) > 5;
+  cleanEm         := TRIM(em,ALL);
+  rgxEmail        := '^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$';
+  isValidEmail    := REGEXFIND(rgxEmail, cleanEm);
   isBlank         := LENGTH(cleanEm) = 0;
 
   return if(
-              (containsAt AND containsPeriod AND minLen) OR isBlank
+              isValidEmail OR isBlank
               ,1
               ,0
             );
@@ -480,7 +504,7 @@ END;
 EXPORT fn_valid_IP(string ip) := FUNCTION
   cleanIp      := TRIM(ip,whitespace);
   isIPV4      := STD.str.filterOut(cleanIp, '0123456789') = '...';
-  isMinLength := LENGTH(cleanIp) > 6;
+  isMinLength := LENGTH(cleanIp) > 6 AND LENGTH(cleanIP) < 16;
   isBlank     := LENGTH(cleanIp) = 0;
 
   return if(
