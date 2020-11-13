@@ -77,4 +77,6 @@ EXPORT keys := MODULE
 					{Files.file_root_sub}, 
 					Constants.dca_keyname   + doxie.Version_SuperKey +  '::root_sub');
 
+//CCPA Phase 2
+	EXPORT key_contacts_bdid := INDEX(Files.contacts_bdid, {bdid}, {Files.contacts_bdid}, Constants.dca_keyname   + doxie.Version_SuperKey +  '::contacts_bdid');
 END;
