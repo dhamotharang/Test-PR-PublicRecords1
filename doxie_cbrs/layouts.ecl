@@ -111,20 +111,25 @@ EXPORT layouts := MODULE
   END;
 
   EXPORT addr_variation_record := RECORD // doxie_cbrs.address_variations_base 
-    doxie_cbrs.Layout_BH;
+    doxie_cbrs.Layout_BH.prim_range;
+    doxie_cbrs.Layout_BH.predir;
+    doxie_cbrs.Layout_BH.prim_name;
+    doxie_cbrs.Layout_BH.addr_suffix;
+    doxie_cbrs.Layout_BH.sec_range;
+    doxie_cbrs.Layout_BH.city;
+    doxie_cbrs.Layout_BH.state;
+    doxie_cbrs.Layout_BH.zip;
     STRING60 msaDesc := '';
     STRING18 county_name := '';
-    STRING120 company_clean := '';
-    UNSIGNED2 name_source_id := 0;
+    doxie_cbrs.Layout_BH.msa;
     UNSIGNED2 addr_source_id := 0;
-    UNSIGNED2 phone_source_id := 0;
-    UNSIGNED2 fein_source_id := 0;
-    UNSIGNED6 group_id := 0;
+    doxie_cbrs.Layout_BH.dt_first_seen;
+    doxie_cbrs.Layout_BH.dt_last_seen;
   END;
 
   EXPORT phone_variation_record := RECORD // doxie_cbrs.phone_variations_base
-    addr_variation_record.phone;
-    addr_variation_record.phone_source_id;
+    doxie_cbrs.Layout_BH.phone;
+    UNSIGNED2 phone_source_id := 0;
   END;
 
   SHARED dcarec := dca.Layout_DCA_Base_slim;
@@ -261,7 +266,5 @@ EXPORT layouts := MODULE
 
   EXPORT profile_record_v2 := corp2_services.layout_corp2_rollup; // doxie_cbrs.profile_records_v2
   
-  
-
 END;
 
