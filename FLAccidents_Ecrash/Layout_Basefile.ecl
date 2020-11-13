@@ -16,7 +16,7 @@
 	STRING10 court_date;
 	STRING9 court_time;
 	//PRtcc datatype update
-	STRING100 citation_detail1;
+	STRING200 citation_detail1;
 	
 	STRING3 local_code;
 	//PRtcc datatype update
@@ -246,7 +246,7 @@
 	STRING60 injured_taken_to;
 	STRING7 incident_transported_for_medical_care;
 	//PRtcc datatype update
-	STRING1 photographs_taken;
+	STRING7 photographs_taken;
 	STRING100 photographed_by;
 	
 	STRING20 photographer_id;

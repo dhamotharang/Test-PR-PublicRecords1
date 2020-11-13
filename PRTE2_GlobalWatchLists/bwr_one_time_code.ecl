@@ -1,4 +1,4 @@
-
+﻿
 EXPORT BWR_ONE_TIME_CODE := MODULE
 
 SHARED MakeSuperKeys(string name) := FUNCTION
@@ -6,6 +6,7 @@ SHARED MakeSuperKeys(string name) := FUNCTION
 	FileServices.CreateSuperFile (RegExReplace('@version@', name, 'father'));
 	FileServices.CreateSuperFile (RegExReplace('@version@', name, 'grandfather'));
 	FileServices.CreateSuperFile (RegExReplace('@version@', name, 'delete'));
+	FileServices.CreateSuperFile (RegExReplace('@version@', name, 'built'));
 	RETURN 'SUCCESS';
 END;
 
@@ -42,6 +43,10 @@ MakeSuperKeys ('~prte::base::globalwatchlistsv2::@version@::name_tokens');
  MakeSuperKeys ('~prte::key::patriot_did_file_@version@');
  MakeSuperKeys ('~prte::key::annotated_names_@version@');
  MakeSuperKeys ('~prte::key::patriot::baddies_with_name_@version@');
+
+ MakeSuperKeys ('~prte::key::baddids::delta_rid_@version@');
+ MakeSuperKeys ('~prte::key::annotated_names::delta_rid_@version@');
+ MakeSuperKeys ('~prte::key::patriot_file_full::delta_rid_@version@');
 
  MakeSuperFiles ('~PRTE::BASE::globalwatchlists::GlobalWatchKeyLists@version@');
 

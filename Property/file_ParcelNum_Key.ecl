@@ -1,6 +1,6 @@
 ﻿IMPORT $, dx_Property;
 
-dForeclosure := property.File_Foreclosure_Base_v2(TRIM(foreclosure_id,LEFT,RIGHT) NOT IN Suppress_FID);
+dForeclosure := property.File_Foreclosure_Base_v2(TRIM(foreclosure_id,LEFT,RIGHT) NOT IN Suppress_FID AND parcel_number_parcel_id != '');
 
 l_key	:= RECORD
 	STRING45	parcel_number_parcel_id;

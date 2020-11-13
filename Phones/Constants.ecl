@@ -161,6 +161,7 @@ MODULE
 		EXPORT ICONECTIV_SRC		:= MDR.sourceTools.src_PhonesPorted_iConectiv;
 		EXPORT SUSPENDED_CODE		:= 'SU';
 		EXPORT DISCONNECTED_CODE:= 'DE';
+		EXPORT DEFAULT_BLOCK_ID := 'A';
 	END;
 	
 	EXPORT UNSIGNED1 Zumigo_NameAddr_Validation_Threshold_MIN :=80;
