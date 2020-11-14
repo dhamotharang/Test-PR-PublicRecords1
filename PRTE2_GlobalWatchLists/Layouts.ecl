@@ -1,6 +1,4 @@
-﻿//Layouts
-
-Import GlobalWatchLists, Patriot, aid;
+﻿Import GlobalWatchLists, Patriot, aid, PRTE2_Common;
 
 EXPORT Layouts := module
 
@@ -76,19 +74,18 @@ end;
 
 export KeyType_BadDids := Patriot.KeyType_BadDids;
 
-Export Layout_Patriot2 := Record
-  Patriot.Layout_Patriot;
+Export Layout_Patriot2 :=  record
+	Patriot.Layout_Patriot;  
 	unsigned8	__fpos {virtual(fileposition)};
-	End;
+End;
 	
-Export Layout_Did := Record
- unsigned6 did;
- Patriot.Layout_Patriot;
+Export Layout_Did := record
+	Patriot.Layout_Patriot;
  unsigned8	__fpos {virtual(fileposition)};
  End;
 
 Export Layout_bdid := Record
-  unsigned6 bdid;
+	unsigned6 bdid;
   Patriot.Layout_Patriot;
 	unsigned8	__fpos {virtual(fileposition)};
 	End;
@@ -119,6 +116,16 @@ Export Country_Layout := RECORD
 	STRING20 pty_key;
 END;
 
+export GWL_base_Layout_IN := RECORD 
+	Layout_GlobalWatchLists and not [global_sid, record_sid];
+	string10 cust_name;
+  string10 bug_num;
+	string8 link_dob;
+  string9 link_ssn;
+	string9 link_fein;
+  string8 link_inc_date;
+end;	
+
 Export GWL_base_Layout_Ext := RECORD 
        Layout_GlobalWatchLists;
 		   string10 cust_name;
@@ -128,6 +135,7 @@ Export GWL_base_Layout_Ext := RECORD
        string9 link_fein;
        string8 link_inc_date;
 			 unsigned6 bdid;
+			 
 End;
 
 			 
@@ -166,5 +174,6 @@ Export Layout_GWL := record
 		aid.common.xaid append_rawaid;
 	end;
 
-
- END;
+export delta_rid := PRTE2_Common.Layouts.DELTA_RID;
+ 
+END;

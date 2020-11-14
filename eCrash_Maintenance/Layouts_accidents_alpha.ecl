@@ -261,7 +261,7 @@ EXPORT Layouts_accidents_alpha := RECORD
   string100 photograph_type;
   string10 posted_satutory_speed_limit;
   string25 safety_equipment_available_or_used;
-  string20 ejection;
+  string100 ejection;
   string40 safety_equipment_helmet;
   string60 transported_to;
   string20 dispatch_time;
