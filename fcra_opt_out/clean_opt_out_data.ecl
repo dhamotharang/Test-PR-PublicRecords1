@@ -1,4 +1,4 @@
-
+﻿
 
 import doxie_files, doxie,ut,Address,did_Add,header_slimsort,watchdog,RoxieKeyBuild;
 
@@ -39,6 +39,7 @@ fcra_opt_out.layout_infile_appended tarecs(al_file L) := transform
 	self.address1 := L.address;
 	self.address2 := L.city + ' '+ L.state + ' '+ L.zip;
 	self := l;
+	self := [];
 end;
 
 arecs := project(al_file,tarecs(left));
@@ -48,6 +49,7 @@ self.date_YYYYMMDD :=  if(l.julian_date <> '',ut.JultoYYYYMMDD(l.julian_date),''
 self.address1 := L.address;
 self.address2 := L.city + ' '+ L.state + ' '+ L.zip5;
 self := L;
+self := [];
 end;
 
 erecs := project(f,trecs(left));
