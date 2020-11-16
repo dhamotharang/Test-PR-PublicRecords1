@@ -30,5 +30,7 @@ EXPORT Constants := MODULE
   EXPORT fields_to_clear_sid    := watercraft.Constants.fields_to_clear_sid;
 	EXPORT fields_to_clear_cid		:= watercraft.Constants.fields_to_clear_cid;
 	EXPORT fields_to_clear_wid		:= watercraft.Constants.fields_to_clear_wid;
-		
+	
+	EXPORT dataset_name						:= 'WatercraftKeys';
+	EXPORT dataset_name_fcra			:= 'FCRA_WatercraftKeys';
 END;
