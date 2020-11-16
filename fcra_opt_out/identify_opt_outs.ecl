@@ -1,4 +1,4 @@
-﻿import _Control, risk_indicators, riskwise, ut, std;
+﻿import _Control, dx_fcra_opt_out, risk_indicators, riskwise, ut, std;
 onThor := _Control.Environment.OnThor;
 
 export identify_opt_outs(dataset(risk_indicators.layout_input) indata) := function
@@ -14,24 +14,24 @@ valid_hit(string1 opt_back_in, string1 permanent_flag, string8 date_yyyymmdd) :=
 	today := (STRING8)Std.Date.Today();
 	hit := opt_back_in='N' and
 				 ( permanent_flag='Y' or (permanent_flag='N' and ut.DaysApart(today,date_yyyymmdd) < ut.DaysInNYears(5)) );
-	return hit;				
+	return hit;
 end;
 
-flagrec getDidKey(indata le, fcra_opt_out.key_did ri) := TRANSFORM
+flagrec getDidKey(indata le, dx_fcra_opt_out.key_did ri) := TRANSFORM
 	self.opt_out_hit:= ri.l_did<>0 and valid_hit(ri.opt_back_in, ri.permanent_flag, ri.date_yyyymmdd);
 	self := le;
 END;
 
 // search by did, and if a match found, flag it
-didkey_roxie := join(indata, fcra_opt_out.key_did,
-					left.did!=0 and 
+didkey_roxie := join(indata, dx_fcra_opt_out.key_did,
+					left.did!=0 and
 					keyed(left.did = right.l_DID),
 				  getDidKey(LEFT,RIGHT),
 					left outer, atmost(riskwise.max_atmost), keep(1));
 
-didkey_thor := join(distribute(indata, hash64(did)), 
-					distribute(pull(fcra_opt_out.key_did), hash64(l_DID)),
-					left.did!=0 and 
+didkey_thor := join(distribute(indata, hash64(did)),
+					distribute(pull(dx_fcra_opt_out.key_did), hash64(l_DID)),
+					left.did!=0 and
 					left.did = right.l_DID,
 				  getDidKey(LEFT,RIGHT),
 					left outer, atmost(left.did = right.l_DID, riskwise.max_atmost), keep(1), LOCAL);
@@ -42,22 +42,22 @@ didkey_thor := join(distribute(indata, hash64(did)),
  didkey := didkey_roxie;
 #END
 
-flagrec getSSNKey(didkey le, fcra_opt_out.key_ssn ri) := TRANSFORM
-	namematch := risk_indicators.iid_constants.g(risk_indicators.FnameScore(le.fname, ri.inname_first)) and 
+flagrec getSSNKey(didkey le, dx_fcra_opt_out.key_ssn ri) := TRANSFORM
+	namematch := risk_indicators.iid_constants.g(risk_indicators.FnameScore(le.fname, ri.inname_first)) and
 																 risk_indicators.iid_constants.g(risk_indicators.LnameScore(le.lname, ri.inname_last));
 	self.opt_out_hit := le.opt_out_hit or (ri.l_ssn<>0 and namematch and valid_hit(ri.opt_back_in, ri.permanent_flag, ri.date_yyyymmdd));
 	self := le;
 END;
 
 // search by ssn, and if a match found, check the names to make sure it's a match
-ssnkey_roxie := join(didkey, fcra_opt_out.key_ssn,
+ssnkey_roxie := join(didkey, dx_fcra_opt_out.key_ssn,
 					left.ssn!='' and ~left.opt_out_hit and
 					keyed((unsigned)left.ssn = right.l_ssn),
 				  getSSNKey(LEFT,RIGHT),
 					left outer, atmost(riskwise.max_atmost), keep(10));
 
-ssnkey_thor := join(distribute(didkey, hash64(ssn)), 
-					distribute(pull(fcra_opt_out.key_ssn), hash64(l_ssn)),
+ssnkey_thor := join(distribute(didkey, hash64(ssn)),
+					distribute(pull(dx_fcra_opt_out.key_ssn), hash64(l_ssn)),
 					left.ssn!='' and ~left.opt_out_hit and
 					(unsigned)left.ssn = right.l_ssn,
 				  getSSNKey(LEFT,RIGHT),
@@ -71,14 +71,14 @@ ssnkey_thor := join(distribute(didkey, hash64(ssn)),
 
 // search by address, and if a match found, check the names to make sure it's a match
 
-flagrec getAddrKey(ssnkey le, fcra_opt_out.key_address ri) := TRANSFORM
-	namematch := risk_indicators.iid_constants.g(risk_indicators.FnameScore(le.fname, ri.inname_first)) and 
+flagrec getAddrKey(ssnkey le, dx_fcra_opt_out.key_address ri) := TRANSFORM
+	namematch := risk_indicators.iid_constants.g(risk_indicators.FnameScore(le.fname, ri.inname_first)) and
 																 risk_indicators.iid_constants.g(risk_indicators.LnameScore(le.lname, ri.inname_last));
 	self.opt_out_hit := le.opt_out_hit or (ri.prim_name<>'' and namematch and valid_hit(ri.opt_back_in, ri.permanent_flag, ri.date_yyyymmdd));
 	self := le;
 END;
 
-addrkey_roxie := join(ssnkey, fcra_opt_out.key_address,
+addrkey_roxie := join(ssnkey, dx_fcra_opt_out.key_address,
 					left.prim_name!='' and left.z5!='' and ~left.opt_out_hit and
 					keyed(left.z5 = right.z5) and
 					keyed(left.prim_range = right.prim_range) and
@@ -86,16 +86,16 @@ addrkey_roxie := join(ssnkey, fcra_opt_out.key_address,
 					keyed(left.sec_range = right.sec_range),
 				  getAddrKey(LEFT,RIGHT),
 					left outer, atmost(riskwise.max_atmost), keep(1000));
-					
-addrkey_thor := join(distribute(ssnkey, hash64(z5, prim_range, prim_name, sec_range)), 
-					distribute(pull(fcra_opt_out.key_address), hash64(z5, prim_range, prim_name, sec_range)),
+
+addrkey_thor := join(distribute(ssnkey, hash64(z5, prim_range, prim_name, sec_range)),
+					distribute(pull(dx_fcra_opt_out.key_address), hash64(z5, prim_range, prim_name, sec_range)),
 					left.prim_name!='' and left.z5!='' and ~left.opt_out_hit and
 					(left.z5 = right.z5) and
 					(left.prim_range = right.prim_range) and
 					(left.prim_name = right.prim_name) and
 					(left.sec_range = right.sec_range),
 				  getAddrKey(LEFT,RIGHT),
-					left outer, atmost(riskwise.max_atmost), keep(1000), LOCAL);					
+					left outer, atmost(riskwise.max_atmost), keep(1000), LOCAL);
 
 #IF(onThor)
   addrkey := addrkey_thor;
