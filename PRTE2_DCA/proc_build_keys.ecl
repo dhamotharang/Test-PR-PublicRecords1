@@ -25,6 +25,9 @@ EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='
 
 	RoxieKeyBuild.MAC_SK_BuildProcess_v2_local( keys.key_root_sub,Constants.dca_keyname + '@version@::root_sub',Constants.dca_keyname + filedate + '::root_sub', build_key_root_sub);
 
+//CCPA Phase 2- New Key	
+	RoxieKeyBuild.MAC_SK_BuildProcess_v2_local( keys.key_contacts_bdid,Constants.dca_keyname + '@version@::contacts_bdid',Constants.dca_keyname + filedate + '::contacts_bdid', build_key_contacts_bdid);
+
 
 //Move Keys to BUILt
 	RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.dca_keyname + '@version@::entnum', Constants.dca_keyname + filedate + '::entnum',	move_built_key_entnum);
@@ -46,6 +49,9 @@ EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='
 	RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.dca_keyname + '@version@::root_sub', 
 																				 Constants.dca_keyname + filedate + '::root_sub',
 																					move_built_key_root_sub);
+//New Key
+	RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.dca_keyname + '@version@::contacts_bdid', Constants.dca_keyname + filedate + '::contacts_bdid',move_built_key_contacts_bdid);
+
 
 //Move Keys to QA
 	RoxieKeyBuild.MAC_SK_Move_v2(Constants.dca_keyname + '@version@::entnum', 														'Q', move_qa_key_entnum);
@@ -57,6 +63,8 @@ EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='
 	RoxieKeyBuild.MAC_SK_Move_v2(Constants.dca_keyname + '@version@::hierarchy_parent_to_child_root_sub', 'Q', move_qa_key_hierarchy_parent_to_child_root_sub);
 	RoxieKeyBuild.MAC_SK_Move_v2(Constants.dca_keyname + '@version@::hierarchy_root_sub', 								'Q', move_qa_key_hierarchy_root_sub);
 	RoxieKeyBuild.MAC_SK_Move_v2(Constants.dca_keyname + '@version@::root_sub', 													'Q', move_qa_key_root_sub);
+//New Key	
+	RoxieKeyBuild.MAC_SK_Move_v2(Constants.dca_keyname + '@version@::contacts_bdid',											'Q', move_qa_key_contacts_bdid);
 
 //Autokeys
 		AutoKeyB2.MAC_Build(files.file_autokey,blank,blank,blank,
@@ -108,23 +116,22 @@ EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='
 																														constants.dataset_name, 
 																														'N', ), named(constants.dataset_name+'Validation'));
 	
-//Orbit Build
-	create_orbit_build	:= Orbit3.proc_Orbit3_CreateBuild('PRTE - DCA', filedate, 'PN', true, true, false,  _control.MyInfo.EmailAddressNormal);
-
 	build_keys	:=	sequential(			
 												parallel(build_key_entnum,build_key_entnum_nonfilt, build_key_hierarchy_parent_to_child_entnum, 
 																	build_key_linkids, build_key_bdid, build_key_hierarchy_bdid, build_key_hierarchy_parent_to_child_root_sub, 
-																	build_key_hierarchy_root_sub, build_key_root_sub), 
+																	build_key_hierarchy_root_sub, build_key_root_sub,
+																	build_key_contacts_bdid), 
 												parallel(move_built_key_entnum, move_built_key_entnum_nonfilt, move_built_key_hierarchy_parent_to_child_entnum, 
 																 move_built_key_linkids, move_built_key_bdid, move_built_key_hierarchy_bdid, move_built_key_hierarchy_parent_to_child_root_sub, 
-																 move_built_key_hierarchy_root_sub, move_built_key_root_sub), 						
+																 move_built_key_hierarchy_root_sub, move_built_key_root_sub,
+																 move_built_key_contacts_bdid), 						
 												parallel(move_qa_key_entnum, move_qa_key_entnum_nonfilt, move_qa_key_hierarchy_parent_to_child_entnum, 
 																 move_qa_key_linkids, move_qa_key_bdid, move_qa_key_hierarchy_bdid, move_qa_key_hierarchy_parent_to_child_root_sub, 
-																 move_qa_key_hierarchy_root_sub, move_qa_key_root_sub) 
+																 move_qa_key_hierarchy_root_sub, move_qa_key_root_sub,
+																 move_qa_key_contacts_bdid) 
 												,retval
 												,key_validation
 												,PerformUpdateOrNot
-												// ,create_orbit_build
 											);
 
 
