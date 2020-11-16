@@ -38,9 +38,9 @@ EXPORT getIDAFraud(DATASET(Risk_Indicators.layouts.layout_IDAFraud_in) indata,
     
     //going to use HistoryDateTimeStamp to pass to IDA
     cleanedDate := MAP(TRIM(le.historyDateTimeStamp) IN ['','999999'] => (STRING)STD.Date.Today() + ' ' + (STRING)STD.Date.CurrentTime(),
-                       LENGTH(TRIM(le.historyDateTimeStamp)) = 6      => le.historyDateTimeStamp + '01 12010100', //use default time
-                       LENGTH(TRIM(le.historyDateTimeStamp)) = 8      => le.historyDateTimeStamp + ' 12010100',   // use default time
-                       LENGTH(TRIM(le.historyDateTimeStamp)) > 8      => le.historyDateTimeStamp,                 //if it seems properly populated then use it
+                       LENGTH(TRIM(le.historyDateTimeStamp)) = 6      => TRIM(le.historyDateTimeStamp) + '01 12010100', //use default time
+                       LENGTH(TRIM(le.historyDateTimeStamp)) = 8      => TRIM(le.historyDateTimeStamp) + ' 12010100',   // use default time
+                       LENGTH(TRIM(le.historyDateTimeStamp)) > 8      => TRIM(le.historyDateTimeStamp),                 //if it seems properly populated then use it
                                                                          (STRING)STD.Date.Today() + ' ' + (STRING)STD.Date.CurrentTime() //fallthrough condition, use Current date/time
                       );
     
