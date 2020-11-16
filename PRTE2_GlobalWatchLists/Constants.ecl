@@ -1,4 +1,4 @@
-//Constants
+﻿//Constants
 
 EXPORT Constants := module
 
@@ -25,5 +25,14 @@ Export KeyName_Annotated := '~prte::key::annotated_names_';
 Export KeyName_Baddies:= '~prte::key::patriot::baddies_with_name_';
 
 Export FileName_Scorenames:= '~prte::in::patriot::scorenames';
+
+//Cloud Keys
+EXPORT Keyname_Patriot_file_delta 						:= '~prte::key::patriot_file_full::delta_rid_';
+EXPORT Keyname_Patriot_baddids_delta 					:= '~prte::key::baddids::delta_rid_';
+EXPORT Keyname_Patriot_annotated_names_delta 	:= '~prte::key::annotated_names::delta_rid_';
+
+EXPORT dataset_name_gwl			:= 'GlobalWatchListKeys';
+EXPORT dataset_name_gwl2		:= 'GlobalWatchListV2Keys';
+EXPORT dataset_name_patriot	:= 'PatriotKeys';
 
 END;
