@@ -51,6 +51,7 @@ dFedExCombined := project (FedEx_with_isBusiness , transform({FedEx.Layout_FedEx
 		self.Append_PrepAddr1				:=	vAddressLine1;
 		self.Append_PrepAddr2				:=	vAddressLine2;
 		self.Append_RawAID					:=	0;
+		self.version:=version_date;
 		self := left)):INDEPENDENT; 
 		
 // Split out US and canadian addresses
@@ -281,7 +282,7 @@ dCombined	:=	dNormalizeNames	+	dCompNameinLName;
 // Blank out phone number 8145162145 associated with Jessica Anna in FedEx
 apply_ln_filters := dCombined(record_id not in fedex.Filters.by_record_id);
 
-PromoteSupers.MAC_SF_BuildProcess(apply_ln_filters,'~thor_200::base::fedex::nohits',buildBase,,,true);
+PromoteSupers.MAC_SF_BuildProcess(apply_ln_filters(version=version_date),'~thor_200::base::fedex::nohits',buildBase,,,true);
 
 output1 := output(project(fedex_dupes,fedex.layout_fedex.returnfiles),,'~thor200::out::fedex::dupes_v1',__compressed__,overwrite,csv(separator(','),terminator('\r\n'),QUOTE('"')),named('fedex_dupes_all'));
 output2 := output(project(new_dupes,fedex.layout_fedex.returnfiles)  ,,'~thor200::out::fedex::new_dupes_v1',__compressed__,overwrite,csv(separator(','),terminator('\r\n'),QUOTE('"')),named('fedex_dupes_new'));

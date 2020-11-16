@@ -1,12 +1,10 @@
 ﻿import AutokeyB2, autokey, roxiekeybuild, CanadianPhones,scrubs_fedex;
 
-export proc_fedex_build_keys2(string version_date) := function
-	fedex_dataset := fedex.fedex_autokey_constants.autokey_dataset2;
+export proc_fedex_build_keys2(string version_date,boolean delta=true) := function
+	fedex_dataset := fedex.fedex_autokey_constants(version_date,delta).autokey_dataset2;
 	logical_key		:= fedex.fedex_autokey_constants.str_AutokeyLogicalName2(version_date);
 	super_keyname	:= fedex.fedex_autokey_constants.str_autokeyname2;
 	skip_set			:= fedex.fedex_autokey_constants.autokey_skip_set;
-
-
 //**** Build the Payload Key and create the FakeID
 											
 autokey.mac_useFakeIDs

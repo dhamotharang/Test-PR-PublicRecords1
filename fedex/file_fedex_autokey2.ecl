@@ -1,7 +1,7 @@
 
 import ut;
-
-ds := fedex.file_fedex_building;
+export file_fedex_autokey2(string pversion,boolean delta=true):=module
+ds := fedex.file_fedex_building(pversion,delta).file;
 
 layout_autokeys := record
 	unsigned1 zero	:= 0;
@@ -11,7 +11,7 @@ layout_autokeys := record
 	typeof(fedex.layout_fedex_base.first_name) fname;
 	typeof(fedex.layout_fedex_base.middle_initial) mname;
 	typeof(fedex.layout_fedex_base.last_name) lname;
-	fedex.layout_fedex_base	-	file_date - nametype;
+	fedex.layout_fedex_base	-	[file_date,nametype,version];
 end;
 
 layout_autokeys add_field(ds l) := transform
@@ -24,4 +24,6 @@ end;
 
 ds_autokey := project(ds, add_field(left));
 
-export file_fedex_autokey2 := ds_autokey;
+export file := ds_autokey;
+
+end;

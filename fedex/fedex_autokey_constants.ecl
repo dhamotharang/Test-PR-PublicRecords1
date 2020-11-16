@@ -1,5 +1,5 @@
 
-export fedex_autokey_constants := module
+export fedex_autokey_constants(string pversion='',boolean delta=true) := module
 	export str_autokeyname := '~thor_data400::key::fedex::autokey::@version@::';
 	export str_autokeyname2 := '~thor_data400::key::fedex2::autokey::@version@::';
 	export str_AutokeyLogicalName(string version_date) := '~thor_data400::key::fedex::' + version_date + '::autokey::';
@@ -7,7 +7,7 @@ export fedex_autokey_constants := module
 	export autokey_qa_Keyname := '~thor_data400::key::fedex::autokey::qa::';
 	export autokey_qa_Keyname2 := '~thor_data400::key::fedex2::autokey::qa::';
 	export autokey_dataset	:= fedex.file_fedex_autokey;
-	export autokey_dataset2	:= fedex.file_fedex_autokey2;
+	export autokey_dataset2	:= fedex.file_fedex_autokey2(pversion,delta).file;
 	export autokey_typeStr	:= 'BC';
 	export autokey_skip_set	:= ['B','-','S'];
 end;
