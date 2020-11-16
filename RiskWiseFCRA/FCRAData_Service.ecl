@@ -32,7 +32,7 @@
 /*--INFO-- Returns FCRA compliant data for a given person. <br/>*/
 IMPORT Risk_Indicators, RiskWise, doxie, FCRA, mdr, ut, avm_v2, american_student_list,
   impulse_email, infutorCID, email_data, Advo, inquiry_AccLogs, header_quick,
-  address, did_add, AlloyMedia_student_list, STD;
+  address, did_add, AlloyMedia_student_list, dx_fcra_opt_out, STD;
 
 export FCRAData_service := MACRO
 
@@ -1135,10 +1135,10 @@ advo_recs  := sort(advo_recs1, -date_last_seen, -date_first_seen);
 // ==========================================================
 // ======================    FCRA OPT Outs  =================
 // ==========================================================
-fcra_opt_outs  := join(dids, fcra_opt_out.key_did,
+fcra_opt_outs  := join(dids, dx_fcra_opt_out.key_did,
 					left.did!=0 and
 					keyed(left.did = right.l_DID),
-				  transform(recordof(fcra_opt_out.key_did),
+				  transform(recordof(dx_fcra_opt_out.key_did),
 										self := right),
 					atmost(riskwise.max_atmost), keep(1));
 
