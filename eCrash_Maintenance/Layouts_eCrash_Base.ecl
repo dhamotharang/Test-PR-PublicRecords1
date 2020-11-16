@@ -370,7 +370,7 @@ EXPORT Layouts_eCrash_Base := RECORD,maxlength(40000)
   string40 safety_equipment_restraint2;
   string40 safety_equipment_helmet;
   string100 air_bag_deployed;
-  string20 ejection;
+  string100 ejection;
   string30 drivers_license_jurisdiction;
   string30 dl_number_class;
   string3 dl_number_cdl;
