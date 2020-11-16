@@ -4,18 +4,21 @@
 
 EXPORT Proc_Build_Combined_Port_Reformat_File(string version/*, string eclsourceip, string thor_name*/):= FUNCTION
 																										
-	//Build Base
+	//Build Historical iConectiv Base
 	buildBase					:= output(PhonesInfo.Remap_Combined_Port_File,,'~thor_data400::base::phones::icport_main_'+version, overwrite, __compressed__);
 	
-	//Clear Delete Files
+	//Clear Historical iConectiv Delete Files
 	clearDelete 			:= nothor(fileservices.clearsuperfile('~thor_data400::base::phones::icport_main_delete', true));	
 	
-	//Move Base Files
+	//Move Historical iConectiv Base Files
 	moveBase					:= Std.File.PromoteSuperFileList(['~thor_data400::base::phones::icport_main',
 																											'~thor_data400::base::phones::icport_main_father',
 																											'~thor_data400::base::phones::icport_main_grandfather',
 																											'~thor_data400::base::phones::icport_main_delete'], '~thor_data400::base::phones::icport_main_'+version, true);		
 										 																															
+	//Build iConectiv PortData Validate File
+	buildPDVBase			:= PhonesInfo.Proc_Build_PortData_Valid_File(version);	
+	
 	//Email Build Status	
 	emailDOps					:= ';darren.knowles@lexisnexisrisk.com; charlene.ros@lexisnexisrisk.com; gregory.rose@lexisnexisrisk.com';
 	emailDev					:= ';judy.tao@lexisnexisrisk.com';
@@ -29,6 +32,7 @@ EXPORT Proc_Build_Combined_Port_Reformat_File(string version/*, string eclsource
 	RETURN sequential(buildBase,
 										clearDelete,
 										moveBase,
-										emailBuildNotice);
+										buildPDVBase/*,
+										emailBuildNotice*/);
 
 END;

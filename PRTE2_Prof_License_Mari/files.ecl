@@ -2,7 +2,8 @@
 
 EXPORT files := MODULE
 	
-	EXPORT raw_search		:= DATASET(Constants.in_prefix_name+ 'search', Layouts.search - [global_sid, record_sid], CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));	
+	EXPORT raw_search		:= DATASET(Constants.in_prefix_name+ 'search', Layouts.search - [global_sid, record_sid, dt_effective_first, dt_effective_last, delta_ind], CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));	
+ 
   EXPORT raw_discp		:= DATASET(Constants.in_prefix_name+ 'disciplinary_actions', Layouts.disp_action, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));	
 	EXPORT raw_indv			:= DATASET(Constants.in_prefix_name+ 'individual_detail', Layouts.indv_detail, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));	
 	EXPORT raw_reg			:= DATASET(Constants.in_prefix_name+ 'regulatory_actions', Layouts.reg_action, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));	
@@ -15,11 +16,12 @@ EXPORT files := MODULE
 	Export base_search_did:=base_Search(did!=0);
 
 
-// AutoKeys Files
-//EXPORT file_search := project(raw_search, transform(recordof(raw_search),
 EXPORT file_search := project(raw_search, transform(Layouts.search,
 self.global_sid:=0;
 self.record_sid:=0;
+self.dt_effective_first :=0;
+self.dt_effective_last:=0;
+
 
 self.process_date := left.process_date;
 Self.ssn_taxid_1:=if(left.Tax_type_1 = 'S',left.link_ssn,if(left.tax_type_1='E',left.link_fein,''));
@@ -35,9 +37,24 @@ EXPORT file_regulatory  :=  if(count(raw_reg) > 0, project(raw_reg, transform(re
 EXPORT file_individual  :=  if(count(raw_indv) > 0, project(raw_indv, transform(recordof(raw_indv), self.process_date := (STRING)Std.Date.Today(), self := left)),
 																													project(raw_indv, Layouts.indv_detail));
 
-Export dsDisciplinary := project(base_disp_actions, layouts.layout_disciplinary);
-Export dsDetail 			:= project(base_indiv_detail, {base_indiv_detail} - [cust_name,bug_num]);
-Export dsRegulatory 	:= project(base_reg_actions, {base_reg_actions} - [cust_name,bug_num]);
+Export dsDisciplinary := project(base_disp_actions, 
+Transform(layouts.layout_disciplinary,
+Self:=Left;
+self := []; 
+));
+
+Export dsDetail := project(base_indiv_detail, 
+Transform(layouts.Individ_Reg_Base,
+Self:=Left;
+self := []; 
+));
+
+Export dsRegulatory := project(base_reg_actions, 
+Transform(layouts.reg_action_2,
+Self:=Left;
+self := []; 
+));
+
 Export dsSearch 			:= project(base_search, {base_search} - [enh_did_src,link_ssn,link_fein,link_inc_date,cust_name,bug_num,link_dob,req]);
 Export dsSearch_did:=dsSearch(did!=0);
 

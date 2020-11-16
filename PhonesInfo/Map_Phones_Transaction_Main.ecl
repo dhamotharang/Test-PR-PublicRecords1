@@ -1,20 +1,20 @@
-﻿IMPORT _control, MDR, Std;
+﻿IMPORT _control, MDR, Std, dx_PhonesInfo;
 
 	//Base Files by Source
-	portFile		:= 	PhonesInfo.File_TCPA.Main(vendor_first_reported_dt<=20150308);					//Neustar Ported
-	port2File		:= 	PhonesInfo.File_iConectiv.Main;																					//iConectiv Ported
-	deactFile		:= 	PhonesInfo.File_Deact.Main;																							//Digital Segment Deact
-	deactGHFile	:= 	PhonesInfo.File_Deact_GH.Main;																					//Neustar Gong History Deact
-	otpFile 		:= 	PhonesInfo.File_OTP.Main;																								//OTP
+	portFile		:= 	PhonesInfo.File_iConectiv.Main;																																					//iConectiv/Telo Ported Phones (source='PK')
+	portVFile		:=  project(PhonesInfo.File_iConectiv.Main_PortData_Valid, dx_PhonesInfo.Layouts.Phones_Transaction_Main);	//iConectiv PortValidate Phones (source='P!')
+	deactFile		:= 	PhonesInfo.File_Deact.Main;																																							//Digital Segment Deact
+	deactGHFile	:= 	PhonesInfo.File_Deact_GH.Main;																																					//Neustar Gong History Deact
+	otpFile 		:= 	PhonesInfo.File_OTP.Main;																																								//OTP
 	
 	//Concat Base Files Together	
-	concatFiles := 	//portFile +
-									port2File +
+	concatFiles := 	portFile +
+									portVFile +
 									deactFile +
 									deactGHFile +
 									otpFile; 
 									
-	//Add Global_SID Field
-	// addGlobalSID:= 	MDR.macGetGlobalSid(concatFiles, 'PhonesMetadata', 'source', 'global_sid');												
+	//Add Global_SID Field												
      addGlobalSID:= 	MDR.macGetGlobalSID(concatFiles,'PhonesMetadata_Virtual','','global_sid');//CCPA-799
+
 EXPORT Map_Phones_Transaction_Main := addGlobalSID;

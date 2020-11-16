@@ -2,6 +2,9 @@
 
 EXPORT Constants := MODULE
 
+    Export dops_name:='MariKeys';
+		Export FCRA_dops_name:='FCRA_marikeys';
+
 		EXPORT in_prefix_name           := '~prte::in::proflic_mari::';
     EXPORT base_prefix_name         := '~prte::base::proflic_mari::';
 		

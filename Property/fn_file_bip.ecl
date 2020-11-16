@@ -9,6 +9,6 @@ file_in := IF(DeedType = 'NOD',
 
 pFileIn := DEDUP(SORT(PROJECT(file_in(site_prim_name<>'' and site_zip<>''),dx_Property.Layouts.BIP_layout),RECORD),RECORD);
 
-RETURN pFileIn;
+RETURN pFileIn(UltID > 0);
 
 END;

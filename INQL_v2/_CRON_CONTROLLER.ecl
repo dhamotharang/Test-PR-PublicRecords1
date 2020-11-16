@@ -33,8 +33,9 @@ _process(string prProcess ,boolean prFCRA, boolean prDaily) := Function
 		+');';
 
 	_cronWhen_ECL := Case( prProcess, 
-												'PRODR3 EXTRACT' => 	':WHEN(CRON(\'55 12 * * *\'))\n' 
-												,			               	':WHEN(Inql_V2._CRON_ECL(\'' + prProcess + '\',' + _prFCRA + ',' + _prDaily + ').EVENT_NAME)\n'
+												'PRODR3 EXTRACT'    => 	':WHEN(CRON(\'55 12 * * *\'))\n',
+												'FILES CONSOLIDATE' => 	':WHEN(CRON(\'00 06 * * 1\'))\n' 
+												,			                 	':WHEN(Inql_V2._CRON_ECL(\'' + prProcess + '\',' + _prFCRA + ',' + _prDaily + ').EVENT_NAME)\n'
 												);
 
 	schedule_ECL       :=  STD.Str.FindReplace( _createWUID_ECL, 'CRON_WHEN', _cronWhen_ECL); 
@@ -59,7 +60,9 @@ FCRAProcesses      		:= Sequential(_process('FILES SPRAY', true,true)
 																	 ,_process('FILES SCRUB', true,true)
 																	 ,_process('BASE PREP', true,true)   // Daily Base pre-process
 																	 ,_process('BASE POST', true,true)   // Daily Base post-process																	 
-																	 ,_process('BATCHR3 BUILD', true,true)																	 
+																	 ,_process('BATCHR3 BUILD', true,true)		
+ 																	 ,_process('FILES CONSOLIDATE', true,true)	
+
 															 );
 															 
 ProdProcesses      		:= Sequential(

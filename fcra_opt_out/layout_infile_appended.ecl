@@ -1,3 +1,4 @@
+﻿IMPORT dx_common;
 export layout_infile_appended  := record
 fcra_opt_out.layout_infile;
 string1 permanent_flag := 'Y';
@@ -46,8 +47,8 @@ string8 date_YYYYMMDD := '';
   unsigned6 		did := 0;
   unsigned 			did_score := 0;
   string9           ssn_append := '';
-  
-      zero := 0;
-	blk  := '';
-
+  zero := 0;
+  blk  := '';
+  // DF-28230
+  dx_common.layout_metadata;
 end;

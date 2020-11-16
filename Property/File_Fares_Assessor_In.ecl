@@ -1,1 +1,0 @@
-export File_Fares_Assessor_In := dataset('~thor_data400::in::fares_2580',property.layout_fares_assessor,flat);

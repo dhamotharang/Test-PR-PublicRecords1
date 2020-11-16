@@ -1,11 +1,11 @@
 ﻿import  PRTE2_ECrash, ut, PromoteSupers, Data_Services, prte2, BIPV2,prte_bip, AID, Address, std, FLAccidents;
 
 //Uppercase, CleanSpaces, and remove unprintable characters
-PRTE2.CleanFields(Files.infile, dsClnEcrash);
+PRTE2.CleanFields(Files.infile_boca, dsClnEcrash);
 
 //Cleaning Address/Name fields for New Records
 temp_layout := record
-  Layouts.Input;
+  layout_boca_in;
 	// string5   suffix := '',
 	BIPV2.IDlayouts.l_xlink_ids;
 	AID.Common.xAID	rawaid	:=	0;
