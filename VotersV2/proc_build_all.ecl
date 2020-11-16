@@ -23,8 +23,8 @@ export proc_build_all(string filedate) := function
   voter_hist      := VotersV2.Mapping_Voters_VoteHistory;
   voter_hist_only := VotersV2.Extract_Census_History(voter_reg, voter_hist).VoteHistOnly;
   census_hist     := VotersV2.Extract_Census_History(voter_reg, voter_hist).VoteHistCensus;
-	PromoteSupers.MAC_SF_BuildProcess(voter_hist_only,VotersV2.Cluster+'base::Voters::Vote_History',aVotersChildBuild,3,,true);
-	PromoteSupers.MAC_SF_BuildProcess(census_hist,VotersV2.Cluster+'base::MA_Census::History',aCensusChildBuild,3,,true);
+	PromoteSupers.MAC_SF_BuildProcess(voter_hist_only,VotersV2.Cluster+'base::Voters::Vote_History',aVotersChildBuild,2,,true);
+	PromoteSupers.MAC_SF_BuildProcess(census_hist,VotersV2.Cluster+'base::MA_Census::History',aCensusChildBuild,2,,true);
 
 	build_base := parallel(aVotersMainBuild, aVotersChildBuild) : success(output('Base files built successfully')), failure(output('Building of base files failed'));
 	build_census := parallel(aCensusMainBuild, aCensusChildBuild) : success(output('Census base files built successfully')), failure(output('Building of census base files failed'));
@@ -46,6 +46,8 @@ export proc_build_all(string filedate) := function
 																);
 	return if(thorlib.wuid()[2..5] <= VotersV2._Flags.stop_year,
 	          sequential(
+						           
+                       Scrubs.ScrubsPlus('Voters','Scrubs_Voters','Scrubs_Voters_In_Reg' ,'In_Reg' ,filedate,mailTarget),
 						           build_base,
                        build_census,
                        Scrubs.ScrubsPlus('Voters','Scrubs_Voters','Scrubs_Voters_Base_History','Base_History',filedate,mailTarget),
