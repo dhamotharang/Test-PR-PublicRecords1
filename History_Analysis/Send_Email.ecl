@@ -1,17 +1,15 @@
 Import STD;
 
-Export Send_Email( string version) := Module
+Export Send_Email( string pVersion) := Module
 
     Shared server           := 'http://dataland_esp.br.seisint.com:8010';
 
-
-	Shared subject          := 'Prod History Report Version:' + version;
-
+	Shared subject          := 'Prod History Report Version:' + pVersion;
     
-	Shared report           := 'All results can found here: ' + server +  '/?Widget=WUDetailsWidget&Wuid=' + workunit + '#/stub/Results-DL/Grid';
+	Shared report           := 'You can find results here: ' + server +  '/?Widget=WUDetailsWidget&Wuid=' + workunit + '#/stub/Results-DL/Grid';
 
-
-	Shared body_success     := 'This is the most recemt DOPS report submitted:' + '\n\n'
+	Shared body_success     := 'Hello,' + '\n\n'
+							+  'This is the most recent Dops History Report.' + '\n\n'
 							+   report +  '\n\n' 
 							+ ' For your notes, the workunit is: ' +  workunit + '\n\n' 
 							+ ' Have a wonderful day!' + '\n\n' 

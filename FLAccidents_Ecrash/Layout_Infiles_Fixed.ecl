@@ -41,7 +41,7 @@
 		STRING10 Court_Date;
 		STRING9 Court_Time;
 		//PRTCC update datatype
-		STRING100 Citation_Detail1;
+		STRING200 Citation_Detail1;
 		
 		STRING3 Local_Code;
 		//PRTCC update datatype
@@ -292,7 +292,7 @@
 		STRING60 Injured_Taken_To;
 		STRING7 Incident_Transported_for_Medical_Care;
 		//PRTCC update datatype
-		STRING1 Photographs_Taken;
+		STRING7 Photographs_Taken;
 		STRING100 Photographed_By;
 		
 		STRING20 Photographer_ID;
@@ -517,7 +517,7 @@
 		STRING40 Safety_Equipment_Restraint2;
 		STRING40 Safety_Equipment_Helmet;
 		STRING100 Air_Bag_Deployed;
-		STRING20 Ejection;
+		STRING100 Ejection;
 		STRING30 Drivers_License_Jurisdiction;
 		STRING30 DL_Number_Class;
 		STRING3 DL_Number_CDL;
@@ -930,7 +930,7 @@
 	EXPORT Citations_ChildRec := RECORD
 		STRING7 Citation_Issued;
 		STRING7 Citation_Type;
-		STRING100 Citation_Detail1;
+		STRING200 Citation_Detail1;
 		STRING64 Citation_Status;
 		STRING60 Violation_Code1;
 		STRING60 Violation_Code2;
@@ -950,7 +950,7 @@
 		STRING10 Court_Date;
 		STRING9 Court_Time;
 		//PRTCC update datatype
-		STRING100 Citation_Detail1;
+		STRING200 Citation_Detail1;
 		
 		STRING3 Local_Code;
 		//PRTCC update datatype
@@ -1182,7 +1182,7 @@
 		STRING60 Injured_Taken_To;
 		STRING7 Incident_Transported_for_Medical_Care;
 		//PRTCC update datatype
-		STRING1 Photographs_Taken;		
+		STRING7 Photographs_Taken;		
 		STRING100 Photographed_By;
 		
 		STRING20 Photographer_ID;
@@ -1318,7 +1318,7 @@
 		STRING40 Safety_Equipment_Restraint2;
 		STRING40 Safety_Equipment_Helmet;
 		STRING100 Air_Bag_Deployed;
-		STRING20 Ejection;
+		STRING100 Ejection;
 		STRING30 Drivers_License_Jurisdiction;
 		STRING30 DL_Number_Class;
 		STRING3 DL_Number_CDL;

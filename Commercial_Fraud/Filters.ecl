@@ -1,4 +1,4 @@
-import advo,Phonesplus,gong_v2,Property,corp2,ut;
+﻿import advo,Phonesplus,gong_v2,Property,corp2,ut;
 
 export Filters :=
 module
@@ -148,7 +148,7 @@ module
 	///////////////////////////////////////////////////////////////////////////////
 	export fForeclosure(
 	
-		 dataset(property.Layout_Fares_Foreclosure_v2) pInput				= Property.file_foreclosure
+		 dataset(property.Layout_Fares_Foreclosure_v2) pInput				= Property.File_Foreclosure_Base_v2
 		,boolean																		pFilterOut		= true
 		,string																			pFilterDate		= _Dataset().CurrentDate
 

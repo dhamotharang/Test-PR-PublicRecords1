@@ -1,38 +1,47 @@
-﻿IMPORT ut;
-IMPORT Data_Services; // Deprecated ut.foreign_prod
+﻿IMPORT Std, _Control, Data_Services, FLAccidents_Ecrash;
 
-EXPORT Update_Incident_Contrib_source := FUNCTION
+EXPORT Update_Incident_Contrib_source() := FUNCTION
 
-  Incident_Contrib_source_layout := RECORD
-		                                   STRING11 incident_id,
-		                                   STRING3  contrib_source
-	                                  END;
+Location := IF(_Control.ThisEnvironment.Name = 'Prod_Thor', '~', Data_Services.foreign_prod);
 
-	ds_incident_CS   :=	DATASET('~thor_data400::in::ecrash::incident_newcontrib'
-															,Incident_Contrib_source_layout
-															,csv(terminator('\n'), separator(','),quote('"'),maxlength(10000)))(Incident_ID != 'Incident_ID');                    
+Layout_Incident_CS := RECORD
+  STRING incident_id;
+  STRING contrib_source;
+  STRING vendor_code;
+  STRING is_deleted;
+  STRING date_deleted;
+END;
 
- ds_incident      := DATASET(Data_Services.foreign_prod+'thor_data400::in::ecrash::incidnt_raw_new'
-															,FLAccidents_Ecrash.Layout_Infiles.incident_new
-															,csv(terminator('\n'), separator(','),quote('"'),maxlength(60000)))(Incident_ID != 'Incident_ID');                  
+//Below is the extract from eCrash team with Contrib Source info available for the blank ContribSource incidents from 2016 till 20201105
+ds_incident_CS :=	DATASET(Location + 'thor::spray::ecrash::incidents::2016_contrib_source_null_hpcc_file', 
+                          Layout_Incident_CS,
+                          CSV(HEADING(single), TERMINATOR('\n'), SEPARATOR(','), QUOTE('"')));
+FLAccidents_Ecrash.mac_CleanFields(ds_incident_CS, Clean_ds_incident_CS);
+ds_incident_CS_Uniq := DEDUP(Clean_ds_incident_CS, ALL);
+													
+Layout_Incident := FLAccidents_Ecrash.Layout_Infiles.incident_new;
+ds_incident := FLAccidents_Ecrash.Infiles.incident;                  
 
-	FLAccidents_Ecrash.Layout_Infiles.incident_new updateIncidents(ds_incident L, ds_incident_CS R) := TRANSFORM
-															SELF.contrib_source := IF(stringlib.stringtouppercase(trim(R.contrib_source,left,right)) IN ['//N', 'NULL'],  '',  R.contrib_source);
-															SELF := L;
-	END;
+Layout_Incident tUpdateContribSrc(ds_incident L, ds_incident_CS_Uniq R) := TRANSFORM
+	SELF.contrib_source := IF(L.contrib_source = '', R.contrib_source, L.Contrib_source);
+	SELF := L;
+END;
 
-	cmbnd_incidents := JOIN(DISTRIBUTE(ds_incident,HASH(incident_id)),DISTRIBUTE(ds_incident_CS,HASH(incident_id)),
-					left.incident_id = right.incident_id,
-					updateIncidents(left,right), left outer, LOCAL);
-					
-	 OUTPUT(cmbnd_incidents,,'~thor_data400::in::ecrash::incident_patch_prod_Contribsource_'+WORKUNIT,overwrite, __compressed__,
-					csv(terminator('\n'), separator(','),quote('"'),maxlength(60000)));
-
-	do_all :=  SEQUENTIAL(
-		FileServices.StartSuperFileTransaction(),
-		FileServices.AddSuperFile('~thor_data400::in::ecrash::incidnt_raw_new','~thor_data400::in::ecrash::incident_patch_prod_Contribsource_'+WORKUNIT),
-		FileServices.FinishSuperFileTransaction()
-	);
-	 
-	RETURN do_all;
+Update_Incident_CS := JOIN(ds_incident, ds_incident_CS_Uniq,
+					                 TRIM(LEFT.incident_id, LEFT, RIGHT) = TRIM(RIGHT.incident_id, LEFT, RIGHT) AND
+													 STD.Str.ToUpperCase(TRIM(LEFT.Vendor_Code, LEFT, RIGHT)) = STD.Str.ToUpperCase(TRIM(RIGHT.Vendor_Code, LEFT, RIGHT)),
+					                 tUpdateContribSrc(LEFT, RIGHT), LEFT OUTER);
+ 					
+ds_Incident_Upd_Out := OUTPUT(Update_Incident_CS ,, Files.Incident_Raw_LF('PopulateContribSource'), OVERWRITE, __COMPRESSED__,
+					                    CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"')));
+ 
+Updated_Incident_Raw := SEQUENTIAL(
+                                ds_Incident_Upd_Out,
+												        STD.File.StartSuperFileTransaction(),
+												        STD.File.ClearSuperFile(Files.Incident_Raw_SF, FALSE),
+												        STD.File.AddSuperFile(Files.Incident_Raw_SF, 
+																                      Files.Incident_Raw_LF('PopulateContribSource')),
+												        STD.File.FinishSuperFileTransaction()
+												       );
+ RETURN Updated_Incident_Raw;
 END;

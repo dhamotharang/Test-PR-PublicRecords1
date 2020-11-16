@@ -4,7 +4,8 @@
 		 , DID_Add
 		 , header_slimsort
 		 , lib_stringlib
-		 , idl_header;
+		 , idl_header
+		 ,dx_property;
 	
 	rsForeclosureIn		:=	File_Foreclosure_Sprayed;
 	
@@ -19,7 +20,7 @@
 	rsRawInLayout	:=	PROJECT(rsForeclosureIn, tProjectRawtoIn(LEFT));
 	
 	//Project the existing base data into the Layout_Foreclosure_In layout
-	Layout_Foreclosure_In	tProjectBasetoIn(Layout_Fares_Foreclosure_v2 pInput)
+	Layout_Foreclosure_In	tProjectBasetoIn(dx_Property.Layout_Fares_Foreclosure_v2 pInput)
 		:=
 			TRANSFORM
 				self	:=	pInput;
