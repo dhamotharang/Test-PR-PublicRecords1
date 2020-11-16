@@ -1273,6 +1273,9 @@
 		export string KEYWORD_RWOMBUD								:= '955';
 		export string KEYWORD_DKFOROM								:= '956';
 		export string KEYWORD_AFNPA									:= '957';
+		export string KEYWORD_MYDOE									:= '958';
+		export string KEYWORD_CZMFCR_UG							:= '959';
+		export string KEYWORD_PKBEOE								:= '960';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
