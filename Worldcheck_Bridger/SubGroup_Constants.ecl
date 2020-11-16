@@ -1276,6 +1276,8 @@
 		export string KEYWORD_MYDOE									:= '958';
 		export string KEYWORD_CZMFCR_UG							:= '959';
 		export string KEYWORD_PKBEOE								:= '960';
+		export string KEYWORD_CRJIA_MW							:= '961';
+		export string KEYWORD_HUNAV_SZF							:= '962';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

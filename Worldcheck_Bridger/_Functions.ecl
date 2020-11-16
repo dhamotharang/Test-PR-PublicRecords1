@@ -1377,6 +1377,8 @@
 				trim(kword, left, right) = 'MYDOE' =>SubGroup_Constants.numKeywordsID.KEYWORD_MYDOE,
 				trim(kword, left, right) = 'CZMFCR-UG' =>SubGroup_Constants.numKeywordsID.KEYWORD_CZMFCR_UG,
 				trim(kword, left, right) = 'PKBEOE' =>SubGroup_Constants.numKeywordsID.KEYWORD_PKBEOE,
+				trim(kword, left, right) = 'CRJIA-MW' =>SubGroup_Constants.numKeywordsID.KEYWORD_CRJIA_MW,
+				trim(kword, left, right) = 'HUNAV-SZF' =>SubGroup_Constants.numKeywordsID.KEYWORD_HUNAV_SZF,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
