@@ -3,60 +3,18 @@ IMPORT Data_services, Std;
 
 //DF-28036: Convert 6-Digit Spids to 4-Character Spids
 	
+	tempLayout := record
+		PhonesInfo.Layout_iConectiv.Intermediate;
+		integer uniqueid;
+		string ocn;
+	end;
+
 ////////////////////////////////////////////////////////////////////////////////////////////	
 //Reformat iConectiv Input File/////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
-	/*
-	//Pull Existing iConectiv History w/ Newly Concatenated Daily - LEGACY PORT RECORDS
-	dailyICInput 		:= PhonesInfo.File_iConectiv.In_Port_Daily_History(action_code in ['A','U','D'] and porting_dt<>'');
-
-	//Reformat Dates & Add Counter
-	tempLayout fixICFile(dailyICInput l, unsigned c):= transform
-			init_dt 							:= l.filename[std.str.Find(l.filename, '_init_', 1)+6..std.str.Find(l.filename, '_init_', 1)+20];
-			incr_dt 							:= l.filename[std.str.Find(l.filename, 'mid_102_', 1)+8..std.str.Find(l.filename, 'mid_102_', 1)+22];
-						
-			f_dt_time							:=  stringlib.stringfilter(if(std.str.Find(l.filename, '_init_', 1 ) > 0,
-																			PhonesInfo._Functions.fn_FixTimeStamp(init_dt),
-																			incr_dt), '0123456789');
-					
-			f_port_dt							:= stringlib.stringfilter(l.porting_dt, '0123456789');	
-				
-		self.filename									:= l.filename[stringlib.stringfind(l.filename, 'mid', 1)..stringlib.stringfind(l.filename, '.csv', 1)-1];					
-		self.file_dt_time							:= std.str.FindReplace(f_dt_time,'_', '');	
-		self.porting_dt								:= f_port_dt;
-		self.vendor_first_reported_dt	:= if(self.file_dt_time<>'', self.file_dt_time, '');
-		self.vendor_last_reported_dt	:= if(self.file_dt_time<>'', self.file_dt_time, '');	
-		self.port_start_dt						:= f_port_dt;
-		self.port_end_dt							:= f_port_dt;
-		self.remove_port_dt						:= if(l.action_code = 'D', f_port_dt, '');
-		self.groupid 									:= c;
-		self.is_ported          			:= if(l.action_code in ['A','U'], true, false);	
-		self.ocn											:= '';
-		self.uniqueid									:= 0;
-		self 													:= l;
-	end;
-
-	iConectivIn 		:= project(dailyICInput, fixICFile(left, counter));
-	
-	//Append OCN
-	srtCRef 				:= sort(distribute(PhonesInfo.File_Source_Reference.Main_Orig(is_current=TRUE), hash(spid)), spid, local);
-	srtTInput				:= sort(distribute(iConectivIn, hash(spid)), spid, local);
-	
-	tempLayout addOCNTr(srtTInput l, srtCRef r):= transform
-		self.ocn 											:= r.ocn;
-		self.spid											:= r.ocn; //Equate SPID to OCN
-		self 													:= l;
-	end;
-	
-	addTOCN 				:= join(srtTInput, srtCRef,
-													left.spid = right.spid,
-													addOCNTr(left, right), left outer, local, keep(1));
-	
-	iConectivInput	:= dedup(sort(distribute(addTOCN, hash(phone)), record, local), record, local);
-	*/
 	
 	//Pull Existing iConectiv History - LEGACY PORT RECORDS
-	iConectivInput  := PhonesInfo.File_iConectiv.In_Port_Daily_History_Translated; //Converted Spid-to-OCN
+	iConectivInput  := PhonesInfo.File_iConectiv.In_Port_Daily_History_Translated; //DF-28036: One-Time Spid-to-OCN Conversion
 	
 ////////////////////////////////////////////////////////////////////////////////////////////	
 //Reformat Telo Input File//////////////////////////////////////////////////////////////////
@@ -71,7 +29,7 @@ IMPORT Data_services, Std;
 	
 	concatDailyTelo		:= dailyTeloAdd + dailyTeloDelAud + dailyTeloDelOth;	
 	
-	PhonesInfo.Layout_iConectiv.Intermediate_Temp fixTeloFile(concatDailyTelo l):= transform
+	tempLayout fixTeloFile(concatDailyTelo l):= transform
 	
 			fn_timeConvert(integer timestamp) := function
 														
@@ -122,7 +80,7 @@ IMPORT Data_services, Std;
 	ccRec						:= iConectivInput + teloInput;
 
 	//Add Counter to Concatenated Files
-	PhonesInfo.Layout_iConectiv.Intermediate_Temp addCtr(ccRec l, unsigned c):= transform
+	tempLayout addCtr(ccRec l, unsigned c):= transform
 		self.groupid 	:= c;
 		self 					:= l;
 	end;

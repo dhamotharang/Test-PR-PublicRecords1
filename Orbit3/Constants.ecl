@@ -1,6 +1,5 @@
-﻿import STD,_Control;
-EXPORT Constants(string Env = 'N',string platform_status = 'ON_DEVELOPMENT') := module
-
+﻿import STD, _Control, Orbit3;
+export Constants(string Env = 'N',string platform_status = 'ON_DEVELOPMENT') := module
 r := Orbit3.Layouts.rPlatformStatus;
 
  export  dataset(r) platform_upd :=  map (     Env = 'N|B|F' or STD.Str.Find(Env,'|',2) <> 0 => dataset([{'NonFCRA',platform_status},{'Boolean',platform_status},{'FCRA',platform_status}],r),

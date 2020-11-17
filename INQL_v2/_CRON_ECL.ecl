@@ -34,7 +34,7 @@ BASE_DIDVILLE_SLIM_BUILD_ECL  := 'Inquiry_AccLogs.fnMapBaseAppendsJennyNew(,,tru
 KEYS_BUILD_ECL 								:= 'INQL_V2.proc_BuildKeys(,'+ sFCRA + ',' + sDaily + ',true);\n';
 STATS_REPORTS_ECL      				:= if(isFCRA,'Inquiry_AccLogs._SCH_FCRAComprehensiveStats;\n'
                                   				,'Inquiry_AccLogs._SCH_NonFCRAComprehensiveStats;\n');
-FILES_CONSOLIDATE_ECL         := INQL_v2.proc_FilesConsolidate(false).ecl;
+FILES_CONSOLIDATE_ECL         := INQL_v2.proc_FilesConsolidate(isFCRA).ecl;
 FIDO_REPORT_ECL               := 'do:=SEQUENTIAL(\nINQL_V2.FIDO_Change_Report.SendFIDOchangesRep;\n);\n';
 
 PROCESS_ECL 				:= Case(pProcessName, 
