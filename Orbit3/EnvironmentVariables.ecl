@@ -10,8 +10,19 @@ EXPORT EnvironmentVariables := MODULE
 			'https://orbit3.risk.regn.net/Orbit3/Orbit3Services/OrbitServicePR.svc',
 			'https://stg.orbit3.risk.regn.net/orbit3/Orbit3Services/OrbitServicePR.svc'
 		);
+
+//*************************************************************************************************************												
+//** ECL copied from Insurance for Orbit Profile setup in PR  
+//*************************************************************************************************************		
+	EXPORT PRServiceURL := 
+	if (_control.ThisEnvironment.Name = 'Prod_Thor', 
+			'https://orbitinsurance.noam.lnrm.net/Orbit3/Orbit3Services/OrbitServicePR.svc',
+			'https://stg.orbit3.risk.regn.net/orbit3/Orbit3Services/OrbitServicePR.svc'
+		);
+		
 	EXPORT serviceurlprod := 'https://orbit3.risk.regn.net/Orbit3/Orbit3Services/OrbitService.svc';
 	EXPORT soapactionprefix := 'http://lexisnexis.com/Orbit/IOrbitService';
+  EXPORT soapactionprofile 	:= 'http://lexisnexis.com/Orbit/IOrbitServiceBase/';
 	
 	EXPORT  namespace := IF( STD.System.Util.PlatformVersionCheck('7.8') ,
 		                           'http://lexisnexis.com/Orbit/',
@@ -34,5 +45,9 @@ EXPORT EnvironmentVariables := MODULE
 			IF (_control.ThisEnvironment.Name = 'Prod_Thor', 
 			'THOR-PROD',
 			'Test-Env');
-
+//*************************************************************************************************************												
+//** ECL copied from Insurance for Orbit Profile setup in PR  
+//*************************************************************************************************************			
+	EXPORT updateme :=  'yes' : stored('update_Orbit3'); // skip orbit update
+	
 END;
