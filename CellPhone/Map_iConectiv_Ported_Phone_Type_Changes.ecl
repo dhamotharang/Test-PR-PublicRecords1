@@ -14,7 +14,8 @@
 	//Add Missing SPID to Port Delete Records in Need of One
 	dsNewPhone		:= PhonesInfo.File_Phones_Transaction.Main(source in ['P!','PK']);
 	
-		sortDs 			:= sort(dsNewPhone, phone, transaction_start_dt, vendor_first_reported_dt ,local);
+		ds 					:= distribute(dsNewPhone, hash(phone));
+		sortDs 			:= sort(ds, phone, transaction_start_dt, vendor_first_reported_dt ,local);
 		gpDs				:= group(sortDs, phone, LOCAL);
 
 		//Populate SPIDs Related Fields to the Delete Records
