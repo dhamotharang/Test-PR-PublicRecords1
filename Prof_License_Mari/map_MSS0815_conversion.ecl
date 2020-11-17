@@ -102,6 +102,7 @@ rCounty_Names cnty(ds_MS_RealEstate L, county_names R) := TRANSFORM
 																 std.str.find(tmpLicenseType,'NON-RESIDENT COMPANY',1)= 1 => 'NRC',
 																 std.str.find(tmpLicenseType,'NON-RESIDENT LICENSED APPRAISER',1)= 1 => 'NRLA',
 																 std.str.find(tmpLicenseType,'APPRAISER INTERN',1)= 1 => 'AI',
+																 std.str.find(tmpLicenseType,'APPRAISER TRAINEE',1)= 1 => 'AI',
 																 ' ');
 		SELF.STD_LICENSE_TYPE	:= tempStdLicenseType;	
 		tempTypeCd						:= IF(tempStdLicenseType IN GR_Lic_types,'GR','MD');

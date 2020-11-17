@@ -1,11 +1,10 @@
 ﻿IMPORT _control, Doxie, RoxieKeyBuild, std, Ut;
 
-//DF-24394: Deactivated TCPA Port File Process.  Source not updating as of 03/15/19.
-
 EXPORT Proc_Build_Combined_Common_Port_Base(string version, string version2, const varstring eclsourceip, string thor_name):= function
 	
 //Process Daily Update Files
-	processICon	:= PhonesInfo.Proc_Build_Combined_Port_File(version2, eclsourceip, thor_name);
+	processPort					:= PhonesInfo.Proc_Build_Historical_Port_File(version, eclsourceip, thor_name);	//Port File Used Before the PortData Validate 
+	processPortDataV		:= PhonesInfo.Proc_Build_PortData_Validate_File(version2, eclsourceip, thor_name);
 	
 //Create Common Base for Update Files	
 	buildComBase:= output(PhonesInfo.Map_Common_Port_Main,,'~thor_data400::base::phones::ported_common_main_'+version, overwrite, __compressed__);
@@ -18,7 +17,8 @@ EXPORT Proc_Build_Combined_Common_Port_Base(string version, string version2, con
 																								'~thor_data400::base::phones::ported_common_main_delete'], '~thor_data400::base::phones::ported_common_main_'+version, true);
 
 	//Run Build & Provide Email on Build Status
-	sendEmail				:= sequential(processICon, 
+	sendEmail				:= sequential(processPort, 
+																processPortDataV,
 																buildComBase, clearDelete, moveComBase):
 																Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com', 'PhonesInfo Port Build Succeeded', workunit + ': Build complete.')),
 																Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com', 'PhonesInfo Port Build Failed', workunit + '\n' + FAILMESSAGE)

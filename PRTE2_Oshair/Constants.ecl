@@ -1,4 +1,6 @@
-EXPORT Constants := module
+﻿EXPORT Constants := module
+
+Export dops_name := 'OshairKeys';
 
 Export In_Accident := '~PRTE::IN::oshair::accident';
 Export In_Inspection := '~PRTE::IN::oshair::inspection';
