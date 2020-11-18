@@ -212,6 +212,19 @@ output(neutral_did_response, named('neutral_did_response'));
 
 in_did := neutral_did_response[1].did;
 
+//ssn wild
+	dids := choosen(dx_header.key_wild_SSN(iType)(keyed(s1=in_socs[1]),
+							 keyed(s2=in_socs[2]),
+							 keyed(s3=in_socs[3]),
+							 keyed(s4=in_socs[4]),
+							 keyed(s5=in_socs[5]),
+							 keyed(s6=in_socs[6]),
+							 keyed(s7=in_socs[7]),
+							 keyed(s8=in_socs[8]),
+							 keyed(s9=in_socs[9])), max_recs);
+	if(in_socs!='' and (include_all_files=true or include_header=true), output(dids, named('wildcard_ssn')) );
+
+
 // DID section
 	header_recs := choosen(dx_header.key_header(iType)(keyed(s_did=in_did)), 200);
 	if(include_header or Include_All_Files, output(header_recs, named('header_records'))) ;
