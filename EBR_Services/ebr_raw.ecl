@@ -108,6 +108,7 @@ export ebr_raw := MODULE
 							self.PAYMENT_PERFORMANCE_DECODE := EBR_Services.decode.DPP(le.PAYMENT_PERFORMANCE);
 							self.PAYMENT_TREND_DECODE := EBR_Services.decode.DPT(le.PAYMENT_TREND);
 							Self :=le;
+              self := [];
 			END;
 		
 			p1 := PROJECT(fnums, get_header(LEFT));
@@ -133,19 +134,36 @@ export ebr_raw := MODULE
 						 			CHOOSEN(SORT(CHOOSEN(ds,constants.maxcounts.default),sequence_number,os,RECORD),cn)
 						ENDMACRO;				
 						SELF.executive_summary_recs := m(PROJECT(ebr.Key_1000_Executive_Summary_FILE_NUMBER(keyed(file_number=le.file_number)),add_exec_summary(left)),constants.maxcounts.Executive_Summary);
-						SELF.trade_recs := m(PROJECT(ebr.Key_2000_Trade_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_2000_Trade_In),constants.maxcounts.Trade,-date_reported);
-						SELF.trade_payment_total_recs := m(PROJECT(ebr.Key_2015_Trade_Payment_Totals_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_2015_Trade_Payment_Totals_In),constants.maxcounts.Trade_Payment_Totals);
+						SELF.trade_recs := m(
+              PROJECT(ebr.Key_2000_Trade_FILE_NUMBER(keyed(file_number=le.file_number)),
+                TRANSFORM(ebr.Layout_2000_Trade_In, SELF := LEFT; SELF := [])),
+              constants.maxcounts.Trade,-date_reported);
+            SELF.trade_payment_total_recs := m(
+              PROJECT(ebr.Key_2015_Trade_Payment_Totals_FILE_NUMBER(keyed(file_number=le.file_number)),
+                TRANSFORM(ebr.Layout_2015_Trade_Payment_Totals_In, SELF := LEFT; SELF := [])),
+              constants.maxcounts.Trade_Payment_Totals);
 						SELF.trade_payment_trend_recs := m(PROJECT(ebr.Key_2020_Trade_Payment_Trends_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_2020_Trade_Payment_Trends_Base),200,-(unsigned)(trend_yy+trend_mm));
 						SELF.trade_quarterly_average_recs := m(PROJECT(ebr.Key_2025_Trade_Quarterly_Averages_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_2025_Trade_Quarterly_Averages_Base),constants.maxcounts.Trade_Payment_Trends,-(unsigned)(quarter_yy+quarter));
-						SELF.collateral_account_recs := m(PROJECT(ebr.Key_4500_Collateral_Accounts_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_4500_Collateral_Accounts_In),constants.maxcounts.Collateral_Accounts);
+						SELF.collateral_account_recs := m(
+              PROJECT(ebr.Key_4500_Collateral_Accounts_FILE_NUMBER(keyed(file_number=le.file_number)),
+                TRANSFORM(ebr.Layout_4500_Collateral_Accounts_In, SELF := LEFT; SELF := [])),
+              constants.maxcounts.Collateral_Accounts);
 						self.bank_detail_recs := m(PROJECT(ebr.Key_5000_Bank_Details_FILE_NUMBER(keyed(file_number=le.file_number)),add_bank_details_county(LEFT)),constants.maxcounts.Bank_Details);
-						SELF.demographic_data_5600_recs := m(PROJECT(ebr.Key_5600_Demographic_Data_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_5600_demographic_data_In),constants.maxcounts.Demographic_Data);			
+						SELF.demographic_data_5600_recs := m(
+              PROJECT(ebr.Key_5600_Demographic_Data_FILE_NUMBER(keyed(file_number=le.file_number)),
+                TRANSFORM(ebr.Layout_5600_demographic_data_In,  SELF := LEFT; SELF := [])),
+              constants.maxcounts.Demographic_Data);			
 						SELF.demographic_data_5610_recs := IF(current_demo5610,m(PROJECT(ebr.Key_5610_Demographic_Data_FILE_NUMBER(keyed(file_number=le.file_number)),add_demographic_5610(left)),constants.maxcounts.Demographic_Data),
 																																	m_all(PROJECT(ebr.Key_5610_Demographic_Data_FILE_NUMBER(keyed(file_number=le.file_number)),add_demographic_5610(left)),constants.maxcounts.Demographic_Data));
-						SELF.government_trade_recs := m(PROJECT(ebr.Key_6500_Government_Trade_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_6500_Government_Trade_In),constants.maxcounts.Government_Trade);
+						SELF.government_trade_recs := m(
+              PROJECT(ebr.Key_6500_Government_Trade_FILE_NUMBER(keyed(file_number=le.file_number)),
+                TRANSFORM(ebr.Layout_6500_Government_Trade_In, SELF := LEFT; SELF := [])),
+                constants.maxcounts.Government_Trade);
 						SELF.government_debarred_contractor_recs := m(PROJECT(ebr.Key_6510_Government_Debarred_Contractor_FILE_NUMBER(keyed(file_number=le.file_number)),add_gvt_debarred_county(LEFT)),constants.maxcounts.Government_Debarred_Contractor);
-						SELF.snp_data_recs := m(PROJECT(ebr.Key_7010_SNP_Data_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_7010_SNP_Data_In),constants.maxcounts.SNP_Data);
-
+						SELF.snp_data_recs := m(
+              PROJECT(ebr.Key_7010_SNP_Data_FILE_NUMBER(keyed(file_number=le.file_number)),
+              TRANSFORM(ebr.Layout_7010_SNP_Data_In, SELF := LEFT; SELF := [])),
+              constants.maxcounts.SNP_Data);
 
 						inquiry_recs := m(PROJECT(ebr.Key_6000_Inquiries_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_6000_Inquiries_Base),constants.maxcounts.Inquiries, -(unsigned)(inq_yy+inq_mm+inq_count));
 
@@ -159,11 +177,23 @@ export ebr_raw := MODULE
 						m_p(ds,cn) := macro
 							CHOOSEN(SORT(dedup(CHOOSEN(ds,initial_choosen),record,except process_date,sequence_number,all),-date_filed,RECORD),cn)
 						ENDMACRO;			
-						SELF.bankruptcy_recs := m_p(PROJECT(ebr.Key_4010_Bankruptcy_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_4010_Bankruptcy_In),constants.maxcounts.public_records);
-						SELF.tax_lien_recs := m_p(PROJECT(ebr.Key_4020_Tax_Liens_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_4020_Tax_Liens_In),constants.maxcounts.public_records);
-						SELF.judgment_recs := m_p(PROJECT(ebr.Key_4030_Judgement_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_4030_Judgement_In),constants.maxcounts.public_records);
-						SELF.ucc_filing_recs := m_p(PROJECT(ebr.Key_4510_UCC_Filings_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_4510_UCC_Filings_In),constants.maxcounts.public_records);
-				END;	
+						SELF.bankruptcy_recs := m_p(
+              PROJECT(ebr.Key_4010_Bankruptcy_FILE_NUMBER(keyed(file_number=le.file_number)),
+              TRANSFORM(ebr.Layout_4010_Bankruptcy_In, SELF := LEFT; SELF := [])),
+              constants.maxcounts.public_records);
+						SELF.tax_lien_recs := m_p(
+              PROJECT(ebr.Key_4020_Tax_Liens_FILE_NUMBER(keyed(file_number=le.file_number)),
+              TRANSFORM(ebr.Layout_4020_Tax_Liens_In, SELF := LEFT; SELF := [])),
+              constants.maxcounts.public_records);
+						SELF.judgment_recs := m_p(
+              PROJECT(ebr.Key_4030_Judgement_FILE_NUMBER(keyed(file_number=le.file_number)), 
+              TRANSFORM(ebr.Layout_4030_Judgement_In, SELF := LEFT; SELF := [])),
+              constants.maxcounts.public_records);
+						SELF.ucc_filing_recs := m_p(
+              PROJECT(ebr.Key_4510_UCC_Filings_FILE_NUMBER(keyed(file_number=le.file_number)),
+                TRANSFORM(ebr.Layout_4510_UCC_Filings_In, SELF := LEFT; SELF := [])),
+              constants.maxcounts.public_records);
+        END;	
 				
 				p := PROJECT(p1, form(LEFT));
 			RETURN p;

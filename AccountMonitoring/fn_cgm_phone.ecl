@@ -1,5 +1,4 @@
-﻿
-IMPORT AccountMonitoring, Phonesplus_v2, gong, ut, watchdog, header, utilfile, 
+﻿IMPORT AccountMonitoring, Phonesplus_v2, gong, ut, watchdog, header, utilfile, 
        header_quick, NID, Paw, Risk_Indicators, Phones, dx_PhonesInfo;
 
 EXPORT DATASET(layouts.history) fn_cgm_phone(

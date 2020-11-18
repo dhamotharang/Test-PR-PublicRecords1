@@ -31,7 +31,7 @@
 	EXPORT Citations_ChildRec := RECORD
 		STRING7 Citation_Issued;
 		STRING7 Citation_Type;
-		STRING100 Citation_Detail1;
+		STRING200 Citation_Detail1; 
 		STRING64 Citation_Status;
 		STRING60 Violation_Code1;
 		STRING60 Violation_Code2;
@@ -121,14 +121,14 @@
 		//PRtCC new fields
 		STRING7 citation_issued;
 		STRING7 citation_type;
-		STRING100 citation_detail1;		
+		STRING200 citation_detail1;		
 	  //CR-1237
 	  STRING64 citation_status; 		
 		STRING60 violation_code1;
 		STRING60 violation_code2;
 		STRING60 violation_code3;
 		STRING60 violation_code4;
-		STRING1 photographs_taken;
+		STRING7 photographs_taken;
 		STRING100 photographed_by;
 		STRING100 photograph_type;
 		STRING10 posted_satutory_speed_limit;
