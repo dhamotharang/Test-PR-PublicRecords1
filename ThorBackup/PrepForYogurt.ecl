@@ -378,9 +378,8 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 		return output(
 									dops.WorkUnitModule(thorbackup.Constants.esp.bocaprodthor,'8010').fSubmitNewWorkunit
 													(
-														'#workunit(\'name\',\'Backup Thor Files\');\r\n'+
-														'thorbackup.PrepForYogurt(\''+location+'\',\''+environment+'\',\''+last_wuid+'\').run: WHEN(CRON(\'7 * * * *\'));'
-														,'hthor'
+														dops.WorkUnitModule(thorbackup.Constants.esp.bocaprodthor,'8010').GetWUInfo(WORKUNIT)[1].ecltext
+														,STD.System.Job.Target()
 													)
 											);
 	
