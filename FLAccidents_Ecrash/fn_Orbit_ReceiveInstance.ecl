@@ -9,11 +9,11 @@ EXPORT fn_Orbit_ReceiveInstance(STRING ProductName, STRING inDate = '') := FUNCT
 	tokenval := Orbit3.GetToken():INDEPENDENT;
 
 	// Receive item																					 
-	ReceiveItem := Orbit3.CreateReceive(TRIM(Orbit3IConstants(ProductName).updatetype, LEFT, RIGHT),
-																			TRIM(Orbit3IConstants(ProductName).datasetname, LEFT, RIGHT),
+	ReceiveItem := Orbit3.CreateReceive(TRIM(OrbitConstants(ProductName).updatetype, LEFT, RIGHT),
+																			TRIM(OrbitConstants(ProductName).datasetname, LEFT, RIGHT),
 																			tokenval,
-																			TRIM(Orbit3IConstants(ProductName).sourcename, LEFT, RIGHT),
-																			TRIM(Orbit3IConstants(ProductName).orbitreceivedatetime(pdate))).retcode:INDEPENDENT;																						 
+																			TRIM(OrbitConstants(ProductName).sourcename, LEFT, RIGHT),
+																			TRIM(OrbitConstants(ProductName).orbitreceivedatetime(pdate))).retcode:INDEPENDENT;																						 
 
 
 	// Load the received item
@@ -24,25 +24,25 @@ EXPORT fn_Orbit_ReceiveInstance(STRING ProductName, STRING inDate = '') := FUNCT
 															
 	lAddReceiveFile	  := Orbit3.AddReceiveFile(tokenval,
 										                         lItemInstanceID,
-																					   TRIM(Orbit3IConstants(ProductName).componentfilename(pdate), LEFT, RIGHT)
+																					   TRIM(OrbitConstants(ProductName).componentfilename(pdate), LEFT, RIGHT)
 									                           ).retcode;
 
-	lUpdateReceive := Orbit3.UpdateReceive(TRIM(Orbit3IConstants(ProductName).updatetype, LEFT, RIGHT),
-																				 TRIM(Orbit3IConstants(ProductName).datasetname, LEFT, RIGHT),
+	lUpdateReceive := Orbit3.UpdateReceive(TRIM(OrbitConstants(ProductName).updatetype, LEFT, RIGHT),
+																				 TRIM(OrbitConstants(ProductName).datasetname, LEFT, RIGHT),
 																				 tokenval,
-																				 TRIM(Orbit3IConstants(ProductName).sourcename, LEFT, RIGHT),
+																				 TRIM(OrbitConstants(ProductName).sourcename, LEFT, RIGHT),
 																				 lItemInstanceID,
-																				 TRIM(Orbit3IConstants(ProductName).orbitreceivedatetime(pdate))).retcode;																							 
+																				 TRIM(OrbitConstants(ProductName).orbitreceivedatetime(pdate))).retcode;																							 
 																							
 																					 
 	// Creating Receive and Load Item instance
-  createReceiveBuildErr := FileServices.SendEmail(Orbit3IConstants(ProductName).orbit_recload_err_email,
+  createReceiveBuildErr := FileServices.SendEmail(OrbitConstants(ProductName).orbit_recload_err_email,
                                                   ProductName + ' Orbit Receive Item: '+ pdate + ' :FAILED',
                                                   'Orbit Load Receive Failed. Reason: ' + ReceiveItem.Message);	
-  createLoadBuildSuc := FileServices.SendEmail(Orbit3IConstants(ProductName).orbit_receiveload_email, 
+  createLoadBuildSuc := FileServices.SendEmail(OrbitConstants(ProductName).orbit_receiveload_email, 
                                                ProductName + ' Orbit Receive and Load: ' + pdate + ' :SUCCESS',
                                                'Orbit Receive and Load Successful on '+ pdate);
-  createLoadBuildErr := FileServices.SendEmail(Orbit3IConstants(ProductName).orbit_recload_err_email, 
+  createLoadBuildErr := FileServices.SendEmail(OrbitConstants(ProductName).orbit_recload_err_email, 
                                                ProductName + ' Orbit Load Item: '+ pdate + ' :FAILED',
                                                'Orbit Load Item Failed. Reason: ' + lAddReceiveFile.Message);
 																								 
