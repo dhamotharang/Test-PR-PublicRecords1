@@ -6,12 +6,23 @@
   ,pProxidExtraResearchFields = '\'cnp_name,prim_range,prim_name,v_city_name,st\''    //optional fields to use to unique on so you can see a better representation of patched clusters.
   ,pLgid3ExtraResearchFields  = '\'cnp_name,prim_range,prim_name,v_city_name,st\''    //optional fields to use to unique on so you can see a better representation of patched clusters.
   ,pOutputDebug               = 'true'
+  ,pDoProxid                  = 'true'
+  ,pDoLgid3                   = 'true'
 ) :=
 functionmacro
 
-  ds_patch_underlinked_proxids := BIPV2_ForceLink.mac_ForceLink_Proxid(pDataset                     ,pProxid_Underlink_file ,pProxidExtraResearchFields ,pOutputDebug);
-  ds_patch_underlinked_lgid3s  := BIPV2_ForceLink.mac_ForceLink_Lgid3(ds_patch_underlinked_proxids  ,pLgid3_Underlink_file  ,pLgid3ExtraResearchFields  ,pOutputDebug);  
-
+  #IF(pDoProxid = true)
+    ds_patch_underlinked_proxids := BIPV2_ForceLink.mac_ForceLink_Proxid(pDataset                     ,pProxid_Underlink_file ,pProxidExtraResearchFields ,pOutputDebug);
+  #ELSE
+    ds_patch_underlinked_proxids := pDataset;
+  #END
+  
+  #IF(pDoLgid3 = true)
+    ds_patch_underlinked_lgid3s  := BIPV2_ForceLink.mac_ForceLink_Lgid3(ds_patch_underlinked_proxids  ,pLgid3_Underlink_file  ,pLgid3ExtraResearchFields  ,pOutputDebug);  
+  #ELSE
+    ds_patch_underlinked_lgid3s  := ds_patch_underlinked_proxids;
+  #END
+  
   return ds_patch_underlinked_lgid3s;
 
 endmacro;

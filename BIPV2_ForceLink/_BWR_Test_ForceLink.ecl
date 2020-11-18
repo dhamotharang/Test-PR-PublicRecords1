@@ -5,4 +5,6 @@
   ,pProxidExtraResearchFields := 'cnp_name,prim_range,prim_name,v_city_name,st' //optional fields to use to unique on so you can see a better representation of clusters.
   ,pLgid3ExtraResearchFields  := 'cnp_name,prim_range,prim_name,v_city_name,st' //optional fields to use to unique on so you can see a better representation of clusters.
   ,pOutputDebug               := true
+  ,pDoProxid                  := true
+  ,pDoLgid3                   := true
 );
