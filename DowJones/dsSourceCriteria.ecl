@@ -1962,7 +1962,9 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2020/1657 Turkey List','1949'},
 {'EC 2020/1648 Belarus List','1950'},
 {'EC 2020/1649 Syria List','1951'},
-{'EC 2020/1655 Turkey List','1952'}
+{'EC 2020/1655 Turkey List','1952'},
+{'EC (CFSP) 2020/1700 Venezuela List','1953'},
+{'EC 2020/1696 Venezuela List','1954'}
 
 ],r);
 

@@ -1,4 +1,6 @@
-﻿EXPORT Files_MBSAgency := MODULE
+﻿IMPORT Orbit3;
+
+EXPORT Files_MBSAgency := MODULE
 
   EXPORT isAgency := TRUE:STORED('MBSAgency');
   EXPORT isAgencyQC := FALSE:STORED('MBSAgency_QC');
@@ -56,12 +58,12 @@
 //###########################################################################
 //              Agency Build Base File Dataset Definition  
 //###########################################################################	
-  EXPORT DS_BASE_AGENCY := DATASET(FILE_BASE_AGENCY_SF, Layout_Infiles_Fixed.agency, THOR, OPT);
+  EXPORT DS_BASE_AGENCY := DATASET(FILE_BASE_AGENCY_SF, Layout_Infiles_Fixed.agency_contrib_source, THOR, OPT);
    
 //###########################################################################
 //              Agency Orbit Profile Dataset Definition
 //###########################################################################	
-  // EXPORT DS_AGENCY_BASE_PROFILE := DATASET([{OrbitConstants(PRODUCT_NAME.DLC_BUILD_ID).ProfileName, 
-                                                          // OrbitConstants().Profile_Type}],
-
+  EXPORT DS_AGENCY_BASE_PROFILE := DATASET([{OrbitConstants(ProductName.MBS_AgencyBuild).ProfileName, 
+                                             OrbitConstants(ProductName.MBS_AgencyBuild).ProfileType}],
+																						Orbit3.Layouts.RequestGetProfileLayout);	
 END;
