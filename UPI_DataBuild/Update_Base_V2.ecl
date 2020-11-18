@@ -604,7 +604,7 @@ EXPORT Update_Base_V2 (
 																
 				// dedup_base	:= dedup(sort(new_base, record, local), record, local);	
 					
-   		RETURN sort(new_base, batch_seq_number);
+   		RETURN distribute(new_base);
    	END; 
 		
 		EXPORT PrepReturn			:= FUNCTION
