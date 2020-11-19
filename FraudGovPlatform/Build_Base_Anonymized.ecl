@@ -92,7 +92,7 @@ module
 		:= join (	distribute(pBaseFile,hash32(record_id)),
 					distribute(Previous_Build,hash32(record_id)),
 					left.record_id = right.record_id,
-					transform(FraudShared.Layouts.Base.Main, self := right),
+					transform(FraudShared.Layouts.Base.Main,self.did:=left.did,self.did_score:=left.did_score, self := right),
 					inner,
 					local);
 

@@ -1,5 +1,4 @@
-﻿
-IMPORT AccountMonitoring, Phonesplus_v2, gong, ut, watchdog, header, utilfile, 
+﻿IMPORT AccountMonitoring, Phonesplus_v2, gong, ut, watchdog, header, utilfile, 
        header_quick, NID, Paw, Risk_Indicators, Phones, dx_PhonesInfo;
 
 EXPORT DATASET(layouts.history) fn_cgm_phone(
@@ -435,9 +434,9 @@ EXPORT DATASET(layouts.history) fn_cgm_phone(
   fn_GetServiceType(STRING1 serv, STRING1 line) :=	FUNCTION//look at both serv and line
             serv_type_code := MAP(serv = '0' AND (line IN ['0','']) => AccountMonitoring.product_files.phone.POTS,
                                   serv = '0' AND line = '2'        => AccountMonitoring.product_files.phone.CABLE,
-                                  serv = '1' AND (line IN ['0','']) => AccountMonitoring.product_files.phone.CELL_PHONE,
-                                  serv = '2' AND (line IN ['0','']) => AccountMonitoring.product_files.phone.VOIP,
-                                  serv = '3' AND (line IN ['0','']) => AccountMonitoring.product_files.phone.UNKNOWN_TYPE,
+                                  serv = '1' AND (line IN ['1','']) => AccountMonitoring.product_files.phone.CELL_PHONE,
+                                  serv = '2' AND (line IN ['2','']) => AccountMonitoring.product_files.phone.VOIP,
+                                  serv = '3' AND (line IN ['3','']) => AccountMonitoring.product_files.phone.UNKNOWN_TYPE,
                                   '');
              RETURN serv_type_code;
 		END;
@@ -448,8 +447,8 @@ EXPORT DATASET(layouts.history) fn_cgm_phone(
                                          SELF.phone_type_code := fn_GetServiceType(RIGHT.serv, RIGHT.line);
 										 SELF.vendor_last_reported_dt := RIGHT.vendor_last_reported_dt;
                                          SELF := LEFT;),
-                               LEFT OUTER, KEEP(1000), LOCAL);
-    ds_PhoneType_sort := DEDUP(SORT(ds_PhoneType_join,phone, -vendor_last_reported_dt),phone);
+                               LEFT OUTER, LOCAL);
+    ds_PhoneType_sort := DEDUP(SORT(ds_PhoneType_join,phone, pid, rid, hid, -vendor_last_reported_dt, LOCAL),phone, pid, rid, hid, LOCAL);
 
 		ds_PhoneType := PROJECT(ds_PhoneType_sort, TRANSFORM(temp_layout, SELF := LEFT)); 
 
@@ -481,14 +480,24 @@ EXPORT DATASET(layouts.history) fn_cgm_phone(
     key_carrierreference := DISTRIBUTED(AccountMonitoring.product_files.phone.key_carrier_reference_dist, HASH64(ocn));
     lerg6_dist := DISTRIBUTE(temp_add_lerg6, HASH64(ocn));
 
-    dLergPhonesFinal := JOIN(lerg6_dist, key_carrierreference,
+    layout_carrier_reference := RECORD
+     temp_layout;	
+     string8 dt_last_reported;
+    END;
+
+    dLergPhonesjoin := JOIN(lerg6_dist, key_carrierreference,
                            LEFT.ocn =RIGHT.ocn,
-                           TRANSFORM(temp_layout,
+                           TRANSFORM(layout_carrier_reference,
                             SELF.phone := LEFT.phone;
+                            SELF.dt_last_reported := RIGHT.dt_last_reported;
                             SELF.phone_type_code := IF(RIGHT.serv != '', fn_GetServiceType(RIGHT.serv, RIGHT.line), AccountMonitoring.product_files.phone.UNKNOWN_TYPE);
 							SELF := LEFT),
-                            LEFT OUTER, KEEP(1), LOCAL);
-		
+                            LEFT OUTER, LOCAL);
+
+    dLergPhones := DEDUP(SORT(dLergPhonesjoin,phone, pid, rid, hid, -dt_last_reported, LOCAL),phone, pid, rid, hid, LOCAL);
+
+    dLergPhonesFinal := PROJECT(dLergPhones, TRANSFORM(temp_layout, SELF := LEFT)); 
+    
     temp_all_recombine := ds_PhoneType_no_lerg & dLergPhonesFinal;
     
     // Now, create a hash value from only those fields we're interested in (these 

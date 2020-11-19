@@ -1,8 +1,9 @@
-EXPORT Out_STRATA_Population_Stats (pTCPAPort    			// TCPA Daily Port File
-																			,piConectPort   // iConectiv Daily Port File
+﻿EXPORT Out_STRATA_Population_Stats (//pTCPAPort    		// TCPA Daily Port File
+																			 piConectPort   // iConectiv Daily Port File
+																			,piConectPortDataValidate //iConectiv PortData Validate File 
 																			,pLIDB					// LIDB File
-																			,pGHDisc 	//Gong History Disconnect Daily File
-																			,pDisc		// Disconnect Daily File
+																			,pGHDisc 				//Gong History Disconnect Daily File
+																			,pDisc					// Disconnect Daily File
 																			,pPhonesMeta 		// PhonesMetadata File	
 																			,pCarrRef				// Carrier Reference File
 																			,pVersion       // Version of Strat Stats
@@ -11,13 +12,17 @@ EXPORT Out_STRATA_Population_Stats (pTCPAPort    			// TCPA Daily Port File
  
 import Strata, PhonesInfo, ut;
 
-	#uniquename(rPopulationStats_pTCPAPort);
-	#uniquename(dPopulationStats_pTCPAPort);
-	#uniquename(zRunTCPAPortStats);
+	//#uniquename(rPopulationStats_pTCPAPort);
+	//#uniquename(dPopulationStats_pTCPAPort);
+	//#uniquename(zRunTCPAPortStats);
 	
 	#uniquename(rPopulationStats_piConectPort);
 	#uniquename(dPopulationStats_piConectPort);
 	#uniquename(zRuniConectPortStats);
+	
+	#uniquename(rPopulationStats_piConectPortDataValidate);
+	#uniquename(dPopulationStats_piConectPortDataValidate);
+	#uniquename(zRuniConectPortDataValidateStats);	
 	
 	#uniquename(rPopulationStats_pLIDB);
 	#uniquename(dPopulationStats_pLIDB);
@@ -37,7 +42,7 @@ import Strata, PhonesInfo, ut;
 	#uniquename(rPopulationStats_pCarrRef);
 	#uniquename(dPopulationStats_pCarrRef);
 	#uniquename(zRunCarrRefStats);
-	
+	/*
 	//TCPA Phones Ported File Population Stats
 		%rPopulationStats_pTCPAPort% := record
 		  countGroup														:= count(group);
@@ -52,7 +57,7 @@ import Strata, PhonesInfo, ut;
 		
 	%dPopulationStats_pTCPAPort% := table(pTCPAPort, %rPopulationStats_pTCPAPort%, phonetype, few);
 	strata.createXMLStats(%dPopulationStats_pTCPAPort%,'PhonesMetadata', 'TCPAPortedPhones', pVersion, '', %zRunTCPAPortStats%);
-	
+	*/
 	//iConectiv Phones Ported File Population Stats
 		%rPopulationStats_piConectPort% := record
 		  string3 grouping												:= 'ALL';																
@@ -78,6 +83,37 @@ import Strata, PhonesInfo, ut;
 
 	%dPopulationStats_piConectPort% := table(piConectPort, %rPopulationStats_piConectPort%, few);
 	strata.createXMLStats(%dPopulationStats_piConectPort%,'PhonesMetadata', 'iConectivPortedPhones', pVersion, '', %zRuniConectPortStats%);
+	
+	//iConectiv Phones PortData Validate Ported File Population Stats
+		%rPopulationStats_piConectPortDataValidate% := record
+		  string3 grouping												:= 'ALL';																
+			countGroup                           		:= count(group);	
+			country_code_CountNonBlank 							:= sum(group, if(piConectPortDataValidate.country_code<>'', 1, 0));
+			phone_CountNonBlank 										:= sum(group, if(piConectPortDataValidate.phone<>'', 1, 0));
+			dial_type_CountNonBlank 								:= sum(group, if(piConectPortDataValidate.dial_type<>'', 1, 0));
+			spid_CountNonBlank 											:= sum(group, if(piConectPortDataValidate.spid<>'', 1, 0));
+			service_provider_CountNonBlank 					:= sum(group, if(piConectPortDataValidate.service_provider<>'', 1, 0));
+			service_type_CountNonBlank 							:= sum(group, if(piConectPortDataValidate.service_type<>'', 1, 0));
+			alt_spid_CountNonBlank 									:= sum(group, if(piConectPortDataValidate.alt_spid<>'', 1, 0));
+			alt_service_provider_CountNonBlank 			:= sum(group, if(piConectPortDataValidate.alt_service_provider<>'', 1, 0));
+			lalt_spid_CountNonBlank 								:= sum(group, if(piConectPortDataValidate.lalt_spid<>'', 1, 0));	
+			lalt_service_provider_CountNonBlank 		:= sum(group, if(piConectPortDataValidate.lalt_service_provider<>'', 1, 0));
+			line_type_CountNonBlank 								:= sum(group, if(piConectPortDataValidate.line_type<>'', 1, 0));
+			routing_code_CountNonBlank 							:= sum(group, if(piConectPortDataValidate.routing_code<>'', 1, 0));
+			porting_dt_CountNonBlank 								:= sum(group, if(piConectPortDataValidate.porting_dt<>'', 1, 0));
+			country_abbr_CountNonBlank 							:= sum(group, if(piConectPortDataValidate.country_abbr<>'', 1, 0));
+			filename_CountNonBlank 									:= sum(group, if(piConectPortDataValidate.filename<>'', 1, 0));
+			file_dt_time_CountNonBlank 							:= sum(group, if(piConectPortDataValidate.file_dt_time<>'', 1, 0));
+			vendor_first_reported_dt_CountNonBlank 	:= sum(group, if(piConectPortDataValidate.vendor_first_reported_dt<>'', 1, 0));
+			vendor_last_reported_dt_CountNonBlank 	:= sum(group, if(piConectPortDataValidate.vendor_last_reported_dt<>'', 1, 0));
+			port_start_dt_CountNonBlank 						:= sum(group, if(piConectPortDataValidate.port_start_dt<>'', 1, 0));
+			port_end_dt_CountNonBlank 							:= sum(group, if(piConectPortDataValidate.port_end_dt<>'', 1, 0));
+			remove_port_dt_CountNonBlank 						:= sum(group, if(piConectPortDataValidate.remove_port_dt<>'', 1, 0));
+			is_ported_CountNonFalse 								:= sum(group, if(piConectPortDataValidate.is_ported<>FALSE, 1, 0));
+		end;
+
+	%dPopulationStats_piConectPortDataValidate% := table(piConectPortDataValidate, %rPopulationStats_piConectPortDataValidate%, few);
+	strata.createXMLStats(%dPopulationStats_piConectPortDataValidate%,'PhonesMetadata', 'iConectivPortDataValidatePortedPhones', pVersion, '', %zRuniConectPortDataValidateStats%);
 	
 	//LIDB File Population Stats
 		%rPopulationStats_pLIDB% := record															
@@ -301,6 +337,6 @@ import Strata, PhonesInfo, ut;
 	%dPopulationStats_pCarrRef% := table(pCarrRef, %rPopulationStats_pCarrRef%, serv, line, few);
 	strata.createXMLStats(%dPopulationStats_pCarrRef%, 'PhonesMetadata', 'CarrierReference2', pVersion, '', %zRunCarrRefStats%);
 	
-	zOut := parallel(%zRunTCPAPortStats%, %zRuniConectPortStats%, %zRunLIDBStats%, %zRunDisconnectStats%, %zRunGHDisconnectStats%, %zRunPhoneMetadataStats%, %zRunCarrRefStats%);
+	zOut := parallel(/*%zRunTCPAPortStats%,*/ %zRuniConectPortStats%, %zRuniConectPortDataValidateStats%, %zRunLIDBStats%, %zRunDisconnectStats%, %zRunGHDisconnectStats%, %zRunPhoneMetadataStats%, %zRunCarrRefStats%);
 
 ENDMACRO;
