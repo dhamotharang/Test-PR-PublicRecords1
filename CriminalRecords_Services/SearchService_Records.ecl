@@ -153,9 +153,9 @@ export SearchService_Records := module
     
     quality_recs := if(in_params.StrictMatch, recs_strict, recs_plus_pen(penalt <= pthreshold_translated));
     
-    Suppress.MAC_Suppress(quality_recs,pull_1,in_params.application_type,Suppress.Constants.LinkTypes.DID,did);
-    Suppress.MAC_Suppress(pull_1,pull_2,in_params.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
-    Suppress.MAC_Suppress(pull_2,pull_3,in_params.application_type,,,Suppress.Constants.DocTypes.OffenderKey,offender_key);
+    Suppress.MAC_Suppress(quality_recs,pull_1,in_params.application_type,Suppress.Constants.LinkTypes.DID,did, isFCRA := isFCRA);
+    Suppress.MAC_Suppress(pull_1,pull_2,in_params.application_type,Suppress.Constants.LinkTypes.SSN,ssn, isFCRA := isFCRA);
+    Suppress.MAC_Suppress(pull_2,pull_3,in_params.application_type,,,Suppress.Constants.DocTypes.OffenderKey,offender_key, isFCRA := isFCRA);
     
     doxie.MAC_PruneOldSSNs(pull_3, out_f_p1, ssn, did, isFCRA);
     doxie.MAC_PruneOldSSNs(out_f_p1, out_f_p2, ssn_appended, did, isFCRA);

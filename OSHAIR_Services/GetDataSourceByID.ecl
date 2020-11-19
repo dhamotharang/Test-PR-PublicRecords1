@@ -148,7 +148,11 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (OSHAIR_Services.layouts.id) i
 /*
 // this is another way of getting child sets, if more complex job required
 
-  violations_rec := OSHAIR.layout_OSHAIR_violations_clean;
+  violations_clean_layout := RECORD
+    dx_OSHAIR.layouts.Layout_Violations - dx_common.layout_metadata
+  END;
+
+  violations_rec := violations_clean_layout;
   src_violations := JOIN (in_ids, OSHAIR.Key_payload_violations,
                           keyed (Left.activity_number = Right.activity_number),
                           transform (violations_rec, SELF := Right),

@@ -1,4 +1,4 @@
-﻿import doxie_files, property, riskwise, bankruptcyv3, liensv2, ut, risk_indicators, MDR, doxie, Suppress;
+﻿import doxie_files, dx_property, riskwise, bankruptcyv3, liensv2, ut, risk_indicators, MDR, doxie, Suppress;
 
 export Boca_Shell_Derogs (GROUPED DATASET(risk_indicators.layouts.layout_derogs_input) ids, unsigned1 BSversion=1, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
 
@@ -734,7 +734,7 @@ liens_rolled := ROLLUP(liens_sorted,LEFT.did=RIGHT.did,roll_liens(LEFT,RIGHT));
 								get_crim(LEFT,RIGHT), LEFT OUTER, KEEP(1));
 								
 
-wFID := join(w_crim, property.key_foreclosure_did, 
+wFID := join(w_crim, dx_Property.Key_Foreclosure_DID, 
 						left.did!=0 and keyed(left.did=right.did), 
 						transform(layout_extended, self.fid := right.fid, self.BJL.foreclosure_flag := right.did!=0, self := left, self := []), 
 						left outer, atmost(keyed(left.did=right.did), riskwise.max_atmost), keep(50));
@@ -744,7 +744,7 @@ unsigned4 global_sid;
 layout_derog_process;
 END;
 
-all_foreclosures_unsuppressed := join(wFID, property.key_foreclosures_fid,
+all_foreclosures_unsuppressed := join(wFID, dx_Property.Key_Foreclosures_FID,
 						left.fid!='' and 
 						keyed(left.fid=right.fid) and
 						right.source=MDR.sourceTools.src_Foreclosures,

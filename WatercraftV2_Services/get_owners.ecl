@@ -39,8 +39,8 @@ EXPORT get_owners(DATASET(WatercraftV2_Services.layouts.owner_raw_rec) owner_key
 
         Census_Data.MAC_Fips2County_Keyed(report_recs_dep, st, county, county_name, owner_recs_unmsk)
 
-        Suppress.MAC_Suppress(owner_recs_unmsk,did_pulled,application_type_value,Suppress.Constants.LinkTypes.DID,did);
-        Suppress.MAC_Suppress(did_pulled,ssn_pulled,application_type_value,Suppress.Constants.LinkTypes.SSN,ssn);
+        Suppress.MAC_Suppress(owner_recs_unmsk,did_pulled,application_type_value,Suppress.Constants.LinkTypes.DID,did, isFCRA := isFCRA);
+        Suppress.MAC_Suppress(did_pulled,ssn_pulled,application_type_value,Suppress.Constants.LinkTypes.SSN,ssn, isFCRA := isFCRA);
 
         // cannot use pullSSN in fcra-side:
         ssn_clean := IF (IsFCRA, owner_recs_unmsk, ssn_pulled);

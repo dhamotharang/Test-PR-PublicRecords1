@@ -150,7 +150,7 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
                     // We're not testing for the SLBBNFEL model only, since the rules listed above indicate that the system must not run a BB model by itself.
                  
 									//Old flagships - SBBM and SBOM
-											LNSmallBizModelsType   = BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT_BLENDED OR   
+           LNSmallBizModelsType   = BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT_BLENDED OR   
            CreditReportModelsType = BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT_BLENDED 
                                   => LNSmallBusiness.Constants.DATASET_MODELS.CREDIT_BLENDED,
            LNSmallBizModelsType   = BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT OR   
@@ -168,7 +168,7 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
       MAP( SmallBizCombined_inmod.ds_SBA_Input[1].SeleID != 0  
              => LNSmallBusiness.fn_addBestInfo(SmallBizCombined_inmod, LNSmallBusiness.Constants.BEST_INFO_REQ_TYPE.SELEID),
            // can comment out for testing so that fn_addBestInfo is not called twice in order to output debug attrs within fn_addBestInfo function.
-		SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_LexID != 0  OR
+           SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_LexID != 0  OR
            SmallBizCombined_inmod.ds_SBA_Input[1].Rep_2_LexID != 0  OR
            SmallBizCombined_inmod.ds_SBA_Input[1].Rep_3_LexID != 0 
              => LNSmallBusiness.fn_addBestInfo(SmallBizCombined_inmod, LNSmallBusiness.Constants.BEST_INFO_REQ_TYPE.LEXID_ONLY),
@@ -207,14 +207,14 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
               LNSmallBusiness.BIP_Layouts.IntermediateLayout );
               
 	  SBA_Results := 
-      IF(~SmallBizCombined_inmod.TestDataEnabled, 
-         SBA_Results_Temp,
-         LNSmallBusiness.SmallBusiness_BIP_Testseed_Function(SmallBizCombined_inmod.ds_SBA_Input,
-                                                             (STRING32)SmallBizCombined_inmod.TestDataTableName,
-                                                             SmallBizCombined_inmod.DataPermissionMask,
-                                                             ds_CombinedModelsRequested));
-  
-				ds_NewModels:=	if(EXISTS(ds_CombinedModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB)),
+     IF(~SmallBizCombined_inmod.TestDataEnabled, 
+        SBA_Results_Temp,
+        LNSmallBusiness.SmallBusiness_BIP_Testseed_Function(SmallBizCombined_inmod.ds_SBA_Input,
+                                                            (STRING32)SmallBizCombined_inmod.TestDataTableName,
+                                                            SmallBizCombined_inmod.DataPermissionMask,
+                                                            ds_CombinedModelsRequested));
+
+    ds_NewModels:=	if(EXISTS(ds_CombinedModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB)),
 							BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_SLBB, 
 							BusinessCredit_Services.Constants.MODEL_NAME_SETS.NONE) +
 						if(EXISTS(ds_CombinedModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO)),
@@ -230,13 +230,6 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
 							BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED_BBFM_SBFEATTR, 
 							BusinessCredit_Services.Constants.MODEL_NAME_SETS.NONE); 
 	
-    ds_Final_SmallBizAnaResults := 
-      LNSmallBusiness.SmallBusiness_intoIESP_layouts.fn_SmallBiz_intoESDL(SBA_Results,
-                                                                          SmallBizCombined_inmod.AttributesRequested,
-                                                                          LNSmallBizModelsType,
-                                                                          ds_NewModels
-                                                                          );
-    
 		isGoodHit := SBA_Results[1].MatchWeight >= BusinessCredit_Services.Constants.BIPID_WEIGHT_THRESHOLD;
 		
    /* ****************************************************************************
@@ -256,7 +249,7 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
       MODULE (PROJECT(SmallBizCombined_inmod, BusinessCredit_Services.Iparam.reportrecords, OPT));
         EXPORT DATASET (BIPV2.IDlayouts.l_xlink_ids2) BusinessIds := ds_BizLinkIds;
         EXPORT UNSIGNED1 GLBPurpose             := SmallBizCombined_inmod.GLBAPurpose;
-		    EXPORT STRING32  ApplicationType        := SmallBizCombined_inmod.ApplicationType;
+        EXPORT STRING32  ApplicationType        := SmallBizCombined_inmod.ApplicationType;
         EXPORT STRING14  DID                    := (STRING14)SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_LexID;
        
 				// Include_businessCredit Always true when called from here
@@ -265,12 +258,12 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
 				// which is the value of BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport if nothing or '1'  is passed in.
 				// in the future when a '2' or '3' is passed for BusinessCreditReportType meaning LnOnly Credit then this will ensure that Include_businessCredit
 				// is false meaning no SBFE data in that particular version of the report.
-	   EXPORT BOOLEAN   Include_BusinessCredit :=   SmallBizCombined_inmod.BusinessCreditReportType = 
+        EXPORT BOOLEAN   Include_BusinessCredit :=   SmallBizCombined_inmod.BusinessCreditReportType = 
 		                                                                                         BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport; 
 
-	 EXPORT BOOLEAN  LimitPaymentHistory24Months  :=  SmallBizCombined_inmod. LimitPaymentHistory24Months; // small bus Credit Report w SBFE addition
-	  EXPORT STRING     SBFEContributorIds  := SmallBizCombined_inmod.SBFEContributorIds; // small bus Credit Report w SBFE addition
-	  EXPORT STRING1 BusinessCreditReportType :=  SmallBizCombined_inmod.BusinessCreditReportType;  // use input iparam for requirement 1.3.3 
+        EXPORT BOOLEAN  LimitPaymentHistory24Months  :=  SmallBizCombined_inmod. LimitPaymentHistory24Months; // small bus Credit Report w SBFE addition
+        EXPORT STRING     SBFEContributorIds  := SmallBizCombined_inmod.SBFEContributorIds; // small bus Credit Report w SBFE addition
+        EXPORT STRING1 BusinessCreditReportType :=  SmallBizCombined_inmod.BusinessCreditReportType;  // use input iparam for requirement 1.3.3 
         EXPORT STRING1   FetchLevel 					  := BIPV2.IDconstants.Fetch_Level_SELEID;
         EXPORT BOOLEAN   IncludeScores          := FALSE; // Don't return scores becasue we are getting them from LNSmallBizAna 
         EXPORT BOOLEAN   AllowAll               := FALSE;
@@ -279,26 +272,26 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
         EXPORT BOOLEAN   includeMinors          := FALSE; 
         EXPORT BOOLEAN   TestDataEnabled        := SmallBizCombined_inmod.TestDataEnabled; 
         EXPORT STRING    TestDataTableName      := SmallBizCombined_inmod.TestDataTableName; 
-				EXPORT companyname                      := SmallBizCombined_inmod.ds_SBA_Input[1].Bus_Company_Name;
-				EXPORT company_streetaddress1           := SmallBizCombined_inmod.ds_SBA_Input[1].Bus_Street_Address1;
-				EXPORT company_city                     := SmallBizCombined_inmod.ds_SBA_Input[1].Bus_City;
-				EXPORT company_state                    := SmallBizCombined_inmod.ds_SBA_Input[1].Bus_State;
-				EXPORT company_zip                      := SmallBizCombined_inmod.ds_SBA_Input[1].Bus_Zip;
-				EXPORT company_phone                    := SmallBizCombined_inmod.ds_SBA_Input[1].Bus_Phone10;
-				EXPORT tin                              := SmallBizCombined_inmod.ds_SBA_Input[1].Bus_FEIN;
-				EXPORT firstname                        := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_First_Name;
-				EXPORT middlename                       := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_Middle_Name;
-				EXPORT lastname                         := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_Last_Name;
-				EXPORT authrep_streetaddress1           := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_Street_Address1;
-				EXPORT authrep_city                     := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_City;
-				EXPORT authrep_state                    := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_State;
-				EXPORT authrep_zip                      := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_Zip;
-				EXPORT authrep_phone                    := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_Phone10;
-				EXPORT ssn                              := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_SSN;
-				EXPORT dob                              := (INTEGER)SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_DOB;
-				EXPORT dlnumber                         := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_DL_Number;
-				EXPORT dlstate                          := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_DL_State;
-				EXPORT BOOLEAN   UseInputDataAsIs       := SmallBizCombined_inmod.UseInputDataAsIs;
+        EXPORT companyname                      := SmallBizCombined_inmod.ds_SBA_Input[1].Bus_Company_Name;
+        EXPORT company_streetaddress1           := SmallBizCombined_inmod.ds_SBA_Input[1].Bus_Street_Address1;
+        EXPORT company_city                     := SmallBizCombined_inmod.ds_SBA_Input[1].Bus_City;
+        EXPORT company_state                    := SmallBizCombined_inmod.ds_SBA_Input[1].Bus_State;
+        EXPORT company_zip                      := SmallBizCombined_inmod.ds_SBA_Input[1].Bus_Zip;
+        EXPORT company_phone                    := SmallBizCombined_inmod.ds_SBA_Input[1].Bus_Phone10;
+        EXPORT tin                              := SmallBizCombined_inmod.ds_SBA_Input[1].Bus_FEIN;
+        EXPORT firstname                        := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_First_Name;
+        EXPORT middlename                       := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_Middle_Name;
+        EXPORT lastname                         := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_Last_Name;
+        EXPORT authrep_streetaddress1           := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_Street_Address1;
+        EXPORT authrep_city                     := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_City;
+        EXPORT authrep_state                    := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_State;
+        EXPORT authrep_zip                      := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_Zip;
+        EXPORT authrep_phone                    := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_Phone10;
+        EXPORT ssn                              := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_SSN;
+        EXPORT dob                              := (INTEGER)SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_DOB;
+        EXPORT dlnumber                         := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_DL_Number;
+        EXPORT dlstate                          := SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_DL_State;
+        EXPORT BOOLEAN UseInputDataAsIs         := SmallBizCombined_inmod.UseInputDataAsIs;
       END;
 
     iesp.businesscreditreport.t_BusinessCreditReportRecord bizCred_null_trans() := TRANSFORM
@@ -318,7 +311,7 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
     // ----------------------------- LN-Only (Cortera) B2B Trade Data --------------------------
     // -----------------------------------------------------------------------------------------
     ds_b2bTrade_LNResults := LNSmallBusiness.LN_Tradeline_Functions(ds_BizLinkIds).compose_b2b_trade_data();
-   ds_b2bTrade_TestSeedResults := LNSmallBusiness.getCorteraTestSeedData(SmallBizCombined_inmod.ds_SBA_Input,
+    ds_b2bTrade_TestSeedResults := LNSmallBusiness.getCorteraTestSeedData(SmallBizCombined_inmod.ds_SBA_Input,
                                                                          (STRING20)SmallBizCombined_inmod.TestDataTableName);
     ds_b2bTrade_results_nohit := 
       LNSmallBusiness.LN_Tradeline_Functions(ds_BizLinkIds).compose_b2b_trade_data_nohit(
@@ -379,7 +372,7 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
     *******************************************************************************************/ 	
  
     ds_model_results	          := NORMALIZE(SBA_Results, LEFT.ModelResults, TRANSFORM(RIGHT));
-	   ds_modelScores_res_filtered := ds_model_results( Name IN set_ScoreTypeFilter );
+	  ds_modelScores_res_filtered := ds_model_results( Name IN set_ScoreTypeFilter );
 
     iesp.businesscreditreport.t_BusinessCreditScore xfm_current_scores(RECORDOF(ds_model_results) L) := 
       TRANSFORM  
@@ -490,75 +483,39 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
                         SELF := []
               ));
 
-    {iesp.smallbusinessbipcombinedreport.t_SmallBusinessBipCombinedReportResponse, BOOLEAN SmallBiz_SBFE_Royalty, UNSIGNED6 Rep_LexID} xfm_transform_SmallBusinessBipCombinedReportResponse() := 
+    LNSmallBusiness.Layouts.SmallBusinessBipCombinedReportIntermediateResponse xfm_transform_SmallBusinessBipCombinedReportResponse() := 
       TRANSFORM
-        SELF._Header    := IF( ~SmallBizCombined_inmod.TestDataEnabled, iesp.ECL2ESP.GetHeaderRow()); //Don't populate the header row if testseeds are requested.
-				SELF.BillingHit := (INTEGER)SBA_Results[1].BillingHit;
-        SELF.InputEcho  := ROW([],iesp.smallbusinessbipcombinedreport.t_SmallBusinessBipCombinedReportSearchBy); 
-        SELF.SmallBusinessAnalyticsResults := ds_Final_SmallBizAnaResults;
-        SELF.CreditReportRecords           := ds_Final_CreditReportRecords;	
-        SELF.SmallBiz_SBFE_Royalty         := (INTEGER)SBA_Results[1].SBFEAccountCount > 0;
-        SELF.Rep_LexID                     := SBA_Results[1].Rep_LexID;
-      END;
-      
+        SELF._Header := IF( ~SmallBizCombined_inmod.TestDataEnabled, iesp.ECL2ESP.GetHeaderRow()); //Don't populate the header row if testseeds are requested.
+        SELF.InputEcho := ROW([],iesp.smallbusinessbipcombinedreport.t_SmallBusinessBipCombinedReportSearchBy); 
+        SELF.BillingHit := (INTEGER)SBA_Results[1].BillingHit;
+        SELF.SmallBusinessAnalyticsResults := ROW([],iesp.smallbusinessbipcombinedreport.t_SmallBusinessAnalyticsIDsModelsAttributes);
+        SELF.CreditReportRecords := ds_Final_CreditReportRecords;	
+        SELF.SBA_Results := SBA_Results; 
+        SELF.SmallBiz_SBFE_Royalty := (INTEGER)SBA_Results[1].SBFEAccountCount > 0;
+        SELF.Rep_LexID := SBA_Results[1].Rep_LexID;
+        SELF.LNSmallBizModelsType := LNSmallBizModelsType;
+        SELF.NewLNSmallBizModelsType := ds_NewModels;       
+       END;
+    
     ds_results_Hit := DATASET([xfm_transform_SmallBusinessBipCombinedReportResponse()]) ;
  
-    {iesp.smallbusinessbipcombinedreport.t_SmallBusinessBipCombinedReportResponse, BOOLEAN SmallBiz_SBFE_Royalty, UNSIGNED6 Rep_LexID} xfm_transform_NoHit() := 
+    LNSmallBusiness.Layouts.SmallBusinessBipCombinedReportIntermediateResponse xfm_transform_NoHit() := 
       TRANSFORM
-        SELF._Header    := IF( ~SmallBizCombined_inmod.TestDataEnabled, iesp.ECL2ESP.GetHeaderRow()); //Don't populate the header row if testseeds are requested.
-				SELF.BillingHit := (INTEGER)SBA_Results[1].BillingHit;
-        SELF.InputEcho  := ROW([],iesp.smallbusinessbipcombinedreport.t_SmallBusinessBipCombinedReportSearchBy); 
-        SELF.SmallBusinessAnalyticsResults := ds_Final_SmallBizAnaResults;
-        SELF.CreditReportRecords           := ds_Final_CreditReportRecords_NoHit;	
-        SELF.SmallBiz_SBFE_Royalty         := (INTEGER)SBA_Results[1].SBFEAccountCount > 0;
-        SELF.Rep_LexID                     := 0;
+        SELF._Header := IF( ~SmallBizCombined_inmod.TestDataEnabled, iesp.ECL2ESP.GetHeaderRow()); //Don't populate the header row if testseeds are requested.
+        SELF.InputEcho := ROW([],iesp.smallbusinessbipcombinedreport.t_SmallBusinessBipCombinedReportSearchBy);
+        SELF.BillingHit := (INTEGER)SBA_Results[1].BillingHit;
+        SELF.SmallBusinessAnalyticsResults := ROW([],iesp.smallbusinessbipcombinedreport.t_SmallBusinessAnalyticsIDsModelsAttributes);
+        SELF.CreditReportRecords := ds_Final_CreditReportRecords_NoHit;	
+        SELF.SBA_Results := SBA_Results; 
+        SELF.SmallBiz_SBFE_Royalty := (INTEGER)SBA_Results[1].SBFEAccountCount > 0;
+        SELF.Rep_LexID  := 0;
+        SELF.LNSmallBizModelsType := LNSmallBizModelsType;
+        SELF.NewLNSmallBizModelsType := ds_NewModels;       
       END;
       
     ds_results_NoHit := DATASET([xfm_transform_NoHit()]) ;
 		
 		ds_results := IF( isGoodHit OR isBIPIDSearch OR SmallBizCombined_inmod.TestDataEnabled, ds_results_Hit, ds_results_NoHit );
-		
-		// output(isGoodHit, named('isGoodHit'));
-		//output(ds_SBA_Input_withCompPhone, named('ds_SBA_Input_withCompPhone'));
-    // OUTPUT(SBA_Results_Temp_with_PhoneSources, NAMED('SBA_Results_Temp_with_PhoneSources'));
-    // OUTPUT(SBA_Results, NAMED('SBA_Results'));
-    // OUTPUT(ds_BizLinkIds, NAMED('ds_BizLinkIds'));
-    // OUTPUT(ds_inCreditScoreRequested, NAMED('ds_inCreditScoreRequested'));
-		// OUTPUT(ds_inBlendedScoreRequested, NAMED('ds_inBlendedScoreRequested'));
-    // OUTPUT(SBA_Results.ModelResults, NAMED('SBA_modelResults'));
-    // OUTPUT(ds_model_results, NAMED('ds_model_results'));
-    // OUTPUT(ds_modelScores_res_filtered, NAMED('ds_modelScores_res_filtered'));
-    // OUTPUT(CreditReportModelsType, NAMED('CreditReportModelsType'));
-    // OUTPUT(set_ScoreTypeFilter, NAMED('set_ScoreTypeFilter'));
-    // OUTPUT(ds_model_results, NAMED('ds_model_results'));
-    // OUTPUT(ds_curr_Scores, NAMED('ds_curr_Scores'));
-    // OUTPUT(_curr_Scores, NAMED('_curr_Scores'));
-    // OUTPUT(ds_CombinedModelsRequested,  NAMED('ds_CombinedModelsRequested'));
-    // OUTPUT(ds_CreditReportCurAndHistScores, NAMED('ds_CreditReportCurAndHistScores'));
-    // OUTPUT(ds_CreditReportPhoneSources, NAMED('ds_CreditReportPhoneSources'));
-    // OUTPUT(ds_Final_CreditReportRecords, NAMED('ds_Final_CreditReportRecords'));
-
-    // OUTPUT(SmallBizCombined_inmod.ds_SBA_Input, NAMED('ds_SBA_Input'));
-    // OUTPUT(ds_CombinedModelsRequested, NAMED('ds_CombinedModelsRequested'));
-    // OUTPUT(SmallBizCombined_inmod.DPPAPurpose,  NAMED('DPPAPurpose'));
-    // OUTPUT(SmallBizCombined_inmod.GLBAPurpose,  NAMED('GLBAPurpose'));
-    // OUTPUT((STRING50)SmallBizCombined_inmod.DataRestrictionMask,  NAMED('DataRestrictionMask'));
-    // OUTPUT((STRING50)SmallBizCombined_inmod.DataPermissionMask,  NAMED('DataPermissionMask'));
-    // OUTPUT(SmallBizCombined_inmod.IndustryClass,  NAMED('IndustryClass'));
-    // OUTPUT(SmallBizCombined_inmod.LinkSearchLevel,  NAMED('LinkSearchLevel'));
-    // OUTPUT(SmallBizCombined_inmod.MarketingMode,  NAMED('MarketingMode'));
-    // OUTPUT(SmallBizCombined_inmod.AllowedSources,  NAMED('AllowedSources'));
-    // OUTPUT(SmallBizCombined_inmod.OFAC_Version,  NAMED('OFAC_Version'));
-    // OUTPUT(SmallBizCombined_inmod.Global_Watchlist_Threshold,  NAMED('Global_Watchlist_Threshold'));
-    // OUTPUT(SmallBizCombined_inmod.Watchlists_Requested,  NAMED('Watchlists_Requested'));
-    // OUTPUT(SmallBizCombined_inmod.Gateways,  NAMED('Gateways'));
-    // OUTPUT(SmallBizCombined_inmod.AttributesRequested,  NAMED('AttributesRequested'));
-    // OUTPUT(ds_CombinedModelsRequested,  NAMED('ds_CombinedModelsRequested'));
-    // OUTPUT(SmallBizCombined_inmod.ModelOptions,  NAMED('ModelOptions'));
-    // OUTPUT(SmallBizCombined_inmod.DisableIntermediateShellLogging,  NAMED('DisableIntermediateShellLogging'));
-    // OUTPUT(SmallBizCombined_inmod.IncludeTargusGateway,  NAMED('IncludeTargusGateway'));
-    // OUTPUT(SmallBizCombined_inmod.RunTargusGateway,  NAMED('RunTargusGateway'));
-    // OUTPUT(ds_SBA_Input_withCompPhone, NAMED('ds_SBA_Input_withCompPhone'));
 
    RETURN ds_results;
   

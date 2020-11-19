@@ -5,6 +5,7 @@ EXPORT PhoneMetaDataRecords(DATASET(Phones.Layouts.PhoneAttributes.BatchIn)   dB
 := FUNCTION 
 
     batch_mod := MODULE(PROJECT(in_mod, Phones.IParam.BatchParams, opt))
+    EXPORT BOOLEAN AllowPortingData := Phones.Constants.PhoneAttributes.AllowPortingData;
     END;
 		
  

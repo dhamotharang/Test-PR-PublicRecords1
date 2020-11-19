@@ -1,7 +1,7 @@
 ﻿import Suppress, ut, AutoHeaderV2;
 
 EXPORT get_dids (dataset(AutoHeaderV2.layouts.unprocessed_input) ds_search_in, integer s_code=0,
-								 boolean forceLocal = true, boolean ShowMessages = false) := function
+								 boolean forceLocal = true, boolean ShowMessages = false, boolean isFCRA = false) := function
 	// Not a true "batch" at the moment
   _row := ds_search_in[1];
 
@@ -13,7 +13,7 @@ EXPORT get_dids (dataset(AutoHeaderV2.layouts.unprocessed_input) ds_search_in, i
   // pre-processing, transforming to a real library interface
   unsigned1 saltLeadThresholdOverwrite := AutoHeaderV2.Constants.SaltLeadThreshold : STORED('SaltLeadThreshold');
   AutoHeaderV2.layouts.lib_search Preprocess (AutoHeaderV2.layouts.unprocessed_input L) := transform
-    Self.ssn := AutoHeaderV2.translate.GetCleanedSSN (L.ssn, L.ApplicationType);
+    Self.ssn := AutoHeaderV2.translate.GetCleanedSSN (L.ssn, L.ApplicationType, isFCRA);
     Self.saltLeadThreshold := saltLeadThresholdOverwrite;
     Self := L;
   end;
@@ -29,7 +29,7 @@ EXPORT get_dids (dataset(AutoHeaderV2.layouts.unprocessed_input) ds_search_in, i
   dids_fetched := if (forceLocal, lib_local.results, lib_remote[1].results);
 
   // post-processing
-  Suppress.MAC_Suppress(dids_fetched,resfil_pulled,_row.ApplicationType,Suppress.Constants.LinkTypes.DID,did,,,false,_row.DemoCustomerName);
+  Suppress.MAC_Suppress(dids_fetched,resfil_pulled,_row.ApplicationType,Suppress.Constants.LinkTypes.DID,did,,,false,_row.DemoCustomerName,,,isFCRA);
 			
   dids := resfil_pulled;
 

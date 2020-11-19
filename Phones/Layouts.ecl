@@ -291,6 +291,7 @@ MODULE
 			string1		phone_serv_type_desc;
 			string30 	carrier_city;
 			string2 	carrier_state;
+			string32 	phone_status;
 		END;
 
 
@@ -299,7 +300,6 @@ MODULE
 			portedMetadata_Main;
 			BatchOut;
 		 Carrier_Reference;
-		 string32 	phone_status;
 		END;
 
 	END;

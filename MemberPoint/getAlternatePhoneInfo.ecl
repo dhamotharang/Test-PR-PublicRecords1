@@ -1,4 +1,4 @@
-IMPORT MemberPoint, PhoneFinder_Services, Gateway;
+﻿IMPORT MemberPoint, PhoneFinder_Services, Gateway;
 
 		EXPORT getAlternatePhoneInfo(DATASET(MemberPoint.Layouts.BestExtended) inDataSet, MemberPoint.IParam.BatchParams options):= FUNCTION
 
@@ -29,6 +29,7 @@ IMPORT MemberPoint, PhoneFinder_Services, Gateway;
 			pfOptionsIn := MODULE(PROJECT(options, PhoneFinder_Services.iParam.SearchParams, OPT))
 				EXPORT BOOLEAN show_minors					:= FALSE;
 				EXPORT UNSIGNED PenaltyThreshold			:= options.PenaltThreshold;
+				EXPORT BOOLEAN UseInHousePhoneMetadataOnly := TRUE;
 			END;
 			//PhoneFinder_Services.Layouts.PhoneFinder.BatchOut
 			modBatchRecords:= PhoneFinder_Services.PhoneFinder_BatchRecords(pfBatchIn, pfOptionsIn, gateways);

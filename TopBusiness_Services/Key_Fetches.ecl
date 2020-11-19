@@ -21,7 +21,7 @@
 IMPORT AMS, ATF, AutoStandardI, BankruptcyV3, BIPV2, BIPV2_Contacts, BusReg, Corp2, Cortera, DCAV2, DEA, DNB_FEINV2,
        Doxie, dx_Equifax_business_data, dx_OSHAIR, dx_Infutor_NARB,
        EBR, Experian_CRDB, Experian_FEIN, faa, FBNV2, FCC, Frandx, dx_Gong, LiensV2,
-       LN_PropertyV2, Prof_LicenseV2, Property, Sheila_Greco, TopBusiness_BIPV2, UCCV2, VehicleV2,
+       LN_PropertyV2, Prof_LicenseV2, dx_Property, Sheila_Greco, TopBusiness_BIPV2, UCCV2, VehicleV2,
        Watercraft, YellowPages;
 
 EXPORT Key_Fetches(dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_linkids
@@ -124,7 +124,7 @@ EXPORT Key_Fetches(dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_linkids
 
   // *** Key fetch to get Foreclosure linkids key records
   // NOTE: This one will need to use a passed in fetch limit
-  EXPORT ds_fc_linkidskey_recs := Property.Key_Foreclosure_Linkids.kfetch(ds_in_linkids,
+  EXPORT ds_fc_linkidskey_recs := dx_Property.Key_Foreclosure_Linkids.kfetch(ds_in_linkids,
                                                                           FETCH_LEVEL,,FETCH_LIMIT);
 
   // *** Key fetch to get Frandx linkids key records
@@ -143,7 +143,8 @@ EXPORT Key_Fetches(dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_linkids
                                                                   FETCH_LEVEL,,FETCH_LIMIT);
 
   // *** Key fetch to get OHSAIR linkids key records
-  EXPORT ds_osha_linkidskey_recs := dx_OSHAIR.Key_LinkIds.kFetch(ds_in_linkids,FETCH_LEVEL,,FETCH_LIMIT);
+  EXPORT ds_osha_linkidskey_recs := dx_OSHAIR.Key_LinkIds.kFetch2(PROJECT(ds_in_linkids,BIPV2.IDlayouts.l_xlink_ids2)
+    ,FETCH_LEVEL,,FETCH_LIMIT);
 
   // *** Key fetch to get Professional License linkids key records
   EXPORT ds_pl_linkidskey_recs := Prof_LicenseV2.Key_Proflic_Linkids.KeyFetch(ds_in_linkids, mod_access,
@@ -157,7 +158,7 @@ EXPORT Key_Fetches(dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_linkids
 
   // *** Key fetch to get Notice of Default/NOD linkids key records
   // NOTE: This one will need to use a passed in fetch limit
-  EXPORT ds_nod_linkidskey_recs := Property.Key_NOD_Linkids.kfetch(ds_in_linkids,
+  EXPORT ds_nod_linkidskey_recs := dx_Property.Key_NOD_Linkids.kfetch(ds_in_linkids,
                                                                    FETCH_LEVEL,,FETCH_LIMIT);
 
   // *** Key fetch to get Sheila Greco linkids key records

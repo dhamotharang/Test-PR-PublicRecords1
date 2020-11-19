@@ -1495,10 +1495,10 @@ EXPORT GetLaborActionsWHDInfo(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctN
 END;
 
   EXPORT GetOSHAInfo(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWithAcctNo,
-                    DATASET(BIPV2.IDlayouts.l_xlink_ids)                 dLinkIds) :=
+                    DATASET(BIPV2.IDlayouts.l_xlink_ids2)                 dLinkIds) :=
   FUNCTION
 
-    dOSHAInfo := dx_OSHAIR.Key_LinkIds.kFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID,,
+    dOSHAInfo := dx_OSHAIR.Key_LinkIds.kFetch2(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID,,
                                                   BusinessBatch_BIP.Constants.Limits.MAXOshair);
 
     dOSHAInfoSlim := DEDUP(SORT(dOSHAInfo,activity_number, -last_activity_date),activity_number);
