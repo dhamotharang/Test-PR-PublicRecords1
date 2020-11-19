@@ -29,10 +29,10 @@ EXPORT Pull_New_Phones(string version, string portV2) := FUNCTION
 				string phone;
 			end;
 			
-			prtPMT 			:= project(dedup(sort(distribute(PhonesInfo.Key_Phones.Ported_Metadata(is_ported=true and source='PK'), hash(phone)), phone, local), phone, local), phLayout);
+			prtPMT 			:= project(dedup(sort(distribute(PhonesInfo.File_Metadata.PortedMetadata_Main(is_ported=true and source in ['P!','PK']), hash(phone)), phone, local), phone, local), phLayout);
 			
 			//Phone Type File	
-			prtPType		:= project(dedup(sort(distribute(dx_PhonesInfo.Key_Phones_Transaction(source in ['P!','PK'] and transaction_code='PA' and transaction_end_dt=0), hash(phone)), phone, local), phone, local), phLayout);
+			prtPType		:= project(dedup(sort(distribute(PhonesInfo.File_Phones_Transaction.Main(source in ['P!','PK'] and transaction_code='PA' and transaction_end_dt=0), hash(phone)), phone, local), phone, local), phLayout);
 	
 	dsIC 						:= if(portV2='N',
 												prtPMT,							//Phones Metadata Key

@@ -1,5 +1,6 @@
-﻿IMPORT  _Control,Orbit3Insurance,STD;
-EXPORT Orbit3IConstants(STRING product, STRING emailme = '') := MODULE
+﻿IMPORT  _Control,Orbit3,Orbit3Insurance,STD;
+
+EXPORT OrbitConstants(STRING product, STRING emailme = '') := MODULE
 	
 // ###########################################################################
 //                    File Tracking & Receiving Instance
@@ -30,9 +31,6 @@ EXPORT Orbit3IConstants(STRING product, STRING emailme = '') := MODULE
 // ###########################################################################
 //                        Create & Update Build
 // ###########################################################################	
-	EXPORT buildstatus_B := 'BUILD_IN_PROGRESS';	
-	EXPORT buildstatus := 'BUILD_AVAILABLE_FOR_USE';	
-	
 	EXPORT buildname := CASE(product, 
 													 'ecrashCRU_Delta' => 'eCrashCRUAcidentsDelta', //FCRA CCAttrDeltaKeys
 													 'eCrash_MBSAgency' => 'eCrash MBS Agency Build',
@@ -55,25 +53,50 @@ EXPORT Orbit3IConstants(STRING product, STRING emailme = '') := MODULE
 	EXPORT componentfilename(STRING pdate) := CASE(product, 
 																								 'ecrashCRU_Delta' => Orbit3Insurance.EnvironmentVariables.orbitcomponentpathprefix + 'delta_cc_attributes\\\\process\\\\' + pdate + '\\\\' + STD.Str.ToLowerCase(orbitfilename),
 																								 'eCrash_MBSAgency' => '\\\\tapeload.risk.regn.net\\K\\accident_reports\\ecrash_(ei)\\mbs\\' + pDate + '\\' + STD.Str.ToLowerCase(orbitfilename),
-																								 'NA');
+																								 'NA');														
+																
+	EXPORT PlatformKey := DATASET([{Orbit3.Constants().platform_N, Orbit3.Constants().pstatus_B}], 
+																Orbit3.Layouts.OrbitPlatformUpdateLayout);
+																		 
+  															
+  EXPORT PlatformKeyDone := DATASET([{Orbit3.Constants().platform_N, Orbit3.Constants().pstatus_D}], 
+	                                  Orbit3.Layouts.OrbitPlatformUpdateLayout);																
+
+// ###########################################################################
+//                        Orbit Profiling
+// ###########################################################################																
+  EXPORT ProfileWorkunitName := CASE(product,
+																		'eCrash_MBSAgency' => 'DIST_ECRASH_MBS_AGENCY',
+																		'NA');			
+
+  EXPORT FileType :=  CASE(product,
+													'eCrash_MBSAgency' => 'ECRASH MBS AGENCY BASE',
+													'NA');																
+																	
+	EXPORT ProfilePrefix := 'DATABUILD';
+  EXPORT ProfileType   := 'ProfilingDataBuilds';
+	
+	EXPORT SubsetName := CASE(product,
+                            'eCrash_MBSAgency' => 'ECRASH',
+                            'NA');
 														
-	EXPORT platform := CASE(product, 
-													'ecrashCRU_Delta' => 'Non FCRA Roxie',
-													'eCrash_MBSAgency' => 'Non FCRA Roxie',
-													'NA');	
+  EXPORT ProfileSuffixName := CASE(product,
+																	'eCrash_MBSAgency' => 'MBS_AGENCY_DISTRIBUTION',
+																	'NA');														
 														
-	EXPORT platformstatus := CASE(product,
-																'ecrashCRU_Delta' => 'On Development',
-																'eCrash_MBSAgency' => 'On Development',
-																'NA');														
+  EXPORT EcrashMBSAgencyProfileName := ProfilePrefix + '_' + SubsetName + '_' + ProfileSuffixName + '_' + 'VIEW';
+	
+  EXPORT ProfileName := CASE(product,
+														'eCrash_MBSAgency' => EcrashMBSAgencyProfileName,
+														'NA');																	
 												
 // ###########################################################################
 //                           Orbit Email Targets
 // ###########################################################################													
   EXPORT dev_email_target := 'DataDevelopment-InsRiskeCrash@lexisnexisrisk.com';
   EXPORT data_qa_email := 'alp-qadata.team@lexisnexis.com';
-  EXPORT ins_data_ops_email := 'InsDataOps@lexisnexis.com, Sudhir.Kasavajjala@lexisnexis.com';
-  EXPORT prod_email_target := 'DataDevelopment-InsRiskeCrash@lexisnexisrisk.com' + ', ' + ins_data_ops_email;
+  EXPORT data_ops_email := 'Sudhir.Kasavajjala@lexisnexisrisk.com';
+  EXPORT prod_email_target := 'DataDevelopment-InsRiskeCrash@lexisnexisrisk.com' + ', ' + data_ops_email;
 												
   EXPORT orbit_createBuild_email := IF(_Control.ThisEnvironment.Name = 'Prod_Thor', data_qa_email,
                                        dev_email_target);
@@ -89,4 +112,4 @@ EXPORT Orbit3IConstants(STRING product, STRING emailme = '') := MODULE
   EXPORT orbit_receiveload_email := IF(_Control.ThisEnvironment.Name = 'Prod_Thor', data_qa_email,
                                        dev_email_target);
 																 
-end;
+END;
