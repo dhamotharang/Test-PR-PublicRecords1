@@ -1278,6 +1278,7 @@
 		export string KEYWORD_PKBEOE								:= '960';
 		export string KEYWORD_CRJIA_MW							:= '961';
 		export string KEYWORD_HUNAV_SZF							:= '962';
+		export string KEYWORD_TWBFT_SHTC						:= '963';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
