@@ -2,9 +2,9 @@
 
 export proc_fedex_build_keys2(string version_date,boolean delta=true) := function
 	fedex_dataset := fedex.fedex_autokey_constants(version_date,delta).autokey_dataset2;
-	logical_key		:= fedex.fedex_autokey_constants.str_AutokeyLogicalName2(version_date);
-	super_keyname	:= fedex.fedex_autokey_constants.str_autokeyname2;
-	skip_set			:= fedex.fedex_autokey_constants.autokey_skip_set;
+	logical_key		:= fedex.fedex_autokey_constants(version_date,delta).str_AutokeyLogicalName2(version_date);
+	super_keyname	:= fedex.fedex_autokey_constants(version_date,delta).str_autokeyname2;
+	skip_set			:= fedex.fedex_autokey_constants(version_date,delta).autokey_skip_set;
 //**** Build the Payload Key and create the FakeID
 											
 autokey.mac_useFakeIDs
@@ -90,7 +90,7 @@ OUTACTION :=
 		AutokeyB2.Fn_Build.Do(akmod,CanadianPhones.MAutokey,CanadianPhones.MAutokeyB)
 	);			
 
-	AutoKeyB2.MAC_AcceptSK_to_QA(super_keyname,move_qa,,fedex.fedex_autokey_constants.autokey_skip_set);
+	AutoKeyB2.MAC_AcceptSK_to_QA(super_keyname,move_qa,,fedex.fedex_autokey_constants(version_date,delta).autokey_skip_set);
 
 	RoxieKeyBuild.Mac_Daily_Email_Local('FEDEX','SUCC', version_date, send_succ_msg, RoxieKeyBuild.Email_Notification_List);
 	RoxieKeyBuild.Mac_Daily_Email_Local('FEDEX','FAIL', version_date, send_fail_msg, 'michael.gould@lexisnexis.com,John.Freibaum@lexisnexis.com');
@@ -101,8 +101,8 @@ OUTACTION :=
 	build_fedex_keys := sequential
 						(
 							build_keys, 
-							run_scrubs,
-							update_dops
+							//run_scrubs,
+							//update_dops
 						) : success(send_succ_msg), failure(send_fail_msg);
 	 
 	return build_fedex_keys;

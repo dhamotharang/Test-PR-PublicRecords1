@@ -1,6 +1,6 @@
 import	Address,AID,PromoteSupers, std, ut;
 
-export proc_fedex_build_base(string version_date) := function 
+export proc_fedex_build_base(string version_date,boolean delta) := function 
 
 // Combine both files
 dFedExIn	:=	FedEx.File_FedEx_In.Main;
@@ -231,6 +231,7 @@ dFedExMainCorrections	:=	join(	dFedExMainRemoveDeletes,
 dFedExMainCorrectionsAdds := dFedExMainCorrections;
 */
 dFedExMainFull:=dFedExCleanCombined+fedex.file_fedex_base;
+
 identify_dupes := fedex.fn_IdentifyDuplicates(dFedExMainFull);
 
 fedex_dupes   := identify_dupes(record_id>parent_record_id);
@@ -253,9 +254,9 @@ new_dupes :=   if(day_of_week='MONDAY',fedex_dupes(file_date between ut.getdateo
 new_uniques := if(day_of_week='MONDAY',fedex_uniques(file_date between ut.getdateoffset(-3,today) and today),
                                        fedex_uniques(file_date between ut.getdateoffset(-1,today) and today)
 								  );
-									
-dCompContNamePopulated	:=	fedex_uniques_keep_max_date(	Ut.CleanSpacesAndUpper(first_name	+	last_name)	<>	''	and	company_name	<>	'');
-dOthers									:=	fedex_uniques_keep_max_date(~(Ut.CleanSpacesAndUpper(first_name	+	last_name)	<>	''	and	company_name	<>	''));
+RemoveBaseRecords:=		fedex_uniques_keep_max_date(version=version_date);							
+dCompContNamePopulated	:=	RemoveBaseRecords(	Ut.CleanSpacesAndUpper(first_name	+	last_name)	<>	''	and	company_name	<>	'');
+dOthers									:=	RemoveBaseRecords(~(Ut.CleanSpacesAndUpper(first_name	+	last_name)	<>	''	and	company_name	<>	''));
 
 FedEx.Layout_FedEx.Base	tNormalizeNames(dCompContNamePopulated	pInput,integer	cnt)	:=
 transform
@@ -281,8 +282,8 @@ dCombined	:=	dNormalizeNames	+	dCompNameinLName;
 
 // Blank out phone number 8145162145 associated with Jessica Anna in FedEx
 apply_ln_filters := dCombined(record_id not in fedex.Filters.by_record_id);
-
-PromoteSupers.MAC_SF_BuildProcess(apply_ln_filters(version=version_date),'~thor_200::base::fedex::nohits',buildBase,,,true);
+VersionControl.macBuildNewLogicalFile(fedex.Filenames(version_date).Base.fedex.new			,apply_ln_filters			,buildBase			,TRUE);
+//PromoteSupers.MAC_SF_BuildProcess(apply_ln_filters(version=version_date),'~thor_200::base::fedex::nohits',buildBase,,,true);
 
 output1 := output(project(fedex_dupes,fedex.layout_fedex.returnfiles),,'~thor200::out::fedex::dupes_v1',__compressed__,overwrite,csv(separator(','),terminator('\r\n'),QUOTE('"')),named('fedex_dupes_all'));
 output2 := output(project(new_dupes,fedex.layout_fedex.returnfiles)  ,,'~thor200::out::fedex::new_dupes_v1',__compressed__,overwrite,csv(separator(','),terminator('\r\n'),QUOTE('"')),named('fedex_dupes_new'));
@@ -290,10 +291,10 @@ output3 := output(project(new_uniques,fedex.layout_fedex.returnfiles),,'~thor200
 
 // build keys before file generation as dup files take long time to build. 
 
-build_keys := fedex.proc_fedex_build_keys2(version_date);
+build_keys := fedex.proc_fedex_build_keys2(version_date,delta);
 
-sample_recs	:=	fedex.fedex_qa_samples(version_date);
+//sample_recs	:=	fedex.fedex_qa_samples(version_date);
 
-return sequential(buildBase,build_keys,sample_recs, output1,output2,output3);
+return sequential(buildBase,build_keys/*,sample_recs, output1,output2,output3*/);
 
 end; 

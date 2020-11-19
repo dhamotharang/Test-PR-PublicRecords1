@@ -38,13 +38,14 @@ dFedEx	:=	project(FromBase, transform (fedex.layout_fedex_base,
 																											       left.st = 'PA' and left.zip = '19118', '2158587948', left.phone); 
                                         self := left));
 
-export	file	:=		dFedEx(	~(			(	phone	=	'7758561163'	and	prim_range	=	'3983'	and	predir	=	'S'	and	prim_name	=	'MCCARRAN'	and	addr_suffix	=	'BLVD'	and	unit_desig	=	'APT'	and	sec_range	=	'475'	and	v_city_name	=	'RENO'	and	st	=	'NV'	and	zip	=	'89502')
+filterfile	:=		dFedEx(	~(			(	phone	=	'7758561163'	and	prim_range	=	'3983'	and	predir	=	'S'	and	prim_name	=	'MCCARRAN'	and	addr_suffix	=	'BLVD'	and	unit_desig	=	'APT'	and	sec_range	=	'475'	and	v_city_name	=	'RENO'	and	st	=	'NV'	and	zip	=	'89502')
 																							or	(	business_indicator	!=	'Y'	and	prim_range	=	'941'	and	prim_name	=	'CORPORATE CENTER'	and	addr_suffix	=	'DR'	and	v_city_name	=	'POMONA'	and	st	=	'CA'	and	zip	=	'91768')
 																							or	(	business_indicator	!=	'Y'	and	prim_range	=	'120'	and	predir	=	'S'	and	prim_name	=	'VICTORY'	and	addr_suffix	=	'ST'	and	v_city_name	=	'LITTLE ROCK'	and	st	=	'AR'	and	zip	=	'72201')
 																							or	(	(regexfind('^(VERIZON)',ut.CleanSpacesAndUpper(first_name),nocase)	or	regexfind('^(VERIZON)',ut.CleanSpacesAndUpper(last_name),nocase)	or	regexfind('^(VERIZON)',ut.CleanSpacesAndUpper(full_name),nocase)	or	regexfind('^(VERIZON)',ut.CleanSpacesAndUpper(company_name),nocase))	and	err_stat[1]	=	'E')
 																							or	(	record_id	in	setFedExRecordID)
 																						)
-																				)
-																+	dFedExAddsCleanAddr;
+																				);
+																
 
+export	file:= if(delta,filterfile,filterfile+	dFedExAddsCleanAddr);
 end;																
