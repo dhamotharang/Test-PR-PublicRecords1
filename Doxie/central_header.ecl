@@ -8,12 +8,13 @@ EXPORT central_header (DATASET (doxie.layout_references) dids,
                        boolean in_getSSNBest = false,
                        dataset(FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = dataset([], FFD.Layouts.PersonContextBatchSlim),
                        integer8 inFFDOptionsMask = 0,
-                       dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
+                       dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile //,
+                       //boolean do_address_hierarchy  = false
                        ) := FUNCTION
 
 boolean includeGeoLocation := false : stored('IncludeGeoLocation');
 boolean IncludePhoneMetadata := false : stored('IncludePhoneMetadata'); //For Accurint CompReport
-
+ 
 doxie.MAC_Header_Field_Declare(IsFCRA); //ssn_value, fname_value, lname_value, dial_contactprecision_value
 doxie.MAC_Selection_Declare();
 
@@ -114,14 +115,18 @@ csa_names := if (IsFCRA, fcra_csa_wrap.names, csa_wrap.names);
 
 shrr0 := doxie.HRI_SSN_records;
 
-_addr_verified := doxie_Crs.Comp_Addresses_Verified(Legacy_Verified_Value);
+//Addresses_Verified was neededed in the past to determine the best verified address based on enhanced TNT values. This is no longer required. 
+_addr_partially_ranked := if(do_address_hierarchy,
+                              doxie.Comp_Addresses,
+                              doxie_Crs.Comp_Addresses_Verified(Legacy_Verified_Value)
+                            );
 
-_addr_geo := join(_addr_verified, AID_Build.Key_AID_Base,
+_addr_geo := join(_addr_partially_ranked, AID_Build.Key_AID_Base,
                   left.rawaid = right.rawaid,
-                  transform(recordof(_addr_verified), self.geo_lat := right.geo_lat, self.geo_long := right.geo_long, self := left),
+                  transform(doxie.Layout_Comp_Addresses, self.geo_lat := right.geo_lat, self.geo_long := right.geo_long, self := left),
                   left outer, keep(1), limit(0));
 
-_addr_temp := if(includeGeoLocation, _addr_geo, _addr_verified);
+_addr_temp := if(includeGeoLocation, _addr_geo, _addr_partially_ranked);
 _addr := IF (IsFCRA, csa_addresses, _addr_temp);
 
 doxie.MAC_Add_UtilityConnection(_addr, doxie.Layout_Comp_Addr_Utility_Recs, //addr,
@@ -249,7 +254,7 @@ end;
 preSuppress := dataset ([Format ()]);
 //This is being added here to accomodate the Peoplewise product until such time as all the all the pullssn and pullid
 //changes are made to get everything on the new suppression, then this becomes redundant.
-Suppress.MAC_Suppress(preSuppress,postSuppress,mod_access.application_type,suppress.constants.LinkTypes.DID,best_information_children[1].did);
+Suppress.MAC_Suppress(preSuppress,postSuppress,mod_access.application_type,suppress.constants.LinkTypes.DID,best_information_children[1].did, isFCRA := isFCRA);
 
 // this should be a temporary measure on FCRA side:
 

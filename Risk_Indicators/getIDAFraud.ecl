@@ -35,7 +35,21 @@ EXPORT getIDAFraud(DATASET(Risk_Indicators.layouts.layout_IDAFraud_in) indata,
     
     //Origination section
     SELF.ReportBy.Origination.RequestType := 'N'; 
-    SELF.ReportBy.Origination.ApplicationDate := to_IDA_date((STRING)STD.Date.Today(), (STRING)STD.Date.CurrentTime()); //Format is YYYY-MM-DDTHH:MM:SS 
+    
+    //going to use HistoryDateTimeStamp to pass to IDA
+    cleanedDate := MAP(TRIM(le.historyDateTimeStamp) IN ['','999999'] => (STRING)STD.Date.Today() + ' ' + (STRING)STD.Date.CurrentTime(),
+                       LENGTH(TRIM(le.historyDateTimeStamp)) = 6      => TRIM(le.historyDateTimeStamp) + '01 12010100', //use default time
+                       LENGTH(TRIM(le.historyDateTimeStamp)) = 8      => TRIM(le.historyDateTimeStamp) + ' 12010100',   // use default time
+                       LENGTH(TRIM(le.historyDateTimeStamp)) > 8      => TRIM(le.historyDateTimeStamp),                 //if it seems properly populated then use it
+                                                                         (STRING)STD.Date.Today() + ' ' + (STRING)STD.Date.CurrentTime() //fallthrough condition, use Current date/time
+                      );
+    
+    // If date is not today then it is a retro run. In that case -1 day so IDA's logic works correctly
+    tempAppDate := IF(cleanedDate[1..8] = (STRING)STD.Date.Today(), cleanedDate, (STRING)Std.Date.AdjustDate((UNSIGNED)(cleanedDate[1..8]), 0,0,-1) + cleanedDate[9..17]);
+    
+    formattedAppDate := to_IDA_date(tempAppDate[1..8], tempAppDate[10..17]);
+    
+    SELF.ReportBy.Origination.ApplicationDate := formattedAppDate; //Format is YYYY-MM-DDTHH:MM:SS
     SELF.ReportBy.Origination.AppID := TRIM(le.App_ID); 
     SELF.ReportBy.Origination.Designation := 'A1';
     SELF.ReportBy.Origination.EventType := '';

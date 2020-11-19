@@ -1,6 +1,6 @@
-import autokeyb2,doxie,Data_Services;
+import autokeyb2,doxie,Data_Services, dx_property;
 
-fakepf := dataset([],recordof(Property.File_NOD_Autokey));
+fakepf := dataset([],dx_property.Layouts.i_autokey);
 
 autokeyb2.MAC_FID_Payload(fakepf,'','','','','','','','','',did,bdid,Data_Services.Data_location.Prefix()+'thor_data400::key::nod::autokey::qa::payload',plk,'');
 

@@ -1,48 +1,9 @@
-﻿/*--SOAP--
-<message name="WatercraftSearch" wuTimeout="300000">
-  <part name="BDID" type="xsd:string"/>
-  <part name="DID" type="xsd:string"/>
-  <part name="WatercraftKey" type="xsd:string" />
-  <part name="SequenceKey" type="xsd:string" />
-  <part name="HullNumber" type="xsd:string" />
-  <part name="VesselName" type="xsd:string" />
-  <part name="MinVesselLength" type="xsd:unsignedInt" />
-  <part name="MaxVesselLength" type="xsd:unsignedInt" />
-  <part name="UnParsedFullName" type="xsd:string"/>
-  <part name="FirstName" type="xsd:string"/>
-  <part name="MiddleName" type="xsd:string"/>
-  <part name="LastName" type = "xsd:string"/>
-  <part name="AllowNicknames" type="xsd:boolean"/>
-  <part name="PhoneticMatch" type="xsd:boolean"/>
-  <part name="CompanyName" type="xsd:string"/>
-  <part name="FEIN" type="xsd:string"/>
-
-  <part name="PrimName" type="xsd:string"/>
-  <part name="PrimRange" type="xsd:string"/>
-
-  <part name="Addr" type="xsd:string"/>
-  <part name="City" type="xsd:string" />
-  <part name="State" type="xsd:string"/>
-  <part name="Zip" type="xsd:string"/>
-  <part name="County" type="xsd:string"/>
-  <part name="ZipRadius" type="xsd:unsignedInt"/>
-  <part name="Phone" type="xsd:string"/>
-  <part name="NoDeepDive" type="xsd:boolean"/>
-  <part name="RecordByDate" type="xsd:string"/>
-  <part name="GLBPurpose" type="xsd:byte"/>
-  <part name="DPPAPurpose" type="xsd:byte"/>
-  <part name="DataRestrictionMask" type="xsd:string"/>
-  <part name="ApplicationType" type="xsd:string"/>
-  <part name="PenaltThreshold" type="xsd:unsignedInt"/>
-  <part name="StrictMatch" type="xsd:boolean"/>
-  <part name="MaxResults" type="xsd:unsignedInt"/>
-  <part name="MaxResultsThisTime" type="xsd:unsignedInt"/>
-  <part name="SkipRecords" type="xsd:unsignedInt"/>
-  <part name="SSNMask" type="xsd:string"/> <!-- [NONE, ALL, LAST4, FIRST5] -->
-  <part name="IncludeNonRegulatedWatercraftSources" type="xsd:boolean" />
-</message>
-*/
-
+﻿// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 IMPORT Text_Search, doxie, AutostandardI, WSInput;
 
 EXPORT WatercraftSearchService := MACRO
@@ -56,7 +17,7 @@ EXPORT WatercraftSearchService := MACRO
 
   doxie.MAC_Header_Field_Declare ();
   gm := AutoStandardI.GlobalModule();
-  
+
   params := MODULE(PROJECT(gm, WatercraftV2_Services.Interfaces.search_params, opt))
     STRING2 st_pass := '' : STORED('state');
     EXPORT STRING2 st := STD.STR.ToUpperCase(st_pass);
@@ -79,5 +40,5 @@ EXPORT WatercraftSearchService := MACRO
   Text_Search.MAC_Append_ExternalKey(rsrt1, rsrt2, l.watercraft_key + l.sequence_key + l.state_origin);
   doxie.MAC_Marshall_Results(rsrt2,rmar);
   OUTPUT(rmar, NAMED('Results'));
-  
+
 ENDMACRO;

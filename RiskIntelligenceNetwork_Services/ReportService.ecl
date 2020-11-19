@@ -18,6 +18,7 @@ EXPORT ReportService := MACRO
  #STORED('GlobalCompanyId', RINUser.GlobalCompanyId);
  #STORED('IndustryTypeName', RINUser.IndustryTypeName);
  #STORED('ProductCode',RINUser.ProductCode);
+ #STORED('InquiryReason', Options.InquiryReason);
 
  //Checking that gc_id, industry type, and product code have some values - they are required.
  IF(RINUser.GlobalCompanyId = 0, FraudShared_Services.Utilities.FailMeWithCode(ut.constants_MessageCodes.FRAUDGOV_GC_ID));

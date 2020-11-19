@@ -13,12 +13,12 @@ Usage: InFile = input file to be checked
 
 export MAC_Suppress_Child := module
 
-			export keyLinked(inFile, childFile='\'\'', outFile, inApplicationType, 
-										 inLinkType='\'\'', inLinkID='\'\'', 
-										 parent_link_key='\'\'', child_set_name='\'\'', 
-										 isEmbedded=false) := macro
+			export keyLinked(inFile, childFile='\'\'', outFile, inApplicationType,
+										 inLinkType='\'\'', inLinkID='\'\'',
+										 parent_link_key='\'\'', child_set_name='\'\'',
+										 isEmbedded=false, isFCRA = false) := macro
 
-        IMPORT suppress;			
+        IMPORT suppress, dx_Suppression, data_services;
 				#uniquename(suppressFile)
 				#uniquename(validCriteria)
 				#uniquename(isEmbedded)
@@ -27,15 +27,18 @@ export MAC_Suppress_Child := module
 				#uniquename(leftRec)
 				#uniquename(xfrmRec)
 				#uniquename(outfile1)
-				
-				%suppressFile% := suppress.Key_New_Suppression;
+				#uniquename(env)
+
+				%env% := Data_Services.data_env.GetEnvFCRA(isFCRA);
+
+				%suppressFile% := dx_Suppression.key_suppression(%env%);
 
 
 				#uniquename (suppress_set)
 				Suppress.MAC_Suppress_Set(inApplicationType,%suppress_set%);
 
 				#uniquename(FormatID)
-				string %FormatID% (string str_ID, string _type) := 
+				string %FormatID% (string str_ID, string _type) :=
 					map (stringlib.StringToUppercase (_type) =  Suppress.Constants.LinkTypes.DID => intformat ((integer) str_ID, 12, 1),
 //							stringlib.StringToUppercase (_type) = Suppress.Constants.LinkTypes.BDID => intformat ((integer) str_ID, 12, 1),
 							stringlib.StringToUppercase (_type) = Suppress.Constants.LinkTypes.SSN => intformat ((integer) str_ID, 9, 1),
@@ -43,15 +46,15 @@ export MAC_Suppress_Child := module
 
 				#uniquename(NumericID)
 				string %NumericID% (string str_ID) := if(ut.isNumeric(str_ID),(string)(unsigned)str_ID,str_ID);
-				
+
 				#if(isEmbedded)
 				%newChild% := record
 					recordof(inFile);
 					recordof(inFile.child_set_name);
 				end;
 				#end
-				
-				%leftRec% := 				
+
+				%leftRec% :=
 						#if(isEmbedded)
 							normalize(inFile,left.child_set_name,transform(%newChild%, self:=left,self:=right));
 						#else
@@ -68,7 +71,7 @@ export MAC_Suppress_Child := module
 													((integer) left.inLinkID != 0)
 													and keyed(right.product in %suppress_set%)
 													and keyed(right.linking_type = inLinkType)
-													and keyed(right.Linking_ID = (string)left.inLinkID or 
+													and keyed(right.Linking_ID = (string)left.inLinkID or
 																		right.Linking_ID = %FormatID%((string)left.inLinkID, (string)inLinkType) or
 																		right.Linking_ID = %NumericID%((string)left.inLinkID)),
 													transform(%xfrmRec%, self := left),
@@ -79,7 +82,7 @@ export MAC_Suppress_Child := module
                            transform(recordof(inFile),self:=left),left only);
 
 				%validCriteria% := inLinkType <> '';
-											 
+
 				outFile := if (%validCriteria%,%outFile1%,inFile);
 			endmacro;
 
@@ -87,26 +90,26 @@ export MAC_Suppress_Child := module
 					Handle the situation when no key exists for linking the two items together.
 				*/
 
-			export nokeyLinked(inFile, childFile='\'\'', outFile, inApplicationType, 
-										 inLinkType='\'\'', inLinkID='\'\'', 
-										 parent_link_key='\'\'', child_set_name='\'\'', 
+			export nokeyLinked(inFile, childFile='\'\'', outFile, inApplicationType,
+										 inLinkType='\'\'', inLinkID='\'\'',
+										 parent_link_key='\'\'', child_set_name='\'\'',
 										 isEmbedded=false) := macro
-			
+
 				#uniquename(addCount)
 				#uniquename(counted)
 				#uniquename(pulled)
-				
+
 				// add a counter for uniqueness
 				{ inFile; unsigned2 cntLink; } %addCount%(inFile L, unsigned2 C) := transform
 					self.cntLink := C;
 					self := L;
 				end;
 				%counted% := project(inFile,%addCount%(left,counter));
-				
+
 				// do the suppression
 				Suppress.MAC_Suppress_Child.keyLinked(%counted%, childFile, %pulled%, inApplicationType,
 															inLinkType, inLinkID, cntLink, child_set_name, isEmbedded);
-				
+
 				// strip the counter
 				outFile := project(%pulled%, transform(recordof(inFile),self:=left));
 

@@ -55,7 +55,7 @@ export Raw := module
                       keep (1), limit(0));
 										
 											//Add Overrides here
-		Suppress.MAC_Suppress(retVal,retVal_pulled,applicationType,Suppress.Constants.LinkTypes.DID,did_out);
+		Suppress.MAC_Suppress(retVal,retVal_pulled,applicationType,Suppress.Constants.LinkTypes.DID,did_out, isFCRA := isFCRA);
 			
 		pilot_override := CHOOSEN (fcra.key_override_faa.airmen_reg (keyed (flag_file_id IN correct_pilot_ffid)),
 																 FCRA.compliance.MAX_OVERRIDE_LIMIT);
@@ -164,7 +164,7 @@ export Raw := module
 		dataset(FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim, 
 		integer8 inFFDOptionsMask = 0 ) := function
 	 
-			Suppress.MAC_Suppress(in_ids,in_ids_pulled,applicationType,Suppress.Constants.LinkTypes.DID,did);
+			Suppress.MAC_Suppress(in_ids,in_ids_pulled,applicationType,Suppress.Constants.LinkTypes.DID,did, isFCRA := isFCRA);
       pilot_recs := joinByAirmenId (in_ids_pulled, applicationtype,isFCRA,flagfile, slim_pc_recs, inFFDOptionsMask);
       cert_recs := GetRawCert (in_ids_pulled,isFCRA,flagfile, ,slim_pc_recs, inFFDOptionsMask);		
 			
@@ -184,7 +184,7 @@ export Raw := module
 			dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
 			integer8 inFFDOptionsMask = 0 ) := function
 			
-			Suppress.MAC_Suppress(in_dids,in_dids_pulled,applicationType,Suppress.Constants.LinkTypes.DID,did);
+			Suppress.MAC_Suppress(in_dids,in_dids_pulled,applicationType,Suppress.Constants.LinkTypes.DID,did, isFCRA := isFCRA);
       in_ids := byDIDs (in_dids_pulled,isFCRA);
 
       pilot_recs := joinByAirmenId (in_ids, applicationtype,isFCRA,flagfile,slim_pc_recs,inFFDOptionsMask);

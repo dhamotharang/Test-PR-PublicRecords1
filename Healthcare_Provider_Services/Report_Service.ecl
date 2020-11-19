@@ -1,169 +1,17 @@
-﻿/*--SOAP--
-<message name="IngenixProviderReportRequest">
-	<part name="DID" type="xsd:string"/>
-  <part name="ProviderID" type="xsd:unsignedInt" required="1"/>
-  <part name="ProviderSrc" type="xsd:string"/>
-  <part name="DPPAPurpose" type="xsd:byte"/>
-	<part name="GLBPurpose" type="xsd:byte" />
-	<part name="DataRestrictionMask" type="xsd:string"/>
-	<part name="DataPermissionMask"    type="xsd:string"/>
-  <part name="IncludeSanctions" type="xsd:boolean"/>
-  <part name="MaxResults" type="xsd:unsignedInt"/>
-  <part name="SSNMask" type="xsd:string"/>
-	<part name="HealthCareConsolidatedReportRequest" type="tns:XmlDataSet" cols="80" rows="40" />
- </message>
-*/
+﻿// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 /*--INFO-- This service pulls from the Ingenix provider files.*/
-/*--HELP-- 
-
-<pre>
-   &lt;HealthCareConsolidatedReportRequest&gt;
-    &lt;Row&gt;
-     &lt;User&gt;
-      &lt;ReferenceCode/&gt;
-      &lt;BillingCode/&gt;
-      &lt;QueryId/&gt;
-      &lt;CompanyId/&gt;
-      &lt;GLBPurpose/&gt;
-      &lt;DLPurpose/&gt;
-      &lt;LoginHistoryId/&gt;
-      &lt;DebitUnits/&gt;
-      &lt;IP/&gt;
-      &lt;IndustryClass/&gt;
-      &lt;ResultFormat/&gt;
-      &lt;LogAsFunction/&gt;
-      &lt;SSNMask/&gt;
-      &lt;DOBMask/&gt;
-      &lt;DLMask&gt;0&lt;/DLMask&gt;
-      &lt;DataRestrictionMask/&gt;
-      &lt;DataPermissionMask/&gt;
-      &lt;ApplicationType/&gt;
-      &lt;SSNMaskingOn&gt;0&lt;/SSNMaskingOn&gt;
-      &lt;DLMaskingOn&gt;0&lt;/DLMaskingOn&gt;
-      &lt;EndUser&gt;
-       &lt;CompanyName/&gt;
-       &lt;StreetAddress1/&gt;
-       &lt;City/&gt;
-       &lt;State/&gt;
-       &lt;Zip5/&gt;
-      &lt;/EndUser&gt;
-      &lt;MaxWaitSeconds/&gt;
-      &lt;RelatedTransactionId/&gt;
-      &lt;AccountNumber/&gt;
-      &lt;TestDataEnabled&gt;0&lt;/TestDataEnabled&gt;
-      &lt;TestDataTableName/&gt;
-     &lt;/User&gt;
-     &lt;RemoteLocations/&gt;
-     &lt;ServiceLocations/&gt;
-     &lt;Options&gt;
-      &lt;Blind&gt;0&lt;/Blind&gt;
-      &lt;Encrypt&gt;0&lt;/Encrypt&gt;
-      &lt;ReturnTokens&gt;0&lt;/ReturnTokens&gt;
-      &lt;IncludeSanctions&gt;0&lt;/IncludeSanctions&gt;
-      &lt;IncludeDegrees&gt;0&lt;/IncludeDegrees&gt;
-      &lt;IncludeGroupAffiliations&gt;0&lt;/IncludeGroupAffiliations&gt;
-      &lt;IncludeHospitalAffiliations&gt;0&lt;/IncludeHospitalAffiliations&gt;
-      &lt;IncludeResidencies&gt;0&lt;/IncludeResidencies&gt;
-      &lt;IncludeMedicalSchools&gt;0&lt;/IncludeMedicalSchools&gt;
-      &lt;IncludeSpecialties&gt;0&lt;/IncludeSpecialties&gt;
-      &lt;IncludeLicenses&gt;0&lt;/IncludeLicenses&gt;
-      &lt;IncludeDEAInformation&gt;0&lt;/IncludeDEAInformation&gt;
-      &lt;IncludeBusinessAddresses&gt;0&lt;/IncludeBusinessAddresses&gt;
-      &lt;IncludeProfessionalLicenses&gt;0&lt;/IncludeProfessionalLicenses&gt;
-      &lt;IncludeCurrentProfessionalLicensesOnly&gt;0&lt;/IncludeCurrentProfessionalLicensesOnly&gt;
-      &lt;IncludeAssociates&gt;0&lt;/IncludeAssociates&gt;
-      &lt;IncludeGSASanctions&gt;0&lt;/IncludeGSASanctions&gt;
-      &lt;StrictMatchGSASanctions&gt;0&lt;/StrictMatchGSASanctions&gt;
-      &lt;IncludeCorporateAffiliations&gt;0&lt;/IncludeCorporateAffiliations&gt;
-      &lt;IncludeCriminalRecords&gt;0&lt;/IncludeCriminalRecords&gt;
-      &lt;IncludeLiensJudgments&gt;0&lt;/IncludeLiensJudgments&gt;
-      &lt;IncludeBankruptcies&gt;0&lt;/IncludeBankruptcies&gt;
-      &lt;IncludeBlankDOD&gt;0&lt;/IncludeBlankDOD&gt;
-      &lt;IncludeIndividualInstantID&gt;0&lt;/IncludeIndividualInstantID&gt;
-      &lt;IncludeBusinessInstantID&gt;0&lt;/IncludeBusinessInstantID&gt;
-      &lt;IncludeCLIA&gt;0&lt;/IncludeCLIA&gt;
-      &lt;IncludeVerifications&gt;0&lt;/IncludeVerifications&gt;
-      &lt;IncludeAlsoFound&gt;0&lt;/IncludeAlsoFound&gt;
-      &lt;Relatives&gt;
-       &lt;IncludeRelatives&gt;0&lt;/IncludeRelatives&gt;
-       &lt;MaxRelatives/&gt;
-       &lt;RelativeDepth/&gt;
-       &lt;IncludeRelativeAddresses&gt;0&lt;/IncludeRelativeAddresses&gt;
-       &lt;MaxRelativeAddresses/&gt;
-      &lt;/Relatives&gt;
-      &lt;Neighbors&gt;
-       &lt;IncludeNeighbors&gt;0&lt;/IncludeNeighbors&gt;
-       &lt;IncludeHistoricalNeighbors&gt;0&lt;/IncludeHistoricalNeighbors&gt;
-       &lt;NeighborhoodCount/&gt;
-       &lt;NeighborCount/&gt;
-       &lt;HistoricalNeighborhoodCount/&gt;
-       &lt;HistoricalNeighborCount/&gt;
-      &lt;/Neighbors&gt;
-      &lt;IncludeModels&gt;
-       &lt;ProviderIntegrityScore&gt;&lt;/ProviderIntegrityScore&gt;
-       &lt;IncludeAllRiskIndicators&gt;0&lt;/IncludeAllRiskIndicators&gt;
-      &lt;/IncludeModels&gt;
-     &lt;/Options&gt;
-     &lt;ReportBy&gt;
-      &lt;ProviderId/&gt;
-      &lt;UniqueId/&gt;
-     &lt;/ReportBy&gt;
-     &lt;ReportBy2&gt;
-      &lt;Name&gt;
-       &lt;Full/&gt;
-       &lt;First/&gt;
-       &lt;Middle/&gt;
-       &lt;Last/&gt;
-       &lt;Suffix/&gt;
-       &lt;Prefix/&gt;
-      &lt;/Name&gt;
-      &lt;CompanyName/&gt;
-      &lt;Address&gt;
-       &lt;StreetNumber/&gt;
-       &lt;StreetPreDirection/&gt;
-       &lt;StreetName/&gt;
-       &lt;StreetSuffix/&gt;
-       &lt;StreetPostDirection/&gt;
-       &lt;UnitDesignation/&gt;
-       &lt;UnitNumber/&gt;
-       &lt;StreetAddress1/&gt;
-       &lt;StreetAddress2/&gt;
-       &lt;City/&gt;
-       &lt;State/&gt;
-       &lt;Zip5/&gt;
-       &lt;Zip4/&gt;
-       &lt;County/&gt;
-       &lt;PostalCode/&gt;
-       &lt;StateCityZip/&gt;
-      &lt;/Address&gt;
-      &lt;Phone10/&gt;
-      &lt;DOB&gt;
-       &lt;Year/&gt;
-       &lt;Month/&gt;
-       &lt;Day/&gt;
-      &lt;/DOB&gt;
-      &lt;ProviderId/&gt;
-      &lt;UniqueId/&gt;
-      &lt;BusinessId/&gt;
-      &lt;UPINNumber/&gt;
-      &lt;NPINumber/&gt;
-      &lt;TaxId/&gt;
-      &lt;FEIN/&gt;
-      &lt;SSN/&gt;
-      &lt;LicenseNumber/&gt;
-      &lt;LicenseState/&gt;
-     &lt;/ReportBy2&gt;
-    &lt;/Row&gt;
-   &lt;/HealthCareConsolidatedReportRequest&gt;
-</pre>
-*/
-import AutoStandardI,ingenix_natlprof,Prof_licensev2_services,doxie_files,doxie,iesp, address,Healthcare_Header_Services,ut;
+import AutoStandardI, doxie, iesp, address, Healthcare_Header_Services, ut;
 
 export Report_Service := macro
  #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
  #onwarning(4207, ignore);
 	myConst := Healthcare_Header_Services.Constants;
-	// get XML input 
+	// get XML input
 	rec_in := iesp.healthcareconsolidatedreport.t_HealthCareConsolidatedReportRequest;
 	ds_in := DATASET([],rec_in) : STORED('HealthCareConsolidatedReportRequest',FEW);
 	request := ds_in[1] : INDEPENDENT;
@@ -178,7 +26,7 @@ export Report_Service := macro
 
   Healthcare_Header_Services.IParams.SetInputSearch(request);
 	hasFullNCPDP := Options.IncludeFullNCPDPInfo;
-	
+
 	STRING25 Model_Request_Raw		  := TRIM(Options.IncludeModels.ProviderIntegrityScore);
 	UNSIGNED1 NumWarningCodes			  := IF(Options.IncludeModels.IncludeAllRiskIndicators = TRUE, 8, 4);
 	Model_Request_Upper := StringLib.StringToUpperCase(Model_Request_Raw);
@@ -186,7 +34,7 @@ export Report_Service := macro
 	#STORED('Model_Request', Model_Request_Upper);
 
 	#STORED('StrictMatch',true);
-	//Defaults requested by Kathy B. for use in the Individual and Business Identifier searches
+  //Defaults requested by Kathy B. for use in the Individual and Business Identifier searches
 	#STORED('OFACOnly',True);
 	#STORED('OFACVersion',1);
 	#STORED('GlobalWatchListThreshold',.84);
@@ -203,7 +51,7 @@ export Report_Service := macro
 									 '');
 	bdid_val := trim(global(ReportBy2).BusinessId) : stored('BusinessId');
 	//Figure out where the providerid value might be coming from due to crazy backward compatibility and then store the value
-	string20 CustID := User.CompanyId;	
+	string20 CustID := User.CompanyId;
 	boolean IncAlsoFound := Options.IncludeAlsoFound : stored('IncludeAlsoFound');
 	providsrc_val :=	trim(global(ReportBy).ProviderSrc,all)	 : stored('ProviderSrc');
 	providsrc_val2 :=	trim(global(ReportBy2).ProviderSrc,all);
@@ -235,7 +83,7 @@ export Report_Service := macro
 	string clnFirst := TRIM(clnName[6..25]);
 	string clnMiddle := TRIM(clnName[26..45]);
 	string clnLast := TRIM(clnName[46..70]);
-	
+
 	//Need to handle request.ReportBy2.address.StreetAddress1
 	cleanAddr := request.ReportBy2.address.StreetAddress1 <> '';
 	clnAddr := Address.CleanFields(Address.GetCleanAddress(request.ReportBy2.address.StreetAddress1,request.ReportBy2.Address.City+' '+request.ReportBy2.Address.State+' '+request.ReportBy2.Address.Zip5,address.Components.Country.US).str_addr);
@@ -279,12 +127,12 @@ export Report_Service := macro
 	self:=[]
 	end;
 	searchByCriteria := dataset([setinput()]);
-	string _DRM := '':Stored('DataRestrictionMask'); 
+	string _DRM := '':Stored('DataRestrictionMask');
 	Healthcare_Header_Services.Layouts.common_runtime_config buildConfig():=transform
-		self.CustomerID := CustID;	
+		self.CustomerID := CustID;
 		self.penalty_threshold := user_penalty_threshold;
 		self.MaxResults := 1;
-		self.DRM := _DRM; // '':Stored('DataRestrictionMask'); 
+		self.DRM := _DRM; // '':Stored('DataRestrictionMask');
 		self.hasFullNCPDP := hasFullNCPDP;
 		self.glb_ok := ut.glb_ok ((integer)user.GLBPurpose);
 		self.dppa_ok := ut.dppa_ok((integer)user.DLPurpose);
@@ -333,11 +181,11 @@ export Report_Service := macro
 		Export String			LicenseNumber := stringlib.StringToUpperCase(L_Number);
 		export string20   License_Number 	:= stringlib.stringtouppercase(l_number);
 		export string15   CLIANumber 	:= stringlib.stringtouppercase(request.ReportBy2.CLIANumber)  :stored('CLIANumber');
-		EXPORT string11 	TaxID := stringlib.StringToUpperCase(request.ReportBy2.TaxID):stored('TaxId');  
-		EXPORT STRING120 	CompanyName := stringlib.StringToUpperCase(request.ReportBy2.CompanyName):stored('CompanyName');      			
-		EXPORT STRING30 	LastName := stringlib.StringToUpperCase(if(cleanName,clnLast,request.ReportBy2.Name.Last)):stored('Last');      			
-		EXPORT STRING30 	FirstName := stringlib.StringToUpperCase(if(cleanName,clnFirst,request.ReportBy2.Name.First)):stored('First');      			
-		EXPORT STRING30 	MiddleName := stringlib.StringToUpperCase(if(cleanName,clnMiddle,request.ReportBy2.Name.Middle)):stored('Middle');      			
+		EXPORT string11 	TaxID := stringlib.StringToUpperCase(request.ReportBy2.TaxID):stored('TaxId');
+		EXPORT STRING120 	CompanyName := stringlib.StringToUpperCase(request.ReportBy2.CompanyName):stored('CompanyName');
+		EXPORT STRING30 	LastName := stringlib.StringToUpperCase(if(cleanName,clnLast,request.ReportBy2.Name.Last)):stored('Last');
+		EXPORT STRING30 	FirstName := stringlib.StringToUpperCase(if(cleanName,clnFirst,request.ReportBy2.Name.First)):stored('First');
+		EXPORT STRING30 	MiddleName := stringlib.StringToUpperCase(if(cleanName,clnMiddle,request.ReportBy2.Name.Middle)):stored('Middle');
 		Export string10 	StreetNumber :=	stringlib.StringToUpperCase(trim(request.ReportBy2.Address.StreetNumber,all)):stored('StreetNumber');
 		Export string2 		StreetPreDirection :=	stringlib.StringToUpperCase(trim(request.ReportBy2.Address.StreetPreDirection,all)):stored('StreetPreDirection');
 		Export string50 	StreetName :=	stringlib.StringToUpperCase(trim(request.ReportBy2.Address.StreetName,all)):stored('StreetName');
@@ -389,4 +237,3 @@ export Report_Service := macro
 							Healthcare_Provider_Services.ReportService_Records.getIndiv(params, mod_access, ReportBy2,cfg));//Default to Indiv if we do not know.
 	output(recs, named('Results'));
 endmacro;
-// Report_Service();

@@ -10,7 +10,7 @@ mod_access := $.compliance.GetGlobalDataAccessModule ();
 export Comp_Subject_Addresses_wrap :=
 MODULE
 	shared csa := doxie.Comp_Subject_Addresses ($.Get_Dids(), , dial_contactprecision_value, Addresses_PerSubject,
-                                              mod_access);
+                                              mod_access, do_address_hierarchy);
 
 	export addresses := csa.addresses;
 	export names := csa.names;
