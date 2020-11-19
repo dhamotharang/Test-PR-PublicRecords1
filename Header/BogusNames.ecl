@@ -954,6 +954,7 @@ single_name_segment_obscenities := [
 'FUKFACE',
 'MOTHERFOURKER',
 'MOTHERFUCKER',
+'NIGGER',
 'PUSSY',
 'PUSSYDILDOHEAD',
 'PUSSYEAT',
