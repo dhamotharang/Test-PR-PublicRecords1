@@ -1,4 +1,4 @@
-﻿IMPORT RoxieKeyBuild, Scrubs_eCrash_MBSAgency;
+﻿IMPORT RoxieKeyBuild, Scrubs_eCrash_MBSAgency, Orbit3;
 #OPTION('multiplePersistInstances',FALSE);
 
 EXPORT Proc_Build_MBSAgency_Base(STRING Build_DateTime = mod_Utilities.strCurrentDateTimeStamp,
@@ -37,8 +37,8 @@ EXPORT Proc_Build_MBSAgency_Base(STRING Build_DateTime = mod_Utilities.strCurren
 	PID := ProductName.MBS_AgencyBuild;
   
 	OrbitReceiveLoad := fn_Orbit_ReceiveInstance(PID, Build_DateTime);										 	
-  OrbitCreateBuild := fn_Orbit_CreateOrUpdateBuildInstance(Build_DateTime, PID, Orbit3IConstants(PID).buildstatus_B, TRUE, TRUE, TRIM(Orbit3IConstants(PID).componentfilename(Build_DateTime), LEFT, RIGHT));		
-  OrbitUpdateBuild := fn_Orbit_CreateOrUpdateBuildInstance(Build_DateTime, PID, Orbit3IConstants(PID).buildstatus, FALSE, FALSE);		
+  OrbitCreateBuild := fn_Orbit_CreateOrUpdateBuildInstance(Build_DateTime, PID, Orbit3.Constants().bstatus_B, TRUE, TRUE, OrbitConstants(PID).PlatformKey);		
+  OrbitUpdateBuild := fn_Orbit_CreateOrUpdateBuildInstance(Build_DateTime, PID, Orbit3.Constants().bstatus_A, FALSE, FALSE, OrbitConstants(PID).PlatformKeyDone);		
 
 // ###########################################################################
 //                        Scrubs
@@ -56,25 +56,25 @@ EXPORT Proc_Build_MBSAgency_Base(STRING Build_DateTime = mod_Utilities.strCurren
 //                        PostBuild 
 // ###########################################################################	
 	PostBuild := SEQUENTIAL(ClearPreSpray, OrbitUpdateBuild, BuildSuccessEmail);
+	//PostBuild := SEQUENTIAL(ClearPreSpray, BuildSuccessEmail);
 	
 // ###########################################################################
 //                        OrbitProfiling 
 // ###########################################################################
-  // ProfileDistribution := fn_Distribute_DLCorrectionsBase(PID, Files_DLC.DS_BASE_DLC);
-	// ProfileSuffixName   := OrbitConstants(PID).ProfileSuffixName;
+  ProfileDistribution := fn_Distribute_MBSAgencyBase(PID, Files_MBSAgency.DS_BASE_AGENCY);
   
-  // RunOrbitProfiles := mac_fn_OrbitProfiling(Build_DateTime, PID, ProfileSuffixName, PID, ProfileDistribution);
+  RunOrbitProfiles := mac_fn_Orbit_Profile_MBSAgencyBase(Build_DateTime, PID, ProfileDistribution);
   // GetOrbitStatus := SEQUENTIAL(Orbit3SOA.GetBuildStatusPostProfileSeverity(Build_DateTime,
-                                                                           // Files_DLC.DS_FCRA_DL_CORRECTIONS_BASE_PROFILE,
-                                                                           // OrbitConstants(PRODUCT_NAME.DLC_BUILD_ID).masterbuildname,
-                                                                           // OrbitConstants(PRODUCT_NAME.DLC_BUILD_ID).FileType,
+                                                                           // Files_MBSAgency.DS_AGENCY_BASE_PROFILE,
+                                                                           // OrbitConstants(PID).MasterBuildname,
+                                                                           // OrbitConstants(PID).FileType,
                                                                            // FALSE,
-                                                                           // OrbitConstants().platformKey_Done),
+                                                                           // OrbitConstants(PID).PlatformKeyDone),
                                // OUTPUT(DATASET([{'Notification : ORBIT UPDATE COMPLETE; ALL PROFILE STATUSES VERIFIED'}], {STRING message}), 
-                                      // NAMED('build_dl_corrections_notes'), EXTEND)
-                               // );
+                                      // NAMED('build_ecrash_mbs_agency_orbit_notes'), EXTEND));
 
   // OrbitProfiling := ORDERED(RunOrbitProfiles, GetOrbitStatus);
+  OrbitProfiling := RunOrbitProfiles;
 
 // ###########################################################################
 //                         RunBaseBuild 
@@ -83,10 +83,10 @@ EXPORT Proc_Build_MBSAgency_Base(STRING Build_DateTime = mod_Utilities.strCurren
 																							 
 	BuildAgencyBase := IF(isSprayAndBaseBuild, 
 												IF(isSprayFileExists,
-													 IF(isSprayFileNotEmpty, SEQUENTIAL(RunBaseBuild, /*OrbitProfiling,*/ PostBuild), EmptyInputFileEmail),
+													 IF(isSprayFileNotEmpty, SEQUENTIAL(RunBaseBuild, OrbitProfiling, PostBuild), EmptyInputFileEmail),
 													 NoInputFileEmail),
-												SEQUENTIAL(CreateSF, BuildBase, /*OrbitProfiling,*/ PostBuild) 
-											):FAILURE(BuildFailureEmail);
+												SEQUENTIAL(CreateSF, BuildBase, OrbitProfiling, PostBuild) 
+											):FAILURE(BuildFailureEmail);											
 
 	RETURN BuildAgencyBase;
 	 

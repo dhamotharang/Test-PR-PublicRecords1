@@ -657,7 +657,7 @@ EXPORT product_files := MODULE
 		// ===================================================================
 		// For SwitchType
 		// ===================================================================
-	  EXPORT phones_type_superfile	:= 'thor_data400::key::'+doxie.Version_SuperKey+'::Phones_type';
+	  EXPORT phones_type_superfile	:= 'thor_data400::key::Phones_type_'+doxie.Version_SuperKey;
     EXPORT phones_type_for_superkey_monitor := 'monitor::Phones_type';
 	  EXPORT phones_type_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + phones_type_for_superkey_monitor + '_qa';
 	
@@ -673,7 +673,7 @@ EXPORT product_files := MODULE
 				HASH64(phone)
 			): INDEPENDENT;
 
-    EXPORT Phones_Lerg6_superfile := 'thor_data400::key::'+doxie.Version_SuperKey+'::phones_lerg6';
+    EXPORT Phones_Lerg6_superfile := 'thor_data400::key::phones_lerg6_'+doxie.Version_SuperKey;
 		EXPORT Phones_Lerg6_for_superkey_monitor := 'monitor::phones_lerg6';
 		EXPORT phones_lerg6_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + Phones_Lerg6_for_superkey_monitor+ '_qa';
 		
@@ -689,7 +689,7 @@ EXPORT product_files := MODULE
 				HASH64(npa, nxx, block_id)
 			): INDEPENDENT;
 
-    EXPORT carrier_reference_superfile := 'thor_data400::key::'+doxie.Version_SuperKey+'::phonesmetadata::carrier_reference';
+    EXPORT carrier_reference_superfile := 'thor_data400::key::phonesmetadata::carrier_reference_'+doxie.Version_SuperKey;
 		EXPORT carrier_reference_for_superkey_monitor := 'monitor::phonesmetadata::carrier_reference';
 		EXPORT carrier_reference_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + carrier_reference_for_superkey_monitor + '_qa';
 
@@ -1356,7 +1356,6 @@ EXPORT product_files := MODULE
 		
 		EXPORT inquiry := MODULE
 	
-			// Linkid key
       EXPORT inquiryLinkid_Roxie_SuperFile := 'thor_data400::key::inquiry_table::LinkIds_' + doxie.Version_SuperKey;
       EXPORT inquiryLinkid_superkey_monitor := 'monitor::inquiry::linkids';
       EXPORT inquiryLinkid_superkey     := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + inquiryLinkid_superkey_monitor + '_qa';

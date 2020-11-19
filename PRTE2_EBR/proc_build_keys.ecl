@@ -107,14 +107,11 @@ To_qa	:=	parallel(mv1_qa, mv2_qa, mv3_qa, mv4_qa, mv5_qa, mv6_qa, mv7_qa, mv8_qa
 
 //---------- making DOPS optional and only in PROD build -------------------------------													
 		notifyEmail 				:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
-		NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD');						
-		updatedops   		 		:= PRTE.UpdateVersion('EBRKeys',filedate,notifyEmail,'B','N','N');
+		NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD');		
+		updatedops   		 		:= PRTE.UpdateVersion('EBRKeys',filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='N',l_includeboolean := 'N');
     PerformUpdateOrNot 	:= IF(doDOPS,sequential(updatedops),NoUpdate);
 		
 		key_validation :=  output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation'));
-
-    updateorbit		:= Orbit3.proc_Orbit3_CreateBuild('PRTE - EBR', filedate, 'N', true, true, false, _control.MyInfo.EmailAddressNormal);  
-
 
 build_autokeys(string filedate) := function
 
@@ -178,9 +175,9 @@ buildKey	:=	sequential(
 											,Move_keys
 											,to_qa
 											,build_autokeys(filedate)
+											,copy_seeds(filedate)
 											,updatedops
 											,key_validation
-											,updateorbit
 											);
 													
 return	buildKey;
