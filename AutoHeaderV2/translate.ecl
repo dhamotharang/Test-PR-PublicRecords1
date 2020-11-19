@@ -1,4 +1,4 @@
-﻿IMPORT AutoStandardI, address, doxie, dx_header, ut, suppress, lib_stringlib, AutoheaderV2, lib_metaphone, lib_ziplib, _Validate, STD;
+﻿IMPORT AutoStandardI, address, doxie, dx_header, ut, suppress, lib_stringlib, AutoheaderV2, lib_metaphone, lib_ziplib, _Validate, STD, dx_Suppression, Data_Services;
 
 isFCRAval := false;
 todays_date := STD.Date.Today();
@@ -22,13 +22,15 @@ EXPORT translate := MODULE
     // note: app-type must be already pre-processed by a caller
     Suppress.MAC_Suppress_Set (app_type, supp_set);
 
-    supp_key := suppress.Key_New_Suppression (
+    env := Data_Services.data_env.GetEnvFCRA(isFCRA);
+
+    supp_key := dx_Suppression.key_suppression(env) (
       keyed (product in supp_set),
       keyed (linking_type=Suppress.Constants.LinkTypes.SSN),
       keyed (Linking_ID=ssn_filtered_value));
 
-    ssn_value_reg := IF (ssn_filtered_value != '' and count(CHOOSEN(supp_key, 1)) > 0, '', ssn_filtered_value);
-    return if (IsFCRA, ssn_filtered_value, ssn_value_reg);
+    ssn_value := IF (ssn_filtered_value != '' and count(CHOOSEN(supp_key, 1)) > 0, '', ssn_filtered_value);
+    return ssn_value;
   end;
 
   EXPORT AutoheaderV2.layouts._ssn xform_cssn (AutoheaderV2.layouts.lib_search L) := transform

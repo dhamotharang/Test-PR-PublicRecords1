@@ -4,14 +4,13 @@
   * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
   ***********************************************************************************************************
 */
-IMPORT $, ConsumerDisclosure, doxie, FCRA_opt_out;
+IMPORT $, ConsumerDisclosure, doxie, dx_common, dx_fcra_opt_out;
 
-  layout_OptOut_raw := RECORDOF(fcra_opt_out.key_did);
-
+  layout_OptOut_raw := dx_fcra_opt_out.layouts.i_did;
   layout_OptOut_rawrec := RECORD(layout_OptOut_raw)
     $.Layouts.InternalMetadata;
   END;
-  
+
 EXPORT RawOptOut := MODULE
 
   EXPORT layout_OptOut_out := RECORD($.Layouts.Metadata)
@@ -19,10 +18,10 @@ EXPORT RawOptOut := MODULE
   END;
 
   // no overrides exist for this data source, only payload is disclosed
-  EXPORT GetData(DATASET(doxie.layout_references) in_dids) := 
+  EXPORT GetData(DATASET(doxie.layout_references) in_dids) :=
   FUNCTION
 
-    main_recs := JOIN(in_dids, fcra_opt_out.key_did,
+    main_recs := JOIN(in_dids, dx_fcra_opt_out.key_did,
                           KEYED(LEFT.did = RIGHT.l_did),
                           TRANSFORM(layout_OptOut_rawrec,
                                     SELF.subject_did := LEFT.did,
@@ -31,19 +30,19 @@ EXPORT RawOptOut := MODULE
                                     SELF := LEFT,
                                     SELF := []),
                                     LIMIT(0), KEEP($.Constants.Limits.MaxOptOutPerDID));
-                                  
 
-    recs_out := PROJECT(main_recs, TRANSFORM(layout_OptOut_out,      
+
+    recs_out := PROJECT(main_recs, TRANSFORM(layout_OptOut_out,
                         SELF.Metadata := $.Functions.GetMetadataESDL(LEFT.compliance_flags,
                                                 LEFT.record_ids,
                                                 LEFT.statement_ids,
-                                                LEFT.subject_did, 
+                                                LEFT.subject_did,
                                                 '');  // no datagroup
-                        SELF := LEFT;      
-                        ));      
-                        
+                        SELF := LEFT;
+                        ));
+
     // IF(ConsumerDisclosure.Debug,OUTPUT(main_recs, NAMED('OptOut_main_recs')));
-    
+
     RETURN SORT(recs_out, -date_YYYYMMDD, -julian_date, RECORD);
   END;
 

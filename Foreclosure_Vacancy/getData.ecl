@@ -1,7 +1,7 @@
 ﻿/*2010-09-09T20:45:34Z (Adam Shirey)
 Returning iesp.intermediate_log.t_IntermediateLogRecord for customer support tool
 */
-import address, ut, Risk_Indicators, ADVO, AddrFraud, Property, iesp, models, std, MDR, Foreclosure_Services, foreclosure_vacancy;
+import address, ut, Risk_Indicators, ADVO, AddrFraud, dx_Property, iesp, models, std, MDR, Foreclosure_Services, foreclosure_vacancy;
  
 //Data sources
 export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],Foreclosure_Vacancy.Layouts.in_data), boolean isRenewal = FALSE) := MODULE
@@ -157,7 +157,7 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 		
 	ENDMACRO;
 
-	Foreclosure_Vacancy.layouts.Foreclosure addAddrOnlyForeclosures(Cleaned l, Property.Key_Foreclosures_Addr r) := TRANSFORM
+	Foreclosure_Vacancy.layouts.Foreclosure addAddrOnlyForeclosures(Cleaned l, dx_Property.Key_Foreclosures_Addr r) := TRANSFORM
 		self.fc_unique_ID := l.UniqueID_in;
 		MAC_PREFILL_DATA();
 		self := r;
@@ -165,7 +165,7 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 		self := [];
 	end;
 
-	EXPORT fn_Find_Foreclosure_By_Addr(DATASET(foreclosure_vacancy.layouts.in_clean) clnd, DATASET(RECORDOF(Property.Key_Foreclosures_Addr)) keyfile, boolean includeBlackKnight=false) :=
+	EXPORT fn_Find_Foreclosure_By_Addr(DATASET(foreclosure_vacancy.layouts.in_clean) clnd, DATASET(RECORDOF(dx_Property.Key_Foreclosures_Addr)) keyfile, boolean includeBlackKnight=false) :=
 		FUNCTION
 			clnd_filtered := clnd(zip != '' and prim_range != '' and prim_name != '');
 			foreclosure_recs := 
@@ -188,21 +188,21 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 			SELF.acctno:=LEFT.acctno,SELF.did:=(UNSIGNED)LEFT.uniqueid));
 
 		// foreclosure fids
-		ds_FOR_fids:=JOIN(acctno_did,Property.Key_Foreclosure_DID,
+		ds_FOR_fids:=JOIN(acctno_did,dx_Property.Key_Foreclosure_DID,
 			KEYED(LEFT.did=RIGHT.did),LIMIT(ut.limits.Foreclosure_PER_DID,SKIP));
 
 		// forclosure payload
-		ds_FOR_recs:=JOIN(ds_FOR_fids,Property.Key_Foreclosures_FID,
+		ds_FOR_recs:=JOIN(ds_FOR_fids, dx_Property.Key_Foreclosures_FID,
 			KEYED(LEFT.fid=RIGHT.fid) AND
 			IF(includeBlackKnight,TRUE,RIGHT.source=MDR.sourceTools.src_Foreclosures),
 			LIMIT(ut.limits.Foreclosure_MAX,SKIP));
 
 		// notice of default fids
-		ds_NOD_fids:=JOIN(acctno_did,Property.Key_NOD_DID,
+		ds_NOD_fids:=JOIN(acctno_did,dx_Property.Key_NOD_DID,
 			KEYED(LEFT.did=RIGHT.did),LIMIT(ut.limits.Foreclosure_PER_DID,SKIP));
 
 		// notice of default payload
-		ds_NOD_recs:=JOIN(ds_NOD_fids,Property.Key_NOD_FID,
+		ds_NOD_recs:=JOIN(ds_NOD_fids, dx_Property.Key_NOD_FID,
 			KEYED(LEFT.fid=RIGHT.fid) AND
 			IF(includeBlackKnight,TRUE,RIGHT.source=MDR.sourceTools.src_Foreclosures),
 			LIMIT(ut.limits.Foreclosure_MAX,SKIP));
@@ -218,7 +218,7 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 		RETURN PROJECT(ds_FOR_recs+ds_NOD_recs,formatOutput(LEFT));
 	END;
 
-	export Find_Foreclosure_By_Addr := fn_Find_Foreclosure_By_Addr(Cleaned, Property.Key_Foreclosures_Addr);
+	export Find_Foreclosure_By_Addr := fn_Find_Foreclosure_By_Addr(Cleaned, dx_Property.Key_Foreclosures_Addr);
 
 	foreclosure_records := Find_Foreclosure_By_Addr(CP_DATA_DATE  <> '');
 	shared foreclosure_sort := sort(foreclosure_records, fc_unique_id, -CP_DATA_DATE);

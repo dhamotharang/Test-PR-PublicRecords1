@@ -1,48 +1,11 @@
-﻿// TODO: define ESDL interface
+﻿// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
+// TODO: define ESDL interface
 // TODO: expose "get minors"
-/*--SOAP--
-<message name="IdentityFraudReportService" wuTimeout="300000">
-  <part name="DID" type="xsd:string" required="1"/>
-  <part name="phone" type="xsd:string"/>
-  <separator />
-  <part name="DL_Number" type="xsd:string"/>
-  <part name="DL_State"  type="xsd:string" description=" (can be blank)"/>
-  <separator />
-  <part name="DPPAPurpose" type="xsd:byte" default="1" size="2"/>
-  <part name="GLBPurpose" type="xsd:byte" default="1" size="2"/> 
-	<part name="ApplicationType" type="xsd:string"/>
-	<part name="TestDataEnabled" type="xsd:boolean" default="false"/>
-	<part name="TestDataTableName" type="xsd:string"/>
-  <part name="IncludePhonesPlus" type="xsd:boolean" default="false"/>
-  <part name="IncludeIdentityRisklevel" type="xsd:boolean" default="true"/>
-  <part name="IncludeSourceRisklevel" type="xsd:boolean" default="true"/>
-  <part name="IncludeVelocityRisklevel" type="xsd:boolean" default="true"/>
-  <part name="SkipPenaltyFilter" type="xsd:boolean" default="false"/>
-  <separator />
-  <part name="CountBySource" type="xsd:boolean" default="false" description=" debug: count by source (vs. by category)"/> 
-  <part name="IncludeSummary" type="xsd:boolean" description=" debug: summary section is deprecated"/> 
-  <part name="MaxTopHRIs" type="xsd:unsignedInt" default="6" description=" debug: number of HRIs to return in Report Summary"/> 
-  <part name="MaxImposters" type="xsd:unsignedInt" default="20" description=" debug: number of associate identities to return (no more than 20)"/> 
-  <part name="MaxIndicatorsPerImposter" type="xsd:unsignedInt" default="3" description=" debug: indicators per imposter"/> 
-  <part name="DataRestrictionMask" type="xsd:string" default="00000000000" />
-  <part name="DataPermissionMask" type="xsd:string" default="0000000000" />
-  <part name="ProbationOverride" type="xsd:boolean" default="true" description=" debug: allows to use data on probation"/> />
-  <separator />
-  <part name="SSNMask_Overload" type="xsd:string" description=" used if no value provided in SSNMask in ESDL User structure"/>
-  <part name="SSNMask" type="xsd:string" description=" always ignored"/>
-  <part name="DOBMask_Overload" type="xsd:string" description=" ... DOBMask ..."/>
-  <part name="DOBMask" type="xsd:string" description=" ignored"/>
-  <part name="DLMask_Overload" type="xsd:boolean" description=" ... DLMask ..."/>
-  <part name="DLMask" type="xsd:boolean" description=" ignored"/>
-  <separator />
-  <part name="IdentityFraudReportRequest" type="tns:XmlDataSet" cols="80" rows="20" />
-</message>
-*/
-/*--INFO-- 
-(Note: "SOAP" options will always override ESDL options)
-*/
-
-
 IMPORT iesp, doxie, AutoHeaderI, AutoStandardI, IdentityFraud_Services, PersonReports, ut, seed_files, suppress;
 
 EXPORT IdentityFraudReportService () := MACRO
@@ -82,8 +45,7 @@ string dob_mask_overload := '' : stored ('DOBMask_Overload');
 
   // this will #store some standard input parameters (generally, for search purpose)
   iesp.ECL2ESP.SetInputBaseRequest (first_row);
-  // may be needed, since we calculate penalty; but it will require change in ESP 
-  //#stored ('StrictMatch', first_row.Options.StrictMatch);
+  // may be needed, since we calculate penalty; but it will require change in ESP
   iesp.ECL2ESP.SetInputReportBy (project (first_row.ReportBy, transform (iesp.bpsreport.t_BpsReportBy, self := Left; Self := [])));
   SetLegacyInput (global (first_row.ReportBy));
 
@@ -95,7 +57,7 @@ string dob_mask_overload := '' : stored ('DOBMask_Overload');
 				export boolean include_source_risk_level := tag_options.IncludeSourceRisklevel : stored('IncludeSourceRisklevel');
 				export boolean include_velocity_risk_level := tag_options.IncludeVelocityRisklevel : stored('IncludeVelocityRisklevel');
 				export boolean skip_penalty_filter := tag_options.SkipPenaltyFilter : stored('SkipPenaltyFilter');
-  end;  
+  end;
 
   // get search parameters from global #stored variables;
   gmod := AutoStandardI.GlobalModule();
@@ -144,18 +106,18 @@ string dob_mask_overload := '' : stored ('DOBMask_Overload');
   dids := MAP (did_value != '' => dids_input,
                dl_number != '' => dids_dl,
                dids_search);
-	
+
 	ifrReportMod	:=	IdentityFraud_Services.IdentityFraudReport (dids, project (report_mod, IdentityFraud_Services.IParam._identityfraudreport, OPT), FALSE);
-	
+
   // main records
   main_results := ifrReportMod.results;
-	
+
 	// email royalties
 	email_recs	:=	ifrReportMod.email_results;
 
 	// ROYALTIES
 	Royalty.MAC_RoyaltyEmail(email_recs, royalties_email,, false)
-	
+
   // test run
   boolean is_testrun := first_row.User.TestDataEnabled : stored ('TestDataEnabled');
   string20 testrun_tablename := first_row.User.TestDataTableName : stored ('TestDataTableName');
@@ -165,7 +127,7 @@ string dob_mask_overload := '' : stored ('DOBMask_Overload');
 
   test_key := seed_files.key_identityreport;
   // additional test in case of hash conflicts
-  is_matched := (test_key.firstname = search_mod.firstname) and (test_key.lastname = search_mod.lastname) and 
+  is_matched := (test_key.firstname = search_mod.firstname) and (test_key.lastname = search_mod.lastname) and
                 (test_key.ssn = search_mod.ssn) and (test_key.zip5 = search_mod.zip) and (test_key.phone = search_mod.phone);
 
   key_match := test_key (keyed (hashvalue = this_hash), ut.NNEQ (testrun_tablename, test_key.table_name), is_matched);
@@ -175,7 +137,7 @@ string dob_mask_overload := '' : stored ('DOBMask_Overload');
   integer cnt := if (is_testrun, count (hash_match), count (dids));
   results := if (is_testrun, test_results, main_results);
 
-  MAP (cnt > 1 => fail (203, doxie.ErrorCodes (203)), // 'Too many subjects found' 
+  MAP (cnt > 1 => fail (203, doxie.ErrorCodes (203)), // 'Too many subjects found'
        // cnt = 0 => fail (10, doxie.ErrorCodes (10)), // 'No records found'
        sequential (//output (is_testrun, named ('test_run')),
                    //output (this_hash, named ('this_hash')),

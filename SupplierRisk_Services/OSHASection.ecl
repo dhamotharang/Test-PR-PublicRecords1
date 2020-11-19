@@ -1,4 +1,4 @@
-﻿IMPORT dx_OSHAIR, OSHAIR, BIPV2, iesp, MDR, TopBusiness_Services;
+﻿IMPORT dx_common, dx_OSHAIR, OSHAIR, BIPV2, iesp, MDR, TopBusiness_Services;
 
 EXPORT OSHASection := MODULE
 
@@ -9,6 +9,10 @@ EXPORT OSHASection := MODULE
   ):= FUNCTION
 
   FETCH_LEVEL := in_options.ReportFetchLevel;
+
+  violations_clean_layout := RECORD
+    dx_OSHAIR.layouts.Layout_Violations - dx_common.layout_metadata
+  END;
 
   osha_work_layout := RECORD
     BIPV2.IDlayouts.l_header_ids;
@@ -21,14 +25,14 @@ EXPORT OSHASection := MODULE
     STRING25 insp_scope_desc;
     INTEGER total_violations;
     STRING5 safety_health_flag;
-    DATASET(OSHAIR.layout_OSHAIR_violations_clean) violations{MAXCOUNT(iesp.constants.OSHAIR.MaxCountViolationRecords)};
+    DATASET(violations_clean_layout) violations{MAXCOUNT(iesp.constants.OSHAIR.MaxCountViolationRecords)};
   END;
 
   // Strip off the input acctno from each record, will re-attach them later.
-  ds_in_unique_ids_only := PROJECT(ds_in_ids,TRANSFORM(BIPV2.IDlayouts.l_xlink_ids,
+  ds_in_unique_ids_only := PROJECT(ds_in_ids,TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2,
     SELF := LEFT, SELF := []));
 
-  oshair_recs_link := dx_OSHAIR.Key_LinkIds.KFetch(ds_in_unique_ids_only, FETCH_LEVEL);
+  oshair_recs_link := dx_OSHAIR.Key_LinkIds.KFetch2(ds_in_unique_ids_only, FETCH_LEVEL);
   oshair_act_recs := PROJECT(oshair_recs_link, TRANSFORM(osha_work_layout, SELF := LEFT; SELF := []));
   oshair_act_recs_dedup := DEDUP(SORT(oshair_act_recs,activity_number),activity_number);
 
@@ -37,7 +41,7 @@ EXPORT OSHASection := MODULE
   oshair_viol_recs := JOIN(oshair_act_recs_dedup, Violations_key,
     KEYED(LEFT.activity_number = RIGHT.activity_number),
     TRANSFORM(osha_work_layout,
-      SELF.violations := ROW(RIGHT, OSHAIR.layout_OSHAIR_violations_clean);
+      SELF.violations := ROW(RIGHT, violations_clean_layout);
       SELF := LEFT;
     ), LEFT OUTER,
     LIMIT(0), KEEP(iesp.constants.OSHAIR.MaxCountViolationRecords));
@@ -51,7 +55,7 @@ EXPORT OSHASection := MODULE
 
   oshair_recs := ROLLUP(oshair_grp, GROUP, roll_violations(LEFT,ROWS(LEFT)));
 
-  iesp.osha.t_OshaSectionViolation xfm_violationRecs(OSHAIR.layout_OSHAIR_violations_clean l, STRING safety_health) := TRANSFORM
+  iesp.osha.t_OshaSectionViolation xfm_violationRecs(violations_clean_layout l, STRING safety_health) := TRANSFORM
     SELF.ViolationType := l.Violation_Type;
     SELF.HealthSafetyIssue := safety_health;
     SELF.ViolationTypeDesc := l.Violation_Desc;

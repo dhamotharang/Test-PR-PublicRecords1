@@ -1,4 +1,4 @@
-﻿import address_attributes, advo, AVM_V2, EASI, LN_PropertyV2, property, Risk_Indicators, MDR;
+﻿import address_attributes, advo, AVM_V2, EASI, LN_PropertyV2, dx_property, Risk_Indicators, MDR;
 
 export get_SmartGrid_Data(DATASET(Address_Attributes.Layouts.SmartGrid_in) indata = DATASET([],Address_Attributes.Layouts.SmartGrid_in)) := FUNCTION
 
@@ -333,14 +333,14 @@ export get_SmartGrid_Data(DATASET(Address_Attributes.Layouts.SmartGrid_in) indat
 				keep(1));
 
 		//Find and Sort Foreclosure Data by address
-		layout_Foreclosure addAddrOnlyForeclosures(Cleaned l, property.key_foreclosures_addr r) := TRANSFORM
+		layout_Foreclosure addAddrOnlyForeclosures(Cleaned l, dx_Property.Key_Foreclosures_Addr r) := TRANSFORM
 			self.data_date := if(r.filing_date >= r.recording_date, r.filing_date, r.recording_date);
 			self.acctno := l.acctno;
 			self := r;
 			self := l;
 		end;
 
-		Find_Foreclosure_By_Addr := join(Cleaned(zip != '' and prim_name != ''), property.key_foreclosures_addr, 
+		Find_Foreclosure_By_Addr := join(Cleaned(zip != '' and prim_name != ''), dx_Property.Key_Foreclosures_Addr, 
 			keyed(left.zip = right.situs1_zip) and
 			keyed(left.prim_range = right.situs1_prim_range) and
 			keyed(left.prim_name = right.situs1_prim_name) and

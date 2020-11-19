@@ -10,36 +10,30 @@ export t_RINIdentityRiskReportBy := record (iesp.identityreport.t_RINIdentityRep
 end;
 		
 export t_RINIdentityRiskReportOption := record (iesp.identityreport.t_RINIdentityReportOption)
-end;
-		
-export t_RINRiskAttributeCount := record
-	string25 RiskAttributeType {xpath('RiskAttributeType')};
-	unsigned2 Count {xpath('Count')};
+	string InquiryReason {xpath('InquiryReason')}; //values['Application','Change of non-address contact information','Change of address information','Change of bank account information','Change of beneficiary information','Change of information (other)','Change of information (unknown)','Recertification','Current beneficiary','Termination','Transaction log','Additional benefits','']
 end;
 		
 export t_RINApiRiskAttribute := record
-	dataset(t_RINRiskAttributeCount) RiskAttributeCount {xpath('RiskAttributeCount/AttributeCountLevel'), MAXCOUNT(iesp.Constants.RIN.MAX_RISK_ATTRIBUTE)};
 	string20 RiskAttributeCode {xpath('RiskAttributeCode')};
 	string200 RiskAttributeReason {xpath('RiskAttributeReason')};
 end;
 		
 export t_RINKnownRisk := record
-	unsigned2 KnownRiskCount {xpath('KnownRiskCount')};
-	string60 ElementType {xpath('ElementType')};
-	string10 RiskLevel {xpath('RiskLevel')};
-	string20 KnownRiskCode {xpath('KnownRiskCode')};
+	string60 ElementType {xpath('ElementType')};//hidden[internal]
+	string20 KnownRiskCode {xpath('KnownRiskCode')};//hidden[internal]
 	string200 KnownRiskReason {xpath('KnownRiskReason')};
 	string100 KnownRiskAgency {xpath('KnownRiskAgency')};
 end;
 		
 export t_RINIdentityRiskReportRecord := record
-	unsigned2 RiskScore {xpath('RiskScore')};
 	string10 RiskLevel {xpath('RiskLevel')};
 	string1 IdentityResolved {xpath('IdentityResolved')};
 	string12 UniqueId {xpath('UniqueId')};
-	iesp.share.t_Date RecentActivityDate {xpath('RecentActivityDate')};
-	unsigned2 TotalNoOfActivities {xpath('TotalNoOfActivities')};
+	iesp.share.t_Date MostRecentActivityDate {xpath('MostRecentActivityDate')};
+	unsigned2 TotalNumberIdentityActivities {xpath('TotalNumberIdentityActivities')};
+	unsigned2 RiskAttributeCount {xpath('RiskAttributeCount')};
 	dataset(t_RINApiRiskAttribute) RiskAttributes {xpath('RiskAttributes/RiskAttribute'), MAXCOUNT(iesp.Constants.RIN.MAX_COUNT_INDICATOR_ATTRIBUTE)};
+	unsigned2 KnownRiskCount {xpath('KnownRiskCount')};
 	dataset(t_RINKnownRisk) KnownRisks {xpath('KnownRisks/KnownRisk'), MAXCOUNT(iesp.Constants.RIN.MAX_COUNT_INDICATOR_ATTRIBUTE)};
 end;
 		

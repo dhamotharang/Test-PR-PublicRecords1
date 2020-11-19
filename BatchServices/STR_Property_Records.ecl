@@ -49,31 +49,8 @@ MODULE
 	// Supress records by fids below.
 	//////////////////////////////////////////////////////////////////////////
 	
-	fidsToPull1 := 
-		join(ds_props_with_parties, Suppress.Key_New_Suppression,
-					keyed(right.Product in map (in_mod.application_type = Suppress.Constants.ApplicationTypes.PeopleWise => Suppress.Constants.SuppressPeopleWise,
-															 in_mod.application_type = Suppress.Constants.ApplicationTypes.LE => Suppress.Constants.SuppressLE,
-															 Suppress.Constants.SuppressGeneral)) and 
-					keyed(right.Linking_type = Suppress.Constants.LinkTypes.DID) and
-				 (unsigned6)left.owners[1].owner_did<>0 and 
-					 keyed(intformat((unsigned6)left.owners[1].owner_did,12,1) = right.Linking_ID),
-				 transform(LN_PropertyV2_Services.layouts.fid, self := left),keep(1));
-	fidsToPull2 := 
-		join(ds_props_with_parties, Suppress.Key_New_Suppression, 
-					keyed(right.Product in map (in_mod.application_type = Suppress.Constants.ApplicationTypes.PeopleWise => Suppress.Constants.SuppressPeopleWise,
-															 in_mod.application_type = Suppress.Constants.ApplicationTypes.LE => Suppress.Constants.SuppressLE,
-															 Suppress.Constants.SuppressGeneral)) and 
-					keyed(right.Linking_type = Suppress.Constants.LinkTypes.SSN) and
-				 length(trim((string60)left.owners[1].owner_ssn))<>0 and 
-				 keyed((string60)left.owners[1].owner_ssn = right.Linking_ID),
-				 transform(LN_PropertyV2_Services.layouts.fid, self := left),keep(1));
-	fidsToPull := fidsToPull1+fidsToPull2;
-	
-	// pull all suppressed fids from property records.
-	ds_props_with_parties_pulled := 
-		join(ds_props_with_parties, fidsToPull, left.ln_fares_id = right.ln_fares_id,
-				 transform(BatchServices.STR_Layouts.Working_Property, self := left),
-				 left only);
+ Suppress.MAC_Suppress(ds_props_with_parties, did_suppress, in_mod.application_type, Suppress.Constants.LinkTypes.DID, owners[1].owner_did);
+ Suppress.MAC_Suppress(did_suppress, ds_props_with_parties_pulled, in_mod.application_type, Suppress.Constants.LinkTypes.SSN, owners[1].owner_ssn);
 	
 	//////////////////////////////////////////////////////////////////////////	
 
