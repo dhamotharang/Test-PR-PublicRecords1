@@ -147,7 +147,7 @@ EXPORT Map_Disconnect_Gong_History(string version) := function
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//Check Against Phones Metadata File//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-	portRec 					:= sort(distribute(PhonesInfo.File_Phones.Ported_Current((source='PJ' and vendor_first_reported_dt<=20150308) or source='PK'), hash(phone)), phone, port_start_dt, local);
+	portRec 					:= sort(distribute(PhonesInfo.File_Phones.Ported_Current(source in ['PK','P!']), hash(phone)), phone, port_start_dt, local);
 	discARec					:= sort(distribute(aggrTrans_r, hash(phone)), phone, deact_start_dt, local);
 
 	PhonesInfo.Layout_Deact_GH.Temp addPrt(discARec l, portRec r):= transform
