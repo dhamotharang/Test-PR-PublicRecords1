@@ -5,21 +5,20 @@ import Scoring_Project_Macros,  scoring_project_pip, Scoring_QA_New_Bins;
 // previous_dt := '20160803';
 // Current_dt := '20160804';
 
- file1_2:= dataset(route + scoring_project_pip.Output_Sample_Names.RV_Attributes_V5_BATCH_CapOne_outfile + previous_dt ,
-								Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_Capone_allflagships_Attributes_V5_Batch_Layout,thor);
+ file1_2:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.RV_Attributes_V5_BATCH_CapOne_outfile + previous_dt ,
+								Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_Capone_allflagships_Attributes_V5_Batch_Layout,thor),(integer)acctno);
 
  // file1:= dataset( scoring_project_pip.Output_Sample_Names.RV_Attributes_V5_XML_Generic_outfile + previous_dt + '_1',
 								// Deurlein_Jon.Riskview_Layout.lay,thor);
 
- file2_2:= dataset(route + scoring_project_pip.Output_Sample_Names.RV_Attributes_V5_BATCH_CapOne_outfile + current_dt , 
-								Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_Capone_allflagships_Attributes_V5_Batch_Layout,thor);
+ file2_2:= distribute(dataset(route + scoring_project_pip.Output_Sample_Names.RV_Attributes_V5_BATCH_CapOne_outfile + current_dt , 
+								Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_Capone_allflagships_Attributes_V5_Batch_Layout,thor),(integer)acctno);
 								
  // file2:= dataset( scoring_project_pip.Output_Sample_Names.RV_Attributes_V5_XML_Generic_outfile + current_dt + '_1', 
 								// Deurlein_Jon.Riskview_Layout.lay,thor);
 
  	   file1 := file1_2(errorcode='');
 file2 := file2_2(errorcode='');
-
 aa1:=join(file1,file2,left.acctno=right.acctno,inner);
 
 aa:=aa1(acctno<>'');

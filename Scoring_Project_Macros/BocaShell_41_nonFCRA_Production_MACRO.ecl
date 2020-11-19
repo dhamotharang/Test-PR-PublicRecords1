@@ -42,7 +42,7 @@
 			END;
 
 			// ds_raw_input := dataset (infile_name, layout_input, CSV(HEADING(SINGLE), QUOTE('"')));
-			ds_raw_input := dataset (infile_name, layout_input, thor);
+			ds_raw_input := distribute(dataset (infile_name, layout_input, thor),(integer)accountnumber);
 
 			ds_raw_input_project := project(ds_raw_input,TRANSFORM(layout_input, self.historydateyyyymm := archive_date, self:= LEFT));
 

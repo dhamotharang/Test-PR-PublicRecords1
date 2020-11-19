@@ -33,7 +33,7 @@ IMPORT Models, Risk_Indicators, RiskWise, Scoring, UT;
 			Scoring_Project_Macros.Regression.runtime_layout;
 		END;
 
-		ds_raw_input := IF(no_of_records <= 0, dataset( infile_name, layout_input, thor), CHOOSEN(DATASET( infile_name, layout_input, thor), no_of_records));
+		ds_raw_input := distribute(IF(no_of_records <= 0, dataset( infile_name, layout_input, thor), CHOOSEN(DATASET( infile_name, layout_input, thor), no_of_records)),(integer)accountnumber);
 
     //*********** CHASE PIO2 XML SETUP AND SOAPCALL ******************
 
