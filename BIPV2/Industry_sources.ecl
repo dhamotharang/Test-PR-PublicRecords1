@@ -5,8 +5,8 @@
 ;
 
 export Industry_sources :=
-	  AMIDIR.AMIDIR_As_Industry
-	+ BBB2.BBB_As_Industry
+	  // AMIDIR.AMIDIR_As_Industry
+	  BBB2.BBB_As_Industry
 	+ BusReg.BusReg_As_Industry
 	+ CALBUS.Calbus_As_Industry
 	+ Corp2.As_Industry
@@ -14,14 +14,14 @@ export Industry_sources :=
 	+ Diversity_Certification.As_Industry
 	+ DNB_FEINV2.As_Industry
 	+ EBR.EBR_As_Industry
-	+ Edgar.Edgar_As_Industry
+	// + Edgar.Edgar_As_Industry
 	+ Experian_CRDB.As_Industry	
 	+ FBNV2.FBNV2_As_Industry
 	+ Frandx.As_Industry
 	+ govdata.IRS_Non_Profit_As_Industry
-	+ govdata.OR_Workers_As_Industry
-	+ InfoUSA.ABIUS_Company_As_Industry
-	+ InfoUSA.DEADCO_As_Industry
+	// + govdata.OR_Workers_As_Industry
+	// + InfoUSA.ABIUS_Company_As_Industry
+	// + InfoUSA.DEADCO_As_Industry
 	+ LaborActions_WHD.As_Industry
 	+ NCPDP.As_Industry
 	+ OIG.OIG_As_Industry
