@@ -489,7 +489,6 @@ j55 := join(j54, archive55,
 						left.fips_geo_12=right.fips_geo_12,
 					append_more_history(left, right),
 						full outer, local);	
-// will need to decide in 2020 if we can keep going with more child records or if we need to remove 2008 because of limits in nested child rows in roxie keys
 archive56 := distribute(hist2021_q4, hash(fips_geo_12));
 j56 := join(j54, archive56,
 						left.fips_geo_12=right.fips_geo_12,
@@ -710,6 +709,7 @@ j92 := join(j91, archive92,
 					append_more_history(left, right),
 						full outer, local);
 
+// will need to decide in 2030 if we can keep going with more child records or if we need to remove 2008 because of limits in nested child rows in roxie keys
 
 return j92;
 
