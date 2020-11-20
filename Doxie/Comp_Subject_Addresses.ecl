@@ -50,12 +50,7 @@ Layout_Comp_Addresses traConsumer(Main_Dn lef,Main_Dn ref) := transform
   end;
 
 //Do address Hiearchy sorting 
-rec_header_plus := RECORD(recordof(Main_Dn)) //Layout_Comp_Addresses
-       STRING2 addr_ind := '';
-      END;
-    
-Main_Dn_plus := PROJECT(Main_Dn,rec_header_plus);
-Main_Dn_ranked := Header.Mac_Append_addr_ind(Main_Dn_plus, addr_ind , /*src*/, did, prim_range, prim_name, sec_range, city_name
+Main_Dn_ranked := Header.Mac_Append_addr_ind(Main_Dn, addr_ind , /*src*/, did, prim_range, prim_name, sec_range, city_name
                                              ,st , zip , predir, postdir, suffix, dt_first_seen, dt_last_seen
                                              , dt_vendor_first_reported, dt_vendor_last_reported);
                                                        

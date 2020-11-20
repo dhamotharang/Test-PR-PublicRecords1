@@ -57,7 +57,6 @@ end;
 Main_tmp :=project(Main_tmp_a,add_sub_Ind(LEFT));
 // Main is for the subj add here
 
-
 PhonesFeedback_Services.Mac_Append_Feedback(Main_tmp
                                             ,did
                                             ,Phone
@@ -85,19 +84,12 @@ Rels1 := join(Rels,Main, left.prim_name=right.prim_name and
 
 doxie.MAC_Address_Rollup(Rels1,Max_RelativeAddresses,Rels_Dn_pre, isKnowx);
  
- //Do address Hiearchy sorting for relatives/associate addresses
- rec_rela_plus := RECORD(recordof(Rels_Dn_pre)) //Layout_Comp_Addresses
-    STRING2 addr_ind := '';
-END;
-    
-Rels_Dn_pre_ranking := PROJECT(Rels_Dn_pre,rec_rela_plus);
-Rels_Dn_ranked := Header.Mac_Append_addr_ind(Rels_Dn_pre_ranking, addr_ind, /*src*/, did, prim_range, prim_name, sec_range, city_name
+//Do address Hiearchy sorting for relatives/associate addresses
+Rels_Dn_ranked := Header.Mac_Append_addr_ind(Rels_Dn_pre, addr_ind, /*src*/, did, prim_range, prim_name, sec_range, city_name
                                               , st, zip, predir, postdir, suffix, dt_first_seen, dt_last_seen, dt_vendor_first_reported
                                               , dt_vendor_last_reported /*,isTrusted,*/ /*isFCRA,*/ /*hitQH,*/ /*debug*/);
                                                        
 Rels_1 := if(do_address_hierarchy,project(Rels_Dn_ranked,Address_Format),Rels_Dn_pre);
-
-
 
 Address_Format tra(Address_Format lef,Address_Format ref) := transform
   self.address_seq_no := if(lef.address_seq_no <=0,1,lef.address_seq_no +1);
