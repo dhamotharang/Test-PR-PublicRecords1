@@ -34,5 +34,5 @@ EXPORT GetIds(dataset(Layouts.rEntity) infile) := FUNCTION
 	dsWithoutVessel := Normalize(infile(EntryType <> 'Vessel' and EntryType <> 'Organization'), 4, xformWithoutVessel(LEFT, COUNTER));
 	dsWithOrganization := Normalize(infile(EntryType = 'Organization'), 5, xformWithOrganization(LEFT, COUNTER));
 
-	return SORT(Distribute((dsWithVessel&dsWithoutVessel&dsWithOrganization)(number<>''), Ent_id), Ent_id, type, number, LOCAL);
+	return DEDUP(SORT(Distribute((dsWithVessel&dsWithoutVessel&dsWithOrganization)(number<>''), Ent_id), Ent_id, type, number, LOCAL), Ent_id, type, number, LOCAL);
 END;
