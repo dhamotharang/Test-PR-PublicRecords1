@@ -30,9 +30,10 @@ EXPORT IParam := MODULE
     EXPORT BOOLEAN		include_temp_susp_reactivate   := FALSE;
     EXPORT BOOLEAN    AllowPortingData := FALSE;
     EXPORT UNSIGNED		max_lidb_age_days              := Phones.Constants.PhoneAttributes.LastActivityThreshold;
-		EXPORT UNSIGNED		max_age_days              := Phones.Constants.PhoneAttributes.LastActivityThreshold;
+	EXPORT UNSIGNED		max_age_days              := Phones.Constants.PhoneAttributes.LastActivityThreshold;
     EXPORT DATASET(Gateway.Layouts.Config) gateways    := DATASET ([], Gateway.Layouts.Config);
-  END;
+	EXPORT BOOLEAN Allow_TCPA_Port := FALSE;
+  END;	
 
 		EXPORT getBatchParams() :=
 		FUNCTION
