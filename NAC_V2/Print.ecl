@@ -207,6 +207,7 @@ troubleshooting_workunit := wk_ut.CreateWuid(submit_cmd, 'thor400_44_sla_eclcc',
 				ds := DATASET([{lfn}], dRow) 
 							& DATASET([{''}], dRow) 
 							& DATASET([{IsOnboardingMessage}], dRow) 	
+							& DATASET([{''}], dRow) 
 							& DATASET([{'Troubleshooting Workunit: ' + troubleshooting_workunit}], dRow) 
 							& DATASET([{''}], dRow) 
 							& NCR_Header

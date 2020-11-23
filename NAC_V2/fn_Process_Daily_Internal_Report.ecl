@@ -32,10 +32,10 @@ dsNcr2 := Nac_V2.GetReports(nac2, ilfn).dsNcr2;
 show_NCR2 := OUTPUT(CHOOSEN(dsNcr2, 2000), NAMED('NCR2'));
 
 dsNcd2 := Nac_V2.GetReports(nac2, ilfn).dsNcd2;
-show_NCD2 := OUTPUT(CHOOSEN(dsNcd2,2000), NAMED('NCD2'));
+show_NCD2 := OUTPUT(CHOOSEN(dsNcd2,2000), NAMED('NCD2')); 
 
 dsNcx2 := Nac_V2.GetReports(nac2, ilfn).dsNcx2;
-show_NCX2 := OUTPUT(CHOOSEN(dsNcx2,2000), NAMED('NCX2'));
+show_NCX2 := OUTPUT(CHOOSEN(dsNcx2,2000), NAMED('NCX2')); 
  
 show_record_codes_count := OUTPUT(SORT(Nac_V2.ExtractRecords(ilfn).Types, RecordCode), NAMED('RecordCodes_In_File'));
 
