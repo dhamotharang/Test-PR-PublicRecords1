@@ -33,9 +33,9 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 			Scoring_Project_Macros.Regression.runtime_layout;
 		END;
 
-		ds_raw_input := IF(no_of_records = 0, 
+		ds_raw_input := distribute(IF(no_of_records = 0, 
 										DATASET(Infile_name, layout_input, thor),
-										CHOOSEN(DATASET(Infile_name, layout_input, thor), no_of_records));
+										CHOOSEN(DATASET(Infile_name, layout_input, thor), no_of_records)),(integer)accountnumber);
 
     //*********** RV Scores V4 XML SETUP AND SOAPCALL ******************
  Layout_Attributes_In := RECORD
