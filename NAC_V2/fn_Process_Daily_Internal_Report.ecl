@@ -18,7 +18,9 @@ showGroupID := OUTPUT(GroupID, NAMED('GroupID'));
 //  "Onboarding : process NCF2 in prod as if they will go, but stage them at the gate until confirmed they're good."
 //  'y' means the file will get processed to a certain point but not get fully ingested, only staged
 boolean IsOnboarding(string GroupID) := NAC_V2.dNAC2Config(GroupID=GroupID)[1].Onboarding in ['y','Y'];
-IsOnboardingMessage := IF(IsOnboarding(GroupID) = TRUE, 'Incoming file will be fully ingested', 'Incoming file will be STAGED only');
+IsOnboardingMessage := IF(IsOnboarding(GroupID) = TRUE, GroupID + ' is in Production,the Incoming file will be FULLY ingested', GroupID + ' is onboarding, the Incoming file is STAGED for file validation only');
+
+
 showIsOnboarding := OUTPUT(IsOnboarding(GroupID), NAMED('IsOnboarding'));
 showIsOnboardingMessage := OUTPUT(IsOnboardingMessage, NAMED('Onboarding_Message'));
 
@@ -27,10 +29,10 @@ show_file_name := OUTPUT(ncf2_file_name, NAMED('File_Name'));
 nac2 := nac_v2.PreprocessNCF2(ilfn);
 
 dsNcr2 := Nac_V2.GetReports(nac2, ilfn).dsNcr2;
-show_NCR2 := OUTPUT(dsNcr2, NAMED('NCR2'));
+show_NCR2 := OUTPUT(CHOOSEN(dsNcr2, 2000), NAMED('NCR2'));
 
 dsNcd2 := Nac_V2.GetReports(nac2, ilfn).dsNcd2;
-show_NCD2 := OUTPUT(dsNcd2, NAMED('NCD2'));
+show_NCD2 := OUTPUT(CHOOSEN(dsNcd2,2000), NAMED('NCD2'));
 
 dsNcx2 := Nac_V2.GetReports(nac2, ilfn).dsNcx2;
 show_NCX2 := OUTPUT(CHOOSEN(dsNcx2,2000), NAMED('NCX2'));
@@ -38,7 +40,7 @@ show_NCX2 := OUTPUT(CHOOSEN(dsNcx2,2000), NAMED('NCX2'));
 show_record_codes_count := OUTPUT(SORT(Nac_V2.ExtractRecords(ilfn).Types, RecordCode), NAMED('RecordCodes_In_File'));
 
 clients := Nac_V2.ExtractRecords(ilfn).clients;
-show_clients_sample := OUTPUT(clients, NAMED('clients_sample'));  
+show_clients_sample := OUTPUT(CHOOSEN(clients, 100), NAMED('clients_sample'));  
 
 clients_with_bad_end_dates_count := OUTPUT(COUNT(clients(enddate<startdate)), NAMED('clients_with_bad_end_dates_count'));
 clients_with_bad_end_dates := OUTPUT(CHOOSEN(clients(enddate<startdate),100),  NAMED('clients_with_bad_end_dates_sample'));
