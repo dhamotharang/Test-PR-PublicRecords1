@@ -34,7 +34,7 @@ cleaned_curr_date := dt;
 cleaned_prev_date := b;
 
 // ds_pre := dataset('~'+ p_file_name, test_apaar.Runway_Join_Layout_Old_test, thor);
-ds_pre := dataset('~' + p_file_name, Scoring_Project_Macros.Runway_Join_Layout, thor);
+ds_pre := distribute(dataset('~' + p_file_name, Scoring_Project_Macros.Runway_Join_Layout, thor),(integer)seq);
 
 ds_join := JOIN(ds_cur, ds_pre, LEFT.seq = RIGHT.seq , transform(left));
 
