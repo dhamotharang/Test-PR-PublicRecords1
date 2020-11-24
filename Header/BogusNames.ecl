@@ -1066,6 +1066,7 @@ export BogusNames(string fname_field, string mname_field, string lname_field) :=
 	(lname_field[1..9]='TECHNICAL') or
 	(stringlib.stringcleanspaces(fname_field+mname_field+lname_field) in home_builders ) or
 	(fname_field in single_name_segment_obscenities)                                     or
+ (mname_field in single_name_segment_obscenities)                                     or
 	(lname_field in single_name_segment_obscenities)                                     or
 	(stringlib.stringcleanspaces(fname_field+lname_field) in full_name_obscenities)      or
 	//To catch name flipping
