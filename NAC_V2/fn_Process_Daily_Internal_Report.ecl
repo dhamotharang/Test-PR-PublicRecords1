@@ -28,8 +28,8 @@ show_file_name := OUTPUT(ncf2_file_name, NAMED('File_Name'));
 
 nac2 := nac_v2.PreprocessNCF2(ilfn);
 
-dsNcr2 := Nac_V2.GetReports(nac2, ilfn).dsNcr2;
-show_NCR2 := OUTPUT(CHOOSEN(dsNcr2, 2000), NAMED('NCR2'));
+// dsNcr2 := Nac_V2.GetReports(nac2, ilfn).dsNcr2;
+// show_NCR2 := OUTPUT(CHOOSEN(dsNcr2, 2000), NAMED('NCR2'));
 
 dsNcd2 := Nac_V2.GetReports(nac2, ilfn).dsNcd2;
 show_NCD2 := OUTPUT(CHOOSEN(dsNcd2,2000), NAMED('NCD2')); 
@@ -71,7 +71,7 @@ report := SEQUENTIAL(
   showGroupID,
   showIsOnboardingMessage,
   show_record_codes_count,
-  show_NCR2,
+  //show_NCR2,
   show_NCD2,
   show_NCX2,
   show_cases_sample,
