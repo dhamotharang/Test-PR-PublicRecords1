@@ -1,4 +1,4 @@
-IMPORT header, address, lssi, doxie_build, RoxieKeyBuild, business_risk, AddrFraud,
+IMPORT header, address, doxie_build, RoxieKeyBuild, business_risk, AddrFraud,
   aid_build, PromoteSupers, InsuranceHeader_xLink;
 IMPORT dx_Header;
 
@@ -12,7 +12,7 @@ prefix := '~thor_data400::key::header::' + filedate + '::';
 //Build header/fheader shared keys
 name_rid := prefix + 'rid_header';
 //TODO: find out if "pFastHeader" and "combo" parameters are needed
-RoxieKeybuild.MAC_build_logical (dx_Header.key_rid(0, pFastHeader, FALSE), header.data_key_rid (pFastHeader, FALSE), 
+RoxieKeybuild.MAC_build_logical (dx_Header.key_rid(0, pFastHeader, FALSE), header.data_key_rid (pFastHeader, FALSE),
                                  dx_Header.names('').i_rid, name_rid, rid_only);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2 (dx_Header.names('').i_rid, name_rid, mv_rid, , , TRUE);
 
@@ -80,7 +80,7 @@ RoxieKeybuild.MAC_build_logical (dx_Header.key_FnameSmall(), header.data_key_Fna
 name_aptbuildings := prefix + 'apt_bldgs';
 RoxieKeybuild.MAC_build_logical (dx_Header.key_AptBuildings(), header.data_key_AptBuildings, dx_Header.names('').i_aptbuildings, name_aptbuildings, apt_blg);
 //cannot test-build it locally, since I don't have ":BASE::Address_Cache::Super"
-name_address_research := prefix + 'address_research';        
+name_address_research := prefix + 'address_research';
 RoxieKeybuild.MAC_build_logical (dx_Header.key_address_research(), header.data_key_address_research, dx_Header.names('').i_address_research, name_address_research, addr_rsch);
 //formely, business_risk.Key_SSN_Address
 name_ssn_address := prefix + 'ssn_address';

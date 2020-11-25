@@ -21,9 +21,9 @@ allows you to pull the individual scores for regression testing
 	In order for this macro to return specific information about how the DID was matched the following
 	fields should be in the ouput layout.
 		unsigned2 Weight
-		unsigned2 Score 
+		unsigned2 Score
 		unsigned4 keys_used // A bitmap of the keys used
-		unsigned2 distance 
+		unsigned2 distance
 		string20 matches // Indicator of what fields contributed to the DID match.
 
 */
@@ -31,29 +31,29 @@ allows you to pull the individual scores for regression testing
 
 export MAC_Match_Flex
 	(infile, matchset,	//see above
-	 ssn_field, dob_field, fname_field, mname_field,lname_field, suffix_field, 
+	 ssn_field, dob_field, fname_field, mname_field,lname_field, suffix_field,
 	 prange_field, pname_field, srange_field,zip_field, state_field, phone_field,
-	 DID_field,  //these will be set to zero before the linking 			
-	 outrec, 
+	 DID_field,  //these will be set to zero before the linking
+	 outrec,
 	 bool_outrec_has_score, DID_Score_field,	//these should default to zero in definition
-	 low_score_threshold,	//dids with a score below here will be dropped 
+	 low_score_threshold,	//dids with a score below here will be dropped
 	 outfile,
 	 bool_infile_has_name_source = 'false', src_field = '',
 	 bool_all_scores ='false',  // will pass through even records with a 100 score							// on to further match macros, to get further scores
 	 bool_outrec_has_indiv_scores='false',score_a_field='score_a',score_d_field='score_d',
 	 score_s_field='score_s',score_p_field='score_p', score_f_field='score_f', score_n_field = 'score_n',// appends individual match scores
-	 bool_clean_addr = 'false', // re-cleans addresses before trying match. 
+	 bool_clean_addr = 'false', // re-cleans addresses before trying match.
 	 predir_field = 'predir',addr_suffix_field = 'addr_suffix',postdir_field = 'postdir',
-	 udesig_field = 'unit_desig',city_field = 'p_city_name', zip4_field = 'zip4', weight_threshold=30, distance=3, segmentation=true) 
+	 udesig_field = 'unit_desig',city_field = 'p_city_name', zip4_field = 'zip4', weight_threshold=30, distance=3, segmentation=true)
 	:= macro
 
-import property, ut, header_slimsort, DID_Add, didville, Business_Header_SS, MDR, Business_header, Address, Header, Watchdog,PersonLinkingADL2V3,PersonLinkingADL2,_Control;
+import ut, DID_Add, didville, Address, _Control;
 import IDLExternalLinking, InsuranceHeader_xLink;
 
 #uniquename(use_fuzzy)
 %use_fuzzy% := 'Q' not in matchset;
 
-#uniquename(inf) 	
+#uniquename(inf)
 #if (bool_clean_addr)
 	#uniquename(pre_clean_rec)
 	#uniquename(addr1)
@@ -138,29 +138,29 @@ end;
 // 2 - in %infile_pre_id%, project(%inf%... (rather than %infile_pre_id_forEmailWarning%)
 // 3 - add self.temp_ID := 0; to transform for %infile_pre_id%
 // 4 - delete %make_id_layout% and supporting uniquename
-%infile_pre_id_forEmailWarning% := project(%inf%, %make_id_layout%(left));			
+%infile_pre_id_forEmailWarning% := project(%inf%, %make_id_layout%(left));
 
 //second, i will transform again and explicitly set DID_Field to zero
 %infile_pre_id% := project(%infile_pre_id_forEmailWarning%, transform(%id_layout%, self.DID_field := 0, self := left));	//default in layout handles %did_score% to zero
-		
-ut.MAC_Sequence_Records(%infile_pre_id%,temp_ID,%pre_infile_id%)	
 
-#uniquename(infile_id)	
+ut.MAC_Sequence_Records(%infile_pre_id%,temp_ID,%pre_infile_id%)
+
+#uniquename(infile_id)
 
 	#uniquename(infile_dist)
     %infile_dist% := distribute(%pre_infile_id%(~(fname_field = '' and lname_field = '')), hash(
 		#if('S' in matchset or '4' in matchset)
-			ssn_field, 
+			ssn_field,
 		#end
 		#if('D' in matchset or 'G' in matchset)
-			dob_field, 
+			dob_field,
 		#end
 		fname_field, mname_field,lname_field, suffix_field,
 		#if('A' in matchset or 'Q' in matchset)
-			prange_field, pname_field, srange_field,  
+			prange_field, pname_field, srange_field,
 		#end
 		#if('A' in matchset or 'Q' in matchset or 'D' in matchset or 'Z' in matchset)
-			state_field,zip_field, 
+			state_field,zip_field,
 		#end
 		#if('P' in matchset)
 			phone_field,
@@ -170,44 +170,44 @@ ut.MAC_Sequence_Records(%infile_pre_id%,temp_ID,%pre_infile_id%)
 		#end
 		1));	//the one just keeps the commas from messing it up
 	#uniquename(infile_srtd)
-    %infile_srtd% := sort(%infile_dist%, 
+    %infile_srtd% := sort(%infile_dist%,
 		#if('S' in matchset or '4' in matchset)
-			ssn_field, 
+			ssn_field,
 		#end
 		#if('D' in matchset or 'G' in matchset)
-			dob_field, 
+			dob_field,
 		#end
 		fname_field, mname_field,lname_field, suffix_field,
 		#if('A' in matchset or 'Q' in matchset)
 			prange_field, pname_field, srange_field,
 		#end
 		#if('A' in matchset or 'Q' in matchset or 'D' in matchset or 'Z' in matchset)
-			state_field,zip_field, 
+			state_field,zip_field,
 		#end
 		#if('P' in matchset)
-			phone_field, 
+			phone_field,
 		#end
 		#if(bool_infile_has_name_source)
 		src_field,
 		#end
-		local);	
+		local);
 #uniquename(infile_grpd)
-    %infile_grpd% := group(%infile_srtd%, 
+    %infile_grpd% := group(%infile_srtd%,
 		#if('S' in matchset or '4' in matchset)
-			ssn_field, 
+			ssn_field,
 		#end
 		#if('D' in matchset or 'G' in matchset)
-			dob_field, 
+			dob_field,
 		#end
 		fname_field, mname_field,lname_field, suffix_field,
 		#if('A' in matchset or 'Q' in matchset)
-			prange_field, pname_field, srange_field, 
+			prange_field, pname_field, srange_field,
 		#end
 		#if('A' in matchset or 'Q' in matchset or 'D' in matchset or 'Z' in matchset)
-			state_field,zip_field, 
+			state_field,zip_field,
 		#end
 		#if('P' in matchset)
-			phone_field, 
+			phone_field,
 		#end
 		#if(bool_infile_has_name_source)
 		src_field,
@@ -218,11 +218,11 @@ ut.MAC_Sequence_Records(%infile_pre_id%,temp_ID,%pre_infile_id%)
 		self.temp_id := if (l.temp_id = 0, r.temp_id, l.temp_id);
 		self := r;
 	end;
-	
+
 	#uniquename(infile_iter)
 	#uniquename(infile_slim)
 	#uniquename(infile_slim_rec)
-    %infile_iter% := iterate(%infile_grpd%, %rid_em%(left, right));	//this is where i will slap the DIDs back on				 	
+    %infile_iter% := iterate(%infile_grpd%, %rid_em%(left, right));	//this is where i will slap the DIDs back on
 	%infile_slim_rec% := record,maxlength(10000)
 		%infile_iter%.temp_id;
 		%infile_iter%.did_field;
@@ -232,24 +232,24 @@ ut.MAC_Sequence_Records(%infile_pre_id%,temp_ID,%pre_infile_id%)
 		%infile_iter%.%score_s%;
 		%infile_iter%.%score_p%;
 		%infile_iter%.%score_f%;
-		%infile_iter%.fname_field; 
+		%infile_iter%.fname_field;
 		%infile_iter%.mname_field;
 		%infile_iter%.lname_field;
-		%infile_iter%.suffix_field; 
+		%infile_iter%.suffix_field;
 		#if('S' in matchset or '4' in matchset)
-			%infile_iter%.ssn_field; 
+			%infile_iter%.ssn_field;
 		#end
 		#if('D' in matchset or 'G' in matchset)
-			%infile_iter%.dob_field; 
+			%infile_iter%.dob_field;
 		#end
 		#if('A' in matchset or 'Q' in matchset)
-			%infile_iter%.prange_field; 
+			%infile_iter%.prange_field;
 			%infile_iter%.pname_field;
 			%infile_iter%.srange_field;
-		#end				
+		#end
 		#if('A' in matchset or 'Q' in matchset or 'D' in matchset or 'Z' in matchset)
 		%infile_iter%.state_field;
-		%infile_iter%.zip_field; 
+		%infile_iter%.zip_field;
 		#end
 		#if('P' in matchset)
 			%infile_iter%.phone_field;
@@ -275,7 +275,7 @@ ut.MAC_Sequence_Records(%infile_pre_id%,temp_ID,%pre_infile_id%)
 	did_add.Mac_Match_NmSSN(%infile_id%,%pre_outfile_ssn%,
 		did_field,%did_score%,
 		fname_field,mname_field,lname_field,suffix_field,ssn_field,
-		%use_fuzzy%,true,%score_s%,bool_all_scores)	
+		%use_fuzzy%,true,%score_s%,bool_all_scores)
 	did_add.mac_dedup_uid_did(%pre_outfile_ssn%, did_field, %outfile_ssn%)
 #else
 	%outfile_ssn% := %infile_id%;
@@ -289,11 +289,11 @@ ut.MAC_Sequence_Records(%infile_pre_id%,temp_ID,%pre_infile_id%)
 #uniquename(pre_outfile_addr)
 
 #if('A' in matchset or 'Q' in matchset)
-	did_add.Mac_Match_NmAddr(%outfile_ssn%,%pre_outfile_addr%, 
+	did_add.Mac_Match_NmAddr(%outfile_ssn%,%pre_outfile_addr%,
 		did_field,%did_score%,
 		fname_field,mname_field,lname_field,suffix_field,
 		prange_field,pname_field,srange_field,zip_field,state_field,
-		%use_fuzzy%,true,%score_a%,bool_all_scores)	
+		%use_fuzzy%,true,%score_a%,bool_all_scores)
 	did_add.mac_dedup_uid_did(%pre_outfile_addr%, did_field, %outfile_addr%)
 #else
 	%outfile_addr% := %outfile_ssn%;
@@ -311,7 +311,7 @@ ut.MAC_Sequence_Records(%infile_pre_id%,temp_ID,%pre_infile_id%)
 	did_add.Mac_Match_NmDayOBZip(%outfile_addr%,%pre_outfile_dob%,
 		did_field,%did_score%,
 		fname_field,mname_field,lname_field,suffix_field,dob_field,zip_field,
-		state_field,%use_fuzzy%,true,%score_d%,bool_all_scores)	
+		state_field,%use_fuzzy%,true,%score_d%,bool_all_scores)
 	did_add.mac_dedup_uid_did(%pre_outfile_dob%, did_field, %outfile_dob%)
 #else
 	%outfile_dob% := %outfile_addr%;
@@ -328,7 +328,7 @@ ut.MAC_Sequence_Records(%infile_pre_id%,temp_ID,%pre_infile_id%)
 	did_add.Mac_Match_NmPhone(%outfile_dob%,%pre_outfile_phone%,
 		did_field,%did_score%,
 		fname_field,mname_field,lname_field,suffix_field,phone_field,
-		true,%score_p%,bool_all_scores)	
+		true,%score_p%,bool_all_scores)
 	did_add.mac_dedup_uid_did(%pre_outfile_phone%, did_field, %outfile_phone%)
 #else
 	%outfile_phone% := %outfile_dob%;
@@ -344,7 +344,7 @@ ut.MAC_Sequence_Records(%infile_pre_id%,temp_ID,%pre_infile_id%)
 	did_add.MAC_Match_Fuzzies(%outfile_phone%,matchset,fname_field,mname_field,
 				lname_field,suffix_field,dob_field,ssn_field,zip_field,
 				did_field,%did_score%,%outfile_fuzzy%,true,%score_f%,bool_all_scores)
-	
+
 	//don't need dedup because it's the last one.
 #else
 	%outfile_fuzzy% := %outfile_phone%;
@@ -385,33 +385,33 @@ ut.MAC_Sequence_Records(%infile_pre_id%,temp_ID,%pre_infile_id%)
 		%infile_id%.%score_f%;
 		string20  %fname%;
 		string20  %mname%;
-		string20  %lname%;	    
-		string10  %prange%; 
+		string20  %lname%;
+		string10  %prange%;
 		string28  %pname%;
 		string8   %srange%;
 		string5   %zip%;
-		string9   %ssn%; 
-		unsigned4 %dob%; 
+		string9   %ssn%;
+		unsigned4 %dob%;
 	end;
 
 %pre_nmsource_rec% %make_expand%(%infile_slim_rec% l) := transform
-	
+
     #if('S' in matchset or '4' in matchset)
-	self.%ssn% := l.ssn_field; 
+	self.%ssn% := l.ssn_field;
 	#else
-    self.%ssn% := ''; 
+    self.%ssn% := '';
 	#end
     #if('D' in matchset or 'G' in matchset)
-	self.%dob% := (unsigned4)l.dob_field; 
+	self.%dob% := (unsigned4)l.dob_field;
 	#else
-	self.%dob% := 0; 
+	self.%dob% := 0;
 	#end
 	#if('A' in matchset or 'Q' in matchset)
-	self.%prange% := l.prange_field; 
+	self.%prange% := l.prange_field;
 	self.%pname% := l.pname_field;
 	self.%srange% := l.srange_field;
 	#else
-	self.%prange% := ''; 
+	self.%prange% := '';
 	self.%pname%  := '';
 	self.%srange% := '';
 	#end
@@ -430,7 +430,7 @@ end;
 #uniquename(use_xADL2)
 %use_xADL2% := _Control.mod_xADLversion.constant_usexADL2;
 
-#if(bool_infile_has_name_source) 
+#if(bool_infile_has_name_source)
 %infile_pre_nmsource% := project(if(%use_xADL2%, %infile_ADL2%,%outfile_fuzzy%), %make_expand%(left));
 #else
 %infile_pre_nmsource% := if(%use_xADL2%, %infile_ADL2%, %outfile_fuzzy%);
@@ -442,7 +442,7 @@ end;
 #uniquename(pre_all_recs_clean)
 DID_Add.MAC_Dedup_DIDs(%infile_pre_nmsource%, temp_id, did_field, %did_score%,
 					   %pre_all_recs_clean%,bool_outrec_has_indiv_scores,%score_a%,%score_d%,%score_s%,%score_p%,%score_f%)
-		
+
 //---------------------------
 //output(%pre_all_recs_clean%);
 //---------------------------
@@ -473,26 +473,26 @@ DID_Add.MAC_Match_NmSource_NoAddr(%pre_all_recs_clean%,%outfile_source%,
 //****** Take the DID and score off the dedupped rec and put it back on the orig
 #uniquename(arc_dist)
 #uniquename(all_recs_clean)
-    %arc_dist% := distribute(%outfile_source%, hash(temp_id));	
+    %arc_dist% := distribute(%outfile_source%, hash(temp_id));
 /*
 		#if('S' in matchset)
-			ssn_field, 
+			ssn_field,
 		#end
 		#if('D' in matchset)
-			dob_field, 
+			dob_field,
 		#end
-		fname_field, mname_field,lname_field, suffix_field, 
+		fname_field, mname_field,lname_field, suffix_field,
 		#if('A' in matchset or 'Q' in matchset)
 			prange_field, pname_field, srange_field, state_field,
 		#end
 		#if('A' in matchset or 'Q' in matchset or 'D' in matchset)
-			zip_field, 
+			zip_field,
 		#end
 		#if('P' in matchset)
 			phone_field,
 		#end
 		1));	//the one just keeps the commas from messing it up
-*/	
+*/
 
 	#uniquename(putemback)
     %id_layout% %putemback%(%id_layout% l, %arc_dist% r) := transform
@@ -508,7 +508,7 @@ DID_Add.MAC_Match_NmSource_NoAddr(%pre_all_recs_clean%,%outfile_source%,
 		#end
 		self := l;
 	end;
-	
+
 	%all_recs_clean% := join(distribute(%infile_iter%,hash(temp_id)), %arc_dist%, //outfile_need_ADL2_dedup, below, is depending on this distribution and local sort (as a result of join) to do a dedup.
 						     left.temp_id = right.temp_id,
 							 %putemback%(left, right), left outer, local) + %pre_infile_id%(fname_field = '' and lname_field= '');
@@ -577,7 +577,7 @@ didville.Layout_DID_InBatch %roxprep%(%pre_infile_id% l) := transform
 		self.dob:= (qSTRING8)l.dob_field;
 	#else
 		self.dob := '';
-	#end	
+	#end
 		#if('A' in matchset)
 		self.prim_range := (qSTRING10)l.prange_field;
 		self.predir := '';
@@ -585,13 +585,13 @@ didville.Layout_DID_InBatch %roxprep%(%pre_infile_id% l) := transform
 		self.addr_suffix := '';
 		self.postdir := '';
 		self.unit_desig := '';
-		self.sec_range := (qSTRING8)l.srange_field; 
+		self.sec_range := (qSTRING8)l.srange_field;
 		self.st := (qSTRING2)l.state_field;
 		#if(%hasCity_field%)
 			self.p_city_name := l.city_field;
 		#else
 			self.p_city_name := '';
-		#end	
+		#end
 	#else
 		self.prim_range := '';
 		self.predir := '';
@@ -608,7 +608,7 @@ didville.Layout_DID_InBatch %roxprep%(%pre_infile_id% l) := transform
 	#else
 		self.z5 := '';
 	#end
-	
+
 	#if('P' in matchset)
 		self.phone10 := (qstring10)l.phone_field;
 	#else
@@ -618,8 +618,8 @@ didville.Layout_DID_InBatch %roxprep%(%pre_infile_id% l) := transform
 	self.fname := (qSTRING20)l.fname_field;
 	self.mname := (qSTRING20)l.mname_field;
 	self.lname := (qSTRING20)l.lname_field;
-	self.suffix := (qSTRING5)l.suffix_field; 
-	self.title := '';	
+	self.suffix := (qSTRING5)l.suffix_field;
+	self.title := '';
 	self.zip4 := '';
 end;
 
@@ -627,15 +627,15 @@ end;
 %roxin% := distribute(project(if(%use_xADL2%, %outfile_need_ADL2_dedup%,%pre_infile_id%), %roxprep%(left)),hash(random()));
 
 #uniquename(opts)
-%opts% := 
+%opts% :=
 #if('Z' in matchset)
-	'ZIP,' + 
+	'ZIP,' +
 #end
 #if('G' in matchset)
-	'AGE,' + 
+	'AGE,' +
 #end
 #if('4' in matchset)
-	'SSN' + 
+	'SSN' +
 #end
 '';
 #uniquename(roxout)
@@ -651,13 +651,13 @@ typeof(%pre_infile_id%) %postrox%(%pre_infile_id% l, %roxout% r) := transform
 end;
 
 #uniquename(roxplus)
-%roxplus% := 
+%roxplus% :=
 join(
 	if(
 		%use_xADL2%,
 		%outfile_need_ADL2%,
 		%pre_infile_id%
-	), 
+	),
 	%roxout%,
 	left.temp_id = right.seq,
 	%postrox%(left, right),
@@ -681,22 +681,22 @@ end;
 //prepare the layout and call ADL2 macro
 //only passing the records w/o DID from source matching to xADL2
 #uniquename(infile_xadl2)
-%infile_xadl2% := project(%outfile_need_ADL2_dedup%, 
+%infile_xadl2% := project(%outfile_need_ADL2_dedup%,
 										transform({InsuranceHeader_xLink.Layout_Person_xLink, InsuranceHeader_xLink.DebugFields},
                                              self.uniqueid := left.temp_id,
 								 			#if('S' in matchset or '4' in matchset)
-											 self.ssn := left.ssn_field,											 
+											 self.ssn := left.ssn_field,
 											#else
-											 self.ssn := '',											 
-											#end											
+											 self.ssn := '',
+											#end
 											 self.fname := left.fname_field,
 											 self.mname := left.mname_field,
-											 self.lname := left.lname_field,				
+											 self.lname := left.lname_field,
 											 self.name_suffix := left.suffix_field,
 											 #if('A' in matchset)
 												self.prim_range := left.prange_field,
 				                self.prim_name  := left.pname_field,
-				                self.sec_range  := left.srange_field, 											 
+				                self.sec_range  := left.srange_field,
 											 #if(%hasCity_field%)
 												 self.city := left.city_field,
 											 #else
@@ -706,7 +706,7 @@ end;
 											#else
 											 self.prim_range := '',
 				               self.prim_name  := '',
-				               self.sec_range  := '', 											 
+				               self.sec_range  := '',
 											 self.city := '',
 											 self.state := '',
 											#end
@@ -714,8 +714,8 @@ end;
 											self.zip := left.zip_field,
 											#else
 											self.zip := '',
-											#end   										
-											
+											#end
+
 											#if('P' in matchset)
  											 self.phone := left.phone_field,
 											#else
@@ -727,18 +727,18 @@ end;
 												self.dob := '';
 	                    #end
 											self.did    := 0,
-                      self := left,  
+                      self := left,
 											self := []));
-											 
+
 //output(count(infile), named('cnt_infile'));
 
 #uniquename(outfile_ADL2)
 #uniquename(all_recs_clean_ADL2)
 
-IDLExternalLinking.mac_xlinking_on_thor_Boca(%infile_xadl2%, 	
-did, name_suffix, fname, mname, lname, , 
-															 , prim_name, prim_range, sec_range, city, 
-															 state, zip, ssn, dob, phone,,, 
+IDLExternalLinking.mac_xlinking_on_thor_Boca(%infile_xadl2%,
+did, name_suffix, fname, mname, lname, ,
+															 , prim_name, prim_range, sec_range, city,
+															 state, zip, ssn, dob, phone,,,
 														%outfile_ADL2%, weight_threshold, distance, segmentation);
 //-------------
 // output(%infile_xadl2%, named('infile_xadl2' ));
@@ -746,7 +746,7 @@ did, name_suffix, fname, mname, lname, ,
 //-------------
 
 //combine all records from xADL2 and source matching
-                                                                                                               
+
 //****** Reappend the full rec
 	#uniquename(putemback_ADL2)
 	#uniquename(hasWeight_field)
@@ -760,30 +760,30 @@ did, name_suffix, fname, mname, lname, ,
 	ut.hasField(%outfile_need_ADL2%, xadl2_distance, %hasDistance_field%);
 	ut.hasField(%outfile_need_ADL2%, xadl2_matches, %hasMatches_field%);
 
-    typeof(%outfile_need_ADL2%) %putemback_ADL2%(%outfile_need_ADL2% l, %outfile_ADL2% r) := transform 
+    typeof(%outfile_need_ADL2%) %putemback_ADL2%(%outfile_need_ADL2% l, %outfile_ADL2% r) := transform
 			self.did_field := if (r.new_score >= low_score_threshold,r.did,0);
-	    self.%did_score% := if (r.new_score >= low_score_threshold, r.new_score,0);			
+	    self.%did_score% := if (r.new_score >= low_score_threshold, r.new_score,0);
 			#if(bool_outrec_has_score)
 				self.DID_Score_field := self.%did_score%;
 			#end
-			#if(%hasWeight_field%)		
-				self.xadl2_weight  := r.xlink_weight, 
+			#if(%hasWeight_field%)
+				self.xadl2_weight  := r.xlink_weight,
 			#end
-			#if(%hasScore_field%)		
-				self.xadl2_score := r.xlink_score, 
+			#if(%hasScore_field%)
+				self.xadl2_score := r.xlink_score,
 			#end
-			#if(%hasKeys_field%)		
-				self.xadl2_keys_used := r.xlink_keys, 
+			#if(%hasKeys_field%)
+				self.xadl2_keys_used := r.xlink_keys,
 			#end
-			#if(%hasDistance_field%)		
-				self.xadl2_distance := r.xlink_distance, 
+			#if(%hasDistance_field%)
+				self.xadl2_distance := r.xlink_distance,
 			#end
-			#if(%hasMatches_field%)		
-				self.xadl2_matches := DID_Add.matches('').xLinkToxADL2Matches(r.xlink_matches),	 
-			#end			
+			#if(%hasMatches_field%)
+				self.xadl2_matches := DID_Add.matches('').xLinkToxADL2Matches(r.xlink_matches),
+			#end
 			self :=  l
 	end;
-		
+
 %all_recs_clean_ADL2% := join(distribute(%outfile_need_ADL2%,hash(temp_id)),
 	                distribute(%outfile_ADL2%,hash(uniqueid)),
 				    left.temp_id = right.uniqueid,
@@ -805,8 +805,8 @@ string4 %force% := '' : stored('did_add_force');
 #uniquename(hit_thor)
 %hit_thor% := (bool_infile_has_name_source and ~%use_xADL2%) or %force%='thor' or (count(infile) > 15000000 and %force% <> 'roxi' and thorlib.nodes() >= 400);
 #uniquename(preclean)
-%preclean% := if(%hit_thor%, 
-			  project(if(%use_xADL2%,%all_recs_clean_ADL2%,%all_recs_clean%),%strip_id%(LEFT)), 
+%preclean% := if(%hit_thor%,
+			  project(if(%use_xADL2%,%all_recs_clean_ADL2%,%all_recs_clean%),%strip_id%(LEFT)),
 			  project(if(%use_xADL2%,%roxplus_ADL2%,%roxplus%),%strip_id_roxie%(LEFT)));
 
 outfile := %preclean%;
@@ -836,40 +836,40 @@ end;
 
 dstest :=
   dataset([
-    {'     ', 'AMY                 ', 'J                   ', 'PLAMBECK            ', '3114      ', 'JOANN                       ', '        ', '                         ', 'NE', '68123', '1352'}, 
-    {'     ', 'BEVERLY             ', 'K                   ', 'HERNANDEZ           ', '702       ', '6TH                         ', '        ', '                         ', 'WY', '82007', '    '}, 
-    {'     ', 'CHARLES             ', 'J                   ', 'WHITMAN             ', '1802      ', 'TARALI                      ', '        ', '                         ', 'UT', '84095', '2774'}, 
-    {'     ', 'CHARLES             ', 'J                   ', 'WHITMAN             ', '1802      ', 'TARALI                      ', '        ', '                         ', 'UT', '84095', '2774'}, 
-    {'     ', 'GAIL                ', 'A                   ', 'HALE                ', '7719      ', 'BENT BRANCH                 ', '        ', '                         ', 'TX', '78250', '3023'}, 
-    {'     ', 'GAIL                ', 'A                   ', 'HALE                ', '7719      ', 'BENT BRANCH                 ', '        ', '                         ', 'TX', '78250', '3023'}, 
-    {'     ', 'GREGORY             ', 'E                   ', 'HALE                ', '7719      ', 'BENT BRANCH                 ', '        ', '                         ', 'TX', '78250', '3023'}, 
-    {'SR   ', 'GREGORY             ', 'E                   ', 'HALE                ', '7719      ', 'BENT BRANCH                 ', '        ', '                         ', 'TX', '78250', '3023'}, 
-    {'SR   ', 'GREGORY             ', 'E                   ', 'HALE                ', '7719      ', 'BENT BRANCH                 ', '        ', '                         ', 'TX', '78250', '3023'}, 
-    {'     ', 'HAZEL               ', '                    ', 'SULLIVAN            ', '305       ', 'HILLCREST                   ', '        ', '                         ', 'MS', '38860', '    '}, 
-    {'     ', 'JAMES               ', 'R                   ', 'RADTKE              ', '1904      ', 'MENLO                       ', '        ', '                         ', 'WI', '53211', '    '}, 
-    {'     ', 'JANICE              ', 'M                   ', 'PLAMBECK            ', '10002     ', '25TH                        ', '        ', '                         ', 'NE', '68123', '5007'}, 
-    {'     ', 'JESSICA             ', '                    ', 'BOND                ', '16731     ', 'LILLY CREST                 ', '        ', '                         ', 'TX', '78232', '    '}, 
-    {'     ', 'JESSICA             ', '                    ', 'BOND                ', '16731     ', 'LILLY CREST                 ', '        ', '                         ', 'TX', '78232', '2303'}, 
-    {'     ', 'JOHN                ', '                    ', 'HARDCASTLE          ', '1607      ', 'BALSAM                      ', '        ', '                         ', 'CO', '80232', '6725'}, 
-    {'     ', 'JOHN                ', '                    ', 'SHALLER             ', '15085     ', 'MARSHALL                    ', '        ', '                         ', 'TX', '79014', '    '}, 
-    {'     ', 'JOHN                ', 'A                   ', 'SHALLER             ', '15085     ', 'MARSHALL                    ', '        ', '                         ', 'TX', '79014', '    '}, 
-    {'     ', 'JOHN                ', 'C                   ', 'HARDCASTLE          ', '1607      ', 'BALSAM                      ', '        ', '                         ', 'CO', '80232', '    '}, 
-    {'     ', 'JOHN                ', 'W                   ', 'ALF                 ', '401       ', 'BILLY CREEK                 ', '        ', '                         ', 'TX', '76053', '6363'}, 
+    {'     ', 'AMY                 ', 'J                   ', 'PLAMBECK            ', '3114      ', 'JOANN                       ', '        ', '                         ', 'NE', '68123', '1352'},
+    {'     ', 'BEVERLY             ', 'K                   ', 'HERNANDEZ           ', '702       ', '6TH                         ', '        ', '                         ', 'WY', '82007', '    '},
+    {'     ', 'CHARLES             ', 'J                   ', 'WHITMAN             ', '1802      ', 'TARALI                      ', '        ', '                         ', 'UT', '84095', '2774'},
+    {'     ', 'CHARLES             ', 'J                   ', 'WHITMAN             ', '1802      ', 'TARALI                      ', '        ', '                         ', 'UT', '84095', '2774'},
+    {'     ', 'GAIL                ', 'A                   ', 'HALE                ', '7719      ', 'BENT BRANCH                 ', '        ', '                         ', 'TX', '78250', '3023'},
+    {'     ', 'GAIL                ', 'A                   ', 'HALE                ', '7719      ', 'BENT BRANCH                 ', '        ', '                         ', 'TX', '78250', '3023'},
+    {'     ', 'GREGORY             ', 'E                   ', 'HALE                ', '7719      ', 'BENT BRANCH                 ', '        ', '                         ', 'TX', '78250', '3023'},
+    {'SR   ', 'GREGORY             ', 'E                   ', 'HALE                ', '7719      ', 'BENT BRANCH                 ', '        ', '                         ', 'TX', '78250', '3023'},
+    {'SR   ', 'GREGORY             ', 'E                   ', 'HALE                ', '7719      ', 'BENT BRANCH                 ', '        ', '                         ', 'TX', '78250', '3023'},
+    {'     ', 'HAZEL               ', '                    ', 'SULLIVAN            ', '305       ', 'HILLCREST                   ', '        ', '                         ', 'MS', '38860', '    '},
+    {'     ', 'JAMES               ', 'R                   ', 'RADTKE              ', '1904      ', 'MENLO                       ', '        ', '                         ', 'WI', '53211', '    '},
+    {'     ', 'JANICE              ', 'M                   ', 'PLAMBECK            ', '10002     ', '25TH                        ', '        ', '                         ', 'NE', '68123', '5007'},
+    {'     ', 'JESSICA             ', '                    ', 'BOND                ', '16731     ', 'LILLY CREST                 ', '        ', '                         ', 'TX', '78232', '    '},
+    {'     ', 'JESSICA             ', '                    ', 'BOND                ', '16731     ', 'LILLY CREST                 ', '        ', '                         ', 'TX', '78232', '2303'},
+    {'     ', 'JOHN                ', '                    ', 'HARDCASTLE          ', '1607      ', 'BALSAM                      ', '        ', '                         ', 'CO', '80232', '6725'},
+    {'     ', 'JOHN                ', '                    ', 'SHALLER             ', '15085     ', 'MARSHALL                    ', '        ', '                         ', 'TX', '79014', '    '},
+    {'     ', 'JOHN                ', 'A                   ', 'SHALLER             ', '15085     ', 'MARSHALL                    ', '        ', '                         ', 'TX', '79014', '    '},
+    {'     ', 'JOHN                ', 'C                   ', 'HARDCASTLE          ', '1607      ', 'BALSAM                      ', '        ', '                         ', 'CO', '80232', '    '},
+    {'     ', 'JOHN                ', 'W                   ', 'ALF                 ', '401       ', 'BILLY CREEK                 ', '        ', '                         ', 'TX', '76053', '6363'},
     {'     ', 'JOHN                ', 'WILFRED             ', 'ALF                 ', '690       ', 'BOON DOCK                   ', '        ', '                         ', 'TX', '75630', '    '}], copy_Record);
 mset := ['A'];
-DID_Add.MAC_Match_Flex(dstest, mset,	nossn , nodob , fname, mname,lname, name_suffix, 
+DID_Add.MAC_Match_Flex(dstest, mset,	nossn , nodob , fname, mname,lname, name_suffix,
 	 prim_range, prim_name, sec_range,zip, state, nophone,
-	 DID,   			
-	 outrec, 
+	 DID,
+	 outrec,
 	 true, score,	//these should default to zero in definition
-	 75,	//dids with a score below here will be dropped 
+	 75,	//dids with a score below here will be dropped
 	 outfile)
 
 strforce :=
 // 'thor';
 'roxi';
 
-	 
+
 #workunit('name','MAC_Match_Flex ' + strforce)
 #stored('did_add_force',strforce)
 output(outfile)

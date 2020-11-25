@@ -1,4 +1,4 @@
-import address, BIPV2, header, iesp, infutor, ut;
+import address, BIPV2, dx_header, iesp, infutor, ut;
 
 EXPORT Layouts := MODULE
 //MASTER Clean Address
@@ -130,7 +130,7 @@ EXPORT Layouts := MODULE
 	export AR_PublicSafety := record
 		string12	geolink;
 		string12 	BDID;
-		STRING90 	Name; 		
+		STRING90 	Name;
 		STRING10 	prim_range;
 		STRING2  	predir;
 		STRING28 	prim_name;
@@ -146,7 +146,7 @@ EXPORT Layouts := MODULE
 		STRING10 	geo_lat;
 		STRING11 	geo_long;
 	end;
-	
+
 	export Occupancy := record
 		unsigned2 occupants;
 		unsigned2 occupants_1yr;
@@ -154,7 +154,7 @@ EXPORT Layouts := MODULE
 		unsigned2 occupants_3yr;
 		unsigned2 occupants_4yr;
 		unsigned2 occupants_5yr;
-		
+
 		unsigned2 turnover_1yr_in;
 		unsigned2 turnover_1yr_out;
 		unsigned2 turnover_2yr_in;
@@ -166,7 +166,7 @@ EXPORT Layouts := MODULE
 		unsigned2 turnover_5yr_in;
 		unsigned2 turnover_5yr_out;
 	end;
-	
+
 	export Crimes := record
 		unsigned2 crimes;
 		unsigned2 crimes_1yr;
@@ -184,7 +184,7 @@ EXPORT Layouts := MODULE
 		unsigned2 foreclosures_4yr;
 		unsigned2 foreclosures_5yr;
 	end;
-	
+
 	export SexOffenders := record
 		unsigned2 sexoffenders;
 		unsigned2 sexoffenders_1yr;
@@ -195,7 +195,7 @@ EXPORT Layouts := MODULE
 	end;
 
 
-	
+
 	export Scores := record
 		real Crime_Index;
 		real Poverty_Index;
@@ -236,7 +236,7 @@ EXPORT Layouts := MODULE
 		string12	phone;
 	end;
 	export college_master := record
-		string120	college_name;	
+		string120	college_name;
 		string12	phone;
 		STRING10 	prim_range;
 		STRING2  	predir;
@@ -260,7 +260,7 @@ EXPORT Layouts := MODULE
 	export final_SmartGrid := record
 		SmartGrid_in_clean;
 		string4	assessed_value_year;
-		string11	sales_price;  
+		string11	sales_price;
 		string11	assessed_total_value;
 		string11	market_total_value;
 		integer	tax_assessment_valuation;
@@ -348,7 +348,7 @@ EXPORT Layouts := MODULE
 		integer2	public_trans;
 		integer2	grocery_food;
 		integer2	restaurant_food;
-		integer2	personal_care;	
+		integer2	personal_care;
 		integer2	drugs_pharmacy;
 		integer2	medical_care;
 		integer2	retail_goods;
@@ -513,9 +513,9 @@ EXPORT Layouts := MODULE
 	export layout_Occupancy := record
 					unsigned2 occupants;
 	end;
-				 
+
 	export layout_withOccupants := record
-						header.layout_header.did;
+						dx_header.layout_header.did;
 						string12 GeoLink;
 						real4 latitude;
 						real4 longitude;
@@ -524,8 +524,8 @@ EXPORT Layouts := MODULE
 					layout_dwell_addr_in;
 					Layout_Occupancy;
 				 end;
-		
-		
+
+
 //
 //Neighborhood Report
 	export rGeolink := record
@@ -602,7 +602,7 @@ EXPORT Layouts := MODULE
 		integer8	automated_valuation;
 		integer8	confidence_score;
 	end;
-	export rEASI := record	
+	export rEASI := record
 		string	POP00;
 		string	FAMILIES;
 		string	HH00;
@@ -795,7 +795,7 @@ EXPORT Layouts := MODULE
 		real	Mobility_Index;
 		integer2	Risk_Index;
 	end;
-	export rSexOffenders := record 
+	export rSexOffenders := record
 		unsigned8	did;
 		string12	offender_id;
 		string30	lname;
@@ -825,7 +825,7 @@ EXPORT Layouts := MODULE
 		STRING10	geo_lat;
 		STRING11	geo_long;
 	end;
-	export rPublicSafety := record 
+	export rPublicSafety := record
 		string12 	BDID;
 		STRING90 	Name;
 		STRING20	Institution;
@@ -848,7 +848,7 @@ EXPORT Layouts := MODULE
 		STRING10 	geo_lat;
 		STRING11 	geo_long;
 	end;
-	export rCorrectional := record 
+	export rCorrectional := record
 		STRING20	Institution;
 		STRING10	Distance;
 		STRING10 	prim_range;
@@ -864,9 +864,9 @@ EXPORT Layouts := MODULE
 		STRING4  	zip4;
 		STRING10 	geo_lat;
 		STRING11 	geo_long;
-	end;	
-	
-	export rColleges := record 
+	end;
+
+	export rColleges := record
 		string10	UNITID;
 		string120	college_name;
 		string1		Inst_type;
@@ -891,7 +891,7 @@ EXPORT Layouts := MODULE
 		STRING1	 	geo_match;
 		string240	WEBADDR;
 end;
-	export rSchools := record 
+	export rSchools := record
 		string15	UNITID;
 		string120	school_name;
 		string1		Inst_type;
@@ -1036,7 +1036,7 @@ end;
 		unsigned4 dt_last_seen;
 		infutor.infutor_layout_main.layout_base_tracker;
 	end;
-	
+
 //BIPV2 Layouts
 	EXPORT BIP_BASE 		:= RECORD
 		string5  zip;
@@ -1056,7 +1056,7 @@ end;
 		STRING3		county;
 		STRING4		msa;
 		QSTRING10	geo_lat;
-		QSTRING11	geo_long;	
+		QSTRING11	geo_long;
 		UNSIGNED4	dt_first_seen;
 		UNSIGNED4	dt_last_seen;
 		BOOLEAN		current;
@@ -1065,7 +1065,7 @@ end;
 		STRING250 cnp_name;
 		STRING10  cnp_phone;
 		STRING9 	cnp_fein;
-		STRING60	company_org_structure_derived;	
+		STRING60	company_org_structure_derived;
 		INTEGER4 BIZ_CNT;
 	//Business Header address Characteristics
 		INTEGER4 naics_risk_high;
@@ -1165,7 +1165,7 @@ end;
 		STRING3		county;
 		STRING4		msa;
 		QSTRING10	geo_lat;
-		QSTRING11	geo_long;	
+		QSTRING11	geo_long;
 		UNSIGNED4	dt_first_seen;
 		UNSIGNED4	dt_last_seen;
 		BOOLEAN		current	:=	FALSE;
@@ -1174,7 +1174,7 @@ end;
 		STRING250	cnp_name;
 		STRING10	cnp_phone;
 		STRING9		cnp_fein;
-		STRING60	company_org_structure_derived;			
+		STRING60	company_org_structure_derived;
 		//Final	classification
 		BOOLEAN		potential_remail	:=	FALSE;
 		STRING4		remail_reason;
@@ -1184,7 +1184,7 @@ end;
 		STRING4		NIS_reason;
 		BOOLEAN		potential_shell		:=	FALSE;
 		INTEGER4	shell_score;
-		
+
 		//Business	Header	address	Characteristics
 		INTEGER4	naics_risk_high;
 		INTEGER4	naics_risk_med;
@@ -1205,7 +1205,7 @@ end;
 		INTEGER4	biz_cnt_at_undel_sec;
 		INTEGER4	storage;
 		INTEGER4	priv_post;
-		
+
 		//Business	Header	address	Counts
 		INTEGER4	naics_risk_high_cnt;
 		INTEGER4	naics_risk_med_cnt;
@@ -1262,7 +1262,7 @@ end;
 		INTEGER4	prim_deliverable_cnt;
 		INTEGER4	prim_undel_sec_cnt;
 		INTEGER4	prim_biz_at_undel_sec_cnt;
-		
+
 		//ADVO	address	attributes
 		STRING1		addr_type;
 		INTEGER4	biz_use;
@@ -1273,14 +1273,14 @@ end;
 		INTEGER4	drop;
 		INTEGER4	deliverable;
 		INTEGER4	undel_sec;
-		
+
 		//Property	Attributes
 		BOOLEAN		occupant_owned;
 		STRING		standardized_land_use_code;
 		UNSIGNED8	building_area;
 		REAL			ID_to_sqft_ratio;
 		BOOLEAN		prop_sfd	:=	FALSE;
-		
+
 		//DNB	Attributes
 		STRING1			industry_group;
 		STRING4			year_started;
@@ -1298,9 +1298,9 @@ end;
 		STRING1			manufacturing_here_indicator;
 		STRING30		parent_company_name;
 		STRING30		ultimate_company_name;
-		STRING1			ultimate_indicator;																																							
-		STRING1			active_duns_number;				//	'N'	Inactive	Duns	Number	(deleted)	'Y'	Active	Duns	Number	'H'	Historical	'C'	Current		
-		
+		STRING1			ultimate_indicator;
+		STRING1			active_duns_number;				//	'N'	Inactive	Duns	Number	(deleted)	'Y'	Active	Duns	Number	'H'	Historical	'C'	Current
+
 		//DNB	address	aggregates
 		INTEGER4	dnb_business_cnt;
 		INTEGER4	dnb_active_duns_cnt;
@@ -1315,7 +1315,7 @@ end;
 		INTEGER4	dnb_owns_cnt;
 		INTEGER4	dnb_rents_cnt;
 		INTEGER4	dnb_zero_sales_cnt;
-		
+
 		//Header	LexID	Aggregation
 		UNSIGNED2	occupants;
 		UNSIGNED2	occupants_1yr;
@@ -1435,7 +1435,7 @@ end;
 				unsigned8	mail_aceaid 	:= 0;
 				unsigned8	rawaid 				:= 0;
 				unsigned8	aceaid 				:= 0;
-				BIPV2.IDlayouts.l_xlink_ids;			
+				BIPV2.IDlayouts.l_xlink_ids;
 	END;
 
 
@@ -1478,7 +1478,7 @@ end;
 		STRING3		county;
 		STRING4		msa;
 		QSTRING10	geo_lat;
-		QSTRING11	geo_long;	
+		QSTRING11	geo_long;
 		UNSIGNED4	dt_first_seen;
 		UNSIGNED4	dt_last_seen;
 		BOOLEAN		current	:=	FALSE;
@@ -1487,7 +1487,7 @@ end;
 		STRING250	cnp_name;
 		STRING10	cnp_phone;
 		STRING9		cnp_fein;
-		STRING60	company_org_structure_derived;			
+		STRING60	company_org_structure_derived;
 		//Final	classification
 		BOOLEAN		potential_remail	:=	FALSE;
 		STRING4		remail_reason;
@@ -1497,7 +1497,7 @@ end;
 		STRING4		NIS_reason;
 		BOOLEAN		potential_shell		:=	FALSE;
 		INTEGER4	shell_score;
-		
+
 		//Business	Header	address	Characteristics
 		INTEGER4	naics_risk_high;
 		INTEGER4	naics_risk_med;
@@ -1518,7 +1518,7 @@ end;
 		INTEGER4	biz_cnt_at_undel_sec;
 		INTEGER4	storage;
 		INTEGER4	priv_post;
-		
+
 		//Business	Header	address	Counts
 		INTEGER4	naics_risk_high_cnt;
 		INTEGER4	naics_risk_med_cnt;
@@ -1548,7 +1548,7 @@ end;
 		INTEGER4	biz_at_undel_sec_cnt;
 		INTEGER4	storage_cnt;
 		INTEGER4	priv_post_cnt;
-		
+
 		//ADVO	address	attributes
 		STRING1		addr_type;
 		INTEGER4	biz_use;
@@ -1559,14 +1559,14 @@ end;
 		INTEGER4	drop;
 		INTEGER4	deliverable;
 		INTEGER4	undel_sec;
-		
+
 		//Property	Attributes
 		BOOLEAN		occupant_owned;
 		STRING		standardized_land_use_code;
 		UNSIGNED8	building_area;
 		REAL			ID_to_sqft_ratio;
 		BOOLEAN		prop_sfd	:=	FALSE;
-		
+
 		//DNB	Attributes
 		STRING1			industry_group;
 		STRING4			year_started;
@@ -1584,8 +1584,8 @@ end;
 		STRING1			manufacturing_here_indicator;
 		STRING30		parent_company_name;
 		STRING30		ultimate_company_name;
-		STRING1			ultimate_indicator;																																							
-		STRING1			active_duns_number;				//	'N'	Inactive	Duns	Number	(deleted)	'Y'	Active	Duns	Number	'H'	Historical	'C'	Current		
+		STRING1			ultimate_indicator;
+		STRING1			active_duns_number;				//	'N'	Inactive	Duns	Number	(deleted)	'Y'	Active	Duns	Number	'H'	Historical	'C'	Current
 
 	END;
 END;
