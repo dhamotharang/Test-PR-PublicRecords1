@@ -127,7 +127,7 @@ boolean IsOnboarding(string GroupID) := NAC_V2.dNAC2Config(GroupID=GroupID)[1].O
 IsOnboardingMessage := IF(IsOnboarding(GroupID) = TRUE, GroupID + ' is in Production,the Incoming file will be FULLY ingested', GroupID + ' is onboarding, the Incoming file is STAGED for file validation only');
 
 
-submit_cmd := 'NAC_V2.fn_Process_Daily_Internal_Report('+ '\'' + lfn + '\'' + ');' ;
+submit_cmd := 'NAC_V2.fn_Process_Daily_Internal_Report('+ '\'' + TRIM(lfn) + '\'' + ');' ;
 troubleshooting_workunit := wk_ut.CreateWuid(submit_cmd, 'thor400_44_sla_eclcc', 'prod_esp.br.seisint.com');
 
 
