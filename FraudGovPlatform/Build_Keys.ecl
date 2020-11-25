@@ -8,21 +8,13 @@ export Build_Keys(
 		 pversion
 	);
 
-	tools.mac_WriteIndex('TheKeys.Main.ClusterDetails.New'								  	,BuildClusterDetailsKey			);
-	tools.mac_WriteIndex('TheKeys.Main.ElementPivot.New'											,BuildElementPivotKey				);
-	tools.mac_WriteIndex('TheKeys.Main.ScoreBreakdown.New'										,BuildScoreBreakdownKey			);
-	tools.mac_WriteIndex('TheKeys.Main.WeightingChart.New'										,BuildWeightingChartKey			);
 	tools.mac_WriteIndex('TheKeys.Main.EntityProfile.New'											,BuildEntityProfileKey			);
 	tools.mac_WriteIndex('TheKeys.Main.ConfigAttributes.New'									,BuildConfigAttributesKey		);
 	tools.mac_WriteIndex('TheKeys.Main.ConfigRules.New'												,BuildConfigRulesKey				);
 													  
 	export full_build :=
 		 parallel(
-			 BuildWeightingChartKey
-			,BuildClusterDetailsKey	
-			,BuildElementPivotKey
-			,BuildScoreBreakdownKey	
-			,BuildEntityProfileKey
+			 BuildEntityProfileKey
 			,BuildConfigAttributesKey
 			,BuildConfigRulesKey
 		 )
