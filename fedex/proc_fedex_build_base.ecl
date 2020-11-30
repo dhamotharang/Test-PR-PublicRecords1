@@ -1,4 +1,4 @@
-import	Address,AID,PromoteSupers, std, ut;
+import	Address,AID,PromoteSupers,VersionControl, std, ut;
 
 export proc_fedex_build_base(string version_date,boolean delta) := function 
 
@@ -282,9 +282,19 @@ dCombined	:=	dNormalizeNames	+	dCompNameinLName;
 
 // Blank out phone number 8145162145 associated with Jessica Anna in FedEx
 apply_ln_filters := dCombined(record_id not in fedex.Filters.by_record_id);
-VersionControl.macBuildNewLogicalFile(fedex.Filenames(version_date).Base.fedex.new			,apply_ln_filters			,buildBase			,TRUE);
-//PromoteSupers.MAC_SF_BuildProcess(apply_ln_filters(version=version_date),'~thor_200::base::fedex::nohits',buildBase,,,true);
+VersionControl.macBuildNewLogicalFile(fedex.Filenames(version_date).Base.fedex.new			,apply_ln_filters			,buildDeltaBase			,TRUE);
+VersionControl.macBuildNewLogicalFile(fedex.Filenames(version_date).Base.fedex.new			,apply_ln_filters+fedex.file_fedex_base			,buildFullBase			,TRUE);
 
+DeltaSteps:=sequential(
+	buildDeltaBase,
+	fileservices.addsuperfile('~thor_200::base::fedex::nohits', fedex.Filenames(version_date).base.fedex.new);
+);
+FullSteps:=sequential(
+	buildFullBase,
+	STD.File.PromoteSuperFileList(['~thor_200::base::fedex::nohits','~thor_200::base::fedex::nohits_father','~thor_200::base::fedex::nohits_grandfather'],fedex.Filenames(version_date).base.fedex.new,true);
+);
+//PromoteSupers.MAC_SF_BuildProcess(apply_ln_filters(version=version_date),'~thor_200::base::fedex::nohits',buildBase,,,true);
+BuildBase:=if(delta,DeltaSteps,FullSteps);
 output1 := output(project(fedex_dupes,fedex.layout_fedex.returnfiles),,'~thor200::out::fedex::dupes_v1',__compressed__,overwrite,csv(separator(','),terminator('\r\n'),QUOTE('"')),named('fedex_dupes_all'));
 output2 := output(project(new_dupes,fedex.layout_fedex.returnfiles)  ,,'~thor200::out::fedex::new_dupes_v1',__compressed__,overwrite,csv(separator(','),terminator('\r\n'),QUOTE('"')),named('fedex_dupes_new'));
 output3 := output(project(new_uniques,fedex.layout_fedex.returnfiles),,'~thor200::out::fedex::new_uniques_v1',__compressed__,overwrite,csv(separator(','),terminator('\r\n'),QUOTE('"')),named('fedex_new_recs'));
