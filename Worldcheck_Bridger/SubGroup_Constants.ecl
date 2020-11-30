@@ -1280,6 +1280,9 @@
 		export string KEYWORD_HUNAV_SZF							:= '962';
 		export string KEYWORD_TWBFT_SHTC						:= '963';
 		export string KEYWORD_US_EO13959						:= '964';
+		export string KEYWORD_SKGPSR								:= '965';
+		export string KEYWORD_CNSAMR								:= '966';
+		export string KEYWORD_USNDAA_889						:= '967';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
