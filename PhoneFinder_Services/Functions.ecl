@@ -526,6 +526,11 @@
       SELF.TotalSourceCount                 := IF(inMod.isPrimarySearchPII, pInput.TotalSourceCount, 0);
       SELF.SelfReportedSourcesOnly          := IF(inMod.isPrimarySearchPII, pInput.SelfReportedSourcesOnly, FALSE);
       SELF.Identity_count                   := pInput.Identity_count;
+      SELF.ZumigoDeviceDetails.SimMinDays   := pInput.sim_Tenure_MinDays;
+      SELF.ZumigoDeviceDetails.SimMaxDays   := pInput.sim_Tenure_MaxDays;
+      SELF.ZumigoDeviceDetails.DeviceMinDays:= pInput.imei_Tenure_MinDays;
+      SELF.ZumigoDeviceDetails.DeviceMaxDays:= pInput.imei_Tenure_MaxDays;
+
       SELF                                  := pInput;
 
       // Below two fields are not being used currently

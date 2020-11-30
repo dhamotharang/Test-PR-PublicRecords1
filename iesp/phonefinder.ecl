@@ -143,17 +143,21 @@ export t_PhoneFinderAlert := record
 end;
 		
 export t_ZumigoDeviceInfo := record
-	iesp.share.t_Date IMSISeenSince {xpath('IMSISeenSince')};
-	iesp.share.t_Date IMSIChangeDate {xpath('IMSIChangeDate')};
-	iesp.share.t_Date IMSIActivationDate {xpath('IMSIActivationDate')};
-	boolean IMSIChangedThisTime {xpath('IMSIChangedThisTime')};
-	boolean ICCIDChangedThisTime {xpath('ICCIDChangedThisTime')};
-	iesp.share.t_Date ICCIDSeenSince {xpath('ICCIDSeenSince')};
-	iesp.share.t_Date IMEISeenSince {xpath('IMEISeenSince')};
-	iesp.share.t_Date IMEIChangeDate {xpath('IMEIChangeDate')};
-	boolean IMEIChangedThisTime {xpath('IMEIChangedThisTime')};
-	boolean LostStolen {xpath('LostStolen')};
-	iesp.share.t_Date LostStolenDate {xpath('LostStolenDate')};
+	iesp.share.t_Date IMSISeenSince {xpath('IMSISeenSince')};//hidden[internal]
+	iesp.share.t_Date IMSIChangeDate {xpath('IMSIChangeDate')};//hidden[internal]
+	iesp.share.t_Date IMSIActivationDate {xpath('IMSIActivationDate')};//hidden[internal]
+	boolean IMSIChangedThisTime {xpath('IMSIChangedThisTime')};//hidden[internal]
+	boolean ICCIDChangedThisTime {xpath('ICCIDChangedThisTime')};//hidden[internal]
+	iesp.share.t_Date ICCIDSeenSince {xpath('ICCIDSeenSince')};//hidden[internal]
+	iesp.share.t_Date IMEISeenSince {xpath('IMEISeenSince')};//hidden[internal]
+	iesp.share.t_Date IMEIChangeDate {xpath('IMEIChangeDate')};//hidden[internal]
+	boolean IMEIChangedThisTime {xpath('IMEIChangedThisTime')};//hidden[internal]
+	boolean LostStolen {xpath('LostStolen')};//hidden[internal]
+	iesp.share.t_Date LostStolenDate {xpath('LostStolenDate')};//hidden[internal]
+	integer SimMinDays {xpath('SimMinDays')};
+	integer SimMaxDays {xpath('SimMaxDays')};
+	integer DeviceMinDays {xpath('DeviceMinDays')};
+	integer DeviceMaxDays {xpath('DeviceMaxDays')};
 end;
 		
 export t_InquiryInfo := record
@@ -201,7 +205,7 @@ export t_PhoneFinderInfo := record (t_BasePhoneInfo)
 	string CallForwardingIndicator {xpath('CallForwardingIndicator')};
 	boolean PhoneOwnershipIndicator {xpath('PhoneOwnershipIndicator')};
 	t_InquiryInfo InquiryDetails {xpath('InquiryDetails')};//hidden[internal]
-	t_ZumigoDeviceInfo ZumigoDeviceDetails {xpath('ZumigoDeviceDetails')};//hidden[internal]
+	t_ZumigoDeviceInfo ZumigoDeviceDetails {xpath('ZumigoDeviceDetails')};
 	boolean Prepaid {xpath('Prepaid')};
 end;
 		
@@ -287,7 +291,7 @@ export t_PhoneFinderDetailedInfo := record (t_BasePhoneInfo)
 	boolean OTPRIFailed {xpath('OTPRIFailed')};
 	string CallForwardingIndicator {xpath('CallForwardingIndicator')};
 	t_InquiryInfo InquiryDetails {xpath('InquiryDetails')};//hidden[internal]
-	t_ZumigoDeviceInfo ZumigoDeviceDetails {xpath('ZumigoDeviceDetails')};//hidden[internal]
+	t_ZumigoDeviceInfo ZumigoDeviceDetails {xpath('ZumigoDeviceDetails')};
 end;
 		
 export t_PhoneFinderSearchRecord := record
