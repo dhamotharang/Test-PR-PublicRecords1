@@ -6,8 +6,10 @@
 /*--INFO-- This service hits the Phonefinder reporting keys by userid, billing group, lexid, phonenumber and returns transaction records. 
 						The search requires a a transaction date/range.
 */
-IMPORT doxie;
+
 EXPORT PfResSnapshotSearchService := MACRO
+
+IMPORT doxie, WSInput, iesp, PhoneFinder_Services;
 
   WSInput.MAC_PFResSnapshotSearchService();
 
@@ -39,7 +41,7 @@ EXPORT PfResSnapshotSearchService := MACRO
     
   ds_out := PhoneFinder_Services.PfResSnapshotSearchRecords(ds_searchby[1]);
   
-  iesp.ECL2ESP.Marshall.MAC_Marshall_Results(ds_out, Results, 
+   iesp.ECL2ESP.Marshall.MAC_Marshall_Results(ds_out, Results, 
                                              iesp.phonefindertransactionsearch.t_PhoneFinderTransactionSearchResponse,,false,, InputEcho, search_by,
                                              iesp.Constants.PfResSnapshot.MaxSearchRecords);
   OUTPUT(Results, NAMED('Results'));
