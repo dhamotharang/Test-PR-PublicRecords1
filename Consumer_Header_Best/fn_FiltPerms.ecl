@@ -20,14 +20,6 @@ local class_resellers := mod_access.isResellerAccount();
 
 local perms := Consumer_Header_Best.Permissions;
 
-/*Bits such that pass := permissions_in & bits_provided = permissions_in
-		perms_in									bits_provided(pass)  bits_provided(fail)
-		GLB	DPPA EQ OTHER					GLB	DPPA EQ	 					GLB	DPPA EQ
-		1		0		 1	1							1		1	 		1 					0		1/0	 1/0
-
-												res:	1		0			1						0		0		 0
-															1		0			0
-*/
 local bits_provided := IF(validGLB, perms.all_glb,0) +
 											 IF(~pre_glb_flag, perms.bitmap.preglb,0) +
 											 IF(validDPPA, perms.all_dppa -
