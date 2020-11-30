@@ -3,7 +3,7 @@
 IMPORT _control, std, header;
 
 #workunit('name', 'PersonHeader: _CRON_Header_Ingest_Controller');
-EVERY_2_HR_ON_SUN_MON_TUE_WED := '0 */2 * * 0,1,2,3';
+EVERY_2_HR_ON_SUN_TO_THU := '0 */2 * * 0,1,2,3,4';
 
 wuname := '*Header Ingest*';
 valid_state := ['','unknown','submitted', 'compiling','compiled','blocked','running','wait'];
@@ -24,14 +24,15 @@ the_eq_file_for_this_month_is_available := today[5..6] = file_version(in_raw);
 the_full_ingest_for_this_month_is_completed := today[5..6] = file_version(monthly_ingest);
 isMonthly := the_eq_file_for_this_month_is_available AND not(the_full_ingest_for_this_month_is_completed);
 
-sf_name := '~thor_data400::out::header_ingest_status_' + if(isMonthly, 'mon', 'inc');
-ver    := Header.LogBuildStatus(sf_name).Read[1].version;
-status := Header.LogBuildStatus(sf_name).Read[1].status;
-run := if(status <> 9, true, false);
+sf_name:='~thor_data400::base::build_status::headeringest_'+if(isMonthly, 'mon', 'inc')+'_';
+ver    := Header.LogBuildStatus(sf_name).GetLatest.versionName;
+status := Header.LogBuildStatus(sf_name).GetLatest.versionStatus;
+
+run := if(status <> 900, true, false);
 
 ecl:=    'IMPORT header;\n'
        + '#WORKUNIT(\'name\',\'PersonHeader: Monitor Header Ingest Scheduler\');\n'
        + if(active_workunit,'fileservices.sendemail(Header.email_list.BocaDevelopers,\'Monitoring Header Ingest\',\'Header Ingest is RUNNING Right now\');\n',if(run, 'notify(\'Build_Header_Ingest\',\'*\');\n', 'output(\'NO Ingest Build to be Recovered\');\n'))
         ;
 
-_control.fSubmitNewWorkunit(ecl,'hthor_eclcc'):WHEN( CRON(EVERY_2_HR_ON_SUN_MON_TUE_WED));
+_control.fSubmitNewWorkunit(ecl,'hthor_eclcc'):WHEN( CRON(EVERY_2_HR_ON_SUN_TO_THU));

@@ -201,6 +201,7 @@
 				trim(cname, left, right) in ['Nigeria','NIGERIA'] =>SubGroup_Constants.numCountryID.NIGERIA ,
 				trim(cname, left, right) in ['Niue','NIUE'] =>SubGroup_Constants.numCountryID.NIUE ,
 				trim(cname, left, right) in ['Norfolk Island','NORFOLK ISLAND'] =>SubGroup_Constants.numCountryID.NORFOLK_ISLAND ,
+				trim(cname, left, right) in ['North Macedonia','NORTH MACEDONIA'] =>SubGroup_Constants.numCountryID.NORTH_MACEDONIA ,
 				trim(cname, left, right) in ['Norway','NORWAY'] =>SubGroup_Constants.numCountryID.NORWAY ,
 				trim(cname, left, right) in ['Oman','OMAN'] =>SubGroup_Constants.numCountryID.OMAN ,
 				trim(cname, left, right) in ['Pakistan','PAKISTAN'] =>SubGroup_Constants.numCountryID.PAKISTAN ,
@@ -316,10 +317,12 @@
 				trim(catname, left, right) in ['Political Individual','POLITICAL INDIVIDUAL'] =>SubGroup_Constants.numCategoryID.POLITICAL_INDIVIDUAL,
 				trim(catname, left, right) in ['Political Party','POLITICAL PARTY'] => SubGroup_Constants.numCategoryID.POLITICAL_PARTY,
 				trim(catname, left, right) in ['Religion','RELIGION'] => SubGroup_Constants.numCategoryID.RELIGION,
+				trim(catname, left, right) in ['Special Jurisdiction','SPECIAL JURISDICTION'] =>SubGroup_Constants.numCategoryID.SPECIAL_JURISDICTION,
 				trim(catname, left, right) in ['Terrorism','TERRORISM'] =>SubGroup_Constants.numCategoryID.TERRORISM,
 				trim(catname, left, right) in ['Trade Union','TRADE UNION'] =>SubGroup_Constants.numCategoryID.TRADE_UNION,
 				trim(catname, left, right) in ['Port','PORT'] =>SubGroup_Constants.numCategoryID.PORT,
 				trim(catname, left, right) in ['Vessel','VESSEL'] =>SubGroup_Constants.numCategoryID.VESSEL,
+				trim(catname, left, right) in ['Website','WEBSITE'] =>SubGroup_Constants.numCategoryID.WEBSITE,
 				'');
 		
 		return category_id;
@@ -1357,7 +1360,28 @@
 				trim(kword, left, right) = 'USDOD-1237' =>SubGroup_Constants.numKeywordsID.KEYWORD_USDOD_1237,
 				trim(kword, left, right) = 'OFAC-ICCP' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_ICCP,
 				trim(kword, left, right) = 'IDRESKRIMUM' =>SubGroup_Constants.numKeywordsID.KEYWORD_IDRESKRIMUM,
-				
+				trim(kword, left, right) = 'CATMX' =>SubGroup_Constants.numKeywordsID.KEYWORD_CATMX,
+				trim(kword, left, right) = 'OFAC-ICAAE' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_ICAAE,
+				trim(kword, left, right) = 'FFICIJ-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_FFICIJ_WC,
+				trim(kword, left, right) = 'USCRAL' =>SubGroup_Constants.numKeywordsID.KEYWORD_USCRAL,
+				trim(kword, left, right) = 'CANSEMBLR' =>SubGroup_Constants.numKeywordsID.KEYWORD_CANSEMBLR,
+				trim(kword, left, right) = 'ZAFIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_ZAFIC,
+				trim(kword, left, right) = 'CHCOMLOT' =>SubGroup_Constants.numKeywordsID.KEYWORD_CHCOMLOT,
+				trim(kword, left, right) = 'OFAC-EO13902' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_EO13902,
+				trim(kword, left, right) = 'UGIGG' =>SubGroup_Constants.numKeywordsID.KEYWORD_UGIGG,
+				trim(kword, left, right) = 'UGPPDA' =>SubGroup_Constants.numKeywordsID.KEYWORD_UGPPDA,
+				trim(kword, left, right) = 'NAMFISA' =>SubGroup_Constants.numKeywordsID.KEYWORD_NAMFISA,
+				trim(kword, left, right) = 'RWOMBUD' =>SubGroup_Constants.numKeywordsID.KEYWORD_RWOMBUD,
+				trim(kword, left, right) = 'DKFOROM' =>SubGroup_Constants.numKeywordsID.KEYWORD_DKFOROM,
+				trim(kword, left, right) = 'AFNPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_AFNPA,
+				trim(kword, left, right) = 'MYDOE' =>SubGroup_Constants.numKeywordsID.KEYWORD_MYDOE,
+				trim(kword, left, right) = 'CZMFCR-UG' =>SubGroup_Constants.numKeywordsID.KEYWORD_CZMFCR_UG,
+				trim(kword, left, right) = 'PKBEOE' =>SubGroup_Constants.numKeywordsID.KEYWORD_PKBEOE,
+				trim(kword, left, right) = 'CRJIA-MW' =>SubGroup_Constants.numKeywordsID.KEYWORD_CRJIA_MW,
+				trim(kword, left, right) = 'HUNAV-SZF' =>SubGroup_Constants.numKeywordsID.KEYWORD_HUNAV_SZF,
+				trim(kword, left, right) = 'TWBFT-SHTC' =>SubGroup_Constants.numKeywordsID.KEYWORD_TWBFT_SHTC,
+				trim(kword, left, right) = 'US-EO13959' =>SubGroup_Constants.numKeywordsID.KEYWORD_US_EO13959,
+								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

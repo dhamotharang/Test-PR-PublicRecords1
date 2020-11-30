@@ -160,6 +160,7 @@
 		export string NIGERIA 						:= '157';
 		export string NIUE 							:= '158';
 		export string NORFOLK_ISLAND 				:= '159';
+		export string NORTH_MACEDONIA 					:= '244';
 		export string NORWAY 						:= '160';
 		export string OMAN 							:= '161';
 		export string PAKISTAN 						:= '162';
@@ -245,6 +246,7 @@
 		export string COCOS_KEELING_IS 				:= '240';
 		export string SINT_MAARTEN 					:= '241';
 		export string CURACAO 						:= '242';//special character CURAÇAO
+		
 	end;
 	
 	export numCategoryID := module
@@ -274,6 +276,8 @@
 		export string VESSEL						:= '24';
 		export string CRIME_TERROR				:= '25';
 		export string NONCONVICTION_TERROR				:= '26';
+		export string SPECIAL_JURISDICTION				:= '27';
+		export string WEBSITE				:= '28';
 	end;
 
 	export numSubCategory := module
@@ -1255,6 +1259,27 @@
 		export string KEYWORD_USDOD_1237						:= '941';
 		export string KEYWORD_OFAC_ICCP							:= '942';
 		export string KEYWORD_IDRESKRIMUM						:= '943';
+		export string KEYWORD_CATMX									:= '944';
+		export string KEYWORD_OFAC_ICAAE						:= '945';
+		export string KEYWORD_FFICIJ_WC							:= '946';
+		export string KEYWORD_USCRAL								:= '947';
+		export string KEYWORD_CANSEMBLR							:= '948';
+		export string KEYWORD_ZAFIC									:= '949';
+		export string KEYWORD_CHCOMLOT							:= '950';
+		export string KEYWORD_OFAC_EO13902					:= '951';
+		export string KEYWORD_UGIGG									:= '952';
+		export string KEYWORD_UGPPDA								:= '953';
+		export string KEYWORD_NAMFISA								:= '954';
+		export string KEYWORD_RWOMBUD								:= '955';
+		export string KEYWORD_DKFOROM								:= '956';
+		export string KEYWORD_AFNPA									:= '957';
+		export string KEYWORD_MYDOE									:= '958';
+		export string KEYWORD_CZMFCR_UG							:= '959';
+		export string KEYWORD_PKBEOE								:= '960';
+		export string KEYWORD_CRJIA_MW							:= '961';
+		export string KEYWORD_HUNAV_SZF							:= '962';
+		export string KEYWORD_TWBFT_SHTC						:= '963';
+		export string KEYWORD_US_EO13959						:= '964';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

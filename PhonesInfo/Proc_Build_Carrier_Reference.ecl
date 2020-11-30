@@ -1,5 +1,7 @@
 ﻿IMPORT _control, PromoteSupers, RoxieKeyBuild, Scrubs_PhonesInfo, Std;
 
+//DF-28036: Convert 6-Digit Spids to 4-Character Spids
+
 EXPORT Proc_Build_Carrier_Reference(string version, string inclCheck, string emailTarget):= function																																										
 																																																																																							
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////	
@@ -32,13 +34,7 @@ EXPORT Proc_Build_Carrier_Reference(string version, string inclCheck, string ema
 		
 		//Process Input Files
 		cleanLergAddr			:= output(PhonesInfo.Clean_Lerg_Addresses);
-		
-		updExceptList			:= PhonesInfo.Map_Exception_List(version);
-		
-		moveExceptList		:= Std.File.PromoteSuperFileList(['~thor_data400::base::phones::source_reference_main_exception',
-																												'~thor_data400::base::phones::source_reference_main_exception_father',
-																												'~thor_data400::base::phones::source_reference_main_exception_delete'], '~thor_data400::base::phones::source_reference_main_exception_'+ version, true);
-		
+			
 		//Build Carrier Reference Base
 		buildCRBase				:= PhonesInfo.Map_Carrier_Reference(version);	
 												 		
@@ -50,7 +46,6 @@ EXPORT Proc_Build_Carrier_Reference(string version, string inclCheck, string ema
 																												'~thor_data400::base::phones::source_reference_main_delete'], '~thor_data400::base::phones::source_reference_main_'+ version, true);
 		
 		runBuild					:= sequential(cleanLergAddr,
-																		updExceptList, moveExceptList,
 																		buildCRBase, clearCRDelete, moveCRBase);			
 		
 	//////////////////////////////////////////////////////////////////////////////////////////////	

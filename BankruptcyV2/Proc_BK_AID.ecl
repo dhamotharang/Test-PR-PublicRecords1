@@ -400,10 +400,10 @@ clean_address.err_stat,local
 	totalcount := count(BankruptcyV2.File_BK_AID);
 	
 	GetBadCleanAddress := if ((badcount / totalcount) > .01,sequential(
-					 if(_Control.ThisEnvironment.Name != 'Prod_Thor',fileservices.sendemail('Anantha.Venkatachalam@lexisnexis.com',
+					 if(_Control.ThisEnvironment.Name != 'Prod_Thor',fileservices.sendemail('Christopher.Brodeur@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com',
 			'Bankruptcy Process failure:ERROR:' + ut.GetDate,
 			'More than 1% of Bankruptcy records have clean addresses with value U000\n'),
-			fileservices.sendemail('Joseph.Lezcano@lexisnexis.com,Vesa.Niemela@lexisnexis.com,Lisa.Simmons@lexisnexis.com,Mike.Schumacher@lexisnexis.com,Brian.Dunnam@lexisnexis.com,Victor.tavernini@lexisnexis.com,Jeff.Torres@lexisnexis.com,Anantha.Venkatachalam@lexisnexis.com,afterhourssupport@lexisnexis.com,Christopher.Brodeur@lexisnexis.com,intel357@bellsouth.net,Sayeed.ahmed@lexisnexis.com',
+			fileservices.sendemail('Joseph.Lezcano@lexisnexis.com,Vesa.Niemela@lexisnexis.com,Lisa.Simmons@lexisnexis.com,Mike.Schumacher@lexisnexis.com,Brian.Dunnam@lexisnexis.com,Victor.tavernini@lexisnexis.com,Jeff.Torres@lexisnexis.com,afterhourssupport@lexisnexis.com,Christopher.Brodeur@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com',
 			'Bankruptcy Process failure:ERROR:' + ut.GetDate,
 			'More than 1% of Bankruptcy records have clean addresses with value U000\n')),
 					 fail('Process Abort: More than 1% of the records have clean addresses with value U000')),
@@ -441,10 +441,10 @@ clean_address.err_stat,local
 									fileservices.clearsuperfile('~thor_data400::base::bankruptcy::aid_delete',true)
 
 									); 
-	retval := sequential(outfile,superfiletransactions,GetBadCleanAddress) : success(fileservices.sendemail('Christopher.Brodeur@lexisnexis.com,Anantha.Venkatachalam@lexisnexis.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net',
+	retval := sequential(outfile,superfiletransactions,GetBadCleanAddress) : success(fileservices.sendemail('Christopher.Brodeur@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com',
 			'Bankruptcy AID:SUCCESS:' + ut.GetDate,
 			'BK AID Complete')),
-			failure(fileservices.sendemail('Christopher.Brodeur@lexisnexis.com,Anantha.Venkatachalam@lexisnexis.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net',
+			failure(fileservices.sendemail('Christopher.Brodeur@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com',
 			'Bankruptcy AID:FAILED:' + ut.GetDate,
 			'BK AID Failed. Check WU'));
 	

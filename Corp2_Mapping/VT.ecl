@@ -35,11 +35,19 @@ export VT  := MODULE;
 			self.Corp_State_Origin            			:= state_origin;
 			self.Corp_Key                     			:= state_fips +'-'+ corp2.t2u(l.business_id);
 			self.Corp_Orig_SOS_Charter_Nbr    			:= corp2.t2u(l.business_id);
-			self.Corp_Orig_Org_Structure_Desc 			:= if(corp2.t2u(l.business_type) ='TRADE NAME','',corp2.t2u(l.business_type));
+			self.Corp_Orig_Org_Structure_Desc 			:= if(corp2.t2u(l.business_type) in ['TRADE NAME','ASSUMED BUSINESS NAME'],'',corp2.t2u(l.business_type));
 			self.corp_home_state_name								:= corp2_mapping.fCleanBusinessName(state_origin,state_desc,l.foreign_business_name).BusinessName;
 			self.Corp_Legal_Name       							:= choose(C,corp2_mapping.fcleanbusinessname(state_origin,state_desc,l.business_name).businessname,corp2_mapping.fcleanbusinessname(state_origin,state_desc,l.foreign_business_name).businessname);
-			self.Corp_LN_Name_Type_CD   					  := choose(C, if(corp2.t2u(l.business_type) ='TRADE NAME','04','01'),if(corp2.t2u(l.business_type) ='TRADE NAME','H','O') );
-			self.Corp_LN_Name_Type_Desc 						:= choose(C, if(corp2.t2u(l.business_type) ='TRADE NAME','TRADENAME','LEGAL'),if(corp2.t2u(l.business_type) ='TRADE NAME','FOREIGN BUSINESS NAME','OTHER'));
+			self.Corp_LN_Name_Type_CD   					  := choose(C, map(corp2.t2u(l.business_type) ='TRADE NAME'=>'04',
+			                                                         corp2.t2u(l.business_type) ='ASSUMED BUSINESS NAME'=>'06',
+																															 '01'),
+			                                                     if(corp2.t2u(l.business_type) ='TRADE NAME','H','O')
+																												);
+			self.Corp_LN_Name_Type_Desc 						:= choose(C, map(corp2.t2u(l.business_type) ='TRADE NAME'=>'TRADENAME',
+			                                                         corp2.t2u(l.business_type) ='ASSUMED BUSINESS NAME'=>'ASSUMED BUSINESS NAME',
+																															 'LEGAL'),
+																													 if(corp2.t2u(l.business_type) ='TRADE NAME','FOREIGN BUSINESS NAME','OTHER')
+																												);
 			self.Corp_Address1_Line1								:= choose(c,corp2_mapping.fCleanAddress(state_origin,state_desc,l.principal_office_address_1,l.principal_office_address_2,l.principal_office_city,l.principal_office_state,l.principal_office_zip).AddressLine1
 																											   ,corp2_mapping.fCleanAddress(state_origin,state_desc,l.foreign_address_1,l.foreign_address_2,l.foreign_city,l.foreign_state,l.foreign_zip).AddressLine1
 																										    );

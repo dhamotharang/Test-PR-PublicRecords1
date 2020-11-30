@@ -41,6 +41,7 @@ Build_Kel_Ecl :=
 +'	):failure(email(\'FraudGov Kel Build failed\'));\n'
 ;
 	export build_all := sequential(
+		FraudGovPlatform.Health_CheckUp(version).ALL,
 		FraudGovPlatform.Build_Input(version).ALL,
 		FraudGovPlatform.Build_Base(version).ALL,
 		if ( FraudGovPlatform.Mac_TestRecordID(version) = 'Passed' and FraudGovPlatform.Mac_TestRinID(version) = 'Passed', 
@@ -49,7 +50,6 @@ Build_Kel_Ecl :=
 					FraudGovPlatform.promote(version).promote_sprayed_files,
 					FraudShared.Build_Keys(version).All,
 					FraudShared.Build_AutoKeys(version),
-					FraudGovPlatform.Promote().Clear_DemoData,
 					FraudGovPlatform.Build_Base_Pii(version).All,
 					_Control.fSubmitNewWorkunit(Build_Kel_Ecl,ECLThorName)
 				),

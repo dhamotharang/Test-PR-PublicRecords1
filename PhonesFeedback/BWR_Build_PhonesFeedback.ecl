@@ -16,7 +16,7 @@ BuildType			:=	If (ut.Weekday((integer)(STRING8)Std.Date.Today()) = 'MONDAY',
 											);
 											
 GetBase		:=	phonesFeedback.proc_build_base(buildType) : independent;
-NonFcra		:=	GetBase
+NonFcra		:=	GetBase;
 
 tools.mac_WriteFile(phonesFeedback.Cluster + 'base::PhonesFeedback_fcra_'+version	,GetBase	,PhonesFeedbackBase_fcra	,pShouldExport := false);
 tools.mac_WriteFile(phonesFeedback.Cluster + 'base::PhonesFeedback_'+version	,NonFcra	,PhonesFeedbackBase	,pShouldExport := false);

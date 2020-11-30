@@ -250,7 +250,7 @@ EXPORT Layout_eCrash := MODULE
 		//PRtCC new fields
 		STRING7 Citation_Issued;
 		STRING7 Citation_Type;
-		STRING100 Citation_Detail1;
+		STRING200 Citation_Detail1;
 		
 		//CR-1237
 		STRING64 Citation_Status; 
@@ -259,12 +259,12 @@ EXPORT Layout_eCrash := MODULE
 		STRING60 Violation_Code2;
 		STRING60 Violation_Code3;
 		STRING60 Violation_Code4;
-		STRING1 Photographs_Taken;
+		STRING7 Photographs_Taken;
 		STRING100 Photographed_By;
 		STRING100 Photograph_Type;
 		STRING10 Posted_Satutory_Speed_Limit;
 		STRING25 Safety_Equipment_Available_Or_Used;
-		STRING20 Ejection;
+		STRING100 Ejection;
 		STRING40 Safety_Equipment_Helmet;
 		STRING60 Transported_To;
 		STRING20 Dispatch_Time;
@@ -296,8 +296,9 @@ EXPORT Layout_eCrash := MODULE
 		//PRtcc CR-1262 
     STRING Direction_Of_Impact;
 	  STRING Event_Sequence;
+		STRING1 is_Suppressed;
 		DATASET(Layout_Infiles_Fixed.Citations_ChildRec) Citation_Details {MAXCOUNT(Constants.Max_Citations_ChildRec_Count)};
-  END;
+		END;
 
   EXPORT Consolidation := RECORD
 		BIPV2.IDlayouts.l_xlink_ids;   //Added for BIP project   

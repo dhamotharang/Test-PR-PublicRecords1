@@ -40,6 +40,7 @@ module
   export highRiskIndustriesCodes   := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::@version@::high_risk_industries'                        ,pversion    );
   
   export firmographicsScore         := dx_BIPV2.Keynames(pVersion).FirmographicsScore;
+  export locid                      := dx_BIPV2.Keynames(pVersion).Locid;
 
   export BIPV2FullKeys := 
     (
@@ -55,6 +56,7 @@ module
     + highRiskIndustriesAddr  .dall_filenames
     + highRiskIndustriesCodes .dall_filenames
     + firmographicsScore      .dall_filenames
+    + locid                   .dall_filenames
     + BIPv2_HRCHY.keynames            (pversion,pUseOtherEnvironment).dall_filenames
     + BIPV2_Crosswalk.filenames(pversion,pUseOtherEnvironment).dall_keynames
  //   + bipv2_proxid.keynames(pversion).attribute_matches     .dall_filenames
@@ -86,14 +88,19 @@ module
     // + BIPV2_Seleid_Relative.keynames  (pversion,pUseOtherEnvironment).dall_filenames
     // + BIPV2_Best.Keynames             (pversion,pUseOtherEnvironment).dall_filenames
       // ;
-  export BIPV2AlphaKeys := 
+  export BIPV2FullKeys_Alpha := 
     ( BizLinkFull.keynames            (pversion,pUseOtherEnvironment).dall_filenames
     + BIPV2_Segmentation.keynames     (pversion,pUseOtherEnvironment).dall_filenames
     + contact_title_linkids       .dall_filenames
     + BIPV2_Best.Keynames             (pversion,pUseOtherEnvironment).dall_filenames
-    + BIPV2_Suppression.FileNames.key_sele_prox_names(pversion).dall_filenames
+    + strnbrname                  .dall_filenames
+    + zipcityst                   .dall_filenames
     )
     (~regexfind('ext_data',logicalname,nocase)) //remove external xlink keys because they are not in this package
+      ;
+
+  export BIPV2SuppressionKeys_Alpha := 
+      BIPV2_Suppression.FileNames.key_sele_prox_names(pversion).dall_filenames
       ;
 
 	export dall_filenames := 

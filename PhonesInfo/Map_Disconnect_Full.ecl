@@ -1,6 +1,8 @@
-import std, ut;
+﻿import std, ut;
 
-ds := PhonesInfo.File_Deact.History2;
+//DF-28036: Convert 6-Digit Spids to 4-Character Spids
+
+ds 						:= PhonesInfo.File_Deact.History2;
 
 		modRaw := record
 			PhonesInfo.Layout_Deact.Raw;
@@ -10,16 +12,16 @@ ds := PhonesInfo.File_Deact.History2;
 
 	//Convert Current Raw File To Previous Raw Layout
 		modRaw conF(ds l)	:= transform	
-			self.action_code	:= PhonesInfo._Functions.fn_FindActCode(stringlib.stringfilter(l.msisdneid, '0123456789'));
+			self.action_code		:= PhonesInfo._Functions.fn_FindActCode(stringlib.stringfilter(l.msisdneid, '0123456789'));
 			self.timestamp			:= stringlib.stringfilter(l.timestamp, '0123456789');
-			self.phone							:= l.msisdn[2..];
-			self.phone_swap		:= l.msisdnnew[2..];
+			self.phone					:= l.msisdn[2..];
+			self.phone_swap			:= l.msisdnnew[2..];
 			self.changeid				:= l.changeid;
-			self.operatorid		:= l.operatorid;
+			self.operatorid			:= l.operatorid;
 			self.filename				:= '';
 		end;
 
-	fixLayout := project(ds, conF(left));
+	fixLayout 	:= project(ds, conF(left));
 	
 	//Append Operator Name	
 	srt_fix			:= sort(distribute(fixLayout, hash(operatorid)), operatorid, local);
@@ -27,41 +29,41 @@ ds := PhonesInfo.File_Deact.History2;
 	
 		modRaw addOp(srt_fix l, srt_his r):= transform
 			self.filename				:= trim(stringlib.stringtouppercase(
-																									map(regexfind('ATT', r.operatorname, 0)<>'' 					=> 'ATT',
-																													regexfind('Sprint', r.operatorname, 0)<>'' 		=> 'SPRINT',
-																													regexfind('T-Mobile', r.operatorname, 0)<>'' => 'TMOBILE',
-																													regexfind('Verizon', r.operatorname, 0)<>'' 	=> 'VERIZON',
-																													r.operatorname)), left, right)+'_'+l.timestamp[1..8];
-			self 												:= l;
+																	map(regexfind('ATT', r.operatorname, 0)<>'' 					=> 'ATT',
+																			regexfind('Sprint', r.operatorname, 0)<>'' 		=> 'SPRINT',
+																			regexfind('T-Mobile', r.operatorname, 0)<>'' => 'TMOBILE',
+																			regexfind('Verizon', r.operatorname, 0)<>'' 	=> 'VERIZON',
+																								r.operatorname)), left, right)+'_'+l.timestamp[1..8];
+			self 								:= l;
 		end;
 	
 		convPrev 	:= join(srt_fix, srt_his,
-																				left.operatorid = right.operatorid,
-																				addOp(left, right), left outer, local);
+											left.operatorid = right.operatorid,
+											addOp(left, right), left outer, local);
 
 	//Map Daily Files To Common Layout
 		PhonesInfo.Layout_Deact.Temp2 fixF(convPrev l, unsigned c):= transform
 			trimFile := trim(l.filename, left, right);
 			
-			self.vendor_first_reported_dt	:= if(trimFile[length(trimFile)-7..]<>'', (unsigned)trimFile[length(trimFile)-7..], 0);
+			self.vendor_first_reported_dt		:= if(trimFile[length(trimFile)-7..]<>'', (unsigned)trimFile[length(trimFile)-7..], 0);
 			self.vendor_last_reported_dt		:= if(trimFile[length(trimFile)-7..]<>'', (unsigned)trimFile[length(trimFile)-7..], 0);
-			self.carrier_name													:= trimFile[1..length(trimFile)-9];		
-			self.filedate																	:= trimFile[length(trimFile)-7..] ;
-			self.swap_start_dt												:= if(l.action_code in ['SW'], (unsigned)l.timestamp, 0);
-			self.swap_end_dt														:= if(l.action_code in ['SW'], (unsigned)l.timestamp, 0);
-			self.deact_code															:= if(l.action_code in ['DE','SU'], l.action_code, '');
-			self.deact_start_dt											:= if(l.action_code in ['DE','SU'], (unsigned)l.timestamp, 0);
-			self.deact_end_dt													:= if(l.action_code in ['DE','SU'], (unsigned)l.timestamp, 0);
-			self.react_start_dt											:= if(l.action_code in ['RE'], (unsigned)l.timestamp, 0);
-			self.react_end_dt													:= if(l.action_code in ['RE'], (unsigned)l.timestamp, 0);
-			self.porting_dt															:= 0;
-			self.groupid																		:= c;
-			self.pk_carrier_name										:= '';
-			self.days_apart															:= 0;
-			self 																									:= l;
+			self.carrier_name								:= trimFile[1..length(trimFile)-9];		
+			self.filedate										:= trimFile[length(trimFile)-7..] ;
+			self.swap_start_dt							:= if(l.action_code in ['SW'], (unsigned)l.timestamp, 0);
+			self.swap_end_dt								:= if(l.action_code in ['SW'], (unsigned)l.timestamp, 0);
+			self.deact_code									:= if(l.action_code in ['DE','SU'], l.action_code, '');
+			self.deact_start_dt							:= if(l.action_code in ['DE','SU'], (unsigned)l.timestamp, 0);
+			self.deact_end_dt								:= if(l.action_code in ['DE','SU'], (unsigned)l.timestamp, 0);
+			self.react_start_dt							:= if(l.action_code in ['RE'], (unsigned)l.timestamp, 0);
+			self.react_end_dt								:= if(l.action_code in ['RE'], (unsigned)l.timestamp, 0);
+			self.porting_dt									:= 0;
+			self.groupid										:= c;
+			self.pk_carrier_name						:= '';
+			self.days_apart									:= 0;
+			self 														:= l;
 		end;
 
-inFile	:= project(convPrev, fixF(left, counter));
+inFile				:= project(convPrev, fixF(left, counter));
 	
 	//CREATE ROLLED UP DAILY FILE
 	fixFields_d 		:= distribute(inFile, hash(phone));
@@ -69,113 +71,115 @@ inFile	:= project(convPrev, fixF(left, counter));
 	fixFields_g 		:= group(fixFields_s, phone);
 	
 	PhonesInfo.Layout_Deact.Temp2 iter1(fixFields_g l, fixFields_g r) := transform
+	
 	//conditions to determine when to rollup into one record
-		sameCarrierDate	:= l.carrier_name = r.carrier_name 	and l.timestamp[1..8] = r.timestamp[1..8];
-		consecDESU 					:= r.action_code in ['DE','SU'] and l.action_code in ['DE','SU'];
-		REafterDESU 				:= r.action_code in ['DE','SU'] and l.action_code in ['RE'];
-		SWafterDESU					:= r.action_code in ['DE','SU'] and l.action_code in ['SW'];
+			sameCarrierDate	:= l.carrier_name = r.carrier_name and l.timestamp[1..8] = r.timestamp[1..8];
+			consecDESU 			:= r.action_code in ['DE','SU'] and l.action_code in ['DE','SU'];
+			REafterDESU 		:= r.action_code in ['DE','SU'] and l.action_code in ['RE'];
+			SWafterDESU			:= r.action_code in ['DE','SU'] and l.action_code in ['SW'];
+				
+			consecRE 				:= r.action_code in ['RE'] 			and l.action_code in ['RE'];
 			
-		consecRE 							:= r.action_code in ['RE'] 					and l.action_code in ['RE'];
-		
-		DESUafterRE 				:= r.action_code in ['RE'] 					and l.action_code in ['DE','SU'];
-		SWafterRE							:= r.action_code in ['RE'] 					and l.action_code in ['SW'];
+			DESUafterRE 		:= r.action_code in ['RE'] 			and l.action_code in ['DE','SU'];
+			SWafterRE				:= r.action_code in ['RE'] 			and l.action_code in ['SW'];
 
-		consecSW 							:= r.action_code in ['SW'] 					and l.action_code in ['SW'];
-		DESUafterSW					:= r.action_code in ['SW'] 					and l.action_code in ['DE','SU'];
-		REafterSW							:= r.action_code in ['SW'] 					and l.action_code in ['RE'];
+			consecSW 				:= r.action_code in ['SW'] 			and l.action_code in ['SW'];
+			DESUafterSW			:= r.action_code in ['SW'] 			and l.action_code in ['DE','SU'];
+			REafterSW				:= r.action_code in ['SW'] 			and l.action_code in ['RE'];
 
-		isLastDESU 					:= l.phone <> r.phone 										and r.action_code in ['DE','SU'];
-		isLastRE 							:= l.phone <> r.phone 										and r.action_code in ['RE'];
-		isLastSW 							:= l.phone <> r.phone 						  		and r.action_code in ['SW'];
+			isLastDESU 			:= l.phone <> r.phone 					and r.action_code in ['DE','SU'];
+			isLastRE 				:= l.phone <> r.phone 					and r.action_code in ['RE'];
+			isLastSW 				:= l.phone <> r.phone 					and r.action_code in ['SW'];
 			
 	//Transactions to be rolled up into one record have the same groupid		
-		self.groupid 						:= if(((consecDESU or consecRE or SWafterDESU or SWafterRE) and sameCarrierDate) or
-																										 (consecSW and sameCarrierDate and l.phone_swap = r.phone_swap) or
-																										 (REafterDESU and l.carrier_name = r.carrier_name), l.groupid, 
-																											r.groupid); 
-		self.deact_code				:= r.deact_code;		
-		self.deact_end_dt 	:= if(isLastDESU, 0, 
+		self.groupid 											:= if(((consecDESU or consecRE or SWafterDESU or SWafterRE) and sameCarrierDate) or
+																						(consecSW and sameCarrierDate and l.phone_swap = r.phone_swap) or
+																						(REafterDESU and l.carrier_name = r.carrier_name), l.groupid, 
+																						r.groupid);
+															
+		self.deact_code										:= r.deact_code;		
+		self.deact_end_dt									:= if(isLastDESU, 0, 
 																										if(consecDESU and ~sameCarrierDate, l.deact_start_dt, 
 																										if(REafterDESU and ~sameCarrierDate, l.react_start_dt,
 																										if(SWafterDESU and ~sameCarrierDate, l.swap_start_dt,
 																										r.deact_end_dt))));	
-		self.react_end_dt 	:= if(isLastRE, 0, 
+		self.react_end_dt 								:= if(isLastRE, 0, 
 																										if(consecRE and ~sameCarrierDate, l.react_start_dt, 
 																										if(DESUafterRE and ~sameCarrierDate, l.deact_start_dt,
 																										if(SWafterRE and ~sameCarrierDate, l.swap_start_dt,
 																										r.react_start_dt))));	
-		self.swap_end_dt 		:= if(isLastSW, 0, 
+		self.swap_end_dt 									:= if(isLastSW, 0, 
 																										if(consecSW and ~sameCarrierDate, l.swap_start_dt,
 																										if(DESUafterSW and ~sameCarrierDate, l.deact_start_dt,
 																										if(REafterSW and ~sameCarrierDate, l.react_start_dt,
 																										r.swap_end_dt))));
-		self.is_deact						:= if(isLastDESU or isLastSW, 'Y', 'N');
-		self.is_react						:= if(isLastRE, 'Y', 'N');
-		self 														:= r;
+		self.is_deact											:= if(isLastDESU or isLastSW, 'Y', 'N');
+		self.is_react											:= if(isLastRE, 'Y', 'N');
+		self 															:= r;
 	end;		
 			
-	tagGroups 						:= iterate(fixFields_g, iter1(left,right));
-	tagGroups_ug 			:= ungroup(tagGroups);
+	tagGroups 		:= iterate(fixFields_g, iter1(left,right));
+	tagGroups_ug 	:= ungroup(tagGroups);
 
-	aggrTrans_d 				:= distribute(tagGroups_ug, hash(groupid));
-	aggrTrans_s					:= sort(aggrTrans_d, (integer)groupid, (integer)changeid, carrier_name, if(action_code in ['DE', 'SU'], 1, 2),local);
+	aggrTrans_d 	:= distribute(tagGroups_ug, hash(groupid));
+	aggrTrans_s		:= sort(aggrTrans_d, (integer)groupid, (integer)changeid, carrier_name, if(action_code in ['DE', 'SU'], 1, 2),local);
 
 	PhonesInfo.Layout_Deact.Temp2 roll(aggrTrans_s l, aggrTrans_s r) := transform	
-		self.vendor_first_reported_dt 	:= ut.min2((unsigned)l.vendor_first_reported_dt,(unsigned)r.vendor_first_reported_dt);
-		self.vendor_last_reported_dt 		:= MAX((unsigned)l.vendor_last_reported_dt,(unsigned)r.vendor_last_reported_dt);
-		self.deact_start_dt												:= ut.min2((unsigned)l.deact_start_dt,(unsigned)r.deact_start_dt);
-		self.react_start_dt												:= ut.min2((unsigned)l.react_start_dt,(unsigned)r.react_start_dt);
-		self.swap_start_dt													:= ut.min2((unsigned)l.swap_start_dt,(unsigned)r.swap_start_dt);
-		self.deact_code																:= if(r.deact_code<>'', r.deact_code, l.deact_code);
-		self.deact_end_dt														:= if(r.is_deact='Y', 0, 
-																																					if(l.deact_start_dt<>0 and l.deact_start_dt<r.react_start_dt, r.react_start_dt, 
-																																						MAX(l.deact_end_dt, r.deact_end_dt)));
-		self.react_end_dt														:= if(r.is_react='Y', 0, 
-																																					if(l.react_start_dt<>0 and l.react_start_dt<r.deact_start_dt, r.deact_start_dt, 
-																																						MAX(l.react_end_dt, r.react_end_dt)));
-		self.swap_end_dt															:= if(r.is_deact='Y' and r.swap_start_dt=0, 0,
-																																					if(l.swap_start_dt<>0 and l.swap_start_dt<r.deact_start_dt, r.deact_start_dt,
-																																					if(l.swap_start_dt<>0 and l.swap_start_dt<r.react_start_dt, r.react_start_dt,
-																																					if(r.is_deact='Y' and l.swap_start_dt<>0 and l.swap_start_dt<r.swap_start_dt, 0,
-																																					MAX(l.swap_end_dt, r.swap_end_dt)))));
-		self 																										:= r;
+		self.vendor_first_reported_dt 		:= ut.min2((unsigned)l.vendor_first_reported_dt,(unsigned)r.vendor_first_reported_dt);
+		self.vendor_last_reported_dt 			:= MAX((unsigned)l.vendor_last_reported_dt,(unsigned)r.vendor_last_reported_dt);
+		self.deact_start_dt								:= ut.min2((unsigned)l.deact_start_dt,(unsigned)r.deact_start_dt);
+		self.react_start_dt								:= ut.min2((unsigned)l.react_start_dt,(unsigned)r.react_start_dt);
+		self.swap_start_dt								:= ut.min2((unsigned)l.swap_start_dt,(unsigned)r.swap_start_dt);
+		self.deact_code										:= if(r.deact_code<>'', r.deact_code, l.deact_code);
+		self.deact_end_dt									:= if(r.is_deact='Y', 0, 
+																										if(l.deact_start_dt<>0 and l.deact_start_dt<r.react_start_dt, r.react_start_dt, 
+																										MAX(l.deact_end_dt, r.deact_end_dt)));
+		self.react_end_dt									:= if(r.is_react='Y', 0, 
+																										if(l.react_start_dt<>0 and l.react_start_dt<r.deact_start_dt, r.deact_start_dt, 
+																										MAX(l.react_end_dt, r.react_end_dt)));
+		self.swap_end_dt									:= if(r.is_deact='Y' and r.swap_start_dt=0, 0,
+																										if(l.swap_start_dt<>0 and l.swap_start_dt<r.deact_start_dt, r.deact_start_dt,
+																										if(l.swap_start_dt<>0 and l.swap_start_dt<r.react_start_dt, r.react_start_dt,
+																										if(r.is_deact='Y' and l.swap_start_dt<>0 and l.swap_start_dt<r.swap_start_dt, 0,
+																										MAX(l.swap_end_dt, r.swap_end_dt)))));
+		self 															:= r;
 	end;
 
-	aggrTrans_r						:= rollup(aggrTrans_s, 
-																												left.groupid = right.groupid, 
-																												roll(left, right), local);
+	aggrTrans_r		:= rollup(aggrTrans_s, 
+													left.groupid = right.groupid, 
+													roll(left, right), local);
 	
 	PhonesInfo.Layout_Deact.Temp2 fixCode(aggrTrans_r l):= transform
-		self.deact_code	:= if(l.deact_code<>'' and l.deact_start_dt<>0, l.deact_code, '');
-		self												:= l;
+		self.deact_code										:= if(l.deact_code<>'' and l.deact_start_dt<>0, l.deact_code, '');
+		self															:= l;
 	end;
 	
-	fixDeactcode					:= project(aggrTrans_r, fixCode(left));
-	ddConcat									:= dedup(sort(distribute(fixDeactcode, hash(phone)), record, local), record, local);	
+	fixDeactcode	:= project(aggrTrans_r, fixCode(left));
+	ddConcat			:= dedup(sort(distribute(fixDeactcode, hash(phone)), record, local), record, local);	
 	
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//APPEND PORT INFO TO ALL MATCHING PHONES (CURRENT & HISTORICAL)/////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	pR									:= PhonesInfo.File_Phones.Ported_Current; 
+	pR						:= PhonesInfo.File_Phones.Ported_Current; 
 
 	discARec			:= sort(distribute(ddConcat, hash(phone)), phone, deact_start_dt, swap_start_dt, local);
 	
 	//Find Carrier_Name
-	ds_rf						:= PhonesInfo.File_Source_Reference.Main;
-	srt_pk					:= sort(distribute(pR(source='PK'), hash(spid)), spid, local);
-	srt_rf					:= sort(distribute(ds_rf, hash(spid)), spid, carrier_name, local);
+	ds_rf					:= PhonesInfo.File_Source_Reference.Main(is_current=TRUE);
+	srt_pk				:= sort(distribute(pR(source in ['PK','P!']), hash(spid)), spid, local);
+	srt_rf				:= sort(distribute(ds_rf, hash(spid)), spid, carrier_name, local);
 
 	PhonesInfo.Layout_Common.portedMain addCn(srt_pk l, srt_rf r):= transform
 		self.service_provider := r.carrier_name;	
 		self 					:= l;
 	end;
 
-	fndCn 					:= join(srt_pk, srt_rf,
-																				left.spid = right.spid,
-																				addCn(left, right), left outer, local, keep(1));
+	fndCn 				:= join(srt_pk, srt_rf,
+												left.spid = right.spid,
+												addCn(left, right), left outer, local, keep(1));
 
-	portRec 			:= sort(distribute(pR(source='PJ' and vendor_first_reported_dt<=20150308) + fndCn, hash(phone)), phone, port_start_dt, local);	
+	portRec 			:= sort(distribute(fndCn, hash(phone)), phone, port_start_dt, local);	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//SET DEACT & REACT FLAGS////////////////////////////////////////////////////////////////////////////////////

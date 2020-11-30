@@ -11,15 +11,13 @@ EXPORT	fn_SuppressedFCRALiensMain	:=	FUNCTION
 	
 	rSuppJurisdictionsNormalized	tSuppJurisdictionsNormalized(dSuppJurisdictions pInput, INTEGER cnt)	:=	TRANSFORM
 		SELF.CourtID				:=	CHOOSE(cnt, pInput.LNCourtID, pInput.CustCourt);
-		SELF.FILETYPEID	:=	pInput.FILETYPEID;
+		SELF.FILETYPEID	    :=	pInput.FILETYPEID;
 	END;
 	
 	dSuppJurisdictionsNormalized	:=	NORMALIZE(dSuppJurisdictions,2,tSuppJurisdictionsNormalized(LEFT,COUNTER));
 	dSuppJurisdictionsNormalizedDedup	:=	DEDUP(SORT(DISTRIBUTE(dSuppJurisdictionsNormalized),RECORD,LOCAL),RECORD,LOCAL);
 	
-	dFCRAMain									:=	LiensV2.file_liens_main(
-																							tmsid[..2]	IN	['HG']
-																						);
+	dFCRAMain									:=	LiensV2.file_liens_main(tmsid[..2]	IN	['HG']);
 	//DF-25415 - Prevent suppression of released cases.																					
   dFCRAMain_released := table(dFCRAMain(release_date <> ''),{TMSID},TMSID,few);	
 
@@ -36,7 +34,14 @@ EXPORT	fn_SuppressedFCRALiensMain	:=	FUNCTION
 															TRANSFORM(
 																rFCRAMainWithCourtID,
 																SELF.CourtID		:=	LEFT.AgencyID; //LEFT.tmsid[LENGTH(TRIM(LEFT.tmsid,LEFT,RIGHT))-6..];
-																SELF.FILETYPEID	:=	LEFT.rmsid[LENGTH(TRIM(LEFT.rmsid,LEFT,RIGHT))-1..];
+                                
+                                //DF-27756 VC - Fixing under suppression																
+                                // SELF.FILETYPEID	:=	LEFT.rmsid[LENGTH(TRIM(LEFT.rmsid,LEFT,RIGHT))-1..];                                 
+                                // filetype        :=  MAP(~regexfind('[0-9]',LEFT.rmsid[LENGTH(TRIM(LEFT.rmsid,LEFT,RIGHT))-1..]) => LEFT.rmsid[LENGTH(TRIM(LEFT.rmsid,LEFT,RIGHT))-1..],
+                                                        // Left.filing_type_id );    
+                                filetype        :=  Left.filing_type_id;
+                                lookupFileType	:=  DICTIONARY(LiensV2_SrcInfoRpt.File_FileType_to_ActionGroup, {FILETYPEID => ActionGroup});
+                                SELF.FILETYPEID	:=	IF (lookupFileType[filetype].ActionGroup <> '',lookupFileType[filetype].ActionGroup,filetype) ;
 																SELF						:=	LEFT;
 															)
 														);

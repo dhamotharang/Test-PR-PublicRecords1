@@ -54,6 +54,42 @@ DI_Metrics.FCRA_ASL_Students(pHostname, pTarget, pContact)
 
 ,DI_Metrics.NonFCRA_Watercraft(pHostname, pTarget, pContact)
 
+,DI_Metrics.ChartsGeoMaps_AccidentReports(pHostname, pTarget, pContact)
+
+,DI_Metrics.ChartsGeoMaps_Criminal(pHostname, pTarget, pContact)
+
+,DI_Metrics.ChartsGeoMaps_DeathMaster(pHostname, pTarget, pContact)
+
+,DI_Metrics.ChartsGeoMaps_DriversLicenses(pHostname, pTarget, pContact)
+
+,DI_Metrics.ChartsGeoMaps_Emails(pHostname, pTarget, pContact)
+
+,DI_Metrics.ChartsGeoMaps_Evictions(pHostname, pTarget, pContact)
+
+,DI_Metrics.ChartsGeoMaps_FAA(pHostname, pTarget, pContact)
+
+,DI_Metrics.ChartsGeoMaps_Foreclosure(pHostname, pTarget, pContact)
+
+,DI_Metrics.ChartsGeoMaps_Marriage_Divorce(pHostname, pTarget, pContact)
+
+,DI_Metrics.ChartsGeoMaps_Phones(pHostname, pTarget, pContact)
+
+,DI_Metrics.ChartsGeoMaps_Professional_Licenses(pHostname, pTarget, pContact)
+
+,DI_Metrics.ChartsGeoMaps_Students(pHostname, pTarget, pContact)
+
+,DI_Metrics.ChartsGeoMaps_UCC(pHostname, pTarget, pContact)
+
+,DI_Metrics.ChartsGeoMaps_Utility(pHostname, pTarget, pContact)
+
+,DI_Metrics.ChartsGeoMaps_Vehicles(pHostname, pTarget, pContact)
+
+,DI_Metrics.ChartsGeoMaps_Voters(pHostname, pTarget, pContact)
+
+,DI_Metrics.ChartsGeoMaps_Watercraft(pHostname, pTarget, pContact)
+
+,DI_Metrics.Monthly_Cortera_Tradeline_Metrics.Cortera_Tradeline_Metrics( pHostname, pTarget, pContact )
+
 );
 
 return build_all;

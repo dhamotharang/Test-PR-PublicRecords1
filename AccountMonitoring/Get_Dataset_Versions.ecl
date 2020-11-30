@@ -185,14 +185,30 @@ EXPORT Get_Dataset_Versions(
 					'base::paw::(.*)::data$',
 					LEFT.name,1,NOCASE)));
 
-		Phone_Neustar := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phone.neustar_filename),
+		Phones_Type := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phone.phones_type_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PHONE',
-				SELF.subfile := 'NEUSTAR',
+				SELF.subfile := 'Phones_type',
 				SELF.version := REGEXFIND(
-					'in::cellphones::neustar::(.*)::wireline-to-wireless-norange.txt',
+					'thor_data400::key::(.*)::Phones_type',
 					LEFT.name,1,NOCASE)));
-					
+
+		Phones_Lerg6 := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phone.phones_lerg6_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'PHONE',
+				SELF.subfile := 'phones_lerg6',
+				SELF.version := REGEXFIND(
+					'thor_data400::key::(.*)::phones_lerg6',
+					LEFT.name,1,NOCASE)));					
+
+		carrier_reference := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phone.carrier_reference_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'PHONE',
+				SELF.subfile := 'carrier_reference',
+				SELF.version := REGEXFIND(
+					'thor_data400::key::(.*)::phonesmetadata::carrier_reference',
+					LEFT.name,1,NOCASE)));
+										
 		Phone :=
 			Phone_Gong +
 			Phone_Plus +
@@ -201,7 +217,9 @@ EXPORT Get_Dataset_Versions(
 			Phone_Daily_Utility +
 			Phone_Person_Best +
 			Phone_PAW +
-			Phone_Neustar;
+			Phones_Type +
+			Phones_Lerg6 +
+			carrier_reference;
 		
 		// Liens
 
@@ -452,12 +470,12 @@ EXPORT Get_Dataset_Versions(
 					LEFT.name,1,NOCASE)));
 		
 		// Phones Feedback
-		PhoneFeedback := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phonefeedback.phonefeedback_filename),
+		PhoneFeedback := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phonefeedback.PhonesFeedback_superkey),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PHONEFEEDBACK',
 				SELF.subfile := '',
 				SELF.version := REGEXFIND(
-					AccountMonitoring.product_files.phonefeedback.phonefeedback_filename_raw + '_(.*)$',
+					'thor_data400::key::phonesFeedback::(.*)::phone',
 					LEFT.name,1,NOCASE)));
 
 		// Foreclosure
@@ -589,7 +607,7 @@ EXPORT Get_Dataset_Versions(
 		govtDebarred := govtdebarred_Linkid;
 		
 		// Inquiry
-		Inquiry_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.inquiry.inquiryLinkid_superkeyname),
+		Inquiry_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.inquiry.inquiryLinkid_superkey),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'INQUIRY',
 				SELF.subfile := 'LINKID',
@@ -597,7 +615,7 @@ EXPORT Get_Dataset_Versions(
 					'thor_data400::key::inquiry::(.*)::linkids',
 					LEFT.name,1,NOCASE)));
 					
-		InquiryUpdate_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.inquiry.inquiryUpdLinkid_superkeyname),
+		InquiryUpdate_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.inquiry.inquiryUpdLinkid_superkey),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'INQUIRY',
 				SELF.subfile := 'LINKID_UPDATE',

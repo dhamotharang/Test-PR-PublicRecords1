@@ -118,12 +118,9 @@ module
 		LEFT.source_rec_id = RIGHT.source_rec_id,
 		TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),
 		LEFT ONLY,
-		LOOKUP);
-
-	dappendName := Standardize_Entity.Clean_Name(Valid_Recs);
-	dCleanInputFields := Standardize_Entity.Clean_InputFields (dappendName);
+		LOOKUP);	
 	
-	input_file_1 := fn_dedup(IdentityData_Sprayed  + project(dCleanInputFields,Layouts.Input.IdentityData)); 
+	input_file_1 := fn_dedup(IdentityData_Sprayed  + project(Valid_Recs,Layouts.Input.IdentityData)); 
 
 
 	tools.mac_WriteFile(

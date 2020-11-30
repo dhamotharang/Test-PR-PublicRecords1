@@ -1,4 +1,4 @@
-﻿/*2015-02-19T03:14:11Z (Ananth Vankatachalam)
+/*2015-02-19T03:14:11Z (Ananth Vankatachalam)
 Changed Dops.TrackID to Business_Header_SS.TrackID
 */
 //MATCHSET should be set of char1's indicating matchfields
@@ -43,6 +43,7 @@ EXPORT MAC_Match_Flex
   ,source_record_id       = ''
   ,src_matching_is_priority = FALSE
   ,setofstrings = '[\'NA\',\'NA\',\'NA\']' // [<dopsdatasetname>,<buildversion>,<environmentflag - check dops.constants.environmentset>] set of strings used to track re-BIP in the following order 
+  ,bGetAllScores=TRUE
 ) :=
 MACRO
 import BIPV2,did_add;
@@ -534,6 +535,7 @@ Business_Header_SS.MAC_Match_Flex_V2
   ,source
   ,source_record_id
   ,src_matching_is_priority
+  ,bGetAllScores
 ) 
   
 #else

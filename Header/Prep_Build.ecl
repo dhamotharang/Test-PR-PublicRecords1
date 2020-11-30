@@ -7,6 +7,12 @@ EXPORT Prep_Build := Module
 				return(Header.Regulatory.apply_FCRA_Header(ds));	
 		endmacro;
 
+		EXPORT Prep_Header(ds) := functionmacro	
+				import header;
+
+				return(Header.Regulatory.apply_Header(ds));	
+		endmacro;
+
 	 	EXPORT applySsnCorrectionSup(base_ds) := FUNCTIONMACRO
 			import Header;
 			return Header.Regulatory.applySsnCorrectionSup(base_ds);

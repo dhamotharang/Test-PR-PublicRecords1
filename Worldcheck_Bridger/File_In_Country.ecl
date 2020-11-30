@@ -125,7 +125,7 @@
 	{'122','Lithuania','3','','1'},
 	{'123','Luxembourg','3','','1'},
 	{'124','Macau','2','','1'},
-	{'125','Macedonia','3','','1'},
+	//{'125','Macedonia','3','','1'},
 	{'126','Madagascar','1','','1'},
 	{'127','Malawi','1','','1'},
 	{'128','Malaysia','2','','1'},
@@ -243,5 +243,6 @@
 	{'240','Cocos (Keeling) Island','2','','1'},
 	{'241','Sint Maarten','5','','1'},
 	{'242','Curaçao','5','','1'},
-	{'243','South Sudan','1','','1'}],
+	{'243','South Sudan','1','','1'},
+	{'244','North Macedonia','3','','1'}],
 	{string5 Country_id, String50 Country, String1 Region_id, String1 x, String5 Group_id});

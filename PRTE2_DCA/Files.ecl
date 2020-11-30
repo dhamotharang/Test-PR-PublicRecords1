@@ -224,5 +224,6 @@ EXPORT Files := MODULE
 											SELF	:= [];
 											));
                       
-
+//CCPA Phase 2
+	EXPORT contacts_bdid := dataset([], layouts.contact_bdid);
 END;

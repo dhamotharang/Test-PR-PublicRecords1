@@ -273,6 +273,7 @@ export key_search_layout := record
 	string60  orig_fname;
 	string60  orig_mname;
 	string100	orig_lname;
+	string3 contrib_source;
 end;
 
 export key_slim_layout := record  
@@ -304,6 +305,7 @@ export key_slim_layout := record
   string60  fname;
   string60  mname;
   string100 lname;
+	string3 contrib_source;
 end;
 
 export PhotoLayout := record

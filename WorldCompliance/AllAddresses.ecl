@@ -1,4 +1,4 @@
-EXPORT AllAddresses := FUNCTION
+﻿EXPORT AllAddresses := FUNCTION
 
 	addresses := GetAddresses(Files.dsAddresses);
 	
@@ -9,7 +9,7 @@ EXPORT AllAddresses := FUNCTION
 			self := [];
 		));
 		
-		addr := SORT(DISTRIBUTE(countries & addresses, Ent_id), Ent_id, country, State, City, Street_1, local);
+		addr := DEDUP(SORT(DISTRIBUTE(countries & addresses, Ent_id), Ent_id, country, State, City, Street_1, local), Ent_id, country, State, City, Street_1, local);
 
 	pAddr := 
 				project(addr,transform({unsigned8 id, Layout_XG.addr_rollup},

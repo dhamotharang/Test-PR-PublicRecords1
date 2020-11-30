@@ -16,7 +16,7 @@
 	STRING10 court_date;
 	STRING9 court_time;
 	//PRtcc datatype update
-	STRING100 citation_detail1;
+	STRING200 citation_detail1;
 	
 	STRING3 local_code;
 	//PRtcc datatype update
@@ -246,7 +246,7 @@
 	STRING60 injured_taken_to;
 	STRING7 incident_transported_for_medical_care;
 	//PRtcc datatype update
-	STRING1 photographs_taken;
+	STRING7 photographs_taken;
 	STRING100 photographed_by;
 	
 	STRING20 photographer_id;
@@ -368,7 +368,7 @@
 	STRING40 safety_equipment_restraint2;
 	STRING40 safety_equipment_helmet;
 	STRING100 air_bag_deployed;
-	STRING20 ejection;
+	STRING100 ejection;
 	STRING30 drivers_license_jurisdiction;
 	STRING30 dl_number_class;
 	STRING3 dl_number_cdl;
@@ -936,6 +936,6 @@
 	//PRtCC CR-1262 
   STRING Direction_Of_Impact;
 	STRING Event_Sequence;
+  STRING1 is_Suppressed;
 	DATASET(Layout_Infiles_Fixed.Citations_ChildRec) Citation_Details {MAXCOUNT(Constants.Max_Citations_ChildRec_Count)};
-
 END;

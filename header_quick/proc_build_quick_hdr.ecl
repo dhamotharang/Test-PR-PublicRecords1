@@ -25,9 +25,9 @@ EXPORT proc_build_quick_hdr(
 
 	// Update Orbit with the correct entries in build in progress mode.
 
-	oQH_fcra      := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'FCRA_Quick_Header',filedate,'F', ,true,true);	
-	oQH_nonfcra   := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'Quick Header',filedate,'N', ,true);	
-	oQH_qhs       := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'QHsourceKeys',filedate,'N', ,true);	
+	oQH_fcra      := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'FCRA_Quick_Header',filedate,'F',leMailTarget,runaddcomponentsonly := false);	
+	oQH_nonfcra   := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'Quick Header',filedate,'N',leMailTarget,runaddcomponentsonly := false);	
+	oQH_qhs       := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'QHsourceKeys',filedate,'N',leMailTarget,runaddcomponentsonly := false);	
 
 	EQ_records_in0 := header.fn_preprocess(true);
 

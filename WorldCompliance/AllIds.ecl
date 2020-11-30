@@ -1,4 +1,4 @@
-EXPORT AllIds(boolean useLexId = false) := FUNCTION
+﻿EXPORT AllIds(boolean useLexId = false) := FUNCTION
 
 	ids := GetIds(Files.dsMasters);
 	

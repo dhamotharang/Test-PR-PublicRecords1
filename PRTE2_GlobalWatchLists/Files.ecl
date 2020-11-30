@@ -1,8 +1,9 @@
-﻿Import GlobalWatchLists,ut,prte2_header,aid,header,lib_datalib,Data_Services,doxie;
+﻿Import $, GlobalWatchLists,ut,prte2_header,aid,header,lib_datalib,Data_Services,doxie;
 
 EXPORT files := module
 
-EXPORT GWL_IN := DATASET(constants.In_GWL, Layouts.GWL_base_Layout_ext - [did,bdid,global_sid,record_sid], CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), maxlength(25000),QUOTE('"')));
+// EXPORT GWL_IN := DATASET(constants.In_GWL, Layouts.GWL_base_Layout_ext - [bdid,global_sid,record_sid], CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), maxlength(25000),QUOTE('"')));
+EXPORT GWL_IN := DATASET(constants.In_GWL, Layouts.GWL_base_Layout_IN, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), maxlength(25000),QUOTE('"')));
 Export GWL_IN_1 := project(GWL_IN(cust_name = ''), 
 transform(Layouts.Layout_GWL, 
 self := Left;
@@ -62,10 +63,15 @@ popu := record
   GWL_Dids.fname;
   GWL_Dids.mname;
   GWL_Dids.lname;
+	GWL_Dids.record_sid;
+  GWL_Dids.global_sid;
+  GWL_Dids.dt_effective_first;
+  GWL_Dids.dt_effective_last;
+  GWL_Dids.delta_ind;
   unsigned4 cnt := count(group);
   end;
 
-ta := table(dedup(GWL_Dids,fname,mname,lname,did,all),popu,fname,mname,lname);
+ta := table(dedup(GWL_Dids,fname,mname,lname,did,all),popu,fname,mname,lname, record_sid, global_sid, dt_effective_first,dt_effective_last, delta_ind);
 
 //key_annotated_names 
 export GWL_Annotated_Names := sort(ta,-cnt);
@@ -112,7 +118,8 @@ END;
 Export GWL_vessels_fixed := PROJECT(GWL,fix_vessels(LEFT));
 
 //key_globalwatchlistscountries
-p_country := DEDUP(GWL(ut.CleanSpacesAndUpper(name_type)	=	'COUNTRY'),pty_key,address_country,all);
+// p_country := DEDUP(GWL(ut.CleanSpacesAndUpper(name_type)	=	'COUNTRY'),pty_key,address_country,all);
+p_country := DEDUP(GWL(ut.CleanSpacesAndUpper(country) <>	''),pty_key,address_country,all);
 Layouts.Country_Layout seq(p_country le) :=
 TRANSFORM
 	SELF.country := ut.CleanSpacesAndUpper(le.address_country);
@@ -124,7 +131,7 @@ Export GWL_country := PROJECT(p_country,seq(LEFT));
 //Baddies
 
 //key_baddids
-Export GWL_Baddids :=     project(functions.Baddies,layouts.KeyType_BadDids);
+Export GWL_Baddids :=     project(functions.Baddies,transform(layouts.KeyType_BadDids, self := left, self := []));
 
 //key_patriotbaddies_with_name
 Export GWL_Baddies:=      project(functions.Key_Baddids_with_name,Layouts.Layout_Baddids_with_name);
@@ -161,6 +168,7 @@ Export GWL_CountryTokens := DATASET([ ],Layouts.LayoutTokens);
 
 Export GWL_NameTokens := DATASET([ ],Layouts.LayoutTokens);
 
+EXPORT Patriot_delta_rid := dataset([], layouts.delta_rid);
 
 end; 
 	

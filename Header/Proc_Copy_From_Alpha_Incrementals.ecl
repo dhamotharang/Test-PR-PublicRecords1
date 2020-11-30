@@ -119,8 +119,7 @@ EXPORT copy_from_alpha(string filedt) := function
     
     // incremental key prefix
     aPref := 'thor_data400::key::insuranceheader_xlink::inc_boca::';
-
-    aPrefLoc := 'thor_data400::key::insuranceheader_locid::';
+    aPrefLoc := 'thor_data400::key::insuranceheader_xlink::';
 
     // Copy foreign keys to local thor
     copy_incremental_keys := sequential(
@@ -263,16 +262,13 @@ SHARED udops(string3 skipPackage='000') := sequential(
                        ))
 );
 
-SHARED orbit_update_entries(boolean isCreate, string skipPackage='000') := function
+SHARED orbit_update_entries(string skipPackage='000') := function
 
-    skipcreatebuild := if(isCreate, false, true);
-    skipupdatebuild := if(isCreate, true, false);
-
-    RETURN sequential(
-                        if(skipPackage[1]='0',Orbit3.Proc_Orbit3_CreateBuild('PersonXLAB_Inc', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers)),
-                        if(skipPackage[2]='0',Orbit3.Proc_Orbit3_CreateBuild('FCRA_Header', filedate, 'F', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers)),
-                        if(skipPackage[3]='0',Orbit3.Proc_Orbit3_CreateBuild('Header_IKB', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers))
-                      );
+    RETURN sequential(    
+      if(skipPackage[1]='0', Orbit3.Proc_Orbit3_CreateBuild('PersonXLAB_Inc', filedate, 'N',email_list := Header.email_list.BocaDevelopers)),
+      if(skipPackage[2]='0', Orbit3.Proc_Orbit3_CreateBuild('FCRA_Header', filedate, 'F', email_list := Header.email_list.BocaDevelopers)),
+      if(skipPackage[3]='0', Orbit3.Proc_Orbit3_CreateBuild('Header_IKB', filedate, 'N', email_list := Header.email_list.BocaDevelopers))
+    );
 
 END;
 
@@ -337,7 +333,7 @@ ver(string nm,string new_ver, string clstr='') :=
                                  ,regexreplace('thor_data400',nm,clstr)),new_ver);
 
 nm := 'thor_data400::key::insuranceheader_segmentation::<<version>>::did_ind';
-aPrefLoc := '~thor_data400::key::insuranceheader_locid::';
+aPrefLoc := '~thor_data400::key::insuranceheader_xlink::';
 father := aPrefLoc + 'father::locid';
 qa     := aPrefLoc + 'qa::locid';
 
@@ -377,8 +373,7 @@ EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000'
     +'gabriel.marcan@lexisnexisrisk.com\n'
     +'\nThank you,'),          
     
-    orbit_update_entries(true,skipPackage),   //Create
-    orbit_update_entries(false,skipPackage),  //Update
+    orbit_update_entries(skipPackage),   //Create
     udops(skipPackage)
 );
 END;

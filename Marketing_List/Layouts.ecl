@@ -42,17 +42,17 @@ module
     string2                   src_naics           ;
   end;
 
-  export business_information := 
-  record
-    unsigned6                 seleid          ;
-    unsigned6                 proxid          ;
-    unsigned6                 ultid           ;
-    unsigned6                 orgid           ;
-    core_business_info_seleid - src_employees - src_sics - src_naics seleid_level    ;
-    core_business_info_proxid proxid_level    ;        
-  end;
+  // export business_information := 
+  // record
+    // unsigned6                 seleid          ;
+    // unsigned6                 proxid          ;
+    // unsigned6                 ultid           ;
+    // unsigned6                 orgid           ;
+    // core_business_info_seleid - src_employees - src_sics - src_naics seleid_level    ;
+    // core_business_info_proxid proxid_level    ;        
+  // end;
 
-  export business_information_prep2 := 
+  export business_information := 
   record
     unsigned6                 seleid          ;
     unsigned6                 proxid          ;
@@ -71,6 +71,10 @@ module
     string                fname                 ;
     string                lname                 ;
    
+    unsigned4             Age                   ;
+    unsigned              executive_ind         ;
+    string2               src_name              ;
+
    // -- new
     unsigned4             dt_first_seen         ;
     unsigned4             dt_last_seen          ;
@@ -109,13 +113,13 @@ module
     
   end;
 
-  export business_contact_prep := 
-  record
-    unsigned4 Age           ;
-    unsigned  executive_ind ;
-    string2   src_name              ;
-    business_contact        ;
-  end;
+  // export business_contact_prep := 
+  // record
+    // unsigned4 Age           ;
+    // unsigned  executive_ind ;
+    // string2   src_name      ;
+    // business_contact        ;
+  // end;
 
   export business_information_prep := 
   record

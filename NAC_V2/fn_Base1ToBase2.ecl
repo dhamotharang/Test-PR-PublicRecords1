@@ -1,5 +1,7 @@
 ﻿import STD, address;
 
+string uc(string s) := Std.Str.ToUpperCase(s);
+
 reclean(DATASET(Nac_v2.Layouts.baseHistorical) filein) := FUNCTION
 	
 	

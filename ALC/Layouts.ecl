@@ -185,6 +185,48 @@ EXPORT Layouts := MODULE
 		  STRING20  degree;
 		END;
 
+
+		
+		EXPORT Nurses4 := RECORD
+			STRING25 		fname;
+			STRING35 		lname;
+			STRING40		title;
+			STRING60		company;
+			STRING40		address;
+			STRING40		address2;
+			STRING25		city;
+			STRING2			state;
+			STRING5			zip;
+			STRING4			zip4;
+			STRING4			cart;
+			STRING3			bar;
+			STRING1			flag;  
+			STRING22		country;
+			STRING20		postal_cd;
+			STRING1			dpv;
+			STRING15		addrtype;
+			STRING4			age;
+			STRING15		county_cd;
+			STRING1			income;
+			STRING1			marital;
+			STRING4			msa;
+			STRING1			nielsen;
+			STRING80		nursetype;
+			STRING10		licstate;
+			STRING50		nursespec;
+			STRING132		email;
+			STRING20		phone;
+			STRING10		listid;
+			STRING10		scno;
+			STRING35		keycode;
+			STRING16		custno;
+			STRING20		lic_no;
+			STRING20		dob;
+			STRING20		origdate;
+			STRING20		expdate;
+			STRING20		degree;
+		END;
+
 		EXPORT Pharmacists := RECORD
 		  STRING25  fname;
 		  STRING35  lname;
