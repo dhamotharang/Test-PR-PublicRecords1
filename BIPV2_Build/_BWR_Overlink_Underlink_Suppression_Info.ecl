@@ -7,6 +7,9 @@
 
   Underlinks:
     BIPV2.BWR_ManualUnderlinks                  -- force lgid3s or proxids together.  uses UnderLinks attribute file, so this will only work if both lgid3s/proxids are in the lgid3/proxid Match Candidates.
+    BIPV2_ForceLink._BWR_Add_Candidates         -- Add Forcelink Candidates.  Outside of SALT.
+    BIPV2_ForceLink._BWR_Remove_Candidates      -- Remove ForceLink Candidates(Just removes them from the forcelink file, does not explode clusters)
+    BIPV2_ForceLink._BWR_Test_ForceLink         -- Test Forcelink(This will show you a deduped version of clusters to be forcelinked to get an idea if it looks right before going into the build).
 
   Suppression:
     BIPV2.BWR_ManualSuppression                 -- suppress records from output keys in the kfetch(example here: BIPV2_Suppression.BWR_Test).
