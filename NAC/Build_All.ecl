@@ -54,23 +54,23 @@ Build_NAC:=if(NewHeader
 											,BuildBase)
 								);
 
-col:=NAC.Mod_Collisions(version[1..6]).NewCollisions;
+// col:=NAC.Mod_Collisions(version[1..6]).NewCollisions;
 
-out_all_col:=	sequential(
-							output(col,,'~nac::out::collisions_'+Version,compressed)
-							,FileServices.StartSuperFileTransaction()
-							,FileServices.AddSuperFile('~nac::out::collisions','~nac::out::collisions_'+Version)
+// out_all_col:=	sequential(
+// 							output(col,,'~nac::out::collisions_'+Version,compressed)
+// 							,FileServices.StartSuperFileTransaction()
+// 							,FileServices.AddSuperFile('~nac::out::collisions','~nac::out::collisions_'+Version)
 
-							,FileServices.AddSuperFile('~nac::in::consortium_history','~nac::in::consortium',,true)
-							,FileServices.ClearSuperFile('~nac::in::consortium')
-							,FileServices.FinishSuperFileTransaction()
-							);
+// 							,FileServices.AddSuperFile('~nac::in::consortium_history','~nac::in::consortium',,true)
+// 							,FileServices.ClearSuperFile('~nac::in::consortium')
+// 							,FileServices.FinishSuperFileTransaction()
+// 							);
 
 buildIt := sequential(
 									Move_temp_in
 									,ByPassedRecords
 									,Build_NAC
-									,Out_all_col
+//									,Out_all_col
 //									,Build_keys(version)
 									,NAC.Mod_despray(version,ip,rootDir).Odespray
 									);
