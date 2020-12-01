@@ -11,9 +11,26 @@
 //APPEND COC_TYPE FROM THE LERG6 TO THE PORT FILE///////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	//iConectiv Port Records
-	dsNewPhone		:= PhonesInfo.File_Phones_Transaction.Main(source='PK');						
-	srtNewPhone		:= sort(distribute(dsNewPhone, hash(phone[1..7])), phone[1..7], local);
+	//Add Missing SPID to Port Delete Records in Need of One
+	dsNewPhone		:= PhonesInfo.File_Phones_Transaction.Main(source in ['P!','PK']);
+	
+		ds 					:= distribute(dsNewPhone, hash(phone));
+		sortDs 			:= sort(ds, phone, transaction_start_dt, vendor_first_reported_dt ,local);
+		gpDs				:= group(sortDs, phone, LOCAL);
+
+		//Populate SPIDs Related Fields to the Delete Records
+		sortDs addFl(sortDs L, sortDs R):= TRANSFORM
+			self.spid				:= if(l.transaction_code in ['PA'] and r.transaction_code = 'PD' and l.phone = r.phone and r.spid='',
+														l.spid,
+														r.spid);
+			self						:= r;
+		end;
+
+		addSpid 			:= iterate(gpDs, addFL(LEFT,RIGHT));
+		ungroupSpid 	:= ungroup(addSpid);	
+	
+	//Pull Port Records
+	srtNewPhone		:= sort(distribute(ungroupSpid, hash(phone[1..7])), phone[1..7], local);
 
 	//Latest Lerg6 Records
 	dsL6					:= dx_PhonesInfo.Key_Phones_Lerg6(is_current=TRUE);	
@@ -69,8 +86,8 @@
 //APPEND SERV/LINE TYPES FROM PHONE TYPE FILE///////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	//Append Serv/Line Types from the Phone Type file to the Transaction File Results
-	dsPType 		:= dedup(sort(distribute(PhonesInfo.File_Phones_Type.Main(source='PK'), hash(phone)), phone, spid, -(((string)vendor_last_reported_dt)+vendor_last_reported_time), local), phone, spid, local);
+	//Append Serv/Line Types from the Phone Type file to the Transaction File 
+	dsPType 		:= dedup(sort(distribute(PhonesInfo.File_Phones_Type.Main(source in ['P!','PK']), hash(phone)), phone, spid, -(((string)vendor_last_reported_dt)+vendor_last_reported_time), local), phone, spid, local);
 
 	srtPType 		:= sort(distribute(dsPType, hash(phone, spid)), phone, spid, local);
 	srtApp			:= sort(distribute(concatAppend, hash(phone, spid)), phone, spid, local);
@@ -116,7 +133,9 @@
 																							//Landline				 //Wireless
 		self.is_land_to_cell	:= if(l.coc_type in ['EOC','VOI'] and (l.serv='1' and l.line='1'), TRUE, FALSE);											//Landline-to-Wireless
 		self.is_current				:= if(l.transaction_code='PA', TRUE, FALSE);																													//Port Add		
-		self.dt_first_seen		:= l.transaction_start_dt;
+		self.dt_first_seen		:= if(l.source='PK',
+																l.transaction_start_dt,
+																l.vendor_first_reported_dt);
 		self.dt_last_seen			:= l.vendor_last_reported_dt;
 		self.dt_last_seen_time:= l.vendor_last_reported_time;
 		

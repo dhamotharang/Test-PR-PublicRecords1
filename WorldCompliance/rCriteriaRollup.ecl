@@ -1,4 +1,4 @@
-EXPORT rCriteriaRollup := RECORD
+﻿EXPORT rCriteriaRollup := RECORD
 		unsigned8	id;
 		integer	criteriaClass;
 		integer	criteriaValue;
