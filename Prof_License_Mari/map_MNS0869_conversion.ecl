@@ -1,4 +1,4 @@
-﻿﻿// MNS0869 / Minnesotas Bookstore /	Real Estate // raw data to common layout for MARI and PL use
+﻿﻿﻿// MNS0869 / Minnesotas Bookstore /	Real Estate // raw data to common layout for MARI and PL use
 #workunit('name','Yogurt: map_MNS0869_conversion'); 
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
 
@@ -403,8 +403,9 @@ EXPORT map_MNS0869_conversion(STRING pVersion) := FUNCTION
 			
 								
 		// assign office license number
-		tempOffSlnum 					:= ut.CleanSpacesAndUpper(pInput.CID);
+		tempOffSlnum 					:= TRIM(Prof_License_Mari.mod_clean_name_addr.strippunctName(pInput.CID),LEFT,RIGHT);
 		SELF.off_license_nbr 	:= tempOffSlnum;
+	
 
 		//Store	TrimAddrNameContact in contact if the name is in FML or LFM format
 		SELF.NAME_CONTACT_FIRST := MAP(REGEXFIND('([A-Z]+) ([A-Z]{1})[\\.]? ([A-Z]+)',TrimAddrNameContact) AND
