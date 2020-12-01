@@ -6,5 +6,5 @@ fname (integer data_category) := IF (data_category = data_services.data_env.iFCR
                                      $.names().i_wild_ssn);
 
 EXPORT key_wild_ssn (integer data_category = 0) := 
-         INDEX (autokey.Layout_Wild_SSN, fname(data_category), OPT); //TODO: OPT?
+         INDEX (autokey.Layout_Wild_SSN, fname(data_category)); //TODO: OPT?
   
