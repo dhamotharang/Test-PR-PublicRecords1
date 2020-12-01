@@ -22,7 +22,7 @@ EXPORT Build_all_rollup_weekly(string pversion, boolean pUseProd = false) := FUN
    								,FileServices.AddSuperFile('~thor400_data::base::hms_stl::hms_stlicrollup','~thor400_data::base::hms_stl::hms_stlicrollup::' + pVersion)
    								,FileServices.FinishSuperFileTransaction()
    								,updateDops																					
-								,Orbit3.proc_Orbit3_CreateBuild('HMS State Licenses Rollup',pversion, 'N|B')
+								,Orbit3.proc_Orbit3_CreateBuild('HMS State Licenses Rollup',pversion, 'N')
 								): success(Send_Email(pversion,pUseProd).BuildSuccess), failure(send_email(pversion,pUseProd).BuildFailure
 	);
 
