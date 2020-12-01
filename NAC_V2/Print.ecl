@@ -122,15 +122,12 @@ EXPORT Print := MODULE
 																				DATASET(NAC_V2.Layouts2.rItemSummary) types,
 																				BOOLEAN print_report_workunit) := FUNCTION
 
-GroupID := STD.Str.ToUpperCase(lfn[6..9]);
-boolean IsOnboarding(string GroupID) := NAC_V2.dNAC2Config(GroupID=GroupID)[1].Onboarding in ['y','Y'];
-IsOnboardingMessage := IF(IsOnboarding(GroupID) = TRUE, GroupID + ' is in Production,the Incoming file will be FULLY ingested', GroupID + ' is onboarding, the Incoming file is STAGED for file validation only');
-
-
-submit_cmd := 'NAC_V2.fn_Process_Daily_Internal_Report('+ '\'' + TRIM(lfn) + '\'' + ');' ;
-troubleshooting_workunit := wk_ut.CreateWuid(submit_cmd, 'thor400_44_sla_eclcc', 'prod_esp.br.seisint.com');
-
-workunit_message := IF(print_report_workunit, 'Troubleshooting Workunit: ' + troubleshooting_workunit,'');
+// GroupID := STD.Str.ToLowerCase(lfn[6..9]);
+// boolean IsOnboarding(string gid) := NAC_V2.dNAC2Config(GroupID=gid)[1].Onboarding in ['y','Y'];
+// IsOnboardingMessage := IF(IsOnboarding(GroupID) = TRUE, GroupID + ' is in Production,the Incoming file will be FULLY ingested', GroupID + ' is onboarding, the Incoming file is STAGED for file validation only');
+// submit_cmd := 'NAC_V2.fn_Process_Daily_Internal_Report('+ '\'' + TRIM(lfn) + '\'' + ');' ;
+// troubleshooting_workunit := wk_ut.CreateWuid(submit_cmd, 'thor400_44_sla_eclcc', 'prod_esp.br.seisint.com');
+// workunit_message := IF(print_report_workunit, 'Troubleshooting Workunit: ' + troubleshooting_workunit,'');
 
   d_prog := programs(itemcode = 'D');  // DSNAP
 	UNSIGNED4	d_count :=  d_prog[1].counts;  
@@ -207,9 +204,9 @@ workunit_message := IF(print_report_workunit, 'Troubleshooting Workunit: ' + tro
 
 				ds := DATASET([{lfn}], dRow) 
 							& DATASET([{''}], dRow) 
-							& DATASET([{IsOnboardingMessage}], dRow) 	
+						//	& DATASET([{IsOnboardingMessage}], dRow) 	
 							& DATASET([{''}], dRow) 
-							& DATASET([{workunit_message}], dRow) 
+					//		& DATASET([{workunit_message}], dRow) 
 							& DATASET([{''}], dRow) 
 							& NCR_Header
 							& PROJECT(SORT(NCR_Samples(errs, nTotal, st),textValue), TRANSFORM(dRow,
