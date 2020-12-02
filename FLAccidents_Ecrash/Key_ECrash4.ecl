@@ -3,11 +3,12 @@
 /////////////////////////////////////////////////////////////////
 //Expand Florida file 
 flc4 := FLAccidents.flc4_Keybuild;
+flc0 := FLAccidents.basefile_flcrash0;
 //using flcrash input file where washington suppression are being removed.  National input file does not have driver phones.
 xpnd_layout := record
-    string2 report_code;
-    string25 report_category;
-    string65 report_code_desc;
+  string2 report_code;
+  string25 report_category;
+  string65 report_code_desc;
 	string22  vehicle_id_nbr,
 	string4   vehicle_year,
 	string4   vehicle_make,
@@ -132,7 +133,7 @@ xpnd_layout := record
 	string5 inquiry_zip5,
 	string4 inquiry_zip4*/
   end;
-xpnd_layout xpndrecs(flc4 L,FLAccidents.Key_FlCrash0 R) := transform
+xpnd_layout xpndrecs(flc4 L, flc0 R) := transform
 self.report_code					:= 'FA';
 self.report_category				:= 'Auto Report';
 self.report_code_desc				:= 'Auto Accident';
@@ -157,7 +158,7 @@ self 								:= L;
 end;
 
 pflc4 := join(distribute(flc4,hash(accident_nbr))
-			  ,distribute(pull(FLAccidents.Key_FlCrash0),hash(accident_nbr))
+			  ,distribute(flc0,hash(accident_nbr))
 			  ,left.accident_nbr = right.accident_nbr,
 			   xpndrecs(left,right),left outer,local);
 
@@ -227,7 +228,7 @@ pntl := project(ntlFile(STD.Str.ToUpperCase(party_type) in ['DRIVER', 'VEHICLE D
 /////////////////////////////////////////////////////////////////
 //Slim National inquiry file 
 ///////////////////////////////////////////////////////////////// 
-inqFile := FLAccidents_Ecrash.File_CRU_inquiries;
+inqFile := FLAccidents.File_CRU_inquiries;
 
 pflc4 slimrec3(inqFile L) := transform
 self.report_code					:= 'I'+ L.report_code;
@@ -444,6 +445,4 @@ allrecs := dedup(pflc4+pntl+pinq+pecrash,record,all)
 export Key_ECrash4 := index(allrecs
                             ,{string40 l_acc_nbr := accident_nbr}
 							,{allrecs}
-							,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrash4_' + doxie.Version_SuperKey);
-						 	 
-							
+							,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrash4_' + doxie.Version_SuperKey);							
