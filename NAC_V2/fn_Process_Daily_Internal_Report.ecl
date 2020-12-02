@@ -11,25 +11,35 @@ EXPORT fn_Process_Daily_Internal_Report(STRING100 ncf2_file_name)  := FUNCTION
 
 ilfn := '~nac::uber::in::'+ ncf2_file_name;
 
-GroupID := STD.Str.ToUpperCase(ncf2_file_name[6..9]);
-
-showGroupID := OUTPUT(GroupID, NAMED('GroupID'));
-
+GroupID :=  STD.Str.ToUpperCase(ncf2_file_name[6..9]);
 //  "Onboarding : process NCF2 in prod as if they will go, but stage them at the gate until confirmed they're good."
 //  'y' means the file will get processed to a certain point but not get fully ingested, only staged
-boolean IsOnboarding(string GroupID) := NAC_V2.dNAC2Config(GroupID=GroupID)[1].Onboarding in ['y','Y'];
-IsOnboardingMessage := IF(IsOnboarding(GroupID) = TRUE, GroupID + ' is in Production,the Incoming file will be FULLY ingested', GroupID + ' is onboarding, the Incoming file is STAGED for file validation only');
 
+BOOLEAN IsOnboarding(string gid) := NAC_V2.dNAC2Config(GroupID= STD.Str.ToLowerCase(gid))[1].Onboarding in ['y','Y'];
+IsOnboardingMessage := IF(IsOnboarding(GroupID) = FALSE, 
+		STD.Str.toUpperCase(GroupID) + ' is in Production, file will be FULLY ingested. ', 
+		STD.Str.toUpperCase(GroupID) + ' is onboarding, file is STAGED for file validation only. ');
 
 showIsOnboarding := OUTPUT(IsOnboarding(GroupID), NAMED('IsOnboarding'));
 showIsOnboardingMessage := OUTPUT(IsOnboardingMessage, NAMED('Onboarding_Message'));
 
-show_file_name := OUTPUT(ncf2_file_name, NAMED('File_Name'));
+show_file_name := OUTPUT(ncf2_file_name, NAMED('NCF2_File_Name'));
 
 nac2 := nac_v2.PreprocessNCF2(ilfn);
 
-// dsNcr2 := Nac_V2.GetReports(nac2, ilfn).dsNcr2;
-// show_NCR2 := OUTPUT(CHOOSEN(dsNcr2, 2000), NAMED('NCR2'));
+
+ModifyFileName(string ilfn, string rpt) := Std.Str.FindReplace(ilfn, 'ncf2', rpt);
+ncr2_filename := ModifyFileName(ilfn, 'ncr2');
+
+LF := '\n';
+dRow := RECORD
+		string130		text;
+		string1			eol := LF;
+	END;
+
+NCR2 := DATASET(ncr2_filename, dRow, THOR);
+show_NCR2 := OUTPUT(CHOOSEN(NCR2, 2000), NAMED('NCR2'));
+
 
 dsNcd2 := Nac_V2.GetReports(nac2, ilfn).dsNcd2;
 show_NCD2 := OUTPUT(CHOOSEN(dsNcd2,2000), NAMED('NCD2')); 
@@ -68,10 +78,9 @@ show_duplicates_info := OUTPUT(CHOOSEN(allinfo,2000), NAMED('dupicate_clients'))
 
 report := SEQUENTIAL(
   show_file_name, 
-  showGroupID,
   showIsOnboardingMessage,
   show_record_codes_count,
-  //show_NCR2,
+  show_NCR2,
   show_NCD2,
   show_NCX2,
   show_cases_sample,
