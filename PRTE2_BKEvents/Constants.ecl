@@ -1,6 +1,10 @@
-IMPORT _Control, Data_Services, std;
+﻿IMPORT _Control, Data_Services, std;
 
 EXPORT Constants := MODULE
+
+    Export dops_name                     := 'BKeventskeys';
+		Export dops_fcra_name                :='FCRA_BKeventskeys';
+		
 
     EXPORT todaysdate 							:= (STRING8)Std.Date.Today();
 		EXPORT in_prefix_name						:= '~prte::in::banko';

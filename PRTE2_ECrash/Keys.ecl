@@ -48,13 +48,19 @@ EXPORT key_ecrash8	:= INDEX(FILES.ds_ecrash8, {string40 l_acc_nbr := accident_nb
 // Use File_KeybuildV2.out file
 EXPORT key_ecrashv2_bdid 		:= INDEX(dedup(file_keybuildV2.out(b_did <> '',b_did <> '0'),all), {unsigned6 l_bdid := (integer)b_did}, {accident_nbr,orig_accnbr}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::bdid');
 	
-EXPORT key_ecrashv2_did 		:= INDEX(dedup(sort(file_keybuildV2.out(did <> '',did <> '0'),did),record), {unsigned6 l_did := (integer)did},{accident_nbr,vin,orig_accnbr}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::did');
+EXPORT key_ecrashv2_did 		:= INDEX(dedup(sort(file_keybuildV2.out(did <> '',did <> '0'),did),record), 
+																		{unsigned6 l_did := (integer)did},
+																		{accident_nbr, vin, orig_accnbr, (string4)report_code, jurisdiction, jurisdiction_state, jurisdiction_nbr, vehicle_incident_st}, 
+																		Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::did');
 
 EXPORT key_ecrashv2_dlnbr 	:= INDEX(file_keybuildV2.out(driver_license_nbr<>''), {l_dlnbr := driver_license_nbr},{accident_nbr,orig_accnbr}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::dlnbr');
 
 EXPORT key_ecrashv2_dol 		:= INDEX(files_addl.ds_dol,{accident_date,report_code,jurisdiction_state, jurisdiction},{files_addl.ds_dol}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::dol');
 
-EXPORT key_ecrashv2_vin 		:= INDEX(file_keybuildV2.out(vin<>'' and vin<>'0' ), {l_vin := vin}, {accident_nbr,orig_accnbr}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::vin'); 
+EXPORT key_ecrashv2_vin 		:= INDEX(file_keybuildV2.out(vin<>'' and vin<>'0' ), 
+																		{l_vin := vin}, 
+																		{accident_nbr,orig_accnbr, (string4)report_code, jurisdiction, jurisdiction_state, jurisdiction_nbr, vehicle_incident_st}, 
+																		Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::vin'); 
 
 //Use Vin Key
 ecrash_vin_base := pull(key_ecrashv2_vin);
@@ -67,20 +73,22 @@ ds_vin7 := project(ecrash_vin_base, transform(Layouts.ecrashv2_vin7,
 
 EXPORT key_ecrashv2_vin7 		:= INDEX(ds_vin7, {l_vin7}, {l_vin,accident_nbr,orig_accnbr}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::vin7'); 
 	
-EXPORT key_ecrashv2_tagnbr 	:= INDEX(file_keybuildV2.out(tag_nbr<>''), {l_tagnbr := tag_nbr},{accident_nbr,orig_accnbr}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::tagnbr7');  
+EXPORT key_ecrashv2_tagnbr 	:= INDEX(file_keybuildV2.out(tag_nbr<>''), {l_tagnbr := tag_nbr},{accident_nbr,orig_accnbr}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::tagnbr');  
 
 
 EXPORT key_ecrashv2_accnbr 	:= INDEX(files_addl.ds_accnbr, {l_accnbr, report_code,jurisdiction_state, jurisdiction}, {files_addl.ds_accnbr},
 																			Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::accnbr');
+																			// '~prte::key::ecrashv2::20200521a::accnbr');
 
 
 EXPORT key_ecrashv2_accnbrv1 := INDEX(files_addl.ds_accnbrv1, {l_accnbr, report_code, jurisdiction_state, jurisdiction}, {files_addl.ds_accnbrv1},
 																			Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::accnbrv1');
 	 
-EXPORT key_ecrashv2_agencyid_sentdate := INDEX(files_addl.ds_agencyid_sentdate, {jurisdiction_nbr}, {MaxSent_to_hpcc_date}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::agencyid_sentdate'); 
+EXPORT key_ecrashv2_agencyid_sentdate := INDEX(files_addl.ds_agencyid_sentdate, {jurisdiction_nbr}, {contrib_source, MaxSent_to_hpcc_date}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::agencyid_sentdate'); 
 
 EXPORT Key_ecrashv2_LastName := INDEX(files_addl.ds_lastname_state, {lname,jurisdiction_state,jurisdiction}, {files_addl.ds_lastname_state}, 
-																			Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::LastName_State'); 
+															
+															Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::LastName_State'); 
 
 EXPORT key_ecrashv2_prefname_state 	:= INDEX(files_addl.ds_prefname_state,{fname,jurisdiction_state,jurisdiction}, {files_addl.ds_prefname_state},
 																			Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::prefname_state');
@@ -90,22 +98,23 @@ EXPORT key_ecrashv2_standlocation 	:= INDEX(file_stAndLocation, {Partial_Acciden
 																					Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::standlocation');
 	 
 
-EXPORT key_ecrashv2_supplemental 		:= INDEX(Files.ds_Supplemental,	{super_report_id}, 											
+EXPORT key_ecrashv2_supplemental 		:= INDEX(Files.ded_supplemental,	{super_report_id}, 											
 																					{report_id,hash_key,accident_nbr,report_code,jurisdiction,jurisdiction_state,accident_date,orig_accnbr,work_type_id,report_type_id,agency_ori,addl_report_number,Vendor_Code,vendor_report_id,Page_Count},
 																					Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::supplemental');
 
-	
+
 EXPORT key_ecrashv2_reportid := INDEX(files.ds_reportid, {report_id}, {Super_report_id}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::ReportId');
 
 EXPORT Key_eCrashv2_reportlinkId := INDEX(files_addl.ds_reportLinkID, {reportlinkid}, {files_addl.ds_reportLinkID}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::ReportLinkId');
 
 EXPORT key_ecrashv2_photoid 	:= INDEX(Files.ds_photoid, {Super_report_id,Document_id,Report_Type}, {Files.ds_photoid}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::PhotoId');
-	
+// */	
 	
 //Use key_EcrashV2_accnbrv1 as input	
 //Delta Date Key
-MaxDate := MAX(pull(key_ecrashv2_accnbrv1)(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and trim(report_type_id,all) in ['A','DE']),(integer)date_vendor_last_reported);
-STRING8 Delta_Date := IF ((INTEGER)MaxDate > 0,INTFORMAT((INTEGER)MaxDate,8,1),(STRING8)Std.Date.Today());
+// MaxDate := MAX(pull(key_ecrashv2_accnbrv1)(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and trim(report_type_id,all) in ['A','DE']),(integer)date_vendor_last_reported);
+// STRING8 Delta_Date := IF ((INTEGER)MaxDate > 0,INTFORMAT((INTEGER)MaxDate,8,1),(STRING8)Std.Date.Today());
+STRING8 Delta_Date := (STRING8)Std.Date.Today();
 DateFile := DATASET([{'DELTADATE',Delta_Date}],FLAccidents_Ecrash.Layouts.Delta_Date);
 file_deltadate := DateFile;
 
@@ -222,8 +231,11 @@ EXPORT key_ecrashv2analytics_byinter 	:= INDEX(file_BYInter(agencyid <>''), {age
 EXPORT key_ecrashv2analytics_bymoy 		:= INDEX(file_ByMOY(agencyid <>''),{agencyid, Accident_date}, {file_ByMOY}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::analytics_bymoy'); 
 
 //New Key for BuyCash KY Integration
-EXPORT key_ecrashV2_agency 						:= INDEX(files.base_agencycmbnd, {Agency_State_Abbr,Agency_Name,Agency_ori}, 
-																									{Mbsi_Agency_ID, Cru_Agency_ID, Cru_State_Number, Source_ID, Append_Overwrite_Flag}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::agency'); 
+EXPORT key_ecrashV2_agency 						:= INDEX(files.dsAgency, {Agency_State_Abbr,Agency_Name,Agency_ori}, 
+																							{Mbsi_Agency_ID, Cru_Agency_ID, Cru_State_Number, Source_ID, Append_Overwrite_Flag,
+																							source_start_date, source_end_date, source_termination_date, source_resale_allowed,
+																							source_auto_renew,source_allow_sale_of_component_data, source_allow_extract_of_vehicle_data}, 
+																							Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::agency'); 
 
 								                            
 EXPORT Key_LinkIds   := MODULE
@@ -268,4 +280,8 @@ EXPORT	key_ecrashv2_OfficerBadgeNbr :=	INDEX(Files_Addl.ds_OfficerBadgeNbr, {off
 
 EXPORT	key_ecrashv2_VinNbr :=	INDEX(Files_Addl.ds_VinNbr, {vin,jurisdiction_state,jurisdiction}, {Files_Addl.ds_VinNbr}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::VinNbr'); 		
 																				
+//New Key																				
+EXPORT key_ecrashv2_unrestrictive_accnbrv1 := INDEX(files_addl.ds_accnbrv1, {l_accnbr, report_code, jurisdiction_state, jurisdiction}, {files_addl.ds_accnbrv1},
+																			Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::unrestricted_accnbrv1');
+
 END;

@@ -6,7 +6,7 @@ ds_proxid_underlinks :=
     // { <proxid>  ,<underLinkId>  ,<comment>}
     { 1234   ,1   ,'BH-1044 -- Implement non-salt FORCE LINK for proxid and lgid3'} // -- examples
    ,{ 12345  ,1   ,'BH-1044 -- Implement non-salt FORCE LINK for proxid and lgid3'} // -- examples
-  ]  ,BIPV2_ForceLink.Layouts.Proxid_Underlink);  //{ unsigned6 proxid  ,integer   underLinkId }
+  ]  ,BIPV2_ForceLink.Layouts.Input.Proxid_Underlink);  //{ unsigned6 proxid  ,integer   underLinkId ,string comment}
 
 BIPV2_ForceLink.Add_Candidates.Proxid_Underlink(ds_proxid_underlinks);
 
@@ -16,6 +16,6 @@ ds_lgid3_underlinks :=
     // { <lgid3>  ,<underLinkId>  ,<comment>}
     { 1234   ,1   ,'BH-1044 -- Implement non-salt FORCE LINK for proxid and lgid3'} // -- examples
    ,{ 12345  ,1   ,'BH-1044 -- Implement non-salt FORCE LINK for proxid and lgid3'} // -- examples
-  ]  ,BIPV2_ForceLink.Layouts.lgid3_Underlink);  //{ unsigned6 lgid3  ,integer   underLinkId }
+  ]  ,BIPV2_ForceLink.Layouts.Input.lgid3_Underlink);  //{ unsigned6 lgid3  ,integer   underLinkId ,string comment }
 
 BIPV2_ForceLink.Add_Candidates.lgid3_Underlink(ds_lgid3_underlinks);

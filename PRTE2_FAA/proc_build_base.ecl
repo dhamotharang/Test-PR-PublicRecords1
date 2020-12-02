@@ -262,9 +262,10 @@ dsSearchAirmenCert := project(dsClnAirmen_Cert, transform(Layouts.base_airmen_ce
 																																									trim(left.cer_exp_date,left,right)+ ','+
 																																									trim(left.ratings,left,right)), self := left, self := [])); 
 																
+dsSearchAircraftReg_dedup:=dedup(dsSearchAircraftReg);
 
 PromoteSupers.Mac_SF_BuildProcess(dsSearchAirmen,Constants.base_prefix_name+'airmen',airmen_out,2,,true);
-PromoteSupers.Mac_SF_BuildProcess(dsSearchAircraftReg,Constants.base_prefix_name+'aircraft_reg',aircraft_reg_out,2,,true);
+PromoteSupers.Mac_SF_BuildProcess(dsSearchAircraftReg_dedup,Constants.base_prefix_name+'aircraft_reg',aircraft_reg_out,2,,true);
 PromoteSupers.Mac_SF_BuildProcess(dsSearchAirmenCert,Constants.base_prefix_name+'airmen_certs',airmen_certs_out,2,,true);
 
 

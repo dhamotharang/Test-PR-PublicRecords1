@@ -3,19 +3,26 @@
 //iConectiv Ported Phone File
 
 EXPORT Proc_Build_Combined_Port_Reformat_File(string version/*, string eclsourceip, string thor_name*/):= FUNCTION
-																										
-	//Build Base
+	
+	//DF-28572: Stop Processing the Telo Files on 11/17/20; Keep Telo history as of 11/15/20. 		
+	/*
+	//Build Historical iConectiv Base
 	buildBase					:= output(PhonesInfo.Remap_Combined_Port_File,,'~thor_data400::base::phones::icport_main_'+version, overwrite, __compressed__);
 	
-	//Clear Delete Files
+	//Clear Historical iConectiv Delete Files
 	clearDelete 			:= nothor(fileservices.clearsuperfile('~thor_data400::base::phones::icport_main_delete', true));	
 	
-	//Move Base Files
+	//Move Historical iConectiv Base Files
 	moveBase					:= Std.File.PromoteSuperFileList(['~thor_data400::base::phones::icport_main',
 																											'~thor_data400::base::phones::icport_main_father',
 																											'~thor_data400::base::phones::icport_main_grandfather',
 																											'~thor_data400::base::phones::icport_main_delete'], '~thor_data400::base::phones::icport_main_'+version, true);		
-										 																															
+	*/	
+									 																															
+	//Build iConectiv PortData Validate File
+	//Start Processing the iConectiv PortData Validate Files on 11/17/20.  Begin using files from 11/16/20.	
+	buildPDVBase			:= PhonesInfo.Proc_Build_PortData_Valid_File(version);	
+	
 	//Email Build Status	
 	emailDOps					:= ';darren.knowles@lexisnexisrisk.com; charlene.ros@lexisnexisrisk.com; gregory.rose@lexisnexisrisk.com';
 	emailDev					:= ';judy.tao@lexisnexisrisk.com';
@@ -26,9 +33,10 @@ EXPORT Proc_Build_Combined_Port_Reformat_File(string version/*, string eclsource
 																,fileservices.SendEmail(emailTarget, 'Phones Metadata: No iConectiv Ported Phone File', 'There Were No iConectiv Ported Phone Records In This Build')
 																);		
 	
-	RETURN sequential(buildBase,
-										clearDelete,
-										moveBase,
-										emailBuildNotice);
+	RETURN buildPDVBase; /*sequential(buildBase,
+																		clearDelete,
+																		moveBase,
+																		buildPDVBase,
+																		emailBuildNotice);*/
 
 END;

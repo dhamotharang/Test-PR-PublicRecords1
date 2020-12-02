@@ -14,10 +14,6 @@ export layouts := MODULE
 			
 
 	END;  
-	// Export Search2:=RECORD
-	// search;
-	// PRTE2.Layouts.DEFLT_CPA;
-	// end;
 	
 
 	export disp_action := RECORD
@@ -25,7 +21,7 @@ export layouts := MODULE
 			string10  cust_name;
 			string10	bug_num;
 	END;
-	
+
 	export indv_detail := RECORD
 			Prof_License_Mari.Layouts.Individual_Reg;
 			unsigned8 __internal_fpos__;
@@ -39,13 +35,22 @@ export layouts := MODULE
 			string10	bug_num;
 	END;
 	
+export reg_action_2 := RECORD
+			Prof_License_Mari.Layouts.Regulatory_Action_Base;
+	END;	
+	
 	export SlimRec := record,maxlength(8000)
 			Prof_License_Mari.Layouts.SlimRec;
 	END; 
 	
 	export layout_disciplinary	:= RECORD, MAXLENGTH(8000)
-  disp_action - [cust_name,bug_num];
+ 	Prof_License_Mari.Layouts.Disciplinary_Action_Base;
 	end;
+	
+  Export Individ_Reg_Base	:=record
+  		Prof_License_Mari.Layouts.Individual_Reg_Base;
+	End;
+ 
 
 Export slim_ssn := record
 unsigned6 mari_rid;

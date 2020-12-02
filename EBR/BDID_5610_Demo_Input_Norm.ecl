@@ -1,4 +1,4 @@
-import ut, Business_Header, Business_Header_SS, did_add,lib_stringlib,idl_header;
+﻿import ut, Business_Header, Business_Header_SS, did_add,lib_stringlib,idl_header;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Value Types
@@ -25,6 +25,7 @@ transform
 	self.clean_officer_name.name_suffix := choose(cnt, l.clean_officer_name_1.name_suffix, l.clean_officer_name_2.name_suffix, l.clean_officer_name_3.name_suffix);
 	self.clean_officer_name.name_score  := choose(cnt, l.clean_officer_name_1.name_score, l.clean_officer_name_2.name_score, l.clean_officer_name_3.name_score);
 	self 				:= l;
+	self				:=[];
 end;
 
 File_in2base := normalize(File_in, 3, Convert2Base(left, counter));

@@ -1,4 +1,4 @@
-﻿IMPORT PRTE2_Common, PRTE2_Email_Data, data_services,PRTE2_Common;
+﻿IMPORT PRTE2_Common, PRTE2_Email_Data, data_services,PRTE2_Common, mdr;
 
 
 EXPORT Files := MODULE
@@ -13,9 +13,19 @@ EXPORT Files := MODULE
 	EXPORT ALPHA_BASE							:= dataset(Constants.base_prefix_name+'alpha', Layouts.base, thor);
 	EXPORT BOCA_BASE							:= dataset(Constants.base_prefix_name+'boca', Layouts.base, thor);
 	
-	EXPORT Combined_Base    			:= ALPHA_BASE + BOCA_BASE;
+	EXPORT Combined_Base_Prep    			:= ALPHA_BASE + BOCA_BASE;
+	
+	Export Combined_Base:=project(Combined_Base_Prep,
+      Transform(Layouts.base,
+		  self.orig_first_name := if(left.email_src = mdr.sourceTools.src_Whois_domains,'', left.orig_first_name);
+			self.orig_last_name  := if(left.email_src = mdr.sourceTools.src_Whois_domains,'', left.orig_last_name);
+		  Self:=Left;
+      ));
+	
+	
+  
 	EXPORT File_Key								:= project(Combined_Base, transform(Layouts.keyRec, 
-																																									 self.best_ssn := if(left.best_ssn <> '', left.best_ssn, left.link_ssn);
+	  																																							 self.best_ssn := if(left.best_ssn <> '', left.best_ssn, left.link_ssn);
 																																										self.best_dob := if(left.best_dob <> 0, left.best_dob, (unsigned)left.best_dob);
 																																										self := left;
 																																										)): INDEPENDENT;

@@ -88,6 +88,8 @@ DI_Metrics.FCRA_ASL_Students(pHostname, pTarget, pContact)
 
 ,DI_Metrics.ChartsGeoMaps_Watercraft(pHostname, pTarget, pContact)
 
+,DI_Metrics.Monthly_Cortera_Tradeline_Metrics.Cortera_Tradeline_Metrics( pHostname, pTarget, pContact )
+
 );
 
 return build_all;

@@ -19,7 +19,7 @@
 							self := [];)),
 					Ent_id, -parsed);
 	dobs := DEDUP(SORT(DISTRIBUTE(dob + AddDOB, ent_id), ent_id, parsed, LOCAL), ent_id, parsed, LOCAL);
-	AddlSorted := SORT(DISTRIBUTE(addlInfo + links + dobs, Ent_id), ent_id, Type, -parsed, information, comments, LOCAL);
+	AddlSorted := DEDUP(SORT(DISTRIBUTE(addlInfo + links + dobs, Ent_id), ent_id, Type, -parsed, information, comments, LOCAL),ent_id, Type,information,comments,LOCAL);
 							
 	pAddl := 
 			project(AddlSorted,					// leave out sanctions

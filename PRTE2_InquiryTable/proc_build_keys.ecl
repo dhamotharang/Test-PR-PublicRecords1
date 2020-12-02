@@ -227,12 +227,14 @@ RoxieKeyBuild.MAC_SK_Move_v2(	'~prte::key::inquiry_table::linkids_@version@',
   updatedops_fcra			:= PRTE.UpdateVersion('FCRA_Inquirytablekeys',filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='F',l_includeboolean :='N');
 
 key_validations :=  parallel(output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation')),
-                   output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_fcra,Constants.fcra_dops_name, 'F'), named(Constants.fcra_dops_name+'Validation')));	
+                    output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_fcra,Constants.fcra_dops_name, 'F'), named(Constants.fcra_dops_name+'Validation')));	
 
 create_orbit_build := parallel(
-																Orbit3.proc_Orbit3_CreateBuild('PRTE - Inquiry_Table_Keys', filedate, 'N', true, true, false,  _control.MyInfo.EmailAddressNormal),
-																Orbit3.proc_Orbit3_CreateBuild('PRTE - FCRA_Inquiry_T able_Keys', filedate, 'F', true, true, false,  _control.MyInfo.EmailAddressNormal),
+                                Orbit3.proc_Orbit3_CreateBuild('PRTE - Inquiry_Table_Keys', filedate, 'PN', email_list:= _control.MyInfo.EmailAddressNormal),
+																Orbit3.proc_Orbit3_CreateBuild('PRTE - FCRA_Inquiry_Table_Keys', filedate, 'PF', email_list:= _control.MyInfo.EmailAddressNormal),
 															);
+																
+ 
  RETURN 		SEQUENTIAL(
             PARALLEL(
             build_linkid_keys
