@@ -11,4 +11,5 @@ EXPORT EchoService := MACRO
   OUTPUT(CHOOSEN(dx_Banko.Key_Banko_Delta_rid(Data_Services.data_env.iFCRA), 10), named('dx_Banko_Key_FCRA_Banko_Delta_rid'));
   OUTPUT(CHOOSEN(dx_fcra_opt_out.key_delta_rid, 10), named('dx_fcra_opt_out_Delta_rid'));
   OUTPUT(CHOOSEN(Suppress.Key_New_Suppression, 10), named('suppress_key_new_suppression'));
+  OUTPUT(CHOOSEN(dx_Suppression.Key_Suppression(), 10), named('dx_suppression_key_suppression'));
 ENDMACRO;
