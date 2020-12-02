@@ -1384,6 +1384,7 @@
 				trim(kword, left, right) = 'SKGPSR' =>SubGroup_Constants.numKeywordsID.KEYWORD_SKGPSR,
 				trim(kword, left, right) = 'CNSAMR' =>SubGroup_Constants.numKeywordsID.KEYWORD_CNSAMR,
 				trim(kword, left, right) = 'USNDAA-889' =>SubGroup_Constants.numKeywordsID.KEYWORD_USNDAA_889,
+				trim(kword, left, right) = 'FRANJ' =>SubGroup_Constants.numKeywordsID.KEYWORD_FRANJ,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
