@@ -14,7 +14,7 @@ IMPORT Data_Services, LNSmallBusiness, iESP, Risk_Indicators, RiskWise, STD;
  * roxieIP: IP Address of the non-FCRA roxie.                         *
  **********************************************************************/
  
-recordsToRun := ALL; // use ALL or numeric value
+recordsToRun := 100; // use ALL or numeric value
 eyeball      := 10;
 threads      := 30;
 
@@ -194,7 +194,7 @@ inSufficientInput := JOIN(f_with_seq_nonFiltered, f_with_seq_Filtered_Rep,
 	
 f_with_seq := f_with_seq_Filtered_Rep;
 
-OUTPUT(choosen(inSufficientInput, eyeball), NAMED('inSufficientInput'));
+OUTPUT(CHOOSEN(inSufficientInput, eyeball), NAMED('inSufficientInput'));
 OUTPUT(CHOOSEN(f_with_seq, eyeball), NAMED('Sample_Raw_Input'));
 
 layout_soap := RECORD
@@ -2870,6 +2870,7 @@ layout_flat_v21 flatten_v21(layout_soap le, SmallBusinessAnalyticsoutput ri) := 
 	SELF.Model10RC6 := Model10.Scores[1].ScoreReasons[6].ReasonCode;
   
 	SELF.ErrorCode := IF(ri.ErrorCode = '' AND SBBMMinInputRequirementsNotMet, 'Error: Minimum input fields required for blended score', ri.ErrorCode);
+  self.SourceIndex := '';
 
 	SELF.time_ms := ri.time_ms;
 END;

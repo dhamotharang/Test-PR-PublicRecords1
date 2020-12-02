@@ -14,7 +14,7 @@ IMPORT Data_Services, LNSmallBusiness, iESP, Risk_Indicators, RiskWise, STD;
  * roxieIP: IP Address of the non-FCRA roxie.                         *
  **********************************************************************/
  
-recordsToRun := ALL; // use ALL or numeric value
+recordsToRun := 100; // use ALL or numeric value
 eyeball      := 10;
 threads      := 30;
 
@@ -1006,7 +1006,8 @@ layout_flat_v1 flatten_v1(layout_soap le, SmallBusinessAnalyticsoutput ri) := TR
 	SELF.Model10RC6 := Model10.Scores[1].ScoreReasons[6].ReasonCode;
   
 	SELF.ErrorCode := IF(ri.ErrorCode = '' AND SBBMMinInputRequirementsNotMet, 'Error: Minimum input fields required for blended score', ri.ErrorCode);
-	
+	  self.SourceIndex := '';
+
   // self.time_ms := ri.time_ms;
 END;
 
