@@ -1,5 +1,5 @@
 ﻿// DF-23679
-IMPORT BuildLogger, Scrubs_Dunndata_Consumer;
+IMPORT BuildLogger, Scrubs_Dunndata_Consumer, Orbit3;
 EXPORT proc_build_all(STRING pversion) := FUNCTION
 
 		#WORKUNIT('name', 'Yogurt: DunnData Consumer ' + pVersion);
@@ -17,6 +17,8 @@ EXPORT proc_build_all(STRING pversion) := FUNCTION
 		//Build keys
 		// build_keys					:= 
 		
+		// DF-28467 Create Orbit entry
+		create_build        := Orbit3.proc_Orbit3_CreateBuild('DunnData Consumer',pVersion,'N');									 
 		RETURN SEQUENTIAL(
 									BuildLogger.BuildStart(false),
 									BuildLogger.PrepStart(false),
@@ -30,7 +32,8 @@ EXPORT proc_build_all(STRING pversion) := FUNCTION
 									BuildLogger.KeyEnd(false),
 									BuildLogger.PostStart(False),
 									BuildLogger.PostEnd(False),
-									BuildLogger.BuildEnd(false)
+									BuildLogger.BuildEnd(false),
+									create_build
 									);
 
 

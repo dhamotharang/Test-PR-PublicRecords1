@@ -6,7 +6,7 @@ IMPORT AccountMonitoring,BankruptcyV2, Business_Header, CellPhone, CourtLink, Co
 			 PhonesFeedback, Phonesplus, POE, Property, Risk_Indicators, ut, UtilFile, Watchdog, 
 			 hygenics_crim, business_header_ss, PhonesInfo, BIPV2_Best, 
 			 Business_Credit, Business_Credit_Scoring, UCCV2, SAM, Inquiry_AccLogs, Corp2,
-			 VehicleV2, FAA, Watercraft, Phonesplus_v2;
+			 VehicleV2, FAA, Watercraft, Phonesplus_v2, dx_PhonesInfo;
 			 
 EXPORT product_files := MODULE
 
@@ -657,20 +657,55 @@ EXPORT product_files := MODULE
 		// ===================================================================
 		// For SwitchType
 		// ===================================================================
-		
-		EXPORT neustar_filename_raw := 'thor_data400::base::neustarupdate';
-		EXPORT neustar_filename := AccountMonitoring.constants.DATA_LOCATION + neustar_filename_raw;
-		
-		EXPORT base_file_neustar :=  
-			DISTRIBUTE(
-				DATASET(
-					neustar_filename,
-					CellPhone.layoutNeuStar,CSV(TERMINATOR('\n'), SEPARATOR('|'))
-				),
-				HASH64(CellPhone)
-			) : INDEPENDENT; //PERSIST('acctmon::phone::base_file_neustar');
+	  EXPORT phones_type_superfile	:= 'thor_data400::key::Phones_type_'+doxie.Version_SuperKey;
+    EXPORT phones_type_for_superkey_monitor := 'monitor::Phones_type';
+	  EXPORT phones_type_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + phones_type_for_superkey_monitor + '_qa';
+	
+		EXPORT key_phones_type := 
+			PULL(INDEX(
+				dx_PhonesInfo.Key_Phones_Type,  
+				phones_type_superkeyname
+			));
 			
-		// Telcordia Settings - Switch Type / Phone Type
+		EXPORT key_phones_type_dist :=
+			DISTRIBUTE(
+				key_phones_type, 
+				HASH64(phone)
+			): INDEPENDENT;
+
+    EXPORT Phones_Lerg6_superfile := 'thor_data400::key::phones_lerg6_'+doxie.Version_SuperKey;
+		EXPORT Phones_Lerg6_for_superkey_monitor := 'monitor::phones_lerg6';
+		EXPORT phones_lerg6_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + Phones_Lerg6_for_superkey_monitor+ '_qa';
+		
+		EXPORT key_Phones_Lerg6 := 
+			PULL(INDEX(
+				dx_PhonesInfo.Key_Phones_Lerg6,  
+				phones_lerg6_superkeyname
+			));
+			
+		EXPORT key_Phones_Lerg6_dist :=
+			DISTRIBUTE(
+				key_Phones_Lerg6, 
+				HASH64(npa, nxx, block_id)
+			): INDEPENDENT;
+
+    EXPORT carrier_reference_superfile := 'thor_data400::key::phonesmetadata::carrier_reference_'+doxie.Version_SuperKey;
+		EXPORT carrier_reference_for_superkey_monitor := 'monitor::phonesmetadata::carrier_reference';
+		EXPORT carrier_reference_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + carrier_reference_for_superkey_monitor + '_qa';
+
+		EXPORT key_carrier_reference := 
+			PULL(INDEX(
+				dx_PhonesInfo.Key_Source_Reference.ocn_name,  
+				carrier_reference_superkeyname
+			));
+			
+		EXPORT key_carrier_reference_dist :=
+			DISTRIBUTE(
+				key_carrier_reference, 
+				HASH64(ocn)
+			): INDEPENDENT;															 
+			
+		// Settings - Switch Type / Phone Type
 		EXPORT SET OF STRING3 Toll_Free_Area_Codes := ['800','811','822','833','844','855','866','877','888','899'];
 		EXPORT STRING1 POTS                       := 'P'; // "Plain Old Telephone Service"
 		EXPORT STRING1 PAGER                      := 'G';
@@ -681,32 +716,9 @@ EXPORT product_files := MODULE
 		EXPORT STRING1 WEATHER                    := 'W';
 		EXPORT STRING1 TOLL_FREE                  := '8';
 		EXPORT STRING1 UNKNOWN_TYPE               := 'U';		
+		EXPORT STRING1 CABLE                      := 'B';
 		
-		EXPORT fn_GetPhoneTypeCode(STRING3 npa, STRING3 COCType, STRING4 SSC) :=	FUNCTION
-			phone_type_code := IF(npa IN Toll_Free_Area_Codes OR REGEXFIND('I',SSC), 
-														 TOLL_FREE,
-														 MAP(COCType IN ['EOC','PMC','RCC','SP1','SP2'] AND 
-																 REGEXFIND('(C|R|S)',SSC)                       => CELL_PHONE,
-																 REGEXFIND('B',      SSC)                       => PAGER,
-																 REGEXFIND('N',      SSC)                       => POTS,
-																 REGEXFIND('V',      SSC)                       => VOIP,
-																 REGEXFIND('T',      SSC)                       => TIME,
-																 REGEXFIND('W',      SSC)                       => WEATHER,
-																 REGEXFIND('8',      SSC)                       => PUERTO_RICO_VIRGIN_ISLANDS,
-																 /* ELSE.....................................*/ UNKNOWN_TYPE)
-														);
-			RETURN phone_type_code;
-		END;
-		
-		EXPORT telcordia_tds_keyfilename_raw := 'thor_data400::key::telcordia_tds_' + doxie.Version_SuperKey;
-		EXPORT telcordia_tds_keyfilename     := AccountMonitoring.constants.DATA_LOCATION + telcordia_tds_keyfilename_raw;
 
-		SHARED telcordia_tds_undist := INDEX(Risk_Indicators.key_Telcordia_tds, 
-																				 telcordia_tds_keyfilename);
-
-		EXPORT telcordia_tds := DISTRIBUTE(telcordia_tds_undist,
-																			 HASH64(npa, nxx, tb)) : INDEPENDENT; //PERSIST('acctmon::phone::telcordia_tds');
-				
 	END; // Phone module
 	
 	EXPORT property := MODULE
@@ -1190,7 +1202,7 @@ EXPORT product_files := MODULE
 							: INDEPENDENT; //PERSIST('acctmon::workplace::base_file_slim');
 
 	END; // end workplace module
-	
+
 	EXPORT PhoneOwnership := MODULE
 		EXPORT pphone_superkeyname := AccountMonitoring.constants.DATA_LOCATION + 'thor_data400::key::phones_ported_metadata_'+doxie.Version_SuperKey;
 		pphone_build_version         := TRIM( did_add.get_EnvVariable('pphones_build_version') ):INDEPENDENT;
@@ -1344,7 +1356,6 @@ EXPORT product_files := MODULE
 		
 		EXPORT inquiry := MODULE
 	
-			// Linkid key
       EXPORT inquiryLinkid_Roxie_SuperFile := 'thor_data400::key::inquiry_table::LinkIds_' + doxie.Version_SuperKey;
       EXPORT inquiryLinkid_superkey_monitor := 'monitor::inquiry::linkids';
       EXPORT inquiryLinkid_superkey     := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + inquiryLinkid_superkey_monitor + '_qa';
@@ -1562,5 +1573,4 @@ EXPORT product_files := MODULE
 				): INDEPENDENT; //PERSIST?
    
   END;
-		
 END;

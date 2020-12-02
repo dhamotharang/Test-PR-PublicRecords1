@@ -4,9 +4,11 @@
 	By: 				ssivasubramanian
 	Desc: 			Holds all layouts of different datasets/record sets used within PRTE watercraft build process. 
 ***********************************************************************************************************/
-IMPORT Watercraft, PRTE2_Watercraft;
+IMPORT Watercraft, PRTE2_Watercraft, AID_BUILD;
 
 EXPORT Layouts := MODULE
+
+EXPORT AID_LAYOUT := AID_BUILD.layouts.rFinal;
 	
 EXPORT Incoming_Boca	:= RECORD
 		Watercraft.Layout_Scrubs.Main_Base - [global_sid, record_sid];

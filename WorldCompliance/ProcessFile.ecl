@@ -15,7 +15,10 @@ string expandGender(string gender) := MAP(
 								gender in ['F', 'f'] => 'Female',
 								'');
 
+
 Layout_XG.routp xForm(Layouts.rEntity infile) := TRANSFORM
+
+
 	self.id := infile.Ent_id;
 	self.type := TRIM(CASE(infile.EntryType,
 						'Individual' => 'Individual',
@@ -48,7 +51,10 @@ Layout_XG.routp xForm(Layouts.rEntity infile) := TRANSFORM
 	
 	self.listed_date := ut.ConvertDate(infile.dateentered,'%Y-%m-%d', '%Y/%m/%d');
 	self.modified_date := ut.ConvertDate(infile.touchdate,'%Y-%m-%d', '%Y/%m/%d');
-	self.reason_listed := if(trim(infile.EntLevel, left, right) in ['N/A', ''] , '', infile.EntLevel + ':') + infile.EntryCategory + if(trim(infile.EntrySubCategory, left, right) in ['N/A', ''], '', ':' + infile.EntrySubCategory);
+	/*self.reason_listed := if(trim(main.EntLevel, left, right) in ['N/A', ''] , '', main.EntLevel + ':') + 
+												main.EntryCategory + if(trim(main.EntrySubCategory, left, right) in ['N/A', ''], '', ':' + 
+												main.EntrySubCategory);
+	*/
 	self.entity_added_by := infile.NameSource;
 	
 	self.comments := CvtPilcrow(infile.remarks);
@@ -56,46 +62,61 @@ Layout_XG.routp xForm(Layouts.rEntity infile) := TRANSFORM
 
 END;
 
-EXPORT ProcessFile(DATASET(Layouts.rEntity) infile, boolean useLexId = false) := FUNCTION
-
+EXPORT ProcessFile(DATASET(Layouts.rEntity) infile, boolean IncludeSanctionsCriteria, boolean useLexId = false) := FUNCTION
 	basis := PROJECT(infile, xForm(LEFT));
 	// add akas
-	withaka := JOIN(basis, AllAkas, LEFT.id=Right.id,
+	withaka := JOIN(basis, dedup(distribute(AllAkas, id),AKA,local), LEFT.id=Right.id,
 					TRANSFORM(Layout_XG.routp,
 						self.aka_list.AKA := CHOOSEN(RIGHT.AKA,254); 
 						self := LEFT;
 					), LEFT OUTER, LOCAL);
 					
-	withInfo := JOIN(withaka, AllInfo, LEFT.id=Right.id,
+	withInfo := JOIN(withaka, distribute(AllInfo, id), LEFT.id=Right.id,
 					TRANSFORM(Layout_XG.routp,
 						self.additional_info_list.additionalinfo := RIGHT.additionalinfo;
 						self := LEFT;
-					), NOSORT(RIGHT), LEFT OUTER, LOCAL);
+					), NOSORT(right), LEFT OUTER, LOCAL);
 										
-	withAddr := JOIN(withInfo, AllAddresses, LEFT.id=Right.id,
-					TRANSFORM(Layout_XG.routp,
-						self.address_list.address := CHOOSEN(RIGHT.address,256); //256 limit protection on addresses
+
+	withAddr := JOIN(withInfo, distribute(AllAddresses, id), LEFT.id=Right.id,
+					TRANSFORM
+					(Layout_XG.routp,
+						self.address_list.address := CHOOSEN(RIGHT.address,256);  //256 limit protection on addresses
 						self := LEFT;
 					), LEFT OUTER, LOCAL);
-					
-	withIds := JOIN(withAddr, AllIds(useLexId), LEFT.id=Right.id,
+
+	withIds := JOIN(withAddr, distribute(AllIds(useLexId), id), LEFT.id=Right.id,
 					TRANSFORM(Layout_XG.routp,
 						self.identification_list.identification := RIGHT.identification;
 						self := LEFT;
 					), LEFT OUTER, LOCAL);
 
-	withCmts := JOIN(withIds, AllComments(infile), LEFT.id=Right.Ent_id,
+	withCmts := JOIN(withIds, distribute(AllComments(infile),Ent_id), LEFT.id=Right.Ent_id,
 					TRANSFORM(Layout_XG.routp,
 						self.comments := RIGHT.cmts;
 						self := LEFT;
 					), LEFT OUTER, LOCAL);
-	criteria := ProcessSearchCriteria(infile);
-	withCriteria := JOIN(withCmts, criteria, LEFT.id=Right.id,
+	criteria := ProcessSearchCriteria(infile,IncludeSanctionsCriteria);
+	withCriteria := JOIN(withCmts, distribute(criteria, id), LEFT.id=Right.id,
 					TRANSFORM(Layout_XG.routp,
 						self.search_criteria := (string)RIGHT.criteria;
 						self := LEFT;
 					), LEFT OUTER, LOCAL);
-					
-	return SORT(withCriteria, id, LOCAL);
+	
+	withCategory := JOIN(withCriteria, distribute(CCriteria, id), LEFT.id=Right.id,
+					TRANSFORM(Layout_XG.routp,
+						self.search_criteria := (string)Left.search_criteria+'3'+(string)RIGHT.criteria+';';
+						self := LEFT;
+					), LEFT OUTER, LOCAL);
+
+	withReason := JOIN(withCategory, distribute(Reason_Listed(infile), ent_id), LEFT.id=Right.Ent_id,
+					TRANSFORM(Layout_XG.routp,
+						self.reason_listed :=RIGHT.cmts;
+						self := LEFT;
+					), LEFT OUTER, LOCAL);
+
+	
+	
+	return SORT(withReason, id, LOCAL);
 
 END;

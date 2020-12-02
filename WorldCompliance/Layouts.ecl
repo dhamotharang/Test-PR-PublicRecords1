@@ -94,6 +94,14 @@ export rSanctionsDOB := RECORD
 	string			Dob {maxlength(75)};
 END;
 
+export rWCOCategories := Record
+	unsigned8		EntityID;
+	string			SegmentType {maxlength(100)};
+	string			SubCategoryLabel {maxlength(100)};
+	string			SubCategoryDesc {maxlength(100)};
+	string			LastUpdated;
+	string			IsActivePEP;
+	END;
 export rRelationship := RECORD
 	unsigned8		RID;
 	unsigned8		Ent_IDParent;

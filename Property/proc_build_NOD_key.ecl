@@ -1,13 +1,32 @@
-import Property,RoxieKeyBuild;
+﻿IMPORT $, RoxieKeyBuild, dx_Property;
 
-export proc_build_NOD_key(string filedate) := 
-function
+EXPORT proc_build_NOD_key(string filedate) := FUNCTION
 
-	RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(Property.Key_NOD_FID,'~thor_data400::key::nod::@version@::fid','~thor_data400::key::nod::'+filedate+'::fid',do1);
-	RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(Property.Key_NOD_DID,'~thor_data400::key::nod::@version@::did','~thor_data400::key::nod::'+filedate+'::did',do2);
-	RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(Property.Key_NOD_BDID,'~thor_data400::key::nod::@version@::bdid','~thor_data400::key::nod::'+filedate+'::bdid',do3);
-	RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(Property.Key_NOD_FID_Linkids,'~thor_data400::key::nod::@version@::fid::linkids','~thor_data400::key::nod::'+filedate+'::fid::linkids',do4);
-	RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(Property.Key_NOD_Linkids.Key,'~thor_data400::key::nod::@version@::linkids','~thor_data400::key::nod::'+filedate+'::linkids',do5);
+	RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_Property.Key_NOD_FID,																	//index
+																							property.file_building_bdid(TRIM(deed_category)IN Category_filter.NOD),	//dataset
+																							'~thor_data400::key::nod::@version@::fid',							//superfile
+																							'~thor_data400::key::nod::'+filedate+'::fid',						//key logical file
+																							do1);
+	RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_Property.Key_NOD_DID,
+																							Property.file_NOD_LexID_Key(did != 0),
+																							'~thor_data400::key::nod::@version@::did',
+																							'~thor_data400::key::nod::'+filedate+'::did',
+																							do2);
+	RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_Property.Key_NOD_BDID,
+																							Property.file_NOD_LexID_Key(bdid != 0),
+																							'~thor_data400::key::nod::@version@::bdid',
+																							'~thor_data400::key::nod::'+filedate+'::bdid',
+																							do3);
+	RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_Property.Key_NOD_FID_Linkids,
+																							property.File_building_Linkids(TRIM(deed_category)IN Category_filter.NOD),
+																							'~thor_data400::key::nod::@version@::fid::linkids',
+																							'~thor_data400::key::nod::'+filedate+'::fid::linkids',
+																							do4);
+	RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_Property.Key_NOD_Linkids.Key,
+																							property.fn_file_bip('NOD'),
+																							'~thor_data400::key::nod::@version@::linkids',
+																							'~thor_data400::key::nod::'+filedate+'::linkids',
+																							do5);
 
 	RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::nod::@version@::fid','~thor_data400::key::nod::'+filedate+'::fid',do22);
 	RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::nod::@version@::did','~thor_data400::key::nod::'+filedate+'::did',do21);

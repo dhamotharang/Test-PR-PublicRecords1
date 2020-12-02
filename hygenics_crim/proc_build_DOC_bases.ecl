@@ -1,4 +1,4 @@
-import fieldstats, ut, corrections, hygenics_search, doxie_build;
+﻿import fieldstats, ut, corrections, hygenics_search, doxie_build;
 
 /*
 inf := AllOffenders;
@@ -63,4 +63,5 @@ export proc_build_DOC_bases := sequential(Hygenics_Search.Out_Offender,
 																					Hygenics_Search.Out_DOC_Offenses,
 																					Hygenics_Search.Out_Punishment,
 																					Hygenics_Search.Out_Activity,
-																					hygenics_crim.Proc_build_Offense_category_history);
+																					hygenics_crim.Proc_build_Offense_category_history,
+																					hygenics_crim.Proc_build_co_base);

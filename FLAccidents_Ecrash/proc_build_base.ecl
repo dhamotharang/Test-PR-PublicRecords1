@@ -1,4 +1,4 @@
-//ECrash Morning deployments
+﻿//ECrash Morning deployments
 // The following flags to be set to Y
 // isprodready is set to Y and Autopkg is set to Y only on Sunday.
 import RoxieKeybuild,ut;
@@ -23,7 +23,7 @@ build_all := sequential(
 			 Spray_ECrash
       ,FLAccidents_Ecrash.map_basefile(filedate)
 	  ,FLAccidents_Ecrash.Map_base_Iyetek(filedate)
-		//	,FLAccidents_Ecrash.map_basefile_inquiry(filedate)
+		//	,FLAccidents.map_basefile_inquiry(filedate)
 			) : success(Send_Email(filedate,'V2').buildsuccess), failure(Send_Email(filedate,'V1').buildfailure);
 
 return build_all;

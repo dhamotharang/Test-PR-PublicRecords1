@@ -67,8 +67,9 @@ EXPORT Proc_Build_Ported_Metadata_Key(string version):= function
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Run Strata Stats///////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	PhonesInfo.Out_STRATA_Population_Stats(PhonesInfo.File_TCPA.Main_Current,
+	PhonesInfo.Out_STRATA_Population_Stats(//PhonesInfo.File_TCPA.Main_Current, No Longer Used
 																										PhonesInfo.File_iConectiv.Main_Current,
+																										PhonesInfo.File_iConectiv.Main_PortData_Validate,
 																										PhonesInfo.File_LIDB.Response_Processed,
 																										PhonesInfo.File_Deact_GH.Main_Current,
 																										PhonesInfo.File_Deact.Main_Current2,
@@ -84,8 +85,8 @@ EXPORT Proc_Build_Ported_Metadata_Key(string version):= function
 	ScrubsRuns	:= sequential(Scrubs_PhonesInfo.RawFileScrubs(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'), 
 																										Scrubs_PhonesInfo.IndividualBaseFileScrubs(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'),
 																										Scrubs_PhonesInfo.PostBuildScrubs(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'),
-																										Scrubs_PhonesInfo.ScrubsProcessLIDB_Current(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'),
-																										Scrubs_PhonesInfo.ScrubsProcessLIDB_Received(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'),
+																										//Scrubs_PhonesInfo.ScrubsProcessLIDB_Current(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'), Historical LIDB No longer Updating
+																										//Scrubs_PhonesInfo.ScrubsProcessLIDB_Received(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'),Historical LIDB No longer Updating
 																										Scrubs_PhonesInfo.ScrubsProcessLIDB_Processed(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'),
 																										);
 															

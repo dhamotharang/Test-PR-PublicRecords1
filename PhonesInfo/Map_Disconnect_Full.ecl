@@ -167,7 +167,7 @@ inFile				:= project(convPrev, fixF(left, counter));
 	
 	//Find Carrier_Name
 	ds_rf					:= PhonesInfo.File_Source_Reference.Main(is_current=TRUE);
-	srt_pk				:= sort(distribute(pR(source='PK'), hash(spid)), spid, local);
+	srt_pk				:= sort(distribute(pR(source in ['PK','P!']), hash(spid)), spid, local);
 	srt_rf				:= sort(distribute(ds_rf, hash(spid)), spid, carrier_name, local);
 
 	PhonesInfo.Layout_Common.portedMain addCn(srt_pk l, srt_rf r):= transform

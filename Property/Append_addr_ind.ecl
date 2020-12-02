@@ -1,6 +1,6 @@
-import ut;
+﻿IMPORT ut;
 
-export Append_addr_ind(dataset(Property.layout_header_append.inrec) in) := FUNCTION
+EXPORT Append_addr_ind(dataset(Property.layout_header_append.inrec) in) := FUNCTION
 
 addresses := dataset(ut.foreign_aprod + 'thor_data400::base::insuranceheader::unique_addresses',Property.layout_header_append.addrrec,thor);
 

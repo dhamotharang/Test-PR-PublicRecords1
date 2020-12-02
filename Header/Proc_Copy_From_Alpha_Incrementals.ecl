@@ -119,8 +119,7 @@ EXPORT copy_from_alpha(string filedt) := function
     
     // incremental key prefix
     aPref := 'thor_data400::key::insuranceheader_xlink::inc_boca::';
-
-    aPrefLoc := 'thor_data400::key::insuranceheader_locid::';
+    aPrefLoc := 'thor_data400::key::insuranceheader_xlink::';
 
     // Copy foreign keys to local thor
     copy_incremental_keys := sequential(
@@ -334,7 +333,7 @@ ver(string nm,string new_ver, string clstr='') :=
                                  ,regexreplace('thor_data400',nm,clstr)),new_ver);
 
 nm := 'thor_data400::key::insuranceheader_segmentation::<<version>>::did_ind';
-aPrefLoc := '~thor_data400::key::insuranceheader_locid::';
+aPrefLoc := '~thor_data400::key::insuranceheader_xlink::';
 father := aPrefLoc + 'father::locid';
 qa     := aPrefLoc + 'qa::locid';
 
