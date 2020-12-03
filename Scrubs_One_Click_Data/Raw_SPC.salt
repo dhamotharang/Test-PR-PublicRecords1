@@ -1,0 +1,55 @@
+﻿ OPTIONS:-gh
+MODULE:Scrubs_One_Click_Data
+FILENAME:One_Click_Data
+NAMESCOPE:Raw 
+// Uncomment up to NINES for internal or external adl
+// IDFIELD:EXISTS:<NameOfIDField>
+// RIDFIELD:<NameOfRidField>
+// RECORDS:<NumberOfRecordsInDataFile>
+// POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+// NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+// Uncomment Process if doing external adl
+// PROCESS:<ProcessName>
+// FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+// BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+// FUZZY can be used to create new types of FUZZY linking
+// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.
+// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running
+// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
+
+FIELDTYPE:Invalid_SSN:CUSTOM(Scrubs_One_Click_Data.functions.fn_numeric>0)
+FIELDTYPE:Invalid_fName:CUSTOM(Scrubs.functions.fn_populated_strings>0,lastname)
+FIELDTYPE:Invalid_Dob:CUSTOM(Scrubs.functions.fn_dob>0)
+FIELDTYPE:Invalid_mandatory_Alpha:CUSTOM(Scrubs.functions.fn_ASCII_printable>0):LENGTHS(1..)
+FIELDTYPE:Invalid_Alpha:CUSTOM(Scrubs.functions.fn_ASCII_printable>0) 
+FIELDTYPE:Invalid_Zip:CUSTOM(Scrubs.functions.fn_valid_Zip>0)
+FIELDTYPE:Invalid_State:CUSTOM(Scrubs.Functions.fn_verify_state > 0)
+FIELDTYPE:Invalid_Phone:CUSTOM(Scrubs.functions.fn_verify_optional_phone>0)
+FIELDTYPE:Invalid_pastDate:CUSTOM(Scrubs.functions.fn_valid_pastDate>0)
+
+FIELD:ssn:TYPE(STRING):LIKE(Invalid_SSN):0,0	
+FIELD:firstname:TYPE(STRING):LIKE(Invalid_fName):0,0
+FIELD:lastname:TYPE(STRING):0,0
+FIELD:dob:TYPE(STRING):LIKE(Invalid_Dob):0,0	
+FIELD:homeaddress:TYPE(STRING):LIKE(Invalid_mandatory_Alpha):0,0
+FIELD:homecity:TYPE(STRING):LIKE(Invalid_Alpha):0,0	
+FIELD:homestate:TYPE(STRING):LIKE(Invalid_State):0,0	
+FIELD:homezip:TYPE(STRING):LIKE(Invalid_Zip):0,0
+FIELD:homephone:TYPE(STRING):LIKE(Invalid_Phone):0,0	
+FIELD:mobilephone:TYPE(STRING):LIKE(Invalid_Phone):0,0
+FIELD:emailaddress:TYPE(STRING):0,0
+FIELD:workname:TYPE(STRING):LIKE(Invalid_mandatory_Alpha):0,0	
+FIELD:workaddress:TYPE(STRING):0,0
+FIELD:workcity:TYPE(STRING):0,0	
+FIELD:workstate:TYPE(STRING):0,0	
+FIELD:workzip:TYPE(STRING):0,0
+FIELD:workphone:TYPE(STRING):LIKE(Invalid_Phone):0,0	
+FIELD:ref1firstname:TYPE(STRING):0,0
+FIELD:ref1lastname:TYPE(STRING):0,0
+FIELD:ref1phone:TYPE(STRING):LIKE(Invalid_Phone):0,0	
+FIELD:lastinquirydate:LIKE(Invalid_pastDate):0,0	
+FIELD:ip:TYPE(STRING):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

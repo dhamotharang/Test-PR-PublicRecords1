@@ -52,7 +52,7 @@ EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string mai
 		
 		processed := $.PreprocessNCF2(ilfn);
 		//base2 := $.fn_constructBase2FromNCFEx(processed, version);				
-		reports := $.GetReports(processed, ilfn);
+		reports := $.GetReports(processed, ilfn, FALSE);
 		ExcessiveInvalidRecordsFound :=	reports.RejectFile;
 		
 		MoveToTempOrReject := 	if(ExcessiveInvalidRecordsFound

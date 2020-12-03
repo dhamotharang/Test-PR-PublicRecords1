@@ -1372,6 +1372,19 @@
 				trim(kword, left, right) = 'UGPPDA' =>SubGroup_Constants.numKeywordsID.KEYWORD_UGPPDA,
 				trim(kword, left, right) = 'NAMFISA' =>SubGroup_Constants.numKeywordsID.KEYWORD_NAMFISA,
 				trim(kword, left, right) = 'RWOMBUD' =>SubGroup_Constants.numKeywordsID.KEYWORD_RWOMBUD,
+				trim(kword, left, right) = 'DKFOROM' =>SubGroup_Constants.numKeywordsID.KEYWORD_DKFOROM,
+				trim(kword, left, right) = 'AFNPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_AFNPA,
+				trim(kword, left, right) = 'MYDOE' =>SubGroup_Constants.numKeywordsID.KEYWORD_MYDOE,
+				trim(kword, left, right) = 'CZMFCR-UG' =>SubGroup_Constants.numKeywordsID.KEYWORD_CZMFCR_UG,
+				trim(kword, left, right) = 'PKBEOE' =>SubGroup_Constants.numKeywordsID.KEYWORD_PKBEOE,
+				trim(kword, left, right) = 'CRJIA-MW' =>SubGroup_Constants.numKeywordsID.KEYWORD_CRJIA_MW,
+				trim(kword, left, right) = 'HUNAV-SZF' =>SubGroup_Constants.numKeywordsID.KEYWORD_HUNAV_SZF,
+				trim(kword, left, right) = 'TWBFT-SHTC' =>SubGroup_Constants.numKeywordsID.KEYWORD_TWBFT_SHTC,
+				trim(kword, left, right) = 'US-EO13959' =>SubGroup_Constants.numKeywordsID.KEYWORD_US_EO13959,
+				trim(kword, left, right) = 'SKGPSR' =>SubGroup_Constants.numKeywordsID.KEYWORD_SKGPSR,
+				trim(kword, left, right) = 'CNSAMR' =>SubGroup_Constants.numKeywordsID.KEYWORD_CNSAMR,
+				trim(kword, left, right) = 'USNDAA-889' =>SubGroup_Constants.numKeywordsID.KEYWORD_USNDAA_889,
+				trim(kword, left, right) = 'FRANJ' =>SubGroup_Constants.numKeywordsID.KEYWORD_FRANJ,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

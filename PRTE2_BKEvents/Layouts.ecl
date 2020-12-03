@@ -1,4 +1,4 @@
-import Banko;
+﻿import Banko;
 EXPORT Layouts := module
 
 
@@ -14,11 +14,14 @@ EXPORT Layouts := module
 		incoming;
 	end;
 	
-//Key Layouts
 	export casenumber := record
 		Base - [fein,customerID,cust_name,bug_name];	
-		UNSIGNED8 RecPos{virtual(fileposition)};
-	end;
+		unsigned8 record_sid;
+    unsigned4 global_sid;
+    unsigned4 dt_effective_first;
+    unsigned4 dt_effective_last;
+    unsigned1 delta_ind;
+		end;
 	
 	export fullcasenumber := record
 		base.CaseKey;

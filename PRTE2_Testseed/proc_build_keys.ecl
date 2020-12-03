@@ -18,7 +18,7 @@ EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='
 		key_validation :=  output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,dataset_name, 'N'), named(dataset_name+'Validation'));
 		
 		//Orbit Build
-		create_orbit_build	:= Orbit3.proc_Orbit3_CreateBuild('PRTE - Testseed', filedate, 'N', true, true, false,  _control.MyInfo.EmailAddressNormal);
+		create_orbit_build	:= Orbit3.proc_Orbit3_CreateBuild('PRTE - TestseedKeys', filedate, 'PN',_control.MyInfo.EmailAddressNormal);
 
-		return sequential( keys, key_validation, PerformUpdateOrNot/*,create_orbit_build*/);
+		return sequential( keys, key_validation, PerformUpdateOrNot,create_orbit_build);
 		END;

@@ -1,4 +1,4 @@
-
+﻿
 IMPORT  doxie,mdr;
 
 EXPORT keys := MODULE
@@ -9,10 +9,11 @@ EXPORT key_patriot_file_full := INDEX(
 	{pty_key,source,orig_pty_name,orig_vessel_name,country,name_type,cname,title,fname,mname,lname,suffix,a_score,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,zip}, 
 	{Files.GWL_Patriot}, 
 	constants.KeyName_Patriot_File + doxie.Version_SuperKey );
-	 
+
+//PRCT-386	 
 EXPORT key_baddids := INDEX(
 	FILES.GWL_Baddids, 
-	{did,other_count,first_seen,rel_count}, 
+	{did,other_count,first_seen,rel_count, dummy}, 
 	{Files.GWL_Baddids}, 
 	constants.KeyName_Baddids + doxie.Version_SuperKey );
 		
@@ -30,7 +31,7 @@ EXPORT key_patriot_did_file := INDEX(
 	 
 EXPORT key_annotated_names := INDEX(
 	FILES.GWL_Annotated_Names, 
-	 {fname,mname,lname}, 
+	 {fname,mname,lname, cnt}, 
 	 {Files.GWL_Annotated_Names}, 
 	 constants.KeyName_Annotated + doxie.Version_SuperKey );
 	 
@@ -88,5 +89,15 @@ EXPORT key_annotated_names := INDEX(
 	 EXPORT key_globalwatchlists_names := INDEX(FILES.GWL_Names,{entityid,recordid}, 
 	        {FILES.GWL_Names}, 
 	        constants.KeyName_gwl + doxie.Version_SuperKey + '::names');
-		
+	
+//Cloud Keys	
+	EXPORT key_patriot_file_delta 	:= INDEX(FILES.Patriot_delta_rid,{record_sid}, {FILES.Patriot_delta_rid},
+																				constants.Keyname_Patriot_file_delta + doxie.Version_SuperKey );
+	
+	EXPORT key_patriot_baddids_delta := INDEX(FILES.Patriot_delta_rid,{record_sid}, {FILES.Patriot_delta_rid},
+																				constants.Keyname_Patriot_baddids_delta + doxie.Version_SuperKey );	
+	
+	EXPORT key_patriot_annotated_names_delta := INDEX(FILES.Patriot_delta_rid,{record_sid}, {FILES.Patriot_delta_rid},
+																										constants.Keyname_Patriot_annotated_names_delta + doxie.Version_SuperKey );																				
+	
 END;

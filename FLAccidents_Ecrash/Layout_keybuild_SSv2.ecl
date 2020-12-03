@@ -242,12 +242,12 @@
 		//PRtCC new fields
 		STRING7 Citation_Issued;
 		STRING7 Citation_Type;
-		STRING100 Citation_Detail1;
+		STRING200 Citation_Detail1;
 		STRING60 Violation_Code1;
 		STRING60 Violation_Code2;
 		STRING60 Violation_Code3;
 		STRING60 Violation_Code4;
-		STRING1 Photographs_Taken;
+		STRING7 Photographs_Taken;
 		STRING100 Photographed_By;
 		STRING100 Photograph_Type;
 		STRING10 Posted_Satutory_Speed_Limit;

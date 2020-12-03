@@ -1,4 +1,5 @@
-﻿IMPORT _control, RoxieKeyBuild,AutoKeyB2,PRTE,_control, autokeyb,Business_Header_SS,business_header,ut,corp2,doxie,address,corp2_services, PRTE2_Common,dops,Prte2;
+﻿
+IMPORT _control, RoxieKeyBuild, PRTE, _control, ut, doxie, PRTE2_Common, dops,Prte2, orbit3;
 
 
 EXPORT proc_build_keys(string filedate,boolean skipDOPS=FALSE, string emailTo='') := FUNCTION
@@ -26,16 +27,17 @@ RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(keys.key_emailevent,
 	RoxieKeyBuild.MAC_SK_Move_v2('~prte::key::email_datav2::@version@::domain_lkp',  
 	'Q', 
 	move_qa_key_domainevent);
- 
- 
-	//---------- making DOPS optional -------------------------------
+  
+	orbit_update       := Orbit3.proc_Orbit3_CreateBuild('PRTE - EmailDataV2EventKeys', filedate, 'PN', email_list:= _control.MyInfo.EmailAddressNormal);
 	
 	notifyEmail					:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
 	NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it'); 
 	updatedops          :=  PRTE.UpdateVersion(constants.dops_dataset, filedate, notifyEmail, l_inloc:='B',l_inenvment:='N',l_includeboolean := 'N');	
-	PerformUpdateOrNot	:= IF(not skipDops,updatedops,NoUpdate);
+	
+	PerformUpdateOrNot	:= IF(not skipDops,parallel(updatedops,orbit_update),NoUpdate);
 	
 	key_validation :=  output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation'));
+ 
  
  RETURN 	Sequential(
               Parallel (Build_key_emailevent,Build_key_domainevent),
@@ -44,11 +46,6 @@ RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(keys.key_emailevent,
 					    PerformUpdateorNot,
 							key_validation);
 			
-			
-			
-			
-			
-    		
-		END;
+	END;
 
  

@@ -1,4 +1,8 @@
 ﻿
+
+IMPORT std, NAC_V2, wk_ut;
+
+;
 /*divide(INTEGER	dividend ,INTEGER	divisor) := FUNCTION
 	decimal8_2 x := (dividend*1000)/divisor;
 	x1 := ROUND(x);
@@ -59,6 +63,8 @@ EXPORT Print := MODULE
 	shared warningText := PROJECT(SORT(nac_v2.ValidationCodes.dsWarningCodes,errCode), TRANSFORM(dRow,
 								self.text := left.textValue + ' = WARNING - ' + left.msg;));
 
+
+
 	export NCR_Header := DATASET([
 				{'====================================== FIELD MESSAGES ==================================='},
 				{(string6)'STATE'
@@ -69,6 +75,7 @@ EXPORT Print := MODULE
 						+ (string8)'  COUNT'
 						+ (string6)'   PCT'}
 				], dRow);
+
 
 
 	// Legend for NCR2 report
@@ -112,9 +119,15 @@ EXPORT Print := MODULE
 																				integer nWarnings,		// total warnings
 																				string2 st='XX', boolean reject = false,  
 																				DATASET(NAC_V2.Layouts2.rItemSummary) programs,
-																				DATASET(NAC_V2.Layouts2.rItemSummary) types
-																				) := FUNCTION
+																				DATASET(NAC_V2.Layouts2.rItemSummary) types,
+																				BOOLEAN print_report_workunit) := FUNCTION
 
+// GroupID := STD.Str.ToLowerCase(lfn[6..9]);
+// boolean IsOnboarding(string gid) := NAC_V2.dNAC2Config(GroupID=gid)[1].Onboarding in ['y','Y'];
+// IsOnboardingMessage := IF(IsOnboarding(GroupID) = TRUE, GroupID + ' is in Production,the Incoming file will be FULLY ingested', GroupID + ' is onboarding, the Incoming file is STAGED for file validation only');
+// submit_cmd := 'NAC_V2.fn_Process_Daily_Internal_Report('+ '\'' + TRIM(lfn) + '\'' + ');' ;
+// troubleshooting_workunit := wk_ut.CreateWuid(submit_cmd, 'thor400_44_sla_eclcc', 'prod_esp.br.seisint.com');
+// workunit_message := IF(print_report_workunit, 'Troubleshooting Workunit: ' + troubleshooting_workunit,'');
 
   d_prog := programs(itemcode = 'D');  // DSNAP
 	UNSIGNED4	d_count :=  d_prog[1].counts;  
@@ -190,6 +203,11 @@ EXPORT Print := MODULE
 
 
 				ds := DATASET([{lfn}], dRow) 
+							& DATASET([{''}], dRow) 
+						//	& DATASET([{IsOnboardingMessage}], dRow) 	
+							& DATASET([{''}], dRow) 
+					//		& DATASET([{workunit_message}], dRow) 
+							& DATASET([{''}], dRow) 
 							& NCR_Header
 							& PROJECT(SORT(NCR_Samples(errs, nTotal, st),textValue), TRANSFORM(dRow,
 										self.text := (string6)left.state + (string6)left.RecordCode +
