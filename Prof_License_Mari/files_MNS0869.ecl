@@ -1,4 +1,4 @@
-// MNS0869 / Minnesotas Bookstore /	Real Estate // raw files
+﻿// MNS0869 / Minnesotas Bookstore /	Real Estate // raw files
 IMPORT ut, _control, Prof_License_Mari, Lib_FileServices;
 
 EXPORT files_MNS0869 := MODULE
