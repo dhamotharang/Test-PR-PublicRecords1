@@ -1,6 +1,4 @@
-﻿IMPORT ut, Scrubs, Codes, MDR, _validate, Codes, std;
-
-IMPORT Phonesplus_v2;
+﻿﻿IMPORT ut, Scrubs, Codes, MDR, _validate, Codes, std;
 
 EXPORT Functions := MODULE
 
@@ -61,13 +59,6 @@ EXPORT Functions := MODULE
   EXPORT fn_alpha(STRING alpha, UNSIGNED1 size = 0) := FUNCTION
     RETURN IF(IF(size = 0, LENGTH(TRIM(alpha, ALL)) > 0, LENGTH(TRIM(alpha, ALL)) = size) AND
               Stringlib.StringFilterOut(alpha, 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz') = '',1,0);
-  END;
-	
-	//****************************************************************************
-  //fn_alphaNum_or_blank: 	returns true if only populated with letters, numbers or blank
-  //****************************************************************************
-  EXPORT fn_alphaNum_or_blank(STRING s) := FUNCTION
-    RETURN IF(Stringlib.StringFilterOut(s, ' 1234567890AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz') = '',1,0);
   END;
   
   //****************************************************************************
@@ -395,14 +386,6 @@ EXPORT Functions := MODULE
     RETURN IF(regexfind('^[-]?\\d+\\.\\d+$', geo_clean) OR geo_clean = '', 1, 0);
   END;
 
-  //****************************************************************************
-  //fn_Valid_Country3Abbrev: returns true if there is a valid country
-  //                         abbreviation or if the code is empty.
-  //****************************************************************************
-  EXPORT fn_Valid_Country3Abbrev(STRING cntry) := FUNCTION
-    RETURN IF(cntry = '' OR ut.Country_ISO3_To_Name(cntry) != '', 1, 0);
-  END;
-
 
     
 
@@ -462,56 +445,5 @@ END;
 //*********************************************************//
 //***************END BUSINESS SECTION**********************//
 //*********************************************************//
-EXPORT fn_Valid_Phone(string no) := FUNCTION 
-
-  isPhoneValid := Phonesplus_v2.Fn_Is_Phone_Valid(no,false);
-  isBlank := no = '';
-  RETURN IF(
-    isPhoneValid OR isBlank,
-    1,
-    0
-  );
-END;
-
-EXPORT fn_Valid_DL(string dl) := FUNCTION 
-  trimmedDL := Trim(dl,all);
-  cleanDL := STD.str.filterout(trimmedDL, '-');
-  doesHaveNums := STD.str.filter(cleanDL,'0123456789') <> '';
-  isRightLength := LENGTH(cleanDL) > 3 AND LENGTH(cleanDL) < 13;
-  isBlank := trimmedDL = '';
-  return IF(
-            (doesHaveNums AND isRightLength) OR isBlank
-            ,1
-            ,0
-          );
-END;
-
-EXPORT fn_valid_email(string em) := FUNCTION
-
-  cleanEm         := TRIM(em,ALL);
-  rgxEmail        := '^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$';
-  isValidEmail    := REGEXFIND(rgxEmail, cleanEm);
-  isBlank         := LENGTH(cleanEm) = 0;
-
-  return if(
-              isValidEmail OR isBlank
-              ,1
-              ,0
-            );
-
-END;
-
-EXPORT fn_valid_IP(string ip) := FUNCTION
-  cleanIp      := TRIM(ip,whitespace);
-  isIPV4      := STD.str.filterOut(cleanIp, '0123456789') = '...';
-  isMinLength := LENGTH(cleanIp) > 6 AND LENGTH(cleanIP) < 16;
-  isBlank     := LENGTH(cleanIp) = 0;
-
-  return if(
-            (isIPV4 AND isMinLength) or isBlank
-            ,1
-            ,0
-          );
-END;
     
 END; //End Functions Module
