@@ -2,7 +2,7 @@
 
 export map_basefile_inquiry(string filedate) := function
 
-d 		:= InFile_NtlAccidents_Alpharetta.cmbnd_inq(first_name_1+middle_name_1+last_name_1+vin !='');
+d 		:= InFile_NtlAccidents_Alpharetta.cmbnd_ntl_inq(first_name_1+middle_name_1+last_name_1+vin !='');
 
 vina	:= VehLic.File_VINA;
 dvina := distribute(vina,hash(vin_input));
