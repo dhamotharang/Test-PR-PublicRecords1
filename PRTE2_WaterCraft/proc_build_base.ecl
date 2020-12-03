@@ -127,25 +127,14 @@ pBoca	:= PROJECT(dsCleanBocaOut, xfrmBoca(left));
 fPrevRecs	:= pBoca(trim(cust_name) = ''); //previous production records
 fNewRecs	:= pBoca(trim(cust_name) != ''); //New added records
 	
-//Clean name/business/address
-lCleanAddr	:= RECORD
-	PRTE2_Watercraft.Layouts.Base_new;
-	STRING prep_address_first;
-	STRING prep_address_last;
-END;
-
-lCleanAddr	AddFullAddr(fNewRecs L) := TRANSFORM
-	self.prep_address_first := Address.fn_addr_clean_prep(TRIM(L.orig_address_1)+' '+TRIM(L.orig_address_2), 'first'); 
-	self.prep_address_last 	:= Address.fn_addr_clean_prep(TRIM(L.orig_city)+ ', '+TRIM(L.orig_state)+' '+TRIM(L.orig_zip), 'last');
-	self	:= L;
-	self	:= [];
-END;
-
-PrepAddr	:= PROJECT(fNewRecs, AddFullAddr(LEFT));
-
-unsigned4	lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;
-
-AID.MacAppendFromRaw_2Line(PrepAddr, prep_address_first, prep_address_last, RawAID, addr_clean, lFlags);
+addr_clean := PRTE2.AddressCleaner(fNewRecs,
+																				['orig_address_1'],
+																				['dummy'], //blank field, not used but passed for attribute purposes
+                                        ['orig_city'],
+                                        ['orig_state'],
+                                        ['orig_zip'],
+                                        ['clean_address'],
+                                        ['addr_rawaid']);
 	
 //Clean names, map clean address fields	
 PRTE2_Watercraft.Layouts.Base_New CleanNameAddr(addr_clean L) := TRANSFORM
@@ -161,43 +150,27 @@ PRTE2_Watercraft.Layouts.Base_New CleanNameAddr(addr_clean L) := TRANSFORM
 	self.company_name				:= IF(trim(L.orig_fein) != '',ut.CleanSpacesAndUpper(L.orig_name),'');
 	
 	//clean address
-	self.prim_range     :=  l.AIDWork_ACECache.prim_range;
-	self.predir         :=  l.AIDWork_ACECache.predir;
-	self.prim_name      :=  l.AIDWork_ACECache.prim_name;;
-	self.suffix    			:=  l.AIDWork_ACECache.addr_suffix;
-	self.postdir        :=  l.AIDWork_ACECache.postdir;
-	self.unit_desig	   	:=	l.AIDWork_AceCache.unit_desig;
-	self.sec_range      :=  l.AIDWork_ACECache.sec_range;
-	self.p_city_name    :=  l.AIDWork_ACECache.p_city_name;
-	self.v_city_name    :=  l.AIDWork_ACECache.v_city_name;
-	self.st             :=  l.AIDWork_ACECache.st;
-	self.zip5           :=  l.aidwork_acecache.zip5;
-	self.zip4           :=  l.aidwork_acecache.zip4;
-	self.cart		       	:=	l.AIDWork_AceCache.cart;
-	self.cr_sort_sz	   	:=	l.AIDWork_AceCache.cr_sort_sz;
-	self.lot		       	:=	l.AIDWork_AceCache.lot;
-	self.lot_order		  :=	l.AIDWork_AceCache.lot_order;
-	self.dpbc		       	:=	l.AIDWork_AceCache.dbpc;
-	self.chk_digit		  :=	l.AIDWork_AceCache.chk_digit;
-	self.rec_type	      :=	l.AIDWork_AceCache.rec_type;
-	self.county	       	:=	l.AIDWork_AceCache.county;
-	self.geo_lat		   	:=	l.AIDWork_AceCache.geo_lat;
-	self.geo_long		   	:=	l.AIDWork_AceCache.geo_long;
-	self.msa			   		:=	l.AIDWork_AceCache.msa;
-	self.geo_blk		   	:=	l.AIDWork_AceCache.geo_blk;
-	self.geo_match		  :=	l.AIDWork_AceCache.geo_match;
-	self.err_stat		   	:=	l.AIDWork_AceCache.err_stat;
-	self.RawAID	   			:=	l.AIDWork_RawAID;
-	self := L;
-	self := [];
+	self.suffix						:= L.clean_address.addr_suffix;
+	self.zip5							:= L.clean_address.zip;
+	self.county						:= L.clean_address.fips_county;
+	self.ace_fips_st  		:= L.clean_address.fips_state;
+	self.ace_fips_county	:= L.clean_address.fips_county;
+	self.dpbc             := L.clean_address.dbpc;
+	self 									:= L.clean_address;
+	self.RawAID	   				:= L.addr_rawaid;
+	self 			:= L;
+	self 			:= [];
 END;
 
 ClnBocaBase	:= PROJECT(addr_clean, CleanNameAddr(left));
 
 //Append ID's
 PRTE2_Watercraft.Layouts.Base_New AddLinkID(ClnBocaBase L) := TRANSFORM
-	self.bdid						:= IF(trim(L.company_name) != '', (string)Prte2.fn_AppendFakeID.bdid(L.company_name, L.prim_range, L.prim_name, L.v_city_name, L.st, L.zip5, L.cust_name),'');
-	self.DID						:= IF(trim(L.lname) != '', (string)prte2.fn_AppendFakeID.did(L.fname, L.lname, L.link_ssn, L.link_dob, L.cust_name), '');
+  self.fein		:= L.link_fein;
+	self.bdid		:= IF(trim(L.company_name) != '', (string)Prte2.fn_AppendFakeID.bdid(L.company_name, L.prim_range, L.prim_name, L.v_city_name, L.st, L.zip5, L.cust_name),'');
+	self.DID		:= If(L.did <> '', L.did,	
+											IF(trim(L.lname) != '', (string)prte2.fn_AppendFakeID.did(L.fname, L.lname, L.link_ssn, L.link_dob, L.cust_name), 
+												''));
 
 	vLinkingIds := prte2.fn_AppendFakeID.LinkIds(L.company_name, L.link_fein, L.link_inc_date, L.prim_range, L.prim_name, L.sec_range, L.v_city_name, L.st, L.zip5, L.cust_name);
 	self.powid	:= vLinkingIds.powid;

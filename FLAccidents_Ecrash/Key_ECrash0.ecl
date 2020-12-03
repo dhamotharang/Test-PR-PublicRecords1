@@ -109,7 +109,7 @@ pntl := project(ntlFile,slimrec(left));
 
 // inquiry file 
 
-inqFile := FLAccidents_Ecrash.File_CRU_inquiries; 
+inqFile := FLAccidents.File_CRU_inquiries; 
 
 pflc0 slimrecinq(inqFile L) := transform
 

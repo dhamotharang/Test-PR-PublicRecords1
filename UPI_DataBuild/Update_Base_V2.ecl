@@ -602,9 +602,9 @@ EXPORT Update_Base_V2 (
 																													,'')
 																,SELF           		:= LEFT));
 																
-				dedup_base	:= dedup(sort(new_base, record, local), record, local);	
+				// dedup_base	:= dedup(sort(new_base, record, local), record, local);	
 					
-   		RETURN sort(dedup_base, batch_seq_number);
+   		RETURN distribute(new_base);
    	END; 
 		
 		EXPORT PrepReturn			:= FUNCTION

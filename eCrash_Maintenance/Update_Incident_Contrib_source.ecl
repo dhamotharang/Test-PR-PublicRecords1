@@ -8,16 +8,15 @@ Layout_Incident_CS := RECORD
   STRING incident_id;
   STRING contrib_source;
   STRING vendor_code;
-  STRING is_deleted;
-  STRING date_deleted;
 END;
 
-//Below is the extract from eCrash team with Contrib Source info available for the blank ContribSource incidents from 2016 till 20201105
-ds_incident_CS :=	DATASET(Location + 'thor::spray::ecrash::incidents::2016_contrib_source_null_hpcc_file', 
+//Below are the extracts from eCrash team with Contrib Source info available for the blank ContribSource incidents from 2016 till 20201105
+// ds_incident_CS :=	DATASET(Location + 'thor::spray::ecrash::incidents::2016_contrib_source_null_hpcc_file', 
+ds_incident_CS :=	DATASET(Location + 'thor::spray::ecrash::incidents::2016_contrib_source_null_hpcc_file::delta_20201118', 
                           Layout_Incident_CS,
                           CSV(HEADING(single), TERMINATOR('\n'), SEPARATOR(','), QUOTE('"')));
 FLAccidents_Ecrash.mac_CleanFields(ds_incident_CS, Clean_ds_incident_CS);
-ds_incident_CS_Uniq := DEDUP(Clean_ds_incident_CS, ALL);
+ds_incident_CS_Uniq := DEDUP(Clean_ds_incident_CS, incident_id);
 													
 Layout_Incident := FLAccidents_Ecrash.Layout_Infiles.incident_new;
 ds_incident := FLAccidents_Ecrash.Infiles.incident;                  
@@ -28,11 +27,10 @@ Layout_Incident tUpdateContribSrc(ds_incident L, ds_incident_CS_Uniq R) := TRANS
 END;
 
 Update_Incident_CS := JOIN(ds_incident, ds_incident_CS_Uniq,
-					                 TRIM(LEFT.incident_id, LEFT, RIGHT) = TRIM(RIGHT.incident_id, LEFT, RIGHT) AND
-													 STD.Str.ToUpperCase(TRIM(LEFT.Vendor_Code, LEFT, RIGHT)) = STD.Str.ToUpperCase(TRIM(RIGHT.Vendor_Code, LEFT, RIGHT)),
-					                 tUpdateContribSrc(LEFT, RIGHT), LEFT OUTER);
+					                 TRIM(LEFT.incident_id, LEFT, RIGHT) = TRIM(RIGHT.incident_id, LEFT, RIGHT),
+					                 tUpdateContribSrc(LEFT, RIGHT), LEFT OUTER, LOOKUP);
  					
-ds_Incident_Upd_Out := OUTPUT(Update_Incident_CS ,, Files.Incident_Raw_LF('PopulateContribSource'), OVERWRITE, __COMPRESSED__,
+ds_Incident_Upd_Out := OUTPUT(Update_Incident_CS ,, Files.Incident_Raw_LF('PopulateContribSource_delta'), OVERWRITE, __COMPRESSED__,
 					                    CSV(TERMINATOR('\n'), SEPARATOR(','), QUOTE('"')));
  
 Updated_Incident_Raw := SEQUENTIAL(
@@ -40,7 +38,7 @@ Updated_Incident_Raw := SEQUENTIAL(
 												        STD.File.StartSuperFileTransaction(),
 												        STD.File.ClearSuperFile(Files.Incident_Raw_SF, FALSE),
 												        STD.File.AddSuperFile(Files.Incident_Raw_SF, 
-																                      Files.Incident_Raw_LF('PopulateContribSource')),
+																                      Files.Incident_Raw_LF('PopulateContribSource_delta')),
 												        STD.File.FinishSuperFileTransaction()
 												       );
  RETURN Updated_Incident_Raw;

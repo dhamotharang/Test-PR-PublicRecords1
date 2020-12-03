@@ -129,7 +129,7 @@ EXPORT Layouts := MODULE
     InputB.Sprayed.DEACTV_DT;
     STRING10    CLEANED_DEACTV_DT;
     InputB.Sprayed.XREF_HCE_ID;
-    STRING10    Clean_Phone := 0;
+    STRING10    Clean_Phone := '';
     Address.Layout_Clean_Name;
     STRING100   prep_addr_line1 := '';
     STRING50    prep_addr_line_last := '';

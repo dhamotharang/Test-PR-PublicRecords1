@@ -1,23 +1,23 @@
-IMPORT  doxie,mdr,BIPV2, Data_Services;
+﻿IMPORT  doxie,mdr,BIPV2, Data_Services;
 
 EXPORT keys := MODULE
 
-  EXPORT key_oshairaccident := INDEX(FILES.NewKeyBuild_accident, {activity_number},  {files.NewKeyBuild_accident},
+  EXPORT key_oshairaccident := INDEX(FILES.NewKeyBuild_accident2, {activity_number},  {files.NewKeyBuild_accident2},
 	constants.KeyName_oshair + 'accident_@version@');
 
-  EXPORT key_oshairinspection := INDEX(FILES.file_out_inspection_cleaned, {activity_number},{files.file_out_inspection_cleaned}, 
+  EXPORT key_oshairinspection := INDEX(FILES.file_out_inspection_cleaned2, {activity_number},{files.file_out_inspection_cleaned2}, 
   constants.KeyName_oshair + 'inspection_@version@');  
 	
-	 EXPORT key_oshairviolations := INDEX(FILES.NewKeyBuild_violations,{activity_number},{FILES.NewKeyBuild_violations}, 
+	 EXPORT key_oshairviolations := INDEX(FILES.NewKeyBuild_violations2,{activity_number},{FILES.NewKeyBuild_violations2}, 
 	 constants.KeyName_oshair + 'violations_@version@');  
 	 
-	  EXPORT key_oshairhazardous_substance := INDEX(FILES.NewKeyBuild_substance,{activity_number},{FILES.NewKeyBuild_substance},
+	  EXPORT key_oshairhazardous_substance := INDEX(FILES.NewKeyBuild_substance2,{activity_number},{FILES.NewKeyBuild_substance2},
 	  constants.KeyName_oshair + 'substance_@version@');  
 	
  EXPORT key_oshairbdid := INDEX(FILES.tbl_bdid,{bdid}, {Activity_Number},
    constants.KeyName_oshair + 'Bdid_@version@'); 
 	 
-	EXPORT key_oshairprogram := INDEX(FILES.NewKeyBuild_program, {activity_number},{files.NewKeyBuild_program}, 
+	EXPORT key_oshairprogram := INDEX(FILES.NewKeyBuild_program2, {activity_number},{files.NewKeyBuild_program2}, 
 	 constants.KeyName_oshair + 'program_@version@');
 
  
@@ -33,8 +33,15 @@ EXPORT LinkIds := MODULE
   end;
 
   NewKeyBuild	:=	project(Base, TRANSFORM(slimLayout,SELF := LEFT;));
-
-	BIPV2.IDmacros.mac_IndexWithXLinkIDs(NewKeyBuild, k, constants.KeyName_oshair + 'linkids_@version@');
+	
+	NewKeyBuild2	:=	project(NewKeyBuild,
+	                  TRANSFORM(layouts.linkids2,
+										              self:=LEFT; 
+                                  self:=[];
+                                  ));
+	
+	
+	BIPV2.IDmacros.mac_IndexWithXLinkIDs(NewKeyBuild2, k, constants.KeyName_oshair + 'linkids_@version@');
 	EXPORT Key := k;
 
 	EXPORT kFetch2(

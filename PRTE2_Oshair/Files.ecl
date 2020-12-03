@@ -1,4 +1,4 @@
-Import Oshair,address;
+﻿Import Oshair,address;
 EXPORT files := module
 
 EXPORT Accident_IN := DATASET(constants.In_Accident, Layouts.Accident, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
@@ -34,6 +34,13 @@ end;
 
 export NewKeyBuild_program	:=	project(f_oshair_program, TRANSFORM(slimLayout_program,SELF := LEFT;));
 
+export NewKeyBuild_program2	:=	project(NewKeyBuild_program,
+                                TRANSFORM(layouts.program2,
+																	self:=LEFT; 
+                                  self:=[];
+                                  ));
+
+
 //accident
 Export f_oshair	:=	Project(accident_Base,
 Transform(layouts.layout_OSHAIR_accident_clean,
@@ -60,6 +67,14 @@ slimLayout ClnAddr(f_oshair l) := TRANSFORM
 	end;
 export NewKeyBuild_Accident	:= PROJECT(f_oshair, ClnAddr(LEFT));
 
+Export NewKeyBuild_Accident2:=project(NewKeyBuild_Accident,
+Transform(layouts.accident2,
+Self:=Left;
+self := []; 
+));
+
+//export NewKeyBuild_Accident2:=project(NewKeyBuild_Accident,layouts.accident2);
+
 
 //inspection
 export file_out_inspection_cleaned_both := project(Inspection_base,
@@ -69,6 +84,13 @@ self:=[];
 ));
 
 export file_out_inspection_cleaned := project(file_out_inspection_cleaned_both,layouts.layout_OSHAIR_inspection_clean);
+
+
+Export file_out_inspection_cleaned2	:=	project(file_out_inspection_cleaned, 
+                                  TRANSFORM(layouts.inspection2,
+																	self:=LEFT; 
+                                  self:=[];
+                                  ));
 
 //bdid
 
@@ -100,6 +122,17 @@ slimLayout_substance	:=	record
 end;
 
 Export NewKeyBuild_substance	:=	project(file_out_hazardous_substance_cleaned, TRANSFORM(slimLayout_substance,SELF := LEFT;));
-																				           
+
+Export NewKeyBuild_substance2	:=	project(NewKeyBuild_substance, 
+                                  TRANSFORM(layouts.substance2,
+																	self:=LEFT; 
+                                  self:=[];
+                                  ));
+		
+Export NewKeyBuild_violations2	:=	project(NewKeyBuild_violations, 
+                                  TRANSFORM(layouts.violations2,
+																	self:=LEFT; 
+                                  self:=[];
+                                  ));		
 
 END;
