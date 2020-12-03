@@ -51,6 +51,10 @@ FUNCTION
     SELF.zip                     := IF(isAddrMissing, ri.zip, le.zip);
     SELF.zip4                    := IF(isAddrMissing, ri.zip4, le.zip4);
     SELF.phn_src_all             := le.phn_src_all + ri.phn_src_all;
+    SELF.imei_Tenure_MinDays     := IF(le.imei_Tenure_MinDays != 0, le.imei_Tenure_MinDays, ri.imei_Tenure_MinDays);
+    SELF.imei_Tenure_MaxDays     := IF(le.imei_Tenure_MaxDays != 0, le.imei_Tenure_MaxDays, ri.imei_Tenure_MaxDays);
+    SELF.sim_Tenure_MinDays      := IF(le.sim_Tenure_MinDays != 0, le.sim_Tenure_MinDays, ri.sim_Tenure_MinDays);
+    SELF.sim_Tenure_MaxDays      := IF(le.sim_Tenure_MaxDays != 0, le.sim_Tenure_MaxDays, ri.sim_Tenure_MaxDays);
     SELF                         := le;
   END;
 
