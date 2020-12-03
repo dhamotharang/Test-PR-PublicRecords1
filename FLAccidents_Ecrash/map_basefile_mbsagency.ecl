@@ -2,7 +2,7 @@
   sAgency := Files_MBSAgency.DS_SPRAY_AGENCY;  
 	
 	mac_CleanFields(sAgency, sCleanAgency);
-  dCleanAgency := dedup(sCleanAgency, all);
+  dCleanAgency := DEDUP(sCleanAgency, all);
 	
   pAgency := PROJECT(dCleanAgency, TRANSFORM(Layout_Infiles_Fixed.agency_contrib_source, 
                             SELF.agency_id := IF(TRIM(Left.agency_id,LEFT,RIGHT) <>'', LEFT.agency_id,ERROR('agency file bad')),

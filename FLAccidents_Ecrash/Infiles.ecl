@@ -4,27 +4,12 @@ EXPORT Infiles := MODULE
 
 // ###########################################################################
 //                        MBS Agency Raw File
-// ###########################################################################
-  Agency_Raw := DATASET(Data_Services.foreign_prod + 'thor_data400::in::ecrash::agency'
-											  ,Layout_Infiles.agency
-											  ,CSV(TERMINATOR(['|\n', '\n', '\nr', '\r', '\rn']), SEPARATOR('|\t|'), QUOTE('"')))(Agency_ID <> 'Agency_ID');
-  mac_CleanFields(Agency_Raw, CleanAgency);
-  EXPORT Agency0 := DEDUP(CleanAgency, ALL);
-	
-  SHARED AgencyInput := PROJECT(Agency0, TRANSFORM(Layout_Infiles_Fixed.agency, 
+// ###########################################################################	
+  EXPORT Agency := Files_MBSAgency.DS_BASE_AGENCY;	
+	SHARED AgencyInput := PROJECT(Agency, TRANSFORM(Layout_Infiles_Fixed.agency, 
                                 SELF.agency_id := IF(TRIM(LEFT.agency_id, LEFT, RIGHT) <> '', LEFT.agency_id, ERROR('agency file bad')),
-                                SELF.agency_name := LEFT.agency_name;
-                                SELF.source_id := LEFT.source_id;
-                                SELF.agency_state_abbr := LEFT.agency_state_abbr;
-                                SELF.agency_ori := LEFT.agency_ori;
-                                SELF.append_overwrite_flag := LEFT.append_overwrite_flag;
                                 SELF := LEFT));
-																
-  Layout_Infiles_Fixed.agency_contrib_source addTermination(AgencyInput L) := TRANSFORM
-		SELF := L;
-		SELF := [];
-  END;
-  EXPORT Agency := PROJECT(AgencyInput, addTermination(LEFT));	
+	
   SHARED uAgency := DEDUP(SORT(DISTRIBUTE(Agency(Agency_ID <> ''), HASH32(Agency_ID)), 
                                Agency_ID, -(Agency_Name <> ''), LOCAL), 
 												  Agency_ID, LOCAL);
