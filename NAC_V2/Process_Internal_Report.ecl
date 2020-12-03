@@ -3,7 +3,7 @@
 IMPORT  Std, NAC_V2; 
 
 
-EXPORT fn_Process_Daily_Internal_Report(STRING100 ncf2_file_name)  := FUNCTION
+EXPORT Process_Internal_Report(STRING100 ncf2_file_name)  := FUNCTION
 //  param example 'ncf2_file_name 'ncf2_la01_20201007_195638.dat';
 
 

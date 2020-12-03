@@ -128,13 +128,9 @@ boolean IsOnboarding(string gid) := NAC_V2.dNAC2Config(GroupID=gid)[1].Onboardin
 IsOnboardingMessage := IF(IsOnboarding(GroupID) = FALSE, 
 		STD.Str.toUpperCase(GroupID) + ' is in Production, file will be FULLY ingested. ', 
 		STD.Str.toUpperCase(GroupID) + ' is onboarding, file is STAGED for file validation only. ');
-submit_cmd := 'NAC_V2.fn_Process_Daily_Internal_Report('+ '\'' + TRIM(lfn) + '\'' + ');' ;
-troubleshooting_workunit := wk_ut.CreateWuid(submit_cmd, 'thor400_44_sla_eclcc', 'prod_esp.br.seisint.com');
-workunit_message := 'Troubleshooting: ' + troubleshooting_workunit;
 
 internal_use_message := IF(show_email_message, '*** For Internal Use only ***', '');
-messages := IsOnboardingMessage + '\n' + workunit_message;
-show_messages := IF(show_email_message, messages, '');
+onboarding_message := IF(show_email_message, IsOnboardingMessage, '');
 
   d_prog := programs(itemcode = 'D');  // DSNAP
 	UNSIGNED4	d_count :=  d_prog[1].counts;  
@@ -211,7 +207,7 @@ show_messages := IF(show_email_message, messages, '');
 
 				ds := DATASET([{lfn}], dRow) 
 						 	& DATASET([{internal_use_message}], dRow) 
-							& DATASET([{show_messages}], dRow) 	
+							& DATASET([{onboarding_message}], dRow) 	
 							& NCR_Header
 							& PROJECT(SORT(NCR_Samples(errs, nTotal, st),textValue), TRANSFORM(dRow,
 										self.text := (string6)left.state + (string6)left.RecordCode +
