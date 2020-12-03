@@ -8,18 +8,18 @@ EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_AlphaNumD
 EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'Invalid_AlphaNumDash' => 1,'Invalid_AlphaNumPunc' => 2,'Invalid_num' => 3,'Invalid_AlphaState' => 4,0);
 
 EXPORT MakeFT_Invalid_AlphaNumDash(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_- '); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_- '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_AlphaNumDash(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_- '))));
-EXPORT InValidMessageFT_Invalid_AlphaNumDash(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_- '),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_AlphaNumDash(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_- '))));
+EXPORT InValidMessageFT_Invalid_AlphaNumDash(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_- '),SALT311.HygieneErrors.Good);
 
 EXPORT MakeFT_Invalid_AlphaNumPunc(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ. '); // Only allow valid symbols
+  s1 := SALT311.stringfilter(s0,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz. '); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_AlphaNumPunc(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ. '))));
-EXPORT InValidMessageFT_Invalid_AlphaNumPunc(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ. '),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_AlphaNumPunc(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz. '))));
+EXPORT InValidMessageFT_Invalid_AlphaNumPunc(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz. '),SALT311.HygieneErrors.Good);
 
 EXPORT MakeFT_Invalid_num(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'12345'); // Only allow valid symbols

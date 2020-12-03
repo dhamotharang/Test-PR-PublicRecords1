@@ -7,12 +7,12 @@ IMPORT scrubs_tris_lnssi,SALT311;
   ip := DISTRIBUTE(infile, SKEW(0.1));
   h := scrubs_tris_lnssi.hygiene(ip);
   p := h.AllProfiles; // Detailed profile of every field
-  //OUTPUT(h.Summary('SummaryReport'),ALL,NAMED('Summary'));
-  //OUTPUT(h.invSummary,NAMED('InvertedSummary'),ALL);
+  OUTPUT(h.Summary('SummaryReport'),ALL,NAMED('Summary'));
+  OUTPUT(h.invSummary,NAMED('InvertedSummary'),ALL);
   OUTPUT(p,NAMED('AllProfiles'),ALL); // Detailed profile of every field
-  //OUTPUT(h.Correlations,NAMED('Correlations'),ALL); // Which fields are related to which other fields
-  //OUTPUT(h.ValidityErrors,NAMED('ValidityErrors'),ALL); // Violations of FieldType statements
-  //OUTPUT(SALT311.MAC_Character_Counts.EclRecord(p,'Layout_tris_lnssi'),NAMED('OptimizedLayout'));// File layout suggested by data
+  OUTPUT(h.Correlations,NAMED('Correlations'),ALL); // Which fields are related to which other fields
+  OUTPUT(h.ValidityErrors,NAMED('ValidityErrors'),ALL); // Violations of FieldType statements
+  OUTPUT(SALT311.MAC_Character_Counts.EclRecord(p,'Layout_tris_lnssi'),NAMED('OptimizedLayout'));// File layout suggested by data
   // Produces field types that match the most common 99.9% of your data. Change to 100 to match all your data
   OUTPUT(SALT311.MAC_Character_Counts.FieldTypes(p,99.9),NAMED('Types'));
   // ****** Cross Tabs *******

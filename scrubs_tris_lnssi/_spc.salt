@@ -3,10 +3,10 @@ MODULE:scrubs_tris_lnssi
 FILENAME:tris_lnssi
 
 // contrib_risk_field
-FIELDTYPE:Invalid_AlphaNumDash:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_- )
+FIELDTYPE:Invalid_AlphaNumDash:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_- )
 
 // contrib_risk_value 
-FIELDTYPE:Invalid_AlphaNumPunc:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ. )
+FIELDTYPE:Invalid_AlphaNumPunc:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz. )
 
 // contrib_risk_attr
 FIELDTYPE:Invalid_num:ALLOW(12345)
