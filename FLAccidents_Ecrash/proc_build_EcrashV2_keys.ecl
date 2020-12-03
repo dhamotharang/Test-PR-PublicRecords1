@@ -62,9 +62,6 @@ RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.Key_ecrash6
 RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.Key_ecrash7
 									   ,'~thor_data400::key::ecrash::' +filedate+'::ecrash7'
 					  			       ,'~thor_data400::key::ecrash7',bk7,2);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(flaccidents_ecrash.Key_ecrash8
-									   ,'~thor_data400::key::ecrash::' +filedate+'::ecrash8'
-					  			       ,'~thor_data400::key::ecrash8',bk8,2);	
 RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.Key_eCrashv2_Supplemental
 									   ,'~thor_data400::key::ecrashv2::' +filedate+'::Supplemental'
 					  			       ,'~thor_data400::key::ecrashv2_Supplemental',bk_Supplemental,2);
@@ -138,7 +135,7 @@ RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_ECrash.Key_eCrashv2_PhotoId
 																				,'~thor_data400::key::eCrashv2::' +filedate+'::PhotoId'
 																				,'~thor_data400::key::eCrashv2_PhotoId',bk_PhotoId,2);				
 		
-build_keys := parallel(bk_did,bk_accnbr,bk_accnbrv1,bk_Unrestricted_accnbrv1,bk_bdid,bk_dlnbr,bk_tagnbr,bk_vin,bk_dol,bk_linkids,bk0,bk1,bk3,bk5,bk6,bk7,bk8,bk_agencyid,bk_DOW,bkMOY,bkHOD,bkCol,bkInter,
+build_keys := parallel(bk_did,bk_accnbr,bk_accnbrv1,bk_Unrestricted_accnbrv1,bk_bdid,bk_dlnbr,bk_tagnbr,bk_vin,bk_dol,bk_linkids,bk0,bk1,bk3,bk5,bk6,bk7,bk_agencyid,bk_DOW,bkMOY,bkHOD,bkCol,bkInter,
                        bk_Supplemental,bk_ReportId,bk_agency,bk_PrefName_State,bk_agencyId_sentdate,bk_StAndLocation,bk_ReportLinkId,
 											 bk_LastName, bk_photoId, bk_dlnnbrdlstate, bk_licenseplatenbr, bk_officerbadgenbr, bk_vinnbr);
 
@@ -207,9 +204,6 @@ RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrash::' +filedate+'::e
 RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrash::' +filedate+'::ecrash7'
                                   ,'~thor_data400::key::ecrash7'
 								  ,move8);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrash::' +filedate+'::ecrash8'
-                                  ,'~thor_data400::key::ecrash8'
-								  ,move9);
 
 RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::ecrashv2::' +filedate+'::Supplemental'
                                   ,'~thor_data400::key::ecrashv2_Supplemental'
@@ -283,7 +277,7 @@ RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::eCrashv2::' +filedate+':
 RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::eCrashv2::' +filedate+'::PhotoId'
 																		,'~thor_data400::key::eCrashv2_PhotoId'
 																		,movePhotoId);								
-move_build_keys := parallel(move10,move11,move11V1,move11V1_1,move12,move13,move14,move15,move18,move1,move2,move4,move6,move7,move8,move9,moveAgencyID,
+move_build_keys := parallel(move10,move11,move11V1,move11V1_1,move12,move13,move14,move15,move18,move1,move2,move4,move6,move7,move8,moveAgencyID,
                             moveDOW,moveMOY,moveHOD,moveCol,moveinter,moveSupplemental,moveReportId, movePrefName_State,moveagency,moveagencyId_sentdate,
 														moveStAndLocation,moveReportLinkId,moveLastName, movePhotoId, movedlnnbrdlstate, movelicenseplatenbr, moveofficerbadgenbr, movevinnbr);
 
@@ -308,7 +302,6 @@ RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrash4',    'Q', moveq5);
 RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrash5',    'Q', moveq6);
 RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrash6',    'Q', moveq7);
 RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrash7',    'Q', moveq8);
-RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrash8',    'Q', moveq9);
 RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2::analytics_byAgencyID',    'Q', moveqAgencyID);
 RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashV2::analytics_byDOW',    'Q', moveqDOW);
 RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashV2::analytics_byMOY',    'Q', moveqMOY);
@@ -330,7 +323,7 @@ RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_dlnnbrdlstate','Q', m
 RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_licenseplatenbr','Q', moveqlicenseplatenbr);
 RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_officerbadgenbr','Q', moveqofficerbadgenbr);
 RoxieKeyBuild.Mac_SK_Move_V3('~thor_data400::key::ecrashv2_vinnbr','Q', moveqvinnbr);
-move_qa_keys := parallel(moveq10,moveq11,moveq11v1,moveq11v1_1,moveq12,moveq13,moveq14,moveq15,moveq18,moveq1,moveq2,moveq4,moveq6,moveq7,moveq8,moveq9,moveqAgencyID,moveqDOW,
+move_qa_keys := parallel(moveq10,moveq11,moveq11v1,moveq11v1_1,moveq12,moveq13,moveq14,moveq15,moveq18,moveq1,moveq2,moveq4,moveq6,moveq7,moveq8,moveqAgencyID,moveqDOW,
                          moveqMOY,moveqHOD,moveqCollision,moveqInter,moveqSupplemental,moveqReportId, moveqPrefName_State,moveqagencyId_sentdate,moveqStAndLocation,
 												 moveqReportLinkId,moveqLastName,moveqPhoto,moveqagency, moveqdlnnbrdlstate, moveqlicenseplatenbr, moveqofficerbadgenbr, moveqvinnbr);
 

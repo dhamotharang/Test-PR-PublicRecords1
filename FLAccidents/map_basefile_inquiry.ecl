@@ -1,8 +1,8 @@
-﻿import Address,ut,did_add,business_header_ss,header_slimsort,VehLic,didville,driversv2,idl_header,flaccidents,STD;
+﻿import Address,ut,did_add,business_header_ss,header_slimsort,VehLic,didville,driversv2,idl_header,STD;
 
 export map_basefile_inquiry(string filedate) := function
 
-d 		:= FLAccidents.InFile_NtlAccidents_Alpharetta.cmbnd_inq(first_name_1+middle_name_1+last_name_1+vin !='');
+d 		:= InFile_NtlAccidents_Alpharetta.cmbnd_inq(first_name_1+middle_name_1+last_name_1+vin !='');
 
 vina	:= VehLic.File_VINA;
 dvina := distribute(vina,hash(vin_input));
@@ -34,7 +34,7 @@ Address.MAC_Address_Clean(PrecsNBlankAddr,temp_addr1,temp_addr2,true,appndAddr);
 cleanAddr := appndAddr +project(PrecsBlankAddr, transform({appndAddr}, self.clean :='', self := left));	
 
 //Parse appended 182 byte clean address field
-FLAccidents_Ecrash.Layout_CRU_inquiries trecs2(cleanAddr L, uvina R) := transform
+Layout_CRU_inquiries trecs2(cleanAddr L, uvina R) := transform
 
 string8     fSlashedMDYtoCYMD(string pDateIn) :=
 intformat((integer2)regexreplace('.*/.*/([0-9]+)',pDateIn,'$1'),4,1) 
@@ -219,7 +219,7 @@ jrecs := join(distribute(cleanAddr(vin!=''),hash(vin)), uvina,
 //Clean names and addresses of records without a vin (flows have been split 
 //for faster processing time.  Vin is populated 60+% 
 ///////////////////////////////////////////////////////////////////////////
-FLAccidents_Ecrash.Layout_CRU_inquiries trecs3(cleanAddr L) := transform
+Layout_CRU_inquiries trecs3(cleanAddr L) := transform
 
 string8     fSlashedMDYtoCYMD(string pDateIn) :=
 intformat((integer2)regexreplace('.*/.*/([0-9]+)',pDateIn,'$1'),4,1) 
