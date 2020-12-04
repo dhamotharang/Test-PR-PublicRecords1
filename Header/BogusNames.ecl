@@ -936,9 +936,9 @@ single_name_segment_obscenities := [
 'BLOWMEBITCH',
 'BLOWMEDOWN',
 'BOLLOCKS',
-'BUGGER',
+// 'BUGGER', // Pssible legitimate name
 'BULLSHIT',
-'COCK',
+// 'COCK', // Pssible legitimate name
 'COCKLICKING',
 'COCKSUCKER',
 'COCKSUCKERS',
@@ -962,7 +962,7 @@ single_name_segment_obscenities := [
 'FUCKYOUMORE',
 'FUCKYOURSELF',
 'FUKFACE',
-'HOE',
+// 'HOE', // Pssible legitimate name
 'MOTHERFOURKER',
 'MOTHERFUCKER',
 'NIGGER',
@@ -978,7 +978,7 @@ single_name_segment_obscenities := [
 'SLHeader',
 'SLUT',
 'TWAT',
-'WANKER',
+// 'WANKER', // Pssible legitimate name
 'WHORE',
 'WHOREFACE',
 'YOUBLOW',

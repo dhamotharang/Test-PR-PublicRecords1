@@ -1,4 +1,4 @@
-﻿IMPORT versioncontrol, _control, ut, tools,HMS_STLIC,STD;
+﻿IMPORT versioncontrol, _control, ut, tools,HMS_STLIC,STD, Orbit3;
 EXPORT Build_all_daily(string pversion, boolean pUseProd = false) := FUNCTION
 
 	spray_  		 := VersionControl.fSprayInputFiles(fSpray(pversion,pUseProd));
@@ -114,6 +114,7 @@ EXPORT Build_all_daily(string pversion, boolean pUseProd = false) := FUNCTION
 					// ),
 					
 					FileServices.FinishSuperFileTransaction()
+					,Orbit3.proc_Orbit3_CreateBuild_AddItem('HMS State Licenses',pversion )
 						// End Archive sequential
 					): success(Send_Email(pversion,pUseProd).BuildSuccess), failure(send_email(pversion,pUseProd).BuildFailure
 
