@@ -5,9 +5,7 @@ EXPORT Build_Base := MODULE
 
 EXPORT AssignBase	:= FUNCTION
 	//Build Assignment file
-	//AssignPrevBase		:= BKMortgage.Files().fAssign;
-	AssignPrevBase		:= DATASET('~thor_data400::base::BKMortgage::Assignment_father',
-																		BKMortgage.Layouts.AssignBase,THOR);
+	AssignPrevBase		:= BKMortgage.Files().fAssign;
 	AssignIngestPrep	:= Assign_prep_ingest_file;
 	AssignIngest			:= Assign_Ingest(,,AssignPrevBase,AssignIngestPrep);
 	AssignNewBase		 	:= AssignIngest.AllRecords;
@@ -25,9 +23,7 @@ END;
 
 EXPORT ReleaseBase := FUNCTION
 	//Build Release file
-	//PrevReleaseBase		:= BKMortgage.Files().fRelease;
-	PrevReleaseBase		:= DATASET('~thor_data400::base::BKMortgage::Release_father',
-																		BKMortgage.Layouts.ReleaseBase,THOR);
+	PrevReleaseBase		:= BKMortgage.Files().fRelease;
 	ReleaseIngestPrep	:= Release_prep_ingest_file;
 	ReleaseIngest			:= Release_Ingest(,,PrevReleaseBase,ReleaseIngestPrep);
 	ReleaseNewBase		:= ReleaseIngest.AllRecords;
