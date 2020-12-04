@@ -9,22 +9,6 @@ export Spray_In(
 ) :=
 function
 
-	lfile(string pkeyword) := '~thor_data400::in::ecrash::' + pkeyword + '.@version@.csv';
-	sfile(string pkeyword) := '~thor_data400::in::ecrash::' + pkeyword;
-	 agency_date :=  (STRING8) Std.Date.Today();
-
-	spry_raw:=DATASET([
-             {Constants.LandingZone,'/data/super_credit/ecrash/agency/'+agency_date+'/'
-									,'mbs_ecrash_v_agency_hpcc_export.txt'
-																						,0 ,lfile('agency'				  ),[{sfile('agency'			  )}],Constants.DestinationCluster,agency_date,'[0-9]{8}','VARIABLE'}
-		 	], VersionControl.Layout_Sprays.Info);
-	
-verify_agency := FileServices.RemoteDirectory(FLAccidents_Ecrash.Constants.LandingZone,'/data/super_credit/ecrash/agency/'+agency_date+'/','*ecrash_v_agency*.txt');
-
-Agency_sp :=  if( ( EXISTS(verify_agency) and verify_agency[1].size <> 0 )  ,                  
-										sequential(fileservices.clearsuperfile('~thor_data400::in::ecrash::agency'),VersionControl.fSprayInputFiles(spry_raw,pIsTesting := pIsTesting)), 
-										output('NO Agency Files Recieved')); 
-
 //Incident Spray
 
  Incident_file := Constants.INCIDENT_SPRAYED_DAILY + '_'+ thorlib.wuid();
@@ -226,7 +210,7 @@ PTYD_spy := if ( ut.Weekday((integer) mod_Utilities.StrSysDate) <> 'SUNDAY' , if
 
 
 																 
-return sequential(Agency_sp,Incident_spy,BillingAgency_spy,Vehicle_spy,Person_spy, Document_spy,Citation_spy,
+return sequential(/*Agency_sp,*/Incident_spy,BillingAgency_spy,Vehicle_spy,Person_spy, Document_spy,Citation_spy,
                   Commercial_spy,PTYD_spy);
 																 
 end;

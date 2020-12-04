@@ -1966,7 +1966,9 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2020/1700 Venezuela List','1953'},
 {'EC 2020/1696 Venezuela List','1954'},
 {'EC (CFSP) 2020/1748 Cyber-Attacks List','1955'},
-{'EC 2020/1744 Cyber-Attacks List','1956'}
+{'EC 2020/1744 Cyber-Attacks List','1956'},
+{'Corrupt Practices Investigation Bureau (CPIB) Singapore Press Release','1957'},
+{'Panama Canal Authority (ACP) Debarred Contractors List','1958'}
 
 ],r);
 
