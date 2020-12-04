@@ -34,7 +34,7 @@ SHARED getFileVersion(string sf,boolean alp=false) := FUNCTION
     frName:=sfc[1].name;
     fd1 := if(alp,regexfind('::2[0-9]{7}[a-z]{0,1}ib:',frName,0),regexfind('::2[0-9]{7}[a-z]{0,1}:',frName,0));
     filedt := if(alp,fd1[3..(length(fd1)-3)],fd1[3..(length(fd1)-1)]);
-    output(dataset([{frName,filedt}],{string lg_ck, string fldt}),named('checked_file'),extend);
+    output(dataset([{frName,filedt}],{string lg_ck, string fldt}),named('version_check_file'),extend);
     
     return filedt;
 
@@ -42,19 +42,19 @@ END;
 
 EXPORT  filedate := getFileVersion(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::inc_boca::did::refs::relative',true):INDEPENDENT ;
 
-SHARED fc(string f1, string f2):= sequential(
-    output(dataset([{f1,'thor400_44',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
-    if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_44',f2,,,,400,TRUE,,TRUE,TRUE,,10000000))));
+ aDali := _control.IPAddress.aprod_thor_dali;
+SHARED lc := '~foreign::' + aDali + '::';
+EXPORT get_alogical(string sf):=nothor(fileservices.GetSuperFileSubName(lc+sf,1));
 
-SHARED fc8(string f1, string f2):= sequential(
-    output(dataset([{f1,'thor400_36',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
-    if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_36',f2,,,,400,TRUE,,TRUE,TRUE,,10000000))));
+EXPORT fileCopy(string f1, string f2, string dCluster='thor400_44',boolean fromAlpha=false):= sequential(
+    output(dataset([{f1,dCluster,f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
+    if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy(IF(fromAlpha,lc,'~')+f1,dCluster,f2,,,,400,TRUE,,TRUE,TRUE,,10000000))));
+
+SHARED fc(string f1, string f2):= fileCopy(f1,f2,'thor400_44');
+SHARED fc8(string f1, string f2):= fileCopy(f1,f2,'thor400_36');
 
 EXPORT copy_addr_uniq_keys_from_alpha(string filedt) := function
   
-  aDali := _control.IPAddress.aprod_thor_dali;
-  lc := '~foreign::' + aDali + '::';
-  get_alogical(string sf):=nothor(fileservices.GetSuperFileSubName(lc+sf,1));
     
   AddrSFKeyName(boolean fcra)  := '~thor_data400::key::' + if(fcra, 'fcra::', '') + 'header::qa::addr_unique_expanded';
   AddrDSFKeyName(boolean fcra) := '~thor_data400::key::' + if(fcra, 'fcra::', '') + 'header::delete::addr_unique_expanded';
@@ -78,10 +78,6 @@ END;
 
 EXPORT copy_ca_minors_from_alpha(string filedt) := function
   
-  aDali := _control.IPAddress.aprod_thor_dali;
-  lc := '~foreign::' + aDali + '::';
-  get_alogical(string sf):=nothor(fileservices.GetSuperFileSubName(lc+sf,1));
-
   prefix := 'thor_data400::base::insuranceheader_incremental::minors::';  
   currentSF := prefix + 'current';
   deleteSF  := prefix + 'delete';
@@ -111,11 +107,6 @@ EXPORT copy_from_alpha(string filedt) := function
                ,'~thor_data400::key::insuranceheader_segmentation::' + filedt + '::did_ind'
                ,bldSegmentation);
 
-    // aDali := '10.194.126.207';//_control.IPAddress.adataland_dali;
-    aDali := _control.IPAddress.aprod_thor_dali;
-
-    lc := '~foreign::' + aDali + '::';
-    get_alogical(string sf):=nothor(fileservices.GetSuperFileSubName(lc+sf,1));
     
     // incremental key prefix
     aPref := 'thor_data400::key::insuranceheader_xlink::inc_boca::';
@@ -376,4 +367,29 @@ EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000'
     orbit_update_entries(skipPackage),   //Create
     udops(skipPackage)
 );
+EXPORT copy_insurance_best:= FUNCTION
+
+  fPattern:='thor_data400::key::insuranceheader_best::<<version>>::did';
+  super_qa := regexreplace('<<version>>',fPattern,'qa');
+  super_fa := regexreplace('<<version>>',fPattern,'father');
+  logical_pattern := regexreplace('<<version>>',fPattern,'.*');
+  logicalRemote:=get_alogical(super_qa);
+
+  newLogical:=regexfind(logical_pattern,logicalRemote,0);
+  doReport:=output(dataset([{super_qa,super_fa,'~'+newLogical}],{string qa,string father, string newLogical}),NAMED('super_report'),EXTEND);
+  doCopy:=fileCopy(newLogical,'~'+newLogical,,TRUE);
+  newLogicalNotInQA:=count( nothor(STD.File.SuperFileContents('~'+super_qa))(name=newLogical))=0;
+  doUpdateSupers:= IF(newLogicalNotInQA,
+                   SEQUENTIAL(
+                             STD.File.PromoteSuperFileList( ['~'+super_qa,'~'+super_fa], deltail:=TRUE ),
+                             STD.File.AddSuperFile('~'+super_qa,'~'+newLogical)
+                   ),OUTPUT('No super update (latest file already in super):'+newLogical));
+
+  RETURN sequential(
+   
+   output( nothor(STD.File.SuperFileContents('~'+super_qa)));
+   output(newLogical);
+   doReport,doCopy,doUpdateSupers);
+END;
+
 END;
