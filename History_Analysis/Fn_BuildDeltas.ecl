@@ -1,12 +1,9 @@
 
 Import $, STD, history_analysis, PromoteSupers, dops;
 
+Export fn_buildDeltas(dataset(history_analysis.layouts.Layout_dopsservice) loadRawdata) := Function
 
-Export fn_buildDeltas( string pVersion ) := Function
-
-loadfile := History_Analysis.Files(pVersion).Keysizedhistory_rawdata;
-
-s_keysizedhistory_rec := sort(loadfile, datasetname, superkey, whenlive); // Sorted dataset
+s_keysizedhistory_rec := sort(loadrawdata, datasetname, superkey, whenlive); // Sorted dataset
 
 g_keysizedhistory_rec := group(s_keysizedhistory_rec, datasetname, superkey); // Grouped Dataset
 
@@ -45,10 +42,6 @@ iterateCount := iterate(t_previousRec, CountDeltas(left, right));
 
 filterIterate:=  iterateCount( not prevrecord_count = 0 ); // Fitered to remove versions with prevrecord_count of zero
 
-
-PromoteSupers.MAC_SF_BuildProcess(filterIterate, History_Analysis.Filenames(pVersion).BaseDeltas, dsResult, 3,,true);
-
-
-Return  dsResult;  
+Return  filterIterate;  
 
 End;
