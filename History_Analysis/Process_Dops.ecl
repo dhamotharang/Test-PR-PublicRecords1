@@ -1,6 +1,6 @@
 Import STD, _control, dops, History_Analysis, PromoteSupers;
 
-Export process_dops( string pVersion, string datasetname, string location, string cluster, string enviroment, string start_date, string end_date, string dopsenv ) := Function
+Export process_dops( string pVersion, string datasetname, string location, string cluster, string enviroment, string start_date, string end_date, string dopsenv ) := Module
  
 // file from 2 year history 
 
@@ -17,7 +17,11 @@ layout := History_Analysis.Layouts.layout_dopsservice;
 // start date of ten day range
 // end date of ten day range
 // dopsenv = 'dev' or 'prod'; dev - points to dev or prod DOPS DB
-dops_service_in := dops.GetHistoricalKeyInfo(datasetname, location, cluster,enviroment , start_date, end_date, dopsenv );
+fcraData := dops.GetHistoricalKeyInfo(datasetname, location, 'N',enviroment , start_date, end_date, dopsenv );
+
+nonfcraData := dops.GetHistoricalKeyInfo(datasetname, location, 'F',enviroment , start_date, end_date, dopsenv );
+
+addBothInputs := (fcraData + nonfcraData );
 
 //from 2018-02-14 15:25:13 to 2/20/2020 1:45:05 AM
 fn_format_date (string date) := Function
@@ -44,7 +48,7 @@ fn_format_date (string date) := Function
 End;
 
 
-dops_service := project(dops_service_in, transform(layout,
+Shared dops_service := project(addBothInputs, transform(layout,
 								self.datasetname := left.datasetname;
 								self.clusterflag := left.clusterflag;
 							    self.whenlive := left.whenlive;  // use fn_format_date(left.whenlive); for KeysizedHistory
@@ -59,7 +63,7 @@ dops_service := project(dops_service_in, transform(layout,
                                 ));
 
 
-processed_dops := output(dops_service,,History_Analysis.Filenames(pversion).dopsServiceData,named('dopsnewest_servicedata'), thor, overwrite);
+Export processed_dops := output(dops_service,,History_Analysis.Filenames(pversion).dopsServiceData, named('dopsnewest_servicedata'), thor, overwrite, __compressed__);
 
 old_data := History_Analysis.Files(pversion).keysizedhistory_rawdata;
 
@@ -69,8 +73,8 @@ dedup_dataset := dedup(dd_dataset, datasetname, buildversion, whenlive, clusterf
 
 sorted_dataset := sort(dedup_dataset(datasetname<>''), datasetname, superkey, whenlive );
 
-PromoteSupers.Mac_SF_BuildProcess(sorted_dataset,'~thor_data400::history_analysis::in::raw_data', build_AggregateFile, 2,,true);
+PromoteSupers.Mac_SF_BuildProcess(sorted_dataset,'~thor_data400::history_analysis::in::raw_data', build_AggregateFile, 3,,true);
 
-Return ordered(processed_dops, build_AggregateFile );
+Export appendRawdata := ordered(processed_dops, build_AggregateFile );
 
 End;

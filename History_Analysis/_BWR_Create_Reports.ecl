@@ -1,9 +1,13 @@
-Import STD, lib_stringlib, History_Analysis;
+Import STD, lib_stringlib, History_Analysis, wk_ut, dops;
 
 pVersion := stringlib.getDateYYYYMMDD();
-output(pVersion, Named('workunit_version'));
+output(pVersion, named('workunit_version'));
 
 #workunit('name', 'Dops History Report ');
+
+todays_date:= (string)Std.Date.Today():global;
+
+tomorrows_date := (string)Std.Date.AdjustDate((integer)todays_date,0,0,1):global;
 
 //This call will build all of the required files including spraying, delta calculations and statistics 
 //////////////////////////////////////// processing dops daily input to a file in memory ////////////////////////////////////////////////
@@ -16,4 +20,11 @@ output(pVersion, Named('workunit_version'));
 // start date of ten day range
 // end date of ten day range
 // dopsenv = 'dev' or 'prod'; dev - points to dev or prod DOPS DB
-History_Analysis.Proc_Build_All(pVersion, '*', 'B','N','P', '20201101', '20201102', 'prod');
+
+
+History_Analysis.Proc_Build_All(pVersion, '*', 'B','set for nonfcra and fcra (process_dops.ecl)','P', todays_date, tomorrows_date, 'prod');
+
+
+///////////////////////  For Standalone Reports ////////////////////////////////////////////
+
+//History_Analysis.CreateStandaloneReports(pVersion, '*', 'B', 'set for nonfcra and fcra (process_dops.ecl)', 'P', '20201130', '20201205', 'prod');
