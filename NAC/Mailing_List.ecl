@@ -3,6 +3,7 @@
 										+',Charles.Pettola@lexisnexis.com'
 										+',Tony.Kirk@lexisnexis.com'
 										+',Charles.Salvo@lexisnexis.com'
+										+',radames.ortega@lexisnexisrisk.com'
 										//+',Jennifer.paganacci@lexisnexis.com'
 										//+',Bonita.Rakestraw@lnssi.com'
 										;
@@ -11,6 +12,7 @@
 										+',Tony.Kirk@lexisnexis.com'
 										+',Charles.Salvo@lexisnexis.com'
 										+',ris-glonoc@risk.lexisnexis.com'
+										+',radames.ortega@lexisnexisrisk.com'
 										//+',Jennifer.paganacci@lexisnexis.com'
 										//+',Bonita.Rakestraw@lnssi.com'
 										;
@@ -19,6 +21,7 @@
 										+',Tony.Kirk@lexisnexis.com'
 										+',Charles.Salvo@lexisnexis.com'
 										+',LNDataQA@lexisnexis.com'
+										+',radames.ortega@lexisnexisrisk.com'
 										//+',Jennifer.paganacci@lexisnexis.com'
 										//+',Bonita.Rakestraw@lnssi.com'
 										;
@@ -30,12 +33,14 @@
 										+',nacprojectsupport@lnssi.com'
 										+',seth.hall@lnssi.com'
 										+',Jennifer.paganacci@lexisnexis.com'
+										+',radames.ortega@lexisnexisrisk.com'
 										;
 	shared DOPS_list := 'Jose.Bello@lexisnexis.com'
 										+',Charles.Pettola@lexisnexis.com'
 										+',Tony.Kirk@lexisnexis.com'
 										+',Charles.Salvo@lexisnexis.com'
 										+',LNDataQA@lexisnexis.com'
+										+',radames.ortega@lexisnexisrisk.com'
 										//+',Jennifer.paganacci@lexisnexis.com'
 										//+',Bonita.Rakestraw@lnssi.com'
 										;
