@@ -275,6 +275,28 @@ string DAMAGE;
 string POLK_VALIDATED_VIN;
 end;
 
+export order_combined := record
+order_vs;
+int_order.SUFFIX;
+int_order.GENDER;
+int_order.PREVIOUS_DL_NBR;
+int_order.PREVIOUS_DL_STATE;
+int_order.FULFILLED_DATE;
+int_order.POLICY_CARRIER_AUTO;
+int_order.POLICY_NBR_AUTO;
+int_order.POLICY_CARRIER_PROPERTY;
+int_order.POLICY_NBR_PROPERTY;
+int_order.PREVIOUS_POLICY_TYPE;
+int_order.MORTGAGE_LOAN_NBR;
+int_order.MORTGAGEE;
+int_order.ORIG_ORDER_ID;
+int_order.INITIAL_ORDER;
+int_order.RULES_STATUS_CD;
+int_order.VERSION;
+int_order.SEARCH_MODE;
+int_order.PROCESS_STATE;
+int_order.PROCESSOR;
+end;
 
 export cmbnd := 
 record
