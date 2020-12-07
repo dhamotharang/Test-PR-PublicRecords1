@@ -37,9 +37,11 @@ END;
 														LOOKUP, INNER);
 END;
 */
-CategoryCriteria(dataset(Layouts.rEntity) infile) := FUNCTION
-		categories := TABLE(infile, {infile.EntryCategory; infile.EntrySubcategory; n := COUNT(GROUP);}, EntryCategory, EntrySubcategory, FEW);
-											
+CategoryCriteria(dataset(Layouts.rEntity) infile, dataset(layouts.rEntity) dsMasters) := FUNCTION
+		//categories := TABLE(infile, {infile.EntryCategory; infile.EntrySubcategory; n := COUNT(GROUP);}, EntryCategory, EntrySubcategory, FEW);
+		cat0 := DEDUP(dsMasters(Ent_ID in SET(infile, Ent_ID)),EntryCategory,EntrySubcategory, ALL);									
+		categories := TABLE(cat0, {cat0.EntryCategory; cat0.EntrySubcategory; n := COUNT(GROUP);}, EntryCategory, EntrySubcategory, FEW);
+		//categories := DISTRIBUTE(cat1, hash32(EntryCategory));
 		return SORT(
 						JOIN(DISTRIBUTE(categories), AllCategoriesFixed, LEFT.EntryCategory + '-' + LEFT.EntrySubCategory = RIGHT.name,
 									TRANSFORM(rCriteria,
@@ -63,7 +65,7 @@ EXPORT GetSearchCriteriaEx(dataset(Layouts.rEntity) infile, boolean IncludeSanct
 															
 		MakeGroupHeader(SORT(CountryCriteria(infile),name), 1, 'Country')
 		+MakeGroupHeader(dsRegion, 2, 'Regional Level')
-		+MakeGroupHeader(CategoryCriteria(infile), 3, 'Category')
+		+MakeGroupHeader(CategoryCriteria(infile, Files.dsMasters), 3, 'Category')
 		+MakeGroupHeader(dsDeceased, 4, 'Deceased State')
 		+MakeGroupHeader(SourceCriteria(infile), 5, 'Source')
 		+IF(IncludeSanctionsCriteria, 

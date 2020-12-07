@@ -118,11 +118,11 @@ END;
 						self := c;
 	END;
 
-	diff := c(benefitstate<>casestate OR SearchClientID <= clientid);
-	same := c(benefitstate=casestate, SearchClientID > clientid);
+	//diff := c(benefitstate<>casestate OR SearchClientID <= clientid);
+	//same := c(benefitstate=casestate, SearchClientID > clientid);
 	
 	//fixed := NORMALIZE(same, 2, xCollisions(LEFT, COUNTER));
-	fixed := PROJECT(same, xCollisions(LEFT, 2));
+	//fixed := PROJECT(same, xCollisions(LEFT, 2));
 
 	//return PROJECT(diff + fixed, xSlim(LEFT));
 	return PROJECT(c, xSlim(LEFT));

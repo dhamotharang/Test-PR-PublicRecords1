@@ -1,4 +1,4 @@
-﻿import STD,lib_fileservices,ut;
+﻿import STD,lib_fileservices,ut,_Control;
 export ArchiveFiles(string location, string environment, integer noofpartitions = 0, integer whichpartition = 0) := module
 	
 	export rundatetime := ut.GetTimeDate() : independent;

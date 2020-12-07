@@ -105,6 +105,52 @@ Export Regulatory := module
 				unsigned8  persistent_record_ID := 0; //tracking the record between full header and individual dataset
 		end;
 
+    export Header_LZ_Layout := 
+      Record
+        string15  did;
+        string15  rid;
+        string1   pflag1;
+        string1   pflag2;
+        string1   pflag3;
+        string2   src;
+        string8   dt_first_seen;
+        string8   dt_last_seen;
+        string8   dt_vendor_last_reported;
+        string8   dt_vendor_first_reported;
+        string8   dt_nonglb_last_seen;
+        string1   rec_type;
+        string18  vendor_id;
+        string10  phone;
+        string9   ssn;
+        string10  dob;
+        string5   title;
+        string20  fname;
+        string20  mname;
+        string20  lname;
+        string5   name_suffix;
+        string10  prim_range;
+        string2   predir;
+        string28  prim_name;
+        string4   suffix;
+        string2   postdir;
+        string10  unit_desig;
+        string8   sec_range;
+        string25  city_name;
+        string2   st;
+        string5   zip;
+        string4   zip4;
+        string3   county;
+        string7   geo_blk;
+        string5   cbsa;
+        string1   tnt;
+        string1   valid_SSN;
+        string1   jflag1;
+        string1   jflag2;
+        string1   jflag3;
+        string20  RawAID;
+        string1   eor; 
+      end;
+
 		Export Fcra_Header_LZ_Layout := Record
 				string15	did;
 				string15  rid;
@@ -162,15 +208,14 @@ Export Regulatory := module
 						return Suppress.applyRegulatory.simple_append(ds, 'adl_segment_inj.txt', header.regulatory.base_layout);						
 				endmacro; 
 
-// process fcra_header_inj data
-
-		export apply_FCRA_Header(ds) := 
-				functionmacro	
+    export _apply(ds,filename,layout) :=
+        functionmacro
 						import Suppress, Header;
 				
-						Base_File_Append_In := Suppress.applyRegulatory.getfile('file_fcra_header_inj.txt', header.regulatory.Fcra_Header_LZ_Layout);	
+						Base_File_Append_In := Suppress.applyRegulatory.getfile(filename, layout);	
 
-						header.Layout_Header reformat_header(Base_File_Append_In L) := transform//REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
+            // typically header.layout_header
+						recordof(ds) reformat_header(Base_File_Append_In L) := transform
 								// FileName_Loc;
 								self.did := (unsigned6) L.did;
 								self.rid := (unsigned6) L.rid;
@@ -203,12 +248,31 @@ Export Regulatory := module
 								self.RawAID := (unsigned8) L.RawAID;			
 								self := L;
 								self := [];
-				end;
+				    end;
 
-				return ds + project(Base_File_Append_In, reformat_header(left)); 
+				    return ds + project(Base_File_Append_In, reformat_header(left)); 
 
 				endmacro; 
 
+// process fcra_header_inj data
+
+		export apply_FCRA_Header(ds) := 
+				functionmacro	
+						import Header;
+				
+						return (header.Regulatory._apply(ds,'file_fcra_header_inj.txt', header.regulatory.Fcra_Header_LZ_Layout));
+
+				endmacro; 
+
+// process header data
+
+		export apply_Header(ds) := 
+				functionmacro	
+						import Header;
+				
+						return (header.Regulatory._apply(ds,'file_headersv2_inj.txt', header.regulatory.Header_LZ_Layout));
+
+				endmacro; 
 
 		EXPORT applySsnCorrectionSup(base_ds) := FUNCTIONMACRO
 			import Header, Suppress;

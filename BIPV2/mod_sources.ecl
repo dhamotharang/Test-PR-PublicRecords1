@@ -298,7 +298,7 @@ export isPermitted(iParams in_mod, boolean dnbPermitted=false) := module
 	// This is the "master list" of sources included in the BIPv2 header,
 	// mapped to a short code suitable for matching.  If a source isn't listed
 	// here it will NOT be allowed into the internal linking process.
-  import bipv2_tools;
+  
   export string2 nonCode := 'xx';
 
   export ingest_whitelist := 

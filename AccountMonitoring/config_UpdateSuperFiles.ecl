@@ -104,7 +104,22 @@ end;
                       AccountMonitoring.product_files.phonefeedback.PhonesFeedback_superkey, //(batchr3::monitor::PhonesFeedback::Phone_qa)
                       AccountMonitoring.types.productMask.phonefeedback
                     }
-				  ],AccountMonitoring.layouts.UPDATE_SOURCE.roxie_monitor_superfile_layout);
+                    ,{
+                      AccountMonitoring.product_files.Phone.phones_type_superfile,
+                      AccountMonitoring.product_files.Phone.phones_type_for_superkey_monitor,
+                      AccountMonitoring.types.productMask.phone
+                    }
+                    ,{
+                      AccountMonitoring.product_files.Phone.phones_lerg6_superfile,
+                      AccountMonitoring.product_files.Phone.Phones_Lerg6_for_superkey_monitor,
+                      AccountMonitoring.types.productMask.phone
+                    }
+                    ,{
+                      AccountMonitoring.product_files.Phone.carrier_reference_superfile,
+                      AccountMonitoring.product_files.Phone.carrier_reference_for_superkey_monitor,
+                      AccountMonitoring.types.productMask.phone
+                    }
+				            ],AccountMonitoring.layouts.UPDATE_SOURCE.roxie_monitor_superfile_layout);
                          
                               
    SuperfilesReturn := if(GetAll,Superfiles,Superfiles(AccountMonitoring.types.testPMBits(product_mask_supported, product_mask)));

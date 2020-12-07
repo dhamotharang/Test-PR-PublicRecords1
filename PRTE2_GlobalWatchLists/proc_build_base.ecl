@@ -7,6 +7,9 @@ export proc_build_base(string filedate) := function
 
 PRTE2.CleanFields(files.GWL_IN_2, ds_file);
 
+filter_recs_boca 	:= ds_file(cust_name <> 'IN_PR');
+filter_recs_alpha := ds_file(cust_name = 'IN_PR');
+
 us_st_ab_filter :=  ',AK |, AK |,AL |, AL |,AR |, AR |,AZ |, AZ |'+
 					',CA |, CA |,CO |, CO |,CT |, CT |,DC |, DC |,DE |, DE |,FL |, FL |,GA |, GA |,HI |, HI |'+
 					',IA |, IA |,ID |, ID |,IL |, IL |,IN |, IN |,KS |, KS |,KY |, KY |,LA |, LA |,MA |, MA |'+
@@ -24,7 +27,7 @@ us_state_filter	:= 'ALABAMA|ALASKA|ARIZONA|ARKANSAS|CALIFORNIA|COLORADO|CONNECTI
 					'TENNESSEE|TEXAS|UTAH|VERMONT|VIRGINIA|WASHINGTON|WEST VIRGINIA|'+
 					'WISCONSIN|WYOMING';
 
-us_filter		:= ds_file((regexfind(us_st_ab_filter, addr_1, 0)<>'' or
+us_filter		:= filter_recs_boca((regexfind(us_st_ab_filter, addr_1, 0)<>'' or
 						regexfind(us_st_ab_filter, addr_2, 0)<>'' or
 						regexfind(us_st_ab_filter, addr_3, 0)<>'' or
 						regexfind(us_st_ab_filter, addr_4, 0)<>'' or
@@ -204,6 +207,7 @@ total_foreign	:= non_us_filter + add_foreign;
 
 prepAddress := project(total_us_records, gwlTrans(left)); 
 
+
 	unsigned4 lAIDAppendFlags		:= AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;			
 
 	AID.MacAppendFromRaw_2Line(prepAddress, Append_Prep_Address1, append_prep_addresslast, Append_RawAID, addressCleaned, lAIDAppendFlags);
@@ -291,7 +295,10 @@ leftoverAddress := project(total_foreign, noCleanAddr(left));
 
 ds_file_old := files.GWL_IN_1;
 
-ds_base := cleanAddress + leftoverAddress + ds_file_old;
+//Alpha CT records
+alpha_recs := project(filter_recs_alpha, transform(Layouts.Layout_GWL, self := left, self :=[]));
+
+ds_base := cleanAddress + leftoverAddress + ds_file_old + alpha_recs;
 				 
 PromoteSupers.MAC_SF_BuildProcess(ds_base,constants.Base_GWL, writefile_Patriots);
 

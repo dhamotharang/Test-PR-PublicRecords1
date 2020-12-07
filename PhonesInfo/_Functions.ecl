@@ -278,7 +278,7 @@ EXPORT _Functions := MODULE
 												 'SC','SD','TN','TX','UT','VT','VA','WA','WV','WI',
 												 'WY','US' ];
 		
-		setUSTerr				:= [ 'AS','FM','GU','MH','MP','PW','PR','VI' ];
+		setUSTerr				:= [ 'AS','FM','GU','MH','MP','NN','PW','PR','VI' ];
 		
 		setUS						:= setUSStates + setUSTerr;
 	

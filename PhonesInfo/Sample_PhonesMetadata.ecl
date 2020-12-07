@@ -3,10 +3,10 @@ import _control;
 
 	//DF-24394: Add L6 Samples to QA Test File
 
-	dailyFile	:= PhonesInfo.Key_Phones.Ported_Metadata;	
+	dailyFile	:= PhonesInfo.File_Metadata.PortedMetadata_Main;	
 	
 	//Ported Phone Samples	
-	filtSrc 	:= max(dailyFile(regexfind('PK|PJ', source, 0)<>''), (unsigned)vendor_last_reported_dt);
+	filtSrc 	:= max(dailyFile(regexfind('PK|P!', source, 0)<>''), (unsigned)vendor_last_reported_dt);
 	filtDt		:= distribute(dailyFile(((string)vendor_last_reported_dt)[1..8]=((string)filtSrc)[1..8]), random());
 
 	filtRD		:= filtDt(remove_port_dt<>0);
@@ -17,8 +17,9 @@ import _control;
 	ds_pk_ed	:= choosen(distribute(filtED(source='PK'), random()), 166);
 	ds_pk_sd	:= choosen(distribute(filtSD(source='PK'), random()), 168);
 	
-	ds_pj_ed	:= choosen(distribute(dailyFile(source='PJ' and port_end_dt=((integer)((string)filtSrc)[1..8])), random()), 250);
-	ds_pj_sd 	:= choosen(distribute(filtSD(source='PJ'), random()), 250);
+	ds_pe_rd	:= choosen(distribute(filtRD(source='P!'), random()), 166);
+	ds_pe_ed	:= choosen(distribute(filtED(source='P!'), random()), 166);
+	ds_pe_sd 	:= choosen(distribute(filtSD(source='P!'), random()), 166);
 	
 	//Disconnect Phone Samples
 	filtSrc2 	:= max(dailyFile(regexfind('PX', source, 0)<>''), (unsigned)vendor_last_reported_dt);
@@ -48,15 +49,15 @@ import _control;
 	
 	//Concat All Results
 	ds_all 		:= ds_pk_rd + ds_pk_ed + ds_pk_sd + 
-													ds_pj_ed + ds_pj_sd +
-													ds_px_yn + ds_px_ny + ds_px_nn + ds_px_pp +
-													ds_pg_yn + ds_pg_ny + ds_pg_nn + ds_pg_pp +
-													ds_pb		 +
-													ds_l6;	
+							 ds_pe_rd	+ ds_pe_ed + ds_pe_sd +
+							 ds_px_yn + ds_px_ny + ds_px_nn + ds_px_pp +
+							 ds_pg_yn + ds_pg_ny + ds_pg_nn + ds_pg_pp +
+							 ds_pb		+
+							 ds_l6;	
 	
 	//Send Email Notice
 	email_notice 	:= if(count(ds_all(phone<>'' and source<>'')) > 0
-										,sequential(output(ds_all(source='PJ'), all, named('PhonesMetadata_PJ_QASamples'))
+										,sequential(output(ds_all(source='P!'), all, named('PhonesMetadata_Pe_QASamples'))
 																,output(ds_all(source='PK'), all, named('PhonesMetadata_PK_QASamples'))
 																,output(ds_all(source='PX'), all, named('PhonesMetadata_PX_QASamples'))
 																,output(ds_all(source='PG'), all, named('PhonesMetadata_PG_QASamples'))

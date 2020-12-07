@@ -1,8 +1,9 @@
 ﻿Export files:=Module
 EXPORT Inquiry_Ins_IN := DATASET(constants.input_file_1, in_Layout, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
 EXPORT Inquiry_Base_IN := DATASET(constants.input_file_2, in_Layout, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
+EXPORT Inquiry_Clone_IN := DATASET(constants.input_file_3, in_Layout, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
 
-Export Inquiry_In:=Inquiry_Ins_IN + Inquiry_Base_IN;
+Export Inquiry_In:=Inquiry_Ins_IN + Inquiry_Base_IN + Inquiry_Clone_IN;
 
 EXPORT Inquiry_base := DATASET(constants.Base_Inquiry, base_layout, FLAT );
 

@@ -324,6 +324,7 @@ EXPORT Base_Contacts := RECORD
 			string50                      Exploded_Title_Description := '';
 		  unsigned4                                     global_sid :=  0;   
       unsigned8                                     record_sid :=  0; 
+		  string6    							                			source     := '';
 END;		
 	  		
 	////////////////////////////////////////////////////////////////////////

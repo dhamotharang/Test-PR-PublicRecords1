@@ -370,7 +370,7 @@ EXPORT Layouts_eCrash_Base := RECORD,maxlength(40000)
   string40 safety_equipment_restraint2;
   string40 safety_equipment_helmet;
   string100 air_bag_deployed;
-  string20 ejection;
+  string100 ejection;
   string30 drivers_license_jurisdiction;
   string30 dl_number_class;
   string3 dl_number_cdl;
@@ -888,5 +888,6 @@ EXPORT Layouts_eCrash_Base := RECORD,maxlength(40000)
   string marijuana_use_suspected;
   string direction_of_impact;
   string event_sequence;
+  string1 is_suppressed;
   DATASET(citations_childrec) citation_details{maxcount(50)};
  END;

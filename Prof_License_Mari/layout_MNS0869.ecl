@@ -1,4 +1,4 @@
-// MNS0869 / Minnesotas Bookstore /	Real Estate //
+﻿﻿﻿﻿// MNS0869 / Minnesotas Bookstore /	Real Estate //
 
 export layout_MNS0869 := module
 
@@ -29,9 +29,9 @@ export rec := record
 	string10   QPLNAME;
 	string10   QPMNAME;
 	string10   QPJRSR;   
-	//string		 dummy_field;		//extra field is added for  20131017 and 20131118
-	string10   CID;
+	//string		dummy_field;		//extra field is added for  20131017 and 20131118
 	string5    empty_field2;
+	string10   CID;
 	string10   COUNTY_CD;
 	string10   COUNTY;
 	// string30   FNAME;
@@ -50,7 +50,6 @@ export rec := record
 	// string60   OFFICENAME;
 	
 END;
-
 
 export rea := record
   string10   LICTYPE;
@@ -90,7 +89,7 @@ export rea := record
 	string10   COUNTY_CD;
 	string10   COUNTY;
 	
-end;
+END;
 export common := record
 	string10   LICTYPE;
 	string20   SLNUM;
@@ -134,5 +133,5 @@ export common := record
 	string10   QPLNAME;
 	string10   QPMNAME;
 	string10   QPJRSR;   
-end;
-end;
+END;
+END;
