@@ -1,17 +1,13 @@
-export Layout_File_CA_Filing_Master_in 
-				:= record
+﻿export Layout_File_CA_Filing_Master_in 	:= record
 						
 						string8    process_date;
-						string1    record_type;
-						string14   initial_filing_number;
-						string29   ucc_filing_type_desc;
-						string12   static;
-						string5    initial_filing_type;
-						string8    filing_date;
-						string4    filing_time;
-						string1    filing_status;
-						string8    ucc_status_desc;
-						string8    lapse_date;
-						string4    page_count;
-						string20   internal_document_no;
-				     end;
+						string14   initial_filing_number;             //ucc1_num
+						string14   ucc3_filing;                       //ucc3_num
+						string29   ucc_filing_type_desc;              //action_type
+						string29   filing_type_id;
+						string8    filing_date;                       //filing_date_time
+						string4    filing_time;                       //filing_date_time
+						string8    lapse_date;                        //lapse_date
+						string4    page_count;                        //page_count
+						string1    filing_status;                     //derived based on lapse_date
+end;
