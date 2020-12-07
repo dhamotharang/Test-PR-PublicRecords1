@@ -39,6 +39,16 @@ EXPORT AdditionalNamespacesLayout := RECORD
     STRING orb_namespace {xpath('@xmlns:orb')} := 'http://lexisnexis.com/Orbit/';
     STRING i_namespace {xpath('@xmlns:i')} := 'http://www.w3.org/2001/XMLSchema-instance';
 	 end; 
+
+export OrbitItemIn := RECORD
+	 string filepathname;
+     string sprayedfilename;
+	 string ingestedbuildwu;
+	 string is_add;
+	 string orbitbuildname;
+	 string orbitbuildvs;
+END;
+
   END;
 
  

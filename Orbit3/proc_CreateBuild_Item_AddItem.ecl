@@ -112,7 +112,7 @@ shared	sendemailitem(string keyword = '',string status = '' ) := function
 												               'N/A'
 												              );
 	   return	 fileservices.sendemail(
-												_Control.MyInfo.EmailAddressNotify +'; sudhir.kasavajjala@lexisnexis.com',
+												'sudhir.kasavajjala@lexisnexis.com',
 												' Orbit for Build : '+buildname+',version: '+Buildvs+',Env : '+Orbit3.Constants(Envmt).which_env,
 												'BuildName:'+buildname+'\n'+
 												'---------------------'+'\n'+
