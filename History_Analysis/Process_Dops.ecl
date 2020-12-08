@@ -3,12 +3,10 @@ Import STD, _control, dops, History_Analysis, PromoteSupers;
 Export process_dops( string pVersion, string datasetname, string location, string cluster, string enviroment, string start_date, string end_date, string dopsenv ) := Module
  
 // file from 2 year history 
-
 KeysizedHistory := History_Analysis.Files(pversion).keysizedhistory_report;
 
 //layouts
 layout := History_Analysis.Layouts.layout_dopsservice;
-
 
 // datasetname = dataset name from dops
 // location = 'B' for boca or 'A' for alpharetta or '' or '*'
