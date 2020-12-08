@@ -2,7 +2,7 @@
 
 export Map_NtlAccidents_Alpharetta(string filedate) := function
 
-d:= FLAccidents.InFile_NtlAccidents_Alpharetta.cmbnd_keyed;
+d:= FLAccidents.InFile_NtlAccidents_Alpharetta.cmbnd_ntl_accidents;
 
 vina	:= VehLic.File_VINA;
 dvina := distribute(vina,hash(vin_input));
