@@ -132,8 +132,8 @@ OUTACTION :=
 	build_fedex_keys := sequential
 						(
 							build_keys, 
-							//run_scrubs,
-							//if(isDelta,update_dops_Delta,update_dops_Full)
+							run_scrubs,
+							if(isDelta,update_dops_Delta,update_dops_Full)
 						) : success(send_succ_msg), failure(send_fail_msg);
 	 
 	return build_fedex_keys;
