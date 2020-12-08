@@ -1,1 +1,1 @@
-export	file_fedex_base	:=	dataset('~thor_200::base::fedex::nohits',fedex.Layout_FedEx.Base,flat);
+export	file_fedex_base	:=	dataset('~thor_200::base::fedex::nohits',fedex.Layout_FedEx.Base,thor);
