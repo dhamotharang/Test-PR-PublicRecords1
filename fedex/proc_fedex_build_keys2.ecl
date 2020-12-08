@@ -8,8 +8,9 @@ export proc_fedex_build_keys2(string version_date, boolean isdelta) := function
 
 
 //**** Build the Payload Key and create the FakeID
-fedex_dataset:=if(isdelta,fedex_datasetPre(version=version_date),fedex_datasetPre);
-PreviousKey:=fedex.key_fedex2_payload;
+fedex_datasetStep1:=if(isdelta,fedex_datasetPre(version=version_date),fedex_datasetPre);
+fedex_dataset:=project(fedex_datasetStep1,transform(recordof(fedex_datasetStep1)-[version],self:=left;));
+PreviousKey:=index(fedex.key_fedex2_payload,'~thor_data400::key::fedex2::20201130::autokey::payload');
 PrevMaxFID := if(isdelta,MAX(PreviousKey,fakeid),0);											
 autokey.mac_useFakeIDs
 	(fedex_dataset,
@@ -122,14 +123,17 @@ OUTACTION :=
 	RoxieKeyBuild.Mac_Daily_Email_Local('FEDEX','SUCC', version_date, send_succ_msg, RoxieKeyBuild.Email_Notification_List);
 	RoxieKeyBuild.Mac_Daily_Email_Local('FEDEX','FAIL', version_date, send_fail_msg, 'michael.gould@lexisnexis.com,John.Freibaum@lexisnexis.com');
 	Run_Scrubs 	:= scrubs_fedex.fn_RunScrubs(version_date);
-	update_dops := RoxieKeyBuild.updateversion('FedexKeys',version_date,'michael.gould@lexisnexis.com,John.Freibaum@lexisnexis.com',,'N');
+
+
+	update_dops_Full := RoxieKeyBuild.updateversion('FedexKeys',version_date,'michael.gould@lexisnexis.com,John.Freibaum@lexisnexis.com',,'N',,,,,,'F');
+	update_dops_Delta := RoxieKeyBuild.updateversion('FedexKeys',version_date,'michael.gould@lexisnexis.com,John.Freibaum@lexisnexis.com',,'N',,,,,,'D');
 	build_keys	:= sequential(outaction, move_qa);
 
 	build_fedex_keys := sequential
 						(
 							build_keys, 
-							run_scrubs,
-							//update_dops
+							//run_scrubs,
+							//if(isDelta,update_dops_Delta,update_dops_Full)
 						) : success(send_succ_msg), failure(send_fail_msg);
 	 
 	return build_fedex_keys;

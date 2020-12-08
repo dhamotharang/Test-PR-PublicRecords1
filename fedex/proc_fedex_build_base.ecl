@@ -1,6 +1,6 @@
 import	Address,AID,PromoteSupers,VersionControl, std, ut;
 
-export proc_fedex_build_base(string version_date,boolean delta) := function 
+export proc_fedex_build_base(string version_date,boolean isdelta) := function 
 
 // Combine both files
 dFedExIn	:=	FedEx.File_FedEx_In.Main;
@@ -135,101 +135,7 @@ dFedExCleanCAAddr	:=	project(dFedExCAAddresses,tReformat2Base(left));
 
 // Combine US & CA addresses
 dFedExCleanCombined			:=	dFedExAID	+	dFedExCleanCAAddr;
-/*dFedExCleanCombinedDist	:=	distribute(dFedExCleanCombined,hash32(record_id));
 
-// Split out the correction records
-dFedExCleanMain					:=	dFedExCleanCombinedDist(record_type	    in ['','A']);
-dFedExCleanCorrections	:=	dFedExCleanCombinedDist(record_type	not in ['','A']);
-
-// Dedup the corrections file on record id and keep the latest correction record
-dFedExCleanCorrectionsDedup	:=	dedup(sort(dFedExCleanCorrections,record_id,-file_date,local),record_id,local);
-
-// Delete records
-dFedExCorrectionDeletes	:=	dFedExCleanCorrectionsDedup(record_type	=	'D');
-
-// Delete records
-dFedExMainRemoveDeletes	:=	join(	dFedExCleanMain,
-																	dFedExCorrectionDeletes,
-																	left.record_id	=	right.record_id,
-																	transform(FedEx.Layout_FedEx.Base,self	:=	left),
-																	left only,
-																	local
-																);
-
-// Change or update 
-dFedExCorrectionUpdates	:=	dFedExCleanCorrectionsDedup(record_type	='U');
-
-FedEx.Layout_FedEx.Base	tFedExCorrectionUpdates(dFedExMainRemoveDeletes	le,dFedExCorrectionUpdates	ri)	:=
-transform
-
-	fn_replace(string left_val, string right_val) := function
-	 string ret_val := if(le.record_id=ri.record_id,left_val,right_val);
-	 return ret_val;
-	end;
-
-	self.record_id					:=	le.record_id;
-	self.record_type				:=	ri.record_type;
-
-  //self.file_date					:=	if(le.record_id	=	ri.record_id,ri.file_date,le.file_date);
-	//each field originally looked like the above
-	self.file_date					:=	fn_replace(ri.file_date,le.file_date);
-	self.first_name					:=	fn_replace(ri.first_name,le.first_name);
-	self.middle_initial			:=	fn_replace(ri.middle_initial,le.middle_initial);
-	self.last_name					:=	fn_replace(ri.last_name,le.last_name);
-	self.full_name					:=	fn_replace(ri.full_name,le.full_name);
-	self.company_name				:=	fn_replace(ri.company_name,le.company_name);
-	self.address_line1			:=	fn_replace(ri.address_line1,le.address_line1);
-	self.address_line2			:=	fn_replace(ri.address_line2,le.address_line2);
-	self.city								:=	fn_replace(ri.city,le.city);
-	self.state							:=	fn_replace(ri.state,le.state);
-	self.zip								:=	fn_replace(ri.zip,le.zip);
-	self.country						:=	fn_replace(ri.country,le.country);
-	self.phone							:=	fn_replace(ri.phone,le.phone);
-	self.Append_PrepAddr1		:=	fn_replace(ri.Append_PrepAddr1,le.Append_PrepAddr1);		
-	self.Append_PrepAddr2		:=	fn_replace(ri.Append_PrepAddr2,le.Append_PrepAddr2);		
-	self.Append_RawAID			:=	(unsigned8)fn_replace((string)ri.Append_RawAID,(string)le.Append_RawAID);		
-	self.business_indicator	:=	fn_replace(ri.business_indicator,le.business_indicator);
-	self.prim_range					:=	fn_replace(ri.prim_range,le.prim_range);
-	self.predir							:=	fn_replace(ri.predir,le.predir);
-	self.prim_name					:=	fn_replace(ri.prim_name,le.prim_name);
-	self.addr_suffix				:=	fn_replace(ri.addr_suffix,le.addr_suffix);
-	self.postdir						:=	fn_replace(ri.postdir,le.postdir);
-	self.unit_desig					:=	fn_replace(ri.unit_desig,le.unit_desig);
-	self.sec_range					:=	fn_replace(ri.sec_range,le.sec_range);
-	self.p_city_name				:=	fn_replace(ri.p_city_name,le.p_city_name);
-	self.v_city_name				:=	fn_replace(ri.v_city_name,le.v_city_name);
-	self.st									:=	fn_replace(ri.st,le.st);
-	self.zip5								:=	fn_replace(ri.zip5,le.zip5);
-	self.zip6								:=	fn_replace(ri.zip6,le.zip6);
-	self.zip4								:=	fn_replace(ri.zip4,le.zip4);
-	self.cart								:=	fn_replace(ri.cart,le.cart);
-	self.cr_sort_sz					:=	fn_replace(ri.cr_sort_sz,le.cr_sort_sz);
-	self.lot								:=	fn_replace(ri.lot,le.lot);
-	self.lot_order					:=	fn_replace(ri.lot_order,le.lot_order);
-	self.dbpc								:=	fn_replace(ri.dbpc,le.dbpc);
-	self.chk_digit					:=	fn_replace(ri.chk_digit,le.chk_digit);
-	self.rec_type						:=	fn_replace(ri.rec_type,le.rec_type);
-	self.county							:=	fn_replace(ri.county,le.county);
-	self.geo_lat						:=	fn_replace(ri.geo_lat,le.geo_lat);
-	self.geo_long						:=	fn_replace(ri.geo_long,le.geo_long);
-	self.msa								:=	fn_replace(ri.msa,le.msa);
-	self.geo_blk						:=	fn_replace(ri.geo_blk,le.geo_blk);
-	self.geo_match					:=	fn_replace(ri.geo_match,le.geo_match);
-	self.err_stat						:=	fn_replace(ri.err_stat,le.err_stat);
-	self.nametype						:=	fn_replace(ri.nametype,le.nametype);
-	
-end;
-
-dFedExMainCorrections	:=	join(	dFedExMainRemoveDeletes,
-																dFedExCorrectionUpdates,
-																left.record_id	=	right.record_id,
-																tFedExCorrectionUpdates(left,right),
-																left outer,
-																local
-															);
-
-dFedExMainCorrectionsAdds := dFedExMainCorrections;
-*/
 dFedExMainFull:=dFedExCleanCombined+fedex.file_fedex_base;
 
 identify_dupes := fedex.fn_IdentifyDuplicates(dFedExMainFull);
@@ -294,17 +200,17 @@ FullSteps:=sequential(
 	STD.File.PromoteSuperFileList(['~thor_200::base::fedex::nohits','~thor_200::base::fedex::nohits_father','~thor_200::base::fedex::nohits_grandfather'],fedex.Filenames(version_date).base.fedex.new,true);
 );
 //PromoteSupers.MAC_SF_BuildProcess(apply_ln_filters(version=version_date),'~thor_200::base::fedex::nohits',buildBase,,,true);
-BuildBase:=if(delta,DeltaSteps,FullSteps);
+BuildBase:=if(isdelta,DeltaSteps,FullSteps);
 output1 := output(project(fedex_dupes,fedex.layout_fedex.returnfiles),,'~thor200::out::fedex::dupes_v1',__compressed__,overwrite,csv(separator(','),terminator('\r\n'),QUOTE('"')),named('fedex_dupes_all'));
 output2 := output(project(new_dupes,fedex.layout_fedex.returnfiles)  ,,'~thor200::out::fedex::new_dupes_v1',__compressed__,overwrite,csv(separator(','),terminator('\r\n'),QUOTE('"')),named('fedex_dupes_new'));
 output3 := output(project(new_uniques,fedex.layout_fedex.returnfiles),,'~thor200::out::fedex::new_uniques_v1',__compressed__,overwrite,csv(separator(','),terminator('\r\n'),QUOTE('"')),named('fedex_new_recs'));
 
 // build keys before file generation as dup files take long time to build. 
 
-build_keys := fedex.proc_fedex_build_keys2(version_date,delta);
+build_keys := fedex.proc_fedex_build_keys2(version_date,isdelta);
 
-//sample_recs	:=	fedex.fedex_qa_samples(version_date);
+sample_recs	:=	fedex.fedex_qa_samples(version_date);
 
-return sequential(buildBase,build_keys/*,sample_recs, output1,output2,output3*/);
+return sequential(buildBase,build_keys,sample_recs, output1,output2,output3);
 
 end; 

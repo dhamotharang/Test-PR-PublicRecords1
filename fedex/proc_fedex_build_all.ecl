@@ -12,7 +12,7 @@ import _control,ut,Orbit3, lib_Datalib,std;
 
 export	proc_fedex_build_all(string	version_date) := function
 
-	isDelta:=if(ut.Weekday((integer)version_date) = 'SATURDAY',TRUE,FALSE);
+	isDelta:=if(ut.Weekday((integer)version_date) = 'MONDAY',FALSE,TRUE);
 	spray_file			:=	fedex.Spray_Prep_Fedex(version_date);
 	build_base_keys	:=	fedex.proc_fedex_build_base(version_date,isDelta);
 	//build_keys	:=	fedex.proc_fedex_build_keys2(version_date);
