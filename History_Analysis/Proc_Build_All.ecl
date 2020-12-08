@@ -10,7 +10,7 @@ Export Proc_Build_All( string pVersion, string datasetname, string location, str
 
     calculateStats := History_Analysis.MLCoreCalculateStatistics(History_Analysis.Files(pVersion).counted_deltas);
 
-    PromoteSupers.Mac_SF_BuildProcess(calculateStats, History_Analysis.Filenames(pVersion).BaseStatistics, writeStats, 3,, True);
+    PromoteSupers.Mac_SF_BuildProcess(calculateStats, History_Analysis.Filenames(pVersion).BaseStatistics, writeStats, 3,, true,);
     
     buildAll := ordered(update_source,
                                   writeDeltas,
