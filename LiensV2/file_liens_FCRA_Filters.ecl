@@ -27,6 +27,7 @@ rLiensSuppressions	:=	RECORD
 	BOOLEAN  bFilteredByFIE          	  :=	FALSE;
 	BOOLEAN  bFilteredByCivilDismissal  :=	FALSE;
 	BOOLEAN  bFilteredByFilingTypeID 	  :=	FALSE;
+	BOOLEAN  bLiensWDischrgedBK         :=  FALSE; //DF-28491
 END;
 
 
@@ -165,7 +166,21 @@ dJurisdictionSuppression	:=	JOIN(
                                 ),
                                 LOCAL
                               );
-
+//	Remove Main records by TMSID corresponding to Liens that were filed prior to discharged BK records \\DF-28491 VC
+dDischargedBK	:=	JOIN(
+                                DEDUP(SORT(DISTRIBUTE(dLiensMain, HASH( TMSID)),TMSID,LOCAL),TMSID,LOCAL),
+                                           DISTRIBUTE(LiensV2.Fn_Liens_With_DischargedBK,HASH(TMSID)),
+                                  LEFT.tmsid  = RIGHT.tmsid,
+                                TRANSFORM(
+                                  rLiensSuppressions,
+                                  SELF.bLiensWDischrgedBK :=  TRUE;
+																	SELF.rmsid                        :=  '';
+                                  SELF.CourtID                      :=  '';
+                                  SELF                              :=  LEFT;
+                                ),
+                                LOCAL
+                              );
+// count(dDischargedBK);
 rLiensSuppressions	tTMSIDSuppressions(rLiensSuppressions l,	DATASET(rLiensSuppressions)	allRows)	:=	TRANSFORM
   SELF.tmsid                      :=  l.tmsid;
   SELF.rmsid                      :=  '';
@@ -182,15 +197,17 @@ rLiensSuppressions	tTMSIDSuppressions(rLiensSuppressions l,	DATASET(rLiensSuppre
   SELF.bFilteredByFIE          	  :=  COUNT(allRows(Filing_Type_ID IN sFIESet))>0;
   SELF.bFilteredByCivilDismissal  :=  COUNT(allRows(Filing_Type_ID IN sCivilDismissalSet))>0;
   SELF.bFilteredByFilingTypeID    :=  COUNT(allRows(Filing_Type_ID IN sFilingTypeSet))>0;
+	SELF.bLiensWDischrgedBK         :=  COUNT(allRows(bLiensWDischrgedBK))>0; //DF-28491
 END;
 
 // ROLLUP Suppressions that are based on TMSID Only
-dTMSIDFlags	:=	dDOPSSuppression+dHoganSuppression+dVacatedSuppression+dMedicalSuppression;
+dTMSIDFlags	:=	dDOPSSuppression+dHoganSuppression+dVacatedSuppression+dMedicalSuppression+dDischargedBK;
 dTMSIDFlagsGrp  :=	GROUP(SORT(DISTRIBUTE(dTMSIDFlags,
                       HASH( tmsid)),
                             tmsid,LOCAL),
                             tmsid,LOCAL);
 dTMSIDSuppressions  :=	ROLLUP(dTMSIDFlagsGrp, GROUP, tTMSIDSuppressions(LEFT,ROWS(LEFT)));
+// count(dTMSIDSuppressions(bLiensWDischrgedBK));
 
 // Join Suppressions based on TMSID with Suppressions based on TMSID and RMSID
 dTMSIDOnlyWithTMSIDAndRMSID	:=	JOIN(
@@ -257,6 +274,7 @@ dSetCaseLinkIDClusterFlags	:=	JOIN(
                                     SELF.bFilteredByFIE             :=	LEFT.bFilteredByFIE OR RIGHT.bFilteredByFIE;
                                     SELF.bFilteredByCivilDismissal  :=	LEFT.bFilteredByCivilDismissal OR RIGHT.bFilteredByCivilDismissal;
                                     SELF.bFilteredByFilingTypeID    :=	LEFT.bFilteredByFilingTypeID OR RIGHT.bFilteredByFilingTypeID;
+																		SELF.bLiensWDischrgedBK         :=  LEFT.bLiensWDischrgedBK OR RIGHT.bLiensWDischrgedBK;
                                     SELF                            :=	RIGHT;
                                   ),
                                   LOCAL,
@@ -279,6 +297,7 @@ rLiensSuppressions	tTMSIDCaseLinkIDSuppressions(rLiensSuppressions l,	DATASET(rL
   SELF.bFilteredByFIE          	  :=  COUNT(allRows(bFilteredByFIE))>0;
   SELF.bFilteredByCivilDismissal  :=  COUNT(allRows(bFilteredByCivilDismissal))>0;
   SELF.bFilteredByFilingTypeID    :=  COUNT(allRows(bFilteredByFilingTypeID))>0;
+	SELF.bLiensWDischrgedBK         :=  COUNT(allRows(bLiensWDischrgedBK))>0;
 END;
 
 // ROLLUP one more time to combine TMSID/RMSID clusters with CaseLinkID clusters
@@ -288,11 +307,11 @@ dCombineTMSIDAndCaseLinkIDClusters  :=	GROUP(SORT(DISTRIBUTE(dSetCaseLinkIDClust
                                                                 COURTID    = ''     OR
                                                                 bVacatedSuppression OR
                                                                 bMedicalSuppression OR
-                                                                bJurisdictionSuppression
+                                                                bJurisdictionSuppression 
                                                               ),
                                         HASH( tmsid, rmsid)),
                                               tmsid, rmsid,LOCAL),
                                               tmsid, rmsid,LOCAL);
-dTMSIDCaseLinkIDSuppressions	:=	ROLLUP(dCombineTMSIDAndCaseLinkIDClusters, GROUP, tTMSIDCaseLinkIDSuppressions(LEFT,ROWS(LEFT))):PERSIST('~thor_data400::persist::file_liens_fcra_filter');
+dTMSIDCaseLinkIDSuppressions	:=	ROLLUP(dCombineTMSIDAndCaseLinkIDClusters, GROUP, tTMSIDCaseLinkIDSuppressions(LEFT,ROWS(LEFT))):PERSIST('~thor_data400::persist::file_liens_fcra_filter1');
 
 EXPORT  file_liens_FCRA_Filters :=  dTMSIDCaseLinkIDSuppressions;

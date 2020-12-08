@@ -10,7 +10,8 @@ dLiensPartyWithFlags :=  JOIN(
                             bHoganSuppression        OR
                             bVacatedSuppression      OR
                             bMedicalSuppression      OR
-                            bJurisdictionSuppression
+                            bJurisdictionSuppression OR
+														bLiensWDischrgedBK //DF-28491
                           ),HASH(tmsid)),
                           DISTRIBUTE(dLiensParty,HASH(tmsid)),
                             LEFT.tmsid	=	RIGHT.tmsid	AND
@@ -23,7 +24,8 @@ dLiensPartyWithFlags :=  JOIN(
                              LEFT.bDOPSSuppression    OR
                              LEFT.bHoganSuppression   OR
                              LEFT.bVacatedSuppression OR
-                             LEFT.bMedicalSuppression
+                             LEFT.bMedicalSuppression OR
+														 LEFT.bLiensWDischrgedBK //DF-28491
                             ),
                           TRANSFORM(
                             {
@@ -38,6 +40,7 @@ dLiensPartyWithFlags :=  JOIN(
                               BOOLEAN bFilteredByFIE            :=	FALSE;
                               BOOLEAN bFilteredByCivilDismissal :=	FALSE;
                               BOOLEAN bFilteredByFilingTypeID   :=	FALSE;
+															BOOLEAN bLiensWDischrgedBK        :=  FALSE; //DF-28491
                             },
                             SELF.bDOPSSuppression           :=	LEFT.bDOPSSuppression;
                             SELF.bHoganSuppression          :=	LEFT.bHoganSuppression;
@@ -49,6 +52,7 @@ dLiensPartyWithFlags :=  JOIN(
                             SELF.bFilteredByFIE             :=	LEFT.bFilteredByFIE;
                             SELF.bFilteredByCivilDismissal  :=	LEFT.bFilteredByCivilDismissal;
                             SELF.bFilteredByFilingTypeID    :=	LEFT.bFilteredByFilingTypeID;
+														SELF.bLiensWDischrgedBK         :=  LEFT.bLiensWDischrgedBK; //DF-28491
                             SELF                            :=	RIGHT;
                           ),
                           RIGHT OUTER,
@@ -61,7 +65,8 @@ dLiensPartySuppressed  :=  dLiensPartyWithFlags(
                               ~bHoganSuppression    AND
                               ~bVacatedSuppression  AND
                               ~bMedicalSuppression  AND
-                              ~bJurisdictionSuppression
+                              ~bJurisdictionSuppression AND
+															~bLiensWDischrgedBK //DF-28491
                             ) OR
                             (
                               bFilteredByCaseLinkID AND

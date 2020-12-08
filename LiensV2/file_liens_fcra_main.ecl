@@ -2,7 +2,7 @@
 
 dLiensMain                      :=	LiensV2.file_liens_main;
 dAllSuppressionsWithCaseLinkID	:=	LiensV2.file_liens_FCRA_Filters;
-
+	
 //  Join our Main file with the Suppressions file to get the flags
 dLiensMainWithFlags	:=	JOIN(
                           DISTRIBUTE(dAllSuppressionsWithCaseLinkID(
@@ -10,7 +10,8 @@ dLiensMainWithFlags	:=	JOIN(
                             bHoganSuppression        OR
                             bVacatedSuppression      OR
                             bMedicalSuppression      OR
-                            bJurisdictionSuppression
+                            bJurisdictionSuppression OR
+														bLiensWDischrgedBK //DF-28491
                           ),HASH(tmsid)),
                           DISTRIBUTE(dLiensMain,HASH(tmsid)),
                             LEFT.tmsid	=	RIGHT.tmsid	AND
@@ -23,7 +24,8 @@ dLiensMainWithFlags	:=	JOIN(
                              LEFT.bDOPSSuppression    OR
                              LEFT.bHoganSuppression   OR
                              LEFT.bVacatedSuppression OR
-                             LEFT.bMedicalSuppression
+                             LEFT.bMedicalSuppression OR
+														 LEFT.bLiensWDischrgedBK //DF-28491
                             ),
                           TRANSFORM(
                             {
@@ -38,6 +40,7 @@ dLiensMainWithFlags	:=	JOIN(
                               BOOLEAN bFilteredByFIE            :=	FALSE;
                               BOOLEAN bFilteredByCivilDismissal :=	FALSE;
                               BOOLEAN bFilteredByFilingTypeID   :=	FALSE;
+															BOOLEAN bLiensWDischrgedBK        :=  FALSE; //DF-28491
                             },
                             SELF.bDOPSSuppression           :=	LEFT.bDOPSSuppression;
                             SELF.bHoganSuppression          :=	LEFT.bHoganSuppression;
@@ -49,11 +52,12 @@ dLiensMainWithFlags	:=	JOIN(
                             SELF.bFilteredByFIE             :=	LEFT.bFilteredByFIE;
                             SELF.bFilteredByCivilDismissal  :=	LEFT.bFilteredByCivilDismissal;
                             SELF.bFilteredByFilingTypeID    :=	LEFT.bFilteredByFilingTypeID;
+														SELF.bLiensWDischrgedBK         :=  LEFT.bLiensWDischrgedBK; //DF-28491
                             SELF                            :=	RIGHT;
                           ),
                           RIGHT OUTER,
                           LOCAL
-                        ):PERSIST('~thor_data400::persist::filtered::file_liens_fcra_main');
+                        ):PERSIST('~thor_data400::persist::filtered::file_liens_fcra_main1');
 								
 dLiensMainSuppressed  :=  dLiensMainWithFlags(
                             (
@@ -61,7 +65,8 @@ dLiensMainSuppressed  :=  dLiensMainWithFlags(
                               ~bHoganSuppression    AND
                               ~bVacatedSuppression  AND
                               ~bMedicalSuppression  AND
-                              ~bJurisdictionSuppression
+                              ~bJurisdictionSuppression AND
+															~bLiensWDischrgedBK //DF-28491
                             ) OR
                             (
                               bFilteredByCaseLinkID AND
