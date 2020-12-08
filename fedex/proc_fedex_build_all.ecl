@@ -10,9 +10,11 @@ import _control,ut,Orbit3, lib_Datalib,std;
 #option 	('AllowAutoQueueSwitch','1');
 #option 	('multiplePersistInstances',FALSE);
 
-export	proc_fedex_build_all(string	version_date) := function	
+export	proc_fedex_build_all(string	version_date) := function
+
+	isDelta:=if(ut.Weekday((integer)version_date) = 'MONDAY',FALSE,TRUE);
 	spray_file			:=	fedex.Spray_Prep_Fedex(version_date);
-	build_base_keys	:=	fedex.proc_fedex_build_base(version_date);
+	build_base_keys	:=	fedex.proc_fedex_build_base(version_date,isDelta);
 	//build_keys	:=	fedex.proc_fedex_build_keys2(version_date);
 	sample_recs	:=	fedex.fedex_qa_samples(version_date);
 	filedate 				:= version_date[1..8];

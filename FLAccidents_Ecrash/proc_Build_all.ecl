@@ -98,8 +98,6 @@ build_key := sequential(
 			,OrbitCreateBuild
 			,FLAccidents_Ecrash.Sample_data.qa
 		  ,FLAccidents_Ecrash.strata(filedate)
-			,FLAccidents_Ecrash.Prod_Superid_Change_extract(filedate) 
-			,FLAccidents_Ecrash.Proc_TMafterTF_extract(filedate,timestamp)
 			,FLAccidents_Ecrash.proc_build_dupe_extract(filedate,timestamp)
 			,FLAccidents_Ecrash.Proc_build_Accident_watch(filedate,timestamp)
 			,FLAccidents_Ecrash.InFilesList

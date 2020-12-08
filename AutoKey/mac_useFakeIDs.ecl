@@ -40,7 +40,9 @@ export mac_useFakeIDs
 	 diffing = false,
 	 use_unique = false,
 			uniqueid = 'junk_uniqueid',
-	 moveToQA = true
+	 moveToQA = true,
+	 isdelta=false,
+	 maxFID=0
 	 )
 := MACRO
 import ut,RoxieKeyBuild;
@@ -79,10 +81,11 @@ ut.mac_sequence_records(added_field,seq_num_added,with_sequence_num);
 
 
 //***** NOT SURE THIS IS NECESSARY, BUT MAINTAINS BEHAVIOR OF PUTTING FAKEID INTO DID AND BDID FIELDS IN PAYLOAD UNLESS useOnlyRecordIDs...may affect fetch
-
+AddtoValue:=MaxFID;
 #uniquename(addFid)
 {indataset, FakeIDFieldType FakeID} %addFid% (with_seq_rec le) := TRANSFORM 
-	fid := le.seq_num_added + autokey.did_adder(typeStr);
+	fid := if(isdelta,AddtoValue + le.seq_num_added + autokey.did_adder(typeStr),
+					  le.seq_num_added + autokey.did_adder(typeStr));
 	self.FakeID := fid;
   SELF.inDID := if((unsigned8)le.inDID > 0 or useOnlyRecordIDs, le.inDID, fid); 
 	SELF.inBDID := if((unsigned8)le.inBDID > 0 or useOnlyRecordIDs, le.inBDID, fid);  //will be the same when both were zero
@@ -130,7 +133,7 @@ outaction :=
 		sequential(
 			if(typestr = '', fail('must have valid typestr when useFakeIDs')),
 			%do_Payload_Key%, 
-			%mv_Payload_Key%,
+			if(isdelta=false,%mv_Payload_Key%),
 			if(moveToQA, %mvQA_Payload_Key%)
 		);
 	
