@@ -1,4 +1,3 @@
-
 export fedex_autokey_constants := module
 	export str_autokeyname := '~thor_data400::key::fedex::autokey::@version@::';
 	export str_autokeyname2 := '~thor_data400::key::fedex2::autokey::@version@::';

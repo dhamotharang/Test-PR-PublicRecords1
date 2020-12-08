@@ -1,4 +1,4 @@
-﻿import	_control,Address,AID,ut;
+﻿import	_control,Address,AID,ut,std;
 
 export	Spray_Prep_Fedex(string	pVersion)	:= function
 	string					vCorrectionsCSVSeparator				:=	',';
@@ -13,7 +13,7 @@ export	Spray_Prep_Fedex(string	pVersion)	:= function
 	string					vCorrectionsSuperFileName				:=	'~thor_200::in::fedex::nohit::corrections';
 	
 //Spray append and correction files
-	sprayMainFile					:=	fileservices.sprayxml(	_control.IPAddress.bctlpedata10,
+sprayMainFile					:=	fileservices.sprayxml(	_control.IPAddress.bctlpedata10,
 																										'/data/hds_4/FedEx/in/addresses.xml',
 																										8192,
 																									//'record',,_control.TargetGroup.Thor400_20,
@@ -23,23 +23,7 @@ export	Spray_Prep_Fedex(string	pVersion)	:= function
 																									);
 	
 	
-	sprayCorrectionsFile	:=	if(	EXISTS(FileServices.RemoteDirectory(_control.IPAddress.bctlpedata10,'/data/hds_4/FedEx/in/','corrections.csv')),
-
-	                              fileservices.sprayvariable(	_control.IPAddress.bctlpedata10,
-																												'/data/hds_4/FedEx/in/corrections.csv',
-																												8192,
-																												vCorrectionsCSVSeparator,
-																												vCorrectionsCSVTerminator,
-																												vCorrectionsCSVQuote,
-																											//_control.TargetGroup.Thor400_20,
-																												'thor400_30',
-																												vCorrectionsTempLogicalFileName,
-																												,,,true,true,true
-																											), 
-																	output('No Corrections files recieved')); 
-																											
 	
-	sprayFile	:=	parallel(sprayMainFile,sprayCorrectionsFile);
 	
 	// Fedex new batch update file
 	dFedExMainIn				:=	dataset(	vMainTempLogicalFileName,
@@ -47,34 +31,11 @@ export	Spray_Prep_Fedex(string	pVersion)	:= function
 																		xml('addressupdate/records/record')
 																	);
 	
-	// Corrections file
-	dFedExCorrectionsIn	:=	dataset(	vCorrectionsTempLogicalFileName,
-																		FedEx.Layout_FedEx.correctionsIn,
-																		csv(separator(vCorrectionsCSVSeparator),terminator(sCorrectionsCSVTerminator),quote(vCorrectionsCSVQuote),heading(single))
-																	,
-																			opt
-																		);
-	
-	// Project the corrections file to the main layout
-	dFedExCorrections2Main	:=	project(	dFedExCorrectionsIn,
-																				transform(FedEx.Layout_FedEx.Main,
-																				
-			
-                                self := left, 
-                                self.file_date :=stringlib.stringfilterout(trim(left.date_changed,left,right)[1..10],'-'),
-																self.record_type := left.status , 
-																self.middle_initial := left.middle_name , 
-																self.full_name := ''; 
-																self.address_line1 := left.street_address, 
-																self.address_line2 := '' ;
-																self.phone := left.phone_number; 
-																			));
-	
 	// Calculate the max value for the record id
-	integer	vMaxFedExRecordID	:=	max(FedEx.file_fedex_in.Main,(integer)record_id[4..])	:	global;
+	integer	vMaxFedExRecordID	:=	max(FedEx.file_fedex_base,(integer)record_id[4..])	:	global;
 	
 	// Combine the corrections and append records
-	dFedExCombinedIn	:=	dFedExMainIn	+	dFedExCorrections2Main;
+	dFedExCombinedIn	:=	dFedExMainIn;
 	
 	// Prep the sprayed file - add file date, cleaned name and record id	
 	FedEx.Layout_FedEx.Prepped	tFedExPrep(FedEx.Layout_FedEx.Main	pInput,integer	cnt)	:=
@@ -114,7 +75,7 @@ export	Spray_Prep_Fedex(string	pVersion)	:= function
 	// Split out the corrections and the append records from the combined file
 
 	dFedExMain				:=	dFedExPrepped(record_type	=		'');
-	dFedExCorrections	:=	dFedExPrepped(record_type	!=	'');
+	//dFedExCorrections	:=	dFedExPrepped(record_type	!=	'');
 	
 	// Output main and corrections prepped files
 	outPreppedFedExMain					:=	output(	dFedExMain,,
@@ -124,31 +85,10 @@ export	Spray_Prep_Fedex(string	pVersion)	:= function
 																					__compressed__
 																				);
 	
-	outPreppedFedExCorrections	:=	output(	dFedExCorrections,,
-																					vCorrectionsLogicalFileName,
-																					csv(separator(vCorrectionsCSVSeparator),terminator(sCorrectionsCSVTerminator),quote(vCorrectionsCSVQuote)),
-																					overwrite,
-																					__compressed__
-																				);
-	
-	outPreppedFedEx	:=	parallel(outPreppedFedExMain,outPreppedFedExCorrections);
-	
+
 	// Superfile transactions
-	addSuperMain				:=	sequential(	fileservices.startsuperfiletransaction(),
-																			fileservices.addsuperfile(vMainSuperFileName,vMainLogicalFileName),
-																			fileservices.finishsuperfiletransaction(),
-																			fileservices.deletelogicalfile(vMainTempLogicalFileName)
-																		);
-	
-	addSuperCorrections	:=	sequential(	fileservices.startsuperfiletransaction(),
-																			fileservices.addsuperfile(vCorrectionsSuperFileName,vCorrectionsLogicalFileName),
-																			fileservices.finishsuperfiletransaction(),
-																			if (FileServices.FileExists(vCorrectionsTempLogicalFileName),fileservices.deletelogicalfile(vCorrectionsTempLogicalFileName), output('Corrections temp file not available to delete'))
-																		);
-	
-	addSuper	:=	parallel(addSuperMain,addSuperCorrections);
-	
-  checkzerobytefile := if(	EXISTS(FileServices.RemoteDirectory(_control.IPAddress.bctlpedata10,'/data/hds_4/FedEx/in/','corrections.csv')),
+	addsupermain:=STD.File.PromoteSuperFileList(['~thor_200::in::fedex::nohit','~thor_200::in::fedex::nohit_father','~thor_200::in::fedex::nohit_grandfather'],vMainLogicalFileName,true);
+	checkzerobytefile := if(	EXISTS(FileServices.RemoteDirectory(_control.IPAddress.bctlpedata10,'/data/hds_4/FedEx/in/','corrections.csv')),
 	   output('corrections files not deleted because it has data'),
 		 sequential(
 		 fileservices.startsuperfiletransaction(),
@@ -157,6 +97,6 @@ export	Spray_Prep_Fedex(string	pVersion)	:= function
 	   fileservices.deletelogicalfile(vCorrectionsLogicalFileName)));
 		 
 	
-	return	sequential(sprayFile,outPreppedFedEx,addSuper,checkzerobytefile);	
+	return	sequential(sprayMainFile,outPreppedFedExMain,addsupermain,checkzerobytefile);	
 		
 end;

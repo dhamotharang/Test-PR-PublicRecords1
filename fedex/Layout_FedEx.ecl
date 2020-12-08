@@ -21,6 +21,8 @@ module
 		string	country				{xpath('address/countrycode')};
 		string	phone					{xpath('phone/phone10')};
 	end;
+
+	
 	
 	export	Corrections	:=
 	record
@@ -67,6 +69,7 @@ module
 	
 	export	Clean	:=
 	record
+		string 					version;
 		string					file_date				{xpath('file_date')};
 		string					record_id				{xpath('record_id')};
 		string					record_type			{xpath('record_type')};

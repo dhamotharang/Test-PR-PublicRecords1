@@ -1,4 +1,4 @@
-﻿IMPORT _control, dx_Phonesplus, Phone_TCPA, PromoteSupers, Std, Ut;
+﻿IMPORT _control, dx_Phonesplus, Phone_TCPA, PromoteSupers, Scrubs_Phone_TCPA, Std, Ut;
 
 EXPORT Proc_TCPA_Phone_Build(string pVersion, const varstring pEclSourceIp, string pDirectory, string pContact, string pThor):= FUNCTION
 	
@@ -46,14 +46,18 @@ EXPORT Proc_TCPA_Phone_Build(string pVersion, const varstring pEclSourceIp, stri
 																			bldHistCL_NR
 																			);
 	
+	//Run Scrub Reports
+	runScrubs							:= Scrubs_Phone_TCPA.fn_RunScrubs(pVersion, pContact);
+		
 	/////////////////////////////////////////////////////////////////////////
 	//Run Build Process//////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////
 
 	sendEmail := SEQUENTIAL(sprayDaily, 
 													buildBase,
-													buildHistory):Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'Phone TCPA Key Build Succeeded', workunit + ': Build complete.')),
-																				Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + pContact, 'Phone TCPA Key Build Failed', workunit + '\n' + FAILMESSAGE));
+													buildHistory,
+													runScrubs):Success(FileServices.SendEmail(pContact, 'Phone TCPA Key Build Succeeded', workunit + ': Build complete.')),
+																		 Failure(FileServices.SendEmail(pContact, 'Phone TCPA Key Build Failed', workunit + '\n' + FAILMESSAGE));
 
 	RETURN sendEmail;
 
