@@ -1968,7 +1968,9 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2020/1748 Cyber-Attacks List','1955'},
 {'EC 2020/1744 Cyber-Attacks List','1956'},
 {'Corrupt Practices Investigation Bureau (CPIB) Singapore Press Release','1957'},
-{'Panama Canal Authority (ACP) Debarred Contractors List','1958'}
+{'Panama Canal Authority (ACP) Debarred Contractors List','1958'},
+{'EC 2020/1992 Banned Air Carriers List','1959'},
+{'Florida State Board of Administration Scrutinized Companies List','1960'}
 
 ],r);
 
