@@ -169,12 +169,6 @@ EXPORT proc3Enhance( string versionDate, boolean isFast = FALSE, string8 forceDe
 	// -- PROCEED WITH BUILD --- //
   // populate ln_derived fields
 
-	dcodesv3 := Codes.File_Codes_V3_In(file_name = 'PROPERTY_ASSESSMENT', field_name = 'FLOOR2SUB') :independent;
-	
-	fncodesv3desc(string code_field, string vendor) := function 
-		file_desc := dcodesv3(code = code_field, field_name2[1]=vendor); 
-		return  file_desc[1].long_desc;
-	END ;
 
   recordof(cmbindAssesEmtpyLnFields) tPopulateLnFields(cmbindAssesEmtpyLnFields L) := TRANSFORM
 		SELF.ln_block										:= if(l.legal_block='',LN_PropertyV2_Fast.Functions_LN_Fields.ExtractBlock(L.legal_brief_description),'');
@@ -185,7 +179,9 @@ EXPORT proc3Enhance( string versionDate, boolean isFast = FALSE, string8 forceDe
 		SELF.ln_condo_indicator					:= LN_PropertyV2_Fast.Functions_LN_Fields.ExtractCondo(L);
 		SELF.ln_mobile_home_indicator		:= LN_PropertyV2_Fast.Functions_LN_Fields.ExtractMH(L);
 		SELF.ln_land_use_category 			:= LN_PropertyV2_Fast.Functions_LN_Fields.ExtractLuseCat(L);
-    SELF.ln_subfloor                := fncodesv3desc(L.floor_cover_code, if(L.vendor_source_flag in ['F','S'], 'F',''));
+    SELF.ln_subfloor                := LN_PropertyV2.fn_codesv3_desc(
+                                      'FLOOR2SUB', L.floor_cover_code,'PROPERTY_ASSESSMENT',
+                                       if(L.vendor_source_flag in ['F','S'], 'F',''));
 		
 		//
 		self.ln_ownership_rights 				:= LN_PropertyV2_Fast.Functions_LN_Owner_Fields.ExtractAssesOwnRghts(L);

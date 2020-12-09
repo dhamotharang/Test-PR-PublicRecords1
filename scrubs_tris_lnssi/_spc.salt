@@ -1,0 +1,26 @@
+OPTIONS:-gh
+MODULE:scrubs_tris_lnssi
+FILENAME:tris_lnssi
+
+// contrib_risk_field
+FIELDTYPE:Invalid_AlphaNumDash:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_- )
+
+// contrib_risk_value 
+FIELDTYPE:Invalid_AlphaNumPunc:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz. )
+
+// contrib_risk_attr
+FIELDTYPE:Invalid_num:ALLOW(12345)
+
+// contrib_state_excl
+FIELDTYPE:Invalid_AlphaState:ALLOW(ACDEFGHIJKLMNOPRSTUVWXYZ_- )
+
+
+FIELD:contrib_risk_field:TYPE(STRING):LIKE(Invalid_AlphaNumDash):0,0
+FIELD:contrib_risk_value:TYPE(STRING):LIKE(Invalid_AlphaNumPunc):0,0
+FIELD:contrib_risk_attr:TYPE(STRING):LIKE(Invalid_num):0,0
+FIELD:contrib_state_excl:TYPE(STRING):LIKE(Invalid_AlphaState):0,0
+
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking
