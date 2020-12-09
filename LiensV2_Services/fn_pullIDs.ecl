@@ -1,38 +1,37 @@
-import ut,doxie,suppress;
+IMPORT ut,doxie,suppress;
 
 inrec := liensv2_services.layout_lien_party_raw;
 
-export fn_pullIDs(grouped dataset(inrec) parties, string32 appType) := 
+EXPORT fn_pullIDs(GROUPED DATASET(inrec) parties, STRING32 appType) :=
 FUNCTION
 
-outrec := liensv2_services.layout_rmsid;
+  outrec := liensv2_services.layout_rmsid;
 
-//add a seq num
-rec := record
-	inrec;
-	unsigned4 seq;
-end;
+  //add a seq num
+  rec := RECORD
+    inrec;
+    UNSIGNED4 seq;
+  END;
 
-ugparties := ungroup(parties);
-ut.MAC_Sequence_Records_NewRec(ugparties, rec, seq, pseq)
+  ugparties := UNGROUP(parties);
+  ut.MAC_Sequence_Records_NewRec(ugparties, rec, seq, pseq)
 
+  //strip out the restricted parties
+  Suppress.MAC_pullIDs_tmsid(GROUP(sorted(pseq, acctno), acctno), pseq3,FALSE,TRUE,appType,'LIENS')
 
-//strip out the restricted parties
-Suppress.MAC_pullIDs_tmsid(group(sorted(pseq, acctno), acctno), pseq3,false,true,appType,'LIENS')
-
-//see which ones we dropped
-dropped := join(pseq, pseq3, 
-				left.seq = right.seq, 
-				transform(rec, self := left), 
-				left only);
-				
-//if dropped, removing matching ids
-clean   := join(pseq, dropped, 
-				left.tmsid = right.tmsid and 
-				left.rmsid = right.rmsid,
-				transform(outrec, self := left),
-				left only);
-				
-return clean;
-	
+  //see which ones we dropped
+  dropped := JOIN(pseq, pseq3,
+    LEFT.seq = RIGHT.seq,
+    TRANSFORM(rec, SELF := LEFT),
+    LEFT only);
+          
+  //if dropped, removing matching ids
+  clean := JOIN(pseq, dropped,
+    LEFT.tmsid = RIGHT.tmsid AND
+    LEFT.rmsid = RIGHT.rmsid,
+    TRANSFORM(outrec, SELF := LEFT),
+    LEFT only);
+          
+  RETURN clean;
+  
 END;

@@ -233,6 +233,7 @@ MODULE
     EXPORT UNSIGNED2 MaxRIs := 100;
     EXPORT UNSIGNED2 MaxIdentities := 100;
     EXPORT UNSIGNED2 MaxOtherPhones := 100;
+    EXPORT UNSIGNED2 MaxSources := 1500;
   END;
 
    EXPORT PFSourceCategory := MODULE
@@ -242,7 +243,6 @@ MODULE
      EXPORT STRING CreditInquiry := 'CreditInquiry';
      EXPORT STRING DirectoryAssistance := 'DirectoryAssistance';
      EXPORT STRING DriverLicense := 'DriverLicense';
-     EXPORT STRING EmployementData := 'EmployementData';
      EXPORT STRING MarketingData := 'MarketingData';
      EXPORT STRING LNRSInquiry := 'LNRSInquiry';
      EXPORT STRING MNOCarrier := 'MNOCarrier';
@@ -309,8 +309,8 @@ MODULE
         {PFSourceCategory.DirectoryAssistance, MDR.sourceTools.src_Gong_phone_append, PFSourceType.Account},//PH
         {PFSourceCategory.DriverLicense, MDR.sourceTools.src_Certegy, PFSourceType.Account},//CY
         {PFSourceCategory.DriverLicense, MDR.sourceTools.src_MO_DL, PFSourceType.Account},//MD
-        {PFSourceCategory.EmployementData, MDR.sourceTools.src_Thrive_LT, PFSourceType.Account},//TM
-        {PFSourceCategory.EmployementData, MDR.sourceTools.src_Thrive_PD, PFSourceType.Account},//T$
+        {PFSourceCategory.EmploymentData, MDR.sourceTools.src_Thrive_LT, PFSourceType.Account},//TM
+        {PFSourceCategory.EmploymentData, MDR.sourceTools.src_Thrive_PD, PFSourceType.Account},//T$
         {PFSourceCategory.LNRSInquiry, MDR.sourceTools.src_InquiryAcclogs, PFSourceType.SelfReported_CreditInquiry},//IQ
         {PFSourceCategory.MarketingData, MDR.sourceTools.src_InfutorCID, PFSourceType.SelfReported},//IR
         {PFSourceCategory.MarketingData, MDR.sourceTools.src_Ibehavior, PFSourceType.SelfReported},//IB

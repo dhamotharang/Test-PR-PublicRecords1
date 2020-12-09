@@ -92,10 +92,14 @@ export ProdData_FCRA := MACRO
 	'DisplayDeployedEnvironment',
 	'DataRestrictionMask',
   'IntendedPurpose',
-	'neutral_gateway'
+	'neutral_gateway',
+	'bsversion',
+	'HistoryDateYYYYMM'
 	));
 
 boolean	isFCRA := true;
+unsigned3 history_date := 999999 	: stored('HistoryDateYYYYMM');
+integer bsversion := 54    : stored('bsversion');
 unsigned1 iType := IF (isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
 unsigned6 input_did := 0    : stored('did');
 string9 in_socs := ''	   : stored('socs');
@@ -203,7 +207,6 @@ END;
 clean_a2 := Project(clean_a2_geolink,TRANSFORM(InputLayout,self := LEFT));
 output(clean_a2, named('cleaned_input'));
 
-bsversion := 54;
 neutral_gateways := DATASET ([{'neutralroxie', neutral_ip}], Gateway.Layouts.Config);
 
 neutral_did_response := if(input_did=0, Risk_Indicators.Neutral_DID_Soapcall(clean_a2, neutral_gateways, bsversion, 2, DataRestrictionMask, true),
@@ -212,12 +215,47 @@ output(neutral_did_response, named('neutral_did_response'));
 
 in_did := neutral_did_response[1].did;
 
-// DID section
-	header_recs := choosen(dx_header.key_header(iType)(keyed(s_did=in_did)), 200);
-	if(include_header or Include_All_Files, output(header_recs, named('header_records'))) ;
+//ssn wild
+	dids := choosen(dx_header.key_wild_SSN(iType)(keyed(s1=in_socs[1]),
+							 keyed(s2=in_socs[2]),
+							 keyed(s3=in_socs[3]),
+							 keyed(s4=in_socs[4]),
+							 keyed(s5=in_socs[5]),
+							 keyed(s6=in_socs[6]),
+							 keyed(s7=in_socs[7]),
+							 keyed(s8=in_socs[8]),
+							 keyed(s9=in_socs[9])), max_recs);
+	if(in_socs!='' and (include_all_files=true or include_header=true), output(dids, named('wildcard_ssn')) );
 
-	qheader_recs := choosen(header_quick.key_DID_fcra(keyed(did=in_did)), 200);
-	if(include_header or Include_All_Files, output(qheader_recs, named('quick_header_records'))) ;
+
+// DID section
+	ds_did := dataset([{in_did}], {unsigned did});
+
+	header_recs_filtered := join(ds_did, dx_header.key_header(iType),
+		keyed(left.did=right.s_did) and
+		right.dt_first_seen < history_date and
+		right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestrictionMask, isFCRA) AND	
+		~Risk_Indicators.iid_constants.filtered_source(right.src, right.st, bsversion) and	
+		~FCRA.Restricted_Header_Src(right.src, right.vendor_id[1]) and
+		// bankruptcy and liens date check
+		((right.src='BA' and FCRA.bankrupt_is_ok(risk_indicators.iid_constants.myGetDate(history_date),(string)right.dt_first_seen)) OR
+		(right.src='L2' and FCRA.lien_is_ok(risk_indicators.iid_constants.myGetDate(history_date),(string)right.dt_first_seen)) OR 
+		right.src not in ['BA','L2']), 
+	transform(recordof(dx_header.key_header(iType)), self := right),atmost(riskwise.max_atmost), keep(300));
+	if(include_header or Include_All_Files, output(header_recs_filtered, named('header_records')) );
+														 
+	Quick_header_recs_filtered := join(ds_did, header_quick.key_DID_fcra,
+		keyed(left.did=right.did) and
+		right.dt_first_seen < history_date and
+		IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) not in risk_indicators.iid_constants.masked_header_sources(DataRestrictionMask, isFCRA) AND	
+		~Risk_Indicators.iid_constants.filtered_source(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src), right.st, bsversion) and	
+		~FCRA.Restricted_Header_Src(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src), right.vendor_id[1]) and
+		// bankruptcy and liens date check
+		((right.src='BA' and FCRA.bankrupt_is_ok(risk_indicators.iid_constants.myGetDate(history_date),(string)right.dt_first_seen)) OR
+		(right.src='L2' and FCRA.lien_is_ok(risk_indicators.iid_constants.myGetDate(history_date),(string)right.dt_first_seen)) OR 
+		right.src not in ['BA','L2']), 
+	transform(recordof(header_quick.key_DID_fcra), self := right),atmost(riskwise.max_atmost), keep(300));
+	if(include_header or Include_All_Files, output(Quick_header_recs_filtered, named('quick_header_records')) );
 
 	header_corr := choosen(FCRA.Key_Override_Header_DID(keyed(did=in_did)), 500);
 	if(include_header or Include_All_Files, output(header_corr, named('header_corrections'))) ;

@@ -1,5 +1,5 @@
-export layout_RMSID := record
-  string50 tmsid;
-	string50 rmsid;
-	string30 acctno := '';
-end;
+EXPORT layout_RMSID := RECORD
+  STRING50 tmsid;
+  STRING50 rmsid;
+  STRING30 acctno := '';
+END;
