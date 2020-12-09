@@ -13,7 +13,7 @@ EXPORT Proc_Build_Carrier_Reference_PType_Update(string version, string emailTar
 	//Move Ported Metadata Base Logical File to Appropriate Superfile
 	moveLIDBBase			:= STD.File.PromoteSuperFileList(['~thor_data400::base::phones::lidb_reference_cr_append_ptype',
 																											'~thor_data400::base::phones::lidb_reference_cr_append_ptype_father',
-																											'~thor_data400::base::phones::lidb_reference_cr_append_ptype'], '~thor_data400::base::phones::lidb_reference_cr_append_ptype_' + version, true);																						
+																											'~thor_data400::base::phones::lidb_reference_cr_append_ptype_delete'], '~thor_data400::base::phones::lidb_reference_cr_append_ptype_' + version, true);																						
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//Create Deltabase Gateway LIDB PType CR Append Base File////////////////////////////////////////////////////
@@ -26,7 +26,7 @@ EXPORT Proc_Build_Carrier_Reference_PType_Update(string version, string emailTar
 	//Move Ported Metadata Base Logical File to Appropriate Superfile
 	moveDGLBase				:= STD.File.PromoteSuperFileList(['~thor_data400::base::deltabase_gateway::lidb_historic_results_cr_append_ptype',
 																											'~thor_data400::base::deltabase_gateway::lidb_historic_results_cr_append_ptype_father',
-																											'~thor_data400::base::deltabase_gateway::lidb_historic_results_cr_append_ptype'], '~thor_data400::base::deltabase_gateway::lidb_historic_results_cr_append_ptype_' + version, true);																	
+																											'~thor_data400::base::deltabase_gateway::lidb_historic_results_cr_append_ptype_delete'], '~thor_data400::base::deltabase_gateway::lidb_historic_results_cr_append_ptype_' + version, true);																	
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//Generate CR PMT Update Status Email///////////////////////////////////////////////////////////////////////
