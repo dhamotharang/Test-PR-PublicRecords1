@@ -1,4 +1,4 @@
-﻿﻿IMPORT Phones, STD, UT;
+﻿IMPORT Phones, STD, UT;
 
 EXPORT PhoneAttributes_BatchRecords(
     DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dBatchPhonesIn,
@@ -10,9 +10,10 @@ EXPORT PhoneAttributes_BatchRecords(
     
      dIntermediatePhonemetadata := Phones.GetPhoneMetadata_wLERG6(dBatchPhonesIn,in_mod);
 
-    dIntermediateBatchPhones := SORT(dIntermediatePhonemetadata, phone,-event_date);
-    
+    dWDNCPhones := $.GetWDNC(dBatchPhonesIn, in_mod);
 
+    dIntermediateBatchPhones := SORT(dIntermediatePhonemetadata + dWDNCPhones, phone,-event_date);
+    
   dFilterBatchPhones    := if(in_mod.include_temp_susp_reactivate,
   dIntermediateBatchPhones,
   dIntermediateBatchPhones(event_type NOT IN 
@@ -35,8 +36,8 @@ EXPORT PhoneAttributes_BatchRecords(
         //Check if the line/serv type is blank, if it is we use the latest record with a value in that field.
         //Since the dataset is already sorted by -event_date we just have to filter it and take the first entry.
         //In the event that the filtered dataset is empty it will pass forward a blank string.
-        SELF.phone_serv_type :=    IF(L.phone_serv_type = '', sort(allrows_rec(phone_serv_type <> ''), -line_type_last_seen)[1].phone_line_type,L.phone_serv_type);
-        SELF.phone_line_type :=    IF(L.phone_line_type = '', sort(allrows_rec(phone_line_type <> ''), -line_type_last_seen)[1].phone_line_type,L.phone_line_type);
+        SELF.phone_serv_type :=    IF(L.phone_serv_type = '', sort(allrows_rec(phone_serv_type <> ''), -line_type_last_seen, source <> Phones.Constants.Sources.PHONES_WDNC)[1].phone_line_type,L.phone_serv_type);
+        SELF.phone_line_type :=    IF(L.phone_line_type = '', sort(allrows_rec(phone_line_type <> ''), -line_type_last_seen, source <> Phones.Constants.Sources.PHONES_WDNC)[1].phone_line_type,L.phone_line_type);
 
         SELF.swapped_phone_number_date := MAX(L.swapped_phone_number_date, MAX(allrows_rec, allrows_rec.swapped_phone_number_date));
         SELF.new_phone_number_from_swap    := MAX(L.new_phone_number_from_swap, MAX(allrows_rec, allrows_rec.new_phone_number_from_swap));
@@ -63,14 +64,21 @@ EXPORT PhoneAttributes_BatchRecords(
     END;
     dPhonesWithCurrent := ITERATE(dPhonesMostRecentRecord, tMarkCurrentRecords(LEFT, RIGHT))(is_current or event_date <> 0);
 
-
+    //Some rare cases where we have the same phoneno and event_date, but event_type is C in one and CL in the other
+    //I doubt we would have any other event_type cases with the same phoneno and event_date
     Layout_BatchOut tRollRecords(Layout_BatchOut L, Layout_BatchOut R) := TRANSFORM
-
+        //SELF.event_type := STD.STR.combineWords(set(
+        //    dedup(sort(ut.WordTokenizer(L.event_type+R.event_type)(char<>''),char),char),char), '');
+        isWDNC := (R.source = Phones.Constants.Sources.PHONES_WDNC);
+        SELF.phone_line_type := IF(isWDNC, R.phone_line_type, L.phone_line_type);
+        SELF.phone_serv_type := IF(isWDNC, R.phone_serv_type, L.phone_serv_type);
+        SELF.line_type_last_seen := IF(isWDNC, R.line_type_last_seen, L.line_type_last_seen);
+        SELF.phone_line_type_desc := IF(isWDNC, R.phone_line_type_desc, L.phone_line_type_desc);
+        SELF.phone_serv_type_desc := IF(isWDNC, R.phone_serv_type_desc, L.phone_serv_type_desc);
         SELF := L;
-        
     END;
 
-    dRolledUpPhones := ROLLUP(SORT(dPhonesWithCurrent, acctno, phoneno, -event_date),
+    dRolledUpPhones := ROLLUP(SORT(dPhonesWithCurrent, acctno, phoneno, -event_date, source = Phones.Constants.Sources.PHONES_WDNC),
         LEFT.acctno = RIGHT.acctno AND
         LEFT.phoneno = RIGHT.phoneno AND
         LEFT.event_date = RIGHT.event_date,

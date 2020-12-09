@@ -1,4 +1,4 @@
-﻿IMPORT MDR, STD, ut;
+﻿IMPORT MDR, STD, Ut, Business_Risk_BIP;
 
 EXPORT mod_BusinessShellVersionLogic(Business_Risk_BIP.LIB_Business_Shell_LIBIN Options) := MODULE
 
@@ -125,7 +125,7 @@ EXPORT mod_BusinessShellVersionLogic(Business_Risk_BIP.LIB_Business_Shell_LIBIN 
   IF(busShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, (STRING)MAX(1, (INTEGER)OrgAddrLegalEntityCount), OrgAddrLegalEntityCount);
   
 	EXPORT _BusNameAuthRepMatch(STRING CompanyName, STRING RepName) := FUNCTION
-		NameMatch_1 := StringLib.StringFind(CompanyName, RepName, 1) > 0;
+		NameMatch_1 := STD.Str.Find(CompanyName, RepName, 1) > 0;
 		NameMatch_2 := Business_Risk_BIP.Common.fn_isFoundInCompanyName(CompanyName, RepName);
     result := IF( busShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, NameMatch_1, NameMatch_2 );
 		RETURN result;
@@ -256,7 +256,7 @@ EXPORT mod_BusinessShellVersionLogic(Business_Risk_BIP.LIB_Business_Shell_LIBIN 
       SHARED recentNonBlankFilingType := filings(TRIM(filing_type) <> '');
       
       SHARED mapFilingType(STRING filing_type) := 
-        CASE( StringLib.StringToUpperCase(TRIM(filing_type)),
+        CASE( STD.Str.ToUpperCase(TRIM(filing_type)),
             'TERMINATION'              => 1,
             'CORRECTION'               => 2,
             'AMENDMENT'                => 3,
@@ -267,7 +267,7 @@ EXPORT mod_BusinessShellVersionLogic(Business_Risk_BIP.LIB_Business_Shell_LIBIN 
             7 );
             
       SHARED mapFilingStatus := 
-        CASE( StringLib.StringToUpperCase(TRIM(filings[1].status_type)),
+        CASE( STD.Str.ToUpperCase(TRIM(filings[1].status_type)),
             'ACTIVE'     => 1,
             'LAPSED'     => 2,
             'TERMINATED'	=> 3,
@@ -379,7 +379,7 @@ EXPORT mod_BusinessShellVersionLogic(Business_Risk_BIP.LIB_Business_Shell_LIBIN 
         busShellVersion =  Business_Risk_BIP.Constants.BusShellVersion_v22 => FirmEmployeeCount_v22,
         busShellVersion =  Business_Risk_BIP.Constants.BusShellVersion_v30 => FirmEmployeeCount_v30, 
         busShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v31 => FirmEmployeeCount_v31,
-        '');  
+        FirmEmployeeCount_v22);  //logic for BusShellVersion V22 is same as V21. 
   END;
   
   EXPORT _FirmEmployeeRangeCount( DATASET(Business_Risk_BIP.Layouts.LayoutSources) SeqEmployeeSources, STRING VerInputIDTruebiz ) := FUNCTION

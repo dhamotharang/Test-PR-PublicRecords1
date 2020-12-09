@@ -278,6 +278,7 @@ EXPORT compliance := MODULE
   EXPORT boolean use_ZumigoIdentity(string dpm)      := dpm[21] NOT IN restrictedSet;
   EXPORT boolean use_AccuityBankData(string dpm)     := dpm[24] NOT IN restrictedSet;
   EXPORT boolean use_DnB(string dpm)                 := dpm[28] NOT IN restrictedSet;
+  EXPORT boolean use_WDNC(string dpm)                 := dpm[37] NOT IN restrictedSet;
 
   // ----------------------------------------------------------------------------------------------
   EXPORT boolean isBusHeaderSourceAllowed (string src, string dpm, string drm) := MAP (

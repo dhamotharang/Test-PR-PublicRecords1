@@ -2139,6 +2139,7 @@ EXPORT Constants := MODULE
 		export UNSIGNED2 MaxOtherPhones := 50;
 		export UNSIGNED2 MaxSearchRecords := 2000;
 		export UNSIGNED2 MaxCompanyIds := 100;
+		export UNSIGNED2 MaxSrcCategories := 100;
 	end;
 
 	//Person Slim alerting query

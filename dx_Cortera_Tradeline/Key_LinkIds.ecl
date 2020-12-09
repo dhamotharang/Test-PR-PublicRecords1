@@ -1,4 +1,4 @@
-﻿IMPORT $, BIPV2;
+﻿IMPORT $, dx_common, BIPV2;
 
 EXPORT Key_LinkIds := MODULE
 
@@ -26,7 +26,8 @@ EXPORT Key_LinkIds := MODULE
     ) :=
   FUNCTION
 
-    BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, out, Level, joinLimit, JoinType);
+    BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, pre_out, Level, joinLimit, JoinType);
+    out := dx_common.Incrementals.mac_Rollup(pre_out, $.Key_Delta_Rid);
     RETURN out;
   END;
 END;
