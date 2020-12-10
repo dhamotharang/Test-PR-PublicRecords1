@@ -1,4 +1,4 @@
-/* RiskProcessing.BWR_Small_Business_Analytics_21_SBFE_BusShellv31 */
+﻿/* RiskProcessing.BWR_Small_Business_Analytics_21_SBFE_BusShellv31 */
 
 #option ('hthorMemoryLimit', 1000);
 
@@ -181,8 +181,6 @@ f_with_seq_Filtered := f_with_seq_nonFiltered(
 // f_with_seq_Filtered_Rep has valid fname and last OR everything is empty; in either case we keep those records				 
 f_with_seq_Filtered_Rep := f_with_seq_Filtered(
 						(TRIM(Representativefirstname) <> '' AND TRIM(Representativelastname) <> '') 
-            //the next line is ccommented out so that we can actually run the input file.  talking to Mike Marshik it was added for blended model scores,  but on approx line 256 that is checked,  will need to validate with Tim
-            and	((TRIM(RepresentativeSSN) <> '') or (TRIM(RepresentativeAddr) <> '' and TRIM(RepresentativeZip) <> '') or TRIM(RepresentativeAddr) <> '' and TRIM(RepresentativeCity) <> '' and TRIM(RepresentativeState) <> '')
 						OR 
 						(
 							TRIM(Representativefirstname) = '' AND 
@@ -447,7 +445,7 @@ layout_flat_v21 := RECORD
 		UNSIGNED6 OrgID;
 		UNSIGNED6 UltID;
 		#IF(includeLN)
-		LNSmallBusiness.BIP_Layouts.Version21Attributes;
+		LNSmallBusiness.BIP_Layouts.Version21Attributes - sourceIndex;
 		#END
 		#IF(IncludeSBFE)
 		LNSmallBusiness.BIP_Layouts.SBFEAttributes - SBFEDelq91CountEverTtl - SBFEDelq121CountEverTtl - SBFEDelq121CountTtl;			
@@ -2898,8 +2896,6 @@ layout_flat_v21 flatten_v21(layout_soap le, SmallBusinessAnalyticsoutput ri) := 
   
 	SELF.ErrorCode := IF(ri.ErrorCode = '' AND SBBMMinInputRequirementsNotMet, 'Error: Minimum input fields required for blended score', ri.ErrorCode);
 	SELF.time_ms := ri.time_ms;
-  //SourceIndex was added to the layout for royalty tracking and does not actually get carried into the results
-  SELF.SourceIndex := '';
 
 END;
 
