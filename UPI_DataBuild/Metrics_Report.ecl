@@ -6,7 +6,7 @@ EXPORT Metrics_Report (string pVersion, boolean pUseProd, string gcid, dataset (
 	EXPORT MetricsRecord(metric1,metric2,metric3,metric4,metric5,metric6,metric7,metric8,metric9,metric10,metric11) := FUNCTIONMACRO
 	
    d := dataset([{min_lexid_score, max_lexid_score, ave_lexid_score, cnt_lexid_change, pct_lexid_change, cnt_crk_change, pct_crk_change, guardian_min_lexid_score, guardian_max_lexid_score, guardian_ave_lexid_score, cnt_new_crk}],
-                  UPI_Databuild.Layouts_V2.metrics_fields);          
+                  UPI_DataBuild.Layouts_V2.metrics_fields);          
 
     return d;
 	endmacro;
@@ -69,9 +69,9 @@ EXPORT Metrics_Report (string pVersion, boolean pUseProd, string gcid, dataset (
 		end;
 		
 		prev_base		:= map(												 
-									pHistMode = 'N'	=> dataset([],upi_databuild.Layouts_V2.base),
+									pHistMode = 'N'	=> dataset([],UPI_DataBuild.Layouts_V2.base),
 									IF(NOTHOR(FileServices.GetSuperFileSubCount(UPI_DataBuild.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).member_base.father)) = 0
-												 ,dataset([],upi_databuild.Layouts_V2.base)
+												 ,dataset([],UPI_DataBuild.Layouts_V2.base)
 												 ,UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.father)); 
  									
 		
