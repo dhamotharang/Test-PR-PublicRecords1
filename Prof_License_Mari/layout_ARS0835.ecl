@@ -22,7 +22,7 @@ EXPORT layout_ARS0835 := MODULE
 	STRING18   LicenseNum,
 	STRING10   FirstLicenseDate,
 	STRING10   IssueDate,
-	STRING10   ExpirationDate,   //removed as of 20130327-change the source of 20130327. Added back as of 20130430
+	// STRING10   ExpirationDate,   //removed as of 20130327-change the source of 20130327. Added back as of 20130430
 	//Phone is removed in 20150513
 	//STRING10	 CEAccru,						//continue education hours accrued. Added since 20130531. Back again in 20130924
 	//DOB is removed in 20150513

@@ -1,5 +1,5 @@
 ﻿import STD, Data_Services;
-BaseFile0 := dataset(Data_Services.Data_location.Prefix('ecrash')+'thor_data400::base::ecrash',FLAccidents_Ecrash.Layout_Basefile,thor)(~(trim(case_identifier,left,right) in  FLAccidents_Ecrash.Suppress_Id and report_code in ['EA', 'TF'])); 
+BaseFile0 := dataset(mod_Utilities.Location + 'thor_data400::base::ecrash',FLAccidents_Ecrash.Layout_Basefile,thor)(~(trim(case_identifier,left,right) in  FLAccidents_Ecrash.Suppress_Id and report_code in ['EA', 'TF'])); 
 BaseFile1 := BaseFile0(trim(report_id,left,right) not in Suppress_report_d);
 
 suppressrec := record
@@ -10,7 +10,7 @@ string Agency_ID;
 end;
 
 
-tosuppress := dataset('~thor_data400::in::ecrash::suppress_tf.csv',suppressrec,csv(heading(1),terminator(['\n','\r\n']), separator(','),quote('"')));
+tosuppress := dataset(mod_Utilities.Location + 'thor_data400::in::ecrash::suppress_tf.csv',suppressrec,csv(heading(1),terminator(['\n','\r\n']), separator(','),quote('"')));
 
 export BaseFile := join(BaseFile1(incident_id not in FLAccidents_Ecrash.supress_incident_id and incident_id not in Set(tosuppress,Incident_ID)) , FLAccidents_Ecrash.Files.deletes, 
                          trim(left.case_identifier,left,right) = trim(right.case_identifier,left,right) and 
