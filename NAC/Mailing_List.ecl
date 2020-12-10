@@ -1,6 +1,5 @@
 ﻿EXPORT Mailing_List(string st) := module
 	shared Dev_list1a := 'Jose.Bello@lexisnexis.com'
-										+',Charles.Pettola@lexisnexis.com'
 										+',Tony.Kirk@lexisnexis.com'
 										+',Charles.Salvo@lexisnexis.com'
 										+',radames.ortega@lexisnexisrisk.com'
@@ -9,7 +8,6 @@
 										//+',Bonita.Rakestraw@lnssi.com'
 										;
 	shared Dev_list1 := 'Jose.Bello@lexisnexis.com'
-										+',Charles.Pettola@lexisnexis.com'
 										+',Tony.Kirk@lexisnexis.com'
 										+',Charles.Salvo@lexisnexis.com'
 										+',ris-glonoc@risk.lexisnexis.com'
@@ -19,7 +17,6 @@
 										//+',Bonita.Rakestraw@lnssi.com'
 										;
 	shared Dev_list2 := 'Jose.Bello@lexisnexis.com'
-										+',Charles.Pettola@lexisnexis.com'
 										+',Tony.Kirk@lexisnexis.com'
 										+',Charles.Salvo@lexisnexis.com'
 										+',LNDataQA@lexisnexis.com'
@@ -29,7 +26,6 @@
 										//+',Bonita.Rakestraw@lnssi.com'
 										;
 	shared Dev_list := 'Jose.Bello@lexisnexis.com'
-										+',Charles.Pettola@lexisnexis.com'
 										+',Tony.Kirk@lexisnexis.com'
 										+',Charles.Salvo@lexisnexis.com'
 										+',Cesar.Gonzalez@lexisnexis.com'
@@ -40,7 +36,6 @@
 										+',Sudhir.Kasavajjala@lexisnexisrisk.com'
 										;
 	shared DOPS_list := 'Jose.Bello@lexisnexis.com'
-										+',Charles.Pettola@lexisnexis.com'
 										+',Tony.Kirk@lexisnexis.com'
 										+',Charles.Salvo@lexisnexis.com'
 										+',LNDataQA@lexisnexis.com'
