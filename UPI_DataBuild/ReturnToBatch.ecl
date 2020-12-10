@@ -55,33 +55,41 @@ EXPORT ReturnToBatch (string pVersion, boolean pUseProd = false, string gcid, da
 																							 L.append_option = '3' => L.lexid_score,
 																							 L.append_option = '4' => 0,
 																							 L.lexid_score); 
-			self.lexid_changed								:= map(L.input_lexid = 0 => ''
-																							,L.append_option = '1' AND L.input_lexid > 0 AND L.input_lexid <> L.lexid => 'Y'
-																							,L.append_option = '1' AND L.input_lexid > 0 AND L.input_lexid =  L.lexid => 'N'
-																							,L.append_option = '2' AND L.input_lexid > 0 AND L.input_lexid <> L.lexid => 'Y'
-																							,L.append_option = '2' AND L.input_lexid > 0 AND L.input_lexid =  L.lexid => 'N'	
-																							,L.append_option = '3' AND L.input_lexid > 0 AND L.input_lexid <> L.lexid => 'Y'
-																							,L.append_option = '3' AND L.input_lexid > 0 AND L.input_lexid =  L.lexid => 'N'
+			self.lexid_changed								:= map((string)L.dt_first_seen = pVersion[1..8] => ''
+																							,L.prev_lexid		 =  0  => ''
+																							,L.append_option = '1' => L.lexid_changed
+																							,L.append_option = '2' => L.lexid_changed
+																							,L.append_option = '3' => L.lexid_changed
 																							,L.append_option = '4' => ''
 																							,''); 
-			self.prev_lexid										:= L.input_lexid; 
+			// self.prev_lexid										:= if((string)L.dt_first_seen = pVersion[1..8], 0, L.prev_lexid); 
+			self.prev_lexid										:= map((string)L.dt_first_seen = pVersion[1..8] => 0
+																							,L.append_option = '1' => L.prev_lexid
+																							,L.append_option = '2' => L.prev_lexid
+																							,L.append_option = '3' => L.prev_lexid
+																							,L.append_option = '4' => 0
+																							,0); 
 			self.crk													:= map(L.append_option = '1' => L.crk,
 																							 L.append_option = '2' AND self.lexid = 0 => L.crk,
 																							 L.append_option = '2' AND self.lexid > 0 => '',
 																							 L.append_option = '3' => '',
 																							 L.append_option = '4' => L.crk,
 																							 L.crk);
-			self.crk_changed									:= map(L.input_crk = '' => ''
-																							,L.append_option = '1' AND L.input_crk <> '' AND L.input_crk <> L.crk => 'Y'
-																							,L.append_option = '1' AND L.input_crk <> '' AND L.input_crk =  L.crk => 'N'
-																							,L.append_option = '2' AND SELF.lexid > 0 => ''
-																							,L.append_option = '2' AND L.input_crk <> '' AND L.input_crk <> L.crk AND SELF.lexid = 0 => 'Y'
-																							,L.append_option = '2' AND L.input_crk <> '' AND L.input_crk =  L.crk AND SELF.lexid = 0 => 'N'
+			self.crk_changed									:= map((string)L.dt_first_seen = pVersion[1..8] => '' 
+																							,L.append_option = '1' => L.crk_changed
+																							,L.append_option = '2' AND self.lexid = 0 => L.crk_changed
+																							,L.append_option = '2' AND self.lexid > 0 => ''
 																							,L.append_option = '3' => ''
-																							,L.append_option = '4' AND L.input_crk <> '' AND L.input_crk <> L.crk => 'Y'
-																							,L.append_option = '4' AND L.input_crk <> '' AND L.input_crk =  L.crk => 'N'
+																							,L.append_option = '4' => L.crk_changed
 																							,'');
-			self.prev_crk											:= L.input_crk;
+			// self.prev_crk											:= if((string)L.dt_first_seen = pVersion[1..8], '', L.prev_crk);
+			self.prev_crk											:= map((string)L.dt_first_seen = pVersion[1..8] => ''
+																							,L.append_option = '1' => L.prev_crk
+																							,L.append_option = '2' AND self.lexid = 0 => L.prev_crk
+																							,L.append_option = '2' AND self.lexid > 0 => ''
+																							,L.append_option = '3' => ''
+																							,L.append_option = '4' => L.prev_crk
+																							,'');
 			SELF  :=  L;	
 			SELF  :=  [];
 		END;
