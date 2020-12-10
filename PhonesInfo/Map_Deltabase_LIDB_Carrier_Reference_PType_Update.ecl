@@ -14,7 +14,7 @@
 		string name;
 	end;
 
-	dsLIDBDelt								:= project(DeltabaseGateway.File_Deltabase_Gateway.Historic_Results_Base(source in ['ATT_DQ_IRS'] and stringlib.stringfind(device_mgmt_status, 'BAD', 1)=0), 	//Source = PB; Deltabase Gateway File (LIDB) - Pull Only Good Records																								
+	dsLIDBDelt								:= project(DeltabaseGateway.File_Deltabase_Gateway.Historic_Results_LIDB_Base, 	//Source = PB; Deltabase Gateway File (LIDB) - Pull Only Good Records																								
 																				transform({compNameRespLayout},
 																										self.name	:= PhonesInfo._Functions.fn_standardName(left.carrier_name);
 																										self			:= left));	
