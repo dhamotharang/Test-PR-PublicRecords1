@@ -97,9 +97,9 @@ output(choosen(		dx_header.key_addr_hist(data_services.data_env.iFCRA)	, luckynu
 output(choosen(		dx_Header.Key_Header_Address(data_services.data_env.iFCRA)	, luckynumber), named('vault_dx_header_Key_FCRA_Header_Address') );
 output(choosen(		dx_Header.Key_Header(data_services.data_env.iFCRA)	, luckynumber), named('vault_dx_header_Key_FCRA_Header') );
 output(choosen(		dx_Header.Key_max_dt_last_seen(data_services.data_env.iFCRA)	, luckynumber), named('vault_dx_header_Key_FCRA_max_dt_last_seen') );
-output(choosen(		fcra_opt_out.key_address	, luckynumber), named('vault_fcra_opt_out_key_address') );
-output(choosen(		fcra_opt_out.key_did	, luckynumber), named('vault_fcra_opt_out_key_did') );
-output(choosen(		fcra_opt_out.key_ssn	, luckynumber), named('vault_fcra_opt_out_key_ssn') );
+output(choosen(		dx_fcra_opt_out.key_address	, luckynumber), named('vault_dx_fcra_opt_out_key_address') );
+output(choosen(		dx_fcra_opt_out.key_did	, luckynumber), named('vault_dx_fcra_opt_out_key_did') );
+output(choosen(		dx_fcra_opt_out.key_ssn	, luckynumber), named('vault_dx_fcra_opt_out_key_ssn') );
 output(choosen(		Risk_Indicators.Key_FCRA_Telcordia_tpm_Slim	, luckynumber), named('vault_Risk_Indicators_Key_FCRA_Telcordia_tpm_Slim') );
 output(choosen(		Census_Data.Key_Fips2County	, luckynumber), named('vault_Census_Data_Key_Fips2County') );
 output(choosen(		dx_Gong.Key_History_Address(data_services.data_env.iFCRA)	, luckynumber), named('vault_Gong_Key_FCRA_History_Address') );
