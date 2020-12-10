@@ -98,10 +98,12 @@ EXPORT proc2Prep(string	prepDate, boolean isFast) :=  FUNCTION
 			+ project(LN_PropertyV2.irs_dummy_recs_assessor,tReformatToCommon(LEFT));
 		combinedPrepDeedMortgage	:= 	prepOkcDeed   + prepFrsDeed + prepOkcMortgage + prepBKMortgage
 			+ project(LN_PropertyV2.irs_dummy_recs_deed,tReformatDeedToCommon(LEFT));
-		combinedPrepSearch_no_sri	:= 	prepOkcSearch + prepFrsSearch + prepBKSearch;
+		combinedPrepSearch_no_aid	:= 	prepOkcSearch + prepBKSearch;
 		combinedPrepAddlLegal			:=	prepAddlLegal + prepFrsAddlLegal;
 		combinedPrepAddlNames			:=	prepAddlNames + prepBKAddlNames;
 
+		LN_Propertyv2.Append_AID(combinedPrepSearch_no_aid,combinedPrepSearch_no_frs,false); // DF-28245 unify multiple calls to AID into a single call
+		combinedPrepSearch_no_sri := combinedPrepSearch_no_frs + prepFrsSearch;
 		combinedPrepSearch_no_sri map_assign_source_rec_id(combinedPrepSearch_no_sri L) := TRANSFORM
 		
 					self.source_rec_id := HASH64( ut.CleanSpacesAndUpper(l.vendor_source_flag) +','
