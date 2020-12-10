@@ -149,12 +149,12 @@ EXPORT Infiles := MODULE
   jProperty_Damage := JOIN(dProperty_Damage, Incidents_ToDelete,
 								           TRIM(LEFT.incident_id, ALL) = TRIM(RIGHT.incident_id, ALL),
 								           LEFT ONLY, LOCAL);					
-  EXPORT tProperty := PROJECT(jProperty_Damage, TRANSFORM(Layout_Infiles_Fixed.Property_damage, SELF := LEFT));		
+  SHARED tProperty := PROJECT(jProperty_Damage, TRANSFORM(Layout_Infiles_Fixed.Property_damage, SELF := LEFT));		
 	
 // ###########################################################################
 //                     Prep Commercial File
 // ###########################################################################													
-  EXPORT tCommercial := PROJECT(Commercl, TRANSFORM(Layout_Infiles_Fixed.commercl, SELF := LEFT));	
+  SHARED tCommercial := PROJECT(Commercl, TRANSFORM(Layout_Infiles_Fixed.commercl, SELF := LEFT));	
 	SHARED uCommercial := DEDUP(SORT(DISTRIBUTE(tcommercial(vehicle_id <> ''), HASH32(vehicle_id)),
 	                                 vehicle_id, creation_date, LOCAL),
 															vehicle_id, RIGHT, LOCAL);
@@ -167,7 +167,7 @@ EXPORT Infiles := MODULE
   jCitation := JOIN(dCitation, Incidents_ToDelete,
 								    TRIM(LEFT.incident_id, ALL) = TRIM(RIGHT.incident_id, ALL),
 								    LEFT ONLY, LOCAL);											
-  EXPORT tCitation := PROJECT(jCitation, TRANSFORM(Layout_Infiles_Fixed.citation, SELF := LEFT));
+  tCitation := PROJECT(jCitation, TRANSFORM(Layout_Infiles_Fixed.citation, SELF := LEFT));
 	
 	gCitations := GROUP(SORT(DISTRIBUTE(tCitation(incident_id <> '' AND person_id <> ''), HASH32(incident_id)), 
 											 incident_id,  person_id,  -citation_id,  LOCAL), 
@@ -380,7 +380,7 @@ EXPORT Infiles := MODULE
 												        MANY LOOKUP, LEFT ONLY );
 
 	macRemoveNulls(Combined_DropSuppress, CleanCombinedAll);
-	EXPORT Cmbnd := DEDUP(SORT(CleanCombinedAll, RECORD, LOCAL),RECORD, LOCAL)(TRIM(agency_id, LEFT, RIGHT) NOT IN ['5','6','7']):PERSIST('~thor_data400::persist::ecrash_cmbnd');
+	EXPORT eCrashCmbnd := DEDUP(SORT(CleanCombinedAll, RECORD, LOCAL), RECORD, LOCAL)(TRIM(agency_id, LEFT, RIGHT) NOT IN ['5','6','7']):PERSIST('~thor_data400::persist::ecrash_cmbnd');
 
 // #############################################################################################
 //  Combine MBS Agency & MBSI Billing Agency 
