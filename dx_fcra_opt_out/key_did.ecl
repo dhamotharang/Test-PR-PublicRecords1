@@ -1,9 +1,9 @@
-// ---------------------------------------------------------------
+﻿// ---------------------------------------------------------------
 // For delta rollup logic (dx_common.mac_incremental_rollup) use:
 // $.key_optout_delta_rid
 // ---------------------------------------------------------------
 
-IMPORT $, _Control;
+IMPORT $, _Control, vault;
 
 rec := $.layouts.i_did;
 
