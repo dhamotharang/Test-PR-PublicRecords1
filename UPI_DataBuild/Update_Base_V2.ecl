@@ -102,18 +102,14 @@ EXPORT Update_Base_V2 (
 		match_flag := IF(
 				trim(stringlib.stringtouppercase(left.input_first_name),left,right) 								=
 				trim(stringlib.stringtouppercase(right.input_first_name),left,right) 							AND
-				trim(stringlib.stringtouppercase(left.input_middle_initial),left,right) 							=
-				trim(stringlib.stringtouppercase(right.input_middle_initial),left,right) 							AND
+				if(left.input_middle_initial <> '' and right.input_middle_initial <> '',
+					trim(stringlib.stringtouppercase(left.input_middle_initial),left,right) 							=
+					trim(stringlib.stringtouppercase(right.input_middle_initial),left,right),true) 							AND
 				trim(stringlib.stringtouppercase(left.input_last_name),left,right) 							=
 				trim(stringlib.stringtouppercase(right.input_last_name),left,right) 							AND
-				trim(stringlib.stringtouppercase(left.input_suffix),left,right) 							=
-				trim(stringlib.stringtouppercase(right.input_suffix),left,right) 							AND
-				trim(stringlib.stringtouppercase(left.input_full_name),left,right) 							=
-				trim(stringlib.stringtouppercase(right.input_full_name),left,right) 						AND
-				trim(stringlib.stringtouppercase(left.input_guardian_first_name),left,right) 						=
-				trim(stringlib.stringtouppercase(right.input_guardian_first_name),left,right) 						AND
-				trim(stringlib.stringtouppercase(left.input_guardian_last_name),left,right) 							=
-				trim(stringlib.stringtouppercase(right.input_guardian_last_name),left,right),
+				if(left.input_suffix <> '' and right.input_suffix <> '',
+					trim(stringlib.stringtouppercase(left.input_suffix),left,right) 							=
+					trim(stringlib.stringtouppercase(right.input_suffix),left,right),true),
 			true, false);
 
 		RETURN match_flag;
@@ -131,51 +127,41 @@ EXPORT Update_Base_V2 (
 				trim(stringlib.stringtouppercase(left.input_state),Left, Right) 	=
 				trim(stringlib.stringtouppercase(right.input_state),Left, Right) 	AND
 				trim(stringlib.stringtouppercase(left.input_zip),Left, Right) 					=
-				trim(stringlib.stringtouppercase(right.input_zip),Left, Right) 					AND
-				trim(stringlib.stringtouppercase(left.input_home_phone),Left, Right) 					=
-				trim(stringlib.stringtouppercase(right.input_home_phone),Left, Right) 					AND
-				trim(stringlib.stringtouppercase(left.input_alt_phone),Left, Right) 						=
-				trim(stringlib.stringtouppercase(right.input_alt_phone),Left, Right) 					AND
-				trim(stringlib.stringtouppercase(left.input_primary_email_address),Left, Right) 					=
-				trim(stringlib.stringtouppercase(right.input_primary_email_address),Left, Right),
+				trim(stringlib.stringtouppercase(right.input_zip),Left, Right),
 			TRUE, FALSE);
 						
 		RETURN match_flag;	
 	ENDMACRO;
 		
-	EXPORT all_others_match (pUpdateFile, pBaseToCheck) := FUNCTIONMACRO
+	EXPORT all_others_match_base (pUpdateFile, pBaseToCheck) := FUNCTIONMACRO
 	
 		match_flag := IF(
 				trim(left.input_dob, all) = trim(right.input_dob, all)										AND	
-				trim(left.input_guardian_dob, all) = trim(right.input_guardian_dob, all)										AND	
 				trim(stringlib.stringtouppercase(left.input_gender),left,right)						=
 				trim(stringlib.stringtouppercase(right.input_gender),left,right)						AND
 				trim(stringlib.stringtouppercase(left.input_ssn),left,right)						=
 				trim(stringlib.stringtouppercase(right.input_ssn),left,right)						AND
-				trim(stringlib.stringtouppercase(left.input_guardian_ssn),left,right)				=
-				trim(stringlib.stringtouppercase(right.input_guardian_ssn),left,right)				AND
-				// left.input_lexid				=	right.input_lexid			AND
-				// left.input_crk					=	right.input_crk				AND
-				left.member_id					=	right.member_id				AND
-				left.customer_id				=	right.customer_id			AND
-				left.account_id					=	right.account_id			AND
-				left.subscriber_id			=	right.subscriber_id		AND
-				trim(stringlib.stringtouppercase(left.group_id),left,right)				=
-				trim(stringlib.stringtouppercase(right.group_id),left,right)			AND
-				trim(stringlib.stringtouppercase(left.relationship_code),left,right)				=
-				trim(stringlib.stringtouppercase(right.relationship_code),left,right)				AND
-				trim(stringlib.stringtouppercase(left.udf1),left,right)		=
-				trim(stringlib.stringtouppercase(right.udf1),left,right)		AND
-				trim(stringlib.stringtouppercase(left.udf2),left,right)		=
-				trim(stringlib.stringtouppercase(right.udf2),left,right)		AND
-				trim(stringlib.stringtouppercase(left.udf3),left,right)		=
-				trim(stringlib.stringtouppercase(right.udf3),left,right),
+				left.rid				= right.rid AND
+				left.nomatch_id	= right.nomatch_id,
+			true, false);
+
+		RETURN match_flag;
+	ENDMACRO;
+	
+	EXPORT all_others_match_input (pUpdateFile, pBaseToCheck) := FUNCTIONMACRO
+	
+		match_flag := IF(
+				trim(left.input_dob, all) = trim(right.input_dob, all)										AND	
+				trim(stringlib.stringtouppercase(left.input_gender),left,right)						=
+				trim(stringlib.stringtouppercase(right.input_gender),left,right)						AND
+				trim(stringlib.stringtouppercase(left.input_ssn),left,right)						=
+				trim(stringlib.stringtouppercase(right.input_ssn),left,right),	
 			true, false);
 
 		RETURN match_flag;
 	ENDMACRO;
 
-	EXPORT dist_and_sort_them (pFileToSort) := FUNCTIONMACRO
+	EXPORT dist_and_sort_them_base (pFileToSort) := FUNCTIONMACRO
 	
 		temp_file_dist		:= distribute(pFileToSort, hash(
 										// name fields
@@ -192,23 +178,13 @@ EXPORT Update_Base_V2 (
 										trim(stringlib.stringtouppercase(input_city),left,right),
 										trim(stringlib.stringtouppercase(input_state),left,right),
 										trim(stringlib.stringtouppercase(input_zip),left,right),
-										trim(stringlib.stringtouppercase(input_home_phone),left,right),
-										trim(stringlib.stringtouppercase(input_alt_phone),left,right),
-										trim(stringlib.stringtouppercase(input_primary_email_address),left,right),
 										// other id fields
 										trim(stringlib.stringfilterout(input_dob,'-.>$!%*@=?&\''),left,right),
 										trim(stringlib.stringfilterout(input_guardian_dob,'-.>$!%*@=?&\''),left,right),
 										trim(stringlib.stringtouppercase(input_gender),left,right),
 										trim(stringlib.stringtouppercase(input_ssn),left,right),
-										trim(stringlib.stringtouppercase(input_guardian_ssn),left,right),
-										// input_lexid,input_crk,
-										member_id,customer_id,account_id,subscriber_id,
-										trim(stringlib.stringtouppercase(group_id),left,right),
-										trim(stringlib.stringtouppercase(relationship_code),left,right),
-										trim(stringlib.stringtouppercase(udf1),left,right),
-										trim(stringlib.stringtouppercase(udf2),left,right),
-										trim(stringlib.stringtouppercase(udf3),left,right)));
-										// trim(stringlib.stringtouppercase(batch_jobid),left,right)));
+										trim(stringlib.stringtouppercase(input_guardian_ssn),left,right)
+										));
 										
 		temp_file_sort := sort(temp_file_dist, 
 										// name fields
@@ -225,32 +201,72 @@ EXPORT Update_Base_V2 (
 										trim(stringlib.stringtouppercase(input_city),left,right),
 										trim(stringlib.stringtouppercase(input_state),left,right),
 										trim(stringlib.stringtouppercase(input_zip),left,right),
-										trim(stringlib.stringtouppercase(input_home_phone),left,right),
-										trim(stringlib.stringtouppercase(input_alt_phone),left,right),
-										trim(stringlib.stringtouppercase(input_primary_email_address),left,right),
 										// other id fields
 										trim(stringlib.stringfilterout(input_dob,'-.>$!%*@=?&\''),left,right),
 										trim(stringlib.stringfilterout(input_guardian_dob,'-.>$!%*@=?&\''),left,right),
 										trim(stringlib.stringtouppercase(input_gender),left,right),
 										trim(stringlib.stringtouppercase(input_ssn),left,right),
 										trim(stringlib.stringtouppercase(input_guardian_ssn),left,right),
-										// input_lexid,input_crk,
-										member_id,customer_id,account_id,subscriber_id,
-										trim(stringlib.stringtouppercase(group_id),left,right),
-										trim(stringlib.stringtouppercase(relationship_code),left,right),
-										trim(stringlib.stringtouppercase(udf1),left,right),
-										trim(stringlib.stringtouppercase(udf2),left,right),
-										trim(stringlib.stringtouppercase(udf3),left,right),
-										// trim(stringlib.stringtouppercase(batch_jobid),left,right),
+										rid,nomatch_id,
 										-dt_vendor_last_reported, local);
-										// local);
+										
+		RETURN temp_file_sort;
+	ENDMACRO;	
+	
+	EXPORT dist_and_sort_them_input (pFileToSort) := FUNCTIONMACRO
+	
+		temp_file_dist		:= distribute(pFileToSort, hash(
+										// name fields
+										trim(stringlib.stringtouppercase(input_last_name),left,right),
+										trim(stringlib.stringtouppercase(input_first_name),left,right),
+										trim(stringlib.stringtouppercase(input_middle_initial),left,right),
+										trim(stringlib.stringtouppercase(input_suffix),left,right),
+										trim(stringlib.stringtouppercase(input_full_name),left,right),
+										trim(stringlib.stringtouppercase(input_guardian_last_name),left,right),
+										trim(stringlib.stringtouppercase(input_guardian_first_name),left,right),
+										// address fields
+										trim(stringlib.stringtouppercase(address_line1),left,right),
+										trim(stringlib.stringtouppercase(address_line2),left,right),
+										trim(stringlib.stringtouppercase(input_city),left,right),
+										trim(stringlib.stringtouppercase(input_state),left,right),
+										trim(stringlib.stringtouppercase(input_zip),left,right),
+										// other id fields
+										trim(stringlib.stringfilterout(input_dob,'-.>$!%*@=?&\''),left,right),
+										trim(stringlib.stringfilterout(input_guardian_dob,'-.>$!%*@=?&\''),left,right),
+										trim(stringlib.stringtouppercase(input_gender),left,right),
+										trim(stringlib.stringtouppercase(input_ssn),left,right),
+										trim(stringlib.stringtouppercase(input_guardian_ssn),left,right)
+										));
+										
+		temp_file_sort := sort(temp_file_dist, 
+										// name fields
+										trim(stringlib.stringtouppercase(input_last_name),left,right),
+										trim(stringlib.stringtouppercase(input_first_name),left,right),
+										trim(stringlib.stringtouppercase(input_middle_initial),left,right),
+										trim(stringlib.stringtouppercase(input_suffix),left,right),
+										trim(stringlib.stringtouppercase(input_full_name),left,right),
+										trim(stringlib.stringtouppercase(input_guardian_last_name),left,right),
+										trim(stringlib.stringtouppercase(input_guardian_first_name),left,right),
+										// address fields
+										trim(stringlib.stringtouppercase(address_line1),left,right),
+										trim(stringlib.stringtouppercase(address_line2),left,right),
+										trim(stringlib.stringtouppercase(input_city),left,right),
+										trim(stringlib.stringtouppercase(input_state),left,right),
+										trim(stringlib.stringtouppercase(input_zip),left,right),
+										// other id fields
+										trim(stringlib.stringfilterout(input_dob,'-.>$!%*@=?&\''),left,right),
+										trim(stringlib.stringfilterout(input_guardian_dob,'-.>$!%*@=?&\''),left,right),
+										trim(stringlib.stringtouppercase(input_gender),left,right),
+										trim(stringlib.stringtouppercase(input_ssn),left,right),
+										trim(stringlib.stringtouppercase(input_guardian_ssn),left,right),
+										-dt_vendor_last_reported, local);
 										
 		RETURN temp_file_sort;
 	ENDMACRO;	
 
-	EXPORT roll_them_up (pFileToRoll)	:= FUNCTIONMACRO
+	EXPORT roll_them_up_base (pFileToRoll)	:= FUNCTIONMACRO
 	
-		temp_sort_file	:= dist_and_sort_them(pFileToRoll);
+		temp_sort_file	:= dist_and_sort_them_base(pFileToRoll);
 		
 		{pFileToRoll} roll_them(temp_sort_file L, temp_sort_file R) := TRANSFORM
 			SELF.dt_first_seen            := ut.EarliestDate(L.dt_first_seen, R.dt_first_seen);
@@ -258,12 +274,9 @@ EXPORT Update_Base_V2 (
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 			SELF.dt_vendor_last_reported  := max(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF.startdate								:= ut.EarliestDate(L.startdate, r.startdate);
-			SELF.source_rid               := min(L.source_rid, R.source_rid);
 			SELF.batch_jobid							:= IF(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.batch_jobid, R.batch_jobid);
 			SELF.batch_seq_number					:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.batch_seq_number, R.batch_seq_number);
 			SELF.gcid_name								:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.gcid_name, R.gcid_name);
-			SELF.rid											:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.rid, R.rid);
-			SELF.nomatch_id								:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.nomatch_id, R.nomatch_id);
 			SELF.lexid										:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.lexid, R.lexid);
 			SELF.lexid_score							:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.lexid_score, R.lexid_score);
 			SELF.guardian_lexid						:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.guardian_lexid, R.guardian_lexid);
@@ -273,8 +286,9 @@ EXPORT Update_Base_V2 (
 			SELF.history_mode							:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.history_mode, R.history_mode);
 			SELF.input_crk								:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.input_crk, R.input_crk);
 			SELF.input_lexid							:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.input_lexid, R.input_lexid);
-			SELF.prev_crk									:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.prev_crk, R.prev_crk);
-			SELF.prev_lexid								:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.prev_lexid, R.prev_lexid);
+			SELF.udf1											:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.udf1, R.udf1);
+			SELF.udf2											:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.udf2, R.udf2);
+			SELF.udf3											:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.udf3, R.udf3);
 			SELF						 		 				  := IF(L.history_or_current = 'C', L, R);	
 		END;
 
@@ -305,12 +319,6 @@ EXPORT Update_Base_V2 (
 								 trim(stringlib.stringtouppercase(right.input_state),left,right)AND
 								 trim(stringlib.stringtouppercase(left.input_zip),left,right)							=
 								 trim(stringlib.stringtouppercase(right.input_zip),left,right)							AND
-								 trim(stringlib.stringtouppercase(left.input_home_phone),left,right)							=
-								 trim(stringlib.stringtouppercase(right.input_home_phone),left,right)						AND
-								 trim(stringlib.stringtouppercase(left.input_alt_phone),left,right)								=
-								 trim(stringlib.stringtouppercase(right.input_alt_phone),left,right)							AND
-								 trim(stringlib.stringtouppercase(left.input_primary_email_address),left,right)							=
-								 trim(stringlib.stringtouppercase(right.input_primary_email_address),left,right)							AND
 								 trim(left.input_dob, all) = trim(right.input_dob, all)										AND	
 								 trim(left.input_guardian_dob, all) = trim(right.input_guardian_dob, all)												AND	
 								 trim(stringlib.stringtouppercase(left.input_gender),left,right)										=
@@ -318,23 +326,79 @@ EXPORT Update_Base_V2 (
 								 trim(stringlib.stringtouppercase(left.input_ssn),left,right)										=
 								 trim(stringlib.stringtouppercase(right.input_ssn),left,right)										AND
 								 trim(stringlib.stringtouppercase(left.input_guardian_ssn),left,right)								=
-								 trim(stringlib.stringtouppercase(right.input_guardian_ssn),left,right)								AND
-								 // left.input_lexid			= right.input_lexid						AND
-								 // left.input_crk				=	right.input_crk		AND
-								 left.member_id				= right.member_id		AND
-								 left.customer_id			=	right.customer_id		AND
-								 left.account_id			=	right.account_id			AND
-								 left.subscriber_id		=	right.subscriber_id						AND
-								 trim(stringlib.stringtouppercase(left.group_id),left,right)									=
-								 trim(stringlib.stringtouppercase(right.group_id),left,right)								AND
-								 trim(stringlib.stringtouppercase(left.relationship_code),left,right)									=
-								 trim(stringlib.stringtouppercase(right.relationship_code),left,right)								AND
-								 trim(stringlib.stringtouppercase(left.udf1),left,right)								=
-								 trim(stringlib.stringtouppercase(right.udf1),left,right)								AND
-								 trim(stringlib.stringtouppercase(left.udf2),left,right)		=
-								 trim(stringlib.stringtouppercase(right.udf2),left,right)		AND
-								 trim(stringlib.stringtouppercase(left.udf3),left,right)		=
-								 trim(stringlib.stringtouppercase(right.udf3),left,right),
+								 trim(stringlib.stringtouppercase(right.input_guardian_ssn),left,right)							AND
+								 left.rid = right.rid AND
+								 left.nomatch_id = right.nomatch_id AND
+								 left.source_rid = right.source_rid,
+					roll_them(LEFT, RIGHT),LOCAL);
+					
+		RETURN rolled_base;
+	ENDMACRO;
+	
+	EXPORT roll_them_up_input (pFileToRoll)	:= FUNCTIONMACRO
+	
+		temp_sort_file	:= dist_and_sort_them_input(pFileToRoll);
+		
+		{pFileToRoll} roll_them(temp_sort_file L, temp_sort_file R) := TRANSFORM
+			SELF.dt_first_seen            := ut.EarliestDate(L.dt_first_seen, R.dt_first_seen);
+			SELF.dt_last_seen             := max(L.dt_last_seen, R.dt_last_seen);
+			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
+			SELF.dt_vendor_last_reported  := max(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			SELF.startdate								:= ut.EarliestDate(L.startdate, r.startdate);
+			SELF.source_rid               := if(L.source_rid = 0, R.source_rid, L.source_rid);
+			SELF.batch_jobid							:= IF(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.batch_jobid, R.batch_jobid);
+			SELF.batch_seq_number					:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.batch_seq_number, R.batch_seq_number);
+			SELF.gcid_name								:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.gcid_name, R.gcid_name);
+			SELF.lexid										:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.lexid, R.lexid);
+			SELF.lexid_score							:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.lexid_score, R.lexid_score);
+			SELF.guardian_lexid						:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.guardian_lexid, R.guardian_lexid);
+			SELF.guardian_lexid_score			:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.guardian_lexid_score, R.guardian_lexid_score);
+			SELF.append_option						:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.append_option, R.append_option);
+			SELF.runtime_threshold				:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.runtime_threshold, R.runtime_threshold);
+			SELF.history_mode							:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.history_mode, R.history_mode);
+			SELF.input_crk								:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.input_crk, R.input_crk);
+			SELF.input_lexid							:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.input_lexid, R.input_lexid);
+			SELF.udf1											:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.udf1, R.udf1);
+			SELF.udf2											:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.udf2, R.udf2);
+			SELF.udf3											:= if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.udf3, R.udf3);
+			SELF						 		 				  := IF(L.history_or_current = 'C', L, R);	
+		END;
+
+		rolled_base := rollup(
+							temp_sort_file,
+								 trim(stringlib.stringtouppercase(left.input_last_name),left,right)								=
+								 trim(stringlib.stringtouppercase(right.input_last_name),left,right)							AND
+								 trim(stringlib.stringtouppercase(left.input_first_name),left,right)									=
+								 trim(stringlib.stringtouppercase(right.input_first_name),left,right)								AND
+								 trim(stringlib.stringtouppercase(left.input_middle_initial),left,right)								=
+								 trim(stringlib.stringtouppercase(right.input_middle_initial),left,right)								AND
+								 trim(stringlib.stringtouppercase(left.input_suffix),left,right)								=
+								 trim(stringlib.stringtouppercase(right.input_suffix),left,right)								AND
+								 trim(stringlib.stringtouppercase(left.input_full_name),left,right)							=
+								 trim(stringlib.stringtouppercase(right.input_full_name),left,right)							AND
+								 trim(stringlib.stringtouppercase(left.input_guardian_last_name),left,right)								=
+								 trim(stringlib.stringtouppercase(right.input_guardian_last_name),left,right)							AND
+								 trim(stringlib.stringtouppercase(left.input_guardian_first_name),left,right)							=
+								 trim(stringlib.stringtouppercase(right.input_guardian_first_name),left,right)						AND
+								 // address fields
+								 trim(stringlib.stringtouppercase(left.address_line1),left,right)								=
+								 trim(stringlib.stringtouppercase(right.address_line1),left,right)							AND
+								 trim(stringlib.stringtouppercase(left.address_line2),left,right)				=
+								 trim(stringlib.stringtouppercase(right.address_line2),left,right)				AND
+								 trim(stringlib.stringtouppercase(left.input_city),left,right)		=
+								 trim(stringlib.stringtouppercase(right.input_city),left,right)	AND
+								 trim(stringlib.stringtouppercase(left.input_state),left,right)	=
+								 trim(stringlib.stringtouppercase(right.input_state),left,right)AND
+								 trim(stringlib.stringtouppercase(left.input_zip),left,right)							=
+								 trim(stringlib.stringtouppercase(right.input_zip),left,right)							AND
+								 trim(left.input_dob, all) = trim(right.input_dob, all)										AND	
+								 trim(left.input_guardian_dob, all) = trim(right.input_guardian_dob, all)												AND	
+								 trim(stringlib.stringtouppercase(left.input_gender),left,right)										=
+								 trim(stringlib.stringtouppercase(right.input_gender),left,right)										AND
+								 trim(stringlib.stringtouppercase(left.input_ssn),left,right)										=
+								 trim(stringlib.stringtouppercase(right.input_ssn),left,right)										AND
+								 trim(stringlib.stringtouppercase(left.input_guardian_ssn),left,right)								=
+								 trim(stringlib.stringtouppercase(right.input_guardian_ssn),left,right),
 					roll_them(LEFT, RIGHT),LOCAL);
 					
 		RETURN rolled_base;
@@ -354,10 +418,6 @@ EXPORT Update_Base_V2 (
 				SELF.current_input		:= 'N',
 				SELF.batch_seq_number := '',
 				SELF.batch_jobid			:= '',
-				SELF.prev_crk					:= '',
-				SELF.prev_lexid				:= 0,
-				SELF.crk_changed			:= '',
-				SELF.lexid_changed		:= '',
 				SELF								:= left));
 		deduped_old_base := dedup(sort(old_base, record, local), record, local);
 		RETURN deduped_old_base;
@@ -375,28 +435,33 @@ EXPORT Update_Base_V2 (
 							
  	EXPORT Processed_Input:= FUNCTION
 	
-				use_threshold					:= if(pAppendOption = '4', 90, pLexidThreshold);
+				use_threshold					:=  pLexidThreshold;//if(pAppendOption = '4', 90, pLexidThreshold);
 												
 				pre_processed_input		:=  Append_LexID(pVersion, pUseProd, gcid, use_threshold, pHistMode, pBatch_jobID, pre_process_input).LexID_Append;
 
 								
 				previous_base		:= IF((NOTHOR(FileServices.GetSuperFileSubCount(UPI_DataBuild.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).member_lBaseTemplate_built)) = 0)
 														OR pHistMode = 'N'
-														,dataset([],upi_databuild.Layouts_V2.input_processing)
+														,dataset([],UPI_DataBuild.Layouts_V2.input_processing)
 														,mark_old(project(UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.qa, 
 																				transform(UPI_DataBuild.Layouts_V2.Input_processing, self := left, self := []))));
 												 						
-				stdInput			:= dist_and_sort_them(pre_processed_input);
+				stdInput			:= dist_and_sort_them_input(pre_processed_input);
 				
-				ds_current		:= dist_and_sort_them(roll_them_up(previous_base));
+				ds_current		:= dist_and_sort_them_base(roll_them_up_base(previous_base));
 				
 				// Right now we don't care about historical only records, that will be handled after CRK results
 				// First we want to compare the new input to the old base to re-use source_rid for any previously
 				// processed individuals (where we can clearly identify as the same individual)
 				UPI_DataBuild.Layouts_V2.input_processing reuse_existing_source_rids(UPI_DataBuild.Layouts_V2.input_processing new_update, UPI_DataBuild.Layouts_v2.input_processing last_built_base) := TRANSFORM
 					SELF.source_rid								:= last_built_base.source_rid;
-					SELF.prev_crk									:= new_update.input_crk;
-					SELF.prev_lexid								:= new_update.input_lexid;
+					SELF.prev_crk									:= last_built_base.prev_crk;
+					SELF.prev_lexid								:= last_built_base.prev_lexid;
+					SELF.dt_first_seen						:= ut.EarliestDate(new_update.dt_first_seen, last_built_base.dt_first_seen);
+					SELF.startdate								:= ut.EarliestDate(new_update.startdate, last_built_base.startdate);			
+					SELF.dt_vendor_first_reported	:= ut.EarliestDate(new_update.dt_vendor_first_reported, last_built_base.dt_vendor_first_reported);
+					SELF.dt_vendor_last_reported	:= max(new_update.dt_vendor_last_reported, last_built_base.dt_vendor_last_reported);
+					SELF.dt_last_seen							:= max(new_update.dt_last_seen, last_built_base.dt_last_seen);
 					SELF 													:= new_update;
 					SELF													:= [];
 				END;
@@ -404,8 +469,8 @@ EXPORT Update_Base_V2 (
 				assign_existing_source_rids := DEDUP(SORT(JOIN(stdInput, ds_current, 
 									name_fields_match(stdInput, ds_current)		AND
 									addresses_match(stdInput, ds_current)			AND
-									all_others_match(stdInput, ds_current),
-								reuse_existing_source_rids(LEFT, RIGHT),LEFT OUTER, LOCAL), RECORD, LOCAL), RECORD, LOCAL);	
+									all_others_match_input(stdInput, ds_current),
+								reuse_existing_source_rids(LEFT, RIGHT),LEFT OUTER, KEEP(1), LOCAL), RECORD, LOCAL), RECORD, LOCAL);	
 								
 				no_existing_source_rids 	:= assign_existing_source_rids(source_rid = 0);
 				with_existing_source_rids	:= assign_existing_source_rids(source_rid > 0);				
@@ -415,8 +480,13 @@ EXPORT Update_Base_V2 (
 					SELF.current_input						:= 'Y';
 					SELF.batch_jobid							:= new_update.batch_jobid;
 					SELF.batch_seq_number					:= new_update.batch_seq_number;
-					SELF.prev_crk									:= if(pHistMode = 'A', last_built_base.crk, new_update.input_crk);
-					SELF.prev_lexid								:= if(pHistMode = 'A', last_built_base.lexid, new_update.input_lexid);
+					SELF.prev_crk									:= last_built_base.prev_crk;
+					SELF.prev_lexid								:= last_built_base.prev_lexid;
+					SELF.dt_first_seen						:= ut.EarliestDate(new_update.dt_first_seen, last_built_base.dt_first_seen);
+					SELF.startdate								:= ut.EarliestDate(new_update.startdate, last_built_base.startdate);			
+					SELF.dt_vendor_first_reported	:= ut.EarliestDate(new_update.dt_vendor_first_reported, last_built_base.dt_vendor_first_reported);
+					SELF.dt_vendor_last_reported	:= max(new_update.dt_vendor_last_reported, last_built_base.dt_vendor_last_reported);
+					SELF.dt_last_seen							:= max(new_update.dt_last_seen, last_built_base.dt_last_seen);
 					SELF 													:= new_update;
 					SELF													:= [];
 				END;
@@ -424,7 +494,7 @@ EXPORT Update_Base_V2 (
 				truly_new_recs := JOIN(no_existing_source_rids, ds_current,
 									name_fields_match(no_existing_source_rids, ds_current)		AND
 									addresses_match(no_existing_source_rids, ds_current)			AND
-									all_others_match(no_existing_source_rids, ds_current),
+									all_others_match_input(no_existing_source_rids, ds_current),
 								find_new_recs(LEFT, RIGHT), LEFT ONLY, LOCAL);
 
 				// add the two together to assign new source_rids
@@ -442,7 +512,86 @@ EXPORT Update_Base_V2 (
    		RETURN sort(all_rids, batch_seq_number);
 	END;
 		
- 	EXPORT Add_CRK_results := FUNCTION
+ 	EXPORT Add_CRK_results_input := FUNCTION
+				
+				crk_results				:= HealthcareNoMatchHeader_Ingest.Files(gcid).CRK;
+								
+				linked_input_file	:= UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).processed_input.new;
+				
+				previously_seen		:= IF(NOTHOR(FileServices.GetSuperFileSubCount(UPI_DataBuild.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).member_lBaseTemplate_built)) = 0
+														OR pHistMode = 'N'
+														,dataset([],UPI_DataBuild.Layouts_V2.input_processing)
+														,mark_old(project(UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.qa, 
+																				transform(UPI_DataBuild.Layouts_V2.Input_processing, self := left, self := []))));
+
+								
+				linked_input_wCRK		:= linked_input_file(prev_crk <> '');
+				linked_input_noCRK	:= linked_input_file(prev_crk =  '');
+				
+				update_current_crk		:= join(sort(distribute(crk_results,hash(old_crk)),old_crk,local),
+																			sort(distribute(linked_input_wCRK,hash(prev_crk)),prev_crk,local)
+																			,LEFT.old_crk = RIGHT.prev_crk
+																			,TRANSFORM(UPI_DataBuild.Layouts_V2.Input_processing
+																					,SELF.input_crk			:= RIGHT.input_crk
+																					,SELF.input_lexid		:= RIGHT.input_lexid
+																					,SELF.prev_crk			:= LEFT.old_crk
+																					,SELF.prev_lexid		:= LEFT.old_lexid
+																					,SELF.crk						:= LEFT.crk
+																					,SELF.nomatch_id		:= LEFT.nomatch_id
+																					,SELF.rid						:= LEFT.rid
+																					,SELF.crk_changed		:= LEFT.crk_changed
+																					,SELF.lexid_changed	:= LEFT.lexid_changed
+																					,SELF           		:= RIGHT
+																					,SELF								:= LEFT)
+																			,RIGHT OUTER, LOCAL);
+																			
+				linked_wprevCRK_update	:= update_current_crk + linked_input_noCRK;
+				
+				linked_input_needsCRK		:= linked_wprevCRK_update(crk =  '');
+				linked_input_hasCRK			:= linked_wprevCRK_update(crk <> '');
+				
+				update_new_CRK		:= join(sort(distribute(crk_results,hash(source_rid)),source_rid,local),	
+																	sort(distribute(linked_input_file,hash(source_rid)),source_rid,local)
+																	,LEFT.source_rid = RIGHT.source_rid
+																	,TRANSFORM(UPI_DataBuild.Layouts_V2.input_processing
+																			,SELF.input_crk			:= RIGHT.input_crk
+																			,SELF.input_lexid		:= RIGHT.input_lexid
+																			,SELF.prev_crk			:= LEFT.old_crk
+																			,SELF.prev_lexid		:= LEFT.old_lexid
+																			,SELF.crk						:= LEFT.crk
+																			,SELF.nomatch_id		:= LEFT.nomatch_id
+																			,SELF.rid						:= LEFT.rid
+																			,SELF.crk_changed		:= LEFT.crk_changed
+																			,SELF.lexid_changed	:= LEFT.lexid_changed
+																			,SELF           		:= RIGHT
+																			,SELF								:= LEFT)
+																	,RIGHT OUTER, LOCAL);
+																																		
+				update_current_batch	:= dedup(linked_input_hasCRK + update_new_CRK, all, except nomatch_id, rid);
+				
+				first_seen	:= sort(distribute(update_current_batch(dt_first_seen = (unsigned)pversion[1..8]), hash(crk)), crk, local);
+				
+				updated_already_seen	:= update_current_batch(dt_first_seen < (unsigned)pversion[1..8]);
+				
+				already_seen					:= sort(distribute(previously_seen + updated_already_seen, hash(prev_crk)), prev_crk, dt_first_seen, local);
+				
+				check_for_new_rec_same_person	:= join(first_seen, already_seen,
+																								left.crk = right.prev_crk, 
+																								transform({update_current_batch},
+																									self.dt_first_seen := if(left.crk = right.prev_crk, right.dt_first_seen, left.dt_first_seen),
+																									self.prev_lexid		 := right.prev_lexid,
+																									self.prev_crk			 := right.prev_crk,
+																									self.crk_changed	 := right.crk_changed,
+																									self.lexid_changed := right.lexid_changed,
+																									self							 := left),
+																								left outer, keep(1), local);
+																								
+			all_updated	:= updated_already_seen + check_for_new_rec_same_person;
+																													
+   		RETURN sort(all_updated, source_rid);
+   	END; 
+		
+ 	EXPORT Add_CRK_results_base := FUNCTION
 				
 				crk_results				:= HealthcareNoMatchHeader_Ingest.Files(gcid).CRK;
 								
@@ -450,166 +599,37 @@ EXPORT Update_Base_V2 (
 				
 				previous_base		:= IF(NOTHOR(FileServices.GetSuperFileSubCount(UPI_DataBuild.Filenames_V2(pVersion, pUseProd, gcid, pHistMode).member_lBaseTemplate_built)) = 0
 														OR pHistMode = 'N'
-														,dataset([],upi_databuild.Layouts_V2.input_processing)
+														,dataset([],UPI_DataBuild.Layouts_V2.input_processing)
 														,mark_old(project(UPI_DataBuild.Files_V2(pVersion,pUseProd,gcid,pHistMode).member_base.qa, 
 																				transform(UPI_DataBuild.Layouts_V2.Input_processing, self := left, self := []))));
-				
-				update_current_batch	:= dedup(sort(join(sort(distribute(crk_results,hash(source_rid)),source_rid,local)
-														,sort(distribute(linked_input_file,hash(source_rid)),source_rid,local)
-														,LEFT.source_rid = RIGHT.source_rid AND
-														 RIGHT.current_input = 'Y'
-														,TRANSFORM(UPI_DataBuild.Layouts_V2.input_processing
-																,SELF.input_crk			:= RIGHT.input_crk
-																,SELF.input_lexid		:= RIGHT.input_lexid
-																,SELF.prev_crk			:= RIGHT.prev_crk
-																,SELF.prev_lexid		:= RIGHT.prev_lexid
-																,SELF.crk						:= LEFT.crk
-																,SELF.nomatch_id		:= LEFT.nomatch_id
-																,SELF.rid						:= LEFT.rid
-																,SELF.crk_changed		:= map(RIGHT.input_crk <> '' AND RIGHT.input_crk =  LEFT.crk => 'N'
-																													,RIGHT.input_crk <> '' AND RIGHT.input_crk <> LEFT.crk => 'Y'
-																													,RIGHT.input_crk = '' => ''
-																													,'')
-																,SELF.lexid_changed	:= map(RIGHT.input_lexid > 0 AND RIGHT.input_lexid =  LEFT.lexid => 'N'
-																													,RIGHT.input_lexid > 0 AND RIGHT.input_lexid <> LEFT.lexid => 'Y'
-																													,RIGHT.input_lexid = 0 => ''
-																													,'')
-																,SELF           		:= RIGHT
-																,SELF								:= LEFT)
-														,RIGHT OUTER
-														,LOCAL), RECORD, LOCAL), RECORD, LOCAL);
-				
-				update_older_records	:= dedup(sort(join(sort(distribute(crk_results,hash(source_rid)),source_rid,local)
-														,sort(distribute(previous_base,hash(source_rid)),source_rid,local)
-														,LEFT.source_rid = RIGHT.source_rid AND
-														 RIGHT.current_input = 'N'
+																				
+				prev_and_new	:= previous_base + linked_input_file;
+																								
+				update_base_records	:= dedup(sort(join(sort(distribute(crk_results,hash(source_rid)),source_rid,local)
+														,sort(distribute(prev_and_new,hash(source_rid)),source_rid,local)
+														,LEFT.source_rid = RIGHT.source_rid 
 														,TRANSFORM({previous_base}
 																,SELF.input_crk			:= RIGHT.input_crk
 																,SELF.input_lexid		:= RIGHT.input_lexid
-																,SELF.prev_crk			:= RIGHT.prev_crk
-																,SELF.prev_lexid		:= RIGHT.prev_lexid
+																,SELF.prev_crk			:= LEFT.old_crk
+																,SELF.prev_lexid		:= LEFT.old_lexid
 																,SELF.crk						:= LEFT.crk
 																,SELF.nomatch_id		:= LEFT.nomatch_id
 																,SELF.rid						:= LEFT.rid
-																,SELF.crk_changed		:= map(RIGHT.input_crk <> '' AND RIGHT.input_crk =  LEFT.crk => 'N'
-																													,RIGHT.input_crk <> '' AND RIGHT.input_crk <> LEFT.crk => 'Y'
-																													,RIGHT.input_crk = '' => ''
-																													,'')
-																,SELF.lexid_changed	:= map(RIGHT.input_lexid > 0 AND RIGHT.input_lexid =  LEFT.lexid => 'N'
-																													,RIGHT.input_lexid > 0 AND RIGHT.input_lexid <> LEFT.lexid => 'Y'
-																													,RIGHT.input_lexid = 0 => ''
-																													,'')
+																,SELF.crk_changed		:= LEFT.crk_changed
+																,SELF.lexid_changed	:= LEFT.lexid_changed
 																,SELF           		:= RIGHT)
-														,RIGHT OUTER
+														,LEFT OUTER
 														,LOCAL), RECORD, LOCAL), RECORD, LOCAL);
 														
-				ds_current		:= dedup(sort(update_older_records, record, local), record, local);	
-
-				stdInput := dedup(sort(update_current_batch, record, local), record, local);
-				
-				// First of a series of 3 joins - the first is to determine the truly historical records, which in this build logic are those
-				// that have previously been processed, and then do not appear again in the new update
-				UPI_DataBuild.Layouts_V2.input_processing find_truly_historical(UPI_DataBuild.Layouts_V2.input_processing new_update, UPI_DataBuild.Layouts_V2.input_processing last_built_base) := TRANSFORM
-					SELF.enddate									:= 99991231;
-					SELF.history_or_current 			:= 'H'; 
-					SELF.dt_first_seen						:= ut.EarliestDate(new_update.dt_first_seen, last_built_base.dt_first_seen);
-					SELF.dt_vendor_first_reported	:= ut.EarliestDate(new_update.dt_vendor_first_reported, last_built_base.dt_vendor_first_reported);
-					SELF.dt_vendor_last_reported	:= max(new_update.dt_vendor_last_reported, last_built_base.dt_vendor_last_reported);
-					SELF.dt_last_seen							:= max(new_update.dt_last_seen, last_built_base.dt_last_seen);
-					SELF.batch_jobid							:= new_update.batch_jobid;
-					SELF.batch_seq_number					:= new_update.batch_jobid;
-					SELF.gcid_name								:= new_update.gcid_name;
-					SELF.prev_crk									:= new_update.input_crk;
-					SELF.prev_lexid								:= new_update.input_lexid;
-					SELF.input_crk								:= new_update.input_crk;
-					SELF.input_lexid							:= new_update.input_lexid;
-					SELF 													:= last_built_base;
-					SELF													:= [];
-				END;
-
-				historical_only := dedup(sort(JOIN(stdInput, ds_current, 
-									name_fields_match(stdInput, ds_current)		AND
-									addresses_match(stdInput, ds_current)			AND
-									all_others_match(stdInput, ds_current),
-								find_truly_historical(LEFT, RIGHT), RIGHT ONLY, LOCAL), RECORD, LOCAL), RECORD, LOCAL);
-								
-				// Second join, this one is to update the records that have been seen previously and update the dt_last_seen and 
-				// dt_vendor_last_reported, and make sure the history_or_current flag is C
-		
-				UPI_DataBuild.Layouts_V2.input_processing update_already_seen_recs(UPI_DataBuild.Layouts_V2.input_processing new_update, UPI_DataBuild.Layouts_V2.input_processing last_built_base) := TRANSFORM
-					SELF.dt_first_seen            := ut.EarliestDate(new_update.dt_first_seen, last_built_base.dt_first_seen);
-					SELF.dt_last_seen             := max(new_update.dt_last_seen, last_built_base.dt_last_seen);
-					SELF.dt_vendor_first_reported := ut.EarliestDate(new_update.dt_vendor_first_reported, last_built_base.dt_vendor_first_reported);
-					SELF.dt_vendor_last_reported  := max(new_update.dt_vendor_last_reported, last_built_base.dt_vendor_last_reported);
-					SELF.startdate								:= ut.EarliestDate((unsigned4)pVersion[1..8], last_built_base.startdate);
-					SELF.enddate									:= 99991231;
-					SELF.history_or_current 			:= 'C';
-					SELF.batch_jobid							:= new_update.batch_jobid;
-					SELF.batch_seq_number					:= new_update.batch_seq_number;
-					SELF.gcid_name								:= new_update.gcid_name;
-					SELF.prev_crk									:= new_update.input_crk;
-					SELF.prev_lexid								:= new_update.input_lexid;
-					SELF.input_crk								:= new_update.input_crk;
-					SELF.input_lexid							:= new_update.input_lexid;
-					SELF.current_input						:= 'Y';
-					SELF 													:= new_update;
-					SELF													:= [];
-				END;
-				
-				update_existing_recs := JOIN(sort(stdInput, source_rid), sort(ds_current, source_rid),
-									LEFT.source_rid = RIGHT.source_rid				AND
-									name_fields_match(stdInput, ds_current)		AND
-									addresses_match(stdInput, ds_current)			AND
-									all_others_match(stdInput, ds_current),
-								update_already_seen_recs(LEFT, RIGHT), LEFT OUTER, LOCAL);	
-								
-				still_need_update	:= dedup(sort(update_existing_recs(crk = ''), record, local), record, local);
-				has_update				:= dedup(sort(update_existing_recs(crk <> ''), record, local), record, local);
-								
-				// Last of three joins - this one is to identify the truly new records and process them as usual
-		
-				UPI_DataBuild.Layouts_V2.input_processing find_new_recs(UPI_DataBuild.Layouts_V2.input_processing new_update, UPI_DataBuild.Layouts_V2.input_processing last_built_base) := TRANSFORM
-					SELF.history_or_current := 'C';
-					SELF.prev_crk			:= new_update.input_crk;
-					SELF.prev_lexid		:= new_update.input_lexid;
-					SELF.input_crk		:= new_update.input_crk;
-					SELF.input_lexid	:= new_update.input_lexid;
-					SELF 							:= new_update;
-					SELF							:= [];
-				END;
-
-				truly_new_recs := JOIN(still_need_update, ds_current,
-									name_fields_match(still_need_update, ds_current)		AND
-									addresses_match(still_need_update, ds_current)			AND
-									all_others_match(still_need_update, ds_current)			AND
-									LEFT.batch_seq_number <> '',
-								find_new_recs(LEFT, RIGHT), LEFT ONLY, LOCAL);
-
-				// add all three pieces together
-				recombined 		:= historical_only + has_update + truly_new_recs; 
-				
-				dedup_recombined	:= dedup(sort(recombined, record, local), record, local);
-
-				new_base	:= PROJECT(dedup_recombined
-														,TRANSFORM({UPI_DataBuild.Layouts_V2.input_processing}
-																,SELF.crk_changed		:= map(LEFT.input_crk <> '' AND LEFT.input_crk =  LEFT.crk => 'N'
-																													,LEFT.input_crk <> '' AND LEFT.input_crk <> LEFT.crk => 'Y'
-																													,LEFT.input_crk = '' => ''
-																													,'')
-																,SELF.lexid_changed	:= map(LEFT.input_lexid > 0 AND LEFT.input_lexid =  LEFT.lexid => 'N'
-																													,LEFT.input_lexid > 0 AND LEFT.input_lexid <> LEFT.lexid => 'Y'
-																													,LEFT.input_lexid = 0 => ''
-																													,'')
-																,SELF           		:= LEFT));
-																
-				// dedup_base	:= dedup(sort(new_base, record, local), record, local);	
+				ds_current		:= roll_them_up_base(update_base_records);	
 					
-   		RETURN distribute(new_base);
+   		RETURN sort(ds_current, source_rid);
    	END; 
 		
 		EXPORT PrepReturn			:= FUNCTION
 		   	
-   				this_batch_only	:= dedup(Add_CRK_Results(batch_jobid = pBatch_jobID), record);
+   				this_batch_only	:= dedup(Add_CRK_Results_input, record);
    					
    				prepReturn_file		:= UPI_DataBuild.ReturnToBatch(pVersion, pUseProd, gcid, this_batch_only, pAppendOption).batch_processing;
 						
@@ -645,10 +665,9 @@ EXPORT Update_Base_V2 (
 	
   	EXPORT All_Data_Base := FUNCTION
    	
-   			new_base			:= project(Add_CRK_results, UPI_DataBuild.Layouts_V2.base); 
- 				rolled_base		:= dist_and_sort_them(roll_them_up(new_base));
+   			new_base			:= project(Add_CRK_results_base, UPI_DataBuild.Layouts_V2.base); 
   			
-   			RETURN rolled_base;
+   			RETURN sort(new_base, source_rid);
    	END;
 												
 END;
