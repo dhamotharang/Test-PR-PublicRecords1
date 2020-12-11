@@ -1,4 +1,4 @@
-ï»¿IMPORT STD, SALT35, SALTRoutines;
+﻿IMPORT STD, SALT35, SALTRoutines;
 FieldTypeLayout := RECORD
 	UNSIGNED8 Field_Number;
 	STRING Field_Name;
