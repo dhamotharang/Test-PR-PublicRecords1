@@ -65,21 +65,6 @@ EXPORT Append_LexID (string pVersion, boolean pUseProd, string gcid, unsigned1 p
 		sort_person1	:= sort(distribute(all_ages(person_type = 1), hash(rec_number)), rec_number, local);
 		sort_person2	:= sort(distribute(all_ages(person_type = 2), hash(rec_number)), rec_number, local);
 		sort_all	:= sort(distribute(all_ages, hash(rec_number)), rec_number, local);
-		// norm_base denorm(norm_base l, sort_all r) := TRANSFORM
-				// SELF.lexid									:= map(r.person_type = 1 => r.temp_lexid,
-																					 // r.person_type = 2 => l.lexid,
-																					 // 0);
-				// SELF.lexid_score						:= map(r.person_type = 1 => r.temp_lexid_score, 
-																					 // r.person_type = 2 => l.lexid_score,
-																					 // 0);
-				// SELF.guardian_lexid					:= map(r.person_type = 1 => l.lexid, 
-																					 // r.person_type = 2 => r.temp_lexid, 
-																					 // 0);
-				// SELF.guardian_lexid_score		:= map(r.person_type = 1 => l.lexid_score,
-																					 // r.person_type = 2 => r.temp_lexid_score,
-																					 // 0);
-				// SELF            := l;
-				//END;
 		
 		denormRecs := join(sort_person1, sort_person2,
 				left.rec_number = right.rec_number,
@@ -90,11 +75,7 @@ EXPORT Append_LexID (string pVersion, boolean pUseProd, string gcid, unsigned1 p
 				SELF.guardian_lexid_score		:= right.temp_lexid_score,
 				SELF            := left),
 				left outer, local);
-	   
-	  // denormRecs := DENORMALIZE(sort(distribute(norm_base, hash(rec_number)),rec_number,local), sort_all,
-											// LEFT.rec_number = RIGHT.rec_number,
-											// denorm(LEFT,RIGHT), LOCAL);
-																					
+	   																					
 		RETURN project(denormRecs, UPI_DataBuild.Layouts_V2.Input_processing); // returning file in input_processing layout not base layout
 	END;
 END;

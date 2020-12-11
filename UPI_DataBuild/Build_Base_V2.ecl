@@ -135,6 +135,11 @@ export Build_Base_V2 := module
 						sequential(				
 						 		 Build_metrics_Base
 								,UPI_DataBuild.Functions.PipeMetricsFile(pVersion, pUseProd, gcid, pHistMode, pBatch_jobID)
+								,UPI_DataBuild.Functions.PipeHistoryFile(pVersion, pUseProd, gcid, pHistMode, pBatch_jobID)
+									// putting this here to convert the linking history file to pipe-delimited, to be consistent with the other
+									// output files that are desprayed to batch at the end of the CRK process - the history file does not
+									// relate directly to the metrics file, but the history file is not called anywhere else, so no "good"
+									// place to call this function, so sticking it here to be sure it gets done before despray
 								,Promote_V2.promote_tobatch_metrics(pVersion, pUseProd, gcid, pHistMode).buildfiles.New2Built);
 	
 					export metrics_all	:=
