@@ -4,7 +4,7 @@ import FraudGovPlatform_Analytics;
 //IMPORT KEL12 AS KEL;
 IMPORT Std;
 
-ModelingAttributeOutput := FraudgovKEL.KEL_EventShell.ModelingStats(t_srcagencyuid = 20995239);
+ModelingAttributeOutput := FraudgovKEL.KEL_EventShell.ModelingStats;//(t_srcagencyuid = 20995239);
 //ModelingAttributeOutput := DATASET('~fraudgov::temp::modelingstats', RECORDOF(FraudgovKEL.KEL_EventShell.ModelingStats), THOR)(t_srcagencyuid = 20995239 and t_srcagencyprogtype = 1029);
 //output(ModelingAttributeOutput,,'~fraudgov::temp::modelingstats', overwrite);
 
@@ -44,8 +44,14 @@ EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(ModelingAttribut
 'p1_aotidkractinagcycntev,p1_aotidkractinagcyflagev,p1_aotidkrappfrdactinagcycntev,p1_aotidkrappfrdactinagcyflagev,p1_aotidkrgenfrdactinagcycntev,p1_aotidkrgenfrdactinagcyflagev,p1_aotidkrothfrdactinagcycntev,p1_aotidkrothfrdactinagcyflagev,p1_aotidkrstolidactinagcycntev,p1_aotidkrstolidactinagcyflagev,p9_aotaddrkractinagcycntev,p9_aotaddrkractinagcyflagev,' +
 'p15_aotssnkractinagcycntev,p15_aotssnkractinagcyflagev,p16_aotphnkractinagcycntev,p16_aotphnkractinagcyflagev,p17_aotemailkractinagcycntev,p17_aotemailkractinagcyflagev,p18_aotipaddrkractinagcycntev,p18_aotipaddrkractinagcyflagev,p19_aotbnkacctkractinagcycntev,p19_aotbnkacctkractinagcyflagev,p20_aotdlkractinagcycntev,p20_aotdlkractinagcyflagev,' +
 't_evttype1statuscodeecho,t_evttype2statuscodeecho,t_evttype3statuscodeecho,t_namestatuscodeecho,t_idstatuscodeecho,t_ssnstatuscodeecho,t_dlstatuscodeecho,t_addrstatuscodeecho,t_phnstatuscodeecho,t_emailstatuscodeecho,t_ipaddrstatuscodeecho,t_bnkacctstatuscodeecho,' +
-'p1_aotidkractshrdsrcagencycntev,p1_aotidkractshrdnewsrcagencydescev,p1_aotidkrgenfrdactshrdsrcagencycntev,p1_aotidkrgenfrdactshrdnewsrcagencydescev,p1_aotidkrstolidactshrdsrcagencycntev'
+'p1_aotidkractshrdsrcagencycntev,p1_aotidkractshrdnewsrcagencydescev,p1_aotidkrgenfrdactshrdsrcagencycntev,p1_aotidkrgenfrdactshrdnewsrcagencydescev,p1_aotidkrstolidactshrdsrcagencycntev,' +
+'p1_aotidkrstolidactshrdnewsrcagencydescev,p1_aotidkrappfrdactshrdsrcagencycntev,p1_aotidkrappfrdactshrdnewsrcagencydescev,p1_aotidkrothfrdactshrdsrcagencycntev,p1_aotidkrothfrdactshrdnewsrcagencydescev,p9_aotaddrkractshrdsrcagencycntev,' +
+'p9_aotaddrkractshrdnewsrcagencydescev,p15_aotssnkractshrdsrcagencycntev,p15_aotssnkractshrdnewsrcagencydescev,p16_aotphnkractshrdsrcagencycntev,p16_aotphnkractshrdnewsrcagencydescev,p17_aotemailkractshrdsrcagencycntev,' +
+'p17_aotemailkractshrdnewsrcagencydescev,p18_aotipaddrkractshrdsrcagencycntev,p18_aotipaddrkractshrdnewsrcagencydescev,p19_aotbnkacctkractshrdsrcagencycntev,p19_aotbnkacctkractshrdnewsrcagencydescev,p20_aotdlkractshrdsrcagencycntev,p20_aotdlkractshrdnewsrcagencydescev'
 );
+
+
+
 
 //EventStatsPrep;
 
@@ -53,9 +59,10 @@ FieldGrouped := GROUP(SORT(DISTRIBUTE(EventStatsPrep, HASH(field)), field, LOCAL
 // Dedupe to get one value per field per person entity context uid
 
 FieldGroupedValues := DEDUP(UNGROUP(FieldGrouped), personentitycontextuid, field, value);
-FieldCardinalityPrep := TABLE(FieldGroupedValues, {field,value}, field, value, MERGE);
-//output(FieldCardinalityPrep(field = 'p15_aotidactcntev'), named('FieldCardinalityPrep'), all);
-FieldCardinality := TABLE(FieldCardinalityPrep, {field,reccount := COUNT(GROUP)}, field, MERGE);
+FieldCardinalityPrep := TABLE(FieldGroupedValues, {field,value, unsigned reccount := COUNT(GROUP)}, field, value, MERGE);
+//output(FieldCardinalityPrep, named('FieldCardinalityPrep'), all);
+
+FieldCardinality := TABLE(FieldCardinalityPrep, {field, unsigned reccount := COUNT(GROUP)}, field, MERGE);
 //output(FieldCardinality, named('FieldCardinality'), all);
 
 //output(FieldGroupedValues, named('FieldGroupedValues'));

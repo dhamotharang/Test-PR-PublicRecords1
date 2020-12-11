@@ -159,7 +159,7 @@ EXPORT KEL_EventShell := MODULE
         NicoleAttr
         );
 
-    EXPORT ModelingStats := hipie_ecl.macSlimDataset(CleanEventShell((T_SrcClassType = 3 /*hash(personentitycontextuid) % 2 = 0 OR */ OR currentlyincarceratedflag =1 OR deceasedpriortoevent=1) OR (industrytype = 1029 and customerid = 20995239)), 'entitycontextuid,t_actuid', 
+    EXPORT ModelingStats := hipie_ecl.macSlimDataset(CleanEventShell/*(industrytype = 1029 and customerid = 20995239))*/, 'entitycontextuid,t_actuid', 
         ModelingAttr
         );
 
