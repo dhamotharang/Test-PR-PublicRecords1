@@ -23,13 +23,7 @@ EXPORT Verify_FCRA_Deprecated_Fields := FUNCTION
 	// Show counts of blanked out fields in thor_data400::key::faa::fcra::airmen_rid_qa
 	cnt_faa_airmen_rid_fcra := OUTPUT(strata.macf_pops(faa.key_airmen_rid(true),,,,,,FALSE,['ace_fips_st','country',
 																										'region','title']));
-
-	// Show counts of blanked out fields in thor_data400::key::fcra::aircraft_reg_did_qa
-	cnt_faa_aircraftreg_did_fcra := OUTPUT(strata.macf_pops(doxie_files.key_aircraft_did_FCRA,,,,,,FALSE,['ace_fips_st','certification',
-																											'compname','country','fract_owner','last_action_date','lf','orig_county',
-																											'region','status_code','title','type_registrant']));
-
 	RETURN PARALLEL(cnt_faa_aircraft_id_fcra,cnt_faa_aircraft_info_fcra,cnt_faa_engine_info_fcra,cnt_faa_airmen_certs_fcra,
-	                cnt_faa_airmen_did_fcra,cnt_faa_airmen_rid_fcra,cnt_faa_aircraftreg_did_fcra);
+	                cnt_faa_airmen_did_fcra,cnt_faa_airmen_rid_fcra);
 	
 END;
