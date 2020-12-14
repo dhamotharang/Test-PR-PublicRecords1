@@ -118,7 +118,8 @@ function
 		self.record_count_1_type			:=	IF(ITV,1,0);
 		self.record_count_2						:=	IF(ITV,(integer)pResponse.Report.ReportIdSection.AttachmentProcessingStatus,0);
 		self.record_count_2_type			:=	IF(ITV,2,0);
-	
+		self.glba_code      					:=	'1';
+
 		self													:=	[];
 	end;
 	

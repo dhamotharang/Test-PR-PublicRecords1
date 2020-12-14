@@ -105,7 +105,8 @@ module
 		string60		user_added	:=	'esp';			//esp User that added the record
 		string60		user_changed;								//User that made a change on the record
 		string10		date_changed;								//Date the record was changed
-	end;
+		string3 		glba_code;  								//CR1381 - log glba = 1
+  end;
 	
 	// Transaction layout for mbsi
 	export	TransactionLogRec	:=
