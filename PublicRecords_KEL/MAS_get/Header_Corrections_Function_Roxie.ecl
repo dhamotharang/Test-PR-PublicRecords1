@@ -27,6 +27,7 @@ Layout_Working := RECORD
 	INTEGER G_ProcUID;
 	Boolean HeaderRec;
 	STRING Archive_Date;
+	data57 DPMBitMAP;
 	dx_Header.layout_header;
 	STRING20 oldFname;
 	STRING20 newFname;

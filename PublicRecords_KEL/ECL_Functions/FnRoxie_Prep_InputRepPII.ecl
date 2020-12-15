@@ -10,7 +10,10 @@ EXPORT FnRoxie_Prep_InputRepPII(DATASET(PublicRecords_KEL.ECL_Functions.Input_UI
 	cleanReps := PublicRecords_KEL.ECL_Functions.Fn_CleanInput_Roxie( echoReps );	
 	
 	// Append Rep LexIDs
-	withRepLexIDs := PublicRecords_KEL.ECL_Functions.Fn_AppendLexid_Roxie( cleanReps, Options );
+	withRepLexIDsPre := PublicRecords_KEL.ECL_Functions.Fn_AppendLexid_Roxie( cleanReps, Options );
+
+	withRepLexIDs := withRepLexIDsPre(PullIDFlag = False);
+	pullidlexids := withRepLexIDsPre(PullIDFlag = true);
 
 	//only run if phone is on input, nonFCRA only
 	//this key is set up like this because we are not able to return PII from this key, we can only use it for phone verification
@@ -89,6 +92,6 @@ EXPORT FnRoxie_Prep_InputRepPII(DATASET(PublicRecords_KEL.ECL_Functions.Input_UI
 	//Check isFCRA to return the insurance DL data only for NonFCRA query
 	RepInput := IF(~Options.isFCRA, UNGROUP(RepInput_NonFCRA), CheckTPMPhone); 
 
-	RETURN RepInput;
+	RETURN RepInput+pullidlexids;
 	
 END;									

@@ -101,7 +101,9 @@ EXPORT Fn_AppendLexid_Roxie(
 						LEFT.G_ProcUID = right.G_ProcUID,
 						chooser(left,right),LEFT OUTER);
 
-					
-RETURN didchooser;
+	getpullidlist := PublicRecords_KEL.ECL_Functions.Fn_getpullid(didchooser, options);				
+
+	
+RETURN getpullidlist;
 
 END;

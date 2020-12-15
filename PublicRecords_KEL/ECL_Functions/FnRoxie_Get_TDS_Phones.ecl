@@ -12,7 +12,7 @@ EXPORT FnRoxie_Get_TDS_Phones(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.La
 									SELF.SSC := RIGHT.ssc;
 									SELF.WirelessIndicator := RIGHT.wireless_ind;
 									SELF := LEFT), 
-						LEFT OUTER, KEEP(1),ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT));
+						LEFT OUTER, KEEP(1),ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_2000));
 																								
 	RETURN TDS;																
 END;	
