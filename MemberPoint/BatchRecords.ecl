@@ -878,6 +878,8 @@
 			self.Email10_latest_orig_login_date:=rowsEmails[10].latest_orig_login_date;
 			self.Email10_num_email_per_did:=rowsEmails[10].num_email_per_did;
 			self.Email10_num_did_per_email:=rowsEmails[10].num_did_per_email;
+      self.input_email_invalid:=dsEmailsWhole.emailstatus[1].input_email_invalid;
+      self.input_email_invalid_reason:=dsEmailsWhole.emailstatus[1].input_email_invalid_reason;		
 			SELF := [];
 		END;
 		//Waterfall BatchOut Transformation
@@ -1008,6 +1010,8 @@
    		end;	
    
    		finalRecords := dataset([{dsOutput ,dsEmailsWhole.Royalties}],finalRec);
-		  return finalRecords;
+    //output(dsEmailsResults,named(	'dsEmailsResultsbatchrecords'));
+    output(finalRecords,named(	'ReportservicefinalRecords'));
+			return finalRecords;
 	end;
   

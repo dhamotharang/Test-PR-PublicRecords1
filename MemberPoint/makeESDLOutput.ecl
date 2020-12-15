@@ -88,6 +88,7 @@ EXPORT iesp.keepcontactreport.t_KeepContactReportResponse makeESDLOutput(dataset
 																	c = 10 => L.EMAIL10_additional_status_info,
 																	''
 																	);
+				
 			end;
 			
 			iesp.keepcontactreport.t_KeepContactPhoneInfo normXformPhones(MemberPoint.Layouts.BatchOut L,integer c) := transform
@@ -243,10 +244,14 @@ EXPORT iesp.keepcontactreport.t_KeepContactReportResponse makeESDLOutput(dataset
 				self.Member.PossibleNewAddress.DateFirstSeen := iesp.ECL2ESP.toDatestring8(L.addr_dt_first_seen_new);
 				self.Member.PossibleNewAddress.DateLastSeen  := iesp.ECL2ESP.toDatestring8(L.addr_dt_last_seen_new);
 				self.Member.Phones :=  PhonesChild;
-        self.member.CalculatedAge:=if(includedob='1' and STD.Date.IsValidDate((integer)l.dob, 1900 , 2099),(string)lib_date.getage(l.dob),'');				self.Member.DOD := if(l.LN_search_name_type='M',iesp.ECL2ESP.toDatestring8(''),iesp.ECL2ESP.toDatestring8(L.Date_of_death));
+        		self.member.CalculatedAge:=if(includedob='1' and STD.Date.IsValidDate((integer)l.dob, 1900 , 2099),(string)lib_date.getage(l.dob),'');				self.Member.DOD := if(l.LN_search_name_type='M',iesp.ECL2ESP.toDatestring8(''),iesp.ECL2ESP.toDatestring8(L.Date_of_death));
 				self.Member.DeceasedMatchCodes := if(l.LN_search_name_type='M','',l.dcd_match_code);
 				self.member.AddressDescriptionCodes:=AddressDescriptionCodes;
 				self.Member.Emails := EmailChild;
+				self.Member.InputEmailValidation :=  project(l, transform(iesp.keepcontactreport.t_KeepContactInputEmailValidation,
+													self.Status :=  left.input_email_invalid,
+													self.StatusReason :=  left.input_email_invalid_reason,
+													self := left));
 				end;
 
 			ESDLOutput := project(BatchOut,xformESDL(left));
