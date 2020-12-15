@@ -1,0 +1,34 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_PhonesInfo
+FILENAME:PhonesInfo
+NAMESCOPE:PhonesTypeMain
+
+FIELDTYPE:Invalid_AlphaNum:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 )
+FIELDTYPE:Invalid_CharCat:ENUM(CAP|CLEC|GENERAL|IC|ILEC|INTL|IPES|L RESELLER|PCS|RBOC|ULEC|W RESELLER|WIRELESS| )
+FIELDTYPE:Invalid_Indic:ALLOW(1| )
+FIELDTYPE:Invalid_Num:ALLOW(0123456789)
+FIELDTYPE:Invalid_Src:ENUM(L6|P!|PB|PK)
+FIELDTYPE:Invalid_Type:ALLOW(0123 )
+
+FIELD:phone:LIKE(Invalid_Num):TYPE(STRING10):0,0
+FIELD:source:LIKE(Invalid_Src):TYPE(STRING5):0,0
+FIELD:vendor_first_reported_dt:LIKE(Invalid_Num):TYPE(UNSIGNED8):0,0
+FIELD:vendor_first_reported_time:LIKE(Invalid_Num):TYPE(STRING6):0,0
+FIELD:vendor_last_reported_dt:LIKE(Invalid_Num):TYPE(UNSIGNED8):0,0
+FIELD:vendor_last_reported_time:LIKE(Invalid_Num):TYPE(STRING6):0,0
+FIELD:reference_id:LIKE(Invalid_AlphaNum):TYPE(STRING30):0,0
+FIELD:reply_code:LIKE(Invalid_Num):TYPE(STRING3):0,0
+FIELD:local_routing_number:LIKE(Invalid_Num):TYPE(STRING10):0,0
+FIELD:account_owner:LIKE(Invalid_AlphaNum):TYPE(STRING6):0,0
+FIELD:carrier_name:TYPE(STRING60):0,0
+FIELD:carrier_category:LIKE(Invalid_CharCat):TYPE(STRING10):0,0
+FIELD:local_area_transport_area:LIKE(Invalid_Num):TYPE(STRING5):0,0
+FIELD:point_code:TYPE(STRING10):0,0
+FIELD:serv:LIKE(Invalid_Type):TYPE(STRING1):0,0
+FIELD:line:LIKE(Invalid_Type):TYPE(STRING1):0,0
+FIELD:spid:LIKE(Invalid_AlphaNum):TYPE(STRING10):0,0
+FIELD:operator_fullname:TYPE(STRING60):0,0
+FIELD:high_risk_indicator:LIKE(Invalid_Indic):TYPE(STRING2):0,0
+FIELD:prepaid:LIKE(Invalid_Indic):TYPE(STRING2):0,0
+FIELD:global_sid:LIKE(Invalid_Num):TYPE(UNSIGNED4):0,0
+FIELD:record_sid:LIKE(Invalid_Num):TYPE(UNSIGNED8):0,0
