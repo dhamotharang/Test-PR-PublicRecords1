@@ -96,8 +96,8 @@ PBKEY := dops.xFerRoxieFiles(filestocopyds
 											,true
 											,false
 											,
-											,'prod_esp.br.seisint.com'
-											,'prod_dali.br.seisint.com'
+											,'uspr-prod-thor-esp.risk.regn.net'
+											,'uspr-prod-thor-dali.risk.regn.net'
 											,'8010'
 											, srcthorclusters := ['thor400_44','thor400_66']
 											,roxieprodesp := '10.173.109.101'
