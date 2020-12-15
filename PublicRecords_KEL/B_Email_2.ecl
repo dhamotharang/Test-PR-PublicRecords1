@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.3.0
-IMPORT KEL13 AS KEL;
+//HPCC Systems KEL Compiler Version 1.5.0rc1
+IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile,E_Email,FN_Compile FROM PublicRecords_KEL;
-IMPORT * FROM KEL13.Null;
+IMPORT * FROM KEL15.Null;
 EXPORT B_Email_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Email(__in,__cfg).__Result) __E_Email := E_Email(__in,__cfg).__Result;
-  SHARED __EE1346071 := __E_Email;
-  EXPORT __ST167525_Layout := RECORD
+  SHARED __EE1469291 := __E_Email;
+  EXPORT __ST202831_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Email_Address_;
     KEL.typ.ndataset(E_Email(__in,__cfg).Email_Rec_Key_Layout) Email_Rec_Key_;
@@ -29,18 +29,15 @@ EXPORT B_Email_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
-    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST167525_Layout __ND4444812__Project(E_Email(__in,__cfg).Layout __PP1345876) := TRANSFORM
-    __CC10315 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('FCRA_email_build_version'))),__CN(__cfg.CurrentDate));
-    __CC27876 := 2556;
-    SELF.Emails7y_ := __OP2(FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__CC10315),__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP1345876.Date_Last_Seen_))),<,__CN(__CC27876));
-    SELF := __PP1345876;
+  SHARED __ST202831_Layout __ND6426848__Project(E_Email(__in,__cfg).Layout __PP1469096) := TRANSFORM
+    __CC12993 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('FCRA_email_build_version'))),__CN(__cfg.CurrentDate));
+    __CC31468 := 2556;
+    SELF.Emails7y_ := __OP2(FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__CC12993),__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP1469096.Date_Last_Seen_))),<,__CN(__CC31468));
+    SELF := __PP1469096;
   END;
-  EXPORT __ENH_Email_2 := PROJECT(__EE1346071,__ND4444812__Project(LEFT));
+  EXPORT __ENH_Email_2 := PROJECT(__EE1469291,__ND6426848__Project(LEFT));
 END;
