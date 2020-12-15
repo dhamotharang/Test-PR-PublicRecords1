@@ -11,6 +11,8 @@ IMPORT Std;
 
 Set_entitycontextuid:=['_1814789556728917185197','_1817705727575360173926','_1813477488177115018873'];
 
+FraudgovKEL.KEL_EventPivot.EventPivotShell;
+
 //FraudGovKEL.b_event.__EE3557558_1(T___Act_Uid_.v = 105889499);
 //Aot_Id_Act_Cnt30_D__7_
 // p9___aotidactcnt30d);
@@ -43,12 +45,12 @@ TOPN(t3, 100, -reccount);
 ScoringOutput := FraudgovKEL.KEL_EventPivot.InputWithRules(industrytype = 1029 and customerid = 20995239);
 output(ScoringOutput,,'~fraudgov::deleteme_rules_nd_csv', CSV(QUOTE('"')), overwrite);	
 */
-
+/*
 output(FraudgovKEL.KEL_EventPivot.EventPivotShell,,'~fraudgov::eventpivot', overwrite, compressed);
 output(FraudgovKEL.KEL_EventPivot.EntityProfileRules,,'~fraudgov::entityrules', overwrite, compressed);
 output(FraudgovKEL.KEL_EntityStats,, 'fraudg~fraudgov::pivotentitystatsfilter', overwrite, compressed);
 output(FraudgovKEL.KEL_GraphPrep.Edges,,'~fraudgov::rin2::graphedges', overwrite);
 output(FraudgovKEL.KEL_GraphPrep.Vertices,,'~fraudgov::rin2::graphpvertices', overwrite);
-
+*/
 
 //output(FraudgovKEL.KEL_GraphPrep.LinksPrep);
