@@ -1653,7 +1653,7 @@ EXPORT B_Event_4 := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE279808_1 := JOIN(__EE279333(Location_.v>0),__EE194827,__JC279339(LEFT,RIGHT),__JT279339(LEFT,RIGHT),HASH); // joe
+  SHARED __EE279808_1 := JOIN(__EE279333(Location_.v>0),__EE194827,__JC279339(LEFT,RIGHT),__JT279339(LEFT,RIGHT),HASH); // jp
   __ST207247_Layout __JT279339_1(__ST205146_Layout __l, __EE279808_1 __r) := TRANSFORM
     SELF.U_I_D__3_ := __r.U_I_D__3_;
     SELF._r_Customer__1_ := __r._r_Customer__1_;
@@ -1689,8 +1689,8 @@ EXPORT B_Event_4 := MODULE
     SELF._is_Additional__1_ := __r._is_Additional__1_;
     SELF := __l;
     SELF := __r;
-  END;  
-  SHARED __EE279808 := JOIN(__EE279333,__EE279808_1,LEFT.uid.v=RIGHT.uid.v,__JT279339_1(LEFT,RIGHT),LEFT OUTER,HASH); // joe
+  END;
+  SHARED __EE279808 := JOIN(__EE279333,__EE279808_1,LEFT.uid.v=RIGHT.uid.v,__JT279339_1(LEFT,RIGHT),LEFT OUTER,HASH); // jp
   SHARED __EE194763 := __ENH_Drivers_License_5;
   SHARED __ST209444_Layout := RECORD
     KEL.typ.nuid UID;
@@ -2590,35 +2590,7 @@ EXPORT B_Event_4 := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE280774_1 := JOIN(__EE280240(Subject_.v>0),__EE194699,__JC280246(LEFT,RIGHT),__JT280246(LEFT,RIGHT),HASH); // joe
-  __ST211596_Layout __JT280246_1(__ST209444_Layout __l, __EE280774_1 __r) := TRANSFORM
-    SELF.U_I_D__5_ := __r.U_I_D__5_;
-    SELF._r_Customer__3_ := __r._r_Customer__3_;
-    SELF.Lex_Id__1_ := __r.Lex_Id__1_;
-    SELF.Source_Customers__2_ := __r.Source_Customers__2_;
-    SELF._rin__source__1_ := __r._rin__source__1_;
-    SELF.Deceased_Date__1_ := __r.Deceased_Date__1_;
-    SELF.Deceased_Date_Of_Birth__1_ := __r.Deceased_Date_Of_Birth__1_;
-    SELF.Deceased_First__1_ := __r.Deceased_First__1_;
-    SELF.Deceased_Middle__1_ := __r.Deceased_Middle__1_;
-    SELF.Deceased_Last__1_ := __r.Deceased_Last__1_;
-    SELF.Deceased_Match_Code__1_ := __r.Deceased_Match_Code__1_;
-    SELF._isdeepdive__1_ := __r._isdeepdive__1_;
-    SELF._county__death__1_ := __r._county__death__1_;
-    SELF.Deceased_Ssn__1_ := __r.Deceased_Ssn__1_;
-    SELF._state__death__flag__1_ := __r._state__death__flag__1_;
-    SELF._death__rec__src__1_ := __r._death__rec__src__1_;
-    SELF._state__death__id__1_ := __r._state__death__id__1_;
-    SELF._curr__incar__flag__1_ := __r._curr__incar__flag__1_;
-    SELF._name__ssn__dob__match__1_ := __r._name__ssn__dob__match__1_;
-    SELF.Deceased__1_ := __r.Deceased__1_;
-    SELF.Deceased_Dob_Match__1_ := __r.Deceased_Dob_Match__1_;
-    SELF.Deceased_Match__1_ := __r.Deceased_Match__1_;
-    SELF.Deceased_Name_Match__1_ := __r.Deceased_Name_Match__1_;
-    SELF := __l;
-    SELF := __r;
-  END;  
-  SHARED __EE280774 := JOIN(__EE280240,__EE280774_1,LEFT.uid.v=RIGHT.uid.v,__JT280246_1(LEFT,RIGHT),LEFT OUTER,HASH); // joe
+  SHARED __EE280774 := JOIN(__EE280240,__EE194699,__JC280246(LEFT,RIGHT),__JT280246(LEFT,RIGHT),LEFT OUTER,HASH);
   SHARED __EE194631 := __ENH_Bank_Account_5;
   SHARED __ST213854_Layout := RECORD
     KEL.typ.nuid UID;
@@ -3676,71 +3648,7 @@ EXPORT B_Event_4 := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE281972_1 := JOIN(__EE281281,__EE194567,__JC281287(LEFT,RIGHT),__JT281287(LEFT,RIGHT),HASH); // joe
-  __ST216083_Layout __JT281287_1(__ST213854_Layout __l, __EE281972_1 __r) := TRANSFORM
-    SELF.U_I_D__7_ := __r.U_I_D__7_;
-    SELF._r_Customer__5_ := __r._r_Customer__5_;
-    SELF.Source_Customers__4_ := __r.Source_Customers__4_;
-    SELF.Ip_Address__1_ := __r.Ip_Address__1_;
-    SELF.Otto_Ip_Address_Id__1_ := __r.Otto_Ip_Address_Id__1_;
-    SELF._iprngbeg__1_ := __r._iprngbeg__1_;
-    SELF._iprngend__1_ := __r._iprngend__1_;
-    SELF._edgecountry__1_ := __r._edgecountry__1_;
-    SELF._edgeregion__1_ := __r._edgeregion__1_;
-    SELF._edgecity__1_ := __r._edgecity__1_;
-    SELF._edgeconnspeed__1_ := __r._edgeconnspeed__1_;
-    SELF._edgemetrocode__1_ := __r._edgemetrocode__1_;
-    SELF._edgelatitude__1_ := __r._edgelatitude__1_;
-    SELF._edgelongitude__1_ := __r._edgelongitude__1_;
-    SELF._edgepostalcode__1_ := __r._edgepostalcode__1_;
-    SELF._edgecountrycode__1_ := __r._edgecountrycode__1_;
-    SELF._edgeregioncode__1_ := __r._edgeregioncode__1_;
-    SELF._edgecitycode__1_ := __r._edgecitycode__1_;
-    SELF._edgecontinentcode__1_ := __r._edgecontinentcode__1_;
-    SELF._edgetwolettercountry__1_ := __r._edgetwolettercountry__1_;
-    SELF._edgeinternalcode__1_ := __r._edgeinternalcode__1_;
-    SELF._edgeareacodes__1_ := __r._edgeareacodes__1_;
-    SELF._edgecountryconf__1_ := __r._edgecountryconf__1_;
-    SELF._edgeregionconf__1_ := __r._edgeregionconf__1_;
-    SELF._edgecitycong__1_ := __r._edgecitycong__1_;
-    SELF._edgepostalconf__1_ := __r._edgepostalconf__1_;
-    SELF._edgegmtoffset__1_ := __r._edgegmtoffset__1_;
-    SELF._edgeindst__1_ := __r._edgeindst__1_;
-    SELF._siccode__1_ := __r._siccode__1_;
-    SELF._domainname__1_ := __r._domainname__1_;
-    SELF._ispname__1_ := __r._ispname__1_;
-    SELF._homebiztype__1_ := __r._homebiztype__1_;
-    SELF._asn__1_ := __r._asn__1_;
-    SELF._asnname__1_ := __r._asnname__1_;
-    SELF._primarylang__1_ := __r._primarylang__1_;
-    SELF._secondarylang__1_ := __r._secondarylang__1_;
-    SELF._proxytype__1_ := __r._proxytype__1_;
-    SELF._proxydescription__1_ := __r._proxydescription__1_;
-    SELF._isanisp__1_ := __r._isanisp__1_;
-    SELF._companyname__1_ := __r._companyname__1_;
-    SELF._ranks__1_ := __r._ranks__1_;
-    SELF._households__1_ := __r._households__1_;
-    SELF._women__1_ := __r._women__1_;
-    SELF._women18to34__1_ := __r._women18to34__1_;
-    SELF._women35to49__1_ := __r._women35to49__1_;
-    SELF._men__1_ := __r._men__1_;
-    SELF._men18to34__1_ := __r._men18to34__1_;
-    SELF._men35to49__1_ := __r._men35to49__1_;
-    SELF._teens__1_ := __r._teens__1_;
-    SELF._kids__1_ := __r._kids__1_;
-    SELF._naicscode__1_ := __r._naicscode__1_;
-    SELF._cbsacode__1_ := __r._cbsacode__1_;
-    SELF._cbsatitle__1_ := __r._cbsatitle__1_;
-    SELF._cbsatype__1_ := __r._cbsatype__1_;
-    SELF._csacode__1_ := __r._csacode__1_;
-    SELF._csatitle__1_ := __r._csatitle__1_;
-    SELF._mdcode__1_ := __r._mdcode__1_;
-    SELF._mdtitle__1_ := __r._mdtitle__1_;
-    SELF._organizationname__1_ := __r._organizationname__1_;
-    SELF := __l;
-    SELF := __r;
-  END;  
-  SHARED __EE281972 := JOIN(__EE281281,__EE281972_1,LEFT.uid.v=RIGHT.uid.v,__JT281287_1(LEFT,RIGHT),HASH); // joe
+  SHARED __EE281972 := JOIN(__EE281281,__EE194567,__JC281287(LEFT,RIGHT),__JT281287(LEFT,RIGHT),LEFT OUTER,LOOKUP);
   SHARED __EE194503 := __ENH_Email_5;
   SHARED __ST218494_Layout := RECORD
     KEL.typ.nuid UID;
@@ -5433,30 +5341,7 @@ EXPORT B_Event_4 := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE283836_1 := JOIN(__EE283181(_r_Ssn_.v>0),__EE194375,__JC283187(LEFT,RIGHT),__JT283187(LEFT,RIGHT),HASH); // joe
-  __ST223139_Layout __JT283187_1(__ST220815_Layout __l, __EE283836_1 __r) := TRANSFORM
-    SELF.U_I_D__10_ := __r.UID;
-    SELF._r_Customer__8_ := __r._r_Customer_;
-    SELF.Source_Customers__7_ := __r.Source_Customers_;
-    SELF.Ssn__1_ := __r.Ssn_;
-    SELF.Otto_S_S_N_Id__1_ := __r.Otto_S_S_N_Id_;
-    SELF.Ssn_Formatted__1_ := __r.Ssn_Formatted_;
-    SELF.Deceased_Date__2_ := __r.Deceased_Date_;
-    SELF.Deceased_Date_Of_Birth__2_ := __r.Deceased_Date_Of_Birth_;
-    SELF.Deceased_First__2_ := __r.Deceased_First_;
-    SELF.Deceased_Middle__2_ := __r.Deceased_Middle_;
-    SELF.Deceased_Last__2_ := __r.Deceased_Last_;
-    SELF.Deceased_Match_Code__2_ := __r.Deceased_Match_Code_;
-    SELF._isdeepdive__2_ := __r._isdeepdive_;
-    SELF._county__death__2_ := __r._county__death_;
-    SELF.Deceased_Ssn__2_ := __r.Deceased_Ssn_;
-    SELF._state__death__flag__2_ := __r._state__death__flag_;
-    SELF._death__rec__src__2_ := __r._death__rec__src_;
-    SELF._state__death__id__2_ := __r._state__death__id_;
-    SELF := __l;
-    SELF := __r;
-  END;
-  SHARED __EE283836 := JOIN(__EE283181,__EE283836_1,LEFT.uid.v=RIGHT.uid.v,__JT283187_1(LEFT,RIGHT),LEFT OUTER,HASH); // joe
+  SHARED __EE283836 := JOIN(__EE283181,__EE194375,__JC283187(LEFT,RIGHT),__JT283187(LEFT,RIGHT),LEFT OUTER,LOOKUP);
   SHARED __ST226269_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;

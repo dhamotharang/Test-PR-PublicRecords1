@@ -1781,35 +1781,7 @@ EXPORT B_Event_3 := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE484101_1 := JOIN(__EE484091(Subject_.v>0),__EE457058,__JC484100(LEFT,RIGHT),__JT484100(LEFT,RIGHT),HASH);
-  __ST469244_Layout __JT484100_1(__ST466917_Layout __l, __EE484101_1 __r) := TRANSFORM
-    SELF.U_I_D__3_ := __r.U_I_D__3_;
-    SELF._r_Customer__1_ := __r._r_Customer__1_;
-    SELF.Lex_Id__1_ := __r.Lex_Id__1_;
-    SELF._rin__source__1_ := __r._rin__source__1_;
-    SELF.Deceased_Date__1_ := __r.Deceased_Date__1_;
-    SELF.Deceased_Date_Of_Birth__1_ := __r.Deceased_Date_Of_Birth__1_;
-    SELF.Deceased_First__1_ := __r.Deceased_First__1_;
-    SELF.Deceased_Middle__1_ := __r.Deceased_Middle__1_;
-    SELF.Deceased_Last__1_ := __r.Deceased_Last__1_;
-    SELF.Deceased_Match_Code__1_ := __r.Deceased_Match_Code__1_;
-    SELF._isdeepdive__1_ := __r._isdeepdive__1_;
-    SELF._county__death__1_ := __r._county__death__1_;
-    SELF.Deceased_Ssn__1_ := __r.Deceased_Ssn__1_;
-    SELF._state__death__flag__1_ := __r._state__death__flag__1_;
-    SELF._death__rec__src__1_ := __r._death__rec__src__1_;
-    SELF._state__death__id__1_ := __r._state__death__id__1_;
-    SELF._curr__incar__flag__1_ := __r._curr__incar__flag__1_;
-    SELF._name__ssn__dob__match__1_ := __r._name__ssn__dob__match__1_;
-    SELF.Deceased__1_ := __r.Deceased__1_;
-    SELF.Deceased_Dob_Match__1_ := __r.Deceased_Dob_Match__1_;
-    SELF.Deceased_Match__1_ := __r.Deceased_Match__1_;
-    SELF.Deceased_Name_Match__1_ := __r.Deceased_Name_Match__1_;
-    SELF := __l;
-    SELF := __r;
-  END;
-  SHARED __EE484101 := JOIN(__EE484091,__EE484101_1,LEFT.uid.v=RIGHT.uid.v,__JT484100_1(LEFT,RIGHT),LEFT OUTER,HASH);
-
+  SHARED __EE484101 := JOIN(__EE484091,__EE457058,__JC484100(LEFT,RIGHT),__JT484100(LEFT,RIGHT),LEFT OUTER,HASH);
   SHARED __ST471689_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
