@@ -6,8 +6,10 @@ IMPORT Risk_Indicators, RiskWise, UT, LiensV2_Services;
 		integer retry := 3;
 		integer timeout := 120;
 		integer threads := 1;
-		String neutralroxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; 
-		String fcraroxieIP := riskwise.shortcuts.staging_fcra_roxieIP;
+		// String neutralroxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; 
+		String neutralroxieIP :=  riskwise.shortcuts.core_97_roxieIP; // CoreRoxie		
+		// String fcraroxieIP := riskwise.shortcuts.staging_fcra_roxieIP;
+		String fcraroxieIP := riskwise.shortcuts.core_97_roxieIP;
 		/* Infile_name :=  ut.foreign_aprod + 'thor::ncf::lj::lexids::d20170418';            //1,336,640 Sample size
 		Infile_name :=  ut.foreign_aprod + 'thor::ncf::lj::lexids::d20170613';            //
 		// Infile_name :=  '~bkarnatz::in::20170629::LJ_LexID_BatchErrors';            //1766 Sample size */
