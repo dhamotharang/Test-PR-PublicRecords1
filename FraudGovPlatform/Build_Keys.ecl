@@ -8,15 +8,17 @@ export Build_Keys(
 		 pversion
 	);
 
-	tools.mac_WriteIndex('TheKeys.Main.EntityProfile.New'											,BuildEntityProfileKey			);
-	tools.mac_WriteIndex('TheKeys.Main.ConfigAttributes.New'									,BuildConfigAttributesKey		);
-	tools.mac_WriteIndex('TheKeys.Main.ConfigRules.New'												,BuildConfigRulesKey				);
+	tools.mac_WriteIndex('TheKeys.Main.EntityProfile.New',BuildEntityProfileKey);
+	tools.mac_WriteIndex('TheKeys.Main.ConfigAttributes.New',BuildConfigAttributesKey);
+	tools.mac_WriteIndex('TheKeys.Main.ConfigRules.New',BuildConfigRulesKey);
+	tools.mac_WriteIndex('TheKeys.Main.DisposableEmailDomains.New',BuildDisposableEmailDomainsKey);
 													  
 	export full_build :=
 		 parallel(
 			 BuildEntityProfileKey
 			,BuildConfigAttributesKey
 			,BuildConfigRulesKey
+			BuildDisposableEmailDomainsKey
 		 )
 		;
 	
