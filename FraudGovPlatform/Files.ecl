@@ -50,7 +50,8 @@ module
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigRiskLevel,Layouts.Input.ConfigRiskLevel,ConfigRiskLevel,'CSV',,'\r\n',',',true);
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigAttributes,Layouts.Input.ConfigAttributes,ConfigAttributes,'CSV',,'\r\n',',',true);		
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigRules,Layouts.Input.ConfigRules,ConfigRules,'CSV',,'\r\n',',',true);
-		
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.DisposableEmailDomains,Layouts.Input.DisposableEmailDomains,DisposableEmailDomains,'CSV',,'\r\n',',',true);
+
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSInclusionDemoData,FraudShared.Layouts.Input.MbsFdnMasterIDIndTypeInclusion,MBSInclusionDemoData,'CSV',,'|\n','|\t|');
 		
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSDemoData,FraudShared.Layouts.Input.Mbs,MBSDemoData,'CSV',,'|\n','|\t|');
@@ -91,7 +92,6 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_EntityAttributes,Layouts.EntityAttributes, kel_EntityAttributes);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_GraphEdges,Layouts.GraphEdges, kel_GraphEdges);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_GraphVertices,Layouts.GraphVertices, kel_GraphVertices);
-		
 	end;
 
 	export CustomerSettings := dataset(Filenames().CustomerSettings,Layouts.CustomerSettings,thor,opt);
