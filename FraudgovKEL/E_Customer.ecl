@@ -58,7 +58,7 @@ EXPORT E_Customer := MODULE
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Customer_Group,COUNT(ROWS(LEFT))=1),GROUP,Customer__Single_Rollup(LEFT)) + ROLLUP(HAVING(Customer_Group,COUNT(ROWS(LEFT))>1),GROUP,Customer__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::FraudgovKEL::Customer::Result',EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Customer::Result',EXPIRE(7));
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Customer_Id__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Customer_Id_);
   EXPORT Industry_Type__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Industry_Type_);

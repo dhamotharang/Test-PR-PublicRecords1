@@ -1695,7 +1695,7 @@ EXPORT B_Email := MODULE
     SELF.Source_Customer_Count_ := KEL.Aggregates.CountN(__PP2976800.Source_Customers_);
     SELF := __PP2976800;
   END;
-  EXPORT __ENH_Email := PROJECT(__EE2976799,__ND2977197__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Email::Annotated',EXPIRE(7));
+  EXPORT __ENH_Email := PROJECT(__EE2976799,__ND2977197__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Email::Annotated',EXPIRE(7));
   SHARED __EE4670537 := __ENH_Email;
   SHARED IDX_Email_UID_Layout := RECORD
     KEL.typ.uid UID;

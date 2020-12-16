@@ -3622,5 +3622,5 @@ EXPORT B_Social_Security_Number_1 := MODULE
     SELF.Kr_Flag_ := MAP(__PP2646499.C_O_U_N_T___Exp1__8_ <> 0=>1,0);
     SELF := __PP2646499;
   END;
-  EXPORT __ENH_Social_Security_Number_1 := PROJECT(__EE2646498,__ND2646503__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Social_Security_Number::Annotated_1',EXPIRE(7));
+  EXPORT __ENH_Social_Security_Number_1 := PROJECT(__EE2646498,__ND2646503__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Social_Security_Number::Annotated_1',EXPIRE(7));
 END;

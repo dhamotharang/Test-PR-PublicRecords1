@@ -877,5 +877,5 @@ EXPORT B_Drivers_License_3 := MODULE
     SELF.Id_Activity_Dt_Last_Seen_ := __PP426186.M_A_X___Event_Date__2_;
     SELF := __PP426186;
   END;
-  EXPORT __ENH_Drivers_License_3 := PROJECT(__EE426185,__ND426209__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Drivers_License::Annotated_3',EXPIRE(7));
+  EXPORT __ENH_Drivers_License_3 := PROJECT(__EE426185,__ND426209__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Drivers_License::Annotated_3',EXPIRE(7));
 END;
