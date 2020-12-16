@@ -1,4 +1,4 @@
-import ut, tools, Corp2_Raw_TX;
+﻿import ut, tools, Corp2_Raw_TX;
 
 EXPORT Files(STRING  pversion = '',
              BOOLEAN pUseOtherEnvironment = FALSE) := MODULE
@@ -190,15 +190,15 @@ EXPORT Files(STRING  pversion = '',
 		Corp2_Raw_TX.Layouts.FilingHist_11_layout f11_fmt(Corp2_Raw_TX.Layouts.RawLayoutIN l) :=  transform
 			self.rec_code             				:= l.blob[1..2];
 			self.filing_number        				:= l.blob[3..12];
-			self.document_no          				:= l.blob[13..24];
-			self.filing_type_id       				:= l.blob[25..36];
-			self.filing_type		  						:= l.blob[37..132];
-			self.entry_date			  						:= l.blob[133..140];
-			self.filing_date		  						:= l.blob[141..148];
-			self.effective_date		  					:= l.blob[149..156];
-			self.effective_cond_flag  				:= l.blob[157..158];
-			self.inactive_date		  					:= l.blob[159..166];
-			self.filler				  							:= l.blob[167..560];
+			self.document_no          				:= l.blob[13..26];
+			self.filing_type_id       				:= l.blob[27..38];
+			self.filing_type		  						:= l.blob[39..134];
+			self.entry_date			  						:= l.blob[135..142];
+			self.filing_date		  						:= l.blob[143..150];
+			self.effective_date		  					:= l.blob[151..158];
+			self.effective_cond_flag  				:= l.blob[159..160];
+			self.inactive_date		  					:= l.blob[161..168];
+			self.filler				  							:= l.blob[169..560];
 		end;
 		
 		EXPORT f11 := project(f11_raw, f11_fmt(left));
