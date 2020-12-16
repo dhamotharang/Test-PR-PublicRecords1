@@ -143,7 +143,7 @@ EXPORT proc_build_vehicle_all(
 	SEQUENTIAL(
 		Spray_Experian_Files,
 		Spray_Infutor_VIN_Files,
-		Spray_Infutor_Motorcycle_Files
+		Spray_Infutor_Motorcycle_Files,
 		VINA_Info,
 		/* 
 		Scrub_Experian_Files,
