@@ -75,8 +75,8 @@ module
 		export ConfigRiskLevel							:= tools.mod_FilenamesInput(Template('ConfigRiskLevel'),pversion);
 		export ConfigAttributes							:= tools.mod_FilenamesInput(Template('ConfigAttributes'),pversion);
 		export ConfigRules									:= tools.mod_FilenamesInput(Template('ConfigRules'),pversion);
-		
-		
+		export DisposableEmailDomains 					:= tools.mod_FilenamesInput(Template('DisposableEmailDomains'),pversion); 
+
 		export dAll_filenames :=
 			IdentityData.dAll_filenames +
 			KnownFraud.dAll_filenames +
@@ -101,7 +101,6 @@ module
 	export Dashboard 				:= FraudGov_Prefix('config') + 'kel::Dashboard';
 	export LinksChart 			:= FraudGov_Prefix('config') + 'kel::LinksChart';
 	export DetailsReport 		:= FraudGov_Prefix('config') + 'kel::DetailsReport';
-
 	export Flags := module
 		export NewHeader := FraudGov_Prefix('flags') + 'NewHeader_flag';
 		export FraudgovInfoFn := FraudGov_Prefix('flags') + 'NewFraudgov_flag';

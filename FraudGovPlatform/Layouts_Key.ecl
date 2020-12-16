@@ -183,5 +183,8 @@
   decimal high;
   integer8 risklevel;
  END;
- 
+
+ EXPORT DisposableEmailDomains := Record
+  string200 DisposableEmailDomain;
+ END;
 END;
