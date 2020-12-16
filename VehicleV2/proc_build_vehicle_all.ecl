@@ -136,6 +136,7 @@ EXPORT proc_build_vehicle_all(
 	create_orbit_build_instance := Orbit3.proc_Orbit3_CreateBuild_AddItem(
 		'Motor Vehicle Registrations',
 		pVersion,
+		'N|B',
 		email_list := STD.Str.FindReplace(Email_Recipients, ',', ';')
 	);
 
