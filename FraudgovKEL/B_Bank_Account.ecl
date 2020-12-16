@@ -1787,7 +1787,7 @@ EXPORT B_Bank_Account := MODULE
     SELF.Source_Customer_Count_ := KEL.Aggregates.CountN(__PP2811779.Source_Customers_);
     SELF := __PP2811779;
   END;
-  EXPORT __ENH_Bank_Account := PROJECT(__EE2811778,__ND2812173__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Bank_Account::Annotated',EXPIRE(7));
+  EXPORT __ENH_Bank_Account := PROJECT(__EE2811778,__ND2812173__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Bank_Account::Annotated',EXPIRE(7));
   SHARED __EE4670048 := __ENH_Bank_Account;
   SHARED IDX_Bank_Account_UID_Layout := RECORD
     KEL.typ.uid UID;

@@ -34,4 +34,7 @@ OttoSharingUsingInclusionIdWithState := JOIN(OttoSharingUsingInclusionId2, Custo
                                 LEFT.SourceCustomerHash=RIGHT.SourceCustomerHash, LEFT OUTER, LOOKUP);
 
 tempSharing := DATASET('~foreign::10.173.14.201::temp::sharingrules', RECORDOF(OttoSharingUsingInclusionIdWithState), THOR);
-EXPORT SharingRules := OttoSharingUsingInclusionIdWithState;//OttoSharingUsingInclusionIdWithState;//tempSharing; 
+EXPORT SharingRules := OttoSharingUsingInclusionIdWithState;//OttoSharingUsingInclusionIdWithState;//OttoSharingUsingInclusionIdWithState;//tempSharing; 
+
+// state and best lexid st 
+

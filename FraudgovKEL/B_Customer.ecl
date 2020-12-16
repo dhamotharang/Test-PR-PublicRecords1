@@ -392,7 +392,7 @@ EXPORT B_Customer := MODULE
     SELF.Person_Event_Count_Median_ := __PP2828114.M_E_D_I_A_N___Event_Count_;
     SELF := __PP2828114;
   END;
-  EXPORT __ENH_Customer := PROJECT(__EE2828113,__ND2828150__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Customer::Annotated',EXPIRE(7));
+  EXPORT __ENH_Customer := PROJECT(__EE2828113,__ND2828150__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Customer::Annotated',EXPIRE(7));
   SHARED __EE4670186 := __ENH_Customer;
   SHARED IDX_Customer_UID_Layout := RECORD
     KEL.typ.uid UID;

@@ -16275,5 +16275,5 @@ EXPORT B_Event_2 := MODULE
     SELF.T___Src_Agency_Desc_ := __OP2(__OP2(__PP1005263.T___Src_Agency_Prog_Jur_St_,+,__CN('-')),+,__PP1005263.T___Src_Agency_Prog_Desc_);
     SELF := __PP1005263;
   END;
-  EXPORT __ENH_Event_2 := PROJECT(__EE1005262,__ND1005267__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Event::Annotated_2',EXPIRE(7));
+  EXPORT __ENH_Event_2 := PROJECT(__EE1005262,__ND1005267__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Event::Annotated_2',EXPIRE(7));
 END;
