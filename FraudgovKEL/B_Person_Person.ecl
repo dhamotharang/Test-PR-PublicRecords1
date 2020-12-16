@@ -3,8 +3,8 @@ IMPORT KEL011 AS KEL;
 IMPORT E_Address,E_Customer,E_Person,E_Person_Person FROM FraudgovKEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Person_Person := MODULE
-  SHARED __EE4159987 := E_Person_Person.__Result;
-  SHARED __IDX_Person_Person_From_Person__Filtered := __EE4159987(__NN(__EE4159987.From_Person_));
+  SHARED __EE4670018 := E_Person_Person.__Result;
+  SHARED __IDX_Person_Person_From_Person__Filtered := __EE4670018(__NN(__EE4670018.From_Person_));
   SHARED IDX_Person_Person_From_Person__Layout := RECORD
     E_Person.Typ From_Person_;
     __IDX_Person_Person_From_Person__Filtered._r_Customer_;
@@ -39,7 +39,7 @@ EXPORT B_Person_Person := MODULE
   EXPORT IDX_Person_Person_From_Person__Name := '~key::KEL::FraudgovKEL::Person_Person::From_Person_';
   EXPORT IDX_Person_Person_From_Person_ := INDEX(IDX_Person_Person_From_Person__Projected,{From_Person_},{IDX_Person_Person_From_Person__Projected},IDX_Person_Person_From_Person__Name);
   EXPORT IDX_Person_Person_From_Person__Build := BUILD(IDX_Person_Person_From_Person_,OVERWRITE);
-  EXPORT __ST4159989_Layout := RECORDOF(IDX_Person_Person_From_Person_);
+  EXPORT __ST4670020_Layout := RECORDOF(IDX_Person_Person_From_Person_);
   EXPORT IDX_Person_Person_From_Person__Wrapped := PROJECT(IDX_Person_Person_From_Person_,TRANSFORM(E_Person_Person.Layout,SELF.From_Person_ := __CN(LEFT.From_Person_),SELF:=LEFT));
   EXPORT BuildAll := PARALLEL(IDX_Person_Person_From_Person__Build);
 END;
