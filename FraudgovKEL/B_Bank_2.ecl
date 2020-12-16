@@ -25,5 +25,5 @@ EXPORT B_Bank_2 := MODULE
     SELF.High_Risk_Routing_ := MAP(__T(__OP2(__PP656431.Routing_Number_,IN,__CN(['031101169','124071889','124303120','073972181','084003997','114924742','031101169','063115194'])))=>1,0);
     SELF := __PP656431;
   END;
-  EXPORT __ENH_Bank_2 := PROJECT(__EE656509,__ND656544__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Bank::Annotated_2',EXPIRE(7));
+  EXPORT __ENH_Bank_2 := PROJECT(__EE656509,__ND656544__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Bank::Annotated_2',EXPIRE(7));
 END;

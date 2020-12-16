@@ -76,5 +76,5 @@ EXPORT B_Email_5 := MODULE
     SELF.Aot_Email_Kr_Act_Cnt_Ev_ := MIN(__PP144497.C_O_U_N_T___Exp1_,9999);
     SELF := __PP144497;
   END;
-  EXPORT __ENH_Email_5 := PROJECT(__EE144496,__ND144520__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Email::Annotated_5',EXPIRE(7));
+  EXPORT __ENH_Email_5 := PROJECT(__EE144496,__ND144520__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Email::Annotated_5',EXPIRE(7));
 END;
