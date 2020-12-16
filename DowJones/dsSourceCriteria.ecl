@@ -1970,7 +1970,11 @@ EXPORT dsSourceCriteria := DATASET([
 {'Corrupt Practices Investigation Bureau (CPIB) Singapore Press Release','1957'},
 {'Panama Canal Authority (ACP) Debarred Contractors List','1958'},
 {'EC 2020/1992 Banned Air Carriers List','1959'},
-{'Florida State Board of Administration Scrutinized Companies List','1960'}
+{'Florida State Board of Administration Scrutinized Companies List','1960'},
+{'EC (CFSP) 2020/2033 Democratic Republic of the Congo List','1961'},
+{'EC 2020/2021 Democratic Republic of the Congo List','1962'},
+{'MGA (Malta) Enforcement Register','1963'},
+{'OFAC - Non-SDN Menu Based Sanctions List','1964'}
 
 ],r);
 
