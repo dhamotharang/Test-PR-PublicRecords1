@@ -1,4 +1,4 @@
-﻿IMPORT STD, Orbit_Report, RoxieKeyBuild, dops, Scrubs_VehicleV2, VehicleV2;
+﻿IMPORT STD, Orbit_Report, Orbit3, RoxieKeyBuild, dops, Scrubs_VehicleV2, VehicleV2;
 
 //export proc_build_vehicle_all(pVersion) :=
 EXPORT proc_build_vehicle_all(
@@ -13,7 +13,7 @@ EXPORT proc_build_vehicle_all(
 
 	/*#OPTION('multiplePersistInstances',FALSE);*/
 
-	Email_Recipients := IF(pContacts <> '', pContacts + ',', '') + 'cathy.tio@lexisnexis.com,dave.beining@lexisnexisrisk.com';
+	Email_Recipients := IF(pContacts <> '', pContacts + ',', '') + 'cathy.tio@lexisnexis.com';
 
 	VehicleV2.proc_build_stats(pVersion,zDoStatsReference);
 
@@ -129,16 +129,16 @@ EXPORT proc_build_vehicle_all(
 		FAILURE(STD.System.Email.SendEmail(Email_Recipients,'persist files failed to delete',failmessage));
 
 	update_dops_non_fcra := dops.updateversion('VehicleV2Keys',pVersion,Email_Recipients,,'N|B');
-	//update_dops_fcra := RoxieKeyBuild.updateversion('FCRA_VehicleV2Keys',pVersion,Email_Recipients,,'F');
-	//update_dops := parallel(update_dops_non_fcra,update_dops_fcra);
 
 	Orbit_report.Vehicle_Stats(getretval);
 
-	// Create orbitI build instance
-	createOrbitIBldInstance := VehicleV2.Proc_OrbitI_CreateBuild(pVersion);
-	
-	// Update DOPS in Alpharetta
-	updateIDops := dops.updateversion('VehicleV2Keys',pVersion,Email_Recipients,,'N',,,'A');
+	// Create ORBIT build instance
+	create_orbit_build_instance := Orbit3.proc_Orbit3_CreateBuild_AddItem(
+		'Motor Vehicle Registrations',
+		pVersion,
+		'N|B',
+		email_list := STD.Str.FindReplace(Email_Recipients, ',', ';')
+	);
 
 	SEQUENTIAL(
 		Spray_Experian_Files,
@@ -167,8 +167,7 @@ EXPORT proc_build_vehicle_all(
 		proc_picker_file,
 		proc_delete_persist_files,
 		getretval,
-		createOrbitIBldInstance,
-		updateIDops
+		create_orbit_build_instance
 	);
 
 ENDMACRO;
