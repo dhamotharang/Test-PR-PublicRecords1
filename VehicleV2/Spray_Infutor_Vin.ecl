@@ -5,7 +5,7 @@ EXPORT Spray_Infutor_Vin(
 	STRING pSourceIP,
 	STRING pDirectory,
 	STRING pVersion,
-	STRING pfileMask = 'NARV3*.txt',
+	STRING pfileMask = 'NARV3_*.txt',
 	STRING pDelimiter = '\\t',
 	UNSIGNED pMaxRecordSize =  8192,
 	STRING pGroupName = STD.System.Thorlib.Group(),
@@ -43,7 +43,7 @@ EXPORT Spray_Infutor_Vin(
 
 	rSprayInfo_layout tSprayInfo(dRemoteFileList pInput) := TRANSFORM
 		SELF.SourceIP  := pSourceIP;
-		SELF.SourceDir := pDirectory + pInput.name;
+		SELF.SourceDir := pDirectory + '/' + pInput.name;
 		SELF.SourceState := REGEXFIND('^NARV3_([A-Z]{2}).txt$', TRIM(pInput.name),1);
 		SELF.FileDate := pVersion;
 		SELF.ProcessDate := vProcessDate;

@@ -1,13 +1,13 @@
-﻿IMPORT STD, _control, lib_fileservices;
+﻿IMPORT STD, VehicleV2;
 
 EXPORT Spray_Experian(
 	STRING  pSourceIP,
 	STRING  pDirectory,
 	STRING  pVersion,
-	STRING pfileMask = '*MVR',
+	STRING pfileMask = 'LASP.R010.AIS.M.*.LDDP1150.*',
 	UNSIGNED pRecLength = 1151,
 	STRING  pGroupName = STD.System.Thorlib.Group(),
-	BOOLEAN pOverwrite = FALSE
+	BOOLEAN pOverwrite = TRUE
 ) :=
 FUNCTION
 
@@ -41,8 +41,8 @@ FUNCTION
 
 	rSprayInfo_layout tSprayInfo(dRemoteFileList pInput) := TRANSFORM
 		self.SourceIP            := pSourceIP;
-		self.SourceDir           := pDirectory + pInput.name;
-		self.SourceState         := stringlib.stringtolowercase(pInput.name)[1..2];
+		self.SourceDir           := pDirectory + '/' + pInput.name;
+		self.SourceState         := STD.Str.SplitWords(pInput.name,'.')[5];
 		self.FileDate            := pVersion;
 		self.ProcessDate         := vProcessDate;
 		self.RecordLength        := pRecLength;
@@ -103,7 +103,7 @@ FUNCTION
 	);
 
 	sprayFiles := NOTHOR(
-		APPLY( 
+		APPLY(
 			dRemoteFiles_SprayInfo,
 			SEQUENTIAL( 
 				IF( pOverwrite = true,
@@ -130,7 +130,7 @@ FUNCTION
 		STRING LogicalFileName {virtual(LogicalFileName)};
 	END;
 	
-	dExperianRaw := dataset(vRawSuperFileName,rExperianRaw_layout,thor);
+	dExperianRaw := DATASET(vRawSuperFileName,rExperianRaw_layout,thor);
 
 	// Create Experian VIN's only file
 	removeExpVinCandidates := IF( 

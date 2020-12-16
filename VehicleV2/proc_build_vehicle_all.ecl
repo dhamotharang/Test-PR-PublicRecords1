@@ -6,6 +6,7 @@ EXPORT proc_build_vehicle_all(
 	pDirectory,
 	pVersion,
 	pContacts,
+	pOverride=TRUE,
 	pSprayInfutorVin=TRUE,
 	pSprayInfutorMotorcycle=TRUE
 ) := MACRO
@@ -19,27 +20,34 @@ EXPORT proc_build_vehicle_all(
 	Spray_Experian_Files := VehicleV2.Spray_Experian(
 		pSourceIP,
 		pDirectory,
-		pVersion
-	) : SUCCESS(OUTPUT('Experian spray was successfully completed.'))
+		pVersion,
+		pOverwrite := pOverride
+	) : SUCCESS(OUTPUT('Experian spray was successfully completed.'));
 
-	Spray_Infutor_VIN_Files := IF(
+	Exec_Spray_Infutor_VIN_Files := VehicleV2.Spray_Infutor_Vin(
+		pSourceIP,
+		pDirectory,
+		pVersion,
+		pOverwrite := pOverride
+	) : SUCCESS(OUTPUT('Infutor VIN Vehicle spray was successfully completed.'));
+
+	Spray_Infutor_VIN_Files := IF (
 		pSprayInfutorVin,
-		VehicleV2.Spray_Infutor_Vin(
-			pSourceIP,
-			pDirectory,
-			pVersion
-		) : SUCCESS(OUTPUT('Infutor VIN Vehicle spray was successfully completed.')),
-		OUTPUT('No New Infutor VIN file available for spray');
+		Exec_Spray_Infutor_VIN_Files,
+		OUTPUT('No New Infutor VIN file available for spray')
 	);
+
+	Exec_Spray_Infutor_Motorcycle_Files := VehicleV2.Spray_Infutor_Motorcycle(
+		pSourceIP,
+		pDirectory,
+		pVersion,
+		pOverwrite := pOverride
+	) : SUCCESS(OUTPUT('Infutor Motorcycle spray was successfully completed.'));
 
 	Spray_Infutor_Motorcycle_Files := IF (
 		pSprayInfutorMotorcycle,
-		VehicleV2.Spray_Infutor_Motorcycle(
-			pSourceIP,
-			pDirectory,
-			pVersion
-		) : SUCCESS(OUTPUT('Infutor Motorcycle spray was successfully completed.')),
-		OUTPUT('No New Infutor Motorcycle file available for spray');
+		Exec_Spray_Infutor_Motorcycle_Files,
+		OUTPUT('No New Infutor Motorcycle file available for spray')
 	);
 
 	VINA_Info := VehicleV2.Populate_VINA_Info:
@@ -135,11 +143,13 @@ EXPORT proc_build_vehicle_all(
 	SEQUENTIAL(
 		Spray_Experian_Files,
 		Spray_Infutor_VIN_Files,
-		Spray_Infutor_Motorcycle_Files,
+		Spray_Infutor_Motorcycle_Files
 		VINA_Info,
-		// Scrub_Experian_Files,
-		// Scrub_Infutor_Motorcycle_Files,
-		// Scrub_Infutor_VIN_Files,
+		/* 
+		Scrub_Experian_Files,
+		Scrub_Infutor_Motorcycle_Files,
+		Scrub_Infutor_VIN_Files,
+		*/
 		Scrubs_Input_Files,
 		Build_Experian_Base,
 		Build_NC_Base,

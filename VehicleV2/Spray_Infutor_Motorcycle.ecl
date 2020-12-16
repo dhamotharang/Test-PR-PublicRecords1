@@ -15,12 +15,9 @@ EXPORT Spray_Infutor_Motorcycle(
 	// check if file exists in UNIX
 	checkFileExists := IF(COUNT(STD.File.RemoteDirectory(pSourceIP,pDirectory,pfileName,false)(size <> 0)) = 1,TRUE,FALSE) : INDEPENDENT;
 
-	// obtain the file date from the file name
-	pFileDate := if(checkFileExists,STD.File.RemoteDirectory(pSourceIP,pDirectory,pfileName,false)[1].name[6..13],'') : INDEPENDENT;
-
-	vRawLogicalFileName := '~thor_data400::in::vehiclev2::inf_nondppa::motorcycle_raw::' + pFileDate;
+	vRawLogicalFileName := '~thor_data400::in::vehiclev2::inf_nondppa::motorcycle_raw::' + pVersion;
 	vRawSuperFileName := '~thor_data400::in::vehiclev2::inf_nondppa::motorcycle_raw';
-	vPrepLogicalFileName := '~thor_data400::in::vehiclev2::inf_nondppa::motorcycle_' + pFileDate;
+	vPrepLogicalFileName := '~thor_data400::in::vehiclev2::inf_nondppa::motorcycle_' + pVersion;
 	vPrepSuperFileName := '~thor_data400::in::vehiclev2::inf_nondppa::motorcycle';
 	vPrepSuperFileFather := '~thor_data400::in::vehiclev2::inf_nondppa::motorcycle_father';
 	vPrepSuperFileBldg := '~thor_data400::in::vehiclev2::inf_nondppa::motorcycle_building';
@@ -65,7 +62,7 @@ EXPORT Spray_Infutor_Motorcycle(
 
 	sprayInfutorMotorcycle:= STD.File.SprayDelimited(
 		pSourceIP,
-		pDirectory+pfileName,
+		pDirectory + '/' + pfileName,
 		pMaxRecordSize,
 		pDelimiter,
 		'\r\n',
