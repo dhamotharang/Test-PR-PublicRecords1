@@ -801,6 +801,7 @@ EXPORT	Layouts	:=	MODULE
 		STRING30	Sbfe_Contributor_Number;
 		STRING50	Contract_Account_Number;
 		STRING50	Original_Contract_Account_Number;
+		STRING4		Overall_File_Format_Version;
 		STRING3		Account_Type_Reported;
 		STRING		process_date;
 		STRING		original_process_date;
@@ -810,6 +811,27 @@ EXPORT	Layouts	:=	MODULE
 		STRING2		source:=Constants().source;
 		BOOLEAN		active;
 	END;
+
+	EXPORT	rTradelineKey	:=	RECORD
+		STRING		Version;
+		STRING		Original_Version;
+		rAccountBase;
+        string     Cycle_Days_Diff;
+        string     Internal_Payment_Status;
+        string     Prior_DBT_V5;
+        string     Prior_Payment_Status;
+        string     Prior_ExceptionCycleDays;
+        string     Last_Payment_Status_Before_Exception;
+        string     Last_DBT_V5_Before_Exception;
+        string     Prior_Last_Payment_Status_Before_Exception;
+        string     Prior_Last_DBT_V5_Before_Exception;
+        string     Fixed_Delinquency_Date;
+        string     DBT_V5_General_Cap;
+        string     Exception_Cycle_Days;
+        string     Raw_DBT_V5;
+        string     DBT_V5;
+		STRING3	   DBT;
+    END;
 	
 	EXPORT	rBIClassification	:=	RECORD
 		STRING2		Record_Type;

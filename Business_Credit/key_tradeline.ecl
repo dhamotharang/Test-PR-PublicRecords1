@@ -5,7 +5,7 @@ EXPORT	key_tradeline(STRING pVersion	=	(STRING8)Std.Date.Today(),
 	rTradelines	:=	RECORD
 		STRING		Version;
 		STRING		Original_Version;
-		Business_Credit.Layouts.rAccountBase AND NOT [active];
+		Business_Credit.Layouts.rAccountBase AND NOT [active,Overall_File_Format_Version];
 		string ln_delinquency_date;
 		STRING3		DBT;
 		string		DBT_V5;
