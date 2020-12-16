@@ -63,9 +63,12 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
       InputOrig);
 
   cleanedInput := Business_Risk_BIP.fn_CleanInput(Input, Options);
+  
+  withAuthRepLexIDs := Business_Risk_BIP.getAuthRepLexIDs(cleanedInput, Options, mod_access);
+	withDID := withAuthRepLexIDs; // don't need to call did append again
+  
 
-  withDID := Business_Risk_BIP.fn_DIDAppend(cleanedInput, Options, mod_access);
-
+  
   // This prevents SeleIDS from going through the BIPappend twice if version 31 of the business shell is being used
   withDIDwithSeleID := PROJECT(withDID(Options.BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v31 and input_echo.SeleID <> 0),
                               TRANSFORM(Business_Risk_BIP.Layouts.LinkID_Results,
@@ -439,13 +442,12 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
                                                 SELF := LEFT),
                                             LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
 
-  withAuthRepLexIDs := Business_Risk_BIP.getAuthRepLexIDs(withPropertyByInputs, Options, mod_access);
 
   // Don't bother running a bunch of searches on Seq's that didn't find any ID's, just add them back at the end
-  NoLinkIDsFound := withAuthRepLexIDs (BIP_IDs.PowID.LinkID = 0 AND BIP_IDs.ProxID.LinkID = 0 AND BIP_IDs.SeleID.LinkID = 0 AND BIP_IDs.OrgID.LinkID = 0 AND BIP_IDs.UltID.LinkID = 0);
+  NoLinkIDsFound := withPropertyByInputs (BIP_IDs.PowID.LinkID = 0 AND BIP_IDs.ProxID.LinkID = 0 AND BIP_IDs.SeleID.LinkID = 0 AND BIP_IDs.OrgID.LinkID = 0 AND BIP_IDs.UltID.LinkID = 0);
 
   // Only run the searches with Seq's that found BIP Link ID's that we can search with
-  LinkIDsFoundTemp := withAuthRepLexIDs (BIP_IDs.PowID.LinkID <> 0 OR BIP_IDs.ProxID.LinkID <> 0 OR BIP_IDs.SeleID.LinkID <> 0 OR BIP_IDs.OrgID.LinkID <> 0 OR BIP_IDs.UltID.LinkID <> 0);
+  LinkIDsFoundTemp := withPropertyByInputs (BIP_IDs.PowID.LinkID <> 0 OR BIP_IDs.ProxID.LinkID <> 0 OR BIP_IDs.SeleID.LinkID <> 0 OR BIP_IDs.OrgID.LinkID <> 0 OR BIP_IDs.UltID.LinkID <> 0);
 
   // Append "Best" Company information if only BIP ID's were passed in and it was requested in the Options that we perform the BIPBestAppend process, otherwise this function just returns what was sent to it
   // NOTE: this function call may be unnecessary (1/28/2020)
@@ -4712,6 +4714,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
   // *********************
   //   DEBUGGING OUTPUTS
   // *********************
+  
   // OUTPUT(CHOOSEN(InputOrig, 100), NAMED('Sample_InputOrig'));
   // OUTPUT(CHOOSEN(Input, 100), NAMED('Sample_Input'));
   // OUTPUT(CHOOSEN(cleanedInput, 100), NAMED('Sample_cleanedInput'));

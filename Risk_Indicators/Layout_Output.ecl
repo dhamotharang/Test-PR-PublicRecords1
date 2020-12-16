@@ -108,30 +108,30 @@ export Layout_Output := RECORD
 	UNSIGNED2 numelever := 0;
 	UNSIGNED2 numsource := 0;	
 	
-	BOOLEAN eqfsfirstcount := 0;
-	BOOLEAN eqfslastcount := 0;
-	BOOLEAN eqfsaddrcount := 0;
-	BOOLEAN eqfssocscount := 0;
+	BOOLEAN eqfsfirstcount := false;
+	BOOLEAN eqfslastcount := false;
+	BOOLEAN eqfsaddrcount := false;
+	BOOLEAN eqfssocscount := false;
 	
-	BOOLEAN tufirstcount := 0;
-	BOOLEAN tulastcount := 0;
-	BOOLEAN tuaddrcount := 0;
-	BOOLEAN tusocscount := 0;
+	BOOLEAN tufirstcount := false;
+	BOOLEAN tulastcount := false;
+	BOOLEAN tuaddrcount := false;
+	BOOLEAN tusocscount := false;
 	
-	BOOLEAN dlfirstcount := 0;
-	BOOLEAN dllastcount := 0;
-	BOOLEAN dladdrcount := 0;
-	BOOLEAN dlsocscount := 0;
+	BOOLEAN dlfirstcount := false;
+	BOOLEAN dllastcount := false;
+	BOOLEAN dladdrcount := false;
+	BOOLEAN dlsocscount := false;
 	
-	BOOLEAN emfirstcount := 0;
-	BOOLEAN emlastcount := 0;
-	BOOLEAN emaddrcount := 0;
-	BOOLEAN emsocscount := 0;
+	BOOLEAN emfirstcount := false;
+	BOOLEAN emlastcount := false;
+	BOOLEAN emaddrcount := false;
+	BOOLEAN emsocscount := false;
 	
-	BOOLEAN bkfirstcount := 0;
-	BOOLEAN bklastcount := 0;
-	BOOLEAN bkaddrcount := 0;
-	BOOLEAN bksocscount := 0;
+	BOOLEAN bkfirstcount := false;
+	BOOLEAN bklastcount := false;
+	BOOLEAN bkaddrcount := false;
+	BOOLEAN bksocscount := false;
 	
 	UNSIGNED3 adl_eqfs_first_seen := 0;
 	UNSIGNED3 adl_eqfs_last_seen := 0;
@@ -388,9 +388,9 @@ export Layout_Output := RECORD
 	UNSIGNED1	chronoaddrscore := 0;
 	STRING50 chrono_sources := '';
 	UNSIGNED2 chrono_addrcount := 0;
-	BOOLEAN chrono_eqfsaddrcount := 0;
-	BOOLEAN chrono_dladdrcount := 0;
-	BOOLEAN chrono_emaddrcount := 0;
+	BOOLEAN chrono_eqfsaddrcount := false;
+	BOOLEAN chrono_dladdrcount := false;
+	BOOLEAN chrono_emaddrcount := false;
 	Risk_Indicators.Layouts.Layout_Addr_Flags chrono_addr_flags;
 	
 	boolean chronoaddr_isBest2 := false;
@@ -415,9 +415,9 @@ export Layout_Output := RECORD
 	UNSIGNED1 chronoaddrscore2 := 0;
 	STRING50 chrono_sources2 := '';
 	UNSIGNED2 chrono_addrcount2 := 0;
-	BOOLEAN chrono_eqfsaddrcount2 := 0;
-	BOOLEAN chrono_dladdrcount2 := 0;
-	BOOLEAN chrono_emaddrcount2 := 0;
+	BOOLEAN chrono_eqfsaddrcount2 := false;
+	BOOLEAN chrono_dladdrcount2 := false;
+	BOOLEAN chrono_emaddrcount2 := false;
 	Risk_Indicators.Layouts.Layout_Addr_Flags chrono_addr_flags2;
 	
 	boolean chronoaddr_isBest3 := false;
@@ -442,9 +442,9 @@ export Layout_Output := RECORD
 	UNSIGNED1 chronoaddrscore3 := 0;	
 	STRING50 chrono_sources3 := '';
 	UNSIGNED2 chrono_addrcount3 := 0;
-	BOOLEAN chrono_eqfsaddrcount3 := 0;
-	BOOLEAN chrono_dladdrcount3 := 0;
-	BOOLEAN chrono_emaddrcount3 := 0;
+	BOOLEAN chrono_eqfsaddrcount3 := false;
+	BOOLEAN chrono_dladdrcount3 := false;
+	BOOLEAN chrono_emaddrcount3 := false;
 	Risk_Indicators.Layouts.Layout_Addr_Flags chrono_addr_flags3;
 	
 	UNSIGNED1 chronophone_namematch := 0;	
