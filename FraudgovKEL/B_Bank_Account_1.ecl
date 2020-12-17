@@ -3594,5 +3594,5 @@ EXPORT B_Bank_Account_1 := MODULE
     SELF.Kr_Flag_ := MAP(__PP1350925.C_O_U_N_T___Exp1__8_ <> 0=>1,0);
     SELF := __PP1350925;
   END;
-  EXPORT __ENH_Bank_Account_1 := PROJECT(__EE1350924,__ND1350929__Project(LEFT)) : PERSIST('~temp::KEL::FraudgovKEL::Bank_Account::Annotated_1',EXPIRE(7));
+  EXPORT __ENH_Bank_Account_1 := PROJECT(__EE1350924,__ND1350929__Project(LEFT)) : PERSIST('~fraudgov::temp::KEL::FraudgovKEL::Bank_Account::Annotated_1',EXPIRE(7));
 END;
