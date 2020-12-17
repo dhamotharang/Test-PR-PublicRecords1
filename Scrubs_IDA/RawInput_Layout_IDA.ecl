@@ -16,5 +16,4 @@ EXPORT RawInput_Layout_IDA := RECORD
     UNSIGNED8 clientassigneduniquerecordid;
     STRING50 emailaddress;
     STRING15 ipaddress;
-
   END;
