@@ -55,7 +55,6 @@ EXPORT Layouts := MODULE
 	    STRING20 customer_id;
 	    STRING20 company_id;
 	    STRING20 global_company_id;
-			STRING   report_options:='';
 			
 	END;
 
@@ -64,7 +63,7 @@ EXPORT Layouts := MODULE
 			UNSIGNED8 group_rid;
 			
 			Inquiry -[product_id, transaction_id];
-			Inquiry_extended - report_options;
+			Inquiry_extended; 
 
 			STANDARD.NAME;							
 			STANDARD.ADDR;
@@ -87,5 +86,15 @@ EXPORT Layouts := MODULE
 			UNSIGNED8 group_rid;			
 	END;
 
+  EXPORT i_grouprid_encrypted :=record
+		unsigned8 group_rid;
+		unsigned2 key_version;
+		string30 	key_group;
+		string 		key_encrypted;
+		string 		query_encrypted;
+		UNSIGNED4 global_sid   := 0;   
+		UNSIGNED8 record_sid   := 0;
+		STRING    report_options:='';
+end;
 
 END;
