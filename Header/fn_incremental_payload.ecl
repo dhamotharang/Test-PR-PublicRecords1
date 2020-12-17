@@ -80,7 +80,7 @@ Key := InsuranceHeader_xLink.Process_xIDL_Layouts().key;
 
 
 jnd_1 := join(distribute(Incpayload, hash(rid)),distribute(Header.File_Headers,hash(rid)),left.rid=right.rid, transform(t, self.valid_ssn := right.valid_ssn; self := left;),left outer,local);
-jnd_2 := join(distribute(jnd_1, hash(did)),distribute(header.ssn_validities,hash(did)),left.did=right.did and left.ssn = right.ssn,transform(t, self.valid_ssn := right.val; self := left;),left outer,keep(1), local);
+jnd_2 := join(distribute(jnd_1, hash(did)),distribute(header.ssn_validities,hash(did)),left.did=right.did and left.ssn = right.ssn,transform(t, self.valid_ssn := if(left.valid_ssn='',RIGHT.val,LEFT.valid_ssn); self := left;),left outer,keep(1), local);
 
 output(sort(table(Incpayload, {valid_ssn, cnt := count(group)}, valid_ssn), -cnt), named('valid_ssn_w_raw'));
 output(sort(table(jnd_1, {valid_ssn, cnt := count(group)}, valid_ssn), -cnt), named('valid_ssn_w_raw_base_header'));
