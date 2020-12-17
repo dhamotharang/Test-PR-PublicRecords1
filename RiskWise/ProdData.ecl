@@ -72,7 +72,7 @@ import AutoStandardI, ut, riskwise, risk_indicators, didville, dx_Gong,
 			 business_header_ss,advo,daybatchpcnsr,easi,avm_v2,utilfile,liensv2,business_header,
 			 _Control, watercraft, AlloyMedia_student_list, American_student_list, doxie_files,
 			 prof_licenseV2,BankruptcyV2, BankruptcyV3, gateway, Royalty,Relationship,dx_header, suppress, VehicleV2,dx_ConsumerFinancialProtectionBureau, std,
-			 Doxie, dx_death_master, DeathV2_Services;
+			 Doxie, dx_death_master, DeathV2_Services,dx_suppression;
 
 export ProdData := MACRO
 
@@ -217,7 +217,7 @@ BOOLEAN DisplayDeployedEnvironment := FALSE : STORED('DisplayDeployedEnvironment
 
 max_recs := 100;
 
-mod_access := MODULE(Doxie.IDataAccess) 
+mod_access := MODULE(Doxie.IDataAccess)
 	EXPORT glb := ^.GLB;
     EXPORT dppa := ^.DPPA;
 	EXPORT DataRestrictionMask := DataRestriction;
@@ -387,7 +387,7 @@ if((i_ct>=2 or in_did<>0) and (include_all_files=true or include_best_data=true)
 	raw			:= topn(misc2.key_dateCorrect_hval(hval=in_hval),1,-endDate,record);
 	if(indata[1].ssn!='' and (include_all_files=true or include_ssntable=true), output(raw, named('SSN_date_correction')) );
 
-	pullid_SSN := suppress.Key_New_Suppression(keyed(product in Suppress.Constants.SuppressGeneral) and
+	pullid_SSN := dx_Suppression.key_suppression()(keyed(product in Suppress.Constants.SuppressGeneral) and
 															 keyed(linking_type=Suppress.Constants.LinkTypes.SSN) and
 															 keyed(linking_ID=intformat((integer)indata[1].ssn, 9, 1) ) );
 	if(indata[1].ssn!='' and (Include_PullID=true or include_all_files=true), output(pullid_SSN, named('pullid_SSN')) );
@@ -412,7 +412,7 @@ if((i_ct>=2 or in_did<>0) and (include_all_files=true or include_best_data=true)
 	did_from_pii := if(count(unique_dids)=1, unique_dids[1].did, ungroup(did_results)[1].did);
 	searchdid := if(in_did=0, did_from_pii, in_did);
 
-	pullid_DID := suppress.Key_New_Suppression(keyed(product in Suppress.Constants.SuppressGeneral) and
+	pullid_DID := dx_Suppression.key_suppression()(keyed(product in Suppress.Constants.SuppressGeneral) and
 															 keyed(linking_type=Suppress.Constants.LinkTypes.DID) and
 															 keyed(linking_ID=intformat(searchdid, 12, 1) ) );
 	if(searchdid!=0 and (Include_PullID=true or include_all_files=true), output(pullid_did, named('pullid_did')) );
@@ -781,7 +781,7 @@ if(include_all_files=true or include_CFPB=true, output(withCFPB_BLKGRP_attr_over
 					keyed((unsigned)left.z5=right.zip) and
 					keyed(left.prim_range=right.prim_range) and
 					keyed (left.prim_name=right.prim_name) and
-					keyed(left.sec_range=right.sec_range) AND 
+					keyed(left.sec_range=right.sec_range) AND
 					doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
 
 					transform(recordof(Business_Risk.Key_Business_Header_Address), self := right),
@@ -804,7 +804,7 @@ if(include_all_files=true or include_CFPB=true, output(withCFPB_BLKGRP_attr_over
 	bus_header_recs := choosen(Business_Header_SS.Key_BH_BDID_pl(keyed(bdid=in_bdid and in_bdid!=0) and doxie.compliance.source_ok(mod_access.glb, mod_access.DataRestrictionMask, source, dt_first_seen) AND doxie.compliance.isBusHeaderSourceAllowed(source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask)),max_recs);
 	if(in_bdid!=0 and (include_all_files=true or include_business_header=true), output(bus_header_recs, named('business_header')) );
 
-	bdid_table_recs := choosen( PROJECT( Business_Risk.key_bdid_table(keyed(bdid=in_bdid) and in_bdid!=0), 
+	bdid_table_recs := choosen( PROJECT( Business_Risk.key_bdid_table(keyed(bdid=in_bdid) and in_bdid!=0),
                                                      TRANSFORM(RECORDOF(Business_Risk.key_bdid_table),
                                                      SELF.cnt_d := IF(mod_access.use_DnB(), LEFT.cnt_d, 0),
                                                      SELF.dnb_emps := IF(mod_access.use_DnB(), LEFT.dnb_emps, 0),
@@ -813,7 +813,7 @@ if(include_all_files=true or include_CFPB=true, output(withCFPB_BLKGRP_attr_over
                                                      SELF:=LEFT) ),max_recs);
 	if(in_bdid!=0 and (include_all_files=true or include_business_header=true), output(bdid_table_recs, named('bdid_table')) );
 
-	bdid_risk_table_recs := choosen( PROJECT( business_risk.key_BDID_risk_table(keyed(bdid=in_bdid) and in_bdid!=0), 
+	bdid_risk_table_recs := choosen( PROJECT( business_risk.key_BDID_risk_table(keyed(bdid=in_bdid) and in_bdid!=0),
                                                    TRANSFORM(RECORDOF(Business_Risk.key_BDID_risk_table),
                                                    SELF.currdnb := IF(mod_access.use_DnB(), LEFT.currdnb, 0 ),
                                                    SELF.dnb_flag := IF(mod_access.use_DnB(), LEFT.dnb_flag, 0),
@@ -877,5 +877,5 @@ vehicles_party := JOIN(vehicle_ids, VehicleV2.Key_Vehicle_Party_Key,
 
 company_opt_out := choosen(inquiry_acclogs.key_lookup_company_optout(keyed(Company_ID = (UNSIGNED)in_CompanyID)), max_recs);
 if(in_CompanyID != '', OUTPUT(company_opt_out, NAMED('Company_Opt_out')));
-   
+
 ENDMACRO;

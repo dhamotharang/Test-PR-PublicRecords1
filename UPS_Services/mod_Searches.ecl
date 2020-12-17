@@ -382,13 +382,8 @@ EXPORT mod_Searches := MODULE
 
       ind := hdr_recs + daily_recs; // + WFPV8_recs;
      
-      rec_header_plus := RECORD(doxie.layout_presentation)
-       STRING2 addr_ind := '';
-      END;
-    
-      ind_plus := PROJECT(ind,rec_header_plus);
       // The macro Header.MAC_Append_Addr_Ind sorts the result, so we don't have to.
-      ind_ranked := Header.MAC_Append_Addr_Ind(ind_plus, addr_ind, /*src*/, did, prim_range ,
+      ind_ranked := Header.MAC_Append_Addr_Ind(ind, addr_ind, /*src*/, did, prim_range ,
                                                prim_name, sec_range, city_name, st, zip,
                                                /*predir*/, /*postdir*/, /*addr_suffix */,
                                                /*dt_first_seen*/, /*dt_last_seen*/, /*dt_vendor_first_reported*/,

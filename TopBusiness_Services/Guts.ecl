@@ -1,4 +1,4 @@
-﻿import topBusiness_services, iesp, AutoStandardI, BIPV2, Doxie;
+﻿import topBusiness_services, AutoStandardI, BIPV2, Doxie;
 
 export Guts := MODULE
  
@@ -95,9 +95,19 @@ export Guts := MODULE
 	                             , ,TopBusiness_Services.Constants.BusHeaderKfetchMaxLimitLarger,
 															 TRUE,,,,mod_access), BIPV2.Key_BH_Linking_Ids.kFetchOutRec);	
        ds_busHeaderRecs := choosen(ds_busHeaderRecsForCnameVariations,TopBusiness_Services.Constants.BusHeaderKfetchMaxLimit);											 
-       											     		                          		
-    BestSection :=  TopBusiness_Services.BestSection.fn_fullView(
-			  ds_tmpinput_data, // passing in full set of ids with dot/emp/pow possibly populated 
+      bipv2BestKeyResults := TopBusiness_services.BestSection.GetBestBipLinkids(ds_in_unique_ids_only, FETCH_LEVEL,
+                                       TopBusiness_Services.Constants.BusHeaderKfetchMaxLimit);
+      // get best sic/naics for use later
+      BestSicCode := if (bipv2BestKeyResults.sic_code[1].company_sic_code1 != '',
+                                    DATASET([{TRIM(bipv2BestKeyResults.sic_code[1].company_sic_code1,LEFT,RIGHT);}], {STRING8 SicCode})
+                                    );
+                                     
+      BestNaicsCode :=  IF (bipv2BestKeyResults.naics_code[1].company_naics_code1 != '',
+                                    DATASET([{TRIM(bipv2BestKeyResults.naics_code[1].company_naics_code1,LEFT,RIGHT);}], {STRING8 NaicsCode})
+                                    );
+    
+    BestSection :=  TopBusiness_Services.BestSection.fn_fullView( 
+			 ds_tmpinput_data, // passing in full set of ids with dot/emp/pow possibly populated 
 		                      // will zero out as needed in best
 		    project(dataset(in_options), 
 					   transform(TopBusiness_Services.BestSection_Layouts.rec_OptionsLayout, self := left, self := []))[1],
@@ -164,7 +174,12 @@ export Guts := MODULE
 				
 			IndustrySection := if (section_industry, TopBusiness_Services.industrySection.fn_fullView(
 					ds_input_data,				
-					project(dataset(in_options), TopBusiness_Services.Layouts.rec_input_options)[1],
+					project(dataset(in_options),  TRANSFORM(
+                                   TopBusiness_Services.IndustrySection_layouts.rec_OptionsLayout,                                   
+                                   SELF.BestSicCode  := BestSicCode;                                  
+                                   SELF.BestNaicsCode := BestNaicsCode;
+                                   SELF := LEFT;
+                                   ))[1],
 					in_mod)
 			 );
 			 
@@ -282,9 +297,11 @@ export Guts := MODULE
                                              SELF.PhoneInfo.Phone10 := LEFT.PhoneInfo.Phone10;                                        
                                              SELF := []))                                                                    
                                 ,NOT(EXISTS(PROJECT(IndustrySection[1].IndustryRecords.Sics, 
-                                             TRANSFORM({STRING8  SICCode;}, SELF.sicCode := LEFT.SicCode;))) OR
-                                          EXISTS(PROJECT(IndustrySection[1].IndustryRecords.NAICSs, 
-                                                  TRANSFORM({STRING8 NaicsCode;},  SELF.NaicsCode := LEFT.Naics;)))
+                                            
+                                             TRANSFORM({STRING8  SICCode;}, SELF.sicCode := LEFT.SicCode;)) + BestSicCode) OR
+                                          EXISTS(PROJECT(IndustrySection[1].IndustryRecords.NAICSs,
+                                                
+                                                   TRANSFORM({STRING8 NaicsCode;},  SELF.NaicsCode := LEFT.Naics;))  + BestNaicsCode)
                                               )                                  
                              ,ContactSection[1].TotalPriorContactCount  +
                               ContactSection[1].TotalCurrentContactCount +
@@ -317,11 +334,9 @@ export Guts := MODULE
                                 EXISTS(ContactSection[1].PriorIndividuals(IsSexualOffender)) OR EXISTS(ContactSection[1].CurrentIndividuals(IsSexualOffender))
                               
                             ,FinanceSection[1].Finances[1].AnnualSales
-                            , (EXISTS(FinanceSection[1].Finances(AnnualSales = '0')) OR (NOT (EXISTS(FinanceSection[1].Finances))))
-                            ,PROJECT(IndustrySection[1].IndustryRecords.Sics, 
-                                  TRANSFORM({STRING8  SICCode;}, SELF.sicCode := LEFT.SicCode;))
-                            ,PROJECT(IndustrySection[1].IndustryRecords.NAICSs, 
-                                  TRANSFORM({STRING8 NaicsCode;},  SELF.NaicsCode := LEFT.Naics;))                                                                                            
+                            , (EXISTS(FinanceSection[1].Finances(AnnualSales = '0')) OR (NOT (EXISTS(FinanceSection[1].Finances))))                         
+                            ,BestSicCode
+                            ,BestNaicsCode                                                                                                                     
                            ,MotorVehicleSection[1].TotalMotorVehicleRecordCount
                             ,MotorVehicleSection[1].MotorVehicleRecords.CurrentRecordCount
                             ,WatercraftSection[1].TotalWatercraftRecordCount
@@ -399,9 +414,9 @@ export Guts := MODULE
 		  SELF := [];
 	END;
   SectionReport := DATASET([ BIPREPORTXFORM() ]);		 
-
+ 
 	return(sectionReport);
-
+   
 	end; // getReport
 
 end; // best Module

@@ -33,7 +33,7 @@ The service has three flavors:-
  Zumigo Results
 */
 
-IMPORT AutoKeyI,BatchShare,PhoneOwnership,Phones,STD,Royalty,WSInput;
+IMPORT AutoKeyI,BatchShare,PhoneOwnership,Phones,STD,Royalty,WSInput, doxie;
 
 EXPORT PhoneOwnership_BatchService(useCannedRecs = 'false') := 
 	MACRO
@@ -55,6 +55,7 @@ EXPORT PhoneOwnership_BatchService(useCannedRecs = 'false') :=
 		END;
 		batch_in_wErr := PROJECT(ds_batch_in, checkValidity(LEFT));
 		//********************Get PhoneOwnership Records**************************/
+		IF(~doxie.compliance.use_WDNC(batch_params.DataPermissionMask), FAIL('Permission not set for TCPA'));
 		dBatchPhonesOut := PhoneOwnership.BatchRecords(batch_in_wErr(err_search=0), batch_params);
 		BatchShare.MAC_RestoreAcctno(batch_in_wErr, dBatchPhonesOut.Results,Results,TRUE,TRUE);	
 		BatchShare.MAC_RestoreAcctno(batch_in_wErr, dBatchPhonesOut.Royalties,Royalties,TRUE,FALSE);	

@@ -1,5 +1,5 @@
 
-IMPORT OSHAIR, OSHAIR_Services, ut, doxie, codes, suppress, census_data, standard;
+IMPORT dx_OSHAIR, OSHAIR, OSHAIR_Services, ut, doxie, codes, suppress, census_data, standard;
 
 OUT_REC := OSHAIR_Services.layouts.SourceOutput;
 
@@ -7,15 +7,15 @@ OUT_REC := OSHAIR_Services.layouts.SourceOutput;
 EXPORT out_rec GetDataSourceByID (GROUPED DATASET (OSHAIR_Services.layouts.id) in_ids) := FUNCTION
 
   // Fetch common info, calculating penalty for every record.
-  OUT_REC GetCommonInfo (OSHAIR.Key_OSHAIR_inspection L) := TRANSFORM
+  OUT_REC GetCommonInfo (dx_OSHAIR.key_payload_inspection L) := TRANSFORM
     // As of now activity number is considered always to be an integer, represented by 10-chars string,
     // padded with leading zeros, if needed, so that "12345", "012345" and "0000012345" are the same.
     // TODO: consider creating field with other name (different types)
     SELF.activity_number := INTFORMAT (L.activity_number, 10, 1);
     SELF.report_id := L.Region_Code + L.Area_Code + L.Office_Code;
-    
+
     // GET VIOLATIONS
-    all_violations := CHOOSEN (OSHAIR.Key_OSHAIR_violations (keyed (activity_number = L.Activity_Number)), Constants.VIOLATION_MAX);
+    all_violations := CHOOSEN (dx_OSHAIR.key_payload_violations (keyed (activity_number = L.Activity_Number)), Constants.VIOLATION_MAX);
     OSHAIR_Services.layouts.Violation SetViolations (all_violations L) := TRANSFORM
       SELF.id_number := L.Citation_Number + L.Item_Number;
       SELF.Violation_Contest_Desc := IF (L.Violation_Contest = 'X', 'YES', 'NO');
@@ -24,10 +24,10 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (OSHAIR_Services.layouts.id) i
     SELF.violations := SORT (PROJECT (all_violations, SetViolations (Left)), id_number);
 
     // GET SUBSTANCES, compact up to 5 of them into child
-    all_substances := CHOOSEN (OSHAIR.Key_OSHAIR_hazardous_substance (keyed (activity_number = L.Activity_Number)), Constants.SUBSTANCE_MAX);
+    all_substances := CHOOSEN (dx_OSHAIR.Key_payload_hazardous_substance(keyed (activity_number = L.Activity_Number)), Constants.SUBSTANCE_MAX);
     layouts.Hazardous_Substance CompactHazards (all_substances L) := transform
       SELF.id_number := L.Citation_Number + L.Item_Number;
-      SELF.substance := 
+      SELF.substance :=
         IF (L.hazardous_substance_1 != '', DATASET ([{L.hazardous_substance_1, L.hazardous_sub_desc_1}], layouts.hsubstance)) +
         IF (L.hazardous_substance_2 != '', DATASET ([{L.hazardous_substance_2, L.hazardous_sub_desc_2}], layouts.hsubstance)) +
         IF (L.hazardous_substance_3 != '', DATASET ([{L.hazardous_substance_3, L.hazardous_sub_desc_3}], layouts.hsubstance)) +
@@ -38,7 +38,7 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (OSHAIR_Services.layouts.id) i
     SELF.substances := SORT (PROJECT (all_substances, CompactHazards (Left)), id_number);
 
     // GET ACCIDENTS
-    all_accidents := CHOOSEN (OSHAIR.Key_OSHAIR_accident (keyed (activity_number = L.Activity_Number)), Constants.ACCIDENT_MAX);
+    all_accidents := CHOOSEN (dx_OSHAIR.key_payload_accident(keyed (activity_number = L.Activity_Number)), Constants.ACCIDENT_MAX);
     OSHAIR_Services.layouts.Accident SetAccidents (all_accidents L) := transform
       SELF.sex_desc := MAP (L.sex = 'M' => 'MALE', L.sex = 'F' => 'FEMALE', '');
       SELF := L;
@@ -79,8 +79,8 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (OSHAIR_Services.layouts.id) i
     SELF.industry_codes.sic_code_desc      := sic_codes[1];
     SELF.industry_codes.secondary_sic_desc := sic_codes[2];
 
-    naics_codes := DATASET ([{'primary', L.NAICS_Code}, {'secondary', L.NAICS_Secondary_Code}, {'inspected', L.NAIC_Inspected}], 
-                             layouts.naics_codes); 
+    naics_codes := DATASET ([{'primary', L.NAICS_Code}, {'secondary', L.NAICS_Secondary_Code}, {'inspected', L.NAIC_Inspected}],
+                             layouts.naics_codes);
     naics_codes_descript := JOIN (naics_codes ((integer) code != 0), codes.Key_NAICS,
                                   keyed (Left.code = Right.naics_code),
                                   transform (layouts.naics_codes, Self.description := Right.naics_description, Self := Left),
@@ -107,7 +107,7 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (OSHAIR_Services.layouts.id) i
       L.Health_PG_Maritime_Insp_Flag       = 'X' => 'HEALTH PLANNING GUIDE - MARITIME INSPECTION',
       L.Migrant_Farm_Insp_Flag  = 'X' => 'INSPECTION OF MIGRANT FARM WORKER CAMP', '');
 
-    layouts.PlanningGuides SetProgramDesc (OSHAIR.Key_OSHAIR_program L) := transform
+    layouts.PlanningGuides SetProgramDesc (dx_OSHAIR.key_payload_program L) := transform
       SELF.description := MAP (L.Program_Type = 'L' => 'LOCAL EMPHASIS PROGRAM: ',
                                L.Program_Type = 'N' => 'NATIONAL SPECIAL EMPHASIS PROGRAM: ',
                                L.Program_Type = 'N' => 'STRATEGIC PLAN: ',
@@ -115,7 +115,7 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (OSHAIR_Services.layouts.id) i
     end;
 
     program_desc_table := CHOOSEN (
-      PROJECT (OSHAIR.Key_OSHAIR_program (keyed (activity_number = L.Activity_Number)), SetProgramDesc (Left)),
+      PROJECT (dx_OSHAIR.key_payload_program (keyed (activity_number = L.Activity_Number)), SetProgramDesc (Left)),
     Constants.PROGRAM_MAX);
 
     SELF.classification := IF (planning_guide_desc != '', DATASET ([{planning_guide_desc}], layouts.PlanningGuides)) +
@@ -126,7 +126,7 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (OSHAIR_Services.layouts.id) i
     SELF.walk_around_desc           := IF (L.walk_around_flag = 'X', 'YES', '');
     SELF.Employees_interviewed_desc := IF (L.Employees_interviewed_flag = 'X', 'YES', '');
 
-    SELF.inspection_hours := 
+    SELF.inspection_hours :=
       IF (L.PA_Prep_Time        != 0, DATASET ([{'PREP', L.PA_Prep_Time}], layouts.InspectionTime)) +
       IF (L.PA_Travel_Time      != 0, DATASET ([{'TRAVEL', L.PA_Travel_Time}], layouts.InspectionTime)) +
       IF (L.PA_On_site_Time     != 0, DATASET ([{'ON-SITE', L.PA_On_site_Time}], layouts.InspectionTime)) +
@@ -140,7 +140,7 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (OSHAIR_Services.layouts.id) i
     SELF := L;
   END;
 
-  src_fetched := JOIN (in_ids, OSHAIR.Key_OSHAIR_inspection,
+  src_fetched := JOIN (in_ids, dx_OSHAIR.key_payload_inspection,
                    keyed (Left.activity_number = Right.activity_number),
                    GetCommonInfo (Right),
                    KEEP (100)); //
@@ -148,7 +148,11 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (OSHAIR_Services.layouts.id) i
 /*
 // this is another way of getting child sets, if more complex job required
 
-  violations_rec := OSHAIR.layout_OSHAIR_violations_clean;
+  violations_clean_layout := RECORD
+    dx_OSHAIR.layouts.Layout_Violations - dx_common.layout_metadata
+  END;
+
+  violations_rec := violations_clean_layout;
   src_violations := JOIN (in_ids, OSHAIR.Key_payload_violations,
                           keyed (Left.activity_number = Right.activity_number),
                           transform (violations_rec, SELF := Right),
@@ -171,7 +175,7 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (OSHAIR_Services.layouts.id) i
                Left.activity_number = Right.activity_number,
                transform (OUT_REC, SELF.violations := Right.violations; SELF := Left),
                LEFT OUTER, ATMOST (1));
-*/  
+*/
   //  add county name
   census_data.MAC_Fips2County_Keyed (src_fetched, address.st, address.fips_county, address.county, ds_cnty);
 

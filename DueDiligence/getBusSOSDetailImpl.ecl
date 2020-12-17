@@ -1,4 +1,4 @@
-﻿IMPORT BIPv2, Business_Risk_BIP, Corp2, DueDiligence, STD;
+﻿IMPORT BIPv2, Business_Risk_BIP, Corp2, DueDiligence;
 
 /*
 	Following Keys being used:
@@ -28,6 +28,10 @@ EXPORT getBusSOSDetailImpl := MODULE
     
     
     EXPORT getIncorporationDate(inBusiness, filteredData) := FUNCTIONMACRO
+    
+        IMPORT BIPv2, DueDiligence;
+    
+    
         incDateSort := SORT(filteredData(corp_inc_date <> 0), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), corp_inc_date);
         incDateDedup := DEDUP(incDateSort, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
         
@@ -47,6 +51,10 @@ EXPORT getBusSOSDetailImpl := MODULE
     
     
     EXPORT getFilingDate(inBusiness, filteredData) := FUNCTIONMACRO
+    
+        IMPORT BIPv2, DueDiligence;
+        
+        
         corpFilingDateSort := SORT(filteredData, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -corp_filing_date);
         corpFilingDateDedup := DEDUP(corpFilingDateSort, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
         
@@ -67,6 +75,10 @@ EXPORT getBusSOSDetailImpl := MODULE
     
     
     EXPORT getOperatingLocations(inBusiness, filteredData) := FUNCTIONMACRO
+    
+        IMPORT BIPv2, DueDiligence;
+        
+        
         filtAddrLoc := filteredData(corp_addr1_prim_name != DueDiligence.Constants.EMPTY AND REGEXFIND(DueDiligence.RegularExpressions.NOT_PO_ADDRESS_EXPRESSION, TRIM(corp_addr1_prim_name), NOCASE));
         corpAddrLocSort := SORT(filtAddrLoc, seq, #EXPAND(BIPV2.IDmacros.mac_ListTop4Linkids()), -dt_last_seen);
         corpAddrLocDedup := DEDUP(corpAddrLocSort, seq, #EXPAND(BIPV2.IDmacros.mac_ListTop4Linkids()));
@@ -107,34 +119,14 @@ EXPORT getBusSOSDetailImpl := MODULE
         addBusnLocCnt := DueDiligence.CommonBusiness.AddOperatingLocations(corpAddrProject, inBusiness, DueDiligence.Constants.SOURCE_BUSINESS_CORP);
 				
         RETURN addBusnLocCnt;
-    ENDMACRO;
-    
-    
-    
-    EXPORT getSICNAICS(inBusiness, filteredData) := FUNCTIONMACRO
-        outCorpSic := DueDiligence.CommonBusiness.getSicNaicCodes(filteredData, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_BUSINESS_CORP, corp_sic_code, TRUE, TRUE, dt_first_seen, dt_last_seen);
-        outCorpNaic := DueDiligence.CommonBusiness.getSicNaicCodes(filteredData, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_BUSINESS_CORP, corp_naic_code, FALSE, TRUE, dt_first_seen, dt_last_seen);
-        
-        allCorpSicNaic := outCorpSic + outCorpNaic;
-        sortCorpRollSicNaic := DueDiligence.CommonBusiness.rollSicNaicBySeqAndBIP(inBusiness, allCorpSicNaic);
-          
-        addCorpSicNaic := JOIN(inBusiness, sortCorpRollSicNaic,
-                                LEFT.seq = RIGHT.seq AND
-                                LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-                                LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-                                LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
-                                TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-                                          SELF.SicNaicSources := RIGHT.sources;
-                                          SELF := LEFT;),
-                                LEFT OUTER,
-                                ATMOST(1));
-                                
-        RETURN addCorpSicNaic;
-    ENDMACRO;
-    
+    ENDMACRO;    
     
     
     EXPORT getFilingStatuses(inBusiness, filteredData) := FUNCTIONMACRO
+    
+        IMPORT BIPv2, DueDiligence;
+        
+        
         projectDates := PROJECT(filteredData, TRANSFORM({UNSIGNED4 lastReinstateDate, BOOLEAN otherStatusExists, BOOLEAN dissolvedExists, BOOLEAN inactiveExists, Boolean suspendedExists, BOOLEAN allDissolveInactiveSuspended, BOOLEAN activeExists, BOOLEAN sosFilingExists, {RECORDOF(corpFilingsFilt)}},
                                                         corpStatusCd := DueDiligence.CommonBusiness.GetSOSStatuses(LEFT);
                       
@@ -190,6 +182,10 @@ EXPORT getBusSOSDetailImpl := MODULE
     
     
     EXPORT getRegisteredAgents(inBusiness, filteredData) := FUNCTIONMACRO
+    
+        IMPORT BIPv2, DueDiligence;
+        
+        
         sosAgent := filteredData((corp_ra_cname1 <> DueDiligence.Constants.EMPTY OR corp_ra_lname1 <> DueDiligence.Constants.EMPTY) AND corp_ra_prim_name <> DueDiligence.Constants.EMPTY);
         sortSosAgent := SORT(sosAgent, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), corp_ra_prim_range, corp_ra_predir, corp_ra_prim_name, corp_ra_addr_suffix, corp_ra_postdir, corp_ra_zip5, dt_first_seen);
 

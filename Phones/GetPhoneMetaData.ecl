@@ -116,7 +116,7 @@ EXPORT GetPhoneTransactions(DATASET(Phones.Layouts.rec_phoneLayout) subjectInfo)
 
   dPhonesTransaction_info :=	GetPhoneTransactions(subjectInfo);
 
-  dPortedOnlyTransactions:= dPhonesTransaction_info(source = Phones.Constants.Sources.ICONECTIV_SRC);
+  dPortedOnlyTransactions:= dPhonesTransaction_info(source IN Phones.Constants.Sources.set_ICONECTIV_SRC);
 
   Phones.Layouts.portedMetadata_Main tAppendPortInfo(Phones.Layouts.portedMetadata_Main L, Phones.Layouts.portedMetadata_Main R):= TRANSFORM
 
@@ -138,7 +138,7 @@ EXPORT GetPhoneTransactions(DATASET(Phones.Layouts.rec_phoneLayout) subjectInfo)
                 LEFT.vendor_last_reported_dt <= RIGHT.vendor_last_reported_dt) AND LEFT.spid = RIGHT.spid,
                 tAppendPortInfo(LEFT, RIGHT), LEFT OUTER);
 
-  dPhones_transactions_combined := SORT((dPhonesTransaction_info(source != Phones.Constants.Sources.ICONECTIV_SRC) + dPhonesTransaction_withport),
+  dPhones_transactions_combined := SORT((dPhonesTransaction_info(source NOT IN Phones.Constants.Sources.set_ICONECTIV_SRC) + dPhonesTransaction_withport),
                       phone, -vendor_last_reported_dt, vendor_first_reported_dt);
 
   portRec := SORT(dPhonesTransaction_withport, phone, -vendor_last_reported_dt, vendor_first_reported_dt);
@@ -188,7 +188,7 @@ EXPORT GetPhoneTransactions(DATASET(Phones.Layouts.rec_phoneLayout) subjectInfo)
               trim(left.carrier_name, left, right)<>PhonesInfo._Functions.fn_keyCarrier(trim(right.operator_fullname, left, right)) and trim(left.carrier_name, left, right)<>'' and trim(right.operator_fullname, left, right)<>'')),
               addPortflag(left, right), left outer);
 
-  dPhones_combined :=	dPhones_combined_info + dPhonesType(source != Phones.Constants.Sources.ICONECTIV_SRC);
+  dPhones_combined :=	dPhones_combined_info + dPhonesType(source NOT IN Phones.Constants.Sources.set_ICONECTIV_SRC);
 
   dPhone_out :=  DEDUP(SORT(dPhones_combined, phone, source, account_owner, -event_date, -vendor_last_reported_dt, vendor_first_reported_dt, is_deact, is_react),
                 phone, source, account_owner, event_date, vendor_last_reported_dt, vendor_first_reported_dt, is_deact, is_react);

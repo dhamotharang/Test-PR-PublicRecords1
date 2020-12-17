@@ -57,6 +57,9 @@ export purposeErrorCode := '24';
 export FDSubscriberIDErrorCode := '25';
 export FDGatewayTimeout := '26';
 export Deferred_request_code := '801';
+export DTEError := 'DTE22';
+export OKCError := 'OKC22';
+export DTEErrorCodes := ['41', '42', '43', '44', '45', 'DTE22'];
 
 export Checking_Indicator_error_desc(string5 error_code) := function
   desc := map(
@@ -75,11 +78,12 @@ export MLA_error_desc(string5 error_code) := function
 	return desc;
 end;
 
+// Status Refresh Constants
 export StatusRefresh_error_desc := 'Error occurred in status refresh.';
-
 export DTE_error_desc := 'The record is no longer reporting and may not be used in an FCRA decision.';
-
 export Deferred_request_desc := 'Request has been Deferred';
+export DefendantDesc := 'DEFENDANT';
+
 
 export set_Valid_Name_Suffix := ['', 'JR', 'SR', 'ST', 'ND', 'RD', 'TH'];
 

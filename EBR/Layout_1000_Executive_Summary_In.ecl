@@ -20,5 +20,5 @@ record
    string1     PAYMENT_TREND;
    string20    INDUSTRY_DESCRIPTION;
    string8     predicted_dbt_date;
-   string1     lf;
+   string1     lf := '';
 end;

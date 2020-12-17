@@ -13,13 +13,9 @@ e0010iirs := IF(NOT doxie.DataRestriction.EBR,doxie_cbrs.industry_information_EB
 //output(Include_IndustryInfo_val, named('iirt_include_ii_val'));
 //output(doxie.DataRestriction.EBR, named('iirt_ddr_ebr'));
 
-ii_rec := RECORD
+ii_rec := RECORD(doxie_cbrs.layouts.industry_info_slim_record)
   UNSIGNED6 bdid;
-  STRING4 sic_code;
-  STRING97 sic_descriptions;
 END;
-
-
 
 ii_rec ii_transform(iirs L,UNSIGNED1 cnt) := TRANSFORM
   SELF.bdid := L.bdid;
@@ -92,14 +88,8 @@ SHARED norm_results := ROLLUP(SORT(
                         LEFT.sic_code = RIGHT.sic_code
                         ,xform_transform(LEFT,RIGHT));
                         
-ii_rec2 := RECORD
-  STRING4 sic_code;
-  STRING97 sic_descriptions;
-END;
-
-
 // Do a project to get rid of the bdid, then dedup it.
-SHARED norm_results_nobdid := PROJECT(norm_results,TRANSFORM(ii_rec2,SELF := LEFT));
+SHARED norm_results_nobdid := PROJECT(norm_results,TRANSFORM(doxie_cbrs.layouts.industry_info_slim_record,SELF := LEFT));
 SHARED dedup_norm_results_nobdid := DEDUP(norm_results_nobdid(sic_code <> ''),sic_code,sic_descriptions,ALL);
 
 // Dedup the temp ds that has bdids

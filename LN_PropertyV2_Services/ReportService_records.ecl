@@ -3,7 +3,8 @@ import doxie, suppress, FCRA, FFD, Gateway, iesp, LN_PropertyV2_Services;
 
 export ReportService_records (boolean isFCRA = false,
                               integer nonSS = suppress.Constants.NonSubjectSuppression.doNothing,
-                              FCRA.iRules in_params = module(FCRA.iRules) end) := function
+                              FCRA.iRules in_params = module(FCRA.iRules) end,
+                              boolean includeBlackKnight = false ) := function
 
     boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(in_params.FFDOptionsMask);
     gateways := Gateway.Configuration.Get();
@@ -26,8 +27,9 @@ export ReportService_records (boolean isFCRA = false,
 
     fids := LN_PropertyV2_Services.ReportService_ids(input.did, input.bdid, input.parcelID,
                                                      input.faresId,,,isFCRA);
-                // generate the report
-    results_pre := LN_PropertyV2_Services.resultFmt.widest_view.get_by_fid(fids,,,nonSS,isFCRA,slim_pc_recs,in_params.FFDOptionsMask, ds_flags);
+    
+    // generate the report
+    results_pre := LN_PropertyV2_Services.resultFmt.widest_view.get_by_fid(fids,,,nonSS,isFCRA,slim_pc_recs,in_params.FFDOptionsMask, ds_flags, includeBlackKnight);
 
     results := if(suppress_results_due_alerts, dataset([],LN_PropertyV2_Services.layouts.combined.widest), results_pre);
 

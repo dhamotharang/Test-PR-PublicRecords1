@@ -122,8 +122,11 @@ IMPORT dx_Header, header_quick, MDR, IDL_Header, ut, data_services;
 #APPEND(finalOutput,%'dl_srcs'% + ' := MDR.SourceTools.set_DL;\n');
 #APPEND(finalOutput,%'voter_srcs'% + ' := MDR.SourceTools.src_Voters_v2;\n');
 
+#UNIQUENAME(rec_ind)
+#APPEND(finalOutput,%'rec_ind'% + ' := record\n\tstring2 ' + #TEXT(addr_ind) + ';\nend;\n');
+
 #UNIQUENAME(rec);
-#APPEND(finalOutput,%'rec'% + ' := recordof(' + #TEXT(ds_in) + ');\n');
+#APPEND(finalOutput,%'rec'% + ' := recordof(' + #TEXT(ds_in) + ') OR '+ %'rec_ind'% +';\n');
 
 #UNIQUENAME(newrec);
 #APPEND(finalOutput,%'newrec'% + ' := record\n\t' + %'rec'% + ';');

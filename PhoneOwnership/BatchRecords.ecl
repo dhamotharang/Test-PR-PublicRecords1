@@ -53,6 +53,8 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 	tempMod := MODULE(PROJECT(inMod,Phones.IParam.BatchParams,OPT))
 		EXPORT BOOLEAN 		return_current								:= TRUE; // Required for initial release
 		EXPORT UNSIGNED		max_age_days						 	:= Phones.Constants.PhoneAttributes.LastActivityThreshold; 
+		EXPORT BOOLEAN AllowPortingData := Phones.Constants.PhoneAttributes.AllowPortingData;
+		EXPORT BOOLEAN Allow_TCPA_Port := TRUE;
 	END;
 	dsPhoneswMetadata := Phones.PhoneAttributes_BatchRecords(PROJECT(ds_batch_in,TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn,
 																							SELF.acctno:=LEFT.acctno,
@@ -78,7 +80,8 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 						Constants.DisconnectStatus.UNKNOWN);
 		SELF.disconnect_status := status;
 		SELF.ph_poss_disconnect_date := disconnectDate;
-		SELF.ph_ported_date := portedDate;
+		// SELF.ph_ported_date := portedDate;
+		SELF.ph_ported_date := 0;// Iconnective change
 		SELF.ph_swap_date := swapDate;
 		SELF.new_phone_number_from_swap := IF(swapDate>0,r.new_phone_number_from_swap,'');
 		//mark all reported invalid numbers

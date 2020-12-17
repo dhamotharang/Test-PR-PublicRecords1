@@ -226,7 +226,7 @@ EXPORT Property_BatchService_Records(DATASET(LN_PropertyV2_Services.layouts.batc
 				pen_name	:= BatchServices.Functions.LN_Property.penalize_fullname(L,entities,isFCRA);
 				pen_cname	:= BatchServices.Functions.LN_Property.penalize_business_name(L,entities);
 				pen_addr	:= BatchServices.Functions.LN_Property.penalize_address(L,R.parties(party_type=PROPERTY)[1]);
-				pen_ssn		:= BatchServices.Functions.LN_Property.penalize_ssn(L,entities);
+				pen_ssn		:= BatchServices.Functions.LN_Property.penalize_ssn(L,entities, isFCRA);
 				self.penalt := pen_name + pen_cname + pen_addr + pen_ssn;
 				self := R;
 		end;

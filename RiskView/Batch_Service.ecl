@@ -33,7 +33,16 @@
 	<part name="ExcludeOtherLiens" type="xsd:boolean"/>
 	<part name="ExcludeJudgments" type="xsd:boolean"/>
 	<part name="ExcludeEvictions" type="xsd:boolean"/>
+    <part name="MinimumAmount" type="xsd:integer"/>
+    <part name="ExcludeEvictions" type="xsd:boolean"/>
+    <part name="ExcludeStates" type="xsd:string"/>
+    <part name="ExcludeReportingSources" type="xsd:string"/>
+    <part name="IncludeStatusRefreshChecks" type="xsd:boolean"/>
+    <part name="AttributesOnly" type="xsd:boolean"/>
+    <part name="ExcludeStatusRefresh" type="xsd:boolean"/>
+    <part name="StatusRefreshWaitPeriod" type="xsd:string"/>
 	<part name="RetainInputDID" type="xsd:boolean"/>
+	<part name="ReturnDetailedRoyalties" type="xsd:boolean"/>
 </message>
 */
 /*--INFO-- Contains RiskView Scores and attributes version 5.0 and higher */
@@ -142,6 +151,8 @@ FilterLienTypes := tmpCityFltr +
         tmpExcludeStatusRefresh;
 
 boolean RetainInputDID := false				: stored('RetainInputDID');  // to be used by modelers in R&D mode
+
+BOOLEAN ReturnDetailedRoyalties := FALSE : STORED('ReturnDetailedRoyalties'); // Allows batch to specify if they want royalty details in RoyaltySet
 
 boolean isCalifornia_in_person := false;  // always false in batch
 STRING6 SSNMask := 'NONE';
@@ -284,7 +295,7 @@ search_Results := riskview.Search_Function(valid_inputs,
 
 
 Results := join(batchin_with_seq, search_results, left.seq=right.seq,
-			RiskView.Transforms.FormatBatch(left, right),
+			RiskView.Transforms.FormatBatch(left, right, IncludeStatusRefreshChecks, ExcludeStatusRefresh),
 			left outer);
 
 AttributesOnlyResults := PROJECT(Results, RiskView.Transforms.AttributesOnlyBatch(LEFT));
@@ -300,8 +311,10 @@ MLA_royalties := if((STD.Str.ToLowerCase(custom_model_name)  = 'mla1608_0' OR
 										 STD.Str.ToLowerCase(custom5_model_name) = 'mla1608_0'), 
 										 Royalty.RoyaltyMLA.GetBatchRoyaltiesBySeq(batchin_with_seq, search_Results),
 										 Royalty.RoyaltyMLA.GetNoBatchRoyalties());
+                     
+dRoyalties := Royalty.GetBatchRoyalties(MLA_royalties, ReturnDetailedRoyalties);
 
-output(MLA_royalties, NAMED('RoyaltySet'));
+output(dRoyalties, NAMED('RoyaltySet'));
 
 output(FinalResults, named('Results')); /*Production*/
 // output(search_Results, named('Results')); /*Validation*/

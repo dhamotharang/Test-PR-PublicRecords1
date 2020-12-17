@@ -334,6 +334,10 @@
       BOOLEAN   is_phone_verified;
       STRING100 verification_desc;
       DATASET(Src_Rec) Phn_src_all;
+      INTEGER  sim_Tenure_MinDays;
+      INTEGER  sim_Tenure_MaxDays;
+      INTEGER  imei_Tenure_MinDays;
+      INTEGER  imei_Tenure_MaxDays;
     END;
 
     EXPORT PhoneSlim :=

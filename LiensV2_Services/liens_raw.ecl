@@ -1,580 +1,582 @@
-﻿import BIPV2, doxie, doxie_cbrs, liensv2, suppress, ut, FFD, FCRA, STD;
+﻿IMPORT BIPV2, doxie, doxie_cbrs, liensv2, suppress, ut, FFD, FCRA, STD;
 // This module will provide liens data in different formats.
 
 //IMPORTANT FCRA-NOTE:
-//  Corresponding FCRA-compliant/neutral data are used here,
-//  fcra-corrections, if required by a service, should be applied to the output result by a caller
-export liens_raw := module
+// Corresponding FCRA-compliant/neutral data are used here,
+// fcra-corrections, if required by a service, should be applied to the output result by a caller
+EXPORT liens_raw := MODULE
 
-	shared with_did := {liensv2_services.layout_rmsid or doxie.layout_references};
-	shared with_bdid := {liensv2_services.layout_rmsid or doxie_cbrs.layout_references};
+  SHARED with_did := {liensv2_services.layout_rmsid OR doxie.layout_references};
+  SHARED with_bdid := {liensv2_services.layout_rmsid OR doxie_cbrs.layout_references};
 
   // Gets RMSIDs from TMSIDs
-	shared get_rmsids_from_tmsids(dataset(liensv2_services.layout_tmsid) in_tmsids, boolean isFCRA=false) := function
-	  key := if(isFCRA, LiensV2.key_liens_main_ID_FCRA, liensv2.key_liens_main_ID);
-		res := join(dedup(sort(in_tmsids,tmsid),tmsid),key,
-		            keyed(left.tmsid = right.tmsid),
-								transform(liensv2_services.layout_rmsid,self := right),
-								limit(10000));
-		return dedup(sort(res,tmsid,rmsid),tmsid,rmsid);
-	end;
+  SHARED get_rmsids_from_tmsids(DATASET(liensv2_services.layout_tmsid) in_tmsids, BOOLEAN isFCRA=FALSE) := FUNCTION
+    key := IF(isFCRA, LiensV2.key_liens_main_ID_FCRA, liensv2.key_liens_main_ID);
+    res := JOIN(DEDUP(SORT(in_tmsids,tmsid),tmsid),key,
+      KEYED(LEFT.tmsid = RIGHT.tmsid),
+      TRANSFORM(liensv2_services.layout_rmsid,SELF := RIGHT),
+      LIMIT(10000));
+    RETURN DEDUP(SORT(res,tmsid,rmsid),tmsid,rmsid);
+  END;
 
-	// Gets RMSIDs from DIDs
-	export get_rmsids_from_dids (dataset(doxie.layout_references) in_dids,
-                               boolean isMoxie = false,
-                               boolean IsFCRA = FALSE,
-															 string1 in_party_type = '') := function
+  // Gets RMSIDs from DIDs
+  EXPORT get_rmsids_from_dids (DATASET(doxie.layout_references) in_dids,
+                               BOOLEAN isMoxie = FALSE,
+                               BOOLEAN IsFCRA = FALSE,
+                               STRING1 in_party_type = '') := FUNCTION
 
-		MAC_GetLiens (key_attr,key_attr2, out_file) := MACRO
+    MAC_GetLiens (key_attr,key_attr2, out_file) := MACRO
       #uniquename (res1);
-			%res1% := join(dedup(sort(in_dids,did),did), key_attr,
-										keyed(left.did = right.did),
-										transform(with_did,self := left,self := right),
-										limit(10000));
+      %res1% := JOIN(DEDUP(SORT(in_dids,did),did), key_attr,
+        KEYED(LEFT.did = RIGHT.did),
+        TRANSFORM(with_did,SELF := LEFT,SELF := RIGHT),
+        LIMIT(10000));
 
       #uniquename (party_checked);
-			%party_checked% := join(%res1%, key_attr2,
-										 keyed(left.tmsid = right.tmsid and left.rmsid = right.rmsid) and
-										 left.did = (unsigned)right.did and
-										 right.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
-										 transform(liensv2_services.layout_rmsid,self := right),
-										 limit(10000));
+      %party_checked% := JOIN(%res1%, key_attr2,
+        KEYED(LEFT.tmsid = RIGHT.tmsid AND LEFT.rmsid = RIGHT.rmsid) AND
+        LEFT.did = (UNSIGNED)RIGHT.did AND
+        RIGHT.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
+        TRANSFORM(liensv2_services.layout_rmsid,SELF := RIGHT),
+        LIMIT(10000));
 
       #uniquename (res_slim1);
-			ut.MAC_Slim_Back(%res1%,liensv2_services.layout_rmsid,%res_slim1%);
+      ut.MAC_Slim_Back(%res1%,liensv2_services.layout_rmsid,%res_slim1%);
       #uniquename (use_res);
-			%use_res% := if(in_party_type = '', %res_slim1%, %party_checked%);
+      %use_res% := IF(in_party_type = '', %res_slim1%, %party_checked%);
 
       #uniquename (res2);
-			// NB: when we hit the limit for DID, we SKIP all records,
-			// because I assert that there should be no person with that many liens
-			// Compare to bdid below
-			%res2% := join(dedup(sort(in_dids,did),did),key_attr,
-										keyed(left.did = right.did) and
-									 (In_Party_Type = '' or exists(key_attr2((unsigned)did = left.did and tmsid = right.tmsid and rmsid=right.rmsid and name_type[1] = STD.Str.ToUpperCase(In_Party_Type)[1]))),
-										transform(liensv2_services.layout_rmsid,self := right),
-										LIMIT(200,SKIP));
-			out_file := IF(isMoxie,%res2%,%use_res%);
-		ENDMACRO;
+      // NB: when we hit the limit for DID, we SKIP all records,
+      // because I assert that there should be no person with that many liens
+      // Compare to bdid below
+      %res2% := JOIN(DEDUP(SORT(in_dids,did),did),key_attr,
+        KEYED(LEFT.did = RIGHT.did) AND
+        (In_Party_Type = '' OR EXISTS(key_attr2((UNSIGNED)did = LEFT.did AND tmsid = RIGHT.tmsid AND rmsid=RIGHT.rmsid AND name_type[1] = STD.Str.ToUpperCase(In_Party_Type)[1]))),
+        TRANSFORM(liensv2_services.layout_rmsid,SELF := RIGHT),
+        LIMIT(200,SKIP));
+      out_file := IF(isMoxie,%res2%,%use_res%);
+    ENDMACRO;
 
-		MAC_GetLiens (liensv2.key_liens_did,Liensv2.key_liens_party_id, res_reg);
-		MAC_GetLiens (liensv2.key_liens_did_fcra,Liensv2.key_liens_party_id_FCRA, res_fcra);
+    MAC_GetLiens (liensv2.key_liens_did,Liensv2.key_liens_party_id, res_reg);
+    MAC_GetLiens (liensv2.key_liens_did_fcra,Liensv2.key_liens_party_id_FCRA, res_fcra);
     res := IF (IsFCRA, res_fcra, res_reg);
 
-		return dedup(sort(res,tmsid,rmsid),tmsid,rmsid);
-	end;
+    RETURN DEDUP(SORT(res,tmsid,rmsid),tmsid,rmsid);
+  END;
 
-	// Gets RMSIDs from BDIDs
-	export get_rmsids_from_bdids(dataset(doxie_cbrs.layout_references) in_bdids,
-	                             unsigned in_limit = 0,
-															 boolean isMoxie = false,
-															 string1 in_party_type = '',
-															 boolean isFCRA = false) := function
+  // Gets RMSIDs from BDIDs
+  EXPORT get_rmsids_from_bdids(DATASET(doxie_cbrs.layout_references) in_bdids,
+                               UNSIGNED in_limit = 0,
+                               BOOLEAN isMoxie = FALSE,
+                               STRING1 in_party_type = '',
+                               BOOLEAN isFCRA = FALSE) := FUNCTION
 
-		key := if(isFCRA, liensv2.Key_FCRA_Liens_BDID, liensv2.key_liens_bdid);
+    key := IF(isFCRA, liensv2.Key_FCRA_Liens_BDID, liensv2.key_liens_bdid);
 
-		res1 := join(dedup(sort(in_bdids,bdid),bdid),key,
-								keyed(left.bdid = right.p_bdid),
-								transform(with_bdid,self := left,self := right),
-								keep(10000));
+    res1 := JOIN(DEDUP(SORT(in_bdids,bdid),bdid),key,
+      KEYED(LEFT.bdid = RIGHT.p_bdid),
+      TRANSFORM(with_bdid,SELF := LEFT,SELF := RIGHT),
+      KEEP(10000));
 
-		party_checked1 := join(res1, liensv2.key_liens_party_ID,
-										 keyed(left.tmsid = right.tmsid and left.rmsid = right.rmsid) and
-										 left.bdid = (unsigned)right.bdid and
-										 right.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
-										 transform(liensv2_services.layout_rmsid,self := right),
-										 keep(10000));
+    party_checked1 := JOIN(res1, liensv2.key_liens_party_ID,
+      KEYED(LEFT.tmsid = RIGHT.tmsid AND LEFT.rmsid = RIGHT.rmsid) AND
+      LEFT.bdid = (UNSIGNED)RIGHT.bdid AND
+      RIGHT.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
+      TRANSFORM(liensv2_services.layout_rmsid,SELF := RIGHT),
+      KEEP(10000));
 
-		ut.MAC_Slim_Back(res1,liensv2_services.layout_rmsid,res_slim1);
-		use_res1 := if(in_party_type = '', res_slim1, party_checked1);
+    ut.MAC_Slim_Back(res1,liensv2_services.layout_rmsid,res_slim1);
+    use_res1 := IF(in_party_type = '', res_slim1, party_checked1);
 
-		res2 := join(dedup(sort(in_bdids,bdid),bdid),key,
-								keyed(left.bdid = right.p_bdid),
-								transform(with_bdid,self := left,self := right),
-								keep(500));
+    res2 := JOIN(DEDUP(SORT(in_bdids,bdid),bdid),key,
+      KEYED(LEFT.bdid = RIGHT.p_bdid),
+      TRANSFORM(with_bdid,SELF := LEFT,SELF := RIGHT),
+      KEEP(500));
 
-		party_checked2 := join(res2, liensv2.key_liens_party_ID,
-										 keyed(left.tmsid = right.tmsid and left.rmsid = right.rmsid) and
-										 left.bdid = (unsigned)right.bdid and
-										 right.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
-										 transform(liensv2_services.layout_rmsid,self := right),
-										 keep(500));
+    party_checked2 := JOIN(res2, liensv2.key_liens_party_ID,
+      KEYED(LEFT.tmsid = RIGHT.tmsid AND LEFT.rmsid = RIGHT.rmsid) AND
+      LEFT.bdid = (UNSIGNED)RIGHT.bdid AND
+      RIGHT.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
+      TRANSFORM(liensv2_services.layout_rmsid,SELF := RIGHT),
+      KEEP(500));
 
-		ut.MAC_Slim_Back(res2,liensv2_services.layout_rmsid,res_slim2);
-		use_res2 := if(in_party_type = '', res_slim2, party_checked2);
+    ut.MAC_Slim_Back(res2,liensv2_services.layout_rmsid,res_slim2);
+    use_res2 := IF(in_party_type = '', res_slim2, party_checked2);
 
-		use_res := IF(isMoxie,use_res2,use_res1);
+    use_res := IF(isMoxie,use_res2,use_res1);
 
-		ded := dedup(sort(use_res,tmsid,rmsid),tmsid,rmsid);
+    ded := DEDUP(SORT(use_res,tmsid,rmsid),tmsid,rmsid);
 
-		return if(in_limit = 0,ded,choosen(ded,in_limit));
-	end;
+    RETURN IF(in_limit = 0,ded,CHOOSEN(ded,in_limit));
+  END;
 
-	// Get RMSIDs from 7 business ids
-	export get_tmsids_from_bids(dataset(BIPV2.IDlayouts.l_xlink_ids) in_bids,
-                              string1 bid_fetch_level,
-                              string1 in_party_type = '') := function
+  // Get RMSIDs from 7 business ids
+  EXPORT get_tmsids_from_bids(DATASET(BIPV2.IDlayouts.l_xlink_ids) in_bids,
+                              STRING1 bid_fetch_level,
+                              STRING1 in_party_type = '') := FUNCTION
     res1 := LiensV2.Key_LinkIds.KeyFetch(in_bids,bid_fetch_level);
 
-		party_checked1 := join(res1, liensv2.key_liens_party_ID,
-										 keyed(left.tmsid = right.tmsid and left.rmsid = right.rmsid) and
-										 left.ultid = right.ultid and
-                     left.orgid = right.orgid and
-                     left.seleid = right.seleid and
-                     left.proxid = right.proxid and
-										 right.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
-										 transform(liensv2_services.layout_rmsid,self := right),
-										 keep(10000));
+    party_checked1 := JOIN(res1, liensv2.key_liens_party_ID,
+      KEYED(LEFT.tmsid = RIGHT.tmsid AND LEFT.rmsid = RIGHT.rmsid) AND
+      LEFT.ultid = RIGHT.ultid AND
+      LEFT.orgid = RIGHT.orgid AND
+      LEFT.seleid = RIGHT.seleid AND
+      LEFT.proxid = RIGHT.proxid AND
+      RIGHT.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
+      TRANSFORM(liensv2_services.layout_rmsid,SELF := RIGHT),
+      KEEP(10000));
 
-		ut.MAC_Slim_Back(res1,liensv2_services.layout_rmsid,res_slim1);
+    ut.MAC_Slim_Back(res1,liensv2_services.layout_rmsid,res_slim1);
 
-		use_res1 := if(in_party_type = '', res_slim1, party_checked1);
+    use_res1 := IF(in_party_type = '', res_slim1, party_checked1);
 
-		return dedup(sort(use_res1,tmsid,rmsid),tmsid,rmsid);
-	end;
+    RETURN DEDUP(SORT(use_res1,tmsid,rmsid),tmsid,rmsid);
+  END;
 
-	// Gets RMSIDs from Casenumber ST
-	export get_rmsids_from_casenumber_st(dataset(LiensV2_Services.layout_casenumber_st) in_casenumber_st, boolean isFCRA=false) := function
-		key := if(isFCRA, liensv2.Key_FCRA_Liens_case_number, liensv2.key_liens_case_number);
-		res := join(dedup(sort(in_casenumber_st,case_number,filing_state),case_number,filing_state),key,
-								keyed(trim(left.case_number) = right.case_number) and
-								keyed(left.filing_state = '' or trim(left.filing_state) = right.filing_state),
-								transform(liensv2_services.layout_rmsid,self := right),
-								keep(1000));
-		return dedup(sort(res,tmsid,rmsid),tmsid,rmsid);
-	end;
+  // Gets RMSIDs from Casenumber ST
+  EXPORT get_rmsids_from_casenumber_st(DATASET(LiensV2_Services.layout_casenumber_st) in_casenumber_st, BOOLEAN isFCRA=FALSE) := FUNCTION
+    key := IF(isFCRA, liensv2.Key_FCRA_Liens_case_number, liensv2.key_liens_case_number);
+    res := JOIN(DEDUP(SORT(in_casenumber_st,case_number,filing_state),case_number,filing_state),key,
+      KEYED(TRIM(LEFT.case_number) = RIGHT.case_number) AND
+      KEYED(LEFT.filing_state = '' OR TRIM(LEFT.filing_state) = RIGHT.filing_state),
+      TRANSFORM(liensv2_services.layout_rmsid,SELF := RIGHT),
+      KEEP(1000));
+    RETURN DEDUP(SORT(res,tmsid,rmsid),tmsid,rmsid);
+  END;
 
-	// Gets RMSIDs from Filing Number
-	export get_rmsids_from_Filing_Number(dataset(liensv2_services.layout_filing_number) in_filing_number, boolean isFCRA=false) := function
-		key := if(isFCRA, LiensV2.Key_FCRA_Liens_Filing, LiensV2.key_liens_filing);
-		res := join(dedup(sort(in_filing_number,filing_number,filing_state),filing_number,filing_state),key,
-								keyed(left.filing_number = right.filing_number) and
-								keyed(left.filing_state = '' or trim(left.filing_state) = right.filing_state),
-								transform(liensv2_services.layout_rmsid,self := right),
-								keep(1000));
-		return dedup(sort(res,tmsid,rmsid),tmsid,rmsid);
-	end;
+  // Gets RMSIDs from Filing Number
+  EXPORT get_rmsids_from_Filing_Number(DATASET(liensv2_services.layout_filing_number) in_filing_number, BOOLEAN isFCRA=FALSE) := FUNCTION
+    key := IF(isFCRA, LiensV2.Key_FCRA_Liens_Filing, LiensV2.key_liens_filing);
+    res := JOIN(DEDUP(SORT(in_filing_number,filing_number,filing_state),filing_number,filing_state),key,
+      KEYED(LEFT.filing_number = RIGHT.filing_number) AND
+      KEYED(LEFT.filing_state = '' OR TRIM(LEFT.filing_state) = RIGHT.filing_state),
+      TRANSFORM(liensv2_services.layout_rmsid,SELF := RIGHT),
+      KEEP(1000));
+    RETURN DEDUP(SORT(res,tmsid,rmsid),tmsid,rmsid);
+  END;
 
-	// Gets RMSIDs from IRS Serial Number
-	export get_rmsids_from_IRS_Serial_Number(dataset(liensv2_services.layout_irs_serial_number) in_serial_number, boolean isFCRA=false) := function
-		key := if(isFCRA, LiensV2.Key_FCRA_Liens_Irs_serial_number, LiensV2.key_liens_irs_serial_number);
-		res := join(dedup(sort(in_serial_number,irs_serial_number),irs_serial_number),key,
-								keyed(left.irs_serial_number = right.irs_serial_number),
-								transform(liensv2_services.layout_rmsid,self := right),
-								keep(1000));
-		return dedup(sort(res,tmsid,rmsid),tmsid,rmsid);
-	end;
+  // Gets RMSIDs from IRS Serial Number
+  EXPORT get_rmsids_from_IRS_Serial_Number(DATASET(liensv2_services.layout_irs_serial_number) in_serial_number, BOOLEAN isFCRA=FALSE) := FUNCTION
+    key := IF(isFCRA, LiensV2.Key_FCRA_Liens_Irs_serial_number, LiensV2.key_liens_irs_serial_number);
+    res := JOIN(DEDUP(SORT(in_serial_number,irs_serial_number),irs_serial_number),key,
+      KEYED(LEFT.irs_serial_number = RIGHT.irs_serial_number),
+      TRANSFORM(liensv2_services.layout_rmsid,SELF := RIGHT),
+      KEEP(1000));
+    RETURN DEDUP(SORT(res,tmsid,rmsid),tmsid,rmsid);
+  END;
 
-	// Gets RMSIDs from Certificate Number
-	export get_rmsids_from_CertificateNumber(dataset(liensv2_services.layout_CertificateNumber) in_CertificateNumber, boolean isFCRA=false) := function
-		key := if(isFCRA, LiensV2.Key_FCRA_Liens_Certificate_Number, LiensV2.key_liens_certificate_number);
-		res := join(dedup(sort(in_CertificateNumber,certificate_number),certificate_number),key,
-								keyed(left.certificate_number = right.certificate_number),
-								transform(liensv2_services.layout_rmsid,self := right),
-								keep(1000));
-		return dedup(sort(res,tmsid,rmsid),tmsid,rmsid);
-	end;
+  // Gets RMSIDs from Certificate Number
+  EXPORT get_rmsids_from_CertificateNumber(DATASET(liensv2_services.layout_CertificateNumber) in_CertificateNumber, BOOLEAN isFCRA=FALSE) := FUNCTION
+    key := IF(isFCRA, LiensV2.Key_FCRA_Liens_Certificate_Number, LiensV2.key_liens_certificate_number);
+    res := JOIN(DEDUP(SORT(in_CertificateNumber,certificate_number),certificate_number),key,
+      KEYED(LEFT.certificate_number = RIGHT.certificate_number),
+      TRANSFORM(liensv2_services.layout_rmsid,SELF := RIGHT),
+      KEEP(1000));
+    RETURN DEDUP(SORT(res,tmsid,rmsid),tmsid,rmsid);
+  END;
 
-	// Batch - Gets TMSIDs from DIDs
-	// Note: TMSID suppressions not done here. They are being done in the report section
-	// and is the responsibility of the caller to suppress them if not using the standard functions
-	export get_tmsids_from_dids_batch(grouped dataset(doxie.layout_references_acctno) in_dids,
-																		boolean IsFCRA = FALSE,
-																		string1 in_party_type = '') := function
-		res_reg := join(dedup(sort(in_dids,did),did),liensv2.key_liens_did,
-								keyed(left.did = right.did),
-								transform(with_did,self := left,self := right),
-								keep(1000)); // actual number might be higher than that...
+  // Batch - Gets TMSIDs from DIDs
+  // Note: TMSID suppressions not done here. They are being done in the report section
+  // and is the responsibility of the caller to suppress them if not using the standard functions
+  EXPORT get_tmsids_from_dids_batch(GROUPED DATASET(doxie.layout_references_acctno) in_dids,
+                                    BOOLEAN IsFCRA = FALSE,
+                                    STRING1 in_party_type = '') := FUNCTION
+    res_reg := JOIN(DEDUP(SORT(in_dids,did),did),liensv2.key_liens_did,
+      KEYED(LEFT.did = RIGHT.did),
+      TRANSFORM(with_did,SELF := LEFT,SELF := RIGHT),
+      KEEP(1000)); // actual number might be higher than that...
 
-		res_reg_checked := join(res_reg, liensv2.key_liens_party_ID,
-														keyed(left.tmsid = right.tmsid) and
-														left.did = (unsigned)right.did and
-														right.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
-														transform(liensv2_services.layout_tmsid,self.acctno := left.acctno, self := right),
-														keep(1000));
+    res_reg_checked := JOIN(res_reg, liensv2.key_liens_party_ID,
+      KEYED(LEFT.tmsid = RIGHT.tmsid) AND
+      LEFT.did = (UNSIGNED)RIGHT.did AND
+      RIGHT.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
+      TRANSFORM(liensv2_services.layout_tmsid,SELF.acctno := LEFT.acctno, SELF := RIGHT),
+      KEEP(1000));
 
-		ut.MAC_Slim_Back(res_reg,liensv2_services.layout_tmsid,res_reg_slim);
-		use_res_reg := if(in_party_type = '', res_reg_slim, res_reg_checked);
+    ut.MAC_Slim_Back(res_reg,liensv2_services.layout_tmsid,res_reg_slim);
+    use_res_reg := IF(in_party_type = '', res_reg_slim, res_reg_checked);
 
-		res_fcra := join(dedup(sort(in_dids,did),did),liensv2.key_liens_did_fcra,
-								keyed(left.did = right.did),
-								transform(with_did,self.acctno := left.acctno,self := right),
-								keep(1000)); // actual number might be higher than that...
+    res_fcra := JOIN(DEDUP(SORT(in_dids,did),did),liensv2.key_liens_did_fcra,
+      KEYED(LEFT.did = RIGHT.did),
+      TRANSFORM(with_did,SELF.acctno := LEFT.acctno,SELF := RIGHT),
+      KEEP(1000)); // actual number might be higher than that...
 
-		res_fcra_checked := join(res_fcra, liensv2.key_liens_party_id_FCRA,
-														keyed(left.tmsid = right.tmsid) and
-														left.did = (unsigned)right.did and
-														right.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
-														transform(liensv2_services.layout_tmsid,self.acctno := left.acctno,self := right),
-														keep(1000));
+    res_fcra_checked := JOIN(res_fcra, liensv2.key_liens_party_id_FCRA,
+      KEYED(LEFT.tmsid = RIGHT.tmsid) AND
+      LEFT.did = (UNSIGNED)RIGHT.did AND
+      RIGHT.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
+      TRANSFORM(liensv2_services.layout_tmsid,SELF.acctno := LEFT.acctno,SELF := RIGHT),
+      KEEP(1000));
 
-		ut.MAC_Slim_Back(res_fcra,liensv2_services.layout_tmsid,res_fcra_slim);
-		use_res_fcra := if(in_party_type = '', res_fcra_slim, res_fcra_checked);
+    ut.MAC_Slim_Back(res_fcra,liensv2_services.layout_tmsid,res_fcra_slim);
+    use_res_fcra := IF(in_party_type = '', res_fcra_slim, res_fcra_checked);
 
     res := IF (IsFCRA, use_res_fcra, use_res_reg);
 
-		return dedup(sort(res,tmsid),tmsid);
-	end;
+    RETURN DEDUP(SORT(res,tmsid),tmsid);
+  END;
 
-	// Gets TMSIDs from DIDs
-	// Note: TMSID suppressions not done here. They are being done in the report section
-	// and is the responsibility of the caller to suppress them if not using the standard functions
-	export get_tmsids_from_dids(dataset(doxie.layout_references) in_dids,string1 in_party_type = '', boolean IsFCRA = false) := function
+  // Gets TMSIDs from DIDs
+  // Note: TMSID suppressions not done here. They are being done in the report section
+  // and is the responsibility of the caller to suppress them if not using the standard functions
+  EXPORT get_tmsids_from_dids(DATASET(doxie.layout_references) in_dids,STRING1 in_party_type = '', BOOLEAN IsFCRA = FALSE) := FUNCTION
 
-		return ungroup(get_tmsids_from_dids_batch(group(sorted(project(in_dids, doxie.layout_references_acctno), acctno), acctno),IsFCRA,in_party_type));
-	end;
+    RETURN UNGROUP(get_tmsids_from_dids_batch(GROUP(sorted(PROJECT(in_dids, doxie.layout_references_acctno), acctno), acctno),IsFCRA,in_party_type));
+  END;
 
-	// Note: TMSID suppressions not done here. They are being done in the report section
-	// and is the responsibility of the caller to suppress them if not using the standard functions
-	export get_tmsids_from_bdids_batch(dataset(doxie_cbrs.layout_references_acctno) in_bdids,
-																		 unsigned in_limit = 0
-																		 ) := function
-		res := join(dedup(sort(in_bdids, acctno, bdid), acctno, bdid), liensv2.key_liens_bdid,
-								keyed(left.bdid = right.p_bdid),
-								transform(liensv2_services.layout_tmsid, self := right, self := left),
-								keep(1000));
-		ded := dedup(sort(res, acctno, tmsid), acctno, tmsid);
+  // Note: TMSID suppressions not done here. They are being done in the report section
+  // and is the responsibility of the caller to suppress them if not using the standard functions
+  EXPORT get_tmsids_from_bdids_batch(DATASET(doxie_cbrs.layout_references_acctno) in_bdids,
+                                     UNSIGNED in_limit = 0
+                                     ) := FUNCTION
+    res := JOIN(DEDUP(SORT(in_bdids, acctno, bdid), acctno, bdid), liensv2.key_liens_bdid,
+      KEYED(LEFT.bdid = RIGHT.p_bdid),
+      TRANSFORM(liensv2_services.layout_tmsid, SELF := RIGHT, SELF := LEFT),
+      KEEP(1000));
+    ded := DEDUP(SORT(res, acctno, tmsid), acctno, tmsid);
 
-		return if( in_limit = 0, ded, choosen(ded,in_limit) );
-	end;
+    RETURN IF( in_limit = 0, ded, CHOOSEN(ded,in_limit) );
+  END;
 
-	// Gets TMSIDs from BDIDs
-	// Note: TMSID suppressions not done here. They are being done in the report section
-	// and is the responsibility of the caller to suppress them if not using the standard functions
-	export get_tmsids_from_bdids(dataset(doxie_cbrs.layout_references) in_bdids,
-	                             unsigned in_limit = 0,
-															 string1 in_party_type = '',
-															 boolean isFCRA=false) := function
-		key := if(isFCRA, liensv2.Key_FCRA_Liens_BDID, liensv2.key_liens_bdid);
+  // Gets TMSIDs from BDIDs
+  // Note: TMSID suppressions not done here. They are being done in the report section
+  // and is the responsibility of the caller to suppress them if not using the standard functions
+  EXPORT get_tmsids_from_bdids(DATASET(doxie_cbrs.layout_references) in_bdids,
+                               UNSIGNED in_limit = 0,
+                               STRING1 in_party_type = '',
+                               BOOLEAN isFCRA=FALSE) := FUNCTION
+    key := IF(isFCRA, liensv2.Key_FCRA_Liens_BDID, liensv2.key_liens_bdid);
 
-		res := join(dedup(sort(in_bdids,bdid),bdid),key,
-								keyed(left.bdid = right.p_bdid),
-								transform(with_bdid,self := left,self := right),
-								keep(1000));
+    res := JOIN(DEDUP(SORT(in_bdids,bdid),bdid),key,
+      KEYED(LEFT.bdid = RIGHT.p_bdid),
+      TRANSFORM(with_bdid,SELF := LEFT,SELF := RIGHT),
+      KEEP(1000));
 
-		party_checked := join(res, liensv2.key_liens_party_ID,
-										 keyed(left.tmsid = right.tmsid) and
-										 left.bdid = (unsigned)right.bdid and
-										 right.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
-										 transform(liensv2_services.layout_tmsid,self := right),
-										 keep(1000));
+    party_checked := JOIN(res, liensv2.key_liens_party_ID,
+      KEYED(LEFT.tmsid = RIGHT.tmsid) AND
+      LEFT.bdid = (UNSIGNED)RIGHT.bdid AND
+      RIGHT.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
+      TRANSFORM(liensv2_services.layout_tmsid,SELF := RIGHT),
+      KEEP(1000));
 
-		ut.MAC_Slim_Back(res,liensv2_services.layout_tmsid,res_slim);
-		use_res := if(in_party_type = '', res_slim, party_checked);
+    ut.MAC_Slim_Back(res,liensv2_services.layout_tmsid,res_slim);
+    use_res := IF(in_party_type = '', res_slim, party_checked);
 
-		ded := dedup(sort(use_res,tmsid),tmsid);
-		return if(in_limit = 0,ded,choosen(ded,in_limit));
-	end;
+    ded := DEDUP(SORT(use_res,tmsid),tmsid);
+    RETURN IF(in_limit = 0,ded,CHOOSEN(ded,in_limit));
+  END;
 
-	// Gets TMSIDs from RMSIDs
-	// Note: TMSID suppressions not done here. They are being done in the report section
-	// and is the responsibility of the caller to suppress them if not using the standard functions
-	export get_tmsids_from_rmsids(dataset(liensv2_services.layout_rmsid) in_rmsids,
-																boolean isFCRA=false
-																) := function
-	  key := if(isFCRA, LiensV2.key_liens_RMSID_FCRA, liensv2.key_liens_rmsid);
-		res := join(dedup(sort(in_rmsids,rmsid),rmsid),key,
-		            keyed(left.rmsid = right.rmsid),
-								transform(liensv2_services.layout_rmsid,self := right),
-								keep(1000));
+  // Gets TMSIDs from RMSIDs
+  // Note: TMSID suppressions not done here. They are being done in the report section
+  // and is the responsibility of the caller to suppress them if not using the standard functions
+  EXPORT get_tmsids_from_rmsids(DATASET(liensv2_services.layout_rmsid) in_rmsids,
+                                BOOLEAN isFCRA=FALSE
+                                ) := FUNCTION
+    key := IF(isFCRA, LiensV2.key_liens_RMSID_FCRA, liensv2.key_liens_rmsid);
+    res := JOIN(DEDUP(SORT(in_rmsids,rmsid),rmsid),key,
+      KEYED(LEFT.rmsid = RIGHT.rmsid),
+      TRANSFORM(liensv2_services.layout_rmsid,SELF := RIGHT),
+      KEEP(1000));
 
-		return dedup(sort(res,tmsid,rmsid),tmsid,rmsid);
-	end;
+    RETURN DEDUP(SORT(res,tmsid,rmsid),tmsid,rmsid);
+  END;
 
   // Gets TMSIDs from Casenumber ST
-	// Note: TMSID suppressions not done here. They are being done in the report section
-	// and is the responsibility of the caller to suppress them if not using the standard functions
-	export get_tmsids_from_casenumber_st(	dataset(LiensV2_Services.layout_casenumber_st) in_casenumber_st) := function
-		key := liensv2.key_liens_case_number;
-		res := join(dedup(sort(in_casenumber_st,case_number,filing_state),case_number,filing_state),key,
-								keyed(trim(left.case_number) = right.case_number) and
-								keyed(left.filing_state = '' or trim(left.filing_state) = right.filing_state),
-								transform(liensv2_services.layout_tmsid,self := right),
-								keep(1000));
+  // Note: TMSID suppressions not done here. They are being done in the report section
+  // and is the responsibility of the caller to suppress them if not using the standard functions
+  EXPORT get_tmsids_from_casenumber_st( DATASET(LiensV2_Services.layout_casenumber_st) in_casenumber_st) := FUNCTION
+    key := liensv2.key_liens_case_number;
+    res := JOIN(DEDUP(SORT(in_casenumber_st,case_number,filing_state),case_number,filing_state),key,
+      KEYED(TRIM(LEFT.case_number) = RIGHT.case_number) AND
+      KEYED(LEFT.filing_state = '' OR TRIM(LEFT.filing_state) = RIGHT.filing_state),
+      TRANSFORM(liensv2_services.layout_tmsid,SELF := RIGHT),
+      KEEP(1000));
 
-		return dedup(sort(res,tmsid),tmsid);
-	end;
+    RETURN DEDUP(SORT(res,tmsid),tmsid);
+  END;
 
 
   // ======================================================================
   // Returns the liens data in the report summary view (grouped and rolled up by TMSID)
   // ======================================================================
-  export report_view := module
+  EXPORT report_view := MODULE
 
-	  // Batch - Returns the liens data in the report summary view using TMSIDs as a lookup mechanism.
-		export by_tmsid_batch(grouped dataset(liensv2_services.layout_tmsid) in_tmsids,
-		                string in_ssn_mask_type = '',
-                    boolean IsFCRA = FALSE,
-										string in_filing_jurisdiction = '',
-										string person_filter_id = '',
-										BOOLEAN return_multiple_pages = FALSE,
-										string32 appType,
-                    boolean includeCriminalIndicators=false,
-										DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc = FFD.Constants.BlankPersonContextBatchSlim,
-										integer8 inFFDOptionsMask = 0,
-										integer FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided,
-										boolean rollup_by_case_link = false) := function
+    // Batch - Returns the liens data in the report summary view using TMSIDs as a lookup mechanism.
+    EXPORT by_tmsid_batch(GROUPED DATASET(liensv2_services.layout_tmsid) in_tmsids,
+      STRING in_ssn_mask_type = '',
+      BOOLEAN IsFCRA = FALSE,
+      STRING in_filing_jurisdiction = '',
+      STRING person_filter_id = '',
+      BOOLEAN return_multiple_pages = FALSE,
+      STRING32 appType,
+      BOOLEAN includeCriminalIndicators=FALSE,
+      DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc = FFD.Constants.BlankPersonContextBatchSlim,
+      INTEGER8 inFFDOptionsMask = 0,
+      INTEGER FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided,
+      BOOLEAN rollup_by_case_link = FALSE) := FUNCTION
 
-			tmsidsgrpd	:=	group(sort(in_tmsids,acctno,tmsid),acctno);
+      tmsidsgrpd := GROUP(SORT(in_tmsids,acctno,tmsid),acctno);
 
-		  return liensv2_services.fn_get_liens_tmsid(tmsidsgrpd,in_ssn_mask_type,IsFCRA,in_filing_jurisdiction,
-																								  person_filter_id,return_multiple_pages,appType,includeCriminalIndicators,
-																									ds_slim_pc,inFFDOptionsMask,FCRAPurpose,rollup_by_case_link);
-		end;
+      RETURN liensv2_services.fn_get_liens_tmsid(tmsidsgrpd,in_ssn_mask_type,IsFCRA,in_filing_jurisdiction,
+                                                person_filter_id,return_multiple_pages,appType,includeCriminalIndicators,
+                                                ds_slim_pc,inFFDOptionsMask,FCRAPurpose,rollup_by_case_link);
+    END;
 
-	  // Returns the liens data in the report summary view using TMSIDs as a lookup mechanism.
-		export by_tmsid(dataset(liensv2_services.layout_tmsid) in_tmsids,
-		                string in_ssn_mask_type = '',
-										boolean IsFCRA = false,
-										string in_filing_jurisdiction = '',
-										string person_filter_id = '',
-										BOOLEAN return_multiple_pages = FALSE,
-										string32 appType,
-                    boolean includeCriminalIndicators=false,
-										DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc = FFD.Constants.BlankPersonContextBatchSlim,
-										integer8 inFFDOptionsMask = 0,
-										integer FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided,
-										boolean rollup_by_case_link = false ) := function
-			return ungroup(by_tmsid_batch(group(sorted(in_tmsids, acctno), acctno),in_ssn_mask_type,
-			                                IsFCRA,in_filing_jurisdiction,person_filter_id,
-											                return_multiple_pages,appType,includeCriminalIndicators,
-											                ds_slim_pc,inFFDOptionsMask,FCRAPurpose,rollup_by_case_link));
-		end;
+    // Returns the liens data in the report summary view using TMSIDs as a lookup mechanism.
+    EXPORT by_tmsid(
+      DATASET(liensv2_services.layout_tmsid) in_tmsids,
+      STRING in_ssn_mask_type = '',
+      BOOLEAN IsFCRA = FALSE,
+      STRING in_filing_jurisdiction = '',
+      STRING person_filter_id = '',
+      BOOLEAN return_multiple_pages = FALSE,
+      STRING32 appType,
+      BOOLEAN includeCriminalIndicators=FALSE,
+      DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc = FFD.Constants.BlankPersonContextBatchSlim,
+      INTEGER8 inFFDOptionsMask = 0,
+      INTEGER FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided,
+      BOOLEAN rollup_by_case_link = FALSE ) := FUNCTION
+      RETURN UNGROUP(by_tmsid_batch(GROUP(sorted(in_tmsids, acctno), acctno),in_ssn_mask_type,
+                                    IsFCRA,in_filing_jurisdiction,person_filter_id,
+                                    return_multiple_pages,appType,includeCriminalIndicators,
+                                    ds_slim_pc,inFFDOptionsMask,FCRAPurpose,rollup_by_case_link));
+    END;
 
-   	  // Batch - Returns the liens data in the report summary view using DIDs as a lookup mechanism.
-   	  export by_did_batch(grouped dataset(doxie.layout_references_acctno) in_dids,
-   		              string in_ssn_mask_type = '',
-   									boolean IsFCRA = FALSE,
-   									string1 in_party_type = '',
-   									string32 appType,
-                    boolean includeCriminalIndicators=false,
-										DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc  = FFD.Constants.BlankPersonContextBatchSlim,
-									  integer8 inFFDOptionsMask = 0,
-										integer FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided,
-										boolean rollup_by_case_link = false ) := function
-   		  return by_tmsid_batch(get_tmsids_from_dids_batch(in_dids, IsFCRA, in_party_type),
-				                        in_ssn_mask_type,IsFCRA,'','',false,appType,includeCriminalIndicators,
-										ds_slim_pc,inFFDOptionsMask,FCRAPurpose,rollup_by_case_link);
-   		end;
-
-
-	  // Returns the liens data in the report summary view using DIDs as a lookup mechanism.
-	  export by_did(dataset(doxie.layout_references) in_dids,
-		              string in_ssn_mask_type = '',
-									boolean IsFCRA = FALSE,
-									string1 in_party_type = '',
-									string32 appType,
-                  boolean includeCriminalIndicators=false,
-									DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc  = FFD.Constants.BlankPersonContextBatchSlim,
-									integer8 inFFDOptionsMask = 0,
-									integer FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided,
-									boolean rollup_by_case_link = false ) := function
-      ds_batch := group(sorted(project(in_dids, doxie.layout_references_acctno), acctno), acctno);
-		  return ungroup(by_did_batch(ds_batch,in_ssn_mask_type,IsFCRA,in_party_type,
-			                              appType,includeCriminalIndicators,ds_slim_pc,
-										  inFFDOptionsMask,FCRAPurpose,rollup_by_case_link));
-		end;
+       // Batch - Returns the liens data in the report summary view using DIDs as a lookup mechanism.
+       EXPORT by_did_batch(
+        GROUPED DATASET(doxie.layout_references_acctno) in_dids,
+        STRING in_ssn_mask_type = '',
+        BOOLEAN IsFCRA = FALSE,
+        STRING1 in_party_type = '',
+        STRING32 appType,
+        BOOLEAN includeCriminalIndicators=FALSE,
+        DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc = FFD.Constants.BlankPersonContextBatchSlim,
+        INTEGER8 inFFDOptionsMask = 0,
+        INTEGER FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided,
+        BOOLEAN rollup_by_case_link = FALSE ) := FUNCTION
+         RETURN by_tmsid_batch(get_tmsids_from_dids_batch(in_dids, IsFCRA, in_party_type),
+                  in_ssn_mask_type,IsFCRA,'','',FALSE,appType,includeCriminalIndicators,
+                ds_slim_pc,inFFDOptionsMask,FCRAPurpose,rollup_by_case_link);
+       END;
 
 
-		// Returns the liens data in the report summary view using BDIDs as a lookup mechanism.
-		export by_bdid(dataset(doxie_cbrs.layout_references) in_bdids,
-		               unsigned in_limit = 0,
-		               string in_ssn_mask_type = '',
-									 string1 in_party_type = '',
-									 string32 appType,
-                   boolean includeCriminalIndicators=false,
-									 DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc  = FFD.Constants.BlankPersonContextBatchSlim,
-									 integer8 inFFDOptionsMask = 0,
-									 boolean rollup_by_case_link = false) := function
-		  return by_tmsid(get_tmsids_from_bdids(in_bdids,in_limit,in_party_type),in_ssn_mask_type,false,'','',
-			              false,appType,includeCriminalIndicators,ds_slim_pc,inFFDOptionsMask,,rollup_by_case_link);
-		end;
+    // Returns the liens data in the report summary view using DIDs as a lookup mechanism.
+    EXPORT by_did(DATASET(doxie.layout_references) in_dids,
+                  STRING in_ssn_mask_type = '',
+                  BOOLEAN IsFCRA = FALSE,
+                  STRING1 in_party_type = '',
+                  STRING32 appType,
+                  BOOLEAN includeCriminalIndicators=FALSE,
+                  DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc = FFD.Constants.BlankPersonContextBatchSlim,
+                  INTEGER8 inFFDOptionsMask = 0,
+                  INTEGER FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided,
+                  BOOLEAN rollup_by_case_link = FALSE ) := FUNCTION
+      ds_batch := GROUP(sorted(PROJECT(in_dids, doxie.layout_references_acctno), acctno), acctno);
+      RETURN UNGROUP(by_did_batch(ds_batch,in_ssn_mask_type,IsFCRA,in_party_type,
+                                    appType,includeCriminalIndicators,ds_slim_pc,
+                      inFFDOptionsMask,FCRAPurpose,rollup_by_case_link));
+    END;
 
-	end;
+
+    // Returns the liens data in the report summary view using BDIDs as a lookup mechanism.
+    EXPORT by_bdid(DATASET(doxie_cbrs.layout_references) in_bdids,
+                   UNSIGNED in_limit = 0,
+                   STRING in_ssn_mask_type = '',
+                   STRING1 in_party_type = '',
+                   STRING32 appType,
+                   BOOLEAN includeCriminalIndicators=FALSE,
+                   DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc = FFD.Constants.BlankPersonContextBatchSlim,
+                   INTEGER8 inFFDOptionsMask = 0,
+                   BOOLEAN rollup_by_case_link = FALSE) := FUNCTION
+      RETURN by_tmsid(get_tmsids_from_bdids(in_bdids,in_limit,in_party_type),in_ssn_mask_type,FALSE,'','',
+                    FALSE,appType,includeCriminalIndicators,ds_slim_pc,inFFDOptionsMask,,rollup_by_case_link);
+    END;
+
+  END;
 
   // ======================================================================
   // Returns non-FCRA liens data in the moxie view (ungrouped and not rolled up)
   // ======================================================================
-	export moxie_view := module
+  EXPORT moxie_view := MODULE
 
-	  // Returns the liens data in the moxie view using tmsids as a lookup mechanism.
-		export by_rmsid(dataset(liensv2_services.layout_rmsid) in_rmsids,
-		                string in_ssn_mask_type, SET OF STRING1 name_types = ALL,
-                    boolean isReport = false, string32 appType='') := function
+    // Returns the liens data in the moxie view using tmsids as a lookup mechanism.
+    EXPORT by_rmsid(DATASET(liensv2_services.layout_rmsid) in_rmsids,
+                    STRING in_ssn_mask_type, SET OF STRING1 name_types = ALL,
+                    BOOLEAN isReport = FALSE, STRING32 appType='') := FUNCTION
 
-      ds_dedup := dedup(sort(in_rmsids,tmsid,rmsid),tmsid,rmsid);
-			res_main := join (ds_dedup, liensv2.key_liens_main_id,
-												keyed(left.tmsid = right.tmsid) and keyed(left.rmsid = right.rmsid),
-												limit(10000));
+      ds_dedup := DEDUP(SORT(in_rmsids,tmsid,rmsid),tmsid,rmsid);
+      res_main := JOIN (ds_dedup, liensv2.key_liens_main_id,
+                        KEYED(LEFT.tmsid = RIGHT.tmsid) AND KEYED(LEFT.rmsid = RIGHT.rmsid),
+                        LIMIT(10000));
 
       // Get party; use penalty to retain or skip records depending on the query type
-			liensv2.layout_liens_party GetParty (liensv2_services.layout_rmsid le, liensv2.key_liens_party_id ri) := TRANSFORM
-					penaddr := doxie.FN_Tra_Penalty_addr(ri.predir,ri.prim_range,ri.prim_name,ri.addr_suffix,ri.postdir,ri.sec_range,ri.p_city_name,ri.st,ri.zip);
+      liensv2.layout_liens_party GetParty (liensv2_services.layout_rmsid le, liensv2.key_liens_party_id ri) := TRANSFORM
+          penaddr := doxie.FN_Tra_Penalty_addr(ri.predir,ri.prim_range,ri.prim_name,ri.addr_suffix,ri.postdir,ri.sec_range,ri.p_city_name,ri.st,ri.zip);
 
-					dpenalt	:=  penaddr +
-										doxie.FN_Tra_Penalty_DID(ri.did) +
-										doxie.FN_Tra_Penalty_SSN(ri.ssn) +
-										doxie.FN_Tra_Penalty_Name(ri.fname, ri.mname, ri.lname);
-					bpenalt	:=  penaddr +
-										doxie.FN_Tra_Penalty_BDID(ri.bdid) +
-										doxie.FN_Tra_Penalty_CName(ri.cname);
+          dpenalt := penaddr +
+                    doxie.FN_Tra_Penalty_DID(ri.did) +
+                    doxie.FN_Tra_Penalty_SSN(ri.ssn) +
+                    doxie.FN_Tra_Penalty_Name(ri.fname, ri.mname, ri.lname);
+          bpenalt := penaddr +
+                    doxie.FN_Tra_Penalty_BDID(ri.bdid) +
+                    doxie.FN_Tra_Penalty_CName(ri.cname);
 
-					ReportSkip := isReport AND ri.name_type='D' AND ~(doxie.FN_Tra_Penalty_BDID(ri.bdid) = 0 OR doxie.FN_Tra_Penalty_DID(ri.did) = 0);
-					RegularSkip := ~isReport AND ri.name_type='D' AND dpenalt>0 AND bpenalt>0;
+          ReportSkip := isReport AND ri.name_type='D' AND ~(doxie.FN_Tra_Penalty_BDID(ri.bdid) = 0 OR doxie.FN_Tra_Penalty_DID(ri.did) = 0);
+          RegularSkip := ~isReport AND ri.name_type='D' AND dpenalt>0 AND bpenalt>0;
 
-					SELF.rmsid := IF(ReportSkip OR RegularSkip,SKIP,ri.rmsid);
-					SELF := ri;
-			END;
+          SELF.rmsid := IF(ReportSkip OR RegularSkip,SKIP,ri.rmsid);
+          SELF := ri;
+      END;
 
-			res_party := join (ds_dedup, liensv2.key_liens_party_id,
-													keyed(left.tmsid = right.tmsid) and keyed(left.rmsid = right.rmsid) and
-													right.name_type IN name_types,
-													GetParty (LEFT,RIGHT), limit(10000));
+      res_party := JOIN (ds_dedup, liensv2.key_liens_party_id,
+                          KEYED(LEFT.tmsid = RIGHT.tmsid) AND KEYED(LEFT.rmsid = RIGHT.rmsid) AND
+                          RIGHT.name_type IN name_types,
+                          GetParty (LEFT,RIGHT), LIMIT(10000));
 
-			res_joined := join(res_main,res_party,left.tmsid = right.tmsid and left.rmsid = right.rmsid,left outer);
+      res_joined := JOIN(res_main,res_party,LEFT.tmsid = RIGHT.tmsid AND LEFT.rmsid = RIGHT.rmsid,LEFT OUTER);
 
       // pull, mask
-			Suppress.MAC_pullIDs_tmsid(res_joined, pulled,false,true,appType,'LIENS');
-			Suppress.MAC_Mask(pulled, res_masked, ssn, null, true, false, maskVal:=in_ssn_mask_type);
+      Suppress.MAC_pullIDs_tmsid(res_joined, pulled,FALSE,TRUE,appType,'LIENS');
+      Suppress.MAC_Mask(pulled, res_masked, ssn, null, TRUE, FALSE, maskVal:=in_ssn_mask_type);
 
-			return dedup(sort(res_masked,record),record);
-		end;
+      RETURN DEDUP(SORT(res_masked,RECORD),RECORD);
+    END;
 
-	  // Returns the liens data in the moxie view using dids as a lookup mechanism.
-	  export by_did(dataset(doxie.layout_references) in_dids,
-                  string in_ssn_mask_type = '',
-									string1 in_party_type = '', boolean isReport = false,string32 appType='') := function
-      return by_rmsid(get_rmsids_from_dids(in_dids, , FALSE, in_party_type), in_ssn_mask_type, , isReport,appType);
-		end;
+    // Returns the liens data in the moxie view using dids as a lookup mechanism.
+    EXPORT by_did(DATASET(doxie.layout_references) in_dids,
+                  STRING in_ssn_mask_type = '',
+                  STRING1 in_party_type = '', BOOLEAN isReport = FALSE,STRING32 appType='') := FUNCTION
+      RETURN by_rmsid(get_rmsids_from_dids(in_dids, , FALSE, in_party_type), in_ssn_mask_type, , isReport,appType);
+    END;
 
-		// Returns the liens data in the moxie view using bdids as a lookup mechanism.
-		export by_bdid(dataset(doxie_cbrs.layout_references) in_bdids,
-		               string in_ssn_mask_type = '',
-									 string1 in_party_type = '',
-									 string32 appType='') := function
-			return by_rmsid(get_rmsids_from_bdids(in_bdids, , , in_party_type),in_ssn_mask_type, , false, appType);
-		end;
-	end;
+    // Returns the liens data in the moxie view using bdids as a lookup mechanism.
+    EXPORT by_bdid(DATASET(doxie_cbrs.layout_references) in_bdids,
+                   STRING in_ssn_mask_type = '',
+                   STRING1 in_party_type = '',
+                   STRING32 appType='') := FUNCTION
+      RETURN by_rmsid(get_rmsids_from_bdids(in_bdids, , , in_party_type),in_ssn_mask_type, , FALSE, appType);
+    END;
+  END;
 
 
   // ==========================================================================
   // Returns the liens data in the source view (grouped and rolled up by RMSID)
   // ==========================================================================
-	export source_view := module
+  EXPORT source_view := MODULE
 
-	  // Returns the liens data in the source view using rmsids as a lookup mechanism.
-		shared by_rmsid(dataset(liensv2_services.layout_rmsid) in_rmsids,
-		                string in_ssn_mask_type,
-										string32 appType,
-                    boolean includeCriminalIndicators=false) := function
-		  return liensv2_services.fn_get_liens_rmsid(group(sorted(in_rmsids, acctno), acctno),in_ssn_mask_type,appType,includeCriminalIndicators);
-		end;
+    // Returns the liens data in the source view using rmsids as a lookup mechanism.
+    SHARED by_rmsid(DATASET(liensv2_services.layout_rmsid) in_rmsids,
+                    STRING in_ssn_mask_type,
+                    STRING32 appType,
+                    BOOLEAN includeCriminalIndicators=FALSE) := FUNCTION
+      RETURN liensv2_services.fn_get_liens_rmsid(GROUP(sorted(in_rmsids, acctno), acctno),in_ssn_mask_type,appType,includeCriminalIndicators);
+    END;
 
-		// Returns the liens data in the source view using tmsids as a lookup mechanism.
-		export by_tmsid(dataset(liensv2_services.layout_tmsid) in_tmsids,
-		                string in_ssn_mask_type = '',
-										string32 appType,
-                    boolean includeCriminalIndicators=false) := function
-		  return by_rmsid(get_rmsids_from_tmsids(in_tmsids),in_ssn_mask_type,appType,includeCriminalIndicators);
-		end;
+    // Returns the liens data in the source view using tmsids as a lookup mechanism.
+    EXPORT by_tmsid(DATASET(liensv2_services.layout_tmsid) in_tmsids,
+                    STRING in_ssn_mask_type = '',
+                    STRING32 appType,
+                    BOOLEAN includeCriminalIndicators=FALSE) := FUNCTION
+      RETURN by_rmsid(get_rmsids_from_tmsids(in_tmsids),in_ssn_mask_type,appType,includeCriminalIndicators);
+    END;
 
-		// Returns the liens data in the source view using dids as a lookup mechanism.
-		export by_did(dataset(doxie.layout_references) in_dids,
-		              string in_ssn_mask_type = '',
-									string1 in_party_type = '',
-									string32 appType,
-                  boolean includeCriminalIndicators=false) := function
-		  return by_rmsid(get_rmsids_from_dids(in_dids, , , in_party_type),in_ssn_mask_type,appType,includeCriminalIndicators);
-		end;
+    // Returns the liens data in the source view using dids as a lookup mechanism.
+    EXPORT by_did(DATASET(doxie.layout_references) in_dids,
+                  STRING in_ssn_mask_type = '',
+                  STRING1 in_party_type = '',
+                  STRING32 appType,
+                  BOOLEAN includeCriminalIndicators=FALSE) := FUNCTION
+      RETURN by_rmsid(get_rmsids_from_dids(in_dids, , , in_party_type),in_ssn_mask_type,appType,includeCriminalIndicators);
+    END;
 
-		// Returns the liens data in the source view using bdids as a lookup mechanism.
-		export by_bdid(dataset(doxie_cbrs.layout_references) in_bdids,
-		               unsigned in_limit = 0,
-		               string in_ssn_mask_type = '',
-									 string1 in_party_type = '',
-									 string32 appType,
-                   boolean includeCriminalIndicators=false) := function
-		  return by_rmsid(get_rmsids_from_bdids(in_bdids,in_limit, ,in_party_type),in_ssn_mask_type,appType,includeCriminalIndicators);
-		end;
-	end;
-	// ==========================================================================
+    // Returns the liens data in the source view using bdids as a lookup mechanism.
+    EXPORT by_bdid(DATASET(doxie_cbrs.layout_references) in_bdids,
+                   UNSIGNED in_limit = 0,
+                   STRING in_ssn_mask_type = '',
+                   STRING1 in_party_type = '',
+                   STRING32 appType,
+                   BOOLEAN includeCriminalIndicators=FALSE) := FUNCTION
+      RETURN by_rmsid(get_rmsids_from_bdids(in_bdids,in_limit, ,in_party_type),in_ssn_mask_type,appType,includeCriminalIndicators);
+    END;
+  END;
+  // ==========================================================================
   // Returns a "flat" version of liens & judgment data (for fcra courtrunner)
   // IMPORTANT:
-  //   . overrides are not applied (court runner requirement).
-  //   . if using anywhere other than court-runner, you MUST change this function
+  // . overrides are not applied (court runner requirement).
+  // . if using anywhere other than court-runner, you MUST change this function
   // to apply overrides.
   // ==========================================================================
-	export Retrieval_view_fcra := module
+  EXPORT Retrieval_view_fcra := MODULE
 
-     export by_did(dataset(doxie.layout_references) in_dids,
-      dataset (fcra.Layout_override_flag) flagfile,
+     EXPORT by_did(DATASET(doxie.layout_references) in_dids,
+      DATASET (fcra.Layout_override_flag) flagfile,
       DATASET(FFD.Layouts.PersonContextBatchSlim) slim_pc_recs,
-      integer8 inFFDOptionsMask,
-      integer FCRAPurpose
-      ) := function
+      INTEGER8 inFFDOptionsMask,
+      INTEGER FCRAPurpose
+      ) := FUNCTION
 
       today := (STRING) STD.Date.Today();
-      boolean showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
-      boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask);
+      BOOLEAN showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
+      BOOLEAN showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask);
       liens_correct_record_id := SET (flagfile (file_id = FCRA.FILE_ID.LIEN), record_id);
 
-      tmsids := join(dedup(sort(in_dids,did),did), liensv2.key_liens_did_fcra,
-        keyed(left.did = right.did),
-        transform(with_did, self := right),
+      tmsids := JOIN(DEDUP(SORT(in_dids,did),did), liensv2.key_liens_did_fcra,
+        KEYED(LEFT.did = RIGHT.did),
+        TRANSFORM(with_did, SELF := RIGHT),
         atmost(1000),
-        keep(100));
+        KEEP(100));
 
-      party_recs_raw := join(tmsids, liensv2.key_liens_party_id_fcra,
-        keyed(left.tmsid = right.tmsid)
-        and left.did = (unsigned6) right.did
-        and right.name_type[1] = 'D' // debtors only, right?
-        and trim((string)right.persistent_record_id) not in liens_correct_record_id,
-        transform($.layout_liens_Retrieval.search_recs,
-          self.tmsid := left.tmsid;
-          self.did := left.did;
-          self := right;
-          self := [];
-        ), atmost(1000), keep(100));
+      party_recs_raw := JOIN(tmsids, liensv2.key_liens_party_id_fcra,
+        KEYED(LEFT.tmsid = RIGHT.tmsid)
+        AND LEFT.did = (UNSIGNED6) RIGHT.did
+        AND RIGHT.name_type[1] = 'D' // debtors only, RIGHT?
+        AND TRIM((STRING)RIGHT.persistent_record_id) NOT IN liens_correct_record_id,
+        TRANSFORM($.layout_liens_Retrieval.search_recs,
+          SELF.tmsid := LEFT.tmsid;
+          SELF.did := LEFT.did;
+          SELF := RIGHT;
+          SELF := [];
+        ), atmost(1000), KEEP(100));
 
       $.layout_liens_retrieval.search_recs xformStatements($.layout_liens_Retrieval.search_recs l, FFD.Layouts.PersonContextBatchSlim r)
-      := transform, skip((~ShowDisputedRecords AND r.isDisputed) OR (~ShowConsumerStatements AND EXISTS(r.StatementIDs)))
-        self.StatementIDs := r.StatementIDs;
-        self.isDisputed := r.isDisputed;
-        self := l;
-      end;
+      := TRANSFORM, SKIP((~ShowDisputedRecords AND r.isDisputed) OR (~ShowConsumerStatements AND EXISTS(r.StatementIDs)))
+        SELF.StatementIDs := r.StatementIDs;
+        SELF.isDisputed := r.isDisputed;
+        SELF := l;
+      END;
 
-      party_recs := join(party_recs_raw, slim_pc_recs(datagroup = FFD.Constants.DataGroups.LIEN_PARTY),
-        left.did = (unsigned6) right.lexid
-        and left.persistent_record_id = (integer) right.RecID1,
-        xformStatements(left, right),
-        left outer,
-        keep(1), atmost(1000));
+      party_recs := JOIN(party_recs_raw, slim_pc_recs(datagroup = FFD.Constants.DataGroups.LIEN_PARTY),
+        LEFT.did = (UNSIGNED6) RIGHT.lexid
+        AND LEFT.persistent_record_id = (INTEGER) RIGHT.RecID1,
+        xformStatements(LEFT, RIGHT),
+        LEFT OUTER,
+        KEEP(1), atmost(1000));
 
-      main_recs_raw := join(dedup(sort(party_recs, tmsid), tmsid), liensv2.key_liens_main_id_fcra,
-        keyed(left.tmsid = right.tmsid)
-        and trim( (string) right.persistent_record_id) not in liens_correct_record_id
-        and FCRA.lien_is_ok (today, right.orig_filing_date), // drop older records
-        transform($.layout_liens_retrieval.search_recs,
-          self := right;
-          self := left;
-        ), keep(100), atmost(1000));
+      main_recs_raw := JOIN(DEDUP(SORT(party_recs, tmsid), tmsid), liensv2.key_liens_main_id_fcra,
+        KEYED(LEFT.tmsid = RIGHT.tmsid)
+        AND TRIM( (STRING) RIGHT.persistent_record_id) NOT IN liens_correct_record_id
+        AND FCRA.lien_is_ok (today, RIGHT.orig_filing_date), // drop older records
+        TRANSFORM($.layout_liens_retrieval.search_recs,
+          SELF := RIGHT;
+          SELF := LEFT;
+        ), KEEP(100), atmost(1000));
 
-	  $.layout_liens_retrieval.search_recs xformStatements_Main($.layout_liens_Retrieval.search_recs l, FFD.Layouts.PersonContextBatchSlim r)
-      := transform, skip((~ShowDisputedRecords AND r.isDisputed) OR (~ShowConsumerStatements AND EXISTS(r.StatementIDs)))
-        self.StatementIDs := r.StatementIDs;
-        self.isDisputed := r.isDisputed;
-        self := l;
-      end;
+    $.layout_liens_retrieval.search_recs xformStatements_Main($.layout_liens_Retrieval.search_recs l, FFD.Layouts.PersonContextBatchSlim r)
+      := TRANSFORM, SKIP((~ShowDisputedRecords AND r.isDisputed) OR (~ShowConsumerStatements AND EXISTS(r.StatementIDs)))
+        SELF.StatementIDs := r.StatementIDs;
+        SELF.isDisputed := r.isDisputed;
+        SELF := l;
+      END;
 
-      main_recs := join(main_recs_raw, slim_pc_recs(datagroup = FFD.Constants.DataGroups.LIEN_MAIN),
-        left.did = (unsigned6) right.lexid
-        and left.persistent_record_id = (integer) right.RecID1,
-        xformStatements_Main(left, right),
-        left outer,
-        keep(1), atmost(1000));
+      main_recs := JOIN(main_recs_raw, slim_pc_recs(datagroup = FFD.Constants.DataGroups.LIEN_MAIN),
+        LEFT.did = (UNSIGNED6) RIGHT.lexid
+        AND LEFT.persistent_record_id = (INTEGER) RIGHT.RecID1,
+        xformStatements_Main(LEFT, RIGHT),
+        LEFT OUTER,
+        KEEP(1), atmost(1000));
 
-      return main_recs;
-		end;
-  end;
+      RETURN main_recs;
+    END;
+  END;
 
-end;
+END;

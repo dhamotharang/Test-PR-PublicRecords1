@@ -4338,6 +4338,7 @@ EXPORT InputEcho := RECORD
 	// Cortera B2B tradeline
   EXPORT CorteraB2B := record	
 			in_key;
+      string8 recenttradedate;
 			// Trade Summary 
 			unsigned2 TradeSumm_OpenAccountsCount;
 			string8 TradeSumm_AccountOpenDate; 

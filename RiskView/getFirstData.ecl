@@ -51,6 +51,7 @@ fd_ln_names := RECORD
 unsigned4 seq;
 string20  ARCHIVE_DATE;
 string	  APPRS_AMT_90D; //Indicator 2
+string	  DAYS_NEW_NEG; //Indicator 7
 string	  DAYS_OLD_NEG; //Indicator 8
 string	  FIRST_SEEN_DATE; //Indicator 13
 string	  FIRST_SEEN_DATE_TRUE; //Indicator 14
@@ -76,6 +77,7 @@ TimeOutSet := STD.Str.Contains(left.Response._header.message,'timeout' ,false);
 self.seq := indata[1].input.seq;
 self.ARCHIVE_DATE := indata[1].input.historyDateTimeStamp[1..6];
 self.APPRS_AMT_90D := STD.Str.FilterOut(left.Response.FDCheckingIndicators.Indicator2, 'APPRS_AMT_90D=');
+self.DAYS_NEW_NEG := STD.Str.FilterOut(left.Response.FDCheckingIndicators.Indicator7, 'DAYS_NEW_NEG=');
 self.DAYS_OLD_NEG := STD.Str.FilterOut(left.Response.FDCheckingIndicators.Indicator8, 'DAYS_OLD_NEG=');
 self.FIRST_SEEN_DATE := STD.Str.FilterOut(FIRST_SEEN_DATE_temp, '-');
 self.FIRST_SEEN_DATE_TRUE := STD.Str.FilterOut(FIRST_SEEN_DATE_TRUE_temp, '-');
@@ -98,6 +100,7 @@ self.seq := indata[1].input.seq;
 self.ARCHIVE_DATE := '';
 self.APPRS_AMT_90D := '';
 self.DAYS_OLD_NEG := '';
+self.DAYS_NEW_NEG := '';
 self.FIRST_SEEN_DATE := '';
 self.FIRST_SEEN_DATE_TRUE := '';
 self.LAST_SEEN_DATE := '';
@@ -135,7 +138,14 @@ checknegtimeoldest_1 := map(
     left.DAYS_OLD_NEG = ''       => -1,
     (integer)left.DAYS_OLD_NEG > 2556.75 => -1,
     (integer)left.DAYS_OLD_NEG <= 0         => -1,
-                                 min(84, max(1, round((integer)left.DAYS_OLD_NEG / (365.25 / 12)))));
+    min(84, max(1, round((integer)left.DAYS_OLD_NEG / (365.25 / 12)))));
+
+checknegtimenewest_1 := map(
+                            LEFT.DAYS_NEW_NEG = '' => -1,
+                            (INTEGER)LEFT.DAYS_NEW_NEG >(365.25*7) => -1,
+                            (INTEGER)LEFT.DAYS_NEW_NEG <= 0 => -1,
+                            max(1, round((INTEGER)LEFT.DAYS_NEW_NEG/(365.25/12)))
+                            );
 
 checknegriskdectimenewest_1 := map(
     left.NO_NEG_DECL_DAYS = '' or (Integer)left.NO_NEG_DECL_DAYS <= 0 => -1,
@@ -201,8 +211,11 @@ archive_bf_last_seen_date := map(
   self.CheckTimeNewest := if(makeGatewayCall = false or (string)archive_bf_first_seen_date = '1' or (string)archive_bf_first_seen_date_true = '1' or (string)archive_bf_last_seen_date = '1' or (string)archive_bf_first_seen_date_true = '-1' 
                           or (string)archive_bf_first_seen_date_true = '-2', '-1', (string)checktimenewest_1);
 
+  self.CheckNegTimeNewest := if(makeGatewayCall = false or (string)archive_bf_first_seen_date = '1' or (string)archive_bf_first_seen_date_true = '1' or (string)archive_bf_last_seen_date = '1' or (string)archive_bf_first_seen_date_true = '-1' 
+                              or (string)archive_bf_first_seen_date_true = '-2', '-1', (string)checknegtimenewest_1);
+
   self.CheckNegTimeOldest := if(makeGatewayCall = false or (string)archive_bf_first_seen_date = '1' or (string)archive_bf_first_seen_date_true = '1' or (string)archive_bf_last_seen_date = '1' or (string)archive_bf_first_seen_date_true = '-1' 
-                             or (string)archive_bf_first_seen_date_true = '-2', '-1', (string)checknegtimeoldest_1);
+                             or (string)archive_bf_first_seen_date_true = '-2', '-1', IF(checknegtimeoldest_1 = -1 AND (integer)self.CheckNegTimeNewest > 0, self.CheckNegTimeNewest, (string)checknegtimeoldest_1 ));
 
   self.CheckNegRiskDecTimeNewest := if(makeGatewayCall = false or (string)archive_bf_first_seen_date = '1' or (string)archive_bf_first_seen_date_true = '1' or (string)archive_bf_last_seen_date = '1' or (string)archive_bf_first_seen_date_true = '-1' 
                                     or (string)archive_bf_first_seen_date_true = '-2', '-1', (string)checknegriskdectimenewest_1);

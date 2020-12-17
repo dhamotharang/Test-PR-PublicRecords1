@@ -1,4 +1,4 @@
-﻿IMPORT $, AutoKeyI, Address, BatchShare, BatchServices, dx_Email, email_data, iesp, STD;
+IMPORT $, AutoKeyI, Address, BatchShare, BatchServices, dx_Email, email_data, iesp, STD;
 
 EXPORT Transforms := MODULE
 
@@ -239,6 +239,20 @@ EXPORT Transforms := MODULE
 
   EXPORT $.Layouts.batch_in_rec xfSearchIn(iesp.emailsearchv2.t_EmailSearchV2SearchBy rec_in)
   := TRANSFORM
+
+    BOOLEAN is_cleanable := ((rec_in.Address.City !='') and (rec_in.Address.State != '')) or (rec_in.Address.Zip5 != '');
+
+    addr_1			 	:= Address.Addr1FromComponents(rec_in.Address.StreetNumber,
+                                                     rec_in.Address.StreetPreDirection,
+                                                     rec_in.Address.StreetName,
+                                                     rec_in.Address.StreetSuffix,
+                                                     rec_in.Address.StreetPostDirection,
+                                                     '', rec_in.Address.UnitNumber);
+    addr_2 				:= Address.Addr2FromComponents(rec_in.Address.City, rec_in.Address.State, rec_in.Address.Zip5);
+    addr_line_1 	:= IF (addr_1 = '', rec_in.Address.StreetAddress1, addr_1);
+    clean_addr 		:= Address.GetCleanAddress(addr_line_1,addr_2,address.Components.country.US);
+    ca						:= clean_addr.results;
+
     SELF.acctno  := $.Constants.Defaults.SingleSearchAccountNo;
     SELF.DID := rec_in.LexId;
     SELF.name_first := rec_in.Name.first;
@@ -248,17 +262,17 @@ EXPORT Transforms := MODULE
     SELF.ssn := rec_in.SSN;
     _dob := iesp.ECL2ESP.DateToString(rec_in.DOB);
     SELF.dob := IF((UNSIGNED)_dob > 0, _dob, '');
-    SELF.prim_range := rec_in.Address.StreetNumber;
-    SELF.predir := rec_in.Address.StreetPreDirection;
-    SELF.prim_name := rec_in.Address.StreetName;
-    SELF.addr_suffix := rec_in.Address.StreetSuffix;
-    SELF.postdir := rec_in.Address.StreetPostDirection;
-    SELF.unit_desig := rec_in.Address.UnitDesignation;
-    SELF.sec_range := rec_in.Address.UnitNumber;
-    SELF.p_city_name := rec_in.Address.City;
-    SELF.st := rec_in.Address.State;
-    SELF.z5 := rec_in.Address.Zip5;
-    SELF.zip4 := rec_in.Address.Zip4;
+    SELF.prim_range := if (is_cleanable, ca.prim_range, rec_in.Address.StreetNumber);
+    SELF.predir := if (is_cleanable, ca.predir, rec_in.Address.StreetPreDirection);
+    SELF.prim_name := if (is_cleanable, ca.prim_name, rec_in.Address.StreetName);
+    SELF.addr_suffix := if (is_cleanable, ca.suffix, rec_in.Address.StreetSuffix);
+    SELF.postdir := if (is_cleanable, ca.postdir, rec_in.Address.StreetPostDirection);
+    SELF.unit_desig := if (is_cleanable, ca.unit_desig, rec_in.Address.UnitDesignation);
+    SELF.sec_range := if (is_cleanable, ca.sec_range, rec_in.Address.UnitNumber);
+    SELF.p_city_name := if (is_cleanable, ca.p_city, rec_in.Address.City);
+    SELF.st := if (is_cleanable, ca.state, rec_in.Address.State);
+    SELF.z5 := if (is_cleanable, ca.zip, rec_in.Address.Zip5);
+    SELF.zip4 := if (is_cleanable, ca.zip4, rec_in.Address.Zip4);
 
     SELF := rec_in;
     SELF := [];

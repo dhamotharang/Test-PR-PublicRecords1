@@ -9,13 +9,13 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
     DATASET(AddressReport_Services.layouts.in_address) m_AddrInfo,
     BOOLEAN valid_addr_city_state, BOOLEAN valid_addr_zip) :=
   FUNCTION
-          
+
     ds_large_area_matches :=
       MAP( valid_addr_zip => ds_first_cut( zip = m_AddrInfo[1].zip ),
         valid_addr_city_state => ds_first_cut(ut.NNEQ(city_name, m_AddrInfo[1].p_city_name) AND
         ut.NNEQ(st, m_AddrInfo[1].st))
       );
-    
+
     ds_address_matches := ds_large_area_matches(
       ut.NNEQ(prim_name, m_AddrInfo[1].prim_name) AND
       ut.NNEQ(prim_range, m_AddrInfo[1].prim_range) AND
@@ -25,17 +25,17 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
       ut.NNEQ(sec_range, m_AddrInfo[1].sec_range)
     );
     RETURN ds_address_matches;
-    
+
   END;
-    
+
   //********************************************************************************************************
   export AddressReport_Services.layouts.residents_final_out add_akas (DATASET(doxie.layout_best) resi_input):=function
-    
+
     main_record := record (AddressReport_Services.layouts.resident_best_layout)
       boolean is_best := true;
       boolean legacy_ssn := false; //for potentially randomized SSNs defines if SSN-DID pair was seen before
     end;
-  
+
     hrecs_raw := join (resi_input, dx_header.Key_Header(),
       KEYED(LEFT.did = RIGHT.s_did)
       and LEFT.prim_name = RIGHT.prim_name
@@ -43,10 +43,8 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
       and ~doxie.compliance.isHeaderSourceRestricted(right.src, mod_access.DataRestrictionMask),
       transform(right),
       limit(ut.limits.DEFAULT));
-    glb_ok := mod_access.isValidGLB ();
-    dppa_ok := mod_access.isValidDPPA ();
     Header.MAC_GlbClean_Header(hrecs_raw,hrecs0, , , mod_access);
-    
+
     main_record get_header_recs(RECORDOF(hrecs0) R) := transform
       self.is_best := false;
       self.name_suffix := if (R.name_suffix ='UNK','',R.name_suffix);
@@ -57,9 +55,9 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
       self.addr_dt_last_seen := R.dt_last_seen;
       self := R;
     end;
-    
+
     hrecs := project(hrecs0, get_header_recs(left));
-    
+
     // this defines which AKAs we consider to be the same.
     all_names := hrecs + project (resi_input, main_record);
     resi_srt := sort (all_names, did, lname, fname, mname, name_suffix, -ssn, -dob, ~is_best);
@@ -111,7 +109,7 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
 
     death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
     res_w_d_appended := dx_death_master.Append.byDid(res_w_issuance, did, death_params);
-    
+
     AddressReport_Services.layouts.resident_layout GetDead (res_w_d_appended L):=transform
       // we prefer DOB from header, if valid for the purpose
       DOB := L.Identity.DOB;
@@ -150,11 +148,11 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
   end;
 
   shared ds_all_records:=add_akas(ds_all_records_tmp);
-      
+
   // Derived flags:
   BOOLEAN valid_addr_city_state := m_AddrInfo[1].prim_name != '' AND m_AddrInfo[1].p_city_name != '' AND m_AddrInfo[1].st != '';
   BOOLEAN valid_addr_zip := m_AddrInfo[1].prim_name != '' AND m_AddrInfo[1].zip != '';
-  
+
   // Prune off non-current records:
   ds_first_cut := ds_all_records(addr_dt_last_seen > AddressReport_Services.constants.THRESHOLD_DATE_FOR_CURRENT_RESIDENCY);
 
@@ -167,7 +165,7 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
   doxie.mac_AddHRIAddress(Current_res_dedup,CurrentResidents_hri);
   CurrentResidents_w_phone := AddressReport_Services.Functions.getRTPhones(CurrentResidents_hri, mod_access, location_report);
   EXPORT CurrentResidents := if(location_report, CurrentResidents_w_phone, project(Current_res_dedup, transform(AddressReport_Services.Layouts.residents_final_out_w_royalties, self.residents := left)));
-  
+
   ds_all_records format_prior_res(ds_all_records l, Current_res_dedup r):=transform
     boolean NOT_address_matches := if( (l.prim_name = m_AddrInfo[1].prim_name AND
       l.prim_range = m_AddrInfo[1].prim_range AND
@@ -191,7 +189,7 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
   end;
   Prior_res_tmp:=join(ds_all_records,Current_res_dedup,LEFT.did=RIGHT.did,format_prior_res(LEFT,RIGHT),LEFT ONLY);
   Prior_res_dedup:=dedup(sort(Prior_res_tmp,did),did);
-  
+
   doxie.layout_AppendGongByAddr_input fixComp(Prior_res_dedup L) := transform
     self.listing_name := '';
     self.timezone := '';
@@ -199,8 +197,8 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
     self := l;
   end;
   a := project(Prior_res_dedup,fixComp(left));
-  cur_phones := doxie.fn_AppendGongByAddr(a(prim_name<>'', prim_range<>'', st<>''),mod_access,true)(not(publish_code = 'N' or omit_phone = 'Y'));   
-  
+  cur_phones := doxie.fn_AppendGongByAddr(a(prim_name<>'', prim_range<>'', st<>''),mod_access,true)(not(publish_code = 'N' or omit_phone = 'Y'));
+
   AddressReport_Services.layouts.residents_final_out add_phones(Prior_res_dedup L, cur_phones R):=transform
     self.CurrentPhone := project(r, transform(iesp.addressreport.t_AddrReportRealTimePhone,
     self.Phone10 := left.phone,
@@ -216,10 +214,9 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
     LEFT.did=RIGHT.did,
     add_phones(LEFT,RIGHT),
     LEFT outer,keep(1),ALL);
-  
+
   PriorResidents_tmp final_dedup(PriorResidents_tmp l,Current_res_dedup r):=transform
     self:=l;
   end;
   EXPORT PriorResidents := join(PriorResidents_tmp,Current_res_dedup,left.did=right.did,final_dedup(LEFT,RIGHT),left only);
 END;
-
