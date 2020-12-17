@@ -88,8 +88,8 @@ module
 	
 	// Split out source B records from others.
 	shared ds_acctno 				:= project (dLNPropRemoveDefaultData, TRANSFORM(layouts.inhouse_layout, SELF.acctno := '', SELF := LEFT));
-	export dsFilterB				:= ds_acctno(vendor_source IN ['B', 'C']);
-	export dsFilterOthers		:= ds_acctno(vendor_source IN ['A', 'D', 'E']);
+	export dsFilterB				:= ds_acctno(vendor_source IN [Constants.Blacknight_LocalizedAverages, Constants.Blacknight]);
+	export dsFilterOthers		:= ds_acctno(vendor_source IN [Constants.Best_CoreLogic_Blacknight, Constants.CoreLogic, Constants.MLS]);
 
 	// JOIN B and A (and MLS E) records to clear B record DEFLT
 	export dsJoinBA := join(dsFilterB, dsFilterOthers, TRUE, PropertyCharacteristics_Services.Functions.xJoinAB(LEFT, RIGHT), left outer, ALL);
@@ -98,11 +98,11 @@ module
 	export dsRollB := rollup(dsJoinBA, TRUE, PropertyCharacteristics_Services.Functions.xRollUpB_Rec(LEFT, RIGHT));
 
 	// Combine source A and B (and MLS E + best of all F or G) records
-	export dsSourceAll := dsRollB + dsFilterOthers + PROJECT (inhouse_results(vendor_source in ['F', 'G']), TRANSFORM(layouts.inhouse_layout, SELF.acctno := '', SELF := LEFT));
+	export dsSourceAll := dsRollB + dsFilterOthers + PROJECT (inhouse_results(vendor_source in [Constants.Best_AllSources, Constants.Best_All_NoMLS]), TRANSFORM(layouts.inhouse_layout, SELF.acctno := '', SELF := LEFT));
 
 	//For Default Plus Option, combine B OKCITY and E MLS records, MLS has higher priority
-  shared DPO_BandE := ROLLUP(dsSourceAll(vendor_source in ['E', 'B']), TRUE, PropertyCharacteristics_Services.Functions.DPOJOin (LEFT, RIGHT));
-	SHARED ds_DPO := dsSourceAll(vendor_source = 'D') + DPO_BandE;
+  shared DPO_BandE := ROLLUP(dsSourceAll(vendor_source in [Constants.MLS, Constants.Blacknight_LocalizedAverages]), TRUE, PropertyCharacteristics_Services.Functions.DPOJOin (LEFT, RIGHT));
+	SHARED ds_DPO := dsSourceAll(vendor_source = Constants.CoreLogic) + DPO_BandE;
 
 	SHARED FinaldsSourceAll := IF (pInMod.ResultOption = Constants.Default_Plus_Option, ds_DPO, dsSourceAll);
 	shared ds_noacctno := project (FinaldsSourceAll, layouts.Payload);
