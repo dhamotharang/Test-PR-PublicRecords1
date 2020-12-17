@@ -215,6 +215,7 @@
 				EXPORT INTEGER MaxPhoneCount:= MPD.MaxPhoneCount : STORED('MaxPhoneCount');
 				EXPORT BOOLEAN ReturnScore:= MPD.ReturnScore : STORED('ReturnScore');
 				EXPORT BOOLEAN StrictAPSX:= MPD.StrictAPSX : STORED('StrictAPSXMatch');
+				Export BOOLEAN KeepUndeliverableEmail := MPD.KeepUndeliverableEmail: STORED('KeepUndeliverableEmail');
 			END;
 			RETURN in_mod;
 		END;

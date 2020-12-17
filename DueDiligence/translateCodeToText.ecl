@@ -19,10 +19,10 @@ EXPORT GenderText(STRING1 code) := CASE(code,
 
                                                     
 EXPORT OffenseLevelText(STRING1 code) := CASE(code,
-                                                DueDiligence.Constants.FELONY => 'Felony',
-                                                DueDiligence.Constants.MISDEMEANOR => 'Misdemeanor',
-                                                DueDiligence.Constants.INFRACTION => 'Infraction',
-                                                DueDiligence.Constants.TRAFFIC => 'Traffic',
+                                                DueDiligence.ConstantsLegal.FELONY => 'Felony',
+                                                DueDiligence.ConstantsLegal.MISDEMEANOR => 'Misdemeanor',
+                                                DueDiligence.ConstantsLegal.INFRACTION => 'Infraction',
+                                                DueDiligence.ConstantsLegal.TRAFFIC => 'Traffic',
                                                 DEFAULT_UNKNOWN);
 																								
 EXPORT IndustryRiskText(STRING code) := CASE(code,

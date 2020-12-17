@@ -25,18 +25,11 @@ EXPORT out_rec format_person (dataset(doxie.layout_references) dids):= FUNCTION
 	hh_dids := project(dids, doxie.layout_references_hh);
 	d_person_hdr := doxie.header_records_byDID(hh_dids, true,,,, true); //include dailies, include all records
 	
-  rec_header_plus_in := record(doxie.layout_presentation) 
-    string2   addr_ind := '';
-	end;
-  
-    rec_header_plus_out := record(doxie.layout_presentation)
+  rec_header_plus_out := record(doxie.layout_presentation)
     iesp.identitymanagementreport.t_IdmAddressHierarchy AddressHierarchy;
 	end;
     
-  
-  d_person_hdr_plus := PROJECT(d_person_hdr,rec_header_plus_in);
-      
-	d_person_hr := Header.MAC_Append_Addr_Ind(d_person_hdr_plus, addr_ind, /*src*/, did, prim_range , 
+	d_person_hr := Header.MAC_Append_Addr_Ind(d_person_hdr, addr_ind, /*src*/, did, prim_range , 
                                              prim_name, sec_range, city_name, st, zip,
                                              predir, postdir, suffix, 
                                              dt_first_seen, dt_last_seen, dt_vendor_first_reported,

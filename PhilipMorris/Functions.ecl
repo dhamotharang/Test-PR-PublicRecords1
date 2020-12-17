@@ -642,8 +642,6 @@ export Functions := MODULE
 			EXPORT boolean no_scrub := probation_override_value;
 			EXPORT string ssn_mask := ssn_mask_value;
 		END;
-		dppa_ok := mod_access.isValidDPPA();
-		glb_ok := mod_access.isValidGLB();
 		//for testing purposes (batch mode only), i need to test with the inclusion
 		//of certain datasets that alghough not yet live, can be used (experian, tu)
 		//the only way for that option to be open if the macro is invoked is to

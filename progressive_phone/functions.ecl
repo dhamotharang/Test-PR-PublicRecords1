@@ -939,16 +939,7 @@ EXPORT GetPhonesV3(DATASET(progressive_phone.layout_progressive_batch_in) f_in_r
 
     phones_out_temp := PROJECT(model_results, x_form_phone_shell(LEFT));
 
-    phones_out_with_ported_date := JOIN(phones_out_temp, Phonesplus_v2.key_neustar_phone_history,
-                                        KEYED(LEFT.subj_phone10 = RIGHT.phone) AND
-                                        RIGHT.dt_first_seen <> 0 AND
-                                        RIGHT.is_current,
-                                        TRANSFORM(recs_with_rel_cat,
-                                          SELF.subj_phone_ported_date := (STRING)RIGHT.dt_first_seen, SELF := LEFT),
-                                        LIMIT (0), // max is ~10
-                                        LEFT OUTER);
-
-    phones_filt1 := dedupHistPhones(f_phone_in_hist, phones_out_with_ported_date, inMod);
+    phones_filt1 := dedupHistPhones(f_phone_in_hist, phones_out_temp, inMod);
 
 		//*******EQUIFAX LOGIC to apply user limit to equifax results 0 to 3**********
 		equifax_results := phones_filt1(subj_phone_type_new = MDR.sourceTools.src_Equifax);

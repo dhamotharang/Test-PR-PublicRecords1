@@ -365,7 +365,8 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
                           le.servicename = 'bridgerwlc' and OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, ['']) => le.servicename,
                           le.servicename = 'bridgerwlc' and OFACVersion = 4 and
                           Not Models.FP_models.Model_Check(Valid_requested_models, Risk_Indicators.iid_constants.FAXML_WatchlistModels)    => '',
-                          Not Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set)           => '', //turn off IDA gateway if we don't need it
+                          le.servicename in Models.FraudAdvisor_Constants.IDA_services and 
+													Not Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set)           => '', //turn off IDA gateway if we don't need it
                                                                                                                                               le.servicename);
                                                                                                                                                
 	self.url := map(Models.FP_models.Model_Check(Valid_requested_models, ['fd5609_2'])                                               => '',
@@ -373,7 +374,8 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
                   le.servicename = 'bridgerwlc' and OFACVersion = 4 and Models.FP_models.Model_Check(Valid_requested_models, ['']) => le.url,
                   le.servicename = 'bridgerwlc' and OFACVersion = 4 and
                   Not Models.FP_models.Model_Check(Valid_requested_models, Risk_Indicators.iid_constants.FAXML_WatchlistModels)    => '',
-                  Not Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set)           => '', //turn off IDA gateway if we don't need it
+                  le.servicename in Models.FraudAdvisor_Constants.IDA_services and 
+									Not Models.FP_models.Model_Check(Valid_requested_models, Models.FraudAdvisor_Constants.IDA_models_set)           => '', //turn off IDA gateway if we don't need it
                                                                                                                                       le.url); 
   self := le;																																								
 end;
@@ -880,6 +882,7 @@ IDA_input := PROJECT(iid, Transform(Risk_Indicators.layouts.layout_IDAFraud_in,
                       SELF.dl_number := drlc_value;
                       SELF.dl_state := drlcstate_value;
                       SELF.email_address := email_value;
+                      SELF.ip_address := ip_value;
                       SELF.historydate := IF(historyDateTimeStamp <> '', (UNSIGNED)historyDateTimeStamp[1..6], history_date);
                       SELF.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp(historydateTimeStamp, history_date);
                       
@@ -893,6 +896,7 @@ IDA_input := PROJECT(iid, Transform(Risk_Indicators.layouts.layout_IDAFraud_in,
                       SELF.ProductID := ''; //Populated per model
                       SELF.App_ID := Trim(OtherApplicationIdentifier3);
                       SELF.ESPTransactionId := TransactionID;
+                      SELF.Channel := Channel;
                       SELF := [];
 
                      ));

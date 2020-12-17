@@ -10,9 +10,9 @@ export ReportService_Records := module
                                      ) := function
     mod_access := PROJECT(in_mod, doxie.IDataAccess);
 
-    Suppress.MAC_Suppress(recs,pull_1,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did);
-    Suppress.MAC_Suppress(pull_1,pull_2,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
-    Suppress.MAC_Suppress(pull_2,pull_3,mod_access.application_type,,,Suppress.Constants.DocTypes.OffenderKey,offender_key);
+    Suppress.MAC_Suppress(recs,pull_1,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did, isFCRA := isFCRA);
+    Suppress.MAC_Suppress(pull_1,pull_2,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,ssn, isFCRA := isFCRA);
+    Suppress.MAC_Suppress(pull_2,pull_3,mod_access.application_type,,,Suppress.Constants.DocTypes.OffenderKey,offender_key, isFCRA := isFCRA);
     
     doxie.MAC_PruneOldSSNs(pull_3, out_f_p1, ssn, did, isFCRA);
     doxie.MAC_PruneOldSSNs(out_f_p1, out_cleaned, ssn_appended, did, isFCRA);

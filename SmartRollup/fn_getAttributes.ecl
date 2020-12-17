@@ -9,9 +9,6 @@ EXPORT fn_getAttributes(integer subjectDid,
                         doxie.IDataAccess mod_access
                         ) := function
 
-  dppa_ok := mod_access.isValidDPPA();
-  glb_ok := mod_access.isValidGLB();
-
   //get single record from watchdogSupplemental key by DID (ie best supplemental)
   attributes := Watchdog.Key_Supplemental(keyed(l_did = subjectDid));
   aRec := attributes[1];

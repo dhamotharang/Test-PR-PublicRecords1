@@ -1,4 +1,4 @@
-export layout_TMSID := record
-	string50 TMSID;
-	string30 acctno := '';
-end;
+EXPORT layout_TMSID := RECORD
+  STRING50 TMSID;
+  STRING30 acctno := '';
+END;

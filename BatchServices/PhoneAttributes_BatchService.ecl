@@ -17,20 +17,23 @@
 						The search requires an account number and a phone.
 */
 
-IMPORT BatchShare,Phones,ut;
+IMPORT BatchShare,Phones,ut,doxie;
 
 EXPORT PhoneAttributes_BatchService(useCannedRecs = 'false') := 
 	MACRO
-
-		batch_params		:= Phones.IParam.getBatchParams();	
+	
+      batch_params := MODULE(Phones.IParam.getBatchParams())	
+                      EXPORT BOOLEAN AllowPortingData := Phones.Constants.PhoneAttributes.AllowPortingData;
+                      EXPORT BOOLEAN Allow_TCPA_Port := TRUE;
+        END;
 		// Grab the input XML and throw into a dataset.	
 		ds_xml_in_raw  	:= DATASET([], Phones.Layouts.PhoneAttributes.BatchIn) : STORED('batch_in', FEW);
 		ds_xml_in 			:= IF( useCannedRecs, Phones.BatchCannedInput.PhonesAttribute, ds_xml_in_raw);	
 
 		BatchShare.MAC_SequenceInput(ds_xml_in, ds_xml_in_seq);		
 		BatchShare.MAC_CapitalizeInput(ds_xml_in_seq, ds_batch_in);		
-		
-		dBatchPhonesOut := Phones.PhoneAttributes_BatchRecords(ds_batch_in, batch_params);
+		IF(~doxie.compliance.use_WDNC(batch_params.DataPermissionMask), FAIL('Permission not set for TCPA'));
+		dBatchPhonesOut := Phones.PhoneAttributes_BatchRecords(ds_batch_in, batch_params); 
 		BatchShare.MAC_RestoreAcctno(ds_batch_in, dBatchPhonesOut, dPreResults,false,false);		
 		dSortResults := SORT(dPreResults, acctno);
 

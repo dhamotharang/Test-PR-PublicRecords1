@@ -90,47 +90,48 @@ EXPORT Parser := MODULE
     RETURN cleaned_property;
   END;
 
-  cleanPropDetails(iesp.avm_internal_resp3.t_AVMIPropertyInformation prop_details, Doxie.IDataAccess mod_access) := FUNCTION
+  cleanPropDetails(DATASET(iesp.avm_internal_resp3.t_AVMIPropertyInformation) prop_details, Doxie.IDataAccess mod_access) := FUNCTION
 
-    iesp.avm_internal_resp3.t_AVMIPropertyInformation create_clean_prop_details() := TRANSFORM
+    iesp.avm_internal_resp3.t_AVMIPropertyInformation create_clean_prop_details(iesp.avm_internal_resp3.t_AVMIPropertyInformation L) := TRANSFORM
       // Clean property structures in all child datasets.
-      SELF.DataProviderComparableSalesList := PROJECT(prop_details.DataProviderComparableSalesList,
+      SELF.DataProviderComparableSalesList := PROJECT(L.DataProviderComparableSalesList,
         TRANSFORM(RECORDOF(LEFT), SELF.Property := cleanProperty(LEFT.Property, mod_access), SELF := LEFT));
 
-      SELF.MultipleRecordsList := PROJECT(prop_details.MultipleRecordsList,
+      SELF.MultipleRecordsList := PROJECT(L.MultipleRecordsList,
         TRANSFORM(RECORDOF(LEFT), SELF.Property := cleanProperty(LEFT.Property, mod_access), SELF := LEFT));
 
-      SELF.CustomSearchResultsList := PROJECT(prop_details.CustomSearchResultsList,
+      SELF.CustomSearchResultsList := PROJECT(L.CustomSearchResultsList,
         TRANSFORM(RECORDOF(LEFT), SELF.Property := cleanProperty(LEFT.Property, mod_access), SELF := LEFT));
 
-      SELF.CascadingAVMResultsList := PROJECT(prop_details.CascadingAVMResultsList,
+      SELF.CascadingAVMResultsList := PROJECT(L.CascadingAVMResultsList,
         TRANSFORM(RECORDOF(LEFT), SELF.Property := cleanProperty(LEFT.Property, mod_access), SELF := LEFT));
 
-      SELF.StatewideSearchResultsList := PROJECT(prop_details.StatewideSearchResultsList,
+      SELF.StatewideSearchResultsList := PROJECT(L.StatewideSearchResultsList,
         TRANSFORM(RECORDOF(LEFT), SELF.Property := cleanProperty(LEFT.Property, mod_access), SELF := LEFT));
 
-      SELF.LoaniqReport.DataProviderComparableSalesList := PROJECT(prop_details.LoaniqReport.DataProviderComparableSalesList,
+      SELF.LoaniqReport.DataProviderComparableSalesList := PROJECT(L.LoaniqReport.DataProviderComparableSalesList,
         TRANSFORM(RECORDOF(LEFT), SELF.Property := cleanProperty(LEFT.Property, mod_access), SELF := LEFT));
 
-      SELF.ForeclosuresList := PROJECT(prop_details.ForeclosuresList,
+      SELF.ForeclosuresList := PROJECT(L.ForeclosuresList,
         TRANSFORM(RECORDOF(LEFT), SELF.Property := cleanProperty(LEFT.Property, mod_access), SELF := LEFT));
 
       // Clean properties that aren't in child datasets.
-      SELF.Property := cleanProperty(prop_details.property, mod_access);
-      SELF.Foreclosure.Property := cleanProperty(prop_details.foreclosure.property, mod_access);
-      SELF.FastLAndVReport.Property := cleanProperty(prop_details.FastLAndVReport.Property, mod_access);
-      SELF.LoaniqReport.Property := cleanProperty(prop_details.LoaniqReport.Property, mod_access);
+      SELF.Property := cleanProperty(L.property, mod_access);
+      SELF.Foreclosure.Property := cleanProperty(L.foreclosure.property, mod_access);
+      SELF.FastLAndVReport.Property := cleanProperty(L.FastLAndVReport.Property, mod_access);
+      SELF.LoaniqReport.Property := cleanProperty(L.LoaniqReport.Property, mod_access);
 
       // Keep the rest.
-      SELF := prop_details;
+      SELF := L;
     END;
 
-    RETURN DATASET([create_clean_prop_details()]);
+    RETURN PROJECT(prop_details, create_clean_prop_details(LEFT));
+
   END;
 
   EXPORT cleanResponse(iesp.avm_internal_resp3.t_AVMInternalResponse  gw_response, Doxie.IDataAccess mod_access) := FUNCTION
 
-    prop_details := gw_response.ResponseGroup.Response.ResponseDataList[1].PropertyInformationResponse.PropertyDetails[1];
+    prop_details := gw_response.ResponseGroup.Response.ResponseDataList[1].PropertyInformationResponse.PropertyDetails;
     prop_details_cleaned := cleanPropDetails(prop_details, mod_access);
 
     iesp.avm_internal_resp3.t_AVMIResponseData create_clean_data_list() := TRANSFORM

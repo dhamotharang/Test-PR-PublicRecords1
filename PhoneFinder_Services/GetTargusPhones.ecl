@@ -39,7 +39,8 @@ FUNCTION
 																											pInput.prim_range,pInput.predir,pInput.prim_name,pInput.addr_suffix,
 																											pInput.postdir,pInput.unit_desig,pInput.sec_range,pInput.p_city_name,pInput.st,
 																											pInput.z5,pInput.zip4,mod_access,
-																											inMod.ScoreThreshold,pGateway,pInput.comp_name,TRUE);
+																											inMod.ScoreThreshold,pGateway,pInput.comp_name,TRUE,
+                                                      PhoneFinder_Services.Constants.GatewayMaxTimeout.Targus_RequestTimeout);
 		SELF.batch_in    := pInput;
 	END;
 

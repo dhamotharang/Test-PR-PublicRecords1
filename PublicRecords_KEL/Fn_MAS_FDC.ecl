@@ -1,7 +1,7 @@
 ﻿IMPORT AID_Build, ADVO, AlloyMedia_student_list,  American_student_list, AutoKey, AVM_V2, BankruptcyV3, BBB2, BIPV2, BIPV2_Best, BIPV2_Build, Business_Risk_BIP, BusReg, CalBus, CellPhone, Certegy, Corp2,
 		Cortera, Data_Services, DCAV2, Death_Master,  Doxie, Doxie_Files, DriversV2, DMA, dx_BestRecords, dx_ConsumerFinancialProtectionBureau, dx_Cortera_Tradeline, dx_DataBridge, DX_Email,
-		dx_Equifax_Business_Data, dx_Gong, dx_Header, dx_Infutor_NARB, dx_Relatives_v3, EBR, Email_Data, emerges, Experian_CRDB, FAA, FBNv2, FLAccidents_Ecrash, Fraudpoint3, Gong,
-		GovData, Header, Header_Quick, InfoUSA, IRS5500, InfutorCID, Inquiry_AccLogs, LiensV2, LN_PropertyV2, MDR, OSHAIR, Phonesplus_v2, Prof_License_Mari,
+		dx_Equifax_Business_Data, dx_Gong, dx_Header, dx_Infutor_NARB, dx_OSHAIR, dx_Relatives_v3, EBR, Email_Data, emerges, Experian_CRDB, FAA, FBNv2, FLAccidents_Ecrash, Fraudpoint3, Gong,
+		GovData, Header, Header_Quick, InfoUSA, IRS5500, InfutorCID, Inquiry_AccLogs, LiensV2, LN_PropertyV2, MDR, Phonesplus_v2, Prof_License_Mari,
 		Prof_LicenseV2, Relationship, Risk_Indicators, RiskView, RiskWise, SAM, SexOffender, STD, Suppress, Targus, thrive, USPIS_HotList, Utilfile, ut,
 		VehicleV2, Watercraft, Watchdog, UCCV2, YellowPages;
 /*
@@ -2889,13 +2889,13 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
 					SELF := []));
 
 	OSHAIR__kfetch_OSHAIR_LinkIds := IF(Common.DoFDCJoin_OSHAIR__kfetch_OSHAIR_LinkIds = TRUE,
-																						 PublicRecords_KEL.ecl_functions.DateSelector(OSHAIR.Key_OSHAIR_LinkIds.kfetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Input_FDC),
+																						 PublicRecords_KEL.ecl_functions.DateSelector(dx_OSHAIR.Key_LinkIds.kfetch2(PublicRecords_KEL.ECL_Functions.Common_Functions.GetLinkIDs(Input_FDC),
 																								PublicRecords_KEL.ECL_Functions.Constants.SetLinkSearchLevel(PublicRecords_KEL.ECL_Functions.Constants.LinkSearch.SeleID),
 																								0, /*ScoreThreshold --> 0 = Give me everything*/
 																								PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT,
 																								BIPV2.IDconstants.JoinTypes.LimitTransformJoin),FALSE,TRUE));
 
-	With_OSHAIR_Key_OSHAIR_LinkIds := DENORMALIZE(With_IRS5500_Key_LinkIDs, OSHAIR__kfetch_OSHAIR_LinkIds,
+	With_OSHAIR_Key_LinkIds := DENORMALIZE(With_IRS5500_Key_LinkIDs, OSHAIR__kfetch_OSHAIR_LinkIds,
 			LEFT.G_ProcBusUID = RIGHT.UniqueID AND
 			LEFT.B_LexIDUlt = RIGHT.ULTID AND
 			LEFT.B_LexIDOrg = RIGHT.ORGID AND
@@ -2927,7 +2927,7 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
 																								PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT,
 																								BIPV2.IDconstants.JoinTypes.LimitTransformJoin),FALSE,TRUE));
 
-	With_SAM_key_linkID := DENORMALIZE(With_OSHAIR_Key_OSHAIR_LinkIds, SAM__kfetch_linkID,
+	With_SAM_key_linkID := DENORMALIZE(With_OSHAIR_Key_LinkIds, SAM__kfetch_linkID,
 			LEFT.G_ProcBusUID = RIGHT.UniqueID AND
 			LEFT.B_LexIDUlt = RIGHT.ULTID AND
 			LEFT.B_LexIDOrg = RIGHT.ORGID AND

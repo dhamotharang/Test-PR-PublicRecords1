@@ -192,13 +192,15 @@ MODULE
 	MODULE
 		EXPORT LERG6		        :=  MDR.sourceTools.src_Phones_Lerg6;
 		EXPORT ATT_LIDB_SRC			:= MDR.sourceTools.src_Phones_LIDB;
-		export set_VERIFICATION		:= [LERG6, ATT_LIDB_SRC];
+		EXPORT set_VERIFICATION		:= [LERG6, ATT_LIDB_SRC];
 		EXPORT ICONECTIV_SRC		:= MDR.sourceTools.src_PhonesPorted_iConectiv;
 		EXPORT DISCONNECT_SRC		:= MDR.sourceTools.src_Phones_Disconnect;
 		EXPORT GONG_DISCONNECT_SRC	:= MDR.sourceTools.src_Phones_Gong_History_Disconnect;
 		EXPORT PHONEFRAUD_OTP		:= MDR.sourceTools.src_PhoneFraud_OTP;
 		EXPORT PHONESPORTED_TCPA_CL	:= MDR.sourceTools.src_PhonesPorted_TCPA_CL;
-
+		EXPORT ICONNECTIVE_PORT_VALIDATE_SRC	:= MDR.sourceTools.src_PhonesPorted2_iConectiv;
+		EXPORT set_ICONECTIV_SRC		:= [ICONECTIV_SRC, ICONNECTIVE_PORT_VALIDATE_SRC];
+		EXPORT PHONES_WDNC	:= 'WDNC';// WDNC file
 
 	END;
 	EXPORT TransactionCodes :=
@@ -229,6 +231,7 @@ MODULE
 		EXPORT ACTIVE_VERIFICATION := 'A'; // event type : phone source is OTP or any other AS source
 		EXPORT DEFAULT_BLOCK_ID:= 'A';
 		EXPORT PORTED := 'P';  //phone number is ported
+		EXPORT AllowPortingData := TRUE;  //Iconnectivedata
 
 	END;
 END;

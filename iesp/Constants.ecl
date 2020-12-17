@@ -426,7 +426,7 @@ EXPORT Constants := MODULE
 
 	//Due Diligence
 	export DDRAttributesConst := MODULE
-    export unsigned2 MaxAttributes      				:= 24;
+    export unsigned2 MaxAttributes      				:= 25;
     export unsigned1 MaxAttributeModules        := 6;
     export unsigned2 MaxReportedAKAs      			:= 500;
     export unsigned2 MaxReportedDOBs      			:= 500;
@@ -2139,6 +2139,7 @@ EXPORT Constants := MODULE
 		export UNSIGNED2 MaxOtherPhones := 50;
 		export UNSIGNED2 MaxSearchRecords := 2000;
 		export UNSIGNED2 MaxCompanyIds := 100;
+		export UNSIGNED2 MaxSrcCategories := 100;
 	end;
 
 	//Person Slim alerting query

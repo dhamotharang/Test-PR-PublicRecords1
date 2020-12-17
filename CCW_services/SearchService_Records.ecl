@@ -16,12 +16,13 @@ export SearchService_Records := module
 	// penalize, suppress/mask sensitive data 
 	export getFormatedRecords (DATASET(CCW_services.layouts.rawrec) recs, 
                               params in_mod,
-                              boolean skip_penalizing = false) :=function
+                              boolean skip_penalizing = false,
+                              boolean isFCRA = false) :=function
 																			 
     // pull out dids which are in the file																
-		Suppress.MAC_Suppress(recs,recs_did_pulled,in_mod.applicationtype,Suppress.Constants.LinkTypes.DID,did_out);
+		Suppress.MAC_Suppress(recs,recs_did_pulled,in_mod.applicationtype,Suppress.Constants.LinkTypes.DID,did_out, isFCRA := isFCRA);
     // pull out ssn's which are in pull ssn file																
-		Suppress.MAC_Suppress(recs_did_pulled,recs_ssn_pulled,in_mod.applicationtype,Suppress.Constants.LinkTypes.SSN,best_ssn);
+		Suppress.MAC_Suppress(recs_did_pulled,recs_ssn_pulled,in_mod.applicationtype,Suppress.Constants.LinkTypes.SSN,best_ssn, isFCRA := isFCRA);
 	 
 		// Calculate the penalty on the records
 		recs_plus_pen := project (recs_ssn_pulled,transform(CCW_services.Layouts.rawrec,
@@ -104,7 +105,7 @@ export SearchService_Records := module
 		// Send the DID and show disputed inside 
 		boolean isCNSMR := in_mod.IndustryClass = ut.IndustryClass.Knowx_IC; // D2C - consumer restriction
 		recs := CCW_Services.Raw.byRids(ids, isFCRA, ds_flags, slim_pc_recs, in_mod.FFDOptionsMask, isCNSMR);
-		final_recs := if(~suppress_results_due_alerts, getFormatedRecords (recs, in_mod, skip_penalizing := isFCRA), //don't penalize on FCRA side
+		final_recs := if(~suppress_results_due_alerts, getFormatedRecords (recs, in_mod, skip_penalizing := isFCRA, isFCRA := isFCRA), //don't penalize on FCRA side
                      dataset([],iesp.concealedweapon_fcra.t_FcraWeaponRecord));
                      
 		// 5) Make the statements
@@ -131,7 +132,7 @@ export SearchService_Records := module
     // get raw records; overrides are applied inside 
 		boolean isCNSMR := in_mod.IndustryClass = ut.IndustryClass.Knowx_IC; // D2C - consumer restriction
     recs := CCW_Services.raw.byRids (ids, isFCRA, flagfile, , , isCNSMR);
-    final_recs := getFormatedRecords (recs, in_mod, skip_penalizing := true);
+    final_recs := getFormatedRecords (recs, in_mod, skip_penalizing := true, isFCRA := isFCRA);
 		
 		return final_recs;
   end;

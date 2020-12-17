@@ -1,16 +1,14 @@
-﻿export MAC_GlbClean_Header(infile,outfile, batch = false, IsFCRA = false, modAccess) := macro
+﻿export MAC_GlbClean_Header(infile,outfile, batch = false, IsFCRA = false, modAccess, _rna = false) := macro
 
 //TODO: check if glb_ok nad dppa_ok can be moved here
 import mdr, ut, doxie, suppress, header, codes, data_services;
 
-#uniquename(isUtility)
-%isUtility% := modAccess.isUtility();
-
-#uniquename(appType)
-%appType% := modAccess.application_type;
-
-#uniquename(suppressDMVInfo)
-%suppressDMVInfo% :=  modAccess.suppress_dmv;
+#uniquename(_dppa)
+%_dppa% := modAccess.dppa;
+#uniquename(_dppa_ok)
+%_dppa_ok% := modAccess.isValidDppa(_rna);
+#uniquename(_glb_ok)
+%_glb_ok% := modAccess.isValidGlb(_rna);
 
 #uniquename(oformat)
 %oformat% := record
@@ -38,22 +36,20 @@ END;
 
 // decide which DL permissions to apply; show a utility record only if not a utility customer
 #uniquename(Fetch1);
-%Fetch1% := PROJECT (infile, %AssignDLSource% (LEFT)) (~mdr.SourceTools.SourceIsUtility(src) OR ~%isUtility%);
+%Fetch1% := PROJECT (infile, %AssignDLSource% (LEFT)) (~mdr.SourceTools.SourceIsUtility(src) OR ~modAccess.isUtility());
 
 
 // Check both DL and GLB permissions
 #uniquename(into)
 %oformat% %into% (%dl_rec% le, codes.Key_Codes_V3 R) := TRANSFORM
-  _dppa_ok := dppa_ok;
-  _dppa    := modAccess.dppa;
   //? TODO: interestingly enough, also skip for batch
-  SELF.dppa := IF (le.dl_src = 0, FALSE, IF (_dppa_ok AND (R.file_name = ''), TRUE, SKIP));
+  SELF.dppa := IF (le.dl_src = 0, FALSE, IF (%_dppa_ok% AND (R.file_name = ''), TRUE, SKIP));
 
   SELF.glb := ~modAccess.isHeaderPreGLB ((unsigned3)le.dt_nonglb_last_seen, (unsigned3)le.dt_first_seen, le.src);
 
   // if we filled in the ssn with a utility ssn and it's a utility customer, blank out
   clean_ssn := IF(le.pflag3 in ['U','X'],'',le.ssn);
-  self.ssn := IF ( ~self.dppa or _dppa IN [1,4,6], clean_ssn, '' );
+  self.ssn := IF ( ~self.dppa or %_dppa% IN [1,4,6], clean_ssn, '' );
   self.valid_ssn := IF ( le.ssn<>'' AND self.ssn='' ,'S',le.valid_ssn);
 	self.name_suffix := IF(ut.is_unk(le.name_suffix),'',le.name_suffix);
 	// scrub prim names from death records
@@ -69,7 +65,7 @@ END;
                   // header/translateSource returns a full source name, but all DL sources' names
                   // start from have 2-char state abbreviation
                   KEYED (RIGHT.field_name2 = (string2) header.translateSource (LEFT.src)) AND
-                  KEYED (RIGHT.code = (string1) modAccess.dppa),
+                  KEYED (RIGHT.code = (string1) %_dppa%),
                   %into% (LEFT, RIGHT),
                   LEFT OUTER,
                   LIMIT (0), KEEP (1)); // limit(0) since we checking just exists condition
@@ -111,8 +107,8 @@ END;
 #uniquename(Fetch3a)
 #uniquename(Fetch3b)
 
-Suppress.MAC_Suppress(%Fetch3%, %Fetch3a%, %appType%, Suppress.Constants.LinkTypes.SSN, ssn, , , batch);
-Suppress.MAC_Suppress(%Fetch3a%, %Fetch3b%, %appType%, Suppress.Constants.LinkTypes.DID, did, , , batch);
+Suppress.MAC_Suppress(%Fetch3%, %Fetch3a%, modAccess.application_type, Suppress.Constants.LinkTypes.SSN, ssn, , , batch,,,,isFCRA);
+Suppress.MAC_Suppress(%Fetch3a%, %Fetch3b%, modAccess.application_type, Suppress.Constants.LinkTypes.DID, did, , , batch,,,,isFCRA);
 
 #uniquename(Fetch3c)
 #uniquename(Fetch3c_minors_cleaned)
@@ -127,9 +123,9 @@ Suppress.MAC_Suppress(%Fetch3a%, %Fetch3b%, %appType%, Suppress.Constants.LinkTy
 #uniquename(Fetch3e0)
 #uniquename(Fetch3e)
 %Fetch3e0% := Header.FilterDMVInfo(%Fetch3d%);
-%Fetch3e% := if(%suppressDMVInfo% and ~modAccess.isConsumer () and ~isFCRA, %Fetch3e0%, %Fetch3d%);
+%Fetch3e% := if(modAccess.suppress_dmv and ~modAccess.isConsumer () and ~isFCRA, %Fetch3e0%, %Fetch3d%);
 #uniquename(Fetch3f)
-%Fetch3f% := %Fetch3e%(glb_ok or ~glb);
+%Fetch3f% := %Fetch3e%(%_glb_ok% or ~glb);
 
 #uniquename(environment)
 %environment% := if(IsFCRA,data_services.data_env.iFCRA,data_services.data_env.iNonFCRA);

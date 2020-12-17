@@ -58,13 +58,15 @@ EXPORT Functions := MODULE
 																																													SELF.ind_type := (STRING)in_mod.IndustryType,
 																																													SELF.record_id := LEFT.batchin_rec.did,
 																																													SELF.agency_state := agency_state_ds[1].st,
-																																													SELF.curr_incar_flag := LEFT.crim_appends[1].curr_incar_flag,
+																																													// SELF.curr_incar_flag := LEFT.crim_appends[1].curr_incar_flag,
+																																													SELF.curr_incar_flag := IF(EXISTS(LEFT.crim_appends(curr_incar_flag='Y')),'Y',''),
 																																													SELF.crim_match_type := (INTEGER)LEFT.crim_appends[1].match_type,
 																																													SELF.crim_hit := IF(LEFT.crim_appends[1].did <> 0, TRUE, FALSE),
 																																													SELF.dl_number := LEFT.dl_appends[1].dl_number,
 																																													SELF.dl_state := LEFT.dl_appends[1].orig_state,
 																																													SELF.phonesMetaHit := IF(LEFT.prepaid_phone_appends[1].phone <> '', TRUE, FALSE),
 																																													SELF.prepaidPhone := LEFT.prepaid_phone_appends[1].prepaid,
+																																													SELF.curr_st := LEFT.pr_best_appends[1].best_state,
 																																													SELF := LEFT,
 																																													SELF := []));
 					
@@ -389,13 +391,16 @@ EXPORT Functions := MODULE
 																																													SELF.ind_type := (STRING)in_mod.IndustryType,
 																																													SELF.record_id := LEFT.batchin_rec.did,
 																																													SELF.agency_state := agency_state_ds[1].st,
-																																													SELF.curr_incar_flag := LEFT.crim_appends[1].curr_incar_flag,
+																																													SELF.curr_incar_flag := IF(EXISTS(LEFT.crim_appends(curr_incar_flag='Y')),'Y',''),
 																																													SELF.crim_match_type := (INTEGER)LEFT.crim_appends[1].match_type,
 																																													SELF.crim_hit := IF(LEFT.crim_appends[1].did <> 0, TRUE, FALSE),
-																																													SELF.dl_number := LEFT.dl_appends[1].dl_number,
-																																													SELF.dl_state := LEFT.dl_appends[1].orig_state,
+																																													//Note: This is different from the real-time scoring function..
+																																													//live assessment uses input not the appends 
+																																													SELF.dl_number := LEFT.batchin_rec.dl_number,
+																																													SELF.dl_state := LEFT.batchin_rec.dl_state,
 																																													SELF.phonesMetaHit := IF(LEFT.prepaid_phone_appends[1].phone <> '', TRUE, FALSE),
 																																													SELF.prepaidPhone := LEFT.prepaid_phone_appends[1].prepaid,
+																																													SELF.curr_st := LEFT.batchin_rec.st,
 																																													SELF := LEFT,
 																																													SELF := []));
 																																													
@@ -418,11 +423,12 @@ EXPORT Functions := MODULE
 					*/
 
 					NicoleAttr := 't17_emaildomaindispflag,t18_ipaddrisispflag,t18_ipaddrhostedflag,t18_ipaddrvpnflag,t18_ipaddrtornodeflag,t18_ipaddrlocnonusflag,t18_ipaddrlocmiamiflag,t19_bnkaccthrprepdrtgflag,t1l_dobnotverflag,' +
-																						't1_stolidflag,t1_synthidflag,t1_manipidflag,t1_adultidnotseenflag,t1_addrnotverflag,t1l_ssnwaltnaverflag,t1_firstnmnotverflag,t1l_hiriskcviflag,t1l_medriskcviflag,t1_minorwlexidflag,t1_lastnmnotverflag,' +
-																						't1_phnnotverflag,t1l_ssnwaddrnotverflag,t1_ssnpriordobflag,t1l_ssnnotverflag,t1l_curraddrnotinagcyjurstflag,t1l_bestdlnotinagcyjurstflag,t1l_hdrsrccatcntlwflag,t1l_iddeceasedflag,t1l_idcurrincarcflag,' +
-																						't1l_iddtofdeathaftidactflagev,p1_aotidkrstolidactflagev,p1_aotidkrgenfrdactflagev,p1_aotidkrappfrdactflagev,p1_aotidkrothfrdactflagev,' +
-																						't15_ssnpopflag, t1_lexidpopflag, p1_idriskunscrbleflag, p9_addrriskunscrbleflag, p15_ssnriskunscrbleflag, p16_phnriskunscrbleflag, p17_emailriskunscrbleflag, p18_ipaddrriskunscrbleflag,' +
-																						'p19_bnkacctriskunscrbleflag, p20_dlriskunscrbleflag';
+																							't9_addrisvacantflag, t9_addrisinvalidflag, t9_addriscmraflag, t15_ssnisinvalidflag, t20_dlisinvalidflag, t16_phnprepdflag,' +
+																							't1_stolidflag,t1_synthidflag,t1_manipidflag,t1_adultidnotseenflag,t1_addrnotverflag,t1l_ssnwaltnaverflag,t1_firstnmnotverflag,t1l_hiriskcviflag,t1l_medriskcviflag,t1_minorwlexidflag,t1_lastnmnotverflag,' +
+																							't1_phnnotverflag,t1l_ssnwaddrnotverflag,t1_ssnpriordobflag,t1l_ssnnotverflag,t1l_curraddrnotinagcyjurstflag,t1l_bestdlnotinagcyjurstflag,t1l_hdrsrccatcntlwflag,t1l_iddeceasedflag,t1l_idcurrincarcflag,' +
+																							't1l_iddtofdeathaftidactflagev,t16_phnisinvalidflag,p1_aotidkrstolidactflagev,p1_aotidkrgenfrdactflagev,p1_aotidkrappfrdactflagev,p1_aotidkrothfrdactflagev,' +
+																							't15_ssnpopflag, t1_lexidpopflag, p1_idriskunscrbleflag, p9_addrriskunscrbleflag, p15_ssnriskunscrbleflag, p16_phnriskunscrbleflag, p17_emailriskunscrbleflag, p18_ipaddrriskunscrbleflag,' +
+																							'p19_bnkacctriskunscrbleflag, p20_dlriskunscrbleflag';
 
 						EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(AttrClean, 'entitycontextuid,t_actuid',//,recordid', 
 					NicoleAttr
@@ -479,7 +485,7 @@ EXPORT Functions := MODULE
 																																																																	SELF.entitycontextuid := '_01' + inputrow.record_id,
 																																																																	SELF := []));
 																																																																		
-						EventStatsPrepWithKr := EventStatsPrep + KnownRiskElementProfileAttributes + SafeListProfileAttributes + MultiIdProfileAttributes;
+						EventStatsPrepWithKr := EventStatsPrep + KnownRiskElementProfileAttributes + SafeListProfileAttributes + MultiIdProfileAttributes + KnownRiskIDProfileAttributes;
 
 					WeightedResultDefault := JOIN(EventStatsPrepWithKr(Value != ''), FraudGovPlatform.Key_ConfigAttributes, 
 																	 LEFT.Field=RIGHT.Field AND ((INTEGER)LEFT.entitycontextuid[2..3] = RIGHT.EntityType OR (INTEGER)LEFT.entitycontextuid[2..3] = 1) AND
@@ -668,6 +674,8 @@ EXPORT Functions := MODULE
 						// output(EventStatsPrep,named('analytics_EventStatsPrep'));
 						// output(elementEntityContextUids,named('analytics_elementEntityContextUids'));
 						// output(elementProfiles,named('analytics_elementProfiles'));
+						// output(KnownRiskElementProfileAttributes,named('analytics_KnownRiskElementProfileAttributes'));
+						// output(KnownRiskIDProfileAttributes,named('analytics_KnownRiskIDProfileAttributes'));
 						// output(EventStatsPrepWithKr,named('analytics_EventStatsPrepWithKr'));
 						// output(WeightedResult,named('analytics_WeightedResult'));
 						// output(RulesResult,named('analytics_RulesResult'));

@@ -23,9 +23,9 @@ EXPORT DDBusiness := MODULE
 		
 		//create the where clause based on if rawData has uniqueID or not
 		LOCAL whereClause := 'LEFT.UltID = RIGHT.inquiredBusiness.ultID AND ' +
-										'LEFT.OrgID = RIGHT.inquiredBusiness.orgID AND ' +
-										'LEFT.SeleID = RIGHT.inquiredBusiness.seleID' + 
-										IF(rawIncludesUniqueID, ' AND LEFT.uniqueID = RIGHT.seq', DueDiligence.Constants.EMPTY);
+                         'LEFT.OrgID = RIGHT.inquiredBusiness.orgID AND ' +
+                         'LEFT.SeleID = RIGHT.inquiredBusiness.seleID' + 
+                         IF(rawIncludesUniqueID, ' AND LEFT.uniqueID = RIGHT.seq', DueDiligence.Constants.EMPTY);
 				
 		//if rawData has uniqueID field, assuming unquieness - otherwise remove duplicate rows
 		//should only have duplicate rows if a given business was added to the file twice
@@ -132,7 +132,9 @@ EXPORT DDBusiness := MODULE
                           attributesRequested.includeStructureType OR attributesRequested.includeSOSAgeRange OR
                           attributesRequested.includePublicRecordAgeRange OR attributesRequested.includeShellShelf;
                           
-        legalAttrs := attributesRequested.includeStateLegalEvent OR attributesRequested.includeCivilLegalEvent OR attributesRequested.includeOffenseType;
+        legalAttrs := attributesRequested.includeStateLegalEvent OR attributesRequested.includeCivilLegalEvent OR 
+                      attributesRequested.includeOffenseType OR attributesRequested.includeCivilLegalEventFilingAmount;
+                      
         networkAttrs := attributesRequested.includeBEOProfLicense OR attributesRequested.includeBEOUSResidency OR attributesRequested.includeBEOAccessToFundsProperty;
         
         

@@ -41,8 +41,9 @@ EXPORT Constants := MODULE
 
   EXPORT STRING LastVerified := 'last verified';
 
-  STRING StatusInvalid := 'invalid';
+  EXPORT STRING StatusInvalid := 'invalid';
   EXPORT BOOLEAN isUndeliverableEmail(STRING _status) := STD.Str.ToLowerCase(_status) = StatusInvalid;
+  EXPORT STRING DomainInactive := 'inactive';
   EXPORT STRING DomainAcceptAll := 'accept_all';
   EXPORT BOOLEAN isUnverifiableEmail(STRING _status) := STD.Str.ToLowerCase(_status) = DomainAcceptAll;
   STRING StatusValid := 'valid';
@@ -88,6 +89,7 @@ EXPORT Constants := MODULE
     EXPORT STRING    RoleAddress  := 'Role Address';
     EXPORT STRING    DisposableAddress  := 'Disposable Address';
     EXPORT STRING    EMAIL_DOMAIN_INVALID  := 'EMAIL_DOMAIN_INVALID';
+    EXPORT STRING    DOMAIN_INACTIVE  := 'DOMAIN_INACTIVE';
     EXPORT STRING    BVAPIkey  := '498acc88-a5a4-4dbc-942d-4bd9ac265ae1';
     EXPORT STRING    TMXOrgId       := 'ymyo6b64';
     EXPORT STRING    TMXApiKey      := 'ivdshxsu3m5xmoom';
@@ -96,6 +98,7 @@ EXPORT Constants := MODULE
     EXPORT STRING    TMXApiType     := 'AttributeQuery';
 
     dict_email_address_invalid := DICTIONARY([
+      {DOMAIN_INACTIVE => 'Email Domain Inactive'},
       {'EMAIL_ACCOUNT_INVALID' => 'Email Account Invalid'},
       {'EMAIL_ADDRESS_INVALID' => 'Email Address Invalid'},
       {EMAIL_DOMAIN_INVALID  => 'Email Domain Invalid'}],

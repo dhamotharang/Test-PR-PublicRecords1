@@ -1,5 +1,5 @@
 ﻿IMPORT AutoStandardI, bankruptcyv3, bankruptcyv3_services, codes,
-       doxie, doxie_cbrs, banko, suppress;
+       data_services, doxie, doxie_cbrs, dx_banko, suppress;
 
 EXPORT fn_rollup(
   DATASET(doxie.layout_references) in_dids,
@@ -22,14 +22,14 @@ EXPORT fn_rollup(
   ) :=
     FUNCTION
       doxie.MAC_Header_Field_Declare(isFCRA)
-      
+
       //special search case for partial SSNs otherwise go standard method of finding DIDs.
                                               //force FCRA only when using SSNLast4 until it is needed and KEY is built.
        in_tmsids1 := IF (in_SSNLast4 <> '' AND isFCRA,
                           bankruptcy_ids_ssn4(in_limit,in_SSNLast4, in_filing_jurisdiction,in_party_type,lname_value,fname_value,isFCRA),
                             bankruptcy_ids(in_dids,in_bdids,in_tmsids0,in_limit,in_party_type, isFCRA,isCaseNumberSearch,isAttorneySearch)
                           );
-  
+
       temp_records_search0 :=
         JOIN(
           in_tmsids1,
@@ -41,12 +41,12 @@ EXPORT fn_rollup(
             SELF := LEFT),
           LIMIT(0),
           KEEP(BankruptcyV3_Services.consts.KEEP_LIMIT));
-      
+
       temp_debtor_dids := PROJECT(DEDUP(SORT(temp_records_search0((UNSIGNED)did != 0 AND name_type[1] = BankruptcyV3_Services.consts.NAME_TYPES.DEBTOR),did),did),TRANSFORM(doxie.layout_references,SELF.did := (UNSIGNED)LEFT.did));
       temp_debtor_bdids := PROJECT(DEDUP(SORT(temp_records_search0((UNSIGNED)bdid != 0 AND name_type[1] = BankruptcyV3_Services.consts.NAME_TYPES.DEBTOR),bdid),bdid),TRANSFORM(doxie_cbrs.layout_references,SELF.bdid := (UNSIGNED)LEFT.bdid));
       temp_addl_tmsids := bankruptcyv3_services.bankruptcy_ids(temp_debtor_dids,temp_debtor_bdids,in_tmsids0(FALSE),IF(in_limit = 0,0,in_limit - COUNT(in_tmsids1)),in_party_type, isFCRA,isCaseNumberSearch,isAttorneySearch);
       in_tmsids := in_tmsids1 + IF(in_all_bks_for_all_debtors AND (in_limit = 0 OR COUNT(in_tmsids1) < in_limit),temp_addl_tmsids);
-      
+
       temp_records_search1 :=
         JOIN(
           temp_addl_tmsids,
@@ -66,7 +66,7 @@ EXPORT fn_rollup(
       in_tmsids_less_pulled_by_debtor := JOIN(in_tmsids, DEDUP(SORT(temp_records_searchD,tmsid),tmsid),
         LEFT.tmsid = RIGHT.tmsid,
         TRANSFORM(LEFT));
-      
+
       // Pull any attorney records that are in the pull file
       temp_records_searchA := IF (isFCRA, temp_records_search(name_type[1]='A'), BankruptcyV3_Services.fn_pullIDs(temp_records_search(name_type[1]='A'),TRUE,appType)); // TRUE here means to pull ONLY the attorney being suppressed, NOT ALL attorneys
       // Pull any other records that are in the pull file
@@ -74,13 +74,13 @@ EXPORT fn_rollup(
                                        BankruptcyV3_Services.fn_pullIds(temp_records_search(name_type[1]<>'A' AND name_type[1]<>BankruptcyV3_Services.consts.NAME_TYPES.DEBTOR),TRUE,appType)); // this may be the empty SET ALL the time??
       // Add together all records NOT pulled (including debtors)
       temp_records := SORT(temp_records_searchD + temp_records_searchA + temp_records_searchOthers, tmsid);
-      
+
       //
       // need to add to temp_records_search the TMSID of the trustee record
       //
       //
       // pull IDs using the party info, then join those IDs back against the input set of tmsids
-      
+
       temp_records_main :=
         JOIN(
           in_tmsids_less_pulled_by_debtor,
@@ -93,17 +93,17 @@ EXPORT fn_rollup(
             SELF := LEFT),
           LIMIT(0),
           KEEP(BankruptcyV3_Services.consts.KEEP_LIMIT));
-          
+
       temp_records_main_final := IF(isFCRA, temp_records_main, bankruptcyv3_services.fn_pullTrusteeIDs(temp_records_main,appType));
-      
+
       // filter by jurisdiction if provided
       temp_records_main_jur := IF(in_filing_jurisdiction <> '',
                                   temp_records_main_final(filing_jurisdiction = in_filing_jurisdiction),
                                   temp_records_main_final);
-                                  
+
       // call suppress macro to suppress the trustee app_ssn field based on app_ssn setting.
       Suppress.MAC_Mask(temp_records_main_jur, temp_records_main_jur_suppressed, app_ssn, null, TRUE, FALSE, maskVal:=in_ssn_mask);
-          
+
       temp_top_slim :=
         PROJECT(
           temp_records_main_jur_suppressed,
@@ -124,7 +124,7 @@ EXPORT fn_rollup(
             SELF.trustee := IF (~LEFT.suppressT, LEFT); // pick up ALL cleaned name/address fields
             SELF := LEFT,
             SELF := []));
-            
+
       temp_top_dedup :=
         DEDUP(
           SORT(
@@ -170,7 +170,7 @@ EXPORT fn_rollup(
               AutoStandardI.LIBCALL_PenaltyI_BDID.val(tempmodb) +
               AutoStandardI.LIBCALL_PenaltyI_Biz_Name.val(tempmodbn) +
               AutoStandardI.LIBCALL_PenaltyI_FEIN.val(tempmodf),
-            SELF.matched_party.party_type := 
+            SELF.matched_party.party_type :=
               IF(DisplayMatchedParty_value,
                 IF(LEFT.name_type=BankruptcyV3_Services.consts.NAME_TYPES.DEBTOR,
                   LEFT.debtor_type, LEFT.name_type),
@@ -230,10 +230,10 @@ EXPORT fn_rollup(
               SELF.attorneys := PROJECT(RIGHT.parties, layouts.layout_party_slim),
               SELF := LEFT),
             LEFT OUTER));
-            
+
       temp_records_main_full := PROJECT(temp_records_main_jur,
         RECORDOF(bankruptcyv3.key_bankruptcyv3_main_full()));
-            
+
       temp_top_add_status :=
         IF(in_isSearch,
           temp_top_add_attorneys,
@@ -258,38 +258,40 @@ EXPORT fn_rollup(
               SELF.comment_history := RIGHT.comments,
               SELF := LEFT),
             LEFT OUTER));
-        
+
       /* key containing docket info
          since we are getting case number from the TMSID, we only need to
-         hit the banko.Key_Banko_courtcode_casenumber key
-         (NOT: banko.Key_Banko_courtcode_fullcasenumber ) */
-      k_docket := banko.Key_Banko_courtcode_casenumber(isFCRA);
-      
+         hit the dx_banko.Key_Banko_courtcode_casenumber key
+         (NOT: dx_banko.Key_Banko_courtcode_fullcasenumber ) */
+
+      UNSIGNED1 env := IF(isFCRA, Data_Services.data_env.iFCRA, Data_Services.data_env.iNonFCRA);
+      k_docket := dx_banko.Key_Banko_courtcode_casenumber(env);
+
       /* functions for use in getting temp_add_docket_flag */
       court_code_from_tmsid (STRING tmsid) := tmsid[3..7];
       case_number_from_tmsid(STRING tmsid) := tmsid[8.. ];
-      
+
       /*
         populate flag that tells client whether extra dockets info is available.
         we only started collecting docket (bk events) data in Nov. of 2009,
         so extra dockets info is only available on some cases,
         and only available for some of the events on some cases.
         (i.e. only those events after 11/2009 of that case)
-      
+
         JIRA RR - 10730 => a new key was created to contain the full case number, so
         Add full case number/BKCaseNumber while adding docket flag
 
         Because we are replacing a project with the following join, we only
         need to keep(1)
       */
- 
+
       temp_add_docket_flag :=
         JOIN(temp_top_add_comments,
              k_docket,
              court_code_from_tmsid (TRIM(LEFT.tmsid,ALL)) = RIGHT.court_code AND
              case_number_from_tmsid(TRIM(LEFT.tmsid,ALL)) = RIGHT.casekey,
              TRANSFORM(RECORDOF(LEFT),
-              SELF.has_docket_info := 
+              SELF.has_docket_info :=
                 court_code_from_tmsid (TRIM(LEFT.tmsid,ALL)) = RIGHT.court_code AND
                 case_number_from_tmsid(TRIM(LEFT.tmsid,ALL)) = RIGHT.casekey;
               SELF.full_case_number := RIGHT.BKCaseNumber;
@@ -297,7 +299,7 @@ EXPORT fn_rollup(
               ),
             LEFT OUTER,
             KEEP(BankruptcyV3_Services.consts.MAX_PER_COURT_CASE_LOOKUP));
- 
+
       temp_top_add_dockets :=
         IF(in_isSearch OR NOT include_dockets,
           temp_add_docket_flag,
@@ -321,8 +323,7 @@ EXPORT fn_rollup(
 // output(trusteesPulled, named('trusteesPulledv3'));
 // output(temp_records_main_jur, named('temp_records_main_jur'),overwrite);
 // output(temp_top_slim, named('temp_top_slimv3'), overwrite);
- 
+
         RETURN SORT(temp_top_add_dockets,-orig_filing_date,-date_filed,RECORD);
-      
+
     END;
-    

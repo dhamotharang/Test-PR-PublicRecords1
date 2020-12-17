@@ -20,10 +20,6 @@ export comp_subject(dataset(doxie.layout_references) dids,
                     integer8 inFFDOptionsMask = 0) :=
 MODULE
 
-shared glb_ok := mod_access.isValidGLB(); //to use in a header cleaing macro
-shared dppa_ok := mod_access.isValidDPPA(); // ...
-
-
 head_all := riskwisefcra._header_data (dids, flagfile);
 
 shared head_all_slim := project (head_all, rec_header);

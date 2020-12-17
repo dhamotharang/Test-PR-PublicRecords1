@@ -4,8 +4,8 @@ IMPORT B_Event_8,E_Address,E_Bank,E_Bank_Account,E_Customer,E_Drivers_License,E_
 IMPORT * FROM KEL11.Null;
 EXPORT B_Event_7 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_8.__ENH_Event_8) __ENH_Event_8 := B_Event_8.__ENH_Event_8;
-  SHARED __EE27087 := __ENH_Event_8;
-  EXPORT __ST20297_Layout := RECORD
+  SHARED __EE27604 := __ENH_Event_8;
+  EXPORT __ST20730_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date_;
@@ -68,7 +68,7 @@ EXPORT B_Event_7 := MODULE
     KEL.typ.nstr _reason6_;
     KEL.typ.nint _socsvalflag_;
     KEL.typ.nint _drlcvalflag_;
-    KEL.typ.nint _hphonevalflag_;
+    KEL.typ.nstr _hphonevalflag_;
     KEL.typ.nstr _historydatetimestamp_;
     KEL.typ.nkdate _reported__dob_;
     KEL.typ.nkdate _bocashell__addr1__dt__first__seen_;
@@ -256,12 +256,12 @@ EXPORT B_Event_7 := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  SHARED __ST20297_Layout __ND27340__Project(B_Event_8.__ST20801_Layout __PP25814) := TRANSFORM
-    SELF.No_Lex_Id_ := MAP(__T(__OP2(__PP25814.Lex_Id_,>,__CN(900000000000)))=>1,0);
-    SELF.T___Is_Bc_Shll_Hit_Flag_ := MAP(__T(__OP2(__PP25814.Bocashell_Hit_,=,__CN(TRUE)))=>1,0);
-    SELF.T___Person_Uid_Echo_ := MAP(__T(__OR(__OR(__OP2(__CAST(KEL.typ.str,__PP25814.Lex_Id_),=,__CN('')),__NT(__PP25814.Lex_Id_)),__OP2(__PP25814.Lex_Id_,=,__CN(0))))=>__ECAST(KEL.typ.nint,__CN(-99999)),__ECAST(KEL.typ.nint,__PP25814.Lex_Id_));
-    SELF.T___Src_Class_Type_ := MAP(__T(__OP2(__PP25814.T___Src_Type_,=,__CN(-99997)))=> -99997,__T(__OP2(__PP25814.T___Src_Type_,IN,__CN([6,14])))=>0,__T(__OP2(__PP25814.T___Src_Type_,IN,__CN([4,8,11])))=>1,__T(__OP2(__PP25814.T___Src_Type_,IN,__CN([3,7])))=>2,__T(__OP2(__PP25814.T___Src_Type_,IN,__CN([2,5])))=>3,4);
-    SELF := __PP25814;
+  SHARED __ST20730_Layout __ND27857__Project(B_Event_8.__ST21234_Layout __PP26331) := TRANSFORM
+    SELF.No_Lex_Id_ := MAP(__T(__OP2(__PP26331.Lex_Id_,>,__CN(900000000000)))=>1,0);
+    SELF.T___Is_Bc_Shll_Hit_Flag_ := MAP(__T(__OP2(__PP26331.Bocashell_Hit_,=,__CN(TRUE)))=>1,0);
+    SELF.T___Person_Uid_Echo_ := MAP(__T(__OR(__OR(__OP2(__CAST(KEL.typ.str,__PP26331.Lex_Id_),=,__CN('')),__NT(__PP26331.Lex_Id_)),__OP2(__PP26331.Lex_Id_,=,__CN(0))))=>__ECAST(KEL.typ.nint,__CN(-99999)),__ECAST(KEL.typ.nint,__PP26331.Lex_Id_));
+    SELF.T___Src_Class_Type_ := MAP(__T(__OP2(__PP26331.T___Src_Type_,=,__CN(-99997)))=> -99997,__T(__OP2(__PP26331.T___Src_Type_,IN,__CN([6,14])))=>0,__T(__OP2(__PP26331.T___Src_Type_,IN,__CN([4,8,11])))=>1,__T(__OP2(__PP26331.T___Src_Type_,IN,__CN([3,7])))=>2,__T(__OP2(__PP26331.T___Src_Type_,IN,__CN([2,5])))=>3,4);
+    SELF := __PP26331;
   END;
-  EXPORT __ENH_Event_7 := PROJECT(__EE27087,__ND27340__Project(LEFT));
+  EXPORT __ENH_Event_7 := PROJECT(__EE27604,__ND27857__Project(LEFT));
 END;

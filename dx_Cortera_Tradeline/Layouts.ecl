@@ -1,7 +1,7 @@
 ﻿IMPORT address, BIPV2, dx_common, MDR;
 
 EXPORT Layouts := MODULE
- 
+
   ////////////////////////////////////////////////////////////////////////
   // -- Input Tradeline Layout
   ////////////////////////////////////////////////////////////////////////
@@ -18,9 +18,9 @@ EXPORT Layouts := MODULE
     STRING20  AGING_91PLUS;    // Number 20  - Amount of accounts receivables that is more than 91 days past due
     STRING20  CREDIT_LIMIT;    // Number 20  - Credit Limit reported by the provider.  Sparsely populated.
     STRING8   FIRST_SALE_DATE; // Number 8   - Date of first sale reported by the provider. Sparsely populated.
-    STRING8   LAST_SALE_DATE;  // Number 8   - Date of last sale reported by the provider. 
+    STRING8   LAST_SALE_DATE;  // Number 8   - Date of last sale reported by the provider.
   END;
- 
+
   ////////////////////////////////////////////////////////////////////////
   // -- Base Layout
   ////////////////////////////////////////////////////////////////////////
@@ -29,7 +29,7 @@ EXPORT Layouts := MODULE
     STRING2   source := MDR.sourceTools.src_Cortera_Tradeline;
     STRING1   status := '';    // blank=current, D=Deleted by vendor, R=Replaced by newer version
     UNSIGNED4 filedate;        // file date from vendor
-    UNSIGNED4 process_date;    // build date 
+    UNSIGNED4 process_date;    // build date
     UNSIGNED4 dt_first_seen;
     UNSIGNED4 dt_last_seen;
     UNSIGNED4 dt_vendor_first_reported;
@@ -41,12 +41,23 @@ EXPORT Layouts := MODULE
     BIPV2.IDlayouts.l_xlink_ids;
 		dx_common.layout_metadata; // Added for Delta build process. CCPA fields are also part of this.
   END;
-	
+
+
+  ////////////////////////////////////////////////////////////////////////
+  // -- Key Layout
+  ////////////////////////////////////////////////////////////////////////
+
+  EXPORT Layout_Tradeline_Key := RECORD
+    BIPV2.IDlayouts.l_key_ids;
+    Layout_Tradeline_Base - BIPV2.IDlayouts.l_xlink_ids;
+    integer1 fp := 0; //for platform?
+  END;
+
 	////////////////////////////////////////////////////////////////////////
   // -- Layout Key Delta RID
   ////////////////////////////////////////////////////////////////////////
   EXPORT Layout_Delta_Rid := RECORD
 		dx_common.layout_ridkey;
   END;
-  
+
 END;
