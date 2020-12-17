@@ -1,4 +1,4 @@
-IMPORT corp2, STD, corp2_mapping;
+﻿IMPORT corp2, STD, corp2_mapping;
 
 EXPORT Functions := Module
 
@@ -66,7 +66,7 @@ EXPORT Functions := Module
 									st ='CANA'=>'CAN',
 									st ='CAYM'=>'CYM',
 									st ='CALG'=>'CAN',
-									st ='CHE'	=>'SWI',
+									st in['CHE','SWIT']	=>'SWI',
 									st ='DELA'=>'DE',								
 									st ='DENM'=>'DNK',
 									st ='ENGL'=>'ENG',
@@ -553,7 +553,7 @@ EXPORT Functions := Module
 									st ='ZAF' =>'SOUTH AFRICA',
 									st ='ZMB' =>'ZAMBIA',
 									st ='ZWE' =>'ZIMBABWE',
-									st in ['','COR','DIS','U'] =>'',
+									st in ['','COR','DIS','SHE','U'] =>'',
 									'**|'+corp2.t2u(code)
 						);
 	END;						
@@ -858,6 +858,7 @@ EXPORT Functions := Module
 		RETURN case(st,
 								'1'=>'GOOD STANDING',
 								'5'=>'NOT CURRENT',
+								'6'=>'FORFEITED EXISTENCE',
 								'7'=>'DISSOLVED',
 								'9'=>'JUDICIALLY DISSOLVED',
 								'10'=>'REVOKED',
@@ -874,7 +875,11 @@ EXPORT Functions := Module
 								'22'=>'ADMINISTRATIVELY DISSOLVED',
 								'23'=>'ADMINISTRATIVELY WITHDRAWN',
 								'24'=>'PENDING',
-								'26'=>'STATUTORILY DISSOLVED', 
+								'25'=>'INACTIVE',
+								'26'=>'STATUTORILY DISSOLVED',
+								'29'=>'DENIED', 
+								'31'=>'FORFEITED CHARTER',
+								'32'=>'FORFEITED CHARTER PAID',
 								''	=>'',
 								'');
 
@@ -914,6 +919,8 @@ EXPORT Functions := Module
 								'30'=>'DOMESTIC PUBLIC WATER AUTHORITY',
 								'31'=>'FOREIGN PUBLIC WATER AUTHORITY',
 								'33'=>'HOME INSPECTOR',
+								'320'=>'DOMESTIC SERIES LLC',
+								'330'=>'DOMESTIC PROTECTED SERIES',
 								'401'=>'INTL STUDENT EXCHANGE VISITOR PLACEMENT ORG REG(ISEVPO)',
 								'501'=>'',
 								''	 =>'',
