@@ -11,6 +11,7 @@ export Constants := module
     export integer WAIT_TIMEOUT_EXPERIAN := 5;
     export integer STATUS_SUCCESS := 0;
     export integer MAX_THREADS := 20;
+    export integer TARGUS_TIMEOUT := 6;
   end;
 
   export ServiceName := module
@@ -42,6 +43,7 @@ export Constants := module
     export String40 ThreatMetrix_test := 'threatmetrix_test'; // added for threatmetrix_test transactions for modeling team
     export String40 FirstData := 'first_data';           // added for firstdata/fiserv
     export String40 EmailRisk := 'emailrisk'; // added for EmailRisk
+    export String40 IDAFraud := 'IDAReport'; // IDA fraud gateway
     export String40 News := 'news'; // WSK news gateway (currently for AML Attributes)
     export String40 ERI := 'erisalary';
     export String40 NeutralRoxie := 'neutralroxie'; // internal

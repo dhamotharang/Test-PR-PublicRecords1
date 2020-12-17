@@ -1,135 +1,15 @@
-﻿/*--SOAP--
-<message name="headerFileRollupRequest">
-  <part name="DID" type="xsd:string"/>
-  <part name="RID" type="xsd:string"/>
-  <part name="DIDOnly" type="xsd:boolean"/>
-  <separator />
-  <part name="DPPAPurpose" type="xsd:byte" default="1" size="2"/>
-  <part name="GLBPurpose" type="xsd:byte" default="1" size="2"/> 
-	<part name="DataRestrictionMask" type="xsd:string" default="000000000000000000000000" size="24"/>
-	<part name="DataPermissionMask" type="xsd:string" default="111111111111111111111111" size="24"/>
-	<part name="ApplicationType" type="xsd:string"/>
-  <part name="IndustryCLASS" type="xsd:string"/>
-	<part name="ExcludeDMVPII" type="xsd:boolean"/>
-  <separator />
-  <part name="SSN" type="xsd:string"/>
-  <part name="SSNTypos" type="xsd:boolean"/>
-	<part name="UnParsedFullName" type="xsd:string"/>
-  <part name="FirstName" type="xsd:string"/>
-  <part name="AllowNickNames" type="xsd:boolean" indent="true"/>
-  <part name="LastName" type="xsd:string"/>
-  <part name="PhoneticMatch" type="xsd:boolean" indent="true"/>
-  <part name="PhoneticDistanceMatch" type="xsd:boolean" indent="true"/>
-  <part name="DistanceThreshold" type="xsd:unsignedInt" indent="true"/>
-  <part name="MiddleName" type="xsd:string"/>
-  <separator />
-  <part name="Addr" type="xsd:string"/>
-	<part name="FuzzySecRange" type="xsd:integer" indent="true" size="1"/>
-  <part name="City" type="xsd:string"/>
-  <part name="State" type="xsd:string"/>
-  <part name="Zip" type="xsd:string"/>
-  <part name="ZipRadius" type="xsd:unsignedInt"/>
-  <part name="Phone" type="xsd:string"/>
-  <part name="DOB" type="xsd:unsignedInt"/>
-  
-  <part name="ScoreThreshold" type="xsd:unsignedInt"/>
-  <part name="SSNMask" type="xsd:string" default="FIRST5"/>
-  <part name="DOBMask" type="xsd:string" default="DAY"/>
-  <part name="AllowWildcard" type="xsd:boolean"/>
-  <part name="AllowHeaderQuick" type="xsd:boolean" default="true"/>
-  <part name="IncludeAllDIDRecords" type="xsd:boolean"/>
-  <separator />
-  <part name="SkipFCRA_RI" type="xsd:boolean" default="false"/>
-	<part name="ReturnCount"				 type="xsd:unsignedInt"/>
-	<part name="StartingRecord"			 type="xsd:unsignedInt"/>	
-<!--
-  <part name="AddressLimit" type="xsd:unsignedInt"/>
-	<part name="CurrentResidentsOnly" type="xsd:boolean"/>
-	<part name="Household" type="xsd:boolean"/> 
-	<part name="LookupType" type="xsd:string"/>
-	<part name="NoLookupSearch" type="xsd:boolean"/>
-	<part name="BestOnly" type="xsd:boolean"/>
-	<part name="CurrentOnly" type="xsd:boolean"/>
-	<part name="DoNotFillBlanks" type="xsd:boolean"/> 
-	<part name="GroupByDID" type="xsd:boolean"/> 
-	<part name="KeepOldSsns" type="xsd:boolean"/>
-	<part name="NonExclusion" type="xsd:boolean"/>
-	<part name="ReducedData" type="xsd:boolean"/>
-	<part name="DLNumber" type="xsd:string"/>
-	<part name="DLState" type="xsd:string"/>
-	<part name="StrictMatch" type="xsd:boolean"/>
--->
-  <separator />
-  <part name="PersonPickListRequest" type="tns:XmlDataSet" cols="80" rows="30" />
-</message>
-*/
+﻿// =====================================================================
+// ROXIE QUERY
+// -----------
+// For the complete list of input parameters please check published WU.
+// Look at the history of this attribute for the old SOAP info.
+// =====================================================================
 /*--INFO-- This service header file and returns a simplified rolled up view.<br/><br/>*/
-
-/*--HELP-- 
-<pre>
-&lt;PersonPickListReportRequest&gt;
-&lt;row&gt;
-&lt;User&gt;
-  &lt;ReferenceCode&gt;ref_code_str&lt;/ReferenceCode&gt;
-  &lt;BillingCode&gt;billing_code&lt;/BillingCode&gt;
-  &lt;QueryId&gt;query_id&lt;/QueryId&gt;
-  &lt;GLBPurpose&gt;1&lt;/GLBPurpose&gt;
-  &lt;DLPurpose&gt;1&lt;/DLPurpose&gt;
-  &lt;SSNMask&gt;first5&lt;/SSNMask&gt;
-  &lt;DOBMask&gt;&lt;/DOBMask&gt;
-  &lt;EndUser/&gt;
-&lt;/User&gt;
-&lt;Options&gt;
-  &lt;ReturnCount/&gt;
-  &lt;StartingRecord/&gt;
-  &lt;UsePhonetics/&gt;
-  &lt;!-- &lt;CheckNameVariants/&gt; --&gt;
-  &lt;UseNicknames/&gt;
-  &lt;UsePartialSSNMatch&gt;true&lt;/UsePartialSSNMatch&gt;
-  &lt;ReturnUniqueIdsOnly&gt;&lt;/ReturnUniqueIdsOnly&gt;
-  &lt;ReturnCount&gt;&lt;/ReturnCount&gt;
-  &lt;SkipFCRARestriction_RhodIsland&gt;false&lt;/SkipFCRARestriction_RhodIsland&gt;
-  &lt;IncludeAllUniqueIdRecords&gt;false&lt;/IncludeAllUniqueIdRecords&gt;
-&lt;/Options&gt;
-&lt;SearchBy&gt;
-  &lt;UniqueID&gt;&lt;/UniqueID&gt;
-  &lt;SSN&gt;&lt;/SSN&gt;
-  &lt;SSNLast4/&gt;
-  &lt;SSNFirst5&gt;&lt;/SSNFirst5&gt;
-  &lt;Phone10&gt;&lt;/Phone10&gt;
-  &lt;Name&gt;
-    &lt;Full&gt;&lt;/Full&gt;
-    &lt;First&gt;&lt;/First&gt;
-    &lt;Middle&gt;&lt;/Middle&gt;
-    &lt;Last&gt;&lt;/Last&gt;
-  &lt;/Name&gt;
-  &lt;Address&gt;
-    &lt;StreetName&gt;&lt;/StreetName&gt;
-    &lt;StreetNumber&gt;&lt;/StreetNumber&gt;
-    &lt;StreetSuffix&gt;&lt;/StreetSuffix&gt;
-    &lt;UnitNumber&gt;&lt;/UnitNumber&gt;
-    &lt;State&gt;&lt;/State&gt;
-    &lt;City&gt;&lt;/City&gt;
-    &lt;Zip5&gt;&lt;/Zip5&gt;
-  &lt;/Address&gt;
-  &lt;DOB&gt;
-    &lt;Year&gt;&lt;/Year&gt;
-    &lt;Month&gt;&lt;/Month&gt;
-    &lt;Day&gt;&lt;/Day&gt;
-   &lt;/DOB&gt;
-  &lt;Radius/&gt;
-&lt;/SearchBy&gt;
-&lt;/row&gt;
-&lt;/PersonPickListReportRequest&gt;
-</pre>
-*/
-/*--USES-- ut.input_xslt */
-
 IMPORT iesp, doxie, AutoStandardI, AutoHeaderI, standard, suppress, header, FCRA;
 
 export PickListService := MACRO
-	
-	//The following macro defines the field sequence on WsECL page of query. 
+
+	//The following macro defines the field sequence on WsECL page of query.
 	WSInput.MAC_PersonSearch_Services_PickListService();
 	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
   #CONSTANT ('UsingKeepSSNs',true);
@@ -146,10 +26,10 @@ export PickListService := MACRO
   iesp.ECL2ESP.SetInputBaseRequest (first_row);
   // search: name, address, ssn, etc.
   iesp.ECL2ESP.SetInputReportBy (ROW (first_row.searchBy, transform (iesp.bpsreport.t_BpsReportBy, Self := Left, Self := [])));
-  //options: UsePhonetics, StrictMatch, UseNicknames, (IncludeAlsoFound)
+  //options: UsePhonetics, strict-match, UseNicknames, (IncludeAlsoFound)
   iesp.ECL2ESP.SetInputSearchOptions (ROW (first_row.Options, transform (iesp.share.t_BaseSearchOptionEx, Self := Left, Self := [])));
 
-  // other options 
+  // other options
   #stored ('DIDOnly', first_row.Options.ReturnUniqueIdsOnly);
   #stored ('IncludeAllDIDRecords', first_row.Options.IncludeAllUniqueIdRecords);
 
@@ -167,10 +47,10 @@ export PickListService := MACRO
 
 	all_dids         := AI.all_dids.val (project (gm,AI.all_dids.params));  // return all DID records for every match
 	return_just_dids := AI.did_only.val (project (gm, AI.did_only.params)); // suppress everything except DID
-	SortByBankruptcy := first_row.Options.SortByBankruptcy ; // put bankruptcy on the top 
+	SortByBankruptcy := first_row.Options.SortByBankruptcy ; // put bankruptcy on the top
 
   // execute search
-/*    
+/*
   // direct library call: define search parameters
   search_mod := module (project (AutoStandardI.GlobalModule(), AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full, opt))
   end;
@@ -179,13 +59,13 @@ export PickListService := MACRO
   // same as in doxie/header_records, but I may need DIDs as a separate dataset
   dids := doxie.get_dids (forceLocal := true, noFail := false);
   all_header_recs := doxie.header_records_byDID (dids,
-                                                 include_dailies := true, allow_wildcard := false, 
+                                                 include_dailies := true, allow_wildcard := false,
                                                  IncludeAllRecords := all_dids, isrollup:= true);
   // format: roughly doxie/layout_header_records;
 
 
   // needed for checking FCRA Rhode Island restriction:
-  // a) DID-results where has latest record is from RI must be suppressed, 
+  // a) DID-results where has latest record is from RI must be suppressed,
   //    if full name and address were not provided in the input. Query must return appropriate message.
   // b) if RI is among the input criteria, then full name and address must be necessarily provided,
   //    otherwise query must fail;
@@ -198,7 +78,7 @@ export PickListService := MACRO
   //prevent "fake" addresses to bypass RI constranint on the input
 	addr_err := AI.err_stat.val (project (gm, AI.err_stat.params));
 
-  ri_input_complete := (fname_value != '') and (lname_value != '') and 
+  ri_input_complete := (fname_value != '') and (lname_value != '') and
                        (addr_err[1] != 'E') and (addr_value != '') and (state_value != '') and (city_value != '');
 
   boolean ri_input_failure := check_ri and (state_value = 'RI') and ~ri_input_complete;
@@ -260,15 +140,15 @@ export PickListService := MACRO
       dob_str);
     return dob_masked;
   end;
-	
+
   header_grp := group (sort (header_raw, did, penalt), did);
   rec_rolled GetPicklistRollupPresentation (rec_header L, dataset (rec_header) R) := transform
     Self.did := L.did;
     Self.penalt := L.penalt;  // this is actually a minimal penalty
 
     // address: so far just city,state
-    addr_slim := project (R, transform (rec_addr, Self.city_name := Left.city_name, 
-                                                  Self.st := Left.st, 
+    addr_slim := project (R, transform (rec_addr, Self.city_name := Left.city_name,
+                                                  Self.st := Left.st,
                                                   Self.dt_last_seen := Left.dt_last_seen, Self := []));
 
     addr_ddp := dedup (sort (addr_slim, city_name, st), city_name, st);
@@ -299,56 +179,56 @@ export PickListService := MACRO
 
   // check RI restriction
   header_rolled_clean := header_rolled (~check_ri OR ri_input_complete OR (info_code & ri_info_code != ri_info_code));
-	
+
  // Full-scale ESDL presentation //
   iesp.person_picklist.t_PersonPickListRecord FormatToESDL (rec_rolled L ) := transform
-	  
+
 			Self.UniqueId := intformat (L.did, 12, 1);
 			Self._Penalty := L.penalt;
-			Self.Names := project (L.names, transform (iesp.share.t_Name, 
+			Self.Names := project (L.names, transform (iesp.share.t_Name,
 																								 Self := iesp.ECL2ESP.SetName (Left.fname, '', Left.lname, '' , '', '')));
-			Self.Addresses := project (L.addresses, transform (iesp.share.t_Address, 
-																								 Self := iesp.ECL2ESP.SetAddress ('', '', '', '', '', '', '', 
+			Self.Addresses := project (L.addresses, transform (iesp.share.t_Address,
+																								 Self := iesp.ECL2ESP.SetAddress ('', '', '', '', '', '', '',
 																																									Left.city_name, Left.st, '' , '', '')));
 			Self.SSNs := project (L.ssns, transform (iesp.share.t_StringArrayItem, Self.value := Left.ssn));
 
-			Self.DOBs := project (L.dobs, transform (iesp.share.t_MaskableDate, 
-																							 Self := iesp.ECL2ESP.toMaskableDatestring8 (Left.dob)));															 
+			Self.DOBs := project (L.dobs, transform (iesp.share.t_MaskableDate,
+																							 Self := iesp.ECL2ESP.toMaskableDatestring8 (Left.dob)));
   end;
-	
+
   esdl_header := project (header_rolled_clean, FormatToESDL (Left));
 
   // if just DIDs were requested and there's no need to check Rhode Island (and potentially others) restriction,
   // then we can take it directly from search results; otherwise -- from rolled up presentation
   dids_clean := dids (did < Header.constants.QH_start_rid);
-  esdl_dids := if (check_ri, 
+  esdl_dids := if (check_ri,
                    project (esdl_header, transform (iesp.person_picklist.t_PersonPickListRecord,
                                                     Self.UniqueId := Left.UniqueId, Self := [])),
                    project (dids_clean, transform (iesp.person_picklist.t_PersonPickListRecord,
                                                    Self.UniqueId := intformat (Left.did, 12, 1), Self := [])));
-	
+
   records_pre := if (return_just_dids, sort (esdl_dids, UniqueId), sort (esdl_header, _Penalty, UniqueId));
 
-  records_bk := PersonSearch_Services.Functions.GetBankruptcyFlag(records_pre);														
+  records_bk := PersonSearch_Services.Functions.GetBankruptcyFlag(records_pre);
 
   records_esdl := if(SortByBankruptcy,
                       project(sort(records_bk, if(_HasBankruptcy, 0, 1), _Penalty, UniqueId), iesp.person_picklist.t_PersonPickListRecord),
                       records_pre);
-  
+
   // set up non-fatal messages
   ds_message := if (check_ri and ~ri_input_complete and exists (header_rolled (info_code & ri_info_code = ri_info_code)),
-// TODO:  I wouldn't want to reuse an error code, but it's not clear if the separate set of codes is feasible to have  
+// TODO:  I wouldn't want to reuse an error code, but it's not clear if the separate set of codes is feasible to have
                     dataset ([{305, doxie.ErrorCodes (305)}], iesp.share.t_CodeMap),
                     dataset ([], iesp.share.t_CodeMap));
 
   // paging; final transforms
   iesp.ECL2ESP.Marshall.Mac_Set (first_row.Options);
-	iesp.ECL2ESP.Marshall.MAC_Marshall_Results (records_esdl, res_esdl, iesp.person_picklist.t_PersonPickListResponse, 
+	iesp.ECL2ESP.Marshall.MAC_Marshall_Results (records_esdl, res_esdl, iesp.person_picklist.t_PersonPickListResponse,
                                               , , SubjectTotalCount, Messages, ds_message);
-  
+
   // output (dids, named('dids'));
   // output (all_header_recs, named('header'));
   // output (header_rolled, named ('header_rolled'));
-  if (ri_input_failure, FAIL (305, doxie.ErrorCodes (305)), 
+  if (ri_input_failure, FAIL (305, doxie.ErrorCodes (305)),
                         output (res_esdl, named('Results')));
 ENDMACRO;

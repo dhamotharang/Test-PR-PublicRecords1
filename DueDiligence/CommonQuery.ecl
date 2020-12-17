@@ -231,7 +231,7 @@ EXPORT CommonQuery := MODULE
     END;
         
     
-    EXPORT mac_GetCompliance(UNSIGNED3 dppaIn, UNSIGNED3 glbaIn, STRING drmIn, STRING dpmIn, STRING10 industryIn, 
+    EXPORT GetCompliance(UNSIGNED3 dppaIn, UNSIGNED3 glbaIn, STRING drmIn, STRING dpmIn, STRING10 industryIn, 
                              UNSIGNED1 lexIDSrcOptOutIn, STRING transIDIn, STRING batchUIDIn, UNSIGNED6 globalCoIDIn) := FUNCTION
       
         compliance := MODULE(DueDiligence.DDInterface.iDDRegulatoryCompliance)
@@ -302,6 +302,7 @@ EXPORT CommonQuery := MODULE
             // EXPORT BOOLEAN includeFederalLegalEvent := useMods AND DueDiligence.ConstantsQuery.MODULE_LEGAL IN setMods; //not yet implemented
             // EXPORT BOOLEAN includeFederalLegalMatchLevel := useMods AND DueDiligence.ConstantsQuery.MODULE_LEGAL IN setMods;  //not yet implemented
             EXPORT BOOLEAN includeCivilLegalEvent := useMods AND DueDiligence.ConstantsQuery.MODULE_LEGAL IN setMods;
+            EXPORT BOOLEAN includeCivilLegalEventFilingAmount := useMods AND DueDiligence.ConstantsQuery.MODULE_LEGAL IN setMods;
             EXPORT BOOLEAN includeOffenseType := useMods AND DueDiligence.ConstantsQuery.MODULE_LEGAL IN setMods;
             EXPORT BOOLEAN includeAgeRange := useMods AND DueDiligence.ConstantsQuery.MODULE_IDENTITY IN setMods;
             EXPORT BOOLEAN includeIdentityRisk := useMods AND DueDiligence.ConstantsQuery.MODULE_IDENTITY IN setMods;
@@ -345,6 +346,7 @@ EXPORT CommonQuery := MODULE
             // EXPORT BOOLEAN includeFederalLegalEvent := useMods AND DueDiligence.ConstantsQuery.MODULE_LEGAL IN setMods;
             // EXPORT BOOLEAN includeFederalLegalMatchLevel := useMods AND DueDiligence.ConstantsQuery.MODULE_LEGAL IN setMods; 
             EXPORT BOOLEAN includeCivilLegalEvent := useMods AND DueDiligence.ConstantsQuery.MODULE_LEGAL IN setMods;
+            EXPORT BOOLEAN includeCivilLegalEventFilingAmount := useMods AND DueDiligence.ConstantsQuery.MODULE_LEGAL IN setMods;
             EXPORT BOOLEAN includeOffenseType := useMods AND DueDiligence.ConstantsQuery.MODULE_LEGAL IN setMods;
             EXPORT BOOLEAN includeBEOProfLicense := useMods AND DueDiligence.ConstantsQuery.MODULE_NETWORK IN setMods;
             EXPORT BOOLEAN includeBEOUSResidency := useMods AND DueDiligence.ConstantsQuery.MODULE_NETWORK IN setMods;

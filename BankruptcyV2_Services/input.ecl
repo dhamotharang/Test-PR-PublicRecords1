@@ -1,15 +1,15 @@
-import autokeyi, autoheaderi, autostandardi;
-export input := module
+IMPORT autokeyi, autoheaderi, autostandardi;
+EXPORT input := MODULE
 
-	export params := interface(
-		AutoKeyI.AutoKeyStandardFetchBaseInterface,
-		AutoHeaderI.LIBIN.FetchI_Hdr_Indv.base,
-		AutoHeaderI.LIBIN.FetchI_Hdr_Biz.base)
-    export boolean skip_ids_search := false; // controls whether to run autokey and deep-dive search when fetching IDs
-                                             //  or use only provided DIDs, BDIDs, etc.
-	end;
-	
-	export it 				:= AutoStandardI.InterfaceTranslator;
-	export gm 				:= AutoStandardI.GlobalModule();
+  EXPORT params := INTERFACE(
+    AutoKeyI.AutoKeyStandardFetchBaseInterface,
+    AutoHeaderI.LIBIN.FetchI_Hdr_Indv.base,
+    AutoHeaderI.LIBIN.FetchI_Hdr_Biz.base)
+    EXPORT BOOLEAN skip_ids_search := FALSE; // controls whether to run autokey AND deep-dive search when fetching IDs
+                                             // or use only provided DIDs, BDIDs, etc.
+  END;
+  
+  EXPORT it := AutoStandardI.InterfaceTranslator;
+  EXPORT gm := AutoStandardI.GlobalModule();
 
-end;
+END;

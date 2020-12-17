@@ -222,6 +222,7 @@ EXPORT Layouts := MODULE
     STRING8    date_last_verified;
     STRING50   domain_status;
     BOOLEAN    accept_all;
+    STRING     source;
   END;
 
   EXPORT batch_final_rec := RECORD

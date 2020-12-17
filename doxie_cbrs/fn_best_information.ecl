@@ -5,36 +5,13 @@ EXPORT fn_best_information(
   BOOLEAN in_use_supergroup
 ) :=
 FUNCTION
-  temp_filter_on_ids := JOIN (in_group_ids, Business_Header.Key_BH_SuperGroup_BDID,
-                              LEFT.bdid=RIGHT.bdid,
-                              TRANSFORM (RIGHT),
-                              KEEP (1), LIMIT (0));
-  best_rec := RECORD
-    STRING bdid; // i know, NOT a STRING.
-    BOOLEAN fromdca := FALSE;
-    STRING8 dt_last_seen := '';
-    QSTRING120 company_name := '';
-    QSTRING10 prim_range := '';
-    STRING2 predir := '';
-    QSTRING28 prim_name := '';
-    QSTRING4 addr_suffix := '';
-    STRING2 postdir := '';
-    QSTRING5 unit_desig := '';
-    QSTRING8 sec_range := '';
-    QSTRING25 city := '';
-    STRING2 state := '';
-    STRING5 zip := '';
-    STRING4 zip4 := '';
-    STRING15 phone := ''; // International numbers
-    STRING10 fein := '';
-    UNSIGNED1 best_flags := 0; // also ok NOT a STRING
-    BOOLEAN isCurrent := FALSE;
-    BOOLEAN hasBBB := FALSE;
-    UNSIGNED1 level := 0;
-    STRING60 msaDesc := '';
-    STRING18 county_name := '';
-    STRING4 msa := '';
-  END;
+  temp_filter_on_ids := 
+    JOIN (in_group_ids, Business_Header.Key_BH_SuperGroup_BDID,
+      LEFT.bdid=RIGHT.bdid,
+      TRANSFORM (RIGHT),
+      KEEP (1), LIMIT (0));
+
+  best_rec := $.layout_best_info;
   
   best_dca := doxie_cbrs.fn_DCA_records_dayton(in_group_ids,in_use_supergroup);
   
@@ -56,20 +33,21 @@ FUNCTION
     SELF.county_name := IF (L.county <> '', R.county_name, '');
     SELF.msa := IF(L.msa <> '0000', L.msa, '');
     SELF.prim_name := IF(L.prim_range = '' AND L.predir = '' AND
-               L.prim_name = '' AND L.addr_suffix = '' AND
-               L.postdir = '' AND L.sec_range = '' AND L.unit_desig = '',
-               L.street, L.prim_name);
+      L.prim_name = '' AND L.addr_suffix = '' AND
+      L.postdir = '' AND L.sec_range = '' AND L.unit_desig = '',
+      L.street, L.prim_name);
     SELF.bdid := (STRING)l.group_id;
       // The following condition filters out blank phone numbers and numbers whose last seven digits (chars, actually) are zeroes.
     SELF.phone := IF(STD.Str.FilterOut(L.phone[MAX(1, LENGTH(TRIM(L.phone))-6)..], '0') != '', L.phone, '');
     SELF.fromdca := TRUE;
     SELF := L;
+    SELF := []; // dt_last_seen, fein, best_flags
   END;
   
   best_dca_rec_trans := JOIN(best_dca_rec,Census_Data.Key_Fips2County,
-                            KEYED(LEFT.state = RIGHT.state_code AND
-                            LEFT.county[3..5] = RIGHT.county_fips),
-                            add_msa_county(LEFT,RIGHT), LEFT OUTER, KEEP (1));
+    KEYED(LEFT.state = RIGHT.state_code AND
+    LEFT.county[3..5] = RIGHT.county_fips),
+    add_msa_county(LEFT,RIGHT), LEFT OUTER, KEEP (1));
                             
   temp_filter_on_ids keepl(temp_filter_on_ids l) := TRANSFORM
     SELF := l;

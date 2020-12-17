@@ -1,4 +1,4 @@
-﻿IMPORT Foreclosure_Vacancy, Property, ut, std;
+﻿IMPORT Foreclosure_Vacancy, dx_Property, ut, std;
 
 EXPORT BatchService_Records(DATASET(Foreclosure_Services.Layouts.layout_batch_in) ds_xml_in = DATASET([],Foreclosure_Services.Layouts.layout_batch_in), boolean includeBlackKnight=false) := 
 	FUNCTION
@@ -44,7 +44,7 @@ EXPORT BatchService_Records(DATASET(Foreclosure_Services.Layouts.layout_batch_in
 			);
 			
 		//Get data
-		byAddr := Foreclosure_Vacancy.getData(isRenewal:=TRUE).fn_Find_Foreclosure_By_Addr(input_cleaned,Property.Key_Foreclosures_Addr,includeBlackKnight);
+		byAddr := Foreclosure_Vacancy.getData(isRenewal:=TRUE).fn_Find_Foreclosure_By_Addr(input_cleaned, dx_Property.Key_Foreclosures_Addr,includeBlackKnight);
 		byDid := Foreclosure_Vacancy.getData(isRenewal:=TRUE).fn_Find_Foreclosure_By_Did(ds_xml_in,includeBlackKnight);
 		response := byAddr+ByDid;
 

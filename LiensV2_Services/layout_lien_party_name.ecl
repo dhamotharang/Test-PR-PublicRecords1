@@ -1,5 +1,5 @@
-import address;
-export layout_lien_party_name := record
+IMPORT address;
+EXPORT layout_lien_party_name := RECORD
   address.layout_clean_name;
-  string200 cname;
-end;
+  STRING200 cname;
+END;

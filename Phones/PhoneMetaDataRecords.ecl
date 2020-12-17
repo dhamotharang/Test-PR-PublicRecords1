@@ -5,6 +5,7 @@ EXPORT PhoneMetaDataRecords(DATASET(Phones.Layouts.PhoneAttributes.BatchIn)   dB
 := FUNCTION 
 
     batch_mod := MODULE(PROJECT(in_mod, Phones.IParam.BatchParams, opt))
+    EXPORT BOOLEAN AllowPortingData := Phones.Constants.PhoneAttributes.AllowPortingData;
     END;
 		
  
@@ -13,7 +14,8 @@ EXPORT PhoneMetaDataRecords(DATASET(Phones.Layouts.PhoneAttributes.BatchIn)   dB
      iesp.phonemetadatasearch.t_PhoneMetaDataSearchRecord tFormat2PhoneMetadata(Phones.Layouts.PhoneAttributes.BatchOut l) :=		TRANSFORM
       SELF.PhoneNumber := l.phoneno;
    	  SELF.isCurrent := l.is_current; 
-   		 SELF.CarrierInfo.id := l.carrier_id;
+   		// SELF.CarrierInfo.id := l.carrier_id;
+         SELF.CarrierInfo.id := ''; //Iconnective changes  
    		 SELF.CarrierInfo.Name := l.carrier_name;
    		 SELF.CarrierInfo.Category := l.carrier_category;
    		 SELF.CarrierInfo.City := l.carrier_city;
@@ -29,7 +31,8 @@ EXPORT PhoneMetaDataRecords(DATASET(Phones.Layouts.PhoneAttributes.BatchIn)   dB
    		 SELF.PhoneServiceType   := l.phone_serv_type;
    		 SELF.PhoneServiceDescription    := l.phone_serv_type_desc;
       SELF.DisconnectDate := iesp.ECL2ESP.toDate(l.disconnect_date);
-      SELF.PortedDate := iesp.ECL2ESP.toDate(l.ported_date);
+      //SELF.PortedDate := iesp.ECL2ESP.toDate(l.ported_date);
+      SELF.PortedDate := row ({0, 0, 0}, iesp.share.t_Date);; //Iconnective change
       SELF.SuspendedDate := iesp.ECL2ESP.toDate(l.suspended_date);
       SELF.ReactivatedDate := iesp.ECL2ESP.toDate(l.reactivated_date);
       SELF.SwappedPhoneNumberDate := iesp.ECL2ESP.toDate(l.swapped_phone_number_date);

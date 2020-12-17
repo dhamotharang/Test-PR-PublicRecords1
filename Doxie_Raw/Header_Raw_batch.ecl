@@ -10,8 +10,6 @@ export Header_Raw_batch(
 FUNCTION
 
 is_knowx := mod_access.isConsumer ();
-glb_ok := mod_access.isValidGlb();
-dppa_ok := mod_access.isValidDppa();
 
 kh := IF(is_knowx,Infutor.Key_Header_Infutor_Knowx,Doxie.Key_Header);
 

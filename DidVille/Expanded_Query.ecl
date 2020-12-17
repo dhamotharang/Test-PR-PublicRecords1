@@ -7,8 +7,6 @@ unsigned1 MaxRecsPer  := 50 : stored('MaxRecordsPerCandidate');
 
 // doxie.MAC_Header_Field_Declare()
 mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
-glb_ok := mod_access.isValidGLB ();
-dppa_ok := mod_access.isValidDPPA ();
 
 // nofold is added as a workaround and better be removed after HPCC-13292 is fixed
 ds := group(limit(NOFOLD(doxie.Get_Dids()),MaxCands,FAIL('Too Many Candidates - Query Aborted')),did,all);
@@ -57,17 +55,17 @@ t_n1 := rollup(sort(t_names,lname,-fname,name_suffix,-mname),ut.lead_contains(le
 
 name_q(string f, string m, string l, string ns) :=
   MAP( length(trim(f)) = 0 => -2,
-       length(trim(f)) ) + 
+       length(trim(f)) ) +
   MAP( length(trim(m)) = 0 => 0,
        length(trim(m)) = 1 => 1,
-       3 ) + 
+       3 ) +
   MAP( length(trim(l)) = 0 => -4,
        stringlib.stringfind(trim(l),' ',1)<>0 => -1,
-       length(trim(l)) ) + 
+       length(trim(l)) ) +
   MAP( length(trim(ns)) = 0 => 0,
        1 );
-	  
-	   
+
+
 ts_n1 := iterate(sort(t_n1,cnt),score_name(left,right,1));
 ts_n2 := iterate(sort(ts_n1,d_first),score_name(left,right,2));
 // better name quality score
@@ -95,7 +93,7 @@ addr_rec := record
   unsigned2 g_score := 0;
   unsigned2 t_score := 0;
   end;
-  
+
 t_addrs := table(t_data,addr_rec,did,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,city_name,st,zip,zip4);
 
 addr_rec eat_addr(addr_rec le,addr_rec ri) := transform
@@ -110,7 +108,7 @@ t_a3 := rollup(sort(t_a2,prim_range,prim_name,zip,-sec_range),left.prim_range=ri
 addr_rec score_addr(addr_rec le,addr_rec ri,unsigned fld) := transform
   self.f_score := IF( fld <> 1, ri.f_score, le.f_score+1 );
   self.r_score := IF( fld <> 2, ri.r_score, le.r_score+1 );
-  self.g_score := MAP( fld <> 3 => ri.g_score, 
+  self.g_score := MAP( fld <> 3 => ri.g_score,
                        le.st<>ri.st => 10,
 					   le.g_score=0 => 0,
 					   le.g_score-5 );

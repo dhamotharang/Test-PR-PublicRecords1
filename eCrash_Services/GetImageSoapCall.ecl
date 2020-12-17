@@ -55,6 +55,8 @@ EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
                                        IsVendorHPD => eCrash_Services.Constants.TX_STATE_ABBR,
                                        SuperReportRow[1].jurisdiction_state);
 			SELF.User.MaxWaitSeconds := Request.User.MaxWaitSeconds;
+			SELF.User.QueryId := Request.User.QueryId;
+			SELF.User.AccountNumber  := Request.User.AccountNumber;
 			// Below 3 fields are exclusive to HPD, so Assigining directly
 			SELF.Options.CustomerType := Request.Options.CustomerType;
 			SELF.Options.OrderDate := Request.Options.OrderDate;
@@ -72,6 +74,8 @@ EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 			SELF.SearchBy.ImageHashes := ImageHashes;
 			SELF.SearchBy.ReportID := Request.ReportBy.ReportId;
 			SELF.User.MaxWaitSeconds := Request.User.MaxWaitSeconds;
+			SELF.User.QueryId := Request.User.QueryId;
+			SELF.User.AccountNumber  := Request.User.AccountNumber;
 			SELF := [];	
 		END;	
 		

@@ -1,4 +1,4 @@
-﻿IMPORT _Control, Data_services, Doxie, LN_PropertyV2, LN_PropertyV2_Services, RiskWise, Suppress, profilebooster, risk_indicators, STD;
+﻿IMPORT _Control, Data_services, Doxie, LN_PropertyV2, LN_PropertyV2_Services, RiskWise, Suppress, profilebooster, risk_indicators, STD, FCRA;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Boca_Shell_Property_Common(GROUPED DATASET(risk_indicators.Layout_PropertyRecord) p_address,
@@ -521,6 +521,62 @@ end;
 				SELF.isDeepDive  := FALSE
 			)
 		);
+
+
+// pull out any records that have prop_correct_lnfare or prop_correct_ffids	 
+rec := record
+	string12 did;
+	string20 file_id;
+	string20 flag_file_id;
+	string100 record_id;
+end;
+
+temp := record
+	dataset(rec) flags;  // create a dataset of flags based on the set of prop_correct_lnfare and prop_correct_ffids
+end;
+
+ids_with_property_flags := ids_only(count(prop_correct_ffid)>0);
+
+people_with_property_corrections := project(ids_with_property_flags, transform(temp, 
+	the_did := (string)left.did; 
+	set_property_correct_ffids := left.prop_correct_ffid;
+	set_property_correct_lnfare := left.prop_correct_lnfare;
+	
+	how_many_ffids := count(set_property_correct_ffids);
+	how_many_recids := count(set_property_correct_lnfare);
+	onerec := dataset([{1}], {unsigned a});
+	
+ds_ffids := normalize(onerec, how_many_ffids, 
+	transform(rec, 
+		self.did := the_did;
+		self.file_id := fcra.FILE_ID.search;  // set the initial set to the search file, later will create duplicates for deed and assessor
+		self.flag_file_id := set_property_correct_ffids[counter];
+		self.record_id := '';  // we have a seperate set of record_id, don't need this populated in the set of FFIDs
+		));
+	
+ds_recordIDs := normalize(onerec, how_many_recids, 
+	transform(rec, 
+		self.did := the_did;
+		self.file_id := fcra.FILE_ID.search;  // set the initial set to the search file, later will create duplicates for deed and assessor as needed
+		self.flag_file_id := '';  // we have a seperate set of flag_file_ids, don't need this populated in the set of recordIDs
+		self.record_id := set_property_correct_lnfare[counter];
+		));
+
+// for each set of recordIDs and ffids, need to create another copy for Deed and assessment records because we don't know which they refer to
+self.flags := ds_ffids
+							+ project(ds_ffids, transform(rec, self.file_id := fcra.file_id.deed, self := left))
+							+ project(ds_ffids, transform(rec, self.file_id := fcra.file_id.assessment, self := left))
+							+ ds_recordIDs 
+							+ project(ds_recordIDs, transform(rec, self.file_id := if(left.record_id[2]='A', fcra.file_id.assessment, fcra.file_id.deed), self := left));
+	));
+
+// need to use these flags instead of calling fcra.GetFlagFile inside of fn_get_report_2.
+// fcra.GetFlagFile doesn't include records from PersonContext, so it's not complete.  fcra.GetFlagFile will be going away
+
+property_flags_from_shell_overrides := project(people_with_property_corrections.flags,
+transform(fcra.Layout_override_flag, self := left; self := [];) );
+
+property_correction_flags := if (is_FCRA and ~OnThor, property_flags_from_shell_overrides, fcra.compliance.blank_flagfile);	
 	
 	// 2.a. Call function fn_get_report(); type results explicitly for reference:
 	LN_PropertyV2_Services.layouts.combined.tmp property_records_full_raw := 
@@ -531,7 +587,8 @@ end;
 			inTrimBySortBy    := FALSE,
 			nonSS             := suppress.constants.NonSubjectSuppression.doNothing,
 			isFCRA            := is_FCRA,
-			in_mod            := input_mod);
+			in_mod            := input_mod,
+			ds_flags					:= property_correction_flags);
 
 	// 2.b. Convert single-record child datasets into datarows for rolling up later.
 	// (You can't rollup a child dataset within a dataset.)
@@ -1252,7 +1309,7 @@ transaction_type_resale := ['1', '001']; // save time in query if we don't have 
 	// output(ds_property_sold_records, named('ds_property_sold_records'));
 	// output(ds_final, named('ds_final'));
 	// output(single_property, named('single_property'));
-																	
+	
 	RETURN Single_Property;
 
 END;

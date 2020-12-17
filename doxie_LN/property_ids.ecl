@@ -107,7 +107,7 @@ currents := if(Use_CurrentlyOwnedProperty_value, cor, bydid);
   
 
 cp := dedup(currents + priors, all);
-Suppress.MAC_Suppress(cp,cp_filter,mod_access.application_type,,,Suppress.Constants.DocTypes.FaresID,fid);
+Suppress.MAC_Suppress(cp,cp_filter,mod_access.application_type,,,Suppress.Constants.DocTypes.FaresID,fid, isFCRA := isFCRA);
 
 // cannot use pullSSN in fcra-side:
 cpclean := IF (IsFCRA, cp, cp_filter);

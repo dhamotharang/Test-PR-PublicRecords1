@@ -43,7 +43,6 @@ EXPORT Search_Function(
 	boolean IncludeStatusRefreshChecks = FALSE,
 	DATASET({string32 DeferredTransactionID}) DeferredTransactionIDs = DATASET([], {string32 DeferredTransactionID}),
     string5 StatusRefreshWaitPeriod = '',
-    string10 ESPInterfaceVersion = '',
     boolean IsBatch = FALSE // Changes the output of the DTE child dataset
   ) := function
 
@@ -1217,6 +1216,7 @@ boolean Alerts200 := (le.SubjectDeceased='1' or attr.SubjectDeceased = '1') or (
   self.CheckTimeOldest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
   self.CheckTimeNewest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
   self.CheckNegTimeOldest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
+  self.CheckNegTimeNewest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
   self.CheckNegRiskDecTimeNewest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
   self.CheckNegPaidTimeNewest := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
   self.CheckCountTotal := if(AlertRegulatoryCondition = '0' and CheckingIndicatorsRequest, '-1', '');
@@ -1351,7 +1351,7 @@ riskview5_final_results := if(CheckingIndicatorsRequest, riskview5_attr_search_r
 boolean InvokeStatusRefresh := IncludeStatusRefreshChecks = TRUE AND COUNT(DeferredTransactionIDs) = 0 AND ~AttributesOnly;
 boolean InvokeDTE := IncludeStatusRefreshChecks = TRUE AND COUNT(DeferredTransactionIDs) <> 0;
 
-riskview_status_refresh := IF(InvokeStatusRefresh, Riskview.Functions.JuLiProcessStatusRefresh(clam, gateways, riskview5_final_results, ExcludeStatusRefresh, StatusRefreshWaitPeriod, ESPInterfaceVersion, IsBatch, riskview_input, InvokeStatusRefresh), dataset([], riskview.layouts.layout_riskview5_search_results));
+riskview_status_refresh := IF(InvokeStatusRefresh, Riskview.Functions.JuLiProcessStatusRefresh(clam, gateways, riskview5_final_results, ExcludeStatusRefresh, StatusRefreshWaitPeriod, IsBatch, riskview_input, InvokeStatusRefresh), dataset([], riskview.layouts.layout_riskview5_search_results));
 riskview_dte := IF(InvokeDTE, Riskview.Functions.JuLiProcessDTE(DeferredTransactionIDs, clam, gateways, riskview5_final_results, InvokeDTE), dataset([], riskview.layouts.layout_riskview5_search_results));
 
 riskview5_with_status_refresh := MAP(InvokeStatusRefresh => riskview_status_refresh,

@@ -267,10 +267,10 @@ invalidGong_roxie := JOIN (datephoneaddrfirstlast, invalid_phone_counts,
                        LEFT.seq = RIGHT.seq,
 											 addInvalidGong(LEFT,RIGHT),
 											 LEFT OUTER, lookup);
-invalidGong_thor := group(JOIN (datephoneaddrfirstlast, invalid_phone_counts,
+invalidGong_thor := JOIN (datephoneaddrfirstlast, invalid_phone_counts,
                        LEFT.seq = RIGHT.seq,
 											 addInvalidGong(LEFT,RIGHT),
-											 LEFT OUTER), seq);
+											 LEFT OUTER);
 
 #IF(onThor)
 	invalidGong := invalidGong_thor;

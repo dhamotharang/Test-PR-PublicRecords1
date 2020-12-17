@@ -14,27 +14,34 @@ EXPORT getPersonLegal(DATASET(DueDiligence.v3Layouts.Internal.PersonTemp) inData
     //get legal data for all unique individuals
     rawLegalResults := DueDiligence.v3SharedData.getCriminalData(unqiuePeople);
     rawCivilResults := DueDiligence.v3PersonData.getLienJundgementEviction(uniqueInquired, regulatoryAccess, ddOptions.ssnMask);
+    rawBankruptcyResults := DueDiligence.v3PersonData.getBankruptcy(uniqueInquired);
     
     //based on the legal data - populate requested attributes
     noAttributeResults := DATASET([], DueDiligence.v3Layouts.InternalPerson.PersonAttributes);
     
     offenseTypeAttributeResults := DueDiligence.v3PersonAttributes.getOffenseType(unqiuePeople, rawLegalResults);
     stateLegalEventAttributeResults := DueDiligence.v3PersonAttributes.getStateLegalEvent(unqiuePeople, rawLegalResults);
-    civilLegalEventAttributeResults := DueDiligence.v3PersonAttributes.getCivilLegalEvent(inData, rawCivilResults);
+    civilLegalEventAttributeResults := DueDiligence.v3PersonAttributes.getCivilLegalEvent(inData, rawCivilResults, rawBankruptcyResults);
+    civilLegalEventFilingAmtAttributeResults := DueDiligence.v3PersonAttributes.getCivilLegalEventFilingAmt(inData, rawCivilResults);
     
     
     offenseType := IF(attributesRequested.includeAll OR attributesRequested.includeOffenseType, offenseTypeAttributeResults, noAttributeResults);
     stateLegalEvent := IF(attributesRequested.includeAll OR attributesRequested.includeStateLegalEvent, stateLegalEventAttributeResults, noAttributeResults);
     civilLegalEvent := IF(attributesRequested.includeAll OR attributesRequested.includeCivilLegalEvent, civilLegalEventAttributeResults, noAttributeResults);
+    civilLegalEventFilingAmt := IF(attributesRequested.includeAll OR attributesRequested.includeCivilLegalEventFilingAmount, civilLegalEventFilingAmtAttributeResults, noAttributeResults);
 
    
     //add all the attributes together to get all necessary legal attributes
-    legalAttributes := ROLLUP(SORT(offenseType + stateLegalEvent + civilLegalEvent, lexID),
+    legalAttributes := ROLLUP(SORT(offenseType + stateLegalEvent + civilLegalEvent + civilLegalEventFilingAmt, lexID),
                               LEFT.lexID = RIGHT.lexID,
                               TRANSFORM(DueDiligence.v3Layouts.InternalPerson.PersonAttributes,
                                         SELF.lexID := LEFT.lexID;
+                                        
                                         SELF.perCivilLegalEvent := DueDiligence.v3Common.General.FirstPopulatedString(perCivilLegalEvent);
                                         SELF.perCivilLegalEvent_Flag := DueDiligence.v3Common.General.FirstPopulatedString(perCivilLegalEvent_Flag);
+                                        
+                                        SELF.perCivilLegalEventFilingAmt := DueDiligence.v3Common.General.FirstPopulatedString(perCivilLegalEventFilingAmt);
+                                        SELF.perCivilLegalEventFilingAmt_Flag := DueDiligence.v3Common.General.FirstPopulatedString(perCivilLegalEventFilingAmt_Flag);
                                         
                                         SELF.perOffenseType := DueDiligence.v3Common.General.FirstPopulatedString(perOffenseType);
                                         SELF.perOffenseType_Flag := DueDiligence.v3Common.General.FirstPopulatedString(perOffenseType_Flag);
@@ -66,7 +73,8 @@ EXPORT getPersonLegal(DATASET(DueDiligence.v3Layouts.Internal.PersonTemp) inData
                       (attributesRequested.includeAll OR 
                       (attributesRequested.includeOffenseType AND
                       attributesRequested.includeStateLegalEvent AND
-                      attributesRequested.includeCivilLegalEvent)), legalReportData, noLegalReportData);
+                      attributesRequested.includeCivilLegalEvent AND
+                      attributesRequested.includeCivilLegalEventFilingAmount)), legalReportData, noLegalReportData);
     
     
     //join the attributes and report data together
@@ -78,6 +86,8 @@ EXPORT getPersonLegal(DATASET(DueDiligence.v3Layouts.Internal.PersonTemp) inData
                                   
                                   SELF.perCivilLegalEvent := LEFT.perCivilLegalEvent;
                                   SELF.perCivilLegalEvent_Flag := LEFT.perCivilLegalEvent_Flag;
+                                  SELF.perCivilLegalEventFilingAmt := LEFT.perCivilLegalEventFilingAmt;
+                                  SELF.perCivilLegalEventFilingAmt_Flag := LEFT.perCivilLegalEventFilingAmt_Flag;
                                   SELF.perOffenseType := LEFT.perOffenseType;
                                   SELF.perOffenseType_Flag := LEFT.perOffenseType_Flag;
                                   SELF.perStateLegalEvent := LEFT.perStateLegalEvent;

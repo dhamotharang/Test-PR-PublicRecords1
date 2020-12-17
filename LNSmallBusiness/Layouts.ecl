@@ -1,4 +1,4 @@
-import iesp;
+﻿import iesp,LNSmallBusiness;
 
 export Layouts := MODULE
 	export Model_With_Seq := RECORD
@@ -183,4 +183,15 @@ export Layouts := MODULE
     RECORD
       STRING ModelName;
     END;
+  
+  EXPORT SmallBusinessBipCombinedReportIntermediateResponse := 
+    RECORD
+      iesp.smallbusinessbipcombinedreport.t_SmallBusinessBipCombinedReportResponse;
+      DATASET(LNSmallBusiness.BIP_Layouts.IntermediateLayout) SBA_Results;
+      BOOLEAN SmallBiz_SBFE_Royalty;
+      UNSIGNED6 Rep_LexID;
+      STRING20 LNSmallBizModelsType;
+      SET OF STRING NewLNSmallBizModelsType;
+    END;
+
 END;

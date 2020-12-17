@@ -87,6 +87,7 @@ MODULE
 		EXPORT BOOLEAN UseTransUnionPVS       := FALSE;
 		EXPORT BOOLEAN IncludeInhousePhones   := FALSE;
 		EXPORT BOOLEAN UseInhousePhones       := FALSE;
+    EXPORT BOOLEAN IncludePortingDetails      := FALSE;
 
     //zumigo options
     EXPORT BOOLEAN NameAddressValidation        := FALSE;
@@ -113,6 +114,7 @@ MODULE
     EXPORT BOOLEAN IsGovSearch := FALSE;
     EXPORT BOOLEAN UseInHousePhoneMetadataOnly := FALSE;
     EXPORT BOOLEAN SuppressRiskIndicatorWarnStatus := FALSE;
+    EXPORT BOOLEAN AllowPortingData := FALSE;
   END;
 
   EXPORT PhoneVerificationParams :=
@@ -290,6 +292,8 @@ MODULE
       EXPORT BOOLEAN hasActivePhoneTransactionCountRule := IncludeRiskIndicators AND EXISTS(RiskIndicators(RiskId = $.Constants.RiskRules.PhoneTransactionCount AND ACTIVE));
       EXPORT BOOLEAN IsGovsearch := application_type in AutoStandardI.Constants.GOV_TYPES;
       EXPORT BOOLEAN SuppressRiskIndicatorWarnStatus            :=  pfOptions.SuppressRiskIndicatorWarnStatus : STORED('SuppressRiskIndicatorWarnStatus'); // Need to read from stored for options defined in MBS for API transactions as they would come under the root tag;
+      EXPORT BOOLEAN IncludePortingDetails            := pfOptions.IncludePortingDetails : STORED('IncludePortingDetails');
+      EXPORT BOOLEAN AllowPortingData := TRUE; //To get Iconnective data from Phones.GetPhoneMetadata_wLERG6
     END;
 
     RETURN in_params;
@@ -405,7 +409,9 @@ MODULE
                                                       IncludeDeviceInfo OR IncludeDeviceChangeInfo;
       EXPORT BOOLEAN UseZumigoIdentity	          := IncludeZumigoOptions AND BillingId <>'' AND doxie.compliance.use_ZumigoIdentity(dpm);
       EXPORT BOOLEAN IsGovsearch := mod_access.application_type in AutoStandardI.Constants.GOV_TYPES;
-      EXPORT BOOLEAN SuppressRiskIndicatorWarnStatus                 :=  FALSE : STORED('SuppressRiskIndicatorWarnStatus');
+      EXPORT BOOLEAN SuppressRiskIndicatorWarnStatus :=  FALSE : STORED('SuppressRiskIndicatorWarnStatus');
+      EXPORT BOOLEAN IncludePortingDetails               := FALSE : STORED('IncludePortingDetails');
+      EXPORT BOOLEAN AllowPortingData := TRUE;
     END;
 
     RETURN input_Mod;

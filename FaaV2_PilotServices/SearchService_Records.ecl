@@ -43,7 +43,7 @@ export SearchService_Records := module
     alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_mod.FCRAPurpose, in_mod.FFDOptionsMask)[1];
     suppress_results_due_alerts := isFCRA and alert_indicators.suppress_records;
     
-    Suppress.MAC_Suppress(ids,ids_tmp,in_mod.applicationtype,Suppress.Constants.LinkTypes.DID,did);
+    Suppress.MAC_Suppress(ids,ids_tmp,in_mod.applicationtype,Suppress.Constants.LinkTypes.DID,did, isFCRA := isFCRA);
     
     // join to payload key.    
     // added condition to limit our records coming back.

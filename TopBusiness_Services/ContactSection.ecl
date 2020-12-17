@@ -1,5 +1,5 @@
 ﻿import AutoStandardI,BankruptcyV3,BipV2,BizLinkFull,CriminalRecords_Services,deathv2_services,iesp,
-LiensV2,NID,Property,Suppress,Std,ut,BusinessCredit_Services, topbusiness_services;
+LiensV2,NID,dx_Property,Suppress,Std,ut,BusinessCredit_Services, topbusiness_services;
  
 export ContactSection := module
 	export fn_fullView(	dataset(TopBusiness_Services.ContactSection_Layouts.rec_Input) ds_in_data,
@@ -255,7 +255,7 @@ export ContactSection := module
 																	 self := []),
 																	 left outer, keep(1));
 
-		PersonInfoForeclosure := join(personInfoLien,Property.Key_Foreclosure_DID,
+		PersonInfoForeclosure := join(personInfoLien,dx_Property.Key_Foreclosure_DID,
 																	keyed(left.did= right.did), 
 																	transform(layout_derog_bools_contact,
 																		self.foreclosureFlag := right.did != 0,
@@ -263,7 +263,7 @@ export ContactSection := module
 																		self := []),
 																		left outer, keep(1));
 																		
-		PersonInfoNOD 				:= join(personInfoForeclosure,Property.Key_NOD_DID,
+		PersonInfoNOD 				:= join(personInfoForeclosure,dx_Property.Key_NOD_DID,
 																	keyed(left.did= right.did), 
 																	transform(layout_derog_bools_contact,
 																		self.nodFlag := right.did != 0,

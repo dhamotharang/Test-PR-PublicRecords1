@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, Doxie, iesp;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, Doxie;
 
 /*
 
@@ -88,12 +88,10 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 
     busAsInd := DueDiligence.getBusAsInd(addrRisk, options, mod_access);  //must be called after getBusSOSDetail & getBusHeader
 
-    busSicNaic := DueDiligence.getBusSicNaic(busAsInd, options, linkingOptions, includeReport, mod_access);  //must be called after getBusRegistration & getBusHeader & getBusSOSDetail
 
 
-    addCounts := PROJECT(busSicNaic, TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+    addCounts := PROJECT(busAsInd, TRANSFORM(DueDiligence.Layouts.Busn_Internal,
                                                 SELF.numOfRegAgents := COUNT(LEFT.registeredAgents);
-                                                SELF.numOfSicNaic := COUNT(LEFT.sicNaicSources);
                                                 SELF.execCount := COUNT(LEFT.execs);
                                                 SELF := LEFT;));
 
@@ -129,7 +127,6 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 
     IF(debugMode, OUTPUT(addrRisk, NAMED('addrRisk')));
     IF(debugMode, OUTPUT(busAsInd, NAMED('busAsInd')));
-    IF(debugMode, OUTPUT(busSicNaic, NAMED('busSicNaic')));
     IF(debugMode, OUTPUT(addBusinessDataForReport, NAMED('addBusinessDataForReport')));
 
     IF(debugMode, OUTPUT(busKRI, NAMED('busKRI')));

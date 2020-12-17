@@ -1,10 +1,12 @@
-﻿IMPORT BIPV2, BusinessInstantID20_Services, DueDiligence;
-
-
-EXPORT getBusHeaderReportData(businessHeaderData,
+﻿EXPORT getBusHeaderReportData(businessHeaderData,
                               businessInternal,
                               options,
                               linkingOptions) := FUNCTIONMACRO
+                              
+
+    IMPORT BIPV2, BusinessInstantID20_Services, DueDiligence;
+
+
                           
 
     //get date vendor first reported - to be used to calc established date for report

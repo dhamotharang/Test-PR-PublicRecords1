@@ -35,8 +35,8 @@ EXPORT Records := MODULE
 			-date_last_seen,-date_first_seen),did,clean_email);
 
 		// apply suppressions
-		Suppress.MAC_Suppress(ds_email_raw,ds_dids_pulled,in_mod.application_type,Suppress.Constants.LinkTypes.DID,did);
-		Suppress.MAC_Suppress(ds_dids_pulled,ds_dids_ssns_pulled,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,best_ssn);
+		Suppress.MAC_Suppress(ds_email_raw,ds_dids_pulled,in_mod.application_type,Suppress.Constants.LinkTypes.DID,did, isFCRA := true);
+		Suppress.MAC_Suppress(ds_dids_pulled,ds_dids_ssns_pulled,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,best_ssn, isFCRA := true);
 
 		// filter raw to disclose only fields restore acctno
 		ds_email_disclose:=JOIN(ds_work_recs,ds_dids_ssns_pulled,

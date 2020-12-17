@@ -11,14 +11,7 @@ needCF := Include_CompanyIDnumbers_val OR Include_CorporationFilings_val OR Incl
 
 mycorp := doxie_cbrs_raw.Corporation_Filings(bdids,needcf, max_CorporationFilings_val).records;
 
-outrec := RECORD, MAXLENGTH(100000)
-  mycorp.level;
-  Corp.Layout_Corp_Base;
-  STRING25 corp_state_origin_decoded;
-  STRING25 corp_inc_state_decoded;
-  STRING25 corp_for_profit_ind_decoded;
-  STRING25 corp_foreign_domestic_ind_decoded;
-END;
+outrec := doxie_cbrs.layouts.corporation_filings_record;
 
 outrec keepr(mycorp r) := TRANSFORM
   SELF.corp_state_origin_decoded := codes.GENERAL.state_long(R.corp_state_origin);

@@ -30,6 +30,8 @@ EXPORT DDOutput := MODULE
       STRING10 PerFederalLegalMatchLevel_Flag;
       STRING2 PerCivilLegalEvent;
       STRING10 PerCivilLegalEvent_Flag;
+      STRING2 perCivilLegalEventFilingAmt;
+      STRING10 perCivilLegalEventFilingAmt_Flag;
       STRING2 PerOffenseType;
       STRING10 PerOffenseType_Flag;
       STRING2 PerAgeRange;
@@ -92,6 +94,8 @@ EXPORT DDOutput := MODULE
       STRING10 BusFederalLegalMatchLevel_Flag;
       STRING2 BusCivilLegalEvent;
       STRING10 BusCivilLegalEvent_Flag;
+      STRING2 BusCivilLegalEventFilingAmt;
+      STRING10 BusCivilLegalEventFilingAmt_Flag;
       STRING2 BusOffenseType;
       STRING10 BusOffenseType_Flag;
       STRING2 BusBEOProfLicense;
