@@ -1,10 +1,11 @@
-﻿import	iesp,InsuranceContext_iesp,ut;
+﻿import	iesp,InsuranceContext_iesp,ut, doxie;
 
 export	Get_Transaction_Logs(	iesp.property_info.t_PropertyInformationRequest														pRequest,
 															InsuranceContext_iesp.insurance_risk_context.t_PropertyInformationContext	pInsContext,
 															iesp.property_info.t_PropertyInformation																	pResponse,
 															// iesp.property_value_report.t_PropertyValueReportResponseEx								pGatewayResponse,
-															PropertyCharacteristics_Services.IParam.SearchRecords											pInMod
+															PropertyCharacteristics_Services.IParam.SearchRecords											pInMod,
+                              doxie.IDataAccess                                                         mod_access
 														)	:=
 function
 	// ITV transaction log ?
@@ -118,7 +119,7 @@ function
 		self.record_count_1_type			:=	IF(ITV,1,0);
 		self.record_count_2						:=	IF(ITV,(integer)pResponse.Report.ReportIdSection.AttachmentProcessingStatus,0);
 		self.record_count_2_type			:=	IF(ITV,2,0);
-		self.glba_code      					:=	'1';
+		self.glba_code      					:=	(STRING3)mod_access.glb;
 
 		self													:=	[];
 	end;

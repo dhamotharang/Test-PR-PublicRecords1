@@ -1,4 +1,4 @@
-﻿import Address,iesp,InsuranceContext_iesp, PropertyCharacteristics_Services; 
+﻿import Address,iesp,InsuranceContext_iesp, PropertyCharacteristics_Services, Doxie; 
 
 export	Records(	PropertyCharacteristics_Services.IParam.SearchRecords											pInMod,
 									InsuranceContext_iesp.insurance_risk_context.t_PropertyInformationContext	pInsContext,
@@ -6,7 +6,7 @@ export	Records(	PropertyCharacteristics_Services.IParam.SearchRecords											
 									Address.ICleanAddress																											clean_addr
 								)	:=
 module
-
+  SHARED mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
   layouts.CleanAddressRec CreateBatchRecord () := transform
 		Self.acctno := ''; // this is a formality in case of a single-row request
 		Self.prim_range  := clean_addr.prim_range;
@@ -34,24 +34,18 @@ module
                           Get_Lexid(pRequest.ReportBy.Name, pRequest.ReportBy.dob, pRequest.ReportBy.ssn, pRequest.ReportBy.DLNumber, pRequest.ReportBy.DLState, clean_addr),
                           0);
 	//Determine if opted out under ccpa
-	SHARED IsOptedOut		:= IF(Lexid <> 0, isOptOut(Lexid), FALSE);
-	   
+	SHARED IsOptedOut		:= IF(Lexid <> 0, PropertyCharacteristics_Services.Functions.isOptOut(Lexid, mod_access), FALSE);
+
   // Replicated the batch functionallity.  QB 5501
-  /*Default Option (report type P) - Corelogic (D) and Blacknight (B)
-	Default Option (report type I) - Best of Corelogic and Blacknight (A)
-	Default Plus Option (report type P) - Corelogic (D) + best of Blacknight (B) and mls(E)
-	Default Plus Option (report type I) -  Best of Corelogic and Blacknight (A)
-	Selected Source - best of all sources (F)
-	Selected Source Plus – best of all sources (F) and all underlying source data -Corelogic (D), Blacknight (B) and mls(E)*/
   dLNPropResultsFiltered := dPropPayload(
-    ((pInMod.ReportType = 'I') AND (pInMod.ResultOption IN [Constants.Default_Option, Constants.Default_Plus_Option]) AND (vendor_source = 'A')) OR 
-    ((pInMod.ReportType = 'P') AND pInMod.ResultOption = Constants.Default_Option AND (vendor_source IN ['B', 'D']) ) OR 
-    ((pInMod.ReportType = 'P') AND pInMod.ResultOption = Constants.Default_Plus_Option AND ~IsOptedOut AND (vendor_source IN ['B', 'D', 'E']) ) OR 
-    ((pInMod.ReportType = 'P') AND pInMod.ResultOption = Constants.Default_Plus_Option AND IsOptedOut AND (vendor_source IN ['B', 'D']) ) OR 
-    ((pInMod.ResultOption = Constants.Selected_Source_Option) AND ~IsOptedOut AND (vendor_source = 'F')) OR
-    ((pInMod.ResultOption = Constants.Selected_Source_Option) AND IsOptedOut AND (vendor_source = 'G')) OR
-    ((pInMod.ResultOption = Constants.Selected_Source_Plus_Option) AND ~IsOptedOut AND (vendor_source IN ['F', 'E', 'D', 'C'])) OR	
-    ((pInMod.ResultOption = Constants.Selected_Source_Plus_Option) AND IsOptedOut AND (vendor_source IN ['G', 'D', 'C'])));	
+    ((pInMod.ReportType = Constants.Inspection_ReportType) AND (pInMod.ResultOption IN [Constants.Default_Option, Constants.Default_Plus_Option]) AND (vendor_source = Constants.Best_CoreLogic_Blacknight)) OR 
+    ((pInMod.ReportType = Constants.Property_ReportType) AND pInMod.ResultOption = Constants.Default_Option AND (vendor_source IN [Constants.Blacknight_LocalizedAverages, Constants.CoreLogic]) ) OR 
+    ((pInMod.ReportType = Constants.Property_ReportType) AND pInMod.ResultOption = Constants.Default_Plus_Option AND ~IsOptedOut AND (vendor_source IN [Constants.Blacknight_LocalizedAverages, Constants.CoreLogic, Constants.MLS]) ) OR 
+    ((pInMod.ReportType = Constants.Property_ReportType) AND pInMod.ResultOption = Constants.Default_Plus_Option AND IsOptedOut AND (vendor_source IN [Constants.Blacknight_LocalizedAverages, Constants.CoreLogic]) ) OR 
+    ((pInMod.ResultOption = Constants.Selected_Source_Option) AND ~IsOptedOut AND (vendor_source = Constants.Best_AllSources)) OR
+    ((pInMod.ResultOption = Constants.Selected_Source_Option) AND IsOptedOut AND (vendor_source = Constants.Best_All_NoMLS)) OR
+    ((pInMod.ResultOption = Constants.Selected_Source_Plus_Option) AND ~IsOptedOut AND (vendor_source IN [Constants.Best_AllSources, Constants.MLS, Constants.CoreLogic, Constants.Blacknight])) OR	
+    ((pInMod.ResultOption = Constants.Selected_Source_Plus_Option) AND IsOptedOut AND (vendor_source IN [Constants.Best_All_NoMLS, Constants.CoreLogic, Constants.Blacknight])));	
 	
 	// back to original layout: "payload" without cleaned address and batch-acctno
 	shared inhouse_results := project (dLNPropResultsFiltered, layouts.Payload);
@@ -147,7 +141,8 @@ module
 																																										,pInsContext
 																																										,PropInfoReport
 																																										// ,dPropGatewayResponse
-																																										,pInMod
+																																										,pInMod,
+                                                                                    mod_access
 																																										);
 																																										
 		// Transaction Logging

@@ -1,4 +1,4 @@
-﻿import	iesp,PropertyCharacteristics,Codes, PropertyCharacteristics_Services;  
+﻿import	iesp,PropertyCharacteristics,Codes, PropertyCharacteristics_Services, Doxie, Suppress;  
 
 export	Functions	:=
 module
@@ -1648,4 +1648,12 @@ LOADXML('<xml/>');
 										'E HOME LISTING DATA' => 11,
 										12);
 										
+  EXPORT isOptOut ( UNSIGNED8 Lexid, doxie.IDataAccess mod_access) := FUNCTION
+    MAC_Suppress_In_Layout := RECORD
+        UNSIGNED6 did;
+        UNSIGNED4 global_sid;
+    END;
+    ds_in	:= DATASET([{Lexid, Constants.MLS_Global_Source_ID}],MAC_Suppress_In_Layout);
+    RETURN ~EXISTS(Suppress.MAC_SuppressSource(ds_in, mod_access));
+  END;                    
 end;
