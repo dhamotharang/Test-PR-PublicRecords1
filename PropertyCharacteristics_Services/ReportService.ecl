@@ -18,7 +18,10 @@ export ReportService() := macro
 	dIn			:=	dataset([],iesp.property_info.t_PropertyInformationRequest)	:	stored('PropertyInformationRequest',FEW);
 	Request	:=	dIn[1]	:	independent;
   //CR1381 - This is Insurance query and GLB is implicitly assumed to always be 1
-  #CONSTANT('GLBPurpose', 1);
+  iesp.ECL2ESP.SetInputBaseRequest(PROJECT(Request, 
+                                    TRANSFORM(iesp.share.t_BaseRequest,
+                                      SELF.User.GLBPurpose := '1',
+                                      SELF := LEFT)));
   	// insurance context
 	dInsContext	:=	dataset([],InsuranceContext_iesp.insurance_risk_context.t_PropertyInformationContext)	:	stored('InsuranceContext',FEW);
 	InsContext	:=	dInsContext[1]	:	independent;
