@@ -105,8 +105,8 @@ module
   EXPORT Inspection_ReportType        := 'I';
 
   EXPORT Best_CoreLogic_Blacknight    := 'A';
-  EXPORT Blacknight                   := 'B';
-  EXPORT Blacknight_LocalizedAverages := 'C';
+  EXPORT Blacknight_LocalizedAverages := 'B';
+  EXPORT Blacknight                   := 'C';
   EXPORT CoreLogic                    := 'D';
   EXPORT MLS                          := 'E';
   EXPORT Best_AllSources              := 'F';

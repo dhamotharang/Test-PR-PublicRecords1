@@ -17,9 +17,8 @@ export ReportService() := macro
 	// get XML input
 	dIn			:=	dataset([],iesp.property_info.t_PropertyInformationRequest)	:	stored('PropertyInformationRequest',FEW);
 	Request	:=	dIn[1]	:	independent;
-  #CONSTANT('glb', '1');
-  iesp.ECL2ESP.SetInputBaseRequest(Request);
-	// insurance context
+  #CONSTANT('GLBPurpose', 1);
+  	// insurance context
 	dInsContext	:=	dataset([],InsuranceContext_iesp.insurance_risk_context.t_PropertyInformationContext)	:	stored('InsuranceContext',FEW);
 	InsContext	:=	dInsContext[1]	:	independent;
 	
