@@ -1,6 +1,6 @@
-import FraudGovPlatform;
+import FraudGovPlatform,ut;
 EXPORT setDisposableEmailDomains 
-	:= DEDUP(DATASET([
+	:= DEDUP( PROJECT( DATASET([
 		{'33MAIL.COM'},
 		{'0-00.USA.CC'},
 		{'0-MAIL.COM'},
@@ -98648,4 +98648,7 @@ EXPORT setDisposableEmailDomains
 		{'zzz813.com'},
 		{'zzz98.xyz'},
 		{'zzzz1717.com'}
-	], FraudGovPlatform.Layouts_Key.DisposableEmailDomains),ALL);
+	], FraudGovPlatform.Layouts_Key.DisposableEmailDomains),
+	TRANSFORM(FraudGovPlatform.Layouts_Key.DisposableEmailDomains,
+		SELF.DisposableEmailDomain := ut.CleanSpacesAndUpper(LEFT.DisposableEmailDomain))
+	),ALL);
