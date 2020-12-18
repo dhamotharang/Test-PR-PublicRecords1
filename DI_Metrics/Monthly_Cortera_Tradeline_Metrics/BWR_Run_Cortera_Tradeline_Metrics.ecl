@@ -7,9 +7,7 @@
 #WORKUNIT('name','Monthly Cortera Tradeline Metrics');
 
 destinationIP   := _Control.IPAddress.bctlpedata12;
-// destinationpath := '/data/datainsight/data_evaluations/DataMetrics/Stats_NonFCRA/';
-// destinationpath := '/data/datainsight/data_evaluations/Automation_Testing/temp/';
-destinationpath := '/data/Builds/builds/first_data/temp/';
+destinationpath := '/data/Builds/builds/DI_Metrics/';
 emailContact    := 'DataInsightAutomation@lexisnexisrisk.com';
 
 DI_Metrics.Monthly_Cortera_Tradeline_Metrics.Cortera_Tradeline_Metrics( destinationIP, destinationpath, emailContact );
