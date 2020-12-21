@@ -1,5 +1,5 @@
 
-Import $, STD, history_analysis, PromoteSupers, dops;
+Import $, STD, history_analysis, PromoteSupers, dops, ut;
 
 Export fn_buildDeltas(dataset(history_analysis.layouts.Layout_dopsservice) loadRawdata) := Function
 
@@ -15,12 +15,12 @@ t_previousRec := project( f_keysizedhistory_rec, history_analysis.layouts.BaseRe
 // Transform
 history_analysis.layouts.BaseRec CountDeltas( history_analysis.layouts.BaseRec Le, history_analysis.layouts.BaseRec Ri ) := Transform
     NotSameVersion     := if( Le.buildversion[1..8] != Ri.buildversion[1..8], true, false ); // Checks that it is not same version 
-    Self.datasetname   := Ri.datasetname;
-    Self.prevbuild_version := if( NotSameVersion, Le.buildversion, Le.prevbuild_version ); 
-    Self.buildversion  := Ri.buildversion;
-    Self.whenlive      := Ri.whenlive;
-    Self.updateflag    := Ri.updateflag;
-    Self.superkey      := Ri.superkey;
+    Self.datasetname   := trim(Ri.datasetname,all);
+    Self.prevbuild_version := trim(if( NotSameVersion, Le.buildversion, Le.prevbuild_version ), all); 
+    Self.buildversion  := trim(Ri.buildversion,all);
+    Self.whenlive      := trim(Ri.whenlive,all);
+    Self.updateflag    := trim(Ri.updateflag,all);
+    Self.superkey      := trim(ut.fn_RemoveSpecialChars(Ri.superkey),all);
     Self.previous_size := if( NotSameVersion, Le.size, Le.previous_size );
     Self.size          := Ri.size;
     Self.delta_size    := if( Le.datasetname = Ri.datasetname and NotSameVersion, 

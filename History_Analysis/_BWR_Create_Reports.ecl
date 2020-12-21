@@ -1,4 +1,4 @@
-Import STD, lib_stringlib, History_Analysis, wk_ut, dops;
+Import STD, lib_stringlib, History_Analysis, wk_ut, dops,ut;
 
 pVersion := stringlib.getDateYYYYMMDD();
 output(pVersion, named('workunit_version'));
@@ -22,7 +22,7 @@ tomorrows_date := (string)Std.Date.AdjustDate((integer)todays_date,0,0,1):global
 // dopsenv = 'dev' or 'prod'; dev - points to dev or prod DOPS DB
 
 
-History_Analysis.Proc_Build_All(pVersion, '*', 'B','set for nonfcra and fcra (process_dops.ecl)','P', todays_date, tomorrows_date, 'prod');
+History_Analysis.Proc_Build_All(pVersion, '*', 'B','set for nonfcra and fcra (process_dops.ecl)','P', '20201218', '20201219', 'prod');
 
 
 ///////////////////////  For Standalone Reports ////////////////////////////////////////////
