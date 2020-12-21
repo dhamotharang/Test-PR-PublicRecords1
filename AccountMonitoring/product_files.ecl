@@ -1169,22 +1169,23 @@ EXPORT product_files := MODULE
 	END; // end workplace module
 
 	EXPORT PhoneOwnership := MODULE
-		EXPORT pphone_superkeyname := AccountMonitoring.constants.DATA_LOCATION + 'thor_data400::key::phones_ported_metadata_'+doxie.Version_SuperKey;
-		pphone_build_version         := TRIM( did_add.get_EnvVariable('pphones_build_version') ):INDEPENDENT;
-		key_pphone_keyname_raw := 'thor_data400::key::'+pphone_build_version+'::phones_ported_metadata';
-		key_pphone_keyname     := AccountMonitoring.constants.DATA_LOCATION + key_pphone_keyname_raw;
-		// Define a Duplicate Index; this points to the logical key file
-		EXPORT key_pphone := 
-			INDEX(
-				PhonesInfo.Key_Phones.Ported_Metadata,  
-				key_pphone_keyname
-			);
+
+	  EXPORT phones_transaction_superfile	:= 'thor_data400::key::Phones_transaction_'+doxie.Version_SuperKey;
+    EXPORT phones_transaction_for_superkey_monitor := 'monitor::Phones_transaction';
+	  EXPORT phones_transaction_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + phones_transaction_for_superkey_monitor + '_qa';
+	
+		EXPORT key_phones_transaction := 
+			PULL(INDEX(
+				dx_PhonesInfo.Key_Phones_Transaction,  
+				phones_transaction_superkeyname
+			));
 			
-		EXPORT key_pphone_dist :=
+		EXPORT key_phones_transaction_dist :=
 			DISTRIBUTE(
-				key_pphone, 
+				key_phones_transaction, 
 				HASH64(phone)
 			): INDEPENDENT;
+
 	END; //end of phone ownership
 	
 	EXPORT sbfe := MODULE
