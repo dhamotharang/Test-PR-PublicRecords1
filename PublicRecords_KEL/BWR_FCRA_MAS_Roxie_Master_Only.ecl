@@ -101,6 +101,7 @@ p := IF (RecordsToRun = 0, P_IN, CHOOSEN (P_IN, RecordsToRun));
 //p := p2(Account in ['TMOBSEP7088-158349', 'TMOBSEP7088-87504','TARG4547-221442', 'TMOBJUN7088-196571','AAAA7833-104166']); 
 PP := PROJECT(P(Account != 'Account'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout, 
 SELF.historydate := if(histDate = '0', LEFT.historydate, histDate);
+self.IPAddress := '';
 SELF := LEFT));
 
 soapLayout := RECORD
@@ -198,8 +199,8 @@ bwr_results :=
 				PARALLEL(threads), 
         onFail(myFail(LEFT)));
 
-Passed := bwr_results(TRIM(P_InpAcct) <> '');
-Failed := bwr_results(TRIM(P_InpAcct) = ''); 
+Passed := bwr_results(TRIM(G_ProcErrorCode) = ''); // Use as input to KEL query.
+Failed := bwr_results(TRIM(G_ProcErrorCode) <> '');
 
 OUTPUT( CHOOSEN(Passed,eyeball), NAMED('bwr_results_Passed') );
 OUTPUT( CHOOSEN(Failed,eyeball), NAMED('bwr_results_Failed') );
