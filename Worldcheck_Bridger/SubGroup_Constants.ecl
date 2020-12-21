@@ -1286,6 +1286,7 @@
 		export string KEYWORD_FRANJ									:= '968';
 		export string KEYWORD_UKSANC								:= '969';
 		export string KEYWORD_NS_CAATSA_RUSSIA			:= '970';
+		export string KEYWORD_EEPO									:= '971';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
