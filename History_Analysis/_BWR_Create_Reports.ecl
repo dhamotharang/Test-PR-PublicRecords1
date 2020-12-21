@@ -22,6 +22,8 @@ tomorrows_date := (string)Std.Date.AdjustDate((integer)todays_date,0,0,1):global
 // dopsenv = 'dev' or 'prod'; dev - points to dev or prod DOPS DB
 
 
+#option('outputLimitMb', 2000);
+
 History_Analysis.Proc_Build_All(pVersion, '*', 'B','set for nonfcra and fcra (process_dops.ecl)','P', todays_date, tomorrows_date, 'prod');
 
 
