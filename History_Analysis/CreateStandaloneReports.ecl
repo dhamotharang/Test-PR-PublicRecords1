@@ -8,15 +8,18 @@ Export CreateStandaloneReports( string pVersion, string datasetname, string loca
 
     convertToDeltas := History_Analysis.Fn_BuildDeltas(History_Analysis.Files(pVersion).keysizedhistory_service);
 
-    writeDeltas := output(convertToDeltas,, History_Analysis.Filenames(pVersion).standaloneDeltas, thor, overwrite, __compressed__ );
+    writeDeltas := output(convertToDeltas,, History_Analysis.Filenames(pVersion).standaloneDeltas, csv(heading(single),separator(','),quote('"')), overwrite, __compressed__ );
 
     calculateStats := History_Analysis.MLCoreCalculateStatistics(History_Analysis.Files(pVersion).standaloneDeltas);
 
-    writeStats := output(calculateStats,, History_Analysis.Filenames(pVersion).standaloneStats, thor, overwrite, __compressed__ );
+    writeStats := output(calculateStats,, History_Analysis.Filenames(pVersion).standaloneStats, csv(heading(single),separator(','),quote('"')), overwrite, __compressed__ );
 
     standaloneReports := ordered(update_source, 
                                 writeDeltas,
                                 writeStats,
+                                History_Analysis.OutputFiles(pVersion).dopsService,
+                                History_Analysis.OutputFiles(pVersion).standaloneDeltas,
+                                History_Analysis.OutputFiles(pVersion).standaloneStats,
                                 );
 
 Return standaloneReports;

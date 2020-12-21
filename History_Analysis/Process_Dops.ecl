@@ -1,9 +1,9 @@
-Import STD, _control, dops, History_Analysis, PromoteSupers;
+Import STD, _control, dops, History_Analysis, PromoteSupers, ut;
 
 Export process_dops( string pVersion, string datasetname, string location, string cluster, string enviroment, string start_date, string end_date, string dopsenv ) := Module
  
 // file from 2 year history 
-KeysizedHistory := History_Analysis.Files(pversion).keysizedhistory_report;
+KeysizedHistory := History_Analysis.Files(pVersion).keysizedhistory_report;
 
 //layouts
 layout := History_Analysis.Layouts.layout_dopsservice;
@@ -47,31 +47,32 @@ End;
 
 
 Shared dops_service := project(addBothInputs, transform(layout,
-								self.datasetname := left.datasetname;
-								self.clusterflag := left.clusterflag;
-							    self.whenlive := left.whenlive;  // use fn_format_date(left.whenlive); for KeysizedHistory
-								self.buildversion := left.buildversion;
-								self.superkey := left.superkey;
-								self.logicalkey := left.logicalkey; // templatelogicalkey for KeysizedHistory
+								self.datasetname := trim(left.datasetname,all);
+								self.clusterflag := trim(left.clusterflag,all);
+							    self.whenlive := trim(left.whenlive,all);  // use fn_format_date(left.whenlive); for KeysizedHistory
+								self.buildversion := trim(left.buildversion, all);
+								self.superkey := trim(ut.fn_RemoveSpecialChars(left.superkey), all);
+								self.logicalkey := trim(ut.fn_RemoveSpecialChars(left.logicalkey), all); // templatelogicalkey for KeysizedHistory
 								self.size := (integer)left.size;
                                 self.recordcount := (integer)left.recordcount;
-								self.updateflag := left.updateflag;
-                                self.statuscode := left.statuscode;  // '' for KeysizedHistory
-                                self.statusdescription := left.statusdescription; // '' for KeysizedHistory
+								self.updateflag := trim(left.updateflag,all);
+                                self.statuscode := trim(left.statuscode,all);  // '' for KeysizedHistory
+                                self.statusdescription := trim(left.statusdescription,all); // '' for KeysizedHistory
                                 ));
 
+						
 
-Export processed_dops := output(dops_service,,History_Analysis.Filenames(pversion).dopsServiceData, named('dopsnewest_servicedata'), thor, overwrite, __compressed__);
+Export processed_dops := output(dops_service,,History_Analysis.Filenames(pVersion).DopsServiceData, csv(heading(single),separator(','),quote('"')), overwrite, __compressed__ );
 
-old_data := History_Analysis.Files(pversion).keysizedhistory_rawdata;
+old_data := History_Analysis.Files(pVersion).keysizedhistory_rawdata;
 
-dd_dataset := old_data + dops_service;
+dd_dataset := (old_data + dops_service );
 
 dedup_dataset := dedup(dd_dataset, datasetname, buildversion, whenlive, clusterflag, updateflag, superkey, logicalkey, size, recordcount, statuscode, statusdescription, all );
 
 sorted_dataset := sort(dedup_dataset(datasetname<>''), datasetname, superkey, whenlive );
 
-PromoteSupers.Mac_SF_BuildProcess(sorted_dataset,'~thor_data400::history_analysis::in::raw_data', build_AggregateFile, 3,,true);
+PromoteSupers.Mac_SF_BuildProcess(sorted_dataset,'~thor_data400::history_analysis::in::raw_data', build_AggregateFile, 3,true,true);
 
 Export appendRawdata := ordered(processed_dops, build_AggregateFile );
 

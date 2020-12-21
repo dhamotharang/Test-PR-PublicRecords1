@@ -1,4 +1,4 @@
-import History_Analysis,ML_Core, PromoteSupers;
+import History_Analysis,ML_Core, PromoteSupers, ut;
 
 export MLCoreCalculateStatistics(dataset(History_Analysis.Layouts.BaseRec) loadDeltas ):=function
 
@@ -29,9 +29,9 @@ CombinedRec:=RECORD
 END;
 
 CombinedRec tCombine(WithRecID L, ML_Core.Types.NumericField R):=TRANSFORM
-    Self.datasetname:=L.datasetname;
-    Self.superkey:=L.superkey;
-    Self.updateflag:=L.updateflag;
+    Self.datasetname:=trim(L.datasetname, all);
+    Self.superkey:=trim(ut.fn_RemoveSpecialChars(L.superkey), all);
+    Self.updateflag:=trim(L.updateflag, all);
     Self.wi:=R.wi;
     Self.id:=R.id;
     Self.number:=R.number;
