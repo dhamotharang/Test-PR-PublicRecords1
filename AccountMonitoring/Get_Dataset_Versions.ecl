@@ -527,13 +527,36 @@ EXPORT Get_Dataset_Versions(
 					LEFT.name,1,NOCASE)));
 		
 		// Phone Ownership
-		PhoneOwnership := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.PhoneOwnership.pphone_superkeyname),
+
+		Phones_transaction := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phoneownership.phones_transaction_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PHONEOWNERSHIP',
-				SELF.subfile := '',
+				SELF.subfile := 'phones_transaction',
 				SELF.version := REGEXFIND(
-					'thor_data400::key::::(.*)::phones_ported_metadata',
-					LEFT.name,1,NOCASE)));
+				'thor_data400::key::(.*)::phones_transaction',
+				LEFT.name,1,NOCASE)));	
+
+		PPhones_Type := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phone.phones_type_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'PHONEOWNERSHIP',
+				SELF.subfile := 'Phones_type',
+				SELF.version := REGEXFIND(
+				'thor_data400::key::(.*)::phones_type',
+				LEFT.name,1,NOCASE)));
+
+		PPhones_Lerg6 := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phone.phones_lerg6_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'PHONEOWNERSHIP',
+				SELF.subfile := 'phones_lerg6',
+				SELF.version := REGEXFIND(
+				'thor_data400::key::(.*)::phones_lerg6',
+				LEFT.name,1,NOCASE)));
+
+		PhoneOwnership := 
+		PPhones_Type +
+		PPhones_Lerg6 +
+		Phones_transaction;
+
 		
 		// BipBest Update
 		BipBestUpdate := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_bipbest_header_superkeyname),

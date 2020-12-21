@@ -107,17 +107,25 @@ end;
                     ,{
                       AccountMonitoring.product_files.Phone.phones_type_superfile,
                       AccountMonitoring.product_files.Phone.phones_type_for_superkey_monitor,
-                      AccountMonitoring.types.productMask.phone
+                      AccountMonitoring.types.productMask.phone +
+                      AccountMonitoring.types.productMask.phoneownership
                     }
                     ,{
                       AccountMonitoring.product_files.Phone.phones_lerg6_superfile,
                       AccountMonitoring.product_files.Phone.Phones_Lerg6_for_superkey_monitor,
-                      AccountMonitoring.types.productMask.phone
+                      AccountMonitoring.types.productMask.phone +
+                      AccountMonitoring.types.productMask.phoneownership
                     }
                     ,{
                       AccountMonitoring.product_files.Phone.carrier_reference_superfile,
                       AccountMonitoring.product_files.Phone.carrier_reference_for_superkey_monitor,
-                      AccountMonitoring.types.productMask.phone
+                      AccountMonitoring.types.productMask.phone +
+                      AccountMonitoring.types.productMask.phoneownership
+                    },
+                    {
+                      AccountMonitoring.product_files.PhoneOwnership.phones_transaction_superfile,
+                      AccountMonitoring.product_files.PhoneOwnership.phones_transaction_for_superkey_monitor,
+                      AccountMonitoring.types.productMask.phoneownership
                     }
                     ,{
                       AccountMonitoring.product_files.Property.Property_search_Roxiesuperfile, //(thor_data400::key::ln_propertyv2::qa::search.fid)
