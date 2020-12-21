@@ -422,23 +422,23 @@ EXPORT Get_Dataset_Versions(
 			Criminal_Punishments;
 			
 		// Property
-		Property_Search := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.property.search_filename),
+		Property_Search := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.property.Property_search_superkey_monitor),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PROPERTY',
 				SELF.subfile := 'SEARCH',
 				SELF.version := REGEXFIND(
-					AccountMonitoring.product_files.property.search_filename_raw + '(.*)$',
+					'thor_data400::key::ln_propertyv2::(.*)::search.fid',
 					LEFT.name,1,NOCASE)));
 
-		Property_Deeds := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.property.deeds_filename),
+		Property_Deeds := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.property.Property_deed_superkey_monitor),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PROPERTY',
 				SELF.subfile := 'DEEDS',
 				SELF.version := REGEXFIND(
-					AccountMonitoring.product_files.property.deeds_filename_raw + '(.*)$',
+					'thor_data400::key::ln_propertyv2::(.*)::addlfaresdeed.fid',
 					LEFT.name,1,NOCASE)));
 	
-		Property_SearchLinkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.property.SearchLinkid_superkeyname),
+		Property_SearchLinkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.property.Property_SearchLinkid_superkey_monitor),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'PROPERTY',
 				SELF.subfile := 'LINKID',
