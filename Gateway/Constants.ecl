@@ -50,6 +50,7 @@ export Constants := module
     export String40 InsurancePhoneHeader := 'insurancephoneheader'; // internal call to insurance/alpharetta roxie
     export String40 FCRARoxie := 'fcra'; // from RiskWiseFCRA.Neutral_Service_Name
     export String40 SearchCore := 'searchcore'; // Bridger SearchCore service
+    export String40 bridgerAPI := 'bridgerapi'; // Bridger Stand alone SearchCore (no wsgateway call) Full World compliance file
     export String40 bridgerxg5 := 'bridgerxg5'; // Bridger Stand alone SearchCore (no wsgateway call) Full World compliance file
     export String40 bridgerwlc := 'bridgerwlc'; // Bridger Stand alone SearchCore (no wsgateway call) Subset of Watchlist files
     export String40 DeltaInquiry := 'delta_inquiry';
