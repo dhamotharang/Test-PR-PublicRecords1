@@ -1,7 +1,7 @@
 ﻿IMPORT _control, Inquiry_AccLogs, data_services, STD, ut; 
 export InquiryRpts_bwrNonFCRAInq50(string pHostname, string pTarget, string pContact ='\' \'') := function
 
-filedate := (STRING8)Std.Date.Today();
+filedate := (STRING8)Std.Date.Today() : INDEPENDENT;
 
 bsversion := 50;
 isfcra := FALSE;
