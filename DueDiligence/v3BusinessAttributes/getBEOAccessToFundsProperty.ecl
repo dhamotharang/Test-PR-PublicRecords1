@@ -15,23 +15,23 @@ EXPORT getBEOAccessToFundsProperty(DATASET(DueDiligence.v3Layouts.Internal.Busin
                                                         beoWithLexIDs := allBEOs(lexID > 0);
                                                         didlessBEOs := allBEOs(lexID = 0);
                                                         
+                                                        //grab only the data that is populated
+                                                        maxWatercraftLength := SORT(beoWithLexIDs, -maxWatercraftLengthRaw)[1].maxWatercraftLengthRaw;
+                                                        
                                                         //should only have information with those that have lexIDs
-                                                        largestTaxAssedProp := SORT(beoWithLexIDs, totalTaxAssessedVal, -numProperties)[1].totalTaxAssessedVal;
-                                                        maxWatercraftLength := SORT(beoWithLexIDs, maxWatercraftLengthRaw, -numWatercraft)[1].maxWatercraftLengthRaw;
-                                                        maxVehicleBase := SORT(beoWithLexIDs, maxBaseVehicleVal, -numVehicles)[1].maxBaseVehicleVal;
-                                                        
-                                                        numProps := SORT(beoWithLexIDs, numProperties)[1].numProperties;
-                                                        numVehs := SORT(beoWithLexIDs, numVehicles)[1].numVehicles;
-                                                        numAir := SORT(beoWithLexIDs, numAircraft)[1].numAircraft;
-                                                        numWater := SORT(beoWithLexIDs, numWatercraft)[1].numWatercraft;
+                                                        //and grab the largest values
+                                                        numProps := SORT(beoWithLexIDs, -numProperties)[1].numProperties;
+                                                        numVehs := SORT(beoWithLexIDs, -numVehicles)[1].numVehicles;
+                                                        numAir := SORT(beoWithLexIDs, -numAircraft)[1].numAircraft;
+                                                        numWater := SORT(beoWithLexIDs, -numWatercraft)[1].numWatercraft;
                                                         
                                                         
-                                                        accessFundsProp9 := IF(largestTaxAssedProp >= 15000000, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-                                                        accessFundsProp8 := IF(largestTaxAssedProp BETWEEN 5000000 AND 14999999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+                                                        accessFundsProp9 := IF(COUNT(beoWithLexIDs(totalTaxAssessedVal >= 15000000)) > 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+                                                        accessFundsProp8 := IF(COUNT(beoWithLexIDs(totalTaxAssessedVal BETWEEN 5000000 AND 14999999)) > 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
                                                         accessFundsProp7 := IF(maxWatercraftLength >= 50, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-                                                        accessFundsProp6 := IF(maxVehicleBase >= 200000, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-                                                        accessFundsProp5 := IF(largestTaxAssedProp BETWEEN 1000000 AND 4999999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-                                                        accessFundsProp4 := IF(maxVehicleBase BETWEEN 75000 AND 199999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+                                                        accessFundsProp6 := IF(COUNT(beoWithLexIDs(maxBaseVehicleVal >= 200000)) > 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+                                                        accessFundsProp5 := IF(COUNT(beoWithLexIDs(totalTaxAssessedVal BETWEEN 1000000 AND 4999999)) > 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+                                                        accessFundsProp4 := IF(COUNT(beoWithLexIDs(maxBaseVehicleVal BETWEEN 75000 AND 199999)) > 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
                                                         accessFundsProp3 := IF(numProps >= 4 OR 
                                                                                numAir >= 1 OR
                                                                                numVehs >= 5 OR
