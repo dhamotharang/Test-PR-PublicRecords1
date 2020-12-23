@@ -47,17 +47,17 @@ End;
 
 
 Shared dops_service := project(addBothInputs, transform(layout,
-								self.datasetname := trim(left.datasetname,all);
-								self.clusterflag := trim(left.clusterflag,all);
-							    self.whenlive := trim(left.whenlive,all);  // use fn_format_date(left.whenlive); for KeysizedHistory
-								self.buildversion := trim(left.buildversion, all);
-								self.superkey := trim(ut.fn_RemoveSpecialChars(left.superkey), all);
-								self.logicalkey := trim(ut.fn_RemoveSpecialChars(left.logicalkey), all); // templatelogicalkey for KeysizedHistory
+								self.datasetname := trim(left.datasetname,right, whitespace );
+								self.clusterflag := trim(left.clusterflag,right, whitespace );
+							    self.whenlive := trim(left.whenlive,right, whitespace );  // use fn_format_date(left.whenlive); for KeysizedHistory
+								self.buildversion := trim(left.buildversion, right, whitespace );
+								self.superkey := trim(ut.fn_RemoveSpecialChars(left.superkey), right, whitespace );
+								self.logicalkey := trim(ut.fn_RemoveSpecialChars(left.logicalkey), right, whitespace ); // templatelogicalkey for KeysizedHistory
 								self.size := (integer)left.size;
                                 self.recordcount := (integer)left.recordcount;
-								self.updateflag := trim(left.updateflag,all);
-                                self.statuscode := trim(left.statuscode,all);  // '' for KeysizedHistory
-                                self.statusdescription := trim(left.statusdescription,all); // '' for KeysizedHistory
+								self.updateflag := trim(left.updateflag,right, whitespace );
+                                self.statuscode := trim(left.statuscode,right, whitespace );  // '' for KeysizedHistory
+                                self.statusdescription := trim(left.statusdescription,right, whitespace ); // '' for KeysizedHistory
                                 ));
 
 						
