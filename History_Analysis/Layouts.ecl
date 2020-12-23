@@ -11,29 +11,29 @@ Export Layouts := Module
     End;
 
     Export layout_keysizedhistory := Record 
-        String datasetname;
-        String buildversion;
-        String whenlive;
-        String clusterflag;
-        String updateflag;
-        String superkey;
-        String templatelogicalkey;
-        String size;
-        String recordcount;
+        String25 datasetname;
+        String10 buildversion;
+        String25 whenlive;
+        String1  clusterflag;
+        String1  updateflag;
+        String60 superkey;
+        String60 templatelogicalkey;
+        String   size;
+        String   recordcount;
     End;
 
     Export layout_dopsservice := Record
-        String  datasetname;
-        String  clusterflag;
-        String  whenlive;
-        String  buildversion;
-        String  superkey;
-        String  logicalkey;
-        Integer size;
-        Integer recordcount;
-        String  updateflag;
-        String  statuscode;
-        String  statusdescription;
+        String25 datasetname;
+        String1  clusterflag;
+        String25 whenlive;
+        String10 buildversion;
+        String60 superkey;
+        String60 logicalkey;
+        Integer8 size;
+        Integer8 recordcount;
+        String1  updateflag;
+        String   statuscode;
+        String   statusdescription;
     END;
 
     Export layout_orbit_buildinstance := Record

@@ -26,7 +26,6 @@ tomorrows_date := (string)Std.Date.AdjustDate((integer)todays_date,0,0,1):global
 
 History_Analysis.Proc_Build_All(pVersion, '*', 'B','set for nonfcra and fcra (process_dops.ecl)','P', todays_date, tomorrows_date, 'prod');
 
-
 ///////////////////////  For Standalone Reports ////////////////////////////////////////////
 
 //History_Analysis.CreateStandaloneReports(pVersion, '*', 'B', 'set for nonfcra and fcra (process_dops.ecl)', 'P', '20201130', '20201205', 'prod');

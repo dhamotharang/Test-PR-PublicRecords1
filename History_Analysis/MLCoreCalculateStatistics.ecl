@@ -29,9 +29,9 @@ CombinedRec:=RECORD
 END;
 
 CombinedRec tCombine(WithRecID L, ML_Core.Types.NumericField R):=TRANSFORM
-    Self.datasetname:=trim(L.datasetname, all);
-    Self.superkey:=trim(ut.fn_RemoveSpecialChars(L.superkey), all);
-    Self.updateflag:=trim(L.updateflag, all);
+    Self.datasetname:=trim(L.datasetname, right, whitespace );
+    Self.superkey:=trim(ut.fn_RemoveSpecialChars(L.superkey), right, whitespace );
+    Self.updateflag:=trim(L.updateflag, right, whitespace );
     Self.wi:=R.wi;
     Self.id:=R.id;
     Self.number:=R.number;
