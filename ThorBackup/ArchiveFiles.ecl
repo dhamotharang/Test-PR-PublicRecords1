@@ -84,6 +84,7 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 	
 	export SlimmedFilesToCopy := function
 		SlimmedDs := dedup(sort(dataset('~'+filestoprocess, filesrec, thor, opt)(~(regexfind('foreign',files) 
+																																							or regexfind(' ', trim(files,left,right))
 																																							or regexfind(':: ',files)
 																																							or regexfind('thor::base::aid_nonheader::ace',files)
 																																							or regexfind('::nid::',files))),files),files)
@@ -203,6 +204,19 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 		end;
 		
 		filesrec_cnt addcnt_trans(SlimmedFilesToCopy l, integer cnt) := transform
+		
+			tb := if (~regexfind('transferbuffersize',l.cmd,nocase)
+														,l.cmd + ' transferbuffersize=10000000 '
+															,l.cmd);
+		
+			nc := if (~regexfind('nocommon',tb,nocase)
+													,tb + ' noCommon=1 '
+													,tb
+												);
+			mc := if (~regexfind('connect',nc,nocase)
+													,nc + ' connect=400 '
+													,nc
+												);
 			self.isChanged := if (~fileservices.fileexists('~'+l.files),
 														true,
 														// there are scenarios when the file copied to destination
@@ -214,6 +228,8 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 																// false)
 																false
 														);
+			self.cmd := mc;
+													
 			self.l_cnt := cnt;
 			self := l;
 		end;
