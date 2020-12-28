@@ -219,6 +219,7 @@ end;
 							SELF.P_InpClnAddrPrimName := LEFT.P_InpClnAddrPrimName,
 							SELF.P_InpClnAddrZip5 := LEFT.P_InpClnAddrZip5,
 							SELF.P_InpClnPhoneHome := LEFT.P_InpClnPhoneHome,
+							SELF.P_InpClnArchDt := if(LEFT.P_InpClnArchDt <> '',LEFT.P_InpClnArchDt, right.b_InpClnArchDt);
 							SELF.AddressGeoLink  := (trim(LEFT.P_InpClnAddrStateCode, left, right) + trim(left.P_InpClnAddrCnty, left, right) + trim(left.P_InpClnAddrGeo, left, right)),
 							self := left;
 							SELF := []), FULL OUTER );
@@ -403,6 +404,7 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 			TRANSFORM( Layouts_FDC.LayoutPhoneGeneric_inputs,
 				SELF.UIDAppend := LEFT.G_ProcBusUID,
 				SELF.Phone := LEFT.B_InpClnPhone,
+				self.p_inpclnarchdt := left.b_inpclnarchdt;
 				SELF := LEFT,
 				SELF := []
 			)
@@ -3227,7 +3229,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 					SELF := []));		
 		
 	Key_PhonesPlus_v2__Keys_Source_Level_Phone := JOIN(Input_Phone_All, dx_PhonesPlus.Key_Source_Level_Phone(iType), 
-				Common.DoFDCJoin_PhonePlus_V2__ScoringPhone = TRUE AND
+				Common.DoFDCJoin_PhonePlus_V2__Key_Source_Level_Payload = TRUE AND
 				LEFT.Phone <> '' AND
 				KEYED(LEFT.Phone  = RIGHT.cellphone),
 				TRANSFORM(Layouts_FDC.Layout_PhonesPlus_v2_Key_Source_Level_Temp,
@@ -3240,7 +3242,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000));
 
 	Key_PhonesPlus_v2__Keys_Source_Level_DID := JOIN(Input_Phone_All, dx_PhonesPlus.Key_Source_Level_DID(iType), 
-				Common.DoFDCJoin_PhonePlus_V2__ScoringPhone = TRUE AND
+				Common.DoFDCJoin_PhonePlus_V2__Key_Source_Level_Payload = TRUE AND
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID  = RIGHT.did),
 				TRANSFORM(Layouts_FDC.Layout_PhonesPlus_v2_Key_Source_Level_Temp,
@@ -3255,7 +3257,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 	Key_PhonesPlus_v2__Keys_Source_Level_Payload_Full := dedup(sort(Key_PhonesPlus_v2__Keys_Source_Level_DID + Key_PhonesPlus_v2__Keys_Source_Level_Phone,UIDAppend, record_sid), UIDAppend, record_sid) ;
 
 	Key_PhonesPlus_v2__Keys_Source_Level_Payload_Unsuppressed := JOIN(Key_PhonesPlus_v2__Keys_Source_Level_Payload_Full, dx_PhonesPlus.Key_Source_Level_Payload(iType), 
-				Common.DoFDCJoin_PhonePlus_V2__ScoringPhone = TRUE AND
+				Common.DoFDCJoin_PhonePlus_V2__Key_Source_Level_Payload = TRUE AND
 				LEFT.record_sid > 0 AND
 				KEYED(LEFT.record_sid  = RIGHT.record_sid) AND
 				ArchiveDate((string)right.datefirstseen, (string)right.datevendorfirstreported) <= LEFT.P_InpClnArchDt[1..8],
@@ -4286,7 +4288,7 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
 					SELF.B_LexIDOrg := LEFT.ORGID,
 					SELF.B_LexIDLegal := LEFT.SELEID,
 					self.Archive_Date := archivedate( (string)right.dt_first_seen, (string)right.dt_vendor_first_reported);
-					self.dt_first_seen :=(integer) archivedate(  (string)left.dt_first_seen);
+					self.dt_first_seen :=(integer) archivedate(  (string)right.dt_first_seen);
 					SELF := RIGHT,
 					SELF := []), 	
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000));
