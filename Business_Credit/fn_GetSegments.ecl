@@ -2,7 +2,7 @@ IMPORT	Business_Credit, MDR, ut,Data_Services;
 EXPORT	fn_GetSegments	:=	MODULE
 
 	//SHARED	dValidRecords	:=	Business_Credit.Files().active;
-SHARED	dValidRecords	:=	DATASET('~thor_data400::out::sbfe::20201212::active',Business_Credit.Layouts.AccountDataLayout,THOR,__compressed__);
+SHARED	dValidRecords	:=	Business_Credit.Files().active;
 	EXPORT	accountBase	:=	FUNCTION
 		
 		Business_Credit.Layouts.rAccountBase	tAccountBase(dValidRecords	pInput)	:=	TRANSFORM

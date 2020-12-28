@@ -24,20 +24,6 @@ export CalculateDBTV5(dataset(Business_Credit.Layouts.rAccountBase) TradeLines):
 
     rAddRequiredStringFields:=RECORD
         Business_Credit.Layouts.rAccountBase;
-        string     Cycle_Days_Diff;
-        STRING     FunctionalPaymentInterval;
-        STRING      FunctionalDateAccountOpened;
-        string     Internal_Payment_Status;
-        string     Prior_DBT_V5;
-        string     Prior_Payment_Status;
-        string     Prior_ExceptionCycleDays;
-        string     Last_Payment_Status_Before_Exception;
-        string     Last_DBT_V5_Before_Exception;
-        string     Prior_Last_Payment_Status_Before_Exception;
-        string     Prior_Last_DBT_V5_Before_Exception;
-        string     Fixed_Delinquency_Date;
-        string     DBT_V5_General_Cap;
-        string     Exception_Cycle_Days;
         string     Raw_DBT_V5;
         string     DBT_V5;
     END;
@@ -267,19 +253,6 @@ export CalculateDBTV5(dataset(Business_Credit.Layouts.rAccountBase) TradeLines):
     end;
     CalculateDBTV5:=iterate(Groupfile,tCalculateDBTV5(left,right,counter));
     MakeEverythingString:=project(CalculateDBTV5,transform(rAddRequiredStringFields,
-        self.Cycle_Days_Diff:=(string)left.Cycle_Days_Diff;
-        self.FunctionalPaymentInterval:=(string)left.FunctionalPaymentInterval;
-        self.Internal_Payment_Status:=(string)left.Internal_Payment_Status;
-        self.Prior_DBT_V5:=(string)left.Prior_DBT_V5;
-        self.Prior_Payment_Status:=(string)left.Prior_Payment_Status;
-        self.Prior_ExceptionCycleDays:=(string)left.Prior_ExceptionCycleDays;
-        self.Last_Payment_Status_Before_Exception:=(string)left.Last_Payment_Status_Before_Exception;
-        self.Last_DBT_V5_Before_Exception:=(string)left.Last_DBT_V5_Before_Exception;
-        self.Prior_Last_Payment_Status_Before_Exception:=(string)left.Prior_Last_Payment_Status_Before_Exception;
-        self.Prior_Last_DBT_V5_Before_Exception:=(string)left.Prior_Last_DBT_V5_Before_Exception;
-        self.Fixed_Delinquency_Date:=(string)left.Fixed_Delinquency_Date;
-        self.DBT_V5_General_Cap:=(string)left.DBT_V5_General_Cap;
-        self.Exception_Cycle_Days:=(string)left.Exception_Cycle_Days;
         self.Raw_DBT_V5:=(string)left.Raw_DBT_V5;
         self:=left;));
     return MakeEverythingString;
