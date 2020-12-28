@@ -543,11 +543,7 @@ EXPORT DoFDCJoin_dx_CFPB__key_Census_Surnames :=
 		Options.IncludePhone OR
 		Options.IncludePersonPhone;
 
-	EXPORT DoFDCJoin_PhonePlus_V2__ScoringPhone := 
-		NOT Options.isFCRA AND	
-		(Options.IncludePhone OR
-		 Options.IncludePersonPhone);
-	 
+ 
 	EXPORT DoFDCJoin_PhonePlus_V2__Iverification_Phone := 
 		NOT Options.isFCRA AND	
 		(Options.IncludePhone);

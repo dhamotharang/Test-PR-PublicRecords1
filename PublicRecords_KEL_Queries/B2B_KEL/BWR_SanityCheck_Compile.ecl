@@ -1,7 +1,7 @@
 ﻿//HPCC Systems KEL Compiler Version 1.3.0beta5
 #OPTION('expandSelectCreateRow',true);
 IMPORT KEL13 AS KEL;
-IMPORT CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Ult,E_Sele_Tradeline,E_Tradeline FROM PublicRecords_KEL_Queries.B2B_KEL;
+IMPORT CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Sele_Tradeline,E_Tradeline FROM PublicRecords_KEL_Queries.B2B_KEL;
 IMPORT * FROM KEL13.Null;
  
 RunAll := TRUE;
@@ -39,6 +39,7 @@ IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Business_Sele().Ult_I_D__SingleValu
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Business_Sele().Org_I_D__SingleValue_Invalid,NAMED('E_Business_Sele_Org_I_D__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Business_Sele().Sele_I_D__SingleValue_Invalid,NAMED('E_Business_Sele_Sele_I_D__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Business_Sele().Sele_Org__SingleValue_Invalid,NAMED('E_Business_Sele_Sele_Org__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Business_Sele().Sele_Overflow__SingleValue_Invalid,NAMED('E_Business_Sele_Sele_Overflow__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Business_Sele().Sele_Gold__SingleValue_Invalid,NAMED('E_Business_Sele_Sele_Gold__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Business_Sele().Is_Sele_Level__SingleValue_Invalid,NAMED('E_Business_Sele_Is_Sele_Level__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Business_Sele().Is_Org_Level__SingleValue_Invalid,NAMED('E_Business_Sele_Is_Org_Level__SingleValue_Invalid')));
@@ -52,6 +53,16 @@ IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Business_Sele().UIDSourceCou
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Business_Sele().TopSourcedUIDs(TopNUids),NAMED('E_Business_Sele_TopSourcedUIDs')));
 IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Business_Sele().UIDSourceDistribution,NAMED('E_Business_Sele_UIDSourceDistribution')));
 IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Business_Sele().NullCounts,NAMED('E_Business_Sele_NullCounts')));
+ 
+//BusinessSeleOverflow sanity checks
+IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Business_Sele_Overflow().SanityCheck,NAMED('E_Business_Sele_Overflow_SanityCheck')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Business_Sele_Overflow().Ult_I_D__SingleValue_Invalid,NAMED('E_Business_Sele_Overflow_Ult_I_D__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Business_Sele_Overflow().Org_I_D__SingleValue_Invalid,NAMED('E_Business_Sele_Overflow_Org_I_D__SingleValue_Invalid')));
+IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Business_Sele_Overflow().Sele_I_D__SingleValue_Invalid,NAMED('E_Business_Sele_Overflow_Sele_I_D__SingleValue_Invalid')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Business_Sele_Overflow().UIDSourceCounts,NAMED('E_Business_Sele_Overflow_UIDSourceCounts')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Business_Sele_Overflow().TopSourcedUIDs(TopNUids),NAMED('E_Business_Sele_Overflow_TopSourcedUIDs')));
+IF(RunAll OR RunFast OR RunUidSourceCounts,OUTPUT(E_Business_Sele_Overflow().UIDSourceDistribution,NAMED('E_Business_Sele_Overflow_UIDSourceDistribution')));
+IF(RunAll OR RunFast OR RunNullCounts,OUTPUT(E_Business_Sele_Overflow().NullCounts,NAMED('E_Business_Sele_Overflow_NullCounts')));
  
 //Tradeline sanity checks
 IF(RunAll OR RunSanityCheckSummary,OUTPUT(E_Tradeline().SanityCheck,NAMED('E_Tradeline_SanityCheck')));
