@@ -340,8 +340,8 @@ EXPORT Layout_Base := MODULE
 	/*
 	EXPORT Party_Bid := RECORD
 		Party;
-		unsigned6 BID;
-		unsigned1 BID_Score;
+		UNSIGNED6 BID;
+		UNSIGNED1 BID_Score;
 	END;
 	*/
 
@@ -474,7 +474,7 @@ EXPORT Layout_Base := MODULE
 	EXPORT	Party_Bip_old := RECORD
 		Party_old;
 		BIPV2.IDlayouts.l_xlink_ids; //Added for BIP project
-		unsigned8				source_rec_id := 0; //Added for BIP project
+		UNSIGNED8 source_rec_id := 0; //Added for BIP project
 	END;
 
 END;
