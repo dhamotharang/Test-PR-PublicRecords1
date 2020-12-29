@@ -134,7 +134,14 @@ EXPORT new_records_sample_Infutor := FUNCTION
 	oSampleMCMain := OUTPUT(zVehicleSamplesMC, ALL, NAMED('sample_vehicle_records_infutor_mc_main'));
 
 	dVehiclePartyVin := DISTRIBUTE(vehiclev2.files.base.party(source_code = '1V'),HASH(vehicle_key));
-	dVehiclePartyVin_father:= DISTRIBUTE(DATASET('~thor_data400::base::VehicleV2::Party_father', VehicleV2.Layout_Base.Party_bip, FLAT)(source_code = '1V'),HASH(vehicle_key));
+	dVehiclePartyVin_father:= DISTRIBUTE(
+		DATASET(
+			'~thor_data400::base::VehicleV2::Party_father',
+			VehicleV2.Layout_Base.Party_CCPA,
+			FLAT
+		)(source_code = '1V'),
+		HASH(vehicle_key)
+	);
 
 	dSampleVinParty := JOIN(dVehiclePartyVin,
 		dVehiclePartyVin_father,
