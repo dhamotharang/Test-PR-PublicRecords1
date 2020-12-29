@@ -83,7 +83,7 @@ rPopulationStats := RECORD
 END;
 
   
-basestrata := SORT(TABLE(basefile_release,rPopulationStats,FIPSCode[1..2],few),FIPSCode);
+basestrata := SORT(TABLE(basefile_release,rPopulationStats,FIPSCode,few),FIPSCode);
 
 STRATA.createXMLStats(basestrata,'BKMortgage_Release','data',filedate,'',strataresults);
 
