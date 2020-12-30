@@ -1389,6 +1389,7 @@
 				trim(kword, left, right) = 'NS-CAATSA-RUSSIA' =>SubGroup_Constants.numKeywordsID.KEYWORD_NS_CAATSA_RUSSIA,
 				trim(kword, left, right) = 'EEPO' =>SubGroup_Constants.numKeywordsID.KEYWORD_EEPO,
 				trim(kword, left, right) = 'IMHA-GN' =>SubGroup_Constants.numKeywordsID.KEYWORD_IMHA_GN,
+				trim(kword, left, right) = 'BXAMEU' =>SubGroup_Constants.numKeywordsID.KEYWORD_BXAMEU,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

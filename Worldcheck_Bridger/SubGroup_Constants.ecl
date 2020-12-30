@@ -1288,6 +1288,7 @@
 		export string KEYWORD_NS_CAATSA_RUSSIA			:= '970';
 		export string KEYWORD_EEPO									:= '971';
 		export string KEYWORD_IMHA_GN								:= '972';
+		export string KEYWORD_BXAMEU								:= '973';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
