@@ -372,7 +372,7 @@ bsversion := 50;  // hard code this for now
 		datapermission:=datapermission, IN_isDirectToConsumer:=isDirectToConsumerPurpose,IntendedPurpose := 'PRESCREEN'
 	);
 
-#if(Models.LIB_RiskView_Models().TurnOnValidation = FALSE)
+#if(Riskview.Constants.TurnOnValidation = FALSE)
 
 //FCRA List Gen - Can we eliminate this join?  Only matters when did_append is run?
 attributes_clam := group(
