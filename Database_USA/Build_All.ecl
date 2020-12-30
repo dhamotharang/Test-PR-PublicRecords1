@@ -17,9 +17,13 @@ function
 	sequential(
 		 Create_Supers
 		,Spray (pversion,pServerIP,pDirectory,pFilename,pGroupName,pIsTesting,pOverwrite)    
+		,Scrubs.ScrubsPlus('Database_USA','Scrubs_Database_USA','Scrubs_Database_USA_Input', 'Input', pversion,Email_Notification_Lists(pIsTesting).BuildFailure,false) 
+		,if(scrubs.mac_ScrubsFailureTest('Scrubs_Database_USA_Input',pversion)
+		 	 ,OUTPUT('Scrubs passed.  Continuing to the Build_Base step.')				
+			 ,FAIL('Scrubs failed.  Base and keys not built.  Processing stopped.')
+		   )	
 		,Build_Base (pversion,pIsTesting,pSprayedFile,pBaseFile)
-		,Build_Keys (pversion).all   
-		,Scrubs.ScrubsPlus('Database_USA','Scrubs_Database_USA','Scrubs_Database_USA_Base', 'Base', pversion,Email_Notification_Lists(pIsTesting).BuildFailure,false)
+		,Build_Keys (pversion).all  
 		,Build_Strata(pversion,pOverwrite,,,pIsTesting)
 		,Promote().Inputfiles.using2used
 		,Promote().Buildfiles.Built2QA
