@@ -1490,6 +1490,34 @@ EXPORT layout_IDAFraud_out := RECORD
   dataset(iesp.ida_report_response.t_IDAAttribute) Indicators {xpath('Indicators/Attribute'), MAXCOUNT(1)};
 
 END;
+
+EXPORT layout_IDA_in := RECORD
+  //starting with layout_input, add any other fields needed here.
+  Risk_Indicators.Layout_Input;
+  String Client;  
+  String Solution;
+  String ProductName;
+  String ProductID;
+  String App_ID;
+  String ESPTransactionId;
+  String CompanyID;
+  String Channel;
+	string CARetailFlag; // for FCRA only, for california in person applicants
+	
+	// for innovis attribute eventually
+	// string best_ssn;
+	// string best_dob;
+	// string best_address;
+	// string best_zip;
+	// string best_phone;
+END;
+
+EXPORT layout_IDA_out := RECORD
+  Unsigned4 seq;
+  String App_ID;
+  dataset(iesp.ida_report_response.t_IDAAttribute) Indicators {xpath('Indicators/Attribute'), MAXCOUNT(1)};
+END;
+
  
 export layout_fp201_attributes := RECORD
 	string2 IDVerAddressMatchesCurrent;
