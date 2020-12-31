@@ -1,10 +1,11 @@
-﻿#workunit('name','MAS Busienss dev156 1 thread 100k');
+﻿#workunit('name','MAS Busienss dev156 1 thread 10k');
 IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD, Gateway, ut;
 Threads := 1;
 
 RoxieIP := RiskWise.shortcuts.dev156;
 
-InputFile := '~mas::uatsamples::business_nfcra_100k_07102019.csv'; //100k file
+// InputFile := '~mas::uatsamples::business_nfcra_100k_07102019.csv'; //100k file
+InputFile := '~mas::uat::mas_brm_regression_10ktestsample.csv';//for weekly regression testing
 // InputFile := '~mas::uatsamples::business_nfcra_1m_07092019.csv'; //1m file
 // InputFile := '~mas::uatsamples::business_nfcra_iptest_04232020.csv'; 
 
@@ -68,7 +69,7 @@ AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.La
 ExcludeSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 
 RecordsToRun := 0;
-eyeball := 120;
+eyeball := 20;
 
 AllowedSources := ''; // Stubbing this out for use in settings output for now. To be used to turn on DNBDMI by setting to 'DNBDMI'
 OverrideExperianRestriction := FALSE; // Stubbing this out for use in settings output for now. To be used to control whether Experian Business Data (EBR and CRDB) is returned.
@@ -363,6 +364,8 @@ OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE, exp
 OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout'));
 
 OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"')), expire(45));
+
+OUTPUT(Failed,,OutputFile+'errors', thor,  expire(20));
 
 Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(Settings);
 		

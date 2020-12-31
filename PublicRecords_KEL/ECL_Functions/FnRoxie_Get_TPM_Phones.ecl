@@ -19,7 +19,7 @@ EXPORT FnRoxie_Get_TPM_Phones := MODULE
 									SELF.NXXType := RIGHT.nxx_type;
 									SELF.ZIPMatch := If(LEFT.P_InpClnAddrZip5[1..5] IN SET(RIGHT.zipcodes, zip), TRUE, FALSE);
 									SELF := LEFT), 
-						LEFT OUTER, ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT), KEEP(1));
+						LEFT OUTER, ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000), KEEP(1));
 																									
 		RETURN TPM;																
 	END;															
@@ -38,7 +38,7 @@ EXPORT FnRoxie_Get_TPM_Phones := MODULE
 									SELF.NXXType := RIGHT.nxx_type;
 									SELF.ZIPMatch := If(LEFT.B_InpClnAddrZip5[1..5] IN SET(RIGHT.zipcodes, zip), TRUE, FALSE);
 									SELF := LEFT), 
-						LEFT OUTER, ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT), KEEP(1));
+						LEFT OUTER, ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000), KEEP(1));
 																									
 		RETURN TPM;																
 	END;			
