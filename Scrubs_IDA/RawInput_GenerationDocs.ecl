@@ -23,8 +23,8 @@ FIELDTYPE:Invalid_SSN:SPACES( ):ALLOW(0123456789):LENGTHS(0,9):WORDS(0,1)
 FIELDTYPE:Invalid_DL:CUSTOM(Scrubs_IDA.Functions.FN_valid_DL > 0)
 FIELDTYPE:Invalid_Phone:LIKE(Invalid_Num):LENGTHS(0,10)
 FIELDTYPE:Invalid_Clientassigneduniquerecordid:LIKE(Invalid_Num)
-FIELDTYPE:Invalid_Emailaddress:CUSTOM(Scrubs_IDA.Functions.fn_valid_email > 0)
-FIELDTYPE:Invalid_Ipaddress:CUSTOM(Scrubs_IDA.Functions.fn_valid_IP > 0)
+FIELDTYPE:Invalid_Emailaddress:CUSTOM(Scrubs.Functions.fn_valid_email > 0)
+FIELDTYPE:Invalid_Ipaddress:CUSTOM(Scrubs.Functions.fn_valid_IP > 0)
 
 FIELD:firstname:TYPE(STRING20):LIKE(Invalid_FName):0,0
 FIELD:middlename:TYPE(STRING20):LIKE(Invalid_MName):0,0

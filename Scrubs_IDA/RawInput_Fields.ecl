@@ -135,14 +135,14 @@ EXPORT InValidMessageFT_Invalid_Clientassigneduniquerecordid(UNSIGNED1 wh) := CH
 EXPORT MakeFT_Invalid_Emailaddress(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_Emailaddress(SALT311.StrType s) := WHICH(~Scrubs_IDA.Functions.fn_valid_email(s)>0);
-EXPORT InValidMessageFT_Invalid_Emailaddress(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_IDA.Functions.fn_valid_email'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Emailaddress(SALT311.StrType s) := WHICH(~Scrubs.Functions.fn_valid_email(s)>0);
+EXPORT InValidMessageFT_Invalid_Emailaddress(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.Functions.fn_valid_email'),SALT311.HygieneErrors.Good);
 
 EXPORT MakeFT_Invalid_Ipaddress(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_Ipaddress(SALT311.StrType s) := WHICH(~Scrubs_IDA.Functions.fn_valid_IP(s)>0);
-EXPORT InValidMessageFT_Invalid_Ipaddress(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_IDA.Functions.fn_valid_IP'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_Invalid_Ipaddress(SALT311.StrType s) := WHICH(~Scrubs.Functions.fn_valid_IP(s)>0);
+EXPORT InValidMessageFT_Invalid_Ipaddress(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.Functions.fn_valid_IP'),SALT311.HygieneErrors.Good);
 
 
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'firstname','middlename','lastname','suffix','addressline1','addressline2','city','state','zip','dob','ssn','dl','dlstate','phone','clientassigneduniquerecordid','emailaddress','ipaddress');
