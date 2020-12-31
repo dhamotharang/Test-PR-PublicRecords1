@@ -104,13 +104,15 @@ BOOLEAN ExcludeStatusRefresh = FALSE) := TRANSFORM
     // don't log the lexid if the person got a noscore
     SELF.inquiry_lexid := if(riskview.constants.noScoreAlert in [ri.Alert1,ri.Alert2,ri.Alert3,ri.Alert4,ri.Alert5,ri.Alert6,ri.Alert7,ri.Alert8,ri.Alert9,ri.Alert10] OR suppress_condition, '', ri.LexID);
     SELF.Exception_Code := MAP(ri.Exception_Code = Riskview.Constants.OKCError => '22',
-                                                           ri.Exception_Code IN Riskview.Constants.DTEErrorCodes => '41',
-                                                           ri.Status_Code = '801' => ri.Status_Code,
-                                                           '');
+                               ri.Exception_Code IN Riskview.Constants.generalErrorCodes => ri.Exception_Code,
+                               ri.Exception_Code IN Riskview.Constants.DTEErrorCodes => '41',
+                               ri.Status_Code = '801' => ri.Status_Code,
+                               '');
     SELF.Exception_Message := MAP(ri.Exception_Code = Riskview.Constants.OKCError => RiskView.Constants.StatusRefresh_error_desc,
-                                                        ri.Exception_Code IN Riskview.Constants.DTEErrorCodes  => RiskView.Constants.DTE_error_desc,
-                                                        ri.Status_Code = '801' => RiskView.Constants.Deferred_request_desc,
-                                                        '');
+                                  ri.Exception_Code IN Riskview.Constants.generalErrorCodes => RiskView.Constants.MLA_error_desc(ri.Exception_Code),
+                                  ri.Exception_Code IN Riskview.Constants.DTEErrorCodes  => RiskView.Constants.DTE_error_desc,
+                                  ri.Status_Code = '801' => RiskView.Constants.Deferred_request_desc,
+                                  '');
     SELF.Liens1_Seq:= IF(~suppress_condition, ri.LnJliens[1].Seq, '');
     SELF.Liens1_DateFiled:= IF(~suppress_condition, ri.LnJliens[1].DateFiled, '');
     SELF.Liens1_LienTypeID := IF(~suppress_condition, ri.LnJliens[1].LienTypeID, '');

@@ -19,15 +19,17 @@ iesp.equifax_sts.t_EquifaxSTSRequest into_in(Input le) := transform
 	self := le;
 end;
 
-iesp.equifax_sts.t_EquifaxSTSResponseEx failX() := transform
+iesp.equifax_sts.t_EquifaxSTSResponseEx failX(INPUT le) := transform
 	self.response._header.message := FAILMESSAGE;
 	self.response._header.status := FAILCODE;
+  //We need to carry this through because the following joins work off of it, if the request failed, there is still info we need to process.
+	self.response._header.QueryID := trim(le.user.QueryId);
 	self := [];
 end;
 
 results := if (makeGatewayCall, soapcall(Input, gateway_cfg.url, 'EquifaxSTS', iesp.equifax_sts.t_EquifaxSTSRequest, into_in(LEFT),
 			   dataset(iesp.equifax_sts.t_EquifaxSTSResponseEx),XPATH('EquifaxSTSResponseEx'),
-			   onfail(failx()), timeout(4), retry(0)));
+			   onfail(failx(LEFT)), timeout(4), retry(0)));
 
 return results;
   
