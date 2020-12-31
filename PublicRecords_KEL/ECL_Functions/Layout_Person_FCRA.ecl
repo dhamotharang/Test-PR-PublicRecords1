@@ -22,7 +22,7 @@
 	STRING1 P_InpAddrCityFlag;
 	STRING1 P_InpAddrStateFlag;
 	STRING1 P_InpAddrZipFlag;
-	STRING1 P_InpAddrSSNFlag;
+	STRING1 P_InpSSNFlag;
 	STRING1 P_InpDOBFlag;
 	STRING1 P_InpDLFlag;
 	STRING1 P_InpDLStateFlag;
@@ -106,8 +106,8 @@
 	STRING6 P_InpValEmailUserAllZeroFlag,
 	STRING6 P_InpValEmailUserBadCharFlag,
 	STRING6 P_InpValEmailDomAllZeroFlag,
-	STRING6 P_InpValEmailDomBadCharFlag,	
-	STRING6 P_InpValEmailBogusFlag,		
+	STRING6 P_InpValEmailDomBadCharFlag,
+	STRING6 P_InpValEmailBogusFlag,
 	STRING6 P_InpClnArchDtFlag;
 	STRING6 P_InpValNameBogusFlag;
 	STRING6 P_InpValPhoneHomeBadCharFlag;
@@ -116,10 +116,10 @@
 	STRING6 P_InpValPhoneWorkBadCharFlag;
 	STRING6 P_InpValPhoneWorkBadLenFlag;
 	STRING6 P_InpValPhoneWorkBogusFlag;
-	STRING30 P_InpClnEmailUser;		
-	STRING30 P_InpClnEmailDom;		
+	STRING30 P_InpClnEmailUser;
+	STRING30 P_InpClnEmailDom;
 	STRING6  P_InpClnEmailExt;
-	STRING45 P_InpClnIPAddr;
+	STRING45 P_InpClnIPAddr,
 	STRING6 P_InpValNameInvalidFlag,
 	STRING6 P_InpValAddrStInvalidFlag,
 	STRING6 P_InpValPhoneHomeInvalidFlag,
@@ -130,12 +130,12 @@
 	STRING6 P_InpValDOBInvalidFlag,
 	STRING6 P_InpValEmailInvalidFlag,
 	STRING6 P_InpValArchDtInvalidFlag,
-	// INTEGER4 PI_InpAddrAVMVal;
-	// INTEGER4 PI_InpAddrAVMValA1Y;
-	// DECIMAL7_2 PI_InpAddrAVMRatio1Y;
-	// INTEGER4 PI_InpAddrAVMValA5Y;
-	// DECIMAL7_2 PI_InpAddrAVMRatio5Y;
-	// INTEGER4 PI_InpAddrAVMConfScore;
+	INTEGER4 PI_InpAddrAVMVal;
+	INTEGER4 PI_InpAddrAVMValA1Y;
+	DECIMAL7_2 PI_InpAddrAVMRatio1Y;
+	INTEGER4 PI_InpAddrAVMValA5Y;
+	DECIMAL7_2 PI_InpAddrAVMRatio5Y;
+	INTEGER4 PI_InpAddrAVMConfScore;
 	STRING6 PI_InpAddrOnFileFlagEv;
 	STRING6 PI_InpAddrIsVacantFlag;
 	STRING6 PI_InpAddrIsThrowbackFlag;
@@ -149,11 +149,16 @@
 	STRING6 PI_InpAddrOWGMFlag;
 	STRING6 PI_InpAddrIsMultiUnitFlag;
 	STRING6 PI_InpAddrIsAptFlag;
+	INTEGER PI_InpDOBAge;
+	STRING6 PI_InpSSNIsDeceasedFlag;
+	STRING10 PI_InpSSNDeceasedDt;
+	STRING6 PI_InpAddrStateVoterAvailFlag;
 	STRING10 G_BuildDrgCrimDt;
 	STRING10 G_BuildAstVehAirDt;
 	STRING10 G_BuildAstVehWtrDt;
 	STRING10 G_BuildAstPropDt;
-	STRING10 G_BuildEduDt;	
+	STRING10 G_BuildEduDt;
+	STRING10 G_BuildEmailDt;
 	STRING6	P_LexIDSeenFlag;
 	INTEGER3 PL_AstVehAirCntEv;
 	STRING PL_AstVehAirEmrgDtListEv;
@@ -167,6 +172,19 @@
 	STRING10 PL_AstVehWtrEmrgOldDtEv;
 	INTEGER3 PL_AstVehWtrEmrgNewMsncEv;
 	INTEGER3 PL_AstVehWtrEmrgOldMsncEv;
+	// Property
+	INTEGER3 PL_AstPropCntEv;
+	STRING900 PL_AstPropNewDtListEv;
+	STRING900 PL_AstPropOldDtListEv;
+	INTEGER3 PL_AstPropCurrCnt;
+	INTEGER3 PL_AstPropSaleCntEv;
+	STRING PL_AstPropSaleAmtListEv;
+	INTEGER4 PL_AstPropSaleTotEv;
+	STRING900 PL_AstPropSaleDtListEv;
+	STRING10 PL_AstPropSaleNewDtEv;
+	STRING10 PL_AstPropSaleOldDtEv;
+	INTEGER3 PL_AstPropSaleNewMsncEv;
+	INTEGER3 PL_AstPropSaleOldMsncEv;
 	INTEGER3 PL_DrgCrimCnt1Y;
 	INTEGER3 PL_DrgCrimCnt7Y;
 	STRING10 PL_DrgCrimNewDt1Y;
@@ -276,11 +294,23 @@
 	STRING150 PL_ProfLicActvNewTitleType;
 	STRING6 PL_ProfLicActvNewIndx;
 	STRING6 PL_ProfLicActvNewSrcType;
-		// Best PII
+	// Best PII
 	STRING200 PL_CurrAddrFull;
 	// STRING200 PL_CurrAddrLocID;
 	STRING200 PL_PrevAddrFull;
 	// STRING200 PL_PrevAddrLocID;
+	STRING6 PL_CurrAddrCnty;
+	STRING7 PL_CurrAddrGeo;
+	STRING10 PL_CurrAddrLat;
+	STRING11 PL_CurrAddrLng;
+	STRING6 PL_CurrAddrType;
+	STRING6 PL_CurrAddrStatus;
+	STRING6 PL_PrevAddrCnty;
+	STRING7 PL_PrevAddrGeo;
+	STRING10 PL_PrevAddrLat;
+	STRING11 PL_PrevAddrLng;
+	STRING6 PL_PrevAddrType;
+	STRING6 PL_PrevAddrStatus;
 	//Current Address
 	STRING6 PL_CurrAddrIsVacantFlag;
 	STRING6 PL_CurrAddrIsThrowbackFlag;
@@ -291,21 +321,96 @@
 	STRING6 PL_CurrAddrIsSimpAddrFlag;
 	STRING6 PL_CurrAddrIsDropDeliveryFlag;
 	STRING6 PL_CurrAddrIsBusinessFlag;
-		//consumer liens	
+	//Previous Address
+	STRING6 PL_PrevAddrIsSimpAddrFlag;
+	STRING6 PL_PrevAddrIsBusinessFlag;
+	//consumer liens
 	STRING10 G_BuildDrgLnJDt;
-	INTEGER3 PL_DrgJudgCnt7Y;		
-	INTEGER3 PL_DrgLTDCnt7Y;		
-	INTEGER3 PL_DrgLienCnt7Y;		
-	//Education		
-	STRING6 PL_EduRecFlagEv;		
-	STRING50 PL_EduSrcListEv;		
-	STRING6 PL_EduHSRecFlagEv;		
-	STRING6 PL_EduCollRecFlagEv;		
-	STRING PL_EduCollSrcEmrgDtListEv;		
-	STRING PL_EduCollSrcLastDtListEv;		
-	STRING8 PL_EduCollSrcNewRecOldDtEv;		
-	STRING8 PL_EduCollSrcNewRecNewDtEv;		
-	INTEGER3 PL_EduCollSrcNewRecOldMsncEv;		
-	INTEGER3 PL_EduCollSrcNewRecNewMsncEv;		
-	INTEGER3 PL_EduCollRecSpanEv;	
+	INTEGER3 PL_DrgJudgCnt7Y;
+	INTEGER3 PL_DrgLTDCnt7Y;
+	STRING PL_DrgLTDAmtList7Y;
+	STRING PL_DrgLTDDtList7Y;
+	INTEGER3 PL_DrgLTDNewMsnc7Y;
+	INTEGER3 PL_DrgLTDOldMsnc7Y;
+	INTEGER3 PL_DrgLienCnt7Y;
+	//Consumer Suits
+	INTEGER3 PL_DrgSuitCnt7Y;
+	STRING PL_DrgSuitAmtList7Y;
+	INTEGER3 PL_DrgSuitAmtTot7Y;
+	STRING PL_DrgSuitDtList7Y;
+	INTEGER3 PL_DrgSuitNewMsnc7Y;
+	INTEGER3 PL_DrgSuitOldMsnc7Y;
+	//OverAllLnJ
+	INTEGER3 PL_DrgLnJCnt7Y;
+	STRING	PL_DrgLnJAmtList7Y;
+	STRING	PL_DrgLnJDtList7Y;
+	STRING10 PL_DrgLnJNewDt7Y;
+	INTEGER3 PL_DrgLnJNewMsnc7Y;
+	STRING10 PL_DrgLnJOldDt7Y;
+	INTEGER3 PL_DrgLnJOldMsnc7Y;
+	//Education
+	STRING6 PL_EduRecFlagEv;
+	STRING50 PL_EduSrcListEv;
+	STRING6 PL_EduHSRecFlagEv;
+	STRING6 PL_EduCollRecFlagEv;
+	STRING PL_EduCollSrcEmrgDtListEv;
+	STRING PL_EduCollSrcLastDtListEv;
+	STRING8 PL_EduCollSrcNewRecOldDtEv;
+	STRING8 PL_EduCollSrcNewRecNewDtEv;
+	INTEGER3 PL_EduCollSrcNewRecOldMsncEv;
+	INTEGER3 PL_EduCollSrcNewRecNewMsncEv;
+	INTEGER3 PL_EduCollRecSpanEv;
+	//Email
+	INTEGER3 PL_EmailCntEv;
+	//Derog History
+	// INTEGER3 PL_DrgCnt7Y;
+	// STRING PL_DrgDtList7Y;
+	// INTEGER3 PL_DrgOldMsnc7Y;
+	// INTEGER3 PL_DrgNewMsnc7Y;		
+	//Best PII
+	STRING20 PL_BestNameFirst;
+	STRING20 PL_BestNameMid;
+	STRING20 PL_BestNameLast;
+	STRING10 PL_BestSSN;
+	STRING10 PL_BestDOB;
+	INTEGER3 PL_BestDOBAge;
+	// Inquiries
+	STRING10 G_BuildInqDt;
+	// FCRA Velocity Inquiries
+	INTEGER3 PL_InqPerLexIDCnt1Y;
+	INTEGER3 PL_InqSSNPerLexIDCnt1Y;
+	INTEGER3 PL_InqAddrPerLexIDCnt1Y;
+	INTEGER3 PL_InqLNamePerLexIDCnt1Y;
+	INTEGER3 PL_InqFNamePerLexIDCnt1Y;
+	INTEGER3 PL_InqPhonePerLexIDCnt1Y;
+	INTEGER3 PL_InqDOBPerLexIDCnt1Y;
+	INTEGER3 PL_InqPerLexIDWInpFLSCnt1Y;
+	// Inquiry PII Corroboration
+	INTEGER3 PL_InqPerLexIDWInpASCnt1Y;
+	INTEGER3 PL_InqPerLexIDWInpSDCnt1Y;
+	INTEGER3 PL_InqPerLexIDWInpPSCnt1Y;
+	INTEGER3 PL_InqPerLexIDWInpFLASCnt1Y;
+	INTEGER3 PL_InqPerLexIDWInpFLPSCnt1Y;
+	INTEGER3 PL_InqPerLexIDWInpFLAPSCnt1Y;
+	//Short Term Lending
+	INTEGER PL_STLCnt1Y;
+	INTEGER PL_STLCnt2Y;
+	INTEGER PL_STLCnt5Y;
+	STRING PL_STLDtList5Y;
+	//Person Header Source Verification
+	// STRING10 G_BuildHdrDt;
+	// INTEGER PL_VerSrcCntEv;
+	// STRING100 PL_VerSrcListEv;
+	// STRING300 PL_VerSrcEmrgDtListEv;
+	// STRING300 PL_VerSrcLastDtListEv;
+	// STRING10 PL_VerSrcOldDtEv;
+	// STRING10 PL_VerSrcNewDtEv;
+	// STRING6 P_LexIDRstdOnlyFlag;
+	string6 PL_AlrtCorrectedFlag;
+	string6 PL_AlrtConsStatementFlag;
+	string6 PL_AlrtDisputeFlag;
+	string6 PL_AlrtSecurityFreezeFlag;
+	string6 PL_AlrtSecurityAlertFlag;
+	string6 PL_AlrtIDTheftFlag;
+	
 END;

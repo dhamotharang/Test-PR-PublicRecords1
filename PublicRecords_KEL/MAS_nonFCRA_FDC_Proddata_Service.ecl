@@ -11,6 +11,7 @@
 	<part name="LexIdSourceOptout" type="xsd:integer"/>
 	<part name="IncludeAccident,"type=xsd:boolean"/>
 	<part name="IncludeAddress,"type=xsd:boolean"/>
+	<part name="IncludeAddressSummary,"type=xsd:boolean"/>
 	<part name="IncludeAircraft,"type=xsd:boolean"/>
 	<part name="IncludeBankruptcy,"type=xsd:boolean"/>
 	<part name="IncludeBusinessSele,"type=xsd:boolean"/>
@@ -26,13 +27,16 @@
 	<part name="IncludeHousehold,"type=xsd:boolean"/>
 	<part name="IncludeInquiry,"type=xsd:boolean"/>
 	<part name="IncludeLienJudgment,"type=xsd:boolean"/>
+	<part name="IncludeNameSummary,"type=xsd:boolean"/>
 	<part name="IncludePerson,"type=xsd:boolean"/>
 	<part name="IncludePhone,"type=xsd:boolean"/>
+	<part name="IncludePhoneSummary,"type=xsd:boolean"/>
 	<part name="IncludeProfessionalLicense,"type=xsd:boolean"/>
 	<part name="IncludeProperty,"type=xsd:boolean"/>
 	<part name="IncludePropertyEvent,"type=xsd:boolean"/>
 	<part name="IncludeSurname,"type=xsd:boolean"/>
 	<part name="IncludeSocialSecurityNumber,"type=xsd:boolean"/>
+	<part name="IncludeSSNSummary,"type=xsd:boolean"/>
 	<part name="IncludeTIN,"type=xsd:boolean"/>
 	<part name="IncludeTradeline,"type=xsd:boolean"/>
 	<part name="IncludeUtility,"type=xsd:boolean"/>
@@ -64,6 +68,7 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		'IsMarketing',
 		'IncludeAccident',
 		'IncludeAddress',
+		'IncludeAddressSummary',
 		'IncludeAircraft',
 		'IncludeBankruptcy',
 		'IncludeBusinessSele',
@@ -82,6 +87,7 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		'IncludeNameSummary',
 		'IncludePerson',
 		'IncludePhone',
+		'IncludePhoneSummary',
 		'IncludeProfessionalLicense',
 		'IncludeProperty',
 		'IncludePropertyEvent',
@@ -140,7 +146,7 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		EXPORT BOOLEAN isFCRA                   		 := is_fcra;
 		EXPORT STRING8 ArchiveDate               		 := (STRING)dtArchiveDate;
 		EXPORT STRING250 InputFileName              := '';
-		EXPORT STRING IndustryClass        					 := '';
+		EXPORT STRING5 IndustryClass        					 := '';
 		EXPORT UNSIGNED1 LexIdSourceOptout := _LexIdSourceOptout;
 		EXPORT STRING100 Data_Restriction_Mask      := DataRestrictionMask;
 		EXPORT STRING100 Data_Permission_Mask       := DataPermissionMask;
@@ -176,6 +182,7 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 
 		EXPORT BOOLEAN IncludeAccident := TRUE: STORED('IncludeAccident');
 		EXPORT BOOLEAN IncludeAddress := TRUE: STORED('IncludeAddress');
+		EXPORT BOOLEAN IncludeAddressSummary := TRUE: STORED('IncludeAddressSummary');
 		EXPORT BOOLEAN IncludeAircraft := TRUE: STORED('IncludeAircraft');
 		EXPORT BOOLEAN IncludeBankruptcy := TRUE: STORED('IncludeBankruptcy');
 		EXPORT BOOLEAN IncludeBusinessSele := TRUE: STORED('IncludeBusinessSele');
@@ -194,6 +201,7 @@ export MAS_nonFCRA_FDC_Proddata_Service() := MACRO
 		EXPORT BOOLEAN IncludeNameSummary := TRUE: STORED('IncludeNameSummary');
 		EXPORT BOOLEAN IncludePerson := TRUE: STORED('IncludePerson');
 		EXPORT BOOLEAN IncludePhone := TRUE: STORED('IncludePhone');
+		EXPORT BOOLEAN IncludePhoneSummary := TRUE: STORED('IncludePhoneSummary');
 		EXPORT BOOLEAN IncludeProfessionalLicense := TRUE: STORED('IncludeProfessionalLicense');
 		EXPORT BOOLEAN IncludeProperty := TRUE: STORED('IncludeProperty');
 		EXPORT BOOLEAN IncludePropertyEvent := TRUE: STORED('IncludePropertyEvent');

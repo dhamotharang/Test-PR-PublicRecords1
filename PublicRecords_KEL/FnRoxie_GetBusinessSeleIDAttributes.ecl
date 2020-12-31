@@ -17,7 +17,7 @@ LayoutBIIAndPII := RECORD
 		DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) RepInput;
 	END;
 	
-	LayoutBusinessSeleIDAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1(
+	LayoutBusinessSeleIDAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
 																	0, // UltID
 																	0, // OrgID
 																	0, // SeleID
@@ -34,7 +34,7 @@ LayoutBIIAndPII := RECORD
 					
 	BusinessSeleAttributes_Results := PROJECT(BusinessSeleAttributesInput, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes},
 		SELF.G_ProcBusUID := LEFT.InputData.G_ProcBusUID;
-		NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1(
+		NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
 				LEFT.InputData.B_LexIDUlt,
 				LEFT.InputData.B_LexIDOrg,
 				LEFT.InputData.B_LexIDLegal,
@@ -48,7 +48,7 @@ LayoutBIIAndPII := RECORD
 
 	BusinessSeleIDAttributesRaw := KEL.Clean(BusinessSeleAttributes_Results, true, true, true);
 
-	LayoutBusinessSeleIDNoDatesAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1(
+	LayoutBusinessSeleIDNoDatesAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1_Dynamic(
 																	0, // UltID
 																	0, // OrgID
 																	0, // SeleID
@@ -58,7 +58,7 @@ LayoutBIIAndPII := RECORD
 	BusinessSeleAttributes_NoDates_Results := IF(Options.OutputMasterResults,
 		PROJECT(InputData, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDNoDatesAttributes},
 			SELF.G_ProcBusUID := LEFT.G_ProcBusUID;
-			NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1(
+			NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1_Dynamic(
 				LEFT.B_LexIDUlt,
 				LEFT.B_LexIDOrg,
 				LEFT.B_LexIDLegal, 				

@@ -1,4 +1,8 @@
-﻿import PublicRecords_KEL, risk_indicators, fcra, MDR, faa, doxie_files, std, SexOffender, Prof_License_Mari, doxie, watercraft, bankruptcyv2, ln_propertyv2;
+﻿import PublicRecords_KEL, risk_indicators, fcra, MDR, faa, doxie_files, std, SexOffender, Prof_License_Mari, doxie, watercraft, bankruptcyv2, ln_propertyv2, RiskView;
+IMPORT KEL13 AS KEL;
+
+//please note
+//FCRA overrides are NOT archivable
 
 
 EXPORT FCRA_Overrides(PublicRecords_KEL.Interface_Options Options) := MODULE 
@@ -11,8 +15,32 @@ SHARED CFG_File     := PublicRecords_KEL.CFG_Compile;
 SHARED GLBARegulatedDeathMasterRecord(STRING glb_flag) := glb_flag = 'Y';
 SHARED DPPARegulatedWaterCraftRecord(STRING dppa_flag) := IF(TRIM(dppa_flag, LEFT, RIGHT) = 'Y', TRUE, FALSE);	
 SHARED LN_PropertyV2_Src(STRING ln_fares_id) := MDR.sourceTools.fProperty(ln_fares_id);
-SHARED 	Common       := PublicRecords_KEL.ECL_Functions.Common(Options);
+SHARED Common       := PublicRecords_KEL.ECL_Functions.Common(Options);
 
+SHARED ArchiveDate(string datevalue_in1, string datevalue_in2 = '' ):= function
+	
+	DateValue := TRIM(datevalue_in1);
+	DateValue2 := TRIM(datevalue_in2);
+	
+	datechooser(string datevalue) := function
+	
+	cleanDate := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date((STRING) TRIM(DateValue))[1];
+	cleanDate2 := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(DateValue[1..6]+'01')[1];
+	validDatechooser := MAP( (STRING)DateValue NOT IN ['', '0'] AND cleanDate.yearfilled and cleanDate.Monthfilled and cleanDate.dayfilled and cleanDate.DateValid => (STRING) DateValue,//if we have a full valid date keep it
+													(STRING)DateValue NOT IN ['', '0'] and length(TRIM(DateValue)) = 7 and cleanDate2.DateValid  => cleanDate2.ValidPortion_01,//if we have a YYYYMMD number keep [1..6] + 01 cleaned if its valid
+														(STRING)DateValue IN ['', '0'] OR (INTEGER)cleanDate.ValidPortion_01 = 0 OR REGEXFIND('[^0-9.]',  DateValue, NOCASE)=> '',//if the date is cleaned to 00000000 or is not numeric set to ''
+														cleanDate.ValidPortion_01);	//else keep it, this should only be good dates			
+
+
+		
+	return validDatechooser;
+	end;
+	
+	date1 := datechooser(datevalue);
+	
+return If(date1 = '', datechooser(datevalue2), date1);	
+	
+end;	
 
 EXPORT GetOverrideFlags(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) shell, BOOLEAN FDCMiniPop = TRUE) := function
 
@@ -107,7 +135,7 @@ EXPORT GetOverrideFlags(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutIn
 	SELF.water_correct_RECORD_ID        := SET(flagrecs(file_id = FCRA.FILE_ID.WATERCRAFT),record_id)+ le.water_correct_RECORD_ID;		
 	
 	SELF.thrive_correct_ffid             := SET(flagrecs(file_id = FCRA.FILE_ID.THRIVE),flag_file_id)  ;
-	SELF.thrive_correct_record_id        := SET(flagrecs(file_id = FCRA.FILE_ID.THRIVE),record_id)+ le.thrive_correct_record_id;		
+	SELF.thrive_correct_record_id        := SET(flagrecs(file_id = FCRA.FILE_ID.THRIVE),record_id)+ le.thrive_correct_record_id;	
 	
 	SELF.SexOffender_correct_ffid             := SET(flagrecs(file_id = FCRA.FILE_ID.so_offenses),flag_file_id)  ;
 	SELF.SexOffender_correct_record_id        := SET(flagrecs(file_id = FCRA.FILE_ID.so_offenses),record_id)+ le.SexOffender_correct_record_id;	
@@ -182,12 +210,15 @@ EXPORT GetOverrideAdvo(DATASET( Layouts_FDC.LayoutAddressGeneric_inputs) shell) 
 										self := left,
 										self := []),
 									atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT));
-									
-	advo_corrections_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(advo_corrections_data, transform(Layouts_FDC.Layout_ADVO__Key_Addr1_History,
+										
+	
+	advo_corrections_data_clean := project(advo_corrections_data, transform(Layouts_FDC.Layout_ADVO__Key_Addr1_History,
 						SELF.Src := MDR.sourceTools.src_advo_valassis,
-						SELF.DPMBitmap := SetDPMBitmap( Source := self.src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),					
+						SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_advo_valassis, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),					
+						self.Archive_Date := '';	
+						self.date_first_seen :=  archivedate((string)left.date_first_seen);
 						SELF := left,
-						SELF := [])), false, false);
+						SELF := []));
 			
 	return advo_corrections_data_clean;	
 	
@@ -213,12 +244,15 @@ EXPORT GetOverrideAircraft(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 													SELF := left,
 													SELF := []), 
                         atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM));
-	
-	reg_corrected_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(reg_corrected, transform(Layouts_FDC.Layout_FAA__key_aircraft_id,
+												
+		
+	reg_corrected_data_clean := project(reg_corrected, transform(Layouts_FDC.Layout_FAA__key_aircraft_id,
 						SELF.Src := MDR.sourceTools.src_Aircrafts,
 						SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Aircrafts, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+						self.Archive_Date := '';		
+						self.date_first_seen :=  archivedate((string)left.date_first_seen);
 						SELF := left,
-						SELF := [])), false, false);	
+						SELF := []));	
 	
 	return reg_corrected_data_clean;	
 	
@@ -242,13 +276,15 @@ EXPORT GetOverrideAVM(DATASET( Layouts_FDC.LayoutAddressGeneric_inputs) shell) :
 												SELF := left,
 												SELF := []), 
 											atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM));
-									
-	avm_corr_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(avm_corr, transform(Layouts_FDC.Layout_AVM_V2_Key_AVM_Address_Norm_Records,
+		
+		
+	avm_corr_data_clean := project(avm_corr, transform(Layouts_FDC.Layout_AVM_V2_Key_AVM_Address_Norm_Records,
 					SELF.Src := PublicRecords_KEL.ECL_Functions.Constants.AVM,
-					SELF.DPMBitmap := SetDPMBitmap( Source := BlankString, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
-					SELF.history_date := left.recording_date,// doing this so our avm overrides have some kind of date to get past the asof statement, not ideal but without it kel will drop these on the floor
+					SELF.DPMBitmap := SetDPMBitmap( Source := PublicRecords_KEL.ECL_Functions.Constants.AVM, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					SELF.history_date :=  ArchiveDate(left.recording_date),// doing this so our avm overrides have some kind of date to get past the asof statement, not ideal but without it kel will drop these on the floor
+					self.Archive_Date := '';									
 					SELF := left,
-					SELF := [])), false, false);		
+					SELF := []));		
 	
 	return avm_corr_data_clean;	
 
@@ -276,12 +312,15 @@ EXPORT GetOverrideBanko(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 													SELF := left,
 													SELF := []), 
 									atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM));
+									
 							
-	bk_corr_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(bk_corr, transform(Layouts_FDC.Layout_BankruptcyV3__key_bankruptcyv3_search,
+	bk_corr_data_clean := project(bk_corr, transform(Layouts_FDC.Layout_BankruptcyV3__key_bankruptcyv3_search,
 					SELF.Src := MDR.sourceTools.src_Bankruptcy,
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Bankruptcy, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.date_first_seen :=  archivedate((string)left.date_first_seen);
+					self.Archive_Date := '';									
 					SELF := left,
-					SELF := [])), false, false);		
+					SELF := []));		
 
 	return bk_corr_data_clean;	
 	
@@ -305,17 +344,26 @@ EXPORT GetOverrideCrimOffenders(DATASET( Layouts_FDC.Layout_FDC) shell) := funct
 															SELF := right,
 															SELF := left,
 															SELF := []), 
-														atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM));	
+														atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM));
+														
+	Doxie_Files__Key_Offenders_Src(STRING data_type) := CASE(data_type,
+				'1' => MDR.sourceTools.src_Accurint_DOC, //DC
+				'2' => MDR.sourceTools.src_Accurint_Crim_Court,//CC
+				'5' => MDR.sourceTools.src_Accurint_Arrest_Log, //AL
+					'');	
+	
 							
-	crim_corr_Offenders_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(crim_corr_Offenders, transform(Layouts_FDC.Layout_Doxie_Files__Key_Offenders,
+	crim_corr_Offenders_data_clean := project(crim_corr_Offenders, transform(Layouts_FDC.Layout_Doxie_Files__Key_Offenders,
 					SELF.src := CASE(left.data_type,
 											'1' => MDR.sourceTools.src_Accurint_DOC, //DC
 											'2' => MDR.sourceTools.src_Accurint_Crim_Court,//CC
 											'5' => MDR.sourceTools.src_Accurint_Arrest_Log, //AL
 												'');
-					SELF.DPMBitmap := SetDPMBitmap( Source := self.src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					SELF.DPMBitmap := SetDPMBitmap( Source := Doxie_Files__Key_Offenders_Src(left.data_type), FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.fcra_date :=   archivedate(left.fcra_date);
+					self.Archive_Date := '';												
 					SELF := left,
-					SELF := [])), false, false);		
+					SELF := []));		
 	
 	return crim_corr_Offenders_data_clean;	
 	
@@ -341,12 +389,15 @@ crimOffenseslay := RECORD
 															SELF := left,
 															SELF := []), 
 														atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM));	
-							
-	crim_corr_offenses_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(crim_corr_offenses, transform(Layouts_FDC.Layout_Doxie_Files__Key_Offenses,
+	
+	
+	crim_corr_offenses_data_clean := project(crim_corr_offenses, transform(Layouts_FDC.Layout_Doxie_Files__Key_Offenses,
 					SELF.Src := MDR.sourceTools.src_Accurint_DOC,
-					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Accurint_Crim_Court, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Accurint_DOC, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.Archive_Date := '';	
+					self.fcra_date :=  archivedate(left.fcra_date);
 					SELF := left,
-					SELF := [])), false, false);		
+					SELF := []));		
 	
 	return crim_corr_offenses_data_clean;	
 	
@@ -370,12 +421,14 @@ crimCourtlay := RECORD
 													SELF := left,
 													SELF := []), 
                         atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM));	
-							
-	crim_corr_Court_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(crim_corr_Court, transform(Layouts_FDC.Layout_Doxie_files__Key_Court_Offenses,
+				
+	crim_corr_Court_data_clean := project(crim_corr_Court, transform(Layouts_FDC.Layout_Doxie_files__Key_Court_Offenses,
 					SELF.Src := MDR.sourceTools.src_Accurint_Crim_Court,
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Accurint_Crim_Court, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.fcra_date := archivedate( left.fcra_date);
+					self.Archive_Date := '';					
 					SELF := left,
-					SELF := [])), false, false);		
+					SELF := []));		
 	
 	return crim_corr_Court_data_clean;	
 	
@@ -406,14 +459,17 @@ SOCourtlay := RECORD
 															SELF := []), 
 														atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM));	
 	
-	SO_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(SO_corr_Court, transform(Layouts_FDC.Layout_SexOffender__Key_SexOffender_SPK,
+
+	SO_data_clean := project(SO_corr_Court, transform(Layouts_FDC.Layout_SexOffender__Key_SexOffender_SPK,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.P_LexID := LEFT.P_LexID,						
 					SELF.Src := MDR.sourceTools.src_sexoffender;
-					SELF.DPMBitmap := SetDPMBitmap( Source := SELF.Src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					SELF.DPMBitmap :=SetDPMBitmap( Source := MDR.sourceTools.src_sexoffender, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.dt_first_reported :=  archivedate((string)left.dt_first_reported) ;
+					self.Archive_Date := '';
 					SELF := left,
-					SELF := [])), false, false);		
+					SELF := []));		
 						
 	return SO_data_clean;	
 	
@@ -442,11 +498,13 @@ EXPORT GetOverrideDeath(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 												atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM)); 
  	
 
-	Death_corr_corr_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(Death_corr, transform(Layouts_FDC.Layout_Doxie__Key_Death_MasterV2_SSA_DID,
+	Death_corr_corr_data_clean := project(Death_corr, transform(Layouts_FDC.Layout_Doxie__Key_Death_MasterV2_SSA_DID,
 					SELF.Src := left.src,
-					SELF.DPMBitmap := SetDPMBitmap( Source := left.src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := GLBARegulatedDeathMasterRecord(left.glb_flag), Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),			
+					SELF.DPMBitmap := SetDPMBitmap( Source := left.src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := GLBARegulatedDeathMasterRecord(left.glb_flag), Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),	
+					self.dod8 :=  archivedate((string)left.dod8);
+					self.Archive_Date := '';					
 					SELF := left,
-					SELF := [])), false, false);		
+					SELF := []));		
 	
 	return Death_corr_corr_data_clean;	
 	
@@ -470,12 +528,15 @@ Emaillay := RECORD
 																	SELF := left,
 																	SELF := []), 
 																atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM));	
-							
-	emailfile_corrections_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(emailfile_corrections, transform(Layouts_FDC.Layout_Email_Data__Key_Did_FCRA,
+		
+		
+	emailfile_corrections_data_clean := project(emailfile_corrections, transform(Layouts_FDC.Layout_Email_Data__Key_Did_FCRA,
 					SELF.Src := left.Email_SRC,
-					SELF.DPMBitmap := SetDPMBitmap( Source := SELF.Src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					SELF.DPMBitmap :=SetDPMBitmap( Source := left.Email_SRC, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.date_first_seen := archivedate(  (string)left.date_first_seen);
+					self.Archive_Date := '';					
 					SELF := left,
-					SELF := [])), false, false);		
+					SELF := []));		
 
 	
 	return emailfile_corrections_data_clean;	
@@ -501,13 +562,15 @@ EXPORT GetOverrideGong(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 													SELF := left,
 													SELF := []), 
                         atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM));	
-							
-	gong_correct_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(gong_correct, transform(Layouts_FDC.Layout_Gong__Key_History_DID,
+		
+	gong_correct_data_clean := project(gong_correct, transform(Layouts_FDC.Layout_Gong__Key_History_DID,
 				SELF.Src := left.Src,
 				SELF.DPMBitmap := SetDPMBitmap( Source := left.Src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 				SELF.Listing_Type := TRIM(left.Listing_Type_Bus + left.Listing_Type_Res + left.Listing_Type_Gov, ALL),
-					SELF := left,
-					SELF := [])), false, false);		
+				self.Archive_Date := '';			
+				self.dt_first_seen :=  archivedate((string)left.dt_first_seen);
+				SELF := left,
+				SELF := []));		
 	
 	return gong_correct_data_clean;	
 	
@@ -533,13 +596,14 @@ EXPORT GetOverrideInquiry(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 													SELF := left,
 													SELF := []), 
 							atmost(5000));	//special for inq
- 						
-	inq_correct_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(inq_correct, transform(Layouts_FDC.Layout_Inquiry_AccLogs__Key_FCRA_DID,
+ 				
+	inq_correct_data_clean := project(inq_correct, transform(Layouts_FDC.Layout_Inquiry_AccLogs__Key_FCRA_DID,
 					SELF.DateOfInquiry := left.Search_Info.DateTime[1..8];
 					SELF.Src := MDR.sourceTools.src_InquiryAcclogs;
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.Archive_Date := '';					
 					SELF := left,
-					SELF := [])), false, false);		
+					SELF := []));		
 	
 	return inq_correct_data_clean;	
 	
@@ -564,12 +628,14 @@ EXPORT GetOverrideInfutor(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 													SELF := left,
 													SELF := []), 
 												atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM)); 
- 						
-	infutor_correct_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(infutor_correct, transform(Layouts_FDC.Layout_InfutorCID__Key_Infutor_Phone,
+ 		
+	infutor_correct_data_clean := project(infutor_correct, transform(Layouts_FDC.Layout_InfutorCID__Key_Infutor_Phone,
 					SELF.Src := MDR.sourceTools.src_InfutorCID,
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InfutorCID, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.dt_first_seen := (integer)archivedate((string)left.dt_first_seen);
+					self.Archive_Date := '';					
 					SELF := left,
-					SELF := [])), false, false);		
+					SELF := []));		
 	
 	return infutor_correct_data_clean;	
 	
@@ -597,9 +663,12 @@ EXPORT GetOverrideLiensParty(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 												atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT)); 	
 												
 	//permissions are applied in the DENORMALIZE for liens								 						
-	Liens_Party_correct_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(Liens_Party_correct, transform(Layouts_FDC.Layout_LiensV2_Key_Liens_Party_ID_Records,
+	Liens_Party_correct_data_clean := project(Liens_Party_correct, transform(Layouts_FDC.Layout_LiensV2_Key_Liens_Party_ID_Records,
+					self.Archive_Date := '';	
+					self.DPMBitmap := SetDPMBitmap( Source := PublicRecords_KEL.ECL_Functions.Constants.Set_Liens_Sources(left.TMSID), FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated , DPPA_Restricted := NotRegulated, DPPA_State :=blankstring, KELPermissions := CFG_File);
+					self.date_first_seen :=  archivedate((string)left.date_first_seen);
 					SELF := left,
-					SELF := [])), false, false);		
+					SELF := []));		
 	
 	return Liens_Party_correct_data_clean;	
 	
@@ -625,9 +694,11 @@ EXPORT GetOverrideLiensMain(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 												atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT)); 
 												
  	//permissions are applied in the DENORMALIZE for liens					
-	Liens_Main_correct_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(Liens_Main_correct, transform(Layouts_FDC.Layout_LiensV2_key_liens_main_ID_Records,
+	Liens_Main_correct_data_clean := project(Liens_Main_correct, transform(Layouts_FDC.Layout_LiensV2_key_liens_main_ID_Records,
+					self.Archive_Date := '';	
+					self.DPMBitmap := SetDPMBitmap( Source := PublicRecords_KEL.ECL_Functions.Constants.Set_Liens_Sources(left.TMSID), FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated , DPPA_Restricted := NotRegulated, DPPA_State :=blankstring, KELPermissions := CFG_File);
 					SELF := left,
-					SELF := [])), false, false);		
+					SELF := []));		
 	
 	return Liens_Main_correct_data_clean;	
 	
@@ -652,9 +723,10 @@ EXPORT GetOverridePropAssess(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 													SELF := left,
 													SELF := []), 
 												atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM)); 
-												
+	
+	
  	//permissions are applied in the next join for PL					
-	PropAssess_correct_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(PropAssess_correct, transform(Layouts_FDC.Layout_PropertyV2_Key_Assessor_Fid_Records,
+	PropAssess_correct_data_clean := project(PropAssess_correct, transform(Layouts_FDC.Layout_PropertyV2_Key_Assessor_Fid_Records,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.P_LexID := LEFT.P_LexID,
@@ -665,18 +737,14 @@ EXPORT GetOverridePropAssess(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 					SELF.ln_property_tax_exemption := left.ln_property_tax_exemption = 'Y',
 					SELF.current_record := left.current_record = 'Y',
 					SELF.owner_occupied := left.owner_occupied = 'Y',
-					SELF.date_first_seen := MAP(
-																			left.tax_year<>'' 						 => (UNSIGNED)left.tax_year,
-																			left.assessed_value_year<>''  => (UNSIGNED)left.assessed_value_year,
-																			left.market_value_year<>'' 	 => (UNSIGNED)left.market_value_year,
-																			left.certification_date<>'' 	 => (UNSIGNED)left.certification_date,
-																			left.tape_cut_date<>'' 			 => (UNSIGNED)left.tape_cut_date,
-																			left.recording_date<>'' 			 => (UNSIGNED)left.recording_date,
-																			left.prior_recording_date<>'' => (UNSIGNED)left.prior_recording_date,
-																																				(UNSIGNED)left.sale_date);
+					SELF.date_first_seen := (unsigned) MAP(	ArchiveDate(left.tax_year, left.assessed_value_year) <> ''  => ArchiveDate(left.tax_year, left.assessed_value_year),
+																							ArchiveDate(left.market_value_year, left.certification_date) <> ''  => ArchiveDate(left.market_value_year, left.certification_date),
+																							ArchiveDate(left.tape_cut_date, left.recording_date) <> ''  => ArchiveDate(left.tape_cut_date, left.recording_date),
+																							ArchiveDate(left.prior_recording_date, left.sale_date));
 					SELF.DPMBitmap := SetDPMBitmap( Source := LN_PropertyV2_Src(left.ln_fares_id), FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File, Marketing_State := left.State_Code),
+					self.Archive_Date := '';					
 					self := left;
-					SELF := [])), false, false);		
+					SELF := []));		
 	
 	return PropAssess_correct_data_clean;	
 	
@@ -701,20 +769,22 @@ EXPORT GetOverridePropDeed(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 													SELF := left,
 													SELF := []), 
 												atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM)); 
+
 												
  	//permissions are applied in the next join for PL					
-	PropDeed_correct_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(PropDeed_correct, transform(Layouts_FDC.Layout_PropertyV2_Key_Deed_Fid_Records,
+	PropDeed_correct_data_clean := project(PropDeed_correct, transform(Layouts_FDC.Layout_PropertyV2_Key_Deed_Fid_Records,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.P_LexID := LEFT.P_LexID,
 					SELF.current_record := LEFT.current_record = 'Y',
 					SELF.timeshare_flag := LEFT.timeshare_flag = 'Y',
 					SELF.addl_name_flag := LEFT.addl_name_flag = 'Y',
-					SELF.Date_First_Seen := IF(LEFT.contract_date<>'',(UNSIGNED)LEFT.contract_date,(UNSIGNED)LEFT.recording_date),
+					SELF.Date_First_Seen :=  (INTEGER)ArchiveDate((string)left.contract_date,(string)left.recording_date),
 					SELF.Src := LN_PropertyV2_Src(LEFT.ln_fares_id),
-					SELF.DPMBitmap := SetDPMBitmap( Source := LN_PropertyV2_Src(LEFT.ln_fares_id), FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File, Marketing_State := LEFT.State),
+					SELF.DPMBitmap :=SetDPMBitmap( Source := LN_PropertyV2_Src(left.ln_fares_id), FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File, Marketing_State := left.State),
+					self.Archive_Date := '';					
 					self := left;
-					SELF := [])), false, false);		
+					SELF := []));		
 	
 	return PropDeed_correct_data_clean;	
 	
@@ -740,8 +810,8 @@ EXPORT GetOverridePropSearch(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 													SELF := []), 
 												atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM)); 
 												
- 	//permissions are applied in the next join for PL					
-	PropSearch_correct_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(PropSearch_correct, transform(Layouts_FDC.Layout_PropertyV2_Key_Search_Fid_Records,
+ 	//we do not have dateselector on this dataset	
+	PropSearch_correct_data_clean := project(PropSearch_correct, transform(Layouts_FDC.Layout_PropertyV2_Key_Search_Fid_Records,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.P_LexID := LEFT.P_LexID,
@@ -756,7 +826,7 @@ EXPORT GetOverridePropSearch(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 					SELF.BorrowerAddress := left.source_code[2] = 'B',
 					SELF.DPMBitmap := SetDPMBitmap( Source := LN_PropertyV2_Src(left.ln_fares_id), FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File, Marketing_State := left.ST),
 					self := left;
-					SELF := [])), false, false);		
+					SELF := []));		
 	
 	return PropSearch_correct_data_clean;	
 	
@@ -780,12 +850,17 @@ EXPORT GetOverrideProfLic(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 													SELF := left,
 													SELF := []), 
 												atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM)); 
+
 												
  	//permissions are applied in the next join for PL					
-	ProfLic_correct_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(ProfLic_correct, transform(Layouts_FDC.Layout_Prof_LicenseV2__Key_Proflic_Did,
+	ProfLic_correct_data_clean := project(ProfLic_correct, transform(Layouts_FDC.Layout_Prof_LicenseV2__Key_Proflic_Did,
 					SELF.did := (INTEGER)left.did,
+					SELF.Src := MDR.sourceTools.src_Professional_License;
+					self.Archive_Date := '';					
+					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Professional_License, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File, Generic_Restriction := left.vendor = RiskView.Constants.directToConsumerPL_sources),
+					self.date_first_seen :=  archivedate((string)left.date_first_seen);
 					SELF := left,
-					SELF := [])), false, false);		
+					SELF := []));		
 	
 	return ProfLic_correct_data_clean;	
 	
@@ -810,11 +885,16 @@ EXPORT GetOverrideMari(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 													SELF := left,
 													SELF := []), 
 												atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM)); 
- 	
+
+	
 	//permissions are applied in the next join for PL
-	Mari_correct_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(Mari_correct, transform(Layouts_FDC.Layout_Prof_License_Mari__Key_Did,
+	Mari_correct_data_clean := project(Mari_correct, transform(Layouts_FDC.Layout_Prof_License_Mari__Key_Did,
+					self.Archive_Date := '';					
+					SELF.Src := MDR.sourceTools.src_Mari_Prof_Lic;
+					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Mari_Prof_Lic, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File, Generic_Restriction := left.std_source_upd IN Risk_Indicators.iid_constants.restricted_Mari_vendor_set),
+					self.date_first_seen :=  archivedate((string)left.date_first_seen);
 					SELF := left,
-					SELF := [])), false, false);		
+					SELF := []));		
 	
 	return Mari_correct_data_clean;	
 	
@@ -841,10 +921,13 @@ EXPORT GetOverrideAmericanStudent(DATASET( Layouts_FDC.Layout_FDC) shell) := fun
 													SELF := []), 
 												atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM)); 
  	
-	AmericanStudent_correct_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(AmericanStudent_correct, transform(Layouts_FDC.Layout_American_student_list__key_DID,
-					SELF.DPMBitmap := SetDPMBitmap( Source := left.source, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated , DPPA_Restricted := NotRegulated, DPPA_State :='', KELPermissions := CFG_File),			
+	
+	AmericanStudent_correct_data_clean := project(AmericanStudent_correct, transform(Layouts_FDC.Layout_American_student_list__key_DID,
+					SELF.DPMBitmap := SetDPMBitmap( Source := left.source, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated , DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),			
+					self.Archive_Date := '';
+					self.date_first_seen :=  archivedate((string)left.date_first_seen);
 					SELF := left,
-					SELF := [])), false, false);		
+					SELF := []));		
 	
 	return AmericanStudent_correct_data_clean;	
 	
@@ -871,10 +954,13 @@ EXPORT GetOverrideAlloyStudent(DATASET( Layouts_FDC.Layout_FDC) shell) := functi
 													SELF := []), 
 												atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM)); 
  	
-	AlloyStudent_correct_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(AlloyStudent_correct, transform(Layouts_FDC.Layout_AlloyMedia_student_list__key_DID,
-					SELF.DPMBitmap := SetDPMBitmap( Source := left.source, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated , DPPA_Restricted := NotRegulated, DPPA_State :='', KELPermissions := CFG_File),
+	
+	AlloyStudent_correct_data_clean := project(AlloyStudent_correct, transform(Layouts_FDC.Layout_AlloyMedia_student_list__key_DID,
+					SELF.DPMBitmap := SetDPMBitmap( Source := left.source, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated , DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.Archive_Date := '';
+					self.date_first_seen :=  archivedate((string)left.date_first_seen);
 					SELF := left,
-					SELF := [])), false, false);		
+					SELF := []));		
 	
 	return AlloyStudent_correct_data_clean;	
 	
@@ -900,11 +986,15 @@ EXPORT GetOverrideThrive(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 													SELF := []), 
 												atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM)); 
  	
-	Thrive_correct_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(Thrive_correct, transform(Layouts_FDC.Layout_Thrive__Key___Did_QA,
+	
+	
+	Thrive_correct_data_clean := project(Thrive_correct, transform(Layouts_FDC.Layout_Thrive__Key___Did_QA,
 					SELF.Src := left.src;
-					SELF.DPMBitmap := SetDPMBitmap( Source := SELF.Src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					SELF.DPMBitmap := SetDPMBitmap( Source := left.Src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.Archive_Date := '';	
+					self.dt_first_seen :=  (integer)archivedate( (string)left.dt_first_seen);
 					SELF := left,
-					SELF := [])), false, false);		
+					SELF := []));		
 					
 	return Thrive_correct_data_clean;	
 	
@@ -931,11 +1021,14 @@ EXPORT GetOverrideWatercraft(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 													SELF := []), 
 												atmost(PublicRecords_KEL.ECL_Functions.Constants.MAX_OVERRIDE_LIMIT_SLIM)); 
  	
-	Watercraft_correct_data_clean := PublicRecords_KEL.ecl_functions.DateSelector(project(Watercraft_correct, transform(Layouts_FDC.Layout_Watercraft__Key_Watercraft_SID,
+	
+	Watercraft_correct_data_clean := project(Watercraft_correct, transform(Layouts_FDC.Layout_Watercraft__Key_Watercraft_SID,
 					SELF.Src := MDR.sourceTools.fWatercraft(left.source_Code, left.state_origin);
-					SELF.DPMBitmap := SetDPMBitmap( Source := SELF.Src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := DPPARegulatedWaterCraftRecord(left.dppa_flag), DPPA_State := BlankString, KELPermissions := CFG_File),				
+					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.fWatercraft(left.source_Code, left.state_origin), FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := DPPARegulatedWaterCraftRecord(left.dppa_flag), DPPA_State := BlankString, KELPermissions := CFG_File),											
+					self.Archive_Date := '';
+					self.date_first_seen :=  archivedate((string)left.date_first_seen);
 					SELF := left,
-					SELF := [])), false, false);		
+					SELF := []));		
 					
 	return Watercraft_correct_data_clean;	
 	

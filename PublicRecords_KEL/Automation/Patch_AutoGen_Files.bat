@@ -1,0 +1,1 @@
+:: powershell -Command "(Get-Content ../Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1.ecl).Replace('__NNEQ(LEFT.T_M_S_I_D_,RIGHT.UID) AND', ' LEFT.T_M_S_I_D_.v=(STRING)RIGHT.UID.v AND') | Out-File -encoding ASCII ../Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1.ecl"
