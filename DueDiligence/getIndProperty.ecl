@@ -16,7 +16,7 @@ EXPORT getIndProperty(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
   propByDID := JOIN(spouseAndInquired, LN_PropertyV2.key_Property_did(), 
                     KEYED(LEFT.individual.did = RIGHT.s_did) AND
                     KEYED(RIGHT.source_code_2 = 'P'),
-                    TRANSFORM(DueDiligence.LayoutsInternal.PropertySlimLayout,
+                    TRANSFORM({DueDiligence.LayoutsInternal.PropertySlimLayout, DueDiligence.Layouts.DIDAndName tempName},
                               SELF.seq := LEFT.seq;
                               SELF.did := LEFT.inquiredDID;
                               
@@ -26,9 +26,12 @@ EXPORT getIndProperty(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                               SELF.inquiredOwned := inquiredOwned;
                               SELF.spouseOwned := spouseOwned;
                               
-                              SELF.ownerNames := IF(inquiredOwned OR spouseOwned, 
-                                                    DATASET([TRANSFORM(DueDiligence.Layouts.DIDAndName, SELF := LEFT.individual;)]), 
-                                                    DATASET([], DueDiligence.Layouts.DIDAndName));
+                              ownName := IF(inquiredOwned OR spouseOwned, 
+                                            DATASET([TRANSFORM(DueDiligence.Layouts.DIDAndName, SELF := LEFT.individual;)]), 
+                                            DATASET([], DueDiligence.Layouts.DIDAndName));
+                              
+                              SELF.ownerNames := ownName;
+                              SELF.tempName := ownName[1];
                               
                               SELF.sourceCode := RIGHT.source_code;
                               SELF.LNFaresId := RIGHT.ln_fares_id;
@@ -46,8 +49,8 @@ EXPORT getIndProperty(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                               SELF.geo_blk := RIGHT.geo_blk;
                               
                               SELF := [];),
-                    KEEP(100), 
-                    ATMOST(DueDiligence.Constants.MAX_ATMOST_1000));
+                    KEEP(DueDiligence.Constants.MAX_1000), 
+                    ATMOST(DueDiligence.Constants.MAX_4500));
                     
     //do we have access to fares data
     restrictFaresData := dataRestrictionMask[Risk_Indicators.iid_constants.posFaresRestriction] = Risk_Indicators.iid_constants.sTrue;
@@ -56,7 +59,7 @@ EXPORT getIndProperty(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                     
                     
     //unique fares_ids based on seq (could have both inquired and spouse or one of the other)
-    sortIndProps := SORT(propDataToUse, seq, did, LNFaresId);
+    sortIndProps := DEDUP(SORT(propDataToUse, seq, did, LNFaresId, tempName.lastName, tempName.firstName, tempName.middleName), seq, did, LNFaresId, tempName.lastName, tempName.firstName, tempName.middleName);
     
     rollProps := ROLLUP(sortIndProps,
                         LEFT.seq = RIGHT.seq AND
@@ -67,54 +70,86 @@ EXPORT getIndProperty(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                   SELF.spouseOwned := LEFT.spouseOwned OR RIGHT.spouseOwned;
                                   SELF.ownerNames := LEFT.ownerNames + RIGHT.ownerNames;
                                   SELF := LEFT;));
-
-    propDetails := DueDiligence.getSharedProperty(rollProps);
+                                   
+ 
+ 
+    ownedProp := JOIN(spouseAndInquired, LN_PropertyV2.key_ownership_did(),
+                      KEYED(LEFT.individual.did = RIGHT.did),
+                      TRANSFORM({UNSIGNED seq, UNSIGNED inquiredDID, UNSIGNED spsInqDID, RECORDOF(RIGHT)},
+                                SELF.seq := LEFT.seq;
+                                SELF.inquiredDID := LEFT.inquiredDID;
+                                SELF.spsInqDID := LEFT.individual.did;
+                                SELF := RIGHT;),
+                      KEEP(100), 
+                      ATMOST(DueDiligence.Constants.MAX_ATMOST_1000)); 
+                                
+    normOwnedProp := NORMALIZE(ownedProp, LEFT.hist,
+                                TRANSFORM({UNSIGNED seq, UNSIGNED inquiredDID, UNSIGNED spsInqDID, BOOLEAN isCurrent, STRING LNFaresID},
+                                          SELF.seq := LEFT.seq;
+                                          SELF.inquiredDID := LEFT.inquiredDID;
+                                          SELF.spsInqDID := LEFT.spsInqDID;
+                                          SELF.isCurrent := LEFT.current;
+                                          SELF.LNFaresID := RIGHT.ln_fares_id;));
+ 
+    updatedRecs := PROJECT(rollProps, TRANSFORM(DueDiligence.LayoutsInternal.PropertySlimLayout,
+                                                SELF.isOwnership := EXISTS(normOwnedProp(lnFaresID = LEFT.lnFaresID AND isCurrent)) OR
+                                                                    EXISTS(normOwnedProp(lnFaresID = LEFT.lnFaresID));
+                                                SELF.isCurrent := EXISTS(normOwnedProp(lnFaresID = LEFT.lnFaresID AND isCurrent));
+                                                SELF := LEFT;));
+                                                    
+                                                    
+ 
+    propDetails := DueDiligence.getSharedProperty(updatedRecs, TRUE);
     
-    //convert the data to what will be used for the person report
-    reportProp := PROJECT(propDetails, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, INTEGER8 totalPropertySumAssedValue, 
-                                                                    UNSIGNED2 soldCnt, UNSIGNED2 ownCnt, DATASET(DueDiligence.Layouts.IndPropertyDataLayout) propReport},
-                                                
-                                                  SELF.totalPropertySumAssedValue := LEFT.totalSumAssessedValue;
-                                                  SELF.soldCnt := LEFT.soldPropCnt;
-                                                  SELF.ownCnt := LEFT.ownPropCnt;
-                                                  SELF.propReport := PROJECT(LEFT.ownedProps, TRANSFORM(DueDiligence.Layouts.IndPropertyDataLayout,
-                                                                                                        SELF.prim_range := LEFT.prim_range;
-                                                                                                        SELF.predir := LEFT.predir;
-                                                                                                        SELF.prim_name := LEFT.prim_name;
-                                                                                                        SELF.addr_suffix := LEFT.addr_suffix;
-                                                                                                        SELF.postdir := LEFT.postdir;
-                                                                                                        SELF.unit_desig := LEFT.unit_desig;
-                                                                                                        SELF.sec_range := LEFT.sec_range;
-                                                                                                        SELF.city := LEFT.city;
-                                                                                                        SELF.state := LEFT.state;
-                                                                                                        SELF.zip5 := LEFT.zip5;
-                                                                                                        SELF.zip4 := LEFT.zip4;
-                                                                                                        SELF.county := LEFT.county;
-                                                                                                        SELF.geo_blk := LEFT.geo_blk;
-                                                                                                        SELF.addressType := LEFT.addressType;
-                                                                                                        SELF.purchaseDate := LEFT.purchaseDate;
-                                                                                                        SELF.purchasePrice := LEFT.purchasePrice;
-                                                                                                        SELF.lengthOfOwnership := LEFT.lengthOfOwnership;
-                                                                                                        SELF.assessedYear := LEFT.assessedYear;
-                                                                                                        SELF.assessedValue := LEFT.assessedTotalValue;
-                                                                                                        SELF.propertyOwners := LEFT.ownerNames;
-                                                                                                        SELF.inquiredOwned := LEFT.inquiredOwned;
-                                                                                                        SELF.spouseOwned := LEFT.spouseOwned;
-                                                                                                        SELF.ownerOccupied := LEFT.ownerOccupied;
-                                                                                                        SELF := [];));
-                                                  SELF := LEFT;));
-      
-    addPropCounts := JOIN(inData, reportProp,
+          
+    addPropCounts := JOIN(inData, propDetails,
                           LEFT.seq = RIGHT.seq AND
                           LEFT.inquiredDID = RIGHT.did,
-                          TRANSFORM(RECORDOF(LEFT),
-                                    SELF.ownedPropCount := RIGHT.ownCnt;
-                                    SELF.totalAssesedValue := RIGHT.totalPropertySumAssedValue;
-                                    SELF.previouslyOwnedPropCount := RIGHT.soldCnt;
-                                    SELF.perProperties := RIGHT.propReport;
+                          TRANSFORM(DueDiligence.Layouts.Indv_Internal,
+                                    SELF.ownedPropCount := RIGHT.ownPropCnt;
+                                    SELF.totalAssesedValue := RIGHT.totalSumAssessedValue;
+                                    SELF.previouslyOwnedPropCount := RIGHT.soldPropCnt;
+                                    SELF.perProperties := PROJECT(RIGHT.ownedProps, TRANSFORM(DueDiligence.Layouts.IndPropertyDataLayout,
+                                                                                              SELF.prim_range := LEFT.prim_range;
+                                                                                              SELF.predir := LEFT.predir;
+                                                                                              SELF.prim_name := LEFT.prim_name;
+                                                                                              SELF.addr_suffix := LEFT.addr_suffix;
+                                                                                              SELF.postdir := LEFT.postdir;
+                                                                                              SELF.unit_desig := LEFT.unit_desig;
+                                                                                              SELF.sec_range := LEFT.sec_range;
+                                                                                              SELF.city := LEFT.city;
+                                                                                              SELF.state := LEFT.state;
+                                                                                              SELF.zip5 := LEFT.zip5;
+                                                                                              SELF.zip4 := LEFT.zip4;
+                                                                                              SELF.county := LEFT.county;
+                                                                                              SELF.geo_blk := LEFT.geo_blk;
+                                                                                              SELF.addressType := LEFT.addressType;
+                                                                                              SELF.purchaseDate := LEFT.purchaseDate;
+                                                                                              SELF.purchasePrice := LEFT.purchasePrice;
+                                                                                              SELF.lengthOfOwnership := LEFT.lengthOfOwnership;
+                                                                                              SELF.assessedYear := LEFT.assessedYear;
+                                                                                              SELF.assessedValue := LEFT.assessedTotalValue;
+                                                                                              SELF.propertyOwners := LEFT.ownerNames;
+                                                                                              SELF.inquiredOwned := LEFT.inquiredOwned;
+                                                                                              SELF.spouseOwned := LEFT.spouseOwned;
+                                                                                              SELF.ownerOccupied := LEFT.ownerOccupied;
+                                                                                              SELF := [];));
                                     SELF := LEFT),
                           LEFT OUTER,
                           ATMOST(1));
+    
+ 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -123,10 +158,15 @@ EXPORT getIndProperty(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     // OUTPUT(getSpouseAsInquired, NAMED('getSpouseAsInquired'));
     // OUTPUT(spouseAndInquired, NAMED('spouseAndInquired'));
     // OUTPUT(propByDID, NAMED('propByDID'));
-    // OUTPUT(rollProps, NAMED('rollProps'));
-    // OUTPUT(propDetails, NAMED('propDetails'));
-    // OUTPUT(reportProp, NAMED('reportProp'));
+    // OUTPUT(propDataToUse, NAMED('propDataToUse'));
+    // OUTPUT(rollProps, NAMED('rollProps'));    
+    // OUTPUT(ownedProp, NAMED('ownedProp'));
+    // OUTPUT(normOwnedProp, NAMED('normOwnedProp'));
+    // OUTPUT(checkOwnership, NAMED('checkOwnership'));
+    // OUTPUT(propDetails, NAMED('propDetails'));    
     // OUTPUT(addPropCounts, NAMED('addPropCounts'));
+   
+   
     
     RETURN addPropCounts;
 END;

@@ -1,4 +1,4 @@
-﻿IMPORT iesp, MDR, risk_indicators;
+﻿IMPORT DueDiligence, iesp, MDR, risk_indicators;
 
 
 EXPORT Constants := MODULE
@@ -28,6 +28,7 @@ EXPORT Constants := MODULE
     EXPORT MAX_500 := 500;
     EXPORT MAX_1000 := 1000;
     EXPORT MAX_2000 := 2000;
+    EXPORT MAX_4500 := 4500;
     EXPORT MAX_5000 := 5000;
     EXPORT MAX_10000 := 10000;
     
@@ -211,8 +212,9 @@ EXPORT MAX_ADDRESS_SCORE := 100;
 EXPORT HighCrimeValue := 140;                 //  High = 140 or more,   Avg = 60 - 139,  Low = 1 - 59
 EXPORT LowCrimeValue := 59;                 //  High = 140 or more,   Avg = 60 - 139,  Low = 1 - 59
 
-EXPORT Owned_Property_code := 'OP'; 
-EXPORT Sold_Property_code  := 'SP';
+EXPORT OWNED_PROPERTY_CODE := 'OP'; 
+EXPORT SOLD_PROPERTY_CODE  := 'SP';
+EXPORT PREVIOUS_PROPERTY_CODE  := 'PO';
 
 EXPORT INQUIRED_BUSINESS_DEGREE := 'IB';
 EXPORT INQUIRED_BUSINESS_EXEC_DEGREE := 'IE';
