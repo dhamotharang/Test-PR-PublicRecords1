@@ -1,8 +1,8 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
-IMPORT KEL12 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.3.2
+IMPORT KEL13 AS KEL;
 IMPORT Business_Credit_KEL;
 IMPORT CFG_graph FROM Business_Credit_KEL;
-IMPORT * FROM KEL12.Null;
+IMPORT * FROM KEL13.Null;
 EXPORT E_Industry(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __cfg = CFG_graph) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
@@ -63,15 +63,15 @@ EXPORT E_Industry(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __
   EXPORT UIDSourceCounts := TABLE(InData,{KEL.typ.uid UID := MIN(GROUP,__T(UID)),KEL.typ.int Cnt := COUNT(GROUP)},UID);
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT _record__type__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_record__type_);
-  EXPORT _sbfe__contributor__number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_sbfe__contributor__number_);
-  EXPORT _contract__account__number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_contract__account__number_);
-  EXPORT _dt__first__seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_dt__first__seen_);
-  EXPORT _dt__last__seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_dt__last__seen_);
-  EXPORT _classification__code__type__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_classification__code__type_);
-  EXPORT _classification__code__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_classification__code_);
-  EXPORT _primary__industry__code__indicator__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_primary__industry__code__indicator_);
-  EXPORT _privacy__indicator__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_privacy__indicator_);
+  EXPORT _record__type__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_record__type_);
+  EXPORT _sbfe__contributor__number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_sbfe__contributor__number_);
+  EXPORT _contract__account__number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_contract__account__number_);
+  EXPORT _dt__first__seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_dt__first__seen_);
+  EXPORT _dt__last__seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_dt__last__seen_);
+  EXPORT _classification__code__type__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_classification__code__type_);
+  EXPORT _classification__code__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_classification__code_);
+  EXPORT _primary__industry__code__indicator__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_primary__industry__code__indicator_);
+  EXPORT _privacy__indicator__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_privacy__indicator_);
   EXPORT SanityCheck := DATASET([{COUNT(Business_Credit_KEL_File_SBFE_temp_BusinessClassification_Invalid),COUNT(_record__type__SingleValue_Invalid),COUNT(_sbfe__contributor__number__SingleValue_Invalid),COUNT(_contract__account__number__SingleValue_Invalid),COUNT(_dt__first__seen__SingleValue_Invalid),COUNT(_dt__last__seen__SingleValue_Invalid),COUNT(_classification__code__type__SingleValue_Invalid),COUNT(_classification__code__SingleValue_Invalid),COUNT(_primary__industry__code__indicator__SingleValue_Invalid),COUNT(_privacy__indicator__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int Business_Credit_KEL_File_SBFE_temp_BusinessClassification_Invalid,KEL.typ.int _record__type__SingleValue_Invalid,KEL.typ.int _sbfe__contributor__number__SingleValue_Invalid,KEL.typ.int _contract__account__number__SingleValue_Invalid,KEL.typ.int _dt__first__seen__SingleValue_Invalid,KEL.typ.int _dt__last__seen__SingleValue_Invalid,KEL.typ.int _classification__code__type__SingleValue_Invalid,KEL.typ.int _classification__code__SingleValue_Invalid,KEL.typ.int _primary__industry__code__indicator__SingleValue_Invalid,KEL.typ.int _privacy__indicator__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'Industry','Business_Credit_KEL.File_SBFE_temp','UID',COUNT(Business_Credit_KEL_File_SBFE_temp_BusinessClassification_Invalid),COUNT(__d0)},

@@ -1,8 +1,8 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
-IMPORT KEL12 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.3.2
+IMPORT KEL13 AS KEL;
 IMPORT Business_Credit_KEL;
 IMPORT CFG_graph FROM Business_Credit_KEL;
-IMPORT * FROM KEL12.Null;
+IMPORT * FROM KEL13.Null;
 EXPORT E_Individual_Owner(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __cfg = CFG_graph) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
@@ -99,27 +99,27 @@ EXPORT E_Individual_Owner(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_
   EXPORT UIDSourceCounts := TABLE(InData,{KEL.typ.uid UID := MIN(GROUP,__T(UID)),KEL.typ.int Cnt := COUNT(GROUP)},UID);
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT _sbfe__contributor__number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_sbfe__contributor__number_);
-  EXPORT _contract__account__number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_contract__account__number_);
-  EXPORT _account__type__reported__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_account__type__reported_);
-  EXPORT _dt__first__seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_dt__first__seen_);
-  EXPORT _dt__last__seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_dt__last__seen_);
-  EXPORT _dt__vendor__first__reported__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_dt__vendor__first__reported_);
-  EXPORT _dt__vendor__last__reported__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_dt__vendor__last__reported_);
-  EXPORT _dt__datawarehouse__first__reported__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_dt__datawarehouse__first__reported_);
-  EXPORT _dt__datawarehouse__last__reported__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_dt__datawarehouse__last__reported_);
-  EXPORT _first__name__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_first__name_);
-  EXPORT _middle__name__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_middle__name_);
-  EXPORT _last__name__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_last__name_);
-  EXPORT _suffix__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_suffix_);
-  EXPORT _e__mail__address__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_e__mail__address_);
-  EXPORT _guarantor__owner__indicator__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_guarantor__owner__indicator_);
-  EXPORT _relationship__to__business__indicator__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_relationship__to__business__indicator_);
-  EXPORT _business__title__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_business__title_);
-  EXPORT _percent__of__liability__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_percent__of__liability_);
-  EXPORT _percent__of__ownership__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_percent__of__ownership_);
-  EXPORT _source__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_source_);
-  EXPORT _active__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_active_);
+  EXPORT _sbfe__contributor__number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_sbfe__contributor__number_);
+  EXPORT _contract__account__number__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_contract__account__number_);
+  EXPORT _account__type__reported__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_account__type__reported_);
+  EXPORT _dt__first__seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_dt__first__seen_);
+  EXPORT _dt__last__seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_dt__last__seen_);
+  EXPORT _dt__vendor__first__reported__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_dt__vendor__first__reported_);
+  EXPORT _dt__vendor__last__reported__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_dt__vendor__last__reported_);
+  EXPORT _dt__datawarehouse__first__reported__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_dt__datawarehouse__first__reported_);
+  EXPORT _dt__datawarehouse__last__reported__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_dt__datawarehouse__last__reported_);
+  EXPORT _first__name__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_first__name_);
+  EXPORT _middle__name__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_middle__name_);
+  EXPORT _last__name__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_last__name_);
+  EXPORT _suffix__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_suffix_);
+  EXPORT _e__mail__address__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_e__mail__address_);
+  EXPORT _guarantor__owner__indicator__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_guarantor__owner__indicator_);
+  EXPORT _relationship__to__business__indicator__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_relationship__to__business__indicator_);
+  EXPORT _business__title__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_business__title_);
+  EXPORT _percent__of__liability__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_percent__of__liability_);
+  EXPORT _percent__of__ownership__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_percent__of__ownership_);
+  EXPORT _source__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_source_);
+  EXPORT _active__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_active_);
   EXPORT SanityCheck := DATASET([{COUNT(Business_Credit_KEL_File_SBFE_temp_IndividualOwner_Invalid),COUNT(_sbfe__contributor__number__SingleValue_Invalid),COUNT(_contract__account__number__SingleValue_Invalid),COUNT(_account__type__reported__SingleValue_Invalid),COUNT(_dt__first__seen__SingleValue_Invalid),COUNT(_dt__last__seen__SingleValue_Invalid),COUNT(_dt__vendor__first__reported__SingleValue_Invalid),COUNT(_dt__vendor__last__reported__SingleValue_Invalid),COUNT(_dt__datawarehouse__first__reported__SingleValue_Invalid),COUNT(_dt__datawarehouse__last__reported__SingleValue_Invalid),COUNT(_first__name__SingleValue_Invalid),COUNT(_middle__name__SingleValue_Invalid),COUNT(_last__name__SingleValue_Invalid),COUNT(_suffix__SingleValue_Invalid),COUNT(_e__mail__address__SingleValue_Invalid),COUNT(_guarantor__owner__indicator__SingleValue_Invalid),COUNT(_relationship__to__business__indicator__SingleValue_Invalid),COUNT(_business__title__SingleValue_Invalid),COUNT(_percent__of__liability__SingleValue_Invalid),COUNT(_percent__of__ownership__SingleValue_Invalid),COUNT(_source__SingleValue_Invalid),COUNT(_active__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int Business_Credit_KEL_File_SBFE_temp_IndividualOwner_Invalid,KEL.typ.int _sbfe__contributor__number__SingleValue_Invalid,KEL.typ.int _contract__account__number__SingleValue_Invalid,KEL.typ.int _account__type__reported__SingleValue_Invalid,KEL.typ.int _dt__first__seen__SingleValue_Invalid,KEL.typ.int _dt__last__seen__SingleValue_Invalid,KEL.typ.int _dt__vendor__first__reported__SingleValue_Invalid,KEL.typ.int _dt__vendor__last__reported__SingleValue_Invalid,KEL.typ.int _dt__datawarehouse__first__reported__SingleValue_Invalid,KEL.typ.int _dt__datawarehouse__last__reported__SingleValue_Invalid,KEL.typ.int _first__name__SingleValue_Invalid,KEL.typ.int _middle__name__SingleValue_Invalid,KEL.typ.int _last__name__SingleValue_Invalid,KEL.typ.int _suffix__SingleValue_Invalid,KEL.typ.int _e__mail__address__SingleValue_Invalid,KEL.typ.int _guarantor__owner__indicator__SingleValue_Invalid,KEL.typ.int _relationship__to__business__indicator__SingleValue_Invalid,KEL.typ.int _business__title__SingleValue_Invalid,KEL.typ.int _percent__of__liability__SingleValue_Invalid,KEL.typ.int _percent__of__ownership__SingleValue_Invalid,KEL.typ.int _source__SingleValue_Invalid,KEL.typ.int _active__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'IndividualOwner','Business_Credit_KEL.File_SBFE_temp','UID',COUNT(Business_Credit_KEL_File_SBFE_temp_IndividualOwner_Invalid),COUNT(__d0)},
