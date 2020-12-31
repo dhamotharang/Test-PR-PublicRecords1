@@ -59,6 +59,7 @@ export FDGatewayTimeout := '26';
 export Deferred_request_code := '801';
 export DTEError := 'DTE22';
 export OKCError := 'OKC22';
+export generalErrorCodes :=['22','23','24'];
 export DTEErrorCodes := ['41', '42', '43', '44', '45', 'DTE22'];
 
 export Checking_Indicator_error_desc(string5 error_code) := function
