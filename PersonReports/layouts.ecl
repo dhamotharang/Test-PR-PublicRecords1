@@ -324,4 +324,17 @@ end;
 				      integer2 count := 0;
 				      string32 _type := '';
 	end;
+  
+      EXPORT PhoneHRILayout := record     
+            STRING10 phone;
+	       STRING5  zip;
+	       STRING20 lname;
+	       STRING30 prim_name; 
+	       STRING30 prim_range; 
+	       STRING2 st; 
+	       STRING10 sec_range;
+	       STRING10 predir; 
+	       STRING10 postdir; 
+	       DATASET(Risk_Indicators.Layout_Desc) hri_phone  {MAXCOUNT(iesp.Constants.MaxCountHRI)};     
+     END;
 end;
