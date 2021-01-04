@@ -72,6 +72,7 @@
      UNSIGNED4 orig_seq;
      UNSIGNED4 whichAuthRep;
      UNSIGNED6 did;
+     unsigned1 did_score;
    END;  
   
    DIDKept_slim :=
@@ -80,7 +81,8 @@
       TRANSFORM( layout_DIDKept_slim,
         SELF.orig_seq     := LEFT.Seq DIV 10,
         SELF.whichAuthRep := LEFT.Seq % 10,
-        SELF.did          := LEFT.did
+        SELF.did          := LEFT.did,
+        self.did_score    := left.score
       )
     );
   
@@ -105,6 +107,11 @@
     STRING15 BusExecLinkAuthRep4LexID;
     STRING15 BusExecLinkAuthRep5LexID;
     STRING15 BusPersonLexIDOverlap;
+    unsigned1 LexID_score;
+    unsigned1 LexID2_score;
+    unsigned1 LexID3_score;
+    unsigned1 LexID4_score;
+    unsigned1 LexID5_score;
   END; 
   
 		layout_authRepLexIDs_temp xfm_ToCombineAuthRepLexIDs( layout_seq le, DATASET(RECORDOF(DIDKept_slim_grpd)) allRows ) := 
@@ -116,6 +123,12 @@
 				SELF.BusExecLinkAuthRep4LexID := (STRING)(allRows(whichAuthRep = 4)[1].did);
 				SELF.BusExecLinkAuthRep5LexID := (STRING)(allRows(whichAuthRep = 5)[1].did);
         SELF.BusPersonLexIDOverlap    := (STRING)(allRows(whichAuthRep = 6)[1].did);
+        
+        SELF.LexID_score  := (allRows(whichAuthRep = 1)[1].did_score);
+				SELF.LexID2_score := (allRows(whichAuthRep = 2)[1].did_score);
+				SELF.LexID3_score := (allRows(whichAuthRep = 3)[1].did_score);
+				SELF.LexID4_score := (allRows(whichAuthRep = 4)[1].did_score);
+				SELF.LexID5_score := (allRows(whichAuthRep = 5)[1].did_score);
 			END;
 
 		withLexIDs_combined := 
@@ -131,10 +144,18 @@
 					LEFT.Seq = RIGHT.Seq, 
 					TRANSFORM( Business_Risk_BIP.Layouts.Shell, 
 						SELF.Seq := LEFT.Seq,
+			SELF.Clean_Input.Rep_LexID := (UNSIGNED)RIGHT.BusExecLinkAuthRepLexID;
 			SELF.Clean_Input.Rep2_LexID := (UNSIGNED)RIGHT.BusExecLinkAuthRep2LexID;
 			SELF.Clean_Input.Rep3_LexID := (UNSIGNED)RIGHT.BusExecLinkAuthRep3LexID;
 			SELF.Clean_Input.Rep4_LexID := (UNSIGNED)RIGHT.BusExecLinkAuthRep4LexID;
 			SELF.Clean_Input.Rep5_LexID := (UNSIGNED)RIGHT.BusExecLinkAuthRep5LexID;
+			
+			SELF.Clean_Input.Rep_LexIDscore := right.LexID_score;
+			SELF.Clean_Input.Rep2_LexIDscore := right.LexID2_score;
+			SELF.Clean_Input.Rep3_LexIDscore := right.LexID3_score;
+			SELF.Clean_Input.Rep4_LexIDscore := right.LexID4_score;
+			SELF.Clean_Input.Rep5_LexIDscore := right.LexID5_score;
+      
       SELF.Business_To_Executive_Link.BusExecLinkAuthRepLexID  := IF( RIGHT.BusExecLinkAuthRepLexID  != '0', RIGHT.BusExecLinkAuthRepLexID, '' ),
       SELF.Business_To_Executive_Link.BusExecLinkAuthRep2LexID := IF( RIGHT.BusExecLinkAuthRep2LexID != '0', RIGHT.BusExecLinkAuthRep2LexID, '' ),
       SELF.Business_To_Executive_Link.BusExecLinkAuthRep3LexID := IF( RIGHT.BusExecLinkAuthRep3LexID != '0', RIGHT.BusExecLinkAuthRep3LexID, '' ),
@@ -147,7 +168,7 @@
                                                             BusinessInputsPopulated AND (INTEGER)RIGHT.BusPersonLexIDOverlap = 0 => '0',   // Business Inputs not resolved to a LexID
                                                                                                                                     '-1'); // Business Inputs not provided
       SELF := LEFT,
-						SELF := []
+
 					),
 					LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
 			

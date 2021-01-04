@@ -1860,7 +1860,7 @@ export layout_BIP_Header_info_54 := record
  integer3    bus_inq_credit_count12 := 0;
  integer3    bus_inq_highriskcredit_count12 := 0;
  integer3    bus_inq_other_count12 := 0;
- boolean     bus_seleID_match := 0;
+ boolean     bus_seleID_match := false;
 end;
 
 //MS-167: new Equifax Fraud Flags fields
