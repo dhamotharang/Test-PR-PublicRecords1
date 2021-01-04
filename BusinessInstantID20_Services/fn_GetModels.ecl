@@ -64,6 +64,8 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
 				SELF.Rep_Age             := le.AuthReps[1].Age;
 				SELF.Rep_DLNumber        := le.AuthReps[1].DLNumber;
 				SELF.Rep_DLState         := le.AuthReps[1].DLState;
+				self.Rep_LexID 					 := le.AuthReps[1].LexID;
+				self.Rep_LexIDScore 		 := le.AuthReps[1].LexIDScore;				
 				// Auth Rep 2
 				SELF.Rep2_FullName       := le.AuthReps[2].FullName;
 				SELF.Rep2_FirstName      := le.AuthReps[2].FirstName;
@@ -82,6 +84,8 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
 				SELF.Rep2_Age            := le.AuthReps[2].Age;
 				SELF.Rep2_DLNumber       := le.AuthReps[2].DLNumber;
 				SELF.Rep2_DLState        := le.AuthReps[2].DLState;
+				self.Rep2_LexID 				 := le.AuthReps[2].LexID;
+				self.Rep2_LexIDScore 		 := le.AuthReps[2].LexIDScore;
 				// Auth Rep 3
 				SELF.Rep3_FullName       := le.AuthReps[3].FullName;
 				SELF.Rep3_FirstName      := le.AuthReps[3].FirstName;
@@ -100,6 +104,8 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
 				SELF.Rep3_Age            := le.AuthReps[3].Age;
 				SELF.Rep3_DLNumber       := le.AuthReps[3].DLNumber;
 				SELF.Rep3_DLState        := le.AuthReps[3].DLState;
+				self.Rep3_LexID 				 := le.AuthReps[3].LexID;
+				self.Rep3_LexIDScore 		 := le.AuthReps[3].LexIDScore;			
 				// Auth Rep 4
 				SELF.Rep4_FullName       := le.AuthReps[4].FullName;
 				SELF.Rep4_FirstName      := le.AuthReps[4].FirstName;
@@ -118,6 +124,8 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
 				SELF.Rep4_Age            := le.AuthReps[4].Age;
 				SELF.Rep4_DLNumber       := le.AuthReps[4].DLNumber;
 				SELF.Rep4_DLState        := le.AuthReps[4].DLState;
+				self.Rep4_LexID 				 := le.AuthReps[4].LexID;
+				self.Rep4_LexIDScore 		 := le.AuthReps[4].LexIDScore;
 				// Auth Rep 5
 				SELF.Rep5_FullName       := le.AuthReps[5].FullName;
 				SELF.Rep5_FirstName      := le.AuthReps[5].FirstName;
@@ -136,7 +144,8 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
 				SELF.Rep5_Age            := le.AuthReps[5].Age;
 				SELF.Rep5_DLNumber       := le.AuthReps[5].DLNumber;
 				SELF.Rep5_DLState        := le.AuthReps[5].DLState;
-				
+				self.Rep5_LexID 				 := le.AuthReps[5].LexID;
+				self.Rep5_LexIDScore 		 := le.AuthReps[5].LexIDScore;
 				SELF := le;
 				SELF := [];
 			END;
@@ -239,7 +248,8 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
     UNSIGNED1 AppendBest := 1;		// search best file
     UNSIGNED3 LastSeenThreshold := Risk_Indicators.iid_constants.max_unsigned3;
     UNSIGNED8 BSOptions := Risk_Indicators.iid_constants.BSOptions.IncludeFraudVelocity +
-                           Risk_Indicators.iid_constants.BSOptions.RetainInputDID;
+                           Risk_Indicators.iid_constants.BSOptions.RetainInputDID +  	// always retain the input DID that we append in the business shell instead of appending it again inside of CIID
+                           Risk_Indicators.iid_constants.BSOptions.TurnOffTumblings;  // really speeds up the inquiries function if we don't need the tumblings
 
     /* Need this used if want same results as a separate boca shell
     boolean RetainInputDID := false;
@@ -312,6 +322,9 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
       SELF.dl_number := STD.Str.ToUpperCase(riskwise.cleanDL_num(le.Rep_DLNumber));
       SELF.dl_state  := STD.Str.ToUpperCase(le.Rep_DLState);
 
+			self.DID := le.Rep_LexID;
+			self.score := le.Rep_LexIDScore;
+				
       SELF := [];
     END;
   

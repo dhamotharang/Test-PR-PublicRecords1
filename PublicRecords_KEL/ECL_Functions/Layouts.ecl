@@ -13,8 +13,8 @@ EXPORT Layouts := MODULE
 		STRING50 P_InpAddrCity;
 		STRING25 P_InpAddrState;
 		STRING10 P_InpAddrZip;
-		STRING20 P_InpSSN; 
-		STRING10 P_InpDOB; 
+		STRING20 P_InpSSN;
+		STRING10 P_InpDOB;
 		STRING50 P_InpDL;
 		STRING25 P_InpDLState;
 		STRING16 P_InpPhoneHome;
@@ -67,19 +67,20 @@ EXPORT Layouts := MODULE
 	
 	EXPORT LayoutExternalFlags := RECORD
 		STRING2 PhoneVerificationBureau;
-		string1 DialIndicator;
-		string1 PointID;
-		string2 NXXType;
-		Boolean ZIPMatch;
-		string3 COCType;
-		string4 SSC;
-		string4 WirelessIndicator;
-		STRING20 InsuranceDLNumber;		
-		STRING2 InsuranceDLState;		
-		STRING InsuranceSource;		
-		BOOLEAN InsuranceDLDataUsed;	
-		Boolean PI_InpDOBAgeIsMinorFlag;
-		Boolean BestDataAppended;
+		STRING1 DialIndicator;
+		STRING1 PointID;
+		STRING2 NXXType;
+		BOOLEAN ZIPMatch;
+		STRING3 COCType;
+		STRING4 SSC;
+		STRING4 WirelessIndicator;
+		STRING20 InsuranceDLNumber;
+		STRING2 InsuranceDLState;
+		STRING InsuranceSource;
+		BOOLEAN InsuranceDLDataUsed;
+		BOOLEAN PI_InpDOBAgeIsMinorFlag;
+		BOOLEAN BestDataAppended;
+		BOOLEAN PullIDFlag;
 	END;
 	
 EXPORT LayoutAppendedAddresses := RECORD
@@ -102,7 +103,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6 CurrentAddrCnty;
 		STRING7 CurrentAddrGeo;
 		// STRING6 CurrentAddrType;
-		// STRING6 CurrentAddrStatus;
+		// STRING6 CurrentAddrStatus;		
 		//previous
 		STRING10 PreviousAddrPrimRng;
 		STRING6 PreviousAddrPreDir;
@@ -143,20 +144,20 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING7 EmergingAddrGeo;
 		// STRING6 EmergingAddrType;
 		// STRING6 EmergingAddrStatus;
-		
 		STRING20 BestNameFirst;
 		STRING20 BestNameMid;
 		STRING20 BestNameLast;
 		STRING10 BestSSN;
 		STRING10 BestDOB;		
 		
-	END;	
+	END;		
 			
 	EXPORT LayoutInputPII := RECORD
-		INTEGER G_UID;
+		INTEGER G_UID;		
 		INTEGER G_ProcUID;
 		INTEGER G_ProcBusUID;
 		INTEGER RepNumber;
+		BOOLEAN IsInputRec;
 		LayoutInputPIIEchoInternal;
 		LayoutInputPIICleanInternal;
 		STRING10 InputIncomeEcho;
@@ -180,7 +181,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING1 P_InpAddrCityFlag;
 		STRING1 P_InpAddrStateFlag;
 		STRING1 P_InpAddrZipFlag;
-		STRING1 P_InpAddrSSNFlag;
+		STRING1 P_InpSSNFlag;
 		STRING1 P_InpDOBFlag;
 		STRING1 P_InpDLFlag;
 		STRING1 P_InpDLStateFlag;
@@ -230,12 +231,12 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6 P_InpClnPhoneHomeFlag;
 		STRING6 P_InpClnPhoneWorkFlag;
 		STRING6 P_InpClnEmailFlag;
-		STRING6 P_InpClnIPAddrFlag;
+		STRING6 P_InpClnIPAddrFlag,
 		STRING6 P_InpValEmailUserAllZeroFlag,
 		STRING6 P_InpValEmailUserBadCharFlag,
 		STRING6 P_InpValEmailDomAllZeroFlag,
-		STRING6 P_InpValEmailDomBadCharFlag,	
-		STRING6 P_InpValEmailBogusFlag,		
+		STRING6 P_InpValEmailDomBadCharFlag,
+		STRING6 P_InpValEmailBogusFlag,
 		STRING6 P_InpClnArchDtFlag;
 		STRING6 P_InpValNameBogusFlag;
 		STRING6 P_InpValPhoneHomeBadCharFlag;
@@ -243,9 +244,9 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6 P_InpValPhoneHomeBogusFlag;
 		STRING6 P_InpValPhoneWorkBadCharFlag;
 		STRING6 P_InpValPhoneWorkBadLenFlag;
-		STRING6 P_InpValPhoneWorkBogusFlag;	
-		STRING30 P_InpClnEmailUser;		
-		STRING30 P_InpClnEmailDom;		
+		STRING6 P_InpValPhoneWorkBogusFlag;
+		STRING30 P_InpClnEmailUser;
+		STRING30 P_InpClnEmailDom;
 		STRING6 P_InpClnEmailExt;
 		STRING45 P_InpClnIPAddr,
 		STRING6 P_InpValNameInvalidFlag,
@@ -258,12 +259,12 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6 P_InpValDOBInvalidFlag,
 		STRING6 P_InpValEmailInvalidFlag,
 		STRING6 P_InpValArchDtInvalidFlag,
-		// INTEGER4 PI_InpAddrAVMVal;
-		// INTEGER4 PI_InpAddrAVMValA1Y;
-		// DECIMAL7_2 PI_InpAddrAVMRatio1Y;
-		// INTEGER4 PI_InpAddrAVMValA5Y;
-		// DECIMAL7_2 PI_InpAddrAVMRatio5Y;
-		// INTEGER4 PI_InpAddrAVMConfScore;
+		INTEGER4 PI_InpAddrAVMVal;
+		INTEGER4 PI_InpAddrAVMValA1Y;
+		DECIMAL7_2 PI_InpAddrAVMRatio1Y;
+		INTEGER4 PI_InpAddrAVMValA5Y;
+		DECIMAL7_2 PI_InpAddrAVMRatio5Y;
+		INTEGER4 PI_InpAddrAVMConfScore;
 		STRING6 PI_InpAddrOnFileFlagEv;
 		STRING6 PI_InpAddrIsVacantFlag;
 		STRING6 PI_InpAddrIsThrowbackFlag;
@@ -277,9 +278,100 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6 PI_InpAddrOWGMFlag;
 		STRING6 PI_InpAddrIsMultiUnitFlag;
 		STRING6 PI_InpAddrIsAptFlag;
+		INTEGER PI_InpDOBAge;
+		STRING6 PI_InpSSNIsDeceasedFlag;
+		STRING10 PI_InpSSNDeceasedDt;
+		STRING6 PI_InpAddrStateDLAvailFlag;
+		STRING6 PI_InpAddrStateVoterAvailFlag;
+		INTEGER3 PI_SrchPerInpSSNCnt1Y;
+		INTEGER3 PI_SrchLexIDPerInpSSNCnt1Y;
+		INTEGER3 PI_SrchLNamePerInpSSNCnt1Y;
+		INTEGER3 PI_SrchAddrPerInpSSNCnt1Y;
+		INTEGER3 PI_SrchDOBPerInpSSNCnt1Y;
+		INTEGER3 PI_SrchPerInpAddrCnt1Y;
+		INTEGER3 PI_SrchLexIDPerInpAddrCnt1Y;
+		INTEGER3 PI_SrchLNamePerInpAddrCnt1Y;
+		INTEGER3 PI_SrchSSNPerInpAddrCnt1Y;
+		INTEGER3 PI_SrchPerInpEmailCnt1Y;
+		INTEGER3 PI_SrchLexIDPerInpEmailCnt1Y;
+		INTEGER3 PI_SrchPerInpPhoneCnt1Y;
+		INTEGER3 PI_SrchLexIDPerInpPhoneCnt1Y;
 		Boolean BestDataAppended;
+		STRING45 IPaddr;
+		STRING24 IPresponse;
+		INTEGER4 NetAcuityRoyalty;
+	END;
+
+	SHARED LayoutAddrSummaryInternal := RECORD
+		STRING100 PI_SrcWInpFLAListEv;
+		STRING300 PI_SrcWInpFLAEmrgDtListEv;
+		STRING300 PI_SrcWInpFLALastDtListEv;
+		STRING100 PI_SrcWInpADListEv;
+		STRING300 PI_SrcWInpADEmrgDtListEv;
+		STRING300 PI_SrcWInpADLastDtListEv;
 	END;
 	
+	EXPORT LayoutAddrSummaryAttributes := RECORD
+		INTEGER G_ProcUID;
+		LayoutAddrSummaryInternal;
+	END;
+
+	SHARED LayoutPhoneSumInternal := RECORD
+			STRING100 PI_SrcWInpPDListEv; 
+			STRING300 PI_SrcWInpPDEmrgDtListEv; 
+			STRING300 PI_SrcWInpPDLastDtListEv;
+			STRING100 PI_SrcWInpLPListEv;
+			STRING300 PI_SrcWInpLPEmrgDtListEv;
+			STRING300 PI_SrcWInpLPLastDtListEv;
+			STRING100 PI_SrcWInpAPListEv; 
+			STRING300 PI_SrcWInpAPEmrgDtListEv; 
+			STRING300 PI_SrcWInpAPLastDtListEv;
+	END;
+	
+	EXPORT LayoutPhoneSumAttributes := RECORD
+		INTEGER G_ProcUID;
+		LayoutPhoneSumInternal;
+	END;
+	
+	SHARED LayoutNSumInternal := RECORD
+		STRING100 PI_SrcWInpFLDListEv;
+		STRING300 PI_SrcWInpFLDEmrgDtListEv;
+		STRING300 PI_SrcWInpFLDLastDtListEv;
+		END;
+		
+	EXPORT LayoutNSumAttributes := RECORD
+		INTEGER G_ProcUID;
+		LayoutNSumInternal;
+	END;
+	
+	SHARED LayoutSSNSumInternal := RECORD
+		STRING100 PI_SrcWInpASListEv;
+		STRING300 PI_SrcWInpASEmrgDtListEv;
+		STRING300 PI_SrcWInpASLastDtListEv;
+		STRING100 PI_SrcWInpSDListEv;
+		STRING300 PI_SrcWInpSDEmrgDtListEv;
+		STRING300 PI_SrcWInpSDLastDtListEv;
+		STRING100 PI_SrcWInpPSListEv;
+		STRING300 PI_SrcWInpPSEmrgDtListEv;
+		STRING300 PI_SrcWInpPSLastDtListEv;
+		STRING100 PI_SrcWInpFLSListEv;
+		STRING300 PI_SrcWInpFLSEmrgDtListEv;
+		STRING300 PI_SrcWInpFLSLastDtListEv;
+	END;
+  
+	EXPORT LayoutSSNSumAttributes := RECORD
+		INTEGER G_ProcUID;
+		LayoutSSNSumInternal;
+	END;
+	
+	EXPORT LayoutALLSumAttributes := RECORD
+		INTEGER G_ProcUID;
+		LayoutNSumInternal;
+		LayoutSSNSumInternal;
+		LayoutPhoneSumInternal;
+		LayoutAddrSummaryInternal;
+	END;
+
 	SHARED LayoutInputBIIBusinessEchoInternal := RECORD
 		STRING65 B_InpAcct;
 		// INTEGER	G_ProcBusUID;
@@ -369,7 +461,6 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING54 B_Rep4InpEmail;
 		STRING50 B_Rep4InpDL;
 		STRING25 B_Rep4InpDLState;
-    
 		
 		INTEGER7 B_Rep5InpLexID;
 		STRING78 B_Rep5InpNameFirst;
@@ -463,13 +554,15 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6		B_Rep1InpClnAddrType;
 		STRING6		B_Rep1InpClnAddrStatus;
 		// INTEGER7	B_Rep1InpClnAddrLocID;
+		
+		
+		
 		STRING10 	B_Rep1InpClnPhone;
 		STRING10 	B_Rep1InpClnSSN;
 		STRING10 	B_Rep1InpClnDOB;
 		STRING50 	B_Rep1InpClnDL;
 		STRING6		B_Rep1InpClnDLState;
 		STRING54 	B_Rep1InpClnEmail;
-		
 		STRING6		B_Rep2InpClnNamePrfx;
 		STRING20 	B_Rep2InpClnNameFirst;
 		STRING20 	B_Rep2InpClnNameMid;
@@ -497,13 +590,14 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6		B_Rep2InpClnAddrType;
 		STRING6		B_Rep2InpClnAddrStatus;
 		// INTEGER7	B_Rep2InpClnAddrLocID;
+		
+		
 		STRING10 	B_Rep2InpClnPhone;
 		STRING10 	B_Rep2InpClnSSN;
 		STRING10 	B_Rep2InpClnDOB;
 		STRING50 	B_Rep2InpClnDL;
 		STRING6		B_Rep2InpClnDLState;
 		STRING54 	B_Rep2InpClnEmail;
-		
 		STRING6		B_Rep3InpClnNamePrfx;
 		STRING20 	B_Rep3InpClnNameFirst;
 		STRING20 	B_Rep3InpClnNameMid;
@@ -531,13 +625,14 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6		B_Rep3InpClnAddrType;
 		STRING6		B_Rep3InpClnAddrStatus;
 		// INTEGER7	B_Rep3InpClnAddrLocID;		
+		
+		
 		STRING10 	B_Rep3InpClnPhone;
 		STRING10 	B_Rep3InpClnSSN;
 		STRING10 	B_Rep3InpClnDOB;
 		STRING50 	B_Rep3InpClnDL;
 		STRING6		B_Rep3InpClnDLState;
 		STRING54 	B_Rep3InpClnEmail;
-		
 		STRING6		B_Rep4InpClnNamePrfx;
 		STRING20 	B_Rep4InpClnNameFirst;
 		STRING20 	B_Rep4InpClnNameMid;
@@ -565,13 +660,14 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6		B_Rep4InpClnAddrType;
 		STRING6		B_Rep4InpClnAddrStatus;
 		// INTEGER7	B_Rep4InpClnAddrLocID;		
+		
+		
 		STRING10 	B_Rep4InpClnPhone;
 		STRING10 	B_Rep4InpClnSSN;
 		STRING10 	B_Rep4InpClnDOB;
 		STRING50 	B_Rep4InpClnDL;
 		STRING6		B_Rep4InpClnDLState;
 		STRING54 	B_Rep4InpClnEmail;
-		
 		STRING6		B_Rep5InpClnNamePrfx;
 		STRING20 	B_Rep5InpClnNameFirst;
 		STRING20 	B_Rep5InpClnNameMid;
@@ -599,6 +695,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6		B_Rep5InpClnAddrType;
 		STRING6		B_Rep5InpClnAddrStatus;
 		// INTEGER7	B_Rep5InpClnAddrLocID;		
+		
 		STRING10 	B_Rep5InpClnPhone;
 		STRING10 	B_Rep5InpClnSSN;
 		STRING10 	B_Rep5InpClnDOB;
@@ -927,11 +1024,12 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6 B_InpValEmailDomAllZeroFlag;
 		STRING6 B_InpValNameBadCharFlag;
 		STRING6 B_InpValAltNameBadCharFlag;
-		STRING6 B_InpValNameMatchesAltNameFlag;	
+		STRING6 B_InpValNameMatchesAltNameFlag;
 	END;
 	
 	SHARED LayoutPersonInternal := RECORD
 		STRING6	P_LexIDSeenFlag;
+		STRING12 P_LexIDCategory;
 		INTEGER3 PL_AstVehAutoCntEv;
 		STRING	PL_AstVehAutoEmrgDtListEv;
 		STRING	PL_AstVehAutoLastDtListEv;
@@ -953,6 +1051,19 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING10 PL_AstVehWtrEmrgOldDtEv;
 		INTEGER3 PL_AstVehWtrEmrgNewMsncEv;
 		INTEGER3 PL_AstVehWtrEmrgOldMsncEv;
+		// Property
+		INTEGER3 PL_AstPropCntEv;
+		STRING900 PL_AstPropNewDtListEv;
+		STRING900 PL_AstPropOldDtListEv;
+		INTEGER3 PL_AstPropCurrCnt;
+		INTEGER3 PL_AstPropSaleCntEv;
+		STRING PL_AstPropSaleAmtListEv;
+		INTEGER4 PL_AstPropSaleTotEv;
+		STRING900 PL_AstPropSaleDtListEv;
+		STRING10 PL_AstPropSaleNewDtEv;
+		STRING10 PL_AstPropSaleOldDtEv;
+		INTEGER3 PL_AstPropSaleNewMsncEv;
+		INTEGER3 PL_AstPropSaleOldMsncEv;
 		INTEGER3 PL_DrgArstCnt1Y;
 		INTEGER3 PL_DrgArstCnt7Y;
 		STRING10 PL_DrgArstNewDt1Y;
@@ -1069,12 +1180,24 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING60 PL_ProfLicActvNewType;
 		STRING150 PL_ProfLicActvNewTitleType;
 		STRING6 PL_ProfLicActvNewIndx;
-		STRING6 PL_ProfLicActvNewSrcType;		
-				// Best PII
+		STRING6 PL_ProfLicActvNewSrcType;
+		// Best PII
 		STRING200 PL_CurrAddrFull;
 		// STRING200 PL_CurrAddrLocID;
 		STRING200 PL_PrevAddrFull;
 		// STRING200 PL_PrevAddrLocID;
+		STRING6 PL_CurrAddrCnty;
+		STRING7 PL_CurrAddrGeo;
+		STRING10 PL_CurrAddrLat;
+		STRING11 PL_CurrAddrLng;
+		STRING6 PL_CurrAddrType;
+		STRING6 PL_CurrAddrStatus;
+		STRING6 PL_PrevAddrCnty;
+		STRING7 PL_PrevAddrGeo;
+		STRING10 PL_PrevAddrLat;
+		STRING11 PL_PrevAddrLng;
+		STRING6 PL_PrevAddrType;
+		STRING6 PL_PrevAddrStatus;
 		//Current Address
 		STRING6 PL_CurrAddrIsVacantFlag;
 		STRING6 PL_CurrAddrIsThrowbackFlag;
@@ -1085,22 +1208,225 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6 PL_CurrAddrIsSimpAddrFlag;
 		STRING6 PL_CurrAddrIsDropDeliveryFlag;
 		STRING6 PL_CurrAddrIsBusinessFlag;
+		//Previous Address
+		STRING6 PL_PrevAddrIsSimpAddrFlag;
+		STRING6 PL_PrevAddrIsBusinessFlag;
 		//consumer liens
-		INTEGER3 PL_DrgJudgCnt7Y;		
-		INTEGER3 PL_DrgLTDCnt7Y;		
-		INTEGER3 PL_DrgLienCnt7Y;		
-			// Education		
-		STRING6 PL_EduRecFlagEv;		
-		STRING50 PL_EduSrcListEv;		
-		STRING6 PL_EduHSRecFlagEv;		
-		STRING6 PL_EduCollRecFlagEv;		
-		STRING PL_EduCollSrcEmrgDtListEv;		
-		STRING PL_EduCollSrcLastDtListEv;		
-		STRING8 PL_EduCollSrcNewRecOldDtEv;		
-		STRING8 PL_EduCollSrcNewRecNewDtEv;		
-		INTEGER3 PL_EduCollSrcNewRecOldMsncEv;		
-		INTEGER3 PL_EduCollSrcNewRecNewMsncEv;		
+		INTEGER3 PL_DrgJudgCnt7Y;
+		INTEGER3 PL_DrgLTDCnt7Y;
+		STRING PL_DrgLTDAmtList7Y;
+		STRING PL_DrgLTDDtList7Y;
+		INTEGER3 PL_DrgLTDNewMsnc7Y;
+		INTEGER3 PL_DrgLTDOldMsnc7Y;
+		INTEGER3 PL_DrgLienCnt7Y;	
+		//Consumer Suits
+		INTEGER3 PL_DrgSuitCnt7Y;
+		STRING PL_DrgSuitAmtList7Y;
+		INTEGER3 PL_DrgSuitAmtTot7Y;
+		STRING PL_DrgSuitDtList7Y;
+		INTEGER3 PL_DrgSuitNewMsnc7Y;
+		INTEGER3 PL_DrgSuitOldMsnc7Y;
+		//OverAllLnJ
+		INTEGER3 PL_DrgLnJCnt7Y;
+		STRING	PL_DrgLnJAmtList7Y;
+		STRING	PL_DrgLnJDtList7Y;
+		STRING10 PL_DrgLnJNewDt7Y;
+		INTEGER3 PL_DrgLnJNewMsnc7Y;
+		STRING10 PL_DrgLnJOldDt7Y;
+		INTEGER3 PL_DrgLnJOldMsnc7Y;
+		// Education
+		STRING6 PL_EduRecFlagEv;
+		STRING50 PL_EduSrcListEv;
+		STRING6 PL_EduHSRecFlagEv;
+		STRING6 PL_EduCollRecFlagEv;
+		STRING PL_EduCollSrcEmrgDtListEv;
+		STRING PL_EduCollSrcLastDtListEv;
+		STRING8 PL_EduCollSrcNewRecOldDtEv;
+		STRING8 PL_EduCollSrcNewRecNewDtEv;
+		INTEGER3 PL_EduCollSrcNewRecOldMsncEv;
+		INTEGER3 PL_EduCollSrcNewRecNewMsncEv;
 		INTEGER3 PL_EduCollRecSpanEv;
+		//PersonBusiniessProperty
+		INTEGER3 PL_AstPropBusCntEv;
+		INTEGER3 PL_AstPropBusCurrCnt;
+		INTEGER3 PL_AstPropBusCurrWTaxValCnt;
+		STRING900 PL_AstPropBusCurrTaxValList;
+		INTEGER4 PL_AstPropBusCurrTaxValTot;
+		//Utility
+		INTEGER3 PL_UtilCntEv;
+		STRING1000 PL_UtilOldDtListEv;
+		STRING8 PL_UtilOldDtEv;
+		INTEGER3 PL_UtilOldMsncEv;
+		//Email
+		INTEGER3 PL_EmailCntEv;
+		//Derog History
+		// INTEGER3 PL_DrgCnt7Y;
+		// STRING PL_DrgDtList7Y;
+		// INTEGER3 PL_DrgOldMsnc7Y;
+		// INTEGER3 PL_DrgNewMsnc7Y;			
+		//Best PII
+		STRING20 PL_BestNameFirst;
+		STRING20 PL_BestNameMid;
+		STRING20 PL_BestNameLast;
+		STRING10 PL_BestSSN;
+		STRING10 PL_BestDOB;
+		INTEGER3 PL_BestDOBAge;
+		integer7 PL_HHID;
+		integer3 PL_HHMmbrCnt;
+		//Inquiry
+		//Inquiry History
+		INTEGER3 PL_SrchCollCnt5Y;
+		STRING PL_SrchCollDtList5Y;
+		STRING10 PL_SrchCollNewDt5Y;
+		STRING10 PL_SrchCollOldDt5Y;
+		INTEGER3 PL_SrchCollNewMsnc5Y;
+		INTEGER3 PL_SrchCollOldMsnc5Y;
+		INTEGER3 PL_SrchCreditHRCnt5Y;
+		STRING PL_SrchCreditHRDtList5Y;
+		STRING10 PL_SrchCreditHRNewDt5Y;
+		STRING10 PL_SrchCreditHROldDt5Y;
+		INTEGER3 PL_SrchCreditHRNewMsnc5Y;
+		INTEGER3 PL_SrchCreditHROldMsnc5Y;
+		INTEGER3 PL_SrchBankCnt5Y;
+		STRING PL_SrchBankDtList5Y;
+		STRING10 PL_SrchBankNewDt5Y;
+		STRING10 PL_SrchBankOldDt5Y;
+		INTEGER3 PL_SrchBankNewMsnc5Y;
+		INTEGER3 PL_SrchBankOldMsnc5Y;
+		INTEGER3  PL_SrchAutoCnt5Y;
+		STRING PL_SrchAutoDtList5Y;
+		STRING10 PL_SrchAutoNewDt5Y;
+		STRING10 PL_SrchAutoOldDt5Y;
+		INTEGER3 PL_SrchAutoNewMsnc5Y;
+		INTEGER3 PL_SrchAutoOldMsnc5Y;
+		INTEGER3 PL_SrchMtgeCnt5Y;
+		STRING PL_SrchMtgeDtList5Y;
+		STRING10 PL_SrchMtgeNewDt5Y;
+		STRING10 PL_SrchMtgeOldDt5Y;
+		INTEGER3 PL_SrchMtgeNewMsnc5Y;
+		INTEGER3 PL_SrchMtgeOldMsnc5Y;
+		INTEGER3  PL_SrchUtilCnt5Y;
+		STRING PL_SrchUtilDtList5Y;
+		STRING10 PL_SrchUtilNewDt5Y;
+		STRING10 PL_SrchUtilOldDt5Y;
+		INTEGER3 PL_SrchUtilNewMsnc5Y;
+		INTEGER3 PL_SrchUtilOldMsnc5Y;
+		INTEGER3 PL_SrchPrepayCardCnt5Y;
+		STRING PL_SrchPrepayCardDtList5Y;
+		STRING10 PL_SrchPrepayCardNewDt5Y;
+		STRING10 PL_SrchPrepayCardOldDt5Y;
+		INTEGER3 PL_SrchPrepayCardNewMsnc5Y;
+		INTEGER3 PL_SrchPrepayCardOldMsnc5Y;
+		INTEGER3 PL_SrchCommCnt5Y;
+		STRING PL_SrchCommDtList5Y;
+		STRING10 PL_SrchCommNewDt5Y;
+		STRING10 PL_SrchCommOldDt5Y;
+		INTEGER3 PL_SrchCommNewMsnc5Y;
+		INTEGER3 PL_SrchCommOldMsnc5Y;
+		INTEGER3 PL_SrchStdntLoanCnt5Y;
+		STRING PL_SrchStdntLoanDtList5Y;
+		STRING10 PL_SrchStdntLoanNewDt5Y;
+		STRING10 PL_SrchStdntLoanOldDt5Y;
+		INTEGER3 PL_SrchStdntLoanNewMsnc5Y;
+		INTEGER3 PL_SrchStdntLoanOldMsnc5Y;
+		INTEGER3 PL_SrchRetailPymtCnt5Y;
+		STRING PL_SrchRetailPymtDtList5Y;
+		STRING10 PL_SrchRetailPymtNewDt5Y;
+		STRING10 PL_SrchRetailPymtOldDt5Y;
+		INTEGER3 PL_SrchRetailPymtNewMsnc5Y;
+		INTEGER3 PL_SrchRetailPymtOldMsnc5Y;
+		INTEGER3 PL_SrchQuizProvCnt5Y;
+		STRING PL_SrchQuizProvDtList5Y;
+		STRING10 PL_SrchQuizProvNewDt5Y;
+		STRING10 PL_SrchQuizProvOldDt5Y;
+		INTEGER3 PL_SrchQuizProvNewMsnc5Y;
+		INTEGER3 PL_SrchQuizProvOldMsnc5Y;
+		INTEGER3  PL_SrchRetailCnt5Y;
+		STRING PL_SrchRetailDtList5Y;
+		STRING10 PL_SrchRetailNewDt5Y;
+		STRING10 PL_SrchRetailOldDt5Y;
+		INTEGER3 PL_SrchRetailNewMsnc5Y;
+		INTEGER3 PL_SrchRetailOldMsnc5Y;
+		INTEGER3  PL_SrchOtherCnt5Y;
+		STRING PL_SrchOtherDtList5Y;
+		STRING10 PL_SrchOtherNewDt5Y;
+		STRING10 PL_SrchOtherOldDt5Y;
+		INTEGER3 PL_SrchOtherNewMsnc5Y;
+		INTEGER3 PL_SrchOtherOldMsnc5Y;
+		INTEGER3  PL_SrchCnt5Y;
+		STRING PL_SrchDtList5Y;
+		STRING10 PL_SrchNewDt5Y;
+		STRING10 PL_SrchOldDt5Y;
+		INTEGER3 PL_SrchNewMsnc5Y;
+		INTEGER3 PL_SrchOldMsnc5Y;
+		// NonFCRA Velocity Inquiries
+		INTEGER3 PL_SrchPerLexIDCnt1Y;
+		INTEGER3 PL_SrchSSNPerLexIDCnt1Y;
+		INTEGER3 PL_SrchAddrPerLexIDCnt1Y;
+		INTEGER3 PL_SrchLNamePerLexIDCnt1Y;
+		INTEGER3 PL_SrchFNamePerLexIDCnt1Y;
+		INTEGER3 PL_SrchPhonePerLexIDCnt1Y;
+		INTEGER3 PL_SrchDOBPerLexIDCnt1Y;
+		INTEGER3 PL_SrchEmailPerLexIDCnt1Y;
+		//INTEGER3 PL_SrchPerCurrAddrCnt1Y;
+		//INTEGER3 PL_SrchLexIDPerCurrAddrCnt1Y;
+		//INTEGER3 PL_SrchLNamePerCurrAddrCnt1Y;
+		//INTEGER3 PL_SrchSSNPerCurrAddrCnt1Y;
+		// NonFCRA Inquiry PII Corroboration 
+		INTEGER3 PL_SrchPerLexIDWInpFLSCnt1Y;
+		INTEGER3 PL_SrchPerLexIDWInpASCnt1Y;
+		INTEGER3 PL_SrchPerLexIDWInpSDCnt1Y;
+		INTEGER3 PL_SrchPerLexIDWInpPSCnt1Y;
+		INTEGER3 PL_SrchPerLexIDWInpFLASCnt1Y;
+		INTEGER3 PL_SrchPerLexIDWInpFLPSCnt1Y;
+		INTEGER3 PL_SrchPerLexIDWInpFLAPSCnt1Y;
+		// FCRA Velocity Inquiries
+		INTEGER3 PL_InqPerLexIDCnt1Y;
+		INTEGER3 PL_InqSSNPerLexIDCnt1Y;
+		INTEGER3 PL_InqAddrPerLexIDCnt1Y;
+		INTEGER3 PL_InqLNamePerLexIDCnt1Y;
+		INTEGER3 PL_InqFNamePerLexIDCnt1Y;
+		INTEGER3 PL_InqPhonePerLexIDCnt1Y;
+		INTEGER3 PL_InqDOBPerLexIDCnt1Y;
+		
+// FCRA Inquiry PII Corroboration
+		INTEGER3 PL_InqPerLexIDWInpFLSCnt1Y;
+		INTEGER3 PL_InqPerLexIDWInpASCnt1Y;
+		INTEGER3 PL_InqPerLexIDWInpSDCnt1Y;
+		INTEGER3 PL_InqPerLexIDWInpPSCnt1Y;
+		INTEGER3 PL_InqPerLexIDWInpFLASCnt1Y;
+		INTEGER3 PL_InqPerLexIDWInpFLPSCnt1Y;
+		INTEGER3 PL_InqPerLexIDWInpFLAPSCnt1Y;
+		//Accidents
+		INTEGER3 PL_AccCntEv;
+		STRING6 PL_AccFlagEv;
+		STRING500 PL_AccDtListEv;
+		STRING8 PL_AccNewDtEv;
+		INTEGER3 PL_AccNewMsncEv;
+		STRING500 PL_AccDmgAmtListEv;
+		INTEGER4 PL_AccDmgTotEv;
+		INTEGER3 PL_AccNewDmgAmtEv;
+		INTEGER3 PL_AccCnt1Y;
+		//Short Term Lending
+		INTEGER PL_STLCnt1Y;
+		INTEGER PL_STLCnt2Y;
+		INTEGER PL_STLCnt5Y;
+		STRING PL_STLDtList5Y;
+		//Person Header Source Verification
+		// INTEGER PL_VerSrcCntEv;
+		// STRING100 PL_VerSrcListEv;
+		// STRING300 PL_VerSrcEmrgDtListEv;
+		// STRING300 PL_VerSrcLastDtListEv;
+		// STRING10 PL_VerSrcOldDtEv;
+		// STRING10 PL_VerSrcNewDtEv;
+		// STRING6 P_LexIDRstdOnlyFlag;
+		//consumer statements
+		string6 PL_AlrtCorrectedFlag;
+		string6 PL_AlrtConsStatementFlag;
+		string6 PL_AlrtDisputeFlag;
+		string6 PL_AlrtSecurityFreezeFlag;
+		string6 PL_AlrtSecurityAlertFlag;
+		string6 PL_AlrtIDTheftFlag;
 	END;
 	
 	EXPORT LayoutPerson := RECORD
@@ -1114,7 +1440,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING BE_VerSrcListEv;
 		INTEGER BE_VerSrcCntEv;
 		STRING BE_VerSrcEmrgDtListEv;
-		STRING BE_VerSrcLastDtListEv;	
+		STRING BE_VerSrcLastDtListEv;
 		STRING10 BE_VerSrcOldDtEv;
 		STRING10 BE_VerSrcNewDtEv;
 		INTEGER BE_VerSrcOldMsncEv;
@@ -1126,44 +1452,44 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER BE_VerSrcBureauOldMsncEv;
 		INTEGER3 BE_DBANameCnt2Y;
 		STRING6 BE_AddrPOBoxFlag;
-		STRING6 BE_URLFlag;		
-		STRING6  BE_VerNameFlag;
-		STRING BE_VerNameSrcListEv;
-		INTEGER BE_VerNameSrcCntEv;
-		STRING BE_VerNameSrcEmrgDtListEv;
-		STRING BE_VerNameSrcLastDtListEv;
-		STRING10 BE_VerNameSrcOldDtEv;
-		STRING10 BE_VerNameSrcNewDtEv;
-		INTEGER BE_VerNameSrcOldMsncEv;
-		INTEGER BE_VerNameSrcNewMsncEv;
-		STRING6 BE_VerAddrFlag;
-		STRING BE_VerAddrSrcListEv;
-		INTEGER BE_VerAddrSrcCntEv;
-		STRING BE_VerAddrSrcEmrgDtListEv;
-		STRING BE_VerAddrSrcLastDtListEv;
-		STRING10 BE_VerAddrSrcOldDtEv;
-		STRING10 BE_VerAddrSrcNewDtEv;
-		INTEGER BE_VerAddrSrcOldMsncEv;
-		INTEGER BE_VerAddrSrcNewMsncEv;
-		INTEGER BE_VerAddrSrcDtSpanEv;
-		STRING6 BE_VerTINFlag;
-		STRING BE_VerTINSrcListEv;
-		INTEGER BE_VerTINSrcCntEv;
-		STRING BE_VerTINSrcEmrgDtListEv;
-		STRING BE_VerTINSrcLastDtListEv;
-		STRING10 BE_VerTINSrcOldDtEv;
-		STRING10 BE_VerTINSrcNewDtEv;
-		INTEGER BE_VerTINSrcOldMsncEv;
-		INTEGER BE_VerTINSrcNewMsncEv;
-		STRING6 BE_VerPhoneFlag;
-		STRING BE_VerPhoneSrcListEv;
-		INTEGER BE_VerPhoneSrcCntEv;
-		STRING BE_VerPhoneSrcEmrgDtListEv;
-		STRING BE_VerPhoneSrcLastDtListEv;
-		STRING10 BE_VerPhoneSrcOldDtEv;
-		STRING10 BE_VerPhoneSrcNewDtEv;
-		INTEGER BE_VerPhoneSrcOldMsncEv;
-		INTEGER BE_VerPhoneSrcNewMsncEv;
+		STRING6 BE_URLFlag;
+		STRING6  BE_VerNameFlag;		
+		STRING BE_VerNameSrcListEv;		
+		INTEGER BE_VerNameSrcCntEv;		
+		STRING BE_VerNameSrcEmrgDtListEv;		
+		STRING BE_VerNameSrcLastDtListEv;		
+		STRING10 BE_VerNameSrcOldDtEv;		
+		STRING10 BE_VerNameSrcNewDtEv;		
+		INTEGER BE_VerNameSrcOldMsncEv;		
+		INTEGER BE_VerNameSrcNewMsncEv;		
+		STRING6 BE_VerAddrFlag;		
+		STRING BE_VerAddrSrcListEv;		
+		INTEGER BE_VerAddrSrcCntEv;		
+		STRING BE_VerAddrSrcEmrgDtListEv;		
+		STRING BE_VerAddrSrcLastDtListEv;		
+		STRING10 BE_VerAddrSrcOldDtEv;		
+		STRING10 BE_VerAddrSrcNewDtEv;		
+		INTEGER BE_VerAddrSrcOldMsncEv;		
+		INTEGER BE_VerAddrSrcNewMsncEv;		
+		INTEGER BE_VerAddrSrcDtSpanEv;		
+		STRING6 BE_VerTINFlag;		
+		STRING BE_VerTINSrcListEv;		
+		INTEGER BE_VerTINSrcCntEv;		
+		STRING BE_VerTINSrcEmrgDtListEv;		
+		STRING BE_VerTINSrcLastDtListEv;		
+		STRING10 BE_VerTINSrcOldDtEv;		
+		STRING10 BE_VerTINSrcNewDtEv;		
+		INTEGER BE_VerTINSrcOldMsncEv;		
+		INTEGER BE_VerTINSrcNewMsncEv;		
+		STRING6 BE_VerPhoneFlag;		
+		STRING BE_VerPhoneSrcListEv;		
+		INTEGER BE_VerPhoneSrcCntEv;		
+		STRING BE_VerPhoneSrcEmrgDtListEv;		
+		STRING BE_VerPhoneSrcLastDtListEv;		
+		STRING10 BE_VerPhoneSrcOldDtEv;		
+		STRING10 BE_VerPhoneSrcNewDtEv;		
+		INTEGER BE_VerPhoneSrcOldMsncEv;		
+		INTEGER BE_VerPhoneSrcNewMsncEv;				
 		//Tradeline		
 		INTEGER3 BE_B2BCntEv;
 		INTEGER3 BE_B2BCnt2Y;
@@ -1325,7 +1651,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING30 BE_B2BFltRecFlagByMonStr24Mc;
 		STRING30 BE_B2BMatRecFlagByMonStr24Mc;
 		STRING30 BE_B2BOpsRecFlagByMonStr24Mc;
-		STRING30 BE_B2BOthRecFlagByMonStr24Mc; 
+		STRING30 BE_B2BOthRecFlagByMonStr24Mc;
 		INTEGER3 BE_B2BRecFlagByMonSum24Mc;
 		INTEGER3 BE_B2BCarrRecFlagByMonSum24Mc;
 		INTEGER3 BE_B2BFltRecFlagByMonSum24Mc;
@@ -1338,7 +1664,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		DECIMAL7_2 BE_B2BMatBalVol24Mc;
 		DECIMAL7_2 BE_B2BOpsBalVol24Mc;
 		DECIMAL7_2 BE_B2BOthBalVol24Mc;
-			// Asset Vehicle		
+		// Asset Vehicle
 		INTEGER3 BE_AstVehAirCntEv;
 		INTEGER3 BE_AstVehWtrCntEv;
 		INTEGER3 BE_AstVehAutoCntEv;
@@ -1349,22 +1675,22 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER4 BE_AstVehAutoValTot2Y;
 		INTEGER3 BE_AstVehAutoEmrgNewMsncEv;
 		STRING10 BE_AstVehAutoEmrgNewDtEv;
-			// Asset Property		
-		INTEGER3 BE_AstPropCntEv;		
-		INTEGER3 BE_AstPropStateCntEv;		
-		INTEGER3 BE_AstPropCurrCnt;		
-		INTEGER3 BE_AstPropCurrStateCnt;		
-		STRING10 BE_AstPropOldDtEv;		
-		INTEGER3 BE_AstPropOldMsncEv;		
-		STRING10 BE_AstPropNewDtEv;		
-		INTEGER3 BE_AstPropNewMsncEv; 		
-		INTEGER4 BE_AstPropCurrTaxValTot;		
-		INTEGER4 BE_AstPropCurrMktValTot;		
-		INTEGER4 BE_AstPropCurrValTot;		
-		INTEGER4 BE_AstPropCurrLotSizeTot;		
-		INTEGER4 BE_AstPropCurrBldgSizeTot;		
-		STRING6 BE_AstPropIndxEv;		
-			// Bankruptcy		
+		// Asset Property
+		INTEGER3 BE_AstPropCntEv;
+		INTEGER3 BE_AstPropStateCntEv;
+		INTEGER3 BE_AstPropCurrCnt;
+		INTEGER3 BE_AstPropCurrStateCnt;
+		STRING10 BE_AstPropOldDtEv;
+		INTEGER3 BE_AstPropOldMsncEv;
+		STRING10 BE_AstPropNewDtEv;
+		INTEGER3 BE_AstPropNewMsncEv; 
+		INTEGER4 BE_AstPropCurrTaxValTot;
+		INTEGER4 BE_AstPropCurrMktValTot;
+		INTEGER4 BE_AstPropCurrValTot;
+		INTEGER4 BE_AstPropCurrLotSizeTot;
+		INTEGER4 BE_AstPropCurrBldgSizeTot;
+		STRING6 BE_AstPropIndxEv;
+		// Bankruptcy
 		INTEGER3 BE_DrgBkCnt1Y;
 		INTEGER3 BE_DrgBkCnt7Y;
 		INTEGER3 BE_DrgBkCnt10Y;
@@ -1400,7 +1726,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER3 BE_SOSFrgnOldMsncEv;
 		INTEGER6 BE_SOSDomStatusIndxEv;
 		STRING120 BE_BestName;
-			// INTEGER7 BE_BestAddrLocID;
+		// INTEGER7 BE_BestAddrLocID;
 		STRING120 BE_BestAddrSt;
 		STRING50 BE_BestAddrCity;
 		STRING50 BE_BestAddrCityPost;
@@ -1417,7 +1743,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING10 BE_DrgLTDOldDt7Y;
 		INTEGER3 BE_DrgLTDNewMsnc7Y;
 		INTEGER3 BE_DrgLTDOldMsnc7Y;
-				//UCC
+		//UCC
 		INTEGER3 BE_UCCCntEv;
 		INTEGER3 BE_UCCDebtorCntEv;
 		STRING10 BE_UCCDebtorOldDtEv;
@@ -1436,7 +1762,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER3 BE_UCCCreditorCntEv;
 		STRING6 BE_UCCRoleIndxEv;
 		STRING6 BE_UCCActvRoleIndx;
-			//Overall Liens
+		//Overall Liens
 		INTEGER3 BE_DrgLienCnt1Y;
 		INTEGER3 BE_DrgLienCnt7Y;
 		INTEGER4 BE_DrgLienAmtTot7Y;
@@ -1475,7 +1801,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING10 BE_DrgLienOtherOldDt7Y;
 		INTEGER3 BE_DrgLienOtherNewMsnc7Y;
 		INTEGER3 BE_DrgLienOtherOldMsnc7Y;
-			//Judgment Attributes
+		//Judgment Attributes
 		INTEGER3 BE_DrgJudgCnt1Y;
 		INTEGER3 BE_DrgJudgCnt7Y;
 		INTEGER4 BE_DrgJudgAmtTot7Y;
@@ -1502,7 +1828,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER3 BE_DrgJudgFrclOldMsnc7Y;
 		STRING10 BE_DrgJudgFrclNewDt7Y;
 		INTEGER3 BE_DrgJudgFrclNewMsnc7Y;
-			//OverAll LienJudgment Attributes
+		//OverAll LienJudgment Attributes
 		INTEGER3 BE_DrgLnJCnt1Y;
 		INTEGER3 BE_DrgLnJCnt7Y;
 		INTEGER4 BE_DrgLnJAmtTot7Y;
@@ -1511,17 +1837,17 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING10 BE_DrgLnJOldDt7Y;
 		INTEGER3 BE_DrgLnJNewMsnc7Y;
 		INTEGER3 BE_DrgLnJOldMsnc7Y;
-			//Suits Attributes
+		//Suits Attributes
 		INTEGER3 BE_DrgSuitCnt7Y;
 		INTEGER4 BE_DrgSuitAmtTot7Y;
 		STRING10 BE_DrgSuitOldDt7Y;
 		INTEGER3 BE_DrgSuitOldMsnc7Y;
 		STRING10 BE_DrgSuitNewDt7Y;
 		INTEGER3 BE_DrgSuitNewMsnc7Y;
-			//LienJudgment Type Attributes
+		//LienJudgment Type Attributes
 		STRING10 BE_DrgJudgNewType7Y;
 		STRING10 BE_DrgLienNewType7Y;
-			//Business OverAll Drg Attributes
+		//Business OverAll Drg Attributes
 		INTEGER3 BE_DrgCnt1Y;
 		INTEGER3 BE_DrgCnt7Y;
 		STRING6 BE_DrgFlag7Y;
@@ -1529,7 +1855,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER3 BE_DrgNewMsnc7Y;
 		STRING10 BE_DrgOldDt7Y;
 		INTEGER3 BE_DrgOldMsnc7Y;
-			//Firmographics
+		//Firmographics
 		STRING6	BE_BusSICCode1; 
 		STRING150	BE_BusSICCode1Desc; 
 		STRING60	BE_BusSICCode1GroupDesc; 
@@ -1554,24 +1880,24 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6   BE_BusNAICSCode4;
 		STRING150 BE_BusNAICSCode4Desc;
 		STRING60  BE_BusNAICSCode4GroupDesc;
-		INTEGER3 BE_BusEmplCountCurr;		
-		STRING6 BE_BusEmplCountCurrRnge;		
-		INTEGER6 BE_BusAnnualSalesCurr;		
-		STRING6 BE_BusAnnualSalesCurrRnge;		
-			//Flag Attributes		
-		STRING6 BE_BusIsNonProfitFlag;		
-		STRING6 BE_BusIsFranchiseFlag;		
-		STRING6 BE_BusOffers401kFlag;		
-		STRING6 BE_BusHasNewLocationFlag1Y;		
-		INTEGER3 BE_BusLocActvCnt;		
-		STRING6 BE_BusIsSBEFlag;		
-			//Ownership Attributes		
-		STRING6 BE_BusInferFemaleOwnedFlag;		
-		STRING6 BE_BusInferFamilyOwnedFlag;		
-		STRING6 BE_BusIsFemaleOwnedFlag;		
-		STRING6 BE_BusIsMinorityOwnedFlag;		
-		STRING6 BE_BusIsPublicFlag;		
-			//assoc attributes		
+		INTEGER3 BE_BusEmplCountCurr;
+		STRING6 BE_BusEmplCountCurrRnge;
+		INTEGER6 BE_BusAnnualSalesCurr;
+		STRING6 BE_BusAnnualSalesCurrRnge;
+		//Flag Attributes
+		STRING6 BE_BusIsNonProfitFlag;
+		STRING6 BE_BusIsFranchiseFlag;
+		STRING6 BE_BusOffers401kFlag;
+		STRING6 BE_BusHasNewLocationFlag1Y;
+		INTEGER3 BE_BusLocActvCnt;
+		STRING6 BE_BusIsSBEFlag;
+		//Ownership Attributes
+		STRING6 BE_BusInferFemaleOwnedFlag;
+		STRING6 BE_BusInferFamilyOwnedFlag;
+		STRING6 BE_BusIsFemaleOwnedFlag;
+		STRING6 BE_BusIsMinorityOwnedFlag;
+		STRING6 BE_BusIsPublicFlag;
+		//assoc attributes
 		INTEGER3 BE_AssocCntEv;
 		INTEGER3 BE_AssocCnt2Y;
 		DECIMAL7_2 BE_AssocPct2Y;	
@@ -1584,44 +1910,44 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6 BE_AssocEmailFlag2Y;
 		STRING6 BE_AssocExecEmailFlag2Y;
 		STRING6 BE_AssocNexecEmailFlag2Y;
-		INTEGER3 BE_AssocAgeAvg2Y;        
-		INTEGER3 BE_AssocExecAgeAvg2Y;		
-		INTEGER3 BE_AssocNexecAgeAvg2Y;		
-		INTEGER3 BE_AssocWEduCollCnt2Y;		
-		INTEGER3 BE_AssocExecWEduCollCnt2Y;		
-		INTEGER3 BE_AssocNexecWEduCollCnt2Y;		
-		INTEGER3 BE_AssocWDrgCrimFelCnt2Y;		
-		INTEGER3 BE_AssocExecWDrgCrimFelCnt2Y;		
-		INTEGER3 BE_AssocNexecWDrgCrimFelCnt2Y;		
-		INTEGER3 BE_AssocWDrgCrimCnt2Y;		
-		INTEGER3 BE_AssocExecWDrgCrimCnt2Y;		
-		INTEGER3 BE_AssocNexecWDrgCrimCnt2Y;    		
-		INTEGER3 BE_AssocWDrgBkCnt2Y;		
-		INTEGER3 BE_AssocExecWDrgBkCnt2Y;		
-		INTEGER3 BE_AssocNexecWDrgBkCnt2Y;        		
-		INTEGER3 BE_AssocWDrgJudgCnt2Y;   		
-		INTEGER3 BE_AssocExecWDrgJudgCnt2Y;		
-		INTEGER3 BE_AssocNexecWDrgJudgCnt2Y;		
-		INTEGER3 BE_AssocWDrgLTDCnt2Y;		
-		INTEGER3 BE_AssocExecWDrgLTDCnt2Y;		
-		INTEGER3 BE_AssocNexecWDrgLTDCnt2Y;    		
-		INTEGER3 BE_AssocWDrgLienCnt2Y;   		
-		INTEGER3 BE_AssocExecWDrgLienCnt2Y;		
-		INTEGER3 BE_AssocNexecWDrgLienCnt2Y;		
-		INTEGER3 BE_AssocWDrgCnt2Y;   		
-		INTEGER3 BE_AssocExecWDrgCnt2Y;		
-		INTEGER3 BE_AssocNexecWDrgCnt2Y;		
-		INTEGER3 BE_AssocEmrgMsncAvg2Y;		
-		INTEGER3 BE_AssocExecEmrgMsncAvg2Y;		
-		INTEGER3 BE_AssocNexecEmrgMsncAvg2Y;		
-		INTEGER3 BE_AssocExecFemaleCnt2Y;		
-		DECIMAL7_2 BE_AssocExecFemalePct2Y;		
-		INTEGER3 BE_AssocExecRelatedCnt2Y;		
-		DECIMAL7_2 BE_AssocExecRelatedPct2Y;		
-		INTEGER3 BE_AssocBusCntAvg2Y;		
-		INTEGER3 BE_AssocExecBusCntAvg2Y;		
-		INTEGER3 BE_AssocNexecBusCntAvg2Y;		
-		//BestAddress
+		INTEGER3 BE_AssocAgeAvg2Y;
+		INTEGER3 BE_AssocExecAgeAvg2Y;
+		INTEGER3 BE_AssocNexecAgeAvg2Y;
+		INTEGER3 BE_AssocWEduCollCnt2Y;
+		INTEGER3 BE_AssocExecWEduCollCnt2Y;
+		INTEGER3 BE_AssocNexecWEduCollCnt2Y;
+		INTEGER3 BE_AssocWDrgCrimFelCnt2Y;
+		INTEGER3 BE_AssocExecWDrgCrimFelCnt2Y;
+		INTEGER3 BE_AssocNexecWDrgCrimFelCnt2Y;
+		INTEGER3 BE_AssocWDrgCrimCnt2Y;
+		INTEGER3 BE_AssocExecWDrgCrimCnt2Y;
+		INTEGER3 BE_AssocNexecWDrgCrimCnt2Y;	
+		INTEGER3 BE_AssocWDrgBkCnt2Y;
+		INTEGER3 BE_AssocExecWDrgBkCnt2Y;
+		INTEGER3 BE_AssocNexecWDrgBkCnt2Y;		
+		INTEGER3 BE_AssocWDrgJudgCnt2Y;   
+		INTEGER3 BE_AssocExecWDrgJudgCnt2Y;
+		INTEGER3 BE_AssocNexecWDrgJudgCnt2Y;
+		INTEGER3 BE_AssocWDrgLTDCnt2Y;
+		INTEGER3 BE_AssocExecWDrgLTDCnt2Y;
+		INTEGER3 BE_AssocNexecWDrgLTDCnt2Y;	
+		INTEGER3 BE_AssocWDrgLienCnt2Y;   
+		INTEGER3 BE_AssocExecWDrgLienCnt2Y;
+		INTEGER3 BE_AssocNexecWDrgLienCnt2Y;
+		INTEGER3 BE_AssocWDrgCnt2Y;   
+		INTEGER3 BE_AssocExecWDrgCnt2Y;
+		INTEGER3 BE_AssocNexecWDrgCnt2Y;
+		INTEGER3 BE_AssocEmrgMsncAvg2Y;
+		INTEGER3 BE_AssocExecEmrgMsncAvg2Y;
+		INTEGER3 BE_AssocNexecEmrgMsncAvg2Y;
+		INTEGER3 BE_AssocExecFemaleCnt2Y;
+		DECIMAL7_2 BE_AssocExecFemalePct2Y;
+		INTEGER3 BE_AssocExecRelatedCnt2Y;
+		DECIMAL7_2 BE_AssocExecRelatedPct2Y;
+		INTEGER3 BE_AssocBusCntAvg2Y;
+		INTEGER3 BE_AssocExecBusCntAvg2Y;
+		INTEGER3 BE_AssocNexecBusCntAvg2Y;
+		//BestAddress Attributes
 		STRING6 BE_BestAddrSeenFlag;
 		STRING  BE_BestAddrSrcListEv;
 		INTEGER3 BE_BestAddrSrcCntEv;
@@ -1643,10 +1969,10 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6 BE_BestAddrNewMktValYrEv;
 		STRING6 BE_BestAddrNewTaxValYrEv;
 		INTEGER BE_BestAddrLotSize;
-		INTEGER BE_BestAddrBldgSize;	
+		INTEGER BE_BestAddrBldgSize;
+
 	END;	
-		
-	EXPORT LayoutBusinessSeleID := RECORD
+		EXPORT LayoutBusinessSeleID := RECORD
 		INTEGER G_ProcBusUID;
 		LayoutBusinessSeleIDInternal;
 	END;
@@ -1662,20 +1988,22 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING10 BP_BestAddrZip;
 		STRING10 BP_BestTIN;
 		STRING16 BP_BestPhone;
-   END;	
-	
-	  EXPORT LayoutBusinessProxID := RECORD
-		INTEGER G_ProcbusUID;
-		LayoutBusinessproxIDInternal;
-		END;	
+   END;
 
+	EXPORT LayoutBusinessProxID := RECORD
+		INTEGER G_ProcBusUID;
+		LayoutBusinessProxIDInternal;
+	END;
+	
 	SHARED LayoutBuildDatesInternal := RECORD
 		STRING10 G_BuildDrgCrimDt;
 		STRING10 G_BuildAstVehAutoDt;
 		STRING10 G_BuildAstVehAirDt;
 		STRING10 G_BuildAstVehWtrDt;
 		STRING10 G_BuildAstPropDt;
-		STRING10 G_BuildEduDt;		
+		STRING10 G_BuildEduDt;	
+		STRING10 G_BuildEmailDt;
+		STRING10 G_BuildPIICorrDt;
 		STRING10 G_BuildDrgBkDt ;
 		STRING10 G_BuildProfLicDt;
 		STRING10 G_BuildDrgLnJDt;
@@ -1683,6 +2011,9 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING10 G_BuildB2BDt;
 		STRING10 G_BuildSOSDt;
 		STRING10 G_BuildUCCDt;
+		STRING10 G_BuildSrchDt;
+		STRING10 G_BuildInqDt;		
+		// STRING10 G_BuildHdrDt;
 	END;
 	
 	EXPORT LayoutBuildDates := RECORD
@@ -1690,11 +2021,15 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER G_ProcBusUID;
 		LayoutBuildDatesInternal;
 	END;
-	
+		
 	EXPORT LayoutMaster := RECORD
 		INTEGER G_ProcUID;
 		LayoutInputPIIInternal;
 		LayoutPersonInternal;
+		LayoutNSumInternal;
+		LayoutSSNSumInternal;
+		LayoutPhoneSumInternal;
+		LayoutAddrSummaryInternal;
 		STRING65 B_InpAcct;
 		INTEGER G_ProcBusUID;
 		LayoutInputBIIInternal - B_InpAcct;
@@ -1702,13 +2037,12 @@ EXPORT LayoutAppendedAddresses := RECORD
 		LayoutBusinessproxIDInternal;
 		LayoutBuildDatesInternal;
 	END;	
-
+	
 	EXPORT LayoutInputPIIWithExtras := RECORD
 		INTEGER G_ProcUID;
 		LayoutInputPIIInternal;
 		INTEGER G_ProcBusUID;
 	END;
-
 
 	EXPORT LayoutInputPII_Overrides := RECORD
 		INTEGER G_ProcUID;
@@ -1733,5 +2067,4 @@ EXPORT LayoutAppendedAddresses := RECORD
 		LayoutBusinessSeleID;
 		STRING10 G_BuildB2BDt;
 	END;
-
 END;

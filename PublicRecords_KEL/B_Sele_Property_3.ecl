@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.3.0
-IMPORT KEL13 AS KEL;
-IMPORT B_Sele_Property_4,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Ult,E_Property,E_Sele_Property,E_Zip_Code FROM PublicRecords_KEL;
-IMPORT * FROM KEL13.Null;
+//HPCC Systems KEL Compiler Version 1.5.0rc1
+IMPORT KEL15 AS KEL;
+IMPORT B_Sele_Property_4,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Property,E_Sele_Property,E_Zip_Code FROM PublicRecords_KEL;
+IMPORT * FROM KEL15.Null;
 EXPORT B_Sele_Property_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Property_4(__in,__cfg).__ENH_Sele_Property_4) __ENH_Sele_Property_4 := B_Sele_Property_4(__in,__cfg).__ENH_Sele_Property_4;
-  SHARED __EE4099398 := __ENH_Sele_Property_4;
-  EXPORT __ST185128_Layout := RECORD
+  SHARED __EE6055976 := __ENH_Sele_Property_4;
+  EXPORT __ST225238_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.nint Ult_I_D_;
@@ -29,16 +29,13 @@ EXPORT B_Sele_Property_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
-    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST185128_Layout __ND4099403__Project(B_Sele_Property_4(__in,__cfg).__ST194458_Layout __PP4099399) := TRANSFORM
-    SELF.Is_Currently_Owned_ := (__PP4099399.Property_Is_Owned_Assessment_ OR __PP4099399.Property_Is_Owned_Deed_) AND NOT (__PP4099399.Property_Is_Sold_);
-    SELF := __PP4099399;
+  SHARED __ST225238_Layout __ND6055981__Project(B_Sele_Property_4(__in,__cfg).__ST235896_Layout __PP6055977) := TRANSFORM
+    SELF.Is_Currently_Owned_ := (__PP6055977.Property_Is_Owned_Assessment_ OR __PP6055977.Property_Is_Owned_Deed_) AND NOT (__PP6055977.Property_Is_Sold_);
+    SELF := __PP6055977;
   END;
-  EXPORT __ENH_Sele_Property_3 := PROJECT(__EE4099398,__ND4099403__Project(LEFT));
+  EXPORT __ENH_Sele_Property_3 := PROJECT(__EE6055976,__ND6055981__Project(LEFT));
 END;

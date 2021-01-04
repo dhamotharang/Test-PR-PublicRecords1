@@ -1,8 +1,8 @@
-//HPCC Systems KEL Compiler Version 1.3.0
-IMPORT KEL13 AS KEL;
+//HPCC Systems KEL Compiler Version 1.5.0rc1
+IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
-IMPORT * FROM KEL13.Null;
+IMPORT * FROM KEL15.Null;
 EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
@@ -38,16 +38,13 @@ EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
-    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     DATA57 __Permits;
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'UID(DEFAULT:UID),tmsid(DEFAULT:T_M_S_I_D_),rmsid(DEFAULT:R_M_S_I_D_),filingnumber(DEFAULT:Filing_Number_:\'\'),originalfilingnumber(DEFAULT:Original_Filing_Number_:\'\'),filingtypedescription(DEFAULT:Filing_Type_Description_:\'\'),amount(DEFAULT:Amount_:\'\'),landlordtenantdisputeflag(DEFAULT:Landlord_Tenant_Dispute_Flag_:\'\'),certificatenumber(DEFAULT:Certificate_Number_:\'\'),irsserialnumber(DEFAULT:I_R_S_Serial_Number_:\'\'),casenumber(DEFAULT:Case_Number_:\'\'),caselinkid(DEFAULT:Case_Link_I_D_:\'\'),filingbook(DEFAULT:Filing_Book_:\'\'),filingpage(DEFAULT:Filing_Page_:\'\'),filingstate(DEFAULT:Filing_State_:\'\'),filingstatusdescription(DEFAULT:Filing_Status_Description_:\'\'),agencyid(DEFAULT:Agency_I_D_:\'\'),agency(DEFAULT:Agency_:\'\'),agencycounty(DEFAULT:Agency_County_:\'\'),agencystate(DEFAULT:Agency_State_:\'\'),senttocreditbureauflag(DEFAULT:Sent_To_Credit_Bureau_Flag_),satisfactiontype(DEFAULT:Satisfaction_Type_:\'\'),originalfilingdate(DEFAULT:Original_Filing_Date_:DATE),collectiondate(DEFAULT:Collection_Date_:DATE),effectivedate(DEFAULT:Effective_Date_:DATE),expirationdate(DEFAULT:Expiration_Date_:DATE),lapsedate(DEFAULT:Lapse_Date_:0),processdate(DEFAULT:Process_Date_:DATE),source(DEFAULT:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),datevendorfirstreported(DEFAULT:Date_Vendor_First_Reported_:EPOCH),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatefirstseen(DEFAULT:Vault_Date_First_Seen_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping := 'UID(DEFAULT:UID),tmsid(DEFAULT:T_M_S_I_D_),rmsid(DEFAULT:R_M_S_I_D_),filingnumber(DEFAULT:Filing_Number_:\'\'),originalfilingnumber(DEFAULT:Original_Filing_Number_:\'\'),filingtypedescription(DEFAULT:Filing_Type_Description_:\'\'),amount(DEFAULT:Amount_:\'\'),landlordtenantdisputeflag(DEFAULT:Landlord_Tenant_Dispute_Flag_:\'\'),certificatenumber(DEFAULT:Certificate_Number_:\'\'),irsserialnumber(DEFAULT:I_R_S_Serial_Number_:\'\'),casenumber(DEFAULT:Case_Number_:\'\'),caselinkid(DEFAULT:Case_Link_I_D_:\'\'),filingbook(DEFAULT:Filing_Book_:\'\'),filingpage(DEFAULT:Filing_Page_:\'\'),filingstate(DEFAULT:Filing_State_:\'\'),filingstatusdescription(DEFAULT:Filing_Status_Description_:\'\'),agencyid(DEFAULT:Agency_I_D_:\'\'),agency(DEFAULT:Agency_:\'\'),agencycounty(DEFAULT:Agency_County_:\'\'),agencystate(DEFAULT:Agency_State_:\'\'),senttocreditbureauflag(DEFAULT:Sent_To_Credit_Bureau_Flag_),satisfactiontype(DEFAULT:Satisfaction_Type_:\'\'),originalfilingdate(DEFAULT:Original_Filing_Date_:DATE),collectiondate(DEFAULT:Collection_Date_:DATE),effectivedate(DEFAULT:Effective_Date_:DATE),expirationdate(DEFAULT:Expiration_Date_:DATE),lapsedate(DEFAULT:Lapse_Date_:0),processdate(DEFAULT:Process_Date_:DATE),source(DEFAULT:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH)';
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
@@ -61,7 +58,7 @@ EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
   SHARED __Table := TABLE(__All_Trim,__TabRec,KeyVal,MERGE);
   SHARED __SortedTable := SORT(__Table,KeyVal);
   EXPORT Lookup := PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
-  SHARED __Mapping0 := 'UID(DEFAULT:UID),tmsid(OVERRIDE:T_M_S_I_D_),rmsid(OVERRIDE:R_M_S_I_D_),filing_number(OVERRIDE:Filing_Number_:\'\'),orig_filing_number(OVERRIDE:Original_Filing_Number_:\'\'),filing_type_desc(OVERRIDE:Filing_Type_Description_:\'\'),amount(OVERRIDE:Amount_:\'\'),eviction(OVERRIDE:Landlord_Tenant_Dispute_Flag_:\'\'),certificate_number(OVERRIDE:Certificate_Number_:\'\'),irs_serial_number(OVERRIDE:I_R_S_Serial_Number_:\'\'),case_number(OVERRIDE:Case_Number_:\'\'),caselinkid(OVERRIDE:Case_Link_I_D_:\'\'),filing_book(OVERRIDE:Filing_Book_:\'\'),filing_page(OVERRIDE:Filing_Page_:\'\'),filing_state(OVERRIDE:Filing_State_:\'\'),filingstatusdescription(OVERRIDE:Filing_Status_Description_:\'\'),agencyid(OVERRIDE:Agency_I_D_:\'\'),agency(OVERRIDE:Agency_:\'\'),agency_county(OVERRIDE:Agency_County_:\'\'),agency_state(OVERRIDE:Agency_State_:\'\'),bcbflag(OVERRIDE:Sent_To_Credit_Bureau_Flag_),satisifaction_type(OVERRIDE:Satisfaction_Type_:\'\'),orig_filing_date(OVERRIDE:Original_Filing_Date_:DATE),collection_date(OVERRIDE:Collection_Date_:DATE),effective_date(OVERRIDE:Effective_Date_:DATE),expiration_date(OVERRIDE:Expiration_Date_:DATE),lapse_date(OVERRIDE:Lapse_Date_:0),process_date(OVERRIDE:Process_Date_:DATE),src(OVERRIDE:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),datevendorfirstreported(DEFAULT:Date_Vendor_First_Reported_:EPOCH),datevendorlastreported(DEFAULT:Date_Vendor_Last_Reported_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatefirstseen(DEFAULT:Vault_Date_First_Seen_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
+  SHARED __Mapping0 := 'UID(DEFAULT:UID),tmsid(OVERRIDE:T_M_S_I_D_),rmsid(OVERRIDE:R_M_S_I_D_),filing_number(OVERRIDE:Filing_Number_:\'\'),orig_filing_number(OVERRIDE:Original_Filing_Number_:\'\'),filing_type_desc(OVERRIDE:Filing_Type_Description_:\'\'),amount(OVERRIDE:Amount_:\'\'),eviction(OVERRIDE:Landlord_Tenant_Dispute_Flag_:\'\'),certificate_number(OVERRIDE:Certificate_Number_:\'\'),irs_serial_number(OVERRIDE:I_R_S_Serial_Number_:\'\'),case_number(OVERRIDE:Case_Number_:\'\'),caselinkid(OVERRIDE:Case_Link_I_D_:\'\'),filing_book(OVERRIDE:Filing_Book_:\'\'),filing_page(OVERRIDE:Filing_Page_:\'\'),filing_state(OVERRIDE:Filing_State_:\'\'),filingstatusdescription(OVERRIDE:Filing_Status_Description_:\'\'),agencyid(OVERRIDE:Agency_I_D_:\'\'),agency(OVERRIDE:Agency_:\'\'),agency_county(OVERRIDE:Agency_County_:\'\'),agency_state(OVERRIDE:Agency_State_:\'\'),bcbflag(OVERRIDE:Sent_To_Credit_Bureau_Flag_),satisifaction_type(OVERRIDE:Satisfaction_Type_:\'\'),orig_filing_date(OVERRIDE:Original_Filing_Date_:DATE),collection_date(OVERRIDE:Collection_Date_:DATE),effective_date(OVERRIDE:Effective_Date_:DATE),expiration_date(OVERRIDE:Expiration_Date_:DATE),lapse_date(OVERRIDE:Lapse_Date_:0),process_date(OVERRIDE:Process_Date_:DATE),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_LiensV2_key_liens_main_ID_Records,TRANSFORM(RECORDOF(__in.Dataset_LiensV2_key_liens_main_ID_Records),SELF:=RIGHT));
   SHARED __d0_Out := RECORD
     RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_LiensV2_key_liens_main_ID_Records);
@@ -90,10 +87,7 @@ EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
-    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
@@ -104,10 +98,7 @@ EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
-    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
@@ -116,10 +107,7 @@ EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
-    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
@@ -142,10 +130,7 @@ EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
-    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
@@ -154,8 +139,8 @@ EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
   Layout Lien_Judgment__Rollup(InLayout __r, DATASET(InLayout) __recs) := TRANSFORM
     SELF.T_M_S_I_D_ := KEL.Intake.SingleValue(__recs,T_M_S_I_D_);
     SELF.R_M_S_I_D_ := KEL.Intake.SingleValue(__recs,R_M_S_I_D_);
-    SELF.Filing_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_First_Reported_,MIN,FALSE),KEL.typ.epoch Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_Last_Reported_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,FALSE),Filing_Number_,Original_Filing_Number_,Filing_Type_Description_,Filing_Status_Description_,Satisfaction_Type_,Amount_,Filing_State_,Landlord_Tenant_Dispute_Flag_,Original_Filing_Date_,Effective_Date_,Collection_Date_,Expiration_Date_,Lapse_Date_,Process_Date_},Filing_Number_,Original_Filing_Number_,Filing_Type_Description_,Filing_Status_Description_,Satisfaction_Type_,Amount_,Filing_State_,Landlord_Tenant_Dispute_Flag_,Original_Filing_Date_,Effective_Date_,Collection_Date_,Expiration_Date_,Lapse_Date_,Process_Date_),Filing_Layout)(__NN(Filing_Number_) OR __NN(Original_Filing_Number_) OR __NN(Filing_Type_Description_) OR __NN(Filing_Status_Description_) OR __NN(Satisfaction_Type_) OR __NN(Amount_) OR __NN(Filing_State_) OR __NN(Landlord_Tenant_Dispute_Flag_) OR __NN(Original_Filing_Date_) OR __NN(Effective_Date_) OR __NN(Collection_Date_) OR __NN(Expiration_Date_) OR __NN(Lapse_Date_) OR __NN(Process_Date_)));
-    SELF.Book_Filing_Details_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_First_Reported_,MIN,FALSE),KEL.typ.epoch Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_Last_Reported_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,FALSE),Filing_Number_,Filing_Book_,Filing_Page_},Filing_Number_,Filing_Book_,Filing_Page_),Book_Filing_Details_Layout)(__NN(Filing_Number_) OR __NN(Filing_Book_) OR __NN(Filing_Page_)));
+    SELF.Filing_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Filing_Number_,Original_Filing_Number_,Filing_Type_Description_,Filing_Status_Description_,Satisfaction_Type_,Amount_,Filing_State_,Landlord_Tenant_Dispute_Flag_,Original_Filing_Date_,Effective_Date_,Collection_Date_,Expiration_Date_,Lapse_Date_,Process_Date_},Filing_Number_,Original_Filing_Number_,Filing_Type_Description_,Filing_Status_Description_,Satisfaction_Type_,Amount_,Filing_State_,Landlord_Tenant_Dispute_Flag_,Original_Filing_Date_,Effective_Date_,Collection_Date_,Expiration_Date_,Lapse_Date_,Process_Date_),Filing_Layout)(__NN(Filing_Number_) OR __NN(Original_Filing_Number_) OR __NN(Filing_Type_Description_) OR __NN(Filing_Status_Description_) OR __NN(Satisfaction_Type_) OR __NN(Amount_) OR __NN(Filing_State_) OR __NN(Landlord_Tenant_Dispute_Flag_) OR __NN(Original_Filing_Date_) OR __NN(Effective_Date_) OR __NN(Collection_Date_) OR __NN(Expiration_Date_) OR __NN(Lapse_Date_) OR __NN(Process_Date_)));
+    SELF.Book_Filing_Details_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Filing_Number_,Filing_Book_,Filing_Page_},Filing_Number_,Filing_Book_,Filing_Page_),Book_Filing_Details_Layout)(__NN(Filing_Number_) OR __NN(Filing_Book_) OR __NN(Filing_Page_)));
     SELF.Agency_I_D_ := KEL.Intake.SingleValue(__recs,Agency_I_D_);
     SELF.Agency_ := KEL.Intake.SingleValue(__recs,Agency_);
     SELF.Agency_County_ := KEL.Intake.SingleValue(__recs,Agency_County_);
@@ -165,31 +150,25 @@ EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     SELF.Case_Number_ := KEL.Intake.SingleValue(__recs,Case_Number_);
     SELF.Case_Link_I_D_ := KEL.Intake.SingleValue(__recs,Case_Link_I_D_);
     SELF.Certificate_Number_ := KEL.Intake.SingleValue(__recs,Certificate_Number_);
-    SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_First_Reported_,MIN,FALSE),KEL.typ.epoch Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(GROUP,Date_Vendor_Last_Reported_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
+    SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
     SELF.__RecordCount := COUNT(__recs);
     SELF.Archive___Date_ := KEL.era.SimpleRoll(__recs,Archive___Date_,MIN,FALSE);
     SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,FALSE);
     SELF.Date_Last_Seen_ := KEL.era.SimpleRoll(__recs,Date_Last_Seen_,MAX,FALSE);
-    SELF.Date_Vendor_First_Reported_ := KEL.era.SimpleRoll(__recs,Date_Vendor_First_Reported_,MIN,FALSE);
-    SELF.Date_Vendor_Last_Reported_ := KEL.era.SimpleRoll(__recs,Date_Vendor_Last_Reported_,MAX,FALSE);
     SELF.Hybrid_Archive_Date_ := KEL.era.SimpleRoll(__recs,Hybrid_Archive_Date_,MIN,FALSE);
-    SELF.Vault_Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Vault_Date_First_Seen_,MIN,FALSE);
-    SELF.Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(__recs,Vault_Date_Last_Seen_,MAX,FALSE);
+    SELF.Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(__recs,Vault_Date_Last_Seen_,MAX,NMAX);
     SELF := __r;
   END;
   Layout Lien_Judgment__Single_Rollup(InLayout __r) := TRANSFORM
-    SELF.Filing_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Filing_Layout,SELF.__RecordCount:=1;,SELF.Archive___Date_:=KEL.era.SimpleRollSingleRow(LEFT,Archive___Date_,FALSE),SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF.Date_Vendor_First_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_First_Reported_,FALSE),SELF.Date_Vendor_Last_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_Last_Reported_,FALSE),SELF.Hybrid_Archive_Date_:=KEL.era.SimpleRollSingleRow(LEFT,Hybrid_Archive_Date_,FALSE),SELF.Vault_Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Vault_Date_First_Seen_,FALSE),SELF.Vault_Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Vault_Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Filing_Number_) OR __NN(Original_Filing_Number_) OR __NN(Filing_Type_Description_) OR __NN(Filing_Status_Description_) OR __NN(Satisfaction_Type_) OR __NN(Amount_) OR __NN(Filing_State_) OR __NN(Landlord_Tenant_Dispute_Flag_) OR __NN(Original_Filing_Date_) OR __NN(Effective_Date_) OR __NN(Collection_Date_) OR __NN(Expiration_Date_) OR __NN(Lapse_Date_) OR __NN(Process_Date_)));
-    SELF.Book_Filing_Details_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Book_Filing_Details_Layout,SELF.__RecordCount:=1;,SELF.Archive___Date_:=KEL.era.SimpleRollSingleRow(LEFT,Archive___Date_,FALSE),SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF.Date_Vendor_First_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_First_Reported_,FALSE),SELF.Date_Vendor_Last_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_Last_Reported_,FALSE),SELF.Hybrid_Archive_Date_:=KEL.era.SimpleRollSingleRow(LEFT,Hybrid_Archive_Date_,FALSE),SELF.Vault_Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Vault_Date_First_Seen_,FALSE),SELF.Vault_Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Vault_Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Filing_Number_) OR __NN(Filing_Book_) OR __NN(Filing_Page_)));
-    SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF.Archive___Date_:=KEL.era.SimpleRollSingleRow(LEFT,Archive___Date_,FALSE),SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF.Date_Vendor_First_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_First_Reported_,FALSE),SELF.Date_Vendor_Last_Reported_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Vendor_Last_Reported_,FALSE),SELF.Hybrid_Archive_Date_:=KEL.era.SimpleRollSingleRow(LEFT,Hybrid_Archive_Date_,FALSE),SELF.Vault_Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Vault_Date_First_Seen_,FALSE),SELF.Vault_Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Vault_Date_Last_Seen_,FALSE),SELF:=LEFT))(__NN(Source_)));
+    SELF.Filing_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Filing_Layout,SELF.__RecordCount:=1;,SELF.Archive___Date_:=KEL.era.SimpleRollSingleRow(LEFT,Archive___Date_,FALSE),SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF.Hybrid_Archive_Date_:=KEL.era.SimpleRollSingleRow(LEFT,Hybrid_Archive_Date_,FALSE),SELF.Vault_Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Vault_Date_Last_Seen_,NMAX),SELF:=LEFT))(__NN(Filing_Number_) OR __NN(Original_Filing_Number_) OR __NN(Filing_Type_Description_) OR __NN(Filing_Status_Description_) OR __NN(Satisfaction_Type_) OR __NN(Amount_) OR __NN(Filing_State_) OR __NN(Landlord_Tenant_Dispute_Flag_) OR __NN(Original_Filing_Date_) OR __NN(Effective_Date_) OR __NN(Collection_Date_) OR __NN(Expiration_Date_) OR __NN(Lapse_Date_) OR __NN(Process_Date_)));
+    SELF.Book_Filing_Details_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Book_Filing_Details_Layout,SELF.__RecordCount:=1;,SELF.Archive___Date_:=KEL.era.SimpleRollSingleRow(LEFT,Archive___Date_,FALSE),SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF.Hybrid_Archive_Date_:=KEL.era.SimpleRollSingleRow(LEFT,Hybrid_Archive_Date_,FALSE),SELF.Vault_Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Vault_Date_Last_Seen_,NMAX),SELF:=LEFT))(__NN(Filing_Number_) OR __NN(Filing_Book_) OR __NN(Filing_Page_)));
+    SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF.Archive___Date_:=KEL.era.SimpleRollSingleRow(LEFT,Archive___Date_,FALSE),SELF.Date_First_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_First_Seen_,FALSE),SELF.Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Date_Last_Seen_,FALSE),SELF.Hybrid_Archive_Date_:=KEL.era.SimpleRollSingleRow(LEFT,Hybrid_Archive_Date_,FALSE),SELF.Vault_Date_Last_Seen_:=KEL.era.SimpleRollSingleRow(LEFT,Vault_Date_Last_Seen_,NMAX),SELF:=LEFT))(__NN(Source_)));
     SELF.__RecordCount := 1;
     SELF.Archive___Date_ := KEL.era.SimpleRollSingleRow(__r,Archive___Date_,FALSE);
     SELF.Date_First_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_First_Seen_,FALSE);
     SELF.Date_Last_Seen_ := KEL.era.SimpleRollSingleRow(__r,Date_Last_Seen_,FALSE);
-    SELF.Date_Vendor_First_Reported_ := KEL.era.SimpleRollSingleRow(__r,Date_Vendor_First_Reported_,FALSE);
-    SELF.Date_Vendor_Last_Reported_ := KEL.era.SimpleRollSingleRow(__r,Date_Vendor_Last_Reported_,FALSE);
     SELF.Hybrid_Archive_Date_ := KEL.era.SimpleRollSingleRow(__r,Hybrid_Archive_Date_,FALSE);
-    SELF.Vault_Date_First_Seen_ := KEL.era.SimpleRollSingleRow(__r,Vault_Date_First_Seen_,FALSE);
-    SELF.Vault_Date_Last_Seen_ := KEL.era.SimpleRollSingleRow(__r,Vault_Date_Last_Seen_,FALSE);
+    SELF.Vault_Date_Last_Seen_ := KEL.era.SimpleRollSingleRow(__r,Vault_Date_Last_Seen_,NMAX);
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Lien_Judgment_Group,COUNT(ROWS(LEFT))=1),GROUP,Lien_Judgment__Single_Rollup(LEFT)) + ROLLUP(HAVING(Lien_Judgment_Group,COUNT(ROWS(LEFT))>1),GROUP,Lien_Judgment__Rollup(LEFT, ROWS(LEFT)));
@@ -243,10 +222,7 @@ EXPORT E_Lien_Judgment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Archive_Date',COUNT(__d0(Archive___Date_=0)),COUNT(__d0(Archive___Date_!=0))},
     {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
     {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorFirstReported',COUNT(__d0(Date_Vendor_First_Reported_=0)),COUNT(__d0(Date_Vendor_First_Reported_!=0))},
-    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorLastReported',COUNT(__d0(Date_Vendor_Last_Reported_=0)),COUNT(__d0(Date_Vendor_Last_Reported_!=0))},
     {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HybridArchiveDate',COUNT(__d0(Hybrid_Archive_Date_=0)),COUNT(__d0(Hybrid_Archive_Date_!=0))},
-    {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateFirstSeen',COUNT(__d0(Vault_Date_First_Seen_=0)),COUNT(__d0(Vault_Date_First_Seen_!=0))},
     {'LienJudgment','PublicRecords_KEL.ECL_Functions.Dataset_FDC','VaultDateLastSeen',COUNT(__d0(Vault_Date_Last_Seen_=0)),COUNT(__d0(Vault_Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

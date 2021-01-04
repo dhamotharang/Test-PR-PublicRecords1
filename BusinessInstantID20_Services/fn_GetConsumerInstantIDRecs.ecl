@@ -364,6 +364,11 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				self.ip_address	      := '';
 				self.employer_name	  := ''; // We must avoid doing an OFAC/Watchlist on company name.
 				self.lname_prev	      := le.FormerLastName;
+        
+        // pass these through to InstantID so we don't need to append them again when we get to IID
+				self.DID := le.lexid;  
+				self.score := le.lexidscore;
+        
 			end;
 
 			prep := project(ds_Normed, into_rep(LEFT));
@@ -385,7 +390,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 															if(~DisallowInsurancePhoneHeaderGateway and actualIIDVersion=1, risk_indicators.iid_constants.BSOptions.IncludeInsNAP, 0) +
 															if(actualIIDVersion=1, risk_indicators.iid_constants.BSOptions.IsInstantIDv1, 0) +  // check other products to make sure it is on and off appropriately, ID2 for example, BIID for example ********************************
 															if(AllowInsuranceDL, risk_indicators.iid_constants.BSOptions.AllowInsuranceDLInfo, 0) + //check to allow use of Insurance DL information
-															if(uniqueid<>0 and FromID2, Risk_Indicators.iid_constants.BSOptions.RetainInputDID,0) +
+															Risk_Indicators.iid_constants.BSOptions.RetainInputDID +  // always retain the input DID to speed things up
 															if(EnableEmergingID, Risk_Indicators.iid_constants.BSOptions.EnableEmergingID,0);
 																														
 			InstantIDResults := risk_indicators.InstantID_Function(prep, 

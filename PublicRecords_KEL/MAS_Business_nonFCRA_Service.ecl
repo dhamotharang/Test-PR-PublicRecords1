@@ -67,6 +67,9 @@ UNSIGNED1 Default_GLB_Purpose := 0;
 STRING100 Default_Data_Restriction_Mask := '';
 #STORED('DataRestrictionMask',Default_Data_Restriction_Mask);
 
+BOOLEAN Default_IncludeMinors := TRUE;
+#STORED('IncludeMinors',Default_IncludeMinors);
+
 	// Read interface params
 	ds_input := DATASET([],PublicRecords_KEL.ECL_Functions.Input_Bus_Layout) : STORED('input');
 	INTEGER Score_threshold := 80 : STORED('ScoreThreshold');
@@ -82,7 +85,8 @@ STRING100 Default_Data_Restriction_Mask := '';
 	BOOLEAN BIPAppend_Include_AuthRep := FALSE : STORED('BIPAppendIncludeAuthRep');
 	BOOLEAN BIPAppend_No_ReAppend := FALSE : STORED('BIPAppendNoReAppend');
 	BOOLEAN Is_Marketing := FALSE : STORED('IsMarketing');
-	BOOLEAN Include_Minors := TRUE : STORED('IncludeMinors');
+	// BOOLEAN Include_Minors := TRUE : STORED('IncludeMinors');
+	BOOLEAN Include_Minors := Default_IncludeMinors : STORED('IncludeMinors');
 	BOOLEAN OverrideExperianRestriction := FALSE : STORED('OverrideExperianRestriction');
 	STRING100 AllowedSources := '' : STORED('AllowedSources');
 	AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) : STORED('AllowedSourcesDataset');
@@ -115,6 +119,7 @@ STRING100 Default_Data_Restriction_Mask := '';
 		EXPORT INTEGER ScoreThreshold := Score_threshold;
 		EXPORT STRING100 Data_Restriction_Mask := DataRestrictionMask;
 		EXPORT STRING100 Data_Permission_Mask := DataPermissionMask;
+		EXPORT STRING5 IndustryClass := Industry_Class;
 		EXPORT UNSIGNED GLBAPurpose := GLBA;
 		EXPORT UNSIGNED DPPAPurpose := DPPA;
 		EXPORT BOOLEAN IsFCRA := FALSE;
@@ -181,6 +186,7 @@ STRING100 Default_Data_Restriction_Mask := '';
 		EXPORT BOOLEAN IncludeNameSummary := TRUE;
 		EXPORT BOOLEAN IncludePerson := TRUE;
 		EXPORT BOOLEAN IncludePhone := TRUE;
+		EXPORT BOOLEAN IncludePhoneSummary := TRUE;
 		EXPORT BOOLEAN IncludeProfessionalLicense := TRUE;
 		EXPORT BOOLEAN IncludeProperty := TRUE;
 		EXPORT BOOLEAN IncludePropertyEvent := TRUE;

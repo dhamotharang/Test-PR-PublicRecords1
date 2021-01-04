@@ -105,7 +105,8 @@ module
 		string60		user_added	:=	'esp';			//esp User that added the record
 		string60		user_changed;								//User that made a change on the record
 		string10		date_changed;								//Date the record was changed
-	end;
+		string3 		glba_code;  								//CR1381 - log glba = 1
+  end;
 	
 	// Transaction layout for mbsi
 	export	TransactionLogRec	:=
@@ -113,6 +114,23 @@ module
 		dataset(TransactionLog)	Rec	{xpath('Records/Rec'),maxcount(3)};
 	end;
 	
+	// Transaction log extesnion layout
+	export	TransactionLogExtension	:=
+	record
+		string20		transaction_id;							//No PK of the entry. Generate by Roxie
+		string10		date_added;									//Date the record was added
+		integer2 		sequence;
+		integer5 		extension_type;
+		string100 	value;
+	end;
+	
+	// Transaction log extension layout for mbsi
+	export	TransactionLogExtensionRec	:=
+	record
+		dataset(TransactionLogExtension)	Rec	{xpath('Records/Rec'),maxcount(3)};
+	end;
+	
+
 	// PropertyCharacteristics payload base layout
 	export	Payload	:= PropertyCharacteristics.Layouts.Base;
 
