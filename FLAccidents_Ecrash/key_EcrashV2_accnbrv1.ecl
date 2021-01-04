@@ -1,6 +1,4 @@
-﻿Import Data_Services, doxie;
-					
-export key_EcrashV2_accnbrv1 := index(mod_PrepEcrashPRKeys().dep_accnbrv1_base
+﻿export key_EcrashV2_accnbrv1 := index(mod_PrepEcrashPRKeys().dep_accnbrv1_base
                    ,{l_accnbr, report_code, jurisdiction_state, jurisdiction}
                    ,{
 								   orig_accnbr, 
@@ -164,7 +162,7 @@ export key_EcrashV2_accnbrv1 := index(mod_PrepEcrashPRKeys().dep_accnbrv1_base
 									 Releasable,
 									 Date_Report_Submitted
 									 }
-							     ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_accnbrv1_' + doxie.Version_SuperKey);
+							     ,Files_PR.FILE_KEY_ACCNBRV1_SF);
 							 		 // ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::PRUS::ecrashV2_accnbrv1_' + doxie.Version_SuperKey);
 										
 

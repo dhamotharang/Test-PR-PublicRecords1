@@ -13,10 +13,8 @@
 /*2015-02-11T00:43:45Z (Ayeesha Kayttala)
 bug# 173256 - code review 
 */
-Import Data_Services, doxie;
-
 export key_ecrashV2_dol := index(mod_PrepEcrashKeys().dep_base
                                  ,{accident_date,report_code,jurisdiction_state, jurisdiction}
                                  ,{mod_PrepEcrashKeys().dep_base}
-							                   ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_dol_' + doxie.Version_SuperKey);
+							                   ,Files_eCrash.FILE_KEY_DOL_SF);
 								
