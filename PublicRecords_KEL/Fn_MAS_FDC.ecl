@@ -850,7 +850,7 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 	nonFCRA_watchdog_temp :=  project(Best_Person__Key_Watchdog_Records,transform(Layouts_FDC.Layout_Best_Person__Key_Watchdog, self.rec  := left._best, self  := left, self := []));
 
 
-	norm_nonFCRA_watchdog := NORMALIZE(FDCDataset_Mini, LEFT.Dataset_Best_Person__Key_Watchdog, TRANSFORM(RECORDOF(RIGHT), SELF.P_LexID := LEFT.P_LexID, SELF := RIGHT));
+	norm_nonFCRA_watchdog := NORMALIZE(FDCDataset_Mini, LEFT.Dataset_Best_Person__Key_Watchdog, TRANSFORM(RECORDOF(RIGHT), SELF.P_LexID := LEFT.P_LexID, self.P_InpClnArchDt := left.P_InpClnArchDt,SELF := RIGHT));
 
 	//choose if we want minifdc version or go get this data now
 	nonFCRA_watchdogChooser := if(FDCMiniPop, nonFCRA_watchdog_temp, norm_nonFCRA_watchdog);
@@ -926,7 +926,7 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000), KEEP(1));
 	
 
-	norm_FCRA_watchdognonEN := NORMALIZE(FDCDataset_Mini, LEFT.Dataset_Best_Person__Key_Watchdog_FCRA_nonEN, TRANSFORM(RECORDOF(RIGHT), SELF.P_LexID := LEFT.P_LexID, SELF := RIGHT));
+	norm_FCRA_watchdognonEN := NORMALIZE(FDCDataset_Mini, LEFT.Dataset_Best_Person__Key_Watchdog_FCRA_nonEN, TRANSFORM(RECORDOF(RIGHT), SELF.P_LexID := LEFT.P_LexID, self.P_InpClnArchDt := left.P_InpClnArchDt, SELF := RIGHT));
 
 	//choose if we want minifdc version or go get this data now
 	FCRA_watchdogChoosernonEN := if(FDCMiniPop, Best_Person__Key_Watchdog_FCRA_nonEN_Records, norm_FCRA_watchdognonEN);	
@@ -938,7 +938,7 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 						SELF := LEFT,
 						SELF := []));	
 	
-	norm_FCRA_watchdognonEQ := NORMALIZE(FDCDataset_Mini, LEFT.Dataset_Best_Person__Key_Watchdog_FCRA_nonEQ, TRANSFORM(RECORDOF(RIGHT), SELF.P_LexID := LEFT.P_LexID, SELF := RIGHT));
+	norm_FCRA_watchdognonEQ := NORMALIZE(FDCDataset_Mini, LEFT.Dataset_Best_Person__Key_Watchdog_FCRA_nonEQ, TRANSFORM(RECORDOF(RIGHT), SELF.P_LexID := LEFT.P_LexID, self.P_InpClnArchDt := left.P_InpClnArchDt, SELF := RIGHT));
 
 	//choose if we want minifdc version or go get this data now
 	FCRA_watchdogChoosernonEQ := if(FDCMiniPop, Best_Person__Key_Watchdog_FCRA_nonEQ_Records, norm_FCRA_watchdognonEQ);		
@@ -981,7 +981,7 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 	
 	Key_QH_SSN :=	
 			JOIN(Input_Best_SSN_nonFCRA, autokey.Key_SSN(header_quick.str_AutokeyName),//non FCRA only
-				Common.DoFDCJoin_Dx_Header__key_wild_SSN = TRUE AND FDCMiniPop AND
+				Common.DoFDCJoin_Quick_Header__key_wild_SSN = TRUE AND FDCMiniPop AND
 				(INTEGER)LEFT.P_InpClnSSN > 0 AND
 				KEYED(LEFT.P_InpClnSSN[1] = RIGHT.s1 AND
 							LEFT.P_InpClnSSN[2] = RIGHT.s2 AND
@@ -1043,9 +1043,11 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 	//choose if we want minifdc version or go get this data now
 	QuickHeaderChooser := if(FDCMiniPop, Header_Quick__Key_Did_Records_Unsuppressed, norm_QuickHeader);
 
+	searchWildKey := if(options.isFCRA, Input_Best_SSN_FCRA, Input_Best_SSN_nonFCRA);
+
 	//gather lexids from input ssn
 		Key_wild_SSN :=	//	No dates does not need DateSelector
-			JOIN(Input_Best_SSN_nonFCRA, dx_Header.key_wild_SSN(),//non FCRA only
+			JOIN(searchWildKey, dx_Header.key_wild_SSN(iType),
 				Common.DoFDCJoin_Dx_Header__key_wild_SSN = TRUE AND FDCMiniPop AND
 				(INTEGER)LEFT.P_InpClnSSN > 0 AND
 				KEYED(LEFT.P_InpClnSSN[1] = RIGHT.s1 AND
@@ -3161,14 +3163,14 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 			KEYED(
 				LEFT.Phone[4..10] = RIGHT.p7 AND 
 				LEFT.Phone[1..3] = RIGHT.p3) and
-				ArchiveDate((string)right.dt_first_seen) <= LEFT.P_InpClnArchDt[1..8] ,
+				archivedate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8] ,
 			TRANSFORM(Layouts_FDC.Layout_Targus__Key_Targus_Phone,
 				SELF.UIDAppend := LEFT.UIDAppend,
 				SELF.G_ProcUID := LEFT.G_ProcUID,
 				SELF.P_LexID := LEFT.P_LexID,
 				SELF.Src := MDR.sourceTools.src_Targus_White_pages,
 				SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Targus_White_pages, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
-				self.Archive_Date :=  ArchiveDate((string)right.dt_first_seen);	
+				self.Archive_Date :=  archivedate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported);	
 				self.dt_first_seen := (integer)archivedate((string)right.dt_first_seen);	
 				SELF := RIGHT, 
 				SELF := LEFT,
