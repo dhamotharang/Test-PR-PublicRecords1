@@ -25,8 +25,8 @@
 <p>For option 2 - prim_range, prim_name, and city/state or zip are required - but the more information provided the more likelihood of a match</p>
 <p>For option 3 - AddressLine1 and AddressLine2 are required. PLEASE NOTE FOR OPTION 3 THE ADDRESS CLEANER WILL BE CALLED PRIOR TO LOCATION ID LOOKUP</p>
 */
-EXPORT LocationID_Service := MACRO
-  IMPORT SALT37,LocationId_xLink,Address,LocationID_Build;
+EXPORT Service_LocationID := MACRO
+  IMPORT SALT37,LocationId_xLink,Address,LocationID_Build, LocationID;
 
 #WEBSERVICE(FIELDS(
 	'AddressLine1', 'AddressLine2', 'prim_range', 'predir', 'prim_name', 'addr_suffix',
@@ -46,7 +46,8 @@ EXPORT LocationID_Service := MACRO
 	      );
 	  
   // baseIndex := LocationID_xLink.BaseFileKey().KeyDef();
-  baseIndex := LocationID_xLink.Process_LocationID_Layouts.Key;
+  baseIndex      := LocationID_xLink.Process_LocationID_Layouts.Key;
+  locIdRawAidMap := LocationID.key_locid_rawaid_map.Key();
   
   STRING    line1        := ''    : STORED('AddressLine1', FORMAT(SEQUENCE(1)));
   STRING    linelast     := ''    : STORED('AddressLine2', FORMAT(SEQUENCE(2)));
@@ -60,13 +61,15 @@ EXPORT LocationID_Service := MACRO
   STRING    inState      := ''    : STORED('state', FORMAT(SEQUENCE(10)));
   STRING    inZip        := ''    : STORED('zip', FORMAT(SEQUENCE(11)));
   unsigned8 inLocID      := 0     : STORED('LocationID', FORMAT(SEQUENCE(12)));
+  unsigned  minDistance  := 5     : STORED('DISTANCE', FORMAT(SEQUENCE(13)));
+  unsigned  minWeight    := 19    : STORED('WEIGHT', FORMAT(SEQUENCE(14)));
 
   InputRecAddrPart := record
 	string prim_range;
-	string pre_dir;
+	string predir;
 	string prim_name;
 	string addr_suffix;
-	string post_dir;
+	string postdir;
 	string sec_range;
 	string city;
 	string state;
@@ -111,8 +114,8 @@ EXPORT LocationID_Service := MACRO
   SALT37.StrType Input_st          := if(inPrimRange!='',StringLib.StringToUpperCase(inState),Address.CleanFields(clean_address).st);
   SALT37.StrType Input_err_stat    := if(inPrimRange!='','S',Address.CleanFields(clean_address).err_stat);
   SALT37.StrType Input_zip5        := if(inPrimRange!='',StringLib.StringToUpperCase(inZip),Address.CleanFields(clean_address).zip);
-  
-  Template := DATASET([],LocationId_xLink.Process_LocationID_Layouts.InputLayout);
+ 
+   Template := DATASET([],LocationId_xLink.Process_LocationID_Layouts.InputLayout);
   Input_Data := DATASET([{(TYPEOF(Template.UniqueID))0,50,0
   ,(TYPEOF(Template.prim_range))Input_prim_range
   ,(TYPEOF(Template.predir))Input_predir
@@ -126,35 +129,31 @@ EXPORT LocationID_Service := MACRO
   ,(TYPEOF(Template.st))Input_st
   ,(TYPEOF(Template.zip5))Input_zip5
   ,true,false,0,0}],LocationId_xLink.Process_LocationID_Layouts.InputLayout);
- 
-  Input_Data2 := project(Input_Data,
-                         transform(LocationId_xLink.Process_LocationID_Layouts.InputLayout,                               
-                                   POBoxIndex             := left.prim_name_derived[1..6]='PO BOX';
-                                   RRIndex                := left.prim_name_derived[1..2] in ['RR','HC'];
-                                   self.prim_range        := map(POBoxIndex and trim(left.prim_range)='' => left.prim_name_derived[8..],
-                                                                 RRIndex and trim(left.prim_range)=''    => left.prim_name_derived[4..],
-                                                                 left.prim_range),
-                                   self.prim_name_derived := map(POBoxIndex and trim(left.prim_range)='' => 'PO BOX',
-                                                                 RRIndex and trim(left.prim_range)=''    => 'RR',
-                                                                 left.prim_name_derived),
-                                   self.sec_range         := if(left.sec_range='','NOVALUE',left.sec_range),
-                                   self.err_stat          := 'S',
-                                   self                   := left));
-              
-  pm := LocationId_xLink.MEOW_LocationID(Input_Data2(prim_name_derived!='')); // This module performs regular xLocId functions
-  ds := pm.Data_;
-  FieldNumber(SALT37.StrType fn) := CASE(fn,'prim_range' => 1,'predir' => 2,'prim_name' => 3,'addr_suffix' => 4,'postdir' => 5,'unit_desig' => 6,'sec_range' => 7,'v_city_name' => 8,'st' => 9,'zip5' => 10,11);
-  result := CHOOSE(FieldNumber(''),SORT(ds,-weight,LocId,prim_range,RECORD),SORT(ds,-weight,LocId,predir_derived,RECORD),SORT(ds,-weight,LocId,prim_name_derived,RECORD),SORT(ds,-weight,LocId,addr_suffix_derived,RECORD),SORT(ds,-weight,LocId,postdir,RECORD),SORT(ds,-weight,LocId,unit_desig,RECORD),SORT(ds,-weight,LocId,sec_range,RECORD),SORT(ds,-weight,LocId,v_city_name,RECORD),SORT(ds,-weight,LocId,st,RECORD),SORT(ds,-weight,LocId,zip5,RECORD),SORT(ds,-weight,LocId,RECORD));
-  
-  allRecs1 := join(dedup(result, locid, all), baseIndex,
-                  left.locid = right.locid,
-			   transform(right), limit(1000));
 
-  allRecs2 := 	choosen(baseIndex(locID=inLocID), 100);
+  resolveInput := dataset([
+                            {1, Input_prim_range, Input_predir, Input_prim_name, Input_addr_suffix, Input_postdir, Input_sec_range, Input_v_city_name, Input_st, Input_zip5, ''}
+                          ],LocationID.IdAppendLayouts.AppendInput);
+
   
-  allRecs  := if(inLocID>0, allRecs2, allRecs1);
+   resolveOutput := LocationID.IdAppendRoxie(resolveInput);
+	
+   allRecs1 := join(resolveOutput, baseIndex,
+                    left.locid = right.locid,
+			           transform(right), limit(1000));
+
+   allRecs2 := 	choosen(baseIndex(locID=inLocID), 100);
   
-  ResultsRec := record
+   allRecs  := if(inLocID>0, allRecs2, allRecs1);
+  
+   rawAidRecs1 := join(resolveOutput, locIdRawAidMap,
+	                    left.locid = right.locid,
+			              transform(right), limit(1000));   
+							  
+   rawAidRecs2 := choosen(locIdRawAidMap(locID=inLocID), 100);                 
+	
+	rawAidRecs  := if(inLocID>0, rawAidRecs2, rawAidRecs1);
+	
+   ResultsRec := record
 	allRecs.LocID;
 	allRecs.rid;
 	allRecs.aid;
@@ -179,5 +178,6 @@ EXPORT LocationID_Service := MACRO
   if(isOption2,output(InputDSAddrPart, named('INPUT_DATA_ADDRESS_PARTS')));
   if(isOption3,output(InputDSAddrLine, named('INPUT_DATA_ADDRESS_LINES')));  
   if(isOption3,output(Input_Data,NAMED('CLEAN_ADDRESS')));
-  output(project(allRecs, ResultsRec),NAMED('RESULTS'));
+  output(project(allRecs, transform(ResultsRec, self.sec_range:=if(left.sec_range='NOVALUE','',left.sec_range), self := left)),NAMED('RESULTS'));
+  output(project(rawAidRecs, LocationID.Layouts.LocIDRawIdRec) ,NAMED('RAW_ADDRESSES'));
 ENDMACRO;
