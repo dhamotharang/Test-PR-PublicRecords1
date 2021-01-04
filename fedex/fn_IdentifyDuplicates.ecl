@@ -39,7 +39,7 @@ r2 x1(in_ds le, ta1 ri) := transform
  self                  := le;
 end;
 
-j1 := join(in_ds,ta1,
+j1 := join(ta1,in_ds,
                 left.full_name=right.full_name
 						and left.company_name=right.company_name
 						and left.phone=right.phone
@@ -52,7 +52,7 @@ j1 := join(in_ds,ta1,
 						and left.zip6=right.zip6
 						and left.geo_lat=right.geo_lat
 						and left.geo_long=right.geo_long
-						,x1(left,right));
+						,x1(left,right),lookup);
 
 return j1;
 
