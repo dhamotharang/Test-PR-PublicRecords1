@@ -234,8 +234,8 @@ EXPORT Layout_Base := MODULE
 		STRING1   Ttl_Odometer_Status_Code;
 		STRING42  Ttl_Odometer_Status_Desc;
 		STRING8   Ttl_Odometer_Date;
-		STRING8   SRC_FIRST_DATE := '';
-		STRING8   SRC_LAST_DATE := '';
+		STRING8   SRC_FIRST_DATE := ''; //New fields added for Infutor batch project - bug #155
+		STRING8   SRC_LAST_DATE := '';  //New fields added for Infutor batch project
 	END;
 
 	EXPORT Party_Bip := RECORD
