@@ -139,6 +139,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 		EXPORT BOOLEAN IncludeProfessionalLicense := TRUE;
 		EXPORT BOOLEAN IncludeProperty := TRUE;
 		EXPORT BOOLEAN IncludePropertyEvent := TRUE;
+		EXPORT BOOLEAN IncludeSexOffender := TRUE;
 		EXPORT BOOLEAN IncludeSocialSecurityNumber := TRUE;
 		EXPORT BOOLEAN IncludeSSNSummary := TRUE;
 		EXPORT BOOLEAN IncludeSurname := TRUE;
