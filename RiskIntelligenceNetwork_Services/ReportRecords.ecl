@@ -6,11 +6,24 @@ EXPORT ReportRecords (DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) 
 
  _Layout := RiskIntelligenceNetwork_Services.Layouts;
  _Constant := RiskIntelligenceNetwork_Services.Constants;
+ hasValue := RiskIntelligenceNetwork_Services.Functions.hasValue;
+ 
+ hasLastName  := hasValue(ds_in[1].name_last);
+ hasFirstName := hasValue(ds_in[1].name_first);
+ hasSSN       := hasValue(ds_in[1].ssn);
+ hasAddress   := hasValue(ds_in[1].Addr) OR hasValue(ds_in[1].prim_range) OR hasValue(ds_in[1].prim_name);
+ hasCityState := hasValue(ds_in[1].p_city_name) AND hasValue(ds_in[1].st);
+ hasZip       := hasValue(ds_in[1].z5);
+ hasDOB       := hasValue(ds_in[1].dob);
+ hasEmail     := hasValue(ds_in[1].email_address);
+ hasIPAddress := hasValue(ds_in[1].ip_address);
+ hasDeviceID  := hasValue(ds_in[1].device_id);
+ hasRoutingNo := hasValue(ds_in[1].bank_routing_number);
+ hasBankAccNo := hasValue(ds_in[1].bank_account_number);
+ hasDLNo      := hasValue(ds_in[1].dl_number);
+ hasDLState   := hasValue(ds_in[1].dl_state);
 
- Minimum_input_for_rinID := ds_in[1].name_last != '' AND ds_in[1].name_first != '' AND
-                            (ds_in[1].ssn != '' OR ((ds_in[1].Addr != '' OR (ds_in[1].prim_range != '' AND ds_in[1].prim_name != '')) AND
-                                                   ((ds_in[1].p_city_name != '' AND ds_in[1].st != '') OR ds_in[1].z5 != ''))) AND 
-                            ds_in[1].dob != '' AND ds_in[1].dob != '00000000';
+ hasMinimunInputForRINID := hasLastName AND hasFirstName AND hasDOB AND (hasSSN OR (hasAddress AND (hasCityState OR hasZip)));
 
  // Validate Input DID by checking if it exists in Public Records.
  InputDidFoundInPR := ds_in[1].did != 0 AND EXISTS(IDLExternalLinking.did_getAllRecs(ds_in[1].did)(s_did > 0));
@@ -43,13 +56,20 @@ EXPORT ReportRecords (DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) 
  ds_auto_out := RiskIntelligenceNetwork_Services.fn_postautokey_joins(ds_in_orig, in_params.FraudPlatform);
 
  ds_payload_recs := RiskIntelligenceNetwork_Services.fn_GetPayloadRecords(ds_auto_out, in_params, fraud_platform := in_params.FraudPlatform);
- ds_payload_recs_filtered := ds_payload_recs(IF(ds_in[1].name_last != '', trim(cleaned_name.lname, left, right) = trim(ds_in[1].name_last, left, right), TRUE) AND
-                                             IF(ds_in[1].name_first != '', trim(cleaned_name.fname, left, right)[1..length(trim(ds_in[1].name_first, left, right))] = trim(ds_in[1].name_first), TRUE) AND
-                                             (IF(ds_in[1].ssn != '', ssn = ds_in[1].ssn, TRUE) OR
-                                              IF(ds_in[1].prim_range != '' OR ds_in[1].prim_name != '',  
-                                                (clean_address.prim_range = ds_in[1].prim_range AND clean_address.prim_name = ds_in[1].prim_name AND
-                                                ((clean_address.p_city_name = ds_in[1].p_city_name and clean_address.st = ds_in[1].st) OR clean_address.zip = ds_in[1].z5)), TRUE)) AND
-                                             IF(ds_in[1].dob != '', dob = ds_in[1].dob, TRUE));
+ ds_payload_recs_filtered := ds_payload_recs((~hasLastName OR (trim(cleaned_name.lname, left, right) = trim(ds_in[1].name_last, left, right))) AND
+                                             (~hasFirstName OR (trim(cleaned_name.fname, left, right)[1..length(trim(ds_in[1].name_first, left, right))] = trim(ds_in[1].name_first))) AND
+                                             (~hasSSN OR ssn = ds_in[1].ssn OR
+                                              (~hasAddress OR  
+                                               (clean_address.prim_range = ds_in[1].prim_range AND clean_address.prim_name = ds_in[1].prim_name AND
+                                               ((clean_address.p_city_name = ds_in[1].p_city_name and clean_address.st = ds_in[1].st) OR clean_address.zip = ds_in[1].z5)))) AND
+                                             (~hasDOB OR dob = ds_in[1].dob) AND
+                                             (~hasEmail OR email_address = ds_in[1].email_address) AND
+                                             (~hasIPAddress OR ip_address = ds_in[1].ip_address) AND
+                                             (~hasDeviceID OR device_id = ds_in[1].device_id) AND
+                                             (~hasRoutingNo OR bank_routing_number_1 = ds_in[1].bank_routing_number OR bank_routing_number_2 = ds_in[1].bank_routing_number) AND	
+                                             (~hasBankAccNo OR bank_account_number_1 = ds_in[1].bank_account_number OR bank_account_number_2 = ds_in[1].bank_account_number) AND
+                                             (~hasDLNo OR Drivers_License = ds_in[1].dl_number) AND
+                                             (~hasDLState OR Drivers_License_State = ds_in[1].dl_state));
 
  ds_PayloadRecs_w_did := ds_payload_recs_filtered(did > 0);
  ds_contributory_dids := PROJECT(ds_PayloadRecs_w_did,
@@ -59,8 +79,9 @@ EXPORT ReportRecords (DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) 
                             SELF.did := LEFT.did,
                             SELF := []));
 
+ /* Since contributed did hold higher priority. So if did is found in both Contributed records and public records ...
+  ... then we want to keep record source as contributed.*/
  ds_dids_combined := SORT(ds_contributory_dids + ds_pr_did_final, Seq, did, RecordSource);
-
  ds_dids_combined_dedup := DEDUP(ds_dids_combined, Seq, did);
 
  multiple_did_resolved := COUNT(ds_dids_combined_dedup) > 1;
@@ -97,11 +118,11 @@ EXPORT ReportRecords (DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) 
  IdentityResolved := MAP(// Input identity found in contributory data
                          InputDidFoundInCR OR (~multiple_did_resolved AND ds_dids_combined_dedup[1].RecordSource = _Constant.RECORD_SOURCE.CONTRIBUTED) => _Constant.IDENTITY_FLAGS.IDENTITY_IN_CONTRIB, 
                          // Input identity not found in contributory data or public records data
-                         ~InputDidFoundInPR AND ~InputDidFoundInCR AND ~EXISTS(ds_dids_combined_dedup) AND Minimum_input_for_rinID => _Constant.IDENTITY_FLAGS.IDENTITY_NOT_FOUND,
+                         ~InputDidFoundInPR AND ~InputDidFoundInCR AND ~EXISTS(ds_dids_combined_dedup) AND hasMinimunInputForRINID => _Constant.IDENTITY_FLAGS.IDENTITY_NOT_FOUND,
                          // Input identity not found in contributory data but found in public records through real-time search
                          ~InputDidFoundInCR AND (InputDidFoundInPR OR (~multiple_did_resolved AND ds_dids_combined_dedup[1].RecordSource = _Constant.RECORD_SOURCE.REALTIME)) => _Constant.IDENTITY_FLAGS.REALTIME_IDENTITY,
                          // Input identity not found in contributory data or public records and does not contain enough information to produce an identity, Unscorable
-                         (~InputDidFoundInCR OR ~InputDidFoundInPR OR ~EXISTS(ds_dids_combined_dedup)) AND ~Minimum_input_for_rinID => _Constant.IDENTITY_FLAGS.UNSCORABLE_IDENTITY,
+                         (~InputDidFoundInCR OR ~InputDidFoundInPR OR ~EXISTS(ds_dids_combined_dedup)) AND ~hasMinimunInputForRINID => _Constant.IDENTITY_FLAGS.UNSCORABLE_IDENTITY,
                          //Multiple LexIDs found in contributory or PR.
                          multiple_did_resolved AND (InputDidFoundInCR OR InputDidFoundInPR OR EXISTS(ds_dids_combined_dedup)) => _Constant.IDENTITY_FLAGS.MULTIPLE_IDENTITY,
                          '');
@@ -127,22 +148,22 @@ EXPORT ReportRecords (DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) 
                                 SELF.ElementType := RiskIntelligenceNetwork_Services.Functions.GetElementType(LEFT.entitytype),
                                 SELF.KnownRiskCode := LEFT.indicatortype,
                                 SELF.KnownRiskReason := LEFT.Label,
-                                SELF.KnownRiskAgency := '')),
+                                SELF.KnownRiskAgency := LEFT.agencydescription)),
                             iesp.Constants.RIN.MAX_COUNT_INDICATOR_ATTRIBUTE);
   // SELF := [];
  END;
  
  result := PROJECT(ds_API_Assessment, trans_API_Assessment(LEFT));
- //Following line Purposely commented and left here for quick debug. 
+//  Following line Purposely commented and left here for quick debug. 
 //  result := DATASET([trans_API_Assessment()]);
  
  // output LOG_Deltabase_Layout_Record
  deltabase_log := RiskIntelligenceNetwork_Services.Functions.GetDeltabaseLogDataSet(ds_in_w_did, in_params);
  OUTPUT(deltabase_log, NAMED('log_delta__fraudgov_delta__identity'));
  
- // Debug Outputs
+// Debug Outputs
 //  OUTPUT(ds_in, named('ds_in'));
-//  OUTPUT(Minimum_input_for_rinID, named('Minimum_input_for_rinID'));
+//  OUTPUT(hasMinimunInputForRINID, named('hasMinimunInputForRINID'));
 //  OUTPUT(InputDidFoundInPR, named('InputDidFoundInPR'));
 //  OUTPUT(InputDidFoundInCR, named('InputDidFoundInCR'));
 //  OUTPUT(ds_in_without_did, named('ds_in_without_did'));
