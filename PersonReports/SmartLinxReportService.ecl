@@ -269,6 +269,12 @@ EXPORT SmartLinxReportService () := MACRO
     export boolean Include_NonRegulated_WatercraftSources := false : stored ('IncludeNonRegulatedWatercraftSources');
     export boolean include_AddressSourceInfo := false : stored('IncludeAddressSourceInfo');
     export boolean includeVendorSourceB := first_row.options.IncludeVendorSourceB;
+    // new additions nov 2020
+    export boolean IncludeProgressivePhone := first_row.options.ProgressivePhones.IncludeProgressivePhone;
+    EXPORT unsigned1 MaxNumSubject  := first_row.options.ProgressivePhones.MaxNumSubject;
+    EXPORT STRING ScoreModel := first_row.options.ProgressivePhones.ScoreModel;
+     EXPORT BOOLEAN UsePremiumSourceA := first_row.options.ProgressivePhones.UsePremiumSourceA;
+     EXPORT UNSIGNED1 PremiumSourceAlimit := first_row.options.ProgressivePhones.PremiumSourceAlimit;
   end;
 
 
@@ -295,8 +301,12 @@ EXPORT SmartLinxReportService () := MACRO
   // ROYALTIES
   Royalty.RoyaltyFares.MAC_SetD(recs.Foreclosures, royalties_fares);
   Royalty.MAC_RoyaltyEmail(recs.Emailaddresses, royalties_email, source);
+  royaltiesEquifaxPhones := recs.EquifaxRoyalties;
   royalties := if (not mod_access.isConsumer(), royalties_fares) +
-               if(report_mod.email_version=2,recs.EmailV2Royalties, royalties_email);
+               if(report_mod.email_version=2,recs.EmailV2Royalties, royalties_email) +                             
+               if (report_mod.IncludeProgressivePhone and report_mod.UsePremiumSourceA 
+                      and ~doxie.compliance.isPhoneMartRestricted(report_mod.DataRestrictionMask)
+                      and mod_access.isValidGLB(), royaltiesEquifaxPhones);
   output (results, named ('Results'));
   output (royalties, named ('RoyaltySet'));
 

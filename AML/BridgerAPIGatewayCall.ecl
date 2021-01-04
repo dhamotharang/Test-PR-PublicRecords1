@@ -82,7 +82,7 @@ EXPORT BridgerAPIGatewayCall(DATASET(AML.Layouts.BridgerSearchInput) inData,
                                                         SELF.searchResult.BlockID := (UNSIGNED)LEFT.searchResult.BlockID;
                                                         
                                                         SELF.searchResult.EntityRecords := DATASET([TRANSFORM(iesp.WsSearchCore.t_ResultEntityRecord,
-                                                                                                              SELF.InputRecord.ID := LEFT.searchResult.records[1].ResultRecordID;
+                                                                                                              SELF.InputRecord.ID := (UNSIGNED)LEFT.searchResult.BlockID;
                                                                                                               SELF.InputRecord.Name.First := recordDetails.Name.First;
                                                                                                               SELF.InputRecord.Name.Middle := recordDetails.Name.Middle;
                                                                                                               SELF.InputRecord.Name.Last := recordDetails.Name.Last;

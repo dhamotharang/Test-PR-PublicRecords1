@@ -11,7 +11,7 @@ EXPORT FnRoxie_get_bureau_phones(DATASET(PublicRecords_KEL.ECL_Functions.Layouts
 																							LEFT.P_InpClnPhoneHome = RIGHT.phone 											 => '1',
 																																																						'0');			
 																			SELF := LEFT),
-																			LEFT OUTER, ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT), KEEP(100));
+																			LEFT OUTER, ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000), KEEP(100));
 				
 	bureau_phonesearch := SORT(bureau_phonesearch_tmp, G_ProcUID, (INTEGER) PhoneVerificationBureau);
 	

@@ -4,7 +4,7 @@ EXPORT Contact_LinkIDs(DATASET(PublicRecords_KEL.ECL_Functions.Layouts_FDC(Publi
 											INTEGER LinkidSearchLevel, 
 											BIPV2.mod_sources.iParams LinkingOptions, 
 											doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess)END,
-											JoinLimit = PublicRecords_KEL.ECL_Functions.Constants.BUSINESS_HEADER_CONTACT_LIMIT
+											JoinLimit = PublicRecords_KEL.ECL_Functions.Constants.BUSINESS_CONTACT_PROPERTY_LIMIT
 											) := FUNCTION
 
 
