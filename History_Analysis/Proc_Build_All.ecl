@@ -16,9 +16,6 @@ Export Proc_Build_All( string pVersion, string datasetname, string location, str
                                   writeDeltas,
                                   writeStats,
                                   History_Analysis.OutputFiles(pVersion).dopsService,
-                                  History_Analysis.OutputFiles(pVersion).raw_data,
-                                  History_Analysis.OutputFiles(pVersion).counted_deltas,
-                                  History_Analysis.OutputFiles(pVersion).deltas_statistics,
                                   ):Success(Send_Email(pVersion).build_success), Failure(Send_Email(pVersion).build_failure);
 
     Return buildAll;
