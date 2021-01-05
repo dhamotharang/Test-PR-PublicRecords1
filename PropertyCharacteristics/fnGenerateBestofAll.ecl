@@ -2027,8 +2027,13 @@ export fnGenerateBestofAll(dataset(PropertyCharacteristics.Layouts.TempBase) CAn
         self:=L;
     END;
 	FilterOutDefaultOutOfRange:=project(NotSingleFamily+dPropAttributeDefaultData,tDefaultFilterInvalid(left));
+	FilterOutNoDefaultOutOfRange:=project(BlankPercentImproved,tDefaultFilterInvalid(left));
+	//ReCombineData:=NotSingleFamily+FilterOutDefaultOutOfRange;
+	NoDefault:=PropertyCharacteristics.Functions.fnCollapseAceAID(FilterOutNoDefaultOutOfRange);
 	 dPropAddrCollapseAceAID	:=	PropertyCharacteristics.Functions.fnCollapseAceAID(FilterOutDefaultOutOfRange);
     PropertyCharacteristics.Mac_Property_Rollup(dPropAddrCollapseAceAID,dCombinedRollup,true,true);
-	
+	PropertyCharacteristics.Mac_Property_Rollup(NoDefault,dCombinedRollupNoDefault,true,true);
+	//output(BlankPercentImproved);
+    
 return dCombinedRollup;
 end;
