@@ -2,9 +2,9 @@
 
 EXPORT get_FIB12010_overrides(DATASET(Risk_Indicators.Layout_Boca_Shell) clam,
                               //Assumes the base layout defined in luci generated code is always the same as Models.fib12010_0.Results.BaseLayout 
-                              DATASET(Models.fib12010_0.Results.BaseLayout) FIBN12010_0 
+                              DATASET(Models.fib12010_0.Results.BaseLayout) FIBN12010_0
                              ) := FUNCTION
-
+Debug := false;
   //same layout that should be defined in Luci generated code
   ScoreMessageLayout := RECORD
     STRING2 MessageType;
@@ -13,8 +13,58 @@ EXPORT get_FIB12010_overrides(DATASET(Risk_Indicators.Layout_Boca_Shell) clam,
   END;
 
 
-Models.fib12010_0.Results.BaseLayout doModel( clam le,  FIBN12010_0 rt ) := TRANSFORM
+Debug_layout := Record
+String add_input_advo_drop;
+String add_input_advo_res_or_bus;
+String add_input_land_use_code;
+Boolean addrpop;
+Boolean dobpop;
+String input_dob_age;
+String inputssncharflag;
+Boolean LexID_deceased;
+String out_addr_type;
+String out_z5;
+String rc_pwssnvalflag;
+String rc_decsflag;
+String rc_dwelltype;
+String rc_hriskaddrflag;
+String rc_hrisksic;
+String rc_pwssndobflag;
+String rc_ssndobflag;
+Boolean rc_ssndod;
+String rc_ssnvalflag;
+String rc_zipclass;
+String rc_ziptypeflag;
+String ssnlength;
+String ver_sources;
+String FirstName;
+String LastName;
+String City;
+String Address;
+String Zip;
+String HPhone;
+String SSN;
+Boolean Friv_name_check;
+Boolean Friv_city_check;
+Boolean Friv_address_check;
+Boolean Friv_phone_check;
+Boolean Friv_ssn_check;
+Boolean Multi_Friv_check;
+String final_score_1;
+String fp3_wc1;
+String fp3_wc2;
+String fp3_wc3;
+String fp3_wc4;
+String fp3_wc5;
+String fp3_wc6;
+END;
 
+
+#IF(Debug)
+Debug_layout doModel( clam le,  FIBN12010_0 rt ) := TRANSFORM
+#ELSE
+Models.fib12010_0.Results.BaseLayout doModel( clam le,  FIBN12010_0 rt ) := TRANSFORM
+#END
 //ECL to SAS mapping
 add_input_advo_drop       := le.advo_input_addr.drop_indicator;
 add_input_advo_res_or_bus := le.advo_input_addr.residential_or_business_ind;
@@ -65,7 +115,7 @@ BOOLEAN indexw(STRING source, STRING target, STRING delim) :=
 	(source = target) OR
 	(STD.STR.Find(source, delim + target + delim, 1) > 0) OR
 	(source[1..length(target)+1] = target + delim) OR
-	(StringLib.StringReverse(source)[1..length(target)+1] = STD.Str.Reverse(target) + delim);
+	(STD.Str.Reverse(source)[1..length(target)+1] = STD.Str.Reverse(target) + delim);
 
 overwrite_248 := (INTEGER)(indexw(STD.STR.ToUpperCase(TRIM(ver_sources, ALL)), 'DS', ',') OR indexw(STD.STR.ToUpperCase(TRIM(ver_sources, ALL)), 'DE', ',') OR LexID_deceased);
 
@@ -103,7 +153,7 @@ Friv_address_check := IF(TRIM(Address) + ' ' + TRIM(Zip) in Models.FraudAdvisor_
 Friv_phone_check := IF(TRIM(HPhone) in Models.FraudAdvisor_Constants.Friv_phone_list, TRUE, FALSE);
 Friv_ssn_check := IF(TRIM(SSN) in Models.FraudAdvisor_Constants.Friv_ssn_list, TRUE, FALSE);
 
-Multi_Friv_check := Count((INTEGER)Friv_name_check + (INTEGER)Friv_address_check + (INTEGER)Friv_phone_check + (INTEGER)Friv_ssn_check) > 1;
+Multi_Friv_check := SUM((INTEGER)Friv_name_check + (INTEGER)Friv_address_check + (INTEGER)Friv_phone_check + (INTEGER)Friv_ssn_check) > 1;
 
 //Fictitious Name or Address
 overwrite_010 := (Friv_name_check OR Friv_address_check) AND NOT Multi_Friv_check;
@@ -221,11 +271,59 @@ final_wc6 := MAP(
   RC5 := DATASET([{'',final_wc5,''}],ScoreMessageLayout);
   RC6 := DATASET([{'',final_wc6,''}],ScoreMessageLayout);
   
+  
+#IF(Debug)
+self.add_input_advo_drop       := add_input_advo_drop;
+self.add_input_advo_res_or_bus := add_input_advo_res_or_bus;
+self.add_input_land_use_code   := add_input_land_use_code;
+self.addrpop                   := addrpop;
+self.dobpop                    := dobpop;
+self.input_dob_age             := input_dob_age;
+self.inputssncharflag          := inputssncharflag;
+self.LexID_deceased            := LexID_deceased;
+self.out_addr_type             := out_addr_type;
+self.out_z5                    := out_z5;
+self.rc_pwssnvalflag           := rc_pwssnvalflag;
+self.rc_decsflag               := rc_decsflag;
+self.rc_dwelltype              := rc_dwelltype;
+self.rc_hriskaddrflag          := rc_hriskaddrflag;
+self.rc_hrisksic               := rc_hrisksic;
+self.rc_pwssndobflag           := rc_pwssndobflag;
+self.rc_ssndobflag             := rc_ssndobflag;
+self.rc_ssndod                 := (Boolean)rc_ssndod;
+self.rc_ssnvalflag             := rc_ssnvalflag;
+self.rc_zipclass               := rc_zipclass;
+self.rc_ziptypeflag            := rc_ziptypeflag;
+self.ssnlength                 := ssnlength;
+self.ver_sources               := ver_sources;
+self.FirstName                 := FirstName;
+self.LastName                  := LastName;
+self.City                      := City;
+self.Address                   := Address;
+self.Zip                       := Zip;
+self.HPhone                    := HPhone;
+self.SSN                       := SSN;
+self.Friv_name_check           :=Friv_name_check;
+self.Friv_city_check           :=Friv_city_check;
+self.Friv_address_check        :=Friv_address_check;
+self.Friv_phone_check          :=Friv_phone_check;
+self.Friv_ssn_check            :=Friv_ssn_check;
+self.Multi_Friv_check          :=Multi_Friv_check;
+self.final_score_1             := final_score_1;
+self.fp3_wc1                   := fp3_wc1;
+self.fp3_wc2                   := fp3_wc2;
+self.fp3_wc3                   := fp3_wc3;
+self.fp3_wc4                   := fp3_wc4;
+self.fp3_wc5                   := fp3_wc5;
+self.fp3_wc6                   := fp3_wc6;
+  
+#ELSE  
 	SELF.score := (STRING)final_score;
   SELF.Messages := RC1+RC2+RC3+RC4+RC5+RC6;
   //assign all other fields from rt since we want to keep it in the luci defined layouts for now
   SELF := rt; 
 	SELF := [];
+#END
 END;
 
   model :=   JOIN(clam, FIBN12010_0,

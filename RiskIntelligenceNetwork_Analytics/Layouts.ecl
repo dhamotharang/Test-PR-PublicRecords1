@@ -2556,6 +2556,7 @@ END;
 	 END;
 
 	EXPORT LayoutRulesFlagsMatched := RECORD
+		STRING20 acctno;
 		UNSIGNED entitytype;	
 		STRING100 rulename;
 		STRING250 description;
@@ -2563,6 +2564,7 @@ END;
 	END;
 	
 	EXPORT LayoutEntityStats := RECORD
+					STRING20 acctno;
     UNSIGNED entitytype;
     STRING100 field;
     STRING250 value;
@@ -2570,6 +2572,7 @@ END;
     STRING250 indicatordescription;
     STRING250 label;
     INTEGER1 risklevel;
+					STRING100 agencydescription;
   END;
 	
 	EXPORT LayoutRiskScore := RECORD

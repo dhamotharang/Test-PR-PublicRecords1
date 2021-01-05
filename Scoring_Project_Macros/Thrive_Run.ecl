@@ -1,0 +1,103 @@
+﻿import Inquiry_AccLogs, BIPV2, doxie, data_services, _control, std, ut;
+
+file_in := '~foreign::' + '10.173.44.105:7070' + '::' +'thor_data400::key::thrive::fcra::qa::did';
+
+layout_input := RECORD
+  unsigned6 did;
+  //=>
+  string20 persistent_record_id;
+  string2 src;
+  unsigned6 dt_first_seen;
+  unsigned6 dt_last_seen;
+  unsigned6 dt_vendor_first_reported;
+  unsigned6 dt_vendor_last_reported;
+  unsigned6 bdid;
+  unsigned1 bdid_score;
+  unsigned1 did_score;
+  string40 orig_fname;
+  string40 orig_mname;
+  string60 orig_lname;
+  string75 orig_addr;
+  string40 orig_city;
+  string2 orig_state;
+  string5 orig_zip5;
+  string4 orig_zip4;
+  string90 email;
+  string50 employer;
+  string10 income;
+  string20 pay_frequency;
+  string20 phone_work;
+  string20 phone_home;
+  string20 phone_cell;
+  string8 dob;
+  string4 monthsemployed;
+  string1 own_home;
+  string1 is_military;
+  string2 drvlic_state;
+  string4 monthsatbank;
+  string25 ip;
+  string25 yrsthere;
+  string20 besttime;
+  string20 credit;
+  string15 loanamt;
+  string25 loantype;
+  string15 ratetype;
+  string15 mortrate;
+  string10 ltv;
+  string25 propertytype;
+  string20 datecollected;
+  string5 title;
+  string20 fname;
+  string20 mname;
+  string20 lname;
+  string5 name_suffix;
+  unsigned8 nid;
+  string10 prim_range;
+  string2 predir;
+  string28 prim_name;
+  string4 addr_suffix;
+  string2 postdir;
+  string10 unit_desig;
+  string8 sec_range;
+  string25 p_city_name;
+  string25 v_city_name;
+  string2 st;
+  string5 zip;
+  string4 zip4;
+  string4 cart;
+  string1 cr_sort_sz;
+  string4 lot;
+  string1 lot_order;
+  string2 dbpc;
+  string1 chk_digit;
+  string2 rec_type;
+  string2 fips_st;
+  string3 fips_county;
+  string10 geo_lat;
+  string11 geo_long;
+  string4 msa;
+  string7 geo_blk;
+  string1 geo_match;
+  string4 err_stat;
+  unsigned8 rawaid;
+  unsigned8 aceaid;
+  string10 clean_phone_work;
+  string10 clean_phone_home;
+  string10 clean_phone_cell;
+  string8 clean_dob;
+  unsigned4 global_sid;
+  unsigned8 record_sid;
+ END;
+ 
+inDate := (INTEGER)ut.GetDate;
+SevenYrs := Std.Date.AdjustCalendar(inDate,-7,,-1);
+
+
+file_ds    := DISTRIBUTE(DATASET(file_in, layout_input,flat),(INTEGER)did);
+file_sort  := SORT(file_ds, dt_last_seen);
+file_trim  := DEDUP(file_sort,did);
+ds2        := file_trim(TRIM((STRING)did,LEFT,RIGHT) <> '000000000000');
+ds_over_7  := ds2(MAX((INTEGER)dt_last_seen[1..8] > SevenYrs));
+idx        := INDEX(ds_over_7,{did},layout_input-did,file_in);//add keyed fields between the brackets and subtract them from layout_input
+
+OUTPUT(CHOOSEN(idx,1000));

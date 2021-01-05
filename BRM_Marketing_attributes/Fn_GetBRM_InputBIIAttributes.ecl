@@ -5,24 +5,24 @@ EXPORT Fn_GetBRM_InputBIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
                                     PublicRecords_KEL.Interface_Options Options) := FUNCTION
   
 	LayoutBIIAndPII := RECORD
-	PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII BusinessInput;
-	DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) RepInput ;
+	  PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII BusinessInput;
+	  DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) RepInput ;
 	END;
 	
-		BIIAttributesInput := DENORMALIZE(BusinessInput, RepInput, 
+	BIIAttributesInput := DENORMALIZE(BusinessInput, RepInput, 
                          LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,  GROUP,
                          TRANSFORM(LayoutBIIAndPII, 
                          SELF.RepInput := ROWS(RIGHT),
                          SELF.BusinessInput := LEFT));
 	
-	LayoutBIIAttributes := RECORDOF( PublicRecords_KEL.Q_Input_Bus_Attributes_V1(
+	LayoutBIIAttributes := RECORDOF( PublicRecords_KEL.Q_Input_Bus_Attributes_V1_Dynamic(
 																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 
 																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII), 
                          0, 
 												       PublicRecords_KEL.CFG_Compile.Permit__NONE).res0);
 	
-		BIIAttributes_Results := PROJECT(BIIAttributesInput, TRANSFORM(LayoutBIIAttributes,
-		NonFCRABIIResults := PublicRecords_KEL.Q_Input_Bus_Attributes_V1(
+	BIIAttributes_Results := PROJECT(BIIAttributesInput, TRANSFORM(LayoutBIIAttributes,
+	NonFCRABIIResults := PublicRecords_KEL.Q_Input_Bus_Attributes_V1_Dynamic(
                         LEFT.RepInput,
                         DATASET(LEFT.BusinessInput),
                         (INTEGER)LEFT.BusinessInput.B_InpClnArchDt[1..8],
@@ -45,14 +45,14 @@ EXPORT Fn_GetBRM_InputBIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
 															SELF.B_InpClnTIN        := (STRING)LEFT.B_InpClnTIN,											
 															SELF.B_InpClnPhone        := (STRING)LEFT.B_InpClnPhone,											
 															SELF.B_InpClnEmail        := (STRING)LEFT.B_InpClnEmail,	
-															SELF.B_LexIDUlt := Left.B_LexIDUlt,
-															SELF.B_LexIDOrg := Left.B_LexIDOrg,
-															SELF.B_LexIDLegal := Left.B_LexIDLegal,
-															SELF.B_LexIDLoc := Left.B_LexIDLoc,
-															SELF.B_LexIDSite := Left.B_LexIDSite,
-															SELF.B_LexIDLegalScore := Left.B_LexIDLegalScore,													
+															SELF.B_LexIDUlt := (STRING)Left.B_LexIDUlt,
+															SELF.B_LexIDOrg := (STRING)Left.B_LexIDOrg,
+															SELF.B_LexIDLegal := (STRING)Left.B_LexIDLegal,
+															SELF.B_LexIDLoc :=(STRING)Left.B_LexIDLoc,
+															SELF.B_LexIDSite := (STRING)Left.B_LexIDSite,
+															SELF.B_LexIDLegalScore := (STRING)Left.B_LexIDLegalScore,													
 															SELF.G_ProcBusUID := LEFT.G_ProcBusUID;
 															SELF := []));
 		
-		RETURN ds_changedatatype;
-	END;
+	RETURN ds_changedatatype;
+END;

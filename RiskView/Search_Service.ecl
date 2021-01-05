@@ -8,11 +8,15 @@
 	<part name="DLMask"	type="xsd:string"/>
 	<part name="DOBMask" type="xsd:string"/>
 	<part name="RetainInputDID" type="xsd:boolean"/>
+
+<part name="_TransactionId" type="xsd:string"/>
+<part name="_CompanyId" type="xsd:string"/>
+
 </message>
 */
 /*--INFO-- Contains RiskView Alerts, Scores, Attributes, Report version 5.0 and higher */
 
-IMPORT Risk_Reporting, iesp, gateway, risk_indicators, std, Inquiry_AccLogs, RiskView, Royalty, Address, Models;
+IMPORT Risk_Reporting, iesp, gateway, risk_indicators, std, Inquiry_AccLogs, RiskView, Royalty, Address;
 
 export Search_Service := MACRO
 
@@ -32,7 +36,10 @@ export Search_Service := MACRO
 		'DLMask',
 		'DOBMask',
 		'RetainInputDID',
-    'RVCheckingSubscriberId'
+    'RVCheckingSubscriberId',
+    '_TransactionID',
+		'_CompanyID'
+		
 	));
 
 /* ***************************************
@@ -50,6 +57,7 @@ export Search_Service := MACRO
 	 **********************************************/
 	string32 _LoginID               := ''	: STORED('_LoginID');
 	outofbandCompanyID							:= '' : STORED('_CompanyID');
+	outofbandTransactionID          := '' : STORED('_TransactionID');
 	string20 CompanyID              := if(users.CompanyId != '', users.CompanyId, outofbandCompanyID);
 	string20 FunctionName           := '' : STORED('_LogFunctionName');
 	string50 ESPMethod              := '' : STORED('_ESPMethodName');
@@ -194,18 +202,41 @@ export Search_Service := MACRO
   Integer outOfBandSubscriberId := 0 : stored('RVCheckingSubscriberId');
   INTEGER8 SubscriberId := IF(option.RVCheckingSubscriberId <> 0, option.RVCheckingSubscriberId, outOfBandSubscriberId);
 	
+  // Check if any IDA models are requested.
+  IDA_model_check :=  auto_model_name IN RiskView.Constants.valid_IDA_models OR 
+                      bankcard_model_name IN RiskView.Constants.valid_IDA_models OR  
+                      Short_term_lending_model_name IN RiskView.Constants.valid_IDA_models OR  
+                      Telecommunications_model_name IN RiskView.Constants.valid_IDA_models OR  
+                      Crossindustry_model_name IN RiskView.Constants.valid_IDA_models OR  
+                      Custom_model_name IN RiskView.Constants.valid_IDA_models OR 
+                      Custom2_model_name IN RiskView.Constants.valid_IDA_models OR 
+                      Custom3_model_name IN RiskView.Constants.valid_IDA_models OR 
+                      Custom4_model_name IN RiskView.Constants.valid_IDA_models OR 
+                      Custom5_model_name IN RiskView.Constants.valid_IDA_models;
+ 
 	gateways_in := Gateway.Configuration.Get();
+  
 	Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
-		SELF.servicename := le.servicename;
-		SELF.url := IF(le.servicename IN ['targus'], '', le.url); // Don't allow Targus Gateway
-    self.properties := if(le.servicename IN ['first_data'], dataset([transform(Gateway.Layouts.ConfigProperties,
+    service_name := STD.STR.ToLowerCase(le.servicename);
+  
+		SELF.servicename := Map( service_name IN [Risk_Indicators.iid_constants.idareport,
+                                              Risk_Indicators.iid_constants.idareportUAT,
+                                              Risk_Indicators.iid_constants.idareportRetro] AND ~IDA_model_check => '', 
+                                                                                                                      le.servicename);
+
+		SELF.url := Map(service_name IN ['targus']                                                          => '',// Don't allow Targus Gateway
+                    service_name IN [Risk_Indicators.iid_constants.idareport,
+                                     Risk_Indicators.iid_constants.idareportUAT,
+                                     Risk_Indicators.iid_constants.idareportRetro] AND ~IDA_model_check => '',
+                                                                                                           le.url); 
+    self.properties := if(service_name IN ['first_data'], dataset([transform(Gateway.Layouts.ConfigProperties,
                         self.name := 'SubscriberId';
                         self.val := (string8)SubscriberId;)]),
     Dataset([], Gateway.Layouts.ConfigProperties));
 		SELF := le;
 	END;
 	gateways := PROJECT(gateways_in, gw_switch(LEFT));
-	
+  
 	#stored('DisableBocaShellLogging', DisableOutcomeTracking);
 
 /* ***************************************
@@ -223,6 +254,10 @@ export Search_Service := MACRO
   STRING20 AccountNumber := users.AccountNumber;
   BOOLEAN TestDataEnabled := users.TestDataEnabled;
 	STRING32 TestDataTableName := STD.Str.ToUpperCase(TRIM(users.TestDataTableName, LEFT, RIGHT));
+  
+  //Needed for IDA gateway calls AppID is a mandatory field for IDA
+  //Use QueryID if populated, otherwise use the TransactionID
+  STRING50 IDA_AppID := IF(users.QueryID != '', users.QueryID, outofbandTransactionID);
 	
   //Used only by MLA
   STRING20 EndUserCompanyName 		:= context.MLAGatewayInfo.EndUserCompanyName;
@@ -272,85 +307,96 @@ export Search_Service := MACRO
 // b. First Name, Last Name, Street Address, City, State
 // c.	First Name, Last Name, SSN
 // d. LexID
-error_message := 'Error - Minimum input fields required: First Name, Last Name, Address, and Zip or City and State; LexID only; or First Name, Last Name, and SSN';
+
 // MLA alert requested by itself (no scores, attributes, report) 
 MLA_alone				:= custom_model_name = 'mla1608_0' AND auto_model_name = '' AND bankcard_model_name = '' AND 
 									 Short_term_lending_model_name = '' AND Telecommunications_model_name = '' AND Crossindustry_model_name ='' AND AttributesVersionRequest = '' AND
 									 custom2_model_name = '' AND custom3_model_name = '' AND custom4_model_name = '' AND custom5_model_name = '' AND
 									 ~run_riskview_report;
+
 // Brad wants to keep error message stating just first/last name, but also allow user to use unparsedfullname field in place of first/last fields if they want
+min_error_message          := 'Error - Minimum input fields required: First Name, Last Name, Address, and Zip or City and State; LexID only; or First Name, Last Name, and SSN';
+no_lexid_min_error_message := 'Error - Minimum input fields required: First Name, Last Name, Address, and Zip or City and State; or First Name, Last Name, and SSN';
+rpt_period_error_message   := 'Error - Input Value for ReportingPeriod must be 1 - 84 months.';
+attr_only_error_message    := 'Error - The AttributesOnly option cannot be selected with the ExcludeReleasedCases option.';
 
-rpt_period_error_message := 'Error - Input Value for ReportingPeriod must be 1 - 84 months.';
+Standard_min_check := (((TRIM(packagedInput[1].name_first)<>'' AND TRIM(packagedInput[1].name_last)<>'') OR TRIM(packagedInput[1].unparsedfullname)<>'') AND  // name check
+							           (TRIM(packagedInput[1].ssn)<>'' OR                                                                                                   // ssn check
+								           ( TRIM(packagedInput[1].street_addr)<>'' AND                                                                                       // address check
+								           (TRIM(packagedInput[1].z5)<>'' OR (TRIM(packagedInput[1].p_city_name)<>'' AND TRIM(packagedInput[1].St)<>'')))));                  // zip or city/state check
+							
+check_valid_input := IF((Standard_min_check
+                          OR
+							          (MLA_alone) //if MLA requested by itself, bypass Riskview minimum input checks here.
+							            OR
+							          (unsigned)packagedInput[1].LexID <> 0), TRUE, FALSE);
 
-attr_only_error_message := 'Error - The AttributesOnly option cannot be selected with the ExcludeReleasedCases option.';
-            
-check_valid_input := IF((( 
-							((trim(packagedInput[1].name_first)<>'' and trim(packagedInput[1].name_last)<>'') or trim(packagedInput[1].unparsedfullname)<>'') and  	// name check
-							(trim(packagedInput[1].ssn)<>'' or   																																																		// ssn check
-								( trim(packagedInput[1].street_addr)<>'' and 																																													// address check
-								(trim(packagedInput[1].z5)<>'' OR (trim(packagedInput[1].p_city_name)<>'' AND trim(packagedInput[1].St)<>'')))												// zip or city/state check
-							)
-								) or
-							 (MLA_alone //if MLA requested by itself, bypass Riskview minimum input checks here.
-							  ) or
-							(unsigned)packagedInput[1].LexID <> 0), TRUE, FALSE);
 
-input_ok := map(AttributesOnly AND ExcludeReleasedCases => ERROR(301,attr_only_error_message),
-							check_valid_input and (ReportingPeriod > 0 and ReportingPeriod <= 84) => true,
-							check_valid_input and (ReportingPeriod <= 0 or ReportingPeriod > 84) => ERROR(301,rpt_period_error_message), // Reporting period must be within 0 - 84.
-							ERROR(301,error_message) // else if anything else is wrong, give the other error message first priority.
-							);
-		
+Non_lexid_min_check := IF(IDA_model_check, 
+                          IF(Standard_min_check, TRUE, FALSE),
+                          TRUE); //Only go into this check if there is an IDA model, then lexid only is not a valid minimum input
+                 
+
+input_ok := map(AttributesOnly AND ExcludeReleasedCases                               => ERROR(301,attr_only_error_message),
+                ~Non_lexid_min_check                                                  => ERROR(301,no_lexid_min_error_message), // Some models do not support LexID only as minimum input
+                check_valid_input and (ReportingPeriod > 0 and ReportingPeriod <= 84) => true,
+                check_valid_input and (ReportingPeriod <= 0 or ReportingPeriod > 84)  => ERROR(301,rpt_period_error_message), // Reporting period must be within 0 - 84.
+                                                                                         ERROR(301,min_error_message)         // if anything else is wrong, give the other error messages first priority.
+               );
+
 		// output(input_ok);						
 /* ***************************************
 	 *      Gather Attributes/Scores:      *
    *************************************** */
 
 search_results_temp := ungroup(
-      	riskview.Search_Function(packagedInput,
-      		gateways,
-      		DataRestriction,
-      		AttributesVersionRequest, 
-      		auto_model_name, 
-      		bankcard_model_name, 
-      		Short_term_lending_model_name, 
-      		Telecommunications_model_name, 
-      		Crossindustry_model_name, 
-      		Custom_model_name,
-      		Custom2_model_name,
-      		Custom3_model_name,
-      		Custom4_model_name,
-      		Custom5_model_name,
-      		intended_purpose,
-      		prescreen_score_threshold, 
-      		isCalifornia_in_person,
-      		riskview.constants.online,
-      		run_riskview_report,//riskview.constants.no_riskview_report // don't run report in initial deployment
-      		DataPermission,
-      		SSNMask,
-      		DOBMask,
-      		DLMask,
-      		FilterLienTypes, 
-      		EndUserCompanyName,
-      		CustomerNumber,
-      		SecurityCode, 
-      		IncludeRecordsWithSSN,
-      	 IncludeBureauRecs, 
-      		ReportingPeriod, 
-      		IncludeLnJ,
-      		RetainInputDID,
-      		exception_score_reason,
-      		MinimumAmount := MinimumAmount,
-      		ExcludeStates := ExcludeStates,
-      		ExcludeReportingSources := ExcludeReportingSources,
-			IncludeStatusRefreshChecks := IncludeStatusRefreshChecks,
-            DeferredTransactionIDs := DeferredTransactionIDs,
-            StatusRefreshWaitPeriod := StatusRefreshWaitPeriod,
-            IsBatch := FALSE
+            riskview.Search_Function(packagedInput,
+              gateways,
+              DataRestriction,
+              AttributesVersionRequest, 
+              auto_model_name, 
+              bankcard_model_name, 
+              Short_term_lending_model_name, 
+              Telecommunications_model_name, 
+              Crossindustry_model_name, 
+              Custom_model_name,
+              Custom2_model_name,
+              Custom3_model_name,
+              Custom4_model_name,
+              Custom5_model_name,
+              intended_purpose,
+              prescreen_score_threshold, 
+              isCalifornia_in_person,
+              riskview.constants.online,
+              run_riskview_report,//riskview.constants.no_riskview_report // don't run report in initial deployment
+              DataPermission,
+              SSNMask,
+              DOBMask,
+              DLMask,
+              FilterLienTypes, 
+              EndUserCompanyName,
+              CustomerNumber,
+              SecurityCode, 
+              IncludeRecordsWithSSN,
+              IncludeBureauRecs, 
+              ReportingPeriod, 
+              IncludeLnJ,
+              RetainInputDID,
+              exception_score_reason,
+              MinimumAmount := MinimumAmount,
+              ExcludeStates := ExcludeStates,
+              ExcludeReportingSources := ExcludeReportingSources,
+              IncludeStatusRefreshChecks := IncludeStatusRefreshChecks,
+              DeferredTransactionIDs := DeferredTransactionIDs,
+              StatusRefreshWaitPeriod := StatusRefreshWaitPeriod,
+              IsBatch := FALSE,
+              CompanyID := CompanyID,
+              TransactionID := outofbandTransactionID,
+              IDA_AppID := IDA_AppID
       		) 
       	);
   
-	#if(Models.LIB_RiskView_Models().TurnOnValidation) // If TRUE, output the model results directly
+	#if(Riskview.Constants.TurnOnValidation) // If TRUE, output the model results directly
 		output(search_results_temp, named('Results'));
 	#else // Else, this is a normal transaction and should be formatted for output appropriately
 	 //search_results := ungroup(search_results_temp);

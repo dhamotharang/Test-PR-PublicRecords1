@@ -17,6 +17,8 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
     EXPORT unsigned6 global_company_id := Options.bus_GlobalCompanyId; // mbs gcid
   END;
 
+  Using_BusShell31 := Options.BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v31;
+  
   RESTRICTED_SET := ['0', ''];
 
   // Restrict SBFE data here in Business_Shell_Function to return blank fields in the SBFE datarow.
@@ -63,11 +65,14 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
       InputOrig);
 
   cleanedInput := Business_Risk_BIP.fn_CleanInput(Input, Options);
+  
+  withAuthRepLexIDs := Business_Risk_BIP.getAuthRepLexIDs(cleanedInput, Options, mod_access);
+	withDID := withAuthRepLexIDs; // don't need to call did append again
+  
 
-  withDID := Business_Risk_BIP.fn_DIDAppend(cleanedInput, Options, mod_access);
-
+  
   // This prevents SeleIDS from going through the BIPappend twice if version 31 of the business shell is being used
-  withDIDwithSeleID := PROJECT(withDID(Options.BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v31 and input_echo.SeleID <> 0),
+  withDIDwithSeleID := PROJECT(withDID(Using_BusShell31 and input_echo.SeleID <> 0),
                               TRANSFORM(Business_Risk_BIP.Layouts.LinkID_Results,
                               SELF.bipidsourceinput := [];
                               SELF.powids := [];
@@ -439,13 +444,12 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
                                                 SELF := LEFT),
                                             LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
 
-  withAuthRepLexIDs := Business_Risk_BIP.getAuthRepLexIDs(withPropertyByInputs, Options, mod_access);
 
   // Don't bother running a bunch of searches on Seq's that didn't find any ID's, just add them back at the end
-  NoLinkIDsFound := withAuthRepLexIDs (BIP_IDs.PowID.LinkID = 0 AND BIP_IDs.ProxID.LinkID = 0 AND BIP_IDs.SeleID.LinkID = 0 AND BIP_IDs.OrgID.LinkID = 0 AND BIP_IDs.UltID.LinkID = 0);
+  NoLinkIDsFound := withPropertyByInputs (BIP_IDs.PowID.LinkID = 0 AND BIP_IDs.ProxID.LinkID = 0 AND BIP_IDs.SeleID.LinkID = 0 AND BIP_IDs.OrgID.LinkID = 0 AND BIP_IDs.UltID.LinkID = 0);
 
   // Only run the searches with Seq's that found BIP Link ID's that we can search with
-  LinkIDsFoundTemp := withAuthRepLexIDs (BIP_IDs.PowID.LinkID <> 0 OR BIP_IDs.ProxID.LinkID <> 0 OR BIP_IDs.SeleID.LinkID <> 0 OR BIP_IDs.OrgID.LinkID <> 0 OR BIP_IDs.UltID.LinkID <> 0);
+  LinkIDsFoundTemp := withPropertyByInputs (BIP_IDs.PowID.LinkID <> 0 OR BIP_IDs.ProxID.LinkID <> 0 OR BIP_IDs.SeleID.LinkID <> 0 OR BIP_IDs.OrgID.LinkID <> 0 OR BIP_IDs.UltID.LinkID <> 0);
 
   // Append "Best" Company information if only BIP ID's were passed in and it was requested in the Options that we perform the BIPBestAppend process, otherwise this function just returns what was sent to it
   // NOTE: this function call may be unnecessary (1/28/2020)
@@ -3487,10 +3491,10 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 
     newestAddrDate := calculateValueFor._newestAddrDate(SeqAddressVerSources, le.Clean_Input.HistoryDate);
     oldestAddrDate := calculateValueFor._oldestAddrDate(SeqAddressVerSources, le.Clean_Input.HistoryDate);
-
-    InputAddrLengthOfResidence := IF(NOT cantVerifyAddress AND newestAddrDate <> Business_Risk_BIP.Constants.MissingDate AND oldestAddrDate <> Business_Risk_BIP.Constants.MissingDate, (STRING)Business_Risk_BIP.Common.CapNum(ut.MonthsApart(newestAddrDate, oldestAddrDate), -1, 99999), '-1');
-    SELF.Verification.InputAddrLengthOfResidence := calculateValueFor.checkTrueBiz(InputAddrLengthOfResidence, VerInputIDTruebiz);
-
+    months_apart := (STRING)Business_Risk_BIP.Common.CapNum(ut.MonthsApart(newestAddrDate, oldestAddrDate), -1, 99999);
+    InputAddrLengthOfResidence := IF(NOT cantVerifyAddress AND newestAddrDate <> Business_Risk_BIP.Constants.MissingDate AND oldestAddrDate <> Business_Risk_BIP.Constants.MissingDate, IF((Using_BusShell31) AND (months_apart='0'),'1',months_apart),
+		                                                                                                                                                                                     IF(Using_BusShell31, '0','-1'));
+		 SELF.Verification.InputAddrLengthOfResidence := calculateValueFor.checkTrueBiz(InputAddrLengthOfResidence, VerInputIDTruebiz);                                                                                                                                                                                    
     SELF.Input_Characteristics.InputAddrSourceCount := IF(cantVerifyAddress, '-1', (STRING)Business_Risk_BIP.Common.capNum(COUNT(SeqAddressVerSources), -1, 10));
     SELF.Verification.AddrSourceCount := (STRING)Business_Risk_BIP.Common.capNum(COUNT(SeqAddressSources), -1, 10);
     SELF.Verification.PhoneMatchSourceList := Business_Risk_BIP.Common.convertDelimited(SeqPhoneSources, Source, Business_Risk_BIP.Constants.FieldDelimiter);
@@ -4035,7 +4039,8 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
                                                         COUNT(NonDerogSourceRecords03Month) >= 4                    => '5',
                                                                                                                        '-1');
 
-    BankruptcyTimeNewest := IF((INTEGER)le.Bankruptcy.BankruptcyCount > 0, le.Bankruptcy.BankruptcyTimeNewest, '-1');
+    BankruptcyTimeNewest := IF((INTEGER)le.Bankruptcy.BankruptcyCount > 0, le.Bankruptcy.BankruptcyTimeNewest,
+		                                                                         IF(Using_BusShell31,'0','-1'));
     SELF.Bankruptcy.BankruptcyTimeNewest := calculateValueFor.checkTrueBiz(BankruptcyTimeNewest, VerInputIDTruebiz);
     SELF.Bankruptcy.BankruptcyCount12Month := calculateValueFor.checkTrueBiz(le.Bankruptcy.BankruptcyCount12Month, VerInputIDTruebiz);
     SELF.Bankruptcy.BankruptcyCount24Month := calculateValueFor.checkTrueBiz(le.Bankruptcy.BankruptcyCount24Month, VerInputIDTruebiz);
@@ -4708,10 +4713,15 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
                                                                                                    FinalShell_pre );
 
   FinalShell_rolled := IF(Options.BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v22, FinalShell, modInp.fn_PopulateAltCompanyNameFields(FinalShell));
+  
+  WithSBA_Patch := Business_Risk_BIP.fn_SASPatch(FinalShell_rolled);
+  
+  FinalShell_rolled_WithV21patch := IF(Using_BusShell31,WithSBA_Patch,FinalShell_rolled);
 
   // *********************
   //   DEBUGGING OUTPUTS
   // *********************
+  
   // OUTPUT(CHOOSEN(InputOrig, 100), NAMED('Sample_InputOrig'));
   // OUTPUT(CHOOSEN(Input, 100), NAMED('Sample_Input'));
   // OUTPUT(CHOOSEN(cleanedInput, 100), NAMED('Sample_cleanedInput'));
@@ -4754,7 +4764,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 
   // OUTPUT(withFinalDelimitedFields, NAMED('withFinalDelimitedFields'));
   // OUTPUT(withBestAddrPhones,NAMED('withBestAddrPhones'));
-
-  RETURN FinalShell_rolled;
+  // Output(FinalShell_rolled_WithV21patch, named('withFinalShell_rolled_WithV21patch'));
+  RETURN FinalShell_rolled_WithV21patch;
 
 END;

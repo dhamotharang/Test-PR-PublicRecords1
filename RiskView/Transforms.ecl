@@ -1,4 +1,4 @@
-﻿IMPORT risk_indicators, RiskView, iesp, STD;
+﻿IMPORT risk_indicators, RiskView, iesp, STD, Models;
 
 EXPORT Transforms := module
 
@@ -104,13 +104,15 @@ BOOLEAN ExcludeStatusRefresh = FALSE) := TRANSFORM
     // don't log the lexid if the person got a noscore
     SELF.inquiry_lexid := if(riskview.constants.noScoreAlert in [ri.Alert1,ri.Alert2,ri.Alert3,ri.Alert4,ri.Alert5,ri.Alert6,ri.Alert7,ri.Alert8,ri.Alert9,ri.Alert10] OR suppress_condition, '', ri.LexID);
     SELF.Exception_Code := MAP(ri.Exception_Code = Riskview.Constants.OKCError => '22',
-                                                           ri.Exception_Code IN Riskview.Constants.DTEErrorCodes => '41',
-                                                           ri.Status_Code = '801' => ri.Status_Code,
-                                                           '');
+                               ri.Exception_Code IN Riskview.Constants.generalErrorCodes => ri.Exception_Code,
+                               ri.Exception_Code IN Riskview.Constants.DTEErrorCodes => '41',
+                               ri.Status_Code = '801' => ri.Status_Code,
+                               '');
     SELF.Exception_Message := MAP(ri.Exception_Code = Riskview.Constants.OKCError => RiskView.Constants.StatusRefresh_error_desc,
-                                                        ri.Exception_Code IN Riskview.Constants.DTEErrorCodes  => RiskView.Constants.DTE_error_desc,
-                                                        ri.Status_Code = '801' => RiskView.Constants.Deferred_request_desc,
-                                                        '');
+                                  ri.Exception_Code IN Riskview.Constants.generalErrorCodes => RiskView.Constants.MLA_error_desc(ri.Exception_Code),
+                                  ri.Exception_Code IN Riskview.Constants.DTEErrorCodes  => RiskView.Constants.DTE_error_desc,
+                                  ri.Status_Code = '801' => RiskView.Constants.Deferred_request_desc,
+                                  '');
     SELF.Liens1_Seq:= IF(~suppress_condition, ri.LnJliens[1].Seq, '');
     SELF.Liens1_DateFiled:= IF(~suppress_condition, ri.LnJliens[1].DateFiled, '');
     SELF.Liens1_LienTypeID := IF(~suppress_condition, ri.LnJliens[1].LienTypeID, '');
@@ -4074,6 +4076,567 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response AttributesOnlyBatch(Risk
         SELF := [];
 END;
 
+//IDA model transforms
+EXPORT Models.RVG2005_0_1.z_layouts_Input xfm_RVG2005_RVAttrs_and_IDAattrs(riskview.layouts.attributes_internal_layout_noscore le, Risk_Indicators.layouts.layout_IDA_out rt) := TRANSFORM
+      Self.TransactionID := (String)le.seq;
+      //RV attributes
+      self.INPUTPROVIDEDFIRSTNAME                   := le.inputprovidedfirstname;
+      self.INPUTPROVIDEDLASTNAME                    := le.inputprovidedlastname;
+      self.INPUTPROVIDEDSTREETADDRESS               := le.inputprovidedstreetaddress;
+      self.INPUTPROVIDEDCITY                        := le.inputprovidedcity;
+      self.INPUTPROVIDEDSTATE                       := le.inputprovidedstate;
+      self.INPUTPROVIDEDZIPCODE                     := le.inputprovidedzipcode;
+      self.INPUTPROVIDEDSSN                         := le.inputprovidedssn;
+      self.INPUTPROVIDEDDATEOFBIRTH                 := le.inputprovideddateofbirth;
+      self.INPUTPROVIDEDPHONE                       := le.inputprovidedphone;
+      self.INPUTPROVIDEDLEXID                       := le.inputprovidedlexid;
+      self.SUBJECTRECORDTIMEOLDEST                  := le.subjectrecordtimeoldest;
+      self.SUBJECTRECORDTIMENEWEST                  := le.subjectrecordtimenewest;
+      self.SUBJECTNEWESTRECORD12MONTH               := le.subjectnewestrecord12month;
+      self.SUBJECTACTIVITYINDEX03MONTH              := le.subjectactivityindex03month;
+      self.SUBJECTACTIVITYINDEX06MONTH              := le.subjectactivityindex06month;
+      self.SUBJECTACTIVITYINDEX12MONTH              := le.subjectactivityindex12month;
+      self.SUBJECTAGE                               := le.subjectage;
+      self.SUBJECTDECEASED                          := le.subjectdeceased;
+      self.SUBJECTSSNCOUNT                          := le.subjectssncount;
+      self.SUBJECTSTABILITYINDEX                    := le.subjectstabilityindex;
+      self.SUBJECTSTABILITYPRIMARYFACTOR            := le.subjectstabilityprimaryfactor;
+      self.SUBJECTABILITYINDEX                      := le.subjectabilityindex;
+      self.SUBJECTABILITYPRIMARYFACTOR              := le.subjectabilityprimaryfactor;
+      self.SUBJECTWILLINGNESSINDEX                  := le.subjectwillingnessindex;
+      self.SUBJECTWILLINGNESSPRIMARYFACTOR          := le.subjectwillingnessprimaryfactor;
+      self.CONFIRMATIONSUBJECTFOUND                 := le.confirmationsubjectfound;
+      self.CONFIRMATIONINPUTNAME                    := le.confirmationinputname;
+      self.CONFIRMATIONINPUTDOB                     := le.confirmationinputdob;
+      self.CONFIRMATIONINPUTSSN                     := le.confirmationinputssn;
+      self.CONFIRMATIONINPUTADDRESS                 := le.confirmationinputaddress;
+      self.SOURCENONDEROGPROFILEINDEX               := le.sourcenonderogprofileindex;
+      self.SOURCENONDEROGCOUNT                      := le.sourcenonderogcount;
+      self.SOURCENONDEROGCOUNT03MONTH               := le.sourcenonderogcount03month;
+      self.SOURCENONDEROGCOUNT06MONTH               := le.sourcenonderogcount06month;
+      self.SOURCENONDEROGCOUNT12MONTH               := le.sourcenonderogcount12month;
+      self.SOURCECREDHEADERTIMEOLDEST               := le.sourcecredheadertimeoldest;
+      self.SOURCECREDHEADERTIMENEWEST               := le.sourcecredheadertimenewest;
+      self.SOURCEVOTERREGISTRATION                  := le.sourcevoterregistration;
+      self.EDUCATIONATTENDANCE                      := le.educationattendance;
+      self.EDUCATIONEVIDENCE                        := le.educationevidence;
+      self.EDUCATIONPROGRAMATTENDED                 := le.educationprogramattended;
+      self.EDUCATIONINSTITUTIONPRIVATE              := le.educationinstitutionprivate;
+      self.EDUCATIONINSTITUTIONRATING               := le.educationinstitutionrating;
+      self.PROFLICCOUNT                             := le.profliccount;
+      self.PROFLICTYPECATEGORY                      := le.proflictypecategory;
+      self.BUSINESSASSOCIATION                      := le.businessassociation;
+      self.BUSINESSASSOCIATIONINDEX                 := le.businessassociationindex;
+      self.BUSINESSASSOCIATIONTIMEOLDEST            := le.businessassociationtimeoldest;
+      self.BUSINESSTITLELEADERSHIP                  := le.businesstitleleadership;
+      self.ASSETINDEX                               := le.assetindex;
+      self.ASSETINDEXPRIMARYFACTOR                  := le.assetindexprimaryfactor;
+      self.ASSETOWNERSHIP                           := le.assetownership;
+      self.ASSETPROP                                := le.assetprop;
+      self.ASSETPROPINDEX                           := le.assetpropindex;
+      self.ASSETPROPEVERCOUNT                       := le.assetpropevercount;
+      self.ASSETPROPCURRENTCOUNT                    := le.assetpropcurrentcount;
+      self.ASSETPROPCURRENTTAXTOTAL                 := le.assetpropcurrenttaxtotal;
+      self.ASSETPROPPURCHASECOUNT12MONTH            := le.assetproppurchasecount12month;
+      self.ASSETPROPPURCHASETIMEOLDEST              := le.assetproppurchasetimeoldest;
+      self.ASSETPROPPURCHASETIMENEWEST              := le.assetproppurchasetimenewest;
+      self.ASSETPROPNEWESTMORTGAGETYPE              := le.assetpropnewestmortgagetype;
+      self.ASSETPROPEVERSOLDCOUNT                   := le.assetpropeversoldcount;
+      self.ASSETPROPSOLDCOUNT12MONTH                := le.assetpropsoldcount12month;
+      self.ASSETPROPSALETIMEOLDEST                  := le.assetpropsaletimeoldest;
+      self.ASSETPROPSALETIMENEWEST                  := le.assetpropsaletimenewest;
+      self.ASSETPROPNEWESTSALEPRICE                 := le.assetpropnewestsaleprice;
+      self.ASSETPROPSALEPURCHASERATIO               := le.assetpropsalepurchaseratio;
+      self.ASSETPERSONAL                            := le.assetpersonal;
+      self.ASSETPERSONALCOUNT                       := le.assetpersonalcount;
+      self.PURCHASEACTIVITYINDEX                    := le.purchaseactivityindex;
+      self.PURCHASEACTIVITYCOUNT                    := le.purchaseactivitycount;
+      self.PURCHASEACTIVITYDOLLARTOTAL              := le.purchaseactivitydollartotal;
+      self.DEROGSEVERITYINDEX                       := le.derogseverityindex;
+      self.DEROGCOUNT                               := le.derogcount;
+      self.DEROGCOUNT12MONTH                        := le.derogcount12month;
+      self.DEROGTIMENEWEST                          := le.derogtimenewest;
+      self.CRIMINALFELONYCOUNT                      := le.criminalfelonycount;
+      self.CRIMINALFELONYCOUNT12MONTH               := le.criminalfelonycount12month;
+      self.CRIMINALFELONYTIMENEWEST                 := le.criminalfelonytimenewest;
+      self.CRIMINALNONFELONYCOUNT                   := le.criminalnonfelonycount;
+      self.CRIMINALNONFELONYCOUNT12MONTH            := le.criminalnonfelonycount12month;
+      self.CRIMINALNONFELONYTIMENEWEST              := le.criminalnonfelonytimenewest;
+      self.EVICTIONCOUNT                            := le.evictioncount;
+      self.EVICTIONCOUNT12MONTH                     := le.evictioncount12month;
+      self.EVICTIONTIMENEWEST                       := le.evictiontimenewest;
+      self.LIENJUDGMENTSEVERITYINDEX                := le.lienjudgmentseverityindex;
+      self.LIENJUDGMENTCOUNT                        := le.lienjudgmentcount;
+      self.LIENJUDGMENTCOUNT12MONTH                 := le.lienjudgmentcount12month;
+      self.LIENJUDGMENTSMALLCLAIMSCOUNT             := le.lienjudgmentsmallclaimscount;
+      self.LIENJUDGMENTCOURTCOUNT                   := le.lienjudgmentcourtcount;
+      self.LIENJUDGMENTTAXCOUNT                     := le.lienjudgmenttaxcount;
+      self.LIENJUDGMENTFORECLOSURECOUNT             := le.lienjudgmentforeclosurecount;
+      self.LIENJUDGMENTOTHERCOUNT                   := le.lienjudgmentothercount;
+      self.LIENJUDGMENTTIMENEWEST                   := le.lienjudgmenttimenewest;
+      self.LIENJUDGMENTDOLLARTOTAL                  := le.lienjudgmentdollartotal;
+      self.BANKRUPTCYCOUNT                          := le.bankruptcycount;
+      self.BANKRUPTCYCOUNT24MONTH                   := le.bankruptcycount24month;
+      self.BANKRUPTCYTIMENEWEST                     := le.bankruptcytimenewest;
+      self.BANKRUPTCYCHAPTER                        := le.bankruptcychapter;
+      self.BANKRUPTCYSTATUS                         := le.bankruptcystatus;
+      self.BANKRUPTCYDISMISSED24MONTH               := le.bankruptcydismissed24month;
+      self.SHORTTERMLOANREQUEST                     := le.shorttermloanrequest;
+      self.SHORTTERMLOANREQUEST12MONTH              := le.shorttermloanrequest12month;
+      self.SHORTTERMLOANREQUEST24MONTH              := le.shorttermloanrequest24month;
+      self.INQUIRYAUTO12MONTH                       := le.inquiryauto12month;
+      self.INQUIRYBANKING12MONTH                    := le.inquirybanking12month;
+      self.INQUIRYTELCOM12MONTH                     := le.inquirytelcom12month;
+      self.INQUIRYNONSHORTTERM12MONTH               := le.inquirynonshortterm12month;
+      self.INQUIRYSHORTTERM12MONTH                  := le.inquiryshortterm12month;
+      self.INQUIRYCOLLECTIONS12MONTH                := le.inquirycollections12month;
+      self.SSNSUBJECTCOUNT                          := le.ssnsubjectcount;
+      self.SSNDECEASED                              := le.ssndeceased;
+      self.SSNDATELOWISSUED                         := le.ssndatelowissued;
+      self.SSNPROBLEMS                              := le.ssnproblems;
+      self.ADDRONFILECOUNT                          := le.addronfilecount;
+      self.ADDRONFILECORRECTIONAL                   := le.addronfilecorrectional;
+      self.ADDRONFILECOLLEGE                        := le.addronfilecollege;
+      self.ADDRONFILEHIGHRISK                       := le.addronfilehighrisk;
+      self.ADDRINPUTTIMEOLDEST                      := le.addrinputtimeoldest;
+      self.ADDRINPUTTIMENEWEST                      := le.addrinputtimenewest;
+      self.ADDRINPUTLENGTHOFRES                     := le.addrinputlengthofres;
+      self.ADDRINPUTSUBJECTCOUNT                    := le.addrinputsubjectcount;
+      self.ADDRINPUTMATCHINDEX                      := le.addrinputmatchindex;
+      self.ADDRINPUTSUBJECTOWNED                    := le.addrinputsubjectowned;
+      self.ADDRINPUTDEEDMAILING                     := le.addrinputdeedmailing;
+      self.ADDRINPUTOWNERSHIPINDEX                  := le.addrinputownershipindex;
+      self.ADDRINPUTPHONESERVICE                    := le.addrinputphoneservice;
+      self.ADDRINPUTPHONECOUNT                      := le.addrinputphonecount;
+      self.ADDRINPUTDWELLTYPE                       := le.addrinputdwelltype;
+      self.ADDRINPUTDWELLTYPEINDEX                  := le.addrinputdwelltypeindex;
+      self.ADDRINPUTDELIVERY                        := le.addrinputdelivery;
+      self.ADDRINPUTTIMELASTSALE                    := le.addrinputtimelastsale;
+      self.ADDRINPUTLASTSALEPRICE                   := le.addrinputlastsaleprice;
+      self.ADDRINPUTTAXVALUE                        := le.addrinputtaxvalue;
+      self.ADDRINPUTTAXYR                           := le.addrinputtaxyr;
+      self.ADDRINPUTTAXMARKETVALUE                  := le.addrinputtaxmarketvalue;
+      self.ADDRINPUTAVMVALUE                        := le.addrinputavmvalue;
+      self.ADDRINPUTAVMVALUE12MONTH                 := le.addrinputavmvalue12month;
+      self.ADDRINPUTAVMRATIO12MONTHPRIOR            := le.addrinputavmratio12monthprior;
+      self.ADDRINPUTAVMVALUE60MONTH                 := le.addrinputavmvalue60month;
+      self.ADDRINPUTAVMRATIO60MONTHPRIOR            := le.addrinputavmratio60monthprior;
+      self.ADDRINPUTCOUNTYRATIO                     := le.addrinputcountyratio;
+      self.ADDRINPUTTRACTRATIO                      := le.addrinputtractratio;
+      self.ADDRINPUTBLOCKRATIO                      := le.addrinputblockratio;
+      self.ADDRINPUTPROBLEMS                        := le.addrinputproblems;
+      self.ADDRCURRENTTIMEOLDEST                    := le.addrcurrenttimeoldest;
+      self.ADDRCURRENTTIMENEWEST                    := le.addrcurrenttimenewest;
+      self.ADDRCURRENTLENGTHOFRES                   := le.addrcurrentlengthofres;
+      self.ADDRCURRENTSUBJECTOWNED                  := le.addrcurrentsubjectowned;
+      self.ADDRCURRENTDEEDMAILING                   := le.addrcurrentdeedmailing;
+      self.ADDRCURRENTOWNERSHIPINDEX                := le.addrcurrentownershipindex;
+      self.ADDRCURRENTPHONESERVICE                  := le.addrcurrentphoneservice;
+      self.ADDRCURRENTDWELLTYPE                     := le.addrcurrentdwelltype;
+      self.ADDRCURRENTDWELLTYPEINDEX                := le.addrcurrentdwelltypeindex;
+      self.ADDRCURRENTTIMELASTSALE                  := le.addrcurrenttimelastsale;
+      self.ADDRCURRENTLASTSALESPRICE                := le.addrcurrentlastsalesprice;
+      self.ADDRCURRENTTAXVALUE                      := le.addrcurrenttaxvalue;
+      self.ADDRCURRENTTAXYR                         := le.addrcurrenttaxyr;
+      self.ADDRCURRENTTAXMARKETVALUE                := le.addrcurrenttaxmarketvalue;
+      self.ADDRCURRENTAVMVALUE                      := le.addrcurrentavmvalue;
+      self.ADDRCURRENTAVMVALUE12MONTH               := le.addrcurrentavmvalue12month;
+      self.ADDRCURRENTAVMRATIO12MONTHPRIOR          := le.addrcurrentavmratio12monthprior;
+      self.ADDRCURRENTAVMVALUE60MONTH               := le.addrcurrentavmvalue60month;
+      self.ADDRCURRENTAVMRATIO60MONTHPRIOR          := le.addrcurrentavmratio60monthprior;
+      self.ADDRCURRENTCOUNTYRATIO                   := le.addrcurrentcountyratio;
+      self.ADDRCURRENTTRACTRATIO                    := le.addrcurrenttractratio;
+      self.ADDRCURRENTBLOCKRATIO                    := le.addrcurrentblockratio;
+      self.ADDRCURRENTCORRECTIONAL                  := le.addrcurrentcorrectional;
+      self.ADDRPREVIOUSTIMEOLDEST                   := le.addrprevioustimeoldest;
+      self.ADDRPREVIOUSTIMENEWEST                   := le.addrprevioustimenewest;
+      self.ADDRPREVIOUSLENGTHOFRES                  := le.addrpreviouslengthofres;
+      self.ADDRPREVIOUSSUBJECTOWNED                 := le.addrprevioussubjectowned;
+      self.ADDRPREVIOUSOWNERSHIPINDEX               := le.addrpreviousownershipindex;
+      self.ADDRPREVIOUSDWELLTYPE                    := le.addrpreviousdwelltype;
+      self.ADDRPREVIOUSDWELLTYPEINDEX               := le.addrpreviousdwelltypeindex;
+      self.ADDRPREVIOUSCORRECTIONAL                 := le.addrpreviouscorrectional;
+      self.ADDRSTABILITYINDEX                       := le.addrstabilityindex;
+      self.ADDRCHANGECOUNT03MONTH                   := le.addrchangecount03month;
+      self.ADDRCHANGECOUNT06MONTH                   := le.addrchangecount06month;
+      self.ADDRCHANGECOUNT12MONTH                   := le.addrchangecount12month;
+      self.ADDRCHANGECOUNT24MONTH                   := le.addrchangecount24month;
+      self.ADDRCHANGECOUNT60MONTH                   := le.addrchangecount60month;
+      self.ADDRLASTMOVETAXRATIODIFF                 := le.addrlastmovetaxratiodiff;
+      self.ADDRLASTMOVEECONTRAJECTORY               := le.addrlastmoveecontrajectory;
+      self.ADDRLASTMOVEECONTRAJECTORYINDEX          := le.addrlastmoveecontrajectoryindex;
+      self.PHONEINPUTPROBLEMS                       := le.phoneinputproblems;
+      self.PHONEINPUTSUBJECTCOUNT                   := le.phoneinputsubjectcount;
+      self.PHONEINPUTMOBILE                         := le.phoneinputmobile;
+      self.ALERTREGULATORYCONDITION                 := le.alertregulatorycondition;
+      
+      //IDA attributes
+      self.CADCSAP_IBK_S1_D90_NUM                   := rt.Indicators(name = 'CADCSAP_IBK_S1_D90_NUM')[1].value;
+      self.CADCSAP_IBK_S1_D90_UNAME                 := rt.Indicators(name = 'CADCSAP_IBK_S1_D90_UNAME')[1].value;
+      self.CADCSAP_IBK_S1_D90_UADD                  := rt.Indicators(name = 'CADCSAP_IBK_S1_D90_UADD')[1].value;
+      self.CADCSAP_IBK_S1_D90_UHP                   := rt.Indicators(name = 'CADCSAP_IBK_S1_D90_UHP')[1].value;
+      self.CADCSAP_IBK_S1_D90_UDOB                  := rt.Indicators(name = 'CADCSAP_IBK_S1_D90_UDOB')[1].value;
+      self.CADCSAP_IBK_S1_D90_UEMAIL                := rt.Indicators(name = 'CADCSAP_IBK_S1_D90_UEMAIL')[1].value;
+      self.CADCSAP_IBK_S1_D90_DAYSMR                := rt.Indicators(name = 'CADCSAP_IBK_S1_D90_DAYSMR')[1].value;
+      self.CADCSAP_IBK_S1_D90_DAYSLR                := rt.Indicators(name = 'CADCSAP_IBK_S1_D90_DAYSLR')[1].value;
+      self.CADCSAP_IBK_S1_D120_NUM                  := rt.Indicators(name = 'CADCSAP_IBK_S1_D120_NUM')[1].value;
+      self.CADCSAP_IBK_S1_D120_UNAME                := rt.Indicators(name = 'CADCSAP_IBK_S1_D120_UNAME')[1].value;
+      self.CADCSAP_IBK_S1_D120_UADD                 := rt.Indicators(name = 'CADCSAP_IBK_S1_D120_UADD')[1].value;
+      self.CADCSAP_IBK_S1_D120_UHP                  := rt.Indicators(name = 'CADCSAP_IBK_S1_D120_UHP')[1].value;
+      self.CADCSAP_IBK_S1_D120_UDOB                 := rt.Indicators(name = 'CADCSAP_IBK_S1_D120_UDOB')[1].value;
+      self.CADCSAP_IBK_S1_D120_UEMAIL               := rt.Indicators(name = 'CADCSAP_IBK_S1_D120_UEMAIL')[1].value;
+      self.CADCSAP_IBK_S1_D120_DAYSMR               := rt.Indicators(name = 'CADCSAP_IBK_S1_D120_DAYSMR')[1].value;
+      self.CADCSAP_IBK_S1_D120_DAYSLR               := rt.Indicators(name = 'CADCSAP_IBK_S1_D120_DAYSLR')[1].value;
+      self.CADCSAP_IBK_S1_D365_NUM                  := rt.Indicators(name = 'CADCSAP_IBK_S1_D365_NUM')[1].value;
+      self.CADCSAP_IBK_S1_D365_UNAME                := rt.Indicators(name = 'CADCSAP_IBK_S1_D365_UNAME')[1].value;
+      self.CADCSAP_IBK_S1_D365_UADD                 := rt.Indicators(name = 'CADCSAP_IBK_S1_D365_UADD')[1].value;
+      self.CADCSAP_IBK_S1_D365_UHP                  := rt.Indicators(name = 'CADCSAP_IBK_S1_D365_UHP')[1].value;
+      self.CADCSAP_IBK_S1_D365_UDOB                 := rt.Indicators(name = 'CADCSAP_IBK_S1_D365_UDOB')[1].value;
+      self.CADCSAP_IBK_S1_D365_UEMAIL               := rt.Indicators(name = 'CADCSAP_IBK_S1_D365_UEMAIL')[1].value;
+      self.CADCSAP_IBK_S1_D365_DAYSMR               := rt.Indicators(name = 'CADCSAP_IBK_S1_D365_DAYSMR')[1].value;
+      self.CADCSAP_IBK_S1_D365_DAYSLR               := rt.Indicators(name = 'CADCSAP_IBK_S1_D365_DAYSLR')[1].value;
+      self.CADCSAP_IBK_S1_D1095_NUM                 := rt.Indicators(name = 'CADCSAP_IBK_S1_D1095_NUM')[1].value;
+      self.CADCSAP_IBK_S1_D1095_UNAME               := rt.Indicators(name = 'CADCSAP_IBK_S1_D1095_UNAME')[1].value;
+      self.CADCSAP_IBK_S1_D1095_UADD                := rt.Indicators(name = 'CADCSAP_IBK_S1_D1095_UADD')[1].value;
+      self.CADCSAP_IBK_S1_D1095_UHP                 := rt.Indicators(name = 'CADCSAP_IBK_S1_D1095_UHP')[1].value;
+      self.CADCSAP_IBK_S1_D1095_UDOB                := rt.Indicators(name = 'CADCSAP_IBK_S1_D1095_UDOB')[1].value;
+      self.CADCSAP_IBK_S1_D1095_UEMAIL              := rt.Indicators(name = 'CADCSAP_IBK_S1_D1095_UEMAIL')[1].value;
+      self.CADCSAP_IBK_S1_D1095_DAYSMR              := rt.Indicators(name = 'CADCSAP_IBK_S1_D1095_DAYSMR')[1].value;
+      self.CADCSAP_IBK_S1_D1095_DAYSLR              := rt.Indicators(name = 'CADCSAP_IBK_S1_D1095_DAYSLR')[1].value;
+      self.CADCSAP_IBK_A1_D90_NUM                   := rt.Indicators(name = 'CADCSAP_IBK_A1_D90_NUM')[1].value;
+      self.CADCSAP_IBK_A1_D90_UNAME                 := rt.Indicators(name = 'CADCSAP_IBK_A1_D90_UNAME')[1].value;
+      self.CADCSAP_IBK_A1_D90_UHP                   := rt.Indicators(name = 'CADCSAP_IBK_A1_D90_UHP')[1].value;
+      self.CADCSAP_IBK_A1_D90_UDOB                  := rt.Indicators(name = 'CADCSAP_IBK_A1_D90_UDOB')[1].value;
+      self.CADCSAP_IBK_A1_D90_UEMAIL                := rt.Indicators(name = 'CADCSAP_IBK_A1_D90_UEMAIL')[1].value;
+      self.CADCSAP_IBK_A1_D90_DAYSMR                := rt.Indicators(name = 'CADCSAP_IBK_A1_D90_DAYSMR')[1].value;
+      self.CADCSAP_IBK_A1_D90_DAYSLR                := rt.Indicators(name = 'CADCSAP_IBK_A1_D90_DAYSLR')[1].value;
+      self.CADCSAP_IBK_A1_D120_NUM                  := rt.Indicators(name = 'CADCSAP_IBK_A1_D120_NUM')[1].value;
+      self.CADCSAP_IBK_A1_D120_UNAME                := rt.Indicators(name = 'CADCSAP_IBK_A1_D120_UNAME')[1].value;
+      self.CADCSAP_IBK_A1_D120_UHP                  := rt.Indicators(name = 'CADCSAP_IBK_A1_D120_UHP')[1].value;
+      self.CADCSAP_IBK_A1_D120_UDOB                 := rt.Indicators(name = 'CADCSAP_IBK_A1_D120_UDOB')[1].value;
+      self.CADCSAP_IBK_A1_D120_UEMAIL               := rt.Indicators(name = 'CADCSAP_IBK_A1_D120_UEMAIL')[1].value;
+      self.CADCSAP_IBK_A1_D120_DAYSMR               := rt.Indicators(name = 'CADCSAP_IBK_A1_D120_DAYSMR')[1].value;
+      self.CADCSAP_IBK_A1_D120_DAYSLR               := rt.Indicators(name = 'CADCSAP_IBK_A1_D120_DAYSLR')[1].value;
+      self.CADCSAP_IBK_A1_D365_NUM                  := rt.Indicators(name = 'CADCSAP_IBK_A1_D365_NUM')[1].value;
+      self.CADCSAP_IBK_A1_D365_UNAME                := rt.Indicators(name = 'CADCSAP_IBK_A1_D365_UNAME')[1].value;
+      self.CADCSAP_IBK_A1_D365_UHP                  := rt.Indicators(name = 'CADCSAP_IBK_A1_D365_UHP')[1].value;
+      self.CADCSAP_IBK_A1_D365_UDOB                 := rt.Indicators(name = 'CADCSAP_IBK_A1_D365_UDOB')[1].value;
+      self.CADCSAP_IBK_A1_D365_UEMAIL               := rt.Indicators(name = 'CADCSAP_IBK_A1_D365_UEMAIL')[1].value;
+      self.CADCSAP_IBK_A1_D365_DAYSMR               := rt.Indicators(name = 'CADCSAP_IBK_A1_D365_DAYSMR')[1].value;
+      self.CADCSAP_IBK_A1_D365_DAYSLR               := rt.Indicators(name = 'CADCSAP_IBK_A1_D365_DAYSLR')[1].value;
+      self.CADCSAP_IBK_A1_D1095_NUM                 := rt.Indicators(name = 'CADCSAP_IBK_A1_D1095_NUM')[1].value;
+      self.CADCSAP_IBK_A1_D1095_UNAME               := rt.Indicators(name = 'CADCSAP_IBK_A1_D1095_UNAME')[1].value;
+      self.CADCSAP_IBK_A1_D1095_UHP                 := rt.Indicators(name = 'CADCSAP_IBK_A1_D1095_UHP')[1].value;
+      self.CADCSAP_IBK_A1_D1095_UDOB                := rt.Indicators(name = 'CADCSAP_IBK_A1_D1095_UDOB')[1].value;
+      self.CADCSAP_IBK_A1_D1095_UEMAIL              := rt.Indicators(name = 'CADCSAP_IBK_A1_D1095_UEMAIL')[1].value;
+      self.CADCSAP_IBK_A1_D1095_DAYSMR              := rt.Indicators(name = 'CADCSAP_IBK_A1_D1095_DAYSMR')[1].value;
+      self.CADCSAP_IBK_A1_D1095_DAYSLR              := rt.Indicators(name = 'CADCSAP_IBK_A1_D1095_DAYSLR')[1].value;
+      self.CADCSAP_IBK_P1_D90_NUM                   := rt.Indicators(name = 'CADCSAP_IBK_P1_D90_NUM')[1].value;
+      self.CADCSAP_IBK_P1_D90_UNAME                 := rt.Indicators(name = 'CADCSAP_IBK_P1_D90_UNAME')[1].value;
+      self.CADCSAP_IBK_P1_D90_UADD                  := rt.Indicators(name = 'CADCSAP_IBK_P1_D90_UADD')[1].value;
+      self.CADCSAP_IBK_P1_D90_UDOB                  := rt.Indicators(name = 'CADCSAP_IBK_P1_D90_UDOB')[1].value;
+      self.CADCSAP_IBK_P1_D90_UEMAIL                := rt.Indicators(name = 'CADCSAP_IBK_P1_D90_UEMAIL')[1].value;
+      self.CADCSAP_IBK_P1_D90_DAYSMR                := rt.Indicators(name = 'CADCSAP_IBK_P1_D90_DAYSMR')[1].value;
+      self.CADCSAP_IBK_P1_D90_DAYSLR                := rt.Indicators(name = 'CADCSAP_IBK_P1_D90_DAYSLR')[1].value;
+      self.CADCSAP_IBK_P1_D120_NUM                  := rt.Indicators(name = 'CADCSAP_IBK_P1_D120_NUM')[1].value;
+      self.CADCSAP_IBK_P1_D120_UNAME                := rt.Indicators(name = 'CADCSAP_IBK_P1_D120_UNAME')[1].value;
+      self.CADCSAP_IBK_P1_D120_UADD                 := rt.Indicators(name = 'CADCSAP_IBK_P1_D120_UADD')[1].value;
+      self.CADCSAP_IBK_P1_D120_UDOB                 := rt.Indicators(name = 'CADCSAP_IBK_P1_D120_UDOB')[1].value;
+      self.CADCSAP_IBK_P1_D120_UEMAIL               := rt.Indicators(name = 'CADCSAP_IBK_P1_D120_UEMAIL')[1].value;
+      self.CADCSAP_IBK_P1_D120_DAYSMR               := rt.Indicators(name = 'CADCSAP_IBK_P1_D120_DAYSMR')[1].value;
+      self.CADCSAP_IBK_P1_D120_DAYSLR               := rt.Indicators(name = 'CADCSAP_IBK_P1_D120_DAYSLR')[1].value;
+      self.CADCSAP_IBK_P1_D365_NUM                  := rt.Indicators(name = 'CADCSAP_IBK_P1_D365_NUM')[1].value;
+      self.CADCSAP_IBK_P1_D365_UNAME                := rt.Indicators(name = 'CADCSAP_IBK_P1_D365_UNAME')[1].value;
+      self.CADCSAP_IBK_P1_D365_UADD                 := rt.Indicators(name = 'CADCSAP_IBK_P1_D365_UADD')[1].value;
+      self.CADCSAP_IBK_P1_D365_UDOB                 := rt.Indicators(name = 'CADCSAP_IBK_P1_D365_UDOB')[1].value;
+      self.CADCSAP_IBK_P1_D365_UEMAIL               := rt.Indicators(name = 'CADCSAP_IBK_P1_D365_UEMAIL')[1].value;
+      self.CADCSAP_IBK_P1_D365_DAYSMR               := rt.Indicators(name = 'CADCSAP_IBK_P1_D365_DAYSMR')[1].value;
+      self.CADCSAP_IBK_P1_D365_DAYSLR               := rt.Indicators(name = 'CADCSAP_IBK_P1_D365_DAYSLR')[1].value;
+      self.CADCSAP_IBK_P1_D1095_NUM                 := rt.Indicators(name = 'CADCSAP_IBK_P1_D1095_NUM')[1].value;
+      self.CADCSAP_IBK_P1_D1095_UNAME               := rt.Indicators(name = 'CADCSAP_IBK_P1_D1095_UNAME')[1].value;
+      self.CADCSAP_IBK_P1_D1095_UADD                := rt.Indicators(name = 'CADCSAP_IBK_P1_D1095_UADD')[1].value;
+      self.CADCSAP_IBK_P1_D1095_UDOB                := rt.Indicators(name = 'CADCSAP_IBK_P1_D1095_UDOB')[1].value;
+      self.CADCSAP_IBK_P1_D1095_UEMAIL              := rt.Indicators(name = 'CADCSAP_IBK_P1_D1095_UEMAIL')[1].value;
+      self.CADCSAP_IBK_P1_D1095_DAYSMR              := rt.Indicators(name = 'CADCSAP_IBK_P1_D1095_DAYSMR')[1].value;
+      self.CADCSAP_IBK_P1_D1095_DAYSLR              := rt.Indicators(name = 'CADCSAP_IBK_P1_D1095_DAYSLR')[1].value;
+      self.CADCSAP_IBK_PX_D90_NUM                   := rt.Indicators(name = 'CADCSAP_IBK_PX_D90_NUM')[1].value;
+      self.CADCSAP_IBK_PX_D90_UNAME                 := rt.Indicators(name = 'CADCSAP_IBK_PX_D90_UNAME')[1].value;
+      self.CADCSAP_IBK_PX_D90_UADD                  := rt.Indicators(name = 'CADCSAP_IBK_PX_D90_UADD')[1].value;
+      self.CADCSAP_IBK_PX_D90_UHP                   := rt.Indicators(name = 'CADCSAP_IBK_PX_D90_UHP')[1].value;
+      self.CADCSAP_IBK_PX_D90_UDOB                  := rt.Indicators(name = 'CADCSAP_IBK_PX_D90_UDOB')[1].value;
+      self.CADCSAP_IBK_PX_D90_UEMAIL                := rt.Indicators(name = 'CADCSAP_IBK_PX_D90_UEMAIL')[1].value;
+      self.CADCSAP_IBK_PX_D90_DAYSMR                := rt.Indicators(name = 'CADCSAP_IBK_PX_D90_DAYSMR')[1].value;
+      self.CADCSAP_IBK_PX_D90_DAYSLR                := rt.Indicators(name = 'CADCSAP_IBK_PX_D90_DAYSLR')[1].value;
+      self.CADCSAP_IBK_PX_D120_NUM                  := rt.Indicators(name = 'CADCSAP_IBK_PX_D120_NUM')[1].value;
+      self.CADCSAP_IBK_PX_D120_UNAME                := rt.Indicators(name = 'CADCSAP_IBK_PX_D120_UNAME')[1].value;
+      self.CADCSAP_IBK_PX_D120_UADD                 := rt.Indicators(name = 'CADCSAP_IBK_PX_D120_UADD')[1].value;
+      self.CADCSAP_IBK_PX_D120_UHP                  := rt.Indicators(name = 'CADCSAP_IBK_PX_D120_UHP')[1].value;
+      self.CADCSAP_IBK_PX_D120_UDOB                 := rt.Indicators(name = 'CADCSAP_IBK_PX_D120_UDOB')[1].value;
+      self.CADCSAP_IBK_PX_D120_UEMAIL               := rt.Indicators(name = 'CADCSAP_IBK_PX_D120_UEMAIL')[1].value;
+      self.CADCSAP_IBK_PX_D120_DAYSMR               := rt.Indicators(name = 'CADCSAP_IBK_PX_D120_DAYSMR')[1].value;
+      self.CADCSAP_IBK_PX_D120_DAYSLR               := rt.Indicators(name = 'CADCSAP_IBK_PX_D120_DAYSLR')[1].value;
+      self.CADCSAP_IBK_PX_D365_NUM                  := rt.Indicators(name = 'CADCSAP_IBK_PX_D365_NUM')[1].value;
+      self.CADCSAP_IBK_PX_D365_UNAME                := rt.Indicators(name = 'CADCSAP_IBK_PX_D365_UNAME')[1].value;
+      self.CADCSAP_IBK_PX_D365_UADD                 := rt.Indicators(name = 'CADCSAP_IBK_PX_D365_UADD')[1].value;
+      self.CADCSAP_IBK_PX_D365_UHP                  := rt.Indicators(name = 'CADCSAP_IBK_PX_D365_UHP')[1].value;
+      self.CADCSAP_IBK_PX_D365_UDOB                 := rt.Indicators(name = 'CADCSAP_IBK_PX_D365_UDOB')[1].value;
+      self.CADCSAP_IBK_PX_D365_UEMAIL               := rt.Indicators(name = 'CADCSAP_IBK_PX_D365_UEMAIL')[1].value;
+      self.CADCSAP_IBK_PX_D365_DAYSMR               := rt.Indicators(name = 'CADCSAP_IBK_PX_D365_DAYSMR')[1].value;
+      self.CADCSAP_IBK_PX_D365_DAYSLR               := rt.Indicators(name = 'CADCSAP_IBK_PX_D365_DAYSLR')[1].value;
+      self.CADCSAP_IBK_PX_D1095_NUM                 := rt.Indicators(name = 'CADCSAP_IBK_PX_D1095_NUM')[1].value;
+      self.CADCSAP_IBK_PX_D1095_UNAME               := rt.Indicators(name = 'CADCSAP_IBK_PX_D1095_UNAME')[1].value;
+      self.CADCSAP_IBK_PX_D1095_UADD                := rt.Indicators(name = 'CADCSAP_IBK_PX_D1095_UADD')[1].value;
+      self.CADCSAP_IBK_PX_D1095_UHP                 := rt.Indicators(name = 'CADCSAP_IBK_PX_D1095_UHP')[1].value;
+      self.CADCSAP_IBK_PX_D1095_UDOB                := rt.Indicators(name = 'CADCSAP_IBK_PX_D1095_UDOB')[1].value;
+      self.CADCSAP_IBK_PX_D1095_UEMAIL              := rt.Indicators(name = 'CADCSAP_IBK_PX_D1095_UEMAIL')[1].value;
+      self.CADCSAP_IBK_PX_D1095_DAYSMR              := rt.Indicators(name = 'CADCSAP_IBK_PX_D1095_DAYSMR')[1].value;
+      self.CADCSAP_IBK_PX_D1095_DAYSLR              := rt.Indicators(name = 'CADCSAP_IBK_PX_D1095_DAYSLR')[1].value;
+      self.CADCSAP_IPD_S1_D90_NUM                   := rt.Indicators(name = 'CADCSAP_IPD_S1_D90_NUM')[1].value;
+      self.CADCSAP_IPD_S1_D90_UNAME                 := rt.Indicators(name = 'CADCSAP_IPD_S1_D90_UNAME')[1].value;
+      self.CADCSAP_IPD_S1_D90_UADD                  := rt.Indicators(name = 'CADCSAP_IPD_S1_D90_UADD')[1].value;
+      self.CADCSAP_IPD_S1_D90_UHP                   := rt.Indicators(name = 'CADCSAP_IPD_S1_D90_UHP')[1].value;
+      self.CADCSAP_IPD_S1_D90_UDOB                  := rt.Indicators(name = 'CADCSAP_IPD_S1_D90_UDOB')[1].value;
+      self.CADCSAP_IPD_S1_D90_UEMAIL                := rt.Indicators(name = 'CADCSAP_IPD_S1_D90_UEMAIL')[1].value;
+      self.CADCSAP_IPD_S1_D90_DAYSMR                := rt.Indicators(name = 'CADCSAP_IPD_S1_D90_DAYSMR')[1].value;
+      self.CADCSAP_IPD_S1_D90_DAYSLR                := rt.Indicators(name = 'CADCSAP_IPD_S1_D90_DAYSLR')[1].value;
+      self.CADCSAP_IPD_S1_D120_NUM                  := rt.Indicators(name = 'CADCSAP_IPD_S1_D120_NUM')[1].value;
+      self.CADCSAP_IPD_S1_D120_UNAME                := rt.Indicators(name = 'CADCSAP_IPD_S1_D120_UNAME')[1].value;
+      self.CADCSAP_IPD_S1_D120_UADD                 := rt.Indicators(name = 'CADCSAP_IPD_S1_D120_UADD')[1].value;
+      self.CADCSAP_IPD_S1_D120_UHP                  := rt.Indicators(name = 'CADCSAP_IPD_S1_D120_UHP')[1].value;
+      self.CADCSAP_IPD_S1_D120_UDOB                 := rt.Indicators(name = 'CADCSAP_IPD_S1_D120_UDOB')[1].value;
+      self.CADCSAP_IPD_S1_D120_UEMAIL               := rt.Indicators(name = 'CADCSAP_IPD_S1_D120_UEMAIL')[1].value;
+      self.CADCSAP_IPD_S1_D120_DAYSMR               := rt.Indicators(name = 'CADCSAP_IPD_S1_D120_DAYSMR')[1].value;
+      self.CADCSAP_IPD_S1_D120_DAYSLR               := rt.Indicators(name = 'CADCSAP_IPD_S1_D120_DAYSLR')[1].value;
+      self.CADCSAP_IPD_S1_D365_NUM                  := rt.Indicators(name = 'CADCSAP_IPD_S1_D365_NUM')[1].value;
+      self.CADCSAP_IPD_S1_D365_UNAME                := rt.Indicators(name = 'CADCSAP_IPD_S1_D365_UNAME')[1].value;
+      self.CADCSAP_IPD_S1_D365_UADD                 := rt.Indicators(name = 'CADCSAP_IPD_S1_D365_UADD')[1].value;
+      self.CADCSAP_IPD_S1_D365_UHP                  := rt.Indicators(name = 'CADCSAP_IPD_S1_D365_UHP')[1].value;
+      self.CADCSAP_IPD_S1_D365_UDOB                 := rt.Indicators(name = 'CADCSAP_IPD_S1_D365_UDOB')[1].value;
+      self.CADCSAP_IPD_S1_D365_UEMAIL               := rt.Indicators(name = 'CADCSAP_IPD_S1_D365_UEMAIL')[1].value;
+      self.CADCSAP_IPD_S1_D365_DAYSMR               := rt.Indicators(name = 'CADCSAP_IPD_S1_D365_DAYSMR')[1].value;
+      self.CADCSAP_IPD_S1_D365_DAYSLR               := rt.Indicators(name = 'CADCSAP_IPD_S1_D365_DAYSLR')[1].value;
+      self.CADCSAP_IPD_S1_D1095_NUM                 := rt.Indicators(name = 'CADCSAP_IPD_S1_D1095_NUM')[1].value;
+      self.CADCSAP_IPD_S1_D1095_UNAME               := rt.Indicators(name = 'CADCSAP_IPD_S1_D1095_UNAME')[1].value;
+      self.CADCSAP_IPD_S1_D1095_UADD                := rt.Indicators(name = 'CADCSAP_IPD_S1_D1095_UADD')[1].value;
+      self.CADCSAP_IPD_S1_D1095_UHP                 := rt.Indicators(name = 'CADCSAP_IPD_S1_D1095_UHP')[1].value;
+      self.CADCSAP_IPD_S1_D1095_UDOB                := rt.Indicators(name = 'CADCSAP_IPD_S1_D1095_UDOB')[1].value;
+      self.CADCSAP_IPD_S1_D1095_UEMAIL              := rt.Indicators(name = 'CADCSAP_IPD_S1_D1095_UEMAIL')[1].value;
+      self.CADCSAP_IPD_S1_D1095_DAYSMR              := rt.Indicators(name = 'CADCSAP_IPD_S1_D1095_DAYSMR')[1].value;
+      self.CADCSAP_IPD_S1_D1095_DAYSLR              := rt.Indicators(name = 'CADCSAP_IPD_S1_D1095_DAYSLR')[1].value;
+      self.CADCSAP_IPD_A1_D90_NUM                   := rt.Indicators(name = 'CADCSAP_IPD_A1_D90_NUM')[1].value;
+      self.CADCSAP_IPD_A1_D90_UNAME                 := rt.Indicators(name = 'CADCSAP_IPD_A1_D90_UNAME')[1].value;
+      self.CADCSAP_IPD_A1_D90_UHP                   := rt.Indicators(name = 'CADCSAP_IPD_A1_D90_UHP')[1].value;
+      self.CADCSAP_IPD_A1_D90_UDOB                  := rt.Indicators(name = 'CADCSAP_IPD_A1_D90_UDOB')[1].value;
+      self.CADCSAP_IPD_A1_D90_UEMAIL                := rt.Indicators(name = 'CADCSAP_IPD_A1_D90_UEMAIL')[1].value;
+      self.CADCSAP_IPD_A1_D90_DAYSMR                := rt.Indicators(name = 'CADCSAP_IPD_A1_D90_DAYSMR')[1].value;
+      self.CADCSAP_IPD_A1_D90_DAYSLR                := rt.Indicators(name = 'CADCSAP_IPD_A1_D90_DAYSLR')[1].value;
+      self.CADCSAP_IPD_A1_D120_NUM                  := rt.Indicators(name = 'CADCSAP_IPD_A1_D120_NUM')[1].value;
+      self.CADCSAP_IPD_A1_D120_UNAME                := rt.Indicators(name = 'CADCSAP_IPD_A1_D120_UNAME')[1].value;
+      self.CADCSAP_IPD_A1_D120_UHP                  := rt.Indicators(name = 'CADCSAP_IPD_A1_D120_UHP')[1].value;
+      self.CADCSAP_IPD_A1_D120_UDOB                 := rt.Indicators(name = 'CADCSAP_IPD_A1_D120_UDOB')[1].value;
+      self.CADCSAP_IPD_A1_D120_UEMAIL               := rt.Indicators(name = 'CADCSAP_IPD_A1_D120_UEMAIL')[1].value;
+      self.CADCSAP_IPD_A1_D120_DAYSMR               := rt.Indicators(name = 'CADCSAP_IPD_A1_D120_DAYSMR')[1].value;
+      self.CADCSAP_IPD_A1_D120_DAYSLR               := rt.Indicators(name = 'CADCSAP_IPD_A1_D120_DAYSLR')[1].value;
+      self.CADCSAP_IPD_A1_D365_NUM                  := rt.Indicators(name = 'CADCSAP_IPD_A1_D365_NUM')[1].value;
+      self.CADCSAP_IPD_A1_D365_UNAME                := rt.Indicators(name = 'CADCSAP_IPD_A1_D365_UNAME')[1].value;
+      self.CADCSAP_IPD_A1_D365_UHP                  := rt.Indicators(name = 'CADCSAP_IPD_A1_D365_UHP')[1].value;
+      self.CADCSAP_IPD_A1_D365_UDOB                 := rt.Indicators(name = 'CADCSAP_IPD_A1_D365_UDOB')[1].value;
+      self.CADCSAP_IPD_A1_D365_UEMAIL               := rt.Indicators(name = 'CADCSAP_IPD_A1_D365_UEMAIL')[1].value;
+      self.CADCSAP_IPD_A1_D365_DAYSMR               := rt.Indicators(name = 'CADCSAP_IPD_A1_D365_DAYSMR')[1].value;
+      self.CADCSAP_IPD_A1_D365_DAYSLR               := rt.Indicators(name = 'CADCSAP_IPD_A1_D365_DAYSLR')[1].value;
+      self.CADCSAP_IPD_A1_D1095_NUM                 := rt.Indicators(name = 'CADCSAP_IPD_A1_D1095_NUM')[1].value;
+      self.CADCSAP_IPD_A1_D1095_UNAME               := rt.Indicators(name = 'CADCSAP_IPD_A1_D1095_UNAME')[1].value;
+      self.CADCSAP_IPD_A1_D1095_UHP                 := rt.Indicators(name = 'CADCSAP_IPD_A1_D1095_UHP')[1].value;
+      self.CADCSAP_IPD_A1_D1095_UDOB                := rt.Indicators(name = 'CADCSAP_IPD_A1_D1095_UDOB')[1].value;
+      self.CADCSAP_IPD_A1_D1095_UEMAIL              := rt.Indicators(name = 'CADCSAP_IPD_A1_D1095_UEMAIL')[1].value;
+      self.CADCSAP_IPD_A1_D1095_DAYSMR              := rt.Indicators(name = 'CADCSAP_IPD_A1_D1095_DAYSMR')[1].value;
+      self.CADCSAP_IPD_A1_D1095_DAYSLR              := rt.Indicators(name = 'CADCSAP_IPD_A1_D1095_DAYSLR')[1].value;
+      self.CADCSAP_IPD_P1_D90_NUM                   := rt.Indicators(name = 'CADCSAP_IPD_P1_D90_NUM')[1].value;
+      self.CADCSAP_IPD_P1_D90_UNAME                 := rt.Indicators(name = 'CADCSAP_IPD_P1_D90_UNAME')[1].value;
+      self.CADCSAP_IPD_P1_D90_UADD                  := rt.Indicators(name = 'CADCSAP_IPD_P1_D90_UADD')[1].value;
+      self.CADCSAP_IPD_P1_D90_UDOB                  := rt.Indicators(name = 'CADCSAP_IPD_P1_D90_UDOB')[1].value;
+      self.CADCSAP_IPD_P1_D90_UEMAIL                := rt.Indicators(name = 'CADCSAP_IPD_P1_D90_UEMAIL')[1].value;
+      self.CADCSAP_IPD_P1_D90_DAYSMR                := rt.Indicators(name = 'CADCSAP_IPD_P1_D90_DAYSMR')[1].value;
+      self.CADCSAP_IPD_P1_D90_DAYSLR                := rt.Indicators(name = 'CADCSAP_IPD_P1_D90_DAYSLR')[1].value;
+      self.CADCSAP_IPD_P1_D120_NUM                  := rt.Indicators(name = 'CADCSAP_IPD_P1_D120_NUM')[1].value;
+      self.CADCSAP_IPD_P1_D120_UNAME                := rt.Indicators(name = 'CADCSAP_IPD_P1_D120_UNAME')[1].value;
+      self.CADCSAP_IPD_P1_D120_UADD                 := rt.Indicators(name = 'CADCSAP_IPD_P1_D120_UADD')[1].value;
+      self.CADCSAP_IPD_P1_D120_UDOB                 := rt.Indicators(name = 'CADCSAP_IPD_P1_D120_UDOB')[1].value;
+      self.CADCSAP_IPD_P1_D120_UEMAIL               := rt.Indicators(name = 'CADCSAP_IPD_P1_D120_UEMAIL')[1].value;
+      self.CADCSAP_IPD_P1_D120_DAYSMR               := rt.Indicators(name = 'CADCSAP_IPD_P1_D120_DAYSMR')[1].value;
+      self.CADCSAP_IPD_P1_D120_DAYSLR               := rt.Indicators(name = 'CADCSAP_IPD_P1_D120_DAYSLR')[1].value;
+      self.CADCSAP_IPD_P1_D365_NUM                  := rt.Indicators(name = 'CADCSAP_IPD_P1_D365_NUM')[1].value;
+      self.CADCSAP_IPD_P1_D365_UNAME                := rt.Indicators(name = 'CADCSAP_IPD_P1_D365_UNAME')[1].value;
+      self.CADCSAP_IPD_P1_D365_UADD                 := rt.Indicators(name = 'CADCSAP_IPD_P1_D365_UADD')[1].value;
+      self.CADCSAP_IPD_P1_D365_UDOB                 := rt.Indicators(name = 'CADCSAP_IPD_P1_D365_UDOB')[1].value;
+      self.CADCSAP_IPD_P1_D365_UEMAIL               := rt.Indicators(name = 'CADCSAP_IPD_P1_D365_UEMAIL')[1].value;
+      self.CADCSAP_IPD_P1_D365_DAYSMR               := rt.Indicators(name = 'CADCSAP_IPD_P1_D365_DAYSMR')[1].value;
+      self.CADCSAP_IPD_P1_D365_DAYSLR               := rt.Indicators(name = 'CADCSAP_IPD_P1_D365_DAYSLR')[1].value;
+      self.CADCSAP_IPD_P1_D1095_NUM                 := rt.Indicators(name = 'CADCSAP_IPD_P1_D1095_NUM')[1].value;
+      self.CADCSAP_IPD_P1_D1095_UNAME               := rt.Indicators(name = 'CADCSAP_IPD_P1_D1095_UNAME')[1].value;
+      self.CADCSAP_IPD_P1_D1095_UADD                := rt.Indicators(name = 'CADCSAP_IPD_P1_D1095_UADD')[1].value;
+      self.CADCSAP_IPD_P1_D1095_UDOB                := rt.Indicators(name = 'CADCSAP_IPD_P1_D1095_UDOB')[1].value;
+      self.CADCSAP_IPD_P1_D1095_UEMAIL              := rt.Indicators(name = 'CADCSAP_IPD_P1_D1095_UEMAIL')[1].value;
+      self.CADCSAP_IPD_P1_D1095_DAYSMR              := rt.Indicators(name = 'CADCSAP_IPD_P1_D1095_DAYSMR')[1].value;
+      self.CADCSAP_IPD_P1_D1095_DAYSLR              := rt.Indicators(name = 'CADCSAP_IPD_P1_D1095_DAYSLR')[1].value;
+      self.CADCSAP_IPD_PX_D90_NUM                   := rt.Indicators(name = 'CADCSAP_IPD_PX_D90_NUM')[1].value;
+      self.CADCSAP_IPD_PX_D90_UNAME                 := rt.Indicators(name = 'CADCSAP_IPD_PX_D90_UNAME')[1].value;
+      self.CADCSAP_IPD_PX_D90_UADD                  := rt.Indicators(name = 'CADCSAP_IPD_PX_D90_UADD')[1].value;
+      self.CADCSAP_IPD_PX_D90_UHP                   := rt.Indicators(name = 'CADCSAP_IPD_PX_D90_UHP')[1].value;
+      self.CADCSAP_IPD_PX_D90_UDOB                  := rt.Indicators(name = 'CADCSAP_IPD_PX_D90_UDOB')[1].value;
+      self.CADCSAP_IPD_PX_D90_UEMAIL                := rt.Indicators(name = 'CADCSAP_IPD_PX_D90_UEMAIL')[1].value;
+      self.CADCSAP_IPD_PX_D90_DAYSMR                := rt.Indicators(name = 'CADCSAP_IPD_PX_D90_DAYSMR')[1].value;
+      self.CADCSAP_IPD_PX_D90_DAYSLR                := rt.Indicators(name = 'CADCSAP_IPD_PX_D90_DAYSLR')[1].value;
+      self.CADCSAP_IPD_PX_D120_NUM                  := rt.Indicators(name = 'CADCSAP_IPD_PX_D120_NUM')[1].value;
+      self.CADCSAP_IPD_PX_D120_UNAME                := rt.Indicators(name = 'CADCSAP_IPD_PX_D120_UNAME')[1].value;
+      self.CADCSAP_IPD_PX_D120_UADD                 := rt.Indicators(name = 'CADCSAP_IPD_PX_D120_UADD')[1].value;
+      self.CADCSAP_IPD_PX_D120_UHP                  := rt.Indicators(name = 'CADCSAP_IPD_PX_D120_UHP')[1].value;
+      self.CADCSAP_IPD_PX_D120_UDOB                 := rt.Indicators(name = 'CADCSAP_IPD_PX_D120_UDOB')[1].value;
+      self.CADCSAP_IPD_PX_D120_UEMAIL               := rt.Indicators(name = 'CADCSAP_IPD_PX_D120_UEMAIL')[1].value;
+      self.CADCSAP_IPD_PX_D120_DAYSMR               := rt.Indicators(name = 'CADCSAP_IPD_PX_D120_DAYSMR')[1].value;
+      self.CADCSAP_IPD_PX_D120_DAYSLR               := rt.Indicators(name = 'CADCSAP_IPD_PX_D120_DAYSLR')[1].value;
+      self.CADCSAP_IPD_PX_D365_NUM                  := rt.Indicators(name = 'CADCSAP_IPD_PX_D365_NUM')[1].value;
+      self.CADCSAP_IPD_PX_D365_UNAME                := rt.Indicators(name = 'CADCSAP_IPD_PX_D365_UNAME')[1].value;
+      self.CADCSAP_IPD_PX_D365_UADD                 := rt.Indicators(name = 'CADCSAP_IPD_PX_D365_UADD')[1].value;
+      self.CADCSAP_IPD_PX_D365_UHP                  := rt.Indicators(name = 'CADCSAP_IPD_PX_D365_UHP')[1].value;
+      self.CADCSAP_IPD_PX_D365_UDOB                 := rt.Indicators(name = 'CADCSAP_IPD_PX_D365_UDOB')[1].value;
+      self.CADCSAP_IPD_PX_D365_UEMAIL               := rt.Indicators(name = 'CADCSAP_IPD_PX_D365_UEMAIL')[1].value;
+      self.CADCSAP_IPD_PX_D365_DAYSMR               := rt.Indicators(name = 'CADCSAP_IPD_PX_D365_DAYSMR')[1].value;
+      self.CADCSAP_IPD_PX_D365_DAYSLR               := rt.Indicators(name = 'CADCSAP_IPD_PX_D365_DAYSLR')[1].value;
+      self.CADCSAP_IPD_PX_D1095_NUM                 := rt.Indicators(name = 'CADCSAP_IPD_PX_D1095_NUM')[1].value;
+      self.CADCSAP_IPD_PX_D1095_UNAME               := rt.Indicators(name = 'CADCSAP_IPD_PX_D1095_UNAME')[1].value;
+      self.CADCSAP_IPD_PX_D1095_UADD                := rt.Indicators(name = 'CADCSAP_IPD_PX_D1095_UADD')[1].value;
+      self.CADCSAP_IPD_PX_D1095_UHP                 := rt.Indicators(name = 'CADCSAP_IPD_PX_D1095_UHP')[1].value;
+      self.CADCSAP_IPD_PX_D1095_UDOB                := rt.Indicators(name = 'CADCSAP_IPD_PX_D1095_UDOB')[1].value;
+      self.CADCSAP_IPD_PX_D1095_UEMAIL              := rt.Indicators(name = 'CADCSAP_IPD_PX_D1095_UEMAIL')[1].value;
+      self.CADCSAP_IPD_PX_D1095_DAYSMR              := rt.Indicators(name = 'CADCSAP_IPD_PX_D1095_DAYSMR')[1].value;
+      self.CADCSAP_IPD_PX_D1095_DAYSLR              := rt.Indicators(name = 'CADCSAP_IPD_PX_D1095_DAYSLR')[1].value;
+      self.CADCSAP_IX_S1_D90_NUM                    := rt.Indicators(name = 'CADCSAP_IX_S1_D90_NUM')[1].value;
+      self.CADCSAP_IX_S1_D90_UNAME                  := rt.Indicators(name = 'CADCSAP_IX_S1_D90_UNAME')[1].value;
+      self.CADCSAP_IX_S1_D90_UADD                   := rt.Indicators(name = 'CADCSAP_IX_S1_D90_UADD')[1].value;
+      self.CADCSAP_IX_S1_D90_UHP                    := rt.Indicators(name = 'CADCSAP_IX_S1_D90_UHP')[1].value;
+      self.CADCSAP_IX_S1_D90_UDOB                   := rt.Indicators(name = 'CADCSAP_IX_S1_D90_UDOB')[1].value;
+      self.CADCSAP_IX_S1_D90_UEMAIL                 := rt.Indicators(name = 'CADCSAP_IX_S1_D90_UEMAIL')[1].value;
+      self.CADCSAP_IX_S1_D90_DAYSMR                 := rt.Indicators(name = 'CADCSAP_IX_S1_D90_DAYSMR')[1].value;
+      self.CADCSAP_IX_S1_D90_DAYSLR                 := rt.Indicators(name = 'CADCSAP_IX_S1_D90_DAYSLR')[1].value;
+      self.CADCSAP_IX_S1_D120_NUM                   := rt.Indicators(name = 'CADCSAP_IX_S1_D120_NUM')[1].value;
+      self.CADCSAP_IX_S1_D120_UNAME                 := rt.Indicators(name = 'CADCSAP_IX_S1_D120_UNAME')[1].value;
+      self.CADCSAP_IX_S1_D120_UADD                  := rt.Indicators(name = 'CADCSAP_IX_S1_D120_UADD')[1].value;
+      self.CADCSAP_IX_S1_D120_UHP                   := rt.Indicators(name = 'CADCSAP_IX_S1_D120_UHP')[1].value;
+      self.CADCSAP_IX_S1_D120_UDOB                  := rt.Indicators(name = 'CADCSAP_IX_S1_D120_UDOB')[1].value;
+      self.CADCSAP_IX_S1_D120_UEMAIL                := rt.Indicators(name = 'CADCSAP_IX_S1_D120_UEMAIL')[1].value;
+      self.CADCSAP_IX_S1_D120_DAYSMR                := rt.Indicators(name = 'CADCSAP_IX_S1_D120_DAYSMR')[1].value;
+      self.CADCSAP_IX_S1_D120_DAYSLR                := rt.Indicators(name = 'CADCSAP_IX_S1_D120_DAYSLR')[1].value;
+      self.CADCSAP_IX_S1_D365_NUM                   := rt.Indicators(name = 'CADCSAP_IX_S1_D365_NUM')[1].value;
+      self.CADCSAP_IX_S1_D365_UNAME                 := rt.Indicators(name = 'CADCSAP_IX_S1_D365_UNAME')[1].value;
+      self.CADCSAP_IX_S1_D365_UADD                  := rt.Indicators(name = 'CADCSAP_IX_S1_D365_UADD')[1].value;
+      self.CADCSAP_IX_S1_D365_UHP                   := rt.Indicators(name = 'CADCSAP_IX_S1_D365_UHP')[1].value;
+      self.CADCSAP_IX_S1_D365_UDOB                  := rt.Indicators(name = 'CADCSAP_IX_S1_D365_UDOB')[1].value;
+      self.CADCSAP_IX_S1_D365_UEMAIL                := rt.Indicators(name = 'CADCSAP_IX_S1_D365_UEMAIL')[1].value;
+      self.CADCSAP_IX_S1_D365_DAYSMR                := rt.Indicators(name = 'CADCSAP_IX_S1_D365_DAYSMR')[1].value;
+      self.CADCSAP_IX_S1_D365_DAYSLR                := rt.Indicators(name = 'CADCSAP_IX_S1_D365_DAYSLR')[1].value;
+      self.CADCSAP_IX_S1_D1095_NUM                  := rt.Indicators(name = 'CADCSAP_IX_S1_D1095_NUM')[1].value;
+      self.CADCSAP_IX_S1_D1095_UNAME                := rt.Indicators(name = 'CADCSAP_IX_S1_D1095_UNAME')[1].value;
+      self.CADCSAP_IX_S1_D1095_UADD                 := rt.Indicators(name = 'CADCSAP_IX_S1_D1095_UADD')[1].value;
+      self.CADCSAP_IX_S1_D1095_UHP                  := rt.Indicators(name = 'CADCSAP_IX_S1_D1095_UHP')[1].value;
+      self.CADCSAP_IX_S1_D1095_UDOB                 := rt.Indicators(name = 'CADCSAP_IX_S1_D1095_UDOB')[1].value;
+      self.CADCSAP_IX_S1_D1095_UEMAIL               := rt.Indicators(name = 'CADCSAP_IX_S1_D1095_UEMAIL')[1].value;
+      self.CADCSAP_IX_S1_D1095_DAYSMR               := rt.Indicators(name = 'CADCSAP_IX_S1_D1095_DAYSMR')[1].value;
+      self.CADCSAP_IX_S1_D1095_DAYSLR               := rt.Indicators(name = 'CADCSAP_IX_S1_D1095_DAYSLR')[1].value;
+      self.CADCSAP_IX_A1_D90_NUM                    := rt.Indicators(name = 'CADCSAP_IX_A1_D90_NUM')[1].value;
+      self.CADCSAP_IX_A1_D90_UNAME                  := rt.Indicators(name = 'CADCSAP_IX_A1_D90_UNAME')[1].value;
+      self.CADCSAP_IX_A1_D90_UHP                    := rt.Indicators(name = 'CADCSAP_IX_A1_D90_UHP')[1].value;
+      self.CADCSAP_IX_A1_D90_UDOB                   := rt.Indicators(name = 'CADCSAP_IX_A1_D90_UDOB')[1].value;
+      self.CADCSAP_IX_A1_D90_UEMAIL                 := rt.Indicators(name = 'CADCSAP_IX_A1_D90_UEMAIL')[1].value;
+      self.CADCSAP_IX_A1_D90_DAYSMR                 := rt.Indicators(name = 'CADCSAP_IX_A1_D90_DAYSMR')[1].value;
+      self.CADCSAP_IX_A1_D90_DAYSLR                 := rt.Indicators(name = 'CADCSAP_IX_A1_D90_DAYSLR')[1].value;
+      self.CADCSAP_IX_A1_D120_NUM                   := rt.Indicators(name = 'CADCSAP_IX_A1_D120_NUM')[1].value;
+      self.CADCSAP_IX_A1_D120_UNAME                 := rt.Indicators(name = 'CADCSAP_IX_A1_D120_UNAME')[1].value;
+      self.CADCSAP_IX_A1_D120_UHP                   := rt.Indicators(name = 'CADCSAP_IX_A1_D120_UHP')[1].value;
+      self.CADCSAP_IX_A1_D120_UDOB                  := rt.Indicators(name = 'CADCSAP_IX_A1_D120_UDOB')[1].value;
+      self.CADCSAP_IX_A1_D120_UEMAIL                := rt.Indicators(name = 'CADCSAP_IX_A1_D120_UEMAIL')[1].value;
+      self.CADCSAP_IX_A1_D120_DAYSMR                := rt.Indicators(name = 'CADCSAP_IX_A1_D120_DAYSMR')[1].value;
+      self.CADCSAP_IX_A1_D120_DAYSLR                := rt.Indicators(name = 'CADCSAP_IX_A1_D120_DAYSLR')[1].value;
+      self.CADCSAP_IX_A1_D365_NUM                   := rt.Indicators(name = 'CADCSAP_IX_A1_D365_NUM')[1].value;
+      self.CADCSAP_IX_A1_D365_UNAME                 := rt.Indicators(name = 'CADCSAP_IX_A1_D365_UNAME')[1].value;
+      self.CADCSAP_IX_A1_D365_UHP                   := rt.Indicators(name = 'CADCSAP_IX_A1_D365_UHP')[1].value;
+      self.CADCSAP_IX_A1_D365_UDOB                  := rt.Indicators(name = 'CADCSAP_IX_A1_D365_UDOB')[1].value;
+      self.CADCSAP_IX_A1_D365_UEMAIL                := rt.Indicators(name = 'CADCSAP_IX_A1_D365_UEMAIL')[1].value;
+      self.CADCSAP_IX_A1_D365_DAYSMR                := rt.Indicators(name = 'CADCSAP_IX_A1_D365_DAYSMR')[1].value;
+      self.CADCSAP_IX_A1_D365_DAYSLR                := rt.Indicators(name = 'CADCSAP_IX_A1_D365_DAYSLR')[1].value;
+      self.CADCSAP_IX_A1_D1095_NUM                  := rt.Indicators(name = 'CADCSAP_IX_A1_D1095_NUM')[1].value;
+      self.CADCSAP_IX_A1_D1095_UNAME                := rt.Indicators(name = 'CADCSAP_IX_A1_D1095_UNAME')[1].value;
+      self.CADCSAP_IX_A1_D1095_UHP                  := rt.Indicators(name = 'CADCSAP_IX_A1_D1095_UHP')[1].value;
+      self.CADCSAP_IX_A1_D1095_UDOB                 := rt.Indicators(name = 'CADCSAP_IX_A1_D1095_UDOB')[1].value;
+      self.CADCSAP_IX_A1_D1095_UEMAIL               := rt.Indicators(name = 'CADCSAP_IX_A1_D1095_UEMAIL')[1].value;
+      self.CADCSAP_IX_A1_D1095_DAYSMR               := rt.Indicators(name = 'CADCSAP_IX_A1_D1095_DAYSMR')[1].value;
+      self.CADCSAP_IX_A1_D1095_DAYSLR               := rt.Indicators(name = 'CADCSAP_IX_A1_D1095_DAYSLR')[1].value;
+      self.CADCSAP_IX_P1_D90_NUM                    := rt.Indicators(name = 'CADCSAP_IX_P1_D90_NUM')[1].value;
+      self.CADCSAP_IX_P1_D90_UNAME                  := rt.Indicators(name = 'CADCSAP_IX_P1_D90_UNAME')[1].value;
+      self.CADCSAP_IX_P1_D90_UADD                   := rt.Indicators(name = 'CADCSAP_IX_P1_D90_UADD')[1].value;
+      self.CADCSAP_IX_P1_D90_UDOB                   := rt.Indicators(name = 'CADCSAP_IX_P1_D90_UDOB')[1].value;
+      self.CADCSAP_IX_P1_D90_UEMAIL                 := rt.Indicators(name = 'CADCSAP_IX_P1_D90_UEMAIL')[1].value;
+      self.CADCSAP_IX_P1_D90_DAYSMR                 := rt.Indicators(name = 'CADCSAP_IX_P1_D90_DAYSMR')[1].value;
+      self.CADCSAP_IX_P1_D90_DAYSLR                 := rt.Indicators(name = 'CADCSAP_IX_P1_D90_DAYSLR')[1].value;
+      self.CADCSAP_IX_P1_D120_NUM                   := rt.Indicators(name = 'CADCSAP_IX_P1_D120_NUM')[1].value;
+      self.CADCSAP_IX_P1_D120_UNAME                 := rt.Indicators(name = 'CADCSAP_IX_P1_D120_UNAME')[1].value;
+      self.CADCSAP_IX_P1_D120_UADD                  := rt.Indicators(name = 'CADCSAP_IX_P1_D120_UADD')[1].value;
+      self.CADCSAP_IX_P1_D120_UDOB                  := rt.Indicators(name = 'CADCSAP_IX_P1_D120_UDOB')[1].value;
+      self.CADCSAP_IX_P1_D120_UEMAIL                := rt.Indicators(name = 'CADCSAP_IX_P1_D120_UEMAIL')[1].value;
+      self.CADCSAP_IX_P1_D120_DAYSMR                := rt.Indicators(name = 'CADCSAP_IX_P1_D120_DAYSMR')[1].value;
+      self.CADCSAP_IX_P1_D120_DAYSLR                := rt.Indicators(name = 'CADCSAP_IX_P1_D120_DAYSLR')[1].value;
+      self.CADCSAP_IX_P1_D365_NUM                   := rt.Indicators(name = 'CADCSAP_IX_P1_D365_NUM')[1].value;
+      self.CADCSAP_IX_P1_D365_UNAME                 := rt.Indicators(name = 'CADCSAP_IX_P1_D365_UNAME')[1].value;
+      self.CADCSAP_IX_P1_D365_UADD                  := rt.Indicators(name = 'CADCSAP_IX_P1_D365_UADD')[1].value;
+      self.CADCSAP_IX_P1_D365_UDOB                  := rt.Indicators(name = 'CADCSAP_IX_P1_D365_UDOB')[1].value;
+      self.CADCSAP_IX_P1_D365_UEMAIL                := rt.Indicators(name = 'CADCSAP_IX_P1_D365_UEMAIL')[1].value;
+      self.CADCSAP_IX_P1_D365_DAYSMR                := rt.Indicators(name = 'CADCSAP_IX_P1_D365_DAYSMR')[1].value;
+      self.CADCSAP_IX_P1_D365_DAYSLR                := rt.Indicators(name = 'CADCSAP_IX_P1_D365_DAYSLR')[1].value;
+      self.CADCSAP_IX_P1_D1095_NUM                  := rt.Indicators(name = 'CADCSAP_IX_P1_D1095_NUM')[1].value;
+      self.CADCSAP_IX_P1_D1095_UNAME                := rt.Indicators(name = 'CADCSAP_IX_P1_D1095_UNAME')[1].value;
+      self.CADCSAP_IX_P1_D1095_UADD                 := rt.Indicators(name = 'CADCSAP_IX_P1_D1095_UADD')[1].value;
+      self.CADCSAP_IX_P1_D1095_UDOB                 := rt.Indicators(name = 'CADCSAP_IX_P1_D1095_UDOB')[1].value;
+      self.CADCSAP_IX_P1_D1095_UEMAIL               := rt.Indicators(name = 'CADCSAP_IX_P1_D1095_UEMAIL')[1].value;
+      self.CADCSAP_IX_P1_D1095_DAYSMR               := rt.Indicators(name = 'CADCSAP_IX_P1_D1095_DAYSMR')[1].value;
+      self.CADCSAP_IX_P1_D1095_DAYSLR               := rt.Indicators(name = 'CADCSAP_IX_P1_D1095_DAYSLR')[1].value;
+      self.CADCSAP_IX_PX_D90_NUM                    := rt.Indicators(name = 'CADCSAP_IX_PX_D90_NUM')[1].value;
+      self.CADCSAP_IX_PX_D90_UNAME                  := rt.Indicators(name = 'CADCSAP_IX_PX_D90_UNAME')[1].value;
+      self.CADCSAP_IX_PX_D90_UADD                   := rt.Indicators(name = 'CADCSAP_IX_PX_D90_UADD')[1].value;
+      self.CADCSAP_IX_PX_D90_UHP                    := rt.Indicators(name = 'CADCSAP_IX_PX_D90_UHP')[1].value;
+      self.CADCSAP_IX_PX_D90_UDOB                   := rt.Indicators(name = 'CADCSAP_IX_PX_D90_UDOB')[1].value;
+      self.CADCSAP_IX_PX_D90_UEMAIL                 := rt.Indicators(name = 'CADCSAP_IX_PX_D90_UEMAIL')[1].value;
+      self.CADCSAP_IX_PX_D90_DAYSMR                 := rt.Indicators(name = 'CADCSAP_IX_PX_D90_DAYSMR')[1].value;
+      self.CADCSAP_IX_PX_D90_DAYSLR                 := rt.Indicators(name = 'CADCSAP_IX_PX_D90_DAYSLR')[1].value;
+      self.CADCSAP_IX_PX_D120_NUM                   := rt.Indicators(name = 'CADCSAP_IX_PX_D120_NUM')[1].value;
+      self.CADCSAP_IX_PX_D120_UNAME                 := rt.Indicators(name = 'CADCSAP_IX_PX_D120_UNAME')[1].value;
+      self.CADCSAP_IX_PX_D120_UADD                  := rt.Indicators(name = 'CADCSAP_IX_PX_D120_UADD')[1].value;
+      self.CADCSAP_IX_PX_D120_UHP                   := rt.Indicators(name = 'CADCSAP_IX_PX_D120_UHP')[1].value;
+      self.CADCSAP_IX_PX_D120_UDOB                  := rt.Indicators(name = 'CADCSAP_IX_PX_D120_UDOB')[1].value;
+      self.CADCSAP_IX_PX_D120_UEMAIL                := rt.Indicators(name = 'CADCSAP_IX_PX_D120_UEMAIL')[1].value;
+      self.CADCSAP_IX_PX_D120_DAYSMR                := rt.Indicators(name = 'CADCSAP_IX_PX_D120_DAYSMR')[1].value;
+      self.CADCSAP_IX_PX_D120_DAYSLR                := rt.Indicators(name = 'CADCSAP_IX_PX_D120_DAYSLR')[1].value;
+      self.CADCSAP_IX_PX_D365_NUM                   := rt.Indicators(name = 'CADCSAP_IX_PX_D365_NUM')[1].value;
+      self.CADCSAP_IX_PX_D365_UNAME                 := rt.Indicators(name = 'CADCSAP_IX_PX_D365_UNAME')[1].value;
+      self.CADCSAP_IX_PX_D365_UADD                  := rt.Indicators(name = 'CADCSAP_IX_PX_D365_UADD')[1].value;
+      self.CADCSAP_IX_PX_D365_UHP                   := rt.Indicators(name = 'CADCSAP_IX_PX_D365_UHP')[1].value;
+      self.CADCSAP_IX_PX_D365_UDOB                  := rt.Indicators(name = 'CADCSAP_IX_PX_D365_UDOB')[1].value;
+      self.CADCSAP_IX_PX_D365_UEMAIL                := rt.Indicators(name = 'CADCSAP_IX_PX_D365_UEMAIL')[1].value;
+      self.CADCSAP_IX_PX_D365_DAYSMR                := rt.Indicators(name = 'CADCSAP_IX_PX_D365_DAYSMR')[1].value;
+      self.CADCSAP_IX_PX_D365_DAYSLR                := rt.Indicators(name = 'CADCSAP_IX_PX_D365_DAYSLR')[1].value;
+      self.CADCSAP_IX_PX_D1095_NUM                  := rt.Indicators(name = 'CADCSAP_IX_PX_D1095_NUM')[1].value;
+      self.CADCSAP_IX_PX_D1095_UNAME                := rt.Indicators(name = 'CADCSAP_IX_PX_D1095_UNAME')[1].value;
+      self.CADCSAP_IX_PX_D1095_UADD                 := rt.Indicators(name = 'CADCSAP_IX_PX_D1095_UADD')[1].value;
+      self.CADCSAP_IX_PX_D1095_UHP                  := rt.Indicators(name = 'CADCSAP_IX_PX_D1095_UHP')[1].value;
+      self.CADCSAP_IX_PX_D1095_UDOB                 := rt.Indicators(name = 'CADCSAP_IX_PX_D1095_UDOB')[1].value;
+      self.CADCSAP_IX_PX_D1095_UEMAIL               := rt.Indicators(name = 'CADCSAP_IX_PX_D1095_UEMAIL')[1].value;
+      self.CADCSAP_IX_PX_D1095_DAYSMR               := rt.Indicators(name = 'CADCSAP_IX_PX_D1095_DAYSMR')[1].value;
+      self.CADCSAP_IX_PX_D1095_DAYSLR               := rt.Indicators(name = 'CADCSAP_IX_PX_D1095_DAYSLR')[1].value;
+      
+      self := [];
+    END;
+
+
+
 // rv5 attribute transform
 EXPORT iesp.share.t_NameValuePair intoVersion5(riskview.layouts.layout_riskview5_search_results le, INTEGER c) := TRANSFORM
   SELF.name := MAP(
@@ -4493,7 +5056,21 @@ END;
 
 
 EXPORT iesp.riskview2.t_RiskView2ModelHRI intoModel(riskview.layouts.layout_riskview5_search_results le, integer c) := TRANSFORM
-		
+
+    Is_next_gen := MAP(
+			c=1	 => le.Auto_Score_Name in RiskView.Constants.next_gen_models,
+			c=2	 => le.BankCard_Score_Name in RiskView.Constants.next_gen_models,
+			c=3	 => le.Short_term_lending_Score_Name in RiskView.Constants.next_gen_models,
+			c=4	 => le.Telecommunications_Score_Name in RiskView.Constants.next_gen_models,
+			c=5	 => le.Crossindustry_Score_Name in RiskView.Constants.next_gen_models,
+			c=6	 => le.Custom_Score_Name in RiskView.Constants.next_gen_models,
+			c=7	 => le.Custom2_Score_Name in RiskView.Constants.next_gen_models,
+			c=8	 => le.Custom3_Score_Name in RiskView.Constants.next_gen_models,
+			c=9	 => le.Custom4_Score_Name in RiskView.Constants.next_gen_models,
+			c=10 => le.Custom5_Score_Name in RiskView.Constants.next_gen_models,
+			        FALSE
+		);
+    
 		score_name := MAP(
 			c=1	=> le.Auto_Score_Name,
 			c=2	=> le.BankCard_Score_Name,
@@ -4607,11 +5184,11 @@ EXPORT iesp.riskview2.t_RiskView2ModelHRI intoModel(riskview.layouts.layout_risk
 		);
 		
 		ds_reasons := DATASET([
-			{1, reason1, Risk_Indicators.getHRIDesc(reason1)},
-			{2, reason2, Risk_Indicators.getHRIDesc(reason2)},
-			{3, reason3, Risk_Indicators.getHRIDesc(reason3)},
-			{4, reason4, Risk_Indicators.getHRIDesc(reason4)},
-			{5, reason5, Risk_Indicators.getHRIDesc(reason5)}
+			{1, reason1, Risk_Indicators.getHRIDesc(reason1, Is_next_gen)},
+			{2, reason2, Risk_Indicators.getHRIDesc(reason2, Is_next_gen)},
+			{3, reason3, Risk_Indicators.getHRIDesc(reason3, Is_next_gen)},
+			{4, reason4, Risk_Indicators.getHRIDesc(reason4, Is_next_gen)},
+			{5, reason5, Risk_Indicators.getHRIDesc(reason5, Is_next_gen)}
 			], iesp.riskview2.t_RiskView2RiskIndicator)(ReasonCode NOT IN ['','00']); // Only keep the valid reason codes
 		
 		self.name := score_name;

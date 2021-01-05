@@ -223,55 +223,54 @@ risk_indicators.layout_output jphonerecs_xform({risk_indicators.layout_output, U
     SELF := L;
 END;
 
-jphonerecs_roxie_unsuppressed := if (isFCRA,
-				join(with_phone_disconnect_hist, Key_FCRA_Business_Header_Phone_Table_Filtered_V2,
-					(integer)left.phone10 != 0 and
-					keyed(left.phone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
-					phtrans_FCRA(left,right,1),left outer,
-					ATMOST( keyed(left.phone10=right.phone10), RiskWise.max_atmost), keep(100)),
-				join(with_phone_disconnect_hist,risk_indicators.key_phone_table_v2,
-					(integer)left.phone10 != 0 and
-					keyed(left.phone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
-					phtrans_nonFCRA(left,right,1),left outer,
-					ATMOST( keyed(left.phone10=right.phone10), RiskWise.max_atmost), keep(100)));
-
-jphonerecs_roxie_flagged := Suppress.MAC_FlagSuppressedSource(jphonerecs_roxie_unsuppressed, mod_access, data_env := iType);
-
-jphonerecs_roxie := PROJECT(jphonerecs_roxie_flagged, jphonerecs_xform(LEFT));
-
-jphonerecs_thor_pre_unsuppressed := if (isFCRA,
-				join(distribute(with_phone_disconnect_hist(phone10 != ''), hash64(phone10)),
-					distribute(pull(Key_FCRA_Business_Header_Phone_Table_Filtered_V2((integer)phone10 != 0)), hash64(phone10)),
-					(integer)left.phone10 != 0 and
-					(left.phone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
-					phtrans_FCRA(left,right,1),left outer,
-					ATMOST( (left.phone10=right.phone10), RiskWise.max_atmost), keep(100), LOCAL),
-				join(distribute(with_phone_disconnect_hist, hash64(phone10)),
-				distribute(pull(risk_indicators.key_phone_table_v2((integer)phone10 != 0)), hash64(phone10)),
-					(integer)left.phone10 != 0 and
-					(left.phone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
-					phtrans_nonFCRA(left,right,1),left outer,
-					ATMOST( (left.phone10=right.phone10), RiskWise.max_atmost), keep(100), LOCAL));
-
-jphonerecs_thor_pre_flagged := Suppress.MAC_FlagSuppressedSource(jphonerecs_thor_pre_unsuppressed, mod_access, use_distributed := TRUE, data_env := iType);
-
-jphonerecs_thor_pre := PROJECT(jphonerecs_thor_pre_flagged, jphonerecs_xform(LEFT));
-
-jphonerecs_thor_nophone := PROJECT(with_phone_disconnect_hist(phone10 = ''), TRANSFORM(risk_indicators.layout_output,
-																		self.hriskphoneflag := '7';
-																		self.hphonetypeflag := 'Z';
-																		self.phonevalflag := '4';
-																		self.hphonevalflag := '6';
-																		self.phonezipflag := '2';
-																		self.PWphonezipflag := '5';
-																		self.phonedissflag := false;
-																		self := left));
-
-jphonerecs_thor := jphonerecs_thor_pre + jphonerecs_thor_nophone;
 
 #IF(onThor)
+  jphonerecs_thor_pre_unsuppressed := if (isFCRA,
+          join(distribute(with_phone_disconnect_hist(phone10 != ''), hash64(phone10)),
+            distribute(pull(Key_FCRA_Business_Header_Phone_Table_Filtered_V2((integer)phone10 != 0)), hash64(phone10)),
+            (integer)left.phone10 != 0 and
+            (left.phone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
+            phtrans_FCRA(left,right,1),left outer,
+            ATMOST( (left.phone10=right.phone10), RiskWise.max_atmost), keep(100), LOCAL),
+          join(distribute(with_phone_disconnect_hist, hash64(phone10)),
+          distribute(pull(risk_indicators.key_phone_table_v2((integer)phone10 != 0)), hash64(phone10)),
+            (integer)left.phone10 != 0 and
+            (left.phone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
+            phtrans_nonFCRA(left,right,1),left outer,
+            ATMOST( (left.phone10=right.phone10), RiskWise.max_atmost), keep(100), LOCAL));
+
+  jphonerecs_thor_pre_flagged := Suppress.MAC_FlagSuppressedSource(jphonerecs_thor_pre_unsuppressed, mod_access, use_distributed := TRUE, data_env := iType);
+
+  jphonerecs_thor_pre := PROJECT(jphonerecs_thor_pre_flagged, jphonerecs_xform(LEFT));
+
+  jphonerecs_thor_nophone := PROJECT(with_phone_disconnect_hist(phone10 = ''), TRANSFORM(risk_indicators.layout_output,
+                                      self.hriskphoneflag := '7';
+                                      self.hphonetypeflag := 'Z';
+                                      self.phonevalflag := '4';
+                                      self.hphonevalflag := '6';
+                                      self.phonezipflag := '2';
+                                      self.PWphonezipflag := '5';
+                                      self.phonedissflag := false;
+                                      self := left));
+
+  jphonerecs_thor := jphonerecs_thor_pre + jphonerecs_thor_nophone;
 	jphonerecs := group(sort(distribute(jphonerecs_thor, hash64(seq)), seq, did, LOCAL), seq, did, LOCAL);
 #ELSE
+  jphonerecs_roxie_unsuppressed := if (isFCRA,
+          join(with_phone_disconnect_hist, Key_FCRA_Business_Header_Phone_Table_Filtered_V2,
+            (integer)left.phone10 != 0 and
+            keyed(left.phone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
+            phtrans_FCRA(left,right,1),left outer,
+            ATMOST( keyed(left.phone10=right.phone10), RiskWise.max_atmost), keep(100)),
+          join(with_phone_disconnect_hist,risk_indicators.key_phone_table_v2,
+            (integer)left.phone10 != 0 and
+            keyed(left.phone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
+            phtrans_nonFCRA(left,right,1),left outer,
+            ATMOST( keyed(left.phone10=right.phone10), RiskWise.max_atmost), keep(100)));
+
+  jphonerecs_roxie_flagged := Suppress.MAC_FlagSuppressedSource(jphonerecs_roxie_unsuppressed, mod_access, data_env := iType);
+
+  jphonerecs_roxie := PROJECT(jphonerecs_roxie_flagged, jphonerecs_xform(LEFT));
 	jphonerecs := jphonerecs_roxie;
 #END
 
@@ -305,52 +304,50 @@ END;
 jphonerecsrolled := rollup(jphonerecs,true,flagroll(LEFT,RIGHT));
 
 
-jphonerecs2_roxie_unsuppressed := if (isFCRA,
-				join(jphonerecsrolled, Key_FCRA_Business_Header_Phone_Table_Filtered_V2,
-					(integer)left.wphone10 != 0 and
-					keyed(left.wphone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
-					phtrans_FCRA(left,right,2),left outer,
-					ATMOST( keyed(left.wphone10=right.phone10), RiskWise.max_atmost), keep(100)),
-
-				join(jphonerecsrolled,risk_indicators.key_phone_table_v2,
-					(integer)left.wphone10 != 0 and
-					keyed(left.wphone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
-					phtrans_nonFCRA(left,right,2),left outer,
-					ATMOST( keyed(left.wphone10=right.phone10), RiskWise.max_atmost), keep(100)));
-
-jphonerecs2_roxie_flagged := Suppress.MAC_FlagSuppressedSource(jphonerecs2_roxie_unsuppressed, mod_access, data_env := iType);
-
-jphonerecs2_roxie := PROJECT(jphonerecs2_roxie_flagged, jphonerecs_xform(LEFT));
-
-jphonerecs2_thor_pre_unsuppressed := if (isFCRA,
-				join(distribute(jphonerecsrolled(wphone10 != ''), hash64(wphone10)),
-				distribute(pull(Key_FCRA_Business_Header_Phone_Table_Filtered_V2((integer)phone10!=0)), hash64(phone10)),
-					(integer)left.wphone10 != 0 and
-					(left.wphone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
-					phtrans_FCRA(left,right,2),left outer,
-					ATMOST( (left.wphone10=right.phone10), RiskWise.max_atmost), keep(100), LOCAL),
-				join(distribute(jphonerecsrolled, hash64(wphone10)),
-					distribute(pull(risk_indicators.key_phone_table_v2((integer)phone10!=0)), hash64(phone10)),
-					(integer)left.wphone10 != 0 and
-					(left.wphone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
-					phtrans_nonFCRA(left,right,2),left outer,
-					ATMOST( (left.wphone10=right.phone10), RiskWise.max_atmost), keep(100), LOCAL));
-
-jphonerecs2_thor_pre_flagged := Suppress.MAC_FlagSuppressedSource(jphonerecs2_thor_pre_unsuppressed, mod_access, use_distributed := TRUE, data_env := iType);
-
-jphonerecs2_thor_pre := PROJECT(jphonerecs_thor_pre_flagged, jphonerecs_xform(LEFT));
-
-jphonerecs2_thor_nowphone := PROJECT(jphonerecsrolled(wphone10 = ''), TRANSFORM(risk_indicators.layout_output,
-					self.wphonevalflag := '6';
-					self.wphonetypeflag := 'Z';
-					self.wphonedissflag := false;
-					self := left));
-
-jphonerecs2_thor := jphonerecs2_thor_pre + jphonerecs2_thor_nowphone;
-
 #IF(onThor)
+  jphonerecs2_thor_pre_unsuppressed := if (isFCRA,
+          join(distribute(jphonerecsrolled(wphone10 != ''), hash64(wphone10)),
+          distribute(pull(Key_FCRA_Business_Header_Phone_Table_Filtered_V2((integer)phone10!=0)), hash64(phone10)),
+            (integer)left.wphone10 != 0 and
+            (left.wphone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
+            phtrans_FCRA(left,right,2),left outer,
+            ATMOST( (left.wphone10=right.phone10), RiskWise.max_atmost), keep(100), LOCAL),
+          join(distribute(jphonerecsrolled, hash64(wphone10)),
+            distribute(pull(risk_indicators.key_phone_table_v2((integer)phone10!=0)), hash64(phone10)),
+            (integer)left.wphone10 != 0 and
+            (left.wphone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
+            phtrans_nonFCRA(left,right,2),left outer,
+            ATMOST( (left.wphone10=right.phone10), RiskWise.max_atmost), keep(100), LOCAL));
+
+  jphonerecs2_thor_pre_flagged := Suppress.MAC_FlagSuppressedSource(jphonerecs2_thor_pre_unsuppressed, mod_access, use_distributed := TRUE, data_env := iType);
+
+  jphonerecs2_thor_pre := PROJECT(jphonerecs_thor_pre_flagged, jphonerecs_xform(LEFT));
+
+  jphonerecs2_thor_nowphone := PROJECT(jphonerecsrolled(wphone10 = ''), TRANSFORM(risk_indicators.layout_output,
+            self.wphonevalflag := '6';
+            self.wphonetypeflag := 'Z';
+            self.wphonedissflag := false;
+            self := left));
+
+  jphonerecs2_thor := jphonerecs2_thor_pre + jphonerecs2_thor_nowphone;
 	jphonerecs2 := group(sort(distribute(jphonerecs2_thor, hash64(seq)), seq, did, LOCAL), seq, did, LOCAL);
 #ELSE
+  jphonerecs2_roxie_unsuppressed := if (isFCRA,
+          join(jphonerecsrolled, Key_FCRA_Business_Header_Phone_Table_Filtered_V2,
+            (integer)left.wphone10 != 0 and
+            keyed(left.wphone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
+            phtrans_FCRA(left,right,2),left outer,
+            ATMOST( keyed(left.wphone10=right.phone10), RiskWise.max_atmost), keep(100)),
+
+          join(jphonerecsrolled,risk_indicators.key_phone_table_v2,
+            (integer)left.wphone10 != 0 and
+            keyed(left.wphone10=right.phone10) AND RIGHT.dt_first_seen < left.historydate,
+            phtrans_nonFCRA(left,right,2),left outer,
+            ATMOST( keyed(left.wphone10=right.phone10), RiskWise.max_atmost), keep(100)));
+
+  jphonerecs2_roxie_flagged := Suppress.MAC_FlagSuppressedSource(jphonerecs2_roxie_unsuppressed, mod_access, data_env := iType);
+
+  jphonerecs2_roxie := PROJECT(jphonerecs2_roxie_flagged, jphonerecs_xform(LEFT));
 	jphonerecs2 := jphonerecs2_roxie;
 #END
 

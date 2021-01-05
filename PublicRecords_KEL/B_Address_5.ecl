@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.3.0
-IMPORT KEL13 AS KEL;
+//HPCC Systems KEL Compiler Version 1.5.0rc1
+IMPORT KEL15 AS KEL;
 IMPORT B_Address_6,CFG_Compile,E_Address,E_Geo_Link,E_Zip_Code FROM PublicRecords_KEL;
-IMPORT * FROM KEL13.Null;
+IMPORT * FROM KEL15.Null;
 EXPORT B_Address_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Address_6(__in,__cfg).__ENH_Address_6) __ENH_Address_6 := B_Address_6(__in,__cfg).__ENH_Address_6;
-  SHARED __EE3577823 := __ENH_Address_6;
-  EXPORT __ST195143_Layout := RECORD
+  SHARED __EE4876299 := __ENH_Address_6;
+  EXPORT __ST236581_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -44,19 +44,16 @@ EXPORT B_Address_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.epoch Date_Vendor_First_Reported_ := 0;
-    KEL.typ.epoch Date_Vendor_Last_Reported_ := 0;
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
-    KEL.typ.epoch Vault_Date_First_Seen_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST195143_Layout __ND3577657__Project(B_Address_6(__in,__cfg).__ST200373_Layout __PP3577111) := TRANSFORM
-    __EE3577652 := __PP3577111.Bestchild_Advo_;
-    SELF.Res_Bus_Flag_ := (__T(__EE3577652))[1].Residential_Or_Business_Indicator_;
-    __EE3577667 := __PP3577111.Bestchild_Advo_;
-    SELF.Vacant_Flag_ := (__T(__EE3577667))[1].Vacancy_Indicator_;
-    SELF := __PP3577111;
+  SHARED __ST236581_Layout __ND4876133__Project(B_Address_6(__in,__cfg).__ST242690_Layout __PP4875446) := TRANSFORM
+    __EE4876128 := __PP4875446.Bestchild_Advo_;
+    SELF.Res_Bus_Flag_ := (__T(__EE4876128))[1].Residential_Or_Business_Indicator_;
+    __EE4876143 := __PP4875446.Bestchild_Advo_;
+    SELF.Vacant_Flag_ := (__T(__EE4876143))[1].Vacancy_Indicator_;
+    SELF := __PP4875446;
   END;
-  EXPORT __ENH_Address_5 := PROJECT(__EE3577823,__ND3577657__Project(LEFT));
+  EXPORT __ENH_Address_5 := PROJECT(__EE4876299,__ND4876133__Project(LEFT));
 END;

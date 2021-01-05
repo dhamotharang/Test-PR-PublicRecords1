@@ -1,8 +1,8 @@
 
-export mac_PickPenalty(starting_score = 100) :=
-macro
+EXPORT mac_PickPenalty(starting_score = 100) :=
+MACRO
 
-	Min2(integer L, integer R) :=  if ( l>r , r, l );
-	self.penalt := min2(starting_score, if(exists(r.parties), r.penalt, 100));
-	
-ENDmacro;
+  Min2(INTEGER L, INTEGER R) := IF ( l>r , r, l );
+  SELF.penalt := min2(starting_score, IF(EXISTS(r.parties), r.penalt, 100));
+  
+ENDMACRO;

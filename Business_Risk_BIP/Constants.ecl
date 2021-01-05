@@ -67,8 +67,12 @@ EXPORT Constants := MODULE
 	EXPORT OneYear											:= 365;
 	EXPORT TwoYear											:= 731;
 	EXPORT FirstSBFELoadDate						:= '20151012';
-	
-  EXPORT MAX_OFAC_VERSION             := 4;
+	EXPORT MAX_OFAC_VERSION             := 4;
+	EXPORT MISSING_INPUT_DATA_INT := -99999;
+	EXPORT NO_DATA_FOUND_INT := -99998;
+	EXPORT MISSING_INPUT_DATA := '-99999';
+	EXPORT NO_DATA_FOUND := '-99998';
+
   
 	// Various JOIN condition limits
 	EXPORT Limit_BusHeader							:= 25000; // Default for Business Header kFetch

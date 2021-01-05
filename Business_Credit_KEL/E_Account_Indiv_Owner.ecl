@@ -1,8 +1,8 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
-IMPORT KEL12 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.3.2
+IMPORT KEL13 AS KEL;
 IMPORT Business_Credit_KEL;
 IMPORT CFG_graph,E_Account,E_Individual_Owner FROM Business_Credit_KEL;
-IMPORT * FROM KEL12.Null;
+IMPORT * FROM KEL13.Null;
 EXPORT E_Account_Indiv_Owner(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __cfg = CFG_graph) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD

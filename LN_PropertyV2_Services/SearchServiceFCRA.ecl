@@ -18,51 +18,52 @@ import FCRA;
 
 export SearchServiceFCRA() := macro
   //Property Search
-	boolean isFCRA := true;
-	// compute results
-	#CONSTANT('NoDeepDive', true);
-	#CONSTANT('usePropMarshall', true);
-	#CONSTANT('DisplayMatchedParty', true);
-	#constant('DidOnly', true); // for picklist
+  boolean isFCRA := true;
+  // compute results
+  #CONSTANT('NoDeepDive', true);
+  #CONSTANT('usePropMarshall', true);
+  #CONSTANT('DisplayMatchedParty', true);
+  #constant('DidOnly', true); // for picklist
+  #CONSTANT('TwoPartySearch', FALSE);
 
-	//------------------------------------------------------------------------------------
-	// gateways := dataset([], Gateway.layouts.config) : stored ('gateways', few);
-	gateways := Gateway.Configuration.Get();
-	picklist_res := FCRA.PickListSoapcall.non_esdl(gateways);
-	//------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------
+  // gateways := dataset([], Gateway.layouts.config) : stored ('gateways', few);
+  gateways := Gateway.Configuration.Get();
+  picklist_res := FCRA.PickListSoapcall.non_esdl(gateways);
+  //------------------------------------------------------------------------------------
 
   rdid := (unsigned6)picklist_res[1].Records[1].UniqueId;
 
-  	//non-subject suppression
+  //non-subject suppression
   nss := ut.getNonSubjectSuppression (Suppress.Constants.NonSubjectSuppression.returnRestrictedDescription);
 
-	  //  Fill FCRA.iRules
-	iRulesParams := module (FCRA.iRules)
-		export integer8 FFDOptionsMask := FFD.FFDMask.Get();
-	  export integer FCRAPurpose := FCRA.FCRAPurpose.Get();
+  //  Fill FCRA.iRules
+  iRulesParams := module (FCRA.iRules)
+    export integer8 FFDOptionsMask := FFD.FFDMask.Get();
+    export integer FCRAPurpose := FCRA.FCRAPurpose.Get();
   end;
 
-	raw_combined := LN_PropertyV2_Services.SearchService_records(rdid,nss,isFCRA,iRulesParams);
-	raw := raw_combined.Records;
-	statements := raw_combined.Statements;
+  raw_combined := LN_PropertyV2_Services.SearchService_records(rdid,nss,isFCRA,iRulesParams);
+  raw := raw_combined.Records;
+  statements := raw_combined.Statements;
   consumer_alerts := raw_combined.ConsumerAlerts;
   input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, false);
 
-	// standard record counts & limits
-	doxie.MAC_Header_Field_Declare(isFCRA);
+  // standard record counts & limits
+  doxie.MAC_Header_Field_Declare(isFCRA);
 
-	Alerts.mac_ProcessAlerts(raw,LN_PropertyV2_Services.alert,raw_final);
+  Alerts.mac_ProcessAlerts(raw,LN_PropertyV2_Services.alert,raw_final);
 
   // create External Key field
   Text_Search.MAC_Append_ExternalKey(raw_final, raw_final2, l.ln_fares_id);
 
-	// doxie.MAC_Marshall_Results(raw_final2,cooked)
-	LN_PropertyV2_Services.Marshall.MAC_Marshall_Results(raw_final2, cooked);
+  // doxie.MAC_Marshall_Results(raw_final2,cooked)
+  LN_PropertyV2_Services.Marshall.MAC_Marshall_Results(raw_final2, cooked);
 
-	// display Property results
-	output(cooked, named('Results'));
-	output(statements, named('ConsumerStatements'));
-	output(consumer_alerts, named('ConsumerAlerts'));
-	output(input_consumer, named('Consumer'));
+  // display Property results
+  output(cooked, named('Results'));
+  output(statements, named('ConsumerStatements'));
+  output(consumer_alerts, named('ConsumerAlerts'));
+  output(input_consumer, named('Consumer'));
 
 endmacro;

@@ -232,6 +232,7 @@ Event := ENTITY(QUERY(UID(record_id),
         STRING ClientId,
 
     INTEGER RecordId=record_id,
+		STRING AcctNo,
     DATE EventDate,
         
         STRING Title=NULL(),
@@ -491,6 +492,7 @@ Event := ENTITY(QUERY(UID(record_id),
     MODEL(
       UID,
       RecordId,
+			AcctNo,
       EventDate,
       rCustomer,
       rSourceCustomer,
@@ -612,7 +614,7 @@ Event: => AgencyProgJurSt := rCustomer.JurisdictionState;
 Event: => T_SrcAgencyUid := rSourceCustomer.CustomerId; 
 Event: => T_SrcAgencyProgType := rSourceCustomer.IndustryType; 
 
-Event: => T_ActUid := RecordId;
+Event: => T_ActUid := AcctNo;
 Event: => T_ActDtEcho := EventDate; 
 
 Event: => T_SrcType := MAP(rin_source <= 0 OR rin_source > 15 => -99997,rin_source); 
@@ -1667,6 +1669,7 @@ T16_PhnPrePdFlag
                     OttoBankAccountId = OttoBankAccountId,
                     EventDate = event_date,
                     RecordId=record_id,
+										AcctNo = batchin_rec.acctno,
                     DateOfBirth = batchin_rec.dob,      
                     Title = pr_best_appends.best_title,
                     FirstName = batchin_rec.name_first,

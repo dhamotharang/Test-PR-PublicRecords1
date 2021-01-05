@@ -54,6 +54,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		EXPORT BOOLEAN 		return_current								:= TRUE; // Required for initial release
 		EXPORT UNSIGNED		max_age_days						 	:= Phones.Constants.PhoneAttributes.LastActivityThreshold; 
 		EXPORT BOOLEAN AllowPortingData := Phones.Constants.PhoneAttributes.AllowPortingData;
+		EXPORT BOOLEAN Allow_TCPA_Port := TRUE;
 	END;
 	dsPhoneswMetadata := Phones.PhoneAttributes_BatchRecords(PROJECT(ds_batch_in,TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn,
 																							SELF.acctno:=LEFT.acctno,
