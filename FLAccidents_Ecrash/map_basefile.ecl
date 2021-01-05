@@ -116,22 +116,22 @@ IMPORT FLAccidents, Address, ut, driversv2, STD, scrubs, scrubs_ecrash, nid, Pro
 		SELF.orig_lname := L.last_name;
 		SELF.orig_mname := L.middle_name;
 	// populated by Vina File
-		SELF.vehicle_seg := MAP(L.vin = R.vin_input => R.variable_segment, '');	
-		SELF.vehicle_seg_type := MAP(L.vin = R.vin_input => R.veh_type, '');	
-		SELF.model_year := MAP(L.vin = R.vin_input => R.model_year, '');	
-		SELF.body_style_code := MAP(L.vin = R.vin_input => R.vina_body_style, '');	
-		SELF.engine_size := MAP(L.vin = R.vin_input => R.engine_size, '');	
-		SELF.fuel_code := MAP(L.vin = R.vin_input => R.fuel_code, '');	
-		SELF.number_of_driving_wheels	:= MAP(L.vin = R.vin_input => R.vp_tilt_wheel, '');	
-		SELF.steering_type := MAP(L.vin = R.vin_input => R.vp_power_steering, '');		
-		SELF.vina_series := MAP(L.vin = R.vin_input => R.vina_series, '');	
-		SELF.vina_model := MAP(L.vin = R.vin_input => R.vina_model, '');	
-		SELF.vina_make := MAP(L.vin = R.vin_input => R.make_description, '');	
-		SELF.vina_body_style := MAP(L.vin = R.vin_input => R.vina_body_style, '');		
-		SELF.make_description := MAP(L.vin = R.vin_input => R.make_description, TRIM(L.make, LEFT, RIGHT));			
-		SELF.model_description := MAP(L.vin = R.vin_input => R.model_description, L.model);		
-		SELF.series_description := MAP(L.vin = R.vin_input => R.series_description, '');	
-		SELF.car_cylinders := MAP(L.vin = R.vin_input => R.number_of_cylinders, '');		
+		SELF.vehicle_seg := IF(L.vin = R.vin_input, R.variable_segment, '');	
+		SELF.vehicle_seg_type := IF(L.vin = R.vin_input, R.veh_type, '');	
+		SELF.model_year := IF(L.vin = R.vin_input, R.model_year, '');	
+		SELF.body_style_code := IF(L.vin = R.vin_input, R.vina_body_style, '');	
+		SELF.engine_size := IF(L.vin = R.vin_input, R.engine_size, '');	
+		SELF.fuel_code := IF(L.vin = R.vin_input, R.fuel_code, '');	
+		SELF.number_of_driving_wheels	:= IF(L.vin = R.vin_input, R.vp_tilt_wheel, '');	
+		SELF.steering_type := IF(L.vin = R.vin_input, R.vp_power_steering, '');		
+		SELF.vina_series := IF(L.vin = R.vin_input, R.vina_series, '');	
+		SELF.vina_model := IF(L.vin = R.vin_input, R.vina_model, '');	
+		SELF.vina_make := IF(L.vin = R.vin_input, R.make_description, '');	
+		SELF.vina_body_style := IF(L.vin = R.vin_input, R.vina_body_style, '');		
+		SELF.make_description := IF(L.vin = R.vin_input, R.make_description, TRIM(L.make, LEFT, RIGHT));			
+		SELF.model_description := IF(L.vin = R.vin_input, R.model_description, L.model);		
+		SELF.series_description := IF(L.vin = R.vin_input, R.series_description, '');	
+		SELF.car_cylinders := IF(L.vin = R.vin_input, R.number_of_cylinders, '');		
 		prefix := MAP(//le.report_code[1] = 'I' and le.vehicle_incident_id[1..3] = 'OID'    => 1000000000000,
 									//le.report_code[1] = 'I' => 2000000000000,
 									 SELF.report_code = 'EA' => 3000000000000,
@@ -242,83 +242,19 @@ IMPORT FLAccidents, Address, ut, driversv2, STD, scrubs, scrubs_ecrash, nid, Pro
 // #############################################################################################
 // Append DID using lfname and dl match --bug # 48839
 // #############################################################################################	
-  eCrashADL := fAppendADL(eCrashClean);
-  eCrashNoDID := eCrashADL(did = 0 AND Drivers_License_Number <> '');
-  eCrashDID := eCrashADL(did <> 0 OR Drivers_License_Number = '');
-
-//splitting streams above to reduce skewing and process run time.
-  dsDL := driversv2.File_DL(did <> 0 AND REGEXFIND('[1-9]', dl_number) AND LENGTH(lname)> 1 AND dl_number <> '1111111');
-
-//create dl/DID table
-  temp_SlimDL_layout := RECORD
-		dsDL.lname;
-		dsDL.fname;
-		dsDL.mname;
-		dsDL.dl_number;
-		dsDL.orig_state;
-		dsDL.did;
-  END;
-  tblDL := TABLE(dsDL, temp_SlimDL_layout, lname, fname, mname, dl_number, orig_state, did, FEW):PERSIST('~thor_200::persist::tbl_dl');
+  eCrashADL := Fn_AppendADL(eCrashClean);
 	
-// #############################################################################################
-// Join eCrash reports with no DID with DL file to append DID.
-// #############################################################################################	
-  utblDLByDlnLn := DEDUP(tblDL, dl_number, lname, ALL);
-  eCrashNoDID tGetDIDDlnLn(eCrashNoDID L, utblDLByDlnLn R) := TRANSFORM
-    SELF.did := MAP(L.Drivers_License_Number = R.dl_number AND
-                    ut.NNEQ(L.Drivers_License_jurisdiction, R.orig_state) AND 
-                    (REGEXFIND(REGEXREPLACE(' +', R.lname, ' '),
-										           REGEXREPLACE(' +', L.fname + ' ' + L.mname + ' ' + L.lname, ' ')) OR 
-                     REGEXFIND(TRIM(R.lname, ALL), REGEXREPLACE(' +', L.fname + ' ' + L.mname + ' ' + L.lname, ' '))
-										 ) => R.did,
-										L.did);    
-    SELF := L;    
-  END;    
-  jeCrashDID_DlnLn := JOIN(eCrashNoDID, utblDLByDlnLn,
-                           LEFT.Drivers_License_Number = RIGHT.dl_number AND
-                           ut.NNEQ(LEFT.Drivers_License_jurisdiction, RIGHT.orig_state) AND
-                           (REGEXFIND(REGEXREPLACE(' +', RIGHT.lname, ' '),
-								                      REGEXREPLACE(' +', LEFT.fname + ' ' + LEFT.mname + ' ' + LEFT.lname, ' ')) OR  
-                            REGEXFIND(TRIM(RIGHT.lname, ALL), REGEXREPLACE(' +', LEFT.fname + ' ' + LEFT.mname + ' ' + LEFT.lname, ' '))),
-                            tGetDIDDlnLn(LEFT, RIGHT), LEFT OUTER, HASH);
-													
-  utblDLByDlnFn := DEDUP(tblDL, dl_number, fname, ALL);
-  jeCrashDID_DlnLn tGetDIDDlnFn(jeCrashDID_DlnLn L, utblDLByDlnFn R) := TRANSFORM
-    SELF.did := MAP(L.did = 0 AND 
-	                  L.Drivers_License_Number = R.dl_number AND
-									  ut.NNEQ(L.Drivers_License_jurisdiction, R.orig_state) AND
-									  ut.NNEQ((STRING)L.mname[1],(STRING)R.mname[1]) AND 
-									  (REGEXFIND(REGEXREPLACE(' +', R.fname, ' '),
-                               REGEXREPLACE(' +', L.fname + ' ' + L.mname + ' ' + L.lname, ' ')) OR 
-                    REGEXFIND(TRIM(R.fname, ALL), REGEXREPLACE(' +', L.fname + ' ' + L.mname + ' ' + L.lname,' ')))
-                    => R.did,
-									  L.did);
-    SELF := L;    
-  END;    
-  jeCrashDID_DL := JOIN(jeCrashDID_DlnLn, utblDLByDlnFn,
-                        LEFT.did = 0 AND 
-                        LEFT.Drivers_License_Number = RIGHT.dl_number AND
-                        ut.NNEQ(LEFT.Drivers_License_jurisdiction,RIGHT.orig_state) AND
-                        ut.NNEQ((STRING)LEFT.mname[1],(STRING)RIGHT.mname[1]) AND
-												(REGEXFIND(
-                        REGEXREPLACE(' +', RIGHT.fname, ' '),
-                        REGEXREPLACE(' +', LEFT.fname + ' ' + LEFT.mname + ' ' + LEFT.lname, ' ')) OR 
-                        REGEXFIND(
-                        TRIM(RIGHT.fname, ALL),
-                        REGEXREPLACE(' +', LEFT.fname + ' ' + LEFT.mname + ' ' + LEFT.lname, ' '))),
-                        tGetDIDDlnFn(LEFT, RIGHT), LEFT OUTER, HASH);
-											 
 // #############################################################################################
 // Join eCrash Reports with Supplemental Reports to get super_report_id
 // #############################################################################################
-  eCrashAccidents := DEDUP(SORT(DISTRIBUTE(jeCrashDID_DL + eCrashDID, HASH32(incident_id)), RECORD, LOCAL), RECORD, LOCAL):PERSIST('~thor_data400::persist::ecrash_did');	
-	dsSupplemental := DISTRIBUTE(Files.base.Supplemental,HASH32(incident_id)); 
+  eCrashAccidents := DEDUP(SORT(DISTRIBUTE(eCrashADL, HASH32(incident_id)), RECORD, LOCAL), RECORD, LOCAL):PERSIST('~thor_data400::persist::ecrash_did');	
+	dsSupplemental := DISTRIBUTE(Files.base.Supplemental, HASH32(incident_id)); 
 	jeCrash_Supplemental := JOIN(eCrashAccidents, dsSupplemental, 
 												       LEFT.incident_id = RIGHT.incident_id, 
 												       TRANSFORM(Layout_Basefile,
 																         SELF.super_report_id := RIGHT.super_report_id,
 																				 SELF := LEFT), LEFT OUTER, LOCAL); 
-											 
+										 
 // #############################################################################################
 // Apply Scrubs to eCrash reports
 // #############################################################################################	
@@ -370,12 +306,11 @@ IMPORT FLAccidents, Address, ut, driversv2, STD, scrubs, scrubs_ecrash, nid, Pro
 // #############################################################################################
 // Build & Promote Base files
 // 1) eCrashBase 2) InseCrashSlimBase 3) SupplementalBase
-// 4) TMAfterTFBase 5) DocumentBase 6) AgencyBase
+// 4) DocumentBase 5) AgencyBase
 // #############################################################################################			
  	PromoteSupers.Mac_SF_BuildProcess(eCrashAccidentsAll, '~thor_data400::base::ecrash', BuildeCrashBase, , , TRUE);
  	PromoteSupers.Mac_SF_BuildProcess(pInseCrashSlim, '~thor_data400::base::InseCrashSlim', BuildInseCrashSlimBase , , , TRUE);
   PromoteSupers.Mac_SF_BuildProcess(BuildSuppmentalReports.compare_add_new, '~thor_data400::base::ecrash_supplemental', BuildSupplementalBase, , , TRUE);
-	PromoteSupers.Mac_SF_BuildProcess(BuildSuppmentalReports.TMafterTF, '~thor_data400::base::ecrash_TMafterTF', BuildTMafterTFBase, , , TRUE);
 	PromoteSupers.Mac_SF_BuildProcess(BuildPhotoFile.CmbndPhotos, '~thor_data400::base::ecrash_documents', BuildPhotoIDBase, , , TRUE);
 	PromoteSupers.Mac_SF_BuildProcess(AgencyCombined, '~thor_data400::base::agency_cmbnd', BuildAgencyCmbndBase, , , TRUE);
 
@@ -386,7 +321,6 @@ RETURN SEQUENTIAL(BuildSupplementalBase,
                   BuildeCrashBase,
 									BuildInseCrashSlimBase,
 									BuildPhotoIDBase,
-									BuildTMafterTFBase,
 									BuildAgencyCmbndBase
 								 );
 

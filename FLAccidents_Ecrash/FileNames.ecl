@@ -1,0 +1,13 @@
+﻿EXPORT FileNames := MODULE
+ 
+  EXPORT INCIDENT_FILE_NAME := 'incident';
+  EXPORT PERSON_FILE_NAME := 'person';
+  EXPORT VEHICLE_FILE_NAME := 'vehicle';
+  EXPORT CITATION_FILE_NAME := 'citation';
+  EXPORT COMMERCIAL_FILE_NAME := 'commercial';
+  EXPORT PROPERTY_DAMAGE_FILE_NAME := 'property_damage';
+  EXPORT DOCUMENT_FILE_NAME := 'document';
+  EXPORT AGENCY_FILE_NAME := 'agency';
+  EXPORT BILLING_AGENCY_FILE_NAME := 'billing_agency';
+	
+END;

@@ -1,7 +1,5 @@
-﻿IMPORT Data_Services, doxie;
-																			
-EXPORT key_EcrashV2_accnbr := INDEX(mod_PrepEcrashPRKeys().dep_accnbr_base
-,{STRING40 l_accnbr := accident_nbr, report_code,jurisdiction_state, jurisdiction}
+﻿EXPORT key_EcrashV2_accnbr := INDEX(mod_PrepEcrashPRKeys().dep_accnbr_base
+,{l_accnbr, report_code,jurisdiction_state, jurisdiction}
 ,{
 orig_accnbr, 
 vehicle_incident_id,
@@ -151,7 +149,7 @@ cru_sequence_nbr;
 date_vendor_last_reported; 
 report_type_id;								 
 }
-,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_accnbr_' + doxie.Version_SuperKey);
+,Files_PR.FILE_KEY_ACCNBR_SF);
  
 
 

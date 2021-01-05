@@ -15,8 +15,11 @@ crash_accnbr_base_norm := (Input + NormAddlRpt + Filter_CRU (vin+driver_license_
 											 
 dst_accnbr_base := DISTRIBUTE(crash_accnbr_base_norm, HASH32(orig_accnbr));
 srt_accnbr_base := SORT(dst_accnbr_base, EXCEPT did, EXCEPT b_did, LOCAL);
-dep_accnbr_base := DEDUP(srt_accnbr_base, EXCEPT did, EXCEPT b_did, LOCAL);
-
+unq_accnbr_base := DEDUP(srt_accnbr_base, EXCEPT did, EXCEPT b_did, LOCAL);
+dep_accnbr_base := PROJECT(unq_accnbr_base, TRANSFORM({STRING40 l_accnbr, RECORDOF(unq_accnbr_base)},
+                                                       SELF.l_accnbr := LEFT.accident_nbr;
+																											 SELF := LEFT;
+																											 ));
 RETURN dep_accnbr_base;
 END;
 
@@ -32,7 +35,7 @@ EXPORT dep_accnbr_base := fn_accnbrv1(Ecrash);
 allrecs := EcrashIn(vin+driver_license_nbr+tag_nbr+lname <> '' AND 
                     (TRIM(report_type_id,ALL) IN ['A','DE'] OR STD.str.ToUpperCase(TRIM(vendor_code,LEFT,RIGHT)) = 'CMPD'));
 
-crash_base := PROJECT(allrecs((accident_date<>'' AND (UNSIGNED) accident_date<>0) ), Layout_PrepEcrashKeys.slim_layout);
+crash_base := PROJECT(allrecs((accident_date<>'' AND (UNSIGNED) accident_date<>0) ), Layout_PrepEcrashKeys.dol_slim);
 											 
 dst_base := DISTRIBUTE(crash_base, HASH32(accident_date));
 srt_base := SORT(dst_base, EXCEPT did, EXCEPT b_did, LOCAL);

@@ -13,7 +13,7 @@ EXPORT Constants_MBSAgency := MODULE
 	
 	EXPORT ThorDest := Constants.DestinationCluster;
 
-	EXPORT LocationPrefix := Files_eCrash.LOCATION_PREFIX;
+	EXPORT LocationPrefix := '~';
 	
 	EXPORT AgencyLZPathPrefix := '/data/super_credit/ecrash/incoming/mbs';
 	EXPORT AgencyLZFilename := 'mbs_ecrash_v_agency_hpcc_export.txt';

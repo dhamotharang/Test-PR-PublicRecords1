@@ -12,11 +12,13 @@ shared ReadEcrashBaseFile := FLAccidents_Ecrash.BaseFile;
 //Expand Florida file 
 flc0 	:= FLAccidents.basefile_flcrash0;
 
-Layout_PrepEcrashFLAccidentPRKeys.flc0_xpnd_layout xpndrecs(flc0 L) := transform
+Layout_PrepEcrashFLAccidentPRKeys.flc0_interim xpndrecs(flc0 L) := transform
 self.report_code					:= 'FA';
 self.report_category		  := 'Auto Report';
 self.report_code_desc		  := 'Auto Accident';
-self.accident_nbr         := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+accidentNumber            := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+self.accident_nbr         := accidentNumber;
+self.l_acc_nbr             := accidentNumber;
 self.orig_accnbr          := l.accident_nbr; 
 self 								      := L;
 end;
@@ -35,7 +37,9 @@ string8     fSlashedMDYtoCYMD(string pDateIn) :=
 self.rec_type_o 			    := '0';
 t_accident_nbr 			      := (string40)((unsigned6)L.vehicle_incident_id+10000000000);
 t_scrub                   := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.accident_nbr         := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub);  
+accidentNumber            := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub);  
+self.accident_nbr         := accidentNumber;
+self.l_acc_nbr             := accidentNumber;
 self.orig_accnbr          := t_accident_nbr; 
 self.accident_date				:= fSlashedMDYtoCYMD(L.loss_date[1..10]);
 self.city_town_name 		  := stringlib.stringtouppercase(L.inc_city);
@@ -60,7 +64,9 @@ t_accident_nbr            := if(L.vehicle_incident_id[1..3] = 'OID',
 													      (string40)((unsigned6)L.vehicle_incident_id[4..11]+100000000000),
 													      (string40)((unsigned6)L.vehicle_incident_id+10000000000));
 t_scrub                   := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.accident_nbr         := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub);  
+accidentNumber            := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub);  
+self.accident_nbr         := accidentNumber;
+self.l_acc_nbr             := accidentNumber;
 self.orig_accnbr          := t_accident_nbr; 
 self.accident_date			  := fSlashedMDYtoCYMD(L.loss_date[1..10]);
 self.city_town_name 		  := STD.Str.ToUpperCase(L.city);
@@ -78,7 +84,9 @@ pflc0 slimrececrash(ecrashFile L) := transform
 self.rec_type_o 			    := '0';
 t_accident_nbr 			      := if(l.source_id in['TM','TF'],L.state_report_number, L.case_identifier);
 t_scrub                   := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.accident_nbr         := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
+accidentNumber            := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
+self.accident_nbr         := accidentNumber;
+self.l_acc_nbr             := accidentNumber;
 self.orig_accnbr          := t_accident_nbr;
 self.accident_date 			  := if(L.incident_id[1..9] ='188188188','20100901',L.crash_date);
 self.city_town_name 		  := STD.Str.ToUpperCase(L.crash_city);
@@ -101,11 +109,13 @@ export flc0_allrecs := dedup(pflc0+pntl+pInq+pecrash,record,all);
 //Expand Florida file 
 flc1	:= FLAccidents.basefile_flcrash1;
 
-Layout_PrepEcrashFLAccidentPRKeys.flc1_xpnd_layout xpndrecs(flc1 L) := transform
+Layout_PrepEcrashFLAccidentPRKeys.flc1_interim xpndrecs(flc1 L) := transform
 self.report_code					:= 'FA';
 self.report_category		  := 'Auto Report';
 self.report_code_desc			:= 'Auto Accident';
-self.accident_nbr         := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+accidentNumber            := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+self.accident_nbr         := accidentNumber;
+self.l_acc_nbr             := accidentNumber;
 self.orig_accnbr          := l.accident_nbr; 
 self.invest_agency_desc   := trim(l.dept_name,left,right); 
 self 								      := L;
@@ -118,12 +128,14 @@ pflc1:= project(flc1,xpndrecs(left));
 
 ecrashfile := ReadEcrashFile; 
 
-Layout_PrepEcrashFLAccidentPRKeys.flc1_xpnd_layout xpndecrash(ecrashfile L) := transform
+Layout_PrepEcrashFLAccidentPRKeys.flc1_interim xpndecrash(ecrashfile L) := transform
 
 	self.rec_type_1 := '1'; 
 	t_accident_nbr := if(l.source_id in ['TM','TF'],L.state_report_number, L.case_identifier);
 	t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-  self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);  
+  accidentNumber := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub); 
+	self.accident_nbr := accidentNumber;
+  self.l_acc_nbr := accidentNumber;
   self.orig_accnbr := t_accident_nbr;
 	self.hr_off_notified :=l.time_notified[1..2];
   self.min_off_notified:=l.time_notified[4..5];
@@ -180,7 +192,7 @@ export flc1_ptotal := dedup(pflc1+pecrash,all);
 //Expand Florida file 
 flc2v 	:= FLAccidents.basefile_flcrash2v;
 
-Layout_PrepEcrashFLAccidentPRKeys.flc2v_xpnd_layout xpndrecs(flc2v L,FLAccidents.BaseFile_FLCrash0 R) := transform
+Layout_PrepEcrashFLAccidentPRKeys.flc2v_interim xpndrecs(flc2v L,FLAccidents.BaseFile_FLCrash0 R) := transform
 self.report_code					:= 'FA';
 self.report_category		  := 'Auto Report';
 self.report_code_desc			:= 'Auto Accident';
@@ -188,7 +200,9 @@ self.vehicle_incident_city:= STD.Str.ToUpperCase(if(L.accident_nbr= R.accident_n
 self.vehicle_incident_st  := 'FL';
 self.carrier_name         := l.ins_company_name;
 self.client_type_id			  := '';
-self.accident_nbr         := stringlib.StringFilter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+accidentNumber            := stringlib.StringFilter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+self.accident_nbr         := accidentNumber;
+self.l_acc_nbr             := accidentNumber;
 self.orig_accnbr          := l.accident_nbr; 
 self.vehicle_owner_dob		:=l.vehicle_owner_dob[5..8]+l.vehicle_owner_dob[1..4] ; 
 self.direction_travel_desc:= ''; 
@@ -213,7 +227,9 @@ self.b_did_score					:= L.bdid_score;
 self.rec_type_2						:= '2';
 t_accident_nbr 			      := (string40)((unsigned6)L.vehicle_incident_id+10000000000);
 t_scrub                   := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.accident_nbr         := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub);  
+accidentNumber            := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub); 
+self.accident_nbr         := accidentNumber;
+self.l_acc_nbr             := accidentNumber; 
 self.orig_accnbr          := t_accident_nbr; 
 self.section_nbr					:= if(L.LAST_NAME+L.FIRST_NAME = L.LAST_NAME_1+L.FIRST_NAME_1,L.vehicle_nbr,'');;
 self.vehicle_tag_nbr			:= L.TAG;
@@ -278,7 +294,9 @@ self.client_type_id 	:= '';
 self.rec_type_2  := '2'; 
 t_accident_nbr 			:= if(l.source_id in ['TF','TM'],L.state_report_number, L.case_identifier);
 t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
+accidentNumber := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
+self.accident_nbr         := accidentNumber;
+self.l_acc_nbr             := accidentNumber; 
 self.orig_accnbr := t_accident_nbr;
 self.section_nbr := l.vehicle_unit_number; 
 self.vehicle_owner_driver_code := ''; 
@@ -426,11 +444,13 @@ export flc2v_allrecs :=dedup(pflc2v+pntl+pecrash,record,all): persist('~thor_dat
 //Expand Florida file 
 flc3v	:= FLAccidents.basefile_flcrash3v;
 
-Layout_PrepEcrashFLAccidentPRKeys.flc3v_xpnd_layout xpndrecs(flc3v L) := transform
+Layout_PrepEcrashFLAccidentPRKeys.flc3v_interim xpndrecs(flc3v L) := transform
 self.report_code					:= 'FA';
 self.report_category			:= 'Auto Report';
 self.report_code_desc		  := 'Auto Accident';
-self.accident_nbr         := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+accidentNumber            := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+self.accident_nbr         := accidentNumber;
+self.l_acc_nbr             := accidentNumber; 
 self.orig_accnbr          := l.accident_nbr; 
 self 								      := L;
 end;
@@ -445,7 +465,7 @@ export pflc3v:= project(flc3v,xpndrecs(left));
 flc4 := FLAccidents.flc4_Keybuild;
 flc0 := FLAccidents.basefile_flcrash0;
 //using flcrash input file where washington suppression are being removed.  National input file does not have driver phones.
-Layout_PrepEcrashFLAccidentPRKeys.flc4_xpnd_layout xpndrecs(flc4 L, flc0 R) := transform
+Layout_PrepEcrashFLAccidentPRKeys.flc4_interim xpndrecs(flc4 L, flc0 R) := transform
 self.report_code					:= 'FA';
 self.report_category			:= 'Auto Report';
 self.report_code_desc			:= 'Auto Accident';
@@ -459,7 +479,9 @@ self.vehicle_incident_st 	:= 'FL';
 self.point_of_impact		  := '';
 self.carrier_name					:= '';
 self.client_type_id				:= '';
-self.accident_nbr         := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');  
+accidentNumber            := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');  
+self.accident_nbr         := accidentNumber;
+self.l_acc_nbr             := accidentNumber; 
 self.orig_accnbr          := l.accident_nbr; 
 tdriver_dob               := TRIM(l.driver_dob, LEFT, RIGHT);
 self.driver_dob           := TRIM(TRIM(tdriver_dob[1..4], LEFT, RIGHT) + TRIM(tdriver_dob[5..8], LEFT, RIGHT), LEFT, RIGHT);
@@ -481,7 +503,9 @@ self.did					:= if(L.did = 0,'000000000000',intformat(L.did,12,1));
 self.rec_type_4 	:= '4';
 t_accident_nbr 		:= (string40)((unsigned6)L.vehicle_incident_id+10000000000);
 t_scrub           := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub);  
+accidentNumber    := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub);  
+self.accident_nbr := accidentNumber;
+self.l_acc_nbr     := accidentNumber; 
 self.orig_accnbr  := t_accident_nbr; 
 //------------------------------------
 //used for mobileTrac
@@ -547,8 +571,10 @@ t_accident_nbr := if(L.vehicle_incident_id[1..3] = 'OID',
 													(string40)((unsigned6)L.vehicle_incident_id+10000000000));
 
 t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub);  
-self.orig_accnbr := t_accident_nbr; 
+accidentNumber        := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub); 
+self.accident_nbr     := accidentNumber;
+self.l_acc_nbr         := accidentNumber;  
+self.orig_accnbr      := t_accident_nbr; 
 self.vehicle_id_nbr		:= L.Vin;
 self.vehicle_year			:= L.Year;
 self.vehicle_make			:= L.make;
@@ -577,8 +603,8 @@ self.suffix 				  := L.name_suffix;
 self.cname					  := '';
 self.filler5 					:= L.claim_nbr;
 self.carrier_name     := L.legal_name;
-self.ins_company_name				:= L.LEGAL_NAME;
-self.ins_policy_nbr					:= '';
+self.ins_company_name := L.LEGAL_NAME;
+self.ins_policy_nbr := '';
 self						:= L;
 self 						:= [];
 end;
@@ -617,7 +643,9 @@ self.client_type_id := '';
 self.rec_type_4 := '4'; 
 t_accident_nbr 			:= if(l.source_id in ['TM','TF'],L.state_report_number, L.case_identifier);
 t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
+accidentNumber := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
+self.accident_nbr := accidentNumber;
+self.l_acc_nbr := accidentNumber; 
 self.orig_accnbr := t_accident_nbr;
 self.section_nbr := l.vehicle_unit_number; 
 self.driver_full_name := trim(l.first_name,left,right)+' '+trim(l.middle_name,left,right) +' '+trim(l.last_name ,left,right); 
@@ -679,15 +707,15 @@ self.seventh_citation_nbr:='';
 self.eighth_citation_nbr:='';
 self.req_endorsement :=''; 
 self.oos_dl_nbr:=''; 
-self.addr_suffix 					:= L.addr_suffix;
-self.ace_fips_st					:= L.county_code[1..2];
-self.county							:= L.county_code[3..5];
-self.zip							:= L.z5;
-self.zip4								:= L.z4;
-self.score 							:= L.name_score;
-self.suffix 						:= L.suffix;  
-self.did								:= if(L.did = 0,'000000000000',intformat(L.did,12,1));	
-self.cname              := l.cname; 
+self.addr_suffix := L.addr_suffix;
+self.ace_fips_st := L.county_code[1..2];
+self.county := L.county_code[3..5];
+self.zip := L.z5;
+self.zip4 := L.z4;
+self.score := L.name_score;
+self.suffix := L.suffix;  
+self.did := if(L.did = 0,'000000000000',intformat(L.did,12,1));	
+self.cname := l.cname; 
 
 self := l; 
 self := [];
@@ -704,13 +732,15 @@ export flc4_allrecs := dedup(pflc4+pntl+pinq+pecrash,record,all): persist('~thor
 flc5 := FLAccidents.basefile_flcrash5;
 //using flcrash input file where washington suppression are being removed.  National input file does not have driver phones.
 
-Layout_PrepEcrashFLAccidentPRKeys.flc5_xpnd_layout xpndrecs(flc5 L) := transform
+Layout_PrepEcrashFLAccidentPRKeys.flc5_interim xpndrecs(flc5 L) := transform
 self.report_code					:= 'FA';
-self.report_category				:= 'Auto Report';
-self.report_code_desc				:= 'Auto Accident';
-self.accident_nbr := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.orig_accnbr := l.accident_nbr; 
-self 								:= L;
+self.report_category		  := 'Auto Report';
+self.report_code_desc		  := 'Auto Accident';
+accidentNumber            := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+self.accident_nbr         := accidentNumber;
+self.l_acc_nbr             := accidentNumber; 
+self.orig_accnbr          := l.accident_nbr; 
+self 								      := L;
 end;
 
 pflc5:= project(flc5,xpndrecs(left));
@@ -755,16 +785,18 @@ ecrashFile := ReadEcrashFile(STD.Str.ToUpperCase(trim(person_type)) in ['\\PASSE
 																																													 'PASSENNGER',
 																																													 'PASSSENGER']); 
 
-Layout_PrepEcrashFLAccidentPRKeys.flc5_xpnd_layout xpndecrash(ecrashFile L) := transform
+Layout_PrepEcrashFLAccidentPRKeys.flc5_interim xpndecrash(ecrashFile L) := transform
 
 self.rec_type_5 := '5';
 t_accident_nbr 			:= if(l.source_id in ['TM','TF'],L.state_report_number, L.case_identifier);
 t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
+accidentNumber := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
+self.accident_nbr := accidentNumber;
+self.l_acc_nbr := accidentNumber; 
 self.orig_accnbr := t_accident_nbr;
-self.did								:= if(L.did = 0,'000000000000',intformat(L.did,12,1));	
+self.did := if(L.did = 0,'000000000000',intformat(L.did,12,1));	
 self.section_nbr := l.vehicle_unit_number; 
-self.passenger_nbr      := trim(l.passenger_number,left,right); 
+self.passenger_nbr := trim(l.passenger_number,left,right); 
 self.passenger_full_name := trim(l.first_name,left,right)+' '+trim(l.middle_name,left,right) +' '+trim(l.last_name ,left,right);
 self.passenger_name_suffix := if(trim(l.name_suffx,left,right) ='N','',l.name_suffx);
 self.passenger_st_city := trim(l.address,left,right) +' '+ trim(l.city,left,right); 
@@ -777,16 +809,16 @@ self.first_passenger_safe := '';
 self.second_passenger_safe := ''; 
 self.passenger_eject_code := ''; 
 self.passenger_fr_cap_code := ''; 
-self.addr_suffix 					:= L.addr_suffix ;
-self.ace_fips_st					:= L.county_code[1..2];
-self.county							:= L.county_code[3..5];
-self.zip							:= L.z5;
-self.zip4								:= L.z4;
-self.score 							:= L.name_score;
-self.suffix 						:= L.suffix;  
-self.cname              := l.cname; 
+self.addr_suffix := L.addr_suffix ;
+self.ace_fips_st := L.county_code[1..2];
+self.county := L.county_code[3..5];
+self.zip := L.z5;
+self.zip4 := L.z4;
+self.score := L.name_score;
+self.suffix := L.suffix;  
+self.cname := l.cname; 
 
-self 								:= L;
+self := L;
 self := []; 
 end;
 
@@ -801,16 +833,18 @@ export flc5_ptotal := dedup(pflc5+pecrash,all);
 flc6 := FLAccidents.basefile_flcrash6;
 //using flcrash input file where washington suppression are being removed.  National input file does not have driver phones.
 
-Layout_PrepEcrashFLAccidentPRKeys.flc6_xpnd_layout xpndrecs(flc6 L) := transform
+Layout_PrepEcrashFLAccidentPRKeys.flc6_interim xpndrecs(flc6 L) := transform
 self.report_code					:= 'FA';
-self.report_category				:= 'Auto Report';
-self.report_code_desc				:= 'Auto Accident';
-self.accident_nbr := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.orig_accnbr := l.accident_nbr;
-self.ded_dob := l.ded_dob[5..8]+l.ded_dob[1..4] ;
-self.ped_race_desc := '';
-self.ped_sex_desc := '';
-self 								:= L;
+self.report_category		  := 'Auto Report';
+self.report_code_desc		  := 'Auto Accident';
+accidentNumber            := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+self.accident_nbr         := accidentNumber;
+self.l_acc_nbr             := accidentNumber; 
+self.orig_accnbr          := l.accident_nbr;
+self.ded_dob              := l.ded_dob[5..8]+l.ded_dob[1..4] ;
+self.ped_race_desc        := '';
+self.ped_sex_desc         := '';
+self 								      := L;
 end;
 
 pflc6:= project(flc6,xpndrecs(left));
@@ -820,13 +854,15 @@ ecrashFile := ReadEcrashFile(STD.Str.ToUpperCase(trim(person_type)) in ['PEDALCY
 																																													 'PEDESTRIAN',
 																																								 					 'PEDETRIAN',
 																																													 'PEDISTRIAN']); 
-Layout_PrepEcrashFLAccidentPRKeys.flc6_xpnd_layout xpndecrash(ecrashFile L) := transform
+Layout_PrepEcrashFLAccidentPRKeys.flc6_interim xpndecrash(ecrashFile L) := transform
 
   self.did							    := if(L.did = 0,'000000000000',intformat(L.did,12,1));
   self.rec_type_6						:= '6';
   t_accident_nbr 			      := if(l.source_id in ['TM','TF'],L.state_report_number, L.case_identifier);
   t_scrub                   := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-  self.accident_nbr         := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
+  accidentNumber            := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
+	self.accident_nbr         := accidentNumber;
+  self.l_acc_nbr             := accidentNumber; 
   self.orig_accnbr          := t_accident_nbr;
   self.addr_suffix 				  := L.addr_suffix;
   self.ace_fips_st				  := L.county_code[1..2];
@@ -859,13 +895,15 @@ export flc6_ptotal := dedup(pflc6+pecrash,all);
 flc7 := FLAccidents.basefile_flcrash7;
 //using flcrash input file where washington suppression are being removed.  National input file does not have driver phones.
 
-Layout_PrepEcrashFLAccidentPRKeys.flc7_xpnd_layout xpndrecs(flc7 L) := transform
+Layout_PrepEcrashFLAccidentPRKeys.flc7_interim xpndrecs(flc7 L) := transform
 self.report_code					:= 'FA';
-self.report_category				:= 'Auto Report';
-self.report_code_desc				:= 'Auto Accident';
-self.accident_nbr := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.orig_accnbr := l.accident_nbr; 
-self 								:= L;
+self.report_category		  := 'Auto Report';
+self.report_code_desc		  := 'Auto Accident';
+accidentNumber            := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+self.accident_nbr         := accidentNumber;
+self.l_acc_nbr             := accidentNumber; 
+self.orig_accnbr          := l.accident_nbr; 
+self 								      := L;
 end;
 
 pflc7:= project(flc7,xpndrecs(left));
@@ -873,15 +911,17 @@ pflc7:= project(flc7,xpndrecs(left));
 //ecrash 
 pecrshFile := ReadEcrashFile( STD.Str.ToUpperCase(trim(person_type)) in ['PROPERTY DAMAGE OWNER','PROPERTY OWNER']); 
 
-Layout_PrepEcrashFLAccidentPRKeys.flc7_xpnd_layout xpndecrash(pecrshFile L) := transform
+Layout_PrepEcrashFLAccidentPRKeys.flc7_interim xpndecrash(pecrshFile L) := transform
 
-self.rec_type_7						:= '7';
-self.did							:= if(L.did = 0,'000000000000',intformat(L.did,12,1));
-self.b_did							:= if(L.bdid = 0,'',intformat(L.bdid,12,1)); 
-self.b_did_score      := l.bdid_score ; 
-t_accident_nbr 			:= if(l.source_id in ['TM','TF'],L.state_report_number, L.case_identifier);
+self.rec_type_7 := '7';
+self.did := if(L.did = 0,'000000000000',intformat(L.did,12,1));
+self.b_did := if(L.bdid = 0,'',intformat(L.bdid,12,1)); 
+self.b_did_score := l.bdid_score ; 
+t_accident_nbr := if(l.source_id in ['TM','TF'],L.state_report_number, L.case_identifier);
 t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
+accidentNumber := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
+self.accident_nbr := accidentNumber;
+self.l_acc_nbr := accidentNumber; 
 self.orig_accnbr := t_accident_nbr;
 self.prop_damage_nbr := ''; // need to be populated after property damage file added in prod 
 self.prop_damaged := l.property_damage_description1;
@@ -893,14 +933,14 @@ self.prop_owner_st_city := trim(l.address,left,right) + trim(l.city,left,right);
 self.prop_owner_state := l.state ; 
 self.prop_owner_zip := l.zip_code; 
 
-self.addr_suffix 					:= L.addr_suffix;
-self.ace_fips_st					:= L.county_code[1..2];
-self.county							:= L.county_code[3..5];
-self.zip							:= L.z5;
-self.zip4								:= L.z4;
-self.score 							:= L.name_score;
-self.suffix 						:= L.suffix;  
-self.cname              := l.cname; 
+self.addr_suffix := L.addr_suffix;
+self.ace_fips_st := L.county_code[1..2];
+self.county := L.county_code[3..5];
+self.zip := L.z5;
+self.zip4 := L.z4;
+self.score := L.name_score;
+self.suffix := L.suffix;  
+self.cname := l.cname; 
 
 self := l; 
 self := [];
@@ -917,13 +957,15 @@ export flc7_ptotal := dedup(pflc7+pecrash,all);
 flc8 := FLAccidents.basefile_flcrash8;
 //using flcrash input file where washington suppression are being removed.  National input file does not have driver phones.
 
-Layout_PrepEcrashFLAccidentPRKeys.flc8_xpnd_layout xpndrecs(flc8 L) := transform
-self.report_code					:= 'FA';
-self.report_category				:= 'Auto Report';
-self.report_code_desc				:= 'Auto Accident';
-self.accident_nbr := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+Layout_PrepEcrashFLAccidentPRKeys.flc8_interim xpndrecs(flc8 L) := transform
+self.report_code := 'FA';
+self.report_category := 'Auto Report';
+self.report_code_desc := 'Auto Accident';
+accidentNumber := STD.Str.Filter(l.accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+self.accident_nbr := accidentNumber;
+self.l_acc_nbr := accidentNumber; 
 self.orig_accnbr := l.accident_nbr; 
-self 								:= L;
+self := L;
 end;
 
 pflc8:= project(flc8,xpndrecs(left));
@@ -932,14 +974,16 @@ pflc8:= project(flc8,xpndrecs(left));
 
 ecrashBaseFile  := ReadEcrashBaseFile;
 
-Layout_PrepEcrashFLAccidentPRKeys.flc8_xpnd_layout xpndecrash(ecrashBaseFile L) := transform
+Layout_PrepEcrashFLAccidentPRKeys.flc8_interim xpndecrash(ecrashBaseFile L) := transform
 
-self.rec_type_8						:= '8';
-t_accident_nbr 			:= if(l.source_id in ['TF','TM'],L.state_report_number, L.case_identifier);
+self.rec_type_8 := '8';
+t_accident_nbr := if(l.source_id in ['TF','TM'],L.state_report_number, L.case_identifier);
 t_scrub := STD.Str.Filter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
+accidentNumber := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.incident_id,t_scrub);
+self.accident_nbr := accidentNumber;
+self.l_acc_nbr := accidentNumber; 
 self.orig_accnbr := t_accident_nbr;
-self.carrier_name     := L.Insurance_Company;
+self.carrier_name := L.Insurance_Company;
 
 self := l; 
 self := [];

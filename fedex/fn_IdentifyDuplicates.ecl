@@ -32,14 +32,14 @@ end;
 //keeping the MIN record_id sticks with the similar concept of doing the same
 //for the Header RID.  once we establish 2 records are the same then keep
 //the earliest occurrence of it.
-r2 x1(in_ds le, ta1 ri) := transform
- self.similar_recs_ct  := (string)ri.similar_recs_ct;
- self.max_file_date    := ri.max_dt_last_seen;
- self.parent_record_id := ri.min_record_id;
- self                  := le;
+r2 x1(ta1 le,  in_ds ri) := transform
+ self.similar_recs_ct  := (string)le.similar_recs_ct;
+ self.max_file_date    := le.max_dt_last_seen;
+ self.parent_record_id := le.min_record_id;
+ self                  := ri;
 end;
 
-j1 := join(in_ds,ta1,
+j1 := join(ta1,in_ds,
                 left.full_name=right.full_name
 						and left.company_name=right.company_name
 						and left.phone=right.phone
@@ -52,7 +52,7 @@ j1 := join(in_ds,ta1,
 						and left.zip6=right.zip6
 						and left.geo_lat=right.geo_lat
 						and left.geo_long=right.geo_long
-						,x1(left,right));
+						,x1(left,right),lookup);
 
 return j1;
 
