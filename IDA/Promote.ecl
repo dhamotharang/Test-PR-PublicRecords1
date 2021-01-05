@@ -1,18 +1,18 @@
-﻿IMPORT tools,std;
+﻿IMPORT tools,std,ida;
 
 lay_daily_build        := tools.Layout_FilenameVersions.builds;
 lay_accumulative_build := tools.Layout_FilenameVersions.builds;
 lay_base_change_build  := tools.Layout_FilenameVersions.builds;
 
-EXPORT Promote(STRING							 pversion				 = trim((string8)std.date.today()),
-               BOOLEAN             pUseProd        = FALSE,
-							 BOOLEAN             pDaily          = FALSE,
-	             STRING							 pFilter				 = '',
-	             BOOLEAN						 pDelete				 = FALSE,
-	             BOOLEAN						 pIsTesting			 = FALSE,
-	             DATASET(lay_accumulative_build) pBuildFilenamesaccumulative = IDA.Filenames(pversion).Base.dAll_filenames,							 
-	             DATASET(lay_daily_build) pBuildFilenamesDaily = IDA.Filenames(pversion).BaseDaily.dAll_filenames,
-							 DATASET(lay_base_change_build) pBuildFilenamesBaseChange = IDA.Filenames(pversion).BaseChange.dAll_filenames
+EXPORT Promote(STRING							 pversion		 = '',
+               BOOLEAN                           pUseProd        = FALSE,
+			   BOOLEAN                           pDaily          = FALSE,
+	           STRING							 pFilter		 = '',
+	           BOOLEAN						     pDelete		 = FALSE,
+	           BOOLEAN						     pIsTesting		 = FALSE,
+	           DATASET(lay_accumulative_build) pBuildFilenamesaccumulative = IDA.Filenames(pversion).Base.dAll_filenames,							 
+	           DATASET(lay_daily_build) pBuildFilenamesDaily = IDA.Filenames(pversion).BaseDaily.dAll_filenames,
+			   DATASET(lay_base_change_build) pBuildFilenamesBaseChange = IDA.Filenames(pversion).BaseChange.dAll_filenames
 					 
 ):= MODULE
 	

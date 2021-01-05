@@ -2,28 +2,29 @@
 
 EXPORT _CRON_ECL(string pProcessName = '',boolean pUseProd = false, boolean pDaily = true, string pVersion='')  := Module
 
-shared version 										:= if(pVersion='',(string8)std.date.today(),pVersion);
-shared groupname		             	:= if(pUseProd, IDA._Constants(version,pUseProd).PROD_THOR, IDA._Constants(version,pUseProd).DATALAND_THOR);
-shared period            					:= if(pDaily, 'DAILY ','QUARTERLY LEXID REAPPEND ');
+// EXPORT version 								:= if(pversion='',IDA._Constants(pUseProd).filesdate,pversion);
+EXPORT version 								:= if(pDaily,IDA._Constants(pUseProd).filesdate,IDA._Constants(pUseProd).monthlyversion);
+EXPORT groupname		                	:= if(pUseProd, IDA._Constants(pUseProd).PROD_THOR, IDA._Constants(pUseProd).DATALAND_THOR);
+EXPORT period            					:= if(pDaily, 'DAILY ','MONTHLY REAPPEND ');
 
 Export WU_NAME				      			:= 'IDA ' + period + 'BUILD';
-Export WU_VERSION 								:= WU_NAME + ' ' + version;
+Export WU_VERSION 							:= WU_NAME + ' ' + version;
 Export SCHEDULER_NAME 						:= WU_NAME + ' SCHEDULER';
 Export EVENT_NAME     						:= WU_NAME + ' EVENT';
 
 
 sDaily                 						:= if(pDaily, 'true','false');
-sUseProd                          := if(pUseProd,'TRUE','FALSE');
+sUseProd                                    := if(pUseProd,'TRUE','FALSE');
 
-IDA_BASE_REAPPEND_ECL             := 'do:=SEQUENTIAL(\nIDA._BWR_Did_Reappend(\''+version+'\','+sUseProd+')\n);\n';
-IDA_DAILY_SPRAY_ECL               := 'do:=SEQUENTIAL(\nIDA._BWR_Build(\''+version+'\','+sUseProd+')\n);\n';
+IDA_BASE_REAPPEND_ECL                       := 'do:=SEQUENTIAL(\nIDA._BWR_Consolidate_And_Did_Reappend(\''+version+'\','+sUseProd+')\n);\n';
+IDA_DAILY_SPRAY_ECL                         := 'do:=SEQUENTIAL(\nIDA._BWR_Build(\''+version+'\','+sUseProd+')\n);\n';
 
 
-PROCESS_ECL 				:= Case(pProcessName, 
+PROCESS_ECL 				                := Case(pProcessName, 
 														'IDA BUILD'        => IDA_DAILY_SPRAY_ECL,
 														'IDA REAPPEND'     => IDA_BASE_REAPPEND_ECL,'');
 
-DO_SEQUENTIAL_ECL   := Case(pProcessName,
+DO_SEQUENTIAL_ECL                           := Case(pProcessName,
 														'IDA BUILD'         => PROCESS_ECL,
 														'IDA REAPPEND'      => PROCESS_ECL,
 														'DO:= SEQUENTIAL(\n'+PROCESS_ECL+');\n');

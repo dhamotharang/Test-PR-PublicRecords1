@@ -1,52 +1,21 @@
-﻿import Address, Ut, lib_stringlib, _Control, business_header,_Validate, mdr,IDA,
-Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, NID, AID,std;
+import Address, Ut, lib_stringlib, _Control, business_header,_Validate, mdr,IDA,
+Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, NID, AID,std,VersionControl;
 
-EXPORT Update_Base (string pversion='', boolean pUseProd=false, boolean pdaily=true) := function
+EXPORT FN_Consolidate_And_Reappend_Did(string pversion,boolean pUseProd=false,boolean pDaily=false):= MODULE
 
+// name                := trim('thor_data400::base::ida::daily::*');	                                                                            	
+// rawFilesinThor      := NOTHOR(STD.File.LogicalFileList(name,true,false,false));
+// shared pversion     := Max(rawFilesinThor,(string)std.str.splitwords(name,'::')[5][1..15]);
 
-//standardize input
+// shared pversion:=IDA._Constants(pUseProd).filesdate;
 
-input := IDA.Files(pversion,pUseProd).input;
-
-Ida.layouts.base tMapping(ida.layouts.input L, C) := TRANSFORM
-
-	SELF.src                          := '';							
-	SELF.persistent_record_id         := pversion;
-	SELF.Dt_first_seen                := (unsigned)pversion;
-	SELF.Dt_last_seen                 := (unsigned)pversion;
-	SELF.Dt_vendor_first_reported     := (unsigned)pversion;
-	SELF.Dt_vendor_last_reported      := (unsigned)pversion;
-	SELF.orig_first_name              := l.firstname;							
-	SELF.orig_middle_name             := l.middlename;
-	SELF.orig_last_name               := l.lastname;
-	SELF.orig_suffix                  := l.suffix;
-	SELF.orig_address1                := l.addressline1;
-	SELF.orig_address2                := l.addressline2;
-	SELF.orig_city                    := l.city;
-	SELF.orig_state_province          := l.state;
-	SELF.orig_zip4                    := l.zip;
-	SELF.orig_zip5                    := '';
-  SELF.orig_dob                     := l.dob;
-	SELF.orig_ssn                     := l.ssn;
-  SELF.orig_dl                      := l.dl;
-  SELF.orig_dlstate                 := l.dlstate;
-	SELF.orig_phone                   := l.phone;
-	SELF.clientassigneduniquerecordid := l.clientassigneduniquerecordid;
-	SELF.adl_ind                      := '';
-	SELF.orig_email                   := l.emailaddress; 
-	SELF.orig_ipaddress               := l.ipaddress;
-	SELF.orig_filecategory            := l.filecategory;
-	SELF.clean_phone                  := if(ut.CleanPhone(L.phone) [1] not in ['0','1'],ut.CleanPhone(L.phone), '') ;
-	SELF.clean_dob                    := if((string)L.dob <> '', _validate.date.fCorrectedDateString((string)L.dob,false), '');
-	SELF  :=  L;
-	SELF := [];
-END;
-
-std_input := project(IDA.Files(pversion,pUseProd).input, tMapping(LEFT, counter));
+shared DailyBaseBuilt:=IDA.Files().Basedaily.Built;
+shared DailyBaseQA:=IDA.Files().Basedaily.QA;
+shared FullDaily:= DailyBaseBuilt + DailyBaseQA;
 
 
 //Clean names
-NID.Mac_CleanParsedNames(std_input, cleanNames
+NID.Mac_CleanParsedNames(FullDaily, cleanNames
 													, firstname:=orig_first_name,lastname:=orig_last_name
 													, includeInRepository:=true, normalizeDualNames:=false
 												);
@@ -91,11 +60,6 @@ END;
 
 cleanAdd_t := project(cleanAddr,tr(left));
 
-//Add to previous base
-// base_and_update := if(nothor(FileServices.GetSuperFileSubCount(IDA.Filenames(version, pUseProd).lBaseTemplate_built)) = 0
-											 // ,cleanAdd_t
-											 // ,cleanAdd_t + IDA.Files(version, pUseProd).base.built);
-
 new_base_d := distribute(cleanAdd_t, hash(orig_first_name,orig_last_name,orig_address1,orig_phone,orig_email,orig_dob));  
 new_base_s := sort(new_base_d,
  		              orig_first_name,
@@ -131,23 +95,6 @@ IDA.Layouts.base t_rollup (new_base_s  le, new_base_s ri) := transform
  self := le;
 end;
 
-// base_f := rollup(new_base_s,
-									// left.orig_first_name = right.orig_first_name and				
-									// left.orig_last_name = right.orig_last_name and						
-									// left.orig_Zip5 = right.orig_Zip5	 and					
-									// left.orig_address1 = right.orig_address1 and				
-									// left.orig_phone = right.orig_phone and														
-									// left.orig_email = right.orig_email and
-									// left.orig_dob = right.orig_dob and
-									// left.orig_address2 = right.orig_address2 and
-									// left.orig_city = right.orig_city and
-									// left.orig_state_province = right.orig_state_province and
-									// left.orig_zip4  = right.orig_zip4 
-																	// ,t_rollup(left, right)
-																	// ,local);
-
-//DID
-
 matchset := ['A','Z','D','P'];
 	 did_add.MAC_Match_Flex
 	 (new_base_s, matchset,					
@@ -155,18 +102,46 @@ matchset := ['A','Z','D','P'];
 	 prim_range, prim_name, sec_range, zip, st, clean_phone, 
 	 DID,IDA.Layouts.base, false, DID_Score_field, 
 	 75, d_did)
+
+
 	 
 //Append ADL_ind
 Watchdog.Mac_append_ADL_ind(d_did, Updated_Base);
 
-daily_base:= Updated_Base;
 
-// accumulative_base := if(nothor(FileServices.GetSuperFileSubCount(IDA.Filenames(pversion, pUseProd).lBaseTemplate_built)) = 0
-// 											 ,Updated_Base
-// 											 ,Updated_Base + IDA.Files(pversion, pUseProd).base.built);
-	 
-// base_and_update := if(pdaily,daily_base,accumulative_base);
-									
-// return base_and_update;
-return daily_base;
+shared reapendedbase:= Updated_Base;
+
+	accumulative_base := if(nothor(FileServices.GetSuperFileSubCount(IDA.Filenames(pversion, pUseProd).lBaseTemplate_built)) = 0
+											 ,reapendedbase
+											 ,reapendedbase + IDA.Files(pversion, pUseProd).base.built);																			
+				
+	VersionControl.macBuildNewLogicalFile( 
+																				 IDA.Filenames(pversion + 'R',pUseProd).base.new	
+																				,accumulative_base
+																				,Build_Did_Reappended_Base_File
+																			 );
+																						 
+export Build_Reappended_Base :=
+		sequential(Build_Did_Reappended_Base_File
+							,IDA.Promote(pversion + 'R',pUseProd,pDaily).BuildAccumulativefiles.New2Built
+							,IDA.Promote(pversion + 'R',pUseProd,pDaily).BuildAccumulativefiles.Built2QA
+);
+
+DeleteDailySeq:=SEQUENTIAL(
+STD.File.StartSuperFileTransaction(),
+STD.File.RemoveOwnedSubFiles('~thor_data400::base::ida::daily::built',TRUE),
+STD.File.RemoveOwnedSubFiles('~thor_data400::base::ida::daily::qa',TRUE),
+STD.File.FinishSuperFileTransaction()
+);
+
+BaseChange:=IDA._BWR_Base_Change(pUseProd,false).Build_Base_Change;
+
+seq:=SEQUENTIAL(Build_Reappended_Base,BaseChange,DeleteDailySeq);
+
+export All :=
+		if(IDA._Constants(pUseProd).IsValidversion(pversion)
+			,seq
+			,output('No Valid version parameter passed, skipping build')
+		);
+
 end;

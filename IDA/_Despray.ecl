@@ -2,7 +2,7 @@
 
 EXPORT _Despray(string pversion='', boolean pUseProd=FALSE) := function
 
-version:=IF(pversion='',trim((string8)std.date.today()),pversion);
+version:=if(pversion='',IDA._Constants(pUseProd).filesdate,pversion);
 
 DailyBase:=IDA.Files().Basedaily.Built;
 

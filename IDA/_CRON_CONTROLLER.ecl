@@ -1,10 +1,10 @@
 ﻿import std, _Control, IDA, wk_ut; 
 #WORKUNIT('name', 'IDA PROCESS CONTROLLER');
 
-_process(string prProcess ,boolean pUseProd, boolean prDaily) := Function 
+_process(string prProcess ,boolean pUseProd, boolean pDaily) := Function 
 
   _pUseProd  :=if(pUseProd,'true','false');   
-	_prDaily   :=if(prDaily,'true','false');
+	_pDaily   :=if(pDaily,'true','false');
 
 	_thor 		:= Case(_Control.ThisEnvironment.ThisDaliIp, 
 										STD.System.Util.ResolveHostName(IDA._Constants().dataland_dali)  => IDA._Constants().DATALAND_THOR_GIT,					
@@ -18,30 +18,30 @@ _process(string prProcess ,boolean pUseProd, boolean prDaily) := Function
 
 	_createWUID_ECL  := 	
 		 '#WORKUNIT(\'protect\',true);\n'
-		+'#WORKUNIT(\'name\', IDA._CRON_ECL(\'' + prProcess + '\',' + _pUseProd + ',' + _prDaily + ').SCHEDULER_NAME);\n'
+		+'#WORKUNIT(\'name\', IDA._CRON_ECL(\'' + prProcess + '\',' + _pUseProd + ',' + _pDaily + ').SCHEDULER_NAME);\n'
 		+'wk_ut.CreateWuid('
-		+'IDA._CRON_ECL(\'' + prProcess + '\',' + _pUseProd  + ',' + _prDaily + ').WU,\n'
+		+'IDA._CRON_ECL(\'' + prProcess + '\',' + _pUseProd  + ',' + _pDaily + ').WU,\n'
 		+'\''+ trim(_thor,left,right) + '\',\n'
 		+'\''+ trim(_esp,left,right)  + '\',\n'
 		+')\n'
 		+'CRON_WHEN\n' 
 		+',FAILURE(FileServices.SendEmail( \n'
 		+'IDA.email_notification_lists.BuildFailure\n'
-		+',\'*** ALERT **** \' +  IDA._CRON_ECL(\'' + prProcess + '\',' + _pUseProd + ',' + _prDaily + ').WU_VERSION\n'
+		+',\'*** ALERT **** \' +  IDA._CRON_ECL(\'' + prProcess + '\',' + _pUseProd + ',' + _pDaily + ').WU_VERSION\n'
 		+',IDA.email_msg(workunit,'+_pUseProd+').NOC_MSG\n'
 		+')\n'
 		+');';
 
 	_cronWhen_ECL := Case( prProcess, 
-											   'IDA REAPPEND' =>  ':WHEN(CRON(\'0 22 * 1-12/3 *\'))\n'  
+											   'IDA REAPPEND' =>  ':WHEN(IDA._CRON_ECL(\'' + prProcess + '\',' + _pUseProd + ',' + _pDaily + ').EVENT_NAME)\n' 
 											  ,'IDA BUILD'    =>  ':WHEN(CRON(\'0 11-23/1 * * *\'))\n'  
-												,			              ':WHEN(IDA._CRON_ECL(\'' + prProcess + '\',' + _pUseProd + ',' + _prDaily + ').EVENT_NAME)\n'
+												,			              ':WHEN(IDA._CRON_ECL(\'' + prProcess + '\',' + _pUseProd + ',' + _pDaily + ').EVENT_NAME)\n'
 												);
 
 	schedule_ECL       :=  STD.Str.FindReplace( _createWUID_ECL, 'CRON_WHEN', _cronWhen_ECL); 
-	noSchedule_ECL 		 := 'output(\''+ IDA._CRON_ECL(prProcess , pUseProd, prDaily).SCHEDULER_NAME + ' is running already \')'; 
+	noSchedule_ECL 		 := 'output(\''+ IDA._CRON_ECL(prProcess , pUseProd, pDaily).SCHEDULER_NAME + ' is running already \')'; 
  
-	active_wu := IDA.GetActiveWU(IDA._CRON_ECL(prProcess , pUseProd, prDaily).SCHEDULER_NAME);
+	active_wu := IDA.GetActiveWU(IDA._CRON_ECL(prProcess , pUseProd, pDaily).SCHEDULER_NAME);
 	
 	return wk_ut.CreateWuid (if(active_wu, noSchedule_ECL, schedule_ECL), _cluster, _esp);   
 

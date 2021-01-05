@@ -25,7 +25,7 @@ Export Input :=RECORD
 	
 
 EXPORT Base := RECORD
-	STRING19	persistent_record_id ;
+	STRING15	persistent_record_id ;
 	STRING2   src;			//				
 	UNSIGNED6 Dt_first_seen;
 	UNSIGNED6 Dt_last_seen;
