@@ -15,12 +15,12 @@
 	STRING1			SSN_IND;		// G=good; F=fatfingers(typo; one or two digits off in the same positions); R=relative; B=bad; O=other
 	STRING1			DOB_IND;		// C=correct, L=correct but low quality, I=invalid, T=typo, B=bad, U=undetermined
 	STRING1			DLNO_IND;   // 1=Current, 2=Former1, 3=Former2, ....
-	STRING1			FNAME_IND;		// 
-	STRING1			MNAME_IND;		// 
-	STRING1			LNAME_IND;		// 
+	STRING2     FNAME_IND;
+	STRING2     MNAME_IND;
+	STRING2     LNAME_IND;
 	STRING2			ADDR_IND;		// 1=Current, 2=Former1, 3=Former2, ....
 	STRING1			BEST_ADDR_IND;
-	STRING1     PHONE_IND;
+	STRING2     PHONE_IND;
 	STRING1			PHONE_TYPE;	//DF-28025
 	STRING2			EMAIL_IND;	//DF-28025
 	STRING1			EMAIL_TYPE; //DF-28025
