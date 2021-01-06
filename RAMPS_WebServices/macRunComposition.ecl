@@ -23,7 +23,7 @@ EXPORT macRunComposition(cmpUuid, 		//Composition ID
 		+IF(~useDspNext, '&KeepECL='+TRIM(keepEcl), '')
 		+'&VIZSERVICEVERSION='+TRIM(vizServiceVersion)
 		+'&forcerun='+TRIM(forceRun)
-    // +'&deleteOldIndexes='+TRIM(deleteOldIndexes)
+    	 	+'&deleteOldIndexes='+TRIM(deleteOldIndexes)
 		+TRIM(filenames)
     +TRIM(globalVariables);
 

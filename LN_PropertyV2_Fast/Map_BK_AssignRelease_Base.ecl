@@ -400,11 +400,11 @@ EXPORT Map_BK_AssignRelease_Base (STRING	pVersionDate
 		dSearchCleanNormName := dedup(sort(normalize(dSearchCleanName,2,tNormSearchCleanNames(LEFT,counter)),
 																	record,local),record, EXCEPT conjunctive_name_seq,local);
 		
-		LN_Propertyv2.Append_AID(dSearchCleanNormName,dSearchCleanAddr,false);
-		dSearchAID	:=	dSearchCleanAddr;
+		//LN_Propertyv2.Append_AID(dSearchCleanNormName,dSearchCleanAddr,false); // DF-28245 unify multiple calls to AID into a single call
+		//dSearchAID	:=	dSearchCleanAddr;
 		
 		//Reformat to bring to base file layouts
-		EXPORT dNew	:=	project(dSearchAID(nameasis	!=	''), LN_PropertyV2_Fast.Layout_prep_search_prp);
+		EXPORT dNew	:=	project(dSearchCleanNormName(nameasis	!=	''), LN_PropertyV2_Fast.Layout_prep_search_prp);
 	
 	END;
 END;

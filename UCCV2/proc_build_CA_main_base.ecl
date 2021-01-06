@@ -1,61 +1,43 @@
 ﻿import address, did_add, didville,ut,header_slimsort,UccV2,business_header,Business_Header_SS;
 
-dMaster	 			             	:= sort(distribute(file_ca_Filing_Master_in,hash(initial_filing_number)),initial_filing_number,filing_status,-process_date,local);
-dUcc3      	 			 			:= sort(distribute(file_ca_ucc3_in,hash(initial_filing_number)),initial_filing_number,ucc3_filing,-process_date,local);
-dCollateral	 			            := file_ca_Collateral_in;
+dMaster	 			     	:= sort(distribute(file_ca_Filing_Master_in,hash(initial_filing_number)),initial_filing_number,filing_status,-process_date,local);
 dfile								:= File_CA_Main_Base;
 
 
-layout_collateral 
-   :=record
-       	string31 	tmsid;	
-		string512 	collateral_desc ;
-		dCollateral.ucc3_filing_number;
- end;
-	 
-
-Layout_UCC_Common.Filing  TFiling(dMaster pLeft, dUcc3 pRight) 
+Layout_UCC_Common.Filing  TFiling(dMaster pLeft) 
    := 
    TRANSFORM
-          
+      
+			//The vendor no longer sends the filing status.  The filing status is derived based on the lapse date
 			self.tmsid 				 := 'CA'+pLeft.initial_filing_number;
-			self.rmsid 				 := 'CA'+pLeft.filing_status+if(pRight.ucc3_filing='',pLeft.initial_filing_number,pRight.ucc3_filing);
-			self.static_value		 :=	if((integer) pLeft.static>0,pLeft.static,'');
+			self.rmsid 				 := 'CA'+pLeft.filing_status+if(pLeft.ucc3_filing='',pLeft.initial_filing_number,pLeft.ucc3_filing);
 			self.Filing_Jurisdiction := 'CA';
 			self.orig_filing_number  := pLeft.initial_filing_number;
-			self.orig_filing_type	 := pLeft.ucc_filing_type_desc;
-			self.orig_filing_date	 := pLeft.filing_date;
-			self.orig_filing_time    := pLeft.filing_time;
-			self.filing_number		 := pRight.ucc3_filing;
-			self.filing_type		 := pRight.ucc3_filing_desc;
-			self.filing_date		 := pRight.ucc3_filing_date;
-			self.filing_time		 := pRight.ucc3_filing_time;
-			self.page				 := pRight.ucc3_page_count;
-			self.expiration_date	 := pLeft.lapse_date;
-			self.Status_type		 := pLeft.ucc_status_desc;
+			self.orig_filing_type	   := if(trim(pLeft.ucc_filing_type_desc) = 'LIEN FINANCING STMT' and trim(pLeft.initial_filing_number) = trim(pLeft.ucc3_filing), 
+			                               trim(pLeft.filing_type_id) + ' - ' + trim(pLeft.ucc_filing_type_desc), '');
+			self.orig_filing_date	   := if(trim(pLeft.ucc_filing_type_desc) = 'LIEN FINANCING STMT' and trim(pLeft.initial_filing_number) = trim(pLeft.ucc3_filing), trim(pLeft.filing_date), '');
+			self.orig_filing_time    := if(trim(pLeft.ucc_filing_type_desc) = 'LIEN FINANCING STMT' and trim(pLeft.initial_filing_number) = trim(pLeft.ucc3_filing), trim(pLeft.filing_time), '');
+			self.filing_number		   := pLeft.ucc3_filing;
+			self.filing_type		     := if(trim(pLeft.ucc_filing_type_desc) <> 'LIEN FINANCING STMT' and trim(pLeft.initial_filing_number) <> trim(pLeft.ucc3_filing), 
+			                               trim(pLeft.ucc_filing_type_desc), '');
+			self.filing_date		     := if(trim(pLeft.ucc_filing_type_desc) <> 'LIEN FINANCING STMT' and trim(pLeft.initial_filing_number) <> trim(pLeft.ucc3_filing), trim(pLeft.filing_date), '');
+			self.filing_time		     := if(trim(pLeft.ucc_filing_type_desc) <> 'LIEN FINANCING STMT' and trim(pLeft.initial_filing_number) <> trim(pLeft.ucc3_filing), trim(pLeft.filing_time), '');
+			self.page				         := if((integer)pLeft.page_count <> 0, trim(pLeft.page_count), '');
+			self.expiration_date	   := pLeft.lapse_date;
 			self.filing_status       := pLeft.filing_status;
-			self.microfilm_number	 := pRight.ucc3_internal_document_no;
-			self			         := pleft;
+			self.status_type         := if(trim(pLeft.filing_status) = 'A', 'ACTIVE','LAPSED');
+			self			               := pleft;
    END; 
 
-layout_collateral  tCollateral(dCollateral pInput) 
-   := 
-   TRANSFORM
-          
-			self.tmsid 				 := 'CA'+pInput.initial_filing_number;			
-			self.collateral_desc	 := pInput.all_collateral;
-			self.ucc3_filing_number  := pInput.ucc3_filing_number;
-   END; 
-   
-  
 
-Layout_UCC_Common.layout_ucc_new Tadd_collateral(Layout_UCC_Common.Filing pLeft, layout_collateral pRight)
+Layout_UCC_Common.layout_ucc_new Tucc_layout(Layout_UCC_Common.Filing pLeft)
    :=
    TRANSFORM
-          self                       := pLeft;
-		  self						 := pRight; 
+          self   := pLeft;
+		      self	 := []; 
    
    END;
+	 
 recordof(dMAster) tRollupDuplicates(dMaster pLeft,  dMaster pRight)
   :=
    TRANSFORM
@@ -63,53 +45,22 @@ recordof(dMAster) tRollupDuplicates(dMaster pLeft,  dMaster pRight)
 	 
 	End;
 
-recordof(dUCC3) tRollupdedup(dUCC3 pLeft,  dUCC3 pRight)
-  :=
-   TRANSFORM
-	 	 self           	  		 := pLeft;
-	 
-	End;
-Layout_UCC_Common.layout_ucc_new tRollupStatus(Layout_UCC_Common.layout_ucc_new pLeft,Layout_UCC_Common.layout_ucc_new Pright)
+Layout_UCC_Common.layout_ucc_new tRollupStatus(Layout_UCC_Common.layout_ucc_new pLeft,Layout_UCC_Common.layout_ucc_new pRight)
    :=
     TRANSFORM
-	 	 self.filing_status          := if (pLeft.filing_status='L' or pLeft.filing_status='' ,pLeft.filing_status,pright.filing_status);
-		 self.Status_type            := if (pLeft.Status_type[1]='L' or pLeft.Status_type[1]='',pLeft.Status_type,pright.Status_type);
+	 	 self.filing_status          := if (pLeft.filing_status='L' or pLeft.filing_status='' ,pLeft.filing_status,pRight.filing_status);
+		 self.Status_type            := if (pLeft.Status_type[1]='L' or pLeft.Status_type[1]='',pLeft.Status_type,pRight.Status_type);
 		 self                        := pleft; 
 	 
 	End;
 
-
-dSortMaster                   		 := rollup(dmaster,tRollupDuplicates(left,right),initial_filing_number,filing_status,local);
-dSortUCC3                   		 := rollup(ducc3,tRollupdedup(left,right),initial_filing_number,ucc3_filing,local);
-   
-dSortCollateral                      := distribute(dedup(project(dCollateral, tCollateral(left)),all),hash(tmsid)) ;
-											   
-dJoinFiling                          := distribute(join(dSortMaster ,
-											dSortUCC3,
-											left.initial_filing_number=right.initial_filing_number ,
-											TFiling(left,right),
-											left outer,local),hash(tmsid)) ;
+dSortMaster                    := rollup(dmaster,tRollupDuplicates(left,right),initial_filing_number,filing_status,ucc_filing_type_desc,local);
+mapFiling := project(dSortMaster,TFiling(left));
+							   
+dMainBase                        := project(mapFiling,Tucc_layout(left));
 											
-dMainBase                            := join(dJoinFiling(filing_number <> '') ,
-											dSortCollateral ,
-											left.tmsid=right.tmsid and 
-											left.filing_number=right.ucc3_filing_number,
-											Tadd_collateral(left,right),
-											left outer,local);
-											
-// *******************************************************
-// Collateral data is not getting populated
-// So this  section of the code is more like a patch to the existing code
+dfinalBase := dMainBase + dfile;
 
-nofilingnumber := dJoinFiling(filing_number = '');
-
-dMainBase1                            := join(nofilingnumber ,
-											dSortCollateral ,
-											left.tmsid=right.tmsid,
-											Tadd_collateral(left,right),
-											left outer,local);
-
-dfinalBase := dMainBase1 + dMainBase + dfile;
 
 // *******************************************************
 AddRecordID := uccv2.fnAddPersistentRecordID_Main(dfinalBase);

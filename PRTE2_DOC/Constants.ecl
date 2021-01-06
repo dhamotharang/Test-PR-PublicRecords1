@@ -1,15 +1,17 @@
 ﻿IMPORT doxie_build, hygenics_crim;
 EXPORT Constants := module
 
-Export lookup_file :='~thor::key::crim_offense_cat::qa::charge';
+Export dops_name:='DocKeys';
+
+Export FCRA_dops_name:='FCRA_DocKeys';
 
 EXPORT KeyName_corrections := 	'~prte::key::corrections::'; 
+
+Export lookup_category_file :='~prte::key::corrections_court_offenses::lookup';
 
 EXPORT corrections_keys_logicalname(string filedate) := '~prte::key::corrections_'+doxie_build.buildstate+'::'+filedate+'::';
 
 EXPORT corrections_keys_root := '~prte::key::corrections_'+doxie_build.buildstate;
-
-Export lookup_key_file:='~prte::key::crim_offense_cat::qa::charge';
 
 EXPORT ak_keyname := KeyName_corrections +'autokey::@version@::'; 
 

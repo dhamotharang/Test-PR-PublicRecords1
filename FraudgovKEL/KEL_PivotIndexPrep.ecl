@@ -92,7 +92,19 @@ EXPORT KEL_PivotIndexPrep := MODULE
 															{'p1_aotidkrappfrdactshrdflagev', (STRING)LEFT.p1_aotidkrappfrdactshrdflagev},
 															{'p1_aotidkrgenfrdactshrdflagev', (STRING)LEFT.p1_aotidkrgenfrdactshrdflagev},
 															{'p1_aotidkrothfrdactshrdflagev', (STRING)LEFT.p1_aotidkrothfrdactshrdflagev},
-															{'p1_aotidkrstolidactshrdflagev', (STRING)LEFT.p1_aotidkrstolidactshrdflagev}
+															{'p1_aotidkrstolidactshrdflagev', (STRING)LEFT.p1_aotidkrstolidactshrdflagev},
+															{'p1_aotidkractshrdnewsrcagencydescev', (STRING)LEFT.p1_aotidkractshrdnewsrcagencydescev},
+															{'p1_aotidkrgenfrdactshrdnewsrcagencydescev', (STRING)LEFT.p1_aotidkrgenfrdactshrdnewsrcagencydescev},
+															{'p1_aotidkrstolidactshrdnewsrcagencydescev', (STRING)LEFT.p1_aotidkrstolidactshrdnewsrcagencydescev},
+															{'p1_aotidkrappfrdactshrdnewsrcagencydescev', (STRING)LEFT.p1_aotidkrappfrdactshrdnewsrcagencydescev},
+															{'p1_aotidkrothfrdactshrdnewsrcagencydescev', (STRING)LEFT.p1_aotidkrothfrdactshrdnewsrcagencydescev},
+															{'p9_aotaddrkractshrdnewsrcagencydescev', (STRING)LEFT.p9_aotaddrkractshrdnewsrcagencydescev},
+															{'p15_aotssnkractshrdnewsrcagencydescev', (STRING)LEFT.p15_aotssnkractshrdnewsrcagencydescev},
+															{'p16_aotphnkractshrdnewsrcagencydescev', (STRING)LEFT.p16_aotphnkractshrdnewsrcagencydescev},
+															{'p17_aotemailkractshrdnewsrcagencydescev', (STRING)LEFT.p17_aotemailkractshrdnewsrcagencydescev},
+															{'p18_aotipaddrkractshrdnewsrcagencydescev', (STRING)LEFT.p18_aotipaddrkractshrdnewsrcagencydescev},
+															{'p19_aotbnkacctkractshrdnewsrcagencydescev', (STRING)LEFT.p19_aotbnkacctkractshrdnewsrcagencydescev},
+															{'p20_aotdlkractshrdnewsrcagencydescev', (STRING)LEFT.p20_aotdlkractshrdnewsrcagencydescev}
 														 ], NvpRec),
 														 SELF := LEFT));
 

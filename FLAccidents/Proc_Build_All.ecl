@@ -8,7 +8,7 @@
   export Build_consolidationBase_file	:= FLCrash_BuildConsolidatedBaseFile : success(output('Consolidation Base file built'));
 	export Build_ROXIE_keys	:= FLCrash_BuildKeys : success(output('ROXIE Keys built'));
   // export Build_MOXIE_keys := Out_MOXIE_FLAccidents_Keys	: success(output('MOXIE keys created'));
-	export Build_AUTOKEYS := Proc_build_autokey	: success(output('AUTOKEYS keys created'));
+	// export Build_AUTOKEYS := Proc_build_autokey	: success(output('AUTOKEYS keys created'));
   // export Despray_Dkc_All := DKC_FLAccidents_Keys(pDestinationIP, pDestinationVolume)
 																		//	: success(output('Despray/DKC finished'));
 	Proc_build_stats(pVersion,zDoStatsReference);

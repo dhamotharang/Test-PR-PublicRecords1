@@ -1,50 +1,46 @@
-﻿export mac_CleanFields(inputFile,outputFile) := macro
+﻿EXPORT mac_CleanFields(InputFile, OutputFile) := MACRO
+	IMPORT STD;
+	LOADXML('<xml/>');
+	
+	#EXPORTXML(doCleanFieldMetaInfo, RECORDOF(InputFile))
 
-		loadxml('<xml/>');
-
-		#exportxml(doCleanFieldMetaInfo, recordof(inputFile))
-		
-/*              #uniquename(myCleanFunctionUTF)																							
-                UTF8 %myCleanFunctionUTF%(utf8 x)     := map(x in [U'\\N', U'NULL', U'null', U'Null']  => U'', 
-                 				             x+'N' = U'\\N'                            => U'',
-							     x);
+/* #UNIQUENAME(myCleanFunctionUTF)																							
+   UTF8 %myCleanFunctionUTF%(UTF8 x) := MAP(x in [U'\\N', U'NULL', U'null', U'Null']  => U'', 
+                 				                    x + 'N' = U'\\N' => U'',
+							                              x);
 */							     
-		#uniquename(myCleanFunctionSTR)																							
-		string %myCleanFunctionSTR%(string x) := map(x in ['\\N', 'NULL', 'null', 'Null'] => '', 
-							     x+'N' = '\\N'                        => '',
-							     x);
-		
-		#uniquename(tra)
-		inputFile %tra%(inputFile le) :=
-		transform
-
-		#if (%'doCleanFieldText'%='')
-		 #declare(doCleanFieldText)
-		#end
-		#set (doCleanFieldText, false)
-		#for (doCleanFieldMetaInfo)
-		 #for (Field)
-			#if (%'@type'% = 'string')
-			#set (doCleanFieldText, 'SELF.' + %'@name'%)
-				#append (doCleanFieldText, ':= ' + %'myCleanFunctionSTR'% + '(le.')
-			#append (doCleanFieldText, %'@name'%)
-			#append (doCleanFieldText, ');\n')
+	#UNIQUENAME(myCleanFunctionSTR)																							
+	STRING %myCleanFunctionSTR%(STRING x) := MAP(STD.Str.ToUpperCase(x) IN ['\\N', 'NULL', 'NUL'] => '', 
+							                                 x + 'N' = '\\N' => '',
+							                                 x);		
+	#UNIQUENAME(tra)
+	InputFile %tra%(InputFile le) := TRANSFORM
+		#IF (%'doCleanFieldText'% = '')
+		 #DECLARE(doCleanFieldText)
+		#END
+		#SET (doCleanFieldText, FALSE)
+		#FOR (doCleanFieldMetaInfo)
+		 #FOR (Field)
+		#IF (%'@type'% = 'string')
+			#SET (doCleanFieldText, 'SELF.' + %'@name'%)
+				#APPEND (doCleanFieldText, ':= ' + %'myCleanFunctionSTR'% + '(le.')
+			#APPEND (doCleanFieldText, %'@name'%)
+			#APPEND (doCleanFieldText, ');\n')
 			%doCleanFieldText%;
-			#end
+	  #END
 /*
-			#if (%'@type'% = 'utf')
-			#set (doCleanFieldText, 'self.' + %'@name'%)
-				#append (doCleanFieldText, ':= ' + %'myCleanFunctionUTF'% + '(le.')
-			#append (doCleanFieldText, %'@name'%)
-			#append (doCleanFieldText, ');\n')
+			#IF (%'@type'% = 'utf')
+			#SET (doCleanFieldText, 'SELF.' + %'@name'%)
+				#APPEND (doCleanFieldText, ':= ' + %'myCleanFunctionUTF'% + '(le.')
+			#APPEND (doCleanFieldText, %'@name'%)
+			#APPEND (doCleanFieldText, ');\n')
 			%doCleanFieldText%;
 			#end
 */
-		 #end
-		#end
-			self := le;
-end;
-
-outputFile := project(inputFile, %tra%(left));
+		 #END
+		#END
+		SELF := le;
+  END;
+OutputFile := PROJECT(InputFile, %tra%(LEFT));
 
 ENDMACRO;

@@ -1,6 +1,14 @@
 ﻿IMPORT hygenics_crim, ut,hygenics_search,crimsrch, doxie, autokey, lib_stringlib, std;
 EXPORT files := module
 
+Export dCrim := dataset('~thor_data400::base::corrections_court_offenses_public', hygenics_crim.Layout_Base_CourtOffenses_with_OffenseCategory, thor)
+								(length(trim(offender_key, left, right))>2);
+
+Export dOffense := dataset('~thor_data400::base::corrections_offenses_public', hygenics_crim.Layout_Base_Offenses_with_OffenseCategory, thor) 
+								(length(trim(offender_key, left, right))>2);
+								
+Export file_lookup_category_file      := DATASET(constants.lookup_category_file, layouts.combined_desc_lookup_layout, FLAT );
+
 EXPORT file_offenders_base_plus					:= DATASET('~PRTE::BASE::corrections::offenders', Layouts.layout_offender_plus,FLAT);
 
 EXPORT file_offenses_base_plus					:= DATASET('~PRTE::BASE::corrections::offenses', Layouts.layout_offenses_base_plus, FLAT);

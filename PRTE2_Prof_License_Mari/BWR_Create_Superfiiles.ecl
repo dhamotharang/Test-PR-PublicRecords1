@@ -1,4 +1,4 @@
-import promotesupers, roxiekeybuild;
+﻿import promotesupers, roxiekeybuild;
 
 
 promotesupers.mac_create_superfiles('~prte::base::proflic_mari::individual_detail');
@@ -20,8 +20,6 @@ roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::proflic_mari', 
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::proflic_mari', 'cmc_slpk');
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::proflic_mari::fcra', 'did');
  
- 
- 
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::proflic_mari::autokey', 'address');
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::proflic_mari::autokey', 'addressb2');
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::proflic_mari::autokey', 'citystname');
@@ -38,3 +36,4 @@ roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::proflic_mari::a
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::proflic_mari::autokey', 'stnameb2');
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::proflic_mari::autokey', 'zip');
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::proflic_mari::autokey', 'zipb2');
+roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::proflic_mari::autokey', 'fein2');
