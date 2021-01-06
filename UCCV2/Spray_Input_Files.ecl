@@ -4,8 +4,7 @@ export Spray_Input_Files (string filename,string filedate,string gname,string so
 := function
 
 sourceCaps	:=	StringLib.StringToUpperCase(source);
-sourceip := _control.IPAddress.bctlpedata12;
-// sourceip := _control.IPAddress.bctlpedata10;
+sourceip := _control.IPAddress.bctlpedata10;
 insource := if(regexfind('from_cp',filename),source+'_from_cp',source);
 superfilenameProcessed := if (sourcetype='UCC' or sourceCaps='WA','~thor_data400::in::uccv2::'+source+'::processed',
 										'~thor_data400::in::uccv2::'+source+'::'+sourcetype+'::processed');
