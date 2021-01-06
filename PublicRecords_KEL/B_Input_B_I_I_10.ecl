@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.5.0rc1
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Input_B_I_I,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Input_B_I_I_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Input_B_I_I(__in,__cfg).__Result) __E_Input_B_I_I := E_Input_B_I_I(__in,__cfg).__Result;
-  SHARED __EE309174 := __E_Input_B_I_I;
-  EXPORT __ST254665_Layout := RECORD
+  SHARED __EE309248 := __E_Input_B_I_I;
+  EXPORT __ST254699_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.nint G___Proc_Bus_U_I_D_;
@@ -79,11 +79,11 @@ EXPORT B_Input_B_I_I_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST254665_Layout __ND4779152__Project(E_Input_B_I_I(__in,__cfg).Layout __PP308833) := TRANSFORM
-    __CC13313 := '-99999';
-    __CC13318 := '-99998';
-    SELF.Bus_Input_Name_Clean_Value_ := FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP308833.B___Inp_Name_),__ECAST(KEL.typ.nstr,__CN(__CC13313)),__ECAST(KEL.typ.nstr,__PP308833.B___Inp_Cln_Name_),__ECAST(KEL.typ.nstr,__CN(__CC13318)));
-    SELF := __PP308833;
+  SHARED __ST254699_Layout __ND4784429__Project(E_Input_B_I_I(__in,__cfg).Layout __PP308907) := TRANSFORM
+    __CC13302 := '-99999';
+    __CC13307 := '-99998';
+    SELF.Bus_Input_Name_Clean_Value_ := FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP308907.B___Inp_Name_),__ECAST(KEL.typ.nstr,__CN(__CC13302)),__ECAST(KEL.typ.nstr,__PP308907.B___Inp_Cln_Name_),__ECAST(KEL.typ.nstr,__CN(__CC13307)));
+    SELF := __PP308907;
   END;
-  EXPORT __ENH_Input_B_I_I_10 := PROJECT(__EE309174,__ND4779152__Project(LEFT));
+  EXPORT __ENH_Input_B_I_I_10 := PROJECT(__EE309248,__ND4784429__Project(LEFT));
 END;
