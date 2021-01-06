@@ -49,7 +49,7 @@ RemovePattern := '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* INC.*$|^.* COMP
 
  //Jira-DF 20443 Per Data Receiving Communication, the Active & Inactive record should be included.
 	ValidFile						:= re(TRIM(ORG_NAME,LEFT,RIGHT) != ' ' 
-	                          AND StringLib.StringToUpperCase(SLNUM)[1..3] != 'APR' /* AND StringLib.StringToUpperCase(LICSTAT) != 'INACTIVE'*/
+	                          AND StringLib.StringToUpperCase(LIC)[1..3] != 'APR' /* AND StringLib.StringToUpperCase(LICSTAT) != 'INACTIVE'*/
 	                          AND NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, StringLib.StringToUpperCase(TRIM(ORG_NAME,LEFT,RIGHT))));
 
 	maribase_plus_dbas := RECORD,MAXLENGTH(5200)
@@ -97,14 +97,7 @@ RemovePattern := '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* INC.*$|^.* COMP
 	
 		tempStdLicType        := MAP(tempRawType[1..4]='SALE' => 'SALE',
 			                           tempRawType[1..4]='BROK' => 'BROK',
-			                           tempRawType[1..3]='TS.' => 'TSDEV',
-																 tempRawType='BROKER ASSOCIATE ACTIVE' => 'BROK',
-																 tempRawType='BROKER BRANCH OFFICE' => 'BROK',
-																 tempRawType='BROKER CORPORATION' => 'BROK',
-																 tempRawType='BROKER LICENSE ACTIVE' => 'BROK',
-																 tempRawType='BROKER LICENSE INACTIVE' => 'BROK',
-																 tempRawType='SALESPERSON INACTIVE' => 'SALE',
-																 tempRawType='TIME SHARE DEVELOPER' => 'TSDEV',
+			                           tempRawType[1..4]='TIME' => 'TSDEV',
 																 '');															 
   	SELF.STD_LICENSE_TYPE := tempStdLicType;
 		//assigning type code based on license type. Example of license type: BROK.ACT, BROK.INA, BROK.CORP, BROK.ASA,
