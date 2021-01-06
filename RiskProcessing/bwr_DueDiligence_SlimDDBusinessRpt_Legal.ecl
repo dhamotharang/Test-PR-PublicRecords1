@@ -1,4 +1,4 @@
-﻿IMPORT DueDiligence, iesp, RiskWise, STD;
+﻿IMPORT Data_Services, DueDiligence, iesp, RiskWise, STD;
 
 #workunit('name', 'DueDiligence - Slim DD Business Report - Legal');
 
@@ -6,9 +6,9 @@
 /* *****************************************************
  *                   Input Section                     *
  *******************************************************/
-inputFile := '~tgertken::in::cleanUniqueValidInputWithLexIDs.csv';
+inputFile := Data_Services.foreign_prod + 'rbao::in::affirm_10144_bus_rep1_input.csv';
  
-outputFileNamePrefix := '~tgertken::out::bus_duedil_mf_' + thorlib.wuid();
+outputFileNamePrefix := Data_Services.foreign_prod + 'tgertken::out::bus_duedil_mf_' + thorlib.wuid();
  
  
 //MINIMUM INPUT:
@@ -41,23 +41,40 @@ UNSIGNED threads := 30;           //Number of parallel calls to run in the SOAPC
  *                   Main Script                        *
  *******************************************************/
  inputLayout:= RECORD 
-  STRING Account; 
-  STRING CompanyName;
-  STRING AltCompanyName;
-  STRING InStreetAddress;
-  STRING InCity;
-  STRING InState;
-  STRING InZip;
-  STRING Phone;
-  STRING TaxID;
+  STRING30 Account;
+  STRING100 CompanyName;
+  STRING100 AltCompanyName;
+  STRING50 InStreetAddress;
+  STRING30 InCity;
+  STRING2 InState;
+  STRING9 InZip;
+  STRING10 Phone;
+  STRING9 TaxID;
+  STRING16 BusinessIPAddress;
+  STRING15 Rep1firstname;
+  STRING15 Rep1MiddleName;
+  STRING20 Rep1lastname;
+  STRING5 Rep1NameSuffix;
+  STRING50 Rep1Addr;
+  STRING30 Rep1City;
+  STRING2 Rep1State;
+  STRING9 Rep1Zip;
+  STRING9 Rep1SSN;
+  STRING8 Rep1DOB;
+  STRING3 Rep1Age;
+  STRING20 Rep1DLNumber;
+  STRING2 Rep1DLState;
+  STRING10 Rep1HomePhone;
+  STRING50 Rep1EmailAddress;
+  STRING20 Rep1FormerLastName;
   STRING HistoryDate;
-  STRING LexID;	
+  STRING LexID; //AKA seleID in this case
 END;
 
 
 input := IF(record_limit = 0, 
-             DATASET(inputFile, inputLayout, CSV(HEADING(single), QUOTE('"'))),
-             CHOOSEN(DATASET(inputFile, inputLayout, CSV(HEADING(single), QUOTE('"'))), record_limit));
+             DATASET(inputFile, inputLayout, CSV(QUOTE('"'))),
+             CHOOSEN(DATASET(inputFile, inputLayout, CSV(QUOTE('"'))), record_limit));
              
             
 //since we are only searching by lexID, lets get the unique lexIDs
@@ -362,6 +379,6 @@ OUTPUT(CHOOSEN(noBEOTopLevel, eyeball), NAMED('noBEOTopLevel'));
 OUTPUT(CHOOSEN(allTopLevel, eyeball), NAMED('allTopLevel'));
 OUTPUT(CHOOSEN(beoLevelBusReport, eyeball), NAMED('beoLevelBusReport'));
 
-OUTPUT(allTopLevel,, outputFileNamePrefix + '_bus_data.csv', CSV(heading(single), quote('"')));
-OUTPUT(beoLevelBusReport,, outputFileNamePrefix + '_beo_legal_data.csv', CSV(heading(single), quote('"')));
-OUTPUT(droppedInput,, outputFileNamePrefix + '_data_to_reprocess.csv', CSV(heading(single), quote('"')));
+OUTPUT(allTopLevel,, outputFileNamePrefix + '_bus_data.csv', CSV(HEADING(single), QUOTE('"')));
+OUTPUT(beoLevelBusReport,, outputFileNamePrefix + '_beo_legal_data.csv', CSV(HEADING(single), QUOTE('"')));
+OUTPUT(droppedInput,, outputFileNamePrefix + '_data_to_reprocess.csv', CSV(QUOTE('"')));
