@@ -307,7 +307,7 @@ re_filter2_nonfcra := SORT(re_filter1_nonfcra, -Difference_Percent);
 
 		XtabOut := ITERATE(output_full, Xform(LEFT, RIGHT));
 
-	final := FileServices.SendEmail('Bridgett.braaten@lexisnexis.com;  Matthew.Ludewig@lexisnexisrisk.com; nathan.koubsky@lexisnexis.com;  Benjamin.Karnatz@lexisnexis.com; lea.smith@lexisnexisrisk.com; Haley.Vicchio@lexisnexisrisk.com;Todd.Steil@lexisnexisrisk.com;Michele.Walklin@lexisnexisrisk.com;David.Schlangen@lexisnexisrisk.com;andi.koenen@lexisnexisrisk.com;christopher.albee@lexisnexisrisk.com', 'BusinessShell Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line):
+	final := FileServices.SendEmail('Matthew.Ludewig@lexisnexisrisk.com; nathan.koubsky@lexisnexis.com; lea.smith@lexisnexisrisk.com;Todd.Steil@lexisnexisrisk.com;Michele.Walklin@lexisnexisrisk.com;David.Schlangen@lexisnexisrisk.com', 'BusinessShell Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line):
 	// final := FileServices.SendEmail('bridgett.braaten@lexisnexis.com', 'BusinessShell Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line):
 								 // WHEN(CRON('0 12 * * *')), //run at 8:00 AM
 									FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.Bocashell_collections_fail_list,'BusinessShell Tracking CRON job failed','The failed workunit is:' + WORKUNIT + FAILMESSAGE));
