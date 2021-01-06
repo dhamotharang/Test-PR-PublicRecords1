@@ -1,8 +1,7 @@
 ﻿IMPORT  PRTE2_DOC,PromoteSupers, prte2,ut, std, address, aid;
 
 EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
-   filename:= constants.lookup_file;
-		
+ 		
 		prte2.CleanFields(Files.corrections_offenses_IN, DOC_Offenses_Clean);
 
 		prte2.CleanFields(Files.corrections_CourtOffenses_IN,DOC_CourtOffenses_Clean);
@@ -15,29 +14,59 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
 		
 		df_offenses := PROJECT(	DOC_Offenses_Clean, 
 														transform( Layouts.layout_offenses_base_plus, 
+														           self.offense_category:=0;
 																			 self := left;
 																			 self:=[];
 																			 ));
 																			 
-       df_offenses_2:= Project(df_Offenses,
-		                      TRANSFORM(Layouts.layout_offenses_base_plus,
-													self.offense_category:=(unsigned8)functions.get_category(left.off_desc_1);
-												                         self:=left;));  
+		 df_offenses_2 := JOIN(files.file_lookup_category_file(data_type='X'),
+                          df_Offenses, 
+                         LEFT.off_desc = trim(RIGHT.off_desc_1), 
+                         TRANSFORM(Layouts.layout_offenses_base_plus,
+											   self.offense_category := left.offense_category;
+											   self:=right;
+											   ), Right Outer);
+								
+																			 
+   		
+		df_offenses_3:=dedup(df_offenses_2,all);
 		
+		df_CourtOffenses := PROJECT(DOC_CourtOffenses_Clean, 
+														transform(layouts.layout_court_offenses_base_plus, 
+														           self.offense_category:=0;
+																			 self := left;
+																			 ));
+				
+		df_CourtOffenses_Type_2 := JOIN(files.file_lookup_category_file(data_type='2'),
+                 df_CourtOffenses(data_type='2'), 
+    LEFT.off_desc = trim(RIGHT.court_off_desc_1), 
+                       TRANSFORM(Layouts.layout_court_offenses_base_plus,
+											 self.offense_category := left.offense_category;
+											 self:=right;
+											 ), Right Outer);
+			
+			df_CourtOffenses_Type_1 := JOIN(files.file_lookup_category_file(data_type='1'),
+                 df_CourtOffenses(data_type='1'), 
+    LEFT.off_desc = trim(RIGHT.arr_off_desc_1), 
+                       TRANSFORM(Layouts.layout_court_offenses_base_plus,
+											 self.offense_category := left.offense_category;
+											 self:=right;
+											 ), Right Outer);
 		
-		
-		
-		df_offenses_3:=dedup(df_offenses_2);
-		
-		df_CourtOffenses := PROJECT(DOC_CourtOffenses_Clean, layouts.layout_court_offenses_base_plus);
+		df_CourtOffenses_Type_5 := JOIN(files.file_lookup_category_file(data_type='5'),
+                 df_CourtOffenses(data_type='5'), 
+    LEFT.off_desc = trim(RIGHT.arr_off_desc_1), 
+                       TRANSFORM(Layouts.layout_court_offenses_base_plus,
+											 self.offense_category := left.offense_category;
+											 self:=right;
+											 ), Right Outer);
+			 
+		df_courtoffenses_remain:= df_courtoffenses(data_type != '2' and data_type != '5');
+			
+		df_courtoffenses_2:= df_courtoffenses_type_1 + df_courtoffenses_type_2 + df_courtoffenses_type_5 + df_courtoffenses_remain;
 						
-		df_Court_offenses_2:= Project(df_CourtOffenses,
-		                      TRANSFORM(Layouts.layout_court_offenses_base_plus,
-													self.offense_category:=if(left.data_type='2',(unsigned8)functions.get_category(left.court_off_desc_1),
-												                         if(left.data_type = '5',(unsigned8)functions.get_category(left.arr_off_desc_1),0));
-												  self:=left;));
-		
-	 df_court_offenses_3:=dedup(df_court_offenses_2);
+			
+	  df_court_offenses_3:=dedup(df_courtoffenses_2,all);
 	
 	 in_offenders_new := DOC_Offenders_Clean(cust_name != '');
 
@@ -58,11 +87,17 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
 			self.name_suffix := Address.CleanNameFields(clean_name).name_suffix;
 			SELF.DOB := INTFORMAT(l.DOB,8,1); 
 			self.did := (string12)prte2.fn_AppendFakeID.did(self.fname, self.lname, l.link_ssn, l.link_dob, l.cust_name);
-		//	SELF.ZIP5 := l.ZIP5;
 			SELF.ZIP5  :=  l.clean_address.ZIP; 	
 			self.ssn_appended := l.ssn;
 			self.ace_fips_st := l.clean_address.fips_state;
 			self.ace_fips_county := l.clean_address.fips_county;
+			self.rawaid:=l.admin_rawaid;
+			self.aceaid:=0;
+			self.datasource := CASE(l.datasource, 
+                       'DEPARTMENT OF CORRECTIONS' => 'Department of Corrections',
+                       'CRIMINAL COURT' => 'Criminal Court',
+                       'ARREST LOG'     => 'Arrest Log',
+                        l.datasource);
 			self := l.clean_address;
 			self := l;
 		end;
@@ -73,6 +108,8 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
 																			SELF.DOB := INTFORMAT(left.DOB,8,1), 
 																			SELF.Did := (string12)Left.did,
 																			SELF.ZIP5 := INTFORMAT((INTEGER)LEFT.ZIP5,5,1),
+																			self.rawaid:=0;
+																			self.aceaid:=0;
 																			self := left));
 									
 		df_offenders := df_offenders_old + df_offenders_new;
@@ -99,17 +136,17 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
 
 		df_activity := PROJECT(DOC_Activity_Clean, layouts.layout_activity_base_plus);
 
-		PromoteSupers.MAC_SF_BuildProcess(df_offenses_3,'~PRTE::BASE::corrections::offenses', writefile_offenses,,,,filedate);
+		 PromoteSupers.MAC_SF_BuildProcess(df_offenses_3,'~PRTE::BASE::corrections::offenses', writefile_offenses,,,,filedate);
 
-		PromoteSupers.MAC_SF_BuildProcess(df_Court_Offenses_3,'~PRTE::BASE::corrections::court_offenses', writefile_court_offenses,,,,filedate);
+		 PromoteSupers.MAC_SF_BuildProcess(df_Court_Offenses_3,'~PRTE::BASE::corrections::court_offenses', writefile_court_offenses,,,,filedate);
 
-		PromoteSupers.MAC_SF_BuildProcess(df_offenders,'~PRTE::BASE::corrections::offenders', writefile_offenders,,,,filedate);
+		 PromoteSupers.MAC_SF_BuildProcess(df_offenders,'~PRTE::BASE::corrections::offenders', writefile_offenders,,,,filedate);
 
-		PromoteSupers.MAC_SF_BuildProcess(file_punishment_keybuilding,'~PRTE::BASE::corrections::punishment', writefile_punishment,,,,filedate);
+		 PromoteSupers.MAC_SF_BuildProcess(file_punishment_keybuilding,'~PRTE::BASE::corrections::punishment', writefile_punishment,,,,filedate);
 
-		PromoteSupers.MAC_SF_BuildProcess(df_activity,'~PRTE::BASE::corrections::activity', writefile_activity,,,,filedate);
+		 PromoteSupers.MAC_SF_BuildProcess(df_activity,'~PRTE::BASE::corrections::activity', writefile_activity,,,,filedate);
 
-		return sequential(writefile_court_offenses,writefile_offenses,writefile_offenders,writefile_punishment,writefile_activity);
+		 return sequential(writefile_court_offenses,writefile_offenses,writefile_offenders,writefile_punishment,writefile_activity);
 		
-		
+			
 END;
