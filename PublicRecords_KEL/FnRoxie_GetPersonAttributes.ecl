@@ -1540,7 +1540,7 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 			SELF.PL_AlrtSecurityFreezeFlag := MAP(NOT Options.IsFCRA => '0',
 																				LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA,	
 																				(string)RIGHT.PL_AlrtSecurityFreezeFlag);
-			SELF.PL_AlrtSecurityAlertFlag := MAP(NOT Options.IsFCRA => '0,',
+			SELF.PL_AlrtSecurityAlertFlag := MAP(NOT Options.IsFCRA => '0',
 																				LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA,	
 																				(string)RIGHT.PL_AlrtSecurityAlertFlag);
 			SELF.PL_AlrtIDTheftFlag := MAP(NOT Options.IsFCRA => '0',
