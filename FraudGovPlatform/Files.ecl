@@ -50,7 +50,7 @@ module
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigRiskLevel,Layouts.Input.ConfigRiskLevel,ConfigRiskLevel,'CSV',,'\r\n',',',true);
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigAttributes,Layouts.Input.ConfigAttributes,ConfigAttributes,'CSV',,'\r\n',',',true);		
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigRules,Layouts.Input.ConfigRules,ConfigRules,'CSV',,'\r\n',',',true);
-		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.DisposableEmailDomains,Layouts.Input.DisposableEmailDomains,DisposableEmailDomains,'CSV',,'\r\n',',',true);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.DisposableEmailDomains,Layouts.Input.DisposableEmailDomains,DisposableEmailDomains,'CSV',,'\r\n',',',true,pUnicode:= false, pHeading:=0);
 
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSInclusionDemoData,FraudShared.Layouts.Input.MbsFdnMasterIDIndTypeInclusion,MBSInclusionDemoData,'CSV',,'|\n','|\t|');
 		

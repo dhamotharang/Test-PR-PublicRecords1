@@ -1,6 +1,6 @@
 ﻿Import data_services,doxie;
 r:=RECORD
-  string200 DisposableEmailDomain;
+  UNICODE200 DisposableEmailDomain;
  END;
 
 d	:=dataset([],r);
