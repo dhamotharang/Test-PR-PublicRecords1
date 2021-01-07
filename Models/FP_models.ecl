@@ -102,18 +102,18 @@ EXPORT FP_models := MODULE
 
     invalidCustomRequest := (((cmModelName = 'customfa_service' AND ~isWFS34) AND
                             (cmModelName = 'customfa_service' AND cmNameValue NOT IN Models.FraudAdvisor_Constants.XML_custom_models)) OR
-                            (cmModelName <> 'customfa_service' /*AND COUNT(ModelRequest) > 0*/));
+                            (cmModelName <> 'customfa_service'));
                             
-    InvalidGreenDotRequest := (((cmNameValue in  ['fp31310_2', 'fp1509_2']) AND (cmRetailZipValue = '') AND (ip_value = ''))
-                  Or ((cmNameValue in ['fp31310_2', 'fp1509_2']) AND (cmLoadAmountValue = '')));
+    InvalidGreenDotRequest := (((cmNameValue IN ['fp31310_2', 'fp1509_2']) AND (cmRetailZipValue = '') AND (ip_value = ''))
+                  OR ((cmNameValue in ['fp31310_2', 'fp1509_2']) AND (cmLoadAmountValue = '')));
                             
-    // model_lc := IF(TRIM(Model) <> '', STD.STR.ToLowerCase(trim(Model)), cmNameValue);
     model_lc := cmNameValue;
 
-    model_name1 := if( (model_lc='' or model_lc in Models.FraudAdvisor_Constants.XML_custom_models OR isWFS34) AND invalidCustomRequest=false, IF(isWFS34, 'ain801_1', model_lc), error('Invalid fraud version/model input combination'));
+    model_name1 := IF( (model_lc='' or model_lc in Models.FraudAdvisor_Constants.XML_custom_models OR isWFS34) AND invalidCustomRequest=false,
+                       IF(isWFS34, 'ain801_1', model_lc), ERROR('Invalid fraud version/model input combination'));
 
 
-    InvalidFP3GLBRequest := model_name1 in Models.FraudAdvisor_Constants.fraudpoint3_models and ~glb_ok; 
+    InvalidFP_GLBRequest := model_name1 in Models.FraudAdvisor_Constants.GLB_models and ~glb_ok; 
 
     // Bureau Fraud Flags Models needs to be requested on it's own with no other scores/attributes.
     InvalidFraudFlagsRequest := model_lc = 'fp1712_0' AND 
@@ -121,15 +121,15 @@ EXPORT FP_models := MODULE
                                 includeriskindices = TRUE OR
                                 redflag_version > 0);
                                 
-    model_name := map(InvalidGreenDotRequest   = true => error('Invalid parameter input combination for fp31310_2 or fp1509_2'),
-                      InvalidFP3GLBRequest     = true => error('Valid Gramm-Leach-Bliley Act (GLBA) purpose required'),
-                      InvalidFraudFlagsRequest = true => error('invalid product option combination'),
+    model_name := MAP(InvalidGreenDotRequest   = TRUE => ERROR('Invalid parameter input combination for fp31310_2 or fp1509_2'),
+                      InvalidFP_GLBRequest     = TRUE => ERROR('Valid Gramm-Leach-Bliley Act (GLBA) purpose required'),
+                      InvalidFraudFlagsRequest = TRUE => ERROR('invalid product option combination'),
                                                          model_name1 );
     
     //IF model_name gets populated then we didn't receive an invalid request, so return the input model request
     Valid_model_request := IF(model_name != '', ModelRequest, DATASET([],Models.Layouts.Layout_Model_Request_In)[1]);
     
-    return Valid_model_request;
+    RETURN Valid_model_request;
   END;
   
   EXPORT Model_Check(DATASET(Models.Layouts.Layout_Model_Request_In) ModelOptions_In, Set of String model_list) := Function
