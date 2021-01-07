@@ -1,4 +1,4 @@
-IMPORT _Control, tools;
+﻿IMPORT _Control, tools;
 
 EXPORT _Flags := MODULE
 
@@ -18,6 +18,7 @@ EXPORT _Flags := MODULE
 		  EXPORT TypeOfPractice   := COUNT(NOTHOR(FileServices.SuperFileContents(Filenames().Input.TypeOfPractice.Sprayed))) > 0;
 		  EXPORT Schools          := COUNT(NOTHOR(FileServices.SuperFileContents(Filenames().Input.Schools.Sprayed))) > 0;
 		  EXPORT Specialty        := COUNT(NOTHOR(FileServices.SuperFileContents(Filenames().Input.Specialty.Sprayed))) > 0;
+			EXPORT Raw_input				:= COUNT(NOTHOR(FileServices.SuperFileContents(Filenames().Input.Raw_input.Sprayed))) > 0;
 		END;
 		
 		EXPORT Base := MODULE
