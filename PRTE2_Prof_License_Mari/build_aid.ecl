@@ -46,7 +46,11 @@ self.ssn_taxid						:= 	choose(cnt,L.ssn_taxid_1,L.ssn_taxid_2,L.ssn_taxid_1,L.s
 self.company							:= 	choose(cnt,L.name_company,L.name_company,L.name_company_dba,L.name_company_dba);
 self.party_phone 					:= 	choose(cnt,L.phn_mari_1,L.phn_mari_2,L.phn_mari_1,L.phn_mari_2);
 self.addr_ind							:=  choose(cnt,L.addr_bus_ind,L.addr_mail_ind,L.addr_bus_ind,L.addr_mail_ind);
-self.prim_range 					:= 	choose(cnt,l.Bus_prim_range,l.Mail_prim_range);
+
+//self.prim_range 					:= 	choose(cnt,l.Bus_prim_range,l.Mail_prim_range);
+
+self.prim_range 					:= 	choose(cnt,l.Bus_prim_range,l.Mail_prim_range,l.Bus_prim_range,l.Mail_prim_range);
+
 self.predir								:=  choose(cnt,l.Bus_predir,l.Mail_predir,l.Bus_predir,l.Mail_predir);
 self.prim_name 						:= 	choose(cnt,l.Bus_prim_name,l.Mail_prim_name,l.Bus_prim_name,l.Mail_prim_name);
 self.addr_suffix					:=  choose(cnt,l.Bus_addr_suffix,l.Mail_addr_suffix,l.Bus_addr_suffix,l.Mail_addr_suffix);
@@ -63,7 +67,7 @@ self.v_city_name          :=  choose(cnt,l.BUS_V_CITY_NAME,l.Mail_V_CITY_NAME,l.
 self.cart                 :=  choose(cnt,l.BUS_cart,l.Mail_cart,l.BUS_cart,l.Mail_cart);
 self.cr_sort_sz           :=  choose(cnt,l.BUS_cr_sort_sz,l.Mail_cr_sort_sz,l.BUS_cr_sort_sz,l.Mail_cr_sort_sz);
 self.lot                  :=  choose(cnt,l.BUS_lot,l.Mail_lot,l.BUS_lot,l.Mail_lot);
-self.lot_order            :=  choose(cnt,l.BUS_lot_order,l.Mail_lot_order,l.BUS_lot,l.Mail_lot_order);
+self.lot_order            :=  choose(cnt,l.BUS_lot_order,l.Mail_lot_order,l.BUS_lot_order,l.Mail_lot_order);
 self.dbpc                 :=  choose(cnt,l.BUS_dpbc,l.Mail_dpbc,l.BUS_dpbc,l.Mail_dpbc);
 self.chk_digit            :=  choose(cnt,l.BUS_chk_digit,l.Mail_chk_digit,l.BUS_chk_digit,l.Mail_chk_digit);
 self.rec_type             :=  choose(cnt,l.BUS_rec_type,l.Mail_rec_type,l.BUS_rec_type,l.Mail_rec_type);
