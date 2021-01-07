@@ -1980,7 +1980,8 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2020/2144 Democratic Republic of the Congo List','1967'},
 {'EC 2020/2129 Belarus List','1968'},
 {'EC 2020/2133 Democratic Republic of the Congo List','1969'},
-{'NACTA (Pakistan) Proscribed Organizations List','1970'}
+{'NACTA (Pakistan) Proscribed Organizations List','1970'},
+{'OFAC - Non-SDN Communist Chinese Military Companies List','1971'}
 
 ],r);
 
