@@ -8,7 +8,6 @@ EXPORT Deltabase_Delta(DATASET(Deltabase_Layout_Deltabase)old_s, DATASET(Deltaba
     hygieneDiffOverall := DifferenceSummary;
     SALT311.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(Scrubs_FraudGov, Deltabase_Fields, 'RECORDOF(hygieneDiffOverall)', FALSE);
     hygieneDiffOverall_Standard := IF(doHygieneSummaryGlobal, NORMALIZE(hygieneDiffOverall, COUNT(inFieldList) * 6, xSummary(LEFT, COUNTER, myTimeStamp, LEFT.txt + '_all', LEFT.txt + '_all')));
- 
     RETURN hygieneDiffOverall_Standard;
   END;
 END;
