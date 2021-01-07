@@ -1,13 +1,12 @@
 ﻿IMPORT SALT311,STD;
 EXPORT Deltabase_Scrubs := MODULE
- 
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 82;
-  EXPORT NumRulesFromFieldType := 82;
+  EXPORT NumRules := 81;
+  EXPORT NumRulesFromFieldType := 81;
   EXPORT NumRulesFromRecordType := 0;
   EXPORT NumFieldsWithRules := 57;
   EXPORT NumFieldsWithPossibleEdits := 57;
-  EXPORT NumRulesWithPossibleEdits := 82;
+  EXPORT NumRulesWithPossibleEdits := 81;
   EXPORT Expanded_Layout := RECORD(Deltabase_Layout_Deltabase)
     UNSIGNED1 inqlog_id_Invalid;
     BOOLEAN inqlog_id_wouldClean;
@@ -129,6 +128,143 @@ EXPORT Deltabase_Scrubs := MODULE
     UNSIGNED8 ScrubsBits2;
     UNSIGNED8 ScrubsCleanBits1;
   END;
+  EXPORT Rule_Layout := RECORD(Deltabase_Layout_Deltabase)
+    STRING Rules {MAXLENGTH(1000)};
+  END;
+  SHARED toRuleDesc(UNSIGNED c) := CHOOSE(c
+          ,'inqlog_id:invalid_numeric:ALLOW'
+          ,'customer_id:invalid_numeric_string:ALLOW'
+          ,'transaction_id:invalid_alphanumeric:ALLOW'
+          ,'date_of_transaction:invalid_date:LEFTTRIM','date_of_transaction:invalid_date:ALLOW'
+          ,'household_id:invalid_alphanumeric:ALLOW'
+          ,'customer_person_id:invalid_alphanumeric:ALLOW'
+          ,'customer_program:invalid_alpha:ALLOW'
+          ,'reason_for_transaction_activity:invalid_alphanumeric:ALLOW'
+          ,'inquiry_source:invalid_alphanumeric:ALLOW'
+          ,'customer_county:invalid_alphanumeric:ALLOW'
+          ,'customer_state:invalid_state:LEFTTRIM','customer_state:invalid_state:ALLOW','customer_state:invalid_state:LENGTHS'
+          ,'customer_agency_vertical_type:invalid_alphanumeric:ALLOW'
+          ,'ssn:invalid_ssn:LEFTTRIM','ssn:invalid_ssn:ALLOW','ssn:invalid_ssn:LENGTHS'
+          ,'dob:invalid_date:LEFTTRIM','dob:invalid_date:ALLOW'
+          ,'rawlinkid:invalid_numeric:ALLOW'
+          ,'raw_full_name:invalid_name:LEFTTRIM','raw_full_name:invalid_name:ALLOW'
+          ,'raw_title:invalid_alphanumeric:ALLOW'
+          ,'raw_first_name:invalid_name:LEFTTRIM','raw_first_name:invalid_name:ALLOW'
+          ,'raw_middle_name:invalid_name:LEFTTRIM','raw_middle_name:invalid_name:ALLOW'
+          ,'raw_last_name:invalid_name:LEFTTRIM','raw_last_name:invalid_name:ALLOW'
+          ,'raw_orig_suffix:invalid_alphanumeric:ALLOW'
+          ,'full_address:invalid_alphanumeric:ALLOW'
+          ,'street_1:invalid_alphanumeric:ALLOW'
+          ,'city:invalid_name:LEFTTRIM','city:invalid_name:ALLOW'
+          ,'state:invalid_state:LEFTTRIM','state:invalid_state:ALLOW','state:invalid_state:LENGTHS'
+          ,'zip:invalid_zip:LEFTTRIM','zip:invalid_zip:ALLOW','zip:invalid_zip:LENGTHS'
+          ,'county:invalid_alphanumeric:ALLOW'
+          ,'mailing_street_1:invalid_alphanumeric:ALLOW'
+          ,'mailing_city:invalid_name:LEFTTRIM','mailing_city:invalid_name:ALLOW'
+          ,'mailing_state:invalid_state:LEFTTRIM','mailing_state:invalid_state:ALLOW','mailing_state:invalid_state:LENGTHS'
+          ,'mailing_zip:invalid_zip:LEFTTRIM','mailing_zip:invalid_zip:ALLOW','mailing_zip:invalid_zip:LENGTHS'
+          ,'mailing_county:invalid_alphanumeric:ALLOW'
+          ,'phone_number:invalid_phone:LEFTTRIM','phone_number:invalid_phone:ALLOW','phone_number:invalid_phone:LENGTHS'
+          ,'ultid:invalid_numeric:ALLOW'
+          ,'orgid:invalid_numeric:ALLOW'
+          ,'seleid:invalid_numeric:ALLOW'
+          ,'tin:invalid_alphanumeric:ALLOW'
+          ,'email_address:invalid_email:ALLOW'
+          ,'appended_provider_id:invalid_numeric:ALLOW'
+          ,'lnpid:invalid_numeric:ALLOW'
+          ,'npi:invalid_alphanumeric:ALLOW'
+          ,'ip_address:invalid_ip:LEFTTRIM','ip_address:invalid_ip:ALLOW'
+          ,'device_id:invalid_alphanumeric:ALLOW'
+          ,'professional_id:invalid_alphanumeric:ALLOW'
+          ,'bank_routing_number_1:invalid_alphanumeric:ALLOW'
+          ,'bank_account_number_1:invalid_alphanumeric:ALLOW'
+          ,'drivers_license_state:invalid_alphanumeric:ALLOW'
+          ,'drivers_license:invalid_alphanumeric:ALLOW'
+          ,'geo_lat:invalid_real_string:ALLOW'
+          ,'geo_long:invalid_real_string:ALLOW'
+          ,'reported_date:invalid_date:LEFTTRIM','reported_date:invalid_date:ALLOW'
+          ,'file_type:invalid_numeric:ALLOW'
+          ,'deceitful_confidence:invalid_numeric_string:ALLOW'
+          ,'reported_by:invalid_alphanumeric:ALLOW'
+          ,'reason_description:invalid_alphanumeric:ALLOW'
+          ,'event_type_1:invalid_numeric_string:ALLOW'
+          ,'event_entity_1:invalid_alphanumeric:ALLOW'
+          ,'field:Number_Errored_Fields:SUMMARY'
+          ,'field:Number_Perfect_Fields:SUMMARY'
+          ,'rule:Number_Errored_Rules:SUMMARY'
+          ,'rule:Number_Perfect_Rules:SUMMARY'
+          ,'rule:Number_OnFail_Rules:SUMMARY'
+          ,'record:Number_Errored_Records:SUMMARY'
+          ,'record:Number_Perfect_Records:SUMMARY'
+          ,'record:Number_Edited_Records:SUMMARY'
+          ,'rule:Number_Edited_Rules:SUMMARY','UNKNOWN');
+  SHARED toErrorMessage(UNSIGNED c) := CHOOSE(c
+          ,Deltabase_Fields.InvalidMessage_inqlog_id(1)
+          ,Deltabase_Fields.InvalidMessage_customer_id(1)
+          ,Deltabase_Fields.InvalidMessage_transaction_id(1)
+          ,Deltabase_Fields.InvalidMessage_date_of_transaction(1),Deltabase_Fields.InvalidMessage_date_of_transaction(2)
+          ,Deltabase_Fields.InvalidMessage_household_id(1)
+          ,Deltabase_Fields.InvalidMessage_customer_person_id(1)
+          ,Deltabase_Fields.InvalidMessage_customer_program(1)
+          ,Deltabase_Fields.InvalidMessage_reason_for_transaction_activity(1)
+          ,Deltabase_Fields.InvalidMessage_inquiry_source(1)
+          ,Deltabase_Fields.InvalidMessage_customer_county(1)
+          ,Deltabase_Fields.InvalidMessage_customer_state(1),Deltabase_Fields.InvalidMessage_customer_state(2),Deltabase_Fields.InvalidMessage_customer_state(3)
+          ,Deltabase_Fields.InvalidMessage_customer_agency_vertical_type(1)
+          ,Deltabase_Fields.InvalidMessage_ssn(1),Deltabase_Fields.InvalidMessage_ssn(2),Deltabase_Fields.InvalidMessage_ssn(3)
+          ,Deltabase_Fields.InvalidMessage_dob(1),Deltabase_Fields.InvalidMessage_dob(2)
+          ,Deltabase_Fields.InvalidMessage_rawlinkid(1)
+          ,Deltabase_Fields.InvalidMessage_raw_full_name(1),Deltabase_Fields.InvalidMessage_raw_full_name(2)
+          ,Deltabase_Fields.InvalidMessage_raw_title(1)
+          ,Deltabase_Fields.InvalidMessage_raw_first_name(1),Deltabase_Fields.InvalidMessage_raw_first_name(2)
+          ,Deltabase_Fields.InvalidMessage_raw_middle_name(1),Deltabase_Fields.InvalidMessage_raw_middle_name(2)
+          ,Deltabase_Fields.InvalidMessage_raw_last_name(1),Deltabase_Fields.InvalidMessage_raw_last_name(2)
+          ,Deltabase_Fields.InvalidMessage_raw_orig_suffix(1)
+          ,Deltabase_Fields.InvalidMessage_full_address(1)
+          ,Deltabase_Fields.InvalidMessage_street_1(1)
+          ,Deltabase_Fields.InvalidMessage_city(1),Deltabase_Fields.InvalidMessage_city(2)
+          ,Deltabase_Fields.InvalidMessage_state(1),Deltabase_Fields.InvalidMessage_state(2),Deltabase_Fields.InvalidMessage_state(3)
+          ,Deltabase_Fields.InvalidMessage_zip(1),Deltabase_Fields.InvalidMessage_zip(2),Deltabase_Fields.InvalidMessage_zip(3)
+          ,Deltabase_Fields.InvalidMessage_county(1)
+          ,Deltabase_Fields.InvalidMessage_mailing_street_1(1)
+          ,Deltabase_Fields.InvalidMessage_mailing_city(1),Deltabase_Fields.InvalidMessage_mailing_city(2)
+          ,Deltabase_Fields.InvalidMessage_mailing_state(1),Deltabase_Fields.InvalidMessage_mailing_state(2),Deltabase_Fields.InvalidMessage_mailing_state(3)
+          ,Deltabase_Fields.InvalidMessage_mailing_zip(1),Deltabase_Fields.InvalidMessage_mailing_zip(2),Deltabase_Fields.InvalidMessage_mailing_zip(3)
+          ,Deltabase_Fields.InvalidMessage_mailing_county(1)
+          ,Deltabase_Fields.InvalidMessage_phone_number(1),Deltabase_Fields.InvalidMessage_phone_number(2),Deltabase_Fields.InvalidMessage_phone_number(3)
+          ,Deltabase_Fields.InvalidMessage_ultid(1)
+          ,Deltabase_Fields.InvalidMessage_orgid(1)
+          ,Deltabase_Fields.InvalidMessage_seleid(1)
+          ,Deltabase_Fields.InvalidMessage_tin(1)
+          ,Deltabase_Fields.InvalidMessage_email_address(1)
+          ,Deltabase_Fields.InvalidMessage_appended_provider_id(1)
+          ,Deltabase_Fields.InvalidMessage_lnpid(1)
+          ,Deltabase_Fields.InvalidMessage_npi(1)
+          ,Deltabase_Fields.InvalidMessage_ip_address(1),Deltabase_Fields.InvalidMessage_ip_address(2)
+          ,Deltabase_Fields.InvalidMessage_device_id(1)
+          ,Deltabase_Fields.InvalidMessage_professional_id(1)
+          ,Deltabase_Fields.InvalidMessage_bank_routing_number_1(1)
+          ,Deltabase_Fields.InvalidMessage_bank_account_number_1(1)
+          ,Deltabase_Fields.InvalidMessage_drivers_license_state(1)
+          ,Deltabase_Fields.InvalidMessage_drivers_license(1)
+          ,Deltabase_Fields.InvalidMessage_geo_lat(1)
+          ,Deltabase_Fields.InvalidMessage_geo_long(1)
+          ,Deltabase_Fields.InvalidMessage_reported_date(1),Deltabase_Fields.InvalidMessage_reported_date(2)
+          ,Deltabase_Fields.InvalidMessage_file_type(1)
+          ,Deltabase_Fields.InvalidMessage_deceitful_confidence(1)
+          ,Deltabase_Fields.InvalidMessage_reported_by(1)
+          ,Deltabase_Fields.InvalidMessage_reason_description(1)
+          ,Deltabase_Fields.InvalidMessage_event_type_1(1)
+          ,Deltabase_Fields.InvalidMessage_event_entity_1(1)
+          ,'Fields with errors'
+          ,'Fields without errors'
+          ,'Rules with errors'
+          ,'Rules without errors'
+          ,'Rules with possible edits'
+          ,'Records with at least one error'
+          ,'Records without errors'
+          ,'Edited records'
+          ,'Rules leading to edits','UNKNOWN');
 EXPORT FromNone(DATASET(Deltabase_Layout_Deltabase) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
     SELF.inqlog_id_Invalid := Deltabase_Fields.InValid_inqlog_id((SALT311.StrType)le.inqlog_id);
@@ -307,12 +443,25 @@ EXPORT FromNone(DATASET(Deltabase_Layout_Deltabase) h) := MODULE
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Deltabase_Layout_Deltabase);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.inqlog_id_Invalid << 0 ) + ( le.customer_id_Invalid << 1 ) + ( le.transaction_id_Invalid << 2 ) + ( le.date_of_transaction_Invalid << 3 ) + ( le.household_id_Invalid << 5 ) + ( le.customer_person_id_Invalid << 6 ) + ( le.customer_program_Invalid << 7 ) + ( le.reason_for_transaction_activity_Invalid << 8 ) + ( le.inquiry_source_Invalid << 9 ) + ( le.customer_county_Invalid << 10 ) + ( le.customer_state_Invalid << 11 ) + ( le.customer_agency_vertical_type_Invalid << 13 ) + ( le.ssn_Invalid << 14 ) + ( le.dob_Invalid << 16 ) + ( le.rawlinkid_Invalid << 18 ) + ( le.raw_full_name_Invalid << 19 ) + ( le.raw_title_Invalid << 21 ) + ( le.raw_first_name_Invalid << 22 ) + ( le.raw_middle_name_Invalid << 24 ) + ( le.raw_last_name_Invalid << 26 ) + ( le.raw_orig_suffix_Invalid << 28 ) + ( le.full_address_Invalid << 29 ) + ( le.street_1_Invalid << 30 ) + ( le.city_Invalid << 31 ) + ( le.state_Invalid << 33 ) + ( le.zip_Invalid << 35 ) + ( le.county_Invalid << 37 ) + ( le.mailing_street_1_Invalid << 38 ) + ( le.mailing_city_Invalid << 39 ) + ( le.mailing_state_Invalid << 41 ) + ( le.mailing_zip_Invalid << 43 ) + ( le.mailing_county_Invalid << 45 ) + ( le.phone_number_Invalid << 47 ) + ( le.ultid_Invalid << 49 ) + ( le.orgid_Invalid << 50 ) + ( le.seleid_Invalid << 51 ) + ( le.tin_Invalid << 52 ) + ( le.email_address_Invalid << 53 ) + ( le.appended_provider_id_Invalid << 54 ) + ( le.lnpid_Invalid << 55 ) + ( le.npi_Invalid << 56 ) + ( le.ip_address_Invalid << 57 ) + ( le.device_id_Invalid << 59 ) + ( le.professional_id_Invalid << 60 ) + ( le.bank_routing_number_1_Invalid << 61 ) + ( le.bank_account_number_1_Invalid << 62 ) + ( le.drivers_license_state_Invalid << 63 );
-    SELF.ScrubsBits2 := ( le.drivers_license_Invalid << 0 ) + ( le.geo_lat_Invalid << 1 ) + ( le.geo_long_Invalid << 2 ) + ( le.reported_date_Invalid << 3 ) + ( le.file_type_Invalid << 5 ) + ( le.deceitful_confidence_Invalid << 6 ) + ( le.reported_by_Invalid << 7 ) + ( le.reason_description_Invalid << 8 ) + ( le.event_type_1_Invalid << 9 ) + ( le.event_entity_1_Invalid << 10 );
+    SELF.ScrubsBits1 := ( le.inqlog_id_Invalid << 0 ) + ( le.customer_id_Invalid << 1 ) + ( le.transaction_id_Invalid << 2 ) + ( le.date_of_transaction_Invalid << 3 ) + ( le.household_id_Invalid << 5 ) + ( le.customer_person_id_Invalid << 6 ) + ( le.customer_program_Invalid << 7 ) + ( le.reason_for_transaction_activity_Invalid << 8 ) + ( le.inquiry_source_Invalid << 9 ) + ( le.customer_county_Invalid << 10 ) + ( le.customer_state_Invalid << 11 ) + ( le.customer_agency_vertical_type_Invalid << 13 ) + ( le.ssn_Invalid << 14 ) + ( le.dob_Invalid << 16 ) + ( le.rawlinkid_Invalid << 18 ) + ( le.raw_full_name_Invalid << 19 ) + ( le.raw_title_Invalid << 21 ) + ( le.raw_first_name_Invalid << 22 ) + ( le.raw_middle_name_Invalid << 24 ) + ( le.raw_last_name_Invalid << 26 ) + ( le.raw_orig_suffix_Invalid << 28 ) + ( le.full_address_Invalid << 29 ) + ( le.street_1_Invalid << 30 ) + ( le.city_Invalid << 31 ) + ( le.state_Invalid << 33 ) + ( le.zip_Invalid << 35 ) + ( le.county_Invalid << 37 ) + ( le.mailing_street_1_Invalid << 38 ) + ( le.mailing_city_Invalid << 39 ) + ( le.mailing_state_Invalid << 41 ) + ( le.mailing_zip_Invalid << 43 ) + ( le.mailing_county_Invalid << 45 ) + ( le.phone_number_Invalid << 46 ) + ( le.ultid_Invalid << 48 ) + ( le.orgid_Invalid << 49 ) + ( le.seleid_Invalid << 50 ) + ( le.tin_Invalid << 51 ) + ( le.email_address_Invalid << 52 ) + ( le.appended_provider_id_Invalid << 53 ) + ( le.lnpid_Invalid << 54 ) + ( le.npi_Invalid << 55 ) + ( le.ip_address_Invalid << 56 ) + ( le.device_id_Invalid << 58 ) + ( le.professional_id_Invalid << 59 ) + ( le.bank_routing_number_1_Invalid << 60 ) + ( le.bank_account_number_1_Invalid << 61 ) + ( le.drivers_license_state_Invalid << 62 ) + ( le.drivers_license_Invalid << 63 );
+    SELF.ScrubsBits2 := ( le.geo_lat_Invalid << 0 ) + ( le.geo_long_Invalid << 1 ) + ( le.reported_date_Invalid << 2 ) + ( le.file_type_Invalid << 4 ) + ( le.deceitful_confidence_Invalid << 5 ) + ( le.reported_by_Invalid << 6 ) + ( le.reason_description_Invalid << 7 ) + ( le.event_type_1_Invalid << 8 ) + ( le.event_entity_1_Invalid << 9 );
     SELF.ScrubsCleanBits1 := ( IF(le.inqlog_id_wouldClean, 1, 0) << 0 ) + ( IF(le.customer_id_wouldClean, 1, 0) << 1 ) + ( IF(le.transaction_id_wouldClean, 1, 0) << 2 ) + ( IF(le.date_of_transaction_wouldClean, 1, 0) << 3 ) + ( IF(le.household_id_wouldClean, 1, 0) << 4 ) + ( IF(le.customer_person_id_wouldClean, 1, 0) << 5 ) + ( IF(le.customer_program_wouldClean, 1, 0) << 6 ) + ( IF(le.reason_for_transaction_activity_wouldClean, 1, 0) << 7 ) + ( IF(le.inquiry_source_wouldClean, 1, 0) << 8 ) + ( IF(le.customer_county_wouldClean, 1, 0) << 9 ) + ( IF(le.customer_state_wouldClean, 1, 0) << 10 ) + ( IF(le.customer_agency_vertical_type_wouldClean, 1, 0) << 11 ) + ( IF(le.ssn_wouldClean, 1, 0) << 12 ) + ( IF(le.dob_wouldClean, 1, 0) << 13 ) + ( IF(le.rawlinkid_wouldClean, 1, 0) << 14 ) + ( IF(le.raw_full_name_wouldClean, 1, 0) << 15 ) + ( IF(le.raw_title_wouldClean, 1, 0) << 16 ) + ( IF(le.raw_first_name_wouldClean, 1, 0) << 17 ) + ( IF(le.raw_middle_name_wouldClean, 1, 0) << 18 ) + ( IF(le.raw_last_name_wouldClean, 1, 0) << 19 ) + ( IF(le.raw_orig_suffix_wouldClean, 1, 0) << 20 ) + ( IF(le.full_address_wouldClean, 1, 0) << 21 ) + ( IF(le.street_1_wouldClean, 1, 0) << 22 ) + ( IF(le.city_wouldClean, 1, 0) << 23 ) + ( IF(le.state_wouldClean, 1, 0) << 24 ) + ( IF(le.zip_wouldClean, 1, 0) << 25 ) + ( IF(le.county_wouldClean, 1, 0) << 26 ) + ( IF(le.mailing_street_1_wouldClean, 1, 0) << 27 ) + ( IF(le.mailing_city_wouldClean, 1, 0) << 28 ) + ( IF(le.mailing_state_wouldClean, 1, 0) << 29 ) + ( IF(le.mailing_zip_wouldClean, 1, 0) << 30 ) + ( IF(le.mailing_county_wouldClean, 1, 0) << 31 ) + ( IF(le.phone_number_wouldClean, 1, 0) << 32 ) + ( IF(le.ultid_wouldClean, 1, 0) << 33 ) + ( IF(le.orgid_wouldClean, 1, 0) << 34 ) + ( IF(le.seleid_wouldClean, 1, 0) << 35 ) + ( IF(le.tin_wouldClean, 1, 0) << 36 ) + ( IF(le.email_address_wouldClean, 1, 0) << 37 ) + ( IF(le.appended_provider_id_wouldClean, 1, 0) << 38 ) + ( IF(le.lnpid_wouldClean, 1, 0) << 39 ) + ( IF(le.npi_wouldClean, 1, 0) << 40 ) + ( IF(le.ip_address_wouldClean, 1, 0) << 41 ) + ( IF(le.device_id_wouldClean, 1, 0) << 42 ) + ( IF(le.professional_id_wouldClean, 1, 0) << 43 ) + ( IF(le.bank_routing_number_1_wouldClean, 1, 0) << 44 ) + ( IF(le.bank_account_number_1_wouldClean, 1, 0) << 45 ) + ( IF(le.drivers_license_state_wouldClean, 1, 0) << 46 ) + ( IF(le.drivers_license_wouldClean, 1, 0) << 47 ) + ( IF(le.geo_lat_wouldClean, 1, 0) << 48 ) + ( IF(le.geo_long_wouldClean, 1, 0) << 49 ) + ( IF(le.reported_date_wouldClean, 1, 0) << 50 ) + ( IF(le.file_type_wouldClean, 1, 0) << 51 ) + ( IF(le.deceitful_confidence_wouldClean, 1, 0) << 52 ) + ( IF(le.reported_by_wouldClean, 1, 0) << 53 ) + ( IF(le.reason_description_wouldClean, 1, 0) << 54 ) + ( IF(le.event_type_1_wouldClean, 1, 0) << 55 ) + ( IF(le.event_entity_1_wouldClean, 1, 0) << 56 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
+  STRING escQuotes(STRING s) := STD.Str.FindReplace(s,'\'','\\\'');
+  Rule_Layout IntoRule(BitmapInfile le, UNSIGNED c) := TRANSFORM
+    mask := 1<<(c-1);
+    hasError := (mask&le.ScrubsBits1)>0 OR (mask&le.ScrubsBits2)>0;
+    SELF.Rules := IF(hasError,TRIM(toRuleDesc(c))+':\''+escQuotes(TRIM(toErrorMessage(c)))+'\'',IF(le.ScrubsBits1=0 AND le.ScrubsBits2=0 AND c=1,'',SKIP));
+    SELF := le;
+  END;
+  unrolled := NORMALIZE(BitmapInfile,NumRules,IntoRule(LEFT,COUNTER));
+  Rule_Layout toRoll(Rule_Layout le,Rule_Layout ri) := TRANSFORM
+    SELF.Rules := TRIM(le.Rules) + IF(LENGTH(TRIM(le.Rules))>0 AND LENGTH(TRIM(ri.Rules))>0,',','') + TRIM(ri.Rules);
+    SELF := le;
+  END;
+  EXPORT RulesInfile := ROLLUP(unrolled,toRoll(LEFT,RIGHT),EXCEPT Rules);
 END;
 // Module to use if you already have a scrubs bitmap you wish to expand or compare
 EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
@@ -349,32 +498,32 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.mailing_city_Invalid := (le.ScrubsBits1 >> 39) & 3;
     SELF.mailing_state_Invalid := (le.ScrubsBits1 >> 41) & 3;
     SELF.mailing_zip_Invalid := (le.ScrubsBits1 >> 43) & 3;
-    SELF.mailing_county_Invalid := (le.ScrubsBits1 >> 45) & 3;
-    SELF.phone_number_Invalid := (le.ScrubsBits1 >> 47) & 3;
-    SELF.ultid_Invalid := (le.ScrubsBits1 >> 49) & 1;
-    SELF.orgid_Invalid := (le.ScrubsBits1 >> 50) & 1;
-    SELF.seleid_Invalid := (le.ScrubsBits1 >> 51) & 1;
-    SELF.tin_Invalid := (le.ScrubsBits1 >> 52) & 1;
-    SELF.email_address_Invalid := (le.ScrubsBits1 >> 53) & 1;
-    SELF.appended_provider_id_Invalid := (le.ScrubsBits1 >> 54) & 1;
-    SELF.lnpid_Invalid := (le.ScrubsBits1 >> 55) & 1;
-    SELF.npi_Invalid := (le.ScrubsBits1 >> 56) & 1;
-    SELF.ip_address_Invalid := (le.ScrubsBits1 >> 57) & 3;
-    SELF.device_id_Invalid := (le.ScrubsBits1 >> 59) & 1;
-    SELF.professional_id_Invalid := (le.ScrubsBits1 >> 60) & 1;
-    SELF.bank_routing_number_1_Invalid := (le.ScrubsBits1 >> 61) & 1;
-    SELF.bank_account_number_1_Invalid := (le.ScrubsBits1 >> 62) & 1;
-    SELF.drivers_license_state_Invalid := (le.ScrubsBits1 >> 63) & 1;
-    SELF.drivers_license_Invalid := (le.ScrubsBits2 >> 0) & 1;
-    SELF.geo_lat_Invalid := (le.ScrubsBits2 >> 1) & 1;
-    SELF.geo_long_Invalid := (le.ScrubsBits2 >> 2) & 1;
-    SELF.reported_date_Invalid := (le.ScrubsBits2 >> 3) & 3;
-    SELF.file_type_Invalid := (le.ScrubsBits2 >> 5) & 1;
-    SELF.deceitful_confidence_Invalid := (le.ScrubsBits2 >> 6) & 1;
-    SELF.reported_by_Invalid := (le.ScrubsBits2 >> 7) & 1;
-    SELF.reason_description_Invalid := (le.ScrubsBits2 >> 8) & 1;
-    SELF.event_type_1_Invalid := (le.ScrubsBits2 >> 9) & 1;
-    SELF.event_entity_1_Invalid := (le.ScrubsBits2 >> 10) & 1;
+    SELF.mailing_county_Invalid := (le.ScrubsBits1 >> 45) & 1;
+    SELF.phone_number_Invalid := (le.ScrubsBits1 >> 46) & 3;
+    SELF.ultid_Invalid := (le.ScrubsBits1 >> 48) & 1;
+    SELF.orgid_Invalid := (le.ScrubsBits1 >> 49) & 1;
+    SELF.seleid_Invalid := (le.ScrubsBits1 >> 50) & 1;
+    SELF.tin_Invalid := (le.ScrubsBits1 >> 51) & 1;
+    SELF.email_address_Invalid := (le.ScrubsBits1 >> 52) & 1;
+    SELF.appended_provider_id_Invalid := (le.ScrubsBits1 >> 53) & 1;
+    SELF.lnpid_Invalid := (le.ScrubsBits1 >> 54) & 1;
+    SELF.npi_Invalid := (le.ScrubsBits1 >> 55) & 1;
+    SELF.ip_address_Invalid := (le.ScrubsBits1 >> 56) & 3;
+    SELF.device_id_Invalid := (le.ScrubsBits1 >> 58) & 1;
+    SELF.professional_id_Invalid := (le.ScrubsBits1 >> 59) & 1;
+    SELF.bank_routing_number_1_Invalid := (le.ScrubsBits1 >> 60) & 1;
+    SELF.bank_account_number_1_Invalid := (le.ScrubsBits1 >> 61) & 1;
+    SELF.drivers_license_state_Invalid := (le.ScrubsBits1 >> 62) & 1;
+    SELF.drivers_license_Invalid := (le.ScrubsBits1 >> 63) & 1;
+    SELF.geo_lat_Invalid := (le.ScrubsBits2 >> 0) & 1;
+    SELF.geo_long_Invalid := (le.ScrubsBits2 >> 1) & 1;
+    SELF.reported_date_Invalid := (le.ScrubsBits2 >> 2) & 3;
+    SELF.file_type_Invalid := (le.ScrubsBits2 >> 4) & 1;
+    SELF.deceitful_confidence_Invalid := (le.ScrubsBits2 >> 5) & 1;
+    SELF.reported_by_Invalid := (le.ScrubsBits2 >> 6) & 1;
+    SELF.reason_description_Invalid := (le.ScrubsBits2 >> 7) & 1;
+    SELF.event_type_1_Invalid := (le.ScrubsBits2 >> 8) & 1;
+    SELF.event_entity_1_Invalid := (le.ScrubsBits2 >> 9) & 1;
     SELF.inqlog_id_wouldClean := le.ScrubsCleanBits1 >> 0;
     SELF.customer_id_wouldClean := le.ScrubsCleanBits1 >> 1;
     SELF.transaction_id_wouldClean := le.ScrubsCleanBits1 >> 2;
@@ -556,11 +705,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     mailing_zip_LENGTHS_ErrorCount := COUNT(GROUP,h.mailing_zip_Invalid=3);
     mailing_zip_LENGTHS_WouldModifyCount := COUNT(GROUP,h.mailing_zip_Invalid=3 AND h.mailing_zip_wouldClean);
     mailing_zip_Total_ErrorCount := COUNT(GROUP,h.mailing_zip_Invalid>0);
-    mailing_county_LEFTTRIM_ErrorCount := COUNT(GROUP,h.mailing_county_Invalid=1);
-    mailing_county_LEFTTRIM_WouldModifyCount := COUNT(GROUP,h.mailing_county_Invalid=1 AND h.mailing_county_wouldClean);
-    mailing_county_ALLOW_ErrorCount := COUNT(GROUP,h.mailing_county_Invalid=2);
-    mailing_county_ALLOW_WouldModifyCount := COUNT(GROUP,h.mailing_county_Invalid=2 AND h.mailing_county_wouldClean);
-    mailing_county_Total_ErrorCount := COUNT(GROUP,h.mailing_county_Invalid>0);
+    mailing_county_ALLOW_ErrorCount := COUNT(GROUP,h.mailing_county_Invalid=1);
+    mailing_county_ALLOW_WouldModifyCount := COUNT(GROUP,h.mailing_county_Invalid=1 AND h.mailing_county_wouldClean);
     phone_number_LEFTTRIM_ErrorCount := COUNT(GROUP,h.phone_number_Invalid=1);
     phone_number_LEFTTRIM_WouldModifyCount := COUNT(GROUP,h.phone_number_Invalid=1 AND h.phone_number_wouldClean);
     phone_number_ALLOW_ErrorCount := COUNT(GROUP,h.phone_number_Invalid=2);
@@ -632,11 +778,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.inqlog_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.transaction_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_of_transaction_Total_ErrorCount > 0, 1, 0) + IF(le.household_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_person_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_program_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reason_for_transaction_activity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.inquiry_source_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_state_Total_ErrorCount > 0, 1, 0) + IF(le.customer_agency_vertical_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ssn_Total_ErrorCount > 0, 1, 0) + IF(le.dob_Total_ErrorCount > 0, 1, 0) + IF(le.rawlinkid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_full_name_Total_ErrorCount > 0, 1, 0) + IF(le.raw_title_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_first_name_Total_ErrorCount > 0, 1, 0) + IF(le.raw_middle_name_Total_ErrorCount > 0, 1, 0) + IF(le.raw_last_name_Total_ErrorCount > 0, 1, 0) + IF(le.raw_orig_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.full_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.street_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.city_Total_ErrorCount > 0, 1, 0) + IF(le.state_Total_ErrorCount > 0, 1, 0) + IF(le.zip_Total_ErrorCount > 0, 1, 0) + IF(le.county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailing_street_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailing_city_Total_ErrorCount > 0, 1, 0) + IF(le.mailing_state_Total_ErrorCount > 0, 1, 0) + IF(le.mailing_zip_Total_ErrorCount > 0, 1, 0) + IF(le.mailing_county_Total_ErrorCount > 0, 1, 0) + IF(le.phone_number_Total_ErrorCount > 0, 1, 0) + IF(le.ultid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orgid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seleid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.tin_ALLOW_ErrorCount > 0, 1, 0) + IF(le.email_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.appended_provider_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.lnpid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.npi_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ip_address_Total_ErrorCount > 0, 1, 0) + IF(le.device_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.professional_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bank_routing_number_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bank_account_number_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.drivers_license_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.drivers_license_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_lat_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_long_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reported_date_Total_ErrorCount > 0, 1, 0) + IF(le.file_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.deceitful_confidence_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reported_by_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reason_description_ALLOW_ErrorCount > 0, 1, 0) + IF(le.event_type_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.event_entity_1_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.inqlog_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.transaction_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_of_transaction_Total_ErrorCount > 0, 1, 0) + IF(le.household_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_person_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_program_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reason_for_transaction_activity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.inquiry_source_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_state_Total_ErrorCount > 0, 1, 0) + IF(le.customer_agency_vertical_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ssn_Total_ErrorCount > 0, 1, 0) + IF(le.dob_Total_ErrorCount > 0, 1, 0) + IF(le.rawlinkid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_full_name_Total_ErrorCount > 0, 1, 0) + IF(le.raw_title_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_first_name_Total_ErrorCount > 0, 1, 0) + IF(le.raw_middle_name_Total_ErrorCount > 0, 1, 0) + IF(le.raw_last_name_Total_ErrorCount > 0, 1, 0) + IF(le.raw_orig_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.full_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.street_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.city_Total_ErrorCount > 0, 1, 0) + IF(le.state_Total_ErrorCount > 0, 1, 0) + IF(le.zip_Total_ErrorCount > 0, 1, 0) + IF(le.county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailing_street_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailing_city_Total_ErrorCount > 0, 1, 0) + IF(le.mailing_state_Total_ErrorCount > 0, 1, 0) + IF(le.mailing_zip_Total_ErrorCount > 0, 1, 0) + IF(le.mailing_county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_number_Total_ErrorCount > 0, 1, 0) + IF(le.ultid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orgid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seleid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.tin_ALLOW_ErrorCount > 0, 1, 0) + IF(le.email_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.appended_provider_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.lnpid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.npi_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ip_address_Total_ErrorCount > 0, 1, 0) + IF(le.device_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.professional_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bank_routing_number_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bank_account_number_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.drivers_license_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.drivers_license_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_lat_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_long_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reported_date_Total_ErrorCount > 0, 1, 0) + IF(le.file_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.deceitful_confidence_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reported_by_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reason_description_ALLOW_ErrorCount > 0, 1, 0) + IF(le.event_type_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.event_entity_1_ALLOW_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.inqlog_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.transaction_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_of_transaction_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.date_of_transaction_ALLOW_ErrorCount > 0, 1, 0) + IF(le.household_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_person_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_program_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reason_for_transaction_activity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.inquiry_source_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_state_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.customer_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.customer_agency_vertical_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ssn_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.ssn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ssn_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.dob_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.dob_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawlinkid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_full_name_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.raw_full_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_title_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_first_name_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.raw_first_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_middle_name_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.raw_middle_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_last_name_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.raw_last_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_orig_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.full_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.street_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.city_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.zip_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailing_street_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailing_city_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.mailing_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailing_state_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.mailing_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailing_state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mailing_zip_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.mailing_zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailing_zip_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mailing_county_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.mailing_county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_number_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.phone_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ultid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orgid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seleid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.tin_ALLOW_ErrorCount > 0, 1, 0) + IF(le.email_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.appended_provider_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.lnpid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.npi_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ip_address_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.ip_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.device_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.professional_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bank_routing_number_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bank_account_number_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.drivers_license_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.drivers_license_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_lat_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_long_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reported_date_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.reported_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.file_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.deceitful_confidence_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reported_by_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reason_description_ALLOW_ErrorCount > 0, 1, 0) + IF(le.event_type_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.event_entity_1_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.inqlog_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.transaction_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.date_of_transaction_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.date_of_transaction_ALLOW_ErrorCount > 0, 1, 0) + IF(le.household_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_person_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_program_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reason_for_transaction_activity_ALLOW_ErrorCount > 0, 1, 0) + IF(le.inquiry_source_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_state_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.customer_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.customer_state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.customer_agency_vertical_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ssn_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.ssn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ssn_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.dob_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.dob_ALLOW_ErrorCount > 0, 1, 0) + IF(le.rawlinkid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_full_name_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.raw_full_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_title_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_first_name_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.raw_first_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_middle_name_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.raw_middle_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_last_name_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.raw_last_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.raw_orig_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.full_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.street_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.city_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.zip_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailing_street_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailing_city_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.mailing_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailing_state_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.mailing_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailing_state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mailing_zip_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.mailing_zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.mailing_zip_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.mailing_county_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_number_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.phone_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.phone_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.ultid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orgid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seleid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.tin_ALLOW_ErrorCount > 0, 1, 0) + IF(le.email_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.appended_provider_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.lnpid_ALLOW_ErrorCount > 0, 1, 0) + IF(le.npi_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ip_address_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.ip_address_ALLOW_ErrorCount > 0, 1, 0) + IF(le.device_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.professional_id_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bank_routing_number_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.bank_account_number_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.drivers_license_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.drivers_license_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_lat_ALLOW_ErrorCount > 0, 1, 0) + IF(le.geo_long_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reported_date_LEFTTRIM_ErrorCount > 0, 1, 0) + IF(le.reported_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.file_type_ALLOW_ErrorCount > 0, 1, 0) + IF(le.deceitful_confidence_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reported_by_ALLOW_ErrorCount > 0, 1, 0) + IF(le.reason_description_ALLOW_ErrorCount > 0, 1, 0) + IF(le.event_type_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.event_entity_1_ALLOW_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
-    SELF.Rules_WithEdits := IF(le.inqlog_id_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.customer_id_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.transaction_id_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.date_of_transaction_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.date_of_transaction_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.household_id_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.customer_person_id_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.customer_program_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.reason_for_transaction_activity_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.inquiry_source_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.customer_county_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.customer_state_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.customer_state_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.customer_state_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.customer_agency_vertical_type_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.ssn_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.ssn_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.ssn_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.dob_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.dob_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.rawlinkid_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.raw_full_name_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.raw_full_name_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.raw_title_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.raw_first_name_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.raw_first_name_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.raw_middle_name_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.raw_middle_name_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.raw_last_name_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.raw_last_name_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.raw_orig_suffix_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.full_address_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.street_1_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.city_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.city_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.state_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.state_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.state_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.zip_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.zip_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.zip_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.county_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.mailing_street_1_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.mailing_city_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.mailing_city_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.mailing_state_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.mailing_state_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.mailing_state_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.mailing_zip_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.mailing_zip_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.mailing_zip_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.mailing_county_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.mailing_county_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.phone_number_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.phone_number_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.phone_number_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.ultid_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.orgid_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.seleid_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.tin_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.email_address_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.appended_provider_id_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.lnpid_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.npi_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.ip_address_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.ip_address_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.device_id_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.professional_id_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.bank_routing_number_1_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.bank_account_number_1_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.drivers_license_state_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.drivers_license_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.geo_lat_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.geo_long_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.reported_date_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.reported_date_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.file_type_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.deceitful_confidence_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.reported_by_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.reason_description_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.event_type_1_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.event_entity_1_ALLOW_WouldModifyCount > 0, 1, 0);
+    SELF.Rules_WithEdits := IF(le.inqlog_id_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.customer_id_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.transaction_id_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.date_of_transaction_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.date_of_transaction_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.household_id_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.customer_person_id_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.customer_program_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.reason_for_transaction_activity_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.inquiry_source_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.customer_county_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.customer_state_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.customer_state_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.customer_state_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.customer_agency_vertical_type_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.ssn_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.ssn_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.ssn_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.dob_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.dob_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.rawlinkid_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.raw_full_name_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.raw_full_name_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.raw_title_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.raw_first_name_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.raw_first_name_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.raw_middle_name_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.raw_middle_name_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.raw_last_name_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.raw_last_name_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.raw_orig_suffix_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.full_address_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.street_1_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.city_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.city_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.state_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.state_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.state_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.zip_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.zip_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.zip_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.county_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.mailing_street_1_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.mailing_city_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.mailing_city_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.mailing_state_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.mailing_state_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.mailing_state_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.mailing_zip_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.mailing_zip_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.mailing_zip_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.mailing_county_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.phone_number_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.phone_number_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.phone_number_LENGTHS_WouldModifyCount > 0, 1, 0) + IF(le.ultid_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.orgid_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.seleid_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.tin_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.email_address_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.appended_provider_id_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.lnpid_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.npi_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.ip_address_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.ip_address_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.device_id_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.professional_id_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.bank_routing_number_1_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.bank_account_number_1_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.drivers_license_state_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.drivers_license_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.geo_lat_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.geo_long_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.reported_date_LEFTTRIM_WouldModifyCount > 0, 1, 0) + IF(le.reported_date_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.file_type_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.deceitful_confidence_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.reported_by_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.reason_description_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.event_type_1_ALLOW_WouldModifyCount > 0, 1, 0) + IF(le.event_entity_1_ALLOW_WouldModifyCount > 0, 1, 0);
     SELF := le;
   END;
   EXPORT SummaryStats := PROJECT(SummaryStats0, xAddErrSummary(LEFT));
@@ -684,7 +830,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.mailing_city_Invalid,'LEFTTRIM','ALLOW','UNKNOWN')
           ,CHOOSE(le.mailing_state_Invalid,'LEFTTRIM','ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.mailing_zip_Invalid,'LEFTTRIM','ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.mailing_county_Invalid,'LEFTTRIM','ALLOW','UNKNOWN')
+          ,CHOOSE(le.mailing_county_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.phone_number_Invalid,'LEFTTRIM','ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.ultid_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.orgid_Invalid,'ALLOW','UNKNOWN')
@@ -711,7 +857,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.event_type_1_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.event_entity_1_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'inqlog_id','customer_id','transaction_id','date_of_transaction','household_id','customer_person_id','customer_program','reason_for_transaction_activity','inquiry_source','customer_county','customer_state','customer_agency_vertical_type','ssn','dob','rawlinkid','raw_full_name','raw_title','raw_first_name','raw_middle_name','raw_last_name','raw_orig_suffix','full_address','street_1','city','state','zip','county','mailing_street_1','mailing_city','mailing_state','mailing_zip','mailing_county','phone_number','ultid','orgid','seleid','tin','email_address','appended_provider_id','lnpid','npi','ip_address','device_id','professional_id','bank_routing_number_1','bank_account_number_1','drivers_license_state','drivers_license','geo_lat','geo_long','reported_date','file_type','deceitful_confidence','reported_by','reason_description','event_type_1','event_entity_1','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_numeric','invalid_numeric_string','invalid_alphanumeric','invalid_date','invalid_alphanumeric','invalid_alphanumeric','invalid_alpha','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_state','invalid_alphanumeric','invalid_ssn','invalid_date','invalid_numeric','invalid_name','invalid_alphanumeric','invalid_name','invalid_name','invalid_name','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_name','invalid_state','invalid_zip','invalid_alphanumeric','invalid_alphanumeric','invalid_name','invalid_state','invalid_zip','invalid_name','invalid_phone','invalid_numeric','invalid_numeric','invalid_numeric','invalid_alphanumeric','invalid_email','invalid_numeric','invalid_numeric','invalid_alphanumeric','invalid_ip','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_real_string','invalid_real_string','invalid_date','invalid_numeric','invalid_numeric_string','invalid_alphanumeric','invalid_alphanumeric','invalid_numeric_string','invalid_alphanumeric','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'invalid_numeric','invalid_numeric_string','invalid_alphanumeric','invalid_date','invalid_alphanumeric','invalid_alphanumeric','invalid_alpha','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_state','invalid_alphanumeric','invalid_ssn','invalid_date','invalid_numeric','invalid_name','invalid_alphanumeric','invalid_name','invalid_name','invalid_name','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_name','invalid_state','invalid_zip','invalid_alphanumeric','invalid_alphanumeric','invalid_name','invalid_state','invalid_zip','invalid_alphanumeric','invalid_phone','invalid_numeric','invalid_numeric','invalid_numeric','invalid_alphanumeric','invalid_email','invalid_numeric','invalid_numeric','invalid_alphanumeric','invalid_ip','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_real_string','invalid_real_string','invalid_date','invalid_numeric','invalid_numeric_string','invalid_alphanumeric','invalid_alphanumeric','invalid_numeric_string','invalid_alphanumeric','UNKNOWN');
     SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.inqlog_id,(SALT311.StrType)le.customer_id,(SALT311.StrType)le.transaction_id,(SALT311.StrType)le.date_of_transaction,(SALT311.StrType)le.household_id,(SALT311.StrType)le.customer_person_id,(SALT311.StrType)le.customer_program,(SALT311.StrType)le.reason_for_transaction_activity,(SALT311.StrType)le.inquiry_source,(SALT311.StrType)le.customer_county,(SALT311.StrType)le.customer_state,(SALT311.StrType)le.customer_agency_vertical_type,(SALT311.StrType)le.ssn,(SALT311.StrType)le.dob,(SALT311.StrType)le.rawlinkid,(SALT311.StrType)le.raw_full_name,(SALT311.StrType)le.raw_title,(SALT311.StrType)le.raw_first_name,(SALT311.StrType)le.raw_middle_name,(SALT311.StrType)le.raw_last_name,(SALT311.StrType)le.raw_orig_suffix,(SALT311.StrType)le.full_address,(SALT311.StrType)le.street_1,(SALT311.StrType)le.city,(SALT311.StrType)le.state,(SALT311.StrType)le.zip,(SALT311.StrType)le.county,(SALT311.StrType)le.mailing_street_1,(SALT311.StrType)le.mailing_city,(SALT311.StrType)le.mailing_state,(SALT311.StrType)le.mailing_zip,(SALT311.StrType)le.mailing_county,(SALT311.StrType)le.phone_number,(SALT311.StrType)le.ultid,(SALT311.StrType)le.orgid,(SALT311.StrType)le.seleid,(SALT311.StrType)le.tin,(SALT311.StrType)le.email_address,(SALT311.StrType)le.appended_provider_id,(SALT311.StrType)le.lnpid,(SALT311.StrType)le.npi,(SALT311.StrType)le.ip_address,(SALT311.StrType)le.device_id,(SALT311.StrType)le.professional_id,(SALT311.StrType)le.bank_routing_number_1,(SALT311.StrType)le.bank_account_number_1,(SALT311.StrType)le.drivers_license_state,(SALT311.StrType)le.drivers_license,(SALT311.StrType)le.geo_lat,(SALT311.StrType)le.geo_long,(SALT311.StrType)le.reported_date,(SALT311.StrType)le.file_type,(SALT311.StrType)le.deceitful_confidence,(SALT311.StrType)le.reported_by,(SALT311.StrType)le.reason_description,(SALT311.StrType)le.event_type_1,(SALT311.StrType)le.event_entity_1,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,57,Into(LEFT,COUNTER));
@@ -724,140 +870,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
-      SELF.ruledesc := CHOOSE(c
-          ,'inqlog_id:invalid_numeric:ALLOW'
-          ,'customer_id:invalid_numeric_string:ALLOW'
-          ,'transaction_id:invalid_alphanumeric:ALLOW'
-          ,'date_of_transaction:invalid_date:LEFTTRIM','date_of_transaction:invalid_date:ALLOW'
-          ,'household_id:invalid_alphanumeric:ALLOW'
-          ,'customer_person_id:invalid_alphanumeric:ALLOW'
-          ,'customer_program:invalid_alpha:ALLOW'
-          ,'reason_for_transaction_activity:invalid_alphanumeric:ALLOW'
-          ,'inquiry_source:invalid_alphanumeric:ALLOW'
-          ,'customer_county:invalid_alphanumeric:ALLOW'
-          ,'customer_state:invalid_state:LEFTTRIM','customer_state:invalid_state:ALLOW','customer_state:invalid_state:LENGTHS'
-          ,'customer_agency_vertical_type:invalid_alphanumeric:ALLOW'
-          ,'ssn:invalid_ssn:LEFTTRIM','ssn:invalid_ssn:ALLOW','ssn:invalid_ssn:LENGTHS'
-          ,'dob:invalid_date:LEFTTRIM','dob:invalid_date:ALLOW'
-          ,'rawlinkid:invalid_numeric:ALLOW'
-          ,'raw_full_name:invalid_name:LEFTTRIM','raw_full_name:invalid_name:ALLOW'
-          ,'raw_title:invalid_alphanumeric:ALLOW'
-          ,'raw_first_name:invalid_name:LEFTTRIM','raw_first_name:invalid_name:ALLOW'
-          ,'raw_middle_name:invalid_name:LEFTTRIM','raw_middle_name:invalid_name:ALLOW'
-          ,'raw_last_name:invalid_name:LEFTTRIM','raw_last_name:invalid_name:ALLOW'
-          ,'raw_orig_suffix:invalid_alphanumeric:ALLOW'
-          ,'full_address:invalid_alphanumeric:ALLOW'
-          ,'street_1:invalid_alphanumeric:ALLOW'
-          ,'city:invalid_name:LEFTTRIM','city:invalid_name:ALLOW'
-          ,'state:invalid_state:LEFTTRIM','state:invalid_state:ALLOW','state:invalid_state:LENGTHS'
-          ,'zip:invalid_zip:LEFTTRIM','zip:invalid_zip:ALLOW','zip:invalid_zip:LENGTHS'
-          ,'county:invalid_alphanumeric:ALLOW'
-          ,'mailing_street_1:invalid_alphanumeric:ALLOW'
-          ,'mailing_city:invalid_name:LEFTTRIM','mailing_city:invalid_name:ALLOW'
-          ,'mailing_state:invalid_state:LEFTTRIM','mailing_state:invalid_state:ALLOW','mailing_state:invalid_state:LENGTHS'
-          ,'mailing_zip:invalid_zip:LEFTTRIM','mailing_zip:invalid_zip:ALLOW','mailing_zip:invalid_zip:LENGTHS'
-          ,'mailing_county:invalid_name:LEFTTRIM','mailing_county:invalid_name:ALLOW'
-          ,'phone_number:invalid_phone:LEFTTRIM','phone_number:invalid_phone:ALLOW','phone_number:invalid_phone:LENGTHS'
-          ,'ultid:invalid_numeric:ALLOW'
-          ,'orgid:invalid_numeric:ALLOW'
-          ,'seleid:invalid_numeric:ALLOW'
-          ,'tin:invalid_alphanumeric:ALLOW'
-          ,'email_address:invalid_email:ALLOW'
-          ,'appended_provider_id:invalid_numeric:ALLOW'
-          ,'lnpid:invalid_numeric:ALLOW'
-          ,'npi:invalid_alphanumeric:ALLOW'
-          ,'ip_address:invalid_ip:LEFTTRIM','ip_address:invalid_ip:ALLOW'
-          ,'device_id:invalid_alphanumeric:ALLOW'
-          ,'professional_id:invalid_alphanumeric:ALLOW'
-          ,'bank_routing_number_1:invalid_alphanumeric:ALLOW'
-          ,'bank_account_number_1:invalid_alphanumeric:ALLOW'
-          ,'drivers_license_state:invalid_alphanumeric:ALLOW'
-          ,'drivers_license:invalid_alphanumeric:ALLOW'
-          ,'geo_lat:invalid_real_string:ALLOW'
-          ,'geo_long:invalid_real_string:ALLOW'
-          ,'reported_date:invalid_date:LEFTTRIM','reported_date:invalid_date:ALLOW'
-          ,'file_type:invalid_numeric:ALLOW'
-          ,'deceitful_confidence:invalid_numeric_string:ALLOW'
-          ,'reported_by:invalid_alphanumeric:ALLOW'
-          ,'reason_description:invalid_alphanumeric:ALLOW'
-          ,'event_type_1:invalid_numeric_string:ALLOW'
-          ,'event_entity_1:invalid_alphanumeric:ALLOW'
-          ,'field:Number_Errored_Fields:SUMMARY'
-          ,'field:Number_Perfect_Fields:SUMMARY'
-          ,'rule:Number_Errored_Rules:SUMMARY'
-          ,'rule:Number_Perfect_Rules:SUMMARY'
-          ,'rule:Number_OnFail_Rules:SUMMARY'
-          ,'record:Number_Errored_Records:SUMMARY'
-          ,'record:Number_Perfect_Records:SUMMARY'
-          ,'record:Number_Edited_Records:SUMMARY'
-          ,'rule:Number_Edited_Rules:SUMMARY','UNKNOWN');
-      SELF.ErrorMessage := CHOOSE(c
-          ,Deltabase_Fields.InvalidMessage_inqlog_id(1)
-          ,Deltabase_Fields.InvalidMessage_customer_id(1)
-          ,Deltabase_Fields.InvalidMessage_transaction_id(1)
-          ,Deltabase_Fields.InvalidMessage_date_of_transaction(1),Deltabase_Fields.InvalidMessage_date_of_transaction(2)
-          ,Deltabase_Fields.InvalidMessage_household_id(1)
-          ,Deltabase_Fields.InvalidMessage_customer_person_id(1)
-          ,Deltabase_Fields.InvalidMessage_customer_program(1)
-          ,Deltabase_Fields.InvalidMessage_reason_for_transaction_activity(1)
-          ,Deltabase_Fields.InvalidMessage_inquiry_source(1)
-          ,Deltabase_Fields.InvalidMessage_customer_county(1)
-          ,Deltabase_Fields.InvalidMessage_customer_state(1),Deltabase_Fields.InvalidMessage_customer_state(2),Deltabase_Fields.InvalidMessage_customer_state(3)
-          ,Deltabase_Fields.InvalidMessage_customer_agency_vertical_type(1)
-          ,Deltabase_Fields.InvalidMessage_ssn(1),Deltabase_Fields.InvalidMessage_ssn(2),Deltabase_Fields.InvalidMessage_ssn(3)
-          ,Deltabase_Fields.InvalidMessage_dob(1),Deltabase_Fields.InvalidMessage_dob(2)
-          ,Deltabase_Fields.InvalidMessage_rawlinkid(1)
-          ,Deltabase_Fields.InvalidMessage_raw_full_name(1),Deltabase_Fields.InvalidMessage_raw_full_name(2)
-          ,Deltabase_Fields.InvalidMessage_raw_title(1)
-          ,Deltabase_Fields.InvalidMessage_raw_first_name(1),Deltabase_Fields.InvalidMessage_raw_first_name(2)
-          ,Deltabase_Fields.InvalidMessage_raw_middle_name(1),Deltabase_Fields.InvalidMessage_raw_middle_name(2)
-          ,Deltabase_Fields.InvalidMessage_raw_last_name(1),Deltabase_Fields.InvalidMessage_raw_last_name(2)
-          ,Deltabase_Fields.InvalidMessage_raw_orig_suffix(1)
-          ,Deltabase_Fields.InvalidMessage_full_address(1)
-          ,Deltabase_Fields.InvalidMessage_street_1(1)
-          ,Deltabase_Fields.InvalidMessage_city(1),Deltabase_Fields.InvalidMessage_city(2)
-          ,Deltabase_Fields.InvalidMessage_state(1),Deltabase_Fields.InvalidMessage_state(2),Deltabase_Fields.InvalidMessage_state(3)
-          ,Deltabase_Fields.InvalidMessage_zip(1),Deltabase_Fields.InvalidMessage_zip(2),Deltabase_Fields.InvalidMessage_zip(3)
-          ,Deltabase_Fields.InvalidMessage_county(1)
-          ,Deltabase_Fields.InvalidMessage_mailing_street_1(1)
-          ,Deltabase_Fields.InvalidMessage_mailing_city(1),Deltabase_Fields.InvalidMessage_mailing_city(2)
-          ,Deltabase_Fields.InvalidMessage_mailing_state(1),Deltabase_Fields.InvalidMessage_mailing_state(2),Deltabase_Fields.InvalidMessage_mailing_state(3)
-          ,Deltabase_Fields.InvalidMessage_mailing_zip(1),Deltabase_Fields.InvalidMessage_mailing_zip(2),Deltabase_Fields.InvalidMessage_mailing_zip(3)
-          ,Deltabase_Fields.InvalidMessage_mailing_county(1),Deltabase_Fields.InvalidMessage_mailing_county(2)
-          ,Deltabase_Fields.InvalidMessage_phone_number(1),Deltabase_Fields.InvalidMessage_phone_number(2),Deltabase_Fields.InvalidMessage_phone_number(3)
-          ,Deltabase_Fields.InvalidMessage_ultid(1)
-          ,Deltabase_Fields.InvalidMessage_orgid(1)
-          ,Deltabase_Fields.InvalidMessage_seleid(1)
-          ,Deltabase_Fields.InvalidMessage_tin(1)
-          ,Deltabase_Fields.InvalidMessage_email_address(1)
-          ,Deltabase_Fields.InvalidMessage_appended_provider_id(1)
-          ,Deltabase_Fields.InvalidMessage_lnpid(1)
-          ,Deltabase_Fields.InvalidMessage_npi(1)
-          ,Deltabase_Fields.InvalidMessage_ip_address(1),Deltabase_Fields.InvalidMessage_ip_address(2)
-          ,Deltabase_Fields.InvalidMessage_device_id(1)
-          ,Deltabase_Fields.InvalidMessage_professional_id(1)
-          ,Deltabase_Fields.InvalidMessage_bank_routing_number_1(1)
-          ,Deltabase_Fields.InvalidMessage_bank_account_number_1(1)
-          ,Deltabase_Fields.InvalidMessage_drivers_license_state(1)
-          ,Deltabase_Fields.InvalidMessage_drivers_license(1)
-          ,Deltabase_Fields.InvalidMessage_geo_lat(1)
-          ,Deltabase_Fields.InvalidMessage_geo_long(1)
-          ,Deltabase_Fields.InvalidMessage_reported_date(1),Deltabase_Fields.InvalidMessage_reported_date(2)
-          ,Deltabase_Fields.InvalidMessage_file_type(1)
-          ,Deltabase_Fields.InvalidMessage_deceitful_confidence(1)
-          ,Deltabase_Fields.InvalidMessage_reported_by(1)
-          ,Deltabase_Fields.InvalidMessage_reason_description(1)
-          ,Deltabase_Fields.InvalidMessage_event_type_1(1)
-          ,Deltabase_Fields.InvalidMessage_event_entity_1(1)
-          ,'Fields with errors'
-          ,'Fields without errors'
-          ,'Rules with errors'
-          ,'Rules without errors'
-          ,'Rules with possible edits'
-          ,'Records with at least one error'
-          ,'Records without errors'
-          ,'Edited records'
-          ,'Rules leading to edits','UNKNOWN');
+      SELF.ruledesc := toRuleDesc(c);
+      SELF.ErrorMessage := toErrorMessage(c);
       SELF.rulecnt := CHOOSE(c
           ,le.inqlog_id_ALLOW_ErrorCount
           ,le.customer_id_ALLOW_ErrorCount
@@ -890,7 +904,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.mailing_city_LEFTTRIM_ErrorCount,le.mailing_city_ALLOW_ErrorCount
           ,le.mailing_state_LEFTTRIM_ErrorCount,le.mailing_state_ALLOW_ErrorCount,le.mailing_state_LENGTHS_ErrorCount
           ,le.mailing_zip_LEFTTRIM_ErrorCount,le.mailing_zip_ALLOW_ErrorCount,le.mailing_zip_LENGTHS_ErrorCount
-          ,le.mailing_county_LEFTTRIM_ErrorCount,le.mailing_county_ALLOW_ErrorCount
+          ,le.mailing_county_ALLOW_ErrorCount
           ,le.phone_number_LEFTTRIM_ErrorCount,le.phone_number_ALLOW_ErrorCount,le.phone_number_LENGTHS_ErrorCount
           ,le.ultid_ALLOW_ErrorCount
           ,le.orgid_ALLOW_ErrorCount
@@ -957,7 +971,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.mailing_city_LEFTTRIM_ErrorCount,le.mailing_city_ALLOW_ErrorCount
           ,le.mailing_state_LEFTTRIM_ErrorCount,le.mailing_state_ALLOW_ErrorCount,le.mailing_state_LENGTHS_ErrorCount
           ,le.mailing_zip_LEFTTRIM_ErrorCount,le.mailing_zip_ALLOW_ErrorCount,le.mailing_zip_LENGTHS_ErrorCount
-          ,le.mailing_county_LEFTTRIM_ErrorCount,le.mailing_county_ALLOW_ErrorCount
+          ,le.mailing_county_ALLOW_ErrorCount
           ,le.phone_number_LEFTTRIM_ErrorCount,le.phone_number_ALLOW_ErrorCount,le.phone_number_LENGTHS_ErrorCount
           ,le.ultid_ALLOW_ErrorCount
           ,le.orgid_ALLOW_ErrorCount
@@ -1010,7 +1024,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     END;
     j := JOIN(SummaryInfo,gt,LEFT.ruledesc=RIGHT.ruledesc,jn(LEFT,RIGHT),HASH,LEFT OUTER);
     FieldErrorStats := IF(examples>0,j,SummaryInfo);
- 
     // field population stats
     mod_hygiene := Deltabase_hygiene(PROJECT(h, Deltabase_Layout_Deltabase));
     hygiene_summaryStats := mod_hygiene.Summary('');
@@ -1199,7 +1212,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.ErrorMessage := '';
     END;
     FieldPopStats := NORMALIZE(hygiene_summaryStats,57,xNormHygieneStats(LEFT,COUNTER,'POP'));
- 
   // record count stats
     SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
@@ -1211,7 +1223,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.rulepcnt := 0;
     END;
     TotalRecsStats := PROJECT(hygiene_summaryStats, xTotalRecs(LEFT, 'records:total_records:POP'));
- 
     mod_Delta := Deltabase_Delta(prevDS, PROJECT(h, Deltabase_Layout_Deltabase));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
     DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),57,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
@@ -1220,23 +1231,18 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
                                       TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');
     DeltaTotalRecsStats := PROJECT(deltaHygieneSummary(txt <> 'Updates_OldFile'), xTotalRecs(LEFT, deltaStatName(LEFT.txt)));
     DeltaStats := IF(COUNT(prevDS) > 0, DeltaFieldPopStats + DeltaTotalRecsStats);
- 
     RETURN FieldErrorStats & FieldPopStats & TotalRecsStats & DeltaStats;
   END;
 END;
- 
 EXPORT StandardStats(DATASET(Deltabase_Layout_Deltabase) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
   myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   expandedFile := FromNone(inFile).ExpandedInfile;
   mod_fromexpandedOverall := FromExpanded(expandedFile);
   scrubsSummaryOverall := mod_fromexpandedOverall.SummaryStats;
- 
   SALT311.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_FraudGov, Deltabase_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
   scrubsSummaryOverall_Standard := NORMALIZE(scrubsSummaryOverall, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'all', 'all'));
- 
   allErrsOverall := mod_fromexpandedOverall.AllErrors;
   tErrsOverall := TABLE(DISTRIBUTE(allErrsOverall, HASH(FieldName, ErrorType)), {FieldName, ErrorType, FieldContents, cntExamples := COUNT(GROUP)}, FieldName, ErrorType, FieldContents, LOCAL);
- 
   scrubsSummaryOverall_Standard_addErr   := IF(doErrorOverall,
                                                DENORMALIZE(SORT(DISTRIBUTE(scrubsSummaryOverall_Standard, HASH(field, ruletype)), field, ruletype, LOCAL),
   	                                                       SORT(tErrsOverall, FieldName, ErrorType, -cntExamples, FieldContents, LOCAL),
@@ -1246,7 +1252,6 @@ EXPORT StandardStats(DATASET(Deltabase_Layout_Deltabase) inFile, BOOLEAN doError
   	                                                       SELF := LEFT),
   	                                                       KEEP(10), LEFT OUTER, LOCAL, NOSORT));
   scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT311.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
- 
   RETURN scrubsSummaryOverall_Standard_addErr & scrubsSummaryOverall_Standard_GeneralErrs;
 END;
 END;

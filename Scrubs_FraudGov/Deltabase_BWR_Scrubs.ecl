@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_FraudGov.Deltabase_BWR_Scrubs - Checking field validity in a file - SALT V3.11.8');
+#workunit('name','Scrubs_FraudGov.Deltabase_BWR_Scrubs - Checking field validity in a file - SALT V3.11.11');
 IMPORT Scrubs_FraudGov,SALT311;
 infile := Scrubs_FraudGov.Deltabase_In_Deltabase;
 mod_scrubs := Scrubs_FraudGov.Deltabase_Scrubs;

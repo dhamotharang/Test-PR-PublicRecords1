@@ -1,6 +1,5 @@
 ﻿IMPORT SALT311,STD;
 EXPORT Deltabase_hygiene(dataset(Deltabase_layout_Deltabase) h) := MODULE
- 
 //A simple summary record
 EXPORT Summary(SALT311.Str30Type  txt) := FUNCTION
   SummaryLayout := RECORD
@@ -242,7 +241,6 @@ EXPORT Summary(SALT311.Str30Type  txt) := FUNCTION
   END;
   RETURN TABLE(T,R1);
 END;
- 
 summary0 := Summary('Summary');
   invRec := RECORD
   UNSIGNED  FldNo;
@@ -334,11 +332,8 @@ SHARED FldIds := DATASET([{1,'inqlog_id'}
       ,{56,'event_type_1'}
       ,{57,'event_entity_1'}],SALT311.MAC_Character_Counts.Field_Identification);
 EXPORT AllProfiles := SALT311.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
- 
 EXPORT SrcProfiles := SALT311.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
- 
 EXPORT Correlations := SALT311.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
- 
 ErrorRecord := RECORD
   UNSIGNED1 FieldNum;
   UNSIGNED1 ErrorNum;
@@ -414,7 +409,7 @@ END;
 TotalErrors := TABLE(Errors,ErrorRecordsTotals,FieldNum,ErrorNum,FEW);
 PrettyErrorTotals := RECORD
   FieldNme := Deltabase_Fields.FieldName(TotalErrors.FieldNum);
-  FieldType := CHOOSE(TotalErrors.FieldNum,'invalid_numeric','invalid_numeric_string','invalid_alphanumeric','invalid_date','invalid_alphanumeric','invalid_alphanumeric','invalid_alpha','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_state','invalid_alphanumeric','invalid_ssn','invalid_date','invalid_numeric','invalid_name','invalid_alphanumeric','invalid_name','invalid_name','invalid_name','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_name','invalid_state','invalid_zip','invalid_alphanumeric','invalid_alphanumeric','invalid_name','invalid_state','invalid_zip','invalid_name','invalid_phone','invalid_numeric','invalid_numeric','invalid_numeric','invalid_alphanumeric','invalid_email','invalid_numeric','invalid_numeric','invalid_alphanumeric','invalid_ip','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_real_string','invalid_real_string','invalid_date','invalid_numeric','invalid_numeric_string','invalid_alphanumeric','invalid_alphanumeric','invalid_numeric_string','invalid_alphanumeric');
+  FieldType := CHOOSE(TotalErrors.FieldNum,'invalid_numeric','invalid_numeric_string','invalid_alphanumeric','invalid_date','invalid_alphanumeric','invalid_alphanumeric','invalid_alpha','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_state','invalid_alphanumeric','invalid_ssn','invalid_date','invalid_numeric','invalid_name','invalid_alphanumeric','invalid_name','invalid_name','invalid_name','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_name','invalid_state','invalid_zip','invalid_alphanumeric','invalid_alphanumeric','invalid_name','invalid_state','invalid_zip','invalid_alphanumeric','invalid_phone','invalid_numeric','invalid_numeric','invalid_numeric','invalid_alphanumeric','invalid_email','invalid_numeric','invalid_numeric','invalid_alphanumeric','invalid_ip','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_alphanumeric','invalid_real_string','invalid_real_string','invalid_date','invalid_numeric','invalid_numeric_string','invalid_alphanumeric','invalid_alphanumeric','invalid_numeric_string','invalid_alphanumeric');
   ErrorMessage := CHOOSE(TotalErrors.FieldNum,Deltabase_Fields.InValidMessage_inqlog_id(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_customer_id(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_transaction_id(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_date_of_transaction(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_household_id(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_customer_person_id(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_customer_program(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_reason_for_transaction_activity(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_inquiry_source(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_customer_county(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_customer_state(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_customer_agency_vertical_type(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_ssn(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_dob(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_rawlinkid(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_raw_full_name(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_raw_title(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_raw_first_name(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_raw_middle_name(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_raw_last_name(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_raw_orig_suffix(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_full_address(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_street_1(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_city(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_state(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_zip(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_county(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_mailing_street_1(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_mailing_city(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_mailing_state(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_mailing_zip(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_mailing_county(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_phone_number(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_ultid(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_orgid(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_seleid(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_tin(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_email_address(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_appended_provider_id(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_lnpid(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_npi(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_ip_address(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_device_id(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_professional_id(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_bank_routing_number_1(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_bank_account_number_1(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_drivers_license_state(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_drivers_license(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_geo_lat(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_geo_long(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_reported_date(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_file_type(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_deceitful_confidence(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_reported_by(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_reason_description(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_event_type_1(TotalErrors.ErrorNum),Deltabase_Fields.InValidMessage_event_entity_1(TotalErrors.ErrorNum));
   TotalErrors.Cnt;
 END;
@@ -423,13 +418,10 @@ EXPORT ValidityErrors := ValErr;
 EXPORT StandardStats(BOOLEAN doSummaryGlobal = TRUE, BOOLEAN doAllProfiles = TRUE) := FUNCTION
   myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   fieldPopulationOverall := Summary('');
- 
   SALT311.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(Scrubs_FraudGov, Deltabase_Fields, 'RECORDOF(fieldPopulationOverall)', FALSE);
- 
   fieldPopulationOverall_Standard := IF(doSummaryGlobal, NORMALIZE(fieldPopulationOverall, COUNT(FldIds) * 6, xSummary(LEFT, COUNTER, myTimeStamp, 'all', 'all')));
   fieldPopulationOverall_TotalRecs_Standard := IF(doSummaryGlobal, SALT311.mod_StandardStatsTransforms.mac_hygieneTotalRecs(fieldPopulationOverall, myTimeStamp, 'all', FALSE, 'all'));
   allProfiles_Standard := IF(doAllProfiles, SALT311.mod_StandardStatsTransforms.hygieneAllProfiles(AllProfiles, myTimeStamp, 10, 'all'));
- 
   RETURN fieldPopulationOverall_Standard & fieldPopulationOverall_TotalRecs_Standard & allProfiles_Standard;
 END;
 END;
