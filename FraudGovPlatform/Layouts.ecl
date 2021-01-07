@@ -367,7 +367,7 @@ EXPORT Layouts := MODULE
 			integer8 risklevel;
 		END;
 		EXPORT DisposableEmailDomains := Record
-			string200 DisposableEmailDomain;
+			UNICODE200 DisposableEmailDomain;
 		END;		
 	END;
 

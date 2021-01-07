@@ -18,7 +18,7 @@ export Build_Keys(
 			 BuildEntityProfileKey
 			,BuildConfigAttributesKey
 			,BuildConfigRulesKey
-			BuildDisposableEmailDomainsKey
+			,BuildDisposableEmailDomainsKey
 		 )
 		;
 	
