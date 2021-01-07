@@ -1200,7 +1200,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
       Model1 := dataset([Transform(iesp.smallbusinessanalytics.t_SBAModelHRI,
                          self.Name := key1.Model1_Name,
                          self.Scores := dataset([Transform(iesp.smallbusinessanalytics.t_SBAScoreHRI,
-                                                 self._Type := '0 to 999',
+                                                 self._Type := '0-999',
                                                  self.Value := (Integer)key1.Model1_Score,
                                                  self.ScoreReasons := model1_reason_codes
                                                )])
@@ -1208,7 +1208,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
       Model2 := dataset([Transform(iesp.smallbusinessanalytics.t_SBAModelHRI,
                          self.Name := key1.Model2_Name,
                          self.Scores := dataset([Transform(iesp.smallbusinessanalytics.t_SBAScoreHRI,
-                                                 self._Type := '0 to 999',
+                                                 self._Type := '0-999',
                                                  self.Value := (Integer)key1.Model2_Score,
                                                  self.ScoreReasons := model2_reason_codes
                                                )])
