@@ -1,7 +1,7 @@
 ﻿import STD, ut;
 
 GetReplacedRecords(dataset(Gong_Neustar.layout_gongMaster) adds, dataset(Gong_Neustar.layout_gongMaster) mstr, string8 filedate) := 
-
+//These are records in master file, but not in refresh file
  JOIN(mstr, adds, 
 				//	LEFT.record_id=RIGHT.record_id AND
 //					LEFT.add_date=RIGHT.add_date AND
@@ -80,42 +80,7 @@ GetUpdates(dataset(Gong_Neustar.layout_gongMaster) adds, dataset(Gong_Neustar.la
 						),
 				LEFT OUTER, KEEP(1)); 
 				
-// DF-28737: Assign persistent_record_id to replaced dataset if the record already exists in master file
-PopulatePersistentRecordId(dataset(Gong_Neustar.layout_gongMaster) replaced, dataset(Gong_Neustar.layout_gongMaster) mstr) := 
-
- JOIN(replaced, mstr,  
-					//LEFT.record_id=RIGHT.record_id AND
-					//LEFT.add_date=RIGHT.add_date AND
-					LEFT.listing_type = RIGHT.listing_type AND
-				LEFT. 	RECORD_TYPE = RIGHT.RECORD_TYPE AND
-				LEFT.  TELEPHONE = RIGHT.telephone AND
-				Gong_Neustar.UC(LEFT.BUSINESS_NAME) = Gong_Neustar.UC(RIGHT.BUSINESS_NAME) AND
-				Gong_Neustar.UC(LEFT.		BUSINESS_CAPTIONS) = Gong_Neustar.UC(RIGHT.BUSINESS_CAPTIONS) AND
-				Gong_Neustar.UC(LEFT.  	CATEGORY) = Gong_Neustar.UC(RIGHT.CATEGORY) AND
-				LEFT.	INDENT = RIGHT.INDENT AND
-				Gong_Neustar.UC(LEFT.LAST_NAME) = Gong_Neustar.UC(RIGHT.LAST_NAME) AND
-				Gong_Neustar.UC(LEFT.SUFFIX_NAME) = Gong_Neustar.UC(RIGHT.SUFFIX_NAME) AND
-				Gong_Neustar.UC(LEFT.FIRST_NAME) = Gong_Neustar.UC(RIGHT.FIRST_NAME) AND
-				ut.NNEQ(Gong_Neustar.UC(LEFT.MIDDLE_NAME), Gong_Neustar.UC(RIGHT.MIDDLE_NAME)) AND
-				Gong_Neustar.UC(LEFT.  	PRIMARY_STREET_NUMBER) = Gong_Neustar.UC(RIGHT.PRIMARY_STREET_NUMBER) AND
-				Gong_Neustar.UC(LEFT.		PRE_DIR) = Gong_Neustar.UC(RIGHT.PRE_DIR) AND
-				Gong_Neustar.UC(LEFT.  	PRIMARY_STREET_NAME) = Gong_Neustar.UC(RIGHT.PRIMARY_STREET_NAME) AND
-				Gong_Neustar.UC(LEFT.  	PRIMARY_STREET_SUFFIX) = Gong_Neustar.UC(RIGHT.PRIMARY_STREET_SUFFIX) AND
-				Gong_Neustar.UC(LEFT.		POST_DIR) = Gong_Neustar.UC(RIGHT.POST_DIR) AND
-//				Gong_Neustar.UC(LEFT.		SECONDARY_ADDRESS_TYPE) = Gong_Neustar.UC(RIGHT.SECONDARY_ADDRESS_TYPE) AND
-				Gong_Neustar.UC(LEFT.		SECONDARY_RANGE) = Gong_Neustar.UC(RIGHT.SECONDARY_RANGE) AND
-				Gong_Neustar.UC(LEFT.  	CITY) = Gong_Neustar.UC(RIGHT.CITY) AND
-				Gong_Neustar.UC(LEFT.  	STATE) = Gong_Neustar.UC(RIGHT.STATE) AND
-				LEFT.  	ZIP_CODE = RIGHT.ZIP_CODE AND
-				//LEFT.	  ZIP_PLUS4 = RIGHT.ZIP_PLUS4 AND
-				//	LEFT.DATA_SOURCE = RIGHT.DATA_SOURCE AND
-				LEFT.OMIT_ADDRESS = RIGHT.OMIT_ADDRESS, 
-						TRANSFORM(Gong_Neustar.layout_gongMaster,
-									self.persistent_record_id := IF(RIGHT.persistent_record_id=0,LEFT.persistent_record_id,RIGHT.persistent_record_id);
-									self := LEFT;
-						),
-				INNER, KEEP(1)); 
-EXPORT MergeFullRefresh(dataset(layout_gongMaster) refresh, dataset(layout_gongMaster) mstr) := FUNCTION
+ EXPORT MergeFullRefresh(dataset(layout_gongMaster) refresh, dataset(layout_gongMaster) mstr) := FUNCTION
 
   string8 filedate := refresh[1].filedate[1..8];
 	curr := mstr(current_record_flag='Y');
@@ -123,9 +88,9 @@ EXPORT MergeFullRefresh(dataset(layout_gongMaster) refresh, dataset(layout_gongM
 
 	updates := GetUpdates(refresh, curr);
 	replaced := GetReplacedRecords(refresh, curr, filedate);
-	replaced_pid := PopulatePersistentRecordId(replaced, curr);		//DF-28737 assign existing persistent_record_id to records in replaced
 
-	master7 := updates & replaced_pid & notcurr;	// DF-28737
+	master7 := updates & replaced & notcurr;	
+	// DF-28737 Assign persistent record id to new records
 	master7_pid := Gong_Neustar.Mac_Assign_UniqueId(master7, persistent_record_id);
 
 	// rollup duplicate records
