@@ -1,4 +1,4 @@
-﻿IMPORT AccountMonitoring, PhonesInfo, MDR;
+﻿﻿IMPORT AccountMonitoring, PhonesInfo, MDR;
 
 EXPORT fn_cgm_phoneownership (
 			DATASET(AccountMonitoring.layouts.portfolio.base) in_portfolio,
@@ -9,10 +9,10 @@ EXPORT fn_cgm_phoneownership (
 	
 	//Key Files
 
-	phone_transactions_key := DISTRIBUTED(AccountMonitoring.product_files.PhoneOwnership.key_phones_transaction_dist);
-	phone_type_key := DISTRIBUTED(AccountMonitoring.product_files.Phone.key_phones_type_dist);
-	phone_lerg6_key := DISTRIBUTED(AccountMonitoring.product_files.Phone.key_Phones_Lerg6_dist);
-	phone_carrier_reference_key := DISTRIBUTED(AccountMonitoring.product_files.Phone.key_carrier_reference_dist);
+	phone_transactions_key := DISTRIBUTED(AccountMonitoring.product_files.PhoneOwnership.key_phones_transaction_dist, HASH64(phone));
+	phone_type_key := DISTRIBUTED(AccountMonitoring.product_files.Phone.key_phones_type_dist, HASH64(phone));
+	phone_lerg6_key := DISTRIBUTED(AccountMonitoring.product_files.Phone.key_Phones_Lerg6_dist, HASH64(npa,nxx,block_id));
+	phone_carrier_reference_key := DISTRIBUTED(AccountMonitoring.product_files.Phone.key_carrier_reference_dist, HASH64(ocn));
 
   temp_layout := RECORD
 		in_portfolio.pid;
