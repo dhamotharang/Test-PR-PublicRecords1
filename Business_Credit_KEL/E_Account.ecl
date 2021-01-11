@@ -1,8 +1,8 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
-IMPORT KEL12 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.3.2
+IMPORT KEL13 AS KEL;
 IMPORT Business_Credit_KEL;
 IMPORT CFG_graph FROM Business_Credit_KEL;
-IMPORT * FROM KEL12.Null;
+IMPORT * FROM KEL13.Null;
 EXPORT E_Account(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __cfg = CFG_graph) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
@@ -126,36 +126,36 @@ EXPORT E_Account(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __c
   EXPORT UIDSourceCounts := TABLE(InData,{KEL.typ.uid UID := MIN(GROUP,__T(UID)),KEL.typ.int Cnt := COUNT(GROUP)},UID);
   EXPORT TopSourcedUIDs(KEL.typ.int n = 10) := TOPN(UIDSourceCounts,n,-Cnt);
   EXPORT UIDSourceDistribution := SORT(TABLE(UIDSourceCounts,{Cnt,KEL.typ.int uidCount := COUNT(GROUP),KEL.typ.uid rep := MIN(GROUP,UID)},Cnt),-Cnt);
-  EXPORT _seq__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_seq_);
-  EXPORT _ultid__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_ultid_);
-  EXPORT _orgid__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_orgid_);
-  EXPORT _seleid__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_seleid_);
-  EXPORT _proxid__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_proxid_);
-  EXPORT _powid__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_powid_);
-  EXPORT _empid__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_empid_);
-  EXPORT _dotid__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_dotid_);
-  EXPORT _ultscore__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_ultscore_);
-  EXPORT _orgscore__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_orgscore_);
-  EXPORT _selescore__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_selescore_);
-  EXPORT _proxscore__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_proxscore_);
-  EXPORT _powscore__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_powscore_);
-  EXPORT _empscore__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_empscore_);
-  EXPORT _dotscore__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_dotscore_);
-  EXPORT _ultweight__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_ultweight_);
-  EXPORT _orgweight__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_orgweight_);
-  EXPORT _seleweight__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_seleweight_);
-  EXPORT _proxweight__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_proxweight_);
-  EXPORT _powweight__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_powweight_);
-  EXPORT _empweight__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_empweight_);
-  EXPORT _dotweight__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_dotweight_);
-  EXPORT _dt__first__seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_dt__first__seen_);
-  EXPORT _dt__last__seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_dt__last__seen_);
-  EXPORT _dt__vendor__first__reported__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_dt__vendor__first__reported_);
-  EXPORT _dt__vendor__last__reported__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_dt__vendor__last__reported_);
-  EXPORT _dt__datawarehouse__first__reported__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_dt__datawarehouse__first__reported_);
-  EXPORT _dt__datawarehouse__last__reported__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_dt__datawarehouse__last__reported_);
-  EXPORT _did__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_did_);
-  EXPORT _did__score__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_did__score_);
+  EXPORT _seq__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_seq_);
+  EXPORT _ultid__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_ultid_);
+  EXPORT _orgid__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_orgid_);
+  EXPORT _seleid__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_seleid_);
+  EXPORT _proxid__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_proxid_);
+  EXPORT _powid__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_powid_);
+  EXPORT _empid__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_empid_);
+  EXPORT _dotid__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_dotid_);
+  EXPORT _ultscore__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_ultscore_);
+  EXPORT _orgscore__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_orgscore_);
+  EXPORT _selescore__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_selescore_);
+  EXPORT _proxscore__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_proxscore_);
+  EXPORT _powscore__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_powscore_);
+  EXPORT _empscore__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_empscore_);
+  EXPORT _dotscore__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_dotscore_);
+  EXPORT _ultweight__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_ultweight_);
+  EXPORT _orgweight__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_orgweight_);
+  EXPORT _seleweight__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_seleweight_);
+  EXPORT _proxweight__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_proxweight_);
+  EXPORT _powweight__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_powweight_);
+  EXPORT _empweight__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_empweight_);
+  EXPORT _dotweight__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_dotweight_);
+  EXPORT _dt__first__seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_dt__first__seen_);
+  EXPORT _dt__last__seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_dt__last__seen_);
+  EXPORT _dt__vendor__first__reported__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_dt__vendor__first__reported_);
+  EXPORT _dt__vendor__last__reported__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_dt__vendor__last__reported_);
+  EXPORT _dt__datawarehouse__first__reported__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_dt__datawarehouse__first__reported_);
+  EXPORT _dt__datawarehouse__last__reported__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_dt__datawarehouse__last__reported_);
+  EXPORT _did__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_did_);
+  EXPORT _did__score__SingleValue_Invalid := KEL.Intake.DetectMultipleValuesOnResult(Result,_did__score_);
   EXPORT SanityCheck := DATASET([{COUNT(Business_Credit_KEL_File_SBFE_temp_Linkids_Invalid),COUNT(_seq__SingleValue_Invalid),COUNT(_ultid__SingleValue_Invalid),COUNT(_orgid__SingleValue_Invalid),COUNT(_seleid__SingleValue_Invalid),COUNT(_proxid__SingleValue_Invalid),COUNT(_powid__SingleValue_Invalid),COUNT(_empid__SingleValue_Invalid),COUNT(_dotid__SingleValue_Invalid),COUNT(_ultscore__SingleValue_Invalid),COUNT(_orgscore__SingleValue_Invalid),COUNT(_selescore__SingleValue_Invalid),COUNT(_proxscore__SingleValue_Invalid),COUNT(_powscore__SingleValue_Invalid),COUNT(_empscore__SingleValue_Invalid),COUNT(_dotscore__SingleValue_Invalid),COUNT(_ultweight__SingleValue_Invalid),COUNT(_orgweight__SingleValue_Invalid),COUNT(_seleweight__SingleValue_Invalid),COUNT(_proxweight__SingleValue_Invalid),COUNT(_powweight__SingleValue_Invalid),COUNT(_empweight__SingleValue_Invalid),COUNT(_dotweight__SingleValue_Invalid),COUNT(_dt__first__seen__SingleValue_Invalid),COUNT(_dt__last__seen__SingleValue_Invalid),COUNT(_dt__vendor__first__reported__SingleValue_Invalid),COUNT(_dt__vendor__last__reported__SingleValue_Invalid),COUNT(_dt__datawarehouse__first__reported__SingleValue_Invalid),COUNT(_dt__datawarehouse__last__reported__SingleValue_Invalid),COUNT(_did__SingleValue_Invalid),COUNT(_did__score__SingleValue_Invalid),TopSourcedUIDs(1)}],{KEL.typ.int Business_Credit_KEL_File_SBFE_temp_Linkids_Invalid,KEL.typ.int _seq__SingleValue_Invalid,KEL.typ.int _ultid__SingleValue_Invalid,KEL.typ.int _orgid__SingleValue_Invalid,KEL.typ.int _seleid__SingleValue_Invalid,KEL.typ.int _proxid__SingleValue_Invalid,KEL.typ.int _powid__SingleValue_Invalid,KEL.typ.int _empid__SingleValue_Invalid,KEL.typ.int _dotid__SingleValue_Invalid,KEL.typ.int _ultscore__SingleValue_Invalid,KEL.typ.int _orgscore__SingleValue_Invalid,KEL.typ.int _selescore__SingleValue_Invalid,KEL.typ.int _proxscore__SingleValue_Invalid,KEL.typ.int _powscore__SingleValue_Invalid,KEL.typ.int _empscore__SingleValue_Invalid,KEL.typ.int _dotscore__SingleValue_Invalid,KEL.typ.int _ultweight__SingleValue_Invalid,KEL.typ.int _orgweight__SingleValue_Invalid,KEL.typ.int _seleweight__SingleValue_Invalid,KEL.typ.int _proxweight__SingleValue_Invalid,KEL.typ.int _powweight__SingleValue_Invalid,KEL.typ.int _empweight__SingleValue_Invalid,KEL.typ.int _dotweight__SingleValue_Invalid,KEL.typ.int _dt__first__seen__SingleValue_Invalid,KEL.typ.int _dt__last__seen__SingleValue_Invalid,KEL.typ.int _dt__vendor__first__reported__SingleValue_Invalid,KEL.typ.int _dt__vendor__last__reported__SingleValue_Invalid,KEL.typ.int _dt__datawarehouse__first__reported__SingleValue_Invalid,KEL.typ.int _dt__datawarehouse__last__reported__SingleValue_Invalid,KEL.typ.int _did__SingleValue_Invalid,KEL.typ.int _did__score__SingleValue_Invalid,DATASET(RECORDOF(UIDSourceCounts)) topSourcedUID});
   EXPORT NullCounts := DATASET([
     {'Account','Business_Credit_KEL.File_SBFE_temp','UID',COUNT(Business_Credit_KEL_File_SBFE_temp_Linkids_Invalid),COUNT(__d0)},
