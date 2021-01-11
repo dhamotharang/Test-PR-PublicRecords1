@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.5.0rc1
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT B_Address_1,B_Address_2,B_Address_3,B_Address_4,B_Address_5,B_Address_6,B_Aircraft_Owner_1,B_Aircraft_Owner_2,B_Aircraft_Owner_3,B_Bankruptcy_1,B_Bankruptcy_2,B_Bankruptcy_3,B_Bankruptcy_4,B_Bankruptcy_5,B_Bankruptcy_6,B_Bankruptcy_7,B_Bankruptcy_8,B_Criminal_Offense_1,B_Criminal_Offense_2,B_Criminal_Offense_3,B_Criminal_Offense_4,B_Criminal_Offense_5,B_Education_1,B_Education_2,B_Education_3,B_Education_4,B_Education_5,B_Education_6,B_Education_7,B_Email_2,B_First_Degree_Relative_5,B_Input_P_I_I,B_Input_P_I_I_1,B_Input_P_I_I_2,B_Input_P_I_I_3,B_Input_P_I_I_4,B_Input_P_I_I_5,B_Input_P_I_I_6,B_Input_P_I_I_7,B_Input_P_I_I_8,B_Input_P_I_I_9,B_Inquiry_10,B_Inquiry_11,B_Inquiry_3,B_Inquiry_4,B_Inquiry_5,B_Inquiry_6,B_Inquiry_7,B_Inquiry_8,B_Inquiry_9,B_Lien_Judgment_13,B_Person,B_Person_1,B_Person_10,B_Person_11,B_Person_2,B_Person_3,B_Person_4,B_Person_5,B_Person_6,B_Person_7,B_Person_8,B_Person_9,B_Person_Accident_8,B_Person_Address_2,B_Person_Address_3,B_Person_Inquiry_3,B_Person_Inquiry_4,B_Person_Inquiry_5,B_Person_Inquiry_6,B_Person_Inquiry_7,B_Person_Inquiry_8,B_Person_Lien_Judgment_12,B_Person_Property_1,B_Person_Property_2,B_Person_Property_3,B_Person_Property_4,B_Person_Property_5,B_Person_Property_6,B_Person_S_S_N_1,B_Person_S_S_N_2,B_Person_Vehicle_1,B_Person_Vehicle_2,B_Person_Vehicle_3,B_Professional_License_1,B_Professional_License_2,B_Professional_License_3,B_Professional_License_4,B_Professional_License_5,B_Property_2,B_Property_3,B_Property_4,B_Property_5,B_Property_Event_1,B_Property_Event_2,B_Property_Event_3,B_Property_Event_4,B_Property_Event_5,B_Property_Event_6,B_Sele_Person_3,B_Sele_Person_4,B_Sele_Person_5,B_Sele_Person_6,B_Sele_Person_7,B_Watercraft_Owner_1,B_Watercraft_Owner_2,B_Watercraft_Owner_3,CFG_Compile,E_Accident,E_Address,E_Address_Inquiry,E_Address_Property,E_Aircraft,E_Aircraft_Owner,E_Bankruptcy,E_Criminal_Offense,E_Education,E_Email,E_Email_Inquiry,E_First_Degree_Associations,E_First_Degree_Relative,E_Geo_Link,E_Household,E_Household_Member,E_Input_P_I_I,E_Inquiry,E_Lien_Judgment,E_Person,E_Person_Accident,E_Person_Address,E_Person_Bankruptcy,E_Person_Education,E_Person_Email,E_Person_Inquiry,E_Person_Lien_Judgment,E_Person_Offenses,E_Person_Property,E_Person_Property_Event,E_Person_S_S_N,E_Person_Vehicle,E_Phone,E_Phone_Inquiry,E_Professional_License,E_Professional_License_Person,E_Property,E_Property_Event,E_S_S_N_Inquiry,E_Sele_Person,E_Social_Security_Number,E_Surname,E_Utility,E_Utility_Person,E_Vehicle,E_Watercraft,E_Watercraft_Owner,E_Zip_Code FROM PublicRecords_KEL;
@@ -682,9 +682,9 @@ EXPORT Q_Inferred_Performance_Hybrid(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(P
   SHARED TYPEOF(B_Input_P_I_I(__in,__cfg_Local).__ENH_Input_P_I_I) __ENH_Input_P_I_I := B_Input_P_I_I_Local.__ENH_Input_P_I_I;
   SHARED TYPEOF(E_Input_P_I_I(__in,__cfg_Local).__Result) __E_Input_P_I_I := E_Input_P_I_I_Filtered.__Result;
   SHARED TYPEOF(B_Person(__in,__cfg_Local).__ENH_Person) __ENH_Person := B_Person_Local.__ENH_Person;
-  SHARED __EE11584977 := __ENH_Person;
-  SHARED __EE11586712 := __EE11584977(__T(__OP2(__EE11584977.UID,=,__CN(__PLexID_in))));
-  SHARED __ST122417_Layout := RECORD
+  SHARED __EE11599139 := __ENH_Person;
+  SHARED __EE11600879 := __EE11599139(__T(__OP2(__EE11599139.UID,=,__CN(__PLexID_in))));
+  SHARED __ST122496_Layout := RECORD
     KEL.typ.int P_L___Drg_Crim_Fel_Cnt1_Y_F1_Y_ := 0;
     KEL.typ.int P_L___Drg_Lien_Cnt1_Y_F1_Y_ := 0;
     KEL.typ.int P_L___Drg_Bk_Cnt1_Y_F1_Y_ := 0;
@@ -696,10 +696,10 @@ EXPORT Q_Inferred_Performance_Hybrid(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(P
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __EE11586734 := PROJECT(TABLE(PROJECT(__EE11586712,__ST122417_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P_L___Drg_Crim_Fel_Cnt1_Y_F1_Y_,P_L___Drg_Lien_Cnt1_Y_F1_Y_,P_L___Drg_Bk_Cnt1_Y_F1_Y_,P_L___Drg_L_T_D1_Y_F1_Y_},P_L___Drg_Crim_Fel_Cnt1_Y_F1_Y_,P_L___Drg_Lien_Cnt1_Y_F1_Y_,P_L___Drg_Bk_Cnt1_Y_F1_Y_,P_L___Drg_L_T_D1_Y_F1_Y_,MERGE),__ST122417_Layout);
-  EXPORT Res0 := __UNWRAP(__EE11586734);
-  SHARED __EE11586742 := __ENH_Input_P_I_I;
-  SHARED __ST122425_Layout := RECORD
+  SHARED __EE11600901 := PROJECT(TABLE(PROJECT(__EE11600879,__ST122496_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P_L___Drg_Crim_Fel_Cnt1_Y_F1_Y_,P_L___Drg_Lien_Cnt1_Y_F1_Y_,P_L___Drg_Bk_Cnt1_Y_F1_Y_,P_L___Drg_L_T_D1_Y_F1_Y_},P_L___Drg_Crim_Fel_Cnt1_Y_F1_Y_,P_L___Drg_Lien_Cnt1_Y_F1_Y_,P_L___Drg_Bk_Cnt1_Y_F1_Y_,P_L___Drg_L_T_D1_Y_F1_Y_,MERGE),__ST122496_Layout);
+  EXPORT Res0 := __UNWRAP(__EE11600901);
+  SHARED __EE11600909 := __ENH_Input_P_I_I;
+  SHARED __ST122504_Layout := RECORD
     KEL.typ.str P___Inp_Cln_Arch_Dt_F6_M_ := '';
     KEL.typ.str P___Inp_Cln_Arch_Dt_F1_Y_ := '';
     KEL.typ.str P___Inp_Cln_Arch_Dt_F2_Y_ := '';
@@ -710,7 +710,7 @@ EXPORT Q_Inferred_Performance_Hybrid(KEL.typ.uid __PLexID_in, DATASET(RECORDOF(P
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT Res1 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE11586742,__ST122425_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P___Inp_Cln_Arch_Dt_F6_M_,P___Inp_Cln_Arch_Dt_F1_Y_,P___Inp_Cln_Arch_Dt_F2_Y_},P___Inp_Cln_Arch_Dt_F6_M_,P___Inp_Cln_Arch_Dt_F1_Y_,P___Inp_Cln_Arch_Dt_F2_Y_,MERGE),__ST122425_Layout));
+  EXPORT Res1 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE11600909,__ST122504_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P___Inp_Cln_Arch_Dt_F6_M_,P___Inp_Cln_Arch_Dt_F1_Y_,P___Inp_Cln_Arch_Dt_F2_Y_},P___Inp_Cln_Arch_Dt_F6_M_,P___Inp_Cln_Arch_Dt_F1_Y_,P___Inp_Cln_Arch_Dt_F2_Y_,MERGE),__ST122504_Layout));
   EXPORT DBG_E_Input_P_I_I_PreEntity := __UNWRAP(E_Input_P_I_I_Params(__in,__cfg_Local).InData);
   EXPORT DBG_E_Input_P_I_I_Result := __UNWRAP(E_Input_P_I_I_Filtered.__Result);
   EXPORT DBG_E_Accident_Result := __UNWRAP(E_Accident_Filtered.__Result);

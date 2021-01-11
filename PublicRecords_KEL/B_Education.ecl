@@ -1,9 +1,9 @@
-//HPCC Systems KEL Compiler Version 1.5.0rc1
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT B_Education_1,B_Education_2,CFG_Compile,E_Education FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Education(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Education_1(__in,__cfg).__ENH_Education_1) __ENH_Education_1 := B_Education_1(__in,__cfg).__ENH_Education_1;
-  SHARED __EE8462407 := __ENH_Education_1;
-  EXPORT __ENH_Education := __EE8462407;
+  SHARED __EE8470386 := __ENH_Education_1;
+  EXPORT __ENH_Education := __EE8470386;
 END;

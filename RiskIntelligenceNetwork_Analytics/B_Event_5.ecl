@@ -4,10 +4,11 @@ IMPORT B_Event_6,E_Address,E_Bank,E_Bank_Account,E_Customer,E_Drivers_License,E_
 IMPORT * FROM KEL11.Null;
 EXPORT B_Event_5 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_6.__ENH_Event_6) __ENH_Event_6 := B_Event_6.__ENH_Event_6;
-  SHARED __EE32727 := __ENH_Event_6;
-  EXPORT __ST19570_Layout := RECORD
+  SHARED __EE32786 := __ENH_Event_6;
+  EXPORT __ST19584_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Record_Id_;
+    KEL.typ.nstr Acct_No_;
     KEL.typ.nkdate Event_Date_;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
@@ -260,10 +261,10 @@ EXPORT B_Event_5 := MODULE
     KEL.typ.int __RecordCount := 0;
     UNSIGNED4 __Part := 0;
   END;
-  SHARED __ST19570_Layout __ND32984__Project(B_Event_6.__ST20165_Layout __PP31432) := TRANSFORM
-    SELF.T1_L___Bc_Shll_Lex_Id_Matches_Inp_Flag_ := MAP(__PP31432.T1___Lex_Id_Pop_Flag_ = 0=> -99999,__PP31432.T___Is_Bc_Shll_Hit_Flag_ < 1 OR __PP31432.T___Src_Class_Type_ < 4=> -99998,__T(__OP2(__PP31432.T___Bc_Shll_Lex_Id_Echo_,=,__CN(-99997)))=> -99997,__T(__OP2(__PP31432.T___Bc_Shll_Lex_Id_Echo_,=,__PP31432.T___Person_Uid_Echo_))=>1,0);
-    SELF.T1_L___Lex_Id_Seen_Flag_ := MAP(__PP31432.T1___Lex_Id_Pop_Flag_ = 0=> -99999,__PP31432.T___Is_Bc_Shll_Hit_Flag_ < 1 OR __PP31432.T___Src_Class_Type_ < 4=> -99998,__T(__OP2(__PP31432.T___Bc_Shll_Lex_Id_Echo_,=,__CN(-99997)))=> -99997,__T(__OP2(__PP31432._truedid_,=,__CN(TRUE)))=>1,0);
-    SELF := __PP31432;
+  SHARED __ST19584_Layout __ND33044__Project(B_Event_6.__ST20181_Layout __PP31486) := TRANSFORM
+    SELF.T1_L___Bc_Shll_Lex_Id_Matches_Inp_Flag_ := MAP(__PP31486.T1___Lex_Id_Pop_Flag_ = 0=> -99999,__PP31486.T___Is_Bc_Shll_Hit_Flag_ < 1 OR __PP31486.T___Src_Class_Type_ < 4=> -99998,__T(__OP2(__PP31486.T___Bc_Shll_Lex_Id_Echo_,=,__CN(-99997)))=> -99997,__T(__OP2(__PP31486.T___Bc_Shll_Lex_Id_Echo_,=,__PP31486.T___Person_Uid_Echo_))=>1,0);
+    SELF.T1_L___Lex_Id_Seen_Flag_ := MAP(__PP31486.T1___Lex_Id_Pop_Flag_ = 0=> -99999,__PP31486.T___Is_Bc_Shll_Hit_Flag_ < 1 OR __PP31486.T___Src_Class_Type_ < 4=> -99998,__T(__OP2(__PP31486.T___Bc_Shll_Lex_Id_Echo_,=,__CN(-99997)))=> -99997,__T(__OP2(__PP31486._truedid_,=,__CN(TRUE)))=>1,0);
+    SELF := __PP31486;
   END;
-  EXPORT __ENH_Event_5 := PROJECT(__EE32727,__ND32984__Project(LEFT));
+  EXPORT __ENH_Event_5 := PROJECT(__EE32786,__ND33044__Project(LEFT));
 END;

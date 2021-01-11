@@ -537,6 +537,7 @@ EXPORT Functions :=
                           SELF.AddressCDS := ds_Person_in.BestInfo.AddressCDS;
                           SELF.Phones     := ds_Person_in.BestInfo.Phones;
                           SELF.PhonesV2   := ds_Person_in.BestInfo.PhonesV2;
+                          SElF.PhonesV3 := []
                         ));
                         
                         
