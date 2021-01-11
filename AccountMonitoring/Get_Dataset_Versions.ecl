@@ -552,11 +552,19 @@ EXPORT Get_Dataset_Versions(
 				'thor_data400::key::(.*)::phones_lerg6',
 				LEFT.name,1,NOCASE)));
 
+		pcarrier_reference := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.phone.carrier_reference_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'PHONEOWNERSHIP',
+				SELF.subfile := 'carrier_reference',
+				SELF.version := REGEXFIND(
+				'thor_data400::key::(.*)::phonesmetadata::carrier_reference',
+				LEFT.name,1,NOCASE)));
+
 		PhoneOwnership := 
 		PPhones_Type +
 		PPhones_Lerg6 +
-		Phones_transaction;
-
+		Phones_transaction +
+		pcarrier_reference;
 		
 		// BipBest Update
 		BipBestUpdate := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.header_files.r_bipbest_header_superkeyname),
