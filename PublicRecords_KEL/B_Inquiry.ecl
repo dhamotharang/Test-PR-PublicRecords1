@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.5.0rc1
+﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
 IMPORT KEL15 AS KEL;
 IMPORT B_Inquiry_1,CFG_Compile,E_Inquiry FROM PublicRecords_KEL;
 IMPORT * FROM KEL15.Null;
 EXPORT B_Inquiry(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Inquiry_1(__in,__cfg).__ENH_Inquiry_1) __ENH_Inquiry_1 := B_Inquiry_1(__in,__cfg).__ENH_Inquiry_1;
-  SHARED __EE8588306 := __ENH_Inquiry_1;
-  EXPORT __ST152286_Layout := RECORD
+  SHARED __EE8596285 := __ENH_Inquiry_1;
+  EXPORT __ST152381_Layout := RECORD
     KEL.typ.nint Lex_I_D_;
     KEL.typ.nstr First_Name_;
     KEL.typ.nstr Last_Name_;
@@ -31,14 +31,14 @@ EXPORT B_Inquiry(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST152259_Layout := RECORD
+  EXPORT __ST152354_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.nstr Sequence_Number_;
     KEL.typ.ndataset(E_Inquiry(__in,__cfg).Search_Info_Layout) Search_Info_;
     KEL.typ.ndataset(E_Inquiry(__in,__cfg).Permissions_Layout) Permissions_;
     KEL.typ.ndataset(E_Inquiry(__in,__cfg).Bus_Intel_Layout) Bus_Intel_;
-    KEL.typ.ndataset(__ST152286_Layout) Person_Info_;
+    KEL.typ.ndataset(__ST152381_Layout) Person_Info_;
     KEL.typ.ndataset(E_Inquiry(__in,__cfg).Business_Info_Layout) Business_Info_;
     KEL.typ.nint Fraudpoint_Score_;
     KEL.typ.ndataset(E_Inquiry(__in,__cfg).Data_Sources_Layout) Data_Sources_;
@@ -63,10 +63,10 @@ EXPORT B_Inquiry(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST152259_Layout __ND8588311__Project(B_Inquiry_1(__in,__cfg).__ST265169_Layout __PP8588307) := TRANSFORM
-    __EE8588381 := __PP8588307.Person_Info_;
-    SELF.Person_Info_ := __BN(PROJECT(__T(__EE8588381),__ST152286_Layout),__NL(__EE8588381));
-    SELF := __PP8588307;
+  SHARED __ST152354_Layout __ND8596290__Project(B_Inquiry_1(__in,__cfg).__ST266766_Layout __PP8596286) := TRANSFORM
+    __EE8596360 := __PP8596286.Person_Info_;
+    SELF.Person_Info_ := __BN(PROJECT(__T(__EE8596360),__ST152381_Layout),__NL(__EE8596360));
+    SELF := __PP8596286;
   END;
-  EXPORT __ENH_Inquiry := PROJECT(__EE8588306,__ND8588311__Project(LEFT));
+  EXPORT __ENH_Inquiry := PROJECT(__EE8596285,__ND8596290__Project(LEFT));
 END;

@@ -31,7 +31,7 @@ EXPORT Functions := MODULE
 																																														 SELF.OttoEmailId := HASH64(LEFT.batchin_rec.email_address),
 																																															SELF.OttoSSNId := HASH64(LEFT.batchin_rec.ssn),
 	
-																																															SELF.OttoPhoneId := HASH64(LEFT.batchin_rec.phoneno),
+																																															SELF.OttoPhoneId := (INTEGER)LEFT.batchin_rec.phoneno,
 																																															SELF.OttoBankAccountId := HASH64(TRIM(LEFT.batchin_rec.bank_routing_number, LEFT, RIGHT) + '|' + TRIM(LEFT.batchin_rec.bank_account_number, LEFT, RIGHT)),
 																																													 //SELF.OttoBankAccountId2 := HASH64(TRIM(LEFT.bank_routing_number_2, LEFT, RIGHT) + '|' + TRIM(LEFT.bank_account_number_2, LEFT, RIGHT)),
 																																													 SELF.OttoDriversLicenseId := HASH64(STD.Str.CleanSpaces(TRIM(LEFT.dl_appends[1].dl_number, LEFT, RIGHT)+ '|' + TRIM(LEFT.dl_appends[1].orig_state, LEFT, RIGHT))),                                                                                                                                                                                 
@@ -303,9 +303,12 @@ EXPORT Functions := MODULE
 																
 					
 					rulesFlagsMatched_final := PROJECT(RulesFlagsMatched,TRANSFORM(RiskIntelligenceNetwork_Analytics.Layouts.LayoutRulesFlagsMatched,
+																																																							SELF.acctno := '1',
 																																																							SELF := LEFT));
 					entityStats_final := PROJECT(WeightedResult(risklevel > -1),TRANSFORM(RiskIntelligenceNetwork_Analytics.Layouts.LayoutEntityStats,
-																																																							SELF := LEFT));
+																																																							SELF.acctno := '1',
+																																																							SELF := LEFT,
+																																																							SELF := []));
 
 					results := PROJECT(EntityAssessment,TRANSFORM(RiskIntelligenceNetwork_analytics.Layouts.LayoutRiskScore,
 																																																															SELF.record_id := 1,
@@ -367,7 +370,7 @@ EXPORT Functions := MODULE
 																																														 SELF.OttoEmailId := HASH64(LEFT.batchin_rec.email_address),
 																																															SELF.OttoSSNId := HASH64(LEFT.batchin_rec.ssn),
 																																															// SELF.OttoSSNId := 7687709163006051155, //kr ssn
-																																															SELF.OttoPhoneId := HASH64(LEFT.batchin_rec.phoneno),
+																																															SELF.OttoPhoneId := (INTEGER)LEFT.batchin_rec.phoneno,
 																																															SELF.OttoBankAccountId := HASH64(TRIM(LEFT.batchin_rec.bank_routing_number, LEFT, RIGHT) + '|' + TRIM(LEFT.batchin_rec.bank_account_number, LEFT, RIGHT)),
 																																													 //SELF.OttoBankAccountId2 := HASH64(TRIM(LEFT.bank_routing_number_2, LEFT, RIGHT) + '|' + TRIM(LEFT.bank_account_number_2, LEFT, RIGHT)),
 																																													 SELF.OttoDriversLicenseId := HASH64(STD.Str.CleanSpaces(TRIM(LEFT.dl_appends[1].dl_number, LEFT, RIGHT)+ '|' + TRIM(LEFT.dl_appends[1].orig_state, LEFT, RIGHT))),                                                                                                                                                                                 
@@ -403,14 +406,41 @@ EXPORT Functions := MODULE
 																																													SELF.curr_st := LEFT.batchin_rec.st,
 																																													SELF := LEFT,
 																																													SELF := []));
-																																													
+						
+						entityContextUidRow := RECORD
+							STRING20 acctno;
+							UNSIGNED6 gc_id;
+							UNSIGNED2 ind_type;
+							STRING entity_context_uid;
+							STRING id_entity_context_uid;
+						END;
+						;
+						
+						entityContextUidRow NormIt(RiskIntelligenceNetwork_Analytics.Layouts.KelInputLayout L, INTEGER C) := TRANSFORM
+							SELF.acctno := L.batchin_rec.acctno;
+							SELF.gc_id := (UNSIGNED)L.gc_id;
+							SELF.ind_type := (UNSIGNED)L.ind_type;
+							SELF.entity_context_uid := CHOOSE(C,
+																																																									_constants_EntityId.PHYSICAL_ADDRESS + L.OttoAddressId,
+																																																									_constants_EntityId.IPADDRESS + L.OttoIpAddressId,
+																																																									_constants_EntityId.EMAIL + L.OttoEmailId,
+																																																									_constants_EntityId.SSN + L.OttoSSNId,
+																																																									_constants_EntityId.BANKACCOUNT + L.OttoBankAccountId,
+																																																									_constants_EntityId.DLNUMBER + L.OttoDriversLicenseId,
+																																																									_constants_EntityId.PHONENO + L.OttoPhoneId, 
+																																																									_constants_EntityId.LEXID + L.record_id);
+							SELF.id_entity_context_uid := _constants_EntityId.LEXID + L.record_id;
+						END;
+						
+						entityContextUids := NORMALIZE(j2,8,NormIt(LEFT,COUNTER));
+						/*
 					inputrow := j2[1];
 					
 					elementEntityContextUids := [_constants_EntityId.PHYSICAL_ADDRESS + inputrow.OttoAddressId, _constants_EntityId.IPADDRESS + inputrow.OttoIpAddressId,
 																																																	_constants_EntityId.EMAIL + inputrow.OttoEmailId, _constants_EntityId.SSN + inputrow.OttoSSNId,
 																																																	_constants_EntityId.BANKACCOUNT + inputrow.OttoBankAccountId, _constants_EntityId.DLNUMBER + inputrow.OttoDriversLicenseId,
 																																																	_constants_EntityId.PHONENO + inputrow.OttoPhoneId, _constants_EntityId.LEXID + inputrow.record_id];				
-					
+					*/
 					raw_Attributes := RiskIntelligenceNetwork_Analytics.Q_Input_Rin(j2).Res0;
 					
 					CleanAttributes := KEL.Clean(raw_Attributes, TRUE /*Remove __Flags*/, TRUE /*Remove __recordcounts*/, TRUE /*Remove _ from Field Names*/);
@@ -436,9 +466,20 @@ EXPORT Functions := MODULE
 						
 							//Get profile rows for each element of input (and identity)
 							//will be used later to get element KR attributes
-						elementProfiles := FraudgovPlatform.Key_entityprofile(customerid = in_mod.GlobalCompanyId AND industrytype = in_mod.IndustryType AND entitycontextuid IN elementEntityContextUids);
+						// elementProfiles := FraudgovPlatform.Key_entityprofile(customerid = in_mod.GlobalCompanyId AND industrytype = in_mod.IndustryType AND entitycontextuid IN elementEntityContextUids);
+						elementProfiles := JOIN(entityContextUids,FraudgovPlatform.Key_entityprofile, KEYED(LEFT.gc_id = RIGHT.customerid AND LEFT.ind_type = RIGHT.industrytype AND LEFT.entity_context_uid = RIGHT.entitycontextuid));
 						
-						identityProfile := elementProfiles(entitytype=1);
+						identityProfiles := elementProfiles(entitytype=1);
+						
+						RECORDOF(EventStatsPrep) NormIdAttrs(RECORDOF(identityProfiles) L, INTEGER C) := TRANSFORM
+											kr_nvp := L.Nvp(Std.Str.Find(name,'p1_aotidkr')>0);
+											SELF.field := kr_nvp[C].name;
+											SELF.value := kr_nvp[C].value;
+											SELF.entitycontextuid := L.entity_context_uid;
+											SELF.t_actuid := L.acctno;
+											SELF.entityhash := L.entity_context_uid + '|' + L.acctno;
+											SELF := [];
+						END;
 						
 						KnownRiskElementProfileAttributes := PROJECT(elementProfiles(entitytype<>1),TRANSFORM(RECORDOF(EventStatsPrep),
 																																																																SELF.field := MAP(
@@ -450,17 +491,24 @@ EXPORT Functions := MODULE
 																																																																																						LEFT.entitytype = 19 => 'p19_aotbnkacctkractinagcyflagev',
 																																																																																						LEFT.entitytype = 20 => 'p20_aotdlkractinagcyflagev',''),
 																																																																	SELF.value :=(STRING)LEFT.aotkractflagev,
-																																																																	SELF.entitycontextuid := '_01' + inputrow.record_id,
+																																																																	SELF.entitycontextuid := LEFT.id_entity_context_uid,
+																																																																	SELF.t_actuid := LEFT.acctno,
+																																																																	SELF.entityhash := LEFT.id_entity_context_uid + '|' + LEFT.acctno,
 																																																																	SELF := []));
 																																																																	
-								KnownRiskIDProfileAttributes := IF(EXISTS(identityProfile),
-																																																								PROJECT(identityProfile[1].Nvp(Std.Str.Find(name,'p1_aotidkr')>0),
+								/*KnownRiskIDProfileAttributes := IF(EXISTS(identityProfiles),
+																																																								PROJECT(identityProfiles[1].Nvp(Std.Str.Find(name,'p1_aotidkr')>0),
 																																																													TRANSFORM(RECORDOF(EventStatsPrep),
 																																																																										SELF.field := LEFT.name,
 																																																																										SELF.value := LEFT.value,
-																																																																										SELF.entitycontextuid := '_01' + inputrow.record_id,
+																																																																										SELF.entitycontextuid := LEFT.personentitycontextuid,
+																																																																										SELF.t_actuid := LEFT.acctno,
+																																																																										SELF.entityhash := LEFT.id_entity_context_uid + '|' + LEFT.acctno,
 																																																																											SELF := [])),
-																																																				DATASET([], RECORDOF(EventStatsPrep)));																							
+																																																				DATASET([], RECORDOF(EventStatsPrep)));*/
+																																																				
+								KnownRiskIDProfileAttributes := NORMALIZE(identityProfiles,COUNT(identityProfiles[1].Nvp(Std.Str.Find(name,'p1_aotidkr')>0)), NormIdAttrs(LEFT,COUNTER));
+								KnownRiskIDSharingAgencyDesc := KnownRiskIDProfileAttributes(Std.Str.Find(field,'ShrdNewSrcAgencyDescEv')>0);
 																																																																	
 								SafeListProfileAttributes := PROJECT(elementProfiles(entitytype IN [9, 16, 18]),TRANSFORM(RECORDOF(EventStatsPrep),
 																																																																SELF.field := MAP(
@@ -468,7 +516,9 @@ EXPORT Functions := MODULE
 																																																																																						LEFT.entitytype = 16 => 'p16_aotphnsafeactflagev',
 																																																																																						LEFT.entitytype = 18 => 'p18_aotipaddrsafeactflagev',''),
 																																																																	SELF.value :=(STRING)LEFT.aotsafeactflagev,
-																																																																	SELF.entitycontextuid := '_01' + inputrow.record_id,
+																																																																	SELF.entitycontextuid := LEFT.id_entity_context_uid,
+																																																																	SELF.t_actuid := LEFT.acctno,
+																																																																	SELF.entityhash := LEFT.id_entity_context_uid + '|' + LEFT.acctno,
 																																																																	SELF := []));
 																																																																	
 									MultiIdProfileAttributes := PROJECT(elementProfiles(entitytype IN [9, 15, 19, 20]),TRANSFORM(RECORDOF(EventStatsPrep),
@@ -482,7 +532,9 @@ EXPORT Functions := MODULE
 																																																																																						LEFT.entitytype = 15 => (STRING)LEFT.NVP(name='t15_ssnmultcurridflagev')[1].value,
 																																																																																						LEFT.entitytype = 19 => (STRING)LEFT.NVP(name='t19_bnkacctmultcurridflagev')[1].value,
 																																																																																						LEFT.entitytype = 20 => (STRING)LEFT.NVP(name='t20_dlmultcurridflagev')[1].value,''),
-																																																																	SELF.entitycontextuid := '_01' + inputrow.record_id,
+																																																																	SELF.entitycontextuid := LEFT.id_entity_context_uid,
+																																																																	SELF.t_actuid := LEFT.acctno,
+																																																																	SELF.entityhash := LEFT.id_entity_context_uid + '|' + LEFT.acctno,
 																																																																	SELF := []));
 																																																																		
 						EventStatsPrepWithKr := EventStatsPrep + KnownRiskElementProfileAttributes + SafeListProfileAttributes + MultiIdProfileAttributes + KnownRiskIDProfileAttributes;
@@ -581,17 +633,18 @@ EXPORT Functions := MODULE
 																			SELF := LEFT), MANY LOOKUP, LEFT OUTER)(RiskLevel>0);
 																		
 
-					RulesResultAggPrep := TABLE(RulesResult, {entitycontextuid, entitytype, rulename, Default, Description, risklevel, reccount := COUNT(GROUP)}, 
-																 entitycontextuid, entitytype, rulename, Default, Description, risklevel, MERGE);
+					RulesResultAggPrep := TABLE(RulesResult, {t_actuid, entitycontextuid, entitytype, rulename, Default, Description, risklevel, reccount := COUNT(GROUP)}, 
+																 t_actuid, entitycontextuid, entitytype, rulename, Default, Description, risklevel, MERGE);
 
 					RulesResultAgg := DEDUP(SORT(DISTRIBUTE(RulesResultAggPrep, HASH64(entitycontextuid)), 
-																 entitycontextuid, entitytype, rulename, default, local), 
-																 entitycontextuid, entitytype, rulename, local); 
+																 t_actuid, entitycontextuid, entitytype, rulename, default, local), 
+																 t_actuid, entitycontextuid, entitytype, rulename, local); 
 
 					// Add how many flags for each rule matched
 					RulesFlagsMatched  := JOIN(RulesResultAgg, MyRulesCnt, 
 																	LEFT.RuleName = RIGHT.RuleName AND LEFT.reccount = RIGHT.reccount, 
-																	TRANSFORM({LEFT.entitycontextuid,
+																	TRANSFORM({LEFT.t_actuid,
+																	LEFT.entitycontextuid,
 																	UNSIGNED entitytype, 
 																	STRING100 rulename,
 																	STRING250 description,
@@ -601,12 +654,13 @@ EXPORT Functions := MODULE
 
 					//need to turn this into 
 					EntityEventAssessment := TABLE(RulesFlagsMatched, 
-															{entitycontextuid,
+															{t_actuid, entitycontextuid,
 															entitytype, INTEGER1 risklevel := MAX(GROUP, risklevel)}, 
 															entitycontextuid, entitytype, MERGE);
 
 
 					rAssessment := RECORD
+						STRING acctno;
 						STRING entitycontextuid;
 						INTEGER1 P1_IDRiskIndx;// 1
 						INTEGER1 P15_SSNRiskIndx;// 15
@@ -620,6 +674,7 @@ EXPORT Functions := MODULE
 
 					EntityAssessmentPrep := SORT(PROJECT(EntityEventAssessment, 
 																			TRANSFORM(rAssessment, 
+																				SELF.acctno := LEFT.t_actuid,
 																				SELF.P1_IDRiskIndx := MAP(LEFT.EntityType = 1 => LEFT.RiskLevel, 0),
 																				SELF.P15_SSNRiskIndx := MAP(LEFT.EntityType = 15 => LEFT.RiskLevel, 0),
 																				SELF.P16_PhnRiskIndx := MAP(LEFT.EntityType = 16 => LEFT.RiskLevel, 0),
@@ -632,6 +687,7 @@ EXPORT Functions := MODULE
 																				
 
 					EntityAssessment := PROJECT(TABLE(EntityAssessmentPrep, {
+																	acctno,
 																 entitycontextuid, 
 																 INTEGER1 P1_IDRiskIndx := MAX(GROUP, P1_IDRiskIndx),
 																 INTEGER1 P15_SSNRiskIndx:= MAX(GROUP, P15_SSNRiskIndx),
@@ -640,7 +696,7 @@ EXPORT Functions := MODULE
 																 INTEGER1 P19_BnkAcctRiskIndx:= MAX(GROUP, P19_BnkAcctRiskIndx),
 																 INTEGER1 P20_DLRiskIndx:= MAX(GROUP, P20_DLRiskIndx),
 																 INTEGER1 P18_IPAddrRiskIndx:= MAX(GROUP, P18_IPAddrRiskIndx),
-																 INTEGER1 P9_AddrRiskIndx:= MAX(GROUP, P9_AddrRiskIndx)}, entitycontextuid, MERGE),
+																 INTEGER1 P9_AddrRiskIndx:= MAX(GROUP, P9_AddrRiskIndx)},acctno, entitycontextuid, MERGE),
 																	TRANSFORM(RECORDOF(LEFT), 
 																		SELF.P1_IDRiskIndx := MAP(LEFT.P1_IDRiskIndx=0=>1, LEFT.P1_IDRiskIndx),
 																		SELF.P15_SSNRiskIndx:= MAP(LEFT.P15_SSNRiskIndx=0=>1, LEFT.P15_SSNRiskIndx),
@@ -654,17 +710,20 @@ EXPORT Functions := MODULE
 																
 					
 					rulesFlagsMatched_final := PROJECT(RulesFlagsMatched,TRANSFORM(RiskIntelligenceNetwork_Analytics.Layouts.LayoutRulesFlagsMatched,
+																																																							SELF.acctno := LEFT.t_actuid,
 																																																							SELF := LEFT));
 					entityStats_final := PROJECT(WeightedResult(risklevel > -1),TRANSFORM(RiskIntelligenceNetwork_Analytics.Layouts.LayoutEntityStats,
+																																																							SELF.acctno := LEFT.t_actuid,
+																																																							SELF.agencydescription := KnownRiskIDSharingAgencyDesc(t_actuid=LEFT.t_actuid and Std.Str.Find(field,LEFT.field)>0)[1].value;
 																																																							SELF := LEFT));
 
 					results := PROJECT(EntityAssessment,TRANSFORM(RiskIntelligenceNetwork_analytics.Layouts.LiveAssessmentScores,
-																																																															SELF.record_id := 1,
-																																																															SELF.RulesFlagsMatched := rulesFlagsMatched_final,
-																																																															SELF.EntityStats := entityStats_final(indicatortype NOT IN ['KR','SF']),
-																																																															SELF.KrAttributes := entityStats_final(indicatortype='KR'),
-																																																															SELF.MostRecentActivityDate := IF(EXISTS(identityProfile),identityProfile[1].eventdate,Std.Date.Today()),
-																																																															SELF.TotalNumberOfIDActivities := IF(EXISTS(identityProfile),identityProfile[1].personeventcount,1),
+																																																															SELF.record_id := (INTEGER)LEFT.acctno,
+																																																															SELF.RulesFlagsMatched := rulesFlagsMatched_final(acctno = LEFT.acctno),
+																																																															SELF.EntityStats := entityStats_final(acctno = LEFT.acctno AND indicatortype NOT IN ['KR','SF']),
+																																																															SELF.KrAttributes := entityStats_final(acctno = LEFT.acctno AND indicatortype='KR'),
+																																																															SELF.MostRecentActivityDate := IF(EXISTS(identityProfiles(acctno = LEFT.acctno)),identityProfiles(acctno = LEFT.acctno)[1].eventdate,Std.Date.Today()),
+																																																															SELF.TotalNumberOfIDActivities := IF(EXISTS(identityProfiles(acctno = LEFT.acctno)),identityProfiles(acctno = LEFT.acctno)[1].personeventcount,1),
 																																																															SELF := LEFT));
 																																																															
 						// output(ds_in,named('analytics_ds_in'));

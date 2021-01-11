@@ -1223,4 +1223,16 @@ EXPORT IOverrideOptions := INTERFACE
     EXPORT BOOLEAN isCode72 := FALSE;
 END;
 
+//Constants for IDA gateway calls
+export idareport := 'idareport';
+export idareportUAT := 'idareport_uat';
+export idareportRetro := 'idareport_retro';
+export idaStandardSolution := 'Standard/MultiProduct';
+export idaCA_Retail := 'CA_RETAIL';
+export idaNotCA_Retail := 'NOT_CA_RETAIL';
+export idaCreditClienPrefix := 'RWS';
+export idaCreditProductName := 'LNCreditAttributes';
+export idaCreditProductID := 'NFS1.0';
+export innovisCreditProductID := 'NFC1.0';
+
 end;

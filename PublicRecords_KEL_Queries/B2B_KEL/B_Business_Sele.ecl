@@ -6,23 +6,23 @@ EXPORT B_Business_Sele(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
   SHARED VIRTUAL TYPEOF(B_Business_Sele_1(__in,__cfg).__ENH_Business_Sele_1) __ENH_Business_Sele_1 := B_Business_Sele_1(__in,__cfg).__ENH_Business_Sele_1;
   SHARED VIRTUAL TYPEOF(B_Sele_Tradeline_1(__in,__cfg).__ENH_Sele_Tradeline_1) __ENH_Sele_Tradeline_1 := B_Sele_Tradeline_1(__in,__cfg).__ENH_Sele_Tradeline_1;
   SHARED VIRTUAL TYPEOF(B_Tradeline_1(__in,__cfg).__ENH_Tradeline_1) __ENH_Tradeline_1 := B_Tradeline_1(__in,__cfg).__ENH_Tradeline_1;
-  SHARED __EE515870 := __ENH_Business_Sele_1;
-  SHARED __EE516507 := __ENH_Tradeline_1;
-  SHARED __EE516510 := __ENH_Sele_Tradeline_1;
-  SHARED __EE527064 := __EE516510(__NN(__EE516510.Legal_) AND __NN(__EE516510.Account_));
-  SHARED __ST365484_Layout := RECORD
+  SHARED __EE515916 := __ENH_Business_Sele_1;
+  SHARED __EE516553 := __ENH_Tradeline_1;
+  SHARED __EE516556 := __ENH_Sele_Tradeline_1;
+  SHARED __EE527110 := __EE516556(__NN(__EE516556.Legal_) AND __NN(__EE516556.Account_));
+  SHARED __ST365530_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
     KEL.typ.nint Sele_I_D_;
     KEL.typ.nstr Account_Key_;
-    KEL.typ.ndataset(B_Tradeline_1(__in,__cfg).__ST123724_Layout) Records_;
+    KEL.typ.ndataset(B_Tradeline_1(__in,__cfg).__ST123770_Layout) Records_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Vendor_Dates_Layout) Vendor_Dates_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Tradeline().Typ) Account_;
     KEL.typ.ndataset(E_Sele_Tradeline(__in,__cfg).Data_Sources_Layout) Data_Sources__1_;
-    KEL.typ.ndataset(B_Sele_Tradeline_3(__in,__cfg).__ST65611_Layout) Trade_Account_;
+    KEL.typ.ndataset(B_Sele_Tradeline_3(__in,__cfg).__ST65660_Layout) Trade_Account_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -30,26 +30,26 @@ EXPORT B_Business_Sele(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC527082(B_Tradeline_1(__in,__cfg).__ST123717_Layout __EE516507, B_Sele_Tradeline_3(__in,__cfg).__ST130946_Layout __EE527064) := __EEQP(__EE527064.Account_,__EE516507.UID);
-  __ST365484_Layout __JT527082(B_Tradeline_1(__in,__cfg).__ST123717_Layout __l, B_Sele_Tradeline_3(__in,__cfg).__ST130946_Layout __r) := TRANSFORM
+  __JC527128(B_Tradeline_1(__in,__cfg).__ST123763_Layout __EE516553, B_Sele_Tradeline_3(__in,__cfg).__ST130992_Layout __EE527110) := __EEQP(__EE527110.Account_,__EE516553.UID);
+  __ST365530_Layout __JT527128(B_Tradeline_1(__in,__cfg).__ST123763_Layout __l, B_Sele_Tradeline_3(__in,__cfg).__ST130992_Layout __r) := TRANSFORM
     SELF.Data_Sources__1_ := __r.Data_Sources_;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE527083 := JOIN(__EE527064,__EE516507,__JC527082(RIGHT,LEFT),__JT527082(RIGHT,LEFT),INNER,HASH);
-  SHARED __EE530206 := __EE527083;
-  SHARED __ST363982_Layout := RECORD
+  SHARED __EE527129 := JOIN(__EE527110,__EE516553,__JC527128(RIGHT,LEFT),__JT527128(RIGHT,LEFT),INNER,HASH);
+  SHARED __EE530252 := __EE527129;
+  SHARED __ST364028_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) UID;
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Tradeline().Typ) Account_;
     KEL.typ.ndataset(E_Sele_Tradeline(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(B_Sele_Tradeline_3(__in,__cfg).__ST65611_Layout) Trade_Account_;
+    KEL.typ.ndataset(B_Sele_Tradeline_3(__in,__cfg).__ST65660_Layout) Trade_Account_;
     KEL.typ.nuid U_I_D__1_;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
     KEL.typ.nint Sele_I_D_;
     KEL.typ.nstr Account_Key_;
-    KEL.typ.ndataset(B_Tradeline_1(__in,__cfg).__ST123724_Layout) Records_;
+    KEL.typ.ndataset(B_Tradeline_1(__in,__cfg).__ST123770_Layout) Records_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Vendor_Dates_Layout) Vendor_Dates_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Data_Sources_Layout) Data_Sources__1_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -58,15 +58,15 @@ EXPORT B_Business_Sele(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
   END;
-  SHARED __ST363982_Layout __ND530213__Project(__ST365484_Layout __PP530209) := TRANSFORM
-    SELF.UID := __PP530209.Legal_;
-    SELF.Data_Sources_ := __PP530209.Data_Sources__1_;
-    SELF.U_I_D__1_ := __PP530209.UID;
-    SELF.Data_Sources__1_ := __PP530209.Data_Sources_;
-    SELF := __PP530209;
+  SHARED __ST364028_Layout __ND530259__Project(__ST365530_Layout __PP530255) := TRANSFORM
+    SELF.UID := __PP530255.Legal_;
+    SELF.Data_Sources_ := __PP530255.Data_Sources__1_;
+    SELF.U_I_D__1_ := __PP530255.UID;
+    SELF.Data_Sources__1_ := __PP530255.Data_Sources_;
+    SELF := __PP530255;
   END;
-  SHARED __EE530340 := PROJECT(__EE530206,__ND530213__Project(LEFT));
-  SHARED __ST364096_Layout := RECORD
+  SHARED __EE530386 := PROJECT(__EE530252,__ND530259__Project(LEFT));
+  SHARED __ST364142_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) UID;
     KEL.typ.nkdate C_U_R_R_E_N_T___D_A_T_E_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -75,13 +75,13 @@ EXPORT B_Business_Sele(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
   END;
-  SHARED __ST364096_Layout __ND530345__Project(__ST363982_Layout __PP530341) := TRANSFORM
+  SHARED __ST364142_Layout __ND530391__Project(__ST364028_Layout __PP530387) := TRANSFORM
     __CC13065 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('cortera_build_version'))),__CN(__cfg.CurrentDate));
     SELF.C_U_R_R_E_N_T___D_A_T_E_ := __CC13065;
-    SELF := __PP530341;
+    SELF := __PP530387;
   END;
-  SHARED __EE530352 := PROJECT(__EE530340,__ND530345__Project(LEFT));
-  SHARED __ST364237_Layout := RECORD
+  SHARED __EE530398 := PROJECT(__EE530386,__ND530391__Project(LEFT));
+  SHARED __ST364283_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) UID;
     KEL.typ.nkdate O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E_;
     KEL.typ.nkdate O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__1_;
@@ -104,26 +104,26 @@ EXPORT B_Business_Sele(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
   END;
-  SHARED __ST364237_Layout __ND530357__Project(__ST364096_Layout __PP530353) := TRANSFORM
-    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E_ := __PP530353.C_U_R_R_E_N_T___D_A_T_E_;
-    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__1_ := __PP530353.C_U_R_R_E_N_T___D_A_T_E_;
-    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__2_ := __PP530353.C_U_R_R_E_N_T___D_A_T_E_;
-    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__3_ := __PP530353.C_U_R_R_E_N_T___D_A_T_E_;
-    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__4_ := __PP530353.C_U_R_R_E_N_T___D_A_T_E_;
-    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__5_ := __PP530353.C_U_R_R_E_N_T___D_A_T_E_;
-    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__6_ := __PP530353.C_U_R_R_E_N_T___D_A_T_E_;
-    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__7_ := __PP530353.C_U_R_R_E_N_T___D_A_T_E_;
-    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__8_ := __PP530353.C_U_R_R_E_N_T___D_A_T_E_;
-    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__9_ := __PP530353.C_U_R_R_E_N_T___D_A_T_E_;
-    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__10_ := __PP530353.C_U_R_R_E_N_T___D_A_T_E_;
-    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__11_ := __PP530353.C_U_R_R_E_N_T___D_A_T_E_;
-    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__12_ := __PP530353.C_U_R_R_E_N_T___D_A_T_E_;
-    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__13_ := __PP530353.C_U_R_R_E_N_T___D_A_T_E_;
-    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__14_ := __PP530353.C_U_R_R_E_N_T___D_A_T_E_;
-    SELF := __PP530353;
+  SHARED __ST364283_Layout __ND530403__Project(__ST364142_Layout __PP530399) := TRANSFORM
+    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E_ := __PP530399.C_U_R_R_E_N_T___D_A_T_E_;
+    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__1_ := __PP530399.C_U_R_R_E_N_T___D_A_T_E_;
+    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__2_ := __PP530399.C_U_R_R_E_N_T___D_A_T_E_;
+    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__3_ := __PP530399.C_U_R_R_E_N_T___D_A_T_E_;
+    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__4_ := __PP530399.C_U_R_R_E_N_T___D_A_T_E_;
+    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__5_ := __PP530399.C_U_R_R_E_N_T___D_A_T_E_;
+    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__6_ := __PP530399.C_U_R_R_E_N_T___D_A_T_E_;
+    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__7_ := __PP530399.C_U_R_R_E_N_T___D_A_T_E_;
+    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__8_ := __PP530399.C_U_R_R_E_N_T___D_A_T_E_;
+    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__9_ := __PP530399.C_U_R_R_E_N_T___D_A_T_E_;
+    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__10_ := __PP530399.C_U_R_R_E_N_T___D_A_T_E_;
+    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__11_ := __PP530399.C_U_R_R_E_N_T___D_A_T_E_;
+    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__12_ := __PP530399.C_U_R_R_E_N_T___D_A_T_E_;
+    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__13_ := __PP530399.C_U_R_R_E_N_T___D_A_T_E_;
+    SELF.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__14_ := __PP530399.C_U_R_R_E_N_T___D_A_T_E_;
+    SELF := __PP530399;
   END;
-  SHARED __EE530422 := PROJECT(__EE530352,__ND530357__Project(LEFT));
-  SHARED __ST366250_Layout := RECORD
+  SHARED __EE530468 := PROJECT(__EE530398,__ND530403__Project(LEFT));
+  SHARED __ST366296_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
@@ -161,12 +161,12 @@ EXPORT B_Business_Sele(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.ndataset(E_Business_Sele(__in,__cfg).Business_Characteristics_Layout) Business_Characteristics_;
     KEL.typ.ndataset(E_Business_Sele(__in,__cfg).Experian_C_R_D_B_Tradelines_Layout) Experian_C_R_D_B_Tradelines_;
     KEL.typ.ndataset(E_Business_Sele(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67063_Layout) B2b_T_L_Bal_In_Carr_Newest_Date2_Y_;
-    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67103_Layout) B2b_T_L_Bal_In_Flt_Newest_Date2_Y_;
-    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67143_Layout) B2b_T_L_Bal_In_Mat_Newest_Date2_Y_;
-    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67183_Layout) B2b_T_L_Bal_In_Ops_Newest_Date2_Y_;
-    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67223_Layout) B2b_T_L_Bal_In_Oth_Newest_Date2_Y_;
-    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67023_Layout) B2b_T_L_Bal_Newest_Date2_Y_;
+    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67112_Layout) B2b_T_L_Bal_In_Carr_Newest_Date2_Y_;
+    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67152_Layout) B2b_T_L_Bal_In_Flt_Newest_Date2_Y_;
+    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67192_Layout) B2b_T_L_Bal_In_Mat_Newest_Date2_Y_;
+    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67232_Layout) B2b_T_L_Bal_In_Ops_Newest_Date2_Y_;
+    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67272_Layout) B2b_T_L_Bal_In_Oth_Newest_Date2_Y_;
+    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67072_Layout) B2b_T_L_Bal_Newest_Date2_Y_;
     KEL.typ.nfloat B2b_T_L_Devation_Sample_;
     KEL.typ.nfloat B2b_T_L_Devation_Sample_In_Carr_;
     KEL.typ.nfloat B2b_T_L_Devation_Sample_In_Flt_;
@@ -341,26 +341,26 @@ EXPORT B_Business_Sele(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC530428(B_Business_Sele_1(__in,__cfg).__ST123218_Layout __EE515870, __ST364237_Layout __EE530422) := __EEQP(__EE515870.UID,__EE530422.UID);
-  __ST366250_Layout __JT530428(B_Business_Sele_1(__in,__cfg).__ST123218_Layout __l, __ST364237_Layout __r) := TRANSFORM
+  __JC530474(B_Business_Sele_1(__in,__cfg).__ST123264_Layout __EE515916, __ST364283_Layout __EE530468) := __EEQP(__EE515916.UID,__EE530468.UID);
+  __ST366296_Layout __JT530474(B_Business_Sele_1(__in,__cfg).__ST123264_Layout __l, __ST364283_Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE530429 := JOIN(__EE515870,__EE530422,__JC530428(LEFT,RIGHT),__JT530428(LEFT,RIGHT),LEFT OUTER,HASH,KEEP(1));
-  SHARED __ST365718_Layout := RECORD
+  SHARED __EE530475 := JOIN(__EE515916,__EE530468,__JC530474(LEFT,RIGHT),__JT530474(LEFT,RIGHT),LEFT OUTER,HASH,KEEP(1));
+  SHARED __ST365764_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
     KEL.typ.nint Sele_I_D_;
     KEL.typ.nstr Account_Key_;
-    KEL.typ.ndataset(B_Tradeline_1(__in,__cfg).__ST123724_Layout) Records_;
+    KEL.typ.ndataset(B_Tradeline_1(__in,__cfg).__ST123770_Layout) Records_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Vendor_Dates_Layout) Vendor_Dates_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Tradeline().Typ) Account_;
     KEL.typ.ndataset(E_Sele_Tradeline(__in,__cfg).Data_Sources_Layout) Data_Sources__1_;
-    KEL.typ.ndataset(B_Sele_Tradeline_3(__in,__cfg).__ST65611_Layout) Trade_Account_;
+    KEL.typ.ndataset(B_Sele_Tradeline_3(__in,__cfg).__ST65660_Layout) Trade_Account_;
     KEL.typ.nkdate A_R_Date_;
     KEL.typ.nint Total_A_R_;
     KEL.typ.nint Current_A_R_;
@@ -395,25 +395,25 @@ EXPORT B_Business_Sele(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC527152(__ST365484_Layout __EE527083, B_Tradeline_1(__in,__cfg).__ST123724_Layout __EE527138) := __T(__EE527138.Is_Most_Recent_Active_Record_);
-  __ST365718_Layout __JT527152(__ST365484_Layout __l, B_Tradeline_1(__in,__cfg).__ST123724_Layout __r) := TRANSFORM, SKIP(NOT(__JC527152(__l,__r)))
+  __JC527198(__ST365530_Layout __EE527129, B_Tradeline_1(__in,__cfg).__ST123770_Layout __EE527184) := __T(__EE527184.Is_Most_Recent_Active_Record_);
+  __ST365764_Layout __JT527198(__ST365530_Layout __l, B_Tradeline_1(__in,__cfg).__ST123770_Layout __r) := TRANSFORM, SKIP(NOT(__JC527198(__l,__r)))
     SELF.__RecordCount := __r.__RecordCount;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE527153 := NORMALIZE(__EE527083,__T(LEFT.Records_),__JT527152(LEFT,RIGHT));
-  SHARED __ST362036_Layout := RECORD
+  SHARED __EE527199 := NORMALIZE(__EE527129,__T(LEFT.Records_),__JT527198(LEFT,RIGHT));
+  SHARED __ST362082_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) UID;
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Tradeline().Typ) Account_;
     KEL.typ.ndataset(E_Sele_Tradeline(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(B_Sele_Tradeline_3(__in,__cfg).__ST65611_Layout) Trade_Account_;
+    KEL.typ.ndataset(B_Sele_Tradeline_3(__in,__cfg).__ST65660_Layout) Trade_Account_;
     KEL.typ.nuid U_I_D__1_;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
     KEL.typ.nint Sele_I_D_;
     KEL.typ.nstr Account_Key_;
-    KEL.typ.ndataset(B_Tradeline_1(__in,__cfg).__ST123724_Layout) Records_;
+    KEL.typ.ndataset(B_Tradeline_1(__in,__cfg).__ST123770_Layout) Records_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Vendor_Dates_Layout) Vendor_Dates_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Data_Sources_Layout) Data_Sources__1_;
     KEL.typ.nkdate A_R_Date_;
@@ -449,15 +449,15 @@ EXPORT B_Business_Sele(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
   END;
-  SHARED __ST362036_Layout __ND527235__Project(__ST365718_Layout __PP527154) := TRANSFORM
-    SELF.UID := __PP527154.Legal_;
-    SELF.Data_Sources_ := __PP527154.Data_Sources__1_;
-    SELF.U_I_D__1_ := __PP527154.UID;
-    SELF.Data_Sources__1_ := __PP527154.Data_Sources_;
-    SELF := __PP527154;
+  SHARED __ST362082_Layout __ND527281__Project(__ST365764_Layout __PP527200) := TRANSFORM
+    SELF.UID := __PP527200.Legal_;
+    SELF.Data_Sources_ := __PP527200.Data_Sources__1_;
+    SELF.U_I_D__1_ := __PP527200.UID;
+    SELF.Data_Sources__1_ := __PP527200.Data_Sources_;
+    SELF := __PP527200;
   END;
-  SHARED __EE527470 := PROJECT(__EE527153,__ND527235__Project(LEFT));
-  SHARED __ST362232_Layout := RECORD
+  SHARED __EE527516 := PROJECT(__EE527199,__ND527281__Project(LEFT));
+  SHARED __ST362278_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) UID;
     KEL.typ.nint Exp1_;
     KEL.typ.nint Exp2_;
@@ -471,17 +471,17 @@ EXPORT B_Business_Sele(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
   END;
-  SHARED __ST362232_Layout __ND533400__Project(__ST362036_Layout __PP527471) := TRANSFORM
-    SELF.Exp1_ := IF(__T(__PP527471.Carrier_Segment_),__ECAST(KEL.typ.nint,__CN(__PP527471.Perf_Level_)),__ECAST(KEL.typ.nint,__N(KEL.typ.int)));
-    SELF.Exp2_ := IF(__T(__PP527471.Fleet_Segment_),__ECAST(KEL.typ.nint,__CN(__PP527471.Perf_Level_)),__ECAST(KEL.typ.nint,__N(KEL.typ.int)));
-    SELF.Exp3_ := IF(__T(__PP527471.Materials_Segment_),__ECAST(KEL.typ.nint,__CN(__PP527471.Perf_Level_)),__ECAST(KEL.typ.nint,__N(KEL.typ.int)));
-    SELF.Exp4_ := IF(__T(__PP527471.Operations_Segment_),__ECAST(KEL.typ.nint,__CN(__PP527471.Perf_Level_)),__ECAST(KEL.typ.nint,__N(KEL.typ.int)));
-    SELF.Exp5_ := IF(__T(__PP527471.Other_Segment_),__ECAST(KEL.typ.nint,__CN(__PP527471.Perf_Level_)),__ECAST(KEL.typ.nint,__N(KEL.typ.int)));
-    SELF.Exp6_ := __CN(__PP527471.Perf_Level_);
-    SELF := __PP527471;
+  SHARED __ST362278_Layout __ND533446__Project(__ST362082_Layout __PP527517) := TRANSFORM
+    SELF.Exp1_ := IF(__T(__PP527517.Carrier_Segment_),__ECAST(KEL.typ.nint,__CN(__PP527517.Perf_Level_)),__ECAST(KEL.typ.nint,__N(KEL.typ.int)));
+    SELF.Exp2_ := IF(__T(__PP527517.Fleet_Segment_),__ECAST(KEL.typ.nint,__CN(__PP527517.Perf_Level_)),__ECAST(KEL.typ.nint,__N(KEL.typ.int)));
+    SELF.Exp3_ := IF(__T(__PP527517.Materials_Segment_),__ECAST(KEL.typ.nint,__CN(__PP527517.Perf_Level_)),__ECAST(KEL.typ.nint,__N(KEL.typ.int)));
+    SELF.Exp4_ := IF(__T(__PP527517.Operations_Segment_),__ECAST(KEL.typ.nint,__CN(__PP527517.Perf_Level_)),__ECAST(KEL.typ.nint,__N(KEL.typ.int)));
+    SELF.Exp5_ := IF(__T(__PP527517.Other_Segment_),__ECAST(KEL.typ.nint,__CN(__PP527517.Perf_Level_)),__ECAST(KEL.typ.nint,__N(KEL.typ.int)));
+    SELF.Exp6_ := __CN(__PP527517.Perf_Level_);
+    SELF := __PP527517;
   END;
-  SHARED __EE533417 := PROJECT(__EE527470,__ND533400__Project(LEFT));
-  SHARED __ST362272_Layout := RECORD
+  SHARED __EE533463 := PROJECT(__EE527516,__ND533446__Project(LEFT));
+  SHARED __ST362318_Layout := RECORD
     KEL.typ.nint M_A_X___Perf_Level_;
     KEL.typ.nint M_A_X___Perf_Level__1_;
     KEL.typ.nint M_A_X___Perf_Level__2_;
@@ -495,8 +495,8 @@ EXPORT B_Business_Sele(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
   END;
-  SHARED __EE533458 := PROJECT(__CLEANANDDO(__EE533417,TABLE(__EE533417,{KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),KEL.Aggregates.MaxNG(__EE533417.Exp1_) M_A_X___Perf_Level_,KEL.Aggregates.MaxNG(__EE533417.Exp2_) M_A_X___Perf_Level__1_,KEL.Aggregates.MaxNG(__EE533417.Exp3_) M_A_X___Perf_Level__2_,KEL.Aggregates.MaxNG(__EE533417.Exp4_) M_A_X___Perf_Level__3_,KEL.Aggregates.MaxNG(__EE533417.Exp5_) M_A_X___Perf_Level__4_,KEL.Aggregates.MaxNG(__EE533417.Exp6_) M_A_X___Perf_Level__5_,UID},UID,MERGE)),__ST362272_Layout);
-  SHARED __ST369102_Layout := RECORD
+  SHARED __EE533504 := PROJECT(__CLEANANDDO(__EE533463,TABLE(__EE533463,{KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),KEL.Aggregates.MaxNG(__EE533463.Exp1_) M_A_X___Perf_Level_,KEL.Aggregates.MaxNG(__EE533463.Exp2_) M_A_X___Perf_Level__1_,KEL.Aggregates.MaxNG(__EE533463.Exp3_) M_A_X___Perf_Level__2_,KEL.Aggregates.MaxNG(__EE533463.Exp4_) M_A_X___Perf_Level__3_,KEL.Aggregates.MaxNG(__EE533463.Exp5_) M_A_X___Perf_Level__4_,KEL.Aggregates.MaxNG(__EE533463.Exp6_) M_A_X___Perf_Level__5_,UID},UID,MERGE)),__ST362318_Layout);
+  SHARED __ST369148_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
@@ -534,12 +534,12 @@ EXPORT B_Business_Sele(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.ndataset(E_Business_Sele(__in,__cfg).Business_Characteristics_Layout) Business_Characteristics_;
     KEL.typ.ndataset(E_Business_Sele(__in,__cfg).Experian_C_R_D_B_Tradelines_Layout) Experian_C_R_D_B_Tradelines_;
     KEL.typ.ndataset(E_Business_Sele(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67063_Layout) B2b_T_L_Bal_In_Carr_Newest_Date2_Y_;
-    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67103_Layout) B2b_T_L_Bal_In_Flt_Newest_Date2_Y_;
-    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67143_Layout) B2b_T_L_Bal_In_Mat_Newest_Date2_Y_;
-    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67183_Layout) B2b_T_L_Bal_In_Ops_Newest_Date2_Y_;
-    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67223_Layout) B2b_T_L_Bal_In_Oth_Newest_Date2_Y_;
-    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67023_Layout) B2b_T_L_Bal_Newest_Date2_Y_;
+    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67112_Layout) B2b_T_L_Bal_In_Carr_Newest_Date2_Y_;
+    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67152_Layout) B2b_T_L_Bal_In_Flt_Newest_Date2_Y_;
+    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67192_Layout) B2b_T_L_Bal_In_Mat_Newest_Date2_Y_;
+    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67232_Layout) B2b_T_L_Bal_In_Ops_Newest_Date2_Y_;
+    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67272_Layout) B2b_T_L_Bal_In_Oth_Newest_Date2_Y_;
+    KEL.typ.ndataset(B_Business_Sele_3(__in,__cfg).__ST67072_Layout) B2b_T_L_Bal_Newest_Date2_Y_;
     KEL.typ.nfloat B2b_T_L_Devation_Sample_;
     KEL.typ.nfloat B2b_T_L_Devation_Sample_In_Carr_;
     KEL.typ.nfloat B2b_T_L_Devation_Sample_In_Flt_;
@@ -721,14 +721,14 @@ EXPORT B_Business_Sele(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC533464(__ST366250_Layout __EE530429, __ST362272_Layout __EE533458) := __EEQP(__EE530429.UID,__EE533458.UID);
-  __ST369102_Layout __JT533464(__ST366250_Layout __l, __ST362272_Layout __r) := TRANSFORM
+  __JC533510(__ST366296_Layout __EE530475, __ST362318_Layout __EE533504) := __EEQP(__EE530475.UID,__EE533504.UID);
+  __ST369148_Layout __JT533510(__ST366296_Layout __l, __ST362318_Layout __r) := TRANSFORM
     SELF.U_I_D__2_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE533808 := JOIN(__EE530429,__EE533458,__JC533464(LEFT,RIGHT),__JT533464(LEFT,RIGHT),LEFT OUTER,HASH);
-  EXPORT __ST118940_Layout := RECORD
+  SHARED __EE533854 := JOIN(__EE530475,__EE533504,__JC533510(LEFT,RIGHT),__JT533510(LEFT,RIGHT),LEFT OUTER,HASH);
+  EXPORT __ST118986_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
@@ -947,107 +947,107 @@ EXPORT B_Business_Sele(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST118940_Layout __ND533813__Project(__ST369102_Layout __PP533809) := TRANSFORM
+  SHARED __ST118986_Layout __ND533859__Project(__ST369148_Layout __PP533855) := TRANSFORM
     __CC13594 := -99998;
-    SELF.B_E___B2_B_Actv1p_Dpd_Bal_Tot_ := IF(__PP533809.B_E___B2_B_Actv_Cnt_ = 0,__CC13594,KEL.Routines.BoundsFold(__PP533809.B_E___B2_B_Actv1p_Dpd_Bal_Tot_No_Cap_,0,99999999));
+    SELF.B_E___B2_B_Actv1p_Dpd_Bal_Tot_ := IF(__PP533855.B_E___B2_B_Actv_Cnt_ = 0,__CC13594,KEL.Routines.BoundsFold(__PP533855.B_E___B2_B_Actv1p_Dpd_Bal_Tot_No_Cap_,0,99999999));
     __CC13597 := -99997;
-    SELF.B_E___B2_B_Actv1p_Dpd_Bal_Tot_Grow1_Y_ := MAP(__PP533809.B_E___B2_B_Actv_Cnt_A1_Y_ = 0 OR __PP533809.B_E___B2_B_Actv_Cnt_ = 0=>(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Actv1p_Dpd_Bal_Tot_A1_Y_ = 0=>(KEL.typ.float)__CC13597,MIN(ROUND(__PP533809.B_E___B2_B_Actv1p_Dpd_Bal_Tot_No_Cap_ / __PP533809.B_E___B2_B_Actv1p_Dpd_Bal_Tot_A1_Y_No_Cap_,4),9999.9999));
-    SELF.B_E___B2_B_Actv1p_Dpd_Bal_Tot_Pct_ := MAP(__PP533809.B_E___B2_B_Actv_Cnt_ = 0=>(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Actv_Bal_Tot_ = 0=>(KEL.typ.float)__CC13597,__PP533809.B_E___B2_B_Actv1p_Dpd_Bal_Tot_No_Cap_ / __PP533809.B_E___B2_B_Actv_Bal_Tot_No_Cap_ * 100);
-    SELF.B_E___B2_B_Actv1p_Dpd_Cnt_ := IF(__PP533809.B_E___B2_B_Actv_Cnt_ = 0,__CC13594,__PP533809.B_E___B2_B_Actv1p_Dpd_Cnt_No_Cap_);
-    SELF.B_E___B2_B_Actv1p_Dpd_Pct_ := IF(__PP533809.B_E___B2_B_Actv_Cnt_ = 0,(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Actv1p_Dpd_Cnt_No_Cap_ / __PP533809.B_E___B2_B_Actv_Cnt_No_Cap_ * 100);
-    SELF.B_E___B2_B_Actv31p_Dpd_Bal_Tot_ := IF(__PP533809.B_E___B2_B_Actv_Cnt_ = 0,__CC13594,KEL.Routines.BoundsFold(__PP533809.B_E___B2_B_Actv31p_Dpd_Bal_Tot_No_Cap_,0,99999999));
-    SELF.B_E___B2_B_Actv31p_Dpd_Bal_Tot_Grow1_Y_ := MAP(__PP533809.B_E___B2_B_Actv_Cnt_A1_Y_ = 0 OR __PP533809.B_E___B2_B_Actv_Cnt_ = 0=>(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Actv31p_Dpd_Bal_Tot_A1_Y_ = 0=>(KEL.typ.float)__CC13597,MIN(ROUND(__PP533809.B_E___B2_B_Actv31p_Dpd_Bal_Tot_No_Cap_ / __PP533809.B_E___B2_B_Actv31p_Dpd_Bal_Tot_A1_Y_No_Cap_,4),9999.9999));
-    SELF.B_E___B2_B_Actv31p_Dpd_Bal_Tot_Pct_ := MAP(__PP533809.B_E___B2_B_Actv_Cnt_ = 0=>(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Actv_Bal_Tot_ = 0=>(KEL.typ.float)__CC13597,__PP533809.B_E___B2_B_Actv31p_Dpd_Bal_Tot_No_Cap_ / __PP533809.B_E___B2_B_Actv_Bal_Tot_No_Cap_ * 100);
-    SELF.B_E___B2_B_Actv31p_Dpd_Cnt_ := IF(__PP533809.B_E___B2_B_Actv_Cnt_ = 0,__CC13594,__PP533809.B_E___B2_B_Actv31p_Dpd_Cnt_No_Cap_);
-    SELF.B_E___B2_B_Actv31p_Dpd_Pct_ := IF(__PP533809.B_E___B2_B_Actv_Cnt_ = 0,(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Actv31p_Dpd_Cnt_No_Cap_ / __PP533809.B_E___B2_B_Actv_Cnt_No_Cap_ * 100);
-    SELF.B_E___B2_B_Actv61p_Dpd_Bal_Tot_ := IF(__PP533809.B_E___B2_B_Actv_Cnt_ = 0,__CC13594,KEL.Routines.BoundsFold(__PP533809.B_E___B2_B_Actv61p_Dpd_Bal_Tot_No_Cap_,0,99999999));
-    SELF.B_E___B2_B_Actv61p_Dpd_Bal_Tot_Grow1_Y_ := MAP(__PP533809.B_E___B2_B_Actv_Cnt_A1_Y_ = 0 OR __PP533809.B_E___B2_B_Actv_Cnt_ = 0=>(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Actv61p_Dpd_Bal_Tot_A1_Y_ = 0=>(KEL.typ.float)__CC13597,MIN(ROUND(__PP533809.B_E___B2_B_Actv61p_Dpd_Bal_Tot_No_Cap_ / __PP533809.B_E___B2_B_Actv61p_Dpd_Bal_Tot_A1_Y_No_Cap_,4),9999.9999));
-    SELF.B_E___B2_B_Actv61p_Dpd_Bal_Tot_Pct_ := MAP(__PP533809.B_E___B2_B_Actv_Cnt_ = 0=>(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Actv_Bal_Tot_ = 0=>(KEL.typ.float)__CC13597,__PP533809.B_E___B2_B_Actv61p_Dpd_Bal_Tot_No_Cap_ / __PP533809.B_E___B2_B_Actv_Bal_Tot_No_Cap_ * 100);
-    SELF.B_E___B2_B_Actv61p_Dpd_Cnt_ := IF(__PP533809.B_E___B2_B_Actv_Cnt_ = 0,__CC13594,__PP533809.B_E___B2_B_Actv61p_Dpd_Cnt_No_Cap_);
-    SELF.B_E___B2_B_Actv61p_Dpd_Pct_ := IF(__PP533809.B_E___B2_B_Actv_Cnt_ = 0,(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Actv61p_Dpd_Cnt_No_Cap_ / __PP533809.B_E___B2_B_Actv_Cnt_No_Cap_ * 100);
-    SELF.B_E___B2_B_Actv91p_Dpd_Bal_Tot_ := IF(__PP533809.B_E___B2_B_Actv_Cnt_ = 0,__CC13594,KEL.Routines.BoundsFold(__PP533809.B_E___B2_B_Actv91p_Dpd_Bal_Tot_No_Cap_,0,99999999));
-    SELF.B_E___B2_B_Actv91p_Dpd_Bal_Tot_Grow1_Y_ := MAP(__PP533809.B_E___B2_B_Actv_Cnt_A1_Y_ = 0 OR __PP533809.B_E___B2_B_Actv_Cnt_ = 0=>(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Actv91p_Dpd_Bal_Tot_A1_Y_ = 0=>(KEL.typ.float)__CC13597,MIN(ROUND(__PP533809.B_E___B2_B_Actv91p_Dpd_Bal_Tot_No_Cap_ / __PP533809.B_E___B2_B_Actv91p_Dpd_Bal_Tot_A1_Y_No_Cap_,4),9999.9999));
-    SELF.B_E___B2_B_Actv91p_Dpd_Bal_Tot_Pct_ := MAP(__PP533809.B_E___B2_B_Actv_Cnt_ = 0=>(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Actv_Bal_Tot_ = 0=>(KEL.typ.float)__CC13597,__PP533809.B_E___B2_B_Actv91p_Dpd_Bal_Tot_No_Cap_ / __PP533809.B_E___B2_B_Actv_Bal_Tot_No_Cap_ * 100);
-    SELF.B_E___B2_B_Actv91p_Dpd_Cnt_ := IF(__PP533809.B_E___B2_B_Actv_Cnt_ = 0,__CC13594,__PP533809.B_E___B2_B_Actv91p_Dpd_Cnt_No_Cap_);
-    SELF.B_E___B2_B_Actv91p_Dpd_Pct_ := IF(__PP533809.B_E___B2_B_Actv_Cnt_ = 0,(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Actv91p_Dpd_Cnt_No_Cap_ / __PP533809.B_E___B2_B_Actv_Cnt_No_Cap_ * 100);
-    SELF.B_E___B2_B_Actv_Bal_Avg_ := IF(__PP533809.B_E___B2_B_Actv_Cnt_ = 0,__CC13594,KEL.Routines.BoundsFold(ROUND(__PP533809.B_E___B2_B_Actv_Bal_Tot_No_Cap_ / __PP533809.B_E___B2_B_Actv_Cnt_No_Cap_),0,99999999));
+    SELF.B_E___B2_B_Actv1p_Dpd_Bal_Tot_Grow1_Y_ := MAP(__PP533855.B_E___B2_B_Actv_Cnt_A1_Y_ = 0 OR __PP533855.B_E___B2_B_Actv_Cnt_ = 0=>(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Actv1p_Dpd_Bal_Tot_A1_Y_ = 0=>(KEL.typ.float)__CC13597,MIN(ROUND(__PP533855.B_E___B2_B_Actv1p_Dpd_Bal_Tot_No_Cap_ / __PP533855.B_E___B2_B_Actv1p_Dpd_Bal_Tot_A1_Y_No_Cap_,4),9999.9999));
+    SELF.B_E___B2_B_Actv1p_Dpd_Bal_Tot_Pct_ := MAP(__PP533855.B_E___B2_B_Actv_Cnt_ = 0=>(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Actv_Bal_Tot_ = 0=>(KEL.typ.float)__CC13597,__PP533855.B_E___B2_B_Actv1p_Dpd_Bal_Tot_No_Cap_ / __PP533855.B_E___B2_B_Actv_Bal_Tot_No_Cap_ * 100);
+    SELF.B_E___B2_B_Actv1p_Dpd_Cnt_ := IF(__PP533855.B_E___B2_B_Actv_Cnt_ = 0,__CC13594,__PP533855.B_E___B2_B_Actv1p_Dpd_Cnt_No_Cap_);
+    SELF.B_E___B2_B_Actv1p_Dpd_Pct_ := IF(__PP533855.B_E___B2_B_Actv_Cnt_ = 0,(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Actv1p_Dpd_Cnt_No_Cap_ / __PP533855.B_E___B2_B_Actv_Cnt_No_Cap_ * 100);
+    SELF.B_E___B2_B_Actv31p_Dpd_Bal_Tot_ := IF(__PP533855.B_E___B2_B_Actv_Cnt_ = 0,__CC13594,KEL.Routines.BoundsFold(__PP533855.B_E___B2_B_Actv31p_Dpd_Bal_Tot_No_Cap_,0,99999999));
+    SELF.B_E___B2_B_Actv31p_Dpd_Bal_Tot_Grow1_Y_ := MAP(__PP533855.B_E___B2_B_Actv_Cnt_A1_Y_ = 0 OR __PP533855.B_E___B2_B_Actv_Cnt_ = 0=>(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Actv31p_Dpd_Bal_Tot_A1_Y_ = 0=>(KEL.typ.float)__CC13597,MIN(ROUND(__PP533855.B_E___B2_B_Actv31p_Dpd_Bal_Tot_No_Cap_ / __PP533855.B_E___B2_B_Actv31p_Dpd_Bal_Tot_A1_Y_No_Cap_,4),9999.9999));
+    SELF.B_E___B2_B_Actv31p_Dpd_Bal_Tot_Pct_ := MAP(__PP533855.B_E___B2_B_Actv_Cnt_ = 0=>(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Actv_Bal_Tot_ = 0=>(KEL.typ.float)__CC13597,__PP533855.B_E___B2_B_Actv31p_Dpd_Bal_Tot_No_Cap_ / __PP533855.B_E___B2_B_Actv_Bal_Tot_No_Cap_ * 100);
+    SELF.B_E___B2_B_Actv31p_Dpd_Cnt_ := IF(__PP533855.B_E___B2_B_Actv_Cnt_ = 0,__CC13594,__PP533855.B_E___B2_B_Actv31p_Dpd_Cnt_No_Cap_);
+    SELF.B_E___B2_B_Actv31p_Dpd_Pct_ := IF(__PP533855.B_E___B2_B_Actv_Cnt_ = 0,(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Actv31p_Dpd_Cnt_No_Cap_ / __PP533855.B_E___B2_B_Actv_Cnt_No_Cap_ * 100);
+    SELF.B_E___B2_B_Actv61p_Dpd_Bal_Tot_ := IF(__PP533855.B_E___B2_B_Actv_Cnt_ = 0,__CC13594,KEL.Routines.BoundsFold(__PP533855.B_E___B2_B_Actv61p_Dpd_Bal_Tot_No_Cap_,0,99999999));
+    SELF.B_E___B2_B_Actv61p_Dpd_Bal_Tot_Grow1_Y_ := MAP(__PP533855.B_E___B2_B_Actv_Cnt_A1_Y_ = 0 OR __PP533855.B_E___B2_B_Actv_Cnt_ = 0=>(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Actv61p_Dpd_Bal_Tot_A1_Y_ = 0=>(KEL.typ.float)__CC13597,MIN(ROUND(__PP533855.B_E___B2_B_Actv61p_Dpd_Bal_Tot_No_Cap_ / __PP533855.B_E___B2_B_Actv61p_Dpd_Bal_Tot_A1_Y_No_Cap_,4),9999.9999));
+    SELF.B_E___B2_B_Actv61p_Dpd_Bal_Tot_Pct_ := MAP(__PP533855.B_E___B2_B_Actv_Cnt_ = 0=>(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Actv_Bal_Tot_ = 0=>(KEL.typ.float)__CC13597,__PP533855.B_E___B2_B_Actv61p_Dpd_Bal_Tot_No_Cap_ / __PP533855.B_E___B2_B_Actv_Bal_Tot_No_Cap_ * 100);
+    SELF.B_E___B2_B_Actv61p_Dpd_Cnt_ := IF(__PP533855.B_E___B2_B_Actv_Cnt_ = 0,__CC13594,__PP533855.B_E___B2_B_Actv61p_Dpd_Cnt_No_Cap_);
+    SELF.B_E___B2_B_Actv61p_Dpd_Pct_ := IF(__PP533855.B_E___B2_B_Actv_Cnt_ = 0,(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Actv61p_Dpd_Cnt_No_Cap_ / __PP533855.B_E___B2_B_Actv_Cnt_No_Cap_ * 100);
+    SELF.B_E___B2_B_Actv91p_Dpd_Bal_Tot_ := IF(__PP533855.B_E___B2_B_Actv_Cnt_ = 0,__CC13594,KEL.Routines.BoundsFold(__PP533855.B_E___B2_B_Actv91p_Dpd_Bal_Tot_No_Cap_,0,99999999));
+    SELF.B_E___B2_B_Actv91p_Dpd_Bal_Tot_Grow1_Y_ := MAP(__PP533855.B_E___B2_B_Actv_Cnt_A1_Y_ = 0 OR __PP533855.B_E___B2_B_Actv_Cnt_ = 0=>(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Actv91p_Dpd_Bal_Tot_A1_Y_ = 0=>(KEL.typ.float)__CC13597,MIN(ROUND(__PP533855.B_E___B2_B_Actv91p_Dpd_Bal_Tot_No_Cap_ / __PP533855.B_E___B2_B_Actv91p_Dpd_Bal_Tot_A1_Y_No_Cap_,4),9999.9999));
+    SELF.B_E___B2_B_Actv91p_Dpd_Bal_Tot_Pct_ := MAP(__PP533855.B_E___B2_B_Actv_Cnt_ = 0=>(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Actv_Bal_Tot_ = 0=>(KEL.typ.float)__CC13597,__PP533855.B_E___B2_B_Actv91p_Dpd_Bal_Tot_No_Cap_ / __PP533855.B_E___B2_B_Actv_Bal_Tot_No_Cap_ * 100);
+    SELF.B_E___B2_B_Actv91p_Dpd_Cnt_ := IF(__PP533855.B_E___B2_B_Actv_Cnt_ = 0,__CC13594,__PP533855.B_E___B2_B_Actv91p_Dpd_Cnt_No_Cap_);
+    SELF.B_E___B2_B_Actv91p_Dpd_Pct_ := IF(__PP533855.B_E___B2_B_Actv_Cnt_ = 0,(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Actv91p_Dpd_Cnt_No_Cap_ / __PP533855.B_E___B2_B_Actv_Cnt_No_Cap_ * 100);
+    SELF.B_E___B2_B_Actv_Bal_Avg_ := IF(__PP533855.B_E___B2_B_Actv_Cnt_ = 0,__CC13594,KEL.Routines.BoundsFold(ROUND(__PP533855.B_E___B2_B_Actv_Bal_Tot_No_Cap_ / __PP533855.B_E___B2_B_Actv_Cnt_No_Cap_),0,99999999));
     __CC13591 := '-99998';
     __CC13599 := '-99997';
-    SELF.B_E___B2_B_Actv_Bal_Tot_Grow_Indx1_Y_ := MAP(__PP533809.B_E___B2_B_Actv_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533809.B_E___B2_B_Actv_Cnt_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533809.B_E___B2_B_Actv_Bal_Tot_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13599)),__T(__AND(__OP2(__PP533809.B_E___B2_B_Actv_Bal_Tot_Grow1_Y_,>=,__CN(0)),__OP2(__PP533809.B_E___B2_B_Actv_Bal_Tot_Grow1_Y_,<,__CN(1))))=>__ECAST(KEL.typ.nstr,__CN('0')),__T(__OP2(__PP533809.B_E___B2_B_Actv_Bal_Tot_Grow1_Y_,=,__CN(1)))=>__ECAST(KEL.typ.nstr,__CN('1')),__T(__AND(__OP2(__PP533809.B_E___B2_B_Actv_Bal_Tot_Grow1_Y_,>,__CN(1)),__OP2(__PP533809.B_E___B2_B_Actv_Bal_Tot_Grow1_Y_,<=,__CN(9999.9999))))=>__ECAST(KEL.typ.nstr,__CN('2')),__N(KEL.typ.str));
-    SELF.B_E___B2_B_Actv_Bal_Tot_Rnge_ := MAP(__PP533809.B_E___B2_B_Actv_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533809.B_E___B2_B_Actv_Bal_Tot_ >= 0 AND __PP533809.B_E___B2_B_Actv_Bal_Tot_ <= 500=>__ECAST(KEL.typ.nstr,__CN('1')),__PP533809.B_E___B2_B_Actv_Bal_Tot_ >= 501 AND __PP533809.B_E___B2_B_Actv_Bal_Tot_ <= 1000=>__ECAST(KEL.typ.nstr,__CN('2')),__PP533809.B_E___B2_B_Actv_Bal_Tot_ >= 1001 AND __PP533809.B_E___B2_B_Actv_Bal_Tot_ <= 5000=>__ECAST(KEL.typ.nstr,__CN('3')),__PP533809.B_E___B2_B_Actv_Bal_Tot_ >= 5001 AND __PP533809.B_E___B2_B_Actv_Bal_Tot_ <= 10000=>__ECAST(KEL.typ.nstr,__CN('4')),__PP533809.B_E___B2_B_Actv_Bal_Tot_ >= 10001 AND __PP533809.B_E___B2_B_Actv_Bal_Tot_ <= 20000=>__ECAST(KEL.typ.nstr,__CN('5')),__PP533809.B_E___B2_B_Actv_Bal_Tot_ >= 20001 AND __PP533809.B_E___B2_B_Actv_Bal_Tot_ <= 40000=>__ECAST(KEL.typ.nstr,__CN('6')),__PP533809.B_E___B2_B_Actv_Bal_Tot_ >= 40001 AND __PP533809.B_E___B2_B_Actv_Bal_Tot_ <= 99999999=>__ECAST(KEL.typ.nstr,__CN('7')),__N(KEL.typ.str));
-    SELF.B_E___B2_B_Actv_Carr_Bal_Avg_ := IF(__PP533809.B_E___B2_B_Actv_Carr_Cnt_ = 0,__CC13594,KEL.Routines.BoundsFold(ROUND(__PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_No_Cap_ / __PP533809.B_E___B2_B_Actv_Carr_Cnt_No_Cap_),0,99999999));
-    SELF.B_E___B2_B_Actv_Carr_Bal_Tot_Grow_Indx1_Y_ := MAP(__PP533809.B_E___B2_B_Actv_Carr_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533809.B_E___B2_B_Actv_Carr_Cnt_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13599)),__T(__AND(__OP2(__PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_Grow1_Y_,>=,__CN(0)),__OP2(__PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_Grow1_Y_,<,__CN(1))))=>__ECAST(KEL.typ.nstr,__CN('0')),__T(__OP2(__PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_Grow1_Y_,=,__CN(1)))=>__ECAST(KEL.typ.nstr,__CN('1')),__T(__AND(__OP2(__PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_Grow1_Y_,>,__CN(1)),__OP2(__PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_Grow1_Y_,<=,__CN(9999.9999))))=>__ECAST(KEL.typ.nstr,__CN('2')),__N(KEL.typ.str));
-    SELF.B_E___B2_B_Actv_Carr_Bal_Tot_Pct_ := MAP(__PP533809.B_E___B2_B_Actv_Cnt_No_Cap_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__PP533809.B_E___B2_B_Actv_Carr_Cnt_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__PP533809.B_E___B2_B_Actv_Bal_Tot_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533809.B_E___B2_B_Actv_Bal_Tot_ > 0=>__ECAST(KEL.typ.nfloat,__CN(__PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_No_Cap_ / __PP533809.B_E___B2_B_Actv_Bal_Tot_No_Cap_ * 100)),__N(KEL.typ.float));
-    SELF.B_E___B2_B_Actv_Carr_Bal_Tot_Rnge_ := MAP(__PP533809.B_E___B2_B_Actv_Carr_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_ >= 0 AND __PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_ <= 500=>__ECAST(KEL.typ.nstr,__CN('1')),__PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_ >= 501 AND __PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_ <= 1000=>__ECAST(KEL.typ.nstr,__CN('2')),__PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_ >= 1001 AND __PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_ <= 5000=>__ECAST(KEL.typ.nstr,__CN('3')),__PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_ >= 5001 AND __PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_ <= 10000=>__ECAST(KEL.typ.nstr,__CN('4')),__PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_ >= 10001 AND __PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_ <= 20000=>__ECAST(KEL.typ.nstr,__CN('5')),__PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_ >= 20001 AND __PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_ <= 40000=>__ECAST(KEL.typ.nstr,__CN('6')),__PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_ >= 40001 AND __PP533809.B_E___B2_B_Actv_Carr_Bal_Tot_ <= 99999999=>__ECAST(KEL.typ.nstr,__CN('7')),__N(KEL.typ.str));
-    SELF.B_E___B2_B_Actv_Carr_Cnt_Grow1_Y_ := IF(__PP533809.B_E___B2_B_Actv_Carr_Cnt_A1_Y_ = 0,(KEL.typ.float)__CC13594,MIN(__PP533809.B_E___B2_B_Actv_Carr_Cnt_No_Cap_ / __PP533809.B_E___B2_B_Actv_Carr_Cnt_A1_Y_No_Cap_,999.9999));
-    SELF.B_E___B2_B_Actv_Carr_Pct_ := IF(__PP533809.B_E___B2_B_Actv_Cnt_No_Cap_ = 0,(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Actv_Carr_Cnt_No_Cap_ / __PP533809.B_E___B2_B_Actv_Cnt_No_Cap_ * 100);
-    SELF.B_E___B2_B_Actv_Carr_Worst_Perf_Indx_ := IF(__PP533809.B_E___B2_B_Actv_Carr_Cnt_ = 0,__ECAST(KEL.typ.nstr,__CN(__CC13591)),__ECAST(KEL.typ.nstr,__CAST(KEL.typ.str,__PP533809.M_A_X___Perf_Level_)));
-    SELF.B_E___B2_B_Actv_Cnt_Grow1_Y_ := IF(__PP533809.B_E___B2_B_Actv_Cnt_A1_Y_ = 0,(KEL.typ.float)__CC13594,MIN(__PP533809.B_E___B2_B_Actv_Cnt_No_Cap_ / __PP533809.B_E___B2_B_Actv_Cnt_A1_Y_No_Cap_,999.9999));
-    SELF.B_E___B2_B_Actv_Flt_Bal_Avg_ := IF(__PP533809.B_E___B2_B_Actv_Flt_Cnt_ = 0,__CC13594,KEL.Routines.BoundsFold(ROUND(__PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_No_Cap_ / __PP533809.B_E___B2_B_Actv_Flt_Cnt_No_Cap_),0,99999999));
-    SELF.B_E___B2_B_Actv_Flt_Bal_Pct_ := MAP(__PP533809.B_E___B2_B_Actv_Cnt_No_Cap_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__PP533809.B_E___B2_B_Actv_Flt_Cnt_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__PP533809.B_E___B2_B_Actv_Bal_Tot_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533809.B_E___B2_B_Actv_Bal_Tot_ > 0=>__ECAST(KEL.typ.nfloat,__CN(__PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_No_Cap_ / __PP533809.B_E___B2_B_Actv_Bal_Tot_No_Cap_ * 100)),__N(KEL.typ.float));
-    SELF.B_E___B2_B_Actv_Flt_Bal_Tot_Grow_Indx1_Y_ := MAP(__PP533809.B_E___B2_B_Actv_Flt_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533809.B_E___B2_B_Actv_Flt_Cnt_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13599)),__T(__AND(__OP2(__PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_Grow1_Y_,>=,__CN(0)),__OP2(__PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_Grow1_Y_,<,__CN(1))))=>__ECAST(KEL.typ.nstr,__CN('0')),__T(__OP2(__PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_Grow1_Y_,=,__CN(1)))=>__ECAST(KEL.typ.nstr,__CN('1')),__T(__AND(__OP2(__PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_Grow1_Y_,>,__CN(1)),__OP2(__PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_Grow1_Y_,<=,__CN(9999.9999))))=>__ECAST(KEL.typ.nstr,__CN('2')),__N(KEL.typ.str));
-    SELF.B_E___B2_B_Actv_Flt_Bal_Tot_Rnge_ := MAP(__PP533809.B_E___B2_B_Actv_Flt_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_ >= 0 AND __PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_ <= 500=>__ECAST(KEL.typ.nstr,__CN('1')),__PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_ >= 501 AND __PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_ <= 1000=>__ECAST(KEL.typ.nstr,__CN('2')),__PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_ >= 1001 AND __PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_ <= 5000=>__ECAST(KEL.typ.nstr,__CN('3')),__PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_ >= 5001 AND __PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_ <= 10000=>__ECAST(KEL.typ.nstr,__CN('4')),__PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_ >= 10001 AND __PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_ <= 20000=>__ECAST(KEL.typ.nstr,__CN('5')),__PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_ >= 20001 AND __PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_ <= 40000=>__ECAST(KEL.typ.nstr,__CN('6')),__PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_ >= 40001 AND __PP533809.B_E___B2_B_Actv_Flt_Bal_Tot_ <= 99999999=>__ECAST(KEL.typ.nstr,__CN('7')),__N(KEL.typ.str));
-    SELF.B_E___B2_B_Actv_Flt_Cnt_Grow1_Y_ := IF(__PP533809.B_E___B2_B_Actv_Flt_Cnt_A1_Y_ = 0,(KEL.typ.float)__CC13594,MIN(__PP533809.B_E___B2_B_Actv_Flt_Cnt_No_Cap_ / __PP533809.B_E___B2_B_Actv_Flt_Cnt_A1_Y_No_Cap_,999.9999));
-    SELF.B_E___B2_B_Actv_Flt_Pct_ := IF(__PP533809.B_E___B2_B_Actv_Cnt_No_Cap_ = 0,(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Actv_Flt_Cnt_No_Cap_ / __PP533809.B_E___B2_B_Actv_Cnt_No_Cap_ * 100);
-    SELF.B_E___B2_B_Actv_Flt_Worst_Perf_Indx_ := IF(__PP533809.B_E___B2_B_Actv_Flt_Cnt_ = 0,__ECAST(KEL.typ.nstr,__CN(__CC13591)),__ECAST(KEL.typ.nstr,__CAST(KEL.typ.str,__PP533809.M_A_X___Perf_Level__1_)));
-    SELF.B_E___B2_B_Actv_Mat_Bal_Avg_ := IF(__PP533809.B_E___B2_B_Actv_Mat_Cnt_ = 0,__CC13594,KEL.Routines.BoundsFold(ROUND(__PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_No_Cap_ / __PP533809.B_E___B2_B_Actv_Mat_Cnt_No_Cap_),0,99999999));
-    SELF.B_E___B2_B_Actv_Mat_Bal_Pct_ := MAP(__PP533809.B_E___B2_B_Actv_Cnt_No_Cap_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__PP533809.B_E___B2_B_Actv_Mat_Cnt_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__PP533809.B_E___B2_B_Actv_Bal_Tot_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533809.B_E___B2_B_Actv_Bal_Tot_ > 0=>__ECAST(KEL.typ.nfloat,__CN(__PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_No_Cap_ / __PP533809.B_E___B2_B_Actv_Bal_Tot_No_Cap_ * 100)),__N(KEL.typ.float));
-    SELF.B_E___B2_B_Actv_Mat_Bal_Tot_Grow_Indx1_Y_ := MAP(__PP533809.B_E___B2_B_Actv_Mat_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533809.B_E___B2_B_Actv_Mat_Cnt_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13599)),__T(__AND(__OP2(__PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_Grow1_Y_,>=,__CN(0)),__OP2(__PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_Grow1_Y_,<,__CN(1))))=>__ECAST(KEL.typ.nstr,__CN('0')),__T(__OP2(__PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_Grow1_Y_,=,__CN(1)))=>__ECAST(KEL.typ.nstr,__CN('1')),__T(__AND(__OP2(__PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_Grow1_Y_,>,__CN(1)),__OP2(__PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_Grow1_Y_,<=,__CN(9999.9999))))=>__ECAST(KEL.typ.nstr,__CN('2')),__N(KEL.typ.str));
-    SELF.B_E___B2_B_Actv_Mat_Bal_Tot_Rnge_ := MAP(__PP533809.B_E___B2_B_Actv_Mat_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_ >= 0 AND __PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_ <= 500=>__ECAST(KEL.typ.nstr,__CN('1')),__PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_ >= 501 AND __PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_ <= 1000=>__ECAST(KEL.typ.nstr,__CN('2')),__PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_ >= 1001 AND __PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_ <= 5000=>__ECAST(KEL.typ.nstr,__CN('3')),__PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_ >= 5001 AND __PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_ <= 10000=>__ECAST(KEL.typ.nstr,__CN('4')),__PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_ >= 10001 AND __PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_ <= 20000=>__ECAST(KEL.typ.nstr,__CN('5')),__PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_ >= 20001 AND __PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_ <= 40000=>__ECAST(KEL.typ.nstr,__CN('6')),__PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_ >= 40001 AND __PP533809.B_E___B2_B_Actv_Mat_Bal_Tot_ <= 99999999=>__ECAST(KEL.typ.nstr,__CN('7')),__N(KEL.typ.str));
-    SELF.B_E___B2_B_Actv_Mat_Cnt_Grow1_Y_ := IF(__PP533809.B_E___B2_B_Actv_Mat_Cnt_A1_Y_ = 0,(KEL.typ.float)__CC13594,MIN(__PP533809.B_E___B2_B_Actv_Mat_Cnt_No_Cap_ / __PP533809.B_E___B2_B_Actv_Mat_Cnt_A1_Y_No_Cap_,999.9999));
-    SELF.B_E___B2_B_Actv_Mat_Pct_ := IF(__PP533809.B_E___B2_B_Actv_Cnt_No_Cap_ = 0,(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Actv_Mat_Cnt_No_Cap_ / __PP533809.B_E___B2_B_Actv_Cnt_No_Cap_ * 100);
-    SELF.B_E___B2_B_Actv_Mat_Worst_Perf_Indx_ := IF(__PP533809.B_E___B2_B_Actv_Mat_Cnt_ = 0,__ECAST(KEL.typ.nstr,__CN(__CC13591)),__ECAST(KEL.typ.nstr,__CAST(KEL.typ.str,__PP533809.M_A_X___Perf_Level__2_)));
-    SELF.B_E___B2_B_Actv_Ops_Bal_Avg_ := IF(__PP533809.B_E___B2_B_Actv_Ops_Cnt_ = 0,__CC13594,KEL.Routines.BoundsFold(ROUND(__PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_No_Cap_ / __PP533809.B_E___B2_B_Actv_Ops_Cnt_No_Cap_),0,99999999));
-    SELF.B_E___B2_B_Actv_Ops_Bal_Pct_ := MAP(__PP533809.B_E___B2_B_Actv_Cnt_No_Cap_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__PP533809.B_E___B2_B_Actv_Ops_Cnt_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__PP533809.B_E___B2_B_Actv_Bal_Tot_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533809.B_E___B2_B_Actv_Bal_Tot_ > 0=>__ECAST(KEL.typ.nfloat,__CN(__PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_No_Cap_ / __PP533809.B_E___B2_B_Actv_Bal_Tot_No_Cap_ * 100)),__N(KEL.typ.float));
-    SELF.B_E___B2_B_Actv_Ops_Bal_Tot_Grow_Indx1_Y_ := MAP(__PP533809.B_E___B2_B_Actv_Ops_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533809.B_E___B2_B_Actv_Ops_Cnt_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13599)),__T(__AND(__OP2(__PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_Grow1_Y_,>=,__CN(0)),__OP2(__PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_Grow1_Y_,<,__CN(1))))=>__ECAST(KEL.typ.nstr,__CN('0')),__T(__OP2(__PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_Grow1_Y_,=,__CN(1)))=>__ECAST(KEL.typ.nstr,__CN('1')),__T(__AND(__OP2(__PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_Grow1_Y_,>,__CN(1)),__OP2(__PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_Grow1_Y_,<=,__CN(9999.9999))))=>__ECAST(KEL.typ.nstr,__CN('2')),__N(KEL.typ.str));
-    SELF.B_E___B2_B_Actv_Ops_Bal_Tot_Rnge_ := MAP(__PP533809.B_E___B2_B_Actv_Ops_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_ >= 0 AND __PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_ <= 500=>__ECAST(KEL.typ.nstr,__CN('1')),__PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_ >= 501 AND __PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_ <= 1000=>__ECAST(KEL.typ.nstr,__CN('2')),__PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_ >= 1001 AND __PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_ <= 5000=>__ECAST(KEL.typ.nstr,__CN('3')),__PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_ >= 5001 AND __PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_ <= 10000=>__ECAST(KEL.typ.nstr,__CN('4')),__PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_ >= 10001 AND __PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_ <= 20000=>__ECAST(KEL.typ.nstr,__CN('5')),__PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_ >= 20001 AND __PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_ <= 40000=>__ECAST(KEL.typ.nstr,__CN('6')),__PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_ >= 40001 AND __PP533809.B_E___B2_B_Actv_Ops_Bal_Tot_ <= 99999999=>__ECAST(KEL.typ.nstr,__CN('7')),__N(KEL.typ.str));
-    SELF.B_E___B2_B_Actv_Ops_Cnt_Grow1_Y_ := IF(__PP533809.B_E___B2_B_Actv_Ops_Cnt_A1_Y_ = 0,(KEL.typ.float)__CC13594,MIN(__PP533809.B_E___B2_B_Actv_Ops_Cnt_No_Cap_ / __PP533809.B_E___B2_B_Actv_Ops_Cnt_A1_Y_No_Cap_,999.9999));
-    SELF.B_E___B2_B_Actv_Ops_Pct_ := IF(__PP533809.B_E___B2_B_Actv_Cnt_No_Cap_ = 0,(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Actv_Ops_Cnt_No_Cap_ / __PP533809.B_E___B2_B_Actv_Cnt_No_Cap_ * 100);
-    SELF.B_E___B2_B_Actv_Ops_Worst_Perf_Indx_ := IF(__PP533809.B_E___B2_B_Actv_Ops_Cnt_ = 0,__ECAST(KEL.typ.nstr,__CN(__CC13591)),__ECAST(KEL.typ.nstr,__CAST(KEL.typ.str,__PP533809.M_A_X___Perf_Level__3_)));
-    SELF.B_E___B2_B_Actv_Oth_Bal_Avg_ := IF(__PP533809.B_E___B2_B_Actv_Oth_Cnt_ = 0,__CC13594,KEL.Routines.BoundsFold(ROUND(__PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_No_Cap_ / __PP533809.B_E___B2_B_Actv_Oth_Cnt_No_Cap_),0,99999999));
-    SELF.B_E___B2_B_Actv_Oth_Bal_Pct_ := MAP(__PP533809.B_E___B2_B_Actv_Cnt_No_Cap_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__PP533809.B_E___B2_B_Actv_Oth_Cnt_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__PP533809.B_E___B2_B_Actv_Bal_Tot_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533809.B_E___B2_B_Actv_Bal_Tot_ > 0=>__ECAST(KEL.typ.nfloat,__CN(__PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_No_Cap_ / __PP533809.B_E___B2_B_Actv_Bal_Tot_No_Cap_ * 100)),__N(KEL.typ.float));
-    SELF.B_E___B2_B_Actv_Oth_Bal_Tot_Grow_Indx1_Y_ := MAP(__PP533809.B_E___B2_B_Actv_Oth_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533809.B_E___B2_B_Actv_Oth_Cnt_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13599)),__T(__AND(__OP2(__PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_Grow1_Y_,>=,__CN(0)),__OP2(__PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_Grow1_Y_,<,__CN(1))))=>__ECAST(KEL.typ.nstr,__CN('0')),__T(__OP2(__PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_Grow1_Y_,=,__CN(1)))=>__ECAST(KEL.typ.nstr,__CN('1')),__T(__AND(__OP2(__PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_Grow1_Y_,>,__CN(1)),__OP2(__PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_Grow1_Y_,<=,__CN(9999.9999))))=>__ECAST(KEL.typ.nstr,__CN('2')),__N(KEL.typ.str));
-    SELF.B_E___B2_B_Actv_Oth_Bal_Tot_Rnge_ := MAP(__PP533809.B_E___B2_B_Actv_Oth_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_ >= 0 AND __PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_ <= 500=>__ECAST(KEL.typ.nstr,__CN('1')),__PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_ >= 501 AND __PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_ <= 1000=>__ECAST(KEL.typ.nstr,__CN('2')),__PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_ >= 1001 AND __PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_ <= 5000=>__ECAST(KEL.typ.nstr,__CN('3')),__PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_ >= 5001 AND __PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_ <= 10000=>__ECAST(KEL.typ.nstr,__CN('4')),__PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_ >= 10001 AND __PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_ <= 20000=>__ECAST(KEL.typ.nstr,__CN('5')),__PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_ >= 20001 AND __PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_ <= 40000=>__ECAST(KEL.typ.nstr,__CN('6')),__PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_ >= 40001 AND __PP533809.B_E___B2_B_Actv_Oth_Bal_Tot_ <= 99999999=>__ECAST(KEL.typ.nstr,__CN('7')),__N(KEL.typ.str));
-    SELF.B_E___B2_B_Actv_Oth_Cnt_Grow1_Y_ := IF(__PP533809.B_E___B2_B_Actv_Oth_Cnt_A1_Y_ = 0,(KEL.typ.float)__CC13594,MIN(__PP533809.B_E___B2_B_Actv_Oth_Cnt_No_Cap_ / __PP533809.B_E___B2_B_Actv_Oth_Cnt_A1_Y_No_Cap_,999.9999));
-    SELF.B_E___B2_B_Actv_Oth_Pct_ := IF(__PP533809.B_E___B2_B_Actv_Cnt_No_Cap_ = 0,(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Actv_Oth_Cnt_No_Cap_ / __PP533809.B_E___B2_B_Actv_Cnt_No_Cap_ * 100);
-    SELF.B_E___B2_B_Actv_Oth_Worst_Perf_Indx_ := IF(__PP533809.B_E___B2_B_Actv_Oth_Cnt_ = 0,__ECAST(KEL.typ.nstr,__CN(__CC13591)),__ECAST(KEL.typ.nstr,__CAST(KEL.typ.str,__PP533809.M_A_X___Perf_Level__4_)));
-    SELF.B_E___B2_B_Actv_Worst_Perf_Indx_ := IF(__PP533809.B_E___B2_B_Actv_Cnt_ = 0,__ECAST(KEL.typ.nstr,__CN(__CC13591)),__ECAST(KEL.typ.nstr,__CAST(KEL.typ.str,__PP533809.M_A_X___Perf_Level__5_)));
-    SELF.B_E___B2_B_Bal_Max2_Y_ := IF(__PP533809.B_E___B2_B_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__PP533809.B_E___B2_B_Bal_Max2_Y_No_Cap_,__CN(0),__CN(99999999))));
-    SELF.B_E___B2_B_Bal_Max_Msnc2_Y_ := IF(__PP533809.B_E___B2_B_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533809.B_E___B2_B_Bal_Max_Dt2_Y_),__PP533809.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E_),__CN(0),__CN(24))));
-    SELF.B_E___B2_B_Bal_Max_Seg_Type2_Y_ := MAP(__PP533809.B_E___B2_B_Cnt2_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533809.B_E___B2_B_Bal_Max_Seg_Type2_Y_Map_Carr_ + __PP533809.B_E___B2_B_Bal_Max_Seg_Type2_Y_Map_Flt_ + __PP533809.B_E___B2_B_Bal_Max_Seg_Type2_Y_Map_Mat_ + __PP533809.B_E___B2_B_Bal_Max_Seg_Type2_Y_Map_Ops_ + __PP533809.B_E___B2_B_Bal_Max_Seg_Type2_Y_Map_Oth_ > 1=>__ECAST(KEL.typ.nstr,__CN('5')),__T(__OP2(__PP533809.B_E___B2_B_Carr_Bal_Max2_Y_No_Cap_,=,__PP533809.B_E___B2_B_Bal_Max2_Y_No_Cap_))=>__ECAST(KEL.typ.nstr,__CN('4')),__T(__OP2(__PP533809.B_E___B2_B_Flt_Bal_Max2_Y_No_Cap_,=,__PP533809.B_E___B2_B_Bal_Max2_Y_No_Cap_))=>__ECAST(KEL.typ.nstr,__CN('3')),__T(__OP2(__PP533809.B_E___B2_B_Mat_Bal_Max2_Y_No_Cap_,=,__PP533809.B_E___B2_B_Bal_Max2_Y_No_Cap_))=>__ECAST(KEL.typ.nstr,__CN('2')),__T(__OP2(__PP533809.B_E___B2_B_Ops_Bal_Max2_Y_No_Cap_,=,__PP533809.B_E___B2_B_Bal_Max2_Y_No_Cap_))=>__ECAST(KEL.typ.nstr,__CN('1')),__T(__OP2(__PP533809.B_E___B2_B_Oth_Bal_Max2_Y_No_Cap_,=,__PP533809.B_E___B2_B_Bal_Max2_Y_No_Cap_))=>__ECAST(KEL.typ.nstr,__CN('0')),__N(KEL.typ.str));
-    SELF.B_E___B2_B_Bal_Vol24_Mc_ := MAP(__T(__OP2(__PP533809.B_E___B2_B_Rec_Flag_By_Mon_Sum24_Mc_,=,__CN(1)))=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533809.B_E___B2_B_Cnt24_Mc_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__ECAST(KEL.typ.nfloat,KEL.Routines.MinN(__OP2(__PP533809.B2b_T_L_Devation_Sample_,/,__PP533809.B2b_T_L_M_E_A_N_),__CN(2.0))));
-    SELF.B_E___B2_B_Carr_Bal_Max2_Y_ := IF(__PP533809.B_E___B2_B_Carr_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__PP533809.B_E___B2_B_Carr_Bal_Max2_Y_No_Cap_,__CN(0),__CN(99999999))));
-    SELF.B_E___B2_B_Carr_Bal_Max_Msnc2_Y_ := IF(__PP533809.B_E___B2_B_Carr_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533809.B_E___B2_B_Carr_Bal_Max_Dt2_Y_),__PP533809.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__1_),__CN(0),__CN(24))));
-    SELF.B_E___B2_B_Carr_Bal_Vol24_Mc_ := MAP(__T(__OP2(__PP533809.B_E___B2_B_Carr_Rec_Flag_By_Mon_Sum24_Mc_,=,__CN(1)))=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533809.B_E___B2_B_Carr_Cnt24_Mc_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__ECAST(KEL.typ.nfloat,KEL.Routines.MinN(__OP2(__PP533809.B2b_T_L_Devation_Sample_In_Carr_,/,__PP533809.B2b_T_L_In_Carr_M_E_A_N_),__CN(2.0))));
-    SELF.B_E___B2_B_Carr_Pct2_Y_ := IF(__PP533809.B_E___B2_B_Cnt2_Y_ = 0,(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Carr_Cnt2_Y_No_Cap_ / __PP533809.B_E___B2_B_Cnt2_Y_No_Cap_ * 100);
-    SELF.B_E___B2_B_Carr_Worst_Perf_Msnc2_Y_ := MAP(__PP533809.B_E___B2_B_Carr_Cnt2_Y_ = 0=>__ECAST(KEL.typ.nint,__CN(__CC13594)),__PP533809.B_E___B2_B_Carr_Worst_Perf_Indx2_Y_ = (KEL.typ.str)0=>__ECAST(KEL.typ.nint,__CN(__CC13597)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533809.B_E___B2_B_Carr_Worst_Perf_Dt2_Y_),__PP533809.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__2_),__CN(0),__CN(24))));
-    SELF.B_E___B2_B_Flt_Bal_Max2_Y_ := IF(__PP533809.B_E___B2_B_Flt_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__PP533809.B_E___B2_B_Flt_Bal_Max2_Y_No_Cap_,__CN(0),__CN(99999999))));
-    SELF.B_E___B2_B_Flt_Bal_Max_Msnc2_Y_ := IF(__PP533809.B_E___B2_B_Flt_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533809.B_E___B2_B_Flt_Bal_Max_Dt2_Y_),__PP533809.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__3_),__CN(0),__CN(24))));
-    SELF.B_E___B2_B_Flt_Bal_Vol24_Mc_ := MAP(__T(__OP2(__PP533809.B_E___B2_B_Flt_Rec_Flag_By_Mon_Sum24_Mc_,=,__CN(1)))=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533809.B_E___B2_B_Flt_Cnt24_Mc_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__ECAST(KEL.typ.nfloat,KEL.Routines.MinN(__OP2(__PP533809.B2b_T_L_Devation_Sample_In_Flt_,/,__PP533809.B2b_T_L_In_Flt_M_E_A_N_),__CN(2.0))));
-    SELF.B_E___B2_B_Flt_Pct2_Y_ := IF(__PP533809.B_E___B2_B_Cnt2_Y_ = 0,(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Flt_Cnt2_Y_No_Cap_ / __PP533809.B_E___B2_B_Cnt2_Y_No_Cap_ * 100);
-    SELF.B_E___B2_B_Flt_Worst_Perf_Msnc2_Y_ := MAP(__PP533809.B_E___B2_B_Flt_Cnt2_Y_ = 0=>__ECAST(KEL.typ.nint,__CN(__CC13594)),__PP533809.B_E___B2_B_Flt_Worst_Perf_Indx2_Y_ = (KEL.typ.str)0=>__ECAST(KEL.typ.nint,__CN(__CC13597)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533809.B_E___B2_B_Flt_Worst_Perf_Dt2_Y_),__PP533809.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__4_),__CN(0),__CN(24))));
-    SELF.B_E___B2_B_Mat_Bal_Max2_Y_ := IF(__PP533809.B_E___B2_B_Mat_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__PP533809.B_E___B2_B_Mat_Bal_Max2_Y_No_Cap_,__CN(0),__CN(99999999))));
-    SELF.B_E___B2_B_Mat_Bal_Max_Msnc2_Y_ := IF(__PP533809.B_E___B2_B_Mat_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533809.B_E___B2_B_Mat_Bal_Max_Dt2_Y_),__PP533809.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__5_),__CN(0),__CN(24))));
-    SELF.B_E___B2_B_Mat_Bal_Vol24_Mc_ := MAP(__T(__OP2(__PP533809.B_E___B2_B_Mat_Rec_Flag_By_Mon_Sum24_Mc_,=,__CN(1)))=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533809.B_E___B2_B_Mat_Cnt24_Mc_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__ECAST(KEL.typ.nfloat,KEL.Routines.MinN(__OP2(__PP533809.B2b_T_L_Devation_Sample_In_Mat_,/,__PP533809.B2b_T_L_In_Mat_M_E_A_N_),__CN(2.0))));
-    SELF.B_E___B2_B_Mat_Pct2_Y_ := IF(__PP533809.B_E___B2_B_Cnt2_Y_ = 0,(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Mat_Cnt2_Y_No_Cap_ / __PP533809.B_E___B2_B_Cnt2_Y_No_Cap_ * 100);
-    SELF.B_E___B2_B_Mat_Worst_Perf_Msnc2_Y_ := MAP(__PP533809.B_E___B2_B_Mat_Cnt2_Y_ = 0=>__ECAST(KEL.typ.nint,__CN(__CC13594)),__PP533809.B_E___B2_B_Mat_Worst_Perf_Indx2_Y_ = (KEL.typ.str)0=>__ECAST(KEL.typ.nint,__CN(__CC13597)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533809.B_E___B2_B_Mat_Worst_Perf_Dt2_Y_),__PP533809.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__6_),__CN(0),__CN(24))));
-    SELF.B_E___B2_B_New_Msnc2_Y_ := IF(__PP533809.B_E___B2_B_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533809.B_E___B2_B_New_Dt2_Y_),__PP533809.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__7_),__CN(0),__CN(24))));
-    SELF.B_E___B2_B_Old_Msnc2_Y_ := IF(__PP533809.B_E___B2_B_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533809.B_E___B2_B_Old_Dt2_Y_),__PP533809.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__8_),__CN(0),__CN(24))));
-    SELF.B_E___B2_B_Old_Msnc_Ev_ := IF(__T(__OP2(__PP533809.B_E___B2_B_Cnt_Ev_,=,__CN(0))),__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533809.B_E___B2_B_Old_Dt_Ev_),__PP533809.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__9_),__CN(0),__CN(999))));
-    SELF.B_E___B2_B_Ops_Bal_Max2_Y_ := IF(__PP533809.B_E___B2_B_Ops_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__PP533809.B_E___B2_B_Ops_Bal_Max2_Y_No_Cap_,__CN(0),__CN(99999999))));
-    SELF.B_E___B2_B_Ops_Bal_Max_Msnc2_Y_ := IF(__PP533809.B_E___B2_B_Ops_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533809.B_E___B2_B_Ops_Bal_Max_Dt2_Y_),__PP533809.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__10_),__CN(0),__CN(24))));
-    SELF.B_E___B2_B_Ops_Bal_Vol24_Mc_ := MAP(__T(__OP2(__PP533809.B_E___B2_B_Ops_Rec_Flag_By_Mon_Sum24_Mc_,=,__CN(1)))=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533809.B_E___B2_B_Ops_Cnt24_Mc_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__ECAST(KEL.typ.nfloat,KEL.Routines.MinN(__OP2(__PP533809.B2b_T_L_Devation_Sample_In_Ops_,/,__PP533809.B2b_T_L_In_Ops_M_E_A_N_),__CN(2.0))));
-    SELF.B_E___B2_B_Ops_Pct2_Y_ := IF(__PP533809.B_E___B2_B_Cnt2_Y_ = 0,(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Ops_Cnt2_Y_No_Cap_ / __PP533809.B_E___B2_B_Cnt2_Y_No_Cap_ * 100);
-    SELF.B_E___B2_B_Ops_Worst_Perf_Msnc2_Y_ := MAP(__PP533809.B_E___B2_B_Ops_Cnt2_Y_ = 0=>__ECAST(KEL.typ.nint,__CN(__CC13594)),__PP533809.B_E___B2_B_Ops_Worst_Perf_Indx2_Y_ = (KEL.typ.str)0=>__ECAST(KEL.typ.nint,__CN(__CC13597)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533809.B_E___B2_B_Ops_Worst_Perf_Dt2_Y_),__PP533809.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__11_),__CN(0),__CN(24))));
-    SELF.B_E___B2_B_Oth_Bal_Max2_Y_ := IF(__PP533809.B_E___B2_B_Oth_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__PP533809.B_E___B2_B_Oth_Bal_Max2_Y_No_Cap_,__CN(0),__CN(99999999))));
-    SELF.B_E___B2_B_Oth_Bal_Max_Msnc2_Y_ := IF(__PP533809.B_E___B2_B_Oth_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533809.B_E___B2_B_Oth_Bal_Max_Dt2_Y_),__PP533809.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__12_),__CN(0),__CN(24))));
-    SELF.B_E___B2_B_Oth_Bal_Vol24_Mc_ := MAP(__T(__OP2(__PP533809.B_E___B2_B_Oth_Rec_Flag_By_Mon_Sum24_Mc_,=,__CN(1)))=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533809.B_E___B2_B_Oth_Cnt24_Mc_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__ECAST(KEL.typ.nfloat,KEL.Routines.MinN(__OP2(__PP533809.B2b_T_L_Devation_Sample_In_Oth_,/,__PP533809.B2b_T_L_In_Oth_M_E_A_N_),__CN(2.0))));
-    SELF.B_E___B2_B_Oth_Pct2_Y_ := IF(__PP533809.B_E___B2_B_Cnt2_Y_ = 0,(KEL.typ.float)__CC13594,__PP533809.B_E___B2_B_Oth_Cnt2_Y_No_Cap_ / __PP533809.B_E___B2_B_Cnt2_Y_No_Cap_ * 100);
-    SELF.B_E___B2_B_Oth_Worst_Perf_Msnc2_Y_ := MAP(__PP533809.B_E___B2_B_Oth_Cnt2_Y_ = 0=>__ECAST(KEL.typ.nint,__CN(__CC13594)),__PP533809.B_E___B2_B_Oth_Worst_Perf_Indx2_Y_ = (KEL.typ.str)0=>__ECAST(KEL.typ.nint,__CN(__CC13597)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533809.B_E___B2_B_Oth_Worst_Perf_Dt2_Y_),__PP533809.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__13_),__CN(0),__CN(24))));
-    SELF.B_E___B2_B_Worst_Perf_Msnc2_Y_ := MAP(__PP533809.B_E___B2_B_Cnt2_Y_ = 0=>__ECAST(KEL.typ.nint,__CN(__CC13594)),__PP533809.B_E___B2_B_Worst_Perf_Indx2_Y_ = (KEL.typ.str)0=>__ECAST(KEL.typ.nint,__CN(__CC13597)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533809.B_E___B2_B_Worst_Perf_Dt2_Y_),__PP533809.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__14_),__CN(0),__CN(24))));
-    __BS536005 := __T(__PP533809.Data_Sources_);
-    SELF.B___Lex_I_D_Legal_Seen_Flag_ := IF(EXISTS(__BS536005(__T(__T(__PP533809.Data_Sources_).Header_Hit_Flag_))),'1','0');
-    SELF := __PP533809;
+    SELF.B_E___B2_B_Actv_Bal_Tot_Grow_Indx1_Y_ := MAP(__PP533855.B_E___B2_B_Actv_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533855.B_E___B2_B_Actv_Cnt_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533855.B_E___B2_B_Actv_Bal_Tot_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13599)),__T(__AND(__OP2(__PP533855.B_E___B2_B_Actv_Bal_Tot_Grow1_Y_,>=,__CN(0)),__OP2(__PP533855.B_E___B2_B_Actv_Bal_Tot_Grow1_Y_,<,__CN(1))))=>__ECAST(KEL.typ.nstr,__CN('0')),__T(__OP2(__PP533855.B_E___B2_B_Actv_Bal_Tot_Grow1_Y_,=,__CN(1)))=>__ECAST(KEL.typ.nstr,__CN('1')),__T(__AND(__OP2(__PP533855.B_E___B2_B_Actv_Bal_Tot_Grow1_Y_,>,__CN(1)),__OP2(__PP533855.B_E___B2_B_Actv_Bal_Tot_Grow1_Y_,<=,__CN(9999.9999))))=>__ECAST(KEL.typ.nstr,__CN('2')),__N(KEL.typ.str));
+    SELF.B_E___B2_B_Actv_Bal_Tot_Rnge_ := MAP(__PP533855.B_E___B2_B_Actv_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533855.B_E___B2_B_Actv_Bal_Tot_ >= 0 AND __PP533855.B_E___B2_B_Actv_Bal_Tot_ <= 500=>__ECAST(KEL.typ.nstr,__CN('1')),__PP533855.B_E___B2_B_Actv_Bal_Tot_ >= 501 AND __PP533855.B_E___B2_B_Actv_Bal_Tot_ <= 1000=>__ECAST(KEL.typ.nstr,__CN('2')),__PP533855.B_E___B2_B_Actv_Bal_Tot_ >= 1001 AND __PP533855.B_E___B2_B_Actv_Bal_Tot_ <= 5000=>__ECAST(KEL.typ.nstr,__CN('3')),__PP533855.B_E___B2_B_Actv_Bal_Tot_ >= 5001 AND __PP533855.B_E___B2_B_Actv_Bal_Tot_ <= 10000=>__ECAST(KEL.typ.nstr,__CN('4')),__PP533855.B_E___B2_B_Actv_Bal_Tot_ >= 10001 AND __PP533855.B_E___B2_B_Actv_Bal_Tot_ <= 20000=>__ECAST(KEL.typ.nstr,__CN('5')),__PP533855.B_E___B2_B_Actv_Bal_Tot_ >= 20001 AND __PP533855.B_E___B2_B_Actv_Bal_Tot_ <= 40000=>__ECAST(KEL.typ.nstr,__CN('6')),__PP533855.B_E___B2_B_Actv_Bal_Tot_ >= 40001 AND __PP533855.B_E___B2_B_Actv_Bal_Tot_ <= 99999999=>__ECAST(KEL.typ.nstr,__CN('7')),__N(KEL.typ.str));
+    SELF.B_E___B2_B_Actv_Carr_Bal_Avg_ := IF(__PP533855.B_E___B2_B_Actv_Carr_Cnt_ = 0,__CC13594,KEL.Routines.BoundsFold(ROUND(__PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_No_Cap_ / __PP533855.B_E___B2_B_Actv_Carr_Cnt_No_Cap_),0,99999999));
+    SELF.B_E___B2_B_Actv_Carr_Bal_Tot_Grow_Indx1_Y_ := MAP(__PP533855.B_E___B2_B_Actv_Carr_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533855.B_E___B2_B_Actv_Carr_Cnt_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13599)),__T(__AND(__OP2(__PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_Grow1_Y_,>=,__CN(0)),__OP2(__PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_Grow1_Y_,<,__CN(1))))=>__ECAST(KEL.typ.nstr,__CN('0')),__T(__OP2(__PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_Grow1_Y_,=,__CN(1)))=>__ECAST(KEL.typ.nstr,__CN('1')),__T(__AND(__OP2(__PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_Grow1_Y_,>,__CN(1)),__OP2(__PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_Grow1_Y_,<=,__CN(9999.9999))))=>__ECAST(KEL.typ.nstr,__CN('2')),__N(KEL.typ.str));
+    SELF.B_E___B2_B_Actv_Carr_Bal_Tot_Pct_ := MAP(__PP533855.B_E___B2_B_Actv_Cnt_No_Cap_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__PP533855.B_E___B2_B_Actv_Carr_Cnt_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__PP533855.B_E___B2_B_Actv_Bal_Tot_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533855.B_E___B2_B_Actv_Bal_Tot_ > 0=>__ECAST(KEL.typ.nfloat,__CN(__PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_No_Cap_ / __PP533855.B_E___B2_B_Actv_Bal_Tot_No_Cap_ * 100)),__N(KEL.typ.float));
+    SELF.B_E___B2_B_Actv_Carr_Bal_Tot_Rnge_ := MAP(__PP533855.B_E___B2_B_Actv_Carr_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_ >= 0 AND __PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_ <= 500=>__ECAST(KEL.typ.nstr,__CN('1')),__PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_ >= 501 AND __PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_ <= 1000=>__ECAST(KEL.typ.nstr,__CN('2')),__PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_ >= 1001 AND __PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_ <= 5000=>__ECAST(KEL.typ.nstr,__CN('3')),__PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_ >= 5001 AND __PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_ <= 10000=>__ECAST(KEL.typ.nstr,__CN('4')),__PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_ >= 10001 AND __PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_ <= 20000=>__ECAST(KEL.typ.nstr,__CN('5')),__PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_ >= 20001 AND __PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_ <= 40000=>__ECAST(KEL.typ.nstr,__CN('6')),__PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_ >= 40001 AND __PP533855.B_E___B2_B_Actv_Carr_Bal_Tot_ <= 99999999=>__ECAST(KEL.typ.nstr,__CN('7')),__N(KEL.typ.str));
+    SELF.B_E___B2_B_Actv_Carr_Cnt_Grow1_Y_ := IF(__PP533855.B_E___B2_B_Actv_Carr_Cnt_A1_Y_ = 0,(KEL.typ.float)__CC13594,MIN(__PP533855.B_E___B2_B_Actv_Carr_Cnt_No_Cap_ / __PP533855.B_E___B2_B_Actv_Carr_Cnt_A1_Y_No_Cap_,999.9999));
+    SELF.B_E___B2_B_Actv_Carr_Pct_ := IF(__PP533855.B_E___B2_B_Actv_Cnt_No_Cap_ = 0,(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Actv_Carr_Cnt_No_Cap_ / __PP533855.B_E___B2_B_Actv_Cnt_No_Cap_ * 100);
+    SELF.B_E___B2_B_Actv_Carr_Worst_Perf_Indx_ := IF(__PP533855.B_E___B2_B_Actv_Carr_Cnt_ = 0,__ECAST(KEL.typ.nstr,__CN(__CC13591)),__ECAST(KEL.typ.nstr,__CAST(KEL.typ.str,__PP533855.M_A_X___Perf_Level_)));
+    SELF.B_E___B2_B_Actv_Cnt_Grow1_Y_ := IF(__PP533855.B_E___B2_B_Actv_Cnt_A1_Y_ = 0,(KEL.typ.float)__CC13594,MIN(__PP533855.B_E___B2_B_Actv_Cnt_No_Cap_ / __PP533855.B_E___B2_B_Actv_Cnt_A1_Y_No_Cap_,999.9999));
+    SELF.B_E___B2_B_Actv_Flt_Bal_Avg_ := IF(__PP533855.B_E___B2_B_Actv_Flt_Cnt_ = 0,__CC13594,KEL.Routines.BoundsFold(ROUND(__PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_No_Cap_ / __PP533855.B_E___B2_B_Actv_Flt_Cnt_No_Cap_),0,99999999));
+    SELF.B_E___B2_B_Actv_Flt_Bal_Pct_ := MAP(__PP533855.B_E___B2_B_Actv_Cnt_No_Cap_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__PP533855.B_E___B2_B_Actv_Flt_Cnt_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__PP533855.B_E___B2_B_Actv_Bal_Tot_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533855.B_E___B2_B_Actv_Bal_Tot_ > 0=>__ECAST(KEL.typ.nfloat,__CN(__PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_No_Cap_ / __PP533855.B_E___B2_B_Actv_Bal_Tot_No_Cap_ * 100)),__N(KEL.typ.float));
+    SELF.B_E___B2_B_Actv_Flt_Bal_Tot_Grow_Indx1_Y_ := MAP(__PP533855.B_E___B2_B_Actv_Flt_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533855.B_E___B2_B_Actv_Flt_Cnt_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13599)),__T(__AND(__OP2(__PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_Grow1_Y_,>=,__CN(0)),__OP2(__PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_Grow1_Y_,<,__CN(1))))=>__ECAST(KEL.typ.nstr,__CN('0')),__T(__OP2(__PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_Grow1_Y_,=,__CN(1)))=>__ECAST(KEL.typ.nstr,__CN('1')),__T(__AND(__OP2(__PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_Grow1_Y_,>,__CN(1)),__OP2(__PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_Grow1_Y_,<=,__CN(9999.9999))))=>__ECAST(KEL.typ.nstr,__CN('2')),__N(KEL.typ.str));
+    SELF.B_E___B2_B_Actv_Flt_Bal_Tot_Rnge_ := MAP(__PP533855.B_E___B2_B_Actv_Flt_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_ >= 0 AND __PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_ <= 500=>__ECAST(KEL.typ.nstr,__CN('1')),__PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_ >= 501 AND __PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_ <= 1000=>__ECAST(KEL.typ.nstr,__CN('2')),__PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_ >= 1001 AND __PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_ <= 5000=>__ECAST(KEL.typ.nstr,__CN('3')),__PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_ >= 5001 AND __PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_ <= 10000=>__ECAST(KEL.typ.nstr,__CN('4')),__PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_ >= 10001 AND __PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_ <= 20000=>__ECAST(KEL.typ.nstr,__CN('5')),__PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_ >= 20001 AND __PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_ <= 40000=>__ECAST(KEL.typ.nstr,__CN('6')),__PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_ >= 40001 AND __PP533855.B_E___B2_B_Actv_Flt_Bal_Tot_ <= 99999999=>__ECAST(KEL.typ.nstr,__CN('7')),__N(KEL.typ.str));
+    SELF.B_E___B2_B_Actv_Flt_Cnt_Grow1_Y_ := IF(__PP533855.B_E___B2_B_Actv_Flt_Cnt_A1_Y_ = 0,(KEL.typ.float)__CC13594,MIN(__PP533855.B_E___B2_B_Actv_Flt_Cnt_No_Cap_ / __PP533855.B_E___B2_B_Actv_Flt_Cnt_A1_Y_No_Cap_,999.9999));
+    SELF.B_E___B2_B_Actv_Flt_Pct_ := IF(__PP533855.B_E___B2_B_Actv_Cnt_No_Cap_ = 0,(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Actv_Flt_Cnt_No_Cap_ / __PP533855.B_E___B2_B_Actv_Cnt_No_Cap_ * 100);
+    SELF.B_E___B2_B_Actv_Flt_Worst_Perf_Indx_ := IF(__PP533855.B_E___B2_B_Actv_Flt_Cnt_ = 0,__ECAST(KEL.typ.nstr,__CN(__CC13591)),__ECAST(KEL.typ.nstr,__CAST(KEL.typ.str,__PP533855.M_A_X___Perf_Level__1_)));
+    SELF.B_E___B2_B_Actv_Mat_Bal_Avg_ := IF(__PP533855.B_E___B2_B_Actv_Mat_Cnt_ = 0,__CC13594,KEL.Routines.BoundsFold(ROUND(__PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_No_Cap_ / __PP533855.B_E___B2_B_Actv_Mat_Cnt_No_Cap_),0,99999999));
+    SELF.B_E___B2_B_Actv_Mat_Bal_Pct_ := MAP(__PP533855.B_E___B2_B_Actv_Cnt_No_Cap_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__PP533855.B_E___B2_B_Actv_Mat_Cnt_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__PP533855.B_E___B2_B_Actv_Bal_Tot_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533855.B_E___B2_B_Actv_Bal_Tot_ > 0=>__ECAST(KEL.typ.nfloat,__CN(__PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_No_Cap_ / __PP533855.B_E___B2_B_Actv_Bal_Tot_No_Cap_ * 100)),__N(KEL.typ.float));
+    SELF.B_E___B2_B_Actv_Mat_Bal_Tot_Grow_Indx1_Y_ := MAP(__PP533855.B_E___B2_B_Actv_Mat_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533855.B_E___B2_B_Actv_Mat_Cnt_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13599)),__T(__AND(__OP2(__PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_Grow1_Y_,>=,__CN(0)),__OP2(__PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_Grow1_Y_,<,__CN(1))))=>__ECAST(KEL.typ.nstr,__CN('0')),__T(__OP2(__PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_Grow1_Y_,=,__CN(1)))=>__ECAST(KEL.typ.nstr,__CN('1')),__T(__AND(__OP2(__PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_Grow1_Y_,>,__CN(1)),__OP2(__PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_Grow1_Y_,<=,__CN(9999.9999))))=>__ECAST(KEL.typ.nstr,__CN('2')),__N(KEL.typ.str));
+    SELF.B_E___B2_B_Actv_Mat_Bal_Tot_Rnge_ := MAP(__PP533855.B_E___B2_B_Actv_Mat_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_ >= 0 AND __PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_ <= 500=>__ECAST(KEL.typ.nstr,__CN('1')),__PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_ >= 501 AND __PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_ <= 1000=>__ECAST(KEL.typ.nstr,__CN('2')),__PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_ >= 1001 AND __PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_ <= 5000=>__ECAST(KEL.typ.nstr,__CN('3')),__PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_ >= 5001 AND __PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_ <= 10000=>__ECAST(KEL.typ.nstr,__CN('4')),__PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_ >= 10001 AND __PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_ <= 20000=>__ECAST(KEL.typ.nstr,__CN('5')),__PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_ >= 20001 AND __PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_ <= 40000=>__ECAST(KEL.typ.nstr,__CN('6')),__PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_ >= 40001 AND __PP533855.B_E___B2_B_Actv_Mat_Bal_Tot_ <= 99999999=>__ECAST(KEL.typ.nstr,__CN('7')),__N(KEL.typ.str));
+    SELF.B_E___B2_B_Actv_Mat_Cnt_Grow1_Y_ := IF(__PP533855.B_E___B2_B_Actv_Mat_Cnt_A1_Y_ = 0,(KEL.typ.float)__CC13594,MIN(__PP533855.B_E___B2_B_Actv_Mat_Cnt_No_Cap_ / __PP533855.B_E___B2_B_Actv_Mat_Cnt_A1_Y_No_Cap_,999.9999));
+    SELF.B_E___B2_B_Actv_Mat_Pct_ := IF(__PP533855.B_E___B2_B_Actv_Cnt_No_Cap_ = 0,(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Actv_Mat_Cnt_No_Cap_ / __PP533855.B_E___B2_B_Actv_Cnt_No_Cap_ * 100);
+    SELF.B_E___B2_B_Actv_Mat_Worst_Perf_Indx_ := IF(__PP533855.B_E___B2_B_Actv_Mat_Cnt_ = 0,__ECAST(KEL.typ.nstr,__CN(__CC13591)),__ECAST(KEL.typ.nstr,__CAST(KEL.typ.str,__PP533855.M_A_X___Perf_Level__2_)));
+    SELF.B_E___B2_B_Actv_Ops_Bal_Avg_ := IF(__PP533855.B_E___B2_B_Actv_Ops_Cnt_ = 0,__CC13594,KEL.Routines.BoundsFold(ROUND(__PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_No_Cap_ / __PP533855.B_E___B2_B_Actv_Ops_Cnt_No_Cap_),0,99999999));
+    SELF.B_E___B2_B_Actv_Ops_Bal_Pct_ := MAP(__PP533855.B_E___B2_B_Actv_Cnt_No_Cap_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__PP533855.B_E___B2_B_Actv_Ops_Cnt_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__PP533855.B_E___B2_B_Actv_Bal_Tot_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533855.B_E___B2_B_Actv_Bal_Tot_ > 0=>__ECAST(KEL.typ.nfloat,__CN(__PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_No_Cap_ / __PP533855.B_E___B2_B_Actv_Bal_Tot_No_Cap_ * 100)),__N(KEL.typ.float));
+    SELF.B_E___B2_B_Actv_Ops_Bal_Tot_Grow_Indx1_Y_ := MAP(__PP533855.B_E___B2_B_Actv_Ops_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533855.B_E___B2_B_Actv_Ops_Cnt_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13599)),__T(__AND(__OP2(__PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_Grow1_Y_,>=,__CN(0)),__OP2(__PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_Grow1_Y_,<,__CN(1))))=>__ECAST(KEL.typ.nstr,__CN('0')),__T(__OP2(__PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_Grow1_Y_,=,__CN(1)))=>__ECAST(KEL.typ.nstr,__CN('1')),__T(__AND(__OP2(__PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_Grow1_Y_,>,__CN(1)),__OP2(__PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_Grow1_Y_,<=,__CN(9999.9999))))=>__ECAST(KEL.typ.nstr,__CN('2')),__N(KEL.typ.str));
+    SELF.B_E___B2_B_Actv_Ops_Bal_Tot_Rnge_ := MAP(__PP533855.B_E___B2_B_Actv_Ops_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_ >= 0 AND __PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_ <= 500=>__ECAST(KEL.typ.nstr,__CN('1')),__PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_ >= 501 AND __PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_ <= 1000=>__ECAST(KEL.typ.nstr,__CN('2')),__PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_ >= 1001 AND __PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_ <= 5000=>__ECAST(KEL.typ.nstr,__CN('3')),__PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_ >= 5001 AND __PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_ <= 10000=>__ECAST(KEL.typ.nstr,__CN('4')),__PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_ >= 10001 AND __PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_ <= 20000=>__ECAST(KEL.typ.nstr,__CN('5')),__PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_ >= 20001 AND __PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_ <= 40000=>__ECAST(KEL.typ.nstr,__CN('6')),__PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_ >= 40001 AND __PP533855.B_E___B2_B_Actv_Ops_Bal_Tot_ <= 99999999=>__ECAST(KEL.typ.nstr,__CN('7')),__N(KEL.typ.str));
+    SELF.B_E___B2_B_Actv_Ops_Cnt_Grow1_Y_ := IF(__PP533855.B_E___B2_B_Actv_Ops_Cnt_A1_Y_ = 0,(KEL.typ.float)__CC13594,MIN(__PP533855.B_E___B2_B_Actv_Ops_Cnt_No_Cap_ / __PP533855.B_E___B2_B_Actv_Ops_Cnt_A1_Y_No_Cap_,999.9999));
+    SELF.B_E___B2_B_Actv_Ops_Pct_ := IF(__PP533855.B_E___B2_B_Actv_Cnt_No_Cap_ = 0,(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Actv_Ops_Cnt_No_Cap_ / __PP533855.B_E___B2_B_Actv_Cnt_No_Cap_ * 100);
+    SELF.B_E___B2_B_Actv_Ops_Worst_Perf_Indx_ := IF(__PP533855.B_E___B2_B_Actv_Ops_Cnt_ = 0,__ECAST(KEL.typ.nstr,__CN(__CC13591)),__ECAST(KEL.typ.nstr,__CAST(KEL.typ.str,__PP533855.M_A_X___Perf_Level__3_)));
+    SELF.B_E___B2_B_Actv_Oth_Bal_Avg_ := IF(__PP533855.B_E___B2_B_Actv_Oth_Cnt_ = 0,__CC13594,KEL.Routines.BoundsFold(ROUND(__PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_No_Cap_ / __PP533855.B_E___B2_B_Actv_Oth_Cnt_No_Cap_),0,99999999));
+    SELF.B_E___B2_B_Actv_Oth_Bal_Pct_ := MAP(__PP533855.B_E___B2_B_Actv_Cnt_No_Cap_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__PP533855.B_E___B2_B_Actv_Oth_Cnt_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__PP533855.B_E___B2_B_Actv_Bal_Tot_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533855.B_E___B2_B_Actv_Bal_Tot_ > 0=>__ECAST(KEL.typ.nfloat,__CN(__PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_No_Cap_ / __PP533855.B_E___B2_B_Actv_Bal_Tot_No_Cap_ * 100)),__N(KEL.typ.float));
+    SELF.B_E___B2_B_Actv_Oth_Bal_Tot_Grow_Indx1_Y_ := MAP(__PP533855.B_E___B2_B_Actv_Oth_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533855.B_E___B2_B_Actv_Oth_Cnt_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_A1_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13599)),__T(__AND(__OP2(__PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_Grow1_Y_,>=,__CN(0)),__OP2(__PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_Grow1_Y_,<,__CN(1))))=>__ECAST(KEL.typ.nstr,__CN('0')),__T(__OP2(__PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_Grow1_Y_,=,__CN(1)))=>__ECAST(KEL.typ.nstr,__CN('1')),__T(__AND(__OP2(__PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_Grow1_Y_,>,__CN(1)),__OP2(__PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_Grow1_Y_,<=,__CN(9999.9999))))=>__ECAST(KEL.typ.nstr,__CN('2')),__N(KEL.typ.str));
+    SELF.B_E___B2_B_Actv_Oth_Bal_Tot_Rnge_ := MAP(__PP533855.B_E___B2_B_Actv_Oth_Cnt_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_ >= 0 AND __PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_ <= 500=>__ECAST(KEL.typ.nstr,__CN('1')),__PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_ >= 501 AND __PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_ <= 1000=>__ECAST(KEL.typ.nstr,__CN('2')),__PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_ >= 1001 AND __PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_ <= 5000=>__ECAST(KEL.typ.nstr,__CN('3')),__PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_ >= 5001 AND __PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_ <= 10000=>__ECAST(KEL.typ.nstr,__CN('4')),__PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_ >= 10001 AND __PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_ <= 20000=>__ECAST(KEL.typ.nstr,__CN('5')),__PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_ >= 20001 AND __PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_ <= 40000=>__ECAST(KEL.typ.nstr,__CN('6')),__PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_ >= 40001 AND __PP533855.B_E___B2_B_Actv_Oth_Bal_Tot_ <= 99999999=>__ECAST(KEL.typ.nstr,__CN('7')),__N(KEL.typ.str));
+    SELF.B_E___B2_B_Actv_Oth_Cnt_Grow1_Y_ := IF(__PP533855.B_E___B2_B_Actv_Oth_Cnt_A1_Y_ = 0,(KEL.typ.float)__CC13594,MIN(__PP533855.B_E___B2_B_Actv_Oth_Cnt_No_Cap_ / __PP533855.B_E___B2_B_Actv_Oth_Cnt_A1_Y_No_Cap_,999.9999));
+    SELF.B_E___B2_B_Actv_Oth_Pct_ := IF(__PP533855.B_E___B2_B_Actv_Cnt_No_Cap_ = 0,(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Actv_Oth_Cnt_No_Cap_ / __PP533855.B_E___B2_B_Actv_Cnt_No_Cap_ * 100);
+    SELF.B_E___B2_B_Actv_Oth_Worst_Perf_Indx_ := IF(__PP533855.B_E___B2_B_Actv_Oth_Cnt_ = 0,__ECAST(KEL.typ.nstr,__CN(__CC13591)),__ECAST(KEL.typ.nstr,__CAST(KEL.typ.str,__PP533855.M_A_X___Perf_Level__4_)));
+    SELF.B_E___B2_B_Actv_Worst_Perf_Indx_ := IF(__PP533855.B_E___B2_B_Actv_Cnt_ = 0,__ECAST(KEL.typ.nstr,__CN(__CC13591)),__ECAST(KEL.typ.nstr,__CAST(KEL.typ.str,__PP533855.M_A_X___Perf_Level__5_)));
+    SELF.B_E___B2_B_Bal_Max2_Y_ := IF(__PP533855.B_E___B2_B_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__PP533855.B_E___B2_B_Bal_Max2_Y_No_Cap_,__CN(0),__CN(99999999))));
+    SELF.B_E___B2_B_Bal_Max_Msnc2_Y_ := IF(__PP533855.B_E___B2_B_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533855.B_E___B2_B_Bal_Max_Dt2_Y_),__PP533855.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E_),__CN(0),__CN(24))));
+    SELF.B_E___B2_B_Bal_Max_Seg_Type2_Y_ := MAP(__PP533855.B_E___B2_B_Cnt2_Y_ = 0=>__ECAST(KEL.typ.nstr,__CN(__CC13591)),__PP533855.B_E___B2_B_Bal_Max_Seg_Type2_Y_Map_Carr_ + __PP533855.B_E___B2_B_Bal_Max_Seg_Type2_Y_Map_Flt_ + __PP533855.B_E___B2_B_Bal_Max_Seg_Type2_Y_Map_Mat_ + __PP533855.B_E___B2_B_Bal_Max_Seg_Type2_Y_Map_Ops_ + __PP533855.B_E___B2_B_Bal_Max_Seg_Type2_Y_Map_Oth_ > 1=>__ECAST(KEL.typ.nstr,__CN('5')),__T(__OP2(__PP533855.B_E___B2_B_Carr_Bal_Max2_Y_No_Cap_,=,__PP533855.B_E___B2_B_Bal_Max2_Y_No_Cap_))=>__ECAST(KEL.typ.nstr,__CN('4')),__T(__OP2(__PP533855.B_E___B2_B_Flt_Bal_Max2_Y_No_Cap_,=,__PP533855.B_E___B2_B_Bal_Max2_Y_No_Cap_))=>__ECAST(KEL.typ.nstr,__CN('3')),__T(__OP2(__PP533855.B_E___B2_B_Mat_Bal_Max2_Y_No_Cap_,=,__PP533855.B_E___B2_B_Bal_Max2_Y_No_Cap_))=>__ECAST(KEL.typ.nstr,__CN('2')),__T(__OP2(__PP533855.B_E___B2_B_Ops_Bal_Max2_Y_No_Cap_,=,__PP533855.B_E___B2_B_Bal_Max2_Y_No_Cap_))=>__ECAST(KEL.typ.nstr,__CN('1')),__T(__OP2(__PP533855.B_E___B2_B_Oth_Bal_Max2_Y_No_Cap_,=,__PP533855.B_E___B2_B_Bal_Max2_Y_No_Cap_))=>__ECAST(KEL.typ.nstr,__CN('0')),__N(KEL.typ.str));
+    SELF.B_E___B2_B_Bal_Vol24_Mc_ := MAP(__T(__OP2(__PP533855.B_E___B2_B_Rec_Flag_By_Mon_Sum24_Mc_,=,__CN(1)))=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533855.B_E___B2_B_Cnt24_Mc_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__ECAST(KEL.typ.nfloat,KEL.Routines.MinN(__OP2(__PP533855.B2b_T_L_Devation_Sample_,/,__PP533855.B2b_T_L_M_E_A_N_),__CN(2.0))));
+    SELF.B_E___B2_B_Carr_Bal_Max2_Y_ := IF(__PP533855.B_E___B2_B_Carr_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__PP533855.B_E___B2_B_Carr_Bal_Max2_Y_No_Cap_,__CN(0),__CN(99999999))));
+    SELF.B_E___B2_B_Carr_Bal_Max_Msnc2_Y_ := IF(__PP533855.B_E___B2_B_Carr_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533855.B_E___B2_B_Carr_Bal_Max_Dt2_Y_),__PP533855.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__1_),__CN(0),__CN(24))));
+    SELF.B_E___B2_B_Carr_Bal_Vol24_Mc_ := MAP(__T(__OP2(__PP533855.B_E___B2_B_Carr_Rec_Flag_By_Mon_Sum24_Mc_,=,__CN(1)))=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533855.B_E___B2_B_Carr_Cnt24_Mc_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__ECAST(KEL.typ.nfloat,KEL.Routines.MinN(__OP2(__PP533855.B2b_T_L_Devation_Sample_In_Carr_,/,__PP533855.B2b_T_L_In_Carr_M_E_A_N_),__CN(2.0))));
+    SELF.B_E___B2_B_Carr_Pct2_Y_ := IF(__PP533855.B_E___B2_B_Cnt2_Y_ = 0,(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Carr_Cnt2_Y_No_Cap_ / __PP533855.B_E___B2_B_Cnt2_Y_No_Cap_ * 100);
+    SELF.B_E___B2_B_Carr_Worst_Perf_Msnc2_Y_ := MAP(__PP533855.B_E___B2_B_Carr_Cnt2_Y_ = 0=>__ECAST(KEL.typ.nint,__CN(__CC13594)),__PP533855.B_E___B2_B_Carr_Worst_Perf_Indx2_Y_ = (KEL.typ.str)0=>__ECAST(KEL.typ.nint,__CN(__CC13597)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533855.B_E___B2_B_Carr_Worst_Perf_Dt2_Y_),__PP533855.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__2_),__CN(0),__CN(24))));
+    SELF.B_E___B2_B_Flt_Bal_Max2_Y_ := IF(__PP533855.B_E___B2_B_Flt_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__PP533855.B_E___B2_B_Flt_Bal_Max2_Y_No_Cap_,__CN(0),__CN(99999999))));
+    SELF.B_E___B2_B_Flt_Bal_Max_Msnc2_Y_ := IF(__PP533855.B_E___B2_B_Flt_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533855.B_E___B2_B_Flt_Bal_Max_Dt2_Y_),__PP533855.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__3_),__CN(0),__CN(24))));
+    SELF.B_E___B2_B_Flt_Bal_Vol24_Mc_ := MAP(__T(__OP2(__PP533855.B_E___B2_B_Flt_Rec_Flag_By_Mon_Sum24_Mc_,=,__CN(1)))=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533855.B_E___B2_B_Flt_Cnt24_Mc_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__ECAST(KEL.typ.nfloat,KEL.Routines.MinN(__OP2(__PP533855.B2b_T_L_Devation_Sample_In_Flt_,/,__PP533855.B2b_T_L_In_Flt_M_E_A_N_),__CN(2.0))));
+    SELF.B_E___B2_B_Flt_Pct2_Y_ := IF(__PP533855.B_E___B2_B_Cnt2_Y_ = 0,(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Flt_Cnt2_Y_No_Cap_ / __PP533855.B_E___B2_B_Cnt2_Y_No_Cap_ * 100);
+    SELF.B_E___B2_B_Flt_Worst_Perf_Msnc2_Y_ := MAP(__PP533855.B_E___B2_B_Flt_Cnt2_Y_ = 0=>__ECAST(KEL.typ.nint,__CN(__CC13594)),__PP533855.B_E___B2_B_Flt_Worst_Perf_Indx2_Y_ = (KEL.typ.str)0=>__ECAST(KEL.typ.nint,__CN(__CC13597)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533855.B_E___B2_B_Flt_Worst_Perf_Dt2_Y_),__PP533855.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__4_),__CN(0),__CN(24))));
+    SELF.B_E___B2_B_Mat_Bal_Max2_Y_ := IF(__PP533855.B_E___B2_B_Mat_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__PP533855.B_E___B2_B_Mat_Bal_Max2_Y_No_Cap_,__CN(0),__CN(99999999))));
+    SELF.B_E___B2_B_Mat_Bal_Max_Msnc2_Y_ := IF(__PP533855.B_E___B2_B_Mat_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533855.B_E___B2_B_Mat_Bal_Max_Dt2_Y_),__PP533855.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__5_),__CN(0),__CN(24))));
+    SELF.B_E___B2_B_Mat_Bal_Vol24_Mc_ := MAP(__T(__OP2(__PP533855.B_E___B2_B_Mat_Rec_Flag_By_Mon_Sum24_Mc_,=,__CN(1)))=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533855.B_E___B2_B_Mat_Cnt24_Mc_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__ECAST(KEL.typ.nfloat,KEL.Routines.MinN(__OP2(__PP533855.B2b_T_L_Devation_Sample_In_Mat_,/,__PP533855.B2b_T_L_In_Mat_M_E_A_N_),__CN(2.0))));
+    SELF.B_E___B2_B_Mat_Pct2_Y_ := IF(__PP533855.B_E___B2_B_Cnt2_Y_ = 0,(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Mat_Cnt2_Y_No_Cap_ / __PP533855.B_E___B2_B_Cnt2_Y_No_Cap_ * 100);
+    SELF.B_E___B2_B_Mat_Worst_Perf_Msnc2_Y_ := MAP(__PP533855.B_E___B2_B_Mat_Cnt2_Y_ = 0=>__ECAST(KEL.typ.nint,__CN(__CC13594)),__PP533855.B_E___B2_B_Mat_Worst_Perf_Indx2_Y_ = (KEL.typ.str)0=>__ECAST(KEL.typ.nint,__CN(__CC13597)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533855.B_E___B2_B_Mat_Worst_Perf_Dt2_Y_),__PP533855.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__6_),__CN(0),__CN(24))));
+    SELF.B_E___B2_B_New_Msnc2_Y_ := IF(__PP533855.B_E___B2_B_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533855.B_E___B2_B_New_Dt2_Y_),__PP533855.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__7_),__CN(0),__CN(24))));
+    SELF.B_E___B2_B_Old_Msnc2_Y_ := IF(__PP533855.B_E___B2_B_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533855.B_E___B2_B_Old_Dt2_Y_),__PP533855.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__8_),__CN(0),__CN(24))));
+    SELF.B_E___B2_B_Old_Msnc_Ev_ := IF(__T(__OP2(__PP533855.B_E___B2_B_Cnt_Ev_,=,__CN(0))),__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533855.B_E___B2_B_Old_Dt_Ev_),__PP533855.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__9_),__CN(0),__CN(999))));
+    SELF.B_E___B2_B_Ops_Bal_Max2_Y_ := IF(__PP533855.B_E___B2_B_Ops_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__PP533855.B_E___B2_B_Ops_Bal_Max2_Y_No_Cap_,__CN(0),__CN(99999999))));
+    SELF.B_E___B2_B_Ops_Bal_Max_Msnc2_Y_ := IF(__PP533855.B_E___B2_B_Ops_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533855.B_E___B2_B_Ops_Bal_Max_Dt2_Y_),__PP533855.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__10_),__CN(0),__CN(24))));
+    SELF.B_E___B2_B_Ops_Bal_Vol24_Mc_ := MAP(__T(__OP2(__PP533855.B_E___B2_B_Ops_Rec_Flag_By_Mon_Sum24_Mc_,=,__CN(1)))=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533855.B_E___B2_B_Ops_Cnt24_Mc_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__ECAST(KEL.typ.nfloat,KEL.Routines.MinN(__OP2(__PP533855.B2b_T_L_Devation_Sample_In_Ops_,/,__PP533855.B2b_T_L_In_Ops_M_E_A_N_),__CN(2.0))));
+    SELF.B_E___B2_B_Ops_Pct2_Y_ := IF(__PP533855.B_E___B2_B_Cnt2_Y_ = 0,(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Ops_Cnt2_Y_No_Cap_ / __PP533855.B_E___B2_B_Cnt2_Y_No_Cap_ * 100);
+    SELF.B_E___B2_B_Ops_Worst_Perf_Msnc2_Y_ := MAP(__PP533855.B_E___B2_B_Ops_Cnt2_Y_ = 0=>__ECAST(KEL.typ.nint,__CN(__CC13594)),__PP533855.B_E___B2_B_Ops_Worst_Perf_Indx2_Y_ = (KEL.typ.str)0=>__ECAST(KEL.typ.nint,__CN(__CC13597)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533855.B_E___B2_B_Ops_Worst_Perf_Dt2_Y_),__PP533855.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__11_),__CN(0),__CN(24))));
+    SELF.B_E___B2_B_Oth_Bal_Max2_Y_ := IF(__PP533855.B_E___B2_B_Oth_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__PP533855.B_E___B2_B_Oth_Bal_Max2_Y_No_Cap_,__CN(0),__CN(99999999))));
+    SELF.B_E___B2_B_Oth_Bal_Max_Msnc2_Y_ := IF(__PP533855.B_E___B2_B_Oth_Cnt2_Y_ = 0,__ECAST(KEL.typ.nint,__CN(__CC13594)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533855.B_E___B2_B_Oth_Bal_Max_Dt2_Y_),__PP533855.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__12_),__CN(0),__CN(24))));
+    SELF.B_E___B2_B_Oth_Bal_Vol24_Mc_ := MAP(__T(__OP2(__PP533855.B_E___B2_B_Oth_Rec_Flag_By_Mon_Sum24_Mc_,=,__CN(1)))=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13597))),__PP533855.B_E___B2_B_Oth_Cnt24_Mc_ = 0=>__ECAST(KEL.typ.nfloat,__CAST(KEL.typ.float,__CN(__CC13594))),__ECAST(KEL.typ.nfloat,KEL.Routines.MinN(__OP2(__PP533855.B2b_T_L_Devation_Sample_In_Oth_,/,__PP533855.B2b_T_L_In_Oth_M_E_A_N_),__CN(2.0))));
+    SELF.B_E___B2_B_Oth_Pct2_Y_ := IF(__PP533855.B_E___B2_B_Cnt2_Y_ = 0,(KEL.typ.float)__CC13594,__PP533855.B_E___B2_B_Oth_Cnt2_Y_No_Cap_ / __PP533855.B_E___B2_B_Cnt2_Y_No_Cap_ * 100);
+    SELF.B_E___B2_B_Oth_Worst_Perf_Msnc2_Y_ := MAP(__PP533855.B_E___B2_B_Oth_Cnt2_Y_ = 0=>__ECAST(KEL.typ.nint,__CN(__CC13594)),__PP533855.B_E___B2_B_Oth_Worst_Perf_Indx2_Y_ = (KEL.typ.str)0=>__ECAST(KEL.typ.nint,__CN(__CC13597)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533855.B_E___B2_B_Oth_Worst_Perf_Dt2_Y_),__PP533855.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__13_),__CN(0),__CN(24))));
+    SELF.B_E___B2_B_Worst_Perf_Msnc2_Y_ := MAP(__PP533855.B_E___B2_B_Cnt2_Y_ = 0=>__ECAST(KEL.typ.nint,__CN(__CC13594)),__PP533855.B_E___B2_B_Worst_Perf_Indx2_Y_ = (KEL.typ.str)0=>__ECAST(KEL.typ.nint,__CN(__CC13597)),__ECAST(KEL.typ.nint,__FN3(KEL.Routines.BoundsFold,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP533855.B_E___B2_B_Worst_Perf_Dt2_Y_),__PP533855.O_N_L_Y___C_U_R_R_E_N_T___D_A_T_E__14_),__CN(0),__CN(24))));
+    __BS536051 := __T(__PP533855.Data_Sources_);
+    SELF.B___Lex_I_D_Legal_Seen_Flag_ := IF(EXISTS(__BS536051(__T(__T(__PP533855.Data_Sources_).Header_Hit_Flag_))),'1','0');
+    SELF := __PP533855;
   END;
-  EXPORT __ENH_Business_Sele := PROJECT(__EE533808,__ND533813__Project(LEFT));
+  EXPORT __ENH_Business_Sele := PROJECT(__EE533854,__ND533859__Project(LEFT));
 END;
