@@ -730,39 +730,17 @@ EXPORT product_files := MODULE
 		//																		ln_fares_id NOT IN LN_PropertyV2.Suppress_LNFaresID);
 		// ===================================================================
 		
-		// Search file.
-		EXPORT layout_search_file_b := RECORD
-			LN_PropertyV2.Layout_DID_Out.ln_fares_id;
-			LN_PropertyV2.Layout_DID_Out.fname;
-			LN_PropertyV2.Layout_DID_Out.mname;
-			LN_PropertyV2.Layout_DID_Out.lname;
-			LN_PropertyV2.Layout_DID_Out.name_suffix;
-			LN_PropertyV2.Layout_DID_Out.cname;
-			LN_PropertyV2.Layout_DID_Out.prim_range;
-			LN_PropertyV2.Layout_DID_Out.predir;
-			LN_PropertyV2.Layout_DID_Out.prim_name;
-			LN_PropertyV2.Layout_DID_Out.suffix;
-			LN_PropertyV2.Layout_DID_Out.postdir;
-			LN_PropertyV2.Layout_DID_Out.unit_desig;
-			LN_PropertyV2.Layout_DID_Out.sec_range;
-			LN_PropertyV2.Layout_DID_Out.p_city_name;
-			LN_PropertyV2.Layout_DID_Out.st;
-			LN_PropertyV2.Layout_DID_Out.zip;
-			LN_PropertyV2.Layout_DID_Out.did;
-			LN_PropertyV2.Layout_DID_Out.bdid;
-			LN_PropertyV2.Layout_DID_Out.prop_addr_propagated_ind;
-			LN_PropertyV2.Layout_DID_Out.dt_last_seen;
-			LN_PropertyV2.Layout_DID_Out.dt_vendor_last_reported;
-			LN_PropertyV2.Layout_DID_Out.app_ssn;
-			LN_PropertyV2.Layout_DID_Out.process_date;
-		END;
+		// Search file.		
+		EXPORT Property_search_Roxiesuperfile:= 'thor_data400::key::ln_propertyv2::qa::search.fid';
+		EXPORT Property_search_keyname_monitor := 'monitor::LN_PropertyV2::Search_fid';
+		EXPORT Property_search_superkey_monitor := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + Property_search_keyname_monitor + '_qa';
 		
-		EXPORT search_filename_raw := 'thor_data400::base::ln_propertyv2::search';
-		EXPORT search_filename     := AccountMonitoring.constants.DATA_LOCATION + search_filename_raw;
-		EXPORT search_file         := DATASET(search_filename, LN_PropertyV2.Layout_DID_Out, THOR);
-		EXPORT search_file_cleaned := 
-			search_file
-				( NOT ( LENGTH(TRIM(cname)) BETWEEN 1 AND 3 OR
+    SHARED Property_search_key_undist := INDEX(
+												LN_PropertyV2.key_search_fid(),  
+												Property_search_superkey_monitor
+												);
+    
+    SHARED Property_search_key_filtered := Property_search_key_undist( NOT ( LENGTH(TRIM(cname)) BETWEEN 1 AND 3 OR
 							 ( TRIM(prim_range)  = '' AND 
 								 TRIM(prim_name)   = '' AND 
 								 TRIM(v_city_name) = '' AND 
@@ -771,62 +749,53 @@ EXPORT product_files := MODULE
 							) AND
 				 (source_code[2] = 'P') AND
 				 ln_fares_id NOT IN LN_PropertyV2.Suppress_LNFaresID );
-		
-		EXPORT search_file_cleaned_slim := PROJECT(search_file_cleaned,layout_search_file_b);
 
-		EXPORT search_file_dist_slim := 
-			DISTRIBUTE(search_file_cleaned_slim,
+		SHARED Property_search_key_dist := 
+			DISTRIBUTE(Property_search_key_filtered,
 			           HASH32(did, bdid, app_ssn, lname, fname, 
-								        prim_range, prim_name, suffix, p_city_name, st, zip));
-												
-		EXPORT search_file_slim := 
-			DEDUP(SORT(search_file_dist_slim,
+								prim_range, prim_name, suffix, p_city_name, st, zip)): INDEPENDENT;
+	  
+		EXPORT Property_search_key_sorted := DEDUP(SORT(Property_search_key_dist,
 								 did, bdid, app_ssn, lname, fname, 
-								 prim_range, prim_name, suffix, p_city_name, st, zip, -process_date, 
+								 prim_range, prim_name, suffix, p_city_name, st, zip, -process_date, RECORD,
 								 LOCAL),
 						did, bdid, app_ssn, lname, fname, 
 						prim_range, prim_name, suffix, p_city_name, st, zip, 
-						LOCAL)
-			: /*INDEPENDENT;*/ PERSIST('acctmon::property::search_file_slim');
-	
+						LOCAL);
+
 		// Deeds file.
-		EXPORT layout_deeds_file_b := RECORD
-			LN_PropertyV2.layout_addl_fares_deed.ln_fares_id;
-			LN_PropertyV2.layout_addl_fares_deed.fares_refi_flag;
-		END;
-		
-		EXPORT deeds_filename_raw := 'thor_data400::base::ln_propertyv2::Addl::fares_deed';
-		EXPORT deeds_filename     := AccountMonitoring.constants.DATA_LOCATION + deeds_filename_raw;
-		EXPORT deeds_file         := DATASET(deeds_filename, LN_PropertyV2.layout_addl_fares_deed, THOR);
-		
-		SHARED deeds_file_slim := PROJECT(deeds_file,layout_deeds_file_b);
-
-		EXPORT deeds_file_dist := 
-			DISTRIBUTE(deeds_file_slim, HASH64(ln_fares_id)) : /*INDEPENDENT;*/ PERSIST('acctmon::property::deeds_file_slim');
 	
-		// Linkid key
-		property_build_version         := TRIM(did_add.get_EnvVariable('Property_Build_Version') ):INDEPENDENT;
-		
-		EXPORT SearchLinkid_keyname_raw := 'thor_data400::key::ln_propertyv2::' + property_build_version + '::search.linkids';
-		EXPORT SearchLinkid_keyname     := AccountMonitoring.constants.DATA_LOCATION + SearchLinkid_keyname_raw;
-			
-		EXPORT SearchLinkid_superkeyname_raw 	:= 'thor_data400::key::ln_propertyv2' + doxie.Version_SuperKey + '::search.linkids';
-		EXPORT SearchLinkid_superkeyname     	:= AccountMonitoring.constants.DATA_LOCATION + SearchLinkid_superkeyname_raw;
+		EXPORT Property_deed_Roxiesuperfile := 'thor_data400::key::ln_propertyv2::qa::addlfaresdeed.fid';
+		EXPORT Property_deed_keyname_monitor := 'monitor::LN_PropertyV2::addlfaresdeed.fid';
+		EXPORT Property_deed_superkey_monitor := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + Property_deed_keyname_monitor + '_qa';
 
-		SHARED SearchLinkid_key_undist := 
+		SHARED Property_deed_key_undist := INDEX(
+										LN_PropertyV2.key_addl_fares_deed_fid,  
+										Property_deed_superkey_monitor
+										);
+
+		EXPORT Property_deed_key_dist := 
+			DISTRIBUTE(Property_deed_key_undist, HASH64(ln_fares_id)) : INDEPENDENT;
+	
+		// Linkid key		
+		EXPORT Property_SearchLinkid_Roxie_superfile := 'thor_data400::key::ln_propertyv2::qa::search.linkids';
+		EXPORT Property_SearchLinkid_keyname_monitor     := 'monitor::LN_PropertyV2::search.linkids';
+		EXPORT Property_SearchLinkid_superkey_monitor := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + Property_SearchLinkid_keyname_monitor + '_qa';
+
+		SHARED Property_SearchLinkid_superkey_undist := 
 				INDEX(
 					LN_PropertyV2.Key_LinkIds.key,  
-					SearchLinkid_keyname
+					Property_SearchLinkid_superkey_monitor
 				);
 
-		EXPORT SearchLinkid_key :=
+		EXPORT Property_SearchLinkid_superkey_dist :=
 				DISTRIBUTE(
-					SearchLinkid_key_undist, 
+					Property_SearchLinkid_superkey_undist, 
 					HASH64(seleid)
 					): INDEPENDENT; //PERSIST('acctmon::property::search_linkid');
 		
 		
-	END;
+	END; // End Property Module
 	
 	EXPORT litigiousdebtor := MODULE
 		
