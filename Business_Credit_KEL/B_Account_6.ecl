@@ -1,17 +1,17 @@
-﻿//HPCC Systems KEL Compiler Version 1.2.1-dev
-IMPORT KEL12 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.3.2
+IMPORT KEL13 AS KEL;
 IMPORT B_Account_7,B_Tradeline_7,CFG_graph,E_Account,E_Account_Tradeline,E_Tradeline FROM Business_Credit_KEL;
-IMPORT * FROM KEL12.Null;
+IMPORT * FROM KEL13.Null;
 EXPORT B_Account_6(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph __cfg = CFG_graph) := MODULE
   SHARED VIRTUAL TYPEOF(B_Account_7(__in,__cfg).__ENH_Account_7) __ENH_Account_7 := B_Account_7(__in,__cfg).__ENH_Account_7;
   SHARED VIRTUAL TYPEOF(E_Account_Tradeline(__in,__cfg).__Result) __E_Account_Tradeline := E_Account_Tradeline(__in,__cfg).__Result;
   SHARED VIRTUAL TYPEOF(B_Tradeline_7(__in,__cfg).__ENH_Tradeline_7) __ENH_Tradeline_7 := B_Tradeline_7(__in,__cfg).__ENH_Tradeline_7;
-  SHARED __EE309779 := __ENH_Account_7;
-  SHARED __EE309859 := __EE309779;
-  SHARED __EE310285 := __E_Account_Tradeline;
-  SHARED __EE314370 := __EE310285(__NN(__EE310285._trade_) AND __NN(__EE310285._acc_));
-  SHARED __EE310287 := __ENH_Tradeline_7;
-  SHARED __ST311900_Layout := RECORD
+  SHARED __EE9810895 := __ENH_Account_7;
+  SHARED __EE9810898 := __EE9810895;
+  SHARED __EE300033 := __E_Account_Tradeline;
+  SHARED __EE9813044 := __EE300033(__NN(__EE300033._trade_) AND __NN(__EE300033._acc_));
+  SHARED __EE9810901 := __ENH_Tradeline_7;
+  SHARED __ST301649_Layout := RECORD
     KEL.typ.ntyp(E_Account().Typ) _acc_;
     KEL.typ.ntyp(E_Tradeline().Typ) _trade_;
     KEL.typ.nuid UID;
@@ -44,7 +44,7 @@ EXPORT B_Account_6(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph _
     KEL.typ.nstr _payment__interval_;
     KEL.typ.nstr _payment__status__category_;
     KEL.typ.nint D_B_T___V5_;
-    KEL.typ.nstr _ln__delinquency__date_;
+    KEL.typ.nint _raw__dbt__v5_;
     KEL.typ.nunk _term__of__account__in__months_;
     KEL.typ.nkdate _first__payment__due__date_;
     KEL.typ.nkdate _final__pyament__due__date_;
@@ -110,13 +110,13 @@ EXPORT B_Account_6(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph _
     KEL.typ.nbool Shows_Closed_Account_;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC314382(E_Account_Tradeline(__in,__cfg).Layout __EE314370, B_Tradeline_7(__in,__cfg).__ST251429_Layout __EE310287) := __EEQP(__EE314370._trade_,__EE310287.UID);
-  __ST311900_Layout __JT314382(E_Account_Tradeline(__in,__cfg).Layout __l, B_Tradeline_7(__in,__cfg).__ST251429_Layout __r) := TRANSFORM
+  __JC9813056(E_Account_Tradeline(__in,__cfg).Layout __EE9813044, B_Tradeline_7(__in,__cfg).__ST251468_Layout __EE9810901) := __EEQP(__EE9813044._trade_,__EE9810901.UID);
+  __ST301649_Layout __JT9813056(E_Account_Tradeline(__in,__cfg).Layout __l, B_Tradeline_7(__in,__cfg).__ST251468_Layout __r) := TRANSFORM
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE314383 := JOIN(__EE314370,__EE310287,__JC314382(LEFT,RIGHT),__JT314382(LEFT,RIGHT),INNER,HASH);
-  SHARED __ST312300_Layout := RECORD
+  SHARED __EE9813057 := JOIN(__EE9813044,__EE9810901,__JC9813056(LEFT,RIGHT),__JT9813056(LEFT,RIGHT),INNER,HASH);
+  SHARED __ST302150_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nunk _seq_;
     KEL.typ.nunk _ultid_;
@@ -194,7 +194,7 @@ EXPORT B_Account_6(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph _
     KEL.typ.nstr _payment__interval_;
     KEL.typ.nstr _payment__status__category_;
     KEL.typ.nint D_B_T___V5_;
-    KEL.typ.nstr _ln__delinquency__date_;
+    KEL.typ.nint _raw__dbt__v5_;
     KEL.typ.nunk _term__of__account__in__months_;
     KEL.typ.nkdate _first__payment__due__date_;
     KEL.typ.nkdate _final__pyament__due__date_;
@@ -260,14 +260,14 @@ EXPORT B_Account_6(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph _
     KEL.typ.nbool Shows_Closed_Account_;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC314492(B_Account_7(__in,__cfg).__ST251089_Layout __EE309859, __ST311900_Layout __EE314383) := __EEQP(__EE309859.UID,__EE314383._acc_);
-  __ST312300_Layout __JT314492(B_Account_7(__in,__cfg).__ST251089_Layout __l, __ST311900_Layout __r) := TRANSFORM
+  __JC9813166(B_Account_7(__in,__cfg).__ST251128_Layout __EE9810898, __ST301649_Layout __EE9813057) := __EEQP(__EE9810898.UID,__EE9813057._acc_);
+  __ST302150_Layout __JT9813166(B_Account_7(__in,__cfg).__ST251128_Layout __l, __ST301649_Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE314493 := JOIN(__EE314383,__EE309859,__JC314492(RIGHT,LEFT),__JT314492(RIGHT,LEFT),INNER,HASH);
-  SHARED __ST311432_Layout := RECORD
+  SHARED __EE9813167 := JOIN(__EE9813057,__EE9810898,__JC9813166(RIGHT,LEFT),__JT9813166(RIGHT,LEFT),INNER,HASH);
+  SHARED __ST301180_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Account().Typ) _acc_;
     KEL.typ.ntyp(E_Tradeline().Typ) _trade_;
@@ -301,7 +301,7 @@ EXPORT B_Account_6(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph _
     KEL.typ.nstr _payment__interval_;
     KEL.typ.nstr _payment__status__category_;
     KEL.typ.nint D_B_T___V5_;
-    KEL.typ.nstr _ln__delinquency__date_;
+    KEL.typ.nint _raw__dbt__v5_;
     KEL.typ.nunk _term__of__account__in__months_;
     KEL.typ.nkdate _first__payment__due__date_;
     KEL.typ.nkdate _final__pyament__due__date_;
@@ -367,24 +367,24 @@ EXPORT B_Account_6(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph _
     KEL.typ.nbool Shows_Closed_Account_;
     KEL.typ.nkdate Most_Recent_Type_Report_Date_;
   END;
-  SHARED __EE315035 := PROJECT(__EE314493,__ST311432_Layout);
-  SHARED __ST311651_Layout := RECORD
+  SHARED __EE9813709 := PROJECT(__EE9813167,__ST301180_Layout);
+  SHARED __ST301400_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Exp1_;
     KEL.typ.nkdate _cycle__end__date_;
   END;
-  SHARED __ST311651_Layout __ND315040__Project(__ST311432_Layout __PP315036) := TRANSFORM
-    SELF.Exp1_ := IF(__T(__OP2(__PP315036._load__date_,=,__PP315036.Most_Recent_Type_Report_Date_)),__ECAST(KEL.typ.nint,__PP315036._account__type__reported_),__ECAST(KEL.typ.nint,__N(KEL.typ.int)));
-    SELF := __PP315036;
+  SHARED __ST301400_Layout __ND9813714__Project(__ST301180_Layout __PP9813710) := TRANSFORM
+    SELF.Exp1_ := IF(__T(__OP2(__PP9813710._load__date_,=,__PP9813710.Most_Recent_Type_Report_Date_)),__ECAST(KEL.typ.nint,__PP9813710._account__type__reported_),__ECAST(KEL.typ.nint,__N(KEL.typ.int)));
+    SELF := __PP9813710;
   END;
-  SHARED __EE315059 := PROJECT(__EE315035,__ND315040__Project(LEFT));
-  SHARED __ST311671_Layout := RECORD
+  SHARED __EE9813733 := PROJECT(__EE9813709,__ND9813714__Project(LEFT));
+  SHARED __ST301420_Layout := RECORD
     KEL.typ.nint O_N_L_Y__account__type__reported_;
     KEL.typ.nkdate M_A_X__cycle__end__date_;
     KEL.typ.nuid UID;
   END;
-  SHARED __EE315080 := PROJECT(__CLEANANDDO(__EE315059,TABLE(__EE315059,{KEL.Aggregates.MaxNG(__EE315059.Exp1_) O_N_L_Y__account__type__reported_,KEL.Aggregates.MaxNG(__EE315059._cycle__end__date_) M_A_X__cycle__end__date_,UID},UID,MERGE)),__ST311671_Layout);
-  SHARED __ST312853_Layout := RECORD
+  SHARED __EE9813754 := PROJECT(__CLEANANDDO(__EE9813733,TABLE(__EE9813733,{KEL.Aggregates.MaxNG(__EE9813733.Exp1_) O_N_L_Y__account__type__reported_,KEL.Aggregates.MaxNG(__EE9813733._cycle__end__date_) M_A_X__cycle__end__date_,UID},UID,MERGE)),__ST301420_Layout);
+  SHARED __ST302804_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nunk _seq_;
     KEL.typ.nunk _ultid_;
@@ -435,14 +435,14 @@ EXPORT B_Account_6(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph _
     KEL.typ.nuid U_I_D__1_;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC315086(B_Account_7(__in,__cfg).__ST251089_Layout __EE309779, __ST311671_Layout __EE315080) := __EEQP(__EE309779.UID,__EE315080.UID);
-  __ST312853_Layout __JT315086(B_Account_7(__in,__cfg).__ST251089_Layout __l, __ST311671_Layout __r) := TRANSFORM
+  __JC9813760(B_Account_7(__in,__cfg).__ST251128_Layout __EE9810895, __ST301420_Layout __EE9813754) := __EEQP(__EE9810895.UID,__EE9813754.UID);
+  __ST302804_Layout __JT9813760(B_Account_7(__in,__cfg).__ST251128_Layout __l, __ST301420_Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE315087 := JOIN(__EE309779,__EE315080,__JC315086(LEFT,RIGHT),__JT315086(LEFT,RIGHT),LEFT OUTER,HASH);
-  EXPORT __ST250344_Layout := RECORD
+  SHARED __EE9813761 := JOIN(__EE9810895,__EE9813754,__JC9813760(LEFT,RIGHT),__JT9813760(LEFT,RIGHT),LEFT OUTER,HASH);
+  EXPORT __ST250383_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nunk _seq_;
     KEL.typ.nunk _ultid_;
@@ -499,17 +499,17 @@ EXPORT B_Account_6(CFG_graph.FDCDataset __in = CFG_graph.FDCDefault, CFG_graph _
     KEL.typ.nbool Opened_Last84_Month_;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST250344_Layout __ND315431__Project(__ST312853_Layout __PP315088) := TRANSFORM
-    SELF.Account_Type_ := __PP315088.O_N_L_Y__account__type__reported_;
-    SELF.Has_Closed12_Month_ := __AND(__AND(__NOT(__PP315088.Opened_Last12_Month_),__CN(__PP315088.Has_Closed_)),__OP2(__FN2(KEL.Routines.MonthsBetween,__PP315088.Date_Closed_Estimated_,__CN(__cfg.CurrentDate)),>=,__CN(12)));
-    SELF.Has_Closed24_Month_ := __AND(__AND(__NOT(__PP315088.Opened_Last24_Month_),__CN(__PP315088.Has_Closed_)),__OP2(__FN2(KEL.Routines.MonthsBetween,__PP315088.Date_Closed_Estimated_,__CN(__cfg.CurrentDate)),>=,__CN(24)));
-    SELF.Has_Closed36_Month_ := __AND(__AND(__NOT(__PP315088.Opened_Last36_Month_),__CN(__PP315088.Has_Closed_)),__OP2(__FN2(KEL.Routines.MonthsBetween,__PP315088.Date_Closed_Estimated_,__CN(__cfg.CurrentDate)),>=,__CN(36)));
-    SELF.Has_Closed3_Month_ := __AND(__AND(__NOT(__PP315088.Opened_Last03_Month_),__CN(__PP315088.Has_Closed_)),__OP2(__FN2(KEL.Routines.MonthsBetween,__PP315088.Date_Closed_Estimated_,__CN(__cfg.CurrentDate)),>=,__CN(3)));
-    SELF.Has_Closed60_Month_ := __AND(__AND(__NOT(__PP315088.Opened_Last60_Month_),__CN(__PP315088.Has_Closed_)),__OP2(__FN2(KEL.Routines.MonthsBetween,__PP315088.Date_Closed_Estimated_,__CN(__cfg.CurrentDate)),>=,__CN(60)));
-    SELF.Has_Closed6_Month_ := __AND(__AND(__NOT(__PP315088.Opened_Last06_Month_),__CN(__PP315088.Has_Closed_)),__OP2(__FN2(KEL.Routines.MonthsBetween,__PP315088.Date_Closed_Estimated_,__CN(__cfg.CurrentDate)),>=,__CN(6)));
-    SELF.Has_Closed84_Month_ := __AND(__AND(__NOT(__PP315088.Opened_Last84_Month_),__CN(__PP315088.Has_Closed_)),__OP2(__FN2(KEL.Routines.MonthsBetween,__PP315088.Date_Closed_Estimated_,__CN(__cfg.CurrentDate)),>=,__CN(84)));
-    SELF.Last_Cycle_End_Date_ := __PP315088.M_A_X__cycle__end__date_;
-    SELF := __PP315088;
+  SHARED __ST250383_Layout __ND9814105__Project(__ST302804_Layout __PP9813762) := TRANSFORM
+    SELF.Account_Type_ := __PP9813762.O_N_L_Y__account__type__reported_;
+    SELF.Has_Closed12_Month_ := __AND(__AND(__NOT(__PP9813762.Opened_Last12_Month_),__CN(__PP9813762.Has_Closed_)),__OP2(__FN2(KEL.Routines.MonthsBetween,__PP9813762.Date_Closed_Estimated_,__CN(__cfg.CurrentDate)),>=,__CN(12)));
+    SELF.Has_Closed24_Month_ := __AND(__AND(__NOT(__PP9813762.Opened_Last24_Month_),__CN(__PP9813762.Has_Closed_)),__OP2(__FN2(KEL.Routines.MonthsBetween,__PP9813762.Date_Closed_Estimated_,__CN(__cfg.CurrentDate)),>=,__CN(24)));
+    SELF.Has_Closed36_Month_ := __AND(__AND(__NOT(__PP9813762.Opened_Last36_Month_),__CN(__PP9813762.Has_Closed_)),__OP2(__FN2(KEL.Routines.MonthsBetween,__PP9813762.Date_Closed_Estimated_,__CN(__cfg.CurrentDate)),>=,__CN(36)));
+    SELF.Has_Closed3_Month_ := __AND(__AND(__NOT(__PP9813762.Opened_Last03_Month_),__CN(__PP9813762.Has_Closed_)),__OP2(__FN2(KEL.Routines.MonthsBetween,__PP9813762.Date_Closed_Estimated_,__CN(__cfg.CurrentDate)),>=,__CN(3)));
+    SELF.Has_Closed60_Month_ := __AND(__AND(__NOT(__PP9813762.Opened_Last60_Month_),__CN(__PP9813762.Has_Closed_)),__OP2(__FN2(KEL.Routines.MonthsBetween,__PP9813762.Date_Closed_Estimated_,__CN(__cfg.CurrentDate)),>=,__CN(60)));
+    SELF.Has_Closed6_Month_ := __AND(__AND(__NOT(__PP9813762.Opened_Last06_Month_),__CN(__PP9813762.Has_Closed_)),__OP2(__FN2(KEL.Routines.MonthsBetween,__PP9813762.Date_Closed_Estimated_,__CN(__cfg.CurrentDate)),>=,__CN(6)));
+    SELF.Has_Closed84_Month_ := __AND(__AND(__NOT(__PP9813762.Opened_Last84_Month_),__CN(__PP9813762.Has_Closed_)),__OP2(__FN2(KEL.Routines.MonthsBetween,__PP9813762.Date_Closed_Estimated_,__CN(__cfg.CurrentDate)),>=,__CN(84)));
+    SELF.Last_Cycle_End_Date_ := __PP9813762.M_A_X__cycle__end__date_;
+    SELF := __PP9813762;
   END;
-  EXPORT __ENH_Account_6 := PROJECT(__EE315087,__ND315431__Project(LEFT));
+  EXPORT __ENH_Account_6 := PROJECT(__EE9813761,__ND9814105__Project(LEFT));
 END;
